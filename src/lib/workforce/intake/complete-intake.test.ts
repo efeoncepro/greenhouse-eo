@@ -6,6 +6,7 @@ const withTransactionMock = vi.fn()
 const canMock = vi.fn()
 const publishOutboxEventMock = vi.fn()
 const resolveWorkforceActivationReadinessMock = vi.fn()
+const ensureActivatedOnboardingCaseForMemberMock = vi.fn()
 
 vi.mock('@/lib/db', () => ({
   withTransaction: (...args: unknown[]) => withTransactionMock(...args)
@@ -22,6 +23,10 @@ vi.mock('@/lib/sync/publish-event', () => ({
 vi.mock('@/lib/workforce/activation/readiness', () => ({
   resolveWorkforceActivationReadiness: (...args: unknown[]) => resolveWorkforceActivationReadinessMock(...args),
   buildWorkforceActivationReadinessAuditSnapshot: (readiness: unknown) => ({ readiness })
+}))
+
+vi.mock('@/lib/workforce/onboarding/store', () => ({
+  ensureActivatedOnboardingCaseForMember: (...args: unknown[]) => ensureActivatedOnboardingCaseForMemberMock(...args)
 }))
 
 const { completeWorkforceMemberIntake } = await import('./complete-intake')
@@ -83,6 +88,14 @@ describe('completeWorkforceMemberIntake', () => {
     vi.clearAllMocks()
     canMock.mockImplementation((_subject, capability) => capability === 'workforce.member.complete_intake')
     resolveWorkforceActivationReadinessMock.mockResolvedValue(ready)
+    ensureActivatedOnboardingCaseForMemberMock.mockResolvedValue({
+      onboardingCase: {
+        onboardingCaseId: 'onboarding-case-1',
+        publicId: 'EO-ON-2026-ABC12345'
+      },
+      created: true,
+      transitioned: true
+    })
     withTransactionMock.mockImplementation(async callback => callback(buildClient([memberRow])))
   })
 
@@ -98,6 +111,7 @@ describe('completeWorkforceMemberIntake', () => {
           memberId: 'mem-1',
           previousStatus: 'pending_intake',
           newStatus: 'completed',
+          onboardingCaseId: 'onboarding-case-1',
           readinessOverride: null
         })
       }),
@@ -113,6 +127,7 @@ describe('completeWorkforceMemberIntake', () => {
 
     expect(response.status).toBe(409)
     expect(payload.code).toBe('activation_readiness_blocked')
+    expect(ensureActivatedOnboardingCaseForMemberMock).not.toHaveBeenCalled()
     expect(publishOutboxEventMock).not.toHaveBeenCalled()
   })
 

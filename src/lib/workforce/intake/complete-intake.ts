@@ -16,6 +16,8 @@ import {
   buildWorkforceActivationReadinessAuditSnapshot,
   resolveWorkforceActivationReadiness
 } from '@/lib/workforce/activation/readiness'
+import { ensureActivatedOnboardingCaseForMember } from '@/lib/workforce/onboarding/store'
+import { HrCoreValidationError } from '@/lib/hr-core/shared'
 
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
@@ -145,6 +147,23 @@ export const completeWorkforceMemberIntake = async ({
         [memberId]
       )
 
+      const onboardingCaseResult = await ensureActivatedOnboardingCaseForMember(
+        {
+          memberId,
+          actorUserId: tenant.userId,
+          source: 'system',
+          reason: reason ?? 'workforce_intake_completed',
+          sourceRef: {
+            source: 'workforce_activation',
+            readinessSnapshotHash
+          },
+          metadata: {
+            readinessOverrideApplied: overrideApplied
+          }
+        },
+        client
+      )
+
       await publishOutboxEvent(
         {
           aggregateType: AGGREGATE_TYPES.member,
@@ -159,6 +178,10 @@ export const completeWorkforceMemberIntake = async ({
             newStatus: 'completed',
             actorUserId: tenant.userId,
             reason,
+            onboardingCaseId: onboardingCaseResult.onboardingCase.onboardingCaseId,
+            onboardingCasePublicId: onboardingCaseResult.onboardingCase.publicId,
+            onboardingCaseCreated: onboardingCaseResult.created,
+            onboardingCaseTransitioned: onboardingCaseResult.transitioned,
             readinessSnapshot,
             readinessSnapshotHash,
             readinessOverride: overrideApplied
@@ -181,6 +204,9 @@ export const completeWorkforceMemberIntake = async ({
           previousStatus,
           transitioned: true,
           actorUserId: tenant.userId,
+          onboardingCaseId: onboardingCaseResult.onboardingCase.onboardingCaseId,
+          onboardingCasePublicId: onboardingCaseResult.onboardingCase.publicId,
+          onboardingCaseCreated: onboardingCaseResult.created,
           readinessSnapshotHash,
           readinessOverrideApplied: overrideApplied
         },
@@ -188,6 +214,17 @@ export const completeWorkforceMemberIntake = async ({
       )
     })
   } catch (error) {
+    if (error instanceof HrCoreValidationError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+          code: error.code ?? 'workforce_intake_transition_failed',
+          details: error.details ?? null
+        },
+        { status: error.statusCode }
+      )
+    }
+
     captureWithDomain(error instanceof Error ? error : new Error(String(error)), 'identity', {
       tags: { source: 'workforce_member_complete_intake', stage: 'transition' },
       extra: { memberId }

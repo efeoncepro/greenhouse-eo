@@ -5881,6 +5881,10 @@ export interface GreenhouseHrOnboardingInstances {
    * Optional link to the canonical WorkRelationshipOffboardingCase. Checklist does not define the workforce exit event.
    */
   offboarding_case_id: string | null;
+  /**
+   * Optional parent WorkRelationshipOnboardingCase. Added by TASK-875 without changing checklist lifecycle.
+   */
+  onboarding_case_id: string | null;
   source: Generated<string>;
   source_ref: Generated<Json>;
   start_date: Timestamp;
@@ -6011,6 +6015,69 @@ export interface GreenhouseHrWorkRelationshipOffboardingCases {
   source: string;
   source_ref: Generated<Json>;
   space_id: string | null;
+  status: Generated<string>;
+  submitted_at: Timestamp | null;
+  updated_at: Generated<Timestamp>;
+  updated_by_user_id: string | null;
+  user_id: string | null;
+}
+
+export interface GreenhouseHrWorkRelationshipOnboardingCaseEvents {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  from_status: string | null;
+  onboarding_case_id: string;
+  payload_json: Generated<Json>;
+  reason: string | null;
+  source: Generated<string>;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrWorkRelationshipOnboardingCases {
+  activated_at: Timestamp | null;
+  approved_at: Timestamp | null;
+  blocked_reason: string | null;
+  cancelled_at: Timestamp | null;
+  contract_type_snapshot: Generated<string>;
+  country_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  deel_contract_id_snapshot: string | null;
+  employment_type: string | null;
+  first_working_day: Timestamp | null;
+  greenhouse_execution_mode: Generated<string>;
+  legacy_checklist_ref: Generated<Json>;
+  legal_entity_organization_id: string | null;
+  manager_member_id: string | null;
+  member_id: string | null;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  onboarding_case_id: string;
+  organization_id: string | null;
+  pay_regime_snapshot: Generated<string>;
+  payroll_via_snapshot: Generated<string>;
+  person_legal_entity_relationship_id: string | null;
+  profile_id: string;
+  public_id: string;
+  reason_code: string | null;
+  relationship_type: Generated<string>;
+  requires_application_access: Generated<boolean>;
+  requires_assignment_bootstrap: Generated<boolean>;
+  requires_equipment_or_access_setup: Generated<boolean>;
+  requires_hr_documents: Generated<boolean>;
+  requires_identity_provisioning: Generated<boolean>;
+  requires_leave_policy_bootstrap: Generated<boolean>;
+  requires_manager_assignment: Generated<boolean>;
+  requires_payroll_readiness: Generated<boolean>;
+  rule_lane: Generated<string>;
+  scheduled_at: Timestamp | null;
+  source: Generated<string>;
+  source_ref: Generated<Json>;
+  space_id: string | null;
+  start_date: Timestamp | null;
+  start_type: Generated<string>;
   status: Generated<string>;
   submitted_at: Timestamp | null;
   updated_at: Generated<Timestamp>;
@@ -9214,6 +9281,8 @@ export interface DB {
   "greenhouse_hr.onboarding_templates": GreenhouseHrOnboardingTemplates;
   "greenhouse_hr.work_relationship_offboarding_case_events": GreenhouseHrWorkRelationshipOffboardingCaseEvents;
   "greenhouse_hr.work_relationship_offboarding_cases": GreenhouseHrWorkRelationshipOffboardingCases;
+  "greenhouse_hr.work_relationship_onboarding_case_events": GreenhouseHrWorkRelationshipOnboardingCaseEvents;
+  "greenhouse_hr.work_relationship_onboarding_cases": GreenhouseHrWorkRelationshipOnboardingCases;
   "greenhouse_hr.workflow_approval_snapshots": GreenhouseHrWorkflowApprovalSnapshots;
   "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
   "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;

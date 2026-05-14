@@ -27,6 +27,7 @@ export const AGGREGATE_TYPES = {
   // HR
   leaveRequest: 'leave_request',
   leaveBalance: 'leave_balance',
+  workRelationshipOnboardingCase: 'work_relationship_onboarding_case',
   workRelationshipOffboardingCase: 'work_relationship_offboarding_case',
   onboardingInstance: 'onboarding_instance',
 
@@ -249,6 +250,12 @@ export const EVENT_TYPES = {
   assignmentCreated: 'assignment.created',
   assignmentUpdated: 'assignment.updated',
   assignmentRemoved: 'assignment.removed',
+  workRelationshipOnboardingCaseCreated: 'work_relationship_onboarding_case.created',
+  workRelationshipOnboardingCaseUpdated: 'work_relationship_onboarding_case.updated',
+  workRelationshipOnboardingCaseApproved: 'work_relationship_onboarding_case.approved',
+  workRelationshipOnboardingCaseScheduled: 'work_relationship_onboarding_case.scheduled',
+  workRelationshipOnboardingCaseActivated: 'work_relationship_onboarding_case.activated',
+  workRelationshipOnboardingCaseCancelled: 'work_relationship_onboarding_case.cancelled',
   workRelationshipOffboardingCaseCreated: 'work_relationship_offboarding_case.created',
   workRelationshipOffboardingCaseUpdated: 'work_relationship_offboarding_case.updated',
   workRelationshipOffboardingCaseApproved: 'work_relationship_offboarding_case.approved',

@@ -35,6 +35,7 @@ export type WorkforceActivationBlockerCode =
   | 'compensation_amount_missing'
   | 'legal_profile_blocked'
   | 'payment_profile_missing_or_unapproved'
+  | 'onboarding_case_blocked'
   | 'contractor_engagement_missing'
 
 export type WorkforceActivationWarningCode =
@@ -43,6 +44,9 @@ export type WorkforceActivationWarningCode =
   | 'legal_profile_warning'
   | 'payment_profile_pending_approval'
   | 'payment_profile_managed_by_deel'
+  | 'onboarding_case_missing'
+  | 'onboarding_case_open'
+  | 'onboarding_case_unavailable'
   | 'onboarding_checklist_missing'
   | 'onboarding_checklist_incomplete'
 

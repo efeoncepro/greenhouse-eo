@@ -6,6 +6,7 @@ const queryMock = vi.fn()
 const listPaymentProfilesMock = vi.fn()
 const assessPersonLegalReadinessMock = vi.fn()
 const resolveRoleTitleMock = vi.fn()
+const getLatestOnboardingCaseForMemberMock = vi.fn()
 
 vi.mock('@/lib/db', () => ({
   query: (...args: unknown[]) => queryMock(...args)
@@ -21,6 +22,12 @@ vi.mock('@/lib/person-legal-profile/readiness', () => ({
 
 vi.mock('@/lib/workforce/role-title', () => ({
   resolveRoleTitle: (...args: unknown[]) => resolveRoleTitleMock(...args)
+}))
+
+vi.mock('@/lib/workforce/onboarding/store', () => ({
+  getLatestOnboardingCaseForMember: (...args: unknown[]) => getLatestOnboardingCaseForMemberMock(...args),
+  isOnboardingCaseSchemaUnavailableError: (error: unknown) =>
+    Boolean(error && typeof error === 'object' && 'code' in error && (error as { code?: unknown }).code === '42P01')
 }))
 
 const { resolveWorkforceActivationReadiness } = await import('./readiness')
@@ -59,6 +66,12 @@ describe('TASK-874 resolveWorkforceActivationReadiness', () => {
     })
     assessPersonLegalReadinessMock.mockResolvedValue({ ready: true, useCase: 'payroll_chile_dependent', blockers: [], warnings: [] })
     listPaymentProfilesMock.mockResolvedValue({ items: [{ profileId: 'pay-1', status: 'active' }], total: 1 })
+    getLatestOnboardingCaseForMemberMock.mockResolvedValue({
+      onboardingCaseId: 'onboarding-case-1',
+      publicId: 'EO-ON-2026-ABC12345',
+      status: 'active',
+      blockedReason: null
+    })
   })
 
   it('marks a complete internal payroll member as ready_to_complete', async () => {
@@ -104,5 +117,31 @@ describe('TASK-874 resolveWorkforceActivationReadiness', () => {
 
     expect(result.ready).toBe(false)
     expect(result.blockers[0]?.code).toBe('member_not_found')
+  })
+
+  it('blocks activation when an onboarding case is explicitly blocked', async () => {
+    queryMock.mockResolvedValueOnce([baseRow])
+    getLatestOnboardingCaseForMemberMock.mockResolvedValueOnce({
+      onboardingCaseId: 'onboarding-case-1',
+      publicId: 'EO-ON-2026-ABC12345',
+      status: 'blocked',
+      blockedReason: 'Manager approval pending'
+    })
+
+    const result = await resolveWorkforceActivationReadiness('mem-1')
+
+    expect(result.ready).toBe(false)
+    expect(result.blockers.some(blocker => blocker.code === 'onboarding_case_blocked')).toBe(true)
+    expect(result.topBlockerLane).toBe('operational_onboarding')
+  })
+
+  it('warns but does not block when onboarding case is missing', async () => {
+    queryMock.mockResolvedValueOnce([baseRow])
+    getLatestOnboardingCaseForMemberMock.mockResolvedValueOnce(null)
+
+    const result = await resolveWorkforceActivationReadiness('mem-1')
+
+    expect(result.ready).toBe(true)
+    expect(result.warnings.some(warning => warning.code === 'onboarding_case_missing')).toBe(true)
   })
 })

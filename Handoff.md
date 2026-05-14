@@ -1,3 +1,18 @@
+# Sesion 2026-05-14 — TASK-875 WorkRelationship Onboarding Case Foundation SHIPPED ✅
+
+- **Branch**: `develop` directo por instruccion del usuario; no se cambio de rama.
+- **Qué cambió**: agregado canonico `WorkRelationshipOnboardingCase` para alta laboral/contractual: tabla `greenhouse_hr.work_relationship_onboarding_cases`, eventos append-only `work_relationship_onboarding_case_events`, FK opcional `greenhouse_hr.onboarding_instances.onboarding_case_id`, runtime `src/lib/workforce/onboarding/*`, event catalog y wiring en Workforce Activation.
+- **Activation wiring**:
+  - `completeWorkforceMemberIntake()` crea/activa el onboarding case idempotentemente dentro de la misma transaccion que marca `workforce_intake_status='completed'`.
+  - `resolveWorkforceActivationReadiness()` trata ausencia de caso como warning, caso abierto como warning y caso `blocked` como blocker de `operational_onboarding`.
+  - El evento `workforce.member.intake_completed` ahora incluye `onboardingCaseId` y `onboardingCasePublicId`.
+- **Menu fix live-feedback**: el usuario reporto que no veia Workforce Activation en el menu. Causa: el item estaba escondido dentro de `Supervisión` y además filtraba por `authorizedViews` client-side, mientras la page real autoriza por capability `workforce.member.activation_readiness.read` derivada de routeGroup/rol. Fix: Workforce Activation ahora es item plano bajo `Personas y HR`, justo despues de `Personas`, con fallback HR/Admin/Finance Admin alineado al entitlement runtime para tolerar claims stale.
+- **DB/runtime drift corregido**: `migrate:up` fallo inicialmente porque la migracion usaba `greenhouse_core.touch_updated_at()`, helper inexistente en DB real. Se corrigio a `greenhouse_hr.touch_onboarding_updated_at()`, que es la primitive vigente del dominio HRIS onboarding.
+- **Migraciones aplicadas**: `pnpm migrate:up` aplico las pendientes TASK-874 access y TASK-875 foundation; `src/types/db.d.ts` regenerado.
+- **Validacion ejecutada**: `pnpm pg:doctor`, `pnpm migrate:status`, `pnpm migrate:up`, focused Vitest 17/17, `pnpm exec tsc --noEmit --pretty false`, `pnpm lint` (0 errores, 4 warnings legacy TASK-825), `pnpm design:lint`, `pnpm build`.
+- **Docs actualizadas**: task completa TASK-875, README/registry, `GREENHOUSE_WORKFORCE_ONBOARDING_ARCHITECTURE_V1.md`, doc funcional HR readiness, `project_context.md`, `changelog.md`, Handoff.
+- **Riesgo/follow-up**: si el usuario prueba `dev-greenhouse.efeoncepro.com`, necesita que este commit se despliegue. Si entra directo por `/hr/workforce/activation` pero el menu no aparece en una sesion vieja, refrescar login; el fallback nuevo evita depender solo del claim `authorizedViews`.
+
 # Sesion 2026-05-14 — TASK-874 Workforce Activation Readiness SHIPPED ✅
 
 - **Branch**: `develop` directo por instrucción explícita del usuario; no se cambió de rama.

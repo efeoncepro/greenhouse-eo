@@ -129,6 +129,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     return viewCodes.some(viewCode => authorizedViews.includes(viewCode))
   }
 
+  const canSeeWorkforceActivation =
+    canSeeView('equipo.workforce_activation', true) ||
+    isHrUser ||
+    isAdminUser ||
+    roleCodes.includes(ROLE_CODES.FINANCE_ADMIN)
+
   const showSub = !(isCollapsed && !isHovered)
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
@@ -252,13 +258,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             children: [
               { label: nl(GH_HR_NAV.team), href: '/hr/team' },
               { label: nl(GH_HR_NAV.approvals), href: '/hr/approvals' },
-              { label: nl(GH_HR_NAV.workforceActivation), href: '/hr/workforce/activation' },
               { label: nl(GH_HR_NAV.departments), href: '/hr/departments' },
               { label: nl(GH_HR_NAV.offboarding), href: '/hr/offboarding' }
             ].filter(item => {
               if (item.href === '/hr/team') return canSeeHrTeamWorkspace
               if (item.href === '/hr/approvals') return canSeeHrTeamWorkspace
-              if (item.href === '/hr/workforce/activation') return canSeeView('equipo.workforce_activation', true)
               if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
               if (item.href === '/hr/offboarding') return canSeeView('equipo.offboarding', true)
 
@@ -307,6 +311,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         label: 'Personas y HR',
         children: [
           { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-address-book' },
+          ...(canSeeWorkforceActivation
+            ? [{ label: nl(GH_HR_NAV.workforceActivation), href: '/hr/workforce/activation', icon: 'tabler-user-check' }]
+            : []),
           ...hrItems
         ]
       })

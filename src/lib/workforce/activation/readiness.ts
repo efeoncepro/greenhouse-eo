@@ -3,6 +3,10 @@ import 'server-only'
 import { query } from '@/lib/db'
 import { listPaymentProfiles } from '@/lib/finance/beneficiary-payment-profiles/list-profiles'
 import { assessPersonLegalReadiness } from '@/lib/person-legal-profile/readiness'
+import {
+  getLatestOnboardingCaseForMember,
+  isOnboardingCaseSchemaUnavailableError
+} from '@/lib/workforce/onboarding/store'
 import { resolveRoleTitle } from '@/lib/workforce/role-title'
 
 import type {
@@ -174,6 +178,84 @@ const lane = (
   detail,
   deepLink: laneLink(memberId, key)
 })
+
+const resolveOperationalOnboardingLane = async (memberId: string) => {
+  const warnings: WorkforceActivationIssue[] = []
+  const blockers: WorkforceActivationIssue[] = []
+  let detail = 'Caso de onboarding listo para registrar la activación.'
+
+  try {
+    const onboardingCase = await getLatestOnboardingCaseForMember(memberId)
+
+    if (!onboardingCase) {
+      warnings.push(
+        issue(
+          memberId,
+          'operational_onboarding',
+          'onboarding_case_missing',
+          'Caso de onboarding se creará al activar',
+          'No existe un caso abierto todavía; el cierre de ficha lo crea y activa de forma idempotente.'
+        )
+      )
+      detail = 'Caso de onboarding pendiente de creación automática.'
+    } else if (onboardingCase.status === 'blocked') {
+      blockers.push(
+        issue(
+          memberId,
+          'operational_onboarding',
+          'onboarding_case_blocked',
+          'Caso de onboarding bloqueado',
+          onboardingCase.blockedReason ?? 'Resolver el bloqueo operacional antes de activar.'
+        )
+      )
+      detail = onboardingCase.blockedReason ?? 'Caso de onboarding bloqueado.'
+    } else if (onboardingCase.status !== 'active') {
+      warnings.push(
+        issue(
+          memberId,
+          'operational_onboarding',
+          'onboarding_case_open',
+          'Caso de onboarding abierto',
+          `El caso ${onboardingCase.publicId} está en estado ${onboardingCase.status}.`
+        )
+      )
+      detail = `Caso ${onboardingCase.publicId} abierto como ${onboardingCase.status}.`
+    }
+  } catch (error) {
+    if (!isOnboardingCaseSchemaUnavailableError(error)) {
+      throw error
+    }
+
+    warnings.push(
+      issue(
+        memberId,
+        'operational_onboarding',
+        'onboarding_case_unavailable',
+        'Foundation de onboarding pendiente',
+        'La tabla de casos de onboarding todavía no está disponible en este entorno.'
+      )
+    )
+    detail = 'Foundation de onboarding pendiente de migración.'
+  }
+
+  warnings.push(
+    issue(
+      memberId,
+      'operational_onboarding',
+      'onboarding_checklist_missing',
+      'Checklist operativo no conectado',
+      'El checklist HRIS queda como hijo operacional; no bloquea V1.'
+    )
+  )
+
+  const status: WorkforceActivationLaneStatus = blockers.length > 0 ? 'blocked' : warnings.length > 0 ? 'warning' : 'ready'
+
+  return {
+    lane: lane(memberId, 'operational_onboarding', status, blockers[0]?.detail ?? warnings[0]?.detail ?? detail),
+    blockers,
+    warnings
+  }
+}
 
 const loadMember = async (memberId: string): Promise<MemberReadinessRow | null> => {
   const rows = await query<MemberReadinessRow>(
@@ -576,10 +658,11 @@ export const resolveWorkforceActivationReadiness = async (
   warnings.push(...payment.warnings)
   lanes.push(payment.lane)
 
-  warnings.push(
-    issue(memberId, 'operational_onboarding', 'onboarding_checklist_missing', 'Checklist operativo no conectado', 'TASK-874 V1 no bloquea por checklist hasta consolidar onboarding runtime.')
-  )
-  lanes.push(lane(memberId, 'operational_onboarding', 'warning', 'Checklist visible como advisory V1.'))
+  const operationalOnboarding = await resolveOperationalOnboardingLane(memberId)
+
+  blockers.push(...operationalOnboarding.blockers)
+  warnings.push(...operationalOnboarding.warnings)
+  lanes.push(operationalOnboarding.lane)
 
   const isContractor = snapshot.contractType === 'honorarios' || snapshot.contractType === 'contractor' || snapshot.contractType === 'eor'
 
