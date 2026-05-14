@@ -25,6 +25,7 @@ import CustomChip from '@core/components/mui/Chip'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import MyPayrollEntryDrawer from './MyPayrollEntryDrawer'
 import { getMicrocopy } from '@/lib/copy'
+import { CanonicalApiError, throwIfNotOk } from '@/lib/api/parse-error-response'
 import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
@@ -219,7 +220,7 @@ const MiniTimeline = ({ steps }: { steps: MiniTimelineStep[] }) => (
 const MyPayrollView = () => {
   const [data, setData] = useState<PayrollData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<{ message: string; actionable: boolean; code: string | null } | null>(null)
   const [drawerEntry, setDrawerEntry] = useState<PayrollEntry | null>(null)
 
   const load = useCallback(async () => {
@@ -229,15 +230,22 @@ const MyPayrollView = () => {
     try {
       const res = await fetch('/api/my/payroll')
 
-      if (!res.ok) {
-        const payload = await res.json().catch(() => null)
-
-        throw new Error(payload?.error || 'No fue posible cargar tu nómina.')
-      }
-
+      await throwIfNotOk(res, 'No fue posible cargar tu nómina.')
       setData(await res.json())
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'No fue posible cargar tu nómina.')
+      if (loadError instanceof CanonicalApiError) {
+        setError({
+          message: loadError.message,
+          actionable: loadError.actionable,
+          code: loadError.code
+        })
+      } else {
+        setError({
+          message: loadError instanceof Error ? loadError.message : 'No fue posible cargar tu nómina.',
+          actionable: true,
+          code: null
+        })
+      }
     } finally {
       setLoading(false)
     }
@@ -264,14 +272,18 @@ const MyPayrollView = () => {
   if (error) {
     return (
       <Alert
-        severity='error'
-        action={(
-          <Button color='inherit' size='small' onClick={() => void load()}>
-            Reintentar
-          </Button>
-        )}
+        severity={error.actionable ? 'error' : 'warning'}
+        action={
+          error.actionable
+            ? (
+              <Button color='inherit' size='small' onClick={() => void load()}>
+                Reintentar
+              </Button>
+            )
+            : undefined
+        }
       >
-        {error}
+        {error.message}
       </Alert>
     )
   }

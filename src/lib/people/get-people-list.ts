@@ -1,11 +1,12 @@
 import 'server-only'
 
-import type { PeopleListPayload, PersonListItem } from '@/types/people'
+import type { PeopleListPayload, PersonListItem, WorkforceIntakeStatus } from '@/types/people'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { readMemberCapacityEconomicsBatch } from '@/lib/member-capacity-economics/store'
 import { PeopleValidationError, getPeopleTableColumns, pickMemberEmails, roundToTenths, runPeopleQuery, toNumber, toStringArray } from '@/lib/people/shared'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 
 type PeopleListRow = {
   member_id: string | null
@@ -16,9 +17,25 @@ type PeopleListRow = {
   role_category: string | null
   department_name: string | null
   avatar_url: string | null
+  avatar_user_id: string | null
   location_country: string | null
   active: boolean | null
   pay_regime: string | null
+  workforce_intake_status: string | null
+}
+
+const KNOWN_WORKFORCE_INTAKE_STATUSES: ReadonlySet<WorkforceIntakeStatus> = new Set([
+  'pending_intake',
+  'in_review',
+  'completed'
+])
+
+const normalizeWorkforceIntakeStatus = (value: string | null): WorkforceIntakeStatus | null => {
+  if (!value) return null
+
+  return KNOWN_WORKFORCE_INTAKE_STATUSES.has(value as WorkforceIntakeStatus)
+    ? (value as WorkforceIntakeStatus)
+    : null
 }
 
 const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
@@ -37,14 +54,15 @@ const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
     roleTitle: String(row.role_title || 'Efeonce Team'),
     roleCategory: String(row.role_category || 'unknown'),
     departmentName: row.department_name || null,
-    avatarUrl: row.avatar_url || null,
+    avatarUrl: resolveAvatarUrl(row.avatar_url, row.avatar_user_id),
     locationCountry: row.location_country || null,
     active: Boolean(row.active),
     totalAssignments: 0,
     contractedFte: 1,
     assignedFte: 0,
     totalFte: 0,
-    payRegime: row.pay_regime === 'international' ? 'international' : row.pay_regime === 'chile' ? 'chile' : null
+    payRegime: row.pay_regime === 'international' ? 'international' : row.pay_regime === 'chile' ? 'chile' : null,
+    workforceIntakeStatus: normalizeWorkforceIntakeStatus(row.workforce_intake_status)
   }
 }
 
@@ -210,10 +228,12 @@ const getPeopleListFromPostgres = async (
       m.role_title,
       m.role_category,
       COALESCE(p360.department_name, dept.name) AS department_name,
-      m.avatar_url,
+      COALESCE(m.avatar_url, p360.resolved_avatar_url) AS avatar_url,
+      p360.user_id AS avatar_user_id,
       m.location_country,
       m.active,
-      c.pay_regime
+      c.pay_regime,
+      m.workforce_intake_status
     FROM greenhouse_core.members m
     LEFT JOIN current_comp c ON c.member_id = m.member_id
     LEFT JOIN greenhouse_core.departments dept ON dept.department_id = m.department_id
@@ -320,9 +340,13 @@ const getPeopleListFromBigQuery = async (memberIds?: string[]): Promise<PeopleLi
         tm.role_title,
         tm.role_category,
         tm.avatar_url,
+        CAST(NULL AS STRING) AS avatar_user_id,
         ${locationCountrySelect}
         tm.active,
-        c.pay_regime
+        c.pay_regime,
+        -- TASK-873: BQ fallback no expone workforce_intake_status (vive solo en PG).
+        -- Consumers tratan NULL como 'completed' (back-compat legacy).
+        CAST(NULL AS STRING) AS workforce_intake_status
       FROM \`${projectId}.greenhouse.team_members\` AS tm
       LEFT JOIN current_compensation AS c
         ON c.member_id = tm.member_id

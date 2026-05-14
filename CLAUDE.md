@@ -610,6 +610,40 @@ Regla: no diseñar una task o arquitectura nueva describiendo solo `views` si ta
 - Cron: `/api/cron/**`, `/api/finance/economic-indicators/sync`
 - Agent Auth: `/api/auth/agent-session` — sesión headless para agentes/Playwright (requiere `AGENT_AUTH_SECRET`)
 
+### Canonical API error response contract (desde 2026-05-14)
+
+Toda respuesta de error API que cruce al cliente **debe** usar el helper canónico `canonicalErrorResponse(code, options?)` desde `src/lib/api/canonical-error-response.ts`. Reemplaza el anti-patrón `NextResponse.json({ error: 'English prose' }, { status: N })` que generaba el bug class "string inglés crudo en UI es-CL" (caso real 2026-05-14: banner "Member identity not linked" surfacing literalmente al usuario via `payload?.error || 'fallback es-CL'` pattern en `/api/my/*` consumers). Complementario a TASK-878 (session-member-identity-self-heal): TASK-878 cierra la causa raíz (sesiones internas sin memberId), este contrato cierra la causa UX (string crudo) hasta que la self-heal converja.
+
+**Shape canónico**:
+
+```json
+{
+  "error": "Tu cuenta aún no está enlazada a un colaborador. Pídele a People Ops que active tu identidad.",
+  "code": "member_identity_not_linked",
+  "actionable": false
+}
+```
+
+- `error`: prose es-CL canónico, safe para mostrar al usuario verbatim (backward compat con consumers legacy que leen `payload.error` directo).
+- `code`: stable machine identifier (snake_case) del enum cerrado `CanonicalErrorCode`. Consumers nuevos lo usan para mapear a UX específico (CTA "Contactar HR" vs "Reintentar").
+- `actionable`: hint binario. `true` cuando reintentar puede resolver (timeout, network blip); `false` cuando la causa es estructural (identity no enlazada, permiso revocado, configuración faltante). UI usa este flag para hide/show del botón "Reintentar".
+
+**Consumer-side**: helper canónico `throwIfNotOk(res, fallbackMessage)` + clase `CanonicalApiError` en `src/lib/api/parse-error-response.ts`. Reemplaza el anti-patrón `throw new Error(payload?.error || 'fallback')`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** retornar `NextResponse.json({ error: 'English prose' }, { status: N })` desde un route handler. Usar `canonicalErrorResponse(code, ...)`. Para nuevos error paths, extender el enum `CanonicalErrorCode` + agregar fila a `CANONICAL_ERRORS` (single source of truth).
+- **NUNCA** poner prose en inglés en `error` (campo client-facing). Toda string debe ser es-CL canónico, ideal extraído de `src/lib/copy/*` (TASK-265).
+- **NUNCA** poner detalle técnico (stack trace, SQL error, internal IDs, PII) en `error`. Eso va a `captureWithDomain` en Sentry, NO al cliente. Usar `redactErrorForResponse` cuando se necesite preservar parte del error original.
+- **NUNCA** en el cliente: `throw new Error(payload?.error || 'fallback')`. El `payload?.error` puede venir en inglés desde un endpoint legacy. Usar `throwIfNotOk(res, fallbackEsCl)` que parsea canonical body y fallbackea al string es-CL local cuando el shape no es canónico.
+- **NUNCA** mostrar botón "Reintentar" cuando `actionable=false`. Reintentar no resuelve causas estructurales (identity no enlazada, permiso revocado) — confunde al usuario y oculta la acción real (contactar HR/admin).
+- **SIEMPRE** que un consumer UI maneje errores de un endpoint que pasa por canonical helper, propagar `actionable` + `code` al render para que la UI decida CTA correcto. Patrón: `error: { message, actionable, code }` state, render condicional según `actionable`.
+- **SIEMPRE** que se introduzca un nuevo bloqueador estructural (e.g. `account_suspended`, `mfa_required`), extender `CanonicalErrorCode` enum + `CANONICAL_ERRORS` map. NO usar strings ad-hoc — rompe el contrato.
+
+**Reliability signal canónico**: `identity.workforce.unlinked_internal_user` (kind=data_quality, severity warning si 1-3 / error si >3, steady=0). Detecta usuarios internos activos sin `member_id` enlazado — son los que verán el banner `member_identity_not_linked`. Cuando alerta, escalación es vía TASK-877 (workforce external identity reconciliation) o `workforce.member.complete_intake` endpoint (TASK-872 Slice 5).
+
+**Spec canónica**: helper en `src/lib/api/canonical-error-response.ts`; cliente parser en `src/lib/api/parse-error-response.ts`; reader del signal en `src/lib/reliability/queries/workforce-unlinked-internal-users.ts`.
+
 ### Auth en server components / layouts / pages — patrón canónico
 
 - **NUNCA** llamar `getServerAuthSession()` directo desde un layout o page con `try/catch + redirect` ad hoc. Usar siempre los helpers canónicos de `src/lib/auth/require-server-session.ts`:
@@ -1223,12 +1257,17 @@ Los 3 hacen UPSERT idempotente por `hubspot_company_id`. Si convergen al mismo c
    - Llama `syncHubSpotCompanies({ fullResync: false })` para promover crm → `greenhouse_core.organizations` + `greenhouse_core.clients`.
 7. Failures individuales se capturan en Sentry con `domain='integrations.hubspot'`. Si TODOS fallan → throw para que HubSpot reintente.
 
-**⚠️ Reglas duras**:
+**⚠️ Reglas duras** (TASK-878 canonical async, desde 2026-05-14):
 - **NO** crear endpoints paralelos para HubSpot. Si emerge necesidad de webhook para deals, products, etc., agregar nuevo handler bajo `src/lib/webhooks/handlers/` y nuevo `webhook_endpoints` row, NO endpoint custom.
-- **NO** hacer sync sincrono blocking en el handler — `syncHubSpotCompanyById` puede tardar (3-10s por company). HubSpot tiene 5s timeout por POST. Si se vuelve crítico, mover el sync a outbox + worker reactive.
-- **NO** sincronizar manualmente si el webhook está activo. El CLI `scripts/integrations/hubspot-sync-company.ts` queda solo para backfills históricos o casos de recuperación.
+- **NUNCA** llamar `syncHubSpotCompanyById` desde el webhook handler `hubspot-companies` (request path). El path canónico es emitir outbox event `commercial.hubspot_company.sync_requested v1` via `enqueueHubSpotCompanyEventsAsync`. La projection `hubspot_companies_intake` (TASK-878 Slice 2) consume el event en ops-reactive-finance cron fuera del request path.
+- **NUNCA** hacer bridge fetch (Cloud Run hubspot-greenhouse-integration) sincrono dentro del webhook handler — HubSpot timeout 5s; el sync toma 3-10s y dispara retries concurrentes que generaron la race condition cerrada en Slice 1 (RETURNING canónico).
+- **NUNCA** generar `company_record_id` / `contact_record_id` en TS antes del INSERT con la intención de hacer SELECT-verify posterior. Siempre `INSERT … ON CONFLICT DO UPDATE … RETURNING <pk>` (patrón canónico TASK-878 Slice 1, ya usado en `nubox/sync-nubox-balances.ts` y `sync/projections/hubspot-services-intake.ts`). El verify defensivo cazaba el síntoma, no la causa.
+- **NUNCA** llamar `syncTenantCapabilitiesFromIntegration` inline en el webhook handler. La capability sync vive dentro del `refresh` de la projection (post-TASK-878 Slice 2).
+- `syncHubSpotCompanyById` sigue invocable desde CLI scripts (`scripts/integrations/hubspot-sync-company.ts`), admin endpoint (`/api/admin/integrations/hubspot/sync-company`), Quote Builder adopt (TASK-537), y la projection `hubspot_companies_intake` — todos paths que corren fuera del 5s budget HubSpot.
+- **NO** sincronizar manualmente si el webhook está activo. El CLI queda solo para backfills históricos o casos de recuperación.
 - **NUNCA** loggear el body crudo del webhook en logs (puede contener PII de contactos). El sistema generic ya lo persiste en `greenhouse_sync.webhook_inbox_events` con scrubbing apropiado.
 - Cuando se cree un nuevo cliente Greenhouse manualmente (sin pasar por HubSpot), seguir el patrón `hubspot-company-{ID}` solo si tiene HubSpot ID; si NO tiene HubSpot, usar otro prefix (ej. `internal-`, `nubox-`, etc.) para evitar colisión.
+- **Reliability signal canónico** `commercial.hubspot_company.intake_dead_letter` (kind=dead_letter, severity=error si count>0, steady=0, subsystem rollup `commercial`). Cuando alerta: bridge Cloud Run caído, `HUBSPOT_ACCESS_TOKEN` corrupto/expirado, permisos OAuth revocados, o schema PG drift.
 
 **Configuración HubSpot Developer Portal** (one-time):
 1. App "Greenhouse Bridge" en `developers.hubspot.com/apps`.
@@ -1884,7 +1923,117 @@ pnpm release:preflight --override-batch-policy --fail-on-error
 - **SIEMPRE** que emerja un nuevo workflow production deploy, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` ANTES del primer deploy (mismo invariant que TASK-849 watchdog) — ci_green check lo filtra automaticamente del set CI relevante.
 - **SIEMPRE** que se cambie copy es-CL en el output formatter, mantener consistencia con `getMicrocopy()` patterns aunque CLI no use el helper directamente (es operator-facing).
 
-**Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Migration: `migrations/20260510144012098_task-850-preflight-capabilities.sql`. CLI: `pnpm release:preflight [--json|--output-file=<path>|--fail-on-error|--override-batch-policy|--target-sha=<sha>|--target-branch=<name>]`.
+**Spec canonica**: `docs/tasks/in-progress/TASK-850-production-preflight-cli-complete.md`. Migration: `migrations/20260510144012098_task-850-preflight-capabilities.sql`. CLI: `pnpm release:preflight [--json|--output-file=<path>|--fail-on-error|--override-batch-policy|--bypass-preflight-warnings|--target-sha=<sha>|--target-branch=<name>]`.
+
+### Production Release Operational Playbook (TASK-871 follow-up — lessons 2026-05-13)
+
+5 patterns descubiertos durante el pase a producción de TASK-871 + bundled accumulated develop (4 orchestrator attempts antes de success). Canónicos para que **el próximo release tome <30min** vs las 4+ horas que tomó cerrar este. Spec runs: `25821880395` (vercel timing) + `25822955070` (watchdog loop) + `25823823716` (incomplete bypass) + `25825280928` (SUCCESS con todas las fixes shipped). Manifest released: `e02cb32e9c30-5acb894c-f164-486c-99c0-074d42aefbeb`.
+
+#### Lesson 1 — Vercel BUILDING timing race (~5-8 min)
+
+`git push origin main` triggea Vercel production deploy automaticamente via Git integration. Vercel toma **5-8 min** en build. Si dispatchas el orchestrator inmediatamente, el preflight `vercel_readiness=BUILDING` lo bloquea con `severity=error`.
+
+**Pattern canónico**: **NO** dispatchar el orchestrator inmediatamente post-push a main. Esperar a `vercel inspect <deploy-url>` que reporte `status: ● Ready` (5-8 min típico) ANTES del `gh workflow run production-release.yml`. Alternativamente, verificar con `vercel list greenhouse-eo --scope=efeonce-7670142f | head -3` que la última deployment en Production esté `Ready`.
+
+**⚠️ Regla dura**: **NUNCA** dispatch orchestrator <8 min post-push main. El `vercel_readiness` check NO se reintenta dentro del preflight — un fail aborta el orchestrator.
+
+#### Lesson 2 — Production Release Watchdog self-reference loop
+
+El workflow `Production Release Watchdog` (scheduled cada 30min, TASK-849) reporta `worker_revision_drift` cuando detecta workers Cloud Run en SHAs distintos al último deploy.yml successful. Cuando hay drift pre-existente, el watchdog **FAILA loud**. El preflight `ci_green` cuenta esa failure como CI block.
+
+**Patrón canónico**: el watchdog DEBE estar en `RELEASE_DEPLOY_WORKFLOWS` allowlist (`src/lib/release/workflow-allowlist.ts`) — mismo pattern que `Production Release Orchestrator` ya tenía documentado para su propia self-reference loop. Sin esto, drift pre-existente bloquea TODA promoción a producción incluso cuando el release ES la solución al drift.
+
+**Closed en commit `4f1e09de` (2026-05-13)** agregando `Production Release Watchdog` al array `RELEASE_DEPLOY_WORKFLOWS` + 2 tests anti-regresión (`workflow-allowlist.test.ts`). Allowlist size 7→8.
+
+**⚠️ Regla dura**: **NUNCA** agregar un nuevo workflow scheduled de monitoring (e.g. `Reliability Synthetic Probe`, `Cost Watchdog`) sin agregarlo al allowlist `RELEASE_DEPLOY_WORKFLOWS` con `cloudRunService: undefined`. Sin esto, cada `failure` del monitoring scheduled bloquea producción para siempre — exactamente lo opuesto a la safety intent.
+
+#### Lesson 3 — `bypass_preflight_reason` era una bypass mechanism INCOMPLETA
+
+La spec CLAUDE.md decía:
+> `bypass_preflight_reason >=20 chars + capability platform.release.bypass_preflight` → operator override broad
+
+Pero la CLI sólo implementaba `--override-batch-policy` (downgrade `release_batch_policy` errors a warnings). Otras checks que producen warnings persistentes (`playwright_smoke: 0 workflows for main pushes by design`, `sentry_critical_issues: 1-9 issues = warning`, `vercel_readiness: BUILDING timing race`) seguían bloqueando vía `readyToDeploy=false` aunque el operador supliera bypass_preflight_reason.
+
+**Closed en commit `c594f066` (2026-05-13)** con:
+
+1. CLI nueva flag `--bypass-preflight-warnings` en `scripts/release/production-preflight.ts`.
+2. `shouldFailPreflightCommand(payload, failOnError, bypassWarnings)` extendido: cuando `bypassWarnings=true` solo `overallStatus === 'blocked'` (ERROR severity) bloquea.
+3. Orchestrator workflow `.github/workflows/production-release.yml` pasa AMBOS `--override-batch-policy --bypass-preflight-warnings` cuando `bypass_preflight_reason >= 20`.
+4. 5 tests anti-regresión en `exit-policy.test.ts` (passes degraded, passes unknown, blocks errors, no-op without failOnError, no-op on healthy).
+
+**Resultado**: la spec canónica documentada en CLAUDE.md ahora SÍ matchea el comportamiento del orchestrator. Bypass mechanism completo.
+
+**⚠️ Regla dura**: **NUNCA** documentar un control en CLAUDE.md (override / bypass / capability / gate) sin verificar que el código TS/YAML CompletELY implementa esa semántica. Spec sin implementation completa = self-blocking architectural debt. Pattern: SPEC describes intent → IMPLEMENTATION partial → GAP solo aparece en release real → 4+ hours debugging. Este pattern lo vimos 3 veces hoy (watchdog allowlist incompleto, bypass-preflight-warnings incompleto, Production env approval gate doble invocación no documentada).
+
+#### Lesson 4 — Production environment gate se invoca DOS VECES, no UNA
+
+El workflow `production-release.yml` tiene environment `production` para 2 sets de jobs distintos:
+
+1. **First gate** (post Vercel ready): aprueba los **4 Cloud Run workers** (ops-worker + commercial-cost-worker + ico-batch-worker + hubspot-greenhouse-integration).
+2. **Second gate** (post worker deploys): aprueba los **2 Azure Bicep deploys** (Teams Notifications + Teams Bot).
+
+El operador debe aprobar la `Production` environment **DOS VECES** — primera para workers, segunda para Azure. Cada aprobación crea un `pending_deployment` separado.
+
+**Pattern canónico para auto-approval scriptable** (cuando el operador autorizó plenariamente):
+
+```bash
+# Approve first gate (workers)
+gh api -X POST repos/<owner>/<repo>/actions/runs/<run_id>/pending_deployments \
+  -F 'environment_ids[]=12831857432' \
+  -f state=approved \
+  -f comment="<reason>"
+
+# Wait for workers to deploy → then second gate auto-emerges for Azure
+# Approve second gate (Azure)  — same env_id, second invocation
+gh api -X POST repos/<owner>/<repo>/actions/runs/<run_id>/pending_deployments \
+  -F 'environment_ids[]=12831857432' \
+  -f state=approved \
+  -f comment="<reason>"
+```
+
+`environment_ids[]` apunta al mismo numeric ID del environment Production (`12831857432` en este repo). Cada gate genera deployment ID distinto (`4680795919` workers, `4680866226+4680866228` Azure).
+
+**⚠️ Regla dura**: **NUNCA** asumir que aprobar el environment Production una sola vez completa el release. Verificar `gh api repos/<owner>/<repo>/actions/runs/<run_id>/pending_deployments` post-workers; si retorna 1+ deployments pendientes, aprobar nuevamente.
+
+#### Lesson 5 — Path B "recovery + ship" requiere code-first cuando ambos usan el mismo bug class
+
+Durante TASK-871 (mismo session) intenté "recovery + ship" como Path B (remediator con `policy='rolling_window_repair'`) ANTES de shippear el código que implementaba esa policy. Falló silenciosamente porque el remediator tenía la MISMA bug class TASK-871 internamente.
+
+**Pattern canónico**: cuando una recovery primitive depende de código que aún no está deployed, la secuencia DEBE ser:
+
+1. Code-first: implementar fix + tests + deploy ops-worker (auto via push develop).
+2. Wait for revisión Cloud Run con nuevo GIT_SHA LIVE.
+3. Recovery via la primitive ya deployada (cron Cloud Scheduler manual o admin endpoint).
+4. Verify signal returns ok=0.
+5. Re-run smoke tests post-recovery.
+6. Then release develop→main.
+
+**⚠️ Regla dura**: **NUNCA** invocar una recovery primitive (remediator / repair endpoint / cron manual) cuando el código que implementa la nueva policy aún no está deployed. Si la primitive tiene la bug class que estás intentando arreglar, recovery falla silente. Pattern reusable: code → deploy → verify revision → recovery → verify signal → release.
+
+#### Operational checklist canónico (para próximo release develop → main)
+
+Tiempo objetivo: **<30 min** para bundled releases típicos.
+
+```text
+[ ] 1. Verify develop green (CI + Playwright + ops-worker deploy SUCCESS por commit reciente)
+[ ] 2. Fetch + merge origin/main → develop si hay hotfixes en main
+[ ] 3. Switch a main + merge develop --no-ff con "release: ..." commit message
+[ ] 4. git push origin main
+[ ] 5. WAIT 5-8 min para Vercel production BUILDING → READY (`vercel list ... | head -3`)
+[ ] 6. WAIT for CI on the merge commit to complete green
+[ ] 7. Dispatch orchestrator: `gh workflow run production-release.yml --ref main -f target_sha=<sha> -f bypass_preflight_reason="<>=20 chars>"`
+[ ] 8. Approve first env gate via gh api (workers)
+[ ] 9. WAIT for workers to deploy
+[ ] 10. Approve second env gate via gh api (Azure Bicep)
+[ ] 11. WAIT for orchestrator transition_state → released SUCCESS
+[ ] 12. Dispatch watchdog: `gh workflow run production-release-watchdog.yml --ref main`
+[ ] 13. Verify all 4 Cloud Run GIT_SHAs match target_sha
+[ ] 14. Move resolved issues + update Handoff/changelog + close tasks
+```
+
+**Skills obligatorias antes de dispatch**: `greenhouse-production-release` (read SKILL.md + PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md + GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md).
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` + `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` + `docs/operations/runbooks/production-release.md`. Last successful release: `25825280928` manifest `e02cb32e9c30-5acb894c-f164-486c-99c0-074d42aefbeb` (2026-05-13).
 
 ### Production Release Orchestrator invariants (TASK-851)
 
@@ -3216,6 +3365,79 @@ Toda surface que muestre o consuma identidad legal de una persona natural (RUT, 
 - `workforce.role_title.unresolved_drift_overdue` (drift, error) — drift proposals pendientes >30 días. Steady state = 0.
 
 **Spec canonica**: `docs/tasks/in-progress/TASK-785-workforce-role-title-source-of-truth-governance.md`. Migración: `migrations/20260505123242929_task-785-role-title-governance.sql`. Pattern fuente: `reporting_hierarchy_drift_proposals` (TASK-731).
+
+### SCIM Internal Collaborator Provisioning invariants (TASK-872, desde 2026-05-13)
+
+SCIM POST `/api/scim/v2/Users` con `tenant_type='efeonce_internal'` Y eligibility verdict `eligible=true` invoca primitive atomic `provisionInternalCollaboratorFromScim` que materializa `client_user + identity_profile + identity_profile_source_links × 2 + member + person_membership` + role assignment + 3 outbox events en una sola tx PG.
+
+**Helpers canónicos**:
+
+- `evaluateInternalCollaboratorEligibility(input)` en `src/lib/scim/eligibility.ts` — función pura 4-layer policy (L1 hard reject `#EXT#`/domain, L2 funcional regex, L3 name shape, L4 admin allowlist/blocklist override). Discriminated union return `EligibilityVerdict`.
+- `provisionInternalCollaboratorFromScim(input)` en `src/lib/scim/provisioning-internal-collaborator.ts` — primitive atomic. Idempotency gate first-step + cascade D-2 (4 niveles: profile_id → azure_oid → email legacy → INSERT new) + drift detection 3 kinds + outbox consolidado `scim.internal_collaborator.provisioned v1`.
+- `createScimEligibilityOverride / supersedeScimEligibilityOverride / listActiveOverridesForTenantMapping` en `src/lib/scim/eligibility-overrides-store.ts` — CRUD canónica con audit append-only via PG trigger.
+
+**Feature flags (default false en producción — zero behavioral change post-merge)**:
+
+| Flag | Default | Efecto cuando true |
+| --- | --- | --- |
+| `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` | `false` | SCIM CREATE internal eligible invoca primitive; ineligibles van a legacy `createUser` |
+| `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` | `false` | Payroll reader `pgGetApplicableCompensationVersionsForPeriod` filtra `m.workforce_intake_status = 'completed'` |
+| `SCIM_ELIGIBILITY_FUNCTIONAL_PATTERNS_ENABLED` | `false` (V1.0) | Reservado V1.1 — control de L2 regex |
+
+**6 reliability signals canónicos (subsystem Identity & Access)**:
+
+- `identity.scim.users_without_identity_profile` (data_quality, error >0, steady=0)
+- `identity.scim.users_without_member` (drift, error >0, steady=0 post-backfill)
+- `identity.scim.ineligible_accounts_in_scope` (drift, warning 1-5 / error >5, steady<5)
+- `identity.scim.member_identity_drift` (data_quality, error >0, steady=0)
+- `workforce.scim_members_pending_profile_completion` (drift, warning >7d / error >30d, steady=0)
+- `identity.scim.allowlist_blocklist_conflict` (data_quality, error >0, steady=0)
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** ejecutar los 6 writes del primitive fuera de `withTransaction`. Si se necesita refactor de un helper downstream, agregar `client?: PoolClient` opcional (dual-mode pattern TASK-765/TASK-872). Helpers refactored: `syncOperatingEntityMembershipForMember`, `createMembership`, `deactivateMembership`.
+- **NUNCA** decidir merge automático en drift D-2. Throw `MemberIdentityDriftError` con `kind` discriminator (`profile_oid_mismatch | oid_profile_mismatch | email_profile_mismatch`) + signal alerta + humano resuelve via runbook escenario 3.
+- **NUNCA** poblar `members` SCIM-provisioned sin `workforce_intake_status='pending_intake'` + `azure_oid` poblado. Backfill bypasa con default `'completed'` SOLO para legacy members existentes pre-TASK-872.
+- **NUNCA** incluir members con `workforce_intake_status != 'completed'` en una corrida payroll cuando `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true`. Gate canonical en `pgGetApplicableCompensationVersionsForPeriod` (postgres-store.ts) — único punto de verdad.
+- **NUNCA** insertar `scim_sync_log` dentro del primitive. Logging vive en endpoint handler (post-call). Permite logging de fallos cuando primitive throws.
+- **NUNCA** emitir outbox event fuera de la tx del primitive. `publishOutboxEvent(event, client?)` acepta client opcional desde TASK-771 — pass through dentro del withTransaction.
+- **NUNCA** DELETE physical sobre `scim_eligibility_overrides`. Solo supersede via `effective_to` + audit row append-only en `scim_eligibility_override_changes` (trigger PG enforce).
+- **NUNCA** invocar `Sentry.captureException` directo en code path SCIM. Usar `captureWithDomain(err, 'identity', { tags: { source: 'scim_provisioning', stage: '...' } })`.
+- **NUNCA** flippear `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true` en producción sin: (1) verify 7 legacy members all `'completed'`; (2) HR signoff workflow complete_intake; (3) smoke staging con member pending_intake synthetic + corrida payroll mock excluye correctamente.
+- **NUNCA** marcar Felipe Zurita / Maria Camila Hoyos backfill como complete sin: (1) flag SCIM enabled staging + smoke `provisionOnDemand` test user verde; (2) comunicación humana a Felipe/Maria sobre badge "Ficha pendiente"; (3) operador humano ejecuta apply con allowlist explícita; (4) signals post-apply en steady state esperado.
+- **SIEMPRE** que primitive devuelva `idempotent: true`, NO emitir outbox events (re-emit duplicates downstream).
+- **SIEMPRE** que un consumer nuevo emerja que enumere members para payroll/capacity/compensation/assignments, agregar el mismo gate `workforce_intake_status = 'completed'` detrás del flag canónico (defense in depth).
+- **SIEMPRE** que cascade outcome sea `reactivated_via_oid_reuse`, signal `identity.scim.member_reactivated_via_oid_reuse` (info-only V1.0) alerta a operador para audit del caso raro.
+
+**Outbox event consolidado canonical `scim.internal_collaborator.provisioned v1`** (aggregateType='client_user'): payload incluye `userId, scimId, identityProfileId, memberId, azureOid, microsoftTenantId, primaryEmail, displayName, roleCode, workforceIntakeStatus, eligibilityVerdict, cascadeOutcome, operatingEntityMembershipAction, provisionedAt`. Single source of truth audit forensic para "qué pasó cuando entró este colaborador".
+
+**Capabilities granulares canónicas (4 nuevas)**:
+
+- `scim.eligibility_override.create` (organization, create, tenant) — EFEONCE_ADMIN + DEVOPS_OPERATOR
+- `scim.eligibility_override.delete` (organization, delete, tenant) — EFEONCE_ADMIN only
+- `scim.backfill.execute` (organization, execute, all) — EFEONCE_ADMIN only
+- `workforce.member.complete_intake` (workforce, update, tenant) — FINANCE_ADMIN + EFEONCE_ADMIN
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-872-scim-internal-collaborator-provisioning.md`. Runbook: `docs/operations/runbooks/scim-internal-collaborator-recovery.md`. Migrations: `migrations/20260513234436189_task-872-scim-eligibility-overrides.sql` + `migrations/20260514000116899_task-872-members-workforce-intake-status.sql` + `migrations/20260514000207733_task-872-capabilities-registry-seed.sql`.
+
+### Capability runtime grant invariant (TASK-873, desde 2026-05-14)
+
+Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_registry` (DB) Y en `src/config/entitlements-catalog.ts` (TS), **debe también granteear esa capability a algún subject en `src/lib/entitlements/runtime.ts`** en el mismo PR. Sin el grant en runtime, el endpoint protegido por `can(subject, '<capability>', ...)` retorna 403 incluso para EFEONCE_ADMIN — la capability existe en el registry pero ningún subject la posee.
+
+**Bug class canonizada live 2026-05-14**: TASK-872 Slice 1.5 seedeó `workforce.member.complete_intake` en TS catalog + DB capabilities_registry pero olvidó el grant en runtime.ts. El endpoint `POST /api/admin/workforce/members/[memberId]/complete-intake` quedó shipped pero inaccesible para cualquier rol durante todo el periodo desde TASK-872 SHIPPED (2026-05-13) hasta TASK-873 Slice 1 fix (2026-05-14, commit `00730a82`).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** agregar entry al `ENTITLEMENT_CAPABILITY_CATALOG` en `src/config/entitlements-catalog.ts` sin agregar grant correspondiente en `src/lib/entitlements/runtime.ts` en el mismo PR. La parity test live `src/lib/capabilities-registry/parity.live.test.ts` NO detecta esto — solo valida TS↔DB shape parity, no runtime grant coverage. Code review es el enforcement humano.
+- **NUNCA** agregar grant en runtime.ts sin un comentario `// TASK-XXX — <descripción del fix>` que documente la decisión + el set canónico de roles. El comentario es lo que permite al próximo agente entender el alcance del gate.
+- **NUNCA** asumir que "la capability ya está en DB" significa "los usuarios tienen acceso". DB registry es **gobernanza** (qué capabilities existen + auditoría); runtime.ts es **policy** (qué subjects las tienen). Son ortogonales.
+- **NUNCA** branchear `roleCodes.includes(...)` inline en route handlers o views. Toda autorización pasa por `can(subject, capability, action, scope)`. Los grants en runtime son la única fuente.
+- **SIEMPRE** que un endpoint nuevo proteja recursos sensibles vía `can(...)`, smoke-test localmente con un usuario real del role objetivo (e.g. agent auth + Playwright + un member con el rol intended) ANTES de mergear. Sin smoke, el bug class del 2026-05-13→05-14 se repite.
+- **SIEMPRE** que emerja una task que cubra Slice "Capabilities Registry Seed" (canonical pattern TASK-839/840/848/849/850/872), el slice **debe** incluir tanto la migration DB como el grant runtime.ts. NO scope-creep al slice anterior ni posterior; mismo commit.
+
+**Defense in depth**: cuando una capability es operacionalmente crítica (e.g. transición state machine, mutación HR/Finance, reveal sensitive), agregar smoke test E2E en `tests/e2e/smoke/` que verifique el flow con un usuario del rol esperado. Sin smoke, el endpoint queda en "shipped pero inaccesible" hasta que un usuario real lo reporta.
+
+**Spec canónica**: `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (Slice 1 fix). Pattern fuente: `src/lib/entitlements/runtime.ts` líneas con grant `workforce.member.complete_intake` (matriz `hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN`).
 
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 

@@ -2,7 +2,7 @@
 
 // TASK-749 — Surface ops cross-entity para Perfiles de Pago.
 // NO duplica el CRUD del Panel reutilizable. Tres jobs:
-//   1. Cola de aprobacion (pending_approval) con bulk approve.
+//   1. Cola de activacion/aprobacion (draft + pending_approval).
 //   2. Drift card: beneficiarios con obligaciones vivas sin perfil activo.
 //   3. Tabla universal read-only — click en fila → deep link al 360.
 
@@ -54,6 +54,7 @@ type BeneficiaryTypeFilter = BeneficiaryPaymentProfileBeneficiaryType | 'all'
 
 const STATUS_OPTIONS: Array<{ value: StatusFilter; label: string }> = [
   { value: 'all', label: 'Todos' },
+  { value: 'draft', label: 'Borrador' },
   { value: 'pending_approval', label: 'Pendiente aprobacion' },
   { value: 'active', label: 'Activo' },
   { value: 'superseded', label: 'Reemplazado' },
@@ -199,9 +200,11 @@ const PaymentProfilesView = () => {
   }, [loadProfiles])
 
   const handleApproveNext = useCallback(async () => {
-    if (!queue || queue.pendingApprovalProfiles.length === 0) return
+    const actionableProfiles = queue?.actionableProfiles ?? queue?.pendingApprovalProfiles ?? []
 
-    const next = queue.pendingApprovalProfiles[0]
+    if (actionableProfiles.length === 0) return
+
+    const next = actionableProfiles[0]
 
     setDrawerProfileId(next.profileId)
   }, [queue])
@@ -211,7 +214,7 @@ const PaymentProfilesView = () => {
   }, [loadQueue, loadProfiles])
 
   const driftRows = queue?.driftRows ?? []
-  const pendingProfiles = queue?.pendingApprovalProfiles ?? []
+  const actionableProfiles = queue?.actionableProfiles ?? queue?.pendingApprovalProfiles ?? []
 
   const tableEmpty = useMemo(() => profiles.length === 0, [profiles])
 
@@ -226,9 +229,10 @@ const PaymentProfilesView = () => {
             </Typography>
             <Typography variant='h4'>Perfiles de pago</Typography>
             <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
-              Esta vista es <strong>read-only</strong> y solo cubre operaciones cross-entity: aprobar
-              pendientes en cola, detectar drift cuando faltan perfiles para obligaciones vivas, y auditar
-              el universo. Para crear o editar un perfil, abri la persona o el accionista correspondiente.
+              Esta vista es <strong>read-only</strong> y cubre operaciones cross-entity: activar
+              borradores, aprobar perfiles con checker, detectar drift cuando faltan perfiles para
+              obligaciones vivas, y auditar el universo. Para crear o editar un perfil, abri la persona
+              o el accionista correspondiente.
             </Typography>
           </Stack>
         </CardContent>
@@ -255,17 +259,18 @@ const PaymentProfilesView = () => {
               >
                 <Stack spacing={0.5}>
                   <Typography variant='overline' color='warning.main' letterSpacing='0.06em'>
-                    Cola de aprobacion
+                    Cola de activacion
                   </Typography>
                   <Typography variant='h5'>
-                    {queueLoading ? '—' : `${pendingProfiles.length} perfiles esperando checker`}
+                    {queueLoading ? '—' : `${actionableProfiles.length} perfiles por activar`}
                   </Typography>
                   <Typography variant='caption' color='text.secondary' sx={{ maxWidth: 480 }}>
-                    El creador no puede aprobar su propio perfil (maker-checker). Acceder al detalle
-                    desde la cola te lleva al drawer con la accion Aprobar.
+                    Incluye borradores y perfiles esperando checker. Un perfil solo desbloquea pagos
+                    y Workforce Activation cuando queda activo; si tiene maker-checker, el creador no
+                    puede aprobarlo.
                   </Typography>
                 </Stack>
-                {pendingProfiles.length > 0 ? (
+                {actionableProfiles.length > 0 ? (
                   <Button variant='contained' color='warning' onClick={handleApproveNext}>
                     Revisar siguiente
                   </Button>
@@ -276,13 +281,13 @@ const PaymentProfilesView = () => {
                 <Box sx={{ pt: 3 }}>
                   <LinearProgress />
                 </Box>
-              ) : pendingProfiles.length === 0 ? (
+              ) : actionableProfiles.length === 0 ? (
                 <Typography variant='body2' color='text.secondary' sx={{ pt: 3 }}>
-                  No hay perfiles esperando aprobacion. Buen trabajo.
+                  No hay perfiles por activar. Buen trabajo.
                 </Typography>
               ) : (
                 <Stack spacing={1.5} sx={{ pt: 3 }}>
-                  {pendingProfiles.slice(0, 5).map(p => (
+                  {actionableProfiles.slice(0, 5).map(p => (
                     <Stack
                       key={p.profileId}
                       direction='row'
@@ -302,7 +307,7 @@ const PaymentProfilesView = () => {
                           {p.beneficiaryName ?? p.beneficiaryId}
                         </Typography>
                         <Typography variant='caption' color='text.secondary'>
-                          via {p.providerSlug ?? 'sin provider'} · maker {p.createdBy.slice(0, 18)}…
+                          {STATUS_LABEL[p.status]} · via {p.providerSlug ?? 'sin provider'} · maker {p.createdBy.slice(0, 18)}…
                         </Typography>
                       </Stack>
                       <Typography variant='caption' color='text.secondary'>

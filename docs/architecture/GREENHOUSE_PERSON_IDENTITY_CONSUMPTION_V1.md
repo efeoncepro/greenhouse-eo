@@ -129,6 +129,19 @@ Si un consumer necesita combinar capas:
 - `member_id` y `user_id` deben resolverse como facetas explícitas
 - la persistencia no debe perder la llave operativa vigente
 
+### External identity source links
+
+Decision accepted `2026-05-14` via `TASK-877`.
+
+Los vínculos externos de identidad (`notion`, `hubspot_crm`, `azure_ad`, etc.) se resuelven canónicamente desde `greenhouse_core.identity_profile_source_links`.
+
+Reglas:
+- `identity_profile_source_links` es el source of truth para el vínculo humano cross-source.
+- `greenhouse_core.members.<source_column>` es una proyección operacional por faceta `member`, útil para compatibilidad y queries rápidas, pero no reemplaza el source link.
+- BigQuery mirrors como `greenhouse.team_members.notion_user_id` son compatibilidad para pipelines conformed/legacy; los readers nuevos deben preferir Postgres source links y degradar a BigQuery solo como fallback documentado.
+- Un apply de link externo debe verificar conflictos activos por `(source_system, source_object_type, source_object_id)` antes de escribir.
+- Workforce Activation puede orquestar el blocker y la aprobación humana, pero no se convierte en source of truth de identidades externas.
+
 ## Canonical Resolution Shape
 
 Todo resolver shared nuevo o endurecido debería poder exponer, como mínimo:

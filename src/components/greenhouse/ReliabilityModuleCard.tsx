@@ -1,7 +1,10 @@
 'use client'
 
+import Link from 'next/link'
+
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
@@ -10,6 +13,8 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { GH_WORKFORCE_INTAKE } from '@/lib/copy/workforce'
+
 import type {
   ReliabilityConfidence,
   ReliabilityModuleSnapshot,
@@ -17,6 +22,54 @@ import type {
   ReliabilitySignal,
   ReliabilitySignalKind
 } from '@/types/reliability'
+
+/**
+ * TASK-873 Slice 5 — Mapeo canonical de signalId → CTA acción.
+ *
+ * Cuando un signal alerta (severity != 'ok'), surface el link operacional
+ * relevante junto a la descripción en el ReliabilityModuleCard. Pattern
+ * declarativo extensible: cada signal action-able tiene una entry aquí.
+ * NO branch inline por signalId en el renderer — agregar entry al map.
+ *
+ * Forward-compat TASK-874: cuando emerjan los signals
+ * `workforce.activation.ready_but_not_completed`,
+ * `workforce.activation.completed_with_missing_readiness` y
+ * `workforce.activation.blocker_backlog`, agregar entries aquí que apunten
+ * a la nueva ruta primaria HR (`/hr/workforce/activation` o
+ * `/workforce/activation`, per TASK-874 Plan Mode).
+ */
+type SignalActionCta = {
+  readonly href: string
+  readonly label: string
+  readonly ariaLabel: string
+}
+
+const SIGNAL_ACTION_CTAS: ReadonlyMap<string, SignalActionCta> = new Map<string, SignalActionCta>([
+  [
+    'workforce.scim_members_pending_profile_completion',
+    {
+      href: '/hr/workforce/activation',
+      label: GH_WORKFORCE_INTAKE.banner_link_to_queue,
+      ariaLabel: GH_WORKFORCE_INTAKE.banner_link_to_queue_aria
+    }
+  ],
+  [
+    'workforce.activation.blocker_backlog',
+    {
+      href: '/hr/workforce/activation',
+      label: GH_WORKFORCE_INTAKE.banner_link_to_queue,
+      ariaLabel: GH_WORKFORCE_INTAKE.banner_link_to_queue_aria
+    }
+  ],
+  [
+    'workforce.activation.ready_not_completed',
+    {
+      href: '/hr/workforce/activation',
+      label: GH_WORKFORCE_INTAKE.banner_link_to_queue,
+      ariaLabel: GH_WORKFORCE_INTAKE.banner_link_to_queue_aria
+    }
+  ]
+])
 
 const SEVERITY_LABEL: Record<ReliabilitySeverity, string> = {
   ok: 'Óptimo',
@@ -82,6 +135,8 @@ const VISIBLE_SIGNALS = 3
 
 const SignalRow = ({ signal }: { signal: ReliabilitySignal }) => {
   const color = SEVERITY_CHIP_COLOR[signal.severity]
+  const cta = SIGNAL_ACTION_CTAS.get(signal.signalId)
+  const showCta = cta && signal.severity !== 'ok' && signal.severity !== 'not_configured'
 
   return (
     <Stack direction='row' spacing={1.5} alignItems='flex-start'>
@@ -97,13 +152,29 @@ const SignalRow = ({ signal }: { signal: ReliabilitySignal }) => {
       >
         <i className={SEVERITY_ICON[signal.severity]} />
       </Box>
-      <Stack spacing={0.25} sx={{ minWidth: 0 }}>
+      <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
         <Typography variant='body2' sx={{ fontWeight: 600 }} noWrap>
           {signal.label}
         </Typography>
         <Typography variant='caption' color='text.secondary'>
           {signal.summary}
         </Typography>
+        {showCta ? (
+          <Box sx={{ mt: 0.5 }}>
+            <Button
+              component={Link}
+              href={cta.href}
+              size='small'
+              variant='text'
+              color='primary'
+              endIcon={<i className='tabler-arrow-right' />}
+              aria-label={cta.ariaLabel}
+              sx={{ px: 1, minWidth: 0 }}
+            >
+              {cta.label}
+            </Button>
+          </Box>
+        ) : null}
       </Stack>
     </Stack>
   )

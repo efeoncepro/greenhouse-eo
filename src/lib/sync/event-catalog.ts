@@ -27,6 +27,7 @@ export const AGGREGATE_TYPES = {
   // HR
   leaveRequest: 'leave_request',
   leaveBalance: 'leave_balance',
+  workRelationshipOnboardingCase: 'work_relationship_onboarding_case',
   workRelationshipOffboardingCase: 'work_relationship_offboarding_case',
   onboardingInstance: 'onboarding_instance',
 
@@ -185,7 +186,15 @@ export const AGGREGATE_TYPES = {
   personAddress: 'person_address',
 
   // Platform Release Control Plane (TASK-848)
-  platformRelease: 'platform.release'
+  platformRelease: 'platform.release',
+
+  // SCIM / Identity (TASK-872) — aggregate canonical para client_users
+  // SCIM-provisioning + scim.* events
+  clientUser: 'client_user',
+
+  // HubSpot Companies async intake (TASK-878) — batch envelope para webhook
+  // companies/contacts. Mirror del pattern hubspot_services_batch (TASK-813b).
+  hubspotCompaniesBatch: 'hubspot_companies_batch'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -245,6 +254,12 @@ export const EVENT_TYPES = {
   assignmentCreated: 'assignment.created',
   assignmentUpdated: 'assignment.updated',
   assignmentRemoved: 'assignment.removed',
+  workRelationshipOnboardingCaseCreated: 'work_relationship_onboarding_case.created',
+  workRelationshipOnboardingCaseUpdated: 'work_relationship_onboarding_case.updated',
+  workRelationshipOnboardingCaseApproved: 'work_relationship_onboarding_case.approved',
+  workRelationshipOnboardingCaseScheduled: 'work_relationship_onboarding_case.scheduled',
+  workRelationshipOnboardingCaseActivated: 'work_relationship_onboarding_case.activated',
+  workRelationshipOnboardingCaseCancelled: 'work_relationship_onboarding_case.cancelled',
   workRelationshipOffboardingCaseCreated: 'work_relationship_offboarding_case.created',
   workRelationshipOffboardingCaseUpdated: 'work_relationship_offboarding_case.updated',
   workRelationshipOffboardingCaseApproved: 'work_relationship_offboarding_case.approved',
@@ -692,7 +707,28 @@ export const EVENT_TYPES = {
   platformReleaseReleased: 'platform.release.released',
   platformReleaseDegraded: 'platform.release.degraded',
   platformReleaseRolledBack: 'platform.release.rolled_back',
-  platformReleaseAborted: 'platform.release.aborted'
+  platformReleaseAborted: 'platform.release.aborted',
+
+  // TASK-872 — SCIM Internal Collaborator Provisioning (4 events v1)
+  // Granular: scim.user.* (legacy compat — existing raw strings publicados desde
+  // src/lib/scim/provisioning.ts). El consolidado provides forensic + cascade tag.
+  scimUserCreated: 'scim.user.created',
+  scimUserUpdated: 'scim.user.updated',
+  scimUserDeactivated: 'scim.user.deactivated',
+  scimInternalCollaboratorProvisioned: 'scim.internal_collaborator.provisioned',
+
+  // TASK-872 Slice 5 — Workforce intake transition (pending_intake|in_review → completed).
+  // Admin endpoint POST /api/admin/workforce/members/[memberId]/complete-intake.
+  workforceMemberIntakeCompleted: 'workforce.member.intake_completed',
+
+  // TASK-876 — Workforce Activation remediation before final completion.
+  workforceMemberIntakeUpdated: 'workforce.member.intake_updated',
+
+  // TASK-878 — HubSpot Companies async intake (canonical pattern TASK-813b).
+  // Webhook handler emite este event y retorna <100ms; el reactive consumer
+  // `hubspot_companies_intake` corre `syncHubSpotCompanyById` async en
+  // ops-worker Cloud Run con retry exponencial + dead-letter.
+  commercialHubspotCompanySyncRequested: 'commercial.hubspot_company.sync_requested'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -844,7 +880,10 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.accountingPlSnapshotMaterialized,
   EVENT_TYPES.accountingPlSnapshotPeriodMaterialized,
   EVENT_TYPES.staffAugPlacementSnapshotMaterialized,
-  EVENT_TYPES.staffAugPlacementSnapshotPeriodMaterialized
+  EVENT_TYPES.staffAugPlacementSnapshotPeriodMaterialized,
+
+  // TASK-878 — Async intake de companies HubSpot (mirror TASK-813b services).
+  EVENT_TYPES.commercialHubspotCompanySyncRequested
 ] as const
 
 // ── Event Payload Types (TASK-247) ──

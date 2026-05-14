@@ -110,17 +110,17 @@ const upsertCompany = async (
   syncRunId: string,
   profile: BridgeCompanyProfile
 ): Promise<{ companyRecordId: string }> => {
-  const existing = await runGreenhousePostgresQuery<{ company_record_id: string }>(
-    `SELECT company_record_id FROM greenhouse_crm.companies WHERE hubspot_company_id = $1`,
-    [profile.hubspotCompanyId]
-  )
-
-  const companyRecordId = existing[0]?.company_record_id ?? `crm-company-${randomUUID()}`
   const payloadHash = buildPayloadHash(profile)
-
   const websiteOrDomain = profile.identity.website ?? profile.identity.domain ?? null
 
-  await runGreenhousePostgresQuery(
+  // Race-safe UPSERT canónico. El `candidateRecordId` solo se materializa cuando
+  // la fila no existe; bajo ON CONFLICT DO UPDATE la fila conserva su PK original
+  // y RETURNING devuelve el `company_record_id` realmente persistido (winner-take-all).
+  // Eliminamos pre-SELECT + post-verify que generaban un bug class de race condition
+  // cuando HubSpot dispara webhooks concurrentes para el mismo hubspot_company_id.
+  const candidateRecordId = `crm-company-${randomUUID()}`
+
+  const rows = await runGreenhousePostgresQuery<{ company_record_id: string }>(
     `INSERT INTO greenhouse_crm.companies (
        company_record_id, hubspot_company_id, company_name, legal_name,
        lifecycle_stage, industry, country_code, website_url,
@@ -145,15 +145,26 @@ const upsertCompany = async (
        synced_at = NOW(),
        sync_run_id = EXCLUDED.sync_run_id,
        payload_hash = EXCLUDED.payload_hash,
-       updated_at = NOW()`,
+       updated_at = NOW()
+     RETURNING company_record_id`,
     [
-      companyRecordId, profile.hubspotCompanyId, profile.identity.name, null,
+      candidateRecordId, profile.hubspotCompanyId, profile.identity.name, null,
       profile.lifecycle.lifecyclestage, profile.identity.industry, profile.identity.country, websiteOrDomain,
       syncRunId, payloadHash
     ]
   )
 
-  return { companyRecordId }
+  if (rows.length === 0) {
+    // Estructuralmente imposible con ON CONFLICT DO UPDATE — RETURNING siempre devuelve
+    // la fila persistida. Si llegamos aquí algo patológico ocurre (trigger BEFORE que
+    // aborta, RLS bloqueando lectura, DDL inesperado). Escalar a humano vía Sentry.
+    throw new Error(
+      `INSERT...ON CONFLICT DO UPDATE on greenhouse_crm.companies for hubspot_company_id=${profile.hubspotCompanyId} returned no row. ` +
+      'Check for BEFORE triggers, RLS, or DDL changes suppressing RETURNING.'
+    )
+  }
+
+  return { companyRecordId: rows[0].company_record_id }
 }
 
 const upsertContact = async (
@@ -162,19 +173,18 @@ const upsertContact = async (
   hubspotCompanyId: string,
   contact: BridgeContactProfile
 ): Promise<void> => {
-  const existing = await runGreenhousePostgresQuery<{ contact_record_id: string }>(
-    `SELECT contact_record_id FROM greenhouse_crm.contacts WHERE hubspot_contact_id = $1`,
-    [contact.hubspotContactId]
-  )
-
-  const contactRecordId = existing[0]?.contact_record_id ?? `crm-contact-${randomUUID()}`
-
   const displayName = contact.displayName
     ?? [contact.firstName, contact.lastName].filter(Boolean).join(' ').trim()
     ?? contact.email
     ?? contact.hubspotContactId
 
   const payloadHash = buildPayloadHash(contact)
+
+  // Race-safe UPSERT canónico (mismo patrón que upsertCompany). El candidate
+  // contact_record_id solo se materializa cuando la fila no existe; ON CONFLICT
+  // DO UPDATE preserva el PK original. Eliminamos el pre-SELECT que generaba
+  // bug class de race condition con webhooks concurrentes para el mismo contact.
+  const candidateContactId = `crm-contact-${randomUUID()}`
 
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_crm.contacts (
@@ -213,7 +223,7 @@ const upsertContact = async (
        payload_hash = EXCLUDED.payload_hash,
        updated_at = NOW()`,
     [
-      contactRecordId, companyRecordId, contact.hubspotContactId,
+      candidateContactId, companyRecordId, contact.hubspotContactId,
       hubspotCompanyId, [hubspotCompanyId],
       contact.email, contact.firstName, contact.lastName, displayName,
       contact.jobTitle, contact.phone, contact.mobilePhone, contact.lifecyclestage, contact.hsLeadStatus,
@@ -302,20 +312,13 @@ export const syncHubSpotCompanyById = async (
     contactsCount = contacts.length
 
     // 3. Upsert company first (autocommit), then contacts (FK to company).
+    // companyRecordId proviene de RETURNING — es el PK canónico persistido
+    // (winner-take-all bajo concurrencia). No requiere verify defensivo: el
+    // race condition que motivaba la verificación está estructuralmente cerrado.
     const r = await upsertCompany(syncRunId, profile)
 
     companyRecordId = r.companyRecordId
     console.log(`[sync-company-by-id] Company upserted: ${companyRecordId}`)
-
-    // Verify company exists before linking contacts (defensive)
-    const verify = await runGreenhousePostgresQuery<{ company_record_id: string }>(
-      `SELECT company_record_id FROM greenhouse_crm.companies WHERE company_record_id = $1`,
-      [companyRecordId]
-    )
-
-    if (verify.length === 0) {
-      throw new Error(`Company ${companyRecordId} was not persisted (FK would fail).`)
-    }
 
     for (const contact of contacts) {
       console.log(`[sync-company-by-id] Upserting contact ${contact.hubspotContactId} (company=${companyRecordId})...`)

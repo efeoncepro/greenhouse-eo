@@ -14,9 +14,13 @@ test.describe('auth / session', () => {
     const sessionCookie = cookies.find(
       cookie =>
         cookie.name === 'next-auth.session-token' ||
+        cookie.name.startsWith('next-auth.session-token.') ||
         cookie.name === '__Secure-next-auth.session-token' ||
+        cookie.name.startsWith('__Secure-next-auth.session-token.') ||
         cookie.name === 'authjs.session-token' ||
-        cookie.name === '__Secure-authjs.session-token'
+        cookie.name.startsWith('authjs.session-token.') ||
+        cookie.name === '__Secure-authjs.session-token' ||
+        cookie.name.startsWith('__Secure-authjs.session-token.')
     )
 
     expect(sessionCookie, 'NextAuth/Auth.js session cookie must be present').toBeTruthy()

@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { COUNTRIES, getCountryName } from '@/lib/locale/countries'
 import {
   listIdentityDocumentsForProfileMasked,
   resolveProfileIdForMember
@@ -59,29 +60,42 @@ interface MemberRow {
   [key: string]: unknown
 }
 
-const COUNTRY_NAMES: Record<string, string> = {
-  CL: 'Chile',
-  CO: 'Colombia',
-  AR: 'Argentina',
-  PE: 'Perú',
-  MX: 'México',
-  EC: 'Ecuador',
-  UY: 'Uruguay',
-  BR: 'Brasil',
-  US: 'Estados Unidos',
-  ES: 'España',
-  VE: 'Venezuela',
-  BO: 'Bolivia',
-  PY: 'Paraguay',
-  CR: 'Costa Rica',
-  GT: 'Guatemala',
-  HN: 'Honduras',
-  NI: 'Nicaragua',
-  PA: 'Panamá',
-  DO: 'República Dominicana',
-  SV: 'El Salvador',
-  CU: 'Cuba',
-  PR: 'Puerto Rico'
+const normalizeLookupKey = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+
+const COUNTRY_CODE_BY_NAME = new Map<string, string>(
+  COUNTRIES.map(country => [normalizeLookupKey(country.name), country.code])
+)
+
+const COUNTRY_ALIASES: Record<string, string> = {
+  chile: 'CL',
+  chl: 'CL',
+  usa: 'US',
+  eeuu: 'US',
+  'estados unidos de america': 'US',
+  mexico: 'MX',
+  peru: 'PE',
+  espana: 'ES',
+  panama: 'PA',
+  'republica dominicana': 'DO'
+}
+
+const normalizeOperationalCountryCode = (input: string | null): string | null => {
+  const trimmed = input?.trim()
+
+  if (!trimmed) return null
+
+  const upper = trimmed.toUpperCase()
+
+  if (/^[A-Z]{2}$/.test(upper)) return upper
+
+  const key = normalizeLookupKey(trimmed)
+
+  return COUNTRY_ALIASES[key] ?? COUNTRY_CODE_BY_NAME.get(key) ?? null
 }
 
 /**
@@ -90,18 +104,20 @@ const COUNTRY_NAMES: Record<string, string> = {
  */
 const inferRegime = (
   payRegime: string | null,
-  countryCode: string | null
+  countryCode: string | null,
+  contractType: string | null
 ): SelfServiceRegime => {
   const country = countryCode?.toUpperCase() ?? null
   const regime = payRegime?.toLowerCase() ?? null
+  const contract = contractType?.toLowerCase() ?? null
 
   // International: cualquier país NO Chile, o pay_regime explícitamente internacional
-  if (regime === 'international' || regime === 'deel' || (country && country !== 'CL')) {
+  if (regime === 'international' || regime === 'deel' || contract === 'contractor' || contract === 'eor' || (country && country !== 'CL')) {
     return 'international'
   }
 
-  // Chile honorarios — pay_regime puede venir como 'honorarios' o 'honorarios_chile'
-  if (regime === 'honorarios' || regime === 'honorarios_chile') {
+  // Chile honorarios — contract_type es más específico que pay_regime legacy ('chile').
+  if (regime === 'honorarios' || regime === 'honorarios_chile' || contract === 'honorarios') {
     return 'honorarios_chile'
   }
 
@@ -163,8 +179,8 @@ export const resolveSelfServicePaymentProfileContext = async (
     }
   }
 
-  const countryCode = member.location_country?.toUpperCase() ?? null
-  const regime = inferRegime(member.pay_regime, countryCode)
+  const countryCode = normalizeOperationalCountryCode(member.location_country)
+  const regime = inferRegime(member.pay_regime, countryCode, member.contract_type)
 
   const currency: 'CLP' | 'USD' | null =
     regime === 'chile_dependent' || regime === 'honorarios_chile'
@@ -213,7 +229,7 @@ export const resolveSelfServicePaymentProfileContext = async (
   return {
     regime,
     countryCode,
-    countryName: countryCode ? (COUNTRY_NAMES[countryCode] ?? countryCode) : null,
+    countryName: countryCode ? (getCountryName(countryCode) ?? countryCode) : null,
     currency,
     legalFullName: member.legal_name ?? member.display_name ?? null,
     legalDocumentMasked,

@@ -441,7 +441,6 @@ registerTemplate('payroll_payment_committed', (context: {
 registerTemplate('beneficiary_payment_profile_changed', (context: {
   fullName: string
   kind: PaymentProfileEmailKind
-  providerLabel: string | null
   bankName: string | null
   accountNumberMasked: string | null
   currency: 'CLP' | 'USD'
@@ -457,7 +456,6 @@ registerTemplate('beneficiary_payment_profile_changed', (context: {
     react: BeneficiaryPaymentProfileChangedEmail({
       fullName: context.fullName,
       kind: context.kind,
-      providerLabel: context.providerLabel,
       bankName: context.bankName,
       accountNumberMasked: context.accountNumberMasked,
       currency: context.currency,
@@ -1059,7 +1057,6 @@ registerPreviewMeta('beneficiary_payment_profile_changed', {
   defaultProps: {
     fullName: 'Maria Gonzalez Rojas',
     kind: 'approved',
-    providerLabel: 'Banco de Chile',
     bankName: 'Banco de Chile',
     accountNumberMasked: '.... 4321',
     currency: 'CLP',
@@ -1070,7 +1067,6 @@ registerPreviewMeta('beneficiary_payment_profile_changed', {
   propsSchema: [
     { key: 'fullName', label: 'Nombre completo', type: 'text' },
     { key: 'kind', label: 'Tipo de aviso', type: 'select', options: ['approved', 'updated', 'cancelled'] },
-    { key: 'providerLabel', label: 'Proveedor', type: 'text' },
     { key: 'bankName', label: 'Banco', type: 'text' },
     { key: 'accountNumberMasked', label: 'Cuenta enmascarada', type: 'text' },
     { key: 'currency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },

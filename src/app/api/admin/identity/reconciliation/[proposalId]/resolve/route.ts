@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 
 import { getServerAuthSession } from '@/lib/auth'
+import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
+import { can } from '@/lib/entitlements/runtime'
+import { loadMemberCandidate } from '@/lib/identity/reconciliation/member-scoped'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { applyIdentityLink, updateProposalStatus } from '@/lib/identity/reconciliation/apply-link'
@@ -25,6 +28,19 @@ export async function POST(request: Request, { params }: Params) {
 
     if (!['approve', 'reject', 'dismiss', 'reassign'].includes(action)) {
       return NextResponse.json({ error: 'Invalid action. Use: approve, reject, dismiss, reassign' }, { status: 400 })
+    }
+
+    const subject = buildTenantEntitlementSubject(tenant)
+
+    const capabilityCheck =
+      action === 'approve'
+        ? can(subject, 'identity.reconciliation.approve', 'approve', 'tenant')
+        : action === 'reassign'
+          ? can(subject, 'identity.reconciliation.reassign', 'update', 'tenant')
+          : can(subject, 'identity.reconciliation.reject', 'update', 'tenant')
+
+    if (!capabilityCheck) {
+      return NextResponse.json({ error: 'Forbidden — identity reconciliation capability required' }, { status: 403 })
     }
 
     // Load proposal
@@ -71,7 +87,7 @@ export async function POST(request: Request, { params }: Params) {
           return NextResponse.json({ error: 'Cannot approve: no candidate member' }, { status: 400 })
         }
 
-        await applyIdentityLink(proposal)
+        await applyIdentityLink(proposal, { requireCanonicalPostgres: true })
         await updateProposalStatus(proposalId, 'admin_approved', resolvedBy, note)
         break
       }
@@ -81,9 +97,18 @@ export async function POST(request: Request, { params }: Params) {
 
         if (!memberId) return NextResponse.json({ error: 'memberId required for reassign' }, { status: 400 })
 
-        const reassigned = { ...proposal, candidateMemberId: memberId }
+        const candidate = await loadMemberCandidate(memberId)
 
-        await applyIdentityLink(reassigned)
+        if (!candidate) return NextResponse.json({ error: `memberId ${memberId} not found` }, { status: 404 })
+
+        const reassigned = {
+          ...proposal,
+          candidateMemberId: memberId,
+          candidateProfileId: candidate.identityProfileId,
+          candidateDisplayName: candidate.displayName
+        }
+
+        await applyIdentityLink(reassigned, { requireCanonicalPostgres: true })
         await updateProposalStatus(proposalId, 'admin_approved', resolvedBy, note || `Reassigned to ${memberId}`)
         break
       }

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-05-01 por Julio Reyes
-> **Ultima actualizacion:** 2026-05-01 por Julio Reyes
+> **Ultima actualizacion:** 2026-05-14 por Codex
 > **Documentacion tecnica:** [docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md)
 
 ## Que es
@@ -22,20 +22,21 @@ montada en 3 lugares.
 |---|---|---|
 | Person 360 - tab "Pago" | Manager/Admin del miembro | Crear, editar, aprobar, cancelar, revelar datos |
 | Shareholder 360 - seccion "Perfil de pago" | Admin de cuenta accionista | Crear, editar, aprobar, cancelar |
-| Finance Ops `/finance/payment-profiles` | Checker de finanzas | Aprobar pendientes, ver drift, auditar universal |
+| Finance Ops `/finance/payment-profiles` | Checker de finanzas | Activar borradores, aprobar pendientes, ver drift, auditar universal |
 
 **Regla**: la creacion y edicion siempre vive con el beneficiario (Person 360 o
 Shareholder 360). La surface ops es read-only y existe para 3 jobs:
 
 1. Cola de aprobacion (perfiles esperando checker)
-2. Drift card: beneficiarios con obligaciones vivas pero sin perfil activo
-3. Tabla universal con deep links a cada 360
+2. Cola de activacion (perfiles en borrador que aun no cuentan como ruta activa)
+3. Drift card: beneficiarios con obligaciones vivas pero sin perfil activo
+4. Tabla universal con deep links a cada 360
 
 ## Estados
 
 | Estado | Que significa |
 |---|---|
-| Borrador | El maker creo el perfil pero aun no esta listo |
+| Borrador | El maker creo el perfil pero aun no esta activo. Debe activarse desde la tarjeta/drawer; si tiene maker-checker, debe hacerlo otro usuario |
 | Pendiente aprobacion | Esperando checker (otro usuario distinto al maker) |
 | Activo | Vigente. Una sola fila por (beneficiario, moneda, espacio) |
 | Reemplazado | Existe un nuevo perfil activo que lo reemplazo |
@@ -45,9 +46,11 @@ Shareholder 360). La surface ops es read-only y existe para 3 jobs:
 
 1. **Crear**: en Person 360 / Shareholder 360, click en "+ Agregar perfil".
    Llenar provider, metodo, cuenta destino, banco, etc.
-2. **Aprobar**: otro usuario distinto al maker entra al perfil y hace click en
-   "Aprobar". El sistema bloquea si maker == checker (triple defensa: trigger DB
-   + helper TS + UI).
+2. **Activar o aprobar**: si el perfil quedo en borrador sin maker-checker, el
+   operador hace click en "Activar perfil". Si quedo pendiente de aprobacion,
+   otro usuario distinto al maker hace click en "Aprobar perfil". El sistema
+   bloquea si maker == checker cuando `require_approval=true` (triple defensa:
+   trigger DB + helper TS + UI).
 3. **Editar**: editar un perfil activo crea uno nuevo. Al aprobarse, el viejo
    queda automaticamente como "Reemplazado" en la misma transaccion.
 4. **Revelar datos sensibles**: solo desde Person 360 / Shareholder 360 con

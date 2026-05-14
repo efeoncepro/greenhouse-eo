@@ -821,8 +821,21 @@ export const pgGetCompensationVersionById = async (versionId: string) => {
   return row ? mapCompensationVersion(row) : null
 }
 
+// TASK-872 Slice 4 — Gate canónico de workforce_intake_status para payroll engine.
+// Flag default false → comportamiento idéntico a pre-TASK-872 (no breaking change).
+// Flag true → excluye members con workforce_intake_status != 'completed' (pending_intake
+// o in_review). Los 7 legacy members default 'completed' por migration Slice 1.5 → no
+// cambio en comportamiento legacy cuando flag flipped.
+//
+// Función pura runtime read (no module-level cache) para que tests puedan flip env var
+// entre cases. Mirror del flag SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED en Slice 3.
+const isPayrollWorkforceIntakeGateEnabled = (): boolean =>
+  process.env.PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED === 'true'
+
 export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: string, periodEnd: string) => {
   await assertPayrollPostgresReady()
+
+  const intakeGate = isPayrollWorkforceIntakeGateEnabled() ? `AND m.workforce_intake_status = 'completed'` : ''
 
   const rows = await runGreenhousePostgresQuery<PgCompensationRow & { active: boolean }>(
     `
@@ -872,6 +885,7 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
        AND cv.effective_from <= $2::date
        AND (cv.effective_to IS NULL OR cv.effective_to >= $1::date)
       WHERE m.active = TRUE
+        ${intakeGate}
         AND NOT EXISTS (
           SELECT 1
           FROM greenhouse_hr.work_relationship_offboarding_cases AS oc

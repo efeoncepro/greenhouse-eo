@@ -30,12 +30,31 @@ Contrato arquitectonico nuevo desde 2026-04-25.
 Estado actual del repo:
 
 - existe onboarding como checklist/template operativo dentro de HRIS (`greenhouse_hr.onboarding_*`, TASK-030)
+- desde TASK-875 existe foundation runtime para `WorkRelationshipOnboardingCase` en `greenhouse_hr.work_relationship_onboarding_cases`
+- `greenhouse_hr.onboarding_instances.onboarding_case_id` permite vincular checklists como hijos operativos opcionales
 - existe soporte parcial de `onboarding` como dominio de approval workflow
 - `SCIM` y Admin Center ya cubren partes del provisioning tecnico de acceso
 - `members` y `People` ya pueden mostrar una persona activa en runtime
-- no existe todavia un agregado canonico que orqueste el inicio laboral, acceso, readiness operativa y lane de payroll end-to-end
+- la orquestacion end-to-end completa de SCIM/payroll/leave/equipment sigue pendiente; TASK-875 solo materializa el aggregate root y el wiring minimo con Workforce Activation
 
 Este documento fija la direccion canonica para cerrar ese gap.
+
+## Delta 2026-05-14 — TASK-875 foundation runtime
+
+TASK-875 implementa la primera version ejecutable del agregado:
+
+- tabla `greenhouse_hr.work_relationship_onboarding_cases`
+- tabla append-only `greenhouse_hr.work_relationship_onboarding_case_events`
+- FK opcional `greenhouse_hr.onboarding_instances.onboarding_case_id`
+- runtime `src/lib/workforce/onboarding/*` con lanes, state machine y store transaccional
+- eventos outbox `work_relationship_onboarding_case.{created,approved,scheduled,activated,cancelled,updated}`
+- wiring desde `completeWorkforceMemberIntake()` para crear/activar el caso idempotentemente al completar una ficha
+- consumo desde `resolveWorkforceActivationReadiness()`:
+  - ausencia de caso = warning advisory, no blocker
+  - caso abierto = warning
+  - caso `blocked` = blocker real de lane `operational_onboarding`
+
+No agrega UI, routeGroups, views, entitlements ni startup policy. La surface humana primaria sigue siendo TASK-874 en `/hr/workforce/activation`.
 
 ## Core Thesis
 

@@ -6,8 +6,9 @@ import { expect, gotoWithTransientRetries, test } from '../fixtures/auth'
  * Verifica el contrato canonico end-to-end. El agent dedicated user
  * (`agent@greenhouse.efeonce.org`) no tiene fila en team_members por
  * diseño (es admin/auth-only), entonces el endpoint context devuelve
- * 422 'Member identity not linked'. El test valida que ESE PATH es
- * el path documentado, y que cuando el regimen sí se resuelve el
+ * 422 con canonical error body `code='member_identity_not_linked'`
+ * (Canonical API error contract, 2026-05-14). El test valida que ESE PATH
+ * es el path documentado, y que cuando el regimen sí se resuelve el
  * provider/method NO aparecen en el form.
  *
  * Para regression test del happy path (member linked), correr con
@@ -22,7 +23,8 @@ test.describe('TASK-753 /my/payment-profile self-service contract', () => {
 
     // Two valid outcomes:
     //  - 200 + valid DTO (when caller has team_members row)
-    //  - 422 + 'Member identity not linked' (admin-only / agent test users)
+    //  - 422 + canonical error body { error, code, actionable } when admin-only / agent test users
+    //    (Canonical API error contract, 2026-05-14)
     expect([200, 422]).toContain(status)
 
     if (status === 200) {
@@ -40,8 +42,14 @@ test.describe('TASK-753 /my/payment-profile self-service contract', () => {
     } else {
       const body = await response.json()
 
+      // Canonical shape (TASK-878 follow-up): { error, code, actionable }.
+      // El error es es-CL canónico, NUNCA prose inglesa. El code es stable
+      // machine identifier; el test pin canonical es por `code` no por copy.
       expect(body).toHaveProperty('error')
-      expect(body.error).toMatch(/Member|member|tenant/i)
+      expect(typeof body.error).toBe('string')
+      expect(body.error.length).toBeGreaterThan(0)
+      expect(body).toHaveProperty('code', 'member_identity_not_linked')
+      expect(body).toHaveProperty('actionable', false)
     }
   })
 

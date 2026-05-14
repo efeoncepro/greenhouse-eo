@@ -41,6 +41,87 @@ Operational evidence:
 
 Residual Entra note: the regular provisioning job can still show historical `countEscrowed` after previous failures. Do not fix that counter with SQL. Use Microsoft Graph provisioning logs, `restart` with `resetScope=Escrows`, and `provisionOnDemand` for controlled validation.
 
+## Delta 2026-05-13 — TASK-872 V1 Internal Collaborator Provisioning SHIPPED (code complete, flags default false)
+
+Implementación canónica completa. 6 commits incrementales en `develop`:
+
+1. Slice 1 (`019a5ffd`) — eligibility 4-layer policy + scim_eligibility_overrides table + audit append-only
+2. Slice 1.5 (`353b06a9`) — `members.workforce_intake_status` migration + capabilities registry seed
+3. Slice 2 (`77d67277`) — primitive atomic `provisionInternalCollaboratorFromScim` + cascade D-2 + outbox consolidado
+4. Slice 3 (`0a08a64c`) — wire SCIM CREATE endpoint behind feature flag
+5. Slice 4 (`1989265c`) — payroll engine gate behind flag
+6. Slice 6 (`54c92b84`) — 6 reliability signals canónicos
+
+Test coverage: 460+ tests verde (46 SCIM unit + live + 420 payroll). Default flags en producción mantienen comportamiento idéntico a pre-TASK-872 (zero behavioral change post-merge). Flips graduales canónicos:
+
+| Flag | Default | Cuándo flippear | Revert |
+| --- | --- | --- | --- |
+| `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` | `false` | Tras smoke staging con `provisionOnDemand` test user verde | env var false + redeploy <5min |
+| `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` | `false` | Tras flag SCIM enabled + cooldown 24h + corrida payroll mock excluye `pending_intake` | env var false + redeploy <5min |
+
+Runbook canonical: `docs/operations/runbooks/scim-internal-collaborator-recovery.md` (6 escenarios).
+
+Slice 5 (backfill apply Felipe + Maria Camila Hoyos) **diferido a Sesión 2** con coordinación HR + signoff humano + smoke staging exhaustivo. Pre-condiciones documentadas en runbook §Escenario 2.
+
+3 decisiones canonizables aplicadas durante arch-architect review pre-implementación:
+
+### D-1 — `members.workforce_intake_status` como gate explícito
+
+Toda alta SCIM interna que cree un `member` lo crea con `workforce_intake_status='pending_intake'`. Payroll/capacity/compensation/assignment readers DEBEN filtrar `WHERE workforce_intake_status = 'completed'` explícito antes de operar sobre el member.
+
+Razón: defaults `members.contract_type='indefinido' + pay_regime='chile'` son trampas latentes. Sin gate explícito, la primera persona contratada via SCIM entra a la próxima corrida de payroll con $0 base. Patrón canónico ya aplicado en `services.hubspot_sync_status` (TASK-813) — estado enum explícito en lugar de derivado.
+
+Migration: `ALTER TABLE greenhouse_core.members ADD COLUMN workforce_intake_status TEXT NOT NULL DEFAULT 'completed' CHECK IN ('pending_intake','in_review','completed')`. Default `'completed'` para legacy = backward compat 100%.
+
+### D-2 — Cascade lookup determinístico de `member_id`
+
+`provisionInternalCollaboratorFromScim` resuelve `member_id` por cascade del más fuerte al más débil:
+
+1. `members WHERE identity_profile_id = $profileId` → reuse + populate `azure_oid` si falta
+2. `members WHERE azure_oid = $externalId` → reuse + populate `identity_profile_id` si falta
+3. `members WHERE lower(primary_email) = lower($email) AND azure_oid IS NULL` → reuse legacy pre-SCIM + populate ambos
+4. None → INSERT new con `member_id = randomUUID()` opaque
+
+**Drift detection**: si cascade #2 o #3 matchea pero `members.identity_profile_id` actual ≠ esperado → throw `MemberIdentityDriftError` + signal `identity.scim.member_identity_drift` (kind=`data_quality`, severity=`error`, steady=0). No auto-merge.
+
+NUNCA derivar `member_id` del email normalizado o del Entra OID — opaque UUID preserva FKs downstream ante cambio de email.
+
+### D-3 — Eligibility policy 4-layer defense-in-depth
+
+Función pura `evaluateInternalCollaboratorEligibility()` en `src/lib/scim/eligibility.ts`:
+
+| Layer | Test | Acción si falla |
+|---|---|---|
+| L1 hard reject | UPN contiene `#EXT#`, o domain ∉ `allowed_email_domains` | NO crear `client_user` ni `member` |
+| L2 funcional | Email local-part match regex `^(noreply|no-reply|support|info|marketing|admin|hr|finance|root|postmaster|webmaster|abuse|security|scim-sync|service-.*|bot-.*)@` | Crear `client_user` SÍ, NO `member` |
+| L3 name shape | Missing apellido o displayName insuficiente | Crear `client_user` SÍ, NO `member` |
+| L4 admin override | Match en tabla `scim_eligibility_overrides` (allow/deny audit-relevant con actor + reason ≥20 chars) | Bypass L1-L3 con audit trail |
+
+Reliability signal `identity.scim.ineligible_accounts_in_scope` (drift, warning si >5, steady<5) cuenta L1+L2+L3 hits últimos 7 días.
+
+### Cross-tenant isolation invariante
+
+SCIM CREATE con `tenant_type='client'` (cliente externo, e.g. Sky) → crea `client_user` SOLO, NO evalúa eligibility internal collaborator, NO crea `member`. Test anti-regresión obligatorio. Esto es ortogonal a D-3 (que filtra dentro del tenant interno).
+
+### Outbox event consolidado nuevo
+
+Además de los granulares (`scim.user.created`, `member.created`, `membership.created`), la primitive emite `scim.internal_collaborator.provisioned v1` con payload completo `{userId, identityProfileId, memberId, azureOid, primaryEmail, displayName, roleCode, workforceIntakeStatus, eligibilityVerdict, cascadeOutcome, operatingEntityMembershipAction}` para audit forensic single-query.
+
+### Hard rules (anti-regression para canonizar al cierre TASK-872)
+
+- **NUNCA** crear `members` desde SCIM CREATE con `client_id != null`. La primitive verifica `client_id IS NULL AND tenant_type='efeonce_internal'`.
+- **NUNCA** derivar `member_id` del email normalizado o del Entra OID. Cascade D-2 + opaque UUID.
+- **NUNCA** poblar `members` sin `workforce_intake_status='pending_intake'` cuando `provisioned_by='scim'`. Default explícito.
+- **NUNCA** incluir members con `workforce_intake_status != 'completed'` en una corrida payroll. Gate explícito en payroll engine reader.
+- **NUNCA** ejecutar los 6 writes fuera de una sola `withTransaction`. Refactorear helpers reusados (e.g. `syncOperatingEntityMembershipForMember`) para aceptar `client?: Kysely | Transaction` opcional.
+- **NUNCA** loggear payload completo de SCIM request. Use `redactErrorForResponse` + `captureWithDomain('identity', err, { tags: { source: 'scim_provisioning' } })`.
+- **NUNCA** ejecutar backfill apply sin `--apply` + allowlist persisted. Dry-run default + drift detection D-2 step ANTES del apply.
+- **NUNCA** marcar member legacy como `workforce_intake_status='pending_intake'` por error en backfill. Cascade D-2 #3 reusa legacy SIN tocar `workforce_intake_status`.
+- **SIEMPRE** que la primitive cree member, emitir `scim.internal_collaborator.provisioned v1` además de los granulares.
+- **SIEMPRE** que el primitive detecte drift D-2 → throw + signal + no auto-merge. Humano resuelve.
+
+---
+
 ## Source-of-Truth Boundaries
 
 | Domain | Authority | Notes |
@@ -79,7 +160,7 @@ Daily cron job that fetches enrichment data directly from the Microsoft Graph AP
 
 - **Schedule:** `0 8 * * *` (08:00 UTC, 05:00 Chile)
 - **Auth:** OAuth2 client credentials flow (`AZURE_AD_CLIENT_ID` + `AZURE_AD_CLIENT_SECRET`)
-- **Syncs:** `jobTitle`, `country`, `city`, `phone`, `displayName`, `accountEnabled`
+- **Syncs:** `jobTitle`, `country`, `city`, `phone`, `displayName`, `accountEnabled`, Microsoft Graph profile photo
 - **Targets:** `client_users`, `identity_profiles`, `members`
 - **Governance add-on:** resolves Graph `manager` and opens review proposals when Entra disagrees with `greenhouse_core.reporting_lines`
 
@@ -114,6 +195,7 @@ Diff-based update logic:
 - Compares Entra values against current Greenhouse records
 - Only writes when values actually differ (uses `IS DISTINCT FROM` in SQL)
 - Cleans Entra display names by removing organizational suffixes (e.g., " | Efeonce")
+- Stores avatar assets in GCS, writes the canonical `gs://` path to `greenhouse_core.client_users.avatar_url`, lets `greenhouse_serving.person_360.resolved_avatar_url` project it, and writes a browser-safe proxy URL to `greenhouse_core.members.avatar_url` for legacy/member readers. Runtime avatar delivery must resolve from Postgres/Person 360 first; BigQuery is only a legacy mirror.
 
 #### 6b. Hierarchy Governance Lane (`src/lib/reporting-hierarchy/governance.ts`)
 

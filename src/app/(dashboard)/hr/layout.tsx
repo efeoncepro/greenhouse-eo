@@ -15,7 +15,7 @@ export default async function HrLayout({ children }: { children: ReactNode }) {
 
   const hasAccess = hasAnyAuthorizedViewCode({
     tenant,
-    viewCodes: ['equipo.nomina', 'equipo.nomina_proyectada', 'equipo.permisos', 'equipo.jerarquia', 'equipo.organigrama', 'equipo.departamentos', 'equipo.asistencia', 'equipo.offboarding', 'equipo.onboarding'],
+    viewCodes: ['equipo.nomina', 'equipo.nomina_proyectada', 'equipo.permisos', 'equipo.jerarquia', 'equipo.organigrama', 'equipo.departamentos', 'equipo.asistencia', 'equipo.offboarding', 'equipo.onboarding', 'equipo.workforce_activation'],
     fallback: tenant.routeGroups.includes('hr') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   })
 

@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 
+import { captureWithDomain } from '@/lib/observability/capture'
+import { redactErrorForResponse } from '@/lib/observability/redact'
 import { requireScimAuth } from '@/lib/scim/auth'
+import { evaluateInternalCollaboratorEligibility } from '@/lib/scim/eligibility'
+import { listActiveOverridesForTenantMapping } from '@/lib/scim/eligibility-overrides-store'
 import { toScimUser, toScimError, toScimListResponse } from '@/lib/scim/formatters'
 import {
   getUserByExternalId,
@@ -10,10 +14,18 @@ import {
   createUser,
   getTenantMappingByDomain,
   getTenantMappingByTenantId,
+  getUserById,
   logScimOperation
 } from '@/lib/scim/provisioning'
+import {
+  MemberIdentityDriftError,
+  provisionInternalCollaboratorFromScim
+} from '@/lib/scim/provisioning-internal-collaborator'
 
 import type { ScimCreateUserRequest } from '@/types/scim'
+
+const isInternalCollaboratorPrimitiveEnabled = () =>
+  process.env.SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED === 'true'
 
 export const dynamic = 'force-dynamic'
 
@@ -174,6 +186,125 @@ export async function POST(request: Request) {
 
     const isInternalTenant = mapping.client_id === null
 
+    // TASK-872 Slice 3 — Branch: internal eligible vs legacy createUser path.
+    // Flag SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true gatea el nuevo primitive.
+    // Cuando false (default prod) o tenant_type='client' (externo) → path legacy.
+    if (isInternalTenant && isInternalCollaboratorPrimitiveEnabled()) {
+      // Evaluate eligibility (4-layer policy)
+      const overrides = await listActiveOverridesForTenantMapping(mapping.scim_tenant_mapping_id)
+
+      const verdict = evaluateInternalCollaboratorEligibility({
+        upn: userName,
+        email,
+        externalId,
+        displayName: body.name?.givenName || body.name?.familyName ? displayName : displayName || null,
+        givenName: body.name?.givenName ?? null,
+        familyName: body.name?.familyName ?? null,
+        allowedDomains: mapping.allowed_email_domains,
+        overrides
+      })
+
+      // Hard reject: no client_user, no member
+      if (!verdict.eligible && verdict.outcome === 'reject') {
+        await logScimOperation({
+          operation: 'CREATE',
+          externalId,
+          email,
+          microsoftTenantId: mapping.microsoft_tenant_id,
+          responseStatus: 400,
+          errorMessage: `Eligibility reject: ${verdict.reason}`
+        })
+
+        return NextResponse.json(
+          toScimError(`SCIM user ineligible (${verdict.reason})`, 400),
+          { status: 400 }
+        )
+      }
+
+      // client_user_only: fallback al legacy path (sin crear member)
+      if (!verdict.eligible && verdict.outcome === 'client_user_only') {
+        const newUser = await createUser({
+          email,
+          displayName: displayName || email,
+          microsoftOid: externalId,
+          microsoftTenantId: mapping.microsoft_tenant_id,
+          microsoftEmail: email,
+          clientId: mapping.client_id,
+          tenantType: 'efeonce_internal',
+          defaultRoleCode: mapping.default_role_code,
+          active
+        })
+
+        await logScimOperation({
+          operation: 'CREATE',
+          scimId: newUser.scim_id,
+          externalId,
+          email,
+          microsoftTenantId: mapping.microsoft_tenant_id,
+          responseStatus: 201,
+          errorMessage: `client_user_only: ${verdict.reason}`
+        })
+
+        return NextResponse.json(toScimUser(newUser), { status: 201 })
+      }
+
+      // Eligible (verdict.eligible === true): full primitive
+      try {
+        const result = await provisionInternalCollaboratorFromScim({
+          email,
+          externalId,
+          displayName: displayName || email,
+          microsoftTenantId: mapping.microsoft_tenant_id,
+          microsoftEmail: email,
+          tenantMappingId: mapping.scim_tenant_mapping_id,
+          defaultRoleCode: mapping.default_role_code,
+          active,
+          entraJobTitle: null, // SCIM standard doesn't include jobTitle; cron enrichment posterior
+          eligibilityVerdict: verdict
+        })
+
+        await logScimOperation({
+          operation: 'CREATE',
+          scimId: result.scimId,
+          externalId,
+          email,
+          microsoftTenantId: mapping.microsoft_tenant_id,
+          responseStatus: 201,
+          errorMessage: result.idempotent ? 'idempotent' : null
+        })
+
+        // Re-fetch row for SCIM-shaped response
+        const userRow = await getUserById(result.userId)
+
+        if (!userRow) {
+          return NextResponse.json(toScimError('Internal error: user disappeared post-provision', 500), { status: 500 })
+        }
+
+        return NextResponse.json(toScimUser(userRow), { status: 201 })
+      } catch (error) {
+        if (error instanceof MemberIdentityDriftError) {
+          captureWithDomain(error, 'identity', {
+            tags: { source: 'scim_provisioning', stage: 'cascade_d2_drift', kind: error.kind },
+            extra: { memberId: error.memberId, details: error.details, externalId, email }
+          })
+
+          await logScimOperation({
+            operation: 'CREATE',
+            externalId,
+            email,
+            microsoftTenantId: mapping.microsoft_tenant_id,
+            responseStatus: 500,
+            errorMessage: `member_identity_drift: ${error.kind}`
+          })
+
+          return NextResponse.json(toScimError('Member identity drift detected — human resolution required', 500), { status: 500 })
+        }
+
+        throw error
+      }
+    }
+
+    // Legacy path (tenant_type='client' externo, OR flag disabled)
     const newUser = await createUser({
       email,
       displayName: displayName || email,
@@ -197,12 +328,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json(toScimUser(newUser), { status: 201 })
   } catch (error) {
-    console.error('[scim] POST /Users error:', error)
+    captureWithDomain(error instanceof Error ? error : new Error(String(error)), 'identity', {
+      tags: { source: 'scim_provisioning', stage: 'unknown' }
+    })
 
     await logScimOperation({
       operation: 'CREATE',
       responseStatus: 500,
-      errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      errorMessage: redactErrorForResponse(error)
     }).catch(() => {})
 
     return NextResponse.json(toScimError('Internal server error', 500), { status: 500 })

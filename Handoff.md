@@ -1,4 +1,207 @@
-# Sesion 2026-05-13 — TASK-871 Account Balance Rolling Anchor Contract SHIPPED on develop (Slices 2-4 + cierre docs)
+# Sesion 2026-05-14 — TASK-877 Workforce Activation External Identity Reconciliation IN-PROGRESS
+
+- **Cierre 2026-05-14**: TASK-877 queda implementada end-to-end y movida a `complete/` en `develop` por instruccion explicita del usuario.
+- **Qué cambió**: Workforce Activation suma lane crítica `operational_integrations`; members activos/asignables en activación requieren link Notion canónico antes de completar ficha. Se agregaron discovery Notion `users.list`, candidatos/evidencia/confianza en drawer HR, endpoint HR `GET/POST /api/hr/workforce/members/[memberId]/external-identity/notion`, apply Postgres-first con BigQuery mirror, hardening admin reconciliation con capabilities y reassign profile-safe, Postgres-first Notion member map para `sync-notion-conformed`, y 2 reliability signals determinísticos.
+- **Access model**:
+  - `routeGroups`: `hr` mantiene la surface operacional Workforce Activation.
+  - `views`: `equipo.workforce_activation` ahora declara binding a `workforce.member.external_identity.resolve`.
+  - `entitlements`: nueva `workforce.member.external_identity.resolve` para HR; `identity.reconciliation.read|approve|reject|reassign|run` quedan EFEONCE_ADMIN en runtime bajo module canónico `organization` (el vocabulario runtime no tiene module `identity`).
+  - `startup policy`: sin cambios.
+- **Matriz de riesgo**:
+  - Runtime activation false positive: mitigado porque readiness no llama Notion live; solo usa Postgres/proyecciones y policy `assignable && active && pending/in_review`.
+  - Link erróneo: mitigado con candidatos server-side, verificación live de Notion, conflict check en `identity_profile_source_links` y aprobación humana.
+  - Drift Postgres/BigQuery: mitigado con apply Postgres-first + mirror BigQuery y signal de conflictos; `sync-notion-conformed` ya lee Postgres-first con fallback.
+  - Access overgrant: mitigado separando `views`/`routeGroups` de capabilities finas; admin reconciliation solo EFEONCE_ADMIN.
+  - Notion outage/token: discovery degrada a unavailable; no se bloquea render ni se acepta UUID manual.
+- **Rollback listo**:
+  1. Revertir/down migration `20260514175558759_task-877-workforce-external-identity-access.sql` para marcar deprecated las 6 capabilities.
+  2. Retirar runtime grant `workforce.member.external_identity.resolve` para ocultar la resolucion operacional sin tocar readiness historico.
+  3. Si se aplico un link incorrecto, marcar `greenhouse_core.identity_profile_source_links.active=false` para ese `source_object_id`, limpiar `members.notion_user_id/notion_display_name` del member afectado y corregir mirror BigQuery `greenhouse.team_members.notion_user_id`.
+  4. Re-ejecutar `pnpm pg:doctor`, reliability signals y readiness del member afectado.
+- **Validación ejecutada**: `pnpm pg:connect:migrate` aplicó la migración y regeneró tipos; `pnpm pg:doctor`; `pnpm exec tsc --noEmit`; `pnpm design:lint`; `pnpm lint` (0 errores, 4 warnings legacy TASK-825 no tocados); `pnpm exec vitest run src/lib/reliability/queries/scim-workforce-signals.live.test.ts src/lib/entitlements/runtime.test.ts`; `pnpm build`.
+- **No validado**: no se aprobó/rechazó un link real desde UI para no mutar identidades reales de personas observadas; el endpoint quedó listo para prueba manual con operador.
+- **Docs actualizadas**: `docs/tasks/complete/TASK-877...`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/plans/TASK-877-plan.md`, `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`, `docs/architecture/DECISIONS_INDEX.md`, `changelog.md`, este `Handoff.md`.
+
+- **Ownership**: Codex toma TASK-877 desde `to-do` y la mueve a `in-progress`.
+- **Branch**: `develop` directo por instruccion explicita del usuario; no se cambio de rama aunque la task declara branch canonica.
+- **Estado actual**: shipped local en develop; no hay PR ni branch abierto para TASK-877.
+- **Scope sensible**: identidad externa, Workforce Activation, Notion/BigQuery mirror, access model y UI visible. Requiere Discovery/Audit/Plan completo antes de codigo runtime.
+
+# Sesion 2026-05-14 — TASK-876 Workforce Activation Remediation Flow SHIPPED ✅
+
+- **Hotfix post-feedback 2026-05-14 — Payment profile activation trap**: el usuario creo perfil de pago para Felipe pero Workforce Activation seguia bloqueando con "Perfil de pago faltante o no aprobado". Causa raíz: readiness exige perfil `active` (correcto), backend `approvePaymentProfile()` permite activar/aprobar `draft|pending_approval` (correcto), pero la UI solo mostraba el CTA de aprobación para `pending_approval`; un perfil `draft` quedaba visible pero no operable. Fix canónico: `PaymentProfileCard` y `ProfileDetailDrawer` ahora muestran `Activar perfil` para `draft` sin maker-checker y `Aprobar perfil` para `draft|pending_approval` con maker-checker, sin saltarse la regla maker != checker. `PaymentProfilesPanel` muestra toast por estado creado, `/finance/payment-profiles` incluye `draft` en la cola accionable, `queue-summary` expone `draftCount/actionableCount/actionableProfiles`, y `resolveWorkforceActivationReadiness()` distingue warning `payment_profile_draft_activation_required` cuando existe perfil pero falta activarlo. No se aprobaron ni mutaron datos reales de Felipe/Maria desde automatización.
+- **Validación hotfix payment profile**: `pnpm vitest run src/lib/workforce/activation/readiness.test.ts` (8/8), `pnpm tsc --noEmit`, `pnpm lint` (0 errores; 4 warnings legacy TASK-825 en client portal). Docs actualizadas: doc funcional y manual de perfiles de pago.
+- **CI/Playwright hotfix post-push 2026-05-14**: CI unit/coverage local quedó verde, pero Playwright smoke en GitHub fallaba antes de ejecutar specs con `Storage.setCookies: Invalid cookie fields`. Causa raíz: `scripts/playwright-auth-setup.mjs` inyectaba el JWT NextAuth del agente como una sola cookie; el token real mide >4KB y NextAuth lo espera chunked (`session-token.0`, `.1`). Fix: auth setup ahora replica chunking NextAuth (`4096 - 163`), normaliza `origin`, imprime chunk count, `shortcuts-dropdown` reusa helper chunked y `login-session` acepta cookies base o chunked. Se agregó `role='group'` + aria canónica al grupo de filtros Workforce para restaurar el smoke sin volver al ToggleButtonGroup viejo.
+- **Hotfix post-deploy 2026-05-14**: el usuario completo datos laborales/compensacion/pago para Felipe y detecto que `Honorarios` dejaba un blocker imposible `Falta engagement contractor`. Causa: `resolveWorkforceActivationReadiness()` trataba `honorarios|contractor|eor` como blocker hard de `contractor_engagement`, pero TASK-790 todavia no existe como runtime accionable. Fix: contractor engagement queda como warning V1 (`contractor_engagement_pending_foundation`) y no bloquea la activacion; los blockers reales siguen siendo pago activo/aprobado, contrato, compensacion, relacion, legal profile segun aplique.
+- **Branch**: `develop` directo por instruccion explicita del usuario; no se cambio de rama.
+- **Regla de datos reales**: no se resolvieron ni mutaron los casos reales de Felipe Zurita ni Maria Camila Hoyos desde automatizacion. El objetivo fue habilitar el flujo para que el operador humano lo pruebe y complete.
+- **Hallazgo clave**: Claude/TASK-874/TASK-875 si dejaron backend para readiness, guard final `complete-intake` y `WorkRelationshipOnboardingCase`, pero faltaba el backend de remediacion: no existia `PATCH /api/hr/workforce/members/[memberId]/intake`, y Personas seguia intentando editar fecha de ingreso por HR Core/BigQuery, lo que falla para members SCIM/PG-only con `Team member not found`.
+- **Qué cambió**: se agrego primitive transaccional `updateWorkforceMemberIntake()` sobre `greenhouse_core.members`, endpoints HR/admin `PATCH .../intake`, endpoint HR `GET .../activation-readiness`, capability `workforce.member.intake.update`, evento outbox `workforce.member.intake_updated`, drawer de remediacion en Workforce Activation y deep-link `?memberId=` desde Personas.
+- **UI/flujo**: Workforce Activation separa ahora `Resolver blockers` de `Completar ficha`. Si readiness no esta ready, el operador abre remediacion con blockers actuales, datos laborales editables, compensacion via `CompensationDrawer` existente y pago via `PaymentProfilesPanel` existente. `Completar ficha` queda como accion final solo cuando readiness lo permite.
+- **Personas**: el CTA de un member pending/in_review navega a `/hr/workforce/activation?memberId=<id>`; la edicion de fecha de ingreso para pending/in_review usa el endpoint workforce y ya no pasa por HR Core legacy.
+- **Access model**:
+  - `routeGroups`: `hr` mantiene la surface primaria.
+  - `views`: `equipo.workforce_activation` suma la capability de update.
+  - `entitlements`: nueva `workforce.member.intake.update` grantada runtime para HR route group, EFEONCE_ADMIN y FINANCE_ADMIN.
+  - `startup policy`: sin cambios.
+- **Migracion aplicada**: `20260514140325495_task-876-workforce-intake-update-capability.sql`; `src/types/db.d.ts` regenerado por `pnpm migrate:up`.
+- **Validacion ejecutada**: `pnpm pg:doctor`, `pnpm migrate:up`, focused Vitest 26/26, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm lint` (0 errores, 4 warnings legacy TASK-825), `pnpm build`, `pnpm fe:capture` y smoke Playwright local abriendo el drawer de remediacion sin guardar datos reales.
+- **Riesgos/follow-ups**: el bloque de pago reusa `PaymentProfilesPanel` admin/finance existente; si se quiere que HR-only cree perfiles sin permisos finance/admin, hay que formalizar una capability delegada de payment profile para HR. Legal Profile sigue viviendo en su faceta dueña; Workforce Activation no duplica ese editor.
+
+# Sesion 2026-05-14 — TASK-875 WorkRelationship Onboarding Case Foundation SHIPPED ✅
+
+- **Branch**: `develop` directo por instruccion del usuario; no se cambio de rama.
+- **Qué cambió**: agregado canonico `WorkRelationshipOnboardingCase` para alta laboral/contractual: tabla `greenhouse_hr.work_relationship_onboarding_cases`, eventos append-only `work_relationship_onboarding_case_events`, FK opcional `greenhouse_hr.onboarding_instances.onboarding_case_id`, runtime `src/lib/workforce/onboarding/*`, event catalog y wiring en Workforce Activation.
+- **Activation wiring**:
+  - `completeWorkforceMemberIntake()` crea/activa el onboarding case idempotentemente dentro de la misma transaccion que marca `workforce_intake_status='completed'`.
+  - `resolveWorkforceActivationReadiness()` trata ausencia de caso como warning, caso abierto como warning y caso `blocked` como blocker de `operational_onboarding`.
+  - El evento `workforce.member.intake_completed` ahora incluye `onboardingCaseId` y `onboardingCasePublicId`.
+- **Menu fix live-feedback**: el usuario reporto que no veia Workforce Activation en el menu. Causa: el item estaba escondido dentro de `Supervisión` y además filtraba por `authorizedViews` client-side, mientras la page real autoriza por capability `workforce.member.activation_readiness.read` derivada de routeGroup/rol. Fix: Workforce Activation ahora es item plano bajo `Personas y HR`, justo despues de `Personas`, con fallback HR/Admin/Finance Admin alineado al entitlement runtime para tolerar claims stale.
+- **DB/runtime drift corregido**: `migrate:up` fallo inicialmente porque la migracion usaba `greenhouse_core.touch_updated_at()`, helper inexistente en DB real. Se corrigio a `greenhouse_hr.touch_onboarding_updated_at()`, que es la primitive vigente del dominio HRIS onboarding.
+- **Migraciones aplicadas**: `pnpm migrate:up` aplico las pendientes TASK-874 access y TASK-875 foundation; `src/types/db.d.ts` regenerado.
+- **Validacion ejecutada**: `pnpm pg:doctor`, `pnpm migrate:status`, `pnpm migrate:up`, focused Vitest 17/17, `pnpm exec tsc --noEmit --pretty false`, `pnpm lint` (0 errores, 4 warnings legacy TASK-825), `pnpm design:lint`, `pnpm build`.
+- **Docs actualizadas**: task completa TASK-875, README/registry, `GREENHOUSE_WORKFORCE_ONBOARDING_ARCHITECTURE_V1.md`, doc funcional HR readiness, `project_context.md`, `changelog.md`, Handoff.
+- **Riesgo/follow-up**: si el usuario prueba `dev-greenhouse.efeoncepro.com`, necesita que este commit se despliegue. Si entra directo por `/hr/workforce/activation` pero el menu no aparece en una sesion vieja, refrescar login; el fallback nuevo evita depender solo del claim `authorizedViews`.
+
+# Sesion 2026-05-14 — TASK-874 Workforce Activation Readiness SHIPPED ✅
+
+- **Branch**: `develop` directo por instrucción explícita del usuario; no se cambió de rama.
+- **Qué cambió**: TASK-874 quedó implementada end-to-end con resolver canónico `resolveWorkforceActivationReadiness(memberId)`, capabilities `workforce.member.activation_readiness.read|override`, view `equipo.workforce_activation`, route primary `/hr/workforce/activation`, API HR/admin, guard `complete-intake` con `409 activation_readiness_blocked`, override auditado con readiness snapshot/hash, reliability signals y docs/manual HR.
+- **Access model**:
+  - `routeGroups`: `hr` para la superficie primaria.
+  - `views`: `equipo.workforce_activation`; admin `/admin/workforce/activation` queda transitional/governance.
+  - `entitlements`: `workforce.member.activation_readiness.read` para lectura; `workforce.member.activation_readiness.override` solo EFEONCE_ADMIN runtime.
+  - `startup policy`: sin cambios.
+- **UI aprobada**: se reemplazó el esqueleto tipo tabla por patrón `queue + inspector` según mockup aprobado TASK-874. Capturas:
+  - Desktop con backlog real: `.captures/2026-05-14T12-52-07_inline-hr-workforce-activation/frames/01-snapshot.png`
+  - Mobile: `.captures/2026-05-14T12-30-57_inline-hr-workforce-activation/frames/01-snapshot.png`
+- **Validación ejecutada**: `pnpm pg:doctor`, `pnpm design:lint`, `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm vitest run src/lib/workforce/intake/complete-intake.test.ts src/views/greenhouse/admin/workforce-activation/CompleteIntakeDrawer.test.tsx src/lib/workforce/activation/readiness.test.ts src/lib/workforce/intake-queue/list-pending-members.test.ts src/components/greenhouse/ReliabilityModuleCard.test.tsx src/lib/admin/internal-role-visibility.test.ts`, `pnpm build`, smoke directo del reader contra DB real y `pnpm fe:capture` desktop/mobile. `pnpm lint` queda con 0 errores y 4 warnings legacy TASK-825 en rutas cliente no tocadas.
+- **Drift corregido post-captura**: la primera captura desktop quedaba vacía aunque había 2 activos en `pending_intake` (Felipe Zurita y María Camila Hoyos). Causa raíz: `resolveWorkforceActivationReadiness` consultaba `greenhouse_payroll.compensation_versions.payroll_via`, columna inexistente en runtime; `payroll_via` vive en `greenhouse_core.members`. Se corrigió el SQL y el reader ahora devuelve ambos con readiness `blocked`.
+- **Cableado de acciones HR**: detectado y corregido antes del cierre: el surface HR leía desde `/api/hr/workforce/activation` pero el drawer completaba contra namespace admin. Se extrajo primitive canónica `completeWorkforceMemberIntake` y se expuso endpoint HR `/api/hr/workforce/members/[memberId]/complete-intake`; admin y HR comparten la misma transacción, readiness guard, override capability y outbox.
+- **Docs actualizadas**: `docs/tasks/complete/TASK-874-workforce-activation-readiness-workspace.md`, `docs/tasks/README.md`, `changelog.md`, `docs/documentation/hr/workforce-activation-readiness.md`, `docs/manual-de-uso/hr/habilitar-colaborador-workforce.md`, `docs/manual-de-uso/hr/completar-ficha-laboral.md`, `docs/documentation/identity/sistema-identidad-roles-acceso.md`.
+- **Riesgos/follow-ups**: `WorkRelationshipOnboardingCase` queda como follow-up si el agregado se formaliza; contractor runtime y classification risk siguen en TASK-790; effective dating/promotion sigue en TASK-788. La migración fue creada, no aplicada live durante el cierre; deploy/migrate debe aplicarla antes de esperar parity DB runtime para las nuevas capabilities/views.
+
+# Sesion 2026-05-14 — TASK-873 Workforce Intake UI V1.1 SHIPPED ✅
+
+- **Branch**: `develop` directo, sin PR ceremony (instrucción "mantente en develop" + pattern TASK-822..827).
+- **Commits**: Slice 1 `00730a82` → Slice 2 `4969014f` → Slice 3 `7b558258` → Slice 4 `caeeaa20` → Slice 5 `6dff8586` → Slice 6 closing (este commit).
+- **Quality gate canónico CLAUDE.md verde**: `pnpm test` 4504 passed / 42 skipped, 1 pre-existing fix (TASK-872 escape: `facet-capability-mapping.test.ts` pin 11→14 — TASK-872 olvidó actualizar al agregar 3 organization capabilities). `pnpm build` production Turbopack exit 0. `pnpm tsc --noEmit` clean. 0 lint errors.
+- **Hallazgo crítico Discovery**: capability `workforce.member.complete_intake` quedó seedeada en DB capabilities_registry por TASK-872 Slice 1.5 pero NUNCA grantada en `src/lib/entitlements/runtime.ts` → endpoint `POST /api/admin/workforce/members/[memberId]/complete-intake` retornaba 403 incluso para EFEONCE_ADMIN durante todo el periodo TASK-872 SHIPPED → TASK-873 Slice 1 fix. Bug class canonizado en CLAUDE.md "Capability runtime grant invariant" con 6 reglas duras anti-recurrencia.
+- **Pivots arquitectónicos mid-session**:
+  - Pivot 1: route + naming aligned con mockup Codex aprobado (`/admin/workforce/activation` vs spec original `/admin/workforce/intake-queue`)
+  - Pivot 2: spec TASK-874 actualizada por Codex (líneas 89-134 "Approved UI Contract") declarando admin variant como transitional/governance; primary HR-facing surface ships en TASK-874 (`/hr/workforce/activation` + viewCode `equipo.workforce_activation` + routeGroup `hr` + menú Personas y HR)
+  - Pivot 3: test pin 11→14 detectado en close gate (TASK-872 escape, NO causado por TASK-873)
+- **Decisión TASK-873 vs TASK-874**: arch-architect 4-pilar confirmó orden 873 → 874 (TASK-874 spec lo declara explicitly + tactical: optimizaciones forward-compat slots opcionales `readinessStatus?`, `blockerCount?`, `topBlockerLane?` ya declarados en `PendingIntakeMemberRow` para que 874 los populate sin breaking change).
+- **TASK-874 handoff section explícita** documentada en `docs/tasks/complete/TASK-874-workforce-activation-readiness-workspace.md` con:
+  - Tabla 10-row de artefactos disponibles para reusar in-place (runtime grant, microcopy, reader, modules catalog, API endpoint, server page, view registry seed, client view, drawer, signal CTA map, badge + button + PersonDetailMember.workforceIntakeStatus)
+  - Mockup binding canonical
+  - Matriz de 7 decisiones arquitectónicas canonizadas que TASK-874 hereda (NO revisar)
+  - 6 tests anti-regresión que TASK-874 debe respetar
+- **Surfaces shipped**:
+  - Badge "Ficha pendiente"/"Ficha en revisión" en `/people` directorio (PeopleListTable estado cell)
+  - Botón "Completar ficha" + drawer en `/people/[memberId]` (PersonView header)
+  - Admin governance queue `/admin/workforce/activation` con tabla TanStack + filters + drawer
+  - CTA link inline en `/admin` reliability dashboard cuando signal alerta
+- **Docs shipped**: manual operador `docs/manual-de-uso/hr/completar-ficha-laboral.md` + doc funcional `sistema-identidad-roles-acceso.md` sección Workforce Intake + CLAUDE.md invariant + changelog 2026-05-14 entry + Handoff (este) + TASK-874 handoff section.
+- **E2E smoke** `tests/e2e/smoke/workforce-intake-flow.spec.ts` agregado (cobertura V1: page render + heading + filter + no fatal). Verificación end-to-end completa (click row → drawer abre → submit → status transitions en DB) queda para TASK-874 closing.
+- **Sentry alert pre-existente** JAVASCRIPT-NEXTJS-5A (`role_view_fallback_used` × 14) NO causado por TASK-873 — drift TS↔DB en view_registry de commit anterior. Pattern documentado CLAUDE.md TASK-827. Pendiente: ISSUE chico de hygiene fuera del scope TASK-873 (1 viewCode huérfano por identificar).
+- **Skills invocadas**: arch-architect (4-pilar verdict pivots), greenhouse-ux (badge tokens + drawer width 480 + warning chip canonical), forms-ux (drawer single-column + label-above-input + paste tolerance), greenhouse-ux-writing (es-CL tuteo + sentence case + microcopy mirror mockup), greenhouse-backend (reader cursor keyset + migration + API), greenhouse-dev (components + tests).
+- **TASK-874 posteriormente implementada** en esta misma fecha; ver sección superior de este handoff.
+
+# Sesion 2026-05-14 (early, replaced) — TASK-873 Workforce Intake UI V1.1 in-progress
+
+- **Branch**: `develop` (sin branch separada — instrucción operativa "mantente en develop").
+- **Discovery hallazgo bloqueante**: capability `workforce.member.complete_intake` quedó seedeada en `capabilities_registry` por TASK-872 Slice 1.5 pero NUNCA se grantó en `src/lib/entitlements/runtime.ts`. Endpoint `POST /api/admin/workforce/members/[memberId]/complete-intake` retorna 403 incluso para EFEONCE_ADMIN. Slice 1 cierra ese loop.
+- **Open Questions resueltas pre-execution** (las 4 originales + 2 emergentes):
+  - Q1: capability extenderse a `hr_payroll` → SÍ vía `hasRouteGroup('hr')` canonical pattern + EFEONCE_ADMIN + FINANCE_ADMIN.
+  - Q2: banner drawer hardcoded vs configurable → HARDCODED en microcopy V1.
+  - Q3: filter por antigüedad → NO V1 (status filter suficiente).
+  - Q4: drawer historia member → NO V1 (out of scope).
+  - Q5 (emergent): add view_registry entry `admin.workforce.intake_queue` → SÍ con migration seed role_view_assignments (per CLAUDE.md TASK-827 governance pattern).
+  - Q6 (emergent, BLOQUEANTE): grant en runtime.ts → SÍ en Slice 1.
+- **Decisión arquitectónica TASK-873 vs TASK-874**: Codex creó TASK-874 (Workforce Activation Readiness Resolver + Workspace, P1/Alto/Alto, **Blocked by TASK-873**). Análisis arch-architect 4-pillar confirmó orden 873 → 874: spec de 874 lo declara explícitamente; UI thin layer de 873 valida flow operativo HR con datos reales antes de diseñar readiness blockers; queue de 873 es el surface donde el resolver de 874 vive. Optimizaciones tácticas aplicadas para reducir fricción downstream: response shape del API expone slots opcionales `readinessStatus?`, `blockerCount?`, `topBlockerLane?` desde V1.0 → 874 los populate sin breaking change ("thin adapter" que la propia spec de 874 menciona).
+- **Pivot mid-session 2026-05-14 sobre Slice 4** (driver: mockup aprobado + spec TASK-874 actualizada por Codex):
+  - **Decisión inicial Slice 4** (descartada): route `/admin/workforce/intake-queue` + viewCode `administracion.workforce_intake_queue` + view `IntakeQueueView` siguiendo literalmente la spec TASK-873 original.
+  - **Pivot 1 (mockup aprobado por user)**: Codex creó mockup `src/views/greenhouse/admin/workforce-activation/mockup/` con título "Workforce Activation". User aprobó. Pivot a `/admin/workforce/activation` + viewCode `administracion.workforce_activation` + view `WorkforceActivationView` para alinear naming con el mockup.
+  - **Pivot 2 (Codex update TASK-874 spec líneas 89-134 "Approved UI Contract — hard rule")**: el surface primario de Workforce Activation NO puede vivir como ruta/menú primario en Admin. Debe vivir bajo Personas y HR con viewCode `equipo.workforce_activation` + routeGroup `hr` + ruta `/hr/workforce/activation` (o `/workforce/activation`). `/admin/workforce/activation` puede mantenerse como "alias / transitional / admin governance" — exactly el rol que cumple mi Slice 4.
+  - **Resolución final TASK-873 Slice 4**: ship admin governance surface en `/admin/workforce/activation` con viewCode `administracion.workforce_activation` — explicitly framed en code comments y view-registry description como "admin governance / transitional; surface primario HR-facing ships in TASK-874". TASK-874 toma el handoff con:
+    - View component compartido (`WorkforceActivationView`) que puede enriquecer in-place O clonar
+    - Reader compartido (`listPendingIntakeMembers`) con slots opcionales para readiness data
+    - Shared drawer (`CompleteIntakeDrawer`) reusable
+    - Microcopy compartida (`GH_WORKFORCE_INTAKE` en `src/lib/copy/workforce.ts`)
+- **Slices entregados al 2026-05-14**:
+  - Slice 1 SHIPPED `00730a82`: runtime grant + microcopy GH_WORKFORCE_INTAKE + helper `listPendingIntakeMembers` cursor keyset + `PersonListItem.workforceIntakeStatus` field + `get-people-list.ts` SELECT extendido. 8/8 tests.
+  - Slice 2 SHIPPED `4969014f`: badge "Ficha pendiente"/"Ficha en revisión" en PeopleListTable estado cell stacked. 5/5 tests.
+  - Slice 3 SHIPPED `7b558258`: CompleteIntakeDrawer compartido + botón "Completar ficha" en PersonProfileHeader + canCompleteIntake gate client mirror runtime.ts + PersonDetailMember.workforceIntakeStatus. 25/25 tests cross-suite.
+  - Slice 4 IN-PROGRESS: page `/admin/workforce/activation` (admin governance surface per Codex spec line 99) + API endpoint paginated + view registry migration + WorkforceActivationView esqueleto + microcopy aligned con mockup aprobado. tsc clean, 16/16 tests cross-suite verdes, 0 lint errors.
+- **Sentry alert observado durante sesión**: JAVASCRIPT-NEXTJS-5A (14 warnings `role_view_fallback_used` en `GET /admin/views`, ts 2026-05-13 09:35:38). **NO causado por TASK-873** (timestamps anteriores al trabajo, mis cambios aún sin commit). Causa raíz: drift TS↔DB en view_registry — 1 viewCode huérfano agregado por commit reciente sin migration acompañante. Pattern documentado en CLAUDE.md "View Registry Governance Pattern (TASK-827)". Recomendación: crear ISSUE chico de hygiene al cierre TASK-873.
+- **Próximo paso**: Slice 5 (link CTA operations) → Slice 6 (E2E + docs + close + TASK-874 handoff section explícita).
+
+# Sesion 2026-05-13 — Diagnostico SCIM Felipe Zurita / Maria Camila Hoyos
+
+- **Trigger**: usuario reporto que Felipe Zurita y Maria Camila Hoyos se crearon en Microsoft Entra pero "no aparecian" en Greenhouse aunque SCIM esta activo.
+- **Hallazgo principal**: SCIM si creo ambos `greenhouse_core.client_users` correctamente:
+  - Felipe Zurita `fzurita@efeoncepro.com`, Entra OID `ec1b7fd0-87c9-43cd-a46f-1e8c37297258`, SCIM `CREATE 201`, `provisioned_at=2026-05-13T15:24:14Z`, role `collaborator`.
+  - Maria Camila Hoyos `mchoyos@efeoncepro.com`, Entra OID `96bf99f6-f940-4946-ac6b-1231985da8e0`, SCIM `CREATE 201`, `provisioned_at=2026-05-13T15:42:52Z`, role `collaborator`.
+- **Estado Entra/SCIM**: job `GH SCIM` activo y sano (`scheduleState=Active`, `lastState=Succeeded`, `countEscrowed=0`). Ambos usuarios estan en el grupo `Efeonce Group`, que es el unico principal asignado al Enterprise App SCIM.
+- **Drift observado**: al revisar, ambos `client_users` estaban sin `identity_profile_id` y sin `members`. Se ejecuto enrichment targeteado via `syncEntraProfiles()` para esos dos usuarios; resultado `profilesCreated=2`, `profilesLinked=2`, `errors=[]`.
+- **Estado post-operacion**: ambos quedaron con `identity_profile_id` + `identity_profiles` con `canonical_email` y `job_title`. Siguen sin `greenhouse_core.members`, lo cual es coherente con el contrato actual: SCIM crea cuenta/acceso, no ficha laboral/People member.
+- **Riesgo/follow-up**: el intento de sync de avatar emitio warning no bloqueante `AADSTS7000215 invalid_client` para `AZURE_AD_CLIENT_SECRET` efectivo en el entorno local usado por Codex. No afecto el link de identidad, pero conviene revisar el carril Graph/profile sync si el cron/webhook tambien esta usando un secret stale en runtime.
+
+# Sesion 2026-05-13 — TASK-871 + bundled accumulated develop SHIPPED A PRODUCCIÓN
+
+## 🎉 Production release SUCCESS
+
+- **Manifest**: `e02cb32e9c30-5acb894c-f164-486c-99c0-074d42aefbeb` (state=`released`)
+- **Target SHA**: `e02cb32e9c3049c2993cfc5d7767e9a9c804da90`
+- **Orchestrator run**: https://github.com/efeoncepro/greenhouse-eo/actions/runs/25825280928 (attempt 4, success)
+- **Vercel production**: `greenhouse-2po0zvu4v-efeonce-7670142f.vercel.app` READY → `greenhouse.efeoncepro.com`
+- **Cloud Run workers (4/4 en target SHA, zero drift)**:
+  - `ops-worker` us-east4 rev `ops-worker-00215-tc4`
+  - `commercial-cost-worker` us-east4 rev `commercial-cost-worker-00174-74t`
+  - `ico-batch-worker` us-east4 rev `ico-batch-worker-00081-4tb`
+  - `hubspot-greenhouse-integration` us-central1 rev `hubspot-greenhouse-integration-00063-v8f`
+- **Azure deploys**: Teams Notifications + Teams Bot health-check success (no Bicep diff → apply skipped canonical)
+- **Post-release watchdog**: run `25826234211` SUCCESS, zero drift
+- **Post-release health**: `/api/auth/health` GREEN
+
+## Release content shipped
+
+- TASK-871 finance bug class closure (rolling rematerialize anchor contract supersedes ISSUE-069 partial fix)
+- TASK-827 client portal composition layer (EPIC-015 child 6/8)
+- TASK-822-826 client portal foundation cascade
+- TASK-848-854 release control plane V1.0/V1.1
+- TASK-870 secret manager normalizer V2 hardening
+- TASK-844 cross-runtime Sentry init
+- TASK-846 Postgres connection pooling V1
+- TASK-836-837 HubSpot service lifecycle + sample sprint outbound projection
+- TASK-784-785 person legal profile + workforce role title governance
+- TASK-743 operational data table density contract
+- TASK-758 + TASK-782 payroll receipt presentation + period report disaggregation
+- TASK-863 V1.5.2 finiquito legal signatures + cláusulas state-conditional + PDF lifecycle invariant
+- ISSUE-075 Entra webhook validation handshake (now Resolved)
+- ISSUE-076 Vercel CLI duplicate project recurrent bug class (Resolved)
+- 4 main-only hotfixes synced back to develop via merge `f4794879`
+
+## 📚 LECCIONES CANONIZADAS (próximo release <30min vs 4h hoy)
+
+Documentadas en CLAUDE.md sección "Production Release Operational Playbook (TASK-871 follow-up — lessons 2026-05-13)". 5 patterns descubiertos durante 4 orchestrator attempts:
+
+1. **Vercel BUILDING timing race (5-8 min)** — push a main triggea Vercel auto-deploy. Dispatch orchestrator inmediatamente → preflight `vercel_readiness=BUILDING` bloquea. **Fix runtime**: esperar `vercel list` que reporte `Ready` antes del dispatch.
+
+2. **Production Release Watchdog self-reference loop** — watchdog scheduled NO estaba en `RELEASE_DEPLOY_WORKFLOWS` allowlist. Cualquier drift pre-existente bloqueaba TODA promoción. **Fix arquitectural (commit `4f1e09de`)**: agregado al allowlist + 2 tests anti-regresión.
+
+3. **`bypass_preflight_reason` mechanism incompleta** — CLAUDE.md spec decía "broad operator override" pero CLI sólo bypassaba `release_batch_policy`. Otras warnings persistentes (`playwright_smoke=0`, `sentry_critical_issues=1-9`) seguían bloqueando. **Fix arquitectural (commit `c594f066`)**: CLI flag `--bypass-preflight-warnings` + orchestrator pasa AMBOS flags + 5 tests.
+
+4. **Production environment gate se invoca 2 veces** — primera para workers (4 Cloud Run), segunda para Azure (2 Bicep deploys). Operador debe aprobar 2 veces. **Fix doc**: pattern canónico para auto-approval via `gh api` documentado.
+
+5. **Path B "recovery + ship" requiere code-first** — invocar recovery primitive antes de deployar el código de la nueva policy falla silente cuando ambos usan el mismo bug class. **Pattern**: code → deploy → verify revision → recovery → verify signal → release.
+
+**Checklist operacional canónico (<30 min target)** documentado en CLAUDE.md sección "Operational checklist canónico (para próximo release develop → main)" — 14 pasos canonical sequence.
+
+## Pre-release implementation history
+
+# Sesion 2026-05-13 (earlier) — TASK-871 Account Balance Rolling Anchor Contract SHIPPED on develop (Slices 2-4 + cierre docs)
 
 - **Trigger**: user pidió hacer pase a producción develop→main. Pre-checks revelaron Playwright smoke `finance.account_balances.fx_drift` rojo pre-existing (3 cuentas en 2026-05-05 con drift real). ISSUE-069 era fix parcial; TASK-871 cierra el bug class de raíz.
 - **Path B intentado (recovery + ship hoy) FALLÓ**: el remediator canonical con `evidence-guard=warn_only` reportaba `seen=0` aunque diagnose decía `seen=1`. El bug class TASK-871 estaba activo en el remediator mismo.
@@ -25003,3 +25206,166 @@ Re-smoke a buzon real:
 - KPI posterior: `sentToday=19`, `failedToday=0`, `pendingRetry=0`, `deliveryRate=100`.
 - Signal posterior: `notifications.email.render_failure_rate` severity `ok`, `total_render_failures=0`, `delivery_render_failures=0`, `reactive_render_failures=0`, `delivery_failure_rate_percent=0.00`.
 - Confirmacion visual humana: usuario reviso el inbox `jreyes@efeoncepro.com` y reporto "Se ven perfectos".
+
+---
+
+## 2026-05-13 — TASK-872 SCIM Internal Collaborator Provisioning — IN-PROGRESS
+
+**Estado**: spec movida a `in-progress/`, branch NO creado (operador instruyó trabajo directo en `develop`). Arch-architect review completo aplicado al spec en commits `11406bae` + `e360d3ae` (Rollout Plan & Risk Matrix canonizado en template + skill `greenhouse-task-planner` + sección poblada en TASK-872).
+
+**Trabajo en curso** (FASE 1 Discovery iniciada):
+
+- Movida `docs/tasks/to-do/TASK-872-*.md` → `docs/tasks/in-progress/`. Lifecycle: `in-progress`.
+- README + Handoff sincronizados.
+- FASE 1 Discovery: lectura paralela de specs canónicas + exploración src/lib/scim, src/lib/payroll, src/lib/identity. Subagentes Explore en paralelo para mapear payroll reader canónico (Open Question Discovery resuelve).
+- FASE 4 Plan → STOP checkpoint humano pendiente (P1/Alto requires explicit approval pre-Slice 1).
+
+**Decisiones canonizadas pre-Discovery** (arch-architect review):
+
+- D-1: nueva columna `members.workforce_intake_status` (default `'completed'` legacy, `'pending_intake'` SCIM new).
+- D-2: cascade lookup `identity_profile_id → azure_oid → email` + drift detection throw.
+- D-3: eligibility policy 4-layer (`L1 hard reject / L2 funcional regex / L3 name shape / L4 admin override`).
+
+**Riesgos identificados** (Risk Matrix R1-R9 en spec):
+
+- R2 HIGH: si Slice 5 backfill corre antes que Slice 4 payroll gate → Felipe Zurita entra a próxima corrida con $0 base. Slice ordering hard rule + test enforcement obligatorios.
+- R1 MEDIUM: primitive throws → 500 a Entra → countEscrowed. Mitigation via feature flag `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=false` default.
+
+**Subjects para remediación**: Felipe Zurita (`fzurita@efeoncepro.com`, OID `ec1b7fd0-...`) + Maria Camila Hoyos (`mchoyos@efeoncepro.com`, OID `96bf99f6-...`). Ambos ya con `client_user` + `identity_profile`, falta `member`.
+
+**Próximo paso**: completar FASE 1-4 + presentar plan al operador para STOP checkpoint approval antes de FASE 5 implementación.
+
+---
+
+## 2026-05-13 — TASK-872 SCIM Internal Collaborator Provisioning — Sesión 1 SHIPPED
+
+**Estado**: Slices 1-4 + 6 + 7 entregados en 6 commits incrementales directos a `develop`. Default flags en producción `false` → **zero behavioral change post-merge**. Slice 5 (backfill apply Felipe + Maria Camila Hoyos) diferido a Sesión 2 con coordinación HR + smoke staging exhaustivo + signoff humano.
+
+**6 commits canonicos**:
+
+1. `019a5ffd` — Slice 1 eligibility 4-layer policy + scim_eligibility_overrides table + audit append-only
+2. `353b06a9` — Slice 1.5 workforce_intake_status migration + capabilities registry seed (4 nuevas)
+3. `77d67277` — Slice 2 primitive atomic provisionInternalCollaboratorFromScim + cascade D-2 + outbox consolidado
+4. `0a08a64c` — Slice 3 wire SCIM CREATE endpoint behind feature flag (default false)
+5. `1989265c` — Slice 4 payroll engine gate behind flag (default false)
+6. `54c92b84` — Slice 6 6 reliability signals canonical
+7. `37c00092` (sibling) — repair 12 pre-existing payroll test failures unrelated to TASK-872
+
+**Test coverage final**: 460+ tests verde. Breakdown:
+- SCIM/eligibility unit + live: 30 unit + 11 store live + 5 primitive live + 6 payroll gate live + 3 signals live = **55 tests**
+- Payroll legacy: 420/420 (incluye 12 fixes previously failing)
+- TypeScript + lint: 0 errors
+
+**Arch-architect verifications applied (3 sesiones)**:
+- Slice 1: 5 fixes pre-coding (table shape mirror TASK-404 user_entitlement_overrides, companion audit append-only via trigger PG, discriminated union verdict shape, deny-wins precedence, hardcoded patterns const)
+- Slice 2: 6 fixes pre-coding (idempotency gate first-step, cascade outcome explicit tracking, drift kind discriminator, consolidated event v1 shape, helpers refactor dual-mode, scim_sync_log fuera de tx)
+- Slice 4: 3 verifications (BQ team_members NO tiene column → gate solo PG V1.0 + inline comment V1.1, flag leído runtime no module cache, SQL string concat preserves INDEX usage)
+
+**Trampa latente neutralizada**: defaults `members.contract_type='indefinido' + pay_regime='chile'` ahora gateados explícitamente por `workforce_intake_status='completed'` cuando flag enabled. Slice 4 garantiza que Felipe Zurita no entra a la próxima corrida payroll con $0 base.
+
+**Helpers refactored (dual-mode pattern, backward compat 100%)**:
+- `syncOperatingEntityMembershipForMember(memberId, options?: { client?: PoolClient })`
+- `createMembership(input, options?: { client?: PoolClient })`
+- `deactivateMembership(membershipId, options?: { client?: PoolClient })`
+
+Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. Nuevo primitive pasa `{ client }` para atomicidad transaccional.
+
+**Runbook canonical**: `docs/operations/runbooks/scim-internal-collaborator-recovery.md` con 6 escenarios canónicos (dead_letter SCIM, backfill Felipe/Maria, member identity drift, pending intake >30d, ineligible accounts in scope, allowlist-blocklist conflict).
+
+**Pre-condiciones para Sesión 2 (backfill apply)**:
+1. ✅ Slices 1-7 mergeadas + deployed a staging (vía push a develop)
+2. ⏳ Staging: flag `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true` flippeado + `provisionOnDemand` test user humano → verify primitive ejecuta + 6 entities + outbox events
+3. ⏳ Staging: flag `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true` flippeado + corrida payroll mock excluye `pending_intake`
+4. ⏳ Cooldown 24h observando 6 reliability signals → todos en steady state esperado
+5. ⏳ HR signoff sobre workflow `pending_intake → completed`
+6. ⏳ Comunicación humana a Felipe + Maria Camila sobre badge "Ficha pendiente"
+7. ⏳ Operador humano ejecuta backfill apply con allowlist explícita (TBD V1.1 backfill script o V1.0 manual via primitive)
+
+**Risk matrix R1-R9 (de spec TASK-872) — status post-Sesión 1**:
+- R1 SCIM primitive throws → 500 a Entra: mitigado via flag default false. Smoke staging requerido antes de flip.
+- R2 HIGH (Felipe entra a payroll $0): **neutralizado** por Slice 1.5 + Slice 4 + flag ordering hard rule.
+- R3 SSO break: cero riesgo — auth callback no tocado, only additive PG columns.
+- R4 Cascade D-2 drift: signal `member_identity_drift` alerta + runbook escenario 3 cubre recovery.
+- R5 Backfill apply masivo accidental: mitigado — Slice 5 diferido a Sesión 2, requiere apply manual con allowlist.
+- R6 Migration breaks consumers: cero — `pnpm db:generate-types` + tsc verdes.
+- R7 Outbox event collision: cero — `scim.internal_collaborator.provisioned` único en catálogo.
+- R8 Cross-tenant leak: mitigado — branch `if isInternalTenant && flag enabled` enforce.
+- R9 Allowlist abuse: signal `allowlist_blocklist_conflict` + audit append-only en `scim_eligibility_override_changes`.
+
+**Próximo paso operativo (Sesión 2)**: cuando operador esté listo, flippear flag SCIM en staging + correr smoke con `provisionOnDemand` test user + verify signals en steady state. Después coordinar con HR + ejecutar backfill apply Felipe/Maria.
+
+---
+
+## 2026-05-14 — Person 360 avatars Postgres-first fix shipped
+
+**Contexto:** En `/people`, Felipe Zurita y Maria Camila Hoyos aparecian con iniciales aunque Microsoft Graph tiene foto para ambos. Investigacion:
+
+- Graph confirma foto `image/jpeg 420x420` para Felipe (`ec1b7fd0-87c9-43cd-a46f-1e8c37297258`) y Maria Camila (`96bf99f6-f940-4946-ac6b-1231985da8e0`).
+- Staging `/api/people` ya devuelve avatar URL para Felipe, pero `/api/media/users/054d589d-44aa-45ac-93a9-16515bcdaf7e/avatar` daba 404 porque el proxy leia BigQuery `greenhouse.client_users` como source primario y ese mirror no tiene el `user_id` nuevo.
+- Maria Camila no tenia `client_users.avatar_url` en Postgres antes del sync; Graph si tenia foto. Se resolvio con corrida canonica de Entra profile sync en staging, no SQL/manual patch.
+
+**Cambio aplicado:** `src/lib/admin/media-assets.ts` ahora resuelve avatars Postgres/Person360-first y usa BigQuery solo como fallback legacy. `src/lib/people/get-people-list.ts` usa `resolveAvatarUrl()` con `person_360.user_id`.
+
+**Validacion local:** `pnpm vitest run src/lib/admin/media-assets.test.ts src/lib/people/get-people-list.test.ts` verde (19 tests), `pnpm tsc --noEmit`, `pnpm lint` (0 errores, 4 warnings legacy TASK-825), pre-push hook verde.
+
+**Validacion staging:** deploy staging `b34a2865` Ready. `/api/media/users/054d589d-44aa-45ac-93a9-16515bcdaf7e/avatar` devuelve `HTTP 200 image/jpeg` para Felipe. Luego de correr `/api/cron/entra-profile-sync` via `vercel curl` (21 processed, 8 avatarsSynced, 0 errors), `/api/people` devuelve avatar proxy para Maria Camila y `/api/media/users/dd8a6be9-c7ca-48db-9ec7-1a0f50b56883/avatar` devuelve `HTTP 200 image/jpeg`.
+
+**CI:** Playwright smoke de GitHub verde para `b34a2865`; CI seguia en progreso al momento de este handoff, en etapa Test/Coverage.
+
+---
+
+## 2026-05-13 — TASK-872 Sesión 2 SHIPPED — Backfill apply Felipe + Maria SUCCESSFUL
+
+**Estado FINAL**: TASK-872 movida a `docs/tasks/complete/`. Felipe Zurita + Maria Camila Hoyos materializados como colaboradores operativos en staging PG (`greenhouse-pg-dev`). Sesión 2 entrega Slice 5 backfill engine + CLI + admin endpoint complete_intake.
+
+**Commits Sesión 2** (sumar a 10 commits Sesión 1):
+
+11. `<TBD>` — Slice 5 backfill engine + CLI script (`src/lib/scim/backfill-internal-collaborators.ts` + `scripts/scim/backfill-internal-collaborators.ts`) + admin endpoint complete_intake + event catalog `workforce.member.intake_completed v1` + task close
+
+**Backfill apply real ejecutado** (operador: `user-efeonce-admin-julio-reyes`):
+
+- Felipe Zurita (`fzurita@efeoncepro.com`): member `e603fade-b262-43d3-896f-09f04dd6ddd7` creado, cascade `created_new`
+- Maria Camila Hoyos (`mchoyos@efeoncepro.com`): member `d1a72374-f4b7-415f-b54a-0dcf76749e46` creado, cascade `created_new`
+
+**Post-apply verification** (queries PG real):
+
+- `members` con `azure_oid` matching `client_users.microsoft_oid` ✅
+- `members.workforce_intake_status='pending_intake'` ✅
+- `members.active=true` ✅
+- `client_users.member_id` linkeado ✅
+- `identity_profile_source_links × 2` per profile (azure_ad/user + greenhouse_auth/client_user) ✅
+- `person_memberships(team_member, is_primary=true, active=true)` con `organization_id` = Efeonce Group SpA operating entity ✅
+- 6 outbox events emitidos (2 × scim.user.created + 2 × member.created + 2 × scim.internal_collaborator.provisioned) ✅
+- 2 `scim_sync_log` rows con `operation='BACKFILL', response_status=200, error_message=NULL` ✅
+
+**Idempotency verified**: re-run dry-run reporta Felipe + Maria como `alreadyComplete` (member_id ya poblado). Re-apply sería no-op.
+
+**Reliability signals post-apply** (steady state esperado):
+
+- `identity.scim.users_without_member`: 2 → 1 (1 residual = `support@efeoncepro.com` cuenta funcional legacy. Operador resuelve via runbook escenario 5: reduce scope Entra OR allowlist L4 override.)
+- `identity.scim.users_without_identity_profile`: 0 ✅
+- `workforce.scim_members_pending_profile_completion` (>7d): 0 ✅ (Felipe + Maria recién creados)
+- `identity.scim.member_identity_drift`: 0 ✅
+- `identity.scim.allowlist_blocklist_conflict`: 0 ✅
+- `identity.scim.ineligible_accounts_in_scope`: 0 ✅
+
+**Admin endpoint complete_intake** (Slice 5 follow-up V1.0):
+
+- `POST /api/admin/workforce/members/[memberId]/complete-intake`
+- Auth: `requireAdminTenantContext` + `can(subject, 'workforce.member.complete_intake', 'update', 'tenant')`
+- Body: `{ reason?: string }`
+- Atomic withTransaction: UPDATE `workforce_intake_status='completed'` + outbox event `workforce.member.intake_completed v1` (aggregateType=member, payload schemaVersion=1 con `previousStatus, newStatus, actorUserId, reason, transitionedAt`)
+- Idempotent: si ya `completed`, devuelve 200 sin retransición
+- Validation: source state debe ser `pending_intake` o `in_review`; 409 si distinto
+- V1.0 minimal: NO valida readiness compensation_packages/contract_terms/person_legal_profile (deferred V1.1 cuando emerja UI dedicada Workforce Intake)
+
+**Próximo workflow operativo** (out of TASK-872 scope, V1.1):
+
+1. HR completa datos faltantes Felipe + Maria (compensation_packages + contract_terms + person_legal_profile)
+2. Operador invoca `POST /api/admin/workforce/members/<member_id>/complete-intake` → transición a `completed`
+3. Felipe + Maria entran a payroll engine normalmente
+4. Para support@efeoncepro.com: operador decide reducir scope Entra (preferred) o crear admin allowlist override via `scim_eligibility_overrides`
+
+**Test coverage final TASK-872**: 500+ tests verde. SCIM/eligibility/primitive: 49 tests. Reliability signals: 3 live tests. Payroll legacy: 420 tests (incluye 12 fixes pre-existentes). Lint + tsc verdes.
+
+**Push pendiente**: 11 commits en `develop` local. Operador autoriza push cuando esté listo. Deploy staging via Vercel auto-trigger en push a develop.

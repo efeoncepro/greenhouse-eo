@@ -273,7 +273,22 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
     }
   }
 
-  const showApprove = profile?.status === 'pending_approval'
+  const showApprove = Boolean(
+    profile && (profile.status === 'pending_approval' || profile.status === 'draft')
+  )
+
+  const approvalActionLabel =
+    profile?.status === 'draft' && !profile.requireApproval ? 'Activar perfil' : 'Aprobar perfil'
+
+  const approvalHelp = !profile
+    ? null
+    : profile.status === 'draft'
+      ? profile.requireApproval
+        ? 'Este perfil esta en borrador y requiere maker-checker: debe aprobarlo un checker distinto al creador para quedar activo.'
+        : 'Este perfil esta en borrador. Activalo para que pueda resolver pagos internos.'
+      : profile.status === 'pending_approval'
+        ? 'Este perfil espera aprobacion maker-checker. El creador no puede aprobar su propio perfil.'
+        : null
 
   const showCancel =
     profile?.status === 'draft' ||
@@ -490,6 +505,12 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
             </Stack>
           ) : null}
 
+          {approvalHelp ? (
+            <Alert severity='warning' icon={<i className='tabler-shield-check' />}>
+              {approvalHelp}
+            </Alert>
+          ) : null}
+
           {/* Lifecycle actions */}
           {(showApprove || showCancel) && (
             <>
@@ -505,7 +526,7 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
                       onClick={handleApprove}
                       disabled={actionInFlight}
                     >
-                      Aprobar
+                      {approvalActionLabel}
                     </Button>
                   ) : null}
                   {showCancel ? (

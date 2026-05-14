@@ -1,8 +1,9 @@
 import 'server-only'
 
-import { NextResponse } from 'next/server'
+import type { NextResponse } from 'next/server'
 
 import { ROLE_CODES } from '@/config/role-codes'
+import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getSupervisorScopeForTenant } from '@/lib/reporting-hierarchy/access'
 import type { SupervisorScopeRecord } from '@/lib/reporting-hierarchy/types'
 import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-context'
@@ -245,13 +246,13 @@ export const requireMyTenantContext = async (): Promise<{
   }
 
   if (tenant.tenantType !== 'efeonce_internal') {
-    return { tenant: null, memberId: null, errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
+    return { tenant: null, memberId: null, errorResponse: canonicalErrorResponse('forbidden') }
   }
 
   const memberId = tenant.memberId || null
 
   if (!memberId) {
-    return { tenant: null, memberId: null, errorResponse: NextResponse.json({ error: 'Member identity not linked' }, { status: 422 }) }
+    return { tenant: null, memberId: null, errorResponse: canonicalErrorResponse('member_identity_not_linked') }
   }
 
   return { tenant, memberId, errorResponse: null }
@@ -263,7 +264,7 @@ export const requireTenantContext = async () => {
   if (!tenant) {
     return {
       tenant: null,
-      unauthorizedResponse: NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      unauthorizedResponse: canonicalErrorResponse('unauthorized')
     }
   }
 
@@ -286,7 +287,7 @@ export const requireClientTenantContext = async () => {
   if (!isClientTenant(tenant) || !hasRouteGroup(tenant, 'client')) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('client_tenant_required')
     }
   }
 
@@ -309,7 +310,7 @@ export const requireInternalTenantContext = async () => {
   if (!hasRouteGroup(tenant, 'internal')) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -332,7 +333,7 @@ export const requireAgencyTenantContext = async () => {
   if (!hasRouteGroup(tenant, 'internal') && !hasRouteGroup(tenant, 'admin')) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -355,7 +356,7 @@ export const requireHrTenantContext = async () => {
   if (!hasRouteGroup(tenant, 'hr') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -384,7 +385,7 @@ export const requireTalentReviewTenantContext = async () => {
   if (!hasAccess) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -407,7 +408,7 @@ export const requireEmployeeTenantContext = async () => {
   if (!hasRouteGroup(tenant, 'my') && !hasRouteGroup(tenant, 'hr') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -433,7 +434,7 @@ export const requirePeopleTenantContext = async () => {
     return {
       tenant: null,
       accessContext: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -457,7 +458,7 @@ export const requireFinanceTenantContext = async () => {
   if (!hasRouteGroup(tenant, 'finance') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -480,7 +481,7 @@ export const requireCommercialTenantContext = async () => {
   if (!canAccessCommercialModule(tenant)) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -509,7 +510,7 @@ export const requireBankTreasuryTenantContext = async () => {
   if (!hasAccess) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -538,7 +539,7 @@ export const requireShareholderAccountTenantContext = async () => {
   if (!hasAccess) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -561,7 +562,7 @@ export const requireCostIntelligenceTenantContext = async () => {
   if (!canReadCostIntelligence(tenant)) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -584,7 +585,7 @@ export const requireAdminTenantContext = async () => {
   if (!hasRouteGroup(tenant, 'admin') || !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 
@@ -607,7 +608,7 @@ export const requireAiToolingTenantContext = async () => {
   if (!hasRouteGroup(tenant, 'ai_tooling') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
-      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      errorResponse: canonicalErrorResponse('forbidden')
     }
   }
 

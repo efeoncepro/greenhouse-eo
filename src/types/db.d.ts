@@ -2437,6 +2437,10 @@ export interface GreenhouseCoreMembers {
    */
   twitter_url: string | null;
   updated_at: Generated<Timestamp>;
+  /**
+   * TASK-872 — Gate explícito de ficha laboral. Default completed para legacy backward compat (todos los members existentes pre-migration retienen behaviour idéntico a hoy). SCIM-provisioned members nacen pending_intake. Transición a completed via admin endpoint POST /api/admin/workforce/members/[memberId]/complete-intake con capability workforce.member.complete_intake. Payroll/capacity/compensation/assignments readers filtran = completed antes de operar sobre el member.
+   */
+  workforce_intake_status: Generated<string>;
   years_experience: Numeric | null;
 }
 
@@ -2850,6 +2854,40 @@ export interface GreenhouseCoreRoleViewAssignments {
   updated_at: Generated<Timestamp>;
   updated_by: string | null;
   view_code: string;
+}
+
+export interface GreenhouseCoreScimEligibilityOverrideChanges {
+  actor_user_id: string;
+  change_id: string;
+  change_kind: string;
+  metadata_json: Generated<Json>;
+  occurred_at: Generated<Timestamp>;
+  override_id: string;
+  reason: string | null;
+}
+
+export interface GreenhouseCoreScimEligibilityOverrides {
+  created_at: Generated<Timestamp>;
+  /**
+   * allow = bypass L1/L2/L3 (force eligible). deny = block L1-default (force ineligible). Deny gana sobre allow en conflicto simultáneo (hard rule canónica).
+   */
+  effect: string;
+  effective_to: Timestamp | null;
+  expires_at: Timestamp | null;
+  /**
+   * Actor user_id o identifier sistema (e.g. system-bootstrap). NO FK rígido — permite system actors como overrides automáticos.
+   */
+  granted_by: string;
+  match_type: string;
+  /**
+   * Valor canonicalizado: email lowercase; upn lowercase; azure_oid UUID lowercase. La función evaluadora normaliza input antes de comparar.
+   */
+  match_value: string;
+  override_id: string;
+  reason: string;
+  scim_tenant_mapping_id: string;
+  superseded_by: string | null;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseCoreScimGroupMemberships {
@@ -5843,6 +5881,10 @@ export interface GreenhouseHrOnboardingInstances {
    * Optional link to the canonical WorkRelationshipOffboardingCase. Checklist does not define the workforce exit event.
    */
   offboarding_case_id: string | null;
+  /**
+   * Optional parent WorkRelationshipOnboardingCase. Added by TASK-875 without changing checklist lifecycle.
+   */
+  onboarding_case_id: string | null;
   source: Generated<string>;
   source_ref: Generated<Json>;
   start_date: Timestamp;
@@ -5973,6 +6015,69 @@ export interface GreenhouseHrWorkRelationshipOffboardingCases {
   source: string;
   source_ref: Generated<Json>;
   space_id: string | null;
+  status: Generated<string>;
+  submitted_at: Timestamp | null;
+  updated_at: Generated<Timestamp>;
+  updated_by_user_id: string | null;
+  user_id: string | null;
+}
+
+export interface GreenhouseHrWorkRelationshipOnboardingCaseEvents {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  from_status: string | null;
+  onboarding_case_id: string;
+  payload_json: Generated<Json>;
+  reason: string | null;
+  source: Generated<string>;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrWorkRelationshipOnboardingCases {
+  activated_at: Timestamp | null;
+  approved_at: Timestamp | null;
+  blocked_reason: string | null;
+  cancelled_at: Timestamp | null;
+  contract_type_snapshot: Generated<string>;
+  country_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  deel_contract_id_snapshot: string | null;
+  employment_type: string | null;
+  first_working_day: Timestamp | null;
+  greenhouse_execution_mode: Generated<string>;
+  legacy_checklist_ref: Generated<Json>;
+  legal_entity_organization_id: string | null;
+  manager_member_id: string | null;
+  member_id: string | null;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  onboarding_case_id: string;
+  organization_id: string | null;
+  pay_regime_snapshot: Generated<string>;
+  payroll_via_snapshot: Generated<string>;
+  person_legal_entity_relationship_id: string | null;
+  profile_id: string;
+  public_id: string;
+  reason_code: string | null;
+  relationship_type: Generated<string>;
+  requires_application_access: Generated<boolean>;
+  requires_assignment_bootstrap: Generated<boolean>;
+  requires_equipment_or_access_setup: Generated<boolean>;
+  requires_hr_documents: Generated<boolean>;
+  requires_identity_provisioning: Generated<boolean>;
+  requires_leave_policy_bootstrap: Generated<boolean>;
+  requires_manager_assignment: Generated<boolean>;
+  requires_payroll_readiness: Generated<boolean>;
+  rule_lane: Generated<string>;
+  scheduled_at: Timestamp | null;
+  source: Generated<string>;
+  source_ref: Generated<Json>;
+  space_id: string | null;
+  start_date: Timestamp | null;
+  start_type: Generated<string>;
   status: Generated<string>;
   submitted_at: Timestamp | null;
   updated_at: Generated<Timestamp>;
@@ -9042,6 +9147,8 @@ export interface DB {
   "greenhouse_core.role_entitlement_defaults": GreenhouseCoreRoleEntitlementDefaults;
   "greenhouse_core.role_view_assignments": GreenhouseCoreRoleViewAssignments;
   "greenhouse_core.roles": GreenhouseCoreRoles;
+  "greenhouse_core.scim_eligibility_override_changes": GreenhouseCoreScimEligibilityOverrideChanges;
+  "greenhouse_core.scim_eligibility_overrides": GreenhouseCoreScimEligibilityOverrides;
   "greenhouse_core.scim_group_memberships": GreenhouseCoreScimGroupMemberships;
   "greenhouse_core.scim_groups": GreenhouseCoreScimGroups;
   "greenhouse_core.scim_sync_log": GreenhouseCoreScimSyncLog;
@@ -9174,6 +9281,8 @@ export interface DB {
   "greenhouse_hr.onboarding_templates": GreenhouseHrOnboardingTemplates;
   "greenhouse_hr.work_relationship_offboarding_case_events": GreenhouseHrWorkRelationshipOffboardingCaseEvents;
   "greenhouse_hr.work_relationship_offboarding_cases": GreenhouseHrWorkRelationshipOffboardingCases;
+  "greenhouse_hr.work_relationship_onboarding_case_events": GreenhouseHrWorkRelationshipOnboardingCaseEvents;
+  "greenhouse_hr.work_relationship_onboarding_cases": GreenhouseHrWorkRelationshipOnboardingCases;
   "greenhouse_hr.workflow_approval_snapshots": GreenhouseHrWorkflowApprovalSnapshots;
   "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
   "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;

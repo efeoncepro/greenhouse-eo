@@ -267,7 +267,6 @@ export const emails: EmailsCopy = {
         `Hola ${firstName}, tu solicitud de cambio de cuenta de pago fue cancelada. Si no fuiste tú, contacta a finance.`
     },
     missingDate: 'Sin fecha registrada',
-    providerLabel: 'Proveedor',
     bankLabel: 'Banco',
     accountLabel: 'Cuenta',
     currencyLabel: 'Moneda',

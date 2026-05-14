@@ -71,6 +71,15 @@ type MemberRow = {
   efeonce_start_date: { value?: string } | string | null
   biography: string | null
   languages: string[] | null
+  workforce_intake_status: string | null
+}
+
+const normalizeWorkforceIntakeStatus = (
+  value: string | null
+): 'pending_intake' | 'in_review' | 'completed' | null => {
+  if (value === 'pending_intake' || value === 'in_review' || value === 'completed') return value
+
+  return null
 }
 
 type AssignmentRow = {
@@ -292,7 +301,8 @@ const buildPersonMember = (row: MemberRow): {
       identityProfileId: row.identity_profile_id || null,
       notionUserId: row.notion_user_id || null,
       azureOid: row.azure_oid || null,
-      hubspotOwnerId: row.hubspot_owner_id || null
+      hubspotOwnerId: row.hubspot_owner_id || null,
+      workforceIntakeStatus: normalizeWorkforceIntakeStatus(row.workforce_intake_status)
     },
     emailAliases
   }
@@ -355,6 +365,7 @@ const getMemberByIdFromPostgres = async (memberId: string): Promise<MemberRow | 
     efeonce_start_date: string | null
     biography: string | null
     languages: string[] | null
+    workforce_intake_status: string | null
   }>(`
     SELECT
       m.member_id,
@@ -389,7 +400,8 @@ const getMemberByIdFromPostgres = async (memberId: string): Promise<MemberRow | 
       m.years_experience,
       m.efeonce_start_date::text,
       m.biography,
-      COALESCE(m.languages, ARRAY[]::text[]) AS languages
+      COALESCE(m.languages, ARRAY[]::text[]) AS languages,
+      m.workforce_intake_status
     FROM greenhouse_core.members m
     WHERE m.member_id = $1
     LIMIT 1
@@ -434,7 +446,8 @@ const getMemberByIdFromPostgres = async (memberId: string): Promise<MemberRow | 
     years_experience: row.years_experience,
     efeonce_start_date: row.efeonce_start_date,
     biography: row.biography,
-    languages: row.languages
+    languages: row.languages,
+    workforce_intake_status: row.workforce_intake_status
   }
 }
 
@@ -528,7 +541,9 @@ const getMemberByIdFromBigQuery = async (memberId: string) => {
         ${memberColumns.has('years_experience') ? 'm.years_experience,' : 'CAST(NULL AS FLOAT64) AS years_experience,'}
         ${memberColumns.has('efeonce_start_date') ? 'm.efeonce_start_date,' : 'CAST(NULL AS DATE) AS efeonce_start_date,'}
         ${memberColumns.has('biography') ? 'm.biography,' : 'CAST(NULL AS STRING) AS biography,'}
-        ${memberColumns.has('languages') ? 'COALESCE(m.languages, ARRAY<STRING>[]) AS languages' : 'ARRAY<STRING>[] AS languages'}
+        ${memberColumns.has('languages') ? 'COALESCE(m.languages, ARRAY<STRING>[]) AS languages,' : 'ARRAY<STRING>[] AS languages,'}
+        -- TASK-873: BQ legacy team_members no expone workforce_intake_status; null = trato como 'completed'.
+        CAST(NULL AS STRING) AS workforce_intake_status
       FROM \`${projectId}.greenhouse.team_members\` AS m
       ${canJoinRoleCatalog ? `LEFT JOIN \`${projectId}.greenhouse.team_role_catalog\` AS rc ON rc.role_id = m.org_role_id AND rc.active = TRUE` : ''}
       ${canJoinProfessionCatalog ? `LEFT JOIN \`${projectId}.greenhouse.team_profession_catalog\` AS pc ON pc.profession_id = m.profession_id AND pc.active = TRUE` : ''}

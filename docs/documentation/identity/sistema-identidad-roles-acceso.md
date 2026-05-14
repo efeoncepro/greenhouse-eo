@@ -114,7 +114,7 @@ Cada vista individual del portal (53 en total) esta registrada en un catalogo. S
 
 **Mi Perfil** muestra la informacion completa del colaborador: nombre, email, avatar (sincronizado desde Microsoft Entra), cargo, departamento, nivel, tipo de empleo, fecha de ingreso, telefono, y los sistemas vinculados (Entra, Notion, HubSpot, etc.). Esta informacion se sincroniza automaticamente desde Microsoft Entra ID mediante un cron diario que actualiza fotos, cargos y datos profesionales. Si un usuario recien creado aun no tiene todos los datos sincronizados, se muestra la informacion disponible de la sesion sin mostrar un error.
 
-> **Detalle tecnico:** Los datos de perfil fluyen desde Microsoft Graph → `client_users` + `identity_profiles` → VIEW `person_360` → `toPersonProfileSummary()`. El avatar se almacena en GCS y se sirve via `/api/media/users/{id}/avatar`. El cron de Entra sync corre diariamente a las 8:00 UTC (`src/app/api/cron/entra-profile-sync/route.ts`). Spec: [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md).
+> **Detalle tecnico:** Los datos de perfil fluyen desde Microsoft Graph → `client_users` + `identity_profiles` → VIEW `person_360` → `toPersonProfileSummary()`. El avatar se almacena en GCS como `client_users.avatar_url` (`gs://...`), `person_360.resolved_avatar_url` lo proyecta y las surfaces UI deben pasar por `resolveAvatarUrl()` para servirlo via `/api/media/users/{id}/avatar`. Ese proxy resuelve Postgres/Person 360 primero y usa BigQuery solo como mirror legacy. El cron de Entra sync corre diariamente a las 8:00 UTC (`src/app/api/cron/entra-profile-sync/route.ts`). Spec: [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md).
 
 > **Detalle tecnico:** El catalogo de vistas esta en [`src/lib/admin/view-access-catalog.ts`](../../src/lib/admin/view-access-catalog.ts). La matriz completa rol-route groups esta en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md §1.5](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md). El fallback de perfil usa `toPersonProfileSummaryFromSession()` en [`src/lib/person-360/get-person-profile.ts`](../../src/lib/person-360/get-person-profile.ts).
 
@@ -466,6 +466,45 @@ Cuando entras al detalle de una organización (cliente B2B) desde Agency, Financ
 **Cambios de permisos en tiempo real**: si te asignan/quitan un rol o un grant, el portal refresca tu workspace automáticamente en pocos segundos (cache TTL 30s + invalidación reactiva).
 
 > **Detalle tecnico:** El helper canonico es `resolveOrganizationWorkspaceProjection` en `src/lib/organization-workspace/projection.ts`. Spec completa: [`GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`](../../architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md). El registro DB de capabilities vive en `greenhouse_core.capabilities_registry`.
+
+---
+
+## Workforce Intake — habilitar laboralmente a un colaborador
+
+Cuando un colaborador se crea via Microsoft Entra (SCIM provisioning, TASK-872), su ficha en Greenhouse nace en estado **`pending_intake`**. Esto significa: tiene cuenta para entrar al portal, pero **NO esta habilitado todavia para entrar al flujo operativo de payroll, capacity, assignments y compensation**. Para activarlo HR debe **completar la ficha laboral** (TASK-873).
+
+### Como aparece visualmente
+
+- **En el directorio People** (`/people`): chip naranja **"Ficha pendiente"** debajo del chip Activo / Inactivo. Si HR ya empezo a revisar la ficha, dice **"Ficha en revision"** (azul).
+- **En el detalle del colaborador** (`/people/[memberId]`): boton naranja **"Completar ficha"** en el header (solo visible para roles con capacidad).
+- **En la cola admin governance** (`/admin/workforce/activation`): lista filtrable de colaboradores con ficha pendiente o en revision, con drawer de accion.
+- **En el dashboard de Admin** (`/admin`): reliability signal **"Members SCIM con ficha laboral pendiente"** + boton CTA cuando alerta (>7 dias warning, >30 dias critico).
+
+### Quien puede completar la ficha
+
+La capacidad canonica es `workforce.member.complete_intake`. La tienen:
+
+- **EFEONCE_ADMIN** (acceso total)
+- **FINANCE_ADMIN** (operador finance que cierra contratos / compensacion)
+- **Cualquier rol con route_group `hr`** (HR_PAYROLL, HR_MANAGER) — declarado en `src/lib/entitlements/runtime.ts`
+
+### Que hace la accion
+
+Cuando un operador autorizado presiona "Completar ficha":
+
+1. El estado `workforce_intake_status` del member transita `pending_intake | in_review → completed` atomicamente.
+2. Se emite outbox event `workforce.member.intake_completed v1` con el user id del operador + nota opcional + timestamp.
+3. El reliability signal baja su contador.
+4. El badge "Ficha pendiente" desaparece del directorio + perfil.
+5. El member queda elegible para payroll (cuando `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` se active en produccion via TASK-872 follow-up, solo members `completed` entran a corridas de nomina).
+
+### Workforce Activation Readiness
+
+Desde **TASK-874**, la validacion automatica de readiness vive en `/hr/workforce/activation` y en el guard server-side de `complete-intake`. El operador ya no valida manualmente a ciegas: el resolver clasifica lanes de identidad, relacion laboral, datos laborales, cargo, compensacion, perfil legal, pago y onboarding antes de permitir `completed`.
+
+La cola `/admin/workforce/activation` queda como surface admin governance / transitional. El entrypoint operativo para HR/Ops es `/hr/workforce/activation` con view code `equipo.workforce_activation`.
+
+> **Detalle tecnico:** Spec backend canonica: [`TASK-872`](../../tasks/complete/TASK-872-scim-internal-collaborator-provisioning.md). Spec UI canonica: TASK-873 (en cierre 2026-05-14). Endpoint canonical: `POST /api/admin/workforce/members/[memberId]/complete-intake`. Manual operador: [`completar-ficha-laboral.md`](../../manual-de-uso/hr/completar-ficha-laboral.md).
 
 ---
 

@@ -17,6 +17,8 @@ import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
  *  - cancelled → "Tu solicitud de cambio fue cancelada"
  *
  * SIEMPRE datos enmascarados. NUNCA `account_number_full`.
+ * El beneficiario ve solo su cuenta destino. No exponer cuenta pagadora,
+ * provider, processor ni origen de fondos empresarial en este email.
  */
 
 export type PaymentProfileEmailKind = 'created' | 'approved' | 'superseded' | 'cancelled'
@@ -24,7 +26,6 @@ export type PaymentProfileEmailKind = 'created' | 'approved' | 'superseded' | 'c
 export interface BeneficiaryPaymentProfileChangedEmailProps {
   fullName: string
   kind: PaymentProfileEmailKind
-  providerLabel: string | null
   bankName: string | null
   accountNumberMasked: string | null
   currency: 'CLP' | 'USD'
@@ -89,7 +90,6 @@ const summaryRow = (label: string, value: string, emphasis = false) => (
 export default function BeneficiaryPaymentProfileChangedEmail({
   fullName = 'María González Rojas',
   kind = 'approved',
-  providerLabel = 'Banco de Chile',
   bankName = null,
   accountNumberMasked = '•••• 4321',
   currency = 'CLP',
@@ -139,7 +139,6 @@ export default function BeneficiaryPaymentProfileChangedEmail({
           margin: '0 0 24px'
         }}
       >
-        {providerLabel ? summaryRow(t.providerLabel, providerLabel) : null}
         {bankName ? summaryRow(t.bankLabel, bankName) : null}
         {summaryRow(t.accountLabel, accountNumberMasked ?? t.maskedFallback, true)}
         {summaryRow(t.currencyLabel, currency)}

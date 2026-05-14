@@ -28,7 +28,8 @@ import CustomTextField from '@core/components/mui/TextField'
 import type {
   BeneficiaryPaymentProfileBeneficiaryType,
   BeneficiaryPaymentProfileCurrency,
-  BeneficiaryPaymentProfilePaymentMethod
+  BeneficiaryPaymentProfilePaymentMethod,
+  BeneficiaryPaymentProfileSafe
 } from '@/types/payment-profiles'
 
 const GREENHOUSE_COPY = getMicrocopy()
@@ -36,7 +37,7 @@ const GREENHOUSE_COPY = getMicrocopy()
 interface CreateProfileDialogProps {
   open: boolean
   onClose: () => void
-  onCreated: () => void | Promise<void>
+  onCreated: (profile?: BeneficiaryPaymentProfileSafe) => void | Promise<void>
   /**
    * Cuando se monta dentro de Person 360 / Shareholder 360, el beneficiario
    * ya esta determinado por el contexto. Lockeamos esos campos en lugar de
@@ -168,7 +169,7 @@ const CreateProfileDialog = ({
         return
       }
 
-      await onCreated()
+      await onCreated(json.profile as BeneficiaryPaymentProfileSafe | undefined)
     } catch (e) {
       console.error(e)
       toast.error('Error de red al crear el perfil')
@@ -353,7 +354,7 @@ const CreateProfileDialog = ({
               <Stack spacing={0.25}>
                 <Typography variant='body2'>Requiere aprobacion (maker-checker)</Typography>
                 <Typography variant='caption' color='text.secondary'>
-                  Recomendado: dejalo activo para auditar cambios sensibles.
+                  Recomendado: dejalo activo para auditar cambios sensibles. Si lo apagas, el perfil queda en borrador y debe activarse desde su tarjeta.
                 </Typography>
               </Stack>
             }

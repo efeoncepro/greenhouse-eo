@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
+import { can } from '@/lib/entitlements/runtime'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { runIdentityReconciliation } from '@/lib/identity/reconciliation/reconciliation-service'
@@ -12,6 +14,10 @@ export async function GET(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  if (!can(buildTenantEntitlementSubject(tenant), 'identity.reconciliation.read', 'read', 'tenant')) {
+    return NextResponse.json({ error: 'Forbidden — capability identity.reconciliation.read required' }, { status: 403 })
+  }
 
   const url = new URL(request.url)
   const status = url.searchParams.get('status') || 'pending'
@@ -52,6 +58,10 @@ export async function POST(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  if (!can(buildTenantEntitlementSubject(tenant), 'identity.reconciliation.run', 'execute', 'tenant')) {
+    return NextResponse.json({ error: 'Forbidden — capability identity.reconciliation.run required' }, { status: 403 })
+  }
 
   try {
     const body = await request.json().catch(() => ({}))

@@ -318,6 +318,141 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-873 — workforce intake completion gate.
+  // Capability `workforce.member.complete_intake` quedó seedeada en
+  // capabilities_registry por TASK-872 Slice 1.5 pero nunca grantada en
+  // runtime → endpoint POST /api/admin/workforce/members/[memberId]/complete-intake
+  // estaba inaccesible incluso para EFEONCE_ADMIN. TASK-873 cierra ese loop
+  // y declara la matriz canónica: HR route_group (HR_PAYROLL, HR_MANAGER,
+  // etc.) ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN. La capability sigue siendo
+  // tenant-scoped + action 'update'; el override de readiness (V1.1, TASK-874)
+  // se modelará como capability granular separada.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : 'role'
+
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.member.complete_intake',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.member.intake.update',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  // TASK-874 — Workforce Activation readiness.
+  // Read access follows the same operator matrix as complete_intake because the
+  // workspace exposes blockers without sensitive values. Override is deliberately
+  // narrower: break-glass only for EFEONCE_ADMIN, audited by the route/outbox.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : 'role'
+
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.member.activation_readiness.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.member.activation_readiness.override',
+      action: 'override',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  // TASK-877 — Workforce external identity reconciliation.
+  // HR operators can inspect and resolve Notion identity blockers only from the
+  // Workforce Activation surface. Broader identity reconciliation operations stay
+  // restricted to EFEONCE_ADMIN because they mutate cross-source identity links.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasAuthorizedView(subject, 'equipo.workforce_activation') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : hasAuthorizedView(subject, 'equipo.workforce_activation')
+        ? 'authorized_view'
+        : 'role'
+
+    for (const action of ['read', 'update'] as const) {
+      addEntitlement(entries, {
+        module: 'workforce',
+        capability: 'workforce.member.external_identity.resolve',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.approve',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.reject',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.reassign',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.reconciliation.run',
+      action: 'execute',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.offboarding') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
       ? 'route_group'

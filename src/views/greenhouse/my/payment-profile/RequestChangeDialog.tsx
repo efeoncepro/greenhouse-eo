@@ -17,6 +17,8 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
+import { COUNTRIES_SORTED } from '@/lib/locale/countries'
+
 import CustomChip from '@core/components/mui/Chip'
 
 const TASK407_ARIA_IDENTIDAD_LEGAL_VERIFICADA = "Identidad legal verificada"
@@ -58,30 +60,6 @@ const CL_ACCOUNT_TYPES: { value: 'cuenta_corriente' | 'cuenta_vista' | 'cuenta_r
   { value: 'cuenta_vista', label: 'Cuenta vista' },
   { value: 'cuenta_rut', label: 'Cuenta RUT' },
   { value: 'chequera_electronica', label: 'Chequera electrónica' }
-]
-
-const COUNTRY_OPTIONS: { code: string; label: string; flag: string }[] = [
-  { code: 'CO', label: 'Colombia', flag: '🇨🇴' },
-  { code: 'MX', label: 'México', flag: '🇲🇽' },
-  { code: 'PE', label: 'Perú', flag: '🇵🇪' },
-  { code: 'AR', label: 'Argentina', flag: '🇦🇷' },
-  { code: 'BR', label: 'Brasil', flag: '🇧🇷' },
-  { code: 'EC', label: 'Ecuador', flag: '🇪🇨' },
-  { code: 'UY', label: 'Uruguay', flag: '🇺🇾' },
-  { code: 'BO', label: 'Bolivia', flag: '🇧🇴' },
-  { code: 'PY', label: 'Paraguay', flag: '🇵🇾' },
-  { code: 'VE', label: 'Venezuela', flag: '🇻🇪' },
-  { code: 'CR', label: 'Costa Rica', flag: '🇨🇷' },
-  { code: 'GT', label: 'Guatemala', flag: '🇬🇹' },
-  { code: 'HN', label: 'Honduras', flag: '🇭🇳' },
-  { code: 'NI', label: 'Nicaragua', flag: '🇳🇮' },
-  { code: 'PA', label: 'Panamá', flag: '🇵🇦' },
-  { code: 'DO', label: 'República Dominicana', flag: '🇩🇴' },
-  { code: 'SV', label: 'El Salvador', flag: '🇸🇻' },
-  { code: 'CU', label: 'Cuba', flag: '🇨🇺' },
-  { code: 'PR', label: 'Puerto Rico', flag: '🇵🇷' },
-  { code: 'ES', label: 'España', flag: '🇪🇸' },
-  { code: 'US', label: 'Estados Unidos', flag: '🇺🇸' }
 ]
 
 const REGIME_LABELS: Record<Regime, string> = {
@@ -552,9 +530,9 @@ const RequestChangeDialog = ({ open, onClose, onSubmit }: Props) => {
           <MenuItem value=''>
             <em>Selecciona…</em>
           </MenuItem>
-          {COUNTRY_OPTIONS.map(c => (
+          {COUNTRIES_SORTED.map(c => (
             <MenuItem key={c.code} value={c.code}>
-              {c.flag} {c.label}
+              {c.flag} {c.name}
             </MenuItem>
           ))}
         </TextField>

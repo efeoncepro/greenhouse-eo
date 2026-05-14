@@ -1,8 +1,8 @@
 # Greenhouse Client Portal Domain Architecture V1
 
-> **Version:** 1.4
+> **Version:** 1.5
 > **Created:** 2026-05-07 por Claude (Opus 4.7)
-> **Updated:** 2026-05-12 por Claude (Opus 4.7) — V1.1 (§3.1 + §3.2 TASK-822), V1.2 (§5.1 rename TASK-824 verdict), V1.3 (§5.2 + §5.3 type/FK drift post-PG-discovery), V1.4 (§5.5 seed contract: view_codes + capabilities son FORWARD-LOOKING en V1.0; parity strict SOLO para data_sources — view_codes parity y capabilities parity son responsabilidad downstream de TASK-826/827 cuando materialicen los catalogs faltantes)
+> **Updated:** 2026-05-13 por Claude (Opus 4.7) — V1.5 (§11 cascade contract canonizado post arch-architect review TASK-828: G-1 instantiate inline, G-2 audit+signal inmediato, G-3 filter upstream, G-5 sourceRefJson canónico, +2 reliability signals, +listActiveAssignmentsForOrganization reader). V1.4 (§5.5 seed contract, 2026-05-12). V1.3 (§5.2 + §5.3 type/FK drift). V1.2 (§5.1 TASK-824). V1.1 (§3.1 + §3.2 TASK-822).
 > **Audience:** Backend engineers, frontend engineers, product owners, comerciales que vendan módulos del portal cliente, agentes que toquen rutas `/api/client-portal/*`, owners de Globe/Wave/CRM Solutions
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` (V3.0, descriptivo — predecesor), `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`, `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `GREENHOUSE_AGENCY_LAYER_V2.md`, `GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`
 > **Supersedes:** este spec NO supersede `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` V3.0 — coexisten: V3.0 describe la experiencia funcional y los 16 cards Creative Hub; este V1 (Domain) canoniza la **estructura del dominio** y el modelo de módulos on-demand. V3.0 sigue siendo lectura obligatoria para entender qué se compone.
@@ -578,6 +578,59 @@ GET    /api/admin/client-portal/health
 ---
 
 ## 11. Cascade desde Client Lifecycle V1 (TASK-828)
+
+### Delta 2026-05-13 — V1.5 contract canonizado post arch-architect review
+
+5 decisiones tomadas durante el review pre-implementación. Pseudocode V1.0 inicial (más abajo) queda como referencia histórica; el contract canónico es el siguiente:
+
+#### G-1 — Race con TASK-820 cascade → instantiate inline
+
+`instantiateClientForParty` corre **inline dentro de `resolveLifecycleCase`** en la misma tx PG, ANTES de `publishOutboxEvent('client.lifecycle.case.completed')`. Razón: el registry no garantiza orden entre consumers; si TASK-828 dispara antes que el cascade de TASK-820, `case.client_id IS NULL` y un `skip` lo congela permanentemente en `outbox_reactive_log`. Inline elimina la race + ahorra 5min del flush + escala visible cualquier violación.
+
+Consecuencia para el consumer de TASK-828: `client_id IS NULL` post-completed es **error duro** (throw → retry → dead_letter + signal), NO skip silente.
+
+#### G-2 — `bundled_modules[]` vacío → audit + signal inmediato (no fallback default)
+
+V1.0 NO materializa default per `business_line` cuando los terms no declaran bundle. Cliente queda sin modules + el consumer:
+
+1. `captureWithDomain(new Error('cascade_no_bundled_modules'), 'client_portal', { level:'warning', ... })`
+2. Persiste audit row `module_assignment_events.event_kind='cascade_skipped_no_bundled'`
+3. Retorna `{status:'completed', materialized:0, reason: <enum>}` (completion legítimo con 0 efectos, no skip).
+
+Reliability signal nuevo `client_portal.cascade.no_bundled_modules` (drift, warning si >0, steady=0) detecta en ≤7 días, complementa el signal `lifecycle_module_drift` de §13 que dispara a los 14 días.
+
+#### G-3 — Filtrado de deprecated module_keys vive en `getBundledModulesForOrganization`, NO en consumer
+
+Si un `module_key` quedó persistido en `engagement_commercial_terms.bundled_modules[]` pero el catálogo lo deprecó (`modules.effective_to IS NOT NULL`), `enableClientPortalModule` lanza 404 mid-loop, materializando parcial. El helper filtra contra catálogo activo antes del retorno, particionando en `moduleKeys` (válidos) y `skippedDeprecatedKeys` (drift).
+
+Reliability signal nuevo `client_portal.commercial_terms.unknown_bundled_module` (drift, error si >0, steady=0): query directa sobre commercial terms × catálogo, detecta drift TS↔DB upstream antes de que el cascade lo descubra.
+
+#### G-5 — `sourceRefJson` schema canónico para forensic completo
+
+TypeScript interface canónica `LifecycleCascadeSourceRef` vive en `src/lib/client-portal/cascade/types.ts`:
+
+```ts
+export type LifecycleCascadeSourceRef = {
+  caseId: string
+  caseKind: 'onboarding' | 'reactivation' | 'offboarding'
+  effectiveDate: string                          // ISO date
+  previousCaseId: string | null
+  commercialTermsIds: string[]
+  cascadeRunAt: string                           // ISO timestamp
+}
+```
+
+Todo `enableClientPortalModule` invocado desde el cascade persiste este shape. Cualquier downstream (admin UI, BQ projection futura, audit forensics) lo importa, NO parsea ad-hoc.
+
+#### Reactivation V1.0 semantics — solo bundled actuales
+
+Trata reactivation como "fresh onboarding contra terms reactivados" (helper lee terms vigentes al `effectiveDate`). Terms pueden haber cambiado entre offboarding y reactivation; el cliente recibe el contrato vigente, NO el snapshot pre-offboarding. Smart restore desde `previous_case_id` (preservar exact state) queda V1.1.
+
+#### `listActiveAssignmentsForOrganization` — gap TASK-826 absorbido
+
+Cascade offboarding necesita `assignmentId[]` para iterar `churnClientPortalModule`. Resolver canónico devuelve `ResolvedClientPortalModule[]` sin `assignmentId` (es para UI). TASK-828 ships el reader native faltante en `src/lib/client-portal/readers/native/list-active-assignments.ts` con metadata canónica `classification='native', ownerDomain=null`.
+
+### Pseudocode V1.0 (referencia histórica — superseded por contract V1.5 + TASK-828 Detailed Spec)
 
 Reactive consumer registrado en projection registry:
 

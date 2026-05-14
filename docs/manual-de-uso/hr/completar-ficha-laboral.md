@@ -1,0 +1,173 @@
+# Completar ficha laboral de un colaborador
+
+> **Tipo de documento:** Manual de uso
+> **Version:** 1.0
+> **Creado:** 2026-05-14 por TASK-873
+> **Modulo:** HR / Workforce / Lifecycle
+> **Rutas:** `/hr/workforce/activation` (principal), `/admin/workforce/activation` (admin governance), `/people/[memberId]` (detalle)
+> **Capacidad requerida:** `workforce.member.complete_intake` para cierre final; `workforce.member.intake.update` para remediar datos laborales.
+> **Endpoint backend:** `POST /api/hr/workforce/members/[memberId]/complete-intake` y `PATCH /api/hr/workforce/members/[memberId]/intake`
+
+## Para que sirve
+
+Cuando un colaborador entra a Greenhouse via Microsoft Entra (SCIM) por
+primera vez, su ficha en el modulo HR / Personas nace en estado **"Ficha
+pendiente"** (`workforce_intake_status = 'pending_intake'`). Antes de que
+ese colaborador entre al flujo operativo de nomina, asignaciones,
+proyecciones de capacidad y compensaciones, HR debe **completar la ficha
+laboral**: confirmar el contrato, la compensacion, el perfil legal y los
+datos de pago.
+
+Este manual explica como completar esa ficha desde la interfaz, sin tener
+que pedirle a alguien tecnico que invoque el endpoint manualmente.
+
+> **Nota TASK-874**: el sistema valida automaticamente contrato, cargo,
+> compensacion, perfil legal y datos de pago antes de completar la ficha.
+> Si hay blockers, resuelvelos primero en `/hr/workforce/activation`.
+>
+> **Nota TASK-876**: el boton de Personas para fichas pendientes ya no abre
+> el drawer final; te lleva al workspace con `?memberId=` para resolver
+> blockers primero.
+
+## Antes de empezar
+
+Verifica que esten al dia, idealmente en este orden:
+
+1. **Datos basicos del colaborador** (nombre legal, RUT/documento de
+   identidad, fecha de nacimiento, telefono, direccion).
+2. **Contrato** (tipo de contrato, fecha de ingreso, cargo, departamento).
+3. **Compensacion** (sueldo bruto, moneda, fecha desde, indemnizaciones,
+   bonos previstos).
+4. **Perfil legal** (relacion contractual activa, documentos cargados).
+5. **Datos de pago** (cuenta bancaria, beneficiario verificado).
+
+Si falta alguno de estos puntos, **NO completes la ficha todavia** —
+abre `/people/[memberId]` y resuelve lo que falta antes.
+
+## Donde aparecen las fichas pendientes
+
+### En el directorio People
+
+Entra a `/people`. Los colaboradores con ficha pendiente muestran un chip
+naranja **"Ficha pendiente"** debajo del chip de estado **Activo / Inactivo**.
+Si la ficha entro a revision interna, el chip dice **"Ficha en revision"**
+(azul).
+
+### En la cola operativa
+
+Entra a `/hr/workforce/activation`. Esta es la cola consolidada de
+**Workforce Activation**. La variante `/admin/workforce/activation` queda
+como admin governance / transitional. La cola
+muestra:
+
+- Avatar + nombre del colaborador
+- Correo
+- Estado (Pendiente / En revision)
+- Fecha de creacion
+- Antiguedad en dias
+
+Puedes filtrar por:
+
+- **Todos** (default)
+- **Pendientes** (solo `pending_intake`)
+- **En revision** (solo `in_review`)
+
+### En el dashboard de Admin
+
+`/admin` muestra un signal de reliability **"Members SCIM con ficha laboral
+pendiente"**. Cuando el signal alerta (mas de 7 dias sin completar = warning;
+mas de 30 dias = critico), aparece un boton **"Ver fichas pendientes →"**
+que te lleva directo a la cola operativa.
+
+## Como completar la ficha — paso a paso
+
+Hay dos rutas equivalentes:
+
+### Opcion 1: Desde la cola operativa
+
+1. Entra a `/admin/workforce/activation`.
+2. Aplica el filtro relevante si quieres scope angosto.
+3. Haz click en la fila del colaborador.
+4. Si el inspector muestra blockers, presiona **"Resolver blockers"**.
+5. Completa primero datos laborales, compensacion, legal profile y pago segun corresponda.
+6. Cuando el inspector quede listo, presiona **"Completar ficha"**.
+7. Se abre el drawer **"Completar ficha laboral"** en el costado derecho.
+8. Verifica los datos read-only (nombre, correo, estado actual, antiguedad,
+   identity profile).
+9. Lee el banner de advertencia amarillo **"Verifica antes de completar"** —
+   confirma que ya revisaste contrato + compensacion + perfil legal + datos
+   de pago.
+10. Opcional: escribe una nota en el campo **"Notas (opcional)"** para que
+   quede registrada en el audit log y outbox event. Util para anotar quien
+   completo, o referenciar tickets de soporte.
+11. Presiona **"Marcar como completada"** (boton naranja contained).
+12. Espera el toast de confirmacion **"Ficha completada"**.
+13. La fila desaparece de la cola.
+
+### Opcion 2: Desde el detalle del colaborador
+
+1. Entra a `/people/[memberId]` (puedes navegar desde la cola, desde el
+   directorio People, o de Microsoft Teams si tienes el link).
+2. En el header del perfil, junto al chip Activo / Inactivo, veras un
+   boton para completar o resolver la ficha si el colaborador esta pendiente.
+3. Presiona el boton. Para `pending_intake` o `in_review`, el sistema abre
+   `/hr/workforce/activation?memberId=<id>`.
+4. Resuelve los blockers desde Workforce Activation y solo despues ejecuta
+   **"Completar ficha"**.
+
+## Que pasa despues
+
+Cuando completas la ficha:
+
+1. **Estado en base de datos**: `workforce_intake_status` pasa a `completed`
+   en `greenhouse_core.members`. La transicion es atomica + idempotente.
+2. **Audit log**: queda registrado en outbox event
+   `workforce.member.intake_completed v1` (TASK-872) con tu user id, la
+   nota opcional, timestamp y el estado anterior. Auditable desde admin.
+3. **Reliability signal**: el contador del signal
+   `workforce.scim_members_pending_profile_completion` baja en 1. Si era el
+   ultimo, el signal vuelve a verde.
+4. **Payroll / capacity / assignments**: el colaborador queda elegible para
+   payroll. Cuando se active el flag `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED`
+   en produccion (TASK-872 follow-up), solo los members `completed` entran
+   a las corridas de nomina.
+5. **El badge "Ficha pendiente"** desaparece del directorio People y del
+   header del perfil.
+
+## Que no hacer
+
+- **No completes la ficha "por completar"** ignorando blockers. Desde
+  TASK-874, el guard impide cerrar si faltan datos críticos; resuelve la
+  fuente dueña del dato desde Workforce Activation antes de insistir.
+- **No edites `workforce_intake_status` directamente con SQL**. Toda
+  transicion pasa por el endpoint canonical, que escribe audit + outbox.
+- **No reabras una ficha completada** desde la UI. La transicion es
+  one-way en V1.0; si un caso amerita reapertura (e.g. revisado en frio
+  y se detecto error), abre un ticket con DevOps o admin para que ajuste
+  via SQL con audit explicito.
+
+## Problemas comunes y troubleshooting
+
+| Sintoma | Diagnostico | Solucion |
+|---|---|---|
+| Boton "Completar ficha" no aparece en /people/[memberId] | Tu rol no tiene la capability `workforce.member.complete_intake`, o el member ya esta `completed`. | Verifica con admin que tu rol este en EFEONCE_ADMIN, FINANCE_ADMIN o tenga route_group=hr. Si no, pide acceso. |
+| Al editar fecha de ingreso aparece `Team member not found` | Estabas usando el flujo legacy de HR Core para un member SCIM/PG-only. | Usa `/hr/workforce/activation?memberId=<id>` y guarda desde **Resolver blockers**. TASK-876 cablea ese update contra `greenhouse_core.members`. |
+| /admin/workforce/activation redirige a tu home | Misma causa: te falta la capability. | Pide acceso a admin. |
+| Toast "No fue posible completar la ficha. Revisa los logs." | El endpoint backend fallo (500). | Notifica al equipo tecnico — el error queda en Sentry domain `identity` con detalles. Mientras tanto, NO retries automaticos: deja correr 1-2 min antes de reintentar. |
+| Toast "La ficha esta en un estado que no permite la transicion." | El member ya cambio de estado en otro tab o lo modifico otro operador. | Recarga la pagina. Si el estado quedo en `completed` ya, el badge desaparece. Si quedo en otro estado raro (e.g. test de QA), notifica al equipo tecnico. |
+| Toast "No tienes permiso para completar esta ficha." | Tu sesion expiro o tu capacidad cambio. | Cierra sesion + vuelve a entrar. Si persiste, pide a admin que revise tus roles. |
+| El badge "Ficha pendiente" no desaparece despues de completar | Cache de la pagina o de la sesion. | Recarga la pagina (cmd+R). La data fetch tras submit es refresh automatico, pero puede haber stale en otra ventana. |
+| La cola muestra colaboradores con email "t872-...-..." o nombres "Test happy" | Son members SCIM de pruebas test que quedaron en staging | Estos son test fixtures TASK-872. En produccion no aparecen. Filtra por nombre real si la cola es ruidosa en staging. |
+
+## Referencias tecnicas
+
+- **Spec backend**: `docs/tasks/complete/TASK-872-scim-internal-collaborator-provisioning.md`
+- **Spec UI**: `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (este shipping)
+- **Spec workspace enriquecido**: `docs/tasks/complete/TASK-874-workforce-activation-readiness-workspace.md`
+- **Manual Workforce Activation**: `docs/manual-de-uso/hr/habilitar-colaborador-workforce.md`
+- **Endpoint**: `src/app/api/admin/workforce/members/[memberId]/complete-intake/route.ts`
+- **Reader cola**: `src/lib/workforce/intake-queue/list-pending-members.ts`
+- **Drawer shared**: `src/views/greenhouse/admin/workforce-activation/CompleteIntakeDrawer.tsx`
+- **View admin**: `src/views/greenhouse/admin/workforce-activation/WorkforceActivationView.tsx`
+- **Runbook recovery SCIM**: `docs/operations/runbooks/scim-internal-collaborator-recovery.md`
+- **Doc funcional identidad**: `docs/documentation/identity/sistema-identidad-roles-acceso.md`

@@ -90,6 +90,30 @@ describe('TASK-753 resolveSelfServicePaymentProfileContext', () => {
     expect(ctx.currency).toBe('CLP')
   })
 
+  it('normalizes legacy country names and honors contract_type=honorarios over generic chile pay_regime', async () => {
+    mockedQuery.mockResolvedValueOnce([
+      {
+        member_id: 'm-felipe',
+        pay_regime: 'chile',
+        location_country: 'Chile',
+        legal_name: null,
+        display_name: 'Felipe Zurita',
+        contract_type: 'honorarios',
+        identity_profile_id: 'ip-felipe'
+      }
+    ])
+    mockedResolveProfile.mockResolvedValueOnce('ip-felipe')
+    mockedListDocs.mockResolvedValueOnce([])
+
+    const ctx = await resolveSelfServicePaymentProfileContext('m-felipe')
+
+    expect(ctx.regime).toBe('honorarios_chile')
+    expect(ctx.countryCode).toBe('CL')
+    expect(ctx.countryName).toBe('Chile')
+    expect(ctx.currency).toBe('CLP')
+    expect(ctx.legalFullName).toBe('Felipe Zurita')
+  })
+
   it('returns regime=international for non-CL country', async () => {
     mockedQuery.mockResolvedValueOnce([
       {

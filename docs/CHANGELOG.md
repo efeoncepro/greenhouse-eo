@@ -4,6 +4,17 @@ Registro de cambios principales de Greenhouse EO.
 
 ---
 
+### Identity / Person 360 — Avatar runtime Postgres-first (2026-05-14)
+
+Se corrige el contrato runtime de avatars para colaboradores SCIM/Person 360:
+
+- `/api/media/users/{id}/avatar` resuelve el asset desde Postgres + `greenhouse_serving.person_360` como fuente primaria.
+- BigQuery queda solo como mirror legacy/fallback, no como dependencia crítica para renderizar fotos.
+- `/people` usa `resolveAvatarUrl()` y `person_360.user_id` para transformar `gs://` en el proxy protegido.
+- Se agregan tests de regresión para evitar volver a servir URLs crudas o depender de mirrors atrasados.
+
+---
+
 ### Sidebar Navigation — Reestructuración de idioma, jerarquía y consistencia (2026-03-20)
 
 Refactor completo del sidebar de navegación para eliminar 7 problemas arquitectónicos: idioma mixto, secciones de 1 hijo, colisión de nombres, dominios fragmentados, NavLabel inconsistente, nombres ambiguos y falta de regla para Section vs SubMenu vs Flat.

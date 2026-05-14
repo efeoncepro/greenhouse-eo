@@ -40,6 +40,7 @@ import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
+import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
   getIdentityGovernancePendingApprovalOverdueSignal
@@ -50,6 +51,8 @@ import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orde
 import { getPayrollComplianceExportDriftSignal } from './queries/payroll-compliance-export-drift'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
+import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 import { getServiceEngagementEngagementKindUnmappedSignal } from './queries/service-engagement-engagement-kind-unmapped'
 import { getServiceEngagementLifecycleStageUnknownSignal } from './queries/service-engagement-lifecycle-stage-unknown'
 import { getServiceEngagementLineageOrphanSignal } from './queries/service-engagement-lineage-orphan'
@@ -352,6 +355,8 @@ interface ReliabilityOverviewSources {
    * verán datos stale hasta resolver). Mismo patrón que paymentOrderSettlement.
    */
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
+  hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
+  workforceUnlinkedInternalUsers?: ReliabilitySignal | null
 
   /**
    * TASK-773 Slice 4 — Outbox publisher health. 2 readers:
@@ -450,6 +455,7 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   workspaceProjection?: ReliabilitySignal[] | null
+  scimWorkforce?: ReliabilitySignal[] | null
 
   /**
    * ISSUE-075 hardening — Microsoft Graph webhook subscription health.
@@ -590,6 +596,10 @@ export const buildReliabilityOverview = (
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
     ...(sources.providerBqSyncDeadLetter ?? []),
+    // TASK-878 Slice 2 — HubSpot companies intake dead-letter (async webhook path).
+    ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
+    // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
+    ...(sources.workforceUnlinkedInternalUsers ? [sources.workforceUnlinkedInternalUsers] : []),
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
     ...(sources.outboxHealth ?? []),
     // TASK-408 Slice 4 — Email render/template safety net.
@@ -612,6 +622,8 @@ export const buildReliabilityOverview = (
     ...(sources.identityGovernance ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
+    // TASK-872 Slice 6 — SCIM Internal Collaborator + workforce intake signals (6).
+    ...(sources.scimWorkforce ?? []),
     // ISSUE-075 hardening — Microsoft Graph webhook subscription health.
     ...(sources.entraWebhookSubscriptionHealth ? [sources.entraWebhookSubscriptionHealth] : []),
     // TASK-827 Slice 8 — Client portal resolver failure rate (V1.0 scaffold).
@@ -829,6 +841,24 @@ export const getReliabilityOverview = async (
           .then(signal => [signal])
           .catch(() => null)
 
+  // TASK-878 Slice 2 — HubSpot companies intake dead-letter (mirror provider_bq_sync).
+  // Detecta path async caído: webhook companies emite outbox event pero la projection
+  // no logra completar el sync después de N retries → operador escala bridge / secret.
+  const hubspotCompaniesIntakeDeadLetter =
+    preloadedSources.hubspotCompaniesIntakeDeadLetter !== undefined
+      ? preloadedSources.hubspotCompaniesIntakeDeadLetter
+      : await getHubspotCompaniesIntakeDeadLetterSignal().catch(() => null)
+
+  // TASK-878 follow-up — Identity UX hardening signal.
+  // Detecta usuarios internos activos sin member_id enlazado. Cuando alerta,
+  // significa que un usuario interno entró pero TASK-877 reconciliación no
+  // los procesó aún — están viendo banner "Tu cuenta aún no está enlazada..."
+  // en todas las vistas /my hasta que HR los active vía workforce intake.
+  const workforceUnlinkedInternalUsers =
+    preloadedSources.workforceUnlinkedInternalUsers !== undefined
+      ? preloadedSources.workforceUnlinkedInternalUsers
+      : await getWorkforceUnlinkedInternalUsersSignal().catch(() => null)
+
   // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
   // 2 readers en paralelo. Cada uno degrada honestamente si su query falla.
   // Critical signal: si el publisher está caído, NINGUNA projection corre.
@@ -939,6 +969,15 @@ export const getReliabilityOverview = async (
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
+
+  // TASK-872 Slice 6 — SCIM + workforce intake signals (6 readers en paralelo).
+  // Cubre: users sin identity_profile / sin member / ineligibles in scope /
+  // member identity drift / members pending intake completion / allowlist-blocklist
+  // conflict. Roll up bajo moduleKey 'identity'.
+  const scimWorkforce =
+    preloadedSources.scimWorkforce !== undefined
+      ? preloadedSources.scimWorkforce
+      : await getScimWorkforceSignals().catch(() => null)
 
   // ISSUE-075 hardening — Microsoft Graph webhook subscription health. Single
   // reader; consulta `greenhouse_sync.integration_registry.metadata` para
@@ -1093,6 +1132,8 @@ export const getReliabilityOverview = async (
     finalSettlementPdfStatusDrift,
     financeClpDrift,
     providerBqSyncDeadLetter,
+    hubspotCompaniesIntakeDeadLetter,
+    workforceUnlinkedInternalUsers,
     outboxHealth,
     emailRenderFailure,
     cronStagingDrift,
@@ -1104,6 +1145,7 @@ export const getReliabilityOverview = async (
     workforceRoleTitle,
     identityGovernance,
     workspaceProjection,
+    scimWorkforce,
     entraWebhookSubscriptionHealth,
     clientPortalResolverFailureRate,
     financeClientProfileUnlinked,

@@ -10,6 +10,7 @@ import {
   getNotionRawFreshnessGate,
   type NotionRawFreshnessGateResult
 } from '@/lib/integrations/notion-readiness'
+import { loadNotionMemberMapPostgresFirst } from '@/lib/identity/reconciliation/notion-member-map'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { auditDeliveryNotionParity } from '@/lib/space-notion/notion-parity-audit'
 import {
@@ -1181,18 +1182,12 @@ export const syncNotionToConformed = async (input?: {
     console.warn('[sync-cron] Could not load space_notion_sources from PostgreSQL — client_id will be null:', err instanceof Error ? err.message : err)
   }
 
-  // Resolve team members for assignee mapping
-  const memberRows = await runBigQuery<{ member_id: string | null; notion_user_id: string | null }>(`
-    SELECT member_id, notion_user_id
-    FROM \`${projectId}.greenhouse.team_members\`
-    WHERE notion_user_id IS NOT NULL
-  `)
+  // Resolve team members for assignee mapping. TASK-877 makes Postgres
+  // identity_profile_source_links canonical; BigQuery remains a compatibility
+  // fallback while conformed sync consumers migrate.
+  const { map: notionMemberMap, source: notionMemberMapSource } = await loadNotionMemberMapPostgresFirst()
 
-  const notionMemberMap = new Map(
-    memberRows
-      .map(r => [toNullableString(r.notion_user_id), toNullableString(r.member_id)] as const)
-      .filter(([uid, mid]) => uid && mid)
-  )
+  console.info(`[sync-cron] Notion assignee member map loaded from ${notionMemberMapSource} (${notionMemberMap.size} links)`)
 
   // 3. Transform projects
   const deliveryProjects = projects.map(row => {

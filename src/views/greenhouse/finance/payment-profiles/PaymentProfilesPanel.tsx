@@ -134,9 +134,17 @@ const PaymentProfilesPanel = ({
     void loadProfiles()
   }, [loadProfiles])
 
-  const handleProfileCreated = useCallback(async () => {
+  const handleProfileCreated = useCallback(async (profile?: BeneficiaryPaymentProfileSafe) => {
     setCreateOpen(false)
-    toast.success('Perfil creado. Esperando aprobacion del checker.')
+
+    if (profile?.status === 'pending_approval') {
+      toast.success('Perfil creado. Esperando aprobacion del checker.')
+    } else if (profile?.status === 'draft') {
+      toast.success('Perfil creado como borrador. Activalo desde la tarjeta para habilitarlo.')
+    } else {
+      toast.success('Perfil creado.')
+    }
+
     await loadProfiles()
     await onActionComplete?.()
   }, [loadProfiles, onActionComplete])

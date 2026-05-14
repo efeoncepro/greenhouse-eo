@@ -44,6 +44,20 @@ const PersonView = ({ memberId }: Props) => {
 
   const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
 
+  // TASK-873 Slice 3 — espejo client-side del gate runtime.ts (Slice 1):
+  // `hasRouteGroup(subject, 'hr') || hasRole(EFEONCE_ADMIN) || hasRole(FINANCE_ADMIN)`.
+  // El endpoint backend revalida la capability vía `can()` server-side, por
+  // lo que este check es solo para esconder el botón a roles sin permiso;
+  // un click optimista del usuario sin capability igualmente recibe 403
+  // con copy redacted via toast canonical (drawer maneja el branching).
+  const roleCodes = session?.user?.roleCodes ?? []
+  const routeGroups = session?.user?.routeGroups ?? []
+
+  const canCompleteIntake =
+    routeGroups.includes('hr') ||
+    roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN) ||
+    roleCodes.includes(ROLE_CODES.FINANCE_ADMIN)
+
   const loadDetail = useCallback(async () => {
     const res = await fetch(`/api/people/${memberId}`)
 
@@ -149,6 +163,8 @@ const PersonView = ({ memberId }: Props) => {
           onEditProfile={() => setEditProfileOpen(true)}
           onDeactivate={() => setDeactivateConfirmOpen(true)}
           onEditCompensation={() => setCompensationOpen(true)}
+          canCompleteIntake={canCompleteIntake}
+          workforceActivationHref={`/hr/workforce/activation?memberId=${encodeURIComponent(detail.member.memberId)}`}
         />
         <PersonTabs
           detail={detail}

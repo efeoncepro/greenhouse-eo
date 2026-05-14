@@ -1,6 +1,6 @@
 # ISSUE-075 — Entra webhook validation handshake rejects POST (subscription create/renew fails)
 
-> **Estado:** Open — fix + hardening shipped a `develop`, validado en staging end-to-end. Cierre formal pendiente de promoción `develop → main` (release orquestado per TASK-848/851) + trigger manual del cron en producción.
+> **Estado:** Resolved 2026-05-13 — fix + hardening shipped a producción via canonical orchestrator release (run `25825280928`, manifest `e02cb32e9c30-5acb894c-f164-486c-99c0-074d42aefbeb`, target_sha `e02cb32e9c3049c2993cfc5d7767e9a9c804da90`). All 4 Cloud Run workers + Vercel production deploy on target SHA, post-release watchdog SUCCESS (zero drift), post-release health green.
 > **Detectado:** 2026-05-13 06:00:03 -04 vía Sentry alert `JAVASCRIPT-NEXTJS-4T`
 > **Severidad:** Alta — bloquea creación/renovación de Microsoft Graph webhook subscription para Entra ID user changes. Cuando la subscription expira, Greenhouse pierde 100% de notifications de cambios de profiles (resolución vía cron diario `entra-profile-sync` de respaldo, pero con latencia ~24h vs <10s nativo)
 > **Canal de detección:** Sentry (project `javascript-nextjs`, environment `production`)

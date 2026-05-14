@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 import {
   createEndorsement,
@@ -17,13 +18,13 @@ export async function POST(
   const { tenant, errorResponse } = await requireInternalTenantContext()
 
   if (!tenant) {
-    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return errorResponse || canonicalErrorResponse('unauthorized')
   }
 
   const endorserMemberId = tenant.memberId || null
 
   if (!endorserMemberId) {
-    return NextResponse.json({ error: 'Member identity not linked' }, { status: 422 })
+    return canonicalErrorResponse('member_identity_not_linked')
   }
 
   try {

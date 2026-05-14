@@ -8,6 +8,20 @@ export type PersonTab = 'profile' | 'activity' | 'memberships' | 'economy' | 'pa
 /** @deprecated Legacy tab values — kept for URL redirect compatibility */
 export type LegacyPersonTab = 'compensation' | 'payroll' | 'finance' | 'hr-profile' | 'identity' | 'intelligence'
 
+/**
+ * Estado del workflow workforce intake (TASK-872 + TASK-873).
+ * - `pending_intake`: member creado por SCIM, falta completar ficha laboral
+ * - `in_review`: ficha en revisión HR (no auto-emitida; transición manual)
+ * - `completed`: ficha lista, member entra a payroll / capacity / compensation
+ *
+ * Default para members legacy pre-TASK-872 = `'completed'` (CHECK constraint
+ * + default greenhouse_core.members.workforce_intake_status).
+ *
+ * Null/undefined cuando la fuente upstream (BigQuery fallback) no expone el
+ * campo — consumers tratan como `completed` (back-compat).
+ */
+export type WorkforceIntakeStatus = 'pending_intake' | 'in_review' | 'completed'
+
 export interface PersonListItem {
   memberId: string
   displayName: string
@@ -30,6 +44,14 @@ export interface PersonListItem {
   /** @deprecated alias de assignedFte para compatibilidad con consumers existentes */
   totalFte: number
   payRegime: 'chile' | 'international' | null
+
+  /**
+   * Estado workforce intake (TASK-872 + TASK-873).
+   *
+   * `null` cuando la fuente es BigQuery legacy (no expone la columna) — los
+   * consumers tratan como `'completed'` (back-compat de members pre-TASK-872).
+   */
+  workforceIntakeStatus: WorkforceIntakeStatus | null
 }
 
 export interface PeopleListPayload {
@@ -103,6 +125,13 @@ export interface PersonDetailMember {
   notionUserId: string | null
   azureOid: string | null
   hubspotOwnerId: string | null
+
+  /**
+   * Estado workforce intake (TASK-872 + TASK-873). Null cuando la fuente
+   * upstream no expone la columna (BQ fallback legacy). Consumers tratan
+   * NULL como 'completed' para back-compat.
+   */
+  workforceIntakeStatus: WorkforceIntakeStatus | null
 }
 
 export interface PersonIntegrations {

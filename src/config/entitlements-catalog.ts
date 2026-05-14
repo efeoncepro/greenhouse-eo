@@ -14,7 +14,12 @@ export const ENTITLEMENT_MODULES = [
   'organization',
   // TASK-848 — namespace de control plane production (release / rollback / preflight bypass).
   // Capabilities granulares least-privilege, NO platform.admin catch-all.
-  'platform'
+  'platform',
+  // TASK-872 + TASK-873 — namespace del workflow workforce intake / activation.
+  // Distinto de `hr` (procesos HR transversales) y `people` (directorio operativo).
+  // V1: workforce.member.complete_intake (transición pending_intake → completed).
+  // V1.1 follow-up (TASK-874): workforce.member.activation_readiness.{read,override}.
+  'workforce'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -36,7 +41,8 @@ export const ENTITLEMENT_ACTIONS = [
   // de reusar manage/launch.
   'execute',
   'rollback',
-  'bypass_preflight'
+  'bypass_preflight',
+  'override'
 ] as const
 
 export type EntitlementAction = (typeof ENTITLEMENT_ACTIONS)[number]
@@ -1050,6 +1056,90 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'platform',
     actions: ['read'] as const,
     defaultScope: 'all'
+  },
+  // TASK-872 — SCIM Internal Collaborator Provisioning capabilities (4 nuevas).
+  // 3 eligibility override (L4 admin allowlist/denylist + backfill execute) +
+  // 1 workforce intake transition (pending_intake → completed).
+  // Patrón canónico TASK-404 (user_entitlement_overrides) + TASK-850 (preflight CLI).
+  // Module 'organization' para SCIM (siguen el namespace canonical de organization
+  // identity); 'workforce' para intake transition (siguen TASK-785 role_title).
+  {
+    key: 'scim.eligibility_override.create',
+    module: 'organization',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'scim.eligibility_override.delete',
+    module: 'organization',
+    actions: ['delete'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'scim.backfill.execute',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'workforce.member.complete_intake',
+    module: 'workforce',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.member.intake.update',
+    module: 'workforce',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.member.activation_readiness.read',
+    module: 'workforce',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.member.activation_readiness.override',
+    module: 'workforce',
+    actions: ['override'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.member.external_identity.resolve',
+    module: 'workforce',
+    actions: ['read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.read',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.approve',
+    module: 'organization',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.reject',
+    module: 'organization',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.reassign',
+    module: 'organization',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.reconciliation.run',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
   }
 ] as const
 
