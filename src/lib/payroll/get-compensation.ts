@@ -582,6 +582,10 @@ export const getApplicableCompensationVersionsForPeriod = async (periodStart: st
           ON cv.member_id = m.member_id
          AND cv.effective_from <= DATE(@periodEnd)
          AND (cv.effective_to IS NULL OR cv.effective_to >= DATE(@periodStart))
+        -- TASK-872 V1.1 — workforce_intake_status gate pendiente: BQ team_members no
+        -- tiene la columna sincronizada todavía (column es PG-canonical desde Slice 1.5).
+        -- Cuando sync_conformed la propague, agregar gate paralelo aquí. V1.0 PG reader
+        -- canonical hace el gating; este BQ path es fallback (solo cuando PG falla).
         WHERE m.active = TRUE
       )
       WHERE row_num = 1
