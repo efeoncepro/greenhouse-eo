@@ -17,7 +17,7 @@ Workforce Activation es el workspace operativo para habilitar a una persona ante
 - Identidad legal: profile legal requerido para payroll Chile dependiente.
 - Pago: perfil de pago activo solo cuando `payroll_via='internal'`; Deel queda como warning no bloqueante.
 - Onboarding: lee `WorkRelationshipOnboardingCase` cuando existe. Si no existe, avisa que se creará al activar; si está `blocked`, bloquea la habilitación.
-- Contractor engagement: lane V1 de visibilidad para los contratos que cierra TASK-790.
+- Contractor engagement: lane V1 de visibilidad para los contratos que cierra TASK-790. Mientras ese runtime no exista, `honorarios`, `contractor` y `eor` quedan como warning operativo, no como blocker.
 
 ## Comportamiento
 
@@ -45,3 +45,5 @@ TASK-874 no implementa effective dating de cargo/promoción (TASK-788), ni runti
 TASK-875 no crea UI nueva ni automatiza SCIM/payroll/leave/equipment; solo formaliza el aggregate root de onboarding y lo conecta al cierre de ficha.
 
 TASK-876 no completa automáticamente a Felipe, María Camila ni ningún colaborador real; solo habilita el flujo para que un operador autorizado lo haga manualmente.
+
+Para `Honorarios`, el blocker de pago sigue dependiendo de un perfil de pago activo/aprobado. Un perfil en `Borrador` no desbloquea la ficha.

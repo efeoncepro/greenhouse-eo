@@ -676,19 +676,19 @@ export const resolveWorkforceActivationReadiness = async (
   warnings.push(...operationalOnboarding.warnings)
   lanes.push(operationalOnboarding.lane)
 
-  const isContractor = snapshot.contractType === 'honorarios' || snapshot.contractType === 'contractor' || snapshot.contractType === 'eor'
+  const needsContractorEngagement = snapshot.contractType === 'honorarios' || snapshot.contractType === 'contractor' || snapshot.contractType === 'eor'
 
-  if (isContractor) {
-    blockers.push(
+  if (needsContractorEngagement) {
+    warnings.push(
       issue(
         memberId,
         'contractor_engagement',
-        'contractor_engagement_missing',
-        'Falta engagement contractor',
-        'Crear o vincular engagement canónico cuando TASK-790 esté disponible.'
+        'contractor_engagement_pending_foundation',
+        'Engagement contractor pendiente de foundation',
+        'TASK-790 formalizará el engagement contractor; no bloquea la activación V1 si contrato, compensación y pago están listos.'
       )
     )
-    lanes.push(lane(memberId, 'contractor_engagement', 'blocked', 'Engagement contractor todavía no está vinculado.'))
+    lanes.push(lane(memberId, 'contractor_engagement', 'warning', 'Engagement contractor queda como seguimiento operativo V1.'))
   } else {
     lanes.push(lane(memberId, 'contractor_engagement', 'not_applicable', DEFAULT_LANE_DETAIL.contractor_engagement))
   }

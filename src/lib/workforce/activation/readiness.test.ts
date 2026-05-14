@@ -144,4 +144,25 @@ describe('TASK-874 resolveWorkforceActivationReadiness', () => {
     expect(result.ready).toBe(true)
     expect(result.warnings.some(warning => warning.code === 'onboarding_case_missing')).toBe(true)
   })
+
+  it('does not block Chile honorarios on contractor engagement while TASK-790 foundation is pending', async () => {
+    queryMock.mockResolvedValueOnce([
+      {
+        ...baseRow,
+        employment_type: 'part_time',
+        contract_type: 'honorarios',
+        pay_regime: 'chile',
+        payroll_via: 'internal',
+        compensation_contract_type: 'honorarios',
+        compensation_pay_regime: 'chile'
+      }
+    ])
+
+    const result = await resolveWorkforceActivationReadiness('mem-1')
+
+    expect(result.ready).toBe(true)
+    expect(result.blockers.some(blocker => blocker.lane === 'contractor_engagement')).toBe(false)
+    expect(result.warnings.some(warning => warning.code === 'contractor_engagement_pending_foundation')).toBe(true)
+    expect(result.lanes.find(lane => lane.key === 'contractor_engagement')?.status).toBe('warning')
+  })
 })

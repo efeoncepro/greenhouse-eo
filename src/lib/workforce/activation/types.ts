@@ -49,6 +49,7 @@ export type WorkforceActivationWarningCode =
   | 'onboarding_case_unavailable'
   | 'onboarding_checklist_missing'
   | 'onboarding_checklist_incomplete'
+  | 'contractor_engagement_pending_foundation'
 
 export interface WorkforceActivationIssue {
   readonly code: WorkforceActivationBlockerCode | WorkforceActivationWarningCode
