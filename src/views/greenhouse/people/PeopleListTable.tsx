@@ -26,13 +26,53 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 import { useListAnimation } from '@/hooks/useListAnimation'
 
-import type { PersonListItem } from '@/types/people'
+import type { PersonListItem, WorkforceIntakeStatus } from '@/types/people'
+import { GH_WORKFORCE_INTAKE } from '@/lib/copy/workforce'
 import { countryLabel, formatFte, roleCategoryLabel, safeRoleCategory } from './helpers'
 import PeopleListFilters from './PeopleListFilters'
 
 import tableStyles from '@core/styles/table.module.css'
 
 const TASK407_EMPTY_NO_SE_ENCONTRARON_COLABORADORES = "No se encontraron colaboradores"
+
+/**
+ * TASK-873 Slice 2 — Renderer del badge de workforce intake en el Estado cell.
+ * NULL/'completed' = no badge (consumer back-compat para legacy members + BQ
+ * fallback). Color + icon + label canonical desde GH_WORKFORCE_INTAKE.
+ *
+ * NOTA arch-architect: la decisión de stack vertical en la columna Estado
+ * (vs columna dedicada) evita anchura adicional en una tabla que ya carga
+ * 7 columnas + filters horizontales. El badge es conditional (~2-5% de members
+ * post TASK-872) — columna dedicada sería casi siempre vacía. Adjacency con
+ * el chip Activo/Inactivo refuerza la lectura "operativamente activo PERO
+ * con ficha pendiente".
+ */
+const WorkforceIntakeBadge = ({
+  status
+}: {
+  status: WorkforceIntakeStatus | null
+}) => {
+  if (status === null || status === 'completed') return null
+
+  const isPending = status === 'pending_intake'
+
+  return (
+    <Chip
+      size='small'
+      variant='outlined'
+      color={isPending ? 'warning' : 'info'}
+      icon={<i className={isPending ? 'tabler-clock' : 'tabler-eye-check'} />}
+      label={
+        isPending ? GH_WORKFORCE_INTAKE.badge_pending_intake : GH_WORKFORCE_INTAKE.badge_in_review
+      }
+      aria-label={
+        isPending
+          ? GH_WORKFORCE_INTAKE.badge_pending_intake_aria
+          : GH_WORKFORCE_INTAKE.badge_in_review_aria
+      }
+    />
+  )
+}
 
 
 const columnHelper = createColumnHelper<PersonListItem>()
@@ -125,13 +165,16 @@ const PeopleListTable = ({ data }: Props) => {
       }),
       columnHelper.accessor('active', {
         header: 'Estado',
-        cell: ({ getValue }) => (
-          <Chip
-            size='small'
-            label={getValue() ? 'Activo' : 'Inactivo'}
-            color={getValue() ? 'success' : 'default'}
-            variant='tonal'
-          />
+        cell: ({ getValue, row }) => (
+          <div className='flex flex-col gap-1'>
+            <Chip
+              size='small'
+              label={getValue() ? 'Activo' : 'Inactivo'}
+              color={getValue() ? 'success' : 'default'}
+              variant='tonal'
+            />
+            <WorkforceIntakeBadge status={row.original.workforceIntakeStatus} />
+          </div>
         )
       })
     ],
