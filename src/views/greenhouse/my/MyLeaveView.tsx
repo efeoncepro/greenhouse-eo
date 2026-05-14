@@ -23,6 +23,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
+import { CanonicalApiError, throwIfNotOk } from '@/lib/api/parse-error-response'
 import GreenhouseCalendar from '@/components/greenhouse/GreenhouseCalendar'
 import LeaveRequestDialog from '@/components/greenhouse/LeaveRequestDialog'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -54,11 +55,17 @@ interface LeaveData {
   calendar: HrLeaveCalendarResponse
 }
 
+interface ViewError {
+  message: string
+  actionable: boolean
+  code: string | null
+}
+
 const MyLeaveView = () => {
   const [data, setData] = useState<LeaveData | null>(null)
   const [leaveTypes, setLeaveTypes] = useState<HrLeaveType[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<ViewError | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [createSaving, setCreateSaving] = useState(false)
 
@@ -71,11 +78,7 @@ const MyLeaveView = () => {
         fetch('/api/hr/core/meta')
       ])
 
-      if (!leaveRes.ok) {
-        const payload = await leaveRes.json().catch(() => null)
-
-        throw new Error(payload?.error || 'No fue posible cargar tus permisos.')
-      }
+      await throwIfNotOk(leaveRes, 'No fue posible cargar tus permisos.')
 
       setData(await leaveRes.json())
 
@@ -85,7 +88,19 @@ const MyLeaveView = () => {
         setLeaveTypes(meta.leaveTypes ?? [])
       }
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'Error cargando datos')
+      if (loadError instanceof CanonicalApiError) {
+        setError({
+          message: loadError.message,
+          actionable: loadError.actionable,
+          code: loadError.code
+        })
+      } else {
+        setError({
+          message: loadError instanceof Error ? loadError.message : 'Error cargando datos',
+          actionable: true,
+          code: null
+        })
+      }
     } finally {
       setLoading(false)
     }
@@ -106,19 +121,24 @@ const MyLeaveView = () => {
         body: JSON.stringify(input)
       })
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null)
-
-        throw new Error(payload?.error || 'No fue posible crear la solicitud.')
-      }
+      await throwIfNotOk(response, 'No fue posible crear la solicitud.')
 
       setCreateOpen(false)
       await load()
     } catch (createError) {
-      const message = createError instanceof Error ? createError.message : 'No fue posible crear la solicitud.'
+      if (createError instanceof CanonicalApiError) {
+        setError({
+          message: createError.message,
+          actionable: createError.actionable,
+          code: createError.code
+        })
+      } else {
+        const message = createError instanceof Error ? createError.message : 'No fue posible crear la solicitud.'
 
-      setError(message)
-      throw createError instanceof Error ? createError : new Error(message)
+        setError({ message, actionable: true, code: null })
+      }
+
+      throw createError instanceof Error ? createError : new Error('No fue posible crear la solicitud.')
     } finally {
       setCreateSaving(false)
     }
@@ -156,8 +176,20 @@ const MyLeaveView = () => {
       </Stack>
 
       {error && (
-        <Alert severity='error' onClose={() => setError(null)}>
-          {error}
+        <Alert
+          severity={error.actionable ? 'error' : 'warning'}
+          onClose={() => setError(null)}
+          action={
+            error.actionable
+              ? (
+                <Button color='inherit' size='small' onClick={() => void load()}>
+                  Reintentar
+                </Button>
+              )
+              : undefined
+          }
+        >
+          {error.message}
         </Alert>
       )}
 

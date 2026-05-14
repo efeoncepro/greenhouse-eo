@@ -18,6 +18,11 @@ import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
 import { getMicrocopy } from '@/lib/copy'
+import {
+  CanonicalApiError,
+  parseApiErrorPayload,
+  throwIfNotOk
+} from '@/lib/api/parse-error-response'
 
 import CustomChip from '@core/components/mui/Chip'
 
@@ -92,10 +97,16 @@ const formatDate = (iso: string | null): string => {
 
 const cardSx = { border: (t: Theme) => `1px solid ${t.palette.divider}` }
 
+interface ViewError {
+  message: string
+  actionable: boolean
+  code: string | null
+}
+
 const MyPaymentProfileView = () => {
   const [data, setData] = useState<ApiResponse | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<ViewError | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [snack, setSnack] = useState<{ severity: 'success' | 'info' | 'warning' | 'error'; message: string } | null>(null)
   const [cancelInProgress, setCancelInProgress] = useState<string | null>(null)
@@ -107,15 +118,22 @@ const MyPaymentProfileView = () => {
     try {
       const res = await fetch('/api/my/payment-profile')
 
-      if (!res.ok) {
-        const payload = await res.json().catch(() => null)
-
-        throw new Error(payload?.error || 'No fue posible cargar tu cuenta de pago.')
-      }
-
+      await throwIfNotOk(res, 'No fue posible cargar tu cuenta de pago.')
       setData(await res.json())
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'No fue posible cargar tu cuenta de pago.')
+      if (loadError instanceof CanonicalApiError) {
+        setError({
+          message: loadError.message,
+          actionable: loadError.actionable,
+          code: loadError.code
+        })
+      } else {
+        setError({
+          message: loadError instanceof Error ? loadError.message : 'No fue posible cargar tu cuenta de pago.',
+          actionable: true,
+          code: null
+        })
+      }
     } finally {
       setLoading(false)
     }
@@ -132,11 +150,7 @@ const MyPaymentProfileView = () => {
       body: JSON.stringify(payload)
     })
 
-    if (!res.ok) {
-      const errPayload = await res.json().catch(() => null)
-
-      throw new Error(errPayload?.error || 'No pudimos registrar tu solicitud.')
-    }
+    await throwIfNotOk(res, 'No pudimos registrar tu solicitud.')
 
     setSnack({
       severity: 'success',
@@ -167,10 +181,11 @@ const MyPaymentProfileView = () => {
         body: JSON.stringify({ reason: reason.trim() })
       })
 
-      const payload = await res.json().catch(() => null)
-
       if (!res.ok) {
-        setSnack({ severity: 'error', message: payload?.error || 'No pudimos cancelar tu solicitud.' })
+        const payload = await res.json().catch(() => null)
+        const parsed = parseApiErrorPayload(payload, 'No pudimos cancelar tu solicitud.')
+
+        setSnack({ severity: 'error', message: parsed.message })
 
         return
       }
@@ -195,14 +210,18 @@ const MyPaymentProfileView = () => {
   if (error) {
     return (
       <Alert
-        severity='error'
+        severity={error.actionable ? 'error' : 'warning'}
         action={
-          <Button color='inherit' size='small' onClick={() => void load()}>
-            Reintentar
-          </Button>
+          error.actionable
+            ? (
+              <Button color='inherit' size='small' onClick={() => void load()}>
+                Reintentar
+              </Button>
+            )
+            : undefined
         }
       >
-        {error}
+        {error.message}
       </Alert>
     )
   }

@@ -52,6 +52,7 @@ import { getPayrollComplianceExportDriftSignal } from './queries/payroll-complia
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
+import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 import { getServiceEngagementEngagementKindUnmappedSignal } from './queries/service-engagement-engagement-kind-unmapped'
 import { getServiceEngagementLifecycleStageUnknownSignal } from './queries/service-engagement-lifecycle-stage-unknown'
 import { getServiceEngagementLineageOrphanSignal } from './queries/service-engagement-lineage-orphan'
@@ -355,6 +356,7 @@ interface ReliabilityOverviewSources {
    */
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
+  workforceUnlinkedInternalUsers?: ReliabilitySignal | null
 
   /**
    * TASK-773 Slice 4 — Outbox publisher health. 2 readers:
@@ -596,6 +598,8 @@ export const buildReliabilityOverview = (
     ...(sources.providerBqSyncDeadLetter ?? []),
     // TASK-878 Slice 2 — HubSpot companies intake dead-letter (async webhook path).
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
+    // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
+    ...(sources.workforceUnlinkedInternalUsers ? [sources.workforceUnlinkedInternalUsers] : []),
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
     ...(sources.outboxHealth ?? []),
     // TASK-408 Slice 4 — Email render/template safety net.
@@ -844,6 +848,16 @@ export const getReliabilityOverview = async (
     preloadedSources.hubspotCompaniesIntakeDeadLetter !== undefined
       ? preloadedSources.hubspotCompaniesIntakeDeadLetter
       : await getHubspotCompaniesIntakeDeadLetterSignal().catch(() => null)
+
+  // TASK-878 follow-up — Identity UX hardening signal.
+  // Detecta usuarios internos activos sin member_id enlazado. Cuando alerta,
+  // significa que un usuario interno entró pero TASK-877 reconciliación no
+  // los procesó aún — están viendo banner "Tu cuenta aún no está enlazada..."
+  // en todas las vistas /my hasta que HR los active vía workforce intake.
+  const workforceUnlinkedInternalUsers =
+    preloadedSources.workforceUnlinkedInternalUsers !== undefined
+      ? preloadedSources.workforceUnlinkedInternalUsers
+      : await getWorkforceUnlinkedInternalUsersSignal().catch(() => null)
 
   // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
   // 2 readers en paralelo. Cada uno degrada honestamente si su query falla.
@@ -1119,6 +1133,7 @@ export const getReliabilityOverview = async (
     financeClpDrift,
     providerBqSyncDeadLetter,
     hubspotCompaniesIntakeDeadLetter,
+    workforceUnlinkedInternalUsers,
     outboxHealth,
     emailRenderFailure,
     cronStagingDrift,
