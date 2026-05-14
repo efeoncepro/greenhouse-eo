@@ -8,19 +8,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseño`
+- Status real: `SHIPPED 2026-05-14 en develop (6 commits sin PR ceremony directo)`
 - Rank: `TBD`
 - Domain: `identity|hr|ui`
 - Blocked by: `none` (TASK-872 endpoint backend + capabilities + signals + member status enum YA shipped 2026-05-13)
-- Branch: `task/TASK-873-workforce-intake-ui`
+- Branch: `develop` (sin branch separada — pattern TASK-822..827; instrucción operativa explícita del user "mantente en develop")
 - Legacy ID: `none`
 - GitHub Issue: `optional`
+- Shipped commits: Slice 1 `00730a82` + Slice 2 `4969014f` + Slice 3 `7b558258` + Slice 4 `caeeaa20` + Slice 5 `6dff8586` + Slice 6 closing
 
 ## Summary
 

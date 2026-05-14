@@ -1,4 +1,31 @@
-# Sesion 2026-05-14 — TASK-873 Workforce Intake UI V1.1 in-progress
+# Sesion 2026-05-14 — TASK-873 Workforce Intake UI V1.1 SHIPPED ✅
+
+- **Branch**: `develop` directo, sin PR ceremony (instrucción "mantente en develop" + pattern TASK-822..827).
+- **Commits**: Slice 1 `00730a82` → Slice 2 `4969014f` → Slice 3 `7b558258` → Slice 4 `caeeaa20` → Slice 5 `6dff8586` → Slice 6 closing (este commit).
+- **Quality gate canónico CLAUDE.md verde**: `pnpm test` 4504 passed / 42 skipped, 1 pre-existing fix (TASK-872 escape: `facet-capability-mapping.test.ts` pin 11→14 — TASK-872 olvidó actualizar al agregar 3 organization capabilities). `pnpm build` production Turbopack exit 0. `pnpm tsc --noEmit` clean. 0 lint errors.
+- **Hallazgo crítico Discovery**: capability `workforce.member.complete_intake` quedó seedeada en DB capabilities_registry por TASK-872 Slice 1.5 pero NUNCA grantada en `src/lib/entitlements/runtime.ts` → endpoint `POST /api/admin/workforce/members/[memberId]/complete-intake` retornaba 403 incluso para EFEONCE_ADMIN durante todo el periodo TASK-872 SHIPPED → TASK-873 Slice 1 fix. Bug class canonizado en CLAUDE.md "Capability runtime grant invariant" con 6 reglas duras anti-recurrencia.
+- **Pivots arquitectónicos mid-session**:
+  - Pivot 1: route + naming aligned con mockup Codex aprobado (`/admin/workforce/activation` vs spec original `/admin/workforce/intake-queue`)
+  - Pivot 2: spec TASK-874 actualizada por Codex (líneas 89-134 "Approved UI Contract") declarando admin variant como transitional/governance; primary HR-facing surface ships en TASK-874 (`/hr/workforce/activation` + viewCode `equipo.workforce_activation` + routeGroup `hr` + menú Personas y HR)
+  - Pivot 3: test pin 11→14 detectado en close gate (TASK-872 escape, NO causado por TASK-873)
+- **Decisión TASK-873 vs TASK-874**: arch-architect 4-pilar confirmó orden 873 → 874 (TASK-874 spec lo declara explicitly + tactical: optimizaciones forward-compat slots opcionales `readinessStatus?`, `blockerCount?`, `topBlockerLane?` ya declarados en `PendingIntakeMemberRow` para que 874 los populate sin breaking change).
+- **TASK-874 handoff section explícita** documentada en `docs/tasks/to-do/TASK-874-workforce-activation-readiness-workspace.md` con:
+  - Tabla 10-row de artefactos disponibles para reusar in-place (runtime grant, microcopy, reader, modules catalog, API endpoint, server page, view registry seed, client view, drawer, signal CTA map, badge + button + PersonDetailMember.workforceIntakeStatus)
+  - Mockup binding canonical
+  - Matriz de 7 decisiones arquitectónicas canonizadas que TASK-874 hereda (NO revisar)
+  - 6 tests anti-regresión que TASK-874 debe respetar
+- **Surfaces shipped**:
+  - Badge "Ficha pendiente"/"Ficha en revisión" en `/people` directorio (PeopleListTable estado cell)
+  - Botón "Completar ficha" + drawer en `/people/[memberId]` (PersonView header)
+  - Admin governance queue `/admin/workforce/activation` con tabla TanStack + filters + drawer
+  - CTA link inline en `/admin` reliability dashboard cuando signal alerta
+- **Docs shipped**: manual operador `docs/manual-de-uso/hr/completar-ficha-laboral.md` + doc funcional `sistema-identidad-roles-acceso.md` sección Workforce Intake + CLAUDE.md invariant + changelog 2026-05-14 entry + Handoff (este) + TASK-874 handoff section.
+- **E2E smoke** `tests/e2e/smoke/workforce-intake-flow.spec.ts` agregado (cobertura V1: page render + heading + filter + no fatal). Verificación end-to-end completa (click row → drawer abre → submit → status transitions en DB) queda para TASK-874 closing.
+- **Sentry alert pre-existente** JAVASCRIPT-NEXTJS-5A (`role_view_fallback_used` × 14) NO causado por TASK-873 — drift TS↔DB en view_registry de commit anterior. Pattern documentado CLAUDE.md TASK-827. Pendiente: ISSUE chico de hygiene fuera del scope TASK-873 (1 viewCode huérfano por identificar).
+- **Skills invocadas**: arch-architect (4-pilar verdict pivots), greenhouse-ux (badge tokens + drawer width 480 + warning chip canonical), forms-ux (drawer single-column + label-above-input + paste tolerance), greenhouse-ux-writing (es-CL tuteo + sentence case + microcopy mirror mockup), greenhouse-backend (reader cursor keyset + migration + API), greenhouse-dev (components + tests).
+- **TASK-874 ready to start** sin Discovery duplicada — la handoff section tiene todo el contexto.
+
+# Sesion 2026-05-14 (early, replaced) — TASK-873 Workforce Intake UI V1.1 in-progress
 
 - **Branch**: `develop` (sin branch separada — instrucción operativa "mantente en develop").
 - **Discovery hallazgo bloqueante**: capability `workforce.member.complete_intake` quedó seedeada en `capabilities_registry` por TASK-872 Slice 1.5 pero NUNCA se grantó en `src/lib/entitlements/runtime.ts`. Endpoint `POST /api/admin/workforce/members/[memberId]/complete-intake` retorna 403 incluso para EFEONCE_ADMIN. Slice 1 cierra ese loop.

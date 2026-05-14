@@ -469,6 +469,45 @@ Cuando entras al detalle de una organización (cliente B2B) desde Agency, Financ
 
 ---
 
+## Workforce Intake — habilitar laboralmente a un colaborador
+
+Cuando un colaborador se crea via Microsoft Entra (SCIM provisioning, TASK-872), su ficha en Greenhouse nace en estado **`pending_intake`**. Esto significa: tiene cuenta para entrar al portal, pero **NO esta habilitado todavia para entrar al flujo operativo de payroll, capacity, assignments y compensation**. Para activarlo HR debe **completar la ficha laboral** (TASK-873).
+
+### Como aparece visualmente
+
+- **En el directorio People** (`/people`): chip naranja **"Ficha pendiente"** debajo del chip Activo / Inactivo. Si HR ya empezo a revisar la ficha, dice **"Ficha en revision"** (azul).
+- **En el detalle del colaborador** (`/people/[memberId]`): boton naranja **"Completar ficha"** en el header (solo visible para roles con capacidad).
+- **En la cola admin governance** (`/admin/workforce/activation`): lista filtrable de colaboradores con ficha pendiente o en revision, con drawer de accion.
+- **En el dashboard de Admin** (`/admin`): reliability signal **"Members SCIM con ficha laboral pendiente"** + boton CTA cuando alerta (>7 dias warning, >30 dias critico).
+
+### Quien puede completar la ficha
+
+La capacidad canonica es `workforce.member.complete_intake`. La tienen:
+
+- **EFEONCE_ADMIN** (acceso total)
+- **FINANCE_ADMIN** (operador finance que cierra contratos / compensacion)
+- **Cualquier rol con route_group `hr`** (HR_PAYROLL, HR_MANAGER) — declarado en `src/lib/entitlements/runtime.ts`
+
+### Que hace la accion
+
+Cuando un operador autorizado presiona "Completar ficha":
+
+1. El estado `workforce_intake_status` del member transita `pending_intake | in_review → completed` atomicamente.
+2. Se emite outbox event `workforce.member.intake_completed v1` con el user id del operador + nota opcional + timestamp.
+3. El reliability signal baja su contador.
+4. El badge "Ficha pendiente" desaparece del directorio + perfil.
+5. El member queda elegible para payroll (cuando `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` se active en produccion via TASK-872 follow-up, solo members `completed` entran a corridas de nomina).
+
+### Roadmap
+
+La validacion automatica de readiness (compensation + contract + legal profile + payment profile completos antes de permitir `completed`) llega en **TASK-874** (Workforce Activation Readiness Resolver + Workspace). Hasta entonces el operador valida manualmente — la UI tiene banner explicito en el drawer recordandolo.
+
+El surface primario HR-facing (con summary cards, filter chips por blocker, inspector right rail per mockup aprobado 2026-05-14) tambien llega en TASK-874. La cola actual en `/admin/workforce/activation` es **admin governance / transitional**; TASK-874 ship el workspace primario bajo `/hr/workforce/activation` o `/workforce/activation` con menu en **Personas y HR**.
+
+> **Detalle tecnico:** Spec backend canonica: [`TASK-872`](../../tasks/complete/TASK-872-scim-internal-collaborator-provisioning.md). Spec UI canonica: TASK-873 (en cierre 2026-05-14). Endpoint canonical: `POST /api/admin/workforce/members/[memberId]/complete-intake`. Manual operador: [`completar-ficha-laboral.md`](../../manual-de-uso/hr/completar-ficha-laboral.md).
+
+---
+
 ## En resumen
 
 El sistema funciona como un edificio con tarjetas de acceso:

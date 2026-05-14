@@ -64,7 +64,11 @@ describe('TASK-611 — capability + view mappings', () => {
       capability => capability.module === 'organization'
     )
 
-    expect(organizationCapabilities).toHaveLength(11)
+    // 11 originales TASK-611 (Organization Workspace projection facets) + 3 nuevas
+    // TASK-872 (scim.eligibility_override.create / .delete + scim.backfill.execute)
+    // = 14 total. Pin actualizado en TASK-873 closing quality gate 2026-05-14 al
+    // detectar regression preexistente (TASK-872 olvidó actualizar este test).
+    expect(organizationCapabilities).toHaveLength(14)
 
     for (const capability of organizationCapabilities) {
       expect(capability.actions.length, `${capability.key} must have at least one action`).toBeGreaterThan(0)

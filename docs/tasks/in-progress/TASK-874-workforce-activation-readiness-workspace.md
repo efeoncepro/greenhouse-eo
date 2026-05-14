@@ -141,9 +141,71 @@ Checklist obligatorio antes de PR:
 - Comparar explícitamente contra la captura desktop aprobada y declarar cualquier diferencia intencional.
 - `pnpm design:lint` debe quedar en `0 errors / 0 warnings`.
 
+## TASK-873 Handoff (2026-05-14)
+
+**TASK-873 SHIPPED el `2026-05-14`** en `develop` (commits `00730a82` Slice 1 →
+`4969014f` Slice 2 → `7b558258` Slice 3 → `caeeaa20` Slice 4 → `6dff8586` Slice 5
+→ Slice 6 closing). TASK-874 NO necesita re-hacer Discovery sobre estos
+artefactos — están canonizados.
+
+### Artefactos disponibles para reusar in-place (no renombrar)
+
+| Artefacto | Path | Estado | Uso recomendado por TASK-874 |
+|---|---|---|---|
+| Runtime capability grant | `src/lib/entitlements/runtime.ts` (líneas ~325-355) | shipped — gate `hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN` para `workforce.member.complete_intake` | Reusar tal cual. Si TASK-874 introduce `workforce.member.activation_readiness.read/override` agregar grants en bloque adyacente con least-privilege más estricto (override solo EFEONCE_ADMIN). |
+| Microcopy namespace | `src/lib/copy/workforce.ts` `GH_WORKFORCE_INTAKE` | shipped — badges, drawer, queue, banner, toasts, page title/subtitle alineados con mockup | Extender con `GH_WORKFORCE_ACTIVATION` namespace OR sub-keys nuevas (`readiness_*`, `lane_*`, `blocker_*`, `next_action_*`) en el mismo namespace. Page title/subtitle ya match el mockup. |
+| Reader paginated | `src/lib/workforce/intake-queue/list-pending-members.ts` | shipped — cursor keyset `(created_at, member_id)`, statusFilter, totalApprox degraded honest, 8/8 tests | **Slots forward-compat ya declarados** en `PendingIntakeMemberRow`: `readinessStatus?`, `blockerCount?`, `topBlockerLane?`. TASK-874 enriquece estos slots desde su readiness resolver per-member; el wire ya está. |
+| ENTITLEMENT_MODULES | `src/config/entitlements-catalog.ts` | shipped — namespace `'workforce'` ya disponible en el catalog | Agregar entries nuevas TASK-874 `workforce.member.activation_readiness.{read,override}` reutilizando el namespace. |
+| API endpoint admin | `GET /api/admin/workforce/activation` | shipped — auth canonical + cursor + filter + sanitization | TASK-874 puede (a) extender este endpoint con campo readiness por row vía join al resolver, o (b) crear endpoint sibling `/api/hr/workforce/activation` con misma shape para el HR primary surface. |
+| Server page admin governance | `/admin/workforce/activation/page.tsx` | shipped — `administracion.workforce_activation` viewCode + 3 roles seeded (efeonce_admin, finance_admin, hr_payroll) | Explicit framing "admin governance / transitional" (Codex spec line 99). TASK-874 puede dejar este page intacto y agregar el HR primary surface en nuevo path, o aliasearlo a /hr/workforce/activation. |
+| View registry seed | migration `20260514113914311_task-873-workforce-activation-view-registry.sql` | shipped + applied live | TASK-874 agrega migration nueva `equipo.workforce_activation` viewCode (sección `equipo`, route `/hr/workforce/activation`, routeGroup `hr`) + role_view_assignments para HR roles primarios. NO modificar la migration TASK-873. |
+| Client view | `WorkforceActivationView.tsx` | shipped — V1 esqueleto: header + total approx + banner + filter chips + tabla 6 cols + drawer + load-more | TASK-874 puede (a) compartir el componente entre admin + HR (refactor para aceptar readiness slots opcionales en el row + agregar inspector right rail conditional), o (b) clonarlo para el HR primary (mockup-aligned: summary cards 4-up, 7 filter tabs por blocker, queue + inspector layout). Decisión Plan Mode 874. |
+| Shared drawer | `src/views/greenhouse/admin/workforce-activation/CompleteIntakeDrawer.tsx` | shipped — POST canonical + 5 status branches + 7 tests | **Reusar tal cual desde el HR primary surface.** El drawer ya tiene la firma correcta + el banner V1.0 (operador confirma manualmente). TASK-874 puede agregar prop `readinessSnapshot?` para mostrar lanes status dentro del drawer si decide. |
+| Reliability signal CTA | `src/components/greenhouse/ReliabilityModuleCard.tsx` `SIGNAL_ACTION_CTAS` Map | shipped — patrón declarativo extensible | TASK-874 agrega entries al mismo Map para los 3 signals nuevos (`workforce.activation.ready_but_not_completed`, `workforce.activation.completed_with_missing_readiness`, `workforce.activation.blocker_backlog`) apuntando a `/hr/workforce/activation` (o ruta primary final). |
+| PersonView badge + button | `src/views/greenhouse/people/PeopleListTable.tsx` + `PersonProfileHeader.tsx` + `PersonView.tsx` | shipped — "Ficha pendiente" chip stack en estado cell + "Completar ficha" button + drawer wire | Reusar tal cual. La gate `canCompleteIntake` client-side ya espeja runtime.ts; TASK-874 puede agregar gate readiness-aware si decide bloquear UI cuando `readiness.ready=false`. |
+| PersonDetailMember.workforceIntakeStatus | `src/types/people.ts` + `get-person-detail.ts` SELECT extendido | shipped (Postgres path) + BQ fallback con CAST NULL | Reusar tal cual. TASK-874 puede agregar `workforceActivationReadiness?` opcional al PersonDetail si quiere enriquecer el detail con readiness lanes. |
+
+### Mockup binding (canonical)
+
+El mockup aprobado por user 2026-05-14 (autor Codex) sigue siendo la referencia
+visual binding para TASK-874:
+
+- `src/views/greenhouse/admin/workforce-activation/mockup/WorkforceActivationMockupView.tsx`
+- `src/views/greenhouse/admin/workforce-activation/mockup/data.ts`
+- Captura desktop: `.captures/2026-05-14T11-29-27_inline-admin-workforce-activation-mockup/`
+- Captura mobile: `.captures/2026-05-14T11-28-58_inline-admin-workforce-activation-mockup/`
+
+TASK-873 entregó el esqueleto V1 mínimo (queue + filtros status + drawer) que
+TASK-874 enriquece con las features del mockup: summary cards 4-up, filter
+tabs por blocker, inspector right rail con readiness lanes + CTA + "Ruta de
+desbloqueo", priorización por riesgo de activación incompleta.
+
+### Decisión arquitectónica heredada de TASK-873 (NO revisar — canonizada)
+
+| Decisión | Resolución | Fuente |
+|---|---|---|
+| `workforce.member.complete_intake` extendido a `hr_payroll` | SÍ — vía `hasRouteGroup('hr')` canonical (incluye HR_PAYROLL + HR_MANAGER) | Q1 TASK-873 + spec line 95 TASK-874 ("debe vivir en menú Personas y HR") |
+| Surface primaria HR vs admin governance | Admin = transitional / governance; HR = primary | Codex spec TASK-874 línea 99 |
+| viewCode admin governance | `administracion.workforce_activation` shipped por TASK-873 | Migration 20260514113914311 |
+| viewCode HR primary | `equipo.workforce_activation` — TASK-874 lo crea | Codex spec TASK-874 línea 97 |
+| Route HR primary | `/hr/workforce/activation` o `/workforce/activation` (Plan Mode 874) | Codex spec TASK-874 línea 99 |
+| Forward-compat data slots | `readinessStatus?`, `blockerCount?`, `topBlockerLane?` en `PendingIntakeMemberRow` | TASK-873 Slice 1 |
+| Drawer + button reusables | Sí, sin refactor necesario | TASK-873 Slice 3 |
+
+### Tests que TASK-874 debe respetar (NO romper)
+
+| Test file | Cobertura | Riesgo si rompe |
+|---|---|---|
+| `src/lib/workforce/intake-queue/list-pending-members.test.ts` | 8 tests reader (paginación + filter + degraded) | Reader es source of truth de la cola para AMBOS surfaces |
+| `src/views/greenhouse/people/PeopleListTable.test.tsx` | 5 tests badge | Badge en directorio People no debe cambiar |
+| `src/views/greenhouse/admin/workforce-activation/CompleteIntakeDrawer.test.tsx` | 7 tests drawer submit flow | Drawer es shared entre PersonView + queue + (futuro) HR workspace |
+| `src/components/greenhouse/ReliabilityModuleCard.test.tsx` | 4 tests CTA map | Patrón declarativo extensible — agregar entries no rompe tests existentes |
+| Live parity test `src/lib/capabilities-registry/parity.live.test.ts` | Verifica TS catalog ↔ DB registry parity | TASK-874 debe seedear nuevas capabilities en DB cuando las agregue al TS catalog (CLAUDE.md regla canonical) |
+| Anti pre-up-marker checks migration TASK-873 | Validates view_registry + role_view_assignments seeded | TASK-874 sigue mismo pattern (CLAUDE.md "View Registry Governance Pattern TASK-827") |
+
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-873-workforce-intake-ui.md` o `docs/tasks/to-do/TASK-873-workforce-intake-ui.md` según lifecycle real al tomar esta task.
+- `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (post-cierre — TASK-873 ships V1 esqueleto el 2026-05-14)
 - `docs/tasks/complete/TASK-872-scim-internal-collaborator-provisioning.md`
 - `docs/tasks/to-do/TASK-788-workforce-role-title-effective-dating-promotion-flow.md`
 - `docs/tasks/to-do/TASK-790-contractor-engagements-runtime-classification-risk.md`
