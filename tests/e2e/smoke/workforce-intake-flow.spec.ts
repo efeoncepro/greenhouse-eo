@@ -7,7 +7,7 @@ import { test, expect, gotoAuthenticated } from '../fixtures/auth'
  * TASK-873 Slice 4. Verifica:
  *  - Page render sin 500
  *  - Title canonical "Workforce Activation" (alineado con mockup aprobado)
- *  - Filter ToggleButtonGroup visible
+ *  - Filter controls visible
  *  - No application error / 500 fatal
  *  - Drawer pattern accesible via aria-label
  *
@@ -37,8 +37,11 @@ test.describe('admin / workforce / activation', () => {
     // Page title canonical (mockup aprobado 2026-05-14)
     await expect(page.getByRole('heading', { name: /workforce activation/i })).toBeVisible()
 
-    // Filter ToggleButtonGroup canonical (Todos / Pendientes / En revisión)
-    await expect(page.getByRole('group', { name: /filtrar por estado/i })).toBeVisible()
+    // Filter controls canonical. The approved UI uses compact filter buttons,
+    // not the older ToggleButtonGroup structure.
+    await expect(page.getByRole('button', { name: /todos/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /listos/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /sin compensación/i })).toBeVisible()
 
     // No fatal application error
     const fatal = page.getByText(/application error|500 — internal/i)
