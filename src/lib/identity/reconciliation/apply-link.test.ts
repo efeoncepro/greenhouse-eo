@@ -69,6 +69,9 @@ describe('applyIdentityLink', () => {
 
     expect(bigQueryMerge.query).toContain('is_primary')
     expect(bigQueryMerge.query).toContain('is_login_identity')
+    expect(bigQueryMerge.query).toContain('created_at')
+    expect(bigQueryMerge.query).toContain('updated_at')
+    expect(bigQueryMerge.query).toContain('CURRENT_TIMESTAMP()')
     expect(bigQueryMerge.params).toMatchObject({
       isPrimary: false,
       isLoginIdentity: false

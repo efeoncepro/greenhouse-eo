@@ -173,7 +173,9 @@ export async function applyIdentityLink(
             @sourceEmail AS source_email,
             @sourceDisplayName AS source_display_name,
             @isPrimary AS is_primary,
-            @isLoginIdentity AS is_login_identity
+            @isLoginIdentity AS is_login_identity,
+            CURRENT_TIMESTAMP() AS created_at,
+            CURRENT_TIMESTAMP() AS updated_at
         ) AS source
         ON target.profile_id = source.profile_id
            AND target.source_system = source.source_system
@@ -186,17 +188,18 @@ export async function applyIdentityLink(
             source_display_name = source.source_display_name,
             is_primary = COALESCE(target.is_primary, source.is_primary),
             is_login_identity = COALESCE(target.is_login_identity, source.is_login_identity),
-            active = TRUE
+            active = TRUE,
+            updated_at = source.updated_at
         WHEN NOT MATCHED THEN
           INSERT (
             link_id, profile_id, source_system, source_object_type, source_object_id,
             source_user_id, source_email, source_display_name, is_primary,
-            is_login_identity, active
+            is_login_identity, active, created_at, updated_at
           )
           VALUES (
             source.link_id, source.profile_id, source.source_system, source.source_object_type, source.source_object_id,
             source.source_user_id, source.source_email, source.source_display_name, source.is_primary,
-            source.is_login_identity, TRUE
+            source.is_login_identity, TRUE, source.created_at, source.updated_at
           )
       `,
       params: {
