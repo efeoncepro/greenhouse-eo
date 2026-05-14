@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
-import { afterAll, afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { query } from '@/lib/db'
 
@@ -88,7 +88,44 @@ const cleanupSeededMembers = async () => {
   }
 }
 
+/**
+ * Pre-flight cleanup: soft-disable any t872 test fixtures left over from prior
+ * interrupted runs (vitest crash, ctrl+C, timeout) BEFORE creating new ones.
+ *
+ * Defense in depth — afterAll cleanup is fragile because it only runs on clean
+ * exit. This beforeAll sweep guarantees a clean slate even if previous runs
+ * accumulated leftover fixtures.
+ */
+const cleanupPriorTestFixtures = async () => {
+  try {
+    await query(
+      `DELETE FROM greenhouse_payroll.compensation_versions WHERE member_id IN (
+        SELECT member_id FROM greenhouse_core.members
+        WHERE display_name LIKE 't872-payroll-%' OR primary_email LIKE 't872-payroll-%@efeoncepro.com'
+      )`
+    )
+  } catch {
+    // best-effort
+  }
+
+  try {
+    await query(
+      `UPDATE greenhouse_core.members
+       SET active = FALSE, status = 'inactive', updated_at = NOW()
+       WHERE active = TRUE
+         AND (display_name LIKE 't872-payroll-%' OR primary_email LIKE 't872-payroll-%@efeoncepro.com')`
+    )
+  } catch {
+    // best-effort
+  }
+}
+
 describe.skipIf(!hasPgConfig)('Payroll workforce intake gate (TASK-872 Slice 4)', () => {
+  beforeAll(async () => {
+    // Pre-flight: sweep prior leftover t872 fixtures (defensive)
+    await cleanupPriorTestFixtures()
+  })
+
   beforeEach(() => {
     delete process.env.PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED
   })
