@@ -18,6 +18,9 @@ import { ROLE_CODES } from '@/config/role-codes'
 import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
 
 import CompensationDrawer, { type CompensationSavePayload } from '@views/greenhouse/payroll/CompensationDrawer'
+import CompleteIntakeDrawer, {
+  type CompleteIntakeDrawerMember
+} from '@views/greenhouse/admin/workforce-intake-queue/CompleteIntakeDrawer'
 import EditProfileDrawer from './drawers/EditProfileDrawer'
 import AddPersonMembershipDrawer from './drawers/AddPersonMembershipDrawer'
 import EditPersonMembershipDrawer, { type MembershipRowData } from './drawers/EditPersonMembershipDrawer'
@@ -38,11 +41,26 @@ const PersonView = ({ memberId }: Props) => {
   const [deactivateConfirmOpen, setDeactivateConfirmOpen] = useState(false)
   const [deactivating, setDeactivating] = useState(false)
   const [compensationOpen, setCompensationOpen] = useState(false)
+  const [completeIntakeOpen, setCompleteIntakeOpen] = useState(false)
   const [membershipDrawerOpen, setMembershipDrawerOpen] = useState(false)
   const [editMembership, setEditMembership] = useState<{ membership: MembershipRowData; assignment?: PersonDetailAssignment } | null>(null)
   const [membershipReloadKey, setMembershipReloadKey] = useState(0)
 
   const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
+
+  // TASK-873 Slice 3 — espejo client-side del gate runtime.ts (Slice 1):
+  // `hasRouteGroup(subject, 'hr') || hasRole(EFEONCE_ADMIN) || hasRole(FINANCE_ADMIN)`.
+  // El endpoint backend revalida la capability vía `can()` server-side, por
+  // lo que este check es solo para esconder el botón a roles sin permiso;
+  // un click optimista del usuario sin capability igualmente recibe 403
+  // con copy redacted via toast canonical (drawer maneja el branching).
+  const roleCodes = session?.user?.roleCodes ?? []
+  const routeGroups = session?.user?.routeGroups ?? []
+
+  const canCompleteIntake =
+    routeGroups.includes('hr') ||
+    roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN) ||
+    roleCodes.includes(ROLE_CODES.FINANCE_ADMIN)
 
   const loadDetail = useCallback(async () => {
     const res = await fetch(`/api/people/${memberId}`)
@@ -149,6 +167,8 @@ const PersonView = ({ memberId }: Props) => {
           onEditProfile={() => setEditProfileOpen(true)}
           onDeactivate={() => setDeactivateConfirmOpen(true)}
           onEditCompensation={() => setCompensationOpen(true)}
+          canCompleteIntake={canCompleteIntake}
+          onCompleteIntake={() => setCompleteIntakeOpen(true)}
         />
         <PersonTabs
           detail={detail}
@@ -160,6 +180,29 @@ const PersonView = ({ memberId }: Props) => {
         />
       </Stack>
 
+      {canCompleteIntake && (
+        <CompleteIntakeDrawer
+          open={completeIntakeOpen}
+          member={
+            detail.member.workforceIntakeStatus &&
+            detail.member.workforceIntakeStatus !== 'completed'
+              ? ({
+                  memberId: detail.member.memberId,
+                  displayName: detail.member.displayName,
+                  primaryEmail: detail.member.publicEmail || detail.member.internalEmail,
+                  workforceIntakeStatus: detail.member.workforceIntakeStatus,
+                  identityProfileId: detail.member.identityProfileId,
+                  createdAt: null,
+                  ageDays: null
+                } satisfies CompleteIntakeDrawerMember)
+              : null
+          }
+          onClose={() => setCompleteIntakeOpen(false)}
+          onCompleted={async () => {
+            await loadDetail()
+          }}
+        />
+      )}
       {isAdmin && (
         <>
           <EditProfileDrawer

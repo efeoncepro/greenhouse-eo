@@ -1,6 +1,7 @@
 'use client'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Grid from '@mui/material/Grid'
@@ -12,6 +13,8 @@ import OptionMenu from '@core/components/option-menu'
 import CardStatsSquare from '@components/card-statistics/CardStatsSquare'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 
+import { GH_WORKFORCE_INTAKE } from '@/lib/copy/workforce'
+
 import type { PersonDetail } from '@/types/people'
 import { formatFte, safeRoleCategory, roleCategoryLabel } from './helpers'
 
@@ -21,6 +24,15 @@ type Props = {
   onEditProfile?: () => void
   onDeactivate?: () => void
   onEditCompensation?: () => void
+
+  /**
+   * TASK-873 Slice 3 — visible solo cuando el usuario actual tiene capability
+   * `workforce.member.complete_intake` AND `member.workforceIntakeStatus`
+   * está pending_intake o in_review. Independiente del gate isAdmin (HR
+   * operadores no son EFEONCE_ADMIN pero tienen la capability).
+   */
+  canCompleteIntake?: boolean
+  onCompleteIntake?: () => void
 }
 
 const INTEGRATION_ITEMS = [
@@ -29,9 +41,22 @@ const INTEGRATION_ITEMS = [
   { key: 'microsoftLinked' as const, label: 'Microsoft' }
 ]
 
-const PersonProfileHeader = ({ detail, isAdmin, onEditProfile, onDeactivate, onEditCompensation }: Props) => {
+const PersonProfileHeader = ({
+  detail,
+  isAdmin,
+  onEditProfile,
+  onDeactivate,
+  onEditCompensation,
+  canCompleteIntake,
+  onCompleteIntake
+}: Props) => {
   const { member, integrations, summary } = detail
   const roleCategory = safeRoleCategory(member.roleCategory)
+
+  const showCompleteIntake =
+    canCompleteIntake === true &&
+    member.workforceIntakeStatus !== null &&
+    member.workforceIntakeStatus !== 'completed'
 
   return (
     <Card
@@ -145,6 +170,18 @@ const PersonProfileHeader = ({ detail, isAdmin, onEditProfile, onDeactivate, onE
               icon={<i className={member.active ? 'tabler-check' : 'tabler-user-off'} />}
               label={member.active ? 'Activo' : 'Inactivo'}
             />
+            {showCompleteIntake && onCompleteIntake ? (
+              <Button
+                variant='contained'
+                color='warning'
+                size='small'
+                onClick={onCompleteIntake}
+                startIcon={<i className='tabler-check' />}
+                aria-label={GH_WORKFORCE_INTAKE.button_complete_intake_aria}
+              >
+                {GH_WORKFORCE_INTAKE.button_complete_intake}
+              </Button>
+            ) : null}
             {isAdmin && (
               <OptionMenu
                 iconClassName='tabler-settings-2'

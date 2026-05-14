@@ -78,7 +78,8 @@ const detail: PersonDetail = {
     identityProfileId: null,
     notionUserId: null,
     azureOid: null,
-    hubspotOwnerId: null
+    hubspotOwnerId: null,
+    workforceIntakeStatus: 'completed'
   },
   access: {
     canViewMemberships: true,

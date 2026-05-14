@@ -125,6 +125,13 @@ export interface PersonDetailMember {
   notionUserId: string | null
   azureOid: string | null
   hubspotOwnerId: string | null
+
+  /**
+   * Estado workforce intake (TASK-872 + TASK-873). Null cuando la fuente
+   * upstream no expone la columna (BQ fallback legacy). Consumers tratan
+   * NULL como 'completed' para back-compat.
+   */
+  workforceIntakeStatus: WorkforceIntakeStatus | null
 }
 
 export interface PersonIntegrations {
