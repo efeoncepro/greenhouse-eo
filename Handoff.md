@@ -1,3 +1,21 @@
+# Sesion 2026-05-14 — TASK-874 Workforce Activation Readiness SHIPPED ✅
+
+- **Branch**: `develop` directo por instrucción explícita del usuario; no se cambió de rama.
+- **Qué cambió**: TASK-874 quedó implementada end-to-end con resolver canónico `resolveWorkforceActivationReadiness(memberId)`, capabilities `workforce.member.activation_readiness.read|override`, view `equipo.workforce_activation`, route primary `/hr/workforce/activation`, API HR/admin, guard `complete-intake` con `409 activation_readiness_blocked`, override auditado con readiness snapshot/hash, reliability signals y docs/manual HR.
+- **Access model**:
+  - `routeGroups`: `hr` para la superficie primaria.
+  - `views`: `equipo.workforce_activation`; admin `/admin/workforce/activation` queda transitional/governance.
+  - `entitlements`: `workforce.member.activation_readiness.read` para lectura; `workforce.member.activation_readiness.override` solo EFEONCE_ADMIN runtime.
+  - `startup policy`: sin cambios.
+- **UI aprobada**: se reemplazó el esqueleto tipo tabla por patrón `queue + inspector` según mockup aprobado TASK-874. Capturas:
+  - Desktop con backlog real: `.captures/2026-05-14T12-52-07_inline-hr-workforce-activation/frames/01-snapshot.png`
+  - Mobile: `.captures/2026-05-14T12-30-57_inline-hr-workforce-activation/frames/01-snapshot.png`
+- **Validación ejecutada**: `pnpm pg:doctor`, `pnpm design:lint`, `pnpm lint`, `pnpm exec tsc --noEmit --pretty false`, `pnpm vitest run src/lib/workforce/intake/complete-intake.test.ts src/views/greenhouse/admin/workforce-activation/CompleteIntakeDrawer.test.tsx src/lib/workforce/activation/readiness.test.ts src/lib/workforce/intake-queue/list-pending-members.test.ts src/components/greenhouse/ReliabilityModuleCard.test.tsx src/lib/admin/internal-role-visibility.test.ts`, `pnpm build`, smoke directo del reader contra DB real y `pnpm fe:capture` desktop/mobile. `pnpm lint` queda con 0 errores y 4 warnings legacy TASK-825 en rutas cliente no tocadas.
+- **Drift corregido post-captura**: la primera captura desktop quedaba vacía aunque había 2 activos en `pending_intake` (Felipe Zurita y María Camila Hoyos). Causa raíz: `resolveWorkforceActivationReadiness` consultaba `greenhouse_payroll.compensation_versions.payroll_via`, columna inexistente en runtime; `payroll_via` vive en `greenhouse_core.members`. Se corrigió el SQL y el reader ahora devuelve ambos con readiness `blocked`.
+- **Cableado de acciones HR**: detectado y corregido antes del cierre: el surface HR leía desde `/api/hr/workforce/activation` pero el drawer completaba contra namespace admin. Se extrajo primitive canónica `completeWorkforceMemberIntake` y se expuso endpoint HR `/api/hr/workforce/members/[memberId]/complete-intake`; admin y HR comparten la misma transacción, readiness guard, override capability y outbox.
+- **Docs actualizadas**: `docs/tasks/complete/TASK-874-workforce-activation-readiness-workspace.md`, `docs/tasks/README.md`, `changelog.md`, `docs/documentation/hr/workforce-activation-readiness.md`, `docs/manual-de-uso/hr/habilitar-colaborador-workforce.md`, `docs/manual-de-uso/hr/completar-ficha-laboral.md`, `docs/documentation/identity/sistema-identidad-roles-acceso.md`.
+- **Riesgos/follow-ups**: `WorkRelationshipOnboardingCase` queda como follow-up si el agregado se formaliza; contractor runtime y classification risk siguen en TASK-790; effective dating/promotion sigue en TASK-788. La migración fue creada, no aplicada live durante el cierre; deploy/migrate debe aplicarla antes de esperar parity DB runtime para las nuevas capabilities/views.
+
 # Sesion 2026-05-14 — TASK-873 Workforce Intake UI V1.1 SHIPPED ✅
 
 - **Branch**: `develop` directo, sin PR ceremony (instrucción "mantente en develop" + pattern TASK-822..827).
@@ -9,7 +27,7 @@
   - Pivot 2: spec TASK-874 actualizada por Codex (líneas 89-134 "Approved UI Contract") declarando admin variant como transitional/governance; primary HR-facing surface ships en TASK-874 (`/hr/workforce/activation` + viewCode `equipo.workforce_activation` + routeGroup `hr` + menú Personas y HR)
   - Pivot 3: test pin 11→14 detectado en close gate (TASK-872 escape, NO causado por TASK-873)
 - **Decisión TASK-873 vs TASK-874**: arch-architect 4-pilar confirmó orden 873 → 874 (TASK-874 spec lo declara explicitly + tactical: optimizaciones forward-compat slots opcionales `readinessStatus?`, `blockerCount?`, `topBlockerLane?` ya declarados en `PendingIntakeMemberRow` para que 874 los populate sin breaking change).
-- **TASK-874 handoff section explícita** documentada en `docs/tasks/to-do/TASK-874-workforce-activation-readiness-workspace.md` con:
+- **TASK-874 handoff section explícita** documentada en `docs/tasks/complete/TASK-874-workforce-activation-readiness-workspace.md` con:
   - Tabla 10-row de artefactos disponibles para reusar in-place (runtime grant, microcopy, reader, modules catalog, API endpoint, server page, view registry seed, client view, drawer, signal CTA map, badge + button + PersonDetailMember.workforceIntakeStatus)
   - Mockup binding canonical
   - Matriz de 7 decisiones arquitectónicas canonizadas que TASK-874 hereda (NO revisar)
@@ -23,7 +41,7 @@
 - **E2E smoke** `tests/e2e/smoke/workforce-intake-flow.spec.ts` agregado (cobertura V1: page render + heading + filter + no fatal). Verificación end-to-end completa (click row → drawer abre → submit → status transitions en DB) queda para TASK-874 closing.
 - **Sentry alert pre-existente** JAVASCRIPT-NEXTJS-5A (`role_view_fallback_used` × 14) NO causado por TASK-873 — drift TS↔DB en view_registry de commit anterior. Pattern documentado CLAUDE.md TASK-827. Pendiente: ISSUE chico de hygiene fuera del scope TASK-873 (1 viewCode huérfano por identificar).
 - **Skills invocadas**: arch-architect (4-pilar verdict pivots), greenhouse-ux (badge tokens + drawer width 480 + warning chip canonical), forms-ux (drawer single-column + label-above-input + paste tolerance), greenhouse-ux-writing (es-CL tuteo + sentence case + microcopy mirror mockup), greenhouse-backend (reader cursor keyset + migration + API), greenhouse-dev (components + tests).
-- **TASK-874 ready to start** sin Discovery duplicada — la handoff section tiene todo el contexto.
+- **TASK-874 posteriormente implementada** en esta misma fecha; ver sección superior de este handoff.
 
 # Sesion 2026-05-14 (early, replaced) — TASK-873 Workforce Intake UI V1.1 in-progress
 

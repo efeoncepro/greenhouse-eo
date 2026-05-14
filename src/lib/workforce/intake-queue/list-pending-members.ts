@@ -1,7 +1,9 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { resolveWorkforceActivationReadiness } from '@/lib/workforce/activation/readiness'
 
+import type { WorkforceActivationReadiness } from '@/lib/workforce/activation/types'
 import type { WorkforceIntakeStatus } from '@/types/people'
 
 /**
@@ -30,6 +32,7 @@ export interface ListPendingIntakeMembersOptions {
   readonly cursor?: ListPendingIntakeMembersCursor | null
   readonly pageSize?: number
   readonly statusFilter?: WorkforceIntakeStatusFilter
+  readonly includeReadiness?: boolean
 }
 
 export interface ListPendingIntakeMembersCursor {
@@ -57,6 +60,7 @@ export interface PendingIntakeMemberRow {
     | 'completed'
   readonly blockerCount?: number
   readonly topBlockerLane?: string
+  readonly activationReadiness?: WorkforceActivationReadiness
 }
 
 export interface ListPendingIntakeMembersResult {
@@ -179,7 +183,23 @@ export const listPendingIntakeMembers = async (
 
   const hasMore = rows.length > pageSize
   const slicedRows = hasMore ? rows.slice(0, pageSize) : rows
-  const items = slicedRows.map(rowToPendingIntakeMember)
+  const baseItems = slicedRows.map(rowToPendingIntakeMember)
+
+  const items = options.includeReadiness
+    ? await Promise.all(
+        baseItems.map(async item => {
+          const activationReadiness = await resolveWorkforceActivationReadiness(item.memberId)
+
+          return {
+            ...item,
+            readinessStatus: activationReadiness.status,
+            blockerCount: activationReadiness.blockerCount,
+            topBlockerLane: activationReadiness.topBlockerLane ?? undefined,
+            activationReadiness
+          } satisfies PendingIntakeMemberRow
+        })
+      )
+    : baseItems
 
   const lastItem = items.length > 0 ? items[items.length - 1] : null
 

@@ -64,12 +64,12 @@ const Page = async () => {
 
   const subject = buildTenantEntitlementSubject(tenant)
 
-  if (!can(subject, 'workforce.member.complete_intake', 'update', 'tenant')) {
+  if (!can(subject, 'workforce.member.activation_readiness.read', 'read', 'tenant')) {
     redirect(tenant.portalHomePath || '/dashboard')
   }
 
   const [initialPage, pendingSignal] = await Promise.all([
-    listPendingIntakeMembers({ pageSize: 50 }).catch(() => ({
+    listPendingIntakeMembers({ pageSize: 50, includeReadiness: true }).catch(() => ({
       items: [],
       nextCursor: null,
       hasMore: false,
@@ -85,6 +85,7 @@ const Page = async () => {
       initialHasMore={initialPage.hasMore}
       initialTotalApprox={initialPage.totalApprox}
       pendingSignal={pendingSignal}
+      apiPath='/api/admin/workforce/activation'
     />
   )
 }

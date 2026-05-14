@@ -21,11 +21,9 @@ datos de pago.
 Este manual explica como completar esa ficha desde la interfaz, sin tener
 que pedirle a alguien tecnico que invoque el endpoint manualmente.
 
-> **Nota V1.0**: el sistema NO valida automaticamente que contrato,
-> compensacion, perfil legal y datos de pago esten al dia. Confirma esos
-> datos manualmente antes de completar la ficha. La validacion pre-flight
-> automatica (Workforce Activation Readiness) llega en una iteracion
-> posterior — ver TASK-874 en el roadmap.
+> **Nota TASK-874**: el sistema valida automaticamente contrato, cargo,
+> compensacion, perfil legal y datos de pago antes de completar la ficha.
+> Si hay blockers, resuelvelos primero en `/hr/workforce/activation`.
 
 ## Antes de empezar
 
@@ -53,9 +51,9 @@ Si la ficha entro a revision interna, el chip dice **"Ficha en revision"**
 
 ### En la cola operativa
 
-Entra a `/admin/workforce/activation`. Esta es la cola consolidada de
-**Workforce Activation** (variante admin governance — ver tambien
-`/hr/workforce/activation` cuando exista el workspace primario HR). La cola
+Entra a `/hr/workforce/activation`. Esta es la cola consolidada de
+**Workforce Activation**. La variante `/admin/workforce/activation` queda
+como admin governance / transitional. La cola
 muestra:
 
 - Avatar + nombre del colaborador
@@ -132,11 +130,9 @@ Cuando completas la ficha:
 
 ## Que no hacer
 
-- **No completes la ficha "por completar"** sin verificar realmente que los
-  datos esten al dia. V1.0 confia en tu juicio — si marcas como completa
-  con contrato faltante, el colaborador entra a payroll con defaults
-  peligrosos. El flag de payroll lo evitara automaticamente solo cuando
-  TASK-874 ship el readiness validator.
+- **No completes la ficha "por completar"** ignorando blockers. Desde
+  TASK-874, el guard impide cerrar si faltan datos críticos; resuelve la
+  fuente dueña del dato desde Workforce Activation antes de insistir.
 - **No edites `workforce_intake_status` directamente con SQL**. Toda
   transicion pasa por el endpoint canonical, que escribe audit + outbox.
 - **No reabras una ficha completada** desde la UI. La transicion es
@@ -160,7 +156,8 @@ Cuando completas la ficha:
 
 - **Spec backend**: `docs/tasks/complete/TASK-872-scim-internal-collaborator-provisioning.md`
 - **Spec UI**: `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (este shipping)
-- **Spec workspace enriquecido**: `docs/tasks/to-do/TASK-874-workforce-activation-readiness-workspace.md`
+- **Spec workspace enriquecido**: `docs/tasks/complete/TASK-874-workforce-activation-readiness-workspace.md`
+- **Manual Workforce Activation**: `docs/manual-de-uso/hr/habilitar-colaborador-workforce.md`
 - **Endpoint**: `src/app/api/admin/workforce/members/[memberId]/complete-intake/route.ts`
 - **Reader cola**: `src/lib/workforce/intake-queue/list-pending-members.ts`
 - **Drawer shared**: `src/views/greenhouse/admin/workforce-activation/CompleteIntakeDrawer.tsx`

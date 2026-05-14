@@ -345,6 +345,38 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-874 — Workforce Activation readiness.
+  // Read access follows the same operator matrix as complete_intake because the
+  // workspace exposes blockers without sensitive values. Override is deliberately
+  // narrower: break-glass only for EFEONCE_ADMIN, audited by the route/outbox.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : 'role'
+
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.member.activation_readiness.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.member.activation_readiness.override',
+      action: 'override',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.offboarding') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
       ? 'route_group'

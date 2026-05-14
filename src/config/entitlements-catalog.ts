@@ -41,7 +41,8 @@ export const ENTITLEMENT_ACTIONS = [
   // de reusar manage/launch.
   'execute',
   'rollback',
-  'bypass_preflight'
+  'bypass_preflight',
+  'override'
 ] as const
 
 export type EntitlementAction = (typeof ENTITLEMENT_ACTIONS)[number]
@@ -1084,6 +1085,18 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'workforce.member.complete_intake',
     module: 'workforce',
     actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.member.activation_readiness.read',
+    module: 'workforce',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.member.activation_readiness.override',
+    module: 'workforce',
+    actions: ['override'] as const,
     defaultScope: 'tenant'
   }
 ] as const

@@ -1,41 +1,15 @@
 import { NextResponse } from 'next/server'
 
+import { getServerAuthSession } from '@/lib/auth'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
-import { getServerAuthSession } from '@/lib/auth'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
-
 import {
   listPendingIntakeMembers,
   type WorkforceIntakeStatusFilter
 } from '@/lib/workforce/intake-queue/list-pending-members'
-
-import type { WorkforceIntakeStatus } from '@/types/people'
-
-/**
- * TASK-873 Slice 4 — GET /api/admin/workforce/activation.
- *
- * Cursor-paginated listing de members con `workforce_intake_status != 'completed'`.
- * Consumido por `WorkforceActivationView` en `/admin/workforce/activation`.
- *
- * Auth: `workforce.member.complete_intake` capability (granted en runtime.ts
- * por Slice 1 a hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN).
- *
- * Query params:
- *   - cursor: JSON `{createdAt, memberId}` (URL-encoded)
- *   - pageSize: número máximo de filas (default 50, max 200)
- *   - statusFilter: 'pending_intake' | 'in_review' | 'all' (default 'all')
- *
- * Response shape:
- *   { items, nextCursor, hasMore, totalApprox }
- *
- * Mirror canónico de TASK-854 /api/admin/releases pattern.
- *
- * Forward-compat TASK-874: items[] expone slots opcionales `readinessStatus?`,
- * `blockerCount?`, `topBlockerLane?` que el resolver de readiness va a populate.
- */
 
 export const dynamic = 'force-dynamic'
 
@@ -85,7 +59,7 @@ export const GET = async (request: Request) => {
 
     const subject = buildTenantEntitlementSubject(tenant)
 
-    if (!can(subject, 'workforce.member.complete_intake', 'update', 'tenant')) {
+    if (!can(subject, 'workforce.member.activation_readiness.read', 'read', 'tenant')) {
       return NextResponse.json({ error: 'Sin capability requerida' }, { status: 403 })
     }
 
@@ -102,24 +76,14 @@ export const GET = async (request: Request) => {
       includeReadiness: true
     })
 
-    return NextResponse.json({
-      items: result.items,
-      nextCursor: result.nextCursor,
-      hasMore: result.hasMore,
-      totalApprox: result.totalApprox
-    } satisfies {
-      items: ReadonlyArray<{ workforceIntakeStatus: WorkforceIntakeStatus }>
-      nextCursor: { createdAt: string; memberId: string } | null
-      hasMore: boolean
-      totalApprox: number | null
-    })
+    return NextResponse.json(result)
   } catch (error) {
     captureWithDomain(error, 'identity', {
-      tags: { source: 'admin_workforce_intake_queue', stage: 'api_get' }
+      tags: { source: 'hr_workforce_activation_queue', stage: 'api_get' }
     })
 
     return NextResponse.json(
-      { error: 'No fue posible listar fichas pendientes', detail: redactErrorForResponse(error) },
+      { error: 'No fue posible listar activaciones workforce', detail: redactErrorForResponse(error) },
       { status: 500 }
     )
   }

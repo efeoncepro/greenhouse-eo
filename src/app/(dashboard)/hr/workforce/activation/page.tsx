@@ -1,0 +1,48 @@
+import { redirect } from 'next/navigation'
+
+import WorkforceActivationView from '@/views/greenhouse/admin/workforce-activation/WorkforceActivationView'
+import { requireServerSession } from '@/lib/auth/require-server-session'
+import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
+import { can } from '@/lib/entitlements/runtime'
+import { getWorkforceScimMembersPendingProfileCompletionSignal } from '@/lib/reliability/queries/scim-workforce-signals'
+import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { listPendingIntakeMembers } from '@/lib/workforce/intake-queue/list-pending-members'
+
+export const dynamic = 'force-dynamic'
+
+const Page = async () => {
+  await requireServerSession()
+  const tenant = await getTenantContext()
+
+  if (!tenant) redirect('/login')
+
+  const subject = buildTenantEntitlementSubject(tenant)
+
+  if (!can(subject, 'workforce.member.activation_readiness.read', 'read', 'tenant')) {
+    redirect(tenant.portalHomePath || '/dashboard')
+  }
+
+  const [initialPage, pendingSignal] = await Promise.all([
+    listPendingIntakeMembers({ pageSize: 50, includeReadiness: true }).catch(() => ({
+      items: [],
+      nextCursor: null,
+      hasMore: false,
+      totalApprox: null
+    })),
+    getWorkforceScimMembersPendingProfileCompletionSignal().catch(() => null)
+  ])
+
+  return (
+    <WorkforceActivationView
+      initialItems={[...initialPage.items]}
+      initialCursor={initialPage.nextCursor}
+      initialHasMore={initialPage.hasMore}
+      initialTotalApprox={initialPage.totalApprox}
+      pendingSignal={pendingSignal}
+      apiPath='/api/hr/workforce/activation'
+      completeIntakeApiBasePath='/api/hr/workforce/members'
+    />
+  )
+}
+
+export default Page

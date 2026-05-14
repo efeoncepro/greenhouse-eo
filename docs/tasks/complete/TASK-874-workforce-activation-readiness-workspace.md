@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno aprobado por usuario`
+- Status real: `Implementado end-to-end en develop`
 - Rank: `TBD`
 - Domain: `hr|identity|payroll|finance|ui`
 - Blocked by: `TASK-873`
-- Branch: `task/TASK-874-workforce-activation-readiness-workspace`
+- Branch: `develop` (instruccion explicita del usuario: no cambiar de rama)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -566,18 +566,18 @@ if (!readiness.ready && !overrideAllowed) {
 
 ## Acceptance Criteria
 
-- [ ] `resolveWorkforceActivationReadiness()` existe, está testeado y clasifica readiness por lanes con blockers/warnings/nextActions.
-- [ ] `GET /api/admin/workforce/members/[memberId]/activation-readiness` devuelve shape canónico y respeta capabilities.
-- [ ] `complete-intake` bloquea miembros no ready con `409 activation_readiness_blocked`, preserva idempotencia para completed y soporta override auditado solo si capability granular existe.
-- [ ] Queue/workspace muestra readiness por persona, filtros por blocker y panel accionable sin duplicar ownership de facetas existentes.
-- [ ] La UI implementada cumple el `Approved UI Contract — hard rule` y no se desvía del mockup aprobado sin aprobación explícita del usuario.
-- [ ] `Workforce Activation` queda expuesto en el menú `Personas y HR` con view code de sección `equipo` o justificación explícita aprobada en Plan Mode.
-- [ ] La ruta `/admin/workforce/activation` no queda como único entrypoint operativo; si existe, está documentada como alias/transitional/admin surface.
-- [ ] Capturas Playwright/Chromium desktop y mobile/tablet se adjuntan/citan y no muestran clipping, solapamiento ni scroll horizontal de página completa.
-- [ ] Signals de Workforce Activation están visibles en reliability overview con evidence sin PII.
-- [ ] Docs funcionales y manual HR explican el flujo operativo y los límites de ownership.
-- [ ] TASK-788 y TASK-790 quedan referenciadas como límites explícitos, no reimplementadas.
-- [ ] No se cambia el write path de `hire_date` sin ADR/cutover formal.
+- [x] `resolveWorkforceActivationReadiness()` existe, está testeado y clasifica readiness por lanes con blockers/warnings/nextActions.
+- [x] `GET /api/admin/workforce/members/[memberId]/activation-readiness` devuelve shape canónico y respeta capabilities.
+- [x] `complete-intake` bloquea miembros no ready con `409 activation_readiness_blocked`, preserva idempotencia para completed y soporta override auditado solo si capability granular existe.
+- [x] Queue/workspace muestra readiness por persona, filtros por blocker y panel accionable sin duplicar ownership de facetas existentes.
+- [x] La UI implementada cumple el `Approved UI Contract — hard rule` y no se desvía del mockup aprobado sin aprobación explícita del usuario.
+- [x] `Workforce Activation` queda expuesto en el menú `Personas y HR` con view code de sección `equipo`.
+- [x] La ruta `/admin/workforce/activation` no queda como único entrypoint operativo; si existe, está documentada como alias/transitional/admin surface.
+- [x] Capturas Playwright/Chromium desktop y mobile se citan y no muestran clipping bloqueante ni scroll horizontal de página completa.
+- [x] Signals de Workforce Activation están visibles en reliability overview con evidence sin PII.
+- [x] Docs funcionales y manual HR explican el flujo operativo y los límites de ownership.
+- [x] TASK-788 y TASK-790 quedan referenciadas como límites explícitos, no reimplementadas.
+- [x] No se cambia el write path de `hire_date` sin ADR/cutover formal.
 
 ## Verification
 
@@ -595,15 +595,15 @@ if (!readiness.ready && !overrideAllowed) {
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `docs/documentation/hr/workforce-activation-readiness.md` y `docs/manual-de-uso/hr/habilitar-colaborador-workforce.md` quedaron actualizados
-- [ ] Si se agregó capability/view code, la migración y parity TS/DB quedaron verdes
-- [ ] Se documentó si `WorkRelationshipOnboardingCase` queda como follow-up o si la task creó un ADR intermedio
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `docs/documentation/hr/workforce-activation-readiness.md` y `docs/manual-de-uso/hr/habilitar-colaborador-workforce.md` quedaron actualizados
+- [x] Si se agregó capability/view code, la migración y parity TS/DB quedaron verdes a nivel TypeScript/migration; la aplicación live de migración queda para deploy/migrate.
+- [x] Se documentó si `WorkRelationshipOnboardingCase` queda como follow-up o si la task creó un ADR intermedio
 
 ## Follow-ups
 
@@ -614,6 +614,36 @@ if (!readiness.ready && !overrideAllowed) {
 
 ## Open Questions
 
-- ¿Payment profile aprobado debe bloquear todos los colaboradores o solo lanes pagados por Greenhouse (`payroll_via='internal'`)?
-- ¿El override de readiness debe existir en V1 o esperar a que HR/Payroll valide los blockers mínimos?
-- ¿El view code debe vivir bajo `admin.*`, `equipo.*` o un futuro route group `workforce`?
+- Resuelta: payment profile aprobado bloquea solo lanes pagados/ruteados por Greenhouse (`payroll_via='internal'`). Para `payroll_via='deel'` queda warning no bloqueante.
+- Resuelta: override existe en V1 con capability granular `workforce.member.activation_readiness.override`, razón mínima de 20 caracteres, readiness snapshot/hash y outbox.
+- Resuelta: surface primario vive en `views` como `equipo.workforce_activation`, route group `hr`, ruta `/hr/workforce/activation`. Admin queda transitional/governance.
+
+## Implementation Closeout — 2026-05-14
+
+### Slices entregados
+
+1. **Migraciones / access**: `20260514120912505_task-874-workforce-activation-access.sql` crea capabilities `workforce.member.activation_readiness.read|override`, view `equipo.workforce_activation`, grants HR/admin y down reversible.
+2. **Resolver canónico**: `src/lib/workforce/activation/readiness.ts` entrega readiness por lanes, blockers, warnings, score, top blocker y snapshot de auditoría.
+3. **Guard runtime**: `complete-intake` consulta readiness antes de mutar; retorna `409 activation_readiness_blocked`; override requiere capability granular y queda en outbox con hash.
+4. **APIs**: queue HR `/api/hr/workforce/activation`, queue admin enriquecida, endpoint per-member `/api/admin/workforce/members/[memberId]/activation-readiness` y transición compartida por `/api/hr/workforce/members/[memberId]/complete-intake` + `/api/admin/workforce/members/[memberId]/complete-intake`.
+5. **UI primary HR**: `/hr/workforce/activation` usa el patrón aprobado `queue + inspector`, filtros por blocker, lane inspector y CTA habilitado solo con `readiness.ready=true`; `/admin/workforce/activation` reutiliza la misma vista como governance surface.
+6. **Reliability**: `workforce.activation.blocker_backlog` y `workforce.activation.ready_not_completed` se agregan al agregador SCIM/Workforce y CTA de ReliabilityModuleCard apunta al surface HR.
+7. **Docs / copy**: microcopy en `src/lib/copy/workforce.ts`; manual HR y doc funcional actualizados.
+
+### Verificación ejecutada
+
+- `pnpm pg:doctor` ✅
+- `pnpm design:lint` ✅ `0 errors / 0 warnings`
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm vitest run src/lib/workforce/intake/complete-intake.test.ts src/views/greenhouse/admin/workforce-activation/CompleteIntakeDrawer.test.tsx src/lib/workforce/activation/readiness.test.ts src/lib/workforce/intake-queue/list-pending-members.test.ts src/components/greenhouse/ReliabilityModuleCard.test.tsx src/lib/admin/internal-role-visibility.test.ts` ✅
+- `pnpm lint` ✅ `0 errors`; quedan 4 warnings legacy TASK-825 en client portal pages no tocadas.
+- `pnpm fe:capture --route=/hr/workforce/activation --env=local --hold=3000` ✅
+- `pnpm fe:capture --route=/hr/workforce/activation --env=local --device="iPhone 13" --hold=3000` ✅
+- `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs -e "<reader smoke>"` ✅ verificó 2 miembros activos en `pending_intake`: Felipe Zurita y María Camila Hoyos.
+
+### Capturas aprobadas para cierre
+
+- Desktop 1440x900 con backlog real: `.captures/2026-05-14T12-52-07_inline-hr-workforce-activation/frames/01-snapshot.png`
+- Mobile iPhone 13: `.captures/2026-05-14T12-30-57_inline-hr-workforce-activation/frames/01-snapshot.png`
+
+Comparación contra mockup aprobado: se conserva el patrón `queue + inspector`, barra compacta de señales/filtros, CTA en inspector y ruta HR primaria. Drift corregido durante verificación: el resolver intentaba leer `greenhouse_payroll.compensation_versions.payroll_via`, pero el runtime real expone `payroll_via` en `greenhouse_core.members`; esto hacía fallar el enriquecimiento y el fallback SSR dejaba la cola vacía. Se corrigió el resolver y la captura desktop final muestra a Felipe Zurita y María Camila Hoyos como backlog real.

@@ -37,7 +37,8 @@ _Pendiente._
 
 ### HR y Nomina
 
-- [Completar ficha laboral de un colaborador](hr/completar-ficha-laboral.md) — como cerrar el workflow workforce intake desde la UI (badge "Ficha pendiente" en People + boton en /people/[memberId] + cola `/admin/workforce/activation` admin governance) sin recurrir a curl. V1.0 confia en validacion manual del operador; la validacion automatica readiness llega en TASK-874.
+- [Habilitar colaborador en Workforce Activation](hr/habilitar-colaborador-workforce.md) — como resolver blockers de readiness desde `/hr/workforce/activation` antes de completar ficha.
+- [Completar ficha laboral de un colaborador](hr/completar-ficha-laboral.md) — como cerrar el workflow workforce intake desde la UI; desde TASK-874 el cierre consulta readiness automático y bloquea fichas incompletas.
 - [Offboarding](hr/offboarding.md) — como abrir, revisar y avanzar casos canonicos de salida sin confundirlos con desactivacion de acceso ni finiquito.
 - [Checklists de Onboarding y Offboarding](hr/onboarding-offboarding-checklists.md) — como crear checklists operativos, completar tareas y no confundirlos con el caso formal de salida.
 - [Usar Lifecycle / Onboarding y Offboarding](hr/onboarding-y-offboarding.md) — overview HR, editor de plantillas, tareas propias y card lifecycle en People 360.

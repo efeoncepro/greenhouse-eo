@@ -2,6 +2,7 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { listPendingIntakeMembers } from '@/lib/workforce/intake-queue/list-pending-members'
 
 import type { ReliabilityModuleKey, ReliabilitySignal } from '@/types/reliability'
 
@@ -301,6 +302,86 @@ export const getWorkforceScimMembersPendingProfileCompletionSignal = async (): P
   }
 }
 
+export const WORKFORCE_ACTIVATION_BLOCKER_BACKLOG_SIGNAL_ID =
+  'workforce.activation.blocker_backlog'
+
+export const getWorkforceActivationBlockerBacklogSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = observedAtNow()
+  const source = 'getWorkforceActivationBlockerBacklogSignal'
+  const label = 'Workforce Activation blockers'
+
+  try {
+    const page = await listPendingIntakeMembers({ pageSize: 100, includeReadiness: true })
+    const blockerCount = page.items.reduce((sum, item) => sum + (item.activationReadiness?.blockerCount ?? 0), 0)
+    const blockedPeople = page.items.filter(item => (item.activationReadiness?.blockerCount ?? 0) > 0).length
+    const severity = blockedPeople === 0 ? 'ok' : blockedPeople >= 25 ? 'error' : 'warning'
+
+    return {
+      signalId: WORKFORCE_ACTIVATION_BLOCKER_BACKLOG_SIGNAL_ID,
+      moduleKey: 'identity',
+      kind: 'data_quality',
+      source,
+      label,
+      severity,
+      summary:
+        blockedPeople === 0
+          ? 'Sin personas pendientes con blockers críticos de activación.'
+          : `${blockedPeople} persona${blockedPeople === 1 ? '' : 's'} con ${blockerCount} blocker${blockerCount === 1 ? '' : 's'} crítico${blockerCount === 1 ? '' : 's'} en Workforce Activation.`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'blocked_people_sample_100', value: String(blockedPeople) },
+        { kind: 'metric', label: 'critical_blockers_sample_100', value: String(blockerCount) },
+        { kind: 'doc', label: 'Workspace', value: '/hr/workforce/activation' }
+      ]
+    }
+  } catch (error) {
+    captureWithDomain(error, 'identity', {
+      tags: { source: 'reliability_signal_workforce_activation_blocker_backlog' }
+    })
+
+    return buildUnknownSignal(WORKFORCE_ACTIVATION_BLOCKER_BACKLOG_SIGNAL_ID, 'identity', 'data_quality', label, source, error)
+  }
+}
+
+export const WORKFORCE_ACTIVATION_READY_NOT_COMPLETED_SIGNAL_ID =
+  'workforce.activation.ready_not_completed'
+
+export const getWorkforceActivationReadyNotCompletedSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = observedAtNow()
+  const source = 'getWorkforceActivationReadyNotCompletedSignal'
+  const label = 'Workforce listo sin completar'
+
+  try {
+    const page = await listPendingIntakeMembers({ pageSize: 100, includeReadiness: true })
+    const readyCount = page.items.filter(item => item.activationReadiness?.ready).length
+    const severity = readyCount === 0 ? 'ok' : readyCount >= 10 ? 'warning' : 'ok'
+
+    return {
+      signalId: WORKFORCE_ACTIVATION_READY_NOT_COMPLETED_SIGNAL_ID,
+      moduleKey: 'identity',
+      kind: 'drift',
+      source,
+      label,
+      severity,
+      summary:
+        readyCount === 0
+          ? 'No hay fichas listas esperando cierre.'
+          : `${readyCount} ficha${readyCount === 1 ? '' : 's'} lista${readyCount === 1 ? '' : 's'} para completar intake.`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'ready_not_completed_sample_100', value: String(readyCount) },
+        { kind: 'doc', label: 'Workspace', value: '/hr/workforce/activation' }
+      ]
+    }
+  } catch (error) {
+    captureWithDomain(error, 'identity', {
+      tags: { source: 'reliability_signal_workforce_activation_ready_not_completed' }
+    })
+
+    return buildUnknownSignal(WORKFORCE_ACTIVATION_READY_NOT_COMPLETED_SIGNAL_ID, 'identity', 'drift', label, source, error)
+  }
+}
+
 // ── 6. identity.scim.allowlist_blocklist_conflict (arch-architect Fix 4) ────
 
 export const IDENTITY_SCIM_ALLOWLIST_BLOCKLIST_CONFLICT_SIGNAL_ID =
@@ -364,6 +445,8 @@ export const getScimWorkforceSignals = async (): Promise<ReliabilitySignal[]> =>
     getScimIneligibleAccountsInScopeSignal().catch(() => null),
     getScimMemberIdentityDriftSignal().catch(() => null),
     getWorkforceScimMembersPendingProfileCompletionSignal().catch(() => null),
+    getWorkforceActivationBlockerBacklogSignal().catch(() => null),
+    getWorkforceActivationReadyNotCompletedSignal().catch(() => null),
     getScimAllowlistBlocklistConflictSignal().catch(() => null)
   ])
 

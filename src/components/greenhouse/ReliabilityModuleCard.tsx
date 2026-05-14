@@ -48,7 +48,23 @@ const SIGNAL_ACTION_CTAS: ReadonlyMap<string, SignalActionCta> = new Map<string,
   [
     'workforce.scim_members_pending_profile_completion',
     {
-      href: '/admin/workforce/activation',
+      href: '/hr/workforce/activation',
+      label: GH_WORKFORCE_INTAKE.banner_link_to_queue,
+      ariaLabel: GH_WORKFORCE_INTAKE.banner_link_to_queue_aria
+    }
+  ],
+  [
+    'workforce.activation.blocker_backlog',
+    {
+      href: '/hr/workforce/activation',
+      label: GH_WORKFORCE_INTAKE.banner_link_to_queue,
+      ariaLabel: GH_WORKFORCE_INTAKE.banner_link_to_queue_aria
+    }
+  ],
+  [
+    'workforce.activation.ready_not_completed',
+    {
+      href: '/hr/workforce/activation',
       label: GH_WORKFORCE_INTAKE.banner_link_to_queue,
       ariaLabel: GH_WORKFORCE_INTAKE.banner_link_to_queue_aria
     }

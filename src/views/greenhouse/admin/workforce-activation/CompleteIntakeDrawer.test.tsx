@@ -162,6 +162,28 @@ describe('TASK-873 Slice 3 — CompleteIntakeDrawer', () => {
     expect(url).toBe('/api/admin/workforce/members/mem%2Fwith%2Fslashes/complete-intake')
   })
 
+  it('uses a custom completion endpoint when the surface provides one', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }))
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderWithTheme(
+      <CompleteIntakeDrawer
+        open
+        member={buildMember()}
+        onClose={() => {}}
+        completeIntakeApiBasePath='/api/hr/workforce/members'
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(GH_WORKFORCE_INTAKE.drawer_submit, 'i') }))
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled())
+    const [url] = fetchMock.mock.calls[0]
+
+    expect(url).toBe('/api/hr/workforce/members/mem-felipe-uuid/complete-intake')
+  })
+
   it('handles null member gracefully', () => {
     renderWithTheme(<CompleteIntakeDrawer open member={null} onClose={() => {}} />)
 

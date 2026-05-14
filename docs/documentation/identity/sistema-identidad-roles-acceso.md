@@ -498,11 +498,11 @@ Cuando un operador autorizado presiona "Completar ficha":
 4. El badge "Ficha pendiente" desaparece del directorio + perfil.
 5. El member queda elegible para payroll (cuando `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` se active en produccion via TASK-872 follow-up, solo members `completed` entran a corridas de nomina).
 
-### Roadmap
+### Workforce Activation Readiness
 
-La validacion automatica de readiness (compensation + contract + legal profile + payment profile completos antes de permitir `completed`) llega en **TASK-874** (Workforce Activation Readiness Resolver + Workspace). Hasta entonces el operador valida manualmente — la UI tiene banner explicito en el drawer recordandolo.
+Desde **TASK-874**, la validacion automatica de readiness vive en `/hr/workforce/activation` y en el guard server-side de `complete-intake`. El operador ya no valida manualmente a ciegas: el resolver clasifica lanes de identidad, relacion laboral, datos laborales, cargo, compensacion, perfil legal, pago y onboarding antes de permitir `completed`.
 
-El surface primario HR-facing (con summary cards, filter chips por blocker, inspector right rail per mockup aprobado 2026-05-14) tambien llega en TASK-874. La cola actual en `/admin/workforce/activation` es **admin governance / transitional**; TASK-874 ship el workspace primario bajo `/hr/workforce/activation` o `/workforce/activation` con menu en **Personas y HR**.
+La cola `/admin/workforce/activation` queda como surface admin governance / transitional. El entrypoint operativo para HR/Ops es `/hr/workforce/activation` con view code `equipo.workforce_activation`.
 
 > **Detalle tecnico:** Spec backend canonica: [`TASK-872`](../../tasks/complete/TASK-872-scim-internal-collaborator-provisioning.md). Spec UI canonica: TASK-873 (en cierre 2026-05-14). Endpoint canonical: `POST /api/admin/workforce/members/[memberId]/complete-intake`. Manual operador: [`completar-ficha-laboral.md`](../../manual-de-uso/hr/completar-ficha-laboral.md).
 

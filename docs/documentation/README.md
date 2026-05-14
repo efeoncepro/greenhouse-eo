@@ -72,6 +72,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### HR y Nomina
 
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
+- [Workforce Activation Readiness](hr/workforce-activation-readiness.md) — resolver canónico y workspace HR para habilitar colaboradores antes de cerrar intake, con lanes, blockers, guard y override auditado
 - [Checklists de Onboarding y Offboarding](hr/onboarding-offboarding-checklists.md) — plantillas e instancias operativas HRIS, self-service del colaborador y frontera con el caso formal de offboarding
 - [Lifecycle / Onboarding & Offboarding](hr/onboarding-offboarding-lifecycle.md) — shell operativa HR, carriles visibles, editor de plantillas, My Onboarding y card People 360
 - [Offboarding laboral y contractual](hr/offboarding.md) — casos canonicos de salida, estados, lanes, triggers HR/SCIM/Admin/contract expiry y frontera con Payroll final

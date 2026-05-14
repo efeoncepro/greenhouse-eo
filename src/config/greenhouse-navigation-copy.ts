@@ -149,6 +149,7 @@ const enUS: NavigationCopy = {
     hierarchy: { label: 'Hierarchy', subtitle: 'Supervision, delegations and changes' },
     orgChart: { label: 'Org chart', subtitle: 'Visual hierarchy explorer' },
     departments: { label: 'Departments', subtitle: 'Organizational structure' },
+    workforceActivation: { label: 'Workforce Activation', subtitle: 'Labor activation and readiness blockers' },
     offboarding: { label: 'Offboarding', subtitle: 'Labor and contractual exit cases' },
     leave: { label: 'Leave', subtitle: 'Requests and leave balances' },
     attendance: { label: 'Attendance', subtitle: 'Team attendance records' },

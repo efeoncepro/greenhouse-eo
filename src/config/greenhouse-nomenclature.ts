@@ -110,6 +110,7 @@ export const GH_HR_NAV = {
   hierarchy: { label: 'Jerarquía', subtitle: 'Supervisoría, delegaciones y cambios' },
   orgChart: { label: 'Organigrama', subtitle: 'Explorador visual de la jerarquía' },
   departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
+  workforceActivation: { label: 'Workforce Activation', subtitle: 'Habilitación laboral y blockers' },
   offboarding: { label: 'Offboarding', subtitle: 'Casos de salida laboral y contractual' },
   leave: { label: 'Permisos', subtitle: 'Solicitudes y saldos de permisos' },
   attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' },

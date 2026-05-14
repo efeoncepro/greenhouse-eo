@@ -19,6 +19,7 @@ import Typography from '@mui/material/Typography'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_WORKFORCE_INTAKE } from '@/lib/copy/workforce'
+import { formatDate } from '@/lib/format'
 
 import type { WorkforceIntakeStatus } from '@/types/people'
 
@@ -52,6 +53,7 @@ interface CompleteIntakeDrawerProps {
   readonly member: CompleteIntakeDrawerMember | null
   readonly onClose: () => void
   readonly onCompleted?: () => void
+  readonly completeIntakeApiBasePath?: string
 }
 
 const statusLabel = (status: WorkforceIntakeStatus): string => {
@@ -71,23 +73,15 @@ const statusColor = (status: WorkforceIntakeStatus): 'warning' | 'info' | 'succe
 const formatCreatedAt = (iso: string | null): string => {
   if (!iso) return '—'
 
-  try {
-    return new Intl.DateTimeFormat('es-CL', {
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit',
-      timeZone: 'America/Santiago'
-    }).format(new Date(iso))
-  } catch {
-    return '—'
-  }
+  return formatDate(iso, { month: 'short', fallback: '—', timeZone: 'America/Santiago' })
 }
 
 const CompleteIntakeDrawer = ({
   open,
   member,
   onClose,
-  onCompleted
+  onCompleted,
+  completeIntakeApiBasePath = '/api/admin/workforce/members'
 }: CompleteIntakeDrawerProps) => {
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -105,7 +99,7 @@ const CompleteIntakeDrawer = ({
 
     try {
       const res = await fetch(
-        `/api/admin/workforce/members/${encodeURIComponent(member.memberId)}/complete-intake`,
+        `${completeIntakeApiBasePath}/${encodeURIComponent(member.memberId)}/complete-intake`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

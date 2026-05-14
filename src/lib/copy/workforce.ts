@@ -276,7 +276,7 @@ export const GH_WORKFORCE_INTAKE = {
     `${n} día${n === 1 ? '' : 's'} desde creación SCIM`,
   drawer_warning_title: 'Verifica antes de completar',
   drawer_warning_body:
-    'Confirma que contrato, compensación, perfil legal y datos de pago están al día. V1.0 no valida los datos automáticamente — la validación pre-flight llega en una iteración posterior.',
+    'El guard valida contrato, cargo, compensación, perfil legal y datos de pago antes de completar. Si hay blockers, resuélvelos desde Workforce Activation.',
   drawer_reason_label: 'Notas (opcional)',
   drawer_reason_placeholder: 'Contexto u observación para el registro de auditoría.',
   drawer_reason_helper: 'Queda registrado en el outbox event y audit log.',
@@ -289,7 +289,7 @@ export const GH_WORKFORCE_INTAKE = {
   toast_submit_error: 'No fue posible completar la ficha. Revisa los logs.',
   toast_submit_forbidden: 'No tienes permiso para completar esta ficha.',
   toast_submit_not_found: 'No se encontró el colaborador.',
-  toast_submit_conflict: 'La ficha está en un estado que no permite la transición.',
+  toast_submit_conflict: 'La ficha tiene blockers de activación o está en un estado que no permite la transición.',
 
   // ── Admin queue page ──────────────────────────────────────────────────
   // Copy alineado con mockup aprobado Codex 2026-05-14 (TASK-874 visual target).
@@ -331,6 +331,44 @@ export const GH_WORKFORCE_INTAKE = {
 } as const
 
 export type GhWorkforceIntakeCopy = typeof GH_WORKFORCE_INTAKE
+
+export const GH_WORKFORCE_ACTIVATION = {
+  page_title: 'Workforce Activation',
+  page_subtitle:
+    'Habilitación laboral completa antes de cerrar intake: relación, cargo, compensación, pago y onboarding.',
+  guard_active: 'Guard activo',
+  export_blockers: 'Exportar blockers',
+  new_activation: 'Nueva habilitación',
+  control_ready: 'Listos',
+  control_people: 'Personas por habilitar',
+  control_relationship: 'Sin relación',
+  control_compensation: 'Sin compensación',
+  control_blocker_hint: 'El guard bloquea completar ficha hasta que las lanes críticas estén listas.',
+  filter_all: 'Todos',
+  filter_ready: 'Listos',
+  filter_compensation: 'Sin compensación',
+  filter_hire_date: 'Sin ingreso',
+  filter_relationship: 'Sin relación legal',
+  filter_payment: 'Sin pago',
+  filter_contractor: 'Contractors',
+  queue_title: 'Cola priorizada',
+  queue_subtitle: 'Personas ordenadas por riesgo de activación incompleta.',
+  queue_count: (count: number) => `${count} en vista`,
+  readiness_label: 'Readiness',
+  blockers_none: 'Sin blockers',
+  blockers_count: (count: number) => `${count} blocker${count === 1 ? '' : 's'}`,
+  ready_detail: 'Lista para completar',
+  inspector_ready: 'Ficha lista para completar.',
+  inspector_blocked: (items: string) => `Resolver primero: ${items}.`,
+  critical_lanes: 'Lanes críticas',
+  complete: 'Completar ficha',
+  unblock_route: 'Ruta de desbloqueo',
+  age_days: (count: number) => `${count} día${count === 1 ? '' : 's'}`,
+  empty_title: 'Sin personas en esta vista',
+  empty_body: 'Ajusta el filtro o revisa si la cola ya quedó despejada.'
+} as const
+
+export type GhWorkforceActivationCopy = typeof GH_WORKFORCE_ACTIVATION
 
 /* ─────────────────── Commercial Pricing ─────────────────── */
 // Copy canónico para el programa de pricing comercial (TASK-463..468).

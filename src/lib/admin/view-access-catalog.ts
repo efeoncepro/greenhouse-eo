@@ -210,6 +210,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
+    viewCode: 'equipo.workforce_activation',
+    section: 'equipo',
+    label: 'Workforce Activation',
+    description: 'Workspace HR para habilitar colaboradores antes de cerrar intake.',
+    routePath: '/hr/workforce/activation',
+    routeGroup: 'hr'
+  },
+  {
     viewCode: 'equipo.onboarding',
     section: 'equipo',
     label: 'Onboarding',
