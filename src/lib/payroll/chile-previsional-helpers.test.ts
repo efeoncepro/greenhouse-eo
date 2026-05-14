@@ -1,4 +1,25 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+// Unit tests para el shape de fallback de los helpers cuando no hay snapshot
+// canónico disponible. Mocks bloquean PG calls + economic indicators para
+// aislar la lógica de la función vs canonical seed state.
+//
+// Patrón canónico mirror chile-previsional-helpers.schema-compatibility.test.ts
+// (TASK-872 Slice 4 follow-up: estos tests pre-existentes fallaban porque
+// asumían "no seed" pero el PG live tenía seeds. Mock aisla intent original.)
+vi.mock('@/lib/postgres/client', () => ({
+  onGreenhousePostgresReset: () => () => {},
+  isGreenhousePostgresRetryableConnectionError: () => false,
+  runGreenhousePostgresQuery: vi.fn(async () => [])
+}))
+
+vi.mock('@/lib/payroll/postgres-store', () => ({
+  isPayrollPostgresEnabled: () => false
+}))
+
+vi.mock('@/lib/finance/economic-indicators', () => ({
+  getHistoricalEconomicIndicatorForPeriod: vi.fn(async () => null)
+}))
 
 import {
   getAfpRateForCode,

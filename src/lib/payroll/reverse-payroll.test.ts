@@ -15,6 +15,12 @@ vi.mock('@/lib/payroll/chile-previsional-helpers', async () => {
     getAfpRateForCode: async () => 0.1046,
     resolveChileAfpRateSplitForCompensation: async () => null,
     getUnemploymentRateForPeriod: async () => 0.006,
+    // TASK-872 Slice 4 follow-up: tests asumen topes=0 para isolation algorítmica.
+    // En producción los topes son seeded (~90 UF AFP, ~135 UF cesantía); aquí los
+    // anulamos para que resolveCappedBase NO requiera ufValue cuando el test no lo
+    // pasa (algunos casos NO miden el cap behavior, solo convergencia).
+    getTopeAfpForPeriod: async () => 0,
+    getTopeCesantiaForPeriod: async () => 0,
     resolveChileEmployerCostAmounts: async () => ({
       sisAmount: 0,
       cesantiaAmount: 0,
