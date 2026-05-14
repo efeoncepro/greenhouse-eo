@@ -185,7 +185,11 @@ export const AGGREGATE_TYPES = {
   personAddress: 'person_address',
 
   // Platform Release Control Plane (TASK-848)
-  platformRelease: 'platform.release'
+  platformRelease: 'platform.release',
+
+  // SCIM / Identity (TASK-872) — aggregate canonical para client_users
+  // SCIM-provisioning + scim.* events
+  clientUser: 'client_user'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -692,7 +696,15 @@ export const EVENT_TYPES = {
   platformReleaseReleased: 'platform.release.released',
   platformReleaseDegraded: 'platform.release.degraded',
   platformReleaseRolledBack: 'platform.release.rolled_back',
-  platformReleaseAborted: 'platform.release.aborted'
+  platformReleaseAborted: 'platform.release.aborted',
+
+  // TASK-872 — SCIM Internal Collaborator Provisioning (4 events v1)
+  // Granular: scim.user.* (legacy compat — existing raw strings publicados desde
+  // src/lib/scim/provisioning.ts). El consolidado provides forensic + cascade tag.
+  scimUserCreated: 'scim.user.created',
+  scimUserUpdated: 'scim.user.updated',
+  scimUserDeactivated: 'scim.user.deactivated',
+  scimInternalCollaboratorProvisioned: 'scim.internal_collaborator.provisioned'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

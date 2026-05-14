@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -24,38 +26,64 @@ export type OperatingEntityMembershipSyncResult =
   | { action: 'created' | 'reactivated' | 'updated' | 'deactivated'; membershipId: string }
   | { action: 'noop' | 'skipped'; membershipId: null }
 
+/**
+ * TASK-872 — Dual-mode query helper. When `client` provided, runs inside the
+ * caller's PG transaction. Else falls back to the global pool runner.
+ */
+const runQueryWithClient = async <T extends Record<string, unknown>>(
+  text: string,
+  params: unknown[],
+  client?: PoolClient
+): Promise<T[]> => {
+  if (client) {
+    const result = await client.query<T>(text, params)
+
+    return result.rows
+  }
+
+  return runGreenhousePostgresQuery<T>(text, params)
+}
+
 const normalizeString = (value: string | null | undefined) => value?.trim() || null
 
-const setPrimaryMembershipForProfile = async (profileId: string, membershipId: string) => {
-  await runGreenhousePostgresQuery(
+const setPrimaryMembershipForProfile = async (profileId: string, membershipId: string, client?: PoolClient) => {
+  await runQueryWithClient(
     `UPDATE greenhouse_core.person_memberships
      SET is_primary = CASE WHEN membership_id = $2 THEN TRUE ELSE FALSE END,
          updated_at = CURRENT_TIMESTAMP
      WHERE profile_id = $1
        AND active = TRUE`,
-    [profileId, membershipId]
+    [profileId, membershipId],
+    client
   )
 }
 
-const publishMembershipUpdated = async (params: {
-  membershipId: string
-  profileId: string
-  organizationId: string
-}) => {
-  await publishOutboxEvent({
-    aggregateType: AGGREGATE_TYPES.membership,
-    aggregateId: params.membershipId,
-    eventType: EVENT_TYPES.membershipUpdated,
-    payload: {
-      membershipId: params.membershipId,
-      profileId: params.profileId,
-      organizationId: params.organizationId
-    }
-  })
+const publishMembershipUpdated = async (
+  params: {
+    membershipId: string
+    profileId: string
+    organizationId: string
+  },
+  client?: PoolClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.membership,
+      aggregateId: params.membershipId,
+      eventType: EVENT_TYPES.membershipUpdated,
+      payload: {
+        membershipId: params.membershipId,
+        profileId: params.profileId,
+        organizationId: params.organizationId
+      }
+    },
+    client
+  )
 }
 
 export const syncOperatingEntityMembershipForMember = async (
-  memberId: string
+  memberId: string,
+  options: { client?: PoolClient } = {}
 ): Promise<OperatingEntityMembershipSyncResult> => {
   const operatingEntity = await getOperatingEntityIdentity()
 
@@ -63,12 +91,15 @@ export const syncOperatingEntityMembershipForMember = async (
     return { action: 'skipped', membershipId: null }
   }
 
-  const [member] = await runGreenhousePostgresQuery<MemberContextRow>(
+  const client = options.client
+
+  const [member] = await runQueryWithClient<MemberContextRow>(
     `SELECT identity_profile_id, role_title, active
      FROM greenhouse_core.members
      WHERE member_id = $1
      LIMIT 1`,
-    [memberId]
+    [memberId],
+    client
   )
 
   const profileId = normalizeString(member?.identity_profile_id)
@@ -77,7 +108,7 @@ export const syncOperatingEntityMembershipForMember = async (
     return { action: 'skipped', membershipId: null }
   }
 
-  const [existing] = await runGreenhousePostgresQuery<ExistingMembershipRow>(
+  const [existing] = await runQueryWithClient<ExistingMembershipRow>(
     `SELECT membership_id, active, is_primary, role_label
      FROM greenhouse_core.person_memberships
      WHERE profile_id = $1
@@ -85,7 +116,8 @@ export const syncOperatingEntityMembershipForMember = async (
        AND membership_type = $3
      ORDER BY active DESC, is_primary DESC, updated_at DESC NULLS LAST, created_at DESC NULLS LAST, membership_id ASC
      LIMIT 1`,
-    [profileId, operatingEntity.organizationId, TEAM_MEMBER_MEMBERSHIP_TYPE]
+    [profileId, operatingEntity.organizationId, TEAM_MEMBER_MEMBERSHIP_TYPE],
+    client
   )
 
   if (!member.active) {
@@ -93,7 +125,7 @@ export const syncOperatingEntityMembershipForMember = async (
       return { action: 'noop', membershipId: null }
     }
 
-    await deactivateMembership(existing.membership_id)
+    await deactivateMembership(existing.membership_id, { client })
 
     return { action: 'deactivated', membershipId: existing.membership_id }
   }
@@ -101,21 +133,24 @@ export const syncOperatingEntityMembershipForMember = async (
   const desiredRoleLabel = normalizeString(member.role_title)
 
   if (!existing) {
-    const created = await createMembership({
-      profileId,
-      organizationId: operatingEntity.organizationId,
-      membershipType: TEAM_MEMBER_MEMBERSHIP_TYPE,
-      roleLabel: desiredRoleLabel ?? undefined,
-      isPrimary: true
-    })
+    const created = await createMembership(
+      {
+        profileId,
+        organizationId: operatingEntity.organizationId,
+        membershipType: TEAM_MEMBER_MEMBERSHIP_TYPE,
+        roleLabel: desiredRoleLabel ?? undefined,
+        isPrimary: true
+      },
+      { client }
+    )
 
-    await setPrimaryMembershipForProfile(profileId, created.membershipId)
+    await setPrimaryMembershipForProfile(profileId, created.membershipId, client)
 
     return { action: 'created', membershipId: created.membershipId }
   }
 
   if (!existing.active) {
-    await runGreenhousePostgresQuery(
+    await runQueryWithClient(
       `UPDATE greenhouse_core.person_memberships
        SET active = TRUE,
            status = 'active',
@@ -123,15 +158,19 @@ export const syncOperatingEntityMembershipForMember = async (
            is_primary = TRUE,
            updated_at = CURRENT_TIMESTAMP
        WHERE membership_id = $1`,
-      [existing.membership_id, desiredRoleLabel]
+      [existing.membership_id, desiredRoleLabel],
+      client
     )
 
-    await setPrimaryMembershipForProfile(profileId, existing.membership_id)
-    await publishMembershipUpdated({
-      membershipId: existing.membership_id,
-      profileId,
-      organizationId: operatingEntity.organizationId
-    })
+    await setPrimaryMembershipForProfile(profileId, existing.membership_id, client)
+    await publishMembershipUpdated(
+      {
+        membershipId: existing.membership_id,
+        profileId,
+        organizationId: operatingEntity.organizationId
+      },
+      client
+    )
 
     return { action: 'reactivated', membershipId: existing.membership_id }
   }
@@ -143,21 +182,25 @@ export const syncOperatingEntityMembershipForMember = async (
     return { action: 'noop', membershipId: null }
   }
 
-  await runGreenhousePostgresQuery(
+  await runQueryWithClient(
     `UPDATE greenhouse_core.person_memberships
      SET role_label = $2,
          is_primary = TRUE,
          updated_at = CURRENT_TIMESTAMP
      WHERE membership_id = $1`,
-    [existing.membership_id, desiredRoleLabel]
+    [existing.membership_id, desiredRoleLabel],
+    client
   )
 
-  await setPrimaryMembershipForProfile(profileId, existing.membership_id)
-  await publishMembershipUpdated({
-    membershipId: existing.membership_id,
-    profileId,
-    organizationId: operatingEntity.organizationId
-  })
+  await setPrimaryMembershipForProfile(profileId, existing.membership_id, client)
+  await publishMembershipUpdated(
+    {
+      membershipId: existing.membership_id,
+      profileId,
+      organizationId: operatingEntity.organizationId
+    },
+    client
+  )
 
   return { action: 'updated', membershipId: existing.membership_id }
 }

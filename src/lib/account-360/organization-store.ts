@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateMembershipId, nextPublicId } from '@/lib/account-360/id-generation'
 import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-presentation'
@@ -8,6 +10,26 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { getOrganizationOperationalServing } from './get-organization-operational-serving'
 import type { OrganizationClientFinance, OrganizationFinanceSummary } from '@/views/greenhouse/organizations/types'
+
+/**
+ * TASK-872 — Dual-mode query helper. When `client` provided, runs inside the
+ * caller's PG transaction (atomicity guarantee). Else falls back to the global
+ * pool runner. Backward compat 100% — existing callers pass no `client` and
+ * behave identically to pre-TASK-872.
+ */
+const runQueryWithClient = async <T = unknown>(
+  text: string,
+  params: unknown[],
+  client?: PoolClient
+): Promise<T[]> => {
+  if (client) {
+    const result = await client.query<T extends Record<string, unknown> ? T : never>(text, params)
+
+    return result.rows as T[]
+  }
+
+  return runGreenhousePostgresQuery<T extends Record<string, unknown> ? T : never>(text, params) as Promise<T[]>
+}
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -427,36 +449,44 @@ export const getOrganizationMemberships = async (orgId: string): Promise<Organiz
   return rows.map(normalizeMembership)
 }
 
-export const createMembership = async (input: CreateMembershipInput) => {
+export const createMembership = async (
+  input: CreateMembershipInput,
+  options: { client?: PoolClient } = {}
+) => {
   const membershipId = generateMembershipId()
   const publicId = await nextPublicId('EO-MBR')
 
-  await runGreenhousePostgresQuery(`
-    INSERT INTO greenhouse_core.person_memberships (
-      membership_id, public_id, profile_id, organization_id, space_id,
-      membership_type, role_label, department, is_primary,
-      status, active, created_at, updated_at
-    )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
-            'active', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-  `, [
-    membershipId,
-    publicId,
-    input.profileId,
-    input.organizationId,
-    input.spaceId ?? null,
-    input.membershipType,
-    input.roleLabel ?? null,
-    input.department ?? null,
-    input.isPrimary ?? false
-  ])
+  await runQueryWithClient(
+    `INSERT INTO greenhouse_core.person_memberships (
+       membership_id, public_id, profile_id, organization_id, space_id,
+       membership_type, role_label, department, is_primary,
+       status, active, created_at, updated_at
+     )
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
+             'active', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+    [
+      membershipId,
+      publicId,
+      input.profileId,
+      input.organizationId,
+      input.spaceId ?? null,
+      input.membershipType,
+      input.roleLabel ?? null,
+      input.department ?? null,
+      input.isPrimary ?? false
+    ],
+    options.client
+  )
 
-  await publishOutboxEvent({
-    aggregateType: AGGREGATE_TYPES.membership,
-    aggregateId: membershipId,
-    eventType: EVENT_TYPES.membershipCreated,
-    payload: { membershipId, profileId: input.profileId, organizationId: input.organizationId, spaceId: input.spaceId ?? null }
-  })
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.membership,
+      aggregateId: membershipId,
+      eventType: EVENT_TYPES.membershipCreated,
+      payload: { membershipId, profileId: input.profileId, organizationId: input.organizationId, spaceId: input.spaceId ?? null }
+    },
+    options.client
+  )
 
   return { membershipId, publicId, created: true }
 }
@@ -511,19 +541,27 @@ export const updateMembership = async (
   return { updated: true }
 }
 
-export const deactivateMembership = async (membershipId: string) => {
-  await runGreenhousePostgresQuery(`
-    UPDATE greenhouse_core.person_memberships
-    SET active = FALSE, status = 'inactive', updated_at = CURRENT_TIMESTAMP
-    WHERE membership_id = $1
-  `, [membershipId])
+export const deactivateMembership = async (
+  membershipId: string,
+  options: { client?: PoolClient } = {}
+) => {
+  await runQueryWithClient(
+    `UPDATE greenhouse_core.person_memberships
+     SET active = FALSE, status = 'inactive', updated_at = CURRENT_TIMESTAMP
+     WHERE membership_id = $1`,
+    [membershipId],
+    options.client
+  )
 
-  await publishOutboxEvent({
-    aggregateType: AGGREGATE_TYPES.membership,
-    aggregateId: membershipId,
-    eventType: EVENT_TYPES.membershipDeactivated,
-    payload: { membershipId }
-  })
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.membership,
+      aggregateId: membershipId,
+      eventType: EVENT_TYPES.membershipDeactivated,
+      payload: { membershipId }
+    },
+    options.client
+  )
 
   return { deactivated: true }
 }
