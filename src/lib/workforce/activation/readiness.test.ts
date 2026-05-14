@@ -110,6 +110,23 @@ describe('TASK-874 resolveWorkforceActivationReadiness', () => {
     expect(result.warnings.some(warning => warning.code === 'payment_profile_managed_by_deel')).toBe(true)
   })
 
+  it('blocks but distinguishes draft payment profiles as activation-required', async () => {
+    queryMock.mockResolvedValueOnce([baseRow])
+    listPaymentProfilesMock.mockResolvedValueOnce({
+      items: [{ profileId: 'pay-draft-1', status: 'draft' }],
+      total: 1
+    })
+
+    const result = await resolveWorkforceActivationReadiness('mem-1')
+
+    expect(result.ready).toBe(false)
+    expect(result.blockers.some(blocker => blocker.code === 'payment_profile_missing_or_unapproved')).toBe(true)
+    expect(result.warnings.some(warning => warning.code === 'payment_profile_draft_activation_required')).toBe(true)
+    expect(result.lanes.find(lane => lane.key === 'payment_profile')?.detail).toBe(
+      'La ruta de pago existe pero aun no esta activa.'
+    )
+  })
+
   it('returns blocked member_not_found when the member does not exist', async () => {
     queryMock.mockResolvedValueOnce([])
 

@@ -42,6 +42,7 @@ export type WorkforceActivationWarningCode =
   | 'identity_access_missing_login'
   | 'role_title_drift_pending'
   | 'legal_profile_warning'
+  | 'payment_profile_draft_activation_required'
   | 'payment_profile_pending_approval'
   | 'payment_profile_managed_by_deel'
   | 'onboarding_case_missing'

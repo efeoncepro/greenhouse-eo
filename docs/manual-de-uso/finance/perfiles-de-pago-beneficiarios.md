@@ -27,7 +27,7 @@ seccion "Perfiles de pago".
 ### Vista ops cross-entity
 
 `/finance/payment-profiles` — read-only. Sirve para:
-- Aprobar perfiles en cola
+- Activar borradores y aprobar perfiles en cola
 - Detectar drift (obligaciones bloqueadas por falta de perfil)
 - Auditar el universo
 - Click en cualquier fila te lleva al 360 correcto para editar
@@ -45,20 +45,21 @@ seccion "Perfiles de pago".
    - **Numero de cuenta**: se enmascara al guardar
    - **Banco**: nombre del banco/plataforma
    - **Notas internas**: contexto operativo
-   - **Requiere aprobacion**: déjalo activo (default).
-4. Click en **Crear perfil**. Entra como **Pendiente aprobacion**.
+   - **Requiere aprobacion**: déjalo activo (default). Si lo apagas, el perfil queda como **Borrador** y debes activarlo desde su tarjeta.
+4. Click en **Crear perfil**. Entra como **Pendiente aprobacion** si requiere checker, o como **Borrador** si no requiere aprobacion.
 
 > El creador NO puede aprobar su propio perfil. Pidele a otro usuario que lo
 > apruebe.
 
-## Aprobar un perfil
+## Activar o aprobar un perfil
 
-Solo aplica a perfiles en estado **Pendiente aprobacion**.
+Aplica a perfiles en estado **Borrador** o **Pendiente aprobacion**.
 
 1. Entra al perfil (desde Person 360, Shareholder 360, o desde la cola en
    `/finance/payment-profiles`).
-2. Si tu usuario es distinto al maker, veras el boton **Aprobar**.
-3. Click → el perfil pasa a **Activo**. Si habia otro perfil activo para la
+2. Si esta en **Borrador** sin maker-checker, veras **Activar perfil**.
+3. Si esta **Pendiente aprobacion**, un checker distinto al maker vera **Aprobar perfil**.
+4. Click → el perfil pasa a **Activo**. Si habia otro perfil activo para la
    misma (moneda, beneficiario), queda automaticamente como **Reemplazado**.
 
 ## Revelar datos sensibles
@@ -82,11 +83,11 @@ Solo aplica a perfiles en estado Borrador, Pendiente aprobacion, o Activo.
 2. Click en **Cancelar perfil** → ingresar motivo (3+ caracteres).
 3. El perfil pasa a **Cancelado** y libera la slot para crear uno nuevo.
 
-## Cola de aprobacion (vista ops)
+## Cola de activacion (vista ops)
 
 `/finance/payment-profiles` muestra:
-- **Cola**: perfiles esperando checker. Click en uno → abre el drawer con boton
-  Aprobar.
+- **Cola**: perfiles en borrador o esperando checker. Click en uno → abre el
+  drawer con boton Activar/Aprobar segun estado.
 - **Drift**: beneficiarios con obligaciones vivas sin perfil activo. Esto
   bloquea las orders de pago. Click → te lleva al 360 para crear el perfil.
 - **Tabla universal**: todos los perfiles en read-only. Click en una fila →
@@ -107,7 +108,7 @@ Solo aplica a perfiles en estado Borrador, Pendiente aprobacion, o Activo.
 |---------|----------------|----------|
 | "Maker-checker: el creador no puede aprobar su propio perfil" | El usuario que intenta aprobar es el mismo que lo creo | Pedir a otro usuario con permisos de finanzas |
 | "V1 solo soporta beneficiary_type member o shareholder" | Intentaste crear un perfil para supplier, tax_authority o processor | Esperar V2 o registrar el rail manualmente en la order |
-| Las orders de un colaborador no se generan automaticamente con el provider correcto | No hay perfil activo o esta en pending_approval | Aprobar el perfil; el resolver lo tomara automaticamente en proximas orders |
+| Las orders de un colaborador no se generan automaticamente con el provider correcto | No hay perfil activo, esta en borrador o esta en pending_approval | Activar o aprobar el perfil; el resolver lo tomara automaticamente en proximas orders |
 | El boton "Revelar numero completo" no aparece | No tienes capability `finance.payment_profiles.reveal_sensitive` | Pedir el grant a un admin |
 
 ## Referencias tecnicas

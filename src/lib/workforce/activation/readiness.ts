@@ -377,7 +377,10 @@ const resolvePaymentLane = async (
     }
   }
 
-  if (profiles.items.some(profile => profile.status === 'pending_approval')) {
+  const hasPendingApprovalProfile = profiles.items.some(profile => profile.status === 'pending_approval')
+  const hasDraftProfile = profiles.items.some(profile => profile.status === 'draft')
+
+  if (hasPendingApprovalProfile) {
     warnings.push(
       issue(
         snapshot.memberId,
@@ -385,6 +388,16 @@ const resolvePaymentLane = async (
         'payment_profile_pending_approval',
         'Perfil de pago pendiente de aprobación',
         'Aprobar el perfil antes de ejecutar pagos internos.'
+      )
+    )
+  } else if (hasDraftProfile) {
+    warnings.push(
+      issue(
+        snapshot.memberId,
+        'payment_profile',
+        'payment_profile_draft_activation_required',
+        'Perfil de pago en borrador',
+        'Activa el perfil de pago para convertirlo en ruta valida de pagos internos.'
       )
     )
   }
@@ -395,12 +408,21 @@ const resolvePaymentLane = async (
       'payment_profile',
       'payment_profile_missing_or_unapproved',
       'Perfil de pago faltante o no aprobado',
-      `Se requiere perfil activo para ${snapshot.compensationCurrency}.`
+      hasDraftProfile || hasPendingApprovalProfile
+        ? `Existe perfil para ${snapshot.compensationCurrency}, pero debe quedar activo antes de habilitar la ficha.`
+        : `Se requiere perfil activo para ${snapshot.compensationCurrency}.`
     )
   )
 
   return {
-    lane: lane(snapshot.memberId, 'payment_profile', 'blocked', 'Falta una ruta de pago interna activa.'),
+    lane: lane(
+      snapshot.memberId,
+      'payment_profile',
+      'blocked',
+      hasDraftProfile || hasPendingApprovalProfile
+        ? 'La ruta de pago existe pero aun no esta activa.'
+        : 'Falta una ruta de pago interna activa.'
+    ),
     blockers,
     warnings
   }

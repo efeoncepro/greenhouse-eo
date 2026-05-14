@@ -229,7 +229,19 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
     }
   }
 
-  const showApprove = profile.status === 'pending_approval'
+  const showApprove = profile.status === 'pending_approval' || profile.status === 'draft'
+
+  const approvalActionLabel =
+    profile.status === 'draft' && !profile.requireApproval ? 'Activar perfil' : 'Aprobar perfil'
+
+  const approvalHelp =
+    profile.status === 'draft'
+      ? profile.requireApproval
+        ? 'Este perfil esta en borrador y requiere maker-checker: debe aprobarlo un checker distinto al creador para quedar activo.'
+        : 'Este perfil esta en borrador. Activalo para que Workforce Activation lo tome como ruta de pago valida.'
+      : profile.status === 'pending_approval'
+        ? 'Este perfil espera aprobacion maker-checker. El creador no puede aprobar su propio perfil.'
+        : null
 
   const showCancel =
     profile.status === 'draft' ||
@@ -447,6 +459,12 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Typography variant='body2'>{profile.cancelledReason}</Typography>
             </Alert>
           ) : null}
+
+          {approvalHelp ? (
+            <Alert severity='warning' icon={<i className='tabler-shield-check' aria-hidden='true' />} sx={{ mt: 2 }}>
+              {approvalHelp}
+            </Alert>
+          ) : null}
         </Box>
 
         {/* Actions */}
@@ -471,7 +489,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Stack direction='row' spacing={1} flexWrap='wrap'>
                 {showApprove ? (
                   <Button variant='contained' size='small' onClick={handleApprove} disabled={actionInFlight}>
-                    Aprobar
+                    {approvalActionLabel}
                   </Button>
                 ) : null}
                 {showCancel ? (
