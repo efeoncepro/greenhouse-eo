@@ -40,6 +40,7 @@ import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
+import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
   getIdentityGovernancePendingApprovalOverdueSignal
@@ -450,6 +451,7 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   workspaceProjection?: ReliabilitySignal[] | null
+  scimWorkforce?: ReliabilitySignal[] | null
 
   /**
    * ISSUE-075 hardening — Microsoft Graph webhook subscription health.
@@ -612,6 +614,8 @@ export const buildReliabilityOverview = (
     ...(sources.identityGovernance ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
+    // TASK-872 Slice 6 — SCIM Internal Collaborator + workforce intake signals (6).
+    ...(sources.scimWorkforce ?? []),
     // ISSUE-075 hardening — Microsoft Graph webhook subscription health.
     ...(sources.entraWebhookSubscriptionHealth ? [sources.entraWebhookSubscriptionHealth] : []),
     // TASK-827 Slice 8 — Client portal resolver failure rate (V1.0 scaffold).
@@ -940,6 +944,15 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-872 Slice 6 — SCIM + workforce intake signals (6 readers en paralelo).
+  // Cubre: users sin identity_profile / sin member / ineligibles in scope /
+  // member identity drift / members pending intake completion / allowlist-blocklist
+  // conflict. Roll up bajo moduleKey 'identity'.
+  const scimWorkforce =
+    preloadedSources.scimWorkforce !== undefined
+      ? preloadedSources.scimWorkforce
+      : await getScimWorkforceSignals().catch(() => null)
+
   // ISSUE-075 hardening — Microsoft Graph webhook subscription health. Single
   // reader; consulta `greenhouse_sync.integration_registry.metadata` para
   // detectar expiración del subscription. Degrada honestamente a `unknown`.
@@ -1104,6 +1117,7 @@ export const getReliabilityOverview = async (
     workforceRoleTitle,
     identityGovernance,
     workspaceProjection,
+    scimWorkforce,
     entraWebhookSubscriptionHealth,
     clientPortalResolverFailureRate,
     financeClientProfileUnlinked,
