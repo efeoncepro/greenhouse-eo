@@ -353,6 +353,31 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-890 Slice 4 — Workforce offboarding external provider close.
+  // Capability granular para cerrar offboarding cases en lane `external_payroll`
+  // (Deel/EOR/proveedor externo). Operador firma decision (Greenhouse no emite
+  // finiquito Chile — cierre vive en proveedor externo). Mismo matriz operador
+  // que `complete_intake`: HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN.
+  // Combinada con `hr.offboarding_case:approve|manage` (gate existente) cuando
+  // transition cruza el state machine. Reason >= 10 chars enforced en route.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : 'role'
+
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.offboarding.close_external_provider',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+  }
+
   // TASK-874 — Workforce Activation readiness.
   // Read access follows the same operator matrix as complete_intake because the
   // workspace exposes blockers without sensitive values. Override is deliberately

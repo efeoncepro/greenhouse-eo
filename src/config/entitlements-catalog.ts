@@ -1112,6 +1112,18 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-890 Slice 4 — capability granular para cerrar offboarding lane
+    // `external_payroll` (Deel/EOR/proveedor externo). Reason >= 10 chars
+    // requerido. Operador firma decision; cierre operativo vive en el
+    // proveedor externo (Greenhouse no emite finiquito Chile). Combinada
+    // con `hr.offboarding_case:approve|manage` cuando transition cruza el
+    // state machine. Spec: GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.
+    key: 'workforce.offboarding.close_external_provider',
+    module: 'workforce',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'identity.reconciliation.read',
     module: 'organization',
     actions: ['read'] as const,
