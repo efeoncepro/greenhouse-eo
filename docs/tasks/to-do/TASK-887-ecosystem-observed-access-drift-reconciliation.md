@@ -30,11 +30,12 @@ El usuario quiere que las plataformas puedan tener su propio provisioning si qui
 
 ## Goal
 
-- Crear ingestion de observed access snapshots por plataforma.
-- Resolver observed subjects contra `identity_profile` y bindings.
-- Detectar drift entre desired y observed.
-- Publicar reliability signals y admin queues para remediacion.
-- Mantener modo read-only/observed para plataformas aun no integradas full.
+- Crear ingestion de observed access snapshots por plataforma (inbound push o outbound pull).
+- Resolver observed subjects contra `identity_profile_source_links` (Postgres-first, patron TASK-877); fallback documentado a email solo si no hay link canonico.
+- Detectar los 7 drift types canonicos comparando desired vs observed.
+- Resolver severity via `resolveDriftSeverity(driftType, platformMode)` — NO hardcodear.
+- Publicar 7 reliability signals + admin queues para remediacion humana.
+- Mantener modo `read_only_observed` / `platform_managed_observed` para plataformas aun no integradas full.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -131,8 +132,19 @@ Reglas obligatorias:
 
 ### Slice 5 — Reliability + Admin Read
 
-- Signals `ecosystem.access.unauthorized_local_access`, `ecosystem.access.pending_provisioning`, `ecosystem.access.identity_unresolved`.
-- Admin read API para cola futura.
+Signals canonicos bajo subsystem nuevo `Ecosystem Access` (spec V1 §5.4, los que viven en este slice):
+
+- `ecosystem.access.pending_provisioning` — kind=drift, severity warning>24h / error>72h.
+- `ecosystem.access.pending_deprovisioning` — kind=drift, severity warning>24h / error>72h.
+- `ecosystem.access.unauthorized_local_access` — kind=drift, severity depende del platform mode (via `resolveDriftSeverity`).
+- `ecosystem.access.identity_unresolved` — kind=data_quality, severity error si count>0. Steady=0.
+- `ecosystem.access.snapshot_stale` — kind=lag, warning>48h / error>7d. Detecta sister platforms activas sin snapshot reciente.
+- `ecosystem.access.capability_deprecated_assignments` — kind=data_quality, warning>0. Detecta assignments activos con capability `deprecated_at IS NOT NULL` (movido desde TASK-885 a este slice).
+- `ecosystem.access.approval_overdue` — kind=drift, warning>7d / error>30d. Detecta assignments `pending_approval` sin resolucion.
+
+Los 2 signals restantes del subsystem (`provisioning_apply_lag`, `provisioning_dead_letter`) viven en TASK-888.
+
+Admin read API: `GET /api/admin/ecosystem/access/drift?status=open&platform=` con cursor pagination keyset on `(detected_at DESC, drift_id)`, gated por capability `ecosystem.access.drift.read`.
 
 ## Out of Scope
 
@@ -143,14 +155,53 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-Drift types minimos:
+Alineado con `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` §4.4.
 
-- `pending_provisioning`: desired active, observed missing.
-- `pending_deprovisioning`: desired revoked/suspended, observed active.
-- `unauthorized_local_access`: observed active, desired none.
-- `identity_unresolved`: observed subject no resoluble.
-- `scope_mismatch`: mismo subject/capability en scope incorrecto.
-- `capability_mismatch`: subject existe pero capability distinta.
+### Drift types canonicos (7, no 6)
+
+- `pending_provisioning` — desired active, observed missing.
+- `pending_deprovisioning` — desired revoked/suspended, observed active.
+- `unauthorized_local_access` — observed active, desired none.
+- `missing_identity_link` — observed subject sin `identity_profile_id` resoluble (era `identity_unresolved` en draft; renombrado por consistencia con spec V1).
+- `scope_mismatch` — mismo subject/capability en scope incorrecto.
+- `capability_mismatch` — subject existe pero capability distinta a la desired.
+- `platform_apply_failed` — provisioning command en `failed` o `dead_letter` (anclado a TASK-888). 7° tipo agregado por spec V1.
+
+### Drift severity NO es constante
+
+La severity depende del `provisioning_mode` del binding asociado. Helper canonico server-only `resolveDriftSeverity(driftType, platformMode) → 'info' | 'warning' | 'error'`. Matriz canonica (spec V1 §4.4):
+
+| Drift type | greenhouse_managed | hybrid_approval | platform_managed_observed | read_only_observed |
+| --- | --- | --- | --- | --- |
+| `pending_provisioning` | error | warning | warning | info |
+| `pending_deprovisioning` | error | warning | warning | info |
+| `unauthorized_local_access` | error | warning | info | info |
+| `missing_identity_link` | error | error | error | error |
+| `scope_mismatch` | error | warning | warning | info |
+| `capability_mismatch` | error | warning | warning | info |
+| `platform_apply_failed` | error | error | error | N/A |
+
+**Regla dura**: consumers NUNCA hardcodean severity inline. Toda lectura pasa por `resolveDriftSeverity`.
+
+### Tabla drift
+
+`greenhouse_core.ecosystem_access_drift`:
+
+- `drift_id` uuid PK
+- `drift_type` text — CHECK enum 7 valores
+- `assignment_id` uuid FK nullable — null para `unauthorized_local_access` o `missing_identity_link`
+- `observed_row_id` uuid FK nullable — null para `pending_provisioning`
+- `platform_key` text NOT NULL
+- `binding_id` uuid FK — anchors severity resolution
+- `severity` text — resuelto al crear via `resolveDriftSeverity`
+- `status` text — `open | acknowledged | resolved | dismissed`
+- `detected_at` timestamptz
+- `resolved_at` timestamptz nullable
+- `resolution_action` text nullable
+
+### Auto-resolve
+
+Si en un snapshot posterior `desired` y `observed` convergen, drift se mueve a `status='resolved'` automaticamente. **No auto-revoke ni auto-grant en V1**; solo close del drift.
 
 ## Rollout Plan & Risk Matrix
 

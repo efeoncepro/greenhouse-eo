@@ -132,10 +132,11 @@ Reglas obligatorias:
 - Admin read APIs para UI futura.
 - Ecosystem read API redacted para consumers.
 
-### Slice 5 — Docs & Signals
+### Slice 5 — Docs & Lint Rule
 
-- Documentar registry en arquitectura.
-- Agregar reliability signal de drift catalogo si aplica.
+- Documentar registry en arquitectura (delta a `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` si el shape difiere).
+- Crear lint rule `greenhouse/no-ecosystem-namespace-in-internal-catalog` modo `error` que bloquea entries `kortex.*`/`verk.*`/`public_website.*` en `ENTITLEMENT_CAPABILITY_CATALOG` interno.
+- NO crear signal `capability_drift` en este slice — vive en TASK-887 una vez existan assignments contra los cuales medir capability deprecated.
 
 ## Out of Scope
 
@@ -146,21 +147,65 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-Tablas sugeridas, sujetas a Discovery:
+Tablas canonicas alineadas con `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` §3.4:
 
-- `greenhouse_core.ecosystem_platforms`
-- `greenhouse_core.ecosystem_platform_capabilities`
+### `greenhouse_core.ecosystem_platforms`
 
-Seed inicial sugerido:
+Columnas criticas:
 
-- `kortex.crm_intelligence.read`
-- `kortex.crm_strategy.run`
-- `kortex.hubspot_installation.manage`
-- `kortex.operator_console.access`
-- `verk.workspace.access`
-- `verk.project.manage`
-- `public_website.cms.publish`
-- `public_website.cms.review`
+- `platform_key` text PK — slug estable (`greenhouse`, `kortex`, `verk`, `public_website`)
+- `display_name` text
+- `status` text — lifecycle `draft | active | suspended | deprecated`
+- `default_provisioning_mode` text — `greenhouse_managed | hybrid_approval | platform_managed_observed | read_only_observed`
+- `owner_label` text
+- `homepage_url`, `admin_url` text nullable
+- `metadata_json` jsonb
+- timestamps `activated_at`, `suspended_at`, `deprecated_at`, `created_at`, `updated_at`
+
+CHECK constraint sobre `status` y `default_provisioning_mode` enumerados.
+
+### `greenhouse_core.ecosystem_platform_capabilities`
+
+Columnas criticas:
+
+- `capability_key` text PK — formato `<platform>.<area>.<action>` (e.g. `kortex.crm_intelligence.read`)
+- `platform_key` text FK to `ecosystem_platforms`
+- `display_label` text
+- `description` text
+- `allowed_subject_types` text[] NOT NULL — subset de `internal_collaborator | client_user | service_account | external_partner`
+- `allowed_scope_types` text[] NOT NULL — subset de `internal | organization | client | space | platform_workspace | platform_installation`
+- `allowed_actions` text[] NOT NULL — acciones permitidas (`read | manage | publish | run | ...`)
+- `requires_approval` boolean NOT NULL DEFAULT false — sensitive grants exigen segunda firma en TASK-886
+- `metadata_json` jsonb
+- `deprecated_at` timestamptz nullable
+- timestamps
+
+CHECK regex sobre `capability_key` `^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$` (3 niveles namespace).
+
+### Seed inicial canonico
+
+`requires_approval=true` para sensitive grants (alineado spec V1 §5.1):
+
+| capability_key | allowed_subject_types | allowed_scope_types | allowed_actions | requires_approval |
+| --- | --- | --- | --- | --- |
+| `kortex.crm_intelligence.read` | internal_collaborator, client_user | client, space, platform_installation | read | false |
+| `kortex.crm_strategy.run` | internal_collaborator | client, platform_installation | run | true |
+| `kortex.hubspot_installation.manage` | internal_collaborator | platform_installation | manage | true |
+| `kortex.operator_console.access` | internal_collaborator | internal | read, manage | false |
+| `verk.workspace.access` | internal_collaborator, client_user | internal, organization, client, space | read | false |
+| `verk.project.manage` | internal_collaborator | organization, client, space | manage | true |
+| `public_website.cms.publish` | internal_collaborator | internal | publish | true |
+| `public_website.cms.review` | internal_collaborator | internal | review | false |
+
+### Registries ortogonales — invariante critico
+
+`ecosystem_platform_capabilities` es **un registry separado** del `capabilities_registry` interno de Greenhouse. NUNCA se mezclan. Capabilities con prefix `kortex.*`, `verk.*`, `public_website.*` jamas entran al `ENTITLEMENT_CAPABILITY_CATALOG` interno.
+
+Lint rule canonica `greenhouse/no-ecosystem-namespace-in-internal-catalog` modo `error` debe nacer en este slice y bloquear cualquier intento de mezclar registries.
+
+### Out of scope movido a TASK-887
+
+El draft original mencionaba en Slice 5 un "reliability signal de drift catalogo". Esto se mueve a TASK-887 (donde ya existiran assignments contra los cuales medir capabilities deprecated). El signal canonico es `ecosystem.access.capability_deprecated_assignments` (kind=data_quality, severity=warning si count>0).
 
 ## Rollout Plan & Risk Matrix
 

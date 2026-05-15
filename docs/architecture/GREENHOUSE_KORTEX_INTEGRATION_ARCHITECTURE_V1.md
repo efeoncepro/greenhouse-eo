@@ -1,11 +1,11 @@
 # Greenhouse -> Kortex Integration Architecture V1
 
 > **Tipo de documento:** Anexo de arquitectura sobre sister-platform contract
-> **Version:** 1.0
+> **Version:** 1.0 (delta 2026-05-15 §16 capability catalog)
 > **Creado:** 2026-04-11
-> **Ultima actualizacion:** 2026-04-11
+> **Ultima actualizacion:** 2026-05-15 — TASK-884 agrega §16 capability catalog Kortex + modos por binding
 > **Contrato marco:** `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
-> **Docs relacionados:** `GREENHOUSE_REPO_ECOSYSTEM_V1.md`, `GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `TASK-039`
+> **Docs relacionados:** `GREENHOUSE_REPO_ECOSYSTEM_V1.md`, `GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md`, `TASK-039`
 
 ---
 
@@ -397,3 +397,47 @@ Greenhouse debe poder registrar:
 4. La primera integracion debe ser read-only.
 5. Todo bridge Kortex -> Greenhouse requiere tenancy binding explicito.
 6. El visual preset compartido no convierte a Kortex en extension del portal.
+
+---
+
+## 16. Delta 2026-05-15 — Capability catalog Kortex (TASK-884 + TASK-885)
+
+`GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` formaliza el carril `Write` del contrato marco §9.5 con un control plane explicito. Para Kortex, esto se materializa como:
+
+### 16.1 Capability catalog Kortex en el registry ecosistema
+
+Capabilities seedeadas en `greenhouse_core.ecosystem_platform_capabilities` por TASK-885. **Estas capabilities viven en el registry ecosistema, NO en el `capabilities_registry` interno de Greenhouse** (registries ortogonales — lint rule canonica bloquea la mezcla):
+
+| `capability_key` | `allowed_subject_types` | `allowed_scope_types` | `allowed_actions` | `requires_approval` |
+| --- | --- | --- | --- | --- |
+| `kortex.crm_intelligence.read` | internal_collaborator, client_user | client, space, platform_installation | read | false |
+| `kortex.crm_strategy.run` | internal_collaborator | client, platform_installation | run | true |
+| `kortex.hubspot_installation.manage` | internal_collaborator | platform_installation | manage | true |
+| `kortex.operator_console.access` | internal_collaborator | internal | read, manage | false |
+
+Capabilities `requires_approval=true` (`crm_strategy.run` y `hubspot_installation.manage`) exigen segunda firma de un EFEONCE_ADMIN distinto del grantor para activarse. Cualquier capability adicional debe agregarse al catalog con su shape declarativo + ADR si es write/mutacion.
+
+### 16.2 Modos por binding Kortex
+
+`sister_platform_bindings` para Kortex declara `provisioning_mode` per binding (NO per platform global). Recomendacion editorial:
+
+- `scope_type='internal'` → `greenhouse_managed` — operadores Efeonce no deberian crearse en Kortex fuera del control plane.
+- `scope_type='client'` o `'space'` → `hybrid_approval` — Kortex puede crear localmente users de clientes (e.g. troubleshooting); Greenhouse aprueba retroactivamente o pide revoke.
+- `scope_type='platform_installation'` (HubSpot portal) → `platform_managed_observed` o `hybrid_approval` segun caso.
+
+### 16.3 Action boundary write — sister platform → Greenhouse vs Greenhouse → Kortex
+
+- **Kortex → Greenhouse**: Kortex sigue siendo read-only contra Greenhouse (§9.3 del contrato marco se preserva).
+- **Greenhouse → Kortex (acceso de personas)**: pasa por el control plane V1 obligatoriamente. Greenhouse persiste `desired_state` + emite outbox event `ecosystem.access.provisioning_requested v1`; Kortex aplica localmente y POSTea ack a `/api/platform/ecosystem/access/provisioning-results`.
+- **Kortex → Greenhouse (observed state)**: Kortex envia snapshot diario incremental a `/api/platform/ecosystem/access/observed-state` para que Greenhouse detecte drift. Snapshot stale > 48h emite signal `ecosystem.access.snapshot_stale`.
+
+### 16.4 Pilot canonico
+
+TASK-889 Slice 5 configura **un binding sandbox Kortex** con `provisioning_mode='hybrid_approval'` para scope `internal`, y habilita el flag `provisioning_dispatch_enabled=true` solo para ese binding. Production rollout requiere validar los 10 smoke tests canonicos del spec V1 §15 antes de habilitar bindings adicionales.
+
+### 16.5 Documentos relacionados (delta)
+
+- `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` — spec V1 maestra del control plane.
+- TASK-885 — registry + catalog (incluye seed Kortex).
+- TASK-886..888 — desired/observed/applied state lifecycle.
+- TASK-889 Slice 5 — Kortex pilot.

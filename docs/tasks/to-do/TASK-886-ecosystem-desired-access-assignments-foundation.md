@@ -124,13 +124,19 @@ Reglas obligatorias:
 
 ### Slice 3 — Audit + Outbox
 
-- Audit append-only.
-- Eventos versionados `ecosystem.access.assignment.{granted,revoked,suspended,approved}`.
+- Audit log `ecosystem_access_audit_log` append-only con triggers anti-UPDATE/DELETE.
+- Eventos versionados v1 (6 nuevos): `granted`, `revoked`, `suspended`, `resumed`, `approved`, `rejected`. Registrar en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`.
 
 ### Slice 4 — Admin API
 
-- Endpoints admin para crear/listar/revocar assignments.
-- Guard por capability Greenhouse interna, por ejemplo `ecosystem.access.assignment.manage`.
+- Endpoints admin para crear/listar/revocar/suspender/aprobar assignments.
+- Guards canonicos least-privilege (NO coarse `assignment.manage`):
+  - `GET /api/admin/ecosystem/access/assignments` → `ecosystem.access.assignment.read`
+  - `POST /api/admin/ecosystem/access/assignments` → `ecosystem.access.assignment.grant`
+  - `PATCH /api/admin/ecosystem/access/assignments/[id]` (suspend/resume) → `ecosystem.access.assignment.suspend`
+  - `DELETE /api/admin/ecosystem/access/assignments/[id]` (revoke) → `ecosystem.access.assignment.revoke`
+  - `POST /api/admin/ecosystem/access/assignments/[id]/approve` → `ecosystem.access.assignment.approve` (actor distinto al grantor)
+- Idempotency: POST con misma `idempotencyKey` retorna 200 `already_active=true`, no 409.
 
 ### Slice 5 — Tests + Docs
 
@@ -146,22 +152,86 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-Assignment shape minimo:
+Tabla canonica `greenhouse_core.ecosystem_access_assignments` alineada con `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` §3.4.
+
+### Assignment shape completo
 
 ```ts
 type EcosystemAccessAssignment = {
-  identityProfileId: string
-  userId: string | null
-  memberId: string | null
-  platformKey: string
-  capabilityKey: string
-  action: string
+  assignmentId: string                                         // uuid PK
+  identityProfileId: string                                    // FK identity_profiles — NOT NULL para subjects humanos
+  subjectType: 'internal_collaborator' | 'client_user' | 'service_account' | 'external_partner'
+  memberId: string | null                                      // NOT NULL si subjectType=internal_collaborator
+  userId: string | null                                        // NOT NULL si subjectType=client_user
+  platformKey: string                                          // FK ecosystem_platforms (TASK-885)
+  capabilityKey: string                                        // FK ecosystem_platform_capabilities (TASK-885)
+  action: string                                               // debe pertenecer a capability.allowed_actions
   scopeType: 'internal' | 'organization' | 'client' | 'space' | 'platform_workspace' | 'platform_installation'
-  scopeId: string | null
+  scopeId: string | null                                       // null cuando scopeType=internal; en otro caso resuelve a binding
+  bindingId: string                                            // FK sister_platform_bindings — NOT NULL, anchors scope resolution
   desiredStatus: 'active' | 'suspended' | 'revoked'
   approvalStatus: 'approved' | 'pending_approval' | 'rejected'
+  grantedByUserId: string                                      // FK client_users — actor que crea
+  approvedByUserId: string | null                              // FK client_users — segunda firma (DEBE diferir de grantedByUserId)
+  reason: string                                               // CHECK length >= 10 chars
+  effectiveFrom: string                                        // timestamptz NOT NULL DEFAULT NOW()
+  effectiveTo: string | null                                   // null = sin expiracion
+  idempotencyKey: string                                       // SHA256 de subjectKey+platform+capability+scope+action — UNIQUE
+  metadataJson: Record<string, unknown>
+  createdAt: string
+  updatedAt: string
 }
 ```
+
+### Constraints obligatorios
+
+- CHECK sobre `subject_type`, `desired_status`, `approval_status`, `scope_type` enumerados.
+- CHECK `length(reason) >= 10`.
+- CHECK `approved_by_user_id IS NULL OR approved_by_user_id <> granted_by_user_id` — segunda firma exige actor distinto.
+- FK obligatorias: `identity_profiles`, `members` (cuando aplica), `client_users` (cuando aplica), `ecosystem_platforms`, `ecosystem_platform_capabilities`, `sister_platform_bindings`.
+- UNIQUE PARTIAL INDEX active por `(identity_profile_id, platform_key, capability_key, action, scope_type, scope_id)` WHERE `desired_status='active' AND approval_status='approved'` — idempotency + bloquea duplicate active grants.
+
+### Trigger anti-zombie
+
+`ecosystem_access_assignments_anti_zombie_trigger` BEFORE INSERT OR UPDATE: si `desired_status='active'` y `effective_to IS NOT NULL AND effective_to < NOW()`, auto-flip a `suspended` y registrar en audit log.
+
+### Audit log `ecosystem_access_audit_log`
+
+Append-only con triggers anti-UPDATE/DELETE (patron TASK-700/TASK-765). Columnas: `audit_id`, `assignment_id` FK, `action` (granted | revoked | suspended | resumed | approved | rejected), `actor_user_id`, `actor_label`, `before_json` jsonb, `after_json` jsonb, `reason`, `recorded_at`.
+
+### Outbox events canonicos (versionados v1)
+
+Alineados con spec V1 §5.3. Persistidos en la **misma tx** que la mutacion (patron TASK-771):
+
+- `ecosystem.access.assignment.granted v1`
+- `ecosystem.access.assignment.revoked v1`
+- `ecosystem.access.assignment.suspended v1`
+- `ecosystem.access.assignment.resumed v1` — al transicionar suspended → active
+- `ecosystem.access.assignment.approved v1` — al cerrar approval pending → active
+- `ecosystem.access.assignment.rejected v1` — al rechazar approval
+
+### Capabilities granulares least-privilege (5)
+
+Reemplaza la capability coarse `ecosystem.access.assignment.manage` del draft original con un set least-privilege alineado a spec V1 §3.5:
+
+| Capability | Action | Allowed audience |
+| --- | --- | --- |
+| `ecosystem.access.assignment.read` | read | route_group=admin / FINANCE_ADMIN / HR |
+| `ecosystem.access.assignment.grant` | create | EFEONCE_ADMIN / DEVOPS_OPERATOR / HR (scoped) |
+| `ecosystem.access.assignment.revoke` | delete | EFEONCE_ADMIN / HR |
+| `ecosystem.access.assignment.suspend` | update | EFEONCE_ADMIN / HR / DEVOPS_OPERATOR |
+| `ecosystem.access.assignment.approve` | approve | EFEONCE_ADMIN only (segunda firma) |
+
+Seedeadas en `greenhouse_core.capabilities_registry` + grants runtime en `src/lib/entitlements/runtime.ts` en el mismo PR (regla canonica TASK-873).
+
+### Helper canonico
+
+`grantEcosystemPlatformAccess(input)` en `src/lib/ecosystem-access/assignments.ts`:
+
+- Atomic tx PG: validar (subject vs capability.allowed_subject_types, scope vs capability.allowed_scope_types, action vs capability.allowed_actions, binding activo para el scope, capability no deprecated) → INSERT/UPDATE assignment → INSERT audit log → publish outbox event.
+- Acepta `client?: PoolClient` opcional para tx compartida (patron TASK-872).
+- Idempotente: si `idempotencyKey` ya existe activo, retorna `{ alreadyActive: true }` sin segunda INSERT.
+- Sensitive grants (`capability.requires_approval=true`) nacen con `approval_status='pending_approval'`; el helper rechaza intentos de set `approved` sin pasar por `approveEcosystemPlatformAccess` (segunda firma).
 
 ## Rollout Plan & Risk Matrix
 

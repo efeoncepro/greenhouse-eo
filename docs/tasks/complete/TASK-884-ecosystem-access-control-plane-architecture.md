@@ -6,19 +6,35 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `policy`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Spec V1 aprobada y mergeada — desbloquea TASK-885..889`
 - Rank: `TBD`
 - Domain: `platform|identity`
 - Blocked by: `none`
 - Branch: `task/TASK-884-ecosystem-access-control-plane-architecture`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-05-15 — Spec V1 entregada
+
+- Spec canonica `docs/architecture/GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` creada via `arch-architect` (Greenhouse overlay).
+- Tres estados ortogonales declarados: `desired` (Greenhouse) / `observed` (sister platform snapshot) / `applied` (sister platform ack).
+- Cuatro platform modes por binding: `greenhouse_managed` / `hybrid_approval` / `platform_managed_observed` / `read_only_observed`.
+- Siete drift types canonicos (incluyendo `platform_apply_failed` que no estaba en el draft original).
+- Matriz de drift severity per platform mode declarada explicita.
+- 11 capabilities internas least-privilege para gobernar el control plane (vs `governance.manage` coarse del draft).
+- 14 outbox events v1 versionados (incluye `resumed` y `rejected` que no estaban).
+- 9 reliability signals bajo subsystem nuevo `Ecosystem Access`.
+- Defense in depth 7 capas (patron TASK-742).
+- 10 smoke tests canonicos para verificar end-to-end.
+- Pasada de revision aplicada a TASK-885..889 (correcciones quirurgicas, sin scope creep).
+
+Pendiente: aprobacion del usuario + actualizar `DECISIONS_INDEX.md` + opcionalmente delta a `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md` y `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md` cuando se ejecuten TASK-885..889.
 
 ## Summary
 

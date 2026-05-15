@@ -127,13 +127,16 @@ Reglas obligatorias:
 
 ### Slice 4 — Retry & Dead Letter
 
-- Retry policy acotada.
-- Signals `ecosystem.provisioning.dead_letter` y `ecosystem.provisioning.apply_lag`.
+- Retry policy exponencial acotada: 5 intentos con backoff `0 / +1m / +5m / +15m / +60m`. Despues `dead_letter` terminal (patron outbox publisher TASK-773).
+- Signals canonicos (naming alineado spec V1 §5.4):
+  - `ecosystem.access.provisioning_apply_lag` — kind=lag, warning>1h / error>4h. Commands en `queued`/`dispatching`.
+  - `ecosystem.access.provisioning_dead_letter` — kind=dead_letter, error si count>0. Steady=0.
 
 ### Slice 5 — Docs & Contract Tests
 
 - OpenAPI/API docs derivadas.
 - Contract tests para result payloads.
+- Documentar 5 outbox events nuevos en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`.
 
 ## Out of Scope
 
@@ -143,26 +146,57 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-Events sugeridos:
+Alineado con `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` §4.2 + §5.3 + §6.2.
 
-- `ecosystem.access.provisioning_requested`
-- `ecosystem.access.deprovisioning_requested`
-- `ecosystem.access.provisioning_applied`
-- `ecosystem.access.provisioning_failed`
-- `ecosystem.access.provisioning_dead_lettered`
+### Outbox events canonicos (versionados v1)
 
-Result payload minimo:
+- `ecosystem.access.provisioning_requested v1`
+- `ecosystem.access.deprovisioning_requested v1`
+- `ecosystem.access.provisioning_applied v1`
+- `ecosystem.access.provisioning_failed v1`
+- `ecosystem.access.provisioning_dead_lettered v1`
+
+Registrar en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`.
+
+### Hosting canonico — Cloud Scheduler + ops-worker (no Vercel cron)
+
+El dispatcher es **async_critical** segun la clasificacion `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md` (TASK-775). Por lo tanto:
+
+- Cloud Scheduler job `ops-ecosystem-provisioning-dispatch` cada 2 min, timezone `America/Santiago`.
+- Endpoint en ops-worker `POST /ecosystem-access/dispatch-batch` envuelto via `wrapCronHandler({ name, domain: 'ecosystem', run })`.
+- Logica pura en `src/lib/ecosystem-access/provisioning-dispatcher.ts` reusable desde Vercel route fallback + Cloud Run.
+- Snapshot canonico de `CLOUD_SCHEDULER_JOBS_FOR_VERCEL_CRONS` actualizado en AMBOS readers (`src/lib/reliability/queries/cron-staging-drift.ts` + `scripts/ci/vercel-cron-async-critical-gate.mjs`).
+
+NUNCA en Vercel cron — el async_critical CI gate (TASK-775) bloquea el commit.
+
+### Sister platform delivery — 2 carriles
+
+Sister platforms reciben commands por **uno** de estos carriles, declarados en el binding:
+
+1. **Webhook outbound**: sister platform configura `webhook_subscriptions` filtrando `event_type IN ('ecosystem.access.provisioning_requested', 'ecosystem.access.deprovisioning_requested')` + `platform_key=<own>`. Dispatcher canonico (`GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`) los entrega con HMAC-SHA256 + retries propios.
+2. **Polling**: sister platform llama `GET /api/platform/ecosystem/access/commands/pending` (sister_platform_consumers auth) — alternativa cuando no puede recibir webhooks (e.g. sitio publico CMS sin endpoint).
+
+Ambos carriles son idempotentes via `idempotencyKey` = SHA256(`assignment_id` + `command_kind` + `effective_from`).
+
+### Result payload canonico
 
 ```json
 {
   "commandId": "cmd_...",
   "platformKey": "kortex",
+  "idempotencyKey": "sha256:...",
   "status": "applied",
-  "platformUserId": "kortex_user_...",
+  "platformUserExternalId": "kortex_user_...",
   "appliedCapabilities": ["kortex.crm_intelligence.read"],
   "appliedAt": "2026-05-15T00:00:00.000Z"
 }
 ```
+
+POST a `/api/platform/ecosystem/access/provisioning-results` valida (a) consumer auth via `sister_platform_consumers`, (b) `commandId` existe + binding matches consumer scope, (c) `idempotencyKey` matches el persistido en `provisioning_commands` (anti-spoof). Result idempotente: misma POST 2 veces = 1 fila en `provisioning_command_results`.
+
+### Dispatch enabled flag
+
+`ecosystem_platforms.metadata_json -> 'provisioning_dispatch_enabled'` boolean por plataforma. Default `false`. Commands se persisten queued pero no se dispatchean hasta flag `true`. Patron compatible con cutover staged: TASK-889 Slice 5 habilita Kortex sandbox primero.
 
 ## Rollout Plan & Risk Matrix
 

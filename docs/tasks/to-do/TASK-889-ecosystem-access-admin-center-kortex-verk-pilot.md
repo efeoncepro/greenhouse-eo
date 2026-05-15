@@ -120,35 +120,48 @@ Reglas obligatorias:
 
 ### Slice 1 — Access Model + Route
 
-- View `administracion.ecosystem_access` o nombre definido por Discovery.
-- Capability `ecosystem.access.governance.manage`.
+- View `administracion.ecosystem_access` (alineado a spec V1 §7.1).
+- Page guard capability `ecosystem.access.governance.read` (view-level read; alineado spec V1 §3.5).
+- Las acciones especificas dentro de la pagina (asignar/revocar/suspender/aprobar/resolver drift) usan capabilities granulares ya seedeadas en TASK-886 + TASK-887 (NO `governance.manage` coarse del draft):
+  - `ecosystem.access.assignment.read | grant | revoke | suspend | approve`
+  - `ecosystem.access.drift.read | resolve`
+  - `ecosystem.access.platform.read | manage`
 - Route `/admin/ecosystem-access`.
 
 ### Slice 2 — Platform & Capability Browser
 
-- Lista de plataformas, status, mode y capabilities.
-- Link a bindings existentes.
+- Lista de plataformas, status, **provisioning_mode declarado por binding**, capabilities catalog.
+- Link a bindings existentes; UI muestra mode por binding (no por platform global — un binding puede ser `hybrid_approval` para scope `client` mientras otro del mismo platform es `greenhouse_managed` para scope `internal`).
 
 ### Slice 3 — Assignment Flow
 
 - Drawer para asignar colaborador/persona a plataforma.
-- Seleccion de cliente/organization/space cuando aplique.
-- Confirmacion con impacto y audit reason.
+- Seleccion de cliente/organization/space cuando aplique — resuelve binding canonico (TASK-376) automaticamente.
+- Confirmacion con impacto + audit reason (>=10 chars per CHECK constraint TASK-886).
+- UI affordances per platform mode del binding seleccionado (alineado spec V1 §7.1):
+  - `greenhouse_managed`: todas las acciones habilitadas.
+  - `hybrid_approval`: grant habilitado, queue approval si capability `requires_approval=true`.
+  - `platform_managed_observed`: solo desired state, sin push (UI muestra warning).
+  - `read_only_observed`: CTAs disabled con tooltip "Plataforma no acepta provisioning".
 
 ### Slice 4 — Drift Queue
 
-- Queue + inspector para `unauthorized_local_access`, `pending_provisioning`, `identity_unresolved`, etc.
-- Acciones aprobar/rechazar/revocar cuando APIs existan.
+- Queue + inspector para los **7 drift types canonicos** (alineado spec V1 §4.4): `pending_provisioning`, `pending_deprovisioning`, `unauthorized_local_access`, `missing_identity_link`, `scope_mismatch`, `capability_mismatch`, `platform_apply_failed`.
+- Severity per drift resuelto via `resolveDriftSeverity(driftType, platformMode)` — NUNCA hardcodear severity inline en componentes.
+- Acciones: `Aprobar acceso local` (materializa assignment retroactivo), `Rechazar acceso local` (queue revoke command), `Forzar reconciliacion` (refresh drift detector), `Reintentar dispatch` (re-enqueue failed command).
 
 ### Slice 5 — Kortex Pilot
 
-- Configurar Kortex sandbox/consumer con mode `hybrid_approval` o `platform_managed_observed`.
-- Probar assignment Greenhouse -> command -> observed/applied.
+- Configurar **un binding sandbox Kortex** con `provisioning_mode='hybrid_approval'` para scope `internal` (mode es per binding, NO per platform).
+- Habilitar flag `provisioning_dispatch_enabled=true` solo para este binding sandbox.
+- Probar end-to-end: assignment Greenhouse → command queued → dispatched → applied → observed snapshot confirma → drift queue clean.
+- Verificar 10 smoke tests canonicos del spec V1 §15.
 
 ### Slice 6 — Verk/Public Website Readiness
 
-- Registrar Verk/public website como plataformas listas para governance aunque no apliquen provisioning real aun.
-- Manual operativo.
+- Registrar Verk como platform con `default_provisioning_mode='read_only_observed'` (no provisioning real aun).
+- Registrar `public_website` con `default_provisioning_mode='platform_managed_observed'` (gestiona via admin propio, Greenhouse observa).
+- Manual operativo: `docs/manual-de-uso/plataforma/gobernar-accesos-ecosistema.md`.
 
 ## Out of Scope
 
