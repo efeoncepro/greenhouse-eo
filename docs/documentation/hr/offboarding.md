@@ -1,11 +1,13 @@
 # Offboarding Laboral y Contractual
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-890 Slice 7 — external_provider_close + drift signal)
+> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-891 Slice 6 — drift reconciliation write path)
 > **Documentacion tecnica:** [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
-> **ADR relacionado:** [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md)
+> **ADRs relacionados:**
+> - [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md) (TASK-890)
+> - [GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1.md](../../architecture/GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1.md) (TASK-891)
 
 ---
 
@@ -99,19 +101,30 @@ Capabilities requeridas (defense in depth dual-gate):
 - `workforce.offboarding.close_external_provider:update` (granular TASK-890) — solo HR / FINANCE_ADMIN / EFEONCE_ADMIN.
 - `hr.offboarding_case:approve|manage` (existente TASK-760) segun la transicion del state machine.
 
-## Drift contrato member ↔ relacion legal (TASK-890 Slice 6)
+## Drift contrato member ↔ relacion legal (TASK-890 Slice 6 + TASK-891)
 
 Un caso comun en colaboradores que pasan de empleado dependiente a contractor/Deel es que el member runtime declara `contract_type='contractor' / payroll_via='deel'` pero la relacion legal activa en `greenhouse_core.person_legal_entity_relationships` sigue como `relationship_type='employee'`.
 
-V1.0 ship solo un **read-only signal** `identity.relationship.member_contract_drift` (subsystem `Identity & Access`) que cuenta este drift. NO hay reconciliacion automatica — eso requeriria mutar Person 360 desde un read path, lo cual viola la regla canonical "NUNCA auto-mutar Person 360 desde un read path".
+**Detección (TASK-890 Slice 6)**: signal `identity.relationship.member_contract_drift` (subsystem `Identity & Access`) cuenta members en drift. Severity:
 
-Resolucion operativa V1.0: HR detecta el drift en `/admin/operations` (rollup `Identity & Access`) y reconcilia la relacion legal manualmente via Person 360. V1.1 (TASK-891 follow-up) ship un command auditado para el write path.
+- `ok` cuando count = 0 (steady state)
+- `warning` cuando count > 0 AND `oldestDriftAgeDays < 30` (drift reciente)
+- `error` cuando count > 0 AND `oldestDriftAgeDays >= 30` (drift sostenido, escala automaticamente post TASK-891 V1.0)
+
+**Resolución (TASK-891 V1.0, desde 2026-05-15)**: comando auditado `reconcileMemberContractDrift` accesible desde el form admin `/admin/identity/drift-reconciliation`. Cierra la relacion `employee` activa (`effective_to=NOW() + status='ended'`) y abre nueva relacion `contractor` (con subtype `contractor | honorarios` persistido en `metadata_json`) en una sola transaccion atomica. Emite outbox events `person_legal_entity_relationship.deactivated` + `person_legal_entity_relationship.created` con correlation forensic via `metadata_json.reconciliationContext` + marker append-only en `notes` de ambas filas.
+
+**Quién puede resolver**: solo `EFEONCE_ADMIN` (capability granular `person.legal_entity_relationships.reconcile_drift:update`). Delegación a HR queda V1.1 post 30d steady sin incidentes.
+
+**NUNCA auto-mutar**: V1.0 ship únicamente comando operator-initiated. Auto-reconciliation desde cron viola la regla canonical "NUNCA auto-mutar Person 360 desde un read path". Decisión V2 contingente con HR approval explícito y ADR nuevo.
+
+**Reversibilidad**: append-only audit. Una reconciliación errónea se revierte ejecutando una NUEVA reconciliación inversa que vuelve la relación a su estado anterior — el historial preserva ambos eventos.
 
 ## Acceso
 
 - Surface visible: view `equipo.offboarding` en `/hr/offboarding`.
 - Autorizacion fina: capability `hr.offboarding_case` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - Cierre con proveedor externo (TASK-890): capability granular `workforce.offboarding.close_external_provider` con accion `update`.
+- Reconciliacion drift Person 360 (TASK-891): capability granular `person.legal_entity_relationships.reconcile_drift` con accion `update`, scope `tenant`. V1.0 grant EFEONCE_ADMIN-only.
 - Finiquito: capability `hr.final_settlement` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - Documento de finiquito: capability `hr.final_settlement_document` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - La cola operacional `GET /api/hr/offboarding/work-queue` exige lectura de las tres capabilities anteriores y no crea capabilities nuevas.

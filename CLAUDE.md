@@ -3496,6 +3496,62 @@ Pattern fuente: `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` (TASK-872).
 
 **Spec canonica**: `docs/architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`. Task: `docs/tasks/in-progress/TASK-890-workforce-exit-payroll-eligibility-window.md`. Patrones fuente: TASK-571/766/774 (VIEW canonica + helper + signal + lint), TASK-742 (defense-in-depth), TASK-872 (feature flag gate), TASK-720 (TS-only declarative reader), TASK-672 (rich struct + thin predicate).
 
+### Person 360 Relationship Reconciliation invariants (TASK-891, desde 2026-05-15)
+
+Toda mutación de relaciones legales (`greenhouse_core.person_legal_entity_relationships`) que cierre una relación activa y abra una nueva en su lugar — el caso disparador es drift `member.contract_type='contractor' / payroll_via='deel'` con relación activa `'employee'` — **debe** pasar por el helper canónico `reconcileMemberContractDrift` (`src/lib/person-legal-entity-relationships/reconcile-drift.ts`). NUNCA SQL inline en consumers; NUNCA auto-mutar desde cron / read path.
+
+**Read API canónico**:
+
+- Helper canónico: `reconcileMemberContractDrift(input)` en `src/lib/person-legal-entity-relationships/reconcile-drift.ts`. Composes `endPersonLegalEntityRelationship` (TASK-337) + `createContractorLegalEntityRelationship` (TASK-337) envueltos en `withGreenhousePostgresTransaction` atomic. REUSE > CREATE.
+- Error class: `PersonRelationshipReconciliationError` con 8 codes canónicos (`reason_too_short`, `member_not_found`, `member_inactive`, `member_missing_identity_profile`, `no_active_employee_relationship`, `multiple_active_employee_relationships`, `invalid_contractor_subtype`, `invalid_external_close_date`). Es-CL safe para exponer en API boundary.
+- Route handler: `POST /api/admin/person/relationships/[memberId]/reconcile-drift`.
+- UI form: `/admin/identity/drift-reconciliation?memberId=<id>`. Reachable vía deep link desde signal alert.
+
+**Defense in depth dual-gate**:
+
+- DB: capability seed en `greenhouse_core.capabilities_registry` (migration `20260515150631235_task-891-...`).
+- App: `requireAdminTenantContext` (route_group=admin + role=EFEONCE_ADMIN) + `can(subject, 'person.legal_entity_relationships.reconcile_drift', 'update', 'tenant')`.
+- TS catalog: `src/config/entitlements-catalog.ts` con `module='people'` (alineado con TASK-784 `person.legal_profile.*`).
+- Runtime grant: `src/lib/entitlements/runtime.ts`. V1.0 grant **SOLO EFEONCE_ADMIN** (drift Person 360 cross-domain). Delegación a HR queda V1.1+.
+
+**Auto-escalation severity** del signal `identity.relationship.member_contract_drift`:
+
+- `count = 0` → `ok`
+- `count > 0 AND oldestDriftAgeDays < 30` → `warning` (reciente)
+- `count > 0 AND oldestDriftAgeDays >= 30` → `error` (sostenido, write path disponible)
+- `query falla` → `unknown`
+
+Threshold `SUSTAINED_DRIFT_THRESHOLD_DAYS = 30` (mismo bar TASK-848/849 production release stale_approval).
+
+**Outbox events**: NO crear `.reconciled` v1 nuevo. Reusar `.deactivated` + `.created` existentes con `metadata_json.reconciliationContext = { commandId: 'reconcile-member-contract-drift', supersededRelationshipId, supersededRelationshipType, reason, actorUserId, reconciledAt, externalCloseDate, contractorSubtype }` en la new row. Correlation forensic via `actor_user_id` idéntico + `created_at` mismo segundo + metadata.
+
+**Notes marker append-only** (forensic readable):
+
+- Legacy row (status='ended'): `[TASK-891 reconciled by actor=USER_ID on YYYY-MM-DD — superseded by new contractor relationship] <reason>`
+- New row (status='active'): `Reconciled from employee via TASK-891 (actor=USER_ID, YYYY-MM-DD) — reason: <reason>`
+
+**Reason length**: `>= 20 chars` (bar más alto que TASK-890 close_external_provider `>= 10` porque blast Person 360 es cross-domain — payroll readiness, payslips, reportes legales, ICO). Pattern fuente TASK-848 production release bypass.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** ejecutar `DELETE FROM person_legal_entity_relationships`. Solo supersede via `effective_to + status='ended'`. Append-only audit.
+- **NUNCA** escribir SQL inline en consumers que muten `person_legal_entity_relationships`. Toda mutación pasa por helpers canónicos del módulo (`endPersonLegalEntityRelationship`, `createContractorLegalEntityRelationship`, `reconcileMemberContractDrift`).
+- **NUNCA** auto-mutar Person 360 desde un read path / cron / cleanup automático. V1.0 es operator-initiated single-member. V2 (cron) requiere ADR nuevo + HR approval explícito.
+- **NUNCA** fabricar `relationship_type` fuera del enum del schema (`shareholder`, `founder`, `legal_representative`, `board_member`, `executive`, `employee`, `contractor`, `shareholder_current_account_holder`, `lender_to_entity`, `borrower_from_entity`). TASK-891 V1.0 solo soporta target `contractor` con subtype en `metadata_json.relationshipSubtype`.
+- **NUNCA** mutar a María Camila Hoyos como parte de TASK-891. Recovery espera staging synthetic fixture verde + HR approval explícito + ejecución vía dialog UI con reason ≥20 chars.
+- **NUNCA** emitir el evento `.reconciled` (no existe en V1.0). Reusar `.deactivated` + `.created` + metadata correlation.
+- **NUNCA** grant `person.legal_entity_relationships.reconcile_drift` a HR ni FINANCE_ADMIN en V1.0. Solo EFEONCE_ADMIN. Delegación = decisión V1.1.
+- **NUNCA** exponer `error.message` raw desde el route handler. Sanitiza via canonical error response con `code + actionable + evidence` + `captureWithDomain('identity', err, ...)`.
+- **NUNCA** invocar `Sentry.captureException()` directo en este path. Usar `captureWithDomain(err, 'identity', { tags: { source: 'person_relationship_reconcile_drift' } })`.
+- **SIEMPRE** envolver UPDATE legacy + INSERT new + outbox publish en `withGreenhousePostgresTransaction`. Si cualquier paso falla, rollback completo.
+- **SIEMPRE** validar `reason.trim().length >= 20` en client UI (button disabled) + server (canonical error). Defense in depth.
+- **SIEMPRE** persistir `metadata_json.reconciliationContext` en la new row para correlation forensic.
+- **SIEMPRE** append marker forensic a `notes` de ambas rows (legacy + new) con shape `[TASK-891 reconciled by actor=X on Y]`.
+- **SIEMPRE** que un consumer downstream necesite reaccionar a reconciliación, correlar via `actor_user_id + created_at` o leer `metadata_json.reconciliationContext` de la new row. Si emerge necesidad real de meta-evento, V1.1 considera `.reconciled v1`.
+- **SIEMPRE** auto-escalation severity respecta `SUSTAINED_DRIFT_THRESHOLD_DAYS = 30`. Si emerge necesidad de ajustar el threshold, hacerlo en `identity-relationship-member-contract-drift.ts` con tests anti-regresion + delta en doc canonical.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1.md`. Task: `docs/tasks/in-progress/TASK-891-person-relationship-drift-reconciliation-write-path.md`. Patrones fuente: TASK-337 (helpers reusados), TASK-877 (signal-then-command), TASK-890 (predecesor del signal), TASK-742 (defense-in-depth), TASK-839/TASK-873 (capability triple-layer canonical), TASK-848 (reason >=20 bar), TASK-672 (rich struct + thin predicate).
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

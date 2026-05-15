@@ -1,9 +1,9 @@
 # Offboarding
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-890 — cierre con proveedor externo auditado)
+> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-891 — reconciliacion drift Person 360 EFEONCE_ADMIN)
 > **Modulo:** HR / Workforce
 > **Ruta en portal:** `/hr/offboarding`
 > **Documentacion relacionada:** [Offboarding laboral y contractual](../../documentation/hr/offboarding.md), [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
@@ -94,6 +94,30 @@ Para cerrar el caso desde Greenhouse:
 Capabilities que necesitas: `workforce.offboarding.close_external_provider:update` (asignada a HR, FINANCE_ADMIN y EFEONCE_ADMIN). Si no la tienes, el boton aparece pero el POST devuelve 403.
 
 **Importante:** el cierre con proveedor en Greenhouse NO ejecuta nada en Deel/EOR. Es solo un registro auditable del lado Greenhouse para que la nomina interna proyectada deje de incluir al colaborador. El cierre legal del lado proveedor lo gestionas en su portal.
+
+## Reconciliar drift Person 360 (TASK-891, EFEONCE_ADMIN solo)
+
+Algunos colaboradores muestran inconsistencia entre lo que dice su member runtime (`contract_type='contractor' / payroll_via='deel'`) y la relación legal activa en Person 360 (`relationship_type='employee'`). Eso se llama **drift Person 360** y aparece como alerta en `/admin/operations` bajo el subsystem `Identity & Access`.
+
+Para resolverlo (solo si tienes rol EFEONCE_ADMIN):
+
+1. Desde `/admin/operations`, identifica el signal `identity.relationship.member_contract_drift` (severity `warning` si reciente, `error` si lleva >30 días sin reconciliar).
+2. Click en el CTA "Resolver drift" → navega a `/admin/identity/drift-reconciliation?memberId=<id>`.
+3. En el form:
+   - **memberId** viene pre-llenado y deshabilitado (no editable si llegaste por deep link).
+   - **Subtipo de la nueva relación**: elige `Contractor estándar` (default) o `Honorarios`. Define cómo se clasifica la nueva relación contractor.
+   - **Motivo** (obligatorio, mínimo 20 caracteres): explica por qué se reconcilia. Queda en el audit log de ambas relaciones — escribe contexto útil (ej. "Maria Hoyos transicionó a contractor via Deel — relación employee legacy cerrada per HR review 2026-05-14"), no solo "fix drift".
+   - **Fecha de cierre externa** (opcional): si el cierre legal ocurrió en una fecha pasada (ej. el proveedor externo emitió termination el día X), regístrala aquí. Default: hoy.
+4. Click **"Confirmar reconciliación"**. El sistema:
+   - Cierra la relación `employee` activa (`effective_to=NOW() + status='ended'`).
+   - Abre nueva relación `contractor` con el subtipo elegido.
+   - Ambos cambios en una sola transacción atómica.
+   - Emite outbox events `.deactivated` + `.created` con correlation forensic.
+   - Append marker `[TASK-891 reconciled by actor=X on Y]` en notes de ambas filas.
+
+**Reversibilidad**: la reconciliación no se deshace automáticamente, pero el historial Person 360 preserva ambos eventos. Si te equivocaste, ejecuta una NUEVA reconciliación inversa con el subtype correcto — ambos eventos quedan en el audit trail.
+
+**Quién más puede ejecutar**: V1.0 solo EFEONCE_ADMIN. Delegación a HR queda como follow-up V1.1 post 30 días sin incidentes operativos.
 
 ## Que no hacer
 
