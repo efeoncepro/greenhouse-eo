@@ -440,3 +440,44 @@ Si bump causa regresión live:
 ## Delta 2026-05-14
 
 Task creada como follow-on canonical de TASK-879 (research/pilot Notion Developer Platform). TASK-879 explora qué hacer con Workers/CLI/agents; TASK-880 entrega los primitives técnicos (cliente canonical + PAT auth + version bump) que cualquier topología futura necesita. Bundled con TASK-881 (Meeting Notes ingest) que es el primer consumer real de la nueva API version.
+
+### Delta 2026-05-14 (live PAT validation cierra Open Questions arquitectónicas)
+
+`ntn` 0.14.0 instalado + autenticado live por Codex contra workspace `Efeonce` (TASK-879 Slice 1 evidence) generó un primer PAT real en Greenhouse y validó hallazgos críticos para esta task:
+
+**Hallazgo 1 — PATs requieren shares explícitos per-resource (NO workspace-wide)**:
+
+`ntn api /v1/search` y `ntn api /v1/blocks/meeting_notes/query` devuelven `results: []` aunque el workspace tiene actividad activa. Razón confirmada: PATs solo ven recursos donde el bot fue **explícitamente compartido** (page-by-page o database-by-database). NO existe scope tipo "Read content workspace-wide" como sí ofrecen los Internal Integration Tokens legacy.
+
+Implicancia para la cascade design `operator_pat → workspace_pat → global_token`:
+
+- **Validada como NO over-engineering**: el cascade diseñado en Slice 1 es exactamente lo que el modelo Notion requiere. `operator_pat` cubre uso interactivo del admin (smoke tests, discovery, scoped admin work) donde el operador comparte selectivamente. `workspace_pat` cubre production sync que necesita ver "todo lo del workspace" (TASK-881 Meeting Notes cross-project ingest no funciona con un solo PAT operador).
+- **`workspace_pat` no es opcional**: para production cross-workspace sync (Meeting Notes de clientes Sky, etc.), necesitamos un PAT compartido del workspace con shares amplios, NO un PAT operador. El cascade ya lo modela como tier 2 (post operator_pat, pre global_token).
+- **`global_token` legacy = Internal Integration Token**: hoy `NOTION_TOKEN` (que el spec de TASK-880 trata como "global token fallback") es probablemente un Internal Integration Token, NO un PAT. Confirmar en Slice 0 audit. Si efectivamente es Integration Token, mantenerlo como tier 3 fallback es la decisión correcta — son auth contracts diferentes y debe documentarse explícitamente en el resolver.
+
+Cierra Open Question original: "¿Necesitamos `workspace_pat` (PAT compartido para una workspace, no atado a operador)?" → **SÍ, no opcional** para production sync use cases.
+
+**Hallazgo 2 — PATs tienen restricciones de operación documentadas**:
+
+Verificado live: `GET /v1/users` devuelve `403 restricted_resource: Personal access tokens cannot list users`. Implicancia para TASK-877 identity reconciliation: el path canonical via `notion-bq-sync` sibling (que usa Internal Integration Token con scope `Read content`) NO debe migrar a PATs. PATs son para uso operador/sync per-resource, NO para discovery global del workspace.
+
+**Hallazgo 3 — Notion-Version `2026-03-11` confirmado como latest soportado**:
+
+Toda spec extraída con `ntn api ... --spec` declara `notionVersion.enum: ["2026-03-11"]` como required. Eso confirma:
+- El bump objetivo `2022-06-28 → 2026-03-11` (Slice 4) es directo a la latest, no requiere version intermedia.
+- Cierra Open Question: "¿Bumpear directo a `2026-03-11` o a algo intermedio?" → **Directo, no hay intermedia válida**.
+
+**Hallazgo 4 — `include_transcript` query param en Markdown API es opt-in PII gate**:
+
+Inspección spec del endpoint `GET /v1/pages/{page_id}/markdown` reveló query param `include_transcript: boolean` (default `false`). Cuando `true`, embebe transcripts completos de meeting notes; cuando `false`, devuelve placeholder con URL. Este flag es load-bearing para TASK-881 PII safety strategy y debe estar disponible en `NotionApiClient.get()` como parameter explícito, no oculto en query string raw.
+
+**Hallazgo 5 — Workers gated por Workspace Admin (NO bloqueante para TASK-880)**:
+
+`ntn doctor` reporta `Workers enabled ! not enabled for this workspace`. Habilitar requiere intervención humana de un Workspace Admin de Efeonce. Esto NO bloquea TASK-880 (que no usa Workers), pero confirma que el cascade canonical NO debe asumir Workers como auth source — los Workers tienen su propio modelo de auth (gestionado por Notion). Si futura task incorpora Workers como path async, agregar un cuarto tier al resolver: `worker_runtime_auth → operator_pat → workspace_pat → global_token`.
+
+### Action items derivados (bundled al inicio de Slice 0)
+
+1. Slice 0 audit DEBE confirmar si `NOTION_TOKEN` global actual es Internal Integration Token o PAT (afecta documentación + tier 3 contract).
+2. Pre-Slice 2: definir si se crea un PAT "Greenhouse Production Sync (workspace_pat)" en Notion Developer Portal con shares amplios para cubrir production sync use cases. Coordinar con Workspace Admin Efeonce.
+3. Bot ID del primer PAT operador (Julio Reyes) ya capturado en TASK-879 evidence: `36139c2f-efe7-815f-b210-00275c518116`. Migrar como primera fila al ejecutar Slice 2 con `label='Notion CLI Julio Reyes (developer sandbox)'`, `scope='read'`, `verified_at=NOW()`.
+4. `NotionApiClient.get()` debe aceptar `include_transcript` como typed param (no query string libre) cuando el path matchea `/v1/pages/{page_id}/markdown`.

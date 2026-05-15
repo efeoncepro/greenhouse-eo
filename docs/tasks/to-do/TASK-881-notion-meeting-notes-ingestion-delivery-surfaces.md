@@ -529,3 +529,105 @@ Esta task NO modifica ICO formula — solo expone la VIEW.
 ## Delta 2026-05-14
 
 Task creada como follow-on de TASK-880 (Notion API modernization) y como primer consumer real del endpoint nuevo Meeting Notes (lanzado 11-may-2026). Coordina con TASK-879 (research/pilot) — si Workers terminan siendo path canonical, esta ingesta migra como V2.
+
+### Delta 2026-05-14 (live spec extraction adelanta Slice 0 + cierra Open Questions)
+
+`ntn` 0.14.0 instalado + autenticado live por Codex contra workspace `Efeonce` (TASK-879 Slice 1 evidence) permitió extraer el OpenAPI spec completo del endpoint `POST /v1/blocks/meeting_notes/query` vía `ntn api /v1/blocks/meeting_notes/query --spec`. Eso adelanta gran parte del trabajo de Slice 0 y modifica varios supuestos del schema PG diseñado en Slice 1.
+
+**Endpoint contract validado (200 response shape)**:
+
+```text
+{
+  "object": "list",
+  "results": [
+    {
+      "object": "block",
+      "id": "<uuid>",                                    // → notion_meeting_note_id
+      "type": "meeting_notes",
+      "created_time": "ISO-8601",                        // → notion_created_at
+      "last_edited_time": "ISO-8601",                    // → notion_last_edited_at
+      "created_by": { "id": "<uuid>", "object": "user" }, // PartialUserObject (NO email)
+      "last_edited_by": { "id": "<uuid>", "object": "user" },
+      "has_children": true,
+      "in_trash": false,                                  // → soft-delete signal (TASK-880 breaking change)
+      "meeting_notes": {
+        "title": [{ "type": "text", "text": {...}, ... }], // rich_text array, NO string plano
+        "calendar_event": {                              // ← evento agendado
+          "attendees": ["<userId>", "<userId>", ...],    // ⚠️ array de USER IDs, NO email/alias
+          "start_time": "ISO-8601",
+          "end_time": "ISO-8601"
+        },
+        "recording": {                                   // ← evento real grabado (puede diferir)
+          "start_time": "ISO-8601",
+          "end_time": "ISO-8601"
+        },
+        "children": {                                    // ⚠️ contenido SEPARADO en 3 sub-blocks
+          "summary_block_id": "<uuid>",                  // tab "AI summary"
+          "notes_block_id": "<uuid>",                    // tab "Notes"
+          "transcript_block_id": "<uuid>"                // tab "Transcript"
+        },
+        "status": "transcription_not_started"            // enum 5 valores ⚠️
+                | "transcription_paused"
+                | "transcription_in_progress"
+                | "summary_in_progress"
+                | "notes_ready"
+      }
+    }
+  ],
+  "has_more": boolean
+}
+```
+
+**Filter contract**: combinator (`and`/`or`) + property filters sobre `title` (string_contains), `attendees` (person_contains, is_not_empty), `created_time`, `created_by`, `last_edited_time`, `last_edited_by`. Soporta date range relative (last 7 days, etc.) o exact.
+
+**Sort contract**: array (multi-key) sobre las 6 properties + `direction: ascending|descending`.
+
+**Limit**: max 50 per request (no 100 como pensé). Pagination cursor-based.
+
+**Required header**: `Notion-Version: 2026-03-11` (única version aceptada). Confirma bloqueo por TASK-880 Slice 4.
+
+**Cambios al schema PG diseñado en Slice 1 (refinements)**:
+
+1. **`attendees_raw_json` simplificado**: en lugar de persistir el blob entero JSONB, podemos extraer al INSERT solo los user IDs (`text[]`) y poblarlos en una columna `attendee_notion_user_ids TEXT[]`. El `attendees_resolved_json` JSONB sigue siendo necesario para el output enriquecido del resolver.
+
+2. **`title` es rich_text array**: persistir como `title TEXT` requiere flatten (concatenar `plain_text` de cada item rich_text). Helper canonical sugerido en Slice 2: `flattenNotionRichText(items)`. Ya existe pattern análogo en TASK-877 reconciliation; reusar si emerge.
+
+3. **`status` enum 5 valores documentado en CHECK constraint**: agregar a Slice 1 migration `CHECK (notion_status IN ('transcription_not_started','transcription_paused','transcription_in_progress','summary_in_progress','notes_ready'))`. Filter en projection: solo materializar `notes_ready` para evitar persistir contenido incompleto que cambia minutos después.
+
+4. **Content NO viene inline — 3 fetch separados requeridos**: el shape original del schema asumía `summary_redacted` + `summary_full` poblados inline. La realidad: la query devuelve los 3 `*_block_id`, y para cargar el contenido hay que llamar `GET /v1/blocks/{summary_block_id}/markdown` (o `/v1/pages/{block_id}/markdown` que también acepta block IDs). Implicancia:
+   - Slice 2 `fetchMeetingNotesForSpace` devuelve metadata + 3 block IDs.
+   - Slice 2 NUEVO helper `fetchMeetingNoteContent(blockId, includeTranscript)` para on-demand fetch.
+   - PG persiste los 3 block IDs como columnas separadas: `summary_block_id`, `notes_block_id`, `transcript_block_id`.
+   - Strategy de qué cachear vs on-demand fetch:
+     - **Pre-fetch al ingest**: `summary_block_id` content (placeholder mode, sin transcript) → `summary_text` column (safe para listings UI).
+     - **On-demand cuando capability lo pida**: full transcript via `transcript_block_id` con `include_transcript=true`. NO se persiste en PG by default — se fetchea al moment del reveal endpoint y se loggea audit.
+   - Esto cierra Open Question original: "¿Retención: cuánto tiempo guardamos `summary_full` en PG?" → **No persistimos transcript completo by default**; fetch on-demand vía Markdown API + audit log.
+
+5. **`recording` vs `calendar_event` timestamps son distintos** y ambos vale persistir:
+   - `meeting_scheduled_start_at` / `meeting_scheduled_end_at` (calendar_event — agendada)
+   - `meeting_recorded_start_at` / `meeting_recorded_end_at` (recording — real)
+   - Permite analytics tipo "% reuniones que empezaron tarde" o "duración real vs agendada" sin re-fetch upstream.
+
+6. **`in_trash` boolean** del shape canonical (post breaking change `archived → in_trash`): mapear directo a `deleted_in_notion_at` (NULL si false, NOW() si true al ingest).
+
+**Cierre de Open Questions originales por evidencia live**:
+
+- ✅ "¿El endpoint funciona bajo integration token global o requiere PAT scoped?" → Funciona con AMBOS (probado con PAT). Pero **PATs requieren shares explícitos** (TASK-880 Delta hallazgo 1) — para production cross-workspace sync, necesitamos `workspace_pat` o Internal Integration Token con Read content amplio. NO un PAT operador.
+- ✅ "¿Notion AI Meeting Notes está disponible en el plan actual del workspace Efeonce?" → Endpoint reachable y respondió 200 OK con `results: []` (zero notes shared con el bot CLI). Eso prueba acceso al endpoint; si efectivamente hay meeting notes en el workspace pero no shared con el PAT, esa es la limitación del PAT, NO del plan. Verificar plan tier es follow-up.
+- ✅ "¿attendees viene con `notion_user_id`, `email`, o solo `display_name`?" → **Solo `notion_user_id`** (PartialUserObject). El attendee resolver NO necesita branching email path en V1 — directo cascade `notion_user_id → members.notion_user_id → member_id`. Si miss, fallback a `GET /v1/users/{userId}` para enriquecer (con caveat: PAT no puede listar users, pero SÍ puede retrieve user individual — confirmar en Slice 2 con test live).
+
+**Open Questions nuevas que emergen**:
+
+- ¿`fetchMeetingNoteContent` debe correr inline en la projection (Slice 3) para poblar `summary_text` o async como step downstream? Default propuesto: inline, porque summary sin transcript es ligero (~5KB típico). Transcript completo ES on-demand always.
+- ¿Persistimos `key_decisions_json` y `action_items_json` que el spec menciona como features de Notion AI? El spec del endpoint NO los expone directamente — viven dentro del bloque `notes_block_id` content. Si Notion los expone como structured fields en el futuro, agregar columnas; por ahora se infieren del markdown.
+- ¿Caching del summary_text es safe ante regeneración de Notion AI? `last_edited_time` debería detectar cambios; si emerge edge case de "Notion regeneró summary sin updatear last_edited_time", agregar `payload_hash` check (ya está en el schema diseñado).
+
+### Action items derivados (para Slice 0 + Slice 1)
+
+1. **Slice 0** ya tiene 80% del audit doc cubierto por esta Delta — agregar solo el live test contra workspace de prueba (1 share manual del bot CLI a una page con meeting notes para validar response real con datos non-empty).
+2. **Slice 1 schema migration** debe incluir: 4 columnas adicionales (`attendee_notion_user_ids TEXT[]`, `meeting_recorded_start_at`, `meeting_recorded_end_at`, `notion_status TEXT`) y reemplazar `summary_full` por `summary_text` (placeholder-mode, fetched inline) + las 3 columnas `*_block_id` para fetch on-demand.
+3. **Slice 2 fetcher** debe exponer 2 funciones separadas: `fetchMeetingNotesForSpace` (lista metadata) + `fetchMeetingNoteContent({blockId, includeTranscript})` (markdown fetch).
+4. **Slice 2 attendee resolver** simplifica a single-cascade `notion_user_id → members`. Test: PAT-fetch de user individual funciona aunque list users falle (verificar en Slice 0 audit live).
+5. **Slice 3 projection** filtra solo `status='notes_ready'` antes de UPSERT.
+6. **Slice 4 reveal endpoint** llama Markdown API con `include_transcript=true` SOLO post-capability check + audit row.
+7. **Reliability signal `attendees_unresolved`** mantiene su threshold (warning >30%) — el cascade simplificado debería tener resolution rate más alto que el original con email path.

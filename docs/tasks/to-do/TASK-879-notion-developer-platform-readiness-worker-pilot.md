@@ -309,7 +309,7 @@ No production feature flag in this task. Any pilot must be isolated by workspace
 - Verified top-level commands exposed by CLI: `api`, `datasources`, `files`, `pages`, `login`, `logout`, `completions`, `doctor`, `update`, `workers`.
 - Verified `ntn api` supports public API calls, endpoint listing, reduced OpenAPI fragments via `--spec`, official endpoint docs via `--docs`, auth via keychain or `NOTION_API_TOKEN`, and `NOTION_API_VERSION` override.
 - Verified `ntn workers` exposes `capabilities`, `create`, `delete`, `deploy`, `new`, `env`, `exec`, `get`, `oauth`, `list`, `runs`, `sync`, `usage`, `webhooks`, `tui`.
-- Remaining Slice 1 blockers: run `ntn login`, select/confirm Efeonce workspace, inspect workspace/plan access for Workers, and confirm sandbox DB permissions before any Worker pilot.
+- Remaining Slice 1 blockers after install-only validation: authenticate, select/confirm Efeonce workspace, inspect workspace/plan access for Workers, and confirm sandbox DB permissions before any Worker pilot.
 
 ### Slice 1 evidence — 2026-05-14 CLI auth
 
@@ -317,8 +317,109 @@ No production feature flag in this task. Any pilot must be isolated by workspace
 - Verified `ntn doctor`: default workspace resolved to `Efeonce` (`d1de7cb1-0325-4b73-a4d3-f266ae396f15`) and token is valid.
 - Verified read-only API auth with `ntn api /v1/users/me`; response identified the CLI bot for workspace `Efeonce` and the owner user.
 - Verified `ntn workers list` exits cleanly with no listed Workers.
-- Current blocker for Worker pilot: `ntn doctor` reports `Workers enabled` as warning/not enabled for this workspace, with hint to run a workers command interactively or ask a Workspace Admin.
-- Updated next step: confirm whether enabling Workers is acceptable for the Efeonce workspace, then run the smallest interactive Workers command in sandbox mode before any `workers new/deploy`.
+- Resolved blocker: workspace admin approved enabling Workers. `ntn workers create` was re-run interactively and accepted the `Enable Notion Workers?` prompt.
+- `ntn doctor` after enablement reports `Workers enabled: yes` and 6/6 checks passed.
+
+### Slice 1 evidence — 2026-05-14 PAT bot identity registry (first canonical PAT)
+
+Live `ntn api /v1/users/me` response capturó identidad completa del primer PAT registrado en Greenhouse. Documentado acá para tracking + audit + futura migración a `notion_personal_access_tokens` table (TASK-880 Slice 2):
+
+| Campo | Valor |
+|---|---|
+| Bot ID | `36139c2f-efe7-815f-b210-00275c518116` |
+| Bot name | `Notion CLI` |
+| Bot type | `bot` (PAT, owner.type=`user`) |
+| Owner user ID | `98be6859-4b84-4dee-a8f2-5546d770c44b` |
+| Owner email | `jreyes@efeoncepro.com` |
+| Owner name | `Julio Reyes` |
+| Workspace ID | `d1de7cb1-0325-4b73-a4d3-f266ae396f15` |
+| Workspace name | `Efeonce` |
+| Max upload size | 5,368,709,120 bytes (5 GB) |
+| Auth source | macOS keychain (default; `NOTION_KEYRING=0` para file-based) |
+| Token storage path (file mode) | `~/.config/notion/auth.json` |
+| Scope (verified live) | read-only PAT, scope per-resource via shares (sin shares activos al momento de registro) |
+| Restrictions verificadas | NO puede `GET /v1/users` (`403 restricted_resource: Personal access tokens cannot list users`) |
+
+Cuando TASK-880 Slice 2 cree la tabla `greenhouse_core.notion_personal_access_tokens`, este PAT debe ser la primera fila migrada con `label='Notion CLI Julio Reyes (developer sandbox)'`, `scope='read'`, `verified_at=NOW()` y `last_used_at` poblado desde el log del Slice 1.
+
+### Slice 1 evidence — 2026-05-14 Markdown API capability gem (`include_transcript`)
+
+Spec inspection reveló feature crítico para TASK-881 PII safety: el endpoint `GET /v1/pages/{page_id}/markdown` acepta query param `include_transcript: boolean` (default `false`). Cuando `true`, el response embebe el transcript completo de meeting notes. Cuando `false`, devuelve un placeholder con la URL de la meeting note original.
+
+Implicancia operativa:
+
+- Surfaces UI (project drawer, sprint timeline) deben llamar con `include_transcript=false` por default — solo embeben placeholder.
+- Endpoint reveal `GET /api/delivery/meeting-notes/[id]/full-summary` (TASK-881 Slice 4) detrás de capability `delivery.meeting_notes.read_summary_full` debe llamar con `include_transcript=true` y persistir audit row con quién + cuándo + razón ANTES de devolver el contenido.
+- Esto reemplaza la separación inicial pensada como `summary_redacted` vs `summary_full` columnas en PG — ahora podemos almacenar SOLO el placeholder + on-demand fetch del transcript completo cuando un caller autorizado lo pida. Reduce blast radius de PII at rest.
+
+### Slice 1 evidence — 2026-05-14 CLI and Developer Platform exploration
+
+Official docs reviewed:
+
+- `https://developers.notion.com/llms.txt`
+- `https://developers.notion.com/cli/get-started/overview`
+- `https://developers.notion.com/cli/guides/data-sources`
+- `https://developers.notion.com/workers/get-started/overview`
+- `https://developers.notion.com/workers/guides/syncs`
+- `https://developers.notion.com/workers/guides/tools`
+- `https://developers.notion.com/workers/guides/webhooks`
+- `https://developers.notion.com/guides/get-started/upgrade-guide-2026-03-11`
+- `https://developers.notion.com/guides/data-apis/working-with-views`
+- `https://developers.notion.com/reference/query-meeting-notes`
+
+CLI surface observed:
+
+- `ntn api ls` reports current OpenAPI endpoints for `meeting_notes`, `blocks`, `comments`, `custom_emojis`, `data_sources`, `databases`, `file_uploads`, `pages`, `search`, `users`, and `views`.
+- `ntn api --spec` works as a local contract inspector; endpoint specs report `Notion-Version: 2026-03-11` as the latest supported version.
+- `ntn api --docs` returns markdown docs inline from official Notion docs, useful for task execution without leaving terminal.
+- `ntn datasources` supports `resolve` and `query`; docs confirm a database can contain one or more data sources and `data_source_id` is now a distinct contract from `database_id`.
+- `ntn pages` supports markdown read/create/update/trash. This is relevant for future docs/manual automation, but write commands stay out of scope for this task.
+- `ntn files` supports create/get/list. `files list` produced no visible uploads for the current token.
+- `ntn workers` supports project scaffolding, deploy/create/delete/list/get, env var management, capability inspection, execution, runs/logs, sync state/status/trigger/pause/resume, usage and webhook URL listing.
+
+Read-only live checks against Efeonce:
+
+- `ntn api /v1/users/me` works and confirms the CLI bot/user context for Efeonce.
+- `ntn api /v1/users page_size==5` returns `403 restricted_resource`: personal access tokens cannot list users. Greenhouse identity reconciliation must not assume PAT can replace existing user discovery; keep internal integration token/server-side path for `users.list`.
+- `ntn api /v1/search -d '{"page_size":5}'` returns an empty list for the current token, suggesting no pages/data sources have been shared to this PAT yet.
+- `ntn api /v1/blocks/meeting_notes/query -d '{"limit":3}'` returns an empty list, but the endpoint is reachable. This supports TASK-881 as a real candidate once the correct workspace content/access is granted.
+- `ntn api /v1/custom_emojis` returns 3 workspace custom emojis; confirms read access beyond `/users/me`.
+- `ntn api /v1/views -X GET` without `database_id` or `data_source_id` returns validation error; views are discoverable only when scoped to a database or data source.
+
+Worker scaffold observed:
+
+- `ntn workers new /tmp/greenhouse-ntn-worker-sandbox --no-install --no-git` succeeds without remote deployment and without changing this repo.
+- The template is Node/TypeScript, requires Node `>=22.0.0` and npm `>=10.9.2`, and depends on `@notionhq/workers`.
+- Default `src/index.ts` registers a sample `worker.tool("sayHello")` using `@notionhq/workers/schema-builder`.
+- Template examples include `tool`, `sync`, `webhook`, `oauth` and `automation` patterns.
+- Sync examples use managed databases, primary keys, `replace` vs `incremental` modes, schedules (`manual`, `5m`, `1h`) and `pacer` rate limiting.
+- Webhook examples include signature verification with `WebhookVerificationError`; docs state Notion creates webhook URLs after deploy and logs are inspected with `ntn workers runs`.
+- No `workers.json` exists before deploy; worker ID/config is expected after deploy or when passing IDs explicitly.
+
+Platform implications for Greenhouse:
+
+- **TASK-880** should remain the first production-safe modernization: migrate our Notion API wrapper toward `2026-03-11`, handle `archived -> in_trash`, `after -> position`, and `transcription -> meeting_notes`, and consider `@notionhq/client` latest (`5.21.0` observed) after adapter design.
+- **TASK-881** is viable as a read-side consumer, but needs the right PAT/internal integration access to meeting notes. Current CLI PAT sees zero notes.
+- **TASK-877 / identity reconciliation** cannot use user-scoped PAT alone for workspace-wide user listing; keep or harden the internal integration/BQ/PG reconciliation path.
+- **TASK-736/737 ingestion** should not move to Workers yet. Workers are promising for managed Notion-facing syncs, but Efeonce Workers are not enabled and managed database semantics may not match our existing `notion_ops -> conformed -> ICO` ownership.
+- **TASK-577 write bridge** could later use Workers for specific Notion-native tool/webhook surfaces, but current evidence favors a hybrid: Cloud Run/portal remains canonical writer/orchestrator; Workers can be piloted for sandbox tools/webhooks or non-critical managed syncs.
+- **EPIC-005 agent/tool angle** is the most interesting near-term Worker use: custom Notion Agent tools that call Greenhouse read APIs, not critical data replication.
+
+### Slice 3 evidence — 2026-05-14 Worker enablement and sandbox tool deploy
+
+- Efeonce workspace Workers were enabled via CLI interactive admin prompt (`Enable Notion Workers? -> Enable`).
+- Created sandbox Worker `greenhouse-cli-readiness-sandbox`.
+- Worker ID: `019e2937-183d-7383-9159-83c29cb685ee`.
+- `ntn workers list --json` returns the sandbox Worker under workspace `d1de7cb1-0325-4b73-a4d3-f266ae396f15`.
+- The CLI created a local `workers.json` in the repo root during `workers create`; it contained only environment/workspace/worker IDs and was removed after testing to avoid committing workspace-local state.
+- Used `/tmp/greenhouse-ntn-worker-sandbox` scaffold from `ntn workers new --no-install --no-git`.
+- Installed sandbox dependencies in `/tmp`, ran `npm run check` successfully (`tsc --noEmit`).
+- Deployed only the default sample tool with `ntn workers deploy --local-build`; deploy returned `is_update: true`, one tool capability `sayHello`, no `database_links`, no `webhook_urls`.
+- Verified remote capability list: one tool capability `sayHello`, no sync/webhook capabilities.
+- Executed remote tool with `ntn workers exec sayHello --worker-id 019e2937-183d-7383-9159-83c29cb685ee -d '{"name":"Greenhouse"}'`; response: `"Hello, Greenhouse!"`.
+- Verified run history: `tool:sayHello` run completed with `exitCode: 0`; deploy capability save run also completed with `exitCode: 0`.
+- No production Notion pages, data sources, delivery DBs, `notion_ops`, `greenhouse_conformed`, ICO or payroll surfaces were touched.
+- Sandbox Worker intentionally remains in Notion for follow-up TASK-879 Worker tests. Delete command if cleanup is required: `ntn workers delete 019e2937-183d-7383-9159-83c29cb685ee`.
 
 ## Closing Protocol
 

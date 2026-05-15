@@ -4,6 +4,7 @@
 - **Que cambie**: nueva task `docs/tasks/to-do/TASK-879-notion-developer-platform-readiness-worker-pilot.md` para evaluar Notion Developer Platform 2026-05-13 (`ntn`, Workers, Worker syncs, agent tools, SDK/API modernization, External Agents alpha) con piloto sandbox y matriz Cloud Run vs Workers vs hibrido.
 - **Referencias ajustadas**: `TASK-736`, `TASK-737`, `TASK-738`, `TASK-739`, `TASK-577`, `EPIC-005`, `EPIC-009`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `changelog.md`.
 - **Decision operativa**: no migrar `notion-bq-sync`, write bridge, sync delivery/ICO/payroll ni writes productivos a Workers sin evidencia de `TASK-879`; External Agents API queda research-only por estar alpha.
+- **Actualizacion CLI/Workers**: `ntn` quedo instalado/autenticado contra Efeonce; Workers fueron habilitados via prompt admin; Worker sandbox `greenhouse-cli-readiness-sandbox` (`019e2937-183d-7383-9159-83c29cb685ee`) desplego tool sample `sayHello` y ejecuto OK. No hubo writes productivos. El `workers.json` local generado en raiz fue eliminado para no versionar estado local.
 - **Validacion**: `pnpm docs:context-check` OK (0 errors; warnings existentes por tamaño de `Handoff.md`), `git diff --check` OK.
 - **Pendiente sugerido**: ejecutar TASK-879 Slice 1-2 como discovery tecnico (`ntn` + inventario runtime) antes de tocar codigo productivo.
 
