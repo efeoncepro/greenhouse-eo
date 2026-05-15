@@ -102,6 +102,8 @@ Agregar capacidad de escritura a Notion al servicio absorbido en `services/hubsp
 
 Slice preliminar: **bootstrap de la integration Notion dedicada** (`Greenhouse Commercial-Delivery Orchestrator`, read+write scope, grant per-DB, secretos `notion-orchestrator-token-{staging,prod}` en Secret Manager, runbook en `scripts/bootstrap-notion-orchestrator-integration.md`).
 
+Delta 2026-05-14: antes de implementar este bridge como Cloud Run/Python definitivo, `TASK-879` debe decidir si Notion Developer Platform Workers cubren parte de writes, webhooks o agent tools. EPIC-005 sigue requiriendo write capability, pero el runtime puede terminar siendo Cloud Run, Worker o mixto.
+
 Decisión en Discovery: ¿renombrar el servicio a `commercial_delivery_bridge` dado que el scope ya no es solo HubSpot? Inclinación: **sí** — el nombre actual engaña. Sujeto a verificar que no rompa references.
 
 Effort: Medio.

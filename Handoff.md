@@ -1,3 +1,12 @@
+# Sesion 2026-05-14 — TASK-879 Notion Developer Platform Readiness creada
+
+- **Contexto**: el usuario pidio primero crear `TASK-879` y ajustar referencias en las tasks Notion relacionadas antes de avanzar con implementacion.
+- **Que cambie**: nueva task `docs/tasks/to-do/TASK-879-notion-developer-platform-readiness-worker-pilot.md` para evaluar Notion Developer Platform 2026-05-13 (`ntn`, Workers, Worker syncs, agent tools, SDK/API modernization, External Agents alpha) con piloto sandbox y matriz Cloud Run vs Workers vs hibrido.
+- **Referencias ajustadas**: `TASK-736`, `TASK-737`, `TASK-738`, `TASK-739`, `TASK-577`, `EPIC-005`, `EPIC-009`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `changelog.md`.
+- **Decision operativa**: no migrar `notion-bq-sync`, write bridge, sync delivery/ICO/payroll ni writes productivos a Workers sin evidencia de `TASK-879`; External Agents API queda research-only por estar alpha.
+- **Validacion**: `pnpm docs:context-check` OK (0 errors; warnings existentes por tamaño de `Handoff.md`), `git diff --check` OK.
+- **Pendiente sugerido**: ejecutar TASK-879 Slice 1-2 como discovery tecnico (`ntn` + inventario runtime) antes de tocar codigo productivo.
+
 # Sesion 2026-05-14 — 🎉 PRODUCTION RELEASE SUCCESS develop → main (40 commits, TASK-872/873/874/875/876/877/878 bundle)
 
 - **Release manifest**: `f945daa17b6d-b0067297-b20f-470d-a78b-664dae0882f2` (state=`released`).

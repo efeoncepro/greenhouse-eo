@@ -13,7 +13,7 @@
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `integrations / delivery`
-- Blocked by: `TASK-574` recomendado (servicio absorbido en monorepo); puede arrancar en paralelo si se aceptan 2 cortes de refactor
+- Blocked by: `TASK-574` recomendado (servicio absorbido en monorepo) y `TASK-879` como decision gate Worker-vs-Cloud Run; puede arrancar en paralelo solo en discovery si se aceptan 2 cortes de refactor
 - Branch: `task/TASK-577-notion-write-bridge`
 - Legacy ID: `—`
 - GitHub Issue: `—`
@@ -21,6 +21,8 @@
 ## Summary
 
 Agregar capacidad de escritura a Notion al servicio Python absorbido (`services/hubspot_greenhouse_integration/` post TASK-574) con 8 endpoints HTTP + bootstrap de una **integration Notion dedicada** (`Greenhouse Commercial-Delivery Orchestrator`). Primer milestone de EPIC-005: sin este bridge, ni forward ni reverse orchestrator pueden proyectar a Notion. Diseñado como extensión del patrón existente (Flask + gunicorn + Secret Manager + `x-greenhouse-integration-key` auth), no como servicio nuevo.
+
+Delta 2026-05-14: este diseño predate el lanzamiento de Notion Developer Platform. Antes de implementar el bridge como Cloud Run/Python definitivo, `TASK-879` debe decidir si algunos writes, webhooks o agent tools convienen más como Notion Workers, o si el bridge debe quedar híbrido.
 
 ## Why This Task Exists
 
@@ -34,6 +36,7 @@ EPIC-005 convierte a Greenhouse en orquestador canónico Commercial↔Delivery. 
 - Runbook scriptado `scripts/bootstrap-notion-orchestrator-integration.md` para que cualquier operador pueda rehacer el setup.
 - `notion-bigquery` integration queda intacta — no comparte token ni scope.
 - Tests unitarios + integration de los 8 endpoints con signature regression + idempotency.
+- Decision documentada de `TASK-879` sobre si el runtime de writes vive en Cloud Run, Notion Workers o una arquitectura mixta.
 
 ## Architecture Alignment
 
@@ -41,6 +44,7 @@ EPIC-005 convierte a Greenhouse en orquestador canónico Commercial↔Delivery. 
 - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (nuevo módulo del bridge)
 - `docs/epics/to-do/EPIC-005-greenhouse-commercial-delivery-orchestrator.md` (contexto)
 - `docs/tasks/to-do/TASK-574-absorb-hubspot-greenhouse-integration-service.md` (dependency natural)
+- `docs/tasks/to-do/TASK-879-notion-developer-platform-readiness-worker-pilot.md` (decision gate Notion Workers / CLI / SDK)
 
 Reglas obligatorias:
 
@@ -55,6 +59,7 @@ Reglas obligatorias:
 
 - `docs/epics/to-do/EPIC-005-greenhouse-commercial-delivery-orchestrator.md`
 - `services/hubspot_greenhouse_integration/` post TASK-574 (referencia de patrón)
+- Notion Developer Platform docs para Workers, CLI `ntn`, webhooks y agent tools (via `TASK-879`)
 - Notion API docs: https://developers.notion.com/reference
 
 ## Dependencies & Impact
@@ -62,6 +67,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-574` cerrada (código del servicio en monorepo). Si no cerró, hay que duplicar el porting.
+- `TASK-879` cerrada o con decision explícita de no usar Workers para writes V1.
 - Admin access al workspace Notion Efeonce para crear la integration + grant per-DB.
 - Admin access GCP `efeonce-group` para crear los 2 secretos en Secret Manager.
 - Notion API token de la integration nueva (no la existente de `notion-bigquery`).
@@ -69,6 +75,7 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - Bloquea TASK-579 (Forward Orchestrator), TASK-580 (Reverse Orchestrator), TASK-582 (Admin Surface). Todas usan estas rutas.
+- Informa la parte EPIC-005 que podria moverse a Workers si `TASK-879` lo valida.
 - NO rompe nada existente — es puramente aditivo al servicio absorbido.
 
 ### Files owned
@@ -100,6 +107,7 @@ Reglas obligatorias:
 - No hay `notion_client.py` ni en el servicio ni en otro módulo.
 - No hay runbook para crear la integration + grant per-DB + secretos.
 - `config.py` del servicio no lee env vars Notion.
+- No existe decision vigente sobre usar Notion Workers para writes/webhooks; `TASK-879` debe resolver esto antes de shippear rutas definitivas.
 
 ## Scope
 
@@ -119,6 +127,7 @@ Reglas obligatorias:
 - Si el número es bajo (< 20) y reemplazable con sed + manual checks → renombrar servicio a `commercial_delivery_bridge` + actualizar el Cloud Run service name.
 - Si es alto o hay external references (env vars de Vercel apuntando al path) → dejar el nombre viejo, documentar el gap en `Handoff.md` como follow-up.
 - Decisión y razón queda registrada en el PR de esta task.
+- Antes de fijar el rename, consumir `TASK-879`: si el bridge queda híbrido con Workers, el nombre/ownership debe reflejar ambos runtimes.
 
 ### Slice 3 — `notion_client.py`
 
@@ -165,6 +174,7 @@ Todas las rutas respetan auth existente (`Authorization: Bearer` + `x-greenhouse
 - Crear las DBs Notion Companies / Contacts. Eso vive en TASK-580 Discovery + slice de bootstrap.
 - Reemplazar `notion-bigquery` ingestion. Sigue intacta, lifecycle independiente.
 - Admin UI para rotación de token. Rotación manual via runbook por ahora.
+- Migrar writes production a Notion Workers sin decision/rollback de `TASK-879` o follow-up dedicado.
 
 ## Detailed Spec
 
@@ -205,6 +215,7 @@ Códigos: `NOTION_AUTH` (401), `NOTION_NOT_FOUND` (404), `NOTION_RATE_LIMIT` (42
 
 - [ ] Integration Notion dedicada existe en workspace Efeonce con nombre `Greenhouse Commercial-Delivery Orchestrator`.
 - [ ] Grant per-DB explícito (Tareas + Proyectos mínimo; Companies/Contacts si TASK-580 bootstrap las creó).
+- [ ] Decision `TASK-879` incorporada: Cloud Run, Workers o híbrido, con rationale.
 - [ ] Secretos `notion-orchestrator-token-staging` y `notion-orchestrator-token-prod` live en Secret Manager.
 - [ ] `notion-bigquery` integration sigue intacta (no comparte token).
 - [ ] `services/hubspot_greenhouse_integration/notion_client.py` existe con retry + backoff + error mapping.
@@ -232,6 +243,7 @@ Códigos: `NOTION_AUTH` (401), `NOTION_NOT_FOUND` (404), `NOTION_RATE_LIMIT` (42
 - [ ] `Handoff.md` + `changelog.md` documentan el merge
 - [ ] Chequeo cruzado sobre `EPIC-005` — acceptance criterion "Notion Write Bridge live" marcado
 - [ ] `TASK-579`, `TASK-580`, `TASK-582` notificadas de que ya pueden arrancar
+- [ ] `TASK-879` referenciada en el handoff y cualquier desviacion respecto del diseño Cloud Run original queda documentada
 
 ## Follow-ups
 
