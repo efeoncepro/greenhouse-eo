@@ -41,6 +41,7 @@ import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
+import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
@@ -930,7 +931,10 @@ export const getReliabilityOverview = async (
           getIdentityLegalProfilePayrollBlockingSignal().catch(() => null),
           getIdentityLegalProfileRevealAnomalySignal().catch(() => null),
           getIdentityLegalProfileEvidenceOrphanSignal().catch(() => null),
-          getIdentityRelationshipMemberContractDriftSignal().catch(() => null)
+          getIdentityRelationshipMemberContractDriftSignal().catch(() => null),
+          // TASK-892 — closure completeness partial (case-level UX surface
+          // del drift Person 360, complementario al signal sistema).
+          getOffboardingCompletenessPartialSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
