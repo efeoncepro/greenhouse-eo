@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `V1.0 SHIPPED 2026-05-15 — 6 slices completos directo en develop`
 - Rank: `TBD`
 - Domain: `identity|hr`
 - Blocked by: `TASK-890 V1.0 (SHIPPED 2026-05-15) — establece signal detector + ADR §7 que mandata este follow-up`
