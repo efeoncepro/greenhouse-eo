@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-05-15
+
+- **TASK-884..889 — Ecosystem Access Control Plane creado.** Se abre el programa para que Greenhouse gobierne accesos, capacidades y asignaciones de colaboradores/clientes hacia plataformas hermanas (`Kortex`, `Verk`, sitio publico y futuras apps) sin impedir que esas plataformas mantengan provisioning local cuando lo necesiten. El contrato base queda dividido en: `TASK-884` arquitectura/ADR; `TASK-885` registry de plataformas + capability catalog namespaced; `TASK-886` desired access assignments desde Greenhouse; `TASK-887` observed access + drift reconciliation; `TASK-888` provisioning commands/webhooks; `TASK-889` Admin Center + piloto Kortex/Verk. Decision central: Greenhouse owns ecosystem desired access state; sister platforms may own local provisioning mechanics, but must converge to Greenhouse-approved access state or report explicit drift.
+
 ## 2026-05-14
 
 - **TASK-879 — Notion Developer Platform Readiness & Worker Pilot creada.** Se abre una task P1 para evaluar las actualizaciones Notion Developer Platform del 2026-05-13 (`ntn`, Workers, Worker syncs, agent tools, SDK/API modernization y External Agents alpha) contra el runtime Greenhouse actual. TASK-736/737/738/739/577 y EPIC-005/009 quedan referenciadas a este gate: antes de migrar `notion-bq-sync`, absorberlo en Cloud Run o mover piezas a Workers, se exigira inventario de uso legacy, piloto sandbox sin writes productivos, matriz Cloud Run vs Workers vs hibrido y criterios de rollout/rollback.

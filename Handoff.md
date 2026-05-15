@@ -1,3 +1,19 @@
+# Sesion 2026-05-15 — TASK-884..889 Ecosystem Access Control Plane creadas
+
+- **Contexto**: el usuario definio que Greenhouse debe gobernar accesos, capacidades y asignaciones de colaboradores/clientes para plataformas hermanas como Kortex, Verk y el sitio publico, permitiendo tambien provisioning local por plataforma cuando convenga.
+- **Skill usada**: `software-architect-2026` para el framing arquitectonico y `greenhouse-task-planner` para crear tasks canonicas.
+- **Colision detectada**: `TASK-883` ya existia como task de Auth Smoke Synthetic Monitor Resilience, asi que no se reutilizo ese ID. No se modifico su contenido; se usaron `TASK-884` a `TASK-889` para este programa.
+- **Tasks nuevas**:
+  - `docs/tasks/to-do/TASK-884-ecosystem-access-control-plane-architecture.md` — ADR/spec del control plane: Greenhouse owns desired access state; plataformas pueden tener provisioning local; convergencia via observed state, drift, approvals y reconciliation.
+  - `docs/tasks/to-do/TASK-885-ecosystem-platform-registry-capability-catalog.md` — registry de plataformas y capabilities namespaced (`kortex.*`, `verk.*`, `public_website.*`).
+  - `docs/tasks/to-do/TASK-886-ecosystem-desired-access-assignments-foundation.md` — desired assignments desde Greenhouse para asignar usuarios/personas a plataformas, scopes y capabilities.
+  - `docs/tasks/to-do/TASK-887-ecosystem-observed-access-drift-reconciliation.md` — ingestion de observed state local y drift engine desired vs observed.
+  - `docs/tasks/to-do/TASK-888-ecosystem-provisioning-commands-webhooks.md` — commands/webhooks idempotentes para aplicar provisioning y recibir applied/failed.
+  - `docs/tasks/to-do/TASK-889-ecosystem-access-admin-center-kortex-verk-pilot.md` — surface Admin Center + piloto Kortex/Verk.
+- **Docs sincronizadas**: `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `changelog.md`.
+- **Siguiente ID disponible**: `TASK-890`.
+- **Validacion**: `git diff --check` OK; `pnpm docs:context-check` OK (0 errores, 2 warnings historicos por tamaño de `Handoff.md`).
+
 # Sesion 2026-05-14 — TASK-879 Notion Developer Platform Readiness creada
 
 - **Contexto**: el usuario pidio primero crear `TASK-879` y ajustar referencias en las tasks Notion relacionadas antes de avanzar con implementacion.
