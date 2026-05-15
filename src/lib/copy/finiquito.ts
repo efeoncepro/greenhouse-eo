@@ -301,7 +301,8 @@ export const GH_FINIQUITO = {
         replaceResignationLetter: 'Reemplazar carta',
         editMaintenance: 'Editar pensión alimentos',
         reissueDocument: 'Reemitir documento',
-        downloadPdf: 'PDF'
+        downloadPdf: 'PDF',
+        reconcileDriftAction: 'Reconciliar relación legal'
       },
       blockers: {
         resignationLetter: 'Falta carta de renuncia ratificada.',
