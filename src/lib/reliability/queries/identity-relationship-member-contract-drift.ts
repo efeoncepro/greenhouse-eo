@@ -5,7 +5,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import type { ReliabilitySignal } from '@/types/reliability'
 
 /**
- * TASK-890 Slice 6 — Drift signal Person 360 (read-only V1).
+ * TASK-890 Slice 6 + TASK-891 Slice 5 — Drift signal Person 360 con
+ * auto-escalation severity post 30d.
  *
  * Detecta divergencia semantica entre el contrato/regimen del member
  * (runtime laboral) y la relacion legal activa registrada en
@@ -19,17 +20,30 @@ import type { ReliabilitySignal } from '@/types/reliability'
  *   - Payroll readiness checks
  *   - Reportes legales / payslip distribution
  *
- * **V1 = read-only signal**. Operador HR resuelve via command auditado en
- * V1.1+ (TASK-891 follow-up). NUNCA auto-mutar relationships desde un
- * read path — viola la hard rule canonical CLAUDE.md "NUNCA auto-mutate
- * Person 360 from a read path".
+ * **TASK-890 V1.0** ship signal en severity `warning` constante porque NO
+ * habia write path — drift sostenido era informativo solamente.
+ *
+ * **TASK-891 V1.0** ship el write path canonico (`reconcileMemberContractDrift`).
+ * Una vez que el operador tiene comando auditado disponible, drift sostenido
+ * (>30d sin reconciliar) ES accionable y debe escalar a `error`. La logica
+ * de auto-escalation queda lista en V1.0 y se activa data-driven sin
+ * intervencion ni redeploy.
+ *
+ * Severity matrix canonical:
+ *   - count = 0                              → `ok` (steady state)
+ *   - count > 0 AND oldestDriftAgeDays < 30  → `warning` (reciente, V1.0 OK)
+ *   - count > 0 AND oldestDriftAgeDays >= 30 → `error` (sostenido, TASK-891 disponible)
+ *   - query falla                            → `unknown`
+ *
+ * Donde `oldestDriftAgeDays` = días desde el `GREATEST(m.updated_at,
+ * rel.updated_at)` más antiguo de las filas en drift. Indica el drift que
+ * lleva más tiempo sin tocar (ni operador ni sync update lo cambió).
  *
  * Pattern fuente: TASK-877 (workforce.member.complete_intake — signal then
- * command auditado). Lint rule TASK-890 + ADR §7 + §9.
+ * command auditado). Pattern severity escalation: TASK-849 watchdog stale
+ * approvals (warning >24h / error >7d).
  *
  * **Kind**: `drift`. Steady state esperado tras cleanup: 0.
- * **Severidad**: `warning` si count > 0 (no error — el signal es informativo
- * hasta que TASK-891 ship el write reconciliation path).
  * **Subsystem rollup**: `Identity & Access` (module=identity).
  */
 export const IDENTITY_RELATIONSHIP_MEMBER_CONTRACT_DRIFT_SIGNAL_ID =
@@ -41,8 +55,18 @@ export const IDENTITY_RELATIONSHIP_MEMBER_CONTRACT_DRIFT_SIGNAL_ID =
 const NON_EMPLOYEE_CONTRACT_TYPES = ['contractor', 'eor', 'honorarios']
 const NON_INTERNAL_PAYROLL_VIA = ['deel', 'none']
 
+// TASK-891 Slice 5 — threshold de auto-escalation severity.
+// >= 30 días sin reconciliar drift → severity `error`. Mismo bar canonical
+// que TASK-848/849 production release stale_approval thresholds.
+const SUSTAINED_DRIFT_THRESHOLD_DAYS = 30
+
 const QUERY_SQL = `
-  SELECT COUNT(*)::int AS n
+  SELECT
+    COUNT(*)::int AS n,
+    COALESCE(
+      EXTRACT(DAY FROM (NOW() - MIN(GREATEST(m.updated_at, rel.updated_at))))::int,
+      0
+    ) AS oldest_drift_age_days
   FROM greenhouse_core.members AS m
   JOIN greenhouse_core.person_legal_entity_relationships AS rel
     ON rel.profile_id = m.identity_profile_id
@@ -57,16 +81,40 @@ const QUERY_SQL = `
     AND (rel.effective_to IS NULL OR rel.effective_to > NOW())
 `
 
+type DriftQueryRow = {
+  n: number
+  oldest_drift_age_days: number
+}
+
 export const getIdentityRelationshipMemberContractDriftSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
 
   try {
-    const rows = await query<{ n: number }>(QUERY_SQL, [
+    const rows = await query<DriftQueryRow>(QUERY_SQL, [
       NON_EMPLOYEE_CONTRACT_TYPES,
       NON_INTERNAL_PAYROLL_VIA
     ])
 
     const count = Number(rows[0]?.n ?? 0)
+    const oldestDriftAgeDays = Number(rows[0]?.oldest_drift_age_days ?? 0)
+
+    // Severity matrix canonical (TASK-891 Slice 5):
+    //   count = 0 → ok
+    //   count > 0 AND oldestDriftAgeDays < threshold → warning (drift reciente)
+    //   count > 0 AND oldestDriftAgeDays >= threshold → error (drift sostenido)
+    const severity: 'ok' | 'warning' | 'error' =
+      count === 0
+        ? 'ok'
+        : oldestDriftAgeDays >= SUSTAINED_DRIFT_THRESHOLD_DAYS
+          ? 'error'
+          : 'warning'
+
+    const summary =
+      count === 0
+        ? 'Sin drift entre contrato de member y relación legal activa.'
+        : severity === 'error'
+          ? `${count} colaborador${count === 1 ? '' : 'es'} con drift contractor/EOR/Deel ↔ relación legal "employee" sostenido > ${SUSTAINED_DRIFT_THRESHOLD_DAYS} días. Resuelve via comando auditado TASK-891 desde Admin > Operations.`
+          : `${count} colaborador${count === 1 ? '' : 'es'} con contrato contractor/EOR/Deel pero relación legal activa sigue como "employee". Resuelve via comando auditado TASK-891.`
 
     return {
       signalId: IDENTITY_RELATIONSHIP_MEMBER_CONTRACT_DRIFT_SIGNAL_ID,
@@ -74,11 +122,8 @@ export const getIdentityRelationshipMemberContractDriftSignal = async (): Promis
       kind: 'drift',
       source: 'getIdentityRelationshipMemberContractDriftSignal',
       label: 'Drift contrato member ↔ relación legal',
-      severity: count === 0 ? 'ok' : 'warning',
-      summary:
-        count === 0
-          ? 'Sin drift entre contrato de member y relación legal activa.'
-          : `${count} colaborador${count === 1 ? '' : 'es'} con contrato contractor/EOR/Deel pero relación legal activa sigue como "employee". Requiere reconciliación auditada (TASK-891).`,
+      severity,
+      summary,
       observedAt,
       evidence: [
         {
@@ -94,6 +139,16 @@ export const getIdentityRelationshipMemberContractDriftSignal = async (): Promis
         },
         {
           kind: 'metric',
+          label: 'oldest_drift_age_days',
+          value: String(oldestDriftAgeDays)
+        },
+        {
+          kind: 'metric',
+          label: 'sustained_threshold_days',
+          value: String(SUSTAINED_DRIFT_THRESHOLD_DAYS)
+        },
+        {
+          kind: 'metric',
           label: 'non_employee_contract_types',
           value: NON_EMPLOYEE_CONTRACT_TYPES.join(', ')
         },
@@ -105,7 +160,8 @@ export const getIdentityRelationshipMemberContractDriftSignal = async (): Promis
         {
           kind: 'doc',
           label: 'Spec',
-          value: 'docs/architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md §7'
+          value:
+            'docs/architecture/GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1.md §7 (auto-escalation severity)'
         }
       ]
     }
