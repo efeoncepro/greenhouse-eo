@@ -1,3 +1,13 @@
+# Sesion 2026-05-15 — TASK-890 Workforce Exit Payroll Eligibility Window creada
+
+- **Contexto**: investigacion del caso Maria Camila Hoyos en `/hr/offboarding`: el caso `EO-OFF-2026-0609A520` aparece como external provider/Deel con ultimo dia `2026-05-14`, la accion primaria "Cerrar con proveedor" solo navega a `/hr/payroll`, y la nomina proyectada seguia mostrando full-month USD 530 para mayo 2026.
+- **Hallazgo clave**: no es bug local de tabla; falta un contrato compartido de ventana de salida entre Offboarding, Payroll proyectado/oficial y Person 360. Tambien hay drift semantico entre `members` contractor/international/Deel y `person_legal_entity_relationships.relationship_type='employee'` activo.
+- **Task creada**: `docs/tasks/to-do/TASK-890-workforce-exit-payroll-eligibility-window.md`.
+- **Docs sincronizadas**: `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `changelog.md`.
+- **Skill usada**: `software-architect-2026` para el framing arquitectonico previo y `greenhouse-task-planner` para registrar la task.
+- **Guardrail**: no se cambio runtime ni datos reales; Maria no fue mutada. La task exige command auditado y staging validation antes de resolver casos reales.
+- **Siguiente ID disponible**: `TASK-891`.
+
 # Sesion 2026-05-15 — TASK-884..889 Ecosystem Access Control Plane creadas
 
 - **Contexto**: el usuario definio que Greenhouse debe gobernar accesos, capacidades y asignaciones de colaboradores/clientes para plataformas hermanas como Kortex, Verk y el sitio publico, permitiendo tambien provisioning local por plataforma cuando convenga.
@@ -11,7 +21,7 @@
   - `docs/tasks/to-do/TASK-888-ecosystem-provisioning-commands-webhooks.md` — commands/webhooks idempotentes para aplicar provisioning y recibir applied/failed.
   - `docs/tasks/to-do/TASK-889-ecosystem-access-admin-center-kortex-verk-pilot.md` — surface Admin Center + piloto Kortex/Verk.
 - **Docs sincronizadas**: `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `changelog.md`.
-- **Siguiente ID disponible**: `TASK-890`.
+- **Siguiente ID disponible al cierre de esa sesion**: `TASK-890` (actualizado a `TASK-891` tras crear TASK-890 en la seccion superior).
 - **Validacion**: `git diff --check` OK; `pnpm docs:context-check` OK (0 errores, 2 warnings historicos por tamaño de `Handoff.md`).
 
 # Sesion 2026-05-14 — TASK-879 Notion Developer Platform Readiness creada

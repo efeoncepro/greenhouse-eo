@@ -2,6 +2,8 @@
 
 ## 2026-05-15
 
+- **TASK-890 — Workforce Exit Payroll Eligibility Window creada.** Se registra task P1 para resolver de raiz el incidente Maria Camila Hoyos: offboarding externo/Deel con ultimo dia `2026-05-14`, accion `Cerrar con proveedor` que solo navega a Nomina, proyeccion mensual completa en payroll y drift entre `members` contractor/international/Deel vs relacion legal activa `employee`. La solucion propuesta exige ADR `GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1`, resolver canonico compartido por Nomina proyectada/oficial, cierre con proveedor auditado y signal de drift Person 360.
+
 - **TASK-884..889 — Ecosystem Access Control Plane creado.** Se abre el programa para que Greenhouse gobierne accesos, capacidades y asignaciones de colaboradores/clientes hacia plataformas hermanas (`Kortex`, `Verk`, sitio publico y futuras apps) sin impedir que esas plataformas mantengan provisioning local cuando lo necesiten. El contrato base queda dividido en: `TASK-884` arquitectura/ADR; `TASK-885` registry de plataformas + capability catalog namespaced; `TASK-886` desired access assignments desde Greenhouse; `TASK-887` observed access + drift reconciliation; `TASK-888` provisioning commands/webhooks; `TASK-889` Admin Center + piloto Kortex/Verk. Decision central: Greenhouse owns ecosystem desired access state; sister platforms may own local provisioning mechanics, but must converge to Greenhouse-approved access state or report explicit drift.
 
 ## 2026-05-14
