@@ -299,6 +299,27 @@ No production feature flag in this task. Any pilot must be isolated by workspace
 - Manual verification of `ntn` commands / Worker sandbox run
 - Manual review of updated tasks and decision matrix
 
+### Slice 1 evidence — 2026-05-14 local CLI install
+
+- Official install paths checked: `curl -fsSL https://ntn.dev | bash` and `npm install --global ntn`; npm path selected to keep the install explicit and inspectable.
+- Local prerequisites OK: `node v22.22.2`, `npm 10.9.7`, `pnpm 10.32.1`; official npm package latest observed as `ntn@0.14.0`.
+- Installed globally with `npm install --global ntn`; no repo dependency or lockfile changed.
+- Verified `ntn --version` -> `ntn 0.14.0`.
+- Verified `ntn doctor` -> CLI version OK, config root `/Users/jreye/.config/notion`, warning expected: no default workspace for prod environment until `ntn login`.
+- Verified top-level commands exposed by CLI: `api`, `datasources`, `files`, `pages`, `login`, `logout`, `completions`, `doctor`, `update`, `workers`.
+- Verified `ntn api` supports public API calls, endpoint listing, reduced OpenAPI fragments via `--spec`, official endpoint docs via `--docs`, auth via keychain or `NOTION_API_TOKEN`, and `NOTION_API_VERSION` override.
+- Verified `ntn workers` exposes `capabilities`, `create`, `delete`, `deploy`, `new`, `env`, `exec`, `get`, `oauth`, `list`, `runs`, `sync`, `usage`, `webhooks`, `tui`.
+- Remaining Slice 1 blockers: run `ntn login`, select/confirm Efeonce workspace, inspect workspace/plan access for Workers, and confirm sandbox DB permissions before any Worker pilot.
+
+### Slice 1 evidence — 2026-05-14 CLI auth
+
+- Ran `ntn login` interactively; browser verification code matched terminal prompt and the CLI exited successfully.
+- Verified `ntn doctor`: default workspace resolved to `Efeonce` (`d1de7cb1-0325-4b73-a4d3-f266ae396f15`) and token is valid.
+- Verified read-only API auth with `ntn api /v1/users/me`; response identified the CLI bot for workspace `Efeonce` and the owner user.
+- Verified `ntn workers list` exits cleanly with no listed Workers.
+- Current blocker for Worker pilot: `ntn doctor` reports `Workers enabled` as warning/not enabled for this workspace, with hint to run a workers command interactively or ask a Workspace Admin.
+- Updated next step: confirm whether enabling Workers is acceptable for the Efeonce workspace, then run the smallest interactive Workers command in sandbox mode before any `workers new/deploy`.
+
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
