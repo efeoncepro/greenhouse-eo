@@ -1,3 +1,35 @@
+# Sesion 2026-05-15 — TASK-890 V1.0 COMPLETO SHIPPED en develop (7 slices end-to-end)
+
+- **Estado final**: V1.0 COMPLETE. 10 commits pushed a `develop` end-to-end:
+  - Slice 1 (ADR + DECISIONS_INDEX): `dea23725`
+  - Slice 2 (Resolver foundation + 38 tests): `5bf227af`
+  - Slice 3 (Integration + lint rule + CLAUDE.md): `4b3851b9` + `1db67205` + `286bfd37`
+  - Slice 4 (Capability + grant + migration + route handler): `3428f589`
+  - Slice 5 (UI Dialog "Cerrar con proveedor externo"): `0433ade6`
+  - Slice 6 (Drift signal Person 360 + tests + wire-up): `87e7d688`
+  - Slice 7 (Docs/manuales actualizados): `69e1af74`
+- **Verificacion final**: `pnpm tsc --noEmit` clean. `pnpm test` 4577 passed 0 fail. `pnpm build` production verde. Lint focal verde (warnings preexistentes TASK-827 no relacionados). Pre-push hook canonical verde 4 veces.
+- **Skills usadas**: `arch-architect` (Greenhouse overlay) invocada **3 veces** con correcciones quirurgicas aplicadas pre-implementation: (1) cutoff `COALESCE(LWD, effective_date)` + enum DB-aligned pre-resolver; (2) Shape A integration approved + defer shadow compare + attached optional window; (3) implicito en cada slice via lectura de overlay. `greenhouse-ux-writing` invocada para validar microcopy es-CL del dialog Slice 5.
+- **Deliverables**:
+  - 1 ADR canonica (374 lineas, indexada DECISIONS_INDEX)
+  - 1 resolver TS-only (5 archivos, 1242 LOC, 38 tests)
+  - 1 migration capabilities_registry seed (TASK-839 governance pattern)
+  - 1 capability granular `workforce.offboarding.close_external_provider`
+  - 1 lint rule `greenhouse/no-inline-payroll-scope-gate` (modo warn, 12 tests RuleTester)
+  - 1 feature flag `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (default false V1.0)
+  - 1 UI dialog auditado reemplaza link silencioso a /hr/payroll
+  - 1 drift signal `identity.relationship.member_contract_drift` read-only V1 (6 tests)
+  - 1 microcopy namespace `GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE` en `src/lib/copy/workforce.ts`
+  - 3 docs/manuales actualizados (offboarding doc v1.3, periodos-de-nomina v1.1, manual offboarding v1.3)
+  - 1 seccion canonica "Workforce Exit Payroll Eligibility invariants" en CLAUDE.md (15 hard rules)
+- **Maria Camila Hoyos NO mutada** en esta task. Recovery operativa espera:
+  1. Staging deploy + activacion `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` solo staging
+  2. Shadow compare ≥7d con Maria-fixture verde + signal `payroll.exit_window.full_month_projection_drift` count=0 sostenido
+  3. HR approval para flip flag a `true` en production
+  4. Operador HR usa el dialog "Cerrar con proveedor" en la cola para transicionar el caso `EO-OFF-2026-0609A520` a `approved`
+- **TASK-891 follow-up** (drift reconciliation write path Person 360): pendiente diseno y planificacion.
+- **Siguiente ID disponible**: `TASK-891`.
+
 # Sesion 2026-05-15 — TASK-890 Slices 1-3 SHIPPED en develop (verde + push)
 
 - **Resultado**: 4 commits pushed a `develop` (5bf227af + 4b3851b9 + 1db67205 + dea23725) implementando Slices 1-3 end-to-end. Slices 4-7 pendientes para sesion(es) siguiente(s).

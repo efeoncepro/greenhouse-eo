@@ -8,17 +8,18 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Slices 1-3 shipped 2026-05-15; Slices 4-7 pendientes`
+- Status real: `V1.0 SHIPPED 2026-05-15 — 7 slices completos directo en develop`
 - Rank: `TBD`
 - Domain: `hr|payroll|identity|platform`
 - Blocked by: `none`
-- Branch: `develop` (operador autorizo trabajar directo en develop; scope inicial doc+helper canonico+lint rule en modo warn, sin runtime breaking changes hasta Slice 3 detras de feature flag)
+- Branch: `develop` (operador autorizo trabajar directo en develop sin branch task/TASK-890-*)
+- Followup V1.1: TASK-891 (drift reconciliation write path) + staging shadow compare ≥7d antes de flip flag `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` a `true` en production.
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
