@@ -495,3 +495,49 @@ El runtime actual ya aporta piezas reutilizables:
 - snapshot contractual operativo en `members` y `payroll`
 
 La regla nueva es que esas piezas ya no deben actuar como islas; deben converger bajo `WorkRelationshipOffboardingCase`.
+
+
+## Delta 2026-05-15 — TASK-892 Closure Completeness Aggregate
+
+El work-queue derivation original (`src/lib/workforce/offboarding/work-queue/derivation.ts`) calculaba `primaryAction` desde **una sola dimension** (`closureLane`), ignorando que el cierre operativo real de un offboarding case involucra **4 capas ortogonales**:
+
+1. **Case lifecycle** (`work_relationship_offboarding_cases.status`) — el agregado que dispara el flujo.
+2. **Member runtime** (`members.contract_type / payroll_via / pay_regime`) — que declara el member hoy.
+3. **Person 360 relationship** (`person_legal_entity_relationships`) — historia legal de las relaciones.
+4. **Payroll scope** (TASK-890 `resolveExitEligibilityForMembers`) — esta en scope o no para nomina proyectada.
+
+### Bug class observado live (2026-05-15)
+
+Maria Camila Hoyos: case `executed` (Layer 1 ✅) + member runtime declara contractor/Deel/international (Layer 2 ✅) + relacion legal activa sigue `relationship_type='employee'` (Layer 3 ❌ drift detectado por TASK-890 signal + TASK-891 dialog disponible) + excluida de payroll proyectada (Layer 4 ✅).
+
+Tres de las 4 capas alineadas. La UI mostraba `primaryAction = 'Cerrar con proveedor'` (boton que reabriria Layer 1 ya cerrado) — desalineado de la realidad operativa. Si operador ejecutaba, state machine rechazaba `executed → approved` con 4xx.
+
+### Solucion canonica
+
+Aggregate `closureCompleteness` server-side via helper canonical `computeClosureCompleteness(facts)` (pure function en `src/lib/workforce/offboarding/work-queue/closure-completeness.ts`):
+
+- 4 layer alignment fields (`caseLifecycle`, `memberRuntime`, `personRelationship`, `payrollScope`) con enums cerrados.
+- `closureState`: `'pending' | 'partial' | 'complete' | 'blocked'` (4-value enum).
+- `pendingSteps[]`: array ordenado por `STEP_PRIORITY = ['case_lifecycle', 'reconcile_drift', 'verify_payroll_exclusion']`.
+
+`primaryAction` se deriva del primer step actionable en `pendingSteps[]` via `derivePrimaryActionFromCompleteness`. Cuando case terminal + drift Layer 3, primaryAction apunta automaticamente a TASK-891 dialog con href `/admin/identity/drift-reconciliation?memberId=<id>`.
+
+### Capability granular reusada
+
+Cada step en `pendingSteps[]` declara su `capability`. UI esconde steps sin capability (defense in depth). `reconcile_drift` reusa la capability canonical `person.legal_entity_relationships.reconcile_drift` (TASK-891, EFEONCE_ADMIN solo).
+
+### Reliability signal
+
+`hr.offboarding.completeness_partial` (kind=drift, severity warning si count>0, steady=0). Cuenta cases terminales con drift Person 360 detectado por el patron canonical (mirror del signal upstream `identity.relationship.member_contract_drift`). Visible en `/admin/operations` bajo `Identity & Access`.
+
+### Reusable pattern cross-flow
+
+El concepto "`pendingSteps[]` decide el primaryAction" es reusable para:
+
+- Onboarding work queue (TASK-875 foundation existe)
+- Hiring pipeline / wizards
+- Workforce activation (TASK-874)
+- Contractor closure (TASK-797 futuro)
+- Final settlement document lifecycle (TASK-863)
+
+Cuando emerja una surface con `primaryAction` derivado de una sola dimension pero la realidad operativa involucra multiples capas ortogonales, replicar el patron: pure function + STEP_PRIORITY + state machine cerrado + signal de cierre parcial.

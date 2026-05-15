@@ -3552,6 +3552,39 @@ Threshold `SUSTAINED_DRIFT_THRESHOLD_DAYS = 30` (mismo bar TASK-848/849 producti
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1.md`. Task: `docs/tasks/in-progress/TASK-891-person-relationship-drift-reconciliation-write-path.md`. Patrones fuente: TASK-337 (helpers reusados), TASK-877 (signal-then-command), TASK-890 (predecesor del signal), TASK-742 (defense-in-depth), TASK-839/TASK-873 (capability triple-layer canonical), TASK-848 (reason >=20 bar), TASK-672 (rich struct + thin predicate).
 
+### Offboarding Closure Completeness Aggregate invariants (TASK-892, desde 2026-05-15)
+
+Toda surface que renderice el detalle operativo de un offboarding case (work-queue inspector, drawer, future Pulse cards, future organization-workspace "Salida" facet) **debe** consumir el aggregate canonical `closureCompleteness` de `OffboardingWorkQueueItem`. El `primaryAction` se deriva de `pendingSteps[0]` actionable, NUNCA hardcoded por `closureLane` solo.
+
+El bug class observado live 2026-05-15 con María Camila Hoyos: case `executed` con drift Person 360 sin reconciliar mostraba `primaryAction = 'Cerrar con proveedor'` (boton de Layer 1 ya terminal). Tres de las 4 capas alineadas, la cuarta (Person 360) reportaba drift detectado por signal `identity.relationship.member_contract_drift` desde TASK-890, pero la UI ignoraba esa capa y mostraba un CTA obsoleto que el state machine rechazaría con 4xx.
+
+**Aggregate canonical** (`src/lib/workforce/offboarding/work-queue/closure-completeness.ts`):
+
+- 4 layer alignment fields ortogonales: `caseLifecycle` / `memberRuntime` / `personRelationship` / `payrollScope`.
+- `closureState`: enum cerrado `'pending' | 'partial' | 'complete' | 'blocked'`.
+- `pendingSteps[]`: array ordenado por constant canonical `STEP_PRIORITY = ['case_lifecycle', 'reconcile_drift', 'verify_payroll_exclusion']`.
+- Helper canonical `computeClosureCompleteness(facts)` pure function — 100% testable, NO IO.
+- `derivePrimaryActionFromCompleteness(completeness, legacyAction)` decide el primaryAction desde primer step actionable.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** computar `primaryAction` inline en componentes de UI desde `closureLane` solo. Toda derivación pasa por `derivePrimaryActionFromCompleteness` server-side dentro de `buildOffboardingWorkQueueItem`.
+- **NUNCA** modificar `STEP_PRIORITY` sin extender paralelamente: (a) `OffboardingClosureStepCode` type union, (b) un `build*Step` builder pure function en `closure-completeness.ts`, (c) test anti-regresión cubriendo el nuevo step en al menos 2 paths (actionable + skip). El orden es contractual — moverlo invalida el bug-class fix y rompe consumers que asumen "primer step actionable = CTA principal".
+- **NUNCA** componer la decisión `closureState` en cliente. Server-only por construcción — `closure-completeness.ts` lleva `import 'server-only'` al inicio.
+- **NUNCA** filtrar pendingSteps en UI por capability inline. Cada step declara `capability: string | null`; UI esconde steps sin capability via gate runtime (`can(subject, capability, action)`). NO duplicar la matriz `relationship × capability → access` en componentes.
+- **NUNCA** crear paths paralelos para "ver el cierre real" (e.g. badge custom en algún card que no consume `closureCompleteness`). Single source of truth.
+- **NUNCA** asumir que `personRelationshipDrift === null` significa "no drift". Es `unknown` (member sin profile o lookup downstream falló). `degradedReasons[]` en `OffboardingWorkQueue` reporta cuándo lookups fallan honestamente.
+- **NUNCA** mostrar `Cierre parcial` sin explicar las capas pendientes. La seccion UI "Capas pendientes" es obligatoria — sino el operador no sabe qué hacer y reincide en el bug class previo.
+- **NUNCA** mutar Maria Camila Hoyos operativamente como parte de TASK-892. Recovery espera ejecución manual via TASK-891 dialog post staging validation. El aggregate solo *visibiliza* el cierre parcial — no auto-resuelve drift Person 360.
+- **NUNCA** invocar `Sentry.captureException()` directo en code paths del aggregate. Usar `captureWithDomain(err, 'identity', { tags: { source: 'offboarding_closure_completeness', stage: '<...>' } })`.
+- **SIEMPRE** que emerja un step nuevo (e.g. `verify_assignment_closure`, `unblock_blocker`, `download_certificate`), agregar al enum + builder pure + STEP_PRIORITY posicion explícita + tests anti-regresión. El builder retorna `null` cuando el step no aplica al case (e.g. case non-terminal para verify_payroll_exclusion).
+- **SIEMPRE** que un consumer downstream (Pulse, organization workspace facet "Salida", report PDFs) muestre el estado del cierre, leer `closureCompleteness.closureState` directo — NUNCA recomputar.
+- **SIEMPRE** preservar el patrón "informational vs actionable" en pendingSteps. Steps `actionable: false` se renderean como hints/alerts sin CTA. Steps `actionable: true` se renderean como CTAs con href si lo declaran.
+
+**Reusable cross-flow**: el patrón "`pendingSteps[]` decide el primaryAction" se replica para Onboarding work queue (TASK-875), hiring pipeline, workforce activation (TASK-874), contractor closure (TASK-797 futuro), final settlement document lifecycle (TASK-863). Cuando emerja una surface con `primaryAction` derivado de una sola dimensión pero realidad operativa multi-capa, replicar: pure function + STEP_PRIORITY + state machine cerrado + signal de cierre parcial.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md` (Delta 2026-05-15). Task: `docs/tasks/in-progress/TASK-892-offboarding-closure-completeness-aggregate.md`. Reliability signal: `hr.offboarding.completeness_partial` (kind=drift, severity warning >0, steady=0, subsystem Identity & Access). Patrones fuente: TASK-742 (4-pillar checklist), TASK-672 (composer + degraded honest), TASK-880 (decision tree por capability + audience), TASK-873 (capability triple-layer canonical).
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

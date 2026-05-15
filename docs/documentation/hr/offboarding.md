@@ -1,9 +1,9 @@
 # Offboarding Laboral y Contractual
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-891 Slice 6 — drift reconciliation write path)
+> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-892 — closure completeness aggregate 4 capas)
 > **Documentacion tecnica:** [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
 > **ADRs relacionados:**
 > - [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md) (TASK-890)
@@ -118,6 +118,34 @@ Un caso comun en colaboradores que pasan de empleado dependiente a contractor/De
 **NUNCA auto-mutar**: V1.0 ship únicamente comando operator-initiated. Auto-reconciliation desde cron viola la regla canonical "NUNCA auto-mutar Person 360 desde un read path". Decisión V2 contingente con HR approval explícito y ADR nuevo.
 
 **Reversibilidad**: append-only audit. Una reconciliación errónea se revierte ejecutando una NUEVA reconciliación inversa que vuelve la relación a su estado anterior — el historial preserva ambos eventos.
+
+## Closure Completeness (TASK-892) — el cierre es de 4 capas, no 1
+
+A partir de 2026-05-15 el cierre operativo de un offboarding case se evalua sobre **4 capas ortogonales**. La UI muestra un badge canonico que sintetiza el estado real de las 4 capas:
+
+- **`En curso`**: case lifecycle abierto (draft / needs_review / approved / scheduled). Layers 2-4 son informativas.
+- **`Cierre parcial`**: case lifecycle `executed` o `cancelled`, pero hay capas Person 360 / payroll sin alinear. La UI muestra una seccion "Capas pendientes" con CTAs al step canonico (e.g. reconciliar drift Person 360 via TASK-891 dialog).
+- **`Cerrado completamente`**: las 4 capas alineadas. Sin pending steps.
+- **`Bloqueado`**: case.status = `blocked`. Operador debe resolver el blocker antes de avanzar.
+
+### Por que importa
+
+El work-queue derivation original calculaba `primaryAction` desde una sola dimension (`closureLane`), ignorando drift Person 360 + payroll scope. Caso real (Maria Camila Hoyos, 2026-05-15): case `executed` con drift Person 360 sin reconciliar mostraba boton "Cerrar con proveedor" obsoleto que reabriria un layer ya terminal.
+
+Post TASK-892, ese mismo caso muestra `closureState='partial'` + step canonico `reconcile_drift` con CTA al dialog auditado de TASK-891. El operador ve la realidad operativa, no un boton de capa equivocada.
+
+### Capas y como se detectan
+
+| Capa | Tabla canonical | Detector |
+|------|------------------|----------|
+| Case lifecycle | `work_relationship_offboarding_cases.status` | column directa |
+| Member runtime | `members.contract_type / payroll_via / pay_regime` | helper `detectMemberRuntimeAlignment` |
+| Person 360 relationship | `person_legal_entity_relationships` | helper `detectPersonRelationshipDrift` (mirror exacto del signal `identity.relationship.member_contract_drift`) |
+| Payroll scope | TASK-890 resolver `resolveExitEligibilityForMembers` | branch sobre `projectionPolicy` |
+
+### Reliability signal
+
+`hr.offboarding.completeness_partial` (subsystem Identity & Access). Cuenta cases terminales con drift Person 360 detectado. Steady state esperado: 0. Cuando warning > 0, operador puede ejecutar reconciliacion desde `/admin/identity/drift-reconciliation` o desde la seccion "Capas pendientes" del case inspector.
 
 ## Acceso
 

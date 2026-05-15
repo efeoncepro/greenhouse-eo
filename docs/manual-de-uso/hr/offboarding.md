@@ -1,9 +1,9 @@
 # Offboarding
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-891 — reconciliacion drift Person 360 EFEONCE_ADMIN)
+> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-892 — closure completeness 4 capas + capas pendientes UI)
 > **Modulo:** HR / Workforce
 > **Ruta en portal:** `/hr/offboarding`
 > **Documentacion relacionada:** [Offboarding laboral y contractual](../../documentation/hr/offboarding.md), [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
@@ -159,12 +159,37 @@ El motivo es obligatorio y debe tener al menos 10 caracteres porque queda en el 
 
 Eso indica drift entre el runtime del member y la clasificacion del caso. Revisa `member.contract_type` y `member.payroll_via` en People 360. Si el colaborador es realmente Chile dependiente, debe estar en lane `internal_payroll` y usar el flujo finiquito normal, no el cierre con proveedor.
 
+## Closure Completeness (TASK-892) — entender los 4 estados de cierre
+
+A partir del 15-may-2026, cada case muestra **dos badges** lado a lado:
+
+1. **Status del case** (`Borrador` / `Requiere revision` / `Ejecutado` / etc.) — el estado del agregado puro.
+2. **Estado de cierre** (`En curso` / `Cierre parcial` / `Cerrado completamente` / `Bloqueado`) — sintesis de las 4 capas operativas.
+
+| Badge "Estado de cierre" | Significado | Que ve el operador |
+|--------------------------|-------------|---------------------|
+| `En curso` | El case esta abierto y operandose | CTA al proximo paso del workflow |
+| `Cierre parcial` | Case ejecutado/cancelado PERO falta alinear capas (drift Person 360, payroll proyectada) | Seccion "Capas pendientes" con CTAs especificos |
+| `Cerrado completamente` | Las 4 capas alineadas | Sin CTAs pendientes |
+| `Bloqueado` | El case tiene un blocker que requiere resolucion humana | CTA al step de resolucion del blocker |
+
+### Que hacer cuando ves "Cierre parcial"
+
+Abre el case (click en la fila o boton "Ver detalle"). En el inspector vas a ver una seccion nueva titulada **"Capas pendientes"** con uno o mas items:
+
+- **"Reconciliar relacion legal Person 360"** (warning): el member runtime declara contractor/Deel/honorarios pero la relacion legal activa sigue como `employee`. Solo `EFEONCE_ADMIN` puede ejecutarla. Click en el boton "Reconciliar relacion legal" abre el dialog auditado de TASK-891.
+
+- **"Confirmar exclusion de nomina"** (info, hint): informativo. Click en "Ver" navega a `/hr/payroll/projected` para que confirmes que el colaborador esta excluido del periodo. No requiere accion adicional si ya esta excluido.
+
+Si NO tienes capability para el step (no eres EFEONCE_ADMIN), el step se esconde de tu UI. Contacta a tu admin para resolverlo.
+
 ## Referencias tecnicas
 
 - `greenhouse_hr.work_relationship_offboarding_cases`
 - `greenhouse_hr.work_relationship_offboarding_case_events`
 - `src/lib/workforce/offboarding/**`
+- `src/lib/workforce/offboarding/work-queue/closure-completeness.ts` (TASK-892 aggregate canonical)
 - `src/lib/payroll/exit-eligibility/**` (TASK-890 resolver canonico)
 - `/api/hr/offboarding/cases`
-- Capabilities: `hr.offboarding_case`, `workforce.offboarding.close_external_provider` (TASK-890)
-- Signal `identity.relationship.member_contract_drift` (subsystem Identity & Access)
+- Capabilities: `hr.offboarding_case`, `workforce.offboarding.close_external_provider` (TASK-890), `person.legal_entity_relationships.reconcile_drift` (TASK-891)
+- Signals: `identity.relationship.member_contract_drift` + `hr.offboarding.completeness_partial` (TASK-892), ambos subsystem Identity & Access

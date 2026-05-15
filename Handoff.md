@@ -1,3 +1,21 @@
+# Sesion 2026-05-15 — TASK-892 V1.0 COMPLETO SHIPPED en develop (4 slices end-to-end)
+
+- **Estado final**: V1.0 COMPLETE. 4 commits pushed a `develop`:
+  - Slice 1 (closure-completeness pure + tests + types.ts + query.ts + derivation.ts integration): `1b285517`
+  - Slice 2 (reliability signal `hr.offboarding.completeness_partial` + wire-up + 8 tests): `28c4eb37`
+  - Slice 3 (UI HrOffboardingView refactor: closureState badge + "Capas pendientes" section): `4d8884b7`
+  - Slice 4 (docs/manuales + CLAUDE.md hard rules + task close-out): pending push
+- **Verificacion**: `pnpm exec tsc --noEmit` clean. `pnpm lint` 0 errors (4 warnings preexistentes TASK-827). `pnpm test src/lib/workforce/offboarding/ src/lib/reliability/queries/offboarding-completeness-partial.test.ts src/views/greenhouse/hr-core/offboarding/` 47 tests verde.
+- **Skills usadas**: `arch-architect` Greenhouse overlay (correcciones quirurgicas pre-implementation: closureState semantics crisp + NO generalizar cross-flow V1.0 + STEP_PRIORITY constant explicito), `greenhouse-backend` (closure-completeness pure + reliability signal + query/derivation integration), `greenhouse-task-planner` (creacion spec original TASK-892).
+- **Bug class resuelto**: caso Maria Camila Hoyos (status='executed' + drift Person 360 sin reconciliar) ya NO muestra boton "Cerrar con proveedor" obsoleto. Ahora muestra `closureState='partial'` + step canonico `reconcile_drift` con CTA al dialog auditado TASK-891.
+- **Aggregate canonical**: `OffboardingClosureCompleteness` con 4 layer fields + closureState enum cerrado + pendingSteps[] ordenado por STEP_PRIORITY = `['case_lifecycle', 'reconcile_drift', 'verify_payroll_exclusion']`.
+- **primaryAction derivation**: `derivePrimaryActionFromCompleteness(completeness, legacyAction)` busca primer step actionable. case_lifecycle preserva semantica legacy (nextStep). reconcile_drift retorna descriptor nuevo con href TASK-891 dialog.
+- **Reliability signal nuevo**: `hr.offboarding.completeness_partial` (subsystem Identity & Access, kind=drift, severity warning si count>0, steady=0). Cuenta cases terminales con drift Person 360 detectado.
+- **UI extension**: HrOffboardingView muestra closureState badge beside case status chip + nueva seccion "Capas pendientes" con CTAs a steps actionable + hints a steps informational. Badge replicado en 3 layouts (inspector panel + mobile card + desktop table row).
+- **Capability granular reusada**: cada pending step declara su capability — `reconcile_drift` reusa `person.legal_entity_relationships.reconcile_drift` (TASK-891, EFEONCE_ADMIN only V1.0).
+- **Maria NO mutada** en esta task. La aggregate solo *visibiliza* el cierre parcial. Recovery operativa sigue requiriendo dialog manual TASK-891 + HR approval explicito post staging validation.
+- **Pattern reusable cross-flow** canonizado: "pendingSteps[] decide el primaryAction" aplicable a Onboarding work queue (TASK-875), hiring pipeline, workforce activation (TASK-874), contractor closure (TASK-797 futuro), final settlement document lifecycle (TASK-863).
+
 # Sesion 2026-05-15 — Sentry JAVASCRIPT-NEXTJS-5Y HubSpot company_name null FIX
 
 - **Incidente**: Sentry production `JAVASCRIPT-NEXTJS-5Y`, `POST /reactive/process-domain`, `ops-worker`, error `null value in column "company_name" of relation "companies" violates not-null constraint`.

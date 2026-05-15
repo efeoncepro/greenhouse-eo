@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `In-flight 2026-05-15`
+- Status real: `Complete 2026-05-15`
 - Rank: `TBD`
 - Domain: `hr|identity|payroll|reliability`
 - Blocked by: `none` (TASK-890 + TASK-891 V1.0 SHIPPED 2026-05-15 — proveen las capas que esta task sintetiza)
