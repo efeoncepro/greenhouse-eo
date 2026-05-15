@@ -99,6 +99,22 @@ const statusLabel: Record<string, string> = {
   cancelled: 'Cancelado'
 }
 
+// TASK-892 — closureCompleteness aggregate badges. Surface el estado real
+// de cierre (4 capas) al operador. 'partial' es el bug class Maria.
+const closureStateColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
+  pending: 'info',
+  partial: 'warning',
+  complete: 'success',
+  blocked: 'error'
+}
+
+const closureStateLabel: Record<string, string> = {
+  pending: 'En curso',
+  partial: 'Cierre parcial',
+  complete: 'Cerrado completamente',
+  blocked: 'Bloqueado'
+}
+
 const documentStatusColor: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
   draft: 'secondary',
   rendered: 'info',
@@ -1016,6 +1032,14 @@ const HrOffboardingView = () => {
           <Typography variant='subtitle2'>Estado del cierre</Typography>
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
             <CustomChip round='true' size='small' color={statusColor[item.case.status] ?? 'default'} label={statusLabel[item.case.status] ?? item.case.status} />
+            {/* TASK-892 — closureState badge: synthesis canonical de 4 capas. */}
+            <CustomChip
+              round='true'
+              size='small'
+              variant='tonal'
+              color={closureStateColor[item.closureCompleteness.closureState] ?? 'default'}
+              label={closureStateLabel[item.closureCompleteness.closureState] ?? item.closureCompleteness.closureState}
+            />
             {item.latestDocument ? <CustomChip round='true' size='small' variant='tonal' color={documentStatusColor[item.latestDocument.documentStatus] ?? 'default'} label={documentStatusLabel[item.latestDocument.documentStatus] ?? item.latestDocument.documentStatus} /> : null}
           </Stack>
           <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${item.case.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} />
@@ -1057,6 +1081,74 @@ const HrOffboardingView = () => {
             {item.attentionReasons.map(reason => <Alert key={reason} severity='warning' variant='outlined'>{reason}</Alert>)}
           </Stack>
         ) : null}
+
+        {/* TASK-892 — pendingSteps non-case_lifecycle. Steps actionable se
+            renderean como secondary CTA (con href si aplica). Steps non-
+            actionable (informational) se renderean como Alert info. El step
+            primario `case_lifecycle` se omite aqui — vive en `primaryButton`. */}
+        {(() => {
+          const nonLifecycleSteps = item.closureCompleteness.pendingSteps.filter(
+            step => step.code !== 'case_lifecycle'
+          )
+
+          if (nonLifecycleSteps.length === 0) return null
+
+          return (
+            <Stack spacing={1.5}>
+              <Typography variant='subtitle2'>Capas pendientes</Typography>
+              {nonLifecycleSteps.map(step => {
+                if (!step.actionable) {
+                  return (
+                    <Alert
+                      key={step.code}
+                      severity='info'
+                      variant='outlined'
+                      action={
+                        step.href ? (
+                          <Button size='small' color='info' href={step.href} target='_blank' rel='noreferrer'>
+                            Ver
+                          </Button>
+                        ) : undefined
+                      }
+                    >
+                      <Stack spacing={0.5}>
+                        <Typography variant='body2' sx={{ fontWeight: 600 }}>{step.label}</Typography>
+                        {step.hint ? <Typography variant='caption' color='text.secondary'>{step.hint}</Typography> : null}
+                      </Stack>
+                    </Alert>
+                  )
+                }
+
+                const buttonColor = step.severity === 'error' ? 'error' : step.severity === 'warning' ? 'warning' : 'primary'
+
+                return (
+                  <Alert
+                    key={step.code}
+                    severity={step.severity === 'error' ? 'error' : 'warning'}
+                    variant='outlined'
+                    action={
+                      step.href ? (
+                        <Button
+                          size='small'
+                          variant='contained'
+                          color={buttonColor}
+                          href={step.href}
+                        >
+                          {step.label}
+                        </Button>
+                      ) : undefined
+                    }
+                  >
+                    <Stack spacing={0.5}>
+                      <Typography variant='body2' sx={{ fontWeight: 700 }}>{step.label}</Typography>
+                      {step.hint ? <Typography variant='caption' color='text.secondary'>{step.hint}</Typography> : null}
+                    </Stack>
+                  </Alert>
+                )
+              })}
+            </Stack>
+          )
+        })()}
 
         {item.latestSettlement ? (
           <Box sx={theme => ({ px: 3, py: 2.5, borderRadius: `${theme.shape.customBorderRadius.md}px`, border: `1px solid ${theme.palette.divider}`, backgroundColor: alpha(theme.palette.primary.main, 0.035) })}>
@@ -1761,6 +1853,14 @@ const HrOffboardingView = () => {
                           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
                             <CustomChip round='true' size='small' variant='tonal' color={statusColor[itemCase.status] ?? 'default'} label={statusLabel[itemCase.status] ?? itemCase.status} />
                             <CustomChip round='true' size='small' variant='tonal' color={item.closureLane.allowsFinalSettlement ? 'primary' : 'secondary'} label={item.closureLane.label} />
+                            {/* TASK-892 — closureState badge (4-layer synthesis). */}
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant='tonal'
+                              color={closureStateColor[item.closureCompleteness.closureState] ?? 'default'}
+                              label={closureStateLabel[item.closureCompleteness.closureState] ?? item.closureCompleteness.closureState}
+                            />
                           </Stack>
                           <Stack spacing={0.25}>
                             <Typography variant='caption' color='text.secondary'>Próximo paso</Typography>
@@ -1854,6 +1954,14 @@ const HrOffboardingView = () => {
                                 <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
                                   <CustomChip round='true' size='small' variant='tonal' color={statusColor[itemCase.status] ?? 'default'} label={statusLabel[itemCase.status] ?? itemCase.status} />
                                   <CustomChip round='true' size='small' variant='tonal' color={item.closureLane.allowsFinalSettlement ? 'primary' : 'secondary'} label={item.closureLane.label} />
+                                  {/* TASK-892 — closureState badge (4-layer synthesis). */}
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    variant='tonal'
+                                    color={closureStateColor[item.closureCompleteness.closureState] ?? 'default'}
+                                    label={closureStateLabel[item.closureCompleteness.closureState] ?? item.closureCompleteness.closureState}
+                                  />
                                 </Stack>
                                 <FieldsProgressChip filled={item.progress.completed} total={item.progress.total} srLabel={(filled, total) => `${itemCase.publicId}: ${filled} de ${total} pasos listos.`} suffix={total => `de ${total} pasos`} readyLabel={item.progress.completed >= item.progress.total ? 'Listo' : undefined} />
                               </Stack>
