@@ -378,6 +378,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-891 Slice 3 — Person 360 relationship drift reconciliation.
+  // Capability granular para cerrar relacion legacy `employee` + abrir nueva
+  // `contractor` en una sola tx atomic (helper `reconcileMemberContractDrift`).
+  // **V1.0 grant SOLO EFEONCE_ADMIN** — drift Person 360 es cross-domain
+  // (payroll readiness, payslips, reportes legales, ICO). Delegacion a HR
+  // queda V1.1 post 30d steady sin incidentes operativos. Mismo modulo
+  // namespace que TASK-784 person.legal_profile.* ('people'). Spec:
+  // GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1 §2.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'people',
+      capability: 'person.legal_entity_relationships.reconcile_drift',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-874 — Workforce Activation readiness.
   // Read access follows the same operator matrix as complete_intake because the
   // workspace exposes blockers without sensitive values. Override is deliberately
