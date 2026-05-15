@@ -1,10 +1,11 @@
 # Periodos de Nomina
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-05-01 por Codex
+> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-890 — exit eligibility window canonico)
 > **Documentacion tecnica:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
+> **ADR relacionado:** [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md)
 
 ---
 
@@ -202,7 +203,41 @@ Si un regimen no tiene ningun colaborador en el periodo, su grupo y su contador 
 
 ---
 
+## Ventana de elegibilidad payroll por salida (TASK-890, desde 2026-05-15)
+
+Cuando un colaborador tiene un caso de offboarding abierto, su inclusion en la nomina proyectada depende del lane del caso y del threshold canonico declarado en el resolver `resolveExitEligibilityForMembers`:
+
+| Lane del caso (rule_lane) | Threshold de exclusion | Que ve el operador en nomina |
+| --- | --- | --- |
+| `internal_payroll` / `relationship_transition` | `status='executed'` AND cutoff `<` periodo | Excluido del periodo siguiente |
+| `internal_payroll` / `relationship_transition` | `status='executed'` AND cutoff en periodo | Prorrateado hasta el ultimo dia laboral |
+| `external_payroll` / `non_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff en periodo | Excluido de nomina interna (proveedor maneja el cierre afuera) |
+| `external_payroll` / `non_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff `<` periodo | Excluido completo |
+| `identity_only` | N/A | Sigue full_period (identity no gobierna payroll) |
+| `unknown` | conservador | Sigue full_period + warning de clasificacion |
+
+El **cutoff canonico** = `COALESCE(last_working_day, effective_date)`. Esto respeta los CHECK constraints de schema TASK-760: `effective_date` esta poblado desde `approved+` y `last_working_day` desde `scheduled+`.
+
+**Por que internal_payroll exige `executed`**: el finiquito Chile dependiente (TASK-862/863) requiere documento emitido + ratificado antes de cerrar formalmente. Greenhouse paga hasta el ultimo dia. Mantener el threshold en `executed` preserva el contract legal.
+
+**Por que external_payroll alcanza con `approved`**: Greenhouse NO paga la nomina — la paga el proveedor externo (Deel, EOR). Esperar `executed` para un evento que vive afuera del runtime Greenhouse es deuda operativa permanente sin ganancia.
+
+### Feature flag para cutover staged
+
+Esta logica vive detras de `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (default `false` V1.0):
+
+- `false` (default): el reader `pgGetApplicableCompensationVersionsForPeriod` mantiene el gate legacy bit-for-bit (`status='executed' AND last_working_day < periodStart`). El comportamiento es identico al pre-TASK-890.
+- `true` (post staging shadow compare ≥7d con Maria-fixture verde + signal `payroll.exit_window.full_month_projection_drift` count=0 sostenido): el reader post-filtra via el resolver canonico aplicando la matriz completa.
+
+Patron heredado de `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` (TASK-872).
+
+### Caso fuente disparador
+
+Maria Camila Hoyos, caso `EO-OFF-2026-0609A520`, lane `external_payroll`/Deel `last_working_day=2026-05-14`. Pre-TASK-890 aparecia full-month USD 530 en nomina proyectada mayo 2026 porque el gate inline solo excluia `executed`. Post-TASK-890 (con flag activo + case en `approved`): excluida del periodo via `projectionPolicy='exclude_from_cutoff'`.
+
 ## Referencias
 
 - [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
+- [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md)
 - [Manual de uso — Periodos de nomina](../../manual-de-uso/hr/periodos-de-nomina.md)
+- [Documentacion — Offboarding](./offboarding.md)

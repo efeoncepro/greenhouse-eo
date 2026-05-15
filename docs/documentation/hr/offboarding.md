@@ -1,10 +1,11 @@
 # Offboarding Laboral y Contractual
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-11 por Codex
+> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-890 Slice 7 — external_provider_close + drift signal)
 > **Documentacion tecnica:** [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
+> **ADR relacionado:** [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md)
 
 ---
 
@@ -78,10 +79,39 @@ El contrato vigente es:
 
 People 360 muestra esa historia como `Relacion laboral cerrada` y `Relacion contractor/honorarios activa` para evitar ambiguedad operativa.
 
+## Cierre con proveedor externo (TASK-890, desde 2026-05-15)
+
+Cuando un caso de offboarding tiene lane `external_payroll` (colaborador con `payroll_via='deel'` o `relationship_type='eor'`), Greenhouse NO emite finiquito Chile — el cierre operativo y el finiquito legal viven en el proveedor externo (Deel, EOR u otro).
+
+Desde TASK-890, la accion primaria "Cerrar con proveedor" en `/hr/offboarding` deja de ser un link silencioso a `/hr/payroll` y dispara un dialog auditado:
+
+1. **Motivo del cierre** (obligatorio, minimo 10 caracteres) — queda en el audit log append-only del caso.
+2. **Referencia del proveedor** (opcional) — texto corto tipo "Deel termination ID 4587" para trazabilidad.
+3. **Confirmacion** transiciona el caso a `status='approved'` via `POST /api/hr/offboarding/cases/[id]/transition` con la flag `externalProviderCloseReason`.
+
+Efecto downstream:
+
+- El resolver canonico `resolveExitEligibilityForMembers` (TASK-890 Slice 2) detecta el caso `external_payroll` en `status>='approved'` con `last_working_day` en el periodo y aplica `projectionPolicy='exclude_from_cutoff'` — el colaborador deja de aparecer en nomina interna proyectada cuando el feature flag `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` esta activo.
+- Mientras el flag esta en `false` (default V1.0 hasta staging shadow compare verde ≥7d), el comportamiento legacy se mantiene bit-for-bit.
+
+Capabilities requeridas (defense in depth dual-gate):
+
+- `workforce.offboarding.close_external_provider:update` (granular TASK-890) — solo HR / FINANCE_ADMIN / EFEONCE_ADMIN.
+- `hr.offboarding_case:approve|manage` (existente TASK-760) segun la transicion del state machine.
+
+## Drift contrato member ↔ relacion legal (TASK-890 Slice 6)
+
+Un caso comun en colaboradores que pasan de empleado dependiente a contractor/Deel es que el member runtime declara `contract_type='contractor' / payroll_via='deel'` pero la relacion legal activa en `greenhouse_core.person_legal_entity_relationships` sigue como `relationship_type='employee'`.
+
+V1.0 ship solo un **read-only signal** `identity.relationship.member_contract_drift` (subsystem `Identity & Access`) que cuenta este drift. NO hay reconciliacion automatica — eso requeriria mutar Person 360 desde un read path, lo cual viola la regla canonical "NUNCA auto-mutar Person 360 desde un read path".
+
+Resolucion operativa V1.0: HR detecta el drift en `/admin/operations` (rollup `Identity & Access`) y reconcilia la relacion legal manualmente via Person 360. V1.1 (TASK-891 follow-up) ship un command auditado para el write path.
+
 ## Acceso
 
 - Surface visible: view `equipo.offboarding` en `/hr/offboarding`.
 - Autorizacion fina: capability `hr.offboarding_case` con acciones `read`, `create`, `update`, `approve`, `manage`.
+- Cierre con proveedor externo (TASK-890): capability granular `workforce.offboarding.close_external_provider` con accion `update`.
 - Finiquito: capability `hr.final_settlement` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - Documento de finiquito: capability `hr.final_settlement_document` con acciones `read`, `create`, `update`, `approve`, `manage`.
 - La cola operacional `GET /api/hr/offboarding/work-queue` exige lectura de las tres capabilities anteriores y no crea capabilities nuevas.
@@ -93,3 +123,4 @@ People 360 muestra esa historia como `Relacion laboral cerrada` y `Relacion cont
 - [Manual de uso — Offboarding](../../manual-de-uso/hr/offboarding.md)
 - [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
 - [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
+- [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md)
