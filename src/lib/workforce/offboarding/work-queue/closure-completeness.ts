@@ -193,18 +193,40 @@ const NON_ACTIONABLE_NEXT_STEPS: ReadonlySet<OffboardingNextStepCode> = new Set(
   'none'
 ])
 
+// Codigos de nextStep que disparan transitions del case lifecycle en el
+// state machine. Para cases terminales, estos serian rechazados con 409
+// porque el state machine NO permite executed/cancelled → otro estado.
+//
+// Operaciones POST-terminal legitimas (calculate finiquito, render document,
+// approve_calculation, etc.) NO estan aqui — operan sobre entidades
+// child (final_settlement, final_settlement_documents) NO sobre el case
+// agregado. Esas siguen siendo validas en cases terminales (recovery path
+// canonical: HR puede calcular finiquito post-executed para casos internos).
+const TRANSITION_NEXT_STEPS_BLOCKED_ON_TERMINAL: ReadonlySet<OffboardingNextStepCode> = new Set([
+  'external_provider_close', // dialog dispara approveOffboardingCase → 409 en terminal
+  'classify_case'            // require_classification → state machine transition
+])
+
 const buildCaseLifecycleStep = (facts: ClosureCompletenessFacts): OffboardingPendingStep | null => {
-  // Terminal cases NUNCA tienen case_lifecycle step — el lifecycle del case
-  // YA esta cerrado. Esto es independent del nextStep legacy del work-queue
-  // que puede devolver `external_provider_close` para closureLane=external
-  // sin branch sobre case.status (legacy deriveNextStep). El aggregate canonical
-  // es authoritative para "que pasos faltan en el cierre real".
+  // Cases en estado terminal: NO generar case_lifecycle step si el nextStep
+  // code seria rechazado por el state machine. Para operaciones POST-terminal
+  // legitimas (calculate finiquito, render document, etc.) el step sigue
+  // valido — el state machine NO se toca, solo se opera sobre entidades child.
   //
   // Bug class observado live 2026-05-15 con Maria: case `executed` +
-  // closureLane='external_provider' → deriveNextStep retorna
-  // 'external_provider_close' → si solo filtramos por NON_ACTIONABLE_NEXT_STEPS,
-  // el case_lifecycle step se genera y dispara el primaryAction obsoleto.
-  if (facts.caseStatus === 'executed' || facts.caseStatus === 'cancelled') return null
+  // closureLane='external_provider' → nextStep='external_provider_close' →
+  // si solo filtramos NON_ACTIONABLE_NEXT_STEPS, el step se genera y dispara
+  // primaryAction obsoleto que 409.
+  //
+  // V1.0.1 (live fix): filtraba TODOS los terminales. Demasiado agresivo —
+  // rompia el path canonical de finiquito recovery (HR calcula finiquito
+  // post-executed). V1.0.2 (este fix): filtro quirurgico al set de codes
+  // que efectivamente disparan state transition del case agregado.
+  const caseIsTerminal = facts.caseStatus === 'executed' || facts.caseStatus === 'cancelled'
+
+  if (caseIsTerminal && TRANSITION_NEXT_STEPS_BLOCKED_ON_TERMINAL.has(facts.nextStep.code)) {
+    return null
+  }
 
   // Defense in depth: si la derivation ya marca el nextStep como terminal
   // (completed/none), tampoco generamos step. Cubre cases blocked u otros
