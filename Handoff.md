@@ -1,3 +1,13 @@
+# Delta 2026-05-15 — TASK-890 production flag flip autorizado
+
+- **Cambio operativo**: `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` quedó activo en `Production` y `staging` para el proyecto Vercel canónico `efeonce-7670142f/greenhouse-eo`.
+- **Proyecto confirmado**: `.vercel/project.json` apunta a `projectId=prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`; `vercel domains inspect greenhouse.efeoncepro.com --scope efeonce-7670142f` confirma que `greenhouse.efeoncepro.com` pertenece a `greenhouse-eo`.
+- **Producción redeployed**: nuevo deployment Ready `https://greenhouse-nuxm6lf83-efeonce-7670142f.vercel.app`, aliasado a `https://greenhouse.efeoncepro.com` y `https://greenhouse-eo.vercel.app`.
+- **Verificación env**: `vercel env ls --scope efeonce-7670142f` muestra `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` en `Production` y `staging`; `vercel env pull --environment=production` y `--environment=staging` confirmaron valor efectivo `"true"` sin persistir archivos locales.
+- **Verificación funcional post-deploy**: request autenticado a `GET https://greenhouse.efeoncepro.com/api/hr/payroll/projected?year=2026&month=5&mode=projected_month_end` respondió `200`, pero María Camila Hoyos todavía aparece (`member_id=d1a72374-f4b7-415f-b54a-0dcf76749e46`, USD 530). Causa confirmada: `origin/main` todavía no contiene los commits de TASK-890; TASK-890 está en `origin/develop`. El flag en production queda listo, pero no tiene efecto hasta promover el código TASK-890 a `main`/Production.
+- **Override documentado**: Julio autorizó explícitamente saltar el gate duro de `CLAUDE.md` de 7 días de staging shadow compare por urgencia operativa mid-month. Razón: `TASK-890 V1.0 flag flip post staging validation — María Camila Hoyos external_payroll exclusión`.
+- **Guardrail**: no se mutaron datos productivos de María Camila Hoyos; solo se activó el flag de runtime y se regeneró el deployment. Siguiente paso real para que `/api/hr/payroll/projected` aplique `projectionPolicy=exclude_from_cutoff`: promover TASK-890 desde `develop` a `main`/Production.
+
 # Sesion 2026-05-15 — TASK-892 V1.0 COMPLETO SHIPPED en develop (4 slices end-to-end)
 
 - **Estado final**: V1.0 COMPLETE. 4 commits pushed a `develop`:
