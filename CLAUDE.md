@@ -3439,6 +3439,63 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 
 **Spec canónica**: `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (Slice 1 fix). Pattern fuente: `src/lib/entitlements/runtime.ts` líneas con grant `workforce.member.complete_intake` (matriz `hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN`).
 
+### Workforce Exit Payroll Eligibility invariants (TASK-890, desde 2026-05-15)
+
+Toda decision "este miembro esta en scope payroll en este periodo" pasa por el **resolver canonico server-only** `src/lib/payroll/exit-eligibility/`. Reemplaza el patron actual donde el reader payroll embebia el gate inline (`NOT EXISTS offboarding_cases WHERE status='executed' AND last_working_day < periodStart`), ignorando casos `external_payroll` (Deel/EOR) que cierran via proveedor externo sin transicionar a `executed`.
+
+Bug class disparador: caso `EO-OFF-2026-0609A520` Maria Camila Hoyos, lane `external_payroll`/Deel `last_working_day=2026-05-14` status `draft`. Nomina proyectada mostraba full-month USD 530 para mayo 2026 porque external_payroll cierra fuera del state machine interno.
+
+**Read API canonico** (`src/lib/payroll/exit-eligibility/index.ts`):
+
+- `resolveExitEligibilityForMembers(memberIds, periodStart, periodEnd) → Map<memberId, WorkforceExitPayrollEligibilityWindow>` — bulk-first. Devuelve `projectionPolicy` (`full_period | partial_until_cutoff | exclude_from_cutoff | exclude_entire_period`) + `eligibleFrom/eligibleTo` + `cutoffDate` + `warnings[]`.
+- `isMemberInPayrollScope(memberId, asOf) → boolean` — thin predicate wrapper para capability gates, drawer state, checks single-member.
+
+**Matriz canonica per lane** (§2 ADR):
+
+| `rule_lane` (DB) | Threshold de exclusion | Policy con cutoff en periodo |
+|---|---|---|
+| `internal_payroll` / `relationship_transition` | `status = 'executed'` | `partial_until_cutoff` (prorratear hasta LWD) |
+| `external_payroll` / `non_payroll` | `status IN ('approved','scheduled','executed')` | `exclude_from_cutoff` (Greenhouse no paga internal) |
+| `identity_only` | N/A — siempre `full_period` | Identity ortogonal a payroll |
+| `unknown` | conservador — `full_period` + warning `unclassified_lane` | — |
+
+**Rationale asymmetric threshold**: internal_payroll requiere `executed` porque Greenhouse paga finiquito Chile que debe estar emitido + ratificado (TASK-862/863). External_payroll/Deel nunca paga Greenhouse; `approved` es momento canonico de decision firmada. Esperar `executed` para evento que vive afuera del runtime Greenhouse es deuda operativa permanente.
+
+**Cutoff canonico**: `COALESCE(last_working_day, effective_date)`. Schema CHECK constraints (TASK-760) garantizan `effective_date NOT NULL` en `approved+` y `last_working_day NOT NULL` en `scheduled+`. NUNCA usar `last_working_day` solo — entre `approved` y `scheduled` puede ser NULL.
+
+**Feature flag canonico** `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (default `false` V1.0):
+
+- `false` (default): `pgGetApplicableCompensationVersionsForPeriod` mantiene gate legacy bit-for-bit (solo excluye `executed` AND `last_working_day < periodStart`). Zero-risk parity.
+- `true` (post staging shadow compare ≥7d con Maria-fixture verde): post-filter via resolver + attach `exitEligibilityWindow?: WorkforceExitPayrollEligibilityWindow` opcional al row para que consumers downstream (`project-payroll.ts`) puedan prorratear.
+
+Pattern fuente: `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` (TASK-872).
+
+**Degraded mode honesto**: si `resolveExitEligibilityForMembers` falla (DB transient, schema drift), `captureWithDomain('payroll', err, { source: 'exit_eligibility.integration_degraded' })` + fallback a legacy SQL path. Payroll nunca rompe full. Reliability signal `payroll.exit_eligibility.bq_fallback_invoked` cubre detection en V1.1.
+
+**Lint rule canonica** `greenhouse/no-inline-payroll-scope-gate` (modo `warn` V1.0, promueve a `error` post 30d steady): detecta SQL embebido con `NOT EXISTS ... work_relationship_offboarding_cases ... status='executed' AND last_working_day` o variantes EXISTS positive. Override block exime: `src/lib/payroll/exit-eligibility/**`, `src/lib/payroll/postgres-store.ts` (gate legacy behind flag — grandfathered), tests del rule.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** filtrar inclusion payroll inline en un SQL embebido en TS. Toda decision pasa por `resolveExitEligibilityForMembers` o `isMemberInPayrollScope`. Lint rule bloquea regresion.
+- **NUNCA** distinguir entre `rule_lane` valores con strings literales en consumers. Usar enum `ExitLane` del resolver (DB-aligned 1:1) o consumer reads `projectionPolicy` directly.
+- **NUNCA** mezclar el gate de intake (`workforce_intake_status` TASK-872) con el gate de exit (`exitLane × status`). Son ortogonales by design — features distintos.
+- **NUNCA** modificar el threshold por lane sin actualizar AMBOS: matriz §2 ADR + tests anti-regresion + lint rule + reliability signal evidence.
+- **NUNCA** ejecutar payroll real (no proyectada) sin que el mismo resolver filtre las compensation versions aplicables. Single source of truth across projected + actual.
+- **NUNCA** auto-mutar Person 360 desde read path. Solo signal en V1 (Slice 6). Write reconciliation = command auditado V1.1+.
+- **NUNCA** usar `last_working_day` solo como cutoff. Toda decision usa `COALESCE(last_working_day, effective_date)`. Schema CHECK invariants TASK-760 garantizan que `effective_date` esta poblado en `approved+`.
+- **NUNCA** invocar `Sentry.captureException()` directo en este path. Usar `captureWithDomain(err, 'payroll' | 'hr' | 'identity', { tags: { source: 'exit_eligibility_*' } })`.
+- **NUNCA** modificar el shape de `WorkforceExitPayrollEligibilityWindow` sin actualizar consumers en el mismo PR. Tipo es contractual cross-module.
+- **NUNCA** activar `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` en production sin: (a) staging shadow compare verde >=7d; (b) Maria-like fixture green; (c) signal `payroll.exit_window.full_month_projection_drift` count=0 sustained.
+- **NUNCA** un consumer payroll que necesite saber "este miembro esta en scope" recomputa el gate inline. Opciones canonicas en orden de preferencia:
+  1. Lee `exitEligibilityWindow` del row mapped que devuelve `pgGetApplicableCompensationVersionsForPeriod` (auto-attached cuando flag activo).
+  2. Llama `resolveExitEligibilityForMembers(memberIds, periodStart, periodEnd)` directamente (bulk).
+  3. Llama `isMemberInPayrollScope(memberId, asOf)` para single-member checks (capability gates, drawer state).
+- **SIEMPRE** que emerja un `rule_lane` nuevo en schema (e.g. `eor_provider`, `intercompany_loan`), extender §2 tabla ADR + `ExitLane` type + matriz `derivePolicy` + tests + lint rule en el mismo PR.
+- **SIEMPRE** que un consumer nuevo necesite "members en scope laboral interno" (capacity, staffing, cost attribution), llamar al resolver. Cero composicion ad-hoc.
+- **SIEMPRE** que BQ fallback path se invoque (cuando emerja replicacion en BQ V1.1+), emitir `captureWithDomain('payroll', warn, { source: 'bq_fallback_no_exit_gate' })`.
+
+**Spec canonica**: `docs/architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`. Task: `docs/tasks/in-progress/TASK-890-workforce-exit-payroll-eligibility-window.md`. Patrones fuente: TASK-571/766/774 (VIEW canonica + helper + signal + lint), TASK-742 (defense-in-depth), TASK-872 (feature flag gate), TASK-720 (TS-only declarative reader), TASK-672 (rich struct + thin predicate).
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa
