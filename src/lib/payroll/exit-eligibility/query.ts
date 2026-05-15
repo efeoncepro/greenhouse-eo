@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { runGreenhousePostgresQuery } from '@/lib/db'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { ExitCaseFacts } from './policy'
 import type { ExitLane, ExitStatus } from './types'

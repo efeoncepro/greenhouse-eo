@@ -14,7 +14,7 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Slice 1 in-flight`
+- Status real: `Slices 1-3 shipped 2026-05-15; Slices 4-7 pendientes`
 - Rank: `TBD`
 - Domain: `hr|payroll|identity|platform`
 - Blocked by: `none`
