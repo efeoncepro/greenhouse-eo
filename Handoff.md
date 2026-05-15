@@ -9,6 +9,47 @@
 - **Pendiente operativo**: tras deploy del fix, re-ejecutar/replay del event o esperar retry para `hubspotCompanyId=54964918606` y verificar que `commercial.hubspot_company.intake_dead_letter` vuelva a 0. No se mutaron datos productivos manualmente desde esta sesión.
 - **Nota multi-agente**: existían cambios no relacionados al inicio/cierre: `TASK-298` doc delta Meeting Notes y `TASK-891` movida a `in-progress`; no se tocaron para este fix salvo el changelog/handoff de este incidente.
 
+# Sesion 2026-05-15 — TASK-891 V1.0 COMPLETO SHIPPED en develop (6 slices end-to-end)
+
+- **Estado final**: V1.0 COMPLETE. 7 commits pushed a `develop`:
+  - Slice 1 (ADR + DECISIONS_INDEX): `2cce9c8f`
+  - Slice 2 (Helper canonico + 17 tests): `5f183d55`
+  - Slice 3 (Capability + grant + migration + route): `d4f32623`
+  - Slice 5 (Auto-escalation severity post 30d): `503a00e2`
+  - Slice 4 (UI form admin): `93a91be0`
+  - Slice 6 (Docs/manuales + CLAUDE.md): `29643bd5`
+  - Close-out (lifecycle + README + registry + changelog + Handoff): pending push
+- **Verificacion final**: `pnpm test` 4608 passed 0 fail (full suite, 54s). `pnpm build` production Turbopack 28.3s. `pnpm lint` 0 errors (4 warnings preexistentes TASK-827). `pnpm tsc --noEmit` clean. Pre-push hook canonical verde 6 veces.
+- **Skills usadas**: `arch-architect` Greenhouse overlay (validacion Open Questions pre-execution), `greenhouse-backend` (helper canonico + route handler), `greenhouse-ux` (UI form anatomy + tokens), `greenhouse-ux-writing` (microcopy es-CL identity.ts), `greenhouse-task-planner` (creacion spec original).
+- **Decisiones clave post-Discovery aplicadas pre-implementation**:
+  1. REUSE > CREATE en Slice 2 — composes `endPersonLegalEntityRelationship` + `createContractorLegalEntityRelationship` existentes (TASK-337) en lugar de SQL inline.
+  2. NO crear evento `.reconciled v1` nuevo — reusar `.deactivated` + `.created` existentes con `metadata_json.reconciliationContext` para correlation forensic.
+  3. Capability `module='people'` (alineado TASK-784 person.legal_profile.*), NOT `'identity'` (ENUM cerrado del runtime no acepta 'identity').
+  4. UI form-only en page propia con Container+Card outlined (NO dialog modal V1.0).
+  5. Auto-escalation severity 30d data-driven (lógica condicional `firstDetectedAt + 30d < NOW()`).
+- **Deliverables**:
+  - 1 ADR canónica (`GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1.md`) indexada
+  - 1 helper canónico `reconcileMemberContractDrift` server-only (854 LOC + 17 tests)
+  - 1 migration capability registry seed (TASK-839 pattern + anti pre-up-marker)
+  - 1 capability granular `person.legal_entity_relationships.reconcile_drift` (EFEONCE_ADMIN-only V1.0)
+  - 1 route handler `POST /api/admin/person/relationships/[memberId]/reconcile-drift`
+  - 1 UI form `/admin/identity/drift-reconciliation` con deep link support
+  - 1 microcopy namespace `GH_PERSON_RELATIONSHIP_DRIFT_RECONCILE` en `src/lib/copy/identity.ts` (nuevo file modular)
+  - 1 auto-escalation severity post 30d en signal reader existente (9 tests, threshold canónico)
+  - 3 docs/manuales actualizados (offboarding doc v1.4, manual offboarding v1.4)
+  - 1 sección canónica "Person 360 Relationship Reconciliation invariants" en CLAUDE.md (14 hard rules)
+- **Maria Camila Hoyos NO mutada** en esta task. Recovery operativa espera:
+  1. Staging deploy de TASK-891
+  2. Synthetic test fixture (member ficticio con drift artificial)
+  3. HR approval explícito sobre el caso real
+  4. Operador EFEONCE_ADMIN ejecuta dialog en `/admin/identity/drift-reconciliation?memberId=<maria-id>` con reason >=20 chars
+- **Follow-ups V1.1+**:
+  - TASK-XXX delegación capability a HR post 30d steady
+  - TASK-XXX bulk reconciliation si emerge volumen sostenido >50/mes
+  - TASK-XXX drift reverso (employee runtime + contractor relación)
+  - TASK-XXX auto-reconciliation cron (V2 con ADR nuevo + HR approval)
+- **Siguiente ID disponible**: `TASK-892`.
+
 # Sesion 2026-05-15 — TASK-891 creada (follow-up TASK-890 ADR §7)
 
 - **Task creada**: `docs/tasks/to-do/TASK-891-person-relationship-drift-reconciliation-write-path.md`. Cierra el follow-up declarado en TASK-890 ADR §7 (write reconciliation Person 360).
