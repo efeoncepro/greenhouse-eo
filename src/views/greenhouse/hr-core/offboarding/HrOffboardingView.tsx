@@ -36,6 +36,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 import { getMicrocopy } from '@/lib/copy'
 import { GH_FINIQUITO } from '@/lib/copy/finiquito'
+import { GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE } from '@/lib/copy/workforce'
 import { GH_MY_NAV } from '@/config/greenhouse-nomenclature'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -291,6 +292,22 @@ const HrOffboardingView = () => {
   const [maintenanceSaving, setMaintenanceSaving] = useState(false)
   const [maintenanceFormError, setMaintenanceFormError] = useState<string | null>(null)
 
+  // TASK-890 Slice 5 — Dialog "Cerrar caso con proveedor externo" para lane
+  // `external_payroll` (Deel/EOR). Reemplaza el `href='/hr/payroll'` legacy
+  // por command auditado POST /api/hr/offboarding/cases/[id]/transition con
+  // `externalProviderCloseReason` (>=10 chars) + capability granular
+  // `workforce.offboarding.close_external_provider`.
+  const [externalProviderCloseTarget, setExternalProviderCloseTarget] =
+    useState<OffboardingWorkQueueItem | null>(null)
+
+  const [externalProviderCloseForm, setExternalProviderCloseForm] = useState<{
+    reason: string
+    providerRef: string
+  }>({ reason: '', providerRef: '' })
+
+  const [externalProviderCloseSaving, setExternalProviderCloseSaving] = useState(false)
+  const [externalProviderCloseError, setExternalProviderCloseError] = useState<string | null>(null)
+
   const queueItems = useMemo(() => workQueue?.items ?? [], [workQueue])
 
   const filteredItems = useMemo(
@@ -319,8 +336,11 @@ const HrOffboardingView = () => {
   const isItemBusy = (item: OffboardingWorkQueueItem) =>
     saving || settlementSavingCaseId === item.case.offboardingCaseId || documentSavingCaseId === item.case.offboardingCaseId
 
+  // TASK-890 Slice 5 — `external_provider_close` ya NO navega a /hr/payroll.
+  // Ahora dispara el dialog auditado que confirma cierre con proveedor externo.
+  // `review_payment` sigue navegando a /hr/payroll (legacy behavior).
   const hrefForAction = (actionDescriptor: OffboardingWorkQueueActionDescriptor | null) =>
-    actionDescriptor?.href ?? (actionDescriptor?.code === 'review_payment' || actionDescriptor?.code === 'external_provider_close' ? '/hr/payroll' : null)
+    actionDescriptor?.href ?? (actionDescriptor?.code === 'review_payment' ? '/hr/payroll' : null)
 
   const prerequisiteRowsFor = (item: OffboardingWorkQueueItem) => {
     if (!item.prerequisites.required) {
@@ -826,24 +846,103 @@ const HrOffboardingView = () => {
     }
   }
 
+  // TASK-890 Slice 5 — handler para el dialog "Cerrar caso con proveedor externo".
+  // POST canonico a /api/hr/offboarding/cases/[id]/transition con
+  // `externalProviderCloseReason` (intent flag detectado por el route handler).
+  // El route handler enforce capability granular + reason >= 10 chars + merge
+  // del reason al campo audit append-only del state machine.
+  const submitExternalProviderClose = async () => {
+    if (!externalProviderCloseTarget) return
+
+    const reason = externalProviderCloseForm.reason.trim()
+
+    if (reason.length < 10) {
+      setExternalProviderCloseError(GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.feedback.errorReasonTooShort)
+
+      return
+    }
+
+    setExternalProviderCloseSaving(true)
+    setExternalProviderCloseError(null)
+    setError(null)
+    setScanMessage(null)
+
+    const item = externalProviderCloseTarget
+    const providerRef = externalProviderCloseForm.providerRef.trim()
+
+    try {
+      const res = await fetch(`/api/hr/offboarding/cases/${item.case.offboardingCaseId}/transition`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'approved',
+          effectiveDate: item.case.effectiveDate ?? item.case.lastWorkingDay ?? today(),
+          lastWorkingDay: item.case.lastWorkingDay ?? today(),
+          externalProviderCloseReason: reason,
+          ...(providerRef ? { externalProviderRef: providerRef } : {})
+        })
+      })
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}))
+
+        throw new Error(
+          payload?.error ?? GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.feedback.errorGeneric
+        )
+      }
+
+      await loadData()
+      setExternalProviderCloseTarget(null)
+      setExternalProviderCloseForm({ reason: '', providerRef: '' })
+      setScanMessage(GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.feedback.success)
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.feedback.errorGeneric
+
+      setExternalProviderCloseError(message)
+    } finally {
+      setExternalProviderCloseSaving(false)
+    }
+  }
+
   const renderCaseInspector = (item: OffboardingWorkQueueItem, mode: 'panel' | 'drawer') => {
     const tone = toneFor(item)
     const primaryAction = item.primaryAction
     const primaryHref = hrefForAction(primaryAction)
     const busy = isItemBusy(item)
 
+    // TASK-890 Slice 5 — `external_provider_close` abre dialog auditado en lugar
+    // de navegar silente a /hr/payroll. Onclick path explicit.
+    const isExternalProviderCloseAction = primaryAction?.code === 'external_provider_close'
+
     const primaryButton = primaryAction
-      ? primaryHref
+      ? isExternalProviderCloseAction
         ? (
-            <Button fullWidth variant='contained' color='primary' disabled={busy || primaryAction.disabled} href={primaryHref}>
+            <Button
+              fullWidth
+              variant='contained'
+              color='primary'
+              disabled={busy || primaryAction.disabled}
+              onClick={() => {
+                setExternalProviderCloseTarget(item)
+                setExternalProviderCloseForm({ reason: '', providerRef: '' })
+                setExternalProviderCloseError(null)
+              }}
+            >
               {busy ? 'Procesando' : primaryAction.label}
             </Button>
           )
-        : (
-            <Button fullWidth variant='contained' color='primary' disabled={busy || primaryAction.disabled} onClick={() => void runQueueAction(item, primaryAction)}>
-              {busy ? 'Procesando' : primaryAction.label}
-            </Button>
-          )
+        : primaryHref
+          ? (
+              <Button fullWidth variant='contained' color='primary' disabled={busy || primaryAction.disabled} href={primaryHref}>
+                {busy ? 'Procesando' : primaryAction.label}
+              </Button>
+            )
+          : (
+              <Button fullWidth variant='contained' color='primary' disabled={busy || primaryAction.disabled} onClick={() => void runQueueAction(item, primaryAction)}>
+                {busy ? 'Procesando' : primaryAction.label}
+              </Button>
+            )
       : null
 
     return (
@@ -1328,6 +1427,128 @@ const HrOffboardingView = () => {
             {maintenanceSaving
               ? GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.savingCta
               : GH_FINIQUITO.resignation.prerequisites.maintenanceDialog.cta}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* TASK-890 Slice 5 — Dialog "Cerrar caso con proveedor externo" */}
+      <Dialog
+        open={Boolean(externalProviderCloseTarget)}
+        onClose={() => {
+          if (!externalProviderCloseSaving) {
+            setExternalProviderCloseTarget(null)
+            setExternalProviderCloseForm({ reason: '', providerRef: '' })
+            setExternalProviderCloseError(null)
+          }
+        }}
+        fullWidth
+        maxWidth='sm'
+      >
+        <DialogTitle>{GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.title}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Typography variant='body2' color='text.secondary'>
+              {GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.description}
+            </Typography>
+
+            {externalProviderCloseTarget && (
+              <Box
+                sx={theme => ({
+                  p: 2,
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                  border: `1px solid ${theme.palette.divider}`,
+                  backgroundColor: alpha(theme.palette.info.main, 0.05)
+                })}
+              >
+                <Stack spacing={0.5}>
+                  <Typography variant='caption' color='text.secondary'>
+                    Caso · {externalProviderCloseTarget.case.publicId}
+                  </Typography>
+                  <Typography variant='subtitle2'>
+                    {externalProviderCloseTarget.collaborator.displayName ?? externalProviderCloseTarget.case.memberId ?? 'Sin colaborador'}
+                  </Typography>
+                  <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 0.5 }}>
+                    <CustomChip
+                      size='small'
+                      label={GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.laneChip}
+                      color='info'
+                      variant='tonal'
+                    />
+                    {externalProviderCloseTarget.case.lastWorkingDay && (
+                      <Typography variant='caption' color='text.secondary'>
+                        Último día: {formatDate(externalProviderCloseTarget.case.lastWorkingDay)}
+                      </Typography>
+                    )}
+                  </Stack>
+                </Stack>
+              </Box>
+            )}
+
+            <TextField
+              label={GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.reasonLabel}
+              placeholder={GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.reasonPlaceholder}
+              helperText={
+                externalProviderCloseError &&
+                externalProviderCloseError === GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.feedback.errorReasonTooShort
+                  ? GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.reasonError
+                  : GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.reasonHelper
+              }
+              error={
+                Boolean(externalProviderCloseError) &&
+                externalProviderCloseError === GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.feedback.errorReasonTooShort
+              }
+              value={externalProviderCloseForm.reason}
+              onChange={event =>
+                setExternalProviderCloseForm(prev => ({ ...prev, reason: event.target.value }))
+              }
+              disabled={externalProviderCloseSaving}
+              fullWidth
+              multiline
+              minRows={3}
+              required
+            />
+
+            <TextField
+              label={GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.providerRefLabel}
+              placeholder={GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.providerRefPlaceholder}
+              helperText={GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.providerRefHelper}
+              value={externalProviderCloseForm.providerRef}
+              onChange={event =>
+                setExternalProviderCloseForm(prev => ({ ...prev, providerRef: event.target.value }))
+              }
+              disabled={externalProviderCloseSaving}
+              fullWidth
+            />
+
+            {externalProviderCloseError &&
+              externalProviderCloseError !== GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.feedback.errorReasonTooShort && (
+                <Alert severity='error' variant='outlined'>
+                  {externalProviderCloseError}
+                </Alert>
+              )}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color='secondary'
+            variant='tonal'
+            disabled={externalProviderCloseSaving}
+            onClick={() => {
+              setExternalProviderCloseTarget(null)
+              setExternalProviderCloseForm({ reason: '', providerRef: '' })
+              setExternalProviderCloseError(null)
+            }}
+          >
+            {GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.cancelButton}
+          </Button>
+          <Button
+            variant='contained'
+            disabled={externalProviderCloseSaving || externalProviderCloseForm.reason.trim().length < 10}
+            onClick={() => void submitExternalProviderClose()}
+          >
+            {externalProviderCloseSaving
+              ? GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.saving
+              : GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE.dialog.confirmButton}
           </Button>
         </DialogActions>
       </Dialog>
