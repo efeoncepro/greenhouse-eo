@@ -211,11 +211,31 @@ The task should produce a decision matrix with at least these options:
 
 | Option | Runtime | Best fit | Risks | Decision |
 |---|---|---|---|---|
-| A | Existing sibling `notion-bq-sync` hardened | Preserve current ingestion with lower blast radius | Keeps split ownership | keep / change / reject |
-| B | Absorb admin/discovery surface only | Reduce portal dependency on public sibling endpoints | Partial duplication | keep / change / reject |
-| C | Full Cloud Run absorption | Maximum repo control | High migration and CI/CD scope | keep / change / reject |
-| D | Notion Workers for selected sync/tools/webhooks | Hosted close to Notion, lower infra | Beta, credits, managed DB limits | keep / change / reject |
-| E | Hybrid: hardened ingestion + Workers for tools/writes | Gradual adoption | More topology to document | keep / change / reject |
+| A | Existing sibling `notion-bq-sync` hardened | Preserve current ingestion with lower blast radius | Keeps split ownership | **keep** (Slice 4 verdict 2026-05-15) |
+| B | Absorb admin/discovery surface only | Reduce portal dependency on public sibling endpoints | Partial duplication | keep / change / reject — pendiente Slice 2 inventory completion |
+| C | Full Cloud Run absorption | Maximum repo control | High migration and CI/CD scope | **reject** (Slice 4 verdict 2026-05-15) — sin justificación post-evidencia Workers |
+| D | Notion Workers for selected sync/tools/webhooks | Hosted close to Notion, lower infra | Beta, credits, managed DB limits | **change** to "Workers para tools/agents only, NO sync crítico" (Slice 4 verdict 2026-05-15) |
+| E | Hybrid: hardened ingestion + Workers for tools/writes | Gradual adoption | More topology to document | **keep / accept as canonical** (Slice 4 verdict 2026-05-15) |
+
+### Slice 4 — Decision verdict 2026-05-15 (post Slice 1 + Slice 3 evidence)
+
+**Veredicto canónico: arquitectura híbrida (option E)** con boundaries explícitos:
+
+- **Ingestion delivery (Notion → BQ raw → conformed → PG)** → **mantener `notion-bq-sync` Cloud Run sibling** (option A). Razón: pipeline canonical estable, control plane retry/orchestration probado (TASK-588 + Slice 0 evidence), schema PG `greenhouse_delivery.*` y BQ `greenhouse_conformed.delivery_*` son source of truth de Greenhouse. Workers NO ofrecen ventaja para este path porque (a) carecen de acceso nativo a PG/BQ Greenhouse, (b) los `notion_ops.*` raw tables ya viven en BQ via el sibling, (c) cross-tenant ingest necesita identity reconciliation Greenhouse-side (TASK-877).
+- **Identity reconciliation (Notion users → identity_profile_source_links)** → **mantener Internal Integration Token + sibling/portal path canonical** (TASK-877 complete). Razón: PATs no pueden listar users (`403 restricted_resource`), Workers no agregan valor sobre el path actual.
+- **Write bridge a Notion (TASK-577 EPIC-005)** → **Cloud Run híbrido + Workers opcional para subset acotado**. Razón: writes que mezclan Notion + HubSpot + identity Greenhouse-side requieren Cloud Run (transactions, multi-store). Writes Notion-puros (e.g. publicar ICO report como Notion page via Markdown API) podrían vivir en un Worker, pero el blast radius del bridge Cloud Run principal NO se reemplaza.
+- **Tools para External Agents API / Nexa-in-Notion (EPIC-005 follow-up)** → **Workers SÍ son canonical**. Razón: cuando el PM hable con Nexa desde Notion ("@Nexa dame el ICO de este proyecto"), la tool corre Notion-side via Worker que llama Greenhouse API read-only. Beneficios validados live: audit log nativo, multi-agent operability, latencia ~4s, sin servidor propio. Use case más alto-valor para Workers.
+- **Tooling/sandbox developer** → **Workers OK como playground**, no production. Sandbox `greenhouse-cli-readiness-sandbox` se mantiene para iteraciones futuras.
+
+**Cross-references actualizadas (Slice 4 entregable)**:
+
+- TASK-577 (write bridge) → mantener Python/Cloud Run como path principal V1; agregar follow-up explícito V2 evaluating Worker para Markdown publisher (publicar ICO/sprint reports a Notion pages como tool dedicada).
+- TASK-736/737 (notion-bq-sync hardening + absorption readiness) → mantener trayectoria actual; **NO migrar a Workers**.
+- TASK-738 (portal Notion SDK migration) → puede correr encima del cliente canonical TASK-880 sin requerir Workers.
+- TASK-739 (API modernization readiness) → absorbida por TASK-880 (mismo scope: bump version + cliente canonical).
+- TASK-880 (foundation) → unblocked, ready para Slice 0; cascade auth contract validated.
+- TASK-881 (Meeting Notes ingest) → **path canonical V1: reactive consumer en ops-worker Cloud Run** (no Worker). Razón: cross-workspace orchestration + cross-tenant + PG materialization + identity resolution Greenhouse-side. Worker como V2 contingente solo si emerge use case Notion-puro.
+- Nuevo follow-up sugerido: **TASK-NNN — Nexa Tools as Notion Workers (EPIC-005 pillar)**. Implementar 3-5 tools read-only (project ICO, sprint health, last meeting summary) como Workers que llamen Greenhouse API platform health (TASK-672) + readers canonical. Bloqueada por: External Agents API GA (alpha al 2026-05-13), TASK-880 cliente canonical, decisión de Workers credits pricing post 11-ago-2026.
 
 Minimum evidence to collect:
 
@@ -341,6 +361,49 @@ Live `ntn api /v1/users/me` response capturó identidad completa del primer PAT 
 | Restrictions verificadas | NO puede `GET /v1/users` (`403 restricted_resource: Personal access tokens cannot list users`) |
 
 Cuando TASK-880 Slice 2 cree la tabla `greenhouse_core.notion_personal_access_tokens`, este PAT debe ser la primera fila migrada con `label='Notion CLI Julio Reyes (developer sandbox)'`, `scope='read'`, `verified_at=NOW()` y `last_used_at` poblado desde el log del Slice 1.
+
+### Slice 3 evidence — 2026-05-15 Cross-agent Worker pilot exec validated
+
+**Pilot setup (entregado por Codex en sesión paralela 2026-05-14)**:
+
+- Workspace admin (Julio) aceptó prompt `Enable Notion Workers?` interactivo via `ntn workers create`. Workers quedaron habilitados workspace-wide para Efeonce.
+- Codex creó Worker sandbox `greenhouse-cli-readiness-sandbox` (ID `019e2937-183d-7383-9159-83c29cb685ee`) desde el template oficial `ntn workers new`, scope mínimo: 1 tool `sayHello`, sin syncs, webhooks, database links.
+- Deploy via `ntn workers deploy` exitoso. `workers.json` local generado por la CLI fue eliminado para no versionar estado local del workspace en el repo (no hay artefactos sandbox checked-in).
+- Codex ejecutó tool desde su sesión: input `{"name":"Greenhouse"}` → output `"Hello, Greenhouse!"`, run `019e2938-335c-72a6-afba-50a37c866396`, exitCode 0, duración ~4s (01:20:09 → 01:20:13 UTC).
+
+**Cross-agent operability validated (Claude session 2026-05-15)**:
+
+- `ntn doctor` desde sesión Claude reporta `Workers enabled ✔ yes` (5 passed, antes era 4 passed + 1 warning) — confirma que la habilitación es workspace-wide y todos los PATs/agents autenticados al workspace ven Workers activos.
+- `ntn workers list` muestra el sandbox vivo: `019e2937-183d-7383-9159-83c29cb685ee greenhouse-cli-readiness-sandbox` creado `2026-05-15T01:18:57Z`, last activity `2026-05-15T01:19:47Z`.
+- `ntn workers capabilities list 019e2937-...` retorna `tool sayHello` (1 capability registered).
+- `ntn workers exec sayHello --worker-id 019e2937-183d-7383-9159-83c29cb685ee -d '{"name":"Claude"}'` → output `"Hello, Claude!"`, run `019e293d-085e-73e4-9b68-0ad99402dfc7`, exitCode 0, duración ~4s (01:25:26 → 01:25:30 UTC).
+- `ntn workers runs list 019e2937-...` muestra audit completo: 3 runs (Codex tool exec + Claude tool exec + initial `fetchAndSaveCapabilities` deploy step), todos exitCode 0, timestamps + duración por run, accesibles cross-agent.
+- `ntn workers usage 019e2937-...` retorna `0 0 30` — zero credits consumidos (tool sample no usa AI), 30 unit quota mostrada.
+
+**Conclusiones validated live**:
+
+| Capacidad | Estado | Implicancia |
+|---|---|---|
+| Workers habilitables por workspace admin | ✅ confirmado | Sin friction post enable; 1 prompt interactivo único per workspace |
+| Cross-agent shared workers | ✅ confirmado | Codex y Claude ejecutaron el mismo Worker sin conflict ni lockout |
+| Audit log nativo per run | ✅ confirmado | Notion provee runs + logs + duración + exitCode sin configurar nada (vs Sentry/PG audit custom que tendríamos que mantener) |
+| Latencia tool execution remota | ~4s validado | Suficiente para uso interactivo (e.g. Nexa-in-Notion responding a comandos PM); NO suficiente para hot path API request handlers |
+| Dev experience (CLI) | ✅ excelente | `ntn workers new/deploy/exec/runs/list` cubren lifecycle completo sin tocar Notion UI |
+| AI credits tracking | ✅ disponible | `ntn workers usage <id>` reporta consumo per Worker; pricing transition al 11-ago-2026 sigue siendo opaco para non-AI workloads |
+| Pricing post-beta | ⚠️ NO validado | Tool sample no consumió credits; pricing real para Workers con AI calls + scheduled syncs sigue requiriendo investigación |
+| Rate limits / max execution time | ⚠️ NO validado | Sample fue trivial; emerge cuando intentemos un Worker con sync/webhook real |
+| Acceso a PG/BQ Greenhouse desde Worker | ❌ NO disponible nativo | Confirmado por arquitectura: Workers corren en infra Notion, requeriría llamar Greenhouse API platform-health (TASK-672) o equivalentes outbound |
+| Cross-tenant scoping | ❌ Workers son workspace-level | NO existe per-cliente / per-tenant Worker. Cross-tenant ops siguen requiriendo Cloud Run Greenhouse |
+
+**Sandbox lifecycle**: el Worker `greenhouse-cli-readiness-sandbox` queda **vivo en Notion para iteraciones futuras** (e.g. probar webhook capabilities, sync con managed DB, AI tool con credits real). Para limpiar: `ntn workers delete 019e2937-183d-7383-9159-83c29cb685ee`. NO hay artefactos checked-in en el repo (workers.json eliminado).
+
+**Acceptance criteria de Slice 3 cumplidos**:
+
+- [x] Sandbox Worker creado + deployado + ejecutado SIN tocar production delivery / ICO / payroll / writes a Notion productivos.
+- [x] Cross-agent operability verificada (2 agents distintos ejecutaron la misma tool).
+- [x] Audit + logs + secrets behavior documentados (audit nativo, sin secrets management requerido para tool sample, rollback < 1 min via `ntn workers delete`).
+- [x] Schedule behavior NO probado (tool simple sin schedule); pendiente para futura iteración con Worker sync.
+- [x] Webhooks NO probados; pendiente para futura iteración.
 
 ### Slice 1 evidence — 2026-05-14 Markdown API capability gem (`include_transcript`)
 
