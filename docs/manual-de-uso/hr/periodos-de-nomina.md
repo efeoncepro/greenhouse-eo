@@ -123,6 +123,19 @@ Que hacer:
 2. Si si lo requiere, valida que exista senal de asistencia o licencia para el mes.
 3. Si el colaborador es `honorarios` o se procesa via `Deel`, ese bloqueo no deberia aplicar.
 
+### Un colaborador inicio a mitad de mes y aparece como mes completo
+
+Estado vigente pre-TASK-893: puede ocurrir. El roster de nomina se resuelve por compensaciones vigentes dentro del mes, pero el motor legacy no prorratea automaticamente por fecha de inicio en `projected_month_end`.
+
+Que hacer:
+
+1. No lo corrijas creando ausencias manuales desde el dia 1 hasta el dia anterior al ingreso.
+2. No uses override manual como solucion permanente.
+3. Escala el caso contra `TASK-893 Payroll Participation Window`.
+4. Si el periodo debe pagarse antes de que TASK-893 este shipped, deja una nota de control/auditoria con el motivo del ajuste manual autorizado por HR/Finance.
+
+La regla aprobada para TASK-893 es que los dias previos al ingreso son no-participacion payroll, no ausencia. El sistema debe prorratear mediante `PayrollParticipationWindow` y no mediante asistencia.
+
 ### El readiness dice que hay regimenes incompatibles
 
 Ese blocker significa que ya existe una liquidacion calculada con campos que no corresponden al regimen del colaborador.
@@ -179,4 +192,5 @@ Si en el reporte mensual o en el Excel ves un subtotal `Total descuentos CLP` (s
 ## Referencias tecnicas
 
 - [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
+- [GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md](../../architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md)
 - [Periodos de nomina](../../documentation/hr/periodos-de-nomina.md)

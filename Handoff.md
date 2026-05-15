@@ -22,6 +22,15 @@
   - Hubspot company name hardening + meeting notes context
 - **Próximo paso operativo**: verificar `/api/hr/payroll/projected` en producción ya NO retorna a María Camila Hoyos. Si confirma, cierra el bug class operacional originalmente reportado por el operador.
 
+# Delta 2026-05-15 — TASK-893 Payroll Participation Window documentada
+
+- **Trigger**: investigacion de Felipe Zurita en production projected payroll mostro `baseSalary=650000`, `grossTotal=650000`, `netTotal=550875`, `prorationFactor=1`, `workingDaysInPeriod=null`, `contractTypeSnapshot='honorarios'`. Causa: el motor legacy usa overlap de compensacion para roster y no tiene ventana canonica de participacion para monto.
+- **Decision arquitectonica**: creada y aceptada `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md`. Payroll debe resolver `eligibleFrom/eligibleTo/policy/reasonCodes/prorationFactor` componiendo `periodStart/periodEnd`, `compensation_versions.effective_from/effective_to`, start de relacion/onboarding si existe, y TASK-890 exit cutoff.
+- **Task creada**: `docs/tasks/to-do/TASK-893-payroll-participation-window.md` (P1 / Alto / Alto, domain `hr|payroll|workforce|reliability`). Siguiente ID disponible actualizado a `TASK-894`.
+- **Regla clave**: ingreso mid-month NO es ausencia. No contaminar attendance (`days_absent`, `days_on_unpaid_leave`) para prorratear dias previos al inicio.
+- **Rollout esperado**: flag `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false`, staging shadow compare, projected + official payroll comparten primitive, signals `payroll.participation_window.*`.
+- **Docs sincronizados**: `DECISIONS_INDEX.md`, `TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, documentacion funcional/manual de periodos y `changelog.md`.
+
 # Delta 2026-05-15 — TASK-890 production flag flip autorizado
 
 - **Cambio operativo**: `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` quedó activo en `Production` y `staging` para el proyecto Vercel canónico `efeonce-7670142f/greenhouse-eo`.

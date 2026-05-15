@@ -235,9 +235,27 @@ Patron heredado de `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` (TASK-872).
 
 Maria Camila Hoyos, caso `EO-OFF-2026-0609A520`, lane `external_payroll`/Deel `last_working_day=2026-05-14`. Pre-TASK-890 aparecia full-month USD 530 en nomina proyectada mayo 2026 porque el gate inline solo excluia `executed`. Post-TASK-890 (con flag activo + case en `approved`): excluida del periodo via `projectionPolicy='exclude_from_cutoff'`.
 
+## Ventana de participacion payroll por ingreso/vigencia (TASK-893, planificada)
+
+Estado vigente pre-TASK-893: Greenhouse descubre el roster mensual por solape de compensacion (`effective_from <= fin de mes` y `effective_to >= inicio de mes`), pero no prorratea automaticamente a colaboradores que ingresan a mitad del periodo. En `projected_month_end`, el factor de prorrateo legacy es `1` salvo que existan ajustes de asistencia/licencias no pagadas.
+
+Esto explica casos como Felipe Zurita: si la compensacion inicia el dia 13, el sistema legacy puede mostrar el mes completo en nomina proyectada porque la compensacion toca el periodo.
+
+La decision canonica aceptada es `GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1`:
+
+```text
+eligibleFrom = max(periodStart, compensation.effective_from, relationshipStartDate si existe)
+eligibleTo   = min(periodEnd, compensation.effective_to, TASK-890 exit cutoff si aplica)
+```
+
+Regla importante: los dias previos al ingreso no son ausencia. No deben alimentar `days_absent`, licencias ni readiness de asistencia. Son no-participacion payroll y deben prorratearse mediante la primitive `PayrollParticipationWindow`.
+
+TASK-893 implementara esta regla detras de `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false` y la aplicara tanto a nomina proyectada como a calculo oficial.
+
 ## Referencias
 
 - [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
 - [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md)
+- [GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md](../../architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md)
 - [Manual de uso — Periodos de nomina](../../manual-de-uso/hr/periodos-de-nomina.md)
 - [Documentacion — Offboarding](./offboarding.md)
