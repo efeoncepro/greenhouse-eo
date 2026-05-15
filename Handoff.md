@@ -1,3 +1,14 @@
+# Sesion 2026-05-15 — Sentry JAVASCRIPT-NEXTJS-5Y HubSpot company_name null FIX
+
+- **Incidente**: Sentry production `JAVASCRIPT-NEXTJS-5Y`, `POST /reactive/process-domain`, `ops-worker`, error `null value in column "company_name" of relation "companies" violates not-null constraint`.
+- **Evidencia runtime**: Cloud Logging confirmó `hubspot_companies_intake failed for scope 54964918606` a `2026-05-15T14:45:09Z`; el bridge respondió `identity.name=null`, `domain=prospectrampuae.help`, `website=prospectrampuae.help`, lifecycle `salesqualifiedlead`.
+- **Causa raíz**: el intake incremental `syncHubSpotCompanyById → upsertCompany` escribía solo `profile.identity.name` en `greenhouse_crm.companies.company_name`, mientras el schema exige `NOT NULL`. El batch sync además tenía fallback legacy `'Sin nombre'`, contrario al contrato anti-sentinel aprendido en TASK-588.
+- **Solución canónica**: nueva primitive pura `src/lib/hubspot/company-identity.ts` con cascada `name → domain → website host → HubSpot Company <id>`. Reutilizada por `src/lib/hubspot/sync-company-by-id.ts` y `scripts/sync-source-runtime-projections.ts`.
+- **Observabilidad**: cuando HubSpot no trae nombre humano, el intake ya no falla; escribe warning determinístico/upsertable en `greenhouse_sync.source_sync_failures` con `error_code='hubspot_company_missing_name_warning'`, `retryable=false`, `source_object_id=<hubspotCompanyId>` y payload redacted de identidad.
+- **Validación**: `pnpm vitest run src/lib/hubspot/company-identity.test.ts src/lib/hubspot/sync-company-by-id.test.ts` verde (5 tests), `pnpm exec tsc --noEmit --pretty false` verde, `pnpm lint` verde con 4 warnings legacy TASK-827 no relacionados, `pnpm build` verde. `pnpm pg:doctor` OK. Sentry API: `SENTRY_AUTH_TOKEN` no estaba exportado en shell; se encontró en `.env.vercel-staging`, pero el endpoint read-only devolvió `403` para `JAVASCRIPT-NEXTJS-5Y`, así que la evidencia final usada fue screenshot + Cloud Logging.
+- **Pendiente operativo**: tras deploy del fix, re-ejecutar/replay del event o esperar retry para `hubspotCompanyId=54964918606` y verificar que `commercial.hubspot_company.intake_dead_letter` vuelva a 0. No se mutaron datos productivos manualmente desde esta sesión.
+- **Nota multi-agente**: existían cambios no relacionados al inicio/cierre: `TASK-298` doc delta Meeting Notes y `TASK-891` movida a `in-progress`; no se tocaron para este fix salvo el changelog/handoff de este incidente.
+
 # Sesion 2026-05-15 — TASK-891 creada (follow-up TASK-890 ADR §7)
 
 - **Task creada**: `docs/tasks/to-do/TASK-891-person-relationship-drift-reconciliation-write-path.md`. Cierra el follow-up declarado en TASK-890 ADR §7 (write reconciliation Person 360).
