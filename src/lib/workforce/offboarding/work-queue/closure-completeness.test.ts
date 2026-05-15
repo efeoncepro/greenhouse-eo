@@ -94,7 +94,32 @@ describe('computeClosureCompleteness — case executed (terminal, BUG CLASS MARI
   // retorna `external_provider_close` (NO 'completed') porque no branch sobre
   // case.status. Si buildCaseLifecycleStep solo filtra por NON_ACTIONABLE
   // codes, el step se genera y dispara primaryAction obsoleto.
-  // Fix: `buildCaseLifecycleStep` filtra por caseStatus directamente.
+  // Fix V1.0.2: `buildCaseLifecycleStep` filtra por nextStep.code targeting
+  // ONLY transitions del case agregado (external_provider_close, classify_case).
+  // Operaciones POST-terminal sobre child entities (calculate, render_document,
+  // approve_calculation, etc.) siguen siendo validas en cases terminales.
+  it('anti-regresion V1.0.2: executed + internal_payroll + nextStep=calculate → case_lifecycle SIGUE valido (post-terminal finiquito recovery)', () => {
+    const result = computeClosureCompleteness(
+      facts({
+        caseStatus: 'executed',
+        // Internal_payroll executed sin finiquito creado todavia: HR puede
+        // calcular finiquito post-terminal (operacion sobre final_settlement
+        // entity, NO transition del case agregado).
+        nextStep: makeNextStep('calculate', 'Calcular finiquito', 'info'),
+        caseLifecycleStepLabel: 'Calcular finiquito',
+        caseLifecycleStepSeverity: 'info',
+        personRelationshipDrift: false, // sin drift Person 360
+        payrollExcluded: true,
+        memberId: 'valentina_member_id'
+      })
+    )
+
+    // Step case_lifecycle SI existe — operacion legitima post-terminal.
+    expect(result.pendingSteps.some(s => s.code === 'case_lifecycle')).toBe(true)
+    expect(result.pendingSteps[0]?.code).toBe('case_lifecycle')
+    expect(result.pendingSteps[0]?.label).toBe('Calcular finiquito')
+  })
+
   it('caso 2a (anti-regresion live Maria): executed + external_provider_close nextStep + drift → SOLO reconcile_drift step', () => {
     const result = computeClosureCompleteness(
       facts({
