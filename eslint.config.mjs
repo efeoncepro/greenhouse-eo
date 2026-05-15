@@ -297,7 +297,11 @@ export default [
       // TASK-827 Slice 7 — modo warn durante migración V1.0. Promote a `error`
       // vive en TASK derivada V1.1 client-portal-legacy-branching-sweep
       // (trigger: zero drift ≥30 días post TASK-829 cierre).
-      'greenhouse/no-untokenized-business-line-branching': 'warn'
+      'greenhouse/no-untokenized-business-line-branching': 'warn',
+      // TASK-890 Slice 3 — modo warn durante V1.0 (gate legacy en postgres-store.ts
+      // grandfathered behind flag PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=false).
+      // Promote a `error` post 30d steady o cuando flag default flip a true.
+      'greenhouse/no-inline-payroll-scope-gate': 'warn'
     }
   },
   {
@@ -330,6 +334,26 @@ export default [
     ],
     rules: {
       'greenhouse/no-untokenized-fx-math': 'off'
+    }
+  },
+
+  // TASK-890 Slice 3 — la lint rule no-inline-payroll-scope-gate se desactiva
+  // SOLO en los archivos donde el patrón aparece legítimamente:
+  //  * src/lib/payroll/exit-eligibility/** — el resolver canónico (LATERAL JOIN
+  //    que referencia work_relationship_offboarding_cases pero NO compone el gate)
+  //  * src/lib/payroll/postgres-store.ts — gate legacy behind flag
+  //    PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED grandfathered hasta V2 cutover
+  //    (Slice 3.x mantiene legacy path para zero-risk parity)
+  //  * Tests anti-regresión del propio rule
+  {
+    files: [
+      'src/lib/payroll/exit-eligibility/**',
+      'src/lib/payroll/postgres-store.ts',
+      'eslint-plugins/greenhouse/rules/no-inline-payroll-scope-gate.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-inline-payroll-scope-gate.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-inline-payroll-scope-gate': 'off'
     }
   },
 

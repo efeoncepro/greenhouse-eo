@@ -1,11 +1,11 @@
 # Greenhouse Sister Platforms Integration Contract V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.0
+> **Version:** 1.0 (delta 2026-05-15 §9.5)
 > **Creado:** 2026-04-11
-> **Ultima actualizacion:** 2026-04-11
+> **Ultima actualizacion:** 2026-05-15 — TASK-884 agrega clausula §9.5 governance formal de acceso cross-platform
 > **Scope:** Greenhouse y plataformas hermanas del ecosistema Efeonce
-> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_REPO_ECOSYSTEM_V1.md`, `GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `TASK-265`, `TASK-039`
+> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_REPO_ECOSYSTEM_V1.md`, `GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md`, `TASK-265`, `TASK-039`
 
 ---
 
@@ -437,6 +437,21 @@ Los carriles LLM/MCP deben asumir:
 
 - read-only por defecto
 - approval humana antes de cualquier mutacion cross-platform
+
+### 9.5 Governance formal de acceso cross-platform
+
+> Delta 2026-05-15 — `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` (TASK-884) formaliza el carril `Write` de §9.3 con un control plane explicito.
+
+Cuando una mutacion cross-platform afecta **acceso de personas** (colaboradores Efeonce o client users) a una sister platform, NO basta con tener API explicita y ownership claro: la mutacion debe pasar por el Ecosystem Access Control Plane canonico. Reglas duras:
+
+- Greenhouse mantiene el `desired_state` de acceso del ecosistema. Las sister platforms pueden tener provisioning local (modo `hybrid_approval` o `platform_managed_observed`) pero deben converger a Greenhouse o reportar drift explicito.
+- Toda mutacion de acceso (grant / revoke / suspend / approve) se persiste en `greenhouse_core.ecosystem_access_assignments` antes de tocar la sister platform. NUNCA se llama a la API externa inline sin haber commiteado el desired state + outbox event en la misma tx PG.
+- Cada binding declara su `provisioning_mode` (`greenhouse_managed | hybrid_approval | platform_managed_observed | read_only_observed`). El modo determina si Greenhouse puede emitir commands de provisioning y como se interpreta el drift.
+- Sister platforms reportan `observed_state` via snapshot a `/api/platform/ecosystem/access/observed-state` (idempotente, scoped al binding) y `applied_state` via `/api/platform/ecosystem/access/provisioning-results` (idempotente, anti-spoof por `idempotencyKey`).
+- Sensitive grants (capabilities con `requires_approval=true`) exigen segunda firma de un EFEONCE_ADMIN distinto del grantor.
+- 7 drift types canonicos cubren los desvios posibles entre desired/observed: `pending_provisioning`, `pending_deprovisioning`, `unauthorized_local_access`, `missing_identity_link`, `scope_mismatch`, `capability_mismatch`, `platform_apply_failed`. La severity de cada drift depende del platform mode del binding (no es constante).
+
+Esta clausula reemplaza interpretaciones laxas de §9.3: "API explicita + ownership claro" no es suficiente para mutaciones de acceso. El control plane es obligatorio. Mutaciones cross-platform de OTRAS dimensiones (e.g. operacion creativa, CRM intelligence) siguen el §9 original sin requerir el control plane.
 
 ---
 

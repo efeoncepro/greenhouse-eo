@@ -353,6 +353,49 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-890 Slice 4 — Workforce offboarding external provider close.
+  // Capability granular para cerrar offboarding cases en lane `external_payroll`
+  // (Deel/EOR/proveedor externo). Operador firma decision (Greenhouse no emite
+  // finiquito Chile — cierre vive en proveedor externo). Mismo matriz operador
+  // que `complete_intake`: HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN.
+  // Combinada con `hr.offboarding_case:approve|manage` (gate existente) cuando
+  // transition cruza el state machine. Reason >= 10 chars enforced en route.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
+      ? 'route_group'
+      : 'role'
+
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.offboarding.close_external_provider',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  // TASK-891 Slice 3 — Person 360 relationship drift reconciliation.
+  // Capability granular para cerrar relacion legacy `employee` + abrir nueva
+  // `contractor` en una sola tx atomic (helper `reconcileMemberContractDrift`).
+  // **V1.0 grant SOLO EFEONCE_ADMIN** — drift Person 360 es cross-domain
+  // (payroll readiness, payslips, reportes legales, ICO). Delegacion a HR
+  // queda V1.1 post 30d steady sin incidentes operativos. Mismo modulo
+  // namespace que TASK-784 person.legal_profile.* ('people'). Spec:
+  // GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1 §2.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'people',
+      capability: 'person.legal_entity_relationships.reconcile_drift',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-874 — Workforce Activation readiness.
   // Read access follows the same operator matrix as complete_intake because the
   // workspace exposes blockers without sensitive values. Override is deliberately

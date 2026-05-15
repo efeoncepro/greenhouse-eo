@@ -1112,6 +1112,33 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-890 Slice 4 — capability granular para cerrar offboarding lane
+    // `external_payroll` (Deel/EOR/proveedor externo). Reason >= 10 chars
+    // requerido. Operador firma decision; cierre operativo vive en el
+    // proveedor externo (Greenhouse no emite finiquito Chile). Combinada
+    // con `hr.offboarding_case:approve|manage` cuando transition cruza el
+    // state machine. Spec: GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.
+    key: 'workforce.offboarding.close_external_provider',
+    module: 'workforce',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-891 Slice 3 — capability granular para reconciliar drift entre
+    // runtime laboral del member y la relacion legal activa en Person 360.
+    // Cierra la relacion legacy `employee` + abre nueva `contractor` en una
+    // sola transaccion atomica. Reason >= 20 chars requerido (bar mas alto
+    // que close_external_provider porque blast Person 360 es cross-domain).
+    // V1.0 grant solo EFEONCE_ADMIN; delegacion a HR queda V1.1 post 30d
+    // steady. Mismo modulo namespace que TASK-784 person.legal_profile.*
+    // (people = directorio operativo y datos canonicos de la persona).
+    // Spec: GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1.
+    key: 'person.legal_entity_relationships.reconcile_drift',
+    module: 'people',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'identity.reconciliation.read',
     module: 'organization',
     actions: ['read'] as const,

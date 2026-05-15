@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolveHubSpotCompanyName } from '@/lib/hubspot/company-identity'
 import { syncHubSpotCompanies } from '@/lib/hubspot/sync-hubspot-companies'
 
 /**
@@ -106,12 +107,76 @@ const buildPayloadHash = (payload: unknown): string => {
   return `hash-${Math.abs(hash).toString(36)}`
 }
 
+const emitMissingCompanyNameWarning = async (
+  syncRunId: string,
+  profile: BridgeCompanyProfile,
+  resolutionSource: string
+): Promise<void> => {
+  try {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_sync.source_sync_failures (
+         sync_failure_id,
+         sync_run_id,
+         source_system,
+         source_object_type,
+         source_object_id,
+         error_code,
+         error_message,
+         payload_json,
+         retryable
+       ) VALUES (
+         $1, $2, 'hubspot', 'company', $3,
+         'hubspot_company_missing_name_warning',
+         $4,
+         $5::jsonb,
+         FALSE
+       )
+       ON CONFLICT (sync_failure_id) DO UPDATE SET
+         sync_run_id = EXCLUDED.sync_run_id,
+         error_message = EXCLUDED.error_message,
+         payload_json = EXCLUDED.payload_json,
+         retryable = EXCLUDED.retryable,
+         created_at = CURRENT_TIMESTAMP`,
+      [
+        `hubspot-company-missing-name-${profile.hubspotCompanyId}`,
+        syncRunId,
+        profile.hubspotCompanyId,
+        `HubSpot company ${profile.hubspotCompanyId} has no populated name; resolved company_name from ${resolutionSource}.`,
+        JSON.stringify({
+          hubspotCompanyId: profile.hubspotCompanyId,
+          resolutionSource,
+          identity: {
+            hasName: Boolean(profile.identity.name?.trim()),
+            domain: profile.identity.domain ?? null,
+            website: profile.identity.website ?? null
+          }
+        })
+      ]
+    )
+  } catch {
+    // Observability only. The sync should not fail after a deterministic
+    // fallback kept the canonical company row materializable.
+  }
+}
+
 const upsertCompany = async (
   syncRunId: string,
   profile: BridgeCompanyProfile
 ): Promise<{ companyRecordId: string }> => {
   const payloadHash = buildPayloadHash(profile)
+
+  const nameResolution = resolveHubSpotCompanyName({
+    hubspotCompanyId: profile.hubspotCompanyId,
+    name: profile.identity.name,
+    domain: profile.identity.domain,
+    website: profile.identity.website
+  })
+
   const websiteOrDomain = profile.identity.website ?? profile.identity.domain ?? null
+
+  if (nameResolution.missingHubSpotName) {
+    await emitMissingCompanyNameWarning(syncRunId, profile, nameResolution.source)
+  }
 
   // Race-safe UPSERT canónico. El `candidateRecordId` solo se materializa cuando
   // la fila no existe; bajo ON CONFLICT DO UPDATE la fila conserva su PK original
@@ -148,7 +213,7 @@ const upsertCompany = async (
        updated_at = NOW()
      RETURNING company_record_id`,
     [
-      candidateRecordId, profile.hubspotCompanyId, profile.identity.name, null,
+      candidateRecordId, profile.hubspotCompanyId, nameResolution.companyName, nameResolution.legalName,
       profile.lifecycle.lifecyclestage, profile.identity.industry, profile.identity.country, websiteOrDomain,
       syncRunId, payloadHash
     ]

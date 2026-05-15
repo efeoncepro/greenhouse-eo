@@ -11,7 +11,7 @@
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `ops`
-- Blocked by: `TASK-736`
+- Blocked by: `TASK-736`, `TASK-879`
 - Branch: `task/TASK-737-notion-bq-sync-hardening-readiness`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -19,6 +19,8 @@
 ## Summary
 
 Formaliza el contrato operativo que Greenhouse necesita del repo/servicio hermano `notion-bq-sync` y deja lista la evaluación seria de absorción futura al monorepo, sin ejecutar todavía el cutover.
+
+Delta 2026-05-14: la readiness de absorcion debe incluir Notion Developer Platform como opcion formal. `TASK-879` decide con evidencia si Workers/CLI/SDK cambian la recomendacion original de mantener/endurecer/absorber el sibling.
 
 ## Why This Task Exists
 
@@ -29,6 +31,7 @@ El flujo crítico de ICO depende del writer canónico `notion-bq-sync`, pero su 
 - fijar un contrato mínimo exigible al servicio upstream
 - definir readiness checklist para absorción futura
 - alinear ownership y rollback path
+- comparar absorcion Cloud Run vs Notion Workers vs arquitectura mixta con evidencia de `TASK-879`
 
 ## Architecture Alignment
 
@@ -40,6 +43,7 @@ El flujo crítico de ICO depende del writer canónico `notion-bq-sync`, pero su 
 
 - `docs/audits/notion/notion-bq-sync/NOTION_BQ_SYNC_AUDIT_2026-04-30.md`
 - `docs/audits/notion/notion-bq-sync/GREENHOUSE_CONSUMPTION_AUDIT_2026-04-30.md`
+- `docs/tasks/to-do/TASK-879-notion-developer-platform-readiness-worker-pilot.md`
 
 ## Dependencies & Impact
 
@@ -47,11 +51,13 @@ El flujo crítico de ICO depende del writer canónico `notion-bq-sync`, pero su 
 
 - repo hermano `cesargrowth11/notion-bigquery`
 - docs operativas de integración
+- `TASK-879` para decision Notion Workers / CLI / SDK antes de cerrar la estrategia de absorcion
 
 ### Blocks / Impacts
 
 - decisión de absorción futura
 - `TASK-739`
+- `TASK-581` si el cutover/retirement del sibling cambia por una topologia Worker/mixta
 
 ### Files owned
 
@@ -68,20 +74,24 @@ El flujo crítico de ICO depende del writer canónico `notion-bq-sync`, pero su 
 ### Slice 2 — Absorption readiness
 
 - checklist de runtime, secrets, CI/CD, rollback, dual-run y ownership
+- agregar una variante explicita para Notion Workers: limits, beta/credits, logs, secrets, deploy, rollback y managed/existing database support
 
 ### Slice 3 — Decision memo
 
 - documentar si la absorción pasa a siguiente ola o queda diferida con condiciones explícitas
+- documentar si la opcion Worker queda aceptada, descartada o limitada a tools/webhooks no criticos
 
 ## Out of Scope
 
 - mover código del repo hermano en esta task
+- ejecutar migracion production a Workers; esta task solo decide readiness/contrato
 
 ## Acceptance Criteria
 
 - [ ] existe contrato operativo explícito para el servicio upstream crítico
 - [ ] existe readiness checklist seria para una absorción futura
 - [ ] se documenta una decisión concreta de siguiente paso, no solo “evaluar después”
+- [ ] la decision incluye Workers/CLI/SDK como opciones evaluadas, no como nota lateral
 
 ## Verification
 
@@ -95,4 +105,4 @@ El flujo crítico de ICO depende del writer canónico `notion-bq-sync`, pero su 
 - [ ] `docs/tasks/README.md` sincronizado
 - [ ] `Handoff.md` actualizado si aplica
 - [ ] `changelog.md` actualizado si aplica
-- [ ] chequeo de impacto cruzado sobre `TASK-736` y `TASK-739`
+- [ ] chequeo de impacto cruzado sobre `TASK-736`, `TASK-739` y `TASK-879`

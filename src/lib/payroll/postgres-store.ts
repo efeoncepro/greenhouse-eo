@@ -56,6 +56,10 @@ import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-
 import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
 import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
 import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
+import {
+  resolveExitEligibilityForMembers,
+  type WorkforceExitPayrollEligibilityWindow
+} from '@/lib/payroll/exit-eligibility'
 
 
 // ---------------------------------------------------------------------------
@@ -832,10 +836,52 @@ export const pgGetCompensationVersionById = async (versionId: string) => {
 const isPayrollWorkforceIntakeGateEnabled = (): boolean =>
   process.env.PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED === 'true'
 
-export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: string, periodEnd: string) => {
+// TASK-890 Slice 3 — Gate canónico de exit eligibility window per lane × status.
+// Flag default false → comportamiento legacy (gate inline: solo excluye `executed`
+// AND last_working_day < periodStart). Flag true → post-filter via resolver canonical
+// `resolveExitEligibilityForMembers` aplicando matrix asymmetric por lane (§2 ADR):
+//   - internal_payroll/relationship_transition: exclude desde `executed`
+//   - external_payroll/non_payroll: exclude desde `approved`
+//   - identity_only: never gates payroll
+// Pattern fuente: TASK-872 (PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED).
+//
+// Cuando flag=true, attach `exitEligibilityWindow` opcional al row para que el
+// consumer (project-payroll.ts) pueda prorratear con `partial_until_cutoff` policy.
+// Activacion solo post staging shadow compare ≥7d con Maria-fixture verde.
+const isPayrollExitEligibilityWindowEnabled = (): boolean =>
+  process.env.PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED === 'true'
+
+export type ApplicableCompensationVersionRow = ReturnType<typeof mapCompensationVersion> & {
+  hasCompensationVersion: boolean
+  // TASK-890: present cuando PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true.
+  // `undefined` cuando flag=false (path legacy bit-for-bit). Consumers downstream
+  // (project-payroll.ts) pueden usarlo para `partial_until_cutoff` proration.
+  exitEligibilityWindow?: WorkforceExitPayrollEligibilityWindow
+}
+
+export const pgGetApplicableCompensationVersionsForPeriod = async (
+  periodStart: string,
+  periodEnd: string
+): Promise<ApplicableCompensationVersionRow[]> => {
   await assertPayrollPostgresReady()
 
   const intakeGate = isPayrollWorkforceIntakeGateEnabled() ? `AND m.workforce_intake_status = 'completed'` : ''
+  const exitWindowEnabled = isPayrollExitEligibilityWindowEnabled()
+
+  // Legacy gate inline (preserved when flag=false for zero-risk parity).
+  // TASK-890: cuando flag=true, este filtro se desactiva y el resolver canonical
+  // aplica la matrix completa post-query (incluye external_payroll desde 'approved').
+  const legacyExitGate = exitWindowEnabled
+    ? ''
+    : `
+        AND NOT EXISTS (
+          SELECT 1
+          FROM greenhouse_hr.work_relationship_offboarding_cases AS oc
+          WHERE oc.member_id = m.member_id
+            AND oc.status = 'executed'
+            AND oc.last_working_day IS NOT NULL
+            AND oc.last_working_day < $1::date
+        )`
 
   const rows = await runGreenhousePostgresQuery<PgCompensationRow & { active: boolean }>(
     `
@@ -885,24 +931,80 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
        AND cv.effective_from <= $2::date
        AND (cv.effective_to IS NULL OR cv.effective_to >= $1::date)
       WHERE m.active = TRUE
-        ${intakeGate}
-        AND NOT EXISTS (
-          SELECT 1
-          FROM greenhouse_hr.work_relationship_offboarding_cases AS oc
-          WHERE oc.member_id = m.member_id
-            AND oc.status = 'executed'
-            AND oc.last_working_day IS NOT NULL
-            AND oc.last_working_day < $1::date
-        )
+        ${intakeGate}${legacyExitGate}
       ORDER BY m.member_id, cv.effective_from DESC, cv.version DESC
     `,
     [periodStart, periodEnd]
   )
 
-  return rows.map(row => ({
-    ...mapCompensationVersion(row),
-    hasCompensationVersion: Boolean(row.version_id)
-  }))
+  // Flag off → return legacy shape (no exitEligibilityWindow field attached).
+  if (!exitWindowEnabled) {
+    return rows.map(row => ({
+      ...mapCompensationVersion(row),
+      hasCompensationVersion: Boolean(row.version_id)
+    }))
+  }
+
+  // Flag on → post-filter via canonical resolver. Defensive degradation: if
+  // resolver fails (DB transient, schema drift), captureWithDomain + fall back
+  // to legacy SQL gate inline so payroll never fully breaks.
+  let windows: Map<string, WorkforceExitPayrollEligibilityWindow>
+
+  try {
+    const memberIds = rows.map(r => r.member_id)
+
+    windows = await resolveExitEligibilityForMembers(memberIds, periodStart, periodEnd)
+  } catch (error) {
+    captureWithDomain(error, 'payroll', {
+      extra: {
+        source: 'exit_eligibility.integration_degraded',
+        stage: 'resolver_fetch',
+        periodStart,
+        periodEnd,
+        roster_size: rows.length
+      }
+    })
+
+    // Degraded: return legacy shape, log alert. Reliability signal
+    // `payroll.exit_eligibility.bq_fallback_invoked` covers detection in V1.1.
+    return rows.map(row => ({
+      ...mapCompensationVersion(row),
+      hasCompensationVersion: Boolean(row.version_id)
+    }))
+  }
+
+  // Apply policy: exclude when projectionPolicy is `exclude_*`.
+  // Attach window when present so downstream consumers can prorate
+  // (`partial_until_cutoff` policy uses `eligibleTo` for the cutoff date).
+  const filtered: ApplicableCompensationVersionRow[] = []
+
+  for (const row of rows) {
+    const window = windows.get(row.member_id)
+
+    if (!window) {
+      // Defensive: resolver couldn't compute this member. Drop conservatively
+      // (member exists in `members` but resolver returned nothing — schema drift).
+      captureWithDomain(new Error('exit_eligibility.member_missing_from_resolver'), 'payroll', {
+        extra: { memberId: row.member_id, periodStart, periodEnd }
+      })
+      continue
+    }
+
+    if (
+      window.projectionPolicy === 'exclude_entire_period' ||
+      window.projectionPolicy === 'exclude_from_cutoff'
+    ) {
+      continue
+    }
+
+    filtered.push({
+      ...mapCompensationVersion(row),
+      hasCompensationVersion: Boolean(row.version_id),
+      exitEligibilityWindow: window
+    })
+  }
+
+  return filtered
 }
 
 export const pgCreateCompensationVersion = async ({

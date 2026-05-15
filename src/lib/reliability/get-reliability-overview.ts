@@ -40,6 +40,8 @@ import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
+import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
+import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
@@ -916,9 +918,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.shortcutsInvalidPins
       : await getShortcutsInvalidPinsSignal().catch(() => null)
 
-  // TASK-784 Slice 7 — Identity legal profile signals (4 readers en paralelo).
-  // Cada uno degrada honestamente a `unknown` si su query falla. Roll up
-  // bajo moduleKey 'identity' via incidentDomainTag.
+  // TASK-784 Slice 7 + TASK-890 Slice 6 — Identity legal profile signals
+  // (5 readers en paralelo). Cada uno degrada honestamente a `unknown` si su
+  // query falla. Roll up bajo moduleKey 'identity' via incidentDomainTag.
+  // TASK-890 agrega `identity.relationship.member_contract_drift` — detecta
+  // member contractor/Deel con relacion legal activa employee (caso Maria).
   const identityLegalProfile =
     preloadedSources.identityLegalProfile !== undefined
       ? preloadedSources.identityLegalProfile
@@ -926,7 +930,11 @@ export const getReliabilityOverview = async (
           getIdentityLegalProfilePendingOverdueSignal().catch(() => null),
           getIdentityLegalProfilePayrollBlockingSignal().catch(() => null),
           getIdentityLegalProfileRevealAnomalySignal().catch(() => null),
-          getIdentityLegalProfileEvidenceOrphanSignal().catch(() => null)
+          getIdentityLegalProfileEvidenceOrphanSignal().catch(() => null),
+          getIdentityRelationshipMemberContractDriftSignal().catch(() => null),
+          // TASK-892 — closure completeness partial (case-level UX surface
+          // del drift Person 360, complementario al signal sistema).
+          getOffboardingCompletenessPartialSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)

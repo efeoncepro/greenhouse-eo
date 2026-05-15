@@ -1,5 +1,10 @@
 import { GH_FINIQUITO } from '@/lib/copy/finiquito'
 
+import {
+  computeClosureCompleteness,
+  derivePrimaryActionFromCompleteness,
+  type ClosureCompletenessFacts
+} from './closure-completeness'
 import type {
   OffboardingClosureLane,
   OffboardingNextStep,
@@ -144,6 +149,12 @@ const actionLabel = (code: OffboardingWorkQueueActionCode) => {
       return copy.actions.reissueDocument
     case 'download_pdf':
       return copy.actions.downloadPdf
+    case 'reconcile_drift_action':
+      // TASK-892 — label es-CL viene del closure-completeness step builder; el
+      // descriptor lo provee inline. Esta rama es defensive (no se invoca por
+      // `action(...)` factory path; closure-completeness construye su propio
+      // descriptor).
+      return copy.actions.reconcileDriftAction
     default:
       return labelForNextStep(code)
   }
@@ -360,16 +371,29 @@ const filtersFor = (
   return filters
 }
 
+/**
+ * Optional facts wired by `query.ts` from the canonical resolvers (Layer 2/3/4).
+ * If omitted, closureCompleteness aggregate sees the relevant fields as `null`
+ * and degrades honestly (sin generar reconcile_drift step).
+ */
+export interface OffboardingClosureFactsInput {
+  memberRuntimeAligned?: boolean | null
+  personRelationshipDrift?: boolean | null
+  payrollExcluded?: boolean | null
+}
+
 export const buildOffboardingWorkQueueItem = ({
   item,
   collaborator,
   settlement,
-  document
+  document,
+  closureFacts
 }: {
   item: OffboardingCase
   collaborator: OffboardingWorkQueueItem['collaborator']
   settlement: OffboardingWorkQueueSettlementSummary | null
   document: OffboardingWorkQueueDocumentSummary | null
+  closureFacts?: OffboardingClosureFactsInput
 }): OffboardingWorkQueueItem => {
   const closureLane = resolveOffboardingClosureLane(item)
 
@@ -384,7 +408,7 @@ export const buildOffboardingWorkQueueItem = ({
   const nextStep = deriveNextStep({ closureLane, prerequisites, settlement, document: latestDocument })
   const progress = deriveProgress({ closureLane, prerequisites, settlement, document: latestDocument, nextStep })
 
-  const primaryAction = nextStep.code === 'completed' || nextStep.code === 'none'
+  const legacyAction = nextStep.code === 'completed' || nextStep.code === 'none'
     ? null
     : action({
         code: nextStep.code,
@@ -394,6 +418,24 @@ export const buildOffboardingWorkQueueItem = ({
           ? prerequisites.blockingReasons.join(' ')
           : null
       })
+
+  // TASK-892 — compute canonical closure completeness aggregate (4 layers).
+  const facts: ClosureCompletenessFacts = {
+    caseStatus: item.status,
+    nextStep,
+    personRelationshipDrift: closureFacts?.personRelationshipDrift ?? null,
+    memberRuntimeAligned: closureFacts?.memberRuntimeAligned ?? null,
+    payrollExcluded: closureFacts?.payrollExcluded ?? null,
+    caseLifecycleStepLabel: nextStep.label,
+    caseLifecycleStepSeverity: nextStep.severity,
+    memberId: item.memberId
+  }
+
+  const closureCompleteness = computeClosureCompleteness(facts)
+
+  // TASK-892 — primaryAction se deriva de pendingSteps[0] cuando case está
+  // terminal. Cuando case NO terminal, preserva semantica legacy del nextStep.
+  const primaryAction = derivePrimaryActionFromCompleteness(closureCompleteness, legacyAction)
 
   const attentionReasons = [
     ...prerequisites.blockingReasons,
@@ -410,6 +452,7 @@ export const buildOffboardingWorkQueueItem = ({
     prerequisites,
     progress,
     nextStep,
+    closureCompleteness,
     primaryAction,
     secondaryActions: deriveSecondaryActions(item, prerequisites, settlement, latestDocument),
     filters: filtersFor(item, closureLane, nextStep, latestDocument),

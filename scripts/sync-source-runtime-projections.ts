@@ -6,6 +6,7 @@ import path from 'node:path'
 
 import { BigQuery } from '@google-cloud/bigquery'
 
+import { resolveHubSpotCompanyName } from '@/lib/hubspot/company-identity'
 import { closeGreenhousePostgres, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
@@ -1873,11 +1874,17 @@ const syncHubspot = async (): Promise<SyncSummary> => {
     const crmCompanies = companies.map(row => {
       const companySourceId = toNullableString(row.hs_object_id)
 
+      const nameResolution = resolveHubSpotCompanyName({
+        hubspotCompanyId: companySourceId,
+        name: toNullableString(row.name),
+        website: toNullableString(row.website)
+      })
+
       return {
         company_source_id: companySourceId,
         client_id: companySourceId ? companyClientMap.get(companySourceId) || null : null,
-        company_name: toNullableString(row.name) || 'Sin nombre',
-        legal_name: toNullableString(row.name),
+        company_name: nameResolution.companyName,
+        legal_name: nameResolution.legalName,
         owner_source_id: toNullableString(row.hubspot_owner_id),
         owner_member_id: null as string | null,
         owner_user_id: null as string | null,

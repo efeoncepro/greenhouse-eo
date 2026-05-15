@@ -3,6 +3,8 @@ import type { FinalSettlementDocumentStatus } from '@/lib/payroll/final-settleme
 
 import type { OffboardingCase, OffboardingCaseListFilters } from '../types'
 
+import type { OffboardingClosureCompleteness } from './closure-completeness'
+
 export type OffboardingClosureLaneCode =
   | 'final_settlement'
   | 'contractual_close'
@@ -43,6 +45,7 @@ export type OffboardingWorkQueueActionCode =
   | 'edit_maintenance'
   | 'reissue_document'
   | 'download_pdf'
+  | 'reconcile_drift_action'
 
 export type OffboardingWorkQueueFilter =
   | 'all'
@@ -130,6 +133,12 @@ export interface OffboardingWorkQueueItem {
   prerequisites: OffboardingPrerequisiteStatus
   progress: OffboardingProgress
   nextStep: OffboardingNextStep
+  /**
+   * TASK-892 — aggregate canonical de cierre (4 capas ortogonales).
+   * UI lee `closureCompleteness.closureState` y `pendingSteps[]` para
+   * mostrar el estado real del case y derivar el primaryAction.
+   */
+  closureCompleteness: OffboardingClosureCompleteness
   primaryAction: OffboardingWorkQueueActionDescriptor | null
   secondaryActions: OffboardingWorkQueueActionDescriptor[]
   filters: OffboardingWorkQueueFilter[]

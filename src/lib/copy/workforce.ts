@@ -411,6 +411,53 @@ export const GH_WORKFORCE_ACTIVATION = {
 
 export type GhWorkforceActivationCopy = typeof GH_WORKFORCE_ACTIVATION
 
+/* ─────────────────── Workforce Offboarding — External Provider Close ─────────────────── */
+// TASK-890 Slice 5 — Copy canónico para el dialog "Cerrar con proveedor externo"
+// disparado desde HrOffboardingView (`/hr/offboarding`) cuando el caso tiene
+// `closureLane='external_provider'`. POST a /api/hr/offboarding/cases/[id]/transition
+// con `{ status: 'approved', externalProviderCloseReason }`.
+// Pattern fuente: TASK-863 dialog finiquito; tono operativo es-CL tuteo.
+// Validado por skill greenhouse-ux-writing.
+
+export const GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE = {
+  dialog: {
+    title: 'Cerrar caso con proveedor externo',
+    description:
+      'Este caso vive en el proveedor laboral externo (Deel, EOR u otro). Al confirmar, el caso queda aprobado y el colaborador se excluye de la nómina interna proyectada. El cierre operativo y el finiquito legal los maneja el proveedor.',
+    laneChip: 'Proveedor externo',
+    reasonLabel: 'Motivo del cierre',
+    reasonPlaceholder: 'Ej: Renuncia gestionada por Deel desde el portal del proveedor.',
+    reasonHelper: 'Mínimo 10 caracteres. Queda en el audit del caso.',
+    reasonError: 'El motivo debe tener al menos 10 caracteres.',
+    providerRefLabel: 'Referencia del proveedor (opcional)',
+    providerRefPlaceholder: 'Ej: Deel termination ID 4587',
+    providerRefHelper: 'ID o referencia del cierre en el proveedor externo. Útil para auditoría.',
+    confirmButton: 'Confirmar cierre',
+    cancelButton: 'Cancelar',
+    saving: 'Cerrando caso…'
+  },
+  feedback: {
+    success: 'Caso cerrado con proveedor externo.',
+    errorGeneric: 'No fue posible cerrar el caso. Reintenta o pide soporte al equipo HR.',
+    errorReasonTooShort: 'El motivo debe tener al menos 10 caracteres.'
+  },
+  inspector: {
+    laneBadge: 'Proveedor externo',
+    laneHelper: 'Cierre laboral fuera de Greenhouse',
+    draftWithCutoffWarning: {
+      title: 'Caso pendiente de decisión',
+      body: 'El último día laboral cae en este período. Confirma el cierre con proveedor para excluirlo de la nómina interna.'
+    },
+    excludedFromPayroll: {
+      title: 'Excluido de nómina interna',
+      body: 'Greenhouse no paga este período. El proveedor externo administra el cierre.'
+    }
+  }
+} as const
+
+export type GhWorkforceOffboardingExternalCloseCopy =
+  typeof GH_WORKFORCE_OFFBOARDING_EXTERNAL_CLOSE
+
 /* ─────────────────── Commercial Pricing ─────────────────── */
 // Copy canónico para el programa de pricing comercial (TASK-463..468).
 // Inventariado y especificado en docs/tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md §4.

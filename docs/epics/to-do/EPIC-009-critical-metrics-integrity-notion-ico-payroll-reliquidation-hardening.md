@@ -64,6 +64,7 @@ Eso vuelve este programa más amplio que una sola task: mezcla payroll safety, f
 - `TASK-737` — contrato de hardening upstream + absorption readiness de `notion-bq-sync`
 - `TASK-738` — migración del cliente directo del portal al SDK oficial de Notion
 - `TASK-739` — readiness para modernización de API Notion (`databases` legacy -> `data sources`)
+- `TASK-879` — readiness/piloto de Notion Developer Platform (`ntn`, Workers, Worker syncs, agent tools) como compuerta antes de cambiar la topologia Notion existente
 
 ## Existing Related Work
 
@@ -103,3 +104,7 @@ Epic creado después de contrastar tres auditorías cross-domain con verificaci�
 ## Delta 2026-04-30 — Wave 0
 
 Se agrega `TASK-740` como prerrequisito operativo del epic. Antes de tocar `TASK-732/733/734`, Greenhouse debe contar con un safety harness explícito: invariantes, golden datasets, replay procedure, contract checks y rollout/rollback plan.
+
+## Delta 2026-05-14 — Notion Developer Platform
+
+Notion lanzó Developer Platform el 2026-05-13. Se agrega `TASK-879` para evaluar `ntn`, Workers, Worker syncs, agent tools y External Agents API alpha antes de cerrar las decisiones de `TASK-736/737/738/739`. La regla del epic no cambia: primero se protege el carril crítico `Notion -> ICO -> Payroll`; cualquier Worker production debe pasar por shadow/parity y no sustituye el writer crítico en esta ola.
