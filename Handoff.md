@@ -1,8 +1,20 @@
+# Sesion 2026-05-15 — TASK-890 Workforce Exit Payroll Eligibility Window EN CURSO directo en develop
+
+- **Estado**: in-progress en `develop` por autorizacion explicita del operador (no se crea branch task/TASK-890-*).
+- **Scope acotado para esta sesion**: Slice 1 (ADR + DECISIONS_INDEX) + Slice 2 (resolver canonico foundation + tests unit) + Slice 3 (integracion payroll proyectada/oficial + lint rule `greenhouse/no-inline-payroll-scope-gate` modo `warn`).
+- **Slice 4-7 quedan para sesion(es) siguiente(s)** (provider closure command, UI contract, drift signal Person 360, docs/manuales). Feature flags y staged cutover documentados en spec linea 311.
+- **Contexto raiz**: caso `EO-OFF-2026-0609A520` Maria Camila Hoyos, lane external_provider/Deel `last_working_day=2026-05-14`, accion "Cerrar con proveedor" navega silente a `/hr/payroll`, proyeccion mes completo USD 530 mayo 2026.
+- **Hallazgo arquitectonico (consolidado pre-implementation)**: bug-class no es local. Falta predicate canonico compartido entre offboarding, payroll proyectado/oficial, capacity/staffing y cost attribution. Patron fuente: TASK-571/766/774 (VIEW canonica + helper + signal) + TASK-742 (defense in depth) + TASK-700/765 (state machine + audit).
+- **Skill primaria**: `arch-architect` (Greenhouse overlay). Decision: predicate canonico SQL function + TS helper espejo + lint rule mecanica. NO opcion B (mezclar intake/exit enum) ni opcion C (materializacion duplicada).
+- **Open Questions tracked**: (1) external provider proyeccion parcial vs exclude full — sera resuelto en Slice 1 ADR; (2) evidencia documental obligatoria en V1 de provider close — sera resuelto en Slice 1 ADR; (3) reconciliacion drift employee vs contractor — Slice 6 read-only signal V1, write reconciliation queda como follow-up.
+- **Guardrail**: no se muta Maria ni datos reales. Slice 3 modifica `pgGetApplicableCompensationVersionsForPeriod` behind feature flag `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=false` default. Lint rule emite warn (no error) hasta cumplir 30 dias steady.
+- **Siguiente ID disponible**: `TASK-891`.
+
 # Sesion 2026-05-15 — TASK-890 Workforce Exit Payroll Eligibility Window creada
 
 - **Contexto**: investigacion del caso Maria Camila Hoyos en `/hr/offboarding`: el caso `EO-OFF-2026-0609A520` aparece como external provider/Deel con ultimo dia `2026-05-14`, la accion primaria "Cerrar con proveedor" solo navega a `/hr/payroll`, y la nomina proyectada seguia mostrando full-month USD 530 para mayo 2026.
 - **Hallazgo clave**: no es bug local de tabla; falta un contrato compartido de ventana de salida entre Offboarding, Payroll proyectado/oficial y Person 360. Tambien hay drift semantico entre `members` contractor/international/Deel y `person_legal_entity_relationships.relationship_type='employee'` activo.
-- **Task creada**: `docs/tasks/to-do/TASK-890-workforce-exit-payroll-eligibility-window.md`.
+- **Task creada**: `docs/tasks/to-do/TASK-890-workforce-exit-payroll-eligibility-window.md` (movida a `in-progress/` post arranque sesion implementacion).
 - **Docs sincronizadas**: `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `changelog.md`.
 - **Skill usada**: `software-architect-2026` para el framing arquitectonico previo y `greenhouse-task-planner` para registrar la task.
 - **Guardrail**: no se cambio runtime ni datos reales; Maria no fue mutada. La task exige command auditado y staging validation antes de resolver casos reales.

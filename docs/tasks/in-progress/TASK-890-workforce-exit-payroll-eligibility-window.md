@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Slice 1 in-flight`
 - Rank: `TBD`
 - Domain: `hr|payroll|identity|platform`
 - Blocked by: `none`
-- Branch: `task/TASK-890-workforce-exit-payroll-eligibility-window`
+- Branch: `develop` (operador autorizo trabajar directo en develop; scope inicial doc+helper canonico+lint rule en modo warn, sin runtime breaking changes hasta Slice 3 detras de feature flag)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
