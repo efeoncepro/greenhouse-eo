@@ -194,8 +194,21 @@ const NON_ACTIONABLE_NEXT_STEPS: ReadonlySet<OffboardingNextStepCode> = new Set(
 ])
 
 const buildCaseLifecycleStep = (facts: ClosureCompletenessFacts): OffboardingPendingStep | null => {
-  // Cases en estado terminal no tienen case_lifecycle step (siempre que el
-  // nextStep canonical lo refleje con 'completed' o 'none').
+  // Terminal cases NUNCA tienen case_lifecycle step — el lifecycle del case
+  // YA esta cerrado. Esto es independent del nextStep legacy del work-queue
+  // que puede devolver `external_provider_close` para closureLane=external
+  // sin branch sobre case.status (legacy deriveNextStep). El aggregate canonical
+  // es authoritative para "que pasos faltan en el cierre real".
+  //
+  // Bug class observado live 2026-05-15 con Maria: case `executed` +
+  // closureLane='external_provider' → deriveNextStep retorna
+  // 'external_provider_close' → si solo filtramos por NON_ACTIONABLE_NEXT_STEPS,
+  // el case_lifecycle step se genera y dispara el primaryAction obsoleto.
+  if (facts.caseStatus === 'executed' || facts.caseStatus === 'cancelled') return null
+
+  // Defense in depth: si la derivation ya marca el nextStep como terminal
+  // (completed/none), tampoco generamos step. Cubre cases blocked u otros
+  // donde el legacy nextStep ya refleja terminacion via codigo canonical.
   if (NON_ACTIONABLE_NEXT_STEPS.has(facts.nextStep.code)) return null
 
   return {

@@ -904,9 +904,16 @@ export const transitionOffboardingCase = async ({
     const current = mapCaseRow(currentRows.rows[0])
 
     if (isTerminalOffboardingStatus(current.status)) {
-      throw new HrCoreValidationError('Terminal offboarding cases cannot be transitioned.', 409, {
-        currentStatus: current.status
-      })
+      // TASK-892 — copy es-CL canonical. Backend ya no debe surface strings
+      // en ingles al cliente (canonical error response contract). El path
+      // de la UI evita este branch del state machine via primaryAction
+      // derivation desde closureCompleteness aggregate; este error queda
+      // como defense in depth para llamadas API directas.
+      throw new HrCoreValidationError(
+        'Este caso ya está cerrado y no puede transicionarse. Si necesitas reconciliar alguna capa pendiente (ej. relación legal Person 360), usa el comando auditado canónico desde el inspector del caso.',
+        409,
+        { currentStatus: current.status }
+      )
     }
 
     assertOffboardingTransition(current, input)

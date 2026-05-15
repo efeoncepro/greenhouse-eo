@@ -89,6 +89,35 @@ describe('computeClosureCompleteness — case draft (non-terminal)', () => {
 })
 
 describe('computeClosureCompleteness — case executed (terminal, BUG CLASS MARIA)', () => {
+  // Anti-regresion test del bug class observado live 2026-05-15:
+  // case `executed` + closureLane `external_provider` → legacy deriveNextStep
+  // retorna `external_provider_close` (NO 'completed') porque no branch sobre
+  // case.status. Si buildCaseLifecycleStep solo filtra por NON_ACTIONABLE
+  // codes, el step se genera y dispara primaryAction obsoleto.
+  // Fix: `buildCaseLifecycleStep` filtra por caseStatus directamente.
+  it('caso 2a (anti-regresion live Maria): executed + external_provider_close nextStep + drift → SOLO reconcile_drift step', () => {
+    const result = computeClosureCompleteness(
+      facts({
+        caseStatus: 'executed',
+        // legacy deriveNextStep retorna external_provider_close para
+        // closureLane=external_provider sin importar case.status
+        nextStep: makeNextStep('external_provider_close', 'Cerrar con proveedor', 'info'),
+        caseLifecycleStepLabel: 'Cerrar con proveedor',
+        caseLifecycleStepSeverity: 'info',
+        personRelationshipDrift: true,
+        payrollExcluded: true,
+        memberId: 'maria_member_id'
+      })
+    )
+
+    // Aggregate canonical correctamente descarta case_lifecycle step
+    // porque caseStatus es terminal.
+    expect(result.closureState).toBe('partial')
+    expect(result.pendingSteps).toHaveLength(1)
+    expect(result.pendingSteps[0]?.code).toBe('reconcile_drift') // NO 'case_lifecycle'
+    expect(result.pendingSteps.some(s => s.code === 'case_lifecycle')).toBe(false)
+  })
+
   it('caso 2: executed + drift Person 360 → partial + reconcile_drift step', () => {
     const result = computeClosureCompleteness(
       facts({
@@ -268,6 +297,38 @@ describe('derivePrimaryActionFromCompleteness', () => {
     const action = derivePrimaryActionFromCompleteness(completeness, legacyAction)
 
     expect(action).toBe(legacyAction)
+  })
+
+  // Anti-regresion test del bug class live (2026-05-15): legacy nextStep
+  // `external_provider_close` activo, pero case ya `executed` + drift Person 360
+  // → primaryAction debe ser reconcile_drift_action (NO legacyAction).
+  it('caso live Maria: executed + external_provider_close legacy + drift → primaryAction = reconcile_drift_action (NO external_provider_close)', () => {
+    const externalCloseAction: OffboardingWorkQueueActionDescriptor = {
+      code: 'external_provider_close',
+      label: 'Cerrar con proveedor',
+      disabled: false,
+      disabledReason: null,
+      severity: 'info',
+      href: null
+    }
+
+    const completeness = computeClosureCompleteness(
+      facts({
+        caseStatus: 'executed',
+        nextStep: makeNextStep('external_provider_close', 'Cerrar con proveedor', 'info'),
+        caseLifecycleStepLabel: 'Cerrar con proveedor',
+        caseLifecycleStepSeverity: 'info',
+        personRelationshipDrift: true,
+        payrollExcluded: true,
+        memberId: 'maria_member_id'
+      })
+    )
+
+    const action = derivePrimaryActionFromCompleteness(completeness, externalCloseAction)
+
+    expect(action?.code).toBe('reconcile_drift_action')
+    expect(action?.code).not.toBe('external_provider_close')
+    expect(action?.href).toBe('/admin/identity/drift-reconciliation?memberId=maria_member_id')
   })
 
   it('terminal + drift → primaryAction = reconcile_drift_action descriptor con href TASK-891', () => {
