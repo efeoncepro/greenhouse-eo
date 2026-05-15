@@ -1,3 +1,13 @@
+# Sesion 2026-05-15 — TASK-891 creada (follow-up TASK-890 ADR §7)
+
+- **Task creada**: `docs/tasks/to-do/TASK-891-person-relationship-drift-reconciliation-write-path.md`. Cierra el follow-up declarado en TASK-890 ADR §7 (write reconciliation Person 360).
+- **Scope V1.0**: helper canonico atomico + capability granular EFEONCE_ADMIN-only + route handler + UI dialog en `/admin/operations` + auto-escalation signal post 30d + docs/manuales. **6 slices**.
+- **Out of Scope V1.0** (documentado explicito): bulk reconciliation, auto-reconcile cron, delegacion capability a HR, drift reverso (member.contract_type='employee' + relacion='contractor'), mutar Maria operativamente en esta task.
+- **Caso fuente disparador**: Maria Camila Hoyos. Recovery operativa espera: (a) staging deploy + synthetic test fixture; (b) HR approval explicito; (c) ejecucion via dialog UI con reason >=20 chars. NO se muta dentro de TASK-891 — la task ship el write path, no ejecuta el caso real.
+- **Rollout Plan & Risk Matrix completo** (seccion canonical desde 2026-05-13): slice ordering hard rule + 6-row risk matrix + feature flag (capability gate solo, sin env var V1.0) + rollback plan per slice (datos reconciled NO revertible — append-only audit preserva ambos eventos) + production verification sequence + out-of-band coordination (HR + DevOps).
+- **Skills usadas para crear la task**: `greenhouse-task-planner`. Sesion previa que parió esta task: arch-architect Greenhouse overlay + `greenhouse-ux-writing` (TASK-890 V1.0 SHIPPED hoy mismo).
+- **Siguiente ID disponible**: `TASK-892`.
+
 # Sesion 2026-05-15 — TASK-890 V1.0 COMPLETO SHIPPED en develop (7 slices end-to-end)
 
 - **Estado final**: V1.0 COMPLETE. 10 commits pushed a `develop` end-to-end:
