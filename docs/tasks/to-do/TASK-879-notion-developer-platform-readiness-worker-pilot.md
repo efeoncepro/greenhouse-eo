@@ -497,10 +497,11 @@ Platform implications for Greenhouse:
 
 ## Follow-ups
 
-- Potencial follow-up: Worker-based Notion write bridge si Slice 3 valida runtime y seguridad.
-- Potencial follow-up: SDK adapter para portal directo si `TASK-738` se mantiene separado de Workers.
-- Potencial follow-up: upstream `notion-bq-sync` contract revision si Workers no reemplazan ingestion.
-- Potencial follow-up: External Agents API waitlist/partner track si Notion libera acceso usable.
+- **TASK-882 creada 2026-05-15** — Nexa Tools as Notion Workers (EPIC-005 pillar). Materializa el use case más alto-valor identificado en Slice 4 verdict: Workers para tools/agents read-only que expongan capabilities Greenhouse (ICO, sprint health, etc.) via External Agents API. Bloqueada por TASK-880 + External Agents API GA + decisión pricing post 11-ago-2026.
+- Potencial follow-up: Worker-based Notion Markdown publisher (publicar ICO/sprint reports a Notion pages) — V2 contingente de TASK-577 write bridge.
+- Potencial follow-up: SDK adapter para portal directo si `TASK-738` se mantiene separado de Workers (corre encima de TASK-880 cliente canonical).
+- Potencial follow-up: upstream `notion-bq-sync` contract revision — Slice 4 verdict: NO migrar a Workers, mantener como sibling Cloud Run hardened (TASK-737 sigue su trayectoria).
+- Potencial follow-up: External Agents API waitlist/partner track si Notion libera acceso usable — bundled en TASK-882.
 
 ## Delta 2026-05-14
 

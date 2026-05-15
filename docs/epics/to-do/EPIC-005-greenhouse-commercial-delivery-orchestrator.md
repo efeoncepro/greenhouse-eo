@@ -198,6 +198,19 @@ Nueva vista en Admin Center reemplazando el auto-silent del sibling (`forward_sy
 
 Effort: Medio.
 
+### TASK-882 — Nexa Tools as Notion Workers (agent angle pillar, agregada 2026-05-15)
+
+Agregada como child task del epic post TASK-879 Slice 4 verdict (2026-05-15) que identificó el use case "Tools para External Agents API / Nexa-in-Notion" como el más alto-valor donde Notion Workers ganan sobre Cloud Run. Materializa el angle "agent" del epic — el orquestador no solo sincroniza state Commercial↔Delivery, también expone capabilities consumibles desde Notion via Nexa.
+
+- 3-5 tools read-only V1 (`getProjectIco`, `getSprintHealth`, `getLastMeetingSummary`, `getProjectStatus`, `getMyAssignments`) deployadas como Notion Workers en workspace Efeonce.
+- Identity bridge canonical: PM Greenhouse invoca `@Nexa <command>` desde Notion → Worker resuelve `notion_user_id → member_id` reusando TASK-877 → endpoint Greenhouse respeta capability boundaries del caller real.
+- Schema PG `notion_worker_api_tokens` separado de `notion_personal_access_tokens` (TASK-880) por shape distinto (Worker token NO atado a operador humano, atado a Worker ID + lifecycle).
+- 3 capabilities granulares (`integrations.notion.worker.{invoke,register_token,revoke_token}`) + 2 reliability signals (`tool_failure_rate` + `tool_latency_p95`) + 1 V2 contingente (`credits_burn_rate` post 11-ago-2026).
+- Coordina con TASK-671 (Nexa Teams bot) — multi-channel coexistence; las 2 canales son additive.
+- Bloqueada por TASK-880 (cliente canonical) + External Agents API GA (alpha al 2026-05-13) + decisión pricing post 11-ago-2026.
+
+Effort: Alto. Spec: `docs/tasks/to-do/TASK-882-nexa-tools-as-notion-workers.md`.
+
 ## Decisiones Arquitectónicas (resueltas 2026-04-23)
 
 | Decisión | Resolución |
