@@ -1,3 +1,18 @@
+# Sesion 2026-05-15 — TASK-890 Slices 1-3 SHIPPED en develop (verde + push)
+
+- **Resultado**: 4 commits pushed a `develop` (5bf227af + 4b3851b9 + 1db67205 + dea23725) implementando Slices 1-3 end-to-end. Slices 4-7 pendientes para sesion(es) siguiente(s).
+- **Verificacion**: 4577 tests passed (0 fail), `pnpm build` production Turbopack verde 36.5s, `pnpm tsc --noEmit` clean, `pnpm lint` 0 errors (4 warnings preexistentes TASK-827 no relacionados), pre-push gate verde.
+- **Deliverables shipped**:
+  - **Slice 1** — ADR canonica `docs/architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md` (374 lineas) + entry en `DECISIONS_INDEX.md`. 5 decisiones canonicas, 13 hard rules, 6 reliability signals enumerados, 7-slice roadmap.
+  - **Slice 2** — Resolver canonico TS-only en `src/lib/payroll/exit-eligibility/{types,policy,query,index}.ts` (5 archivos, 1242 LOC). 38 tests unit con matrix completa lane × status × cutoff + edge dates + Maria-like regression fixture.
+  - **Slice 3** — Integration en `pgGetApplicableCompensationVersionsForPeriod` behind flag `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (default `false`, zero-risk parity bit-for-bit). Lint rule `greenhouse/no-inline-payroll-scope-gate` modo `warn` con 12 tests RuleTester (5 invalid + 7 valid). CLAUDE.md sumo seccion canonica "Workforce Exit Payroll Eligibility invariants" con 15 hard rules.
+  - **Fix** — `query.ts` importa direct de `@/lib/postgres/client` (evita chain `db.ts → postgres/client` que rompia 4 tests legacy del payroll-receipts-store con mock parcial).
+- **Skills usadas**: `arch-architect` (Greenhouse overlay) invocada **2 veces**: (a) checkpoint pre-implementation con 7 preguntas concretas → 2 correcciones quirurgicas aplicadas (cutoff = COALESCE(LWD, effective_date), exitLane DB-aligned); (b) checkpoint Slice 3 integration shape → Shape A approved (vs Shape B con CTE unificado), defer shadow compare a Slice 3.4, attached window optional con `undefined` semantica.
+- **Patrones canonicos reutilizados**: TASK-571/766/774 (canonical reader + lint rule), TASK-700/765 (state machine + audit), TASK-742 (defense-in-depth), TASK-872 (feature flag gate pattern), TASK-720 (TS-only declarative reader), TASK-672 (rich struct + thin predicate).
+- **Open Questions resueltas** (3): (1) external_provider exclude desde `approved` (no esperar `executed`), (2) provider closure evidence opcional V1.0 reason >= 10 chars, (3) drift Person 360 V1 ship solo read-only signal (no auto-mutate).
+- **Slice 4-7 quedan para sesion(es) siguiente(s)** (provider closure command auditado, UI contract `Cerrar con proveedor`, drift signal Person 360, docs/manuales). Feature flags y staged cutover documentados en spec linea 311.
+- **Guardrail**: Maria NO mutada. Slice 3 modifica path payroll productivo pero feature flag default `false` preserva comportamiento legacy bit-for-bit hasta staging shadow compare ≥7d post Maria-fixture verde.
+
 # Sesion 2026-05-15 — TASK-890 Workforce Exit Payroll Eligibility Window EN CURSO directo en develop
 
 - **Estado**: in-progress en `develop` por autorizacion explicita del operador (no se crea branch task/TASK-890-*).
