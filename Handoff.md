@@ -1,3 +1,27 @@
+# Sesion 2026-05-15 — Production Release Canónico end-to-end (TASK-890/891/892 bundle SHIPPED a main)
+
+- **Estado final**: ✅ RELEASE COMPLETE. Manifest transitionado a `released`.
+- **Target SHA**: `2f048eb26324d398c2d986331a0164f23f9f3669` (commit `release: TASK-892 V1.0.2 hotfix CI failure — narrow buildCaseLifecycleStep filter`)
+- **Orchestrator run**: [25937416170](https://github.com/efeoncepro/greenhouse-eo/actions/runs/25937416170) — success en 13 min (19:33 → 19:46 UTC)
+- **Watchdog run**: [25938088814](https://github.com/efeoncepro/greenhouse-eo/actions/runs/25938088814) — success post-release
+- **Cloud Run GIT_SHA verification** (los 4 workers en target_sha exacto):
+  - `ops-worker` (us-east4): `2f048eb26324d398c2d986331a0164f23f9f3669` ✅
+  - `commercial-cost-worker` (us-east4): `2f048eb26324d398c2d986331a0164f23f9f3669` ✅
+  - `ico-batch-worker` (us-east4): `2f048eb26324d398c2d986331a0164f23f9f3669` ✅
+  - `hubspot-greenhouse-integration` (us-central1): `2f048eb26324d398c2d986331a0164f23f9f3669` ✅
+- **Vercel Production**: Ready, aliased `greenhouse.efeoncepro.com`
+- **Azure Bicep**: validated + diff detect (no Bicep changes en bundle → deploys skipped correctamente)
+- **Gates aprobados**: 2 environment gates Production aprobados via `gh api` con autorización explícita del operador (Julio Reyes)
+- **CI fix mid-release**: V1.0.2 hotfix necesario — V1.0.1 filtraba todos los terminales, rompía recovery path finiquito post-executed. Fix quirurgico: solo `external_provider_close` + `classify_case` (state transitions). Tests anti-regresión agregados.
+- **Override CLAUDE.md gate**: skip de 7d staging shadow compare para TASK-890 flag autorizado por operador por urgencia operativa mid-month (caso Maria Camila Hoyos external_payroll/Deel).
+- **Bundle final**: 42 commits develop → main:
+  - TASK-890 V1.0 — Workforce Exit Payroll Eligibility Window (resolver canonico + 7 slices + signal drift Person 360)
+  - TASK-891 V1.0 — Person 360 Relationship Drift Reconciliation Write Path (helper atomic + dialog UI + auto-escalation severity 30d)
+  - TASK-892 V1.0 + V1.0.1 + V1.0.2 — Offboarding Closure Completeness Aggregate (4 capas + closureState badge + Capas pendientes UI + signal hr.offboarding.completeness_partial)
+  - 3 hotfixes mergeados desde main (identity link timestamps, identity source link flags, workforce activation reconciliation schema)
+  - Hubspot company name hardening + meeting notes context
+- **Próximo paso operativo**: verificar `/api/hr/payroll/projected` en producción ya NO retorna a María Camila Hoyos. Si confirma, cierra el bug class operacional originalmente reportado por el operador.
+
 # Delta 2026-05-15 — TASK-890 production flag flip autorizado
 
 - **Cambio operativo**: `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` quedó activo en `Production` y `staging` para el proyecto Vercel canónico `efeonce-7670142f/greenhouse-eo`.
