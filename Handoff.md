@@ -1,3 +1,19 @@
+# Sesion 2026-05-16 — TASK-893 Payroll Participation Window — kickoff implementación
+
+- **Task**: `TASK-893` — Payroll Participation Window. Primitive canonica para que Payroll calcule `eligibleFrom/eligibleTo/policy/reasonCodes/prorationFactor` por colaborador y periodo.
+- **Spec**: `docs/tasks/in-progress/TASK-893-payroll-participation-window.md` (movida desde `to-do/` 2026-05-16).
+- **ADR**: `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` (Accepted 2026-05-15, ajustada con 5 ajustes pre-implementación 2026-05-15).
+- **Branch policy**: directo en `develop` (sin branch dedicada) por instrucción explícita del operador.
+- **Pre-trabajo realizado en sesión previa (2026-05-15)**:
+  - Review arch-architect del ADR — 5 ajustes incorporados (type shape embebe exitEligibility, V1 single source compensation.effective_from, flag dependency TASK-893→TASK-890, 3 signals + subsystem Finance Data Quality, blast radius 6 downstream + no_recompute_closed_periods invariant).
+  - Triple-gate semantics documentado (intake TASK-872 / exit TASK-890 / participation TASK-893).
+  - Régimen coverage 4 canónicos validado (chile_dependent, honorarios, deel, international_internal).
+  - Hard rules canónicos declarados (12 invariantes) para lift a CLAUDE.md en Slice 6.
+- **Plan ejecución**: Slices 1-3 esta sesión (resolver + bulk query + projected integration). Checkpoint humano antes de Slice 4 (official payroll calculation tiene write blast radius).
+- **Estado en curso**: housekeeping completado, Discovery/Audit/Plan en curso.
+
+---
+
 # Sesion 2026-05-15 — Production Release Canónico end-to-end (TASK-890/891/892 bundle SHIPPED a main)
 
 - **Estado final**: ✅ RELEASE COMPLETE. Manifest transitionado a `released`.
@@ -22,11 +38,19 @@
   - Hubspot company name hardening + meeting notes context
 - **Próximo paso operativo**: verificar `/api/hr/payroll/projected` en producción ya NO retorna a María Camila Hoyos. Si confirma, cierra el bug class operacional originalmente reportado por el operador.
 
+# Delta 2026-05-15 — TASK-894 International Internal Contract Type documentada
+
+- **Trigger**: investigacion del dropdown de contrato confirmo que `international_internal` existe como regimen de receipts/reportes, pero no como `ContractType` seleccionable ni persistible. Los dropdowns actuales solo exponen `indefinido`, `plazo_fijo`, `honorarios`, `contractor` y `eor`; backend re-deriva `payRegime/payrollVia` desde `CONTRACT_DERIVATIONS`.
+- **Task creada**: `docs/tasks/to-do/TASK-894-international-internal-contract-type.md` (P1 / Alto / Medio, domain `hr|payroll|workforce|finance|data`). Siguiente ID disponible actualizado a `TASK-895`.
+- **Decision de diseno inicial**: resolver como perfil contractual canonico `international_internal -> payRegime='international' + payrollVia='internal'`, no como selector libre de regimen/via. Debe cubrir schema/check constraints, UI, write paths, payroll, receipts/reportes, payment obligations, readiness, dry-run data quality y docs.
+- **Relación con TASK-893**: TASK-893 queda actualizado para tratar `international_internal` como interno internacional prorrateable si TASK-894 se implementa antes o durante la ventana de participación.
+- **Guardrail**: no se tocaron datos reales ni código runtime; es documentación/task planning.
+
 # Delta 2026-05-15 — TASK-893 Payroll Participation Window documentada
 
 - **Trigger**: investigacion de Felipe Zurita en production projected payroll mostro `baseSalary=650000`, `grossTotal=650000`, `netTotal=550875`, `prorationFactor=1`, `workingDaysInPeriod=null`, `contractTypeSnapshot='honorarios'`. Causa: el motor legacy usa overlap de compensacion para roster y no tiene ventana canonica de participacion para monto.
 - **Decision arquitectonica**: creada y aceptada `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md`. Payroll debe resolver `eligibleFrom/eligibleTo/policy/reasonCodes/prorationFactor` componiendo `periodStart/periodEnd`, `compensation_versions.effective_from/effective_to`, start de relacion/onboarding si existe, y TASK-890 exit cutoff.
-- **Task creada**: `docs/tasks/to-do/TASK-893-payroll-participation-window.md` (P1 / Alto / Alto, domain `hr|payroll|workforce|reliability`). Siguiente ID disponible actualizado a `TASK-894`.
+- **Task creada**: `docs/tasks/to-do/TASK-893-payroll-participation-window.md` (P1 / Alto / Alto, domain `hr|payroll|workforce|reliability`). En ese momento el siguiente ID disponible quedo en `TASK-894`; tras crear TASK-894, el siguiente vigente es `TASK-895`.
 - **Regla clave**: ingreso mid-month NO es ausencia. No contaminar attendance (`days_absent`, `days_on_unpaid_leave`) para prorratear dias previos al inicio.
 - **Rollout esperado**: flag `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false`, staging shadow compare, projected + official payroll comparten primitive, signals `payroll.participation_window.*`.
 - **Docs sincronizados**: `DECISIONS_INDEX.md`, `TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, documentacion funcional/manual de periodos y `changelog.md`.
