@@ -1,9 +1,9 @@
 # Periodos de Nomina
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-890 — exit eligibility window canonico)
+> **Ultima actualizacion:** 2026-05-16 por Claude Opus (TASK-893 — payroll participation window V1 SHIPPED Slices 1-5)
 > **Documentacion tecnica:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
 > **ADR relacionado:** [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md)
 
@@ -235,22 +235,62 @@ Patron heredado de `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` (TASK-872).
 
 Maria Camila Hoyos, caso `EO-OFF-2026-0609A520`, lane `external_payroll`/Deel `last_working_day=2026-05-14`. Pre-TASK-890 aparecia full-month USD 530 en nomina proyectada mayo 2026 porque el gate inline solo excluia `executed`. Post-TASK-890 (con flag activo + case en `approved`): excluida del periodo via `projectionPolicy='exclude_from_cutoff'`.
 
-## Ventana de participacion payroll por ingreso/vigencia (TASK-893, planificada)
+## Ventana de participacion payroll por ingreso/vigencia (TASK-893, V1 SHIPPED 2026-05-16)
 
-Estado vigente pre-TASK-893: Greenhouse descubre el roster mensual por solape de compensacion (`effective_from <= fin de mes` y `effective_to >= inicio de mes`), pero no prorratea automaticamente a colaboradores que ingresan a mitad del periodo. En `projected_month_end`, el factor de prorrateo legacy es `1` salvo que existan ajustes de asistencia/licencias no pagadas.
+**Estado**: V1 SHIPPED a `develop` con flag `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false` default en todos los ambientes. Comportamiento legacy preservado bit-for-bit hasta que el operador flippee el flag.
 
-Esto explica casos como Felipe Zurita: si la compensacion inicia el dia 13, el sistema legacy puede mostrar el mes completo en nomina proyectada porque la compensacion toca el periodo.
+### Que resuelve
 
-La decision canonica aceptada es `GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1`:
+Antes de TASK-893: Greenhouse descubria el roster mensual por solape de compensacion (`effective_from <= fin de mes` y `effective_to >= inicio de mes`), pero NO prorrateaba automaticamente a colaboradores que ingresaban a mitad del periodo. En `projected_month_end`, el factor de prorrateo legacy era `1` salvo que existieran ajustes de asistencia.
+
+Eso explicaba casos como Felipe Zurita: compensacion inicia dia 13, sistema legacy mostraba mes completo en nomina proyectada.
+
+Despues de TASK-893: cuando el operador active el flag, Greenhouse calcula una **ventana de participacion canonica** por colaborador y periodo:
 
 ```text
-eligibleFrom = max(periodStart, compensation.effective_from, relationshipStartDate si existe)
+eligibleFrom = max(periodStart, compensation.effective_from)
 eligibleTo   = min(periodEnd, compensation.effective_to, TASK-890 exit cutoff si aplica)
 ```
 
-Regla importante: los dias previos al ingreso no son ausencia. No deben alimentar `days_absent`, licencias ni readiness de asistencia. Son no-participacion payroll y deben prorratearse mediante la primitive `PayrollParticipationWindow`.
+Y aplica un `prorationFactor = countWeekdays(eligibleFrom, eligibleTo) / countWeekdays(periodStart, periodEnd)` que se inyecta en la compensacion ANTES del calculo de nomina (no como rescale post-hoc). Esto asegura que deducciones Chile + gratificacion legal + retencion SII se recomputan correctamente desde el bruto prorrateado.
 
-TASK-893 implementara esta regla detras de `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false` y la aplicara tanto a nomina proyectada como a calculo oficial.
+### Que cubre el calculo
+
+V1 cubre los 4 regimenes canonicos:
+
+| Régimen | Que escala con el factor | Que NO escala (preservado contractual) |
+| --- | --- | --- |
+| `chile_dependent` | base salary + remote allowance + bono fijo + caps bonos KPI + APV. Deducciones AFP/salud/cesantia/IUSC se recomputan desde gross prorrateado. Gratificacion legal cap mensual respetada. | Colacion + movilizacion (asignaciones no imponibles fijas, jurisprudencia chilena Art 50 CT) |
+| `honorarios` | base honorarios. Retencion SII Art 74 N°2 LIR se recomputa desde gross prorrateado | (mismo) |
+| `international_deel` | base USD; Deel reconcilia el pago real | (mismo) |
+| `international_internal` | base salary + componentes; sin deducciones Chile | (mismo) |
+
+### Politica legal explicita
+
+- **Gratificacion legal Art 50 CT mes parcial**: cap MENSUAL (4.75 × IMM ÷ 12, aprox. $213,354 en 2026) NO se prorratea. El calculator canonico clampea al cap monthly sobre el gross prorrateado (validado por payroll-auditor 2026-05-16 contra fixtures sintéticos high/low salary). Si HR decide que entry month = `$0` gratificacion (Dictamen DT 2937/050), debe setear `gratificacionLegalMode='ninguna'` en la compensacion (override manual).
+- **Asignaciones no imponibles**: colacion y movilizacion son montos fijos mensuales pactados contractualmente. NO se prorratean automaticamente al ingreso/salida — la decision de prorratear es contractual del operador HR.
+- **IMM piso legal**: Greenhouse respeta IMM mensual completo en el contrato. Para mes parcial (entry/exit mid-month), la base prorrateada puede caer bajo IMM full pero NO viola IMM proporcional por dias trabajados (DT 4423/156 2001).
+- **Boleta honorarios mid-month**: el colaborador honorarios debe emitir su boleta por el bruto **prorrateado** (no el contrato full) para que la retencion SII declarada en F29 cuadre con el DTE 41. Comunicar a colaboradores afectados.
+
+### Regla importante
+
+Los dias previos al ingreso no son ausencia. No alimentan `days_absent`, licencias ni readiness de asistencia. Son **no-participacion payroll** y se prorratean via la primitive canonica `PayrollParticipationWindow`.
+
+### Estado del flag y pre-flag-ON gates
+
+- `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false` default en cualquier ambiente.
+- Requiere `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` (TASK-890) en el mismo ambiente. Sin esa pre-condicion, la ventana emite warning `exit_resolver_disabled` por miembro afectado.
+- Activacion productiva requiere: capability `payroll.period.force_recompute` shippeada, 5 Open Questions resueltas con HR/Finance/Legal signoff, staging shadow compare >=7d verde, allowlist explicita de members documentada en `Handoff.md`.
+
+### Observabilidad canonica (Slice 5)
+
+3 reliability signals bajo subsystem `Finance Data Quality` (visibles en `/admin/operations`):
+
+- `payroll.participation_window.full_month_entry_drift`: detecta members con effective_from mid-period que pagaron full month gross. Bajo flag OFF = informativo; bajo flag ON = regresion real.
+- `payroll.participation_window.source_date_disagreement`: detecta drift > 7 dias entre `compensation.effective_from` y `onboarding.start_date`. Data-driven trigger para V1.1 onboarding-source decision.
+- `payroll.participation_window.projection_delta_anomaly`: V1.0 honest degradation (severity=unknown). V1.1 wireara shadow compare.
+
+> Detalle tecnico: `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` + `src/lib/payroll/participation-window/`.
 
 ## Referencias
 

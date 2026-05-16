@@ -7,7 +7,65 @@
 - **Guardrail crítico**: no migrar ni tocar production `notion-bq-sync` sibling ni el pipeline crítico Notion → BQ raw → conformed → PG fuera de los wrappers Greenhouse-side; preservar fallback a token global hasta que PATs estén verificados.
 - **Estado actual**: Discovery/Audit/Plan en curso. PR/branch `TASK-880` no detectados antes de tomar ownership. Worktree ya tenía cambios ajenos en `project_context.md`, `changelog.md` y `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md`; no revertirlos ni mezclarlos salvo coordinación explícita.
 
-# Sesion 2026-05-16 — TASK-893 Payroll Participation Window V0.1 SHIPPED + Slice 4 scope expandido post-audit
+# Sesion 2026-05-16 — TASK-893 Payroll Participation Window V1 SHIPPED end-to-end (6 slices)
+
+**Status final**: ✅ TASK-893 V1 COMPLETE. Movida a `docs/tasks/complete/`. 9 commits a `develop` directo (sin branch). Flag `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false` default productivo — legacy bit-for-bit preservado.
+
+## Commits Slice-by-Slice
+
+| Slice | Commit | Tests verde acumulado |
+| --- | --- | --- |
+| Housekeeping | `a9361535` | — |
+| Slice 1 (resolver foundation) | `5eb44c47` | +19 |
+| Slice 2 (bulk query + TASK-890 composition) | `84f4f00e` | +10 |
+| Slice 3 (projected integration) | `10eec239` | +5 (full project-payroll 11) |
+| V0.1 audit closing | `297b2800` | doc |
+| BL-3 (flag dependency enforcement) | `9bdc5bb0` | +3 |
+| BL-4 RESOLVED non-issue + cross-spec lift | `c7a29476` | doc |
+| BL-5 (reopened recompute guard) | `a279d765` | +4 |
+| BL-1 (recompute deductions from prorated gross) | `005a42c3` | +3 |
+| BL-2 (calculatePayroll oficial + recalc bypass guard) | `fb80c49b` | full suite preserved |
+| Slice 5 (3 reliability signals + builder + wiring) | `93abeb5d` | +266 reliability |
+
+## Resultado final
+
+- **499/499 payroll tests verde** (6 skipped pre-existentes).
+- **266/266 reliability tests verde**.
+- **Cero regresión** en 11 commits consecutivos.
+- **Flag default OFF** en cualquier env → comportamiento legacy bit-for-bit.
+- **Defense in depth 4 capas** + pre-BL-2 expert audit con payroll-auditor + finance-accounting-operator (GREEN con 2 correcciones aplicadas).
+
+## Pre-flag-ON-producción gates (canonical, NO se flippea ON sin estos)
+
+1. ✅ Slice 4 + Slice 5 SHIPPED (esta sesión).
+2. ✅ Slice 6 SHIPPED (docs funcional v1.2 + manual v1.1 + CLAUDE.md hard rules + changelog + DECISIONS_INDEX + spec finiquito cross-spec lift).
+3. ⏸ **Capability `payroll.period.force_recompute`** SHIPPED (reclassified V1.1 → pre-flag-ON gate por finance auditor 2026-05-16). Sin esta capability, BL-5 deja al operador stuck cuando emerja necesidad de recompute en período exportado pre-flag-flip. Tarea derivada explícita.
+4. ⏸ **5 Open Questions resueltas con HR/Finance/Legal signoff escrito**:
+   - Q-1 finiquito base: ✅ RESOLVED (BL-4 NON-ISSUE).
+   - Q-2 gratificación cap mes parcial: ✅ RESOLVED por BL-1 pattern (Opción A canonical — cap MENSUAL NO prorrateado).
+   - Q-3 vacaciones proporcionales Art 67 CT: V1.1 follow-up (módulo HR separado `vacation_accruals`).
+   - Q-4 capability force_recompute: reclassified to pre-flag-ON gate (item 3 above).
+   - Q-5 backfill scope V1: ✅ NO backfill, append-only audit preserved.
+5. ⏸ **Staging shadow compare ≥ 7d steady verde**: flag ON en staging only, monitor 3 reliability signals = 0.
+6. ⏸ **HR/Finance written approval**: documented en `Handoff.md` con specific members allowlist.
+
+## NO mutate hasta steady state
+
+- **Felipe Zurita** real (`e603fade-...`): NO mutate operativamente. Member usado solo como fixture en tests.
+- **Maria Camila Hoyos** real (`d1a72374-...`): NO mutate operativamente. Recovery espera signoff HR + activación productiva del flag.
+- `PAYROLL_PARTICIPATION_WINDOW_ENABLED`: NO se flippea ON en ningún env hasta cerrar pre-flag-ON gates 3-6 arriba.
+
+## Próximas sesiones recomendadas (post TASK-893 V1)
+
+| Sesión | Scope | Pre-requisito |
+| --- | --- | --- |
+| Capability `payroll.period.force_recompute` | Nueva capability + admin endpoint con reason >= 20 chars + audit row + escape hatch en BL-5 guard | Ninguno (puede tomarse ya) |
+| Vacaciones proporcionales V1.1 | TASK derivada nueva: participation-aware `vacation_accruals` (módulo HR separado) | Opcional, no bloquea flag-ON |
+| Shadow compare wiring | V1.1 follow-up: wire `projection_delta_anomaly` signal (Sentry event filtered o PG table o smoke_lane_runs) | Capability + staging shadow >=7d en proceso |
+
+---
+
+# Sesion 2026-05-16 — TASK-893 V0.1 SHIPPED + Slice 4 scope expandido post-audit (snapshot histórico pre-cierre)
 
 ## V0.1 milestone shipped (Slices 1-3 directo en develop sin branch)
 
