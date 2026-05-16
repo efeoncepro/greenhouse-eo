@@ -1,4 +1,34 @@
-# Sesion 2026-05-16 — TASK-895 V1.1a flag activation — CEO signoff + Fase 1 audit baseline
+# Sesion 2026-05-16 — TASK-894 international_internal contract type foundation — IN-PROGRESS develop
+
+**Status**: ⏳ Lifecycle move + spec recalibration commiteado. FASE 1 Discovery iniciada.
+
+## Context
+
+Implementación TASK-894 — sexto `ContractType` canonico `international_internal` (payRegime='international' + payrollVia='internal') para colaboradores internacionales pagados internamente por Efeonce (sin Deel/EOR). Directo en `develop` por instrucción explícita del operador (sin branch switch).
+
+## Pre-execution arch-review aplicado (Delta 2026-05-16)
+
+3 ajustes incorporados al spec antes de mover a in-progress:
+
+1. **Outbox event `member.contract_type.changed v1`** agregado a Slice 5 con shape completo + 4 consumers downstream esperados. `legalReviewReference` NUNCA cruda en payload (solo `hasLegalReviewReference: boolean`).
+2. **Subsystem rollup decidido** (Open Question #6): `invalid_tuple_drift` + `fallback_resolution_legacy` → `Identity & Access`; `invalid_statutory_application` → `Finance Data Quality`.
+3. **V1.1 follow-up** `legalReviewReference → asset_id` documentado (reusa patrón TASK-721 evidence uploader, cierra residual risk Safety pillar).
+
+17 hard rules canonicas declaradas en spec para lift a CLAUDE.md en Slice 6.
+
+## Open Questions resueltas
+
+- Q1 Label → `Internacional interno` (es-CL neutral)
+- Q2 Currency default → `USD`
+- Q3 contractAllowsRemoteAllowance → `false` V1 conservador
+- Q4 Payment Obligations lane → lane interna existente reusada (verificado `materialize-payroll.ts:164`)
+- Q5 Pre-flip productivo Legal/People Ops → afecta SOLO grant capability productivo (Slice 6 pre-flip gate), NO bloquea implementación Slice 1-5
+- Q6 Subsystem rollup signals → decidido (ver arriba)
+- Q7 Backfill members reales → V1 explicit NO backfill productivo automatico; solo dry-run CSV
+
+NO blockers para implementación. La capability productiva queda detrás de gate `Handoff.md` allowlist + Legal/Finance/HR signoff escrito.
+
+## Sesión previa (TASK-895)
 
 **Status**: ✅ Fase 1 (audit baseline) ejecutado live PG staging 2026-05-16 09:56 UTC-4. CEO signoff registrado (Julio Reyes Rangel, jreysgo@gmail.com).
 
