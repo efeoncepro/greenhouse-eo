@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
-import { resolveExitEligibilityForMembers } from '@/lib/payroll/exit-eligibility'
+import { isPayrollExitEligibilityWindowEnabled, resolveExitEligibilityForMembers } from '@/lib/payroll/exit-eligibility'
 import type { WorkforceExitPayrollEligibilityWindow } from '@/lib/payroll/exit-eligibility'
 
 import { isPayrollParticipationWindowEnabled } from './flag'
@@ -62,6 +62,28 @@ export const resolvePayrollParticipationWindowsForMembers = async (
   const factsByMember = await fetchParticipationFactsForMembers(memberIds, periodStart, periodEnd)
 
   /*
+   * TASK-893 Slice 4 BL-3 — Flag dependency enforcement.
+   *
+   * If `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (TASK-890) is OFF in this
+   * environment, `resolveExitEligibilityForMembers` returns the legacy
+   * fallback shape silently (NOT throw). Without the explicit check below,
+   * the participation resolver would compose `exitEligibility=null` and
+   * produce `full_period` for Maria-like — "partial correctness, worst
+   * failure mode" identified by the payroll auditor.
+   *
+   * We respect the canonical flag dependency declared in ADR §"Flag Dependency":
+   * TASK-893=ON requires TASK-890=ON. When TASK-890 is OFF, every member
+   * receives an `exit_resolver_disabled` warning so the operator surface
+   * can flag the degraded mode honestly.
+   *
+   * We still INVOKE the TASK-890 resolver (cheap call) — even when its flag
+   * is OFF it returns shape with `projectionPolicy='full_period'` per member
+   * which the policy derivation handles correctly. The warning is the
+   * canonical operator signal.
+   */
+  const exitResolverEnabled = isPayrollExitEligibilityWindowEnabled()
+
+  /*
    * Compose TASK-890 in parallel. Resolve to a Map even on failure so the
    * per-member loop below stays branch-free.
    */
@@ -96,6 +118,24 @@ export const resolvePayrollParticipationWindowsForMembers = async (
 
     const exit = exitByMember.get(memberId) ?? null
 
+    /*
+     * BL-3 degraded reason precedence:
+     *   1. TASK-890 throw → `failed` (with detail).
+     *   2. TASK-890 flag OFF → `disabled` (operator-visible signal).
+     *   3. Otherwise → undefined (happy path).
+     *
+     * Note: when flag is OFF, TASK-890 returns shape with full_period for
+     * every member, so the policy resolver derives correctly — the warning
+     * is purely operator observability for the canonical flag dependency.
+     */
+    let degraded: PayrollParticipationFacts['exitResolverDegraded']
+
+    if (exitResolverFailureDetail) {
+      degraded = { reason: 'failed', detail: exitResolverFailureDetail }
+    } else if (!exitResolverEnabled) {
+      degraded = { reason: 'disabled' }
+    }
+
     const factsInput: PayrollParticipationFacts = {
       memberId,
       periodStart,
@@ -104,9 +144,7 @@ export const resolvePayrollParticipationWindowsForMembers = async (
       compensationEffectiveTo: facts.compensationEffectiveTo,
       onboardingStartDate: facts.onboardingStartDate,
       exitEligibility: exit,
-      exitResolverDegraded: exitResolverFailureDetail
-        ? { reason: 'failed', detail: exitResolverFailureDetail }
-        : undefined
+      exitResolverDegraded: degraded
     }
 
     out.set(memberId, derivePayrollParticipationPolicy(factsInput))

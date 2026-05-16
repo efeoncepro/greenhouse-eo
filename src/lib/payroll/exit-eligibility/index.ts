@@ -16,6 +16,7 @@ export type {
 
 export type { ExitCaseFacts } from './policy'
 export { computeCutoff, derivePolicy } from './policy'
+export { isPayrollExitEligibilityWindowEnabled } from './flag'
 
 /**
  * Canonical resolver — TASK-890 single source of truth.

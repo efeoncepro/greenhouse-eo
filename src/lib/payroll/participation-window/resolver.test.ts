@@ -12,6 +12,7 @@ const resolveExitMock = vi.fn<
   (memberIds: ReadonlyArray<string>, periodStart: string, periodEnd: string) => Promise<Map<string, WorkforceExitPayrollEligibilityWindow>>
 >()
 
+const isExitFlagEnabledMock = vi.fn<() => boolean>(() => true)
 const captureWithDomainMock = vi.fn()
 
 vi.mock('./query', () => ({
@@ -19,7 +20,8 @@ vi.mock('./query', () => ({
 }))
 
 vi.mock('@/lib/payroll/exit-eligibility', () => ({
-  resolveExitEligibilityForMembers: (...args: Parameters<typeof resolveExitMock>) => resolveExitMock(...args)
+  resolveExitEligibilityForMembers: (...args: Parameters<typeof resolveExitMock>) => resolveExitMock(...args),
+  isPayrollExitEligibilityWindowEnabled: () => isExitFlagEnabledMock()
 }))
 
 vi.mock('@/lib/observability/capture', () => ({
@@ -60,6 +62,9 @@ beforeEach(() => {
   fetchFactsMock.mockReset()
   resolveExitMock.mockReset()
   captureWithDomainMock.mockReset()
+  /* Default: TASK-890 flag ON (happy path); individual tests can override. */
+  isExitFlagEnabledMock.mockReset()
+  isExitFlagEnabledMock.mockReturnValue(true)
 })
 
 describe('resolvePayrollParticipationWindowsForMembers', () => {
@@ -239,6 +244,82 @@ describe('resolvePayrollParticipationWindowsForMembers', () => {
 
     expect(drift).toBeDefined()
     expect(drift?.evidence).toMatchObject({ diffDays: 15 })
+  })
+
+  /*
+   * BL-3 (Slice 4) — Flag dependency TASK-893→TASK-890 enforcement.
+   *
+   * When TASK-890 flag is OFF in the environment but TASK-893 ON, the resolver
+   * must emit `exit_resolver_disabled` warning per member so the operator
+   * surface flags the degraded composition mode.
+   */
+  it('BL-3: TASK-890 flag OFF emits exit_resolver_disabled warning per member', async () => {
+    isExitFlagEnabledMock.mockReturnValue(false)
+
+    fetchFactsMock.mockResolvedValueOnce(
+      new Map([['member-felipe', buildFactsRow({ compensationEffectiveFrom: '2026-05-13' })]])
+    )
+    /* TASK-890 silently returns empty Map (or fallback shape) when its flag is OFF */
+    resolveExitMock.mockResolvedValueOnce(new Map())
+
+    const result = await resolvePayrollParticipationWindowsForMembers(
+      ['member-felipe'],
+      PERIOD_START,
+      PERIOD_END
+    )
+
+    const window = result.get('member-felipe')!
+
+    /* Entry-side still derives correctly */
+    expect(window.policy).toBe('prorate_from_start')
+    expect(window.eligibleFrom).toBe('2026-05-13')
+
+    /* But operator-visible warning is emitted */
+    const warning = window.warnings.find(w => w.code === 'exit_resolver_disabled')
+
+    expect(warning).toBeDefined()
+    expect(warning?.severity).toBe('warning')
+  })
+
+  it('BL-3: TASK-890 flag ON happy path does NOT emit exit_resolver_disabled', async () => {
+    /* default beforeEach: flag ON */
+    fetchFactsMock.mockResolvedValueOnce(
+      new Map([['member-felipe', buildFactsRow()]])
+    )
+    resolveExitMock.mockResolvedValueOnce(
+      new Map([['member-felipe', buildExitWindow()]])
+    )
+
+    const result = await resolvePayrollParticipationWindowsForMembers(
+      ['member-felipe'],
+      PERIOD_START,
+      PERIOD_END
+    )
+
+    const window = result.get('member-felipe')!
+
+    expect(window.warnings.find(w => w.code === 'exit_resolver_disabled')).toBeUndefined()
+  })
+
+  it('BL-3 precedence: TASK-890 throw takes precedence over flag OFF (both signals → only failed wins)', async () => {
+    isExitFlagEnabledMock.mockReturnValue(false)
+
+    fetchFactsMock.mockResolvedValueOnce(
+      new Map([['member-felipe', buildFactsRow()]])
+    )
+    resolveExitMock.mockRejectedValueOnce(new Error('PG timeout'))
+
+    const result = await resolvePayrollParticipationWindowsForMembers(
+      ['member-felipe'],
+      PERIOD_START,
+      PERIOD_END
+    )
+
+    const window = result.get('member-felipe')!
+
+    /* failed wins over disabled — the actual error is the higher-fidelity signal */
+    expect(window.warnings.find(w => w.code === 'exit_resolver_failed')).toBeDefined()
+    expect(window.warnings.find(w => w.code === 'exit_resolver_disabled')).toBeUndefined()
   })
 })
 
