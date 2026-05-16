@@ -26,3 +26,4 @@ export {
   resolvePayrollParticipationWindowsForMembers,
   isMemberParticipatingInPayroll
 } from './resolver'
+export { prorateCompensationForParticipationWindow } from './prorate-compensation'

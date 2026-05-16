@@ -26,7 +26,12 @@ import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
-import { isPayrollParticipationWindowEnabled } from '@/lib/payroll/participation-window'
+import {
+  isPayrollParticipationWindowEnabled,
+  prorateCompensationForParticipationWindow,
+  resolvePayrollParticipationWindowsForMembers
+} from '@/lib/payroll/participation-window'
+import { captureWithDomain } from '@/lib/observability/capture'
 import {
   canRecalculatePayrollPeriod,
   isPayrollPeriodReopened,
@@ -568,9 +573,71 @@ export const calculatePayroll = async ({
     )
   }
 
+  /*
+   * TASK-893 Slice 4 BL-2 — Resolve per-member participation windows BEFORE
+   * the official calculation loop. Mirror of `project-payroll.ts:269`
+   * `maybeResolveParticipationWindows`, adapted for the write path with
+   * defensive degradation:
+   *
+   * - Flag OFF (default) → returns `null` → for-loop falls back to legacy
+   *   path bit-for-bit (no compensation scaling, no skip).
+   * - Flag ON happy path → returns Map<memberId, PayrollParticipationWindow>.
+   * - Flag ON + resolver throws → captureWithDomain + null → degrades to
+   *   legacy. Write path NEVER crashes due to participation resolver failure.
+   *
+   * Read-only call to PG. Safe to invoke before opening the write
+   * transaction.
+   */
+  const participationByMember = isPayrollParticipationWindowEnabled()
+    ? await resolvePayrollParticipationWindowsForMembers(
+        compensationRows.map(c => c.memberId),
+        range.periodStart,
+        range.periodEnd
+      ).catch((err: unknown) => {
+        captureWithDomain(err, 'payroll', {
+          extra: {
+            source: 'calculate_payroll.participation_window_resolve_failed',
+            periodId,
+            periodStart: range.periodStart,
+            periodEnd: range.periodEnd,
+            memberCount: compensationRows.length
+          }
+        })
+
+        return null
+      })
+    : null
+
   const entries: PayrollEntry[] = []
+  const excludedMemberIds: string[] = []
 
   for (const compensation of compensationRows) {
+    /*
+     * TASK-893 Slice 4 BL-2 — Per-member participation resolution.
+     *
+     * - Flag OFF or no participation entry → factor=1 → no compensation
+     *   scaling, no behavior change vs pre-TASK-893.
+     * - Flag ON + factor>0 + factor<1 → prorate compensation BEFORE
+     *   buildPayrollEntry. The canonical Chile calculator recomputes
+     *   deductions, gratificación legal cap, and retención SII from the
+     *   prorated bases (BL-1 pattern, validated by payroll auditor 2026-05-16).
+     * - Flag ON + factor=0 (policy='exclude') → SKIP member entirely. No
+     *   payroll_entries row persisted. Critical: do NOT emit zero-amount
+     *   entries (would corrupt DTE/F29 cross-validation).
+     */
+    const participation = participationByMember?.get(compensation.memberId) ?? null
+    const participationFactor = participation?.prorationFactor ?? 1
+
+    if (participationFactor <= 0) {
+      excludedMemberIds.push(compensation.memberId)
+      continue
+    }
+
+    const effectiveCompensation =
+      participationFactor < 1
+        ? prorateCompensationForParticipationWindow(compensation, participationFactor)
+        : compensation
+
     const kpi = kpiData.snapshots.get(compensation.memberId) || null
 
     const attendance = attendanceData.get(compensation.memberId) ?? null
@@ -578,7 +645,7 @@ export const calculatePayroll = async ({
     let entry = await buildPayrollEntry({
       periodId,
       periodDate: range.periodEnd,
-      compensation,
+      compensation: effectiveCompensation,
       ufValue: indicatorValues.ufValue,
       bonusConfig,
       kpi,
@@ -592,27 +659,35 @@ export const calculatePayroll = async ({
         utmValue: indicatorValues.utmValue
       })
 
+      /*
+       * TASK-893 Slice 4 BL-2 — Second-pass calculator receives the prorated
+       * compensation inputs (NOT the original). Adjusted overrides from
+       * TASK-745 (entry.adjusted*) still take priority when present.
+       * Without this fix, the recompute of deductions / gratificación would
+       * use the FULL baseSalary while the entry has the prorated gross —
+       * the exact double-prorrateo bug class that BL-1 closes for projected.
+       */
       const totalsWithTax = await calculatePayrollTotals({
-        payRegime: compensation.payRegime,
-        baseSalary: entry.adjustedBaseSalary ?? compensation.baseSalary,
-        remoteAllowance: entry.adjustedRemoteAllowance ?? compensation.remoteAllowance,
-        colacionAmount: entry.adjustedColacionAmount ?? compensation.colacionAmount,
-        movilizacionAmount: entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount,
-        fixedBonusAmount: entry.adjustedFixedBonusAmount ?? compensation.fixedBonusAmount,
+        payRegime: effectiveCompensation.payRegime,
+        baseSalary: entry.adjustedBaseSalary ?? effectiveCompensation.baseSalary,
+        remoteAllowance: entry.adjustedRemoteAllowance ?? effectiveCompensation.remoteAllowance,
+        colacionAmount: entry.adjustedColacionAmount ?? effectiveCompensation.colacionAmount,
+        movilizacionAmount: entry.adjustedMovilizacionAmount ?? effectiveCompensation.movilizacionAmount,
+        fixedBonusAmount: entry.adjustedFixedBonusAmount ?? effectiveCompensation.fixedBonusAmount,
         bonusOtdAmount: entry.bonusOtdAmount,
         bonusRpaAmount: entry.bonusRpaAmount,
         bonusOtherAmount: entry.bonusOtherAmount,
-        gratificacionLegalMode: compensation.gratificacionLegalMode,
-        afpName: compensation.afpName,
-        afpRate: compensation.afpRate,
-        afpCotizacionRate: compensation.afpCotizacionRate,
-        afpComisionRate: compensation.afpComisionRate,
-        healthSystem: compensation.healthSystem,
-        healthPlanUf: compensation.healthPlanUf,
-        unemploymentRate: compensation.unemploymentRate,
-        contractType: compensation.contractType,
-        hasApv: compensation.hasApv,
-        apvAmount: compensation.apvAmount,
+        gratificacionLegalMode: effectiveCompensation.gratificacionLegalMode,
+        afpName: effectiveCompensation.afpName,
+        afpRate: effectiveCompensation.afpRate,
+        afpCotizacionRate: effectiveCompensation.afpCotizacionRate,
+        afpComisionRate: effectiveCompensation.afpComisionRate,
+        healthSystem: effectiveCompensation.healthSystem,
+        healthPlanUf: effectiveCompensation.healthPlanUf,
+        unemploymentRate: effectiveCompensation.unemploymentRate,
+        contractType: effectiveCompensation.contractType,
+        hasApv: effectiveCompensation.hasApv,
+        apvAmount: effectiveCompensation.apvAmount,
         ufValue: indicatorValues.ufValue,
         taxAmount: taxResult.taxAmountClp,
         periodDate: range.periodEnd

@@ -578,8 +578,41 @@ Convergencia: **V0.1 está bien diseñado y safe** (pure function, defensive deg
 - Slices 5-6 en sesiones separadas (signals additive + docs/rollout).
 - `PAYROLL_PARTICIPATION_WINDOW_ENABLED` **NO se flippea ON** en ningún env hasta cerrar los 5 blockers + 5 OQs.
 
-### Status post-BL-3 + BL-4 (2026-05-16, in-session 2)
+### Status post-Slice 4 completo (2026-05-16, in-session 2)
 
-- **BL-3 SHIPPED** (`9bdc5bb0`): flag dependency TASK-893→TASK-890 enforcement en `resolver.ts`. Emit warning `exit_resolver_disabled` por member cuando TASK-890 OFF. 3 tests nuevos verde, 489/489 payroll suite verde.
-- **BL-4 RESOLVED as non-issue**: investigación read-only confirmó que `final-settlement/calculator.ts:397-401` consume `compensation.baseSalary` (nominal), NO `payroll_entries.gross_total`. Cero doble-prorrateo posible. Solo doc gap menor en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` (Delta 2026-05-16 separate commit).
-- **Remaining**: BL-1 (recompute deductions), BL-2 (integrate calculatePayroll), BL-5 (reopened guard).
+**Todos los 5 blockers de Slice 4 cerrados en esta sesión**. Slice 4 SHIPPED end-to-end a develop directo (sin branch dedicada). 496/496 payroll tests verde, flag default OFF preserva bit-for-bit legacy. Lo único pendiente para flag-ON producción es: Slice 5 (3 reliability signals) + Slice 6 (docs/manuales) + cierre de 5 Open Questions HR/Finance/Legal.
+
+- **BL-3 SHIPPED** (`9bdc5bb0`): flag dependency TASK-893→TASK-890 enforcement en `resolver.ts`. Emit warning `exit_resolver_disabled` por member cuando TASK-890 OFF. 3 tests nuevos verde.
+- **BL-4 RESOLVED as non-issue** (`c7a29476`): investigación read-only confirmó que `final-settlement/calculator.ts:397-401` consume `compensation.baseSalary` (nominal), NO `payroll_entries.gross_total`. Cero doble-prorrateo posible. Doc lift en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` Delta 2026-05-16.
+- **BL-5 SHIPPED** (`a279d765`): reopened recompute guard. Helper canonical `isReopenedRecomputeBlockedByParticipationWindow(status, flagEnabled)` pure function. Cuando flag ON AND status=reopened → throw canonical error `period_reopened_under_legacy_no_recompute`. 4 tests nuevos verde.
+- **BL-1 SHIPPED** (`005a42c3`): recompute deductions desde bruto prorrateado. Pattern canónico: escalar compensation inputs antes de `buildPayrollEntry` en lugar de rescale post-hoc del output. Gratificación legal cap mensual respetada correctamente (validation pre-BL-2 audit pattern Opción A canonical per jurisprudencia chilena).
+- **BL-2 SHIPPED** (`<BL-2 commit>`): integración `calculatePayroll` oficial con resolve + effectiveCompensation + skip exclude policy + recalculate-entry single-member bypass guard. Helper extraído a módulo shared `participation-window/prorate-compensation.ts` para reuse cross-path (project-payroll + calculate-payroll). 496/496 payroll tests verde.
+
+### Pre-BL-2 expert audit (2026-05-16)
+
+Antes de tocar el write path productivo, re-invocación de los 2 lentes con fixtures concretos (Felipe real + Maria real + synthetic CL-indefinido low/high salary). Convergencia:
+
+- **Payroll auditor**: GREEN. Pattern BL-1 produces legalmente correct numbers para los 4 fixtures. Gratificación legal cap correctamente clampea al cap mensual (canonical Opción A — jurisprudencia chilena Art 50 CT + Dictamen DT 2937/050 2002). Pattern resuelve el Fixture D bug class (high salary doble-prorrateo subdeclara 38% gratificación) que motivó BL-1.
+- **Finance auditor**: GREEN con 2 correcciones aplicadas en BL-2:
+  1. `recalculate-entry.ts` bypass path → block bajo flag ON (canonical error `recalc_blocked_by_participation_window`).
+  2. Capability `payroll.period.force_recompute` reclassified de V1.1 follow-up a **pre-flag-ON gate** explícito.
+
+Cost attribution ramp-up effect documentado como **aceptable bajo IFRS 15 matching principle** (no es distorsión contable, es realidad económica de entry mid-month). Requires disclosure operator-facing en surfaces cliente, no code change.
+
+### Pre-flag-ON-producción gates (canonical list, post-Slice 4)
+
+Estos gates son condiciones necesarias ANTES de que el operador flippee `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` en producción. Slice 4 ship a develop con flag OFF; el flag flip productivo viene después.
+
+1. **Slice 5 SHIPPED**: 3 reliability signals + builder + getReliabilityOverview wiring (separate session).
+2. **Slice 6 SHIPPED**: docs/manuales/CLAUDE.md lift + changelog (separate session).
+3. **Capability `payroll.period.force_recompute`**: pre-flag-ON gate (reclassified from V1.1 per finance auditor 2026-05-16). Sin esta capability, BL-5 deja al operador stuck cuando emerja necesidad de recompute en período exportado pre-flag-flip.
+4. **5 Open Questions resueltas con HR/Finance/Legal signoff escrito en Handoff**:
+   - Q-1 finiquito base: ✅ RESOLVED (BL-4 NON-ISSUE).
+   - Q-2 gratificación cap mes parcial: ✅ RESOLVED por BL-1 pattern (cap mensual NO prorrateado per Opción A canonical).
+   - Q-3 vacaciones proporcionales Art 67 CT: V1.1 follow-up. Módulo HR separado (`vacation_accruals`), NO bloquea participation window porque vacaciones se materializan en otro path. Crear TASK derivada V1.1 para participation-aware vacation accruals.
+   - Q-4 capability force_recompute: reclassified to pre-flag-ON gate (above).
+   - Q-5 backfill scope V1: ✅ NO backfill, append-only audit preserved.
+5. **Staging shadow compare ≥ 7d steady verde**: flag ON en staging only, monitor 3 reliability signals = 0.
+6. **HR/Finance written approval**: documented en `Handoff.md` con specific members allowlist.
+7. **Cost attribution ramp-up disclosure**: footnote canónica en `/agency/clients/[id]` cost breakdown + ICO scorecard tooltips (operator-facing, Slice 6 scope).
+8. **Doc operativo honorarios mid-month**: doc en `docs/documentation/hr/` advirtiendo que la boleta debe emitirse por bruto prorrateado, NO contrato full (evita DTE↔F29 drift).

@@ -24,6 +24,7 @@ import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import {
   isPayrollParticipationWindowEnabled,
+  prorateCompensationForParticipationWindow,
   resolvePayrollParticipationWindowsForMembers,
   type PayrollParticipationWindow
 } from '@/lib/payroll/participation-window'
@@ -126,108 +127,6 @@ const prorateEntry = (entry: PayrollEntry, factor: number): PayrollEntry => {
     chileEmployerMutualAmount: sn(entry.chileEmployerMutualAmount),
     chileEmployerTotalCost: sn(entry.chileEmployerTotalCost),
     siiRetentionAmount: entry.siiRetentionAmount != null ? roundCurrency(entry.siiRetentionAmount * factor) : null
-  }
-}
-
-/**
- * TASK-893 Slice 4 BL-1 — Prorate the compensation BEFORE `buildPayrollEntry`.
- *
- * **Why**: when TASK-893 flag is ON, the previous Slice 3 approach
- * (`prorateEntry(fullEntry, finalFactor)`) rescaled the full output linearly
- * — including fields with non-linear semantics:
- *
- * - `chileGratificacionLegalAmount` has a MONTHLY cap (4.75 × IMM ÷ 12 Art 50
- *   CT). Rescaling post-hoc double-prorrates rows already at the cap.
- * - `chileTotalDeductions` is an aggregate computed from contribution bases.
- *   Rescaling the aggregate ≠ recomputing from prorated bases.
- * - `siiRetentionAmount` for honorarios should reflect retention on prorated
- *   gross — rescaling is mathematically equivalent but loses traceability.
- *
- * **Canonical fix** (payroll auditor 2026-05-16): scale the *inputs* to
- * `buildPayrollEntry` first; let the canonical calculator recompute
- * deductions, gratificación legal cap, and retención SII from the prorated
- * bases.
- *
- * **What scales** (proportional to time worked):
- * - `baseSalary`, `remoteAllowance`, `fixedBonusAmount`
- * - `bonusOtdMin/Max`, `bonusRpaMin/Max` (KPI bonus caps proportional)
- * - `apvAmount` (voluntary contribution proportional to imponible base)
- *
- * **What does NOT scale** (asignaciones no imponibles fijas — Chilean
- * jurisprudence does NOT auto-prorate by days not worked at contract entry;
- * the decision is contractual, not automatic):
- * - `colacionAmount`, `movilizacionAmount`
- *
- * **Identity preserved** (non-monetary or rate-based):
- * - `afpName/afpRate`, `healthSystem`, `unemploymentRate`, `contractType`,
- *   `payRegime`, `payrollVia`, etc.
- *
- * **HR Open Question Q-4** (gratificación legal in entry month): Chilean
- * jurisprudence (Dictamen DT 2937/050, 2002) supports "0 in entry month".
- * V1 conservative defers to `buildPayrollEntry`'s canonical cap-aware
- * recompute — which produces the smallest legal amount given the prorated
- * gross, NOT zero. HR/Finance signoff in V1.1 may override to set
- * `gratificacionLegalMode='ninguna'` for entry month or extend the resolver
- * with a "first-month flag".
- *
- * Pure function. Used only on the flag-ON path; flag OFF preserves legacy
- * bit-for-bit (this helper is not called).
- */
-const prorateCompensationForParticipationWindow = <T extends {
-  baseSalary: number
-  remoteAllowance: number
-  fixedBonusAmount: number
-  bonusOtdMin: number
-  bonusOtdMax: number
-  bonusRpaMin: number
-  bonusRpaMax: number
-  apvAmount: number
-}>(
-  compensation: T,
-  factor: number
-): T => {
-  /*
-   * Factor at or above 1 → no scaling needed. Equivalent to identity for
-   * full_period policy (factor=1). Guards against propagating > 1 factors
-   * by accident — those would inflate, which is never desired.
-   */
-  if (factor >= 1) return compensation
-
-  /*
-   * Factor at 0 → exclude. The caller should have filtered the member out
-   * upstream (policy='exclude'). Defensive: if it slips through, produce
-   * all-zero monetary fields rather than negative values from rounding.
-   */
-  if (factor <= 0) {
-    return {
-      ...compensation,
-      baseSalary: 0,
-      remoteAllowance: 0,
-      fixedBonusAmount: 0,
-      bonusOtdMin: 0,
-      bonusOtdMax: 0,
-      bonusRpaMin: 0,
-      bonusRpaMax: 0,
-      apvAmount: 0
-    }
-  }
-
-  const s = (v: number) => roundCurrency(v * factor)
-
-  return {
-    ...compensation,
-    baseSalary: s(compensation.baseSalary),
-    remoteAllowance: s(compensation.remoteAllowance),
-    fixedBonusAmount: s(compensation.fixedBonusAmount),
-    bonusOtdMin: s(compensation.bonusOtdMin),
-    bonusOtdMax: s(compensation.bonusOtdMax),
-    bonusRpaMin: s(compensation.bonusRpaMin),
-    bonusRpaMax: s(compensation.bonusRpaMax),
-    apvAmount: s(compensation.apvAmount)
-    /*
-     * colacionAmount + movilizacionAmount intentionally preserved (legacy
-     * preserved). See JSDoc above for rationale.
-     */
   }
 }
 

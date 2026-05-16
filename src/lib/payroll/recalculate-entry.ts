@@ -13,6 +13,7 @@ import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { getCompensationVersionById } from '@/lib/payroll/get-compensation'
 import { getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
+import { isPayrollParticipationWindowEnabled } from '@/lib/payroll/participation-window'
 import {
   canEditPayrollEntries,
   isPayrollPeriodReopened,
@@ -204,6 +205,39 @@ export const recalculatePayrollEntry = async ({
 
   if (!compensation) {
     throw new PayrollValidationError('Compensation version not found for payroll entry.', 500)
+  }
+
+  /*
+   * TASK-893 Slice 4 BL-2 — Single-member recalc bypass guard.
+   *
+   * Flagged by finance auditor 2026-05-16: `recalculatePayrollEntry` is a
+   * bypass path that does NOT know about the participation window factor.
+   * It invokes `buildPayrollEntry` / `calculatePayrollTotals` with the raw
+   * compensation, ignoring `prorateCompensationForParticipationWindow`.
+   *
+   * Under flag ON, this would produce v2 entries with FULL gross/deductions
+   * (ignoring participation) while v1 had the prorated gross — DTE/F29
+   * drift on Previred + SII retention.
+   *
+   * V1 conservative: BLOCK single-member recalc when flag ON. Operator MUST
+   * use period-level recalc via `calculatePayroll()` which respects
+   * participation correctly. V1.1 follow-up: participation-aware
+   * single-member recalc with capability + reason + audit.
+   *
+   * Flag OFF (default) preserves bit-for-bit legacy behavior — the guard
+   * is a no-op.
+   */
+  if (isPayrollParticipationWindowEnabled()) {
+    throw new PayrollValidationError(
+      'Single-member recalc is not supported under participation window. Use period-level recalc (calculatePayroll) or wait for V1.1 capability.',
+      409,
+      {
+        code: 'recalc_blocked_by_participation_window',
+        entryId,
+        memberId: entry.memberId,
+        periodId: entry.periodId
+      }
+    )
   }
 
   const {
