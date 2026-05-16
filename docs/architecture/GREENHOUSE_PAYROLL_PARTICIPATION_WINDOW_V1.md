@@ -616,3 +616,61 @@ Estos gates son condiciones necesarias ANTES de que el operador flippee `PAYROLL
 6. **HR/Finance written approval**: documented en `Handoff.md` con specific members allowlist.
 7. **Cost attribution ramp-up disclosure**: footnote canónica en `/agency/clients/[id]` cost breakdown + ICO scorecard tooltips (operator-facing, Slice 6 scope).
 8. **Doc operativo honorarios mid-month**: doc en `docs/documentation/hr/` advirtiendo que la boleta debe emitirse por bruto prorrateado, NO contrato full (evita DTE↔F29 drift).
+
+---
+
+## Delta 2026-05-16 — TASK-895 V1.1a S0 — Leave Accrual Participation-Aware ADR
+
+V1.1a follow-up extiende el primitive month-scope a un **aggregator year-scope** owned by Leave domain. Cierra bug class regulatorio CL Art 67/68 CT detectado por discovery 2026-05-16: cuando un colaborador transita `contractor → dependent` mid-year, el helper legacy `calculateAccruedLeaveAllowanceDays` ancla accrual desde `hire_date` ignorando el periodo non-dependent. Resultado: ~5+ días "fantasma" acumulados legalmente no defendibles → sobrepago al finiquito + precedente contractual riesgoso.
+
+### Decisión arquitectónica (arch-architect + greenhouse-payroll-auditor 2026-05-16)
+
+- **Two-task split V1.1a + V1.1b** (NO bundle): TASK-895 Leave (orthogonal failure mode) y TASK-896 Shadow Compare son independientes — distinto owner, surface, scope (year vs month), blast radius.
+- **DAG direction**: Leave imports from `@/lib/payroll/participation-window`. **Reverse forbidden** (Payroll no conoce Art 67 CT). Anti-corruption layer enforced en barrel.
+- **Year-scope aggregator pattern**: `resolveLeaveAccrualWindowForMember(memberId, year)` compone TASK-893 mes a mes + filtra `rule_lane='internal_payroll'` semantica vía TASK-890. NUNCA extender `PayrollParticipationWindow` con `contractType`/`payRegime` — Leave hace su propia query a `compensation_versions` para entry-side decision; compone TASK-893/890 sólo para exit cutoff.
+
+### Boundary semantic
+
+| Domain | Scope | Source | Owns |
+|---|---|---|---|
+| Leave | Year (`year ∈ [2026, ...]`) | `compensation_versions` filtered by `contract_type IN ('indefinido','plazo_fijo') AND pay_regime='chile' AND payroll_via='internal'` | `LeaveAccrualEligibilityWindow.eligibleDays` + `firstServiceCycleDays` |
+| Payroll (TASK-893) | Month (`[periodStart, periodEnd]`) | `compensation_versions` applicable to period | `PayrollParticipationWindow.prorationFactor` + `exitEligibility` |
+| Workforce Exit (TASK-890) | Period (case-driven) | `work_relationship_offboarding_cases` | `WorkforceExitPayrollEligibilityWindow.projectionPolicy` + `eligibleTo` |
+
+### Canonical types (S0 SHIPPED 2026-05-16, commit pending)
+
+- `LeaveAccrualPolicy` enum cerrado: `full_year_dependent | partial_dependent | no_dependent | unknown`.
+- `LeaveAccrualReasonCode` enum cerrado (8 codes): documenta el porqué del año parcial (hired_mid_year, contractor↔dependent transition, external_payroll_exit_truncates, etc.).
+- `LeaveAccrualEligibilityWindow`: shape canonical con `eligibleDays` (numerador) + `firstServiceCycleDays` (denominador) para preservar la fórmula canonical legacy `(annualDays × overlapDays) / firstServiceCycleDays` bit-for-bit cuando no hay transiciones.
+- `degradedMode: true` → consumer cae a legacy `hire_date`-based accrual (zero-risk safety floor preserva CL legal minimum Art 67 CT).
+
+### Flag dependency canonical
+
+`LEAVE_PARTICIPATION_AWARE_ENABLED=true` REQUIERE `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` AND `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` en el mismo environment. El helper `isLeaveAccrualParticipationAwareEnabled()` enforce la dependencia al boundary: retorna `true` solo cuando las 3 flags están ON. Sin esa pre-condición, retorna `false` (legacy bit-for-bit fallback) — degraded honesto.
+
+### Hard rules (lift to CLAUDE.md post-S5)
+
+- **NUNCA** reescribir el helper puro `calculateAccruedLeaveAllowanceDays`. Integration ocurre en el call site (`postgres-leave-store.ts:1078,1102`) behind flag. Preserva 7 tests pure verdes.
+- **NUNCA** extender `PayrollParticipationWindow` con `contractType`/`payRegime` para servir a Leave. Leave hace su propia query a `compensation_versions`.
+- **NUNCA** computar accrual inline desde `hire_date` solo cuando `LEAVE_PARTICIPATION_AWARE_ENABLED=true` y `memberId` disponible. El call site debe consumir el resolver canónico.
+- **NUNCA** mutar `leave_balances` automáticamente cuando se activa el flag — backfill audit script V1.1a S4 es read-only dry-run; mutation auditada queda V1.2 con capability `leave.balances.reconcile`.
+- **NUNCA** importar `@/lib/leave/participation-window` desde un módulo de Payroll. DAG-leaf rule enforced.
+
+### Slicing canonical V1.1a
+
+- **S0 (this Delta)**: ADR + types + flag + barrel (no code, no test). SHIPPED.
+- **S1**: Resolver puro + 30+ tests pure function. Query independent a `compensation_versions` + compose TASK-890 para exit cutoff.
+- **S2**: Integration en `postgres-leave-store.ts:1078,1102` behind flag. Legacy bit-for-bit con flag OFF.
+- **S3**: Signal `hr.leave.accrual_overshoot_drift` (kind=drift, severity warning >0, steady=0). Subsystem rollup `'Payroll Data Quality'` (moduleKey `'payroll'`).
+- **S4**: Backfill audit script `scripts/leave/audit-accrual-drift.ts` (read-only dry-run) + runbook.
+- **S5**: Docs canonical (CLAUDE.md hard rules + doc funcional + manual operador + DECISIONS_INDEX).
+
+### Pre-flag-ON-producción gates V1.1a
+
+1. **Slices 1-5 SHIPPED verde** (`pnpm test` + `pnpm build` full).
+2. **TASK-893 + TASK-890 flags ON staging** ≥7 días steady.
+3. **Audit script S4 reporta 0 overshoot** en staging members (allowlist explícita).
+4. **Signal `hr.leave.accrual_overshoot_drift` count=0** sustained ≥30 días staging.
+5. **HR + Legal signoff escrito** en `Handoff.md` con specific members allowlist primer ciclo.
+6. **Flag flip productivo controlado**: allowlist explícita inicial (e.g. Felipe Zurita), ampliar progresivamente.
+
