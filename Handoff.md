@@ -1,3 +1,51 @@
+# Sesion 2026-05-16 — TASK-895 V1.1a flag activation — CEO signoff + Fase 1 audit baseline
+
+**Status**: ✅ Fase 1 (audit baseline) ejecutado live PG staging 2026-05-16 09:56 UTC-4. CEO signoff registrado (Julio Reyes Rangel, jreysgo@gmail.com).
+
+## CEO signoff escrito (sustituye HR + Legal canónico)
+
+**Operador**: Julio Reyes Rangel (CEO Efeonce Group)
+**Fecha**: 2026-05-16
+**Decisión**: autorizar fast-track del rollout TASK-895 V1.1a sin esperar HR/Legal signoff externo escrito. CEO firma como signing authority.
+**Risk acceptance**: el ADR canonical TASK-895 documenta que pre-flag-ON gate es HR + Legal signoff con allowlist explícita + staging ≥30d. CEO sustituye ambos requisitos por autoridad ejecutiva. Audit baseline ejecutado live PG real provee evidence quantitativa pre-decisión.
+
+## Audit baseline results (live staging PG, 2026)
+
+| Miembro | hire_date | Policy resolver | Legacy days | Participation-aware | Drift |
+|---|---|---|---|---|---|
+| Humberly Henriquez | 2025-10-01 | `no_dependent` (honorarios) | 15 | 0 | **15.00** |
+| Julio Reyes | NULL | `no_dependent` (honorarios) | 15 | 0 | **15.00** |
+| Luis Reyes | 2026-04-01 | `no_dependent` (honorarios) | 15 | 0 | **15.00** |
+| Valentina Hoyos | 2025-09-09 | `partial_dependent` (transition) | 5.18 | 3.66 | **1.52** |
+
+**Total drift sobreacumulado**: **46.52 días** (artifact en `audit-baseline-2026.json`).
+
+**Interpretación del drift**:
+
+- **3 honorarios CL** (Humberly, Julio, Luis) tienen 15 días anuales acumulados en `leave_balances` 2026, pero como honorarios NO tienen derecho a feriado legal Art 67 CT (no son trabajadores subordinados bajo CT). El resolver canónico los marca `policy='no_dependent'` con `reasonCodes=['no_qualifying_versions']`.
+- **Valentina Hoyos** (`partial_dependent`): hire_date 2025-09-09, first_dependent_effective_from 2026-02-01, además tiene exit case `internal_payroll` truncating la elegibilidad. 89 días elegibles del year × 15 / 365 = 3.66 vs legacy 5.18. Drift mínimo (1.52 días).
+
+## Recovery path documentado
+
+Rollback es flag-flip puro sin code change:
+
+```bash
+echo "false" | vercel env add LEAVE_PARTICIPATION_AWARE_ENABLED production --force --scope=efeonce-7670142f
+vercel --prod --scope=efeonce-7670142f
+```
+
+Cae inmediatamente a `calculateAccruedLeaveAllowanceDays` legacy bit-for-bit.
+
+## Próximos pasos pending
+
+- [ ] Confirmación CEO para tocar Vercel flags staging (Fase 3.1)
+- [ ] Activar las 3 flags staging simultaneamente
+- [ ] Re-seed manual de un miembro allowlist (e.g. Valentina Hoyos) — validation
+- [ ] Verify signal `hr.leave.accrual_overshoot_drift` count=0 post re-seed
+- [ ] Si staging verde → repetir Fase 4 production con allowlist explícita
+
+---
+
 # Sesion 2026-05-16 — TASK-895 Leave Accrual Participation-Aware V1.1a SHIPPED end-to-end
 
 **Status final**: ✅ TASK-895 V1.1a COMPLETE. Movida a `docs/tasks/complete/`. 6 commits a `develop` directo (incluyendo Sentry hotfix mid-implementation). Flag `LEAVE_PARTICIPATION_AWARE_ENABLED=false` default productivo — legacy bit-for-bit preservado.
