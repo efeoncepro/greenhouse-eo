@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto` (riesgo legal CL Art 67 CT — sobreacumulacion de feriado legal)
 - Effort: `Medio`

@@ -1,3 +1,38 @@
+# Sesion 2026-05-16 — TASK-895 Leave Accrual Participation-Aware V1.1a SHIPPED end-to-end
+
+**Status final**: ✅ TASK-895 V1.1a COMPLETE. Movida a `docs/tasks/complete/`. 6 commits a `develop` directo (incluyendo Sentry hotfix mid-implementation). Flag `LEAVE_PARTICIPATION_AWARE_ENABLED=false` default productivo — legacy bit-for-bit preservado.
+
+## Commits Slice-by-Slice
+
+| Slice | Commit | Concepto |
+| --- | --- | --- |
+| Sentry hotfix prereq | `468505e5` | Fix 2 alerts JAVASCRIPT-NEXTJS-5Z en `/admin` (TASK-893 Slice 5 readers): `pe.superseded_by_entry_id` → `pe.is_active=TRUE + pe.superseded_by IS NULL`; `EXTRACT(EPOCH FROM date-date)` → `ABS(::date - ::date) > 7`. Lección canónica canonizada. |
+| Slice 0 | `c9494104` | ADR + types + flag canonical (triple flag dependency) + barrel. No code, no test. Delta en ADR canonical. |
+| Slice 1 | `2f348150` | Resolver puro + query + policy + 27 tests pure verde. `LeaveAccrualEligibilityWindow` shape + deriveLeaveAccrualPolicy + fetchCompensationFactsForLeaveAccrual + resolveLeaveAccrualWindowsForMembers. |
+| Slice 2 | `f69a115f` | Integration en `postgres-leave-store.ts:computeBalanceSeedForYear` (2 call sites linea 1078 + 1102) via helper local `tryComputeParticipationAwareAllowanceDays` con 4 pre-condiciones + fallback legacy. asOfDate clamping + 6 tests adicionales. **Smoke contra PG real detectó bug class** (lección hotfix canónica): `cv.payroll_via` no existe, vive en `members`. Fix aplicado. |
+| Slice 3 | `8122e72e` | Signal `hr.leave.accrual_overshoot_drift` reader + builder canonical `buildLeaveAccrualSignals` + wiring en `get-reliability-overview.ts`. Subsystem rollup `Payroll Data Quality`. Smoke contra PG: count=1 detectado live staging. |
+| Slice 4 | `28ee5e72` | Audit script `scripts/leave/audit-accrual-drift.ts` (read-only dry-run) + runbook canonical `docs/operations/runbooks/leave-accrual-drift-audit.md`. Smoke live: 4 miembros con drift, total 46.52 días. |
+| Slice 5 | `49950668` | Docs canonical: CLAUDE.md hard rules section nueva (11 NUNCAs + 3 SIEMPRES + 3 open questions V1.2) + DECISIONS_INDEX (6 decisiones canónicas) + doc funcional leave v1.3 sección "Transiciones contractor a dependent" + changelog (TASK-895 entry + Sentry hotfix entry). |
+
+## Resultado final
+
+- **Bug class regulatorio CL Art 67 CT cerrado**: transiciones `contractor → dependent` mid-year ya no sobreacumulan feriado legal cuando flag activado.
+- **Validación live staging via audit script**: 4 miembros CL con drift detectado (3 honorarios x 15 días sobreacumulados + 1 mínimo, total 46.52 días). Bug class real-world confirmado.
+- **Triple flag dependency canonical enforced**: TASK-895 + TASK-893 + TASK-890 todas deben estar ON. Helper boundary enforce; fallback legacy automático.
+- **Lección canonical canonizada**: SQL readers DEBEN validar contra PG real via proxy antes de mergear. Detectado mid-Slice 2 (`payroll_via` vive en members) y mid-hotfix (`superseded_by_entry_id` no existe, `EXTRACT` con date arithmetic falla).
+- **Tests verde**: 33/33 pure + 60/60 integration + 266/266 reliability + 4722/4764 full suite + production build 31.2s.
+- **Pre-flag-ON gates documentados**: las 3 flags ON + staging audit ≥30d + signal count=0 sustained + HR/Legal signoff con allowlist explícita.
+- **Para activar el flag pronto** (intención del usuario): correr `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/leave/audit-accrual-drift.ts --target-year=2026 --output=audit-pre-flag-on.json` y compartir output con HR + Legal para signoff.
+
+## Próximos pasos (V1.2 follow-ups deliberadamente fuera de scope V1.1a)
+
+- Write-path reconciliation auditada con capability `leave.balances.reconcile` (mutation del balance histórico).
+- Honorarios proporcional opcional (hoy NO acumulan; si HR decide cambiar política → ADR separado).
+- Tracking historical de `members.payroll_via` (cambios mid-year).
+- TASK-896 (V1.1b Shadow Compare Wiring) en backlog `to-do/`.
+
+---
+
 # Sesion 2026-05-16 — TASK-880 Notion API Modernization & PAT Foundation — kickoff implementación
 
 - **Task**: `TASK-880` — Notion API Modernization & PAT Foundation.
