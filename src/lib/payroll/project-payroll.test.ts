@@ -76,6 +76,8 @@ vi.mock('@/lib/payroll/chile-previsional-helpers', () => ({
 }))
 
 import { projectPayrollForPeriod } from './project-payroll'
+import * as participationWindowModule from './participation-window'
+import * as captureModule from '@/lib/observability/capture'
 
 const baseCompensation = {
   versionId: 'cv-1',
@@ -315,5 +317,197 @@ describe('projectPayrollForPeriod', () => {
       periodYear: 2026,
       periodMonth: 3
     })
+  })
+})
+
+/*
+ * TASK-893 Slice 3 — Payroll Participation Window integration tests.
+ *
+ * Verify that:
+ *   1. Flag OFF (default) preserves BIT-FOR-BIT legacy behavior — covered
+ *      already by the previous 6 tests which never see the resolver.
+ *   2. Flag ON + happy path → per-member factor applied; output struct
+ *      `prorationFactor` reflects the composed factor.
+ *   3. Flag ON + resolver throws → defensive degradation; projected payroll
+ *      keeps rendering with legacy factor + Sentry capture emitted.
+ *   4. Flag ON in `actual_to_date` mode → factor composes correctly
+ *      (participationFactor × actualToDateFactor).
+ */
+describe('projectPayrollForPeriod — TASK-893 participation window integration', () => {
+  let isPayrollParticipationWindowEnabledSpy: ReturnType<typeof vi.spyOn>
+  let resolvePayrollParticipationWindowsForMembersSpy: ReturnType<typeof vi.spyOn>
+  let captureWithDomainSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockPgGetActiveBonusConfig.mockResolvedValue({
+      otdThreshold: 89,
+      otdFloor: 70,
+      rpaThreshold: 3,
+      rpaFullPayoutThreshold: 1.7,
+      rpaSoftBandEnd: 2,
+      rpaSoftBandFloorFactor: 0.8
+    })
+    mockGetHistoricalEconomicIndicatorForPeriod.mockResolvedValue({ value: 38150 })
+
+    isPayrollParticipationWindowEnabledSpy = vi.spyOn(
+      participationWindowModule,
+      'isPayrollParticipationWindowEnabled'
+    )
+    resolvePayrollParticipationWindowsForMembersSpy = vi.spyOn(
+      participationWindowModule,
+      'resolvePayrollParticipationWindowsForMembers'
+    )
+    captureWithDomainSpy = vi.spyOn(captureModule, 'captureWithDomain').mockImplementation(() => undefined)
+  })
+
+  it('flag OFF: resolver is never called (legacy behavior preserved)', async () => {
+    isPayrollParticipationWindowEnabledSpy.mockReturnValue(false)
+
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
+    mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })
+    mockFetchAttendanceForAllMembers.mockResolvedValue({ snapshots: new Map(), leaveDataDegraded: false })
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 5, mode: 'projected_month_end' })
+
+    expect(resolvePayrollParticipationWindowsForMembersSpy).not.toHaveBeenCalled()
+    expect(result.entries).toHaveLength(1)
+    expect(result.entries[0].prorationFactor).toBe(1)
+    expect(result.entries[0].baseSalary).toBe(800000) /* full-month base preserved bit-for-bit */
+  })
+
+  it('flag ON: per-member participation factor applied (Felipe-like mid-month entry)', async () => {
+    isPayrollParticipationWindowEnabledSpy.mockReturnValue(true)
+
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
+    mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })
+    mockFetchAttendanceForAllMembers.mockResolvedValue({ snapshots: new Map(), leaveDataDegraded: false })
+
+    /* Felipe-like: 13 weekdays out of 22 (factor ≈ 0.5909) */
+    resolvePayrollParticipationWindowsForMembersSpy.mockResolvedValue(
+      new Map([
+        [
+          'member-1',
+          {
+            memberId: 'member-1',
+            periodStart: '2026-05-01',
+            periodEnd: '2026-05-31',
+            eligibleFrom: '2026-05-13',
+            eligibleTo: '2026-05-31',
+            policy: 'prorate_from_start' as const,
+            reasonCodes: ['entry_mid_period'] as const,
+            prorationFactor: 13 / 22,
+            prorationBasis: 'weekdays' as const,
+            exitEligibility: null,
+            warnings: []
+          }
+        ]
+      ])
+    )
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 5, mode: 'projected_month_end' })
+
+    expect(resolvePayrollParticipationWindowsForMembersSpy).toHaveBeenCalledWith(
+      ['member-1'],
+      '2026-05-01',
+      '2026-05-31'
+    )
+    expect(result.entries[0].prorationFactor).toBeCloseTo(13 / 22, 6)
+    /* Base salary scaled by the participation factor — Felipe stops being paid full month */
+    expect(result.entries[0].baseSalary).toBeLessThan(800000)
+    expect(result.entries[0].baseSalary).toBeCloseTo(800000 * (13 / 22), 0)
+  })
+
+  it('flag ON + actual_to_date mode: composes participationFactor × actualToDateFactor', async () => {
+    isPayrollParticipationWindowEnabledSpy.mockReturnValue(true)
+
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
+    mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })
+    mockFetchAttendanceForAllMembers.mockResolvedValue({ snapshots: new Map(), leaveDataDegraded: false })
+
+    /*
+     * countWeekdays is mocked to return 22 always; in actual_to_date mode the
+     * scalar factor = 22/22 = 1 anyway. To prove composition, force a
+     * non-trivial participation factor — final factor should equal it.
+     */
+    resolvePayrollParticipationWindowsForMembersSpy.mockResolvedValue(
+      new Map([
+        [
+          'member-1',
+          {
+            memberId: 'member-1',
+            periodStart: '2026-05-01',
+            periodEnd: '2026-05-31',
+            eligibleFrom: '2026-05-13',
+            eligibleTo: '2026-05-31',
+            policy: 'prorate_from_start' as const,
+            reasonCodes: ['entry_mid_period'] as const,
+            prorationFactor: 0.5,
+            prorationBasis: 'weekdays' as const,
+            exitEligibility: null,
+            warnings: []
+          }
+        ]
+      ])
+    )
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 5, mode: 'actual_to_date' })
+
+    /* actualToDateFactor = workingDaysCut/workingDaysTotal = 22/22 = 1; composed = 0.5 × 1 = 0.5 */
+    expect(result.entries[0].prorationFactor).toBeCloseTo(0.5, 6)
+    expect(result.entries[0].baseSalary).toBeCloseTo(400000, 0)
+  })
+
+  it('flag ON + resolver throws: degrades to legacy + emits captureWithDomain', async () => {
+    isPayrollParticipationWindowEnabledSpy.mockReturnValue(true)
+
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
+    mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })
+    mockFetchAttendanceForAllMembers.mockResolvedValue({ snapshots: new Map(), leaveDataDegraded: false })
+
+    resolvePayrollParticipationWindowsForMembersSpy.mockRejectedValue(new Error('PG connection timeout'))
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 5, mode: 'projected_month_end' })
+
+    /* Projected payroll did NOT crash; degraded to legacy bit-for-bit */
+    expect(result.entries).toHaveLength(1)
+    expect(result.entries[0].prorationFactor).toBe(1)
+    expect(result.entries[0].baseSalary).toBe(800000)
+
+    /* Sentry captured with the canonical source tag */
+    expect(captureWithDomainSpy).toHaveBeenCalledTimes(1)
+
+    const [errArg, domain, ctx] = captureWithDomainSpy.mock.calls[0] as [
+      unknown,
+      string,
+      { extra?: Record<string, unknown> }
+    ]
+
+    expect(errArg).toBeInstanceOf(Error)
+    expect(domain).toBe('payroll')
+    expect(ctx.extra).toMatchObject({
+      source: 'project_payroll.participation_window_resolve_failed',
+      periodStart: '2026-05-01',
+      periodEnd: '2026-05-31',
+      memberCount: 1
+    })
+  })
+
+  it('flag ON: member absent from participation map → factor 1 fallback (no crash)', async () => {
+    isPayrollParticipationWindowEnabledSpy.mockReturnValue(true)
+
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
+    mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })
+    mockFetchAttendanceForAllMembers.mockResolvedValue({ snapshots: new Map(), leaveDataDegraded: false })
+
+    /* Resolver returns Map but member-1 absent (edge case: race / silent skip) */
+    resolvePayrollParticipationWindowsForMembersSpy.mockResolvedValue(new Map())
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 5, mode: 'projected_month_end' })
+
+    /* Member NOT excluded — falls back to factor 1 (legacy semantic) */
+    expect(result.entries).toHaveLength(1)
+    expect(result.entries[0].prorationFactor).toBe(1)
+    expect(result.entries[0].baseSalary).toBe(800000)
   })
 })
