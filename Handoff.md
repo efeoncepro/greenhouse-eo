@@ -38,11 +38,50 @@ Cae inmediatamente a `calculateAccruedLeaveAllowanceDays` legacy bit-for-bit.
 
 ## Próximos pasos pending
 
-- [ ] Confirmación CEO para tocar Vercel flags staging (Fase 3.1)
-- [ ] Activar las 3 flags staging simultaneamente
-- [ ] Re-seed manual de un miembro allowlist (e.g. Valentina Hoyos) — validation
+- [x] Confirmación CEO para tocar Vercel flags staging (Fase 3.1) — CEO autorizó "vamos" 2026-05-16
+- [x] Activar las 3 flags staging simultaneamente — completado 2026-05-16 14:01 UTC-4
+- [x] Trigger redeploy staging — commit `e8918d6b` empty + deploy `qyvjgnzpo` Ready 5m
+- [x] Verify audit pre/post flag bit-for-bit identico (resolver deterministic) — confirmed
+- [ ] Re-seed manual de un miembro allowlist (e.g. Valentina Hoyos) — pending test plan claro
 - [ ] Verify signal `hr.leave.accrual_overshoot_drift` count=0 post re-seed
 - [ ] Si staging verde → repetir Fase 4 production con allowlist explícita
+
+## Fase 3 staging activation — completada 2026-05-16
+
+**Status**: ✅ 3 flags ON en Vercel preview/develop. Deploy staging Ready. Audit pre/post bit-for-bit idéntico (resolver canonical es deterministic — esperado).
+
+### Acciones ejecutadas
+
+1. **Verify project link** — `cat .vercel/project.json` confirmed canonical `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`.
+2. **Flip 3 flags Vercel preview/develop simultáneas**:
+   ```bash
+   vercel env add PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED preview develop --value true --yes --scope=efeonce-7670142f
+   vercel env add PAYROLL_PARTICIPATION_WINDOW_ENABLED preview develop --value true --yes --scope=efeonce-7670142f
+   vercel env add LEAVE_PARTICIPATION_AWARE_ENABLED preview develop --value true --yes --scope=efeonce-7670142f
+   ```
+3. **Trigger redeploy** — commit empty `e8918d6b` push develop. Vercel auto-deploy `qyvjgnzpo` Building → Ready 5m.
+4. **Audit smoke pre/post flag** — bit-for-bit idéntico (4 miembros con drift, total 46.52 dias). Resolver canonical es deterministic — confirma que el audit script reporta lo mismo independiente del runtime flag state.
+
+### Pendiente validation runtime real
+
+El audit script invoca el resolver directamente, NO pasa por el integration en `postgres-leave-store.ts:tryComputeParticipationAwareAllowanceDays`. Para validar que el runtime real-time usa el participation-aware path, hay que **trigger un re-seed manual** de leave_balances para uno de los miembros (e.g. Valentina Hoyos) y observar que `allowance_days` baja de `5.18` a `3.66`.
+
+Este re-seed NO se ejecuta automáticamente — requiere intervención (UI HR admin endpoint o script CLI). Decidido out-of-scope esta sesión hasta tener test plan claro y CEO autorización adicional.
+
+### Recovery path verificado
+
+```bash
+# Reversible en segundos:
+vercel env rm LEAVE_PARTICIPATION_AWARE_ENABLED preview develop --yes --scope=efeonce-7670142f
+# O cambiar value a false:
+vercel env add LEAVE_PARTICIPATION_AWARE_ENABLED preview develop --value false --yes --force --scope=efeonce-7670142f
+```
+
+Próximo redeploy staging consume el nuevo state. Cero downtime, cero code change.
+
+### Producción
+
+Producción **NO TOCADA** este turno. Sigue todas las 3 flags OFF / inexistentes. Activación productiva queda pendiente de: (a) re-seed manual exitoso staging para validar runtime, (b) confirmación CEO explícita adicional para flippear producción.
 
 ---
 
