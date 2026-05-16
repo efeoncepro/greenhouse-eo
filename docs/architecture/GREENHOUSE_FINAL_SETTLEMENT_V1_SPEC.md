@@ -310,3 +310,47 @@ Si el render del PDF falla (e.g. RAM exhausted, fuente externa caída, snapshot 
 - ✅ Operador re-aprueba el doc → próximo download muestra badge "Aprobado · pendiente de emisión" (no más "Borrador HR").
 
 **Recovery path para drift histórico**: documentos pre-V1.5.2 con `metadata.documentStatusAtRender` NULL aparecen en el reliability signal hasta que el operador haga reissue. NO se requiere backfill masivo — el reissue manual es suficiente y preserva audit trail.
+
+## Delta 2026-05-16 — Cross-spec invariant TASK-893 (Payroll Participation Window)
+
+**Contexto**: TASK-893 introduce un `participationFactor` per-member que, cuando su flag `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` esté ON, hará que `payroll_entries.gross_total` venga prorrateado mensualmente para miembros con entrada/salida mid-month (Felipe-like, Maria-like, same-month entry+exit).
+
+**Pregunta cross-spec**: ¿el calculator de finiquito V1 puede caer en doble-prorrateo si TASK-893 flippea ON (`payroll_entries.gross_total` × `participationFactor`) + finiquito aplica su propio prorrateo Art 159 CT sobre esa base ya prorrateada?
+
+**Verdict (investigación read-only 2026-05-16, validada contra código en vivo)**: **NO. El finiquito V1 ya está blindado by design contra este escenario.** Cero code change requerido. Documentación canonizada acá para que la invariante sea explícita y future-proof.
+
+### Source canónico de la base imponible del finiquito V1
+
+Todos los componentes legales del finiquito V1 leen **`compensation.baseSalary`** desde `compensation_versions` (nominal full-month salary), NUNCA `payroll_entries.gross_total`:
+
+| Componente legal | Source canónico | File:line |
+| --- | --- | --- |
+| Sueldo proporcional Art 159 CT | `compensation.baseSalary × prorationFactor` | `src/lib/payroll/final-settlement/calculator.ts:397` |
+| Remote allowance proporcional | `compensation.remoteAllowance × prorationFactor` | `calculator.ts:398` |
+| Colación/movilización proporcional | `compensation.colacionAmount / movilizacionAmount × prorationFactor` | `calculator.ts:399-400` |
+| Bono fijo proporcional | `compensation.fixedBonusAmount × prorationFactor` | `calculator.ts:401` |
+| Gratificación legal Art 50 CT | `compensation.baseSalary` + tope 4.75 × IMM/12 × mesesDevengados | `calculator.ts:171-208, 509` (helper `resolveMonthlyGratificationDue`) |
+| Vacaciones proporcionales Art 67 CT | `compensation.baseSalary / 30` (daily base) | `calculator.ts:476` |
+| Indemnización años de servicio Art 161 CT | última remuneración mensual nominal — `compensation.baseSalary` | (calc por separado en mismo módulo) |
+
+**`final-settlement/store.ts:145, 197`** mapea explícitamente `base_salary` columna de `compensation_versions` → TS property `baseSalary`. La query SQL NO toca `payroll_entries`.
+
+### Single prorrateo canónico Art 159 CT
+
+El finiquito aplica **un solo prorateo** sobre la base nominal: `prorationFactor = payableDays / daysInMonth` (`calculator.ts:394`) — fundamentado en Art 159 CT (sueldo proporcional al período trabajado del mes de cesación). Este factor **NO se compone con el `participationFactor` de TASK-893** porque la base imponible es nominal, no devengada.
+
+### `overlap-ledger.ts` es solo audit trail
+
+`final-settlement/overlap-ledger.ts:59-67` lee `payroll_entries.gross_total` SOLO para poblar `coveredAmounts` en el `ledger` JSON (audit trail / explanation surface). Este objeto NO se consume en el calculator del finiquito — solo describe qué pagos del mes regular ya cubrieron el período del LWD para que el calculator decida si emitir sueldo proporcional o `0` (campo `coveredByMonthlyPayroll`).
+
+El gating `coveredByMonthlyPayroll` se basa en señales separadas (estado del payroll period, fechas de pago, etc.), NO en montos `gross_total`. Por lo tanto, aunque `gross_total` venga prorrateado por TASK-893, el calculator del finiquito sigue resolviendo correctamente sobre `compensation.baseSalary` nominal.
+
+### Invariante canónica forward (hard rules)
+
+- **NUNCA** consumir `payroll_entries.gross_total`, `chile_taxable_base`, `chile_total_deductions` ni cualquier campo devengado de `payroll_entries` para computar bases imponibles legales en el finiquito (Art 159, 161, 50, 67 CT). Siempre `compensation_versions.base_salary` + componentes nominales.
+- **SIEMPRE** que emerja un componente legal nuevo en el calculator (e.g. indemnización sustitutiva aviso previo Art 162, indemnización feriado progresivo Art 70), validar explícitamente que su source es `compensation.*` nominal, no `payroll_entries.*` devengado.
+- `overlap-ledger.ts` `coveredAmounts` queda como audit trail informativo only. Si emerge necesidad de consumirlo en calculator, primero re-evaluar contra esta invariante.
+
+### Validation cross-spec
+
+TASK-893 ADR `GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` Delta 2026-05-16 documenta esta investigación bajo "BL-4 ✅ NON-ISSUE". Los dos specs canónicos están alineados.
