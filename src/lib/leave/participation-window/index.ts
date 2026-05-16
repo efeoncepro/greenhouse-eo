@@ -26,8 +26,11 @@ export {
   diagnoseLeaveAccrualFlagDependency
 } from './flag'
 
-/* Slice 1 will export resolver primitives:
- *
- *   - `resolveLeaveAccrualWindowForMember(memberId, year): Promise<LeaveAccrualEligibilityWindow>`
- *   - `deriveLeaveAccrualPolicy(facts): LeaveAccrualEligibilityWindow` (pure)
- */
+export { buildDegradedLeaveAccrualWindow, deriveLeaveAccrualPolicy } from './policy'
+
+export { fetchCompensationFactsForLeaveAccrual } from './query'
+
+export {
+  resolveLeaveAccrualWindowsForMembers,
+  resolveLeaveAccrualWindowForMember
+} from './resolver'
