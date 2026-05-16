@@ -1097,6 +1097,26 @@ export const buildPayrollParticipationWindowSignals = async (
 }
 
 /**
+ * TASK-895 V1.1a Slice 3 — builder canonico para signals del Leave Accrual
+ * Participation-Aware primitive. V1.1a ships con 1 signal canonical
+ * (`hr.leave.accrual_overshoot_drift`). Si emergen >3 signals Leave-native en
+ * V1.2, spawn dedicated subsystem `'HR Leave Quality'`.
+ *
+ * Subsystem rollup actual: `'Payroll Data Quality'` (moduleKey `'payroll'`)
+ * — unificado con TASK-893 signals por proximidad conceptual (bug class
+ * derivado del Payroll Participation Window).
+ */
+export const buildLeaveAccrualSignals = async (
+  readers: {
+    accrualOvershootDrift: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [overshoot] = await Promise.all([readers.accrualOvershootDrift()])
+
+  return [overshoot]
+}
+
+/**
  * TASK-768 Slice 7 — builder canonico de signals "economic_category_unresolved"
  * para expenses + income. Mismo patron que buildFinanceClpDriftSignals.
  * Subsystem rollup: finance_data_quality.

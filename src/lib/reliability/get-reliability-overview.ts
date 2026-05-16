@@ -55,6 +55,7 @@ import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-exp
 import { getPayrollParticipationWindowFullMonthEntryDriftSignal } from './queries/payroll-participation-window-full-month-entry-drift'
 import { getPayrollParticipationWindowProjectionDeltaAnomalySignal } from './queries/payroll-participation-window-projection-delta-anomaly'
 import { getPayrollParticipationWindowSourceDateDisagreementSignal } from './queries/payroll-participation-window-source-date-disagreement'
+import { getLeaveAccrualOvershootDriftSignal } from './queries/leave-accrual-overshoot-drift'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
@@ -124,6 +125,7 @@ import {
   buildCommercialHealthSignals,
   buildExpenseDistributionSignals,
   buildPayrollParticipationWindowSignals,
+  buildLeaveAccrualSignals,
   buildPaymentOrderSettlementSignals,
   buildSentryIncidentSignals,
   buildSubsystemSignals,
@@ -350,6 +352,16 @@ interface ReliabilityOverviewSources {
    * (shadow compare wiring es V1.1 follow-up).
    */
   payrollParticipationWindow?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-895 V1.1a Slice 3 — Leave Accrual Participation-Aware signals.
+   * Single signal V1.1a (`hr.leave.accrual_overshoot_drift`) detectando shape
+   * del bug class CL Art 67 CT (sobreacumulación contractor→dependent).
+   * Subsystem rollup `Payroll Data Quality` (moduleKey='payroll') unificado
+   * con TASK-893. Reader degrada honestamente (severity=unknown) si la query
+   * falla. Steady state esperado = 0 post-flag-ON + re-seed.
+   */
+  leaveAccrual?: ReliabilitySignal[] | null
 
   /**
    * TASK-766 Slice 2 — Finance CLP currency drift signals. 2 readers que
@@ -614,6 +626,7 @@ export const buildReliabilityOverview = (
     // monitor projection_delta_anomaly ships V1.0 with severity=unknown
     // (shadow compare wiring is V1.1 follow-up).
     ...(sources.payrollParticipationWindow ?? []),
+    ...(sources.leaveAccrual ?? []),
     // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
@@ -847,6 +860,16 @@ export const getReliabilityOverview = async (
           fullMonthEntryDrift: getPayrollParticipationWindowFullMonthEntryDriftSignal,
           sourceDateDisagreement: getPayrollParticipationWindowSourceDateDisagreementSignal,
           projectionDeltaAnomaly: getPayrollParticipationWindowProjectionDeltaAnomalySignal
+        }).catch(() => null)
+
+  // TASK-895 V1.1a — Leave Accrual Participation-Aware signals (1 reader
+  // canonical V1.1a; subsystem rollup Payroll Data Quality unified con
+  // TASK-893). Reader degrada honestamente si la query falla.
+  const leaveAccrual =
+    preloadedSources.leaveAccrual !== undefined
+      ? preloadedSources.leaveAccrual
+      : await buildLeaveAccrualSignals({
+          accrualOvershootDrift: getLeaveAccrualOvershootDriftSignal
         }).catch(() => null)
 
   // TASK-863 V1.5.2 — Final settlement PDF status drift (DB vs asset metadata).
@@ -1174,6 +1197,7 @@ export const getReliabilityOverview = async (
     payrollComplianceExportDrift,
     finalSettlementPdfStatusDrift,
     payrollParticipationWindow,
+    leaveAccrual,
     financeClpDrift,
     providerBqSyncDeadLetter,
     hubspotCompaniesIntakeDeadLetter,
