@@ -7937,6 +7937,18 @@ export interface GreenhouseServingProjectedPayrollSnapshots {
   materialized_at: Generated<Timestamp>;
   member_id: string;
   net_total: Generated<Numeric>;
+  /**
+   * TASK-893 V1.1 — fecha de fin efectiva de participation del miembro en el período (eligibleTo del resolver). NULL cuando full-period o open-ended.
+   */
+  participation_end_date: Timestamp | null;
+  /**
+   * TASK-893 V1.1 — fecha de inicio efectiva de participation del miembro en el período (eligibleFrom del resolver). NULL cuando full-period.
+   */
+  participation_start_date: Timestamp | null;
+  /**
+   * TASK-893 V1.1 — días hábiles efectivos del miembro en su ventana de participation. NULL cuando full-period (prorationFactor = 1). Distinto de working_days_cut (calendar-derived global).
+   */
+  participation_working_days: number | null;
   period_month: number;
   period_year: number;
   projection_mode: string;
