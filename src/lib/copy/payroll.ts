@@ -66,4 +66,12 @@ export const GH_PAYROLL_COMPLIANCE_EXPORTS = {
   lreAria: (periodLabel: string) => `Descargar LRE del periodo ${periodLabel}`
 } as const
 
+export const GH_PAYROLL_CONTRACTS = {
+  legalReviewReferenceLabel: 'Referencia revisión legal',
+  legalReviewReferenceHelper: 'Ticket, documento o thread aprobado por Legal/PeopleOps',
+  internationalInternalWarning:
+    'Payroll registra esta relación como internacional operada internamente. No se aplican descuentos Chile ni flujo Deel.',
+  legalReviewReferenceRequired: 'La referencia de revisión legal es obligatoria para contrato internacional interno'
+} as const
+
 // ─── Nexa Insights Namespace ──────────────────────────────────────────────

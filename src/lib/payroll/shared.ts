@@ -5,12 +5,14 @@ export const payrollCompletedStatuses = ['Listo', 'Done', 'Finalizado', 'Complet
 export class PayrollValidationError extends Error {
   statusCode: number
   details?: unknown
+  code?: string
 
-  constructor(message: string, statusCode = 400, details?: unknown) {
+  constructor(message: string, statusCode = 400, details?: unknown, code?: string) {
     super(message)
     this.name = 'PayrollValidationError'
     this.statusCode = statusCode
     this.details = details
+    this.code = code
   }
 }
 

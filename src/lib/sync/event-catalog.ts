@@ -700,6 +700,11 @@ export const EVENT_TYPES = {
   memberRoleTitleDriftProposed: 'member.role_title.drift_proposed',
   memberRoleTitleDriftResolved: 'member.role_title.drift_resolved',
 
+  // TASK-894 — Member contract taxonomy changed.
+  // Payload redacts legalReviewReference; consumers receive only
+  // hasLegalReviewReference and must refetch canonical member facts.
+  memberContractTypeChanged: 'member.contract_type.changed',
+
   // TASK-848 — Production Release Control Plane (7 events versionados v1)
   platformReleaseStarted: 'platform.release.started',
   platformReleaseDeploying: 'platform.release.deploying',

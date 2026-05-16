@@ -35,6 +35,7 @@ interface WorkforceIntakeRemediationDrawerProps {
   readonly onSaved: (readiness: WorkforceActivationReadiness) => Promise<void> | void
   readonly onOpenCompensation: () => void
   readonly onOpenExternalIdentity: () => void
+  readonly canUseInternationalInternalContract?: boolean
 }
 
 const employmentOptions: ReadonlyArray<{ value: HrEmploymentType; label: string }> = [
@@ -52,7 +53,8 @@ const WorkforceIntakeRemediationDrawer = ({
   onClose,
   onSaved,
   onOpenCompensation,
-  onOpenExternalIdentity
+  onOpenExternalIdentity,
+  canUseInternationalInternalContract = false
 }: WorkforceIntakeRemediationDrawerProps) => {
   const snapshot = member?.activationReadiness?.member ?? null
   const [hireDate, setHireDate] = useState('')
@@ -60,6 +62,7 @@ const WorkforceIntakeRemediationDrawer = ({
   const [contractType, setContractType] = useState<ContractType>('indefinido')
   const [contractEndDate, setContractEndDate] = useState('')
   const [deelContractId, setDeelContractId] = useState('')
+  const [legalReviewReference, setLegalReviewReference] = useState('')
   const [dailyRequired, setDailyRequired] = useState(true)
   const [reason, setReason] = useState('')
   const [saving, setSaving] = useState(false)
@@ -78,6 +81,7 @@ const WorkforceIntakeRemediationDrawer = ({
     setContractType(nextContractType)
     setContractEndDate(snapshot.contractEndDate ?? '')
     setDeelContractId(snapshot.deelContractId ?? '')
+    setLegalReviewReference('')
     setDailyRequired(snapshot.dailyRequired ?? SCHEDULE_DEFAULTS[nextContractType].defaultValue)
     setReason('')
     setError(null)
@@ -85,6 +89,8 @@ const WorkforceIntakeRemediationDrawer = ({
   }, [open, snapshot])
 
   const isDeel = CONTRACT_DERIVATIONS[contractType].payrollVia === 'deel'
+  const isInternationalInternal = contractType === 'international_internal'
+  const canSelectInternationalInternal = canUseInternationalInternalContract || snapshot?.contractType === 'international_internal'
   const scheduleLocked = !SCHEDULE_DEFAULTS[contractType].overridable
 
   const laborBlockers = useMemo(
@@ -100,6 +106,10 @@ const WorkforceIntakeRemediationDrawer = ({
 
     if (CONTRACT_DERIVATIONS[next].payrollVia !== 'deel') {
       setDeelContractId('')
+    }
+
+    if (next !== 'international_internal') {
+      setLegalReviewReference('')
     }
   }
 
@@ -118,6 +128,7 @@ const WorkforceIntakeRemediationDrawer = ({
           contractEndDate: contractEndDate || null,
           dailyRequired,
           deelContractId: isDeel ? deelContractId || null : null,
+          legalReviewReference: isInternationalInternal ? legalReviewReference.trim() : null,
           reason: reason.trim() || undefined
         })
       })
@@ -217,7 +228,9 @@ const WorkforceIntakeRemediationDrawer = ({
                   value={contractType}
                   onChange={event => handleContractChange(event.target.value as ContractType)}
                 >
-                  {contractOptions.map(([value, meta]) => (
+                  {contractOptions
+                    .filter(([value]) => value !== 'international_internal' || canSelectInternationalInternal)
+                    .map(([value, meta]) => (
                     <MenuItem key={value} value={value}>
                       {meta.label}
                     </MenuItem>
@@ -241,6 +254,16 @@ const WorkforceIntakeRemediationDrawer = ({
                     label={GH_WORKFORCE_ACTIVATION.resolver_deel_contract_id}
                     value={deelContractId}
                     onChange={event => setDeelContractId(event.target.value)}
+                  />
+                ) : null}
+                {isInternationalInternal ? (
+                  <TextField
+                    fullWidth
+                    size='small'
+                    label={GH_WORKFORCE_ACTIVATION.resolver_legal_review_reference}
+                    value={legalReviewReference}
+                    onChange={event => setLegalReviewReference(event.target.value)}
+                    helperText={GH_WORKFORCE_ACTIVATION.resolver_legal_review_reference_helper}
                   />
                 ) : null}
                 <FormControlLabel

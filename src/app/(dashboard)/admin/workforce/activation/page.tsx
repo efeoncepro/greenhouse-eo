@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import WorkforceActivationView from '@/views/greenhouse/admin/workforce-activation/WorkforceActivationView'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
+import { INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY } from '@/types/hr-contracts'
 import { listPendingIntakeMembers } from '@/lib/workforce/intake-queue/list-pending-members'
 import { getWorkforceScimMembersPendingProfileCompletionSignal } from '@/lib/reliability/queries/scim-workforce-signals'
 import { requireServerSession } from '@/lib/auth/require-server-session'
@@ -95,6 +96,7 @@ const Page = async ({
       completeIntakeApiBasePath='/api/admin/workforce/members'
       intakeApiBasePath='/api/admin/workforce/members'
       initialSelectedMemberId={initialSelectedMemberId}
+      canUseInternationalInternalContract={can(subject, INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY, 'update', 'tenant')}
     />
   )
 }

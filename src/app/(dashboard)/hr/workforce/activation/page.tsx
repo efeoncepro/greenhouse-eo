@@ -4,6 +4,7 @@ import WorkforceActivationView from '@/views/greenhouse/admin/workforce-activati
 import { requireServerSession } from '@/lib/auth/require-server-session'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
+import { INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY } from '@/types/hr-contracts'
 import { getWorkforceScimMembersPendingProfileCompletionSignal } from '@/lib/reliability/queries/scim-workforce-signals'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import {
@@ -61,6 +62,7 @@ const Page = async ({
       intakeApiBasePath='/api/hr/workforce/members'
       initialSelectedMemberId={initialSelectedMemberId}
       initialExternalIdentityOpen={initialDrawer === 'external-identity' && directMember !== null}
+      canUseInternationalInternalContract={can(subject, INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY, 'update', 'tenant')}
     />
   )
 }

@@ -614,6 +614,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'payroll.contract.use_international_internal',
+        action: 'create',
+        scope: 'tenant',
+        source
+      })
+
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'payroll.contract.use_international_internal',
+        action: 'update',
+        scope: 'tenant',
+        source
+      })
+    }
+
     addEntitlement(entries, {
       module: 'finance',
       capability: 'finance.payment_instruments.update',

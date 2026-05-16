@@ -53,6 +53,7 @@ interface WorkforceActivationViewProps {
   readonly intakeApiBasePath?: string
   readonly initialSelectedMemberId?: string | null
   readonly initialExternalIdentityOpen?: boolean
+  readonly canUseInternationalInternalContract?: boolean
 }
 
 type ActivationFilter = 'all' | 'ready' | 'compensation' | 'hire_date' | 'relationship' | 'payment' | 'external_identity' | 'contractor'
@@ -424,7 +425,8 @@ const WorkforceActivationView = ({
   completeIntakeApiBasePath = '/api/admin/workforce/members',
   intakeApiBasePath = completeIntakeApiBasePath,
   initialSelectedMemberId = null,
-  initialExternalIdentityOpen = false
+  initialExternalIdentityOpen = false,
+  canUseInternationalInternalContract = false
 }: WorkforceActivationViewProps) => {
   const [items, setItems] = useState<PendingIntakeMemberRow[]>(initialItems)
   const [cursor, setCursor] = useState<ListPendingIntakeMembersCursor | null>(initialCursor)
@@ -720,6 +722,7 @@ const WorkforceActivationView = ({
         }}
         onOpenCompensation={() => setCompensationOpen(true)}
         onOpenExternalIdentity={() => setExternalIdentityOpen(true)}
+        canUseInternationalInternalContract={canUseInternationalInternalContract}
       />
       <WorkforceExternalIdentityDrawer
         open={externalIdentityOpen}
@@ -736,6 +739,7 @@ const WorkforceActivationView = ({
           existingVersion={null}
           memberId={selected.memberId}
           memberName={selected.displayName}
+          canUseInternationalInternalContract={canUseInternationalInternalContract}
           onSave={handleSaveCompensation}
         />
       ) : null}

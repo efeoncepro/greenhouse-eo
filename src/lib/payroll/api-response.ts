@@ -25,6 +25,7 @@ export const toPayrollErrorResponse = (
     return NextResponse.json(
       {
         error: error.message,
+        code: error.code ?? null,
         details: error.details ?? null
       },
       { status: error.statusCode }

@@ -56,6 +56,7 @@ import { getPayrollParticipationWindowFullMonthEntryDriftSignal } from './querie
 import { getPayrollParticipationWindowProjectionDeltaAnomalySignal } from './queries/payroll-participation-window-projection-delta-anomaly'
 import { getPayrollParticipationWindowSourceDateDisagreementSignal } from './queries/payroll-participation-window-source-date-disagreement'
 import { getLeaveAccrualOvershootDriftSignal } from './queries/leave-accrual-overshoot-drift'
+import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/payroll-contract-taxonomy-invalid-tuple-drift'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
@@ -869,7 +870,8 @@ export const getReliabilityOverview = async (
     preloadedSources.leaveAccrual !== undefined
       ? preloadedSources.leaveAccrual
       : await buildLeaveAccrualSignals({
-          accrualOvershootDrift: getLeaveAccrualOvershootDriftSignal
+          accrualOvershootDrift: getLeaveAccrualOvershootDriftSignal,
+          contractTaxonomyInvalidTupleDrift: getPayrollContractTaxonomyInvalidTupleDriftSignal
         }).catch(() => null)
 
   // TASK-863 V1.5.2 — Final settlement PDF status drift (DB vs asset metadata).

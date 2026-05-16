@@ -1109,11 +1109,15 @@ export const buildPayrollParticipationWindowSignals = async (
 export const buildLeaveAccrualSignals = async (
   readers: {
     accrualOvershootDrift: () => Promise<ReliabilitySignal>
+    contractTaxonomyInvalidTupleDrift?: () => Promise<ReliabilitySignal>
   }
 ): Promise<ReliabilitySignal[]> => {
-  const [overshoot] = await Promise.all([readers.accrualOvershootDrift()])
+  const [overshoot, contractTaxonomy] = await Promise.all([
+    readers.accrualOvershootDrift(),
+    readers.contractTaxonomyInvalidTupleDrift?.() ?? Promise.resolve(null)
+  ])
 
-  return [overshoot]
+  return [overshoot, contractTaxonomy].filter(Boolean) as ReliabilitySignal[]
 }
 
 /**

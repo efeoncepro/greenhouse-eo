@@ -122,6 +122,7 @@ export interface CreateCompensationVersionInput {
   hasApv?: boolean
   apvAmount?: number
   desiredNetClp?: number | null
+  legalReviewReference?: string | null
   effectiveFrom: string
   changeReason: string
 }
@@ -153,6 +154,7 @@ export interface UpdateCompensationVersionInput {
   hasApv?: boolean
   apvAmount?: number
   desiredNetClp?: number | null
+  legalReviewReference?: string | null
   effectiveFrom: string
   changeReason: string
 }
@@ -463,6 +465,9 @@ export interface PayrollCompensationOverview {
   compensations: CompensationVersion[]
   eligibleMembers: PayrollCompensationMember[]
   members: PayrollCompensationMember[]
+  capabilities?: {
+    canUseInternationalInternalContract: boolean
+  }
   summary: {
     activeMembers: number
     activeCompensations: number

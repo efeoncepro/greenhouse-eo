@@ -2277,6 +2277,27 @@ export interface GreenhouseCoreMemberCertifications {
   visibility: Generated<string>;
 }
 
+export interface GreenhouseCoreMemberContractTypeAuditLog {
+  actor_email: string | null;
+  actor_user_id: string;
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  effective_at: Generated<Timestamp>;
+  legal_review_reference: string | null;
+  member_id: string;
+  metadata_json: Generated<Json>;
+  new_contract_type: string;
+  new_deel_contract_id: string | null;
+  new_pay_regime: string;
+  new_payroll_via: string;
+  previous_contract_type: string | null;
+  previous_deel_contract_id: string | null;
+  previous_pay_regime: string | null;
+  previous_payroll_via: string | null;
+  reason: string | null;
+  source: string;
+}
+
 export interface GreenhouseCoreMemberEndorsements {
   comment: string | null;
   created_at: Generated<Timestamp>;
@@ -6335,6 +6356,7 @@ export interface GreenhousePayrollCompensationVersions {
   health_system: string | null;
   is_current: Generated<boolean>;
   member_id: string;
+  metadata_json: Generated<Json>;
   movilizacion_amount: Generated<Numeric>;
   pay_regime: string;
   remote_allowance: Generated<Numeric>;
@@ -9150,6 +9172,7 @@ export interface DB {
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
+  "greenhouse_core.member_contract_type_audit_log": GreenhouseCoreMemberContractTypeAuditLog;
   "greenhouse_core.member_endorsements": GreenhouseCoreMemberEndorsements;
   "greenhouse_core.member_evidence": GreenhouseCoreMemberEvidence;
   "greenhouse_core.member_languages": GreenhouseCoreMemberLanguages;

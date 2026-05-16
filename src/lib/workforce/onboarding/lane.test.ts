@@ -31,4 +31,19 @@ describe('resolveOnboardingLane', () => {
     expect(result.requiresManagerAssignment).toBe(false)
     expect(result.greenhouseExecutionMode).toBe('informational')
   })
+
+  it('routes international internal onboarding through internal payroll without Chile leave bootstrap', () => {
+    const result = resolveOnboardingLane({
+      relationshipType: 'employee',
+      contractType: 'international_internal',
+      payRegime: 'international',
+      payrollVia: 'internal',
+      startType: 'new_hire'
+    })
+
+    expect(result.ruleLane).toBe('internal_payroll')
+    expect(result.requiresPayrollReadiness).toBe(true)
+    expect(result.requiresLeavePolicyBootstrap).toBe(false)
+    expect(result.greenhouseExecutionMode).toBe('partial')
+  })
 })

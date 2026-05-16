@@ -3,12 +3,18 @@ import 'server-only'
 import { withTransaction } from '@/lib/db'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
+import { recordMemberContractTypeChange } from '@/lib/hr-core/member-contract-type-audit'
 import { HrCoreValidationError, assertDateString, normalizeNullableString } from '@/lib/hr-core/shared'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { resolveWorkforceActivationReadiness } from '@/lib/workforce/activation/readiness'
 import {
   CONTRACT_DERIVATIONS,
+  INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY,
+  INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE,
+  isContractType,
+  isInternationalInternalContractType,
+  normalizeLegalReviewReference,
   resolveScheduleRequired,
   type ContractType
 } from '@/types/hr-contracts'
@@ -16,7 +22,6 @@ import type { HrEmploymentType } from '@/types/hr-core'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 const EMPLOYMENT_TYPES = new Set<HrEmploymentType>(['full_time', 'part_time', 'contractor'])
-const CONTRACT_TYPES = new Set<ContractType>(['indefinido', 'plazo_fijo', 'honorarios', 'contractor', 'eor'])
 
 export interface UpdateWorkforceMemberIntakeBody {
   readonly hireDate?: string | null
@@ -25,6 +30,7 @@ export interface UpdateWorkforceMemberIntakeBody {
   readonly contractEndDate?: string | null
   readonly dailyRequired?: boolean | null
   readonly deelContractId?: string | null
+  readonly legalReviewReference?: string | null
   readonly reason?: string
 }
 
@@ -75,12 +81,12 @@ const assertEmploymentType = (value: unknown): HrEmploymentType | null => {
 }
 
 const assertContractType = (value: unknown): ContractType => {
-  if (typeof value === 'string' && CONTRACT_TYPES.has(value as ContractType)) {
-    return value as ContractType
+  if (isContractType(value)) {
+    return value
   }
 
   throw new HrCoreValidationError('contractType is invalid.', 400, {
-    allowed: [...CONTRACT_TYPES]
+    allowed: Object.keys(CONTRACT_DERIVATIONS)
   })
 }
 
@@ -121,7 +127,8 @@ export const updateWorkforceMemberIntake = async ({
     'contractType',
     'contractEndDate',
     'dailyRequired',
-    'deelContractId'
+    'deelContractId',
+    'legalReviewReference'
   ].some(key => hasOwn(body, key as keyof UpdateWorkforceMemberIntakeBody))
 
   if (!updatesRequested) {
@@ -203,6 +210,28 @@ export const updateWorkforceMemberIntake = async ({
       throw new HrCoreValidationError('deelContractId is required for contractor and eor contracts.', 400)
     }
 
+    const nextLegalReviewReference = normalizeLegalReviewReference(body.legalReviewReference)
+
+    if (isInternationalInternalContractType(nextContractType)) {
+      if (!can(subject, INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY, 'update', 'tenant')) {
+        throw new HrCoreValidationError(
+          `Forbidden — capability ${INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY}:update required`,
+          403,
+          { capability: INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY },
+          'international_internal_contract_forbidden'
+        )
+      }
+
+      if (!nextLegalReviewReference || nextLegalReviewReference.length < 10) {
+        throw new HrCoreValidationError(
+          'legalReviewReference is required for international_internal contracts.',
+          400,
+          null,
+          INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE
+        )
+      }
+    }
+
     const nextValues = {
       hireDate: hasOwn(body, 'hireDate') ? assertNullableDateString(body.hireDate, 'hireDate') : previous.hireDate,
       employmentType: hasOwn(body, 'employmentType') ? assertEmploymentType(body.employmentType) : member.employment_type,
@@ -243,6 +272,29 @@ export const updateWorkforceMemberIntake = async ({
         memberId
       ]
     )
+
+    await recordMemberContractTypeChange({
+      client,
+      memberId,
+      actorUserId: tenant.userId,
+      actorEmail: null,
+      source: 'workforce_intake',
+      reason: normalizeNullableString(body.reason),
+      legalReviewReference: nextLegalReviewReference,
+      previous: {
+        contractType: previous.contractType,
+        payRegime: previous.payRegime,
+        payrollVia: previous.payrollVia,
+        deelContractId: previous.deelContractId
+      },
+      next: {
+        contractType: nextValues.contractType,
+        payRegime: nextValues.payRegime,
+        payrollVia: nextValues.payrollVia,
+        deelContractId: nextValues.deelContractId
+      },
+      metadata: { sourceVersion: 'TASK-894' }
+    })
 
     const after = {
       ...nextValues,

@@ -69,6 +69,7 @@ const PayrollDashboard = () => {
   const [compensations, setCompensations] = useState<CompensationVersion[]>([])
   const [eligibleMembers, setEligibleMembers] = useState<PayrollCompensationMember[]>([])
   const [compensationMembers, setCompensationMembers] = useState<PayrollCompensationMember[]>([])
+  const [canUseInternationalInternalContract, setCanUseInternationalInternalContract] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -161,12 +162,14 @@ const PayrollDashboard = () => {
         setCompensations(data.compensations || [])
         setEligibleMembers(data.eligibleMembers || [])
         setCompensationMembers(data.members || [])
+        setCanUseInternationalInternalContract(Boolean(data.capabilities?.canUseInternationalInternalContract))
       } else {
         const data = await compRes.json().catch(() => null)
 
         setCompensations([])
         setEligibleMembers([])
         setCompensationMembers([])
+        setCanUseInternationalInternalContract(false)
         nextErrors.push(data?.error || 'No fue posible cargar las compensaciones de nómina.')
       }
 
@@ -509,6 +512,7 @@ const PayrollDashboard = () => {
               compensations={compensations}
               eligibleMembers={eligibleMembers}
               members={compensationMembers}
+              canUseInternationalInternalContract={canUseInternationalInternalContract}
               onRefresh={handleRefresh}
             />
           </TabPanel>

@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server'
 
 import { getServerAuthSession } from '@/lib/auth'
+import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
+import { can } from '@/lib/entitlements/runtime'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { updateCompensationVersion } from '@/lib/payroll/get-compensation'
-import { assertPayrollDateString, parsePayrollNumber } from '@/lib/payroll/shared'
+import { PayrollValidationError, assertPayrollDateString, parsePayrollNumber } from '@/lib/payroll/shared'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
-import { normalizeContractType } from '@/types/hr-contracts'
+import {
+  INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY,
+  INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE,
+  isInternationalInternalContractType,
+  normalizeContractType
+} from '@/types/hr-contracts'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +32,28 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ve
 
     const session = await getServerAuthSession()
     const { versionId } = await params
+    const contractType = normalizeContractType(typeof body.contractType === 'string' ? body.contractType : null)
+
+    if (isInternationalInternalContractType(contractType)) {
+      const subject = buildTenantEntitlementSubject(tenant)
+
+      if (!can(subject, INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY, 'update', 'tenant')) {
+        throw new PayrollValidationError(
+          `Forbidden — capability ${INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY}:update required`,
+          403,
+          { capability: INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY }
+        )
+      }
+
+      if (typeof body.legalReviewReference !== 'string' || body.legalReviewReference.trim().length < 10) {
+        throw new PayrollValidationError(
+          'legalReviewReference is required for international_internal contracts.',
+          400,
+          null,
+          INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE
+        )
+      }
+    }
 
     const updated = await updateCompensationVersion({
       versionId,
@@ -54,12 +83,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ve
           min: 0,
           max: 1
         }),
-        contractType: normalizeContractType(typeof body.contractType === 'string' ? body.contractType : null),
+        contractType,
         scheduleRequired: typeof body.scheduleRequired === 'boolean' ? body.scheduleRequired : undefined,
         deelContractId: typeof body.deelContractId === 'string' ? body.deelContractId : null,
         hasApv: Boolean(body.hasApv),
         apvAmount: parsePayrollNumber(body.apvAmount ?? 0, 'apvAmount', { min: 0 }) ?? 0,
         desiredNetClp: parsePayrollNumber(body.desiredNetClp, 'desiredNetClp', { allowNull: true, min: 0 }),
+        legalReviewReference: typeof body.legalReviewReference === 'string' ? body.legalReviewReference : null,
         effectiveFrom: assertPayrollDateString(body.effectiveFrom, 'effectiveFrom'),
         changeReason: String(body.changeReason || '')
       },

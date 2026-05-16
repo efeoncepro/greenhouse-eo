@@ -77,6 +77,16 @@ export const resolveOnboardingLane = ({
     })
   }
 
+  if (payrollVia === 'internal' && payRegime === 'international' && contractType === 'international_internal') {
+    return decision('internal_payroll', {
+      requiresPayrollReadiness: true,
+      requiresLeavePolicyBootstrap: false,
+      requiresHrDocuments: true,
+      requiresEquipmentOrAccessSetup: true,
+      greenhouseExecutionMode: 'partial'
+    })
+  }
+
   if (contractType === 'honorarios' || contractType === 'contractor' || relationshipType === 'contractor') {
     return decision('non_payroll', {
       requiresPayrollReadiness: false,

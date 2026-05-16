@@ -25,6 +25,7 @@ import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 
 import { getMicrocopy } from '@/lib/copy'
+import { GH_PAYROLL_CONTRACTS } from '@/lib/copy/payroll'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -94,10 +95,19 @@ type Props = {
   existingVersion: CompensationVersion | null
   memberId: string
   memberName: string
+  canUseInternationalInternalContract?: boolean
   onSave: (payload: CompensationSavePayload) => Promise<void>
 }
 
-const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberName, onSave }: Props) => {
+const CompensationDrawer = ({
+  open,
+  onClose,
+  existingVersion,
+  memberId,
+  memberName,
+  canUseInternationalInternalContract = false,
+  onSave
+}: Props) => {
   const ev = existingVersion
 
   const [payRegime, setPayRegime] = useState<PayRegime>(ev?.payRegime ?? 'chile')
@@ -122,6 +132,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [unemploymentRate, setUnemploymentRate] = useState(ev?.unemploymentRate ?? 0.006)
   const [contractType, setContractType] = useState<ContractType>(ev?.contractType ?? 'indefinido')
   const [deelContractId, setDeelContractId] = useState(ev?.deelContractId ?? '')
+  const [legalReviewReference, setLegalReviewReference] = useState('')
   const [hasApv, setHasApv] = useState(ev?.hasApv ?? false)
   const [apvAmount, setApvAmount] = useState(ev?.apvAmount ?? 0)
   const [effectiveFrom, setEffectiveFrom] = useState(ev?.effectiveFrom ?? new Date().toISOString().slice(0, 10))
@@ -138,6 +149,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const isChileEmployee = payRegime === 'chile' && contractType !== 'honorarios'
   const isHonorarios = contractType === 'honorarios'
   const isDeel = payrollVia === 'deel'
+  const isInternationalInternal = contractType === 'international_internal'
+  const canSelectInternationalInternal = canUseInternationalInternalContract || ev?.contractType === 'international_internal'
   const supportsRemoteAllowance = contractAllowsRemoteAllowance(contractType)
   const saveMode = getCompensationSaveMode({ existingVersion: ev, effectiveFrom })
 
@@ -162,6 +175,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setUnemploymentRate(ev?.unemploymentRate ?? 0.006)
     setContractType(ev?.contractType ?? 'indefinido')
     setDeelContractId(ev?.deelContractId ?? '')
+    setLegalReviewReference('')
     setHasApv(ev?.hasApv ?? false)
     setApvAmount(ev?.apvAmount ?? 0)
     setEffectiveFrom(ev?.effectiveFrom ?? new Date().toISOString().slice(0, 10))
@@ -268,11 +282,21 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     if (!contractAllowsRemoteAllowance(ct)) {
       setRemoteAllowance(0)
     }
+
+    if (ct !== 'international_internal') {
+      setLegalReviewReference('')
+    }
   }
 
   const handleSubmit = async () => {
     if (!changeReason.trim()) {
       setError('El motivo del cambio es obligatorio')
+
+      return
+    }
+
+    if (isInternationalInternal && legalReviewReference.trim().length < 10) {
+      setError(GH_PAYROLL_CONTRACTS.legalReviewReferenceRequired)
 
       return
     }
@@ -297,6 +321,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         bonusRpaMin: 0, bonusRpaMax: bonusRpa,
         contractType,
         deelContractId: isDeel ? deelContractId.trim() || null : null,
+        legalReviewReference: isInternationalInternal ? legalReviewReference.trim() : null,
         effectiveFrom, changeReason: resolvedChangeReason,
         ...(isChileEmployee && {
           afpName: afpName || null, afpRate, healthSystem,
@@ -345,11 +370,13 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             <FormControl fullWidth size='small'>
               <InputLabel>Contrato</InputLabel>
               <Select value={contractType} label='Contrato' onChange={e => handleContractChange(e.target.value as ContractType)}>
-                <MenuItem value='indefinido'>Indefinido</MenuItem>
-                <MenuItem value='plazo_fijo'>Plazo fijo</MenuItem>
-                <MenuItem value='honorarios'>Honorarios</MenuItem>
-                <MenuItem value='contractor'>Contractor (Deel)</MenuItem>
-                <MenuItem value='eor'>EOR (Deel)</MenuItem>
+                {Object.entries(CONTRACT_LABELS)
+                  .filter(([value]) => value !== 'international_internal' || canSelectInternationalInternal)
+                  .map(([value, meta]) => (
+                    <MenuItem key={value} value={value}>
+                      {meta.label}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
 
@@ -370,6 +397,23 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                 value={deelContractId}
                 onChange={e => setDeelContractId(e.target.value)}
                 helperText='Referencia manual del contrato gestionado en Deel'
+              />
+            )}
+
+            {isInternationalInternal && (
+              <Alert severity='warning' variant='outlined' sx={{ py: 0.75 }}>
+                {GH_PAYROLL_CONTRACTS.internationalInternalWarning}
+              </Alert>
+            )}
+
+            {isInternationalInternal && (
+              <CustomTextField
+                fullWidth
+                size='small'
+                label={GH_PAYROLL_CONTRACTS.legalReviewReferenceLabel}
+                value={legalReviewReference}
+                onChange={e => setLegalReviewReference(e.target.value)}
+                helperText={GH_PAYROLL_CONTRACTS.legalReviewReferenceHelper}
               />
             )}
 

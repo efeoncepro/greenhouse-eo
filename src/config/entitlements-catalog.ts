@@ -206,6 +206,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-894 — Contract type excepcional para colaboradores internacionales
+    // operados internamente. V1 grant solo EFEONCE_ADMIN y write paths requieren
+    // legalReviewReference >= 10 chars; no es visibilidad de pagina.
+    key: 'payroll.contract.use_international_internal',
+    module: 'hr',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'finance.workspace',
     module: 'finance',
     actions: ['read', 'launch'] as const,
