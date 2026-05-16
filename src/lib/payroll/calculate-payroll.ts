@@ -26,7 +26,12 @@ import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
-import { canRecalculatePayrollPeriod, isPayrollPeriodReopened } from '@/lib/payroll/period-lifecycle'
+import { isPayrollParticipationWindowEnabled } from '@/lib/payroll/participation-window'
+import {
+  canRecalculatePayrollPeriod,
+  isPayrollPeriodReopened,
+  isReopenedRecomputeBlockedByParticipationWindow
+} from '@/lib/payroll/period-lifecycle'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
 import { supersedePayrollEntryOnRecalculate } from '@/lib/payroll/supersede-entry'
 import { applyAdjustmentsToEntry } from '@/lib/payroll/adjustments/apply-to-entry'
@@ -429,6 +434,36 @@ export const calculatePayroll = async ({
 
   if (!canRecalculatePayrollPeriod(period.status)) {
     throw new PayrollValidationError('Exported payroll periods cannot be recalculated.', 409)
+  }
+
+  /*
+   * TASK-893 Slice 4 BL-5 — Reopened recompute guard bajo flag TASK-893 ON.
+   *
+   * Cuando `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` AND el período está
+   * en estado `reopened` (path TASK-410 reliquidación), un recompute crearía
+   * v2 entries con la NUEVA semántica de participación mientras v1 quedó
+   * con la legacy. Eso produce asientos contradictorios contra:
+   *
+   * - DTE/F29 retención SII honorarios ya presentado bajo v1
+   * - Cotización Previred ya pagada bajo v1
+   * - Nota de crédito / nueva boleta sobre v2 con monto distinto
+   *
+   * V1 conservative (Opción B per ADR Delta 2026-05-16): bloquear el recompute.
+   * Operador puede:
+   *   - Si quiere recompute con nueva semántica → cancelar reopen + re-export
+   *     same legacy → next period usa new semantic.
+   *   - Si quiere correcciones manuales → editar entries en reopened sin
+   *     trigger de recompute.
+   *
+   * V1.1 follow-up: capability `payroll.period.force_recompute` (EFEONCE_ADMIN
+   * + FINANCE_ADMIN, reason >= 20 chars, audit row) permite override explícito.
+   */
+  if (isReopenedRecomputeBlockedByParticipationWindow(period.status, isPayrollParticipationWindowEnabled())) {
+    throw new PayrollValidationError(
+      'Reopened payroll period cannot be recalculated under participation window. Cancel reopen + re-export, or wait for V1.1 force_recompute capability.',
+      409,
+      { code: 'period_reopened_under_legacy_no_recompute', periodId, status: period.status }
+    )
   }
 
   const range = getPeriodRangeFromId(periodId)

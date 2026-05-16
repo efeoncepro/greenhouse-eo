@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import type { PeriodStatus } from '@/types/payroll'
+
 import {
   canEditPayrollPeriodMetadata,
   canEditPayrollEntries,
@@ -11,6 +13,7 @@ import {
   doesPayrollPeriodUpdateRequireReset,
   isPayrollPeriodFinalized,
   isPayrollPeriodReopened,
+  isReopenedRecomputeBlockedByParticipationWindow,
   shouldReopenApprovedPayrollPeriod
 } from './period-lifecycle'
 
@@ -133,5 +136,43 @@ describe('payroll period lifecycle', () => {
         nextTaxTableVersion: 'SII-2026-03'
       })
     ).toBe(false)
+  })
+
+  /*
+   * TASK-893 Slice 4 BL-5 — Reopened recompute guard under participation window.
+   *
+   * Predicate must return TRUE only when BOTH conditions hold:
+   *   - period.status === 'reopened'
+   *   - PAYROLL_PARTICIPATION_WINDOW_ENABLED === true
+   *
+   * Any other combination MUST return FALSE so the legacy reopened recompute
+   * path (TASK-410) keeps working bit-for-bit when the new flag is OFF.
+   */
+  describe('isReopenedRecomputeBlockedByParticipationWindow (BL-5)', () => {
+    it('blocks when status=reopened AND flag enabled', () => {
+      expect(isReopenedRecomputeBlockedByParticipationWindow('reopened', true)).toBe(true)
+    })
+
+    it('does NOT block when flag is disabled, regardless of status', () => {
+      ;(['draft', 'calculated', 'approved', 'exported', 'reopened'] as PeriodStatus[]).forEach(s => {
+        expect(isReopenedRecomputeBlockedByParticipationWindow(s, false)).toBe(false)
+      })
+    })
+
+    it('does NOT block non-reopened statuses when flag is enabled', () => {
+      ;(['draft', 'calculated', 'approved', 'exported'] as PeriodStatus[]).forEach(s => {
+        expect(isReopenedRecomputeBlockedByParticipationWindow(s, true)).toBe(false)
+      })
+    })
+
+    /*
+     * Invariante crítica: cuando TASK-893 flag está OFF (default productivo),
+     * reopened recompute SIGUE PERMITIDO bit-for-bit con el comportamiento
+     * legacy. Sin esta invariante, el guard rompería el flujo TASK-410
+     * reliquidación.
+     */
+    it('preserves legacy TASK-410 reopened recompute path bit-for-bit (flag OFF default)', () => {
+      expect(isReopenedRecomputeBlockedByParticipationWindow('reopened', false)).toBe(false)
+    })
   })
 })
