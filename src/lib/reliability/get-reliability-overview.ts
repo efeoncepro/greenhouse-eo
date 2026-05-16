@@ -40,6 +40,7 @@ import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
+import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
@@ -1014,7 +1015,11 @@ export const getReliabilityOverview = async (
           getIdentityRelationshipMemberContractDriftSignal().catch(() => null),
           // TASK-892 — closure completeness partial (case-level UX surface
           // del drift Person 360, complementario al signal sistema).
-          getOffboardingCompletenessPartialSignal().catch(() => null)
+          getOffboardingCompletenessPartialSignal().catch(() => null),
+          // Notion bridge coverage drift — detecta regresión del resolver
+          // Notion-user-id → member-id (caso fuente: incidente 2026-05-16
+          // post-TASK-877 dejó coverage en 3.7%, colapsando OTD/RpA bonuses).
+          getIdentityNotionBridgeCoverageSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
