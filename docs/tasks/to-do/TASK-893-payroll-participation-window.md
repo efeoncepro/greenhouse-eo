@@ -423,7 +423,7 @@ Hasta que la capability aterrize (V1.1), `calculatePayroll()` MUST refuse to ove
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Slice 1 | Revert code commit; no runtime flag consumed | <10 min | si |
 | Slice 2 | Revert resolver/query commit; no production behavior if flag=false | <10 min | si |
 | Slice 3 | Flip `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false` + redeploy | <5 min | si |
@@ -471,9 +471,10 @@ Hasta que la capability aterrize (V1.1), `calculatePayroll()` MUST refuse to ove
 - [ ] `PayrollParticipationWindow` type **embeds** `exitEligibility: WorkforceExitPayrollEligibilityWindow | null` (NO duplica `eligibleFrom`/`eligibleTo` exit-side).
 - [ ] V1 source precedence: `eligibleFrom = max(periodStart, compensation.effective_from)` — single canonical source. Onboarding NO consumido en V1.
 - [ ] Flag dependency check: cuando TASK-890 flag OFF, emite warning `exit_resolver_disabled` + degrade `exitEligibility = null` honest.
-- [ ] Felipe-like fixture con `effective_from` inside the month prorates and no longer pays full month.
+- [ ] Felipe-like fixture con `effective_from` inside the month prorates and no longer pays full month (régimen `honorarios`).
 - [ ] Maria-like fixture composes TASK-890 and remains excluded/prorated according to exit policy.
 - [ ] Same-month entry+exit fixture produces `prorate_bounded_window` policy con bounds correctas.
+- [ ] **TASK-894 cross-task fixture** (cuando TASK-894 ships): member `contractType='international_internal'`, `effective_from='2026-05-13'`, `baseSalary=5000 USD` → policy `prorate_from_start`, `prorationFactor ~0.6`, `grossTotal ~3000 USD` (no conversion silente a CLP), `chileTotalDeductions=0`, `siiRetentionAmount=null`, regime classified `international_internal`. Sin TASK-894 ships, este fixture queda en pending hasta el cierre.
 - [ ] Full-month collaborators remain bit-for-bit equal when eligible for the whole period.
 - [ ] 4 regimenes (chile_dependent, honorarios, deel, international_internal) prorratean correctamente; honorarios extiende `prorateEntry` sin contaminar attendance.
 - [ ] `projectPayrollForPeriod()` and `calculatePayroll()` consume the same participation primitive.
