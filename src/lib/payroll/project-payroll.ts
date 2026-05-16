@@ -130,6 +130,108 @@ const prorateEntry = (entry: PayrollEntry, factor: number): PayrollEntry => {
 }
 
 /**
+ * TASK-893 Slice 4 BL-1 — Prorate the compensation BEFORE `buildPayrollEntry`.
+ *
+ * **Why**: when TASK-893 flag is ON, the previous Slice 3 approach
+ * (`prorateEntry(fullEntry, finalFactor)`) rescaled the full output linearly
+ * — including fields with non-linear semantics:
+ *
+ * - `chileGratificacionLegalAmount` has a MONTHLY cap (4.75 × IMM ÷ 12 Art 50
+ *   CT). Rescaling post-hoc double-prorrates rows already at the cap.
+ * - `chileTotalDeductions` is an aggregate computed from contribution bases.
+ *   Rescaling the aggregate ≠ recomputing from prorated bases.
+ * - `siiRetentionAmount` for honorarios should reflect retention on prorated
+ *   gross — rescaling is mathematically equivalent but loses traceability.
+ *
+ * **Canonical fix** (payroll auditor 2026-05-16): scale the *inputs* to
+ * `buildPayrollEntry` first; let the canonical calculator recompute
+ * deductions, gratificación legal cap, and retención SII from the prorated
+ * bases.
+ *
+ * **What scales** (proportional to time worked):
+ * - `baseSalary`, `remoteAllowance`, `fixedBonusAmount`
+ * - `bonusOtdMin/Max`, `bonusRpaMin/Max` (KPI bonus caps proportional)
+ * - `apvAmount` (voluntary contribution proportional to imponible base)
+ *
+ * **What does NOT scale** (asignaciones no imponibles fijas — Chilean
+ * jurisprudence does NOT auto-prorate by days not worked at contract entry;
+ * the decision is contractual, not automatic):
+ * - `colacionAmount`, `movilizacionAmount`
+ *
+ * **Identity preserved** (non-monetary or rate-based):
+ * - `afpName/afpRate`, `healthSystem`, `unemploymentRate`, `contractType`,
+ *   `payRegime`, `payrollVia`, etc.
+ *
+ * **HR Open Question Q-4** (gratificación legal in entry month): Chilean
+ * jurisprudence (Dictamen DT 2937/050, 2002) supports "0 in entry month".
+ * V1 conservative defers to `buildPayrollEntry`'s canonical cap-aware
+ * recompute — which produces the smallest legal amount given the prorated
+ * gross, NOT zero. HR/Finance signoff in V1.1 may override to set
+ * `gratificacionLegalMode='ninguna'` for entry month or extend the resolver
+ * with a "first-month flag".
+ *
+ * Pure function. Used only on the flag-ON path; flag OFF preserves legacy
+ * bit-for-bit (this helper is not called).
+ */
+const prorateCompensationForParticipationWindow = <T extends {
+  baseSalary: number
+  remoteAllowance: number
+  fixedBonusAmount: number
+  bonusOtdMin: number
+  bonusOtdMax: number
+  bonusRpaMin: number
+  bonusRpaMax: number
+  apvAmount: number
+}>(
+  compensation: T,
+  factor: number
+): T => {
+  /*
+   * Factor at or above 1 → no scaling needed. Equivalent to identity for
+   * full_period policy (factor=1). Guards against propagating > 1 factors
+   * by accident — those would inflate, which is never desired.
+   */
+  if (factor >= 1) return compensation
+
+  /*
+   * Factor at 0 → exclude. The caller should have filtered the member out
+   * upstream (policy='exclude'). Defensive: if it slips through, produce
+   * all-zero monetary fields rather than negative values from rounding.
+   */
+  if (factor <= 0) {
+    return {
+      ...compensation,
+      baseSalary: 0,
+      remoteAllowance: 0,
+      fixedBonusAmount: 0,
+      bonusOtdMin: 0,
+      bonusOtdMax: 0,
+      bonusRpaMin: 0,
+      bonusRpaMax: 0,
+      apvAmount: 0
+    }
+  }
+
+  const s = (v: number) => roundCurrency(v * factor)
+
+  return {
+    ...compensation,
+    baseSalary: s(compensation.baseSalary),
+    remoteAllowance: s(compensation.remoteAllowance),
+    fixedBonusAmount: s(compensation.fixedBonusAmount),
+    bonusOtdMin: s(compensation.bonusOtdMin),
+    bonusOtdMax: s(compensation.bonusOtdMax),
+    bonusRpaMin: s(compensation.bonusRpaMin),
+    bonusRpaMax: s(compensation.bonusRpaMax),
+    apvAmount: s(compensation.apvAmount)
+    /*
+     * colacionAmount + movilizacionAmount intentionally preserved (legacy
+     * preserved). See JSDoc above for rationale.
+     */
+  }
+}
+
+/**
  * TASK-893 Slice 3 — defensive resolution of the per-member participation
  * window. Gated by `PAYROLL_PARTICIPATION_WINDOW_ENABLED` (default OFF).
  *
@@ -286,10 +388,27 @@ export const projectPayrollForPeriod = async ({
     const kpi = kpiMap.get(compensation.memberId) ?? null
     const attendance = attendanceSnapshots.get(compensation.memberId) ?? null
 
+    /*
+     * Resolve per-member participation factor.
+     * - Flag OFF (or degraded) → participationFactor = 1 → no compensation
+     *   scaling, no behavioral change vs pre-TASK-893.
+     * - Flag ON → participation truncates per the resolved window. Factor
+     *   is baked into the compensation BEFORE buildPayrollEntry so the
+     *   canonical calculator recomputes deductions / gratificación / SII
+     *   retention from the prorated gross (BL-1 fix — auditor 2026-05-16).
+     */
+    const participation = participationByMember?.get(compensation.memberId) ?? null
+    const participationFactor = participation?.prorationFactor ?? 1
+
+    const effectiveCompensation =
+      participationFactor < 1
+        ? prorateCompensationForParticipationWindow(compensation, participationFactor)
+        : compensation
+
     const fullEntry = await buildPayrollEntry({
       periodId,
       periodDate: periodEnd,
-      compensation,
+      compensation: effectiveCompensation,
       ufValue,
       bonusConfig,
       kpi,
@@ -297,20 +416,21 @@ export const projectPayrollForPeriod = async ({
     })
 
     /*
-     * Compose the per-member factor. When TASK-893 is OFF (or degraded to
-     * null), `participationFactor = 1` and the composed factor reduces to
-     * the legacy `actualToDateFactor`. When TASK-893 is ON, the per-member
-     * `participationFactor` truncates the entry to the eligible window.
+     * `prorateEntry` now applies ONLY the legacy `actualToDateFactor` on
+     * top of the entry. When flag OFF, this is the legacy bit-for-bit
+     * behavior (participationFactor=1 means effectiveCompensation =
+     * compensation). When flag ON, the participation truncation is
+     * already baked into the entry monetary fields via the prorated
+     * compensation; `prorateEntry` here scales further by the
+     * actual-to-date factor (proyection mode `actual_to_date` only,
+     * factor=1 for `projected_month_end`).
      *
-     * Members absent from the participation map (no compensation overlap)
-     * are NOT reachable in this loop — `compensations` already filtered
-     * them upstream via `getApplicableCompensationVersionsForPeriod`.
+     * Output `prorationFactor` field is the composed factor for
+     * operator surface transparency (shows the full effective factor
+     * regardless of which path produced it).
      */
-    const participation = participationByMember?.get(compensation.memberId) ?? null
-    const participationFactor = participation?.prorationFactor ?? 1
+    const entry = prorateEntry(fullEntry, actualToDateFactor)
     const finalFactor = participationFactor * actualToDateFactor
-
-    const entry = prorateEntry(fullEntry, finalFactor)
 
     entries.push({
       ...entry,
