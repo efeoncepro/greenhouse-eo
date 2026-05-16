@@ -1,16 +1,72 @@
-# Sesion 2026-05-16 — TASK-893 Payroll Participation Window — kickoff implementación
+# Sesion 2026-05-16 — TASK-880 Notion API Modernization & PAT Foundation — kickoff implementación
 
-- **Task**: `TASK-893` — Payroll Participation Window. Primitive canonica para que Payroll calcule `eligibleFrom/eligibleTo/policy/reasonCodes/prorationFactor` por colaborador y periodo.
-- **Spec**: `docs/tasks/in-progress/TASK-893-payroll-participation-window.md` (movida desde `to-do/` 2026-05-16).
-- **ADR**: `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` (Accepted 2026-05-15, ajustada con 5 ajustes pre-implementación 2026-05-15).
-- **Branch policy**: directo en `develop` (sin branch dedicada) por instrucción explícita del operador.
-- **Pre-trabajo realizado en sesión previa (2026-05-15)**:
-  - Review arch-architect del ADR — 5 ajustes incorporados (type shape embebe exitEligibility, V1 single source compensation.effective_from, flag dependency TASK-893→TASK-890, 3 signals + subsystem Finance Data Quality, blast radius 6 downstream + no_recompute_closed_periods invariant).
-  - Triple-gate semantics documentado (intake TASK-872 / exit TASK-890 / participation TASK-893).
-  - Régimen coverage 4 canónicos validado (chile_dependent, honorarios, deel, international_internal).
-  - Hard rules canónicos declarados (12 invariantes) para lift a CLAUDE.md en Slice 6.
-- **Plan ejecución**: Slices 1-3 esta sesión (resolver + bulk query + projected integration). Checkpoint humano antes de Slice 4 (official payroll calculation tiene write blast radius).
-- **Estado en curso**: housekeeping completado, Discovery/Audit/Plan en curso.
+- **Task**: `TASK-880` — Notion API Modernization & PAT Foundation.
+- **Spec**: `docs/tasks/in-progress/TASK-880-notion-api-modernization-and-pat-foundation.md` (movida desde `to-do/` 2026-05-16).
+- **Branch policy**: directo en `develop` por instrucción explícita del operador; no crear ni cambiar a branch `task/TASK-880-*`.
+- **Scope**: modernizar el contrato Greenhouse-side de Notion sin romper flujos existentes: inventario callsites, `NotionApiClient` canónico, resolver PAT cascade, tabla/audit PAT, capabilities, surfaces admin/operator, bump controlado a `Notion-Version: 2026-03-11`, reliability signals y lint rule.
+- **Guardrail crítico**: no migrar ni tocar production `notion-bq-sync` sibling ni el pipeline crítico Notion → BQ raw → conformed → PG fuera de los wrappers Greenhouse-side; preservar fallback a token global hasta que PATs estén verificados.
+- **Estado actual**: Discovery/Audit/Plan en curso. PR/branch `TASK-880` no detectados antes de tomar ownership. Worktree ya tenía cambios ajenos en `project_context.md`, `changelog.md` y `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md`; no revertirlos ni mezclarlos salvo coordinación explícita.
+
+# Sesion 2026-05-16 — TASK-893 Payroll Participation Window V0.1 SHIPPED + Slice 4 scope expandido post-audit
+
+## V0.1 milestone shipped (Slices 1-3 directo en develop sin branch)
+
+- **Slice 1** (`5eb44c47`): resolver foundation — `src/lib/payroll/participation-window/` con types canonicos, pure-function policy `derivePayrollParticipationPolicy`, 19 tests matriz canonica.
+- **Slice 2** (`84f4f00e`): bulk query + TASK-890 composition — `fetchParticipationFactsForMembers` con LEFT JOIN observe-only a `work_relationship_onboarding_cases`, `resolvePayrollParticipationWindowsForMembers` con degraded fallbacks. 29 tests acumulado.
+- **Slice 3** (`10eec239`): projected payroll integration behind flag — `isPayrollParticipationWindowEnabled()` default OFF; `projectPayrollForPeriod()` compone `finalFactor = participationFactor × actualToDateFactor` per-member cuando flag ON; defensive `maybeResolveParticipationWindows` degrada a legacy si resolver throw. 486/486 tests payroll verde.
+
+**V0.1 = infraestructura latente productiva safe**:
+
+- `PAYROLL_PARTICIPATION_WINDOW_ENABLED` default OFF en cualquier env → comportamiento bit-for-bit idéntico al legacy.
+- Resolver es pure function + bulk + server-only; cero invocación productiva todavía.
+- Defense in depth de 4 capas (server-only boundary, TASK-890 throw → warning per member, TASK-893 throw → captureWithDomain + null + fall-back legacy, member missing → factor 1 fallback).
+- 6 tests legacy preservados intactos (proof of bit-for-bit invariance under flag OFF).
+- Maria Camila Hoyos + Felipe Zurita real fixtures válidos: ambos members tienen `effective_from=2026-05-13` en PG real.
+
+## Expert audit pre-Slice 4 (this session, 2026-05-16)
+
+Dos lentes invocados sobre V0.1 surface ANTES de avanzar a Slice 4:
+
+- `greenhouse-payroll-auditor` — review legal/payroll structural integrity de Slices 1-3.
+- `greenhouse-finance-accounting-operator` — downstream blast cross-domain (payment_obligations, cost attribution, ICO, P&L, finiquito, FX) cuando flag flippee ON eventualmente.
+
+**Veredicto convergente**: V0.1 está bien diseñado y SAFE. **Slice 4 tiene 5 blockers canonicos convergentes** + 8 warnings + 5 open questions con HR/Finance/Legal.
+
+## 5 BLOCKERS canonicos para Slice 4 (must fix before flag-ON productivo)
+
+Documentados en ADR Delta 2026-05-16 sección "5 BLOCKERS canónicos para Slice 4":
+
+1. **BL-1** — Recomputar `calculateChileDeductions` desde bruto prorrateado en lugar de escalar output `prorateEntry`. Gratificación legal Art 50 CT cap mensual + asignaciones no imponibles colación/movilización rompen el rescale lineal.
+2. **BL-2** — Slice 4 DEBE integrar `calculatePayroll()` mandatory (no diferir). ADR hard rule: "NEVER fixear projection sin fixear official".
+3. **BL-3** — Flag dependency TASK-893→TASK-890 declarada pero NO enforced en código del resolver. Si TASK-890 OFF, fallback legacy silente produce `full_period` para Maria-like (worst failure mode "partial correctness").
+4. **BL-4** — Cross-spec invariant TASK-862/863 ↔ TASK-893: si `final-settlement/overlap-ledger.ts` consume `payroll_entries.gross_total` directo, doble-prorrateo de base imponible → finiquito subdeclarado → risk legal Art 162 CT.
+5. **BL-5** — `reopened` permite recompute silente bajo flag ON sin capability gate. Slice 4 debe shippear Opción B mínima (block reopened recompute bajo flag ON + canonical error `period_reopened_under_legacy_no_recompute`). Capability `force_recompute` Opción A queda V1.1.
+
+## Reality correction post-audit (importante)
+
+Spec previa de TASK-893 declaraba "closed periods" como `status IN ('exported','approved')`. Eso **contradice la convención canónica del repo** (`canRecalculatePayrollPeriod` bloquea solo `exported`). `approved` permite recompute por design (path canónico hacia `reopened` para correcciones auditadas, TASK-410).
+
+ADR corregido 2026-05-16: el "no_recompute_closed_periods" invariant se cumple via `canRecalculatePayrollPeriod` existente. Slice 4 reusa el helper, no introduce nuevo guard duplicado. El risk REAL es BL-5 (reopened bajo flag ON), no `approved`.
+
+## Plan próximas sesiones
+
+| Sesión | Scope | Pre-requisito | Output |
+| --- | --- | --- | --- |
+| **Sesión 1 (ESTA — cierre)** | V0.1 SHIPPED + ADR Delta + Handoff cierre | Auditor + finance ya hechos | Closing commits + push |
+| **Sesión 2 (Slice 4)** | Re-invocar auditor + finance con fixtures Felipe + Maria + CL-indefinido synthetic. Si verde → integrar calculatePayroll + recompute deductions + flag-dependency enforcement + reopened guard + cross-spec finiquito audit. Si rojo en blockers → escalar a HR/Finance/Legal. | 5 blockers + 5 Open Qs cerrados con HR/Finance/Legal signoff documentado | Write path integrated, flag OFF, V0.2 latente |
+| **Sesión 3 (Slice 5+6)** | 3 reliability signals + buildPayrollParticipationWindowSignals + getReliabilityOverview wiring + docs/manuales/CLAUDE.md hard rules + changelog | Slice 4 SHIPPED | TASK-893 V1 complete |
+
+## NO mutate hasta steady state
+
+- Felipe Zurita real (`e603fade-...`): NO mutate operativamente. Member usado solo como fixture en tests + auditor invocation.
+- Maria Camila Hoyos real (`d1a72374-...`): NO mutate operativamente. Recovery espera Slice 4 completo + signoff HR.
+- `PAYROLL_PARTICIPATION_WINDOW_ENABLED`: NO se flippea ON en ningún env hasta cerrar 5 blockers + 5 Open Qs.
+
+## Status
+
+- **TASK-893**: in-progress. Slices 1-3 SHIPPED, Slice 4 scope expandido documentado.
+- **CLAUDE.md hard rules**: no lift hasta Slice 6 cierre. Spec actual contiene los hard rules canonicos.
+- **changelog.md**: no entry hasta TASK-893 V1 complete (V0.1 es infraestructura latente, sin visible behavior change).
 
 ---
 

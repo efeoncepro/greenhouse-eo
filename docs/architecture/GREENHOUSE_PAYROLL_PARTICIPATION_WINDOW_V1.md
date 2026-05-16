@@ -334,15 +334,64 @@ The flag flip changes payroll amounts for mid-period entry/exit cases. Six downs
 | `client_economics` materializer + ICO motor | Globe client KPIs, ICO scorecards | ICO economics shift for clients with mid-month-entry staff | No additional mitigation; signal cascade catches anomaly |
 | Final settlement (TASK-862/863) | Finiquito calculation, document render, ratification | Same-month entry+exit case bases legales change | Validate with `greenhouse-payroll-auditor` BEFORE Slice 4 ships; cross-spec invariant lift to `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` if needed |
 
-### No-recompute-silente invariant
+### No-recompute-silente invariant (corregido 2026-05-16 post payroll + finance audit V0.1)
 
-Periods already exported (`payroll_periods.status IN ('exported','approved')` or equivalent terminal) MUST preserve legacy semantic. Recompute on a closed period requires:
+**Reality check**: el helper canónico `canRecalculatePayrollPeriod(status)` en
+`src/lib/payroll/period-lifecycle.ts:5` ya define la semántica del repo:
 
-- Capability `payroll.period.force_recompute` (NEW V1.1; reserved EFEONCE_ADMIN + FINANCE_ADMIN).
-- Reason >= 20 chars persisted in audit row.
+```ts
+export const isPayrollPeriodFinalized = (status: PeriodStatus) => status === 'exported'
+export const canRecalculatePayrollPeriod = (status: PeriodStatus) => !isPayrollPeriodFinalized(status)
+```
+
+Solo `exported` es terminal. Los estados `draft`, `calculated`, `approved`,
+`reopened` PERMITEN recompute. La spec previa de TASK-893 declaraba "closed
+periods" como `status IN ('exported', 'approved')` — eso CONTRADICE la
+convención canónica del repo. Corrección efectiva 2026-05-16:
+
+- El "no_recompute_closed_periods" invariant **se cumple via el helper
+  existente** `canRecalculatePayrollPeriod`. Slice 4 NO agrega guard nuevo —
+  respeta el helper.
+- `reopened` ES un path canónico de recompute auditado (TASK-410). La
+  transición `exported → reopened` es opt-in del operador con audit trail
+  preservado en v1 rows de `payroll_entries`.
+
+**Bug class adicional descubierto en finance audit (2026-05-16, BL-5)**:
+cuando `PAYROLL_PARTICIPATION_WINDOW_ENABLED` se flippea ON en producción,
+cualquier período previamente `exported` bajo legacy puede transicionar a
+`reopened` y un recompute pasa silente al payroll oficial v2 con la NUEVA
+semántica de participación mientras v1 quedó con la legacy. Eso produce
+asientos contradictorios:
+
+- DTE/F29 retención SII honorarios ya presentado bajo v1
+- Cotización Previred ya pagada bajo v1
+- Nota de crédito / nueva boleta sobre v2 con monto distinto
+
+**Solución canónica V1 (mandatory pre-Slice 4 flag flip productivo)**:
+
+Opción A (preferida) — **Capability + reason gate**:
+
+- Nueva capability `payroll.period.force_recompute` (EFEONCE_ADMIN +
+  FINANCE_ADMIN solo).
+- Reason >= 20 chars persistido en audit row.
 - Explicit operator action via admin endpoint; never automatic.
+- Aplica cuando: `isPayrollPeriodReopened(status) === true` AND el período
+  fue originalmente `exported` bajo legacy flag.
 
-Until the capability lands (V1.1), `calculatePayroll()` MUST refuse to overwrite entries on closed periods and surface a `period_closed_no_recompute` error code. Flag-on does not retroactively change past months.
+Opción B (fallback simpler) — **Block reopened recompute bajo flag ON**:
+
+- `canRecalculatePayrollPeriod` extendido: si flag ON AND status='reopened'
+  AND el período fue exported pre-flag-flip, return false + canonical error
+  `period_reopened_under_legacy_no_recompute`.
+- Operador puede:
+  - O re-exportar legacy primero, después flippear flag.
+  - O esperar al próximo período (no retroactivo).
+
+V1.0 ships con **Opción B** como guard mínimo. Capability `force_recompute`
+(Opción A) emerge como follow-up V1.1 cuando HR/Finance demanden el path
+de recompute auditado.
+
+Flag-on **NO** retroactiva past months bajo ningún path.
 
 ## Consequences
 
@@ -460,4 +509,72 @@ Removing any of the three creates a blind spot. The first two are required for V
 Six downstream systems consume payroll entries or their derivatives. The flag flip propagates a delta to all six. The mitigation is documenting them explicitly (see "Downstream Consumers" above) and the `no_recompute_closed_periods` invariant.
 
 The highest-risk consumer is **final settlement (TASK-862/863)**: a same-month entry+exit case calculates indemnización + finiquito over a partial-month base. The Chilean legal framework treats this case explicitly (Art. 159 CT — voluntary resignation requires 30-day notice prorated). Whether the participation window primitive applies to finiquito calculation or finiquito has its own dedicated logic MUST be validated with `greenhouse-payroll-auditor` BEFORE Slice 4 ships. This is an Open Question, not a known answer.
+
+## Delta 2026-05-16 — V0.1 SHIPPED + expert audit synthesis pre-Slice 4
+
+### V0.1 Status (Slices 1-3 SHIPPED a develop sin branch dedicada)
+
+- **Slice 1** (`5eb44c47`) — Resolver foundation: types, pure-function policy, 19 tests verde.
+- **Slice 2** (`84f4f00e`) — Bulk query + TASK-890 composition + degraded fallbacks: 29 tests acumulado.
+- **Slice 3** (`10eec239`) — Projection integration behind flag `PAYROLL_PARTICIPATION_WINDOW_ENABLED` (default OFF): 486/486 tests payroll verde, flag OFF preserva bit-for-bit legacy.
+
+V0.1 = infraestructura **latente**. Cero impacto productivo. Operadores pueden planificar staging shadow compare en paralelo sin presión.
+
+### Pre-Slice 4 expert audit (2026-05-16, in-session)
+
+Dos lentes expertos invocados sobre V0.1 surface:
+
+- `greenhouse-payroll-auditor` — review legal/payroll structural integrity
+- `greenhouse-finance-accounting-operator` — downstream blast cross-domain (payment_obligations, cost attribution, ICO, P&L, finiquito, FX)
+
+Convergencia: **V0.1 está bien diseñado y safe** (pure function, defensive degradation, embedded TASK-890, flag OFF). PERO Slice 4 tiene **5 blockers convergentes** que ambos lentes flagearon. Lista canónica abajo.
+
+### 5 BLOCKERS canónicos para Slice 4 (must fix before flag flip productivo)
+
+| # | Issue | Lente que lo flageó | Fix canónico |
+| --- | --- | --- | --- |
+| BL-1 | `prorateEntry` (project-payroll.ts:80-124) escala linealmente `chileGratificacionLegalAmount`, `chileColacionAmount`, `chileMovilizacionAmount`, `chileTotalDeductions`. Gratificación legal Art 50 CT tiene cap mensual (4.75 × IMM ÷ 12 ≈ $209k 2026); rescale post-hoc double-prorratea cuando la row ya está en el cap. Colación/movilización son asignaciones no imponibles fijas — la jurisprudencia NO las prorratea automáticamente por días no trabajados al inicio del contrato. | payroll | Slice 4 debe **recomputar `calculateChileDeductions` desde bruto prorrateado**, NO escalar el output. Patrón canónico = el que la ADR §"Régimen coverage" ya promete pero el código no implementa todavía. Aplica a chile_dependent + honorarios (recompute `siiRetentionAmount` desde bruto prorrateado para traceability). |
+| BL-2 | ADR §"Integration Points" hard rule: "NEVER fixear projection sin fixear official". Slice 3 sólo tocó projected. Si Slice 4 flippea flag sin integrar `calculatePayroll`, oficial = full-month + projected = prorated → exactamente el failure mode que la ADR rechaza. | payroll | Slice 4 scope **incluye obligatoriamente** la integración en `src/lib/payroll/calculate-payroll.ts:412`. No diferible. |
+| BL-3 | Flag dependency TASK-893 → TASK-890 declarada en ADR §"Flag Dependency" y en `flag.ts` JSDoc, pero NO enforced en código del resolver. Si TASK-890 está OFF, `resolveExitEligibilityForMembers` retorna fallback legacy silente → resolver compose con `exitEligibility=null` y produce `full_period` para Maria-like → "partial correctness, worst failure mode". | payroll | En `resolver.ts` antes del try/catch, leer `isPayrollExitEligibilityWindowEnabled()` y si OFF emit warning `exit_resolver_disabled` por cada member con exit case activo en período. |
+| BL-4 | Cross-spec invariant TASK-862/863 ↔ TASK-893: si `final-settlement/overlap-ledger.ts:59-67` consume `payroll_entries.gross_total` directo para base imponible del finiquito, el flag ON produce **doble-prorrateo** (base ya prorrateada por participation + lógica finiquito Art 159 CT proporcional sobre esa base) → finiquito subdeclarado → risk legal Art 162 CT. | finance | Slice 4 debe (a) auditar `overlap-ledger.ts` y helpers de finiquito; (b) si consume `payroll_entries`, switch a leer `compensation_versions.base_amount` (sueldo nominal full-month) para la base indemnizatoria; (c) cross-spec invariant documentado en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` Delta 2026-05-16. |
+| BL-5 | `canRecalculatePayrollPeriod` permite recompute en `reopened`. Bajo flag ON, un período `exported → reopened` post-flag-flip recompute v2 con nueva semántica mientras v1 quedó legacy → DTE/F29/Previred asientos contradictorios. | finance | Slice 4 debe shippear **Opción B** mínima: extender `canRecalculatePayrollPeriod` o agregar guard explícito al inicio de `calculatePayroll` que bloquee `reopened` recompute cuando flag ON AND período exportado pre-flag-flip. Canonical error code `period_reopened_under_legacy_no_recompute`. Capability `force_recompute` (Opción A) queda follow-up V1.1. |
+
+### 8 WARNINGS no-blocking (Slice 4 o V1.1)
+
+- W-1 (payroll): `compensation_version_overlap` warning declarado en types pero NO emitido por resolver. SQL `query.ts:31-41` usa `DISTINCT ON` y descarta versiones overlap silentes. Detectar `COUNT(*) > 1` y propagar warning.
+- W-2 (payroll): IMM piso legal — la base prorrateada puede caer bajo IMM proporcional. Art 44 CT no exige enforcement de piso por período parcial, pero UI debe mostrar nota "prorrateado por inicio el día N", no aparentar sueldo bajo IMM.
+- W-3 (payroll): `source_date_disagreement` threshold 7 días — razonable V1. Re-evaluar con HR cuando emerja drift real en signal.
+- W-4 (finance): Outbox events `payroll_entry.materialized/.reliquidated` no versionan participation factor source. Agregar `participationFactorSource: 'legacy_scalar' | 'task_893_window'` en metadata cuando Slice 4 ship.
+- W-5 (finance): Revenue/cost matching asymmetry — `commercial_cost_attribution_v2` lee `payroll_entries.gross_total` JOIN-eado con `client_team_assignments.fte_allocation`. Cliente factura full-month FTE; cost prorrateado → margen artificial el mes de joiner. Documentar como "ramp-up effect" en surfaces ICO.
+- W-6 (finance): SII honorarios DTE 41 ↔ F29 retención drift potencial. Si la boleta del boletista se emite por monto full-month pero Greenhouse retiene 14.5% sobre monto prorrateado → cross-validation SII falla. Validar con tax accountant antes flag-ON.
+- W-7 (finance): FX rate at-period-end (preparación TASK-894) — para `effective_from` mid-month USD, rate debe ser del día del `eligibleFrom`, NO del period_end.
+- W-8 (payroll): aguinaldos / bono navideño — si están en `fixedBonusAmount` o `bonusOtherAmount`, ¿se prorratean con `participationFactor`? Costumbre chilena = proporcional a meses completos del año, NO al window mensual. Confirmar con HR antes Slice 4.
+
+### 5 OPEN QUESTIONS para Slice 4 (HR + Finance + Legal input mandatory)
+
+- Q-1: Finiquito base imponible source — `compensation_versions.base_amount` (full-month nominal) vs `payroll_entries.gross_total` (devengado prorrateado)? Decisión legal Art 172 CT (última remuneración promedio últimos 3 meses). **Sugerencia**: `base_amount` para base indemnizatoria; participation aplica solo al pay del último mes.
+- Q-2: Gratificación legal Art 50 CT en mes parcial — Dictamen DT 2937/050 (2002) sostiene "por mes completo trabajado". Código actual escala linealmente → sobrepaga joiners mid-month. **Decisión**: `0` en entry month vs `linear prorate` vs `fraction of month`?
+- Q-3: Vacaciones proporcionales Art 67 CT (1.25 días por mes trabajado) en finiquito — ¿se recalculan con participación cuando joiner ingresa mid-month? `1.25 × (10/22)` días devengados primer mes vs `1.25` full?
+- Q-4: Same-month entry+exit contrato `indefinido` Chile — corresponde finiquito formal? Art 159 CT requiere 30 días aviso. Si entrada día 5 + renuncia día 20 → no aplica finiquito formal pero hay derecho a remuneración proporcional + feriado proporcional 1/12. ¿Participation window cubre? Signal `same_month_entry_exit_chile_dependent` para escalación manual?
+- Q-5: Maria-like `international_deel` partial — ADR dice "Greenhouse projecta, Deel reconcilia final". ¿Projected muestra `$0` (Deel paga todo) o `$530 × 14/22 ≈ $337` (prorrate Deel también)? Semantic correcta para projected international_deel parcial?
+
+### Slice 4 scope expandido (canónico post-audit)
+
+**MANDATORY for Slice 4 PR**:
+
+1. Integración en `calculatePayroll()` (BL-2) — projected + official misma primitive.
+2. Recompute `calculateChileDeductions` desde bruto prorrateado (BL-1) — reemplazar `prorateEntry` rescale post-hoc por recompute correcto en path Slice 4.
+3. Enforcement flag dependency TASK-893 → TASK-890 en `resolver.ts` (BL-3) — emit warning `exit_resolver_disabled` cuando TASK-890 OFF.
+4. Cross-spec finiquito invariant (BL-4) — auditar `final-settlement` consumers, switch a `compensation_versions.base_amount` para base indemnizatoria, Delta en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md`.
+5. Reopened recompute guard (BL-5) — Opción B canonical, error code `period_reopened_under_legacy_no_recompute`.
+
+**Pre-Slice 4 first action**: re-invocar `greenhouse-payroll-auditor` Y `greenhouse-finance-accounting-operator` con fixtures concretos (Felipe real + Maria real + Chile-dependent-indefinido synthetic mid-month) para auditar números contra los 4 regímenes. Cierre con Q-1..Q-5 resueltas + signoff HR/Finance/Legal documentado en Handoff.
+
+### Status update
+
+- TASK-893 **stays in-progress** después de Slices 1-3 SHIPPED.
+- ADR + spec + audit verdicts documentados.
+- Próxima sesión: Slice 4 con scope expandido + auditor invocation primero.
+- Slices 5-6 en sesiones separadas (signals additive + docs/rollout).
+- `PAYROLL_PARTICIPATION_WINDOW_ENABLED` **NO se flippea ON** en ningún env hasta cerrar los 5 blockers + 5 OQs.
 

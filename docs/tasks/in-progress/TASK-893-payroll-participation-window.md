@@ -195,14 +195,31 @@ Reglas obligatorias:
 - Migrar tests existentes que mockean `prorationFactor: 22` global ANTES del refactor (caso `project-payroll.test.ts:28`).
 - Agregar shadow compare logged sin romper response — emite `captureWithDomain('payroll', { source: 'participation_window.shadow_compare', tags: { period, legacy_total, new_total, delta_pct } })` cuando flag=false.
 
-### Slice 4 — Official Calculation Integration
+### Slice 4 — Official Calculation Integration (scope EXPANDIDO post-audit 2026-05-16)
 
-- Integrar la misma primitive en `calculatePayroll()`.
+**Pre-Slice 4 audit done (2026-05-16)**: `greenhouse-payroll-auditor` + `greenhouse-finance-accounting-operator` revisaron V0.1. Convergencia: V0.1 está SAFE (flag OFF), pero Slice 4 tiene **5 blockers canonicos convergentes** documentados en ADR Delta 2026-05-16 sección "5 BLOCKERS canónicos para Slice 4". Resumen:
+
+- **BL-1** Recomputar `calculateChileDeductions` desde bruto prorrateado en lugar de escalar output `prorateEntry`. Gratificación legal Art 50 cap mensual + asignaciones no imponibles colación/movilización rompen el rescale lineal.
+- **BL-2** Slice 4 DEBE integrar `calculatePayroll()` (no diferir). ADR hard rule: NEVER fixear projection sin fixear official.
+- **BL-3** Flag dependency TASK-893→TASK-890 enforce en `resolver.ts`: emit warning `exit_resolver_disabled` cuando TASK-890 OFF.
+- **BL-4** Cross-spec finiquito (TASK-862/863): auditar `final-settlement/overlap-ledger.ts`; si consume `payroll_entries.gross_total`, switch a `compensation_versions.base_amount` para base indemnizatoria + Delta en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md`.
+- **BL-5** `reopened` recompute guard: bloquear con canonical error `period_reopened_under_legacy_no_recompute` cuando flag ON AND período exportado pre-flag-flip. Capability `force_recompute` (Opción A) queda V1.1; Slice 4 ships Opción B mínima.
+
+**Important reality correction post-audit**: `canRecalculatePayrollPeriod` canonical helper bloquea solo `exported` (NO `approved`). Estados `draft`, `calculated`, `approved`, `reopened` permiten recompute por design — `reopened` es path auditado TASK-410. La spec previa decía `IN ('exported','approved')` lo cual es incorrecto vs convención repo. Corrigido en ADR Delta 2026-05-16.
+
+**Slice 4 scope mandatory (post-audit)**:
+
+- Integrar la misma primitive en `calculatePayroll()` (BL-2).
 - Aplicar `prorationFactor` per-member tambien para regimenes honorarios + international_deel + international_internal (NO solo chile_dependent).
+- **Recomputar deductions Chile desde bruto prorrateado (BL-1)** — reemplazar `prorateEntry` rescale post-hoc por recompute correcto en Slice 4 path. Aplica para chileTotalDeductions + chileGratificacionLegalAmount + chileColacionAmount + chileMovilizacionAmount + siiRetentionAmount (honorarios).
 - Persistir `workingDaysInPeriod`, `daysPresent`, `adjusted*` SIN contaminar attendance con entry proration. Hard rule: participation ≠ attendance.
 - Asegurar que `payroll_entries` reflejen montos prorrateados pero no inventen ausencias.
-- Implementar guard `no_recompute_closed_periods`: si periodo está `status IN ('exported','approved')`, refuse to overwrite + surface error code `period_closed_no_recompute`. Capability `payroll.period.force_recompute` queda V1.1+.
-- Validar con `greenhouse-payroll-auditor` que finiquito calculation (TASK-862/863) maneja same-month entry+exit correctamente ANTES de mergear Slice 4.
+- **Reutilizar guard existente `canRecalculatePayrollPeriod` para no-recompute exported** (corrección post-audit; NO crear nuevo guard duplicado).
+- **Reopened recompute guard adicional bajo flag ON (BL-5)**: bloquear cuando período fue exportado pre-flag-flip + canonical error code `period_reopened_under_legacy_no_recompute`.
+- **Flag dependency enforcement (BL-3)** en `resolver.ts`.
+- **Cross-spec finiquito audit (BL-4)** + Delta en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` si emergen cambios.
+- Pre-merge: re-invocar `greenhouse-payroll-auditor` Y `greenhouse-finance-accounting-operator` con fixtures concretos (Felipe + Maria + Chile-dependent-indefinido synthetic mid-month) para auditoría de números reales.
+- Cerrar 5 Open Questions del ADR Delta 2026-05-16 (Q-1..Q-5) con HR/Finance/Legal signoff antes flag-ON producción.
 - Mantener rollback instant via flag=false.
 
 ### Slice 5 — Reliability Signals + Operator Evidence
