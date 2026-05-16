@@ -2323,6 +2323,23 @@ export interface GreenhouseCoreMemberLanguages {
   visibility: Generated<string>;
 }
 
+export interface GreenhouseCoreMemberPayrollForceRecomputeAuditLog {
+  actor_email: string | null;
+  actor_user_id: string;
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  effective_at: Generated<Timestamp>;
+  flag_state_snapshot: Generated<Json>;
+  ip_address: string | null;
+  metadata_json: Generated<Json>;
+  reason: string;
+  target_entry_id: string | null;
+  target_kind: string;
+  target_member_id: string | null;
+  target_period_id: string | null;
+  user_agent: string | null;
+}
+
 export interface GreenhouseCoreMemberRoleTitleAuditLog {
   action: string;
   actor_email: string | null;
@@ -9124,6 +9141,7 @@ export interface DB {
   "greenhouse_core.member_endorsements": GreenhouseCoreMemberEndorsements;
   "greenhouse_core.member_evidence": GreenhouseCoreMemberEvidence;
   "greenhouse_core.member_languages": GreenhouseCoreMemberLanguages;
+  "greenhouse_core.member_payroll_force_recompute_audit_log": GreenhouseCoreMemberPayrollForceRecomputeAuditLog;
   "greenhouse_core.member_role_title_audit_log": GreenhouseCoreMemberRoleTitleAuditLog;
   "greenhouse_core.member_skills": GreenhouseCoreMemberSkills;
   "greenhouse_core.member_tools": GreenhouseCoreMemberTools;

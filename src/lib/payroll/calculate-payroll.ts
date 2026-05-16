@@ -422,11 +422,29 @@ export const buildPayrollEntry = async ({
 export const calculatePayroll = async ({
   periodId,
   actorIdentifier,
-  projectionContext
+  projectionContext,
+  forceRecomputeReason
 }: {
   periodId: string
   actorIdentifier: string | null
   projectionContext?: PayrollProjectionContext | null
+  /**
+   * TASK-893 V1.1 / TASK-895 — Escape hatch para el BL-5 reopened guard.
+   *
+   * Cuando `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` AND el periodo esta
+   * en `reopened`, el guard canonical BL-5 bloquea recompute por default
+   * para evitar drift contable contra Previred/SII ya presentado. Cuando
+   * el operador necesita forzar legitimamente (e.g. periodo exportado
+   * pre-flag-flip + error en boleta detectado post-flag-flip), pasa
+   * `forceRecomputeReason` con `>= 20 chars` AND el caller (admin endpoint)
+   * VALIDO la capability `payroll.period.force_recompute`.
+   *
+   * El helper NO valida la capability — eso pasa upstream en el endpoint
+   * (`/api/admin/hr/payroll/periods/[periodId]/force-recompute`). El helper
+   * solo confia en que cuando viene `forceRecomputeReason` valido, la
+   * capability ya fue chequeada.
+   */
+  forceRecomputeReason?: string | null
 }): Promise<PayrollCalculationResult> => {
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
@@ -464,11 +482,22 @@ export const calculatePayroll = async ({
    * + FINANCE_ADMIN, reason >= 20 chars, audit row) permite override explícito.
    */
   if (isReopenedRecomputeBlockedByParticipationWindow(period.status, isPayrollParticipationWindowEnabled())) {
-    throw new PayrollValidationError(
-      'Reopened payroll period cannot be recalculated under participation window. Cancel reopen + re-export, or wait for V1.1 force_recompute capability.',
-      409,
-      { code: 'period_reopened_under_legacy_no_recompute', periodId, status: period.status }
-    )
+    /*
+     * TASK-893 V1.1 / TASK-895 — Escape hatch via capability
+     * `payroll.period.force_recompute`. El caller (admin endpoint) DEBE
+     * haber validado la capability + persistido audit row ANTES de pasar
+     * `forceRecomputeReason >= 20 chars` aqui. Sin reason explicita, el
+     * guard sigue bloqueando.
+     */
+    const reasonTrimmed = (forceRecomputeReason ?? '').trim()
+
+    if (reasonTrimmed.length < 20) {
+      throw new PayrollValidationError(
+        'Reopened payroll period cannot be recalculated under participation window. Use admin endpoint `/api/admin/hr/payroll/periods/[periodId]/force-recompute` with capability `payroll.period.force_recompute` + reason >= 20 chars.',
+        409,
+        { code: 'period_reopened_under_legacy_no_recompute', periodId, status: period.status }
+      )
+    }
   }
 
   const range = getPeriodRangeFromId(periodId)

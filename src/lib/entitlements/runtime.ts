@@ -602,6 +602,18 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = 'role'
 
+    // TASK-893 V1.1 / TASK-895 — Force recompute payroll period bajo flag
+    // PAYROLL_PARTICIPATION_WINDOW_ENABLED cuando los guards canonicos
+    // (BL-2 single-member, BL-5 reopened) bloquean recompute legitimo.
+    // Reason >= 20 chars + audit row append-only. EFEONCE_ADMIN + FINANCE_ADMIN.
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'payroll.period.force_recompute',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
+
     addEntitlement(entries, {
       module: 'finance',
       capability: 'finance.payment_instruments.update',

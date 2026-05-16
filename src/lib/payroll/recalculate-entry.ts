@@ -170,11 +170,21 @@ const validateBonusAmount = ({
 export const recalculatePayrollEntry = async ({
   entryId,
   input,
-  actorIdentifier
+  actorIdentifier,
+  forceRecomputeReason
 }: {
   entryId: string
   input: UpdatePayrollEntryInput
   actorIdentifier?: string | null
+  /**
+   * TASK-893 V1.1 / TASK-895 — Escape hatch para el BL-2 single-member bypass
+   * guard. Cuando `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true`, este helper
+   * bloquea por default porque single-member recalc no conoce el
+   * participation factor. El caller (admin endpoint) DEBE haber validado
+   * capability `payroll.period.force_recompute` + persistido audit row
+   * ANTES de pasar `forceRecomputeReason >= 20 chars`.
+   */
+  forceRecomputeReason?: string | null
 }): Promise<PayrollEntry> => {
   if (!isPayrollPostgresEnabled()) {
     await ensurePayrollInfrastructure()
@@ -228,16 +238,27 @@ export const recalculatePayrollEntry = async ({
    * is a no-op.
    */
   if (isPayrollParticipationWindowEnabled()) {
-    throw new PayrollValidationError(
-      'Single-member recalc is not supported under participation window. Use period-level recalc (calculatePayroll) or wait for V1.1 capability.',
-      409,
-      {
-        code: 'recalc_blocked_by_participation_window',
-        entryId,
-        memberId: entry.memberId,
-        periodId: entry.periodId
-      }
-    )
+    /*
+     * TASK-893 V1.1 / TASK-895 — Escape hatch via capability
+     * `payroll.period.force_recompute`. El caller (admin endpoint) DEBE
+     * haber validado la capability + persistido audit row ANTES de pasar
+     * `forceRecomputeReason >= 20 chars` aqui. Sin reason explicita, el
+     * guard sigue bloqueando.
+     */
+    const reasonTrimmed = (forceRecomputeReason ?? '').trim()
+
+    if (reasonTrimmed.length < 20) {
+      throw new PayrollValidationError(
+        'Single-member recalc is not supported under participation window. Use period-level recalc (calculatePayroll) or admin endpoint `/api/admin/hr/payroll/periods/[periodId]/force-recompute` with capability `payroll.period.force_recompute` + reason >= 20 chars.',
+        409,
+        {
+          code: 'recalc_blocked_by_participation_window',
+          entryId,
+          memberId: entry.memberId,
+          periodId: entry.periodId
+        }
+      )
+    }
   }
 
   const {

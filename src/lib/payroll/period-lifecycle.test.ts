@@ -174,5 +174,16 @@ describe('payroll period lifecycle', () => {
     it('preserves legacy TASK-410 reopened recompute path bit-for-bit (flag OFF default)', () => {
       expect(isReopenedRecomputeBlockedByParticipationWindow('reopened', false)).toBe(false)
     })
+
+    /*
+     * TASK-895 escape hatch — el predicate sigue devolviendo true porque el
+     * escape hatch vive UPSTREAM en `calculatePayroll` (acepta
+     * forceRecomputeReason >= 20 chars cuando la capability ya fue validada
+     * por el admin endpoint). Este test pinea que el predicate canonical NO
+     * conoce del escape hatch — es responsabilidad del caller.
+     */
+    it('does NOT know about force_recompute escape hatch (predicate stays pure)', () => {
+      expect(isReopenedRecomputeBlockedByParticipationWindow('reopened', true)).toBe(true)
+    })
   })
 })
