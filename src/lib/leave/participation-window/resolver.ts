@@ -69,7 +69,8 @@ import type {
  */
 export const resolveLeaveAccrualWindowsForMembers = async (
   memberIds: ReadonlyArray<string>,
-  year: number
+  year: number,
+  options: { asOfDate?: string } = {}
 ): Promise<Map<string, LeaveAccrualEligibilityWindow>> => {
   if (memberIds.length === 0) {
     return new Map()
@@ -163,7 +164,8 @@ export const resolveLeaveAccrualWindowsForMembers = async (
         year,
         facts,
         exitEligibility: exitResolverFailed ? null : exit,
-        warnings
+        warnings,
+        asOfDate: options.asOfDate
       })
     )
   }
@@ -177,9 +179,10 @@ export const resolveLeaveAccrualWindowsForMembers = async (
  */
 export const resolveLeaveAccrualWindowForMember = async (
   memberId: string,
-  year: number
+  year: number,
+  options: { asOfDate?: string } = {}
 ): Promise<LeaveAccrualEligibilityWindow> => {
-  const map = await resolveLeaveAccrualWindowsForMembers([memberId], year)
+  const map = await resolveLeaveAccrualWindowsForMembers([memberId], year, options)
   const window = map.get(memberId)
 
   if (!window) {

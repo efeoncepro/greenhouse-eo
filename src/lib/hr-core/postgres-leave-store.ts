@@ -46,6 +46,11 @@ import {
   roundLeaveDays
 } from '@/lib/hr-core/leave-domain'
 import type { LeaveDayPeriod, LeavePayrollImpactPeriod, LeavePolicy } from '@/lib/hr-core/leave-domain'
+import {
+  isLeaveAccrualParticipationAwareEnabled,
+  resolveLeaveAccrualWindowForMember
+} from '@/lib/leave/participation-window'
+import type { LeaveAccrualEligibilityWindow } from '@/lib/leave/participation-window'
 import { canPerformLeaveReviewAction, getLeaveApprovalStageCode } from '@/lib/hr-core/leave-review-policy'
 import { getNextApprovalAuthority, resolveInitialApprovalAuthority } from '@/lib/approval-authority/resolver'
 import {
@@ -1042,6 +1047,59 @@ const buildPolicyExplain = ({
   allowNegativeBalance: resolution.policy.allowNegativeBalance
 })
 
+/**
+ * TASK-895 V1.1a — Participation-aware accrual integration.
+ *
+ * Composes the canonical `LeaveAccrualEligibilityWindow` (year-scope, owned
+ * by the Leave domain) with the canonical accrual formula
+ * `(annualDays * eligibleDays) / firstServiceCycleDays`. Preserves the legacy
+ * `calculateAccruedLeaveAllowanceDays` denominator semantic exactly when
+ * `policy === 'full_year_dependent'` with no transitions — guaranteeing
+ * bit-for-bit parity when there's no contractor↔dependent drift to correct.
+ *
+ * Pre-conditions for the canonical override (ALL must hold; else fallback to
+ * legacy):
+ *
+ * 1. `isLeaveAccrualParticipationAwareEnabled()` returns true (enforces the
+ *    canonical flag dependency triple: TASK-895 + TASK-893 + TASK-890).
+ * 2. `policy.accrualType === 'monthly_accrual'` (the path TASK-895 covers —
+ *    feriado legal CL Art 67 CT). Other accrual types (annual_fixed,
+ *    unlimited, custom) keep legacy behavior.
+ * 3. `member.pay_regime === 'chile'` (Art 67 CT applies to dependent CL only).
+ * 4. The resolver returns `degradedMode === false`. Any degradation
+ *    (PG fail, TASK-890 fail) falls back to legacy.
+ *
+ * On any condition failing, the function returns `null` and the caller uses
+ * the legacy helper bit-for-bit. This is the canonical "safety floor": legacy
+ * CL minimum is preserved on every fallback path.
+ */
+const tryComputeParticipationAwareAllowanceDays = async ({
+  member,
+  policy,
+  year,
+  asOfDate
+}: {
+  member: PostgresMemberResolverRow
+  policy: LeavePolicy
+  year: number
+  asOfDate: string
+}): Promise<{ allowanceDays: number; window: LeaveAccrualEligibilityWindow } | null> => {
+  if (!isLeaveAccrualParticipationAwareEnabled()) return null
+  if (policy.accrualType !== 'monthly_accrual') return null
+  if (member.pay_regime !== 'chile') return null
+
+  const window = await resolveLeaveAccrualWindowForMember(member.member_id, year, { asOfDate })
+
+  if (window.degradedMode) return null
+  if (window.firstServiceCycleDays <= 0) return null
+
+  const allowanceDays = roundLeaveDays(
+    (policy.annualDays * window.eligibleDays) / window.firstServiceCycleDays
+  )
+
+  return { allowanceDays, window }
+}
+
 const computeBalanceSeedForYear = async ({
   member,
   leaveType,
@@ -1074,14 +1132,30 @@ const computeBalanceSeedForYear = async ({
   const currentAsOfDate =
     year === todayYear ? todayDate : `${year}-12-31`
 
-  const previousYearAllowanceDays = previousBalance
-    ? calculateAccruedLeaveAllowanceDays({
-      annualDays: policy.annualDays,
-      accrualType: policy.accrualType,
-      hireDate: toPgDateString(member.hire_date),
+  /*
+   * TASK-895 V1.1a — Previous-year accrual (retroactive carryover base).
+   * Flag-gated: when participation-aware enabled, compose the canonical
+   * year-scope window. Otherwise fallback to legacy bit-for-bit.
+   */
+  const previousYearParticipationAware = previousBalance
+    ? await tryComputeParticipationAwareAllowanceDays({
+      member,
+      policy,
       year: year - 1,
       asOfDate: `${year - 1}-12-31`
     })
+    : null
+
+  const previousYearAllowanceDays = previousBalance
+    ? previousYearParticipationAware
+      ? previousYearParticipationAware.allowanceDays
+      : calculateAccruedLeaveAllowanceDays({
+        annualDays: policy.annualDays,
+        accrualType: policy.accrualType,
+        hireDate: toPgDateString(member.hire_date),
+        year: year - 1,
+        asOfDate: `${year - 1}-12-31`
+      })
     : 0
 
   const previousAvailable = previousBalance
@@ -1099,13 +1173,28 @@ const computeBalanceSeedForYear = async ({
   const accumulatedPeriods = previousAvailable > 0 ? previousAccumulatedPeriods + 1 : 0
   const priorWorkYears = toNullableNumber(member.prior_work_years) ?? 0
 
-  const allowanceDays = calculateAccruedLeaveAllowanceDays({
-    annualDays: policy.annualDays,
-    accrualType: policy.accrualType,
-    hireDate: toPgDateString(member.hire_date),
+  /*
+   * TASK-895 V1.1a — Current-year accrual.
+   * Flag-gated: when participation-aware enabled and pre-conditions hold,
+   * use the canonical year-scope eligibility window. Else fallback to legacy
+   * bit-for-bit (preserves CL legal floor under flag OFF + degraded paths).
+   */
+  const currentYearParticipationAware = await tryComputeParticipationAwareAllowanceDays({
+    member,
+    policy,
     year,
     asOfDate: currentAsOfDate
   })
+
+  const allowanceDays = currentYearParticipationAware
+    ? currentYearParticipationAware.allowanceDays
+    : calculateAccruedLeaveAllowanceDays({
+      annualDays: policy.annualDays,
+      accrualType: policy.accrualType,
+      hireDate: toPgDateString(member.hire_date),
+      year,
+      asOfDate: currentAsOfDate
+    })
 
   const progressiveExtraDays =
     policy.progressiveEnabled && member.pay_regime === 'chile'

@@ -566,6 +566,88 @@ describe('deriveLeaveAccrualPolicy (TASK-895 V1.1a S1)', () => {
   })
 })
 
+describe('deriveLeaveAccrualPolicy — asOfDate clamping (legacy parity)', () => {
+  it('asOfDate in-year truncates eligibleDays to today (no anticipated accrual)', () => {
+    const result = deriveLeaveAccrualPolicy({
+      memberId: 'm1',
+      year: 2026,
+      facts: [fact({ effectiveFrom: '2025-12-01', effectiveTo: null })],
+      exitEligibility: null,
+      asOfDate: '2026-03-15'
+    })
+
+    /* 2026-01-01 to 2026-03-15 inclusive = 74 days */
+    expect(result.eligibleDays).toBe(74)
+    /* Policy is partial_dependent because eligibleDays < yearLength */
+    expect(result.policy).toBe('partial_dependent')
+  })
+
+  it('asOfDate exactly at yearEnd preserves full_year_dependent', () => {
+    const result = deriveLeaveAccrualPolicy({
+      memberId: 'm1',
+      year: 2026,
+      facts: [fact({ effectiveFrom: '2025-12-01', effectiveTo: null })],
+      exitEligibility: null,
+      asOfDate: '2026-12-31'
+    })
+
+    expect(result.eligibleDays).toBe(365)
+    expect(result.policy).toBe('full_year_dependent')
+  })
+
+  it('asOfDate omitted defaults to yearEnd (retroactive past year accrual)', () => {
+    const result = deriveLeaveAccrualPolicy({
+      memberId: 'm1',
+      year: 2025,
+      facts: [fact({ effectiveFrom: '2024-08-01', effectiveTo: null })],
+      exitEligibility: null
+    })
+
+    expect(result.eligibleDays).toBe(365)
+    expect(result.policy).toBe('full_year_dependent')
+  })
+
+  it('asOfDate out-of-year (past) collapses to yearEnd', () => {
+    const result = deriveLeaveAccrualPolicy({
+      memberId: 'm1',
+      year: 2026,
+      facts: [fact({ effectiveFrom: '2025-01-01', effectiveTo: null })],
+      exitEligibility: null,
+      asOfDate: '2025-06-15'
+    })
+
+    /* asOfDate < yearStart → fallback yearEnd → full year accrual */
+    expect(result.eligibleDays).toBe(365)
+  })
+
+  it('asOfDate combined with hired-mid-year: clamped correctly', () => {
+    const result = deriveLeaveAccrualPolicy({
+      memberId: 'm-felipe',
+      year: 2026,
+      facts: [fact({ effectiveFrom: '2026-05-13', effectiveTo: null })],
+      exitEligibility: null,
+      asOfDate: '2026-08-31'
+    })
+
+    /* Eligibility = 2026-05-13 to 2026-08-31 inclusive = 111 days */
+    expect(result.eligibleDays).toBe(111)
+    expect(result.policy).toBe('partial_dependent')
+  })
+
+  it('asOfDate before earliest qualifying effectiveFrom: zero eligibility', () => {
+    const result = deriveLeaveAccrualPolicy({
+      memberId: 'm1',
+      year: 2026,
+      facts: [fact({ effectiveFrom: '2026-09-01', effectiveTo: null })],
+      exitEligibility: null,
+      asOfDate: '2026-08-15'
+    })
+
+    expect(result.eligibleDays).toBe(0)
+    expect(result.policy).toBe('no_dependent')
+  })
+})
+
 describe('buildDegradedLeaveAccrualWindow', () => {
   it('produces canonical degraded shape with warning', () => {
     const result = buildDegradedLeaveAccrualWindow({

@@ -125,13 +125,22 @@ export const deriveLeaveAccrualPolicy = ({
   year,
   facts,
   exitEligibility,
-  warnings = []
+  warnings = [],
+  asOfDate
 }: {
   memberId: string
   year: number
   facts: ReadonlyArray<LeaveAccrualCompensationFact>
   exitEligibility: WorkforceExitPayrollEligibilityWindow | null
   warnings?: ReadonlyArray<LeaveAccrualWarning>
+  /**
+   * Optional clamp date for `eligibleDays` accrual. Mirrors the legacy
+   * `calculateAccruedLeaveAllowanceDays.asOfDate` semantic: when computing the
+   * CURRENT-year balance, we do NOT accrue future days (no anticipated
+   * vacation). When omitted, defaults to `yearEnd` (full-year accrual,
+   * appropriate for past-year retroactive balances).
+   */
+  asOfDate?: string
 }): LeaveAccrualEligibilityWindow => {
   if (!Number.isInteger(year) || year < 1900 || year > 9999) {
     return degraded(memberId, year, 'compensation_query_failed', [...warnings])
@@ -139,6 +148,14 @@ export const deriveLeaveAccrualPolicy = ({
 
   const yearStart = `${year}-01-01`
   const yearEnd = `${year}-12-31`
+
+  /*
+   * Effective upper bound for accrual: clamp to asOfDate when in-year, else
+   * yearEnd. Mirrors legacy semantic. Out-of-year asOfDate (past or future)
+   * collapses to the canonical year bound.
+   */
+  const effectiveAsOfDate =
+    asOfDate && asOfDate >= yearStart && asOfDate <= yearEnd ? asOfDate : yearEnd
 
   /*
    * Sort facts by effective_from ASC (defense in depth — query already sorts).
@@ -233,6 +250,14 @@ export const deriveLeaveAccrualPolicy = ({
       }
     }
 
+    /*
+     * Apply asOfDate clamp (legacy parity): no anticipated accrual beyond
+     * today. effectiveAsOfDate is already clamped to year bounds above.
+     */
+    if (effectiveAsOfDate < intervalEnd) {
+      intervalEnd = effectiveAsOfDate
+    }
+
     if (intervalEnd >= intervalStart) {
       intervals.push({ start: intervalStart, end: intervalEnd })
     }
@@ -288,7 +313,8 @@ export const deriveLeaveAccrualPolicy = ({
   if (eligibleDays === 0) {
     policy = 'no_dependent'
   } else if (
-    eligibleDays === yearLength(year) &&
+    eligibleDays === daysBetween(yearStart, effectiveAsOfDate) &&
+    effectiveAsOfDate === yearEnd &&
     reasonCodes.size === 0 &&
     firstQualifying.effectiveFrom <= yearStart
   ) {
