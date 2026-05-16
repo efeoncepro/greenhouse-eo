@@ -158,7 +158,7 @@ const FRESHNESS_SQL = `
   SELECT
     a.account_id,
     MAX(ab.balance_date)::text AS last_materialized_at,
-    EXTRACT(EPOCH FROM (CURRENT_DATE - MAX(ab.balance_date)))::int / 86400 AS days_stale
+    (CURRENT_DATE - MAX(ab.balance_date))::int AS days_stale
   FROM greenhouse_finance.accounts a
   LEFT JOIN greenhouse_finance.account_balances ab ON ab.account_id = a.account_id
   WHERE a.is_active = TRUE
