@@ -301,7 +301,10 @@ export default [
       // TASK-890 Slice 3 — modo warn durante V1.0 (gate legacy en postgres-store.ts
       // grandfathered behind flag PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=false).
       // Promote a `error` post 30d steady o cuando flag default flip a true.
-      'greenhouse/no-inline-payroll-scope-gate': 'warn'
+      'greenhouse/no-inline-payroll-scope-gate': 'warn',
+      // TASK-893 hotfix #3 (2026-05-16) — modo error desde commit-1 (tolerancia
+      // cero: bug class ya genero 2 Sentry alerts en producción hoy).
+      'greenhouse/no-extract-epoch-from-date-subtraction': 'error'
     }
   },
   {
@@ -354,6 +357,19 @@ export default [
     ],
     rules: {
       'greenhouse/no-inline-payroll-scope-gate': 'off'
+    }
+  },
+
+  // TASK-893 hotfix #3 (2026-05-16) — la lint rule no-extract-epoch-from-date-subtraction
+  // se desactiva SOLO en el rule mismo + tests (donde el patron aparece en
+  // docstrings y assertion strings). Anywhere else el patron esta prohibido.
+  {
+    files: [
+      'eslint-plugins/greenhouse/rules/no-extract-epoch-from-date-subtraction.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-extract-epoch-from-date-subtraction.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-extract-epoch-from-date-subtraction': 'off'
     }
   },
 
