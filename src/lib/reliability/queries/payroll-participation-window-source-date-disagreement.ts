@@ -61,7 +61,7 @@ const QUERY_SQL = `
   SELECT COUNT(*)::int AS n
   FROM latest_comp lc
   JOIN latest_onboarding lo ON lo.member_id = lc.member_id
-  WHERE ABS(EXTRACT(EPOCH FROM (lc.effective_from - lo.start_date)) / 86400) > 7
+  WHERE ABS((lc.effective_from::date - lo.start_date::date)) > 7
 `
 
 export const getPayrollParticipationWindowSourceDateDisagreementSignal =

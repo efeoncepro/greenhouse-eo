@@ -38,7 +38,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
  *   indicating full-month gross was applied instead of prorated)
  * - AND period is in `('calculated', 'approved', 'exported', 'reopened')`
  *   (skipped 'draft' since those are not yet computed)
- * - AND `pe.superseded_by_entry_id IS NULL` (only active entries; v1 rows
+ * - AND `pe.is_active = TRUE` + `pe.superseded_by IS NULL` (only active entries; v1 rows
  *   from reopened periods are intentionally skipped — they are audit trail)
  */
 export const PAYROLL_PARTICIPATION_WINDOW_FULL_MONTH_ENTRY_DRIFT_SIGNAL_ID =
@@ -55,7 +55,8 @@ const QUERY_SQL = `
   JOIN greenhouse_payroll.payroll_periods pp
     ON pp.period_id = pe.period_id
   WHERE pp.status IN ('calculated', 'approved', 'exported', 'reopened')
-    AND pe.superseded_by_entry_id IS NULL
+    AND COALESCE(pe.is_active, TRUE) = TRUE
+    AND pe.superseded_by IS NULL
     AND cv.effective_from > MAKE_DATE(pp.year, pp.month, 1)
     AND cv.effective_from <= (MAKE_DATE(pp.year, pp.month, 1) + INTERVAL '1 month' - INTERVAL '1 day')::date
     AND pe.gross_total >= cv.base_salary - 1
