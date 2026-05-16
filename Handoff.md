@@ -1,32 +1,48 @@
-# Sesion 2026-05-16 — TASK-894 international_internal contract type foundation — IN-PROGRESS develop
+# Sesion 2026-05-16 — TASK-894 international_internal contract type foundation — SHIPPED develop
 
-**Status**: ⏳ Lifecycle move + spec recalibration commiteado. FASE 1 Discovery iniciada.
+**Status final**: ✅ TASK-894 COMPLETE. Implementada directo en `develop` por instrucción explícita del operador (sin branch switch). Spec movida a `docs/tasks/complete/TASK-894-international-internal-contract-type.md`.
 
-## Context
+## Commits
 
-Implementación TASK-894 — sexto `ContractType` canonico `international_internal` (payRegime='international' + payrollVia='internal') para colaboradores internacionales pagados internamente por Efeonce (sin Deel/EOR). Directo en `develop` por instrucción explícita del operador (sin branch switch).
+| Commit | Concepto |
+| --- | --- |
+| `8df53882` | Runtime foundation: `international_internal` en tipos/derivaciones/UI/API, migración DB, capability, audit log, outbox event, write paths Payroll + Workforce, receipt/workforce tests y `db.d.ts` regenerado. |
+| docs closeout | Señales reliability restantes + docs vivas + lifecycle cierre. |
 
-## Pre-execution arch-review aplicado (Delta 2026-05-16)
+## Resultado
 
-3 ajustes incorporados al spec antes de mover a in-progress:
+- Sexto `ContractType` canonico: `international_internal` → `payRegime='international'`, `payrollVia='internal'`.
+- No se mutaron colaboradores reales ni se hizo backfill automático. Live discovery preservó 6 rows legacy en `compensation_versions`; la constraint de compensation queda `NOT VALID` para no reescribir historia, pero bloquea escrituras nuevas inválidas.
+- Capability `payroll.contract.use_international_internal` EFEONCE_ADMIN-only y `legalReviewReference >= 10` requerido en write paths.
+- DB hardening: `members` valida tuple completo `(contract_type,pay_regime,payroll_via)`, `payroll_entries.contract_type_snapshot` acepta el nuevo tipo y `member_contract_type_audit_log` es append-only.
+- Outbox `member.contract_type.changed v1` documentado y emitido en la misma tx que update + audit. Payload no incluye `legalReviewReference` cruda.
+- UI Payroll/Workforce muestra `Internacional interno` solo con capability o al editar un valor existente.
+- Payroll actual queda preservado: no se tocaron fórmulas Chile; deductions siguen brancheando por `payRegime='chile'`; international_internal no aplica AFP/salud/cesantía/IUSC/retención SII.
+- Reliability agrega 3 signals: `payroll.contract_taxonomy.invalid_tuple_drift`, `payroll.contract_taxonomy.invalid_statutory_application`, `payroll.contract_taxonomy.fallback_resolution_legacy`.
 
-1. **Outbox event `member.contract_type.changed v1`** agregado a Slice 5 con shape completo + 4 consumers downstream esperados. `legalReviewReference` NUNCA cruda en payload (solo `hasLegalReviewReference: boolean`).
-2. **Subsystem rollup decidido** (Open Question #6): `invalid_tuple_drift` + `fallback_resolution_legacy` → `Identity & Access`; `invalid_statutory_application` → `Finance Data Quality`.
-3. **V1.1 follow-up** `legalReviewReference → asset_id` documentado (reusa patrón TASK-721 evidence uploader, cierra residual risk Safety pillar).
+## Skills / revisiones usadas
 
-17 hard rules canonicas declaradas en spec para lift a CLAUDE.md en Slice 6.
+- `greenhouse-payroll-auditor`: clasificación de régimen, no mezclar Chile statutory payroll con internacional, preservar formulas actuales.
+- `software-architect-2026`: decisión arquitectónica, reversibilidad, audit/outbox/observability.
+- `greenhouse-finance-accounting-operator`: frontera Payroll → Payment Obligations; no lane nueva, employee net pay preserva moneda nativa y settlement/FX vive en Payment Orders.
+- `greenhouse-agent` + `greenhouse-task-planner`: protocolo repo/task.
 
-## Open Questions resueltas
+## Validación ejecutada
 
-- Q1 Label → `Internacional interno` (es-CL neutral)
-- Q2 Currency default → `USD`
-- Q3 contractAllowsRemoteAllowance → `false` V1 conservador
-- Q4 Payment Obligations lane → lane interna existente reusada (verificado `materialize-payroll.ts:164`)
-- Q5 Pre-flip productivo Legal/People Ops → afecta SOLO grant capability productivo (Slice 6 pre-flip gate), NO bloquea implementación Slice 1-5
-- Q6 Subsystem rollup signals → decidido (ver arriba)
-- Q7 Backfill members reales → V1 explicit NO backfill productivo automatico; solo dry-run CSV
+- `pnpm pg:connect:migrate` aplicado OK.
+- `pnpm pg:doctor` OK.
+- `pnpm vitest run src/types/hr-contracts.test.ts src/lib/workforce/onboarding/lane.test.ts src/lib/payroll/receipt-presenter.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx`
+- `pnpm vitest run src/lib/reliability/signals.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint` OK con 4 warnings legacy preexistentes `greenhouse/no-untokenized-business-line-branching`.
+- `pnpm test` OK: 726 files, 4732 tests passed, 10 files/42 tests skipped.
+- `pnpm build` OK.
 
-NO blockers para implementación. La capability productiva queda detrás de gate `Handoff.md` allowlist + Legal/Finance/HR signoff escrito.
+## Riesgos / follow-ups
+
+- Pre-flip productivo sigue requiriendo Legal/People Ops + Finance + HR review escrita y allowlist por miembro antes de usar la capability en casos reales.
+- V1.1 recomendado: reemplazar `legalReviewReference` free-text por FK a asset privado `greenhouse_core.assets` con retention class legal evidence.
+- Si Finance exige CLP settlement automático para USD internos, eso vive en Payment Orders/FX policy, no en el materializer Payroll de esta task.
 
 ## Sesión previa (TASK-895)
 

@@ -1109,15 +1109,34 @@ export const buildPayrollParticipationWindowSignals = async (
 export const buildLeaveAccrualSignals = async (
   readers: {
     accrualOvershootDrift: () => Promise<ReliabilitySignal>
-    contractTaxonomyInvalidTupleDrift?: () => Promise<ReliabilitySignal>
   }
 ): Promise<ReliabilitySignal[]> => {
-  const [overshoot, contractTaxonomy] = await Promise.all([
-    readers.accrualOvershootDrift(),
-    readers.contractTaxonomyInvalidTupleDrift?.() ?? Promise.resolve(null)
+  const [overshoot] = await Promise.all([readers.accrualOvershootDrift()])
+
+  return [overshoot]
+}
+
+/**
+ * TASK-894 — Contract taxonomy data quality signals.
+ *
+ * These readers are observation-only. They do not mutate Payroll rows and do
+ * not participate in calculation; they keep the new `international_internal`
+ * contract detectable if future DDL/imports bypass canonical write paths.
+ */
+export const buildPayrollContractTaxonomySignals = async (
+  readers: {
+    invalidTupleDrift: () => Promise<ReliabilitySignal>
+    invalidStatutoryApplication: () => Promise<ReliabilitySignal>
+    fallbackResolutionLegacy: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [invalidTuple, invalidStatutory, fallbackLegacy] = await Promise.all([
+    readers.invalidTupleDrift(),
+    readers.invalidStatutoryApplication(),
+    readers.fallbackResolutionLegacy()
   ])
 
-  return [overshoot, contractTaxonomy].filter(Boolean) as ReliabilitySignal[]
+  return [invalidTuple, invalidStatutory, fallbackLegacy]
 }
 
 /**

@@ -154,17 +154,18 @@ Si la asistencia o licencias son requeridas para el calculo y no existe senal co
 
 ## Fronteras de regimen Payroll
 
-Greenhouse separa tres familias de calculo:
+Greenhouse separa cuatro familias de calculo:
 
 - `Chile dependiente`: aplica AFP, salud, Seguro de Cesantia, SIS, mutual, APV e Impuesto Unico cuando corresponde.
 - `Honorarios`: aplica retencion SII del anio de emision y no aplica descuentos de trabajador dependiente.
 - `Internacional/Deel`: registra compensacion y bonos operativos, pero no aplica payroll estatutario Chile.
+- `Internacional interno`: registra compensacion y bonos operativos en nómina interna, sin Deel ID y sin descuentos Chile. Es un perfil operacional controlado por capability y requiere referencia de revisión legal por colaborador.
 
 Desde `TASK-744`, cada entry guarda un `contract_type_snapshot` para auditar que el calculo no cambie de regimen despues de materializarse.
 
 Si el readiness detecta que una entry ya calculada mezcla regimenes incompatibles, bloquea aprobacion/export y pide recalcular. Esto evita aprobar una nomina que combine, por ejemplo, retencion SII de honorarios con AFP/salud/cesantia de trabajador dependiente.
 
-Melkin Hernandez, Daniela Ferreira y Andres Carlosama deben mantenerse como internacionales/Deel. Si tienen bono variable, siguen requiriendo KPI ICO, pero no deben recibir deducciones Chile.
+Melkin Hernandez, Daniela Ferreira y Andres Carlosama deben mantenerse como internacionales/Deel salvo que exista allowlist y revisión HR/Finance/Legal explícita para migrarlos a `international_internal`. Si tienen bono variable, siguen requiriendo KPI ICO, pero no deben recibir deducciones Chile.
 
 ## Como se ve el recibo segun el regimen (TASK-758)
 
@@ -175,7 +176,7 @@ Desde `RECEIPT_TEMPLATE_VERSION = '4'` (2026-05-04) Greenhouse emite el recibo i
 | Chile dependiente (`indefinido`/`plazo_fijo`) | Bloque "Descuentos legales" completo: AFP con cotizacion + comision separadas, salud obligatoria 7% + voluntaria si la hay, seguro cesantia, impuesto unico, APV cuando aplica. Si la compensacion incluye gratificacion legal, aparece como haber explicito. |
 | Honorarios | Bloque "Retencion honorarios" con Tasa SII + monto retenido. Nota informativa "Boleta de honorarios Chile · Art. 74 N°2 LIR". No aparecen filas de AFP, salud, cesantia ni impuesto unico. |
 | Contractor o EOR via Deel | Sin bloque de descuentos legales. Aparece la nota "Pago administrado por Deel" explicando que el liquido legal lo emite Deel en la jurisdiccion del trabajador, mas el `Contrato Deel` cuando esta registrado. Hero dice "Monto bruto registrado". |
-| Internacional interno (sin Deel) | Sin bloque de descuentos legales. Aparece la nota "Regimen internacional · Sin descuentos previsionales Chile". |
+| Internacional interno (sin Deel) | Sin bloque de descuentos legales. Aparece la nota "Regimen internacional · Sin descuentos previsionales Chile". El tipo se selecciona solo si el operador tiene capability `payroll.contract.use_international_internal` y registra una referencia legal válida. |
 | Excluido del periodo | El recibo se emite igual con un banner rojo explicando la causa, omite haberes/asistencia/descuentos, y el hero pasa a estado "Sin pago este periodo · $0" en gris. |
 
 Cualquier nuevo tipo de contrato debe declarar primero su comportamiento de recibo en `src/lib/payroll/receipt-presenter.ts` antes de mergear codigo — el helper canonico tiene un `never`-check que rompe build sin esa rama.

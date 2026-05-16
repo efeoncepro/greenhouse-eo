@@ -744,6 +744,10 @@ CREATE TABLE greenhouse_core.members (
     phone text,
     job_level text,
     employment_type text,
+    contract_type text DEFAULT 'indefinido'::text NOT NULL,
+    pay_regime text DEFAULT 'chile'::text NOT NULL,
+    payroll_via text DEFAULT 'internal'::text NOT NULL,
+    deel_contract_id text,
     hire_date date,
     contract_end_date date,
     daily_required boolean DEFAULT true NOT NULL,
@@ -780,7 +784,40 @@ CREATE TABLE greenhouse_core.members (
     efeonce_start_date date,
     languages text[],
     assignable boolean DEFAULT true NOT NULL,
-    prior_work_years numeric(10,2) DEFAULT 0 NOT NULL
+    prior_work_years numeric(10,2) DEFAULT 0 NOT NULL,
+    CONSTRAINT members_contract_payroll_tuple_check CHECK ((((contract_type = ANY (ARRAY['indefinido'::text, 'plazo_fijo'::text, 'honorarios'::text])) AND (pay_regime = 'chile'::text) AND (payroll_via = 'internal'::text)) OR ((contract_type = ANY (ARRAY['contractor'::text, 'eor'::text])) AND (pay_regime = 'international'::text) AND (payroll_via = 'deel'::text)) OR ((contract_type = 'international_internal'::text) AND (pay_regime = 'international'::text) AND (payroll_via = 'internal'::text)))),
+    CONSTRAINT members_contract_type_check CHECK ((contract_type = ANY (ARRAY['indefinido'::text, 'plazo_fijo'::text, 'honorarios'::text, 'contractor'::text, 'eor'::text, 'international_internal'::text]))),
+    CONSTRAINT members_pay_regime_check CHECK ((pay_regime = ANY (ARRAY['chile'::text, 'international'::text]))),
+    CONSTRAINT members_payroll_via_check CHECK ((payroll_via = ANY (ARRAY['internal'::text, 'deel'::text])))
+);
+
+
+--
+-- Name: member_contract_type_audit_log; Type: TABLE; Schema: greenhouse_core; Owner: -
+--
+
+CREATE TABLE greenhouse_core.member_contract_type_audit_log (
+    audit_id text NOT NULL,
+    member_id text NOT NULL,
+    actor_user_id text NOT NULL,
+    actor_email text,
+    source text NOT NULL,
+    reason text,
+    legal_review_reference text,
+    previous_contract_type text,
+    previous_pay_regime text,
+    previous_payroll_via text,
+    previous_deel_contract_id text,
+    new_contract_type text NOT NULL,
+    new_pay_regime text NOT NULL,
+    new_payroll_via text NOT NULL,
+    new_deel_contract_id text,
+    effective_at timestamp with time zone DEFAULT now() NOT NULL,
+    metadata_json jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT member_contract_type_audit_legal_review_reference_check CHECK (((new_contract_type <> 'international_internal'::text) OR (char_length(TRIM(BOTH FROM COALESCE(legal_review_reference, ''::text))) >= 10))),
+    CONSTRAINT member_contract_type_audit_metadata_object CHECK ((jsonb_typeof(metadata_json) = 'object'::text)),
+    CONSTRAINT member_contract_type_audit_source_check CHECK ((source = ANY (ARRAY['payroll_compensation'::text, 'workforce_intake'::text])))
 );
 
 
@@ -2602,7 +2639,9 @@ CREATE TABLE greenhouse_payroll.compensation_versions (
     afp_cotizacion_rate numeric(6,4),
     afp_comision_rate numeric(6,4),
     desired_net_clp numeric(14,2),
-    CONSTRAINT compensation_versions_contract_type_check CHECK ((contract_type = ANY (ARRAY['indefinido'::text, 'plazo_fijo'::text]))),
+    metadata_json jsonb DEFAULT '{}'::jsonb NOT NULL,
+    CONSTRAINT compensation_versions_contract_pay_regime_check CHECK ((((contract_type = ANY (ARRAY['indefinido'::text, 'plazo_fijo'::text, 'honorarios'::text])) AND (pay_regime = 'chile'::text)) OR ((contract_type = ANY (ARRAY['contractor'::text, 'eor'::text, 'international_internal'::text])) AND (pay_regime = 'international'::text))),
+    CONSTRAINT compensation_versions_contract_type_check CHECK ((contract_type = ANY (ARRAY['indefinido'::text, 'plazo_fijo'::text, 'honorarios'::text, 'contractor'::text, 'eor'::text, 'international_internal'::text]))),
     CONSTRAINT compensation_versions_currency_check CHECK ((currency = ANY (ARRAY['CLP'::text, 'USD'::text]))),
     CONSTRAINT compensation_versions_health_system_check CHECK (((health_system IS NULL) OR (health_system = ANY (ARRAY['fonasa'::text, 'isapre'::text])))),
     CONSTRAINT compensation_versions_pay_regime_check CHECK ((pay_regime = ANY (ARRAY['chile'::text, 'international'::text])))
@@ -2697,7 +2736,9 @@ CREATE TABLE greenhouse_payroll.payroll_entries (
     chile_employer_cesantia_amount numeric(14,2),
     chile_employer_mutual_amount numeric(14,2),
     chile_employer_total_cost numeric(14,2),
+    contract_type_snapshot text,
     CONSTRAINT payroll_entries_currency_check CHECK ((currency = ANY (ARRAY['CLP'::text, 'USD'::text]))),
+    CONSTRAINT payroll_entries_contract_type_snapshot_check CHECK (((contract_type_snapshot IS NULL) OR (contract_type_snapshot = ANY (ARRAY['indefinido'::text, 'plazo_fijo'::text, 'honorarios'::text, 'contractor'::text, 'eor'::text, 'international_internal'::text])))),
     CONSTRAINT payroll_entries_pay_regime_check CHECK ((pay_regime = ANY (ARRAY['chile'::text, 'international'::text])))
 );
 

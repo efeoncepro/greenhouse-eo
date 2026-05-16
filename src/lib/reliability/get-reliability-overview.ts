@@ -56,7 +56,9 @@ import { getPayrollParticipationWindowFullMonthEntryDriftSignal } from './querie
 import { getPayrollParticipationWindowProjectionDeltaAnomalySignal } from './queries/payroll-participation-window-projection-delta-anomaly'
 import { getPayrollParticipationWindowSourceDateDisagreementSignal } from './queries/payroll-participation-window-source-date-disagreement'
 import { getLeaveAccrualOvershootDriftSignal } from './queries/leave-accrual-overshoot-drift'
+import { getPayrollContractTaxonomyFallbackResolutionLegacySignal } from './queries/payroll-contract-taxonomy-fallback-resolution-legacy'
 import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/payroll-contract-taxonomy-invalid-tuple-drift'
+import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './queries/payroll-contract-taxonomy-invalid-statutory-application'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
@@ -125,6 +127,7 @@ import {
   buildFinanceClpDriftSignals,
   buildCommercialHealthSignals,
   buildExpenseDistributionSignals,
+  buildPayrollContractTaxonomySignals,
   buildPayrollParticipationWindowSignals,
   buildLeaveAccrualSignals,
   buildPaymentOrderSettlementSignals,
@@ -363,6 +366,13 @@ interface ReliabilityOverviewSources {
    * falla. Steady state esperado = 0 post-flag-ON + re-seed.
    */
   leaveAccrual?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-894 — Payroll contract taxonomy guardrails for the sixth canonical
+   * contract type (`international_internal`). Observation-only readers:
+   * tuple drift, invalid statutory application and legacy receipt fallback.
+   */
+  payrollContractTaxonomy?: ReliabilitySignal[] | null
 
   /**
    * TASK-766 Slice 2 — Finance CLP currency drift signals. 2 readers que
@@ -628,6 +638,8 @@ export const buildReliabilityOverview = (
     // (shadow compare wiring is V1.1 follow-up).
     ...(sources.payrollParticipationWindow ?? []),
     ...(sources.leaveAccrual ?? []),
+    // TASK-894 — Payroll contract taxonomy signals.
+    ...(sources.payrollContractTaxonomy ?? []),
     // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
@@ -870,8 +882,16 @@ export const getReliabilityOverview = async (
     preloadedSources.leaveAccrual !== undefined
       ? preloadedSources.leaveAccrual
       : await buildLeaveAccrualSignals({
-          accrualOvershootDrift: getLeaveAccrualOvershootDriftSignal,
-          contractTaxonomyInvalidTupleDrift: getPayrollContractTaxonomyInvalidTupleDriftSignal
+          accrualOvershootDrift: getLeaveAccrualOvershootDriftSignal
+        }).catch(() => null)
+
+  const payrollContractTaxonomy =
+    preloadedSources.payrollContractTaxonomy !== undefined
+      ? preloadedSources.payrollContractTaxonomy
+      : await buildPayrollContractTaxonomySignals({
+          invalidTupleDrift: getPayrollContractTaxonomyInvalidTupleDriftSignal,
+          invalidStatutoryApplication: getPayrollContractTaxonomyInvalidStatutoryApplicationSignal,
+          fallbackResolutionLegacy: getPayrollContractTaxonomyFallbackResolutionLegacySignal
         }).catch(() => null)
 
   // TASK-863 V1.5.2 — Final settlement PDF status drift (DB vs asset metadata).
@@ -1200,6 +1220,7 @@ export const getReliabilityOverview = async (
     finalSettlementPdfStatusDrift,
     payrollParticipationWindow,
     leaveAccrual,
+    payrollContractTaxonomy,
     financeClpDrift,
     providerBqSyncDeadLetter,
     hubspotCompaniesIntakeDeadLetter,

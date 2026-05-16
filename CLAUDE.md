@@ -19,6 +19,15 @@ Greenhouse EO — portal operativo de Efeonce Group. Next.js 16 App Router + MUI
 - Feriados nacionales: `Nager.Date` + overrides persistidos en Greenhouse
 - No usar helpers locales de vista para decidir ventana de cierre o mes operativo vigente
 
+### International Internal Contract Type Invariants (TASK-894)
+
+- `international_internal` es un `ContractType` canónico: `payRegime='international'` + `payrollVia='internal'`. No es Deel, no es EOR y no se degrada automáticamente a `contractor`.
+- Efeonce SpA actúa como operational payer, no como employer of record/local-country legal employer en V1. No aplicar AFP, salud, cesantía, SIS, mutual, APV, IUSC ni retención SII a este perfil.
+- Writes reales requieren capability `payroll.contract.use_international_internal` y `legalReviewReference` >= 10 caracteres. No loggear ni publicar el valor crudo en outbox/Sentry; el evento usa solo `hasLegalReviewReference`.
+- Toda mutación de `contract_type`/`pay_regime`/`payroll_via` debe pasar por los helpers canónicos y emitir `member.contract_type.changed v1` + audit row append-only en la misma transacción.
+- La DB protege la matriz contractual: miembros validan la tupla completa `(contract_type, pay_regime, payroll_via)` y `compensation_versions` valida `(contract_type, pay_regime)` para nuevas/actualizadas rows. No bypass por SQL directo.
+- Los consumers downstream deben detectar `international_internal` por `contractType`, no por heurísticas compuestas de régimen/vía.
+
 ### Canonical 360 Object Model
 
 - `Cliente` → `greenhouse.clients.client_id`
