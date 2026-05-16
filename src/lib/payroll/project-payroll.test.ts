@@ -661,3 +661,159 @@ describe('projectPayrollForPeriod — TASK-893 participation window integration'
     expect(result.entries[0].prorationFactor).toBe(0)
   })
 })
+
+/*
+ * TASK-893 V1.1 follow-up (2026-05-16) — Participation window display fields.
+ *
+ * Distinción semántica canonical: `projectedWorkingDays / Total` siguen
+ * representando "días hábiles del PERÍODO" (calendar-derived global).
+ * Los 3 nuevos fields opcionales (`participationWindowWorkingDays`,
+ * `participationStartDate`, `participationEndDate`) reflejan la ventana
+ * efectiva del miembro CUANDO `prorationFactor < 1`.
+ *
+ * Cuando factor === 1 (full-period), los 3 fields son `null` — preserve
+ * backward compat con consumers que ignoren participation context.
+ */
+describe('projectPayrollForPeriod — TASK-893 V1.1 participation window display fields', () => {
+  let isPayrollParticipationWindowEnabledSpy: ReturnType<typeof vi.spyOn>
+  let resolvePayrollParticipationWindowsForMembersSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })
+    mockFetchAttendanceForAllMembers.mockResolvedValue({ snapshots: new Map(), leaveDataDegraded: false })
+
+    isPayrollParticipationWindowEnabledSpy = vi.spyOn(participationWindowModule, 'isPayrollParticipationWindowEnabled')
+    resolvePayrollParticipationWindowsForMembersSpy = vi.spyOn(
+      participationWindowModule,
+      'resolvePayrollParticipationWindowsForMembers'
+    )
+  })
+
+  const baseCompensation = {
+    hasCompensationVersion: true,
+    versionId: 'v-1',
+    memberId: 'felipe-1',
+    displayName: 'Felipe Zurita',
+    avatarUrl: null,
+    versionEffectiveFrom: '2026-05-13',
+    versionEffectiveTo: null,
+    contractType: 'honorarios',
+    payRegime: 'chile',
+    payrollVia: 'internal',
+    currency: 'CLP',
+    deelContractId: null,
+    baseSalary: 650000,
+    remoteAllowance: 0,
+    colacionAmount: 0,
+    movilizacionAmount: 0,
+    fixedBonusLabel: null,
+    fixedBonusAmount: 0,
+    bonusOtdMin: 0,
+    bonusOtdMax: 0,
+    bonusRpaMin: 0,
+    bonusRpaMax: 0,
+    chileAfpName: null,
+    chileAfpRate: null,
+    chileHealthSystem: null,
+    chileHealthAmount: null,
+    chileApvAmount: null,
+    siiRetentionRate: 0.1525,
+    workerEmail: 'fzurita@efeoncepro.com',
+    exitEligibilityWindow: null
+  }
+
+  it('factor < 1: emits participationWindowWorkingDays + dates (Felipe mid-month)', async () => {
+    isPayrollParticipationWindowEnabledSpy.mockReturnValue(true)
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
+
+    resolvePayrollParticipationWindowsForMembersSpy.mockResolvedValue(
+      new Map([
+        [
+          'felipe-1',
+          {
+            memberId: 'felipe-1',
+            periodStart: '2026-05-01',
+            periodEnd: '2026-05-31',
+            eligibleFrom: '2026-05-13',
+            eligibleTo: '2026-05-31',
+            policy: 'prorate_from_start' as const,
+            reasonCodes: ['entry_mid_period'] as const,
+            prorationFactor: 13 / 22,
+            prorationBasis: 'weekdays' as const,
+            exitEligibility: null,
+            warnings: []
+          }
+        ]
+      ])
+    )
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 5, mode: 'projected_month_end' })
+
+    expect(result.entries[0].participationWindowWorkingDays).toBe(22) /* mocked countWeekdays returns 22 */
+    expect(result.entries[0].participationStartDate).toBe('2026-05-13')
+    expect(result.entries[0].participationEndDate).toBe('2026-05-31')
+  })
+
+  it('factor === 1: participation fields are null (backward-compat preserved)', async () => {
+    isPayrollParticipationWindowEnabledSpy.mockReturnValue(true)
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
+
+    resolvePayrollParticipationWindowsForMembersSpy.mockResolvedValue(
+      new Map([
+        [
+          'felipe-1',
+          {
+            memberId: 'felipe-1',
+            periodStart: '2026-05-01',
+            periodEnd: '2026-05-31',
+            eligibleFrom: '2026-05-01',
+            eligibleTo: '2026-05-31',
+            policy: 'full_period' as const,
+            reasonCodes: ['full_period'] as const,
+            prorationFactor: 1,
+            prorationBasis: 'weekdays' as const,
+            exitEligibility: null,
+            warnings: []
+          }
+        ]
+      ])
+    )
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 5, mode: 'projected_month_end' })
+
+    expect(result.entries[0].participationWindowWorkingDays).toBeNull()
+    expect(result.entries[0].participationStartDate).toBeNull()
+    expect(result.entries[0].participationEndDate).toBeNull()
+  })
+
+  it('flag OFF: participation fields are null regardless (legacy bit-for-bit)', async () => {
+    isPayrollParticipationWindowEnabledSpy.mockReturnValue(false)
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 5, mode: 'projected_month_end' })
+
+    expect(resolvePayrollParticipationWindowsForMembersSpy).not.toHaveBeenCalled()
+    expect(result.entries[0].participationWindowWorkingDays).toBeNull()
+    expect(result.entries[0].participationStartDate).toBeNull()
+    expect(result.entries[0].participationEndDate).toBeNull()
+    /* And legacy projectedWorkingDays fields remain populated */
+    expect(result.entries[0].projectedWorkingDays).toBe(22)
+    expect(result.entries[0].projectedWorkingDaysTotal).toBe(22)
+  })
+
+  it('resolver degraded (null window): participation fields are null + factor=1 (degraded path)', async () => {
+    isPayrollParticipationWindowEnabledSpy.mockReturnValue(true)
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
+
+    /* Resolver returned empty map → member fell to factor=1 (legacy path) */
+    resolvePayrollParticipationWindowsForMembersSpy.mockResolvedValue(new Map())
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 5, mode: 'projected_month_end' })
+
+    expect(result.entries[0].prorationFactor).toBe(1)
+    expect(result.entries[0].participationWindowWorkingDays).toBeNull()
+    expect(result.entries[0].participationStartDate).toBeNull()
+    expect(result.entries[0].participationEndDate).toBeNull()
+  })
+})

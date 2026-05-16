@@ -39,11 +39,15 @@ export const upsertProjectedPayrollSnapshot = async (
        bonus_otd_amount, bonus_rpa_amount, gross_total, total_deductions,
        net_total, kpi_otd_percent, kpi_rpa_avg,
        working_days_cut, working_days_total, days_absent, days_on_leave,
-       uf_value, snapshot_status, materialized_at
+       uf_value,
+       participation_working_days, participation_start_date, participation_end_date,
+       snapshot_status, materialized_at
      )
      VALUES ($1, $2, $3, $4, $5::date,
              $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
-             $17, $18, $19, $20, $21, 'projected', CURRENT_TIMESTAMP)
+             $17, $18, $19, $20, $21,
+             $22, $23::date, $24::date,
+             'projected', CURRENT_TIMESTAMP)
      ON CONFLICT (member_id, period_year, period_month, projection_mode) DO UPDATE SET
        as_of_date = EXCLUDED.as_of_date,
        currency = EXCLUDED.currency,
@@ -62,6 +66,9 @@ export const upsertProjectedPayrollSnapshot = async (
        days_absent = EXCLUDED.days_absent,
        days_on_leave = EXCLUDED.days_on_leave,
        uf_value = EXCLUDED.uf_value,
+       participation_working_days = EXCLUDED.participation_working_days,
+       participation_start_date = EXCLUDED.participation_start_date,
+       participation_end_date = EXCLUDED.participation_end_date,
        snapshot_status = 'projected',
        materialized_at = CURRENT_TIMESTAMP`,
     [
@@ -73,7 +80,10 @@ export const upsertProjectedPayrollSnapshot = async (
       entry.kpiOtdPercent, entry.kpiRpaAvg,
       entry.projectedWorkingDays, entry.projectedWorkingDaysTotal,
       entry.daysAbsent ?? 0, entry.daysOnLeave ?? 0,
-      entry.chileUfValue
+      entry.chileUfValue,
+      entry.participationWindowWorkingDays ?? null,
+      entry.participationStartDate ?? null,
+      entry.participationEndDate ?? null
     ]
   )
 }

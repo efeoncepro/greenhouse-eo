@@ -32,12 +32,48 @@ import { isPayrollPostgresEnabled, pgGetActiveBonusConfig } from '@/lib/payroll/
 
 // ── Types ──
 
+/**
+ * TASK-893 V1.1 follow-up (2026-05-16) — campos `participationWindowWorkingDays`,
+ * `participationStartDate`, `participationEndDate` opcionales que reflejan la
+ * ventana efectiva de participation del miembro cuando `prorationFactor < 1`.
+ *
+ * Distinción semántica canonical (arch-architect verdict):
+ *
+ * - `projectedWorkingDays` / `projectedWorkingDaysTotal`: **días hábiles del
+ *   PERÍODO** (calendar-derived global). Mismo valor para todos los miembros
+ *   en el loop. Backward-compat: tests existentes con `=22` siguen verdes.
+ *
+ * - `participationWindowWorkingDays`: **días hábiles efectivos del miembro en
+ *   su ventana de participation**. `null` cuando `prorationFactor === 1`
+ *   (member full-period — no information loss vs. `projectedWorkingDays`).
+ *
+ * - `participationStartDate` / `participationEndDate`: ISO `YYYY-MM-DD` con la
+ *   ventana de participation (`eligibleFrom` / `eligibleTo` del resolver).
+ *   `null` cuando participation = full period.
+ *
+ * UX rationale: la regla canonical TASK-893 "Participation NO es attendance"
+ * previene inflar `daysAbsent` con días pre-ingreso. PERO la UI sigue
+ * mostrando "21/21 días hábiles, Asistencia completa" lo cual es engañoso
+ * para Felipe-like (entró 13/05, trabajó 13 días). Estos campos permiten
+ * render rico:
+ *
+ *   compact:  "13 / 21 hábiles" + tooltip "Ingreso 13/05/2026"
+ *   expanded: "13 días efectivos · 21 hábiles del período · Ingreso 13/05"
+ *
+ * Bug latente cubierto en TASK-898 V1.2: `payroll_entries.working_days_in_period`
+ * (DB persistido por buildPayrollEntry runtime) tiene la misma ambigüedad para
+ * un futuro CL dependent mid-month. Migration + columna participation_working_days
+ * en payroll_entries queda V1.2.
+ */
 export type ProjectedPayrollEntry = PayrollEntry & {
   projectionMode: ProjectionMode
   asOfDate: string
   projectedWorkingDays: number
   projectedWorkingDaysTotal: number
   prorationFactor: number
+  participationWindowWorkingDays?: number | null
+  participationStartDate?: string | null
+  participationEndDate?: string | null
 }
 
 export type ProjectedPayrollResult = {
@@ -331,13 +367,40 @@ export const projectPayrollForPeriod = async ({
     const entry = prorateEntry(fullEntry, actualToDateFactor)
     const finalFactor = participationFactor * actualToDateFactor
 
+    /*
+     * TASK-893 V1.1 follow-up — populate ventana de participation visible.
+     *
+     * Cuando `participationFactor < 1` Y el resolver entregó `eligibleFrom` y
+     * `eligibleTo` non-null, derivamos días hábiles efectivos del miembro
+     * en su ventana. `null` para members full-period — preserve backward
+     * compat con consumers que asuman "absent" cuando NO hay participation
+     * info disponible.
+     *
+     * Field `participationWindowWorkingDays` es DIFERENTE de
+     * `projectedWorkingDays`: el primero refleja participation del miembro,
+     * el segundo refleja el período calendario completo. Ambos coexisten
+     * para que la UI muestre "13 efectivos / 21 hábiles" + contexto fechas.
+     */
+    const hasParticipationWindow =
+      participation !== null &&
+      participation.eligibleFrom !== null &&
+      participation.eligibleTo !== null &&
+      participationFactor < 1
+
+    const participationWindowWorkingDays = hasParticipationWindow
+      ? countWeekdays(participation.eligibleFrom as string, participation.eligibleTo as string)
+      : null
+
     entries.push({
       ...entry,
       projectionMode: mode,
       asOfDate,
       projectedWorkingDays: workingDaysCut,
       projectedWorkingDaysTotal: workingDaysTotal,
-      prorationFactor: finalFactor
+      prorationFactor: finalFactor,
+      participationWindowWorkingDays,
+      participationStartDate: hasParticipationWindow ? participation.eligibleFrom : null,
+      participationEndDate: hasParticipationWindow ? participation.eligibleTo : null
     })
   }
 

@@ -44,7 +44,11 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import { computeCurrencyDelta, formatDeltaLabel, payrollTrendDirection } from '@/lib/finance/currency-comparison'
 import { getMicrocopy } from '@/lib/copy'
 import { resolveReceiptRegime, type ReceiptRegime } from '@/lib/payroll/receipt-presenter'
-import { GH_PAYROLL_PROJECTED_ARIA } from '@/lib/copy/payroll'
+import {
+  GH_PAYROLL_PARTICIPATION_WINDOW,
+  GH_PAYROLL_PROJECTED_ARIA,
+  formatParticipationDateForLabel
+} from '@/lib/copy/payroll'
 import { formatCurrency } from './helpers'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -98,6 +102,10 @@ interface ProjectedEntry {
   projectedWorkingDays: number
   projectedWorkingDaysTotal: number
   prorationFactor: number
+  // TASK-893 V1.1 follow-up — opcional, populated cuando prorationFactor < 1
+  participationWindowWorkingDays?: number | null
+  participationStartDate?: string | null
+  participationEndDate?: string | null
   officialGrossTotal: number | null
   officialNetTotal: number | null
   deltaGross: number | null
@@ -824,8 +832,15 @@ const ProjectedPayrollView = () => {
                                               <Typography variant='subtitle2'>Indicadores</Typography>
                                             </Stack>
 
-                                            {/* Attendance ring */}
-                                            <AttendanceRing present={e.projectedWorkingDays} total={e.projectedWorkingDaysTotal} absent={e.daysAbsent ?? 0} />
+                                            {/* Attendance ring — TASK-893 V1.1: muestra ventana de participation cuando aplica */}
+                                            <AttendanceRing
+                                              present={e.projectedWorkingDays}
+                                              total={e.projectedWorkingDaysTotal}
+                                              absent={e.daysAbsent ?? 0}
+                                              participationWorkingDays={e.participationWindowWorkingDays ?? null}
+                                              participationStartDate={e.participationStartDate ?? null}
+                                              participationEndDate={e.participationEndDate ?? null}
+                                            />
 
                                             <Stack spacing={0.5}>
                                               <LineItem label='Permisos' value={e.daysOnLeave != null && e.daysOnLeave > 0 ? `${e.daysOnLeave} (${e.daysOnUnpaidLeave ?? 0} sin goce)` : '0'} />
@@ -922,25 +937,100 @@ const BonusPayoutBlock = ({ label, kpiLabel, amount, max, color, tooltip, cur }:
   )
 }
 
-const AttendanceRing = ({ present, total, absent }: { present: number; total: number; absent: number }) => {
-  const pct = total > 0 ? Math.round((present / total) * 100) : 0
+/**
+ * AttendanceRing — visualización canonical de asistencia / ventana de
+ * participation del miembro.
+ *
+ * TASK-893 V1.1 follow-up (2026-05-16):
+ *
+ * Cuando `participationWorkingDays != null` (miembro mid-month entry/exit),
+ * el ring muestra la ventana de PARTICIPATION del miembro:
+ *
+ *   - Compact label: "{participationWorkingDays} / {periodTotal} hábiles"
+ *     (siempre con period como denominador — preserva contexto calendario).
+ *   - Tooltip: ventana de fechas (entry / exit).
+ *   - Detail: "Sin ausencias en ventana de participación" o "N ausencias..."
+ *
+ * Cuando `participationWorkingDays === null` (full-period member), el ring
+ * mantiene la semántica legacy: "X / Y días hábiles, Asistencia completa".
+ *
+ * Regla canonical (CLAUDE.md TASK-893 V1.1): cualquier surface que muestre
+ * attendance para un miembro con `prorationFactor < 1` debe mostrar AMBOS:
+ * período total (calendar context) + participation effective days (member
+ * context). Single-number renders son operator-confusing.
+ */
+const AttendanceRing = ({
+  present,
+  total,
+  absent,
+  participationWorkingDays,
+  participationStartDate,
+  participationEndDate
+}: {
+  present: number
+  total: number
+  absent: number
+  participationWorkingDays?: number | null
+  participationStartDate?: string | null
+  participationEndDate?: string | null
+}) => {
+  const hasParticipationWindow =
+    participationWorkingDays != null && participationWorkingDays >= 0 && participationStartDate
+
+  /*
+   * Cuando hay ventana de participation: el ring muestra "días efectivos del
+   * miembro / días hábiles del período" (preserva ratio visual para que el
+   * operador vea de un vistazo la proporción).
+   */
+  const effectiveDays = hasParticipationWindow ? (participationWorkingDays as number) : present
+  const periodTotal = total
+  const pct = periodTotal > 0 ? Math.round((effectiveDays / periodTotal) * 100) : 0
   const ringColor = absent === 0 ? 'success' : absent <= 2 ? 'warning' : 'error'
 
-  return (
+  const entryLabel = hasParticipationWindow ? formatParticipationDateForLabel(participationStartDate) : ''
+
+  const exitLabel =
+    hasParticipationWindow && participationEndDate
+      ? formatParticipationDateForLabel(participationEndDate)
+      : null
+
+  const compactLabel = hasParticipationWindow
+    ? GH_PAYROLL_PARTICIPATION_WINDOW.attendanceRingCompactLabel(effectiveDays, periodTotal)
+    : `${present} / ${total} días hábiles`
+
+  const detailText = hasParticipationWindow
+    ? absent === 0
+      ? GH_PAYROLL_PARTICIPATION_WINDOW.noAbsencesInWindow
+      : GH_PAYROLL_PARTICIPATION_WINDOW.absencesInWindow(absent)
+    : absent === 0
+      ? 'Asistencia completa'
+      : `${absent} ausencia${absent > 1 ? 's' : ''}`
+
+  const tooltipTitle = hasParticipationWindow
+    ? GH_PAYROLL_PARTICIPATION_WINDOW.attendanceRingTooltip(entryLabel, exitLabel)
+    : ''
+
+  const ring = (
     <Stack direction='row' spacing={2} alignItems='center'>
       <Box sx={{ position: 'relative', display: 'inline-flex' }}>
         <CircularProgress variant='determinate' value={pct} size={48} thickness={4} color={ringColor} />
         <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant='caption' fontWeight={600}>{present}</Typography>
+          <Typography variant='caption' fontWeight={600}>{effectiveDays}</Typography>
         </Box>
       </Box>
       <Stack spacing={0.25}>
-        <Typography variant='body2' fontWeight={500}>{present} / {total} días hábiles</Typography>
-        <Typography variant='caption' color='text.secondary'>
-          {absent === 0 ? 'Asistencia completa' : `${absent} ausencia${absent > 1 ? 's' : ''}`}
-        </Typography>
+        <Typography variant='body2' fontWeight={500}>{compactLabel}</Typography>
+        <Typography variant='caption' color='text.secondary'>{detailText}</Typography>
       </Stack>
     </Stack>
+  )
+
+  if (!hasParticipationWindow) return ring
+
+  return (
+    <Tooltip title={tooltipTitle} arrow placement='top'>
+      <Box>{ring}</Box>
+    </Tooltip>
   )
 }
 
