@@ -72,7 +72,9 @@ Cuando hagas el cierre del período mayo 2026 en `/hr/payroll`:
 
 1. **Confirmar bruto en `payroll_entries.gross_total`** para Felipe = **$402,381** (no $650,000).
 2. **Confirmar `siiRetentionAmount`** = **$61,363** (15.25% × 402,381).
-3. **Antes de exportar** a Previred/F29, verificar que Felipe haya emitido la boleta por exactamente $402,381.
+3. **Antes de exportar a F29** (declaración mensual SII retenciones), verificar que Felipe haya emitido la boleta por exactamente $402,381.
+
+> **Nota Previred**: Felipe NO va por Previred. Previred (AFP + Salud + Cesantía + SIS + Mutual + Gratificación) es exclusivo para trabajadores **dependentes CL** bajo Código del Trabajo (`contract_type IN ('indefinido','plazo_fijo')`). Felipe es honorarios → emite boleta DTE 41 + Efeonce declara la retención del 15.25% en F29 mensual. Sin cotizaciones previsionales.
 
 Si Felipe emite por $650,000 (full-month) por error:
 - Pedir anulación de boleta vía sii.cl
