@@ -1,10 +1,10 @@
 # Sistema de Permisos y Licencias
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-06 por Claude (TASK-271)
-> **Ultima actualizacion:** 2026-04-16 por Codex (TASK-415, identidad y actividad administrativa)
-> **Documentacion tecnica:** docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
+> **Ultima actualizacion:** 2026-05-16 por Claude Opus (TASK-895 V1.1a, accrual participation-aware)
+> **Documentacion tecnica:** docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md + docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md
 
 ## Que es
 
@@ -218,5 +218,44 @@ No todos los contratos usan la misma logica:
 - `Contractor` y `EOR` pueden quedar sujetos a politica externa o sin saldo legal equivalente dentro del portal
 
 Por eso HR puede ver en la pantalla administrativa una explicacion basica de la politica aplicada a cada saldo.
+
+### Transiciones contractor a dependent mid-year (TASK-895, V1.1a)
+
+Cuando un colaborador entra a Greenhouse como contractor o honorarios y mas tarde, en el mismo year calendario, transita a relacion dependent CL (`indefinido` o `plazo_fijo` con `pay_regime='chile'` y `payroll_via='internal'`), Greenhouse necesita ser mas preciso que la logica legacy anclada en `hire_date`.
+
+Por que importa:
+
+- El feriado legal CL Art 67 del Codigo del Trabajo acumula solo durante el vinculo dependent activo. Honorarios y contractor no son trabajadores subordinados bajo CT y no generan derecho a feriado legal.
+- La logica legacy anclaba el accrual en `members.hire_date`. Cuando el hire_date era anterior al inicio del vinculo dependent real, el sistema sobreacumulaba dias que legalmente no corresponden.
+- En el finiquito, esa sobreacumulacion se traduce en sobrepago al colaborador y precedente contractual riesgoso si emerge litigio "consideren que mi vinculo continuo era dependent".
+
+Como funciona la version participation-aware:
+
+- Cuando el flag `LEAVE_PARTICIPATION_AWARE_ENABLED` esta activado en el ambiente, el motor de accrual compone el primitive year-scope `LeaveAccrualEligibilityWindow` mes a mes del year.
+- Filtra solo los periodos donde el colaborador tuvo vinculo dependent CL activo (`contract_type IN ('indefinido','plazo_fijo')` Y `pay_regime='chile'` Y `payroll_via='internal'`).
+- Aplica truncacion de salida via TASK-890 (Workforce Exit Payroll Eligibility) si hubo offboarding mid-year.
+- Computa el saldo anual con la formula canonica `(dias anuales × dias elegibles dependent) / dias del primer ciclo de servicio`.
+
+Que ve HR:
+
+- Si el flag esta apagado (default productivo hoy), el saldo se calcula con la logica legacy y aparece igual que siempre.
+- Si el flag esta encendido y el colaborador tuvo transicion contractor a dependent, el saldo de feriado refleja solo el tramo dependent. HR puede ver la diferencia en el script de auditoria (operativo, no UI).
+- En la planilla del colaborador (vista admin del balance), la cifra aparece con el saldo correcto sin sobre-comunicacion del cambio.
+
+Reglas duras:
+
+- El flag tiene dependencias canonicas: requiere `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` (TASK-893) y `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` (TASK-890) en el mismo ambiente. Sin esas pre-condiciones, el motor cae al calculo legacy automaticamente (degraded honesto, sin romper).
+- El cambio nunca muta saldos automaticamente. Solo aplica al recalcular el seed del balance (nueva siembra anual o re-seed manual). Los saldos historicos persistidos no se tocan.
+- El script `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/leave/audit-accrual-drift.ts` permite a HR ver el drift entre logica legacy y participation-aware sin tocar datos. Runbook canonical en `docs/operations/runbooks/leave-accrual-drift-audit.md`.
+
+Ejemplo real:
+
+- Persona contratada el 15 de enero de 2026 como contractor.
+- En el mismo year, el 13 de mayo de 2026, pasa a `indefinido` dependent CL.
+- Legacy: acumula desde 15 de enero, daria aproximadamente todo el year proporcionalmente.
+- Participation-aware: acumula solo desde 13 de mayo, daria 233 dias elegibles / 365 dias del primer ciclo × 15 dias = aproximadamente 9.58 dias.
+- Diferencia: aproximadamente 5+ dias que legalmente no corresponden bajo Art 67 CT.
+
+> Detalle tecnico: el motor de calculo vive en `src/lib/hr-core/leave-domain.ts` (helper puro legacy intacto). La integration participation-aware vive en `src/lib/hr-core/postgres-leave-store.ts:computeBalanceSeedForYear` via el helper local `tryComputeParticipationAwareAllowanceDays`. El primitive year-scope canonical vive en `src/lib/leave/participation-window/`. El signal de reliability `hr.leave.accrual_overshoot_drift` aparece en `/admin/operations` bajo subsystem Payroll Data Quality. Ver spec arquitectonica en `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` Delta 2026-05-16 TASK-895.
 
 > Detalle tecnico: el motor de calculo vive en `src/lib/hr-core/leave-day-calculation.ts` y usa el calendario operativo de `src/lib/calendar/operational-calendar.ts`. Los schemas de datos estan en `greenhouse_hr` (leave_requests, leave_policies, leave_balances). Ver spec completa en `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` seccion 2.8.

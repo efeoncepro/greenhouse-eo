@@ -3536,6 +3536,63 @@ Toda decision "esta persona participa en este periodo y por cuanto" pasa por el 
 
 **Spec canonica**: `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` Delta 2026-05-16. Task: `docs/tasks/complete/TASK-893-payroll-participation-window.md`. Pre-flag-ON gates documentados en ADR seccion "Pre-flag-ON-producción gates". Patrones fuente: TASK-890 (exit eligibility composition), TASK-758 (4 regimenes canonicos), TASK-742 (defense-in-depth 7-layer), TASK-872 (flag gate), TASK-765/766/768/774 (reliability signals canonical pattern + builder).
 
+### Leave Accrual Participation-Aware invariants (TASK-895, desde 2026-05-16)
+
+Toda decision de **accrual de feriado legal CL Art 67 CT** para un colaborador en un year pasa por el **resolver canonico server-only** `src/lib/leave/participation-window/`. El resolver es un **year-scope aggregator** que compone TASK-893 (Payroll Participation Window, month-scope) mes a mes + filtra `rule_lane='internal_payroll'` para excluir periodos contractor/honorarios/external. Cierra bug class regulatorio CL: cuando un colaborador transita `contractor → dependent` mid-year, el helper legacy `calculateAccruedLeaveAllowanceDays` ancla accrual desde `members.hire_date` ignorando el periodo non-dependent — generando sobreacumulación + sobrepago al finiquito + precedente contractual riesgoso.
+
+**Read API canonico** (`src/lib/leave/participation-window/`):
+
+- `resolveLeaveAccrualWindowsForMembers(memberIds, year, options?: { asOfDate?: string }) → Map<memberId, LeaveAccrualEligibilityWindow>` — canonical bulk resolver.
+- `resolveLeaveAccrualWindowForMember(memberId, year, options?)` — single-member helper.
+- `deriveLeaveAccrualPolicy(facts) → LeaveAccrualEligibilityWindow` — pure function (33 tests verde).
+- `fetchCompensationFactsForLeaveAccrual(memberIds, yearStart, yearEnd)` — bulk PG query.
+- `isLeaveAccrualParticipationAwareEnabled() → boolean` — flag check con triple flag dependency enforcement.
+- `buildDegradedLeaveAccrualWindow(...)` — helper canonical para construir degraded windows desde el resolver wrapper.
+
+**Boundary semantic**:
+
+| Domain | Scope | Owns |
+|---|---|---|
+| Leave (TASK-895) | Year | `LeaveAccrualEligibilityWindow.eligibleDays` + `firstServiceCycleDays` |
+| Payroll Participation (TASK-893) | Month | `PayrollParticipationWindow.prorationFactor` + `exitEligibility` |
+| Workforce Exit (TASK-890) | Period (case-driven) | `WorkforceExitPayrollEligibilityWindow.projectionPolicy` + `eligibleTo` |
+
+**Flag dependency canonical (triple enforcement)**: `LEAVE_PARTICIPATION_AWARE_ENABLED=true` REQUIERE `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` AND `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` en el mismo ambiente. El helper `isLeaveAccrualParticipationAwareEnabled()` enforce la dependencia al boundary: retorna `true` solo cuando las 3 flags están ON. Sin esa pre-condición, retorna `false` (legacy bit-for-bit fallback) — degraded honesto.
+
+**Integration canonical en `postgres-leave-store.ts`**: el helper local `tryComputeParticipationAwareAllowanceDays` valida 4 pre-condiciones antes de aplicar la fórmula canonical `roundLeaveDays((annualDays * eligibleDays) / firstServiceCycleDays)`:
+
+1. `isLeaveAccrualParticipationAwareEnabled()` returns true.
+2. `policy.accrualType === 'monthly_accrual'`.
+3. `member.pay_regime === 'chile'`.
+4. Resolver returns `degradedMode === false`.
+
+Si cualquier pre-condición falla → fallback a `calculateAccruedLeaveAllowanceDays` legacy bit-for-bit. Preserva CL legal floor en cada degraded path.
+
+**Reliability signal canonical**: `hr.leave.accrual_overshoot_drift` (kind=`drift`, severity=`warning` si count>0, steady=0 post-flag-ON + re-seed). Subsystem rollup: `'Payroll Data Quality'` (moduleKey `'payroll'`) — unificado con TASK-893 signals. Reader pattern SHAPE detector (NO recompute exacto): identifica miembros con `hire_date` >30 días antes del `MIN(effective_from)` qualifying dependent CL.
+
+**Auditoría canonical**: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/leave/audit-accrual-drift.ts --target-year=<year> [--output=<path>]`. Read-only dry-run que reporta drift exacto por miembro (legacy vs participation-aware). Documentado en `docs/operations/runbooks/leave-accrual-drift-audit.md`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** reescribir el helper puro `calculateAccruedLeaveAllowanceDays` en `src/lib/hr-core/leave-domain.ts`. Integration ocurre en el call site (`postgres-leave-store.ts:1078,1102`) behind flag. Preserva 7 tests pure verdes legacy + SRP.
+- **NUNCA** extender `PayrollParticipationWindow` con `contractType`/`payRegime` para servir a Leave. Leave hace su propia query independiente a `compensation_versions` + compose TASK-893/890 solo para exit cutoff. DAG-leaf rule.
+- **NUNCA** importar `@/lib/leave/participation-window` desde un módulo de Payroll. DAG direction: Leave → Payroll, NUNCA reverse. Anti-corruption layer enforced en barrel.
+- **NUNCA** computar accrual inline desde `hire_date` solo cuando `LEAVE_PARTICIPATION_AWARE_ENABLED=true` y `memberId` disponible. El call site debe consumir el resolver canónico via `tryComputeParticipationAwareAllowanceDays`.
+- **NUNCA** mutar `leave_balances` automáticamente cuando se activa el flag. Backfill audit script V1.1a es read-only dry-run; mutation auditada queda V1.2 con capability `leave.balances.reconcile`.
+- **NUNCA** activar `LEAVE_PARTICIPATION_AWARE_ENABLED=true` sin: (a) las dos flags parent ON en mismo env, (b) staging shadow audit ≥30d con signal count=0, (c) HR + Legal written approval en `Handoff.md` con specific members allowlist, (d) audit script S4 dry-run con review HR documentado.
+- **NUNCA** consumir el modulo `participation-window` desde codigo client-side. Server-only enforce con `import 'server-only'` en cada archivo del modulo.
+- **NUNCA** validar SQL queries de signal readers contra `db.d.ts` shapes inferred como ground truth. **Lección canonical** del hotfix Sentry 2026-05-16: schema real PG es source of truth, no TS types. Future readers DEBEN validar contra PG real via proxy (`pnpm pg:connect:shell` + smoke script) ANTES de mergear. Bug class concreto detectado: `compensation_versions.payroll_via` NO existe en PG real (Kysely codegen drift); `payroll_via` vive en `members`. Y `compensation_versions.effective_from` es `date` no `timestamp` (`date - date = integer`, no `interval`).
+- **SIEMPRE** que un consumer downstream necesite "días efectivos de dependent CL en este year", llamar al resolver canonico. Cero composicion ad-hoc.
+- **SIEMPRE** que emerja un nuevo path que compute accrual de feriado legal, verificar que pase por `tryComputeParticipationAwareAllowanceDays` (mirror del pattern aplicado a `computeBalanceSeedForYear`). Single source of truth canonical.
+
+**Open questions (deliberadamente NO en V1.1a)**:
+
+- Honorarios + feriado proporcional opcional: hoy NO. Solo `dependent` (`indefinido`/`plazo_fijo`).
+- Saldos negativos por vacaciones tomadas pre-transición contractor→dependent: V1.2 write-path reconciliation con capability `leave.balances.reconcile`.
+- Tracking historical de `members.payroll_via` (cambios mid-year): V1.2 si emerge necesidad concreta.
+
+**Spec canonica**: `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` Delta 2026-05-16 §"TASK-895 V1.1a S0". Task: `docs/tasks/complete/TASK-895-leave-accrual-participation-aware.md`. Runbook: `docs/operations/runbooks/leave-accrual-drift-audit.md`. Patrones fuente: TASK-893 (month-scope primitive composer), TASK-890 (exit lanes), TASK-742 (defense-in-depth flag dependency).
+
 ### Person 360 Relationship Reconciliation invariants (TASK-891, desde 2026-05-15)
 
 Toda mutación de relaciones legales (`greenhouse_core.person_legal_entity_relationships`) que cierre una relación activa y abra una nueva en su lugar — el caso disparador es drift `member.contract_type='contractor' / payroll_via='deel'` con relación activa `'employee'` — **debe** pasar por el helper canónico `reconcileMemberContractDrift` (`src/lib/person-legal-entity-relationships/reconcile-drift.ts`). NUNCA SQL inline en consumers; NUNCA auto-mutar desde cron / read path.
