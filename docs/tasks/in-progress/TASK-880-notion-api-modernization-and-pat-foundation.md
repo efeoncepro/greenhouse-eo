@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -16,20 +16,26 @@
 - Rank: `TBD`
 - Domain: `integrations|platform|identity`
 - Blocked by: `none` (puede correr en paralelo con TASK-879 — esta task entrega los primitives, TASK-879 explora topología)
-- Branch: `task/TASK-880-notion-api-modernization-pat-foundation`
+- Branch: `develop` (operator override: no branch switch for this execution)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
 ## Summary
 
-Bumpear el header `Notion-Version` consumido por todos los callers Greenhouse de `2022-06-28` (junio 2022, ~4 años atrás) a `2026-03-11` y reemplazar el modelo de auth single-token global (`NOTION_TOKEN`) por un resolver canónico de Personal Access Tokens (PATs) scoped por workspace + operador. Es la foundation técnica que desbloquea todo lo nuevo de Notion Developer Platform 3.5 (Meeting Notes, Markdown API, Views API, MCP improvements, External Agents) y simultáneamente cierra un gap real de seguridad: hoy un solo token global firma sync + discovery + governance + admin triggers, sin audit trail per-actor.
+Bumpear el header `Notion-Version` consumido por todos los callers Greenhouse de `2022-06-28` (junio 2022, ~4 años atrás) a `2026-03-11` y reemplazar el modelo de auth single-token global (`NOTION_TOKEN`) por un resolver canónico de tokens Notion que distinga explícitamente entre:
+
+- `operator_pat`: Personal Access Token user-scoped para flujos interactivos donde el operador debe actuar con sus propios permisos.
+- `workspace_internal_connection`: token de internal connection / service-owned connection para automatizaciones team-owned y syncs no ligados a una persona.
+- `global_token`: fallback legacy actual, preservado para compatibilidad y rollback.
+
+Es la foundation técnica que desbloquea todo lo nuevo de Notion Developer Platform 3.5 (Meeting Notes, Markdown API, Views API, MCP improvements, External Agents) y simultáneamente cierra un gap real de seguridad: hoy un solo token global firma sync + discovery + governance + admin triggers, sin audit trail por actor o por token source.
 
 ## Why This Task Exists
 
 Greenhouse depende fuertemente de Notion (5,274 delivery tasks + 153 projects + 33 sprints en PG al 2026-05-14, governance de spaces, identity reconciliation TASK-877, future commercial↔delivery orchestrator EPIC-005) pero la integración corre con dos deudas estructurales:
 
 1. **API version stale**: `Notion-Version: 2022-06-28` está hardcodeada en `notion-client.ts`, `notion-governance.ts`, `notion-users.ts` y otros consumers. Notion ya shipped breaking changes en `2026-03-11` (`archived` → `in_trash`, `after` → objeto `position`, `transcription` → `meeting_notes`) que no podemos absorber sin esta foundation. Sin upgrade, ningún endpoint nuevo (Meeting Notes, Markdown API, Views API) está disponible.
-2. **Single-token blast radius**: `NOTION_TOKEN` global en GCP Secret Manager firma TODO. Si leakea: blast radius = todos los workspaces conectados, sin distinción de operador. No hay audit trail real (`source_sync_runs.triggered_by` es self-reportado, no verificable contra Notion-side audit). Notion lanzó PATs scoped per usuario el 12-may-2026 (Developer Portal unificado) que cierran este gap.
+2. **Single-token blast radius**: `NOTION_TOKEN` global en GCP Secret Manager firma TODO. Si leakea: blast radius = todos los workspaces conectados, sin distinción de operador. No hay audit trail real (`source_sync_runs.triggered_by` es self-reportado, no verificable contra Notion-side audit). Los PATs user-scoped reducen blast radius en flujos interactivos; los internal connections/service-owned tokens siguen siendo el modelo correcto para automatizaciones estables de equipo.
 
 Sin esta task, TASK-879 (pilot Workers/CLI) puede correr en sandbox pero no produce primitives reusables; TASK-738 (portal SDK migration) y TASK-739 (API modernization readiness) quedan en limbo; las oportunidades Tier 1 (Meeting Notes ingest TASK-881, Markdown reports publisher) están bloqueadas.
 
@@ -38,9 +44,9 @@ Sin esta task, TASK-879 (pilot Workers/CLI) puede correr en sandbox pero no prod
 - Centralizar TODA llamada a la API de Notion en un único cliente canónico (`NotionApiClient`) que enforce `Notion-Version` configurable + PAT cascade + audit log + redacción de tokens en logs.
 - Bumpear default version a `2026-03-11` con feature flag transitorio (`NOTION_API_VERSION_OVERRIDE`) para revert <5min sin redeploy.
 - Absorber los 3 breaking changes de `2026-03-11` (`archived` → `in_trash`, `after` → `position`, `transcription` → `meeting_notes`) sin romper el pipeline canónico (`runNotionSyncOrchestration` + `syncBqConformedToPostgres`).
-- Introducir resolver canónico `resolveNotionAuth({operatorUserId?, workspaceId?, scope})` con cascade `operator_pat → workspace_pat → global_token` + tabla PG `greenhouse_core.notion_personal_access_tokens` para PATs registrados por operadores admin.
-- Reliability signal `integrations.notion.api_version_drift` (warning si algún consumer todavía manda version != canonical) + `integrations.notion.auth_token_age_overdue` (warning si un PAT registrado tiene > 180 días sin rotación).
-- Capability granular `integrations.notion.pat.{register,revoke,list_self}` + admin endpoint `/api/admin/integrations/notion/personal-access-tokens` (CRUD self-scoped + admin-scoped tenant).
+- Introducir resolver canónico `resolveNotionAuth({operatorUserId?, workspaceId?, scope, purpose})` con cascade `operator_pat → workspace_internal_connection → global_token` + tabla PG `greenhouse_core.notion_api_tokens` para PATs de operador y tokens de internal connection/service-owned.
+- Reliability signal `integrations.notion.api_version_drift` (warning si algún consumer todavía manda version != canonical) + `integrations.notion.auth_token_rotation_overdue` (warning si un token activo tiene > 180 días sin rotación o PAT a <90 días de expirar; error si PAT expirado o >365 días).
+- Capability granular `integrations.notion.auth_tokens.{list_self,register_self,verify_self,revoke_self,list_tenant,revoke_tenant,register_workspace,verify_workspace,revoke_workspace}` + admin endpoint `/api/admin/integrations/notion/auth-tokens` (CRUD self-scoped + admin-scoped tenant/workspace).
 - Sin breaking change para consumers existentes: cualquier código que hoy importa `notionRequest({...})` sigue funcionando (la cascade resuelve a `global_token` cuando no hay PAT).
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -90,7 +96,7 @@ Reglas obligatorias:
 - `src/lib/integrations/notion-readiness.ts` / `notion-sync-orchestration.ts`
 - `src/app/api/integrations/notion/discover/route.ts` + `register/route.ts` (proxies a notion-bq-sync sibling — no llama Notion API directo, NO afectado)
 - `services/ops-worker/server.ts` (endpoint `/notion-conformed/sync` — corre `runNotionSyncOrchestration` que NO llama Notion API)
-- `greenhouse_core` schema (nueva tabla `notion_personal_access_tokens`)
+- `greenhouse_core` schema (nueva tabla `notion_api_tokens`)
 - TASK-697 reveal-sensitive pattern (encryption strategy reusable)
 - TASK-742 secret hygiene + redact helpers
 - TASK-877 `identity_profile_source_links` (no afectado, pero el resolver respeta el contract)
@@ -108,23 +114,23 @@ Reglas obligatorias:
 
 - `src/lib/notion/api-client.ts` — NEW canonical NotionApiClient
 - `src/lib/notion/auth-resolver.ts` — NEW PAT cascade resolver
-- `src/lib/notion/personal-access-tokens-store.ts` — NEW PG store CRUD
+- `src/lib/notion/auth-tokens-store.ts` — NEW PG store CRUD
 - `src/lib/notion/breaking-changes-shims.ts` — NEW absorption helpers (`in_trash`/`archived` dual-read, etc.)
 - `src/lib/notion/index.ts` — NEW barrel
 - `src/lib/space-notion/notion-client.ts` — REFACTOR a delegate del cliente nuevo
 - `src/lib/identity/reconciliation/notion-users.ts` — REFACTOR usar cliente nuevo
-- `src/app/api/admin/integrations/notion/personal-access-tokens/route.ts` — NEW CRUD admin
-- `src/app/api/me/integrations/notion/personal-access-tokens/route.ts` — NEW self-scoped CRUD operador
-- `src/app/(dashboard)/admin/integrations/notion/personal-access-tokens/page.tsx` — NEW admin surface (lista + revoke)
+- `src/app/api/admin/integrations/notion/auth-tokens/route.ts` — NEW CRUD admin
+- `src/app/api/my/integrations/notion/auth-tokens/route.ts` — NEW self-scoped CRUD operador
+- `src/app/(dashboard)/admin/integrations/notion/auth-tokens/page.tsx` — NEW admin surface (lista + revoke)
 - `src/lib/reliability/queries/notion-api-version-drift.ts` — NEW signal reader
 - `src/lib/reliability/queries/notion-pat-age-overdue.ts` — NEW signal reader
-- `migrations/<timestamp>_task-880-notion-personal-access-tokens.sql`
+- `migrations/<timestamp>_task-880-notion-api-tokens.sql`
 - `migrations/<timestamp>_task-880-capabilities-registry-seed.sql`
 - `docs/architecture/GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md` (Delta)
 - `docs/architecture/GREENHOUSE_NOTION_BIGQUERY_ABSORPTION_DECISION_V1.md` (Delta — confirmar que esta task no muta la decisión absorption)
 - `docs/architecture/DECISIONS_INDEX.md` (entry nueva)
 - `docs/documentation/plataforma/integraciones-notion.md` (NEW funcional)
-- `docs/manual-de-uso/plataforma/notion-personal-access-tokens.md` (NEW manual operador)
+- `docs/manual-de-uso/plataforma/notion-auth-tokens.md` (NEW manual operador/admin)
 
 ## Current Repo State
 
@@ -170,63 +176,75 @@ Reglas obligatorias:
 ### Slice 1 — Canonical NotionApiClient + auth resolver foundation
 
 - Crear `src/lib/notion/api-client.ts`: clase `NotionApiClient` con métodos `get/post/patch/delete<T>(path, options)`. Default `Notion-Version` resuelto desde `getCurrentNotionApiVersion()` (lee env var + fallback canonical). Timeout 30s. Retry exponencial 3 attempts para 429/5xx. `captureWithDomain` en error path. Token redactado en error logs.
-- Crear `src/lib/notion/auth-resolver.ts`: `resolveNotionAuth({operatorUserId?, workspaceId?, scope: 'read'|'write'|'admin'})` con cascade `operator_pat → workspace_pat → global_token`. Server-only enforce.
+- Crear `src/lib/notion/auth-resolver.ts`: `resolveNotionAuth({operatorUserId?, workspaceId?, scope: 'read'|'write'|'admin', purpose?})` con cascade `operator_pat → workspace_internal_connection → global_token`. Server-only enforce.
 - Crear `src/lib/notion/index.ts` barrel: re-exports + types.
 - `src/lib/space-notion/notion-client.ts` se refactoriza a thin delegate que importa el cliente canónico (preserva la signature `notionRequest({...})` 100% backward-compat). Marca el module con `// @deprecated use NotionApiClient from @/lib/notion` en jsdoc.
 - Tests Vitest: 15+ tests cubren happy path, 429 retry, 5xx retry, timeout, token redaction en error, cascade resolution (con/sin PAT), invalid token shape rejection.
 - NO bumpear version todavía — Slice 1 mantiene `2022-06-28` como default canonical para que sea additive.
 
-### Slice 2 — Notion Personal Access Tokens (PG storage + capabilities)
+### Slice 2 — Notion auth tokens (PG storage + capabilities)
 
-- Migration `<timestamp>_task-880-notion-personal-access-tokens.sql`:
-  - Tabla `greenhouse_core.notion_personal_access_tokens`:
-    - `pat_id UUID PK DEFAULT gen_random_uuid()`
-    - `user_id TEXT NOT NULL REFERENCES greenhouse_core.client_users(user_id) ON DELETE CASCADE`
-    - `workspace_id TEXT NOT NULL` (Notion workspace UUID; FK opcional a `greenhouse_core.space_notion_sources` si existe)
-    - `label TEXT NOT NULL CHECK (length(label) BETWEEN 3 AND 64)` (operator-supplied display name)
-    - `token_value_full TEXT NOT NULL` (encrypted-at-rest via PG TDE; grants estrictos)
-    - `token_value_hash BYTEA NOT NULL` (SHA-256(pepper || raw_token) para dedup + audit lookup)
-    - `token_display_mask TEXT NOT NULL` (`secret_xxx...XXXX` last-4)
-    - `scope TEXT NOT NULL CHECK (scope IN ('read', 'write', 'admin'))`
-    - `verified_at TIMESTAMPTZ NULL` (NULL hasta que un test call confirme que el token funciona)
+- Migration `<timestamp>_task-880-notion-api-tokens.sql`:
+  - Tabla `greenhouse_core.notion_api_tokens`:
+    - `token_id UUID PK DEFAULT gen_random_uuid()`
+    - `token_kind TEXT NOT NULL CHECK (token_kind IN ('operator_pat','workspace_internal_connection','legacy_global_token_ref'))`
+    - `user_id TEXT NULL REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL` (requerido para `operator_pat`; NULL para tokens workspace/service-owned).
+    - `workspace_id TEXT NOT NULL` (Notion workspace UUID o stable external workspace id; FK opcional a `greenhouse_core.notion_workspaces` si el runtime real lo permite).
+    - `label TEXT NOT NULL CHECK (length(label) BETWEEN 3 AND 96)` (operator/admin supplied display name).
+    - `token_value_full TEXT NULL` (solo para tokens registrados en PG; encrypted at rest via Cloud SQL TDE + grants estrictos).
+    - `secret_ref TEXT NULL` (para tokens gestionados en Secret Manager o fallback legacy).
+    - `token_value_hash TEXT NOT NULL` (SHA-256(pepper || raw_token) para dedup + audit lookup; nunca reversible sin pepper).
+    - `token_hash_pepper_version TEXT NOT NULL DEFAULT 'v1'`.
+    - `token_display_mask TEXT NOT NULL` (`secret_...XXXX` o `ntn_...XXXX`, nunca plaintext).
+    - `scope TEXT NOT NULL CHECK (scope IN ('read','write','admin'))`
+    - `notion_bot_user_id TEXT NULL`
+    - `notion_workspace_name TEXT NULL`
+    - `verified_at TIMESTAMPTZ NULL` (NULL hasta que `GET /v1/users/me` confirme que el token funciona).
     - `last_used_at TIMESTAMPTZ NULL`
     - `last_rotated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`
+    - `expires_at TIMESTAMPTZ NULL` (requerido para `operator_pat`, porque los PATs expiran al año según docs Notion; NULL permitido para internal connection si Notion no publica expiración).
     - `revoked_at TIMESTAMPTZ NULL`
     - `revoked_by TEXT NULL` + `revoke_reason TEXT NULL`
     - `created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`
     - `updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`
-    - UNIQUE INDEX partial `(user_id, workspace_id) WHERE revoked_at IS NULL` (un PAT activo por user-workspace).
-  - Tabla `greenhouse_core.notion_personal_access_token_audit_log` (append-only; trigger anti-update/delete):
-    - `audit_id UUID PK`, `pat_id UUID FK`, `action TEXT CHECK (action IN ('registered', 'verified', 'revoked', 'used', 'rotated'))`, `actor_user_id TEXT`, `metadata_json JSONB`, `occurred_at TIMESTAMPTZ`.
+    - UNIQUE INDEX partial `(token_kind, user_id, workspace_id, scope) WHERE revoked_at IS NULL AND token_kind = 'operator_pat'`.
+    - UNIQUE INDEX partial `(token_kind, workspace_id, scope) WHERE revoked_at IS NULL AND token_kind = 'workspace_internal_connection'`.
+  - Tabla `greenhouse_core.notion_api_token_audit_log` (append-only; trigger anti-update/delete):
+    - `audit_id UUID PK`, `token_id UUID FK`, `action TEXT CHECK (action IN ('registered','verified','revoked','used','rotated','secret_ref_updated'))`, `actor_user_id TEXT`, `metadata_json JSONB`, `occurred_at TIMESTAMPTZ`.
   - Trigger `set_updated_at` BEFORE UPDATE.
   - Anti pre-up-marker DO block valida tablas creadas + columns esperadas.
   - GRANTs: `greenhouse_runtime` SELECT/INSERT/UPDATE (NO DELETE — solo soft-delete via `revoked_at`).
 - Migration `<timestamp>_task-880-capabilities-registry-seed.sql`:
-  - `integrations.notion.pat.list_self` (module=`integrations`, action=`read`, scope=`own`) — cualquier `client_user` activo.
-  - `integrations.notion.pat.register_self` (action=`create`, scope=`own`) — cualquier `client_user` activo.
-  - `integrations.notion.pat.revoke_self` (action=`delete`, scope=`own`) — cualquier `client_user` activo.
-  - `integrations.notion.pat.list_tenant` (action=`read`, scope=`tenant`) — `EFEONCE_ADMIN`.
-  - `integrations.notion.pat.revoke_tenant` (action=`delete`, scope=`tenant`) — `EFEONCE_ADMIN`.
+  - Primero formaliza `integrations` como módulo de entitlements si no existe, con ADR/index antes de seedear capabilities.
+  - `integrations.notion.auth_tokens.list_self` (module=`integrations`, action=`read`, scope=`own`) — cualquier `client_user` activo.
+  - `integrations.notion.auth_tokens.register_self` (action=`create`, scope=`own`) — cualquier `client_user` activo.
+  - `integrations.notion.auth_tokens.verify_self` (action=`execute`, scope=`own`) — cualquier `client_user` activo.
+  - `integrations.notion.auth_tokens.revoke_self` (action=`delete`, scope=`own`) — cualquier `client_user` activo.
+  - `integrations.notion.auth_tokens.list_tenant` (action=`read`, scope=`tenant`) — `EFEONCE_ADMIN`.
+  - `integrations.notion.auth_tokens.revoke_tenant` (action=`delete`, scope=`tenant`) — `EFEONCE_ADMIN`.
+  - `integrations.notion.auth_tokens.register_workspace` / `verify_workspace` / `revoke_workspace` (actions `create|execute|delete`, scope=`tenant`) — `EFEONCE_ADMIN` only; estos gestionan `workspace_internal_connection`, no PATs de otro usuario.
   - Grants en `src/lib/entitlements/runtime.ts` (CLAUDE.md TASK-873 invariant: capability seed sin grant runtime = endpoint inaccesible).
-- Helper `src/lib/notion/personal-access-tokens-store.ts`:
-  - `registerPersonalAccessToken({userId, workspaceId, label, rawToken, scope})` — atomic: hash + mask + INSERT + audit row + outbox event `notion.pat.registered v1`.
-  - `revokePersonalAccessToken({patId, actorUserId, reason})` — soft-delete + audit + outbox `notion.pat.revoked v1`.
-  - `verifyPersonalAccessToken(patId)` — issue test call (`GET /v1/users/me`) usando el cliente canónico, persistir `verified_at` + outbox.
-  - `listPersonalAccessTokensForUser(userId)` / `listPersonalAccessTokensForTenant()` — masked, NUNCA expone `token_value_full`.
-  - `resolveActivePatForUserAndWorkspace(userId, workspaceId)` — usado por el auth-resolver.
+- Helper `src/lib/notion/auth-tokens-store.ts`:
+  - `registerOperatorPat({userId, workspaceId, label, rawToken, scope, expiresAt})` — atomic: hash + mask + INSERT + audit row + outbox event `notion.auth_token.registered v1`.
+  - `registerWorkspaceInternalConnection({workspaceId, label, rawToken|secretRef, scope})` — admin-only helper para automatizaciones team-owned.
+  - `revokeNotionAuthToken({tokenId, actorUserId, reason})` — soft-delete + audit + outbox `notion.auth_token.revoked v1`.
+  - `verifyNotionAuthToken(tokenId)` — issue test call (`GET /v1/users/me`) usando el cliente canónico, persistir `verified_at`, `notion_bot_user_id` y metadata segura + outbox.
+  - `listNotionAuthTokensForUser(userId)` / `listNotionAuthTokensForTenant()` — masked, NUNCA expone `token_value_full`.
+  - `resolveActiveOperatorPatForUserAndWorkspace(userId, workspaceId)` y `resolveWorkspaceInternalConnection(workspaceId, scope)` — usados por el auth-resolver.
 - Tests: 20+ tests. Idempotency, scope enforcement, hash+pepper paridad, audit append-only, soft-delete preserva audit.
 
 ### Slice 3 — Admin + operator surfaces (CRUD UI)
 
 - API routes:
-  - `GET/POST /api/me/integrations/notion/personal-access-tokens` (capability `integrations.notion.pat.list_self` / `register_self`).
-  - `DELETE /api/me/integrations/notion/personal-access-tokens/[patId]` (capability `revoke_self`, gate `userId === pat.user_id`).
-  - `POST /api/me/integrations/notion/personal-access-tokens/[patId]/verify`.
-  - `GET /api/admin/integrations/notion/personal-access-tokens` (capability `list_tenant`).
-  - `DELETE /api/admin/integrations/notion/personal-access-tokens/[patId]` (capability `revoke_tenant`).
-- Surface operador: bloque "Mis tokens Notion" en `Mi Greenhouse` (`/me/integraciones/notion`). Form de registro (label + rawToken + workspaceId pickable from `space_notion_sources` activos + scope radio). Lista con masked + verified badge + last_used_at relativo + botón Revocar.
-- Surface admin: `/admin/integrations/notion/personal-access-tokens` con tabla TanStack (operador, workspace, scope, last_used, status). Drawer con audit log timeline. Filtros por estado/operador/workspace.
-- Microcopy en `src/lib/copy/integraciones.ts` (extender domain copy module).
+  - `GET/POST /api/my/integrations/notion/auth-tokens` (capability `integrations.notion.auth_tokens.list_self` / `register_self`; solo permite `token_kind='operator_pat'` para el usuario autenticado).
+  - `DELETE /api/my/integrations/notion/auth-tokens/[tokenId]` (capability `revoke_self`, gate `token.user_id === session.user.id` y `token_kind='operator_pat'`).
+  - `POST /api/my/integrations/notion/auth-tokens/[tokenId]/verify`.
+  - `GET /api/admin/integrations/notion/auth-tokens` (capability `list_tenant`).
+  - `POST /api/admin/integrations/notion/auth-tokens/workspace` (capability `register_workspace`; crea `workspace_internal_connection` o secret ref, nunca registra PAT en nombre de otro usuario).
+  - `DELETE /api/admin/integrations/notion/auth-tokens/[tokenId]` (capability `revoke_tenant` o `revoke_workspace` según `token_kind`).
+- Surface operador: bloque "Mis tokens Notion" en `Mi Greenhouse` (`/my/integrations/notion`). Form de registro (label + rawToken + workspaceId pickable from `notion_workspaces` / `space_notion_sources` activos + scope radio + `expires_at`). Lista con masked + verified badge + expiration/rotation status + last_used_at relativo + botón Revocar.
+- Surface admin: `/admin/integrations/notion/auth-tokens` con tabla TanStack (token kind, operador cuando aplique, workspace, scope, last_used, expires/rotation status). Drawer con audit log timeline. Filtros por estado/kind/operador/workspace.
+- Microcopy en `src/lib/copy/integrations.ts` o módulo existente equivalente (verificar convención actual antes de crear).
 - Sin breaking change: cuando un operador NO tiene PAT registrado, fallback automático a global token (cascade canonical).
 - Tests: render + interaction + microcopy.
 
@@ -246,13 +264,13 @@ Reglas obligatorias:
 
 - Reliability signal `integrations.notion.api_version_drift` (kind=drift, severity=warning si count>0, steady=0):
   - Reader `src/lib/reliability/queries/notion-api-version-drift.ts`. Cuenta requests Notion en últimas 24h con `notion_version_used != getCurrentNotionApiVersion()`. Source: log structured emitted por `NotionApiClient` cuando consumer fuerza override.
-- Reliability signal `integrations.notion.pat_age_overdue` (kind=drift, severity=warning >180d, error >365d):
-  - Reader cuenta PATs activos (revoked_at IS NULL) con `last_rotated_at < now() - interval '180 days'`.
+- Reliability signal `integrations.notion.auth_token_rotation_overdue` (kind=drift, severity=warning >180d o PAT expira en <90d, error >365d o PAT expirado):
+  - Reader cuenta tokens activos (revoked_at IS NULL) con `last_rotated_at < now() - interval '180 days'` o `expires_at` vencido/próximo.
 - Wire-up en `getReliabilityOverview` source `integrations.notion[]`. Subsystem rollup: `Integrations` (verificar que existe; si no, agregar al registry).
 - Lint rule `greenhouse/no-direct-notion-api-call` (modo `warn` en V1, promote a `error` post-cleanup):
   - Detecta `fetch('https://api.notion.com/...')` o `Notion-Version: 2022-06-28` literal fuera de `src/lib/notion/**` y `src/lib/space-notion/notion-client.ts` (legacy delegate).
 - Doc funcional: `docs/documentation/plataforma/integraciones-notion.md` v1.0 (estructura: qué es, cómo registrar PAT, cómo se usa la cascade, cuándo aparecen los signals).
-- Manual operador: `docs/manual-de-uso/plataforma/notion-personal-access-tokens.md` (paso a paso registrar/revocar/verificar).
+- Manual operador/admin: `docs/manual-de-uso/plataforma/notion-auth-tokens.md` (paso a paso registrar/revocar/verificar PAT propio y administrar internal connection tokens).
 - ADR entry en `docs/architecture/DECISIONS_INDEX.md`: "Notion auth canonical = PAT cascade resolver + global token fallback".
 - Spec Delta en `GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md` y `GREENHOUSE_NOTION_BIGQUERY_ABSORPTION_DECISION_V1.md`.
 - CLAUDE.md + AGENTS.md: hard rules sobre uso del cliente canónico + version bump invariant.
@@ -274,23 +292,25 @@ Reglas obligatorias:
 ### Cascade canonical de auth
 
 ```text
-resolveNotionAuth({operatorUserId, workspaceId, scope}) →
+resolveNotionAuth({operatorUserId, workspaceId, scope, purpose}) →
 
   if operatorUserId AND workspaceId:
-    pat = resolveActivePatForUserAndWorkspace(operatorUserId, workspaceId)
-    if pat AND pat.scope >= scope AND pat.revoked_at IS NULL:
+    pat = resolveActiveOperatorPatForUserAndWorkspace(operatorUserId, workspaceId)
+    if pat AND pat.scope >= scope AND pat.revoked_at IS NULL AND pat.expires_at > now():
       audit(pat.id, 'used', operatorUserId)
-      return {token: decrypt(pat.token_value_full), source: 'operator_pat', patId: pat.id}
+      return {token, source: 'operator_pat', tokenId: pat.id}
 
   if workspaceId:
-    workspacePat = resolveDefaultPatForWorkspace(workspaceId)  // future: shared workspace token
-    if workspacePat: return {token: ..., source: 'workspace_pat'}
+    workspaceToken = resolveWorkspaceInternalConnection(workspaceId, scope)
+    if workspaceToken:
+      audit(workspaceToken.id, 'used', operatorUserId ?? '__system__')
+      return {token, source: 'workspace_internal_connection', tokenId: workspaceToken.id}
 
-  globalToken = resolveSecretByRef('greenhouse-notion-token')
+  globalToken = resolveLegacyGlobalToken()
   return {token: globalToken, source: 'global_token'}
 ```
 
-Si `scope='write'` y la cascade resuelve a `global_token` (que hoy es read-only), throw `NotionAuthScopeMismatchError` + `captureWithDomain('integrations.notion', err)`.
+Si `scope='write'` y la cascade resuelve a `global_token` sin contrato explícito de write, throw `NotionAuthScopeMismatchError` + `captureWithDomain('integrations.notion', err)`. `purpose='list_users'` debe saltar `operator_pat`, porque Notion documenta que PATs no pueden listar todos los usuarios.
 
 ### Storage encryption strategy
 
@@ -298,16 +318,17 @@ Pattern fuente TASK-697 (`src/lib/finance/beneficiary-payment-profiles/reveal-se
 
 - Plaintext at rest (Cloud SQL TDE cubre disk encryption).
 - Grants estrictos `greenhouse_runtime` SELECT/INSERT/UPDATE solo (NO DELETE — soft-delete via `revoked_at`).
-- `token_value_hash = sha256(pepper || raw_token)` con pepper en GCP Secret Manager `greenhouse-notion-pat-pepper`. Sin pepper, hashes de tokens "secret_xxx" son comparables; el pepper rompe que sean reversibles.
+- `token_value_hash = sha256(pepper || raw_token)` con pepper en GCP Secret Manager versionado (`greenhouse-notion-token-pepper-v1` o nombre aprobado por ADR). Sin pepper, hashes de tokens son comparables; el pepper rompe que sean reversibles.
+- `token_hash_pepper_version` obligatorio desde V1 para permitir rotación futura sin reescribir la arquitectura.
 - `token_display_mask = "secret_" + lastChars(rawToken, 4).padStart(8, "•")` precomputado al INSERT.
 - Reveal endpoint NO incluido en V1 — el operador solo ve mask. Si necesita el token completo, lo genera nuevo desde Notion Developer Portal y revoca el viejo.
 
 ### Outbox events nuevos (versionados v1, documentar en EVENT_CATALOG)
 
-- `notion.pat.registered v1` — `{patId, userId, workspaceId, scope, registeredAt}`.
-- `notion.pat.verified v1` — `{patId, verifiedAt, notionUserId}`.
-- `notion.pat.revoked v1` — `{patId, actorUserId, reason, revokedAt}`.
-- `notion.pat.used v1` — high-volume; emit solo bajo flag `NOTION_PAT_USAGE_OUTBOX_ENABLED=true` para audit forensic durante incident response. Default OFF.
+- `notion.auth_token.registered v1` — `{tokenId, tokenKind, userId?, workspaceId, scope, registeredAt}`.
+- `notion.auth_token.verified v1` — `{tokenId, tokenKind, verifiedAt, notionBotUserId}`.
+- `notion.auth_token.revoked v1` — `{tokenId, tokenKind, actorUserId, reason, revokedAt}`.
+- `notion.auth_token.used v1` — high-volume; emit solo bajo flag `NOTION_AUTH_TOKEN_USAGE_OUTBOX_ENABLED=true` para audit forensic durante incident response. Default OFF.
 
 ### Rollback path canónico (Slice 4 bump)
 
@@ -324,7 +345,7 @@ Si bump causa regresión live:
 
 - Slice 0 (discovery) DEBE finalizar antes de Slice 1.
 - Slice 1 (cliente canonical) DEBE finalizar antes de Slice 2 (PAT store usa el cliente para verify).
-- Slice 2 (PAT store) puede correr en paralelo con Slice 4 (version bump) en términos de código, PERO mergear Slice 2 antes de Slice 4 reduce riesgo (PATs ya disponibles si rollback necesario).
+- Slice 2 (auth token store) puede correr en paralelo con Slice 4 (version bump) en términos de código, PERO mergear Slice 2 antes de Slice 4 reduce riesgo (resolver/audit ya disponibles si rollback necesario).
 - Slice 3 (UI) depende de Slice 2.
 - Slice 4 (version bump) DEBE absorber los 3 breaking changes en el mismo PR — NO mergear bump sin shims.
 - Slice 5 (signals + lint + docs) cierra. Lint rule `error` mode SOLO post-cleanup completo.
@@ -334,18 +355,19 @@ Si bump causa regresión live:
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Version bump rompe consumer downstream que parsea `archived` | Identity / Delivery sync | medium | env override + dual-read shims + smoke staging post-bump | `integrations.notion.api_version_drift` + Sentry domain=integrations.notion |
-| PAT plaintext leakage en logs | Secrets / Identity | low | redactSensitive + token_display_mask precomputado + grants strictos | secret scan / git diff / Sentry payload audit |
-| PAT pepper missing en Secret Manager | Auth | low | startup check en `resolveNotionAuth` + fail-fast con `captureWithDomain` | Sentry alert al boot + CI check |
+| Token plaintext leakage en logs | Secrets / Identity | low | redactSensitive + token_display_mask precomputado + grants strictos | secret scan / git diff / Sentry payload audit |
+| Token pepper missing en Secret Manager | Auth | low | startup check en `resolveNotionAuth` + fail-fast con `captureWithDomain` | Sentry alert al boot + CI check |
 | Operador registra PAT con scope=write incorrectamente y rompe rate limits | Notion API | low | scope=write requiere capability extra + verification call obligatoria pre-uso | rate limit 429 spike + Sentry domain=integrations.notion |
-| Cascade fallback a global_token sin que operador se entere | Audit | medium | source field en outbox `notion.pat.used` + dashboard "operadores sin PAT" | reliability signal nueva (V2 si emerge necesidad) |
+| Se usa PAT humano como token de automatización estable | Notion API / Ops | medium | `token_kind` explícito + admin route separada para `workspace_internal_connection` + docs | signal token expiration/rotation + audit |
+| Cascade fallback a global_token sin que operador se entere | Audit | medium | source field en audit/outbox usage bajo flag + dashboard "operadores sin PAT" | reliability signal nueva (V2 si emerge necesidad) |
 | Shim `transcription`→`meeting_notes` rompe `runNotionSyncOrchestration` | Delivery sync | medium | smoke staging + parity audit post-bump | delivery_tasks count drop signal |
 | Lint rule false positive bloquea PR legítimo | Dev velocity | low | `warn` mode en V1; promote a error solo post-cleanup completo | CI noise |
 
 ### Feature flags / cutover
 
 - `NOTION_API_VERSION_OVERRIDE` (default unset) — env var Vercel + ops-worker. Override a `2022-06-28` revert instant. Cleanup post 30d steady-state.
-- `NOTION_PAT_RESOLVER_ENABLED` (default `true` desde Slice 2) — kill-switch defensivo. Si `false`, cascade salta directo a global_token. Cleanup post 60d.
-- `NOTION_PAT_USAGE_OUTBOX_ENABLED` (default `false`) — emit outbox event en cada uso de PAT. Para audit forensic ad-hoc; OFF en steady state por volumen.
+- `NOTION_AUTH_TOKEN_RESOLVER_ENABLED` (default `true` desde Slice 2) — kill-switch defensivo. Si `false`, cascade salta directo a global_token. Cleanup post 60d.
+- `NOTION_AUTH_TOKEN_USAGE_OUTBOX_ENABLED` (default `false`) — emit outbox event en cada uso de token registrado. Para audit forensic ad-hoc; OFF en steady state por volumen.
 
 ### Rollback plan per slice
 
@@ -353,7 +375,7 @@ Si bump causa regresión live:
 |---|---|---|---|
 | Slice 0 | Revert audit doc | <5 min | sí |
 | Slice 1 | Revert PR — cliente canonical es additive, legacy delegate intacto | <10 min | sí |
-| Slice 2 | Migration down (DROP tablas, idempotente) + revert PR. Tokens en DB se borran con CASCADE. | <30 min | sí |
+| Slice 2 | Migration down (DROP tablas, idempotente) + revert PR. Tokens registrados en DB se borran; legacy global token queda intacto. | <30 min | sí |
 | Slice 3 | Revert UI PR — endpoints quedan accesibles via API direct (no breaking) | <10 min | sí |
 | Slice 4 | `NOTION_API_VERSION_OVERRIDE=2022-06-28` + redeploy | <5 min | sí |
 | Slice 5 | Revert signals + lint rule | <10 min | sí |
@@ -363,7 +385,7 @@ Si bump causa regresión live:
 1. Slice 0 audit doc merged → review file paths + sample size completos.
 2. Slice 1 cliente canonical merged a develop → CI verde + tests Vitest 15+ verde.
 3. Slice 2 migration aplicada en staging → `pnpm migrate:status` verifica + DO block check pasa + capabilities seedadas.
-4. Slice 3 UI deployed staging → smoke test: registrar PAT test, verificar, revocar. Audit log poblado.
+4. Slice 3 UI deployed staging → smoke test: registrar PAT operador test, verificar, revocar. Audit log poblado.
 5. Slice 4 bump merged a develop → smoke `runNotionSyncOrchestration` corre en staging via `/api/admin/integrations/notion/trigger-conformed-sync` → assert `greenhouse_delivery.{projects,tasks,sprints}` count NO cae.
 6. Slice 4 deploy production → monitor signal `api_version_drift` + Sentry domain=integrations.notion durante 24h. Si drift > 0 sostenido, root cause y fix.
 7. Slice 5 lint rule en `warn` mode → revisar reportes + cleanup callsites residuales.
@@ -371,8 +393,9 @@ Si bump causa regresión live:
 
 ### Out-of-band coordination required
 
-- Verificar que GCP Secret Manager tiene espacio para nuevo secret `greenhouse-notion-pat-pepper` (`gcloud secrets create greenhouse-notion-pat-pepper --replication-policy=automatic --project=efeonce-group`) + grant a `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`.
+- Verificar que GCP Secret Manager tiene espacio para nuevo secret versionado de pepper (`greenhouse-notion-token-pepper-v1`, nombre final por ADR) + grant a la service account runtime correspondiente.
 - Comunicar a operadores admin (Julio + Cesar) la opción de registrar PAT propio post Slice 3 — opt-in, no obligatorio.
+- Coordinar con Workspace Admin Efeonce si se requiere crear/rotar internal connection token service-owned para automatizaciones team-owned.
 - Si bump version rompe el upstream `notion-bq-sync` (correlación esperada baja porque sibling tiene su propio path), coordinar con TASK-737.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -383,16 +406,17 @@ Si bump causa regresión live:
 
 - [ ] Audit Slice 0 lista TODOS los callsites Notion API en repo + count exacto + breaking changes affected.
 - [ ] `NotionApiClient` canonical existe + tests Vitest 15+ verde + cubre redaction + retry + cascade.
-- [ ] `notion_personal_access_tokens` table aplicada en staging + production + DO block anti pre-up-marker pasa.
-- [ ] 5 capabilities `integrations.notion.pat.*` seeded en `capabilities_registry` + grants en `runtime.ts` + parity test verde.
-- [ ] Surface admin `/admin/integrations/notion/personal-access-tokens` operativa + surface operador `/me/integraciones/notion` operativa.
+- [ ] `notion_api_tokens` table aplicada en staging + production + DO block anti pre-up-marker pasa.
+- [ ] Módulo de entitlements `integrations` formalizado por ADR/index antes de seedear capabilities.
+- [ ] Capabilities `integrations.notion.auth_tokens.*` seeded en `capabilities_registry` + grants en `runtime.ts` + parity test verde.
+- [ ] Surface admin `/admin/integrations/notion/auth-tokens` operativa + surface operador `/my/integrations/notion` operativa.
 - [ ] Default API version bumped a `2026-03-11` + 3 breaking changes absorbed + smoke `runNotionSyncOrchestration` verde.
-- [ ] Reliability signals `api_version_drift` + `pat_age_overdue` registrados + visible en `/admin/operations`.
+- [ ] Reliability signals `api_version_drift` + `auth_token_rotation_overdue` registrados + visible en `/admin/operations`.
 - [ ] Lint rule `greenhouse/no-direct-notion-api-call` activa en `warn` mode (promote a `error` post-cleanup).
 - [ ] Doc funcional + manual operador + ADR entry merged.
 - [ ] CLAUDE.md + AGENTS.md hard rules agregadas.
 - [ ] No regresión: count `greenhouse_delivery.{projects,tasks,sprints}` post-bump >= count pre-bump (smoke 7d).
-- [ ] Outbox events `notion.pat.{registered,verified,revoked}` documentados en `GREENHOUSE_EVENT_CATALOG_V1.md`.
+- [ ] Outbox events `notion.auth_token.{registered,verified,revoked}` documentados en `GREENHOUSE_EVENT_CATALOG_V1.md`.
 
 ## Verification
 
@@ -401,7 +425,7 @@ Si bump causa regresión live:
 - `pnpm test` (full suite — CLAUDE.md task closing quality gate)
 - `pnpm build` (Turbopack — atrapa boundary violations server-only)
 - `pnpm migrate:status` post Slice 2
-- Smoke staging: registrar PAT, verify, revoke, audit log + outbox emitidos
+- Smoke staging: registrar PAT operador, verify, revoke, audit log + outbox emitidos
 - Smoke staging: trigger `runNotionSyncOrchestration` post-bump → assert delivery_* counts
 - Manual review reliability dashboard `/admin/operations` post-deploy
 
@@ -418,7 +442,7 @@ Si bump causa regresión live:
 - [ ] AGENTS.md mirror del invariant
 - [ ] Spec arquitectónica `GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md` con Delta
 - [ ] ADR en `DECISIONS_INDEX.md`
-- [ ] PATs de operadores piloto (Julio + Cesar opcional) documentados en runbook
+- [ ] PATs de operadores piloto (Julio + Cesar opcional) documentados en runbook sin valores secretos
 
 ## Follow-ups
 
@@ -431,35 +455,36 @@ Si bump causa regresión live:
 
 ## Open Questions
 
-- ¿El operador admin debe poder registrar un PAT en nombre de otro operador (delegated registration)? V1 dice no — cada operador registra el suyo. V2 puede agregar si emerge necesidad.
-- ¿Necesitamos `workspace_pat` (PAT compartido para una workspace, no atado a operador)? V1 omite — cascade va de operator_pat directo a global_token. V2 puede agregar si tenemos workflows automated que necesitan auth distinto al global token pero no atado a un humano.
-- ¿La verificación de PAT al registrar debe llamar `GET /v1/users/me` o algo más liviano? Probable `users/me` — devuelve workspace info útil.
-- ¿Pepper rotation strategy? V1 single pepper. V2 puede agregar `pepper_version` + dual-hash si emerge necesidad de rotation forzada.
-- ¿Bumpear directo a `2026-03-11` o a algo intermedio (e.g. `2025-09-03` que también es post-2022)? Probable directo — minimiza versiones intermedias.
+Todas las Open Questions originales quedan resueltas antes de implementación:
+
+- ¿El operador admin debe poder registrar un PAT en nombre de otro operador (delegated registration)? → **No en V1.** Cada operador registra su propio PAT. Admin puede listar/revocar por tenant y registrar/rotar tokens `workspace_internal_connection`, pero no copiar ni custodiar PATs personales de otro usuario.
+- ¿Necesitamos `workspace_pat`? → **No como PAT.** La categoría correcta es `workspace_internal_connection`: token de internal connection/service-owned para automatizaciones team-owned. Los PATs son user-scoped y expiran al año; no deben ser el contrato de sync estable.
+- ¿La verificación de PAT al registrar debe llamar `GET /v1/users/me` o algo más liviano? → **Sí: `GET /v1/users/me`.** Es el endpoint soportado por PATs y permite guardar `notion_bot_user_id`/workspace metadata segura.
+- ¿Pepper rotation strategy? → **V1 incluye `token_hash_pepper_version`.** La primera versión puede usar un solo pepper activo, pero el schema ya queda preparado para rotación dual-hash futura.
+- ¿Bumpear directo a `2026-03-11` o a algo intermedio? → **Directo a `2026-03-11`.** Es la versión vigente que activa los cambios objetivo y evita migraciones intermedias.
+- ¿Pueden los PATs alimentar `notion-users.ts` / `GET /v1/users`? → **No.** Notion documenta y runtime confirmó que PATs no pueden listar todos los usuarios. Ese path debe usar internal/global token explícito.
 
 ## Delta 2026-05-14
 
 Task creada como follow-on canonical de TASK-879 (research/pilot Notion Developer Platform). TASK-879 explora qué hacer con Workers/CLI/agents; TASK-880 entrega los primitives técnicos (cliente canonical + PAT auth + version bump) que cualquier topología futura necesita. Bundled con TASK-881 (Meeting Notes ingest) que es el primer consumer real de la nueva API version.
 
-### Delta 2026-05-14 (live PAT validation cierra Open Questions arquitectónicas)
+### Delta 2026-05-14 (live PAT validation + docs oficiales cierran Open Questions arquitectónicas)
 
 `ntn` 0.14.0 instalado + autenticado live por Codex contra workspace `Efeonce` (TASK-879 Slice 1 evidence) generó un primer PAT real en Greenhouse y validó hallazgos críticos para esta task:
 
-**Hallazgo 1 — PATs requieren shares explícitos per-resource (NO workspace-wide)**:
+**Hallazgo 1 — PATs son user-scoped; internal connections son el modelo team-owned**:
 
-`ntn api /v1/search` y `ntn api /v1/blocks/meeting_notes/query` devuelven `results: []` aunque el workspace tiene actividad activa. Razón confirmada: PATs solo ven recursos donde el bot fue **explícitamente compartido** (page-by-page o database-by-database). NO existe scope tipo "Read content workspace-wide" como sí ofrecen los Internal Integration Tokens legacy.
+La validación live mostró `results: []` para algunos recursos, pero la corrección contra docs oficiales cambia la interpretación: un PAT actúa como el usuario que lo creó y usa los permisos reales de ese usuario. No es un bot con "Add connections" por recurso. Por eso:
 
-Implicancia para la cascade design `operator_pat → workspace_pat → global_token`:
+- `operator_pat` cubre uso interactivo del admin/desarrollador donde el usuario real es el boundary de seguridad.
+- `workspace_internal_connection` cubre production sync y automatizaciones team-owned, porque un PAT humano expira al año y pierde acceso si el usuario pierde permisos o sale del workspace.
+- `global_token` legacy probablemente es un Internal Integration Token o equivalente service-owned; Slice 0 debe confirmar su naturaleza sin exponer el valor.
 
-- **Validada como NO over-engineering**: el cascade diseñado en Slice 1 es exactamente lo que el modelo Notion requiere. `operator_pat` cubre uso interactivo del admin (smoke tests, discovery, scoped admin work) donde el operador comparte selectivamente. `workspace_pat` cubre production sync que necesita ver "todo lo del workspace" (TASK-881 Meeting Notes cross-project ingest no funciona con un solo PAT operador).
-- **`workspace_pat` no es opcional**: para production cross-workspace sync (Meeting Notes de clientes Sky, etc.), necesitamos un PAT compartido del workspace con shares amplios, NO un PAT operador. El cascade ya lo modela como tier 2 (post operator_pat, pre global_token).
-- **`global_token` legacy = Internal Integration Token**: hoy `NOTION_TOKEN` (que el spec de TASK-880 trata como "global token fallback") es probablemente un Internal Integration Token, NO un PAT. Confirmar en Slice 0 audit. Si efectivamente es Integration Token, mantenerlo como tier 3 fallback es la decisión correcta — son auth contracts diferentes y debe documentarse explícitamente en el resolver.
-
-Cierra Open Question original: "¿Necesitamos `workspace_pat` (PAT compartido para una workspace, no atado a operador)?" → **SÍ, no opcional** para production sync use cases.
+Cierra Open Question original: "¿Necesitamos `workspace_pat`?" → **No como PAT. Sí necesitamos tier `workspace_internal_connection` para automatizaciones.**
 
 **Hallazgo 2 — PATs tienen restricciones de operación documentadas**:
 
-Verificado live: `GET /v1/users` devuelve `403 restricted_resource: Personal access tokens cannot list users`. Implicancia para TASK-877 identity reconciliation: el path canonical via `notion-bq-sync` sibling (que usa Internal Integration Token con scope `Read content`) NO debe migrar a PATs. PATs son para uso operador/sync per-resource, NO para discovery global del workspace.
+Verificado live: `GET /v1/users` devuelve `403 restricted_resource: Personal access tokens cannot list users`. Implicancia para TASK-877 identity reconciliation: el path canonical via internal/global token NO debe migrar a PATs. PATs son para uso operador/user-scoped, NO para discovery global del workspace.
 
 **Hallazgo 3 — Notion-Version `2026-03-11` confirmado como latest soportado**:
 
@@ -473,11 +498,20 @@ Inspección spec del endpoint `GET /v1/pages/{page_id}/markdown` reveló query p
 
 **Hallazgo 5 — Workers gated por Workspace Admin (NO bloqueante para TASK-880)**:
 
-`ntn doctor` reporta `Workers enabled ! not enabled for this workspace`. Habilitar requiere intervención humana de un Workspace Admin de Efeonce. Esto NO bloquea TASK-880 (que no usa Workers), pero confirma que el cascade canonical NO debe asumir Workers como auth source — los Workers tienen su propio modelo de auth (gestionado por Notion). Si futura task incorpora Workers como path async, agregar un cuarto tier al resolver: `worker_runtime_auth → operator_pat → workspace_pat → global_token`.
+`ntn doctor` reporta `Workers enabled ! not enabled for this workspace`. Habilitar requiere intervención humana de un Workspace Admin de Efeonce. Esto NO bloquea TASK-880 (que no usa Workers), pero confirma que el cascade canonical NO debe asumir Workers como auth source — los Workers tienen su propio modelo de auth (gestionado por Notion). Si futura task incorpora Workers como path async, agregar un cuarto tier al resolver: `worker_runtime_auth → operator_pat → workspace_internal_connection → global_token`.
 
 ### Action items derivados (bundled al inicio de Slice 0)
 
-1. Slice 0 audit DEBE confirmar si `NOTION_TOKEN` global actual es Internal Integration Token o PAT (afecta documentación + tier 3 contract).
-2. Pre-Slice 2: definir si se crea un PAT "Greenhouse Production Sync (workspace_pat)" en Notion Developer Portal con shares amplios para cubrir production sync use cases. Coordinar con Workspace Admin Efeonce.
-3. Bot ID del primer PAT operador (Julio Reyes) ya capturado en TASK-879 evidence: `36139c2f-efe7-815f-b210-00275c518116`. Migrar como primera fila al ejecutar Slice 2 con `label='Notion CLI Julio Reyes (developer sandbox)'`, `scope='read'`, `verified_at=NOW()`.
+1. Slice 0 audit DEBE confirmar si `NOTION_TOKEN` global actual es Internal Integration Token o PAT (afecta documentación + tier 3 contract), sin revelar el valor del secreto.
+2. Pre-Slice 2: definir si se registra un `workspace_internal_connection` service-owned para production sync use cases. Coordinar con Workspace Admin Efeonce si se requiere crear o rotar ese token.
+3. El primer PAT operador validado en TASK-879 puede migrarse como fila piloto solo si el operador entrega/rota el token durante Slice 2; no asumir que el valor plaintext sigue disponible ni copiarlo desde `.env`.
 4. `NotionApiClient.get()` debe aceptar `include_transcript` como typed param (no query string libre) cuando el path matchea `/v1/pages/{page_id}/markdown`.
+
+## Delta 2026-05-16 — Corrección post-discovery antes de implementación
+
+Discovery de TASK-880 contra runtime real corrigió cuatro supuestos que no deben llegar a código:
+
+- `workspace_pat` queda reemplazado por `workspace_internal_connection`. Los PATs son personales, user-scoped y expiran; no son token estable de automatización.
+- La tabla propuesta cambia de `greenhouse_core.notion_personal_access_tokens` a `greenhouse_core.notion_api_tokens`, con `token_kind`, `expires_at` y `token_hash_pepper_version`.
+- La ruta personal cambia de `/me/integraciones/notion` a `/my/integrations/notion`, porque el portal usa `/my/*` para superficies user-facing.
+- El módulo de entitlements `integrations` todavía no existe; Slice 2 debe formalizarlo con ADR/index antes de seedear `integrations.notion.auth_tokens.*`.

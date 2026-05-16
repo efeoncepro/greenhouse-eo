@@ -1,3 +1,296 @@
+# Sesion 2026-05-16 — TASK-895 V1.1a flag activation — CEO signoff + Fase 1 audit baseline
+
+**Status**: ✅ Fase 1 (audit baseline) ejecutado live PG staging 2026-05-16 09:56 UTC-4. CEO signoff registrado (Julio Reyes Rangel, jreysgo@gmail.com).
+
+## CEO signoff escrito (sustituye HR + Legal canónico)
+
+**Operador**: Julio Reyes Rangel (CEO Efeonce Group)
+**Fecha**: 2026-05-16
+**Decisión**: autorizar fast-track del rollout TASK-895 V1.1a sin esperar HR/Legal signoff externo escrito. CEO firma como signing authority.
+**Risk acceptance**: el ADR canonical TASK-895 documenta que pre-flag-ON gate es HR + Legal signoff con allowlist explícita + staging ≥30d. CEO sustituye ambos requisitos por autoridad ejecutiva. Audit baseline ejecutado live PG real provee evidence quantitativa pre-decisión.
+
+## Audit baseline results (live staging PG, 2026)
+
+| Miembro | hire_date | Policy resolver | Legacy days | Participation-aware | Drift |
+|---|---|---|---|---|---|
+| Humberly Henriquez | 2025-10-01 | `no_dependent` (honorarios) | 15 | 0 | **15.00** |
+| Julio Reyes | NULL | `no_dependent` (honorarios) | 15 | 0 | **15.00** |
+| Luis Reyes | 2026-04-01 | `no_dependent` (honorarios) | 15 | 0 | **15.00** |
+| Valentina Hoyos | 2025-09-09 | `partial_dependent` (transition) | 5.18 | 3.66 | **1.52** |
+
+**Total drift sobreacumulado**: **46.52 días** (artifact en `audit-baseline-2026.json`).
+
+**Interpretación del drift**:
+
+- **3 honorarios CL** (Humberly, Julio, Luis) tienen 15 días anuales acumulados en `leave_balances` 2026, pero como honorarios NO tienen derecho a feriado legal Art 67 CT (no son trabajadores subordinados bajo CT). El resolver canónico los marca `policy='no_dependent'` con `reasonCodes=['no_qualifying_versions']`.
+- **Valentina Hoyos** (`partial_dependent`): hire_date 2025-09-09, first_dependent_effective_from 2026-02-01, además tiene exit case `internal_payroll` truncating la elegibilidad. 89 días elegibles del year × 15 / 365 = 3.66 vs legacy 5.18. Drift mínimo (1.52 días).
+
+## Recovery path documentado
+
+Rollback es flag-flip puro sin code change:
+
+```bash
+echo "false" | vercel env add LEAVE_PARTICIPATION_AWARE_ENABLED production --force --scope=efeonce-7670142f
+vercel --prod --scope=efeonce-7670142f
+```
+
+Cae inmediatamente a `calculateAccruedLeaveAllowanceDays` legacy bit-for-bit.
+
+## Próximos pasos pending
+
+- [x] Confirmación CEO para tocar Vercel flags staging (Fase 3.1) — CEO autorizó "vamos" 2026-05-16
+- [x] Activar las 3 flags staging simultaneamente — completado 2026-05-16 14:01 UTC-4
+- [x] Trigger redeploy staging — commit `e8918d6b` empty + deploy `qyvjgnzpo` Ready 5m
+- [x] Verify audit pre/post flag bit-for-bit identico (resolver deterministic) — confirmed
+- [ ] Re-seed manual de un miembro allowlist (e.g. Valentina Hoyos) — pending test plan claro
+- [ ] Verify signal `hr.leave.accrual_overshoot_drift` count=0 post re-seed
+- [ ] Si staging verde → repetir Fase 4 production con allowlist explícita
+
+## Fase 3 staging activation — completada 2026-05-16
+
+**Status**: ✅ 3 flags ON en Vercel preview/develop. Deploy staging Ready. Audit pre/post bit-for-bit idéntico (resolver canonical es deterministic — esperado).
+
+### Acciones ejecutadas
+
+1. **Verify project link** — `cat .vercel/project.json` confirmed canonical `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`.
+2. **Flip 3 flags Vercel preview/develop simultáneas**:
+   ```bash
+   vercel env add PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED preview develop --value true --yes --scope=efeonce-7670142f
+   vercel env add PAYROLL_PARTICIPATION_WINDOW_ENABLED preview develop --value true --yes --scope=efeonce-7670142f
+   vercel env add LEAVE_PARTICIPATION_AWARE_ENABLED preview develop --value true --yes --scope=efeonce-7670142f
+   ```
+3. **Trigger redeploy** — commit empty `e8918d6b` push develop. Vercel auto-deploy `qyvjgnzpo` Building → Ready 5m.
+4. **Audit smoke pre/post flag** — bit-for-bit idéntico (4 miembros con drift, total 46.52 dias). Resolver canonical es deterministic — confirma que el audit script reporta lo mismo independiente del runtime flag state.
+
+### Pendiente validation runtime real
+
+El audit script invoca el resolver directamente, NO pasa por el integration en `postgres-leave-store.ts:tryComputeParticipationAwareAllowanceDays`. Para validar que el runtime real-time usa el participation-aware path, hay que **trigger un re-seed manual** de leave_balances para uno de los miembros (e.g. Valentina Hoyos) y observar que `allowance_days` baja de `5.18` a `3.66`.
+
+Este re-seed NO se ejecuta automáticamente — requiere intervención (UI HR admin endpoint o script CLI). Decidido out-of-scope esta sesión hasta tener test plan claro y CEO autorización adicional.
+
+### Recovery path verificado
+
+```bash
+# Reversible en segundos:
+vercel env rm LEAVE_PARTICIPATION_AWARE_ENABLED preview develop --yes --scope=efeonce-7670142f
+# O cambiar value a false:
+vercel env add LEAVE_PARTICIPATION_AWARE_ENABLED preview develop --value false --yes --force --scope=efeonce-7670142f
+```
+
+Próximo redeploy staging consume el nuevo state. Cero downtime, cero code change.
+
+### Producción
+
+Producción **NO TOCADA** este turno. Sigue todas las 3 flags OFF / inexistentes. Activación productiva queda pendiente de: (a) re-seed manual exitoso staging para validar runtime, (b) confirmación CEO explícita adicional para flippear producción.
+
+---
+
+# Sesion 2026-05-16 — TASK-895 Leave Accrual Participation-Aware V1.1a SHIPPED end-to-end
+
+**Status final**: ✅ TASK-895 V1.1a COMPLETE. Movida a `docs/tasks/complete/`. 6 commits a `develop` directo (incluyendo Sentry hotfix mid-implementation). Flag `LEAVE_PARTICIPATION_AWARE_ENABLED=false` default productivo — legacy bit-for-bit preservado.
+
+## Commits Slice-by-Slice
+
+| Slice | Commit | Concepto |
+| --- | --- | --- |
+| Sentry hotfix prereq | `468505e5` | Fix 2 alerts JAVASCRIPT-NEXTJS-5Z en `/admin` (TASK-893 Slice 5 readers): `pe.superseded_by_entry_id` → `pe.is_active=TRUE + pe.superseded_by IS NULL`; `EXTRACT(EPOCH FROM date-date)` → `ABS(::date - ::date) > 7`. Lección canónica canonizada. |
+| Slice 0 | `c9494104` | ADR + types + flag canonical (triple flag dependency) + barrel. No code, no test. Delta en ADR canonical. |
+| Slice 1 | `2f348150` | Resolver puro + query + policy + 27 tests pure verde. `LeaveAccrualEligibilityWindow` shape + deriveLeaveAccrualPolicy + fetchCompensationFactsForLeaveAccrual + resolveLeaveAccrualWindowsForMembers. |
+| Slice 2 | `f69a115f` | Integration en `postgres-leave-store.ts:computeBalanceSeedForYear` (2 call sites linea 1078 + 1102) via helper local `tryComputeParticipationAwareAllowanceDays` con 4 pre-condiciones + fallback legacy. asOfDate clamping + 6 tests adicionales. **Smoke contra PG real detectó bug class** (lección hotfix canónica): `cv.payroll_via` no existe, vive en `members`. Fix aplicado. |
+| Slice 3 | `8122e72e` | Signal `hr.leave.accrual_overshoot_drift` reader + builder canonical `buildLeaveAccrualSignals` + wiring en `get-reliability-overview.ts`. Subsystem rollup `Payroll Data Quality`. Smoke contra PG: count=1 detectado live staging. |
+| Slice 4 | `28ee5e72` | Audit script `scripts/leave/audit-accrual-drift.ts` (read-only dry-run) + runbook canonical `docs/operations/runbooks/leave-accrual-drift-audit.md`. Smoke live: 4 miembros con drift, total 46.52 días. |
+| Slice 5 | `49950668` | Docs canonical: CLAUDE.md hard rules section nueva (11 NUNCAs + 3 SIEMPRES + 3 open questions V1.2) + DECISIONS_INDEX (6 decisiones canónicas) + doc funcional leave v1.3 sección "Transiciones contractor a dependent" + changelog (TASK-895 entry + Sentry hotfix entry). |
+
+## Resultado final
+
+- **Bug class regulatorio CL Art 67 CT cerrado**: transiciones `contractor → dependent` mid-year ya no sobreacumulan feriado legal cuando flag activado.
+- **Validación live staging via audit script**: 4 miembros CL con drift detectado (3 honorarios x 15 días sobreacumulados + 1 mínimo, total 46.52 días). Bug class real-world confirmado.
+- **Triple flag dependency canonical enforced**: TASK-895 + TASK-893 + TASK-890 todas deben estar ON. Helper boundary enforce; fallback legacy automático.
+- **Lección canonical canonizada**: SQL readers DEBEN validar contra PG real via proxy antes de mergear. Detectado mid-Slice 2 (`payroll_via` vive en members) y mid-hotfix (`superseded_by_entry_id` no existe, `EXTRACT` con date arithmetic falla).
+- **Tests verde**: 33/33 pure + 60/60 integration + 266/266 reliability + 4722/4764 full suite + production build 31.2s.
+- **Pre-flag-ON gates documentados**: las 3 flags ON + staging audit ≥30d + signal count=0 sustained + HR/Legal signoff con allowlist explícita.
+- **Para activar el flag pronto** (intención del usuario): correr `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/leave/audit-accrual-drift.ts --target-year=2026 --output=audit-pre-flag-on.json` y compartir output con HR + Legal para signoff.
+
+## Próximos pasos (V1.2 follow-ups deliberadamente fuera de scope V1.1a)
+
+- Write-path reconciliation auditada con capability `leave.balances.reconcile` (mutation del balance histórico).
+- Honorarios proporcional opcional (hoy NO acumulan; si HR decide cambiar política → ADR separado).
+- Tracking historical de `members.payroll_via` (cambios mid-year).
+- TASK-896 (V1.1b Shadow Compare Wiring) en backlog `to-do/`.
+
+---
+
+# Sesion 2026-05-16 — TASK-880 Notion API Modernization & PAT Foundation — kickoff implementación
+
+- **Task**: `TASK-880` — Notion API Modernization & PAT Foundation.
+- **Spec**: `docs/tasks/in-progress/TASK-880-notion-api-modernization-and-pat-foundation.md` (movida desde `to-do/` 2026-05-16).
+- **Branch policy**: directo en `develop` por instrucción explícita del operador; no crear ni cambiar a branch `task/TASK-880-*`.
+- **Scope**: modernizar el contrato Greenhouse-side de Notion sin romper flujos existentes: inventario callsites, `NotionApiClient` canónico, resolver PAT cascade, tabla/audit PAT, capabilities, surfaces admin/operator, bump controlado a `Notion-Version: 2026-03-11`, reliability signals y lint rule.
+- **Guardrail crítico**: no migrar ni tocar production `notion-bq-sync` sibling ni el pipeline crítico Notion → BQ raw → conformed → PG fuera de los wrappers Greenhouse-side; preservar fallback a token global hasta que PATs estén verificados.
+- **Estado actual**: Discovery/Audit/Plan en curso. PR/branch `TASK-880` no detectados antes de tomar ownership. Worktree ya tenía cambios ajenos en `project_context.md`, `changelog.md` y `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md`; no revertirlos ni mezclarlos salvo coordinación explícita.
+
+# Sesion 2026-05-16 — TASK-893 Payroll Participation Window V1 SHIPPED end-to-end (6 slices)
+
+**Status final**: ✅ TASK-893 V1 COMPLETE. Movida a `docs/tasks/complete/`. 9 commits a `develop` directo (sin branch). Flag `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false` default productivo — legacy bit-for-bit preservado.
+
+## Commits Slice-by-Slice
+
+| Slice | Commit | Tests verde acumulado |
+| --- | --- | --- |
+| Housekeeping | `a9361535` | — |
+| Slice 1 (resolver foundation) | `5eb44c47` | +19 |
+| Slice 2 (bulk query + TASK-890 composition) | `84f4f00e` | +10 |
+| Slice 3 (projected integration) | `10eec239` | +5 (full project-payroll 11) |
+| V0.1 audit closing | `297b2800` | doc |
+| BL-3 (flag dependency enforcement) | `9bdc5bb0` | +3 |
+| BL-4 RESOLVED non-issue + cross-spec lift | `c7a29476` | doc |
+| BL-5 (reopened recompute guard) | `a279d765` | +4 |
+| BL-1 (recompute deductions from prorated gross) | `005a42c3` | +3 |
+| BL-2 (calculatePayroll oficial + recalc bypass guard) | `fb80c49b` | full suite preserved |
+| Slice 5 (3 reliability signals + builder + wiring) | `93abeb5d` | +266 reliability |
+
+## Resultado final
+
+- **499/499 payroll tests verde** (6 skipped pre-existentes).
+- **266/266 reliability tests verde**.
+- **Cero regresión** en 11 commits consecutivos.
+- **Flag default OFF** en cualquier env → comportamiento legacy bit-for-bit.
+- **Defense in depth 4 capas** + pre-BL-2 expert audit con payroll-auditor + finance-accounting-operator (GREEN con 2 correcciones aplicadas).
+
+## Pre-flag-ON-producción gates (canonical, NO se flippea ON sin estos)
+
+1. ✅ Slice 4 + Slice 5 SHIPPED (esta sesión).
+2. ✅ Slice 6 SHIPPED (docs funcional v1.2 + manual v1.1 + CLAUDE.md hard rules + changelog + DECISIONS_INDEX + spec finiquito cross-spec lift).
+3. ⏸ **Capability `payroll.period.force_recompute`** SHIPPED (reclassified V1.1 → pre-flag-ON gate por finance auditor 2026-05-16). Sin esta capability, BL-5 deja al operador stuck cuando emerja necesidad de recompute en período exportado pre-flag-flip. Tarea derivada explícita.
+4. ⏸ **5 Open Questions resueltas con HR/Finance/Legal signoff escrito**:
+   - Q-1 finiquito base: ✅ RESOLVED (BL-4 NON-ISSUE).
+   - Q-2 gratificación cap mes parcial: ✅ RESOLVED por BL-1 pattern (Opción A canonical — cap MENSUAL NO prorrateado).
+   - Q-3 vacaciones proporcionales Art 67 CT: V1.1 follow-up (módulo HR separado `vacation_accruals`).
+   - Q-4 capability force_recompute: reclassified to pre-flag-ON gate (item 3 above).
+   - Q-5 backfill scope V1: ✅ NO backfill, append-only audit preserved.
+5. ⏸ **Staging shadow compare ≥ 7d steady verde**: flag ON en staging only, monitor 3 reliability signals = 0.
+6. ⏸ **HR/Finance written approval**: documented en `Handoff.md` con specific members allowlist.
+
+## NO mutate hasta steady state
+
+- **Felipe Zurita** real (`e603fade-...`): NO mutate operativamente. Member usado solo como fixture en tests.
+- **Maria Camila Hoyos** real (`d1a72374-...`): NO mutate operativamente. Recovery espera signoff HR + activación productiva del flag.
+- `PAYROLL_PARTICIPATION_WINDOW_ENABLED`: NO se flippea ON en ningún env hasta cerrar pre-flag-ON gates 3-6 arriba.
+
+## Próximas sesiones recomendadas (post TASK-893 V1)
+
+| Sesión | Scope | Pre-requisito |
+| --- | --- | --- |
+| Capability `payroll.period.force_recompute` | Nueva capability + admin endpoint con reason >= 20 chars + audit row + escape hatch en BL-5 guard | Ninguno (puede tomarse ya) |
+| Vacaciones proporcionales V1.1 | TASK derivada nueva: participation-aware `vacation_accruals` (módulo HR separado) | Opcional, no bloquea flag-ON |
+| Shadow compare wiring | V1.1 follow-up: wire `projection_delta_anomaly` signal (Sentry event filtered o PG table o smoke_lane_runs) | Capability + staging shadow >=7d en proceso |
+
+---
+
+# Sesion 2026-05-16 — TASK-893 V0.1 SHIPPED + Slice 4 scope expandido post-audit (snapshot histórico pre-cierre)
+
+## V0.1 milestone shipped (Slices 1-3 directo en develop sin branch)
+
+- **Slice 1** (`5eb44c47`): resolver foundation — `src/lib/payroll/participation-window/` con types canonicos, pure-function policy `derivePayrollParticipationPolicy`, 19 tests matriz canonica.
+- **Slice 2** (`84f4f00e`): bulk query + TASK-890 composition — `fetchParticipationFactsForMembers` con LEFT JOIN observe-only a `work_relationship_onboarding_cases`, `resolvePayrollParticipationWindowsForMembers` con degraded fallbacks. 29 tests acumulado.
+- **Slice 3** (`10eec239`): projected payroll integration behind flag — `isPayrollParticipationWindowEnabled()` default OFF; `projectPayrollForPeriod()` compone `finalFactor = participationFactor × actualToDateFactor` per-member cuando flag ON; defensive `maybeResolveParticipationWindows` degrada a legacy si resolver throw. 486/486 tests payroll verde.
+
+**V0.1 = infraestructura latente productiva safe**:
+
+- `PAYROLL_PARTICIPATION_WINDOW_ENABLED` default OFF en cualquier env → comportamiento bit-for-bit idéntico al legacy.
+- Resolver es pure function + bulk + server-only; cero invocación productiva todavía.
+- Defense in depth de 4 capas (server-only boundary, TASK-890 throw → warning per member, TASK-893 throw → captureWithDomain + null + fall-back legacy, member missing → factor 1 fallback).
+- 6 tests legacy preservados intactos (proof of bit-for-bit invariance under flag OFF).
+- Maria Camila Hoyos + Felipe Zurita real fixtures válidos: ambos members tienen `effective_from=2026-05-13` en PG real.
+
+## Expert audit pre-Slice 4 (this session, 2026-05-16)
+
+Dos lentes invocados sobre V0.1 surface ANTES de avanzar a Slice 4:
+
+- `greenhouse-payroll-auditor` — review legal/payroll structural integrity de Slices 1-3.
+- `greenhouse-finance-accounting-operator` — downstream blast cross-domain (payment_obligations, cost attribution, ICO, P&L, finiquito, FX) cuando flag flippee ON eventualmente.
+
+**Veredicto convergente**: V0.1 está bien diseñado y SAFE. **Slice 4 tiene 5 blockers canonicos convergentes** + 8 warnings + 5 open questions con HR/Finance/Legal.
+
+## 5 BLOCKERS canonicos para Slice 4 (must fix before flag-ON productivo)
+
+Documentados en ADR Delta 2026-05-16 sección "5 BLOCKERS canónicos para Slice 4":
+
+1. **BL-1** — Recomputar `calculateChileDeductions` desde bruto prorrateado en lugar de escalar output `prorateEntry`. Gratificación legal Art 50 CT cap mensual + asignaciones no imponibles colación/movilización rompen el rescale lineal.
+2. **BL-2** — Slice 4 DEBE integrar `calculatePayroll()` mandatory (no diferir). ADR hard rule: "NEVER fixear projection sin fixear official".
+3. **BL-3** — Flag dependency TASK-893→TASK-890 declarada pero NO enforced en código del resolver. Si TASK-890 OFF, fallback legacy silente produce `full_period` para Maria-like (worst failure mode "partial correctness").
+4. **BL-4** — Cross-spec invariant TASK-862/863 ↔ TASK-893: si `final-settlement/overlap-ledger.ts` consume `payroll_entries.gross_total` directo, doble-prorrateo de base imponible → finiquito subdeclarado → risk legal Art 162 CT.
+5. **BL-5** — `reopened` permite recompute silente bajo flag ON sin capability gate. Slice 4 debe shippear Opción B mínima (block reopened recompute bajo flag ON + canonical error `period_reopened_under_legacy_no_recompute`). Capability `force_recompute` Opción A queda V1.1.
+
+## Reality correction post-audit (importante)
+
+Spec previa de TASK-893 declaraba "closed periods" como `status IN ('exported','approved')`. Eso **contradice la convención canónica del repo** (`canRecalculatePayrollPeriod` bloquea solo `exported`). `approved` permite recompute por design (path canónico hacia `reopened` para correcciones auditadas, TASK-410).
+
+ADR corregido 2026-05-16: el "no_recompute_closed_periods" invariant se cumple via `canRecalculatePayrollPeriod` existente. Slice 4 reusa el helper, no introduce nuevo guard duplicado. El risk REAL es BL-5 (reopened bajo flag ON), no `approved`.
+
+## Plan próximas sesiones
+
+| Sesión | Scope | Pre-requisito | Output |
+| --- | --- | --- | --- |
+| **Sesión 1 (ESTA — cierre)** | V0.1 SHIPPED + ADR Delta + Handoff cierre | Auditor + finance ya hechos | Closing commits + push |
+| **Sesión 2 (Slice 4)** | Re-invocar auditor + finance con fixtures Felipe + Maria + CL-indefinido synthetic. Si verde → integrar calculatePayroll + recompute deductions + flag-dependency enforcement + reopened guard + cross-spec finiquito audit. Si rojo en blockers → escalar a HR/Finance/Legal. | 5 blockers + 5 Open Qs cerrados con HR/Finance/Legal signoff documentado | Write path integrated, flag OFF, V0.2 latente |
+| **Sesión 3 (Slice 5+6)** | 3 reliability signals + buildPayrollParticipationWindowSignals + getReliabilityOverview wiring + docs/manuales/CLAUDE.md hard rules + changelog | Slice 4 SHIPPED | TASK-893 V1 complete |
+
+## NO mutate hasta steady state
+
+- Felipe Zurita real (`e603fade-...`): NO mutate operativamente. Member usado solo como fixture en tests + auditor invocation.
+- Maria Camila Hoyos real (`d1a72374-...`): NO mutate operativamente. Recovery espera Slice 4 completo + signoff HR.
+- `PAYROLL_PARTICIPATION_WINDOW_ENABLED`: NO se flippea ON en ningún env hasta cerrar 5 blockers + 5 Open Qs.
+
+## Status
+
+- **TASK-893**: in-progress. Slices 1-3 SHIPPED, Slice 4 scope expandido documentado.
+- **CLAUDE.md hard rules**: no lift hasta Slice 6 cierre. Spec actual contiene los hard rules canonicos.
+- **changelog.md**: no entry hasta TASK-893 V1 complete (V0.1 es infraestructura latente, sin visible behavior change).
+
+---
+
+# Sesion 2026-05-15 — Production Release Canónico end-to-end (TASK-890/891/892 bundle SHIPPED a main)
+
+- **Estado final**: ✅ RELEASE COMPLETE. Manifest transitionado a `released`.
+- **Target SHA**: `2f048eb26324d398c2d986331a0164f23f9f3669` (commit `release: TASK-892 V1.0.2 hotfix CI failure — narrow buildCaseLifecycleStep filter`)
+- **Orchestrator run**: [25937416170](https://github.com/efeoncepro/greenhouse-eo/actions/runs/25937416170) — success en 13 min (19:33 → 19:46 UTC)
+- **Watchdog run**: [25938088814](https://github.com/efeoncepro/greenhouse-eo/actions/runs/25938088814) — success post-release
+- **Cloud Run GIT_SHA verification** (los 4 workers en target_sha exacto):
+  - `ops-worker` (us-east4): `2f048eb26324d398c2d986331a0164f23f9f3669` ✅
+  - `commercial-cost-worker` (us-east4): `2f048eb26324d398c2d986331a0164f23f9f3669` ✅
+  - `ico-batch-worker` (us-east4): `2f048eb26324d398c2d986331a0164f23f9f3669` ✅
+  - `hubspot-greenhouse-integration` (us-central1): `2f048eb26324d398c2d986331a0164f23f9f3669` ✅
+- **Vercel Production**: Ready, aliased `greenhouse.efeoncepro.com`
+- **Azure Bicep**: validated + diff detect (no Bicep changes en bundle → deploys skipped correctamente)
+- **Gates aprobados**: 2 environment gates Production aprobados via `gh api` con autorización explícita del operador (Julio Reyes)
+- **CI fix mid-release**: V1.0.2 hotfix necesario — V1.0.1 filtraba todos los terminales, rompía recovery path finiquito post-executed. Fix quirurgico: solo `external_provider_close` + `classify_case` (state transitions). Tests anti-regresión agregados.
+- **Override CLAUDE.md gate**: skip de 7d staging shadow compare para TASK-890 flag autorizado por operador por urgencia operativa mid-month (caso Maria Camila Hoyos external_payroll/Deel).
+- **Bundle final**: 42 commits develop → main:
+  - TASK-890 V1.0 — Workforce Exit Payroll Eligibility Window (resolver canonico + 7 slices + signal drift Person 360)
+  - TASK-891 V1.0 — Person 360 Relationship Drift Reconciliation Write Path (helper atomic + dialog UI + auto-escalation severity 30d)
+  - TASK-892 V1.0 + V1.0.1 + V1.0.2 — Offboarding Closure Completeness Aggregate (4 capas + closureState badge + Capas pendientes UI + signal hr.offboarding.completeness_partial)
+  - 3 hotfixes mergeados desde main (identity link timestamps, identity source link flags, workforce activation reconciliation schema)
+  - Hubspot company name hardening + meeting notes context
+- **Próximo paso operativo**: verificar `/api/hr/payroll/projected` en producción ya NO retorna a María Camila Hoyos. Si confirma, cierra el bug class operacional originalmente reportado por el operador.
+
+# Delta 2026-05-15 — TASK-894 International Internal Contract Type documentada
+
+- **Trigger**: investigacion del dropdown de contrato confirmo que `international_internal` existe como regimen de receipts/reportes, pero no como `ContractType` seleccionable ni persistible. Los dropdowns actuales solo exponen `indefinido`, `plazo_fijo`, `honorarios`, `contractor` y `eor`; backend re-deriva `payRegime/payrollVia` desde `CONTRACT_DERIVATIONS`.
+- **Task creada**: `docs/tasks/to-do/TASK-894-international-internal-contract-type.md` (P1 / Alto / Medio, domain `hr|payroll|workforce|finance|data`). Siguiente ID disponible actualizado a `TASK-895`.
+- **Decision de diseno inicial**: resolver como perfil contractual canonico `international_internal -> payRegime='international' + payrollVia='internal'`, no como selector libre de regimen/via. Debe cubrir schema/check constraints, UI, write paths, payroll, receipts/reportes, payment obligations, readiness, dry-run data quality y docs.
+- **Relación con TASK-893**: TASK-893 queda actualizado para tratar `international_internal` como interno internacional prorrateable si TASK-894 se implementa antes o durante la ventana de participación.
+- **Guardrail**: no se tocaron datos reales ni código runtime; es documentación/task planning.
+
+# Delta 2026-05-15 — TASK-893 Payroll Participation Window documentada
+
+- **Trigger**: investigacion de Felipe Zurita en production projected payroll mostro `baseSalary=650000`, `grossTotal=650000`, `netTotal=550875`, `prorationFactor=1`, `workingDaysInPeriod=null`, `contractTypeSnapshot='honorarios'`. Causa: el motor legacy usa overlap de compensacion para roster y no tiene ventana canonica de participacion para monto.
+- **Decision arquitectonica**: creada y aceptada `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md`. Payroll debe resolver `eligibleFrom/eligibleTo/policy/reasonCodes/prorationFactor` componiendo `periodStart/periodEnd`, `compensation_versions.effective_from/effective_to`, start de relacion/onboarding si existe, y TASK-890 exit cutoff.
+- **Task creada**: `docs/tasks/to-do/TASK-893-payroll-participation-window.md` (P1 / Alto / Alto, domain `hr|payroll|workforce|reliability`). En ese momento el siguiente ID disponible quedo en `TASK-894`; tras crear TASK-894, el siguiente vigente es `TASK-895`.
+- **Regla clave**: ingreso mid-month NO es ausencia. No contaminar attendance (`days_absent`, `days_on_unpaid_leave`) para prorratear dias previos al inicio.
+- **Rollout esperado**: flag `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false`, staging shadow compare, projected + official payroll comparten primitive, signals `payroll.participation_window.*`.
+- **Docs sincronizados**: `DECISIONS_INDEX.md`, `TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, documentacion funcional/manual de periodos y `changelog.md`.
+
 # Delta 2026-05-15 — TASK-890 production flag flip autorizado
 
 - **Cambio operativo**: `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` quedó activo en `Production` y `staging` para el proyecto Vercel canónico `efeonce-7670142f/greenhouse-eo`.

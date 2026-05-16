@@ -1066,6 +1066,57 @@ export const buildFinanceClpDriftSignals = async (
 }
 
 /**
+ * TASK-893 Slice 5 — builder canónico de signals Payroll Participation Window.
+ *
+ * Compone los 3 readers (drift full-month-entry + drift source-date +
+ * delta-anomaly placeholder) en `Promise.all` para evitar latencia secuencial
+ * en `/admin/operations`. Cada reader degrada honestamente (severity=unknown)
+ * si su query falla — un solo signal roto NUNCA envenena el overview entero.
+ *
+ * Subsystem rollup: `finance_data_quality` (moduleKey='finance') alineado
+ * con TASK-765/766/768/774 (payroll deltas son outcomes económicos, no
+ * identity/access).
+ *
+ * Mirror exact del patrón `buildPaymentOrderSettlementSignals` (TASK-765
+ * Slice 7) y `buildFinanceClpDriftSignals` (TASK-766 Slice 2).
+ */
+export const buildPayrollParticipationWindowSignals = async (
+  readers: {
+    fullMonthEntryDrift: () => Promise<ReliabilitySignal>
+    sourceDateDisagreement: () => Promise<ReliabilitySignal>
+    projectionDeltaAnomaly: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [fullMonth, sourceDate, deltaAnomaly] = await Promise.all([
+    readers.fullMonthEntryDrift(),
+    readers.sourceDateDisagreement(),
+    readers.projectionDeltaAnomaly()
+  ])
+
+  return [fullMonth, sourceDate, deltaAnomaly]
+}
+
+/**
+ * TASK-895 V1.1a Slice 3 — builder canonico para signals del Leave Accrual
+ * Participation-Aware primitive. V1.1a ships con 1 signal canonical
+ * (`hr.leave.accrual_overshoot_drift`). Si emergen >3 signals Leave-native en
+ * V1.2, spawn dedicated subsystem `'HR Leave Quality'`.
+ *
+ * Subsystem rollup actual: `'Payroll Data Quality'` (moduleKey `'payroll'`)
+ * — unificado con TASK-893 signals por proximidad conceptual (bug class
+ * derivado del Payroll Participation Window).
+ */
+export const buildLeaveAccrualSignals = async (
+  readers: {
+    accrualOvershootDrift: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [overshoot] = await Promise.all([readers.accrualOvershootDrift()])
+
+  return [overshoot]
+}
+
+/**
  * TASK-768 Slice 7 — builder canonico de signals "economic_category_unresolved"
  * para expenses + income. Mismo patron que buildFinanceClpDriftSignals.
  * Subsystem rollup: finance_data_quality.

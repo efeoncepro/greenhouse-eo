@@ -1,9 +1,9 @@
 # Periodos de Nomina
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-05-01 por Codex
+> **Ultima actualizacion:** 2026-05-16 por Claude Opus (TASK-893 — ventana de participacion payroll V1 SHIPPED)
 > **Modulo:** HR / Nomina
 > **Ruta en portal:** `/hr/payroll`
 > **Documentacion relacionada:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md), [Periodos de nomina](../../documentation/hr/periodos-de-nomina.md)
@@ -123,6 +123,19 @@ Que hacer:
 2. Si si lo requiere, valida que exista senal de asistencia o licencia para el mes.
 3. Si el colaborador es `honorarios` o se procesa via `Deel`, ese bloqueo no deberia aplicar.
 
+### Un colaborador inicio a mitad de mes y aparece como mes completo
+
+Estado vigente pre-TASK-893: puede ocurrir. El roster de nomina se resuelve por compensaciones vigentes dentro del mes, pero el motor legacy no prorratea automaticamente por fecha de inicio en `projected_month_end`.
+
+Que hacer:
+
+1. No lo corrijas creando ausencias manuales desde el dia 1 hasta el dia anterior al ingreso.
+2. No uses override manual como solucion permanente.
+3. Escala el caso contra `TASK-893 Payroll Participation Window`.
+4. Si el periodo debe pagarse antes de que TASK-893 este shipped, deja una nota de control/auditoria con el motivo del ajuste manual autorizado por HR/Finance.
+
+La regla aprobada para TASK-893 es que los dias previos al ingreso son no-participacion payroll, no ausencia. El sistema debe prorratear mediante `PayrollParticipationWindow` y no mediante asistencia.
+
 ### El readiness dice que hay regimenes incompatibles
 
 Ese blocker significa que ya existe una liquidacion calculada con campos que no corresponden al regimen del colaborador.
@@ -170,13 +183,50 @@ El PDF del reporte mensual y el Excel del periodo aprobado separan los totales p
 
 Si en el reporte mensual o en el Excel ves un subtotal `Total descuentos CLP` (sin la palabra "previsionales") es un archivo legacy del periodo `v3` antes del 4 de mayo de 2026 — re-aprueba o re-exporta el periodo para regenerar el archivo con el nuevo contrato canonico.
 
+## Ingresos / salidas a mitad de mes (TASK-893, V1 SHIPPED)
+
+Greenhouse calcula automaticamente el prorrateo cuando un colaborador entra o sale a mitad del periodo, mediante la **Ventana de Participacion Payroll** (TASK-893). Esto reemplaza el comportamiento legacy donde un ingreso mid-month podia pagar el mes completo.
+
+**Estado del flag**: hoy `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false` por default en cualquier ambiente. El comportamiento legacy se mantiene bit-for-bit. La activacion productiva requiere signoff escrito de HR/Finance, staging shadow compare verde y allowlist de members.
+
+### Que cubre cuando se active
+
+- **Ingreso mid-month**: el colaborador con `effective_from` dia 13 paga proporcional a los dias habiles trabajados (13-31 / dias habiles del mes). Sin pagar mes completo legacy.
+- **Salida mid-month**: integrado con TASK-890 exit eligibility. La ventana se acota al dia de salida.
+- **Ingreso + salida en el mismo mes** (caso Maria Camila Hoyos): ventana acotada a los dias efectivos del periodo trabajado.
+- **Honorarios**: la retencion SII se recomputa sobre el bruto prorrateado. **Atencion**: el colaborador honorarios debe emitir su boleta por el bruto prorrateado (no el contrato full) para que la retencion declarada en F29 cuadre con el DTE 41. Si emite por contrato full, hay drift SII.
+- **Deel internacional**: Greenhouse proyecta el bruto prorrateado; Deel reconcilia el pago real en la jurisdiccion del trabajador.
+
+### Que NO cubre (decisiones contractuales del operador HR)
+
+- Colacion y movilizacion (asignaciones no imponibles fijas) NO se prorratean automaticamente. Si el contrato lo exige, el operador HR debe ajustar el monto manualmente para el mes parcial.
+- Gratificacion legal Art 50 CT: el cap MENSUAL ($213,354 aprox 2026) NO se prorratea — siempre se respeta el cap full. Si HR decide que entry month = $0 gratificacion, debe setear `gratificacionLegalMode='ninguna'` en la compensacion (override manual).
+- Aguinaldos y bonos navideños extraordinarios (`bonusOtherAmount` via TASK-745 adjustments): se pagan segun decision HR, no se prorratean automaticamente por participacion.
+
+### Lo que veras como operador
+
+Cuando el flag este activo (post HR/Finance signoff):
+
+- En nomina proyectada: el `prorationFactor` per colaborador refleja la ventana de participacion. Members con effective_from mid-period veran `prorationFactor < 1` y `grossTotal` proporcional.
+- En recibo individual: el bruto, deducciones, retencion SII y neto reflejan el calculo prorrateado correctamente.
+- En el reporte mensual (PDF + Excel TASK-782): los subtotales `Total descuentos previsionales` y `Total retencion SII honorarios` reflejan los montos efectivamente devengados.
+- En `/admin/operations`: 3 signals canonicos bajo `Finance Data Quality` te avisan si emerge drift (full_month entries no prorrateados, source_date drift onboarding vs compensation, projection_delta_anomaly).
+
+### Cuando NO se permite recalcular bajo flag ON
+
+- **Periodo `reopened` con flag ON**: si un periodo fue exportado bajo flag OFF y luego se quiere reabrir y recalcular bajo flag ON, Greenhouse lo BLOQUEA con error `period_reopened_under_legacy_no_recompute`. Eso evita asientos contradictorios contra DTE/F29/Previred ya presentados. Para corregir, cancela el reopen y re-exporta el periodo legacy; o espera a que se shippee la capability `payroll.period.force_recompute` (V1.1).
+- **Recalculo de entry individual**: bajo flag ON se bloquea con `recalc_blocked_by_participation_window`. Usa el recalculo a nivel periodo (`calculatePayroll`) que respeta participation correctamente.
+
 ## Que no hacer
 
 - No inventes una version tributaria solo para destrabar el flujo.
 - No uses overrides manuales como rutina operativa.
 - No calcules una nomina Chile si el sistema avisa que falta la tabla del mes.
+- **No actives `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` en produccion sin signoff escrito de HR/Finance + staging shadow compare verde + allowlist de members en `Handoff.md`.**
+- **No esperes que colacion/movilizacion se prorratee automaticamente** — la jurisprudencia chilena no lo hace; tu decides contractualmente.
 
 ## Referencias tecnicas
 
 - [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
+- [GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md](../../architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md)
 - [Periodos de nomina](../../documentation/hr/periodos-de-nomina.md)

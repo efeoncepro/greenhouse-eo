@@ -10,6 +10,7 @@ import type {
 
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { formatISODateKey } from '@/lib/format'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { buildPayrollEntry } from '@/lib/payroll/calculate-payroll'
 import { requiresPayrollAttendanceSignal, requiresPayrollKpi } from '@/lib/payroll/compensation-requirements'
@@ -21,6 +22,12 @@ import {
 } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
+import {
+  isPayrollParticipationWindowEnabled,
+  prorateCompensationForParticipationWindow,
+  resolvePayrollParticipationWindowsForMembers,
+  type PayrollParticipationWindow
+} from '@/lib/payroll/participation-window'
 import { isPayrollPostgresEnabled, pgGetActiveBonusConfig } from '@/lib/payroll/postgres-store'
 
 // ── Types ──
@@ -123,6 +130,56 @@ const prorateEntry = (entry: PayrollEntry, factor: number): PayrollEntry => {
   }
 }
 
+/**
+ * TASK-893 Slice 3 — defensive resolution of the per-member participation
+ * window. Gated by `PAYROLL_PARTICIPATION_WINDOW_ENABLED` (default OFF).
+ *
+ * Contract:
+ *
+ * - **Flag OFF** → returns `null`. The for-loop below falls back to the
+ *   legacy scalar `actualToDateFactor` applied uniformly to every member.
+ *   Output is bit-for-bit identical to pre-TASK-893 behavior.
+ *
+ * - **Flag ON, happy path** → returns `Map<memberId, PayrollParticipationWindow>`.
+ *   The for-loop composes `participationFactor × actualToDateFactor` per member.
+ *
+ * - **Flag ON, resolver throws** → captures Sentry with domain `payroll` +
+ *   returns `null` (degrades to legacy). Projected payroll NEVER crashes
+ *   when the participation resolver fails. Operator sees the dashboard
+ *   render as before; the regression is detected via Sentry + reliability
+ *   signal (Slice 5).
+ *
+ * This wrapper is the **single defensive boundary** between
+ * `projectPayrollForPeriod` and the new TASK-893 primitive. Slice 1-2 give
+ * the primitive its own internal degradation contracts (exit_resolver_failed
+ * warnings); this wrapper protects the projected payroll path from any
+ * unexpected throw at the resolver entry.
+ */
+const maybeResolveParticipationWindows = async (
+  memberIds: ReadonlyArray<string>,
+  periodStart: string,
+  periodEnd: string
+): Promise<Map<string, PayrollParticipationWindow> | null> => {
+  if (!isPayrollParticipationWindowEnabled()) return null
+
+  if (memberIds.length === 0) return new Map()
+
+  try {
+    return await resolvePayrollParticipationWindowsForMembers(memberIds, periodStart, periodEnd)
+  } catch (err) {
+    captureWithDomain(err, 'payroll', {
+      extra: {
+        source: 'project_payroll.participation_window_resolve_failed',
+        periodStart,
+        periodEnd,
+        memberCount: memberIds.length
+      }
+    })
+
+    return null
+  }
+}
+
 // ── Core ──
 
 /**
@@ -197,8 +254,32 @@ export const projectPayrollForPeriod = async ({
   const workingDaysCut = countWeekdays(periodStart, attendanceCutDate)
   const workingDaysTotal = countWeekdays(periodStart, periodEnd)
 
+  /*
+   * TASK-893 Slice 3 — per-member participation window resolution.
+   *
+   * - Flag OFF (default) → `participationByMember = null` → the for-loop uses
+   *   the legacy scalar `actualToDateFactor` uniformly per member.
+   *   Output is BIT-FOR-BIT identical to pre-TASK-893 behavior.
+   *
+   * - Flag ON → resolver returns a Map; per member we compose
+   *   `finalFactor = participationFactor × actualToDateFactor`.
+   *
+   * - Flag ON + resolver throws → wrapper captures Sentry + returns null →
+   *   degrades to legacy. Projected payroll NEVER crashes.
+   */
+  const participationByMember = await maybeResolveParticipationWindows(
+    compensations.map(c => c.memberId),
+    periodStart,
+    periodEnd
+  )
+
   // 3. Build projected entry for each member
-  const prorationFactor = mode === 'actual_to_date' && workingDaysTotal > 0 ? workingDaysCut / workingDaysTotal : 1
+  /*
+   * `actualToDateFactor` is the legacy period-wide scalar (renamed from
+   * `prorationFactor` for clarity). It is composed multiplicatively with
+   * the per-member `participationFactor` when TASK-893 is ON.
+   */
+  const actualToDateFactor = mode === 'actual_to_date' && workingDaysTotal > 0 ? workingDaysCut / workingDaysTotal : 1
 
   const entries: ProjectedPayrollEntry[] = []
 
@@ -206,17 +287,49 @@ export const projectPayrollForPeriod = async ({
     const kpi = kpiMap.get(compensation.memberId) ?? null
     const attendance = attendanceSnapshots.get(compensation.memberId) ?? null
 
+    /*
+     * Resolve per-member participation factor.
+     * - Flag OFF (or degraded) → participationFactor = 1 → no compensation
+     *   scaling, no behavioral change vs pre-TASK-893.
+     * - Flag ON → participation truncates per the resolved window. Factor
+     *   is baked into the compensation BEFORE buildPayrollEntry so the
+     *   canonical calculator recomputes deductions / gratificación / SII
+     *   retention from the prorated gross (BL-1 fix — auditor 2026-05-16).
+     */
+    const participation = participationByMember?.get(compensation.memberId) ?? null
+    const participationFactor = participation?.prorationFactor ?? 1
+
+    const effectiveCompensation =
+      participationFactor < 1
+        ? prorateCompensationForParticipationWindow(compensation, participationFactor)
+        : compensation
+
     const fullEntry = await buildPayrollEntry({
       periodId,
       periodDate: periodEnd,
-      compensation,
+      compensation: effectiveCompensation,
       ufValue,
       bonusConfig,
       kpi,
       attendance
     })
 
-    const entry = prorateEntry(fullEntry, prorationFactor)
+    /*
+     * `prorateEntry` now applies ONLY the legacy `actualToDateFactor` on
+     * top of the entry. When flag OFF, this is the legacy bit-for-bit
+     * behavior (participationFactor=1 means effectiveCompensation =
+     * compensation). When flag ON, the participation truncation is
+     * already baked into the entry monetary fields via the prorated
+     * compensation; `prorateEntry` here scales further by the
+     * actual-to-date factor (proyection mode `actual_to_date` only,
+     * factor=1 for `projected_month_end`).
+     *
+     * Output `prorationFactor` field is the composed factor for
+     * operator surface transparency (shows the full effective factor
+     * regardless of which path produced it).
+     */
+    const entry = prorateEntry(fullEntry, actualToDateFactor)
+    const finalFactor = participationFactor * actualToDateFactor
 
     entries.push({
       ...entry,
@@ -224,7 +337,7 @@ export const projectPayrollForPeriod = async ({
       asOfDate,
       projectedWorkingDays: workingDaysCut,
       projectedWorkingDaysTotal: workingDaysTotal,
-      prorationFactor
+      prorationFactor: finalFactor
     })
   }
 

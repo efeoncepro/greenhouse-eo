@@ -3496,6 +3496,103 @@ Pattern fuente: `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` (TASK-872).
 
 **Spec canonica**: `docs/architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`. Task: `docs/tasks/in-progress/TASK-890-workforce-exit-payroll-eligibility-window.md`. Patrones fuente: TASK-571/766/774 (VIEW canonica + helper + signal + lint), TASK-742 (defense-in-depth), TASK-872 (feature flag gate), TASK-720 (TS-only declarative reader), TASK-672 (rich struct + thin predicate).
 
+### Payroll Participation Window invariants (TASK-893, desde 2026-05-16)
+
+Toda decision "esta persona participa en este periodo y por cuanto" pasa por el **resolver canonico server-only** `src/lib/payroll/participation-window/`. Compone TASK-890 (exit eligibility) + compensation effective dating + observe-only onboarding source. Reemplaza el patron legacy donde `prorateEntry` rescala monetary fields post-hoc (rompe `chileGratificacionLegalAmount` cap, `chileTotalDeductions` aggregate, `siiRetentionAmount` traceability).
+
+**Pattern canonico (BL-1)**: escalar la compensation **antes** de `buildPayrollEntry`, NUNCA rescale post-hoc del output. La canonical calculator recomputa deducciones, gratificacion legal cap, y retencion SII desde las bases prorrateadas.
+
+**Read API canonico** (`src/lib/payroll/participation-window/`):
+
+- `resolvePayrollParticipationWindowsForMembers(memberIds, periodStart, periodEnd) → Map<memberId, PayrollParticipationWindow>` — canonical bulk resolver.
+- `isMemberParticipatingInPayroll(memberId, asOf) → boolean` — thin predicate para capability checks.
+- `prorateCompensationForParticipationWindow<T>(compensation, factor) → T` — pure helper que escala los inputs canonicos pre-buildPayrollEntry. Generic over T. Idempotente.
+- `derivePayrollParticipationPolicy(facts) → PayrollParticipationWindow` — pure function que computa policy + reason codes + prorationFactor weekday-basis.
+- `isPayrollParticipationWindowEnabled() → boolean` — flag check (`PAYROLL_PARTICIPATION_WINDOW_ENABLED`, default `false`).
+
+**Flag dependency canonical**: `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` REQUIERE `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` en el mismo ambiente. Sin esa pre-condicion, el resolver emite warning `exit_resolver_disabled` por miembro afectado (partial correctness es el peor failure mode). Enforce code-side en `resolver.ts` invocando `isPayrollExitEligibilityWindowEnabled()` explicito.
+
+**4 reliability signals canonicos** bajo subsystem `Finance Data Quality` (moduleKey='finance', mirror TASK-765/766/768/774):
+
+- `payroll.participation_window.full_month_entry_drift` — kind=drift, severity=warning >0, steady=0 post flag-ON. Detecta mid-period entries no prorrateados.
+- `payroll.participation_window.source_date_disagreement` — kind=drift, severity=warning >0, steady=0 post-cleanup. Detecta drift compensation.effective_from vs onboarding.start_date > 7 dias.
+- `payroll.participation_window.projection_delta_anomaly` — kind=drift, severity=unknown V1.0 (honest degradation; shadow compare wiring es V1.1 follow-up).
+- Bonus: lint rule `greenhouse/no-inline-payroll-scope-gate` (TASK-890 herencia) sigue cubriendo el path roster.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** rescale monetary fields post-`buildPayrollEntry` para members con participation factor < 1. Pattern canonical: escalar compensation primero, dejar al calculator recomputar deducciones + gratificacion legal cap + retencion SII desde gross prorrateado. El helper `prorateCompensationForParticipationWindow` es la unica fuente de truth para ese scale.
+- **NUNCA** prorratear `colacionAmount` ni `movilizacionAmount` automaticamente en el path de participation. Son asignaciones no imponibles fijas; la decision es contractual del operador HR (jurisprudencia chilena Art 50 CT no las auto-prorratea).
+- **NUNCA** consumir el modulo `participation-window` desde codigo client-side. Server-only enforce con `import 'server-only'`.
+- **NUNCA** activar `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` sin (a) `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` en mismo env, (b) staging shadow compare >=7d verde, (c) HR/Finance written approval en `Handoff.md`, (d) allowlist explicita de members afectados.
+- **NUNCA** activar el flag productivo sin haber shippeado la capability `payroll.period.force_recompute` (V1.1 reclassified to pre-flag-ON gate por finance auditor 2026-05-16). Sin esa capability, BL-5 deja al operador stuck cuando necesite recompute en periodo exportado pre-flag-flip.
+- **NUNCA** recomputar single-member entry bajo flag ON via `recalculatePayrollEntry`. El path esta blocked con canonical error `recalc_blocked_by_participation_window` para evitar bypass del participation factor. Usar period-level `calculatePayroll` que respeta participation correctamente.
+- **NUNCA** recomputar periodo `reopened` bajo flag ON sin capability `payroll.period.force_recompute`. Guard canonico `isReopenedRecomputeBlockedByParticipationWindow(status, flagEnabled)` enforce.
+- **NUNCA** consumir `payroll_entries.gross_total` ni cualquier campo devengado para base imponible legal del finiquito (Art 159, 161, 50, 67 CT). Source canonical es `compensation_versions.base_salary` nominal full-month (cross-spec invariant lift en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` Delta 2026-05-16).
+- **NUNCA** modificar la cap mensual de gratificacion legal (4.75 × IMM ÷ 12 ≈ $213,354 en 2026) para mes parcial. El cap es MENSUAL, NO se prorratea (jurisprudencia chilena Opcion A canonical, Dictamen DT 2937/050 2002). Si HR decide entry month = $0 gratificacion, debe usar `gratificacionLegalMode='ninguna'` (override manual).
+- **NUNCA** modelar los dias previos al ingreso contractual como ausencia. Participation NO es attendance. `days_absent`, `daysOnUnpaidLeave`, readiness de asistencia: ninguno debe inflarse para representar no-participacion.
+- **SIEMPRE** que un consumer payroll necesite "el monto del mes para member X", leer `payroll_entries.gross_total` (que viene prorrateado correctamente cuando flag ON). NUNCA recomputar inline desde compensation × dias trabajados.
+- **SIEMPRE** que emerja un nuevo path que muta o calcula payroll_entries, verificar que invoque `prorateCompensationForParticipationWindow` ANTES de `buildPayrollEntry` (mirror del pattern en `project-payroll.ts` + `calculate-payroll.ts`). Single-member paths bypass son anti-pattern bajo flag ON — blockear con canonical error.
+
+**Spec canonica**: `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` Delta 2026-05-16. Task: `docs/tasks/complete/TASK-893-payroll-participation-window.md`. Pre-flag-ON gates documentados en ADR seccion "Pre-flag-ON-producción gates". Patrones fuente: TASK-890 (exit eligibility composition), TASK-758 (4 regimenes canonicos), TASK-742 (defense-in-depth 7-layer), TASK-872 (flag gate), TASK-765/766/768/774 (reliability signals canonical pattern + builder).
+
+### Leave Accrual Participation-Aware invariants (TASK-895, desde 2026-05-16)
+
+Toda decision de **accrual de feriado legal CL Art 67 CT** para un colaborador en un year pasa por el **resolver canonico server-only** `src/lib/leave/participation-window/`. El resolver es un **year-scope aggregator** que compone TASK-893 (Payroll Participation Window, month-scope) mes a mes + filtra `rule_lane='internal_payroll'` para excluir periodos contractor/honorarios/external. Cierra bug class regulatorio CL: cuando un colaborador transita `contractor → dependent` mid-year, el helper legacy `calculateAccruedLeaveAllowanceDays` ancla accrual desde `members.hire_date` ignorando el periodo non-dependent — generando sobreacumulación + sobrepago al finiquito + precedente contractual riesgoso.
+
+**Read API canonico** (`src/lib/leave/participation-window/`):
+
+- `resolveLeaveAccrualWindowsForMembers(memberIds, year, options?: { asOfDate?: string }) → Map<memberId, LeaveAccrualEligibilityWindow>` — canonical bulk resolver.
+- `resolveLeaveAccrualWindowForMember(memberId, year, options?)` — single-member helper.
+- `deriveLeaveAccrualPolicy(facts) → LeaveAccrualEligibilityWindow` — pure function (33 tests verde).
+- `fetchCompensationFactsForLeaveAccrual(memberIds, yearStart, yearEnd)` — bulk PG query.
+- `isLeaveAccrualParticipationAwareEnabled() → boolean` — flag check con triple flag dependency enforcement.
+- `buildDegradedLeaveAccrualWindow(...)` — helper canonical para construir degraded windows desde el resolver wrapper.
+
+**Boundary semantic**:
+
+| Domain | Scope | Owns |
+|---|---|---|
+| Leave (TASK-895) | Year | `LeaveAccrualEligibilityWindow.eligibleDays` + `firstServiceCycleDays` |
+| Payroll Participation (TASK-893) | Month | `PayrollParticipationWindow.prorationFactor` + `exitEligibility` |
+| Workforce Exit (TASK-890) | Period (case-driven) | `WorkforceExitPayrollEligibilityWindow.projectionPolicy` + `eligibleTo` |
+
+**Flag dependency canonical (triple enforcement)**: `LEAVE_PARTICIPATION_AWARE_ENABLED=true` REQUIERE `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` AND `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` en el mismo ambiente. El helper `isLeaveAccrualParticipationAwareEnabled()` enforce la dependencia al boundary: retorna `true` solo cuando las 3 flags están ON. Sin esa pre-condición, retorna `false` (legacy bit-for-bit fallback) — degraded honesto.
+
+**Integration canonical en `postgres-leave-store.ts`**: el helper local `tryComputeParticipationAwareAllowanceDays` valida 4 pre-condiciones antes de aplicar la fórmula canonical `roundLeaveDays((annualDays * eligibleDays) / firstServiceCycleDays)`:
+
+1. `isLeaveAccrualParticipationAwareEnabled()` returns true.
+2. `policy.accrualType === 'monthly_accrual'`.
+3. `member.pay_regime === 'chile'`.
+4. Resolver returns `degradedMode === false`.
+
+Si cualquier pre-condición falla → fallback a `calculateAccruedLeaveAllowanceDays` legacy bit-for-bit. Preserva CL legal floor en cada degraded path.
+
+**Reliability signal canonical**: `hr.leave.accrual_overshoot_drift` (kind=`drift`, severity=`warning` si count>0, steady=0 post-flag-ON + re-seed). Subsystem rollup: `'Payroll Data Quality'` (moduleKey `'payroll'`) — unificado con TASK-893 signals. Reader pattern SHAPE detector (NO recompute exacto): identifica miembros con `hire_date` >30 días antes del `MIN(effective_from)` qualifying dependent CL.
+
+**Auditoría canonical**: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/leave/audit-accrual-drift.ts --target-year=<year> [--output=<path>]`. Read-only dry-run que reporta drift exacto por miembro (legacy vs participation-aware). Documentado en `docs/operations/runbooks/leave-accrual-drift-audit.md`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** reescribir el helper puro `calculateAccruedLeaveAllowanceDays` en `src/lib/hr-core/leave-domain.ts`. Integration ocurre en el call site (`postgres-leave-store.ts:1078,1102`) behind flag. Preserva 7 tests pure verdes legacy + SRP.
+- **NUNCA** extender `PayrollParticipationWindow` con `contractType`/`payRegime` para servir a Leave. Leave hace su propia query independiente a `compensation_versions` + compose TASK-893/890 solo para exit cutoff. DAG-leaf rule.
+- **NUNCA** importar `@/lib/leave/participation-window` desde un módulo de Payroll. DAG direction: Leave → Payroll, NUNCA reverse. Anti-corruption layer enforced en barrel.
+- **NUNCA** computar accrual inline desde `hire_date` solo cuando `LEAVE_PARTICIPATION_AWARE_ENABLED=true` y `memberId` disponible. El call site debe consumir el resolver canónico via `tryComputeParticipationAwareAllowanceDays`.
+- **NUNCA** mutar `leave_balances` automáticamente cuando se activa el flag. Backfill audit script V1.1a es read-only dry-run; mutation auditada queda V1.2 con capability `leave.balances.reconcile`.
+- **NUNCA** activar `LEAVE_PARTICIPATION_AWARE_ENABLED=true` sin: (a) las dos flags parent ON en mismo env, (b) staging shadow audit ≥30d con signal count=0, (c) HR + Legal written approval en `Handoff.md` con specific members allowlist, (d) audit script S4 dry-run con review HR documentado.
+- **NUNCA** consumir el modulo `participation-window` desde codigo client-side. Server-only enforce con `import 'server-only'` en cada archivo del modulo.
+- **NUNCA** validar SQL queries de signal readers contra `db.d.ts` shapes inferred como ground truth. **Lección canonical** del hotfix Sentry 2026-05-16: schema real PG es source of truth, no TS types. Future readers DEBEN validar contra PG real via proxy (`pnpm pg:connect:shell` + smoke script) ANTES de mergear. Bug class concreto detectado: `compensation_versions.payroll_via` NO existe en PG real (Kysely codegen drift); `payroll_via` vive en `members`. Y `compensation_versions.effective_from` es `date` no `timestamp` (`date - date = integer`, no `interval`).
+- **SIEMPRE** que un consumer downstream necesite "días efectivos de dependent CL en este year", llamar al resolver canonico. Cero composicion ad-hoc.
+- **SIEMPRE** que emerja un nuevo path que compute accrual de feriado legal, verificar que pase por `tryComputeParticipationAwareAllowanceDays` (mirror del pattern aplicado a `computeBalanceSeedForYear`). Single source of truth canonical.
+
+**Open questions (deliberadamente NO en V1.1a)**:
+
+- Honorarios + feriado proporcional opcional: hoy NO. Solo `dependent` (`indefinido`/`plazo_fijo`).
+- Saldos negativos por vacaciones tomadas pre-transición contractor→dependent: V1.2 write-path reconciliation con capability `leave.balances.reconcile`.
+- Tracking historical de `members.payroll_via` (cambios mid-year): V1.2 si emerge necesidad concreta.
+
+**Spec canonica**: `docs/architecture/GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1.md` Delta 2026-05-16 §"TASK-895 V1.1a S0". Task: `docs/tasks/complete/TASK-895-leave-accrual-participation-aware.md`. Runbook: `docs/operations/runbooks/leave-accrual-drift-audit.md`. Patrones fuente: TASK-893 (month-scope primitive composer), TASK-890 (exit lanes), TASK-742 (defense-in-depth flag dependency).
+
 ### Person 360 Relationship Reconciliation invariants (TASK-891, desde 2026-05-15)
 
 Toda mutación de relaciones legales (`greenhouse_core.person_legal_entity_relationships`) que cierre una relación activa y abra una nueva en su lugar — el caso disparador es drift `member.contract_type='contractor' / payroll_via='deel'` con relación activa `'employee'` — **debe** pasar por el helper canónico `reconcileMemberContractDrift` (`src/lib/person-legal-entity-relationships/reconcile-drift.ts`). NUNCA SQL inline en consumers; NUNCA auto-mutar desde cron / read path.

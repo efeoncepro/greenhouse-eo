@@ -1904,3 +1904,36 @@ El final settlement laboral V1 solo aplica a `internal_payroll` + Chile dependie
 ### 28.5 Documento PDF
 
 El PDF de finiquito usa el contrato visual aprobado en `mockups/finiquito-document-v1/index.html`: branding Greenhouse, entidad legal/RUT, trabajador/RUT, estado textual visible, tabla `Concepto / Tratamiento / Evidencia / Monto`, totales separados y footer con template/snapshot. El render formal falla cerrado si falta identidad legal verificada del trabajador, entidad empleadora, policy/evidencia por línea o si el neto negativo no está autorizado.
+
+## 29. Payroll Participation Window (TASK-893)
+
+El calculo de nomina debe distinguir entre **roster discovery** y **participacion pagable**.
+
+El overlap de `greenhouse_payroll.compensation_versions` (`effective_from <= periodEnd` y `effective_to >= periodStart`) solo responde "este colaborador tiene una compensacion que toca el periodo". No responde "cuantos dias/monto del periodo son pagables".
+
+Desde la decision `GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1`, Greenhouse debe resolver una ventana canonica por colaborador:
+
+```text
+eligibleFrom = max(periodStart, compensation.effective_from, relationshipStartDate if known)
+eligibleTo   = min(periodEnd, compensation.effective_to, TASK-890 exit cutoff if applicable)
+```
+
+La primitive gobierna ingreso, salida y vigencia de compensacion para projected + official payroll. El primer rollout vive en `TASK-893` detras de `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false`.
+
+### 29.1 Regla anti-attendance
+
+Un colaborador que inicia el dia 13 no estuvo ausente del dia 1 al 12; todavia no participaba del periodo de nomina. Por lo tanto:
+
+- no se deben crear ausencias artificiales
+- no se deben contaminar `days_present`, `days_absent` ni `days_on_unpaid_leave`
+- el prorrateo de ingreso debe vivir en `PayrollParticipationWindow`, no en `fetchAttendanceForPayrollPeriod`
+
+### 29.2 Caso fuente
+
+Felipe Zurita aparece en production mayo 2026 con `baseSalary=650000`, `grossTotal=650000`, `prorationFactor=1`, `contractTypeSnapshot='honorarios'`. Ese resultado es consistente con el motor legacy pero incorrecto para un inicio mid-month.
+
+El fixture Felipe-like de TASK-893 debe probar que `effective_from` dentro del mes produce `policy='prorate_from_start'` y monto menor al full-month, sin inventar asistencia.
+
+### 29.3 Relacion con TASK-890
+
+TASK-890 sigue siendo la fuente canonica para salida/offboarding. TASK-893 no reimplementa lane/status; compone `resolveExitEligibilityForMembers()` para derivar el bound `eligibleTo`.

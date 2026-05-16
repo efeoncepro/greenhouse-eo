@@ -1,0 +1,95 @@
+{
+  "summary": {
+    "targetYear": 2026,
+    "driftNoiseFloorDays": 0.01,
+    "membersScanned": 4,
+    "membersWithDrift": 4,
+    "membersDegraded": 0,
+    "totalDriftDays": 46.52,
+    "maxDriftDays": 15,
+    "avgDriftDays": 11.63
+  },
+  "items": [
+    {
+      "memberId": "humberly-henriquez",
+      "displayName": "Humberly Henriquez",
+      "hireDate": "2025-10-01",
+      "year": 2026,
+      "leaveTypeCode": "vacation",
+      "policy": "no_dependent",
+      "policyAnnualDays": 15,
+      "legacyAllowanceDays": 15,
+      "participationAwareAllowanceDays": 0,
+      "driftDays": 15,
+      "eligibleDays": 0,
+      "firstServiceCycleDays": 365,
+      "firstDependentEffectiveFrom": null,
+      "reasonCodes": [
+        "no_qualifying_versions"
+      ],
+      "degradedMode": false,
+      "degradedReason": null
+    },
+    {
+      "memberId": "julio-reyes",
+      "displayName": "Julio Reyes",
+      "hireDate": null,
+      "year": 2026,
+      "leaveTypeCode": "vacation",
+      "policy": "no_dependent",
+      "policyAnnualDays": 15,
+      "legacyAllowanceDays": 15,
+      "participationAwareAllowanceDays": 0,
+      "driftDays": 15,
+      "eligibleDays": 0,
+      "firstServiceCycleDays": 365,
+      "firstDependentEffectiveFrom": null,
+      "reasonCodes": [
+        "no_qualifying_versions"
+      ],
+      "degradedMode": false,
+      "degradedReason": null
+    },
+    {
+      "memberId": "luis-reyes",
+      "displayName": "Luis Reyes",
+      "hireDate": "2026-04-01",
+      "year": 2026,
+      "leaveTypeCode": "vacation",
+      "policy": "no_dependent",
+      "policyAnnualDays": 15,
+      "legacyAllowanceDays": 15,
+      "participationAwareAllowanceDays": 0,
+      "driftDays": 15,
+      "eligibleDays": 0,
+      "firstServiceCycleDays": 365,
+      "firstDependentEffectiveFrom": null,
+      "reasonCodes": [
+        "no_qualifying_versions"
+      ],
+      "degradedMode": false,
+      "degradedReason": null
+    },
+    {
+      "memberId": "valentina-hoyos",
+      "displayName": "Valentina Hoyos",
+      "hireDate": "2025-09-09",
+      "year": 2026,
+      "leaveTypeCode": "vacation",
+      "policy": "partial_dependent",
+      "policyAnnualDays": 15,
+      "legacyAllowanceDays": 5.18,
+      "participationAwareAllowanceDays": 3.66,
+      "driftDays": 1.52,
+      "eligibleDays": 89,
+      "firstServiceCycleDays": 365,
+      "firstDependentEffectiveFrom": "2026-02-01",
+      "reasonCodes": [
+        "hired_mid_year_dependent",
+        "exited_mid_year_internal_payroll"
+      ],
+      "degradedMode": false,
+      "degradedReason": null
+    }
+  ]
+}

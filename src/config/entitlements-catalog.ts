@@ -196,6 +196,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-893 V1.1 / TASK-895 — Force recompute payroll period bajo flag
+    // PAYROLL_PARTICIPATION_WINDOW_ENABLED cuando los guards canonicos
+    // (BL-2 single-member, BL-5 reopened) bloquean recompute legitimo.
+    // Reason >= 20 chars + audit row append-only. EFEONCE_ADMIN + FINANCE_ADMIN.
+    key: 'payroll.period.force_recompute',
+    module: 'hr',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'finance.workspace',
     module: 'finance',
     actions: ['read', 'launch'] as const,

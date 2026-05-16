@@ -90,5 +90,18 @@ export const GH_MRR_ARR_DASHBOARD = {
 } as const
 
 // ────────────────────────────────────────────────────────────────
+// TASK-893 V1.1 / TASK-895 — Cost Attribution ramp-up effect disclosure
+// ────────────────────────────────────────────────────────────────
+
+export const GH_COST_ATTRIBUTION = {
+  rampUpDisclosureTitle: 'Efecto ramp-up por ingresos/salidas a mitad de mes',
+  rampUpDisclosureBody:
+    'Cuando un colaborador ingresa o sale a mitad de mes, su costo laboral se atribuye proporcional a los días hábiles efectivamente trabajados, no al mes completo. Esto puede hacer que el costo del cliente al que está staffeado se vea más bajo de lo esperado en ese período.',
+  rampUpDisclosureExpected: 'Es comportamiento esperado del motor de payroll (Payroll Participation Window TASK-893).',
+  rampUpDisclosureWhenSuspicious:
+    'Si la atribución se ve baja y no hay ingresos/salidas mid-month en el equipo del cliente, revisa Costos > Salud de Atribución y reporta a finance-ops.'
+} as const
+
+// ────────────────────────────────────────────────────────────────
 // TASK-471 — Pricing Catalog Phase-4 UX (diff + revert + bulk + impact + approvals + excel)
 // ────────────────────────────────────────────────────────────────

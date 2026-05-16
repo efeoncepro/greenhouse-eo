@@ -46,6 +46,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import tableStyles from '@core/styles/table.module.css'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_COST_ATTRIBUTION } from '@/lib/copy/finance'
 import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
@@ -879,6 +880,22 @@ const CostAllocationsView = () => {
                       </Alert>
                     </Grid>
                   )}
+
+                  {/* TASK-893 V1.1 / TASK-895: ramp-up effect disclosure — explica por que la atribucion puede verse baja cuando hay onboarding/exit mid-month */}
+                  <Grid size={{ xs: 12 }}>
+                    <Alert severity='info' variant='outlined' icon={<i className='tabler-clock-hour-4' />}>
+                      <Typography variant='body2' sx={{ fontWeight: 600, mb: 0.5 }}>
+                        {GH_COST_ATTRIBUTION.rampUpDisclosureTitle}
+                      </Typography>
+                      <Typography variant='caption' display='block' component='div' sx={{ mb: 0.5 }}>
+                        {GH_COST_ATTRIBUTION.rampUpDisclosureBody}
+                      </Typography>
+                      <Typography variant='caption' display='block' component='div' color='text.secondary'>
+                        {GH_COST_ATTRIBUTION.rampUpDisclosureExpected}{' '}
+                        {GH_COST_ATTRIBUTION.rampUpDisclosureWhenSuspicious}
+                      </Typography>
+                    </Alert>
+                  </Grid>
 
                   {/* Client table + Donut chart */}
                   <Grid size={{ xs: 12, md: 7 }}>

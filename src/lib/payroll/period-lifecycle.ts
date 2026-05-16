@@ -27,6 +27,33 @@ export const canReopenPayrollPeriod = (status: PeriodStatus) => status === 'expo
 // immutable — mutations create a superseding v2 row instead of updating v1.
 export const isPayrollPeriodReopened = (status: PeriodStatus) => status === 'reopened'
 
+/**
+ * TASK-893 Slice 4 BL-5 — Reopened recompute guard predicate.
+ *
+ * Returns `true` when the period is in `reopened` state AND
+ * `PAYROLL_PARTICIPATION_WINDOW_ENABLED` is ON in this environment. That
+ * combination is canonically blocked because recomputing v2 entries with the
+ * NEW participation-window semantic while v1 was computed under legacy creates
+ * contradictory accounting entries against DTE/F29/Previred already submitted
+ * under v1.
+ *
+ * V1 conservative (Opción B per ADR Delta 2026-05-16): block hard. The
+ * operator can:
+ *   - Cancel reopen + re-export legacy and let next period use new semantic.
+ *   - Edit entries manually in reopened without triggering recompute.
+ *
+ * V1.1 follow-up: capability `payroll.period.force_recompute` (EFEONCE_ADMIN +
+ * FINANCE_ADMIN, reason >= 20 chars, audit row) will allow explicit override.
+ *
+ * Pure function: takes the period status + the flag-enabled flag as inputs.
+ * Callers (notably `calculatePayroll`) read the flag separately so this
+ * helper stays pure and unit-testable in isolation.
+ */
+export const isReopenedRecomputeBlockedByParticipationWindow = (
+  status: PeriodStatus,
+  participationWindowEnabled: boolean
+): boolean => participationWindowEnabled && isPayrollPeriodReopened(status)
+
 export const doesPayrollPeriodUpdateRequireReset = ({
   currentYear,
   currentMonth,

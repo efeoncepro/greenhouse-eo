@@ -1,0 +1,676 @@
+# GREENHOUSE_PAYROLL_PARTICIPATION_WINDOW_V1
+
+## Status
+
+- Status: Accepted
+- Date: 2026-05-15
+- Owner: HR / Payroll / Workforce
+- Scope: Payroll projection, official payroll calculation, compensation effective dating, workforce entry/exit eligibility, HR operational documentation.
+- Reversibility: two-way-but-slow
+- Confidence: high
+- Validated as of: 2026-05-15
+
+## Context
+
+Greenhouse Payroll currently includes any active member whose compensation version overlaps the monthly period:
+
+```text
+cv.effective_from <= periodEnd
+AND (cv.effective_to IS NULL OR cv.effective_to >= periodStart)
+```
+
+That overlap rule is correct for roster discovery, but it is not sufficient for amount calculation. If a collaborator starts mid-month, for example Felipe Zurita starting on day 13, the current `projected_month_end` path treats the compensation as a full-month obligation because `projectPayrollForPeriod()` sets `prorationFactor = 1` for month-end projection and `buildPayrollEntry()` only reduces amounts for unpaid absence or leave.
+
+TASK-890 solved the exit side for workforce offboarding by introducing a canonical exit eligibility resolver. The entry side remains uncovered: a collaborator can enter the monthly roster correctly and still be overpaid because Payroll has no canonical participation window for the part of the period where the person is actually eligible.
+
+This is a payroll semantic decision, not a UI bug. It affects projected payroll, official payroll, future payroll snapshots, payment obligations, personnel expense, and auditability.
+
+## Decision
+
+Greenhouse will introduce a canonical **Payroll Participation Window** primitive. The primitive determines the eligible interval for each member in a payroll period by composing:
+
+- period bounds (`periodStart`, `periodEnd`)
+- compensation effective dating (`compensation_versions.effective_from`, `effective_to`)
+- workforce relationship or onboarding start date when available
+- TASK-890 exit eligibility cutoff when applicable
+
+The participation window is the only place where Payroll decides whether a member is excluded, paid for the full period, or prorated for a bounded portion of the period.
+
+Implementation lives behind a feature flag until staging shadow compare is green:
+
+```text
+PAYROLL_PARTICIPATION_WINDOW_ENABLED=false
+```
+
+## Runtime Contract
+
+### Type Shape
+
+The implementation must expose a server-only bulk resolver with this contract or an equivalent strictly typed shape. Note `exitEligibility` is **embedded**, not duplicated — TASK-890 stays the single source of truth for exit semantics.
+
+```ts
+import type { WorkforceExitPayrollEligibilityWindow } from '@/lib/payroll/exit-eligibility'
+
+type PayrollParticipationPolicy =
+  | 'exclude'
+  | 'full_period'
+  | 'prorate_from_start'
+  | 'prorate_until_end'
+  | 'prorate_bounded_window'
+
+/**
+ * Reason codes ADD information NOT derivable from `policy` alone. They are not
+ * redundant with `policy`. Canonical matrix `policy × validReasonCodes`:
+ *
+ * - `exclude`                 → `compensation_not_effective` | `relationship_not_started`
+ *                               | `relationship_ended` | `external_payroll_exit`
+ * - `full_period`             → `full_period`
+ * - `prorate_from_start`      → `entry_mid_period`
+ * - `prorate_until_end`       → `exit_mid_period`
+ * - `prorate_bounded_window`  → `entry_mid_period` + (`exit_mid_period` | `external_payroll_exit`)
+ *
+ * Consumers branch on `policy`. Reason codes are forensic / observability /
+ * operator-visible copy. NUNCA branch consumer logic on reason codes.
+ */
+type PayrollParticipationReasonCode =
+  | 'compensation_not_effective'
+  | 'entry_mid_period'
+  | 'exit_mid_period'
+  | 'external_payroll_exit'
+  | 'relationship_not_started'
+  | 'relationship_ended'
+  | 'full_period'
+
+type PayrollParticipationWindow = {
+  memberId: string
+
+  /** ISO date YYYY-MM-DD inclusive */
+  periodStart: string
+
+  /** ISO date YYYY-MM-DD inclusive */
+  periodEnd: string
+
+  /**
+   * Effective participation interval intersected with [periodStart, periodEnd].
+   * `null` en eligibleFrom = no eligible at period start (excluded or future
+   * entry). `null` en eligibleTo = eligible through period end. Ambos `null` =
+   * excluded entire period.
+   */
+  eligibleFrom: string | null
+  eligibleTo: string | null
+
+  policy: PayrollParticipationPolicy
+  reasonCodes: readonly PayrollParticipationReasonCode[]
+
+  /**
+   * Composed proration factor in [0, 1].
+   *
+   * Composition formula (canonical):
+   *
+   * ```
+   * participationFactor = countWeekdays(eligibleFrom, eligibleTo)
+   *                     / countWeekdays(periodStart, periodEnd)
+   * ```
+   *
+   * Consumers compose with mode-specific factors (e.g. projected `actual_to_date`):
+   *
+   * ```
+   * finalFactor = participationFactor
+   *             × (actualToDateFactor if mode = 'actual_to_date' else 1)
+   * ```
+   *
+   * Composition lives at the consumer (`projectPayrollForPeriod`,
+   * `calculatePayroll`), NOT inside the resolver. The resolver only knows the
+   * participation window.
+   */
+  prorationFactor: number
+
+  /**
+   * Embedded TASK-890 decision. NEVER replicate `(lane, status, cutoff)` matrix
+   * in callers. Read this struct or branch on `policy` above.
+   *
+   * `null` when no offboarding case applies (member full active) OR when the
+   * TASK-890 resolver degraded (see `warnings`).
+   */
+  exitEligibility: WorkforceExitPayrollEligibilityWindow | null
+
+  warnings: readonly PayrollParticipationWarning[]
+}
+
+type PayrollParticipationWarning = {
+  code: PayrollParticipationWarningCode
+  severity: 'info' | 'warning' | 'blocking'
+  messageKey: string
+  evidence?: Record<string, unknown>
+}
+
+type PayrollParticipationWarningCode =
+  | 'exit_resolver_disabled'           // TASK-890 flag OFF; exit decisions degraded to legacy
+  | 'exit_resolver_failed'             // TASK-890 query threw; falling back to compensation only
+  | 'source_date_disagreement'         // comp.effective_from vs onboarding source differ > 7d (V1.1+)
+  | 'compensation_version_overlap'     // multiple comp versions inside period; V1 picks the active one
+```
+
+### Date Composition
+
+The canonical formula V1 uses **exactly two sources** for entry — compensation effective dating and period bounds — and composes the exit side via TASK-890:
+
+```text
+eligibleFrom = max(periodStart, compensation.effective_from)
+eligibleTo   = min(
+                  periodEnd,
+                  compensation.effective_to,
+                  exitEligibility.eligibleTo   when exitEligibility != null
+                )
+```
+
+If `exitEligibility.projectionPolicy === 'exclude_entire_period'` → policy `exclude`, both bounds `null`.
+If `exitEligibility.projectionPolicy === 'exclude_from_cutoff'` AND cutoff ≤ periodStart → policy `exclude`.
+If `eligibleFrom > eligibleTo` → policy `exclude`, both bounds `null`.
+
+If the eligible bounds equal the full period, policy is `full_period` and `prorationFactor = 1`.
+
+If only the start is bounded inside the period, policy is `prorate_from_start`.
+
+If only the end is bounded inside the period, policy is `prorate_until_end`.
+
+If both start and end are bounded inside the period, policy is `prorate_bounded_window`.
+
+### Source Precedence — V1 explicit single entry source
+
+The decision space for `eligibleFrom` evaluated three candidate sources during design:
+
+| Source | Status in V1 | Reason |
+| --- | --- | --- |
+| `compensation_versions.effective_from` | **Canonical for V1** | Already populated for every active member; consumed by `pgGetApplicableCompensationVersionsForPeriod` today; CHECK constraints exist |
+| `work_relationship_onboarding_cases.completed_at` (or equivalent) | **V1.1+ deferred** | Table exists (`src/lib/workforce/onboarding/store.ts`) but no canonical field in `members` yet. Adding it requires schema work + HR validation that onboarding date is more authoritative than comp dating. Out of scope for V1 |
+| `members.relationship_started_at` | **Does not exist** | No canonical column in `members`. Would require dedicated TASK to materialize |
+
+**V1 hard rule**: the resolver uses `compensation.effective_from` ONLY for `eligibleFrom`. Adding onboarding as a second source is gated on (a) HR confirming onboarding date is canonical for proration, (b) materializing a single `relationship_started_at` column in `members` or persisting the resolver decision via a derivation table. Both are V1.1+ work.
+
+**Future-ready hook**: the resolver bulk-query (Slice 2) MAY LEFT JOIN onboarding cases without consuming the data — purely to detect drift via the `source_date_disagreement` reliability signal. That signal then drives the V1.1 decision data-driven, not gut-feel.
+
+### Flag Dependency — TASK-893 requires TASK-890
+
+`PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` in any environment **requires** `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` in the same environment. Otherwise the participation resolver composes a degraded exit decision (`full_period` for everyone) and silently overpays exiting collaborators while correctly prorating entering ones — worst failure mode (partial correctness without operator awareness).
+
+The resolver MUST:
+
+1. Call `resolveExitEligibilityForMembers` explicitly (NOT read `exitEligibilityWindow` attached to rows by `pgGetApplicableCompensationVersionsForPeriod`, because that attachment is itself gated by the TASK-890 flag).
+2. If TASK-890 returns the legacy fallback (flag OFF), emit warning `exit_resolver_disabled` per member with active exit case in period and degrade `exitEligibility = null`.
+3. If TASK-890 throws (DB transient, schema drift), emit `captureWithDomain('payroll', err, { source: 'participation_window.exit_composition_failed' })` + warning `exit_resolver_failed` + degrade `exitEligibility = null`.
+
+This is defense-in-depth: TASK-890 alone gates exit semantics; TASK-893 additionally gates exit composition. Operators flipping TASK-893 without TASK-890 see the warning + the reliability signal `payroll.participation_window.full_month_entry_drift` (which will fire because exit-prorated members suddenly show full month).
+
+### Triple-gate roster semantics
+
+Post-rollout, three orthogonal gates filter the payroll roster, applied in this canonical order:
+
+```text
+                ┌──────────────────────────────────────────┐
+                │ pgGetApplicableCompensationVersionsForPeriod
+                │                                          │
+roster ────────▶│ 1. Compensation overlap                  │ ───┐
+                │    (effective_from <= periodEnd AND      │    │
+                │     effective_to >= periodStart)         │    │
+                │                                          │    │
+                │ 2. Intake gate (TASK-872)                │    │ filter
+                │    WHERE workforce_intake_status =       │    │ (excluded
+                │      'completed'                         │    │ members never
+                │    (flag-gated, default OFF V1)          │    │ enter roster)
+                └──────────────────────────────────────────┘    │
+                                                                ▼
+                                                       eligibleMembers[]
+                                                                │
+                                                                ▼
+                ┌──────────────────────────────────────────┐
+                │ resolvePayrollParticipationWindows...    │
+                │  (TASK-893, this spec)                   │
+                │                                          │
+                │ 3. Participation window                  │
+                │    INTERSECTION of:                      │
+                │     • compensation effective range       │
+                │     • TASK-890 exit eligibility window   │ ───▶ prorationFactor per member
+                │     • period bounds                      │      policy per member
+                │    (flag-gated, default OFF V1)          │
+                └──────────────────────────────────────────┘
+```
+
+- **Gate 1** (compensation overlap, no flag): roster discovery. Always on.
+- **Gate 2** (intake, TASK-872 flag): exclude un-onboarded members BEFORE participation. Filter, not intersection.
+- **Gate 3** (participation, TASK-893 flag): intersect entry + exit windows. Compute prorationFactor.
+
+Gates 2 and 3 are independent flags. Gate 3 internally consumes TASK-890 (gate inside gate, see Flag Dependency above). NEVER collapse the gates into one. NEVER reorder.
+
+### Régimen coverage (4 regímenes canónicos)
+
+Participation window applies to ALL four canonical payroll regímenes (TASK-758 receipt presenter taxonomy). The basis (`countWeekdays`) is the same for the four. The application differs by what gets multiplied:
+
+| Régimen | `prorationFactor` applies to |
+| --- | --- |
+| `chile_dependent` | Base salary + fixed haberes; `chileTotalDeductions` recomputed from prorated gross (Previred bases scale linearly) |
+| `honorarios` | Base honorarios; `siiRetentionAmount` recomputed from prorated gross (retención SII Art. 74 N°2 LIR scales linearly) |
+| `international_deel` | `baseGross` only (Greenhouse projects, Deel calculates final). Footnote in receipt: "monto proyectado, Deel reconcilia" |
+| `international_internal` | Base salary + fixed haberes; no Chile-specific deductions |
+
+The implementation MUST extend `prorateEntry` to honorarios path. Today honorarios skips attendance proration; that skip must NOT extend to participation. Participation is a contractual eligibility gate, not an attendance phenomenon.
+
+### Proration Basis
+
+V1 uses canonical payroll working days, not calendar days:
+
+```text
+prorationFactor =
+  countWeekdays(eligibleFrom, eligibleTo) / countWeekdays(periodStart, periodEnd)
+```
+
+The implementation may later swap `countWeekdays()` for the operational calendar primitive (`src/lib/calendar/operational-calendar.ts`) without changing the public contract. That future change requires its own validation because holidays and local calendars affect payout.
+
+### Attendance Boundary
+
+Participation is not attendance.
+
+A collaborator who starts on the 13th was not absent from the 1st to the 12th. They were not yet eligible for payroll participation. The implementation must not model entry proration as absence, unpaid leave, or attendance deficit.
+
+Attendance and leave continue to adjust amounts only after the participation window has defined the eligible portion of the period.
+
+### Integration Points
+
+The primitive must be consumed by both:
+
+- `src/lib/payroll/project-payroll.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+
+It is not acceptable to fix projected payroll only. Projected and official payroll must share the same participation decision.
+
+TASK-890 exit eligibility remains the canonical exit/offboarding source. The participation resolver composes it; it does not reimplement offboarding lane/status policy.
+
+### Observability
+
+The implementation must add **three canonical reliability signals** for drift introduced by the new window. All three live under subsystem **`Finance Data Quality`** rollup with `incidentDomainTag='payroll'` (aligns with TASK-766/768/774 cost-discipline signals; payroll deltas are economic outcomes, not workforce identity drift).
+
+| Signal | Kind | Severity | Steady | Detects |
+| --- | --- | --- | --- | --- |
+| `payroll.participation_window.projection_delta_anomaly` | drift | warning if delta > 5% / error if > 15% | < 5% | post-rollout proyección delta vs legacy baseline, period-by-period |
+| `payroll.participation_window.full_month_entry_drift` | drift | error if count > 0 | 0 | members con `effective_from` mid-period que igual recibieron `prorationFactor = 1` (regresión silente del fix) |
+| `payroll.participation_window.source_date_disagreement` | drift | warning if count > 0 | 0 | `(member, period)` donde `comp.effective_from` y `onboarding.completed_at` difieren > 7 días; data-driven trigger para V1.1 onboarding source |
+
+Signal payloads MUST include: `period_year`, `period_month`, `count`, affected `member_ids[]` (redacted via `redactSensitive`), and `reason_code_distribution` (count per `PayrollParticipationReasonCode`). PII (full name, RUT, email) stays redacted per `src/lib/observability/redact.ts` rules.
+
+`source_date_disagreement` is the **observability hook** for the V1.1 decision: when count emerges > 0 sustained, that's the data-driven signal to materialize onboarding as a second source. Until then, the resolver detects without consuming.
+
+## Alternatives Considered
+
+### Patch only `projectPayrollForPeriod()`
+
+Rejected. It would make the projected view look right while official payroll could still calculate the full month. This creates a worse failure mode because operators would trust a projected value that does not match the final calculation.
+
+### Treat days before start as absence
+
+Rejected. It is semantically false and pollutes attendance, receipts, compliance exports, personnel expense explanations, and future HR analytics.
+
+### Use only `compensation_versions.effective_from`
+
+Rejected as incomplete. Compensation effective dating is necessary, but workforce relationship/onboarding dates can be the stronger source for when a person actually begins participation. The resolver must be able to compose both without spreading that decision across callers.
+
+### Create a Felipe-specific honorarios rule
+
+Rejected. Felipe is the real trigger fixture, not the architecture. The same bug class applies to Chile dependent workers, honorarios, internal payroll, and future mixed entry/exit cases.
+
+### Extend TASK-890 directly
+
+Rejected as a naming and ownership issue. TASK-890 is specifically exit/offboarding eligibility. The new primitive should compose TASK-890, not expand it into a generic payroll engine with unclear boundaries.
+
+## Downstream Consumers — Cross-Domain Blast Radius
+
+The flag flip changes payroll amounts for mid-period entry/exit cases. Six downstream systems consume payroll entries (or derivatives) and will see propagated deltas. Coordination is required before production cutover.
+
+| Sistema | Surface | Blast | Mitigación |
+| --- | --- | --- | --- |
+| `/api/hr/payroll/projected` | Pulse projected payroll card, agency dashboards | Montos proyectados bajan para mid-month joiners | Staging shadow compare verde >= 7d before prod flip |
+| `calculatePayroll()` oficial | Period close, payslips, export to Previred/SII | Persisted amounts change post-rollout | HR/Finance OOB approval; `no_recompute_closed_periods` invariant (see below) |
+| `payment_obligations` (TASK-748) | Bank pay queue, payment orders | Obligaciones generadas pueden reflejar montos prorateados new-semantic en periods abiertos | Re-materialization gated; period-close ordering enforced |
+| `commercial_cost_attribution_v2` (TASK-708) + `client_labor_cost_allocation_consolidated` (TASK-709) | `/agency/cost-intelligence`, MRR/ARR margin views | `expense_direct_member_via_fte` baja; client_economics ICO baja | VIEW recompute is downstream-reactive; signal `commercial.cost_attribution.delta_anomaly` covers detection (existing) |
+| `client_economics` materializer + ICO motor | Globe client KPIs, ICO scorecards | ICO economics shift for clients with mid-month-entry staff | No additional mitigation; signal cascade catches anomaly |
+| Final settlement (TASK-862/863) | Finiquito calculation, document render, ratification | Same-month entry+exit case bases legales change | Validate with `greenhouse-payroll-auditor` BEFORE Slice 4 ships; cross-spec invariant lift to `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` if needed |
+
+### No-recompute-silente invariant (corregido 2026-05-16 post payroll + finance audit V0.1)
+
+**Reality check**: el helper canónico `canRecalculatePayrollPeriod(status)` en
+`src/lib/payroll/period-lifecycle.ts:5` ya define la semántica del repo:
+
+```ts
+export const isPayrollPeriodFinalized = (status: PeriodStatus) => status === 'exported'
+export const canRecalculatePayrollPeriod = (status: PeriodStatus) => !isPayrollPeriodFinalized(status)
+```
+
+Solo `exported` es terminal. Los estados `draft`, `calculated`, `approved`,
+`reopened` PERMITEN recompute. La spec previa de TASK-893 declaraba "closed
+periods" como `status IN ('exported', 'approved')` — eso CONTRADICE la
+convención canónica del repo. Corrección efectiva 2026-05-16:
+
+- El "no_recompute_closed_periods" invariant **se cumple via el helper
+  existente** `canRecalculatePayrollPeriod`. Slice 4 NO agrega guard nuevo —
+  respeta el helper.
+- `reopened` ES un path canónico de recompute auditado (TASK-410). La
+  transición `exported → reopened` es opt-in del operador con audit trail
+  preservado en v1 rows de `payroll_entries`.
+
+**Bug class adicional descubierto en finance audit (2026-05-16, BL-5)**:
+cuando `PAYROLL_PARTICIPATION_WINDOW_ENABLED` se flippea ON en producción,
+cualquier período previamente `exported` bajo legacy puede transicionar a
+`reopened` y un recompute pasa silente al payroll oficial v2 con la NUEVA
+semántica de participación mientras v1 quedó con la legacy. Eso produce
+asientos contradictorios:
+
+- DTE/F29 retención SII honorarios ya presentado bajo v1
+- Cotización Previred ya pagada bajo v1
+- Nota de crédito / nueva boleta sobre v2 con monto distinto
+
+**Solución canónica V1 (mandatory pre-Slice 4 flag flip productivo)**:
+
+Opción A (preferida) — **Capability + reason gate**:
+
+- Nueva capability `payroll.period.force_recompute` (EFEONCE_ADMIN +
+  FINANCE_ADMIN solo).
+- Reason >= 20 chars persistido en audit row.
+- Explicit operator action via admin endpoint; never automatic.
+- Aplica cuando: `isPayrollPeriodReopened(status) === true` AND el período
+  fue originalmente `exported` bajo legacy flag.
+
+Opción B (fallback simpler) — **Block reopened recompute bajo flag ON**:
+
+- `canRecalculatePayrollPeriod` extendido: si flag ON AND status='reopened'
+  AND el período fue exported pre-flag-flip, return false + canonical error
+  `period_reopened_under_legacy_no_recompute`.
+- Operador puede:
+  - O re-exportar legacy primero, después flippear flag.
+  - O esperar al próximo período (no retroactivo).
+
+V1.0 ships con **Opción B** como guard mínimo. Capability `force_recompute`
+(Opción A) emerge como follow-up V1.1 cuando HR/Finance demanden el path
+de recompute auditado.
+
+Flag-on **NO** retroactiva past months bajo ningún path.
+
+## Consequences
+
+### Positive
+
+- Projected and official payroll share one participation decision.
+- Mid-month entry, mid-month exit, and same-month entry/exit become auditable as one bounded interval.
+- Future agents can reason about payroll inclusion through a named primitive instead of reverse-engineering inline SQL and calculation code.
+- Felipe-like and Maria-like cases can be covered in the same regression matrix.
+- TASK-890 stays the single source of truth for exit semantics; TASK-893 composes, does not duplicate.
+
+### Negative / Costs
+
+- Official payroll calculation changes behavior once the flag is enabled.
+- Historical periods must not be recalculated silently; the `no_recompute_closed_periods` invariant is load-bearing.
+- If source dates disagree, the resolver must choose deterministically and expose reason codes; otherwise operators will see unexplained deltas.
+- Six downstream systems propagate the delta. Misaligned rollout (TASK-893 ON, TASK-890 OFF) produces partial correctness — the worst failure mode.
+- `prorationFactor` in `ProjectedPayrollEntry` shifts from period-wide scalar to per-member; legacy tests pinning the period-wide value must migrate before Slice 3.
+
+## Implementation Notes
+
+Expected module:
+
+```text
+src/lib/payroll/participation-window/
+```
+
+Expected public entrypoints:
+
+```text
+resolvePayrollParticipationWindowsForMembers()
+isMemberParticipatingInPayroll()
+```
+
+Expected first task:
+
+```text
+TASK-893 — Payroll Participation Window
+```
+
+## Rollout Requirements
+
+1. Ship resolver and tests behind `PAYROLL_PARTICIPATION_WINDOW_ENABLED=false`.
+2. Verify `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` in staging BEFORE flipping TASK-893 flag (flag dependency canonical).
+3. Run staging shadow compare with flag false, recording legacy vs new decisions.
+4. Flip flag true in staging only.
+5. Verify:
+   - Felipe-like mid-month entry prorates from start date.
+   - Maria-like external payroll exit remains excluded via TASK-890.
+   - Full-month collaborators remain bit-for-bit equal.
+   - Same-month entry/exit produces a bounded window.
+   - 4 régimenes (chile_dependent, honorarios, deel, international_internal) each prorate correctly.
+   - All 3 reliability signals readable and steady (delta < 5%, full_month_drift = 0, source_disagreement reports actual count).
+6. Keep production flag false until staging evidence is accepted by HR/Finance.
+7. Pre-flip checklist before production:
+   - TASK-890 flag on in production for >= 7 days steady.
+   - HR/Finance written approval (documented in `Handoff.md`).
+   - Validation with `greenhouse-payroll-auditor` that finiquito calculation (TASK-862/863) handles same-month entry+exit correctly.
+   - Coordination message to downstream consumers (Finance P&L, ICO observers) that personnel expense may decrease for joiner months.
+8. Flip production via Vercel env var + redeploy only after pre-flip checklist green.
+
+## Hard Rules — Canonical (lift to `CLAUDE.md` post-Slice 6)
+
+- **NUNCA** replicar la matriz `(lane, status, cutoff)` en consumers nuevos. Toda decisión de exit pasa por `resolveExitEligibilityForMembers`; toda decisión de entry + exit pasa por `resolvePayrollParticipationWindowsForMembers` (compone TASK-890).
+- **NUNCA** modelar días previos al inicio contractual como attendance / leave / unpaid. Participation ≠ attendance.
+- **NUNCA** fixear projection sin fixear official. Ambos paths consumen la misma primitive.
+- **NUNCA** activar `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` sin: (a) `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` en mismo env; (b) staging shadow compare >= 7d verde; (c) HR/Finance approval OOB documentado.
+- **NUNCA** recomputar período cerrado (`status IN ('exported','approved')`) silente. Requiere capability `payroll.period.force_recompute` + reason >= 20 chars + audit row (V1.1).
+- **NUNCA** branchear lógica de consumer en `reasonCodes`. Branch en `policy` (enum cerrado). Reason codes son forensic + operator copy.
+- **NUNCA** leer `exitEligibilityWindow` desde rows attachados por `pgGetApplicableCompensationVersionsForPeriod`; el participation resolver SIEMPRE invoca `resolveExitEligibilityForMembers` explícito (independiente del estado del flag TASK-890).
+- **NUNCA** poblar `eligibleFrom` con `relationshipStartDate` en V1; única source canónica es `compensation.effective_from`. Onboarding source es V1.1+ con materialización de columna canónica en `members`.
+- **NUNCA** colapsar los 3 gates (intake / exit / participation) en uno. Son ortogonales by design.
+- **NUNCA** skipear participation para honorarios. Los 4 regímenes prorratean con la misma basis (`countWeekdays`).
+- **SIEMPRE** que un consumer payroll necesite `prorationFactor` per-member, leer el row mapped (post `pgGetApplicableCompensationVersionsForPeriod` con TASK-893 flag ON); NUNCA recomputar inline.
+- **SIEMPRE** que emerja un régimen nuevo (más allá de los 4), declarar explícitamente cómo se aplica el `prorationFactor` antes de mergear.
+- **SIEMPRE** que un proceso async downstream consume payroll entries (payment_obligations, cost attribution, ICO), respetar el invariante `no_recompute_closed_periods`.
+
+## Revisit When
+
+- Greenhouse adopts operational-calendar holidays as the legal proration basis instead of weekdays.
+- Payroll needs split entries for multiple compensation versions inside the same period.
+- HR introduces country-specific payroll regimes where proration basis differs by jurisdiction.
+- Provider payroll (Deel/EOR) becomes source-of-truth for payable amount rather than Greenhouse storing an operational projection.
+
+## Self-Critique
+
+### What Breaks In 12 Months
+
+The likely failure mode is **source-date drift**: compensation effective date, workforce relationship start date, and onboarding execution date disagree. V1 closes this by using compensation as the only source AND emitting `source_date_disagreement` signal that watches the would-be V1.1 source silently. When the signal accumulates count, the decision to introduce onboarding becomes data-driven, not gut-feel.
+
+### What Breaks In 36 Months
+
+Payroll may need **split entries per sub-period** when a person changes salary or contract type mid-month. This V1 window model does not create multiple entries; it prorates one selected compensation version. That is acceptable for V1 but must be revisited when intra-month compensation changes become common.
+
+A second 36-month risk: the **triple-gate orchestration** (intake / exit / participation) may grow a fourth orthogonal dimension (e.g. legal hold, garnishment, leave override). Adding without an architectural review will produce drift between gates. The canonical pattern is: each gate has its own resolver + flag + signal; composition lives in the bulk reader, not in consumer code.
+
+### Cognitive Debt Risk
+
+Low if implemented as one primitive with ADR, tests, and docs. High if agents patch `project-payroll.ts`, `calculate-payroll.ts`, and SQL readers independently — the hard rule "NUNCA fixear projection sin fixear official" defends against this.
+
+The `prorationFactor` type shift (period-wide scalar → per-member) is the highest-friction migration. Legacy tests mock it as a global 22-day factor. Slice 1 must lock the new shape before Slice 3 touches `projectPayrollForPeriod`.
+
+### Observability Gap
+
+Without shadow compare and reason-code distribution, operators may see lower payroll totals without understanding whether the delta is correct. The three reliability signals are load-bearing:
+
+- `projection_delta_anomaly` tracks aggregate behavior (the "did the rollout move the needle as expected" question).
+- `full_month_entry_drift` catches silent regression (the "did the fix accidentally stop working for someone" question).
+- `source_date_disagreement` watches the V1.1 decision space passively (the "should we add onboarding as a second source yet" question).
+
+Removing any of the three creates a blind spot. The first two are required for V1 rollout; the third is required for V1.1 evolution.
+
+### Cross-Domain Coordination Risk
+
+Six downstream systems consume payroll entries or their derivatives. The flag flip propagates a delta to all six. The mitigation is documenting them explicitly (see "Downstream Consumers" above) and the `no_recompute_closed_periods` invariant.
+
+The highest-risk consumer is **final settlement (TASK-862/863)**: a same-month entry+exit case calculates indemnización + finiquito over a partial-month base. The Chilean legal framework treats this case explicitly (Art. 159 CT — voluntary resignation requires 30-day notice prorated). Whether the participation window primitive applies to finiquito calculation or finiquito has its own dedicated logic MUST be validated with `greenhouse-payroll-auditor` BEFORE Slice 4 ships. This is an Open Question, not a known answer.
+
+## Delta 2026-05-16 — V0.1 SHIPPED + expert audit synthesis pre-Slice 4
+
+### V0.1 Status (Slices 1-3 SHIPPED a develop sin branch dedicada)
+
+- **Slice 1** (`5eb44c47`) — Resolver foundation: types, pure-function policy, 19 tests verde.
+- **Slice 2** (`84f4f00e`) — Bulk query + TASK-890 composition + degraded fallbacks: 29 tests acumulado.
+- **Slice 3** (`10eec239`) — Projection integration behind flag `PAYROLL_PARTICIPATION_WINDOW_ENABLED` (default OFF): 486/486 tests payroll verde, flag OFF preserva bit-for-bit legacy.
+
+V0.1 = infraestructura **latente**. Cero impacto productivo. Operadores pueden planificar staging shadow compare en paralelo sin presión.
+
+### Pre-Slice 4 expert audit (2026-05-16, in-session)
+
+Dos lentes expertos invocados sobre V0.1 surface:
+
+- `greenhouse-payroll-auditor` — review legal/payroll structural integrity
+- `greenhouse-finance-accounting-operator` — downstream blast cross-domain (payment_obligations, cost attribution, ICO, P&L, finiquito, FX)
+
+Convergencia: **V0.1 está bien diseñado y safe** (pure function, defensive degradation, embedded TASK-890, flag OFF). PERO Slice 4 tiene **5 blockers convergentes** que ambos lentes flagearon. Lista canónica abajo.
+
+### 5 BLOCKERS canónicos para Slice 4 (must fix before flag flip productivo)
+
+| # | Issue | Lente que lo flageó | Fix canónico |
+| --- | --- | --- | --- |
+| BL-1 | `prorateEntry` (project-payroll.ts:80-124) escala linealmente `chileGratificacionLegalAmount`, `chileColacionAmount`, `chileMovilizacionAmount`, `chileTotalDeductions`. Gratificación legal Art 50 CT tiene cap mensual (4.75 × IMM ÷ 12 ≈ $209k 2026); rescale post-hoc double-prorratea cuando la row ya está en el cap. Colación/movilización son asignaciones no imponibles fijas — la jurisprudencia NO las prorratea automáticamente por días no trabajados al inicio del contrato. | payroll | Slice 4 debe **recomputar `calculateChileDeductions` desde bruto prorrateado**, NO escalar el output. Patrón canónico = el que la ADR §"Régimen coverage" ya promete pero el código no implementa todavía. Aplica a chile_dependent + honorarios (recompute `siiRetentionAmount` desde bruto prorrateado para traceability). |
+| BL-2 | ADR §"Integration Points" hard rule: "NEVER fixear projection sin fixear official". Slice 3 sólo tocó projected. Si Slice 4 flippea flag sin integrar `calculatePayroll`, oficial = full-month + projected = prorated → exactamente el failure mode que la ADR rechaza. | payroll | Slice 4 scope **incluye obligatoriamente** la integración en `src/lib/payroll/calculate-payroll.ts:412`. No diferible. |
+| BL-3 | Flag dependency TASK-893 → TASK-890 declarada en ADR §"Flag Dependency" y en `flag.ts` JSDoc, pero NO enforced en código del resolver. Si TASK-890 está OFF, `resolveExitEligibilityForMembers` retorna fallback legacy silente → resolver compose con `exitEligibility=null` y produce `full_period` para Maria-like → "partial correctness, worst failure mode". | payroll | En `resolver.ts` antes del try/catch, leer `isPayrollExitEligibilityWindowEnabled()` y si OFF emit warning `exit_resolver_disabled` por cada member con exit case activo en período. |
+| BL-4 ✅ NON-ISSUE | Investigación read-only 2026-05-16 (post finance auditor flag): `final-settlement/calculator.ts:397-401` consume `compensation.baseSalary` directo de `compensation_versions` (nominal full-month), NO `payroll_entries.gross_total`. Gratificación Art 50 CT, vacaciones proporcionales Art 67 CT, sueldo proporcional Art 159 CT — todos leen `compensation.baseSalary`. `overlap-ledger.ts:59-67` es solo audit trail (`coveredAmounts` documentation), NO consumed por calculator. Cross-spec invariant **ya está blindado by design** en V1. Single `prorationFactor` interno del finiquito (días trabajados / días del mes Art 159 CT) ≠ `participationFactor` TASK-893 (weekdays). Cero doble-prorrateo possible. | finance auditor (false positive, real code review por subagent post-flag) | **Sin code change Slice 4**. Solo documentation gap: el spec `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` no documenta explícitamente el source canónico (`compensation_versions.base_salary`). Cierre del gap via Delta 2026-05-16 en ese spec. |
+| BL-5 | `canRecalculatePayrollPeriod` permite recompute en `reopened`. Bajo flag ON, un período `exported → reopened` post-flag-flip recompute v2 con nueva semántica mientras v1 quedó legacy → DTE/F29/Previred asientos contradictorios. | finance | Slice 4 debe shippear **Opción B** mínima: extender `canRecalculatePayrollPeriod` o agregar guard explícito al inicio de `calculatePayroll` que bloquee `reopened` recompute cuando flag ON AND período exportado pre-flag-flip. Canonical error code `period_reopened_under_legacy_no_recompute`. Capability `force_recompute` (Opción A) queda follow-up V1.1. |
+
+### 8 WARNINGS no-blocking (Slice 4 o V1.1)
+
+- W-1 (payroll): `compensation_version_overlap` warning declarado en types pero NO emitido por resolver. SQL `query.ts:31-41` usa `DISTINCT ON` y descarta versiones overlap silentes. Detectar `COUNT(*) > 1` y propagar warning.
+- W-2 (payroll): IMM piso legal — la base prorrateada puede caer bajo IMM proporcional. Art 44 CT no exige enforcement de piso por período parcial, pero UI debe mostrar nota "prorrateado por inicio el día N", no aparentar sueldo bajo IMM.
+- W-3 (payroll): `source_date_disagreement` threshold 7 días — razonable V1. Re-evaluar con HR cuando emerja drift real en signal.
+- W-4 (finance): Outbox events `payroll_entry.materialized/.reliquidated` no versionan participation factor source. Agregar `participationFactorSource: 'legacy_scalar' | 'task_893_window'` en metadata cuando Slice 4 ship.
+- W-5 (finance): Revenue/cost matching asymmetry — `commercial_cost_attribution_v2` lee `payroll_entries.gross_total` JOIN-eado con `client_team_assignments.fte_allocation`. Cliente factura full-month FTE; cost prorrateado → margen artificial el mes de joiner. Documentar como "ramp-up effect" en surfaces ICO.
+- W-6 (finance): SII honorarios DTE 41 ↔ F29 retención drift potencial. Si la boleta del boletista se emite por monto full-month pero Greenhouse retiene 14.5% sobre monto prorrateado → cross-validation SII falla. Validar con tax accountant antes flag-ON.
+- W-7 (finance): FX rate at-period-end (preparación TASK-894) — para `effective_from` mid-month USD, rate debe ser del día del `eligibleFrom`, NO del period_end.
+- W-8 (payroll): aguinaldos / bono navideño — si están en `fixedBonusAmount` o `bonusOtherAmount`, ¿se prorratean con `participationFactor`? Costumbre chilena = proporcional a meses completos del año, NO al window mensual. Confirmar con HR antes Slice 4.
+
+### 5 OPEN QUESTIONS para Slice 4 (HR + Finance + Legal input mandatory)
+
+- Q-1: Finiquito base imponible source — `compensation_versions.base_amount` (full-month nominal) vs `payroll_entries.gross_total` (devengado prorrateado)? Decisión legal Art 172 CT (última remuneración promedio últimos 3 meses). **Sugerencia**: `base_amount` para base indemnizatoria; participation aplica solo al pay del último mes.
+- Q-2: Gratificación legal Art 50 CT en mes parcial — Dictamen DT 2937/050 (2002) sostiene "por mes completo trabajado". Código actual escala linealmente → sobrepaga joiners mid-month. **Decisión**: `0` en entry month vs `linear prorate` vs `fraction of month`?
+- Q-3: Vacaciones proporcionales Art 67 CT (1.25 días por mes trabajado) en finiquito — ¿se recalculan con participación cuando joiner ingresa mid-month? `1.25 × (10/22)` días devengados primer mes vs `1.25` full?
+- Q-4: Same-month entry+exit contrato `indefinido` Chile — corresponde finiquito formal? Art 159 CT requiere 30 días aviso. Si entrada día 5 + renuncia día 20 → no aplica finiquito formal pero hay derecho a remuneración proporcional + feriado proporcional 1/12. ¿Participation window cubre? Signal `same_month_entry_exit_chile_dependent` para escalación manual?
+- Q-5: Maria-like `international_deel` partial — ADR dice "Greenhouse projecta, Deel reconcilia final". ¿Projected muestra `$0` (Deel paga todo) o `$530 × 14/22 ≈ $337` (prorrate Deel también)? Semantic correcta para projected international_deel parcial?
+
+### Slice 4 scope expandido (canónico post-audit)
+
+**MANDATORY for Slice 4 PR**:
+
+1. Integración en `calculatePayroll()` (BL-2) — projected + official misma primitive.
+2. Recompute `calculateChileDeductions` desde bruto prorrateado (BL-1) — reemplazar `prorateEntry` rescale post-hoc por recompute correcto en path Slice 4.
+3. Enforcement flag dependency TASK-893 → TASK-890 en `resolver.ts` (BL-3) — emit warning `exit_resolver_disabled` cuando TASK-890 OFF.
+4. Cross-spec finiquito invariant (BL-4) — auditar `final-settlement` consumers, switch a `compensation_versions.base_amount` para base indemnizatoria, Delta en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md`.
+5. Reopened recompute guard (BL-5) — Opción B canonical, error code `period_reopened_under_legacy_no_recompute`.
+
+**Pre-Slice 4 first action**: re-invocar `greenhouse-payroll-auditor` Y `greenhouse-finance-accounting-operator` con fixtures concretos (Felipe real + Maria real + Chile-dependent-indefinido synthetic mid-month) para auditar números contra los 4 regímenes. Cierre con Q-1..Q-5 resueltas + signoff HR/Finance/Legal documentado en Handoff.
+
+### Status update
+
+- TASK-893 **stays in-progress** después de Slices 1-3 SHIPPED.
+- ADR + spec + audit verdicts documentados.
+- Próxima sesión: Slice 4 con scope expandido + auditor invocation primero.
+- Slices 5-6 en sesiones separadas (signals additive + docs/rollout).
+- `PAYROLL_PARTICIPATION_WINDOW_ENABLED` **NO se flippea ON** en ningún env hasta cerrar los 5 blockers + 5 OQs.
+
+### Status post-Slice 4 completo (2026-05-16, in-session 2)
+
+**Todos los 5 blockers de Slice 4 cerrados en esta sesión**. Slice 4 SHIPPED end-to-end a develop directo (sin branch dedicada). 496/496 payroll tests verde, flag default OFF preserva bit-for-bit legacy. Lo único pendiente para flag-ON producción es: Slice 5 (3 reliability signals) + Slice 6 (docs/manuales) + cierre de 5 Open Questions HR/Finance/Legal.
+
+- **BL-3 SHIPPED** (`9bdc5bb0`): flag dependency TASK-893→TASK-890 enforcement en `resolver.ts`. Emit warning `exit_resolver_disabled` por member cuando TASK-890 OFF. 3 tests nuevos verde.
+- **BL-4 RESOLVED as non-issue** (`c7a29476`): investigación read-only confirmó que `final-settlement/calculator.ts:397-401` consume `compensation.baseSalary` (nominal), NO `payroll_entries.gross_total`. Cero doble-prorrateo posible. Doc lift en `GREENHOUSE_FINAL_SETTLEMENT_V1_SPEC.md` Delta 2026-05-16.
+- **BL-5 SHIPPED** (`a279d765`): reopened recompute guard. Helper canonical `isReopenedRecomputeBlockedByParticipationWindow(status, flagEnabled)` pure function. Cuando flag ON AND status=reopened → throw canonical error `period_reopened_under_legacy_no_recompute`. 4 tests nuevos verde.
+- **BL-1 SHIPPED** (`005a42c3`): recompute deductions desde bruto prorrateado. Pattern canónico: escalar compensation inputs antes de `buildPayrollEntry` en lugar de rescale post-hoc del output. Gratificación legal cap mensual respetada correctamente (validation pre-BL-2 audit pattern Opción A canonical per jurisprudencia chilena).
+- **BL-2 SHIPPED** (`<BL-2 commit>`): integración `calculatePayroll` oficial con resolve + effectiveCompensation + skip exclude policy + recalculate-entry single-member bypass guard. Helper extraído a módulo shared `participation-window/prorate-compensation.ts` para reuse cross-path (project-payroll + calculate-payroll). 496/496 payroll tests verde.
+
+### Pre-BL-2 expert audit (2026-05-16)
+
+Antes de tocar el write path productivo, re-invocación de los 2 lentes con fixtures concretos (Felipe real + Maria real + synthetic CL-indefinido low/high salary). Convergencia:
+
+- **Payroll auditor**: GREEN. Pattern BL-1 produces legalmente correct numbers para los 4 fixtures. Gratificación legal cap correctamente clampea al cap mensual (canonical Opción A — jurisprudencia chilena Art 50 CT + Dictamen DT 2937/050 2002). Pattern resuelve el Fixture D bug class (high salary doble-prorrateo subdeclara 38% gratificación) que motivó BL-1.
+- **Finance auditor**: GREEN con 2 correcciones aplicadas en BL-2:
+  1. `recalculate-entry.ts` bypass path → block bajo flag ON (canonical error `recalc_blocked_by_participation_window`).
+  2. Capability `payroll.period.force_recompute` reclassified de V1.1 follow-up a **pre-flag-ON gate** explícito.
+
+Cost attribution ramp-up effect documentado como **aceptable bajo IFRS 15 matching principle** (no es distorsión contable, es realidad económica de entry mid-month). Requires disclosure operator-facing en surfaces cliente, no code change.
+
+### Pre-flag-ON-producción gates (canonical list, post-Slice 4)
+
+Estos gates son condiciones necesarias ANTES de que el operador flippee `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` en producción. Slice 4 ship a develop con flag OFF; el flag flip productivo viene después.
+
+1. **Slice 5 SHIPPED**: 3 reliability signals + builder + getReliabilityOverview wiring (separate session).
+2. **Slice 6 SHIPPED**: docs/manuales/CLAUDE.md lift + changelog (separate session).
+3. **Capability `payroll.period.force_recompute`**: pre-flag-ON gate (reclassified from V1.1 per finance auditor 2026-05-16). Sin esta capability, BL-5 deja al operador stuck cuando emerja necesidad de recompute en período exportado pre-flag-flip.
+4. **5 Open Questions resueltas con HR/Finance/Legal signoff escrito en Handoff**:
+   - Q-1 finiquito base: ✅ RESOLVED (BL-4 NON-ISSUE).
+   - Q-2 gratificación cap mes parcial: ✅ RESOLVED por BL-1 pattern (cap mensual NO prorrateado per Opción A canonical).
+   - Q-3 vacaciones proporcionales Art 67 CT: V1.1 follow-up. Módulo HR separado (`vacation_accruals`), NO bloquea participation window porque vacaciones se materializan en otro path. Crear TASK derivada V1.1 para participation-aware vacation accruals.
+   - Q-4 capability force_recompute: reclassified to pre-flag-ON gate (above).
+   - Q-5 backfill scope V1: ✅ NO backfill, append-only audit preserved.
+5. **Staging shadow compare ≥ 7d steady verde**: flag ON en staging only, monitor 3 reliability signals = 0.
+6. **HR/Finance written approval**: documented en `Handoff.md` con specific members allowlist.
+7. **Cost attribution ramp-up disclosure**: footnote canónica en `/agency/clients/[id]` cost breakdown + ICO scorecard tooltips (operator-facing, Slice 6 scope).
+8. **Doc operativo honorarios mid-month**: doc en `docs/documentation/hr/` advirtiendo que la boleta debe emitirse por bruto prorrateado, NO contrato full (evita DTE↔F29 drift).
+
+---
+
+## Delta 2026-05-16 — TASK-895 V1.1a S0 — Leave Accrual Participation-Aware ADR
+
+V1.1a follow-up extiende el primitive month-scope a un **aggregator year-scope** owned by Leave domain. Cierra bug class regulatorio CL Art 67/68 CT detectado por discovery 2026-05-16: cuando un colaborador transita `contractor → dependent` mid-year, el helper legacy `calculateAccruedLeaveAllowanceDays` ancla accrual desde `hire_date` ignorando el periodo non-dependent. Resultado: ~5+ días "fantasma" acumulados legalmente no defendibles → sobrepago al finiquito + precedente contractual riesgoso.
+
+### Decisión arquitectónica (arch-architect + greenhouse-payroll-auditor 2026-05-16)
+
+- **Two-task split V1.1a + V1.1b** (NO bundle): TASK-895 Leave (orthogonal failure mode) y TASK-896 Shadow Compare son independientes — distinto owner, surface, scope (year vs month), blast radius.
+- **DAG direction**: Leave imports from `@/lib/payroll/participation-window`. **Reverse forbidden** (Payroll no conoce Art 67 CT). Anti-corruption layer enforced en barrel.
+- **Year-scope aggregator pattern**: `resolveLeaveAccrualWindowForMember(memberId, year)` compone TASK-893 mes a mes + filtra `rule_lane='internal_payroll'` semantica vía TASK-890. NUNCA extender `PayrollParticipationWindow` con `contractType`/`payRegime` — Leave hace su propia query a `compensation_versions` para entry-side decision; compone TASK-893/890 sólo para exit cutoff.
+
+### Boundary semantic
+
+| Domain | Scope | Source | Owns |
+|---|---|---|---|
+| Leave | Year (`year ∈ [2026, ...]`) | `compensation_versions` filtered by `contract_type IN ('indefinido','plazo_fijo') AND pay_regime='chile' AND payroll_via='internal'` | `LeaveAccrualEligibilityWindow.eligibleDays` + `firstServiceCycleDays` |
+| Payroll (TASK-893) | Month (`[periodStart, periodEnd]`) | `compensation_versions` applicable to period | `PayrollParticipationWindow.prorationFactor` + `exitEligibility` |
+| Workforce Exit (TASK-890) | Period (case-driven) | `work_relationship_offboarding_cases` | `WorkforceExitPayrollEligibilityWindow.projectionPolicy` + `eligibleTo` |
+
+### Canonical types (S0 SHIPPED 2026-05-16, commit pending)
+
+- `LeaveAccrualPolicy` enum cerrado: `full_year_dependent | partial_dependent | no_dependent | unknown`.
+- `LeaveAccrualReasonCode` enum cerrado (8 codes): documenta el porqué del año parcial (hired_mid_year, contractor↔dependent transition, external_payroll_exit_truncates, etc.).
+- `LeaveAccrualEligibilityWindow`: shape canonical con `eligibleDays` (numerador) + `firstServiceCycleDays` (denominador) para preservar la fórmula canonical legacy `(annualDays × overlapDays) / firstServiceCycleDays` bit-for-bit cuando no hay transiciones.
+- `degradedMode: true` → consumer cae a legacy `hire_date`-based accrual (zero-risk safety floor preserva CL legal minimum Art 67 CT).
+
+### Flag dependency canonical
+
+`LEAVE_PARTICIPATION_AWARE_ENABLED=true` REQUIERE `PAYROLL_PARTICIPATION_WINDOW_ENABLED=true` AND `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED=true` en el mismo environment. El helper `isLeaveAccrualParticipationAwareEnabled()` enforce la dependencia al boundary: retorna `true` solo cuando las 3 flags están ON. Sin esa pre-condición, retorna `false` (legacy bit-for-bit fallback) — degraded honesto.
+
+### Hard rules (lift to CLAUDE.md post-S5)
+
+- **NUNCA** reescribir el helper puro `calculateAccruedLeaveAllowanceDays`. Integration ocurre en el call site (`postgres-leave-store.ts:1078,1102`) behind flag. Preserva 7 tests pure verdes.
+- **NUNCA** extender `PayrollParticipationWindow` con `contractType`/`payRegime` para servir a Leave. Leave hace su propia query a `compensation_versions`.
+- **NUNCA** computar accrual inline desde `hire_date` solo cuando `LEAVE_PARTICIPATION_AWARE_ENABLED=true` y `memberId` disponible. El call site debe consumir el resolver canónico.
+- **NUNCA** mutar `leave_balances` automáticamente cuando se activa el flag — backfill audit script V1.1a S4 es read-only dry-run; mutation auditada queda V1.2 con capability `leave.balances.reconcile`.
+- **NUNCA** importar `@/lib/leave/participation-window` desde un módulo de Payroll. DAG-leaf rule enforced.
+
+### Slicing canonical V1.1a
+
+- **S0 (this Delta)**: ADR + types + flag + barrel (no code, no test). SHIPPED.
+- **S1**: Resolver puro + 30+ tests pure function. Query independent a `compensation_versions` + compose TASK-890 para exit cutoff.
+- **S2**: Integration en `postgres-leave-store.ts:1078,1102` behind flag. Legacy bit-for-bit con flag OFF.
+- **S3**: Signal `hr.leave.accrual_overshoot_drift` (kind=drift, severity warning >0, steady=0). Subsystem rollup `'Payroll Data Quality'` (moduleKey `'payroll'`).
+- **S4**: Backfill audit script `scripts/leave/audit-accrual-drift.ts` (read-only dry-run) + runbook.
+- **S5**: Docs canonical (CLAUDE.md hard rules + doc funcional + manual operador + DECISIONS_INDEX).
+
+### Pre-flag-ON-producción gates V1.1a
+
+1. **Slices 1-5 SHIPPED verde** (`pnpm test` + `pnpm build` full).
+2. **TASK-893 + TASK-890 flags ON staging** ≥7 días steady.
+3. **Audit script S4 reporta 0 overshoot** en staging members (allowlist explícita).
+4. **Signal `hr.leave.accrual_overshoot_drift` count=0** sustained ≥30 días staging.
+5. **HR + Legal signoff escrito** en `Handoff.md` con specific members allowlist primer ciclo.
+6. **Flag flip productivo controlado**: allowlist explícita inicial (e.g. Felipe Zurita), ampliar progresivamente.
+
