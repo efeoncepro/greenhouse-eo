@@ -87,8 +87,9 @@ Delta `2026-05-17 — Precisión implementacional sesión RpA / Indicador de Per
 
 ## Cross-references creados en esta sesión
 
-- `docs/architecture/Contrato_Metricas_ICO_v1.md` — Delta canonical (top del file).
+- `docs/architecture/Contrato_Metricas_ICO_v1.md` — Delta canonical (top del file). Update post-cierre Cycle Time: secciones C + D ahora canonizan las 4 decisiones tomadas (inicio="En curso" / fin=Fecha de completado / feedback time SÍ cuenta / Bloqueado NO cuenta) + separación canonical OTD% (promise compliance) vs CT SLO% (competitive benchmark).
 - `docs/tasks/to-do/TASK-901-canonical-notion-metric-compute-v1-rpa.md` — Normative Docs ampliada para referenciar esta Delta como precondición canonical de Discovery + Slice 1.
+- `docs/tasks/to-do/TASK-908-ico-status-transition-tracking-canonical-cycle-time.md` — **NUEVA TASK creada 2026-05-17**. Implementa lo canonizado en Delta secciones C + D + B: status transition capture infra + canonical CT helper + CT SLO% nueva métrica + fix B.1 (Bloqueado excluido) + fix B.2 (estados Sky mapeados) + housekeeping Engine spec doc. 9 slices + 6 feature flags graduados. Reusa pattern infra de TASK-901 (webhook + outbox + Cloud Tasks). Note: TASK-906/907 ya estaban tomados por trabajo paralelo de Codex (International Withholding Engine Europe + Spain Rule Pack); usamos TASK-908 next available.
 
 # Sesion 2026-05-16 — Sentry JAVASCRIPT-NEXTJS-63 `/admin` reliability reader hotfix
 

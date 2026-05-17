@@ -173,51 +173,74 @@ Detectado live 2026-05-16: BQ `notion_ops.tareas.rpa` = `null` en 100% (3,168 ta
 
 **Estado de remediation**: `TASK-901` (Canonical Notion Metric Compute V1) es la solución canonical permanente — mover el compute a Greenhouse code con writeback. Eso elimina la dependencia del sync para entregar el value del formula. **Out of scope de patches al sync legacy** — el patch sería deuda temporal que TASK-901 absorbe.
 
-### C) Decisiones pendientes — Cycle Time (precondición para futuro TASK de canonical compute)
+### C) Cycle Time — DECISIONES CANONICAL TOMADAS 2026-05-17
 
-Las 3 ambigüedades operativas detectadas en sesión 2026-05-17 que requieren decisión del operador antes de comprometer el helper canonical `calculateCycleTime()` en código. Sin estas decisiones, el helper TS mediría cosas diferentes según el contexto del consumer (per QBR vs per bonificación operativa vs per TTM).
+Las 3 ambigüedades operativas previamente abiertas fueron resueltas con operador en sesión 2026-05-17 + agregada decisión nueva (C.4) sobre Bloqueado.
 
-#### C.1 Evento de INICIO del Cycle Time
+#### C.1 INICIO canonical: status transition → `En curso` / `Tomado`
 
-3 candidatos plausibles, cada uno mide algo distinto:
+Cycle Time arranca cuando el equipo toma la pieza activamente (status pasa a `En curso` en Efeonce, o `Tomado` en Sky-side). **NO** desde `created_at` Notion. Justificación operativa: tareas pueden vivir días/semanas en backlog antes de que alguien arranque trabajo real; contar ese tiempo infla CT con espera no-productiva y desincentiva grooming agresivo del backlog.
 
-| Inicio candidato | Mide | Trade-off operativo |
-|---|---|---|
-| **A) `createdTime` Notion** (cuando la tarea se crea en la database) | Tiempo total que la tarea vivió en el sistema | Incluye tiempo en backlog/Pendiente cuando nadie estaba trabajando — infla CT artificialmente con espera no-productiva |
-| **B) Cuando estado pasa a `En curso` / `Tomado`** | Tiempo desde que ALGUIEN tomó la pieza activamente | Mide producción real, excluye espera en backlog. Pero requiere capturar transition timestamps (no es campo directo en Notion hoy) |
-| **C) `Fecha de aprobación del brief`** | Tiempo desde que el brief quedó claro hasta entrega | Operacionalmente el "start" más limpio según contrato Sección 4. PERO **no existe property explícita** capturada en Notion DB hoy (ni Sky ni Efeonce) |
+**Impacto vs código actual**: el código hoy (`src/lib/ico-engine/schema.ts:108-113`) usa `created_at` como inicio. **Requiere cambio canonical**. Sin embargo, Notion hoy NO captura el timestamp de status transition — la única señal cercana es `last_edited_time` (que se sobreescribe en cada edit, no preserva el momento exacto del cambio de estado). Requiere infra nueva (ver D).
 
-**Recomendación pre-decisión**: opción **B (status → `En curso`)** parece más alineada al contrato "tiempo desde brief aprobado hasta entrega" si interpretamos "brief aprobado" ≈ "equipo arranca trabajo". Requiere capturar transition timestamps via Notion last_edited_time + status change tracking, o agregar una property explícita `Fecha de inicio de producción` en Notion.
+#### C.2 FIN canonical: `Fecha de completado` (property Notion `Fecha de completado` → BQ `completed_at`)
 
-#### C.2 Evento de FIN del Cycle Time
+Cycle Time termina cuando el equipo marca la pieza como completada internamente. **NO** cuando el cliente aprueba (`Aprobado` state). Justificación operativa: la aprobación del cliente es un **milestone separado de validación** que mide otra cosa (responsividad del cliente, alignment del brief original con expectativas) — no la duración de producción.
 
-3 candidatos:
+**Impacto vs código actual**: el código hoy ya usa `completed_at`. **Sin cambios**.
 
-| Fin candidato | Mide |
-|---|---|
-| **A) `Fecha de completado`** (property Notion) | Última fecha de cierre operativo, puede o no coincidir con aprobación cliente |
-| **B) Estado → `Aprobado`** (final state) | Aprobación final del cliente, el "delivered" más estricto |
-| **C) Estado → `Listo para revisión`** (primera vez) | Primera entrega al cliente, excluye tiempo de iteración post-feedback |
+Métrica complementaria canonical sugerida (out of scope V1, considerar V2): `time_to_client_approval` = días entre `Fecha de completado` y `Aprobado` cliente — mide responsividad del cliente, no del equipo.
 
-**Recomendación pre-decisión**: opción **B (estado `Aprobado`)** alinea mejor con el contrato Sección 4 "hasta pieza entregada" interpretado como "entregada y aceptada por cliente". Opción C mediría "first delivery cycle time" — útil métrica complementaria pero no es THE cycle time canonical.
+#### C.3 Tiempo en `En feedback` (cliente revisando): SE INCLUYE en CT
 
-#### C.3 Inclusión / exclusión de tiempo en `En feedback` (cliente revisando)
+Cuando una pieza está `En feedback`, el cliente está revisando. Greenhouse no controla ese tiempo, pero **se incluye en CT** porque refleja el calendar real que vivió la pieza. Justificación operativa: alineado con TTM y Early Launch Advantage — al cliente le importa el calendar completo, no la eficiencia interna. Además, el equipo PUEDE gestionar la espera (pasar a otra tarea mientras tanto, no quedar bloqueado contemplando el feedback que no llega).
 
-Cuando una pieza está `En feedback`, Greenhouse no controla ese tiempo. 2 interpretaciones:
+**Impacto vs código actual**: el código hoy ya incluye `En feedback` time (es `DATE_DIFF` calendar puro). **Sin cambios**.
 
-| Approach | Qué mide | Argumento pro | Argumento con |
+#### C.4 Tiempo en `Bloqueado` / `Detenido`: SE EXCLUYE de CT (NUEVO)
+
+Cuando una pieza pasa a `Bloqueado` o `Detenido`, ese tiempo NO debe contar para CT. Justificación operativa: coherencia con regla A.4 (tareas bloqueadas fuera del denominador de métricas) — si excluimos tareas bloqueadas del COUNT, no podemos a la vez contar su TIEMPO bloqueado en el promedio CT. Penalizaría al equipo por dependencias externas (cliente no envía assets, legal no firma, vendor no responde).
+
+**Impacto vs código actual**: el código hoy NO descuenta tiempo en Bloqueado (es `DATE_DIFF` puro). **Requiere cambio canonical**. Igual que C.1, requiere capturar entry/exit timestamps de Bloqueado — infra nueva (ver D).
+
+#### Cycle Time canonical — fórmula final
+
+```
+CT canonical = (Fecha completado − Timestamp status→En curso)
+              − (Tiempo total acumulado en Bloqueado/Detenido durante esa ventana)
+```
+
+Donde el tiempo en `En feedback` SÍ se cuenta (no se descuenta).
+
+### D) OTD% vs CT SLO% — separación canonical 2026-05-17
+
+Decisión arquitectónica: separar 2 KPIs hoy mezclados conceptualmente en lectura. Las 2 mediciones son útiles, pero responden preguntas distintas y NO deben presentarse como la misma métrica:
+
+| KPI canonical | Pregunta de negocio | Fórmula | Source actual |
 |---|---|---|---|
-| **Incluir `En feedback`** | Calendar end-to-end | Refleja TTM real (al cliente le importa el calendario completo, no la eficiencia interna) | Penaliza al equipo por demoras del cliente que no controla |
-| **Excluir `En feedback`** | Pure production time | Mide eficiencia equipo Greenhouse, accountability clara | Pierde el calendar real → disconnect con TTM y Early Launch Advantage |
+| **OTD% (canonical, existente)** | "¿Cumplimos el deadline que **nosotros** prometimos al cliente?" | `% tareas con performance_indicator_code = 'on_time'` (per-task deadline compliance) | `src/lib/ico-engine/metric-registry.ts:202-206` |
+| **CT SLO% (canonical, NUEVA)** | "¿Nuestro tiempo de ciclo es competitivo vs **industria**?" | `% tareas con cycle_time_days ≤ threshold` (default 14.2 días, calibrable per tipo de pieza) | NO existe hoy — métrica nueva |
 
-**Recomendación pre-decisión**: doble medición canonical:
+**Justificación operativa**:
 
-- `cycle_time_calendar` (incluye `En feedback`) → para TTM / Early Launch / cliente-facing
-- `cycle_time_production` (excluye `En feedback`) → para eficiencia interna / bonificación operativa / mejora continua
+- **OTD%** mide **promise compliance** — accountability del equipo por el deadline acordado en el brief individual.
+- **CT SLO%** mide **competitive benchmark** — performance del equipo vs estándar de industria, indicador de eficiencia operativa absoluta.
 
-Dos KPIs separados que responden preguntas distintas. El contrato Sección 4 menciona "Cycle Time" sin desambiguar, lo cual es el origen del problema.
+Una pieza puede ser **on_time** (cumplió SU deadline de 30 días) pero **fuera del SLO** (tomó >14.2 días, lento vs industria). Otra puede ser **late_drop** (no cumplió SU deadline) pero **dentro del SLO** (tomó <14.2 días, rápido pero el deadline original era irrealmente corto).
 
-**Próximo paso bloqueante**: operador define las 3 decisiones (C.1, C.2, C.3) antes de levantar `TASK derivada — Canonical Cycle Time compute V1` (estimación: medio o un día dev depende de si capturamos las 2 versiones o solo una).
+Por eso son **métricas hermanas pero NO redundantes**. Ambas son canonical.
+
+**Threshold inicial**: 14.2 días (per `Greenhouse_ICO_Engine_v1.md` línea 912, "promedio agencia LATAM"). **Calibrable per tipo de pieza** (Sección 7.2 del contrato): video > sitio web > estático > GIF. Implementation guarda el threshold en config externa (no hard-coded).
+
+**Resuelve drift detected**: `Greenhouse_ICO_Engine_v1.md` líneas 958-992 tiene una versión OUTDATED que mezcla OTD% con CT SLO% (define OTD% como `cycle_time_days <= 14.2`). Post-decisión 2026-05-17 esa parte del Engine spec doc queda **explícitamente desactualizada** — TASK derivada incluye housekeeping de actualizar el Engine spec para reflejar la separación canonical OTD% (promise) vs CT SLO% (benchmark).
+
+### E) TASK derivada candidata (paquete combinado)
+
+Las decisiones C.1, C.2, C.3, C.4 + separación D requieren infra nueva (status transition tracking) que conviene paquetarse con los gaps B.1 (Bloqueado en denominador) + B.2 (estados Sky no mapeados a CSC) ya que comparten la misma capa de status taxonomy. Estimación combinada: 1-2 semanas dev (status transition capture + CT canonical helper + CT SLO% nueva + fix B.1 + fix B.2 + housekeeping Engine spec doc).
+
+Spec canonical referenciada: `docs/tasks/to-do/TASK-908-ico-status-transition-tracking-canonical-cycle-time.md` (creada en misma sesión 2026-05-17).
+
+### F) Evidencia citada de esta sesión
 
 ### D) Evidencia citada de esta sesión
 
