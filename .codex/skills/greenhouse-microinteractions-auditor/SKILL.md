@@ -79,8 +79,10 @@ Review the surface in this order:
 ## Greenhouse platform decisions
 
 - Import motion primitives from `@/libs/FramerMotion`, not directly from `framer-motion`.
+- Import GSAP only from `@/libs/GSAP` or `@/libs/GSAPScrollTrigger`, never directly from `gsap`, `gsap/ScrollTrigger`, or `@gsap/react`.
 - Import Lottie from `@/libs/Lottie`, not directly from `lottie-react`.
 - Use `useReducedMotion` for any custom motion.
+- Use GSAP only for advanced timelines, SVG/path/text choreography, or measured ScrollTrigger experiences; keep normal microinteractions on Framer Motion, CSS/MUI transitions, or auto-animate.
 - Reuse `AnimatedCounter` for KPI value transitions.
 - Reuse `EmptyState` with `animatedIcon` only for first-use or no-results moments where calm motion helps orientation.
 - Keep error states and destructive confirmations visually stable.
@@ -140,6 +142,7 @@ Return:
 ## Anti-patterns
 
 - importing animation libraries directly in new code
+- using GSAP for hover/focus/press, KPI counters, loading states, or ordinary list mutations
 - adding motion where copy or structure would solve the real problem
 - using zero or fake values as animated placeholders
 - relying on color or motion alone to communicate a state
@@ -159,4 +162,3 @@ Use this quick mapping unless the surface has a stronger local pattern:
 - successful save / mutation -> toast + stable inline state if relevant
 - urgent blocking issue -> `Alert` or dialog, not toast-only
 - dynamic result count / async status -> persistent live region or `role="status"`
-

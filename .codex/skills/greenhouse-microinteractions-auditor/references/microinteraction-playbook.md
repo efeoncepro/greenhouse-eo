@@ -83,6 +83,10 @@ Validation should help recovery while the user still remembers the field context
 
 - `src/libs/FramerMotion.tsx`
   - canonical motion wrapper
+- `src/libs/GSAP.tsx`
+  - canonical GSAP + `useGSAP` wrapper for advanced motion
+- `src/libs/GSAPScrollTrigger.tsx`
+  - canonical ScrollTrigger registration/export for measured scroll choreography
 - `src/libs/Lottie.tsx`
   - canonical Lottie wrapper
 - `src/hooks/useReducedMotion.ts`
@@ -143,6 +147,7 @@ Validation should help recovery while the user still remembers the field context
 | destructive confirmation | MUI `Dialog` / local dialog pattern |
 | dynamic async status | persistent `role="status"` / `aria-live="polite"` |
 | urgent blocking problem | `Alert` or `role="alert"` |
+| advanced timeline / SVG / ScrollTrigger | GSAP via `@/libs/GSAP` and `@/libs/GSAPScrollTrigger`, with `useReducedMotion` guard |
 
 ## 5. Audit checklist
 
@@ -163,6 +168,6 @@ When reviewing a screen, ask:
 - Keep error handling calmer and more static than celebratory or first-use moments.
 - Do not animate placeholder zeroes or fake KPI values.
 - Do not recommend new animation libraries for portal microinteractions.
+- Do not use GSAP for ordinary hover/focus/press, KPI counters, loading states, or list mutations; reserve it for the advanced motion lane documented in `GREENHOUSE_GSAP_ADOPTION_DECISION_V1.md`.
 - If copy, hierarchy, or state modeling solves the issue better than motion, prefer that.
 - For client-facing surfaces, keep the brand voice warm but the data labels operational.
-

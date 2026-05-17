@@ -139,6 +139,8 @@ W3C ARIA22 technique for `role="status"`:
 | File | Purpose |
 |---|---|
 | `src/libs/FramerMotion.tsx` | Canonical re-export of framer-motion primitives (`motion`, `AnimatePresence`, `useInView`, `useSpring`, `useTransform`, `useMotionValue`) |
+| `src/libs/GSAP.tsx` | Canonical GSAP + `useGSAP` wrapper for advanced motion |
+| `src/libs/GSAPScrollTrigger.tsx` | Canonical ScrollTrigger registration/export for measured scroll choreography |
 | `src/libs/Lottie.tsx` | Dynamic import wrapper for `lottie-react` (SSR-safe) |
 | `src/hooks/useReducedMotion.ts` | OS-level `prefers-reduced-motion` hook with listener |
 | `src/components/greenhouse/AnimatedCounter.tsx` | Numeric KPI spring transition; skips animation when reduced motion is on |
@@ -205,6 +207,8 @@ When reviewing a Greenhouse screen, ask:
 ## 6. Greenhouse-specific guardrails
 
 - Import motion from `@/libs/FramerMotion`, never directly from `framer-motion`.
+- Import GSAP from `@/libs/GSAP` or `@/libs/GSAPScrollTrigger`, never directly from `gsap`, `gsap/ScrollTrigger`, or `@gsap/react`.
+- Use GSAP only for advanced timelines, SVG/path/text choreography, or measured ScrollTrigger experiences. Keep normal microinteractions on Framer Motion, CSS/MUI transitions, or auto-animate.
 - Import Lottie from `@/libs/Lottie`, never directly from `lottie-react`.
 - Use `useReducedMotion` hook for any custom motion work.
 - Keep error states calmer and more static than celebratory or first-use moments.

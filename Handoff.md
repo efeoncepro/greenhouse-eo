@@ -1,3 +1,36 @@
+# Sesion 2026-05-17 (cont. — GSAP adoption como carril especializado de motion)
+
+**Status**: ✅ UI platform adoption. Se adopto `gsap` + `@gsap/react` con wrappers canonicos y ADR dedicado, sin reemplazar Framer Motion para microinteracciones normales.
+
+## Resultado
+
+- Dependencias agregadas: `gsap` y `@gsap/react`.
+- Wrappers canonicos nuevos:
+  - `src/libs/GSAP.tsx` — re-exporta `gsap` + `useGSAP` y registra el plugin React.
+  - `src/libs/GSAPScrollTrigger.tsx` — registra/exporta `ScrollTrigger` separado para no cargarlo en consumers que solo necesitan core timelines.
+- ADR nuevo Accepted: `docs/architecture/GREENHOUSE_GSAP_ADOPTION_DECISION_V1.md`.
+- Docs sincronizadas: `GREENHOUSE_MOTION_SYSTEM_V1.md`, `GREENHOUSE_UI_PLATFORM_V1.md`, doc funcional de animaciones, `DECISIONS_INDEX.md`, `project_context.md`, `changelog.md` y skills locales de microinteractions.
+
+## Contrato vigente
+
+- Imports productivos:
+  - `import { gsap, useGSAP } from '@/libs/GSAP'`
+  - `import { ScrollTrigger } from '@/libs/GSAPScrollTrigger'`
+- No importar `gsap`, `gsap/ScrollTrigger` ni `@gsap/react` directo desde componentes.
+- GSAP queda reservado para timelines complejos, SVG/path/text y ScrollTrigger medido.
+- Framer Motion, CSS/MUI transitions y `@formkit/auto-animate` siguen siendo default para hover/focus/press, counters, list mutation, page entrance, skeleton crossfade y scroll reveal liviano.
+- Toda animacion GSAP debe ser client-side, cleanup-safe via `useGSAP`/context, respetar `useReducedMotion` y evitar estados de error/destructivos animados.
+
+## Validacion
+
+- `pnpm exec tsc --noEmit` ✅
+- `pnpm lint` ✅ exit 0. Quedaron 4 warnings preexistentes `greenhouse/no-untokenized-business-line-branching` en:
+  - `src/app/(dashboard)/agency/organizations/[id]/page.tsx`
+  - `src/app/(dashboard)/finance/clients/[id]/page.tsx`
+- Durante `pnpm add` se observaron peer dependency warnings preexistentes Tiptap/zod; no bloquean esta adopcion.
+
+---
+
 # Sesion 2026-05-17 (cont. — ADR Migration Strategy + TASK-910 Demo Teamspace + IDs canonical verified)
 
 **Status**: ✅ Doc-only + Notion teamspace clone operador. ADR canonical nuevo `GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md` (480 líneas) que formaliza la estrategia de migración progresiva NO big-bang (12-14 meses, 6 fases ramp, 8 stop-gates obligatorios, demo teamspace pre-prod, recovery primitives canonical, backward compat 90+ días). Plus TASK-910 (Notion Demo Teamspace Migration Sandbox, 6 slices, ~450 líneas) con IDs canonical del teamspace `Demo Greenhouse` identificados live vía Notion MCP post-clone operador (anti-confusion verified vs Efeonce/Sky productivos — cero overlap). Plus actualización TASK-901/TASK-908 con prerequisite TASK-910. CLAUDE.md sección nueva con 8 stop-gates + IDs canonical. DECISIONS_INDEX + METRICS_INDEX + REGISTRY + README sincronizados.

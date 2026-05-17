@@ -2249,8 +2249,9 @@ import type { OperationsOverview } from '@/lib/operations/get-operations-overvie
 |----------|---------|---------------|
 | `lottie-react` | `src/libs/Lottie.tsx` | Ilustraciones animadas (empty states, loading, onboarding) |
 | `framer-motion` | `src/libs/FramerMotion.tsx` | Micro-interacciones (counters, transitions, layout animations) |
+| `gsap` + `@gsap/react` | `src/libs/GSAP.tsx`, `src/libs/GSAPScrollTrigger.tsx` | Motion avanzado: timelines complejos, SVG/path/text, ScrollTrigger medido |
 
-Ambas se cargan via dynamic import o `'use client'` re-export para evitar problemas SSR.
+Las librerías de motion se consumen via dynamic import o wrappers `'use client'` para evitar problemas SSR.
 
 ### Accesibilidad — prefers-reduced-motion (obligatorio)
 
@@ -2338,8 +2339,9 @@ Para agregar assets nuevos:
 - **Reutilizar `useReducedMotion`** para cualquier animación condicional
 - **No importar `framer-motion` directo** — usar `src/libs/FramerMotion.tsx` para re-exports centralizados
 - **No importar `lottie-react` directo** — usar `src/libs/Lottie.tsx` (dynamic import SSR-safe)
+- **No importar `gsap`, `gsap/ScrollTrigger` ni `@gsap/react` directo** — usar `src/libs/GSAP.tsx` y `src/libs/GSAPScrollTrigger.tsx`
 - **Lottie JSON < 50KB** recomendado para cada asset individual
-- **No usar GSAP ni Three.js** para micro-interacciones — están fuera del scope de animación UI (Three.js se reserva para TASK-233 logo animation)
+- **No usar GSAP ni Three.js para micro-interacciones comunes** — GSAP queda reservado para choreography avanzado por `GREENHOUSE_GSAP_ADOPTION_DECISION_V1.md`; Three.js se reserva para TASK-233/logo/3D explícito
 - **El prop `animatedIcon` es opt-in** — no reemplazar empty states masivamente sin validación visual
 
 ### Pilotos activos
