@@ -1,3 +1,66 @@
+# Sesion 2026-05-17 (cont. — Bomba 1 cerrada: ADR canonical Status Lifecycle universal cross-tenant)
+
+**Status**: ✅ Doc-only. **Bomba silenciosa detectada y resuelta en sesión live**: auditoría manual de schemas Notion vía MCP reveló que los estados de status divergían estructuralmente cross-tenant (Efeonce `Estado` con vocabulary Spanish-formal vs Sky `Estado 1` con vocabulary Spanish-informal + property name typo histórico + estados Sky-only mal puestos como status que eran tags de responsable + estados Efeonce-only sin equivalente Sky). El "evento canonical de corrección" (`Listo para revisión → En Feedback`) del ADR RpA V2 firmado horas antes **solo existía en Sky** — rompía estructuralmente la premisa cross-tenant. Resolución: ADR nuevo `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` que canoniza **11 estados universales en property `Estado` cross-tenant** (Path B canonical: templates Notion unificados en lugar de adapter layer per-tenant).
+
+## Resultado canonical
+
+### ADR nuevo `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md`
+
+- **11 estados canonical universales**: `Sin empezar` · `Brief listo` · `En curso` · `Listo para revisión` · `Cambios solicitados` · `Aprobado` · `Pendiente aprobación interna` · `En pausa` · `Bloqueado` · `Cancelado` · `Archivado`
+- **Property unificada `Estado`** en TODOS los teamspaces (Sky renombra de `Estado 1` → `Estado`)
+- **Evento canonical de corrección universal**: transición `Listo para revisión → Cambios solicitados` (funciona idéntico en todos los tenants)
+- **Estado `Tomado` Sky eliminado** — era tag de "responsable cliente Sky" mal puesto como status; vive en campo `Responsable`
+- **Onboarding cliente nuevo** = clone template canonical Notion (Demo Greenhouse), cero customización vocabulary
+- **8 hard rules anti-regresión** + reglas semánticas para distinguir `Bloqueado` (external) vs `Pendiente aprobación interna` (interno identificable) vs `En pausa` (decisión interna sin escalation), y `Cancelado` vs `Archivado`
+- **3 open questions** deliberadamente NO decididas (signal `status_drift_from_canonical` V1.1, localización futura, `Brief listo` adoption real)
+
+### Delta canonical al ADR RpA V2 firmado horas antes
+
+- **Premisa corregida**: evento canonical de corrección ahora es universal cross-tenant
+- **Schema `task_status_transitions` simplificado**: NO requiere columnas `canonical_from_status` + `canonical_to_status` separadas (Notion mismo opera con vocabulary canonical post-cleanup)
+- **Fase 0 nueva agregada al roadmap**: cleanup Notion canonical (~1-2 días, operador-side) ejecutado ANTES de Fase A
+- **Sin cambios** al naming canonical V2 (`calculateRpaV2`, `rpa_avg_v2`, `[GH] RpA v2`), 5 fases, garantía cutover bonus reversible — todo sigue válido
+
+### Sincronización canonical asociada
+
+- **DECISIONS_INDEX** entry #69 (lifecycle canonical) + entry #68 RpA V2 actualizada con Delta marker
+- **Skill `greenhouse-ico`** boundary doc actualizado con Update canonical post-Bomba-1
+- **Skill `notion-platform`** property-allowlist actualizado con Update canonical (Sky `Estado 1` → `Estado` post-cleanup)
+- **Mirror Codex** sincronizado idéntico
+
+### Migration Notion pendiente (operador-side, ~1-2 días)
+
+- **Efeonce**: 7 renames de status existentes (`Cancelada → Cancelado`, `Archivadas → Archivado`, `Listo → Aprobado`, `Cambios Solicitados → Cambios solicitados`, `Listo para diseñar → Brief listo`, `Pendiente Dir. Arte → Pendiente aprobación interna`, `Detenido → En pausa`)
+- **Sky Airline**: rename property `Estado 1 → Estado` + rename `En feedback → Cambios solicitados` + agregar 4 estados (`Brief listo`, `Pendiente aprobación interna`, `En pausa`, `Cancelado`) + eliminar `Tomado` (reasignar tasks afectadas a `En curso` o `Sin empezar` previamente) + fusionar `Pendiente → Sin empezar`
+- **Demo Greenhouse**: re-clonar de Efeonce post-cleanup, O aplicar mismo cleanup
+
+## Hallazgos clave
+
+- **Path B (templates Notion unificados) ganó sobre Path A (adapter layer Greenhouse-side)** porque: single source of truth sin código adapter + operadores cross-tenant hablan mismo idioma + cliente nuevo se onboardea clonando template canonical sin código nuevo + métricas auto-comparables cross-tenant. Path A optimizaba flexibilidad per cliente, pero esa flexibilidad no era feature operativa — era ruido histórico.
+- **Decisión semántica fina**: `Bloqueado` (dependencia externa) vs `Pendiente aprobación interna` (esperando aprobador interno identificable) vs `En pausa` (decisión interna sin escalation) son distintos operacionalmente. Cada uno tiene escalation path distinto — vale la pena distinguirlos.
+- **Estado `Tomado` Sky era ruido**: fue tag de responsable ("la hace Sky o la hace Agencia Efeonce") mal puesto en status. Ya hay otra property (`Responsable`) que captura quién la hace. Eliminarlo simplifica el lifecycle + elimina ambigüedad.
+- **`Listo para diseñar` generalizado a `Brief listo`**: aplica a cualquier tipo de trabajo (diseño, video, copy, web), no solo diseño. Más universal + más claro.
+- **`Pendiente Dir. Arte` generalizado a `Pendiente aprobación interna`**: aplica a cualquier aprobador interno (Lead, Manager, Stakeholder), no solo Director de Arte.
+- **`Detenido` clarificado a `En pausa`**: nombre más claro + distingue de `Bloqueado`.
+- **Costo de migration Notion es one-time + barato**: ~1-2 días de operador en Notion app, sin código Greenhouse-side ni migration script. Beneficio compuesto permanente.
+
+## Validacion
+
+- ADR canonical aprobado live por CEO 2026-05-17 (Path B explícito + 11 estados aprobados + naming `Cambios solicitados`/`Brief listo`/`Pendiente aprobación interna`/`En pausa` aprobados)
+- Skills invocadas pre-decisión: `arch-architect` (DDD anti-corruption layer evaluation) + `greenhouse-ico` (boundary canonical) + `notion-platform` (schema inspection live via Notion MCP)
+- Notion MCP fetch verified los schemas reales de Efeonce + Sky data sources (drift confirmado con evidencia concreta)
+- Pre-existing markdown warnings (MD031/MD032/MD060 cosméticos) NO bloquean — patrón canonical tolerado del repo
+
+## Siguientes pasos
+
+- **Migration Notion operador-side** (~1-2 días, CEO ejecuta directo en Notion app): Efeonce 7 renames + Sky rename property + 4 agregados + 1 eliminación + reasignación tasks
+- **Verificar post-migration via Notion MCP**: los 11 estados canonical sincronizados en Efeonce + Sky + Demo
+- **TASK-908 + TASK-910** quedan unblocked para arrancar dev post-migration verde
+- **TASK-901 Fase 0 (nueva) = pre-migration coordination** + verification post-migration; Fase A arranca después
+- **Reliability signal V1.1 recomendado** `notion.task.status_drift_from_canonical` (out of scope V1 — agregar si emerge necesidad de detección automática de drift Notion futuro)
+
+---
+
 # Sesion 2026-05-17 (cont. — Skill `notion-platform` creada + ADR RpA V2 Strangler canonical)
 
 **Status**: ✅ Doc-only. Doble entregable canonical: (1) Skill `notion-platform` invocable creada en mirror Claude + Codex (58 archivos cada uno, 23 POPULATED + 21 stubs + 4 top-level + SKILL.md) cubriendo Notion API + Developer Platform 2026 (Workers Beta, ntn CLI GA, External Agents Alpha, PATs GA, Notion-Version 2026-03-11). (2) ADR canonical `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` (~440 líneas) que formaliza la migración del compute RpA Notion formula → Greenhouse helper canonical vía **Strangler Fig pattern** (Fowler 2004) en 5 fases canonical durante 5-7 meses sin tocar bonus payroll productivo.

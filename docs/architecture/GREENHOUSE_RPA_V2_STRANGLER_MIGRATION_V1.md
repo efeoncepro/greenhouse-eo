@@ -1,11 +1,52 @@
 # GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1
 
-> **Status**: Accepted
+> **Status**: Accepted (con Delta canonical 2026-05-17 post-Bomba-1)
 > **Date**: 2026-05-17
 > **Authors**: sesión deep-dive CEO + arch-architect + greenhouse-ico + notion-platform skills
 > **Scope**: Delivery / ICO / Integrations / Payroll downstream consumer / Reliability
 > **Supersedes**: ninguno (extiende `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` + `GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md` + `GREENHOUSE_METRIC_SPEC_PATTERN_V1.md`)
+> **Precondición canonical**: `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` ⭐ (cierra Bomba 1)
 > **Implementation tasks**: TASK-901 (RpA V2 carril paralelo) + bloqueada por TASK-908 + TASK-910
+
+---
+
+## Delta 2026-05-17 — Bomba 1 cerrada (status divergence cross-tenant)
+
+**Bomba detectada en sesión live post-ship original**: auditoría manual de schemas Notion reveló que el "evento canonical de corrección" (`Listo para revisión → En Feedback`) **solo existía en Sky** — Efeonce usaba `Listo para revisión → Cambios Solicitados`. Plus property name divergente (`Estado` vs `Estado 1`), enum values distintos, estados Efeonce-only sin equivalente Sky, y un estado Sky (`Tomado`) que era tag de responsable mal puesto como status.
+
+**Resolución canonical**: ADR nuevo `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` declara los **11 estados canonical universales** que TODOS los teamspaces Notion comparten, en una property unificada `Estado`. Sin per-tenant mapping, sin adapter layer — Notion mismo opera con vocabulary canonical.
+
+**Cambios canonical a este ADR derivados del Delta**:
+
+1. **Evento canonical de corrección actualizado**: `Listo para revisión → Cambios solicitados` (universal cross-tenant, NO solo Sky)
+2. **Naming canonical V2 sin cambios** — sigue válido (helper `calculateRpaV2`, columna `rpa_avg_v2`, property `[GH] RpA v2`)
+3. **Schema `task_status_transitions` simplificado** (TASK-908 owned): NO requiere columnas `canonical_from_status` + `canonical_to_status` separadas — el status raw Notion ya es canonical post-cleanup
+4. **Helper `countCorrectionTransitions(taskId)`** consume directo:
+   ```sql
+   WHERE from_status = 'Listo para revisión'
+     AND to_status = 'Cambios solicitados'
+   ```
+   Funciona idéntico en todos los tenants.
+5. **Reliability signal nuevo recomendado V1.1**: `notion.task.status_drift_from_canonical` (kind=drift, warning si emerge estado non-canonical en algún teamspace).
+6. **Fase 0 nueva agregada al roadmap**: cleanup Notion canonical (operador-side, ~1-2 días) ejecutado **antes** de Fase A. Detalle en `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md §5`.
+
+**Hard rules adicionales derivadas**:
+
+- **NUNCA** consumir status de Notion sin haber verificado que el teamspace tiene los 11 canonical sincronizados (per ADR lifecycle §7 hard rule 5).
+- **NUNCA** introducir variants de spelling en transición canonical de corrección — el canonical literal es `'Listo para revisión'` → `'Cambios solicitados'`.
+
+**Impacto en lo firmado en commit `d1fa620a` original**:
+
+- ✅ TL;DR + decisiones canonical generales del ADR → siguen válidas
+- ✅ Naming canonical V2 (`calculateRpaV2`, etc.) → sigue válido
+- ✅ 5 Fases canonical (A-E) → siguen válidas (+ Fase 0 nueva pre-A)
+- ✅ Garantía operativa cutover bonus reversible <5min → sigue válida
+- ⚠️ Premisa del evento canonical de corrección → **CORREGIDA** vía este Delta
+- ⚠️ Schema `task_status_transitions` → **SIMPLIFICADO** (no requiere doble columna)
+
+---
+
+## Original ADR content (intacto post-Delta)
 
 ---
 
