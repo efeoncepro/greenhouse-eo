@@ -1,5 +1,34 @@
 # TASK-901 — Canonical Notion Metric Compute V1 (RpA-only progressive migration)
 
+> ## Delta 2026-05-17 — RpA V2 Strangler Migration (carril paralelo)
+>
+> Esta task implementa el **carril V2 paralelo** definido por el ADR canonical [`GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`](../../architecture/GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md). **V1 actual NO se toca durante toda la migración** (Notion formula `RpA` + sync legacy + `metrics_by_member.rpa_avg` + bonus path productivo siguen intactos).
+>
+> **Naming canonical V2** (mirror ADR §3.1):
+>
+> - Helper: `calculateRpaV2(inputs): Promise<RpaV2Result>` (NO `calculateRpa` sin suffix)
+> - Constante version: `RPA_FORMULA_VERSION = 'rpa_v2.0'`
+> - Notion property: `[GH] RpA v2` (NO `[GH] RpA`)
+> - BQ column nueva: `metrics_by_member.rpa_avg_v2` (NO modificar `rpa_avg` existente)
+> - Reliability signals: sufijo `_v2` (e.g. `notion.metrics.shadow_paridad_rpa_v2`, `writeback_dead_letter_v2`, etc.)
+> - Outbox events: `notion.task.rpa_v2_recompute_requested v1`, `notion.task.rpa_v2_written v1`
+> - Cloud Tasks queue: `notion-writeback-v2`
+> - Feature flags: `NOTION_RPA_V2_COMPUTE_ENABLED`, `NOTION_RPA_V2_WRITEBACK_ENABLED`, `BONUS_USE_RPA_V2`
+>
+> **Slices se ejecutan en 5 Fases canonical** (mirror ADR §4):
+>
+> - **Fase A — Build paralelo (V2 invisible)**: S0 foundation + S1 helper + S2 webhook + S3 materializer extension. Bonus payroll sigue V1 100%.
+> - **Fase B — Shadow mode**: S4 reactive consumer compute SIN PATCH + paridad signal canonical `notion.metrics.rpa_v2_vs_v1_paridad`. Gate: ≥95% durante 7d.
+> - **Fase C — Writeback V2 visible Notion**: S5 Cloud Tasks queue + S6 setup property `[GH] RpA v2` + S7 writeback flag flip + S8 nightly safety net. Bonus sigue V1.
+> - **Fase D — Bonus cutover gradual per-tenant**: S9 flag `BONUS_USE_RPA_V2=true` Efeonce + 30d observación + HR reconciliation, después S10 Sky. V1 sigue corriendo paralelo intacto.
+> - **Fase E — Cleanup V1 (OPCIONAL, post 90+ días Fase D stable + sign-off)**: S11-S15 drop V1 column + rename V2 a canonical + cleanup Notion + ADR final + lint promote a error. **PUEDE DEFERIRSE INDEFINIDAMENTE**.
+>
+> **Garantía operativa**: cutover bonus = una sola línea de código gated por `BONUS_USE_RPA_V2` flag + reversible <5 min via env var flip + redeploy ops-worker. Path bonus payroll productivo **NUNCA queda en estado intermedio inconsistente**.
+>
+> **Las slices y detalles técnicos abajo permanecen — agregar prefijo `_v2` / `V2` consistentemente al implementar**. La spec original definida pre-strangler ya capturaba V2 conceptualmente; el Delta solo formaliza el naming canonical + la coexistencia con V1 + las Fases A-E.
+>
+> **Fuente canonical de la decisión**: ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` + DECISIONS_INDEX entry #68 + skill `greenhouse-ico/bonus-impact-playbook/rpa-bonus-detail.md`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

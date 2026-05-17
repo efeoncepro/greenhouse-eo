@@ -1,3 +1,66 @@
+# Sesion 2026-05-17 (cont. — Skill `notion-platform` creada + ADR RpA V2 Strangler canonical)
+
+**Status**: ✅ Doc-only. Doble entregable canonical: (1) Skill `notion-platform` invocable creada en mirror Claude + Codex (58 archivos cada uno, 23 POPULATED + 21 stubs + 4 top-level + SKILL.md) cubriendo Notion API + Developer Platform 2026 (Workers Beta, ntn CLI GA, External Agents Alpha, PATs GA, Notion-Version 2026-03-11). (2) ADR canonical `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` (~440 líneas) que formaliza la migración del compute RpA Notion formula → Greenhouse helper canonical vía **Strangler Fig pattern** (Fowler 2004) en 5 fases canonical durante 5-7 meses sin tocar bonus payroll productivo.
+
+## Resultado canonical
+
+### Skill `notion-platform` (entregable 1)
+
+- **58 archivos** en cada mirror (`~/.claude/skills/notion-platform/` + `~/.codex/skills/notion-platform/`) con paridad exacta
+- **23 POPULATED ★**: SKILL.md entrypoint + 7 api-reference (auth/data-model/endpoints/webhooks/rate-limits/pagination/errors) + 7 developer-platform-2026 (workers/syncs/agents/external-agents/ntn/data-sources-vs-databases/version-history) + 2 sdks + 3 patterns canonical (HMAC/echo-loop/bulk-patch) + 3 greenhouse-runtime (tenant-config/demo-teamspace/property-allowlist) + 2 use-cases (read-pipeline-conformed/writeback-gh-metrics) + 2 decision-frameworks (workers-vs-cloud-run/webhook-vs-polling) + anti-patterns-catalog (28 anti-patterns) + edge-cases-and-gotchas (33 casos) + future-roadmap + 1 investigation-gap (workers-production-readiness) + 3 reference (glossary 40+ terms / MCP tools inventory / changelog Jan-May 2026) + 2 output-templates
+- **21 stubs ◯**: cada uno con `Next review trigger` declarado para evolución organic
+- **5-pillar Notion Platform contract** canonical: Determinism + Safety + Resilience + Observability + Reversibility
+- **17 hard rules canonical** non-negociables (HMAC always, echo-loop filter mandatory, re-fetch nunca confiar payload, captureWithDomain solo, etc.)
+- **Material post-cutoff capturado vía 7 WebFetches**: Developer Platform launch May 13 (Workers Beta + ntn CLI GA + External Agents Alpha + Database Sync Beta + Notion Agent SDK Alpha), PATs GA May 12, Notion-Version 2026-03-11 BREAKING (`after`→`position`, `archived`→`in_trash`, `transcription`→`meeting_notes`), data sources / databases split desde 2025-09-03, comment management GA Apr 17, pagination 10K limit Apr 20, Views API Mar 19, Markdown content API Feb 26
+- **Hallazgo crítico que la skill expone**: `/v1/pages/bulk` mencionado en TASK-901 spec **NO EXISTE** en docs canonical Notion al 2026-05-17 — `patterns-canonical/bulk-patch-batching.md` documenta 3 alternativas canonical (sequential throttled via Cloud Tasks recomendada V1, Notion Worker, parallel limited)
+
+### ADR canonical RpA V2 Strangler (entregable 2)
+
+- **`docs/architecture/GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`** (~440 líneas) — decisión canonical aprobada por CEO 2026-05-17
+- **5 fases canonical** documentadas con gates explícitos:
+  - Fase A: Build paralelo V2 invisible (~6-8 semanas; S0 foundation + S1 helper + S2 webhook + S3 materializer extension)
+  - Fase B: Shadow mode V2 (signal `notion.metrics.rpa_v2_vs_v1_paridad` ≥95% sustained 7d como gate)
+  - Fase C: Writeback `[GH] RpA v2` visible operador (bonus sigue V1; 14-30d observation)
+  - Fase D: Bonus cutover gradual per-tenant (Efeonce primero 30d + HR reconciliation, después Sky; flag `BONUS_USE_RPA_V2` reversible <5min)
+  - Fase E: Cleanup V1 OPCIONAL post 90+d stable (puede deferirse indefinidamente como defensive depth permanente)
+- **Naming canonical V2**: helper `calculateRpaV2`, constante `RPA_FORMULA_VERSION='rpa_v2.0'`, BQ column `metrics_by_member.rpa_avg_v2`, Notion property `[GH] RpA v2`, signals sufijo `_v2`, Cloud Tasks queue `notion-writeback-v2`
+- **Garantía operativa central**: cutover bonus = una línea de código gated por flag + reversible <5min via env var. V1 path (formula Notion + sync legacy + `metrics_by_member.rpa_avg` + `calculateRpaBonus`) NUNCA se toca durante toda la migration
+- **Defense in depth 8-layer**: feature flag per-cliente per-métrica + kill switch + reliability signal paridad + HR reconciliation script + snapshot BQ + Sentry alerts + runbook + cliente sign-off
+- **10 hard rules anti-regresión** incluyendo NEVER flip global directo, NEVER cleanup pre-Fase D + 6m, ALWAYS HR reconciliation mes 1 post-flip antes de extender tenant
+- **Template canonical reusable** por TASK-902 (OTD V2) / TASK-903 (FTR V2) / TASK-904 (Cumplimiento V2) / TASK-905+ — heredan naming convention + 5 fases + 5-pillar ICO scoring + hard rules
+
+### Sincronización canonical asociada
+
+- **TASK-901 spec actualizada** con Delta strangler V2 al top (formaliza naming canonical + 5 Fases + cross-ref a ADR + garantía operativa)
+- **Skill `greenhouse-ico` stub poblado**: `bonus-impact-playbook/rpa-bonus-detail.md` movido de PENDING → POPULATED con HR reconciliation process canonical + cómo cambia bonus per Fase + cross-skill invocation guide
+- **DECISIONS_INDEX.md** entry #68 nueva con RpA V2 strangler decision
+- **changelog.md** sincronizado con session summary
+
+## Hallazgos clave
+
+- **Strangler Fig pattern es el approach canonical** (mirror greenhouse-ico mandate "NUNCA big-bang") para mover compute de métricas Notion → Greenhouse — V1 sigue intacto, V2 corre paralelo, comparación cross-version activa, cutover gradual per-tenant, cleanup deferred indefinidamente como defensive depth
+- **Decisión semántica explícita: cleanup V1 puede deferirse indefinidamente**. Trade-off: +30% BQ compute permanente vs rollback window permanente + audit cross-method permanente. Recomendación canonical: deferir cleanup hasta Fase D + 6m sin incidente como mínimo
+- **Bug class TASK-877 follow-up cerrado estructuralmente**: V2 elimina las 7 fragilidades del path legacy (formula editable sin protección, sin git history, sin tests, drift cross-tenant silente, sin observability, sin audit trail, sync legacy frágil) reemplazando con compute canonical TS + tests + lint rule + 7 reliability signals + audit log append-only + writeback canonical
+- **Pattern reusable cross-métrica**: este ADR es **template canonical** para TODAS las futuras migraciones ICO progresivas (OTD, FTR, Cumplimiento, Cycle Time, etc.). El ADR único cubre todas; cada task individual referencia este ADR + agrega specifics de su métrica
+- **Garantía operativa para HR**: durante TODA la migración (5-7 meses), el bonus payroll sigue leyendo V1. Cutover bonus = una sola línea de código gated por feature flag granular per-tenant, reversible inmediato <5min via env var flip. Cero riesgo blast radius sobre nómina actual
+
+## Validacion
+
+- Doc-only changes — no se tocó código runtime
+- ADR canonical aprobado live por CEO 2026-05-17
+- Skills invocadas pre-decisión: `arch-architect` Greenhouse overlay (4-pillar) + `greenhouse-ico` (5-pillar + strangler mandate) + `notion-platform` (5-pillar + boundary)
+- Pre-existing markdown warnings (MD060 table-column-style + MD034 bare URLs preexistentes en TASK-901 base) NO bloquean — 2 nuevos warnings MD032 introducidos por Delta fueron corregidos inline
+
+## Siguientes pasos
+
+- **TASK-908 Slices 0-3.5** sigue como prerequisito arquitectónico crítico (status transitions foundation + `countCorrectionTransitions` helper) — desbloquea Fase A S1 de RpA V2
+- **TASK-910 demo teamspace** sigue como gate canonical pre-Fase B (4 semanas runtime verde demo antes de shadow mode productivo)
+- **TASK-901 Fase A** puede arrancar post-TASK-908 verde
+- **Implementación V2 NO arranca aún** — esta sesión cerró el contrato canonical. El próximo step operativo es coordinar dev de TASK-908 + TASK-910 (pueden ir en paralelo, ambos independientes uno del otro)
+- **Cuando emerja métrica nueva strangler** (TASK-902 OTD V2, etc.), reusar este ADR pattern verbatim — NO inventar variantes
+
+---
+
 # Sesion 2026-05-17 (cont. — Skill ICO comprehensive + viva creada)
 
 **Status**: ✅ Skill canonical creada. `greenhouse-ico` ahora disponible en `~/.claude/skills/` Y `~/.codex/skills/` con 56 archivos cada uno (16 POPULATED + 40 stubs explícitos con next review trigger). Skill es viva — evoluciona a medida que el negocio + plataforma evolucionan. Pre-poblada based on inventario completo lo que sé hoy + lo que falta investigar + lo futuro (12 métricas candidatas, 6 SLAs, 8 SLOs, 6 SLIs propuestos).
