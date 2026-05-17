@@ -182,3 +182,21 @@ Out of scope V1. Hipótesis: equipos especializados en videos largos pueden tole
 ## 12. Open questions deliberadamente NO resueltas en V1
 
 Idénticas a `STUCK_ASSETS_V1.md` §12. Cualquier cambio de threshold, definición de movimiento o calibración aplica coherente a ambas (Stuck Assets count + Stuck %).
+
+---
+
+## 13. Downstream consumers — qué consume Stuck %
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. Stuck % NO entra al cálculo de bonus V1. Misma razón canonical que [`STUCK_ASSETS_V1.md`](STUCK_ASSETS_V1.md) §13.1 — métrica hermana, detector operacional con causa frecuentemente externa al member.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Comparativos cross-member + management dashboards
+
+Stuck % es la versión **normalizada** apropiada para comparar health cross-member o cross-tiempo cuando los volúmenes de backlog varían. Útil para reviews ejecutivas y identificar quién tiene problema operacional más severo (member con 5 stuck de 10 = 50% > member con 5 stuck de 50 = 10%).
+
+### 13.3 Mismas surfaces que Stuck Assets
+
+Ver `STUCK_ASSETS_V1.md` §13.2 + §13.3 — operational dashboards, capacity review.

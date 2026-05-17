@@ -255,3 +255,23 @@ Out of scope V1. V2 podría calibrar threshold per `role_title` (e.g. content le
 - **Stuck Assets per fase CSC**: V1 expone solo count total. V2 desglose per fase (¿stuck en Briefing vs Producción vs Cambios cliente?).
 - **Helper TS standalone**: V1 NO. V2 si emerge consumer real con countdown per-task.
 - **Notificación automática operacional**: cuando stuck count llega a critical (≥5), ¿auto-alert al member? V1 NO automatizado. V2 si emerge workflow.
+
+---
+
+## 13. Downstream consumers — qué consume Stuck Assets
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. Stuck Assets NO entra al cálculo de bonus V1.
+
+**Razón canonical**: Detector operacional — causa puede ser **dependencia externa** al member (cliente no envía assets, legal no firma, vendor no responde). Bonus negativo automático sería injusto. HR/Finance decisión: Stuck Assets es señal operacional para **escalation a unblock**, no para descuento de compensación. Coherente con regla canonical de exclusión: tareas `Bloqueado`/`Detenido` excluidas del denominador OTD/RpA/FTR para no contaminar bonus.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Operational dashboards + workflow accionable
+
+Lista per-task accionable en Person 360 + Pulse — qué tareas necesitan unblock hoy. Operador HR/Delivery prioriza intervenciones (ping al cliente, escalar dependencia, re-asignar).
+
+### 13.3 Management capacity review
+
+Stuck count creciente sostenido = procesos rotos o capacity insuficiente para gestión proactiva. Input a capacity review interno.

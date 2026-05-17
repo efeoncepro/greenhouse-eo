@@ -231,3 +231,23 @@ Out of scope V1. Hipótesis: equipos especializados en piezas long-form pueden t
 - **Cross-tabulation OCF × Stuck Assets**: V1 expone separadamente. V2 si emerge consumer real (matrix view).
 - **Calibración per rol**: V1 uniforme. V2 si emerge data.
 - **OCF rolling vs cierre estricto period**: V1 mes calendar cerrado. V2 rolling 30d para early-detection.
+
+---
+
+## 13. Downstream consumers — qué consume OCF
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. OCF NO entra al cálculo de bonus V1.
+
+**Razón canonical**: Deuda histórica acumulada — causa puede ser **cliente upstream slow** (no envió assets meses anteriores), **dependencia legal/vendor**, o **decisión de management de re-priorizar**. Bonus negativo automático sería injusto al member. HR/Finance decisión: OCF es señal **escalation a capacity review**, no descuento automático de compensación.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Management capacity review + cliente conversations
+
+OCF creciente sostenido = backlog tóxico — escalation a capacity adjustment (hiring) o conversation con cliente (rebalancear scope, priorizar). Input directo a sales para retention conversations cuando OCF lo causa el cliente upstream.
+
+### 13.3 Operational priorización
+
+Lista per-task accionable canonical: "primero lo más arrastrado" — operador HR/Delivery prioriza unblock de OCF antes de aceptar intake nuevo del mismo cliente.

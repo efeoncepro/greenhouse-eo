@@ -239,3 +239,23 @@ Consumers (Pulse, CVR, scorecards) leen el agregado del registry SQL directament
 - **Throughput weighted by complexity**: V1 cuenta cada tarea = 1. V2 podría ponderar por `task_type` complexity (video=3 puntos, GIF=1 punto). Decisión cuando emerja consumer real.
 - **Helper TS standalone**: V1 NO. V2 si emerge consumer real (e.g. capacity simulator).
 - **Throughput rolling window**: V1 mensual cerrado. V2 rolling 30d para early-detection.
+
+---
+
+## 13. Downstream consumers — qué consume Throughput
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. Throughput NO entra al cálculo de bonus V1.
+
+**Razón canonical**: Volume metric — pagar por volumen incentiva quantity over quality, conflicto directo con RpA + OTD (que son inputs bonus V1). HR/Finance decisión política: bonus opera sobre **calidad first-pass** (RpA) + **promise compliance** (OTD%), no sobre **volumen producido**. Si V2 cambia política para incluir Throughput como input bonus, requiere balance vs RpA/OTD para evitar incentive perverso "produzco más rápido aunque tenga 3 rondas de corrección por tarea".
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Sales / comercial palanca Revenue Enabled
+
+Throughput es input directo al claim "Throughput Expandido" (palanca 3 de Revenue Enabled — Contrato §2.3). Aparece en QBR/CVR como volumen entregado al cliente. Sales lo usa para narrar "Globe expande tu capacity creativa N piezas/mes".
+
+### 13.3 Capacity planning + Pulse executive
+
+Display per-member-month + per-space + per-cliente. Throughput sostenidamente bajo = capacity subutilizada o pipeline pequeño. Throughput sostenidamente alto + RpA estable + OTD% estable = equipo performing.

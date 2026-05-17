@@ -256,3 +256,23 @@ Consumers (Pulse, CVR, scorecards) leen el agregado del registry SQL directament
 - **Velocity weighted by complexity**: V1 cada tarea = 1. V2 podría ponderar (video=3, GIF=1) como mismo open question de Throughput.
 - **Velocity per fase CSC**: V1 expone solo total. V2 desglose Briefing/Producción/Cambios/Entrega.
 - **Velocity per cliente**: V1 expone per-member, per-space, per-cliente. ¿Se necesita per-team? Decisión cuando emerja consumer.
+
+---
+
+## 13. Downstream consumers — qué consume Pipeline Velocity
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. Pipeline Velocity NO entra al cálculo de bonus V1.
+
+**Razón canonical**: Es **ratio flow del backlog** (health composite) — no métrica per-member output direct. Velocity baja puede deberse a causa externa al member (backlog upstream creció por intake del cliente, dependencias bloqueadas) — penalizar al individuo por health composite sería injusto. HR/Finance decisión: bonus opera sobre RpA + OTD% per-member. Pipeline Velocity es indicador de **escalation operacional** (capacity review), no de **bonus negativo automático**.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Capacity planning + management dashboards
+
+Pileup detector — velocity baja sostenida = capacity insuficiente para intake actual. Input a escalation a sales (rebalancear scope), capacity adjustment (hiring), o process review (qué fase atasca).
+
+### 13.3 CVR cliente narrative (pipeline health)
+
+Velocity aparece en QBR/CVR como métrica de salud del pipeline — claim "Globe procesa tu volumen sin saturar". Diferenciador comercial vs equipos in-house saturados.

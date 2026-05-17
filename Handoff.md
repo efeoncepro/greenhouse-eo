@@ -1,3 +1,64 @@
+# Sesion 2026-05-17 (cont. — Payroll bonus ADR + sección 13 cross-spec) — flujo bonus canonizado
+
+**Status**: ✅ Doc-only. ADR canonical nuevo `GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md` que canoniza el flujo end-to-end de cómo Payroll consume métricas ICO (RpA + OTD) para calcular bonificaciones variables. Plus sección 13 "Downstream consumers" agregada a las 14 specs de métricas canonical (RpA + OTD detail completo; 12 restantes documentan razón NO-input bonus V1). Template canonical extendido con sección 13 opcional. METRICS_INDEX completo con "Payroll bonus input matrix". DECISIONS_INDEX + Contrato + Handoff + changelog sincronizados.
+
+## Resultado
+
+- **ADR canonical nuevo `GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`** (514 líneas) — documenta:
+  - Pipeline canonical end-to-end (ICO Engine → fetchKpisForPeriod → calculateOtdBonus/calculateRpaBonus → payroll_entries)
+  - **`calculateOtdBonus`**: graduated linear proration 3 zonas (100% si OTD ≥89%, linear 70-89%, $0 <70%)
+  - **`calculateRpaBonus`**: banded inverse proration 4 zonas (100% si RpA ≤1.7, soft band 1.7-2.0 down to 80%, hard band 2.0-3.0 down to 0%, $0 ≥3.0)
+  - Defaults canonical en `bonus-config.ts` + override per-tenant via BQ `payroll_bonus_config` con vigencia temporal
+  - Bridge canonical `fetchKpisForPeriod` strategy `materialized_first_with_live_fallback` — reusa agregados SQL del registry, NO recompute paralelo
+  - Reglas especiales per `contractType`: honorarios → discrecional ($0 auto), Deel → mismas fórmulas + `deelGrossTotal`
+  - Persistencia auditable: `bonus_{otd,rpa}_{amount,proration_factor,min,max}` + snapshots `kpi_{otd_percent,rpa_avg}`
+  - **Lista canonical 12 métricas NO-input bonus V1** con razones (FTR double-counting, CT/CT SLO% velocidad absoluta, Throughput conflict quality, Pipeline Velocity/Stuck/OCF/CSC causa externa, Iteration Velocity/BCS/TTM narrative-level)
+  - **Bug class TASK-877 follow-up canonizado** (sección 9): 3,168 tareas Sky con `rpa=null` 10 meses → toda nómina Sky proyectada perdía bonus RpA silenciosamente; mitigation vía TASK-901
+  - **11 hard rules anti-regresión** + 9 open questions deliberadamente NO resueltas V1
+  - **7 pasos canonical de extensión** para agregar métrica nueva como input bonus (defense in depth contra "agregar bonus inline ad-hoc")
+
+- **Template canonical `_TEMPLATE.md` extendido** con sección 13 opcional "Downstream consumers — qué consume esta métrica" (Payroll bonus + otros consumers downstream).
+
+- **14 specs canonical actualizadas con sección 13**:
+  - **RPA_V1.md** — sección 13 detallada (primary input bonus, banded inverse proration completa, edge cases, bug class TASK-877)
+  - **OTD_V1.md** — sección 13 detallada (primary input bonus, graduated linear proration completa, distinción canonical OTD% vs CT SLO% en consumers)
+  - **CUMPLIMIENTO_V1.md** — sección 13 (indirect via OTD alias narrativo, per-task NO input)
+  - **FTR_V1.md** — sección 13 (NO input bonus V1, razón canonical double-counting con RpA)
+  - **12 specs restantes** (CT, CT Variance, CT SLO%, Throughput, Pipeline Velocity, CSC Distribution, Stuck Assets, Stuck %, OCF, Iteration Velocity, BCS, TTM) — sección 13 con razón NO-input bonus V1 + otros downstream consumers (Pulse, CVR, sales, capacity)
+
+- **METRICS_INDEX.md actualizado** con sección "Payroll bonus input matrix canonical" — tabla con 16 entries (14 métricas + 2 categorías) listando input bonus Sí/No + razón + cross-ref a sección 13 de cada spec.
+
+- **DECISIONS_INDEX.md** + entry nueva canonical del ADR Payroll Bonus.
+
+## Hallazgos clave
+
+- **El ADR canoniza código existente** (helpers `calculateOtdBonus`/`calculateRpaBonus` operan en producción desde TASK-758 era + `payroll_bonus_config` BQ table existe). Zero código tocado — la sesión es pure documentation para auditabilidad + onboarding + prevenir drift futuro.
+- **La distinción canonical OTD% vs CT SLO%** (sesión anterior Delta D) tiene **consecuencia concreta en bonus**: OTD% sí es input bonus (promise compliance bonus-eable); CT SLO% no (competitive benchmark, no debe pagar por velocidad absoluta). Sección 6.5 OTD_V1 + sección 6.1 CT_SLO_PCT_V1 + sección 13.1 ambas documentan cross-distinction.
+- **Bug class TASK-877 follow-up tiene canónico explícito** en sección 9 del ADR — captura el impacto operacional (nómina Sky proyectada perdía bonus RpA silenciosamente) para reference futura. TASK-901 (RpA writeback canonical) elimina la dependencia del sync legacy → bonus estables post-ship.
+- **12 métricas NO-input bonus V1 tienen razón canonical documentada** — previene drift "agregar bonus inline ad-hoc". Cualquier propuesta V2 de incluir métrica nueva pasa por los 7 pasos canonical (ADR §10).
+- **Cross-invariantes formalizadas**:
+  - RpA + OTD% son los 2 únicos primary inputs
+  - Cumplimiento = indirect via OTD% alias narrativo
+  - FTR = double-counting con RpA (delegación pura)
+  - Cycle Time / CT SLO% / Throughput = velocidad absoluta / volume → conflict con quality
+  - Pipeline Velocity / Stuck / OCF / CSC = causa frecuentemente externa al member
+  - Iteration Velocity / BCS / TTM = narrative-level / project-level / per-campaign, no per-member-month
+
+## Validacion
+
+- Doc-only changes. No corrió build/test runtime — flow bonus ya está SHIPPED en producción desde TASK-758 era.
+- ADR es snapshot canonical de código existente — auditabilidad post-mortem TASK-877 follow-up.
+- Pre-existing markdown warnings (MD060 + spell-check) NO bloquean.
+
+## Siguientes pasos
+
+- **TASK-901 ship → bonus RpA estables**. Post-TASK-908 foundation + TASK-901 writeback, `metrics_by_member.rpa` viene del compute canonical Greenhouse (no sync legacy frágil). Bug class TASK-877 follow-up cerrado.
+- **TASK-902 ship → bonus OTD estables** (mismo pattern post-901).
+- Si HR/Finance propone V2 incluir métrica nueva en bonus → pasar por 7 pasos canonical (ADR §10) — extender schema + helper + thresholds + buildPayrollEntry + persistencia + spec §13 + METRICS_INDEX matrix.
+- Auditor HR/Finance interno puede consultar el ADR completo + cada spec §13 sin necesidad de leer código TS — onboarding 1 doc vs múltiples archivos.
+
+---
+
 # Sesion 2026-05-17 (cont. — 12 specs nuevos) — 14 specs canonical Accepted (paquete completo)
 
 **Status**: ✅ Doc-only. Sesión extendida del trabajo anterior — creados los 12 specs canonical pendientes (OTD + CT SLO% + Cumplimiento + Cycle Time + CT Variance + Throughput + Pipeline Velocity + CSC Distribution + Stuck Assets + Stuck % + OCF + Iteration Velocity + BCS + TTM). Total: **14 de 14 métricas críticas con spec V1 Accepted**. TASK-909 reshape (Slices 2-3 removidos — specs ya creados). METRICS_INDEX completo. Contrato + Engine doc Deltas actualizados. Zero código runtime tocado.

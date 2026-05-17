@@ -312,3 +312,27 @@ Out of scope V1. Hipótesis: rebrand complejo requiere brief más estricto (thre
 - **Aggregate per cliente / período**: V1 project-level only. V2 si emerge demanda comparativa (e.g. "BCS promedio Sky Q2").
 - **Writeback per-project Notion**: V2 TASK-910 incluye writeback property.
 - **Action recommendations from breakdown**: V2 podría exponer breakdown como checklist actionable ("falta info de target audience", "deadline ambiguo") en UI.
+
+---
+
+## 13. Downstream consumers — qué consume BCS
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. BCS NO entra al cálculo de bonus V1.
+
+**Razón canonical**: BCS es **project-level** (no per-member-month) — no map directo a bonus per-individual. Plus: BCS mide calidad de **brief del cliente** (input), no calidad de **entrega del equipo** (output). Equipo no debería ser penalizado por brief malo del cliente. Si HR/Finance V2 quiere reflejar calidad del proceso intake completo en bonus, sería bonus a **roles que califican briefs** (Account Manager, Project Lead) no a creativos downstream.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 TTM observed enabler (cross-invariante crítica)
+
+BCS pass es **prerequisito** para TTM start observed. Ver [`TTM_V1.md`](TTM_V1.md) §3.2. Sin BCS auditado → TTM degrada a proxy → palanca 1 Revenue Enabled (Early Launch Advantage) reporta como `range` o `estimated`.
+
+### 13.3 Operational gate de arranque
+
+Per [`Contrato_Metricas_ICO_v1.md`](../Contrato_Metricas_ICO_v1.md), BCS pass (`score ≥ 80`) habilita el evento `brief efectivo` operacional. Equipo creativo usa BCS para decidir si arrancar trabajo o pedir clarificación al cliente. Brief malo (BCS < 80) = riesgo alto de re-trabajo, demoras, scope creep.
+
+### 13.4 Cliente feedback loop (V2 con TASK-910 backend activo)
+
+Cliente recibe feedback de calidad del brief — si BCS sostenido bajo, problema en intake process del cliente. Input a sales conversation para mejorar proceso intake conjunto.

@@ -289,3 +289,28 @@ Implementación V2 requiere:
 - **Writeback per-task Notion**: V1 NO. Si emerge demanda operativa (operador quiere ver bucket per-tarea en Notion), TASK derivada.
 - **Histórico calibración benchmark**: cuando el benchmark `14.2` se actualice (e.g. industria mejora a `12d` en 2030), bump major v2.0 + Delta histórico.
 - **Métrica cross-cliente comparable**: ¿exponer CT SLO% normalizado para comparar performance vs otras agencias del benchmark? V2 si emerge data competitive intelligence.
+
+---
+
+## 13. Downstream consumers — qué consume CT SLO%
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. CT SLO% NO entra al cálculo de bonus V1.
+
+**Razón canonical**: CT SLO% es **competitive benchmark** (vs industria), no **promise compliance** (vs deadline acordado per brief). OTD% ya cubre promise compliance — que es lo que HR/Finance consideran justo de bonus-eable. CT SLO% mide eficiencia operativa absoluta — pagar por velocidad absoluta puede incentivar trade-offs perversos (operador rushea para CT bajo a costa de quality / scope cuts). Si HR/Finance decide V2 incluir velocidad absoluta como input bonus, requiere los 7 pasos canonical de extensión documentados en [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+**Distinción canonical OTD% vs CT SLO%** (NO confundir):
+
+- **OTD% = promise compliance** → input bonus V1 sí
+- **CT SLO% = competitive benchmark** → input bonus V1 NO
+
+Ver `OTD_V1.md` §6.5 + este spec §6.1 para cross-distinction completa.
+
+### 13.2 Pitch comercial + CVR cliente narrative
+
+CT SLO% es la métrica que sustenta el claim "Globe opera dentro del benchmark de industria". Aparece en QBR + sales materials como diferenciador competitivo. Display per-cliente + per-período via aggregate SQL.
+
+### 13.3 Capacity planning + sales
+
+CT SLO% sostenidamente bajo = capacity insuficiente o proceso degradado → input a sales conversation con cliente (rebalancear scope) o capacity review interno.

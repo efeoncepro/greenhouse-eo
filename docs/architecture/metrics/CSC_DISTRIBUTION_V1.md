@@ -254,3 +254,23 @@ Consumers (Pulse, CVR, scorecards, Person 360) leen el agregado del registry SQL
 - **CSC Distribution rolling** vs snapshot puntual: V1 snapshot a `period_year/month`. V2 rolling 7d para early-detection de shifts.
 - **Per-cliente CSC custom phases**: V1 fases uniformes. ¿Cliente enterprise pide tracking de fase custom (e.g. "Legal review", "Brand check")? V2 si emerge demanda — pero risk de fragmentar el contrato canonical.
 - **CSC Distribution per tipo de pieza**: V1 agregado uniforme. V2 podría desglosar video vs estático separadamente.
+
+---
+
+## 13. Downstream consumers — qué consume CSC Distribution
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. CSC Distribution NO entra al cálculo de bonus V1.
+
+**Razón canonical**: Es **shape metric** (distribución), no magnitudinal — NO bonus-evaluable. No tiene threshold operacional fijo, interpretación contextual humana. Bonus opera sobre métricas magnitudinales con thresholds canonical (OTD%, RpA).
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Pulse + scorecards + capacity planning
+
+Donut chart per-member, per-space, per-cliente. Diagnóstico visual de cuellos de botella — qué fase tiene pileup. Input para retros + capacity adjustment (qué fase necesita más recursos).
+
+### 13.3 CVR cliente narrative (pipeline visual)
+
+CSC Distribution aparece en QBR como visualización del flow creativo — input al claim "Globe procesa tu volumen sin saturar ninguna fase".

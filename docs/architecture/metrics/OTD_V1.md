@@ -368,3 +368,89 @@ Pre-flip de `NOTION_OTD_WRITEBACK_ENABLED=true`:
 - **Per-cliente threshold**: ¿Cliente enterprise pide SLA OTD específico distinto al benchmark? V1 NO. V2 si emerge demanda comercial.
 - **OTD% rolling window vs absolute period**: V1 usa periodo mensual cerrado. V2 podría exponer OTD% rolling 30d para early-detection trends.
 - **Granularidad team vs member**: V1 expone per-member-month. ¿OTD% per-team-month como agregado nuevo? Decisión cuando emerja consumer real (e.g. team scorecards).
+
+---
+
+## 13. Downstream consumers — qué consume OTD%
+
+### 13.1 Payroll bonus calculation — **input PRIMARIO canonical**
+
+**Sí, OTD% es uno de los 2 únicos inputs canonical de bonus V1** (el otro es RpA). Aplica a contratos `indefinido` / `plazo_fijo` / `international_internal` + `deel`. Excluye `honorarios` (discrecional manual).
+
+**Pipeline canonical**:
+
+```text
+metrics_by_member.otd_pct (materializado per member-month)
+  ↓
+fetchKpisForPeriod() → PayrollKpiSnapshot.otdPercent
+  ↓
+calculateOtdBonus(otdPercent, compensation.bonusOtdMax, bonusConfig)
+  ↓
+{amount, prorationFactor, qualifies} → persisted en payroll_entries
+```
+
+**Helper canonical**: `src/lib/payroll/bonus-proration.ts:20-45` (`calculateOtdBonus`).
+
+**Graduated linear proration** (3 zonas) — OTD% higher is better:
+
+| OTD% | Zona | Pago % del `bonusOtdMax` |
+|---|---|---|
+| `≥ 89%` (`otdThreshold`) | Full payout | **100%** |
+| `70% - 89%` (linear proration) | Banda lineal | `(otd% - 70) / (89 - 70)` |
+| `< 70%` (`otdFloor`) | Cutoff | **$0** |
+
+**Ejemplo OTD 80%** con `bonusOtdMax = $120,000` y defaults:
+
+```text
+factor = (80 - 70) / (89 - 70) = 10/19 ≈ 0.5263
+amount = $120,000 × 0.5263 = $63,158
+```
+
+**Ejemplo OTD 95%** mismo tope:
+
+```text
+factor = 1.0  (>= otdThreshold)
+amount = $120,000  (full payout)
+```
+
+**Ejemplo OTD 65%** mismo tope:
+
+```text
+factor = 0  (< otdFloor)
+amount = $0  (cutoff)
+```
+
+**Thresholds**: configurables per-tenant via BQ table `payroll_bonus_config` (con vigencia temporal `effective_from`). Defaults canonical en `src/lib/payroll/bonus-config.ts:3-10`. Validación `otdThreshold >= otdFloor` enforced en `normalizeBonusProrationConfig()`.
+
+**Per-member tope**: `greenhouse_payroll.compensation_versions.bonus_otd_max` (numeric). Cada colaborador puede tener tope distinto según rol/contrato.
+
+**Edge canonical crítico**: `otdPercent === null` (data unavailable o sin tareas con due_date) → helper retorna `{amount: 0, qualifies: false}` — degradación honesta. UI debe distinguir entre:
+
+- "OTD < 70% → bonus no aplica" (regla operacional, performance bajo)
+- "Sin datos ICO disponibles" (data quality issue, escalar HR)
+- "Member en régimen honorarios" (discrecional)
+
+**Persistencia auditable en `payroll_entries`**:
+
+- `bonus_otd_amount` — monto computado ($)
+- `bonus_otd_proration_factor` — factor 0-1 (reproducible)
+- `bonus_otd_min` / `bonus_otd_max` — snapshot del tope al momento del cálculo
+- `kpi_otd_percent` — snapshot del valor KPI ICO usado
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §4.1.
+
+### 13.2 Cumplimiento de promesa (aggregate narrative)
+
+Como documenta [`CUMPLIMIENTO_V1.md`](CUMPLIMIENTO_V1.md) §1.1, "Cumplimiento de promesa" es **alias narrativo** de OTD% en lectura QBR/CVR ejecutiva. NO es cálculo separado — consume OTD% directo. Si OTD% cambia, "Cumplimiento de promesa" cambia automático.
+
+### 13.3 Person 360 + Pulse + ICO scorecards
+
+Display per-member-month de OTD% con threshold zone (verde ≥90% / ámbar 70-90% / rojo <70%). Consumer lee `metrics_by_member.otd_pct` directo del registry agregado SQL. NO recompute inline.
+
+### 13.4 CVR / QBR cliente narrative
+
+OTD% agregado per-cliente per-período aparece en reportes ejecutivos al cliente como métrica de cumplimiento contractual. Es la métrica que más rápidamente erosiona confianza del cliente cuando baja sostenidamente — input directo a retention conversations.
+
+### 13.5 Distinción canonical vs CT SLO% (NO confundir downstream)
+
+OTD% (promise compliance) y CT SLO% (competitive benchmark) son **inputs distintos a UI / dashboards / reports**. Bonus consume **solo OTD%** V1 — CT SLO% NO entra al cálculo. Ver [`CT_SLO_PCT_V1.md`](CT_SLO_PCT_V1.md) §6.1 + §13 para razón canonical.

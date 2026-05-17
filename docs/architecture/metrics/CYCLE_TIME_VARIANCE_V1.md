@@ -217,3 +217,18 @@ Consumers (Pulse, scorecards, Person 360) leen el agregado del registry SQL dire
 - **Variance per fase CSC**: V1 expone solo total. V2 podría desglosar variance por Briefing/Producción/Cambios/Entrega.
 - **Helper TS para projection / sensitivity analysis**: V1 NO. Si emerge consumer real (e.g. simulator "qué pasa con SD si remove top-2 outliers"), V2 helper.
 - **Per-cliente threshold**: V1 uniforme. V2 si cliente enterprise pide SLA SD específico.
+
+---
+
+## 13. Downstream consumers — qué consume Cycle Time Variance
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. Cycle Time Variance NO entra al cálculo de bonus V1. Hereda razón canonical de [`CYCLE_TIME_V1.md`](CYCLE_TIME_V1.md) §13.1 — métrica de velocidad/predictabilidad absoluta, no de promise compliance ni quality. HR/Finance decisión: bonus opera sobre OTD% + RpA, no sobre velocidad / variance.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Management dashboards + sales / comercial narrative
+
+- Pulse + executive scorecards: SD baja sostenida es input al claim "Globe entrega con predictabilidad" (CVR).
+- Sales: input para promesas con buffer realista al cliente — alta variance = ofrecer plazos más conservadores.

@@ -340,3 +340,77 @@ Pre-flip de `NOTION_RPA_WRITEBACK_ENABLED=true` en producción:
 - **Internal Review Rounds (IRR)**: métrica paralela hipotética. V1 NO la implementa. Cuando workflow review system emerja, evaluar si crear `IRR_V1.md` como métrica hermana o si IRR es feature interno de un dashboard sin merece spec propio.
 - **Backfill histórico de transitions**: TASK-908 Slice 9 cubre el backfill best-effort desde Notion API history. Tareas sin history disponible quedan `unavailable` permanentemente. NO se reconstruye desde Notion `Correcciones` rollup legacy (rompe boundary canonical).
 - **Workflow auto-resolución de `low_confidence`**: V1 deja `low_confidence` como concepto disponible vía `rpa-policy.ts` pero NO classify automático. Cuándo aplicar `low_confidence` (e.g. tarea con < N días de observation) → decisión a tomar cuando emerja caso real.
+
+---
+
+## 13. Downstream consumers — qué consume RpA
+
+### 13.1 Payroll bonus calculation — **input PRIMARIO canonical**
+
+**Sí, RpA es uno de los 2 únicos inputs canonical de bonus V1** (el otro es OTD%). Aplica a contratos `indefinido` / `plazo_fijo` / `international_internal` + `deel`. Excluye `honorarios` (discrecional manual).
+
+**Pipeline canonical**:
+
+```text
+metrics_by_member.rpa (materializado per member-month)
+  ↓
+fetchKpisForPeriod() → PayrollKpiSnapshot.rpaAvg
+  ↓
+calculateRpaBonus(rpaAvg, compensation.bonusRpaMax, bonusConfig)
+  ↓
+{amount, prorationFactor, qualifies} → persisted en payroll_entries
+```
+
+**Helper canonical**: `src/lib/payroll/bonus-proration.ts:54-108` (`calculateRpaBonus`).
+
+**Banded inverse proration** (4 zonas) — RpA lower is better:
+
+| RpA promedio | Zona | Pago % del `bonusRpaMax` |
+|---|---|---|
+| `≤ 1.7` (`rpaFullPayoutThreshold`) | Full payout | **100%** |
+| `1.7 - 2.0` (soft band linear) | Soft band | 100% → 80% (`rpaSoftBandFloorFactor`) |
+| `2.0 - 3.0` (hard band linear) | Hard band | 80% → 0% |
+| `≥ 3.0` (`rpaThreshold`) | Cutoff | **$0** |
+
+**Ejemplo RpA 1.85** (mid soft band) con `bonusRpaMax = $180,000`:
+
+```text
+bandProgress = (1.85 - 1.7) / (2.0 - 1.7) = 0.5
+factor = 1 - 0.5 × (1 - 0.8) = 0.9
+amount = $180,000 × 0.9 = $162,000
+```
+
+**Ejemplo RpA 2.5** (mid hard band) mismo tope:
+
+```text
+declineProgress = (2.5 - 2.0) / (3.0 - 2.0) = 0.5
+factor = 0.8 × (1 - 0.5) = 0.4
+amount = $180,000 × 0.4 = $72,000
+```
+
+**Thresholds**: configurables per-tenant via BQ table `payroll_bonus_config` (con vigencia temporal `effective_from`). Defaults canonical en `src/lib/payroll/bonus-config.ts:3-10`.
+
+**Per-member tope**: `greenhouse_payroll.compensation_versions.bonus_rpa_max` (numeric). Cada colaborador puede tener tope distinto según rol/contrato.
+
+**Edge canonical crítico**: `rpaAvg === null` (data unavailable) → helper retorna `{amount: 0, qualifies: false}` — **degradación honesta, NO inventa data**. Bug class TASK-877 follow-up demostró el impacto: 3,168 tareas Sky con `rpa=null` 10 meses → toda la nómina Sky proyectada perdía bonus RpA silenciosamente. TASK-901 elimina la dependencia del sync legacy → bonus estables post-ship.
+
+**Persistencia auditable en `payroll_entries`**:
+
+- `bonus_rpa_amount` — monto computado ($)
+- `bonus_rpa_proration_factor` — factor 0-1 (reproducible)
+- `bonus_rpa_min` / `bonus_rpa_max` — snapshot del tope al momento del cálculo
+- `kpi_rpa_avg` — snapshot del valor KPI ICO usado
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §4.2.
+
+### 13.2 Person 360 + Pulse + ICO scorecards
+
+Display per-member-month de RpA promedio con threshold zone (verde / ámbar / rojo). Consumer lee `metrics_by_member.rpa` directo del registry agregado SQL. NO recompute inline.
+
+### 13.3 CVR / QBR cliente narrative
+
+RpA agregado per-cliente per-período aparece en reportes ejecutivos al cliente (lectura "rondas promedio que tu equipo Globe necesitó para entregar"). Input al claim de "calidad first-pass" de Globe.
+
+### 13.4 Iteration Velocity (Revenue Enabled palanca 2) — relación NO directa
+
+RpA **NO es input directo** de Iteration Velocity. Iteration Velocity discrimina iteración útil (frame_versions ≥ 2 sin client_change_round) vs corrective rework — RpA cuenta solo el rework client-side. Métricas hermanas pero distintas semánticas. Ver `ITERATION_VELOCITY_V1.md` §6.1.

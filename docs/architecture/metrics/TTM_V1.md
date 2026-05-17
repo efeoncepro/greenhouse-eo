@@ -299,3 +299,27 @@ Industria creative-tech LATAM: median TTM ~21 días para campañas estándar. Gl
 - **Aggregate per cliente / período**: V1 per-campaign only. V2 si emerge demanda comparativa.
 - **TTM rolling vs absolute**: V1 absolute per-campaign. V2 rolling 90d per-cliente para early-detection trends.
 - **TTM real-time** durante campaign en curso: V1 retorna unavailable hasta activation. ¿UI mostrar "running TTM"? Decisión cuando emerja consumer.
+
+---
+
+## 13. Downstream consumers — qué consume TTM
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. TTM NO entra al cálculo de bonus V1.
+
+**Razón canonical**: TTM es **per-campaign** (no per-member-month) — no map directo a bonus per-individual. Plus: TTM mide tiempo entre `brief efectivo` y `activación en mercado` que depende de **decisión del cliente de activar** (no del equipo Globe). Equipo no debería ser bonificado o penalizado por timing de decisión del cliente. Bonus opera sobre métricas per-member-month auditables (OTD%, RpA).
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Revenue Enabled palanca 1 — Early Launch Advantage (CVR / QBR)
+
+TTM bajo = más días en mercado = más demanda capturada → input directo al claim "Globe te ayuda a lanzar antes = capturar más demanda". Palanca 1 de Revenue Enabled (Contrato §2.3). V1 mayoría `degraded` mode (BCS backend pendiente TASK-910) — V2 con BCS observed reportará `observed` mode.
+
+### 13.3 Cliente performance / marketing decisión
+
+TTM aparece en QBR como métrica clave para captar demanda estacional (Black Friday, lanzamiento producto, ventana competitiva). Sales/Comercial usa TTM histórico per cliente para ofrecer service levels (e.g. "tu TTM promedio Q4 fue 18 días — para Black Friday Q4 próximo recomendamos arrancar brief X días antes").
+
+### 13.4 Retention conversation
+
+TTM sostenido bajo per cliente = competitive advantage frente a in-house o agencias slower → cliente ve valor → retention strong. TTM sostenido alto = riesgo retention.

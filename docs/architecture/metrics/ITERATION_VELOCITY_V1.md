@@ -294,3 +294,23 @@ Si V2 emerge necesidad de visibilizarla per-task (e.g. flag "esta tarea fue iter
 - **Materializar en registry runtime**: V1 NO (sigue como helper standalone Revenue Enabled). V2 si emerge demanda de per-member-month bonificaciones.
 - **Workflow team rounds**: integration legacy NO existe. V2 si emerge sistema workflow.
 - **Per-cliente customization**: V1 uniforme threshold. V2 si cliente performance-driven pide SLA específico.
+
+---
+
+## 13. Downstream consumers — qué consume Iteration Velocity
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. Iteration Velocity NO entra al cálculo de bonus V1.
+
+**Razón canonical**: Métrica narrative-level Revenue Enabled (palanca 2). V1 mostly **proxy mode** (Frame.io integration NO existe, ad platform integration NO existe). NO auditable suficiente para input bonus directo. HR/Finance decisión: bonus opera sobre métricas auditables canonical (OTD% + RpA). Cuando V2 integraciones shippeen y mayoría scopes alcancen `observed` mode, evaluar inclusion.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Revenue Enabled palanca 2 (CVR / QBR cliente narrative)
+
+Iteration Velocity es palanca 2 de Revenue Enabled — sustenta el claim "Globe habilita iteración rápida = mejor performance ad-platforms". Aparece en QBR/CVR como input al revenue habilitado por testing creativo. V1 reporta en `proxy` mode honestamente; V2 cuando Frame.io + ad platforms emerjan reporta en `observed`.
+
+### 13.3 Capacity planning + fit cliente-equipo
+
+Input para evaluar fit de equipo creativo con cliente performance-driven (alta iteración esperada) vs cliente branding-driven (baja iteración esperada). Capacity adjustment si misfit.

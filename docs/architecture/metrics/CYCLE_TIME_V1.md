@@ -360,3 +360,28 @@ Si emerge demanda operativa de ver CT live per-task en Notion (e.g. operador qui
 - **Writeback per-task Notion**: V1 NO prioriza. Agregado SQL suficiente para dashboards. Si emerge necesidad operativa, TASK derivada.
 - **Calibración per tipo de pieza**: V1 threshold uniforme. V2 con diferenciación video/sitio/estático/GIF.
 - **Backfill histórico de transitions**: TASK-908 Slice 9 cubre best-effort. Tareas sin history queda en `sourceMode='fallback_created_at'` permanentemente (no es bug — es honestidad operativa).
+
+---
+
+## 13. Downstream consumers — qué consume Cycle Time
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. Cycle Time NO entra al cálculo de bonus V1.
+
+**Razón canonical**: Cycle Time mide duración absoluta — NO promise compliance. Decisión HR/Finance: pagar por velocidad absoluta puede incentivar trade-offs perversos (operador rushea para CT bajo a costa de quality / scope cuts). Bonus opera sobre **promise compliance** (OTD%) + **quality** (RpA), no sobre **velocidad absoluta**. Si HR quiere componente de velocity en bonus, conversación pasa por CT SLO% (competitive benchmark) — pero V1 tampoco lo incluye.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 CT SLO%, CT Variance — métricas derivadas
+
+`cycle_time_days` materializado es input directo de:
+
+- [`CT_SLO_PCT_V1.md`](CT_SLO_PCT_V1.md) — `% (cycle_time_days ≤ threshold industria)`
+- [`CYCLE_TIME_VARIANCE_V1.md`](CYCLE_TIME_VARIANCE_V1.md) — `STDDEV(cycle_time_days)`
+
+Si Cycle Time cambia, ambas derivadas cambian automático sin re-spec.
+
+### 13.3 Pulse + Person 360 + capacity planning
+
+Display per-member-month + per-space + per-cliente. Input para capacity reviews, retros, sizing de briefs futuros. Consumer lee `metrics_by_member.cycle_time` agregado SQL directo.

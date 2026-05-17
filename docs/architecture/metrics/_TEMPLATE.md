@@ -228,3 +228,26 @@ ROUND(100 * COUNT(*) FILTER (WHERE <numerator_condition>) / NULLIF(COUNT(*) FILT
 
 - `<question 1>`: `<scope deferido, condición de re-evaluación>`
 - `<question 2>`: ...
+
+---
+
+## 13. Downstream consumers — qué consume esta métrica (opcional)
+
+> Sección opcional pero recomendada cuando la métrica tiene downstream consumers críticos (Payroll bonus, P&L attribution, cliente reporting, CVR/QBR narrative, etc.). Lista cada consumer + cómo lo usa + cross-ref al spec/ADR del consumer.
+
+### 13.1 Payroll bonus calculation
+
+`Sí / No / Indirect via <alias>`. Si `Sí`:
+
+- Helper canonical consumer: `src/lib/payroll/bonus-proration.ts:<helper>`
+- Thresholds: `<defaults + override per-tenant via payroll_bonus_config>`
+- Per-member tope: `compensation_versions.bonus_<metric>_max`
+- ADR detallado: `GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`
+
+Si `No`:
+
+- Razón canonical: `<por qué NO entra bonus V1 — política HR/Finance / double-counting / no per-member-month / etc.>`
+
+### 13.2 Otros consumers (P&L, CVR, dashboards, reports)
+
+Listar consumers adicionales con cross-ref + comportamiento esperado.

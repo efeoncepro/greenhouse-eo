@@ -354,3 +354,25 @@ Pre-flip de `NOTION_FTR_WRITEBACK_ENABLED=true`:
 - **Internal Review Rounds (IRR) como métrica hermana**: V1 NO mide internal review. Si emerge necesidad operativa, evaluar TASK separada `IRR_V1.md` como métrica paralela a FTR sin afectar el contrato de RpA/FTR de cliente.
 - **Per-cliente threshold customization**: ¿Sky merece threshold distinto a Efeonce internal? V1 NO. Si emerge demanda comercial (cliente Globe enterprise pide SLA específico de FTR), evaluar V2 per-cliente.
 - **FTR rolling window vs absolute period**: V1 usa periodo mensual cerrado (month-end snapshot). V2 podría exponer FTR rolling 30d para early-detection. Decisión cuando emerja consumer real.
+
+---
+
+## 13. Downstream consumers — qué consume FTR
+
+### 13.1 Payroll bonus calculation — **NO input bonus V1**
+
+**No**. FTR NO entra al cálculo de bonus V1.
+
+**Razón canonical**: FTR es derivada pura de RpA (`calculateFtr === calculateRpa === 0`). Incluirla como input bonus separado sería **double-counting** con RpA — la misma señal operativa (rondas de cliente = 0) pagaría dos veces. HR/Finance decisión: bonus opera sobre RpA cuantitativo (granularidad fina: pago varía por número de rondas) en lugar de FTR binario.
+
+Si V2 cambia FTR para incluir señales adicionales Frame.io (`client_review_open`, `workflow_review_open`, `open_frame_comments`) cuando esa integración exista, evaluar si emerge FTR como input bonus independiente con compute distinto a RpA puro. V1 NO.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+### 13.2 Dashboards Person 360 + Pulse + scorecards
+
+Display per-member-month de `ftr_pct` con threshold zone (verde ≥85% / ámbar 70-85% / rojo <70%). Consumer lee `metrics_by_member.ftr_pct` agregado SQL directo. NO recompute inline.
+
+### 13.3 CVR / QBR cliente narrative
+
+`ftr_pct` aparece en reportes ejecutivos al cliente como métrica de **calidad first-pass** — claim "X% de las piezas Globe se aprueban a la primera". Diferenciador comercial.

@@ -230,3 +230,27 @@ Idéntico a OTD% (`OTD_V1.md` §8). Threshold ≥90% optimal.
 - **Agregar Cumplimiento % per-task**: V1 NO. Si emerge demanda real, evaluar parser canonical de strings `"100 %"` / `"100+ %"` / `"<100 %"` + agregado per-período.
 - **Renombrar "Cumplimiento de promesa" para evitar ambigüedad**: ¿usar "Promise Compliance" en código y "Cumplimiento" solo como label visual? V1 mantiene "Cumplimiento de promesa" como alias narrativo per Engine doc convention.
 - **Threshold per-task implícito**: ¿operadores hacen reviews automáticas cuando `<100 %` aparece? Hoy NO automatizado. Si emerge workflow, evaluar.
+
+---
+
+## 13. Downstream consumers — qué consume Cumplimiento
+
+### 13.1 Payroll bonus calculation — **indirect via OTD% alias**
+
+**Indirect**. "Cumplimiento de promesa" (sección 1.1) es alias narrativo de OTD% — si OTD% es input bonus, "Cumplimiento de promesa" es indirectamente input (no tiene compute propio). Ver [`OTD_V1.md`](OTD_V1.md) §13.1.
+
+**Cumplimiento % per-task** (sección 1.2) **NO es input bonus**:
+
+- Razón canonical: es **audit signal per-task** (string `"100 %"` / `"100+ %"` / `"<100 %"`), no agregado per-member-month. Bonus opera a nivel agregado.
+- No tiene threshold canonical operacional — interpretación contextual humana.
+- Si emerge demanda V2 de agregar Cumplimiento % per-task como input bonus, requiere parser canonical de strings + agregación + 7 pasos de extensión documentados en [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10.
+
+**ADR detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md) §10 (lista "métricas NO input bonus V1").
+
+### 13.2 QBR / CVR cliente narrative
+
+"Cumplimiento de promesa" aparece en reportes ejecutivos al cliente como narrativa agregada de OTD family. Es **la lectura preferida por cliente** vs "OTD%" técnico — mismo número, etiqueta más amable.
+
+### 13.3 Per-task audit forensic
+
+`Cumplimiento %` per-task (`"100 %"` / `"100+ %"` / `"<100 %"`) aparece en drawer detail de tarea individual cuando operador HR/Delivery investiga un caso específico. NO entra a agregados — solo audit context.

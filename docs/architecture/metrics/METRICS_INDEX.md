@@ -53,6 +53,33 @@
 
 ---
 
+## Payroll bonus input matrix canonical (2026-05-17)
+
+**Las únicas 2 métricas inputs directos de bonus V1**: RpA + OTD%. El resto (12) **NO entran a bonus V1** por razones canonical documentadas en cada spec §13 + ADR `GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md` §10.
+
+| Métrica | Input bonus V1? | Razón / Pattern |
+|---|---|---|
+| RpA | **Sí (primary)** | Helper `calculateRpaBonus` — banded inverse proration. Tope `compensation.bonusRpaMax`. Ver [RPA_V1.md §13.1](RPA_V1.md) |
+| OTD% | **Sí (primary)** | Helper `calculateOtdBonus` — graduated linear proration. Tope `compensation.bonusOtdMax`. Ver [OTD_V1.md §13.1](OTD_V1.md) |
+| Cumplimiento | **Indirect via OTD alias** | "Cumplimiento de promesa" = alias narrativo OTD%; per-task audit signal NO entra. Ver [CUMPLIMIENTO_V1.md §13.1](CUMPLIMIENTO_V1.md) |
+| FTR | No (V1) | Double-counting con RpA (FTR = `RpA === 0`). Ver [FTR_V1.md §13.1](FTR_V1.md) |
+| Cycle Time | No (V1) | Velocidad absoluta — pagar incentiva trade-offs vs quality. Ver [CYCLE_TIME_V1.md §13.1](CYCLE_TIME_V1.md) |
+| Cycle Time Variance | No (V1) | Hereda razón Cycle Time. Ver [CYCLE_TIME_VARIANCE_V1.md §13.1](CYCLE_TIME_VARIANCE_V1.md) |
+| CT SLO% | No (V1) | Competitive benchmark (no promise compliance); OTD% ya cubre promise. Ver [CT_SLO_PCT_V1.md §13.1](CT_SLO_PCT_V1.md) |
+| Throughput | No (V1) | Volume metric — quality conflict con RpA/OTD. Ver [THROUGHPUT_V1.md §13.1](THROUGHPUT_V1.md) |
+| Pipeline Velocity | No (V1) | Ratio composite — causa externa al member. Ver [PIPELINE_VELOCITY_V1.md §13.1](PIPELINE_VELOCITY_V1.md) |
+| CSC Distribution | No (V1) | Shape metric (distribution) — no magnitudinal. Ver [CSC_DISTRIBUTION_V1.md §13.1](CSC_DISTRIBUTION_V1.md) |
+| Stuck Assets | No (V1) | Causa externa al member; coherencia con exclusión Bloqueado. Ver [STUCK_ASSETS_V1.md §13.1](STUCK_ASSETS_V1.md) |
+| Stuck % | No (V1) | Hereda razón Stuck Assets. Ver [STUCK_ASSET_PCT_V1.md §13.1](STUCK_ASSET_PCT_V1.md) |
+| OCF | No (V1) | Deuda histórica — causa externa al member. Ver [OCF_V1.md §13.1](OCF_V1.md) |
+| Iteration Velocity | No (V1) | Narrative-level Revenue Enabled, mostly proxy V1, no auditable suficiente. Ver [ITERATION_VELOCITY_V1.md §13.1](ITERATION_VELOCITY_V1.md) |
+| BCS | No (V1) | Project-level (no per-member-month); mide brief del cliente no entrega del equipo. Ver [BCS_V1.md §13.1](BCS_V1.md) |
+| TTM | No (V1) | Per-campaign (no per-member-month); depende de decisión de activación del cliente. Ver [TTM_V1.md §13.1](TTM_V1.md) |
+
+**ADR canonical detallado**: [`../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md`](../GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md). Si HR/Finance decide V2 incluir nueva métrica como input bonus, requiere los **7 pasos canonical de extensión** documentados en §10 del ADR (extender schema `compensation_versions`, helper nuevo, thresholds canonical, `buildPayrollEntry` wire, persistencia, spec §13 update, este index).
+
+---
+
 ## Estados de writeback canonical (TASK-901 progressive pattern)
 
 Conforme la migración progresiva avanza, cada métrica transita por estos estados:
