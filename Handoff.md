@@ -1,3 +1,36 @@
+# Sesion 2026-05-17 — TASK-905 SII Europe withholding discovery + Payroll skill enrichment
+
+**Status**: ✅ Discovery oficial Europa documentado. No se implemento runtime, schema ni catalog seed productivo.
+
+## Resultado
+
+- Se creo auditoria reusable: `docs/audits/payroll/TASK-905_INTERNATIONAL_WITHHOLDING_EUROPE_SII_DISCOVERY_2026-05-17.md`.
+- Se indexo en `docs/audits/payroll/README.md`.
+- Se actualizo `docs/tasks/to-do/TASK-905-international-withholding-engine-americas.md` para incorporar las conclusiones de Americas + Europa como contrato de implementacion: `draft_tax_review`, `blocked_invalid_tax_residency`, inputs completos del resolver, shape minimo del catalogo, guardrails de transporte/TIEA/territorios y categorias de servicio mas precisas.
+- Se crearon y conectaron las tasks follow-up:
+  - `docs/tasks/to-do/TASK-906-international-withholding-engine-europe.md` — extension Europa sobre la foundation de TASK-905.
+  - `docs/tasks/to-do/TASK-907-spain-international-withholding-rule-pack.md` — vertical slice Espana/Daniela sobre TASK-906.
+- Se sincronizaron `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`; siguiente ID disponible: `TASK-908`.
+- Se enriquecieron las skills locales de Payroll para Codex y Claude:
+  - `.codex/skills/greenhouse-payroll-auditor/references/international-withholding-europe-sii.md`
+  - `.claude/skills/greenhouse-payroll-auditor/references/international-withholding-europe-sii.md`
+  - ambos `SKILL.md` ahora apuntan a la nueva referencia cuando aparezca `international_internal` con residencia fiscal europea.
+
+## Hallazgos clave
+
+- Europa confirma que el motor no puede ser `rateByCountry`: ademas de pais y servicio, debe resolver payee type, PE/base fija/service PE, 183 dias o seis meses segun convenio, evidencia Resolucion 58, MLI/PPT, beneficiario efectivo y cobertura territorial.
+- SII lista DTA general vigente para Austria, Belgica, Croacia, Dinamarca, Espana, Francia, Irlanda, Italia, Noruega, Paises Bajos, Polonia, Portugal, Reino Unido, Republica Checa, Rusia, Suecia y Suiza.
+- Las circulares MFN son criticas: varias tasas de regalias/equipos del PDF base estan rebajadas por SII a `2%` equipos y `10%` otros. No seedear tasas historicas sin circular vigente.
+- Espana/Europa siguen fuera de TASK-905 Americas V1; si aparece `tax_residence_country_code='ES'` o europeo, el resolver debe devolver `needs_tax_review` hasta `TASK-906` y, para Espana/Daniela, `TASK-907` con aprobacion Tax/Legal.
+- Transporte-only e intercambio de informacion no habilitan payroll services: Alemania solo transporte en SII; Guernsey/Jersey solo TIEA.
+
+## Validacion
+
+- Fuentes verificadas en SII: pagina oficial de convenios, Ley sobre Impuesto a la Renta PDF, Resolucion Exenta SII N°58/2021 y Circulares N°22/2018, N°50/2018, N°27/2019, N°5/2020 y N°65/2025.
+- No se corrio lint/build porque el cambio fue documental/skill-only.
+
+---
+
 # Sesion 2026-05-17 — TASK-905 SII Americas withholding discovery + Payroll skill enrichment
 
 **Status**: ✅ Discovery oficial documentado. No se implemento runtime, schema ni catalog seed productivo.
