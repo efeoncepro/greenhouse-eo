@@ -1,3 +1,53 @@
+# Sesion 2026-05-17 (cont. — Skill ICO comprehensive + viva creada)
+
+**Status**: ✅ Skill canonical creada. `greenhouse-ico` ahora disponible en `~/.claude/skills/` Y `~/.codex/skills/` con 56 archivos cada uno (16 POPULATED + 40 stubs explícitos con next review trigger). Skill es viva — evoluciona a medida que el negocio + plataforma evolucionan. Pre-poblada based on inventario completo lo que sé hoy + lo que falta investigar + lo futuro (12 métricas candidatas, 6 SLAs, 8 SLOs, 6 SLIs propuestos).
+
+## Resultado
+
+- **Skill `greenhouse-ico` estructura canonical** (56 archivos):
+  - **SKILL.md** entrypoint (load order, when invoke matrix 17 triggers, 5-pillar ICO contract, 10 core decision frameworks, 17 hard rules, file map, maintenance protocol)
+  - **anti-patterns-catalog.md** (18 anti-patterns canonicalmente prohibidos)
+  - **metrics-canonical-index.md** (14 specs cross-ref + payroll bonus input matrix)
+  - **conceptual-framework/** (5 files: boundary ✅ + 4 stubs)
+  - **decision-frameworks/** (6: when-to-add-new-metric ✅ + sla-vs-slo-vs-sli ✅ + 4 stubs)
+  - **migration-playbook/** (4: progressive-strategy-canonical ✅ + 3 stubs)
+  - **bonus-impact-playbook/** (4: excluded-metrics-rationale ✅ + 3 stubs)
+  - **observability-canonical/** (3 stubs)
+  - **sla-slo-sli-framework/** (5: SLA ✅ + SLO ✅ + SLI ✅ + 2 stubs)
+  - **future-roadmap/** (6: new-metrics-pipeline-12 ✅ + 5 stubs)
+  - **investigation-gaps/** (8: frame-io ✅ + 7 stubs)
+  - **reference/** (5: glossary ✅ + adr-bibliography ✅ + 3 stubs)
+  - **output-templates/** (7: new-metric-spec ✅ + 6 stubs)
+
+- **Mirror exacto** en `.codex/skills/greenhouse-ico/` — ambos Claude + Codex agents pueden invocar.
+
+- **5-pillar ICO contract canonical** (extiende 4-pillar arch-architect con Auditability ICO-specific): Safety + Robustness + Resilience + Scalability + **Auditability** ⭐.
+
+- **10 core decision frameworks memorized**: Bonus impact 3-question, Migration 8 stop-gates, SLA/SLO/SLI distinction, Boundary check, Strangler mandate, Demo-first testing, Defense in depth dual, Honest degradation always, Reliability signal upstream, Spec canonical first.
+
+- **17 hard rules canonical** + maintenance protocol viva (cuándo + cómo + por quién evolucionar).
+
+## Contenido pre-poblado canonical
+
+- **Lo que sé hoy** documentado: 14 métricas + helpers + ADRs (4 primarios + 4 secundarios) + 18 tasks relacionadas + reliability signals + bug class catalog + glossary completo (40+ términos canonical)
+- **Lo que falta investigar** (9 gaps identificados): Frame.io integration (✅ detail), ad platforms (stub), BCS AI backend (stub), workflow team review (stub), Sky status completion (stub), P&L attribution (stub), cliente CVR rendering (stub), predictive metrics (stub), multi-cliente onboarding (stub)
+- **Lo futuro** (12 métricas candidatas con priority matrix): IRR, First-Touch-to-Brief-Approved, Client Approval Time, Workflow Velocity, Asset Reuse Rate, Re-work Cost $, Time-to-Insight, Quality Drift, Capacity Utilization, Member Burnout Risk, CSAT, NPS + 6 SLAs propuestos + 8 SLOs + 6 SLIs
+
+## Validacion
+
+- Doc-only changes en `~/.claude/skills/` y `~/.codex/skills/` (NO en repo Greenhouse — skills canonical viven en home directory).
+- 56 archivos en cada mirror — counts verificados.
+- Skill registrada disponible para invocación: `greenhouse-ico` aparece en runtime skills list.
+
+## Siguientes pasos
+
+- **Skill invocable inmediatamente** por cualquier agente que toque ICO (triggers en SKILL.md "When to invoke" matrix).
+- **Stubs se pueblan organicamente** cuando trigger se cumple — operador o agente no inventa "qué crear next", el SKILL.md File map declara qué falta + cuándo.
+- **Cross-impact downstream**: cuando agent invoque otras skills (`greenhouse-payroll-auditor`, `greenhouse-postgres`, `arch-architect`, `commercial-expert`) y emerja decisión ICO-relevante, cross-ref de vuelta a `greenhouse-ico`.
+- **Maintenance philosophy canonical**: cada commit ICO downstream debería preguntarse "¿esta decisión updates la skill?" + update inline si aplica.
+
+---
+
 # Sesion 2026-05-17 (cont. — GSAP adoption como carril especializado de motion)
 
 **Status**: ✅ UI platform adoption. Se adopto `gsap` + `@gsap/react` con wrappers canonicos y ADR dedicado, sin reemplazar Framer Motion para microinteracciones normales.
