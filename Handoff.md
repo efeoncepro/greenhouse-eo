@@ -1,3 +1,55 @@
+# Sesion 2026-05-17 (cont. — 12 specs nuevos) — 14 specs canonical Accepted (paquete completo)
+
+**Status**: ✅ Doc-only. Sesión extendida del trabajo anterior — creados los 12 specs canonical pendientes (OTD + CT SLO% + Cumplimiento + Cycle Time + CT Variance + Throughput + Pipeline Velocity + CSC Distribution + Stuck Assets + Stuck % + OCF + Iteration Velocity + BCS + TTM). Total: **14 de 14 métricas críticas con spec V1 Accepted**. TASK-909 reshape (Slices 2-3 removidos — specs ya creados). METRICS_INDEX completo. Contrato + Engine doc Deltas actualizados. Zero código runtime tocado.
+
+## Resultado
+
+- **12 specs canonical nuevos** en `docs/architecture/metrics/` con altísimo nivel de detalle siguiendo template canonical 12 secciones:
+  - **Cluster B — Delivery compliance**: `OTD_V1.md`, `CT_SLO_PCT_V1.md`, `CUMPLIMIENTO_V1.md`
+  - **Cluster C — Velocidad operativa**: `CYCLE_TIME_V1.md`, `CYCLE_TIME_VARIANCE_V1.md`, `THROUGHPUT_V1.md`, `PIPELINE_VELOCITY_V1.md`
+  - **Cluster D — Health / saturation**: `CSC_DISTRIBUTION_V1.md`, `STUCK_ASSETS_V1.md`, `STUCK_ASSET_PCT_V1.md`, `OCF_V1.md`
+  - **Cluster E — Revenue Enabled palancas**: `ITERATION_VELOCITY_V1.md`, `BCS_V1.md`, `TTM_V1.md`
+- **METRICS_INDEX.md** actualizado con todos los 14 specs Accepted + status writeback per métrica + agrupación por cluster.
+- **TASK-909 reshape**: Slices 2-3 removidos (creación de THROUGHPUT_V1 + PIPELINE_VELOCITY_V1 ya hecha en esta sesión). TASK-909 ahora se enfoca en helper `calculateFtr` + Engine doc pointer Delta + housekeeping.
+- **`Contrato_Metricas_ICO_v1.md`** Delta 2026-05-17 sección H actualizada con todos los 14 specs Accepted + cluster decisión canonical cubierto.
+- **`Greenhouse_ICO_Engine_v1.md`** Delta 2026-05-17 tabla extendida con los 14 specs cross-ref completo.
+- **Zero código runtime tocado** — todos los specs documentan código existente + decisiones canonical 2026-05-17.
+
+## Hallazgos clave
+
+- **Patrón template 12 secciones funcionó cleanly cross-métrica**: cada spec sigue la misma estructura sin forzar — métricas con compute simple (Throughput, OCF) usan secciones más compactas; métricas con compute complejo (Cycle Time, Iteration Velocity, BCS) llenan todas las secciones con detalle profundo.
+- **Cross-invariantes canonical formalizadas explícitamente**:
+  - RpA ↔ FTR: delegación pura (FTR delega a RpA, sin lógica propia)
+  - BCS ↔ TTM: BCS pass habilita TTM start `observed` (sin BCS → TTM degrada a proxy)
+  - Cycle Time ↔ CT SLO%: SLO% consume cycle_time_days computado por CT
+  - Stuck Assets ↔ Stuck %: misma fuente flag `is_stuck`, vistas distintas (count vs ratio)
+  - OTD% ↔ CT SLO%: **NO mezclar** — promise compliance vs competitive benchmark (cross-distinction documentada en sección 6.1 de ambos)
+  - Throughput ↔ Pipeline Velocity: **NO mezclar** — count absoluto vs ratio normalizado (cross-distinction documentada)
+- **Decisiones de sesión 2026-05-17 incorporadas en specs específicos**:
+  - 4 decisiones Cycle Time canonical (sección C Delta) → embebidas en `CYCLE_TIME_V1.md` §2.2
+  - Separación OTD% vs CT SLO% (sección D Delta) → 2 specs separados con cross-distinction
+  - Semántica corrección canonical (sección G Delta) → `RPA_V1.md` §1+§2+§6 + `FTR_V1.md` §1+§2 delegación
+  - Dual-meaning Cumplimiento (sección A.3 Delta) → `CUMPLIMIENTO_V1.md` §1.1+§1.2
+  - Drift Engine doc Throughput/Pipeline Velocity → `THROUGHPUT_V1.md` §6.1 + `PIPELINE_VELOCITY_V1.md` §6.1
+  - Excepción canonical boundary (per-task Cumplimiento Notion sync-only) → `CUMPLIMIENTO_V1.md` §3.3 con 3 razones justificación
+- **Source policies preservadas**: TASK-218 (TTM), TASK-219 (Iteration Velocity), TASK-220 (BCS) — specs canonicalmente referencian las tasks fuente sin duplicar.
+- **Migración progresiva completa**: las 14 métricas tienen spec canonical desde día 1, no esperan a que cada task las toque. Pattern stranger ahora aplica solo para **implementación** de helpers / writeback / runtime changes (no para definición conceptual).
+
+## Validacion
+
+- Doc-only changes. No corrió build/test runtime — validaciones lógicas vienen de implementación cuando TASK-908/TASK-901/TASK-909/futuras shippeen.
+- Pre-existing markdown lint warnings (MD060 + spell-check Spanish) NO bloquean — patrón consolidado en repo.
+- Spec contracts auto-consistentes — cada cross-ref entre specs cita el otro spec por path canonical.
+
+## Siguientes pasos
+
+- **TASK-908 Slices 0-3.5** sigue siendo foundation crítica (countCorrectionTransitions + transitions table) — desbloquea TASK-901 + TASK-909.
+- **TASK-909 reshape** ahora más compacta — solo helper `calculateFtr` + Engine doc Delta pointer + housekeeping. Slices 2-3 removidos.
+- **Specs `Pending` count: 0**. Strangler migration de definiciones conceptuales **completada**. Strangler de **implementación** sigue per task (writeback / helpers / runtime).
+- Próximas tasks que toquen métricas críticas pueden **leer 1 spec canonical en lugar de 6 fuentes** — onboarding 6x más rápido + drift detection automática con code review.
+
+---
+
 # Sesion 2026-05-17 (cont.) — ICO metrics canonical spec pattern + boundary ownership ADRs
 
 **Status**: ✅ Doc-only. 2 ADRs canonical creados (boundary ownership Notion ↔ Greenhouse + metric spec pattern), 4 specs canonical por métrica (template + index + RPA_V1 + FTR_V1), reshape TASK-901/TASK-908 + creación TASK-909, sync Contrato + Engine doc Deltas + DECISIONS_INDEX + CLAUDE.md hard rules. Plus hotfix Sentry `JAVASCRIPT-NEXTJS-63` aplicado (commit `3537496c`, ya pusheado al inicio de la sesión).

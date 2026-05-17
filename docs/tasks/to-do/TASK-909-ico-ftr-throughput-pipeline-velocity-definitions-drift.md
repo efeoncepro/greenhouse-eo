@@ -232,31 +232,13 @@ Reglas obligatorias canonical:
   - Detecta patterns: `client_change_round_final = 0` inline en SQL embedded TS, `FTR_PASSED_SQL` referencias fuera del registry, `formula.ftr` lectura inline de Notion
   - Override block exime el helper canonical + tests + `metric-registry.ts` (única fuente legítima de agregado SQL)
 
-### Slice 2 — Crear `THROUGHPUT_V1.md` spec canonical
+### Slice 2 — ~~Crear `THROUGHPUT_V1.md` spec canonical~~ **REMOVIDO 2026-05-17 (cont.)**
 
-- **Sin cambios de código** (Throughput código actual es canonical operacional).
-- Copiar `docs/architecture/metrics/_TEMPLATE.md` a `docs/architecture/metrics/THROUGHPUT_V1.md`.
-- Llenar las 12 secciones canonical per el spec pattern. Highlights:
-  - **Sección 1 Definición**: "Throughput mide el volumen mensual de tareas completadas — cuántas piezas terminadas entrega el equipo por período. Es métrica de volumen absoluto, no de eficiencia relativa."
-  - **Sección 2 Fórmula**: `Throughput(member, period) = COUNT(tasks WHERE completed AND in period AND in member AND NOT excluded)`. Versionado `THROUGHPUT_FORMULA_VERSION = 'throughput_v1.0'`.
-  - **Sección 5 Agregado canonical**: file:line `metric-registry.ts:310-323` con el SQL canonical.
-  - **Sección 10 Histórico**: "2026-05-17 — V1 created. Resuelve drift Engine doc línea 998-1025 que decía `weekly_rate / 4`. Decisión canonical: `monthly_count` es el throughput operativo (alineado con cómo operador reporta). La fórmula `weekly_rate / 4` era artefacto histórico no implementado, deprecada vía esta spec."
-  - **Sección 9 Writeback**: `N.A.` (Throughput es agregado per-período, no aplica writeback per-task Notion).
-- Update `METRICS_INDEX.md` cambiando entry de Throughput de `Pending` → `Accepted 2026-05-17` + cross-ref a spec.
+> **REMOVIDO**: `THROUGHPUT_V1.md` ya fue creado en la misma sesión 2026-05-17 como parte del paquete "crear los 12 specs canonicales pendientes" — sesión doc-only que canonizó las 14 métricas críticas. Ver `docs/architecture/metrics/THROUGHPUT_V1.md` Accepted. TASK-909 NO necesita crearlo.
 
-### Slice 3 — Crear `PIPELINE_VELOCITY_V1.md` spec canonical
+### Slice 3 — ~~Crear `PIPELINE_VELOCITY_V1.md` spec canonical~~ **REMOVIDO 2026-05-17 (cont.)**
 
-- **Sin cambios de código** (Pipeline Velocity código actual es canonical).
-- Copiar template a `docs/architecture/metrics/PIPELINE_VELOCITY_V1.md`.
-- Llenar las 12 secciones. Highlights:
-  - **Sección 1 Definición**: "Pipeline Velocity mide qué porcentaje del pipeline activo se cierra por período — la **eficiencia relativa al backlog**, no el volumen absoluto. Distingue equipos que mantienen pipeline saludable de equipos donde el backlog crece más rápido que la salida (pileup detector)."
-  - **Sección 2 Fórmula**: `PipelineVelocity(member, period) = completed_count / (completed_count + open_count)` (ratio entre 0 y 1, expresado en %). Versionado `PIPELINE_VELOCITY_FORMULA_VERSION = 'pipeline_velocity_v1.0'`.
-  - **Sección 5 Agregado canonical**: file:line `metric-registry.ts:338-367`.
-  - **Sección 6 Semántica edge**: "NO es throughput. Equipo con throughput alto + velocity baja = pileup; equipo con velocity alta + throughput bajo = pipeline pequeño bien cerrado."
-  - **Sección 10 Histórico**: "2026-05-17 — V1 created. Resuelve drift Engine doc línea 1089-1116 que decía `identical to throughput`. Decisión canonical: son métricas distintas que responden preguntas distintas — Throughput = volumen absoluto, Pipeline Velocity = eficiencia relativa al backlog. Ambas canonical, NO redundantes."
-  - **Sección 9 Writeback**: `N.A.` (agregado per-período).
-  - **Sección 11 Cross-refs**: link a [THROUGHPUT_V1.md](THROUGHPUT_V1.md) con nota "métrica hermana — distinta semántica".
-- Update `METRICS_INDEX.md` cambiando Pipeline Velocity de `Pending` → `Accepted 2026-05-17`.
+> **REMOVIDO**: `PIPELINE_VELOCITY_V1.md` ya fue creado en la misma sesión. Ver `docs/architecture/metrics/PIPELINE_VELOCITY_V1.md` Accepted. TASK-909 NO necesita crearlo.
 
 ### Slice 4 — Engine doc + Contrato + DECISIONS_INDEX pointer Delta
 

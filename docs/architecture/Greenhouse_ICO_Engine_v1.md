@@ -10,9 +10,22 @@ Este doc (Engine doc) queda como **framework conceptual enterprise** (drivers op
 |---|---|---|
 | RpA (Rounds per Asset) | [`metrics/RPA_V1.md`](metrics/RPA_V1.md) | Accepted 2026-05-17 |
 | FTR (First-Time Right) | [`metrics/FTR_V1.md`](metrics/FTR_V1.md) | Accepted 2026-05-17 |
-| Throughput | `metrics/THROUGHPUT_V1.md` | Accepted via TASK-909 |
-| Pipeline Velocity | `metrics/PIPELINE_VELOCITY_V1.md` | Accepted via TASK-909 |
-| OTD, Cumplimiento, Cycle Time, CT SLO%, Iteration Velocity, BCS, TTM | `metrics/<METRIC>_V1.md` | Pending — strangler migration cuando cada task toque la métrica |
+| OTD% (On-Time Delivery — promise compliance) | [`metrics/OTD_V1.md`](metrics/OTD_V1.md) | Accepted 2026-05-17 |
+| CT SLO% (Cycle Time SLO percentage — competitive benchmark) | [`metrics/CT_SLO_PCT_V1.md`](metrics/CT_SLO_PCT_V1.md) | Accepted 2026-05-17 |
+| Cumplimiento (dual: per-task audit + aggregate alias OTD) | [`metrics/CUMPLIMIENTO_V1.md`](metrics/CUMPLIMIENTO_V1.md) | Accepted 2026-05-17 |
+| Cycle Time (Tiempo de ciclo) | [`metrics/CYCLE_TIME_V1.md`](metrics/CYCLE_TIME_V1.md) | Accepted 2026-05-17 |
+| Cycle Time Variance (Previsibilidad) | [`metrics/CYCLE_TIME_VARIANCE_V1.md`](metrics/CYCLE_TIME_VARIANCE_V1.md) | Accepted 2026-05-17 |
+| Throughput (Volumen mensual) | [`metrics/THROUGHPUT_V1.md`](metrics/THROUGHPUT_V1.md) | Accepted 2026-05-17 |
+| Pipeline Velocity (ratio — pileup detector) | [`metrics/PIPELINE_VELOCITY_V1.md`](metrics/PIPELINE_VELOCITY_V1.md) | Accepted 2026-05-17 |
+| CSC Distribution (composición pipeline por fase CSC) | [`metrics/CSC_DISTRIBUTION_V1.md`](metrics/CSC_DISTRIBUTION_V1.md) | Accepted 2026-05-17 |
+| Stuck Assets (count sin movimiento ≥72h) | [`metrics/STUCK_ASSETS_V1.md`](metrics/STUCK_ASSETS_V1.md) | Accepted 2026-05-17 |
+| Stuck % (% normalizado backlog) | [`metrics/STUCK_ASSET_PCT_V1.md`](metrics/STUCK_ASSET_PCT_V1.md) | Accepted 2026-05-17 |
+| OCF (Overdue Carried Forward) | [`metrics/OCF_V1.md`](metrics/OCF_V1.md) | Accepted 2026-05-17 |
+| Iteration Velocity (Revenue Enabled palanca 2) | [`metrics/ITERATION_VELOCITY_V1.md`](metrics/ITERATION_VELOCITY_V1.md) | Accepted 2026-05-17 |
+| BCS (Brief Clarity Score) | [`metrics/BCS_V1.md`](metrics/BCS_V1.md) | Accepted 2026-05-17 (infrastructure-ready, AI backend TASK-910 futura) |
+| TTM (Time-to-Market — Revenue Enabled palanca 1) | [`metrics/TTM_V1.md`](metrics/TTM_V1.md) | Accepted 2026-05-17 |
+
+**14 de 14 métricas críticas canonical** con spec V1 Accepted. Ver [`metrics/METRICS_INDEX.md`](metrics/METRICS_INDEX.md) para índice maestro.
 
 Índice maestro: [`metrics/METRICS_INDEX.md`](metrics/METRICS_INDEX.md). Pattern canonical: `GREENHOUSE_METRIC_SPEC_PATTERN_V1.md`. Ownership boundary Notion ↔ Greenhouse: `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md`.
 

@@ -333,14 +333,25 @@ FTR V1 ship con `calculateFtr(taskId) = calculateRpa(taskId) === 0`. NO ship con
 
 Cada métrica crítica de delivery tiene su **spec canonical dedicado** en `docs/architecture/metrics/<METRIC>_V1.md` con 12 secciones obligatorias (definición / fórmula / inputs / helper canonical / agregado canonical / semántica edge / estados / threshold / writeback / histórico / cross-refs / open questions). **Este doc (Contrato) queda como narrativa de negocio + contratos cross-métrica** (Revenue Enabled, palancas, CSC, tier matrix, policy observed/range/estimated). Referencia los specs canonicalmente sin duplicar definiciones de métrica individual.
 
-**4 specs canonical Accepted al cierre de la sesión 2026-05-17**:
+**14 specs canonical Accepted al cierre de la sesión 2026-05-17 (cont.)** — paquete completo en sesión doc-only extendida:
 
-- [`metrics/RPA_V1.md`](metrics/RPA_V1.md) — RpA (Rounds per Asset). Source canonical = `countCorrectionTransitions` (TASK-908). Writeback V1 = TASK-901.
-- [`metrics/FTR_V1.md`](metrics/FTR_V1.md) — FTR (First-Time Right). Delega a `calculateRpa === 0`. Helper V1 = TASK-909. Writeback futura = TASK-903.
-- `metrics/THROUGHPUT_V1.md` — Throughput mensual (monthly_count canonical, resuelve drift Engine doc `weekly_rate / 4`). Creada en TASK-909.
-- `metrics/PIPELINE_VELOCITY_V1.md` — Pipeline Velocity (ratio `completed/(completed+open)`, distinto a Throughput). Creada en TASK-909.
+- **Cluster A — Quality core**: [`metrics/RPA_V1.md`](metrics/RPA_V1.md), [`metrics/FTR_V1.md`](metrics/FTR_V1.md)
+- **Cluster B — Delivery compliance**: [`metrics/OTD_V1.md`](metrics/OTD_V1.md), [`metrics/CT_SLO_PCT_V1.md`](metrics/CT_SLO_PCT_V1.md), [`metrics/CUMPLIMIENTO_V1.md`](metrics/CUMPLIMIENTO_V1.md)
+- **Cluster C — Velocidad operativa**: [`metrics/CYCLE_TIME_V1.md`](metrics/CYCLE_TIME_V1.md), [`metrics/CYCLE_TIME_VARIANCE_V1.md`](metrics/CYCLE_TIME_VARIANCE_V1.md), [`metrics/THROUGHPUT_V1.md`](metrics/THROUGHPUT_V1.md), [`metrics/PIPELINE_VELOCITY_V1.md`](metrics/PIPELINE_VELOCITY_V1.md)
+- **Cluster D — Health / saturation**: [`metrics/CSC_DISTRIBUTION_V1.md`](metrics/CSC_DISTRIBUTION_V1.md), [`metrics/STUCK_ASSETS_V1.md`](metrics/STUCK_ASSETS_V1.md), [`metrics/STUCK_ASSET_PCT_V1.md`](metrics/STUCK_ASSET_PCT_V1.md), [`metrics/OCF_V1.md`](metrics/OCF_V1.md)
+- **Cluster E — Revenue Enabled palancas**: [`metrics/ITERATION_VELOCITY_V1.md`](metrics/ITERATION_VELOCITY_V1.md), [`metrics/BCS_V1.md`](metrics/BCS_V1.md), [`metrics/TTM_V1.md`](metrics/TTM_V1.md)
 
-**9 specs pendientes** (strangler migration — emergerán cuando cada task toque la métrica): OTD, Cumplimiento, Cycle Time, CT SLO%, Iteration Velocity, BCS, TTM. Ver [`metrics/METRICS_INDEX.md`](metrics/METRICS_INDEX.md) para status maestro.
+**14 de 14 métricas críticas con spec canonical Accepted**. Ver [`metrics/METRICS_INDEX.md`](metrics/METRICS_INDEX.md) para índice maestro + status writeback per métrica.
+
+**Cluster decisión canonical 2026-05-17 cubierto**:
+
+- Decisión semántica corrección (sección G) → embebida en `RPA_V1.md` §1+§2+§6 + `FTR_V1.md` §1+§2 (delegación)
+- 4 decisiones canonical Cycle Time (sección C) → embebidas en `CYCLE_TIME_V1.md` §2.2
+- Separación canonical OTD% vs CT SLO% (sección D) → 2 specs separados con sección 6.1+6.5 cross-distinction
+- Dual-meaning Cumplimiento (sección A.3) → embebida en `CUMPLIMIENTO_V1.md` §1.1+§1.2
+- Gap B.2 estados Sky → `CSC_DISTRIBUTION_V1.md` §3.3 documenta el fix (TASK-908 Slice 7)
+- Drift Engine doc throughput/pipeline velocity → resuelto en `THROUGHPUT_V1.md` §6.1 + `PIPELINE_VELOCITY_V1.md` §6.1
+- Revenue Enabled palancas narrative-level → 3 specs cluster E (TASK-218/219/220 source policy preservada)
 
 **Reglas canonical de migración**:
 
