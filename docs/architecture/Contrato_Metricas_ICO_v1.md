@@ -240,9 +240,117 @@ Las decisiones C.1, C.2, C.3, C.4 + separación D requieren infra nueva (status 
 
 Spec canonical referenciada: `docs/tasks/to-do/TASK-908-ico-status-transition-tracking-canonical-cycle-time.md` (creada en misma sesión 2026-05-17).
 
-### F) Evidencia citada de esta sesión
+### F) Ownership boundary canonical — Notion = Task OS, ICO Engine = motor exclusivo de métricas (NUEVO 2026-05-17)
 
-### D) Evidencia citada de esta sesión
+**Decisión arquitectónica canonical** (formalizada en ADR `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md`):
+
+- **Notion** queda como **Task Operating System**: captura datos operativos primitivos (asignación, fechas, estado, tipo de entregable, archivos), recibe transiciones de estado, sirve como UI de gestión del operador.
+- **Greenhouse ICO Engine** queda como **motor exclusivo de cómputo** de TODAS las métricas (RpA, OTD, FTR, Cumplimiento, Cycle Time, Throughput, Pipeline Velocity, BCS, TTM, Iteration Velocity, futuras).
+- **Greenhouse devuelve los valores computados a Notion vía bulk PATCH** a propiedades `[GH] <métrica>` read-only para que el operador siga viendo las métricas live en la UI Notion (la única superficie de gestión operativa hoy).
+
+**Por qué este boundary** (5 razones canonical):
+
+1. Fórmulas como propiedades Notion son frágiles — cualquier operador puede romperlas sin git history, tests, code review, observabilidad. Bug TASK-877 follow-up 2026-05-16 lo demostró (3,168 tareas Sky con `rpa=null` 10 meses sin que nadie se enterara).
+2. Greenhouse ya tiene el stack (tests, git, code review, captureWithDomain, reliability signals, outbox pattern, materializer) — mover el compute es reusar infra canonical.
+3. Notion sigue siendo UI de gestión — operadores NO pierden funcionalidad, ven `[GH] <métrica>` live con latencia 5-30s post-edit.
+4. Las métricas se vuelven observables, auditables, versionables (cada compute deja audit row + outbox event + reliability signal).
+5. Una sola fuente de cómputo elimina drift cross-surface (Notion vs `metric-registry.ts` vs BQ views).
+
+**Hard rules canonical** (subset, ver ADR completo):
+
+- NUNCA introducir propiedad formula nueva en Notion para calcular una métrica ICO. Toda métrica nueva nace en Greenhouse code.
+- NUNCA modificar/editar fórmula Notion existente sin coordinar con helper canonical en Greenhouse.
+- NUNCA computar métrica ICO leyendo propiedad Notion como input cuando esa propiedad sea derivable de eventos canonical (transitions, fechas).
+- NUNCA consumer downstream recomputa métrica inline. Toda lectura pasa por columna materializada o helper canonical.
+
+**Migración progresiva canonical** (strangler pattern):
+
+| Fase | Métrica | Task | Status |
+|---|---|---|---|
+| Foundation | Status transition tracking | TASK-908 | En diseño 2026-05-17 |
+| V1 | RpA (writeback completo del pattern) | TASK-901 | En diseño 2026-05-17 |
+| V2 | OTD writeback | TASK-902 (futuro) | Backlog |
+| V3 | FTR writeback (delega a calculateRpa) | TASK-903 (futuro) | Backlog post TASK-909 |
+| V4 | Cumplimiento writeback | TASK-904 (futuro) | Backlog |
+| V5+ | Throughput, Cycle Time SLO%, Pipeline Velocity writebacks | TBD | Backlog |
+| V6+ | BCS, TTM (AI-derived) | TASK-910 + futura TTM | Backlog |
+
+Cada Vn ship con shadow mode mínimo 7 días verde antes de activar writeback. Después del writeback, las fórmulas Notion originales se mantienen en paralelo 7-14 días más para paridad cross.
+
+### G) Semántica canonical de "corrección" para RpA / FTR (NUEVO 2026-05-17)
+
+Consecuencia de la decisión F: RpA y FTR dejan de depender de la propiedad Notion `Correcciones` rollup y pasan a computarse desde el **status history canonical** capturado por TASK-908.
+
+**Definición canonical**:
+
+> **1 corrección = 1 transición `Listo para revisión → En Feedback`** en el status history de la tarea.
+
+No es ronda interna del equipo. No es comentario sin resolver. No es review del workflow team. Es específicamente **"el cliente vio el entregable y pidió cambios"**, observado como evento de transición de estado.
+
+**Helper canonical**: `countCorrectionTransitions(taskId)` vive en TASK-908 foundation (`src/lib/notion-metrics/count-correction-transitions.ts`). Lee `greenhouse_delivery.task_status_transitions` capturada vía webhook Notion.
+
+**Re-shape de helpers downstream**:
+
+- `calculateRpa(taskId)` (TASK-901 Slice 1) **delega a** `countCorrectionTransitions(taskId)`. NO lee propiedad Notion `Correcciones`.
+- `calculateFtr(taskId)` (TASK-909 Slice 1) **delega a** `calculateRpa(taskId) === 0`. NO duplica lógica.
+
+**Casos edge canonical**:
+
+| Escenario | Cuenta como corrección? | Justificación |
+|---|---|---|
+| Listo para revisión → En Feedback | **Sí** (+1) | El cliente vio el entregable y pidió cambios |
+| En Feedback → Listo para revisión (re-submit) | No | Colaborador re-entregando, no rechazo del cliente |
+| En curso → En Feedback (sin pasar por revisión) | No | Trabajo en progreso, no rechazo |
+| Listo para revisión → Completado/Aprobado | No | Aprobación directa, RpA=0 para esa tarea |
+| Listo para revisión → En curso (sin feedback) | No | Colaborador decidió retomar sin envío al cliente |
+
+**Forward-compat Frame.io** (cuando exista la integración):
+
+`calculateRpa` extiende inputs **sin breaking change** — el helper combina:
+
+- `correctionTransitionsCount` (siempre, fuente primaria)
+- `clientReviewOpen` (Frame.io, opcional)
+- `workflowReviewOpen` (Frame.io, opcional)
+- `openFrameComments` (Frame.io, opcional)
+
+Sin Frame.io (hoy), `calculateRpa = correctionTransitionsCount`. Con Frame.io (futuro), `calculateRpa` puede sumar señales adicionales bajo policy a definir.
+
+**Workflow team rounds (internal review)**:
+
+NO cuentan para RpA. RpA es exclusivamente rondas de **cliente**. Si emerge necesidad de medir internal review rounds, se reporta en métrica separada `IRR` (Internal Review Rounds) en paralelo, no agregada a RpA.
+
+**Implicación para TASK-901**:
+
+El scope de TASK-901 Slice 1 (helper canonical `calculateRpa`) cambia: en vez de leer propiedad Notion `Correcciones`, lee el conteo de transiciones canonical. **Esto vuelve TASK-908 prerequisite arquitectónico de TASK-901**. Orden canonical de ship: TASK-908 Slices 0-3 (foundation transitions + helper countCorrectionTransitions) → TASK-901 Slice 1 (calculateRpa delega) → resto de TASK-901 (webhook + Cloud Tasks + writeback).
+
+**Implicación para TASK-909**:
+
+FTR V1 ship con `calculateFtr(taskId) = calculateRpa(taskId) === 0`. NO ship con motor compuesto de 5 señales (Frame.io 4 de las 5 NO existe hoy). Cuando Frame.io exista, `calculateRpa` se extiende (no `calculateFtr`) y FTR se beneficia automático.
+
+### H) Migración progresiva a specs canonical por métrica (NUEVO 2026-05-17)
+
+**Decisión arquitectónica canonical** (formalizada en ADR `GREENHOUSE_METRIC_SPEC_PATTERN_V1.md`):
+
+Cada métrica crítica de delivery tiene su **spec canonical dedicado** en `docs/architecture/metrics/<METRIC>_V1.md` con 12 secciones obligatorias (definición / fórmula / inputs / helper canonical / agregado canonical / semántica edge / estados / threshold / writeback / histórico / cross-refs / open questions). **Este doc (Contrato) queda como narrativa de negocio + contratos cross-métrica** (Revenue Enabled, palancas, CSC, tier matrix, policy observed/range/estimated). Referencia los specs canonicalmente sin duplicar definiciones de métrica individual.
+
+**4 specs canonical Accepted al cierre de la sesión 2026-05-17**:
+
+- [`metrics/RPA_V1.md`](metrics/RPA_V1.md) — RpA (Rounds per Asset). Source canonical = `countCorrectionTransitions` (TASK-908). Writeback V1 = TASK-901.
+- [`metrics/FTR_V1.md`](metrics/FTR_V1.md) — FTR (First-Time Right). Delega a `calculateRpa === 0`. Helper V1 = TASK-909. Writeback futura = TASK-903.
+- `metrics/THROUGHPUT_V1.md` — Throughput mensual (monthly_count canonical, resuelve drift Engine doc `weekly_rate / 4`). Creada en TASK-909.
+- `metrics/PIPELINE_VELOCITY_V1.md` — Pipeline Velocity (ratio `completed/(completed+open)`, distinto a Throughput). Creada en TASK-909.
+
+**9 specs pendientes** (strangler migration — emergerán cuando cada task toque la métrica): OTD, Cumplimiento, Cycle Time, CT SLO%, Iteration Velocity, BCS, TTM. Ver [`metrics/METRICS_INDEX.md`](metrics/METRICS_INDEX.md) para status maestro.
+
+**Reglas canonical de migración**:
+
+- Cuando una task toca métrica sin spec canonical, **primer slice de la task crea el spec** antes de tocar código. Sin spec previo = trabajo no canonical.
+- Las secciones acá (Contrato) que definen métrica individual van migrando progresivamente a **cross-refs al spec canonical** + 2-3 líneas de narrativa de negocio. NO se borran de un golpe.
+- Si emerge drift entre Contrato/Engine doc vs spec canonical, **el spec canonical gana**.
+
+**Disparador de la decisión**: pre-2026-05-17, entender una métrica como RpA requería leer 6 fuentes distintas (Contrato + Delta + Engine doc + código + 2 tasks) — fragmentación insostenible para métricas contractuales con clientes/equipo/management.
+
+### I) Evidencia citada de esta sesión
 
 - **Notion MCP fetch** del Sky Tasks DB schema 2026-05-17: data source `23039c2f-efe7-81f8-af2d-000b67594d18`, page `23039c2f-efe7-8138-9d1e-c8238fc40523`, teamspace Sky Airlines `22d39c2f-efe7-8142-a645-00427b6a67d5`.
 - **Sibling Efeonce Tasks DB** (formula IDs compartidos, mismo template canonical): data source `5126d7d8-bf3f-454c-80f4-be31d1ca38d4`, page `3a54f090-4be1-4158-8335-33ba96557a73`.

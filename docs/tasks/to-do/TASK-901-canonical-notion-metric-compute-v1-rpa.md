@@ -15,7 +15,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|platform|reliability`
-- Blocked by: `Discovery slice (3 verifications) precede Slice 1`
+- Blocked by: `TASK-908 Slices 0-3.5 (Status Transition Foundation + countCorrectionTransitions helper) — prerequisito arquitectónico canonical (ADR GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1 2026-05-17). Plus Discovery slice (3 verifications) que precede Slice 1.`
 - Branch: `task/TASK-901-canonical-notion-metric-compute-v1-rpa`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -107,6 +107,7 @@ Reglas obligatorias canonical:
 
 ### Depends on
 
+- **TASK-908 Slices 0-3.5 SHIPPED (PREREQUISITO ARQUITECTÓNICO CANONICAL)** — ADR `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1` 2026-05-17. El helper `calculateRpa` Slice 1 consume `countCorrectionTransitions(taskSourceId)` que vive en TASK-908. Sin esto, Slice 1 caería en el anti-patrón legacy de leer Notion property `Correcciones` rollup (bug class TASK-877 follow-up). Orden canonical de ship: TASK-908 Slices 0-3.5 → TASK-901 Slice 1 puede arrancar → resto de TASK-901 secuencial.
 - BQ snapshot canonical ya ejecutado 2026-05-17 01:41 UTC en `ico_engine_backup.metrics_by_*_20260517_014155` (defense-in-depth pre-cualquier cambio futuro)
 - Notion internal integration token canonical almacenado en GCP Secret Manager como `notion-integration-token-greenhouse-metrics` (parte de S0)
 - HMAC webhook signing secret almacenado como `notion-webhook-signing-secret-<workspace>` (parte de S0)
@@ -224,15 +225,45 @@ Tests obligatorios a verificar antes de comprometer el scope final. Cualquiera d
 
 ### Slice 1 — Canonical helper + lint rule
 
+> **RESHAPED 2026-05-17** (ADR `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1` + Contrato Delta sección G). El helper `calculateRpa` ya NO lee la propiedad Notion `Correcciones` rollup (anti-patrón legacy frágil que motivó el bug class TASK-877 follow-up). **Source canonical**: `countCorrectionTransitions(taskSourceId)` definido en **TASK-908 Slice 3.5** que cuenta transiciones `Listo para revisión → En Feedback` desde `greenhouse_delivery.task_status_transitions`. Esto vuelve **TASK-908 Slices 0-3.5 prerequisito arquitectónico de este Slice 1**.
+
 - Crear `src/lib/notion-metrics/calculate-rpa.ts` con:
-  - Tipo `TaskInputsForRpa` (`reviewSource`, `clientChangeRound`, `workflowChangeRound`, `correccionesCount`)
-  - Tipo `RpaResult` (`value: number | null`, `dataStatus`, `inputsUsed`, `formulaVersion`)
-  - Pure function `calculateRpa(inputs: TaskInputsForRpa): RpaResult`
-  - Constant `RPA_FORMULA_VERSION = 'rpa_v1.0'`
-- Tests pure mínimo 8 paths: happy frame_io, happy workflow, happy auto/correcciones, all nulls, review_source undefined, partial inputs, negative values, edge cases.
-- Lint rule `eslint-plugins/greenhouse/rules/no-inline-rpa-calculation.mjs` modo `warn` durante migración. Override block exime `src/lib/notion-metrics/calculate-rpa.ts` + tests.
+  - Tipo `TaskInputsForRpa` (V1.0 simple):
+
+    ```typescript
+    type TaskInputsForRpa = {
+      taskSourceId: string                  // Notion page ID, para lookup en task_status_transitions
+      windowStart?: Date | null             // opcional: contar solo correcciones en ventana
+      windowEnd?: Date | null
+      // Forward-compat Frame.io (V2 cuando integración exista — hoy null/ausente):
+      clientReviewOpen?: boolean | null
+      workflowReviewOpen?: boolean | null
+      openFrameComments?: number | null
+    }
+    ```
+
+  - Tipo `RpaResult` (`value: number | null`, `dataStatus`, `inputsUsed`, `formulaVersion`, `sourceMode`)
+  - Async function `calculateRpa(inputs: TaskInputsForRpa): Promise<RpaResult>`:
+    - V1.0 lógica canonical: `const result = await countCorrectionTransitions({ taskSourceId, windowStart, windowEnd })` (helper de TASK-908) — `value = result.count`, `sourceMode = result.sourceMode`.
+    - Cuando `sourceMode === 'unavailable'` (tarea pre-TASK-908 deployment sin transitions capturadas), `dataStatus='unavailable'` + `value=null`. NUNCA fallback a leer Notion `Correcciones` rollup — eso reintroduce el anti-patrón.
+    - Forward-compat V2 Frame.io: cuando `clientReviewOpen` / `workflowReviewOpen` / `openFrameComments` estén poblados, helper combina señales bajo policy a definir en TASK derivada (V1 los ignora silenciosamente).
+  - Constant `RPA_FORMULA_VERSION = 'rpa_v1.0'` (bump a `v2.0` cuando Frame.io signals se incorporen).
+- Tests mínimo 8 paths (mock `countCorrectionTransitions`):
+  1. Happy: tarea con 0 transitions correctivas → `value=0`, `sourceMode='canonical'`, `dataStatus='valid'`
+  2. Happy: tarea con 1 transición → `value=1`
+  3. Happy: tarea con 5 transiciones → `value=5`
+  4. Window filter: 3 transiciones, 2 dentro de ventana → `value=2`
+  5. Edge: tarea pre-TASK-908 (sourceMode='unavailable') → `value=null`, `dataStatus='unavailable'`
+  6. Edge: taskSourceId vacío/inválido → `value=null`, `dataStatus='unavailable'`
+  7. Forward-compat V2 ignore: `clientReviewOpen=true` pasado pero V1 lo ignora → mismo result que sin el campo
+  8. Idempotencia: 2 invocaciones consecutivas con mismos inputs → mismo result (sin side effects)
+- Lint rule `eslint-plugins/greenhouse/rules/no-inline-rpa-calculation.mjs` modo `warn` durante migración. Override block exime `src/lib/notion-metrics/calculate-rpa.ts` + tests. Detecta también el anti-patrón legacy `prop.Correcciones.rollup.number` y `formula.number` leyendo property `RpA` directo de Notion.
 - Barrel export `src/lib/notion-metrics/index.ts` server-only.
 - Cero side effects en este slice — solo helper + tests + lint.
+
+**Implicación crítica de orden de ship**:
+
+Este Slice 1 NO puede arrancar hasta que TASK-908 Slices 0-3.5 hayan shippeado a develop con `countCorrectionTransitions` helper verde + tabla `task_status_transitions` poblada (al menos con webhook capture activo + algunas tareas con transitions reales). Para tareas pre-TASK-908 deployment, este Slice 1 retornará `dataStatus='unavailable'` legítimamente (no es bug — es honestidad operativa). El backfill histórico de transitions vive en TASK-908 Slice 9.
 
 ### Slice 0 (renumerado, ship junto con S1) — Foundation
 

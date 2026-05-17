@@ -1,4 +1,8 @@
-# TASK-908 — ICO Status Transition Tracking + Canonical Cycle Time + CT SLO% + status hygiene gaps
+# TASK-908 — ICO Status Transition Foundation + Canonical Cycle Time + CT SLO% + correction counter + status hygiene gaps
+
+> **REPOSICIÓN 2026-05-17**: esta TASK pasó de ser "Cycle Time only" a ser la **Foundation de Status Transition Tracking** que sostiene TODO el motor canonical de métricas ICO basado en eventos observables (RpA, FTR, Cycle Time canonical). **Es prerequisito arquitectónico de TASK-901**. La capa de `task_status_transitions` que esta TASK construye sirve también como input para `countCorrectionTransitions(taskId)` (helper canonical reusable por `calculateRpa` en TASK-901 y `calculateFtr` en TASK-909).
+>
+> Pre-condición canonical: `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` (ADR 2026-05-17). Notion deja de ser source of truth de fórmulas ICO; Greenhouse computa todas las métricas desde events canonical y devuelve valores vía writeback.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -22,7 +26,18 @@
 
 ## Summary
 
-Paquete combinado de 5 entregables que comparten la misma capa de **status taxonomy + status transition capture** en el motor ICO: (1) infra nueva para capturar timestamps de transiciones de estado en Notion tasks (hoy NO existe), (2) helper canonical `calculateCycleTime()` con las 4 decisiones canonizadas en sesión 2026-05-17 (inicio = "En curso", fin = `Fecha de completado`, feedback time SÍ cuenta, Bloqueado NO cuenta), (3) nueva métrica canonical `CT SLO%` (% tareas con cycle_time ≤ threshold industria, separada de OTD%), (4) fix B.1 del Delta 2026-05-17 (excluir `Bloqueado`/`Detenido` del denominador de OTD/RpA/FTR), (5) fix B.2 del Delta 2026-05-17 (mapear estados Sky-specific `Tomado`/`Listo para revisión`/`En feedback`/`Aprobado` a CSC canonical). Plus housekeeping: actualizar `Greenhouse_ICO_Engine_v1.md` para reflejar la separación canonical OTD% (promise compliance) vs CT SLO% (competitive benchmark) y resolver drift documental detectado.
+Foundation de **Status Transition Tracking + helpers canonical reusables** que sostiene el motor ICO completo de métricas basadas en eventos observables (RpA, FTR, Cycle Time canonical). Paquete combinado de 6 entregables que comparten la misma capa subyacente de status taxonomy + status transition capture:
+
+1. **Infra canonical de status transition capture** (Slices 0-3): tabla append-only `greenhouse_delivery.task_status_transitions` + webhook ingestion + outbox + reactive consumer. Hoy NO existe — Notion solo expone `last_edited_time` (sobreescrito).
+2. **Helper canonical `countCorrectionTransitions(taskId)`** (Slice 3.5 NUEVO): consumido por TASK-901 `calculateRpa` + TASK-909 `calculateFtr`. **Desbloquea TASK-901 arquitectónicamente** — sin esto, TASK-901 caería en el anti-patrón legacy de leer Notion property `Correcciones` (bug class TASK-877 follow-up).
+3. **Helper canonical `calculateCycleTime()`** (Slice 1) con las 4 decisiones canonizadas en sesión 2026-05-17 (inicio = "En curso", fin = `Fecha de completado`, feedback time SÍ cuenta, Bloqueado NO cuenta).
+4. **Nueva métrica canonical `CT SLO%`** (Slice 5): % tareas con cycle_time ≤ threshold industria, separada de OTD%.
+5. **Fix B.1** (Slice 6): excluir `Bloqueado`/`Detenido` del denominador de OTD/RpA/FTR.
+6. **Fix B.2** (Slice 7): mapear estados Sky-specific `Tomado`/`Listo para revisión`/`En feedback`/`Aprobado` a CSC canonical.
+
+Plus housekeeping (Slice 8): actualizar `Greenhouse_ICO_Engine_v1.md` para reflejar separación canonical OTD% (promise compliance) vs CT SLO% (competitive benchmark) y resolver drift documental detectado.
+
+**Esta TASK es prerequisito arquitectónico de TASK-901** (decisión canonical 2026-05-17, ADR `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1`). Orden canonical de ship: TASK-908 Slices 0-3.5 (foundation transitions + countCorrectionTransitions) → TASK-901 Slice 1 (calculateRpa delega) → resto de TASK-901 (webhook + Cloud Tasks + writeback) → TASK-909 (FTR + Throughput + Pipeline Velocity definitions).
 
 ## Why This Task Exists
 
@@ -110,14 +125,19 @@ Reglas obligatorias canonical:
 - **`metrics_by_*` materialized**: cambio en `cycle_time_days` fórmula causa cambio en aggregados downstream (`cycle_time_avg_days`, `cycle_time_p50_days`, `cycle_time_variance`). Recovery requiere full re-materialization post-cambio.
 - **Person 360 + Pulse + ICO scorecards**: CSC distribution charts mejoran para Sky tras fix B.2.
 - **OTD% / RpA / FTR**: denominadores cambian post-fix B.1 (excluyendo Bloqueado). Tareas previamente contaminadas dejan de contar → métricas SUBEN ligeramente (efecto esperado, no bug).
-- **TASK-901 (RpA writeback)**: complementario. Esta TASK y TASK-901 comparten infra de webhook ingestion + outbox + consumer. Idealmente shippean en orden: TASK-901 Discovery + Slice 0 + 1 primero (foundation común), después TASK-908 extiende reusing.
-- **TASK-902/903/904 (OTD/FTR/Cumplimiento writebacks futuros)**: si emergen, beneficiados por la infra de status transition ya canonizada acá.
+- **TASK-901 (RpA writeback) — ARQUITECTÓNICAMENTE BLOQUEADA POR ESTA TASK** (decisión canonical 2026-05-17, ADR `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1`). El helper `calculateRpa(taskId)` consume `countCorrectionTransitions(taskId)` definido en Slice 3.5 de esta TASK. Sin TASK-908 Slices 0-3.5, TASK-901 quedaría leyendo la propiedad Notion `Correcciones` rollup (anti-patrón legacy frágil — bug class TASK-877 follow-up). **Orden canonical de ship**: TASK-908 Slices 0-3.5 (foundation transitions + helper countCorrectionTransitions) → TASK-901 Slice 1 puede arrancar.
+- **TASK-909 (FTR canonical) — ARQUITECTÓNICAMENTE BLOQUEADA por TASK-901 Slice 1**: FTR delega a calculateRpa que a su vez delega a countCorrectionTransitions. Cadena de dependencia: TASK-908 → TASK-901 Slice 1 → TASK-909 Slice 1.
+- **TASK-902/903/904 (OTD/FTR/Cumplimiento writebacks futuros)**: si emergen, beneficiados por la infra de status transition ya canonizada acá. TASK-903 (FTR writeback) reusa directamente helpers de TASK-901 + countCorrectionTransitions.
 
 ### Files owned
 
 - `src/lib/notion-metrics/calculate-cycle-time.ts` — NEW: helper canonical `calculateCycleTime()` pure + tests
 - `src/lib/notion-metrics/calculate-cycle-time.test.ts` — NEW: tests pure (12+ paths)
 - `src/lib/notion-metrics/cycle-time-types.ts` — NEW: `TaskInputsForCycleTime`, `CycleTimeResult` types
+- `src/lib/notion-metrics/count-correction-transitions.ts` — NEW (Slice 3.5): helper canonical `countCorrectionTransitions()` que consume `task_status_transitions`
+- `src/lib/notion-metrics/count-correction-transitions.test.ts` — NEW (Slice 3.5): tests (10+ paths cubriendo edge cases canonical semántica)
+- `src/lib/reliability/queries/notion-correction-transitions-source-availability.ts` — NEW (Slice 3.5): signal data_quality coverage
+- `eslint-plugins/greenhouse/rules/no-inline-correction-counting.mjs` — NEW (Slice 3.5): lint rule modo warn durante migración TASK-901
 - `src/lib/notion-metrics/cycle-time-slo-config.ts` — NEW: threshold configuration (default 14.2, calibrable per tipo de pieza)
 - `src/lib/webhooks/handlers/notion-status-transitions.ts` — NEW: webhook handler para `Estado 1` property changes
 - `src/app/api/webhooks/notion-status-transitions/route.ts` — NEW: Vercel route handler thin wrapper (puede share con TASK-901 endpoint si emerge canonical decision)
@@ -242,6 +262,66 @@ Reglas obligatorias canonical:
   - INSERT row en `greenhouse_delivery.task_status_transitions`
   - Idempotency: UNIQUE constraint `(task_source_id, source_event_id)` o equivalent
 - Wire-up en ops-worker reactive processor
+
+### Slice 3.5 — Helper canonical `countCorrectionTransitions` (DESBLOQUEA TASK-901)
+
+Esta sub-slice convierte la tabla de transitions en la **fuente canonical de RpA** consumida por TASK-901 + TASK-909. Sin ella, TASK-901 no puede shipear su Slice 1 (`calculateRpa` queda sin source confiable y caería en el anti-patrón legacy de leer Notion property `Correcciones`).
+
+Decisión canonical: la lógica de "contar correcciones" vive aquí (TASK-908), no en TASK-901 ni TASK-909. Ambos consumen el helper. Single source of truth por construcción.
+
+- Crear `src/lib/notion-metrics/count-correction-transitions.ts`:
+  ```typescript
+  type CountCorrectionTransitionsInput = {
+    taskSourceId: string
+    windowStart?: Date | null  // opcional: si se quiere contar solo correcciones en una ventana
+    windowEnd?: Date | null
+  }
+
+  type CountCorrectionTransitionsResult = {
+    count: number              // # transiciones 'Listo para revisión' → 'En Feedback' en la ventana
+    transitions: Array<{
+      transitionedAt: Date
+      transitionedBy: string | null
+    }>
+    sourceMode: 'canonical' | 'unavailable'  // canonical = data observada; unavailable = pre-TASK-908 backfill
+  }
+
+  countCorrectionTransitions(input: CountCorrectionTransitionsInput): Promise<CountCorrectionTransitionsResult>
+  // Lógica canonical (semántica Delta 2026-05-17 sección G):
+  // SELECT * FROM greenhouse_delivery.task_status_transitions
+  // WHERE task_source_id = $1
+  //   AND from_status = 'Listo para revisión'
+  //   AND to_status = 'En Feedback'
+  //   AND ($2::timestamptz IS NULL OR transitioned_at >= $2)
+  //   AND ($3::timestamptz IS NULL OR transitioned_at <= $3)
+  // ORDER BY transitioned_at ASC
+  ```
+
+- Casos canonical canonical cubiertos en tests (mínimo 10 paths):
+  - Happy: 0 transitions → count=0
+  - Happy: 1 transición Listo→Feedback → count=1
+  - Happy: 3 transiciones Listo→Feedback (oscilación múltiple) → count=3
+  - Edge: transición En curso → En Feedback (sin pasar por Listo) → NO cuenta
+  - Edge: transición En Feedback → Listo para revisión (re-submit colaborador) → NO cuenta (es la transición inversa)
+  - Edge: transición Listo → Completado/Aprobado (sin Feedback) → NO cuenta
+  - Edge: window filter: 2 transiciones, 1 dentro de ventana, 1 fuera → count=1
+  - Edge: taskSourceId inexistente → count=0, sourceMode='unavailable'
+  - Edge: tarea pre-TASK-908 deployment (NO hay rows en transitions) → count=0, sourceMode='unavailable'
+  - Edge: Sky DB usa `En feedback` lowercase vs Efeonce `En Feedback` capitalizado → normalizar comparison case-insensitive (el helper debe tolerar ambas)
+
+- Reliability signal `notion-correction-transitions-source-availability.ts`:
+  - kind=`data_quality`, severity=`warning` si % tareas con sourceMode=`unavailable` > 10% en últimos 30 días
+  - Detecta tareas que TASK-908 webhook NO capturó (pre-deployment, edits batch que no dispararon webhook, etc.)
+  - Steady state esperado post-backfill (Slice 9): < 5%
+
+- Lint rule `greenhouse/no-inline-correction-counting`:
+  - Modo `warn` durante migración TASK-901
+  - Detecta SQL embedded que cuente `to_status='En Feedback'` inline en consumers
+  - Override block exime el helper canonical + tests
+
+**Implicación para TASK-901 Slice 1**: el helper `calculateRpa(taskId)` se reduce a `(await countCorrectionTransitions({taskSourceId})).count`. Eso resuelve el anti-patrón legacy de depender de la propiedad Notion `Correcciones` editable por operadores.
+
+**Implicación para TASK-909 Slice 1**: el helper `calculateFtr(taskId)` se reduce a `(await calculateRpa(taskId)).value === 0`. Delegación pura, sin lógica propia.
 
 ### Slice 4 — Actualizar fórmula `cycle_time_days` en BQ view
 

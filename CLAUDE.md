@@ -3844,6 +3844,74 @@ Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct
 
 **Spec canónica**: `src/lib/identity/reconciliation/notion-member-map.ts` (resolver canónico, post-TASK-877). Signal canónico: `identity.notion_bridge.coverage_drift` en `src/lib/reliability/queries/identity-notion-bridge-coverage.ts`. Migration fuente: `migrations/20260516234743277_backfill-notion-bridge-greenhouse-staff.sql`. Patrones fuente: TASK-742 (defense-in-depth 7-layer), TASK-720 (`instrumentCategoriesWithoutKpiRule` detector), TASK-571/766/774 (VIEW canónica + helper + signal).
 
+### Delivery Metrics Ownership Boundary invariants (TASK-901 + TASK-908 + TASK-909, desde 2026-05-17)
+
+**Notion = Task Operating System. Greenhouse ICO Engine = motor exclusivo de cómputo de métricas.** Notion captura datos operativos primitivos (asignación, fechas, estado, tipo de entregable, archivos) y sirve como UI de gestión. Greenhouse computa TODAS las métricas (RpA, OTD, FTR, Cumplimiento, Cycle Time, Throughput, Pipeline Velocity, BCS, TTM, Iteration Velocity, futuras) desde eventos canonical y escribe los valores de vuelta a Notion vía bulk PATCH a propiedades `[GH] <métrica>` read-only.
+
+**Bug class disparador** (TASK-877 follow-up 2026-05-16): 3,168 tareas Sky en 10 meses con `rpa=null` 100% — la fórmula `RpA` vivía como propiedad formula Notion editable por cualquier operador, sin git history, tests, code review ni observabilidad. El sync `notion-bq-sync` perdía el valor silenciosamente y nadie se enteraba hasta que un usuario reportó UI rota.
+
+**Pipeline canonical**:
+
+```text
+Notion edit (operador) → webhook canonical (HMAC + echo-loop filter)
+  → outbox event → ops-outbox-publish (TASK-773)
+  → reactive consumer en ops-worker
+  → ICO Engine canonical compute (calculate<Metric>(taskId) en Greenhouse code)
+  → Cloud Tasks throttled (vs Notion rate limit 3 req/sec)
+  → PATCH /v1/pages/bulk (Notion-Version 2026-02-01, up to 100 pages)
+  → propiedades [GH] <métrica> updated en Notion
+  → operador ve métrica live en UI Notion
+```
+
+Plus safety net nocturno: Cloud Run Job escanea tareas con `last_edited_time > checkpoint`, recomputa via mismo helper canonical, detecta drift Greenhouse vs Notion-stored, re-writeback.
+
+**Semántica canonical de "corrección"** (TASK-909):
+
+> **1 corrección = 1 transición `Listo para revisión → En Feedback`** en el status history canonical de la tarea.
+
+No es ronda interna, no es comentario sin resolver, no es review del workflow team. Es específicamente "el cliente vio el entregable y pidió cambios", observado como evento de transición de estado capturado por TASK-908.
+
+- `calculateRpa(taskId)` (TASK-901 Slice 1) **delega a** `countCorrectionTransitions(taskId)` (TASK-908). NO lee propiedad Notion `Correcciones`.
+- `calculateFtr(taskId)` (TASK-909 Slice 1) **delega a** `calculateRpa(taskId) === 0`. NO duplica lógica.
+
+Forward-compat Frame.io: cuando exista la integración, `calculateRpa` extiende inputs sin breaking change (combinar `correctionTransitionsCount` + `clientReviewOpen` + `workflowReviewOpen` + `openFrameComments` bajo policy a definir).
+
+**Migración progresiva canonical** (strangler pattern, NO migramos todas las métricas de una vez):
+
+| Fase | Métrica | Task | Status |
+|---|---|---|---|
+| Foundation | Status transition tracking + `countCorrectionTransitions` helper | TASK-908 | En diseño 2026-05-17 |
+| V1 | RpA (writeback completo del pattern) | TASK-901 | En diseño 2026-05-17 |
+| V2 | OTD writeback | TASK-902 (futuro) | Backlog |
+| V3 | FTR writeback (delega a calculateRpa) | TASK-903 (futuro) | Backlog post TASK-909 |
+| V4 | Cumplimiento writeback | TASK-904 (futuro) | Backlog |
+| V5+ | Throughput, Cycle Time SLO%, Pipeline Velocity writebacks | TBD | Backlog |
+| V6+ | BCS, TTM (AI-derived) | TASK-910 + futura TTM | Backlog |
+
+Cada Vn ship con shadow mode mínimo 7 días verde antes de activar writeback. Después del writeback, las fórmulas Notion originales se mantienen en paralelo 7-14 días más para paridad cross.
+
+**⚠️ Reglas duras canonical**:
+
+- **NUNCA** introducir una propiedad formula nueva en Notion para calcular una métrica ICO. Toda métrica nueva nace en Greenhouse code (con tests + reliability signal + writeback).
+- **NUNCA** modificar/editar/reemplazar una fórmula Notion existente de métrica ICO sin coordinar paralelamente con el helper canonical en Greenhouse — la métrica vive en código, Notion es solo display vía writeback.
+- **NUNCA** computar una métrica ICO leyendo otra propiedad Notion como input cuando esa propiedad sea derivable de eventos canonical (transitions, fechas). Ejemplo prohibido: leer Notion `Correcciones` rollup para computar RpA — el RpA canonical viene de `countCorrectionTransitions(taskId)`.
+- **NUNCA** consumer downstream (UI, dashboard, scorecard, report PDF, agente IA) recomputa una métrica ICO inline. Toda lectura pasa por la columna materializada (`v_tasks_enriched.<metric>`, `metrics_by_*.<metric>`) o por el helper canonical (`calculate<Metric>(taskId)`).
+- **NUNCA** invocar `Sentry.captureException()` directo en code paths de compute o writeback de métricas ICO. Usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'metric_compute' | 'metric_writeback', metric: '<name>' } })`.
+- **NUNCA** activar writeback de una métrica nueva sin: (a) feature flag `NOTION_<METRIC>_WRITEBACK_ENABLED` default false, (b) shadow mode 7 días verde, (c) reliability signal `notion.metrics.shadow_paridad_<metric>` steady=0, (d) approval explícito en `Handoff.md` con allowlist de propiedades target Notion.
+- **NUNCA** crear template Notion DB nuevo con formulas de métricas ICO embedded. Templates nuevos declaran solo propiedades primitivas + las propiedades `[GH] <métrica>` (read-only target del writeback). Templates legacy con formulas se mantienen como fallback histórico inactivo.
+- **SIEMPRE** que un input nuevo emerja para una métrica (e.g. Frame.io integration aporta `client_change_round` real para RpA), extender el helper canonical en Greenhouse + agregar tests anti-regresión + NO crear fórmula Notion paralela.
+- **SIEMPRE** que se cree una propiedad Notion `[GH] <métrica>`, documentar en el ADR `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` + DECISIONS_INDEX + spec arquitectónica de la métrica que la propiedad es **read-only para operadores** (solo Greenhouse integration token escribe).
+- **SIEMPRE** TASK-908 (status transition tracking) es prerequisito arquitectónico de cualquier migración Vn que dependa de eventos canonical observados (RpA, FTR, Cycle Time canonical, futuras). NO shipear Vn write-back path antes que TASK-908 Slices 0-3 estén verde.
+
+**Helpers canonical**:
+
+- `countCorrectionTransitions(taskId) → number` — en TASK-908 foundation, lee `greenhouse_delivery.task_status_transitions`
+- `calculateCycleTime(taskId) → CycleTimeResult` — en TASK-908, lee transitions + descuenta Bloqueado
+- `calculateRpa(taskId) → RpaResult` — en TASK-901 Slice 1, delega a `countCorrectionTransitions`
+- `calculateFtr(taskId) → FtrResult` — en TASK-909 Slice 1, delega a `calculateRpa`
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` (ADR canonical). Cross-refs: `docs/architecture/Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 secciones F + G; `docs/architecture/Greenhouse_ICO_Engine_v1.md` (conceptual spec, drift por resolver post-TASK-908/909/901). Patrones fuente: TASK-742 (defense-in-depth 7-layer), TASK-773 (outbox publisher canonical), TASK-771 (decoupling write paths via outbox), TASK-706 (HMAC webhook ingestion), TASK-720 (TS-only declarative reader pattern).
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

@@ -1,3 +1,49 @@
+# Sesion 2026-05-17 (cont.) — ICO metrics canonical spec pattern + boundary ownership ADRs
+
+**Status**: ✅ Doc-only. 2 ADRs canonical creados (boundary ownership Notion ↔ Greenhouse + metric spec pattern), 4 specs canonical por métrica (template + index + RPA_V1 + FTR_V1), reshape TASK-901/TASK-908 + creación TASK-909, sync Contrato + Engine doc Deltas + DECISIONS_INDEX + CLAUDE.md hard rules. Plus hotfix Sentry `JAVASCRIPT-NEXTJS-63` aplicado (commit `3537496c`, ya pusheado al inicio de la sesión).
+
+## Resultado
+
+- **ADR canonical nuevo `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md`** — Notion queda como **Task Operating System** (datos primitivos: asignación, fechas, estado, archivos); Greenhouse ICO Engine queda como **motor exclusivo de cómputo** de todas las métricas (RpA, OTD, FTR, Cumplimiento, Cycle Time, Throughput, Pipeline Velocity, BCS, TTM, Iteration Velocity) con writeback canonical a propiedades `[GH] <métrica>` read-only en Notion. Pipeline canonical: webhook → outbox → reactive consumer → Cloud Tasks → bulk PATCH. Migración progresiva strangler (TASK-908 foundation → TASK-901 RpA → TASK-902+ progresivos).
+- **ADR canonical nuevo `GREENHOUSE_METRIC_SPEC_PATTERN_V1.md`** — 1 métrica crítica = 1 spec canonical en `docs/architecture/metrics/<METRIC>_V1.md` con 12 secciones obligatorias. Pre-decisión, entender una métrica como RpA requería leer 6 fuentes distintas (Contrato + Delta + Engine doc + código + 2 tasks). Post-decisión: spec canonical es single source of truth; Contrato + Engine doc consumen los specs sin redefinir.
+- **Directorio canonical `docs/architecture/metrics/`** con:
+  - `_TEMPLATE.md` — template canonical 12 secciones obligatorias
+  - `METRICS_INDEX.md` — índice maestro 11 métricas con status + writeback state + helper canonical + cross-refs
+  - `RPA_V1.md` — primer spec canonical (RpA via `countCorrectionTransitions`, source canonical = status transitions TASK-908, NO Notion property `Correcciones`)
+  - `FTR_V1.md` — segundo spec canonical (delega a `calculateRpa`, cierra 4 Q semánticas: post-completion only / "completada" depende fix B.2 / helper per-task + SQL agregado coexisten / threshold 85% mantenido)
+- **Semántica canonical de "corrección" canonizada**: 1 corrección = 1 transición `Listo para revisión → En Feedback`. Observable, auditable, immutable. Helper `countCorrectionTransitions(taskId)` en TASK-908 Slice 3.5.
+- **Re-shape canonical TASK-908**: ahora es "Status Transition **Foundation**" (no solo Cycle Time). Slice 3.5 nuevo agrega `countCorrectionTransitions` helper canonical. **Prerequisito arquitectónico de TASK-901**.
+- **Re-shape canonical TASK-901**: `calculateRpa` Slice 1 source = transitions (NO Notion `Correcciones`). Blocked by TASK-908 Slices 0-3.5.
+- **Re-shape canonical TASK-909 (creada en sesión)**: implementa `calculateFtr` (matchea `FTR_V1.md`) + crea `THROUGHPUT_V1.md` + `PIPELINE_VELOCITY_V1.md` specs canonical + Engine doc/Contrato pointer Delta. Bloqueada por TASK-901 Slice 1 + TASK-908.
+- **DECISIONS_INDEX.md** + 2 entries (boundary + metric spec pattern).
+- **`Contrato_Metricas_ICO_v1.md` Delta 2026-05-17** extendido con secciones F (boundary), G (semántica corrección), H (migración a specs canonical), I (evidencia).
+- **`Greenhouse_ICO_Engine_v1.md` Delta 2026-05-17** al inicio con pointer a specs canonical + tabla de 3 drifts resueltos.
+- **CLAUDE.md sección nueva** "Delivery Metrics Ownership Boundary invariants (TASK-901 + TASK-908 + TASK-909, desde 2026-05-17)" con hard rules canonical.
+- **Hotfix Sentry `JAVASCRIPT-NEXTJS-63`** previo a esta sesión doc (commit `3537496c` ya en develop): `identity-notion-bridge-coverage.ts` reader cambió `last_edited_time` → `COALESCE(source_updated_at, updated_at, created_at, NOW())`. 10 tests verde.
+
+## Hallazgos clave
+
+- **Fragmentación documental de métricas críticas** detectada al intentar TASK-909 (FTR drift Engine doc vs código). Pre-decisión una métrica vivía spread entre Contrato + Delta + Engine doc + código + 2 tasks. Insostenible para métricas contractuales con clientes (QBR/CVR), equipo (compensación variable) y management (decisiones operativas). Decisión canonical: 1 métrica = 1 spec.
+- **Boundary canonical**: Notion = task OS; Greenhouse ICO Engine = motor exclusivo de métricas. Operadores siguen viendo métricas live en UI Notion via propiedades `[GH] <métrica>` read-only escritas por Greenhouse vía bulk PATCH. Elimina dependencia de fórmulas Notion editables (bug class TASK-877 follow-up: 3,168 tareas Sky con `rpa=null` 10 meses sin que nadie se enterara).
+- **Decisión semántica canonical de RpA**: 1 corrección = 1 transición `Listo para revisión → En Feedback`. Observable, auditable, immutable. NO depende de fórmula Notion editable.
+- **Strangler migration**: TASK-908 foundation → TASK-901 RpA V1 → TASK-902/903/904 OTD/FTR/Cumplimiento → TASK-905+ resto progresivo. Cada Vn ship con shadow mode 7d verde antes de writeback enabled.
+- **Decisión meta canonical**: el código es source of truth canonical de métrica. Cuando emerge drift entre spec y código, **se actualiza el spec inmediatamente** (no se modifica el código para "matchear" spec viejo).
+
+## Validacion
+
+- Doc-only changes. No corrió build/test runtime — validaciones lógicas vienen de implementación cuando TASK-908/TASK-901/TASK-909 shippeen.
+- Hotfix Sentry validado con `pnpm test src/lib/reliability/queries/identity-notion-bridge-coverage.test.ts` (10/10 verde) + pre-push hook (lint + tsc verde) — ya pusheado.
+- Markdown lint warnings pre-existentes (MD060 + spell-check Spanish) NO bloquean — patrón consolidado.
+
+## Siguientes pasos
+
+- **TASK-908 Slices 0-3.5** son foundation crítica que desbloquea TASK-901 + TASK-909 arquitectónicamente. Cuando se inicie implementación, primer trabajo.
+- **TASK-901 Slice 1** arranca post-TASK-908 verde.
+- **TASK-909** arranca post-TASK-901 Slice 1 verde.
+- **Specs faltantes** (OTD / Cumplimiento / Cycle Time / CT SLO% / Iteration Velocity / BCS / TTM) emergen strangler-mode cuando cada task downstream las toque — no urgente todos a la vez.
+
+---
+
 # Sesion 2026-05-17 — TASK-905 SII Europe withholding discovery + Payroll skill enrichment
 
 **Status**: ✅ Discovery oficial Europa documentado. No se implemento runtime, schema ni catalog seed productivo.
