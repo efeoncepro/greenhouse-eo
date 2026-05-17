@@ -139,7 +139,7 @@ describe('getIdentityNotionBridgeCoverageSignal', () => {
     expect(signal.severity).toBe('error')
   })
 
-  it('SQL filters by recent window + counts both resolved + unresolved distinct', async () => {
+  it('SQL filters by canonical PG projection timestamp + counts both resolved + unresolved distinct', async () => {
     queryMock.mockResolvedValueOnce([
       { total_assigned_tasks: 100, resolved_tasks: 70, distinct_assignees: 5, unresolved_distinct_assignees: 1 }
     ])
@@ -150,7 +150,10 @@ describe('getIdentityNotionBridgeCoverageSignal', () => {
     const sql = queryMock.mock.calls[0][0] as string
 
     expect(sql).toMatch(/greenhouse_delivery\.tasks/)
-    expect(sql).toMatch(/last_edited_time/)
+    expect(sql).toMatch(/source_updated_at/)
+    expect(sql).toMatch(/updated_at/)
+    expect(sql).toMatch(/created_at/)
+    expect(sql).not.toMatch(/last_edited_time/)
     expect(sql).toMatch(/90 days/)
     expect(sql).toMatch(/COUNT\(DISTINCT assignee_source_id\)/)
   })

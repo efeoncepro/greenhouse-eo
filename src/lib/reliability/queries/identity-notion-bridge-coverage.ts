@@ -8,7 +8,8 @@ import type { ReliabilitySignal } from '@/types/reliability'
  * Notion ↔ member bridge coverage detector.
  *
  * Mide qué porcentaje de tareas Notion recientes (últimos 90 días) tienen
- * `assignee_member_id` resuelto. Una caída brusca indica regresión del bridge
+ * `assignee_member_id` resuelto. En la proyección PostgreSQL canónica,
+ * `source_updated_at` representa el `last_edited_time` de Notion. Una caída brusca indica regresión del bridge
  * identity Notion-user-id → member-id (el bug class del incidente 2026-05-16
  * post-TASK-877: el resolver PG-first quedó con cobertura parcial sin que
  * BigQuery fallback engagara, dejando ~95% de tareas sin atribución y
@@ -50,7 +51,7 @@ const QUERY_SQL = `
       assignee_member_id
     FROM greenhouse_delivery.tasks
     WHERE assignee_source_id IS NOT NULL
-      AND COALESCE(last_edited_time, created_at, NOW()) >= NOW() - INTERVAL '${RECENT_WINDOW_DAYS} days'
+      AND COALESCE(source_updated_at, updated_at, created_at, NOW()) >= NOW() - INTERVAL '${RECENT_WINDOW_DAYS} days'
   )
   SELECT
     COUNT(*)::int AS total_assigned_tasks,
@@ -112,7 +113,7 @@ export const getIdentityNotionBridgeCoverageSignal = async (): Promise<Reliabili
         {
           kind: 'sql',
           label: 'Query',
-          value: 'greenhouse_delivery.tasks — recent assignee_member_id resolution coverage'
+          value: 'greenhouse_delivery.tasks — recent assignee_member_id resolution coverage using source_updated_at'
         },
         {
           kind: 'metric',
