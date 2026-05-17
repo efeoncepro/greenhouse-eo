@@ -3912,6 +3912,58 @@ Cada Vn ship con shadow mode mínimo 7 días verde antes de activar writeback. D
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` (ADR canonical). Cross-refs: `docs/architecture/Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 secciones F + G; `docs/architecture/Greenhouse_ICO_Engine_v1.md` (conceptual spec, drift por resolver post-TASK-908/909/901). Patrones fuente: TASK-742 (defense-in-depth 7-layer), TASK-773 (outbox publisher canonical), TASK-771 (decoupling write paths via outbox), TASK-706 (HMAC webhook ingestion), TASK-720 (TS-only declarative reader pattern).
 
+### ICO Metrics Progressive Migration invariants (TASK-901 + TASK-908 + TASK-910, desde 2026-05-17)
+
+La migración del compute canonical de las 14 métricas ICO (RpA, FTR, OTD, Cumplimiento, Cycle Time, CT Variance, CT SLO%, Throughput, Pipeline Velocity, CSC Distribution, Stuck Assets, Stuck %, OCF + 3 narrative-level deferred V2: BCS/TTM/Iteration Velocity) **NO es big-bang**. Es strangler pattern obligatorio con stop-gates canonical, demo teamspace pre-prod, recovery primitives explícitas, backward compatibility 90+ días.
+
+**Bug class motivador**: TASK-877 follow-up (3,168 tareas Sky con `rpa=null` 10 meses, nómina Sky proyectada perdía bonus RpA silenciosamente). Big-bang × 14 métricas × N meses = riesgo inaceptable.
+
+**Timeline canonical**: 12-14 meses end-to-end para 13 métricas operacionales. **NO acelerar**.
+
+**Demo teamspace canonical** (TASK-910) ya creado live 2026-05-17:
+
+| Asset | Name | Page ID | Data Source ID |
+|---|---|---|---|
+| Teamspace | `Demo Greenhouse` | `36339c2f-efe7-814c-a0f5-0042863dbb5a` | N/A |
+| Tareas | `Tareas` | `36339c2f-efe7-80e2-9109-e7e9e41b36e4` | `36339c2f-efe7-81a6-980c-000b0056bba8` |
+| Proyectos | `Proyectos` | `36339c2f-efe7-800e-9bba-c5c1661dd242` | `36339c2f-efe7-8116-8c15-000be81c5538` |
+| Sprints | `Sprints ` (con space trailing) | `36339c2f-efe7-803c-a94a-e52bc41c8e77` | `36339c2f-efe7-81cc-8f2f-000b112ee87c` |
+
+IDs distintos vs productivos (Efeonce DS `5126d7d8-...`, Sky DS `23039c2f-...`) — cero overlap, cero risk cross-contamination.
+
+**⚠️ Reglas duras canonical (8 stop-gates obligatorios per flip de writeback)**:
+
+- **NUNCA** flip writeback de métrica ICO sin pasar por los 8 stop-gates del ADR `GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md` §3. Falta cualquiera → NO flip. No "casi listo":
+  1. Foundation completa (TASK-908 Slices 0-3.5 + backfill histórico verde)
+  2. Demo teamspace pre-prod (TASK-910 verde 4 semanas runtime end-to-end)
+  3. Shadow mode prod verde 30d bonus / 7d operational
+  4. Pilot scope ≤ 1 cliente (Efeonce primero, Sky después de Efeonce verde 30d)
+  5. HR/Finance written sign-off (bonus metrics solamente: RpA + OTD)
+  6. Snapshot pre-flip BQ restorable <1h
+  7. Kill switch verificado staging <5min revert
+  8. Runbook operativo + cliente sign-off (cliente externo Sky vía QBR)
+- **NUNCA** flip global directo cross-cliente. SIEMPRE pilot Efeonce primero, después Sky.
+- **NUNCA** borrar formula Notion legacy durante la migración. Mínimo 90 días coexistencia post-flip stable.
+- **NUNCA** computar bonus para demo members. `fetchKpisForPeriod` filtra `tenant_type='demo'` + helpers bonus tienen pre-check `if (member?.tenantType === 'demo') return {amount: 0, qualifies: false}`. Defense in depth dual. Demo NUNCA toca payroll real.
+- **NUNCA** mezclar demo events con productivos en tabla `task_status_transitions`. Tabla separada `task_status_transitions_demo` enforced por reactive consumer demo (filtra `metadata.demo_mode=true`).
+- **NUNCA** compartir webhook secret HMAC entre prod y demo. Secrets separados en GCP Secret Manager (`notion-webhook-signing-secret-efeonce` vs `notion-webhook-signing-secret-demo`).
+- **NUNCA** permitir acceso de cliente externo (Sky) al teamspace demo. Solo equipo interno Greenhouse + HR + Delivery interno.
+- **NUNCA** desincronizar schema del demo con el template productivo. Cuando Efeonce template agrega status option o property nueva, el demo se actualiza en el mismo PR.
+- **NUNCA** archivar el demo durante la migración (12-14 meses). Demo es load-bearing — sin él, los siguientes flips de Fase 2-5 pierden el gate canonical de testing pre-prod.
+- **NUNCA** acelerar timeline canonical "porque va bien". 12-14 meses es el contrato canonical. Acelerar reintroduce risk class TASK-877 follow-up.
+- **NUNCA** ignorar reliability signal `notion.metrics.shadow_paridad_<metric>` con count > 0. Drift sostenido pre-flip = NO flip; post-flip = rollback.
+- **NUNCA** flip nuevo si hay rollback de cualquier métrica últimos 30 días. Estabilizar antes de avanzar.
+- **NUNCA** flip OTD% antes de RpA stable V1.0 (90 días post-Sky verde). Diversificar risk.
+- **NUNCA** flip métrica narrative-level Revenue Enabled (BCS, TTM, Iteration Velocity) sin Frame.io + ad platforms integration. V1 mostly proxy honesto es OK.
+- **NUNCA** ejecutar rollback parcial (e.g. solo para member X). Rollback es per-cliente vía feature flag — granularidad menor no soportada V1.
+- **NUNCA** confundir IDs del demo con IDs de Efeonce/Sky productivos. Demo teamspace ID = `36339c2f-...4c-a0f5-0042863dbb5a`, prefix consistente `36339c2f-...` en todos los assets demo. Productivos tienen prefixes distintos (Efeonce `5126d7d8-...` Tasks DS; Sky `23039c2f-...` Tasks DS).
+- **SIEMPRE** que emerja bug class durante pilot Efeonce, halt migration completa + RCA documentada antes de retry.
+- **SIEMPRE** snapshot BQ pre-flip persistido + restorable <1h antes de cualquier flip.
+- **SIEMPRE** HR reconciliation bonus mes 1 post-flip antes de declarar pilot pass.
+- **SIEMPRE** runbook canonical publicado per métrica antes del flip.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md` (ADR — 8 stop-gates + demo gate + 6 fases ramp + recovery primitives). Demo teamspace governance: `docs/tasks/to-do/TASK-910-notion-demo-teamspace-migration-sandbox.md` §Detailed Spec.
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

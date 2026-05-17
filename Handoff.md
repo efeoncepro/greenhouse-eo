@@ -1,3 +1,66 @@
+# Sesion 2026-05-17 (cont. — ADR Migration Strategy + TASK-910 Demo Teamspace + IDs canonical verified)
+
+**Status**: ✅ Doc-only + Notion teamspace clone operador. ADR canonical nuevo `GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md` (480 líneas) que formaliza la estrategia de migración progresiva NO big-bang (12-14 meses, 6 fases ramp, 8 stop-gates obligatorios, demo teamspace pre-prod, recovery primitives canonical, backward compat 90+ días). Plus TASK-910 (Notion Demo Teamspace Migration Sandbox, 6 slices, ~450 líneas) con IDs canonical del teamspace `Demo Greenhouse` identificados live vía Notion MCP post-clone operador (anti-confusion verified vs Efeonce/Sky productivos — cero overlap). Plus actualización TASK-901/TASK-908 con prerequisite TASK-910. CLAUDE.md sección nueva con 8 stop-gates + IDs canonical. DECISIONS_INDEX + METRICS_INDEX + REGISTRY + README sincronizados.
+
+## Resultado
+
+- **ADR canonical nuevo `GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md`** (480 líneas) — contrato operacional que protege la migración de los siguientes 12-14 meses. Documenta:
+  - Risk surface 3 capas (bonus / operational / narrative) con velocidades distintas
+  - 8 stop-gates obligatorios canonical per flip (foundation, demo, shadow, pilot ≤1 cliente, HR sign-off, snapshot, kill switch, runbook+cliente sign-off)
+  - 6 fases ramp con timeline realista (Fase 0 foundation → Fase 0.5 demo paralelo → Fase 1 RpA pilot Efeonce → Fase 2 Sky → Fase 3 OTD → Fase 4 operational rapid → Fase 5 resto)
+  - Defense in depth 8-layer per flip
+  - Recovery primitives canonical (4 scripts + dashboard + runbook)
+  - Backward compatibility 90+ días formulas Notion legacy
+  - 15 hard rules anti-regresión incluyendo NUNCA acelerar timeline
+  - Cuándo NO migrar / cuándo abortar
+  - Bug class TASK-877 follow-up canonizado como motivador
+
+- **TASK-910 spec** (~450 líneas) — Notion Demo Teamspace Migration Sandbox como gate canonical pre-Fase 1:
+  - 6 slices canonical (foundation + bridge identity + webhook + reactive consumer + signals + governance)
+  - **IDs canonical identificados live 2026-05-17 vía Notion MCP** post-clone operador:
+    - Teamspace `Demo Greenhouse`: `36339c2f-efe7-814c-a0f5-0042863dbb5a`
+    - Tareas DB: page `36339c2f-efe7-80e2-9109-e7e9e41b36e4`, data source `36339c2f-efe7-81a6-980c-000b0056bba8`
+    - Proyectos DB: page `36339c2f-efe7-800e-9bba-c5c1661dd242`, data source `36339c2f-efe7-8116-8c15-000be81c5538`
+    - Sprints DB: page `36339c2f-efe7-803c-a94a-e52bc41c8e77`, data source `36339c2f-efe7-81cc-8f2f-000b112ee87c`
+  - Cross-references verificadas (integridad clone: Proyectos→Tareas relation, Sprints→Tareas relation, Tareas→Proyectos+Sprints bidireccional)
+  - Anti-confusion confirmada: IDs distintos vs Efeonce productivo (`5126d7d8-...`) y Sky productivo (`23039c2f-...`) — cero overlap
+  - Schema verificado: formulas legacy preservadas (Client Change Round Final, Completitud, RpA Promedio, % On-Time) → habilita shadow mode paridad testing canonical
+  - **Garantía operativa**: bonus calculation NUNCA toca demo members (`fetchKpisForPeriod` filtra `tenant_type='demo'` + helpers bonus pre-check — defense in depth dual)
+  - **BLOQUEA TASK-901 Slice 4** (shadow mode RpA Efeonce productivo) hasta 4 semanas runtime end-to-end verde en demo
+
+- **TASK-901 + TASK-908 actualizadas** con prerequisite TASK-910 explícito
+- **CLAUDE.md sección nueva** "ICO Metrics Progressive Migration invariants" con 8 stop-gates + IDs canonical + 18 hard rules
+- **DECISIONS_INDEX.md** + entry canonical del ADR migration strategy
+- **METRICS_INDEX.md** + sección "Migration playbook canonical" con tabla IDs demo verified
+- **TASK_ID_REGISTRY.md** + entry TASK-910
+- **docs/tasks/README.md** + bullet TASK-910 + siguiente ID disponible `TASK-911`
+
+## Hallazgos clave
+
+- **El usuario tuvo razón total** en pedir migración progresiva no big-bang. TASK-877 follow-up ya demostró el costo de cambio silencioso: 3,168 tareas × 10 meses × N members afectados. Big-bang × 14 métricas × N meses = riesgo inaceptable.
+- **Demo teamspace como gate canonical es defense in depth crítica**: aísla risk de infraestructura (echo-loop, rate limiting, webhook security, bulk PATCH error handling, recovery primitives) ANTES de exponer datos productivos. Shadow mode prod sigue siendo necesario para validar realidad/semántica, pero demo elimina la primera capa de bugs.
+- **Operador clone Efeonce fue exitoso end-to-end**: schema 1:1 preservado, formulas legacy intactas (RpA Promedio, % On-Time, Client Change Round Final, Completitud), cross-references bidireccionales correctas. Notion MCP identificó IDs canonical sin ambigüedad.
+- **Anti-confusion verified**: IDs demo distintos vs Efeonce/Sky productivos. Cero risk cross-contamination accidental por mismatch de ID.
+- **Timeline 12-14 meses end-to-end** es contrato canonical. NO acelerar — el ADR §10 hard rule prohíbe acelerar "porque va bien".
+- **Risk surface 3 capas distinct velocidades** documentada explícita: bonus (90+ días/métrica), operational (30-60d), narrative-level deferred V2 hasta Frame.io+ad platforms.
+
+## Validacion
+
+- Doc-only changes + operador clonó teamspace en Notion (paralelo). No corrió build/test runtime — implementación viene en TASK-910 + TASK-901+908.
+- Notion MCP verificación: 4 IDs canonical identificados + cross-references confirmadas + anti-confusion check OK.
+- Pre-existing markdown warnings (MD060 + spell-check) NO bloquean.
+
+## Siguientes pasos
+
+- **TASK-910 ship** (1-2 semanas) — implementa 6 slices: migration + bridge identity + webhook + consumer + signals + governance + bonus guardrail. **Gate canonical pre-Fase 1**.
+- **4 semanas runtime end-to-end verde DEMO** post-TASK-910 ship antes de iniciar TASK-901 Slice 4 (shadow mode RpA Efeonce productivo).
+- **Fase 0 foundation paralelo**: TASK-908 Slices 0-3.5 (status transitions + countCorrectionTransitions helper). Puede ir en paralelo a TASK-910.
+- **Fase 1 RpA pilot Efeonce inicia post-demo verde**: TASK-901 Slices 4-9 (shadow + flip + observation + HR reconciliation bonus mes 1).
+- **Documentación operativa pendiente pre-Fase 1**: runbook `docs/operations/runbooks/notion-metric-writeback-rollback.md` (TASK-910 Slice 5) + per-métrica runbooks (creados en cada TASK derivada).
+- **Skill ICO** (próximo en esta sesión) — canonical reasoning framework + invocation triggers + cross-refs a 14 specs + ADRs + decisiones canonical.
+
+---
+
 # Sesion 2026-05-17 (cont. — Payroll bonus ADR + sección 13 cross-spec) — flujo bonus canonizado
 
 **Status**: ✅ Doc-only. ADR canonical nuevo `GREENHOUSE_PAYROLL_BONUS_CALCULATION_V1.md` que canoniza el flujo end-to-end de cómo Payroll consume métricas ICO (RpA + OTD) para calcular bonificaciones variables. Plus sección 13 "Downstream consumers" agregada a las 14 specs de métricas canonical (RpA + OTD detail completo; 12 restantes documentan razón NO-input bonus V1). Template canonical extendido con sección 13 opcional. METRICS_INDEX completo con "Payroll bonus input matrix". DECISIONS_INDEX + Contrato + Handoff + changelog sincronizados.

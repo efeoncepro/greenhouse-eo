@@ -80,6 +80,33 @@
 
 ---
 
+## Migration playbook canonical (2026-05-17 ADR)
+
+**Toda migración writeback canonical de métrica ICO sigue el ADR** [`../GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md`](../GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md):
+
+- **NO big-bang** — strangler pattern obligatorio con 6 fases ramp (~12-14 meses end-to-end)
+- **8 stop-gates obligatorios per flip** (foundation + demo + shadow + pilot + HR sign-off + snapshot + kill switch + runbook)
+- **Demo teamspace pre-prod** (TASK-910 — `Demo Greenhouse` teamspace ID `36339c2f-efe7-814c-a0f5-0042863dbb5a`) como gate canonical pre-Fase 1
+- **Pilot scope ≤ 1 cliente** (Efeonce primero, Sky después de Efeonce verde 30d)
+- **Backward compatibility 90+ días** — formulas Notion legacy NO se borran
+- **Defense in depth 8-layer per flip**
+- **Recovery primitives canonical** pre-instaladas (4 scripts + dashboard + runbook)
+
+### Demo teamspace IDs canonical (Sandbox migración)
+
+Identificados live 2026-05-17 vía Notion MCP. Distintos vs Efeonce/Sky productivos — cero risk cross-contamination.
+
+| Asset | Name | Page ID | Data Source ID |
+|---|---|---|---|
+| Teamspace | `Demo Greenhouse` | `36339c2f-efe7-814c-a0f5-0042863dbb5a` | N/A |
+| Tareas | `Tareas` | `36339c2f-efe7-80e2-9109-e7e9e41b36e4` | `36339c2f-efe7-81a6-980c-000b0056bba8` |
+| Proyectos | `Proyectos` | `36339c2f-efe7-800e-9bba-c5c1661dd242` | `36339c2f-efe7-8116-8c15-000be81c5538` |
+| Sprints | `Sprints ` (trailing space en Notion) | `36339c2f-efe7-803c-a94a-e52bc41c8e77` | `36339c2f-efe7-81cc-8f2f-000b112ee87c` |
+
+Schema verificado: formulas legacy preservadas (Client Change Round Final, Completitud, RpA Promedio, % On-Time) — habilita shadow mode paridad testing canonical.
+
+---
+
 ## Estados de writeback canonical (TASK-901 progressive pattern)
 
 Conforme la migración progresiva avanza, cada métrica transita por estos estados:

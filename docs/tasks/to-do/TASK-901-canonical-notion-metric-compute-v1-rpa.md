@@ -15,7 +15,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|platform|reliability`
-- Blocked by: `TASK-908 Slices 0-3.5 (Status Transition Foundation + countCorrectionTransitions helper) — prerequisito arquitectónico canonical (ADR GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1 2026-05-17). Plus Discovery slice (3 verifications) que precede Slice 1.`
+- Blocked by: `TASK-908 Slices 0-3.5 (Status Transition Foundation + countCorrectionTransitions helper) — prerequisito arquitectónico canonical (ADR GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1 2026-05-17). Plus Discovery slice (3 verifications) que precede Slice 1. Plus TASK-910 (Notion Demo Teamspace Sandbox) ship + 4 semanas runtime end-to-end verde DEMO antes de iniciar Slice 4 (shadow mode RpA Efeonce productivo) — gate canonical pre-Fase 1 del ADR GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Demo teamspace canonical IDs en TASK-910 §Detailed Spec.`
 - Branch: `task/TASK-901-canonical-notion-metric-compute-v1-rpa`
 - Legacy ID: `none`
 - GitHub Issue: `optional`

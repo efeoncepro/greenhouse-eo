@@ -19,7 +19,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|platform|reliability`
-- Blocked by: `none` (Cycle Time decisions canonical ya canonizadas en sesión 2026-05-17)
+- Blocked by: `none para Slices 0-3.5 (foundation transitions + countCorrectionTransitions). Slice 9 (backfill histórico) usa TASK-910 (Notion Demo Teamspace) como gate canonical de testing del backfill paginación Notion API antes de tocar Efeonce/Sky productivo — pattern del ADR GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1 §3.2.`
 - Branch: `task/TASK-908-ico-status-transition-tracking-canonical-cycle-time`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
