@@ -85,6 +85,10 @@ Reglas obligatorias canonical:
 
 ## Normative Docs
 
+- **`docs/architecture/Contrato_Metricas_ICO_v1.md` § Delta 2026-05-17 — Precisión implementacional sesión RpA/OTD/Cumplimiento/Cycle Time** — **PRECONDICIÓN CANONICAL** para Discovery slice + Slice 1 de esta task. Contiene 5 confirmaciones canonical del estado actual (incluyendo el helper `calculateRpa()` ya validado para Slice 1), 3 gaps implementacionales detectados (Bloqueado en denominador + estados Sky no mapeados + bug class sync RpA Sky), y 3 decisiones pendientes Cycle Time (out of scope de esta task pero relacionadas). Sin leer esta Delta primero, el helper canonical `calculateRpa()` puede re-derivar interpretación incorrecta de la formula Notion vigente.
+- `docs/architecture/Greenhouse_ICO_Engine_v1.md` — implementación técnica del motor ICO (3,122 líneas, lectura selectiva por sección). Especialmente sección `A.5.4.0 Categorías funcionales de métricas ICO` (línea 2363) para entender el dual-meaning de Cumplimiento.
+- `src/lib/ico-engine/metric-registry.ts` — implementación runtime de las métricas. Especialmente `TASK_STATUS_TO_CSC` (líneas 103-115), `EXCLUDED_STATUSES` + `BLOCKED_STATUSES` (líneas 122-123), `CANONICAL_OPEN_TASK_SQL` (líneas 133-136), `CANONICAL_FTR_PASSED_SQL` (líneas 155-158). Gaps B.1 y B.2 del Delta 2026-05-17 viven acá.
+- `src/lib/ico-engine/rpa-policy.ts` — TASK-215 confidence policy (`valid` / `low_confidence` / `suppressed` / `unavailable`). Esta task NO toca este archivo — la policy de confidence sigue vigente y aplica al valor que el helper canonical retorne.
 - `CLAUDE.md` § "Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)" — invariantes adyacentes
 - `CLAUDE.md` § "Outbox publisher canónico — Cloud Scheduler, no Vercel" (TASK-773)
 - `CLAUDE.md` § "Cross-runtime observability — Sentry init invariant" (TASK-844)

@@ -1,3 +1,92 @@
+# Sesion 2026-05-17 — TASK-905 SII Americas withholding discovery + Payroll skill enrichment
+
+**Status**: ✅ Discovery oficial documentado. No se implemento runtime, schema ni catalog seed productivo.
+
+## Resultado
+
+- Se creo auditoria reusable: `docs/audits/payroll/TASK-905_INTERNATIONAL_WITHHOLDING_AMERICAS_SII_DISCOVERY_2026-05-17.md`.
+- Se indexo en `docs/audits/payroll/README.md`.
+- Se enriquecieron las skills locales de Payroll para Codex y Claude:
+  - `.codex/skills/greenhouse-payroll-auditor/references/international-withholding-americas-sii.md`
+  - `.claude/skills/greenhouse-payroll-auditor/references/international-withholding-americas-sii.md`
+  - ambos `SKILL.md` ahora apuntan a la nueva referencia cuando aparezca `international_internal` pagado directo desde Chile.
+
+## Hallazgos clave
+
+- El motor TASK-905 no puede ser `rateByCountry`: debe resolver pais fiscal, tipo de servicio, payee type, lugar de prestacion, dias Chile 12m, EP/base fija, evidencia de convenio, beneficiario efectivo, Art. 41 H y `tax_borne_by`.
+- Sin convenio, el baseline SII para servicios profesionales/tecnicos Art. 59 N°2 es `15%`, subiendo a `20%` si aplican circunstancias de regimen fiscal preferencial; otros servicios deben bloquear a revision.
+- Con convenio, tasa reducida o cero exige certificado de residencia fiscal, declaracion de no EP/base fija y elegibilidad de convenio. Sin evidencia: `blocked_missing_evidence`, no pago bruto.
+- Americas con DTA general SII vigente: Argentina, Brasil, Canada, Colombia, Ecuador, Estados Unidos, Mexico, Paraguay, Peru y Uruguay. Transporte-only / intercambio informacion no autorizan payroll services.
+- Recomendacion Slice 0: seed completo Americas con fallback `needs_tax_review`; promover reglas `approved_*` solo mediante aprobacion Tax/Legal auditada.
+
+## Validacion
+
+- Fuentes verificadas en SII: pagina oficial de convenios, Ley sobre Impuesto a la Renta PDF, FAQ SII Art. 59/60 y Resolucion Exenta SII N°58/2021.
+- No se corrio lint/build porque el cambio fue documental/skill-only.
+
+---
+
+# Sesion 2026-05-17 — Precisión implementacional contrato ICO (Delta canonical en Contrato_Metricas_ICO_v1.md)
+
+**Status**: ✅ Delta canonical shippeada. Decisiones Cycle Time (C.1, C.2, C.3) **pendientes de operador**.
+
+## Lo que se canonizó
+
+Delta `2026-05-17 — Precisión implementacional sesión RpA / Indicador de Performance / Cumplimiento / Cycle Time` agregada al top de `docs/architecture/Contrato_Metricas_ICO_v1.md`. Contiene 4 secciones:
+
+- **A) Confirmados del estado actual (5 puntos canonical)**:
+  - A.1 RpA per-task hoy = `Correcciones` rollup count (Frame.io integration pendiente)
+  - A.2 Indicador de Performance — 4 buckets canonical (On-Time / Late Drop / Overdue / Carry-Over) + mapeo a OTD denominador/numerador
+  - A.3 Cumplimiento dual-meaning canonical (agregado narrativo vs per-task audit signal `delivery_compliance`)
+  - A.4 Regla canonical de exclusión: Bloqueado + Archivado + Cancelado excluidos del denominador, incluidos en total
+  - A.5 Helper canonical `calculateRpa()` para TASK-901 Slice 1 (input ya validado)
+- **B) Gaps implementacionales detectados (3)**:
+  - B.1 ⚠️ `Bloqueado` declarado en `BLOCKED_STATUSES` pero NO excluido del `CANONICAL_OPEN_TASK_SQL` → contamina denominador. TASK candidata: small fix ~2h.
+  - B.2 ⚠️ Estados Sky-specific (`Tomado`, `Listo para revisión`, `En feedback`, `Aprobado`, `Bloqueado`) NO mapeados en `TASK_STATUS_TO_CSC` → CSC distribution charts incorrectos para Sky. TASK candidata: small fix ~2h.
+  - B.3 ⚠️ Bug class TASK-877 (sync notion-bq-sync pierde value del formula RpA Sky) — solución canonical es TASK-901 (writeback architecture), no patch al sync legacy.
+- **C) Decisiones pendientes Cycle Time (3 ambigüedades)**: C.1 evento INICIO (createdTime / status=En curso / fecha brief), C.2 evento FIN (`Aprobado` / `Listo para revisión` / `Fecha de completado`), C.3 inclusión/exclusión tiempo en `En feedback`. Sin estas decisiones, un futuro `TASK derivada — Canonical Cycle Time compute V1` no puede shippear.
+- **D + E) Evidencia citada + cross-references canonical** (Notion MCP fetches, BQ queries, file:line references, TASK-877/900/901 links).
+
+## Próximos pasos bloqueantes (operador)
+
+1. Resolver las 3 decisiones Cycle Time (C.1, C.2, C.3) para destrabar futuro TASK derivada de canonical CT compute.
+2. Decidir si gaps B.1 y B.2 se paquetan en una TASK chica conjunta (recomendación: sí — TASK candidata `ICO status hygiene Sky + Bloqueado exclusion`, ~4h con tests anti-regresión combined) o quedan como follow-ups oportunistas.
+
+## Cross-references creados en esta sesión
+
+- `docs/architecture/Contrato_Metricas_ICO_v1.md` — Delta canonical (top del file).
+- `docs/tasks/to-do/TASK-901-canonical-notion-metric-compute-v1-rpa.md` — Normative Docs ampliada para referenciar esta Delta como precondición canonical de Discovery + Slice 1.
+
+# Sesion 2026-05-16 — Sentry JAVASCRIPT-NEXTJS-63 `/admin` reliability reader hotfix
+
+**Status**: ✅ Fix local implementado y validado contra PG real. Pendiente deploy para que staging deje de emitir el alert.
+
+## Causa raiz
+
+- Sentry reporto `GET /admin` con `column "last_edited_time" does not exist`.
+- El crash venia de `src/lib/reliability/queries/identity-notion-bridge-coverage.ts`.
+- El reader asumio el nombre raw de Notion/BigQuery (`last_edited_time`) sobre la proyeccion runtime PG `greenhouse_delivery.tasks`.
+- Schema vivo PG confirmado: `greenhouse_delivery.tasks` NO tiene `last_edited_time`; usa `source_updated_at` como timestamp canonico de ultima edicion upstream, mas `synced_at`, `created_at`, `updated_at`. Las 5.426 filas actuales tienen `source_updated_at`.
+
+## Fix aplicado
+
+- Alineado el filtro temporal del signal `identity.notion_bridge.coverage_drift` a `COALESCE(source_updated_at, updated_at, created_at, NOW())`.
+- No se agrego migracion ni columna alias: duplicar `last_edited_time` en PG seria parchear el sintoma y erosionar el contrato canonico de proyecciones runtime.
+- Test actualizado para bloquear regresion: el SQL del reader debe usar `source_updated_at` y no volver a referenciar `last_edited_time`.
+
+## Validacion
+
+- `pnpm pg:doctor` OK.
+- Discovery PG real via `information_schema.columns` confirmo timestamps canonicos en `greenhouse_delivery.{projects,sprints,tasks}`: `source_updated_at`, `synced_at`, `created_at`, `updated_at`; no `last_edited_time`.
+- Smoke live del reader: `identity.notion_bridge.coverage_drift` retorna `severity=ok`, coverage `73.2%` (`1449/1979` tareas resueltas), sin throw.
+- `pnpm vitest run src/lib/reliability/queries/identity-notion-bridge-coverage.test.ts` OK: 10/10.
+- `pnpm exec eslint src/lib/reliability/queries/identity-notion-bridge-coverage.ts src/lib/reliability/queries/identity-notion-bridge-coverage.test.ts` OK.
+
+## Riesgos / notas
+
+- `SENTRY_AUTH_TOKEN` no estaba disponible en el entorno local, asi que no se consulto el evento via API; el diagnostico se hizo con el screenshot + stack parcial + reproduccion contra codigo y PG real.
+- Hasta que este cambio se despliegue al preview/staging afectado, el deployment actual puede seguir emitiendo `JAVASCRIPT-NEXTJS-63`.
+
 # Sesion 2026-05-16 — TASK-894 international_internal contract type foundation — SHIPPED develop
 
 **Status final**: ✅ TASK-894 COMPLETE. Implementada directo en `develop` por instrucción explícita del operador (sin branch switch). Spec movida a `docs/tasks/complete/TASK-894-international-internal-contract-type.md`.

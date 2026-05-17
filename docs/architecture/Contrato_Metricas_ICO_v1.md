@@ -1,5 +1,251 @@
 # Contrato de métricas ICO
 
+## Delta 2026-05-17 — Precisión implementacional sesión RpA / Indicador de Performance / Cumplimiento / Cycle Time
+
+Post-incidente TASK-877 follow-up (commit `4fc8c0c4` 2026-05-16) que recuperó el bridge Notion↔member, esta sesión hizo deep-dive del contrato de métricas para detectar gaps entre el conceptual (este doc + `Greenhouse_ICO_Engine_v1.md`) y la implementación runtime (`src/lib/ico-engine/`, formulas Notion en Sky y Efeonce DBs). Esta Delta consolida (A) confirmaciones canonical del estado actual, (B) gaps implementacionales detectados pendientes de remediation, y (C) decisiones pendientes sobre Cycle Time antes de canonizar el compute helper.
+
+Esta Delta es precondición canonical para `TASK-901 — Canonical Notion Metric Compute V1 (RpA-only)`. La precisión documentada acá alimenta el Discovery slice + Slice 1 (canonical helper) sin re-derivar interpretación de la fórmula Notion vigente.
+
+### A) Confirmados del estado actual (2026-05-17)
+
+#### A.1 RpA — fuente de datos hoy en producción
+
+- La fórmula canónica de `RpA` en Notion (data sources `23039c2f-efe7-81f8-af2d-000b67594d18` Sky + `5126d7d8-bf3f-454c-80f4-be31d1ca38d4` Efeonce, formula codeUrl `PVhQTw` compartido) lee según `Review Source` (select Notion: `Auto` / `Frame.io` / `Workflow`):
+  - `Review Source = Frame.io` → `Client Change Round` (number property, contador automático esperado desde Frame.io)
+  - `Review Source = Workflow` → `Workflow Change Round` (number property, contador automático esperado desde workflow)
+  - `Review Source = Auto` → `Correcciones` rollup (count de la relation `Correcciones` con base Correcciones, manual)
+- **Estado actual canonical**: la integración Frame.io **NO está desarrollada todavía**. `Client Change Round` y `Workflow Change Round` están vacíos en 100% de las tareas Sky y en la gran mayoría de Efeonce. En producción hoy, **RpA per-task = count de `Correcciones` rollup exclusivamente** (path `Auto` del dispatcher, o fallback cuando `Review Source` está null).
+- **RpA semánticamente es rondas DE CLIENTE solamente**. Una ronda = ciclo completo de cambios solicitados por cliente entre 2 envíos a revisión. Workflow rounds (internos del equipo) **NO** deben contar para RpA. La fórmula Notion respeta esto vía `Review Source` dispatcher, pero el dispatcher solo aplica cuando el property se setea explícitamente — por defecto cae en `Auto` (Correcciones manual), que conceptualmente representa correcciones cliente capturadas manualmente.
+- Bug class detectado live 2026-05-16: BQ `notion_ops.tareas.rpa` = `null` en 100% para Sky (3,168 tareas completadas en 10 meses, Aug 2025 – May 2026). La fórmula evalúa correctamente per-page en Notion (verified vía MCP fetch + Notion Web UI), pero el sync `notion-bq-sync` no extrae `prop.formula.number` correctamente. **Es bug del sync, no de la fórmula Notion ni del schema**. Esto motiva `TASK-901` (mover compute canonical a Greenhouse code + writeback a propiedad `[GH] RpA`).
+
+#### A.2 Indicador de Performance — 4 buckets canonical per-task
+
+- Property Notion: `Indicador de Performance` (formula, codeUrl `b00_Og` Sky)
+- Descripción canónica verbatim del property: *"Clasifica cada tarea del mes actual en On-Time, Late Drop, Overdue o Carry-Over."*
+
+| Bucket | ¿Tarea cerrada? | ¿Pasada fecha límite? | Entra en OTD denominador? | Entra en OTD numerador? |
+|---|---|---|---|---|
+| **On-Time** | ✅ Sí (estado terminal) | ❌ No | ✅ | ✅ |
+| **Late Drop** | ✅ Sí | ✅ Sí | ✅ | ❌ |
+| **Overdue** | ❌ No (abierta) | ✅ Sí | ✅ | ❌ |
+| **Carry-Over** | ❌ No (abierta) | ❌ No (aún dentro de plazo) | ❌ | ❌ |
+
+`Carry-Over` no entra en OTD porque la tarea **aún tiene tiempo** — no es un "fracaso de entrega", solo continuación de trabajo del mes anterior dentro del plazo. Esto es coherente con el código actual (`src/lib/ico-engine/metric-registry.ts:202-206`) que define el denominador OTD como `(on_time OR late_drop OR overdue)`, excluyendo `carry_over`.
+
+**Naming canonical aclarado** (resolución sesión 2026-05-17):
+
+| Concepto | Naming canonical | Granularidad | Para qué sirve |
+|---|---|---|---|
+| El bucket per-task (4 categorías) | `performance_indicator_code` / `Indicador de Performance` | Per-task | Saber en qué bucket cayó UNA tarea |
+| El % entregadas a tiempo del período | `OTD%` / `otd_pct` | Per-member-month o per-space-month | KPI agregado canonical |
+| El label per-task de velocidad relativa al plazo | `Cumplimiento %` / `delivery_compliance` | Per-task | Audit signal cualitativo (`"100 %"`, `"100+ %"`) |
+| La narrativa agregada de OTD family | "Cumplimiento de promesa" | Per-período | Lectura de negocio en QBR/CVR |
+
+**Acción canonical sugerida**: agregar `carry_over` como 4° valor explícito al enum `performance_indicator_code` en código (hoy solo se manejan `on_time`, `late_drop`, `overdue`). Sin esto, `carry_over` tasks llegan como string suelto sin clasificación enum.
+
+#### A.3 Cumplimiento — dual meaning canonical
+
+`Cumplimiento` se usa con DOS significados distintos en el ecosistema. Esta Delta los formaliza separados para que el código no los confunda:
+
+- **Cumplimiento de promesa (agregado, categoría narrativa)**: alias de la familia OTD% en lectura de negocio. Agrupa `otd_pct` + `on_time_count` + `late_drop_count` + `overdue_count`. Documentado canonical en `Greenhouse_ICO_Engine_v1.md` línea 2363, sección `A.5.4.0 Categorías funcionales de métricas ICO`. **NO es métrica separada** — es categoría narrativa para QBR/CVR. Responde la pregunta de negocio "¿Estamos cumpliendo la promesa operativa del período?".
+- **Cumplimiento % (per-task, audit signal)**: property Notion `Cumplimiento %` (formula codeUrl `Yk47Tg` Sky), sincronizada como columna `delivery_compliance` en `greenhouse_conformed.delivery_tasks` y `greenhouse_delivery.tasks` (vía `src/lib/sync/sync-notion-conformed.ts:1284` y aliases definidos en `src/lib/space-notion/notion-governance-contract.ts:204`). Valores observados en BQ: `"100 %"` (cumplimiento exacto), `"100+ %"` (entrega adelantada), presumiblemente `"<100 %"` cuando hay atraso. Clasificada como **"Contexto de auditoría"** en `Greenhouse_ICO_Engine_v1.md` línea 2372 — **NO entra en agregados de métricas**, es señal explicativa per-task que sirve para entender por qué una tarea individual cayó en su bucket.
+
+**Implicación canonical**: `delivery_compliance` se persiste per-task pero NO se agrega a `metrics_by_member` ni a `metrics_by_*`. Es solo lectura per-task en `get-project-detail.ts:494` (campo `deliveryCompliance` del API response). Esto es coherente con el contrato y NO debe modificarse.
+
+#### A.4 Regla canonical de exclusión de tareas
+
+Validado con operador en sesión 2026-05-17:
+
+- **Denominador de OTD / RpA / FTR / Cycle Time / Cycle Time Variance**: excluye tareas en estados `Bloqueado`, `Detenido`, `Archivada`, `Archivadas`, `Archivado`, `Cancelada`, `Canceled`, `Cancelled`.
+- **Total de tareas visible (reporting/UI, count para mostrar carga)**: incluye TODAS las tareas independiente del estado. Operador necesita ver carga completa para gestión.
+- **Justificación operativa**: tareas bloqueadas o detenidas no son "fracaso del colaborador" — están bloqueadas por dependencias externas o decisiones del cliente. Contaminar el denominador con esas tareas penalizaría injustamente al equipo en OTD/RpA/FTR. Pero el operador SÍ necesita contarlas para entender carga real (planning, capacity).
+
+#### A.5 RpA per-task helper canonical (input para TASK-901 Slice 1)
+
+Con A.1 confirmado, el helper canonical `calculateRpa(taskInputs) → number | null` que TASK-901 Slice 1 debe implementar se simplifica a:
+
+```typescript
+type TaskInputsForRpa = {
+  reviewSource: 'auto' | 'frame_io' | 'workflow' | null
+  clientChangeRound: number | null      // hoy SIEMPRE null (Frame.io integration pendiente)
+  workflowChangeRound: number | null    // hoy SIEMPRE null (workflow integration pendiente)
+  correccionesCount: number             // rollup count, valor real hoy
+}
+
+// Lógica canonical 2026-05-17:
+calculateRpa({ reviewSource, clientChangeRound, workflowChangeRound, correccionesCount }) → number
+// = reviewSource === 'frame_io' && clientChangeRound != null ? clientChangeRound
+// : reviewSource === 'workflow' && workflowChangeRound != null ? workflowChangeRound
+// : correccionesCount  // fallback canonical (Auto path)
+```
+
+Hoy, en práctica, **siempre retorna `correccionesCount`** porque las 2 fuentes automáticas están vacías. Pero el helper queda forward-compatible cuando Frame.io / workflow integrations se desarrollen (no requerirá refactor — solo poblar los inputs).
+
+### B) Gaps implementacionales detectados — pendientes de remediation
+
+#### B.1 ⚠️ `Bloqueado` no excluido del denominador de métricas
+
+**Evidencia**: `src/lib/ico-engine/metric-registry.ts:122-123`:
+
+```typescript
+export const EXCLUDED_STATUSES = ['Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled', 'Archivado'] as const
+export const BLOCKED_STATUSES = ['Bloqueado', 'Detenido'] as const
+```
+
+`CANONICAL_OPEN_TASK_SQL` (líneas 133-136):
+
+```typescript
+const CANONICAL_OPEN_TASK_SQL = `(
+  completed_at IS NULL
+  AND (task_status IS NULL OR task_status NOT IN (${EXCLUDED_STATUSES_SQL}))
+)`
+```
+
+`BLOCKED_STATUSES` está **declarada pero NO usada** en exclusion SQL. Tareas en `Bloqueado` o `Detenido` entran al denominador de OTD/RpA/FTR.
+
+**Severity**: contradice la regla A.4 confirmada con operador. Si el equipo tiene N tareas bloqueadas en el período (e.g. esperando assets del cliente, esperando aprobación legal), su OTD% queda artificialmente diluido — esas N tareas cuentan como `overdue` cuando pasan fecha, contaminando el denominador con "fallas" que no son atribuibles al equipo.
+
+**Remediation pattern recomendado**:
+
+```typescript
+// Extender o crear EXCLUDED_FROM_METRICS_STATUSES que combine ambos
+const EXCLUDED_FROM_METRICS_STATUSES = [...EXCLUDED_STATUSES, ...BLOCKED_STATUSES] as const
+const EXCLUDED_FROM_METRICS_SQL = EXCLUDED_FROM_METRICS_STATUSES.map(s => `'${s}'`).join(',')
+
+const CANONICAL_OPEN_TASK_SQL = `(
+  completed_at IS NULL
+  AND (task_status IS NULL OR task_status NOT IN (${EXCLUDED_FROM_METRICS_SQL}))
+)`
+```
+
+Las queries canonical (`CANONICAL_OPEN_TASK_SQL`, `CANONICAL_COMPLETED_TASK_SQL`, derivadas) deben usar el conjunto extendido. Tests anti-regresión necesarios para verificar que el cambio NO altera el resultado para tareas que ya estaban excluidas (archivadas/canceladas) y SÍ cambia el resultado para tareas bloqueadas.
+
+**TASK derivada candidata**: small fix `TASK-902 — Excluir Bloqueado del denominador de métricas ICO` (estimación ~2h con tests + signal de validación que el conteo de tareas excluidas crece monotónicamente post-fix). Out of scope inmediato de TASK-901 (que se enfoca en writeback architecture).
+
+#### B.2 ⚠️ Estados Sky-specific NO mapeados a CSC en código
+
+**Evidencia**: Sky DB (data source `23039c2f-efe7-81f8-af2d-000b67594d18`) usa estos `Estado 1` status options canonical (per Notion schema fetched 2026-05-17):
+
+```
+groups:
+  to_do:       [Sin empezar, Pendiente, Bloqueado, Tomado]
+  in_progress: [En curso, Listo para revisión, En feedback]
+  complete:    [Aprobado, Archivado]
+```
+
+`src/lib/ico-engine/metric-registry.ts:103-115` `TASK_STATUS_TO_CSC`:
+
+```typescript
+{
+  'Sin empezar': 'briefing',
+  'Backlog': 'briefing',
+  'Pendiente': 'briefing',
+  'Listo para diseñar': 'briefing',
+  'En curso': 'produccion',
+  'En Curso': 'produccion',
+  'Cambios Solicitados': 'cambios_cliente',
+  'Listo': 'entrega',
+  'Done': 'entrega',
+  'Finalizado': 'entrega',
+  'Completado': 'entrega'
+}
+```
+
+**Estados Sky NO mapeados**: `Tomado`, `Listo para revisión`, `En feedback`, `Aprobado`, `Bloqueado`.
+
+**Severity**: Sky tasks con estos status caen en `fase_csc = NULL` o `otros` cuando se proyectan a `v_tasks_enriched` BQ. **CSC distribution charts** en `/people/[id]?tab=activity` (Person 360), `/agency/pulse` y Sky scorecards pueden mostrar información parcial/incorrecta para Sky. OTD/RpA/FTR siguen OK porque NO dependen de CSC mapping — usan `performance_indicator_code` directamente.
+
+**Mapeo canonical sugerido** (validado contra workflow operativo Sky en sesión 2026-05-17):
+
+```typescript
+'Tomado': 'briefing',              // estado inicial Sky-side: equipo Sky toma la pieza (similar a "Sin empezar" pero post-asignación)
+'Listo para revisión': 'entrega',  // pieza casi entregada, antes del primer envío al cliente
+'En feedback': 'cambios_cliente',  // equivalente a "Cambios Solicitados" en otros DBs
+'Aprobado': 'entrega',             // estado terminal Sky-side (= Listo/Done en otros DBs)
+'Bloqueado': N/A                   // no se mapea, debería excluirse al igual que `Archivado` (ver B.1)
+```
+
+**TASK derivada candidata**: small fix `TASK-903 — Mapear estados Sky a CSC canonical` (estimación ~2h con tests + smoke visual de Sky CSC charts pre/post fix). Out of scope inmediato de TASK-901. Puede paquetearse con B.1 en una sola TASK `TASK-902 — ICO status hygiene Sky + Bloqueado exclusion`.
+
+#### B.3 ⚠️ Bug class TASK-877: sync notion-bq-sync pierde el value del formula RpA para Sky (referencia, ya en flight)
+
+Detectado live 2026-05-16: BQ `notion_ops.tareas.rpa` = `null` en 100% (3,168 tasks 10 meses) para Sky DB. Notion MCP confirmó que la formula evalúa correctamente per-page (Correcciones rollup populated con valores 2-3 en samples, formula returns number). El sync `notion-bq-sync` no lee `prop.formula.number` correctamente o tiene drift de Notion-Version.
+
+**Estado de remediation**: `TASK-901` (Canonical Notion Metric Compute V1) es la solución canonical permanente — mover el compute a Greenhouse code con writeback. Eso elimina la dependencia del sync para entregar el value del formula. **Out of scope de patches al sync legacy** — el patch sería deuda temporal que TASK-901 absorbe.
+
+### C) Decisiones pendientes — Cycle Time (precondición para futuro TASK de canonical compute)
+
+Las 3 ambigüedades operativas detectadas en sesión 2026-05-17 que requieren decisión del operador antes de comprometer el helper canonical `calculateCycleTime()` en código. Sin estas decisiones, el helper TS mediría cosas diferentes según el contexto del consumer (per QBR vs per bonificación operativa vs per TTM).
+
+#### C.1 Evento de INICIO del Cycle Time
+
+3 candidatos plausibles, cada uno mide algo distinto:
+
+| Inicio candidato | Mide | Trade-off operativo |
+|---|---|---|
+| **A) `createdTime` Notion** (cuando la tarea se crea en la database) | Tiempo total que la tarea vivió en el sistema | Incluye tiempo en backlog/Pendiente cuando nadie estaba trabajando — infla CT artificialmente con espera no-productiva |
+| **B) Cuando estado pasa a `En curso` / `Tomado`** | Tiempo desde que ALGUIEN tomó la pieza activamente | Mide producción real, excluye espera en backlog. Pero requiere capturar transition timestamps (no es campo directo en Notion hoy) |
+| **C) `Fecha de aprobación del brief`** | Tiempo desde que el brief quedó claro hasta entrega | Operacionalmente el "start" más limpio según contrato Sección 4. PERO **no existe property explícita** capturada en Notion DB hoy (ni Sky ni Efeonce) |
+
+**Recomendación pre-decisión**: opción **B (status → `En curso`)** parece más alineada al contrato "tiempo desde brief aprobado hasta entrega" si interpretamos "brief aprobado" ≈ "equipo arranca trabajo". Requiere capturar transition timestamps via Notion last_edited_time + status change tracking, o agregar una property explícita `Fecha de inicio de producción` en Notion.
+
+#### C.2 Evento de FIN del Cycle Time
+
+3 candidatos:
+
+| Fin candidato | Mide |
+|---|---|
+| **A) `Fecha de completado`** (property Notion) | Última fecha de cierre operativo, puede o no coincidir con aprobación cliente |
+| **B) Estado → `Aprobado`** (final state) | Aprobación final del cliente, el "delivered" más estricto |
+| **C) Estado → `Listo para revisión`** (primera vez) | Primera entrega al cliente, excluye tiempo de iteración post-feedback |
+
+**Recomendación pre-decisión**: opción **B (estado `Aprobado`)** alinea mejor con el contrato Sección 4 "hasta pieza entregada" interpretado como "entregada y aceptada por cliente". Opción C mediría "first delivery cycle time" — útil métrica complementaria pero no es THE cycle time canonical.
+
+#### C.3 Inclusión / exclusión de tiempo en `En feedback` (cliente revisando)
+
+Cuando una pieza está `En feedback`, Greenhouse no controla ese tiempo. 2 interpretaciones:
+
+| Approach | Qué mide | Argumento pro | Argumento con |
+|---|---|---|---|
+| **Incluir `En feedback`** | Calendar end-to-end | Refleja TTM real (al cliente le importa el calendario completo, no la eficiencia interna) | Penaliza al equipo por demoras del cliente que no controla |
+| **Excluir `En feedback`** | Pure production time | Mide eficiencia equipo Greenhouse, accountability clara | Pierde el calendar real → disconnect con TTM y Early Launch Advantage |
+
+**Recomendación pre-decisión**: doble medición canonical:
+
+- `cycle_time_calendar` (incluye `En feedback`) → para TTM / Early Launch / cliente-facing
+- `cycle_time_production` (excluye `En feedback`) → para eficiencia interna / bonificación operativa / mejora continua
+
+Dos KPIs separados que responden preguntas distintas. El contrato Sección 4 menciona "Cycle Time" sin desambiguar, lo cual es el origen del problema.
+
+**Próximo paso bloqueante**: operador define las 3 decisiones (C.1, C.2, C.3) antes de levantar `TASK derivada — Canonical Cycle Time compute V1` (estimación: medio o un día dev depende de si capturamos las 2 versiones o solo una).
+
+### D) Evidencia citada de esta sesión
+
+- **Notion MCP fetch** del Sky Tasks DB schema 2026-05-17: data source `23039c2f-efe7-81f8-af2d-000b67594d18`, page `23039c2f-efe7-8138-9d1e-c8238fc40523`, teamspace Sky Airlines `22d39c2f-efe7-8142-a645-00427b6a67d5`.
+- **Sibling Efeonce Tasks DB** (formula IDs compartidos, mismo template canonical): data source `5126d7d8-bf3f-454c-80f4-be31d1ca38d4`, page `3a54f090-4be1-4158-8335-33ba96557a73`.
+- **BQ query histórico Sky RpA**: `notion_ops.tareas` 10 meses (Aug 2025 – May 2026), 3,168 tareas completadas (`task_status IN DONE_STATUSES`), 100% `rpa = null`. Confirmado pattern es del sync, no del template Notion.
+- **BQ query Daniela May 2026 Efeonce-internal**: 8 tareas completadas, 8/8 con `Review Source = null` → `rpa = 0` per formula evaluation. Tareas son trabajo interno (AXIS Design System, GTM, Berel ops setup) que sí debería contar para RpA per regla operativa.
+- **Properties Notion confirmadas vivas en Sky DB** (vía MCP schema fetch):
+  - `RpA` (formula, codeUrl `PVhQTw`)
+  - `Semáforo RpA` (formula, codeUrl `aVZIVQ`)
+  - `Indicador de Performance` (formula, codeUrl `b00_Og`) — descripción canonical "Clasifica cada tarea del mes actual en On-Time, Late Drop, Overdue o Carry-Over"
+  - `Cumplimiento %` (formula, codeUrl `Yk47Tg`)
+  - `Días de retraso` (formula, codeUrl `UWtcbw`)
+  - `Client Change Round` (number, empty 100% rows) — Frame.io integration pendiente
+  - `Workflow Change Round` (number, empty 100% rows) — workflow integration pendiente
+  - `Review Source` (select: `Auto` / `Frame.io` / `Workflow`)
+  - `Correcciones` (relation rollup, populated con valores reales)
+  - `Estado 1` (status property con groups `to_do`, `in_progress`, `complete` enumerados en B.2)
+
+### E) Cross-references canonical
+
+- `TASK-877` follow-up commit `4fc8c0c4` (2026-05-16) — recovery del bridge Notion↔member, motiva esta deep-dive
+- `TASK-900` — ICO Materializer Hardening (MERGE incremental + freshness guard) — complementario, ataca el materializer downstream
+- `TASK-901` — Canonical Notion Metric Compute V1 (RpA-only) — consume esta Delta como precondición canonical
+- `Greenhouse_ICO_Engine_v1.md` sección `A.5.4.0 Categorías funcionales de métricas ICO` (línea 2363) — fuente del dual-meaning de Cumplimiento
+- `src/lib/ico-engine/metric-registry.ts` — implementación runtime de las métricas (gaps B.1 y B.2 referenciados con file:line)
+- `src/lib/ico-engine/rpa-policy.ts` — TASK-215 confidence policy (no afectada por esta Delta, sigue vigente)
+
 ## Delta 2026-04-04 — TASK-223 formaliza la lane runtime inicial de aceleradores metodológicos
 
 `TASK-223` no convierte todavía `Design System` ni `Brand Voice para AI` en productos visibles independientes, pero sí deja su primera lectura runtime defendible dentro del contrato `CVR`.
