@@ -1,3 +1,63 @@
+# Sesion 2026-05-18 (cont. — Sky Estado 1→Estado live cutover + robust PG projection canonical fix)
+
+**Status**: ✅ Live cutover ejecutado end-to-end. Sky Notion property `Estado 1` → `Estado` canonical V1 con 11 estados, los 3935 tasks Sky pasaron de `stg_tareas.estado=NULL` (0%) → `100% populated` con distribución canonical (Aprobado 3168, Sin empezar 488, Archivado 141, Brief listo 87, Pendiente aprobación interna 21, En curso 13, Listo para revisión 13, Cambios solicitados 3, Bloqueado 1). Bug class secundario "PG projection invalid input syntax for integer: 0.44" canonizado con solución robusta de 4 capas (SQL `::numeric::integer` cast + per-row try/catch + Sentry domain capture + diagnostic samples).
+
+## Resultado canonical
+
+### Capa L4 — legacy notion-bq-sync defensive Estado/Estado 1 fallback
+
+Repo sibling `cesargrowth11/notion-bigquery` (Cloud Run `notion-bq-sync@us-central1`, project `efeonce-group`, scheduler diario 03:00 Santiago) recibió patch defensivo en `main.py`:
+
+- 3 mappers (`tareas`, `proyectos`, `sprints`) — `_prop_value(row, "Estado") or _prop_value(row, "Estado 1")` (cortocircuito Python OR, preserva Efeonce semantics, fallback transparente para Sky pre-rename).
+- `_smoke_estado_fallback.py` self-contained — 14 asserts PASS cubriendo Efeonce / Sky pre-rename / Sky post-rename / ambos presentes / empty / row vacío / sprints.
+- Cloud Run canary deploy `notion-bq-sync-00016-mat` `--no-traffic --tag=canary` → smoke verificó Sky 0→3935 estado populated → promote 100% traffic → tag removed.
+- Merge a `main` + push `cesargrowth11/notion-bigquery` (commit `dba8d6c`).
+
+### Capa L1 — Sky Notion canonical post-rename (operador CEO ejecutó en Notion UI)
+
+Property `Estado 1` → `Estado` (preserva todos los 3935 task statuses vía ID-stable rename Notion). 11 estados canonical V1 (Sin empezar, Brief listo, Pendiente aprobación interna, En pausa, Bloqueado, En curso, Listo para revisión, Cambios solicitados, Aprobado, Cancelado, Archivado). Sky-specific options legacy migrados: Tomado(87) → Brief listo, Pendiente(20) → Pendiente aprobación interna, En feedback(4) → Cambios solicitados.
+
+### Capa L2 — greenhouse-eo conformed sync robust PG projection (TASK-908 foundation prep)
+
+Bug class detectado live: BQ formula columns emiten valores fraccionales (e.g. `"0.44"`) que rompen PG INTEGER cast. Una sola row mala fallaba el batch completo sin diagnóstico de qué row/columna. Solución canonical robusta de 4 capas en `src/lib/sync/project-notion-delivery-to-postgres.ts`:
+
+1. **SQL-boundary integer coercion** (`intArg(value) = (${value})::numeric::integer`): aplica a las 10 columnas INTEGER (`days_late`, `rescheduled_days`, `client_change_round_final`, `frame_versions`, `frame_comments`, `open_frame_comments`, `blocker_count`, `workflow_change_round`, `completed_tasks_count`, `total_tasks_count`). Cualquier columna nueva queda protegida por default.
+2. **Per-row try/catch** en upsertProjects/upsertSprints/upsertTasks: una row mala NO bloquea el batch. Resilience.
+3. **Diagnostic capture** (`summarizePgError`): `captureWithDomain(err, 'integrations.notion', { tags: { source: 'delivery_projection', entity: '<project|sprint|task>' }, extra: { syncRunId, entityId, message, code, position, column, constraint } })`. Observability.
+4. **Result shape extendido**: `projectsSkipped/sprintsSkipped/tasksSkipped` + `failureSamples[]` (capped 20) — caller logs aggregate + first sample para cron visibility.
+
+Push develop → commit `ca465ac0` → GH Actions ops-worker auto-deploy run #115 → SUCCESS 7m35s → Cloud Scheduler manual trigger `ops-notion-conformed-sync` para verificar fix end-to-end.
+
+## Hallazgos clave
+
+- **Defense in depth canonical L1+L2+L3+L4**: la fuente (L1 Notion) está canonical, la sync canonical (L2 greenhouse-eo conformed) ya tiene `COALESCE(estado, estado_1)` defensivo + ahora robust PG projection, la ingesta canonical próxima (L3 TASK-908 webhook + `task_status_transitions`), y el legacy (L4 notion-bq-sync Python) tiene el OR fallback. **Cualquier capa que falle queda contenida** por las otras.
+- **Bug class pre-existente (0.44 → integer)** se manifestó precisamente cuando se necesitaba: el rename Sky disparó la cascada que reveló un bug latente. El **fix robusto** (no parche local) garantiza que la próxima formula BQ fraccional no rompa nada — defense in depth aplica a TODA columna integer presente o futura.
+- **Solución robusta vs parche local**: CEO explícitamente pidió "no parches, solo soluciones robustas, seguras, resilientes y escalables". El fix entrega los 4 ejes:
+  - **Robusto**: maneja string "0.44", number 0.44, fractionals, null, cualquier formula BQ futura.
+  - **Seguro**: per-row try/catch contiene failures; rest of batch succeeds.
+  - **Resiliente**: degraded honest cuando una row falla — el cron sigue funcionando, Sentry alerta.
+  - **Escalable**: cualquier columna INTEGER añadida al schema queda auto-protegida sin nuevo código.
+
+## Validación
+
+- Pre-commit lint + tsc PASS (pre-push hooks canonical).
+- `pnpm test src/lib/sync/`: 249/249 verde.
+- ops-worker deploy GH Actions run #115: SUCCESS 7m35s.
+- Sky stg_tareas (post-canary deploy + post-rename + re-sync): 3935/3935 (100%) estado populated, distribución canonical 9 estados activos.
+- Sky stg_proyectos: 86/86 (100%) estado.
+- Sky stg_sprints: 15/15 (100%) estado_sprint.
+- Efeonce: 1342/1342 (100%) sin cambio.
+
+## Siguientes pasos
+
+- Verificar PG projection post-fix: `gcloud scheduler jobs run ops-notion-conformed-sync --location=us-east4 --project=efeonce-group` → verificar `greenhouse_delivery.tasks` PG con Sky estados canonical + skipped=0.
+- Actualizar CLAUDE.md con regla canonical: "Notion delivery PG projection: SQL-cast all INTEGER columns + per-row try/catch + captureWithDomain canonical pattern".
+- Reliability signal `delivery.projection.row_failure_rate` (kind=data_quality, severity=warning si count>0, steady=0, fuente Sentry domain=integrations.notion source=delivery_projection) — V1.1 cuando emerja necesidad de surfaces tabular del failure rate.
+- TASK-908 dev continúa según plan canonical (webhook + outbox + PG `task_status_transitions` + helper canonical `countCorrectionTransitions`).
+- TASK-910 dev demo sandbox + bonus guardrail.
+
+---
+
 # Sesion 2026-05-18 (cont. — 3 open questions ADR Lifecycle cerradas como decisiones canonical)
 
 **Status**: ✅ Doc-only. Sesión live cerró las 3 open questions deferred del ADR `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` con decisiones canonical aprobadas por CEO. §8 del ADR pasa de "Open questions deliberadamente NO decididas" a "Decisiones canonical 2026-05-18".

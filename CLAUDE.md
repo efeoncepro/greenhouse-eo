@@ -933,6 +933,59 @@ Contrato versionado `platform-health.v1` que un agente, MCP, Teams bot, cron de 
 
 **Admin queue de hygiene**: `/admin/data-quality/notion-titles` lista las pages con `*_name IS NULL` agrupadas por space, con CTA "Editar en Notion" → page_url. Cuando el usuario edita el title en Notion, el next sync drena el cambio y la row sale del queue.
 
+### Notion delivery PG projection — robust integer cast + per-row resilience (2026-05-18)
+
+`projectNotionDeliveryToPostgres` (`src/lib/sync/project-notion-delivery-to-postgres.ts`) es el writer canónico de `greenhouse_delivery.{projects,tasks,sprints}` PG desde BQ conformed. Toda INSERT de una columna INTEGER pasa por **SQL-boundary cast** + **per-row try/catch** + **Sentry diagnostic capture** + **result shape con skipped counters**. Defense in depth de 4 capas.
+
+**Helpers canónicos** (`src/lib/sync/project-notion-delivery-to-postgres.ts`):
+
+- `intArg(value)` → `sql\`(${value})::numeric::integer\``. Cast doble que acepta string (`"0.44"`), number (`0.44`), null, undefined → coerce a INTEGER truncando fraccional. Belt-and-suspenders con TS `toInteger` upstream.
+- `summarizePgError(err)` → extrae `{message, code, position, column, constraint}` de un PG error sin row-level data.
+
+**Pattern canónico per upsert helper**:
+
+```typescript
+for (const row of rows) {
+  if (!row.entity_source_id) continue
+  try {
+    await sql`INSERT INTO greenhouse_delivery.X (...)
+              VALUES (..., ${intArg(row.integer_col)}, ...)
+              ON CONFLICT (...) DO UPDATE SET ...`.execute(db)
+    written += 1
+  } catch (err) {
+    skipped += 1
+    const summary = summarizePgError(err)
+    captureWithDomain(err, 'integrations.notion', {
+      tags: { source: 'delivery_projection', entity: '<project|sprint|task>' },
+      extra: { syncRunId, entityId: row.entity_source_id, ...summary }
+    })
+    if (failures.length < 20) failures.push({ entityType, entityId, error: summary })
+  }
+}
+```
+
+**Result shape canónico** (extendido a `ProjectNotionDeliveryToPostgresResult`):
+
+- `projectsSkipped` / `sprintsSkipped` / `tasksSkipped` — real counters per entity (no capped).
+- `failureSamples[]` — capped a 20 samples para audit payload bounded.
+
+**Bug class disparador (2026-05-18)**: BQ formula columns emiten valores fraccionales como string `"0.44"` (e.g. una formula "RpA"-like que agrega contra cero corrections). El TS contract `TaskProjectionRow.<col>: number | null` PASSED tsc, pero una upstream que bypassea `toInteger` podía dejar pasar la string. PG INTEGER rechazaba con `invalid input syntax for type integer: "0.44"`. Sin per-row try/catch, una sola row mala fallaba el batch entero. Sin diagnostic capture, RCA requería deep grep post-facto.
+
+**Columnas INTEGER actualmente protegidas** (10): `days_late`, `rescheduled_days`, `client_change_round_final`, `frame_versions`, `frame_comments`, `open_frame_comments`, `blocker_count`, `workflow_change_round`, `completed_tasks_count`, `total_tasks_count`. Cualquier columna INTEGER nueva queda automáticamente protegida por la primitiva canonical.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** pasar una columna INTEGER a un INSERT sin envolver el valor en `intArg(...)`. Aunque el TS contract diga `number | null`, el runtime puede leak strings desde BQ formulas; `intArg` es el último guardia.
+- **NUNCA** envolver un upsert helper (`upsertProjects/Sprints/Tasks`) sin per-row try/catch. Resilience canónica: una row mala no debe bloquear el batch.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'delivery_projection', entity: '<project|sprint|task>' }, extra: { syncRunId, entityId, ...summary } })`.
+- **NUNCA** loggear el row completo en el catch (puede contener PII). Solo `entityId` + `summarizePgError(err)` output (campos estructurales sin user data).
+- **NUNCA** modificar el shape `ProjectNotionDeliveryToPostgresResult` removiendo campos. Adding-only es safe; removing rompe consumers.
+- **SIEMPRE** que emerja una columna INTEGER nueva en el schema, agregarla al INSERT con `intArg(...)`. La lint rule no la enforce hoy — code review humano.
+- **SIEMPRE** que emerja un nuevo upsert helper (e.g. para `revisions` o cualquier delivery entity nueva), seguir el mismo pattern: try/catch + intArg + captureWithDomain + skipped/failures wiring.
+- **SIEMPRE** caller del helper debe loggear `pgResult.{projectsSkipped, sprintsSkipped, tasksSkipped}` en cron summary line + first `failureSamples[0]` si totalSkipped > 0. Cron visibility canónica.
+
+**Spec canónica**: commit `ca465ac0` en `develop` 2026-05-18. Pattern fuente: TASK-742 7-layer auth resilience (per-row try/catch + diagnostic capture + Sentry domain), TASK-571/766/774 (VIEW canónica + helper + signal + lint).
+
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574
 
 - Servicio Cloud Run Python/Flask en `us-central1` (NO `us-east4` — region bloqueada para preservar URL pública).
