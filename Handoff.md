@@ -1,3 +1,61 @@
+# Sesion 2026-05-18 (cont. — TASK-900 ICO Materializer Hardening shipped)
+
+**Status**: ✅ TASK-900 completa, 7 slices shipped en `develop` (sin branch switch per user request). Defaults flags OFF garantizan zero behavioral change post-merge — el cron nocturno sigue con DELETE+INSERT bit-for-bit hasta que operador active explícitamente los flags post staging shadow >=7d verde.
+
+## Resultado canonical TASK-900
+
+| Slice | Commit | Líneas | Notas |
+|---|---|---|---|
+| 1 — Freshness gate helper | `7493d880` | +325/-1 | 12 tests verde (ok/warning/error/throws/multi-blocking/override) |
+| 3 — Migration tracking table | `db061450` | +802/0 | 14 tests TS + live PG smoke (12 columns + 2 triggers + 3 indexes verificados via information_schema) |
+| 2 — MERGE for materializeMemberMetrics | `2d6e9456` | +837/-3 | 8 tests anti-regresión (LEGACY/MERGE/GATE block/GATE pass/COHERENCE/BUG CLASS TASK-877/TRACKING failure/MERGE failure) |
+| 4 — Incremental delta filter | `7a4659b7` | +214/-8 | 3 tests (delta enabled/first run/lookup failure) |
+| 5 — Extract orchestrator + 4 siblings | `08f4e455` | +810/-585 | materialize.ts reduce 693 → 285 líneas substantivas; 13 builder tests + 5 entities (member/project/sprint/organization/business_unit) usando MaterializerSqlConfig declarativa |
+| 6 — Signal delivery.ico_materializer.skipped_safety | `4516423d` | +355/-1 | 8 tests + wire-up en getReliabilityOverview |
+| 7 — Docs + CLAUDE.md hard rule + ADR | (current commit) | TBD | CLAUDE.md sección canonical + GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md ADR + RELIABILITY_CONTROL_PLANE_V1 Delta |
+
+**Test suite final**: 20 archivos / 141 tests verde. Cero regresión cross-file.
+
+## Defensa canonical contra bug class TASK-877
+
+El bug class fuente (2026-05-14 → 2026-05-16): bridge `Notion → member` degradado → materializer destruyó 2 noches de data buena vía DELETE+INSERT sin warning. Operador vio OTD/RpA proyectado en $0 por ~2 días.
+
+TASK-900 cierra la causa raíz arquitectónica con defense in depth de 4 capas (cuando flags activos):
+
+1. **Freshness gate** (`runUpstreamFreshnessGate`): consulta `identity.notion_bridge.coverage_drift` upstream; cuando severity='error' → skipea preemptivo. Materializer retorna 0 rows escritos sin tocar BQ.
+2. **MERGE atomic** (vs DELETE+INSERT): preserva historicos cuando upstream parcial (NO `WHEN NOT MATCHED BY SOURCE THEN DELETE`). QUALIFY ROW_NUMBER cinturón anti-duplicate.
+3. **Tracking persistente** (`greenhouse_sync.ico_materialization_runs`): audit append-only de cada corrida + lookup `last_materialization_at` para incremental delta filter.
+4. **Reliability signal** (`delivery.ico_materializer.skipped_safety`): visibiliza cuando el gate alertó (warning > 0, error > 5/24h). Complementario al signal upstream.
+
+## Cutover plan (post-staging)
+
+3 flags graduados default OFF:
+- `ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED`
+- `ICO_MATERIALIZER_MERGE_PATTERN_ENABLED`
+- `ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED` (REQUIRES MERGE)
+
+Sequence canonical:
+1. Staging behind 3 flags OFF — verify cron sigue legacy bit-for-bit
+2. `MERGE_PATTERN_ENABLED=true` staging shadow 7d — comparar coverage diario
+3. `INCREMENTAL_DELTA_ENABLED=true` staging shadow 7d — verify bytes scanned reduce
+4. `FRESHNESS_GATE_ENABLED=true` staging shadow 14d — inyectar bug class artificial
+5. Production rollout secuencial post staging >=21d total con cooldown >=48h entre flips
+
+## Files canonical creados/modificados
+
+- NEW `src/lib/ico-engine/materialize-{guards,tracking,orchestrator,flags,sql-builders}.ts`
+- NEW `src/lib/ico-engine/materialize-{guards,tracking,member-merge,sql-builders}.test.ts`
+- NEW `src/lib/reliability/queries/ico-materializer-skipped-safety{,.test}.ts`
+- NEW `migrations/20260518141020881_ico-materializer-tracking.sql`
+- NEW `docs/architecture/GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md`
+- MOD `src/lib/ico-engine/materialize.ts` (reducción 693 → 285 líneas substantivas)
+- MOD `src/lib/reliability/get-reliability-overview.ts` (wire-up)
+- MOD `src/types/db.d.ts` (regenerated post-migration)
+- MOD `CLAUDE.md` (sección canonical TASK-900)
+- MOD `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` (Delta 2026-05-18)
+
+---
+
 # Sesion 2026-05-18 (cont. — Governance fix: transfer `notion-bigquery` repo a efeoncepro org)
 
 **Status**: ✅ Transfer GitHub ejecutado live (`cesargrowth11/notion-bigquery` → `efeoncepro/notion-bigquery`). Trust boundary cerrado: el repo crítico del legacy sync ahora vive en la org institucional, no en cuenta personal externa. Cero impacto operacional verificado (Cloud Run sigue corriendo intacto, scheduler intacto, BigQuery intacto, smoke `/health` retorna `status=ok mode=multi-tenant spaces=2`). README del repo agregó deprecation note explícita marcando sunset post TASK-908 GA.

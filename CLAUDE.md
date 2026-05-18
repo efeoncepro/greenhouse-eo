@@ -3985,6 +3985,117 @@ Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct
 
 **Spec canónica**: `src/lib/identity/reconciliation/notion-member-map.ts` (resolver canónico, post-TASK-877). Signal canónico: `identity.notion_bridge.coverage_drift` en `src/lib/reliability/queries/identity-notion-bridge-coverage.ts`. Migration fuente: `migrations/20260516234743277_backfill-notion-bridge-greenhouse-staff.sql`. Patrones fuente: TASK-742 (defense-in-depth 7-layer), TASK-720 (`instrumentCategoriesWithoutKpiRule` detector), TASK-571/766/774 (VIEW canónica + helper + signal).
 
+### ICO Materializer Hardening Pattern (TASK-900, desde 2026-05-18)
+
+Patrón canonical para los 5 materializers ICO (`metrics_by_{member,project,sprint,organization,business_unit}`) y futuros downstream (Frame.io, HubSpot snapshots, Nubox financial materialization). Reemplaza el patrón legacy DELETE+INSERT por **MERGE incremental + freshness gate + tracking persistente + delta filter** — defense in depth contra el bug class TASK-877 follow-up donde upstream degraded destruyó 2 noches de data buena vía DELETE+INSERT sin warning.
+
+**Pipeline canonical**:
+
+```text
+Cloud Scheduler ico-materialize-daily (3:15 AM Santiago, monthsBack=3)
+  → POST /ico/materialize en ico-batch-worker Cloud Run
+  → materializeMonthlySnapshots()
+  → para cada materializer (member/project/sprint/organization/business_unit):
+     runIcoMaterializerCycle({tableName, periodYear, periodMonth, runLegacy, runMerge, ...}):
+       Capa 1: runUpstreamFreshnessGate()
+         ├─ safe=false → skipIcoMaterializationRun + captureWithDomain('delivery', warning) + return 0
+         └─ safe=true → procede
+       Capa 2: beginIcoMaterializationRun (status='running') si useMerge
+       Capa 2b: getLastSuccessfulMaterializationAt (delta cutoff lookup) si useMerge && useIncrementalDelta
+       Capa 3: ejecutar runMerge(deltaCutoffIso) o runLegacyDeleteInsert
+         ├─ throw → failIcoMaterializationRun + captureWithDomain('delivery', error) + re-throw
+         └─ rowCount → continúa
+       Capa 4: completeIcoMaterializationRun (status='succeeded' + rows_merged + notes)
+```
+
+**3 flags graduados default OFF** (cutover progresivo post staging shadow >= 7d):
+
+- `ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED` — invoca `runUpstreamFreshnessGate` antes de ejecutar
+- `ICO_MATERIALIZER_MERGE_PATTERN_ENABLED` — usa MERGE BQ atomic vs legacy DELETE+INSERT
+- `ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED` — filter `entity_last_edited >= deltaCutoff` (REQUIRES MERGE)
+
+Defaults OFF garantiza zero behavioral change post-merge — el cron sigue con DELETE+INSERT bit-for-bit hasta que operador active explícitamente los flags.
+
+**Helpers canonical**:
+
+- `runUpstreamFreshnessGate({requireSignals?, blockingSeverity?}) → Promise<{safe, reason, blockingSignals}>` — `src/lib/ico-engine/materialize-guards.ts`. Default consume `identity.notion_bridge.coverage_drift`; `requireSignals` array es injectable. Degradación honest: signal que rechaza promise se filtra a null y NO bloquea.
+- `runIcoMaterializerCycle(input)` — `src/lib/ico-engine/materialize-orchestrator.ts`. Orchestrator canonical de las 4 capas. Recibe callbacks `runLegacyDeleteInsert` + `runMerge(deltaCutoffIso)` per-entity + flag readers como inputs (test-friendly).
+- `buildLegacyDeleteInsertSql` / `buildMergeSql` / `buildPostCountSql` — `src/lib/ico-engine/materialize-sql-builders.ts`. Builders desde `MaterializerSqlConfig` declarativa. Generan SQL canonical sin copy-paste cross-entity.
+- `beginIcoMaterializationRun` / `completeIcoMaterializationRun` / `skipIcoMaterializationRun` / `failIcoMaterializationRun` / `getLastSuccessfulMaterializationAt` / `countRecentSkippedSafetyRuns` — `src/lib/ico-engine/materialize-tracking.ts`. CRUD canonical sobre `greenhouse_sync.ico_materialization_runs` (append-only, anti-UPDATE/DELETE triggers).
+
+**MERGE pattern canonical** (per `buildMergeSql`):
+
+```sql
+MERGE INTO `<project>.ico_engine.<table>` AS t
+USING (
+  SELECT <key_cols>, period_year, period_month, <metric_cols>, materialized_at
+  FROM (
+    SELECT
+      <key_select_sql>,
+      @periodYear AS period_year,
+      @periodMonth AS period_month,
+      ${buildMetricSelectSQL()},
+      MAX(te.last_edited_time) AS entity_last_edited,
+      CURRENT_TIMESTAMP() AS materialized_at
+    FROM ${buildDeliveryPeriodSourceSql(projectId)} te
+    WHERE <where_clause_sql>
+    GROUP BY <group_by_sql>
+  )
+  WHERE entity_last_edited >= TIMESTAMP(@deltaCutoff)  -- opcional, si delta enabled
+  QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY <partition_by_sql>
+    ORDER BY materialized_at DESC
+  ) = 1
+) AS s
+ON t.<key> = s.<key> AND t.period_year = s.period_year AND t.period_month = s.period_month
+WHEN MATCHED THEN UPDATE SET <metric_cols> = s.<metric_cols>, materialized_at = s.materialized_at
+WHEN NOT MATCHED THEN INSERT (...) VALUES (...)
+-- CRÍTICO: NO `WHEN NOT MATCHED BY SOURCE THEN DELETE` — preserva historicos cuando upstream parcial
+```
+
+**Tracking table canonical** `greenhouse_sync.ico_materialization_runs` (migration `20260518141020881`):
+
+- `(table_name, period_year, period_month, started_at, completed_at, status, rows_merged, blocking_signals JSONB, notes)`
+- CHECK status IN ('running','succeeded','skipped_safety','failed')
+- CHECK skipped_safety REQUIERE blocking_signals NOT NULL
+- INDEX `(table_name, period_year, period_month, started_at DESC)` para lookup O(log n) `getLastSuccessfulMaterializationAt`
+- INDEX parcial `WHERE status='skipped_safety' ORDER BY started_at DESC` para reliability signal
+- Anti-UPDATE trigger: solo permite transición `running → succeeded|failed|skipped_safety`; identity cols (id/table_name/period/started_at/created_at) immutables
+- Anti-DELETE trigger: unconditionally rejected
+- Ownership `greenhouse_ops`, GRANT SELECT/INSERT a `greenhouse_runtime`
+
+**Reliability signal canonical** `delivery.ico_materializer.skipped_safety` (`src/lib/reliability/queries/ico-materializer-skipped-safety.ts`):
+
+- kind=`drift`, moduleKey='delivery', subsystem rollup automatic via registry
+- Severity: count=0 → ok | 1-5 → warning | >5 en 24h → error | query throws → unknown
+- Steady state esperado = 0 (gate confía en upstream)
+- Complementario a `identity.notion_bridge.coverage_drift` — cuando alerta es porque protegió data buena downstream
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** ejecutar un DELETE+INSERT sobre una tabla materializada de ICO sin pasar por el orchestrator canonical `runIcoMaterializerCycle`. Si emerge un materializer downstream nuevo (Frame.io, HubSpot, etc.), reusa el orchestrator con su `MaterializerSqlConfig` declarativa.
+- **NUNCA** filtrar a nivel TASK con `WHERE te.last_edited_time >= cutoff` en el aggregate source. **DEBE** filtrar a nivel BUCKET vía `MAX(te.last_edited_time) AS entity_last_edited` + outer WHERE. Filtrar tasks corrompe metrics (e.g. member con 10 tasks, 1 editada → aggregate de 1 task en lugar de 10).
+- **NUNCA** incluir `WHEN NOT MATCHED BY SOURCE THEN DELETE` en el MERGE. La omisión es load-bearing: preserva data buena cuando upstream parcial. La diferencia entre destruir y proteger.
+- **NUNCA** activar `ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED=true` sin `ICO_MATERIALIZER_MERGE_PATTERN_ENABLED=true`. Code-side `assertMaterializerFlagCoherence` throw runtime — defense in depth.
+- **NUNCA** abortar silenciosamente el materializer: si el gate skipea, emite `captureWithDomain(err, 'delivery', {source: 'ico_materializer_skipped_safety'})` + persiste `status='skipped_safety'` + `blocking_signals` JSONB en tracking table.
+- **NUNCA** mutar/borrar `greenhouse_sync.ico_materialization_runs`. Anti-UPDATE / anti-DELETE triggers PG enforce. Para correcciones, INSERT nueva fila — append-only audit trail.
+- **NUNCA** computar `last_materialization_at` derivado de `metrics_by_*.materialized_at` (BQ). Usar siempre PG tracking SSOT — BQ es eventually consistent, PG es source of truth governance.
+- **NUNCA** invocar `Sentry.captureException` directo en code paths del materializer. Usar `captureWithDomain(err, 'delivery', { tags: { source: 'ico_materializer_*', table: '<name>' } })` para rollup canonical en `/admin/operations`.
+- **NUNCA** reescribir un materializer sin tests anti-regresión que simulen upstream degraded + verifiquen preservación de data previa (pattern `materialize-member-merge.test.ts`).
+- **SIEMPRE** que emerja un materializer nuevo (Frame.io, HubSpot, Nubox, etc.), reusar `runIcoMaterializerCycle` + builders + tracking. Cero código nuevo de orquestación.
+- **SIEMPRE** que emerja un signal upstream nuevo cuya regression podría corromper el materializer ICO, agregar su fetcher al `requireSignals` array del gate (sin refactor del orchestrator).
+
+**Bug class fuente** (canonizado live 2026-05-18): TASK-877 follow-up 2026-05-14 → 2026-05-16. Bridge Notion→member degradado destruyó 2 noches consecutivas de data buena en `ico_engine.metrics_by_member` vía DELETE+INSERT. Operador vio TODOS los colaboradores con OTD/RpA proyectado en $0 por ~2 días aunque la nómina actual de Abril persistida en `payroll_entries` era correcta. Mitigación temporal commit `4fc8c0c4` (reliability signal `identity.notion_bridge.coverage_drift`) detecta el síntoma en horas vs 2 días — **pero no previene el bug, solo lo expone**. TASK-900 cierra la causa raíz arquitectónica.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md` (ADR). Files canónicos:
+
+- Helpers: `src/lib/ico-engine/materialize-{guards,orchestrator,tracking,flags,sql-builders}.ts`
+- Migration: `migrations/20260518141020881_ico-materializer-tracking.sql`
+- Signal reader: `src/lib/reliability/queries/ico-materializer-skipped-safety.ts`
+- Wire-up: `src/lib/reliability/get-reliability-overview.ts` (`icoMaterializerSkippedSafety` source)
+
+Patrones fuente reusados: TASK-571/699/766/774 (VIEW + helper + reliability + lint), TASK-742 (defense in depth 7-layer), TASK-848 (state machine + tracking append-only), TASK-873 (capability granularity), TASK-720/768/777 (declarative config + lint rule pattern para futuros materializers).
+
 ### Delivery Metrics Ownership Boundary invariants (TASK-901 + TASK-908 + TASK-909, desde 2026-05-17)
 
 **Notion = Task Operating System. Greenhouse ICO Engine = motor exclusivo de cómputo de métricas.** Notion captura datos operativos primitivos (asignación, fechas, estado, tipo de entregable, archivos) y sirve como UI de gestión. Greenhouse computa TODAS las métricas (RpA, OTD, FTR, Cumplimiento, Cycle Time, Throughput, Pipeline Velocity, BCS, TTM, Iteration Velocity, futuras) desde eventos canonical y escribe los valores de vuelta a Notion vía bulk PATCH a propiedades `[GH] <métrica>` read-only.

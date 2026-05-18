@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Shipped 2026-05-18 directo en develop (7 slices canonical, defaults flags OFF)`
 - Rank: `TBD`
 - Domain: `delivery|ico|reliability|platform`
 - Blocked by: `none`

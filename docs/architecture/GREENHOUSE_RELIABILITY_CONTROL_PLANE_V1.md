@@ -2,10 +2,27 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.7`
+> Versión: `1.8`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-09` por ISSUE-073 follow-up (smoke navigation contract)
+> Última actualización: `2026-05-18` por TASK-900 (ICO Materializer skipped_safety signal)
+
+---
+
+## Delta 2026-05-18 — TASK-900: signal `delivery.ico_materializer.skipped_safety`
+
+Nuevo signal canonical bajo `moduleKey='delivery'` que cuenta corridas del materializer ICO con `status='skipped_safety'` en `greenhouse_sync.ico_materialization_runs` ventana 24h. Complementario al `identity.notion_bridge.coverage_drift` (TASK-877 follow-up): este último detecta el síntoma upstream (bridge regresión), el nuevo `delivery.ico_materializer.skipped_safety` confirma que el gate canonical activó la defensa anti-bug-class antes de destruir downstream.
+
+Severity matrix:
+
+- count = 0 → `ok` (gate confía en upstream, steady state)
+- 1 ≤ count ≤ 5 → `warning` (gate protegió data; operador resuelve signal fuente)
+- count > 5 en 24h → `error` (upstream NO resolviéndose; intervención humana)
+- query throws → `unknown` + `captureWithDomain('delivery', ...)`
+
+Reader canonical: `src/lib/reliability/queries/ico-materializer-skipped-safety.ts`. Wire-up en `getReliabilityOverview` via source `icoMaterializerSkippedSafety`. Subsystem rollup automático bajo módulo `delivery` (registry.ts:147 — `incidentDomainTag='delivery'` ya existe).
+
+Spec arquitectónica completa: `GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md`. Reglas duras canonicalizadas en CLAUDE.md § "ICO Materializer Hardening Pattern (TASK-900, desde 2026-05-18)".
 
 ---
 
