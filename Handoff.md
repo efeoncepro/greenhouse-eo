@@ -1,3 +1,71 @@
+# Sesion 2026-05-18 (cont. — arrayArg SQL-boundary helper canonical para ARRAY NOT NULL columns)
+
+**Status**: ✅ Bug class ARRAY NOT NULL detectado vía Sentry alert post Efeonce rename + fixed canonical robusto. Mirror del pattern `intArg` (commit `ca465ac0`): nuevo helper `arrayArg(value)` que coerce `null → []` en SQL boundary. Aplicado a las 4 columnas ARRAY NOT NULL de `greenhouse_delivery.tasks`. Cualquier columna ARRAY NOT NULL futura queda automáticamente protegida. Cero parche local — el helper es la canonical primitive single-source-of-truth.
+
+## Resultado canonical
+
+### Bug class detectado en vivo
+
+Sentry alert `JAVASCRIPT-NEXTJS-64`:
+
+```text
+error: null value in column "tarea_principal_ids" of relation "tasks"
+violates not-null constraint
+  File "/app/dist/server.mjs", line 59816, in upsertTasks
+  File "/app/dist/server.mjs", line 59999, in projectNotionDeliveryToPostgres
+  File "/app/dist/server.mjs", line 61808, in syncNotionToConformed
+  File "/app/dist/server.mjs", line 62305, in runNotionConformedCycle
+```
+
+Root cause: BQ runtime devuelve `null` para repeated-string Notion properties sin valores (e.g. task sin `Subtareas` relation, sin `Tarea principal` relation). PG schema declara las 4 columnas ARRAY como `NOT NULL DEFAULT '{}'`. El mapper TS pasa el `null` directo. PG rechaza.
+
+Detected durante Efeonce canonical rename cascade: 1322 de 1342 task rows skipped en Step 1 PG projection. La per-row resilience (introducida en `ca465ac0`) contuvo el fallo — el batch siguió, Sentry capturó cada error con `column: "tarea_principal_ids"` exact + `code: 23502` + `constraint: ...`. Step 2 UNCONDITIONAL drain BQ→PG después succeed para 1342/1342 (zero skipped) → la cascada quedó completa SIN intervención manual.
+
+### Solución canonical robusta
+
+Mirror exacto del pattern `intArg`:
+
+```typescript
+const arrayArg = (value: string[] | null | undefined) =>
+  sql<string[]>`COALESCE(${value}::text[], ARRAY[]::text[])`
+```
+
+Aplicado a las 4 columnas ARRAY NOT NULL en `upsertTasks` INSERT:
+- `${arrayArg(task.assignee_member_ids)}`
+- `${arrayArg(task.project_source_ids)}`
+- `${arrayArg(task.tarea_principal_ids)}`
+- `${arrayArg(task.subtareas_ids)}`
+
+Reemplaza inline `${task.X}::text[]` (que solo convertía JSON a text[], NO manejaba null).
+
+### Garantías cero rotura
+
+- **Refactor es SUPERSET**: pre-existing rows con non-null arrays siguen matcheando (`COALESCE` retorna el input unchanged). Future rows con null arrays ahora coerce a empty array.
+- **Schema PG sin cambio**: no migration, no data backfill.
+- **TS clean** + **lint 0 errors** + **333 tests sync/delivery PASS**.
+
+## Hallazgos clave
+
+- **Defense in depth ya funcionando**: la per-row resilience (commit `ca465ac0`) capturó 1322 errors limpiamente sin bloquear batch. La Step 2 UNCONDITIONAL drain completó el cascade. **Sin el fix anterior, este bug habría bloqueado todo el sync de Efeonce post-rename**.
+- **arrayArg + intArg = pattern canonical reusable**: cualquier futura columna NOT NULL (INTEGER o ARRAY) queda auto-protegida cuando el INSERT la envuelve con el helper apropiado. Mismo nombre conceptual: `<type>Arg(value)`.
+- **Sentry alert con `column: "X"` permitió RCA en segundos**: sin `summarizePgError` capturando PG error metadata structural, debuggear este bug habría requerido deep dive.
+
+## Validación
+
+- TS clean post-helper + 4 callsites refactored.
+- Lint clean (0 errors, 4 pre-existing warnings unrelated).
+- `pnpm test src/lib/sync/ src/lib/delivery/`: 333 PASS / 3 skipped.
+- Commit `550c0e67` push develop SUCCESS.
+- GH Actions ops-worker deploy run `26035113953` triggered automatically (matches trigger path `src/lib/sync/**`).
+
+## Siguientes pasos
+
+- Esperar ops-worker auto-deploy completar (~7-8 min) → re-trigger conformed sync → verificar Step 1 PG projection skipped=0.
+- ICO compute downstream + reactive consumers consumen PG tasks ya canonical, ningún cambio adicional necesario.
+- Bug class futuro: si emerge columna NOT NULL de otro tipo (DATE, JSONB, etc.), seguir el mismo pattern + agregar helper canonical apropiado.
+
+---
+
 # Sesion 2026-05-18 (cont. — Canonical task status vocabulary V1 Plan A + 22 callsites refactor pre-Efeonce rename)
 
 **Status**: ✅ Plan A canonical executed end-to-end. Foundation defensiva creada para hacer safe el rename de Efeonce status options (Listo→Aprobado, Cancelada→Cancelado, Archivadas→Archivado, Detenido→En pausa, Listo para diseñar→Brief listo, Pendiente Dir. Arte→Pendiente aprobación interna, Cambios Solicitados→Cambios solicitados). Audit detectó 22 archivos × ~50 callsites con literales hardcodeados que romperían silenciosamente en cualquier rename Notion. Single source of truth canonical + alias map + helpers + tests. 4812 tests PASS. Zero rotura demostrada antes de push.
