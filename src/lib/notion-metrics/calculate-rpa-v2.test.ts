@@ -8,7 +8,7 @@ vi.mock('./count-correction-transitions', () => ({
   countCorrectionTransitions: mocks.countCorrectionTransitions
 }))
 
-import { calculateRpa, RPA_FORMULA_VERSION } from './calculate-rpa'
+import { calculateRpaV2, RPA_FORMULA_VERSION } from './calculate-rpa-v2'
 
 beforeEach(() => {
   mocks.countCorrectionTransitions.mockReset()
@@ -29,13 +29,13 @@ const transitionsResult = (
   }))
 })
 
-describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
+describe('calculateRpaV2 — TASK-901 Slice 1 canonical V2 (strangler carril paralelo)', () => {
   describe('Happy paths — sourceMode canonical', () => {
     // Test 1 spec §4.2
     it('0 transitions → value=0, dataStatus=valid', async () => {
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(0))
 
-      const r = await calculateRpa({ taskSourceId: TASK_ID })
+      const r = await calculateRpaV2({ taskSourceId: TASK_ID })
 
       expect(r.value).toBe(0)
       expect(r.dataStatus).toBe('valid')
@@ -49,7 +49,7 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
     it('1 transición → value=1', async () => {
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(1))
 
-      const r = await calculateRpa({ taskSourceId: TASK_ID })
+      const r = await calculateRpaV2({ taskSourceId: TASK_ID })
 
       expect(r.value).toBe(1)
       expect(r.dataStatus).toBe('valid')
@@ -61,7 +61,7 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
     it('5 transiciones (oscilación múltiple) → value=5', async () => {
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(5))
 
-      const r = await calculateRpa({ taskSourceId: TASK_ID })
+      const r = await calculateRpaV2({ taskSourceId: TASK_ID })
 
       expect(r.value).toBe(5)
       expect(r.dataStatus).toBe('valid')
@@ -78,7 +78,7 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
       const windowStart = new Date('2026-05-01T00:00:00Z')
       const windowEnd = new Date('2026-05-31T23:59:59Z')
 
-      const r = await calculateRpa({ taskSourceId: TASK_ID, windowStart, windowEnd })
+      const r = await calculateRpaV2({ taskSourceId: TASK_ID, windowStart, windowEnd })
 
       expect(r.value).toBe(2)
       expect(r.dataStatus).toBe('valid')
@@ -99,7 +99,7 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
       const windowStart = new Date('2026-05-31T23:59:59Z')
       const windowEnd = new Date('2026-05-01T00:00:00Z')
 
-      const r = await calculateRpa({ taskSourceId: TASK_ID, windowStart, windowEnd })
+      const r = await calculateRpaV2({ taskSourceId: TASK_ID, windowStart, windowEnd })
 
       expect(r.value).toBe(0)
       expect(r.dataStatus).toBe('valid')
@@ -114,7 +114,7 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
     it('tarea pre-TASK-912 (sourceMode=unavailable) → value=null, dataStatus=unavailable', async () => {
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(0, 'unavailable'))
 
-      const r = await calculateRpa({ taskSourceId: TASK_ID })
+      const r = await calculateRpaV2({ taskSourceId: TASK_ID })
 
       expect(r.value).toBeNull()
       expect(r.dataStatus).toBe('unavailable')
@@ -127,7 +127,7 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
     it('taskSourceId vacío → value=null, dataStatus=unavailable (delegated upstream)', async () => {
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(0, 'unavailable'))
 
-      const r = await calculateRpa({ taskSourceId: '' })
+      const r = await calculateRpaV2({ taskSourceId: '' })
 
       expect(r.value).toBeNull()
       expect(r.dataStatus).toBe('unavailable')
@@ -141,7 +141,7 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
     it('V2 fields pasados pero V1 los ignora silenciosamente → mismo result', async () => {
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(2))
 
-      const r = await calculateRpa({
+      const r = await calculateRpaV2({
         taskSourceId: TASK_ID,
         clientReviewOpen: true,
         workflowReviewOpen: false,
@@ -164,8 +164,8 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
     it('2 invocaciones consecutivas con mismos inputs → mismo result', async () => {
       mocks.countCorrectionTransitions.mockResolvedValue(transitionsResult(3))
 
-      const r1 = await calculateRpa({ taskSourceId: TASK_ID })
-      const r2 = await calculateRpa({ taskSourceId: TASK_ID })
+      const r1 = await calculateRpaV2({ taskSourceId: TASK_ID })
+      const r2 = await calculateRpaV2({ taskSourceId: TASK_ID })
 
       expect(r1).toEqual(r2)
       expect(r1.value).toBe(3)
@@ -176,19 +176,19 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
 
   describe('Formula version canonical', () => {
     it('RPA_FORMULA_VERSION === rpa_v1.0 (anti-regresión)', () => {
-      expect(RPA_FORMULA_VERSION).toBe('rpa_v1.0')
+      expect(RPA_FORMULA_VERSION).toBe('rpa_v2.0')
     })
 
     it('result siempre incluye formulaVersion canonical (valid + unavailable paths)', async () => {
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(2))
-      const valid = await calculateRpa({ taskSourceId: TASK_ID })
+      const valid = await calculateRpaV2({ taskSourceId: TASK_ID })
 
-      expect(valid.formulaVersion).toBe('rpa_v1.0')
+      expect(valid.formulaVersion).toBe('rpa_v2.0')
 
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(0, 'unavailable'))
-      const unavailable = await calculateRpa({ taskSourceId: TASK_ID })
+      const unavailable = await calculateRpaV2({ taskSourceId: TASK_ID })
 
-      expect(unavailable.formulaVersion).toBe('rpa_v1.0')
+      expect(unavailable.formulaVersion).toBe('rpa_v2.0')
     })
   })
 
@@ -196,10 +196,10 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
     it('sourceMode=unavailable NUNCA produce value=0 — siempre value=null', async () => {
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(0, 'unavailable'))
 
-      const r = await calculateRpa({ taskSourceId: TASK_ID })
+      const r = await calculateRpaV2({ taskSourceId: TASK_ID })
 
       // Anti-regresión TASK-877 follow-up bug class: 3,168 Sky tareas con rpa=null
-      // por bug del sync legacy. Si calculateRpa retornara 0, bonus calc inflaría
+      // por bug del sync legacy. Si calculateRpaV2 retornara 0, bonus calc inflaría
       // a "full payout" para tareas sin tracking. Mapping unavailable→null es
       // load-bearing para preservar la degradación honesta downstream.
       expect(r.value).toBeNull()
@@ -210,7 +210,7 @@ describe('calculateRpa — TASK-901 Slice 1 canonical V1', () => {
     it('sourceMode=canonical con count=0 SÍ produce value=0 (distingue de unavailable)', async () => {
       mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(0, 'canonical'))
 
-      const r = await calculateRpa({ taskSourceId: TASK_ID })
+      const r = await calculateRpaV2({ taskSourceId: TASK_ID })
 
       expect(r.value).toBe(0)
       expect(r.value).not.toBeNull()

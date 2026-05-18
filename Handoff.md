@@ -1,3 +1,28 @@
+# Sesion 2026-05-18 (cont. — TASK-901 Slice 1 calculateRpaV2 canonical helper shipped + arch forward-fix V2 naming)
+
+**Status**: ✅ TASK-901 Slice 1 shipped en `develop` en 2 commits canonical:
+
+1. **`308be17d`** — helper canonical inicial nombrado `calculateRpa` + version `'rpa_v1.0'`.
+2. **Forward-fix commit (este)** — rename canonical a V2 strangler naming per ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` (Accepted 2026-05-17): `calculateRpa → calculateRpaV2`, `'rpa_v1.0' → 'rpa_v2.0'`, file rename `calculate-rpa.{ts,test.ts} → calculate-rpa-v2.{ts,test.ts}`, types renombrados (`TaskInputsForRpa → TaskInputsForRpaV2`, `RpaResult → RpaV2Result`, etc.).
+
+**Razón del forward-fix canonical**: el ADR Strangler exige naming V2 explícito porque V1 = path productivo legacy (Notion formula `RpA` + sync notion-bq-sync + `metrics_by_member.rpa_avg` + `calculateRpaBonus` payroll) que **NO se toca durante toda la migración 5-7 meses**. V2 = código canonical paralelo coexiste con V1 hasta cutover bonus (Fase D del ADR — gated por flag `BONUS_USE_RPA_V2` reversible <5min) + cleanup V1 opcional 90+ días post Fase D stable + HR/Finance sign-off escrito (Fase E). Yo consulté las 3 skills (arch + ico + notion) con RPA_V1.md spec §4.1 (que dice naming V1) pero NO con el ADR Strangler superseding. Forward-fix limpio antes de cualquier consumer wire-up.
+
+**Cero impacto productivo del fix**: el commit `308be17d` shippeó un helper **aislado sin consumers downstream** (Slices 2-5 + TASK-912 deferred). V1 productivo (Notion formula + sync + bonus path) NO se tocó en ningún momento — sigue corriendo idéntico. El rename es de naming canonical solamente, runtime intacto.
+
+Helper canonical V2 (`src/lib/notion-metrics/calculate-rpa-v2.ts`) implementa literal RPA_V1.md §4.1 con naming V2 strangler. Delega 100% a `countCorrectionTransitions` (TASK-908 V1.0 Foundation). 13 tests verde post-rename. 3 skills invocadas paralelo pre-implementation (arch-architect + greenhouse-ico + notion-platform) — todas convergieron en PROCEED con modifications menores aplicadas (taskSourceId en inputsUsed + edge case window invertida + JSDoc canonical apuntando a CLAUDE.md "Delivery Metrics Ownership Boundary invariants"). Null-not-zero contract preservado (anti-regresión TASK-877 follow-up bug class).
+
+**Pre-TASK-912 deployment esperado**: helper retorna `sourceMode='unavailable'` 100% (tabla `task_status_transitions` vacía hasta webhook ingestion shipea). Bonus calc downstream maneja `rpaAvg===null → {amount:0, qualifies:false}`. Cero inflación bonus. Degradación honesta universal. Reliability signal `notion.correction_transitions.source_availability` reporta severity=error 100% esperado.
+
+**Out of scope Slice 1** (deferred a Fases B-E del ADR Strangler + TASK-912):
+
+- Fase B: reactive consumer compute shadow mode + paridad signal `notion.metrics.rpa_v2_vs_v1_paridad` (Slice 4 → Fase B del ADR)
+- Fase C: Cloud Tasks queue `notion-writeback-v2` + setup property `[GH] RpA v2` + writeback flag flip + nightly safety net (Slices 5-8 → Fase C)
+- Fase D: bonus cutover gradual per-tenant via flag `BONUS_USE_RPA_V2=true` Efeonce → 30d HR reconciliation → Sky (Slices 9-10 → Fase D)
+- Fase E: cleanup V1 OPCIONAL post 90+ días Fase D stable (Slices 11-15 → Fase E, **PUEDE DEFERIRSE INDEFINIDAMENTE**)
+- TASK-912: webhook ingestion infrastructure (Fase A foundation prerequisito para Fase B compute)
+
+---
+
 # Sesion 2026-05-18 (cont. — TASK-908 FOUNDATION shipped — desbloquea TASK-901)
 
 **Status**: ✅ TASK-908 V1.0 Foundation shipped end-to-end en `develop`. 5 slices canonical (0, 1, 3.5, 6, 7, 8) + table migration + helpers + reliability signal + tests anti-regresión + docs canonical. **Desbloquea TASK-901 (calculateRpa) y TASK-909 (calculateFtr) arquitectónicamente** — ambos delegan a `countCorrectionTransitions` canonical helper que shipea esta sesión. Slices 2/3/4/5/9 (webhook ingestion + reactive consumer + BQ formula update + backfill) deferred a TASK-912 cuando Notion webhook subscription se registre operador-side. Defaults: tabla `task_status_transitions` vacía hasta TASK-912, helpers retornan `sourceMode='unavailable'` graceful (NO crash) para tareas pre-deployment.
