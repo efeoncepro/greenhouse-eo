@@ -1,3 +1,59 @@
+# Sesion 2026-05-18 (cont. — Canonical task status vocabulary V1 Plan A + 22 callsites refactor pre-Efeonce rename)
+
+**Status**: ✅ Plan A canonical executed end-to-end. Foundation defensiva creada para hacer safe el rename de Efeonce status options (Listo→Aprobado, Cancelada→Cancelado, Archivadas→Archivado, Detenido→En pausa, Listo para diseñar→Brief listo, Pendiente Dir. Arte→Pendiente aprobación interna, Cambios Solicitados→Cambios solicitados). Audit detectó 22 archivos × ~50 callsites con literales hardcodeados que romperían silenciosamente en cualquier rename Notion. Single source of truth canonical + alias map + helpers + tests. 4812 tests PASS. Zero rotura demostrada antes de push.
+
+## Resultado canonical
+
+### Módulo canonical V1 — `src/lib/delivery/task-status-canonical.ts`
+
+NOT server-only (safe en client + server). Exports:
+- `TASK_STATUS_CANONICAL` — 11 V1 (Sin empezar, Brief listo, Pendiente aprobación interna, En pausa, Bloqueado, En curso, Listo para revisión, Cambios solicitados, Aprobado, Cancelado, Archivado).
+- `TASK_STATUS_ALIASES` — frozen map cubriendo: canonical self-maps + Efeonce legacy (7 renames) + Sky legacy (3) + English/accent variants (8). Total 26 entries.
+- `TASK_STATUS_GROUPS` — BRIEFING, ACTIVE, BLOCKED, COMPLETED, EXCLUDED, READY_FOR_REVIEW, CLIENT_CHANGES.
+- Helpers puros: `normalizeTaskStatus`, `isCanonicalStatus`, `isCanonicalStatusInGroup`, `allVariantsForCanonical`, `allVariantsForGroup`.
+- SQL builders (server-side): `taskStatusSql`, `taskStatusGroupSql`, `buildTaskStatusToCscPhaseSql`.
+- 68 tests anti-regresión (`task-status-canonical.test.ts`) cubriendo todas las variantes + edge cases.
+
+### Refactor end-to-end — 22 archivos × ~50 callsites
+
+**ICO Engine** (corazón del bonus): `metric-registry.ts` (TASK_STATUS_TO_CSC generated + DONE/EXCLUDED/BLOCKED_STATUSES backward-compat) + `shared.ts` (DONE_STATUSES_SQL / EXCLUDED_STATUSES_SQL) + `schema.ts` (BQ VIEW v_tasks_enriched CASE WHEN canonical + is_stuck filter + DELETE filter).
+
+**Consumers downstream**: projects/get-project-detail.ts (CSC phase + 4 status filters), projects/get-projects-overview.ts, account-360/organization-projects.ts, dashboard/get-dashboard-overview.ts (state_group CASE), agency/agency-queries.ts (5 callsites: assets_activos x2 + weekly + statusMix + STATUS_MAP via canonical helpers), capability-queries/shared.ts (state_group CASE), sprints/sprint-store.ts, team-queries.ts (in_review + changes_requested COUNTIF), campaigns/campaign-metrics.ts (7 SQL completion checks), person-360/get-person-delivery.ts (PG NOT IN constants), people/get-person-operational-metrics.ts.
+
+**API routes**: app/api/reviews/queue (2 SQL filters), app/api/cron/materialization-health (COUNTIF), app/api/projects/[id]/{ico,full} (CSC distribution NOT IN).
+
+**UI**: views/greenhouse/organizations/tabs/OrganizationProjectsTab.tsx (statusColor chip — client-side helper via `isCanonicalStatusInGroup`).
+
+### Garantías cero rotura
+
+- Refactor es **SUPERSET**: cada lista expandida incluye TODAS las variantes legacy + canonical V1 nuevo. Pre-rename Efeonce data con "Cambios Solicitados" (capital S) sigue matcheando. Post-rename con "Cambios solicitados" (lowercase) también. Mismo principio para los otros 6 renames.
+- `pnpm exec tsc --noEmit`: clean.
+- `pnpm lint`: 0 errors, 4 pre-existing warnings unrelated.
+- `pnpm test`: **4812 PASS** / 42 skipped.
+
+## Hallazgos clave
+
+- **El bug más crítico estaba escondido en case sensitivity**: 20+ matches de `"Cambios Solicitados"` (S mayúscula) vs canonical `"Cambios solicitados"` (s minúscula). Al renombrar Efeonce sin este refactor, el RpA-target (corrección cliente) habría roto silenciosamente — métricas incorrectas sin alerta. Era la clase exacta de bug que TASK-877 follow-up tuvo con Sky.
+- **El codebase YA tenía conciencia parcial del problema**: ya existían listas tipo `['Listo', 'Done', 'Finalizado', 'Completado']` dispersas en 12+ archivos. Mi refactor las consolidó en un single source of truth.
+- **Plan A robusto pero con techo**: aliases legacy crecen si entra cliente nuevo con custom names. Plan B canonical es TASK-908 (`status_code` enum persistido en PG al boundary del sync — código matchea por código estable, no por nombre).
+
+## Validación
+
+- TS clean post-refactor.
+- Lint clean post-auto-fix.
+- 4812 tests PASS / 42 skipped (cero regresión).
+- 68 tests nuevos del módulo canonical PASS.
+- Commit `1525e51c` push develop SUCCESS.
+- Vercel auto-deploy en develop trigger automatic (greenhouse-eo Next.js app).
+
+## Siguientes pasos
+
+- **Tu turno**: renombrar las 7 opciones Efeonce en Notion UI (Listo→Aprobado, Cancelada→Cancelado, Archivadas→Archivado, Detenido→En pausa, Listo para diseñar→Brief listo, Pendiente Dir. Arte→Pendiente aprobación interna, Cambios Solicitados→Cambios solicitados). El código ya soporta ambos nombres simultáneamente — zero downtime, zero rotura.
+- Trigger conformed sync post-rename para drenar BQ + verificar distribución canonical Efeonce.
+- Eventualmente (TASK-908 dev): canonical `status_code` enum persistido en PG → código matchea por código estable → eliminamos `TASK_STATUS_ALIASES` legacy.
+
+---
+
 # Sesion 2026-05-18 (cont. — Sky Estado 1→Estado live cutover + robust PG projection canonical fix)
 
 **Status**: ✅ Live cutover ejecutado end-to-end. Sky Notion property `Estado 1` → `Estado` canonical V1 con 11 estados, los 3935 tasks Sky pasaron de `stg_tareas.estado=NULL` (0%) → `100% populated` con distribución canonical (Aprobado 3168, Sin empezar 488, Archivado 141, Brief listo 87, Pendiente aprobación interna 21, En curso 13, Listo para revisión 13, Cambios solicitados 3, Bloqueado 1). Bug class secundario "PG projection invalid input syntax for integer: 0.44" canonizado con solución robusta de 4 capas (SQL `::numeric::integer` cast + per-row try/catch + Sentry domain capture + diagnostic samples).
