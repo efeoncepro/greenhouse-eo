@@ -1726,15 +1726,28 @@ export const syncNotionToConformed = async (input?: {
       })
 
       console.log(
-        `[sync-conformed] PG projection: projects=${pgResult.projectsWritten}/+${pgResult.projectsMarkedDeleted}d, ` +
-        `sprints=${pgResult.sprintsWritten}/+${pgResult.sprintsMarkedDeleted}d, ` +
-        `tasks=${pgResult.tasksWritten}/+${pgResult.tasksMarkedDeleted}d, ${pgResult.durationMs}ms`
+        `[sync-conformed] PG projection: projects=${pgResult.projectsWritten}/+${pgResult.projectsMarkedDeleted}d/-${pgResult.projectsSkipped}skip, ` +
+        `sprints=${pgResult.sprintsWritten}/+${pgResult.sprintsMarkedDeleted}d/-${pgResult.sprintsSkipped}skip, ` +
+        `tasks=${pgResult.tasksWritten}/+${pgResult.tasksMarkedDeleted}d/-${pgResult.tasksSkipped}skip, ${pgResult.durationMs}ms`
       )
+
+      const totalSkipped = pgResult.projectsSkipped + pgResult.sprintsSkipped + pgResult.tasksSkipped
+
+      if (totalSkipped > 0) {
+        // Per-row failures already capture to Sentry domain=integrations.notion
+        // inside the upsert helpers. Log a summary line here for cron visibility
+        // and surface the first sample so operators see "what kind of failure".
+        console.warn(
+          `[sync-conformed] PG projection skipped ${totalSkipped} row(s) (non-blocking, batch continued). ` +
+          `First sample: ${JSON.stringify(pgResult.failureSamples[0])}`
+        )
+      }
     } catch (err) {
       // Non-blocking — BQ-conformed already succeeded which is the user-visible
       // contract for this cycle. PG can be back-filled by re-running the cron
       // (idempotent) or by toggling the kill-switch off and using the legacy
-      // manual script.
+      // manual script. Per-row failures are already handled inside the helper;
+      // this catch only fires on systemic failures (DB unreachable, etc.).
       console.warn('[sync-conformed] PG projection failed (non-blocking, BQ conformed unaffected):', err)
     }
   }
