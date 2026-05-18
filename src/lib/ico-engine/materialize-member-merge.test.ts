@@ -26,6 +26,7 @@ const mocks = vi.hoisted(() => ({
   completeIcoMaterializationRun: vi.fn(),
   skipIcoMaterializationRun: vi.fn(),
   failIcoMaterializationRun: vi.fn(),
+  getLastSuccessfulMaterializationAt: vi.fn(),
   captureWithDomain: vi.fn()
 }))
 
@@ -48,7 +49,8 @@ vi.mock('./materialize-tracking', () => ({
   beginIcoMaterializationRun: mocks.beginIcoMaterializationRun,
   completeIcoMaterializationRun: mocks.completeIcoMaterializationRun,
   skipIcoMaterializationRun: mocks.skipIcoMaterializationRun,
-  failIcoMaterializationRun: mocks.failIcoMaterializationRun
+  failIcoMaterializationRun: mocks.failIcoMaterializationRun,
+  getLastSuccessfulMaterializationAt: mocks.getLastSuccessfulMaterializationAt
 }))
 
 vi.mock('@/lib/observability/capture', () => ({
@@ -148,6 +150,7 @@ beforeEach(() => {
 
   mocks.completeIcoMaterializationRun.mockResolvedValue(undefined)
   mocks.failIcoMaterializationRun.mockResolvedValue(undefined)
+  mocks.getLastSuccessfulMaterializationAt.mockResolvedValue(null)
 })
 
 afterEach(() => {
@@ -436,6 +439,143 @@ describe('TASK-900 Slice 2 — materializeMemberMetrics flag matrix', () => {
         tags: expect.objectContaining({
           source: 'ico_materializer_tracking_failed',
           stage: 'begin'
+        })
+      })
+    )
+  })
+
+  it('INCREMENTAL DELTA: ambos flags ON + previous succeeded run → MERGE source incluye member_last_edited filter', async () => {
+    process.env.ICO_MATERIALIZER_MERGE_PATTERN_ENABLED = 'true'
+    process.env.ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED = 'true'
+
+    const lastRun = new Date('2026-05-17T03:15:00.000Z')
+
+    mocks.getLastSuccessfulMaterializationAt.mockResolvedValueOnce(lastRun)
+
+    const mod = await importMaterializer()
+
+    const fn = (
+      mod as unknown as {
+        __test_materializeMemberMetrics?: (
+          projectId: string,
+          periodYear: number,
+          periodMonth: number
+        ) => Promise<number>
+      }
+    ).__test_materializeMemberMetrics
+
+    if (typeof fn !== 'function') {
+      expect(typeof fn).toBe('function')
+
+      return
+    }
+
+    const result = await fn(FAKE_PROJECT_ID, PERIOD_YEAR, PERIOD_MONTH)
+
+    expect(result).toBe(5)
+    const mergeCall = findIcoCall('MERGE INTO')
+
+    expect(mergeCall).toBeDefined()
+    expect(mergeCall![0]).toContain('member_last_edited >= TIMESTAMP(@deltaCutoff)')
+    expect(mergeCall![0]).toContain('MAX(te.last_edited_time) AS member_last_edited')
+
+    // Verifica que el deltaCutoff = lastRun - 1h (overlap)
+    const params = mergeCall![1] as Record<string, unknown>
+    const expectedCutoff = new Date(lastRun.getTime() - 60 * 60 * 1000).toISOString()
+
+    expect(params.deltaCutoff).toBe(expectedCutoff)
+
+    // Verifica completeIcoMaterializationRun recibe notes incremental
+    expect(mocks.completeIcoMaterializationRun).toHaveBeenCalledWith(
+      expect.objectContaining({
+        notes: expect.stringContaining('incremental from')
+      })
+    )
+  })
+
+  it('INCREMENTAL DELTA: primera corrida (no previous succeeded) → full period sin filter', async () => {
+    process.env.ICO_MATERIALIZER_MERGE_PATTERN_ENABLED = 'true'
+    process.env.ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED = 'true'
+
+    mocks.getLastSuccessfulMaterializationAt.mockResolvedValueOnce(null)
+
+    const mod = await importMaterializer()
+
+    const fn = (
+      mod as unknown as {
+        __test_materializeMemberMetrics?: (
+          projectId: string,
+          periodYear: number,
+          periodMonth: number
+        ) => Promise<number>
+      }
+    ).__test_materializeMemberMetrics
+
+    if (typeof fn !== 'function') {
+      expect(typeof fn).toBe('function')
+
+      return
+    }
+
+    const result = await fn(FAKE_PROJECT_ID, PERIOD_YEAR, PERIOD_MONTH)
+
+    expect(result).toBe(5)
+    const mergeCall = findIcoCall('MERGE INTO')
+
+    expect(mergeCall).toBeDefined()
+    expect(mergeCall![0]).not.toContain('member_last_edited >= TIMESTAMP')
+
+    // Sin deltaCutoff en params
+    const params = mergeCall![1] as Record<string, unknown>
+
+    expect(params.deltaCutoff).toBeUndefined()
+
+    expect(mocks.completeIcoMaterializationRun).toHaveBeenCalledWith(
+      expect.objectContaining({ notes: 'full period' })
+    )
+  })
+
+  it('INCREMENTAL DELTA: lookup failure → degrada graceful a full period + captureWithDomain', async () => {
+    process.env.ICO_MATERIALIZER_MERGE_PATTERN_ENABLED = 'true'
+    process.env.ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED = 'true'
+
+    mocks.getLastSuccessfulMaterializationAt.mockRejectedValueOnce(
+      new Error('PG connection refused')
+    )
+
+    const mod = await importMaterializer()
+
+    const fn = (
+      mod as unknown as {
+        __test_materializeMemberMetrics?: (
+          projectId: string,
+          periodYear: number,
+          periodMonth: number
+        ) => Promise<number>
+      }
+    ).__test_materializeMemberMetrics
+
+    if (typeof fn !== 'function') {
+      expect(typeof fn).toBe('function')
+
+      return
+    }
+
+    const result = await fn(FAKE_PROJECT_ID, PERIOD_YEAR, PERIOD_MONTH)
+
+    expect(result).toBe(5)
+    const mergeCall = findIcoCall('MERGE INTO')
+
+    expect(mergeCall).toBeDefined()
+    // Sin filter de delta porque lookup falló
+    expect(mergeCall![0]).not.toContain('member_last_edited >= TIMESTAMP')
+
+    expect(mocks.captureWithDomain).toHaveBeenCalledWith(
+      expect.any(Error),
+      'delivery',
+      expect.objectContaining({
+        tags: expect.objectContaining({
+          stage: 'delta_lookup'
         })
       })
     )

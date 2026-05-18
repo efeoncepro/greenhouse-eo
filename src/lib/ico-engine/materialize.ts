@@ -27,6 +27,7 @@ import {
   beginIcoMaterializationRun,
   completeIcoMaterializationRun,
   failIcoMaterializationRun,
+  getLastSuccessfulMaterializationAt,
   skipIcoMaterializationRun,
   type IcoMaterializerTableName
 } from './materialize-tracking'
@@ -729,7 +730,8 @@ const runMaterializeMemberLegacyDeleteInsert = async (
 const runMaterializeMemberMerge = async (
   projectId: string,
   periodYear: number,
-  periodMonth: number
+  periodMonth: number,
+  deltaCutoffIso: string | null
 ): Promise<number> => {
   // MERGE pattern: atomic statement BQ. Source CTE aplica
   // QUALIFY ROW_NUMBER OVER (PARTITION BY merge_key) = 1 como cinturón
@@ -739,9 +741,22 @@ const runMaterializeMemberMerge = async (
   // CRÍTICO: NO incluir `WHEN NOT MATCHED BY SOURCE THEN DELETE` — preserve
   // historicos buenos cuando upstream parcial (cierra bug class TASK-877).
   //
-  // Incremental delta filter (Slice 4) se inyecta como WHERE adicional
-  // cuando ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED=true. V1 todavía full
-  // period — Slice 4 wire-up.
+  // Incremental delta filter (Slice 4):
+  //   Cuando deltaCutoffIso != null, el aggregate computa MAX(last_edited_time)
+  //   AS member_last_edited y un WHERE outer filtra members con
+  //   `member_last_edited >= TIMESTAMP(@deltaCutoff)`. Filtramos a nivel
+  //   BUCKET (member), NO a nivel TASK — si filtraramos tasks individuales,
+  //   el aggregate quedaría incompleto y corrompería metrics.
+  //
+  //   Members no touched → no aparecen en source → MERGE preserva sus rows
+  //   (no `WHEN NOT MATCHED BY SOURCE THEN DELETE`).
+  //
+  //   Members touched → source aggregate completo de TODAS sus tasks → MERGE
+  //   sobrescribe correctamente.
+
+  const deltaFilterSql = deltaCutoffIso
+    ? `WHERE member_last_edited >= TIMESTAMP(@deltaCutoff)`
+    : ''
 
   const mergeSql = `
     MERGE INTO \`${projectId}.${ICO_DATASET}.metrics_by_member\` AS t
@@ -768,12 +783,14 @@ const runMaterializeMemberMerge = async (
 
           ${buildMetricSelectSQL()},
 
+          MAX(te.last_edited_time) AS member_last_edited,
           CURRENT_TIMESTAMP() AS materialized_at
         FROM ${buildDeliveryPeriodSourceSql(projectId)} te
         WHERE te.primary_owner_member_id IS NOT NULL
           AND te.primary_owner_member_id != ''
         GROUP BY member_id
       )
+      ${deltaFilterSql}
       QUALIFY ROW_NUMBER() OVER (
         PARTITION BY member_id, period_year, period_month
         ORDER BY materialized_at DESC
@@ -828,7 +845,13 @@ const runMaterializeMemberMerge = async (
        s.materialized_at)
   `
 
-  await runIcoEngineQuery(mergeSql, { periodYear, periodMonth })
+  const params: Record<string, unknown> = { periodYear, periodMonth }
+
+  if (deltaCutoffIso) {
+    params.deltaCutoff = deltaCutoffIso
+  }
+
+  await runIcoEngineQuery(mergeSql, params)
 
   const countRows = await runIcoEngineQuery<{ cnt: unknown }>(`
     SELECT COUNT(*) AS cnt
@@ -931,12 +954,51 @@ const materializeMemberMetrics = async (
     }
   }
 
+  // ── Capa 2b: Incremental delta cutoff (Slice 4) ──────────────────────────
+  // Solo aplica cuando AMBOS flags activos (MERGE_PATTERN + INCREMENTAL_DELTA).
+  // assertMaterializerFlagCoherence ya garantizó que INCREMENTAL no esté
+  // activo sin MERGE — pero defense in depth: re-check antes de lookup.
+  //
+  // Si lastMaterializedAt is null (primera corrida o sólo había skipped/failed),
+  // procesamos full period.
+  //
+  // 1-hour overlap = defensa contra races entre `started_at` y el momento de
+  // la query downstream (task editada en la ventana intermedia podría no
+  // aparecer si filtramos exact).
+  let deltaCutoffIso: string | null = null
+
+  if (useMerge && isIncrementalDeltaEnabled()) {
+    try {
+      const lastMaterializedAt = await getLastSuccessfulMaterializationAt({
+        tableName: ICO_TABLE_METRICS_BY_MEMBER,
+        periodYear,
+        periodMonth
+      })
+
+      if (lastMaterializedAt) {
+        const overlapMs = 60 * 60 * 1000
+
+        deltaCutoffIso = new Date(lastMaterializedAt.getTime() - overlapMs).toISOString()
+      }
+    } catch (lookupError) {
+      // Lookup tracking falló — degradar graceful a full period. NO bloquear.
+      captureWithDomain(lookupError, 'delivery', {
+        tags: {
+          source: 'ico_materializer_tracking_failed',
+          table: ICO_TABLE_METRICS_BY_MEMBER,
+          stage: 'delta_lookup'
+        },
+        extra: { periodYear, periodMonth }
+      })
+    }
+  }
+
   // ── Capa 3: Ejecutar MERGE o legacy DELETE+INSERT ────────────────────────
   let rowCount: number
 
   try {
     rowCount = useMerge
-      ? await runMaterializeMemberMerge(projectId, periodYear, periodMonth)
+      ? await runMaterializeMemberMerge(projectId, periodYear, periodMonth, deltaCutoffIso)
       : await runMaterializeMemberLegacyDeleteInsert(projectId, periodYear, periodMonth)
   } catch (mergeError) {
     if (materializationId) {
@@ -973,11 +1035,15 @@ const materializeMemberMetrics = async (
 
   // ── Capa 4: Tracking complete ────────────────────────────────────────────
   if (materializationId) {
+    const notes = deltaCutoffIso
+      ? `incremental from ${deltaCutoffIso}`
+      : 'full period'
+
     try {
       await completeIcoMaterializationRun({
         materializationId,
         rowsMerged: rowCount,
-        notes: 'full period (incremental delta filter pending Slice 4)'
+        notes
       })
     } catch (trackingError) {
       captureWithDomain(trackingError, 'delivery', {
