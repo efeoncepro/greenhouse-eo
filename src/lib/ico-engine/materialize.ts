@@ -18,6 +18,47 @@ import {
   TREND_STABLE_BAND_PP
 } from './performance-report'
 import { materializeAiSignals } from './ai/materialize-ai-signals'
+import {
+  runUpstreamFreshnessGate,
+  summarizeBlockingSignals,
+  isFreshnessGateEnabled
+} from './materialize-guards'
+import {
+  beginIcoMaterializationRun,
+  completeIcoMaterializationRun,
+  failIcoMaterializationRun,
+  skipIcoMaterializationRun,
+  type IcoMaterializerTableName
+} from './materialize-tracking'
+import { captureWithDomain } from '@/lib/observability/capture'
+
+// ─── TASK-900 — Materializer hardening flags ─────────────────────────────────
+//
+// 3 flags ortogonales graduados, todos default OFF. Cutover progresivo:
+//   1. MERGE_PATTERN_ENABLED  → MERGE vs DELETE+INSERT (estructura SQL)
+//   2. FRESHNESS_GATE_ENABLED → skip preemptivo cuando upstream degradado
+//   3. INCREMENTAL_DELTA_ENABLED (Slice 4) → REQUIRES MERGE_PATTERN_ENABLED
+//
+// Dependency hard rule enforced en `assertMaterializerFlagCoherence` abajo —
+// activar INCREMENTAL_DELTA sin MERGE_PATTERN throw runtime error.
+//
+// Default OFF garantiza zero behavioral change post-merge: el cron sigue con
+// legacy DELETE+INSERT bit-for-bit hasta que operador active explícitamente
+// los flags post staging shadow >=7d verde.
+
+const isMergePatternEnabled = (): boolean =>
+  process.env.ICO_MATERIALIZER_MERGE_PATTERN_ENABLED === 'true'
+
+const isIncrementalDeltaEnabled = (): boolean =>
+  process.env.ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED === 'true'
+
+const assertMaterializerFlagCoherence = (): void => {
+  if (isIncrementalDeltaEnabled() && !isMergePatternEnabled()) {
+    throw new Error(
+      'incremental_delta_requires_merge_pattern: ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED=true requires ICO_MATERIALIZER_MERGE_PATTERN_ENABLED=true. Activate MERGE_PATTERN first or disable INCREMENTAL_DELTA.'
+    )
+  }
+}
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -621,13 +662,30 @@ const materializeProjectMetrics = async (
 }
 
 // ─── Member-Level Metrics Materialization ────────────────────────────────────
+//
+// TASK-900 Slice 2 — Hardening:
+//   1. Freshness gate (flag-gated) — skipea preemptivo si upstream signal
+//      `identity.notion_bridge.coverage_drift` está en severity bloqueante.
+//      Sin gate: legacy behavior bit-for-bit.
+//   2. MERGE pattern (flag-gated) — atomic en una sola statement BQ. Cinturón
+//      QUALIFY ROW_NUMBER por si emerge duplicate source row (arch-architect
+//      recommendation #1). Preserva historicos cuando upstream parcial.
+//      Sin flag: legacy DELETE+INSERT bit-for-bit.
+//   3. Tracking persistente en `greenhouse_sync.ico_materialization_runs`
+//      (Slice 3) — append-only audit + lookup `last_materialization_at` para
+//      incremental delta filter (Slice 4).
+//
+// Defaults: TODOS los flags OFF → legacy behavior preservado.
 
-const materializeMemberMetrics = async (
+const ICO_TABLE_METRICS_BY_MEMBER: IcoMaterializerTableName = 'metrics_by_member'
+
+const runMaterializeMemberLegacyDeleteInsert = async (
   projectId: string,
   periodYear: number,
   periodMonth: number
 ): Promise<number> => {
-  // Delete current period rows then re-insert (idempotent)
+  // Legacy path: DELETE current period rows then re-insert (idempotent).
+  // Preserved bit-for-bit hasta MERGE_PATTERN_ENABLED flip post staging.
   await runIcoEngineQuery(`
     DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
     WHERE period_year = @periodYear AND period_month = @periodMonth
@@ -666,6 +724,274 @@ const materializeMemberMetrics = async (
   `, { periodYear, periodMonth })
 
   return toNumber(countRows[0]?.cnt)
+}
+
+const runMaterializeMemberMerge = async (
+  projectId: string,
+  periodYear: number,
+  periodMonth: number
+): Promise<number> => {
+  // MERGE pattern: atomic statement BQ. Source CTE aplica
+  // QUALIFY ROW_NUMBER OVER (PARTITION BY merge_key) = 1 como cinturón
+  // anti-duplicate-source (arch-architect rec #1 — sin esto, BQ MERGE
+  // falla con "more than one source row" si emergen duplicates upstream).
+  //
+  // CRÍTICO: NO incluir `WHEN NOT MATCHED BY SOURCE THEN DELETE` — preserve
+  // historicos buenos cuando upstream parcial (cierra bug class TASK-877).
+  //
+  // Incremental delta filter (Slice 4) se inyecta como WHERE adicional
+  // cuando ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED=true. V1 todavía full
+  // period — Slice 4 wire-up.
+
+  const mergeSql = `
+    MERGE INTO \`${projectId}.${ICO_DATASET}.metrics_by_member\` AS t
+    USING (
+      SELECT
+        member_id,
+        period_year,
+        period_month,
+        rpa_avg, rpa_median,
+        rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
+        otd_pct, ftr_pct,
+        cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
+        throughput_count, pipeline_velocity,
+        stuck_asset_count, stuck_asset_pct,
+        total_tasks, completed_tasks, active_tasks,
+        on_time_count, late_drop_count, overdue_count,
+        carry_over_count, overdue_carried_forward_count,
+        materialized_at
+      FROM (
+        SELECT
+          te.primary_owner_member_id AS member_id,
+          @periodYear AS period_year,
+          @periodMonth AS period_month,
+
+          ${buildMetricSelectSQL()},
+
+          CURRENT_TIMESTAMP() AS materialized_at
+        FROM ${buildDeliveryPeriodSourceSql(projectId)} te
+        WHERE te.primary_owner_member_id IS NOT NULL
+          AND te.primary_owner_member_id != ''
+        GROUP BY member_id
+      )
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY member_id, period_year, period_month
+        ORDER BY materialized_at DESC
+      ) = 1
+    ) AS s
+    ON  t.member_id = s.member_id
+    AND t.period_year = s.period_year
+    AND t.period_month = s.period_month
+    WHEN MATCHED THEN UPDATE SET
+      rpa_avg = s.rpa_avg,
+      rpa_median = s.rpa_median,
+      rpa_eligible_task_count = s.rpa_eligible_task_count,
+      rpa_missing_task_count = s.rpa_missing_task_count,
+      rpa_non_positive_task_count = s.rpa_non_positive_task_count,
+      otd_pct = s.otd_pct,
+      ftr_pct = s.ftr_pct,
+      cycle_time_avg_days = s.cycle_time_avg_days,
+      cycle_time_p50_days = s.cycle_time_p50_days,
+      cycle_time_variance = s.cycle_time_variance,
+      throughput_count = s.throughput_count,
+      pipeline_velocity = s.pipeline_velocity,
+      stuck_asset_count = s.stuck_asset_count,
+      stuck_asset_pct = s.stuck_asset_pct,
+      total_tasks = s.total_tasks,
+      completed_tasks = s.completed_tasks,
+      active_tasks = s.active_tasks,
+      on_time_count = s.on_time_count,
+      late_drop_count = s.late_drop_count,
+      overdue_count = s.overdue_count,
+      carry_over_count = s.carry_over_count,
+      overdue_carried_forward_count = s.overdue_carried_forward_count,
+      materialized_at = s.materialized_at
+    WHEN NOT MATCHED THEN INSERT
+      (member_id, period_year, period_month,
+       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
+       otd_pct, ftr_pct,
+       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
+       throughput_count, pipeline_velocity,
+       stuck_asset_count, stuck_asset_pct,
+       total_tasks, completed_tasks, active_tasks,
+       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
+       materialized_at)
+    VALUES
+      (s.member_id, s.period_year, s.period_month,
+       s.rpa_avg, s.rpa_median, s.rpa_eligible_task_count, s.rpa_missing_task_count, s.rpa_non_positive_task_count,
+       s.otd_pct, s.ftr_pct,
+       s.cycle_time_avg_days, s.cycle_time_p50_days, s.cycle_time_variance,
+       s.throughput_count, s.pipeline_velocity,
+       s.stuck_asset_count, s.stuck_asset_pct,
+       s.total_tasks, s.completed_tasks, s.active_tasks,
+       s.on_time_count, s.late_drop_count, s.overdue_count, s.carry_over_count, s.overdue_carried_forward_count,
+       s.materialized_at)
+  `
+
+  await runIcoEngineQuery(mergeSql, { periodYear, periodMonth })
+
+  const countRows = await runIcoEngineQuery<{ cnt: unknown }>(`
+    SELECT COUNT(*) AS cnt
+    FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+    WHERE period_year = @periodYear AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  return toNumber(countRows[0]?.cnt)
+}
+
+const materializeMemberMetrics = async (
+  projectId: string,
+  periodYear: number,
+  periodMonth: number
+): Promise<number> => {
+  // Hard-rule: INCREMENTAL_DELTA requires MERGE_PATTERN. Throw runtime si drift.
+  assertMaterializerFlagCoherence()
+
+  // ── Capa 1: Freshness gate (TASK-900 flag-gated) ─────────────────────────
+  if (isFreshnessGateEnabled()) {
+    const gate = await runUpstreamFreshnessGate()
+
+    if (!gate.safe) {
+      const blockingSignals = summarizeBlockingSignals(gate.blockingSignals)
+
+      try {
+        await skipIcoMaterializationRun({
+          tableName: ICO_TABLE_METRICS_BY_MEMBER,
+          periodYear,
+          periodMonth,
+          blockingSignals,
+          reason: gate.reason
+        })
+      } catch (trackingError) {
+        // Tracking persistence falló — log + continue. La señal upstream sigue
+        // bloqueando la corrida (gate hard) — no necesitamos PG writeable para
+        // tomar la decisión de skip.
+        captureWithDomain(trackingError, 'delivery', {
+          tags: {
+            source: 'ico_materializer_tracking_failed',
+            table: ICO_TABLE_METRICS_BY_MEMBER,
+            stage: 'skip_persist'
+          },
+          extra: { periodYear, periodMonth }
+        })
+      }
+
+      captureWithDomain(
+        new Error(
+          `ico_materializer_skipped_safety: metrics_by_member ${periodYear}-${String(periodMonth).padStart(2, '0')} (${gate.reason})`
+        ),
+        'delivery',
+        {
+          level: 'warning',
+          tags: {
+            source: 'ico_materializer_skipped_safety',
+            table: ICO_TABLE_METRICS_BY_MEMBER
+          },
+          extra: {
+            periodYear,
+            periodMonth,
+            blockingSignals: gate.blockingSignals.map(s => ({
+              signalId: s.signalId,
+              severity: s.severity
+            }))
+          }
+        }
+      )
+
+      return 0
+    }
+  }
+
+  // ── Capa 2: Tracking begin (cuando MERGE pattern activo) ─────────────────
+  // Para path legacy DELETE+INSERT (flag OFF), NO trackeamos. Slice 5 lo
+  // promueve a all-paths cuando el patrón merge sea stable.
+  const useMerge = isMergePatternEnabled()
+  let materializationId: string | null = null
+
+  if (useMerge) {
+    try {
+      const run = await beginIcoMaterializationRun({
+        tableName: ICO_TABLE_METRICS_BY_MEMBER,
+        periodYear,
+        periodMonth
+      })
+
+      materializationId = run.materializationId
+    } catch (trackingError) {
+      // Tracking begin falló — log + continue con MERGE. Best-effort audit;
+      // si tracking es inaccesible, NO bloqueamos el cron diario.
+      captureWithDomain(trackingError, 'delivery', {
+        tags: {
+          source: 'ico_materializer_tracking_failed',
+          table: ICO_TABLE_METRICS_BY_MEMBER,
+          stage: 'begin'
+        },
+        extra: { periodYear, periodMonth }
+      })
+    }
+  }
+
+  // ── Capa 3: Ejecutar MERGE o legacy DELETE+INSERT ────────────────────────
+  let rowCount: number
+
+  try {
+    rowCount = useMerge
+      ? await runMaterializeMemberMerge(projectId, periodYear, periodMonth)
+      : await runMaterializeMemberLegacyDeleteInsert(projectId, periodYear, periodMonth)
+  } catch (mergeError) {
+    if (materializationId) {
+      try {
+        await failIcoMaterializationRun({
+          materializationId,
+          errorMessage:
+            mergeError instanceof Error ? mergeError.message : String(mergeError)
+        })
+      } catch (trackingError) {
+        captureWithDomain(trackingError, 'delivery', {
+          tags: {
+            source: 'ico_materializer_tracking_failed',
+            table: ICO_TABLE_METRICS_BY_MEMBER,
+            stage: 'fail_persist'
+          },
+          extra: { periodYear, periodMonth }
+        })
+      }
+    }
+
+    captureWithDomain(mergeError, 'delivery', {
+      tags: {
+        source: useMerge
+          ? 'ico_materializer_merge_failed'
+          : 'ico_materializer_legacy_failed',
+        table: ICO_TABLE_METRICS_BY_MEMBER
+      },
+      extra: { periodYear, periodMonth }
+    })
+
+    throw mergeError
+  }
+
+  // ── Capa 4: Tracking complete ────────────────────────────────────────────
+  if (materializationId) {
+    try {
+      await completeIcoMaterializationRun({
+        materializationId,
+        rowsMerged: rowCount,
+        notes: 'full period (incremental delta filter pending Slice 4)'
+      })
+    } catch (trackingError) {
+      captureWithDomain(trackingError, 'delivery', {
+        tags: {
+          source: 'ico_materializer_tracking_failed',
+          table: ICO_TABLE_METRICS_BY_MEMBER,
+          stage: 'complete'
+        },
+        extra: { periodYear, periodMonth, rowCount }
+      })
+    }
+  }
+
+  return rowCount
 }
 
 // ─── Sprint-Level Metrics Materialization ────────────────────────────────────
@@ -1002,3 +1328,15 @@ const materializePerformanceReports = async (
 
   return toNumber(countRows[0]?.cnt)
 }
+
+// ─── Test-only exports (TASK-900) ───────────────────────────────────────────
+//
+// Exposed for anti-regression tests. These are NOT part of the public API
+// and should NEVER be imported from production code. Production consumers
+// go through `materializeMonthlySnapshots`.
+//
+// Underscore prefix + comment make intent explicit. ESLint can be configured
+// to forbid imports from outside `*.test.ts` if regression risk emerges.
+
+export const __test_materializeMemberMetrics = materializeMemberMetrics
+
