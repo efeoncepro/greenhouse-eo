@@ -3774,6 +3774,22 @@ export interface GreenhouseDeliveryTasks {
   workflow_review_open: Generated<boolean>;
 }
 
+export interface GreenhouseDeliveryTaskStatusTransitions {
+  assignee_member_id: string | null;
+  captured_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  from_status: string;
+  source_event_id: string | null;
+  source_quality: Generated<string>;
+  space_id: string | null;
+  task_source_id: string;
+  to_status: string;
+  transition_id: Generated<string>;
+  transitioned_at: Timestamp;
+  transitioned_by: string | null;
+  workspace_id: string;
+}
+
 export interface GreenhouseFinanceAccountBalances {
   account_id: string;
   balance_date: Timestamp;
@@ -9259,6 +9275,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_events": GreenhouseDeliveryStaffAugEvents;
   "greenhouse_delivery.staff_aug_onboarding_items": GreenhouseDeliveryStaffAugOnboardingItems;
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
+  "greenhouse_delivery.task_status_transitions": GreenhouseDeliveryTaskStatusTransitions;
   "greenhouse_delivery.tasks": GreenhouseDeliveryTasks;
   "greenhouse_finance.account_balances": GreenhouseFinanceAccountBalances;
   "greenhouse_finance.account_balances_monthly": GreenhouseFinanceAccountBalancesMonthly;
