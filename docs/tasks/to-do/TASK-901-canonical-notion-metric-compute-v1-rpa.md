@@ -1,5 +1,31 @@
 # TASK-901 — Canonical Notion Metric Compute V1 (RpA-only progressive migration)
 
+> ## Delta 2026-05-18 — Slice 1 SHIPPED (calculateRpaV2 canonical helper Fase A)
+>
+> ✅ **Slice 1 V2 helper canonical shipped end-to-end** directo en `develop` (sin branch switch) en 2 commits canonical:
+>
+> 1. **`308be17d`** — helper inicial nombrado `calculateRpa` + version `'rpa_v1.0'`. 3 skills invocadas paralelo pre-implementation (arch-architect + greenhouse-ico + notion-platform) convergieron en PROCEED. Modifications aplicadas: `inputsUsed.taskSourceId` snapshot full audit reproducibility + test edge case window invertida + JSDoc null-not-zero contract.
+> 2. **`589ab5f3`** — arch forward-fix rename canonical a V2 strangler naming per ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`. Helper `calculateRpa → calculateRpaV2`, version `'rpa_v1.0' → 'rpa_v2.0'`, file rename `calculate-rpa.{ts,test.ts} → calculate-rpa-v2.{ts,test.ts}`, types renombrados a V2. Forward-fix limpio antes de cualquier consumer wire-up. **Cero impacto productivo**: V1 legacy (Notion formula + sync + bonus path) intacto durante todo el proceso.
+>
+> **Files shipped canonical**:
+>
+> - `src/lib/notion-metrics/calculate-rpa-v2.ts` (helper server-only, delega 100% a `countCorrectionTransitions` TASK-908 Foundation)
+> - `src/lib/notion-metrics/calculate-rpa-v2.test.ts` (13 tests verde: 3 happy paths canonical + 2 window filter incluyendo edge invertida + 2 unavailable + 1 V3 forward-compat Frame.io ignored + 1 idempotencia + 2 formula version + 2 null-not-zero contract anti-regresión TASK-877)
+>
+> **Pre-TASK-912 deployment esperado** (estado actual): helper retorna `sourceMode='unavailable'` 100% (tabla `task_status_transitions` vacía hasta webhook ingestion shipea). Bonus calc downstream V1 sigue intacto. Degradación honesta universal para tareas pre-deployment. Reliability signal `notion.correction_transitions.source_availability` reporta severity=error 100% esperado.
+>
+> **Quality gates verde**: `tsc --noEmit` clean, `pnpm lint` 0 errors (4 warnings pre-existing unrelated), `pnpm test src/lib/notion-metrics/` 56/56 verde post-rename. Pre-push hooks verde en ambos commits.
+>
+> **Next slices to-do** (Fases B-E del ADR Strangler):
+>
+> - **Slice 2 + 3 (Fase A continuación)**: outbox event `notion.task.rpa_v2_recompute_requested v1` + reactive consumer en ops-worker que invoca `calculateRpaV2` (compute aún sin PATCH a Notion)
+> - **Slice 4 (Fase B shadow mode)**: paridad signal canonical `notion.metrics.rpa_v2_vs_v1_paridad` ≥95% durante 7d. Bloqueado por TASK-912 (webhook ingestion necesita estar shippeado para que la tabla tenga data) + TASK-910 (demo teamspace 4 semanas runtime verde antes de tocar Efeonce productivo)
+> - **Slices 5-8 (Fase C writeback Notion visible)**: Cloud Tasks queue `notion-writeback-v2` + property `[GH] RpA v2` setup + flag flip + nightly safety net Cloud Run Job
+> - **Slices 9-10 (Fase D cutover bonus gated)**: flag `BONUS_USE_RPA_V2=true` Efeonce + 30d HR reconciliation + Sky después. V1 sigue corriendo paralelo intacto
+> - **Slices 11-15 (Fase E cleanup V1 OPCIONAL post 90+ días Fase D stable)**: PUEDE DEFERIRSE INDEFINIDAMENTE
+>
+> ---
+
 > ## Delta 2026-05-17 — RpA V2 Strangler Migration (carril paralelo)
 >
 > Esta task implementa el **carril V2 paralelo** definido por el ADR canonical [`GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`](../../architecture/GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md). **V1 actual NO se toca durante toda la migración** (Notion formula `RpA` + sync legacy + `metrics_by_member.rpa_avg` + bonus path productivo siguen intactos).
@@ -35,13 +61,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `to-do` (Slice 1 V2 helper ✅ SHIPPED 2026-05-18 directo en `develop`; Slices 2-5 + Fases B-E ADR Strangler deferred — bloqueados por TASK-912 webhook ingestion + TASK-910 demo runtime verde + HR/Finance sign-off cutover bonus)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Slice 1 SHIPPED — calculateRpaV2 canonical helper (commits 308be17d + 589ab5f3 V2 rename arch forward-fix). Slices 2-5 quedan to-do.`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|platform|reliability`
 - Blocked by: `TASK-908 V1.0 Foundation ✅ SHIPPED 2026-05-18 (Slices 0+1+3.5+6+7+8 — table task_status_transitions + countCorrectionTransitions + calculateCycleTime + cycle-time-slo-config + signal). Slice 1 de TASK-901 puede arrancar inmediatamente — countCorrectionTransitions vive en src/lib/notion-metrics/count-correction-transitions.ts. TASK-912 (Slices 2/3/4/5/9 webhook + reactive consumer + BQ formula + backfill) deferred — bloquea TASK-901 Slice 4 (shadow mode prod) cuando Notion webhook subscription se registre operador-side. Plus TASK-910 (Notion Demo Teamspace Sandbox) ship + 4 semanas runtime end-to-end verde DEMO antes de iniciar Slice 4 (shadow mode RpA Efeonce productivo) — gate canonical pre-Fase 1 del ADR GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Demo teamspace canonical IDs en TASK-910 §Detailed Spec.`
