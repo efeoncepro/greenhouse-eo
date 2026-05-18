@@ -30,9 +30,9 @@ La task debe dejar un contrato explicito y portable para Node 24 en `package.jso
 
 ## Why This Task Exists
 
-TASK-607 cerro el warning de GitHub Actions migrando actions compatibles con runtime interno Node.js 24 (`checkout@v5`, `setup-node@v5`, `upload-artifact@v7`, etc.). Ese cierre no cambia el runtime de la app ni de los jobs: los workflows siguen usando `node-version: 20`.
+TASK-607 cerro el warning de GitHub Actions migrando actions compatibles con runtime interno Node.js 24 (`checkout@v5`, `setup-node@v5`, `upload-artifact@v7`, etc.). Ese cierre no cambia el runtime de la app ni de los jobs: los workflows principales siguen usando `node-version: 20`.
 
-Node.js oficial marca Node 20 como EOL al 2026, mientras Node 24 es LTS vigente. Vercel soporta Node 24.x para builds y functions y lo usa como default para proyectos nuevos. Mantener app/tests en Node 20 aumenta riesgo de seguridad, drift de tooling y comportamiento distinto entre Vercel/CI/local.
+Node.js 20 alcanzo fin de mantenimiento oficial el 2026-04-30; al 2026-05-18 Node 24.x es el target LTS vigente para este upgrade. Vercel soporta Node 24.x para builds y functions, lo ofrece como default para proyectos nuevos y permite que `package.json#engines.node` overridee Project Settings. Mantener app/tests en Node 20 aumenta riesgo de seguridad, drift de tooling y comportamiento distinto entre Vercel/CI/local.
 
 ## Goal
 
@@ -67,8 +67,10 @@ Reglas obligatorias:
 - No reabrir TASK-607: esa task resolvio el runtime interno de GitHub Actions. Esta task cambia el runtime de app/tests/builds.
 - Usar Node 24.x LTS, no Node 26 Current.
 - No usar `>=20` como contrato final: Vercel mapearia a latest 24.x hoy, pero el repo debe expresar explicitamente `24.x` para evitar ambiguedad.
+- No usar `>=22` ni `>=24` como contrato final: rangos abiertos permiten upgrades mayores futuros sin decision explicita. Usar `24.x`.
 - No romper hooks canonicos Husky/lint-staged ni saltarlos con `--no-verify`.
 - Si aparece incompatibilidad con una dependencia o script, resolver causa raiz en el script/helper/config compartido correspondiente; no fijar hacks por workflow aislado.
+- No declarar la task cerrada solo porque el build local pasa: debe haber evidencia de clean install, CI, Playwright y Vercel.
 
 ## Normative Docs
 
@@ -76,6 +78,9 @@ Reglas obligatorias:
 - `docs/documentation/plataforma/reliability-control-plane.md`
 - `docs/documentation/plataforma/git-hooks-pre-commit-pre-push.md`
 - `changelog.md`
+- Node.js release schedule oficial: `https://nodejs.org/en/about/releases/`
+- Vercel Supported Node.js versions: `https://vercel.com/docs/functions/runtimes/node-js/node-js-versions`
+- Vercel Node version file conformance: `https://vercel.com/docs/conformance/rules/REQUIRE_NODE_VERSION_FILE`
 
 ## Dependencies & Impact
 
@@ -104,7 +109,7 @@ Reglas obligatorias:
 
 - `package.json`
 - `.nvmrc` (nuevo si no existe)
-- `.node-version` (nuevo si se decide estandarizar tambien para asdf/mise; evitar duplicidad si el repo define uno como canonico)
+- `.node-version` (opcional; si se agrega debe tener exactamente el mismo contenido que `.nvmrc`)
 - `.github/workflows/ci.yml`
 - `.github/workflows/playwright.yml`
 - `.github/workflows/reliability-verify.yml`
@@ -126,7 +131,11 @@ Reglas obligatorias:
 - `package.json` usa `next` `16.1.1` y `@types/node` `24.10.1`.
 - Workflows ya usan actions Node 24-compatible por TASK-607.
 - Workflows principales siguen ejecutando app/tests con `node-version: 20`.
-- No existe `.nvmrc` ni `.node-version` al momento de crear esta task.
+- Verificacion 2026-05-18:
+  - `node-version: 20` aparece en `.github/workflows/ci.yml`, `.github/workflows/playwright.yml`, `.github/workflows/design-contract.yml` y dos jobs de `.github/workflows/reliability-verify.yml`.
+  - `node-version: '24'` ya aparece en `.github/workflows/production-release.yml` y `.github/workflows/production-release-watchdog.yml`.
+  - shell local observado: Node `22.22.2`; `pnpm` `10.32.1`; `packageManager` `pnpm@10.32.1`.
+- No existe `.nvmrc` ni `.node-version` al momento de reforzar esta task.
 - Vercel soporta Node 24.x para builds/functions y permite override via `engines.node` en `package.json`.
 
 ### Gap
@@ -155,24 +164,34 @@ Reglas obligatorias:
 
 - Confirmar tags/soporte vigente de Node 24.x en Vercel y GitHub Actions al momento de ejecutar.
 - Agregar `engines.node = "24.x"` en `package.json`.
-- Crear el archivo local de version canonico (`.nvmrc` con `24`) y decidir si tambien corresponde `.node-version`; si se agrega ambos, documentar por que no genera ambiguedad.
+- Crear `.nvmrc` con contenido exacto `24` como version file local canonico.
+- Agregar `.node-version` solo si se decide soportar herramientas tipo asdf/mise; si se agrega, su contenido debe ser exactamente `24` y la documentacion debe explicar que `.nvmrc` sigue siendo el archivo canonico humano.
 - Verificar que `pnpm` actual funciona bajo Node 24 o ajustar `packageManager`/Corepack si el repo lo requiere.
+- No activar `engine-strict=true` en `.npmrc` en este slice salvo que todos los ambientes locales/CI/Vercel ya esten probados con Node 24 y el equipo acepte el corte duro. `engines.node` gobierna Vercel; el enforcement local puede quedar como follow-up si hace falta.
 
 ### Slice 2 — CI runtime cutover
 
 - Cambiar `node-version: 20` a `node-version: 24` en workflows que ejecutan app/tests/builds.
+- Validar con `rg -n "node-version: 20|node-version: '20'|node-version: \"20\"" .github/workflows` que no quedan jobs de app/tests/builds en Node 20.
 - Mantener intactas las actions Node 24-compatible ya resueltas por TASK-607.
 - Revisar workflows de deploy/worker que no usan `setup-node` para confirmar si necesitan contrato explicito o si corren en runtime container separado.
 
 ### Slice 3 — Local and script compatibility
 
 - Ejecutar con Node 24 real, no solo editar YAML.
+- Ejecutar un install limpio bajo Node 24:
+  - `corepack enable`
+  - `pnpm install --frozen-lockfile`
+  - preferir worktree limpio o remover `node_modules` solo dentro de un workspace aislado si se necesita detectar native/prebuilt dependency drift
 - Validar scripts core:
   - `pnpm lint`
   - `pnpm exec tsc --noEmit`
   - `pnpm test`
   - `pnpm build`
   - `pnpm design:lint` si el cambio toca docs/contrato visual indirectamente
+- Validar al menos un script operativo `tsx` que use bootstrap real de repo y no solo Next/Vitest; minimo recomendado:
+  - `pnpm docs:context-check`
+  - `pnpm migration-marker-gate:test`
 - Si falla un script por cambio de Node 24, corregir el script/helper compartido y agregar regresion focal cuando aplique.
 
 ### Slice 4 — E2E and deploy verification
@@ -185,6 +204,8 @@ Reglas obligatorias:
   - logs muestran `Setup Node.js` con Node 24 para app/tests
 - Verificar Vercel build/runtime:
   - via `engines.node` o Project Settings/CLI segun corresponda
+  - incluir evidencia concreta de deployment/build log o `process.version` que muestre Node 24.x
+  - si Vercel Project Settings siguen en 20.x/22.x, documentar que `engines.node=24.x` overridea settings o corregir settings con Vercel CLI si corresponde
   - dejar evidencia en `Handoff.md`
 
 ### Slice 5 — Documentation and closeout
@@ -216,6 +237,7 @@ Reglas obligatorias:
 ```
 
 - Workflows que hoy usan `node-version: 20` deben pasar a `node-version: 24`.
+- `.nvmrc` debe declarar `24`. `.node-version` solo existe si declara el mismo valor.
 - La task debe comprobar que `@types/node` ya esta en version compatible y que no hay polyfills/hacks para Node 20 que deban retirarse.
 
 ### Architecture decision
@@ -242,21 +264,27 @@ Esta task no crea una nueva semantica de producto, pero si cambia contrato opera
 ## Acceptance Criteria
 
 - [ ] `package.json` declara `engines.node = "24.x"`.
-- [ ] Existe archivo local de version Node canonico y documentado (`.nvmrc` y/o `.node-version`).
-- [ ] No quedan `node-version: 20` en workflows que ejecutan app/tests/builds.
+- [ ] `.nvmrc` existe y contiene `24`; si `.node-version` existe, tambien contiene `24`.
+- [ ] `rg -n "node-version: 20|node-version: '20'|node-version: \"20\"" .github/workflows` no devuelve jobs de app/tests/builds pendientes.
+- [ ] Clean install bajo Node 24 (`corepack enable` + `pnpm install --frozen-lockfile`) termina sin errores.
 - [ ] CI en GitHub corre con Node 24 para app/tests y termina success.
 - [ ] Playwright smoke corre con Node 24 y termina success o publica failure real con evidencia clara no atribuible al upgrade.
-- [ ] Vercel queda gobernado por Node 24.x para nuevos deployments, via `engines.node` y/o settings verificados.
+- [ ] Vercel queda gobernado por Node 24.x para nuevos deployments, via `engines.node` y/o settings verificados, con evidencia de build/deployment.
 - [ ] Documentacion viva diferencia claramente entre runtime interno de GitHub Actions y runtime de app/tests.
 - [ ] No se introducen workarounds temporales sin owner, condicion de retiro y follow-up.
 
 ## Verification
 
 - `node -v` bajo Node 24 local antes de correr checks.
+- `corepack enable`
+- `pnpm install --frozen-lockfile`
+- `rg -n "node-version: 20|node-version: '20'|node-version: \"20\"" .github/workflows`
 - `pnpm lint`
 - `pnpm exec tsc --noEmit`
 - `pnpm test`
 - `pnpm build`
+- `pnpm docs:context-check`
+- `pnpm migration-marker-gate:test`
 - `pnpm exec playwright test tests/e2e/smoke/login-session.spec.ts tests/e2e/smoke/cron-staging-parity.spec.ts --project=chromium --workers=1`
 - Post-push: verificar GitHub CI + Playwright run logs.
 - Verificar Vercel runtime con CLI o deployment evidence.
@@ -270,6 +298,7 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre.
 - [ ] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado con el cierre.
 - [ ] `Handoff.md` quedo actualizado con evidencia de Node 24 local, CI, Playwright y Vercel.
+- [ ] `Handoff.md` incluye el output/resumen de `node -v`, clean install, `rg node-version`, CI run IDs, Playwright run ID y evidencia Vercel.
 - [ ] `project_context.md` quedo actualizado si el contrato runtime cambia.
 - [ ] `changelog.md` quedo actualizado.
 - [ ] Arquitectura/documentacion funcional de plataforma quedo actualizada.
