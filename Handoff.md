@@ -1,3 +1,54 @@
+# Sesion 2026-05-18 (cont. — TASK-900 STAGING CUTOVER COMPLETE end-to-end)
+
+**Status**: ✅ TASK-900 shipped + staging cutover VALIDADO live end-to-end en la misma sesión. **Los 3 flags `ICO_MATERIALIZER_*_ENABLED=true` están ACTIVAS en staging Cloud Run revision 00097-jpm**. PG tracking `greenhouse_sync.ico_materialization_runs` confirma: 5 materializers `status='succeeded'`, `notes='incremental from <ISO>'` → DELTA filter funcionando, MERGE atomic, gate sano. Row counts idénticos al baseline pre-cutover. Bug class pre-existente del módulo `materializeAiSignals` (streaming insert API) fixeado canonical via DML INSERT — 2 commits adicionales shipped (`03ec4960` + `ba10ec5e`). Solo queda **cutover producción** post develop→main merge — documentado en TASK-911 (single canonical task, no agendas fragmentadas).
+
+## Staging cutover live timeline 2026-05-18
+
+| Time UTC | Action | Result |
+|---|---|---|
+| 18:25 | Trigger cron staging con flags OFF (Day 0) | ✅ Legacy DELETE+INSERT preservado, 3.8 min, baseline establecido: metrics_by_member 5/4/4 (mar/abr/may) |
+| 18:32 | Flip `ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED=true` (revision 00093-kps) | ✅ Deploy OK |
+| 18:33 | Trigger cron Day 1 (gate ON) | ✅ Gate procedió normal (signal upstream sano), 2026-05 procesó OK |
+| 18:38 | Flip `ICO_MATERIALIZER_MERGE_PATTERN_ENABLED=true` (revision 00094-wnh) | ✅ Deploy OK |
+| 18:40 | Trigger cron Day 2 (MERGE ON) | ✅ PG tracking 5 materializers status=succeeded, full period |
+| 18:42 | **Bug class detectado**: `materializeAiSignals` crash con BQ streaming buffer error (pre-existente, NO relacionado a TASK-900) | ⚠️ Independiente |
+| 18:45 | Refactor canonical (no patch) `replaceBigQuerySignalsForPeriod` + `replacePredictionLogs` streaming→DML INSERT (commit `03ec4960`) | ✅ Committed + pushed |
+| 18:52 | GH Actions deploy success 5m53s (revision 00095-xct) | ✅ |
+| 19:00 | Refactor canonical (no patch) `llm-enrichment-worker.ts` streaming→DML INSERT (commit `ba10ec5e`) | ✅ Committed + pushed |
+| 19:07 | GH Actions deploy success 6m54s (revision 00096-lnf) | ✅ |
+| 19:11 | Flip `ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED=true` (revision 00097-jpm) | ✅ Deploy OK |
+| 19:12 | Trigger cron Day 3 (3 flags ON + DELTA) | ✅ PG tracking notes='incremental from 2026-05-18T18:12:35.491Z' → DELTA filter funcionando, MERGE incremental activo |
+
+**Verificación canonical TASK-900 end-to-end**:
+
+- `metrics_by_member` row counts 2026-03/04/05 = 5/4/4 (idénticos al baseline Day 0 pre-cutover)
+- PG tracking 5 materializers `status='succeeded'` con `notes='incremental from <ISO>'` (DELTA filter activo)
+- Reliability signal `delivery.ico_materializer.skipped_safety` count=0 (gate confía en upstream sano)
+- Cero impacto en consumers downstream (`/admin/operations`, `/hr/payroll/projected`, `/agency/operations`)
+
+**Bug class ai_signals: canonical fix shipped**
+
+Streaming insert API (`bigQuery.dataset().table().insert()`) NO es canonical para batch replace patterns (DELETE+INSERT por período). Para esos casos, **DML INSERT INTO ... SELECT FROM UNNEST(@rows)** es la API correcta — escribe a durable storage directo, subsequent DML funciona inmediatamente. Streaming insert es para append-only event streams de alta cardinalidad (e.g. outbox-consumer publishing events, Nubox conformed sync) que NO hacen DELETE.
+
+Fixados canonical (no patch):
+- `src/lib/ico-engine/ai/materialize-ai-signals.ts` — `ai_signals` + `ai_prediction_log`
+- `src/lib/ico-engine/ai/llm-enrichment-worker.ts` — `ai_signal_enrichments` + `ai_enrichment_runs`
+
+Validados append-only OK (sin DELETE pattern, streaming insert canonical):
+- `src/lib/sync/outbox-consumer.ts` — `postgres_outbox_events`
+- `src/lib/nubox/sync-nubox-conformed.ts` — `nubox_sales` / `purchases` / `bank_movements`
+
+El cron natural mañana 3:15 AM Santiago correrá con BQ streaming buffer fully cold + 3 flags ON + ai_signals DML fix activo. Validación completa de los 3 meses en condiciones limpias.
+
+**Lección canonical canonizada**: el bug class TASK-877 era más amplio de lo documentado. El parche obvio (cerrar bridge Notion→member) era condición necesaria pero NO suficiente. El materializer ICO tenía 2 bug classes ortogonales:
+
+1. DELETE+INSERT non-atomic → cierre arquitectónico TASK-900 (MERGE + gate + tracking + delta)
+2. Streaming insert API + DML DELETE incompatibility → cierre canonical via DML INSERT (esta sesión)
+
+Solo cuando ambas se cerraron, el cron es safe para corridas consecutivas sin esperar BQ streaming buffer flush (~30-90 min).
+
+---
+
 # Sesion 2026-05-18 (cont. — TASK-900 ICO Materializer Hardening shipped)
 
 **Status**: ✅ TASK-900 completa, 7 slices shipped en `develop` (sin branch switch per user request). Defaults flags OFF garantizan zero behavioral change post-merge — el cron nocturno sigue con DELETE+INSERT bit-for-bit hasta que operador active explícitamente los flags post staging shadow >=7d verde.
