@@ -3777,8 +3777,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La fuente canónica para ownership multi-repo y selección de upstream quedó fijada en:
   - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
 - Repos hermanos documentados:
-  - `cesargrowth11/notion-bigquery`
-  - `cesargrowth11/hubspot-bigquery`
+  - `efeoncepro/notion-bigquery` (transferido desde `cesargrowth11` el 2026-05-18; deprecated — sunset post TASK-908 GA)
+  - `cesargrowth11/hubspot-bigquery` (post TASK-574 conserva solo `main.py` Cloud Function + HubSpot Developer Platform app — el write bridge ya vive en `services/hubspot_greenhouse_integration/`)
   - `cesargrowth11/notion-teams`
   - `cesargrowth11/notion-frame-io`
   - `efeoncepro/kortex`

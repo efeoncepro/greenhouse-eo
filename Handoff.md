@@ -1,3 +1,55 @@
+# Sesion 2026-05-18 (cont. — Governance fix: transfer `notion-bigquery` repo a efeoncepro org)
+
+**Status**: ✅ Transfer GitHub ejecutado live (`cesargrowth11/notion-bigquery` → `efeoncepro/notion-bigquery`). Trust boundary cerrado: el repo crítico del legacy sync ahora vive en la org institucional, no en cuenta personal externa. Cero impacto operacional verificado (Cloud Run sigue corriendo intacto, scheduler intacto, BigQuery intacto, smoke `/health` retorna `status=ok mode=multi-tenant spaces=2`). README del repo agregó deprecation note explícita marcando sunset post TASK-908 GA.
+
+## Resultado canonical
+
+### Acción
+
+- **GitHub UI**: Settings → Transfer ownership (acción del CEO).
+- Target: `efeoncepro` org.
+- Repo name preservado: `notion-bigquery`.
+- Auto-redirect activo: `cesargrowth11/notion-bigquery` → `efeoncepro/notion-bigquery` (GitHub mantiene meses post-transfer).
+
+### Verificación cero impacto
+
+| Componente | Estado post-transfer |
+|---|---|
+| Cloud Run `notion-bq-sync@us-central1` | ✅ revisión `00016-mat` LIVE, `conditions[0].status=True` |
+| Smoke `/health` | ✅ `status=ok mode=multi-tenant spaces=2 tables_configured=4` |
+| Cloud Scheduler `notion-bq-daily-sync` | ✅ intact (cron 03:00 Santiago) |
+| BigQuery `notion_ops.*` | ✅ intact |
+| Secret Manager `notion-token` | ✅ intact |
+| Git remote local | ✅ actualizado a `git@github.com:efeoncepro/notion-bigquery.git` |
+| `git fetch origin` | ✅ funciona |
+
+### Cleanup downstream
+
+- **README repo legacy**: agregada deprecation note explícita (status: "Deprecated — Maintenance only" + política critical-patches-only + sunset plan post TASK-908 GA + cross-ref greenhouse-eo).
+- **Branch protection**: SKIPPED — `efeoncepro` Free plan no permite branch protection en repos privados. Para repo deprecated con sunset 3-6 meses, la deprecation note del README + operational discipline son suficientes. Si emerge necesidad real, upgrade a Team plan en su momento (~$4/user/mes).
+- **5 referencias `cesargrowth11/notion-bigquery` en greenhouse-eo docs**: actualizadas (`project_context.md` L3780, `changelog.md` L8, `Handoff.md` L133/L138).
+- **`cesargrowth11/hubspot-bigquery`**: NO transferido (es repo separado, post TASK-574 ya solo conserva `main.py` Cloud Function HubSpot→BQ — fuera de scope hoy).
+
+## Hallazgos clave
+
+- **Trust boundary fix barato cierra risk class real**: 5 min de operación reversible elimina dependencia de cuenta personal externa para un sync crítico de producción. Si Cesar pierde acceso GitHub futuro, no perdemos control del source-of-truth código.
+- **Cloud Run ↔ GitHub NO se hablan**: el deploy es 100% manual (`gcloud run deploy --source=.` desde local). Transfer del repo no toca el runtime. Verificado live.
+- **Branch protection deshabilitado en Free plan** para repos privados — informacional para el ecosistema, no bloquea nada.
+
+## Validación
+
+- `gh api repos/efeoncepro/notion-bigquery` retorna 200 + `private: true` + `default_branch: main`.
+- `gh api repos/cesargrowth11/notion-bigquery` redirige correctamente a `efeoncepro/notion-bigquery`.
+- Cloud Run smoke `https://notion-bq-sync-y6egnifl6a-uc.a.run.app` retorna 200 `status=ok` post-transfer.
+- Git remote local actualizado + `git fetch origin` OK.
+
+## Siguientes pasos
+
+- Cuando TASK-908 ship + steady state Sky+Efeonce ≥30d → archive `efeoncepro/notion-bigquery` + delete Cloud Run `notion-bq-sync` (proceso documentado en README del repo).
+- Mientras tanto: solo critical patches al repo legacy si emergen bug classes operacionales (defense in depth contra renames Notion adicionales, etc.).
+
+---
+
 # Sesion 2026-05-18 (cont. — arrayArg SQL-boundary helper canonical para ARRAY NOT NULL columns)
 
 **Status**: ✅ Bug class ARRAY NOT NULL detectado vía Sentry alert post Efeonce rename + fixed canonical robusto. Mirror del pattern `intArg` (commit `ca465ac0`): nuevo helper `arrayArg(value)` que coerce `null → []` en SQL boundary. Aplicado a las 4 columnas ARRAY NOT NULL de `greenhouse_delivery.tasks`. Cualquier columna ARRAY NOT NULL futura queda automáticamente protegida. Cero parche local — el helper es la canonical primitive single-source-of-truth.
@@ -130,12 +182,12 @@ NOT server-only (safe en client + server). Exports:
 
 ### Capa L4 — legacy notion-bq-sync defensive Estado/Estado 1 fallback
 
-Repo sibling `cesargrowth11/notion-bigquery` (Cloud Run `notion-bq-sync@us-central1`, project `efeonce-group`, scheduler diario 03:00 Santiago) recibió patch defensivo en `main.py`:
+Repo sibling `efeoncepro/notion-bigquery` (transferido desde `cesargrowth11` el 2026-05-18; Cloud Run `notion-bq-sync@us-central1`, project `efeonce-group`, scheduler diario 03:00 Santiago) recibió patch defensivo en `main.py`:
 
 - 3 mappers (`tareas`, `proyectos`, `sprints`) — `_prop_value(row, "Estado") or _prop_value(row, "Estado 1")` (cortocircuito Python OR, preserva Efeonce semantics, fallback transparente para Sky pre-rename).
 - `_smoke_estado_fallback.py` self-contained — 14 asserts PASS cubriendo Efeonce / Sky pre-rename / Sky post-rename / ambos presentes / empty / row vacío / sprints.
 - Cloud Run canary deploy `notion-bq-sync-00016-mat` `--no-traffic --tag=canary` → smoke verificó Sky 0→3935 estado populated → promote 100% traffic → tag removed.
-- Merge a `main` + push `cesargrowth11/notion-bigquery` (commit `dba8d6c`).
+- Merge a `main` + push (commit `dba8d6c`).
 
 ### Capa L1 — Sky Notion canonical post-rename (operador CEO ejecutó en Notion UI)
 
