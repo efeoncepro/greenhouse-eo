@@ -152,31 +152,9 @@ export const ensurePersonIntelligenceSchema = (): Promise<void> => {
   if (ensureSchemaPromise) return ensureSchemaPromise
 
   ensureSchemaPromise = runGreenhousePostgresQuery(`
-    CREATE TABLE IF NOT EXISTS greenhouse_serving.person_operational_360 (
-      member_id TEXT NOT NULL,
-      period_year INT NOT NULL,
-      period_month INT NOT NULL,
-      rpa_avg NUMERIC(6,2), rpa_median NUMERIC(6,2),
-      otd_pct NUMERIC(5,2), ftr_pct NUMERIC(5,2),
-      cycle_time_avg_days NUMERIC(6,2), cycle_time_p50_days NUMERIC(6,2), cycle_time_variance NUMERIC(6,2),
-      throughput_count INT, pipeline_velocity NUMERIC(5,3),
-      stuck_asset_count INT DEFAULT 0, stuck_asset_pct NUMERIC(5,2),
-      total_tasks INT DEFAULT 0, completed_tasks INT DEFAULT 0, active_tasks INT DEFAULT 0,
-      utilization_pct NUMERIC(5,2), allocation_variance NUMERIC(5,3),
-      cost_per_asset NUMERIC(14,2), cost_per_hour NUMERIC(14,2),
-      quality_index NUMERIC(5,2), dedication_index NUMERIC(5,2),
-      role_category TEXT, total_fte_allocation NUMERIC(5,3),
-      contracted_hours_month INT, assigned_hours_month INT,
-      used_hours_month INT, available_hours_month INT,
-      expected_throughput NUMERIC(6,1), capacity_health TEXT,
-      overcommitted BOOLEAN DEFAULT FALSE, active_assignment_count INT DEFAULT 0,
-      compensation_currency TEXT, monthly_base_salary NUMERIC(14,2),
-      monthly_total_comp NUMERIC(14,2), compensation_version_id TEXT,
-      source TEXT NOT NULL DEFAULT 'person_intelligence',
-      engine_version TEXT,
-      materialized_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      PRIMARY KEY (member_id, period_year, period_month)
-    )
+    SELECT 1
+    FROM greenhouse_serving.person_operational_360
+    LIMIT 0
   `).then(() => {}).catch(err => {
     ensureSchemaPromise = null
     throw err
