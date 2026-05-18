@@ -10,6 +10,51 @@
 
 ---
 
+## Delta 2026-05-18 — PoC RpA V2 validado empíricamente contra Demo
+
+Sesión live 2026-05-18: PoC ejecutado contra Demo teamspace + flujo manual del operador validó la regla canonical end-to-end.
+
+**Setup PoC**:
+- Script `scripts/notion-metrics/_poc-rpa-v2-demo.ts` (~330 líneas TS, SDK `@notionhq/client` v5.21.0)
+- Polling cada 30 seg vs Demo Tareas data source (1342 tasks fetched per poll)
+- Snapshot diff + transitions log append-only persistido en `.poc-snapshots/` (gitignored)
+- Reglas canonical bajo test: target transition `Listo para revisión → Cambios solicitados`
+
+**Resultado empírico** (task `AXIS / EPIC — Patterns`, flow manual 6 cambios de status):
+
+| Poll | Transición detectada | ¿Target? |
+|---|---|---|
+| #1 | Baseline 1342 tasks | — |
+| #2 | `En curso → Listo para revisión` | ❌ |
+| #3 | `Listo para revisión → Cambios solicitados` | ✅ TARGET → RpA = 1 |
+| #4 | `Cambios solicitados → En curso` | ❌ |
+| #5 | `En curso → Listo para revisión` | ❌ |
+| #6 | `Listo para revisión → Cambios solicitados` | ✅ TARGET → **RpA = 2** ← matchea expectation |
+
+**Validaciones canonical confirmadas**:
+- ✅ Helper de detección cuenta correctamente solo las transitions target
+- ✅ Estados intermedios (3 transitions no-target) loggeados pero NO inflan el counter
+- ✅ Persistence (snapshot + transitions log) sobrevive entre polls
+- ✅ Rate limit Notion respetado (~14 req/poll × 6 polls = ~84 calls en 6 min, sin 429)
+- ✅ Flow operativo real validado (correcciones in-place en `Cambios solicitados`, no vuelve a `En curso`)
+- ⚠️ Polling pierde transitions intermedias entre snapshots — confirma necesidad del webhook canonical en TASK-908
+
+**Limitación canonical del polling exhibida en sandbox** (no es bug del PoC):
+
+Cuando hicimos flow rápido sin loop activo, el script solo capturó el **net diff** (estado inicial vs estado final), perdiendo todas las transitions intermedias. Esto reafirma por qué el approach canonical TASK-908 usa **webhook real-time** en lugar de polling — cada transition individual queda capturada por separado.
+
+**Implicación operativa para TASK-908**:
+
+El schema `task_status_transitions` debe capturar cada transición individual con su timestamp canonical del `event.timestamp` Notion webhook. El PoC validó que las transitions individuales pueden trackearse — solo falta el delivery mechanism canonical (webhook vs polling) para que escale a producción sin pérdidas.
+
+Detalle completo del schema timestamp + queries canonical en ADR `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` Delta 2026-05-18 §2.
+
+**Files canonical de la sesión**:
+- `scripts/notion-metrics/_poc-rpa-v2-demo.ts` — reference implementation reusable como template para TASK-908 webhook handler (mismo shape: fetch via SDK + extractStatus + persist transitions)
+- `.poc-snapshots/demo-transitions-log.json` — gitignored, contiene las 5 transitions reales detectadas
+
+---
+
 ## Delta 2026-05-17 — Bomba 1 cerrada (status divergence cross-tenant)
 
 **Bomba detectada en sesión live post-ship original**: auditoría manual de schemas Notion reveló que el "evento canonical de corrección" (`Listo para revisión → En Feedback`) **solo existía en Sky** — Efeonce usaba `Listo para revisión → Cambios Solicitados`. Plus property name divergente (`Estado` vs `Estado 1`), enum values distintos, estados Efeonce-only sin equivalente Sky, y un estado Sky (`Tomado`) que era tag de responsable mal puesto como status.

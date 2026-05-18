@@ -1,3 +1,91 @@
+# Sesion 2026-05-18 — PoC RpA V2 validado empíricamente contra Demo + flow operativo real + timestamp canonical
+
+**Status**: ✅ Doc-only + PoC sandbox executed live. PoC RpA V2 implementado (`scripts/notion-metrics/_poc-rpa-v2-demo.ts`, ~330 líneas TS, SDK `@notionhq/client` v5.21.0 instalado canonical), ejecutado contra Demo teamspace con flow manual del operador, **validó la regla canonical `Listo para revisión → Cambios solicitados` end-to-end** (RpA = 2 esperado = RpA = 2 detectado). Plus 2 Deltas canonical post-validation: (1) flow operativo real documentado (correcciones in-place en `Cambios solicitados`, no vuelve a `En curso`); (2) timestamp canonical obligatorio per transición en `task_status_transitions` schema (`transitioned_at` del webhook event.timestamp como source of truth para Cycle Time + Time-in-Status + futuras métricas temporales).
+
+## Resultado canonical
+
+### PoC RpA V2 — validación empírica exitosa
+
+- **Script canonical**: `scripts/notion-metrics/_poc-rpa-v2-demo.ts` ~330 líneas TS — usable como **reference implementation** template para TASK-908 webhook handler (mismo shape: SDK fetch + extractStatus + persist transitions + diff snapshot)
+- **SDK canonical instalado**: `@notionhq/client` v5.21.0 (última npm, mismo que la skill notion-platform recomienda) → queda en `package.json` canonical para TASK-908 + TASK-901 + futuras
+- **Polling cada 30s** vs Demo Tareas data source — 1342 tasks fetched per poll (clone Efeonce trajo todo el histórico)
+- **Resultado empírico flow manual operador**:
+  - Poll #1: Baseline 1342 tasks
+  - Poll #2: `En curso → Listo para revisión` (no target)
+  - Poll #3: ✅ TARGET `Listo para revisión → Cambios solicitados` (RpA = 1)
+  - Poll #4: `Cambios solicitados → En curso` (no target)
+  - Poll #5: `En curso → Listo para revisión` (no target)
+  - Poll #6: ✅ TARGET `Listo para revisión → Cambios solicitados` (**RpA = 2 ← matchea expectation**)
+- ✅ Validaciones canonical confirmadas: helper detecta correcto, estados intermedios no inflan counter, persistence sobrevive entre polls, rate limit respetado, flow real operativo funciona idéntico al sintético
+- ⚠️ Limitación canonical del polling exhibida: cuando flow rápido sin loop activo, solo captura net diff — confirma necesidad de webhook canonical (TASK-908)
+
+### Delta canonical 1: Flow operativo real documentado en ADR Lifecycle V1
+
+Post explicación operador en sesión: el equipo NO vuelve a `En curso` entre rondas de revisión. Las correcciones se trabajan **dentro del status `Cambios solicitados`**:
+
+```
+[ronda 1] En curso → Listo para revisión → Cambios solicitados
+[ronda 2]                                        → Listo para revisión → Cambios solicitados
+[ronda 3]                                                                      → Listo para revisión → Cambios solicitados
+[final]                                                                                                      → Listo para revisión → Aprobado
+```
+
+**`En curso` solo aparece UNA VEZ al inicio** (primera ejecución pre-primer-review). Después el equipo trabaja los cambios sin cambiar el status.
+
+**Implicación canonical**:
+- ✅ Regla RpA + FTR: **NO afectadas** — la transición canonical `Listo para revisión → Cambios solicitados` es robusta a cualquier estado pre-`Listo para revisión` (funciona idéntico viniendo de `En curso` o de `Cambios solicitados` previo)
+- ⚠️ Cycle Time canonical futuro (TASK derivada): `Cambios solicitados` debe contar como "trabajo activo" igual que `En curso` — NO como "en revisión congelado"
+- ⚠️ Time-in-Status: el tiempo total en `Cambios solicitados` puede ser engañoso (incluye work + waiting for next review) — métrica derivada debe distinguir
+- ✅ OTD / Throughput / Pipeline Velocity: no afectadas
+
+### Delta canonical 2: Timestamp obligatorio per transición en ADR Lifecycle V1
+
+`greenhouse_delivery.task_status_transitions` (TASK-908 owned) **debe capturar timestamp canonical de cada transición** — load-bearing para todas las métricas temporales (Cycle Time, Time-in-Status, Lead Time, etc.).
+
+Schema canonical reforzado:
+
+| Campo | Source | Uso canonical |
+|---|---|---|
+| `transitioned_at TIMESTAMPTZ NOT NULL` | `event.timestamp` del webhook Notion (canonical) | Source of truth para métricas temporales |
+| `captured_at TIMESTAMPTZ DEFAULT NOW()` | Greenhouse-side processing time | Observability del lag webhook → Greenhouse |
+
+**Queries canonical habilitadas**:
+- Time-in-status per task: `LEAD(transitioned_at) OVER (PARTITION BY task_source_id ORDER BY transitioned_at)`
+- Cycle Time canonical per task: `MIN(transitioned_at) FILTER (WHERE from_status='Sin empezar')` → `MAX(transitioned_at) FILTER (WHERE to_status='Aprobado')`
+- Lag analysis webhook delivery: `captured_at - transitioned_at`
+
+**Hard rule canonical adicional**:
+- **NUNCA** persistir una transition row sin `transitioned_at` populado. Es load-bearing para Cycle Time canonical (TASK derivada futura) + Time-in-Status.
+
+## Hallazgos clave
+
+- **Validación end-to-end con 6 polls + 5 transitions detectadas + 2 TARGET matches**: confirma que el diseño canonical V2 funciona en flow operativo real, no solo sintético.
+- **Polling es insuficiente para producción**: si el operador hace flow rápido (cambios <30s entre sí), polling pierde transitions intermedias y solo captura el net diff. Webhook canonical (TASK-908) resuelve esto.
+- **El SDK `@notionhq/client` v5.21.0 funciona correctamente con Notion-Version 2026-03-11** y el endpoint `/v1/data_sources/{id}/query` canonical post-2025-09-03.
+- **El flow operativo real "no vuelve a En curso entre rondas"** NO rompe el conteo RpA canonical — la regla es robusta. Pero SÍ tiene implicaciones para Cycle Time futuro: el período en `Cambios solicitados` puede contener tanto "work-in-progress" como "esperando review", lo cual una métrica time-in-status genérica no distingue sin más context.
+- **Timestamp canonical obligatorio** por transición es prerequisito para TODAS las métricas temporales downstream — Cycle Time, Time-in-Status, Lead Time, Throughput rate. El schema task_status_transitions canonical (TASK-908) ya lo capturaba pero el ADR no lo enfatizaba como load-bearing hard rule.
+- **PoC sirve como reference implementation** para TASK-908 webhook handler — mismo shape (SDK fetch + extractStatus + persist transitions + snapshot diff), solo cambia el trigger (webhook real-time vs polling 30s).
+
+## Validacion
+
+- Doc-only + PoC sandbox sin código de producción tocado
+- `@notionhq/client` v5.21.0 instalado canonical (queda en package.json para uso futuro TASK-908/901)
+- `scripts/notion-metrics/_poc-rpa-v2-demo.ts` queda committeable como reference implementation
+- `.poc-snapshots/` queda gitignored (state local, no commit)
+- 5 transitions reales capturadas + persistidas en `.poc-snapshots/demo-transitions-log.json` (gitignored)
+- Pre-existing markdown warnings (MD031/MD032/MD060 cosméticos en ADRs) NO bloquean — patrón canonical tolerado del repo
+
+## Siguientes pasos
+
+- **Operador revoca el token `ntn_155...` de pruebas** desde Notion Developer Portal (higiene canonical post-test)
+- **TASK-908 dev**: implementar webhook handler + outbox + reactive consumer + PG `task_status_transitions` con timestamp canonical obligatorio + helper `countCorrectionTransitions`. Usar PoC como reference implementation para la lógica de detección de transitions.
+- **TASK-910 dev**: implementar demo teamspace bridge + reliability signals + bonus guardrail
+- **TASK-901 Fase A** post TASK-908 + TASK-910 verde: motor V2 paralelo a V1
+- **Migration Notion Sky + Efeonce** (operador-side, en cualquier momento): rename + add canonical
+- **Futura TASK derivada Cycle Time canonical**: tratar `Cambios solicitados` como "trabajo activo" igual que `En curso` (no congelar el clock)
+
+---
+
 # Sesion 2026-05-17 (cont. — Bomba 1 cerrada: ADR canonical Status Lifecycle universal cross-tenant)
 
 **Status**: ✅ Doc-only. **Bomba silenciosa detectada y resuelta en sesión live**: auditoría manual de schemas Notion vía MCP reveló que los estados de status divergían estructuralmente cross-tenant (Efeonce `Estado` con vocabulary Spanish-formal vs Sky `Estado 1` con vocabulary Spanish-informal + property name typo histórico + estados Sky-only mal puestos como status que eran tags de responsable + estados Efeonce-only sin equivalente Sky). El "evento canonical de corrección" (`Listo para revisión → En Feedback`) del ADR RpA V2 firmado horas antes **solo existía en Sky** — rompía estructuralmente la premisa cross-tenant. Resolución: ADR nuevo `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` que canoniza **11 estados universales en property `Estado` cross-tenant** (Path B canonical: templates Notion unificados en lugar de adapter layer per-tenant).

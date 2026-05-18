@@ -83,3 +83,6 @@ src/assets/iconify-icons/generated-icons.css
 
 # Local PDF render scratch (test artifacts, not committed)
 /tmp/
+
+# RpA V2 PoC sandbox snapshots (gitignored — never commit demo state)
+.poc-snapshots/

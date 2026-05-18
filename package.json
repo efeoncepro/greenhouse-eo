@@ -181,6 +181,7 @@
     "@mui/lab": "7.0.1-beta.19",
     "@mui/material": "7.3.6",
     "@mui/material-nextjs": "7.3.6",
+    "@notionhq/client": "^5.21.0",
     "@react-email/components": "^1.0.10",
     "@react-pdf/renderer": "^4.3.2",
     "@reduxjs/toolkit": "2.11.2",

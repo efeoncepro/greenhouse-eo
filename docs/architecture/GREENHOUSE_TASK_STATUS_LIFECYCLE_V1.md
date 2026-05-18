@@ -9,6 +9,120 @@
 
 ---
 
+## Delta 2026-05-18 — Flow operativo real + timestamp canonical obligatorio per transición
+
+Post validación PoC RpA V2 contra Demo teamspace (sesión 2026-05-18), se documentan 2 invariantes operativos adicionales que el ADR no explicitaba:
+
+### 1. Flow operativo canonical real (correcciones in-place)
+
+El equipo NO vuelve a `En curso` entre rondas de revisión. Las correcciones se trabajan **dentro del status `Cambios solicitados`**:
+
+```
+[ronda 1] En curso → Listo para revisión → Cambios solicitados
+[ronda 2]                                        → Listo para revisión → Cambios solicitados
+[ronda 3]                                                                      → Listo para revisión → Cambios solicitados
+[final]                                                                                                      → Listo para revisión → Aprobado
+```
+
+`En curso` solo aparece UNA VEZ al inicio (primera ejecución pre-primera-review). Después, el equipo trabaja los cambios sin cambiar el status.
+
+**Implicación para semántica de estados** (extiende §3 del ADR):
+
+| Estado canonical | Significado original | Significado operativo real |
+|---|---|---|
+| `En curso` | "Trabajo activo en ejecución" | **Solo primera ejecución** pre-primer-review |
+| `Cambios solicitados` | "Revisor pidió cambios" | "Cambios pedidos + equipo trabajando los cambios" (incluye work-in-progress de revisión) |
+
+→ Esto NO cambia los 11 estados canonical ni la transición target de RpA. La regla canonical `Listo para revisión → Cambios solicitados` es robusta a cualquier estado pre-`Listo para revisión` — funciona idéntico viniendo de `En curso` o de `Cambios solicitados` previo.
+
+**Implicación para métricas downstream (CRÍTICO para futuras TASKs)**:
+
+| Métrica futura | Cómo se ve afectada |
+|---|---|
+| **Cycle Time canonical** | `Cambios solicitados` debe contar como "trabajo activo" igual que `En curso` — NO como "en revisión congelado" |
+| **Time-in-status** | El tiempo total en `Cambios solicitados` puede ser engañoso (incluye work + waiting for next review) — métrica derivada debe distinguir |
+| **Throughput / Pipeline Velocity** | No afectadas — basadas en transitions terminales (`→ Aprobado`) |
+| **RpA / FTR** | No afectadas — regla canonical es robusta a flow real |
+
+### 2. Timestamp canonical obligatorio per transición
+
+`greenhouse_delivery.task_status_transitions` (TASK-908 owned) **debe capturar timestamp canonical de cada transición** — es load-bearing para todas las métricas temporales (Cycle Time, Time-in-Status, Lead Time, etc.).
+
+Schema canonical reforzado:
+
+```sql
+CREATE TABLE greenhouse_delivery.task_status_transitions (
+  transition_id UUID PRIMARY KEY,
+  task_source_id TEXT NOT NULL,
+  workspace_id TEXT NOT NULL,
+  from_status TEXT NOT NULL,                   -- canonical (uno de los 11)
+  to_status TEXT NOT NULL,                     -- canonical (uno de los 11)
+  transitioned_at TIMESTAMPTZ NOT NULL,        -- ★ CANONICAL del webhook event.timestamp
+  transitioned_by TEXT,                        -- Notion user_id que hizo el cambio
+  source_event_id TEXT UNIQUE,                 -- dedup canonical
+  captured_at TIMESTAMPTZ NOT NULL DEFAULT NOW() -- Greenhouse-side processing time
+);
+
+CREATE INDEX ts_task_id_time_idx
+  ON greenhouse_delivery.task_status_transitions (task_source_id, transitioned_at DESC);
+```
+
+**Diferencia entre los 2 timestamps** (ambos obligatorios per row):
+
+| Campo | Source | Uso canonical |
+|---|---|---|
+| `transitioned_at` | `event.timestamp` del webhook Notion (canonical) | Source of truth para métricas temporales (Cycle Time, Time-in-Status, lag analysis) |
+| `captured_at` | `NOW()` cuando Greenhouse persiste | Observability del lag webhook → Greenhouse (debug delivery delays) |
+
+**Implicación operativa**:
+- Vía webhook canonical (TASK-908): `transitioned_at = event.timestamp` (accurate al segundo)
+- Vía polling (PoC sandbox): `transitioned_at = page.last_edited_time` (proxy, no exacto del status change) — limitación documentada
+- Vía backfill histórico: `transitioned_at` reconstruido best-effort, marcar con flag `is_backfilled=TRUE` (opcional V1.1)
+
+**Queries canonical habilitadas por timestamp obligatorio**:
+
+```sql
+-- Time-in-status per task (windowed)
+SELECT
+  task_source_id,
+  to_status,
+  transitioned_at AS started_at,
+  LEAD(transitioned_at) OVER (
+    PARTITION BY task_source_id ORDER BY transitioned_at
+  ) AS ended_at,
+  EXTRACT(EPOCH FROM (
+    LEAD(transitioned_at) OVER (PARTITION BY task_source_id ORDER BY transitioned_at)
+    - transitioned_at
+  ))/3600 AS hours_in_status
+FROM greenhouse_delivery.task_status_transitions
+WHERE task_source_id = ?
+ORDER BY transitioned_at;
+
+-- Cycle Time canonical per task (start to Aprobado)
+SELECT
+  task_source_id,
+  MIN(transitioned_at) FILTER (WHERE from_status = 'Sin empezar') AS started_at,
+  MAX(transitioned_at) FILTER (WHERE to_status = 'Aprobado') AS approved_at
+FROM greenhouse_delivery.task_status_transitions
+GROUP BY task_source_id;
+```
+
+**Hard rule adicional canonical**:
+
+- **NUNCA** persistir una transition row sin `transitioned_at` populado. Es load-bearing para Cycle Time canonical (TASK derivada futura) + Time-in-Status (futuro).
+
+### Validación PoC empírica (sesión 2026-05-18)
+
+PoC RpA V2 ejecutado contra Demo teamspace capturó 6 polls con 5 transitions reales, validando:
+- ✅ Regla canonical `Listo para revisión → Cambios solicitados` cuenta correcto (RpA = 2 esperado, RpA = 2 detectado)
+- ✅ Timestamps disponibles vía Notion `last_edited_time` (~accurate como proxy del status change)
+- ✅ Flow real operativo (correcciones in-place) funciona idéntico al flow sintético
+- ⚠️ Polling pierde transitions intermedias entre snapshots — confirma necesidad de webhook canonical (TASK-908)
+
+Detalle completo en commit del PoC + transitions log persistido (`.poc-snapshots/demo-transitions-log.json`, gitignored).
+
+---
+
 ## 0. TL;DR canonical
 
 **Todos los teamspaces Notion de Greenhouse usan los mismos 11 estados canonical universales en una property llamada `Estado`.** Sin variantes per cliente. Sin per-tenant mapping. Sin adapter layer.
