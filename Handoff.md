@@ -1,3 +1,33 @@
+# Sesion 2026-05-18 (cont. — TASK-901 V1.0 Foundation closure + ISSUE-078 hotfix Sentry)
+
+**Status**: ✅ TASK-901 V1.0 Foundation Slice 1 cerrado formalmente directo en `develop` (mirror pattern TASK-908 closure 2026-05-18). Mover task `in-progress/` → `complete/`. Slices 2-5 + Fases B-E ADR Strangler deferred a **TASK-913** V1.1 follow-up (creado esta sesión, bloqueado por TASK-912 webhook ingestion + TASK-910 demo runtime verde + HR/Finance written approval cutover bonus). README + Handoff + changelog sincronizados. Siguiente ID disponible: TASK-914.
+
+**ISSUE-078 hotfix Sentry shipped** (commit `023a97e8`, mismo session 2026-05-18 16:47 -04): reader signal `notion.correction_transitions.source_availability` (TASK-908 Slice 3.5 shipped commit `ca62969a`) usaba `t.task_source_id` contra `greenhouse_delivery.tasks` donde el column canonical real es `t.notion_task_id`. Sentry alert `JAVASCRIPT-NEXTJS-65` continuo en `/admin` page render. Causa raíz: schema naming drift architectonal entre `tasks.notion_task_id` ⇄ `task_status_transitions.task_source_id` (mismo identificador Notion UUID, nombres distintos cross-table) + violación CLAUDE.md "SQL Signal Reader Schema Validation Gate" (TASK-893 hotfix #3) — shipeé sin live PG smoke verify. Resuelto canonical V1: alias `t.notion_task_id AS task_source_id` en CTE (pattern fuente `get-project-detail.ts:484` + `delivery-coverage.ts:112`) + JSDoc canonical embedded documenta cross-table naming drift + live PG smoke verified pre-commit (1927 tasks, severity=error 100% steady state esperado pre-TASK-912). Architectural rename column deferred (ISSUE-078 archive). 
+
+**TASK-901 Slice 1 V2 shipped en 3 commits canonical en `develop`**:
+
+1. **`308be17d`** `feat(ico)` — helper inicial nombrado `calculateRpa` + version `'rpa_v1.0'`. 3 skills invocadas paralelo (arch-architect + greenhouse-ico + notion-platform) convergieron PROCEED.
+2. **`589ab5f3`** `refactor(ico)` — arch forward-fix V2 strangler naming canonical per ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`. Rename `calculateRpa → calculateRpaV2`, `'rpa_v1.0' → 'rpa_v2.0'`, files + types. Handoff + changelog updated.
+3. **`08bb9da1`** `docs(TASK-901)` — Delta 2026-05-18 al top del spec + Status block update con closure marker.
+
+**Files canonical shipped Slice 1**:
+- `src/lib/notion-metrics/calculate-rpa-v2.ts` — helper server-only delega 100% a `countCorrectionTransitions` TASK-908 Foundation
+- `src/lib/notion-metrics/calculate-rpa-v2.test.ts` — 13 tests verde
+
+**Razón del forward-fix V2 naming canonical** (consensus 3 skills + ADR Strangler): V1 actual = path productivo legacy (Notion formula `RpA` + sync notion-bq-sync + `metrics_by_member.rpa_avg` + `calculateRpaBonus` payroll) NO se toca durante toda la migración (5-7 meses). V2 = código canonical paralelo coexiste con V1 hasta cutover bonus Fase D (gated por flag `BONUS_USE_RPA_V2` reversible <5min env var flip) + cleanup V1 opcional 90+ días post Fase D stable (Fase E PUEDE DEFERIRSE INDEFINIDAMENTE). Yo consulté las 3 skills con RPA_V1.md spec §4.1 (que describe naming V1) pero NO con el ADR Strangler superseding — forward-fix limpio antes de cualquier consumer wire-up.
+
+**Cero impacto productivo**: helper Slice 1 aislado sin consumers downstream (Slices 2-5 + TASK-912 + TASK-913 todos deferred). V1 productivo intacto durante todo el proceso. Pre-TASK-912 deployment: `calculateRpaV2` retorna `sourceMode='unavailable'` 100% (tabla `task_status_transitions` vacía). Bonus calc downstream V1 sigue intacto. Degradación honesta universal.
+
+**Out of scope Slice 1** (deferred → TASK-913 V1.1):
+
+- Fase B (Slices 2-3): outbox event `notion.task.rpa_v2_recompute_requested v1` + reactive consumer compute en ops-worker
+- Fase B Shadow Mode (Slice 4): paridad signal `notion.metrics.rpa_v2_vs_v1_paridad` ≥95% sustained 7d
+- Fase C Writeback Visible Notion (Slices 5-8): Cloud Tasks queue `notion-writeback-v2` + setup property `[GH] RpA v2` + flag flip + nightly safety net
+- Fase D Bonus Cutover Gated (Slices 9-10): flag `BONUS_USE_RPA_V2=true` Efeonce + 30d HR reconciliation + Sky después
+- Fase E Cleanup V1 OPCIONAL (Slices 11-15): drop V1 column + rename V2 → canonical + Notion cleanup. **PUEDE DEFERIRSE INDEFINIDAMENTE**
+
+---
+
 # Sesion 2026-05-18 (cont. — TASK-901 Slice 1 calculateRpaV2 canonical helper shipped + arch forward-fix V2 naming)
 
 **Status**: ✅ TASK-901 Slice 1 shipped en `develop` en 2 commits canonical:

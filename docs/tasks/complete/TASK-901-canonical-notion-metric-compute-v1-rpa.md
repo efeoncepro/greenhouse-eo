@@ -61,13 +61,13 @@
 
 ## Status
 
-- Lifecycle: `to-do` (Slice 1 V2 helper ✅ SHIPPED 2026-05-18 directo en `develop`; Slices 2-5 + Fases B-E ADR Strangler deferred — bloqueados por TASK-912 webhook ingestion + TASK-910 demo runtime verde + HR/Finance sign-off cutover bonus)
+- Lifecycle: `complete` (V1.0 Foundation Slice 1 V2 helper ✅ SHIPPED 2026-05-18 directo en `develop`; Slices 2-5 + Fases B-E ADR Strangler deferred a TASK-913 V1.1 cuando TASK-912 webhook ingestion shipee + TASK-910 demo runtime verde + HR/Finance sign-off cutover bonus)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Slice 1 SHIPPED — calculateRpaV2 canonical helper (commits 308be17d + 589ab5f3 V2 rename arch forward-fix). Slices 2-5 quedan to-do.`
+- Status real: `V1.0 Foundation COMPLETE — Slice 1 calculateRpaV2 canonical helper shipped (commits 308be17d + 589ab5f3 V2 rename arch forward-fix + 08bb9da1 Delta closure). Slices 2-5 + Fases B-E deferred a TASK-913 V1.1 follow-up cuando TASK-912 webhook ingestion shipee.`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|platform|reliability`
 - Blocked by: `TASK-908 V1.0 Foundation ✅ SHIPPED 2026-05-18 (Slices 0+1+3.5+6+7+8 — table task_status_transitions + countCorrectionTransitions + calculateCycleTime + cycle-time-slo-config + signal). Slice 1 de TASK-901 puede arrancar inmediatamente — countCorrectionTransitions vive en src/lib/notion-metrics/count-correction-transitions.ts. TASK-912 (Slices 2/3/4/5/9 webhook + reactive consumer + BQ formula + backfill) deferred — bloquea TASK-901 Slice 4 (shadow mode prod) cuando Notion webhook subscription se registre operador-side. Plus TASK-910 (Notion Demo Teamspace Sandbox) ship + 4 semanas runtime end-to-end verde DEMO antes de iniciar Slice 4 (shadow mode RpA Efeonce productivo) — gate canonical pre-Fase 1 del ADR GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Demo teamspace canonical IDs en TASK-910 §Detailed Spec.`
