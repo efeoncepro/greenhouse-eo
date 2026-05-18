@@ -267,6 +267,63 @@ export const buildRecommendationSignals = ({
   return recommendations
 }
 
+// ─── Canonical struct types for DML INSERT params (TASK-900 follow-up) ─────
+//
+// BQ tabledata.insertAll API (.dataset().table().insert()) writes to streaming
+// buffer where subsequent DML (DELETE/UPDATE/MERGE) is blocked ~30 min. Para
+// batch inserts replazables por período, el API canonical es DML INSERT INTO
+// ... SELECT FROM UNNEST(@rows) que escribe a durable storage directo.
+//
+// Mirrors TASK-900 hardening pattern: ningún path destructivo + insert debe
+// depender de streaming buffer flush para idempotencia.
+//
+// El BQ Node.js client requiere `types` explícitos para ARRAY<STRUCT> params
+// porque JS objects no llevan type metadata. Mantener en sync con
+// `toBigQuerySignalRow` / `toBigQueryPredictionLogRow` y el schema BQ canonical.
+
+const AI_SIGNAL_STRUCT_TYPES = {
+  signal_id: 'STRING',
+  signal_type: 'STRING',
+  space_id: 'STRING',
+  member_id: 'STRING',
+  project_id: 'STRING',
+  metric_name: 'STRING',
+  period_year: 'INT64',
+  period_month: 'INT64',
+  severity: 'STRING',
+  current_value: 'FLOAT64',
+  expected_value: 'FLOAT64',
+  z_score: 'FLOAT64',
+  predicted_value: 'FLOAT64',
+  confidence: 'FLOAT64',
+  prediction_horizon: 'STRING',
+  contribution_pct: 'FLOAT64',
+  dimension: 'STRING',
+  dimension_id: 'STRING',
+  action_type: 'STRING',
+  action_summary: 'STRING',
+  action_target_id: 'STRING',
+  model_version: 'STRING',
+  generated_at: 'TIMESTAMP',
+  ai_eligible: 'BOOL',
+  payload_json: 'STRING'
+} as const
+
+const AI_PREDICTION_LOG_STRUCT_TYPES = {
+  prediction_id: 'STRING',
+  space_id: 'STRING',
+  metric_name: 'STRING',
+  period_year: 'INT64',
+  period_month: 'INT64',
+  predicted_value: 'FLOAT64',
+  predicted_at: 'TIMESTAMP',
+  confidence: 'FLOAT64',
+  actual_value: 'FLOAT64',
+  actual_recorded_at: 'TIMESTAMP',
+  error_pct: 'FLOAT64',
+  model_version: 'STRING'
+} as const
+
 const replaceBigQuerySignalsForPeriod = async (
   projectId: string,
   periodYear: number,
@@ -286,7 +343,28 @@ const replaceBigQuerySignalsForPeriod = async (
     return 0
   }
 
-  await bigQuery.dataset('ico_engine').table('ai_signals').insert(signals.map(toBigQuerySignalRow))
+  // DML INSERT canonical (not streaming insert) — durable storage path.
+  // Subsequent DML (e.g. next cron's DELETE) works immediately.
+  const rows = signals.map(toBigQuerySignalRow)
+
+  await bigQuery.query({
+    query: `INSERT INTO \`${projectId}.ico_engine.ai_signals\` (
+              signal_id, signal_type, space_id, member_id, project_id, metric_name,
+              period_year, period_month, severity, current_value, expected_value, z_score,
+              predicted_value, confidence, prediction_horizon, contribution_pct,
+              dimension, dimension_id, action_type, action_summary, action_target_id,
+              model_version, generated_at, ai_eligible, payload_json
+            )
+            SELECT
+              s.signal_id, s.signal_type, s.space_id, s.member_id, s.project_id, s.metric_name,
+              s.period_year, s.period_month, s.severity, s.current_value, s.expected_value, s.z_score,
+              s.predicted_value, s.confidence, s.prediction_horizon, s.contribution_pct,
+              s.dimension, s.dimension_id, s.action_type, s.action_summary, s.action_target_id,
+              s.model_version, s.generated_at, s.ai_eligible, s.payload_json
+            FROM UNNEST(@rows) AS s`,
+    params: { rows },
+    types: { rows: [AI_SIGNAL_STRUCT_TYPES] }
+  })
 
   return signals.length
 }
@@ -305,7 +383,23 @@ const replacePredictionLogs = async (projectId: string, rows: AiPredictionLogRow
     { predictionIds }
   )
 
-  await bigQuery.dataset('ico_engine').table('ai_prediction_log').insert(rows.map(toBigQueryPredictionLogRow))
+  // DML INSERT canonical (not streaming insert) — same rationale as ai_signals.
+  const logRows = rows.map(toBigQueryPredictionLogRow)
+
+  await bigQuery.query({
+    query: `INSERT INTO \`${projectId}.ico_engine.ai_prediction_log\` (
+              prediction_id, space_id, metric_name, period_year, period_month,
+              predicted_value, predicted_at, confidence,
+              actual_value, actual_recorded_at, error_pct, model_version
+            )
+            SELECT
+              s.prediction_id, s.space_id, s.metric_name, s.period_year, s.period_month,
+              s.predicted_value, s.predicted_at, s.confidence,
+              s.actual_value, s.actual_recorded_at, s.error_pct, s.model_version
+            FROM UNNEST(@rows) AS s`,
+    params: { rows: logRows },
+    types: { rows: [AI_PREDICTION_LOG_STRUCT_TYPES] }
+  })
 
   return rows.length
 }
