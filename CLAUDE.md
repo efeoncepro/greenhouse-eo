@@ -4121,7 +4121,7 @@ TASK-908 (foundation, esta task)                TASK-901 (RpA)                  
 
 - Append-only enforced por triggers PG anti-UPDATE/anti-DELETE (mirror pattern TASK-848 release_state_transitions + TASK-900 ico_materialization_runs)
 - CHECK constraint enum cerrado canonical en `from_status` Y `to_status` — solo permite los 11 canonical V1 (`Sin empezar`, `Brief listo`, `Pendiente aprobación interna`, `En pausa`, `Bloqueado`, `En curso`, `Listo para revisión`, `Cambios solicitados`, `Aprobado`, `Cancelado`, `Archivado`)
-- Webhook handler (TASK-908b futuro) normaliza legacy variants via `normalizeTaskStatus` (de `task-status-canonical.ts`, ya existente desde TASK-742 prep commit `1525e51c`) ANTES de insertar. La tabla NUNCA almacena strings legacy.
+- Webhook handler (TASK-912 futuro) normaliza legacy variants via `normalizeTaskStatus` (de `task-status-canonical.ts`, ya existente desde TASK-742 prep commit `1525e51c`) ANTES de insertar. La tabla NUNCA almacena strings legacy.
 - Indexes: source_event_id UNIQUE partial (dedup canonical), task_lookup (hot path history per task DESC), to_status recent (queries "tareas en X estado"), correction_event_partial (TASK-901 calculateRpa + TASK-909 calculateFtr hot path)
 - `source_quality TEXT` discrimina origen: `'canonical'` (event.timestamp webhook), `'proxy'` (polling lossy), `'backfilled'` (reconstruido históricamente)
 
@@ -4141,7 +4141,7 @@ TASK-908 (foundation, esta task)                TASK-901 (RpA)                  
 - **NUNCA** persistir row en `task_status_transitions` con string legacy. Webhook handler upstream DEBE normalizar via `normalizeTaskStatus` antes del INSERT. La table CHECK constraint enforce el canonical enum cerrado (11 V1).
 - **NUNCA** persistir row sin `transitioned_at` populated. Es el timestamp canonical de la métrica downstream (Cycle Time, Lead Time, Time-in-Status). Webhook handler usa `event.timestamp` source-of-truth; polling fallback usa `last_edited_time` con `source_quality='proxy'`.
 - **NUNCA** consumer downstream recomputa "número de correcciones" inline. Toda lógica de contar correciones vive en `countCorrectionTransitions` — single source of truth canonical. RpA (TASK-901) + FTR (TASK-909) delegan.
-- **NUNCA** consumer downstream recomputa Cycle Time inline. Toda lógica vive en `calculateCycleTime` helper o `cycle_time_days` column materializada (post Slice 4 futuro de TASK-908b).
+- **NUNCA** consumer downstream recomputa Cycle Time inline. Toda lógica vive en `calculateCycleTime` helper o `cycle_time_days` column materializada (post Slice 4 futuro de TASK-912).
 - **NUNCA** modificar fórmula `cycle_time_days` SQL en `schema.ts:108-113` sin migration + backfill verified contra snapshot pre-cambio. Cambio afecta `metrics_by_*` downstream materializados.
 - **NUNCA** ejecutar DELETE / UPDATE sobre `task_status_transitions` (anti-UPDATE/anti-DELETE triggers enforce). Para correcciones, INSERT row nueva con `source_quality='backfilled'`.
 - **NUNCA** invocar `Sentry.captureException` directo. Use `captureWithDomain(err, 'delivery', { tags: { source: 'cycle_time_*' | 'correction_transitions_*' } })`.
@@ -4149,7 +4149,7 @@ TASK-908 (foundation, esta task)                TASK-901 (RpA)                  
 - **SIEMPRE** que el helper devuelva `sourceMode='unavailable'`, downstream consumer mapea a `dataStatus='unavailable'` + `value=null` (NO `value=0`). Distingue "no datos" vs "0 correcciones reales".
 - **SIEMPRE** que emerja un nuevo cliente Notion con custom status names, **enforce canonical template L1** en Notion antes del onboarding. Single source of truth (`task-status-canonical.ts`) — NO agregar aliases custom-per-cliente.
 
-**Deferred a TASK-908b follow-up** (requiere coordinación operador-side de Notion webhook subscription):
+**Deferred a TASK-912 follow-up** (requiere coordinación operador-side de Notion webhook subscription):
 
 - Slice 2: webhook handler `notion-status-transitions` + HMAC validation + outbox event
 - Slice 3: reactive consumer ops-worker que persiste transitions

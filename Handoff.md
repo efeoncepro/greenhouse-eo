@@ -1,6 +1,6 @@
 # Sesion 2026-05-18 (cont. — TASK-908 FOUNDATION shipped — desbloquea TASK-901)
 
-**Status**: ✅ TASK-908 V1.0 Foundation shipped end-to-end en `develop`. 5 slices canonical (0, 1, 3.5, 6, 7, 8) + table migration + helpers + reliability signal + tests anti-regresión + docs canonical. **Desbloquea TASK-901 (calculateRpa) y TASK-909 (calculateFtr) arquitectónicamente** — ambos delegan a `countCorrectionTransitions` canonical helper que shipea esta sesión. Slices 2/3/4/5/9 (webhook ingestion + reactive consumer + BQ formula update + backfill) deferred a TASK-908b cuando Notion webhook subscription se registre operador-side. Defaults: tabla `task_status_transitions` vacía hasta TASK-908b, helpers retornan `sourceMode='unavailable'` graceful (NO crash) para tareas pre-deployment.
+**Status**: ✅ TASK-908 V1.0 Foundation shipped end-to-end en `develop`. 5 slices canonical (0, 1, 3.5, 6, 7, 8) + table migration + helpers + reliability signal + tests anti-regresión + docs canonical. **Desbloquea TASK-901 (calculateRpa) y TASK-909 (calculateFtr) arquitectónicamente** — ambos delegan a `countCorrectionTransitions` canonical helper que shipea esta sesión. Slices 2/3/4/5/9 (webhook ingestion + reactive consumer + BQ formula update + backfill) deferred a TASK-912 cuando Notion webhook subscription se registre operador-side. Defaults: tabla `task_status_transitions` vacía hasta TASK-912, helpers retornan `sourceMode='unavailable'` graceful (NO crash) para tareas pre-deployment.
 
 ## TASK-908 Foundation V1.0 — resultado canonical
 
@@ -29,8 +29,8 @@ TASK-901 ahora puede arrancar Slice 1 (`calculateRpa`) sin escribir lógica de "
 
 ## Decisiones canonical pre-execution (Open Questions resueltas)
 
-- **Q1 Infra compartida con TASK-901**: DEFER → TASK-908b cuando TASK-901 prepare wiring. Premature consolidation con task no-shipped es bandaid.
-- **Q2 Backfill scope**: DEFER → TASK-908b. Helper canonical maneja `sourceMode='unavailable'` graceful para tareas pre-deployment.
+- **Q1 Infra compartida con TASK-901**: DEFER → TASK-912 cuando TASK-901 prepare wiring. Premature consolidation con task no-shipped es bandaid.
+- **Q2 Backfill scope**: DEFER → TASK-912. Helper canonical maneja `sourceMode='unavailable'` graceful para tareas pre-deployment.
 - **Q3 CT SLO threshold per-task-type**: V1 default uniforme 14.2 (Engine doc §A.5.5). `getSLOThreshold(taskType?)` accepts param forward-compat V2.
 - **Q4 Cycle time per tipo de pieza**: same as Q3, V2 follow-up.
 
@@ -38,14 +38,14 @@ TASK-901 ahora puede arrancar Slice 1 (`calculateRpa`) sin escribir lógica de "
 
 `notion.correction_transitions.source_availability` (kind=data_quality, moduleKey=delivery, steady < 10% post-deployment):
 
-- **Pre TASK-908b deployment** (esperado HOY): severity=`error` 100% — tabla vacía sin webhook capturando.
+- **Pre TASK-912 deployment** (esperado HOY): severity=`error` 100% — tabla vacía sin webhook capturando.
 - **Post-deployment + backfill verde**: severity=`ok` < 10% — coverage saludable.
 
-Visible en `/admin/operations` bajo subsystem delivery. Cuando flippeé TASK-908b, signal va a bajar monotónicamente — observation canonical.
+Visible en `/admin/operations` bajo subsystem delivery. Cuando flippeé TASK-912, signal va a bajar monotónicamente — observation canonical.
 
-## Scope deferred → TASK-908b
+## Scope deferred → TASK-912
 
-Slices 2/3/4/5/9 requieren coordinación operador-side de Notion webhook subscription. Cuando emerja la decisión de shipping, TASK-908b se spawnea con scope:
+Slices 2/3/4/5/9 requieren coordinación operador-side de Notion webhook subscription. Cuando emerja la decisión de shipping, TASK-912 se spawnea con scope:
 
 - Slice 2: webhook handler `notion-status-transitions` + HMAC validation + outbox event v1
 - Slice 3: reactive consumer ops-worker persistiendo transitions

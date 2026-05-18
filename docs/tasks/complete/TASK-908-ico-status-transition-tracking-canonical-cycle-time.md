@@ -13,7 +13,7 @@
 
 ## Status
 
-- Lifecycle: `complete` (V1.0 Foundation shipped 2026-05-18; Slices 2/3/4/5/9 → TASK-908b cuando Notion webhook subscription se registre operador-side)
+- Lifecycle: `complete` (V1.0 Foundation shipped 2026-05-18; Slices 2/3/4/5/9 → TASK-912 cuando Notion webhook subscription se registre operador-side)
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
