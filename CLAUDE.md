@@ -4096,6 +4096,69 @@ WHEN NOT MATCHED THEN INSERT (...) VALUES (...)
 
 Patrones fuente reusados: TASK-571/699/766/774 (VIEW + helper + reliability + lint), TASK-742 (defense in depth 7-layer), TASK-848 (state machine + tracking append-only), TASK-873 (capability granularity), TASK-720/768/777 (declarative config + lint rule pattern para futuros materializers).
 
+### ICO Status Transition Foundation invariants (TASK-908, desde 2026-05-18)
+
+Foundation canonical de Status Transition Tracking que sostiene el motor ICO completo de métricas basadas en eventos observables (RpA, FTR, Cycle Time canonical). Reemplaza el anti-patrón legacy de leer Notion property formulas (frágil — bug class TASK-877 follow-up).
+
+**Cadena canonical de dependencias** (orden de ship):
+
+```text
+TASK-908 (foundation, esta task)                TASK-901 (RpA)                      TASK-909 (FTR)
+─────────────────────────────                   ──────────────────                  ─────────────────
+• Tabla task_status_transitions             →   • calculateRpa(taskId)          →   • calculateFtr(taskId)
+• countCorrectionTransitions helper             ↳ delega a count... (zero lógica)   ↳ delega a calculateRpa===0
+• calculateCycleTime helper
+• CT SLO config helper
+```
+
+**Read API canonical (V1.0 shipped)**:
+
+- `countCorrectionTransitions(input)` — `src/lib/notion-metrics/count-correction-transitions.ts`. Cuenta transiciones canonical `'Listo para revisión' → 'Cambios solicitados'` en `greenhouse_delivery.task_status_transitions`. Source mode discrimination canonical: `'canonical'` (tarea con rows en table) vs `'unavailable'` (tarea sin rows, pre-deployment). Consumido por `calculateRpa` (TASK-901) + transitively por `calculateFtr` (TASK-909).
+- `calculateCycleTime(inputs)` — `src/lib/notion-metrics/calculate-cycle-time.ts`. Pure function canonical V1 con 4 decisiones (Delta 2026-05-17): inicio `'En curso'`, fin `completedAt`, feedback time SÍ cuenta, Bloqueado SE EXCLUYE (clamp intervals).
+- `getSLOThreshold(taskType?)` + `isWithinSLO(cycleTimeDays, taskType?)` — `src/lib/notion-metrics/cycle-time-slo-config.ts`. V1 default uniforme 14.2 días (Engine doc §A.5.5). V2 calibración per tipo de pieza queda forward-compat.
+
+**Tabla canonical** `greenhouse_delivery.task_status_transitions`:
+
+- Append-only enforced por triggers PG anti-UPDATE/anti-DELETE (mirror pattern TASK-848 release_state_transitions + TASK-900 ico_materialization_runs)
+- CHECK constraint enum cerrado canonical en `from_status` Y `to_status` — solo permite los 11 canonical V1 (`Sin empezar`, `Brief listo`, `Pendiente aprobación interna`, `En pausa`, `Bloqueado`, `En curso`, `Listo para revisión`, `Cambios solicitados`, `Aprobado`, `Cancelado`, `Archivado`)
+- Webhook handler (TASK-908b futuro) normaliza legacy variants via `normalizeTaskStatus` (de `task-status-canonical.ts`, ya existente desde TASK-742 prep commit `1525e51c`) ANTES de insertar. La tabla NUNCA almacena strings legacy.
+- Indexes: source_event_id UNIQUE partial (dedup canonical), task_lookup (hot path history per task DESC), to_status recent (queries "tareas en X estado"), correction_event_partial (TASK-901 calculateRpa + TASK-909 calculateFtr hot path)
+- `source_quality TEXT` discrimina origen: `'canonical'` (event.timestamp webhook), `'proxy'` (polling lossy), `'backfilled'` (reconstruido históricamente)
+
+**Reliability signal canonical**: `notion.correction_transitions.source_availability` (kind=`data_quality`, moduleKey=`delivery`). Detecta % tareas completadas 90d sin rows en table. Steady state post-deployment + backfill: < 10%. Pre-deployment esperado 100% (foundation aún sin webhook capturando).
+
+**Capabilities canonical V1.0** (granular least-privilege):
+
+- `cycle_time.compute.execute` (delivery / execute / all) — EFEONCE_ADMIN + DEVOPS_OPERATOR
+- `correction_transitions.compute.read` (delivery / read / all) — EFEONCE_ADMIN + DEVOPS_OPERATOR + HR_ADMIN
+
+**Fix B.1 canonical (Slice 6)**: `EXCLUDED_FROM_METRICS_STATUSES = EXCLUDED_STATUSES ∪ BLOCKED_STATUSES`. Tareas en `Bloqueado` / `En pausa` / legacy `Detenido` ahora excluidas del denominador OTD/RpA/FTR via `CANONICAL_OPEN_TASK_SQL`. Pre-fix: contaminaban métricas. Post-fix: métricas suben ligeramente (ESPERADO).
+
+**Fix B.2 canonical (Slice 7 — verify ya done)**: `buildTaskStatusToCsc()` consume `allVariantsForCanonical` + `allVariantsForGroup` que incluyen TODOS los aliases legacy Sky (`Tomado`, `En feedback`, `Pendiente`) + Efeonce (`Listo para diseñar`, `Pendiente Dir. Arte`, `Cambios Solicitados` capital S) → CSC mapping canonical universal funciona post-rename operador-side.
+
+**⚠️ Reglas duras canonical**:
+
+- **NUNCA** persistir row en `task_status_transitions` con string legacy. Webhook handler upstream DEBE normalizar via `normalizeTaskStatus` antes del INSERT. La table CHECK constraint enforce el canonical enum cerrado (11 V1).
+- **NUNCA** persistir row sin `transitioned_at` populated. Es el timestamp canonical de la métrica downstream (Cycle Time, Lead Time, Time-in-Status). Webhook handler usa `event.timestamp` source-of-truth; polling fallback usa `last_edited_time` con `source_quality='proxy'`.
+- **NUNCA** consumer downstream recomputa "número de correcciones" inline. Toda lógica de contar correciones vive en `countCorrectionTransitions` — single source of truth canonical. RpA (TASK-901) + FTR (TASK-909) delegan.
+- **NUNCA** consumer downstream recomputa Cycle Time inline. Toda lógica vive en `calculateCycleTime` helper o `cycle_time_days` column materializada (post Slice 4 futuro de TASK-908b).
+- **NUNCA** modificar fórmula `cycle_time_days` SQL en `schema.ts:108-113` sin migration + backfill verified contra snapshot pre-cambio. Cambio afecta `metrics_by_*` downstream materializados.
+- **NUNCA** ejecutar DELETE / UPDATE sobre `task_status_transitions` (anti-UPDATE/anti-DELETE triggers enforce). Para correcciones, INSERT row nueva con `source_quality='backfilled'`.
+- **NUNCA** invocar `Sentry.captureException` directo. Use `captureWithDomain(err, 'delivery', { tags: { source: 'cycle_time_*' | 'correction_transitions_*' } })`.
+- **SIEMPRE** que un consumer downstream necesite "una corrección observada", consumir `countCorrectionTransitions({taskSourceId, windowStart?, windowEnd?})`. NO leer Notion property `Correcciones` (anti-patrón legacy bug class TASK-877).
+- **SIEMPRE** que el helper devuelva `sourceMode='unavailable'`, downstream consumer mapea a `dataStatus='unavailable'` + `value=null` (NO `value=0`). Distingue "no datos" vs "0 correcciones reales".
+- **SIEMPRE** que emerja un nuevo cliente Notion con custom status names, **enforce canonical template L1** en Notion antes del onboarding. Single source of truth (`task-status-canonical.ts`) — NO agregar aliases custom-per-cliente.
+
+**Deferred a TASK-908b follow-up** (requiere coordinación operador-side de Notion webhook subscription):
+
+- Slice 2: webhook handler `notion-status-transitions` + HMAC validation + outbox event
+- Slice 3: reactive consumer ops-worker que persiste transitions
+- Slice 4: cycle_time_days BQ formula update (status → En curso start + descontar Bloqueado)
+- Slice 5: métrica `cycle_time_slo_pct` materialization en metric-registry + dashboards
+- Slice 9: backfill histórico opcional via Notion API page history
+
+**Spec canonical**: `docs/architecture/metrics/{RPA,CYCLE_TIME,CT_SLO_PCT,FTR}_V1.md`. Migration: `migrations/20260518193001910_task-status-transitions-foundation.sql`. Helpers: `src/lib/notion-metrics/`. Signal reader: `src/lib/reliability/queries/notion-correction-transitions-source-availability.ts`. ADRs: `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` + `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` + `Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 secciones B+C+D.
+
 ### Delivery Metrics Ownership Boundary invariants (TASK-901 + TASK-908 + TASK-909, desde 2026-05-17)
 
 **Notion = Task Operating System. Greenhouse ICO Engine = motor exclusivo de cómputo de métricas.** Notion captura datos operativos primitivos (asignación, fechas, estado, tipo de entregable, archivos) y sirve como UI de gestión. Greenhouse computa TODAS las métricas (RpA, OTD, FTR, Cumplimiento, Cycle Time, Throughput, Pipeline Velocity, BCS, TTM, Iteration Velocity, futuras) desde eventos canonical y escribe los valores de vuelta a Notion vía bulk PATCH a propiedades `[GH] <métrica>` read-only.

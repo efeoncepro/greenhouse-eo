@@ -1,3 +1,60 @@
+# Sesion 2026-05-18 (cont. — TASK-908 FOUNDATION shipped — desbloquea TASK-901)
+
+**Status**: ✅ TASK-908 V1.0 Foundation shipped end-to-end en `develop`. 5 slices canonical (0, 1, 3.5, 6, 7, 8) + table migration + helpers + reliability signal + tests anti-regresión + docs canonical. **Desbloquea TASK-901 (calculateRpa) y TASK-909 (calculateFtr) arquitectónicamente** — ambos delegan a `countCorrectionTransitions` canonical helper que shipea esta sesión. Slices 2/3/4/5/9 (webhook ingestion + reactive consumer + BQ formula update + backfill) deferred a TASK-908b cuando Notion webhook subscription se registre operador-side. Defaults: tabla `task_status_transitions` vacía hasta TASK-908b, helpers retornan `sourceMode='unavailable'` graceful (NO crash) para tareas pre-deployment.
+
+## TASK-908 Foundation V1.0 — resultado canonical
+
+| Slice | Commit | Files | Tests | Notas |
+|---|---|---|---|---|
+| 0 — Migration + capabilities + SLO config | `8bf8fc8c` | migration + cycle-time-slo-config.{ts,test.ts} | 13 ✅ | Tabla `greenhouse_delivery.task_status_transitions` append-only + 5 indexes + 2 triggers anti-UPDATE/DELETE + CHECK enum cerrado canonical 11-state + 2 capabilities granular. Live verify PG: 13 cols + 5 indexes + 2 triggers + 2 capabilities. |
+| 1 — calculateCycleTime helper | `a86d00da` | calculate-cycle-time.{ts,test.ts} + cycle-time-types.ts | 14 ✅ | Pure function canonical V1 con 4 decisiones (Delta 2026-05-17). 14 tests cubren happy + fallback + bloqueado clamp pre/post-window + múltiples intervals + idempotencia + edge cases. |
+| 3.5 — countCorrectionTransitions + signal | `ca62969a` | count-correction-transitions.{ts,test.ts} + reliability/queries/notion-correction-transitions-source-availability.{ts,test.ts} | 25 ✅ | **DESBLOQUEA TASK-901**. Helper canonical query partial index hot path. Source mode discrimination canonical/unavailable. Signal kind=data_quality moduleKey=delivery. |
+| 6+7 — Fix B.1 BLOCKED excluded + verify B.2 done | `4213a8ce` | metric-registry.{ts,test.ts} | 18 ✅ | Slice 6: nuevo `EXCLUDED_FROM_METRICS_STATUSES = EXCLUDED ∪ BLOCKED`. Slice 7: verify ya done via `buildTaskStatusToCsc` (commit 1525e51c TASK-742 prep) — el spec asumía pendiente pero `allVariantsForCanonical` ya incluye Sky/Efeonce legacy aliases automáticamente. |
+| 8 — Docs canonical | (this commit) | CLAUDE.md + Handoff + changelog + README + spec V1 status | — | CLAUDE.md sección "ICO Status Transition Foundation invariants (TASK-908, desde 2026-05-18)" + hard rules. |
+
+**Test suite TASK-908**: 24 archivos / 203 tests verde (incluye preexistentes ICO).
+
+## Cadena canonical desbloqueada
+
+```text
+TASK-908 (esta, shipped)              TASK-901 (siguiente)              TASK-909 (después)
+─────────────────────────             ──────────────────                ─────────────────
+• Tabla task_status_transitions   →   • calculateRpa(taskId)        →   • calculateFtr(taskId)
+• countCorrectionTransitions          ↳ delega a count... (5-line)      ↳ delega a calculateRpa===0
+• calculateCycleTime
+• cycle-time-slo-config (forward-compat V2)
+```
+
+TASK-901 ahora puede arrancar Slice 1 (`calculateRpa`) sin escribir lógica de "contar correcciones" — la heredan canónicamente del helper `countCorrectionTransitions` shipped esta sesión. Implementation de TASK-901 Slice 1 es literalmente un wrapper de 5 líneas (`value: count` + dataStatus mapping).
+
+## Decisiones canonical pre-execution (Open Questions resueltas)
+
+- **Q1 Infra compartida con TASK-901**: DEFER → TASK-908b cuando TASK-901 prepare wiring. Premature consolidation con task no-shipped es bandaid.
+- **Q2 Backfill scope**: DEFER → TASK-908b. Helper canonical maneja `sourceMode='unavailable'` graceful para tareas pre-deployment.
+- **Q3 CT SLO threshold per-task-type**: V1 default uniforme 14.2 (Engine doc §A.5.5). `getSLOThreshold(taskType?)` accepts param forward-compat V2.
+- **Q4 Cycle time per tipo de pieza**: same as Q3, V2 follow-up.
+
+## Reliability signal TASK-908 V1.0
+
+`notion.correction_transitions.source_availability` (kind=data_quality, moduleKey=delivery, steady < 10% post-deployment):
+
+- **Pre TASK-908b deployment** (esperado HOY): severity=`error` 100% — tabla vacía sin webhook capturando.
+- **Post-deployment + backfill verde**: severity=`ok` < 10% — coverage saludable.
+
+Visible en `/admin/operations` bajo subsystem delivery. Cuando flippeé TASK-908b, signal va a bajar monotónicamente — observation canonical.
+
+## Scope deferred → TASK-908b
+
+Slices 2/3/4/5/9 requieren coordinación operador-side de Notion webhook subscription. Cuando emerja la decisión de shipping, TASK-908b se spawnea con scope:
+
+- Slice 2: webhook handler `notion-status-transitions` + HMAC validation + outbox event v1
+- Slice 3: reactive consumer ops-worker persistiendo transitions
+- Slice 4: cycle_time_days BQ formula update (status → En curso + descuento Bloqueado)
+- Slice 5: métrica `cycle_time_slo_pct` materialization en metric-registry + dashboards
+- Slice 9: backfill histórico via Notion API page history (opcional)
+
+---
+
 # Sesion 2026-05-18 (cont. — TASK-900 STAGING CUTOVER COMPLETE end-to-end)
 
 **Status**: ✅ TASK-900 shipped + staging cutover VALIDADO live end-to-end en la misma sesión. **Los 3 flags `ICO_MATERIALIZER_*_ENABLED=true` están ACTIVAS en staging Cloud Run revision 00097-jpm**. PG tracking `greenhouse_sync.ico_materialization_runs` confirma: 5 materializers `status='succeeded'`, `notes='incremental from <ISO>'` → DELTA filter funcionando, MERGE atomic, gate sano. Row counts idénticos al baseline pre-cutover. Bug class pre-existente del módulo `materializeAiSignals` (streaming insert API) fixeado canonical via DML INSERT — 2 commits adicionales shipped (`03ec4960` + `ba10ec5e`). Solo queda **cutover producción** post develop→main merge — documentado en TASK-911 (single canonical task, no agendas fragmentadas).
