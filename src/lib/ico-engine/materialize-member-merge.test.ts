@@ -476,8 +476,8 @@ describe('TASK-900 Slice 2 — materializeMemberMetrics flag matrix', () => {
     const mergeCall = findIcoCall('MERGE INTO')
 
     expect(mergeCall).toBeDefined()
-    expect(mergeCall![0]).toContain('member_last_edited >= TIMESTAMP(@deltaCutoff)')
-    expect(mergeCall![0]).toContain('MAX(te.last_edited_time) AS member_last_edited')
+    expect(mergeCall![0]).toContain('entity_last_edited >= TIMESTAMP(@deltaCutoff)')
+    expect(mergeCall![0]).toContain('MAX(te.last_edited_time) AS entity_last_edited')
 
     // Verifica que el deltaCutoff = lastRun - 1h (overlap)
     const params = mergeCall![1] as Record<string, unknown>
@@ -523,7 +523,7 @@ describe('TASK-900 Slice 2 — materializeMemberMetrics flag matrix', () => {
     const mergeCall = findIcoCall('MERGE INTO')
 
     expect(mergeCall).toBeDefined()
-    expect(mergeCall![0]).not.toContain('member_last_edited >= TIMESTAMP')
+    expect(mergeCall![0]).not.toContain('entity_last_edited >= TIMESTAMP')
 
     // Sin deltaCutoff en params
     const params = mergeCall![1] as Record<string, unknown>
@@ -568,7 +568,7 @@ describe('TASK-900 Slice 2 — materializeMemberMetrics flag matrix', () => {
 
     expect(mergeCall).toBeDefined()
     // Sin filter de delta porque lookup falló
-    expect(mergeCall![0]).not.toContain('member_last_edited >= TIMESTAMP')
+    expect(mergeCall![0]).not.toContain('entity_last_edited >= TIMESTAMP')
 
     expect(mocks.captureWithDomain).toHaveBeenCalledWith(
       expect.any(Error),
