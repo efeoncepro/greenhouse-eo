@@ -40,6 +40,7 @@ import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
+import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
@@ -349,6 +350,17 @@ interface ReliabilityOverviewSources {
   finalSettlementPdfStatusDrift?: ReliabilitySignal | null
 
   /**
+   * TASK-900 Slice 6 — ICO Materializer skipped_safety signal. Cuenta
+   * corridas del materializer ICO con `status='skipped_safety'` en
+   * ventana 24h. Roll up bajo moduleKey='delivery'. Steady state = 0
+   * (gate canonical confía en upstream). Severity warning > 0, error > 5
+   * en 24h. Complementario a `identity.notion_bridge.coverage_drift` —
+   * cuando el gate alerta es porque protegió data buena downstream del
+   * bug class TASK-877.
+   */
+  icoMaterializerSkippedSafety?: ReliabilitySignal | null
+
+  /**
    * TASK-893 Slice 5 — Payroll Participation Window signals (3 readers):
    * full_month_entry_drift + source_date_disagreement + projection_delta_anomaly.
    * Subsystem rollup `Finance Data Quality` via moduleKey='finance'. Cada
@@ -632,6 +644,11 @@ export const buildReliabilityOverview = (
     // PDF asset metadata.documentStatusAtRender). Defense-in-depth para detectar
     // regen failure o transition agregada al state machine sin pasar por el helper.
     ...(sources.finalSettlementPdfStatusDrift ? [sources.finalSettlementPdfStatusDrift] : []),
+    // TASK-900 Slice 6 — ICO Materializer skipped_safety signal. Roll up bajo
+    // moduleKey='delivery'. Visibiliza cuando el freshness gate del materializer
+    // ICO está protegiendo data buena del bug class TASK-877 (upstream bridge
+    // Notion→member regresión silente). Steady=0.
+    ...(sources.icoMaterializerSkippedSafety ? [sources.icoMaterializerSkippedSafety] : []),
     // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
     // Subsystem rollup Finance Data Quality via moduleKey='finance'. Each
     // reader degrades honestly (severity=unknown) on query failure. The
@@ -1152,6 +1169,14 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-900 Slice 6 — ICO Materializer skipped_safety. Single reader;
+  // consulta count de runs con status='skipped_safety' en últimas 24h.
+  // Degrada honestamente a `unknown` si la query falla.
+  const icoMaterializerSkippedSafety =
+    preloadedSources.icoMaterializerSkippedSafety !== undefined
+      ? preloadedSources.icoMaterializerSkippedSafety
+      : await getIcoMaterializerSkippedSafetySignal().catch(() => null)
+
   // TASK-848 Slice 7 + TASK-849 Slice 2 + TASK-854 Slice 0 + TASK-857 —
   // Production Release Control Plane signals. 6 readers en paralelo. Cada
   // uno degrada a `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN /
@@ -1252,7 +1277,8 @@ export const getReliabilityOverview = async (
     postgresConnectionSaturation,
     servicesEngagement,
     commercialHealth,
-    productionRelease
+    productionRelease,
+    icoMaterializerSkippedSafety
   })
 }
 
