@@ -2,7 +2,10 @@
 
 > **REPOSICIÓN 2026-05-17**: esta TASK pasó de ser "Cycle Time only" a ser la **Foundation de Status Transition Tracking** que sostiene TODO el motor canonical de métricas ICO basado en eventos observables (RpA, FTR, Cycle Time canonical). **Es prerequisito arquitectónico de TASK-901**. La capa de `task_status_transitions` que esta TASK construye sirve también como input para `countCorrectionTransitions(taskId)` (helper canonical reusable por `calculateRpa` en TASK-901 y `calculateFtr` en TASK-909).
 >
-> Pre-condición canonical: `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` (ADR 2026-05-17). Notion deja de ser source of truth de fórmulas ICO; Greenhouse computa todas las métricas desde events canonical y devuelve valores vía writeback.
+> Pre-condiciones canonical (ambos ADRs 2026-05-17):
+>
+> 1. `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` — Notion deja de ser source of truth de fórmulas ICO; Greenhouse computa todas las métricas desde events canonical y devuelve valores vía writeback.
+> 2. `docs/architecture/GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` — 11 estados canonical universales cross-tenant (`Sin empezar`, `Brief listo`, `En curso`, `Listo para revisión`, `Cambios solicitados`, `Aprobado`, `Pendiente aprobación interna`, `En pausa`, `Bloqueado`, `Cancelado`, `Archivado`). Evento canonical de corrección = `Listo para revisión → Cambios solicitados` (universal, NO Sky-specific `En Feedback`). Cleanup operador-side pendiente (~1-2 días post 2026-05-17): Efeonce rename 7 estados; Sky rename property `Estado 1 → Estado` + rename 1 estado + agregar 4 + eliminar `Tomado`. Esta TASK shipea con tolerancia para variantes legacy durante la cleanup window vía `normalizeStatusToCanonical` helper (Slice 0).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -82,6 +85,8 @@ Empaquetar los 5 entregables en una sola TASK porque **comparten la misma capa s
 
 Revisar y respetar:
 
+- `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` — ADR boundary Notion=OS / Greenhouse=motor (PRECONDICIÓN canonical)
+- `docs/architecture/GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` — ADR 11 estados canonical universales + evento corrección canonical `Listo para revisión → Cambios solicitados` (PRECONDICIÓN canonical)
 - `docs/architecture/Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 sección C y D — **PRECONDICIÓN CANONICAL** (cierra las decisiones que esta TASK implementa)
 - `docs/architecture/Greenhouse_ICO_Engine_v1.md` líneas 887-992 — drift documental a resolver
 - `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` — pattern outbox + consumer
@@ -191,26 +196,66 @@ Reglas obligatorias canonical:
 
 ### Slice 0 — Foundation: migration + capability + types
 
+> **Schema canonical**: el shape de `greenhouse_delivery.task_status_transitions` está definido en `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` Delta 2026-05-18 sección "Timestamp canonical obligatorio per transición". Esta TASK lo materializa via migration sin extender el schema con campos nuevos no canonical.
+
 - Migration `migrations/<timestamp>_task-status-transitions-capture-and-ct-slo.sql`:
-  - Tabla `greenhouse_delivery.task_status_transitions` (append-only):
+  - Tabla `greenhouse_delivery.task_status_transitions` (append-only) per schema canonical del ADR:
     - `transition_id UUID PK DEFAULT gen_random_uuid()`
     - `task_source_id TEXT NOT NULL` (Notion page ID)
-    - `assignee_member_id TEXT NULL` (snapshot al momento de la transition)
-    - `space_id TEXT NULL` (snapshot)
-    - `from_status TEXT NULL` (NULL si es primer transition)
-    - `to_status TEXT NOT NULL`
-    - `transitioned_at TIMESTAMPTZ NOT NULL`
-    - `transitioned_by TEXT NULL` (Notion user ID que hizo el cambio si está en payload)
-    - `source_event_id TEXT NULL` (Notion webhook event_id para dedup)
-    - `received_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`
-  - INDEX `(task_source_id, transitioned_at ASC)` para reconstruir history per task
-  - INDEX `(to_status, transitioned_at DESC)` para queries "tareas en X estado en período"
-  - Anti-UPDATE trigger sobre identity fields (append-only)
-  - Capabilities seed `cycle_time.compute.execute` (read, all, EFEONCE_ADMIN + DEVOPS_OPERATOR)
+    - `workspace_id TEXT NOT NULL` (Notion workspace ID — `tenant_id` se deriva downstream desde mapping workspace→tenant)
+    - `from_status TEXT NOT NULL` (canonical — uno de los 11 estados del ADR; NULL solo si es primer transition. Resolver edge: si webhook envía primer evento sin prev status, persistir `'Sin empezar'` como sentinel canonical en lugar de NULL — preserva NOT NULL constraint)
+    - `to_status TEXT NOT NULL` (canonical — uno de los 11 estados del ADR)
+    - `transitioned_at TIMESTAMPTZ NOT NULL` (★ canonical del webhook `event.timestamp`; via polling cae a `page.last_edited_time` proxy, marcar `source_quality='proxy'`)
+    - `transitioned_by TEXT NULL` (Notion user ID que hizo el cambio, si está en payload)
+    - `source_event_id TEXT UNIQUE` (Notion webhook event_id para dedup canonical — table-level UNIQUE per ADR, no composite con task_source_id)
+    - `source_quality TEXT NOT NULL DEFAULT 'canonical' CHECK (source_quality IN ('canonical', 'proxy', 'backfilled'))` — `canonical` = webhook event.timestamp; `proxy` = polling con last_edited_time; `backfilled` = reconstruido históricamente best-effort
+    - `captured_at TIMESTAMPTZ NOT NULL DEFAULT NOW()` (Greenhouse-side processing time; usado para lag analysis webhook → ingestion)
+    - `assignee_member_id TEXT NULL` (snapshot al momento de la transition; FK lazy resolved post-ingestion)
+    - `space_id TEXT NULL` (snapshot canonical 360 — `greenhouse_core.spaces`)
+  - CHECK constraint canonical enum cerrado en `from_status` Y `to_status`: `IN ('Sin empezar', 'Brief listo', 'En curso', 'Listo para revisión', 'Cambios solicitados', 'Aprobado', 'Pendiente aprobación interna', 'En pausa', 'Bloqueado', 'Cancelado', 'Archivado')`. Webhook handler (Slice 2) normaliza legacy via `normalizeStatusToCanonical` ANTES de insertar — la tabla NUNCA almacena strings legacy.
+  - INDEX `(task_source_id, transitioned_at DESC)` per ADR — reconstruir history per task; DESC porque queries hot path leen "última transition" + LEAD/LAG windowed.
+  - INDEX `(to_status, transitioned_at DESC)` para queries "tareas en X estado en período".
+  - PARTIAL INDEX `(task_source_id, transitioned_at DESC) WHERE from_status = 'Listo para revisión' AND to_status = 'Cambios solicitados'` para count de correcciones (hot path `countCorrectionTransitions` consumido por TASK-901 calculateRpa + TASK-909 calculateFtr).
+  - UNIQUE `source_event_id` table-level (NULL allowed para rows backfilled sin webhook origin — UNIQUE con NULLs distinct semantic PG).
+  - Anti-UPDATE trigger sobre identity fields (`task_source_id`, `from_status`, `to_status`, `transitioned_at`, `source_event_id`) — append-only enforcement canonical.
+  - Anti-DELETE trigger — audit append-only canonical (mirror pattern `payment_order_state_transitions` TASK-765).
+  - Capabilities seed (`greenhouse_core.capabilities_registry`):
+    - `cycle_time.compute.execute` (module=delivery, action=execute, scope=all) — grant: EFEONCE_ADMIN + DEVOPS_OPERATOR
+    - `correction_transitions.compute.read` (module=delivery, action=read, scope=all) — grant: EFEONCE_ADMIN + DEVOPS_OPERATOR + HR_ADMIN (audit bonus RpA post-TASK-901 V1)
+- Helper canonical `src/lib/notion-metrics/normalize-status-to-canonical.ts`:
+  ```typescript
+  // Mapea status crudo (legacy operador-side cleanup window O canonical) al canonical enum 11-state.
+  // Es la ÚNICA forma de obtener un canonical status — webhook handler invoca esto ANTES de persistir.
+  // La tabla `task_status_transitions` SOLO almacena canonical values (CHECK constraint enforce).
+  export type CanonicalStatus =
+    | 'Sin empezar' | 'Brief listo' | 'En curso' | 'Listo para revisión'
+    | 'Cambios solicitados' | 'Aprobado' | 'Pendiente aprobación interna'
+    | 'En pausa' | 'Bloqueado' | 'Cancelado' | 'Archivado'
+
+  normalizeStatusToCanonical(
+    raw: string | null | undefined,
+    context?: { workspaceId?: string | null; sourceEventId?: string | null }
+  ): CanonicalStatus | null
+  // Reglas:
+  // - LOWER(TRIM(raw))
+  // - Exact match (case-insensitive) con uno de los 11 → return canonical
+  // - Legacy mappings tolerados durante cleanup window operador-side (~1-2 días post 2026-05-17):
+  //   * 'tomado' → 'En curso'              (Sky legacy, era responsable mal puesto como status)
+  //   * 'en feedback' → 'Cambios solicitados' (Sky legacy)
+  //   * 'cambios solicitados' (capitalized) → 'Cambios solicitados' (Efeonce pre-rename)
+  //   * 'detenido' → 'En pausa'             (Efeonce legacy)
+  //   * 'listo' → 'Aprobado'                (Efeonce legacy)
+  //   * 'listo para diseñar' → 'Brief listo' (Efeonce legacy)
+  //   * 'pendiente dir. arte' → 'Pendiente aprobación interna' (Efeonce legacy)
+  //   * 'cancelada' → 'Cancelado'           (Efeonce gender legacy)
+  //   * 'archivada' / 'archivadas' → 'Archivado' (Efeonce gender legacy)
+  //   * 'pendiente' → 'Sin empezar'         (Sky legacy fusion)
+  // - Sin match → return null + `captureWithDomain(err, 'integrations.notion', { tags: { source: 'status_normalize_unknown', raw, workspaceId, sourceEventId } })` para alerta operador
+  ```
 - Tipos TS `TaskInputsForCycleTime` + `CycleTimeResult` en `src/lib/notion-metrics/cycle-time-types.ts`
 - Helper de configuración `cycle-time-slo-config.ts` (threshold default 14.2 + map per tipo de pieza)
 - Capability grants en `runtime.ts`
-- Anti pre-up-marker DO guard
+- Anti pre-up-marker DO guard verificando: tabla creada + 2 triggers append-only (`information_schema.triggers`) + 3 INDEX (`pg_indexes`) + 2 capability registry rows seedeadas + CHECK constraint canonical enum activo en ambas columnas (`pg_constraint` query)
 
 ### Slice 1 — Canonical helpers + tests
 
@@ -244,7 +289,7 @@ Reglas obligatorias canonical:
 
 - Crear `src/lib/webhooks/handlers/notion-status-transitions.ts`:
   - HMAC validation (mismo pattern TASK-901)
-  - Filter: solo procesar events donde `updated_properties` incluye `Estado 1`
+  - Filter: solo procesar events donde `updated_properties` incluye una property en `STATUS_PROPERTY_NAMES = ['Estado', 'Estado 1']`. `Estado` es canonical universal (ADR `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1`); `Estado 1` es typo legacy Sky tolerado durante cleanup window operador-side (~1-2 días post 2026-05-17). Reliability signal alerta cuando se siguen recibiendo events bajo `Estado 1` post-cleanup window.
   - Echo-loop filter: si event author == nuestro integration user, ACK + drop
   - Inbox dedup vía `notion_webhook_inbox` (compartido con TASK-901 si shippea primero, o crear separado)
   - Para cada transition detectada: emit outbox event `notion.task.status_transitioned v1` con `{taskSourceId, fromStatus, toStatus, transitionedAt, transitionedBy}`
@@ -278,7 +323,7 @@ Decisión canonical: la lógica de "contar correcciones" vive aquí (TASK-908), 
   }
 
   type CountCorrectionTransitionsResult = {
-    count: number              // # transiciones 'Listo para revisión' → 'En Feedback' en la ventana
+    count: number              // # transiciones 'Listo para revisión' → 'Cambios solicitados' en la ventana
     transitions: Array<{
       transitionedAt: Date
       transitionedBy: string | null
@@ -287,27 +332,35 @@ Decisión canonical: la lógica de "contar correcciones" vive aquí (TASK-908), 
   }
 
   countCorrectionTransitions(input: CountCorrectionTransitionsInput): Promise<CountCorrectionTransitionsResult>
-  // Lógica canonical (semántica Delta 2026-05-17 sección G):
+  // Lógica canonical (semántica ADR GREENHOUSE_TASK_STATUS_LIFECYCLE_V1, 2026-05-17):
   // SELECT * FROM greenhouse_delivery.task_status_transitions
   // WHERE task_source_id = $1
-  //   AND from_status = 'Listo para revisión'
-  //   AND to_status = 'En Feedback'
+  //   AND LOWER(TRIM(from_status)) = 'listo para revisión'
+  //   AND LOWER(TRIM(to_status))   IN ('cambios solicitados', 'en feedback')  -- 'en feedback' tolerated durante cleanup window Sky
   //   AND ($2::timestamptz IS NULL OR transitioned_at >= $2)
   //   AND ($3::timestamptz IS NULL OR transitioned_at <= $3)
   // ORDER BY transitioned_at ASC
+  //
+  // NOTA cleanup window (~1-2 días post-2026-05-17):
+  // - Pre-cleanup operador-side: Sky usa property `Estado 1` con estado `En feedback` (legacy)
+  // - Post-cleanup: TODOS los teamspaces usan property `Estado` con estado canonical `Cambios solicitados`
+  // - El helper acepta AMBAS variantes durante la ventana para no perder eventos. Reliability signal
+  //   `notion-correction-transitions-source-availability` detecta % de eventos legacy vs canonical;
+  //   cuando legacy → 0% sostenido 7d, retirar la tolerancia (helper queda solo con canonical).
   ```
 
-- Casos canonical canonical cubiertos en tests (mínimo 10 paths):
+- Casos canonical canonical cubiertos en tests (mínimo 11 paths):
   - Happy: 0 transitions → count=0
-  - Happy: 1 transición Listo→Feedback → count=1
-  - Happy: 3 transiciones Listo→Feedback (oscilación múltiple) → count=3
-  - Edge: transición En curso → En Feedback (sin pasar por Listo) → NO cuenta
-  - Edge: transición En Feedback → Listo para revisión (re-submit colaborador) → NO cuenta (es la transición inversa)
-  - Edge: transición Listo → Completado/Aprobado (sin Feedback) → NO cuenta
+  - Happy: 1 transición Listo→Cambios solicitados → count=1
+  - Happy: 3 transiciones Listo→Cambios solicitados (oscilación múltiple) → count=3
+  - Happy: 1 transición Listo→En feedback (Sky legacy pre-cleanup) → count=1 (tolerated)
+  - Edge: transición En curso → Cambios solicitados (sin pasar por Listo) → NO cuenta
+  - Edge: transición Cambios solicitados → Listo para revisión (re-submit colaborador) → NO cuenta (es la transición inversa)
+  - Edge: transición Listo → Completado/Aprobado (sin corrección) → NO cuenta
   - Edge: window filter: 2 transiciones, 1 dentro de ventana, 1 fuera → count=1
   - Edge: taskSourceId inexistente → count=0, sourceMode='unavailable'
   - Edge: tarea pre-TASK-908 deployment (NO hay rows en transitions) → count=0, sourceMode='unavailable'
-  - Edge: Sky DB usa `En feedback` lowercase vs Efeonce `En Feedback` capitalizado → normalizar comparison case-insensitive (el helper debe tolerar ambas)
+  - Edge: variantes case/whitespace (`'  Listo para revisión '`, `'CAMBIOS SOLICITADOS'`) → normalizar comparison `LOWER(TRIM(...))`, helper tolerante
 
 - Reliability signal `notion-correction-transitions-source-availability.ts`:
   - kind=`data_quality`, severity=`warning` si % tareas con sourceMode=`unavailable` > 10% en últimos 30 días
@@ -316,7 +369,7 @@ Decisión canonical: la lógica de "contar correcciones" vive aquí (TASK-908), 
 
 - Lint rule `greenhouse/no-inline-correction-counting`:
   - Modo `warn` durante migración TASK-901
-  - Detecta SQL embedded que cuente `to_status='En Feedback'` inline en consumers
+  - Detecta SQL embedded que cuente `to_status IN ('Cambios solicitados', 'En feedback')` inline en consumers (cualquier variante de "corrección" debe pasar por el helper canonical, no inline)
   - Override block exime el helper canonical + tests
 
 **Implicación para TASK-901 Slice 1**: el helper `calculateRpa(taskId)` se reduce a `(await countCorrectionTransitions({taskSourceId})).count`. Eso resuelve el anti-patrón legacy de depender de la propiedad Notion `Correcciones` editable por operadores.
@@ -326,9 +379,9 @@ Decisión canonical: la lógica de "contar correcciones" vive aquí (TASK-908), 
 ### Slice 4 — Actualizar fórmula `cycle_time_days` en BQ view
 
 - Modificar `src/lib/ico-engine/schema.ts:108-113` para que `cycle_time_days` use:
-  - INICIO: `COALESCE((SELECT MIN(transitioned_at) FROM transitions WHERE task_source_id = dt.task_source_id AND to_status IN ('En curso', 'Tomado')), dt.created_at)`
+  - INICIO: `COALESCE((SELECT MIN(transitioned_at) FROM transitions WHERE task_source_id = dt.task_source_id AND LOWER(TRIM(to_status)) IN ('en curso', 'tomado')), dt.created_at)`. Post ADR `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1` el estado canonical universal es `'En curso'`; `'Tomado'` queda tolerado solo durante cleanup window Sky (~1-2 días) — se elimina del helper una vez que Sky completó rename + remove `Tomado` y signal `notion-correction-transitions-source-availability` reporta 0% legacy usage 7d sostenido.
   - FIN: `COALESCE(DATE(dt.completed_at), CURRENT_DATE())`
-  - DESCUENTO BLOQUEADO: subtract sum of (exit - enter) for transitions where to_status IN ('Bloqueado', 'Detenido')
+  - DESCUENTO BLOQUEADO: subtract sum of (exit - enter) for transitions where `LOWER(TRIM(to_status)) IN ('bloqueado', 'detenido')`. `'Bloqueado'` es canonical universal; `'Detenido'` es legacy tolerado durante cleanup window.
 - **IMPORTANTE**: la tabla `task_status_transitions` vive en PG, pero `cycle_time_days` vive en BQ. Hay 2 opciones:
   - **A) Sync periodically PG transitions → BQ** mediante materialization daily (reuse pattern de TASK-900 MERGE incremental).
   - **B) Compute cycle_time_days post-BQ** en consumer cuando se lee — fallback complejo.
@@ -374,21 +427,36 @@ Decisión canonical: la lógica de "contar correcciones" vive aquí (TASK-908), 
 - Reliability signal `ico-blocked-tasks-exclusion-coverage.ts` (count de tareas Bloqueado que dejaron de contar — monotónicamente creciente post-fix)
 - Tests anti-regresión: verificar que tareas previamente archivadas/canceladas siguen excluidas (sin cambio), y que tareas bloqueadas ahora SE excluyen (cambio)
 
-### Slice 7 — Fix B.2: Estados Sky mapeados a CSC
+### Slice 7 — Fix B.2: Status canonical universal mapeados a CSC (post ADR GREENHOUSE_TASK_STATUS_LIFECYCLE_V1)
 
-- Modificar `metric-registry.ts:103-115` `TASK_STATUS_TO_CSC`:
+Post ADR canonical 2026-05-17, los 11 estados canonical universales cross-tenant son: `Sin empezar`, `Brief listo`, `En curso`, `Listo para revisión`, `Cambios solicitados`, `Aprobado`, `Pendiente aprobación interna`, `En pausa`, `Bloqueado`, `Cancelado`, `Archivado`. Cleanup operador-side (~1-2 días) hace converger Efeonce + Sky al mismo set. El mapping CSC ya no es Sky-specific — es canonical universal.
+
+- Modificar `metric-registry.ts:103-115` `TASK_STATUS_TO_CSC` con el mapping canonical universal (NO Sky-specific):
   ```typescript
-  {
-    // ... existentes ...
-    'Tomado': 'briefing',              // Sky-side initial state
-    'Listo para revisión': 'entrega',  // antes de enviar al cliente
-    'En feedback': 'cambios_cliente',  // = "Cambios Solicitados" en otros DBs
-    'Aprobado': 'entrega',             // estado terminal Sky-side
-    // 'Bloqueado' NO se mapea — está en EXCLUDED_FROM_METRICS_STATUSES
-  }
+  export const TASK_STATUS_TO_CSC: Record<string, CscPhase> = {
+    // Briefing
+    'Sin empezar': 'briefing',
+    'Brief listo': 'briefing',
+    // Producción
+    'En curso': 'produccion',
+    // Revisión interna
+    'Pendiente aprobación interna': 'revision_interna',
+    // Entrega (handoff cliente)
+    'Listo para revisión': 'entrega',
+    // Cambios cliente
+    'Cambios solicitados': 'cambios_cliente',
+    // Entrega (terminal)
+    'Aprobado': 'entrega',
+    // NO mapean a CSC (quedan en EXCLUDED_FROM_METRICS_STATUSES):
+    //   'En pausa', 'Bloqueado', 'Cancelado', 'Archivado'
+  } as const
   ```
-- Reliability signal `ico-sky-csc-mapping-coverage.ts` (count de tareas Sky con `fase_csc IN ('otros', NULL)` — debe bajar a 0 post-fix)
-- Smoke test E2E visual: comparar CSC distribution chart Sky pre/post fix (Person 360 + Pulse)
+- **Tolerancia cleanup window operador-side**: helper normaliza con `LOWER(TRIM(...))` para tolerar variantes legacy (`'Tomado'`, `'En feedback'`, `'En Feedback'`, `'Cambios Solicitados'`) durante los ~1-2 días que toma el rename operador-side. Mapeos legacy temporales:
+  - `LOWER('Tomado') → 'produccion'` (Sky legacy, equivale a `'En curso'` post-cleanup)
+  - `LOWER('En feedback') / LOWER('En Feedback') → 'cambios_cliente'` (equivale a `'Cambios solicitados'`)
+  Reliability signal alerta cuando estos legacy se siguen viendo post-cleanup window.
+- Reliability signal `ico-csc-mapping-coverage.ts` (count de tareas — Sky + Efeonce — con `fase_csc IN ('otros', NULL)` — debe bajar a 0 post-fix + post-cleanup operador-side)
+- Smoke test E2E visual: comparar CSC distribution chart pre/post fix (Person 360 + Pulse) para ambos tenants
 
 ### Slice 8 — Housekeeping documental Engine spec doc
 
