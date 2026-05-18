@@ -41,6 +41,7 @@ import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
 import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
+import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
@@ -361,6 +362,14 @@ interface ReliabilityOverviewSources {
   icoMaterializerSkippedSafety?: ReliabilitySignal | null
 
   /**
+   * TASK-908 Slice 3.5 — Notion correction transitions source availability.
+   * % de tareas completadas en 90d sin rows en `task_status_transitions`.
+   * Pre-TASK-908b deployment: severity=error 100% esperado. Post-deployment +
+   * backfill verde: < 10% steady state. Roll up bajo moduleKey='delivery'.
+   */
+  notionCorrectionTransitionsSourceAvailability?: ReliabilitySignal | null
+
+  /**
    * TASK-893 Slice 5 — Payroll Participation Window signals (3 readers):
    * full_month_entry_drift + source_date_disagreement + projection_delta_anomaly.
    * Subsystem rollup `Finance Data Quality` via moduleKey='finance'. Cada
@@ -649,6 +658,13 @@ export const buildReliabilityOverview = (
     // ICO está protegiendo data buena del bug class TASK-877 (upstream bridge
     // Notion→member regresión silente). Steady=0.
     ...(sources.icoMaterializerSkippedSafety ? [sources.icoMaterializerSkippedSafety] : []),
+    // TASK-908 Slice 3.5 — Notion correction transitions source availability.
+    // Pre-TASK-908b deployment: 100% unavailable esperado (tabla vacía).
+    // Post-deployment + backfill: < 10% steady state. Visibiliza coverage del
+    // foundation que sustenta calculateRpa (TASK-901) + calculateFtr (TASK-909).
+    ...(sources.notionCorrectionTransitionsSourceAvailability
+      ? [sources.notionCorrectionTransitionsSourceAvailability]
+      : []),
     // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
     // Subsystem rollup Finance Data Quality via moduleKey='finance'. Each
     // reader degrades honestly (severity=unknown) on query failure. The
@@ -1177,6 +1193,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.icoMaterializerSkippedSafety
       : await getIcoMaterializerSkippedSafetySignal().catch(() => null)
 
+  // TASK-908 Slice 3.5 — Notion correction transitions source availability.
+  // Single reader; LEFT JOIN tasks completadas vs task_status_transitions.
+  // Degrada honestamente a `unknown` si la query falla.
+  const notionCorrectionTransitionsSourceAvailability =
+    preloadedSources.notionCorrectionTransitionsSourceAvailability !== undefined
+      ? preloadedSources.notionCorrectionTransitionsSourceAvailability
+      : await getNotionCorrectionTransitionsSourceAvailabilitySignal().catch(() => null)
+
   // TASK-848 Slice 7 + TASK-849 Slice 2 + TASK-854 Slice 0 + TASK-857 —
   // Production Release Control Plane signals. 6 readers en paralelo. Cada
   // uno degrada a `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN /
@@ -1278,7 +1302,8 @@ export const getReliabilityOverview = async (
     servicesEngagement,
     commercialHealth,
     productionRelease,
-    icoMaterializerSkippedSafety
+    icoMaterializerSkippedSafety,
+    notionCorrectionTransitionsSourceAvailability
   })
 }
 
