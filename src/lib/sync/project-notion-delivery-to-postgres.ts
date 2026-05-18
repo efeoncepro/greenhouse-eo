@@ -27,6 +27,30 @@ const intArg = (value: number | string | null | undefined) =>
   sql<number | null>`(${value})::numeric::integer`
 
 /**
+ * SQL-boundary array coercion (TEXT[] columns NOT NULL DEFAULT '{}').
+ *
+ * BQ returns `null` for repeated-string columns when the underlying Notion
+ * property has no values (e.g. a task with no `Subtareas` relation). The TS
+ * mapper passes the `null` through to PG, but PG `greenhouse_delivery.tasks`
+ * has 4 ARRAY columns declared NOT NULL DEFAULT '{}' which reject the insert
+ * with `null value in column "tarea_principal_ids" of relation "tasks"
+ * violates not-null constraint`.
+ *
+ * Mirror del pattern `intArg`: cast EVERY array parameter at the SQL boundary
+ * via `COALESCE(${value}::text[], ARRAY[]::text[])`. NULL → empty array; non-
+ * null array passes unchanged. Any FUTURE ARRAY column added to the projection
+ * is automatically protected from this bug class even if the upstream mapper
+ * forgets to coalesce.
+ *
+ * Belt-and-suspenders: TS contract says `string[] | null`, but BQ runtime may
+ * return null for any of the 4 ARRAY NOT NULL columns (`assignee_member_ids`,
+ * `project_source_ids`, `subtareas_ids`, `tarea_principal_ids`) plus any column
+ * that becomes NOT NULL in a future migration. The SQL boundary catches it.
+ */
+const arrayArg = (value: string[] | null | undefined) =>
+  sql<string[]>`COALESCE(${value}::text[], ARRAY[]::text[])`
+
+/**
  * Defensive PG-error redaction for diagnostic capture. PG errors include
  * `position`, `detail`, `where`, `code`, but never include row-level user data
  * unless they reflect literal values. We extract only the structural fields.
@@ -429,9 +453,9 @@ const upsertTasks = async (
         ${task.sprint_source_id ? `sprint-${task.sprint_source_id}` : null},
         ${task.space_id}, ${task.client_id}, ${task.module_id},
         ${task.assignee_member_id}, ${task.assignee_source_id},
-        ${task.assignee_member_ids}::text[], ${task.project_database_source_id},
+        ${arrayArg(task.assignee_member_ids)}, ${task.project_database_source_id},
         ${task.task_source_id}, ${task.project_source_id},
-        ${task.project_source_ids}::text[], ${task.sprint_source_id},
+        ${arrayArg(task.project_source_ids)}, ${task.sprint_source_id},
         ${task.task_name}, ${task.task_status}, ${task.task_phase},
         ${task.task_priority}, ${task.completion_label}, ${task.delivery_compliance},
         ${intArg(task.days_late)}, ${intArg(task.rescheduled_days)}, ${task.is_rescheduled},
@@ -441,7 +465,7 @@ const upsertTasks = async (
         ${intArg(task.frame_comments)}, ${intArg(task.open_frame_comments)},
         ${task.client_review_open}, ${task.workflow_review_open},
         ${intArg(task.blocker_count)}, ${task.last_frame_comment},
-        ${task.tarea_principal_ids}::text[], ${task.subtareas_ids}::text[],
+        ${arrayArg(task.tarea_principal_ids)}, ${arrayArg(task.subtareas_ids)},
         ${task.original_due_date}::date, ${task.execution_time_label},
         ${task.changes_time_label}, ${task.review_time_label},
         ${intArg(task.workflow_change_round)}, ${task.due_date}::date,
