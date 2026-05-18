@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { TASK_STATUS_GROUPS, taskStatusGroupSql } from '@/lib/delivery/task-status-canonical'
 
 export const dynamic = 'force-dynamic'
 
@@ -93,7 +94,7 @@ export async function GET(request: Request) {
           ON tm.member_id = te.assignee_member_id
         WHERE te.project_source_id IN UNNEST(@projectIds)
           AND (te.client_review_open = TRUE OR te.fase_csc IN ('cambios_cliente', 'revision_interna'))
-          AND te.task_status NOT IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Archivadas', 'Cancelada')
+          AND te.task_status NOT IN (${taskStatusGroupSql([...TASK_STATUS_GROUPS.COMPLETED, ...TASK_STATUS_GROUPS.EXCLUDED])})
           ${pendingFilter}
         ORDER BY te.hours_since_update DESC
       `,
@@ -139,7 +140,7 @@ export async function GET(request: Request) {
             te.completed_at
           FROM \`${projectId}.ico_engine.v_tasks_enriched\` te
           WHERE te.project_source_id IN UNNEST(@projectIds)
-            AND te.task_status IN ('Listo', 'Done', 'Finalizado', 'Completado')
+            AND te.task_status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})
             AND te.completed_at >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
           ORDER BY te.completed_at DESC
           LIMIT 20

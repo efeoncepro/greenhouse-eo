@@ -37,8 +37,15 @@ type BreakdownRow = {
   asset_count: number | string | null
 }
 
-const completedStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
-const inactiveStatuses = [...completedStatuses, 'Cancelado', 'Cancelada', 'Cancelled', 'Canceled']
+import {
+  TASK_STATUS_CANONICAL,
+  TASK_STATUS_GROUPS,
+  allVariantsForCanonical,
+  allVariantsForGroup
+} from '@/lib/delivery/task-status-canonical'
+
+const completedStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.COMPLETED)
+const inactiveStatuses = [...completedStatuses, ...allVariantsForCanonical(TASK_STATUS_CANONICAL.CANCELADO)]
 const getProjectId = () => getBigQueryProjectId()
 
 const quoteIdentifier = (identifier: string) => `\`${identifier.replace(/`/g, '``')}\``

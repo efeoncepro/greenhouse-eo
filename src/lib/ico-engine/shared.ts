@@ -3,6 +3,7 @@ import 'server-only'
 import { NextResponse } from 'next/server'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { TASK_STATUS_GROUPS, taskStatusGroupSql } from '@/lib/delivery/task-status-canonical'
 
 // ─── Error Class ────────────────────────────────────────────────────────────
 
@@ -242,9 +243,23 @@ export const buildDeliveryPeriodSourceSql = (projectId: string) => `(
 )`
 
 // ─── Canonical Status Lists ────────────────────────────────────────────────
+//
+// Source: `src/lib/delivery/task-status-canonical.ts`. Includes all canonical
+// V1 names + Efeonce legacy + Sky legacy + English variants. SQL is computed
+// at module load — safe to embed in BQ query strings.
 
-export const DONE_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado'`
-export const EXCLUDED_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado','Tomado'`
+export const DONE_STATUSES_SQL = taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)
+
+/**
+ * Union COMPLETED ∪ EXCLUDED (kept as a single SQL fragment for backward
+ * compatibility with existing consumers that use this list as "do not count
+ * as open work"). Includes all variants of: Aprobado, Cancelado, Archivado
+ * (canonical V1 + legacy aliases incl. Listo, Done, Tomado, etc.).
+ */
+export const EXCLUDED_STATUSES_SQL = taskStatusGroupSql([
+  ...TASK_STATUS_GROUPS.COMPLETED,
+  ...TASK_STATUS_GROUPS.EXCLUDED
+])
 export const PERIOD_START_SQL = 'DATE(@periodYear, @periodMonth, 1)'
 export const PERIOD_END_SQL = `DATE_SUB(DATE_ADD(${PERIOD_START_SQL}, INTERVAL 1 MONTH), INTERVAL 1 DAY)`
 export const REPORT_CUTOFF_DATE_SQL = `DATE_ADD(${PERIOD_END_SQL}, INTERVAL 1 DAY)`

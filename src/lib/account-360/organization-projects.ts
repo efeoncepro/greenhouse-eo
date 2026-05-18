@@ -3,6 +3,7 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getSpaceNotionSource } from '@/lib/space-notion/space-notion-store'
 import { getProjectsOverview } from '@/lib/projects/get-projects-overview'
+import { TASK_STATUS_GROUPS, allVariantsForGroup } from '@/lib/delivery/task-status-canonical'
 
 interface SpaceRow extends Record<string, unknown> {
   space_id: string
@@ -134,7 +135,7 @@ export const getOrganizationProjects = async (
 
   // 4. Aggregate totals
   const allProjects = spaceGroups.flatMap(s => s.projects)
-  const activeStatuses = ['En curso', 'Listo para revisión', 'Listo para revision', 'Cambios Solicitados']
+  const activeStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.ACTIVE)
 
   const totalTasks = allProjects.reduce((s, p) => s + p.totalTasks, 0)
   const activeTasks = allProjects.reduce((s, p) => s + p.activeTasks, 0)

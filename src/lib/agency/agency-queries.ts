@@ -1,6 +1,14 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import {
+  TASK_STATUS_CANONICAL,
+  TASK_STATUS_GROUPS,
+  isCanonicalStatus,
+  isCanonicalStatusInGroup,
+  taskStatusGroupSql,
+  taskStatusSql
+} from '@/lib/delivery/task-status-canonical'
 import { buildMetricSelectSQL, buildPeriodFilterSQL } from '@/lib/ico-engine/shared'
 import { buildMetricValuesFromRow, type MetricAggregateRowLike } from '@/lib/ico-engine/read-metrics'
 import type { ThresholdZone } from '@/lib/ico-engine/metric-registry'
@@ -323,7 +331,7 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
       ),
       task_agg AS (
         SELECT
-          COUNTIF(t.estado NOT IN ('Listo', 'Cancelado')) AS assets_activos,
+          COUNTIF(t.estado NOT IN (${taskStatusGroupSql([...TASK_STATUS_GROUPS.COMPLETED, ...TASK_STATUS_GROUPS.EXCLUDED])})) AS assets_activos,
           COUNTIF(SAFE_CAST(t.open_frame_comments AS INT64) > 0) AS feedback_pendiente,
           MAX(t.last_edited_time) AS last_synced_at
         FROM \`${projectId}.notion_ops.tareas\` t
@@ -429,7 +437,7 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
       task_health AS (
         SELECT
           cs.client_id,
-          COUNTIF(t.estado NOT IN ('Listo', 'Cancelado')) AS assets_activos,
+          COUNTIF(t.estado NOT IN (${taskStatusGroupSql([...TASK_STATUS_GROUPS.COMPLETED, ...TASK_STATUS_GROUPS.EXCLUDED])})) AS assets_activos,
           COUNTIF(SAFE_CAST(t.open_frame_comments AS INT64) > 0) AS feedback_pendiente
         FROM client_spaces cs
         LEFT JOIN \`${projectId}.notion_ops.tareas\` t
@@ -554,7 +562,7 @@ export const getAgencyWeeklyActivity = async (): Promise<AgencyChartWeeklyPoint[
         COUNT(*) AS completed
       FROM \`${projectId}.notion_ops.tareas\` t
       WHERE t.space_id IN (SELECT space_id FROM client_spaces)
-        AND t.estado = 'Listo'
+        AND t.estado IN (${taskStatusSql(TASK_STATUS_CANONICAL.APROBADO)})
         AND t.fecha_de_completado IS NOT NULL
         AND DATE(t.fecha_de_completado) >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 WEEK)
       GROUP BY week_start
@@ -572,12 +580,22 @@ export const getAgencyStatusMix = async (): Promise<AgencyChartStatusItem[]> => 
   const projectId = getBigQueryProjectId()
   const bq = getBigQueryClient()
 
-  const STATUS_MAP: Record<string, string> = {
-    'En Curso': 'active',
-    'Listo para Revision': 'review',
-    'Cambios Solicitados': 'changes',
-    'Listo': 'completed'
+  // Group raw status into canonical buckets (any variant → canonical key).
+  const statusToKey = (raw: string): 'active' | 'review' | 'changes' | 'completed' | 'other' => {
+    if (isCanonicalStatus(raw, TASK_STATUS_CANONICAL.EN_CURSO)) return 'active'
+    if (isCanonicalStatusInGroup(raw, TASK_STATUS_GROUPS.READY_FOR_REVIEW)) return 'review'
+    if (isCanonicalStatusInGroup(raw, TASK_STATUS_GROUPS.CLIENT_CHANGES)) return 'changes'
+    if (isCanonicalStatusInGroup(raw, TASK_STATUS_GROUPS.COMPLETED)) return 'completed'
+
+    return 'other'
   }
+
+  const inclusiveStatusSql = taskStatusGroupSql([
+    TASK_STATUS_CANONICAL.EN_CURSO,
+    TASK_STATUS_CANONICAL.LISTO_PARA_REVISION,
+    TASK_STATUS_CANONICAL.CAMBIOS_SOLICITADOS,
+    TASK_STATUS_CANONICAL.APROBADO
+  ])
 
   const [rows] = await bq.query({
     query: `
@@ -587,22 +605,22 @@ export const getAgencyStatusMix = async (): Promise<AgencyChartStatusItem[]> => 
         COUNT(*) AS item_count
       FROM \`${projectId}.notion_ops.tareas\` t
       WHERE t.space_id IN (SELECT space_id FROM client_spaces)
-        AND t.estado IN ('En Curso', 'Listo para Revision', 'Cambios Solicitados', 'Listo')
+        AND t.estado IN (${inclusiveStatusSql})
       GROUP BY t.estado
     `
   })
 
   const LABELS: Record<string, string> = {
-    active: 'En Curso',
-    review: 'En Revisión',
-    changes: 'Cambios',
-    completed: 'Listo'
+    active: 'En curso',
+    review: 'En revisión',
+    changes: 'Cambios solicitados',
+    completed: 'Aprobado'
   }
 
   return (rows as Record<string, unknown>[])
     .map(row => ({
-      key: STATUS_MAP[String(row.group_key)] ?? 'other',
-      label: LABELS[STATUS_MAP[String(row.group_key)] ?? ''] ?? String(row.group_key),
+      key: statusToKey(String(row.group_key)),
+      label: LABELS[statusToKey(String(row.group_key))] ?? String(row.group_key),
       value: toNumber(row.item_count)
     }))
     .filter(item => item.key !== 'other')

@@ -20,6 +20,12 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import {
+  TASK_STATUS_CANONICAL,
+  TASK_STATUS_GROUPS,
+  isCanonicalStatus,
+  isCanonicalStatusInGroup
+} from '@/lib/delivery/task-status-canonical'
 
 import type { OrganizationDetailData } from '../types'
 
@@ -82,9 +88,10 @@ const healthColor = (health: string): 'success' | 'warning' | 'error' => {
 }
 
 const statusColor = (status: string): 'success' | 'warning' | 'info' | 'secondary' => {
-  if (['Listo', 'Done', 'Finalizado', 'Completado'].includes(status)) return 'success'
-  if (['Cambios Solicitados', 'Listo para revisión', 'Listo para revision'].includes(status)) return 'warning'
-  if (status === 'En curso') return 'info'
+  if (isCanonicalStatusInGroup(status, TASK_STATUS_GROUPS.COMPLETED)) return 'success'
+  if (isCanonicalStatusInGroup(status, TASK_STATUS_GROUPS.CLIENT_CHANGES)) return 'warning'
+  if (isCanonicalStatusInGroup(status, TASK_STATUS_GROUPS.READY_FOR_REVIEW)) return 'warning'
+  if (isCanonicalStatus(status, TASK_STATUS_CANONICAL.EN_CURSO)) return 'info'
 
   return 'secondary'
 }

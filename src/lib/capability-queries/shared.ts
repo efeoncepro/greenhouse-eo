@@ -85,10 +85,15 @@ export interface CapabilityModuleSnapshot {
   qualitySignals: GreenhouseDashboardQualityPoint[]
 }
 
-const doneStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
-const closedStatuses = ['Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled']
-const blockedStatuses = ['Bloqueado', 'Detenido']
-const queuedStatuses = ['Sin empezar', 'Backlog', 'Pendiente']
+import { TASK_STATUS_GROUPS, allVariantsForGroup } from '@/lib/delivery/task-status-canonical'
+
+const doneStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.COMPLETED)
+const closedStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.EXCLUDED)
+const blockedStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.BLOCKED)
+const queuedStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.BRIEFING)
+const clientChangesStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.CLIENT_CHANGES)
+const enCursoStatuses = allVariantsForGroup([TASK_STATUS_GROUPS.ACTIVE[0]]) // En curso only
+const readyForReviewStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.READY_FOR_REVIEW)
 
 const monthLabelFormatter = new Intl.DateTimeFormat('es-CL', {
   month: 'short',
@@ -229,10 +234,10 @@ const getCapabilityModuleSnapshotUncached = async (viewer: CapabilityViewerConte
           WHEN estado IN UNNEST(@doneStatuses) THEN 'completed'
           WHEN estado IN UNNEST(@closedStatuses) THEN 'closed'
           WHEN estado IN UNNEST(@blockedStatuses) OR blocked_references > 0 THEN 'blocked'
-          WHEN estado = 'Cambios Solicitados' THEN 'changes'
-          WHEN estado = 'En curso' THEN 'active'
-          WHEN estado LIKE 'Listo para revis%' THEN 'review'
-          WHEN estado IN UNNEST(@queuedStatuses) OR estado LIKE 'Listo para dise%' THEN 'queued'
+          WHEN estado IN UNNEST(@clientChangesStatuses) THEN 'changes'
+          WHEN estado IN UNNEST(@enCursoStatuses) THEN 'active'
+          WHEN estado IN UNNEST(@readyForReviewStatuses) THEN 'review'
+          WHEN estado IN UNNEST(@queuedStatuses) THEN 'queued'
           ELSE 'other'
         END AS state_group,
         CASE
@@ -357,7 +362,10 @@ const getCapabilityModuleSnapshotUncached = async (viewer: CapabilityViewerConte
     doneStatuses,
     closedStatuses,
     blockedStatuses,
-    queuedStatuses
+    queuedStatuses,
+    clientChangesStatuses,
+    enCursoStatuses,
+    readyForReviewStatuses
   }
 
   const [aggregateResponse, projectsResponse, monthlyDeliveryResponse, monthlyQualityResponse] = await Promise.all([

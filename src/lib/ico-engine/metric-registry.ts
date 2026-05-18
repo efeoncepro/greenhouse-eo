@@ -99,31 +99,52 @@ export const CSC_CHART_COLORS: Record<CscPhase, string> = {
 
 // ─── Task Status → CSC Phase Mapping ────────────────────────────────────────
 // task_status values come from Notion (Spanish) but the column name is English.
+//
+// Canonical V1 source of truth: `src/lib/delivery/task-status-canonical.ts`.
+// All status names (canonical V1 + Efeonce legacy + Sky legacy + English /
+// accent variants) are mapped via the central alias table. Adding a tenant
+// variant means adding one entry there, NOT mutating this map.
 
-export const TASK_STATUS_TO_CSC: Record<string, CscPhase> = {
-  'Sin empezar': 'briefing',
-  'Backlog': 'briefing',
-  'Pendiente': 'briefing',
-  'Listo para diseñar': 'briefing',
-  'En curso': 'produccion',
-  'En Curso': 'produccion',
-  'Cambios Solicitados': 'cambios_cliente',
-  'Listo': 'entrega',
-  'Done': 'entrega',
-  'Finalizado': 'entrega',
-  'Completado': 'entrega'
+import {
+  TASK_STATUS_CANONICAL,
+  TASK_STATUS_GROUPS,
+  allVariantsForCanonical,
+  allVariantsForGroup,
+  taskStatusGroupSql
+} from '@/lib/delivery/task-status-canonical'
+
+const buildTaskStatusToCsc = (): Record<string, CscPhase> => {
+  const map: Record<string, CscPhase> = {}
+
+  for (const variant of allVariantsForGroup(TASK_STATUS_GROUPS.BRIEFING)) map[variant] = 'briefing'
+  for (const variant of allVariantsForCanonical(TASK_STATUS_CANONICAL.EN_CURSO)) map[variant] = 'produccion'
+
+  for (const variant of allVariantsForCanonical(TASK_STATUS_CANONICAL.LISTO_PARA_REVISION)) {
+    map[variant] = 'revision_interna'
+  }
+
+  for (const variant of allVariantsForCanonical(TASK_STATUS_CANONICAL.CAMBIOS_SOLICITADOS)) {
+    map[variant] = 'cambios_cliente'
+  }
+
+  for (const variant of allVariantsForCanonical(TASK_STATUS_CANONICAL.APROBADO)) map[variant] = 'entrega'
+
+  return map
 }
 
-// "Listo para revisión" uses a LIKE match in SQL — handled in the view, not here.
+export const TASK_STATUS_TO_CSC: Record<string, CscPhase> = buildTaskStatusToCsc()
 
 // ─── Done / Excluded Status Sets ────────────────────────────────────────────
+//
+// Backward-compat exports kept for any external consumer. New code should
+// consume `TASK_STATUS_GROUPS.*` + `taskStatusGroupSql` directly.
 
-export const DONE_STATUSES = ['Listo', 'Done', 'Finalizado', 'Completado', 'Aprobado'] as const
-export const EXCLUDED_STATUSES = ['Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled', 'Archivado'] as const
-export const BLOCKED_STATUSES = ['Bloqueado', 'Detenido'] as const
+export const DONE_STATUSES = allVariantsForCanonical(TASK_STATUS_CANONICAL.APROBADO)
+export const EXCLUDED_STATUSES = allVariantsForGroup(TASK_STATUS_GROUPS.EXCLUDED)
+export const BLOCKED_STATUSES = allVariantsForGroup(TASK_STATUS_GROUPS.BLOCKED)
 
-const DONE_STATUSES_SQL = DONE_STATUSES.map(status => `'${status}'`).join(',')
-const EXCLUDED_STATUSES_SQL = EXCLUDED_STATUSES.map(status => `'${status}'`).join(',')
+const DONE_STATUSES_SQL = taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)
+const EXCLUDED_STATUSES_SQL = taskStatusGroupSql(TASK_STATUS_GROUPS.EXCLUDED)
 
 const CANONICAL_COMPLETED_TASK_SQL = `(
   completed_at IS NOT NULL

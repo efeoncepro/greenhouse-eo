@@ -23,8 +23,10 @@ interface ProjectRow {
   page_url: string | null
 }
 
-const activeStatuses = ['En curso', 'Listo para revisión', 'Listo para revision', 'Cambios Solicitados']
-const completedStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
+import { TASK_STATUS_GROUPS, allVariantsForGroup } from '@/lib/delivery/task-status-canonical'
+
+const activeStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.ACTIVE)
+const completedStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.COMPLETED)
 
 const toNumber = (value: unknown) => {
   if (typeof value === 'number') {

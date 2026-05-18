@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { TASK_STATUS_GROUPS, taskStatusGroupSql } from '@/lib/delivery/task-status-canonical'
 
 // ── Types ──
 
@@ -79,8 +80,8 @@ export const listSprints = async (projectIds: string[]): Promise<SprintListItem[
         SELECT
           dt.sprint_source_id,
           COUNT(*) AS total_tasks,
-          COUNTIF(dt.task_status IN ('Listo', 'Done', 'Finalizado', 'Completado')) AS completed_tasks,
-          COUNTIF(dt.task_status IN ('En curso', 'Listo para revisión', 'Listo para revision', 'Cambios Solicitados')) AS active_tasks
+          COUNTIF(dt.task_status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})) AS completed_tasks,
+          COUNTIF(dt.task_status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.ACTIVE)})) AS active_tasks
         FROM \`${projectId}.greenhouse_conformed.delivery_tasks\` dt
         WHERE dt.project_source_id IN UNNEST(@projectIds)
           AND dt.sprint_source_id IS NOT NULL

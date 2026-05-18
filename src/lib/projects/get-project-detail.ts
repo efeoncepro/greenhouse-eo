@@ -80,10 +80,26 @@ interface TaskRow {
   page_url: string | null
 }
 
-const activeStatuses = ['En curso', 'Listo para revisión', 'Listo para revision', 'Cambios Solicitados']
-const completedStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
-const readyForReviewStatuses = ['Listo para revisión', 'Listo para revision']
-const blockedStatuses = ['Bloqueado', 'Detenido']
+import {
+  TASK_STATUS_GROUPS,
+  allVariantsForCanonical,
+  allVariantsForGroup,
+  TASK_STATUS_CANONICAL
+} from '@/lib/delivery/task-status-canonical'
+
+const activeStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.ACTIVE)
+const completedStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.COMPLETED)
+const readyForReviewStatuses = allVariantsForCanonical(TASK_STATUS_CANONICAL.LISTO_PARA_REVISION)
+const blockedStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.BLOCKED)
+const briefingStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.BRIEFING)
+const enCursoStatuses = allVariantsForCanonical(TASK_STATUS_CANONICAL.EN_CURSO)
+const clientChangesStatuses = allVariantsForCanonical(TASK_STATUS_CANONICAL.CAMBIOS_SOLICITADOS)
+
+const inactiveOrBriefingStatuses = [
+  ...allVariantsForGroup(TASK_STATUS_GROUPS.COMPLETED),
+  ...allVariantsForGroup(TASK_STATUS_GROUPS.EXCLUDED),
+  ...allVariantsForGroup(TASK_STATUS_GROUPS.BRIEFING)
+]
 
 const toNumber = (value: unknown) => {
   if (typeof value === 'number') {
@@ -307,7 +323,7 @@ export const getProjectDetail = async (scope: ProjectDetailScope): Promise<Green
         ROUND(AVG(rpa_value), 2) AS avg_rpa,
         COUNTIF(client_review_open OR workflow_review_open OR open_frame_comments > 0) AS open_review_items,
         COUNTIF(estado IN UNNEST(@readyForReviewStatuses)) AS ready_for_review_tasks,
-        COUNTIF(estado = 'Cambios Solicitados') AS client_change_tasks,
+        COUNTIF(estado IN UNNEST(@clientChangesStatuses)) AS client_change_tasks,
         COUNTIF(blocker_count > 0 OR estado IN UNNEST(@blockedStatuses)) AS blocked_tasks
       FROM scoped_tasks
     )
@@ -348,7 +364,11 @@ export const getProjectDetail = async (scope: ProjectDetailScope): Promise<Green
       activeStatuses,
       completedStatuses,
       readyForReviewStatuses,
-      blockedStatuses
+      blockedStatuses,
+      briefingStatuses,
+      enCursoStatuses,
+      clientChangesStatuses,
+      inactiveOrBriefingStatuses
     }
   })
 
@@ -441,15 +461,15 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
         DAY
       ) AS cycle_time_days,
       CASE
-        WHEN t.estado IN ('Sin empezar', 'Backlog', 'Pendiente', 'Listo para diseñar') THEN 'briefing'
-        WHEN t.estado IN ('En curso', 'En Curso') THEN 'produccion'
-        WHEN t.estado LIKE 'Listo para revis%' THEN 'revision_interna'
-        WHEN t.estado = 'Cambios Solicitados' THEN 'cambios_cliente'
-        WHEN t.estado IN ('Listo', 'Done', 'Finalizado', 'Completado') THEN 'entrega'
+        WHEN t.estado IN UNNEST(@briefingStatuses) THEN 'briefing'
+        WHEN t.estado IN UNNEST(@enCursoStatuses) THEN 'produccion'
+        WHEN t.estado IN UNNEST(@readyForReviewStatuses) THEN 'revision_interna'
+        WHEN t.estado IN UNNEST(@clientChangesStatuses) THEN 'cambios_cliente'
+        WHEN t.estado IN UNNEST(@completedStatuses) THEN 'entrega'
         ELSE 'otros'
       END AS fase_csc,
       (
-        t.estado NOT IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Archivadas', 'Cancelada', 'Sin empezar', 'Backlog', 'Pendiente')
+        t.estado NOT IN UNNEST(@inactiveOrBriefingStatuses)
         AND t.last_edited_time IS NOT NULL
         AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), t.last_edited_time, HOUR) >= 72
       ) AS is_stuck,
