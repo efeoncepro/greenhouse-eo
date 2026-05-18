@@ -365,27 +365,52 @@ El ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` se actualiza con Delta:
 
 ---
 
-## 8. Open questions deliberadamente NO decididas
+## 8. Decisiones canonical 2026-05-18 (ex Open Questions cerradas)
 
-### 8.1 ¿Reliability signal para detectar drift Notion futuro?
+Sesión live 2026-05-18 cerró las 3 open questions deferred del ADR. Status pasa a "Decisiones canonical aprobadas".
 
-Si alguien (operador, cliente, agente externo) agrega un estado nuevo a `Estado` en algún teamspace, ¿lo detectamos automáticamente?
+### 8.1 ✅ Reliability signal canonical `notion.task.status_drift_from_canonical` — V1 (desde TASK-908)
 
-**Recomendación V1**: signal `notion.task.status_drift_from_canonical` (kind=drift, severity=warning si emerge estado non-canonical, steady=0). Reader compara enum values actuales de Notion vs los 11 canonical hardcoded en Greenhouse. Si emerge drift → operador investiga (puede ser legítimo "necesidad operativa nueva" o accidental).
+**Decisión canonical**: signal incluido **desde V1 en TASK-908** (no V1.1 diferido).
 
-Pero este signal es V1.1 — no bloquea ship del cleanup actual.
+- **Kind**: drift
+- **Severity**: warning si emerge estado non-canonical en algún teamspace, steady=0
+- **Reader**: compara enum values actuales de cada teamspace Notion vs los 11 canonical hardcoded en Greenhouse
+- **Disparador esperado** (probabilidad media en operación real):
+  - Operador HR/Delivery agrega estado nuevo por necesidad operativa real (e.g. emerge "Pendiente legal review")
+  - Cliente nuevo onboardea con vocabulary distinto sin clonar template canonical
+  - Drift accidental (test, basura) que queda en producción
 
-### 8.2 ¿Localización futura?
+**Razón de incluir en V1**: el costo de drift silencioso post-flip productivo (puede mover RpA real sin que nos enteremos) supera el ~30 min extra de dev en TASK-908. Defense in depth canonical.
 
-¿Si emerge cliente que requiere status en inglés (e.g. cliente US)?
+**Implementation hint para TASK-908**:
+```typescript
+// src/lib/reliability/queries/notion-task-status-drift-from-canonical.ts (TBD)
+const CANONICAL_STATUSES = [
+  'Sin empezar', 'Brief listo', 'En curso', 'Listo para revisión',
+  'Cambios solicitados', 'Aprobado', 'Pendiente aprobación interna',
+  'En pausa', 'Bloqueado', 'Cancelado', 'Archivado'
+] as const
 
-**Decisión deferred**: V1 es es-CL universal. Si emerge necesidad real, V2 podría introducir layer i18n para display (Notion property displays "Pending review" pero canonical sigue siendo `Listo para revisión`). NO en V1 — YAGNI.
+// Per teamspace: fetch data source schema via Notion API → compare options vs CANONICAL_STATUSES
+// Si emerge un name fuera del set → signal warning con detalle (teamspace + non-canonical option name + first observed timestamp)
+```
 
-### 8.3 ¿`Brief listo` mata el flow "Sin empezar"?
+### 8.2 ✅ Localización i18n — deferred indefinidamente (NO V1, NO planificar V2)
 
-Si todos los tasks empiezan con `Sin empezar`, ¿`Brief listo` se vuelve redundante? ¿O tiene tracking real de "brief listo, falta ejecutar"?
+**Decisión canonical**: vocabulary canonical permanece es-CL universal. Si emerge cliente real que requiera status en inglés (u otro idioma), ese momento será el trigger para diseñar layer de i18n separada (Notion display per idioma, canonical interno sigue siendo es-CL).
 
-**Decisión V1**: ambos coexisten. `Sin empezar` para tasks con brief incompleto, `Brief listo` para tasks con brief approved + queued. Si operador en práctica no usa `Brief listo`, V1.1 puede eliminarlo. Pero V1 lo deja como opción canonical disponible.
+**Razón**: YAGNI. Diseñar i18n sin caso real es overengineering.
+
+**Trigger para revisitar**: primer cliente que pida status en idioma distinto. NO antes.
+
+### 8.3 ✅ `Brief listo` — coexiste con `Sin empezar` en V1, revisar adoption a 90 días post-migration
+
+**Decisión canonical**: ambos estados quedan disponibles en el canonical desde V1. `Sin empezar` para tasks con brief incompleto, `Brief listo` para tasks con brief aprobado + queued.
+
+**Revisión a 90 días post-migration completa**: si operadores en práctica no usan `Brief listo` (queda 0 tasks asignadas sostenido), V1.1 puede eliminarlo del canonical. Pero precipitar la eliminación pre-migración es prematuro.
+
+**Trigger para revisitar**: 90 días post-Sky + Efeonce + Demo migration completos (cleanup canonical). Check via Notion query: ¿cuántas tasks tienen `Brief listo`? Si sostenido < 5% del total operativo → considerar eliminarlo en V1.1.
 
 ---
 

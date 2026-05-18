@@ -1,3 +1,49 @@
+# Sesion 2026-05-18 (cont. — 3 open questions ADR Lifecycle cerradas como decisiones canonical)
+
+**Status**: ✅ Doc-only. Sesión live cerró las 3 open questions deferred del ADR `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` con decisiones canonical aprobadas por CEO. §8 del ADR pasa de "Open questions deliberadamente NO decididas" a "Decisiones canonical 2026-05-18".
+
+## Resultado canonical
+
+### Q1 ✅ Reliability signal `notion.task.status_drift_from_canonical` — V1 desde TASK-908
+
+Decisión final: signal incluido en V1 (no V1.1 diferido). Razón: el costo de drift silencioso post-flip productivo (puede mover RpA real sin que nos enteremos) supera el ~30 min extra de dev en TASK-908. Defense in depth canonical.
+
+- kind=drift, severity=warning si emerge estado non-canonical en algún teamspace, steady=0
+- Reader compara enum values actuales de cada teamspace Notion vs los 11 canonical hardcoded
+- Disparadores esperados: operador HR/Delivery agrega estado nuevo por necesidad operativa real, cliente nuevo onboardea sin clonar template canonical, drift accidental (test/basura)
+- Implementation hint: `src/lib/reliability/queries/notion-task-status-drift-from-canonical.ts` con `CANONICAL_STATUSES` constant + fetch schema per teamspace via Notion API + diff
+
+### Q2 ✅ Localización i18n — deferred indefinidamente (NO V1, NO planificar V2)
+
+Decisión final: vocabulary canonical permanece es-CL universal. Trigger para revisitar: primer cliente real que pida status en idioma distinto. Razón canonical: YAGNI — diseñar i18n sin caso real es overengineering.
+
+### Q3 ✅ `Brief listo` — coexiste con `Sin empezar` en V1, revisar adoption a 90 días post-migration
+
+Decisión final: ambos estados quedan disponibles en el canonical desde V1. Revisión a 90 días post-migration completa (Sky + Efeonce + Demo cleanup): si operadores en práctica no usan `Brief listo` sostenido < 5% del total operativo → V1.1 puede eliminarlo.
+
+## Hallazgos clave
+
+- **Q1 ganó V1 sobre V1.1 después de discusión**: la pregunta real era probabilidad de drift. Análisis de probabilidades real (operador HR/Delivery agrega estado por necesidad operativa = media, cliente nuevo sin protocolo = baja, drift accidental = baja-media) + costo de drift silencioso post-flip → defense in depth canonical desde día 1 gana.
+- **Q2 deferred es decisión más fuerte que "TBD"**: NO planificar V2 explícitamente comunica que el caso de uso aún no existe. Si emerge cliente que requiere i18n, ese momento será trigger natural para diseñar.
+- **Q3 con criterio cuantitativo concreto (< 5% del total operativo en 90d)** elimina ambigüedad: vs "si emerge necesidad" subjetivo, tenemos métrica clara para revisitar.
+
+## Validacion
+
+- Doc-only changes
+- Decisiones canonical aprobadas live por CEO 2026-05-18
+- ADR `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` §8 reescrita como "Decisiones canonical" en lugar de "Open questions deferred"
+- Pre-existing markdown warnings (MD040/MD060/MD032 cosméticos) NO bloquean
+
+## Siguientes pasos
+
+- **TASK-908 dev**: implementar signal `notion.task.status_drift_from_canonical` como parte de Slice canonical reliability signals + el resto del foundation (webhook handler + outbox + reactive consumer + PG `task_status_transitions` con `transitioned_at` obligatorio + helper `countCorrectionTransitions`)
+- **TASK-910 dev**: demo sandbox + bonus guardrail
+- **TASK-901 Fase A** post TASK-908 + TASK-910 verde
+- **Migration manual Notion Sky + Efeonce** (operador-side, cuando quiera) + verificación post via API
+- **Revisión 90 días post-migration** completa: medir adoption `Brief listo` per teamspace para decidir V1.1 eliminar o mantener
+
+---
+
 # Sesion 2026-05-18 — PoC RpA V2 validado empíricamente contra Demo + flow operativo real + timestamp canonical
 
 **Status**: ✅ Doc-only + PoC sandbox executed live. PoC RpA V2 implementado (`scripts/notion-metrics/_poc-rpa-v2-demo.ts`, ~330 líneas TS, SDK `@notionhq/client` v5.21.0 instalado canonical), ejecutado contra Demo teamspace con flow manual del operador, **validó la regla canonical `Listo para revisión → Cambios solicitados` end-to-end** (RpA = 2 esperado = RpA = 2 detectado). Plus 2 Deltas canonical post-validation: (1) flow operativo real documentado (correcciones in-place en `Cambios solicitados`, no vuelve a `En curso`); (2) timestamp canonical obligatorio per transición en `task_status_transitions` schema (`transitioned_at` del webhook event.timestamp como source of truth para Cycle Time + Time-in-Status + futuras métricas temporales).
