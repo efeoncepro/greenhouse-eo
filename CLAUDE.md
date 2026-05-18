@@ -94,6 +94,23 @@ CLI Vercel targetea por `name+scope`, NO por ID directo. El pattern resuelve el 
 
 **Spec canónica**: `docs/issues/resolved/ISSUE-076-vercel-cli-duplicate-project-recurrent-bug-class.md` (cierra recurrencia de ISSUE-013).
 
+### Cross-repo action safety (desde 2026-05-18, post Kortex over-application)
+
+Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a múltiples repos del ecosystem (e.g. documentar transfer, agregar notas cross-link, broadcast cambios canonical), **antes de commitear a cualquier repo distinto de `efeoncepro/greenhouse-eo`**, el agente debe verificar 2 condiciones:
+
+1. **Relevancia operacional**: ¿el repo target consume o referencia el cambio? `GREENHOUSE_REPO_ECOSYSTEM_V1.md` lista repos hermanos pero algunos son **productos separados** (e.g. `efeoncepro/kortex` es plataforma CRM/HubSpot, NO Greenhouse ecosystem operacional). Aplicar la instrucción literal a TODOS los repos del doc sin filtrar = over-application.
+
+2. **CI/CD del target repo**: ¿el repo tiene auto-deploy en push a `main` (Vercel/GitHub Actions/etc.)? Si SÍ, un commit benigno (incluso solo al README) **dispara el pipeline completo** — puede revelar bugs pre-existing dormant y generar email burst al owner. Antes de commit directo, verificar el último deploy status. Si está en Error, NO commitear (re-disparás el fail).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** commit directo a `main` de un repo sibling sin (a) confirmar relevancia operacional del cambio, (b) check del último deploy status del repo target, (c) decisión explícita del user si el repo tiene auto-deploy productivo.
+- **NUNCA** asumir "instrucción literal aplica a todos los repos listados en el ecosystem doc". Filtrar por relevancia operacional ANTES de actuar. Si emerge duda, preguntar al user.
+- **PREFERIR** PR + review en lugar de commit directo cuando el repo target tiene auto-deploy productivo y el cambio no es critical hotfix.
+- **SIEMPRE** que la instrucción del user incluya "todos los repos hermanos" o equivalente plural, enumerar primero los repos candidate + propuesta filter por relevancia + esperar confirmación antes de bulk apply.
+
+**Caso fuente (2026-05-18, Kortex over-application)**: durante governance fix del transfer `notion-bigquery` → `efeoncepro` org, agregué ecosystem note cross-link al README de los 4 repos hermanos listados en `GREENHOUSE_REPO_ECOSYSTEM_V1.md`. Kortex es **producto separado** sin relación operacional al sync notion-bigquery, pero apliqué la instrucción literal. Mi commit benigno (solo README) disparó auto-deploy Vercel productivo que falló por bug pre-existing 33 días dormant. Email noise al owner + 5 min cleanup (revert vía git clone). Lesson: relevancia + CI/CD check ANTES de cross-repo actions.
+
 ## Quick Reference
 
 - **Package manager:** `pnpm` (siempre usar `pnpm`, no `npm` ni `yarn`)
