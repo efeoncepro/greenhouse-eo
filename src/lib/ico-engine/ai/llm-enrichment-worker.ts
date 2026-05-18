@@ -786,11 +786,108 @@ export const materializeAiLlmEnrichments = async (
         spaceId: input.spaceId
       })
 
+      // TASK-900 follow-up — canonical fix: replace BQ streaming insert API
+      // (.dataset().table().insert()) with DML INSERT INTO ... SELECT FROM UNNEST(@rows).
+      // Streaming insert writes to streaming buffer where subsequent DML is
+      // blocked ~30 min. DML INSERT writes directly to durable storage.
+      // Eliminates the "streaming buffer blocks DELETE" failure mode.
       if (records.length > 0) {
-        await bigQuery.dataset(ICO_DATASET).table('ai_signal_enrichments').insert(records.map(toBigQueryEnrichmentRow))
+        const enrichmentRows = records.map(toBigQueryEnrichmentRow)
+
+        await bigQuery.query({
+          query: `INSERT INTO \`${projectId}.${ICO_DATASET}.ai_signal_enrichments\` (
+                    enrichment_id, run_id, signal_id, space_id, member_id, project_id,
+                    signal_type, metric_name, period_year, period_month, severity,
+                    quality_score, explanation_summary, root_cause_narrative,
+                    recommended_action, explanation_json, model_id, prompt_version,
+                    prompt_hash, confidence, tokens_in, tokens_out, latency_ms,
+                    status, error_message, input_signal_snapshot, processed_at, _synced_at
+                  )
+                  SELECT
+                    s.enrichment_id, s.run_id, s.signal_id, s.space_id, s.member_id, s.project_id,
+                    s.signal_type, s.metric_name, s.period_year, s.period_month, s.severity,
+                    s.quality_score, s.explanation_summary, s.root_cause_narrative,
+                    s.recommended_action, s.explanation_json, s.model_id, s.prompt_version,
+                    s.prompt_hash, s.confidence, s.tokens_in, s.tokens_out, s.latency_ms,
+                    s.status, s.error_message, s.input_signal_snapshot, s.processed_at, s._synced_at
+                  FROM UNNEST(@rows) AS s`,
+          params: { rows: enrichmentRows },
+          types: {
+            rows: [{
+              enrichment_id: 'STRING',
+              run_id: 'STRING',
+              signal_id: 'STRING',
+              space_id: 'STRING',
+              member_id: 'STRING',
+              project_id: 'STRING',
+              signal_type: 'STRING',
+              metric_name: 'STRING',
+              period_year: 'INT64',
+              period_month: 'INT64',
+              severity: 'STRING',
+              quality_score: 'FLOAT64',
+              explanation_summary: 'STRING',
+              root_cause_narrative: 'STRING',
+              recommended_action: 'STRING',
+              explanation_json: 'STRING',
+              model_id: 'STRING',
+              prompt_version: 'STRING',
+              prompt_hash: 'STRING',
+              confidence: 'FLOAT64',
+              tokens_in: 'INT64',
+              tokens_out: 'INT64',
+              latency_ms: 'INT64',
+              status: 'STRING',
+              error_message: 'STRING',
+              input_signal_snapshot: 'STRING',
+              processed_at: 'TIMESTAMP',
+              _synced_at: 'TIMESTAMP'
+            }]
+          }
+        })
       }
 
-      await bigQuery.dataset(ICO_DATASET).table('ai_enrichment_runs').insert([toBigQueryRunRow(run)])
+      const runRow = toBigQueryRunRow(run)
+
+      await bigQuery.query({
+        query: `INSERT INTO \`${projectId}.${ICO_DATASET}.ai_enrichment_runs\` (
+                  run_id, trigger_event_id, space_id, period_year, period_month,
+                  trigger_type, status, signals_seen, signals_enriched, signals_failed,
+                  model_id, prompt_version, prompt_hash, tokens_in, tokens_out,
+                  latency_ms, error_message, started_at, completed_at, _synced_at
+                )
+                SELECT
+                  s.run_id, s.trigger_event_id, s.space_id, s.period_year, s.period_month,
+                  s.trigger_type, s.status, s.signals_seen, s.signals_enriched, s.signals_failed,
+                  s.model_id, s.prompt_version, s.prompt_hash, s.tokens_in, s.tokens_out,
+                  s.latency_ms, s.error_message, s.started_at, s.completed_at, s._synced_at
+                FROM UNNEST(@rows) AS s`,
+        params: { rows: [runRow] },
+        types: {
+          rows: [{
+            run_id: 'STRING',
+            trigger_event_id: 'STRING',
+            space_id: 'STRING',
+            period_year: 'INT64',
+            period_month: 'INT64',
+            trigger_type: 'STRING',
+            status: 'STRING',
+            signals_seen: 'INT64',
+            signals_enriched: 'INT64',
+            signals_failed: 'INT64',
+            model_id: 'STRING',
+            prompt_version: 'STRING',
+            prompt_hash: 'STRING',
+            tokens_in: 'INT64',
+            tokens_out: 'INT64',
+            latency_ms: 'INT64',
+            error_message: 'STRING',
+            started_at: 'TIMESTAMP',
+            completed_at: 'TIMESTAMP',
+            _synced_at: 'TIMESTAMP'
+          }]
+        }
+      })
     } catch (bqError) {
       console.warn('[llm-enrichment] BigQuery write skipped (streaming buffer or transient error), persisting to PostgreSQL serving:', bqError instanceof Error ? bqError.message : bqError)
     }
