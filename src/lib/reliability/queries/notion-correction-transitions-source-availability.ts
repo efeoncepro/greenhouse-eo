@@ -49,9 +49,34 @@ export const NOTION_CORRECTION_TRANSITIONS_SOURCE_AVAILABILITY_SIGNAL_ID =
 const WARNING_THRESHOLD_PCT = 10
 const ERROR_THRESHOLD_PCT = 50
 
+/**
+ * **Schema naming drift canonical** (hotfix Sentry JAVASCRIPT-NEXTJS-65, 2026-05-18):
+ *
+ * Las 2 tablas usan nombres DISTINTOS para el mismo identificador canonical
+ * (Notion page UUID):
+ *
+ * - `greenhouse_delivery.tasks.notion_task_id` (TEXT NOT NULL) — canonical en
+ *   la tabla snapshot de Notion delivery
+ * - `greenhouse_delivery.task_status_transitions.task_source_id` (TEXT NOT NULL)
+ *   — canonical en la tabla event-sourced append-only de TASK-908
+ *
+ * Mismo identificador, diferente naming convention cross-table. Otros callsites
+ * canonical usan el mismo pattern (e.g. `src/lib/projects/get-project-detail.ts`
+ * usa `dt.task_source_id = t.notion_page_id` desde BQ delivery view).
+ *
+ * Pattern canonical V1: alias `t.notion_task_id AS task_source_id` en el CTE
+ * para que el LEFT JOIN downstream funcione idéntico al naming de transitions.
+ * Drift architectural (mismo dato 2 nombres) queda como ISSUE follow-up para
+ * evaluar rename de column en `task_status_transitions` (NO urgente — el alias
+ * es correct + canonical per pattern fuente).
+ *
+ * Live PG verified pre-merge canonical (CLAUDE.md "SQL Signal Reader Schema
+ * Validation Gate" TASK-893 hotfix #3): query retorna shape esperado +
+ * severity=error 100% pre-TASK-912 deployment (steady state ese state).
+ */
 const QUERY_SQL = `
   WITH completed_in_window AS (
-    SELECT t.task_source_id
+    SELECT t.notion_task_id AS task_source_id
     FROM greenhouse_delivery.tasks t
     WHERE t.completed_at IS NOT NULL
       AND t.completed_at >= NOW() - INTERVAL '90 days'
