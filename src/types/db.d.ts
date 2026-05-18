@@ -8390,6 +8390,21 @@ export interface GreenhouseSyncHandlerHealthTransitions {
   trigger_event_id: string | null;
 }
 
+export interface GreenhouseSyncIcoMaterializationRuns {
+  blocking_signals: Json | null;
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  materialization_id: Generated<string>;
+  notes: string | null;
+  period_month: number;
+  period_year: number;
+  rows_inserted: number | null;
+  rows_merged: number | null;
+  started_at: Generated<Timestamp>;
+  status: string;
+  table_name: string;
+}
+
 export interface GreenhouseSyncIdentityProfileMergeLog {
   client_users_moved: Generated<number>;
   contacts_moved: Generated<number>;
@@ -9427,6 +9442,7 @@ export interface DB {
   "greenhouse_sync.github_release_webhook_events": GreenhouseSyncGithubReleaseWebhookEvents;
   "greenhouse_sync.handler_health": GreenhouseSyncHandlerHealth;
   "greenhouse_sync.handler_health_transitions": GreenhouseSyncHandlerHealthTransitions;
+  "greenhouse_sync.ico_materialization_runs": GreenhouseSyncIcoMaterializationRuns;
   "greenhouse_sync.identity_profile_merge_log": GreenhouseSyncIdentityProfileMergeLog;
   "greenhouse_sync.identity_reconciliation_proposals": GreenhouseSyncIdentityReconciliationProposals;
   "greenhouse_sync.integration_data_quality_checks": GreenhouseSyncIntegrationDataQualityChecks;
