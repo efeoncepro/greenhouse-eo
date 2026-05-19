@@ -42,6 +42,14 @@ import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
 import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
+import {
+  getNotionMetricsShadowParidadRpaDemoSignal,
+  getNotionMetricsEchoLoopDemoSignal,
+  getNotionMetricsWebhookSignatureFailuresDemoSignal,
+  getNotionMetricsWritebackDeadLetterDemoSignal,
+  getNotionMetricsDemoTeamspaceDriftSignal,
+  getPayrollBonusDemoContaminationSignal
+} from './queries/notion-metrics-demo-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
@@ -613,6 +621,21 @@ interface ReliabilityOverviewSources {
    * cuando exista release_manifests data populated.
    */
   productionRelease?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical):
+   *   - notion.metrics.shadow_paridad_rpa_demo (drift)
+   *   - notion.metrics.echo_loop_detected_demo (drift)
+   *   - notion.metrics.webhook_signature_failures_demo (drift)
+   *   - notion.metrics.writeback_dead_letter_demo (drift, deferred TASK-913)
+   *   - notion.metrics.demo_teamspace_drift (drift)
+   *   - payroll.bonus.demo_member_contamination (drift, ERROR si > 0 — CRITICAL
+   *     defense in depth canonical anti-regresión bonus guardrail Slice 5)
+   * Roll up: primer 5 bajo moduleKey 'delivery', último bajo moduleKey 'payroll'.
+   * Sub-rollup conceptual `Notion Metrics Migration` (demo gate canonical
+   * pre-Fase 1 RpA pilot Efeonce).
+   */
+  notionMetricsDemo?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -727,7 +750,10 @@ export const buildReliabilityOverview = (
     // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
     ...(sources.commercialHealth ?? []),
     // TASK-848 Slice 7 — Production Release Control Plane signals (2 of 4 V1).
-    ...(sources.productionRelease ?? [])
+    ...(sources.productionRelease ?? []),
+    // TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical).
+    // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
+    ...(sources.notionMetricsDemo ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -1261,6 +1287,24 @@ export const getReliabilityOverview = async (
           })
           .catch(() => null)
 
+  // TASK-910 Slice 4 — Notion Demo Teamspace signals (6 canonical).
+  // Defense in depth dual: 5 signals delivery + 1 critical signal payroll.
+  // El payroll signal `payroll.bonus.demo_member_contamination` es ERROR si > 0
+  // (NUNCA debe pasar — alerta immediate canonical anti-regresión).
+  const notionMetricsDemo =
+    preloadedSources.notionMetricsDemo !== undefined
+      ? preloadedSources.notionMetricsDemo
+      : await Promise.all([
+          getNotionMetricsShadowParidadRpaDemoSignal().catch(() => null),
+          getNotionMetricsEchoLoopDemoSignal().catch(() => null),
+          getNotionMetricsWebhookSignatureFailuresDemoSignal().catch(() => null),
+          getNotionMetricsWritebackDeadLetterDemoSignal().catch(() => null),
+          getNotionMetricsDemoTeamspaceDriftSignal().catch(() => null),
+          getPayrollBonusDemoContaminationSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -1303,7 +1347,8 @@ export const getReliabilityOverview = async (
     commercialHealth,
     productionRelease,
     icoMaterializerSkippedSafety,
-    notionCorrectionTransitionsSourceAvailability
+    notionCorrectionTransitionsSourceAvailability,
+    notionMetricsDemo
   })
 }
 
