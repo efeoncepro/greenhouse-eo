@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   runGreenhousePostgresQuery: vi.fn(),
-  captureWithDomain: vi.fn()
+  captureWithDomain: vi.fn(),
+  publishOutboxEvent: vi.fn()
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
@@ -11,6 +12,10 @@ vi.mock('@/lib/postgres/client', () => ({
 
 vi.mock('@/lib/observability/capture', () => ({
   captureWithDomain: mocks.captureWithDomain
+}))
+
+vi.mock('../publish-event', () => ({
+  publishOutboxEvent: mocks.publishOutboxEvent
 }))
 
 import {
@@ -24,6 +29,7 @@ const { persistStatusTransitionDemo } = __testing__
 beforeEach(() => {
   mocks.runGreenhousePostgresQuery.mockReset()
   mocks.captureWithDomain.mockReset()
+  mocks.publishOutboxEvent.mockReset()
 })
 
 const validDemoPayload = {
@@ -237,6 +243,84 @@ describe('TASK-910 Slice 3 — notion-status-transition-capture-demo canonical',
     it('name canonical es notion_status_transition_capture_demo', () => {
       expect(notionStatusTransitionCaptureDemoProjection.name).toBe(
         'notion_status_transition_capture_demo'
+      )
+    })
+  })
+
+  describe('TASK-913 Slice 1 chain event emit (transition_captured.demo)', () => {
+    it('emite chain event SOLO para correction transition (Listo para revisión → Cambios solicitados)', async () => {
+      mocks.runGreenhousePostgresQuery.mockResolvedValueOnce([])
+      mocks.publishOutboxEvent.mockResolvedValueOnce('outbox-uuid-1')
+
+      const correctionPayload = {
+        ...validDemoPayload,
+        fromStatus: 'Listo para revisión',
+        toStatus: 'Cambios solicitados'
+      }
+
+      await notionStatusTransitionCaptureDemoProjection.refresh(
+        { entityType: 'notion_task', entityId: 'task-uuid-1' },
+        correctionPayload as unknown as Record<string, unknown>
+      )
+
+      expect(mocks.publishOutboxEvent).toHaveBeenCalledOnce()
+      expect(mocks.publishOutboxEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'notion.task.transition_captured.demo',
+          aggregateType: 'notion_task',
+          aggregateId: 'task-uuid-1',
+          payload: expect.objectContaining({
+            workspaceId: 'demo',
+            fromStatus: 'Listo para revisión',
+            toStatus: 'Cambios solicitados',
+            metadata: { demo_mode: true }
+          })
+        })
+      )
+    })
+
+    it('NO emite chain event para transitions NO de corrección (e.g. En curso → Listo para revisión)', async () => {
+      mocks.runGreenhousePostgresQuery.mockResolvedValueOnce([])
+
+      const nonCorrectionPayload = {
+        ...validDemoPayload,
+        fromStatus: 'En curso',
+        toStatus: 'Listo para revisión'
+      }
+
+      await notionStatusTransitionCaptureDemoProjection.refresh(
+        { entityType: 'notion_task', entityId: 'task-uuid-1' },
+        nonCorrectionPayload as unknown as Record<string, unknown>
+      )
+
+      expect(mocks.publishOutboxEvent).not.toHaveBeenCalled()
+    })
+
+    it('NO throw cuando chain event emit falla (non-blocking, warning capture)', async () => {
+      mocks.runGreenhousePostgresQuery.mockResolvedValueOnce([])
+      mocks.publishOutboxEvent.mockRejectedValueOnce(new Error('outbox locked'))
+
+      const correctionPayload = {
+        ...validDemoPayload,
+        fromStatus: 'Listo para revisión',
+        toStatus: 'Cambios solicitados'
+      }
+
+      // Should NOT throw — transition persisted, only chain event emit failed
+      await expect(
+        notionStatusTransitionCaptureDemoProjection.refresh(
+          { entityType: 'notion_task', entityId: 'task-uuid-1' },
+          correctionPayload as unknown as Record<string, unknown>
+        )
+      ).resolves.toBeTruthy()
+
+      expect(mocks.captureWithDomain).toHaveBeenCalledWith(
+        expect.any(Error),
+        'integrations.notion',
+        expect.objectContaining({
+          level: 'warning',
+          tags: expect.objectContaining({ stage: 'chain_event_emit' })
+        })
       )
     })
   })

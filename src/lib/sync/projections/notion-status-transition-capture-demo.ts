@@ -3,6 +3,8 @@ import 'server-only'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { EVENT_TYPES } from '../event-catalog'
+import { publishOutboxEvent } from '../publish-event'
 import type { ProjectionDefinition } from '../projection-registry'
 
 /**
@@ -210,6 +212,50 @@ export const notionStatusTransitionCaptureDemoProjection: ProjectionDefinition =
         sourceEventId,
         workspaceId: 'demo'
       })
+
+      // TASK-913 Slice 1 — Emit chain event canonical post-persist exitoso.
+      // Garantiza happens-before: capture commitea → emite → compute consume.
+      // Compute projection downstream lee task_status_transitions_demo con
+      // fila garantizadamente persistida (sin race condition).
+      //
+      // Solo correction transitions (`Listo para revisión → Cambios solicitados`)
+      // disparan el chain — otras transitions persisten pero no emiten chain
+      // event (compute solo le interesan correcciones). Defense in depth:
+      // si el filter falla, compute igual filtra por su lógica downstream.
+      const isCorrectionTransition =
+        fromStatus === 'Listo para revisión' && toStatus === 'Cambios solicitados'
+
+      if (isCorrectionTransition) {
+        try {
+          await publishOutboxEvent({
+            aggregateType: 'notion_task',
+            aggregateId: taskSourceId,
+            eventType: EVENT_TYPES.notionTaskTransitionCapturedDemo,
+            payload: {
+              schemaVersion: 1,
+              taskSourceId,
+              workspaceId: 'demo',
+              fromStatus,
+              toStatus,
+              transitionedAt,
+              sourceEventId,
+              metadata: { demo_mode: true }
+            }
+          })
+        } catch (chainErr) {
+          // Chain event emit failure es non-blocking: la transition está
+          // persistida (idempotent fix posterior puede re-emitir). Captura
+          // observability para detectar gap si emerge.
+          captureWithDomain(chainErr, 'integrations.notion', {
+            level: 'warning',
+            tags: {
+              source: 'demo_status_transition_capture',
+              stage: 'chain_event_emit'
+            },
+            extra: { taskSourceId, sourceEventId }
+          })
+        }
+      }
 
       return `task_status_transitions_demo:${taskSourceId}:${sourceEventId}`
     } catch (err) {

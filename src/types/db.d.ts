@@ -3721,6 +3721,25 @@ export interface GreenhouseDeliveryStaffAugPlacements {
   updated_by_user_id: string | null;
 }
 
+export interface GreenhouseDeliveryTaskRpaDemoSnapshots {
+  computed_at: Generated<Timestamp>;
+  correction_transitions_count: Generated<number>;
+  created_at: Generated<Timestamp>;
+  formula_version: Generated<string>;
+  notion_writeback_attempt_count: Generated<number>;
+  notion_writeback_event_id: string | null;
+  notion_writeback_last_error: string | null;
+  rpa_data_status: string;
+  rpa_value: number | null;
+  snapshot_id: Generated<string>;
+  source_event_id: string | null;
+  source_event_received_at: Timestamp | null;
+  source_mode: string;
+  task_source_id: string;
+  workspace_id: Generated<string>;
+  written_to_notion_at: Timestamp | null;
+}
+
 export interface GreenhouseDeliveryTasks {
   assignee_member_id: string | null;
   assignee_member_ids: Generated<string[]>;
@@ -9296,6 +9315,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_events": GreenhouseDeliveryStaffAugEvents;
   "greenhouse_delivery.staff_aug_onboarding_items": GreenhouseDeliveryStaffAugOnboardingItems;
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
+  "greenhouse_delivery.task_rpa_demo_snapshots": GreenhouseDeliveryTaskRpaDemoSnapshots;
   "greenhouse_delivery.task_status_transitions": GreenhouseDeliveryTaskStatusTransitions;
   "greenhouse_delivery.task_status_transitions_demo": GreenhouseDeliveryTaskStatusTransitionsDemo;
   "greenhouse_delivery.tasks": GreenhouseDeliveryTasks;
