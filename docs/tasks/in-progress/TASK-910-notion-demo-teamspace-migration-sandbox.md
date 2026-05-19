@@ -14,7 +14,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1` (gate canonical bloquea Fase 1 RpA pilot Efeonce)
 - Impact: `Alto` (demo es defense in depth crítica de toda la migración 12-14 meses)
 - Effort: `Medio` (1-2 semanas setup + maintenance overhead ~1 día/mes durante migración)
