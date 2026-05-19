@@ -1,12 +1,37 @@
-# TASK-913 — RpA V2 Writeback Pipeline Follow-up (V1.1 follow-up TASK-901 Slice 1 Foundation)
+# TASK-913 — RpA V2 Demo Pipeline End-to-End
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta V1.0 — 2026-05-19 — Demo-first pipeline shipped end-to-end
+
+**V1.0 shipped end-to-end** (4 slices commits `14ed458a..31fe319c` en `develop`):
+
+- **Slice 1** (commit `14ed458a`): outbox events `notion.task.transition_captured.demo` + `notion.task.metrics_writeback_requested.demo` canonizados, tabla `greenhouse_delivery.task_rpa_demo_snapshots` shipped (migration `20260519130951001`), reactive consumer `notion-rpa-compute-demo` invocando `calculateRpaV2Demo` sibling canonical + chain event downstream
+- **Slice 2** (commit `f063355f`): Notion API client demo-only `notion-demo-client.ts` con token físicamente separado `NOTION_METRICS_DEMO_TOKEN_SECRET_REF`, writeback projection `notion-rpa-writeback-demo` con defense in depth 7-layer (re-read PG defensive, idempotency triple, skip honest sin token, maxRetries=4)
+- **Slice 3** (commit `31fe319c`): 2 reliability signals nuevos canonical (`writeback_dead_letter_demo` ERROR si >0 + `writeback_lag_demo` warning/error kind=lag) + nightly safety net script `scripts/rpa-demo/retrigger-pending-writebacks.ts`
+- **Slice 4** (este commit): hard rules CLAUDE.md + AGENTS.md mirror + closing TASK-913 V1.0
+
+**Diseño simétrico sibling-pattern** canonizado en CLAUDE.md/AGENTS.md: cada layer demo es 1:1 mappable al productive futuro (TASK-901 Slice 4+) — promote a productivo es repointing (tablas/secretos/property names), NO rediseño.
+
+**78 tests verde** (foundation helpers + compute + writeback + signals + capture chain emit).
+
+**Setup operador-side pendiente** para activar el pipeline live:
+
+1. Notion integration `Greenhouse Metrics Demo` con permisos SOLO en teamspace Demo Greenhouse
+2. GCP Secret `notion-integration-token-greenhouse-metrics-demo` (project `efeonce-group`)
+3. Vercel env `NOTION_METRICS_DEMO_TOKEN_SECRET_REF=notion-integration-token-greenhouse-metrics-demo`
+4. Property `[GH] RpA v2` (number, read-only operadores) en Tareas DB del demo teamspace
+5. Notion webhook subscription → `/api/webhooks/notion-tasks-demo` con HMAC secret demo
+
+**V1.1 follow-up productive cutover** (TASK-901 Slice 4+, deferred): cuando demo runtime verde 4 semanas end-to-end + paridad mode shipping + HR/Finance written sign-off, replicate siblings físicos → productive (Efeonce primero, Sky después, 8 stop-gates canonical del ADR Strangler).
+
+---
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
