@@ -222,26 +222,126 @@ export const getNotionMetricsWebhookSignatureFailuresDemoSignal = async (): Prom
 
 export const WRITEBACK_DEAD_LETTER_DEMO_SIGNAL_ID = 'notion.metrics.writeback_dead_letter_demo'
 
+// Dead-letter threshold canonical: notion-rpa-writeback-demo projection
+// maxRetries=4 → snapshot con attempt_count >= 4 está exhausto.
+const WRITEBACK_DEAD_LETTER_THRESHOLD = 4
+
 export const getNotionMetricsWritebackDeadLetterDemoSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
 
-  // Writeback dead-letter detection — pending TASK-913 V1.1 Fase C cuando
-  // Cloud Tasks queue notion-writeback-demo shipee. Pre-V1.1: severity=unknown
-  // honest, no queue activa.
-  return {
-    signalId: WRITEBACK_DEAD_LETTER_DEMO_SIGNAL_ID,
-    moduleKey: MODULE_KEY,
-    kind: 'drift',
-    source: 'getNotionMetricsWritebackDeadLetterDemoSignal',
-    label: 'Writeback dead-letter demo',
-    severity: 'unknown',
-    summary:
-      'Cloud Tasks queue writeback demo pending TASK-913 V1.1 Fase C deployment. Sin data yet.',
-    observedAt,
-    evidence: [
-      { kind: 'doc', label: 'Spec Fase C', value: 'TASK-913 V1.1 follow-up' },
-      { kind: 'doc', label: 'Pattern fuente', value: 'TASK-878 dead-letter handling' }
-    ]
+  try {
+    // TASK-913 Slice 3 — Real signal canonical sobre task_rpa_demo_snapshots.
+    // Detecta snapshots con writeback exhausto (attempt_count >= threshold)
+    // AND last_error NOT NULL AND aún no written. Indica:
+    // - Notion API rate limit sostenido (unlikely para demo low volume)
+    // - Integration token revocado / corrupto
+    // - Notion page borrada del teamspace
+    // - Bug en property name / shape
+    const rows = await query<{ count: string; latest_error: string | null }>(
+      `SELECT
+          COUNT(*)::text AS count,
+          MAX(notion_writeback_last_error) AS latest_error
+       FROM greenhouse_delivery.task_rpa_demo_snapshots
+       WHERE notion_writeback_attempt_count >= $1
+         AND notion_writeback_last_error IS NOT NULL
+         AND written_to_notion_at IS NULL`,
+      [WRITEBACK_DEAD_LETTER_THRESHOLD]
+    )
+
+    const count = Number(rows[0]?.count ?? 0)
+    const latestError = rows[0]?.latest_error ?? null
+
+    const severity: ReliabilitySignal['severity'] = count === 0 ? 'ok' : 'error'
+
+    return {
+      signalId: WRITEBACK_DEAD_LETTER_DEMO_SIGNAL_ID,
+      moduleKey: MODULE_KEY,
+      kind: 'drift',
+      source: 'getNotionMetricsWritebackDeadLetterDemoSignal',
+      label: 'Writeback dead-letter demo',
+      severity,
+      summary:
+        count === 0
+          ? 'Steady state — zero snapshots en dead-letter (attempt_count >= 4).'
+          : `${count} snapshots en dead-letter. Revisar Notion token + property [GH] RpA v2 + rate limit.`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'dead_letter_count', value: String(count) },
+        { kind: 'metric', label: 'threshold_attempts', value: String(WRITEBACK_DEAD_LETTER_THRESHOLD) },
+        { kind: 'metric', label: 'latest_error', value: latestError?.slice(0, 200) ?? 'none' }
+      ]
+    }
+  } catch (err) {
+    captureWithDomain(err, 'integrations.notion', {
+      tags: { source: 'reliability_signal_writeback_dead_letter_demo' }
+    })
+
+    return buildErrorSignal(WRITEBACK_DEAD_LETTER_DEMO_SIGNAL_ID, 'Writeback dead-letter demo', err, observedAt)
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// 4b. notion.metrics.writeback_lag_demo (TASK-913 Slice 3 new)
+// ════════════════════════════════════════════════════════════════════════════
+
+export const WRITEBACK_LAG_DEMO_SIGNAL_ID = 'notion.metrics.writeback_lag_demo'
+
+// Threshold canonical para "demasiado lag": reactive consumer corre cada 5 min
+// + Notion API typical latency <1s → un snapshot pending > 30 min indica un
+// problema real (consumer caído, token corrupto, snapshot fuera del happy path).
+const WRITEBACK_LAG_THRESHOLD_MIN = 30
+
+export const getNotionMetricsWritebackLagDemoSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = new Date().toISOString()
+
+  try {
+    // TASK-913 Slice 3 — Detecta snapshots pending writeback con lag overdue.
+    // Filtra solo snapshots writable (rpa_data_status='valid' + value != NULL)
+    // y aún NO en dead-letter (attempt_count < threshold). Esos son los que
+    // el reactive consumer debería estar procesando activamente.
+    const rows = await query<{ count: string; oldest_age_minutes: string | null }>(
+      `SELECT
+          COUNT(*)::text AS count,
+          MAX(EXTRACT(EPOCH FROM (NOW() - computed_at)) / 60)::text AS oldest_age_minutes
+       FROM greenhouse_delivery.task_rpa_demo_snapshots
+       WHERE rpa_data_status = 'valid'
+         AND rpa_value IS NOT NULL
+         AND written_to_notion_at IS NULL
+         AND notion_writeback_attempt_count < $1
+         AND computed_at < NOW() - INTERVAL '${WRITEBACK_LAG_THRESHOLD_MIN} minutes'`,
+      [WRITEBACK_DEAD_LETTER_THRESHOLD]
+    )
+
+    const count = Number(rows[0]?.count ?? 0)
+    const oldestAgeMin = rows[0]?.oldest_age_minutes ? Math.round(Number(rows[0].oldest_age_minutes)) : 0
+
+    const severity: ReliabilitySignal['severity'] =
+      count === 0 ? 'ok' : count <= 3 ? 'warning' : 'error'
+
+    return {
+      signalId: WRITEBACK_LAG_DEMO_SIGNAL_ID,
+      moduleKey: MODULE_KEY,
+      kind: 'lag',
+      source: 'getNotionMetricsWritebackLagDemoSignal',
+      label: 'Writeback lag demo',
+      severity,
+      summary:
+        count === 0
+          ? `Steady state — zero snapshots con lag > ${WRITEBACK_LAG_THRESHOLD_MIN}min.`
+          : `${count} snapshots pending writeback > ${WRITEBACK_LAG_THRESHOLD_MIN}min (oldest=${oldestAgeMin}min). Reactive consumer puede estar caído o token revocado.`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'lag_count', value: String(count) },
+        { kind: 'metric', label: 'threshold_minutes', value: String(WRITEBACK_LAG_THRESHOLD_MIN) },
+        { kind: 'metric', label: 'oldest_age_minutes', value: String(oldestAgeMin) }
+      ]
+    }
+  } catch (err) {
+    captureWithDomain(err, 'integrations.notion', {
+      tags: { source: 'reliability_signal_writeback_lag_demo' }
+    })
+
+    return buildErrorSignal(WRITEBACK_LAG_DEMO_SIGNAL_ID, 'Writeback lag demo', err, observedAt)
   }
 }
 

@@ -47,6 +47,7 @@ import {
   getNotionMetricsEchoLoopDemoSignal,
   getNotionMetricsWebhookSignatureFailuresDemoSignal,
   getNotionMetricsWritebackDeadLetterDemoSignal,
+  getNotionMetricsWritebackLagDemoSignal,
   getNotionMetricsDemoTeamspaceDriftSignal,
   getPayrollBonusDemoContaminationSignal
 } from './queries/notion-metrics-demo-signals'
@@ -1299,6 +1300,7 @@ export const getReliabilityOverview = async (
           getNotionMetricsEchoLoopDemoSignal().catch(() => null),
           getNotionMetricsWebhookSignatureFailuresDemoSignal().catch(() => null),
           getNotionMetricsWritebackDeadLetterDemoSignal().catch(() => null),
+          getNotionMetricsWritebackLagDemoSignal().catch(() => null),
           getNotionMetricsDemoTeamspaceDriftSignal().catch(() => null),
           getPayrollBonusDemoContaminationSignal().catch(() => null)
         ])
