@@ -2421,6 +2421,10 @@ export interface GreenhouseCoreMembers {
   hire_date: Timestamp | null;
   hubspot_owner_id: string | null;
   identity_profile_id: string | null;
+  /**
+   * TASK-910 — TRUE indica member sintético del demo teamspace Notion (Demo Greenhouse). Defense in depth: bonus calculation NUNCA procesa demo members (filter en fetchKpisForPeriod + pre-check en calculateRpaBonus/calculateOtdBonus). FALSE para todos los members reales (Efeonce internos + clientes Sky/etc.).
+   */
+  is_demo: Generated<boolean>;
   job_level: string | null;
   languages: string[] | null;
   /**
@@ -3788,6 +3792,23 @@ export interface GreenhouseDeliveryTaskStatusTransitions {
   transitioned_at: Timestamp;
   transitioned_by: string | null;
   workspace_id: string;
+}
+
+export interface GreenhouseDeliveryTaskStatusTransitionsDemo {
+  assignee_member_id: string | null;
+  captured_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  demo_metadata: Json | null;
+  from_status: string;
+  source_event_id: string | null;
+  source_quality: Generated<string>;
+  space_id: string | null;
+  task_source_id: string;
+  to_status: string;
+  transition_id: Generated<string>;
+  transitioned_at: Timestamp;
+  transitioned_by: string | null;
+  workspace_id: Generated<string>;
 }
 
 export interface GreenhouseFinanceAccountBalances {
@@ -9276,6 +9297,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_onboarding_items": GreenhouseDeliveryStaffAugOnboardingItems;
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
   "greenhouse_delivery.task_status_transitions": GreenhouseDeliveryTaskStatusTransitions;
+  "greenhouse_delivery.task_status_transitions_demo": GreenhouseDeliveryTaskStatusTransitionsDemo;
   "greenhouse_delivery.tasks": GreenhouseDeliveryTasks;
   "greenhouse_finance.account_balances": GreenhouseFinanceAccountBalances;
   "greenhouse_finance.account_balances_monthly": GreenhouseFinanceAccountBalancesMonthly;

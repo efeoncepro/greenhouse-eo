@@ -1186,6 +1186,22 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'organization',
     actions: ['execute'] as const,
     defaultScope: 'tenant'
+  },
+  // TASK-910 — Notion Demo Teamspace Sandbox capabilities (canonical defense in depth).
+  // Demo teamspace (Notion 36339c2f-...4ca0f5-...) sirve como gate canonical pre-Fase 1
+  // del ADR GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Demo NUNCA toca payroll real
+  // (filter via members.is_demo en fetchKpisForPeriod + pre-check en bonus helpers).
+  {
+    key: 'notion.metrics.demo.execute',
+    module: 'admin',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'notion.metrics.demo.read',
+    module: 'admin',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
   }
 ] as const
 
