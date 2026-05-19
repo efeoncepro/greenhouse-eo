@@ -31,6 +31,14 @@ on:
       - 'src/lib/auth/**'
       - 'src/lib/auth-secrets.ts'
       - 'src/lib/secrets/**'
+      # ops-worker hosts /reliability-ai-watch which invokes getReliabilityOverview
+      # + getReliabilityAiObserver → demo signal readers (TASK-910/913). Sin este
+      # filter, fixes a las queries demo (e.g. canonical schema corrections) NO
+      # triggerean redeploy y quedan en Sentry generando alertas hasta que otro
+      # push toque paths filtrados. Live discovery durante hotfix JAVASCRIPT-NEXTJS-67/68
+      # (2026-05-19) — canonical schema fix demo signals quedó stranded post-merge.
+      - 'src/lib/reliability/**'
+      - 'src/lib/notion-metrics/**'
   workflow_dispatch:
     inputs:
       environment:
