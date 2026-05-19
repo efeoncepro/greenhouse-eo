@@ -209,6 +209,39 @@ describe('TASK-913 Slice 2 — notion-rpa-writeback-demo canonical', () => {
     })
   })
 
+  describe('refresh — token-not-configured graceful skip (degraded honest)', () => {
+    it('skip silente sin burn attempt_count cuando token NO resolvable (secret missing)', async () => {
+      mocks.runGreenhousePostgresQuery.mockResolvedValueOnce([snapshotRow])
+      // NotionDemoClientUnavailableError mock — replicates resolver throw
+      const tokenErr = new Error('Demo Notion integration token resolution failed')
+
+      tokenErr.name = 'NotionDemoClientUnavailableError'
+      Object.setPrototypeOf(
+        tokenErr,
+        Object.getPrototypeOf(
+          new (
+            await import('@/lib/notion-metrics/notion-demo-client')
+          ).NotionDemoClientUnavailableError('test')
+        )
+      )
+      mocks.patchNotionDemoPage.mockRejectedValueOnce(tokenErr)
+
+      const result = await notionRpaWritebackDemoProjection.refresh(
+        { entityType: 'rpa_snapshot_demo', entityId: 'snap-uuid-001' },
+        validWritebackPayload
+      )
+
+      // Skip honest — NO mark failed, NO Sentry capture, NO throw
+      expect(result).toBe('rpa_writeback_demo:snap-uuid-001:skipped:token_unavailable')
+
+      // Only the read snapshot call should have happened — NO mark_failed UPDATE
+      expect(mocks.runGreenhousePostgresQuery).toHaveBeenCalledTimes(1)
+
+      // No Sentry capture for "expected degraded state"
+      expect(mocks.captureWithDomain).not.toHaveBeenCalled()
+    })
+  })
+
   describe('refresh — error handling + retry policy', () => {
     it('marca snapshot failed + throw cuando PATCH Notion falla', async () => {
       mocks.runGreenhousePostgresQuery

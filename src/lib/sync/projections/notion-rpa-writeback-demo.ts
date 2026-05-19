@@ -239,6 +239,21 @@ export const notionRpaWritebackDemoProjection: ProjectionDefinition = {
         [NOTION_PROPERTY_RPA_V2]: { number: snapshot.rpa_value }
       })
     } catch (err) {
+      // Distinguish "config not ready" vs "real Notion API failure":
+      //
+      // - `NotionDemoClientUnavailableError` = token not resolved (secret missing
+      //   or content corrupt). Degraded honest: skip sin burn attempt_count, sin
+      //   Sentry spam, sin mark failed. Next reactive tick reintenta automático;
+      //   cuando operador completa setup (uploads token), succeeds. Reliability
+      //   signal canonical `writeback_lag_demo` alerta si lag persiste > 30 min.
+      //
+      // - Cualquier otro error (rate limit, 401 token revocado, 404 page missing,
+      //   network) = real failure. Mark failed + capture + re-throw para retry
+      //   exponencial canonical (maxRetries=4 → dead-letter).
+      if (err instanceof NotionDemoClientUnavailableError) {
+        return `rpa_writeback_demo:${snapshotId}:skipped:token_unavailable`
+      }
+
       const message = err instanceof Error ? err.message : String(err)
 
       // Mark failure first (best effort)

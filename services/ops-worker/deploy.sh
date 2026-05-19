@@ -341,6 +341,30 @@ else
   echo "  HubSpot access token: secret '${HUBSPOT_ACCESS_TOKEN_SECRET_NAME}' not found — hubspot_services_intake projection will fail."
 fi
 
+# TASK-913 — NOTION_METRICS_DEMO_TOKEN_SECRET_REF para writeback demo projection.
+# Required por `src/lib/notion-metrics/notion-demo-client.ts` cuando el reactive
+# consumer `notion-rpa-writeback-demo` invoca PATCH /v1/pages/{id} sobre el
+# teamspace Demo Greenhouse. Sin este env var configurado, el resolver degrada
+# honest via `NotionDemoClientUnavailableError` (skip silente, no Sentry spam,
+# no attempt_count burn) y reliability signal `writeback_lag_demo` alerta.
+#
+# Defense in depth canonical: el token físicamente separado del productive
+# NOTION_TOKEN — permisos SOLO sobre teamspace Demo Greenhouse, NUNCA accesible
+# a databases Efeonce/Sky productivos.
+#
+# Pre-wired desde Slice 4 closing 2026-05-19. Activation depende de operator
+# uploading version al secret `notion-integration-token-greenhouse-metrics-demo`
+# (ver runbook docs/operations/runbooks/rpa-v2-demo-activation.md).
+NOTION_METRICS_DEMO_TOKEN_SECRET_REF="${NOTION_METRICS_DEMO_TOKEN_SECRET_REF:-notion-integration-token-greenhouse-metrics-demo}"
+ENV_VARS="${ENV_VARS},NOTION_METRICS_DEMO_TOKEN_SECRET_REF=${NOTION_METRICS_DEMO_TOKEN_SECRET_REF}"
+
+if gcloud secrets describe "${NOTION_METRICS_DEMO_TOKEN_SECRET_REF}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  ensure_secret_accessor_binding "${NOTION_METRICS_DEMO_TOKEN_SECRET_REF}:latest"
+  echo "  Notion metrics demo token: secret '${NOTION_METRICS_DEMO_TOKEN_SECRET_REF}' exists; IAM binding ensured."
+else
+  echo "  Notion metrics demo token: secret '${NOTION_METRICS_DEMO_TOKEN_SECRET_REF}' not found — writeback demo will degrade honest until operator uploads version."
+fi
+
 ensure_secret_accessor_binding "${NEXTAUTH_SECRET_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
 ensure_secret_accessor_binding "${AZURE_AD_CLIENT_SECRET_REF}"
