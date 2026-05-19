@@ -14,7 +14,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete` (V1.0 shipped end-to-end 2026-05-19 directo en `develop` — 6 slices canonical + 5 demo members live + governance doc + CLAUDE.md/AGENTS.md hard rules. Operador-side prerequisites pendientes: GCP secret + Notion webhook subscription + páginas demo opcional. Re-abrir SOLO si emerge issue durante operador setup o post-cutover demo.)
 - Priority: `P1` (gate canonical bloquea Fase 1 RpA pilot Efeonce)
 - Impact: `Alto` (demo es defense in depth crítica de toda la migración 12-14 meses)
 - Effort: `Medio` (1-2 semanas setup + maintenance overhead ~1 día/mes durante migración)

@@ -1,3 +1,44 @@
+# Sesion 2026-05-19 — TASK-910 V1.0 shipped end-to-end (Notion Demo Teamspace Sandbox)
+
+**Status**: ✅ TASK-910 V1.0 shipped end-to-end directo en `develop` en 6 slices canonical. Demo teamspace `Demo Greenhouse` (Notion `36339c2f-efe7-814c-a0f5-0042863dbb5a`) ahora tiene infraestructura Greenhouse-side completa: migration + helpers + webhook handler + reactive consumer + reliability signals + bonus guardrail dual + governance doc. 5 demo members sintéticos live en PG.
+
+**Garantía operativa canonical**: demo NUNCA afecta colaboradores reales (KPIs, bonus, payroll, dashboards productivos) — defense in depth de **9 capas**.
+
+**Slices canonical (6 commits)**:
+
+| Slice | Commit | Highlight |
+|---|---|---|
+| 0 | `af32d79a` | Migration foundation: tabla demo + `members.is_demo` + space_notion_sources demo + webhook_endpoints + 2 capabilities + triggers anti-UPDATE/anti-DELETE |
+| 1 | `12a80d77` | Demo-members helpers + 5 live (Demo Juan/Maria/Pedro/Ana/Carlos @ demo.greenhouse.efeonce.org) + setup script idempotent + 17 tests |
+| 2 | `42dbf6c8` | Webhook handler `/api/webhooks/notion-tasks-demo` + HMAC dedicated + echo-loop + property allowlist + status normalization canonical + 23 tests |
+| 3 | `f3db9bb6` | Reactive consumer + filter strict `metadata.demo_mode === true` + persist en tabla físicamente separada + 19 tests |
+| 4 | `563a6fc1` | 6 reliability signals canonical (5 delivery + 1 CRITICAL payroll defense in depth) |
+| 5 | `00b5e8ab` | Bonus guardrail defense-in-depth DUAL: filter SQL upstream + pre-check wrappers + 24 tests anti-regresión |
+| 6 | (this commit) | Governance doc + CLAUDE.md/AGENTS.md hard rules + closing canonical |
+
+**Defense in depth canonical de 9 capas** (demo NUNCA afecta payroll real):
+
+1. Tabla físicamente separada `task_status_transitions_demo` (CHECK workspace_id='demo')
+2. Discriminator `members.is_demo BOOLEAN DEFAULT FALSE`
+3. Webhook dedicated + HMAC secret separado (`notion-webhook-signing-secret-demo`)
+4. `space_notion_sources.sync_enabled=FALSE` → sync legacy NO procesa demo
+5. Helper `isDemoMember` strict `=== true` (anti-coersion)
+6. Filter SQL `filterOutDemoMembers` en `fetchKpisForPeriod` (Capa 1 dual)
+7. Pre-check wrappers `calculateRpaBonusForMember/calculateOtdBonusForMember` (Capa 2 dual)
+8. Reactive consumer filter strict `payload.metadata.demo_mode === true`
+9. Reliability signal `payroll.bonus.demo_member_contamination` (steady=0, ERROR si > 0)
+
+**Operador-side prerequisites pendientes** (no bloquea V1.0 ship — handler dormant hasta listos):
+
+1. Crear GCP secret `notion-webhook-signing-secret-demo`
+2. Vercel env var `NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF`
+3. Registrar Notion webhook subscription en Notion Developer Console
+4. (Opcional) Poblar 5-10 tareas test en demo + Notion People sintéticos
+
+**Spec canonical**: `docs/tasks/complete/TASK-910-notion-demo-teamspace-migration-sandbox.md`. Governance: `docs/operations/notion-demo-teamspace-governance.md`.
+
+---
+
 # Sesion 2026-05-18 (cont. — TASK-911 V1.0 closure + drift discovery prod cutover ya ejecutado)
 
 **Status**: ✅ TASK-911 cerrado preliminar directo en `develop` con Lifecycle `complete` + observation period 30d en curso hasta 2026-06-17. **Drift critical discovery**: el cutover prod TASK-900 ya se ejecutó tácitamente durante la sesión TASK-900 ship live 2026-05-18 ~19:11 UTC, NO requería una sesión separada como asumía la spec original. Razón canonical: solo existe UN servicio Cloud Run `ico-batch-worker` en proyecto `efeonce-group` (no hay staging/prod separados a nivel infrastructure) + workflow `ico-batch-deploy.yml` triggea por push develop (no por merge develop→main). El "staging cutover" del Handoff anterior fue en realidad el ÚNICO cutover porque sirve el cron diario producción real.

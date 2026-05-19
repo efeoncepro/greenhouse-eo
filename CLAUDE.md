@@ -4279,6 +4279,61 @@ IDs distintos vs productivos (Efeonce DS `5126d7d8-...`, Sky DS `23039c2f-...`) 
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md` (ADR — 8 stop-gates + demo gate + 6 fases ramp + recovery primitives). Demo teamspace governance: `docs/tasks/to-do/TASK-910-notion-demo-teamspace-migration-sandbox.md` §Detailed Spec.
 
+### Notion Demo Teamspace Sandbox invariants (TASK-910, desde 2026-05-19)
+
+Setup canonical Greenhouse-side del demo teamspace `Demo Greenhouse` (Notion `36339c2f-efe7-814c-a0f5-0042863dbb5a`) creado live 2026-05-17 por operador. Gate canonical pre-Fase 1 del ADR Progressive Migration. Demo NUNCA afecta colaboradores reales en KPIs, bonus, payroll, ni dashboards productivos.
+
+**Defense in depth canonical de 9 capas**:
+
+1. **Tabla físicamente separada** `greenhouse_delivery.task_status_transitions_demo` (CHECK `workspace_id='demo'` + triggers anti-UPDATE/anti-DELETE — shipped migration `20260519120713456`)
+2. **Discriminator canonical** `members.is_demo BOOLEAN NOT NULL DEFAULT FALSE` con index parcial
+3. **Webhook dedicated** `/api/webhooks/notion-tasks-demo` + HMAC secret separado `NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF` (GCP `notion-webhook-signing-secret-demo`)
+4. **Sync legacy NO procesa demo** — `space_notion_sources.sync_enabled = FALSE` para demo space (notion-bq-sync legacy excluye)
+5. **Helper `isDemoMember` strict** `=== true` canonical (anti-coersion contra truthy values)
+6. **Filter SQL canonical** en `fetchKpisForPeriod`: `filterOutDemoMembers()` excluye demo del payroll input ANTES de BQ query
+7. **Pre-check helpers** `calculateRpaBonusForMember` + `calculateOtdBonusForMember` (defense in depth dual con wrappers canonical)
+8. **Reactive consumer filter** `payload.metadata.demo_mode === true` (strict, anti-coersion) — demo events solo entran a tabla demo
+9. **Reliability signal `payroll.bonus.demo_member_contamination`** (steady=0, ERROR canonical si > 0 — NUNCA debe pasar)
+
+**Capabilities canonical V1.0**:
+
+- `notion.metrics.demo.execute` (module=admin, scope=tenant) — EFEONCE_ADMIN
+- `notion.metrics.demo.read` (module=admin, scope=tenant) — EFEONCE_ADMIN + HR_MANAGER + EFEONCE_OPERATIONS
+
+**6 reliability signals canonical** bajo subsystem rollup `delivery` (5) + `payroll` (1 critical):
+
+- `notion.metrics.shadow_paridad_rpa_demo` (drift)
+- `notion.metrics.echo_loop_detected_demo` (drift, steady=0)
+- `notion.metrics.webhook_signature_failures_demo` (drift, steady=0)
+- `notion.metrics.writeback_dead_letter_demo` (drift, deferred TASK-913 V1.1)
+- `notion.metrics.demo_teamspace_drift` (drift, schema vs canonical V1)
+- `payroll.bonus.demo_member_contamination` (drift, **ERROR canonical si > 0**)
+
+**⚠️ Reglas duras canonical**:
+
+- **NUNCA** computar bonus para demo members. Filter SQL en `fetchKpisForPeriod` + pre-check en `guardDemoMemberBonus` wrappers garantizan defense in depth dual.
+- **NUNCA** mezclar demo events con productivos en tabla `task_status_transitions`. Físicamente separadas — CHECK constraint `workspace_id='demo'` rechaza INSERT cross-tenant.
+- **NUNCA** compartir webhook HMAC secret entre prod y demo. GCP secrets separados (`notion-webhook-signing-secret-{efeonce|sky|demo}`). Leak en uno NO compromete los otros.
+- **NUNCA** permitir cliente externo (Sky, etc.) access al demo teamspace. Solo interno Greenhouse + HR + Delivery (`notion.metrics.demo.read` capability matrix canonical).
+- **NUNCA** desincronizar schema demo del template Efeonce sin update governance doc + reliability signal `demo_teamspace_drift` review.
+- **NUNCA** archivar demo durante la migración (12-14 meses canonical per ADR Strangler). Demo es load-bearing.
+- **NUNCA** activar `sync_enabled=TRUE` en demo `space_notion_sources` row. Sync legacy NO procesa demo — defense in depth contra contaminate `greenhouse_conformed.delivery_*` + `metrics_by_*` productivos.
+- **NUNCA** marcar real member con `is_demo=TRUE` manualmente. Helper `registerDemoMember` rechaza convertir real (is_demo=FALSE existente) a demo. Invariant anti-corruption.
+- **NUNCA** invocar `Sentry.captureException()` directo en demo code paths. Usar `captureWithDomain('integrations.notion', { tags: { source: 'demo_<stage>' } })` o `'payroll'` para signal contamination.
+- **NUNCA** desactivar el filter SQL en `fetchKpisForPeriod` ni los wrappers `calculateRpaBonusForMember/calculateOtdBonusForMember`. Defense in depth dual es load-bearing.
+- **SIEMPRE** que un nuevo bug class demo emerja, agregar test anti-regresión en `bonus-proration.test.ts` (demo member → $0 bonus + qualifies=false canonical).
+- **SIEMPRE** que un consumer payroll nuevo emerja que llame `fetchKpisForPeriod`, verificar que el filter `filterOutDemoMembers` corre antes de cualquier read BQ.
+
+**Helpers canonical**:
+
+- `src/lib/identity/demo-members.ts`: `registerDemoMember`, `isDemoMember`, `listDemoMembers`, `countDemoMembers`
+- `src/lib/webhooks/handlers/notion-tasks-demo.ts`: webhook handler con HMAC + echo-loop + property allowlist + status normalization
+- `src/lib/sync/projections/notion-status-transition-capture-demo.ts`: reactive consumer + filter strict + persist en tabla demo
+- `src/lib/payroll/bonus-proration.ts`: `guardDemoMemberBonus`, `calculateRpaBonusForMember`, `calculateOtdBonusForMember`
+- `src/lib/reliability/queries/notion-metrics-demo-signals.ts`: 6 signal readers canonical
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-910-notion-demo-teamspace-migration-sandbox.md`. Governance doc: `docs/operations/notion-demo-teamspace-governance.md`.
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa
