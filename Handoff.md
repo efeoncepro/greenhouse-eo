@@ -1,3 +1,56 @@
+# Sesion 2026-05-19 — TASK-913 V1.0 shipped end-to-end (RpA V2 Demo Pipeline End-to-End)
+
+**Status**: ✅ TASK-913 V1.0 shipped end-to-end directo en `develop` en 4 slices canonical. Pipeline completo RpA V2 demo desde captura webhook → compute via `calculateRpaV2Demo` → snapshot PG → PATCH Notion `[GH] RpA v2`. Carril paralelo invisible al productive durante toda la migración Strangler. Diseño simétrico sibling-pattern canonizado para que cutover productive (TASK-901 Slice 4+) sea repointing, NO rediseño.
+
+**Garantía operativa canonical**: demo NUNCA toca Efeonce/Sky productivos — defense in depth 14-layer (heredadas TASK-910 + extendidas TASK-913). Token Notion físicamente separado con permisos SOLO sobre teamspace Demo Greenhouse.
+
+**Slices canonical TASK-913 (4 commits)**:
+
+| Slice | Commit | Highlight |
+|---|---|---|
+| 1 | `14ed458a` | Outbox events nuevos (`notion.task.transition_captured.demo` + `notion.task.metrics_writeback_requested.demo`) + tabla `task_rpa_demo_snapshots` (migration `20260519130951001`) + foundation helpers demo (`count-correction-transitions-demo`, `calculate-rpa-v2-demo`) + compute projection + capture extension con chain emit |
+| 2 | `f063355f` | Notion demo client físicamente separado (token `NOTION_METRICS_DEMO_TOKEN_SECRET_REF`) + writeback projection con defense in depth 7-layer (re-read PG defensive, idempotency triple, skip honest sin token, maxRetries=4) |
+| 3 | `31fe319c` | 2 reliability signals nuevos canonical (`writeback_dead_letter_demo` ERROR si >0, `writeback_lag_demo` kind=lag) + nightly safety net script `retrigger-pending-writebacks.ts` |
+| 4 | (this commit) | CLAUDE.md/AGENTS.md hard rules canonical + spec move to-do→in-progress + README index + Handoff + changelog |
+
+**Pipeline canonical event-driven** (4 capas decoupled via outbox):
+
+```text
+Notion edit demo → webhook /notion-tasks-demo (HMAC + echo-loop filter)
+  → notion.task.status_transitioned (metadata.demo_mode=true)
+    → capture-demo persiste task_status_transitions_demo
+      → notion.task.transition_captured.demo (chain canonical anti race)
+        → compute-demo invoca calculateRpaV2Demo + persiste task_rpa_demo_snapshots
+          → notion.task.metrics_writeback_requested.demo
+            → writeback-demo re-read PG + PATCH Notion [GH] RpA v2
+              → snapshot.written_to_notion_at = NOW()
+```
+
+**Diseño simétrico sibling-pattern canonical** (cero rediseño para cutover productive):
+
+- Foundation helpers: `count-correction-transitions{-demo}.ts` ↔ sibling
+- Mapper canonical: `calculate-rpa-v2{-demo}.ts` ↔ sibling
+- Projections: `notion-{capture,compute,writeback}{-demo}.ts` ↔ siblings futuros
+- Notion clients: `notion-demo-client.ts` (token separado) ↔ `notion-client.ts` (productive)
+- Tablas PG: `task_rpa_demo_snapshots` ↔ `task_rpa_snapshots` (futuro)
+- Eventos: `*.demo` ↔ `*.prod` (futuro)
+
+**78 tests verde** end-to-end: foundation helpers + compute projection (21) + writeback projection (19) + capture chain emit (3 nuevos sobre 23 existentes) + signals demo (9 nuevos sobre 5 existentes) + calculate-rpa-v2-demo (7).
+
+**Setup operador-side pendiente para live activation** (no bloquea ship — dormant hasta listos):
+
+1. Notion integration `Greenhouse Metrics Demo` con permisos SOLO sobre teamspace Demo Greenhouse
+2. GCP Secret `notion-integration-token-greenhouse-metrics-demo` (project `efeonce-group`)
+3. Vercel env `NOTION_METRICS_DEMO_TOKEN_SECRET_REF=notion-integration-token-greenhouse-metrics-demo`
+4. Property `[GH] RpA v2` (number, read-only operadores) en Tareas DB del demo teamspace
+5. Notion webhook subscription para `/api/webhooks/notion-tasks-demo`
+
+**V1.1 follow-up productive cutover** (TASK-901 Slice 4+, deferred): cuando demo runtime verde 4 semanas + paridad shipping + HR/Finance sign-off + 8 stop-gates ADR Strangler, replicate siblings físicos al productive (Efeonce primero, Sky después).
+
+**Spec canonical**: `docs/tasks/in-progress/TASK-913-rpa-v2-demo-pipeline-end-to-end.md` (Delta V1.0 2026-05-19). ADR Strangler: `docs/architecture/GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`. CLAUDE.md sección "RpA V2 Demo Pipeline End-to-End invariants (TASK-913, desde 2026-05-19)" canonizada. AGENTS.md mirror canonizado.
+
+---
+
 # Sesion 2026-05-19 — TASK-910 V1.0 shipped end-to-end (Notion Demo Teamspace Sandbox)
 
 **Status**: ✅ TASK-910 V1.0 shipped end-to-end directo en `develop` en 6 slices canonical. Demo teamspace `Demo Greenhouse` (Notion `36339c2f-efe7-814c-a0f5-0042863dbb5a`) ahora tiene infraestructura Greenhouse-side completa: migration + helpers + webhook handler + reactive consumer + reliability signals + bonus guardrail dual + governance doc. 5 demo members sintéticos live en PG.

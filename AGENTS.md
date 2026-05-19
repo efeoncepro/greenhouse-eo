@@ -873,6 +873,88 @@ Setup canonical del demo teamspace `Demo Greenhouse` (Notion `36339c2f-efe7-814c
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-910-notion-demo-teamspace-migration-sandbox.md`. Governance doc: `docs/operations/notion-demo-teamspace-governance.md`.
 
+### RpA V2 Demo Pipeline End-to-End (TASK-913, desde 2026-05-19)
+
+Pipeline canonical RpA V2 demo end-to-end: status transition Notion → captura demo → compute RpA V2 → persist snapshot → PATCH Notion `[GH] RpA v2`. Carril paralelo invisible al productive durante toda la migración Strangler. Sólo opera sobre teamspace Demo Greenhouse; NUNCA toca Efeonce/Sky productivos.
+
+**Cadena event-driven** (4 capas decoupled vía outbox, mirror TASK-771):
+
+1. Webhook Notion → `notion.task.status_transitioned` con `metadata.demo_mode=true`
+2. `notion-status-transition-capture-demo` persiste `task_status_transitions_demo` → emite `notion.task.transition_captured.demo` (chain) si correction transition
+3. `notion-rpa-compute-demo` invoca `calculateRpaV2Demo` → persiste row en `task_rpa_demo_snapshots` → emite `notion.task.metrics_writeback_requested.demo` si valid
+4. `notion-rpa-writeback-demo` re-reads PG defensive + PATCH Notion `[GH] RpA v2`
+
+**Diseño simétrico canonical sibling-pattern** (forward-compat productive cutover por repointing, NO rediseño):
+
+- `count-correction-transitions{-demo}.ts` — foundation helper
+- `calculate-rpa-v2{-demo}.ts` — mapper canonical
+- `notion-{capture,compute,writeback}{-demo}.ts` — projections siblings
+- `notion-{demo-,}client.ts` — Notion API client con token físicamente separado
+- `task_rpa{,_demo}_snapshots` — PG tables sibling
+- Eventos `*.demo` ↔ `*.prod`
+
+**Tabla canonical** `greenhouse_delivery.task_rpa_demo_snapshots` (migration `20260519130951001`):
+
+- PK UUID + CHECK `workspace_id='demo'` + 4 indexes hot path
+- Append-only triggers (excepción canonical: writeback columns mutable para idempotency)
+- UNIQUE partial INDEX sobre `source_event_id WHERE NOT NULL`
+
+**2 reliability signals canonical nuevos**:
+
+- `notion.metrics.writeback_dead_letter_demo` (drift, ERROR si `attempt_count >= 4 AND last_error IS NOT NULL AND NOT written`)
+- `notion.metrics.writeback_lag_demo` (lag, warning 1-3 / error >3, snapshots pending > 30min)
+
+**Nightly safety net**: `scripts/rpa-demo/retrigger-pending-writebacks.ts` — re-emite chain event para snapshots lag overdue. Idempotent canonical.
+
+**Defense in depth canonical** (heredadas TASK-910 + extendidas):
+
+- Token Notion físicamente separado (`NOTION_METRICS_DEMO_TOKEN_SECRET_REF` → GCP `notion-integration-token-greenhouse-metrics-demo`) con permisos SOLO en teamspace Demo Greenhouse
+- Re-read snapshot from PG defensive en writeback (NUNCA confía payload)
+- Skip honest cuando token NO configurado (degraded honest, NO degrada silenciosamente)
+- Idempotency triple: ON CONFLICT (compute) + `written_to_notion_at` guard (writeback) + PATCH Notion idempotent
+- `maxRetries=4` writeback antes de dead-letter
+
+**⚠️ Reglas duras canonical** (mirror CLAUDE.md):
+
+- **NUNCA** drift entre demo y productive siblings. Re-export types canonical desde productive. Cambio en uno se refleja en el otro.
+- **NUNCA** mezclar lógica demo + productive en mismo módulo. Siblings físicamente separados es el patrón canonical — `if (isDemo)` está prohibido.
+- **NUNCA** parametrize `tableName: string` en foundation helpers — siblings físicos enforce boundary a nivel código.
+- **NUNCA** compartir integration token Notion entre demo y productive. Secrets físicamente separados en GCP.
+- **NUNCA** escribir property `[GH] RpA v2` en databases productivas usando demo writeback. Defense in depth dual.
+- **NUNCA** crear consumer downstream que confíe `rpaValue` del payload sin re-read PG. Payload es trigger; verdad = PG.
+- **NUNCA** ON UPDATE columnas append-only de `task_rpa_demo_snapshots` (todas excepto writeback columns). Trigger PG enforce.
+- **NUNCA** persistir snapshot con `rpa_data_status='valid' AND rpa_value=NULL`. CHECK constraint rechaza.
+- **NUNCA** invocar `Sentry.captureException()` directo en pipeline demo. Usar `captureWithDomain('integrations.notion', { tags: { source: 'demo_<stage>' } })`.
+- **NUNCA** correr pipeline demo en paralelo con legacy sync (`space_notion_sources.sync_enabled=TRUE` para demo).
+- **NUNCA** auto-promover pipeline demo a productive sin pasar por los 8 stop-gates del ADR Strangler.
+- **NUNCA** escalar volumen writeback demo > Notion rate limit ~3 req/s sin migrar a Cloud Tasks throttled.
+- **NUNCA** modificar `formula_version='rpa_v2.0'` retroactivamente. Bump a v3 en paralelo cuando Frame.io shippee.
+- **NUNCA** crear consumer/dashboard que lea `task_rpa_demo_snapshots` para propósito payroll/bonus/KPI productivo. Demo-only.
+- **SIEMPRE** que consumer demo nuevo emerja, validar filter strict `metadata.demo_mode === true` + workspace check + defense in depth dual mínimo.
+- **SIEMPRE** que se modifique writeback projection, verificar que `notion_writeback_attempt_count` se incrementa en AMBOS paths (success + fail).
+- **SIEMPRE** que cliente productivo nuevo emerja con custom property names en Notion, enforce canonical template L1 ANTES del onboarding (NO agregar property aliases).
+
+**Helpers canonical** (todos `import 'server-only'`):
+
+- `src/lib/notion-metrics/count-correction-transitions-demo.ts` — foundation helper sibling
+- `src/lib/notion-metrics/calculate-rpa-v2-demo.ts` — mapper canonical demo
+- `src/lib/notion-metrics/notion-demo-client.ts` — Notion API client demo-only
+- `src/lib/sync/projections/notion-rpa-compute-demo.ts` — compute projection
+- `src/lib/sync/projections/notion-rpa-writeback-demo.ts` — writeback projection
+- `src/lib/sync/projections/notion-status-transition-capture-demo.ts` (TASK-910 + Slice 1 extended chain emit)
+- `src/lib/reliability/queries/notion-metrics-demo-signals.ts` — 7 signal readers (5 + 2 nuevos)
+- `scripts/rpa-demo/retrigger-pending-writebacks.ts` — nightly safety net
+
+**Setup operador-side pendiente** (no code, ver spec canonical para detalle paso a paso):
+
+1. Crear Notion integration `Greenhouse Metrics Demo` con permisos SOLO sobre teamspace Demo Greenhouse
+2. GCP Secret Manager: `notion-integration-token-greenhouse-metrics-demo` (project `efeonce-group`)
+3. Vercel env: `NOTION_METRICS_DEMO_TOKEN_SECRET_REF=notion-integration-token-greenhouse-metrics-demo`
+4. Property `[GH] RpA v2` (number) en Tareas DB del demo teamspace (read-only para operadores)
+5. Notion webhook subscription apuntando a `/api/webhooks/notion-tasks-demo` con secret `NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF`
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-913-rpa-v2-demo-pipeline-end-to-end.md`. ADR Strangler: `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`. Cross-refs TASK-910 + TASK-908 + TASK-901.
+
 ### Production Release Watchdog (TASK-848 + TASK-849, 2026-05-10)
 
 - **Que hace**: scheduled GH Actions cron `*/30 * * * *` que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale Production approvals, pending sin jobs, worker revision drift) y emite alertas Teams a `production-release-alerts` con dedup canonico via `greenhouse_sync.release_watchdog_alert_state`.
