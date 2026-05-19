@@ -59,6 +59,7 @@ import { paymentProfileNotificationsProjection } from './payment-profile-notific
 import { engagementConvertedProjection } from './engagement-converted'
 import { engagementCancelledProjection } from './engagement-cancelled'
 import { organizationWorkspaceCacheInvalidationProjection } from './organization-workspace-cache-invalidation'
+import { notionStatusTransitionCaptureDemoProjection } from './notion-status-transition-capture-demo'
 import { sampleSprintHubSpotOutboundProjection } from './sample-sprint-hubspot-outbound'
 import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 
@@ -132,4 +133,5 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(organizationWorkspaceCacheInvalidationProjection) // TASK-611 Slice 6 — drops projection cache on grant/role/lifecycle events
   registerProjection(sampleSprintRuntimeCacheInvalidationProjection) // TASK-835 Slice 6 — drops Sample Sprints runtime projection cache on engagement events
   registerProjection(sampleSprintHubSpotOutboundProjection) // TASK-837 Slice 4 — projects Sample Sprints to HubSpot p_services with idempotency + association orchestration
+  registerProjection(notionStatusTransitionCaptureDemoProjection) // TASK-910 Slice 3 — persist demo teamspace status transitions en tabla físicamente separada (filter metadata.demo_mode === true)
 }
