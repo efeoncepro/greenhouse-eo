@@ -14,8 +14,12 @@ vi.mock('@/lib/observability/capture', () => ({
 }))
 
 import {
+  getNotionMetricsEchoLoopDemoSignal,
+  getNotionMetricsWebhookSignatureFailuresDemoSignal,
   getNotionMetricsWritebackDeadLetterDemoSignal,
   getNotionMetricsWritebackLagDemoSignal,
+  ECHO_LOOP_DEMO_SIGNAL_ID,
+  WEBHOOK_SIGNATURE_FAILURES_DEMO_SIGNAL_ID,
   WRITEBACK_DEAD_LETTER_DEMO_SIGNAL_ID,
   WRITEBACK_LAG_DEMO_SIGNAL_ID
 } from './notion-metrics-demo-signals'
@@ -23,6 +27,81 @@ import {
 beforeEach(() => {
   mocks.query.mockReset()
   mocks.captureWithDomain.mockReset()
+})
+
+describe('ISSUE Sentry JAVASCRIPT-NEXTJS-67/68 hotfix — canonical schema validation', () => {
+  describe('echo_loop_demo (JOIN canonical post bug fix)', () => {
+    it('usa JOIN webhook_endpoints canónico, NO columna endpoint_key directa', async () => {
+      mocks.query.mockResolvedValueOnce([{ count: '0' }])
+
+      await getNotionMetricsEchoLoopDemoSignal()
+
+      const callArgs = mocks.query.mock.calls[0]
+      const sql = callArgs[0] as string
+
+      expect(sql).toContain('JOIN greenhouse_sync.webhook_endpoints')
+      expect(sql).toContain('we.endpoint_key')
+      expect(sql).toContain('we.webhook_endpoint_id = ie.webhook_endpoint_id')
+      // Anti-regresión: NO usar columna directa que no existe
+      expect(sql).not.toMatch(/\bie\.endpoint_key\b/)
+      // Anti-regresión: NO usar columna outcome (no existe)
+      expect(sql).not.toMatch(/\boutcome\b/)
+    })
+
+    it('severity=ok cuando count=0 (steady state pre-handler V1.1)', async () => {
+      mocks.query.mockResolvedValueOnce([{ count: '0' }])
+
+      const signal = await getNotionMetricsEchoLoopDemoSignal()
+
+      expect(signal.signalId).toBe(ECHO_LOOP_DEMO_SIGNAL_ID)
+      expect(signal.severity).toBe('ok')
+    })
+  })
+
+  describe('webhook_signature_failures_demo (signature_verified canónica)', () => {
+    it('usa signature_verified BOOLEAN canónica, NO outcome o error_message LIKE', async () => {
+      mocks.query.mockResolvedValueOnce([{ count: '0' }])
+
+      await getNotionMetricsWebhookSignatureFailuresDemoSignal()
+
+      const callArgs = mocks.query.mock.calls[0]
+      const sql = callArgs[0] as string
+
+      expect(sql).toContain('JOIN greenhouse_sync.webhook_endpoints')
+      expect(sql).toContain('we.endpoint_key')
+      expect(sql).toContain('ie.signature_verified = FALSE')
+      // Anti-regresión: NO usar columna outcome (no existe)
+      expect(sql).not.toMatch(/\boutcome\b/)
+      // Anti-regresión: NO matchear signature via error_message ILIKE
+      expect(sql).not.toMatch(/error_message ILIKE.*signature/i)
+    })
+
+    it('severity=ok cuando count=0', async () => {
+      mocks.query.mockResolvedValueOnce([{ count: '0' }])
+
+      const signal = await getNotionMetricsWebhookSignatureFailuresDemoSignal()
+
+      expect(signal.signalId).toBe(WEBHOOK_SIGNATURE_FAILURES_DEMO_SIGNAL_ID)
+      expect(signal.severity).toBe('ok')
+    })
+
+    it('severity=warning cuando count entre 1-5', async () => {
+      mocks.query.mockResolvedValueOnce([{ count: '3' }])
+
+      const signal = await getNotionMetricsWebhookSignatureFailuresDemoSignal()
+
+      expect(signal.severity).toBe('warning')
+      expect(signal.summary).toContain('3 HMAC failures')
+    })
+
+    it('severity=error cuando count > 5', async () => {
+      mocks.query.mockResolvedValueOnce([{ count: '10' }])
+
+      const signal = await getNotionMetricsWebhookSignatureFailuresDemoSignal()
+
+      expect(signal.severity).toBe('error')
+    })
+  })
 })
 
 describe('TASK-913 Slice 3 — writeback demo signals canonical', () => {

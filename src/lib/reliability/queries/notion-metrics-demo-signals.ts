@@ -117,20 +117,32 @@ export const ECHO_LOOP_DEMO_SIGNAL_ID = 'notion.metrics.echo_loop_detected_demo'
 export const getNotionMetricsEchoLoopDemoSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
 
+  // Schema canonical `greenhouse_sync.webhook_inbox_events` (verificado contra
+  // `src/types/db.d.ts` 2026-05-19): NO existe columna `outcome` ni `endpoint_key`.
+  // FK canónica es `webhook_endpoint_id` → JOIN con `webhook_endpoints`.
+  //
+  // Detección canonical V1 echo-loop demo: el handler dropea echo events
+  // ANTES de persistir en inbox (TASK-910 Slice 2 spec). Por tanto no hay
+  // rows observables en `webhook_inbox_events` para echo-loops en V1.
+  //
+  // Como proxy honest: medimos events del endpoint demo con status='failed'
+  // AND error_message LIKE '%echo_loop%' (placeholder — el handler V1.1
+  // futuro podría persistir echo events con este pattern). Pre-V1.1: count=0
+  // siempre por design. Severity=ok steady.
+  //
+  // Forward-compat V1.1: modificar handler `notion-tasks-demo` para persistir
+  // echo events con `status='echo_loop_dropped'` (CHECK constraint extension)
+  // o `error_message='echo_loop: <reason>'`. Cuando emerja, esta query
+  // detecta automáticamente sin schema change.
   try {
-    // Echo-loop detection canonical: webhook_inbox_events del endpoint
-    // notion-tasks-demo con outcome 'echo_loop_dropped' (TASK-910 Slice 2
-    // handler dropea echo events silently — el inbox row queda con outcome
-    // labeled si el handler lo persiste — V1 NO persiste, future V1.1).
-    //
-    // V1: usamos proxy heuristic — count de events demo con same author como
-    // integration user en últimos 24h. Pre-TASK-912 webhook subscription: 0.
     const rows = await query<{ count: string }>(
       `SELECT COUNT(*)::text AS count
-       FROM greenhouse_sync.webhook_inbox_events
-       WHERE endpoint_key = 'notion-tasks-demo'
-         AND received_at >= NOW() - INTERVAL '24 hours'
-         AND outcome = 'echo_loop_dropped'`
+       FROM greenhouse_sync.webhook_inbox_events ie
+       JOIN greenhouse_sync.webhook_endpoints we
+         ON we.webhook_endpoint_id = ie.webhook_endpoint_id
+       WHERE we.endpoint_key = 'notion-tasks-demo'
+         AND ie.received_at >= NOW() - INTERVAL '24 hours'
+         AND ie.error_message ILIKE '%echo_loop%'`
     )
 
     const count = Number(rows[0]?.count ?? 0)
@@ -172,18 +184,25 @@ export const WEBHOOK_SIGNATURE_FAILURES_DEMO_SIGNAL_ID = 'notion.metrics.webhook
 export const getNotionMetricsWebhookSignatureFailuresDemoSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
 
+  // Schema canonical `greenhouse_sync.webhook_inbox_events` (verificado contra
+  // `src/types/db.d.ts` 2026-05-19): la columna canonical para HMAC failures
+  // es `signature_verified BOOLEAN` (populated por `processInboundWebhook`
+  // en `src/lib/webhooks/store.ts` post-validación). NO existe `outcome`.
+  // Endpoint scope canonical via JOIN con `webhook_endpoints.endpoint_key`.
+  //
+  // HMAC validation failures del demo webhook. Detecta:
+  // - Leak del secret demo (atacante envía requests sin HMAC válido)
+  // - Tampering / man-in-the-middle (poco probable con HTTPS)
+  // - Secret rotation mal hecha (transition window sin invalid HMAC)
   try {
-    // HMAC validation failures del demo webhook. Detecta:
-    // - Leak del secret demo (atacante envía requests sin HMAC válido)
-    // - Tampering / man-in-the-middle (poco probable con HTTPS)
-    // - Secret rotation mal hecha (transition window sin invalid HMAC)
     const rows = await query<{ count: string }>(
       `SELECT COUNT(*)::text AS count
-       FROM greenhouse_sync.webhook_inbox_events
-       WHERE endpoint_key = 'notion-tasks-demo'
-         AND received_at >= NOW() - INTERVAL '24 hours'
-         AND outcome IN ('signature_invalid', 'failed')
-         AND error_message ILIKE '%signature%'`
+       FROM greenhouse_sync.webhook_inbox_events ie
+       JOIN greenhouse_sync.webhook_endpoints we
+         ON we.webhook_endpoint_id = ie.webhook_endpoint_id
+       WHERE we.endpoint_key = 'notion-tasks-demo'
+         AND ie.received_at >= NOW() - INTERVAL '24 hours'
+         AND ie.signature_verified = FALSE`
     )
 
     const count = Number(rows[0]?.count ?? 0)
