@@ -1,3 +1,38 @@
+# Sesion 2026-05-18 (cont. — TASK-911 V1.0 closure + drift discovery prod cutover ya ejecutado)
+
+**Status**: ✅ TASK-911 cerrado preliminar directo en `develop` con Lifecycle `complete` + observation period 30d en curso hasta 2026-06-17. **Drift critical discovery**: el cutover prod TASK-900 ya se ejecutó tácitamente durante la sesión TASK-900 ship live 2026-05-18 ~19:11 UTC, NO requería una sesión separada como asumía la spec original. Razón canonical: solo existe UN servicio Cloud Run `ico-batch-worker` en proyecto `efeonce-group` (no hay staging/prod separados a nivel infrastructure) + workflow `ico-batch-deploy.yml` triggea por push develop (no por merge develop→main). El "staging cutover" del Handoff anterior fue en realidad el ÚNICO cutover porque sirve el cron diario producción real.
+
+**Estado real verificado live 2026-05-18 ~20:00 UTC** (vía gcloud direct):
+
+| Property | Value |
+|---|---|
+| Service | `ico-batch-worker` (proyecto `efeonce-group`, region `us-east4`) |
+| Revision activa | `ico-batch-worker-00098-7kd` (deployed 2026-05-18T19:54:06Z) |
+| GIT_SHA | `a8567937` (commit "docs: TASK-908 Slice 8 — V1.0 Foundation closing") |
+| NODE_ENV | `production` |
+| ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED | **`true`** ✅ |
+| ICO_MATERIALIZER_MERGE_PATTERN_ENABLED | **`true`** ✅ |
+| ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED | **`true`** ✅ |
+| Cloud Scheduler `ico-materialize-daily` | ENABLED, cron `15 3 * * *` America/Santiago, último attempt manual 2026-05-18T19:14:06Z verde |
+
+**Validación end-to-end final (ya completada 2026-05-18 sesión TASK-900)**:
+
+- PG tracking `greenhouse_sync.ico_materialization_runs` confirma 5 materializers `status='succeeded'`
+- BQ row counts `metrics_by_member` 2026-03/04/05 = 5/4/4 idénticos al baseline pre-cutover
+- Reliability signal `delivery.ico_materializer.skipped_safety` count=0 (gate confía en upstream sano)
+
+**Observation period gates pendientes** (operador-side daily/weekly check):
+
+- 🟡 **Day 1 — 2026-05-19 03:15 -04** (cron natural primer pase post-cutover): verify PG `ico_materialization_runs` con rows nuevas status='succeeded' + signal count=0
+- 🟡 **Day 7 — 2026-05-25**: 7 crones naturales consecutivos verde + sin rollback flags
+- 🟡 **Day 30 — 2026-06-17 V1.0 stable declaration**: 30 crones naturales verde + cierre operativo completo + CLAUDE.md Delta "V1.0 stable production 2026-06-17"
+
+**Re-abrir TASK-911 SOLO si emerge issue durante observation period**. Rollback procedure canonical documentado en spec (5min env var flip + redeploy ops-worker).
+
+**Decisión canonical aplicada**: Camino (A) reescribir spec a "execution complete + observation period" + closure preliminar (mirror pattern TASK-908 V1.0 Foundation closure). Cero re-ejecución requerida.
+
+---
+
 # Sesion 2026-05-18 (cont. — TASK-901 V1.0 Foundation closure + ISSUE-078 hotfix Sentry)
 
 **Status**: ✅ TASK-901 V1.0 Foundation Slice 1 cerrado formalmente directo en `develop` (mirror pattern TASK-908 closure 2026-05-18). Mover task `in-progress/` → `complete/`. Slices 2-5 + Fases B-E ADR Strangler deferred a **TASK-913** V1.1 follow-up (creado esta sesión, bloqueado por TASK-912 webhook ingestion + TASK-910 demo runtime verde + HR/Finance written approval cutover bonus). README + Handoff + changelog sincronizados. Siguiente ID disponible: TASK-914.
