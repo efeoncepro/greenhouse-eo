@@ -194,7 +194,13 @@ export const AGGREGATE_TYPES = {
 
   // HubSpot Companies async intake (TASK-878) — batch envelope para webhook
   // companies/contacts. Mirror del pattern hubspot_services_batch (TASK-813b).
-  hubspotCompaniesBatch: 'hubspot_companies_batch'
+  hubspotCompaniesBatch: 'hubspot_companies_batch',
+
+  // TASK-908 / TASK-910 / TASK-912 — Notion task aggregate canonical para
+  // status transitions events. Aggregate identity = taskSourceId (Notion page
+  // UUID). Demo y productivo comparten aggregate_type pero distinguen via
+  // payload.metadata.demo_mode boolean + payload.workspaceId.
+  notionTask: 'notion_task'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -733,7 +739,28 @@ export const EVENT_TYPES = {
   // Webhook handler emite este event y retorna <100ms; el reactive consumer
   // `hubspot_companies_intake` corre `syncHubSpotCompanyById` async en
   // ops-worker Cloud Run con retry exponencial + dead-letter.
-  commercialHubspotCompanySyncRequested: 'commercial.hubspot_company.sync_requested'
+  commercialHubspotCompanySyncRequested: 'commercial.hubspot_company.sync_requested',
+
+  // TASK-908 / TASK-910 / TASK-912 — Notion task status transition event.
+  // Emitido por webhook handler `notion-tasks` (productivo, TASK-912) o
+  // `notion-tasks-demo` (TASK-910) cuando una task cambia de status en Notion.
+  //
+  // Payload canonical V1:
+  //   {
+  //     taskSourceId: string,        // Notion page UUID
+  //     workspaceId: string,         // 'efeonce' | 'sky' | 'demo'
+  //     fromStatus: string,          // canonical V1 status (post normalize)
+  //     toStatus: string,            // canonical V1 status (post normalize)
+  //     transitionedAt: string,      // ISO 8601
+  //     transitionedBy: string | null, // Notion user UUID
+  //     sourceEventId: string,       // Notion webhook event id (idempotency key)
+  //     metadata?: { demo_mode?: boolean }  // TRUE para demo, FALSE/undefined prod
+  //   }
+  //
+  // Reactive consumers DEBEN filtrar por `payload.metadata?.demo_mode` para
+  // discriminar demo vs prod (defense in depth: tablas físicamente separadas
+  // task_status_transitions_demo vs task_status_transitions).
+  notionTaskStatusTransitioned: 'notion.task.status_transitioned'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
