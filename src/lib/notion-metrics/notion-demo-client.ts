@@ -43,12 +43,6 @@ const NOTION_READ_VERSION = '2026-03-11'
 const SECRET_REF_ENV = 'NOTION_METRICS_DEMO_TOKEN_SECRET_REF'
 
 /**
- * Data source canonical de la DB "Tareas" del teamspace Demo Greenhouse
- * (TASK-910). Único data source que el pipeline RpA V2 demo observa.
- */
-export const DEMO_TAREAS_DATA_SOURCE_ID = '36339c2f-efe7-81a6-980c-000b0056bba8'
-
-/**
  * Nombres canónicos de la propiedad de estado en el template demo
  * (`Estado` actual + `Estado 1` legacy). Single source of truth — el handler
  * y el consumer importan de acá, no duplican.
@@ -162,73 +156,6 @@ export const patchNotionDemoPage = async (
 // cambiaron). El estado actual es source of truth en la página → re-fetch.
 // Anti-pattern prohibido: confiar el payload del webhook (notion-platform
 // Pillar 1, Hard rule #2).
-
-let cachedStatusPropertyIds: { value: Set<string>; resolvedAt: number; dataSourceId: string } | null = null
-const STATUS_PROP_CACHE_TTL_MS = 10 * 60 * 1000 // 10 min
-
-/**
- * Reset cache — testing only.
- */
-export const __testing_resetStatusPropertyIdCache = () => {
-  cachedStatusPropertyIds = null
-}
-
-/**
- * Resuelve los IDs de la(s) propiedad(es) de estado del data source demo desde
- * el schema (cacheado TTL 10 min). Necesario porque los webhooks Notion mandan
- * IDs de propiedad en `updated_properties`, no nombres — el handler matchea
- * contra estos IDs para decidir si emitir el trigger.
- *
- * Defensive: en caller, una resolución fallida NO debe dropear status changes
- * reales (forward defensivo). Devuelve Set vacío si el fetch falla.
- */
-export const resolveDemoStatusPropertyIds = async (
-  dataSourceId: string = DEMO_TAREAS_DATA_SOURCE_ID
-): Promise<Set<string>> => {
-  const now = Date.now()
-
-  if (
-    cachedStatusPropertyIds &&
-    cachedStatusPropertyIds.dataSourceId === dataSourceId &&
-    now - cachedStatusPropertyIds.resolvedAt < STATUS_PROP_CACHE_TTL_MS
-  ) {
-    return cachedStatusPropertyIds.value
-  }
-
-  const token = await resolveDemoToken()
-
-  const response = await fetch(`${NOTION_API}/data_sources/${dataSourceId}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Notion-Version': NOTION_READ_VERSION
-    },
-    signal: AbortSignal.timeout(15_000)
-  })
-
-  if (!response.ok) {
-    const error = new Error(`Notion API GET data_source ${response.status}`)
-
-    ;(error as Error & { status?: number }).status = response.status
-    throw error
-  }
-
-  const body = (await response.json()) as {
-    properties?: Record<string, { id?: string; type?: string }>
-  }
-
-  const ids = new Set<string>()
-
-  for (const [name, prop] of Object.entries(body.properties ?? {})) {
-    if (DEMO_STATUS_PROPERTY_NAMES.has(name) && prop?.id) {
-      ids.add(prop.id)
-    }
-  }
-
-  cachedStatusPropertyIds = { value: ids, resolvedAt: now, dataSourceId }
-
-  return ids
-}
 
 export interface DemoPageStatus {
   statusName: string | null

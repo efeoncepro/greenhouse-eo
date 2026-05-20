@@ -1,9 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-import {
-  DEMO_STATUS_PROPERTY_NAMES,
-  resolveDemoStatusPropertyIds
-} from '@/lib/notion-metrics/notion-demo-client'
+import { DEMO_STATUS_PROPERTY_NAMES } from '@/lib/notion-metrics/notion-demo-client'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -135,26 +132,31 @@ interface DemoStatusChangeSignal {
 }
 
 /**
- * TASK-914 — Extrae TRIGGERS de cambio de propiedad de estado desde los webhook
- * events. NO deriva from/to del payload: los webhooks Notion 2026 NO incluyen
- * valores (solo IDs de propiedad en `updated_properties`). El consumer reactivo
+ * TASK-914 — Extrae TRIGGERS de cambio de propiedad desde los webhook events.
+ * NO deriva from/to del payload: los webhooks Notion 2026 NO incluyen valores
+ * (solo IDs de propiedad en `updated_properties`). El consumer reactivo
  * re-fetchea la página para resolver el estado real (re-fetch pattern canonical
  * — notion-platform Pillar 1).
+ *
+ * **Por qué NO filtramos por status property ID acá**: el ID del status
+ * property en el schema del data source es namespaced (`notion://tasks/
+ * status_property`) y NO matchea el ID corto que Notion manda en el webhook
+ * `updated_properties`. Un gate por ID dropearía TODO status change real (bug
+ * detectado en smoke E2E 2026-05-20). El filtro autoritativo e idempotente es
+ * el consumer: re-fetchea el estado actual y compara contra la última
+ * transición — si no cambió, no-op. Forward de cualquier cambio de propiedad
+ * es robusto (nunca pierde un status change) a costo de re-fetches en cambios
+ * non-status (negligible en demo low-volume; productivo TASK-901 puede agregar
+ * un filtro confiable cuando se entienda el formato de id del webhook).
  *
  * Filtros:
  * 1. page event con entity id.
  * 2. echo-loop: drop si el autor es nuestra integración.
- * 3. `updated_properties` (IDs) intersecta `statusPropertyIds`. Si
- *    `statusPropertyIds` está vacío (resolver del schema falló), forward
- *    DEFENSIVO de cualquier cambio de propiedad — el consumer compara
- *    estado actual vs última transición e idempotentemente no registra si no
- *    cambió. Defense in depth: nunca dropear un status change real por un
- *    fallo transitorio del resolver.
+ * 3. `updated_properties` no vacío (page.created sin props NO es un cambio).
  */
 const extractDemoStatusChangeSignals = (
   events: readonly NotionWebhookEvent[],
-  integrationUserId: string | null,
-  statusPropertyIds: ReadonlySet<string>
+  integrationUserId: string | null
 ): readonly DemoStatusChangeSignal[] => {
   const signals: DemoStatusChangeSignal[] = []
 
@@ -176,19 +178,10 @@ const extractDemoStatusChangeSignals = (
     }
 
     // Filter 3: must have updated_properties (a property changed). page.created
-    // sin updated_properties NO es un status change → skip.
+    // sin updated_properties NO es un cambio relevante → skip.
     const updatedProps = event.data?.updated_properties ?? []
 
     if (updatedProps.length === 0) {
-      continue
-    }
-
-    // Match por ID contra la(s) propiedad(es) de estado. Si el resolver del
-    // schema falló (set vacío), forward defensivo (consumer re-fetch filtra).
-    const touchesStatus =
-      statusPropertyIds.size === 0 || updatedProps.some(propId => statusPropertyIds.has(propId))
-
-    if (!touchesStatus) {
       continue
     }
 
@@ -261,23 +254,9 @@ registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPa
   // 3. Resolve integration user ID for echo-loop filter (optional env var)
   const integrationUserId = process.env.GREENHOUSE_NOTION_INTEGRATION_USER_ID ?? null
 
-  // 4. Resolve status property IDs from the data source schema (cached). Los
-  //    webhooks mandan IDs de propiedad, no nombres. Defensive: si falla el
-  //    resolver, set vacío → forward defensivo (el consumer re-fetch filtra).
-  let statusPropertyIds: ReadonlySet<string>
-
-  try {
-    statusPropertyIds = await resolveDemoStatusPropertyIds()
-  } catch (err) {
-    statusPropertyIds = new Set<string>()
-    captureWithDomain(err, 'integrations.notion', {
-      level: 'warning',
-      tags: { source: 'notion-tasks-demo-webhook', stage: 'resolve_status_prop_ids' }
-    })
-  }
-
-  // 5. Extract status-change TRIGGERS (re-fetch pattern: no from/to del payload)
-  const signals = extractDemoStatusChangeSignals(events, integrationUserId, statusPropertyIds)
+  // 4. Extract property-change TRIGGERS (re-fetch pattern: no from/to del
+  //    payload; el consumer re-fetch + compare-to-last es el filtro autoritativo)
+  const signals = extractDemoStatusChangeSignals(events, integrationUserId)
 
   if (signals.length === 0) {
     // No status-property changes — webhook ACK'd, nada que emitir
