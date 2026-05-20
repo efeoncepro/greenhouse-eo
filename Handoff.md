@@ -1,3 +1,22 @@
+# Sesion 2026-05-20 — RpA V2 demo pipeline ACTIVADO live + property renombrada `RpA` + release develop→main
+
+**Status**: ✅ Pipeline RpA V2 demo activado end-to-end en producción. Cierre operador-side de TASK-913 + release canonical.
+
+**Qué se hizo**:
+
+1. **Webhook Notion verificado**: el token de verificación de `/api/webhooks/notion-tasks-demo` se recuperó de `greenhouse_sync.webhook_inbox_events.payload_json` (handler lo persiste pre-HMAC, NO a Sentry por ser secret) y se pegó en Notion UI → suscripción activa.
+2. **Signing secret HMAC**: GCP secret `notion-webhook-signing-secret-demo` creado + v1 con el verification token (50 bytes, sin newline). Vercel env `NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF` (forma bare) agregada a production.
+3. **Property renombrada por pedido del operador**: `[GH] RpA v2` → **`RpA`** vía Notion API (data source `36339c2f-efe7-81a6-980c-000b0056bba8`, prop id `AIYt` preservado). Solo en demo (sandbox sin formula legacy); productivo Efeonce/Sky conserva `[GH] RpA v2`. Constante `NOTION_PROPERTY_RPA_V2='RpA'` + comentarios + runbook. Commit `4a8619bc`.
+4. **Release develop→main**: orchestrator run `26179893058` → manifest `released`. Target SHA `26bfe1208731096ff73aa97ffb8309b58efae29d`. 4 workers Cloud Run en ese SHA, Azure skipped (no-diff), post-release health OK, watchdog verde **cero drift**.
+
+**Estado del release anterior (aclaración)**: el paso a producción del 2026-05-20 15:25 (run `26172446159`, RpA V2 demo pre-wire + webhook 401 fix) había terminado **exitoso** — no quedó estancado. Las fallas del watchdog previas eran drift transitorio pre-release ya resuelto.
+
+**Pipeline demo ahora LIVE**: env var del signing secret inyectada al runtime Vercel → webhook valida HMAC → capture → compute (`calculateRpaV2Demo`) → snapshot PG → PATCH Notion property `RpA`. Carril paralelo invisible al productive.
+
+**Pendiente de verificación funcional** (opcional): smoke E2E transicionando una tarea demo `En curso`→`Listo para revisión`→`Cambios solicitados` y confirmar que `RpA` muestra el contador (~5 min cron tick). Runbook: `docs/operations/runbooks/rpa-v2-demo-activation.md`.
+
+---
+
 # Sesion 2026-05-19 — TASK-913 V1.0 shipped end-to-end (RpA V2 Demo Pipeline End-to-End)
 
 **Status**: ✅ TASK-913 V1.0 shipped end-to-end directo en `develop` en 4 slices canonical. Pipeline completo RpA V2 demo desde captura webhook → compute via `calculateRpaV2Demo` → snapshot PG → PATCH Notion `[GH] RpA v2`. Carril paralelo invisible al productive durante toda la migración Strangler. Diseño simétrico sibling-pattern canonizado para que cutover productive (TASK-901 Slice 4+) sea repointing, NO rediseño.
