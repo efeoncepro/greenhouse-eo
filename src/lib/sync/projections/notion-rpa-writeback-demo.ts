@@ -13,7 +13,11 @@ import type { ProjectionDefinition } from '../projection-registry'
 
 /**
  * TASK-913 Slice 2 — Reactive consumer writeback demo: PATCH Notion property
- * `[GH] RpA v2` con el valor del snapshot. Idempotente, retryable, observable.
+ * `RpA` con el valor del snapshot. Idempotente, retryable, observable.
+ *
+ * NOTA naming: en el teamspace demo la propiedad se llama `RpA` (sandbox limpio,
+ * sin formula legacy con la que colisionar). En productivo (Efeonce/Sky) el
+ * sibling TASK-901 mantiene `[GH] RpA v2` porque coexiste con la formula legacy.
  *
  * **Defense in depth canonical (TASK-910 demo isolation + TASK-742 7-layer)**:
  *
@@ -51,10 +55,10 @@ import type { ProjectionDefinition } from '../projection-registry'
  * - Spec: docs/tasks/in-progress/TASK-913-rpa-v2-demo-pipeline-end-to-end.md
  * - Upstream emitter: src/lib/sync/projections/notion-rpa-compute-demo.ts
  * - Notion client: src/lib/notion-metrics/notion-demo-client.ts
- * - Notion property target: `[GH] RpA v2` (number) en teamspace Demo Greenhouse
+ * - Notion property target: `RpA` (number) en teamspace Demo Greenhouse
  */
 
-const NOTION_PROPERTY_RPA_V2 = '[GH] RpA v2'
+const NOTION_PROPERTY_RPA_V2 = 'RpA'
 
 interface WritebackRequestedDemoPayload {
   schemaVersion?: number
@@ -153,7 +157,7 @@ const markSnapshotFailed = async (
 export const notionRpaWritebackDemoProjection: ProjectionDefinition = {
   name: 'notion_rpa_writeback_demo',
   description:
-    'TASK-913 Slice 2 — PATCH Notion property [GH] RpA v2 con el valor del snapshot. Idempotente (re-reads PG), retryable (counter + last_error). Defense in depth: filter dual demo_mode + workspaceId + token físicamente separado.',
+    'TASK-913 Slice 2 — PATCH Notion property RpA (demo) con el valor del snapshot. Idempotente (re-reads PG), retryable (counter + last_error). Defense in depth: filter dual demo_mode + workspaceId + token físicamente separado.',
   domain: 'delivery',
   triggerEvents: [EVENT_TYPES.notionTaskMetricsWritebackRequestedDemo],
   extractScope: (payload: Record<string, unknown>) => {
