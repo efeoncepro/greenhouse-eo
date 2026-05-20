@@ -9,7 +9,7 @@
 
 | Item | Status | Detalle |
 |---|---|---|
-| Property `[GH] RpA v2` (number) en Tareas DB demo | ✅ Creada | Notion teamspace Demo Greenhouse data source `36339c2f-efe7-81a6-980c-000b0056bba8` |
+| Property `RpA` (number) en Tareas DB demo | ✅ Creada | Notion teamspace Demo Greenhouse data source `36339c2f-efe7-81a6-980c-000b0056bba8` (renombrada desde `[GH] RpA v2` 2026-05-20 — sandbox demo sin formula legacy con la que colisionar; productivo conserva `[GH] RpA v2`) |
 | GCP secret `notion-integration-token-greenhouse-metrics-demo` | ✅ Container creado | `efeonce-group` project, replication automatic, sin version aún |
 | IAM binding `roles/secretmanager.secretAccessor` | ✅ Otorgado | SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` |
 | Vercel env `NOTION_METRICS_DEMO_TOKEN_SECRET_REF` | ✅ Set (3 envs) | Production + Preview (develop) + Development |
@@ -124,7 +124,7 @@ printf %s "<NOTION_VERIFICATION_TOKEN>" | \
 1. Abrir una tarea cualquiera del demo teamspace (e.g. crear una task "Test RpA V2" con status `Sin empezar`).
 2. Cambiar status: `Sin empezar` → `En curso` → `Listo para revisión` → `Cambios solicitados` (esta última transition canonical dispara una corrección RpA = 1).
 3. Esperar ~5 min (Cloud Scheduler ops-reactive-process cron tick).
-4. Verificar en la tarea Notion que la property `[GH] RpA v2` ahora muestra `1` (escrito por el writeback projection).
+4. Verificar en la tarea Notion que la property `RpA` ahora muestra `1` (escrito por el writeback projection).
 5. Repetir transiciones `Listo para revisión` → `Cambios solicitados` para confirmar que el contador incrementa (RpA = 2, 3, ...).
 
 **Observabilidad canonical post-activación**:

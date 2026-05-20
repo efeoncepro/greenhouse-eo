@@ -22,7 +22,7 @@ import {
  * - Lee SOLO tabla `task_status_transitions_demo` (via foundation helper demo)
  * - NUNCA toca `task_status_transitions` productive
  * - Persistencia downstream va a `task_rpa_demo_snapshots` (NO `metrics_by_*` productive)
- * - Writeback downstream apunta a property `[GH] RpA v2` del demo teamspace (NO Efeonce/Sky)
+ * - Writeback downstream apunta a property `RpA` del demo teamspace (NO Efeonce/Sky)
  * - `formulaVersion='rpa_v2.0'` mismo enum que productive — distinción es
  *   table source, no formula version (forward-compat para promote demo → prod
  *   sin schema bump)

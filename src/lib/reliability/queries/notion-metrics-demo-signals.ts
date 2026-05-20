@@ -282,7 +282,7 @@ export const getNotionMetricsWritebackDeadLetterDemoSignal = async (): Promise<R
       summary:
         count === 0
           ? 'Steady state — zero snapshots en dead-letter (attempt_count >= 4).'
-          : `${count} snapshots en dead-letter. Revisar Notion token + property [GH] RpA v2 + rate limit.`,
+          : `${count} snapshots en dead-letter. Revisar Notion token + property RpA (demo) + rate limit.`,
       observedAt,
       evidence: [
         { kind: 'metric', label: 'dead_letter_count', value: String(count) },
