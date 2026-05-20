@@ -503,6 +503,71 @@ export const getPayrollBonusDemoContaminationSignal = async (): Promise<Reliabil
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// 7. notion.metrics.transition_capture_refetch_failed_demo (TASK-914)
+// ════════════════════════════════════════════════════════════════════════════
+
+export const TRANSITION_CAPTURE_REFETCH_FAILED_DEMO_SIGNAL_ID =
+  'notion.metrics.transition_capture_refetch_failed_demo'
+
+// handler key canonical en outbox_reactive_log = `<projection.name>:<triggerEvent>`
+const CAPTURE_HANDLER = 'notion_status_transition_capture_demo:notion.task.page_change_signal.demo'
+
+/**
+ * TASK-914 — Detecta re-fetch failures exhaustos del capture consumer demo.
+ * El consumer re-fetchea la página Notion para resolver el estado actual; si
+ * el fetch falla (429 sostenido, token revocado, 5xx persistente) agota los
+ * retries del outbox y cae a dead-letter → la transición NUNCA se captura →
+ * RpA nunca se computa para esa task. Steady=0.
+ */
+export const getNotionMetricsTransitionCaptureRefetchFailedDemoSignal =
+  async (): Promise<ReliabilitySignal> => {
+    const observedAt = new Date().toISOString()
+
+    try {
+      const rows = await query<{ n: string }>(
+        `SELECT COUNT(*)::text AS n
+         FROM greenhouse_sync.outbox_reactive_log
+         WHERE handler = $1
+           AND result = 'dead-letter'
+           AND acknowledged_at IS NULL
+           AND recovered_at IS NULL`,
+        [CAPTURE_HANDLER]
+      )
+
+      const count = Number(rows[0]?.n ?? 0)
+
+      return {
+        signalId: TRANSITION_CAPTURE_REFETCH_FAILED_DEMO_SIGNAL_ID,
+        moduleKey: MODULE_KEY,
+        kind: 'dead_letter',
+        source: 'getNotionMetricsTransitionCaptureRefetchFailedDemoSignal',
+        label: 'Transition capture re-fetch dead-letter demo',
+        severity: count === 0 ? 'ok' : 'error',
+        summary:
+          count === 0
+            ? 'Steady state — zero re-fetches en dead-letter. Captura de transiciones demo sana.'
+            : `${count} signals en dead-letter por re-fetch fallido. Revisar Notion token demo + rate limit + páginas borradas.`,
+        observedAt,
+        evidence: [
+          { kind: 'metric', label: 'dead_letter_count', value: String(count) },
+          { kind: 'metric', label: 'handler', value: CAPTURE_HANDLER }
+        ]
+      }
+    } catch (err) {
+      captureWithDomain(err, 'integrations.notion', {
+        tags: { source: 'reliability_signal_transition_capture_refetch_failed_demo' }
+      })
+
+      return buildErrorSignal(
+        TRANSITION_CAPTURE_REFETCH_FAILED_DEMO_SIGNAL_ID,
+        'Transition capture re-fetch dead-letter demo',
+        err,
+        observedAt
+      )
+    }
+  }
+
+// ════════════════════════════════════════════════════════════════════════════
 // Helper canonical para error responses uniformes
 // ════════════════════════════════════════════════════════════════════════════
 

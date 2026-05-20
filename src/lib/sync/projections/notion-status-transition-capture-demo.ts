@@ -1,11 +1,19 @@
 import 'server-only'
 
+import { normalizeTaskStatus } from '@/lib/delivery/task-status-canonical'
+import { fetchDemoPageStatus } from '@/lib/notion-metrics/notion-demo-client'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { EVENT_TYPES } from '../event-catalog'
 import { publishOutboxEvent } from '../publish-event'
 import type { ProjectionDefinition } from '../projection-registry'
+
+/**
+ * Estado canónico inicial cuando no hay transición previa registrada para una
+ * task (Notion no provee el estado previo; es el primer cambio que observamos).
+ */
+const INITIAL_STATUS = 'Sin empezar'
 
 /**
  * TASK-910 Slice 3 — Reactive consumer demo para persist status transitions
@@ -44,15 +52,18 @@ import type { ProjectionDefinition } from '../projection-registry'
  * - Pattern fuente: src/lib/sync/projections/hubspot-companies-intake.ts (TASK-878)
  */
 
-interface StatusTransitionPayload {
+/**
+ * TASK-914 — Payload del trigger `notion.task.page_change_signal.demo`. El
+ * webhook NO incluye from/to (Notion solo manda IDs de propiedad cambiada).
+ * Este consumer re-fetchea la página para resolver el estado real.
+ */
+interface PageChangeSignalPayload {
   schemaVersion?: number
   taskSourceId?: string
   workspaceId?: string
-  fromStatus?: string
-  toStatus?: string
-  transitionedAt?: string
-  transitionedBy?: string | null
+  changedPropertyIds?: readonly string[]
   sourceEventId?: string
+  occurredAt?: string
   metadata?: {
     demo_mode?: boolean
   }
@@ -69,10 +80,27 @@ export const isDemoModePayload = (payload: unknown): boolean => {
     return false
   }
 
-  const typed = payload as StatusTransitionPayload
+  const typed = payload as PageChangeSignalPayload
 
-  
-return typed.metadata?.demo_mode === true
+  return typed.metadata?.demo_mode === true
+}
+
+/**
+ * Deriva el estado previo (`from`) de una task desde la última transición
+ * registrada en PG. Notion no provee el estado previo en el webhook — el
+ * último `to_status` registrado ES el estado previo canonical. Si no hay
+ * transición previa, retorna el estado inicial canonical `'Sin empezar'`.
+ */
+const deriveFromStatus = async (taskSourceId: string): Promise<string> => {
+  const rows = await runGreenhousePostgresQuery<{ to_status: string }>(
+    `SELECT to_status FROM greenhouse_delivery.task_status_transitions_demo
+     WHERE task_source_id = $1
+     ORDER BY transitioned_at DESC, created_at DESC
+     LIMIT 1`,
+    [taskSourceId]
+  )
+
+  return rows[0]?.to_status ?? INITIAL_STATUS
 }
 
 interface PersistTransitionDemoInput {
@@ -125,11 +153,11 @@ const persistStatusTransitionDemo = async (input: PersistTransitionDemoInput): P
 export const notionStatusTransitionCaptureDemoProjection: ProjectionDefinition = {
   name: 'notion_status_transition_capture_demo',
   description:
-    'TASK-910 Slice 3 — Persist Notion task status transitions del demo teamspace en tabla físicamente separada task_status_transitions_demo. Filter canonical strict metadata.demo_mode === true (anti-coersion). Defense in depth dual: filter + tabla separada + CHECK workspace_id=demo PG-side.',
+    'TASK-914 — Resuelve transitions del demo teamspace vía re-fetch de la página (Notion no manda from/to en el webhook). Trigger notion.task.page_change_signal.demo → re-fetch status actual → derive from de última transición PG → persist-if-changed en task_status_transitions_demo. Filter strict metadata.demo_mode === true. Defense in depth dual: filter + tabla separada + CHECK workspace_id=demo PG-side.',
   domain: 'delivery',
-  triggerEvents: ['notion.task.status_transitioned'],
+  triggerEvents: ['notion.task.page_change_signal.demo'],
   extractScope: (payload: Record<string, unknown>) => {
-    const typed = payload as unknown as StatusTransitionPayload
+    const typed = payload as unknown as PageChangeSignalPayload
 
     // CRITICAL: filter canonical anti-coersion. Solo procesa events demo.
     // Productive events (sin demo_mode flag) son ignorados — el consumer
@@ -168,7 +196,7 @@ export const notionStatusTransitionCaptureDemoProjection: ProjectionDefinition =
     return { entityType: 'notion_task', entityId: taskSourceId }
   },
   refresh: async (_scope, payload) => {
-    const typed = payload as unknown as StatusTransitionPayload
+    const typed = payload as unknown as PageChangeSignalPayload
 
     // Redundant safety check (extractScope already filtered, but defense in depth)
     if (!isDemoModePayload(typed)) {
@@ -176,31 +204,65 @@ export const notionStatusTransitionCaptureDemoProjection: ProjectionDefinition =
     }
 
     const taskSourceId = typed.taskSourceId?.trim() ?? ''
-    const fromStatus = typed.fromStatus?.trim() ?? ''
-    const toStatus = typed.toStatus?.trim() ?? ''
-    const transitionedAt = typed.transitionedAt?.trim() ?? ''
     const sourceEventId = typed.sourceEventId?.trim() ?? ''
+    const occurredAt = typed.occurredAt?.trim() || new Date().toISOString()
 
-    if (!taskSourceId || !fromStatus || !toStatus || !transitionedAt || !sourceEventId) {
-      // Malformed payload — drop + capture for diagnostic
+    if (!taskSourceId || !sourceEventId) {
       captureWithDomain(
-        new Error('Demo status transition payload missing required fields'),
+        new Error('Demo page-change signal payload missing required fields'),
         'integrations.notion',
         {
           level: 'warning',
           tags: { source: 'demo_status_transition_capture', stage: 'refresh' },
-          extra: {
-            taskSourceId,
-            fromStatus,
-            toStatus,
-            transitionedAt,
-            sourceEventId
-          }
+          extra: { taskSourceId, sourceEventId }
         }
       )
 
       return null
     }
+
+    // 1. RE-FETCH la página (source of truth del estado actual). Notion no manda
+    //    valores en el webhook → re-fetch canonical (notion-platform Pillar 1).
+    let page
+
+    try {
+      page = await fetchDemoPageStatus(taskSourceId)
+    } catch (err) {
+      // Re-fetch falló (429 / 5xx / network). Throw → outbox retry exponencial.
+      // Reliability signal `transition_capture_refetch_failed_demo` lo detecta.
+      captureWithDomain(err, 'integrations.notion', {
+        level: 'error',
+        tags: { source: 'demo_status_transition_capture', stage: 'refetch' },
+        extra: { taskSourceId, sourceEventId }
+      })
+
+      throw err
+    }
+
+    if (!page) {
+      // Página borrada (404) — degradación honesta, skip sin error.
+      return `skip:page_deleted:${taskSourceId}`
+    }
+
+    // 2. Normalizar el estado actual a canonical V1 (acepta aliases legacy).
+    const toStatus = page.statusName ? normalizeTaskStatus(page.statusName) : null
+
+    if (!toStatus) {
+      // Status ausente o no canonical — skip honesto (no inventar). Drift de
+      // schema lo detecta `notion.metrics.demo_teamspace_drift`.
+      return `skip:status_unresolved:${taskSourceId}`
+    }
+
+    // 3. Derivar el estado previo de la última transición registrada en PG.
+    const fromStatus = await deriveFromStatus(taskSourceId)
+
+    // 4. Idempotencia: si el estado no cambió respecto al último registrado,
+    //    no-op (maneja signals over-emitidos + retries + cambios non-status).
+    if (fromStatus === toStatus) {
+      return `noop:unchanged:${taskSourceId}:${toStatus}`
+    }
+
+    const transitionedAt = page.lastEditedTime ?? occurredAt
 
     try {
       await persistStatusTransitionDemo({
@@ -208,7 +270,7 @@ export const notionStatusTransitionCaptureDemoProjection: ProjectionDefinition =
         fromStatus,
         toStatus,
         transitionedAt,
-        transitionedBy: typed.transitionedBy ?? null,
+        transitionedBy: page.lastEditedBy ?? null,
         sourceEventId,
         workspaceId: 'demo'
       })
