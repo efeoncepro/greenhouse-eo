@@ -1,6 +1,9 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-import { normalizeTaskStatus, TASK_STATUS_CANONICAL } from '@/lib/delivery/task-status-canonical'
+import {
+  DEMO_STATUS_PROPERTY_NAMES,
+  resolveDemoStatusPropertyIds
+} from '@/lib/notion-metrics/notion-demo-client'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -67,11 +70,10 @@ export const extractVerificationToken = (parsedPayload: unknown): string | null 
 }
 
 /**
- * Notion canonical status property names (Greenhouse template).
- * Sky workspace legacy usaba `Estado 1` (typo); post operator cleanup
- * 2026-05-17 todos los teamspaces convergen a `Estado` canonical.
+ * Notion canonical status property names — single source of truth en el demo
+ * client (`DEMO_STATUS_PROPERTY_NAMES`). Re-export local para tests.
  */
-const STATUS_PROPERTY_NAMES = new Set(['Estado', 'Estado 1'])
+const STATUS_PROPERTY_NAMES = DEMO_STATUS_PROPERTY_NAMES
 
 interface NotionWebhookEvent {
   readonly id?: string
@@ -81,10 +83,10 @@ interface NotionWebhookEvent {
     readonly type?: string
   }
   readonly data?: {
+    // updated_properties son IDs de propiedad (no nombres). Notion NO incluye
+    // valores previous/current en el webhook — por eso el consumer re-fetchea.
     readonly updated_properties?: readonly string[]
     readonly parent?: { readonly id?: string; readonly type?: string }
-    readonly previous?: { readonly status?: { readonly name?: string } }
-    readonly current?: { readonly status?: { readonly name?: string } }
   }
   readonly authors?: ReadonlyArray<{ readonly id?: string; readonly type?: string }>
   readonly timestamp?: string
@@ -125,34 +127,36 @@ const validateNotionSignature = (
   }
 }
 
-/**
- * Extract Notion task transitions from webhook events. Canonical:
- * - event.entity.type === 'page'
- * - event.data.updated_properties includes 'Estado' (o 'Estado 1' legacy)
- * - event.data.previous.status.name + current.status.name presentes
- *
- * Returns ONLY events que matchean estos criterios + normaliza statuses
- * via normalizeTaskStatus canonical (TASK-742 helper, accepts legacy aliases).
- */
-const extractDemoTransitions = (
-  events: readonly NotionWebhookEvent[],
-  integrationUserId: string | null
-): ReadonlyArray<{
+interface DemoStatusChangeSignal {
   taskSourceId: string
-  fromStatus: string
-  toStatus: string
-  transitionedAt: string
-  transitionedBy: string | null
+  changedPropertyIds: readonly string[]
   sourceEventId: string
-}> => {
-  const transitions: Array<{
-    taskSourceId: string
-    fromStatus: string
-    toStatus: string
-    transitionedAt: string
-    transitionedBy: string | null
-    sourceEventId: string
-  }> = []
+  occurredAt: string
+}
+
+/**
+ * TASK-914 — Extrae TRIGGERS de cambio de propiedad de estado desde los webhook
+ * events. NO deriva from/to del payload: los webhooks Notion 2026 NO incluyen
+ * valores (solo IDs de propiedad en `updated_properties`). El consumer reactivo
+ * re-fetchea la página para resolver el estado real (re-fetch pattern canonical
+ * — notion-platform Pillar 1).
+ *
+ * Filtros:
+ * 1. page event con entity id.
+ * 2. echo-loop: drop si el autor es nuestra integración.
+ * 3. `updated_properties` (IDs) intersecta `statusPropertyIds`. Si
+ *    `statusPropertyIds` está vacío (resolver del schema falló), forward
+ *    DEFENSIVO de cualquier cambio de propiedad — el consumer compara
+ *    estado actual vs última transición e idempotentemente no registra si no
+ *    cambió. Defense in depth: nunca dropear un status change real por un
+ *    fallo transitorio del resolver.
+ */
+const extractDemoStatusChangeSignals = (
+  events: readonly NotionWebhookEvent[],
+  integrationUserId: string | null,
+  statusPropertyIds: ReadonlySet<string>
+): readonly DemoStatusChangeSignal[] => {
+  const signals: DemoStatusChangeSignal[] = []
 
   for (const event of events) {
     // Filter 1: must be page event with entity id
@@ -171,49 +175,32 @@ const extractDemoTransitions = (
       }
     }
 
-    // Filter 3: updated_properties must include status property canonical
+    // Filter 3: must have updated_properties (a property changed). page.created
+    // sin updated_properties NO es un status change → skip.
     const updatedProps = event.data?.updated_properties ?? []
-    const touchesStatus = updatedProps.some(prop => STATUS_PROPERTY_NAMES.has(prop))
+
+    if (updatedProps.length === 0) {
+      continue
+    }
+
+    // Match por ID contra la(s) propiedad(es) de estado. Si el resolver del
+    // schema falló (set vacío), forward defensivo (consumer re-fetch filtra).
+    const touchesStatus =
+      statusPropertyIds.size === 0 || updatedProps.some(propId => statusPropertyIds.has(propId))
 
     if (!touchesStatus) {
       continue
     }
 
-    // Filter 4: previous + current status present
-    const previousRaw = event.data?.previous?.status?.name
-    const currentRaw = event.data?.current?.status?.name
-
-    if (!previousRaw || !currentRaw) {
-      continue
-    }
-
-    // Normalize via canonical helper — accepts legacy aliases + maps to V1
-    const fromCanonical = normalizeTaskStatus(previousRaw)
-    const toCanonical = normalizeTaskStatus(currentRaw)
-
-    if (!fromCanonical || !toCanonical) {
-      // Unknown status (NOT in canonical 11 V1 nor any legacy alias) —
-      // skip silently. Reliability signal `demo_teamspace_drift` (Slice 4)
-      // detecta drift schema.
-      continue
-    }
-
-    if (fromCanonical === toCanonical) {
-      // Same status (NO transition) — skip
-      continue
-    }
-
-    transitions.push({
+    signals.push({
       taskSourceId,
-      fromStatus: fromCanonical,
-      toStatus: toCanonical,
-      transitionedAt: event.timestamp ?? new Date().toISOString(),
-      transitionedBy: event.authors?.[0]?.id ?? null,
-      sourceEventId: event.id ?? `${taskSourceId}-${event.timestamp ?? Date.now()}`
+      changedPropertyIds: updatedProps,
+      sourceEventId: event.id ?? `${taskSourceId}-${event.timestamp ?? Date.now()}`,
+      occurredAt: event.timestamp ?? new Date().toISOString()
     })
   }
 
-  return transitions
+  return signals
 }
 
 registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPayload) => {
@@ -274,32 +261,45 @@ registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPa
   // 3. Resolve integration user ID for echo-loop filter (optional env var)
   const integrationUserId = process.env.GREENHOUSE_NOTION_INTEGRATION_USER_ID ?? null
 
-  // 4. Extract canonical demo transitions (after all filters + normalization)
-  const transitions = extractDemoTransitions(events, integrationUserId)
+  // 4. Resolve status property IDs from the data source schema (cached). Los
+  //    webhooks mandan IDs de propiedad, no nombres. Defensive: si falla el
+  //    resolver, set vacío → forward defensivo (el consumer re-fetch filtra).
+  let statusPropertyIds: ReadonlySet<string>
 
-  if (transitions.length === 0) {
-    // No relevant transitions — webhook ACK'd but nothing to emit
+  try {
+    statusPropertyIds = await resolveDemoStatusPropertyIds()
+  } catch (err) {
+    statusPropertyIds = new Set<string>()
+    captureWithDomain(err, 'integrations.notion', {
+      level: 'warning',
+      tags: { source: 'notion-tasks-demo-webhook', stage: 'resolve_status_prop_ids' }
+    })
+  }
+
+  // 5. Extract status-change TRIGGERS (re-fetch pattern: no from/to del payload)
+  const signals = extractDemoStatusChangeSignals(events, integrationUserId, statusPropertyIds)
+
+  if (signals.length === 0) {
+    // No status-property changes — webhook ACK'd, nada que emitir
     return
   }
 
-  // 5. Emit outbox event per transition with metadata.demo_mode: true
-  //    Reactive consumer canonical `notion-status-transition-capture-demo`
-  //    (Slice 3) filtra por metadata.demo_mode === true antes de persistir.
-  for (const transition of transitions) {
+  // 6. Emit page_change_signal.demo per trigger. El consumer reactivo
+  //    `notion-status-transition-capture-demo` re-fetchea la página y resuelve
+  //    la transición real. metadata.demo_mode=true (defense in depth filter).
+  for (const signal of signals) {
     try {
       await publishOutboxEvent({
         aggregateType: AGGREGATE_TYPES.notionTask,
-        aggregateId: transition.taskSourceId,
-        eventType: EVENT_TYPES.notionTaskStatusTransitioned,
+        aggregateId: signal.taskSourceId,
+        eventType: EVENT_TYPES.notionTaskPageChangeSignalDemo,
         payload: {
           schemaVersion: 1,
-          taskSourceId: transition.taskSourceId,
+          taskSourceId: signal.taskSourceId,
           workspaceId: 'demo',
-          fromStatus: transition.fromStatus,
-          toStatus: transition.toStatus,
-          transitionedAt: transition.transitionedAt,
-          transitionedBy: transition.transitionedBy,
-          sourceEventId: transition.sourceEventId,
+          changedPropertyIds: signal.changedPropertyIds,
+          sourceEventId: signal.sourceEventId,
+          occurredAt: signal.occurredAt,
           metadata: {
             demo_mode: true
           }
@@ -313,9 +313,7 @@ registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPa
           stage: 'outbox_emit'
         },
         extra: {
-          taskSourceId: transition.taskSourceId,
-          fromStatus: transition.fromStatus,
-          toStatus: transition.toStatus
+          taskSourceId: signal.taskSourceId
         }
       })
 
@@ -326,9 +324,8 @@ registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPa
 
 // Export for tests
 export const __testing__ = {
-  extractDemoTransitions,
+  extractDemoStatusChangeSignals,
   validateNotionSignature,
   extractVerificationToken,
-  STATUS_PROPERTY_NAMES,
-  TASK_STATUS_CANONICAL
+  STATUS_PROPERTY_NAMES
 }

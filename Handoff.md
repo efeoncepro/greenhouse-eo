@@ -1,6 +1,28 @@
-# Sesion 2026-05-20 — RpA V2 demo pipeline ACTIVADO live + property renombrada `RpA` + release develop→main
+# Sesion 2026-05-20 — RpA V2 demo pipeline ACTIVADO live + property renombrada `RpA` + 2 releases develop→main
 
-**Status**: ✅ Pipeline RpA V2 demo activado end-to-end en producción. Cierre operador-side de TASK-913 + release canonical.
+**Status**: ✅ Pipeline RpA V2 demo activado en producción. Cierre operador-side de TASK-913 + 2 releases canonical. El smoke E2E real reveló 2 bugs que se arreglaron en el release #2.
+
+**Bugs detectados por el smoke E2E (y arreglados)**:
+
+1. **Resolución del signing secret (release #2 `afc1125e`)**: el handler `notion-tasks-demo` llamaba `resolveSecret('NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF')` del helper `webhooks/signing`, que appendea `_SECRET_REF` al argumento → buscaba `..._SECRET_REF_SECRET_REF` (inexistente) → fallback `envValue` usaba el NOMBRE crudo del secret como key HMAC. Resultado: TODAS las firmas Notion fallaban `signature validation failed`. **Fix**: env var explícito + `resolveSecretByRef` (patrón sibling `notion-demo-client.ts`). Verificado local: HMAC matchea exacto la firma de eventos rechazados.
+2. **IAM faltante**: el GCP secret `notion-webhook-signing-secret-demo` se creó sin binding `secretmanager.secretAccessor` para `greenhouse-portal@efeonce-group`. Tras el fix de código el error mutó a `not configured`. **Fix**: otorgado el binding (mismo que el integration token). ⚠️ **Lección operativa**: al crear un GCP secret nuevo consumido por runtime Vercel, otorgar `secretAccessor` a `greenhouse-portal@efeonce-group` en el mismo paso (no hay accessor project-level para ese SA).
+
+**Verificación**: webhook demo pasó de `failed` (signature) → `failed` (not configured) → **`processed`** ✅. Chain reactivo capture→compute→writeback ya probado (eventos `notion.task.*` 14:34-14:36 `published` + snapshot rpa=1).
+
+**🔴 Bug #3 (DISEÑO — bloquea captura desde webhooks vivos, requiere follow-up TASK-913)**: el re-smoke con espaciado limpio (28s) tampoco extrajo transición. Inspección del payload REAL de Notion (`page.properties_updated`, Notion-Version 2026-03-11) muestra que `extractDemoTransitions` es incompatible con el shape real:
+
+- Notion manda `data.updated_properties: ["<property_id>"]` — el **ID** de la propiedad (ej. `KlJW`), NO el nombre. El handler matchea contra `STATUS_PROPERTY_NAMES = {'Estado','Estado 1'}` (Filter 3) → nunca matchea → rechaza.
+- El payload **NO incluye** `data.previous.status` ni `data.current.status` (Filter 4 exige ambos) → siempre rechaza.
+
+Consecuencia: el handler extrae 0 transiciones de TODO webhook real → nunca emite `notion.task.status_transitioned` → nunca se computa RpA desde edits vivos. La única transición/snapshot que existe (14:34, rpa=1) fue sembrada por script de test, no por webhook. Los 78 tests de TASK-913 pasaron porque mockean un payload SINTÉTICO con `previous`/`current` + nombres — que no es lo que Notion realmente envía.
+
+**Fix requerido (follow-up, NO hotfix)**: (a) matchear status por property ID (resolver/configurar el ID de "Estado" del data source demo), (b) como Notion no manda valores, FETCH del page status actual vía API, (c) derivar `from` desde la última transición en `task_status_transitions_demo` (Notion no provee previous). Es rediseño de extractDemoTransitions + posible fetch de page state. Decisión de diseño → tratar como TASK-913 follow-up con review, no release autónomo.
+
+**Lo que SÍ quedó activado y verificado**: infraestructura del pipeline (webhook endpoint + HMAC validation + secret + IAM) — webhook entra `processed`. El chain reactivo capture→compute→writeback está probado (eventos 14:34-14:36 `published` + writeback a Notion). El gap es solo la extracción de transición desde el payload real.
+
+---
+
+**Status original (release #1)**: ✅ Pipeline RpA V2 demo activado. Cierre operador-side de TASK-913 + release canonical.
 
 **Qué se hizo**:
 

@@ -4,7 +4,8 @@ import { describe, expect, it } from 'vitest'
 
 import { __testing__ } from './notion-tasks-demo'
 
-const { extractDemoTransitions, validateNotionSignature, extractVerificationToken, STATUS_PROPERTY_NAMES } = __testing__
+const { extractDemoStatusChangeSignals, validateNotionSignature, extractVerificationToken, STATUS_PROPERTY_NAMES } =
+  __testing__
 
 describe('Notion webhook verification handshake (live fix 2026-05-20)', () => {
   describe('extractVerificationToken', () => {
@@ -90,193 +91,132 @@ describe('TASK-910 Slice 2 — notion-tasks-demo handler canonical', () => {
     })
   })
 
-  describe('extractDemoTransitions canonical', () => {
+  // TASK-914 — extractDemoStatusChangeSignals: re-fetch TRIGGER (no from/to del
+  // payload). Matchea por property ID (Notion manda IDs, no nombres). El payload
+  // real NO incluye previous/current — esos campos NO existen.
+  describe('extractDemoStatusChangeSignals (re-fetch trigger) canonical', () => {
+    const STATUS_PROP_ID = 'estId'
+    const statusIds = new Set([STATUS_PROP_ID])
+
     const baseEvent = {
       id: 'evt-1',
+      type: 'page.properties_updated',
       entity: { id: 'task-uuid-1', type: 'page' as const },
       data: {
-        updated_properties: ['Estado'],
-        previous: { status: { name: 'En curso' } },
-        current: { status: { name: 'Listo para revisión' } }
+        updated_properties: [STATUS_PROP_ID]
       },
       authors: [{ id: 'real-user-uuid', type: 'person' as const }],
       timestamp: '2026-05-19T10:00:00Z'
     }
 
-    it('extrae transition canonical happy path', () => {
-      const result = extractDemoTransitions([baseEvent], null)
+    it('emite signal cuando cambió la propiedad de estado (match por ID)', () => {
+      const result = extractDemoStatusChangeSignals([baseEvent], null, statusIds)
 
       expect(result).toHaveLength(1)
       expect(result[0]).toMatchObject({
         taskSourceId: 'task-uuid-1',
-        fromStatus: 'En curso',
-        toStatus: 'Listo para revisión',
-        transitionedAt: '2026-05-19T10:00:00Z',
-        transitionedBy: 'real-user-uuid',
-        sourceEventId: 'evt-1'
+        changedPropertyIds: [STATUS_PROP_ID],
+        sourceEventId: 'evt-1',
+        occurredAt: '2026-05-19T10:00:00Z'
       })
     })
 
-    it('echo-loop filter: drop si event author es integration user', () => {
-      const result = extractDemoTransitions(
-        [{ ...baseEvent, authors: [{ id: 'integration-uuid', type: 'bot' as const }] }],
-        'integration-uuid'
+    it('NO incluye from/to (el consumer los resuelve vía re-fetch)', () => {
+      const [signal] = extractDemoStatusChangeSignals([baseEvent], null, statusIds)
+
+      expect(signal).not.toHaveProperty('fromStatus')
+      expect(signal).not.toHaveProperty('toStatus')
+    })
+
+    it('drop si updated_properties NO incluye un status property ID', () => {
+      const result = extractDemoStatusChangeSignals(
+        [{ ...baseEvent, data: { updated_properties: ['otroPropId'] } }],
+        null,
+        statusIds
       )
 
       expect(result).toHaveLength(0)
     })
 
-    it('echo-loop NO filtra si integrationUserId es null (no configured)', () => {
-      const result = extractDemoTransitions([baseEvent], null)
+    it('forward DEFENSIVO cuando statusPropertyIds está vacío (resolver falló)', () => {
+      const result = extractDemoStatusChangeSignals(
+        [{ ...baseEvent, data: { updated_properties: ['cualquierPropId'] } }],
+        null,
+        new Set()
+      )
 
       expect(result).toHaveLength(1)
     })
 
-    it('property allowlist: drop si updated_properties NO incluye Estado/Estado 1', () => {
-      const result = extractDemoTransitions(
-        [{ ...baseEvent, data: { ...baseEvent.data, updated_properties: ['Otro campo'] } }],
-        null
+    it('echo-loop filter: drop si event author es integration user', () => {
+      const result = extractDemoStatusChangeSignals(
+        [{ ...baseEvent, authors: [{ id: 'integration-uuid', type: 'bot' as const }] }],
+        'integration-uuid',
+        statusIds
       )
 
       expect(result).toHaveLength(0)
     })
 
-    it('property allowlist acepta `Estado 1` legacy Sky', () => {
-      expect(STATUS_PROPERTY_NAMES.has('Estado 1')).toBe(true)
+    it('echo-loop NO filtra si integrationUserId es null', () => {
+      const result = extractDemoStatusChangeSignals([baseEvent], null, statusIds)
+
+      expect(result).toHaveLength(1)
     })
 
     it('drop si entity type NO es page', () => {
-      const result = extractDemoTransitions(
+      const result = extractDemoStatusChangeSignals(
         [{ ...baseEvent, entity: { id: 'x', type: 'database' as const } }],
-        null
+        null,
+        statusIds
       )
 
       expect(result).toHaveLength(0)
     })
 
     it('drop si entity id missing', () => {
-      const result = extractDemoTransitions(
+      const result = extractDemoStatusChangeSignals(
         [{ ...baseEvent, entity: { type: 'page' as const } }],
-        null
+        null,
+        statusIds
       )
 
       expect(result).toHaveLength(0)
     })
 
-    it('drop si previous status missing', () => {
-      const result = extractDemoTransitions(
-        [{ ...baseEvent, data: { ...baseEvent.data, previous: { status: { name: undefined } } } }],
-        null
+    it('drop si updated_properties vacío (page.created sin props)', () => {
+      const result = extractDemoStatusChangeSignals(
+        [{ ...baseEvent, type: 'page.created', data: { updated_properties: [] } }],
+        null,
+        statusIds
       )
 
       expect(result).toHaveLength(0)
     })
 
-    it('drop si current status missing', () => {
-      const result = extractDemoTransitions(
-        [{ ...baseEvent, data: { ...baseEvent.data, current: { status: { name: undefined } } } }],
-        null
-      )
-
-      expect(result).toHaveLength(0)
-    })
-
-    it('drop si status unknown (no canonical V1 + no legacy alias)', () => {
-      const result = extractDemoTransitions(
-        [
-          {
-            ...baseEvent,
-            data: {
-              ...baseEvent.data,
-              previous: { status: { name: 'StatusInventado' } },
-              current: { status: { name: 'En curso' } }
-            }
-          }
-        ],
-        null
-      )
-
-      expect(result).toHaveLength(0)
-    })
-
-    it('drop si fromStatus === toStatus (no real transition)', () => {
-      const result = extractDemoTransitions(
-        [
-          {
-            ...baseEvent,
-            data: {
-              ...baseEvent.data,
-              previous: { status: { name: 'En curso' } },
-              current: { status: { name: 'En curso' } }
-            }
-          }
-        ],
-        null
-      )
-
-      expect(result).toHaveLength(0)
-    })
-
-    it('normaliza legacy Sky `En feedback` a canonical `Cambios solicitados`', () => {
-      const result = extractDemoTransitions(
-        [
-          {
-            ...baseEvent,
-            data: {
-              ...baseEvent.data,
-              previous: { status: { name: 'Listo para revisión' } },
-              current: { status: { name: 'En feedback' } }
-            }
-          }
-        ],
-        null
-      )
-
-      expect(result).toHaveLength(1)
-      expect(result[0].toStatus).toBe('Cambios solicitados')
-    })
-
-    it('correction event canonical (Listo para revisión → Cambios solicitados) extracted correctly', () => {
-      const result = extractDemoTransitions(
-        [
-          {
-            ...baseEvent,
-            data: {
-              ...baseEvent.data,
-              previous: { status: { name: 'Listo para revisión' } },
-              current: { status: { name: 'Cambios solicitados' } }
-            }
-          }
-        ],
-        null
-      )
-
-      expect(result).toHaveLength(1)
-      expect(result[0].fromStatus).toBe('Listo para revisión')
-      expect(result[0].toStatus).toBe('Cambios solicitados')
-    })
-
-    it('extrae multiple transitions en mismo payload', () => {
+    it('emite multiple signals en mismo payload', () => {
       const event2 = {
         ...baseEvent,
         id: 'evt-2',
         entity: { id: 'task-uuid-2', type: 'page' as const }
       }
 
-      const result = extractDemoTransitions([baseEvent, event2], null)
+      const result = extractDemoStatusChangeSignals([baseEvent, event2], null, statusIds)
 
       expect(result).toHaveLength(2)
       expect(result.map(r => r.taskSourceId)).toEqual(['task-uuid-1', 'task-uuid-2'])
     })
 
     it('genera sourceEventId fallback cuando event.id missing', () => {
-      const result = extractDemoTransitions(
-        [{ ...baseEvent, id: undefined }],
-        null
-      )
+      const result = extractDemoStatusChangeSignals([{ ...baseEvent, id: undefined }], null, statusIds)
 
       expect(result).toHaveLength(1)
       expect(result[0].sourceEventId).toContain('task-uuid-1')
+    })
+
+    it('STATUS_PROPERTY_NAMES sigue conteniendo Estado + Estado 1 legacy', () => {
+      expect(STATUS_PROPERTY_NAMES.has('Estado')).toBe(true)
+      expect(STATUS_PROPERTY_NAMES.has('Estado 1')).toBe(true)
     })
   })
 })

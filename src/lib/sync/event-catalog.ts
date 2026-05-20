@@ -814,7 +814,28 @@ export const EVENT_TYPES = {
   // Reactive consumers DEBEN filtrar por `payload.metadata?.demo_mode` para
   // discriminar demo vs prod (defense in depth: tablas físicamente separadas
   // task_status_transitions_demo vs task_status_transitions).
-  notionTaskStatusTransitioned: 'notion.task.status_transitioned'
+  notionTaskStatusTransitioned: 'notion.task.status_transitioned',
+
+  // TASK-914 — Notion demo page-change TRIGGER (re-fetch pattern).
+  // Emitido por el handler `notion-tasks-demo` cuando un webhook indica que una
+  // page del teamspace demo cambió la propiedad de estado. El webhook NO incluye
+  // valores (solo IDs de propiedad), así que este evento es un trigger ligero;
+  // el consumer `notion-status-transition-capture-demo` re-fetchea la página
+  // (source of truth del `to`) y deriva el `from` de la última transición en PG.
+  //
+  // Payload canonical V1:
+  //   {
+  //     taskSourceId: string,          // Notion page UUID demo
+  //     workspaceId: 'demo',
+  //     changedPropertyIds: string[],  // IDs de updated_properties del webhook
+  //     sourceEventId: string,         // idempotency key (Notion event id)
+  //     occurredAt: string,            // ISO 8601 (event.timestamp)
+  //     metadata: { demo_mode: true }
+  //   }
+  //
+  // Reemplaza el uso de notion.task.status_transitioned como entrada del capture
+  // demo (ese contrato exigía from/to que Notion no provee — bug TASK-913).
+  notionTaskPageChangeSignalDemo: 'notion.task.page_change_signal.demo'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

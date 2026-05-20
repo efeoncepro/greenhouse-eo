@@ -49,6 +49,7 @@ import {
   getNotionMetricsWritebackDeadLetterDemoSignal,
   getNotionMetricsWritebackLagDemoSignal,
   getNotionMetricsDemoTeamspaceDriftSignal,
+  getNotionMetricsTransitionCaptureRefetchFailedDemoSignal,
   getPayrollBonusDemoContaminationSignal
 } from './queries/notion-metrics-demo-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
@@ -1302,6 +1303,7 @@ export const getReliabilityOverview = async (
           getNotionMetricsWritebackDeadLetterDemoSignal().catch(() => null),
           getNotionMetricsWritebackLagDemoSignal().catch(() => null),
           getNotionMetricsDemoTeamspaceDriftSignal().catch(() => null),
+          getNotionMetricsTransitionCaptureRefetchFailedDemoSignal().catch(() => null),
           getPayrollBonusDemoContaminationSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
