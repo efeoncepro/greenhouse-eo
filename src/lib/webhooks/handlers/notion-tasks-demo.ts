@@ -132,6 +132,31 @@ interface DemoStatusChangeSignal {
 }
 
 /**
+ * TASK-914 — Normaliza el envelope del webhook a un array de eventos. Notion
+ * 2026-03-11 entrega un objeto evento único (`{ id, type, entity, data }`), pero
+ * versiones/configs pueden mandar `{ events: [...] }`. Soporta ambos. Exported
+ * para tests anti-regresión.
+ */
+const normalizeWebhookEvents = (parsedPayload: unknown): readonly NotionWebhookEvent[] => {
+  if (!parsedPayload || typeof parsedPayload !== 'object') {
+    return []
+  }
+
+  const obj = parsedPayload as { events?: unknown; type?: unknown; entity?: unknown }
+
+  if (Array.isArray(obj.events)) {
+    return obj.events as NotionWebhookEvent[]
+  }
+
+  // Evento single canonical Notion: tiene `type` + `entity`.
+  if (typeof obj.type === 'string' && obj.entity && typeof obj.entity === 'object') {
+    return [parsedPayload as NotionWebhookEvent]
+  }
+
+  return []
+}
+
+/**
  * TASK-914 — Extrae TRIGGERS de cambio de propiedad desde los webhook events.
  * NO deriva from/to del payload: los webhooks Notion 2026 NO incluyen valores
  * (solo IDs de propiedad en `updated_properties`). El consumer reactivo
@@ -242,9 +267,12 @@ registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPa
     throw new Error('Notion demo webhook signature validation failed')
   }
 
-  // 2. Parse events array (Notion webhook canonical envelope)
-  const envelope = parsedPayload as { events?: readonly NotionWebhookEvent[] } | null
-  const events = Array.isArray(envelope?.events) ? envelope.events : []
+  // 2. Normalizar el envelope. Notion 2026-03-11 entrega un OBJETO EVENTO ÚNICO
+  //    (`{ id, type, entity, data, ... }`), NO envuelto en `{ events: [...] }`.
+  //    Soportamos ambos formatos: si hay array `events` lo usamos; si el payload
+  //    es un evento single (tiene `type` + `entity`), lo envolvemos. Bug real
+  //    detectado en smoke E2E 2026-05-20: asumir `events[]` dropeaba TODO.
+  const events = normalizeWebhookEvents(parsedPayload)
 
   if (events.length === 0) {
     // ACK empty payload — Notion sometimes sends keepalive
@@ -304,6 +332,7 @@ registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPa
 // Export for tests
 export const __testing__ = {
   extractDemoStatusChangeSignals,
+  normalizeWebhookEvents,
   validateNotionSignature,
   extractVerificationToken,
   STATUS_PROPERTY_NAMES
