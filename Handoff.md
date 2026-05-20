@@ -9,7 +9,16 @@
 
 **Verificación**: webhook demo pasó de `failed` (signature) → `failed` (not configured) → **`processed`** ✅. Chain reactivo capture→compute→writeback ya probado (eventos `notion.task.*` 14:34-14:36 `published` + snapshot rpa=1).
 
-**Pendiente menor**: el smoke con PATCHes muy seguidos (8s) coalesció en Notion y no extrajo transición; re-disparado con espaciado 28s para producir el evento `Listo para revisión → Cambios solicitados` limpio. El chain (crons 5 min) escribe `RpA` en la tarea demo. extractDemoTransitions requiere `previous.status.name` + `current.status.name` en eventos separados.
+**🔴 Bug #3 (DISEÑO — bloquea captura desde webhooks vivos, requiere follow-up TASK-913)**: el re-smoke con espaciado limpio (28s) tampoco extrajo transición. Inspección del payload REAL de Notion (`page.properties_updated`, Notion-Version 2026-03-11) muestra que `extractDemoTransitions` es incompatible con el shape real:
+
+- Notion manda `data.updated_properties: ["<property_id>"]` — el **ID** de la propiedad (ej. `KlJW`), NO el nombre. El handler matchea contra `STATUS_PROPERTY_NAMES = {'Estado','Estado 1'}` (Filter 3) → nunca matchea → rechaza.
+- El payload **NO incluye** `data.previous.status` ni `data.current.status` (Filter 4 exige ambos) → siempre rechaza.
+
+Consecuencia: el handler extrae 0 transiciones de TODO webhook real → nunca emite `notion.task.status_transitioned` → nunca se computa RpA desde edits vivos. La única transición/snapshot que existe (14:34, rpa=1) fue sembrada por script de test, no por webhook. Los 78 tests de TASK-913 pasaron porque mockean un payload SINTÉTICO con `previous`/`current` + nombres — que no es lo que Notion realmente envía.
+
+**Fix requerido (follow-up, NO hotfix)**: (a) matchear status por property ID (resolver/configurar el ID de "Estado" del data source demo), (b) como Notion no manda valores, FETCH del page status actual vía API, (c) derivar `from` desde la última transición en `task_status_transitions_demo` (Notion no provee previous). Es rediseño de extractDemoTransitions + posible fetch de page state. Decisión de diseño → tratar como TASK-913 follow-up con review, no release autónomo.
+
+**Lo que SÍ quedó activado y verificado**: infraestructura del pipeline (webhook endpoint + HMAC validation + secret + IAM) — webhook entra `processed`. El chain reactivo capture→compute→writeback está probado (eventos 14:34-14:36 `published` + writeback a Notion). El gap es solo la extracción de transición desde el payload real.
 
 ---
 
