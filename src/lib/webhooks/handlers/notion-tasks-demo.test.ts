@@ -4,7 +4,31 @@ import { describe, expect, it } from 'vitest'
 
 import { __testing__ } from './notion-tasks-demo'
 
-const { extractDemoTransitions, validateNotionSignature, STATUS_PROPERTY_NAMES } = __testing__
+const { extractDemoTransitions, validateNotionSignature, extractVerificationToken, STATUS_PROPERTY_NAMES } = __testing__
+
+describe('Notion webhook verification handshake (live fix 2026-05-20)', () => {
+  describe('extractVerificationToken', () => {
+    it('returns el token cuando payload es verification request', () => {
+      expect(extractVerificationToken({ verification_token: 'secret_abc123' })).toBe('secret_abc123')
+    })
+
+    it('returns null cuando NO hay verification_token (evento normal)', () => {
+      expect(extractVerificationToken({ events: [{ id: 'x', entity: { type: 'page' } }] })).toBeNull()
+    })
+
+    it('returns null para token vacío o no-string', () => {
+      expect(extractVerificationToken({ verification_token: '' })).toBeNull()
+      expect(extractVerificationToken({ verification_token: 123 })).toBeNull()
+      expect(extractVerificationToken({ verification_token: null })).toBeNull()
+    })
+
+    it('returns null para payload null/undefined/no-objeto', () => {
+      expect(extractVerificationToken(null)).toBeNull()
+      expect(extractVerificationToken(undefined)).toBeNull()
+      expect(extractVerificationToken('string')).toBeNull()
+    })
+  })
+})
 
 describe('TASK-910 Slice 2 — notion-tasks-demo handler canonical', () => {
   describe('validateNotionSignature', () => {

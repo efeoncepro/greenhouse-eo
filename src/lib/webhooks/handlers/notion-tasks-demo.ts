@@ -49,6 +49,24 @@ import { resolveSecret } from '@/lib/webhooks/signing'
 const SIGNATURE_HEADER = 'x-notion-signature'
 
 /**
+ * Detecta el verification handshake de Notion. Al crear/verificar una
+ * suscripción webhook, Notion envía `{ verification_token: 'secret_...' }`
+ * sin array `events` ni firma HMAC válida. El token ES el futuro signing
+ * secret. Returns el token si es un verification request, null si no.
+ *
+ * Exported para tests anti-regresión.
+ */
+export const extractVerificationToken = (parsedPayload: unknown): string | null => {
+  if (!parsedPayload || typeof parsedPayload !== 'object') {
+    return null
+  }
+
+  const token = (parsedPayload as { verification_token?: unknown }).verification_token
+
+  return typeof token === 'string' && token.length > 0 ? token : null
+}
+
+/**
  * Notion canonical status property names (Greenhouse template).
  * Sky workspace legacy usaba `Estado 1` (typo); post operator cleanup
  * 2026-05-17 todos los teamspaces convergen a `Estado` canonical.
@@ -199,6 +217,23 @@ const extractDemoTransitions = (
 }
 
 registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPayload) => {
+  // 0. Notion webhook verification handshake (canonical, pre-HMAC).
+  //
+  // Al crear/verificar una suscripción, Notion envía un POST con
+  // `{ verification_token: 'secret_...' }` — SIN array `events`, SIN firma HMAC
+  // válida (el token ES el futuro signing secret, todavía no existe). Debemos
+  // ACK (200) sin validar HMAC. El token queda persistido en
+  // `webhook_inbox_events.payload_json` para que el operador lo recupere y lo
+  // (a) pegue en el UI de Notion para activar la suscripción, (b) suba al GCP
+  // secret `notion-webhook-signing-secret-demo` como signing secret canonical.
+  //
+  // NO logueamos el valor del token a Sentry (es un secret). Solo se persiste
+  // en el inbox (PG), accesible vía query directa por el operador.
+  if (extractVerificationToken(parsedPayload)) {
+    // ACK 200. El inbox ya persistió el payload con el token. Skip HMAC + events.
+    return
+  }
+
   // 1. Validate HMAC signature canonical
   const headers = inboxEvent.headers_json as Record<string, string>
   const signature = headers[SIGNATURE_HEADER] ?? ''
@@ -286,6 +321,7 @@ registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPa
 export const __testing__ = {
   extractDemoTransitions,
   validateNotionSignature,
+  extractVerificationToken,
   STATUS_PROPERTY_NAMES,
   TASK_STATUS_CANONICAL
 }
