@@ -4,8 +4,13 @@ import { describe, expect, it } from 'vitest'
 
 import { __testing__ } from './notion-tasks-demo'
 
-const { extractDemoStatusChangeSignals, validateNotionSignature, extractVerificationToken, STATUS_PROPERTY_NAMES } =
-  __testing__
+const {
+  extractDemoStatusChangeSignals,
+  normalizeWebhookEvents,
+  validateNotionSignature,
+  extractVerificationToken,
+  STATUS_PROPERTY_NAMES
+} = __testing__
 
 describe('Notion webhook verification handshake (live fix 2026-05-20)', () => {
   describe('extractVerificationToken', () => {
@@ -94,6 +99,34 @@ describe('TASK-910 Slice 2 — notion-tasks-demo handler canonical', () => {
   // TASK-914 — extractDemoStatusChangeSignals: re-fetch TRIGGER (no from/to del
   // payload). Matchea por property ID (Notion manda IDs, no nombres). El payload
   // real NO incluye previous/current — esos campos NO existen.
+  // TASK-914 — Notion 2026 entrega un evento single (no { events: [] }).
+  describe('normalizeWebhookEvents (dual envelope format)', () => {
+    const singleEvent = {
+      id: 'evt-1',
+      type: 'page.properties_updated',
+      entity: { id: 'task-1', type: 'page' },
+      data: { updated_properties: ['p1'] }
+    }
+
+    it('envuelve un evento single canonical Notion (sin events[])', () => {
+      const result = normalizeWebhookEvents(singleEvent)
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toMatchObject({ id: 'evt-1', type: 'page.properties_updated' })
+    })
+
+    it('usa el array events[] cuando está presente (formato legacy)', () => {
+      const result = normalizeWebhookEvents({ events: [singleEvent, { ...singleEvent, id: 'evt-2' }] })
+
+      expect(result).toHaveLength(2)
+    })
+
+    it('devuelve [] para payload sin type/entity ni events (keepalive)', () => {
+      expect(normalizeWebhookEvents({ foo: 'bar' })).toHaveLength(0)
+      expect(normalizeWebhookEvents(null)).toHaveLength(0)
+    })
+  })
+
   describe('extractDemoStatusChangeSignals (re-fetch trigger) canonical', () => {
     const baseEvent = {
       id: 'evt-1',
