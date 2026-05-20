@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 1.1
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-05-16 por Claude Opus (TASK-893 — ventana de participacion payroll V1 SHIPPED)
+> **Ultima actualizacion:** 2026-05-16 por Codex (TASK-894 — contrato internacional interno)
 > **Modulo:** HR / Nomina
 > **Ruta en portal:** `/hr/payroll`
 > **Documentacion relacionada:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md), [Periodos de nomina](../../documentation/hr/periodos-de-nomina.md)
@@ -151,6 +151,20 @@ Que hacer:
 2. Si el periodo no esta exportado, usa `Calcular` para regenerar las entries con el motor corregido.
 3. Si el periodo ya esta exportado, usa reapertura/reliquidacion formal y deja trazabilidad del motivo.
 4. Si afecta a Melkin, Daniela o Andres, confirma que sigan como internacionales/Deel y que solo usen KPI ICO para bonos variables.
+
+### Necesito configurar un colaborador internacional pagado internamente
+
+Usa el contrato `Internacional interno` solo cuando exista revisión legal/HR/Finance para ese colaborador. Este perfil procesa la nómina desde Greenhouse/Efeonce, pero no convierte a Efeonce en employer of record local ni aplica impuestos o seguridad social del país del trabajador en V1.
+
+Que hacer:
+
+1. Confirma que tienes la capability `payroll.contract.use_international_internal`.
+2. En la compensación o remediación laboral, selecciona `Internacional interno`.
+3. Registra `legalReviewReference` con una referencia auditable de al menos 10 caracteres.
+4. Verifica que no exista `deelContractId` para ese caso.
+5. Revisa el recibo: debe aparecer sin AFP, salud, cesantía, IUSC ni retención SII.
+
+Si no tienes revisión legal documentada, mantén el colaborador en el contrato actual y escala el caso antes de modificar la compensación.
 
 ### Veo un valor esperado como `gael-2026-04` y no se si debo escribirlo
 

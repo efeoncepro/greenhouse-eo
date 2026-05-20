@@ -141,6 +141,20 @@ const verifyAuth = async (
 ): Promise<boolean | null> => {
   if (endpoint.auth_mode === 'none') return null
 
+  // `provider_native`: el handler del provider valida la firma internamente
+  // (HMAC propio: Notion `x-notion-signature`, HubSpot v3, GitHub `x-hub-signature`).
+  // El generic verifyAuth NO debe resolver ni validar el secret — devuelve null
+  // (skip) y delega al handler.
+  //
+  // Esto ADEMÁS arregla el chicken-and-egg de la verificación de webhooks Notion:
+  // el verification request ES el que establece el signing secret, así que el
+  // endpoint DEBE aceptarlo aunque el secret aún no exista. Sin este early-return,
+  // `resolveSecret(secret_ref)` devuelve null para un secret no creado todavía →
+  // `if (!secret) return false` → 401 → Notion no puede verificar la suscripción.
+  // Bug detectado live 2026-05-20 (Notion devolvía "estado 401" en el handshake
+  // de verificación del endpoint notion-tasks-demo).
+  if (endpoint.auth_mode === 'provider_native') return null
+
   const secretRef = endpoint.secret_ref
 
   if (!secretRef) return null

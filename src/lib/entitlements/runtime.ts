@@ -614,6 +614,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'payroll.contract.use_international_internal',
+        action: 'create',
+        scope: 'tenant',
+        source
+      })
+
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'payroll.contract.use_international_internal',
+        action: 'update',
+        scope: 'tenant',
+        source
+      })
+    }
+
     addEntitlement(entries, {
       module: 'finance',
       capability: 'finance.payment_instruments.update',
@@ -1317,6 +1335,39 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         source: 'role'
       })
     }
+  }
+
+  // TASK-910 — Notion Demo Teamspace Sandbox capabilities (canonical defense in depth).
+  // Demo teamspace sirve como gate canonical pre-Fase 1 del ADR
+  // GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Acceso restringido per
+  // governance doc: equipo interno Greenhouse + HR + Delivery (NO cliente
+  // externo). Demo NUNCA toca payroll real (filter via members.is_demo en
+  // fetchKpisForPeriod + pre-check en bonus helpers Slice 5).
+  // - .execute: trigger manual operations (recompute, smoke tests) — solo EFEONCE_ADMIN
+  // - .read: visibility (paridad signals, audit transitions) — extended a HR_MANAGER
+  //   + EFEONCE_OPERATIONS (mismo matrix que workforce.member.activation_readiness.read)
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'admin',
+      capability: 'notion.metrics.demo.execute',
+      action: 'execute',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    addEntitlement(entries, {
+      module: 'admin',
+      capability: 'notion.metrics.demo.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   const resolvedEntries = Array.from(entries.values())

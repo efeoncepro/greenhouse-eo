@@ -40,6 +40,18 @@ import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
+import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
+import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
+import {
+  getNotionMetricsShadowParidadRpaDemoSignal,
+  getNotionMetricsEchoLoopDemoSignal,
+  getNotionMetricsWebhookSignatureFailuresDemoSignal,
+  getNotionMetricsWritebackDeadLetterDemoSignal,
+  getNotionMetricsWritebackLagDemoSignal,
+  getNotionMetricsDemoTeamspaceDriftSignal,
+  getPayrollBonusDemoContaminationSignal
+} from './queries/notion-metrics-demo-signals'
+import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
@@ -56,6 +68,9 @@ import { getPayrollParticipationWindowFullMonthEntryDriftSignal } from './querie
 import { getPayrollParticipationWindowProjectionDeltaAnomalySignal } from './queries/payroll-participation-window-projection-delta-anomaly'
 import { getPayrollParticipationWindowSourceDateDisagreementSignal } from './queries/payroll-participation-window-source-date-disagreement'
 import { getLeaveAccrualOvershootDriftSignal } from './queries/leave-accrual-overshoot-drift'
+import { getPayrollContractTaxonomyFallbackResolutionLegacySignal } from './queries/payroll-contract-taxonomy-fallback-resolution-legacy'
+import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/payroll-contract-taxonomy-invalid-tuple-drift'
+import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './queries/payroll-contract-taxonomy-invalid-statutory-application'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
@@ -124,6 +139,7 @@ import {
   buildFinanceClpDriftSignals,
   buildCommercialHealthSignals,
   buildExpenseDistributionSignals,
+  buildPayrollContractTaxonomySignals,
   buildPayrollParticipationWindowSignals,
   buildLeaveAccrualSignals,
   buildPaymentOrderSettlementSignals,
@@ -344,6 +360,25 @@ interface ReliabilityOverviewSources {
   finalSettlementPdfStatusDrift?: ReliabilitySignal | null
 
   /**
+   * TASK-900 Slice 6 — ICO Materializer skipped_safety signal. Cuenta
+   * corridas del materializer ICO con `status='skipped_safety'` en
+   * ventana 24h. Roll up bajo moduleKey='delivery'. Steady state = 0
+   * (gate canonical confía en upstream). Severity warning > 0, error > 5
+   * en 24h. Complementario a `identity.notion_bridge.coverage_drift` —
+   * cuando el gate alerta es porque protegió data buena downstream del
+   * bug class TASK-877.
+   */
+  icoMaterializerSkippedSafety?: ReliabilitySignal | null
+
+  /**
+   * TASK-908 Slice 3.5 — Notion correction transitions source availability.
+   * % de tareas completadas en 90d sin rows en `task_status_transitions`.
+   * Pre-TASK-908b deployment: severity=error 100% esperado. Post-deployment +
+   * backfill verde: < 10% steady state. Roll up bajo moduleKey='delivery'.
+   */
+  notionCorrectionTransitionsSourceAvailability?: ReliabilitySignal | null
+
+  /**
    * TASK-893 Slice 5 — Payroll Participation Window signals (3 readers):
    * full_month_entry_drift + source_date_disagreement + projection_delta_anomaly.
    * Subsystem rollup `Finance Data Quality` via moduleKey='finance'. Cada
@@ -362,6 +397,13 @@ interface ReliabilityOverviewSources {
    * falla. Steady state esperado = 0 post-flag-ON + re-seed.
    */
   leaveAccrual?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-894 — Payroll contract taxonomy guardrails for the sixth canonical
+   * contract type (`international_internal`). Observation-only readers:
+   * tuple drift, invalid statutory application and legacy receipt fallback.
+   */
+  payrollContractTaxonomy?: ReliabilitySignal[] | null
 
   /**
    * TASK-766 Slice 2 — Finance CLP currency drift signals. 2 readers que
@@ -580,6 +622,21 @@ interface ReliabilityOverviewSources {
    * cuando exista release_manifests data populated.
    */
   productionRelease?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical):
+   *   - notion.metrics.shadow_paridad_rpa_demo (drift)
+   *   - notion.metrics.echo_loop_detected_demo (drift)
+   *   - notion.metrics.webhook_signature_failures_demo (drift)
+   *   - notion.metrics.writeback_dead_letter_demo (drift, deferred TASK-913)
+   *   - notion.metrics.demo_teamspace_drift (drift)
+   *   - payroll.bonus.demo_member_contamination (drift, ERROR si > 0 — CRITICAL
+   *     defense in depth canonical anti-regresión bonus guardrail Slice 5)
+   * Roll up: primer 5 bajo moduleKey 'delivery', último bajo moduleKey 'payroll'.
+   * Sub-rollup conceptual `Notion Metrics Migration` (demo gate canonical
+   * pre-Fase 1 RpA pilot Efeonce).
+   */
+  notionMetricsDemo?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -620,6 +677,18 @@ export const buildReliabilityOverview = (
     // PDF asset metadata.documentStatusAtRender). Defense-in-depth para detectar
     // regen failure o transition agregada al state machine sin pasar por el helper.
     ...(sources.finalSettlementPdfStatusDrift ? [sources.finalSettlementPdfStatusDrift] : []),
+    // TASK-900 Slice 6 — ICO Materializer skipped_safety signal. Roll up bajo
+    // moduleKey='delivery'. Visibiliza cuando el freshness gate del materializer
+    // ICO está protegiendo data buena del bug class TASK-877 (upstream bridge
+    // Notion→member regresión silente). Steady=0.
+    ...(sources.icoMaterializerSkippedSafety ? [sources.icoMaterializerSkippedSafety] : []),
+    // TASK-908 Slice 3.5 — Notion correction transitions source availability.
+    // Pre-TASK-908b deployment: 100% unavailable esperado (tabla vacía).
+    // Post-deployment + backfill: < 10% steady state. Visibiliza coverage del
+    // foundation que sustenta calculateRpa (TASK-901) + calculateFtr (TASK-909).
+    ...(sources.notionCorrectionTransitionsSourceAvailability
+      ? [sources.notionCorrectionTransitionsSourceAvailability]
+      : []),
     // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
     // Subsystem rollup Finance Data Quality via moduleKey='finance'. Each
     // reader degrades honestly (severity=unknown) on query failure. The
@@ -627,6 +696,8 @@ export const buildReliabilityOverview = (
     // (shadow compare wiring is V1.1 follow-up).
     ...(sources.payrollParticipationWindow ?? []),
     ...(sources.leaveAccrual ?? []),
+    // TASK-894 — Payroll contract taxonomy signals.
+    ...(sources.payrollContractTaxonomy ?? []),
     // TASK-766 Slice 2 — Finance CLP currency drift signals (expense + income).
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
@@ -680,7 +751,10 @@ export const buildReliabilityOverview = (
     // TASK-807 — Commercial Health signals (six Sample Sprints health gates).
     ...(sources.commercialHealth ?? []),
     // TASK-848 Slice 7 — Production Release Control Plane signals (2 of 4 V1).
-    ...(sources.productionRelease ?? [])
+    ...(sources.productionRelease ?? []),
+    // TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical).
+    // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
+    ...(sources.notionMetricsDemo ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -872,6 +946,15 @@ export const getReliabilityOverview = async (
           accrualOvershootDrift: getLeaveAccrualOvershootDriftSignal
         }).catch(() => null)
 
+  const payrollContractTaxonomy =
+    preloadedSources.payrollContractTaxonomy !== undefined
+      ? preloadedSources.payrollContractTaxonomy
+      : await buildPayrollContractTaxonomySignals({
+          invalidTupleDrift: getPayrollContractTaxonomyInvalidTupleDriftSignal,
+          invalidStatutoryApplication: getPayrollContractTaxonomyInvalidStatutoryApplicationSignal,
+          fallbackResolutionLegacy: getPayrollContractTaxonomyFallbackResolutionLegacySignal
+        }).catch(() => null)
+
   // TASK-863 V1.5.2 — Final settlement PDF status drift (DB vs asset metadata).
   // Detecta documentos cuyo pdf_asset_id apunta a un PDF rendereado con un
   // documentStatus distinto al actual en DB. Steady=0 post-helper canónico.
@@ -992,7 +1075,11 @@ export const getReliabilityOverview = async (
           getIdentityRelationshipMemberContractDriftSignal().catch(() => null),
           // TASK-892 — closure completeness partial (case-level UX surface
           // del drift Person 360, complementario al signal sistema).
-          getOffboardingCompletenessPartialSignal().catch(() => null)
+          getOffboardingCompletenessPartialSignal().catch(() => null),
+          // Notion bridge coverage drift — detecta regresión del resolver
+          // Notion-user-id → member-id (caso fuente: incidente 2026-05-16
+          // post-TASK-877 dejó coverage en 3.7%, colapsando OTD/RpA bonuses).
+          getIdentityNotionBridgeCoverageSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
@@ -1125,6 +1212,22 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-900 Slice 6 — ICO Materializer skipped_safety. Single reader;
+  // consulta count de runs con status='skipped_safety' en últimas 24h.
+  // Degrada honestamente a `unknown` si la query falla.
+  const icoMaterializerSkippedSafety =
+    preloadedSources.icoMaterializerSkippedSafety !== undefined
+      ? preloadedSources.icoMaterializerSkippedSafety
+      : await getIcoMaterializerSkippedSafetySignal().catch(() => null)
+
+  // TASK-908 Slice 3.5 — Notion correction transitions source availability.
+  // Single reader; LEFT JOIN tasks completadas vs task_status_transitions.
+  // Degrada honestamente a `unknown` si la query falla.
+  const notionCorrectionTransitionsSourceAvailability =
+    preloadedSources.notionCorrectionTransitionsSourceAvailability !== undefined
+      ? preloadedSources.notionCorrectionTransitionsSourceAvailability
+      : await getNotionCorrectionTransitionsSourceAvailabilitySignal().catch(() => null)
+
   // TASK-848 Slice 7 + TASK-849 Slice 2 + TASK-854 Slice 0 + TASK-857 —
   // Production Release Control Plane signals. 6 readers en paralelo. Cada
   // uno degrada a `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN /
@@ -1185,6 +1288,25 @@ export const getReliabilityOverview = async (
           })
           .catch(() => null)
 
+  // TASK-910 Slice 4 — Notion Demo Teamspace signals (6 canonical).
+  // Defense in depth dual: 5 signals delivery + 1 critical signal payroll.
+  // El payroll signal `payroll.bonus.demo_member_contamination` es ERROR si > 0
+  // (NUNCA debe pasar — alerta immediate canonical anti-regresión).
+  const notionMetricsDemo =
+    preloadedSources.notionMetricsDemo !== undefined
+      ? preloadedSources.notionMetricsDemo
+      : await Promise.all([
+          getNotionMetricsShadowParidadRpaDemoSignal().catch(() => null),
+          getNotionMetricsEchoLoopDemoSignal().catch(() => null),
+          getNotionMetricsWebhookSignatureFailuresDemoSignal().catch(() => null),
+          getNotionMetricsWritebackDeadLetterDemoSignal().catch(() => null),
+          getNotionMetricsWritebackLagDemoSignal().catch(() => null),
+          getNotionMetricsDemoTeamspaceDriftSignal().catch(() => null),
+          getPayrollBonusDemoContaminationSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -1198,6 +1320,7 @@ export const getReliabilityOverview = async (
     finalSettlementPdfStatusDrift,
     payrollParticipationWindow,
     leaveAccrual,
+    payrollContractTaxonomy,
     financeClpDrift,
     providerBqSyncDeadLetter,
     hubspotCompaniesIntakeDeadLetter,
@@ -1224,7 +1347,10 @@ export const getReliabilityOverview = async (
     postgresConnectionSaturation,
     servicesEngagement,
     commercialHealth,
-    productionRelease
+    productionRelease,
+    icoMaterializerSkippedSafety,
+    notionCorrectionTransitionsSourceAvailability,
+    notionMetricsDemo
   })
 }
 

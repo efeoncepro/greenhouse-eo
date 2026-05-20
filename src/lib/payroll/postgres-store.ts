@@ -16,7 +16,10 @@ import type {
 } from '@/types/payroll'
 import {
   CONTRACT_DERIVATIONS,
+  INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE,
   contractAllowsRemoteAllowance,
+  isInternationalInternalContractType,
+  normalizeLegalReviewReference,
   normalizeContractType,
   normalizePayrollVia,
   resolveScheduleRequired
@@ -60,6 +63,7 @@ import {
   resolveExitEligibilityForMembers,
   type WorkforceExitPayrollEligibilityWindow
 } from '@/lib/payroll/exit-eligibility'
+import { recordMemberContractTypeChange } from '@/lib/hr-core/member-contract-type-audit'
 
 
 // ---------------------------------------------------------------------------
@@ -690,12 +694,14 @@ const resolveMemberContractForCompensation = async ({
   contractType,
   scheduleRequired,
   deelContractId,
+  legalReviewReference,
   client
 }: {
   memberId: string
   contractType?: CreateCompensationVersionInput['contractType']
   scheduleRequired?: CreateCompensationVersionInput['scheduleRequired']
   deelContractId?: CreateCompensationVersionInput['deelContractId']
+  legalReviewReference?: CreateCompensationVersionInput['legalReviewReference']
   client: PoolClient
 }) => {
   const [member] = await queryRows<{
@@ -731,18 +737,39 @@ const resolveMemberContractForCompensation = async ({
     derivation.payrollVia === 'deel' ? (deelContractId ?? member.deel_contract_id) : null
   )
 
+  const resolvedLegalReviewReference = normalizeLegalReviewReference(legalReviewReference)
+
   if ((resolvedContractType === 'contractor' || resolvedContractType === 'eor') && !resolvedDeelContractId) {
     throw new PayrollValidationError('deelContractId is required for contractor and eor contracts.', 400, {
       memberId
     })
   }
 
+  if (
+    isInternationalInternalContractType(resolvedContractType) &&
+    (!resolvedLegalReviewReference || resolvedLegalReviewReference.length < 10)
+  ) {
+    throw new PayrollValidationError(
+      'legalReviewReference is required for international_internal contracts.',
+      400,
+      { memberId },
+      INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE
+    )
+  }
+
   return {
+    previous: {
+      contractType: member.contract_type,
+      payRegime: member.pay_regime,
+      payrollVia: member.payroll_via,
+      deelContractId: member.deel_contract_id
+    },
     contractType: resolvedContractType,
     payRegime: derivation.payRegime,
     payrollVia: derivation.payrollVia,
     scheduleRequired: resolvedScheduleRequired,
-    deelContractId: resolvedDeelContractId
+    deelContractId: resolvedDeelContractId,
+    legalReviewReference: resolvedLegalReviewReference
   }
 }
 
@@ -753,14 +780,29 @@ const syncMemberContractForCompensation = async ({
   payrollVia,
   scheduleRequired,
   deelContractId,
+  actorUserId,
+  actorEmail,
+  changeReason,
+  legalReviewReference,
+  previous,
   client
 }: {
   memberId: string
   contractType: CompensationVersion['contractType']
   payRegime: CompensationVersion['payRegime']
-  payrollVia: CompensationVersion['payrollVia']
+  payrollVia: NonNullable<CompensationVersion['payrollVia']>
   scheduleRequired: CompensationVersion['scheduleRequired']
-  deelContractId: CompensationVersion['deelContractId']
+  deelContractId: string | null
+  actorUserId: string
+  actorEmail: string | null
+  changeReason: string | null
+  legalReviewReference: string | null
+  previous: {
+    contractType: string | null
+    payRegime: string | null
+    payrollVia: string | null
+    deelContractId: string | null
+  }
   client: PoolClient
 }) => {
   await client.query(
@@ -777,6 +819,24 @@ const syncMemberContractForCompensation = async ({
     `,
     [contractType, payRegime, payrollVia, scheduleRequired, deelContractId, memberId]
   )
+
+  await recordMemberContractTypeChange({
+    client,
+    memberId,
+    actorUserId,
+    actorEmail,
+    source: 'payroll_compensation',
+    reason: changeReason,
+    legalReviewReference,
+    previous,
+    next: {
+      contractType,
+      payRegime,
+      payrollVia,
+      deelContractId
+    },
+    metadata: { sourceVersion: 'TASK-894' }
+  })
 }
 
 export const pgGetCurrentCompensation = async () => {
@@ -1096,6 +1156,7 @@ export const pgCreateCompensationVersion = async ({
       contractType: input.contractType,
       scheduleRequired: input.scheduleRequired,
       deelContractId: input.deelContractId,
+      legalReviewReference: input.legalReviewReference,
       client
     })
 
@@ -1178,6 +1239,11 @@ export const pgCreateCompensationVersion = async ({
       payrollVia: memberContract.payrollVia,
       scheduleRequired: memberContract.scheduleRequired,
       deelContractId: memberContract.deelContractId,
+      actorUserId: actorUserId ?? actorEmail ?? 'system:payroll',
+      actorEmail,
+      changeReason: input.changeReason.trim(),
+      legalReviewReference: memberContract.legalReviewReference,
+      previous: memberContract.previous,
       client
     })
 
@@ -1204,7 +1270,7 @@ export const pgCreateCompensationVersion = async ({
           afp_name, afp_rate, afp_cotizacion_rate, afp_comision_rate, health_system, health_plan_uf,
           unemployment_rate, contract_type, has_apv, apv_amount,
           effective_from, effective_to, is_current,
-          change_reason, desired_net_clp, created_by_user_id
+          change_reason, desired_net_clp, created_by_user_id, metadata_json
         )
         VALUES (
           $1, $2, $3, $4, $5,
@@ -1213,7 +1279,7 @@ export const pgCreateCompensationVersion = async ({
           $17, $18, $19, $20, $21, $22,
           $23, $24, $25, $26,
           $27::date, $28, $29,
-          $30, $31, $32
+          $30, $31, $32, $33::jsonb
         )
       `,
       [
@@ -1230,7 +1296,13 @@ export const pgCreateCompensationVersion = async ({
         input.unemploymentRate ?? (memberContract.contractType === 'plazo_fijo' ? 0 : 0.006),
         memberContract.contractType, Boolean(input.hasApv), Number(input.apvAmount ?? 0),
         effectiveFrom, nextEffectiveTo, isCurrent,
-        input.changeReason.trim(), input.desiredNetClp ?? null, actorUserId
+        input.changeReason.trim(), input.desiredNetClp ?? null, actorUserId,
+        JSON.stringify({
+          ...(memberContract.legalReviewReference
+            ? { legalReviewReference: memberContract.legalReviewReference }
+            : {}),
+          schemaVersion: 1
+        })
       ]
     )
 
@@ -1337,11 +1409,24 @@ export const pgUpdateCompensationVersion = async ({
 
     const existingVersion = mapCompensationVersion(versionRow)
 
+    let actorUserId: string | null = null
+
+    if (actorEmail) {
+      const [actorRow] = await queryRows<{ user_id: string }>(
+        `SELECT user_id FROM greenhouse_core.client_users WHERE email = $1 LIMIT 1`,
+        [actorEmail],
+        client
+      )
+
+      actorUserId = actorRow?.user_id ?? null
+    }
+
     const memberContract = await resolveMemberContractForCompensation({
       memberId: existingVersion.memberId,
       contractType: input.contractType,
       scheduleRequired: input.scheduleRequired,
       deelContractId: input.deelContractId,
+      legalReviewReference: input.legalReviewReference,
       client
     })
 
@@ -1392,6 +1477,11 @@ export const pgUpdateCompensationVersion = async ({
       payrollVia: memberContract.payrollVia,
       scheduleRequired: memberContract.scheduleRequired,
       deelContractId: memberContract.deelContractId,
+      actorUserId: actorUserId ?? actorEmail ?? 'system:payroll',
+      actorEmail,
+      changeReason: input.changeReason.trim(),
+      legalReviewReference: memberContract.legalReviewReference,
+      previous: memberContract.previous,
       client
     })
 
@@ -1423,8 +1513,13 @@ export const pgUpdateCompensationVersion = async ({
           has_apv = $22,
           apv_amount = $23,
           change_reason = $24,
-          desired_net_clp = $25
-        WHERE version_id = $26
+          desired_net_clp = $25,
+          metadata_json = COALESCE(metadata_json, '{}'::jsonb)
+            || CASE
+              WHEN $26::text IS NULL THEN '{}'::jsonb
+              ELSE jsonb_build_object('legalReviewReference', $26::text, 'schemaVersion', 1)
+            END
+        WHERE version_id = $27
       `,
       [
         memberContract.payRegime,
@@ -1452,6 +1547,7 @@ export const pgUpdateCompensationVersion = async ({
         Number(input.apvAmount ?? 0),
         input.changeReason.trim(),
         input.desiredNetClp ?? null,
+        memberContract.legalReviewReference,
         versionId
       ]
     )

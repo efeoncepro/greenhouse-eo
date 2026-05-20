@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { getProjectDetail, getProjectTasks } from '@/lib/projects/get-project-detail'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { TASK_STATUS_GROUPS, taskStatusGroupSql } from '@/lib/delivery/task-status-canonical'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,7 +69,7 @@ export async function GET(
           query: `SELECT fase_csc, COUNT(*) AS task_count
                   FROM \`${pid}.ico_engine.v_tasks_enriched\`
                   WHERE project_source_id = @projectSourceId
-                    AND task_status NOT IN ('Listo','Done','Finalizado','Completado','Archivadas','Cancelada')
+                    AND task_status NOT IN (${taskStatusGroupSql([...TASK_STATUS_GROUPS.COMPLETED, ...TASK_STATUS_GROUPS.EXCLUDED])})
                   GROUP BY fase_csc ORDER BY fase_csc`,
           params: { projectSourceId }
         })

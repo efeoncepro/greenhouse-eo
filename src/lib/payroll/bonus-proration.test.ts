@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import type { BonusProrationConfig } from '@/types/payroll'
 
-import { calculateOtdBonus, calculateRpaBonus } from './bonus-proration'
+import {
+  calculateOtdBonus,
+  calculateOtdBonusForMember,
+  calculateRpaBonus,
+  calculateRpaBonusForMember,
+  guardDemoMemberBonus
+} from './bonus-proration'
 
 const config: BonusProrationConfig = {
   otdThreshold: 89,
@@ -169,5 +175,95 @@ describe('calculateRpaBonus', () => {
 
     expect(result.prorationFactor).toBe(0.8667)
     expect(result.amount).toBe(866.7)
+  })
+})
+
+// ════════════════════════════════════════════════════════════════════════════
+// TASK-910 Slice 5 — Defense in depth canonical for demo members.
+// guardDemoMemberBonus + calculateRpaBonusForMember + calculateOtdBonusForMember
+// ════════════════════════════════════════════════════════════════════════════
+
+describe('TASK-910 Slice 5 — guardDemoMemberBonus canonical', () => {
+  it('returns null cuando member NO es demo (consumer procede a calc puro)', () => {
+    expect(guardDemoMemberBonus({ isDemo: false })).toBeNull()
+  })
+
+  it('returns null cuando isDemo undefined (default safe — legacy member)', () => {
+    expect(guardDemoMemberBonus({})).toBeNull()
+  })
+
+  it('returns null cuando isDemo null', () => {
+    expect(guardDemoMemberBonus({ isDemo: null })).toBeNull()
+  })
+
+  it('returns null cuando member null/undefined (defensive — bonus puro safe)', () => {
+    expect(guardDemoMemberBonus(null)).toBeNull()
+    expect(guardDemoMemberBonus(undefined)).toBeNull()
+  })
+
+  it('returns ZERO BonusResult cuando isDemo === true (canonical demo member)', () => {
+    const result = guardDemoMemberBonus({ isDemo: true })
+
+    expect(result).toEqual({ amount: 0, prorationFactor: 0, qualifies: false })
+  })
+
+  it('returns null cuando isDemo truthy pero NO strictly true (anti-coersion)', () => {
+    // Strict === true es load-bearing. Si llegara isDemo='true' string o 1,
+    // el caller debe arreglar upstream — NO procesar como demo defensive.
+    expect(guardDemoMemberBonus({ isDemo: 'true' as unknown as boolean })).toBeNull()
+    expect(guardDemoMemberBonus({ isDemo: 1 as unknown as boolean })).toBeNull()
+  })
+})
+
+describe('TASK-910 Slice 5 — calculateRpaBonusForMember canonical', () => {
+  it('demo member SIEMPRE retorna $0 bonus + qualifies=false (defense in depth)', () => {
+    // Aún con rpaAvg perfecto (1.0 = far below threshold), demo member → $0
+    const result = calculateRpaBonusForMember({ isDemo: true }, 1.0, 1000, config)
+
+    expect(result).toEqual({ amount: 0, prorationFactor: 0, qualifies: false })
+  })
+
+  it('demo member con rpaAvg null retorna $0 + qualifies=false', () => {
+    const result = calculateRpaBonusForMember({ isDemo: true }, null, 1000, config)
+
+    expect(result).toEqual({ amount: 0, prorationFactor: 0, qualifies: false })
+  })
+
+  it('real member (isDemo=false) procede a calc puro normal', () => {
+    const result = calculateRpaBonusForMember({ isDemo: false }, 1.0, 1000, config)
+
+    // rpaAvg=1.0 < rpaFullPayoutThreshold (1.7) → 100% canonical
+    expect(result).toEqual({ amount: 1000, prorationFactor: 1, qualifies: true })
+  })
+
+  it('member null/undefined procede a calc puro (defensive — fetchKpis filter principal)', () => {
+    // El filter principal canonical vive en fetchKpisForPeriod upstream.
+    // Si caller pierde acceso al member object, calc puro sigue funcionando.
+    const result = calculateRpaBonusForMember(null, 1.0, 1000, config)
+
+    expect(result.qualifies).toBe(true)
+  })
+})
+
+describe('TASK-910 Slice 5 — calculateOtdBonusForMember canonical', () => {
+  it('demo member SIEMPRE retorna $0 (defense in depth) — incluso con OTD 100%', () => {
+    const result = calculateOtdBonusForMember({ isDemo: true }, 100, 500, config)
+
+    expect(result).toEqual({ amount: 0, prorationFactor: 0, qualifies: false })
+  })
+
+  it('real member con OTD 100% retorna 100% bonus canonical', () => {
+    const result = calculateOtdBonusForMember({ isDemo: false }, 100, 500, config)
+
+    expect(result.qualifies).toBe(true)
+    expect(result.amount).toBe(500)
+  })
+
+  it('demo member NUNCA es tocado por OTD calc (defense in depth crítico)', () => {
+    // Anti-regresión TASK-877 follow-up bug class. Demo members con
+    // tareas "completadas" en demo NUNCA deben generar bonus real.
+    const result = calculateOtdBonusForMember({ isDemo: true }, 95, 1000, config)
+
+    expect(result.amount).toBe(0)
   })
 })

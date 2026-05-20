@@ -1,6 +1,12 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import {
+  TASK_STATUS_CANONICAL,
+  TASK_STATUS_GROUPS,
+  taskStatusGroupSql,
+  taskStatusSql
+} from '@/lib/delivery/task-status-canonical'
 import { DONE_STATUSES_SQL } from '@/lib/ico-engine/shared'
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -88,18 +94,19 @@ const buildTasksEnrichedView = (projectId: string) => `
     -- Derived: Canonical period anchor (due date preferred, fallback to created/synced date)
     COALESCE(dt.due_date, DATE(dt.created_at), DATE(dt.synced_at)) AS period_anchor_date,
 
-    -- Derived: CSC phase (configurable per space via status_phase_config, fallback to hardcoded CASE)
+    -- Derived: CSC phase (configurable per space via status_phase_config, fallback to canonical CASE).
+    -- Status name lists generated from canonical aliases (V1 + legacy variants).
     COALESCE(spc.fase_csc,
       CASE
-        WHEN dt.task_status IN ('Sin empezar', 'Backlog', 'Pendiente', 'Listo para diseñar')
+        WHEN dt.task_status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.BRIEFING)})
           THEN 'briefing'
-        WHEN dt.task_status IN ('En curso', 'En Curso')
+        WHEN dt.task_status IN (${taskStatusSql(TASK_STATUS_CANONICAL.EN_CURSO)})
           THEN 'produccion'
-        WHEN dt.task_status LIKE 'Listo para revis%'
+        WHEN dt.task_status IN (${taskStatusSql(TASK_STATUS_CANONICAL.LISTO_PARA_REVISION)})
           THEN 'revision_interna'
-        WHEN dt.task_status = 'Cambios Solicitados'
+        WHEN dt.task_status IN (${taskStatusSql(TASK_STATUS_CANONICAL.CAMBIOS_SOLICITADOS)})
           THEN 'cambios_cliente'
-        WHEN dt.task_status IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Aprobado')
+        WHEN dt.task_status IN (${taskStatusSql(TASK_STATUS_CANONICAL.APROBADO)})
           THEN 'entrega'
         ELSE 'otros'
       END
@@ -115,13 +122,14 @@ const buildTasksEnrichedView = (projectId: string) => `
     -- Derived: Hours since last edit
     TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), dt.last_edited_time, HOUR) AS hours_since_update,
 
-    -- Derived: Is stuck (no movement in 72+ hours while in an active state)
+    -- Derived: Is stuck (no movement in 72+ hours while in an active state).
+    -- Excludes: COMPLETED ∪ EXCLUDED ∪ BRIEFING — only ACTIVE/BLOCKED count as stuck candidates.
     (
-      dt.task_status NOT IN (
-        'Listo', 'Done', 'Finalizado', 'Completado', 'Aprobado',
-        'Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled',
-        'Sin empezar', 'Backlog', 'Pendiente'
-      )
+      dt.task_status NOT IN (${taskStatusGroupSql([
+        ...TASK_STATUS_GROUPS.COMPLETED,
+        ...TASK_STATUS_GROUPS.EXCLUDED,
+        ...TASK_STATUS_GROUPS.BRIEFING
+      ])})
       AND dt.last_edited_time IS NOT NULL
       AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), dt.last_edited_time, HOUR) >= 72
     ) AS is_stuck,
@@ -148,7 +156,7 @@ const buildTasksEnrichedView = (projectId: string) => `
   LEFT JOIN \`${projectId}.${ICO_DATASET}.status_phase_config\` spc
     ON spc.space_id = dt.space_id AND spc.task_status = dt.task_status
   WHERE dt.is_deleted = FALSE
-    AND (dt.task_status IS NULL OR dt.task_status NOT IN ('Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled'))
+    AND (dt.task_status IS NULL OR dt.task_status NOT IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.EXCLUDED)}))
 `
 
 /**

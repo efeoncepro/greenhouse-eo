@@ -1,9 +1,9 @@
 # Sistema de Animaciones y Microinteracciones del Portal
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-04-26 por Claude (TASK-642)
-> **Última actualización:** 2026-04-26
+> **Última actualización:** 2026-05-17 — GSAP adoptado como carril especializado de motion avanzado.
 > **Documentación técnica:** [GREENHOUSE_MOTION_SYSTEM_V1.md](../../architecture/GREENHOUSE_MOTION_SYSTEM_V1.md)
 
 ---
@@ -146,6 +146,7 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 | **Dashboard se carga** | KPI counters rolling + charts entrando al scroll |
 | **Agregar/sacar/reordenar item de una lista** | List mutation (auto-animate) |
 | **Lista de 20+ rows aparece** | List stagger (entrada cinematográfica) |
+| **Demo ejecutiva o vista narrativa con motion avanzado** | GSAP timeline o ScrollTrigger, solo si el caso lo justifica |
 
 ---
 
@@ -182,8 +183,9 @@ Las animaciones del portal están diseñadas para **no impactar performance**:
 El sistema está versionado:
 
 - **V1 (vigente)**: las 8 dimensiones descritas arriba. Foundation completa.
-- **V2 (futuro, no planificado)**: si emerge necesidad de motion choreography compleja (ej. multi-element morphs orquestados), se evaluará.
-- **Decisiones cerradas**: NO usamos GSAP, Lottie, react-spring, Anime.js ni react-transition-group. Stack canónico es View Transitions API + Framer Motion + auto-animate.
+- **V1.1 (vigente desde 2026-05-17)**: GSAP queda disponible para motion avanzado: timelines complejos, SVG/path/text y experiencias con ScrollTrigger. No reemplaza Framer Motion para microinteracciones normales.
+- **V2 (futuro)**: si aparecen varios usos productivos de GSAP, se crearán primitives Greenhouse dedicadas para no repetir timelines por pantalla.
+- **Decisiones cerradas**: Stack canónico base = View Transitions API + Framer Motion + auto-animate + CSS/MUI transitions. GSAP es carril especializado; react-spring, Anime.js y react-transition-group siguen fuera.
 
 Cualquier vista nueva del portal debe consumir el sistema. No se permite hardcodear timing inline ni introducir nuevas librerías de motion sin actualizar el documento técnico.
 

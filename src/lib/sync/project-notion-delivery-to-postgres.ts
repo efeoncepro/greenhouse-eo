@@ -3,6 +3,69 @@ import 'server-only'
 import { sql } from 'kysely'
 
 import { getDb } from '@/lib/db'
+import { captureWithDomain } from '@/lib/observability/capture'
+
+/**
+ * SQL-boundary integer coercion.
+ *
+ * BQ formula columns can emit fractional values (e.g. `"0.44"` for an "RpA"-like
+ * formula that aggregates against zero corrections). The TS mapper passes these
+ * to PG INTEGER columns where `'0.44'::integer` fails with `invalid input syntax
+ * for type integer: "0.44"`. Even when the upstream `toInteger` helper wraps a
+ * column, a future column added to the projection might miss the wrap and trip
+ * the same bug class.
+ *
+ * Canonical defense: cast EVERY integer parameter twice at the SQL boundary —
+ * first to NUMERIC (accepts both string "0.44" and number 0.44), then to
+ * INTEGER (truncates fractional, equivalent to `Math.trunc`). Belt-and-suspenders
+ * with the TS `toInteger` helper.
+ *
+ * NULL passes through. Strings parseable as numbers parse correctly. Fractional
+ * numerics truncate. Anything else fails loud (intended — bad type contract).
+ */
+const intArg = (value: number | string | null | undefined) =>
+  sql<number | null>`(${value})::numeric::integer`
+
+/**
+ * SQL-boundary array coercion (TEXT[] columns NOT NULL DEFAULT '{}').
+ *
+ * BQ returns `null` for repeated-string columns when the underlying Notion
+ * property has no values (e.g. a task with no `Subtareas` relation). The TS
+ * mapper passes the `null` through to PG, but PG `greenhouse_delivery.tasks`
+ * has 4 ARRAY columns declared NOT NULL DEFAULT '{}' which reject the insert
+ * with `null value in column "tarea_principal_ids" of relation "tasks"
+ * violates not-null constraint`.
+ *
+ * Mirror del pattern `intArg`: cast EVERY array parameter at the SQL boundary
+ * via `COALESCE(${value}::text[], ARRAY[]::text[])`. NULL → empty array; non-
+ * null array passes unchanged. Any FUTURE ARRAY column added to the projection
+ * is automatically protected from this bug class even if the upstream mapper
+ * forgets to coalesce.
+ *
+ * Belt-and-suspenders: TS contract says `string[] | null`, but BQ runtime may
+ * return null for any of the 4 ARRAY NOT NULL columns (`assignee_member_ids`,
+ * `project_source_ids`, `subtareas_ids`, `tarea_principal_ids`) plus any column
+ * that becomes NOT NULL in a future migration. The SQL boundary catches it.
+ */
+const arrayArg = (value: string[] | null | undefined) =>
+  sql<string[]>`COALESCE(${value}::text[], ARRAY[]::text[])`
+
+/**
+ * Defensive PG-error redaction for diagnostic capture. PG errors include
+ * `position`, `detail`, `where`, `code`, but never include row-level user data
+ * unless they reflect literal values. We extract only the structural fields.
+ */
+const summarizePgError = (err: unknown): Record<string, unknown> => {
+  const e = err as { message?: string; code?: string; position?: string; column?: string; constraint?: string }
+
+  return {
+    message: e?.message ?? String(err),
+    code: e?.code,
+    position: e?.position,
+    column: e?.column,
+    constraint: e?.constraint
+  }
+}
 
 /**
  * Notion conformed → PostgreSQL projection
@@ -156,31 +219,57 @@ export interface ProjectNotionDeliveryToPostgresInput {
   replaceMissingForSpaces?: boolean
 }
 
+export interface ProjectionRowFailure {
+  entityType: 'project' | 'sprint' | 'task'
+  entityId: string
+  error: Record<string, unknown>
+}
+
 export interface ProjectNotionDeliveryToPostgresResult {
   projectsWritten: number
   sprintsWritten: number
   tasksWritten: number
+  projectsSkipped: number
+  sprintsSkipped: number
+  tasksSkipped: number
   projectsMarkedDeleted: number
   sprintsMarkedDeleted: number
   tasksMarkedDeleted: number
+  /** Sampled failures for diagnostics (capped at 20 to keep payload bounded). */
+  failureSamples: ProjectionRowFailure[]
   durationMs: number
+}
+
+interface UpsertOutcome {
+  written: number
+  skipped: number
 }
 
 const upsertProjects = async (
   syncRunId: string,
-  projects: ProjectProjectionRow[]
-): Promise<number> => {
-  if (projects.length === 0) return 0
+  projects: ProjectProjectionRow[],
+  failures: ProjectionRowFailure[]
+): Promise<UpsertOutcome> => {
+  if (projects.length === 0) return { written: 0, skipped: 0 }
   const db = await getDb()
   let written = 0
+  let skipped = 0
 
   // One UPSERT per row keeps the SQL simple and uses the existing
   // `ON CONFLICT (notion_project_id)` index. Volume is bounded by the
   // number of active projects (~hundreds), so per-row overhead is negligible.
+  //
+  // Per-row try/catch (canonical resilience pattern):
+  //   - One bad row does NOT fail the batch.
+  //   - Each failure captures entity_id + sanitized PG error metadata.
+  //   - `failureSamples` is capped at 20 to keep the audit payload bounded.
+  //   - Sentry domain=`integrations.notion` rolls up the failure into the
+  //     reliability dashboard.
   for (const project of projects) {
     if (!project.project_source_id) continue
 
-    await sql`
+    try {
+      await sql`
       INSERT INTO greenhouse_delivery.projects (
         project_record_id, space_id, client_id, module_id,
         project_database_source_id, notion_project_id, project_name,
@@ -227,24 +316,44 @@ const upsertProjects = async (
         payload_hash = EXCLUDED.payload_hash,
         updated_at = CURRENT_TIMESTAMP
     `.execute(db)
-    written += 1
+      written += 1
+    } catch (err) {
+      skipped += 1
+      const summary = summarizePgError(err)
+
+      captureWithDomain(err, 'integrations.notion', {
+        tags: { source: 'delivery_projection', entity: 'project' },
+        extra: { syncRunId, entityId: project.project_source_id, ...summary }
+      })
+
+      if (failures.length < 20) {
+        failures.push({
+          entityType: 'project',
+          entityId: project.project_source_id,
+          error: summary
+        })
+      }
+    }
   }
 
-  return written
+  return { written, skipped }
 }
 
 const upsertSprints = async (
   syncRunId: string,
-  sprints: SprintProjectionRow[]
-): Promise<number> => {
-  if (sprints.length === 0) return 0
+  sprints: SprintProjectionRow[],
+  failures: ProjectionRowFailure[]
+): Promise<UpsertOutcome> => {
+  if (sprints.length === 0) return { written: 0, skipped: 0 }
   const db = await getDb()
   let written = 0
+  let skipped = 0
 
   for (const sprint of sprints) {
     if (!sprint.sprint_source_id) continue
 
-    await sql`
+    try {
+      await sql`
       INSERT INTO greenhouse_delivery.sprints (
         sprint_record_id, project_record_id, space_id,
         project_database_source_id, notion_sprint_id, sprint_name,
@@ -258,8 +367,8 @@ const upsertSprints = async (
         ${sprint.space_id}, ${sprint.project_database_source_id},
         ${sprint.sprint_source_id}, ${sprint.sprint_name},
         ${sprint.sprint_status}, ${sprint.start_date}::date,
-        ${sprint.end_date}::date, ${sprint.completed_tasks_count},
-        ${sprint.total_tasks_count}, ${sprint.completion_pct_source},
+        ${sprint.end_date}::date, ${intArg(sprint.completed_tasks_count)},
+        ${intArg(sprint.total_tasks_count)}, ${sprint.completion_pct_source},
         ${sprint.page_url}, ${sprint.is_deleted},
         ${sprint.last_edited_time}::timestamptz,
         ${sprint.synced_at}::timestamptz, ${syncRunId},
@@ -284,24 +393,44 @@ const upsertSprints = async (
         payload_hash = EXCLUDED.payload_hash,
         updated_at = CURRENT_TIMESTAMP
     `.execute(db)
-    written += 1
+      written += 1
+    } catch (err) {
+      skipped += 1
+      const summary = summarizePgError(err)
+
+      captureWithDomain(err, 'integrations.notion', {
+        tags: { source: 'delivery_projection', entity: 'sprint' },
+        extra: { syncRunId, entityId: sprint.sprint_source_id, ...summary }
+      })
+
+      if (failures.length < 20) {
+        failures.push({
+          entityType: 'sprint',
+          entityId: sprint.sprint_source_id,
+          error: summary
+        })
+      }
+    }
   }
 
-  return written
+  return { written, skipped }
 }
 
 const upsertTasks = async (
   syncRunId: string,
-  tasks: TaskProjectionRow[]
-): Promise<number> => {
-  if (tasks.length === 0) return 0
+  tasks: TaskProjectionRow[],
+  failures: ProjectionRowFailure[]
+): Promise<UpsertOutcome> => {
+  if (tasks.length === 0) return { written: 0, skipped: 0 }
   const db = await getDb()
   let written = 0
+  let skipped = 0
 
   for (const task of tasks) {
     if (!task.task_source_id) continue
 
-    await sql`
+    try {
+      await sql`
       INSERT INTO greenhouse_delivery.tasks (
         task_record_id, project_record_id, sprint_record_id, space_id, client_id,
         module_id, assignee_member_id, assignee_source_id, assignee_member_ids,
@@ -324,22 +453,22 @@ const upsertTasks = async (
         ${task.sprint_source_id ? `sprint-${task.sprint_source_id}` : null},
         ${task.space_id}, ${task.client_id}, ${task.module_id},
         ${task.assignee_member_id}, ${task.assignee_source_id},
-        ${task.assignee_member_ids}::text[], ${task.project_database_source_id},
+        ${arrayArg(task.assignee_member_ids)}, ${task.project_database_source_id},
         ${task.task_source_id}, ${task.project_source_id},
-        ${task.project_source_ids}::text[], ${task.sprint_source_id},
+        ${arrayArg(task.project_source_ids)}, ${task.sprint_source_id},
         ${task.task_name}, ${task.task_status}, ${task.task_phase},
         ${task.task_priority}, ${task.completion_label}, ${task.delivery_compliance},
-        ${task.days_late}, ${task.rescheduled_days}, ${task.is_rescheduled},
+        ${intArg(task.days_late)}, ${intArg(task.rescheduled_days)}, ${task.is_rescheduled},
         ${task.performance_indicator_label}, ${task.performance_indicator_code},
-        ${task.client_change_round_label}, ${task.client_change_round_final},
-        ${task.rpa_semaphore_source}, ${task.rpa_value}, ${task.frame_versions},
-        ${task.frame_comments}, ${task.open_frame_comments},
+        ${task.client_change_round_label}, ${intArg(task.client_change_round_final)},
+        ${task.rpa_semaphore_source}, ${task.rpa_value}, ${intArg(task.frame_versions)},
+        ${intArg(task.frame_comments)}, ${intArg(task.open_frame_comments)},
         ${task.client_review_open}, ${task.workflow_review_open},
-        ${task.blocker_count}, ${task.last_frame_comment},
-        ${task.tarea_principal_ids}::text[], ${task.subtareas_ids}::text[],
+        ${intArg(task.blocker_count)}, ${task.last_frame_comment},
+        ${arrayArg(task.tarea_principal_ids)}, ${arrayArg(task.subtareas_ids)},
         ${task.original_due_date}::date, ${task.execution_time_label},
         ${task.changes_time_label}, ${task.review_time_label},
-        ${task.workflow_change_round}, ${task.due_date}::date,
+        ${intArg(task.workflow_change_round)}, ${task.due_date}::date,
         ${task.completed_at}::timestamptz, ${task.page_url}, ${task.is_deleted},
         ${task.last_edited_time}::timestamptz, ${task.synced_at}::timestamptz,
         ${syncRunId}, ${task.payload_hash}
@@ -396,10 +525,27 @@ const upsertTasks = async (
         payload_hash = EXCLUDED.payload_hash,
         updated_at = CURRENT_TIMESTAMP
     `.execute(db)
-    written += 1
+      written += 1
+    } catch (err) {
+      skipped += 1
+      const summary = summarizePgError(err)
+
+      captureWithDomain(err, 'integrations.notion', {
+        tags: { source: 'delivery_projection', entity: 'task' },
+        extra: { syncRunId, entityId: task.task_source_id, ...summary }
+      })
+
+      if (failures.length < 20) {
+        failures.push({
+          entityType: 'task',
+          entityId: task.task_source_id,
+          error: summary
+        })
+      }
+    }
   }
 
-  return written
+  return { written, skipped }
 }
 
 /**
@@ -489,9 +635,15 @@ export const projectNotionDeliveryToPostgres = async ({
   // Order: projects → sprints → tasks. Tasks reference both, sprints reference
   // projects. The FKs are NULLable so the writes succeed regardless, but this
   // order ensures the joined queries see consistent state at every step.
-  const projectsWritten = await upsertProjects(syncRunId, projects)
-  const sprintsWritten = await upsertSprints(syncRunId, sprints)
-  const tasksWritten = await upsertTasks(syncRunId, tasks)
+  //
+  // Shared `failures[]` aggregates per-row error samples across all 3 upserts.
+  // Capped at 20 samples globally (see upsert*). Per-entity skipped counters
+  // are returned independently (not capped). Caller logs aggregate + emits
+  // reliability signal when count > 0. One bad row never blocks the batch.
+  const failures: ProjectionRowFailure[] = []
+  const projectsOutcome = await upsertProjects(syncRunId, projects, failures)
+  const sprintsOutcome = await upsertSprints(syncRunId, sprints, failures)
+  const tasksOutcome = await upsertTasks(syncRunId, tasks, failures)
 
   let projectsMarkedDeleted = 0
   let sprintsMarkedDeleted = 0
@@ -524,12 +676,16 @@ export const projectNotionDeliveryToPostgres = async ({
   }
 
   return {
-    projectsWritten,
-    sprintsWritten,
-    tasksWritten,
+    projectsWritten: projectsOutcome.written,
+    sprintsWritten: sprintsOutcome.written,
+    tasksWritten: tasksOutcome.written,
+    projectsSkipped: projectsOutcome.skipped,
+    sprintsSkipped: sprintsOutcome.skipped,
+    tasksSkipped: tasksOutcome.skipped,
     projectsMarkedDeleted,
     sprintsMarkedDeleted,
     tasksMarkedDeleted,
+    failureSamples: failures,
     durationMs: Date.now() - startedAt
   }
 }

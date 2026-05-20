@@ -19,6 +19,15 @@ Greenhouse EO — portal operativo de Efeonce Group. Next.js 16 App Router + MUI
 - Feriados nacionales: `Nager.Date` + overrides persistidos en Greenhouse
 - No usar helpers locales de vista para decidir ventana de cierre o mes operativo vigente
 
+### International Internal Contract Type Invariants (TASK-894)
+
+- `international_internal` es un `ContractType` canónico: `payRegime='international'` + `payrollVia='internal'`. No es Deel, no es EOR y no se degrada automáticamente a `contractor`.
+- Efeonce SpA actúa como operational payer, no como employer of record/local-country legal employer en V1. No aplicar AFP, salud, cesantía, SIS, mutual, APV, IUSC ni retención SII a este perfil.
+- Writes reales requieren capability `payroll.contract.use_international_internal` y `legalReviewReference` >= 10 caracteres. No loggear ni publicar el valor crudo en outbox/Sentry; el evento usa solo `hasLegalReviewReference`.
+- Toda mutación de `contract_type`/`pay_regime`/`payroll_via` debe pasar por los helpers canónicos y emitir `member.contract_type.changed v1` + audit row append-only en la misma transacción.
+- La DB protege la matriz contractual: miembros validan la tupla completa `(contract_type, pay_regime, payroll_via)` y `compensation_versions` valida `(contract_type, pay_regime)` para nuevas/actualizadas rows. No bypass por SQL directo.
+- Los consumers downstream deben detectar `international_internal` por `contractType`, no por heurísticas compuestas de régimen/vía.
+
 ### Canonical 360 Object Model
 
 - `Cliente` → `greenhouse.clients.client_id`
@@ -84,6 +93,23 @@ fi
 CLI Vercel targetea por `name+scope`, NO por ID directo. El pattern resuelve el ID via `inspect`, compara contra el ID authorized por humano, y aborta si mismatch. Único patrón seguro para destructive Vercel actions cuando el target fue autorizado by ID (no by name+scope).
 
 **Spec canónica**: `docs/issues/resolved/ISSUE-076-vercel-cli-duplicate-project-recurrent-bug-class.md` (cierra recurrencia de ISSUE-013).
+
+### Cross-repo action safety (desde 2026-05-18, post Kortex over-application)
+
+Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a múltiples repos del ecosystem (e.g. documentar transfer, agregar notas cross-link, broadcast cambios canonical), **antes de commitear a cualquier repo distinto de `efeoncepro/greenhouse-eo`**, el agente debe verificar 2 condiciones:
+
+1. **Relevancia operacional**: ¿el repo target consume o referencia el cambio? `GREENHOUSE_REPO_ECOSYSTEM_V1.md` lista repos hermanos pero algunos son **productos separados** (e.g. `efeoncepro/kortex` es plataforma CRM/HubSpot, NO Greenhouse ecosystem operacional). Aplicar la instrucción literal a TODOS los repos del doc sin filtrar = over-application.
+
+2. **CI/CD del target repo**: ¿el repo tiene auto-deploy en push a `main` (Vercel/GitHub Actions/etc.)? Si SÍ, un commit benigno (incluso solo al README) **dispara el pipeline completo** — puede revelar bugs pre-existing dormant y generar email burst al owner. Antes de commit directo, verificar el último deploy status. Si está en Error, NO commitear (re-disparás el fail).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** commit directo a `main` de un repo sibling sin (a) confirmar relevancia operacional del cambio, (b) check del último deploy status del repo target, (c) decisión explícita del user si el repo tiene auto-deploy productivo.
+- **NUNCA** asumir "instrucción literal aplica a todos los repos listados en el ecosystem doc". Filtrar por relevancia operacional ANTES de actuar. Si emerge duda, preguntar al user.
+- **PREFERIR** PR + review en lugar de commit directo cuando el repo target tiene auto-deploy productivo y el cambio no es critical hotfix.
+- **SIEMPRE** que la instrucción del user incluya "todos los repos hermanos" o equivalente plural, enumerar primero los repos candidate + propuesta filter por relevancia + esperar confirmación antes de bulk apply.
+
+**Caso fuente (2026-05-18, Kortex over-application)**: durante governance fix del transfer `notion-bigquery` → `efeoncepro` org, agregué ecosystem note cross-link al README de los 4 repos hermanos listados en `GREENHOUSE_REPO_ECOSYSTEM_V1.md`. Kortex es **producto separado** sin relación operacional al sync notion-bigquery, pero apliqué la instrucción literal. Mi commit benigno (solo README) disparó auto-deploy Vercel productivo que falló por bug pre-existing 33 días dormant. Email noise al owner + 5 min cleanup (revert vía git clone). Lesson: relevancia + CI/CD check ANTES de cross-repo actions.
 
 ## Quick Reference
 
@@ -923,6 +949,130 @@ Contrato versionado `platform-health.v1` que un agente, MCP, Teams bot, cron de 
 - DB functions `greenhouse_delivery.{task,project,sprint}_display_name` (migration `20260426144105255`) producen el fallback display data-derived al READ time. Mirror exacto en TS via `src/lib/delivery/task-display.ts` (paridad regression-tested).
 
 **Admin queue de hygiene**: `/admin/data-quality/notion-titles` lista las pages con `*_name IS NULL` agrupadas por space, con CTA "Editar en Notion" → page_url. Cuando el usuario edita el title en Notion, el next sync drena el cambio y la row sale del queue.
+
+### Canonical task status vocabulary V1 — single source of truth cross-tenant (2026-05-18)
+
+Toda comparación de `task_status` / `estado` en TS o SQL embebido **debe** pasar por el módulo canonical `src/lib/delivery/task-status-canonical.ts`. Single source of truth para los 11 estados V1 del lifecycle de tareas Greenhouse + alias map cubriendo Efeonce legacy + Sky legacy + English/accent variants.
+
+**Módulo canonical**: `src/lib/delivery/task-status-canonical.ts` (NOT server-only — safe en client + server).
+
+- `TASK_STATUS_CANONICAL` — 11 estados V1: `Sin empezar`, `Brief listo`, `Pendiente aprobación interna`, `En pausa`, `Bloqueado`, `En curso`, `Listo para revisión`, `Cambios solicitados`, `Aprobado`, `Cancelado`, `Archivado`.
+- `TASK_STATUS_ALIASES` — frozen map: 11 canonical self-maps + 7 Efeonce legacy (`Listo→Aprobado`, `Cancelada→Cancelado`, `Archivadas→Archivado`, `Detenido→En pausa`, `Listo para diseñar→Brief listo`, `Pendiente Dir. Arte→Pendiente aprobación interna`, `Cambios Solicitados→Cambios solicitados` con S→s) + 3 Sky legacy (`Tomado→Brief listo`, `Pendiente→Pendiente aprobación interna`, `En feedback→Cambios solicitados`) + 8 English/accent variants (Done/Finalizado/Completado→Aprobado, Cancelled/Canceled→Cancelado, sin tilde, capital case, Backlog→Sin empezar, Archivada singular).
+- `TASK_STATUS_GROUPS` — semantic groups: `BRIEFING`, `ACTIVE`, `BLOCKED`, `COMPLETED`, `EXCLUDED`, `READY_FOR_REVIEW`, `CLIENT_CHANGES`.
+
+**Helpers puros** (client + server):
+
+- `normalizeTaskStatus(raw)` → canonical V1 string o null.
+- `isCanonicalStatus(raw, canonical)` → boolean predicate.
+- `isCanonicalStatusInGroup(raw, group)` → boolean predicate.
+- `allVariantsForCanonical(canonical)` → string[] con TODAS las variantes (legacy + canonical).
+- `allVariantsForGroup(group)` → string[] expandido.
+
+**SQL builders** (server-side):
+
+- `taskStatusSql(canonical)` → `'A','B','C'` SQL-safe IN list para un canonical.
+- `taskStatusGroupSql(group)` → group expandido con todas las variantes.
+- `buildTaskStatusToCscPhaseSql(column)` → CASE WHEN canonical mapeando a CSC phase (briefing / produccion / revision_interna / cambios_cliente / aprobado / bloqueado / excluido / unknown).
+
+**Pattern canónico**:
+
+```ts
+// TS predicate (client + server)
+if (isCanonicalStatusInGroup(row.task_status, TASK_STATUS_GROUPS.COMPLETED)) { ... }
+
+// SQL embebido (server)
+const sql = `
+  COUNTIF(task_status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})) AS done
+`
+
+// UNNEST(@param) pattern para BQ parameterized
+const params = { completedStatuses: allVariantsForGroup(TASK_STATUS_GROUPS.COMPLETED) }
+const sql = `COUNTIF(estado IN UNNEST(@completedStatuses)) AS done`
+```
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** hardcodear un literal de status en TS/SQL/BQ (`if (status === 'Cambios Solicitados')`, `WHERE estado = 'Listo'`, etc.). Toda comparación pasa por canonical helpers + constants.
+- **NUNCA** comparar status con `===` contra un nombre canonical sin normalizar el lado raw antes. Pre-rename data tiene variantes case-mismatched (`'Cambios Solicitados'` capital S vs canonical `'Cambios solicitados'`) — la comparación directa falla silente. Usar `isCanonicalStatus(raw, canonical)` o `normalizeTaskStatus(raw)` primero.
+- **NUNCA** modificar `TASK_STATUS_ALIASES` para REMOVER un legacy alias sin verificar que BQ/PG no tiene rows residuales con ese nombre. La eliminación es decisión coordinada cuando TASK-908 ship + 0% data en BQ con el nombre viejo.
+- **NUNCA** agregar aliases para nombres custom de cliente nuevo. Si entra cliente con custom status names, **enforce canonical template L1** en Notion antes del onboarding (eso es lo escalable). Los aliases son SOLO para legacy transition window.
+- **NUNCA** importar este módulo desde código que tenga `import 'server-only'` directive en un componente cliente — el módulo en sí NO es server-only (sin directive), pero los SQL builders solo tienen sentido server-side.
+- **NUNCA** usar el output de `taskStatusGroupSql` / `taskStatusSql` en un endpoint que acepte user input para el group/canonical (potencial SQL injection). Los inputs DEBEN ser constants `TASK_STATUS_GROUPS.*` o `TASK_STATUS_CANONICAL.*`, no strings runtime.
+- **SIEMPRE** que emerja un nuevo callsite que necesite comparar/filtrar status, usar canonical helpers. NO replicar inline arrays como `['Listo', 'Done', 'Finalizado', 'Completado']`.
+- **SIEMPRE** que emerja un cliente nuevo con custom status names en Notion, NO agregar aliases. Migrar el template Notion del cliente al canonical V1 ANTES del onboarding. L1 universalización es la única solución escalable.
+
+**Pattern fuente**: TASK-742 (single source of truth + frozen maps + helper canonical pattern). Migration path: Plan B (TASK-908) introduce `status_code` enum persistido en PG al boundary del sync — código matchea por código estable, no por nombre. Cuando shipee, los aliases legacy se eliminan en cleanup PR.
+
+**Spec canónica**: commit `1525e51c` en `develop` 2026-05-18. Tests anti-regresión: 68 asserts en `src/lib/delivery/task-status-canonical.test.ts`.
+
+### Notion delivery PG projection — robust integer cast + per-row resilience (2026-05-18)
+
+`projectNotionDeliveryToPostgres` (`src/lib/sync/project-notion-delivery-to-postgres.ts`) es el writer canónico de `greenhouse_delivery.{projects,tasks,sprints}` PG desde BQ conformed. Toda INSERT de una columna INTEGER pasa por **SQL-boundary cast** + **per-row try/catch** + **Sentry diagnostic capture** + **result shape con skipped counters**. Defense in depth de 4 capas.
+
+**Helpers canónicos** (`src/lib/sync/project-notion-delivery-to-postgres.ts`):
+
+- `intArg(value)` → `sql\`(${value})::numeric::integer\``. Cast doble que acepta string (`"0.44"`), number (`0.44`), null, undefined → coerce a INTEGER truncando fraccional. Belt-and-suspenders con TS `toInteger` upstream.
+- `arrayArg(value)` → `sql\`COALESCE(${value}::text[], ARRAY[]::text[])\``. Mirror del `intArg` pattern para ARRAY NOT NULL columns. BQ runtime puede devolver `null` para repeated-string properties sin valores (e.g. task sin Subtareas relation). PG ARRAY NOT NULL DEFAULT '{}' rechaza ese null. Helper coerce `null → []` en SQL boundary. Aplica a las 4 columnas ARRAY NOT NULL canónicas (`assignee_member_ids`, `project_source_ids`, `subtareas_ids`, `tarea_principal_ids`) + cualquier columna ARRAY NOT NULL futura.
+- `summarizePgError(err)` → extrae `{message, code, position, column, constraint}` de un PG error sin row-level data.
+
+**Pattern canónico per upsert helper**:
+
+```typescript
+for (const row of rows) {
+  if (!row.entity_source_id) continue
+  try {
+    await sql`INSERT INTO greenhouse_delivery.X (...)
+              VALUES (...,
+                ${intArg(row.integer_col)},
+                ${arrayArg(row.array_col)},
+                ...)
+              ON CONFLICT (...) DO UPDATE SET ...`.execute(db)
+    written += 1
+  } catch (err) {
+    skipped += 1
+    const summary = summarizePgError(err)
+    captureWithDomain(err, 'integrations.notion', {
+      tags: { source: 'delivery_projection', entity: '<project|sprint|task>' },
+      extra: { syncRunId, entityId: row.entity_source_id, ...summary }
+    })
+    if (failures.length < 20) failures.push({ entityType, entityId, error: summary })
+  }
+}
+```
+
+**Result shape canónico** (extendido a `ProjectNotionDeliveryToPostgresResult`):
+
+- `projectsSkipped` / `sprintsSkipped` / `tasksSkipped` — real counters per entity (no capped).
+- `failureSamples[]` — capped a 20 samples para audit payload bounded.
+
+**Bug class disparadores (2026-05-18)**:
+
+- **INTEGER NOT NULL** (commit `ca465ac0`): BQ formula columns emiten valores fraccionales como string `"0.44"`. El TS contract `<col>: number | null` PASSED tsc, pero runtime podía leak strings. PG INTEGER rechazaba con `invalid input syntax for type integer: "0.44"`. Solución: `intArg`.
+- **ARRAY NOT NULL** (commit `550c0e67`): BQ devuelve `null` para repeated-string properties sin valores (e.g. task sin Subtareas). PG `ARRAY NOT NULL DEFAULT '{}'` rechaza con `null value in column "tarea_principal_ids" of relation "tasks" violates not-null constraint`. Detected en vivo durante Efeonce canonical rename cascade (1322 rows skipped en Step 1, Sentry alert JAVASCRIPT-NEXTJS-64). Solución: `arrayArg`.
+
+Sin per-row try/catch, una sola row mala fallaba el batch entero. Sin diagnostic capture, RCA requería deep grep post-facto. La per-row resilience + diagnostic capture hicieron que el bug class ARRAY fuera SURFACEABLE inmediatamente (Sentry alert clara con `column: "tarea_principal_ids"`) sin bloquear la cascada (Step 2 UNCONDITIONAL drain bypaseó el bug y dejó PG canonical).
+
+**Columnas protegidas actualmente**:
+
+- INTEGER (10): `days_late`, `rescheduled_days`, `client_change_round_final`, `frame_versions`, `frame_comments`, `open_frame_comments`, `blocker_count`, `workflow_change_round`, `completed_tasks_count`, `total_tasks_count`.
+- ARRAY NOT NULL (4): `assignee_member_ids`, `project_source_ids`, `subtareas_ids`, `tarea_principal_ids`.
+
+Cualquier columna nueva (INTEGER o ARRAY NOT NULL) queda automáticamente protegida por la primitiva canonical cuando se envuelve con el helper apropiado.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** pasar una columna INTEGER a un INSERT sin envolver el valor en `intArg(...)`. Aunque el TS contract diga `number | null`, el runtime puede leak strings desde BQ formulas.
+- **NUNCA** pasar una columna ARRAY NOT NULL a un INSERT sin envolver el valor en `arrayArg(...)`. Aunque el TS contract diga `string[] | null`, BQ runtime puede devolver `null` cuando la repeated property Notion no tiene valores.
+- **NUNCA** envolver un upsert helper (`upsertProjects/Sprints/Tasks`) sin per-row try/catch. Resilience canónica: una row mala no debe bloquear el batch.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'delivery_projection', entity: '<project|sprint|task>' }, extra: { syncRunId, entityId, ...summary } })`.
+- **NUNCA** loggear el row completo en el catch (puede contener PII). Solo `entityId` + `summarizePgError(err)` output (campos estructurales sin user data).
+- **NUNCA** modificar el shape `ProjectNotionDeliveryToPostgresResult` removiendo campos. Adding-only es safe; removing rompe consumers.
+- **SIEMPRE** que emerja una columna INTEGER nueva en el schema, agregarla al INSERT con `intArg(...)`. Lint rule no la enforce hoy — code review humano.
+- **SIEMPRE** que emerja una columna ARRAY NOT NULL nueva en el schema, agregarla al INSERT con `arrayArg(...)`. Mismo enforcement humano.
+- **SIEMPRE** que emerja un nuevo upsert helper (e.g. para `revisions` o cualquier delivery entity nueva), seguir el mismo pattern: try/catch + intArg + arrayArg + captureWithDomain + skipped/failures wiring.
+- **SIEMPRE** caller del helper debe loggear `pgResult.{projectsSkipped, sprintsSkipped, tasksSkipped}` en cron summary line + first `failureSamples[0]` si totalSkipped > 0. Cron visibility canónica.
+
+**Spec canónica**: commits `ca465ac0` (intArg + per-row resilience) + `550c0e67` (arrayArg) en `develop` 2026-05-18. Pattern fuente: TASK-742 7-layer auth resilience (per-row try/catch + diagnostic capture + Sentry domain), TASK-571/766/774 (VIEW canónica + helper + signal + lint).
 
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574
 
@@ -3806,6 +3956,490 @@ El bug class observado live 2026-05-15 con María Camila Hoyos: case `executed` 
 **Reusable cross-flow**: el patrón "`pendingSteps[]` decide el primaryAction" se replica para Onboarding work queue (TASK-875), hiring pipeline, workforce activation (TASK-874), contractor closure (TASK-797 futuro), final settlement document lifecycle (TASK-863). Cuando emerja una surface con `primaryAction` derivado de una sola dimensión pero realidad operativa multi-capa, replicar: pure function + STEP_PRIORITY + state machine cerrado + signal de cierre parcial.
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md` (Delta 2026-05-15). Task: `docs/tasks/in-progress/TASK-892-offboarding-closure-completeness-aggregate.md`. Reliability signal: `hr.offboarding.completeness_partial` (kind=drift, severity warning >0, steady=0, subsystem Identity & Access). Patrones fuente: TASK-742 (4-pillar checklist), TASK-672 (composer + degraded honest), TASK-880 (decision tree por capability + audience), TASK-873 (capability triple-layer canonical).
+
+### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
+
+Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).
+
+**Bug class canónico (2026-05-16)**: TASK-877 cambió `loadNotionMemberMapPostgresFirst` para preferir PG sobre BQ. La condición `if (map.size > 0) return PG; else BQ fallback` aceptó un mapa parcial (2 entries de SCIM) como "PG está activa", silenciando BQ fallback que tenía 6 entries correctas. Resultado: cobertura del bridge cayó de 95%+ → 3.7% durante 2 días. Materializer ICO wipeaba metrics_by_member cada noche y reinsertaba vacío → bonificaciones OTD/RpA proyectadas colapsaron a $0 para todos los colaboradores.
+
+**Invariantes obligatorios al hacer cutover**:
+
+1. **Migration de backfill atómico en el MISMO PR**: una migration que copia los datos canónicos de la store legacy a la store nueva. Idempotente (UPDATE conditional sobre prev value), con anti pre-up-marker DO block que verifique post-INSERT count == expected. Pattern fuente: `migrations/20260516234743277_backfill-notion-bridge-greenhouse-staff.sql`.
+
+2. **Reliability signal canónico de coverage drift**: detector que mide cobertura del bridge en tiempo real. Steady = baseline esperado (puede ser 60% si hay externos legítimos, o 100% si solo internal). Severity: ok / warning (caída significativa) / error (regresión sistémica). Pattern fuente: `src/lib/reliability/queries/identity-notion-bridge-coverage.ts`.
+
+3. **NUNCA gate `if (result.size > 0) return primary`**: el contador "primary tiene algo" NO es válido para decidir "primary está completa". Patrones canónicos para resolver multi-source:
+   - **Always UNION** ambas fuentes + dedup + log diff (más resiliente, más cost). Recomendado por default.
+   - **Parity check**: shadow-read secondary en paralelo + assert `|primary - secondary| < tolerance` antes de aceptar primary.
+   - **Coverage threshold**: `if (primary.size >= expected_minimum)` donde `expected_minimum` viene de un cálculo upstream (e.g. COUNT(*) en `members` activos).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** mergear cutover de un bridge identity (Notion↔member, HubSpot owner↔member, Azure OID↔member, similares) sin migration de backfill atómico en el mismo PR.
+- **NUNCA** decidir "store A está activa" basándose en `if (result.size > 0)` cuando la respuesta correcta es "A está completa". Una store puede retornar 2 entries de 10 esperadas y eso NO es completa.
+- **NUNCA** introducir un nuevo bridge resolver canónico sin reliability signal de coverage drift en el mismo PR.
+- **NUNCA** sobrescribir bulk `members.notion_user_id` (o equivalentes) desde un script sin transacción atómica + verificación pre-state (UPDATE conditional sobre valor previo conocido).
+- **NUNCA** asumir que un cutover funcionó porque "el resolver retorna algo". Verificar coverage % concreto en producción dentro de las primeras 24h post-merge.
+- **SIEMPRE** que un bug afecte UNIFORMEMENTE a todos los entities downstream, sospechar primero del bridge / resolver / config compartida ANTES que del calculator per-entity. El bug del 2026-05-16 ocupó 4 horas de diagnóstico que hubieran sido 30 min si se hubiera empezado por el bridge.
+
+**Spec canónica**: `src/lib/identity/reconciliation/notion-member-map.ts` (resolver canónico, post-TASK-877). Signal canónico: `identity.notion_bridge.coverage_drift` en `src/lib/reliability/queries/identity-notion-bridge-coverage.ts`. Migration fuente: `migrations/20260516234743277_backfill-notion-bridge-greenhouse-staff.sql`. Patrones fuente: TASK-742 (defense-in-depth 7-layer), TASK-720 (`instrumentCategoriesWithoutKpiRule` detector), TASK-571/766/774 (VIEW canónica + helper + signal).
+
+### ICO Materializer Hardening Pattern (TASK-900, desde 2026-05-18)
+
+Patrón canonical para los 5 materializers ICO (`metrics_by_{member,project,sprint,organization,business_unit}`) y futuros downstream (Frame.io, HubSpot snapshots, Nubox financial materialization). Reemplaza el patrón legacy DELETE+INSERT por **MERGE incremental + freshness gate + tracking persistente + delta filter** — defense in depth contra el bug class TASK-877 follow-up donde upstream degraded destruyó 2 noches de data buena vía DELETE+INSERT sin warning.
+
+**Pipeline canonical**:
+
+```text
+Cloud Scheduler ico-materialize-daily (3:15 AM Santiago, monthsBack=3)
+  → POST /ico/materialize en ico-batch-worker Cloud Run
+  → materializeMonthlySnapshots()
+  → para cada materializer (member/project/sprint/organization/business_unit):
+     runIcoMaterializerCycle({tableName, periodYear, periodMonth, runLegacy, runMerge, ...}):
+       Capa 1: runUpstreamFreshnessGate()
+         ├─ safe=false → skipIcoMaterializationRun + captureWithDomain('delivery', warning) + return 0
+         └─ safe=true → procede
+       Capa 2: beginIcoMaterializationRun (status='running') si useMerge
+       Capa 2b: getLastSuccessfulMaterializationAt (delta cutoff lookup) si useMerge && useIncrementalDelta
+       Capa 3: ejecutar runMerge(deltaCutoffIso) o runLegacyDeleteInsert
+         ├─ throw → failIcoMaterializationRun + captureWithDomain('delivery', error) + re-throw
+         └─ rowCount → continúa
+       Capa 4: completeIcoMaterializationRun (status='succeeded' + rows_merged + notes)
+```
+
+**3 flags graduados default OFF** (cutover progresivo post staging shadow >= 7d):
+
+- `ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED` — invoca `runUpstreamFreshnessGate` antes de ejecutar
+- `ICO_MATERIALIZER_MERGE_PATTERN_ENABLED` — usa MERGE BQ atomic vs legacy DELETE+INSERT
+- `ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED` — filter `entity_last_edited >= deltaCutoff` (REQUIRES MERGE)
+
+Defaults OFF garantiza zero behavioral change post-merge — el cron sigue con DELETE+INSERT bit-for-bit hasta que operador active explícitamente los flags.
+
+**Helpers canonical**:
+
+- `runUpstreamFreshnessGate({requireSignals?, blockingSeverity?}) → Promise<{safe, reason, blockingSignals}>` — `src/lib/ico-engine/materialize-guards.ts`. Default consume `identity.notion_bridge.coverage_drift`; `requireSignals` array es injectable. Degradación honest: signal que rechaza promise se filtra a null y NO bloquea.
+- `runIcoMaterializerCycle(input)` — `src/lib/ico-engine/materialize-orchestrator.ts`. Orchestrator canonical de las 4 capas. Recibe callbacks `runLegacyDeleteInsert` + `runMerge(deltaCutoffIso)` per-entity + flag readers como inputs (test-friendly).
+- `buildLegacyDeleteInsertSql` / `buildMergeSql` / `buildPostCountSql` — `src/lib/ico-engine/materialize-sql-builders.ts`. Builders desde `MaterializerSqlConfig` declarativa. Generan SQL canonical sin copy-paste cross-entity.
+- `beginIcoMaterializationRun` / `completeIcoMaterializationRun` / `skipIcoMaterializationRun` / `failIcoMaterializationRun` / `getLastSuccessfulMaterializationAt` / `countRecentSkippedSafetyRuns` — `src/lib/ico-engine/materialize-tracking.ts`. CRUD canonical sobre `greenhouse_sync.ico_materialization_runs` (append-only, anti-UPDATE/DELETE triggers).
+
+**MERGE pattern canonical** (per `buildMergeSql`):
+
+```sql
+MERGE INTO `<project>.ico_engine.<table>` AS t
+USING (
+  SELECT <key_cols>, period_year, period_month, <metric_cols>, materialized_at
+  FROM (
+    SELECT
+      <key_select_sql>,
+      @periodYear AS period_year,
+      @periodMonth AS period_month,
+      ${buildMetricSelectSQL()},
+      MAX(te.last_edited_time) AS entity_last_edited,
+      CURRENT_TIMESTAMP() AS materialized_at
+    FROM ${buildDeliveryPeriodSourceSql(projectId)} te
+    WHERE <where_clause_sql>
+    GROUP BY <group_by_sql>
+  )
+  WHERE entity_last_edited >= TIMESTAMP(@deltaCutoff)  -- opcional, si delta enabled
+  QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY <partition_by_sql>
+    ORDER BY materialized_at DESC
+  ) = 1
+) AS s
+ON t.<key> = s.<key> AND t.period_year = s.period_year AND t.period_month = s.period_month
+WHEN MATCHED THEN UPDATE SET <metric_cols> = s.<metric_cols>, materialized_at = s.materialized_at
+WHEN NOT MATCHED THEN INSERT (...) VALUES (...)
+-- CRÍTICO: NO `WHEN NOT MATCHED BY SOURCE THEN DELETE` — preserva historicos cuando upstream parcial
+```
+
+**Tracking table canonical** `greenhouse_sync.ico_materialization_runs` (migration `20260518141020881`):
+
+- `(table_name, period_year, period_month, started_at, completed_at, status, rows_merged, blocking_signals JSONB, notes)`
+- CHECK status IN ('running','succeeded','skipped_safety','failed')
+- CHECK skipped_safety REQUIERE blocking_signals NOT NULL
+- INDEX `(table_name, period_year, period_month, started_at DESC)` para lookup O(log n) `getLastSuccessfulMaterializationAt`
+- INDEX parcial `WHERE status='skipped_safety' ORDER BY started_at DESC` para reliability signal
+- Anti-UPDATE trigger: solo permite transición `running → succeeded|failed|skipped_safety`; identity cols (id/table_name/period/started_at/created_at) immutables
+- Anti-DELETE trigger: unconditionally rejected
+- Ownership `greenhouse_ops`, GRANT SELECT/INSERT a `greenhouse_runtime`
+
+**Reliability signal canonical** `delivery.ico_materializer.skipped_safety` (`src/lib/reliability/queries/ico-materializer-skipped-safety.ts`):
+
+- kind=`drift`, moduleKey='delivery', subsystem rollup automatic via registry
+- Severity: count=0 → ok | 1-5 → warning | >5 en 24h → error | query throws → unknown
+- Steady state esperado = 0 (gate confía en upstream)
+- Complementario a `identity.notion_bridge.coverage_drift` — cuando alerta es porque protegió data buena downstream
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** ejecutar un DELETE+INSERT sobre una tabla materializada de ICO sin pasar por el orchestrator canonical `runIcoMaterializerCycle`. Si emerge un materializer downstream nuevo (Frame.io, HubSpot, etc.), reusa el orchestrator con su `MaterializerSqlConfig` declarativa.
+- **NUNCA** filtrar a nivel TASK con `WHERE te.last_edited_time >= cutoff` en el aggregate source. **DEBE** filtrar a nivel BUCKET vía `MAX(te.last_edited_time) AS entity_last_edited` + outer WHERE. Filtrar tasks corrompe metrics (e.g. member con 10 tasks, 1 editada → aggregate de 1 task en lugar de 10).
+- **NUNCA** incluir `WHEN NOT MATCHED BY SOURCE THEN DELETE` en el MERGE. La omisión es load-bearing: preserva data buena cuando upstream parcial. La diferencia entre destruir y proteger.
+- **NUNCA** activar `ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED=true` sin `ICO_MATERIALIZER_MERGE_PATTERN_ENABLED=true`. Code-side `assertMaterializerFlagCoherence` throw runtime — defense in depth.
+- **NUNCA** abortar silenciosamente el materializer: si el gate skipea, emite `captureWithDomain(err, 'delivery', {source: 'ico_materializer_skipped_safety'})` + persiste `status='skipped_safety'` + `blocking_signals` JSONB en tracking table.
+- **NUNCA** mutar/borrar `greenhouse_sync.ico_materialization_runs`. Anti-UPDATE / anti-DELETE triggers PG enforce. Para correcciones, INSERT nueva fila — append-only audit trail.
+- **NUNCA** computar `last_materialization_at` derivado de `metrics_by_*.materialized_at` (BQ). Usar siempre PG tracking SSOT — BQ es eventually consistent, PG es source of truth governance.
+- **NUNCA** invocar `Sentry.captureException` directo en code paths del materializer. Usar `captureWithDomain(err, 'delivery', { tags: { source: 'ico_materializer_*', table: '<name>' } })` para rollup canonical en `/admin/operations`.
+- **NUNCA** reescribir un materializer sin tests anti-regresión que simulen upstream degraded + verifiquen preservación de data previa (pattern `materialize-member-merge.test.ts`).
+- **SIEMPRE** que emerja un materializer nuevo (Frame.io, HubSpot, Nubox, etc.), reusar `runIcoMaterializerCycle` + builders + tracking. Cero código nuevo de orquestación.
+- **SIEMPRE** que emerja un signal upstream nuevo cuya regression podría corromper el materializer ICO, agregar su fetcher al `requireSignals` array del gate (sin refactor del orchestrator).
+
+**Bug class fuente** (canonizado live 2026-05-18): TASK-877 follow-up 2026-05-14 → 2026-05-16. Bridge Notion→member degradado destruyó 2 noches consecutivas de data buena en `ico_engine.metrics_by_member` vía DELETE+INSERT. Operador vio TODOS los colaboradores con OTD/RpA proyectado en $0 por ~2 días aunque la nómina actual de Abril persistida en `payroll_entries` era correcta. Mitigación temporal commit `4fc8c0c4` (reliability signal `identity.notion_bridge.coverage_drift`) detecta el síntoma en horas vs 2 días — **pero no previene el bug, solo lo expone**. TASK-900 cierra la causa raíz arquitectónica.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md` (ADR). Files canónicos:
+
+- Helpers: `src/lib/ico-engine/materialize-{guards,orchestrator,tracking,flags,sql-builders}.ts`
+- Migration: `migrations/20260518141020881_ico-materializer-tracking.sql`
+- Signal reader: `src/lib/reliability/queries/ico-materializer-skipped-safety.ts`
+- Wire-up: `src/lib/reliability/get-reliability-overview.ts` (`icoMaterializerSkippedSafety` source)
+
+Patrones fuente reusados: TASK-571/699/766/774 (VIEW + helper + reliability + lint), TASK-742 (defense in depth 7-layer), TASK-848 (state machine + tracking append-only), TASK-873 (capability granularity), TASK-720/768/777 (declarative config + lint rule pattern para futuros materializers).
+
+### ICO Status Transition Foundation invariants (TASK-908, desde 2026-05-18)
+
+Foundation canonical de Status Transition Tracking que sostiene el motor ICO completo de métricas basadas en eventos observables (RpA, FTR, Cycle Time canonical). Reemplaza el anti-patrón legacy de leer Notion property formulas (frágil — bug class TASK-877 follow-up).
+
+**Cadena canonical de dependencias** (orden de ship):
+
+```text
+TASK-908 (foundation, esta task)                TASK-901 (RpA)                      TASK-909 (FTR)
+─────────────────────────────                   ──────────────────                  ─────────────────
+• Tabla task_status_transitions             →   • calculateRpa(taskId)          →   • calculateFtr(taskId)
+• countCorrectionTransitions helper             ↳ delega a count... (zero lógica)   ↳ delega a calculateRpa===0
+• calculateCycleTime helper
+• CT SLO config helper
+```
+
+**Read API canonical (V1.0 shipped)**:
+
+- `countCorrectionTransitions(input)` — `src/lib/notion-metrics/count-correction-transitions.ts`. Cuenta transiciones canonical `'Listo para revisión' → 'Cambios solicitados'` en `greenhouse_delivery.task_status_transitions`. Source mode discrimination canonical: `'canonical'` (tarea con rows en table) vs `'unavailable'` (tarea sin rows, pre-deployment). Consumido por `calculateRpa` (TASK-901) + transitively por `calculateFtr` (TASK-909).
+- `calculateCycleTime(inputs)` — `src/lib/notion-metrics/calculate-cycle-time.ts`. Pure function canonical V1 con 4 decisiones (Delta 2026-05-17): inicio `'En curso'`, fin `completedAt`, feedback time SÍ cuenta, Bloqueado SE EXCLUYE (clamp intervals).
+- `getSLOThreshold(taskType?)` + `isWithinSLO(cycleTimeDays, taskType?)` — `src/lib/notion-metrics/cycle-time-slo-config.ts`. V1 default uniforme 14.2 días (Engine doc §A.5.5). V2 calibración per tipo de pieza queda forward-compat.
+
+**Tabla canonical** `greenhouse_delivery.task_status_transitions`:
+
+- Append-only enforced por triggers PG anti-UPDATE/anti-DELETE (mirror pattern TASK-848 release_state_transitions + TASK-900 ico_materialization_runs)
+- CHECK constraint enum cerrado canonical en `from_status` Y `to_status` — solo permite los 11 canonical V1 (`Sin empezar`, `Brief listo`, `Pendiente aprobación interna`, `En pausa`, `Bloqueado`, `En curso`, `Listo para revisión`, `Cambios solicitados`, `Aprobado`, `Cancelado`, `Archivado`)
+- Webhook handler (TASK-912 futuro) normaliza legacy variants via `normalizeTaskStatus` (de `task-status-canonical.ts`, ya existente desde TASK-742 prep commit `1525e51c`) ANTES de insertar. La tabla NUNCA almacena strings legacy.
+- Indexes: source_event_id UNIQUE partial (dedup canonical), task_lookup (hot path history per task DESC), to_status recent (queries "tareas en X estado"), correction_event_partial (TASK-901 calculateRpa + TASK-909 calculateFtr hot path)
+- `source_quality TEXT` discrimina origen: `'canonical'` (event.timestamp webhook), `'proxy'` (polling lossy), `'backfilled'` (reconstruido históricamente)
+
+**Reliability signal canonical**: `notion.correction_transitions.source_availability` (kind=`data_quality`, moduleKey=`delivery`). Detecta % tareas completadas 90d sin rows en table. Steady state post-deployment + backfill: < 10%. Pre-deployment esperado 100% (foundation aún sin webhook capturando).
+
+**Capabilities canonical V1.0** (granular least-privilege):
+
+- `cycle_time.compute.execute` (delivery / execute / all) — EFEONCE_ADMIN + DEVOPS_OPERATOR
+- `correction_transitions.compute.read` (delivery / read / all) — EFEONCE_ADMIN + DEVOPS_OPERATOR + HR_ADMIN
+
+**Fix B.1 canonical (Slice 6)**: `EXCLUDED_FROM_METRICS_STATUSES = EXCLUDED_STATUSES ∪ BLOCKED_STATUSES`. Tareas en `Bloqueado` / `En pausa` / legacy `Detenido` ahora excluidas del denominador OTD/RpA/FTR via `CANONICAL_OPEN_TASK_SQL`. Pre-fix: contaminaban métricas. Post-fix: métricas suben ligeramente (ESPERADO).
+
+**Fix B.2 canonical (Slice 7 — verify ya done)**: `buildTaskStatusToCsc()` consume `allVariantsForCanonical` + `allVariantsForGroup` que incluyen TODOS los aliases legacy Sky (`Tomado`, `En feedback`, `Pendiente`) + Efeonce (`Listo para diseñar`, `Pendiente Dir. Arte`, `Cambios Solicitados` capital S) → CSC mapping canonical universal funciona post-rename operador-side.
+
+**⚠️ Reglas duras canonical**:
+
+- **NUNCA** persistir row en `task_status_transitions` con string legacy. Webhook handler upstream DEBE normalizar via `normalizeTaskStatus` antes del INSERT. La table CHECK constraint enforce el canonical enum cerrado (11 V1).
+- **NUNCA** persistir row sin `transitioned_at` populated. Es el timestamp canonical de la métrica downstream (Cycle Time, Lead Time, Time-in-Status). Webhook handler usa `event.timestamp` source-of-truth; polling fallback usa `last_edited_time` con `source_quality='proxy'`.
+- **NUNCA** consumer downstream recomputa "número de correcciones" inline. Toda lógica de contar correciones vive en `countCorrectionTransitions` — single source of truth canonical. RpA (TASK-901) + FTR (TASK-909) delegan.
+- **NUNCA** consumer downstream recomputa Cycle Time inline. Toda lógica vive en `calculateCycleTime` helper o `cycle_time_days` column materializada (post Slice 4 futuro de TASK-912).
+- **NUNCA** modificar fórmula `cycle_time_days` SQL en `schema.ts:108-113` sin migration + backfill verified contra snapshot pre-cambio. Cambio afecta `metrics_by_*` downstream materializados.
+- **NUNCA** ejecutar DELETE / UPDATE sobre `task_status_transitions` (anti-UPDATE/anti-DELETE triggers enforce). Para correcciones, INSERT row nueva con `source_quality='backfilled'`.
+- **NUNCA** invocar `Sentry.captureException` directo. Use `captureWithDomain(err, 'delivery', { tags: { source: 'cycle_time_*' | 'correction_transitions_*' } })`.
+- **SIEMPRE** que un consumer downstream necesite "una corrección observada", consumir `countCorrectionTransitions({taskSourceId, windowStart?, windowEnd?})`. NO leer Notion property `Correcciones` (anti-patrón legacy bug class TASK-877).
+- **SIEMPRE** que el helper devuelva `sourceMode='unavailable'`, downstream consumer mapea a `dataStatus='unavailable'` + `value=null` (NO `value=0`). Distingue "no datos" vs "0 correcciones reales".
+- **SIEMPRE** que emerja un nuevo cliente Notion con custom status names, **enforce canonical template L1** en Notion antes del onboarding. Single source of truth (`task-status-canonical.ts`) — NO agregar aliases custom-per-cliente.
+
+**Deferred a TASK-912 follow-up** (requiere coordinación operador-side de Notion webhook subscription):
+
+- Slice 2: webhook handler `notion-status-transitions` + HMAC validation + outbox event
+- Slice 3: reactive consumer ops-worker que persiste transitions
+- Slice 4: cycle_time_days BQ formula update (status → En curso start + descontar Bloqueado)
+- Slice 5: métrica `cycle_time_slo_pct` materialization en metric-registry + dashboards
+- Slice 9: backfill histórico opcional via Notion API page history
+
+**Spec canonical**: `docs/architecture/metrics/{RPA,CYCLE_TIME,CT_SLO_PCT,FTR}_V1.md`. Migration: `migrations/20260518193001910_task-status-transitions-foundation.sql`. Helpers: `src/lib/notion-metrics/`. Signal reader: `src/lib/reliability/queries/notion-correction-transitions-source-availability.ts`. ADRs: `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` + `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` + `Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 secciones B+C+D.
+
+### Delivery Metrics Ownership Boundary invariants (TASK-901 + TASK-908 + TASK-909, desde 2026-05-17)
+
+**Notion = Task Operating System. Greenhouse ICO Engine = motor exclusivo de cómputo de métricas.** Notion captura datos operativos primitivos (asignación, fechas, estado, tipo de entregable, archivos) y sirve como UI de gestión. Greenhouse computa TODAS las métricas (RpA, OTD, FTR, Cumplimiento, Cycle Time, Throughput, Pipeline Velocity, BCS, TTM, Iteration Velocity, futuras) desde eventos canonical y escribe los valores de vuelta a Notion vía bulk PATCH a propiedades `[GH] <métrica>` read-only.
+
+**Bug class disparador** (TASK-877 follow-up 2026-05-16): 3,168 tareas Sky en 10 meses con `rpa=null` 100% — la fórmula `RpA` vivía como propiedad formula Notion editable por cualquier operador, sin git history, tests, code review ni observabilidad. El sync `notion-bq-sync` perdía el valor silenciosamente y nadie se enteraba hasta que un usuario reportó UI rota.
+
+**Pipeline canonical**:
+
+```text
+Notion edit (operador) → webhook canonical (HMAC + echo-loop filter)
+  → outbox event → ops-outbox-publish (TASK-773)
+  → reactive consumer en ops-worker
+  → ICO Engine canonical compute (calculate<Metric>(taskId) en Greenhouse code)
+  → Cloud Tasks throttled (vs Notion rate limit 3 req/sec)
+  → PATCH /v1/pages/bulk (Notion-Version 2026-02-01, up to 100 pages)
+  → propiedades [GH] <métrica> updated en Notion
+  → operador ve métrica live en UI Notion
+```
+
+Plus safety net nocturno: Cloud Run Job escanea tareas con `last_edited_time > checkpoint`, recomputa via mismo helper canonical, detecta drift Greenhouse vs Notion-stored, re-writeback.
+
+**Semántica canonical de "corrección"** (TASK-909):
+
+> **1 corrección = 1 transición `Listo para revisión → En Feedback`** en el status history canonical de la tarea.
+
+No es ronda interna, no es comentario sin resolver, no es review del workflow team. Es específicamente "el cliente vio el entregable y pidió cambios", observado como evento de transición de estado capturado por TASK-908.
+
+- `calculateRpa(taskId)` (TASK-901 Slice 1) **delega a** `countCorrectionTransitions(taskId)` (TASK-908). NO lee propiedad Notion `Correcciones`.
+- `calculateFtr(taskId)` (TASK-909 Slice 1) **delega a** `calculateRpa(taskId) === 0`. NO duplica lógica.
+
+Forward-compat Frame.io: cuando exista la integración, `calculateRpa` extiende inputs sin breaking change (combinar `correctionTransitionsCount` + `clientReviewOpen` + `workflowReviewOpen` + `openFrameComments` bajo policy a definir).
+
+**Migración progresiva canonical** (strangler pattern, NO migramos todas las métricas de una vez):
+
+| Fase | Métrica | Task | Status |
+|---|---|---|---|
+| Foundation | Status transition tracking + `countCorrectionTransitions` helper | TASK-908 | En diseño 2026-05-17 |
+| V1 | RpA (writeback completo del pattern) | TASK-901 | En diseño 2026-05-17 |
+| V2 | OTD writeback | TASK-902 (futuro) | Backlog |
+| V3 | FTR writeback (delega a calculateRpa) | TASK-903 (futuro) | Backlog post TASK-909 |
+| V4 | Cumplimiento writeback | TASK-904 (futuro) | Backlog |
+| V5+ | Throughput, Cycle Time SLO%, Pipeline Velocity writebacks | TBD | Backlog |
+| V6+ | BCS, TTM (AI-derived) | TASK-910 + futura TTM | Backlog |
+
+Cada Vn ship con shadow mode mínimo 7 días verde antes de activar writeback. Después del writeback, las fórmulas Notion originales se mantienen en paralelo 7-14 días más para paridad cross.
+
+**⚠️ Reglas duras canonical**:
+
+- **NUNCA** introducir una propiedad formula nueva en Notion para calcular una métrica ICO. Toda métrica nueva nace en Greenhouse code (con tests + reliability signal + writeback).
+- **NUNCA** modificar/editar/reemplazar una fórmula Notion existente de métrica ICO sin coordinar paralelamente con el helper canonical en Greenhouse — la métrica vive en código, Notion es solo display vía writeback.
+- **NUNCA** computar una métrica ICO leyendo otra propiedad Notion como input cuando esa propiedad sea derivable de eventos canonical (transitions, fechas). Ejemplo prohibido: leer Notion `Correcciones` rollup para computar RpA — el RpA canonical viene de `countCorrectionTransitions(taskId)`.
+- **NUNCA** consumer downstream (UI, dashboard, scorecard, report PDF, agente IA) recomputa una métrica ICO inline. Toda lectura pasa por la columna materializada (`v_tasks_enriched.<metric>`, `metrics_by_*.<metric>`) o por el helper canonical (`calculate<Metric>(taskId)`).
+- **NUNCA** invocar `Sentry.captureException()` directo en code paths de compute o writeback de métricas ICO. Usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'metric_compute' | 'metric_writeback', metric: '<name>' } })`.
+- **NUNCA** activar writeback de una métrica nueva sin: (a) feature flag `NOTION_<METRIC>_WRITEBACK_ENABLED` default false, (b) shadow mode 7 días verde, (c) reliability signal `notion.metrics.shadow_paridad_<metric>` steady=0, (d) approval explícito en `Handoff.md` con allowlist de propiedades target Notion.
+- **NUNCA** crear template Notion DB nuevo con formulas de métricas ICO embedded. Templates nuevos declaran solo propiedades primitivas + las propiedades `[GH] <métrica>` (read-only target del writeback). Templates legacy con formulas se mantienen como fallback histórico inactivo.
+- **SIEMPRE** que un input nuevo emerja para una métrica (e.g. Frame.io integration aporta `client_change_round` real para RpA), extender el helper canonical en Greenhouse + agregar tests anti-regresión + NO crear fórmula Notion paralela.
+- **SIEMPRE** que se cree una propiedad Notion `[GH] <métrica>`, documentar en el ADR `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` + DECISIONS_INDEX + spec arquitectónica de la métrica que la propiedad es **read-only para operadores** (solo Greenhouse integration token escribe).
+- **SIEMPRE** TASK-908 (status transition tracking) es prerequisito arquitectónico de cualquier migración Vn que dependa de eventos canonical observados (RpA, FTR, Cycle Time canonical, futuras). NO shipear Vn write-back path antes que TASK-908 Slices 0-3 estén verde.
+
+**Helpers canonical**:
+
+- `countCorrectionTransitions(taskId) → number` — en TASK-908 foundation, lee `greenhouse_delivery.task_status_transitions`
+- `calculateCycleTime(taskId) → CycleTimeResult` — en TASK-908, lee transitions + descuenta Bloqueado
+- `calculateRpa(taskId) → RpaResult` — en TASK-901 Slice 1, delega a `countCorrectionTransitions`
+- `calculateFtr(taskId) → FtrResult` — en TASK-909 Slice 1, delega a `calculateRpa`
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` (ADR canonical). Cross-refs: `docs/architecture/Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 secciones F + G; `docs/architecture/Greenhouse_ICO_Engine_v1.md` (conceptual spec, drift por resolver post-TASK-908/909/901). Patrones fuente: TASK-742 (defense-in-depth 7-layer), TASK-773 (outbox publisher canonical), TASK-771 (decoupling write paths via outbox), TASK-706 (HMAC webhook ingestion), TASK-720 (TS-only declarative reader pattern).
+
+### ICO Metrics Progressive Migration invariants (TASK-901 + TASK-908 + TASK-910, desde 2026-05-17)
+
+La migración del compute canonical de las 14 métricas ICO (RpA, FTR, OTD, Cumplimiento, Cycle Time, CT Variance, CT SLO%, Throughput, Pipeline Velocity, CSC Distribution, Stuck Assets, Stuck %, OCF + 3 narrative-level deferred V2: BCS/TTM/Iteration Velocity) **NO es big-bang**. Es strangler pattern obligatorio con stop-gates canonical, demo teamspace pre-prod, recovery primitives explícitas, backward compatibility 90+ días.
+
+**Bug class motivador**: TASK-877 follow-up (3,168 tareas Sky con `rpa=null` 10 meses, nómina Sky proyectada perdía bonus RpA silenciosamente). Big-bang × 14 métricas × N meses = riesgo inaceptable.
+
+**Timeline canonical**: 12-14 meses end-to-end para 13 métricas operacionales. **NO acelerar**.
+
+**Demo teamspace canonical** (TASK-910) ya creado live 2026-05-17:
+
+| Asset | Name | Page ID | Data Source ID |
+|---|---|---|---|
+| Teamspace | `Demo Greenhouse` | `36339c2f-efe7-814c-a0f5-0042863dbb5a` | N/A |
+| Tareas | `Tareas` | `36339c2f-efe7-80e2-9109-e7e9e41b36e4` | `36339c2f-efe7-81a6-980c-000b0056bba8` |
+| Proyectos | `Proyectos` | `36339c2f-efe7-800e-9bba-c5c1661dd242` | `36339c2f-efe7-8116-8c15-000be81c5538` |
+| Sprints | `Sprints ` (con space trailing) | `36339c2f-efe7-803c-a94a-e52bc41c8e77` | `36339c2f-efe7-81cc-8f2f-000b112ee87c` |
+
+IDs distintos vs productivos (Efeonce DS `5126d7d8-...`, Sky DS `23039c2f-...`) — cero overlap, cero risk cross-contamination.
+
+**⚠️ Reglas duras canonical (8 stop-gates obligatorios per flip de writeback)**:
+
+- **NUNCA** flip writeback de métrica ICO sin pasar por los 8 stop-gates del ADR `GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md` §3. Falta cualquiera → NO flip. No "casi listo":
+  1. Foundation completa (TASK-908 Slices 0-3.5 + backfill histórico verde)
+  2. Demo teamspace pre-prod (TASK-910 verde 4 semanas runtime end-to-end)
+  3. Shadow mode prod verde 30d bonus / 7d operational
+  4. Pilot scope ≤ 1 cliente (Efeonce primero, Sky después de Efeonce verde 30d)
+  5. HR/Finance written sign-off (bonus metrics solamente: RpA + OTD)
+  6. Snapshot pre-flip BQ restorable <1h
+  7. Kill switch verificado staging <5min revert
+  8. Runbook operativo + cliente sign-off (cliente externo Sky vía QBR)
+- **NUNCA** flip global directo cross-cliente. SIEMPRE pilot Efeonce primero, después Sky.
+- **NUNCA** borrar formula Notion legacy durante la migración. Mínimo 90 días coexistencia post-flip stable.
+- **NUNCA** computar bonus para demo members. `fetchKpisForPeriod` filtra `tenant_type='demo'` + helpers bonus tienen pre-check `if (member?.tenantType === 'demo') return {amount: 0, qualifies: false}`. Defense in depth dual. Demo NUNCA toca payroll real.
+- **NUNCA** mezclar demo events con productivos en tabla `task_status_transitions`. Tabla separada `task_status_transitions_demo` enforced por reactive consumer demo (filtra `metadata.demo_mode=true`).
+- **NUNCA** compartir webhook secret HMAC entre prod y demo. Secrets separados en GCP Secret Manager (`notion-webhook-signing-secret-efeonce` vs `notion-webhook-signing-secret-demo`).
+- **NUNCA** permitir acceso de cliente externo (Sky) al teamspace demo. Solo equipo interno Greenhouse + HR + Delivery interno.
+- **NUNCA** desincronizar schema del demo con el template productivo. Cuando Efeonce template agrega status option o property nueva, el demo se actualiza en el mismo PR.
+- **NUNCA** archivar el demo durante la migración (12-14 meses). Demo es load-bearing — sin él, los siguientes flips de Fase 2-5 pierden el gate canonical de testing pre-prod.
+- **NUNCA** acelerar timeline canonical "porque va bien". 12-14 meses es el contrato canonical. Acelerar reintroduce risk class TASK-877 follow-up.
+- **NUNCA** ignorar reliability signal `notion.metrics.shadow_paridad_<metric>` con count > 0. Drift sostenido pre-flip = NO flip; post-flip = rollback.
+- **NUNCA** flip nuevo si hay rollback de cualquier métrica últimos 30 días. Estabilizar antes de avanzar.
+- **NUNCA** flip OTD% antes de RpA stable V1.0 (90 días post-Sky verde). Diversificar risk.
+- **NUNCA** flip métrica narrative-level Revenue Enabled (BCS, TTM, Iteration Velocity) sin Frame.io + ad platforms integration. V1 mostly proxy honesto es OK.
+- **NUNCA** ejecutar rollback parcial (e.g. solo para member X). Rollback es per-cliente vía feature flag — granularidad menor no soportada V1.
+- **NUNCA** confundir IDs del demo con IDs de Efeonce/Sky productivos. Demo teamspace ID = `36339c2f-...4c-a0f5-0042863dbb5a`, prefix consistente `36339c2f-...` en todos los assets demo. Productivos tienen prefixes distintos (Efeonce `5126d7d8-...` Tasks DS; Sky `23039c2f-...` Tasks DS).
+- **SIEMPRE** que emerja bug class durante pilot Efeonce, halt migration completa + RCA documentada antes de retry.
+- **SIEMPRE** snapshot BQ pre-flip persistido + restorable <1h antes de cualquier flip.
+- **SIEMPRE** HR reconciliation bonus mes 1 post-flip antes de declarar pilot pass.
+- **SIEMPRE** runbook canonical publicado per métrica antes del flip.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md` (ADR — 8 stop-gates + demo gate + 6 fases ramp + recovery primitives). Demo teamspace governance: `docs/tasks/to-do/TASK-910-notion-demo-teamspace-migration-sandbox.md` §Detailed Spec.
+
+### Notion Demo Teamspace Sandbox invariants (TASK-910, desde 2026-05-19)
+
+Setup canonical Greenhouse-side del demo teamspace `Demo Greenhouse` (Notion `36339c2f-efe7-814c-a0f5-0042863dbb5a`) creado live 2026-05-17 por operador. Gate canonical pre-Fase 1 del ADR Progressive Migration. Demo NUNCA afecta colaboradores reales en KPIs, bonus, payroll, ni dashboards productivos.
+
+**Defense in depth canonical de 9 capas**:
+
+1. **Tabla físicamente separada** `greenhouse_delivery.task_status_transitions_demo` (CHECK `workspace_id='demo'` + triggers anti-UPDATE/anti-DELETE — shipped migration `20260519120713456`)
+2. **Discriminator canonical** `members.is_demo BOOLEAN NOT NULL DEFAULT FALSE` con index parcial
+3. **Webhook dedicated** `/api/webhooks/notion-tasks-demo` + HMAC secret separado `NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF` (GCP `notion-webhook-signing-secret-demo`)
+4. **Sync legacy NO procesa demo** — `space_notion_sources.sync_enabled = FALSE` para demo space (notion-bq-sync legacy excluye)
+5. **Helper `isDemoMember` strict** `=== true` canonical (anti-coersion contra truthy values)
+6. **Filter SQL canonical** en `fetchKpisForPeriod`: `filterOutDemoMembers()` excluye demo del payroll input ANTES de BQ query
+7. **Pre-check helpers** `calculateRpaBonusForMember` + `calculateOtdBonusForMember` (defense in depth dual con wrappers canonical)
+8. **Reactive consumer filter** `payload.metadata.demo_mode === true` (strict, anti-coersion) — demo events solo entran a tabla demo
+9. **Reliability signal `payroll.bonus.demo_member_contamination`** (steady=0, ERROR canonical si > 0 — NUNCA debe pasar)
+
+**Capabilities canonical V1.0**:
+
+- `notion.metrics.demo.execute` (module=admin, scope=tenant) — EFEONCE_ADMIN
+- `notion.metrics.demo.read` (module=admin, scope=tenant) — EFEONCE_ADMIN + HR_MANAGER + EFEONCE_OPERATIONS
+
+**6 reliability signals canonical** bajo subsystem rollup `delivery` (5) + `payroll` (1 critical):
+
+- `notion.metrics.shadow_paridad_rpa_demo` (drift)
+- `notion.metrics.echo_loop_detected_demo` (drift, steady=0)
+- `notion.metrics.webhook_signature_failures_demo` (drift, steady=0)
+- `notion.metrics.writeback_dead_letter_demo` (drift, deferred TASK-913 V1.1)
+- `notion.metrics.demo_teamspace_drift` (drift, schema vs canonical V1)
+- `payroll.bonus.demo_member_contamination` (drift, **ERROR canonical si > 0**)
+
+**⚠️ Reglas duras canonical**:
+
+- **NUNCA** computar bonus para demo members. Filter SQL en `fetchKpisForPeriod` + pre-check en `guardDemoMemberBonus` wrappers garantizan defense in depth dual.
+- **NUNCA** mezclar demo events con productivos en tabla `task_status_transitions`. Físicamente separadas — CHECK constraint `workspace_id='demo'` rechaza INSERT cross-tenant.
+- **NUNCA** compartir webhook HMAC secret entre prod y demo. GCP secrets separados (`notion-webhook-signing-secret-{efeonce|sky|demo}`). Leak en uno NO compromete los otros.
+- **NUNCA** permitir cliente externo (Sky, etc.) access al demo teamspace. Solo interno Greenhouse + HR + Delivery (`notion.metrics.demo.read` capability matrix canonical).
+- **NUNCA** desincronizar schema demo del template Efeonce sin update governance doc + reliability signal `demo_teamspace_drift` review.
+- **NUNCA** archivar demo durante la migración (12-14 meses canonical per ADR Strangler). Demo es load-bearing.
+- **NUNCA** activar `sync_enabled=TRUE` en demo `space_notion_sources` row. Sync legacy NO procesa demo — defense in depth contra contaminate `greenhouse_conformed.delivery_*` + `metrics_by_*` productivos.
+- **NUNCA** marcar real member con `is_demo=TRUE` manualmente. Helper `registerDemoMember` rechaza convertir real (is_demo=FALSE existente) a demo. Invariant anti-corruption.
+- **NUNCA** invocar `Sentry.captureException()` directo en demo code paths. Usar `captureWithDomain('integrations.notion', { tags: { source: 'demo_<stage>' } })` o `'payroll'` para signal contamination.
+- **NUNCA** desactivar el filter SQL en `fetchKpisForPeriod` ni los wrappers `calculateRpaBonusForMember/calculateOtdBonusForMember`. Defense in depth dual es load-bearing.
+- **SIEMPRE** que un nuevo bug class demo emerja, agregar test anti-regresión en `bonus-proration.test.ts` (demo member → $0 bonus + qualifies=false canonical).
+- **SIEMPRE** que un consumer payroll nuevo emerja que llame `fetchKpisForPeriod`, verificar que el filter `filterOutDemoMembers` corre antes de cualquier read BQ.
+
+**Helpers canonical**:
+
+- `src/lib/identity/demo-members.ts`: `registerDemoMember`, `isDemoMember`, `listDemoMembers`, `countDemoMembers`
+- `src/lib/webhooks/handlers/notion-tasks-demo.ts`: webhook handler con HMAC + echo-loop + property allowlist + status normalization
+- `src/lib/sync/projections/notion-status-transition-capture-demo.ts`: reactive consumer + filter strict + persist en tabla demo
+- `src/lib/payroll/bonus-proration.ts`: `guardDemoMemberBonus`, `calculateRpaBonusForMember`, `calculateOtdBonusForMember`
+- `src/lib/reliability/queries/notion-metrics-demo-signals.ts`: 6 signal readers canonical
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-910-notion-demo-teamspace-migration-sandbox.md`. Governance doc: `docs/operations/notion-demo-teamspace-governance.md`.
+
+### RpA V2 Demo Pipeline End-to-End invariants (TASK-913, desde 2026-05-19)
+
+Pipeline canonical RpA V2 demo end-to-end: captura status transition Notion → persiste en tabla demo → computa RpA V2 via helper canonical → persiste snapshot → PATCH Notion property `[GH] RpA v2`. Carril paralelo invisible al productive durante toda la migración Strangler (per ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`). El pipeline corre **sólo sobre el teamspace Demo Greenhouse**; NUNCA toca Efeonce/Sky productivos.
+
+**Cadena canonical event-driven** (4 capas decoupled vía outbox, mirror del pattern TASK-771):
+
+```text
+Notion edit status (operador demo) → webhook /api/webhooks/notion-tasks-demo (HMAC + echo-loop filter)
+  → outbox event notion.task.status_transitioned (metadata.demo_mode=true)
+    → capture-demo (TASK-910 Slice 3) persiste task_status_transitions_demo
+      → emite chain event notion.task.transition_captured.demo (TASK-913 Slice 1)
+        → compute-demo invoca calculateRpaV2Demo (foundation helper sibling demo)
+          → persiste row en task_rpa_demo_snapshots (CHECK workspace_id='demo')
+          → emite chain event notion.task.metrics_writeback_requested.demo (Slice 1)
+            → writeback-demo (Slice 2) re-reads PG defensive + PATCH Notion [GH] RpA v2
+              → marca snapshot.written_to_notion_at = NOW()
+```
+
+**Diseño simétrico canonical sibling-pattern** (forward-compat productive cutover por repointing, NO rediseño):
+
+| Demo (V1 shipped 2026-05-19) | Productive sibling (TASK-901 Slice 4+ futuro) |
+|---|---|
+| `count-correction-transitions-demo.ts` | `count-correction-transitions.ts` (TASK-908 shipped) |
+| `calculate-rpa-v2-demo.ts` | `calculate-rpa-v2.ts` (TASK-901 shipped) |
+| `notion-status-transition-capture-demo.ts` | `notion-status-transition-capture.ts` (TASK-912 futuro) |
+| `notion-rpa-compute-demo.ts` | `notion-rpa-compute.ts` (futuro) |
+| `notion-rpa-writeback-demo.ts` | `notion-rpa-writeback.ts` (futuro) |
+| `notion-demo-client.ts` (token `NOTION_METRICS_DEMO_TOKEN_SECRET_REF`) | `notion-client.ts` (token `NOTION_TOKEN`) |
+| `task_rpa_demo_snapshots` (PG demo) | `task_rpa_snapshots` (PG productive, futuro) |
+| `task_status_transitions_demo` | `task_status_transitions` (TASK-908 shipped) |
+| Events `notion.task.*.demo` | Events `notion.task.*` o `*.prod` (futuro) |
+| Property Notion `[GH] RpA v2` (demo teamspace) | Property `[GH] RpA v2` (Efeonce/Sky DBs) |
+
+**Eventos canonical V1** (3 nuevos outbox events bumpeados al catálogo):
+
+- `notion.task.status_transitioned` (heredado TASK-908/910) — webhook source, discriminado por `metadata.demo_mode`
+- `notion.task.transition_captured.demo` (TASK-913 Slice 1) — chain event canonical post-persist, garantiza happens-before vs race condition del dispatcher reactivo paralelo
+- `notion.task.metrics_writeback_requested.demo` (TASK-913 Slice 1) — chain event post-compute, dispara writeback
+
+**Tabla canonical** `greenhouse_delivery.task_rpa_demo_snapshots` (migration `20260519130951001`):
+
+- PK `snapshot_id UUID`
+- CHECK `workspace_id = 'demo'` PG-side
+- CHECK `rpa_data_status IN (valid|unavailable|low_confidence|suppressed)`
+- CHECK `source_mode IN (canonical|unavailable)`
+- UNIQUE partial INDEX sobre `source_event_id WHERE NOT NULL` (idempotency canonical)
+- 3 indexes hot path: `task_latest_desc`, `writeback_pending`, `paridad`
+- Append-only triggers anti-UPDATE/anti-DELETE (EXCEPCIÓN canonical: writeback columns `written_to_notion_at`, `notion_writeback_event_id`, `notion_writeback_attempt_count`, `notion_writeback_last_error` SÍ pueden mutar para idempotency canonical writeback)
+- Ownership `greenhouse_ops` + GRANT SELECT/INSERT/UPDATE a `greenhouse_runtime`
+
+**2 reliability signals nuevos** (TASK-913 Slice 3) bajo subsystem rollup `delivery`:
+
+- `notion.metrics.writeback_dead_letter_demo` (drift): real signal post-Slice 2 que detecta `notion_writeback_attempt_count >= 4 AND notion_writeback_last_error IS NOT NULL AND written_to_notion_at IS NULL`. Steady=0. ERROR si > 0.
+- `notion.metrics.writeback_lag_demo` (lag): snapshots `valid + NOT written + < dead-letter threshold + computed_at > 30 min ago`. Steady=0. Warning 1-3, error > 3.
+
+**Nightly safety net canonical**: script `scripts/rpa-demo/retrigger-pending-writebacks.ts` re-emite `notion.task.metrics_writeback_requested.demo` para snapshots lag overdue. Idempotent (PATCH idempotent + snapshot guard downstream). Pattern fuente TASK-878.
+
+**Defense in depth canonical 9 capas** (heredadas TASK-910 + extendidas por TASK-913):
+
+1-9: ver TASK-910 sección Notion Demo Teamspace Sandbox
+10. **Token Notion físicamente separado** `NOTION_METRICS_DEMO_TOKEN_SECRET_REF` (GCP `notion-integration-token-greenhouse-metrics-demo`) con permisos SOLO en teamspace Demo Greenhouse — NUNCA accesible a Efeonce/Sky databases
+11. **Re-read snapshot from PG defensive** en writeback projection — NUNCA confía el `rpaValue` del payload del event (source of truth = PG)
+12. **Skip honest cuando token NO configurado** — degraded mode honest, reliability signal alerta vs degradar silenciosamente al productive
+13. **Idempotency triple**: ON CONFLICT DO NOTHING (compute snapshot) + `written_to_notion_at` guard (writeback skip si already_written) + PATCH Notion idempotent (mismo body NOOP)
+14. **maxRetries=4** en writeback projection antes de dead-letter (3 retries + initial)
+
+**⚠️ Reglas duras canonical**:
+
+- **NUNCA** hacer drift entre las firmas/types de los helpers demo (`count-correction-transitions-demo`, `calculate-rpa-v2-demo`) y sus siblings productive. Re-export types canonical desde productive (mismo shape `RpaV2Result`, `CountCorrectionTransitionsResult`). Cualquier cambio en uno debe reflejarse en el otro.
+- **NUNCA** mezclar la lógica de demo y productive en el mismo módulo. Siblings físicamente separados es el patrón canonical — `if (isDemo) { ... } else { ... }` está prohibido. Lint manual durante code review.
+- **NUNCA** introducir parametrize `tableName: string` en los foundation helpers (`countCorrectionTransitions[Demo]`). Bug futuro podría pointear productive al table demo o vice-versa. Siblings físicos enforce el boundary a nivel código.
+- **NUNCA** invocar `calculateRpaV2` (productive) desde un code path que opera sobre demo. Y vice-versa. Lint manual code review.
+- **NUNCA** compartir el integration token de Notion entre demo y productive. Secret físicamente separado en GCP (`notion-integration-token-greenhouse-metrics-demo` vs `NOTION_TOKEN`). Permisos del demo token DEBEN estar restringidos al teamspace Demo Greenhouse — NUNCA tener acceso a databases Efeonce/Sky.
+- **NUNCA** escribir a la propiedad `[GH] RpA v2` en databases productivas usando el demo writeback projection. Defense in depth dual: filter `workspaceId === 'demo'` strict + integration token con permisos restringidos.
+- **NUNCA** crear consumer downstream que confíe el `rpaValue` del payload del event sin re-read PG. El payload es trigger; la fuente de verdad es `task_rpa_demo_snapshots` (defense in depth pattern TASK-771 sample-sprint).
+- **NUNCA** ON UPDATE las columnas append-only de `task_rpa_demo_snapshots` (todas excepto writeback columns). Trigger PG enforce. Para correcciones, INSERT nueva fila con `source_event_id` distinto.
+- **NUNCA** persistir un snapshot con `rpa_data_status='valid'` Y `rpa_value=NULL`. CHECK constraint PG-side rechaza. Para tasks pre-deployment (sin transitions), persiste `rpa_data_status='unavailable'` + `rpa_value=NULL`.
+- **NUNCA** invocar `Sentry.captureException()` directo en code paths del pipeline demo. Usar `captureWithDomain('integrations.notion', { tags: { source: 'demo_<stage>' } })` para rollup canonical en `/admin/operations`.
+- **NUNCA** introducir nuevo chain event (e.g. para BCS, TTM, OTD) sin agregar (a) entry en `EVENT_TYPES`, (b) outbox aggregateType canonical, (c) projection registrada con `triggerEvents`, (d) tests anti-regresión, (e) reliability signal observable downstream.
+- **NUNCA** correr el pipeline demo en paralelo con el legacy sync (`space_notion_sources.sync_enabled=TRUE` para demo). El sync legacy NO procesa demo — pero garantizar que sigue OFF es load-bearing canonical anti-contamination.
+- **NUNCA** auto-promover pipeline demo a productive (Efeonce/Sky) sin pasar por los 8 stop-gates canonical del ADR Strangler `GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1.md` (foundation + demo verde 4 semanas + shadow 30d bonus / 7d operational + pilot scope ≤ 1 cliente + HR sign-off + snapshot pre-flip + kill switch + runbook + cliente sign-off).
+- **NUNCA** escalar volumen de writeback demo > Notion rate limit ~3 req/s sin migrar a Cloud Tasks queue throttled. V1 demo low volume <10/day es seguro con reactive consumer cada 5min; productive cutover REQUIERE Cloud Tasks rate=3/s explícito.
+- **NUNCA** modificar el `formula_version='rpa_v2.0'` retroactivamente. Bump a `rpa_v3.0` cuando Frame.io integration shippee + extender helpers en paralelo a productive — NUNCA modificar V2 in-place.
+- **NUNCA** crear consumer/dashboard que lea `task_rpa_demo_snapshots` para cualquier propósito payroll/bonus/KPI productivo. La tabla es demo-only; el bonus payroll productivo lee `metrics_by_member.rpa_avg` (V1 legacy) hasta cutover Fase D del Strangler ADR.
+- **SIEMPRE** que un consumer demo nuevo emerja, validar (a) filter strict `metadata.demo_mode === true`, (b) workspace check, (c) defense in depth dual mínimo (filter + tabla/secret físicamente separada).
+- **SIEMPRE** que se modifique el writeback projection (`notion-rpa-writeback-demo`), verificar que el counter `notion_writeback_attempt_count` se incrementa en AMBOS paths (success + fail). Sin counter, dead-letter signal pierde observabilidad.
+- **SIEMPRE** que se modifique cualquier column del schema `task_rpa_demo_snapshots`, regenerar tipos via `pnpm migrate:up` (auto) y actualizar consumers TypeScript. Drift entre PG schema + TS types rompe build.
+- **SIEMPRE** que un cliente productivo nuevo (Sky, futuro) emerja con custom property names en Notion, NO agregar property aliases — enforcer canonical template L1 ANTES del onboarding (mismo principio que TASK-742 canonical status vocabulary).
+
+**Capabilities canonical V1.0** (heredadas TASK-910 + reusadas):
+
+- `notion.metrics.demo.execute` (module=admin, scope=tenant) — EFEONCE_ADMIN
+- `notion.metrics.demo.read` (module=admin, scope=tenant) — EFEONCE_ADMIN + HR_MANAGER + EFEONCE_OPERATIONS
+
+**Helpers canonical** (todos `import 'server-only'`):
+
+- `src/lib/notion-metrics/count-correction-transitions-demo.ts`: foundation helper sibling demo
+- `src/lib/notion-metrics/calculate-rpa-v2-demo.ts`: mapper canonical demo (delegates a foundation helper)
+- `src/lib/notion-metrics/notion-demo-client.ts`: Notion API client demo-only con token físicamente separado
+- `src/lib/sync/projections/notion-rpa-compute-demo.ts`: reactive consumer compute (invoca calculateRpaV2Demo + persiste snapshot + emite chain event)
+- `src/lib/sync/projections/notion-rpa-writeback-demo.ts`: reactive consumer writeback (PATCH Notion + idempotent + retryable)
+- `src/lib/sync/projections/notion-status-transition-capture-demo.ts` (TASK-910 extended Slice 1): emite chain event post-persist en correction transitions
+- `src/lib/reliability/queries/notion-metrics-demo-signals.ts`: 7 signal readers canonical (5 + 2 nuevos Slice 3)
+- `scripts/rpa-demo/retrigger-pending-writebacks.ts`: nightly safety net script
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-913-rpa-v2-demo-pipeline-end-to-end.md`. ADR: `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`. Cross-refs TASK-910 (demo teamspace foundation), TASK-908 (status transition tracking foundation), TASK-901 (calculateRpaV2 productive helper).
 
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { TASK_STATUS_GROUPS, taskStatusGroupSql } from '@/lib/delivery/task-status-canonical'
 import { getProjectBriefClarityMetric } from '@/lib/ico-engine/brief-clarity'
 import { resolveIterationVelocityMetric } from '@/lib/ico-engine/iteration-velocity'
 
@@ -95,7 +96,7 @@ export async function GET(
           FROM \`${projectId}.ico_engine.v_tasks_enriched\`
           WHERE project_source_id = @projectSourceId
             AND (@spaceId IS NULL OR space_id = @spaceId)
-            AND task_status NOT IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Archivadas', 'Cancelada')
+            AND task_status NOT IN (${taskStatusGroupSql([...TASK_STATUS_GROUPS.COMPLETED, ...TASK_STATUS_GROUPS.EXCLUDED])})
           GROUP BY fase_csc
           ORDER BY fase_csc
         `,

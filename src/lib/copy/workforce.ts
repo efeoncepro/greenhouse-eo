@@ -391,6 +391,8 @@ export const GH_WORKFORCE_ACTIVATION = {
   resolver_contract_type: 'Tipo de contrato',
   resolver_contract_end_date: 'Fin de contrato',
   resolver_deel_contract_id: 'Contrato Deel',
+  resolver_legal_review_reference: 'Referencia revisión legal',
+  resolver_legal_review_reference_helper: 'Ticket, documento o thread aprobado por Legal/PeopleOps',
   resolver_daily_required: 'Requiere asistencia diaria',
   resolver_reason: 'Motivo del cambio',
   resolver_reason_placeholder: 'Ej: alta laboral revisada por HR.',

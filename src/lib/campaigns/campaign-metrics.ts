@@ -2,6 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { TASK_STATUS_GROUPS, taskStatusGroupSql } from '@/lib/delivery/task-status-canonical'
 import { getFirstEffectiveBriefDateForProjects } from '@/lib/ico-engine/brief-clarity'
 import {
   resolveTimeToMarketMetric,
@@ -204,26 +205,26 @@ export const getCampaignMetrics = async (campaignId: string): Promise<CampaignMe
         )
         SELECT
           COUNT(*) AS total_tasks,
-          COUNTIF(t.status IN ('Listo', 'Done', 'Finalizado', 'Completado')) AS completed_tasks,
-          COUNTIF(t.status IN ('En curso', 'Listo para revisión', 'Listo para revision', 'Cambios Solicitados')) AS active_tasks,
+          COUNTIF(t.status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})) AS completed_tasks,
+          COUNTIF(t.status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.ACTIVE)})) AS active_tasks,
           SAFE_CAST(AVG(SAFE_CAST(t.rpa AS FLOAT64)) AS FLOAT64) AS avg_rpa,
           SAFE_DIVIDE(
             COUNTIF(t.completed_on_time = TRUE),
-            NULLIF(COUNTIF(t.status IN ('Listo', 'Done', 'Finalizado', 'Completado')), 0)
+            NULLIF(COUNTIF(t.status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})), 0)
           ) * 100 AS otd_pct,
           SAFE_DIVIDE(
-            COUNTIF(t.revision_count = 0 AND t.status IN ('Listo', 'Done', 'Finalizado', 'Completado')),
-            NULLIF(COUNTIF(t.status IN ('Listo', 'Done', 'Finalizado', 'Completado')), 0)
+            COUNTIF(t.revision_count = 0 AND t.status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})),
+            NULLIF(COUNTIF(t.status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})), 0)
           ) * 100 AS ftr_pct,
           AVG(IF(t.cycle_time_days > 0, t.cycle_time_days, NULL)) AS cycle_time_avg,
           SAFE_DIVIDE(
-            COUNTIF(t.status IN ('Listo', 'Done', 'Finalizado', 'Completado')
+            COUNTIF(t.status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})
                     AND t.completed_at >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 7 DAY)),
             1
           ) AS throughput_weekly,
-          COUNTIF(t.status NOT IN ('Listo', 'Done', 'Finalizado', 'Completado')
+          COUNTIF(t.status NOT IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})
                   AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), t.last_edited_at, HOUR) > 48) AS stuck_48h,
-          COUNTIF(t.status NOT IN ('Listo', 'Done', 'Finalizado', 'Completado')
+          COUNTIF(t.status NOT IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})
                   AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), t.last_edited_at, HOUR) > 96) AS stuck_96h
         FROM campaign_tasks t
       `,

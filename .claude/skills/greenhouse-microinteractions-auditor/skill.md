@@ -92,6 +92,7 @@ These are non-negotiable import and usage rules:
 | Rule | Detail |
 |---|---|
 | Motion imports | `import { motion, AnimatePresence, ... } from '@/libs/FramerMotion'` — never from `framer-motion` directly |
+| GSAP imports | `import { gsap, useGSAP } from '@/libs/GSAP'`; `import { ScrollTrigger } from '@/libs/GSAPScrollTrigger'` — never from `gsap`, `gsap/ScrollTrigger`, or `@gsap/react` directly |
 | Lottie imports | `import Lottie from '@/libs/Lottie'` — never from `lottie-react` directly |
 | Reduced motion | Always use `useReducedMotion` from `@/hooks/useReducedMotion` for custom motion |
 | KPI transitions | Reuse `AnimatedCounter` from `@/components/greenhouse/AnimatedCounter` |
@@ -101,6 +102,7 @@ These are non-negotiable import and usage rules:
 | Loading | MUI `Skeleton` (known layout), `CircularProgress` (localized), `LinearProgress` (section/page refresh) |
 | Alerts | MUI `Alert` for inline messages; `role="alert"` for urgent blocking |
 | Staggered lists | `AnimatePresence` + `motion.div`, gated by `useReducedMotion` (see `NexaInsightsBlock.tsx` pattern) |
+| GSAP usage | Advanced timelines, SVG/path/text choreography, or measured ScrollTrigger experiences only; not normal hover/focus/press/counters/loading/list mutation |
 
 ## Implementation heuristics
 
@@ -180,7 +182,8 @@ Return:
 
 ## Anti-patterns
 
-- Importing `framer-motion` or `lottie-react` directly in new code
+- Importing `framer-motion`, `lottie-react`, `gsap`, `gsap/ScrollTrigger`, or `@gsap/react` directly in new code
+- Using GSAP for ordinary portal microinteractions that CSS, MUI, Framer Motion, or auto-animate already cover
 - Adding motion where copy or structure would solve the real problem
 - Using zero or fake values as animated placeholders
 - Relying on color or motion alone to communicate state

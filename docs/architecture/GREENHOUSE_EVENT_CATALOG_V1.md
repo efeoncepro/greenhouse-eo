@@ -2,6 +2,20 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-16 — TASK-894: Member contract taxonomy changes (1 event v1)
+
+Aggregate type: `member`.
+
+| Event Type | Disparado por | Payload v1 contract | Consumers |
+|---|---|---|---|
+| `member.contract_type.changed` | Write paths canónicos de Payroll compensation y Workforce intake cuando cambia `contract_type`, `pay_regime`, `payroll_via` o `deel_contract_id` en `greenhouse_core.members` | `{version:1, memberId, actorUserId, previous:{contractType,payRegime,payrollVia,hasDeelContractId}, next:{contractType,payRegime,payrollVia,hasDeelContractId}, hasLegalReviewReference:boolean, source:'payroll_compensation'|'workforce_intake', occurredAt}` | Auditoría, payroll participation/readiness refresh, payment lane refresh, Person 360/workforce projections |
+
+Reglas duras:
+
+- Se emite en la misma transacción que el update de `greenhouse_core.members` y el insert en `greenhouse_core.member_contract_type_audit_log`.
+- El payload NUNCA incluye `legalReviewReference` crudo. Solo publica `hasLegalReviewReference`; el valor completo vive en audit/metadata con acceso restringido.
+- No se emite en refresh idempotente sin cambio factual de contrato.
+
 ## Delta 2026-05-14 — TASK-876: Workforce intake remediation (1 event v1)
 
 Aggregate type: `workforce_member_intake`

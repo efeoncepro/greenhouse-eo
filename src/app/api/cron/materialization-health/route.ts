@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { TASK_STATUS_GROUPS, taskStatusGroupSql } from '@/lib/delivery/task-status-canonical'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export const dynamic = 'force-dynamic'
@@ -210,8 +211,8 @@ export async function GET(request: Request) {
     const [rows] = await bigQuery.query({
       query: `
         SELECT
-          COUNTIF(status IN ('Listo', 'Done', 'Finalizado', 'Completado')) AS total_completed,
-          COUNTIF(status IN ('Listo', 'Done', 'Finalizado', 'Completado')
+          COUNTIF(status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})) AS total_completed,
+          COUNTIF(status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})
             AND assignee_member_ids IS NOT NULL
             AND ARRAY_LENGTH(assignee_member_ids) > 0) AS with_assignee
         FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`

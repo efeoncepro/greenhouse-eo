@@ -206,6 +206,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-894 — Contract type excepcional para colaboradores internacionales
+    // operados internamente. V1 grant solo EFEONCE_ADMIN y write paths requieren
+    // legalReviewReference >= 10 chars; no es visibilidad de pagina.
+    key: 'payroll.contract.use_international_internal',
+    module: 'hr',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'finance.workspace',
     module: 'finance',
     actions: ['read', 'launch'] as const,
@@ -1176,6 +1185,22 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'identity.reconciliation.run',
     module: 'organization',
     actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-910 — Notion Demo Teamspace Sandbox capabilities (canonical defense in depth).
+  // Demo teamspace (Notion 36339c2f-...4ca0f5-...) sirve como gate canonical pre-Fase 1
+  // del ADR GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Demo NUNCA toca payroll real
+  // (filter via members.is_demo en fetchKpisForPeriod + pre-check en bonus helpers).
+  {
+    key: 'notion.metrics.demo.execute',
+    module: 'admin',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'notion.metrics.demo.read',
+    module: 'admin',
+    actions: ['read'] as const,
     defaultScope: 'tenant'
   }
 ] as const

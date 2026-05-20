@@ -194,7 +194,13 @@ export const AGGREGATE_TYPES = {
 
   // HubSpot Companies async intake (TASK-878) — batch envelope para webhook
   // companies/contacts. Mirror del pattern hubspot_services_batch (TASK-813b).
-  hubspotCompaniesBatch: 'hubspot_companies_batch'
+  hubspotCompaniesBatch: 'hubspot_companies_batch',
+
+  // TASK-908 / TASK-910 / TASK-912 — Notion task aggregate canonical para
+  // status transitions events. Aggregate identity = taskSourceId (Notion page
+  // UUID). Demo y productivo comparten aggregate_type pero distinguen via
+  // payload.metadata.demo_mode boolean + payload.workspaceId.
+  notionTask: 'notion_task'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -700,6 +706,11 @@ export const EVENT_TYPES = {
   memberRoleTitleDriftProposed: 'member.role_title.drift_proposed',
   memberRoleTitleDriftResolved: 'member.role_title.drift_resolved',
 
+  // TASK-894 — Member contract taxonomy changed.
+  // Payload redacts legalReviewReference; consumers receive only
+  // hasLegalReviewReference and must refetch canonical member facts.
+  memberContractTypeChanged: 'member.contract_type.changed',
+
   // TASK-848 — Production Release Control Plane (7 events versionados v1)
   platformReleaseStarted: 'platform.release.started',
   platformReleaseDeploying: 'platform.release.deploying',
@@ -728,7 +739,82 @@ export const EVENT_TYPES = {
   // Webhook handler emite este event y retorna <100ms; el reactive consumer
   // `hubspot_companies_intake` corre `syncHubSpotCompanyById` async en
   // ops-worker Cloud Run con retry exponencial + dead-letter.
-  commercialHubspotCompanySyncRequested: 'commercial.hubspot_company.sync_requested'
+  commercialHubspotCompanySyncRequested: 'commercial.hubspot_company.sync_requested',
+
+  // TASK-913 Slice 1 — Demo transition captured (intermediate chain event).
+  //
+  // Emitido por reactive consumer `notion-status-transition-capture-demo`
+  // (TASK-910 Slice 3) post-persist exitoso de la transition canonical en
+  // tabla físicamente separada `task_status_transitions_demo`.
+  //
+  // **Por qué chain event y no fire compute en el mismo `notion.task.status_
+  // transitioned`**: las projections que comparten un trigger event corren
+  // en paralelo desde el dispatcher reactivo (`reactive-consumer.ts`). Si el
+  // compute escuchara directamente `notion.task.status_transitioned`, podría
+  // leer `task_status_transitions_demo` ANTES de que capture haya persistido
+  // (race condition determinística). Chain event garantiza happens-before
+  // canonical: capture commitea row → emite event → compute consume.
+  //
+  // Pattern fuente: TASK-771 (decoupled write paths via outbox).
+  //
+  // Payload canonical V1:
+  //   {
+  //     schemaVersion: 1,
+  //     taskSourceId: string,        // Notion page UUID demo
+  //     workspaceId: 'demo',         // CHECK constraint downstream PG
+  //     fromStatus: string,          // canonical V1 status
+  //     toStatus: string,            // canonical V1 status
+  //     transitionedAt: string,      // ISO 8601
+  //     sourceEventId: string,       // Notion webhook event id (forensic)
+  //     metadata: { demo_mode: true }  // strict === true downstream
+  //   }
+  notionTaskTransitionCapturedDemo: 'notion.task.transition_captured.demo',
+
+  // TASK-913 Slice 1 — RpA V2 writeback request (demo path canonical V1).
+  //
+  // Emitido por reactive consumer compute `notion-rpa-compute-demo` post
+  // `calculateRpaV2` invocation cuando rpa_data_status='valid' (worth writing
+  // back to Notion). Consumed por reactive consumer writeback `notion-rpa-
+  // writeback-demo` (Slice 2) que enqueue Cloud Tasks → worker PATCH Notion
+  // page property `[GH] RpA v2`.
+  //
+  // Payload canonical V1:
+  //   {
+  //     schemaVersion: 1,
+  //     taskSourceId: string,        // Notion page UUID demo
+  //     workspaceId: 'demo',         // CHECK constraint downstream PG
+  //     rpaValue: number,            // computed RpA (lower is better)
+  //     rpaDataStatus: 'valid',      // solo 'valid' triggers writeback
+  //     snapshotId: string,          // UUID PK del task_rpa_demo_snapshots row
+  //     formulaVersion: 'rpa_v2.0',
+  //     computedAt: string,          // ISO 8601
+  //     metadata: { demo_mode: true }  // mismo pattern TASK-910 defense in depth
+  //   }
+  //
+  // Defense in depth canonical: workspaceId='demo' + metadata.demo_mode=true
+  // garantizan que writeback nunca toca Efeonce/Sky productivo.
+  notionTaskMetricsWritebackRequestedDemo: 'notion.task.metrics_writeback_requested.demo',
+
+  // TASK-908 / TASK-910 / TASK-912 — Notion task status transition event.
+  // Emitido por webhook handler `notion-tasks` (productivo, TASK-912) o
+  // `notion-tasks-demo` (TASK-910) cuando una task cambia de status en Notion.
+  //
+  // Payload canonical V1:
+  //   {
+  //     taskSourceId: string,        // Notion page UUID
+  //     workspaceId: string,         // 'efeonce' | 'sky' | 'demo'
+  //     fromStatus: string,          // canonical V1 status (post normalize)
+  //     toStatus: string,            // canonical V1 status (post normalize)
+  //     transitionedAt: string,      // ISO 8601
+  //     transitionedBy: string | null, // Notion user UUID
+  //     sourceEventId: string,       // Notion webhook event id (idempotency key)
+  //     metadata?: { demo_mode?: boolean }  // TRUE para demo, FALSE/undefined prod
+  //   }
+  //
+  // Reactive consumers DEBEN filtrar por `payload.metadata?.demo_mode` para
+  // discriminar demo vs prod (defense in depth: tablas físicamente separadas
+  // task_status_transitions_demo vs task_status_transitions).
+  notionTaskStatusTransitioned: 'notion.task.status_transitioned'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

@@ -1,5 +1,27 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-05-16 — TASK-894: International Internal Contract Type Foundation
+
+Payroll reconoce seis perfiles contractuales canónicos. El nuevo perfil `international_internal` cubre colaboradores internacionales pagados internamente por Efeonce/Greenhouse, sin Deel/EOR y sin payroll estatutario Chile.
+
+| contractType | payRegime | payrollVia | legal employer / payer semantics | Chile deductions |
+| --- | --- | --- | --- | --- |
+| `indefinido` | `chile` | `internal` | Efeonce SpA como empleador Chile | si |
+| `plazo_fijo` | `chile` | `internal` | Efeonce SpA como empleador Chile | si |
+| `honorarios` | `chile` | `internal` | Prestador emite boleta; Greenhouse retiene SII | solo retencion honorarios |
+| `contractor` | `international` | `deel` | Deel / contractor segun contrato proveedor | no |
+| `eor` | `international` | `deel` | Deel EOR | no |
+| `international_internal` | `international` | `internal` | Efeonce SpA procesa pago operativo; no declara employer of record local en V1 | no |
+
+Reglas canónicas:
+
+- El operador elige `contractType`; `payRegime` y `payrollVia` se derivan desde `CONTRACT_DERIVATIONS`. No existe selector libre de combinaciones.
+- `international_internal` requiere capability `payroll.contract.use_international_internal` y `legalReviewReference` >= 10 caracteres en write paths de compensación/intake.
+- `members` protege la tupla completa `(contract_type, pay_regime, payroll_via)` a nivel DB. `compensation_versions` protege `(contract_type, pay_regime)` como constraint `NOT VALID` para no mutar seis rows legacy detectadas en discovery, pero sí bloquea escrituras nuevas inválidas.
+- Todo cambio factual de contrato escribe `greenhouse_core.member_contract_type_audit_log` y emite `member.contract_type.changed v1` en la misma transacción.
+- Reliability agrega tres señales read-only: `payroll.contract_taxonomy.invalid_tuple_drift`, `payroll.contract_taxonomy.invalid_statutory_application` y `payroll.contract_taxonomy.fallback_resolution_legacy`.
+- No hubo backfill automático de colaboradores reales. Cualquier migración futura hacia `international_internal` debe ser opt-in por miembro con allowlist HR/Finance/Legal y audit row.
+
 ## Architecture Decision 2026-05-09 -- Chile Compliance Exports as Versioned Payroll Projections
 
 - Status: Accepted

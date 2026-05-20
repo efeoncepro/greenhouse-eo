@@ -1,5 +1,14 @@
 # GREENHOUSE_REPO_ECOSYSTEM_V1.md
 
+## Delta 2026-05-18 — `notion-bigquery` transferido a `efeoncepro` org (governance fix, pre-sunset)
+
+- **Acción ejecutada**: GitHub UI Settings → Transfer ownership de `cesargrowth11/notion-bigquery` a `efeoncepro/notion-bigquery`.
+- **Motivo canónico**: trust boundary fix. El sync diario que orquesta una cascada productiva crítica (`notion_ops → BQ conformed → PG delivery → ICO compute + bonus`) vivía en cuenta personal externa. Si el owner perdía acceso GitHub, Greenhouse perdía control del source-of-truth del código (Cloud Run runtime sigue corriendo pero patches futuros bloqueados). Audit pre-transfer verificó cero dependencias técnicas a la URL vieja: no GitHub Actions, no GCP Cloud Build triggers, no WIF providers, no IAM bindings. GitHub mantiene auto-redirect del URL viejo durante meses.
+- **Cero impacto operacional**: Cloud Run `notion-bq-sync@us-central1` sigue revisión `00016-mat` LIVE; smoke `/health` retorna `status=ok mode=multi-tenant spaces=2 tables_configured=4`; Cloud Scheduler `notion-bq-daily-sync` intact; BigQuery `notion_ops.*` intact; Secret Manager `notion-token` intact.
+- **Política nueva del repo legacy** (vía deprecation note en su README): "Deprecated — Maintenance only". Solo critical patches. NO nuevas features ni refactors. Sunset plan post TASK-908 GA (archive repo + delete Cloud Run service).
+- **Próximo paso canónico**: TASK-908 (webhook canonical Notion + reactive consumer en `ops-worker` + tabla `task_status_transitions` PG) construye **alongside** del sync Python actual, NO lo modifica. Strangler Fig pattern. Cuando TASK-908 ship + steady state Sky+Efeonce ≥30 días → cutover ICO compute al path canonical via feature flag → coexistencia 90 días → sunset definitivo.
+- **Reversible**: si emerge issue, retransferir el repo a cesargrowth11 (o cualquier cuenta) toma ~1 min via Settings UI. Cloud Run no se entera.
+
 ## Delta 2026-04-24 — `notion-bigquery` queda como repo hermano; dependencia sí, absorción no todavía
 
 - Fuente canónica nueva:
@@ -61,8 +70,8 @@ Nota:
 
 ### 2. Notion -> BigQuery delivery pipeline
 
-- Repo: `cesargrowth11/notion-bigquery`
-- Rol: Cloud Function que sincroniza Notion hacia BigQuery (`notion_ops`) y genera tablas operativas/staging para analitica
+- Repo: `efeoncepro/notion-bigquery` (transferido desde `cesargrowth11` el 2026-05-18; **status: Deprecated — Maintenance only**, sunset post TASK-908 GA)
+- Rol: Cloud Function (Python) que sincroniza Notion hacia BigQuery (`notion_ops`) y genera tablas operativas/staging para analitica
 - Source of truth para:
   - extraccion de bases de Notion (`tareas`, `proyectos`, `sprints`, `revisiones`)
   - shape operativo de `notion_ops.*`
@@ -191,7 +200,7 @@ Nota:
 
 - Repos verificados por GitHub CLI en esta sesion:
   - `efeoncepro/greenhouse-eo`
-  - `cesargrowth11/notion-bigquery`
+  - `efeoncepro/notion-bigquery` (transferido desde `cesargrowth11` el 2026-05-18)
   - `cesargrowth11/hubspot-bigquery`
   - `cesargrowth11/notion-teams`
   - `cesargrowth11/notion-frame-io`

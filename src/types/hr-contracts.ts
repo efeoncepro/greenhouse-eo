@@ -1,6 +1,9 @@
-export type ContractType = 'indefinido' | 'plazo_fijo' | 'honorarios' | 'contractor' | 'eor'
+export type ContractType = 'indefinido' | 'plazo_fijo' | 'honorarios' | 'contractor' | 'eor' | 'international_internal'
 export type PayRegime = 'chile' | 'international'
 export type PayrollVia = 'internal' | 'deel'
+
+export const INTERNATIONAL_INTERNAL_CONTRACT_CAPABILITY = 'payroll.contract.use_international_internal'
+export const INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE = 'international_internal_requires_legal_review_reference'
 
 export interface ContractCompensationPolicy {
   allowsRemoteAllowance: boolean
@@ -20,7 +23,8 @@ export const CONTRACT_DERIVATIONS: Record<ContractType, { payRegime: PayRegime; 
   plazo_fijo: { payRegime: 'chile', payrollVia: 'internal' },
   honorarios: { payRegime: 'chile', payrollVia: 'internal' },
   contractor: { payRegime: 'international', payrollVia: 'deel' },
-  eor: { payRegime: 'international', payrollVia: 'deel' }
+  eor: { payRegime: 'international', payrollVia: 'deel' },
+  international_internal: { payRegime: 'international', payrollVia: 'internal' }
 }
 
 export const CONTRACT_LABELS: Record<ContractType, { label: string; description: string }> = {
@@ -43,6 +47,10 @@ export const CONTRACT_LABELS: Record<ContractType, { label: string; description:
   eor: {
     label: 'EOR (Deel)',
     description: 'Deel actúa como empleador legal'
+  },
+  international_internal: {
+    label: 'Internacional interno',
+    description: 'Relación internacional operada internamente con revisión legal documentada'
   }
 }
 
@@ -51,7 +59,8 @@ export const SCHEDULE_DEFAULTS: Record<ContractType, { defaultValue: boolean; ov
   plazo_fijo: { defaultValue: true, overridable: false },
   honorarios: { defaultValue: false, overridable: true },
   contractor: { defaultValue: false, overridable: true },
-  eor: { defaultValue: false, overridable: true }
+  eor: { defaultValue: false, overridable: true },
+  international_internal: { defaultValue: false, overridable: true }
 }
 
 export const CONTRACT_COMPENSATION_POLICIES: Record<ContractType, ContractCompensationPolicy> = {
@@ -59,7 +68,8 @@ export const CONTRACT_COMPENSATION_POLICIES: Record<ContractType, ContractCompen
   plazo_fijo: { allowsRemoteAllowance: true },
   honorarios: { allowsRemoteAllowance: false },
   contractor: { allowsRemoteAllowance: true },
-  eor: { allowsRemoteAllowance: true }
+  eor: { allowsRemoteAllowance: true },
+  international_internal: { allowsRemoteAllowance: false }
 }
 
 export const SII_RETENTION_RATES: Record<number, number> = {
@@ -78,12 +88,52 @@ export const normalizeContractType = (value: string | null | undefined): Contrac
     value === 'plazo_fijo' ||
     value === 'honorarios' ||
     value === 'contractor' ||
-    value === 'eor'
+    value === 'eor' ||
+    value === 'international_internal'
   ) {
     return value
   }
 
   return 'indefinido'
+}
+
+export const isContractType = (value: unknown): value is ContractType =>
+  typeof value === 'string' && Object.prototype.hasOwnProperty.call(CONTRACT_DERIVATIONS, value)
+
+export const isInternationalInternalContractType = (contractType: ContractType | string | null | undefined) =>
+  normalizeContractType(contractType) === 'international_internal'
+
+export const normalizeLegalReviewReference = (value: unknown) => {
+  const normalized = typeof value === 'string' ? value.trim() : ''
+
+  return normalized || null
+}
+
+export const assertInternationalInternalLegalReviewReference = (value: unknown) => {
+  const normalized = normalizeLegalReviewReference(value)
+
+  if (!normalized || normalized.length < 10) {
+    const error = new Error('legalReviewReference is required for international_internal contracts.')
+
+    error.name = INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE
+    throw error
+  }
+
+  return normalized
+}
+
+export const isCanonicalContractPayrollTuple = ({
+  contractType,
+  payRegime,
+  payrollVia
+}: {
+  contractType: ContractType
+  payRegime: PayRegime
+  payrollVia: PayrollVia
+}) => {
+  const derivation = CONTRACT_DERIVATIONS[contractType]
+
+  return derivation.payRegime === payRegime && derivation.payrollVia === payrollVia
 }
 
 export const normalizePayRegime = (value: string | null | undefined, contractType?: ContractType | null): PayRegime => {

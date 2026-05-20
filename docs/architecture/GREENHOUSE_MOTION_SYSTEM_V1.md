@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura canónica
 > **Versión:** 1.0
 > **Creado:** 2026-04-26 por Claude (TASK-642)
-> **Última actualización:** 2026-04-26
+> **Última actualización:** 2026-05-17 — GSAP adoptado como carril especializado de motion avanzado. Ver `GREENHOUSE_GSAP_ADOPTION_DECISION_V1.md`.
 > **Documentación funcional:** `docs/documentation/plataforma/sistema-animaciones-microinteracciones.md`
 > **Status:** Vigente — los componentes referenciados se materializan a lo largo del programa TASK-642 (slices 1-5)
 
@@ -34,15 +34,16 @@ Este documento es la fuente de verdad técnica. Cualquier componente, view o fea
 | --- | --- | --- | --- |
 | **View Transitions API** (browser nativo) | n/a — Chrome 111+, Safari 18+, Firefox en progreso | Cross-page navigation morphs (list ↔ detail, page ↔ edit) | Todo cambio de ruta con identidad compartida |
 | **Framer Motion** | `^12.38` | Page entrance, KPI counters, scroll reveal, stagger, AnimatePresence | Cualquier animación stateful o orchestrada en cliente |
+| **GSAP** | `^3.15` + `@gsap/react` | Timelines complejos, SVG/path/text avanzado, ScrollTrigger medido | Solo casos especializados donde CSS/Framer/auto-animate no bastan |
 | **`@formkit/auto-animate`** | adopción en TASK-526 | List mutations (add/remove/reorder zero-config) | Listas mutables — drop-in `useAutoAnimate()` ref |
 | **MUI v5 transitions** | embedded | Defaults de Button/Card/Link/Modal | Cuando el componente MUI ya provee la transición correcta — no sobrescribir sin razón |
 | **CSS transitions/keyframes** | n/a — nativo | Microinteractions tokens (`hoverScale`, `pressDepress`) | Cuando una `sx` prop con transition simple basta — no traer Framer Motion para algo que CSS resuelve |
 
-### 3.2 Lo que NO usamos (decisiones explícitas)
+### 3.2 Lo que NO usamos por defecto (decisiones explícitas)
 
 | Lib | Por qué NO |
 | --- | --- |
-| **GSAP** | Comercial para uso comercial; Framer Motion cubre todo lo que necesitamos |
+| **GSAP para microinteracciones comunes** | Superseded 2026-05-17: GSAP queda adoptado solo para choreography avanzado. Para hover, focus, counters, list motion y page entrance siguen CSS/Framer/auto-animate. |
 | **react-spring** | Framer Motion ya cubre spring physics; no duplicar APIs |
 | **Lottie** | Bundle pesado; Rive evaluado en TASK-527 si emerge necesidad de illustrations |
 | **react-transition-group** | Legacy 2018; Framer Motion `AnimatePresence` lo reemplaza |
@@ -259,6 +260,8 @@ src/
         StaggeredList.tsx        # list stagger wrapper (TASK-646)
   libs/
     FramerMotion.tsx             # re-export canónico de framer-motion
+    GSAP.tsx                     # re-export canónico de gsap + useGSAP
+    GSAPScrollTrigger.tsx        # registro lazy de ScrollTrigger
   @core/theme/
     overrides/
       Button.ts                  # tokens aplicados globalmente (TASK-643)
@@ -282,16 +285,27 @@ src/
 
 ### 10.3 ¿Necesitás una lib nueva?
 
-Triggers válidos para introducir una lib nueva de motion:
+Triggers válidos para usar GSAP o introducir una lib nueva de motion:
 
-- Necesidad de SVG path animations complejas (caso edge — Rive en TASK-527).
+- Necesidad de timeline complejo multi-elemento donde Framer Motion vuelva frágil el componente.
+- Necesidad de SVG path/text animations complejas.
+- Necesidad de `ScrollTrigger` con scrub/pin/snap para una experiencia narrativa o dashboard ejecutivo, validada con performance.
 - Necesidad de 3D (Three.js — TASK-233 evaluación).
 - Performance issue medido que ninguna lib actual resuelve.
 
 Triggers inválidos:
 
 - "Lottie es popular" — no, lo evaluamos.
-- "Quiero usar GSAP" — no, Framer Motion cubre todo.
+- "Quiero usar GSAP" para hover, focus, counters, loading o list motion — no, el stack existente ya cubre eso.
+
+Regla de import:
+
+```tsx
+import { gsap, useGSAP } from '@/libs/GSAP'
+import { ScrollTrigger } from '@/libs/GSAPScrollTrigger'
+```
+
+No importar `gsap`, `gsap/ScrollTrigger` ni `@gsap/react` directo desde una surface de producto.
 
 ### 10.4 ¿Tu vista nueva debe usar el sistema?
 
@@ -318,7 +332,7 @@ Sí. Toda vista nueva del portal debe consumir el sistema. Convención mínima:
 ## 12. Versionamiento del sistema
 
 - **V1 (actual)**: tokens + 7 wrappers canónicos. Foundation.
-- **V2 (futuro)**: si emerge necesidad de motion choreography compleja (ej. multi-element morphs orquestados), se evaluará abrir librería interna `GhMotionPrimitives`. NO se planifica todavía.
+- **V2 (futuro)**: si emergen 3+ consumers productivos de GSAP, crear wrappers Greenhouse dedicados bajo `src/components/greenhouse/motion/` para evitar timelines ad-hoc.
 - **V3 (especulativo)**: si Greenhouse adopta Storybook, los wrappers se documentan ahí con stories de cada estado.
 
 ## 13. Decisiones cerradas
@@ -327,7 +341,8 @@ Sí. Toda vista nueva del portal debe consumir el sistema. Convención mínima:
 - **2026-04-26**: Framer Motion `^12.38` es la lib de animaciones declarativas (instalada, sin uso real hasta TASK-642).
 - **2026-04-26**: `@formkit/auto-animate` se adopta para list mutations (TASK-526 dentro del programa TASK-642).
 - **2026-04-26**: ApexCharts y ECharts coexisten como tier 2 y tier 1 respectivamente (TASK-641); el motion system es agnóstico al chart lib.
-- **2026-04-26**: NO se adopta GSAP, Lottie, Anime.js, react-spring ni react-transition-group.
+- **2026-04-26**: No se adoptaba GSAP, Lottie, Anime.js, react-spring ni react-transition-group en el motion system original.
+- **2026-05-17**: La decisión anterior queda parcialmente superseded para GSAP: se adopta como carril especializado de motion avanzado por `GREENHOUSE_GSAP_ADOPTION_DECISION_V1.md`; no reemplaza Framer Motion, CSS transitions ni auto-animate.
 
 ## 14. Riesgos vigentes
 
@@ -343,6 +358,7 @@ Sí. Toda vista nueva del portal debe consumir el sistema. Convención mínima:
 - TASK-525 — View Transitions API rollout (cerrada).
 - TASK-642 — Motion Polish Program 2026 (umbrella).
 - TASK-526, TASK-643, TASK-644, TASK-645, TASK-646 — sub-tasks que materializan este sistema.
+- `GREENHOUSE_GSAP_ADOPTION_DECISION_V1.md` — ADR que habilita GSAP como carril especializado.
 - `GREENHOUSE_UI_PLATFORM_V1.md` — stack UI canónico.
 - `GREENHOUSE_DESIGN_TOKENS_V1.md` — tokens de color, tipografía, spacing.
 - Skill `greenhouse-microinteractions-auditor` — invocable para auditar interacciones en code review.

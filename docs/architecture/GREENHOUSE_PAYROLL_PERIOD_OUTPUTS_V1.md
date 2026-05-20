@@ -24,11 +24,11 @@ Los tres surfaces consumen el helper canonico `src/lib/payroll/receipt-presenter
 type ReceiptRegime =
   | 'chile_dependent'      // indefinido + plazo_fijo
   | 'honorarios'           // honorarios SII Art. 74 N°2 LIR
-  | 'international_deel'   // contractor + eor (jurisdiccion del trabajador)
-  | 'international_internal' // payRegime='international' sin Deel
+  | 'international_deel'   // contractTypeSnapshot ∈ {contractor, eor} OR legacy payrollVia === 'deel'
+  | 'international_internal' // contractTypeSnapshot === 'international_internal' OR legacy international/internal fallback
 ```
 
-Detector primario: `entry.contractTypeSnapshot`. Fallbacks defensivos para data legacy: `payrollVia === 'deel'` → deel; `payRegime === 'chile' && siiRetentionAmount > 0` → honorarios; default seguro `chile_dependent`.
+Detector primario: `entry.contractTypeSnapshot`. Desde TASK-894, `contractTypeSnapshot === 'international_internal'` es el path primario para internacional interno; `payRegime === 'international' && payrollVia === 'internal'` queda solo como fallback legacy observable por `payroll.contract_taxonomy.fallback_resolution_legacy`. Otros fallbacks defensivos: `payrollVia === 'deel'` → Deel; `payRegime === 'chile' && siiRetentionAmount > 0` → honorarios; default seguro `chile_dependent`.
 
 Orden canonico estable (no depende de orden alfabetico): `chile_dependent → honorarios → international_deel → international_internal`. Exportado como `RECEIPT_REGIME_DISPLAY_ORDER`.
 

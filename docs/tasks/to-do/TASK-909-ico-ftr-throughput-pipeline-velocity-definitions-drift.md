@@ -1,0 +1,325 @@
+# TASK-909 — FTR canonical helper V1 + Throughput/Pipeline Velocity specs + Engine doc deprecation pointer
+
+> **Precondiciones canonical**:
+>
+> - `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` (ADR 2026-05-17 — boundary Notion = OS / ICO = motor)
+> - `docs/architecture/GREENHOUSE_METRIC_SPEC_PATTERN_V1.md` (ADR 2026-05-17 — 1 métrica = 1 spec canonical)
+> - `docs/architecture/metrics/FTR_V1.md` (spec canonical de la métrica — TASK-909 implementa lo que ahí se canoniza, NO redefine)
+> - `docs/architecture/metrics/RPA_V1.md` (FTR delega a RpA — single source of truth)
+> - `docs/architecture/metrics/METRICS_INDEX.md` (índice maestro post-creación de specs)
+>
+> Bloqueada arquitectónicamente por TASK-901 Slice 1 (que a su vez requiere TASK-908 Slices 0-3.5). FTR helper delega a `calculateRpa` que delega a `countCorrectionTransitions`.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P2`
+- Impact: `Medio`
+- Effort: `Medio`
+- Type: `implementation`
+- Epic: `optional`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `delivery|ico|integrations|reliability`
+- Blocked by: `TASK-908 Slices 0-3.5 + TASK-901 Slice 1 (calculateRpa canonical). Sin esa cadena, calculateFtr no tiene source confiable y caería en el anti-patrón legacy de leer Notion property RpA directo (mismo bug class que motivó la decisión de boundary canonical 2026-05-17).`
+- Branch: `task/TASK-909-ico-ftr-throughput-pipeline-velocity-definitions-drift`
+- Legacy ID: `none`
+- GitHub Issue: `optional`
+
+## Summary
+
+Implementar el **helper canonical `calculateFtr` V1** que `FTR_V1.md` canoniza (delega a `calculateRpa`, sin lógica propia) + crear **specs canonical Throughput + Pipeline Velocity** que resuelven el drift histórico entre Engine doc y código runtime + apuntar Engine doc + Contrato a los specs nuevos como source of truth.
+
+**Reshape post creación del pattern canonical (sesión 2026-05-17)**: esta TASK ya NO redefine las métricas inline ni edita Engine doc con cambios conceptuales. La definición canonical vive en `docs/architecture/metrics/<METRIC>_V1.md`. Esta TASK:
+
+1. **Implementa `calculateFtr` helper V1** (Slice 1) — código TS que matchea exactamente `FTR_V1.md` section 4.1 signature canonical + tests anti-regresión section 4.2.
+2. **Crea `THROUGHPUT_V1.md` spec canonical** (Slice 2) — resuelve drift: spec consolida que `monthly_count` (código actual `metric-registry.ts:310-323`) es canonical operacional; la fórmula `weekly_rate / 4` del Engine doc era artefacto histórico no implementado. Sin cambios de código.
+3. **Crea `PIPELINE_VELOCITY_V1.md` spec canonical** (Slice 3) — resuelve drift: spec consolida que es **ratio `completed / (completed + open)` per-período** (código actual `metric-registry.ts:338-367`), NO "identical to throughput". Distingue semántica per Engine doc legacy. Sin cambios de código.
+4. **Engine doc + Contrato pointer Delta** (Slice 4) — agregar Delta 2026-05-17 al inicio de Engine doc señalando que para definiciones canonical de cada métrica, leer `metrics/<METRIC>_V1.md`. Engine doc queda como framework conceptual sin redefinir.
+5. **METRICS_INDEX update + Closing** (Slice 5) — actualizar índice con status `Accepted` para los 3 specs nuevos + cross-impact scan.
+
+**Out of scope V1 (referenciado para tasks futuras)**:
+
+- FTR writeback completo a Notion property `[GH] FTR` → TASK-903 (futura), reusa pattern TASK-901.
+- Throughput writeback → TASK-905+ (futura).
+- Pipeline Velocity writeback → TASK-905+ (futura).
+- Frame.io integration (que poblaría las 4 señales restantes de FTR compuesto V2) → backlog separado.
+- Migración progresiva del resto de métricas (OTD, Cumplimiento, Cycle Time, CT SLO%, Iteration Velocity, BCS, TTM) a specs canonical — cada uno emerge cuando una task la toca (strangler pattern per `GREENHOUSE_METRIC_SPEC_PATTERN_V1.md` §5).
+
+## Why This Task Exists
+
+Deep-dive sesión 2026-05-17 detectó 3 drifts entre Engine spec doc y código runtime que generan confusión cross-team:
+
+- **FTR drift**: Engine doc § A.5.3 propone "FTR = composite 5 signals". Código implementa `completed AND client_change_round_final = 0`. Las otras 4 señales (`client_review_open`, `workflow_review_open`, `open_frame_comments`, `handoff_artifact_present`) **no se rastrean** (Frame.io no existe; handoff artifact no se mide). El spec doc describe el ideal futuro, el código describe el presente operacional. Sin resolver el drift, agentes y consumers no saben cuál es la verdad canonical.
+
+- **Throughput drift**: Engine doc dice `weekly_rate / 4`. Código dice `COUNT(*) per month`. Operador reporta y lee throughput mensual. La fórmula `weekly_rate / 4` es artefacto histórico de un análisis previo no implementado. Documentar que `monthly_count` es canonical operacional resuelve confusión.
+
+- **Pipeline Velocity drift**: Engine doc dice "identical to throughput". Código dice "completed / open ratio". Son métricas distintas semánticamente:
+  - **Throughput**: cuántas tareas se completan en el período (volumen absoluto)
+  - **Pipeline Velocity**: ratio de salida vs entrada (qué tan rápido fluye el pipeline relativo al backlog activo)
+  - Un equipo puede tener `throughput` alto y `pipeline_velocity` baja si el backlog crece más rápido que la salida.
+
+Estos drifts NO bloquean operación (las métricas funcionan), pero generan riesgo cuando:
+
+- Un nuevo agente lee el Engine doc + intenta implementar — termina divergiendo del código existente.
+- Un consumer downstream lee la spec + asume comportamiento que el código NO entrega.
+- El Cycle Time canonical (TASK-908) actualiza la fórmula CT — sin housekeeping del Engine doc para las métricas adyacentes, el drift crece.
+
+**Decisión arquitectónica canonical 2026-05-17 (ADR `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1`)**: cuando hay drift entre Engine doc (conceptual) y código (runtime), **el código es source of truth canonical**. El Engine doc se actualiza para reflejar el código + documentar diferida lo que aún no se implementa (con cross-ref a backlog task).
+
+## Goal
+
+- **FTR canonical V1 helper** (`src/lib/notion-metrics/calculate-ftr.ts`): pure function async `calculateFtr(taskId): Promise<FtrResult>` que delega a `calculateRpa(taskId)` (de TASK-901) y devuelve `{ value: 'pass' | 'fail' | 'not_applicable', dataStatus, sourceMode, formulaVersion: 'ftr_v1.0' }`. NO implementa señales Frame.io (forward-compat: cuando emerja, `calculateRpa` extiende y `calculateFtr` se beneficia automático sin breaking change).
+- **Throughput canonical decision documented**: actualizar Engine doc para que diga "Throughput = monthly_count per period, alineado con código runtime canonical en `metric-registry.ts:310-323`. El `weekly_rate / 4` original del spec era artefacto histórico no implementado". Sin cambios de código.
+- **Pipeline Velocity canonical decision documented**: actualizar Engine doc para clarificar que NO es identical to throughput. Es el ratio `completed_count / (completed_count + open_count)` per período (cómo `metric-registry.ts:338-367` lo computa). Mide flow eficiencia relativa al backlog activo. Sin cambios de código.
+- **Engine doc housekeeping**: actualizar `docs/architecture/Greenhouse_ICO_Engine_v1.md` líneas 887-1116 + secciones impactadas. Agregar Delta 2026-05-17 al inicio que liste las 3 resoluciones canonical + cross-ref ADR boundary.
+- **Lint rule defense canonical**: `eslint-plugins/greenhouse/rules/no-inline-ftr-calculation.mjs` modo `warn` durante migración (mismo pattern que `no-inline-rpa-calculation`).
+- **Tests anti-regresión**: helper `calculateFtr` con mocks de `calculateRpa`, mínimo 8 paths cubriendo casos canonical (pass/fail/not_applicable/sourceMode unavailable/forward-compat ignored Frame.io signals).
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` — **PRECONDICIÓN CANONICAL** (ADR boundary Notion = OS / ICO Engine = motor)
+- `docs/architecture/Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 secciones F + G — semántica canonical de corrección y boundary
+- `docs/architecture/Greenhouse_ICO_Engine_v1.md` líneas 887-1116 — sección a resolver drift
+- `docs/tasks/to-do/TASK-908-ico-status-transition-tracking-canonical-cycle-time.md` — foundation prerequisita (countCorrectionTransitions Slice 3.5)
+- `docs/tasks/to-do/TASK-901-canonical-notion-metric-compute-v1-rpa.md` — calculateRpa Slice 1 prerequisito
+
+Reglas obligatorias canonical:
+
+- **NUNCA** reescribir FTR como motor compuesto de 5 señales en V1 — las 4 señales Frame.io NO existen. Forward-compat: cuando emerjan, extender `calculateRpa` (no `calculateFtr`).
+- **NUNCA** modificar el código de Throughput o Pipeline Velocity en V1 — son canonical operacional, solo se documenta su semántica para resolver drift conceptual.
+- **NUNCA** consumer downstream recomputa FTR/Throughput/Pipeline Velocity inline. Toda lectura pasa por columna materializada o helper canonical.
+- **NUNCA** invocar `Sentry.captureException()` directo — usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'metric_compute', metric: 'ftr' } })`.
+
+## Normative Docs
+
+- `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` — ADR canonical
+- `Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 sección G — semántica canonical de corrección
+- `Greenhouse_ICO_Engine_v1.md` líneas 2330-2346 (§ A.5.3 FTR composite spec) — drift a resolver
+- `src/lib/ico-engine/metric-registry.ts` líneas 155-158 (CANONICAL_FTR_PASSED_SQL), 226-249 (ftr_pct), 310-323 (throughput), 338-367 (pipeline_velocity)
+- TASK-908 spec — countCorrectionTransitions helper
+- TASK-901 spec — calculateRpa helper
+
+## Dependencies & Impact
+
+### Depends on
+
+- **TASK-908 Slices 0-3.5 SHIPPED** (transitions foundation + countCorrectionTransitions helper)
+- **TASK-901 Slice 1 SHIPPED** (calculateRpa canonical async helper)
+- `src/lib/observability/capture.ts` (`captureWithDomain`)
+- `src/lib/notion-metrics/index.ts` barrel export (de TASK-901)
+
+### Blocks / Impacts
+
+- **TASK-903 (FTR writeback futura)**: consume `calculateFtr` de esta TASK + reusa infra writeback de TASK-901.
+- **Consumers downstream UI** (Person 360, Pulse, ICO scorecards): NO cambian. Siguen leyendo `metrics_by_*.ftr_pct` agregado por SQL del registry (NO consumen `calculateFtr` per-task directo).
+- Lint rule `greenhouse/no-inline-ftr-calculation`: afecta cualquier consumer futuro que intente recomputar FTR inline.
+
+### Files owned
+
+- `src/lib/notion-metrics/calculate-ftr.ts` — NEW: helper canonical async `calculateFtr` que delega a `calculateRpa`
+- `src/lib/notion-metrics/calculate-ftr.test.ts` — NEW: tests mínimo 8 paths con mocks
+- `src/lib/notion-metrics/ftr-types.ts` — NEW (o consolidar en `types.ts` de TASK-901): `TaskInputsForFtr`, `FtrResult` types
+- `eslint-plugins/greenhouse/rules/no-inline-ftr-calculation.mjs` — NEW: lint rule modo warn
+- `docs/architecture/Greenhouse_ICO_Engine_v1.md` — MODIFY: secciones FTR (§ A.5.3) + Throughput + Pipeline Velocity + Delta canonical al inicio
+- `docs/architecture/Contrato_Metricas_ICO_v1.md` — MODIFY (light): agregar nota de cross-ref a TASK-909 closure cuando shippee
+- `CLAUDE.md` — MODIFY (light): agregar pointer a `calculate-ftr.ts` en la sección "Delivery Metrics Ownership Boundary invariants" (helpers canonical list)
+
+## Current Repo State
+
+### Already exists
+
+- `src/lib/ico-engine/metric-registry.ts:155-158` — `CANONICAL_FTR_PASSED_SQL` actual
+- `src/lib/ico-engine/metric-registry.ts:226-249` — métrica `ftr_pct` actual (agregado SQL)
+- `src/lib/ico-engine/metric-registry.ts:310-323` — `throughput` actual (monthly_count)
+- `src/lib/ico-engine/metric-registry.ts:338-367` — `pipeline_velocity` actual (ratio completed/open)
+- `Greenhouse_ICO_Engine_v1.md` líneas 887-1116 con drift documentado
+- `src/lib/notion-metrics/calculate-rpa.ts` (TASK-901 Slice 1 SHIPPED — prerequisite)
+
+### Gap
+
+- No existe helper canonical `calculateFtr()` per-task — la lógica vive solo en SQL agregado del registry
+- No existe forward-compat documentado para Frame.io signals en FTR
+- Engine doc tiene drift documental no resuelto (FTR composite, Throughput formula, Pipeline Velocity definition)
+- No existe lint rule anti-inline FTR
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 1 — `calculateFtr` canonical helper
+
+- Crear `src/lib/notion-metrics/calculate-ftr.ts`:
+
+  ```typescript
+  import 'server-only'
+  import { calculateRpa, type RpaResult } from './calculate-rpa'
+
+  export const FTR_FORMULA_VERSION = 'ftr_v1.0'
+
+  export type TaskInputsForFtr = {
+    taskSourceId: string
+    windowStart?: Date | null
+    windowEnd?: Date | null
+    // Forward-compat Frame.io (V2 — hoy ignored, V2 task derivada activa policy):
+    clientReviewOpen?: boolean | null
+    workflowReviewOpen?: boolean | null
+    openFrameComments?: number | null
+    handoffArtifactPresent?: boolean | null
+  }
+
+  export type FtrResult = {
+    value: 'pass' | 'fail' | 'not_applicable' | null
+    dataStatus: 'valid' | 'unavailable'
+    sourceMode: 'canonical' | 'unavailable'
+    rpaSnapshot: RpaResult
+    formulaVersion: typeof FTR_FORMULA_VERSION
+  }
+
+  export const calculateFtr = async (inputs: TaskInputsForFtr): Promise<FtrResult> => {
+    const rpaResult = await calculateRpa({
+      taskSourceId: inputs.taskSourceId,
+      windowStart: inputs.windowStart,
+      windowEnd: inputs.windowEnd,
+      clientReviewOpen: inputs.clientReviewOpen,
+      workflowReviewOpen: inputs.workflowReviewOpen,
+      openFrameComments: inputs.openFrameComments
+    })
+
+    if (rpaResult.dataStatus === 'unavailable' || rpaResult.value === null) {
+      return {
+        value: null,
+        dataStatus: 'unavailable',
+        sourceMode: rpaResult.sourceMode,
+        rpaSnapshot: rpaResult,
+        formulaVersion: FTR_FORMULA_VERSION
+      }
+    }
+
+    return {
+      value: rpaResult.value === 0 ? 'pass' : 'fail',
+      dataStatus: 'valid',
+      sourceMode: 'canonical',
+      rpaSnapshot: rpaResult,
+      formulaVersion: FTR_FORMULA_VERSION
+    }
+  }
+  ```
+
+- Tests mínimo 8 paths (mock `calculateRpa`):
+  1. Happy pass: RpA=0 → FTR `pass`
+  2. Happy fail: RpA=1 → FTR `fail`
+  3. Happy fail multiple: RpA=5 → FTR `fail`
+  4. Unavailable: RpA sourceMode='unavailable' → FTR `null`, `dataStatus='unavailable'`
+  5. RpA value=null → FTR `null`
+  6. Window filter propagation: ventana pasada correctamente a calculateRpa
+  7. Forward-compat ignore: `clientReviewOpen=true` pasado pero V1 lo pasa a calculateRpa que también lo ignora → same result
+  8. RpaSnapshot preserved en FtrResult para forensic/debugging
+
+- Lint rule `eslint-plugins/greenhouse/rules/no-inline-ftr-calculation.mjs` modo `warn`:
+  - Detecta patterns: `client_change_round_final = 0` inline en SQL embedded TS, `FTR_PASSED_SQL` referencias fuera del registry, `formula.ftr` lectura inline de Notion
+  - Override block exime el helper canonical + tests + `metric-registry.ts` (única fuente legítima de agregado SQL)
+
+### Slice 2 — ~~Crear `THROUGHPUT_V1.md` spec canonical~~ **REMOVIDO 2026-05-17 (cont.)**
+
+> **REMOVIDO**: `THROUGHPUT_V1.md` ya fue creado en la misma sesión 2026-05-17 como parte del paquete "crear los 12 specs canonicales pendientes" — sesión doc-only que canonizó las 14 métricas críticas. Ver `docs/architecture/metrics/THROUGHPUT_V1.md` Accepted. TASK-909 NO necesita crearlo.
+
+### Slice 3 — ~~Crear `PIPELINE_VELOCITY_V1.md` spec canonical~~ **REMOVIDO 2026-05-17 (cont.)**
+
+> **REMOVIDO**: `PIPELINE_VELOCITY_V1.md` ya fue creado en la misma sesión. Ver `docs/architecture/metrics/PIPELINE_VELOCITY_V1.md` Accepted. TASK-909 NO necesita crearlo.
+
+### Slice 4 — Engine doc + Contrato + DECISIONS_INDEX pointer Delta
+
+- Agregar **Delta 2026-05-17** al inicio de `Greenhouse_ICO_Engine_v1.md` (antes de la sección 1) con párrafo + tabla:
+
+  > **Delta 2026-05-17 — Migración a specs canonical por métrica**
+  >
+  > Post sesión deep-dive 2026-05-17 + ADR `GREENHOUSE_METRIC_SPEC_PATTERN_V1.md`, cada métrica crítica tiene su spec canonical dedicado en `docs/architecture/metrics/<METRIC>_V1.md` que es **single source of truth** de definición, fórmula, helper, agregado, semántica, threshold, writeback, estados y casos edge.
+  >
+  > Este doc (Engine doc) queda como **framework conceptual enterprise** (drivers operativos, 3 niveles, cadena causal, narrativa pitch). Las definiciones de métrica individual viven en los specs canonical referenciados acá:
+  >
+  > | Métrica | Spec canonical | Status |
+  > |---|---|---|
+  > | RpA | `metrics/RPA_V1.md` | Accepted |
+  > | FTR | `metrics/FTR_V1.md` | Accepted |
+  > | Throughput | `metrics/THROUGHPUT_V1.md` | Accepted |
+  > | Pipeline Velocity | `metrics/PIPELINE_VELOCITY_V1.md` | Accepted |
+  > | Resto (9 métricas pendientes) | `metrics/METRICS_INDEX.md` | Strangler migration |
+  >
+  > **Reglas canonical**: si emerge drift entre las definiciones acá vs los specs canonical, **el spec canonical gana**. Las secciones acá que redefinen métricas serán simplificadas progresivamente a cross-refs a medida que cada spec emerja.
+
+- Agregar a `Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 nueva sección **I) Migración progresiva a specs canonical por métrica** apuntando al pattern + index + 4 specs Accepted.
+- Update `DECISIONS_INDEX.md` con entry nueva: "1 métrica crítica = 1 spec canonical en `docs/architecture/metrics/<METRIC>_V1.md`" pointing to `GREENHOUSE_METRIC_SPEC_PATTERN_V1.md`.
+
+### Slice 5 — CLAUDE.md + METRICS_INDEX final + Closing
+
+- Update `CLAUDE.md` sección "Delivery Metrics Ownership Boundary invariants" — agregar `calculateFtr` a la lista de helpers canonical + agregar pointer al ADR metric spec pattern.
+- Update `METRICS_INDEX.md` final con los 4 specs Accepted (RPA + FTR + THROUGHPUT + PIPELINE_VELOCITY) + status final post-shipping.
+- Update `docs/tasks/README.md` + `Handoff.md` + `changelog.md` con shipping notice TASK-909.
+- Cross-impact scan `docs/tasks/to-do/` por tasks referenciando FTR/Throughput/Pipeline Velocity (sobre todo TASK-903 cuando emerja).
+- Mover task a `complete/`.
+
+## Out of Scope
+
+- **FTR writeback completo a Notion `[GH] FTR` property** → TASK-903 (futura). Reusa infra TASK-901 (webhook + outbox + Cloud Tasks + bulk PATCH).
+- **Throughput writeback** → TASK-905+ (futura).
+- **Pipeline Velocity writeback** → TASK-905+ (futura).
+- **Frame.io integration** (que poblaría 4 de 5 señales del FTR compuesto V2) → backlog separado, NO blocking V1.
+- **Cambios a código de Throughput o Pipeline Velocity** → out of scope. V1 documenta el código actual como canonical; modificaciones requieren TASK separada con análisis impacto downstream.
+- **BCS y TTM** (también pendientes en backlog) → TASK-910 separada cuando emerja necesidad operativa.
+- **IRR (Internal Review Rounds)** mencionada en CLAUDE.md como métrica futura paralela a RpA — out of scope V1, evaluar cuando workflow review system emerja.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSURE
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] `src/lib/notion-metrics/calculate-ftr.ts` existe + tests mínimo 8 paths verde
+- [ ] Helper `calculateFtr` delega a `calculateRpa` (zero lógica propia — solo mapping `value === 0 ? 'pass' : 'fail'`)
+- [ ] Lint rule `greenhouse/no-inline-ftr-calculation` modo warn activa + tests del rule
+- [ ] `Greenhouse_ICO_Engine_v1.md` actualizado con Delta 2026-05-17 al inicio + cross-refs ADR + secciones FTR/Throughput/Pipeline Velocity con resoluciones canonical
+- [ ] `CLAUDE.md` sección boundary actualizada con pointer a `calculateFtr`
+- [ ] `Contrato_Metricas_ICO_v1.md` Delta sección G actualizada con shipping notice TASK-909
+- [ ] README + Handoff + changelog actualizados
+- [ ] `pnpm test src/lib/notion-metrics/calculate-ftr.test.ts` verde
+- [ ] `pnpm lint` verde (incluye nueva lint rule)
+- [ ] `pnpm tsc --noEmit` verde
+- [ ] Zero cambios de código en `metric-registry.ts` (throughput + pipeline_velocity)
+- [ ] Task movida a `complete/`
+
+## Verification
+
+- Manual review: leer Engine doc Delta + cross-refs canonical → entendible para nuevo agente sin background
+- Manual review: tests cubren forward-compat path (Frame.io signals ignored sin warning ni breakage)
+- `pnpm test` (full suite) + `pnpm build` (production Turbopack) verde como gate final canonical (CLAUDE.md regla "Task Closing Quality Gate")
+
+## Closing Protocol
+
+1. Verificar acceptance criteria todas en verde
+2. `pnpm test && pnpm build` local pre-close
+3. Mover archivo a `docs/tasks/complete/TASK-909-...`
+4. Update `Lifecycle` a `complete` en frontmatter
+5. Update `docs/tasks/README.md` (mover entrada a Complete)
+6. Update `Handoff.md` + `changelog.md`
+7. Cross-impact scan `docs/tasks/to-do/` por tasks referenciando FTR canonical (TASK-903 sobre todo)
+8. Commit + push develop con conventional message `feat(ico): TASK-909 ship FTR canonical V1 + Engine doc drift resolution`
+
+## Follow-ups
+
+- `TASK-903` (futura) — FTR writeback completo a Notion (consume calculateFtr de esta task, reusa infra TASK-901)
+- `TASK-905+` (futuras) — Throughput + Pipeline Velocity writebacks (cuando se justifique operativamente — UI ya consume agregados del registry sin necesidad de writeback inmediato a Notion)
+- `TASK-910` (futura) — BCS AI layer activation
+- Backlog separado — Frame.io integration (cuando emerja → activa señales V2 de FTR/RpA)

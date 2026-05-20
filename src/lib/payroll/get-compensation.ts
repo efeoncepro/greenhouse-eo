@@ -43,7 +43,14 @@ import {
   pgGetCompensationOverview
 } from '@/lib/payroll/postgres-store'
 import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
-import { contractAllowsRemoteAllowance, normalizeContractType } from '@/types/hr-contracts'
+import {
+  CONTRACT_DERIVATIONS,
+  INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE,
+  contractAllowsRemoteAllowance,
+  isInternationalInternalContractType,
+  normalizeContractType,
+  normalizeLegalReviewReference
+} from '@/types/hr-contracts'
 
 const COMPENSATION_MUTATION_TYPES = {
   afpName: 'STRING',
@@ -227,7 +234,7 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     healthPlanUf: toNullableNumber(row.health_plan_uf),
     unemploymentRate: toNumber(row.unemployment_rate),
     contractType,
-    payrollVia: payRegime === 'international' ? 'deel' : 'internal',
+    payrollVia: CONTRACT_DERIVATIONS[contractType].payrollVia,
     scheduleRequired: contractType === 'indefinido' || contractType === 'plazo_fijo',
     deelContractId: null,
     hasApv: normalizeBoolean(row.has_apv),
@@ -290,6 +297,18 @@ const assertCompensationValues = (input: CompensationValueInput | UpdateCompensa
 
   if (Number(input.bonusRpaMax ?? 0) < Number(input.bonusRpaMin ?? 0)) {
     throw new PayrollValidationError('bonusRpaMax must be greater than or equal to bonusRpaMin.')
+  }
+
+  if (
+    isInternationalInternalContractType(input.contractType) &&
+    !normalizeLegalReviewReference(input.legalReviewReference)
+  ) {
+    throw new PayrollValidationError(
+      'legalReviewReference is required for international_internal contracts.',
+      400,
+      null,
+      INTERNATIONAL_INTERNAL_LEGAL_REVIEW_ERROR_CODE
+    )
   }
 }
 
@@ -714,6 +733,8 @@ export const createCompensationVersion = async ({
       : null
 
   const isCurrent = effectiveFrom <= today && (!nextScheduledEffectiveFrom || nextScheduledEffectiveFrom > today)
+  const contractType = normalizeContractType(input.contractType)
+  const contractDerivation = CONTRACT_DERIVATIONS[contractType]
 
   if (coveringVersion?.version_id) {
     await runPayrollQuery(
@@ -738,10 +759,10 @@ export const createCompensationVersion = async ({
     versionId,
     memberId: input.memberId,
     version: nextVersion,
-    payRegime: input.payRegime,
+    payRegime: contractDerivation.payRegime,
     currency: input.currency,
     baseSalary: Number(input.baseSalary),
-    remoteAllowance: contractAllowsRemoteAllowance(input.contractType ?? 'indefinido') ? Number(input.remoteAllowance ?? 0) : 0,
+    remoteAllowance: contractAllowsRemoteAllowance(contractType) ? Number(input.remoteAllowance ?? 0) : 0,
     colacionAmount: Number(input.colacionAmount ?? 0),
     movilizacionAmount: Number(input.movilizacionAmount ?? 0),
     fixedBonusLabel: normalizeNullableString(input.fixedBonusLabel),
@@ -750,19 +771,19 @@ export const createCompensationVersion = async ({
     bonusOtdMax: Number(input.bonusOtdMax ?? 0),
     bonusRpaMin: Number(input.bonusRpaMin ?? 0),
     bonusRpaMax: Number(input.bonusRpaMax ?? 0),
-    gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, input.payRegime),
+    gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, contractDerivation.payRegime),
     afpName: normalizeNullableString(input.afpName),
     afpRate: input.afpRate ?? null,
     ...resolvePersistedAfpSplitRates({
-      payRegime: input.payRegime,
+      payRegime: contractDerivation.payRegime,
       afpRate: input.afpRate ?? null,
       afpCotizacionRate: input.afpCotizacionRate ?? null,
       afpComisionRate: input.afpComisionRate ?? null
     }),
     healthSystem: input.healthSystem ?? null,
     healthPlanUf: input.healthPlanUf ?? null,
-    unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
-    contractType: input.contractType ?? 'indefinido',
+    unemploymentRate: input.unemploymentRate ?? (contractType === 'plazo_fijo' ? 0.03 : 0.006),
+    contractType,
     hasApv: Boolean(input.hasApv),
     apvAmount: Number(input.apvAmount ?? 0),
     effectiveFrom,
@@ -900,6 +921,8 @@ export const updateCompensationVersion = async ({
   }
 
   const normalizedExisting = normalizeCompensationVersion(existingVersion)
+  const contractType = normalizeContractType(input.contractType)
+  const contractDerivation = CONTRACT_DERIVATIONS[contractType]
 
   if (normalizedExisting.effectiveFrom !== effectiveFrom) {
     throw new PayrollValidationError(
@@ -938,10 +961,10 @@ export const updateCompensationVersion = async ({
 
   const updateParams = {
     versionId,
-    payRegime: input.payRegime,
+    payRegime: contractDerivation.payRegime,
     currency: input.currency,
     baseSalary: Number(input.baseSalary),
-    remoteAllowance: contractAllowsRemoteAllowance(input.contractType ?? 'indefinido') ? Number(input.remoteAllowance ?? 0) : 0,
+    remoteAllowance: contractAllowsRemoteAllowance(contractType) ? Number(input.remoteAllowance ?? 0) : 0,
     colacionAmount: Number(input.colacionAmount ?? 0),
     movilizacionAmount: Number(input.movilizacionAmount ?? 0),
     fixedBonusLabel: normalizeNullableString(input.fixedBonusLabel),
@@ -950,19 +973,19 @@ export const updateCompensationVersion = async ({
     bonusOtdMax: Number(input.bonusOtdMax ?? 0),
     bonusRpaMin: Number(input.bonusRpaMin ?? 0),
     bonusRpaMax: Number(input.bonusRpaMax ?? 0),
-    gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, input.payRegime),
+    gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, contractDerivation.payRegime),
     afpName: normalizeNullableString(input.afpName),
     afpRate: input.afpRate ?? null,
     ...resolvePersistedAfpSplitRates({
-      payRegime: input.payRegime,
+      payRegime: contractDerivation.payRegime,
       afpRate: input.afpRate ?? null,
       afpCotizacionRate: input.afpCotizacionRate ?? null,
       afpComisionRate: input.afpComisionRate ?? null
     }),
     healthSystem: input.healthSystem ?? null,
     healthPlanUf: input.healthPlanUf ?? null,
-    unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
-    contractType: input.contractType ?? 'indefinido',
+    unemploymentRate: input.unemploymentRate ?? (contractType === 'plazo_fijo' ? 0.03 : 0.006),
+    contractType,
     hasApv: Boolean(input.hasApv),
     apvAmount: Number(input.apvAmount ?? 0),
     changeReason: input.changeReason.trim(),

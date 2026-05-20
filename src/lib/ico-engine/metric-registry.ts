@@ -99,31 +99,83 @@ export const CSC_CHART_COLORS: Record<CscPhase, string> = {
 
 // ─── Task Status → CSC Phase Mapping ────────────────────────────────────────
 // task_status values come from Notion (Spanish) but the column name is English.
+//
+// Canonical V1 source of truth: `src/lib/delivery/task-status-canonical.ts`.
+// All status names (canonical V1 + Efeonce legacy + Sky legacy + English /
+// accent variants) are mapped via the central alias table. Adding a tenant
+// variant means adding one entry there, NOT mutating this map.
 
-export const TASK_STATUS_TO_CSC: Record<string, CscPhase> = {
-  'Sin empezar': 'briefing',
-  'Backlog': 'briefing',
-  'Pendiente': 'briefing',
-  'Listo para diseñar': 'briefing',
-  'En curso': 'produccion',
-  'En Curso': 'produccion',
-  'Cambios Solicitados': 'cambios_cliente',
-  'Listo': 'entrega',
-  'Done': 'entrega',
-  'Finalizado': 'entrega',
-  'Completado': 'entrega'
+import {
+  TASK_STATUS_CANONICAL,
+  TASK_STATUS_GROUPS,
+  allVariantsForCanonical,
+  allVariantsForGroup,
+  taskStatusGroupSql
+} from '@/lib/delivery/task-status-canonical'
+
+const buildTaskStatusToCsc = (): Record<string, CscPhase> => {
+  const map: Record<string, CscPhase> = {}
+
+  for (const variant of allVariantsForGroup(TASK_STATUS_GROUPS.BRIEFING)) map[variant] = 'briefing'
+  for (const variant of allVariantsForCanonical(TASK_STATUS_CANONICAL.EN_CURSO)) map[variant] = 'produccion'
+
+  for (const variant of allVariantsForCanonical(TASK_STATUS_CANONICAL.LISTO_PARA_REVISION)) {
+    map[variant] = 'revision_interna'
+  }
+
+  for (const variant of allVariantsForCanonical(TASK_STATUS_CANONICAL.CAMBIOS_SOLICITADOS)) {
+    map[variant] = 'cambios_cliente'
+  }
+
+  for (const variant of allVariantsForCanonical(TASK_STATUS_CANONICAL.APROBADO)) map[variant] = 'entrega'
+
+  return map
 }
 
-// "Listo para revisión" uses a LIKE match in SQL — handled in the view, not here.
+export const TASK_STATUS_TO_CSC: Record<string, CscPhase> = buildTaskStatusToCsc()
 
 // ─── Done / Excluded Status Sets ────────────────────────────────────────────
+//
+// Backward-compat exports kept for any external consumer. New code should
+// consume `TASK_STATUS_GROUPS.*` + `taskStatusGroupSql` directly.
 
-export const DONE_STATUSES = ['Listo', 'Done', 'Finalizado', 'Completado', 'Aprobado'] as const
-export const EXCLUDED_STATUSES = ['Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled', 'Archivado'] as const
-export const BLOCKED_STATUSES = ['Bloqueado', 'Detenido'] as const
+export const DONE_STATUSES = allVariantsForCanonical(TASK_STATUS_CANONICAL.APROBADO)
+export const EXCLUDED_STATUSES = allVariantsForGroup(TASK_STATUS_GROUPS.EXCLUDED)
+export const BLOCKED_STATUSES = allVariantsForGroup(TASK_STATUS_GROUPS.BLOCKED)
 
-const DONE_STATUSES_SQL = DONE_STATUSES.map(status => `'${status}'`).join(',')
-const EXCLUDED_STATUSES_SQL = EXCLUDED_STATUSES.map(status => `'${status}'`).join(',')
+/**
+ * TASK-908 Slice 6 — Fix B.1 canonical V1.
+ *
+ * Union canonical de `EXCLUDED` (Cancelado, Archivado) + `BLOCKED`
+ * (Bloqueado, En pausa, legacy `Detenido`). Tareas en estos estados NO
+ * cuentan en el denominador de OTD/RpA/FTR — son trabajo detenido o cerrado
+ * que no representa pipeline activo evaluable.
+ *
+ * Contradicción canonical resuelta (per spec Delta 2026-05-17 sección B.1):
+ * `BLOCKED_STATUSES` estaba declarado pero NO se excluía del denominator.
+ * Resultado: tareas bloqueadas contaminaban OTD/RpA/FTR. Post-fix, métricas
+ * suben ligeramente (efecto canonical esperado, NO bug).
+ *
+ * Cross-ref `docs/architecture/Contrato_Metricas_ICO_v1.md` Delta 2026-05-17
+ * sección B.1 + `GREENHOUSE_TASK_STATUS_LIFECYCLE_V1.md` regla A.4.
+ */
+export const EXCLUDED_FROM_METRICS_STATUSES = [
+  ...EXCLUDED_STATUSES,
+  ...BLOCKED_STATUSES
+] as const
+
+const DONE_STATUSES_SQL = taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)
+
+/**
+ * TASK-908 Slice 6 — SQL canonical para `EXCLUDED_FROM_METRICS_STATUSES`.
+ * Incluye TODAS las variantes (canonical V1 + legacy aliases Efeonce/Sky)
+ * vía `taskStatusGroupSql([...EXCLUDED, ...BLOCKED])`. Reemplaza el legacy
+ * `EXCLUDED_STATUSES_SQL` (que solo cubría EXCLUDED, omitiendo BLOCKED).
+ */
+const EXCLUDED_FROM_METRICS_SQL = taskStatusGroupSql([
+  ...TASK_STATUS_GROUPS.EXCLUDED,
+  ...TASK_STATUS_GROUPS.BLOCKED
+])
 
 const CANONICAL_COMPLETED_TASK_SQL = `(
   completed_at IS NOT NULL
@@ -132,7 +184,7 @@ const CANONICAL_COMPLETED_TASK_SQL = `(
 
 const CANONICAL_OPEN_TASK_SQL = `(
   completed_at IS NULL
-  AND (task_status IS NULL OR task_status NOT IN (${EXCLUDED_STATUSES_SQL}))
+  AND (task_status IS NULL OR task_status NOT IN (${EXCLUDED_FROM_METRICS_SQL}))
 )`
 
 const CANONICAL_ON_TIME_SQL = `(

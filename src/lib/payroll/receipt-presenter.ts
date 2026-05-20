@@ -283,6 +283,7 @@ export const resolveReceiptRegime = (
 
   if (contractType === 'honorarios') return 'honorarios'
   if (contractType === 'contractor' || contractType === 'eor') return 'international_deel'
+  if (contractType === 'international_internal') return 'international_internal'
   if (contractType === 'indefinido' || contractType === 'plazo_fijo') return 'chile_dependent'
 
   // Legacy fallbacks

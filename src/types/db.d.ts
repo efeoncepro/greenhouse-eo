@@ -2277,6 +2277,27 @@ export interface GreenhouseCoreMemberCertifications {
   visibility: Generated<string>;
 }
 
+export interface GreenhouseCoreMemberContractTypeAuditLog {
+  actor_email: string | null;
+  actor_user_id: string;
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  effective_at: Generated<Timestamp>;
+  legal_review_reference: string | null;
+  member_id: string;
+  metadata_json: Generated<Json>;
+  new_contract_type: string;
+  new_deel_contract_id: string | null;
+  new_pay_regime: string;
+  new_payroll_via: string;
+  previous_contract_type: string | null;
+  previous_deel_contract_id: string | null;
+  previous_pay_regime: string | null;
+  previous_payroll_via: string | null;
+  reason: string | null;
+  source: string;
+}
+
 export interface GreenhouseCoreMemberEndorsements {
   comment: string | null;
   created_at: Generated<Timestamp>;
@@ -2400,6 +2421,10 @@ export interface GreenhouseCoreMembers {
   hire_date: Timestamp | null;
   hubspot_owner_id: string | null;
   identity_profile_id: string | null;
+  /**
+   * TASK-910 — TRUE indica member sintético del demo teamspace Notion (Demo Greenhouse). Defense in depth: bonus calculation NUNCA procesa demo members (filter en fetchKpisForPeriod + pre-check en calculateRpaBonus/calculateOtdBonus). FALSE para todos los members reales (Efeonce internos + clientes Sky/etc.).
+   */
+  is_demo: Generated<boolean>;
   job_level: string | null;
   languages: string[] | null;
   /**
@@ -3696,6 +3721,25 @@ export interface GreenhouseDeliveryStaffAugPlacements {
   updated_by_user_id: string | null;
 }
 
+export interface GreenhouseDeliveryTaskRpaDemoSnapshots {
+  computed_at: Generated<Timestamp>;
+  correction_transitions_count: Generated<number>;
+  created_at: Generated<Timestamp>;
+  formula_version: Generated<string>;
+  notion_writeback_attempt_count: Generated<number>;
+  notion_writeback_event_id: string | null;
+  notion_writeback_last_error: string | null;
+  rpa_data_status: string;
+  rpa_value: number | null;
+  snapshot_id: Generated<string>;
+  source_event_id: string | null;
+  source_event_received_at: Timestamp | null;
+  source_mode: string;
+  task_source_id: string;
+  workspace_id: Generated<string>;
+  written_to_notion_at: Timestamp | null;
+}
+
 export interface GreenhouseDeliveryTasks {
   assignee_member_id: string | null;
   assignee_member_ids: Generated<string[]>;
@@ -3751,6 +3795,39 @@ export interface GreenhouseDeliveryTasks {
   updated_at: Generated<Timestamp>;
   workflow_change_round: number | null;
   workflow_review_open: Generated<boolean>;
+}
+
+export interface GreenhouseDeliveryTaskStatusTransitions {
+  assignee_member_id: string | null;
+  captured_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  from_status: string;
+  source_event_id: string | null;
+  source_quality: Generated<string>;
+  space_id: string | null;
+  task_source_id: string;
+  to_status: string;
+  transition_id: Generated<string>;
+  transitioned_at: Timestamp;
+  transitioned_by: string | null;
+  workspace_id: string;
+}
+
+export interface GreenhouseDeliveryTaskStatusTransitionsDemo {
+  assignee_member_id: string | null;
+  captured_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  demo_metadata: Json | null;
+  from_status: string;
+  source_event_id: string | null;
+  source_quality: Generated<string>;
+  space_id: string | null;
+  task_source_id: string;
+  to_status: string;
+  transition_id: Generated<string>;
+  transitioned_at: Timestamp;
+  transitioned_by: string | null;
+  workspace_id: Generated<string>;
 }
 
 export interface GreenhouseFinanceAccountBalances {
@@ -6335,6 +6412,7 @@ export interface GreenhousePayrollCompensationVersions {
   health_system: string | null;
   is_current: Generated<boolean>;
   member_id: string;
+  metadata_json: Generated<Json>;
   movilizacion_amount: Generated<Numeric>;
   pay_regime: string;
   remote_allowance: Generated<Numeric>;
@@ -8368,6 +8446,21 @@ export interface GreenhouseSyncHandlerHealthTransitions {
   trigger_event_id: string | null;
 }
 
+export interface GreenhouseSyncIcoMaterializationRuns {
+  blocking_signals: Json | null;
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  materialization_id: Generated<string>;
+  notes: string | null;
+  period_month: number;
+  period_year: number;
+  rows_inserted: number | null;
+  rows_merged: number | null;
+  started_at: Generated<Timestamp>;
+  status: string;
+  table_name: string;
+}
+
 export interface GreenhouseSyncIdentityProfileMergeLog {
   client_users_moved: Generated<number>;
   contacts_moved: Generated<number>;
@@ -9150,6 +9243,7 @@ export interface DB {
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
+  "greenhouse_core.member_contract_type_audit_log": GreenhouseCoreMemberContractTypeAuditLog;
   "greenhouse_core.member_endorsements": GreenhouseCoreMemberEndorsements;
   "greenhouse_core.member_evidence": GreenhouseCoreMemberEvidence;
   "greenhouse_core.member_languages": GreenhouseCoreMemberLanguages;
@@ -9221,6 +9315,9 @@ export interface DB {
   "greenhouse_delivery.staff_aug_events": GreenhouseDeliveryStaffAugEvents;
   "greenhouse_delivery.staff_aug_onboarding_items": GreenhouseDeliveryStaffAugOnboardingItems;
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
+  "greenhouse_delivery.task_rpa_demo_snapshots": GreenhouseDeliveryTaskRpaDemoSnapshots;
+  "greenhouse_delivery.task_status_transitions": GreenhouseDeliveryTaskStatusTransitions;
+  "greenhouse_delivery.task_status_transitions_demo": GreenhouseDeliveryTaskStatusTransitionsDemo;
   "greenhouse_delivery.tasks": GreenhouseDeliveryTasks;
   "greenhouse_finance.account_balances": GreenhouseFinanceAccountBalances;
   "greenhouse_finance.account_balances_monthly": GreenhouseFinanceAccountBalancesMonthly;
@@ -9404,6 +9501,7 @@ export interface DB {
   "greenhouse_sync.github_release_webhook_events": GreenhouseSyncGithubReleaseWebhookEvents;
   "greenhouse_sync.handler_health": GreenhouseSyncHandlerHealth;
   "greenhouse_sync.handler_health_transitions": GreenhouseSyncHandlerHealthTransitions;
+  "greenhouse_sync.ico_materialization_runs": GreenhouseSyncIcoMaterializationRuns;
   "greenhouse_sync.identity_profile_merge_log": GreenhouseSyncIdentityProfileMergeLog;
   "greenhouse_sync.identity_reconciliation_proposals": GreenhouseSyncIdentityReconciliationProposals;
   "greenhouse_sync.integration_data_quality_checks": GreenhouseSyncIntegrationDataQualityChecks;

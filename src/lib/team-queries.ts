@@ -2,6 +2,13 @@ import 'server-only'
 
 import { buildAccountTeam } from '@/lib/dashboard/tenant-dashboard-overrides'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import {
+  TASK_STATUS_CANONICAL,
+  TASK_STATUS_GROUPS,
+  allVariantsForCanonical,
+  allVariantsForGroup,
+  taskStatusSql
+} from '@/lib/delivery/task-status-canonical'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   clampPercent,
@@ -174,8 +181,12 @@ const roleOrder: Record<TeamRoleCategory, number> = {
   unknown: 7
 }
 
-const completedStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
-const inactiveStatuses = [...completedStatuses, 'Cancelado', 'Cancelada', 'Cancelled', 'Canceled']
+const completedStatuses = allVariantsForGroup(TASK_STATUS_GROUPS.COMPLETED)
+
+const inactiveStatuses = [
+  ...completedStatuses,
+  ...allVariantsForCanonical(TASK_STATUS_CANONICAL.CANCELADO)
+]
 
 const periodFormatter = new Intl.DateTimeFormat('es-CL', {
   month: 'long',
@@ -1260,8 +1271,8 @@ const getProjectTeamRows = async (projectIdValue: string, columns: Set<string>) 
         COUNTIF(t.estado NOT IN UNNEST(@inactiveStatuses)) AS active_assets,
         COUNTIF(t.estado IN UNNEST(@completedStatuses)) AS completed_assets,
         ROUND(AVG(CASE WHEN SAFE_CAST(t.rpa AS FLOAT64) > 0 THEN SAFE_CAST(t.rpa AS FLOAT64) END), 2) AS avg_rpa,
-        COUNTIF(t.estado IN ('Listo para revisión', 'Listo para revision')) AS in_review,
-        COUNTIF(t.estado = 'Cambios Solicitados') AS changes_requested
+        COUNTIF(t.estado IN (${taskStatusSql(TASK_STATUS_CANONICAL.LISTO_PARA_REVISION)})) AS in_review,
+        COUNTIF(t.estado IN (${taskStatusSql(TASK_STATUS_CANONICAL.CAMBIOS_SOLICITADOS)})) AS changes_requested
       FROM \`${projectId}.notion_ops.tareas\` AS t
       WHERE t.proyecto = @projectId
         AND ${responsableNombreExpr} IS NOT NULL

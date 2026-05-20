@@ -108,38 +108,9 @@ export const ensureMemberCapacityEconomicsSchema = async () => {
   if (ensureSchemaPromise) return ensureSchemaPromise
 
   ensureSchemaPromise = runGreenhousePostgresQuery(`
-    CREATE TABLE IF NOT EXISTS greenhouse_serving.member_capacity_economics (
-      member_id TEXT NOT NULL,
-      period_year INT NOT NULL,
-      period_month INT NOT NULL,
-      contracted_fte NUMERIC(5,3) NOT NULL DEFAULT 1,
-      contracted_hours INT NOT NULL,
-      assigned_hours INT NOT NULL DEFAULT 0,
-      usage_kind TEXT NOT NULL DEFAULT 'missing',
-      used_hours NUMERIC(10,2),
-      usage_percent NUMERIC(5,2),
-      commercial_availability_hours INT NOT NULL,
-      operational_availability_hours NUMERIC(10,2),
-      source_currency TEXT NOT NULL,
-      target_currency TEXT NOT NULL DEFAULT 'CLP',
-      total_comp_source NUMERIC(14,2),
-      total_labor_cost_target NUMERIC(14,2),
-      direct_overhead_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      shared_overhead_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      loaded_cost_target NUMERIC(14,2),
-      cost_per_hour_target NUMERIC(14,2),
-      suggested_bill_rate_target NUMERIC(14,2),
-      fx_rate NUMERIC(18,6),
-      fx_rate_date DATE,
-      fx_provider TEXT,
-      fx_strategy TEXT,
-      snapshot_status TEXT NOT NULL DEFAULT 'partial',
-      source_compensation_version_id TEXT,
-      source_payroll_period_id TEXT,
-      assignment_count INT NOT NULL DEFAULT 0,
-      materialized_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      PRIMARY KEY (member_id, period_year, period_month)
-    )
+    SELECT 1
+    FROM greenhouse_serving.member_capacity_economics
+    LIMIT 0
   `).then(() => {}).catch(error => {
     ensureSchemaPromise = null
     throw error

@@ -59,6 +59,9 @@ import { paymentProfileNotificationsProjection } from './payment-profile-notific
 import { engagementConvertedProjection } from './engagement-converted'
 import { engagementCancelledProjection } from './engagement-cancelled'
 import { organizationWorkspaceCacheInvalidationProjection } from './organization-workspace-cache-invalidation'
+import { notionStatusTransitionCaptureDemoProjection } from './notion-status-transition-capture-demo'
+import { notionRpaComputeDemoProjection } from './notion-rpa-compute-demo'
+import { notionRpaWritebackDemoProjection } from './notion-rpa-writeback-demo'
 import { sampleSprintHubSpotOutboundProjection } from './sample-sprint-hubspot-outbound'
 import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 
@@ -132,4 +135,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(organizationWorkspaceCacheInvalidationProjection) // TASK-611 Slice 6 — drops projection cache on grant/role/lifecycle events
   registerProjection(sampleSprintRuntimeCacheInvalidationProjection) // TASK-835 Slice 6 — drops Sample Sprints runtime projection cache on engagement events
   registerProjection(sampleSprintHubSpotOutboundProjection) // TASK-837 Slice 4 — projects Sample Sprints to HubSpot p_services with idempotency + association orchestration
+  registerProjection(notionStatusTransitionCaptureDemoProjection) // TASK-910 Slice 3 — persist demo teamspace status transitions en tabla físicamente separada (filter metadata.demo_mode === true)
+  registerProjection(notionRpaComputeDemoProjection) // TASK-913 Slice 1 — compute RpA V2 demo via calculateRpaV2Demo + snapshot + emit writeback chain event (sibling físicamente separado del path productivo futuro TASK-901 Slice 4)
+  registerProjection(notionRpaWritebackDemoProjection) // TASK-913 Slice 2 — PATCH Notion [GH] RpA v2 con valor del snapshot (re-read PG defensive, retryable, idempotent — sibling físicamente separado del writeback productivo futuro)
 }

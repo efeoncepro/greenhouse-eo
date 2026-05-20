@@ -39,10 +39,17 @@ type Props = {
   compensations: CompensationVersion[]
   eligibleMembers: PayrollCompensationMember[]
   members: PayrollCompensationMember[]
+  canUseInternationalInternalContract: boolean
   onRefresh: () => void
 }
 
-const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRefresh }: Props) => {
+const PayrollCompensationTab = ({
+  compensations,
+  eligibleMembers,
+  members,
+  canUseInternationalInternalContract,
+  onRefresh
+}: Props) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedComp, setSelectedComp] = useState<CompensationVersion | null>(null)
   const [newMemberId, setNewMemberId] = useState('')
@@ -306,6 +313,7 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
         existingVersion={selectedComp}
         memberId={drawerMemberId}
         memberName={drawerMemberName}
+        canUseInternationalInternalContract={canUseInternationalInternalContract}
         onSave={handleSave}
       />
     </>

@@ -691,7 +691,7 @@ export const resolveWorkforceActivationReadiness = async (
   const employmentChecks: Array<[boolean, WorkforceActivationBlockerCode, string, string]> = [
     [Boolean(snapshot.hireDate), 'hire_date_missing', 'Falta fecha de ingreso', 'Define fecha de ingreso laboral.'],
     [Boolean(snapshot.employmentType), 'employment_type_missing', 'Falta tipo de empleo', 'Define la relación como empleado, contractor u otro tipo permitido.'],
-    [Boolean(snapshot.contractType), 'contract_type_missing', 'Falta tipo de contrato', 'Define contrato indefinido, plazo fijo, honorarios, contractor o EOR.'],
+    [Boolean(snapshot.contractType), 'contract_type_missing', 'Falta tipo de contrato', 'Define contrato indefinido, plazo fijo, honorarios, contractor, EOR o internacional interno.'],
     [Boolean(snapshot.payRegime), 'pay_regime_missing', 'Falta régimen de pago', 'Define régimen Chile o internacional.'],
     [Boolean(snapshot.payrollVia), 'payroll_via_missing', 'Falta vía de pago', 'Define si Greenhouse paga internamente o vía Deel.']
   ]

@@ -1117,6 +1117,29 @@ export const buildLeaveAccrualSignals = async (
 }
 
 /**
+ * TASK-894 — Contract taxonomy data quality signals.
+ *
+ * These readers are observation-only. They do not mutate Payroll rows and do
+ * not participate in calculation; they keep the new `international_internal`
+ * contract detectable if future DDL/imports bypass canonical write paths.
+ */
+export const buildPayrollContractTaxonomySignals = async (
+  readers: {
+    invalidTupleDrift: () => Promise<ReliabilitySignal>
+    invalidStatutoryApplication: () => Promise<ReliabilitySignal>
+    fallbackResolutionLegacy: () => Promise<ReliabilitySignal>
+  }
+): Promise<ReliabilitySignal[]> => {
+  const [invalidTuple, invalidStatutory, fallbackLegacy] = await Promise.all([
+    readers.invalidTupleDrift(),
+    readers.invalidStatutoryApplication(),
+    readers.fallbackResolutionLegacy()
+  ])
+
+  return [invalidTuple, invalidStatutory, fallbackLegacy]
+}
+
+/**
  * TASK-768 Slice 7 — builder canonico de signals "economic_category_unresolved"
  * para expenses + income. Mismo patron que buildFinanceClpDriftSignals.
  * Subsystem rollup: finance_data_quality.

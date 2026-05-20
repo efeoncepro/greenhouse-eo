@@ -786,7 +786,7 @@ BEGIN
   ) THEN
     ALTER TABLE greenhouse_core.members
       ADD CONSTRAINT members_contract_type_check
-      CHECK (contract_type IN ('indefinido', 'plazo_fijo', 'honorarios', 'contractor', 'eor'));
+      CHECK (contract_type IN ('indefinido', 'plazo_fijo', 'honorarios', 'contractor', 'eor', 'international_internal'));
   END IF;
 
   IF NOT EXISTS (

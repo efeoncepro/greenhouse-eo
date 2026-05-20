@@ -236,6 +236,14 @@ describe('resolveReceiptRegime', () => {
     )
   })
 
+  it('detects international_internal from contractTypeSnapshot=international_internal', () => {
+    expect(
+      resolveReceiptRegime(
+        internationalInternalEntry({ contractTypeSnapshot: 'international_internal' })
+      )
+    ).toBe('international_internal')
+  })
+
   it('detects international_internal when payRegime=international and no Deel marker', () => {
     expect(resolveReceiptRegime(internationalInternalEntry())).toBe('international_internal')
   })

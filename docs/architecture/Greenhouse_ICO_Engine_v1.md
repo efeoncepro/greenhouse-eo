@@ -1,5 +1,50 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-05-17 — Migración a specs canonical por métrica
+
+Post sesión deep-dive 2026-05-17 + ADR `GREENHOUSE_METRIC_SPEC_PATTERN_V1.md`, cada métrica crítica tiene su **spec canonical dedicado** en `docs/architecture/metrics/<METRIC>_V1.md` que es **single source of truth** de definición, fórmula, helper, agregado, semántica, threshold, writeback, estados y casos edge.
+
+Este doc (Engine doc) queda como **framework conceptual enterprise** (drivers operativos, 3 niveles, cadena causal, narrativa pitch comercial). Las definiciones de métrica individual viven en los specs canonical referenciados acá:
+
+| Métrica | Spec canonical | Status |
+|---|---|---|
+| RpA (Rounds per Asset) | [`metrics/RPA_V1.md`](metrics/RPA_V1.md) | Accepted 2026-05-17 |
+| FTR (First-Time Right) | [`metrics/FTR_V1.md`](metrics/FTR_V1.md) | Accepted 2026-05-17 |
+| OTD% (On-Time Delivery — promise compliance) | [`metrics/OTD_V1.md`](metrics/OTD_V1.md) | Accepted 2026-05-17 |
+| CT SLO% (Cycle Time SLO percentage — competitive benchmark) | [`metrics/CT_SLO_PCT_V1.md`](metrics/CT_SLO_PCT_V1.md) | Accepted 2026-05-17 |
+| Cumplimiento (dual: per-task audit + aggregate alias OTD) | [`metrics/CUMPLIMIENTO_V1.md`](metrics/CUMPLIMIENTO_V1.md) | Accepted 2026-05-17 |
+| Cycle Time (Tiempo de ciclo) | [`metrics/CYCLE_TIME_V1.md`](metrics/CYCLE_TIME_V1.md) | Accepted 2026-05-17 |
+| Cycle Time Variance (Previsibilidad) | [`metrics/CYCLE_TIME_VARIANCE_V1.md`](metrics/CYCLE_TIME_VARIANCE_V1.md) | Accepted 2026-05-17 |
+| Throughput (Volumen mensual) | [`metrics/THROUGHPUT_V1.md`](metrics/THROUGHPUT_V1.md) | Accepted 2026-05-17 |
+| Pipeline Velocity (ratio — pileup detector) | [`metrics/PIPELINE_VELOCITY_V1.md`](metrics/PIPELINE_VELOCITY_V1.md) | Accepted 2026-05-17 |
+| CSC Distribution (composición pipeline por fase CSC) | [`metrics/CSC_DISTRIBUTION_V1.md`](metrics/CSC_DISTRIBUTION_V1.md) | Accepted 2026-05-17 |
+| Stuck Assets (count sin movimiento ≥72h) | [`metrics/STUCK_ASSETS_V1.md`](metrics/STUCK_ASSETS_V1.md) | Accepted 2026-05-17 |
+| Stuck % (% normalizado backlog) | [`metrics/STUCK_ASSET_PCT_V1.md`](metrics/STUCK_ASSET_PCT_V1.md) | Accepted 2026-05-17 |
+| OCF (Overdue Carried Forward) | [`metrics/OCF_V1.md`](metrics/OCF_V1.md) | Accepted 2026-05-17 |
+| Iteration Velocity (Revenue Enabled palanca 2) | [`metrics/ITERATION_VELOCITY_V1.md`](metrics/ITERATION_VELOCITY_V1.md) | Accepted 2026-05-17 |
+| BCS (Brief Clarity Score) | [`metrics/BCS_V1.md`](metrics/BCS_V1.md) | Accepted 2026-05-17 (infrastructure-ready, AI backend TASK-910 futura) |
+| TTM (Time-to-Market — Revenue Enabled palanca 1) | [`metrics/TTM_V1.md`](metrics/TTM_V1.md) | Accepted 2026-05-17 |
+
+**14 de 14 métricas críticas canonical** con spec V1 Accepted. Ver [`metrics/METRICS_INDEX.md`](metrics/METRICS_INDEX.md) para índice maestro.
+
+Índice maestro: [`metrics/METRICS_INDEX.md`](metrics/METRICS_INDEX.md). Pattern canonical: `GREENHOUSE_METRIC_SPEC_PATTERN_V1.md`. Ownership boundary Notion ↔ Greenhouse: `GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md`.
+
+**Reglas canonical**:
+
+- Si emerge drift entre las definiciones acá vs los specs canonical, **el spec canonical gana**. Las secciones acá que redefinen métricas serán simplificadas progresivamente a cross-refs a medida que cada spec emerja.
+- **NUNCA** modificar una definición de métrica individual acá sin actualizar paralelamente el spec canonical. Toda definición de fórmula/threshold/semántica vive en el spec.
+- **Cuándo leer este doc**: para entender narrativa Revenue Enabled, palancas, cadena causal, drivers operativos, framework conceptual de 3 niveles. **Cuándo leer un spec canonical**: para entender qué mide, cómo se computa, qué cuenta como edge case, cuál es el threshold operativo, cuál es el estado del writeback de UNA métrica específica.
+
+**Drifts detectados resueltos vía specs canonical en sesión 2026-05-17**:
+
+| Drift | Resolución canonical |
+|---|---|
+| FTR Engine spec (5 señales compuestas) vs código (1 señal) | V1 = `calculateRpa === 0` (delegación pura); V2 extiende vía `calculateRpa` cuando Frame.io exista. Ver `metrics/FTR_V1.md`. |
+| Throughput Engine spec (`weekly_rate / 4`) vs código (`monthly_count`) | Canonical = `monthly_count` (alineado con cómo operador reporta). Spec deprecada. Ver `metrics/THROUGHPUT_V1.md`. |
+| Pipeline Velocity Engine spec ("identical to throughput") vs código (ratio `completed/(completed+open)`) | Canonical = ratio (mide flow vs pileup); NO es throughput. Métricas hermanas pero NO redundantes. Ver `metrics/PIPELINE_VELOCITY_V1.md`. |
+
+---
+
 ## Delta 2026-05-02 — Agency `RpA Global = 3` traced to live-May sample, not missing Notion data
 
 Investigacion ejecutada sobre staging el `2026-05-02`:

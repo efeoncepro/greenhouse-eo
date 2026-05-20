@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Shipped 2026-05-16`
 - Rank: `TBD`
 - Domain: `hr|payroll|workforce|finance|data`
 - Blocked by: `none`
-- Branch: `task/TASK-894-international-internal-contract-type`
+- Branch: `develop` (instruccion explicita del operador; no branch switch)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -334,13 +334,49 @@ Reglas obligatorias:
 
   Write path (`updateMemberContractType()` o equivalente helper canonico) escribe audit row en la misma tx que el UPDATE de `members` / `compensation_versions`.
 
-- **3 reliability signals canonicos** bajo subsystem `Identity & Access` (audit + drift) + `Finance Data Quality` (payroll impact):
+- **3 reliability signals canonicos** con subsystem rollup decidido (Open Question #6 resuelta):
 
-  | Signal | Kind | Severity | Steady | Detects |
-  | --- | --- | --- | --- | --- |
-  | `payroll.contract_taxonomy.invalid_tuple_drift` | data_quality | error if > 0 | 0 | rows con tuple invalido (defense in depth despues del CHECK compuesto; detecta drift si constraint es bypaseada via DDL futuro) |
-  | `payroll.contract_taxonomy.invalid_statutory_application` | drift | error if > 0 | 0 | members `international_internal` con `chileTotalDeductions > 0` o `siiRetentionAmount > 0` en payroll entry |
-  | `payroll.contract_taxonomy.fallback_resolution_legacy` | drift | warning if > 0 | 0 | entries con `contractTypeSnapshot=NULL` que caen al fallback step 4 de `resolveReceiptRegime` |
+  | Signal | Kind | Severity | Steady | Subsystem rollup | Detects |
+  | --- | --- | --- | --- | --- | --- |
+  | `payroll.contract_taxonomy.invalid_tuple_drift` | data_quality | error if > 0 | 0 | `Identity & Access` | rows con tuple invalido (defense in depth despues del CHECK compuesto; detecta drift si constraint es bypaseada via DDL futuro) |
+  | `payroll.contract_taxonomy.invalid_statutory_application` | drift | error if > 0 | 0 | `Finance Data Quality` | members `international_internal` con `chileTotalDeductions > 0` o `siiRetentionAmount > 0` en payroll entry (economic outcome — afecta net pagado) |
+  | `payroll.contract_taxonomy.fallback_resolution_legacy` | drift | warning if > 0 | 0 | `Identity & Access` | entries con `contractTypeSnapshot=NULL` que caen al fallback step 4 de `resolveReceiptRegime` (data quality del modelo) |
+
+- **Outbox event canonico `member.contract_type.changed v1`** (aggregateType=`member`):
+
+  ```ts
+  {
+    type: 'member.contract_type.changed',
+    aggregateType: 'member',
+    aggregateId: memberId,
+    schemaVersion: 1,
+    payload: {
+      memberId,
+      previousContractType: string | null,   // null en first-time set
+      previousPayRegime: string | null,
+      previousPayrollVia: string | null,
+      newContractType: string,
+      newPayRegime: string,
+      newPayrollVia: string,
+      effectiveFrom: ISO8601,                // compensation_version effective_from
+      compensationVersionId: string,
+      legalReviewReference: null,            // NUNCA cruda en payload — solo flag boolean si aplica
+      hasLegalReviewReference: boolean,      // safe surrogate del campo sensible
+      actorUserId: string,
+      changedAt: ISO8601
+    }
+  }
+  ```
+
+  Emitido en la misma tx que UPDATE `members` + UPDATE `compensation_versions` + INSERT `member_contract_type_audit_log` via `publishOutboxEvent(event, client)`. Documentar en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` Delta TASK-894.
+
+  **Consumers downstream esperados**:
+  - Payment obligations lane resolver: invalidar cache de "lane internal vs deel" para member afectado (post-cutover de regime).
+  - TASK-893 participation window: invalidar cache de `resolvePayrollParticipationWindowsForMembers` si el cambio cruza la frontera `chile_dependent ↔ international_internal` (impacta `rule_lane` del exit eligibility downstream).
+  - Workforce activation readiness: re-evaluar intake checklist (chile-specific fields vs internacional).
+  - Person 360 facets: refrescar `OrganizationWorkspaceProjection` cache si el member tiene relaciones organization-side visibles.
+
+  Single source of truth: NUNCA branchear downstream por composicion `payRegime + payrollVia` para detectar el cambio — siempre subscribir al outbox event.
 
 ### Slice 6 — Tests + Docs + Rollout
 
@@ -348,7 +384,10 @@ Reglas obligatorias:
 - Tests UI para dropdowns y clearing de Deel ID.
 - Tests payroll para projected/official no-Chile deductions.
 - Tests receipt/report para label y grouping.
+- Test outbox event `member.contract_type.changed v1`: emitido en misma tx que UPDATE; payload contiene `hasLegalReviewReference: boolean` (NO valor crudo); previous/new tuples poblados; consumer downstream mock recibe evento + invalida cache esperado.
+- Test redact: `redactSensitive` aplicado a `legalReviewReference` en cualquier log/Sentry capture path.
 - Actualizar docs funcionales/manuales y Handoff/changelog.
+- Lift de 17 hard rules canonicas a `CLAUDE.md` seccion "International Internal Contract Type invariants".
 - Validar staging con un colaborador fixture o synthetic data, sin mutar casos productivos reales sin aprobacion HR/Finance.
 
 ## Out of Scope
@@ -434,6 +473,8 @@ Antes de cualquier apply sobre personas reales:
 | FX conversion silente USD -> CLP en payment_obligations | finance | medium | rate historico al periodo (TASK-766 reader pattern) + validacion `greenhouse-finance-accounting-operator` pre-Slice 5 merge | `finance.expense_payments.clp_drift` (existente) |
 | `resolveReceiptRegime` fallback path masks legacy contract_type_snapshot=NULL | observability | low | step 1a explicit primary + Sentry warning cuando fallback dispara | `payroll.contract_taxonomy.fallback_resolution_legacy` |
 | Activacion productiva sin legal/finance review | legal/release | high | capability NO grant-eada hasta legal/finance firme; dropdown oculto sin capability | `Handoff.md` evidence + grant audit |
+| Downstream consumers no detectan cambio de regimen (payment lane stale, TASK-893 prorrata stale, workforce readiness stale) | payroll/finance/workforce | medium | outbox event `member.contract_type.changed v1` emitido en misma tx que UPDATE + audit_log | outbox event delivery signal + dead_letter |
+| Legal review reference leak en logs/Sentry/outbox | legal/observability | low-medium | payload outbox solo persiste `hasLegalReviewReference: boolean`; audit log con anti-mutation triggers; sanitizers en `redactSensitive` | manual code review + Sentry redact pattern |
 
 ### Feature flags / cutover
 
@@ -482,30 +523,31 @@ Antes de cualquier apply sobre personas reales:
 
 ## Acceptance Criteria
 
-- [ ] `ContractType` includes `international_internal`.
-- [ ] `CONTRACT_DERIVATIONS.international_internal` resolves to `payRegime='international'` and `payrollVia='internal'`.
-- [ ] Matriz canonica 3D (`contractType` × `payRegime` × `payrollVia` × `legalEmployer` × `currencyDefault`) documentada en spec con 6 filas explicitas (Slice 1).
-- [ ] **Legal Scope V1 declaracion vinculante** persistida en spec: perfil operacional, NO legal employer, disclaimer obligatorio en recibo.
-- [ ] DB CHECK constraints **columna ampliada** allow `international_internal` en member y compensation contract snapshots.
-- [ ] DB CHECK constraint **compuesto** sobre tupla `(contract_type, pay_regime, payroll_via)` enforce 6 combinaciones validas; 18 invalidas rechazadas a nivel DB.
-- [ ] Capability `payroll.contract.use_international_internal` seedeada en `capabilities_registry` + granteada en `runtime.ts` SOLO a EFEONCE_ADMIN.
-- [ ] UI dropdown `Internacional interno` oculto sin capability; visible cuando capability presente; `payRegime`/`payrollVia` siempre derived read-only.
-- [ ] Payload `legalReviewReference` (min 10 chars) requerido en write paths cuando `contractType='international_internal'`; canonical error code `international_internal_requires_legal_review_reference` cuando ausente.
-- [ ] `deelContractId` is not required and is cleared for `international_internal`.
-- [ ] Payroll projected and official calculations do not apply Chile statutory deductions or SII retention.
-- [ ] `resolveReceiptRegime` cascade actualizada: step 1a explicit `contractTypeSnapshot==='international_internal'` primary path; step 4 fallback legacy data emite warning Sentry.
-- [ ] Receipt/report/export grouping treats `contractTypeSnapshot='international_internal'` as primary `international_internal` regime; 4 surfaces (preview MUI + PDF + Excel + period report) validadas.
-- [ ] Payment obligations bridge usa lane interna existente (`payroll_via='internal'`) sin lane nueva; FX historico al periodo aplicado correctamente (`amount_native` USD + `amount_clp` con rate at-period-end).
-- [ ] `member_contract_type_audit_log` append-only creada con anti-UPDATE/anti-DELETE triggers; cada write de contract_type emite audit row en misma tx.
-- [ ] 3 reliability signals readable y wired en `getReliabilityOverview`:
-  - [ ] `payroll.contract_taxonomy.invalid_tuple_drift`
-  - [ ] `payroll.contract_taxonomy.invalid_statutory_application`
-  - [ ] `payroll.contract_taxonomy.fallback_resolution_legacy`
-- [ ] TASK-893 explicitly includes `international_internal` fixture mid-month entry en su acceptance criteria + tests.
-- [ ] Coordinacion con `greenhouse-finance-accounting-operator` skill para validar payment_obligations FX path completada y documentada.
-- [ ] Backfill script (si aplica): idempotente (skipea members ya migrados); dry-run CSV requerido pre-apply; HR/Finance approval documentada en `Handoff.md`; audit row per apply.
-- [ ] Hard rules lifted a `CLAUDE.md` (seccion "International Internal Contract Type invariants") en Slice 6.
-- [ ] Docs, Handoff and changelog are synchronized.
+- [x] `ContractType` includes `international_internal`.
+- [x] `CONTRACT_DERIVATIONS.international_internal` resolves to `payRegime='international'` and `payrollVia='internal'`.
+- [x] Matriz canonica 3D (`contractType` × `payRegime` × `payrollVia` × `legalEmployer` × `currencyDefault`) documentada en spec con 6 filas explicitas (Slice 1).
+- [x] **Legal Scope V1 declaracion vinculante** persistida en spec: perfil operacional, NO legal employer, disclaimer obligatorio en recibo.
+- [x] DB CHECK constraints **columna ampliada** allow `international_internal` en member y compensation contract snapshots.
+- [x] DB CHECK constraint **compuesto** sobre tupla `(contract_type, pay_regime, payroll_via)` enforce combinaciones validas en `members`; `compensation_versions` usa `(contract_type,pay_regime) NOT VALID` por legacy drift verificado.
+- [x] Capability `payroll.contract.use_international_internal` seedeada en `capabilities_registry` + granteada en `runtime.ts` SOLO a EFEONCE_ADMIN.
+- [x] UI dropdown `Internacional interno` oculto sin capability; visible cuando capability presente; `payRegime`/`payrollVia` siempre derived read-only.
+- [x] Payload `legalReviewReference` (min 10 chars) requerido en write paths cuando `contractType='international_internal'`; canonical error code `international_internal_requires_legal_review_reference` cuando ausente.
+- [x] `deelContractId` is not required and is cleared for `international_internal`.
+- [x] Payroll projected and official calculations do not apply Chile statutory deductions or SII retention.
+- [x] `resolveReceiptRegime` cascade actualizada: `contractTypeSnapshot==='international_internal'` es primary path; fallback legacy queda observable por reliability signal.
+- [x] Receipt/report/export grouping treats `contractTypeSnapshot='international_internal'` as primary `international_internal` regime; preview MUI + PDF/Excel/report consumen el helper canónico.
+- [x] Payment obligations bridge usa lane interna existente (`payroll_via='internal'`) sin lane nueva; preserva moneda nativa y deja settlement/FX a Payment Orders.
+- [x] `member_contract_type_audit_log` append-only creada con anti-UPDATE/anti-DELETE triggers; cada write de contract_type emite audit row en misma tx.
+- [x] 3 reliability signals readable y wired en `getReliabilityOverview` con subsystem rollup decidido:
+  - [x] `payroll.contract_taxonomy.invalid_tuple_drift`
+  - [x] `payroll.contract_taxonomy.invalid_statutory_application`
+  - [x] `payroll.contract_taxonomy.fallback_resolution_legacy`
+- [x] Outbox event `member.contract_type.changed v1` emitido en misma tx que UPDATE + audit_log; documentado en `GREENHOUSE_EVENT_CATALOG_V1.md`; `legalReviewReference` NUNCA cruda en payload (solo `hasLegalReviewReference: boolean`).
+- [x] TASK-893 runtime already treats internal payroll by `payrollVia='internal'`; TASK-894 added lane/receipt tests without modifying closed TASK-893 spec.
+- [x] Coordinacion con `greenhouse-finance-accounting-operator` skill para validar payment_obligations path completada y documentada.
+- [x] Backfill script no aplica: V1 explicit NO backfill automatico; futuras migraciones son opt-in con allowlist.
+- [x] Hard rules lifted a `CLAUDE.md` (seccion "International Internal Contract Type Invariants") en Slice 6.
+- [x] Docs, Handoff and changelog are synchronized.
 
 ### Pre-flip productivo (separado de implementacion)
 
@@ -530,18 +572,20 @@ Antes de cualquier apply sobre personas reales:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `docs/architecture/DECISIONS_INDEX.md` indexa la decision si se agrego ADR.
-- [ ] `TASK-893` quedo actualizado si la task sigue abierta al implementar esta.
-- [ ] No se mutaron colaboradores reales sin allowlist y aprobacion HR/Finance documentada.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `docs/architecture/DECISIONS_INDEX.md` indexa la decision si se agrego ADR.
+- [x] `TASK-893` no estaba abierta; runtime de participation usa `payrollVia='internal'` y se validó no crear path paralelo.
+- [x] No se mutaron colaboradores reales sin allowlist y aprobacion HR/Finance documentada.
 
 ## Follow-ups
 
+- **V1.1**: evolucionar `legalReviewReference` de free-text string a FK a `greenhouse_core.assets` con `retention_class='contract_legal_review_evidence'` (reusa patron TASK-721 finance evidence uploader). Operator sube PDF del legal review aprobado, sistema persiste `legal_review_asset_id` en `compensation_versions.metadata_json` + dedup por SHA-256. Cierra el residual risk V1 de "free-text confia en operator EFEONCE_ADMIN".
+- **V1.1**: extender `contractAllowsRemoteAllowance(international_internal)` a `true` si HR define caso de uso explicito con override per compensation_version.
 - V2: separar `contractClass`, `payRegime`, `payrollVia`, `legalEmployer`, `paymentOwner`, `taxOwner` en un catalogo versionado en vez de seguir agregando significado a `contractType`.
 - V2: soportar providers adicionales (`remote`, `oyster`, `manual_provider`, `direct_international`) con taxonomia de payroll provider.
 - V2: payment profile internacional self-service y funding workflow por moneda.
@@ -551,6 +595,40 @@ Antes de cualquier apply sobre personas reales:
 
 - Task creada desde investigacion del dropdown de contrato: `international_internal` aparece en receipts/reportes como regimen, pero no existe como `ContractType` seleccionable ni persistible por el write path canonico.
 - Decision de diseno inicial: V1 debe agregar un perfil contractual canonico, no habilitar combinaciones libres de regimen/via de pago en UI.
+
+## Delta 2026-05-16 — Implementation shipped
+
+TASK-894 quedo implementada en `develop` en dos commits:
+
+- `8df53882 feat: add international internal payroll contract type`
+- docs/closeout commit posterior con signals/documentacion/lifecycle.
+
+Cambios entregados:
+
+- `international_internal` agregado a `ContractType`, derivaciones, labels, defaults, payroll/workforce types y tests.
+- Migracion `20260516181754032_task-894-international-internal-contract-type.sql` aplicada con `pnpm pg:connect:migrate`.
+- CHECKs DB ampliados en `members`, `compensation_versions` y `payroll_entries.contract_type_snapshot`; `members` valida tuple completo, `compensation_versions` usa `(contract_type,pay_regime) NOT VALID` por seis rows legacy detectadas en discovery.
+- Capability `payroll.contract.use_international_internal` seedeada/granteada para EFEONCE_ADMIN runtime.
+- Write paths de Payroll compensation y Workforce intake validan capability + `legalReviewReference`, derivan payRegime/payrollVia, limpian Deel ID para `international_internal` y emiten audit/outbox.
+- `greenhouse_core.member_contract_type_audit_log` append-only creado con anti-update/delete triggers.
+- Outbox `member.contract_type.changed v1` emitido sin `legalReviewReference` cruda.
+- UI Payroll compensation y Workforce activation remediation muestran `Internacional interno` solo con capability o al editar valor existente.
+- Receipt/report path usa `contractTypeSnapshot === 'international_internal'` como primary path; display/PDF/Excel ya estaban first-class y se validaron con tests.
+- Reliability agrega 3 signals read-only: `invalid_tuple_drift`, `invalid_statutory_application`, `fallback_resolution_legacy`.
+- No hubo backfill automático ni mutación de miembros reales.
+
+Verificacion ejecutada:
+
+- `pnpm pg:connect:migrate`
+- `pnpm vitest run src/types/hr-contracts.test.ts src/lib/workforce/onboarding/lane.test.ts src/lib/payroll/receipt-presenter.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx`
+- `pnpm vitest run src/lib/reliability/signals.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+Drift documentado:
+
+- `compensation_versions.payroll_via` no existe en runtime real; vive en `greenhouse_core.members`. Por eso el CHECK compuesto completo vive en `members`, mientras `compensation_versions` protege `(contract_type,pay_regime)` y la reliability query hace JOIN a `members` para observar tuple completo.
+- Live discovery encontro seis rows legacy `compensation_versions` con tuple historico invalido (`indefinido/international` para miembros contractor/deel). No se corrigieron en esta task para preservar historico; la constraint `NOT VALID` bloquea escrituras nuevas invalidas.
+- Payment obligations no crea lane nueva: `employee_net_pay` ya preserva `currency` nativa y metadata `payrollVia`; `international_internal` cae como pago interno porque `payrollVia='internal'`. CLP cash settlement/FX policy queda en el flujo de Payment Orders, no en esta task.
 
 ## Delta 2026-05-16
 
@@ -564,6 +642,18 @@ Antes de cualquier apply sobre personas reales:
 - Reality check: el gap es mas chico de lo que la spec sugeria. Display layer (`ReceiptRegime` taxonomy, PDF, Excel, period report) YA es first-class para `international_internal` desde TASK-758. Payment obligations lane YA reusa interna sin lane nueva (`materialize-payroll.ts:164` branchea por `payrollVia`). Calc path YA branchea Chile deductions por `payRegime`. Bottleneck real: `ContractType` enum + `CONTRACT_DERIVATIONS` + DB CHECK + UI dropdown + capability gate.
 - Hard rules canonicos declarados en task para lift a `CLAUDE.md` en Slice 6.
 
+## Delta 2026-05-16 (ajustes post-review #2)
+
+Aplicados 3 refinamientos antes de mover a `in-progress`:
+
+1. **Outbox event canonico `member.contract_type.changed v1`** agregado a Slice 5 con shape completo + lista de 4 consumers downstream esperados (payment lane, TASK-893 participation, workforce readiness, Person 360 facets). Emitido en misma tx que UPDATE + audit_log via `publishOutboxEvent(event, client)`. `legalReviewReference` NUNCA cruda en payload (solo `hasLegalReviewReference: boolean`); valor pleno persistido en audit log con anti-mutation triggers. Sin este evento, downstream consumers detectarian el cambio solo via stale read o sweep manual.
+2. **Subsystem rollup decidido** (Open Question #6): `invalid_tuple_drift` + `fallback_resolution_legacy` → `Identity & Access` (data quality del modelo); `invalid_statutory_application` → `Finance Data Quality` (economic outcome). Tabla canonica en Slice 5 actualizada con columna `Subsystem rollup` explicita.
+3. **V1.1 follow-up `legalReviewReference` → asset_id** documentado explicito. Free-text en V1 acepta residual risk "confia en operator EFEONCE_ADMIN"; V1.1 evoluciona a FK `greenhouse_core.assets` con `retention_class='contract_legal_review_evidence'` (reusa patron TASK-721 finance evidence uploader, dedup SHA-256). Cierra el residual risk del Safety pillar V1.
+
+Hard rules adicionales agregadas (4 nuevas, 13 → 17 total): NUNCA mutar contract facts sin emitir outbox event; NUNCA incluir `legalReviewReference` crudo en payload; NUNCA detectar cambio composing `payRegime + payrollVia`. Acceptance criteria + risk matrix actualizadas con outbox event coverage.
+
+Task lista para `in-progress`. Sin blockers spec-side; Open Question #5 (Legal review) bloquea solo el grant productivo de la capability (Slice 6 pre-flip), no la implementacion Slice 1-5.
+
 ## Canonical Hard Rules (lift to `CLAUDE.md` post-Slice 6)
 
 - **NUNCA** persistir un tuple `(contract_type, pay_regime, payroll_via)` fuera de las 6 combinaciones canonicas. CHECK constraint compuesto enforce a nivel DB.
@@ -576,6 +666,9 @@ Antes de cualquier apply sobre personas reales:
 - **NUNCA** backfillear masivamente `contract_type` sin (a) dry-run CSV, (b) allowlist explicita per member, (c) HR/Finance approval escrita, (d) audit row per apply.
 - **NUNCA** loggear `legalReviewReference` value crudo en Sentry / outbox payloads — puede contener referencias confidenciales a docs legales. Redactar via `redactSensitive`.
 - **NUNCA** persistir `legalReviewReference` < 10 chars; rechazar a nivel API con canonical error code `international_internal_requires_legal_review_reference`.
+- **NUNCA** mutar `contract_type`, `pay_regime` o `payroll_via` sin emitir outbox event `member.contract_type.changed v1` en la misma tx. Downstream consumers (payment obligations lane, TASK-893 participation, workforce readiness, Person 360 facets) dependen del evento — bypass causa drift silente.
+- **NUNCA** incluir el valor crudo de `legalReviewReference` en outbox event payload. Solo `hasLegalReviewReference: boolean` como flag safe. Audit log persiste el valor completo (con anti-mutation triggers).
+- **NUNCA** detectar "international_internal vs contractor vs eor" en consumers downstream composing `payRegime + payrollVia`. Branchear por `contractType === 'international_internal'` directo, o subscribir al outbox event para reactividad.
 - **SIEMPRE** que emerja un 7º perfil contractual que no encaje en la matriz lineal canonica, abrir TASK V2 (ortogonal `contractClass × payRegime × payrollVia × legalEmployer`) en lugar de seguir agregando valores al enum `ContractType`.
 - **SIEMPRE** que `resolveReceiptRegime` caiga al fallback step 4 por `contractTypeSnapshot=NULL`, emitir warning `captureWithDomain('payroll', warn, { source: 'receipt_regime.fallback_resolution_legacy_data' })`.
 - **SIEMPRE** que un consumer downstream necesite "es internacional interno", branchear por `contractType === 'international_internal'` directo (post-task), NO por composicion `payRegime + payrollVia`.
@@ -587,5 +680,5 @@ Antes de cualquier apply sobre personas reales:
 3. ~~`allowsRemoteAllowance`~~ **Resuelto**: `false` V1 conservador (remote allowance es chile-specific). HR puede definir override en V1.1 si emerge caso de uso.
 4. ~~Payment Obligations lane~~ **Resuelto** (verificado en codigo `materialize-payroll.ts:164`): lane interna existente reusada. Branching es por `payrollVia`, no por `payRegime`. **Pendiente**: coordinacion con `greenhouse-finance-accounting-operator` para validar FX rate historico aplicado correctamente.
 5. **Pre-Slice 1 (no resuelta)**: Legal/People Ops escala — V1 perfil OPERATIVO declarado, pero el rollout productivo requiere review legal escrita ANTES de grant capability `payroll.contract.use_international_internal`. Sin review, opcion oculta en UI productiva.
-6. **Pre-Slice 5**: confirmar subsystem rollup definitivo para los 3 signals — `Identity & Access` (audit + drift) vs `Finance Data Quality` (payroll impact). Mi recomendacion: `tuple_drift` + `fallback_resolution` van a `Identity & Access`; `invalid_statutory_application` va a `Finance Data Quality` (economic outcome).
+6. ~~Subsystem rollup~~ **Resuelto** (Delta 2026-05-16 ajuste post-review): `invalid_tuple_drift` + `fallback_resolution_legacy` → `Identity & Access` (data quality del modelo); `invalid_statutory_application` → `Finance Data Quality` (economic outcome — afecta net pagado). Documentado en Slice 5 tabla canonica.
 7. **Pre-rollout productivo**: politica explicita HR/Finance sobre members reales — preserve actual estado (`contractor` legacy) vs backfill a `international_internal` con allowlist. Recomendacion: backfill es opt-in per member, NO masivo.

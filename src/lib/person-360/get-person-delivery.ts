@@ -3,6 +3,20 @@ import 'server-only'
 import { getOrganizationClientIds } from '@/lib/account-360/organization-store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
+import {
+  TASK_STATUS_CANONICAL,
+  TASK_STATUS_GROUPS,
+  allVariantsForCanonical,
+  allVariantsForGroup
+} from '@/lib/delivery/task-status-canonical'
+
+const COMPLETED_OR_CANCELLED_VARIANTS = [
+  ...allVariantsForGroup(TASK_STATUS_GROUPS.COMPLETED),
+  ...allVariantsForCanonical(TASK_STATUS_CANONICAL.CANCELADO)
+]
+
+// Build the PG IN list once (constants only, safe).
+const PG_COMPLETED_OR_CANCELLED_SQL = COMPLETED_OR_CANCELLED_VARIANTS.map(s => `'${s.replace(/'/g, "''")}'`).join(',')
 
 // ── Types ──
 
@@ -159,7 +173,7 @@ const buildScopedDeliveryContext = async (
        SELECT
          COUNT(*)::int AS total_assigned,
          COUNT(*) FILTER (
-           WHERE t.task_status NOT IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Cancelado', 'Cancelada', 'Cancelled', 'Canceled')
+           WHERE t.task_status NOT IN (${PG_COMPLETED_OR_CANCELLED_SQL})
              AND NOT t.is_deleted
          )::int AS active_tasks,
          COUNT(*) FILTER (
@@ -168,7 +182,7 @@ const buildScopedDeliveryContext = async (
          )::int AS completed_30d,
          COUNT(*) FILTER (
            WHERE t.due_date < CURRENT_DATE
-             AND t.task_status NOT IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Cancelado', 'Cancelada', 'Cancelled', 'Canceled')
+             AND t.task_status NOT IN (${PG_COMPLETED_OR_CANCELLED_SQL})
              AND NOT t.is_deleted
          )::int AS overdue_tasks,
          AVG(t.rpa_value) FILTER (

@@ -18,6 +18,19 @@ import {
   TREND_STABLE_BAND_PP
 } from './performance-report'
 import { materializeAiSignals } from './ai/materialize-ai-signals'
+import {
+  assertMaterializerFlagCoherence,
+  isIncrementalDeltaEnabled,
+  isMergePatternEnabled
+} from './materialize-flags'
+import { runIcoMaterializerCycle } from './materialize-orchestrator'
+import {
+  buildLegacyDeleteInsertSql,
+  buildMergeSql,
+  buildPostCountSql,
+  type MaterializerSqlConfig
+} from './materialize-sql-builders'
+import type { IcoMaterializerTableName } from './materialize-tracking'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -570,245 +583,155 @@ const materializeRpaTrend = async (projectId: string): Promise<number> => {
   return toNumber(countRows[0]?.cnt)
 }
 
-// ─── Project-Level Metrics Materialization ───────────────────────────────────
+// ─── Materializer SQL configs (TASK-900 Slice 5) ─────────────────────────────
+//
+// Single source of truth para los 5 materializers. Cada config alimenta los
+// builders shared (`buildLegacyDeleteInsertSql` + `buildMergeSql` +
+// `buildPostCountSql`). Toda nueva entity downstream (Frame.io, HubSpot)
+// agrega su config aquí + se beneficia del orchestrator canonical.
 
-const materializeProjectMetrics = async (
+const METRICS_BY_MEMBER_CONFIG: MaterializerSqlConfig = {
+  tableName: 'metrics_by_member',
+  keyColumns: ['member_id'],
+  keySelectSql: 'te.primary_owner_member_id AS member_id',
+  whereClauseSql:
+    "te.primary_owner_member_id IS NOT NULL\n      AND te.primary_owner_member_id != ''",
+  groupBySql: 'member_id',
+  partitionBySql: 'member_id, period_year, period_month'
+}
+
+const METRICS_BY_PROJECT_CONFIG: MaterializerSqlConfig = {
+  tableName: 'metrics_by_project',
+  keyColumns: ['project_source_id', 'space_id'],
+  keySelectSql: 'project_source_id,\n      space_id',
+  whereClauseSql:
+    "space_id IS NOT NULL\n      AND project_source_id IS NOT NULL\n      AND project_source_id != ''",
+  groupBySql: 'project_source_id, space_id',
+  partitionBySql: 'project_source_id, space_id, period_year, period_month'
+}
+
+const METRICS_BY_SPRINT_CONFIG: MaterializerSqlConfig = {
+  tableName: 'metrics_by_sprint',
+  keyColumns: ['sprint_source_id', 'space_id'],
+  keySelectSql: 'sprint_source_id,\n      space_id',
+  whereClauseSql:
+    "space_id IS NOT NULL\n      AND sprint_source_id IS NOT NULL\n      AND sprint_source_id != ''",
+  groupBySql: 'sprint_source_id, space_id',
+  partitionBySql: 'sprint_source_id, space_id, period_year, period_month'
+}
+
+const METRICS_BY_ORGANIZATION_CONFIG: MaterializerSqlConfig = {
+  tableName: 'metrics_by_organization',
+  keyColumns: ['organization_id'],
+  keySelectSql: 'client_id AS organization_id',
+  whereClauseSql: "client_id IS NOT NULL\n      AND client_id != ''",
+  groupBySql: 'client_id',
+  partitionBySql: 'organization_id, period_year, period_month'
+}
+
+const METRICS_BY_BUSINESS_UNIT_CONFIG: MaterializerSqlConfig = {
+  tableName: 'metrics_by_business_unit',
+  keyColumns: ['business_unit'],
+  keySelectSql: 'operating_business_unit AS business_unit',
+  whereClauseSql:
+    "operating_business_unit IS NOT NULL\n      AND operating_business_unit != ''",
+  groupBySql: 'operating_business_unit',
+  partitionBySql: 'business_unit, period_year, period_month'
+}
+
+// ─── Generic materializer per config (TASK-900 Slice 5) ─────────────────────
+//
+// Cada materializer es ahora un thin wrapper sobre runIcoMaterializerCycle
+// (orchestrator canonical) + builders shared. Cero copy-paste de SQL.
+
+const runLegacyDeleteInsertForConfig = async (
+  cfg: MaterializerSqlConfig,
   projectId: string,
   periodYear: number,
   periodMonth: number
 ): Promise<number> => {
-  // Delete current period rows then re-insert (idempotent)
-  await runIcoEngineQuery(`
-    DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
+  const { deleteSql, insertSql } = buildLegacyDeleteInsertSql(cfg, projectId)
 
-  await runIcoEngineQuery(`
-    INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-      (project_source_id, space_id, period_year, period_month,
-       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
-       otd_pct, ftr_pct,
-       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
-       throughput_count, pipeline_velocity,
-       stuck_asset_count, stuck_asset_pct,
-       total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
-       materialized_at)
-    SELECT
-      project_source_id,
-      space_id,
-      @periodYear AS period_year,
-      @periodMonth AS period_month,
+  await runIcoEngineQuery(deleteSql, { periodYear, periodMonth })
+  await runIcoEngineQuery(insertSql, { periodYear, periodMonth })
 
-      ${buildMetricSelectSQL()},
-
-      CURRENT_TIMESTAMP() AS materialized_at
-
-    FROM ${buildDeliveryPeriodSourceSql(projectId)}
-    WHERE space_id IS NOT NULL
-      AND project_source_id IS NOT NULL
-      AND project_source_id != ''
-    GROUP BY project_source_id, space_id
-  `, { periodYear, periodMonth })
-
-  const countRows = await runIcoEngineQuery<{ cnt: unknown }>(`
-    SELECT COUNT(*) AS cnt
-    FROM \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
+  const countRows = await runIcoEngineQuery<{ cnt: unknown }>(
+    buildPostCountSql(cfg, projectId),
+    { periodYear, periodMonth }
+  )
 
   return toNumber(countRows[0]?.cnt)
 }
+
+const runMergeForConfig = async (
+  cfg: MaterializerSqlConfig,
+  projectId: string,
+  periodYear: number,
+  periodMonth: number,
+  deltaCutoffIso: string | null
+): Promise<number> => {
+  const mergeSql = buildMergeSql(cfg, projectId, Boolean(deltaCutoffIso))
+
+  const params: Record<string, unknown> = { periodYear, periodMonth }
+
+  if (deltaCutoffIso) {
+    params.deltaCutoff = deltaCutoffIso
+  }
+
+  await runIcoEngineQuery(mergeSql, params)
+
+  const countRows = await runIcoEngineQuery<{ cnt: unknown }>(
+    buildPostCountSql(cfg, projectId),
+    { periodYear, periodMonth }
+  )
+
+  return toNumber(countRows[0]?.cnt)
+}
+
+const wrapMaterializerWithCycle = (
+  cfg: MaterializerSqlConfig
+) =>
+  (
+    projectId: string,
+    periodYear: number,
+    periodMonth: number
+  ): Promise<number> =>
+    runIcoMaterializerCycle({
+      tableName: cfg.tableName as IcoMaterializerTableName,
+      periodYear,
+      periodMonth,
+      runLegacyDeleteInsert: () =>
+        runLegacyDeleteInsertForConfig(cfg, projectId, periodYear, periodMonth),
+      runMerge: deltaCutoffIso =>
+        runMergeForConfig(cfg, projectId, periodYear, periodMonth, deltaCutoffIso),
+      assertFlagCoherence: assertMaterializerFlagCoherence,
+      isMergePatternEnabled,
+      isIncrementalDeltaEnabled
+    })
+
+// ─── Project-Level Metrics Materialization ───────────────────────────────────
+
+const materializeProjectMetrics = wrapMaterializerWithCycle(METRICS_BY_PROJECT_CONFIG)
 
 // ─── Member-Level Metrics Materialization ────────────────────────────────────
 
-const materializeMemberMetrics = async (
-  projectId: string,
-  periodYear: number,
-  periodMonth: number
-): Promise<number> => {
-  // Delete current period rows then re-insert (idempotent)
-  await runIcoEngineQuery(`
-    DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
-
-  await runIcoEngineQuery(`
-    INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-      (member_id, period_year, period_month,
-       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
-       otd_pct, ftr_pct,
-       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
-       throughput_count, pipeline_velocity,
-       stuck_asset_count, stuck_asset_pct,
-       total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
-       materialized_at)
-    SELECT
-      te.primary_owner_member_id AS member_id,
-      @periodYear AS period_year,
-      @periodMonth AS period_month,
-
-      ${buildMetricSelectSQL()},
-
-      CURRENT_TIMESTAMP() AS materialized_at
-
-    FROM ${buildDeliveryPeriodSourceSql(projectId)} te
-    WHERE te.primary_owner_member_id IS NOT NULL
-      AND te.primary_owner_member_id != ''
-    GROUP BY member_id
-  `, { periodYear, periodMonth })
-
-  const countRows = await runIcoEngineQuery<{ cnt: unknown }>(`
-    SELECT COUNT(*) AS cnt
-    FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
-
-  return toNumber(countRows[0]?.cnt)
-}
+const materializeMemberMetrics = wrapMaterializerWithCycle(METRICS_BY_MEMBER_CONFIG)
 
 // ─── Sprint-Level Metrics Materialization ────────────────────────────────────
 
-const materializeSprintMetrics = async (
-  projectId: string,
-  periodYear: number,
-  periodMonth: number
-): Promise<number> => {
-  await runIcoEngineQuery(`
-    DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_sprint\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
+const materializeSprintMetrics = wrapMaterializerWithCycle(METRICS_BY_SPRINT_CONFIG)
 
-  await runIcoEngineQuery(`
-    INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_sprint\`
-      (sprint_source_id, space_id, period_year, period_month,
-       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
-       otd_pct, ftr_pct,
-       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
-       throughput_count, pipeline_velocity,
-       stuck_asset_count, stuck_asset_pct,
-       total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
-       materialized_at)
-    SELECT
-      sprint_source_id,
-      space_id,
-      @periodYear AS period_year,
-      @periodMonth AS period_month,
+// ─── Organization-Level Metrics Materialization ──────────────────────────────
 
-      ${buildMetricSelectSQL()},
+const materializeOrganizationMetrics = wrapMaterializerWithCycle(
+  METRICS_BY_ORGANIZATION_CONFIG
+)
 
-      CURRENT_TIMESTAMP() AS materialized_at
+// ─── Business Unit Metrics Materialization ───────────────────────────────────
 
-    FROM ${buildDeliveryPeriodSourceSql(projectId)}
-    WHERE space_id IS NOT NULL
-      AND sprint_source_id IS NOT NULL
-      AND sprint_source_id != ''
-    GROUP BY sprint_source_id, space_id
-  `, { periodYear, periodMonth })
-
-  const sprintCountRows = await runIcoEngineQuery<{ cnt: unknown }>(`
-    SELECT COUNT(*) AS cnt
-    FROM \`${projectId}.${ICO_DATASET}.metrics_by_sprint\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
-
-  return toNumber(sprintCountRows[0]?.cnt)
-}
-
-// ─── Organization-Level Metrics Materialization ────────────────────────────────
-const materializeOrganizationMetrics = async (
-  projectId: string,
-  periodYear: number,
-  periodMonth: number
-): Promise<number> => {
-  await runIcoEngineQuery(`
-    DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_organization\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
-
-  await runIcoEngineQuery(`
-    INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_organization\`
-      (organization_id, period_year, period_month,
-       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
-       otd_pct, ftr_pct,
-       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
-       throughput_count, pipeline_velocity,
-       stuck_asset_count, stuck_asset_pct,
-       total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
-       materialized_at)
-    SELECT
-      client_id AS organization_id,
-      @periodYear AS period_year,
-      @periodMonth AS period_month,
-
-      ${buildMetricSelectSQL()},
-
-      CURRENT_TIMESTAMP() AS materialized_at
-
-    FROM ${buildDeliveryPeriodSourceSql(projectId)}
-    WHERE client_id IS NOT NULL
-      AND client_id != ''
-    GROUP BY client_id
-  `, { periodYear, periodMonth })
-
-  const orgCountRows = await runIcoEngineQuery<{ cnt: unknown }>(`
-    SELECT COUNT(*) AS cnt
-    FROM \`${projectId}.${ICO_DATASET}.metrics_by_organization\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
-
-  return toNumber(orgCountRows[0]?.cnt)
-}
-
-// ─── Business Unit Metrics Materialization ─────────────────────────────────
-
-const materializeBusinessUnitMetrics = async (
-  projectId: string,
-  periodYear: number,
-  periodMonth: number
-): Promise<number> => {
-  await runIcoEngineQuery(`
-    DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_business_unit\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
-
-  await runIcoEngineQuery(`
-    INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_business_unit\`
-      (business_unit, period_year, period_month,
-       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
-       otd_pct, ftr_pct,
-       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
-       throughput_count, pipeline_velocity,
-       stuck_asset_count, stuck_asset_pct,
-       total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
-       materialized_at)
-    SELECT
-      operating_business_unit AS business_unit,
-      @periodYear AS period_year,
-      @periodMonth AS period_month,
-
-      ${buildMetricSelectSQL()},
-
-      CURRENT_TIMESTAMP() AS materialized_at
-
-    FROM ${buildDeliveryPeriodSourceSql(projectId)}
-    WHERE operating_business_unit IS NOT NULL
-      AND operating_business_unit != ''
-    GROUP BY operating_business_unit
-  `, { periodYear, periodMonth })
-
-  const buCountRows = await runIcoEngineQuery<{ cnt: unknown }>(`
-    SELECT COUNT(*) AS cnt
-    FROM \`${projectId}.${ICO_DATASET}.metrics_by_business_unit\`
-    WHERE period_year = @periodYear AND period_month = @periodMonth
-  `, { periodYear, periodMonth })
-
-  return toNumber(buCountRows[0]?.cnt)
-}
+const materializeBusinessUnitMetrics = wrapMaterializerWithCycle(
+  METRICS_BY_BUSINESS_UNIT_CONFIG
+)
 
 // ─── Performance Report Materialization ────────────────────────────────────
 
@@ -1002,3 +925,15 @@ const materializePerformanceReports = async (
 
   return toNumber(countRows[0]?.cnt)
 }
+
+// ─── Test-only exports (TASK-900) ───────────────────────────────────────────
+//
+// Exposed for anti-regression tests. These are NOT part of the public API
+// and should NEVER be imported from production code. Production consumers
+// go through `materializeMonthlySnapshots`.
+//
+// Underscore prefix + comment make intent explicit. ESLint can be configured
+// to forbid imports from outside `*.test.ts` if regression risk emerges.
+
+export const __test_materializeMemberMetrics = materializeMemberMetrics
+

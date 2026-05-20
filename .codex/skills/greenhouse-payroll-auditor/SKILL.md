@@ -34,6 +34,8 @@ Read only what is needed for the requested task:
 - `references/chile-payroll-law.md`: Chile legal/payroll formula map and official source links.
 - `references/greenhouse-payroll-runtime.md`: Greenhouse schema, code paths, formulas, known audit watchlist, and verification commands.
 - `references/international-remote-payroll.md`: Remote/international worker regimes, Deel/EOR/contractor boundaries, and Efeonce audit posture.
+- `references/international-withholding-americas-sii.md`: SII discovery summary for `international_internal` withholding across Americas, including LIR Art. 59/60/74/79, treaty evidence gates, country matrix, and TASK-905 fail-closed posture.
+- `references/international-withholding-europe-sii.md`: SII discovery summary for future Europe `international_internal` withholding, including European DTA list, MFN circular rate changes, MLI notes, territorial caveats, and fail-closed seed posture.
 
 ## Core Invariants
 
@@ -181,6 +183,9 @@ For `payRegime = 'international'` or `payrollVia = 'deel'`:
 - Remote allowance is allowed for `contractor` and `eor` in current Greenhouse policy.
 - KPI ICO is still mandatory when OTD/RPA bonus exposure can change pay, even if the worker is outside Chile.
 - Treat local-country taxes, social security, benefits, and withholding as provider/legal-counsel scope unless Greenhouse has a jurisdiction-specific engine.
+- For `international_internal`, do not assume gross equals compliant net. If a Chile payer directly pays a non-resident, review `references/international-withholding-americas-sii.md` and, for European tax residence, `references/international-withholding-europe-sii.md` before approving calculation, readiness, receipts, or payment obligations.
+- Europe is outside TASK-905 Americas V1 approved seed. Spain/Europe must resolve `needs_tax_review` until a Europe-specific catalog is legally approved.
+- Never apply a treaty zero/reduced withholding rate without residence certificate, no-PE/base-fixed declaration, beneficiary eligibility, service category, period, and evidence snapshot.
 
 ## Known Payroll Audit Watchlist
 
