@@ -95,71 +95,56 @@ describe('TASK-910 Slice 2 — notion-tasks-demo handler canonical', () => {
   // payload). Matchea por property ID (Notion manda IDs, no nombres). El payload
   // real NO incluye previous/current — esos campos NO existen.
   describe('extractDemoStatusChangeSignals (re-fetch trigger) canonical', () => {
-    const STATUS_PROP_ID = 'estId'
-    const statusIds = new Set([STATUS_PROP_ID])
-
     const baseEvent = {
       id: 'evt-1',
       type: 'page.properties_updated',
       entity: { id: 'task-uuid-1', type: 'page' as const },
       data: {
-        updated_properties: [STATUS_PROP_ID]
+        updated_properties: ['shortPropId']
       },
       authors: [{ id: 'real-user-uuid', type: 'person' as const }],
       timestamp: '2026-05-19T10:00:00Z'
     }
 
-    it('emite signal cuando cambió la propiedad de estado (match por ID)', () => {
-      const result = extractDemoStatusChangeSignals([baseEvent], null, statusIds)
+    it('emite signal para cualquier cambio de propiedad en page (consumer re-fetch filtra)', () => {
+      const result = extractDemoStatusChangeSignals([baseEvent], null)
 
       expect(result).toHaveLength(1)
       expect(result[0]).toMatchObject({
         taskSourceId: 'task-uuid-1',
-        changedPropertyIds: [STATUS_PROP_ID],
+        changedPropertyIds: ['shortPropId'],
         sourceEventId: 'evt-1',
         occurredAt: '2026-05-19T10:00:00Z'
       })
     })
 
     it('NO incluye from/to (el consumer los resuelve vía re-fetch)', () => {
-      const [signal] = extractDemoStatusChangeSignals([baseEvent], null, statusIds)
+      const [signal] = extractDemoStatusChangeSignals([baseEvent], null)
 
       expect(signal).not.toHaveProperty('fromStatus')
       expect(signal).not.toHaveProperty('toStatus')
     })
 
-    it('drop si updated_properties NO incluye un status property ID', () => {
+    it('drop si updated_properties vacío (page.created sin props)', () => {
       const result = extractDemoStatusChangeSignals(
-        [{ ...baseEvent, data: { updated_properties: ['otroPropId'] } }],
-        null,
-        statusIds
+        [{ ...baseEvent, type: 'page.created', data: { updated_properties: [] } }],
+        null
       )
 
       expect(result).toHaveLength(0)
     })
 
-    it('forward DEFENSIVO cuando statusPropertyIds está vacío (resolver falló)', () => {
-      const result = extractDemoStatusChangeSignals(
-        [{ ...baseEvent, data: { updated_properties: ['cualquierPropId'] } }],
-        null,
-        new Set()
-      )
-
-      expect(result).toHaveLength(1)
-    })
-
     it('echo-loop filter: drop si event author es integration user', () => {
       const result = extractDemoStatusChangeSignals(
         [{ ...baseEvent, authors: [{ id: 'integration-uuid', type: 'bot' as const }] }],
-        'integration-uuid',
-        statusIds
+        'integration-uuid'
       )
 
       expect(result).toHaveLength(0)
     })
 
     it('echo-loop NO filtra si integrationUserId es null', () => {
-      const result = extractDemoStatusChangeSignals([baseEvent], null, statusIds)
+      const result = extractDemoStatusChangeSignals([baseEvent], null)
 
       expect(result).toHaveLength(1)
     })
@@ -167,29 +152,14 @@ describe('TASK-910 Slice 2 — notion-tasks-demo handler canonical', () => {
     it('drop si entity type NO es page', () => {
       const result = extractDemoStatusChangeSignals(
         [{ ...baseEvent, entity: { id: 'x', type: 'database' as const } }],
-        null,
-        statusIds
+        null
       )
 
       expect(result).toHaveLength(0)
     })
 
     it('drop si entity id missing', () => {
-      const result = extractDemoStatusChangeSignals(
-        [{ ...baseEvent, entity: { type: 'page' as const } }],
-        null,
-        statusIds
-      )
-
-      expect(result).toHaveLength(0)
-    })
-
-    it('drop si updated_properties vacío (page.created sin props)', () => {
-      const result = extractDemoStatusChangeSignals(
-        [{ ...baseEvent, type: 'page.created', data: { updated_properties: [] } }],
-        null,
-        statusIds
-      )
+      const result = extractDemoStatusChangeSignals([{ ...baseEvent, entity: { type: 'page' as const } }], null)
 
       expect(result).toHaveLength(0)
     })
@@ -201,14 +171,14 @@ describe('TASK-910 Slice 2 — notion-tasks-demo handler canonical', () => {
         entity: { id: 'task-uuid-2', type: 'page' as const }
       }
 
-      const result = extractDemoStatusChangeSignals([baseEvent, event2], null, statusIds)
+      const result = extractDemoStatusChangeSignals([baseEvent, event2], null)
 
       expect(result).toHaveLength(2)
       expect(result.map(r => r.taskSourceId)).toEqual(['task-uuid-1', 'task-uuid-2'])
     })
 
     it('genera sourceEventId fallback cuando event.id missing', () => {
-      const result = extractDemoStatusChangeSignals([{ ...baseEvent, id: undefined }], null, statusIds)
+      const result = extractDemoStatusChangeSignals([{ ...baseEvent, id: undefined }], null)
 
       expect(result).toHaveLength(1)
       expect(result[0].sourceEventId).toContain('task-uuid-1')
