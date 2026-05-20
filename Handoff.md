@@ -1,6 +1,19 @@
-# Sesion 2026-05-20 — RpA V2 demo pipeline ACTIVADO live + property renombrada `RpA` + release develop→main
+# Sesion 2026-05-20 — RpA V2 demo pipeline ACTIVADO live + property renombrada `RpA` + 2 releases develop→main
 
-**Status**: ✅ Pipeline RpA V2 demo activado end-to-end en producción. Cierre operador-side de TASK-913 + release canonical.
+**Status**: ✅ Pipeline RpA V2 demo activado en producción. Cierre operador-side de TASK-913 + 2 releases canonical. El smoke E2E real reveló 2 bugs que se arreglaron en el release #2.
+
+**Bugs detectados por el smoke E2E (y arreglados)**:
+
+1. **Resolución del signing secret (release #2 `afc1125e`)**: el handler `notion-tasks-demo` llamaba `resolveSecret('NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF')` del helper `webhooks/signing`, que appendea `_SECRET_REF` al argumento → buscaba `..._SECRET_REF_SECRET_REF` (inexistente) → fallback `envValue` usaba el NOMBRE crudo del secret como key HMAC. Resultado: TODAS las firmas Notion fallaban `signature validation failed`. **Fix**: env var explícito + `resolveSecretByRef` (patrón sibling `notion-demo-client.ts`). Verificado local: HMAC matchea exacto la firma de eventos rechazados.
+2. **IAM faltante**: el GCP secret `notion-webhook-signing-secret-demo` se creó sin binding `secretmanager.secretAccessor` para `greenhouse-portal@efeonce-group`. Tras el fix de código el error mutó a `not configured`. **Fix**: otorgado el binding (mismo que el integration token). ⚠️ **Lección operativa**: al crear un GCP secret nuevo consumido por runtime Vercel, otorgar `secretAccessor` a `greenhouse-portal@efeonce-group` en el mismo paso (no hay accessor project-level para ese SA).
+
+**Verificación**: webhook demo pasó de `failed` (signature) → `failed` (not configured) → **`processed`** ✅. Chain reactivo capture→compute→writeback ya probado (eventos `notion.task.*` 14:34-14:36 `published` + snapshot rpa=1).
+
+**Pendiente menor**: el smoke con PATCHes muy seguidos (8s) coalesció en Notion y no extrajo transición; re-disparado con espaciado 28s para producir el evento `Listo para revisión → Cambios solicitados` limpio. El chain (crons 5 min) escribe `RpA` en la tarea demo. extractDemoTransitions requiere `previous.status.name` + `current.status.name` en eventos separados.
+
+---
+
+**Status original (release #1)**: ✅ Pipeline RpA V2 demo activado. Cierre operador-side de TASK-913 + release canonical.
 
 **Qué se hizo**:
 
