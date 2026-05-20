@@ -4,8 +4,8 @@ import { normalizeTaskStatus, TASK_STATUS_CANONICAL } from '@/lib/delivery/task-
 import { captureWithDomain } from '@/lib/observability/capture'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 import { registerInboundHandler } from '@/lib/webhooks/inbound'
-import { resolveSecret } from '@/lib/webhooks/signing'
 
 /**
  * TASK-910 Slice 2 — Notion tasks-demo webhook handler.
@@ -238,7 +238,14 @@ registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPa
   const headers = inboxEvent.headers_json as Record<string, string>
   const signature = headers[SIGNATURE_HEADER] ?? ''
 
-  const secret = await resolveSecret('NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF')
+  // El env var contiene el NOMBRE del secret GCP (forma bare `*_SECRET_REF`).
+  // Resolvemos su VALOR con resolveSecretByRef (mismo patrón que el sibling
+  // notion-demo-client.ts). NO usar el helper resolveSecret(envName) de
+  // webhooks/signing: ese le append `_SECRET_REF` al argumento, así que pasarle
+  // ya el nombre `_REF` cae al fallback envValue y usaría el nombre crudo del
+  // secret como key HMAC (bug detectado en smoke E2E 2026-05-20).
+  const secretRef = process.env.NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF?.trim()
+  const secret = secretRef ? await resolveSecretByRef(secretRef) : null
 
   if (!secret) {
     // Secret NO configurado — webhook NO puede validar signature.
