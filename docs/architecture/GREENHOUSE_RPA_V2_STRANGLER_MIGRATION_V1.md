@@ -10,6 +10,52 @@
 
 ---
 
+## Delta 2026-05-20 — TASK-914: arquitectura canonical de captura vía re-fetch pattern
+
+Sesión live 2026-05-20: el pipeline RpA V2 demo (TASK-913) se activó en producción y el **smoke E2E con artefacto real** (webhook real de Notion contra el teamspace Demo) reveló que la capa de **captura de transiciones** era incompatible con el payload real de Notion 2026-03-11. TASK-914 rediseña la captura siguiendo el **re-fetch pattern canonical** (notion-platform Pillar 1). Validado end-to-end: 3 transiciones capturadas desde webhooks reales + snapshot `rpa=2 valid` computado.
+
+### Arquitectura canonical de captura (webhook = trigger, consumer = resolver)
+
+```text
+Notion edit (operador) → webhook /api/webhooks/notion-tasks-demo
+  ├─ valida HMAC (resolveSecretByRef) + echo-loop filter
+  ├─ normalizeWebhookEvents: soporta evento single { id,type,entity,data } Y { events:[] }
+  ├─ extractDemoStatusChangeSignals: forward de cualquier page property change
+  │    (NO filtra por status property ID — ver Bug #4 abajo)
+  └─ emite notion.task.page_change_signal.demo { taskSourceId, changedPropertyIds, sourceEventId, occurredAt }
+       → consumer reactivo notion-status-transition-capture-demo (ops-worker, async):
+            ├─ RE-FETCH la página (fetchDemoPageStatus) → estado actual = `to` (source of truth)
+            ├─ normalizeTaskStatus(to)
+            ├─ deriva `from` = último to_status registrado en task_status_transitions_demo (o 'Sin empezar')
+            ├─ si from === to → no-op idempotente
+            └─ si from !== to → persiste transición + emite transition_captured.demo (si corrección)
+                 → compute (calculateRpaV2Demo) → snapshot rpa → writeback → PATCH Notion property `RpA`
+```
+
+**Principio canonical (notion-platform Pillar 1 / Hard rule #2)**: **NUNCA confiar el payload del webhook como source of truth — siempre re-fetch desde la API antes de computar.** El webhook Notion es un *trigger ligero* que solo dice "página X cambió propiedad(es) Y" (IDs, sin valores). El estado real (`to`) se obtiene re-fetcheando la página; el estado previo (`from`) se deriva de la última transición registrada en PG (Notion no provee previous/current).
+
+### Bugs en cascada detectados por el smoke E2E (cada uno real y distinto)
+
+El protocolo de **verificación con artefacto real** (CLAUDE.md "Real-Artifact Iterative Verification Loop") cazó 5 bugs que los 78 tests mockeados de TASK-913 no veían — porque los tests asumían un payload sintético que no es el que Notion realmente envía:
+
+| # | Bug | Causa raíz | Fix |
+|---|---|---|---|
+| 1 | HMAC siempre fallaba | `resolveSecret('..._SECRET_REF')` re-appendea `_SECRET_REF` → fallback usaba el NOMBRE del secret como key HMAC | `resolveSecretByRef(env)` explícito |
+| 2 | secret `not configured` | GCP secret nuevo sin IAM `secretAccessor` para `greenhouse-portal@` | grant IAM (mismo binding que el integration token) |
+| 3 | extracción 0 transiciones | el handler exigía `previous`/`current` + nombres; Notion manda IDs sin valores | re-fetch pattern (consumer re-fetchea) |
+| 4 | gate por status property ID | el ID del schema (`notion://tasks/status_property`) parecía no matchear el del webhook | forward-all (el consumer re-fetch es el filtro autoritativo idempotente) |
+| 5 | 0 signals emitidos | Notion entrega un **evento single**, NO `{ events:[] }` → `events=[]` → 0 signals | `normalizeWebhookEvents` soporta ambos formatos |
+
+> Nota Bug #4: el `updated_properties` del webhook SÍ incluye `notion://tasks/status_property` (URL-encoded). El gate por ID hubiera podido funcionar, pero un gate frágil que dropea status changes reales es peor que no filtrar. La decisión canonical es **forward-all + consumer re-fetch idempotente** (compare-to-last): nunca pierde un cambio, no-op si no cambió; el re-fetch en cambios non-status es negligible en demo (productivo TASK-901 puede agregar un filtro confiable + Cloud Tasks throttling cuando se entienda el formato de id del webhook).
+
+### Lección meta canonical
+
+5 releases (`26bfe120` → `cd047724`) en una sesión. **Sin el smoke E2E con webhook real, los 5 bugs habrían quedado latentes** hasta que un operador o cliente los descubriera con el pipeline silenciosamente roto (webhooks `processed` pero 0 transiciones, 0 RpA). Los 78 tests mockeados pasaban porque mockeaban el shape equivocado. **Regla reforzada**: para features que emiten/consumen artefactos de sistemas externos (webhooks, PDFs, emails), el contrato técnico (tsc + lint + tests mockeados) NO es suficiente — hay que emitir un caso real, capturarlo, y re-auditar contra el artefacto real.
+
+**Implementación**: TASK-914 (`docs/tasks/in-progress/TASK-914-notion-demo-transition-capture-refetch.md`). Helpers: `src/lib/notion-metrics/notion-demo-client.ts` (`fetchDemoPageStatus`), `src/lib/webhooks/handlers/notion-tasks-demo.ts` (`normalizeWebhookEvents`, `extractDemoStatusChangeSignals`), `src/lib/sync/projections/notion-status-transition-capture-demo.ts` (re-fetch + derive). Signal: `notion.metrics.transition_capture_refetch_failed_demo`.
+
+---
+
 ## Delta 2026-05-18 — PoC RpA V2 validado empíricamente contra Demo
 
 Sesión live 2026-05-18: PoC ejecutado contra Demo teamspace + flujo manual del operador validó la regla canonical end-to-end.
