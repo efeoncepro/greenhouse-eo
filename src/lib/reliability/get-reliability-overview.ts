@@ -57,6 +57,7 @@ import {
   getNotionStatusTransitionsCaptureRefetchFailedSignal,
   getNotionStatusTransitionsBqSyncLagSignal
 } from './queries/notion-status-transitions-signals'
+import { getNotionStatusTransitionsReconciliationSignal } from './queries/notion-status-transitions-reconciliation'
 import {
   getNotionMetricsWritebackDeadLetterSignal,
   getNotionMetricsWritebackLagSignal
@@ -1347,7 +1348,8 @@ export const getReliabilityOverview = async (
       : await Promise.all([
           getNotionStatusTransitionsIngestionLagSignal().catch(() => null),
           getNotionStatusTransitionsCaptureRefetchFailedSignal().catch(() => null),
-          getNotionStatusTransitionsBqSyncLagSignal().catch(() => null)
+          getNotionStatusTransitionsBqSyncLagSignal().catch(() => null),
+          getNotionStatusTransitionsReconciliationSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
