@@ -8,6 +8,7 @@ import {
   taskStatusSql
 } from '@/lib/delivery/task-status-canonical'
 import { DONE_STATUSES_SQL } from '@/lib/ico-engine/shared'
+import { buildCycleTimeDaysExpression, buildCycleTimeJoinClause } from '@/lib/ico-engine/cycle-time-formula'
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -112,12 +113,11 @@ const buildTasksEnrichedView = (projectId: string) => `
       END
     ) AS fase_csc,
 
-    -- Derived: Cycle time (days from creation to completion or now)
-    DATE_DIFF(
-      COALESCE(DATE(dt.completed_at), CURRENT_DATE()),
-      COALESCE(DATE(dt.created_at), DATE(dt.synced_at)),
-      DAY
-    ) AS cycle_time_days,
+    -- Derived: Cycle time (days). Gated por CT_DAYS_CANONICAL_FORMULA_ENABLED
+    -- (default OFF = fórmula legacy byte-idéntica; ON = canónica V1 con INICIO
+    -- 'En curso' + descuento Bloqueado leyendo conformed.task_status_transitions).
+    -- TASK-912 Slice 4. El flip ON está gated por shadow mode 7d + arch-architect.
+    ${buildCycleTimeDaysExpression()} AS cycle_time_days,
 
     -- Derived: Hours since last edit
     TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), dt.last_edited_time, HOUR) AS hours_since_update,
@@ -154,7 +154,7 @@ const buildTasksEnrichedView = (projectId: string) => `
   LEFT JOIN \`${projectId}.${CONFORMED_DATASET}.delivery_projects\` dp
     ON dp.project_source_id = dt.project_source_id AND dp.is_deleted = FALSE
   LEFT JOIN \`${projectId}.${ICO_DATASET}.status_phase_config\` spc
-    ON spc.space_id = dt.space_id AND spc.task_status = dt.task_status
+    ON spc.space_id = dt.space_id AND spc.task_status = dt.task_status${buildCycleTimeJoinClause(projectId)}
   WHERE dt.is_deleted = FALSE
     AND (dt.task_status IS NULL OR dt.task_status NOT IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.EXCLUDED)}))
 `
