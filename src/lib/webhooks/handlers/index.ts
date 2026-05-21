@@ -10,6 +10,10 @@ export async function ensureHandlersRegistered() {
   // /api/webhooks/notion-tasks-demo, separate HMAC secret + tabla
   // task_status_transitions_demo separada del productivo).
   await import('./notion-tasks-demo')
+  // TASK-912 — Notion status-transitions webhook handler PRODUCTIVO (Efeonce + Sky,
+  // endpoint /api/webhooks/notion-status-transitions, secret separado, gated por
+  // kill-switch flag NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED default OFF).
+  await import('./notion-status-transitions')
 
   // Future handlers imported here
   registered = true

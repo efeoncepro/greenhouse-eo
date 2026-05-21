@@ -52,6 +52,7 @@ import {
   getNotionMetricsTransitionCaptureRefetchFailedDemoSignal,
   getPayrollBonusDemoContaminationSignal
 } from './queries/notion-metrics-demo-signals'
+import { getNotionStatusTransitionsIngestionLagSignal } from './queries/notion-status-transitions-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
@@ -638,6 +639,13 @@ interface ReliabilityOverviewSources {
    * pre-Fase 1 RpA pilot Efeonce).
    */
   notionMetricsDemo?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-912 — Notion status-transitions productive capture signals (Efeonce/Sky).
+   *   - notion.task_status_transitions.ingestion_lag (lag)
+   * Roll up bajo moduleKey 'delivery'. Pre-activación (flag OFF) reportan steady.
+   */
+  notionStatusTransitions?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -755,7 +763,9 @@ export const buildReliabilityOverview = (
     ...(sources.productionRelease ?? []),
     // TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical).
     // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
-    ...(sources.notionMetricsDemo ?? [])
+    ...(sources.notionMetricsDemo ?? []),
+    // TASK-912 — Notion status-transitions productive capture signals.
+    ...(sources.notionStatusTransitions ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -1309,6 +1319,14 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-912 — Notion status-transitions productive capture signals (Efeonce/Sky).
+  const notionStatusTransitions =
+    preloadedSources.notionStatusTransitions !== undefined
+      ? preloadedSources.notionStatusTransitions
+      : await Promise.all([getNotionStatusTransitionsIngestionLagSignal().catch(() => null)])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -1352,7 +1370,8 @@ export const getReliabilityOverview = async (
     productionRelease,
     icoMaterializerSkippedSafety,
     notionCorrectionTransitionsSourceAvailability,
-    notionMetricsDemo
+    notionMetricsDemo,
+    notionStatusTransitions
   })
 }
 
