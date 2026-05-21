@@ -59,12 +59,32 @@ const NOTION_PROPERTY_RPA_V2 = '[GH] RpA v2'
 const PRODUCTIVE_WORKSPACES = new Set(['efeonce', 'sky'])
 
 /**
- * Gate canonical del writeback productivo. Default OFF — no escribe a Notion
- * hasta TASK-917 Flip A. Patrón `process.env.X === 'true'` (sin drift, sin
- * coersion), mirror de `isNotionStatusTransitionsWebhookEnabled` (TASK-912).
+ * Gate canonical del writeback productivo. Patrón `process.env.X === 'true'`
+ * (sin drift, sin coersion).
+ *
+ * **Per-cliente (TASK-919 #4, stop-gate canonical ICO)**: si se pasa
+ * `workspaceId`, un override explícito por-cliente
+ * `NOTION_RPA_WRITEBACK_ENABLED_<EFEONCE|SKY>` gana sobre el global (permite
+ * habilitar/deshabilitar un cliente independientemente — requerido por el
+ * stop-gate "Efeonce primero" del ADR Strangler). Si el per-cliente NO está
+ * seteado, cae al global `NOTION_RPA_WRITEBACK_ENABLED`. Backward-compat: sin
+ * `workspaceId` o sin per-cliente → comportamiento global idéntico al previo.
  */
-export const isNotionRpaWritebackEnabled = (): boolean =>
-  process.env.NOTION_RPA_WRITEBACK_ENABLED === 'true'
+export const isNotionRpaWritebackEnabled = (workspaceId?: string): boolean => {
+  if (workspaceId) {
+    const perClient = process.env[`NOTION_RPA_WRITEBACK_ENABLED_${workspaceId.toUpperCase()}`]
+
+    if (perClient === 'true') {
+      return true
+    }
+
+    if (perClient === 'false') {
+      return false // override explícito por-cliente gana (apagar un solo cliente)
+    }
+  }
+
+  return process.env.NOTION_RPA_WRITEBACK_ENABLED === 'true'
+}
 
 interface WritebackRequestedPayload {
   schemaVersion?: number
@@ -195,10 +215,11 @@ export const notionRpaWritebackProjection: ProjectionDefinition = {
       return null
     }
 
-    // Defense layer 2: gate flag. Default OFF → skip honest (no escribe a Notion
-    // hasta TASK-917 Flip A). El snapshot persiste con written_to_notion_at=NULL;
-    // cuando el flag se active, el próximo tick (o el nightly safety net) escribe.
-    if (!isNotionRpaWritebackEnabled()) {
+    // Defense layer 2: gate flag per-cliente (TASK-919 #4). El override
+    // NOTION_RPA_WRITEBACK_ENABLED_<workspace> gana sobre el global; permite
+    // apagar un cliente sin tocar al otro. Skip honest cuando OFF — el snapshot
+    // persiste con written_to_notion_at=NULL; al activar, el próximo tick escribe.
+    if (!isNotionRpaWritebackEnabled(typed.workspaceId)) {
       return `rpa_writeback:${snapshotId}:skipped:flag_disabled`
     }
 

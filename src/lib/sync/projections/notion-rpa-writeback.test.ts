@@ -126,6 +126,38 @@ describe('TASK-916 Slice 4 — notion-rpa-writeback productive', () => {
       expect(result).toBe('rpa_writeback:snap-uuid-001:skipped:flag_disabled')
       expect(mocks.patchNotionPage).not.toHaveBeenCalled()
     })
+
+    it('TASK-919 #4 — override por-cliente OFF gana sobre global ON (apaga un cliente)', async () => {
+      process.env.NOTION_RPA_WRITEBACK_ENABLED = 'true' // global ON
+      process.env.NOTION_RPA_WRITEBACK_ENABLED_EFEONCE = 'false' // efeonce OFF
+
+      const result = await notionRpaWritebackProjection.refresh(
+        { entityType: 'rpa_snapshot', entityId: 'snap-uuid-001' },
+        validPayload // workspaceId='efeonce'
+      )
+
+      expect(result).toBe('rpa_writeback:snap-uuid-001:skipped:flag_disabled')
+      expect(mocks.runGreenhousePostgresQuery).not.toHaveBeenCalled()
+      delete process.env.NOTION_RPA_WRITEBACK_ENABLED_EFEONCE
+    })
+
+    it('TASK-919 #4 — override por-cliente ON habilita aunque el global esté OFF', async () => {
+      delete process.env.NOTION_RPA_WRITEBACK_ENABLED // global unset
+      process.env.NOTION_RPA_WRITEBACK_ENABLED_EFEONCE = 'true' // efeonce ON
+      mocks.runGreenhousePostgresQuery
+        .mockResolvedValueOnce([snapshotRow])
+        .mockResolvedValueOnce([])
+      mocks.patchNotionPage.mockResolvedValueOnce({ id: 'efeonce-task-uuid-001' })
+
+      const result = await notionRpaWritebackProjection.refresh(
+        { entityType: 'rpa_snapshot', entityId: 'snap-uuid-001' },
+        validPayload
+      )
+
+      expect(result).toBe('rpa_writeback:snap-uuid-001:written:2')
+      expect(mocks.patchNotionPage).toHaveBeenCalled()
+      delete process.env.NOTION_RPA_WRITEBACK_ENABLED_EFEONCE
+    })
   })
 
   describe('refresh — happy path PATCH success (flag ON)', () => {
