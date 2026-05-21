@@ -20,6 +20,13 @@
 - Legacy ID: `TASK-908 Slices 2/3/4/5/9 deferred → renamed canonical TASK-912 (2026-05-18)`
 - GitHub Issue: `none`
 
+## Delta 2026-05-21 — DESBLOQUEADA (parte) + parent TASK-915 + lecciones TASK-914
+
+- **Suscripción webhook Notion: ✅ YA EXISTE** (confirmado operador 2026-05-21) y es **amplia — cubre TODOS los teamspaces** (incluso fuera de Efeonce/Sky). Implicación de diseño DURA: el handler productivo **DEBE filtrar por data source ID canónico** (Efeonce `5126d7d8-…` [verificar], Sky `23039c2f-…` [verificar]) y **NO procesar** el demo (`36339c2f-…`, tiene su propio endpoint `/notion-tasks-demo`) ni otros teamspaces. Sin el filtro, captura transiciones de teamspaces no deseados.
+- **Aplicar el re-fetch pattern de TASK-914**: el webhook Notion entrega un **evento single** (no `{events:[]}`) + **sin valores** (solo IDs de propiedad). El handler debe usar `normalizeWebhookEvents` + el consumer re-fetchea la página (source of truth) + deriva `from` de la última transición en PG. Reusar los patrones canonizados en `complete/TASK-914-...` (NO repetir los 5 bugs de la cascada demo).
+- **Prerequisito operador-side RESTANTE**: cleanup schema Sky (`Estado 1`→`Estado` + status legacy → canónicos). HMAC signing secret + IAM: aplicar el patrón de TASK-914 (crear secret + grant `secretAccessor` a `greenhouse-portal@` en el mismo paso).
+- **Parent**: TASK-915 (umbrella RpA V2 productive cutover). Esta task es el Frente 1 (captura) del programa de dos flips (Flip A display 01/06, Flip B bono 01/07).
+
 ## Summary
 
 Cerrar el loop end-to-end del ICO Status Transition Capture pipeline shippeado V1.0 Foundation en TASK-908. Hoy la tabla `greenhouse_delivery.task_status_transitions` existe vacía + helpers canonical (`countCorrectionTransitions`, `calculateCycleTime`) retornan `sourceMode='unavailable'` graceful. Esta task agrega: (a) webhook handler `/api/webhooks/notion-status-transitions` con HMAC validation + dedup + outbox emit (Slice 2), (b) reactive consumer `notion-status-transition-capture` que persiste transitions en PG (Slice 3), (c) BQ formula update `cycle_time_days` en `v_tasks_enriched` consumiendo PG transitions sync materializada (Slice 4), (d) nueva métrica `cycle_time_slo_pct` con threshold 14.2 días default + per-task-type calibration forward-compat (Slice 5), (e) backfill histórico opcional desde Notion page history API (Slice 9). Cuando shipea: el helper `countCorrectionTransitions` empieza a retornar `sourceMode='canonical'` + count real → desbloquea TASK-901 Slice 4 (shadow mode RpA prod) + reliability signal `notion.correction_transitions.source_availability` baja monotónicamente de 100% error → < 5% steady state.
