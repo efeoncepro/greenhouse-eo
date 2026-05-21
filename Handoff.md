@@ -1,3 +1,24 @@
+# Sesion 2026-05-21 — TASK-916 RpA V2 productive compute + writeback siblings (COMPLETE, develop)
+
+**Status**: ✅ COMPLETE V1.0 SHIPPED en `develop` (writeback flag OFF). Aditivo — V1 legacy intacto, cero escrituras a Notion productivo. Sin push a `main` (eso es release canonical → TASK-917 Flip A).
+
+**Qué se construyó** (clonado mecánico de los siblings demo TASK-913/914 repointeado a producción; validado contra skills ICO/arquitectura/Notion + smoke PG real):
+
+- Migration `20260521182825984` — `greenhouse_delivery.task_rpa_snapshots` (sibling de `task_rpa_demo_snapshots`, `CHECK workspace_id IN ('efeonce','sky')` sin DEFAULT, append-only triggers con excepción writeback, UNIQUE parcial source_event_id, anti pre-up-marker guard). Tipos regenerados.
+- Evento `notion.task.metrics_writeback_requested` v1 (event-catalog) + helper `patchNotionPage` en `notion-client.ts`.
+- `notionRpaComputeProjection` (`notion-rpa-compute.ts`) — trigger `notion.task.status_transitioned` (captura TASK-912) → `calculateRpaV2` → snapshot → chain event.
+- `notionRpaWritebackProjection` (`notion-rpa-writeback.ts`) — PATCH `[GH] RpA v2`, **gated `NOTION_RPA_WRITEBACK_ENABLED` default OFF** (skip honest `flag_disabled`), maxRetries=4, re-read PG defensive.
+- 2 signals (`notion.metrics.writeback_dead_letter` + `writeback_lag`) wired en `get-reliability-overview` (source `notionMetricsRpa`, subsystem `delivery`).
+- Ambas projections registradas. 44 tests focales + full suite 5197 passed + tsc 0 + lint 0 errors + build ✓.
+
+**Verificación**: smoke PG real — `task_rpa_snapshots` queryable (0 rows), signals dead_letter=0/lag=0, CHECK rechaza `workspace='demo'`.
+
+**Decisión pre-execution (Open Question)**: la propiedad Notion `[GH] RpA v2` NO existe en Efeonce ni Sky (verificado vía data_sources API — solo `RpA` legacy + `Semáforo RpA`). Se difirió su creación a **TASK-917 Flip A** porque el writeback está OFF (no la necesita) y crear una propiedad vacía visible en el workspace del cliente Sky semanas antes del flip es ruido innecesario.
+
+**Próximo paso (TASK-917 Flip A)**: crear `[GH] RpA v2` read-only en Efeonce/Sky + activar `NOTION_RPA_WRITEBACK_ENABLED` bajo los 8 stop-gates ADR Strangler + ~3-4 semanas de captura acumulada (TASK-912) + materializar `rpa_avg_v2` + paridad shadow vs legacy + flip bono.
+
+---
+
 # Sesion 2026-05-21 — Sentry ops-worker hardening: Notion token + Nubox timeout
 
 **Status**: 🟡 FIX IMPLEMENTADO LOCALMENTE, pendiente de release canonical/approval para desplegar. No se hizo `git push`, workflow dispatch ni Cloud Run deploy porque `greenhouse-production-release` exige aprobacion explícita para mutaciones externas de producción.

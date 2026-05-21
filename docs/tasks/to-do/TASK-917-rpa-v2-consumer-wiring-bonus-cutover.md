@@ -1,5 +1,16 @@
 # TASK-917 — RpA V2 consumer wiring + bonus flag + two-flip cutover
 
+## Delta 2026-05-21 — TASK-916 SHIPPED (compute/writeback siblings prod): blocker resuelto + 2 precondiciones de Flip A heredadas
+
+TASK-916 está COMPLETE V1.0 en `develop` (writeback flag OFF). El compute prod (`notionRpaComputeProjection`) persiste snapshots en `task_rpa_snapshots`; el writeback prod (`notionRpaWritebackProjection`) hace PATCH a `[GH] RpA v2` **gated por `NOTION_RPA_WRITEBACK_ENABLED` (default OFF)**. Por lo tanto el blocker "compute/writeback prod" queda resuelto — TASK-917 ya puede wirear consumers + ejecutar el cutover.
+
+**Dos precondiciones de Flip A que TASK-916 dejó explícitas (NO las hizo, son de este task)**:
+
+1. **Crear la propiedad `[GH] RpA v2` en Efeonce + Sky** (read-only para operadores). Verificado 2026-05-21 vía Notion `data_sources` API: NO existe en ninguno de los dos (solo `RpA` legacy + `Semáforo RpA`). El writeback fallaría con error Notion si se activa sin crearla. Crearla justo antes del Flip A (no antes — evita propiedad vacía visible en el workspace del cliente Sky por semanas).
+2. **Activar `NOTION_RPA_WRITEBACK_ENABLED=true`** en el ops-worker (Vercel/Cloud Run env) bajo los 8 stop-gates ADR Strangler + ~3-4 semanas de captura acumulada vía TASK-912.
+
+El signal `shadow_paridad_rpa` (V2 vs legacy) se materializa en este task (TASK-917) — `task_rpa_snapshots` ya tiene el índice `paridad` listo. Spec TASK-916: `complete/TASK-916-rpa-v2-productive-compute-writeback.md`.
+
 <!-- ZONE 0 -->
 
 ## Status

@@ -4,12 +4,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Implementacion`
+- Status real: `Complete (2026-05-21, develop) — writeback gated OFF, property + activación → TASK-917 Flip A`
 - Domain: `delivery|ico|integrations|reliability`
 - Blocked by: `TASK-912 captura SHIPPED (Slices 1-2, flag OFF) — desbloqueado para clonar siblings prod (writeback gated default OFF hasta TASK-917 Flip A)`
 - Branch: `develop` (sesión 2026-05-21 — implementación directa en develop por instrucción del operador, sin branch dedicado)
@@ -137,12 +137,29 @@ notionTaskMetricsWritebackRequested: 'notion.task.metrics_writeback_requested',
 
 ## Acceptance Criteria
 
-- [ ] `task_rpa_snapshots` creada + tipos regenerados.
-- [ ] Compute projection persiste snapshot desde `task_status_transitions` (Efeonce/Sky).
-- [ ] Writeback projection (gated) escribe `[GH] RpA v2` cuando `NOTION_RPA_WRITEBACK_ENABLED=true`.
-- [ ] Signals prod wired + steady=0 esperado.
-- [ ] Tests verde (mirror demo) + tsc + lint.
+- [x] `task_rpa_snapshots` creada + tipos regenerados (migration `20260521182825984`, CHECK `workspace_id IN ('efeonce','sky')`, append-only triggers, smoke PG: CHECK rechaza `demo`).
+- [x] Compute projection persiste snapshot desde `task_status_transitions` (Efeonce/Sky) — `notion-rpa-compute.ts`, trigger `notion.task.status_transitioned`, filter dual `demo_mode !== true` + workspace prod.
+- [x] Writeback projection (gated) escribe `[GH] RpA v2` cuando `NOTION_RPA_WRITEBACK_ENABLED=true` — `notion-rpa-writeback.ts`, default OFF (skip honest `flag_disabled`), maxRetries=4, re-read PG defensive.
+- [x] Signals prod wired + steady=0 (smoke PG: dead_letter=0, lag=0) — `notion-metrics-rpa-signals.ts` + wire en `get-reliability-overview` (source `notionMetricsRpa`).
+- [x] Tests verde (44 focal compute+writeback) + tsc 0 + lint 0 errors + `pnpm build` ✓ + full suite 5197 passed.
+
+## Delta 2026-05-21 — SHIPPED V1.0 (develop, writeback flag OFF)
+
+Clonado mecánico de los siblings demo (TASK-913/914) repointeado a producción, verificado contra los 3 skills (ICO/arquitectura/Notion) + smoke PG real:
+
+- **Migration** `20260521182825984_task-916-rpa-v2-snapshots.sql` — `greenhouse_delivery.task_rpa_snapshots` (sibling de `task_rpa_demo_snapshots`, `CHECK workspace_id IN ('efeonce','sky')` sin DEFAULT, append-only triggers con excepción writeback, UNIQUE parcial source_event_id, anti pre-up-marker guard). Tipos regenerados.
+- **Evento** `notion.task.metrics_writeback_requested` v1 (event-catalog, sin `.demo`) + helper `patchNotionPage(pageId, properties)` en `notion-client.ts` (mirror de `patchNotionDemoPage`, vía `notionRequest`/`NOTION_TOKEN`/`2022-06-28`).
+- **Compute** `notionRpaComputeProjection` (`notion-rpa-compute.ts`) — trigger `notion.task.status_transitioned` (captura TASK-912), `calculateRpaV2` (lee `task_status_transitions`) → snapshot → chain event cuando `valid`. Filter dual `demo_mode !== true` + `workspaceId IN ('efeonce','sky')`.
+- **Writeback** `notionRpaWritebackProjection` (`notion-rpa-writeback.ts`) — trigger del chain event → re-read PG → PATCH `[GH] RpA v2` → mark written. **Gated `NOTION_RPA_WRITEBACK_ENABLED` (default OFF → skip honest)**. maxRetries=4.
+- **Signals** `notion.metrics.writeback_dead_letter` + `notion.metrics.writeback_lag` (`notion-metrics-rpa-signals.ts`) wired en `get-reliability-overview` (source `notionMetricsRpa`, subsystem `delivery`). Steady=0 verificado.
+- **Tests** 44 focales (compute 20 + writeback 24) + full suite verde.
+
+**Open Question resuelta**: la propiedad `[GH] RpA v2` NO existe en Efeonce ni Sky (verificado vía Notion `data_sources` API — solo `RpA` legacy + `Semáforo RpA`). **Decisión: NO crearla en este task**. El writeback está gated OFF; la propiedad no es necesaria para los acceptance criteria. Crearla ahora pondría una propiedad vacía visible en el workspace del cliente (Sky) semanas antes del flip. Se difiere a **TASK-917 Flip A** como precondición explícita (crear `[GH] RpA v2` read-only para operadores + activar flag bajo los 8 stop-gates ADR Strangler + ~3-4 semanas de captura acumulada vía TASK-912).
+
+**No-interferencia**: aditivo puro. V1 legacy (formula Notion `RpA` + `metrics_by_member.rpa_avg` + bonus path productivo) intacto. Writeback OFF → cero escrituras a Notion productivo. Echo-loop descartado: el writeback escribe un number, no el status → la captura prod re-fetchea STATUS → noop → no recompute.
+
+**Pendiente TASK-917 Flip A**: crear propiedad `[GH] RpA v2` en Efeonce/Sky + activar `NOTION_RPA_WRITEBACK_ENABLED` + materializar `rpa_avg_v2` + paridad shadow vs legacy + flip bono.
 
 ## Verification
 
-`pnpm test` (focal + projections) + `pnpm build` + smoke con una tarea real Efeonce (flag on en staging).
+`pnpm test` (full 5197 passed) + `pnpm build` (✓ compiled) + `pnpm lint` (0 errors) + `pnpm tsc --noEmit` (0) + smoke PG real (tabla queryable 0 rows, signals dead_letter/lag = 0, CHECK rechaza `workspace='demo'`). Smoke con tarea real Efeonce + flag ON queda para TASK-917 Flip A staging.

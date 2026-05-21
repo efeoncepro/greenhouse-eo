@@ -4485,6 +4485,51 @@ Notion webhook (suscripción ÚNICA y AMPLIA, todos los teamspaces)
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-912-ico-status-transition-webhook-ingestion-and-bq-formula.md`. Pattern fuente: demo siblings TASK-910/913/914.
 
+### RpA V2 productive compute + writeback invariants (TASK-916, desde 2026-05-21)
+
+Siblings PRODUCTIVOS (Efeonce + Sky) del pipeline RpA V2 demo (TASK-913/914). Clonado mecánico + repointeo, NO rediseño. Carril paralelo invisible al productive durante la migración Strangler (ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`). **Aditivo + writeback flag OFF por default → cero impacto en métricas/Notion productivo al merge.**
+
+**Pipeline canónico** (sibling físicamente separado del demo):
+
+```text
+Notion edit status (Efeonce/Sky) → captura prod TASK-912 (notion-status-transition-capture)
+  → emite notion.task.status_transitioned (con from/to, workspaceId resuelto autoritativo)
+    → notionRpaComputeProjection (reactivo): calculateRpaV2 sobre task_status_transitions
+      → persiste snapshot en task_rpa_snapshots (CHECK workspace_id IN ('efeonce','sky'))
+      → emite chain event notion.task.metrics_writeback_requested cuando rpaDataStatus='valid'
+        → notionRpaWritebackProjection (reactivo, GATED NOTION_RPA_WRITEBACK_ENABLED default OFF):
+          re-read PG defensive → PATCH [GH] RpA v2 vía patchNotionPage/NOTION_TOKEN → mark written
+```
+
+**Diseño simétrico sibling-pattern** (mismo invariante que TASK-913): cada pieza prod es 1:1 mappable a su sibling demo — la lógica difícil ya está peleada. Diferencias: tabla `task_rpa_snapshots` (no `_demo`), evento sin `.demo`, property `[GH] RpA v2` (coexiste con legacy `RpA`), token `NOTION_TOKEN` (no el demo separado), gate `NOTION_RPA_WRITEBACK_ENABLED`.
+
+**Helpers/archivos canónicos**:
+
+- `src/lib/notion-metrics/calculate-rpa-v2.ts` (reusado tal cual — ya lee `task_status_transitions`, NO variante prod).
+- `src/lib/space-notion/notion-client.ts` → `patchNotionPage(pageId, properties)` (mirror de `patchNotionDemoPage`, vía `notionRequest`/`NOTION_TOKEN`/`2022-06-28`).
+- `src/lib/sync/projections/notion-rpa-compute.ts` + `notion-rpa-writeback.ts`.
+- `src/lib/reliability/queries/notion-metrics-rpa-signals.ts` (`notion.metrics.writeback_dead_letter` + `notion.metrics.writeback_lag`, subsystem `delivery`, steady=0).
+- Migration `20260521182825984_task-916-rpa-v2-snapshots.sql`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** hacer drift entre las firmas de los siblings prod (`notion-rpa-compute`, `notion-rpa-writeback`) y los demo. Si cambia uno, reflejar en el otro. NO mezclar la lógica prod/demo en el mismo módulo (`if (isDemo) {...}` prohibido — siblings físicamente separados es el patrón canónico).
+- **NUNCA** invocar `calculateRpaV2Demo` desde el compute prod ni `calculateRpaV2` desde el demo. Mismo para tablas: prod escribe `task_rpa_snapshots`, demo `task_rpa_demo_snapshots`. CHECK constraints PG-side enforce.
+- **NUNCA** quitar el gate `NOTION_RPA_WRITEBACK_ENABLED` ni cambiar su default OFF. Es lo que garantiza cero escrituras a Notion productivo hasta TASK-917 Flip A.
+- **NUNCA** confiar el `rpaValue` del payload del chain event en el writeback. SIEMPRE re-read del snapshot por `snapshotId` desde `task_rpa_snapshots` (defensive re-read, pattern TASK-771).
+- **NUNCA** filtrar el compute prod solo por workspace sin chequear `demo_mode !== true` (anti-coersion strict), ni viceversa. Defense in depth dual.
+- **NUNCA** crear formula property nueva en Notion para RpA — boundary canónico (Notion = OS, Greenhouse = motor). El productivo escribe `[GH] RpA v2` read-only para operadores; coexiste con `RpA` legacy (NO se toca durante la migración Strangler).
+- **NUNCA** invocar `Sentry.captureException` directo. Usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'rpa_compute' | 'rpa_writeback' } })`.
+- **NUNCA** activar `NOTION_RPA_WRITEBACK_ENABLED=true` sin: (a) crear la propiedad `[GH] RpA v2` en Efeonce/Sky (NO existe aún — verificado 2026-05-21), (b) los 8 stop-gates del ADR Strangler, (c) ~3-4 semanas de captura acumulada vía TASK-912. Eso es TASK-917 Flip A.
+- **SIEMPRE** que el compute persista snapshot pero el chain event emit falle, NON-blocking: el snapshot persistido es source of truth; el signal `writeback_lag` detecta el pending overdue.
+- **SIEMPRE** que emerja una métrica V2 nueva (OTD, FTR, etc.) con writeback productivo, replicar este patrón sibling (compute + writeback + snapshot table + 2 signals + chain event), NO improvisar.
+
+**Echo-loop**: el writeback escribe un number (`[GH] RpA v2`), NO el status. El webhook que dispara → captura prod re-fetchea STATUS → unchanged → noop → no `status_transitioned` → no recompute. Sin loop.
+
+**Estado**: V1.0 SHIPPED en `develop` 2026-05-21 (writeback flag OFF). Migration aplicada + tipos regenerados. 44 tests focales + full suite 5197 passed + tsc 0 + lint 0 + build ✓. Smoke PG real: tabla queryable 0 rows, signals dead_letter/lag = 0, CHECK rechaza `workspace='demo'`. Activación → TASK-917 Flip A.
+
+**Spec canónica**: `docs/tasks/complete/TASK-916-rpa-v2-productive-compute-writeback.md`. Pattern fuente: demo siblings TASK-913/914.
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa
