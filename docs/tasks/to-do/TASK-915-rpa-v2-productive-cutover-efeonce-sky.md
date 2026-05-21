@@ -53,7 +53,7 @@ Hoy RpA en producción corre por la **fórmula legacy de Notion** (`Correcciones
 
 ## Scope (frentes → tasks hijas)
 
-1. **TASK-912 — Captura productiva** (desbloqueada): webhook handler productivo → `task_status_transitions`. **Filtro canónico por data source ID** (Efeonce `5126d7d8-…` [verificar], Sky `23039c2f-…` [verificar]) porque la suscripción Notion cubre TODOS los teamspaces — NO doble-procesar el demo (`36339c2f-…`, tiene su propio endpoint) ni otros teamspaces. Re-fetch pattern (igual que demo TASK-914). Prerequisito operador-side restante: **cleanup schema Sky** (`Estado 1`→`Estado`, status legacy → canónicos).
+1. **TASK-912 — Captura productiva** (desbloqueada): webhook handler productivo → `task_status_transitions`. **Filtro canónico por data source ID** (Efeonce `5126d7d8-bf3f-454c-80f4-be31d1ca38d4`, Sky `23039c2f-efe7-81f8-af2d-000b67594d18` — confirmados vía Notion fetch 2026-05-21) porque la suscripción Notion cubre TODOS los teamspaces — NO doble-procesar el demo (`36339c2f-…`, tiene su propio endpoint) ni otros teamspaces. Re-fetch pattern (igual que demo TASK-914). El status property se llama `Estado` en ambos y las 11 opciones ya son canónicas → el cleanup operador-side Sky está mayormente hecho (solo la descripción del campo Sky quedó con texto legacy stale, cosmético). Ver inventario completo en TASK-912 §"Inventario de schemas Notion".
 2. **TASK-916 — Compute + writeback productivos**: siblings de `notion-rpa-compute-demo` + `notion-rpa-writeback-demo`. Tabla `task_rpa_snapshots` productiva. Writeback a propiedad `[GH] RpA v2` (read-only operadores, coexiste con fórmula legacy `RpA`). Flag `NOTION_RPA_WRITEBACK_ENABLED`.
 3. **TASK-917 — Wiring consumers + flag bonus + ejecución cutover**: poblar `metrics_by_member.rpa_avg_v2` desde V2; repoint las 6 UI + trends a V2 (Flip A); flag `BONUS_USE_RPA_V2` en `calculateRpaBonus` (Flip B); ejecución de los dos flips con sus gates.
 
@@ -89,7 +89,7 @@ Hoy RpA en producción corre por la **fórmula legacy de Notion** (`Correcciones
 | V2 difiere de V1 y se paga bono malo | payroll | Media | Flip B gated por paridad + HR sign-off; Flip A no toca bono | `shadow_paridad_rpa` |
 | **V2 con datos INCOMPLETOS infla el bono** (tareas con correcciones pre-captura → V2 subcuenta → rpa_avg bajo → bono alto) | payroll | **Alta sin backfill** | **Backfill histórico (Notion page history, TASK-908 Slice 9) es prerequisito DURO del Flip B**; el bono usa AVG sobre TODAS las tareas del período → V2 necesita historial completo per-tarea | `shadow_paridad_rpa` (diff sistemático = datos incompletos) |
 | Captura procesa teamspaces no deseados (suscripción amplia) | delivery | Media | Filtro por data source ID canónico en handler prod (TASK-912) | `transition_capture_*` |
-| Schema Sky sin limpiar → status no normaliza | delivery | Media | Cleanup Sky pre-Flip A (operador) + `normalizeTaskStatus` aliases | `demo_teamspace_drift` análogo prod |
+| Schema Sky sin limpiar → status no normaliza | delivery | Baja | Status Sky ya canónico (`Estado` + 11 opciones V1, verificado 2026-05-21) + `normalizeTaskStatus` aliases como red de seguridad | `demo_teamspace_drift` análogo prod |
 | Cutover ambos clientes a la vez en bono | payroll | Alta si simultáneo | Efeonce primero, Sky después | reclamos HR |
 
 ### Rollback plan
@@ -99,9 +99,9 @@ Hoy RpA en producción corre por la **fórmula legacy de Notion** (`Correcciones
 
 ### Out-of-band coordination required
 
-- **Operador**: cleanup schema Sky (`Estado 1`→`Estado`) antes de Flip A.
+- **Operador**: status Sky ya canónico (`Estado` + 11 opciones V1, verificado 2026-05-21) — solo queda actualizar la descripción stale del campo (cosmético, no bloquea Flip A).
 - **HR/Finance**: sign-off escrito antes de Flip B (bono).
-- Confirmar `[GH] RpA v2` existe (read-only) en las Tareas DB de Efeonce y Sky.
+- **Operador**: crear propiedad `[GH] RpA v2` (read-only para operadores) en las Tareas DB de Efeonce y Sky antes del writeback de Flip A.
 
 <!-- ZONE 4 — ACCEPTANCE -->
 
