@@ -56,12 +56,12 @@ const buildErrorSignal = (err: unknown, observedAt: string): ReliabilitySignal =
   evidence: [{ kind: 'metric', label: 'error', value: err instanceof Error ? err.message : String(err) }]
 })
 
-interface DriftCandidateRow {
+type DriftCandidateRow = {
   task_source_id: string
   workspace_id: string
   current_status: string | null
   last_recorded: string
-}
+} & Record<string, unknown>
 
 export const getNotionStatusTransitionsReconciliationSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()

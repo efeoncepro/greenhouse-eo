@@ -40,11 +40,26 @@ Tras activar Flip A (writeback prod), el demo live expuso que la captura es un *
 
 ## Acceptance Criteria
 
-- [ ] `page.created` capturado → baseline correcto (prod + demo) + tests.
-- [ ] Flag por-cliente funcional + backward-compat global + tests.
-- [ ] Signal `recorded_vs_current_drift` wired + steady esperado + repair primitive idempotente + tests.
-- [ ] `pnpm test` (focal + full) + tsc 0 + lint 0 + build ✓.
+- [x] **#4 Flag por-cliente** funcional + backward-compat global + tests (23 verde).
+- [x] **#3 Signal `recorded_vs_current_drift`** wired (subsystem delivery) + steady≈0 + tests (7 verde). Gated en `source_updated_at > transitioned_at`.
+- [ ] `pnpm test` (full) + tsc 0 + lint 0 + build ✓.
 - [ ] Deploy ops-worker verde + signals steady.
+
+## Delta 2026-05-21 — shipped #3 (detección) + #4; #2 + auto-repair + #5 diferidos (con rationale)
+
+**Shipped V1.0 en `develop`**:
+
+- **#4 Flag por-cliente**: override `NOTION_RPA_WRITEBACK_ENABLED_<EFEONCE|SKY>` gana sobre el global. Cumple stop-gate canónico ICO. Backward-compat total.
+- **#3 Reconciliación DETECCIÓN**: signal `notion.task_status_transitions.recorded_vs_current_drift`. Compara último `to_status` registrado vs `tasks.task_status` (synced), gated en `source_updated_at > transitioned_at` (evita falso-positivo del sync stale 24h). CERO llamadas a Notion. Convierte el modo de falla silencioso (captura perdiendo transiciones) en observable.
+
+**Diferido con rationale (signal-then-command canónico, patrón TASK-877/891)**:
+
+- **#3 Auto-repair (fase 2)**: el comando que registra la transición faltante + recomputa RpA toca el write-path de RpA → no se apura. Diseño claro: para tareas drifteadas, INSERT transición (`source_quality='reconciled'`) + emit `notion.task.status_transitioned` → compute/writeback existentes recalculan. Próxima slice.
+- **#2 Baseline `page.created`**: la suscripción es amplia y el payload de `page.created` no trae `data_source_id` → forward-ear todas las creaciones re-fetchearía CADA página nueva del workspace (mayoría no-Tareas) = desperdicio de rate-limit por un edge raro. Bajo ROI vs costo. Diferido.
+- **#1 Lane 60s / de-coalescing**: superseded por #3. No se toca el dispatcher compartido.
+- **#5 Cloud Tasks**: diferido; el signal `writeback_lag` (TASK-916) cubre la detección a 10x.
+
+**Robustez resultante**: el pipeline ya era robusto para uso real (correcciones lentas). Esta task agrega kill-switch por-cliente (safety) + detección del residual de muestreo (observabilidad). Auto-repair + #2 quedan trackeadas.
 
 ## Rollback
 
