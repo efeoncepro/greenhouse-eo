@@ -186,3 +186,66 @@ export const getNotionStatusTransitionsCaptureRefetchFailedSignal = async (): Pr
     )
   }
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// notion.task_status_transitions.bq_sync_lag
+// ════════════════════════════════════════════════════════════════════════════
+
+export const NOTION_STATUS_TRANSITIONS_BQ_SYNC_LAG_SIGNAL_ID =
+  'notion.task_status_transitions.bq_sync_lag'
+
+const BQ_SYNC_HANDLER = 'notion_transition_bq_sync:notion.task.status_transitioned'
+
+/**
+ * TASK-912 Slice 3 — Detecta lag/fallas del MERGE PG → BQ de transiciones. Si el
+ * MERGE BQ falla persistente (BQ down, schema drift, permisos) cae a dead-letter
+ * → la transición NUNCA llega a `greenhouse_conformed.task_status_transitions` →
+ * la fórmula canónica `cycle_time_days` (Slice 4) lee data incompleta. Steady=0.
+ */
+export const getNotionStatusTransitionsBqSyncLagSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = new Date().toISOString()
+
+  try {
+    const rows = await query<{ n: string }>(
+      `SELECT COUNT(*)::text AS n
+       FROM greenhouse_sync.outbox_reactive_log
+       WHERE handler = $1
+         AND result = 'dead-letter'
+         AND acknowledged_at IS NULL
+         AND recovered_at IS NULL`,
+      [BQ_SYNC_HANDLER]
+    )
+
+    const count = Number(rows[0]?.n ?? 0)
+
+    return {
+      signalId: NOTION_STATUS_TRANSITIONS_BQ_SYNC_LAG_SIGNAL_ID,
+      moduleKey: MODULE_KEY,
+      kind: 'lag',
+      source: 'getNotionStatusTransitionsBqSyncLagSignal',
+      label: 'Sync transiciones PG→BQ (Efeonce/Sky)',
+      severity: count === 0 ? 'ok' : 'error',
+      summary:
+        count === 0
+          ? 'Steady state — zero MERGE PG→BQ en dead-letter. Conformed task_status_transitions al día.'
+          : `${count} sync PG→BQ en dead-letter. Revisar acceso BigQuery + schema greenhouse_conformed.task_status_transitions.`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'dead_letter_count', value: String(count) },
+        { kind: 'metric', label: 'handler', value: BQ_SYNC_HANDLER }
+      ]
+    }
+  } catch (err) {
+    captureWithDomain(err, 'integrations.notion', {
+      tags: { source: 'reliability_signal_notion_status_transitions_bq_sync_lag' }
+    })
+
+    return buildErrorSignal(
+      NOTION_STATUS_TRANSITIONS_BQ_SYNC_LAG_SIGNAL_ID,
+      'Sync transiciones PG→BQ (Efeonce/Sky)',
+      'lag',
+      err,
+      observedAt
+    )
+  }
+}

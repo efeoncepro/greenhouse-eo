@@ -54,7 +54,8 @@ import {
 } from './queries/notion-metrics-demo-signals'
 import {
   getNotionStatusTransitionsIngestionLagSignal,
-  getNotionStatusTransitionsCaptureRefetchFailedSignal
+  getNotionStatusTransitionsCaptureRefetchFailedSignal,
+  getNotionStatusTransitionsBqSyncLagSignal
 } from './queries/notion-status-transitions-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
@@ -647,6 +648,7 @@ interface ReliabilityOverviewSources {
    * TASK-912 — Notion status-transitions productive capture signals (Efeonce/Sky).
    *   - notion.task_status_transitions.ingestion_lag (lag)
    *   - notion.task_status_transitions.refetch_failed (dead_letter)
+   *   - notion.task_status_transitions.bq_sync_lag (lag, TASK-912 Slice 3)
    * Roll up bajo moduleKey 'delivery'. Pre-activación (flag OFF) reportan steady.
    */
   notionStatusTransitions?: ReliabilitySignal[] | null
@@ -1329,7 +1331,8 @@ export const getReliabilityOverview = async (
       ? preloadedSources.notionStatusTransitions
       : await Promise.all([
           getNotionStatusTransitionsIngestionLagSignal().catch(() => null),
-          getNotionStatusTransitionsCaptureRefetchFailedSignal().catch(() => null)
+          getNotionStatusTransitionsCaptureRefetchFailedSignal().catch(() => null),
+          getNotionStatusTransitionsBqSyncLagSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
