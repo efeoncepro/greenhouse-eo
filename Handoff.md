@@ -1,3 +1,20 @@
+# Sesion 2026-05-20 (cont.) — TASK-914: captura Notion vía re-fetch + RpA V2 demo verificado E2E
+
+**Status**: ✅ TASK-914 COMPLETE. El pipeline RpA V2 demo funciona end-to-end con webhooks reales de Notion: captura → compute → writeback. **`RpA=2` verificado live en Notion demo** (`01:10Z`).
+
+**Qué se construyó**: el motor de **cálculo de RpA** (`countCorrectionTransitions` + `calculateRpaV2Demo`) + la **capa de captura** canonical (webhook=trigger, consumer re-fetchea la página como source of truth + deriva `from` de PG). El bug #3 de TASK-913 (handler incompatible con payload real Notion) está cerrado.
+
+**5 bugs en cascada** detectados por el smoke E2E con artefacto real (releases `26bfe120`→`cd047724`): HMAC resolveSecret, IAM secret, payload sin previous/current (re-fetch pattern), gate por property ID (forward-all), envelope evento single (normalizeWebhookEvents). Detalle: ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` Delta 2026-05-20.
+
+**ALCANCE — leer con cuidado**:
+- Esto corre en el **carril DEMO** (teamspace Demo Greenhouse), NO en producción para Efeonce/Sky. El demo es el campo de pruebas del Strangler.
+- Es **RpA, la PRIMERA de las 14 métricas ICO** en tener motor de cómputo + pipeline writeback. Las otras 13 (OTD, FTR, Cycle Time, Throughput, etc.) siguen en spec/legacy.
+- El **cutover a productivo** (Efeonce/Sky usando RpA V2, reemplazando la fórmula Notion) está gated por los **8 stop-gates** del Strangler (demo verde 4 semanas + shadow mode + HR/Finance sign-off). NO es flip inmediato — son 12-14 meses de rollout progresivo per ADR.
+
+**Docs canonizados**: arch (Strangler Delta) + documentation funcional (`delivery/captura-transiciones-notion-rpa-demo.md`) + manual (`operations/pipeline-rpa-v2-demo.md`) + ICO skill (`bug-class-catalog.md` BUG-CLASS-002). Commits docs: `fcd231e1` + cierre TASK-914.
+
+---
+
 # Sesion 2026-05-20 — RpA V2 demo pipeline ACTIVADO live + property renombrada `RpA` + 2 releases develop→main
 
 **Status**: ✅ Pipeline RpA V2 demo activado en producción. Cierre operador-side de TASK-913 + 2 releases canonical. El smoke E2E real reveló 2 bugs que se arreglaron en el release #2.
