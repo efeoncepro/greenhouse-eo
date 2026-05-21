@@ -167,7 +167,7 @@ SELECT COUNT(*) FROM greenhouse_delivery.task_rpa_demo_snapshots WHERE workspace
 
 ## Cross-refs canonical
 
-- **Spec TASK-913**: `docs/tasks/in-progress/TASK-913-rpa-v2-demo-pipeline-end-to-end.md`
+- **Spec TASK-913**: `docs/tasks/complete/TASK-913-rpa-v2-demo-pipeline-end-to-end.md`
 - **ADR Strangler**: `docs/architecture/GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`
 - **TASK-910 demo teamspace foundation**: `docs/tasks/complete/TASK-910-notion-demo-teamspace-migration-sandbox.md`
 - **TASK-910 governance doc**: `docs/operations/notion-demo-teamspace-governance.md`

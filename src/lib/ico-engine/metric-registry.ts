@@ -112,6 +112,8 @@ import {
   allVariantsForGroup,
   taskStatusGroupSql
 } from '@/lib/delivery/task-status-canonical'
+import { getSLOThreshold } from '@/lib/notion-metrics/cycle-time-slo-config'
+import { isCtSloPctMetricEnabled } from '@/lib/ico-engine/cycle-time-flags'
 
 const buildTaskStatusToCsc = (): Record<string, CscPhase> => {
   const map: Record<string, CscPhase> = {}
@@ -215,7 +217,7 @@ export const STUCK_THRESHOLD_HOURS = 72
 
 // ─── Metric Registry ────────────────────────────────────────────────────────
 
-export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
+const BASE_ICO_METRIC_REGISTRY: MetricDefinition[] = [
   {
     id: 'rpa',
     code: 'rpa',
@@ -533,6 +535,56 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     }
   }
 ]
+
+/**
+ * TASK-912 Slice 5 — `cycle_time_slo_pct`: % de tareas completadas con
+ * `cycle_time_days <= threshold SLO` (default 14.2 días, Engine §A.5.5,
+ * calibrable per tipo de pieza V2 vía `getSLOThreshold`).
+ *
+ * Gated por `CT_SLO_PCT_METRIC_ENABLED` (default OFF). Cuando OFF NO se incluye
+ * en `ICO_METRIC_REGISTRY` → inerte (sin UI, sin compute, sin persist). Cuando
+ * ON aparece. El threshold se interpola al build del registry (uniforme V1).
+ */
+export const CYCLE_TIME_SLO_PCT_METRIC: MetricDefinition = {
+  id: 'cycle_time_slo_pct',
+  code: 'cycle_time_slo_pct',
+  label: '% dentro de SLO de ciclo',
+  shortName: 'CT SLO%',
+  description:
+    'Porcentaje de tareas completadas del período con cycle_time_days dentro del SLO de industria (default 14.2 días).',
+  unit: '%',
+  granularities: ['monthly', 'weekly'],
+  formula: {
+    kind: 'percentage',
+    numeratorCondition: `(${CANONICAL_COMPLETED_TASK_SQL} AND cycle_time_days IS NOT NULL AND cycle_time_days <= ${getSLOThreshold()})`,
+    denominatorCondition: CANONICAL_COMPLETED_TASK_SQL
+  },
+  thresholds: {
+    optimal: { min: 89, max: 100 },
+    attention: { min: 75, max: 89 },
+    critical: { min: 0, max: 75 }
+  },
+  higherIsBetter: true,
+  icon: 'tabler-gauge',
+  color: 'success',
+  benchmark: {
+    type: 'external',
+    label: 'Benchmark industria LATAM',
+    source: 'Greenhouse_ICO_Engine_v1.md §A.5.5'
+  },
+  trust: {
+    sampleBasis: 'completed_tasks',
+    healthyMinSampleSize: 10
+  }
+}
+
+/**
+ * Registry canónico. Incluye `cycle_time_slo_pct` solo cuando
+ * `CT_SLO_PCT_METRIC_ENABLED` (default OFF → registry idéntico al pre-TASK-912).
+ */
+export const ICO_METRIC_REGISTRY: MetricDefinition[] = isCtSloPctMetricEnabled()
+  ? [...BASE_ICO_METRIC_REGISTRY, CYCLE_TIME_SLO_PCT_METRIC]
+  : BASE_ICO_METRIC_REGISTRY
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

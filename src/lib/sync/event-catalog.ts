@@ -835,7 +835,32 @@ export const EVENT_TYPES = {
   //
   // Reemplaza el uso de notion.task.status_transitioned como entrada del capture
   // demo (ese contrato exigía from/to que Notion no provee — bug TASK-913).
-  notionTaskPageChangeSignalDemo: 'notion.task.page_change_signal.demo'
+  notionTaskPageChangeSignalDemo: 'notion.task.page_change_signal.demo',
+
+  // TASK-912 — Notion PRODUCTIVO page-change TRIGGER (re-fetch pattern, sibling
+  // del demo `notion.task.page_change_signal.demo`). Emitido por el handler
+  // productivo `notion-status-transitions` cuando un webhook indica que una page
+  // de un teamspace productivo (Efeonce/Sky) cambió la propiedad de estado. El
+  // webhook NO incluye valores (solo IDs de propiedad) — este evento es un
+  // trigger ligero; el consumer `notion-status-transition-capture` re-fetchea la
+  // página (source of truth del `to` + del data source autoritativo), resuelve el
+  // workspace por `parent.data_source_id` (Efeonce/Sky o skip) y deriva el `from`
+  // de la última transición en PG.
+  //
+  // Payload canonical V1:
+  //   {
+  //     schemaVersion: 1,
+  //     taskSourceId: string,          // Notion page UUID productivo
+  //     changedPropertyIds: string[],  // IDs de updated_properties del webhook
+  //     parentId: string | null,       // hint del parent del webhook (no autoritativo)
+  //     sourceEventId: string,         // idempotency key (Notion event id)
+  //     occurredAt: string             // ISO 8601 (event.timestamp)
+  //   }
+  //
+  // NO lleva `metadata.demo_mode` — el consumer demo lo ignora (filtra ===true) y
+  // el consumer productivo lo procesa (filtra !==true). Tablas físicamente
+  // separadas (task_status_transitions vs task_status_transitions_demo).
+  notionTaskPageChangeSignal: 'notion.task.page_change_signal'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

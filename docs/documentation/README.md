@@ -100,6 +100,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Delivery
 
 - [Motor ICO — Metricas Operativas](delivery/motor-ico-metricas-operativas.md) — metricas operativas, materializacion diaria, cadena de fallback (Postgres/BQ/live), diagnostico
+- [Captura de transiciones Notion → RpA (carril demo)](delivery/captura-transiciones-notion-rpa-demo.md) — como Greenhouse captura cambios de estado de Notion via webhook + re-fetch y los convierte en RpA; por que el webhook es solo un aviso y no la fuente de verdad
 - [Nexa Insights — Digest semanal para liderazgo](delivery/nexa-insights-digest-semanal.md) — resumen semanal interno por email con top insights ICO-first, audiencias, schedule, links al portal y limites del corte actual
 - [Nexa Insights — Bloque en Agency, Home y 360](delivery/nexa-insights-bloque-agency.md) — superficie dentro del portal con KPIs, lista de senales recientes y modo Historial (timeline cross-period). Explica el toggle, causa raiz colapsable y menciones clickeables
 

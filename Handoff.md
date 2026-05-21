@@ -1,3 +1,36 @@
+# Sesion 2026-05-21 — TASK-912: captura productiva de transiciones de estado (Efeonce + Sky)
+
+**Status**: 🔨 IN PROGRESS en `develop` (sin branch separado, por instrucción del usuario). Implementación del **sibling productivo** del pipeline de captura demo (TASK-913/914). Cierra el loop end-to-end de TASK-908 Foundation para Efeonce + Sky.
+
+**Qué se construye**: webhook handler `/api/webhooks/notion-status-transitions` (HMAC + re-fetch pattern) → reactive consumer `notion-status-transition-capture` (re-fetchea la página, resuelve workspace por data source Efeonce/Sky, persiste en `task_status_transitions` productiva, emite `notion.task.status_transitioned`) → BQ materializer PG→conformed → fórmula `cycle_time_days` canónica (flag OFF) → métrica `cycle_time_slo_pct` (flag OFF) → backfill script (no se corre en prod). Cuando shipea, `countCorrectionTransitions` retorna `sourceMode='canonical'` y desbloquea TASK-901 Slice 4 / TASK-916.
+
+**Decisiones pre-execution** (ver AUDIT en la task): suscripción Notion es ÚNICA y amplia → 1 secret HMAC productivo (no per-workspace); workspace se resuelve en el CONSUMER por el data source de la página re-fetcheada (autoritativo) → no depende del shape del parent del webhook; eventos productivos sin sufijo `.demo`; todo flagged OFF por default (cero cambio de comportamiento al merge).
+
+**Shippeado en `develop`** (commits `2f8754de` Slice 1 + `7cb6937d` Slice 2, 43 tests verde, flag OFF): la captura completa (handler `notion-status-transitions` + consumer `notion-status-transition-capture` + 2 reliability signals + migration + 2 capabilities). **CERO escrituras a Notion, cero impacto en notion-bq-sync legacy ni en el pipeline demo.**
+
+**Slices 3-5 también SHIPPED** (verificados contra BigQuery real — gcloud/ADC sí funcionan): Slice 3 (`0a927b5e`) materializer reactivo PG→BQ; Slice 4 (`b783f54c`) fórmula `cycle_time_days` canónica de-correlada gated OFF (el dry-run BQ reveló que la fórmula correlacionada del spec no compila — reescrita); Slice 5 (`ae15e101`) métrica `cycle_time_slo_pct` gated OFF. **Flags OFF → cero impacto; flip gated por shadow mode 7d + arch-architect.**
+
+**Slice 6 (backfill) BLOQUEADO por falta de fuente** (hallazgo): no hay API Notion de property-history + snapshots BQ stale (4 días). → Path canónico = **forward-accumulation** (activar captura, esperar 1 período completo, flip bono solo para períodos cubiertos). Corrige TASK-915/917. **Activación de la captura**: crear GCP secret + IAM + Vercel env `NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF` + confirmar suscripción → endpoint + flip `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED=true`.
+
+---
+
+# Sesion 2026-05-20 (cont.) — TASK-914: captura Notion vía re-fetch + RpA V2 demo verificado E2E
+
+**Status**: ✅ TASK-914 COMPLETE. El pipeline RpA V2 demo funciona end-to-end con webhooks reales de Notion: captura → compute → writeback. **`RpA=2` verificado live en Notion demo** (`01:10Z`).
+
+**Qué se construyó**: el motor de **cálculo de RpA** (`countCorrectionTransitions` + `calculateRpaV2Demo`) + la **capa de captura** canonical (webhook=trigger, consumer re-fetchea la página como source of truth + deriva `from` de PG). El bug #3 de TASK-913 (handler incompatible con payload real Notion) está cerrado.
+
+**5 bugs en cascada** detectados por el smoke E2E con artefacto real (releases `26bfe120`→`cd047724`): HMAC resolveSecret, IAM secret, payload sin previous/current (re-fetch pattern), gate por property ID (forward-all), envelope evento single (normalizeWebhookEvents). Detalle: ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` Delta 2026-05-20.
+
+**ALCANCE — leer con cuidado**:
+- Esto corre en el **carril DEMO** (teamspace Demo Greenhouse), NO en producción para Efeonce/Sky. El demo es el campo de pruebas del Strangler.
+- Es **RpA, la PRIMERA de las 14 métricas ICO** en tener motor de cómputo + pipeline writeback. Las otras 13 (OTD, FTR, Cycle Time, Throughput, etc.) siguen en spec/legacy.
+- El **cutover a productivo** (Efeonce/Sky usando RpA V2, reemplazando la fórmula Notion) está gated por los **8 stop-gates** del Strangler (demo verde 4 semanas + shadow mode + HR/Finance sign-off). NO es flip inmediato — son 12-14 meses de rollout progresivo per ADR.
+
+**Docs canonizados**: arch (Strangler Delta) + documentation funcional (`delivery/captura-transiciones-notion-rpa-demo.md`) + manual (`operations/pipeline-rpa-v2-demo.md`) + ICO skill (`bug-class-catalog.md` BUG-CLASS-002). Commits docs: `fcd231e1` + cierre TASK-914.
+
+---
+
 # Sesion 2026-05-20 — RpA V2 demo pipeline ACTIVADO live + property renombrada `RpA` + 2 releases develop→main
 
 **Status**: ✅ Pipeline RpA V2 demo activado en producción. Cierre operador-side de TASK-913 + 2 releases canonical. El smoke E2E real reveló 2 bugs que se arreglaron en el release #2.

@@ -2,7 +2,7 @@
 
 ## Zone 0 — Identity & Triage
 
-- **Lifecycle**: in-progress
+- **Lifecycle**: complete
 - **Owner**: Claude (sesión 2026-05-20)
 - **Branch**: develop
 - **Tipo**: fix arquitectónico (no parche) — capa de captura del pipeline RpA V2 demo
@@ -81,3 +81,18 @@ Notion edit demo → webhook /notion-tasks-demo
 
 - Smoke E2E real: transición demo `Listo para revisión → Cambios solicitados` con espaciado → webhook `processed` → transición persistida → snapshot rpa computado → property `RpA` escrita en Notion.
 - Tests anti-regresión: handler emite signal en status change (por ID), no en otras props; consumer re-fetch + derive from + idempotencia.
+
+## Cierre — Verificación E2E (2026-05-20)
+
+✅ **Smoke E2E real cerrado de punta a punta** sobre el teamspace Demo Greenhouse:
+
+1. Webhook real de Notion → handler emite `page_change_signal.demo` (`00:08`, `00:26`)
+2. Consumer re-fetchea + deriva from → 3 transiciones capturadas (`Cambios solicitados → Listo para revisión`, `Listo para revisión → Cambios solicitados`)
+3. Compute → snapshot `rpa=2 valid`
+4. Writeback → **`RpA=2` visible en la propiedad number de Notion** (confirmado `01:10:22Z`)
+
+**5 bugs en cascada detectados + corregidos** (releases `26bfe120` → `cd047724`): HMAC resolveSecret, IAM secret, payload sin previous/current (re-fetch pattern), gate por property ID frágil (forward-all), envelope evento single (normalizeWebhookEvents). Detalle en ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` Delta 2026-05-20.
+
+**Fix operativo final**: colisión de nombre con la fórmula legacy `RpA` del template demo → renombrada a `RpA (fórmula legacy)`, la propiedad number renombrada a `RpA`. El writeback escribe a la number correctamente.
+
+**Docs canonizados**: arch (Strangler Delta), documentation funcional, manual de uso, ICO skill bug-class-catalog (BUG-CLASS-002).

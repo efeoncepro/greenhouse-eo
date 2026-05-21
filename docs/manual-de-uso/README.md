@@ -50,6 +50,7 @@ _Pendiente._
 ### Agencia y Operaciones
 
 - [Monitorear Costos Cloud con FinOps](operations/monitorear-costos-cloud-finops.md) — como revisar gasto GCP, interpretar proyecciones y drivers, usar alertas tempranas y ejecutar diagnosticos seguros sin depender solo de la consola de Google Cloud.
+- [Operar el pipeline RpA V2 demo](operations/pipeline-rpa-v2-demo.md) — verificar que un cambio de estado en una tarea demo se captura y se refleja en la propiedad `RpA` de Notion; interpretar señales de confiabilidad; troubleshooting de captura y writeback.
 
 ### Plataforma
 

@@ -31,7 +31,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -311,3 +311,11 @@ Por Fase:
 - **Gate canonical**: TASK-910 (Notion Demo Teamspace) — bloqueante para Slice 3 shadow contra productivo
 - **Downstream consumer**: TASK-909 (FTR canonical helper) — consume `calculateRpaV2.value === 0` post Fase B verde
 - **Downstream final consumer**: `calculateRpaBonus` (TASK-758 zone) — Fase D cutover gated por `BONUS_USE_RPA_V2`
+
+## Cierre V1.0 (2026-05-20)
+
+✅ **COMPLETE**. El pipeline RpA V2 demo está activado y verificado end-to-end en producción (carril demo): webhook real Notion → captura → compute → writeback → `RpA=2` visible en Notion demo.
+
+**Bug #3 detectado en el smoke E2E (handler incompatible con payload real Notion) → cerrado por TASK-914** (`complete/TASK-914-notion-demo-transition-capture-refetch.md`): re-fetch pattern + `normalizeWebhookEvents` + forward-all. 5 bugs en cascada corregidos en 5 releases (`26bfe120`→`cd047724`).
+
+**V1.1 productive cutover deferred** → TASK-901 Slice 4+ (requires demo verde 4 semanas + shadow mode + HR/Finance sign-off + 8 stop-gates ADR Strangler) + TASK-912 (webhook ingestion productiva, bloqueada por suscripción Notion operador-side + cleanup schema Sky).

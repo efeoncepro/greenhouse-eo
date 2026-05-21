@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,6 +19,76 @@
 - Branch: `task/TASK-912-ico-status-transition-webhook-ingestion`
 - Legacy ID: `TASK-908 Slices 2/3/4/5/9 deferred → renamed canonical TASK-912 (2026-05-18)`
 - GitHub Issue: `none`
+
+## Delta 2026-05-21 — DESBLOQUEADA (parte) + parent TASK-915 + lecciones TASK-914
+
+- **Suscripción webhook Notion: ✅ YA EXISTE** (confirmado operador 2026-05-21) y es **amplia — cubre TODOS los teamspaces** (incluso fuera de Efeonce/Sky). Implicación de diseño DURA: el handler productivo **DEBE filtrar por data source ID canónico** (Efeonce `5126d7d8-…` [verificar], Sky `23039c2f-…` [verificar]) y **NO procesar** el demo (`36339c2f-…`, tiene su propio endpoint `/notion-tasks-demo`) ni otros teamspaces. Sin el filtro, captura transiciones de teamspaces no deseados.
+- **Aplicar el re-fetch pattern de TASK-914**: el webhook Notion entrega un **evento single** (no `{events:[]}`) + **sin valores** (solo IDs de propiedad). El handler debe usar `normalizeWebhookEvents` + el consumer re-fetchea la página (source of truth) + deriva `from` de la última transición en PG. Reusar los patrones canonizados en `complete/TASK-914-...` (NO repetir los 5 bugs de la cascada demo).
+- **Prerequisito operador-side RESTANTE**: cleanup schema Sky (`Estado 1`→`Estado` + status legacy → canónicos). HMAC signing secret + IAM: aplicar el patrón de TASK-914 (crear secret + grant `secretAccessor` a `greenhouse-portal@` en el mismo paso).
+- **Parent**: TASK-915 (umbrella RpA V2 productive cutover). Esta task es el Frente 1 (captura) del programa de dos flips (Flip A display 01/06, Flip B bono 01/07).
+- **Slice 9 (backfill histórico) DEJA DE SER OPCIONAL para el path de bono**: el bono RpA = AVG sobre TODAS las tareas completadas del período. La captura live solo registra transiciones desde su arranque → tareas con correcciones pre-captura quedan subcontadas → bono inflado. **El backfill (Notion page history API) es prerequisito DURO del Flip B de TASK-915.** Para el Flip A (display) sigue siendo opcional (mostrar incompleto es honesto vía `dataStatus`).
+
+## Inventario de schemas Notion Efeonce + Sky (verificado vía Notion fetch 2026-05-21)
+
+Exploración previa de los data sources `Tareas` de ambos teamspaces productivos para saber **cómo atacar** la captura. IDs canónicos confirmados (ya no `[verificar]`):
+
+| Dimensión | Efeonce `Tareas` | Sky `Tareas` | Demo `Tareas` |
+|---|---|---|---|
+| **Data source ID** | `5126d7d8-bf3f-454c-80f4-be31d1ca38d4` | `23039c2f-efe7-81f8-af2d-000b67594d18` | `36339c2f-efe7-81a6-980c-000b0056bba8` |
+| **Status property** | `Estado` | `Estado` | `Estado` (TASK-910) |
+| **Status options** | 11 canónicos V1 ✅ | 11 canónicos V1 ✅ (la *descripción* del campo aún menciona `Tomado`/`En feedback` pero las opciones reales ya son canónicas) | canónicos |
+| **Title property** | `Nombre de tarea` | `Nombre de la tarea` | — |
+| **Person property** | `Responsables` (plural) | `Responsable` (singular) | — |
+| **RpA legacy** | FÓRMULA: por `Review Source` lee Client Change Round (Frame.io) / Workflow Change Round / relación `Revisiones` | FÓRMULA: por `Review Source` lee Client Change Round / Workflow Change Round / relación `Correcciones` | propiedad número `[GH] RpA` (writeback demo TASK-913/914) |
+| **Otras props RpA** | `Semáforo RpA` | `Rondas` (rollup), `Cantidad de correcciones` | — |
+
+**Implicaciones para el handler productivo (TASK-912)**:
+
+1. **Filtro por data source ID confirmado** — los IDs de arriba son la allowlist canónica del handler. La suscripción amplia entrega eventos de todos los teamspaces; el handler procesa SOLO Efeonce + Sky, ignora el demo (`36339c2f-…`, endpoint propio) y cualquier otro.
+2. **El status property se llama `Estado` en AMBOS teamspaces** — el typo legacy `Estado 1` de Sky **ya no existe** (cleanup mayormente hecho operador-side). `STATUS_PROPERTY_NAMES = ['Estado', 'Estado 1']` mantiene `Estado 1` solo como tolerancia defensiva; el path real es `Estado`. Esto **reduce el prerequisito operador-side restante** a casi nada (solo la descripción del campo Sky quedó con texto legacy stale — cosmético, no afecta opciones).
+3. **Title y person properties difieren** (`Nombre de tarea`/`Responsables` vs `Nombre de la tarea`/`Responsable`) — irrelevante para la captura de transiciones de estado (el handler solo lee `Estado`), pero relevante si el re-fetch necesita resolver el `task_source_id` o display. La captura de RpA V2 NO depende de estos campos.
+4. **Coexistencia sin colisión** — el writeback productivo escribe la propiedad NUEVA `[GH] RpA v2`, distinta de la fórmula legacy `RpA`. No se repite la colisión del demo (que renombró un número a `RpA` chocando con la fórmula). La fórmula legacy `RpA` queda intacta 90+ días (rollback safety, per TASK-915).
+
+**Nota sobre metodología (NO es blocker — diseño V2 confirmado correcto por el operador 2026-05-21)**: el RpA legacy es una fórmula que cuenta "rondas" desde Frame.io / workflow / relación manual, mientras que V2 cuenta transiciones de estado `Listo para revisión → Cambios solicitados`. Son dos proxies del mismo concepto ("rondas de corrección del cliente") por mecanismos distintos. El signal `notion.metrics.shadow_paridad_rpa` durante junio es una **comparación informativa** (sanity check), no un gate de "match exacto": divergencias esperables vienen de tareas donde el operador no movió el estado en cada corrección o donde el `Review Source` legacy contaba rondas internas. Esto **no requiere rediseñar V2 ni incorporar Frame.io en V1** — V2 es canónico tal como está. El operador/HR decide el threshold de aceptación del bono observando junio real.
+
+## Delta 2026-05-21 (cont.) — Implementación: CAPTURA shippeada (Slices 1-2), Cycle Time + backfill DIFERIDOS (Slices 3-6)
+
+**Shippeado en `develop` (verificado, flag OFF, cero impacto en métricas existentes)**:
+
+- **Slice 1 — Webhook ingestion** (commit `2f8754de`): handler `notion-status-transitions` (HMAC, kill-switch `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED` default OFF, re-fetch pattern, demo+echo drop) + resolver canónico de workspace + `fetchPageStatus` productivo (lee `Estado` + `parent.data_source_id`) + migration seed `webhook_endpoints` + 2 capabilities + signal `notion.task_status_transitions.ingestion_lag`. 24 tests.
+- **Slice 2 — Reactive consumer** (commit `7cb6937d`): `notion-status-transition-capture` (re-fetch → workspace autoritativo por `parent.data_source_id` o SKIP → persist `task_status_transitions` → emite `notion.task.status_transitioned`) + signal `refetch_failed`. 19 tests.
+
+**Decisiones pre-execution canónicas** (resuelven Open Questions Q6-Q8 nuevas):
+
+| # | Decisión | Rationale (no bandaid) |
+|---|---|---|
+| Q6 | Webhook emite `notion.task.page_change_signal` (trigger liviano), NO `status_transitioned` con from/to | Notion no manda from/to (lección TASK-914). El consumer re-fetchea (source of truth) y emite `status_transitioned`. |
+| Q7 | 1 secret HMAC productivo (`NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF`), no per-workspace | La suscripción es ÚNICA y amplia → 1 signing secret. Matchea el modelo real de Notion. |
+| Q8 | Workspace se resuelve en el CONSUMER por `parent.data_source_id` de la página re-fetcheada (autoritativo); handler solo descarta demo+echo | El `parent.id` del webhook tiene shape incierto (DS vs DB id). El GET de la página da el DS autoritativo. Garantía anti-contaminación. |
+
+**Slices 3-5 SHIPPED (verificados contra BigQuery real, flags OFF)** — tras confirmar que gcloud/ADC SÍ funcionan (corrección del operador 2026-05-21):
+
+- **Slice 3 — BQ materializer** (commit `0a927b5e`): `materialize-task-status-transitions.ts` (ensureTable + `materializeTransitionsFromPg` re-read PG → MERGE BQ por `transition_id`) + reactive projection `notion-transition-bq-sync` (consume `notion.task.status_transitioned`, rides ops-reactive-delivery, **sin Cloud Scheduler nuevo**) + signal `bq_sync_lag`. Tabla `greenhouse_conformed.task_status_transitions` creada (empty, additive) + MERGE validado via dry-run BQ real. 5 tests.
+- **Slice 4 — `cycle_time_days` canónica** (commit `b783f54c`): `cycle-time-formula.ts` gated por `CT_DAYS_CANONICAL_FORMULA_ENABLED` (default OFF = legacy VERBATIM + sin JOIN extra → VIEW byte-idéntica). **Hallazgo BQ real**: la fórmula naive del spec (subqueries correlacionadas a la tabla de transiciones) la rechaza BQ — reescrita de-correlada via LEFT JOIN a subquery pre-agregada (GROUP BY task_source_id, 1:1). Ambas ramas verificadas: OFF dry-run OK (sin `ctw`); ON dry-run + **run real OK** (transitions vacío → fallback `created_at`, blocked_days=0 = degradación honesta = idéntico a legacy). 161 tests ico-engine.
+- **Slice 5 — `cycle_time_slo_pct`** (commit `ae15e101`): métrica gated por `CT_SLO_PCT_METRIC_ENABLED` (default OFF → NO en `ICO_METRIC_REGISTRY`, inerte). 3 tests.
+
+**NO flip**: `cycle_time_days` y `cycle_time_slo_pct` quedan flag OFF — el flip está gated por shadow mode 7d verde + arch-architect 4-pillar (+ HR si afecta bonus). Signals de shadow-compare (`cycle_time.canonical_paridad`) + coverage (`ct_slo_pct.coverage`) diferidos a la activación (son herramientas de fase shadow, requieren correr ambas fórmulas BQ; no son signals steady).
+
+**Slice 6 — Backfill histórico: BLOQUEADO POR FALTA DE FUENTE DE DATOS (hallazgo 2026-05-21)**:
+
+- La premisa del spec ("Notion page history API") es **inviable**: la API pública de Notion NO expone el historial de cambios de propiedades (el "page history" del UI no está en la API).
+- La alternativa (diffing de snapshots diarios BQ `greenhouse_raw.notion_tasks_snapshots`) es **inadecuada**: solo 4 días stale (2026-03-15 → 2026-04-02, nada desde entonces). Reconstruir transiciones de eso produciría filas backfilled engañosas (granularidad diaria, 2 meses viejas, NULL source_event_id) que contaminarían la tabla.
+- **Conclusión canónica**: NO hay backfill histórico viable. El path correcto para el bono es **forward-accumulation**: activar la captura → esperar UN período completo → V2 tiene historia completa de ese período → recién ahí flip del bono. Esto **reemplaza** el supuesto "backfill = prerequisito duro del Flip B" de TASK-915 por "un período completo de captura activa antes del Flip B". Ver TASK-915 (corregido).
+
+**Lo que NO bloquea el valor core**: la captura (Slices 1-2) **ya desbloquea** `countCorrectionTransitions` → `sourceMode='canonical'` (cuando el operador active el flag + secret), que es lo que TASK-901 Slice 4 / TASK-916 (RpA prod) necesitan. RpA NO depende de la fórmula BQ de cycle time.
+
+**Prerequisitos operador-side para activar la captura** (Slice 0):
+1. Crear GCP secret + IAM: `notion-webhook-signing-secret-status-transitions` (o el nombre elegido) + grant `secretAccessor` a `greenhouse-portal@`.
+2. Vercel env: `NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF=<secret-name>`.
+3. Confirmar que la suscripción amplia apunta a `/api/webhooks/notion-status-transitions` (o re-apuntarla) + pegar el verification token.
+4. Flip `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED=true` (gated, observable vía signal `ingestion_lag`).
+
+**Próximo paso del follow-up (BQ Cycle Time)**: relanzar gcloud + ADC, smoke-test las queries BQ contra el dataset real, construir Slices 3-5 con shadow mode, ejecutar Slice 6 backfill staged (demo→Efeonce→Sky).
 
 ## Summary
 
@@ -132,14 +202,12 @@ Verificar antes de iniciar Slice 1:
      - Idem para `-sky`
    - Vercel env vars (Production + Preview): `NOTION_WEBHOOK_SIGNING_SECRET_REF_EFEONCE=greenhouse-notion-webhook-signing-secret-efeonce` + idem Sky
 
-2. **Schema cleanup operador-side Notion** (~1-2 días humano operando UI Notion):
-   - Sky property `Estado 1` (typo legacy) → rename a `Estado` canonical
-   - Sky status options legacy → rename:
-     - `Tomado` → `En curso`
-     - `En feedback` → `Cambios solicitados`
-     - `Detenido` → `En pausa`
-   - Efeonce: verificar 11 estados canonical V1 ya presentes (probablemente OK pre-cleanup)
-   - Demo teamspace (TASK-910): mismo schema cleanup verbatim
+2. **Schema cleanup operador-side Notion** — **MAYORMENTE HECHO** (verificado vía Notion fetch 2026-05-21, ver §"Inventario de schemas Notion"):
+   - Sky status property ya se llama `Estado` (el typo legacy `Estado 1` ya no existe) ✅
+   - Sky ya tiene las 11 opciones canónicas V1 ✅ (solo la *descripción* del campo quedó con texto legacy `Tomado`/`En feedback` — cosmético, no afecta opciones)
+   - Efeonce: 11 estados canonical V1 confirmados presentes ✅
+   - Demo teamspace (TASK-910): schema canónico ✅
+   - **Restante (opcional, cosmético)**: limpiar la descripción stale del campo `Estado` en Sky. NO bloquea ningún slice.
 
 Sin estos 2 prerequisitos, Slices 1-5 quedan pending + esta task se mantiene `to-do`.
 
