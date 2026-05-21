@@ -72,7 +72,7 @@ Hoy RpA en producción corre por la **fórmula legacy de Notion** (`Correcciones
 | Build captura + compute/writeback prod | ~22-31/05 | Pipeline V2 prod corriendo en paralelo (invisible), escribe `[GH] RpA v2` | TASK-912 + TASK-916 verde |
 | **Flip A — display/writeback** | **01/06** | V2 visible en Efeonce/Sky + dashboards; **bonus sigue V1** | Pipeline verde + signals steady=0 |
 | Shadow real | jun (todo el mes) | V2 ∥ V1, comparar paridad | signal `notion.metrics.shadow_paridad_rpa` ≥95% |
-| **Flip B — bonus (Efeonce primero)** | **01/07** | Bonus lee V2 (`BONUS_USE_RPA_V2`) | **paridad ≥95% + V2 con datos COMPLETOS del período (backfill) + sign-off HR/Finance escrito** |
+| **Flip B — bonus (Efeonce primero)** | **01/07** | Bonus lee V2 (`BONUS_USE_RPA_V2`) | **paridad ≥95% + período enteramente cubierto por captura activa (forward-accumulation, NO backfill) + sign-off HR/Finance escrito** |
 | Flip B — bonus Sky | ~05/07 | Sky bonus a V2 tras Efeonce verde | Efeonce bonus verde + sin reclamos |
 | Cleanup legacy | ≥01/10 (90d) | Opcional: deprecar fórmula Notion | ≥90d sin rollback |
 
@@ -80,14 +80,18 @@ Hoy RpA en producción corre por la **fórmula legacy de Notion** (`Correcciones
 
 1. Foundation prod (TASK-912 captura) verde · 2. Demo soak (TASK-914 ✅) · 3. Shadow paridad ≥95% (junio) · 4. Pilot ≤1 cliente (Efeonce primero) · 5. **Sign-off HR/Finance escrito** · 6. Snapshot pre-flip restorable <1h · 7. Kill switch verificado (flag flip <5min) · 8. Runbook + cliente sign-off (Sky vía QBR).
 
-**Gate adicional DURO para Flip B (bono)** — completeness de datos: el bono RpA = `calculateRpaBonus(rpa_avg)` donde `rpa_avg = AVG(rpa por-tarea)` sobre TODAS las tareas completadas del período. V2 solo es válido para el bono cuando tiene el **historial COMPLETO de transiciones de cada tarea** del período — no solo desde el inicio de la captura live. **→ Backfill histórico (TASK-908 Slice 9, Notion page history API) es prerequisito DURO del Flip B**, no opcional. Sin él, tareas con correcciones pre-captura quedan subcontadas y el bono se infla. Display (Flip A) NO requiere backfill (mostrar incompleto es honesto vía `dataStatus`); el bono SÍ.
+**Gate adicional DURO para Flip B (bono)** — completeness de datos vía FORWARD-ACCUMULATION (corregido 2026-05-21): el bono RpA = `calculateRpaBonus(rpa_avg)` donde `rpa_avg = AVG(rpa por-tarea)` sobre TODAS las tareas completadas del período. V2 solo es válido para el bono cuando tiene el **historial COMPLETO de transiciones de cada tarea del período**.
+
+**El backfill histórico NO es viable** (hallazgo TASK-912 2026-05-21): la API pública de Notion NO expone historial de cambios de propiedades, y los snapshots BQ (`greenhouse_raw.notion_tasks_snapshots`) solo tienen 4 días stale (mar–abr 2026). NO hay fuente para reconstruir transiciones pre-captura.
+
+**Path canónico = forward-accumulation**: activar la captura (TASK-912 flag ON) → esperar **un período completo** con la captura activa → recién ese período tiene historia V2 completa per-tarea → flip del bono SOLO para períodos enteramente cubiertos por la captura. Las tareas iniciadas antes de la activación nunca tendrán su `from`-history completo, así que el primer período elegible para Flip B es el primer mes calendario que arranque DESPUÉS de la activación de la captura. Display (Flip A) NO requiere esto (mostrar incompleto es honesto vía `dataStatus`); el bono SÍ.
 
 ### Risk matrix (impact-level — el runtime lo introducen las hijas)
 
 | Riesgo | Sistema | Prob | Mitigación | Signal |
 |---|---|---|---|---|
 | V2 difiere de V1 y se paga bono malo | payroll | Media | Flip B gated por paridad + HR sign-off; Flip A no toca bono | `shadow_paridad_rpa` |
-| **V2 con datos INCOMPLETOS infla el bono** (tareas con correcciones pre-captura → V2 subcuenta → rpa_avg bajo → bono alto) | payroll | **Alta sin backfill** | **Backfill histórico (Notion page history, TASK-908 Slice 9) es prerequisito DURO del Flip B**; el bono usa AVG sobre TODAS las tareas del período → V2 necesita historial completo per-tarea | `shadow_paridad_rpa` (diff sistemático = datos incompletos) |
+| **V2 con datos INCOMPLETOS infla el bono** (tareas con correcciones pre-captura → V2 subcuenta → rpa_avg bajo → bono alto) | payroll | **Alta si se flipea un período no cubierto** | Backfill NO viable (sin API Notion history + snapshots BQ stale, hallazgo TASK-912). **Forward-accumulation**: Flip B SOLO para períodos enteramente posteriores a la activación de la captura | `shadow_paridad_rpa` (diff sistemático = período no cubierto) |
 | Captura procesa teamspaces no deseados (suscripción amplia) | delivery | Media | Filtro por data source ID canónico en handler prod (TASK-912) | `transition_capture_*` |
 | Schema Sky sin limpiar → status no normaliza | delivery | Baja | Status Sky ya canónico (`Estado` + 11 opciones V1, verificado 2026-05-21) + `normalizeTaskStatus` aliases como red de seguridad | `demo_teamspace_drift` análogo prod |
 | Cutover ambos clientes a la vez en bono | payroll | Alta si simultáneo | Efeonce primero, Sky después | reclamos HR |

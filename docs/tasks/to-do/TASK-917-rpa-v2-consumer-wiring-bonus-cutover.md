@@ -38,7 +38,7 @@ Los consumers (bonus `calculateRpaBonus`, 6 UI views, materialización, trends A
 
 ## Dependencies & Current Repo State
 
-- **Depende de**: TASK-916 (V2 escribiendo snapshots + `[GH] RpA v2`) + paridad validada (signal `shadow_paridad_rpa` ≥95% sobre junio) + **backfill histórico completo (TASK-908 Slice 9 / TASK-912)**. El bono RpA = AVG sobre TODAS las tareas del período → V2 necesita el historial completo de transiciones per-tarea, no solo desde la captura live. Sin backfill, tareas con correcciones pre-captura se subcuentan → bono inflado. **Gate DURO del Flip B (Slice 3).**
+- **Depende de**: TASK-916 (V2 escribiendo snapshots + `[GH] RpA v2`) + paridad validada (signal `shadow_paridad_rpa` ≥95%) + **período enteramente cubierto por captura activa (forward-accumulation)**. El bono RpA = AVG sobre TODAS las tareas del período → V2 necesita el historial completo de transiciones per-tarea. **El backfill histórico NO es viable** (sin API Notion de property-history + snapshots BQ stale, hallazgo TASK-912 2026-05-21). Por eso el Flip B solo aplica a períodos enteramente posteriores a la activación de la captura (TASK-912 flag ON). **Gate DURO del Flip B (Slice 3).**
 - **Ya existe**: todos los consumers + campo `rpa_avg_v2` declarado en `metrics_by_member`.
 - **Gap**: poblar `rpa_avg_v2` desde V2; switch de fuente en consumers (gated); flag `BONUS_USE_RPA_V2`.
 

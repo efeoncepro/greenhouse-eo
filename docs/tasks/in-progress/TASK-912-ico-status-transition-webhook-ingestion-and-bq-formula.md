@@ -66,12 +66,19 @@ Exploración previa de los data sources `Tareas` de ambos teamspaces productivos
 | Q7 | 1 secret HMAC productivo (`NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF`), no per-workspace | La suscripción es ÚNICA y amplia → 1 signing secret. Matchea el modelo real de Notion. |
 | Q8 | Workspace se resuelve en el CONSUMER por `parent.data_source_id` de la página re-fetcheada (autoritativo); handler solo descarta demo+echo | El `parent.id` del webhook tiene shape incierto (DS vs DB id). El GET de la página da el DS autoritativo. Garantía anti-contaminación. |
 
-**DIFERIDOS a follow-up (NO shippeados esta sesión)** — Slices 3 (BQ materializer PG→conformed), 4 (`cycle_time_days` canónica), 5 (`cycle_time_slo_pct`), 6 (backfill histórico). Razón:
+**Slices 3-5 SHIPPED (verificados contra BigQuery real, flags OFF)** — tras confirmar que gcloud/ADC SÍ funcionan (corrección del operador 2026-05-21):
 
-1. **Tocan la VIEW de métricas viva** `v_tasks_enriched.cycle_time_days` (Slice 4) que alimenta dashboards — el usuario priorizó explícitamente "no romper las métricas que funcionan".
-2. **No verificables esta sesión**: gcloud/ADC vencidos → sin acceso BigQuery para smoke. Shipear SQL BQ sin ejercitar viola el Solution Quality Contract + la regla "SQL Signal Reader Schema Validation Gate".
-3. **El flip de `cycle_time_days` está spec-gated** por shadow mode 7d verde + arch-architect 4-pillar (+ HR si afecta bonus) — imposible completar ahora.
-4. **El backfill (Slice 6)** requiere TASK-910 demo verde 4 semanas + Notion page history API throttled — gate canónico ADR Strangler, no ejecutable ahora.
+- **Slice 3 — BQ materializer** (commit `0a927b5e`): `materialize-task-status-transitions.ts` (ensureTable + `materializeTransitionsFromPg` re-read PG → MERGE BQ por `transition_id`) + reactive projection `notion-transition-bq-sync` (consume `notion.task.status_transitioned`, rides ops-reactive-delivery, **sin Cloud Scheduler nuevo**) + signal `bq_sync_lag`. Tabla `greenhouse_conformed.task_status_transitions` creada (empty, additive) + MERGE validado via dry-run BQ real. 5 tests.
+- **Slice 4 — `cycle_time_days` canónica** (commit `b783f54c`): `cycle-time-formula.ts` gated por `CT_DAYS_CANONICAL_FORMULA_ENABLED` (default OFF = legacy VERBATIM + sin JOIN extra → VIEW byte-idéntica). **Hallazgo BQ real**: la fórmula naive del spec (subqueries correlacionadas a la tabla de transiciones) la rechaza BQ — reescrita de-correlada via LEFT JOIN a subquery pre-agregada (GROUP BY task_source_id, 1:1). Ambas ramas verificadas: OFF dry-run OK (sin `ctw`); ON dry-run + **run real OK** (transitions vacío → fallback `created_at`, blocked_days=0 = degradación honesta = idéntico a legacy). 161 tests ico-engine.
+- **Slice 5 — `cycle_time_slo_pct`** (commit `ae15e101`): métrica gated por `CT_SLO_PCT_METRIC_ENABLED` (default OFF → NO en `ICO_METRIC_REGISTRY`, inerte). 3 tests.
+
+**NO flip**: `cycle_time_days` y `cycle_time_slo_pct` quedan flag OFF — el flip está gated por shadow mode 7d verde + arch-architect 4-pillar (+ HR si afecta bonus). Signals de shadow-compare (`cycle_time.canonical_paridad`) + coverage (`ct_slo_pct.coverage`) diferidos a la activación (son herramientas de fase shadow, requieren correr ambas fórmulas BQ; no son signals steady).
+
+**Slice 6 — Backfill histórico: BLOQUEADO POR FALTA DE FUENTE DE DATOS (hallazgo 2026-05-21)**:
+
+- La premisa del spec ("Notion page history API") es **inviable**: la API pública de Notion NO expone el historial de cambios de propiedades (el "page history" del UI no está en la API).
+- La alternativa (diffing de snapshots diarios BQ `greenhouse_raw.notion_tasks_snapshots`) es **inadecuada**: solo 4 días stale (2026-03-15 → 2026-04-02, nada desde entonces). Reconstruir transiciones de eso produciría filas backfilled engañosas (granularidad diaria, 2 meses viejas, NULL source_event_id) que contaminarían la tabla.
+- **Conclusión canónica**: NO hay backfill histórico viable. El path correcto para el bono es **forward-accumulation**: activar la captura → esperar UN período completo → V2 tiene historia completa de ese período → recién ahí flip del bono. Esto **reemplaza** el supuesto "backfill = prerequisito duro del Flip B" de TASK-915 por "un período completo de captura activa antes del Flip B". Ver TASK-915 (corregido).
 
 **Lo que NO bloquea el valor core**: la captura (Slices 1-2) **ya desbloquea** `countCorrectionTransitions` → `sourceMode='canonical'` (cuando el operador active el flag + secret), que es lo que TASK-901 Slice 4 / TASK-916 (RpA prod) necesitan. RpA NO depende de la fórmula BQ de cycle time.
 

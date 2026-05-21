@@ -8,7 +8,9 @@
 
 **Shippeado en `develop`** (commits `2f8754de` Slice 1 + `7cb6937d` Slice 2, 43 tests verde, flag OFF): la captura completa (handler `notion-status-transitions` + consumer `notion-status-transition-capture` + 2 reliability signals + migration + 2 capabilities). **CERO escrituras a Notion, cero impacto en notion-bq-sync legacy ni en el pipeline demo.**
 
-**DIFERIDO** (Slices 3-6 — BQ materializer + fórmula `cycle_time_days` + métrica `cycle_time_slo_pct` + backfill histórico): tocan la VIEW de métricas viva `v_tasks_enriched`, requieren acceso BigQuery para verificar (gcloud/ADC vencidos), y el flip de la fórmula está spec-gated por shadow mode 7d. Stop-and-report responsable dado el aviso del usuario "no rompas las métricas". TASK-912 queda `in-progress` con el Delta documentando shipped/deferred. **Próximo paso**: relanzar gcloud+ADC → smoke BQ → construir Slices 3-5 con shadow mode → backfill staged. Activación de la captura: crear secret + IAM + Vercel env `NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF` + flip `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED=true`.
+**Slices 3-5 también SHIPPED** (verificados contra BigQuery real — gcloud/ADC sí funcionan): Slice 3 (`0a927b5e`) materializer reactivo PG→BQ; Slice 4 (`b783f54c`) fórmula `cycle_time_days` canónica de-correlada gated OFF (el dry-run BQ reveló que la fórmula correlacionada del spec no compila — reescrita); Slice 5 (`ae15e101`) métrica `cycle_time_slo_pct` gated OFF. **Flags OFF → cero impacto; flip gated por shadow mode 7d + arch-architect.**
+
+**Slice 6 (backfill) BLOQUEADO por falta de fuente** (hallazgo): no hay API Notion de property-history + snapshots BQ stale (4 días). → Path canónico = **forward-accumulation** (activar captura, esperar 1 período completo, flip bono solo para períodos cubiertos). Corrige TASK-915/917. **Activación de la captura**: crear GCP secret + IAM + Vercel env `NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF` + confirmar suscripción → endpoint + flip `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED=true`.
 
 ---
 

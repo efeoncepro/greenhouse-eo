@@ -4481,7 +4481,7 @@ Notion webhook (suscripción ÚNICA y AMPLIA, todos los teamspaces)
 
 **Reliability signals** (subsystem `delivery`): `notion.task_status_transitions.ingestion_lag` (lag) + `notion.task_status_transitions.refetch_failed` (dead_letter). Steady=0.
 
-**Estado**: Slices 1-2 (captura) shipped + verificados en `develop` (flag OFF). Slices 3-6 (BQ materializer `cycle_time_days` + `cycle_time_slo_pct` + backfill histórico) DIFERIDOS — tocan la VIEW de métricas viva, requieren acceso BigQuery para verificar, y el flip de la fórmula está spec-gated por shadow mode 7d. Ver TASK-912 spec Delta 2026-05-21.
+**Estado**: Slices 1-5 shipped + verificados en `develop` (flags OFF). Captura (1-2) + BQ materializer reactivo (3) + `cycle_time_days` canónica de-correlada (4, verificada contra BQ real ambas ramas) + `cycle_time_slo_pct` (5). El flip de `cycle_time_days`/`cycle_time_slo_pct` (flags ON) está gated por shadow mode 7d + arch-architect 4-pillar — NO flipeado. **Slice 6 (backfill histórico) BLOQUEADO por falta de fuente**: la API Notion no expone property-history y los snapshots BQ son stale (4 días mar–abr). Path canónico = forward-accumulation (activar captura → esperar 1 período completo → flip). Ver TASK-912 spec Delta 2026-05-21.
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-912-ico-status-transition-webhook-ingestion-and-bq-formula.md`. Pattern fuente: demo siblings TASK-910/913/914.
 
