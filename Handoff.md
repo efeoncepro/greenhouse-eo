@@ -1,3 +1,19 @@
+# Sesion 2026-05-21 — TASK-919 RpA V2 capture hardening (robustez) — #3 detección + #4 flag shipped
+
+**Status**: 🔨 IN PROGRESS en `develop`. Endurece el pipeline de captura RpA V2 (BUG-CLASS-003 muestreo). **Shipped**: #4 flag por-cliente + #3 reconciliación (detección). **Diferido con rationale**: auto-repair (#3 fase 2), #2 baseline page.created, #5 Cloud Tasks. #1 (lane 60s) superseded por #3.
+
+**Shipped V1.0**:
+- **#4 Flag por-cliente** (`feat … #4`, 23 tests): `isNotionRpaWritebackEnabled(workspaceId?)` — override `NOTION_RPA_WRITEBACK_ENABLED_<EFEONCE|SKY>` gana sobre el global. Cumple stop-gate ICO. Backward-compat total. El ops-worker se redesplegó con esto (push `dd690a46`).
+- **#3 Reconciliación DETECCIÓN** (`feat … #3`, 7 tests): signal `notion.task_status_transitions.recorded_vs_current_drift` (subsystem delivery). Compara último `to_status` registrado vs `tasks.task_status` synced, gated en `source_updated_at > transitioned_at` (evita falso-positivo del sync stale 24h). CERO llamadas Notion. Convierte el modo de falla silencioso del muestreo en observable.
+
+**Decisión de diseño honesta**: el límite de muestreo (BUG-CLASS-003) NO se elimina al 100% (Notion no expone property-history). El pipeline YA era robusto para uso real (correcciones lentas). Esta task agrega kill-switch por-cliente (safety) + detección del residual (observabilidad). El auto-repair (signal-then-command canónico, patrón TASK-877/891) + #2 quedan como slices trackeadas — NO se apuran porque tocan el write-path de RpA.
+
+**Verificación**: tsc 0 + lint 0 + full suite 5206 passed + build ✓.
+
+**Pendiente (slices trackeadas en TASK-919)**: auto-repair command (INSERT transición reconciled + emit status_transitioned), #2 baseline page.created (bajo ROI vs costo re-fetch), #5 Cloud Tasks (escala writeback, detección ya cubierta por `writeback_lag`).
+
+---
+
 # Sesion 2026-05-21 — TASK-916 Flip A ACTIVADO (RpA V2 writeback ON, Efeonce + Sky) — override de dueño
 
 **Status**: ✅ Writeback RpA V2 **ACTIVADO en producción** para Efeonce + Sky (flag `NOTION_RPA_WRITEBACK_ENABLED=true`, ops-worker SHA `57ed94d0`, rev `ops-worker-00260-qtg`).
