@@ -10,6 +10,19 @@
 
 ---
 
+## Delta 2026-05-21 — TASK-916: límite de MUESTREO del re-fetch (BUG-CLASS-003) + Flip A writeback activado
+
+**Flip A writeback activado** en producción (Efeonce + Sky) vía `NOTION_RPA_WRITEBACK_ENABLED=true` (override de dueño del stop-gate "Efeonce primero"; legacy `RpA` formula + bono intactos — ver Handoff 2026-05-21). Propiedad `[GH] RpA v2` (number) creada en ambos data sources. Pipeline verificado end-to-end con caso real: click humano → captura → compute → writeback → `[GH] RpA v2=1`.
+
+**Aprendizaje canónico que faltaba documentar (BUG-CLASS-003)** — el re-fetch pattern (Delta 2026-05-20) es un **sistema de MUESTREO**, no un registro continuo. La captura solo registra transiciones cuyo estado **persiste a través de ≥1 read reactivo**. Causa: (1) el webhook Notion no trae valores (solo IDs de propiedad — verificado payload real `updated_properties:["PyIi","notion://tasks/status_property"]`) → re-fetch da solo estado actual; (2) el dispatcher reactivo coalescia eventos de la misma página en un `refresh()` por batch (~5 min). Consecuencia: **transiciones más rápidas que la cadencia, o ida-y-vuelta al mismo estado dentro de un batch, se colapsan** (estados intermedios irreconstruibles — Notion no expone property-history).
+
+- **Inherente, no bug**: imposible reconstruir un estado no muestreado dentro de webhook+re-fetch. Quitar coalescing no lo arregla. Mejora posible (no necesaria aún): re-fetch al llegar el webhook (gap ~segundos) — rompe outbox decoupling TASK-771, YAGNI.
+- **Aceptable para RpA**: correcciones reales son client-driven sobre horas/días → siempre persisten a través de batches → capturadas. Subconteo solo con toqueteo sub-minuto (no es uso real). El demo TASK-914 (RpA=2) funcionó por transiciones espaciadas.
+- **Protección bono (Flip B)**: gate `shadow_paridad_rpa ≥95%` 30d + HR sign-off detecta subconteo material antes de mover plata.
+- **Meta-lección**: el Delta 2026-05-20 (TASK-914) documentó el FIX re-fetch pero NO su límite de muestreo residual → se re-descubrió costosamente en TASK-916. **Regla canónica**: un fix de captura webhook+re-fetch se documenta SIEMPRE junto a su característica de muestreo, o el aprendizaje se pierde. Cross-ref: ICO `bug-class-catalog.md` BUG-CLASS-003 + CLAUDE.md "RpA V2 productive compute + writeback invariants (TASK-916)".
+
+---
+
 ## Delta 2026-05-20 — TASK-914: arquitectura canonical de captura vía re-fetch pattern
 
 Sesión live 2026-05-20: el pipeline RpA V2 demo (TASK-913) se activó en producción y el **smoke E2E con artefacto real** (webhook real de Notion contra el teamspace Demo) reveló que la capa de **captura de transiciones** era incompatible con el payload real de Notion 2026-03-11. TASK-914 rediseña la captura siguiendo el **re-fetch pattern canonical** (notion-platform Pillar 1). Validado end-to-end: 3 transiciones capturadas desde webhooks reales + snapshot `rpa=2 valid` computado.
