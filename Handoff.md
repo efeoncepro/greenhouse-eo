@@ -10,7 +10,24 @@
 
 **Slices 3-5 también SHIPPED** (verificados contra BigQuery real — gcloud/ADC sí funcionan): Slice 3 (`0a927b5e`) materializer reactivo PG→BQ; Slice 4 (`b783f54c`) fórmula `cycle_time_days` canónica de-correlada gated OFF (el dry-run BQ reveló que la fórmula correlacionada del spec no compila — reescrita); Slice 5 (`ae15e101`) métrica `cycle_time_slo_pct` gated OFF. **Flags OFF → cero impacto; flip gated por shadow mode 7d + arch-architect.**
 
-**Slice 6 (backfill) BLOQUEADO por falta de fuente** (hallazgo): no hay API Notion de property-history + snapshots BQ stale (4 días). → Path canónico = **forward-accumulation** (activar captura, esperar 1 período completo, flip bono solo para períodos cubiertos). Corrige TASK-915/917. **Activación de la captura**: crear GCP secret + IAM + Vercel env `NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF` + confirmar suscripción → endpoint + flip `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED=true`.
+**Slice 6 (backfill) BLOQUEADO por falta de fuente** (hallazgo): no hay API Notion de property-history + snapshots BQ stale (4 días). → Path canónico = **forward-accumulation** (activar captura, esperar 1 período completo, flip bono solo para períodos cubiertos). Corrige TASK-915/917.
+
+## ACTIVADO EN PRODUCCIÓN + VERIFICADO E2E (2026-05-21)
+
+**Release a prod**: `develop→main` `95b04411` (orchestrator run `26235665945` → manifest `released`, 4 workers en `95b04411`, watchdog 0 drift). Todo flag OFF excepto el webhook (activado a propósito).
+
+**Captura ACTIVADA + verificada end-to-end** (los 5 eslabones, con un cambio real de tarea Efeonce):
+webhook (HMAC ✓, flag ON) → `page_change_signal` → consumer re-fetch → workspace **efeonce** → persist PG `task_status_transitions` → emite `status_transitioned` → bq-sync MERGE a `greenhouse_conformed.task_status_transitions` (BQ). Fila capturada: `[efeonce] Sin empezar → Listo para revisión`.
+
+**Secrets/tokens (2 distintos, no confundir)**:
+- HMAC signing secret de la suscripción → GCP `notion-webhook-signing-secret-status-transitions` + Vercel env `NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF`. Valida la firma en el handler (Vercel).
+- Token de integración "Greenhouse PRD" (dueña de la suscripción) → GCP `notion-integration-token-greenhouse-prd`, montado como `NOTION_TOKEN` en **ops-worker** (re-fetch). Vercel env `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED=true`.
+
+**Lección (bug class)**: el consumer reactivo corre en **ops-worker (Cloud Run)**, no en Vercel. `fetchPageStatus` lee `process.env.NOTION_TOKEN`, que existía en Vercel pero NO en ops-worker → re-fetch fallaba `NOTION_TOKEN not configured`. El demo no falló porque resuelve su token por secret-ref (que ops-worker sí tiene). Fix: montar el token productivo como secret en ops-worker. **Regla**: cualquier código que corra en ops-worker y use `process.env.X` necesita esa env montada en ops-worker, no solo en Vercel.
+
+**Persistencia**: el `NOTION_TOKEN` en ops-worker se montó en caliente vía `gcloud` (rev 00256). Persistido en `services/ops-worker/deploy.sh` (commit `beb382fc` en develop). **Pendiente**: ese deploy.sh llega a `main` en el próximo release → hasta entonces hay drift declarado/real (prod ops-worker tiene NOTION_TOKEN vía gcloud, main's deploy.sh aún no lo declara). El próximo release reconcilia. No hay gap funcional (la rev 00256 lo sirve).
+
+**BQ formula flags** (`CT_DAYS_CANONICAL_FORMULA_ENABLED` / `CT_SLO_PCT_METRIC_ENABLED`): siguen OFF, gated por shadow mode.
 
 ---
 
