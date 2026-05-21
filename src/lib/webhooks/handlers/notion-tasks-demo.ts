@@ -279,7 +279,20 @@ registerInboundHandler('notion-tasks-demo', async (inboxEvent, rawBody, parsedPa
     return
   }
 
-  // 3. Resolve integration user ID for echo-loop filter (optional env var)
+  // 3. Echo-loop filter (OPCIONAL en demo — ver nota).
+  //
+  // Cuando el writeback de Greenhouse hace PATCH de la propiedad `RpA`, Notion
+  // dispara un webhook cuyo autor es nuestra integración. Sin filtro, ese echo
+  // genera una señal → el consumer re-fetchea → el status NO cambió → no-op
+  // idempotente (compare-to-last). Es decir: el echo es INOFENSIVO por diseño
+  // (no hay loop, solo un re-fetch desperdiciado por writeback, negligible en
+  // demo low-volume). Por eso el env var es opcional y hoy NO está seteado.
+  //
+  // Para activar el filtro (optimización), setear GREENHOUSE_NOTION_INTEGRATION_USER_ID
+  // al author bot id de la integración demo. ⚠️ Productivo (TASK-912): NO reusar
+  // este env var genérico — usar uno por-handler (e.g. el handler productivo lee
+  // su propio integration user id) porque demo y productivo son integraciones
+  // distintas con bot ids distintos.
   const integrationUserId = process.env.GREENHOUSE_NOTION_INTEGRATION_USER_ID ?? null
 
   // 4. Extract property-change TRIGGERS (re-fetch pattern: no from/to del

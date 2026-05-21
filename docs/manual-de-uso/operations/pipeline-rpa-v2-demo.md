@@ -61,4 +61,4 @@ Usalo cuando:
 - Documentacion funcional: [Captura de transiciones Notion → RpA (carril demo)](../../documentation/delivery/captura-transiciones-notion-rpa-demo.md)
 - Spec arquitectonica: [GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md](../../architecture/GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md) (Delta 2026-05-20)
 - Runbook de activacion: `docs/operations/runbooks/rpa-v2-demo-activation.md`
-- Task: `docs/tasks/in-progress/TASK-914-notion-demo-transition-capture-refetch.md`
+- Task: `docs/tasks/complete/TASK-914-notion-demo-transition-capture-refetch.md`

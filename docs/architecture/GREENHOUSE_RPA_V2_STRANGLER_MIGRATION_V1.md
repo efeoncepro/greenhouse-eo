@@ -52,7 +52,7 @@ El protocolo de **verificación con artefacto real** (CLAUDE.md "Real-Artifact I
 
 5 releases (`26bfe120` → `cd047724`) en una sesión. **Sin el smoke E2E con webhook real, los 5 bugs habrían quedado latentes** hasta que un operador o cliente los descubriera con el pipeline silenciosamente roto (webhooks `processed` pero 0 transiciones, 0 RpA). Los 78 tests mockeados pasaban porque mockeaban el shape equivocado. **Regla reforzada**: para features que emiten/consumen artefactos de sistemas externos (webhooks, PDFs, emails), el contrato técnico (tsc + lint + tests mockeados) NO es suficiente — hay que emitir un caso real, capturarlo, y re-auditar contra el artefacto real.
 
-**Implementación**: TASK-914 (`docs/tasks/in-progress/TASK-914-notion-demo-transition-capture-refetch.md`). Helpers: `src/lib/notion-metrics/notion-demo-client.ts` (`fetchDemoPageStatus`), `src/lib/webhooks/handlers/notion-tasks-demo.ts` (`normalizeWebhookEvents`, `extractDemoStatusChangeSignals`), `src/lib/sync/projections/notion-status-transition-capture-demo.ts` (re-fetch + derive). Signal: `notion.metrics.transition_capture_refetch_failed_demo`.
+**Implementación**: TASK-914 (`docs/tasks/complete/TASK-914-notion-demo-transition-capture-refetch.md`). Helpers: `src/lib/notion-metrics/notion-demo-client.ts` (`fetchDemoPageStatus`), `src/lib/webhooks/handlers/notion-tasks-demo.ts` (`normalizeWebhookEvents`, `extractDemoStatusChangeSignals`), `src/lib/sync/projections/notion-status-transition-capture-demo.ts` (re-fetch + derive). Signal: `notion.metrics.transition_capture_refetch_failed_demo`.
 
 ---
 

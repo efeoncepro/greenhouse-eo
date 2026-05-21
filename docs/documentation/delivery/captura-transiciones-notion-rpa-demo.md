@@ -61,5 +61,5 @@ Como el "desde" (estado anterior) tampoco viene en el aviso, Greenhouse lo deduc
 > Detalle tecnico:
 > - Spec arquitectonica: [GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md](../../architecture/GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md) (Delta 2026-05-20)
 > - Codigo: `src/lib/webhooks/handlers/notion-tasks-demo.ts`, `src/lib/sync/projections/notion-status-transition-capture-demo.ts`, `src/lib/notion-metrics/notion-demo-client.ts`
-> - Task: `docs/tasks/in-progress/TASK-914-notion-demo-transition-capture-refetch.md`
+> - Task: `docs/tasks/complete/TASK-914-notion-demo-transition-capture-refetch.md`
 > - Manual operativo: [Operar el pipeline RpA V2 demo](../../manual-de-uso/operations/pipeline-rpa-v2-demo.md)
