@@ -4441,6 +4441,50 @@ Notion edit status (operador demo) → webhook /api/webhooks/notion-tasks-demo (
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-913-rpa-v2-demo-pipeline-end-to-end.md`. ADR: `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`. Cross-refs TASK-910 (demo teamspace foundation), TASK-908 (status transition tracking foundation), TASK-901 (calculateRpaV2 productive helper).
 
+### Notion Status Transition Capture — productive pipeline invariants (TASK-912, desde 2026-05-21)
+
+Sibling PRODUCTIVO (Efeonce + Sky) del pipeline de captura demo (TASK-910/914). Cierra el loop de captura de TASK-908 Foundation: cuando el operador active el flag + secret, `countCorrectionTransitions` empieza a retornar `sourceMode='canonical'` y desbloquea TASK-901 Slice 4 / TASK-916 (RpA prod). **Aditivo + flag OFF por default → cero impacto en métricas existentes al merge.**
+
+**Pipeline canónico** (sibling físicamente separado del demo):
+
+```text
+Notion webhook (suscripción ÚNICA y AMPLIA, todos los teamspaces)
+  → /api/webhooks/notion-status-transitions  (handler notion-status-transitions)
+     ├─ verification handshake → ACK siempre
+     ├─ kill-switch NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED OFF → ACK + drop
+     ├─ HMAC (secret productivo separado del demo) + echo + demo-drop best-effort
+     └─ emite notion.task.page_change_signal (trigger liviano, sin from/to)
+  → consumer notion-status-transition-capture (reactivo, ops-worker)
+     ├─ re-fetch página (NOTION_TOKEN, read 2026-03-11)
+     ├─ resuelve workspace por parent.data_source_id → Efeonce/Sky o SKIP (autoritativo)
+     ├─ derive from de última transición en task_status_transitions (PG)
+     ├─ persist-if-changed en task_status_transitions (workspace_id resuelto)
+     └─ emite notion.task.status_transitioned (canonical, con from/to) para downstream
+```
+
+**Helpers canónicos**:
+- `resolveProductiveWorkspace(notionId)` / `isDemoTareasDataSource(notionId)` — `src/lib/notion-metrics/notion-productive-workspaces.ts` (data source IDs Efeonce `5126d7d8-…` / Sky `23039c2f-…` / demo `36339c2f-…`, normalización dashless).
+- `fetchPageStatus(pageId)` — `src/lib/space-notion/notion-client.ts` (lee `Estado` + `parent.data_source_id`, read version 2026-03-11).
+- `isNotionStatusTransitionsWebhookEnabled()` — `src/lib/notion-metrics/status-transitions-flags.ts`.
+
+**⚠️ Reglas duras (no-interferencia con flujos de métricas existentes)**:
+
+- **NUNCA** quitar el kill-switch flag `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED` ni cambiar su default OFF. Es lo que garantiza cero actividad al merge.
+- **NUNCA** confiar el `parent.id` del webhook para decidir workspace. El shape (DS vs DB id) no está garantizado. La resolución autoritativa es `parent.data_source_id` del GET de la página (consumer). El handler solo hace demo-drop best-effort.
+- **NUNCA** persistir en `task_status_transitions` una tarea cuyo workspace NO resuelva a Efeonce/Sky. `resolveProductiveWorkspace` null → SKIP. Garantía anti-contaminación (la suscripción amplia trae demo + otros teamspaces).
+- **NUNCA** escribir a Notion desde este pipeline (captura = solo GET re-fetch read-only). El writeback es TASK-916.
+- **NUNCA** reusar el secret HMAC del demo ni el integration user id genérico. Secret productivo dedicado + `NOTION_PRODUCTIVE_INTEGRATION_USER_ID` separado.
+- **NUNCA** consumir el evento `notion.task.page_change_signal` desde el consumer demo (filtra `metadata.demo_mode === true`) ni viceversa. Eventos + tablas físicamente separados.
+- **NUNCA** invocar `Sentry.captureException` directo. Usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'status_transition_capture' | 'notion-status-transitions-webhook' } })`.
+- **NUNCA** modificar `notion-bq-sync` (flujo legacy de métricas) desde este pipeline — no comparte código; sigue intacto.
+- **SIEMPRE** que emerja un teamspace productivo nuevo, agregarlo a `PRODUCTIVE_TAREAS_DATA_SOURCE_IDS` (el consumer lo resuelve automáticamente).
+
+**Reliability signals** (subsystem `delivery`): `notion.task_status_transitions.ingestion_lag` (lag) + `notion.task_status_transitions.refetch_failed` (dead_letter). Steady=0.
+
+**Estado**: Slices 1-2 (captura) shipped + verificados en `develop` (flag OFF). Slices 3-6 (BQ materializer `cycle_time_days` + `cycle_time_slo_pct` + backfill histórico) DIFERIDOS — tocan la VIEW de métricas viva, requieren acceso BigQuery para verificar, y el flip de la fórmula está spec-gated por shadow mode 7d. Ver TASK-912 spec Delta 2026-05-21.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-912-ico-status-transition-webhook-ingestion-and-bq-formula.md`. Pattern fuente: demo siblings TASK-910/913/914.
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

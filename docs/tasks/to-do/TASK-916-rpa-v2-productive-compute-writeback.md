@@ -15,6 +15,10 @@
 - Branch: `task/TASK-916-rpa-v2-productive-compute-writeback`
 - Parent: `TASK-915 (umbrella cutover)`
 
+## Delta 2026-05-21 — TASK-912 captura SHIPPED (Slices 1-2): blocker parcialmente resuelto
+
+La captura productiva (TASK-912 Slices 1-2) está shippeada en `develop` (commits `2f8754de` + `7cb6937d`): webhook handler `notion-status-transitions` + consumer `notion-status-transition-capture` que persiste en `task_status_transitions` (Efeonce/Sky) vía re-fetch pattern + resolución autoritativa de workspace. **Flag OFF** (`NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED`) — dormant hasta que el operador cree el secret + active el flag. Cuando esté activo, `countCorrectionTransitions` retorna `sourceMode='canonical'` y este task (compute prod) puede consumir `task_status_transitions` poblado. El consumer de captura ya emite `notion.task.status_transitioned` (canonical, con from/to) — TASK-916 puede usarlo como trigger del compute. **NOTA**: la parte BQ de TASK-912 (materializer + `cycle_time_days`) quedó diferida; NO es prerequisito de TASK-916 (RpA no depende de cycle time).
+
 ## Summary
 
 Construir los siblings PRODUCTIVOS de compute + writeback de RpA V2 (los equivalentes de `notion-rpa-compute-demo` + `notion-rpa-writeback-demo`, ya probados en TASK-914): consumer reactivo que computa `calculateRpaV2` desde `task_status_transitions`, persiste en una tabla `task_rpa_snapshots` productiva, y escribe `[GH] RpA v2` en Efeonce/Sky. Gated por `NOTION_RPA_WRITEBACK_ENABLED` (default false).

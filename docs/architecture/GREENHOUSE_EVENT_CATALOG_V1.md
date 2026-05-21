@@ -824,3 +824,14 @@ Ver playbook completo: `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBO
 1. Agregar el dominio a `ProjectionDomain` type en `projection-registry.ts`
 2. Crear cron route en `src/app/api/cron/outbox-react-{domain}/route.ts`
 3. Registrar en Vercel cron config si aplica
+
+## Delta 2026-05-21 — TASK-912: `notion.task.page_change_signal` (captura productiva)
+
+Nuevo evento productivo `notion.task.page_change_signal` (sibling del demo `notion.task.page_change_signal.demo` de TASK-914).
+
+- **Emisor**: handler webhook `notion-status-transitions` (`/api/webhooks/notion-status-transitions`) cuando un teamspace productivo (Efeonce/Sky) cambia una propiedad de estado en Notion. Trigger liviano (re-fetch pattern): NO incluye `from`/`to` (Notion solo manda IDs de propiedad), solo `taskSourceId`, `changedPropertyIds`, `parentId` (hint no autoritativo), `sourceEventId`, `occurredAt`.
+- **Consumer**: `notion-status-transition-capture` re-fetchea la página (source of truth), resuelve el workspace por `parent.data_source_id` (autoritativo) → Efeonce/Sky o SKIP, deriva `from` de la última transición en PG, persiste en `task_status_transitions` y emite `notion.task.status_transitioned` (canonical, con `from`/`to`) para downstream RpA/CT/FTR.
+- `notion.task.status_transitioned` (ya catalogado) ahora se documenta como emitido por el **consumer post-persist** (re-fetch pattern), NO por el webhook handler — el handler no conoce `from`/`to`.
+- No lleva `metadata.demo_mode`: el consumer demo lo ignora (filtra `=== true`), el productivo lo procesa. Tablas físicamente separadas (`task_status_transitions` vs `task_status_transitions_demo`).
+
+Spec: `docs/tasks/in-progress/TASK-912-ico-status-transition-webhook-ingestion-and-bq-formula.md`.

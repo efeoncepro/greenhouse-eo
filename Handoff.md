@@ -6,6 +6,10 @@
 
 **Decisiones pre-execution** (ver AUDIT en la task): suscripción Notion es ÚNICA y amplia → 1 secret HMAC productivo (no per-workspace); workspace se resuelve en el CONSUMER por el data source de la página re-fetcheada (autoritativo) → no depende del shape del parent del webhook; eventos productivos sin sufijo `.demo`; todo flagged OFF por default (cero cambio de comportamiento al merge).
 
+**Shippeado en `develop`** (commits `2f8754de` Slice 1 + `7cb6937d` Slice 2, 43 tests verde, flag OFF): la captura completa (handler `notion-status-transitions` + consumer `notion-status-transition-capture` + 2 reliability signals + migration + 2 capabilities). **CERO escrituras a Notion, cero impacto en notion-bq-sync legacy ni en el pipeline demo.**
+
+**DIFERIDO** (Slices 3-6 — BQ materializer + fórmula `cycle_time_days` + métrica `cycle_time_slo_pct` + backfill histórico): tocan la VIEW de métricas viva `v_tasks_enriched`, requieren acceso BigQuery para verificar (gcloud/ADC vencidos), y el flip de la fórmula está spec-gated por shadow mode 7d. Stop-and-report responsable dado el aviso del usuario "no rompas las métricas". TASK-912 queda `in-progress` con el Delta documentando shipped/deferred. **Próximo paso**: relanzar gcloud+ADC → smoke BQ → construir Slices 3-5 con shadow mode → backfill staged. Activación de la captura: crear secret + IAM + Vercel env `NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF` + flip `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED=true`.
+
 ---
 
 # Sesion 2026-05-20 (cont.) — TASK-914: captura Notion vía re-fetch + RpA V2 demo verificado E2E

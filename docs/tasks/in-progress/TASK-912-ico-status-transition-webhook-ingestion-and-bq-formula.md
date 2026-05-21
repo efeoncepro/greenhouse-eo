@@ -51,6 +51,38 @@ Exploración previa de los data sources `Tareas` de ambos teamspaces productivos
 
 **Nota sobre metodología (NO es blocker — diseño V2 confirmado correcto por el operador 2026-05-21)**: el RpA legacy es una fórmula que cuenta "rondas" desde Frame.io / workflow / relación manual, mientras que V2 cuenta transiciones de estado `Listo para revisión → Cambios solicitados`. Son dos proxies del mismo concepto ("rondas de corrección del cliente") por mecanismos distintos. El signal `notion.metrics.shadow_paridad_rpa` durante junio es una **comparación informativa** (sanity check), no un gate de "match exacto": divergencias esperables vienen de tareas donde el operador no movió el estado en cada corrección o donde el `Review Source` legacy contaba rondas internas. Esto **no requiere rediseñar V2 ni incorporar Frame.io en V1** — V2 es canónico tal como está. El operador/HR decide el threshold de aceptación del bono observando junio real.
 
+## Delta 2026-05-21 (cont.) — Implementación: CAPTURA shippeada (Slices 1-2), Cycle Time + backfill DIFERIDOS (Slices 3-6)
+
+**Shippeado en `develop` (verificado, flag OFF, cero impacto en métricas existentes)**:
+
+- **Slice 1 — Webhook ingestion** (commit `2f8754de`): handler `notion-status-transitions` (HMAC, kill-switch `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED` default OFF, re-fetch pattern, demo+echo drop) + resolver canónico de workspace + `fetchPageStatus` productivo (lee `Estado` + `parent.data_source_id`) + migration seed `webhook_endpoints` + 2 capabilities + signal `notion.task_status_transitions.ingestion_lag`. 24 tests.
+- **Slice 2 — Reactive consumer** (commit `7cb6937d`): `notion-status-transition-capture` (re-fetch → workspace autoritativo por `parent.data_source_id` o SKIP → persist `task_status_transitions` → emite `notion.task.status_transitioned`) + signal `refetch_failed`. 19 tests.
+
+**Decisiones pre-execution canónicas** (resuelven Open Questions Q6-Q8 nuevas):
+
+| # | Decisión | Rationale (no bandaid) |
+|---|---|---|
+| Q6 | Webhook emite `notion.task.page_change_signal` (trigger liviano), NO `status_transitioned` con from/to | Notion no manda from/to (lección TASK-914). El consumer re-fetchea (source of truth) y emite `status_transitioned`. |
+| Q7 | 1 secret HMAC productivo (`NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF`), no per-workspace | La suscripción es ÚNICA y amplia → 1 signing secret. Matchea el modelo real de Notion. |
+| Q8 | Workspace se resuelve en el CONSUMER por `parent.data_source_id` de la página re-fetcheada (autoritativo); handler solo descarta demo+echo | El `parent.id` del webhook tiene shape incierto (DS vs DB id). El GET de la página da el DS autoritativo. Garantía anti-contaminación. |
+
+**DIFERIDOS a follow-up (NO shippeados esta sesión)** — Slices 3 (BQ materializer PG→conformed), 4 (`cycle_time_days` canónica), 5 (`cycle_time_slo_pct`), 6 (backfill histórico). Razón:
+
+1. **Tocan la VIEW de métricas viva** `v_tasks_enriched.cycle_time_days` (Slice 4) que alimenta dashboards — el usuario priorizó explícitamente "no romper las métricas que funcionan".
+2. **No verificables esta sesión**: gcloud/ADC vencidos → sin acceso BigQuery para smoke. Shipear SQL BQ sin ejercitar viola el Solution Quality Contract + la regla "SQL Signal Reader Schema Validation Gate".
+3. **El flip de `cycle_time_days` está spec-gated** por shadow mode 7d verde + arch-architect 4-pillar (+ HR si afecta bonus) — imposible completar ahora.
+4. **El backfill (Slice 6)** requiere TASK-910 demo verde 4 semanas + Notion page history API throttled — gate canónico ADR Strangler, no ejecutable ahora.
+
+**Lo que NO bloquea el valor core**: la captura (Slices 1-2) **ya desbloquea** `countCorrectionTransitions` → `sourceMode='canonical'` (cuando el operador active el flag + secret), que es lo que TASK-901 Slice 4 / TASK-916 (RpA prod) necesitan. RpA NO depende de la fórmula BQ de cycle time.
+
+**Prerequisitos operador-side para activar la captura** (Slice 0):
+1. Crear GCP secret + IAM: `notion-webhook-signing-secret-status-transitions` (o el nombre elegido) + grant `secretAccessor` a `greenhouse-portal@`.
+2. Vercel env: `NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF=<secret-name>`.
+3. Confirmar que la suscripción amplia apunta a `/api/webhooks/notion-status-transitions` (o re-apuntarla) + pegar el verification token.
+4. Flip `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED=true` (gated, observable vía signal `ingestion_lag`).
+
+**Próximo paso del follow-up (BQ Cycle Time)**: relanzar gcloud + ADC, smoke-test las queries BQ contra el dataset real, construir Slices 3-5 con shadow mode, ejecutar Slice 6 backfill staged (demo→Efeonce→Sky).
+
 ## Summary
 
 Cerrar el loop end-to-end del ICO Status Transition Capture pipeline shippeado V1.0 Foundation en TASK-908. Hoy la tabla `greenhouse_delivery.task_status_transitions` existe vacía + helpers canonical (`countCorrectionTransitions`, `calculateCycleTime`) retornan `sourceMode='unavailable'` graceful. Esta task agrega: (a) webhook handler `/api/webhooks/notion-status-transitions` con HMAC validation + dedup + outbox emit (Slice 2), (b) reactive consumer `notion-status-transition-capture` que persiste transitions en PG (Slice 3), (c) BQ formula update `cycle_time_days` en `v_tasks_enriched` consumiendo PG transitions sync materializada (Slice 4), (d) nueva métrica `cycle_time_slo_pct` con threshold 14.2 días default + per-task-type calibration forward-compat (Slice 5), (e) backfill histórico opcional desde Notion page history API (Slice 9). Cuando shipea: el helper `countCorrectionTransitions` empieza a retornar `sourceMode='canonical'` + count real → desbloquea TASK-901 Slice 4 (shadow mode RpA prod) + reliability signal `notion.correction_transitions.source_availability` baja monotónicamente de 100% error → < 5% steady state.
