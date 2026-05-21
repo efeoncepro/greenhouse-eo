@@ -39,6 +39,7 @@ Construir los siblings PRODUCTIVOS de compute + writeback de RpA V2 (los equival
 ## Dependencies & Current Repo State
 
 - **Depende de**: TASK-912 (captura productiva poblando `task_status_transitions`) + `calculateRpaV2` (existe) + propiedad `[GH] RpA v2` en Efeonce/Sky [verificar existe].
+- ⚠️ **Completeness para el bono (TASK-917 Flip B)**: el snapshot per-tarea que este task computa solo es **completo** si `task_status_transitions` está backfilled (TASK-908 Slice 9). Para display (Flip A) basta la captura live (incompleto = honesto vía `dataStatus`); para el bono, V2 necesita el historial completo per-tarea. Este task computa correctamente lo que haya en la tabla — la completitud es responsabilidad de la captura+backfill upstream.
 - **Ya existe**: helpers de cómputo + los siblings demo como blueprint + cliente Notion productivo (`NOTION_TOKEN`).
 - **Gap**: tabla `task_rpa_snapshots` prod, 2 projections prod, signals prod, evento chain prod (`notion.task.metrics_writeback_requested` sin `.demo`).
 

@@ -26,6 +26,7 @@
 - **Aplicar el re-fetch pattern de TASK-914**: el webhook Notion entrega un **evento single** (no `{events:[]}`) + **sin valores** (solo IDs de propiedad). El handler debe usar `normalizeWebhookEvents` + el consumer re-fetchea la página (source of truth) + deriva `from` de la última transición en PG. Reusar los patrones canonizados en `complete/TASK-914-...` (NO repetir los 5 bugs de la cascada demo).
 - **Prerequisito operador-side RESTANTE**: cleanup schema Sky (`Estado 1`→`Estado` + status legacy → canónicos). HMAC signing secret + IAM: aplicar el patrón de TASK-914 (crear secret + grant `secretAccessor` a `greenhouse-portal@` en el mismo paso).
 - **Parent**: TASK-915 (umbrella RpA V2 productive cutover). Esta task es el Frente 1 (captura) del programa de dos flips (Flip A display 01/06, Flip B bono 01/07).
+- **Slice 9 (backfill histórico) DEJA DE SER OPCIONAL para el path de bono**: el bono RpA = AVG sobre TODAS las tareas completadas del período. La captura live solo registra transiciones desde su arranque → tareas con correcciones pre-captura quedan subcontadas → bono inflado. **El backfill (Notion page history API) es prerequisito DURO del Flip B de TASK-915.** Para el Flip A (display) sigue siendo opcional (mostrar incompleto es honesto vía `dataStatus`).
 
 ## Summary
 
