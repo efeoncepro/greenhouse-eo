@@ -1,3 +1,24 @@
+# Sesion 2026-05-21 — TASK-916 Flip A ACTIVADO (RpA V2 writeback ON, Efeonce + Sky) — override de dueño
+
+**Status**: ✅ Writeback RpA V2 **ACTIVADO en producción** para Efeonce + Sky (flag `NOTION_RPA_WRITEBACK_ENABLED=true`, ops-worker SHA `57ed94d0`, rev `ops-worker-00260-qtg`).
+
+**⚠️ Override de dueño documentado**: el operador (dueño) decidió activar **ambos clientes simultáneamente**, anulando conscientemente el stop-gate canónico #4 del ADR Strangler ("Efeonce primero; Sky 30+ días después") + el shadow-mode #3 + el QBR Sky #8. Se le explicó que esto NO rompe el flujo legacy ni el bono (verificado), y que el riesgo real es de **exposición al cliente** (columna `[GH] RpA v2` nueva y al principio escasa en el Notion de Sky), no técnico. Decisión informada tomada tras invocar las 3 skills (ICO/Notion/producción).
+
+**Qué se hizo**:
+- Propiedad `[GH] RpA v2` (number) creada en Efeonce (`mGgK`) + Sky (`AmoF`) — separada de la formula legacy `RpA`.
+- `NOTION_RPA_WRITEBACK_ENABLED=true` agregado declarativo en `services/ops-worker/deploy.sh` (default true; un redeploy no lo borra — patrón NOTION_TOKEN/TASK-912) + deploy via workflow (`develop`, run `26249255393` success).
+
+**Verificación "nada se rompió"** (toda verde):
+- Legacy `RpA` INTACTA (sigue `type=formula` en Efeonce + Sky). Bono INTACTO (`calculateRpaBonus`→`rpa_avg`; `BONUS_USE_RPA_V2` no flipeado, no hay consumer).
+- Worker sano, flag live, señal `writeback_dead_letter`=0, sin errores rpa_compute/rpa_writeback en logs.
+- Datos actuales: `task_status_transitions`=1 (no-corrección), snapshots=0. **El primer write real de `[GH] RpA v2` ocurrirá cuando una tarea real pase por `Listo para revisión → Cambios solicitados`** (la captura ya está viva; se irá poblando con el trabajo del equipo).
+
+**Rollback (<5min)**: `gcloud run services update ops-worker --region=us-east4 --update-env-vars NOTION_RPA_WRITEBACK_ENABLED=false` o `NOTION_RPA_WRITEBACK_ENABLED=false ENV=staging bash services/ops-worker/deploy.sh`.
+
+**Pendiente (NO hecho — sigue siendo TASK-917)**: la otra mitad de Flip A (materializar `metrics_by_member.rpa_avg_v2` + repuntar las 6 UI + trends API a V2) NO se hizo — solo se activó el **writeback display**. Y Flip B (bono usa V2) sigue intacto/pendiente con sus gates de paridad + HR sign-off.
+
+---
+
 # Sesion 2026-05-21 — TASK-916 RpA V2 productive compute + writeback siblings (COMPLETE, develop)
 
 **Status**: ✅ COMPLETE V1.0 SHIPPED en `develop` (writeback flag OFF). Aditivo — V1 legacy intacto, cero escrituras a Notion productivo. Sin push a `main` (eso es release canonical → TASK-917 Flip A).
