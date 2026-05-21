@@ -288,6 +288,19 @@ ENV_VARS="${ENV_VARS},RELIABILITY_AI_OBSERVER_ENABLED=${RELIABILITY_AI_OBSERVER_
 CLOUD_COST_AI_COPILOT_ENABLED="${CLOUD_COST_AI_COPILOT_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},CLOUD_COST_AI_COPILOT_ENABLED=${CLOUD_COST_AI_COPILOT_ENABLED}"
 
+# TASK-916 — RpA V2 writeback (Flip A). Cuando true, el consumer reactivo
+# `notion_rpa_writeback` hace PATCH a la propiedad Notion `[GH] RpA v2` (separada
+# de la formula legacy `RpA` — coexistencia Strangler; NO toca el bono, que sigue
+# leyendo `rpa_avg` legacy via `BONUS_USE_RPA_V2` separado). Default false.
+# Declarativo acá para que `--set-env-vars` (destructivo) NO lo borre en cada
+# redeploy — mismo patron que NOTION_TOKEN (leccion TASK-912). Activado 2026-05-21
+# por override de dueno (Efeonce + Sky simultaneo) sobre el stop-gate "Efeonce
+# primero" del ADR Strangler; ver Handoff. Apagar para rollback (<5min):
+# `NOTION_RPA_WRITEBACK_ENABLED=false ENV=<env> bash services/ops-worker/deploy.sh`
+# o `gcloud run services update ops-worker --update-env-vars NOTION_RPA_WRITEBACK_ENABLED=false`.
+NOTION_RPA_WRITEBACK_ENABLED="${NOTION_RPA_WRITEBACK_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},NOTION_RPA_WRITEBACK_ENABLED=${NOTION_RPA_WRITEBACK_ENABLED}"
+
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 else
