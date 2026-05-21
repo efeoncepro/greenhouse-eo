@@ -326,20 +326,24 @@ fi
 # TASK-912 — NOTION_TOKEN para el re-fetch del consumer reactivo
 # `notion-status-transition-capture` (productivo Efeonce/Sky). Es el token de la
 # integración Notion "Greenhouse PRD" (dueña de la suscripción webhook → acceso
-# garantizado a las páginas suscritas). Mount condicional: si el secret existe,
-# se monta; si no, el re-fetch falla → retry + reliability signal `refetch_failed`
-# (el flag NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED gatea si el consumer corre).
+# garantizado a las páginas suscritas). Desde la activación productiva del
+# webhook, este secreto es contrato duro del ops-worker: `deploy.sh` usa
+# `--set-env-vars`/`--update-secrets` de forma declarativa, así que permitir un
+# deploy sin `NOTION_TOKEN` reintroduce el incidente Sentry
+# "NOTION_TOKEN not configured" en el siguiente redeploy.
 # NOTA: el consumer DEMO usa su propio token (NOTION_METRICS_DEMO_TOKEN_SECRET_REF),
 # este es exclusivo del path productivo.
 NOTION_TOKEN_SECRET_NAME="${NOTION_TOKEN_SECRET_NAME:-notion-integration-token-greenhouse-prd}"
 
-if gcloud secrets describe "${NOTION_TOKEN_SECRET_NAME}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
-  SECRETS="${SECRETS},NOTION_TOKEN=${NOTION_TOKEN_SECRET_NAME}:latest"
-  ensure_secret_accessor_binding "${NOTION_TOKEN_SECRET_NAME}:latest"
-  echo "  Notion token (status-transition re-fetch): mounted from '${NOTION_TOKEN_SECRET_NAME}'"
-else
-  echo "  Notion token: secret '${NOTION_TOKEN_SECRET_NAME}' not found — productive status-transition capture re-fetch will fail until set."
+if ! gcloud secrets describe "${NOTION_TOKEN_SECRET_NAME}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  echo "ERROR: Notion token secret '${NOTION_TOKEN_SECRET_NAME}' not found."
+  echo "       ops-worker cannot process productive Notion status transitions without NOTION_TOKEN."
+  exit 1
 fi
+
+SECRETS="${SECRETS},NOTION_TOKEN=${NOTION_TOKEN_SECRET_NAME}:latest"
+ensure_secret_accessor_binding "${NOTION_TOKEN_SECRET_NAME}:latest"
+echo "  Notion token (status-transition re-fetch): mounted from '${NOTION_TOKEN_SECRET_NAME}'"
 
 # TASK-844 — HUBSPOT_ACCESS_TOKEN for hubspot_services_intake reactive consumer.
 # Required by `src/lib/hubspot/list-services-for-company.ts` (canonical helper

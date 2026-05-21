@@ -70,6 +70,40 @@ const isRetryable = (status: number) => status === 429 || status >= 500
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
+const isRetryableFetchError = (error: unknown) => {
+  if (!error || typeof error !== 'object') {
+    return false
+  }
+
+  const maybeError = error as { name?: unknown; code?: unknown; cause?: unknown }
+  const name = typeof maybeError.name === 'string' ? maybeError.name : ''
+  const code = typeof maybeError.code === 'string' ? maybeError.code : ''
+
+  const causeCode =
+    maybeError.cause && typeof maybeError.cause === 'object' && 'code' in maybeError.cause
+      ? String((maybeError.cause as { code?: unknown }).code || '')
+      : ''
+
+  return (
+    name === 'AbortError' ||
+    name === 'TimeoutError' ||
+    name === 'TypeError' ||
+    code.startsWith('UND_ERR_') ||
+    causeCode.startsWith('UND_ERR_') ||
+    causeCode === 'ECONNRESET' ||
+    causeCode === 'ETIMEDOUT' ||
+    causeCode === 'EAI_AGAIN'
+  )
+}
+
+const formatFetchError = (error: unknown) => {
+  if (error instanceof Error && error.message) {
+    return error.message
+  }
+
+  return String(error)
+}
+
 // ─── Core Fetch ─────────────────────────────────────────────────────────────
 
 type NuboxRequestOptions = {
@@ -116,13 +150,27 @@ const nuboxFetch = async <T>(options: NuboxRequestOptions): Promise<T> => {
       await sleep(backoff)
     }
 
-    const response = await fetch(url.toString(), {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      cache: 'no-store',
-      signal: AbortSignal.timeout(timeoutMs)
-    })
+    let response: Response
+
+    try {
+      response = await fetch(url.toString(), {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        cache: 'no-store',
+        signal: AbortSignal.timeout(timeoutMs)
+      })
+    } catch (error) {
+      const message = formatFetchError(error)
+
+      lastError = new Error(`Nubox API ${method} ${path} request failed: ${message}`)
+
+      if (isRetryableFetchError(error) && attempt < MAX_RETRIES) {
+        continue
+      }
+
+      throw lastError
+    }
 
     // 204 No Content — valid empty response
     if (response.status === 204) {

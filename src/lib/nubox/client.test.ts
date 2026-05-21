@@ -222,4 +222,33 @@ describe('decodeNuboxXmlPayload', () => {
     expect(fetcher).toHaveBeenCalledTimes(2)
     expect(rows).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }])
   })
+
+  it('retries transient fetch timeouts before failing the sync lane', async () => {
+    vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: 'env-token',
+      NUBOX_X_API_KEY: 'env-api-key'
+    })
+
+    const timeout = new DOMException('The operation was aborted due to timeout', 'TimeoutError')
+
+    const fetchMock = vi.fn()
+      .mockRejectedValueOnce(timeout)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [{ id: 1 }],
+        headers: new Headers({
+          'x-total-count': '1'
+        })
+      })
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(listNuboxSales('2026-03')).resolves.toEqual({
+      data: [{ id: 1 }],
+      totalCount: 1
+    })
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
 })

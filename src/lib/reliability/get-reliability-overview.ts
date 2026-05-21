@@ -57,6 +57,10 @@ import {
   getNotionStatusTransitionsCaptureRefetchFailedSignal,
   getNotionStatusTransitionsBqSyncLagSignal
 } from './queries/notion-status-transitions-signals'
+import {
+  getNotionMetricsWritebackDeadLetterSignal,
+  getNotionMetricsWritebackLagSignal
+} from './queries/notion-metrics-rpa-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
@@ -652,6 +656,15 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'delivery'. Pre-activación (flag OFF) reportan steady.
    */
   notionStatusTransitions?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-916 — Notion RpA V2 productive writeback signals (Efeonce/Sky).
+   *   - notion.metrics.writeback_dead_letter (drift)
+   *   - notion.metrics.writeback_lag (lag)
+   * Roll up bajo moduleKey 'delivery'. Pre-flip (NOTION_RPA_WRITEBACK_ENABLED
+   * OFF) reportan steady (writeback skipea sin tocar attempt_count).
+   */
+  notionMetricsRpa?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -771,7 +784,9 @@ export const buildReliabilityOverview = (
     // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
     ...(sources.notionMetricsDemo ?? []),
     // TASK-912 — Notion status-transitions productive capture signals.
-    ...(sources.notionStatusTransitions ?? [])
+    ...(sources.notionStatusTransitions ?? []),
+    // TASK-916 — Notion RpA V2 productive writeback signals (2).
+    ...(sources.notionMetricsRpa ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -1337,6 +1352,17 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-916 — Notion RpA V2 productive writeback signals (Efeonce/Sky).
+  const notionMetricsRpa =
+    preloadedSources.notionMetricsRpa !== undefined
+      ? preloadedSources.notionMetricsRpa
+      : await Promise.all([
+          getNotionMetricsWritebackDeadLetterSignal().catch(() => null),
+          getNotionMetricsWritebackLagSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -1381,7 +1407,8 @@ export const getReliabilityOverview = async (
     icoMaterializerSkippedSafety,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsDemo,
-    notionStatusTransitions
+    notionStatusTransitions,
+    notionMetricsRpa
   })
 }
 

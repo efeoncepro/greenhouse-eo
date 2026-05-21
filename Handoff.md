@@ -1,3 +1,24 @@
+# Sesion 2026-05-21 — Sentry ops-worker hardening: Notion token + Nubox timeout
+
+**Status**: 🟡 FIX IMPLEMENTADO LOCALMENTE, pendiente de release canonical/approval para desplegar. No se hizo `git push`, workflow dispatch ni Cloud Run deploy porque `greenhouse-production-release` exige aprobacion explícita para mutaciones externas de producción.
+
+**Sentry revisado desde screenshots + Cloud Logging** (`SENTRY_AUTH_TOKEN` no está configurado localmente, por eso no se consultó API Sentry):
+- `JAVASCRIPT-NEXTJS-69` (`NOTION_TOKEN not configured`) ocurrió 2026-05-21 12:20 -04 en `POST /reactive/process-domain`. Logs confirman 1 falla en `delivery`; la revisión activa `ops-worker-00258-7t8` fue creada 13:18 -04 con `NOTION_TOKEN` montado desde `notion-integration-token-greenhouse-prd`. Desde 13:20 -04 no aparecen nuevos `NOTION_TOKEN not configured`.
+- `JAVASCRIPT-NEXTJS-6A` (`TimeoutError` en `POST /nubox/quotes-hot-sync`) ocurrió 12:45 -04. Causa raíz: `nuboxFetch` solo reintentaba respuestas HTTP 429/5xx; un timeout de `fetch()` salía como excepción antes de entrar al retry. Los runs siguientes quedaron verdes, confirmando upstream transitorio.
+
+**Cambios locales**:
+- `src/lib/nubox/client.ts`: timeouts/red transitorios (`TimeoutError`, `AbortError`, `TypeError`, `UND_ERR_*`, `ECONNRESET`, `ETIMEDOUT`, `EAI_AGAIN`) ahora usan el mismo retry/backoff acotado que 429/5xx. Si se agota el budget, el error queda contextualizado por método/path sin secretos.
+- `services/ops-worker/deploy.sh`: el secret productivo `NOTION_TOKEN` ya no es condicional; si `notion-integration-token-greenhouse-prd` falta, el deploy falla antes de publicar una revisión rota.
+- Tests agregados en `src/lib/nubox/client.test.ts` y `services/ops-worker/deploy-contract.test.ts`.
+
+**Validación**:
+- `pnpm exec vitest run src/lib/nubox/client.test.ts services/ops-worker/deploy-contract.test.ts` → 2 files / 14 tests passing.
+- `gcloud secrets describe notion-integration-token-greenhouse-prd` → existe.
+- Cloud Logging post `ops-worker-00258-7t8` (desde 13:20 -04) → sin nuevos `NOTION_TOKEN not configured` ni `TimeoutError`.
+
+**Pendiente para cerrar producción**:
+- Commit/push del fix y release por el orchestrator canonical (`production-release.yml`) con approval explícita del operador. No usar deploy directo/break-glass salvo aprobación explícita y documentada.
+
 # Sesion 2026-05-21 — TASK-912: captura productiva de transiciones de estado (Efeonce + Sky)
 
 **Status**: 🔨 IN PROGRESS en `develop` (sin branch separado, por instrucción del usuario). Implementación del **sibling productivo** del pipeline de captura demo (TASK-913/914). Cierra el loop end-to-end de TASK-908 Foundation para Efeonce + Sky.

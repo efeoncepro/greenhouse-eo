@@ -28,6 +28,17 @@ describe('ops-worker deploy Nubox contract', () => {
   })
 })
 
+describe('ops-worker deploy Notion status-transition contract', () => {
+  it('requires the productive Notion token secret before deploy can continue', () => {
+    const script = deployScript()
+
+    expect(script).toContain('NOTION_TOKEN_SECRET_NAME="${NOTION_TOKEN_SECRET_NAME:-notion-integration-token-greenhouse-prd}"')
+    expect(script).toContain('ERROR: Notion token secret')
+    expect(script).toContain('ops-worker cannot process productive Notion status transitions without NOTION_TOKEN')
+    expect(script).toContain('SECRETS="${SECRETS},NOTION_TOKEN=${NOTION_TOKEN_SECRET_NAME}:latest"')
+  })
+})
+
 describe('ops-worker deploy finance FX drift remediation contract', () => {
   it('schedules bounded remediation after daily rematerialization and before ledger health', () => {
     const script = deployScript()
