@@ -4,15 +4,15 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Domain: `delivery|ico|integrations|reliability`
-- Blocked by: `TASK-912 (captura productiva debe poblar task_status_transitions)`
-- Branch: `task/TASK-916-rpa-v2-productive-compute-writeback`
+- Blocked by: `TASK-912 captura SHIPPED (Slices 1-2, flag OFF) — desbloqueado para clonar siblings prod (writeback gated default OFF hasta TASK-917 Flip A)`
+- Branch: `develop` (sesión 2026-05-21 — implementación directa en develop por instrucción del operador, sin branch dedicado)
 - Parent: `TASK-915 (umbrella cutover)`
 
 ## Delta 2026-05-21 — TASK-912 captura SHIPPED (Slices 1-2): blocker parcialmente resuelto
