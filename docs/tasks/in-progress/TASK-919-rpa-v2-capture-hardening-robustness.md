@@ -7,7 +7,7 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Implementacion`
+- Status real: `Pausado 2026-05-21 — #3 (detección) + #4 (flag por-cliente) SHIPPED; auto-repair + #2 + #5 NO se ejecutan ahora (decisión operador). Retomar desde el auto-repair command.`
 - Domain: `delivery|ico|integrations|reliability`
 - Branch: `develop` (sesión 2026-05-21, implementación directa por instrucción del operador)
 - Parent: `TASK-915 (umbrella RpA V2 cutover)`
