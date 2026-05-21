@@ -1,3 +1,13 @@
+# Sesion 2026-05-21 — TASK-912: captura productiva de transiciones de estado (Efeonce + Sky)
+
+**Status**: 🔨 IN PROGRESS en `develop` (sin branch separado, por instrucción del usuario). Implementación del **sibling productivo** del pipeline de captura demo (TASK-913/914). Cierra el loop end-to-end de TASK-908 Foundation para Efeonce + Sky.
+
+**Qué se construye**: webhook handler `/api/webhooks/notion-status-transitions` (HMAC + re-fetch pattern) → reactive consumer `notion-status-transition-capture` (re-fetchea la página, resuelve workspace por data source Efeonce/Sky, persiste en `task_status_transitions` productiva, emite `notion.task.status_transitioned`) → BQ materializer PG→conformed → fórmula `cycle_time_days` canónica (flag OFF) → métrica `cycle_time_slo_pct` (flag OFF) → backfill script (no se corre en prod). Cuando shipea, `countCorrectionTransitions` retorna `sourceMode='canonical'` y desbloquea TASK-901 Slice 4 / TASK-916.
+
+**Decisiones pre-execution** (ver AUDIT en la task): suscripción Notion es ÚNICA y amplia → 1 secret HMAC productivo (no per-workspace); workspace se resuelve en el CONSUMER por el data source de la página re-fetcheada (autoritativo) → no depende del shape del parent del webhook; eventos productivos sin sufijo `.demo`; todo flagged OFF por default (cero cambio de comportamiento al merge).
+
+---
+
 # Sesion 2026-05-20 (cont.) — TASK-914: captura Notion vía re-fetch + RpA V2 demo verificado E2E
 
 **Status**: ✅ TASK-914 COMPLETE. El pipeline RpA V2 demo funciona end-to-end con webhooks reales de Notion: captura → compute → writeback. **`RpA=2` verificado live en Notion demo** (`01:10Z`).
