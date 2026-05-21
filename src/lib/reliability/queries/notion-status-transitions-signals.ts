@@ -121,3 +121,68 @@ export const getNotionStatusTransitionsIngestionLagSignal = async (): Promise<Re
     )
   }
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// notion.task_status_transitions.refetch_failed
+// ════════════════════════════════════════════════════════════════════════════
+
+export const NOTION_STATUS_TRANSITIONS_REFETCH_FAILED_SIGNAL_ID =
+  'notion.task_status_transitions.refetch_failed'
+
+// handler key canonical en outbox_reactive_log = `<projection.name>:<triggerEvent>`
+const CAPTURE_HANDLER = 'notion_status_transition_capture:notion.task.page_change_signal'
+
+/**
+ * TASK-912 — Detecta re-fetch failures exhaustos del capture consumer productivo.
+ * El consumer re-fetchea la página Notion para resolver estado + workspace; si el
+ * fetch falla persistente (429 sostenido, NOTION_TOKEN revocado, 5xx) agota los
+ * retries del outbox y cae a dead-letter → la transición NUNCA se captura → RpA/CT
+ * nunca se computan para esa task. Steady=0.
+ */
+export const getNotionStatusTransitionsCaptureRefetchFailedSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = new Date().toISOString()
+
+  try {
+    const rows = await query<{ n: string }>(
+      `SELECT COUNT(*)::text AS n
+       FROM greenhouse_sync.outbox_reactive_log
+       WHERE handler = $1
+         AND result = 'dead-letter'
+         AND acknowledged_at IS NULL
+         AND recovered_at IS NULL`,
+      [CAPTURE_HANDLER]
+    )
+
+    const count = Number(rows[0]?.n ?? 0)
+
+    return {
+      signalId: NOTION_STATUS_TRANSITIONS_REFETCH_FAILED_SIGNAL_ID,
+      moduleKey: MODULE_KEY,
+      kind: 'dead_letter',
+      source: 'getNotionStatusTransitionsCaptureRefetchFailedSignal',
+      label: 'Captura transiciones Notion: re-fetch dead-letter (Efeonce/Sky)',
+      severity: count === 0 ? 'ok' : 'error',
+      summary:
+        count === 0
+          ? 'Steady state — zero re-fetches en dead-letter. Captura de transiciones productiva sana.'
+          : `${count} signals en dead-letter por re-fetch fallido. Revisar NOTION_TOKEN + rate limit + páginas borradas.`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'dead_letter_count', value: String(count) },
+        { kind: 'metric', label: 'handler', value: CAPTURE_HANDLER }
+      ]
+    }
+  } catch (err) {
+    captureWithDomain(err, 'integrations.notion', {
+      tags: { source: 'reliability_signal_notion_status_transitions_refetch_failed' }
+    })
+
+    return buildErrorSignal(
+      NOTION_STATUS_TRANSITIONS_REFETCH_FAILED_SIGNAL_ID,
+      'Captura transiciones Notion: re-fetch dead-letter (Efeonce/Sky)',
+      'dead_letter',
+      err,
+      observedAt
+    )
+  }
+}
