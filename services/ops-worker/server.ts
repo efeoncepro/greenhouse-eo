@@ -1628,7 +1628,12 @@ const handleNotionConformedSync = async (req: IncomingMessage, res: ServerRespon
 
     try {
       pgProjectionResult = await syncBqConformedToPostgres({
-        syncRunId: orchestrationResult.syncRunId ?? `pg-drain-${Date.now()}`,
+        // The drain owns its own source_sync_runs row (created before stamping
+        // delivery rows), so the sync_run_id FK is always satisfied. The
+        // orchestration id is passed for lineage only — it is null whenever
+        // Step 1 skipped, which is exactly when the old `pg-drain-${Date.now()}`
+        // fallback produced a dangling FK and broke this endpoint.
+        parentOrchestrationRunId: orchestrationResult.syncRunId ?? null,
         targetSpaceIds: null, // null = all active spaces
         replaceMissingForSpaces: true
       })

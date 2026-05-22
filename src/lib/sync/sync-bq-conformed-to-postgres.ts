@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { reconcileNotionFreshnessToPostgres } from '@/lib/integrations/notion-sync-freshness'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import {
   projectNotionDeliveryToPostgres,
@@ -182,6 +183,75 @@ export interface SyncBqConformedToPostgresInput {
   syncRunId?: string
   targetSpaceIds?: string[] | null
   replaceMissingForSpaces?: boolean
+  /**
+   * Run id of the upstream BQ raw→conformed orchestration (if any), recorded
+   * for lineage in the drain's run notes. NEVER used as the FK-stamped
+   * `sync_run_id` — the drain always owns its own `source_sync_runs` row so
+   * the FK on `greenhouse_delivery.{projects,sprints,tasks}.sync_run_id` is
+   * satisfied even when the orchestration skipped (and returned a null id).
+   */
+  parentOrchestrationRunId?: string | null
+}
+
+/**
+ * Opens the drain's own `source_sync_runs` row (status='running') BEFORE any
+ * delivery row is stamped with `sync_run_id`. This is **load-bearing**: the
+ * `greenhouse_delivery.{projects,sprints,tasks}.sync_run_id` FK references
+ * `source_sync_runs(sync_run_id)`, so the parent must exist first. If this
+ * write fails the whole drain must abort loud — proceeding would FK-violate
+ * on every child INSERT. Hence: this rethrows (unlike the non-critical
+ * finalize write).
+ *
+ * Idempotent: `ON CONFLICT DO NOTHING` preserves an existing row on re-run.
+ */
+const openBqPgDrainRun = async (syncRunId: string, parentOrchestrationRunId?: string | null) => {
+  const notes = parentOrchestrationRunId
+    ? `BQ conformed → PG drain started. parent_orchestration_run=${parentOrchestrationRunId}`
+    : 'BQ conformed → PG drain started (no upstream orchestration run — drain ran independently).'
+
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_sync.source_sync_runs
+       (sync_run_id, source_system, source_object_type, sync_mode, status,
+        records_read, records_projected_postgres, triggered_by, notes, finished_at)
+     VALUES ($1, 'notion', 'bq_pg_drain', 'incremental', 'running', 0, 0, 'ops_worker', $2, NULL)
+     ON CONFLICT (sync_run_id) DO NOTHING`,
+    [syncRunId, notes]
+  )
+}
+
+/**
+ * Finalizes the drain's run row (status='succeeded'|'failed'|'partial') with
+ * counts + `finished_at`. Non-critical control-plane write: a failure here
+ * must NOT fail a drain that already wrote data, so it swallows.
+ */
+const finalizeBqPgDrainRun = async ({
+  syncRunId,
+  status,
+  notes,
+  recordsRead,
+  recordsProjected
+}: {
+  syncRunId: string
+  status: 'succeeded' | 'failed' | 'partial'
+  notes: string
+  recordsRead: number
+  recordsProjected: number
+}) => {
+  try {
+    await runGreenhousePostgresQuery(
+      `UPDATE greenhouse_sync.source_sync_runs
+       SET status = $2,
+           records_read = $3,
+           records_projected_postgres = $4,
+           notes = $5,
+           finished_at = CURRENT_TIMESTAMP
+       WHERE sync_run_id = $1`,
+      [syncRunId, status, recordsRead, recordsProjected, notes.slice(0, 1000)]
+    )
+  } catch {
+    // Non-critical: the drain's data is already committed; metadata write
+    // failure must not surface as a drain failure.
+  }
 }
 
 export interface SyncBqConformedToPostgresResult {
@@ -203,152 +273,194 @@ export interface SyncBqConformedToPostgresResult {
 export const syncBqConformedToPostgres = async ({
   syncRunId = `bq-pg-${randomUUID()}`,
   targetSpaceIds = null,
-  replaceMissingForSpaces = true
+  replaceMissingForSpaces = true,
+  parentOrchestrationRunId = null
 }: SyncBqConformedToPostgresInput = {}): Promise<SyncBqConformedToPostgresResult> => {
   const startedAt = Date.now()
   const projectId = getBigQueryProjectId()
   const bq = getBigQueryClient()
 
-  const projectsFilter = buildSpaceFilter('space_id', targetSpaceIds)
-  const sprintsFilter = buildSpaceFilter('space_id', targetSpaceIds)
-  const tasksFilter = buildSpaceFilter('space_id', targetSpaceIds)
+  // Open the drain's own run row FIRST. The delivery tables' `sync_run_id` FK
+  // references `source_sync_runs(sync_run_id)`; without this the stamp would
+  // FK-violate whenever the upstream orchestration skipped (null run id) and
+  // a synthetic id was used. Load-bearing — rethrows on failure.
+  await openBqPgDrainRun(syncRunId, parentOrchestrationRunId)
 
-  const [bqProjects, bqSprints, bqTasks] = await Promise.all([
-    bq.query({
-      query: `SELECT * FROM \`${projectId}.greenhouse_conformed.delivery_projects\` WHERE TRUE${projectsFilter}`
-    }).then(([rows]) => rows as BqProjectRow[]),
-    bq.query({
-      query: `SELECT * FROM \`${projectId}.greenhouse_conformed.delivery_sprints\` WHERE TRUE${sprintsFilter}`
-    }).then(([rows]) => rows as BqSprintRow[]),
-    bq.query({
-      query: `SELECT * FROM \`${projectId}.greenhouse_conformed.delivery_tasks\` WHERE TRUE${tasksFilter}`
-    }).then(([rows]) => rows as BqTaskRow[])
-  ])
+  try {
+    const projectsFilter = buildSpaceFilter('space_id', targetSpaceIds)
+    const sprintsFilter = buildSpaceFilter('space_id', targetSpaceIds)
+    const tasksFilter = buildSpaceFilter('space_id', targetSpaceIds)
 
-  const projects: ProjectProjectionRow[] = bqProjects.map(row => ({
-    project_source_id: row.project_source_id,
-    space_id: row.space_id,
-    client_id: row.client_id,
-    module_id: row.module_id ?? null,
-    project_database_source_id: row.project_database_source_id,
-    project_name: row.project_name,
-    project_status: row.project_status,
-    project_summary: row.project_summary,
-    completion_label: row.completion_label,
-    on_time_pct_source: toNumber(row.on_time_pct_source),
-    avg_rpa_source: toNumber(row.avg_rpa_source),
-    project_phase: row.project_phase,
-    owner_member_id: row.owner_member_id,
-    start_date: toIsoString(row.start_date),
-    end_date: toIsoString(row.end_date),
-    page_url: row.page_url,
-    is_deleted: toBool(row.is_deleted),
-    last_edited_time: toIsoString(row.last_edited_time),
-    synced_at: toIsoString(row.synced_at) ?? new Date().toISOString(),
-    sync_run_id: syncRunId,
-    payload_hash: row.payload_hash ?? ''
-  }))
+    const [bqProjects, bqSprints, bqTasks] = await Promise.all([
+      bq
+        .query({
+          query: `SELECT * FROM \`${projectId}.greenhouse_conformed.delivery_projects\` WHERE TRUE${projectsFilter}`
+        })
+        .then(([rows]) => rows as BqProjectRow[]),
+      bq
+        .query({
+          query: `SELECT * FROM \`${projectId}.greenhouse_conformed.delivery_sprints\` WHERE TRUE${sprintsFilter}`
+        })
+        .then(([rows]) => rows as BqSprintRow[]),
+      bq
+        .query({
+          query: `SELECT * FROM \`${projectId}.greenhouse_conformed.delivery_tasks\` WHERE TRUE${tasksFilter}`
+        })
+        .then(([rows]) => rows as BqTaskRow[])
+    ])
 
-  const sprints: SprintProjectionRow[] = bqSprints.map(row => ({
-    sprint_source_id: row.sprint_source_id,
-    project_source_id: row.project_source_id,
-    space_id: row.space_id,
-    project_database_source_id: row.project_database_source_id,
-    sprint_name: row.sprint_name,
-    sprint_status: row.sprint_status,
-    start_date: toIsoString(row.start_date),
-    end_date: toIsoString(row.end_date),
-    completed_tasks_count: toInteger(row.completed_tasks_count),
-    total_tasks_count: toInteger(row.total_tasks_count),
-    completion_pct_source: toNumber(row.completion_pct_source),
-    page_url: row.page_url,
-    is_deleted: toBool(row.is_deleted),
-    last_edited_time: toIsoString(row.last_edited_time),
-    synced_at: toIsoString(row.synced_at) ?? new Date().toISOString(),
-    sync_run_id: syncRunId,
-    payload_hash: row.payload_hash ?? ''
-  }))
+    const projects: ProjectProjectionRow[] = bqProjects.map(row => ({
+      project_source_id: row.project_source_id,
+      space_id: row.space_id,
+      client_id: row.client_id,
+      module_id: row.module_id ?? null,
+      project_database_source_id: row.project_database_source_id,
+      project_name: row.project_name,
+      project_status: row.project_status,
+      project_summary: row.project_summary,
+      completion_label: row.completion_label,
+      on_time_pct_source: toNumber(row.on_time_pct_source),
+      avg_rpa_source: toNumber(row.avg_rpa_source),
+      project_phase: row.project_phase,
+      owner_member_id: row.owner_member_id,
+      start_date: toIsoString(row.start_date),
+      end_date: toIsoString(row.end_date),
+      page_url: row.page_url,
+      is_deleted: toBool(row.is_deleted),
+      last_edited_time: toIsoString(row.last_edited_time),
+      synced_at: toIsoString(row.synced_at) ?? new Date().toISOString(),
+      sync_run_id: syncRunId,
+      payload_hash: row.payload_hash ?? ''
+    }))
 
-  const tasks: TaskProjectionRow[] = bqTasks.map(row => ({
-    task_source_id: row.task_source_id,
-    project_source_id: row.project_source_id,
-    project_source_ids: row.project_source_ids,
-    sprint_source_id: row.sprint_source_id,
-    space_id: row.space_id,
-    client_id: row.client_id,
-    module_id: row.module_id,
-    module_code: row.module_code,
-    assignee_member_id: row.assignee_member_id,
-    assignee_source_id: row.assignee_source_id,
-    assignee_member_ids: row.assignee_member_ids,
-    project_database_source_id: row.project_database_source_id,
-    task_name: row.task_name,
-    task_status: row.task_status,
-    task_phase: row.task_phase,
-    task_priority: row.task_priority,
-    completion_label: row.completion_label,
-    delivery_compliance: row.delivery_compliance,
-    days_late: toInteger(row.days_late),
-    rescheduled_days: toInteger(row.rescheduled_days),
-    is_rescheduled: toBool(row.is_rescheduled),
-    performance_indicator_label: row.performance_indicator_label,
-    performance_indicator_code: row.performance_indicator_code,
-    client_change_round_label: row.client_change_round_label,
-    client_change_round_final: toInteger(row.client_change_round_final),
-    rpa_semaphore_source: row.rpa_semaphore_source,
-    rpa_value: toNumber(row.rpa_value),
-    frame_versions: toInteger(row.frame_versions),
-    frame_comments: toInteger(row.frame_comments),
-    open_frame_comments: toInteger(row.open_frame_comments),
-    client_review_open: toBool(row.client_review_open),
-    workflow_review_open: toBool(row.workflow_review_open),
-    blocker_count: toInteger(row.blocker_count) ?? 0,
-    last_frame_comment: row.last_frame_comment,
-    tarea_principal_ids: row.tarea_principal_ids,
-    subtareas_ids: row.subtareas_ids,
-    original_due_date: toIsoString(row.original_due_date),
-    execution_time_label: row.execution_time_label,
-    changes_time_label: row.changes_time_label,
-    review_time_label: row.review_time_label,
-    workflow_change_round: toInteger(row.workflow_change_round),
-    due_date: toIsoString(row.due_date),
-    completed_at: toIsoString(row.completed_at),
-    page_url: row.page_url,
-    is_deleted: toBool(row.is_deleted),
-    last_edited_time: toIsoString(row.last_edited_time),
-    synced_at: toIsoString(row.synced_at) ?? new Date().toISOString(),
-    sync_run_id: syncRunId,
-    payload_hash: row.payload_hash ?? '',
-    created_at: toIsoString(row.created_at)
-  }))
+    const sprints: SprintProjectionRow[] = bqSprints.map(row => ({
+      sprint_source_id: row.sprint_source_id,
+      project_source_id: row.project_source_id,
+      space_id: row.space_id,
+      project_database_source_id: row.project_database_source_id,
+      sprint_name: row.sprint_name,
+      sprint_status: row.sprint_status,
+      start_date: toIsoString(row.start_date),
+      end_date: toIsoString(row.end_date),
+      completed_tasks_count: toInteger(row.completed_tasks_count),
+      total_tasks_count: toInteger(row.total_tasks_count),
+      completion_pct_source: toNumber(row.completion_pct_source),
+      page_url: row.page_url,
+      is_deleted: toBool(row.is_deleted),
+      last_edited_time: toIsoString(row.last_edited_time),
+      synced_at: toIsoString(row.synced_at) ?? new Date().toISOString(),
+      sync_run_id: syncRunId,
+      payload_hash: row.payload_hash ?? ''
+    }))
 
-  const pgResult = await projectNotionDeliveryToPostgres({
-    syncRunId,
-    projects,
-    sprints,
-    tasks,
-    targetSpaceIds,
-    replaceMissingForSpaces
-  })
+    const tasks: TaskProjectionRow[] = bqTasks.map(row => ({
+      task_source_id: row.task_source_id,
+      project_source_id: row.project_source_id,
+      project_source_ids: row.project_source_ids,
+      sprint_source_id: row.sprint_source_id,
+      space_id: row.space_id,
+      client_id: row.client_id,
+      module_id: row.module_id,
+      module_code: row.module_code,
+      assignee_member_id: row.assignee_member_id,
+      assignee_source_id: row.assignee_source_id,
+      assignee_member_ids: row.assignee_member_ids,
+      project_database_source_id: row.project_database_source_id,
+      task_name: row.task_name,
+      task_status: row.task_status,
+      task_phase: row.task_phase,
+      task_priority: row.task_priority,
+      completion_label: row.completion_label,
+      delivery_compliance: row.delivery_compliance,
+      days_late: toInteger(row.days_late),
+      rescheduled_days: toInteger(row.rescheduled_days),
+      is_rescheduled: toBool(row.is_rescheduled),
+      performance_indicator_label: row.performance_indicator_label,
+      performance_indicator_code: row.performance_indicator_code,
+      client_change_round_label: row.client_change_round_label,
+      client_change_round_final: toInteger(row.client_change_round_final),
+      rpa_semaphore_source: row.rpa_semaphore_source,
+      rpa_value: toNumber(row.rpa_value),
+      frame_versions: toInteger(row.frame_versions),
+      frame_comments: toInteger(row.frame_comments),
+      open_frame_comments: toInteger(row.open_frame_comments),
+      client_review_open: toBool(row.client_review_open),
+      workflow_review_open: toBool(row.workflow_review_open),
+      blocker_count: toInteger(row.blocker_count) ?? 0,
+      last_frame_comment: row.last_frame_comment,
+      tarea_principal_ids: row.tarea_principal_ids,
+      subtareas_ids: row.subtareas_ids,
+      original_due_date: toIsoString(row.original_due_date),
+      execution_time_label: row.execution_time_label,
+      changes_time_label: row.changes_time_label,
+      review_time_label: row.review_time_label,
+      workflow_change_round: toInteger(row.workflow_change_round),
+      due_date: toIsoString(row.due_date),
+      completed_at: toIsoString(row.completed_at),
+      page_url: row.page_url,
+      is_deleted: toBool(row.is_deleted),
+      last_edited_time: toIsoString(row.last_edited_time),
+      synced_at: toIsoString(row.synced_at) ?? new Date().toISOString(),
+      sync_run_id: syncRunId,
+      payload_hash: row.payload_hash ?? '',
+      created_at: toIsoString(row.created_at)
+    }))
 
-  // Keep operational metadata aligned with the binding source of truth.
-  // The upstream notion-bq-sync service updates BigQuery freshness directly,
-  // so we mirror those timestamps back into PostgreSQL here.
-  const freshnessResult = await reconcileNotionFreshnessToPostgres(targetSpaceIds)
+    const pgResult = await projectNotionDeliveryToPostgres({
+      syncRunId,
+      projects,
+      sprints,
+      tasks,
+      targetSpaceIds,
+      replaceMissingForSpaces
+    })
 
-  return {
-    syncRunId,
-    bqProjectsRead: bqProjects.length,
-    bqSprintsRead: bqSprints.length,
-    bqTasksRead: bqTasks.length,
-    pgProjectsWritten: pgResult.projectsWritten,
-    pgSprintsWritten: pgResult.sprintsWritten,
-    pgTasksWritten: pgResult.tasksWritten,
-    pgProjectsMarkedDeleted: pgResult.projectsMarkedDeleted,
-    pgSprintsMarkedDeleted: pgResult.sprintsMarkedDeleted,
-    pgTasksMarkedDeleted: pgResult.tasksMarkedDeleted,
-    notionFreshnessCandidates: freshnessResult.candidateSpaces,
-    notionFreshnessUpdated: freshnessResult.updatedSpaces,
-    durationMs: Date.now() - startedAt
+    // Keep operational metadata aligned with the binding source of truth.
+    // The upstream notion-bq-sync service updates BigQuery freshness directly,
+    // so we mirror those timestamps back into PostgreSQL here.
+    const freshnessResult = await reconcileNotionFreshnessToPostgres(targetSpaceIds)
+
+    const recordsRead = bqProjects.length + bqSprints.length + bqTasks.length
+    const recordsProjected = pgResult.projectsWritten + pgResult.sprintsWritten + pgResult.tasksWritten
+
+    await finalizeBqPgDrainRun({
+      syncRunId,
+      status: 'succeeded',
+      notes:
+        `BQ conformed → PG drain succeeded. ` +
+        `read=${bqProjects.length}p/${bqSprints.length}s/${bqTasks.length}t, ` +
+        `written=${pgResult.projectsWritten}p/${pgResult.sprintsWritten}s/${pgResult.tasksWritten}t, ` +
+        `deleted=${pgResult.projectsMarkedDeleted}p/${pgResult.sprintsMarkedDeleted}s/${pgResult.tasksMarkedDeleted}t`,
+      recordsRead,
+      recordsProjected
+    })
+
+    return {
+      syncRunId,
+      bqProjectsRead: bqProjects.length,
+      bqSprintsRead: bqSprints.length,
+      bqTasksRead: bqTasks.length,
+      pgProjectsWritten: pgResult.projectsWritten,
+      pgSprintsWritten: pgResult.sprintsWritten,
+      pgTasksWritten: pgResult.tasksWritten,
+      pgProjectsMarkedDeleted: pgResult.projectsMarkedDeleted,
+      pgSprintsMarkedDeleted: pgResult.sprintsMarkedDeleted,
+      pgTasksMarkedDeleted: pgResult.tasksMarkedDeleted,
+      notionFreshnessCandidates: freshnessResult.candidateSpaces,
+      notionFreshnessUpdated: freshnessResult.updatedSpaces,
+      durationMs: Date.now() - startedAt
+    }
+  } catch (error) {
+    // Drain failed after the run row was opened — record it as failed so the
+    // run is not left dangling in 'running' and Ops Health reflects reality.
+    await finalizeBqPgDrainRun({
+      syncRunId,
+      status: 'failed',
+      notes: `BQ conformed → PG drain failed: ${error instanceof Error ? error.message : String(error)}`,
+      recordsRead: 0,
+      recordsProjected: 0
+    })
+
+    throw error
   }
 }
