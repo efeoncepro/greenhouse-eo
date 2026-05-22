@@ -5,8 +5,10 @@ import { randomUUID } from 'node:crypto'
 import { getBigQueryClient } from '@/lib/bigquery'
 import {
   listNuboxSales,
-  fetchAllPages
+  fetchAllPages,
+  NuboxApiError
 } from '@/lib/nubox/client'
+import { captureWithDomain } from '@/lib/observability/capture'
 import {
   buildNuboxIncomeByNuboxIdMap,
   buildNuboxOrgByRutMap,
@@ -282,6 +284,7 @@ export const syncNuboxQuotesHot = async (options?: { periods?: string[] }): Prom
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
+      const transient = error instanceof NuboxApiError && error.transient
 
       await writeSyncFailure({
         runId: syncRunId,
@@ -295,6 +298,38 @@ export const syncNuboxQuotesHot = async (options?: { periods?: string[] }): Prom
         notes: message.slice(0, 500)
       }).catch(() => {})
 
+      if (transient) {
+        // Transient Nubox connectivity/timeout. This sync runs every 15 min and
+        // is idempotent (advisory lock + UPSERT), so the next cycle recovers.
+        // Persistent failure surfaces via the Nubox source freshness signal
+        // (TASK-841) — the staleness backstop. Degrade honestly instead of
+        // paging: capture as WARNING (no high-priority page) and return a
+        // skipped result so the cron returns 200, not a 502 error.
+        const kind = error instanceof NuboxApiError ? error.kind : 'unknown'
+
+        captureWithDomain(error, 'finance', {
+          level: 'warning',
+          tags: { source: 'nubox_quotes_hot_sync', kind },
+          extra: { periods, syncRunId }
+        })
+
+        return {
+          syncRunId,
+          skipped: true,
+          skipReason: `nubox_transient_${kind}`,
+          periods,
+          salesFetched: 0,
+          quoteSalesFetched: 0,
+          rawWritten: 0,
+          conformedWritten: 0,
+          quotesCreated: 0,
+          quotesUpdated: 0,
+          quotesSkipped: 0,
+          durationMs: Date.now() - startMs
+        }
+      }
+
+      // Non-transient (auth, 4xx, schema, PG write failure): page loud.
       throw error
     }
   })
