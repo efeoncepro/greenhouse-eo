@@ -34,7 +34,7 @@ El ADR `GREENHOUSE_CLIENT_ONBOARDING_PROVISIONING_V1` identifica el gap: hoy `/r
   1. **VERIFY** — `diffTenantSchemaVsCanonical` (TASK-924); drift de estado → reporta + bloquea; props `[GH]` faltantes → install.
   2. **INSTALL** — crea las `[GH]` read-only faltantes vía Notion API (create/update data source), Notion-Version explícito, read-only por permisos.
   3. **REGISTER** — reusa lógica de `/api/integrations/notion/register` (persiste data sources en `space_notion_sources` PG + BQ, `sync_enabled`).
-  4. **SUBSCRIBE** — suscribe webhooks para el data source (status transitions TASK-912 + due_date changes TASK-921), con HMAC.
+  4. **SUBSCRIBE** — asegura cobertura de webhooks para el data source (status transitions TASK-912 + due_date changes TASK-921), con HMAC. **Nota (operador 2026-05-23)**: ya existe un webhook Greenhouse PRD con scope MUY AMPLIO que cubre los teamspaces productivos + uno en Demo (integración Greenhouse) → para tenants productivos este paso típicamente **verifica cobertura**, no crea webhook nuevo. Solo crear/ampliar si el scope no incluye el data source o los property-change events necesarios.
   5. **SMOKE** — readiness check: el tenant produce métricas (status canónico, captura llega, compute central las toma). Degradación honesta → estado `degraded`, no falso OK.
 - Onboarding state machine append-only (`discovered → template_cloned → schema_verified → gh_props_installed → registered → webhooks_subscribed → ready` + `drift_detected`/`degraded`), persistida en extensión de `space_notion_sources` o tabla `notion_tenant_provisioning` (decidir).
 - 3 reliability signals: `integrations.notion.tenant_schema_drift`, `tenant_unprovisioned`, `tenant_not_ready` (steady=0).

@@ -13,7 +13,7 @@
 - Status real: `Diseno (foundation del ADR Attributable Lateness V1)`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|reliability`
-- Blocked by: `TASK-912 (captura de transiciones de estado — patrón sibling a clonar; idealmente con webhook subscription registrada). No bloquea por compute: esta task solo CAPTURA eventos de due_date, no calcula atraso.`
+- Blocked by: `TASK-912 (captura de transiciones de estado — patrón sibling a clonar). El webhook YA está suscrito (confirmado operador 2026-05-23): existe un webhook Demo (integración Greenhouse) + uno en Greenhouse PRD con scope MUY AMPLIO que cubre productivos — NO hay que suscribir webhook nuevo, solo agregar el handler/consumer para los events de Fecha límite y verificar que el scope PRD los incluye. No bloquea por compute: esta task solo CAPTURA eventos de due_date, no calcula atraso.`
 - Branch: `task/TASK-921-due-date-change-capture-reschedule-reason`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
