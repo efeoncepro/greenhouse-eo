@@ -42,7 +42,10 @@ export async function POST() {
 
     try {
       pgProjection = await syncBqConformedToPostgres({
-        syncRunId: orchestrationResult.syncRunId ?? `pg-drain-manual-${Date.now()}`,
+        // Drain owns its own source_sync_runs row; orchestration id is lineage
+        // only (null when Step 1 skipped). Avoids the dangling-FK that the old
+        // `pg-drain-manual-${Date.now()}` fallback produced.
+        parentOrchestrationRunId: orchestrationResult.syncRunId ?? null,
         targetSpaceIds: null,
         replaceMissingForSpaces: true
       })

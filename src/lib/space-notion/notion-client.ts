@@ -53,6 +53,44 @@ export async function notionRequest<T>(
   return response.json() as Promise<T>
 }
 
+// ── TASK-916: productive property writeback (sibling de patchNotionDemoPage) ──
+//
+// Notion API NO tiene endpoint bulk canonical (`/v1/pages/bulk` no existe — ver
+// notion-platform skill §0). Cada page se actualiza con un single PATCH. El
+// caller (writeback consumer) DEBE throttle si el volumen crece (Notion rate
+// limit ~3 req/sec). Usa el token productivo `NOTION_TOKEN` (Efeonce + Sky) +
+// Notion-Version `2022-06-28` (default canonical de `notionRequest`, mirror del
+// demo `patchNotionDemoPage`).
+
+export interface NotionPropertyValue {
+  // Notion property update shape canonical V1. RpA V2 writeback es number-only.
+  // Forward-compat: agregar shapes para rich_text, select, multi_select, etc.
+  number?: number | null
+}
+
+/**
+ * PATCH /v1/pages/{pageId} — actualiza properties de una page productiva
+ * (Efeonce/Sky). Idempotente (Notion API es idempotent para mismo body).
+ *
+ * @param pageId Notion page UUID productivo
+ * @param properties Map de property name → value canonical Notion shape
+ * @returns Notion API response (page object)
+ *
+ * @throws Error (con `.status`) si Notion API rechaza — el caller decide retry
+ *   exponencial vía outbox. `notionRequest` ya resuelve `NOTION_TOKEN` y lanza
+ *   "NOTION_TOKEN not configured" si falta (el writeback consumer está gated por
+ *   `NOTION_RPA_WRITEBACK_ENABLED` antes de llegar acá).
+ */
+export const patchNotionPage = async (
+  pageId: string,
+  properties: Record<string, NotionPropertyValue>
+): Promise<unknown> => {
+  return notionRequest<unknown>(`/pages/${pageId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ properties })
+  })
+}
+
 // ── TASK-912: productive status re-fetch (sibling de notion-demo-client) ──────
 //
 // Notion webhooks NO incluyen valores de propiedad (solo IDs de las que

@@ -70,6 +70,100 @@ const isRetryable = (status: number) => status === 429 || status >= 500
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
+const isRetryableFetchError = (error: unknown) => {
+  if (!error || typeof error !== 'object') {
+    return false
+  }
+
+  const maybeError = error as { name?: unknown; code?: unknown; cause?: unknown }
+  const name = typeof maybeError.name === 'string' ? maybeError.name : ''
+  const code = typeof maybeError.code === 'string' ? maybeError.code : ''
+
+  const causeCode =
+    maybeError.cause && typeof maybeError.cause === 'object' && 'code' in maybeError.cause
+      ? String((maybeError.cause as { code?: unknown }).code || '')
+      : ''
+
+  return (
+    name === 'AbortError' ||
+    name === 'TimeoutError' ||
+    name === 'TypeError' ||
+    code.startsWith('UND_ERR_') ||
+    causeCode.startsWith('UND_ERR_') ||
+    causeCode === 'ECONNRESET' ||
+    causeCode === 'ETIMEDOUT' ||
+    causeCode === 'EAI_AGAIN'
+  )
+}
+
+const formatFetchError = (error: unknown) => {
+  if (error instanceof Error && error.message) {
+    return error.message
+  }
+
+  return String(error)
+}
+
+/** Classifies the failure mode of a thrown fetch error for typed handling. */
+const classifyFetchErrorKind = (error: unknown): NuboxApiErrorKind => {
+  if (!error || typeof error !== 'object') return 'unknown'
+
+  const name = typeof (error as { name?: unknown }).name === 'string' ? (error as { name: string }).name : ''
+
+  if (name === 'TimeoutError' || name === 'AbortError') return 'timeout'
+
+  // Anything else the retry classifier considers retryable is a connectivity
+  // blip (UND_ERR_*, ECONNRESET, ETIMEDOUT, EAI_AGAIN, TypeError from undici).
+  if (isRetryableFetchError(error)) return 'connectivity'
+
+  return 'unknown'
+}
+
+export type NuboxApiErrorKind = 'timeout' | 'connectivity' | 'http' | 'unknown'
+
+/**
+ * Typed error thrown by `nuboxFetch` so consumers can distinguish a **transient**
+ * external failure (Nubox slow/unreachable — recoverable on the next cycle) from
+ * a **real** failure (auth, 4xx, schema). Periodic idempotent syncs degrade
+ * honestly on transient errors instead of paging; persistent failure surfaces
+ * via the Nubox source freshness signal (TASK-841). `message` is preserved
+ * verbatim so Sentry grouping and existing assertions are unaffected.
+ */
+export class NuboxApiError extends Error {
+  readonly kind: NuboxApiErrorKind
+  readonly transient: boolean
+  readonly status?: number
+
+  constructor(
+    message: string,
+    options: { kind: NuboxApiErrorKind; transient: boolean; status?: number; cause?: unknown }
+  ) {
+    super(message)
+    this.name = 'NuboxApiError'
+    this.kind = options.kind
+    this.transient = options.transient
+    this.status = options.status
+
+    if (options.cause !== undefined) {
+      ;(this as { cause?: unknown }).cause = options.cause
+    }
+  }
+}
+
+/**
+ * Per-request timeout for the `/sales` list endpoint. It is heavier than the
+ * generic 15s default (returns up to `size` full sale records and is the most
+ * frequently paginated call), so it gets its own env-tunable budget. Clamped to
+ * a sane range so a misconfig can't set it to 0 or an unbounded value.
+ */
+const SALES_LIST_TIMEOUT_MS = (() => {
+  const parsed = Number.parseInt((process.env.NUBOX_SALES_LIST_TIMEOUT_MS ?? '').trim(), 10)
+
+  if (!Number.isFinite(parsed)) return 30_000
+
+  return Math.max(5_000, Math.min(parsed, 120_000))
+})()
+
 // ─── Core Fetch ─────────────────────────────────────────────────────────────
 
 type NuboxRequestOptions = {
@@ -116,13 +210,32 @@ const nuboxFetch = async <T>(options: NuboxRequestOptions): Promise<T> => {
       await sleep(backoff)
     }
 
-    const response = await fetch(url.toString(), {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      cache: 'no-store',
-      signal: AbortSignal.timeout(timeoutMs)
-    })
+    let response: Response
+
+    try {
+      response = await fetch(url.toString(), {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        cache: 'no-store',
+        signal: AbortSignal.timeout(timeoutMs)
+      })
+    } catch (error) {
+      const message = formatFetchError(error)
+      const transient = isRetryableFetchError(error)
+
+      lastError = new NuboxApiError(`Nubox API ${method} ${path} request failed: ${message}`, {
+        kind: classifyFetchErrorKind(error),
+        transient,
+        cause: error
+      })
+
+      if (transient && attempt < MAX_RETRIES) {
+        continue
+      }
+
+      throw lastError
+    }
 
     // 204 No Content — valid empty response
     if (response.status === 204) {
@@ -148,18 +261,25 @@ const nuboxFetch = async <T>(options: NuboxRequestOptions): Promise<T> => {
     }
 
     if (isRetryable(response.status) && attempt < MAX_RETRIES) {
-      lastError = new Error(`Nubox API ${method} ${path} returned ${response.status}`)
+      lastError = new NuboxApiError(`Nubox API ${method} ${path} returned ${response.status}`, {
+        kind: 'http',
+        transient: true,
+        status: response.status
+      })
       continue
     }
 
     const errorBody = await response.text().catch(() => '')
 
-    throw new Error(
-      `Nubox API ${method} ${path} failed with ${response.status}: ${errorBody.slice(0, 500)}`
+    throw new NuboxApiError(
+      `Nubox API ${method} ${path} failed with ${response.status}: ${errorBody.slice(0, 500)}`,
+      // 429/5xx are transient even after exhausting retries; 4xx are real (auth,
+      // bad request, not found) and must page.
+      { kind: 'http', transient: isRetryable(response.status), status: response.status }
     )
   }
 
-  throw lastError || new Error(`Nubox API ${method} ${path} failed after retries`)
+  throw lastError || new NuboxApiError(`Nubox API ${method} ${path} failed after retries`, { kind: 'unknown', transient: true })
 }
 
 export const decodeNuboxXmlPayload = (body: string): string => {
@@ -192,7 +312,8 @@ export const decodeNuboxXmlPayload = (body: string): string => {
 export const listNuboxSales = async (period: string, page = 1, size = 100) =>
   nuboxFetch<NuboxPaginatedResponse<NuboxSale>>({
     path: '/sales',
-    params: { period, page: String(page), size: String(size) }
+    params: { period, page: String(page), size: String(size) },
+    timeoutMs: SALES_LIST_TIMEOUT_MS
   })
 
 export const getNuboxSale = async (id: number) =>

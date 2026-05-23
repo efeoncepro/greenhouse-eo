@@ -288,6 +288,19 @@ ENV_VARS="${ENV_VARS},RELIABILITY_AI_OBSERVER_ENABLED=${RELIABILITY_AI_OBSERVER_
 CLOUD_COST_AI_COPILOT_ENABLED="${CLOUD_COST_AI_COPILOT_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},CLOUD_COST_AI_COPILOT_ENABLED=${CLOUD_COST_AI_COPILOT_ENABLED}"
 
+# TASK-916 — RpA V2 writeback (Flip A). Cuando true, el consumer reactivo
+# `notion_rpa_writeback` hace PATCH a la propiedad Notion `[GH] RpA v2` (separada
+# de la formula legacy `RpA` — coexistencia Strangler; NO toca el bono, que sigue
+# leyendo `rpa_avg` legacy via `BONUS_USE_RPA_V2` separado). Default false.
+# Declarativo acá para que `--set-env-vars` (destructivo) NO lo borre en cada
+# redeploy — mismo patron que NOTION_TOKEN (leccion TASK-912). Activado 2026-05-21
+# por override de dueno (Efeonce + Sky simultaneo) sobre el stop-gate "Efeonce
+# primero" del ADR Strangler; ver Handoff. Apagar para rollback (<5min):
+# `NOTION_RPA_WRITEBACK_ENABLED=false ENV=<env> bash services/ops-worker/deploy.sh`
+# o `gcloud run services update ops-worker --update-env-vars NOTION_RPA_WRITEBACK_ENABLED=false`.
+NOTION_RPA_WRITEBACK_ENABLED="${NOTION_RPA_WRITEBACK_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},NOTION_RPA_WRITEBACK_ENABLED=${NOTION_RPA_WRITEBACK_ENABLED}"
+
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 else
@@ -326,20 +339,24 @@ fi
 # TASK-912 — NOTION_TOKEN para el re-fetch del consumer reactivo
 # `notion-status-transition-capture` (productivo Efeonce/Sky). Es el token de la
 # integración Notion "Greenhouse PRD" (dueña de la suscripción webhook → acceso
-# garantizado a las páginas suscritas). Mount condicional: si el secret existe,
-# se monta; si no, el re-fetch falla → retry + reliability signal `refetch_failed`
-# (el flag NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED gatea si el consumer corre).
+# garantizado a las páginas suscritas). Desde la activación productiva del
+# webhook, este secreto es contrato duro del ops-worker: `deploy.sh` usa
+# `--set-env-vars`/`--update-secrets` de forma declarativa, así que permitir un
+# deploy sin `NOTION_TOKEN` reintroduce el incidente Sentry
+# "NOTION_TOKEN not configured" en el siguiente redeploy.
 # NOTA: el consumer DEMO usa su propio token (NOTION_METRICS_DEMO_TOKEN_SECRET_REF),
 # este es exclusivo del path productivo.
 NOTION_TOKEN_SECRET_NAME="${NOTION_TOKEN_SECRET_NAME:-notion-integration-token-greenhouse-prd}"
 
-if gcloud secrets describe "${NOTION_TOKEN_SECRET_NAME}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
-  SECRETS="${SECRETS},NOTION_TOKEN=${NOTION_TOKEN_SECRET_NAME}:latest"
-  ensure_secret_accessor_binding "${NOTION_TOKEN_SECRET_NAME}:latest"
-  echo "  Notion token (status-transition re-fetch): mounted from '${NOTION_TOKEN_SECRET_NAME}'"
-else
-  echo "  Notion token: secret '${NOTION_TOKEN_SECRET_NAME}' not found — productive status-transition capture re-fetch will fail until set."
+if ! gcloud secrets describe "${NOTION_TOKEN_SECRET_NAME}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  echo "ERROR: Notion token secret '${NOTION_TOKEN_SECRET_NAME}' not found."
+  echo "       ops-worker cannot process productive Notion status transitions without NOTION_TOKEN."
+  exit 1
 fi
+
+SECRETS="${SECRETS},NOTION_TOKEN=${NOTION_TOKEN_SECRET_NAME}:latest"
+ensure_secret_accessor_binding "${NOTION_TOKEN_SECRET_NAME}:latest"
+echo "  Notion token (status-transition re-fetch): mounted from '${NOTION_TOKEN_SECRET_NAME}'"
 
 # TASK-844 — HUBSPOT_ACCESS_TOKEN for hubspot_services_intake reactive consumer.
 # Required by `src/lib/hubspot/list-services-for-company.ts` (canonical helper

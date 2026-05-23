@@ -57,6 +57,11 @@ import {
   getNotionStatusTransitionsCaptureRefetchFailedSignal,
   getNotionStatusTransitionsBqSyncLagSignal
 } from './queries/notion-status-transitions-signals'
+import { getNotionStatusTransitionsReconciliationSignal } from './queries/notion-status-transitions-reconciliation'
+import {
+  getNotionMetricsWritebackDeadLetterSignal,
+  getNotionMetricsWritebackLagSignal
+} from './queries/notion-metrics-rpa-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
@@ -109,6 +114,7 @@ import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
 import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-revision-drift'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
+import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
 import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
 import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
@@ -570,6 +576,13 @@ interface ReliabilityOverviewSources {
   nuboxSourceFreshness?: ReliabilitySignal | null
 
   /**
+   * Notion conformed → PG drain freshness. Escalation backstop for the FK
+   * incident (JAVASCRIPT-NEXTJS-6C): surfaces if the bq_pg_drain stops
+   * completing and greenhouse_delivery.* goes stale. Roll up under 'sync'.
+   */
+  notionConformedDrainFreshness?: ReliabilitySignal | null
+
+  /**
    * TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
    *   - infrastructure.critical_tables.missing (drift, error si > 0)
    * Roll up bajo moduleKey 'cloud'.
@@ -652,6 +665,15 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'delivery'. Pre-activación (flag OFF) reportan steady.
    */
   notionStatusTransitions?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-916 — Notion RpA V2 productive writeback signals (Efeonce/Sky).
+   *   - notion.metrics.writeback_dead_letter (drift)
+   *   - notion.metrics.writeback_lag (lag)
+   * Roll up bajo moduleKey 'delivery'. Pre-flip (NOTION_RPA_WRITEBACK_ENABLED
+   * OFF) reportan steady (writeback skipea sin tocar attempt_count).
+   */
+  notionMetricsRpa?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -753,6 +775,8 @@ export const buildReliabilityOverview = (
     ...(sources.financeClientProfileUnlinked ? [sources.financeClientProfileUnlinked] : []),
     // TASK-841 — Nubox raw/conformed/projection freshness.
     ...(sources.nuboxSourceFreshness ? [sources.nuboxSourceFreshness] : []),
+    // Notion conformed → PG drain freshness (FK incident escalation backstop).
+    ...(sources.notionConformedDrainFreshness ? [sources.notionConformedDrainFreshness] : []),
     // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
@@ -771,7 +795,9 @@ export const buildReliabilityOverview = (
     // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
     ...(sources.notionMetricsDemo ?? []),
     // TASK-912 — Notion status-transitions productive capture signals.
-    ...(sources.notionStatusTransitions ?? [])
+    ...(sources.notionStatusTransitions ?? []),
+    // TASK-916 — Notion RpA V2 productive writeback signals (2).
+    ...(sources.notionMetricsRpa ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -1176,6 +1202,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.nuboxSourceFreshness
       : await getNuboxSourceFreshnessSignal().catch(() => null)
 
+  const notionConformedDrainFreshness =
+    preloadedSources.notionConformedDrainFreshness !== undefined
+      ? preloadedSources.notionConformedDrainFreshness
+      : await getNotionConformedDrainFreshnessSignal().catch(() => null)
+
   // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG. Single
   // reader; degrada honestamente a `unknown` si la query falla.
   const criticalTablesMissing =
@@ -1332,7 +1363,19 @@ export const getReliabilityOverview = async (
       : await Promise.all([
           getNotionStatusTransitionsIngestionLagSignal().catch(() => null),
           getNotionStatusTransitionsCaptureRefetchFailedSignal().catch(() => null),
-          getNotionStatusTransitionsBqSyncLagSignal().catch(() => null)
+          getNotionStatusTransitionsBqSyncLagSignal().catch(() => null),
+          getNotionStatusTransitionsReconciliationSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
+  // TASK-916 — Notion RpA V2 productive writeback signals (Efeonce/Sky).
+  const notionMetricsRpa =
+    preloadedSources.notionMetricsRpa !== undefined
+      ? preloadedSources.notionMetricsRpa
+      : await Promise.all([
+          getNotionMetricsWritebackDeadLetterSignal().catch(() => null),
+          getNotionMetricsWritebackLagSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
@@ -1371,6 +1414,7 @@ export const getReliabilityOverview = async (
     clientPortalResolverFailureRate,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
+    notionConformedDrainFreshness,
     criticalTablesMissing,
     cloudRunSilentObservability,
     secretsEnvRefFormatDrift,
@@ -1381,7 +1425,8 @@ export const getReliabilityOverview = async (
     icoMaterializerSkippedSafety,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsDemo,
-    notionStatusTransitions
+    notionStatusTransitions,
+    notionMetricsRpa
   })
 }
 

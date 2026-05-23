@@ -795,6 +795,33 @@ export const EVENT_TYPES = {
   // garantizan que writeback nunca toca Efeonce/Sky productivo.
   notionTaskMetricsWritebackRequestedDemo: 'notion.task.metrics_writeback_requested.demo',
 
+  // TASK-916 Slice 2 — RpA V2 writeback request (PRODUCTIVO, sibling sin `.demo`).
+  //
+  // Emitido por el reactive consumer compute `notion-rpa-compute` post
+  // `calculateRpaV2` invocation cuando rpa_data_status='valid' (worth writing
+  // back to Notion). Consumed por el reactive consumer writeback
+  // `notion-rpa-writeback` (Slice 4) que hace PATCH a la propiedad Notion
+  // `[GH] RpA v2` de la página (Efeonce/Sky), gated por
+  // `NOTION_RPA_WRITEBACK_ENABLED` (default OFF — no escribe hasta TASK-917
+  // Flip A).
+  //
+  // Payload canonical V1:
+  //   {
+  //     schemaVersion: 1,
+  //     taskSourceId: string,        // Notion page UUID productivo
+  //     workspaceId: 'efeonce' | 'sky',
+  //     rpaValue: number,            // computed RpA (lower is better)
+  //     rpaDataStatus: 'valid',      // solo 'valid' triggers writeback
+  //     snapshotId: string,          // UUID PK del task_rpa_snapshots row
+  //     formulaVersion: 'rpa_v2.0',
+  //     computedAt: string           // ISO 8601
+  //   }
+  //
+  // NO lleva `metadata.demo_mode` — el writeback demo lo ignora (filtra ===true);
+  // el writeback productivo lo procesa. Tablas físicamente separadas
+  // (task_rpa_snapshots vs task_rpa_demo_snapshots).
+  notionTaskMetricsWritebackRequested: 'notion.task.metrics_writeback_requested',
+
   // TASK-908 / TASK-910 / TASK-912 — Notion task status transition event.
   // Emitido por webhook handler `notion-tasks` (productivo, TASK-912) o
   // `notion-tasks-demo` (TASK-910) cuando una task cambia de status en Notion.

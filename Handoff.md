@@ -1,3 +1,82 @@
+# Sesion 2026-05-21 — TASK-919 RpA V2 capture hardening (robustez) — #3 detección + #4 flag shipped
+
+**Status**: 🔨 IN PROGRESS en `develop`. Endurece el pipeline de captura RpA V2 (BUG-CLASS-003 muestreo). **Shipped**: #4 flag por-cliente + #3 reconciliación (detección). **Diferido con rationale**: auto-repair (#3 fase 2), #2 baseline page.created, #5 Cloud Tasks. #1 (lane 60s) superseded por #3.
+
+**Shipped V1.0**:
+- **#4 Flag por-cliente** (`feat … #4`, 23 tests): `isNotionRpaWritebackEnabled(workspaceId?)` — override `NOTION_RPA_WRITEBACK_ENABLED_<EFEONCE|SKY>` gana sobre el global. Cumple stop-gate ICO. Backward-compat total. El ops-worker se redesplegó con esto (push `dd690a46`).
+- **#3 Reconciliación DETECCIÓN** (`feat … #3`, 7 tests): signal `notion.task_status_transitions.recorded_vs_current_drift` (subsystem delivery). Compara último `to_status` registrado vs `tasks.task_status` synced, gated en `source_updated_at > transitioned_at` (evita falso-positivo del sync stale 24h). CERO llamadas Notion. Convierte el modo de falla silencioso del muestreo en observable.
+
+**Decisión de diseño honesta**: el límite de muestreo (BUG-CLASS-003) NO se elimina al 100% (Notion no expone property-history). El pipeline YA era robusto para uso real (correcciones lentas). Esta task agrega kill-switch por-cliente (safety) + detección del residual (observabilidad). El auto-repair (signal-then-command canónico, patrón TASK-877/891) + #2 quedan como slices trackeadas — NO se apuran porque tocan el write-path de RpA.
+
+**Verificación**: tsc 0 + lint 0 + full suite 5206 passed + build ✓.
+
+**Pendiente (slices trackeadas en TASK-919)**: auto-repair command (INSERT transición reconciled + emit status_transitioned), #2 baseline page.created (bajo ROI vs costo re-fetch), #5 Cloud Tasks (escala writeback, detección ya cubierta por `writeback_lag`).
+
+---
+
+# Sesion 2026-05-21 — TASK-916 Flip A ACTIVADO (RpA V2 writeback ON, Efeonce + Sky) — override de dueño
+
+**Status**: ✅ Writeback RpA V2 **ACTIVADO en producción** para Efeonce + Sky (flag `NOTION_RPA_WRITEBACK_ENABLED=true`, ops-worker SHA `57ed94d0`, rev `ops-worker-00260-qtg`).
+
+**⚠️ Override de dueño documentado**: el operador (dueño) decidió activar **ambos clientes simultáneamente**, anulando conscientemente el stop-gate canónico #4 del ADR Strangler ("Efeonce primero; Sky 30+ días después") + el shadow-mode #3 + el QBR Sky #8. Se le explicó que esto NO rompe el flujo legacy ni el bono (verificado), y que el riesgo real es de **exposición al cliente** (columna `[GH] RpA v2` nueva y al principio escasa en el Notion de Sky), no técnico. Decisión informada tomada tras invocar las 3 skills (ICO/Notion/producción).
+
+**Qué se hizo**:
+- Propiedad `[GH] RpA v2` (number) creada en Efeonce (`mGgK`) + Sky (`AmoF`) — separada de la formula legacy `RpA`.
+- `NOTION_RPA_WRITEBACK_ENABLED=true` agregado declarativo en `services/ops-worker/deploy.sh` (default true; un redeploy no lo borra — patrón NOTION_TOKEN/TASK-912) + deploy via workflow (`develop`, run `26249255393` success).
+
+**Verificación "nada se rompió"** (toda verde):
+- Legacy `RpA` INTACTA (sigue `type=formula` en Efeonce + Sky). Bono INTACTO (`calculateRpaBonus`→`rpa_avg`; `BONUS_USE_RPA_V2` no flipeado, no hay consumer).
+- Worker sano, flag live, señal `writeback_dead_letter`=0, sin errores rpa_compute/rpa_writeback en logs.
+- Datos actuales: `task_status_transitions`=1 (no-corrección), snapshots=0. **El primer write real de `[GH] RpA v2` ocurrirá cuando una tarea real pase por `Listo para revisión → Cambios solicitados`** (la captura ya está viva; se irá poblando con el trabajo del equipo).
+
+**Rollback (<5min)**: `gcloud run services update ops-worker --region=us-east4 --update-env-vars NOTION_RPA_WRITEBACK_ENABLED=false` o `NOTION_RPA_WRITEBACK_ENABLED=false ENV=staging bash services/ops-worker/deploy.sh`.
+
+**Pendiente (NO hecho — sigue siendo TASK-917)**: la otra mitad de Flip A (materializar `metrics_by_member.rpa_avg_v2` + repuntar las 6 UI + trends API a V2) NO se hizo — solo se activó el **writeback display**. Y Flip B (bono usa V2) sigue intacto/pendiente con sus gates de paridad + HR sign-off.
+
+---
+
+# Sesion 2026-05-21 — TASK-916 RpA V2 productive compute + writeback siblings (COMPLETE, develop)
+
+**Status**: ✅ COMPLETE V1.0 SHIPPED en `develop` (writeback flag OFF). Aditivo — V1 legacy intacto, cero escrituras a Notion productivo. Sin push a `main` (eso es release canonical → TASK-917 Flip A).
+
+**Qué se construyó** (clonado mecánico de los siblings demo TASK-913/914 repointeado a producción; validado contra skills ICO/arquitectura/Notion + smoke PG real):
+
+- Migration `20260521182825984` — `greenhouse_delivery.task_rpa_snapshots` (sibling de `task_rpa_demo_snapshots`, `CHECK workspace_id IN ('efeonce','sky')` sin DEFAULT, append-only triggers con excepción writeback, UNIQUE parcial source_event_id, anti pre-up-marker guard). Tipos regenerados.
+- Evento `notion.task.metrics_writeback_requested` v1 (event-catalog) + helper `patchNotionPage` en `notion-client.ts`.
+- `notionRpaComputeProjection` (`notion-rpa-compute.ts`) — trigger `notion.task.status_transitioned` (captura TASK-912) → `calculateRpaV2` → snapshot → chain event.
+- `notionRpaWritebackProjection` (`notion-rpa-writeback.ts`) — PATCH `[GH] RpA v2`, **gated `NOTION_RPA_WRITEBACK_ENABLED` default OFF** (skip honest `flag_disabled`), maxRetries=4, re-read PG defensive.
+- 2 signals (`notion.metrics.writeback_dead_letter` + `writeback_lag`) wired en `get-reliability-overview` (source `notionMetricsRpa`, subsystem `delivery`).
+- Ambas projections registradas. 44 tests focales + full suite 5197 passed + tsc 0 + lint 0 errors + build ✓.
+
+**Verificación**: smoke PG real — `task_rpa_snapshots` queryable (0 rows), signals dead_letter=0/lag=0, CHECK rechaza `workspace='demo'`.
+
+**Decisión pre-execution (Open Question)**: la propiedad Notion `[GH] RpA v2` NO existe en Efeonce ni Sky (verificado vía data_sources API — solo `RpA` legacy + `Semáforo RpA`). Se difirió su creación a **TASK-917 Flip A** porque el writeback está OFF (no la necesita) y crear una propiedad vacía visible en el workspace del cliente Sky semanas antes del flip es ruido innecesario.
+
+**Próximo paso (TASK-917 Flip A)**: crear `[GH] RpA v2` read-only en Efeonce/Sky + activar `NOTION_RPA_WRITEBACK_ENABLED` bajo los 8 stop-gates ADR Strangler + ~3-4 semanas de captura acumulada (TASK-912) + materializar `rpa_avg_v2` + paridad shadow vs legacy + flip bono.
+
+---
+
+# Sesion 2026-05-21 — Sentry ops-worker hardening: Notion token + Nubox timeout
+
+**Status**: 🟡 FIX IMPLEMENTADO LOCALMENTE, pendiente de release canonical/approval para desplegar. No se hizo `git push`, workflow dispatch ni Cloud Run deploy porque `greenhouse-production-release` exige aprobacion explícita para mutaciones externas de producción.
+
+**Sentry revisado desde screenshots + Cloud Logging** (`SENTRY_AUTH_TOKEN` no está configurado localmente, por eso no se consultó API Sentry):
+- `JAVASCRIPT-NEXTJS-69` (`NOTION_TOKEN not configured`) ocurrió 2026-05-21 12:20 -04 en `POST /reactive/process-domain`. Logs confirman 1 falla en `delivery`; la revisión activa `ops-worker-00258-7t8` fue creada 13:18 -04 con `NOTION_TOKEN` montado desde `notion-integration-token-greenhouse-prd`. Desde 13:20 -04 no aparecen nuevos `NOTION_TOKEN not configured`.
+- `JAVASCRIPT-NEXTJS-6A` (`TimeoutError` en `POST /nubox/quotes-hot-sync`) ocurrió 12:45 -04. Causa raíz: `nuboxFetch` solo reintentaba respuestas HTTP 429/5xx; un timeout de `fetch()` salía como excepción antes de entrar al retry. Los runs siguientes quedaron verdes, confirmando upstream transitorio.
+
+**Cambios locales**:
+- `src/lib/nubox/client.ts`: timeouts/red transitorios (`TimeoutError`, `AbortError`, `TypeError`, `UND_ERR_*`, `ECONNRESET`, `ETIMEDOUT`, `EAI_AGAIN`) ahora usan el mismo retry/backoff acotado que 429/5xx. Si se agota el budget, el error queda contextualizado por método/path sin secretos.
+- `services/ops-worker/deploy.sh`: el secret productivo `NOTION_TOKEN` ya no es condicional; si `notion-integration-token-greenhouse-prd` falta, el deploy falla antes de publicar una revisión rota.
+- Tests agregados en `src/lib/nubox/client.test.ts` y `services/ops-worker/deploy-contract.test.ts`.
+
+**Validación**:
+- `pnpm exec vitest run src/lib/nubox/client.test.ts services/ops-worker/deploy-contract.test.ts` → 2 files / 14 tests passing.
+- `gcloud secrets describe notion-integration-token-greenhouse-prd` → existe.
+- Cloud Logging post `ops-worker-00258-7t8` (desde 13:20 -04) → sin nuevos `NOTION_TOKEN not configured` ni `TimeoutError`.
+
+**Pendiente para cerrar producción**:
+- Commit/push del fix y release por el orchestrator canonical (`production-release.yml`) con approval explícita del operador. No usar deploy directo/break-glass salvo aprobación explícita y documentada.
+
 # Sesion 2026-05-21 — TASK-912: captura productiva de transiciones de estado (Efeonce + Sky)
 
 **Status**: 🔨 IN PROGRESS en `develop` (sin branch separado, por instrucción del usuario). Implementación del **sibling productivo** del pipeline de captura demo (TASK-913/914). Cierra el loop end-to-end de TASK-908 Foundation para Efeonce + Sky.

@@ -906,6 +906,29 @@ Contrato versionado `platform-health.v1` que un agente, MCP, Teams bot, cron de 
 - Tests: `pnpm test src/lib/platform-health src/lib/observability/redact` (47 tests cubren composer, safe-modes, redaction, with-source-timeout, recommended-checks).
 - Spec: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` (sección Platform Health), doc funcional `docs/documentation/plataforma/platform-health-api.md`, OpenAPI `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` (schema `PlatformHealthV1`).
 
+### Notion Integrations Registry — token ↔ servicio ↔ scope canónico (desde 2026-05-22)
+
+Existen **3 integraciones Notion productivas/no-productivas** + **1 dedicada al sandbox demo**. Cada una mapea a un secret GCP distinto, la usa un consumer distinto y tiene un scope de acceso (qué teamspaces puede ver) estrictamente delimitado. Conectar la integración equivocada a un teamspace es una violación de aislamiento (root cause investigado 2026-05-22: el sandbox demo quedó compartido con *BigQuery Sync*; no hubo fuga porque el demo nunca se registró en el mirror BQ del sync, pero fue mina latente).
+
+| Integración Notion | Secret GCP / env var | Consumer | Scope permitido | Entorno |
+|---|---|---|---|---|
+| **BigQuery Sync** | `notion-token` (2026-03-08) | Cloud Run `notion-bq-sync` (sync legacy Notion → BigQuery, daily 03:00 Santiago) | SOLO teamspaces productivos registrados en `space_notion_sources WHERE sync_enabled=TRUE` (Efeonce + Sky) | Productivo |
+| **Greenhouse** | env `NOTION_TOKEN` (staging/dev) | Runtime no-productivo (`dev-greenhouse`, preview, local) | Efeonce + Sky (staging/dev) | **Staging/Dev** |
+| **Greenhouse PRD** | `notion-integration-token-greenhouse-prd` (2026-05-21) → env `NOTION_TOKEN` | Runtime Vercel prod + `ops-worker` (re-fetch status transitions TASK-912 + writeback `[GH]` properties TASK-916) | Efeonce + Sky (productivo) | Producción |
+| **(dedicada demo)** | `notion-integration-token-greenhouse-metrics-demo` (2026-05-19) → `NOTION_METRICS_DEMO_TOKEN_SECRET_REF` | `ops-worker` compute/writeback demo (TASK-913) | **SOLO** teamspace `Demo Greenhouse` (`36339c2f-…`) | Sandbox demo |
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** conectar **BigQuery Sync** ni **Greenhouse PRD** al teamspace `Demo Greenhouse`. El demo se conecta **SOLO** a la integración dedicada demo (`notion-integration-token-greenhouse-metrics-demo`), con permisos restringidos exclusivamente a ese teamspace. Esa es la integración canónica del demo (TASK-913) — ni BigQuery Sync, ni Greenhouse, ni Greenhouse PRD.
+- **NUNCA** conectar **BigQuery Sync** a un teamspace que no deba llegar a BigQuery. Su endpoint `/discover` enumera **TODO lo que la integración puede ver** vía Notion search, bypassando `space_notion_sources` por completo — cualquier teamspace compartido con esta integración es contaminación potencial de BQ con un solo `/discover` o un flip de `sync_enabled`.
+- **NUNCA** usar la integración **Greenhouse** (staging/dev) en producción ni **Greenhouse PRD** en staging/dev. El sufijo `PRD` separa los entornos; cruzarlos rompe el aislamiento prod/staging.
+- **NUNCA** flipear `sync_enabled=TRUE` para el space demo en `space_notion_sources`. Está sembrado `FALSE` (migración `20260519120713456`) y ausente del mirror BQ — doble defensa que evita que el sync legacy lo procese aunque BigQuery Sync tuviera acceso.
+- **NUNCA** "conectar todas las integraciones por las dudas" al crear un teamspace/database nuevo en Notion. Conectar **solo** la integración cuyo dominio corresponde al propósito del teamspace.
+- **NUNCA** usar el secret `notion-token` (BigQuery Sync) ni `notion-integration-token-greenhouse-prd` (Greenhouse PRD) como fuente del token del pipeline demo. El demo resuelve su token exclusivamente vía `NOTION_METRICS_DEMO_TOKEN_SECRET_REF` ([notion-demo-client.ts](src/lib/notion-metrics/notion-demo-client.ts)).
+- **SIEMPRE** que emerja una integración Notion nueva (e.g. otro cliente, otro pipeline), agregarla a este registry con su secret + consumer + scope + entorno antes del primer uso, y enumerar a qué teamspaces se le concede acceso.
+
+**Verificación operador-side** (no es código — son settings de Notion): la lista de integraciones conectadas a un teamspace se ve en Notion → teamspace → Settings → Connections. Para auditar fuga a BQ: `bq query 'SELECT source_database_id, space_id, COUNT(*) FROM efeonce-group.notion_ops.raw_pages_snapshot GROUP BY 1,2'` — todo `source_database_id` debe pertenecer a Efeonce (`spc-c0cf6478-…`) o Sky (`spc-ae463d9f-…`); cualquier `36339c2f…` (demo) es fuga.
+
 ### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
 
 **El daily Notion sync es un SOLO ciclo de DOS pasos en `ops-worker` Cloud Run**, schedulado por Cloud Scheduler. No hay otro path scheduled.
@@ -4484,6 +4507,59 @@ Notion webhook (suscripción ÚNICA y AMPLIA, todos los teamspaces)
 **Estado**: Slices 1-5 shipped + verificados en `develop` (flags OFF). Captura (1-2) + BQ materializer reactivo (3) + `cycle_time_days` canónica de-correlada (4, verificada contra BQ real ambas ramas) + `cycle_time_slo_pct` (5). El flip de `cycle_time_days`/`cycle_time_slo_pct` (flags ON) está gated por shadow mode 7d + arch-architect 4-pillar — NO flipeado. **Slice 6 (backfill histórico) BLOQUEADO por falta de fuente**: la API Notion no expone property-history y los snapshots BQ son stale (4 días mar–abr). Path canónico = forward-accumulation (activar captura → esperar 1 período completo → flip). Ver TASK-912 spec Delta 2026-05-21.
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-912-ico-status-transition-webhook-ingestion-and-bq-formula.md`. Pattern fuente: demo siblings TASK-910/913/914.
+
+### RpA V2 productive compute + writeback invariants (TASK-916, desde 2026-05-21)
+
+Siblings PRODUCTIVOS (Efeonce + Sky) del pipeline RpA V2 demo (TASK-913/914). Clonado mecánico + repointeo, NO rediseño. Carril paralelo invisible al productive durante la migración Strangler (ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`). **Aditivo + writeback flag OFF por default → cero impacto en métricas/Notion productivo al merge.**
+
+**Pipeline canónico** (sibling físicamente separado del demo):
+
+```text
+Notion edit status (Efeonce/Sky) → captura prod TASK-912 (notion-status-transition-capture)
+  → emite notion.task.status_transitioned (con from/to, workspaceId resuelto autoritativo)
+    → notionRpaComputeProjection (reactivo): calculateRpaV2 sobre task_status_transitions
+      → persiste snapshot en task_rpa_snapshots (CHECK workspace_id IN ('efeonce','sky'))
+      → emite chain event notion.task.metrics_writeback_requested cuando rpaDataStatus='valid'
+        → notionRpaWritebackProjection (reactivo, GATED NOTION_RPA_WRITEBACK_ENABLED default OFF):
+          re-read PG defensive → PATCH [GH] RpA v2 vía patchNotionPage/NOTION_TOKEN → mark written
+```
+
+**Diseño simétrico sibling-pattern** (mismo invariante que TASK-913): cada pieza prod es 1:1 mappable a su sibling demo — la lógica difícil ya está peleada. Diferencias: tabla `task_rpa_snapshots` (no `_demo`), evento sin `.demo`, property `[GH] RpA v2` (coexiste con legacy `RpA`), token `NOTION_TOKEN` (no el demo separado), gate `NOTION_RPA_WRITEBACK_ENABLED`.
+
+**Helpers/archivos canónicos**:
+
+- `src/lib/notion-metrics/calculate-rpa-v2.ts` (reusado tal cual — ya lee `task_status_transitions`, NO variante prod).
+- `src/lib/space-notion/notion-client.ts` → `patchNotionPage(pageId, properties)` (mirror de `patchNotionDemoPage`, vía `notionRequest`/`NOTION_TOKEN`/`2022-06-28`).
+- `src/lib/sync/projections/notion-rpa-compute.ts` + `notion-rpa-writeback.ts`.
+- `src/lib/reliability/queries/notion-metrics-rpa-signals.ts` (`notion.metrics.writeback_dead_letter` + `notion.metrics.writeback_lag`, subsystem `delivery`, steady=0).
+- Migration `20260521182825984_task-916-rpa-v2-snapshots.sql`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** hacer drift entre las firmas de los siblings prod (`notion-rpa-compute`, `notion-rpa-writeback`) y los demo. Si cambia uno, reflejar en el otro. NO mezclar la lógica prod/demo en el mismo módulo (`if (isDemo) {...}` prohibido — siblings físicamente separados es el patrón canónico).
+- **NUNCA** invocar `calculateRpaV2Demo` desde el compute prod ni `calculateRpaV2` desde el demo. Mismo para tablas: prod escribe `task_rpa_snapshots`, demo `task_rpa_demo_snapshots`. CHECK constraints PG-side enforce.
+- **NUNCA** quitar el gate `NOTION_RPA_WRITEBACK_ENABLED` ni cambiar su default OFF. Es lo que garantiza cero escrituras a Notion productivo hasta TASK-917 Flip A.
+- **NUNCA** confiar el `rpaValue` del payload del chain event en el writeback. SIEMPRE re-read del snapshot por `snapshotId` desde `task_rpa_snapshots` (defensive re-read, pattern TASK-771).
+- **NUNCA** filtrar el compute prod solo por workspace sin chequear `demo_mode !== true` (anti-coersion strict), ni viceversa. Defense in depth dual.
+- **NUNCA** crear formula property nueva en Notion para RpA — boundary canónico (Notion = OS, Greenhouse = motor). El productivo escribe `[GH] RpA v2` read-only para operadores; coexiste con `RpA` legacy (NO se toca durante la migración Strangler).
+- **NUNCA** invocar `Sentry.captureException` directo. Usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'rpa_compute' | 'rpa_writeback' } })`.
+- **NUNCA** activar `NOTION_RPA_WRITEBACK_ENABLED=true` sin: (a) crear la propiedad `[GH] RpA v2` en Efeonce/Sky (NO existe aún — verificado 2026-05-21), (b) los 8 stop-gates del ADR Strangler, (c) ~3-4 semanas de captura acumulada vía TASK-912. Eso es TASK-917 Flip A.
+- **SIEMPRE** que el compute persista snapshot pero el chain event emit falle, NON-blocking: el snapshot persistido es source of truth; el signal `writeback_lag` detecta el pending overdue.
+- **SIEMPRE** que emerja una métrica V2 nueva (OTD, FTR, etc.) con writeback productivo, replicar este patrón sibling (compute + writeback + snapshot table + 2 signals + chain event), NO improvisar.
+
+**Echo-loop**: el writeback escribe un number (`[GH] RpA v2`), NO el status. El webhook que dispara → captura prod re-fetchea STATUS → unchanged → noop → no `status_transitioned` → no recompute. Sin loop.
+
+**⚠️ Característica de MUESTREO canónica (no es bug — BUG-CLASS-003, canonizada 2026-05-21)**: la captura de transiciones es un **sistema de muestreo**, no un registro continuo. Dos hechos: (1) el webhook de Notion NO trae valores (solo IDs de propiedad — payload real verificado `updated_properties:["PyIi","notion://tasks/status_property"]`) → el consumer re-fetchea y obtiene solo el estado ACTUAL; (2) el dispatcher reactivo (`reactive-consumer.ts` Phase B) coalescia todos los eventos de la misma página en UN `refresh()` por batch (~5 min). Consecuencia: **transiciones más rápidas que la cadencia (o ida-y-vuelta al mismo estado dentro de un batch) se COLAPSAN** — solo se registran las que persisten a través de ≥1 read reactivo. Estados intermedios nunca observados son irreconstruibles (Notion no expone property-history).
+
+- **NUNCA** tratar esto como bug a "arreglar" dentro de webhook+re-fetch — es inherente (no se puede reconstruir un estado no muestreado). Quitar el coalescing NO lo arregla (dos eventos post-cambios re-fetchean el mismo estado). La única mejora sería re-fetch al llegar el webhook (gap ~segundos), pero rompe el decoupling outbox (TASK-771) y sigue siendo muestreo. **YAGNI hasta que la paridad lo justifique.**
+- **Aceptable para RpA**: las correcciones reales son client-driven sobre horas/días → siempre persisten a través de batches → se capturan bien. El subconteo solo ocurre con toqueteo sub-minuto (no es uso real). El demo de TASK-914 (RpA=2) funcionó porque las transiciones estaban espaciadas en batches distintos.
+- **Protección del bono (Flip B)**: gate `shadow_paridad_rpa ≥95%` 30 días + sign-off HR. Si el subconteo fuera material, la paridad lo detecta antes de mover plata (RpA bajo = mejor → subcontar infla calidad → el gate lo frena). Flip A (display) no toca el bono.
+- **Para DEMOS/tests**: para verificar que una corrección se captura, **espaciar las transiciones entre batches reactivos** (o verificar la captura del paso N antes del N+1). Toqueteo sub-minuto colapsa y NO es representativo. Verificado live 2026-05-21: demo espaciado → `[GH] RpA v2=1`; toqueteo en segundos → 0 (colapso esperado).
+- **SIEMPRE** que se canonice un fix de captura vía webhook+re-fetch, documentar JUNTO al fix esta característica de muestreo. Lección dura de TASK-916: BUG-CLASS-002 documentó el fix re-fetch pero NO su límite residual → se re-descubrió costosamente en TASK-916. El fix y su límite de muestreo se documentan **juntos** o el aprendizaje se pierde.
+
+**Estado**: V1.0 SHIPPED en `develop` 2026-05-21 (writeback flag OFF). Migration aplicada + tipos regenerados. 44 tests focales + full suite 5197 passed + tsc 0 + lint 0 + build ✓. Smoke PG real: tabla queryable 0 rows, signals dead_letter/lag = 0, CHECK rechaza `workspace='demo'`. Activación → TASK-917 Flip A.
+
+**Spec canónica**: `docs/tasks/complete/TASK-916-rpa-v2-productive-compute-writeback.md`. Pattern fuente: demo siblings TASK-913/914.
 
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 

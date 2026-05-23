@@ -5,8 +5,10 @@ import { randomUUID } from 'node:crypto'
 import { getBigQueryClient } from '@/lib/bigquery'
 import {
   listNuboxSales,
-  fetchAllPages
+  fetchAllPages,
+  NuboxApiError
 } from '@/lib/nubox/client'
+import { captureWithDomain } from '@/lib/observability/capture'
 import {
   buildNuboxIncomeByNuboxIdMap,
   buildNuboxOrgByRutMap,
@@ -201,16 +203,70 @@ export const syncNuboxQuotesHot = async (options?: { periods?: string[] }): Prom
     try {
       const salesById = new Map<string, NuboxSale>()
       let salesFetched = 0
+      const failedPeriods: Array<{ period: string; message: string }> = []
 
+      // Per-period isolation: a transient failure on one period must not sink
+      // the others. A NON-transient failure (auth / 4xx / schema) is systemic
+      // — same credentials and endpoint for every period — so it pages loud
+      // immediately rather than masquerading as a partial result.
       for (const period of periods) {
-        const sales = await fetchAllPages(listNuboxSales, period)
+        try {
+          const sales = await fetchAllPages(listNuboxSales, period)
 
-        salesFetched += sales.length
+          salesFetched += sales.length
 
-        for (const sale of sales) {
-          if (isQuoteSale(sale)) {
-            salesById.set(String(sale.id), sale)
+          for (const sale of sales) {
+            if (isQuoteSale(sale)) {
+              salesById.set(String(sale.id), sale)
+            }
           }
+        } catch (error) {
+          if (!(error instanceof NuboxApiError && error.transient)) {
+            throw error
+          }
+
+          failedPeriods.push({
+            period,
+            message: error instanceof Error ? error.message : String(error)
+          })
+        }
+      }
+
+      // Every period failed transiently → nothing fetched. Degrade honestly:
+      // record failed, capture warning, return skipped so the cron returns 200.
+      // The */15min cadence + freshness signal (TASK-841) are the backstop.
+      if (failedPeriods.length === periods.length && periods.length > 0) {
+        await writeSyncFailure({
+          runId: syncRunId,
+          errorMessage: `All periods failed transiently: ${failedPeriods.map(f => `${f.period} (${f.message})`).join('; ')}`,
+          payload: { periods }
+        }).catch(() => {})
+        await writeSyncRun({
+          runId: syncRunId,
+          status: 'failed',
+          periods,
+          notes: `All ${periods.length} periods failed transiently — recovers next cycle.`.slice(0, 500)
+        }).catch(() => {})
+
+        captureWithDomain(new Error('nubox_quotes_hot_all_periods_transient_failure'), 'finance', {
+          level: 'warning',
+          tags: { source: 'nubox_quotes_hot_sync', kind: 'all_periods_transient' },
+          extra: { periods, failedPeriods, syncRunId }
+        })
+
+        return {
+          syncRunId,
+          skipped: true,
+          skipReason: 'nubox_transient_all_periods',
+          periods,
+          salesFetched: 0,
+          quoteSalesFetched: 0,
+          rawWritten: 0,
+          conformedWritten: 0,
+          quotesCreated: 0,
+          quotesUpdated: 0,
+          quotesSkipped: 0,
+          durationMs: Date.now() - startMs
         }
       }
 
@@ -247,14 +303,30 @@ export const syncNuboxQuotesHot = async (options?: { periods?: string[] }): Prom
         else quotesSkipped++
       }
 
-      const status = quotesSkipped > 0 ? 'partial' : 'succeeded'
+      // Partial when some periods failed transiently (we still persisted the
+      // good ones) OR when some quotes were skipped during projection.
+      const status = failedPeriods.length > 0 || quotesSkipped > 0 ? 'partial' : 'succeeded'
 
       const notes = [
         `Hot quote periods: ${periods.join(', ')}`,
         `Sales fetched: ${salesFetched}`,
         `Quote sales: ${quoteSales.length}`,
-        `Quotes: ${quotesCreated} created, ${quotesUpdated} updated, ${quotesSkipped} skipped`
+        `Quotes: ${quotesCreated} created, ${quotesUpdated} updated, ${quotesSkipped} skipped`,
+        ...(failedPeriods.length > 0
+          ? [`Failed periods (transient, retry next cycle): ${failedPeriods.map(f => f.period).join(', ')}`]
+          : [])
       ].join(' | ')
+
+      // Surface the partial fetch as a warning (not a page) so it is visible
+      // without alert fatigue; persistent staleness escalates via the freshness
+      // signal (TASK-841).
+      if (failedPeriods.length > 0) {
+        captureWithDomain(new Error('nubox_quotes_hot_partial_periods'), 'finance', {
+          level: 'warning',
+          tags: { source: 'nubox_quotes_hot_sync', kind: 'partial_periods' },
+          extra: { periods, failedPeriods, syncRunId }
+        })
+      }
 
       await writeSyncRun({
         runId: syncRunId,
@@ -282,6 +354,7 @@ export const syncNuboxQuotesHot = async (options?: { periods?: string[] }): Prom
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
+      const transient = error instanceof NuboxApiError && error.transient
 
       await writeSyncFailure({
         runId: syncRunId,
@@ -295,6 +368,38 @@ export const syncNuboxQuotesHot = async (options?: { periods?: string[] }): Prom
         notes: message.slice(0, 500)
       }).catch(() => {})
 
+      if (transient) {
+        // Transient Nubox connectivity/timeout. This sync runs every 15 min and
+        // is idempotent (advisory lock + UPSERT), so the next cycle recovers.
+        // Persistent failure surfaces via the Nubox source freshness signal
+        // (TASK-841) — the staleness backstop. Degrade honestly instead of
+        // paging: capture as WARNING (no high-priority page) and return a
+        // skipped result so the cron returns 200, not a 502 error.
+        const kind = error instanceof NuboxApiError ? error.kind : 'unknown'
+
+        captureWithDomain(error, 'finance', {
+          level: 'warning',
+          tags: { source: 'nubox_quotes_hot_sync', kind },
+          extra: { periods, syncRunId }
+        })
+
+        return {
+          syncRunId,
+          skipped: true,
+          skipReason: `nubox_transient_${kind}`,
+          periods,
+          salesFetched: 0,
+          quoteSalesFetched: 0,
+          rawWritten: 0,
+          conformedWritten: 0,
+          quotesCreated: 0,
+          quotesUpdated: 0,
+          quotesSkipped: 0,
+          durationMs: Date.now() - startMs
+        }
+      }
+
+      // Non-transient (auth, 4xx, schema, PG write failure): page loud.
       throw error
     }
   })

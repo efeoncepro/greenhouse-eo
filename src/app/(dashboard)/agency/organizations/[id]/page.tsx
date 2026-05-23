@@ -4,6 +4,7 @@ import AgencyOrganizationWorkspaceClient from '@views/greenhouse/organizations/A
 import { requireServerSession } from '@/lib/auth/require-server-session'
 import { isWorkspaceShellEnabledForSubject } from '@/lib/workspace-rollout'
 import { resolveOrganizationWorkspaceProjection } from '@/lib/organization-workspace/projection'
+import { buildOrganizationWorkspaceSubject } from '@/lib/organization-workspace/build-projection-subject'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 export const dynamic = 'force-dynamic'
@@ -52,18 +53,7 @@ const OrganizationDetailPage = async ({ params }: { params: Promise<{ id: string
   }
 
   const projection = await resolveOrganizationWorkspaceProjection({
-    subject: {
-      userId: session.user.userId,
-      tenantType: session.user.tenantType,
-      roleCodes: session.user.roleCodes,
-      primaryRoleCode: session.user.primaryRoleCode,
-      routeGroups: session.user.routeGroups,
-      authorizedViews: session.user.authorizedViews,
-      projectScopes: session.user.projectScopes,
-      campaignScopes: session.user.campaignScopes,
-      businessLines: session.user.businessLines,
-      serviceModules: session.user.serviceModules
-    },
+    subject: buildOrganizationWorkspaceSubject(session.user),
     organizationId: id,
     entrypointContext: 'agency'
   })

@@ -2,6 +2,20 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-21 — TASK-916: RpA V2 productive writeback chain event (1 event v1)
+
+Aggregate type: `notion_task`.
+
+| Event Type | Disparado por | Payload v1 contract | Consumers |
+|---|---|---|---|
+| `notion.task.metrics_writeback_requested` | Reactive consumer `notion_rpa_compute` (productivo) post `calculateRpaV2`, cuando `rpaDataStatus='valid'` y el snapshot persistió (no ON CONFLICT skip) | `{schemaVersion:1, taskSourceId, workspaceId:'efeonce' or 'sky', rpaValue:number, rpaDataStatus:'valid', snapshotId, formulaVersion:'rpa_v2.0', computedAt}` | `notion_rpa_writeback` (productivo) — PATCH propiedad Notion `[GH] RpA v2`, gated `NOTION_RPA_WRITEBACK_ENABLED` (default OFF) |
+
+Reglas duras:
+
+- Sibling PRODUCTIVO (sin sufijo `.demo`) de `notion.task.metrics_writeback_requested.demo` (TASK-913). NO lleva `metadata.demo_mode` — el writeback demo lo ignora (filtra `===true`), el productivo lo procesa. Tablas físicamente separadas (`task_rpa_snapshots` vs `task_rpa_demo_snapshots`).
+- Chain event pattern (TASK-771): compute y writeback decoupled via outbox, retry exponencial per-step. El writeback re-lee el snapshot de PG por `snapshotId` (NUNCA confía el `rpaValue` del payload).
+- El writeback es aditivo y gated OFF por default — cero escrituras a Notion productivo hasta TASK-917 Flip A. V1 legacy (formula Notion `RpA` + `metrics_by_member.rpa_avg`) intacto.
+
 ## Delta 2026-05-16 — TASK-894: Member contract taxonomy changes (1 event v1)
 
 Aggregate type: `member`.

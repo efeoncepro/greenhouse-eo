@@ -13,7 +13,8 @@ import {
   fetchAllPages,
   getNuboxSalePdf,
   getNuboxSaleXml,
-  listNuboxSales
+  listNuboxSales,
+  NuboxApiError
 } from '@/lib/nubox/client'
 
 const mockSecretResolution = (values: Record<string, string | null>) => {
@@ -221,5 +222,90 @@ describe('decodeNuboxXmlPayload', () => {
 
     expect(fetcher).toHaveBeenCalledTimes(2)
     expect(rows).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }])
+  })
+
+  it('retries transient fetch timeouts before failing the sync lane', async () => {
+    vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: 'env-token',
+      NUBOX_X_API_KEY: 'env-api-key'
+    })
+
+    const timeout = new DOMException('The operation was aborted due to timeout', 'TimeoutError')
+
+    const fetchMock = vi.fn()
+      .mockRejectedValueOnce(timeout)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [{ id: 1 }],
+        headers: new Headers({
+          'x-total-count': '1'
+        })
+      })
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(listNuboxSales('2026-03')).resolves.toEqual({
+      data: [{ id: 1 }],
+      totalCount: 1
+    })
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('throws a transient NuboxApiError (kind=timeout) after exhausting retries on timeout', async () => {
+    vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: 'env-token',
+      NUBOX_X_API_KEY: 'env-api-key'
+    })
+
+    const timeout = new DOMException('The operation was aborted due to timeout', 'TimeoutError')
+    const fetchMock = vi.fn().mockRejectedValue(timeout)
+
+    vi.stubGlobal('fetch', fetchMock)
+    vi.useFakeTimers()
+
+    try {
+      const caught = listNuboxSales('2026-03').catch((error: unknown) => error)
+
+      // Flush the exponential backoff sleeps between retries.
+      await vi.runAllTimersAsync()
+
+      const error = await caught
+
+      expect(error).toBeInstanceOf(NuboxApiError)
+      expect(error).toMatchObject({ kind: 'timeout', transient: true })
+
+      // 1 initial + 3 retries (MAX_RETRIES).
+      expect(fetchMock).toHaveBeenCalledTimes(4)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('throws a non-transient NuboxApiError on a 4xx (must page, no retry)', async () => {
+    vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: 'env-token',
+      NUBOX_X_API_KEY: 'env-api-key'
+    })
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      text: async () => 'bad request',
+      headers: new Headers()
+    })
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    const error = await listNuboxSales('2026-03').catch((err: unknown) => err)
+
+    expect(error).toBeInstanceOf(NuboxApiError)
+    expect(error).toMatchObject({ kind: 'http', transient: false, status: 400 })
+
+    // 4xx is not retryable → single attempt.
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })
