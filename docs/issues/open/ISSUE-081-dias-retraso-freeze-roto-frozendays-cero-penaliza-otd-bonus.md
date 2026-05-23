@@ -90,4 +90,7 @@ open
 - `src/lib/ico-engine/schema.ts:138-148` (`delivery_signal` BQ sin freeze)
 - `src/lib/sync/sync-notion-conformed.ts:1289` (`performance_indicator_code` synced de Notion)
 - `src/lib/payroll/bonus-proration.ts` (`calculateOtdBonus`)
-- TASK derivada (diseño "días de retraso imputables") — pendiente de crear
+- **ADR canónico del modelo de solución**: `docs/architecture/GREENHOUSE_ATTRIBUTABLE_LATENESS_V1.md` (2026-05-23)
+- **TASK-921** — Captura `task_due_date_changes` + motivo (foundation)
+- **TASK-922** — `calculateAttributableLateness` + bucket OTD reason-aware (shadow)
+- Cutover del OTD-bono → task futura gated (8 stop-gates + HR sign-off)

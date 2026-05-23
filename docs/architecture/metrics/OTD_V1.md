@@ -10,7 +10,7 @@
 | Created | 2026-05-17 by sesión deep-dive ICO + arch reasoning |
 | Last updated | 2026-05-17 |
 | Writeback state | `not_implemented` (TASK-902 futura implementa writeback canonical) |
-| Cross-refs | TASK-902 (writeback futuro) · TASK-908 (CT SLO% separación) · RPA_V1 · FTR_V1 · CT_SLO_PCT_V1 · CUMPLIMIENTO_V1 · ADR boundary · ADR metric spec pattern |
+| Cross-refs | TASK-902 (writeback futuro) · TASK-908 (CT SLO% separación) · TASK-921/922 (atraso imputable + bucket reason-aware) · RPA_V1 · FTR_V1 · CT_SLO_PCT_V1 · CUMPLIMIENTO_V1 · ADR boundary · ADR metric spec pattern · **ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` (bucket OTD reason-aware + freeze — corrige ISSUE-081)** |
 
 ---
 
