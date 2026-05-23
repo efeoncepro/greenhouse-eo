@@ -13,7 +13,7 @@
 - Status real: `Diseno (compute del ADR Attributable Lateness V1)`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|payroll|reliability`
-- Blocked by: `TASK-921 (log task_due_date_changes + motivo) + TASK-908/912 (task_status_transitions con captura activa). Sin las dos fuentes de eventos, el helper no tiene insumos confiables.`
+- Blocked by: `TASK-923 (M1 — Greenhouse ya owner del clasificador OTD; este task reusa classify-otd-bucket con freeze ON) + TASK-921 (log task_due_date_changes + motivo) + TASK-908/912 (task_status_transitions con captura activa). M2 del ADR §16: agrega la semántica freeze sobre el clasificador ya GH-owned por M1. Sin M1 no hay clasificador GH al cual aplicarle freeze.`
 - Branch: `task/TASK-922-attributable-lateness-helper-otd-bucket-shadow`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
