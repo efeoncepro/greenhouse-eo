@@ -179,8 +179,38 @@ Secuencia canónica de 4 movimientos independientes (detalle en §16):
 - **TASK-921 (M0)** — Captura `task_due_date_changes` + inferencia de motivo + propiedad Notion `Motivo de reprogramación` (foundation, sibling TASK-912).
 - **TASK-922 (M2)** — Helper `calculateAttributableLateness` (freeze + reason-aware) sobre el clasificador **ya GH-owned por TASK-923**; escribe el bucket corregido en `gh_otd_bucket`, **shadow** + reliability signals. **Depende de TASK-923 + TASK-921.**
 - **Cutover del OTD-bono (M3, futura gateada)** — flip de la fuente de `otd_pct` → columna GH reason-aware. **Único movimiento que toca el bono.** Requiere ≥30d shadow + 8 stop-gates + sign-off HR. **No puede ocurrir dentro de los 7 días de la próxima nómina.**
-- **Follow-ups (no creados aún)**: superficies de severidad/retro; ADR chico de convención de naming `[GH]`; spec de métrica `ATTRIBUTABLE_LATENESS_V1.md` + Delta a `OTD_V1.md`; rollup `days_late` project-level (open question 5).
+- **Follow-ups (no creados aún — strangler)**:
+  - Spec de métrica nueva `ATTRIBUTABLE_LATENESS_V1.md` + Delta a `OTD_V1.md` (bucket reason-aware) — owner: TASK-922.
+  - **Spec nueva de trazabilidad de reprogramación** (Días reprogramados + motivo, event-log-backed) — owner: derivar de TASK-921 al cerrar (gap detectado 2026-05-23, ver §17).
+  - **Spec/sección nueva de severidad** (tiers 🟢/🟠/🔴/🔴🔴) — owner: task de superficies retro (futura, gap detectado 2026-05-23, ver §17).
+  - Delta a `CUMPLIMIENTO_V1.md` (hereda OTD% reason-aware) — owner: TASK-922.
+  - ADR chico de convención de naming `[GH]`.
+  - Rollup `days_late` project-level (open question 5).
 - Cierra/contribuye a **ISSUE-081**.
+
+## 17. Esto redefine la familia OTD — gobernanza de specs
+
+> **Declaración canónica (2026-05-23)**: este ADR **no es un fix puntual de "días de retraso"** — es una **redefinición de la familia de métricas OTD**. No cambia los nombres de las métricas, pero sí (a) **cómo se computan** varias (bucket assignments con freeze + clasificador GH-owned), (b) agrega **dimensiones nuevas** (motivo de reprogramación, severidad, atraso imputable). La familia **velocidad** (Cycle Time, CT SLO%, Throughput, Pipeline Velocity) **NO se toca** — blast radius acotado a OTD + reprogramación.
+
+**La redefinición es en papel + shadow hasta M3** (§16): en producción las métricas conservan su definición actual hasta el cutover gateado. La familia "se redefine" en specs y en la columna shadow `gh_otd_bucket`, no en lo que el bono lee hoy.
+
+### 17.1 Tratamiento de specs por métrica (canon ICO: "1 métrica = 1 spec", "NUNCA modificar V1 retroactivo — Delta/V2 append-only", "spec canonical first")
+
+| Métrica | ¿Redefinida? | Tratamiento de spec | Owner |
+|---|---|---|---|
+| Los 4 buckets (on_time/late_drop/overdue/carry_over) | Sí (clasificador GH + freeze + unifica enum/counts) | Delta a `OTD_V1.md` | TASK-922 |
+| OTD% (`otd_pct`) | Sí (semántica — valores cambian) | Delta a `OTD_V1.md` | TASK-922 |
+| Días de retraso (`days_late`) | Sí (concepto nuevo: imputable) | **nuevo** `ATTRIBUTABLE_LATENESS_V1.md` | TASK-922 |
+| OCF (overdue_carried_forward) | Sí (derivado de overdue) | Delta a `OTD_V1.md` | TASK-922 |
+| Cumplimiento | Sí (alias de OTD%) | Delta a `CUMPLIMIENTO_V1.md` (cross-ref) | TASK-922 |
+| Días reprogramados / Reprogramada | Sí (snapshot → event-log historial) | **nuevo** spec trazabilidad de reprogramación | TASK-921 (derivar al cerrar) |
+| Motivo de reprogramación | Nuevo (dimensión) | parte del spec de reprogramación | TASK-921 |
+| Severidad (tiers) | Nueva | **nuevo** spec/sección de severidad | task superficies retro (futura) |
+| Cycle Time / CT SLO% / Throughput / Pipeline Velocity | **No** | sin cambio | — |
+
+### 17.2 Regla de gobernanza
+
+Ninguna métrica de la familia OTD puede cambiar su **cómputo** (M2/M3) sin que su **spec** refleje la redefinición **primero** (Delta append-only o V2 bump). El cómputo y la spec se mueven juntos, o la spec gana. Las métricas con Delta a `OTD_V1.md` se agrupan en un solo Delta append-only fechado, no en ediciones retroactivas dispersas.
 
 ## 16. Movimiento del clasificador OTD (Notion → Greenhouse) — descomposición canónica
 
