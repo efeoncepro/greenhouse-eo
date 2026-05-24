@@ -301,6 +301,25 @@ ENV_VARS="${ENV_VARS},CLOUD_COST_AI_COPILOT_ENABLED=${CLOUD_COST_AI_COPILOT_ENAB
 NOTION_RPA_WRITEBACK_ENABLED="${NOTION_RPA_WRITEBACK_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},NOTION_RPA_WRITEBACK_ENABLED=${NOTION_RPA_WRITEBACK_ENABLED}"
 
+# TASK-921 (M0) — captura de cambios de fecha limite (task_due_date_changes).
+# Gatea el consumer reactivo notion_due_date_change_capture (reusa el evento
+# notion.task.page_change_signal de TASK-912). SHADOW: solo puebla la tabla de
+# captura; NO toca el bono. Declarativo acá para que --set-env-vars (destructivo)
+# NO lo borre en cada redeploy. Activado por etapas 2026-05-24 (staging via push
+# develop; produccion en el proximo release develop->main limpio). Rollback (<5min):
+# `NOTION_DUE_DATE_CAPTURE_ENABLED=false ENV=<env> bash services/ops-worker/deploy.sh`.
+NOTION_DUE_DATE_CAPTURE_ENABLED="${NOTION_DUE_DATE_CAPTURE_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},NOTION_DUE_DATE_CAPTURE_ENABLED=${NOTION_DUE_DATE_CAPTURE_ENABLED}"
+
+# TASK-922 (M2) — computo shadow de atraso imputable (task_attributable_lateness_shadow).
+# Gatea el consumer reactivo notion_attributable_lateness_compute (reusa
+# notion.task.status_transitioned). SHADOW: solo puebla la tabla shadow que NADIE
+# lee; NO toca el bono (el cutover M3 es task futura gated, separado). Declarativo
+# para que --set-env-vars no lo borre. Activado por etapas 2026-05-24. Rollback (<5min):
+# `ATTRIBUTABLE_LATENESS_OTD_ENABLED=false ENV=<env> bash services/ops-worker/deploy.sh`.
+ATTRIBUTABLE_LATENESS_OTD_ENABLED="${ATTRIBUTABLE_LATENESS_OTD_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},ATTRIBUTABLE_LATENESS_OTD_ENABLED=${ATTRIBUTABLE_LATENESS_OTD_ENABLED}"
+
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 else
