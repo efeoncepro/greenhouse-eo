@@ -60,6 +60,10 @@ import {
 } from './queries/notion-status-transitions-signals'
 import { getNotionStatusTransitionsReconciliationSignal } from './queries/notion-status-transitions-reconciliation'
 import {
+  getRescheduleCaptureLagSignal,
+  getReschedulePendingReasonSignal
+} from './queries/reschedule-signals'
+import {
   getNotionMetricsWritebackDeadLetterSignal,
   getNotionMetricsWritebackLagSignal
 } from './queries/notion-metrics-rpa-signals'
@@ -672,6 +676,7 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'delivery'. Pre-activación (flag OFF) reportan steady.
    */
   notionStatusTransitions?: ReliabilitySignal[] | null
+  notionMetricsReschedule?: ReliabilitySignal[] | null
 
   /**
    * TASK-916 — Notion RpA V2 productive writeback signals (Efeonce/Sky).
@@ -808,7 +813,9 @@ export const buildReliabilityOverview = (
     // TASK-912 — Notion status-transitions productive capture signals.
     ...(sources.notionStatusTransitions ?? []),
     // TASK-916 — Notion RpA V2 productive writeback signals (2).
-    ...(sources.notionMetricsRpa ?? [])
+    ...(sources.notionMetricsRpa ?? []),
+    // TASK-921 — Reschedule (due-date change) capture signals (2).
+    ...(sources.notionMetricsReschedule ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -1397,6 +1404,17 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-921 — Notion reschedule (due-date change) capture signals.
+  const notionMetricsReschedule =
+    preloadedSources.notionMetricsReschedule !== undefined
+      ? preloadedSources.notionMetricsReschedule
+      : await Promise.all([
+          getRescheduleCaptureLagSignal().catch(() => null),
+          getReschedulePendingReasonSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -1444,7 +1462,8 @@ export const getReliabilityOverview = async (
     notionMetricsOtdClassifierParity,
     notionMetricsDemo,
     notionStatusTransitions,
-    notionMetricsRpa
+    notionMetricsRpa,
+    notionMetricsReschedule
   })
 }
 
