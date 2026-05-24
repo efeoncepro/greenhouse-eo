@@ -121,8 +121,9 @@ Drivers (mayo): `CI` (5.157 min / 339 runs) + `Playwright` (933 min / 287 runs) 
 | 4 | Cloud SQL — committed use discount 1 año | ~$15 | Estructural | decisión (compromiso) |
 | 5 | Vertex AI — trim de prompts | ~$2-4 | Estructural | TASK-928 empezó |
 | 6 | GitHub Actions — batch + lanes | variable | Comportamiento | TASK-931 shipped |
+| 7 | **Cloud SQL `kortex-pg-dev`** (proyecto `efeonce-kortex-dev`, cross-project) — detener si Kortex dev pausado | ~$7.5 | Instant reversible | 🆕 decisión del owner (producto separado), ver §10 |
 
-**Trío instant (1+2+3) ≈ $42/mo casi gratis (−32% de GCP).** + Cloud SQL CUD ~$15 si se compromete.
+**Trío instant (1+2+3) ≈ $42/mo casi gratis (−32% de GCP).** + Kortex (#7) ~$7.5/mo + Cloud SQL CUD ~$15 si se compromete.
 
 ---
 
@@ -138,6 +139,41 @@ Ver sección dedicada al final del audit (§ Solución Secret Manager) y/o la TA
 3. **Destroy** las disabled (irreversible — recién acá se libera el storage; disabled todavía factura).
 
 **Prevención escalable (root cause):** cuando el pipeline Frame.io se productivice (TASK-020), el flujo de refresh **debe destruir versiones viejas on-rotate** (keep-N). Y el helper canónico de rotación de Greenhouse (`secrets:rotate`) debe hacer destroy-on-rotate de superseded — generaliza a cualquier secret, no solo frameio. **NO** construir un cron destructor recurrente para un flujo dormido (over-engineering + riesgo de destrucción irreversible automática); el fix vive en el productor cuando exista.
+
+---
+
+## 10. Barrido extendido (Active Assist Recommender + cross-project) — 2026-05-24
+
+Barrido sistemático con la herramienta canónica GCP (Active Assist Recommender) + inventario de recursos huérfanos + desglose de billing **por proyecto** (el export es a nivel cuenta de billing, no proyecto — incluye proyectos hermanos).
+
+### Hallazgo cross-project: Cloud SQL de Kortex ocioso (~$9/mo)
+
+El desglose por proyecto reveló costo fuera de `efeonce-group`:
+
+| Proyecto | USD/mo | Nota |
+|---|---|---|
+| `efeonce-group` (Greenhouse) | ~$99.5 | el portal |
+| `(NULL)` | ~$22.2 | seat Gemini Code Assist (sin proyecto; ver §4) |
+| **`efeonce-kortex-dev`** | **~$10.83** | **producto separado (Kortex)** |
+| `esoteric-pen-478412-b3` | ~$0 | vacío |
+
+`efeonce-kortex-dev` corre `kortex-control-plane` (Cloud Run, escala a cero → $0) **+ `kortex-pg-dev`** (Cloud SQL `db-f1-micro`, `activationPolicy=ALWAYS`, 24/7 = **$9.17/mo**). Kortex es producto separado ("Greenhouse es bridge hasta que esté listo"); su desarrollo es esporádico pero la DB factura 24/7.
+
+**Oportunidad (~$7.5/mo, reversible):** si Kortex dev no está en uso diario, **detener** la instancia (`gcloud sql instances patch kortex-pg-dev --project=efeonce-kortex-dev --activation-policy=NEVER`) → corta el compute, **conserva datos + storage** ($1.65/mo). Se reactiva en segundos (`--activation-policy=ALWAYS`). **Decisión del owner** (producto separado; no se actúa sin OK explícito por regla cross-repo).
+
+### Verificado LIMPIO (sin waste adicional en `efeonce-group`)
+
+| Revisado (herramienta) | Resultado |
+|---|---|
+| IPs estáticas reservadas sin usar (`gcloud compute addresses`) | ✅ ninguna |
+| Discos persistentes sin adjuntar (`gcloud compute disks`) | ✅ ninguno |
+| Cloud Run min-instances / warm 24/7 (`minScale`) | ✅ todos en 0 (escalan a cero) |
+| Recommender idle/overprovisioned Cloud SQL (Active Assist) | ✅ sin alertas |
+| BigQuery query/storage | $1.56/mo (trivial) |
+| Cloud Scheduler (20 jobs) | legítimos (ops crons reactivos) |
+| Artifact Registry `cloud-run-source-deploy` + `gcf-artifacts` (~7.5GB) | ~$0.7/mo — menor; extender cleanup policy opcional |
+
+**Conclusión del barrido:** el proyecto Greenhouse (`efeonce-group`) está limpio de recursos huérfanos. La única oportunidad nueva material es cross-project (Kortex DB, ~$9/mo).
 
 ---
 
