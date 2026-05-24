@@ -8,6 +8,7 @@
     "local:check": "pnpm lint && pnpm exec tsc --noEmit",
     "local:check:full": "pnpm local:check && pnpm test && pnpm build",
     "local:check:ui": "pnpm local:check && pnpm design:lint && pnpm build",
+    "actions:cost:audit": "node scripts/github-actions-cost-audit.mjs",
     "predev": "pnpm build:icons",
     "dev": "next dev --turbopack",
     "prebuild": "pnpm build:icons && pnpm catalog:check",
