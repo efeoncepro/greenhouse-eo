@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url'
 
 const DEFAULT_RATE_USD = 0.006
 const DEFAULT_LIMIT_RUNS = 200
+const GH_API_MAX_BUFFER_BYTES = 32 * 1024 * 1024
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
 const usage = () => `Usage:
@@ -171,6 +172,7 @@ const ghApiJson = (path, fields = []) => {
 
   const output = execFileSync('gh', args, {
     encoding: 'utf8',
+    maxBuffer: GH_API_MAX_BUFFER_BYTES,
     stdio: ['ignore', 'pipe', 'pipe']
   }).trim()
 

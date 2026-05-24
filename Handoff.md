@@ -10,6 +10,7 @@
 - **Validacion:** `pnpm local:check` (lint + tsc), `pnpm test scripts/ci/__tests__/github-actions-cost-audit.test.ts`, Ruby YAML parser sobre `.github/workflows/*.yml`, `pnpm task:lint --task TASK-931`, `git diff --check`.
 - **No validado:** `pnpm test` full suite y `pnpm build` full; no hay evidencia post-push de workflows nuevos porque el cambio queda local en `develop` hasta que el operador autorice push. Los cambios CI remotos empiezan a aplicar despues del proximo push/merge.
 - **Riesgos/follow-ups:** Vercel threshold envs aplican en el proximo deployment; budget GitHub Actions existente con `budget_amount=0` no se modifico sin aprobacion porque puede bloquear releases/uso pago; TASK-859 debe decidir si persiste workflow metrics/DORA/flaky detector; PR #125 sigue siendo coordinacion adjacent para `.github/workflows/claude.yml`.
+- **Delta costo-eficiente post-cierre:** segunda pasada implementada localmente tras auditoria de los ultimos runs. `CI` conserva lint/typecheck/tests en `push:develop`, pero `pnpm build` corre solo en PRs, `main` y dispatch manual porque Vercel ya build-ea develop; se agrega cache de ESLint; `Production Release Watchdog` baja a hourly con dispatch manual; `actions:cost:audit` sube buffer para ventanas mensuales grandes. Playwright lanes NO se partieron en esta pasada porque el dato live muestra ~2.5 min/run y el setup domina; partirlo hoy puede sumar overhead sin ahorro material.
 
 # Sesion 2026-05-24 — Local-first development workflow — ✅ OPERATING MODEL
 

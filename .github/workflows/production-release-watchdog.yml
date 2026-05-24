@@ -19,8 +19,10 @@ name: Production Release Watchdog
 
 on:
   schedule:
-    # Cada 30 min — granularity adecuada para warning threshold 2h.
-    - cron: '*/30 * * * *'
+    # Cada 60 min — sigue dando 2 oportunidades antes del warning threshold
+    # 2h y reduce a la mitad los runs scheduled. `workflow_dispatch` queda
+    # disponible para checks inmediatos antes/despues de un release.
+    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       enable_teams:

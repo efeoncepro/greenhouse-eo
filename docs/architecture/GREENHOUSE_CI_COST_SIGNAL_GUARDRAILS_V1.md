@@ -44,9 +44,11 @@ Remote CI is integration/release evidence, not the exploratory workbench.
 - `pnpm actions:cost:audit` is the repo-local workflow/job hotspot report.
 - `src/lib/cloud/github-billing.ts:getGitHubBillingOverview` remains the official GitHub Billing reader.
 - `.github/workflows/ci.yml` and `.github/workflows/playwright.yml` may skip docs-only changes when specialized gates cover those docs.
-- `CI` keeps lint, typecheck, test results and build in the frequent lane. Coverage moves to `CI Deep Verification` on `main`, manual dispatch and weekly scheduled backstop.
+- `CI` keeps lint, typecheck and test results in the frequent lane. Coverage moves to `CI Deep Verification` on `main`, manual dispatch and weekly scheduled backstop. `pnpm build` remains a GitHub gate for PRs, `main` and manual checkpoints; `push:develop` relies on Vercel's deployment build to avoid duplicate paid build minutes.
+- `CI` may cache deterministic lint/build-support artifacts such as `.eslintcache` when cache miss only affects runtime cost and never changes the check set.
 - Playwright smoke on `develop` is path-aware for UI/runtime/auth/admin/payroll/reliability/API-critical paths.
 - Staging worker deploys on `develop` are latest-only; production worker deploys remain orchestrator-owned and retain release evidence.
+- `Production Release Watchdog` scheduled cadence is hourly by default. Manual dispatch remains available for immediate release checks; lowering the cadence below hourly requires a replacement signal or explicit incident rationale.
 - Production workflows must preserve auditable evidence and release semantics from `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`.
 - Any persisted workflow/job metrics belong to TASK-859 or a superseding ADR; TASK-931 V1 uses read-only API reporting.
 

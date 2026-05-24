@@ -385,6 +385,16 @@ No validado:
 - `pnpm test` full suite y `pnpm build` full; se uso `local:check` + tests focales por proporcionalidad.
 - Evidencia post-push de workflows nuevos porque el operador pidio permanecer en `develop` y no se hizo push. Los cambios remotos empiezan a operar despues del proximo push/merge.
 
+### Delta 2026-05-24 — segunda pasada costo-eficiente
+
+Tras una revision live adicional de GitHub Actions:
+
+- `CI` conserva lint/typecheck/tests en `push:develop`, pero `pnpm build` queda solo para PRs, `main` y dispatch manual. Rationale: Vercel ya ejecuta build para cada push a develop, por lo que el build GitHub era señal duplicada y pagada dos veces.
+- `CI` agrega cache de ESLint (`.eslintcache`) para reducir minutos de lint sin cambiar el set de reglas.
+- `Production Release Watchdog` baja de cada 30 minutos a hourly; el warning threshold operativo es 2h y `workflow_dispatch` queda disponible para checks inmediatos antes/despues de release.
+- `pnpm actions:cost:audit` aumenta el buffer de `gh api` para soportar ventanas mensuales amplias sin `ENOBUFS`.
+- Playwright no se parte por lanes todavia: el dato live muestra ~2.5 min/run y el setup domina; introducir un detect job puede comerse el ahorro. Se mantiene path-aware completo hasta que el costo de smoke crezca o TASK-859 entregue datos persistidos.
+
 ## Open Questions
 
 - Resuelta: el reporte workflow/job vive como script local read-only en V1. Rationale: evita duplicar TASK-859 (workflow metrics persistidos/DORA/flaky detector), no agrega DB ni UI prematura y ya permite auditoria mensual reproducible.

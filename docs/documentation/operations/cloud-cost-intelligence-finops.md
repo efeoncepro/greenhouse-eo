@@ -128,6 +128,15 @@ pnpm actions:cost:audit --from 2026-05-01 --to 2026-05-24
 
 Ese reporte usa GitHub Actions Runs/Jobs API via `gh` y calcula `estimatedGrossUsd` con un rate configurable (`--rate-usd`, default USD 0.006/min para `actions_linux`). Es una atribucion operativa, no factura oficial. Puede diferir de GitHub Billing por cuota incluida, descuentos, rounding, storage/cache y ajustes de billing.
 
+Para auditorias mensuales amplias, preferir primero el ranking macro y luego profundizar por workflow:
+
+```bash
+pnpm actions:cost:audit --from 2026-05-01 --to 2026-05-24 --limit-runs 300 --no-jobs
+pnpm actions:cost:audit --from 2026-05-01 --to 2026-05-24 --workflow CI --limit-runs 50
+```
+
+El workflow `CI` evita duplicate build minutes en `push:develop`: GitHub conserva lint/typecheck/tests como señal rápida, mientras Vercel es el build gate de staging. GitHub sigue corriendo `pnpm build` en PRs, `main` y dispatch manual. El `Production Release Watchdog` corre hourly por defecto; si el operador necesita una foto inmediata antes/despues de release, usar `workflow_dispatch`.
+
 Decision canonica: [GREENHOUSE_CI_COST_SIGNAL_GUARDRAILS_V1](../../architecture/GREENHOUSE_CI_COST_SIGNAL_GUARDRAILS_V1.md).
 
 ## Alertas tempranas
