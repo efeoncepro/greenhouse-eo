@@ -38,7 +38,7 @@ El patrón es siempre el mismo: **regla → check ejecutable (lint rule / parity
 
 Greenhouse **adopta Spec-Driven Development como práctica explícita y nombrada**, con una doctrina canónica para promover invariantes de prosa a enforcement ejecutable. La decisión NO es "mecanizar toda la prosa" (eso sería sobre-ingeniería); es **definir cuándo y cómo un invariante merece graduarse a check ejecutable**, y declarar el patrón canónico para hacerlo.
 
-### 2.1 La escalera de promoción (prose → executable)
+### 2.1 La escalera de promoción (prosa → ejecutable)
 
 Todo invariante de Greenhouse vive en uno de tres niveles. La doctrina define cuándo subir de nivel:
 
@@ -63,7 +63,7 @@ Cuando un invariante se promueve a L2, sigue el shape ya probado en el repo:
 
 1. **Check declarativo** — lint rule en `eslint-plugins/greenhouse/`, parity test (`*.live.test.ts`), o gate script en `scripts/ci/*.mjs`. Catálogo de reglas en data, no en branches hardcodeados.
 2. **Rollout warn-first** — el check nace en modo `warning` (no bloquea) hasta confirmar 0 falsos positivos sobre el backlog real; flip a `error` en un paso posterior verificado.
-3. **Legacy-exempt explícito** — el backlog histórico que no puede cumplir el contrato se clasifica como exento, no como deuda bloqueante. La deuda pre-existente se tría como limpieza separada, nunca como bloqueo del flujo activo.
+3. **Legacy-exempt explícito** — el backlog histórico que no puede cumplir el contrato se clasifica como exento, no como deuda bloqueante. La deuda pre-existente se prioriza aparte como limpieza, nunca como bloqueo del flujo activo.
 4. **Gate CI** — workflow propio (espejo de `design-contract.yml`) con path-filtering, o step en `ci.yml`.
 5. **La prosa permanece** — el ADR / regla dura sigue siendo la fuente del *porqué*; el check es el *enforcement*. No se borra la prosa al agregar el check.
 
