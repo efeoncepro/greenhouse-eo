@@ -117,7 +117,8 @@ Reglas obligatorias:
 
 - Reglas estructurales (solo `template` tasks): zonas obligatorias presentes según Type; `Acceptance Criteria` con ≥1 checkbox; `implementation` exige `Rollout Plan & Risk Matrix` no vacía (no "N/A" sin razón para dominios sensibles — warn).
 - Regla de paridad **lifecycle↔carpeta**: el campo `Lifecycle:` debe coincidir con la carpeta (`to-do`/`in-progress`/`complete`). `error`.
-- Regla de paridad **registry**: cada task `template` en una carpeta tiene fila en `TASK_ID_REGISTRY.md`, y el `Lifecycle` del registry coincide. `error` para missing, `warning` para lifecycle mismatch.
+- Regla de paridad **registry**: cada task `template` en una carpeta tiene fila en `TASK_ID_REGISTRY.md`, y el `Lifecycle` del registry coincide. `error` para missing, `warning` para lifecycle mismatch. **Esta regla nace y permanece `warning`-only más tiempo que el resto** (el registry es una tabla hecha a mano que ya sabemos driftada): el primer run destapará deuda pre-existente del registry como una avalancha de findings → se **tría aparte como limpieza**, NO se trata como bloqueo. Flip a `error` solo cuando el registry esté saneado.
+- Regla de **next-id marker** (ajuste post-review arquitectura 2026-05-24): el marcador "siguiente ID disponible: `TASK-###`" en `docs/tasks/README.md` debe ser `max(ID en TASK_ID_REGISTRY) + 1`. `warning` si está desactualizado. Es el drift class que más nos pega (lo venimos bumpeando a mano 924→925→926→927). Idealmente la fuente de verdad del next-id se **deriva del registry** (`max+1`), reduciendo el marcador a algo verificable en vez de mantenido a mano — el linter al menos lo valida.
 
 ### Slice 3 — CLI surface
 
@@ -143,6 +144,8 @@ Reglas obligatorias:
 
 El parser NO usa un parser markdown pesado: opera por líneas (regex de headings `^## ` / `^### ` + extracción del bloque `## Status` con pares `- Campo: \`valor\``), espejo del enfoque liviano de `scripts/ci/*.mjs`. Sin dependencias nuevas en `package.json`.
 
+**Tolerancia a valores multi-línea/prosa en `## Status`** (ajuste post-review arquitectura 2026-05-24): campos como `Blocked by:` hoy contienen párrafos largos (ej. TASK-921 con prosa multi-línea, backticks y enlaces). El parser NO debe asumir un valor de una sola línea: extrae el valor del campo hasta el próximo `- Campo:` o el fin del bloque `## Status`. Fixture real obligatorio con un `Blocked by:` multi-línea del backlog vigente.
+
 Clasificación `template` vs `legacy`: una task es `template` si el filename matchea `^TASK-\d{3}-` Y contiene un bloque `## Status` con `Lifecycle:`. Cualquier otra (`CODEX_TASK_*`, briefs, specs reclasificadas) es `legacy` → solo se le aplican reglas de paridad registry en modo `warning`, nunca estructurales.
 
 Finding shape: `{ file, rule, severity, line?, message }`. Salida JSON: `{ errors: Finding[], warnings: Finding[], summary: { tasksScanned, templateTasks, legacyTasks } }` — mismo shape filosófico que `design:lint --format json` para que un futuro dashboard lo consuma.
@@ -163,6 +166,7 @@ Cambio aditivo de tooling + doc. No toca runtime productivo, ni SCIM/payroll/fin
 | Falsos positivos bloquean PRs legítimos | CI / DX | medium | modo `--changed` (solo PR diff) + warn-first rollout + legacy-exempt | PRs rojos por task-contract; revisar findings |
 | Parser frágil ante variaciones de formato del template | tooling | medium | reglas tolerantes (presencia de heading, no contenido exacto) + tests con fixtures reales del backlog | tests de fixtures fallan |
 | Backlog legacy dispara ruido | CI / DX | high (si no se exime) | clasificación `legacy` explícita + reglas estructurales solo a `template` | volumen de warnings en primer run |
+| Deuda pre-existente del registry sale como avalancha en el primer run | DX / governance | high | regla registry-parity nace `warning`-only + se tría como limpieza separada, NO bloqueo; flip a `error` solo post-saneo | volumen de findings registry en primer run |
 
 ### Feature flags / cutover
 
@@ -194,8 +198,10 @@ N/A — repo-only change.
 
 - [ ] `pnpm task:lint` corre sin crashear sobre el backlog completo y reporta summary (`tasksScanned/templateTasks/legacyTasks`).
 - [ ] Detecta lifecycle↔carpeta mismatch como `error` (verificado con fixture).
-- [ ] Detecta task `template` en carpeta sin fila en `TASK_ID_REGISTRY.md` como `error`.
+- [ ] Detecta task `template` en carpeta sin fila en `TASK_ID_REGISTRY.md` (regla registry-parity, `warning`-only en V1 hasta saneo del registry; flip a `error` posterior).
+- [ ] Detecta marcador "siguiente ID disponible" desactualizado vs `max(ID registry)+1` como `warning`.
 - [ ] Tasks `CODEX_TASK_*` y briefs no generan `error` estructural (solo paridad registry warn).
+- [ ] Parsea correctamente un `## Status` con `Blocked by:` multi-línea/prosa (fixture real del backlog, ej. TASK-921) sin truncar ni romper.
 - [ ] `--format json` emite shape `{ errors, warnings, summary }`.
 - [ ] `--changed` limita el scan al diff del PR.
 - [ ] `.github/workflows/task-contract.yml` corre en PRs que tocan `docs/tasks/**` (warn-only en el primer merge).
