@@ -1,3 +1,22 @@
+# Sesion 2026-05-24 — TASK-929 Finance ledger drift remediation — 🔨 Discovery+Audit+Plan completos, P1 STOP checkpoint pre-FASE 5
+
+**Rama**: `develop` (override del operador, sin branch nuevo). Lifecycle: `in-progress`.
+
+**Skills**: greenhouse-finance-accounting-operator + arch-architect (loop de verificación constante).
+
+**Hallazgos live (probe contra `greenhouse-pg-dev`)**:
+- `JAVASCRIPT-NEXTJS-4Q` está driveado **solo por settlement drift = 4 incomes**. Las 6 dimensiones fuera de scope (task708/708d/714d/720/721) + phantoms + freshness + unanchored = **0**. → 4Q **puede cerrar con el scope de esta task**.
+- Los 4 drifts se parten en 2 sub-clases: **A auto-remediable** (`INC-NB-26004360`, `INC-202602-001` — `amount_paid` cache stale, fix = `fn_recompute_income_amount_paid`) y **B needs-review** (`INC-NB-25302941`, `INC-NB-26639047` — facturas factorizadas con `payments_total` ~2x invoice, pago duplicado, fix = identificar + `dismissIncomePhantom`).
+- **Bug nuevo descubierto**: `getFinanceLedgerHealth` envuelve sus ~19 queries en `.catch(()=>[])` → un blip de conexión en la query de settlement reporta `healthy=true` FALSO (verificado: probe local dio healthy=true mientras la VIEW tenía 4 drifts). Bug class ISSUE-071 / Pillar 3. Slice 4 lo endurece (distinguir `unknown` de `0`).
+
+**Open Questions resueltas pre-execution** (en el task doc): OQ1 materialidad gobierna routing no detección (VIEW intacta, umbral en reader); OQ2/6 las 6 dims en 0 → 4Q cierra; OQ3 V1 = admin endpoint + report, sin UI page.
+
+**Canonical primitives a reusar** (no inventar): `account-balances-fx-drift-remediation.ts` (policy/dryRun/decision/evidenceGuard shape), `income_settlement_reconciliation` VIEW + `income-settlement.ts`, `dismissIncomePhantom`/`fn_recompute_income_amount_paid`, `payment_order_state_transitions` (state-machine+CHECK+append-only exemplar), capability seed pattern (`finance.payments.repair_clp`), signal reader pattern (`expense-payments-clp-drift.ts`).
+
+**Próximo paso**: esperar aprobación humana del Plan (FASE 4, P1) antes de FASE 5 implementación. Plan de 5 slices presentado en el chat.
+
+---
+
 # Sesion 2026-05-24 — Diagnóstico de costos cloud (GCP + Actions + Vercel) — 🔨 acciones en curso
 
 **Audit**: `docs/audits/cloud-cost/CLOUD_COST_AUDIT_2026-05-24.md`. Datos reales (GCP billing en CLP ÷898; Vercel `/v1/billing/charges`; GitHub via TASK-637). Total ~$249/mo: GCP ~$132, Actions ~$93, **Vercel ~$24 (el más barato)**.

@@ -286,8 +286,47 @@ Remediation mutante debe ser dry-run por defecto. Cualquier auto-apply requiere 
 - **Async**: health check ya corre en cron Cloud Scheduler (`ops-finance-ledger-health`), fuera del request path.
 - **Cost at 10x**: sub-lineal; finance ledger no crece como delivery/eventos. Sin preocupacion a 10x.
 
-## Open Questions (deliberadamente no decididas)
+## Open Questions — Resueltas pre-execution (2026-05-24)
 
-- Valor exacto del umbral de materialidad por tipo de drift (settlement $X CLP, unanchored bucket boundaries) — calibrar con datos del inventory Slice 1 + sign-off finance.
-- Si las 6 dimensiones fuera de scope (task708/708d/714d/720/721) estan en 0 hoy en prod → determina si 4Q cierra con esta task o requiere derivadas. Lo resuelve el preflight de Slice 1.
-- Si la cola de revision necesita superficie UI propia (`/finance/...`) o basta con endpoint admin + report en V1.
+Resueltas con la opcion mas robusta/segura/resiliente antes de FASE 5. Ninguna resulto bloqueante.
+
+### OQ1 — Umbral de materialidad por tipo de drift → RESUELTA
+
+**Decision**: la materialidad gobierna **routing** (auto-remediable vs revision humana vs batch-accept), NUNCA **deteccion**. La VIEW `income_settlement_reconciliation` mantiene `has_drift = |drift| > 0.01` intacta (detecta todo). El umbral vive como constante de config en el reader de inventory/remediation, no en la VIEW (mirror del patron FX TASK-871 que mantiene la tolerancia $1 CLP en el reader, no en la fuente).
+
+- Settlement drift: tolerancia de routing = $1 CLP (anti FP-noise). Todo drift real (>$1) se rutea.
+- Unanchored expense: bucket de revision humana default = $50.000 CLP (configurable); inmaterial → batch-accept documentado a `acknowledgedDebt`.
+
+**Rationale**: separar deteccion de routing evita esconder deuda (detecta todo) y a la vez evita ahogar la cola con ruido inmaterial. Valores finales de unanchored se calibran con sign-off finance, pero el default conservador no bloquea el build (apply gated por flag+allowlist). Lente contable: es performance materiality sobre un SUM, no bajar el umbral de deteccion.
+
+### OQ2 / OQ6 — ¿Las 6 dimensiones fuera de scope estan en 0? → RESUELTA (verificada live)
+
+**Hallazgo (probe live 2026-05-24 contra `greenhouse-pg-dev`)**: las 6 dimensiones fuera de scope estan en **0** (`task708`, `task708d`, `task714d`, `task720`, `task721`). `JAVASCRIPT-NEXTJS-4Q` esta driveado **exclusivamente por settlement drift = 4 incomes**. Phantoms / freshness / unanchored = 0 hoy.
+
+**Conclusion**: 4Q **puede cerrar con el scope de esta task** una vez resueltos los 4 settlement drifts y mantenidos en 0. No requiere tasks derivadas para el cierre Sentry.
+
+### OQ3 — ¿Cola de revision necesita UI propia? → RESUELTA
+
+**Decision**: V1 = admin endpoint + CLI report. NO pagina `/finance/...` dedicada. La visibilidad de la cola es via reliability signal `finance.ledger.unresolved_drift_items` + el inventory report. UI dedicada se difiere a task derivada cuando el volumen lo justifique (YAGNI).
+
+## Discovery findings vinculantes (2026-05-24)
+
+### Hallazgo nuevo (no estaba en la spec) — `getFinanceLedgerHealth` puede reportar `healthy=true` falso
+
+`getFinanceLedgerHealth` ([ledger-health.ts:648](../../../src/lib/finance/ledger-health.ts)) envuelve cada una de sus ~19 queries en `.catch(() => [])`. Un error transitorio (ej. blip de conexion) en la query de settlement degrada silenciosamente a "0 drift" → `healthy=true` falso, ocultando deuda real. Verificado live: un probe local devolvio `healthy=true` mientras la VIEW devolvia 4 drift rows (staging reporto correctamente `healthy=false`). Es la bug class ISSUE-071 / anti-pattern Pillar 3 (deshonestidad de degradacion). **Slice 4 debe distinguir `query failed (unknown)` de `0 drift (healthy)`** — no colapsar ambos. Refuerza el Refinamiento 5.
+
+### Clasificacion contable de los 4 settlement drifts reales (lente finance)
+
+Los 4 drifts se parten limpio en 2 sub-clases con tratamiento distinto:
+
+| Income | total | amount_paid | payments_total | factoring_fee | expected | drift | Sub-clase | Decision kind |
+|---|---:|---:|---:|---:|---:|---:|---|---|
+| `INC-NB-26004360` | 752.730 | **0** | 752.730 | 0 | 752.730 | -752.730 | A: `amount_paid` cache stale | `auto_remediable` |
+| `INC-202602-001` | 752.000 | 2.609 | 754.609 | 0 | 754.609 | -752.000 | A: `amount_paid` cache stale | `auto_remediable` |
+| `INC-NB-25302941` | 6.902.000 | 6.902.000 | **13.688.146** | 115.854 | 13.804.000 | -6.902.000 | B: factura factorizada con pago ~2x | `needs_human_review` |
+| `INC-NB-26639047` | 6.902.000 | 6.902.000 | **13.678.453** | 125.547 | 13.804.000 | -6.902.000 | B: factura factorizada con pago ~2x | `needs_human_review` |
+
+- **Sub-clase A (recompute)**: los `income_payments` existen pero el campo denormalizado `amount_paid` no se recomputo. Fix canonico = `fn_recompute_income_amount_paid(incomeId)` (mismo helper que invoca `dismissIncomePhantom`). Evidencia = las propias filas de pago. **Auto-remediable**, cero juicio contable, idempotente.
+- **Sub-clase B (duplicado en factoring)**: `payments_total` ≈ 2x el invoice en facturas factorizadas. Una pata de pago es duplicada (anticipo de factoring contabilizado dos veces, o anticipo + settlement del cliente ambos booked). Fix = identificar la pata espuria y superseder via `dismissIncomePhantom`. **Requiere evidencia/clasificacion humana** → `needs_human_review`. NO es write-off; es de-duplicacion de reconciliacion.
+
+Esto valida el diseno: settlement drift NO es monolitico — se rutea por decision kind igual que el remediator FX. Sub-clase A = caso auto; Sub-clase B = caso que va a la cola de revision con evidencia.
