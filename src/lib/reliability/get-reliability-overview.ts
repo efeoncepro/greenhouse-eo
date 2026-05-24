@@ -3,6 +3,7 @@ import 'server-only'
 import type { CloudSentryIncidentsSnapshot } from '@/lib/cloud/contracts'
 import { getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { getGitHubBillingOverview } from '@/lib/cloud/github-billing'
 import { getVercelBillingOverview } from '@/lib/cloud/vercel-billing'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
@@ -14,6 +15,7 @@ import { getFinanceSmokeLaneStatus } from '@/lib/reliability/finance/get-finance
 import { getLatestSyntheticSnapshotsByRoute } from '@/lib/reliability/synthetic/reader'
 import type { GcpBillingOverview } from '@/types/billing-export'
 import type { FinanceSmokeLaneStatus } from '@/types/finance-smoke-lane'
+import type { GitHubBillingOverview } from '@/types/github-billing'
 import type {
   ReliabilityIntegrationBoundary,
   ReliabilityModuleDefinition,
@@ -154,6 +156,7 @@ import {
 import {
   buildCloudSignals,
   buildDomainIncidentSignals,
+  buildGitHubBillingSignals,
   buildFinanceSmokeLaneSignals,
   buildGcpBillingSignals,
   buildVercelBillingSignals,
@@ -189,6 +192,14 @@ const RELIABILITY_INTEGRATION_BOUNDARIES: ReliabilityIntegrationBoundary[] = [
     expectedSource: 'getVercelBillingOverview',
     status: 'ready',
     note: 'TASK-636 agrega Vercel Billing FOCUS v1.3 read-only con degradación honesta y adapter buildVercelBillingSignals.'
+  },
+  {
+    taskId: 'TASK-637',
+    moduleKey: 'cloud',
+    expectedSignalKind: 'billing',
+    expectedSource: 'getGitHubBillingOverview',
+    status: 'ready',
+    note: 'TASK-637 agrega GitHub Billing Usage read-only con degradación honesta y adapter buildGitHubBillingSignals.'
   },
   {
     taskId: 'TASK-586',
@@ -344,6 +355,7 @@ const sortSignalsForDisplay = (signals: ReliabilitySignal[]): ReliabilitySignal[
 interface ReliabilityOverviewSources {
   billing?: GcpBillingOverview | null
   vercelBilling?: VercelBillingOverview | null
+  githubBilling?: GitHubBillingOverview | null
   notionOperational?: NotionSyncOperationalOverview | null
   syntheticSnapshots?: SyntheticRouteSnapshot[] | null
   financeSmokeLane?: FinanceSmokeLaneStatus | null
@@ -723,6 +735,7 @@ export const buildReliabilityOverview = (
     ...buildNotionDataQualitySignals(operations.notionDeliveryDataQuality ?? null),
     ...(sources.billing ? buildGcpBillingSignals(sources.billing) : []),
     ...(sources.vercelBilling ? buildVercelBillingSignals(sources.vercelBilling) : []),
+    ...(sources.githubBilling ? buildGitHubBillingSignals(sources.githubBilling) : []),
     ...(sources.notionOperational ? [buildNotionFreshnessSignal(sources.notionOperational)] : []),
     ...buildSyntheticRouteSignals(syntheticSnapshots),
     ...buildSyntheticModuleSignals(syntheticSnapshots),
@@ -943,6 +956,11 @@ export const getReliabilityOverview = async (
     preloadedSources.vercelBilling !== undefined
       ? preloadedSources.vercelBilling
       : await getVercelBillingOverview().catch(() => null)
+
+  const githubBilling =
+    preloadedSources.githubBilling !== undefined
+      ? preloadedSources.githubBilling
+      : await getGitHubBillingOverview().catch(() => null)
 
   const notionOperational =
     preloadedSources.notionOperational !== undefined
@@ -1454,6 +1472,7 @@ export const getReliabilityOverview = async (
   return buildReliabilityOverview(operations, {
     billing,
     vercelBilling,
+    githubBilling,
     notionOperational,
     syntheticSnapshots,
     financeSmokeLane,
