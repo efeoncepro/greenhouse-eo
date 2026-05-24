@@ -1,3 +1,16 @@
+# Sesion 2026-05-24 — TASK-637 GitHub Billing & Actions Cost Observability — 🚧 IN PROGRESS
+
+**Status**: tomado directo en `develop` por instruccion explicita del operador (sin branch switch). Discovery/Audit/Mapa/Plan completados antes de implementar.
+
+**Decisiones cerradas antes de implementar**:
+- Scope canonico GitHub Billing: org `efeoncepro`; repo queda como filtro opcional. Smoke live con `gh api` confirmo mayo 2026: 49 usage items, producto `actions`, gross `USD 93.18099132`, net `USD 0`; top repo `greenhouse-eo`.
+- Token: el token local de `gh` tiene `admin:org` y lee la API, pero no se persistira como secreto productivo por ser amplio/personal. La implementacion soportara `GREENHOUSE_GITHUB_BILLING_TOKEN` o `GREENHOUSE_GITHUB_BILLING_TOKEN_SECRET_REF`; produccion requiere token dedicado least-privilege con org Administration read.
+- Thresholds: no se inventa budget. `GREENHOUSE_GITHUB_BILLING_MONTHLY_WARN_USD`, `GREENHOUSE_GITHUB_BILLING_MONTHLY_CRITICAL_USD` y `GREENHOUSE_GITHUB_ACTIONS_DAILY_SPIKE_PCT` seran opcionales; sin valores queda `unconfigured`.
+- Access model: `routeGroups=admin`; views reutilizadas `administracion.admin_center`, `administracion.cloud_integrations`, `administracion.ops_health`; sin entitlements nuevos V1; startup policy sin cambios.
+- V1 no persiste en PostgreSQL: sin migraciones ni schema nuevo; reader/API/UI/reliability snapshot read-only.
+
+**Drift detectado**: TASK-637 referenciaba TASK-586/TASK-636 como pendientes y `AdminCloudIntegrationsView`; runtime real tiene TASK-586/TASK-636 completas y surface vigente `AdminIntegrationGovernanceView`.
+
 # Sesion 2026-05-24 — TASK-636 Vercel Billing FOCUS Observability — ✅ COMPLETE
 
 **Status**: ✅ COMPLETE directo en `develop` por instrucción explícita del operador (sin branch switch). Discovery/Audit/Plan completados antes de implementar.

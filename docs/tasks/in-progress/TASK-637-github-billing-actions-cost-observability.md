@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-007`
-- Status real: `Diseno`
+- Status real: `En implementacion`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-586`
-- Branch: `task/TASK-637-github-billing-actions-cost-observability`
+- Blocked by: `none` — TASK-586 y TASK-636 ya estan complete; se reutiliza el patron GCP/Vercel Billing + Reliability.
+- Branch: `develop` — override explicito del operador; no cambiar de rama.
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
