@@ -4,13 +4,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno (M1 del ADR GREENHOUSE_ATTRIBUTABLE_LATENESS_V1 — clasificador ownership move, parity-first)`
+- Status real: `in-progress 2026-05-24 — implementación DIRECTO en develop (override operador: sin branch). M1 del ADR GREENHOUSE_ATTRIBUTABLE_LATENESS_V1 — clasificador ownership move, parity-first, shadow, flag OFF.`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|reliability`
 - Blocked by: `Nada. M1 solo necesita completed_at/due_date/status que ya existen en v_tasks_enriched. Independiente de TASK-921/922 — puede ir primero (máximo de-risk, cero impacto en nómina).`
@@ -88,15 +88,28 @@ Reglas obligatorias (del ADR §16.6):
 - Tocar `performance_indicator_code` synced o `otd_pct` → prohibido en M1.
 
 ## Acceptance Criteria
-- [ ] `classify-otd-bucket.ts` (helper pure freeze-aware togglable, freeze off en M1) + tests
-- [ ] Expresión `gh_otd_bucket` en `v_tasks_enriched` + test paridad TS↔SQL
-- [ ] `gh_otd_bucket` materializado en snapshots junto a `performance_indicator_code` (dual-column)
-- [ ] Signal `notion.metrics.shadow_paridad_otd_classifier` wired; paridad ~100% verificada contra datos reales
-- [ ] Flag `OTD_CLASSIFIER_GH_SHADOW_ENABLED` default OFF
-- [ ] **Verificado: `otd_pct` y el bono NO cambian** (columna legacy intacta)
-- [ ] `pnpm test` + `pnpm build` verde
-- [ ] Task movida a `complete/`
+- [x] `classify-otd-bucket.ts` (helper pure freeze-aware togglable, freeze off en M1) + tests (21 verde)
+- [x] Expresión `gh_otd_bucket` en `v_tasks_enriched` + `buildOtdBucketSql` mirror + test paridad TS↔SQL
+- [x] `gh_otd_bucket` materializado en snapshots (DDL + REQUIRED_COLUMN_MIGRATIONS + materialize INSERT/SELECT)
+- [x] Signal `notion.metrics.shadow_paridad_otd_classifier` wired; **paridad 100% verificada contra PG real (198/198)**
+- [x] Flag `OTD_CLASSIFIER_GH_SHADOW_ENABLED` default OFF
+- [x] **Verificado: `otd_pct` y el bono NO cambian** (columna nueva shadow, nadie la lee; legacy intacto)
+- [x] `pnpm test` (5239 passed) + `pnpm build` verde
+- [x] Task movida a `complete/`
+
+## Delta 2026-05-24 — M1 SHIPPED (directo en develop, sin branch per override operador)
+
+4 slices commiteados: classifyOtdBucket helper + 21 tests (`6e54a17e`), flag (`5c4d87fa`), signal PG-based (`efa47faf`), BQ mirror gh_otd_bucket (`fed7381a`).
+
+**Verificaciones live (post gcloud auth)**:
+- Signal PG real: **100% paridad (198/198 tareas completadas on_time/late_drop coinciden con el synced Notion)** — el helper `classifyOtdBucket` reproduce exacto el `Indicador de Performance`. Boundary move Notion→Greenhouse probado con cero cambios de número.
+- BQ dry-run del CASE: sintaxis OK + read-only SELECT distribución `on_time 192 / carry_over 149 / overdue 13 / late_drop 6 / not_applicable 4931` (resto por gate esMesActual). **No se mutó la view** (solo dry-run + SELECT).
+
+**Aplicación de las DDL BQ**: `v_tasks_enriched` (CREATE OR REPLACE VIEW) + `delivery_task_monthly_snapshots` (ALTER ADD COLUMN IF NOT EXISTS) se aplican en el próximo `ensureIcoEngineInfrastructure` (deploy staging/cron). Additive + flag-independiente → cero impacto.
+
+**Bono/nómina intactos**: M1 escribe solo la columna shadow `gh_otd_bucket`; `performance_indicator_code` synced + `otd_pct` + `calculateOtdBonus` no se tocan.
 
 ## Follow-ups
-- TASK-922 (M2) reusa el helper con freeze on.
-- Cutover del bono (M3) — futura gated.
+- TASK-922 (M2) reusa `classifyOtdBucket` con freeze ON (frozenDays). **Desbloqueada por M1.**
+- Cutover del bono (M3) — futura gated (8 stop-gates + sign-off HR).
+- Post-deploy: confirmar en staging que `gh_otd_bucket` se materializa + signal en /admin/operations.

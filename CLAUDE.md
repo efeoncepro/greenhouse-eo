@@ -4561,6 +4561,34 @@ Notion edit status (Efeonce/Sky) → captura prod TASK-912 (notion-status-transi
 
 **Spec canónica**: `docs/tasks/complete/TASK-916-rpa-v2-productive-compute-writeback.md`. Pattern fuente: demo siblings TASK-913/914.
 
+### OTD Bucket Classifier Ownership invariants (TASK-923, M1, desde 2026-05-24)
+
+Greenhouse es el **clasificador autoritativo del bucket OTD** (`on_time` / `late_drop` / `overdue` / `carry_over` / `na`). El cómputo del bucket vive en un helper canónico TS + su espejo BQ — NUNCA en una fórmula Notion. M1 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16: movió el clasificador desde la fórmula Notion `Indicador de Performance` (→ synced `performance_indicator_code`) a Greenhouse en **modo paridad** (freeze-off, replica la semántica cruda actual), escrito a la columna shadow `gh_otd_bucket`. Es aditivo: el bono sigue leyendo `otd_pct` legacy intacto.
+
+**Helpers canónicos** (`src/lib/notion-metrics/`):
+
+- `classifyOtdBucket(inputs: TaskInputsForOtdBucket) → OtdBucketResult` — pure helper canonical, **freeze-aware togglable** (M1 = freeze off / paridad; M2 = freeze on). Un solo helper, no dos. server-only. Importa `task-status-canonical.ts` (Aprobado/Cancelado/Archivado + `normalizeTaskStatus`).
+- `buildOtdBucketSql(cols, frozenDaysSql='0') → string` — espejo BQ CASE del helper. TS es source of truth; la expresión BQ se valida con test de paridad TS↔SQL.
+- `OTD_BUCKET_FORMULA_VERSION='otd_bucket_v1.0'` en `otd-bucket-types.ts`.
+- `isOtdClassifierGhShadowEnabled()` (`OTD_CLASSIFIER_GH_SHADOW_ENABLED`, default OFF) en `otd-classifier-flags.ts`.
+
+**Columna shadow** `gh_otd_bucket` (STRING): en `v_tasks_enriched` (VIEW additive) + `delivery_task_monthly_snapshots` (DDL + `REQUIRED_COLUMN_MIGRATIONS`). La materialize la inserta vía `buildOtdBucketSql`.
+
+**Reliability signal** `notion.metrics.shadow_paridad_otd_classifier` (PG-based, moduleKey `delivery`, kind `drift`): compara `performance_indicator_code IN ('on_time','late_drop')` legacy vs el recompute del helper, **solo sobre tareas COMPLETADAS** (buckets estables now()-independientes), últimos 90d. Severity: mismatch ≤2% ok / ≤10% warning / >10% error.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** computar el bucket OTD leyendo la fórmula Notion `Indicador de Performance` ni `performance_indicator_code` para cómputo nuevo. El bucket canónico se computa con `classifyOtdBucket`. `performance_indicator_code` queda como display/paridad legacy hasta ≥90d post-cutover M3.
+- **NUNCA** crear un helper de clasificación OTD paralelo. Si M2 (TASK-922 freeze) o futuros movimientos necesitan más semántica, **extender `classifyOtdBucket`** (es freeze-aware togglable by design) + extender `buildOtdBucketSql`. Un solo helper.
+- **NUNCA** modificar `classifyOtdBucket` sin actualizar paralelamente `buildOtdBucketSql` + el test de paridad TS↔SQL. La expresión BQ debe espejar el helper byte-semánticamente.
+- **NUNCA** el bono lee `gh_otd_bucket` antes de M3 (cutover gateado: ≥30d shadow + sign-off HR). M1/M2 escriben solo la columna shadow que el bono NO lee → matemáticamente no alteran `otd_pct`.
+- **NUNCA** medir paridad M1 sobre tareas abiertas (`overdue`/`carry_over`). Esos buckets dependen de `now()` + del gate `esMesActual` → la divergencia es esperada, no falla. La signal mide solo completadas (`on_time`/`late_drop`).
+- **NUNCA** subir `OTD_CLASSIFIER_GH_SHADOW_ENABLED` a un comportamiento que cambie un número que el bono ve. El flag es de observabilidad/shadow; el cutover real del bono es M3 (futura task gateada).
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'delivery', { tags: { source: 'otd_classifier_*' } })`.
+- **SIEMPRE** que emerja un movimiento downstream (M2 freeze, M3 cutover), reusar el helper canónico + columna shadow + signal de paridad. Cero plumbing nuevo.
+
+**Spec canónica**: `docs/tasks/complete/TASK-923-greenhouse-owns-otd-bucket-classifier-parity-shadow.md`. ADR: `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1.md` §16 (Delta 2026-05-24 — M1 shipped). Desbloquea M2 (TASK-922). Patrón fuente: TASK-908 (calculate-cycle-time + cycle-time-formula TS↔SQL mirror), TASK-901 (RpA helper canonical), Delivery Metrics Ownership Boundary (Notion = OS / Greenhouse = motor).
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

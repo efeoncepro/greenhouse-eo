@@ -1,3 +1,21 @@
+# Sesion 2026-05-24 — TASK-923 M1: Greenhouse owns OTD bucket classifier (parity, shadow) — ✅ SHIPPED
+
+**Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M1 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16. Movió el clasificador del bucket OTD (on_time/late_drop/overdue/carry_over) de Notion (`Indicador de Performance` formula → synced `performance_indicator_code`) a Greenhouse, en **modo paridad** (replica semántica cruda, sin freeze) → columna nueva `gh_otd_bucket` en `v_tasks_enriched` + `delivery_task_monthly_snapshots`, **shadow + flag `OTD_CLASSIFIER_GH_SHADOW_ENABLED` OFF**. Legacy `performance_indicator_code` + `otd_pct` + **bono INTACTOS**. Contexto crítico: nómina en ~6 días → nada toca el bono (M1 es columna nueva que nadie lee).
+
+**Qué se shippeó (4 slices, todos committeados)**:
+- **Slice 1** (`6e54a17e`): `classifyOtdBucket()` pure helper canonical + `buildOtdBucketSql()` BQ CASE mirror + `otd-bucket-types.ts` (`OTD_BUCKET_FORMULA_VERSION='otd_bucket_v1.0'`). 21 tests (fixture matrix + freeze toggle + TS↔SQL parity).
+- **Slice 2** (`5c4d87fa`): flag `isOtdClassifierGhShadowEnabled()` (`OTD_CLASSIFIER_GH_SHADOW_ENABLED`, default OFF).
+- **Slice 3** (`efa47faf`): reliability signal `notion.metrics.shadow_paridad_otd_classifier` (PG-based, moduleKey 'delivery', kind 'drift'). Mide paridad sobre tareas COMPLETADAS (on_time/late_drop). Wired en `get-reliability-overview.ts`.
+- **Slice 4** (`fed7381a`): `gh_otd_bucket` shadow column en `v_tasks_enriched` (VIEW additive) + `delivery_task_monthly_snapshots` DDL + `REQUIRED_COLUMN_MIGRATIONS` + materialize INSERT/SELECT.
+
+**Decisión de diseño (parity con `now()` dinámico)**: el `performance_indicator_code` synced es snapshot del Notion formula al `now()` del último sync; el recompute usa otro `now()`. Paridad perfecta imposible para tareas ABIERTAS (overdue/carry_over dependen de now()) + gate `esMesActual`. **Resolución**: la signal mide ~100% sobre tareas COMPLETADAS (buckets estables now()-independientes); divergencia en abiertas = esperada/tolerada.
+
+**Verificación**: full suite **5239 tests passed**, `pnpm build` green, `tsc --noEmit` clean, lint clean. Signal verificada LIVE contra PG real → **100% paridad (198/198)**. BQ dry-run + SELECT read-only confirmaron materialización (`on_time` 192 / `carry_over` 149 / `overdue` 13 / `late_drop` 6 / NA 4931).
+
+**Próximo**: M2 (TASK-922 freeze, ahora desbloqueado) + M3 (bonus cutover, gated post-nómina). Ver ADR §16.
+
+---
+
 # Sesion 2026-05-21 — TASK-919 RpA V2 capture hardening (robustez) — #3 detección + #4 flag shipped
 
 **Status**: 🔨 IN PROGRESS en `develop`. Endurece el pipeline de captura RpA V2 (BUG-CLASS-003 muestreo). **Shipped**: #4 flag por-cliente + #3 reconciliación (detección). **Diferido con rationale**: auto-repair (#3 fase 2), #2 baseline page.created, #5 Cloud Tasks. #1 (lane 60s) superseded por #3.

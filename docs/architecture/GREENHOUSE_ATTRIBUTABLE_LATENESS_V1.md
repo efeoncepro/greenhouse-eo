@@ -255,3 +255,16 @@ GH classifier V1 replica la semántica **efectiva actual**: `on_time`/`late_drop
 - **NUNCA** ningún movimiento dentro de los 7 días de nómina toca `otd_pct`.
 - El helper TS es source of truth; la expresión BQ lo espeja con test de paridad.
 - La fórmula Notion `Indicador de Performance` queda como display legacy hasta ≥90d post-cutover.
+
+### 16.7 Delta 2026-05-24 — M1 SHIPPED (TASK-923)
+
+M1 cerró en `develop` (directo, sin branch, override operador). Estado por slice:
+
+- **Helper canónico** `classifyOtdBucket(inputs)` + `buildOtdBucketSql()` en `src/lib/notion-metrics/classify-otd-bucket.ts` (+ `otd-bucket-types.ts`, `OTD_BUCKET_FORMULA_VERSION='otd_bucket_v1.0'`). Modo freeze-off (paridad). 21 tests: fixture matrix + freeze toggle + paridad TS↔SQL.
+- **Flag** `isOtdClassifierGhShadowEnabled()` (`OTD_CLASSIFIER_GH_SHADOW_ENABLED`, default OFF) en `otd-classifier-flags.ts`.
+- **Reliability signal** `notion.metrics.shadow_paridad_otd_classifier` (PG-based, moduleKey `delivery`, kind `drift`) en `src/lib/reliability/queries/notion-metrics-otd-classifier-parity.ts`, wired en `get-reliability-overview.ts`. Mide paridad sobre tareas COMPLETADAS (`on_time`/`late_drop`, buckets estables now()-independientes); divergencia en abiertas = esperada, no falla. Severity: ≤2% ok / ≤10% warning / >10% error.
+- **BQ mirror** `gh_otd_bucket` shadow column: `v_tasks_enriched` VIEW (additive) + `delivery_task_monthly_snapshots` DDL + `REQUIRED_COLUMN_MIGRATIONS` + INSERT/SELECT del materializer (`schema.ts` + `materialize.ts`).
+
+**Verificación**: full suite 5239 passed, build green, tsc clean. Signal LIVE contra PG real → **100% paridad (198/198)**. BQ dry-run + SELECT read-only confirmaron materialización (`on_time` 192 / `carry_over` 149 / `overdue` 13 / `late_drop` 6 / NA 4931). Bono + `otd_pct` + `performance_indicator_code` intactos.
+
+**Desbloquea M2** (TASK-922): el helper freeze-aware togglable ya existe GH-owned; M2 solo flipea freeze on + reason-aware sobre el mismo `gh_otd_bucket`.
