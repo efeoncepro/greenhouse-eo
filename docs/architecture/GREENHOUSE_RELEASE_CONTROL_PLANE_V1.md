@@ -163,6 +163,12 @@ orchestrator-only via `workflow_call`. Workers conservan `push:develop` para
 staging y `workflow_dispatch` para break-glass auditado; no despliegan
 production automaticamente por `push:main`.
 
+**Delta 2026-05-24 (TASK-931)**: `push:develop` de workers conserva deploy
+staging automático, pero pasa a `latest-only` (`cancel-in-progress=true` para
+`refs/heads/develop`). Bajo Vibe Coding, un deploy staging superseded por un
+commit posterior no aporta evidencia vigente y consume minutos Actions/Cloud
+Run. Production mantiene ownership del orchestrator y break-glass auditado.
+
 **Why kill bug class V1 + decouple V2**: GitHub Actions concurrency es black-box. Opcion A mata el deadlock determinista en su origen; Opcion B desacopla orchestrated path del directo. Son complementarios, no excluyentes.
 
 ### 2.8. Rollback automatico (Vercel + Cloud Run) vs manual gated (Azure)

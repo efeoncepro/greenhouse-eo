@@ -77,14 +77,14 @@ on:
 # durante 14-22 dias. Pushes nuevos al mismo concurrency group quedaron
 # `pending` con `jobs: []` y se cancelaron en cascada.
 #
-# Fix: cancel-in-progress=TRUE solo para production path (workflow_call o
-# workflow_dispatch con environment=production). Staging preserva
-# cancel-in-progress=false para no disrumpir in-flight QA.
+# Fix V1: cancel-in-progress=TRUE para production path. TASK-931 extiende
+# latest-only a pushes develop/staging: bajo Vibe Coding, un deploy staging
+# superseded por un commit posterior no aporta señal vigente y quema minutos.
 #
 # Spec: docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.7
 concurrency:
   group: ops-worker-deploy-${{ github.ref }}
-  cancel-in-progress: ${{ (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
 
 permissions:
   contents: read

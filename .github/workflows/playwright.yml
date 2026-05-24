@@ -10,11 +10,25 @@ on:
   push:
     branches:
       - develop
-    paths-ignore:
-      - '**/*.md'
-      - 'docs/**'
-      - '.claude/**'
-      - '.codex/**'
+    paths:
+      - '.github/workflows/playwright.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'playwright.config.ts'
+      - 'tests/e2e/**'
+      - 'src/app/**'
+      - 'src/components/**'
+      - 'src/config/**'
+      - 'src/layouts/**'
+      - 'src/menu/**'
+      - 'src/types/**'
+      - 'src/views/**'
+      - 'src/lib/auth/**'
+      - 'src/lib/cloud/**'
+      - 'src/lib/finance/**'
+      - 'src/lib/payroll/**'
+      - 'src/lib/reliability/**'
+      - 'src/lib/tenant/**'
 
 permissions:
   contents: read

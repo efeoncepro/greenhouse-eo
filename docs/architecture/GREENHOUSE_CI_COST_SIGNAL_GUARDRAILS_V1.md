@@ -44,6 +44,9 @@ Remote CI is integration/release evidence, not the exploratory workbench.
 - `pnpm actions:cost:audit` is the repo-local workflow/job hotspot report.
 - `src/lib/cloud/github-billing.ts:getGitHubBillingOverview` remains the official GitHub Billing reader.
 - `.github/workflows/ci.yml` and `.github/workflows/playwright.yml` may skip docs-only changes when specialized gates cover those docs.
+- `CI` keeps lint, typecheck, test results and build in the frequent lane. Coverage moves to `CI Deep Verification` on `main`, manual dispatch and weekly scheduled backstop.
+- Playwright smoke on `develop` is path-aware for UI/runtime/auth/admin/payroll/reliability/API-critical paths.
+- Staging worker deploys on `develop` are latest-only; production worker deploys remain orchestrator-owned and retain release evidence.
 - Production workflows must preserve auditable evidence and release semantics from `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`.
 - Any persisted workflow/job metrics belong to TASK-859 or a superseding ADR; TASK-931 V1 uses read-only API reporting.
 

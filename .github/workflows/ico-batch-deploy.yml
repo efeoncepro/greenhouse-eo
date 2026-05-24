@@ -57,11 +57,12 @@ on:
         required: true
 
 # TASK-848 Slice 3 (Opcion A) — concurrency fix canonica para production.
+# TASK-931 — latest-only tambien para staging/develop obsoleto.
 # Ver ops-worker-deploy.yml para contexto. Spec:
 # docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.7
 concurrency:
   group: ico-batch-deploy-${{ github.ref }}
-  cancel-in-progress: ${{ (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
 
 permissions:
   contents: read

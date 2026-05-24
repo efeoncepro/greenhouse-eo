@@ -5,6 +5,11 @@ on:
     branches:
       - develop
       - main
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.claude/**'
+      - '.codex/**'
   workflow_dispatch:
     inputs:
       base_ref:

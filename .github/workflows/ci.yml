@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
     paths-ignore:
       - '**/*.md'
@@ -28,7 +29,7 @@ permissions:
 
 jobs:
   quality:
-    name: Lint, test and build
+    name: Fast feedback, test and build
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -84,6 +85,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
       - name: Vercel cron async-critical gate (TASK-775)
         # Bloquea PRs que agreguen entries `async-critical` a vercel.json sin
         # equivalente Cloud Scheduler. Vercel custom environments NO ejecutan
@@ -113,10 +117,6 @@ jobs:
         # room for reporter/artifact flushing so a healthy run is not killed.
         timeout-minutes: 8
 
-      - name: Coverage
-        run: pnpm test:coverage
-        timeout-minutes: 10
-
       - name: Test observability summary
         if: always()
         run: pnpm test:observability:summary
@@ -136,7 +136,6 @@ jobs:
           if-no-files-found: warn
           path: |
             artifacts/tests/**
-            artifacts/coverage/**
 
       - name: Build
         run: pnpm build
