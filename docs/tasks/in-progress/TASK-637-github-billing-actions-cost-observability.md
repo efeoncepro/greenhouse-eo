@@ -369,6 +369,24 @@ interface GitHubBillingOverview {
 - `daily_spike`: el costo de un dia supera el promedio de la ventana anterior por `GREENHOUSE_GITHUB_ACTIONS_DAILY_SPIKE_PCT`.
 - Si no hay baseline suficiente, rendir `awaiting_data` o summary explicito, no alerta falsa.
 
+## Rollout Plan & Risk Matrix
+
+| Riesgo | Mitigacion | Estado |
+| --- | --- | --- |
+| Token GitHub productivo demasiado amplio | V1 soporta `GREENHOUSE_GITHUB_BILLING_TOKEN_SECRET_REF`, pero no persiste el PAT local amplio de `gh`; produccion debe usar token dedicado con org `Administration: read`. | Abierto como follow-up operativo |
+| Confundir uso bruto con cobro real | UI/API exponen `grossAmount`, `discountAmount` y `netAmount`; la documentacion explica que `netAmount=0` puede coexistir con consumo Actions. | Mitigado |
+| GitHub Billing API no disponible para el scope | Reader degrada a `error`/`not_configured` sin romper Admin Center; smoke local valida org `efeoncepro`. | Mitigado |
+| Umbrales sin presupuesto real | Env vars opcionales; sin valores el forecast queda `unconfigured`, no healthy inventado. | Mitigado |
+| Costo por workflow no expuesto por REST Billing | V1 no promete workflow-level cost; queda follow-up correlacionar spikes con APIs de Actions. | Documentado |
+
+Rollout:
+
+1. Mergear codigo read-only y docs.
+2. Mantener `GREENHOUSE_GITHUB_BILLING_ORG=efeoncepro` en Vercel `production`, `staging` y `development`.
+3. Crear token dedicado least-privilege y publicarlo en Secret Manager.
+4. Configurar `GREENHOUSE_GITHUB_BILLING_TOKEN_SECRET_REF` en Vercel.
+5. Definir budgets reales antes de configurar `GREENHOUSE_GITHUB_BILLING_MONTHLY_*`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      "Como compruebo que termine y que actualizo?"
@@ -417,6 +435,6 @@ interface GitHubBillingOverview {
 
 ## Open Questions
 
-- Definir los thresholds iniciales concretos para `warn` y `critical` segun presupuesto operativo real.
-- Confirmar si el billing scope canonico es org `efeoncepro`, usuario, enterprise o una combinacion.
-- Confirmar si el token disponible tiene permisos de billing/plan read suficientes sin elevarlo a owner innecesariamente.
+- Resuelta: thresholds iniciales quedan sin configurar hasta tener presupuesto operativo real. Rationale: inventar warning/critical haria que Reliability reportara una severidad falsa.
+- Resuelta: el billing scope canonico V1 es la org `efeoncepro`; repo es filtro opcional. Rationale: el endpoint live de organizacion muestra Actions de `greenhouse-eo` y `kortex`, que es el scope institucional.
+- Resuelta: el token local `gh` tiene permisos suficientes para smoke, pero no se persiste por ser amplio/personal. Rationale: produccion debe usar token dedicado least-privilege con org `Administration: read`.
