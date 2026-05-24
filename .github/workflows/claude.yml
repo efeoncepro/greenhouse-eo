@@ -26,15 +26,23 @@ on:
   pull_request_review_comment:
     types: [created]
 
-# Una corrida por hilo de comentario; cancelar en duplicados ahorra API.
+# Dedup: si el MISMO evento de comentario se re-entrega, el run nuevo cancela
+# el anterior. Comentarios distintos => grupos distintos => corren independientes
+# (cada @claude es una petición propia, no se deben cancelar entre sí).
 concurrency:
-  group: claude-assistant-${{ github.event.issue.number || github.event.pull_request.number }}-${{ github.event.comment.id }}
-  cancel-in-progress: false
+  group: claude-assistant-${{ github.event.comment.id }}
+  cancel-in-progress: true
 
 jobs:
   claude:
-    # Gate de costo: solo en menciones explícitas @claude.
-    if: contains(github.event.comment.body, '@claude')
+    # Doble gate (costo + abuso):
+    #  1. mención explícita @claude
+    #  2. autor con relación de confianza al repo (OWNER/MEMBER/COLLABORATOR)
+    #     => un tercero que comente NO puede gastar la API key ni hacer que el
+    #     bot escriba con permisos issues/pull-requests write.
+    if: >
+      contains(github.event.comment.body, '@claude') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
