@@ -32,6 +32,12 @@
 - **Software Architect 2026 skill:** Codex ahora tiene la skill local invocable `software-architect-2026` en `.codex/skills/software-architect-2026/`. Se adapto desde el paquete Claude entregado por el usuario y conserva referencias, checklists, templates y overlay Efeonce. Uso esperado: decisiones de arquitectura, ADRs, C4, stack picks, auditorias, migraciones, threat models, cost estimates y handoff a TASK docs. En Greenhouse, `AGENTS.md`, `project_context.md`, `Handoff.md` y la task vigente prevalecen si alguna referencia del overlay queda stale.
 - **GSAP adoption vigente:** Greenhouse adopta `gsap` + `@gsap/react` como carril especializado de motion avanzado, no como reemplazo del stack base. ADR canonical: `docs/architecture/GREENHOUSE_GSAP_ADOPTION_DECISION_V1.md`. Imports canonicos: `src/libs/GSAP.tsx` (`gsap`, `useGSAP`) y `src/libs/GSAPScrollTrigger.tsx` (`ScrollTrigger`). Framer Motion/CSS/auto-animate siguen siendo default para microinteracciones comunes; GSAP queda para timelines complejos, SVG/path/text y ScrollTrigger medido con reduced-motion y performance guardrails.
 
+## Delta 2026-05-24 SDD adoptado como práctica explícita (ADR aceptado)
+
+- Greenhouse adopta **Spec-Driven Development** como práctica nombrada. Contrato operativo nuevo para agentes: todo invariante vive en un nivel de la **escalera de promoción L0 prosa → L1 revisado → L2 ejecutable**, y se promueve a L2 (check ejecutable + gate CI) solo si cumple el criterio explícito (drift recurrente / costo alto-irreversible / recurso cross-agente / verificación barata). NO promover por reflejo; NO mecanizar toda la prosa; NO code-gen.
+- Patrón canónico de promoción: regla → check declarativo (lint rule / parity test / gate script) → rollout warn-first → legacy-exempt → gate CI. Generaliza lo ya probado en `design:lint`, lint rules y parity tests.
+- ADR canónico: `docs/architecture/GREENHOUSE_SPEC_DRIVEN_DEVELOPMENT_V1.md` (Accepted, indexado en `DECISIONS_INDEX.md`). Primera implementación shipped: TASK-926 (`pnpm task:lint`, `.github/workflows/task-contract.yml`, `--active`, `--changed`, `--task`). Follow-ups: collision detector Files owned, parity tipos↔OpenAPI.
+
 ## Delta 2026-05-09 ISSUE-072 smoke-lane publisher hardening
 
 - Los warnings `sync:smoke-lane <lane> failed (non-blocking)` en Playwright eran un incidente de plataforma, no ruido aceptable. Causas reales encadenadas: script sin `server-only` shim, secret ref `secret:version` inválido, WIF deployer sin `roles/cloudsql.client` y saturación transitoria Cloud SQL/Postgres (`53300`).

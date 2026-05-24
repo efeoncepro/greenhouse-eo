@@ -34,6 +34,18 @@
 
 ---
 
+# Sesion 2026-05-24 — SDD adoptado como práctica explícita (ADR aceptado)
+
+**Status**: ✅ ADR aceptado, en PR #124 → develop (rama `docs/sdd-adr-v1`). Doc-only / aditivo, rebaseado sobre `develop` después de que TASK-926 quedó `complete`.
+
+**Qué se decidió**: Greenhouse adopta Spec-Driven Development como práctica nombrada, con doctrina canónica de promoción de invariantes **L0 prosa → L1 revisado → L2 ejecutable** + criterio explícito de cuándo promover (drift recurrente / costo alto-irreversible / recurso cross-agente / verificación barata). Generaliza el patrón ya probado (`design:lint`, lint rules, parity tests). Anti-goals: no mecanizar toda la prosa, no code-gen, no promover por reflejo.
+
+**Entregado**: ADR `docs/architecture/GREENHOUSE_SPEC_DRIVEN_DEVELOPMENT_V1.md` (Accepted, con campos + secciones obligatorios del ADR model) + fila en `DECISIONS_INDEX.md` + TASK-926 complete apuntando al ADR + propagación a `project_context.md` (Delta 2026-05-24) + `changelog.md`. Primera implementación ya shipped: TASK-926 (`pnpm task:lint`, `.github/workflows/task-contract.yml`, `--active`, `--changed`, `--task`). Follow-ups: collision detector Files owned, parity tipos↔OpenAPI.
+
+**Nota de rebase PR #124**: se corrigió el drift detectado por review Codex: no reintroducir `docs/tasks/to-do/TASK-926...`, no referirse a TASK-926 como `to-do`, y preservar las entradas recientes de Handoff/changelog de TASK-922/TASK-926/TASK-928.
+
+---
+
 # Sesion 2026-05-24 — TASK-928 Reliability/Admin N+1 batching — 🔨 IN PROGRESS
 
 **Status**: 🔨 IN PROGRESS directo en `develop` por override del operador (sin branch switch). Implementacion local de batching para N+1 Sentry; **no cerrar Sentry** hasta evidencia post-deploy 24-48h.

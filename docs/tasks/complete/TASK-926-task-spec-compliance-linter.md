@@ -48,6 +48,7 @@ Es exactamente el gap que `design:lint` ya resolvió para el contrato visual: un
 
 Revisar y respetar:
 
+- `docs/architecture/GREENHOUSE_SPEC_DRIVEN_DEVELOPMENT_V1.md` — **ADR que esta task implementa**. TASK-926 es la primera implementación de la escalera de promoción L0→L2: toma invariantes-prosa del Task Protocol (zonas, paridad lifecycle↔carpeta) y los lleva a L2 (check ejecutable). Respetar el patrón canónico §2.2 (check declarativo + rollout warn-first + legacy-exempt + gate CI).
 - `docs/tasks/TASK_TEMPLATE.md` — fuente de verdad de las zonas y secciones obligatorias.
 - `docs/tasks/TASK_PROCESS.md` — semántica de Type (`implementation` / `umbrella` / `policy`), Lightweight Mode, y qué secciones aplican a cada Type.
 - `docs/tasks/README.md` — convención vigente (paridad carpeta ↔ `Lifecycle`).
@@ -69,6 +70,7 @@ Reglas obligatorias:
 
 ### Depends on
 
+- `docs/architecture/GREENHOUSE_SPEC_DRIVEN_DEVELOPMENT_V1.md` (ADR; esta task es su primera implementación)
 - `docs/tasks/TASK_TEMPLATE.md` (estructura de zonas — contrato que el linter codifica)
 - `docs/tasks/TASK_ID_REGISTRY.md` (fuente para la paridad registry)
 - patrón `package.json` script + `scripts/ci/*.mjs` ya establecido
