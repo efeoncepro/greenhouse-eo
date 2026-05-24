@@ -240,4 +240,48 @@ describe('buildOtdBucketSql — mirror BQ (paridad TS↔SQL)', () => {
 
     expect(aliased).toContain('t.due_date IS NULL')
   })
+
+  it('applyMonthGate=false omite la cláusula esMesActual (M2)', () => {
+    const m2sql = buildOtdBucketSql(undefined, 'gh_frozen_days', false)
+
+    expect(m2sql).not.toContain('EXTRACT(MONTH FROM')
+    expect(m2sql).toContain('- (gh_frozen_days))')
+  })
+
+  it('applyMonthGate=true (default) mantiene la cláusula esMesActual (M1)', () => {
+    expect(sql).toContain('EXTRACT(MONTH FROM due_date)')
+  })
+})
+
+describe('classifyOtdBucket — applyMonthGate (M2)', () => {
+  // due_date fuera del mes vigente (asOf mayo 2026, due marzo 2026)
+  const outOfMonth = {
+    taskStatus: 'Aprobado',
+    dueDate: new Date('2026-03-10T00:00:00Z'),
+    completedAt: new Date('2026-03-08T00:00:00Z'),
+    asOf: new Date('2026-05-24T12:00:00Z')
+  }
+
+  it('M1 (default true) → not_applicable cuando due_date fuera del mes vigente', () => {
+    expect(classifyOtdBucket(outOfMonth).bucket).toBe('not_applicable')
+  })
+
+  it('M2 (applyMonthGate=false) → clasifica igual sin gate de mes (on_time)', () => {
+    expect(classifyOtdBucket({ ...outOfMonth, applyMonthGate: false }).bucket).toBe('on_time')
+  })
+
+  it('M2 freeze ON descuenta días no imputables del bucket', () => {
+    // due 2026-03-10, completed 2026-03-20 → 10 días tarde crudo; freeze 10 → on_time
+    const result = classifyOtdBucket({
+      taskStatus: 'Aprobado',
+      dueDate: new Date('2026-03-10T00:00:00Z'),
+      completedAt: new Date('2026-03-20T00:00:00Z'),
+      asOf: new Date('2026-05-24T12:00:00Z'),
+      applyMonthGate: false,
+      frozenDays: 10
+    })
+
+    expect(result.bucket).toBe('on_time')
+    expect(result.frozenDaysApplied).toBe(10)
+  })
 })

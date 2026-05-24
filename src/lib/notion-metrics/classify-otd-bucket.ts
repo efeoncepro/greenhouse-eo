@@ -64,6 +64,7 @@ export const classifyOtdBucket = (inputs: TaskInputsForOtdBucket): OtdBucketResu
   const { taskStatus, dueDate, completedAt } = inputs
   const asOf = inputs.asOf ?? new Date()
   const frozenDays = inputs.frozenDays ?? 0
+  const applyMonthGate = inputs.applyMonthGate ?? true
 
   const base = {
     frozenDaysApplied: frozenDays,
@@ -93,7 +94,9 @@ export const classifyOtdBucket = (inputs: TaskInputsForOtdBucket): OtdBucketResu
   }
 
   // 3. Gate esMesActual (paridad M1): due_date debe caer en el mes vigente.
-  if (!isSameCalendarMonth(dueDate, asOf)) {
+  //    M2/TASK-922 pasa applyMonthGate=false (el filtro de período del registry
+  //    ya hace el scoping; el gate por mes calendario es redundante — ADR §16.5).
+  if (applyMonthGate && !isSameCalendarMonth(dueDate, asOf)) {
     return result('not_applicable', 'valid')
   }
 
@@ -131,7 +134,8 @@ export const buildOtdBucketSql = (
     dueDate: 'due_date',
     completedAt: 'completed_at'
   },
-  frozenDaysSql = '0'
+  frozenDaysSql = '0',
+  applyMonthGate = true
 ): string => {
   const { taskStatus, dueDate, completedAt } = cols
 
@@ -152,10 +156,11 @@ export const buildOtdBucketSql = (
   const daysOverdueExpr = `(DATE_DIFF(CURRENT_DATE(), ${dueDate}, DAY) - (${frozenDaysSql}))`
   const esMesActual = `EXTRACT(MONTH FROM ${dueDate}) = EXTRACT(MONTH FROM CURRENT_DATE()) AND EXTRACT(YEAR FROM ${dueDate}) = EXTRACT(YEAR FROM CURRENT_DATE())`
 
+  const monthGateClause = applyMonthGate ? `\n    WHEN NOT (${esMesActual}) THEN 'not_applicable'` : ''
+
   return `CASE
     WHEN ${dueDate} IS NULL THEN 'not_applicable'
-    WHEN ${taskStatus} IN (${cancelado}, ${archivado}) THEN 'not_applicable'
-    WHEN NOT (${esMesActual}) THEN 'not_applicable'
+    WHEN ${taskStatus} IN (${cancelado}, ${archivado}) THEN 'not_applicable'${monthGateClause}
     WHEN ${taskStatus} IN (${aprobado}) AND ${completedAt} IS NULL THEN 'on_time'
     WHEN ${taskStatus} IN (${aprobado}) AND ${daysLateExpr} <= 0 THEN 'on_time'
     WHEN ${taskStatus} IN (${aprobado}) THEN 'late_drop'

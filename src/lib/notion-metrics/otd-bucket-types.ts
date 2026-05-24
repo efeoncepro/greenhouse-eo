@@ -39,6 +39,13 @@ export interface TaskInputsForOtdBucket {
    * Es el toggle freeze-aware: 0 = freeze OFF.
    */
   readonly frozenDays?: number
+  /**
+   * Aplica el gate `esMesActual` (due_date en el mes calendario vigente, si no
+   * → `not_applicable`). **M1 = true** (paridad con la fórmula Notion). M2/TASK-922
+   * pasa `false`: el filtro de período del registry ya hace el scoping y el gate
+   * por mes calendario es redundante (ADR §16.5). Default `true`.
+   */
+  readonly applyMonthGate?: boolean
 }
 
 export interface OtdBucketResult {
