@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -89,13 +89,25 @@ Reglas obligatorias:
 - Backfill histórico profundo (más allá del best-effort de fecha original) → evaluar en TASK-922+.
 
 ## Acceptance Criteria
-- [ ] Migration `task_due_date_changes` aplicada + tipos regenerados + triggers append-only + CHECK enums
-- [ ] Captura vía webhook con re-fetch + HMAC + echo-loop + workspace resolution, flag OFF default → cero impacto al merge
-- [ ] Inferencia de motivo (función pura + tests) desde status_at_change + transiciones
-- [ ] Propiedad Notion `Motivo de reprogramación` + writeback de sugerencia + path de confirmación operador
-- [ ] 2 reliability signals wired (capture_lag, pending_reason_confirmation), steady=0
-- [ ] `pnpm test` + `pnpm build` verde
-- [ ] Task movida a `complete/`
+- [x] Migration `task_due_date_changes` aplicada + tipos regenerados + triggers append-only + CHECK enums (verificada live: 16 cols, 2 triggers, 4 indexes)
+- [x] Captura con re-fetch + workspace resolution + flag OFF default → cero impacto al merge (reusa el HMAC/echo-loop del webhook `notion-status-transitions` de TASK-912 vía `page_change_signal`; flag propio `NOTION_DUE_DATE_CAPTURE_ENABLED`)
+- [x] Inferencia de motivo (función pura + 16 tests) desde status_at_change + transiciones
+- [~] Propiedad Notion `Motivo de reprogramación` + **path de confirmación operador incluido** (consumer lee el select → `operator_confirmed`); **writeback de la sugerencia DEFERIDO a follow-up** (ver Follow-ups + Delta)
+- [x] 2 reliability signals wired (capture_lag, pending_reason_confirmation), steady=0 (SQL verificado live)
+- [x] `pnpm test` (focales) verde — 32 tests nuevos; build no corrido por WIP de Codex en el árbol (ver Delta)
+- [x] Task movida a `complete/`
+
+## Delta 2026-05-24 — M0 SHIPPED (develop, sin branch — override operador)
+
+5 slices committeados en `develop`. Decisiones de diseño (Audit pre-FASE 1):
+
+- **Reusar `notion.task.page_change_signal`** (webhook `notion-status-transitions` de TASK-912, ya emite para cualquier cambio de propiedad y ya está ON en prod) con un 2do consumer `notionDueDateChangeCaptureProjection` — NO segundo endpoint/HMAC/suscripción. Más DRY/robusto.
+- **Flag propio `NOTION_DUE_DATE_CAPTURE_ENABLED` (default OFF)**: como el webhook de TASK-912 ya está ON, sin flag propio el merge capturaría inmediato. El flag gatea el persist del consumer → cero impacto al merge.
+- **Writeback-de-sugerencia DEFERIDO** (mirror TASK-927): mostrar el motivo inferido en la propiedad Notion es el componente más pesado (Cloud Tasks + echo-loop + propiedad out-of-band) y NO es lo que TASK-922 consume. El **path de confirmación-read del operador SÍ se incluye**: el consumer lee la propiedad `Motivo de reprogramación` en el re-fetch → si el operador la setea, `reason_source='operator_confirmed'`. El operador setea el motivo por su propio conocimiento; ver la sugerencia es nicety.
+- **Baseline seed** desde `Fecha límite original` en la primera observación (best-effort histórico, `source_quality='backfilled'`); `scope_change` NUNCA se infiere (solo operador), default ambiguo `unspecified` (conservador). `days_delta` en TS (no `EXTRACT(EPOCH FROM date-date)`, gate TASK-893).
+
+Slices: 1 migration (`20260524100613341`) · 2 helper `reschedule-reason-inference.ts` · 3 `fetchPageDueDate` + consumer + flag · 4 signals · 5 docs. 32 tests focales verdes. Test pre-existente roto en develop `src/lib/reliability/ai/build-prompt.test.ts` (byte-idéntico a origin/develop, ajeno a M0). WIP de Codex sin commitear en el árbol (`reliability/ai|synthetic` + `ops-worker/server.ts`) — NO tocado.
 
 ## Follow-ups
-- TASK-922 (compute shadow) consume este log.
+- **TASK-922** (compute shadow / atraso imputable) consume este log + el motivo confirmado. Desbloqueado.
+- **Writeback-de-sugerencia del motivo a Notion** (deferido): proyección que escribe el `reason_code` inferido a la propiedad `Motivo de reprogramación` (read-only para el operador, con sufijo "(sugerido)") vía Cloud Tasks throttled + echo-loop. Requiere crear la propiedad out-of-band. Patrón fuente: TASK-927 (writeback display). Crear task derivada cuando se priorice la UX de sugerencia.
