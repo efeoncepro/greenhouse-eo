@@ -66,6 +66,10 @@ export interface NotionPropertyValue {
   // Notion property update shape canonical V1. RpA V2 writeback es number-only.
   // Forward-compat: agregar shapes para rich_text, select, multi_select, etc.
   number?: number | null
+
+  // TASK-903 — FTR writeback usa select (`[GH] FTR` = Pass/Fail/N/A). Notion
+  // PATCH shape: `{ select: { name: 'Pass' } }` o `{ select: null }` para limpiar.
+  select?: { name: string } | null
 }
 
 /**
