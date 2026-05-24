@@ -43,6 +43,7 @@
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
  */
 
+import { randomUUID } from 'node:crypto'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
 // TASK-844 — Sentry init must run BEFORE any function from @/lib/** is invoked
@@ -1311,6 +1312,96 @@ const handleFinanceFxDriftRemediation = async (req: IncomingMessage, res: Server
  * when drift is detected — surfaces in the Reliability dashboard via
  * `RELIABILITY_REGISTRY[finance].incidentDomainTag` cascade.
  */
+const FINANCE_LEDGER_HEALTH_SOURCE_SYSTEM = 'finance_ledger_health'
+
+const buildFinanceLedgerDriftSignature = (health: Awaited<ReturnType<typeof getFinanceLedgerHealth>>) =>
+  JSON.stringify({
+    healthy: health.healthy,
+    settlement: health.settlementDrift.driftedIncomesCount,
+    phantoms: health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount,
+    staleBalances: health.balanceFreshness.accountsWithStaleBalances.length,
+    unanchored: health.unanchoredExpenses.count,
+    task708Runtime: health.task708.paymentsPendingAccountResolutionRuntime,
+    task708Historical: health.task708.paymentsPendingAccountResolutionHistorical,
+    task708d: health.task708d.postCutoverPhantomsWithoutBankEvidence,
+    task714d: health.task714d.internalTransferGroupsWithMissingPair,
+    task720: health.task720.instrumentCategoriesWithoutKpiRule,
+    task721: health.task721.reconciliationSnapshotsWithBrokenEvidence,
+    settlementSample: health.settlementDrift.sampleDrifted.map(row => row.incomeId).slice(0, 5).sort(),
+    unanchoredSample: health.unanchoredExpenses.sample.map(row => row.expenseId).slice(0, 5).sort()
+  })
+
+const readLatestFinanceLedgerDriftSignature = async (): Promise<string | null> => {
+  const rows = await runGreenhousePostgresQuery<{ notes: string | null }>(
+    `SELECT notes
+       FROM greenhouse_sync.source_sync_runs
+      WHERE source_system = $1
+        AND source_object_type = 'ledger_health'
+        AND sync_mode = 'daily_probe'
+        AND finished_at IS NOT NULL
+      ORDER BY finished_at DESC
+      LIMIT 1`,
+    [FINANCE_LEDGER_HEALTH_SOURCE_SYSTEM]
+  )
+
+  const notes = rows[0]?.notes
+
+  if (!notes) return null
+
+  try {
+    const parsed = JSON.parse(notes)
+
+    return typeof parsed?.driftSignature === 'string' ? parsed.driftSignature : null
+  } catch {
+    return null
+  }
+}
+
+const recordFinanceLedgerHealthRun = async ({
+  health,
+  driftSignature,
+  durationMs,
+  sentryAlerted
+}: {
+  health: Awaited<ReturnType<typeof getFinanceLedgerHealth>>
+  driftSignature: string
+  durationMs: number
+  sentryAlerted: boolean
+}): Promise<void> => {
+  const notes = JSON.stringify({
+    driftSignature,
+    healthy: health.healthy,
+    sentryAlerted,
+    durationMs,
+    counts: {
+      settlement: health.settlementDrift.driftedIncomesCount,
+      phantoms: health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount,
+      staleBalances: health.balanceFreshness.accountsWithStaleBalances.length,
+      unanchored: health.unanchoredExpenses.count,
+      task708Runtime: health.task708.paymentsPendingAccountResolutionRuntime,
+      task708Historical: health.task708.paymentsPendingAccountResolutionHistorical,
+      task708d: health.task708d.postCutoverPhantomsWithoutBankEvidence,
+      task714d: health.task714d.internalTransferGroupsWithMissingPair,
+      task720: health.task720.instrumentCategoriesWithoutKpiRule,
+      task721: health.task721.reconciliationSnapshotsWithBrokenEvidence
+    }
+  })
+
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_sync.source_sync_runs (
+       sync_run_id, source_system, source_object_type, sync_mode,
+       status, records_read, records_written_raw, triggered_by, notes, finished_at
+     )
+     VALUES ($1, $2, 'ledger_health', 'daily_probe', $3, 1, 0, 'ops_worker', $4, CURRENT_TIMESTAMP)`,
+    [
+      `finance-ledger-health-${randomUUID()}`,
+      FINANCE_LEDGER_HEALTH_SOURCE_SYSTEM,
+      health.healthy ? 'succeeded' : 'partial',
+      notes
+    ]
+  )
+}
+
 const handleFinanceLedgerHealthCheck = async (_req: IncomingMessage, res: ServerResponse) => {
   const startMs = Date.now()
 
@@ -1319,26 +1410,54 @@ const handleFinanceLedgerHealthCheck = async (_req: IncomingMessage, res: Server
   try {
     const health = await getFinanceLedgerHealth()
     const durationMs = Date.now() - startMs
+    const driftSignature = buildFinanceLedgerDriftSignature(health)
+    let sentryAlerted = false
 
     if (!health.healthy) {
-      captureMessageWithDomain(
-        `Finance ledger drift detected on daily probe (settlement=${health.settlementDrift.driftedIncomesCount}, phantoms=${health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount}, stale_balances=${health.balanceFreshness.accountsWithStaleBalances.length}, unanchored=${health.unanchoredExpenses.count}).`,
-        'finance',
-        {
-          level: 'warning',
-          tags: { source: 'finance_ledger_drift_daily_cron' },
-          extra: {
-            settlementDriftCount: health.settlementDrift.driftedIncomesCount,
-            phantomsCount: health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount,
-            staleBalancesCount: health.balanceFreshness.accountsWithStaleBalances.length,
-            unanchoredExpensesCount: health.unanchoredExpenses.count
-          },
-          fingerprint: ['finance-ledger-drift-daily']
-        }
-      )
+      let lastDriftSignature: string | null = null
+
+      try {
+        lastDriftSignature = await readLatestFinanceLedgerDriftSignature()
+      } catch (error) {
+        console.warn('[ops-worker] finance ledger health signature lookup failed; preserving Sentry alert', {
+          error: (error as Error).message
+        })
+      }
+
+      if (lastDriftSignature !== driftSignature) {
+        sentryAlerted = true
+
+        captureMessageWithDomain(
+          `Finance ledger drift detected on daily probe (settlement=${health.settlementDrift.driftedIncomesCount}, phantoms=${health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount}, stale_balances=${health.balanceFreshness.accountsWithStaleBalances.length}, unanchored=${health.unanchoredExpenses.count}).`,
+          'finance',
+          {
+            level: 'warning',
+            tags: { source: 'finance_ledger_drift_daily_cron' },
+            extra: {
+              driftSignature,
+              previousDriftSignature: lastDriftSignature,
+              settlementDriftCount: health.settlementDrift.driftedIncomesCount,
+              phantomsCount: health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount,
+              staleBalancesCount: health.balanceFreshness.accountsWithStaleBalances.length,
+              unanchoredExpensesCount: health.unanchoredExpenses.count
+            },
+            fingerprint: ['finance-ledger-drift-daily']
+          }
+        )
+      }
     }
 
-    console.log(`[ops-worker] /finance/ledger-health-check done — healthy=${health.healthy} ${durationMs}ms`)
+    try {
+      await recordFinanceLedgerHealthRun({ health, driftSignature, durationMs, sentryAlerted })
+    } catch (error) {
+      console.warn('[ops-worker] finance ledger health run tracking failed', {
+        error: (error as Error).message
+      })
+    }
+
+    console.log(
+      `[ops-worker] /finance/ledger-health-check done — healthy=${health.healthy} sentryAlerted=${sentryAlerted} ${durationMs}ms`
+    )
 
     json(res, 200, { ...health, durationMs })
   } catch (error) {

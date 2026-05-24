@@ -1,3 +1,142 @@
+# Sesion 2026-05-24 — TASK-922 M2: atraso imputable + bucket OTD reason-aware (shadow) — ✅ SHIPPED
+
+**Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M2 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16. Computa el atraso imputable + bucket OTD reason-aware en **shadow** (flag `ATTRIBUTABLE_LATENESS_OTD_ENABLED` OFF) → bono intacto. Cierra el compute que TASK-921 (M0) + TASK-923 (M1) habilitaron; desbloquea M3 (cutover bono, gated) que cierra ISSUE-081 en prod.
+
+**Shipped (6 slices)**: `6c847583` classifyOtdBucket applyMonthGate (26 tests) · `03452444` calculateAttributableLateness pure helper (16 tests) · `289959cd` migration shadow table + flag · `2d572cca` consumer reactivo (11 tests) · `ad1b67b3` 2 reliability signals · cierre docs. **53 tests focales verdes**, tsc 0, lint limpio, SQL signals verificado live (steady 0). 326 reliability tests verdes.
+
+**Decisión clave**: output M2 en **PG shadow table + consumer reactivo** (patrón RpA V2), NO mirror BQ del freeze (multi-ciclo no mantenible en CASE BQ). Reusa `classifyOtdBucket` (M1) extendido con `applyMonthGate` — single source of truth del bucket. Preserva `gh_otd_bucket` de M1 intacto.
+
+**Verificación runtime contra DATA REAL** (no solo mocks; respuesta a "¿cómo sabemos que funciona si está apagado?"): se corrió el pipeline real contra la data capturada por TASK-912 (72 transitions live, 31 tareas, 30 con freeze) en sesión proxy local — dry-run read-only de 31 tareas (28 valid, 19 con freeze, **0 anomalías**) + write path de 5 tareas con flag forzado ON solo local (UPSERT real → 5 filas, ambos signals leyeron ok) + CLEANUP (DELETE → tabla vacía, estado flag-OFF restaurado). El flag de prod NUNCA se flipeó, el bono nunca se tocó. Detalle en la Delta de la task.
+
+**Camino restante ISSUE-081**: M3 (cutover bono) — task futura gated. Operador activa `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2) para acumular shadow ≥30d.
+
+**Nota multi-agente**: Codex trabajó TASK-926/928 en paralelo en el árbol; los docs compartidos (README/REGISTRY/changelog/este Handoff) llevan ediciones de ambos. NO toqué el código de Codex (scripts/ci/task-lint, workflow, package.json, reliability/payroll WIP).
+
+---
+
+# Sesion 2026-05-24 — TASK-926 Task Spec Compliance Linter — ✅ SHIPPED
+
+**Status**: ✅ COMPLETE directo en `develop` por override del operador (sin branch switch). Repo-only tooling; no toca runtime, DB, Payroll, access model ni UI.
+
+**Delta post-ship — debt boundary robusto**: se agrego `pnpm task:lint --active` y una frontera explicita de deuda activa post-adopcion. Resultado actual: `pnpm task:lint` = 1011 scanned, 590 `complete/` historicas exentas, 418 activas pre-TASK-926 exentas, 0 errors / 0 warnings. `pnpm task:lint --active` = 421 scanned, 418 pre-adoption active exentas, 0 errors / 0 warnings. `--changed` y `--task TASK-###` siguen siendo estrictos para drift nuevo o revision focal.
+
+**Entregado**:
+- `pnpm task:lint` con parser reusable (`scripts/ci/task-lint/parser.mjs`), rule catalog declarativo (`rules.mjs`) y CLI (`scripts/ci/task-lint.mjs`) con `--format json|human`, `--changed`, `--task` y `--strict`.
+- Workflow `.github/workflows/task-contract.yml` en rollout warn-first: CI revisa `docs/tasks/**` con `--changed`; warnings reportan, errores bloquean drift nuevo/focal.
+- Tests focales `pnpm task:lint:test`: multiline `## Status`, lifecycle-folder mismatch, registry warning-only, next-id marker y shape JSON.
+- `docs/tasks/TASK_PROCESS.md`, `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, `changelog.md` y task markdown sincronizados; TASK-926 movida a `complete/`.
+
+**Decisión de rollout**: full backlog queda warning-only (`pnpm --silent task:lint --format json`) porque hay deuda histórica/pre-template real. `--changed` y `--task` mantienen errores duros para evitar drift nuevo sin incendiar el backlog.
+
+**Validación local**: `pnpm task:lint:test`, `pnpm --silent task:lint --format json`, `pnpm task:lint --changed`, `pnpm --silent task:lint --task TASK-926 --format json`, ESLint focal del linter.
+
+**Cuidado multi-agente**: el checkout `develop` está ahead de `origin/develop` con commits ajenos TASK-922 y WIP documental/metrics no mío. No push desde este estado sin coordinar, porque empujaría commits ajenos junto con TASK-926.
+
+---
+
+# Sesion 2026-05-24 — SDD adoptado como práctica explícita (ADR aceptado)
+
+**Status**: ✅ ADR aceptado, en PR #124 → develop (rama `docs/sdd-adr-v1`). Doc-only / aditivo, rebaseado sobre `develop` después de que TASK-926 quedó `complete`.
+
+**Qué se decidió**: Greenhouse adopta Spec-Driven Development como práctica nombrada, con doctrina canónica de promoción de invariantes **L0 prosa → L1 revisado → L2 ejecutable** + criterio explícito de cuándo promover (drift recurrente / costo alto-irreversible / recurso cross-agente / verificación barata). Generaliza el patrón ya probado (`design:lint`, lint rules, parity tests). Anti-goals: no mecanizar toda la prosa, no code-gen, no promover por reflejo.
+
+**Entregado**: ADR `docs/architecture/GREENHOUSE_SPEC_DRIVEN_DEVELOPMENT_V1.md` (Accepted, con campos + secciones obligatorios del ADR model) + fila en `DECISIONS_INDEX.md` + TASK-926 complete apuntando al ADR + propagación a `project_context.md` (Delta 2026-05-24) + `changelog.md`. Primera implementación ya shipped: TASK-926 (`pnpm task:lint`, `.github/workflows/task-contract.yml`, `--active`, `--changed`, `--task`). Follow-ups: collision detector Files owned, parity tipos↔OpenAPI.
+
+**Nota de rebase PR #124**: se corrigió el drift detectado por review Codex: no reintroducir `docs/tasks/to-do/TASK-926...`, no referirse a TASK-926 como `to-do`, y preservar las entradas recientes de Handoff/changelog de TASK-922/TASK-926/TASK-928.
+
+---
+
+# Sesion 2026-05-24 — TASK-928 Reliability/Admin N+1 batching — 🔨 IN PROGRESS
+
+**Status**: 🔨 IN PROGRESS directo en `develop` por override del operador (sin branch switch). Implementacion local de batching para N+1 Sentry; **no cerrar Sentry** hasta evidencia post-deploy 24-48h.
+
+**Slices entregados localmente**:
+- `/admin/views`: `syncViewRegistryCatalog()` ahora hace bulk upsert con `UNNEST` en una transaccion (antes 1 UPSERT por view en cada GET). `getAdminPersistedViewAccessGovernance()` resuelve role/view una sola vez y deriva access + source desde el mismo resultado.
+- Platform Health: `fetchAllSources()` reutiliza `operationsPromise` y `syntheticsPromise` y pasa esas sources preloaded a `getReliabilityOverview()` cuando estan sanas, evitando lecturas duplicadas en cache miss.
+- Payroll projected: `fetchKpisForPeriod()` usa `computeMemberMetricsBatch()` para el fallback live de miembros faltantes/stale. No toca `buildPayrollEntry`, periodos, liquidaciones ni UI; conserva materialized-first y missing-member accounting.
+
+**Validacion local**:
+- `pnpm pg:doctor` -> green.
+- `pnpm exec vitest run src/lib/admin/view-access-store.test.ts src/lib/platform-health/composer.test.ts src/lib/platform-health/composer-fetch.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts` -> 4 files / 13 tests passing.
+- `pnpm exec vitest run src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/project-payroll.test.ts src/views/greenhouse/payroll/ProjectedPayrollView.test.tsx` -> 3 files / 23 tests passing.
+- `pnpm exec tsc --noEmit` -> green.
+- `pnpm lint` -> green.
+
+**Pendiente**: si este queda como batch final de integracion, `pnpm build`. Mantener la task en `in-progress` hasta revisar Sentry performance 24-48h post-deploy.
+
+**Cuidado multi-agente**: el worktree en `develop` contiene cambios/commits de TASK-921 y otros docs no relacionados. Stagear selectivamente; no revertir WIP ajeno.
+
+---
+
+# Sesion 2026-05-24 — TASK-921 M0: captura `task_due_date_changes` + motivo de reprogramación — ✅ SHIPPED
+
+**Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M0 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16 — foundation que TASK-922 (M2 freeze/atraso imputable) consume. Creó el log append-only `greenhouse_delivery.task_due_date_changes` + captura de cambios de `Fecha límite` + inferencia de motivo de reprogramación.
+
+**Shipped (5 slices committeados, flag OFF)**: `06fbce8a` migration (16 cols, 2 triggers append-only excepto motivo, 4 indexes, verificada live) · `98616eef` helper `inferRescheduleReason` pure (16 tests) · `5e6b8bd6` `fetchPageDueDate` + consumer `notionDueDateChangeCaptureProjection` (reusa `page_change_signal`) + flag `NOTION_DUE_DATE_CAPTURE_ENABLED` (16 tests) · `e050d4be` 2 reliability signals (SQL verificado live, steady 0/null) · cierre docs. **32 tests focales verdes**, lint + tsc limpios para mis archivos. **Desbloquea TASK-922 (M2)**.
+
+**Pendiente de push**: el pre-push (`tsc --noEmit` full) choca con el WIP de Codex (no mío) → push con stash selectivo al final, como en sesiones previas. Hay además un test pre-existente roto en develop `src/lib/reliability/ai/build-prompt.test.ts` (byte-idéntico a origin/develop, ajeno a M0).
+
+**Decisiones de diseño pre-FASE 1 (documentadas en Audit)**:
+- **Reusar `notion.task.page_change_signal`** (ya emitido por el webhook `notion-status-transitions` de TASK-912 para CUALQUIER cambio de propiedad) con un consumer nuevo → NO segundo endpoint/HMAC/suscripción. Más DRY/robusto.
+- **Flag propio `NOTION_DUE_DATE_CAPTURE_ENABLED` (default OFF)**: el webhook de TASK-912 YA está ON en prod → sin flag propio el merge capturaría inmediato (viola cero-impacto). El flag gatea el PERSIST del consumer.
+- **Writeback-de-sugerencia a Notion → DEFERIDO a follow-up** (mirror TASK-927). El path de CONFIRMACIÓN del operador SÍ se incluye: el consumer LEE la propiedad Notion `Motivo de reprogramación` en el re-fetch → `reason_source='operator_confirmed'`. TASK-922 solo consume motivos confirmados.
+- **Baseline seed** desde `Fecha límite original` en primera observación (best-effort histórico); `scope_change` NUNCA se infiere (solo operador), default ambiguo = `unspecified` (conservador, no extiende fecha_justa).
+
+**Plan**: Slice 1 migration → 2 helper inferencia → 3 fetchPageDueDate + consumer + flag → 4 signals → 5 docs+cierre. Additive, flag OFF → cero impacto al merge.
+
+**NOTA**: hay WIP de Codex sin commitear en `src/lib/reliability/ai|synthetic` + `services/ops-worker/server.ts` — NO tocar; staging selectivo por slice.
+
+---
+
+# Sesion 2026-05-24 — Sentry weekly remediation hardening (May 15-22)
+
+**Status**: 🔨 IMPLEMENTADO LOCALMENTE, pendiente de release/deploy y verificacion Sentry 24-48h. Se aplico el plan sin parches: no sampling, no fingerprint hiding, no ignore/mute. Finance drift sigue visible.
+
+**Qué se implementó**:
+- **Reliability AI Observer**: prompts compactos + schema Gemini (`responseMimeType=application/json`, `responseSchema`, `maxOutputTokens`), parser de JSON balanceado, un unico retry de reparacion y logging acotado sin respuesta cruda. Archivos: `src/lib/reliability/ai/build-prompt.ts`, `src/lib/reliability/ai/runner.ts`, test `src/lib/reliability/ai/runner.test.ts`.
+- **Synthetic probes**: `recordProbeResults()` bulk insert por chunk con `UNNEST`, fallback per-probe si el batch falla. Archivos: `src/lib/reliability/synthetic/persist.ts`, `runner.ts`, test `persist.test.ts`.
+- **Finance ledger health**: firma deterministica de drift + tracking diario en `greenhouse_sync.source_sync_runs` (`source_system='finance_ledger_health'`). Sentry solo alerta si el drift aparece o cambia materialmente; no se oculta el estado unhealthy ni se autoclasifica contabilidad.
+
+**Sentry closeout**:
+- Auditoria versionada: `docs/audits/sentry/SENTRY_WEEKLY_REMEDIATION_AUDIT_2026-05-24.md`.
+- Intento de resolver issues stale/fixed via Sentry API con `greenhouse-sentry-incidents-auth-token` fallo para todos con `You do not have permission to perform this action`. No reintentar con credenciales improvisadas; se necesita token/identidad con permiso de resolver issues.
+- Candidatos stale/fixed quedan documentados con issue IDs. Issues activos que NO se cierran: `JAVASCRIPT-NEXTJS-4Q` finance drift y N+1 restantes.
+
+**Tasks derivadas**:
+- `TASK-928` — Reliability/Admin N+1 batching and request cache.
+- `TASK-929` — Finance ledger drift remediation control.
+
+**Validación local**:
+- `pnpm exec vitest run src/lib/reliability/ai/runner.test.ts src/lib/reliability/synthetic/persist.test.ts` → 2 files / 6 tests passing.
+- `pnpm exec tsc --noEmit` → green.
+- `pnpm lint` → green.
+- `pnpm build` → green.
+
+**Post-deploy requerido**:
+- Cloud Run logs: confirmar que desaparece el log viejo `JSON parse failed — raw response`.
+- Sentry: 24-48h sin recurrencia antes de resolver stale/fixed; performance N+1 no se resuelve hasta `TASK-928`.
+- Finance: verificar que `finance_ledger_health` escriba una fila diaria y que `JAVASCRIPT-NEXTJS-4Q` solo alerte cuando la firma cambia.
+
+---
+
+# Sesion 2026-05-24 — TASK-923 M1: Greenhouse owns OTD bucket classifier (parity, shadow) — ✅ SHIPPED
+
+**Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M1 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16. Movió el clasificador del bucket OTD (on_time/late_drop/overdue/carry_over) de Notion (`Indicador de Performance` formula → synced `performance_indicator_code`) a Greenhouse, en **modo paridad** (replica semántica cruda, sin freeze) → columna nueva `gh_otd_bucket` en `v_tasks_enriched` + `delivery_task_monthly_snapshots`, **shadow + flag `OTD_CLASSIFIER_GH_SHADOW_ENABLED` OFF**. Legacy `performance_indicator_code` + `otd_pct` + **bono INTACTOS**. Contexto crítico: nómina en ~6 días → nada toca el bono (M1 es columna nueva que nadie lee).
+
+**Qué se shippeó (4 slices, todos committeados)**:
+- **Slice 1** (`6e54a17e`): `classifyOtdBucket()` pure helper canonical + `buildOtdBucketSql()` BQ CASE mirror + `otd-bucket-types.ts` (`OTD_BUCKET_FORMULA_VERSION='otd_bucket_v1.0'`). 21 tests (fixture matrix + freeze toggle + TS↔SQL parity).
+- **Slice 2** (`5c4d87fa`): flag `isOtdClassifierGhShadowEnabled()` (`OTD_CLASSIFIER_GH_SHADOW_ENABLED`, default OFF).
+- **Slice 3** (`efa47faf`): reliability signal `notion.metrics.shadow_paridad_otd_classifier` (PG-based, moduleKey 'delivery', kind 'drift'). Mide paridad sobre tareas COMPLETADAS (on_time/late_drop). Wired en `get-reliability-overview.ts`.
+- **Slice 4** (`fed7381a`): `gh_otd_bucket` shadow column en `v_tasks_enriched` (VIEW additive) + `delivery_task_monthly_snapshots` DDL + `REQUIRED_COLUMN_MIGRATIONS` + materialize INSERT/SELECT.
+
+**Decisión de diseño (parity con `now()` dinámico)**: el `performance_indicator_code` synced es snapshot del Notion formula al `now()` del último sync; el recompute usa otro `now()`. Paridad perfecta imposible para tareas ABIERTAS (overdue/carry_over dependen de now()) + gate `esMesActual`. **Resolución**: la signal mide ~100% sobre tareas COMPLETADAS (buckets estables now()-independientes); divergencia en abiertas = esperada/tolerada.
+
+**Verificación**: full suite **5239 tests passed**, `pnpm build` green, `tsc --noEmit` clean, lint clean. Signal verificada LIVE contra PG real → **100% paridad (198/198)**. BQ dry-run + SELECT read-only confirmaron materialización (`on_time` 192 / `carry_over` 149 / `overdue` 13 / `late_drop` 6 / NA 4931).
+
+**Próximo**: M2 (TASK-922 freeze, ahora desbloqueado) + M3 (bonus cutover, gated post-nómina). Ver ADR §16.
+
+---
+
 # Sesion 2026-05-21 — TASK-919 RpA V2 capture hardening (robustez) — #3 detección + #4 flag shipped
 
 **Status**: 🔨 IN PROGRESS en `develop`. Endurece el pipeline de captura RpA V2 (BUG-CLASS-003 muestreo). **Shipped**: #4 flag por-cliente + #3 reconciliación (detección). **Diferido con rationale**: auto-repair (#3 fase 2), #2 baseline page.created, #5 Cloud Tasks. #1 (lane 60s) superseded por #3.

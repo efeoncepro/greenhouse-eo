@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import type { ReliabilityModuleSnapshot, ReliabilityOverview } from '@/types/reliability'
 
-import { buildPromptContext, buildPrompts, fingerprintModule, fingerprintOverview } from './build-prompt'
+import {
+  TOP_SIGNALS_PER_MODULE,
+  buildPromptContext,
+  buildPrompts,
+  fingerprintModule,
+  fingerprintOverview
+} from './build-prompt'
 
 const baseModule = (overrides: Partial<ReliabilityModuleSnapshot> = {}): ReliabilityModuleSnapshot => ({
   moduleKey: 'finance',
@@ -59,7 +65,7 @@ describe('buildPromptContext', () => {
     expect(context.modules[0].topSignals[0].summary).toContain('<uuid>')
   })
 
-  it('caps topSignals to TOP_SIGNALS_PER_MODULE (4)', () => {
+  it('caps topSignals to TOP_SIGNALS_PER_MODULE', () => {
     const signals = Array.from({ length: 10 }, (_, i) => ({
       signalId: `s${i}`,
       moduleKey: 'finance' as const,
@@ -75,7 +81,7 @@ describe('buildPromptContext', () => {
     const overview = baseOverview([baseModule({ signals })])
     const context = buildPromptContext(overview)
 
-    expect(context.modules[0].topSignals).toHaveLength(4)
+    expect(context.modules[0].topSignals).toHaveLength(TOP_SIGNALS_PER_MODULE)
   })
 
   it('includes pendingBoundaries count', () => {

@@ -565,35 +565,72 @@ const getRecentViewAccessLog = async () => {
 export const syncViewRegistryCatalog = async (actorUserId = 'system') => {
   try {
     await withGreenhousePostgresTransaction(async client => {
-      for (const [index, view] of VIEW_REGISTRY.entries()) {
-        await client.query(
-          `
-            INSERT INTO greenhouse_core.view_registry (
+      await client.query(
+        `
+          WITH registry_input AS (
+            SELECT *
+            FROM UNNEST(
+              $1::text[],
+              $2::text[],
+              $3::text[],
+              $4::text[],
+              $5::text[],
+              $6::text[],
+              $7::int[]
+            ) AS input (
               view_code,
               section,
               label,
               description,
               route_group,
               route_path,
-              display_order,
-              active,
-              updated_by
+              display_order
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE, $8)
-            ON CONFLICT (view_code) DO UPDATE SET
-              section = EXCLUDED.section,
-              label = EXCLUDED.label,
-              description = EXCLUDED.description,
-              route_group = EXCLUDED.route_group,
-              route_path = EXCLUDED.route_path,
-              display_order = EXCLUDED.display_order,
-              active = TRUE,
-              updated_at = now(),
-              updated_by = EXCLUDED.updated_by
-          `,
-          [view.viewCode, view.section, view.label, view.description, view.routeGroup, view.routePath, index, actorUserId]
-        )
-      }
+          )
+          INSERT INTO greenhouse_core.view_registry (
+            view_code,
+            section,
+            label,
+            description,
+            route_group,
+            route_path,
+            display_order,
+            active,
+            updated_by
+          )
+          SELECT
+            view_code,
+            section,
+            label,
+            description,
+            route_group,
+            route_path,
+            display_order,
+            TRUE,
+            $8
+          FROM registry_input
+          ON CONFLICT (view_code) DO UPDATE SET
+            section = EXCLUDED.section,
+            label = EXCLUDED.label,
+            description = EXCLUDED.description,
+            route_group = EXCLUDED.route_group,
+            route_path = EXCLUDED.route_path,
+            display_order = EXCLUDED.display_order,
+            active = TRUE,
+            updated_at = now(),
+            updated_by = EXCLUDED.updated_by
+        `,
+        [
+          VIEW_REGISTRY.map(view => view.viewCode),
+          VIEW_REGISTRY.map(view => view.section),
+          VIEW_REGISTRY.map(view => view.label),
+          VIEW_REGISTRY.map(view => view.description),
+          VIEW_REGISTRY.map(view => view.routeGroup),
+          VIEW_REGISTRY.map(view => view.routePath),
+          VIEW_REGISTRY.map((_, index) => index),
+          actorUserId
+        ]
+      )
 
       await client.query(
         `
@@ -888,10 +925,8 @@ export const getAdminPersistedViewAccessGovernance = async () => {
 
   const users = await enrichGovernancePreviewUsers(userBaselines)
 
-  const views = registryRows.map(view => ({
-    ...view,
-    roleAccess: Object.fromEntries(
-      roles.map(role => {
+  const views = registryRows.map(view => {
+    const resolvedRoleAccess = roles.map(role => {
         const roleAssignments = persistedByRole.get(role.roleCode)
 
         const resolvedAccess = resolvePersistedOrFallbackRoleAccess({
@@ -900,23 +935,23 @@ export const getAdminPersistedViewAccessGovernance = async () => {
           view
         })
 
-        return [role.roleCode, resolvedAccess.granted]
-      })
-    ),
-    roleAccessSource: Object.fromEntries(
-      roles.map(role => {
-        const roleAssignments = persistedByRole.get(role.roleCode)
+      return {
+        roleCode: role.roleCode,
+        granted: resolvedAccess.granted,
+        source: resolvedAccess.source
+      }
+    })
 
-        const resolvedAccess = resolvePersistedOrFallbackRoleAccess({
-          roleAssignments,
-          role: toRoleFallbackSubject(role),
-          view
-        })
-
-        return [role.roleCode, resolvedAccess.source]
-      })
-    ) as Record<string, ViewAccessSource>
-  }))
+    return {
+      ...view,
+      roleAccess: Object.fromEntries(
+        resolvedRoleAccess.map(role => [role.roleCode, role.granted])
+      ),
+      roleAccessSource: Object.fromEntries(
+        resolvedRoleAccess.map(role => [role.roleCode, role.source])
+      ) as Record<string, ViewAccessSource>
+    }
+  })
 
   return {
     totals: {

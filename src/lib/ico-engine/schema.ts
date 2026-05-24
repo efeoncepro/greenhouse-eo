@@ -9,6 +9,7 @@ import {
 } from '@/lib/delivery/task-status-canonical'
 import { DONE_STATUSES_SQL } from '@/lib/ico-engine/shared'
 import { buildCycleTimeDaysExpression, buildCycleTimeJoinClause } from '@/lib/ico-engine/cycle-time-formula'
+import { buildOtdBucketSql } from '@/lib/notion-metrics/classify-otd-bucket'
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -146,6 +147,15 @@ const buildTasksEnrichedView = (projectId: string) => `
         AND DATE(dt.completed_at) > dt.due_date THEN 'late'
       ELSE 'unknown'
     END AS delivery_signal,
+
+    -- TASK-923 (M1) — bucket OTD computado GH-side (clasificador autoritativo).
+    -- Mirror del helper canonical classifyOtdBucket (src/lib/notion-metrics/
+    -- classify-otd-bucket.ts) — source of truth TS, validado por test de paridad
+    -- TS↔SQL + signal notion.metrics.shadow_paridad_otd_classifier. M1 = paridad
+    -- cruda (frozenDays=0). SHADOW: ningún consumer lo lee hasta el cutover M3
+    -- (flag OTD_CLASSIFIER_GH_SHADOW_ENABLED). NO reemplaza performance_indicator_code
+    -- synced (que el bono sigue leyendo). ADR GREENHOUSE_ATTRIBUTABLE_LATENESS_V1 §16.
+    ${buildOtdBucketSql({ taskStatus: 'dt.task_status', dueDate: 'dt.due_date', completedAt: 'dt.completed_at' })} AS gh_otd_bucket,
 
     -- Operating business unit (from project, not from commercial context)
     dp.operating_business_unit
@@ -644,6 +654,7 @@ const buildDeliveryTaskMonthlySnapshotsTable = (projectId: string) => `
     hours_since_update INT64,
     is_stuck BOOL,
     delivery_signal STRING,
+    gh_otd_bucket STRING,
     operating_business_unit STRING,
     snapshot_status STRING,
     locked_at TIMESTAMP,
@@ -842,6 +853,7 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
   delivery_task_monthly_snapshots: {
     performance_indicator_label: 'STRING',
     original_due_date: 'DATE',
+    gh_otd_bucket: 'STRING',
     snapshot_status: 'STRING',
     locked_at: 'TIMESTAMP',
     materialized_at: 'TIMESTAMP',

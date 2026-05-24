@@ -42,6 +42,7 @@ import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
 import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
+import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
 import {
   getNotionMetricsShadowParidadRpaDemoSignal,
   getNotionMetricsEchoLoopDemoSignal,
@@ -58,6 +59,14 @@ import {
   getNotionStatusTransitionsBqSyncLagSignal
 } from './queries/notion-status-transitions-signals'
 import { getNotionStatusTransitionsReconciliationSignal } from './queries/notion-status-transitions-reconciliation'
+import {
+  getRescheduleCaptureLagSignal,
+  getReschedulePendingReasonSignal
+} from './queries/reschedule-signals'
+import {
+  getAttributableLatenessShadowParidadSignal,
+  getAttributableLatenessOverlapSignal
+} from './queries/attributable-lateness-signals'
 import {
   getNotionMetricsWritebackDeadLetterSignal,
   getNotionMetricsWritebackLagSignal
@@ -391,6 +400,12 @@ interface ReliabilityOverviewSources {
   notionCorrectionTransitionsSourceAvailability?: ReliabilitySignal | null
 
   /**
+   * TASK-923 (M1) — shadow paridad del clasificador OTD GH-owned vs synced
+   * Notion. Steady: paridad alta (mismatch ~0%). Roll up moduleKey='delivery'.
+   */
+  notionMetricsOtdClassifierParity?: ReliabilitySignal | null
+
+  /**
    * TASK-893 Slice 5 — Payroll Participation Window signals (3 readers):
    * full_month_entry_drift + source_date_disagreement + projection_delta_anomaly.
    * Subsystem rollup `Finance Data Quality` via moduleKey='finance'. Cada
@@ -665,6 +680,8 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'delivery'. Pre-activación (flag OFF) reportan steady.
    */
   notionStatusTransitions?: ReliabilitySignal[] | null
+  notionMetricsReschedule?: ReliabilitySignal[] | null
+  attributableLateness?: ReliabilitySignal[] | null
 
   /**
    * TASK-916 — Notion RpA V2 productive writeback signals (Efeonce/Sky).
@@ -725,6 +742,10 @@ export const buildReliabilityOverview = (
     // foundation que sustenta calculateRpa (TASK-901) + calculateFtr (TASK-909).
     ...(sources.notionCorrectionTransitionsSourceAvailability
       ? [sources.notionCorrectionTransitionsSourceAvailability]
+      : []),
+    // TASK-923 (M1) — shadow paridad clasificador OTD GH vs Notion synced.
+    ...(sources.notionMetricsOtdClassifierParity
+      ? [sources.notionMetricsOtdClassifierParity]
       : []),
     // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
     // Subsystem rollup Finance Data Quality via moduleKey='finance'. Each
@@ -797,7 +818,11 @@ export const buildReliabilityOverview = (
     // TASK-912 — Notion status-transitions productive capture signals.
     ...(sources.notionStatusTransitions ?? []),
     // TASK-916 — Notion RpA V2 productive writeback signals (2).
-    ...(sources.notionMetricsRpa ?? [])
+    ...(sources.notionMetricsRpa ?? []),
+    // TASK-921 — Reschedule (due-date change) capture signals (2).
+    ...(sources.notionMetricsReschedule ?? []),
+    // TASK-922 — Attributable lateness shadow signals (2).
+    ...(sources.attributableLateness ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -1276,6 +1301,12 @@ export const getReliabilityOverview = async (
       ? preloadedSources.notionCorrectionTransitionsSourceAvailability
       : await getNotionCorrectionTransitionsSourceAvailabilitySignal().catch(() => null)
 
+  // TASK-923 (M1) — shadow paridad clasificador OTD. PG-based, degrada a `unknown`.
+  const notionMetricsOtdClassifierParity =
+    preloadedSources.notionMetricsOtdClassifierParity !== undefined
+      ? preloadedSources.notionMetricsOtdClassifierParity
+      : await getNotionMetricsOtdClassifierParitySignal().catch(() => null)
+
   // TASK-848 Slice 7 + TASK-849 Slice 2 + TASK-854 Slice 0 + TASK-857 —
   // Production Release Control Plane signals. 6 readers en paralelo. Cada
   // uno degrada a `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN /
@@ -1380,6 +1411,28 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-921 — Notion reschedule (due-date change) capture signals.
+  const notionMetricsReschedule =
+    preloadedSources.notionMetricsReschedule !== undefined
+      ? preloadedSources.notionMetricsReschedule
+      : await Promise.all([
+          getRescheduleCaptureLagSignal().catch(() => null),
+          getReschedulePendingReasonSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
+  // TASK-922 — Attributable lateness shadow signals (M2).
+  const attributableLateness =
+    preloadedSources.attributableLateness !== undefined
+      ? preloadedSources.attributableLateness
+      : await Promise.all([
+          getAttributableLatenessShadowParidadSignal().catch(() => null),
+          getAttributableLatenessOverlapSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -1424,9 +1477,12 @@ export const getReliabilityOverview = async (
     productionRelease,
     icoMaterializerSkippedSafety,
     notionCorrectionTransitionsSourceAvailability,
+    notionMetricsOtdClassifierParity,
     notionMetricsDemo,
     notionStatusTransitions,
-    notionMetricsRpa
+    notionMetricsRpa,
+    notionMetricsReschedule,
+    attributableLateness
   })
 }
 

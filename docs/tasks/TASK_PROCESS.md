@@ -108,6 +108,39 @@ Reglas:
 - `Checkpoint` y `Mode` se derivan automaticamente de Priority x Effort (ver tablas abajo) — el agente los calcula al tomar la task, no se declaran en el archivo
 - una task no puede declararse "terminada" ante el usuario mientras siga en `in-progress/` o con `Lifecycle: in-progress`
 
+## Task Contract Linter
+
+TASK-926 agrega `pnpm task:lint` como enforcement mecanico del contrato de tasks.
+
+Uso canonico:
+
+- `pnpm task:lint` — revisa el backlog en modo report; `complete/` historico queda exento de deuda activa.
+- `pnpm task:lint --active` — revisa solo `to-do/` + `in-progress/` creadas bajo el contrato
+  TASK-926+; es el indicador de deuda operativa viva post-adopcion.
+- `pnpm task:lint --task TASK-###` — revision focal de una task; errores estructurales bloquean.
+- `pnpm task:lint --changed` — revision rapida para PRs; errores estructurales bloquean y es el modo usado por CI.
+- `pnpm task:lint --format json` — salida consumible por workflow/dashboard.
+- `pnpm task:lint --strict` — warnings tambien bloquean; reservado para flips post-saneo.
+
+Reglas V1:
+
+- `Lifecycle` debe coincidir con la carpeta (`to-do`, `in-progress`, `complete`) y es `error`.
+- Las tasks formato template deben mantener las secciones canonicas, `### Files owned`,
+  `Acceptance Criteria` con checkboxes y rollout no vacio para `implementation`.
+- Tasks `CODEX_TASK_*` y formatos pre-template quedan legacy-exempt de reglas
+  estructurales.
+- Tasks en `complete/` previas al contrato se tratan como historico: no cuentan como
+  deuda activa salvo que se modifiquen (`--changed`) o se revisen explicitamente
+  con `--task TASK-###`.
+- Tasks activas pre-TASK-926 no cuentan como deuda activa global; al ejecutarlas o tocarlas
+  se revisan con `--task TASK-###` / `--changed` y el agente debe normalizarlas si corresponde.
+- Paridad contra `TASK_ID_REGISTRY.md` y marcador "siguiente ID disponible" nacen como
+  `warning` para rollout warn-first; no deben bloquear hasta que el registry este saneado.
+
+CI corre `.github/workflows/task-contract.yml` en modo `--changed` warn-first. No usar el
+linter para reescribir backlog legacy ni para auto-mover archivos; reporta drift y el agente
+lo corrige siguiendo este proceso.
+
 ---
 
 ## Derivacion de Checkpoint y Mode

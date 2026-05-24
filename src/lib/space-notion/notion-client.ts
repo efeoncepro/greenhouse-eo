@@ -184,3 +184,136 @@ export const fetchPageStatus = async (pageId: string): Promise<ProductivePageSta
     parentDataSourceId: body.parent?.data_source_id ?? body.parent?.database_id ?? null
   }
 }
+
+// ── TASK-921: productive due-date re-fetch (sibling de fetchPageStatus) ───────
+//
+// Mismo patrón canonical re-fetch (notion-platform Pillar 1): los webhooks Notion
+// NO mandan valores → re-fetch GET de la página como source of truth. Lee la
+// fecha límite vigente + la fecha límite original (baseline seed histórico) + el
+// motivo de reprogramación confirmado por el operador + el estado + el data
+// source autoritativo. Sibling físicamente separado de fetchPageStatus: cada
+// consumer reactivo re-fetchea por su cuenta; tipos limpios por dominio.
+
+/**
+ * Nombres canónicos de la propiedad de fecha límite vigente (date) en las DB
+ * `Tareas` productivas. Verificado vía sync conformado (`fecha_límite`).
+ */
+export const DUE_DATE_PROPERTY_NAMES: ReadonlySet<string> = new Set(['Fecha límite', 'Fecha Límite'])
+
+/**
+ * Nombres canónicos de la fecha límite original (date) — baseline seed para
+ * reconstruir best-effort el primer cambio histórico (`fecha_límite_original`).
+ */
+export const ORIGINAL_DUE_DATE_PROPERTY_NAMES: ReadonlySet<string> = new Set([
+  'Fecha límite original',
+  'Fecha Límite original'
+])
+
+export interface ProductivePageReschedule {
+  /** Fecha límite vigente `YYYY-MM-DD` (date.start) o null si no seteada. */
+  dueDate: string | null
+  /** Fecha límite original `YYYY-MM-DD` (baseline seed) o null. */
+  originalDueDate: string | null
+  /** Estado canonical-raw al momento del re-fetch (input de la inferencia). */
+  statusName: string | null
+  /**
+   * Label del select `Motivo de reprogramación` que el operador confirmó en
+   * Notion (o null si vacío). El consumer lo mapea a `reason_code` canonical.
+   */
+  rescheduleReasonLabel: string | null
+  lastEditedTime: string | null
+  lastEditedBy: string | null
+  /** Data source autoritativo del parent (resolución de workspace productivo). */
+  parentDataSourceId: string | null
+}
+
+const NOTION_DATE_START = (
+  prop: { type?: string; date?: { start?: string | null } | null } | undefined
+): string | null => {
+  if (prop?.type !== 'date') {
+    return null
+  }
+
+  const start = prop.date?.start ?? null
+
+  // Notion date.start puede venir como `YYYY-MM-DD` o ISO datetime — normalizamos
+  // a fecha calendario (los 10 primeros chars) para alinear con la columna DATE.
+  return start ? start.slice(0, 10) : null
+}
+
+/**
+ * GET /v1/pages/{pageId} y lee fecha límite vigente + original + motivo de
+ * reprogramación + estado + data source del parent. Mismo contrato de error que
+ * fetchPageStatus: `null` si 404 (borrada), throw para otros (retry vía outbox).
+ *
+ * Usa el token productivo `NOTION_TOKEN` (acceso a Efeonce + Sky).
+ */
+export const fetchPageDueDate = async (pageId: string): Promise<ProductivePageReschedule | null> => {
+  const token = process.env.NOTION_TOKEN?.trim()
+
+  if (!token) {
+    throw new Error('NOTION_TOKEN not configured (cannot re-fetch productive page due-date)')
+  }
+
+  const response = await fetch(`${NOTION_API}/pages/${pageId}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Notion-Version': NOTION_READ_VERSION
+    },
+    signal: AbortSignal.timeout(15_000)
+  })
+
+  if (response.status === 404) {
+    return null
+  }
+
+  if (!response.ok) {
+    const error = new Error(`Notion API GET page ${response.status}`)
+
+    ;(error as Error & { status?: number }).status = response.status
+    throw error
+  }
+
+  const body = (await response.json()) as {
+    last_edited_time?: string
+    last_edited_by?: { id?: string }
+    parent?: { type?: string; data_source_id?: string; database_id?: string }
+    properties?: Record<
+      string,
+      {
+        type?: string
+        date?: { start?: string | null } | null
+        status?: { name?: string } | null
+        select?: { name?: string } | null
+      }
+    >
+  }
+
+  let dueDate: string | null = null
+  let originalDueDate: string | null = null
+  let statusName: string | null = null
+  let rescheduleReasonLabel: string | null = null
+
+  for (const [name, prop] of Object.entries(body.properties ?? {})) {
+    if (DUE_DATE_PROPERTY_NAMES.has(name)) {
+      dueDate = NOTION_DATE_START(prop)
+    } else if (ORIGINAL_DUE_DATE_PROPERTY_NAMES.has(name)) {
+      originalDueDate = NOTION_DATE_START(prop)
+    } else if (prop?.type === 'status' && STATUS_PROPERTY_NAMES.has(name)) {
+      statusName = prop.status?.name ?? null
+    } else if (prop?.type === 'select' && name === 'Motivo de reprogramación') {
+      rescheduleReasonLabel = prop.select?.name ?? null
+    }
+  }
+
+  return {
+    dueDate,
+    originalDueDate,
+    statusName,
+    rescheduleReasonLabel,
+    lastEditedTime: body.last_edited_time ?? null,
+    lastEditedBy: body.last_edited_by?.id ?? null,
+    parentDataSourceId: body.parent?.data_source_id ?? body.parent?.database_id ?? null
+  }
+}

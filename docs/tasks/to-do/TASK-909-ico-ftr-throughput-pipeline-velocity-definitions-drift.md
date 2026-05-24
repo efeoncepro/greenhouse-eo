@@ -1,4 +1,4 @@
-# TASK-909 — FTR canonical helper V1 + Throughput/Pipeline Velocity specs + Engine doc deprecation pointer
+# TASK-909 — FTR canonical helper V1 + Engine doc drift resolution (Throughput/Pipeline Velocity ya son specs Accepted — esta task NO toca su código, solo el puntero del Engine doc)
 
 > **Precondiciones canonical**:
 >
@@ -8,7 +8,7 @@
 > - `docs/architecture/metrics/RPA_V1.md` (FTR delega a RpA — single source of truth)
 > - `docs/architecture/metrics/METRICS_INDEX.md` (índice maestro post-creación de specs)
 >
-> Bloqueada arquitectónicamente por TASK-901 Slice 1 (que a su vez requiere TASK-908 Slices 0-3.5). FTR helper delega a `calculateRpa` que delega a `countCorrectionTransitions`.
+> **DESBLOQUEADA 2026-05-23**: TASK-901 Slice 1 + TASK-908 Slices 0-3.5 AMBAS SHIPPED en `develop`. El helper delegado existe como `calculateRpaV2` en `src/lib/notion-metrics/calculate-rpa-v2.ts` (estrangulador RpA V2, ADR `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md`), **NO** `calculateRpa`/`calculate-rpa.ts` como decía el sketch original. FTR helper delega a `calculateRpaV2` → `countCorrectionTransitions`. Spec `FTR_V1.md` corregida 2026-05-23 (naming V2 + dataStatus mapping de 4 valores).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -22,17 +22,17 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Listo para implementar (desbloqueada 2026-05-23 — prerequisitos SHIPPED, spec corregida)`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|reliability`
-- Blocked by: `TASK-908 Slices 0-3.5 + TASK-901 Slice 1 (calculateRpa canonical). Sin esa cadena, calculateFtr no tiene source confiable y caería en el anti-patrón legacy de leer Notion property RpA directo (mismo bug class que motivó la decisión de boundary canonical 2026-05-17).`
+- Blocked by: `DESBLOQUEADA 2026-05-23 — TASK-908 (countCorrectionTransitions) + TASK-901 (calculateRpaV2) AMBAS SHIPPED en develop. El helper delegado existe como calculateRpaV2 en src/lib/notion-metrics/calculate-rpa-v2.ts (estrangulador RpA V2), NO calculateRpa. La cadena de source confiable está completa.`
 - Branch: `task/TASK-909-ico-ftr-throughput-pipeline-velocity-definitions-drift`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
 ## Summary
 
-Implementar el **helper canonical `calculateFtr` V1** que `FTR_V1.md` canoniza (delega a `calculateRpa`, sin lógica propia) + crear **specs canonical Throughput + Pipeline Velocity** que resuelven el drift histórico entre Engine doc y código runtime + apuntar Engine doc + Contrato a los specs nuevos como source of truth.
+Implementar el **helper canonical `calculateFtr` V1** que `FTR_V1.md` canoniza (delega a `calculateRpaV2`, sin lógica propia) + crear **specs canonical Throughput + Pipeline Velocity** que resuelven el drift histórico entre Engine doc y código runtime + apuntar Engine doc + Contrato a los specs nuevos como source of truth.
 
 **Reshape post creación del pattern canonical (sesión 2026-05-17)**: esta TASK ya NO redefine las métricas inline ni edita Engine doc con cambios conceptuales. La definición canonical vive en `docs/architecture/metrics/<METRIC>_V1.md`. Esta TASK:
 
@@ -73,12 +73,12 @@ Estos drifts NO bloquean operación (las métricas funcionan), pero generan ries
 
 ## Goal
 
-- **FTR canonical V1 helper** (`src/lib/notion-metrics/calculate-ftr.ts`): pure function async `calculateFtr(taskId): Promise<FtrResult>` que delega a `calculateRpa(taskId)` (de TASK-901) y devuelve `{ value: 'pass' | 'fail' | 'not_applicable', dataStatus, sourceMode, formulaVersion: 'ftr_v1.0' }`. NO implementa señales Frame.io (forward-compat: cuando emerja, `calculateRpa` extiende y `calculateFtr` se beneficia automático sin breaking change).
+- **FTR canonical V1 helper** (`src/lib/notion-metrics/calculate-ftr.ts`): pure function async `calculateFtr(inputs): Promise<FtrResult>` que delega a `calculateRpaV2(inputs)` (de TASK-901) y devuelve `{ value: 'pass' | 'fail' | 'not_applicable' | null, dataStatus: 'valid' | 'unavailable' | 'low_confidence', sourceMode, rpaSnapshot, formulaVersion: 'ftr_v1.0' }`. NO implementa señales Frame.io (forward-compat: cuando emerja, `calculateRpaV2` extiende y `calculateFtr` se beneficia automático sin breaking change).
 - **Throughput canonical decision documented**: actualizar Engine doc para que diga "Throughput = monthly_count per period, alineado con código runtime canonical en `metric-registry.ts:310-323`. El `weekly_rate / 4` original del spec era artefacto histórico no implementado". Sin cambios de código.
 - **Pipeline Velocity canonical decision documented**: actualizar Engine doc para clarificar que NO es identical to throughput. Es el ratio `completed_count / (completed_count + open_count)` per período (cómo `metric-registry.ts:338-367` lo computa). Mide flow eficiencia relativa al backlog activo. Sin cambios de código.
 - **Engine doc housekeeping**: actualizar `docs/architecture/Greenhouse_ICO_Engine_v1.md` líneas 887-1116 + secciones impactadas. Agregar Delta 2026-05-17 al inicio que liste las 3 resoluciones canonical + cross-ref ADR boundary.
 - **Lint rule defense canonical**: `eslint-plugins/greenhouse/rules/no-inline-ftr-calculation.mjs` modo `warn` durante migración (mismo pattern que `no-inline-rpa-calculation`).
-- **Tests anti-regresión**: helper `calculateFtr` con mocks de `calculateRpa`, mínimo 8 paths cubriendo casos canonical (pass/fail/not_applicable/sourceMode unavailable/forward-compat ignored Frame.io signals).
+- **Tests anti-regresión**: helper `calculateFtr` con mocks de `calculateRpaV2`, mínimo 9 paths cubriendo casos canonical (pass/fail/unavailable/suppressed/low_confidence/forward-compat ignored Frame.io signals).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -92,11 +92,11 @@ Revisar y respetar:
 - `docs/architecture/Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 secciones F + G — semántica canonical de corrección y boundary
 - `docs/architecture/Greenhouse_ICO_Engine_v1.md` líneas 887-1116 — sección a resolver drift
 - `docs/tasks/to-do/TASK-908-ico-status-transition-tracking-canonical-cycle-time.md` — foundation prerequisita (countCorrectionTransitions Slice 3.5)
-- `docs/tasks/to-do/TASK-901-canonical-notion-metric-compute-v1-rpa.md` — calculateRpa Slice 1 prerequisito
+- `docs/tasks/complete/TASK-901-canonical-notion-metric-compute-v1-rpa.md` — calculateRpaV2 Slice 1 prerequisito (SHIPPED)
 
 Reglas obligatorias canonical:
 
-- **NUNCA** reescribir FTR como motor compuesto de 5 señales en V1 — las 4 señales Frame.io NO existen. Forward-compat: cuando emerjan, extender `calculateRpa` (no `calculateFtr`).
+- **NUNCA** reescribir FTR como motor compuesto de 5 señales en V1 — las 4 señales Frame.io NO existen. Forward-compat: cuando emerjan, extender `calculateRpaV2` (no `calculateFtr`).
 - **NUNCA** modificar el código de Throughput o Pipeline Velocity en V1 — son canonical operacional, solo se documenta su semántica para resolver drift conceptual.
 - **NUNCA** consumer downstream recomputa FTR/Throughput/Pipeline Velocity inline. Toda lectura pasa por columna materializada o helper canonical.
 - **NUNCA** invocar `Sentry.captureException()` directo — usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'metric_compute', metric: 'ftr' } })`.
@@ -108,14 +108,14 @@ Reglas obligatorias canonical:
 - `Greenhouse_ICO_Engine_v1.md` líneas 2330-2346 (§ A.5.3 FTR composite spec) — drift a resolver
 - `src/lib/ico-engine/metric-registry.ts` líneas 155-158 (CANONICAL_FTR_PASSED_SQL), 226-249 (ftr_pct), 310-323 (throughput), 338-367 (pipeline_velocity)
 - TASK-908 spec — countCorrectionTransitions helper
-- TASK-901 spec — calculateRpa helper
+- TASK-901 spec — calculateRpaV2 helper (`src/lib/notion-metrics/calculate-rpa-v2.ts`)
 
 ## Dependencies & Impact
 
 ### Depends on
 
 - **TASK-908 Slices 0-3.5 SHIPPED** (transitions foundation + countCorrectionTransitions helper)
-- **TASK-901 Slice 1 SHIPPED** (calculateRpa canonical async helper)
+- **TASK-901 Slice 1 SHIPPED** (`calculateRpaV2` canonical async helper en `calculate-rpa-v2.ts`)
 - `src/lib/observability/capture.ts` (`captureWithDomain`)
 - `src/lib/notion-metrics/index.ts` barrel export (de TASK-901)
 
@@ -127,7 +127,7 @@ Reglas obligatorias canonical:
 
 ### Files owned
 
-- `src/lib/notion-metrics/calculate-ftr.ts` — NEW: helper canonical async `calculateFtr` que delega a `calculateRpa`
+- `src/lib/notion-metrics/calculate-ftr.ts` — NEW: helper canonical async `calculateFtr` que delega a `calculateRpaV2`
 - `src/lib/notion-metrics/calculate-ftr.test.ts` — NEW: tests mínimo 8 paths con mocks
 - `src/lib/notion-metrics/ftr-types.ts` — NEW (o consolidar en `types.ts` de TASK-901): `TaskInputsForFtr`, `FtrResult` types
 - `eslint-plugins/greenhouse/rules/no-inline-ftr-calculation.mjs` — NEW: lint rule modo warn
@@ -144,7 +144,7 @@ Reglas obligatorias canonical:
 - `src/lib/ico-engine/metric-registry.ts:310-323` — `throughput` actual (monthly_count)
 - `src/lib/ico-engine/metric-registry.ts:338-367` — `pipeline_velocity` actual (ratio completed/open)
 - `Greenhouse_ICO_Engine_v1.md` líneas 887-1116 con drift documentado
-- `src/lib/notion-metrics/calculate-rpa.ts` (TASK-901 Slice 1 SHIPPED — prerequisite)
+- `src/lib/notion-metrics/calculate-rpa-v2.ts` (`calculateRpaV2` — TASK-901 Slice 1 SHIPPED — prerequisite)
 
 ### Gap
 
@@ -165,7 +165,7 @@ Reglas obligatorias canonical:
 
   ```typescript
   import 'server-only'
-  import { calculateRpa, type RpaResult } from './calculate-rpa'
+  import { calculateRpaV2, type RpaV2Result } from './calculate-rpa-v2'
 
   export const FTR_FORMULA_VERSION = 'ftr_v1.0'
 
@@ -173,23 +173,26 @@ Reglas obligatorias canonical:
     taskSourceId: string
     windowStart?: Date | null
     windowEnd?: Date | null
-    // Forward-compat Frame.io (V2 — hoy ignored, V2 task derivada activa policy):
+    // Forward-compat Frame.io (propagado a calculateRpaV2, que hoy los ignora):
     clientReviewOpen?: boolean | null
     workflowReviewOpen?: boolean | null
     openFrameComments?: number | null
+    // handoffArtifactPresent: reservado V2; calculateRpaV2 aún NO lo acepta → NO se propaga.
     handoffArtifactPresent?: boolean | null
   }
 
   export type FtrResult = {
     value: 'pass' | 'fail' | 'not_applicable' | null
-    dataStatus: 'valid' | 'unavailable'
+    // Hereda los estados computables de RpA V2 (que tiene 4: valid | unavailable
+    // | low_confidence | suppressed). low_confidence se propaga, no se colapsa.
+    dataStatus: 'valid' | 'unavailable' | 'low_confidence'
     sourceMode: 'canonical' | 'unavailable'
-    rpaSnapshot: RpaResult
+    rpaSnapshot: RpaV2Result
     formulaVersion: typeof FTR_FORMULA_VERSION
   }
 
   export const calculateFtr = async (inputs: TaskInputsForFtr): Promise<FtrResult> => {
-    const rpaResult = await calculateRpa({
+    const rpa = await calculateRpaV2({
       taskSourceId: inputs.taskSourceId,
       windowStart: inputs.windowStart,
       windowEnd: inputs.windowEnd,
@@ -198,35 +201,43 @@ Reglas obligatorias canonical:
       openFrameComments: inputs.openFrameComments
     })
 
-    if (rpaResult.dataStatus === 'unavailable' || rpaResult.value === null) {
+    // No computable: sin data canonical, valor nulo, o data suprimida.
+    if (
+      rpa.value === null ||
+      rpa.dataStatus === 'unavailable' ||
+      rpa.dataStatus === 'suppressed'
+    ) {
       return {
         value: null,
         dataStatus: 'unavailable',
-        sourceMode: rpaResult.sourceMode,
-        rpaSnapshot: rpaResult,
+        sourceMode: rpa.sourceMode,
+        rpaSnapshot: rpa,
         formulaVersion: FTR_FORMULA_VERSION
       }
     }
 
+    // value no-nulo + dataStatus valid|low_confidence → computa pass/fail.
+    // El caveat low_confidence se propaga (NO se colapsa silenciosamente a valid).
     return {
-      value: rpaResult.value === 0 ? 'pass' : 'fail',
-      dataStatus: 'valid',
+      value: rpa.value === 0 ? 'pass' : 'fail',
+      dataStatus: rpa.dataStatus === 'low_confidence' ? 'low_confidence' : 'valid',
       sourceMode: 'canonical',
-      rpaSnapshot: rpaResult,
+      rpaSnapshot: rpa,
       formulaVersion: FTR_FORMULA_VERSION
     }
   }
   ```
 
-- Tests mínimo 8 paths (mock `calculateRpa`):
-  1. Happy pass: RpA=0 → FTR `pass`
-  2. Happy fail: RpA=1 → FTR `fail`
+- Tests mínimo 9 paths (mock `calculateRpaV2`):
+  1. Happy pass: RpA=0 → FTR `pass`, `dataStatus='valid'`
+  2. Happy fail: RpA=1 → FTR `fail`, `dataStatus='valid'`
   3. Happy fail multiple: RpA=5 → FTR `fail`
-  4. Unavailable: RpA sourceMode='unavailable' → FTR `null`, `dataStatus='unavailable'`
-  5. RpA value=null → FTR `null`
-  6. Window filter propagation: ventana pasada correctamente a calculateRpa
-  7. Forward-compat ignore: `clientReviewOpen=true` pasado pero V1 lo pasa a calculateRpa que también lo ignora → same result
-  8. RpaSnapshot preserved en FtrResult para forensic/debugging
+  4. Unavailable: RpA `dataStatus='unavailable'` → FTR `null`, `dataStatus='unavailable'`
+  5. RpA `value=null` → FTR `null`, `dataStatus='unavailable'`
+  6. Suppressed: RpA `dataStatus='suppressed'` con value no-nulo → FTR `null`, `dataStatus='unavailable'`
+  7. Low confidence: RpA `dataStatus='low_confidence'`, value=0 → FTR `pass`, `dataStatus='low_confidence'` (señal propagada)
+  8. Window filter propagation: ventana pasada correctamente a `calculateRpaV2`
+  9. Forward-compat: `clientReviewOpen=true` propagado a `calculateRpaV2` (que hoy lo ignora) → same result; `rpaSnapshot` preservado en `FtrResult` para forensic/debugging
 
 - Lint rule `eslint-plugins/greenhouse/rules/no-inline-ftr-calculation.mjs` modo `warn`:
   - Detecta patterns: `client_change_round_final = 0` inline en SQL embedded TS, `FTR_PASSED_SQL` referencias fuera del registry, `formula.ftr` lectura inline de Notion
@@ -287,8 +298,8 @@ Reglas obligatorias canonical:
 
 ## Acceptance Criteria
 
-- [ ] `src/lib/notion-metrics/calculate-ftr.ts` existe + tests mínimo 8 paths verde
-- [ ] Helper `calculateFtr` delega a `calculateRpa` (zero lógica propia — solo mapping `value === 0 ? 'pass' : 'fail'`)
+- [ ] `src/lib/notion-metrics/calculate-ftr.ts` existe + tests mínimo 9 paths verde
+- [ ] Helper `calculateFtr` delega a `calculateRpaV2` (zero lógica propia — solo mapping `value === 0 ? 'pass' : 'fail'` + propagación de `dataStatus`)
 - [ ] Lint rule `greenhouse/no-inline-ftr-calculation` modo warn activa + tests del rule
 - [ ] `Greenhouse_ICO_Engine_v1.md` actualizado con Delta 2026-05-17 al inicio + cross-refs ADR + secciones FTR/Throughput/Pipeline Velocity con resoluciones canonical
 - [ ] `CLAUDE.md` sección boundary actualizada con pointer a `calculateFtr`

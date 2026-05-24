@@ -14,7 +14,7 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Ready for Plan Mode`
 - Rank: `TBD`
 - Domain: `platform|reliability|ops`
 - Blocked by: `TASK-865` for root-cause isolation; implementation may start only for non-mutating watchdog internals if TASK-865 is still open.
@@ -30,14 +30,39 @@ La task no reemplaza TASK-865. TASK-865 elimina la causa raiz de drift por `push
 
 ## Why This Task Exists
 
-Revision read-only 2026-05-16 detecto que el watchdog actual reporta `platform.release.worker_revision_drift` correctamente, pero mantiene gaps operativos:
+Revision read-only 2026-05-16 y revalidacion read-only 2026-05-19 detectaron que el watchdog actual reporta `platform.release.worker_revision_drift` correctamente, pero mantiene gaps operativos:
 
-- drift activo en `ops-worker` y `commercial-cost-worker` contra el manifest release esperado.
+- drift activo en `ops-worker`, `commercial-cost-worker` e `ico-batch-worker` contra el manifest release esperado.
 - `dispatchWatchdogRecovery()` existe, pero el CLI `production-release-watchdog.ts` no lo invoca.
 - las alertas Teams usan finding sintetico `workflowName='aggregate'`, `runId=0`, `sha='aggregate'`.
 - `severity='unknown'` se mapea a `ok` en la agregacion del CLI, ocultando ceguera operacional.
 - el reader de drift solo entrega remediation concreta para `hubspot-greenhouse-integration`.
 - el watchdog no consume ni correlaciona readiness/Sentry/preflight checks ya existentes.
+
+### Revalidacion 2026-05-19
+
+Comando read-only ejecutado localmente con `gh auth token`, GCP ADC/Secret Manager y Postgres ops:
+
+```bash
+pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
+  scripts/release/production-release-watchdog.ts --json
+```
+
+Resultado observado:
+
+- `aggregateSeverity`: `error`
+- `platform.release.stale_approval`: `ok`, `count=0`
+- `platform.release.pending_without_jobs`: `ok`, `count=0`
+- `platform.release.worker_revision_drift`: `error`, `drift_count=3`, `data_missing_count=0`
+- manifest expected SHA prefix: `c699197902a4`
+- drift workers:
+  - `ops-worker`: Cloud Run `GIT_SHA=550c0e679693`
+  - `commercial-cost-worker`: Cloud Run `GIT_SHA=a8567937b695`
+  - `ico-batch-worker`: Cloud Run `GIT_SHA=a8567937b695`
+- synced worker:
+  - `hubspot-greenhouse-integration`: Cloud Run `GIT_SHA=c699197902a4`
+
+Interpretacion: el watchdog detecta el drift real, pero aun no entrega identidad/accion/recovery granular. No corregir estos workers desde esta task; eso pertenece al release/orchestrator path y a TASK-865/TASK-866.
 
 ## Goal
 
@@ -168,11 +193,42 @@ Reglas obligatorias:
 - Eliminar el uso operativo de `workflowName='aggregate'`, `runId=0`, `sha='aggregate'` para alertas reales.
 - Mantener output JSON backward compatible o versionarlo explicitamente si cambia shape.
 
+Implementation notes:
+
+- Crear extraction helpers puros y testeables; no parsear strings libres de `summary` si el reader puede exponer metadata estructurada.
+- Para `stale_approval` y `pending_without_jobs`, reutilizar `listWaitingProductionRuns()` y `listPendingRuns()` como source de records reales.
+- Para `worker_revision_drift`, exponer records estructurados desde `release-worker-revision-drift.ts` o un helper compartido; no depender de `evidence.detail` como protocolo primario.
+- El JSON del CLI debe preservar `signals[]` y agregar `findings[]` versionado si hace falta. Si se agrega `schemaVersion`, documentar `1 -> 2`.
+
+Definition of done:
+
+- No queda ningun alert real generado con `workflowName='aggregate'`, `runId=0` o `sha='aggregate'`.
+- Cada finding tiene stable key:
+  - GitHub run findings: `workflowName + runId + alertKind`
+  - Cloud Run drift findings sin run asociado: `workflowName + serviceKeyVersioned + alertKind`, donde `serviceKeyVersioned` no puede colisionar con run IDs reales.
+- Tests cubren al menos un finding por cada signal.
+
 ### Slice 2 — Recovery Wiring
 
 - Conectar el CLI scheduled con `dispatchWatchdogRecovery()` para findings previamente alertados que ya no aparecen activos.
 - Asegurar que el dedup state se limpia solo despues de recovery alert exitoso.
 - Cubrir stale approvals, pending without jobs y worker revision drift con tests unitarios.
+
+Implementation notes:
+
+- Recovery se calcula comparando dedup rows activas contra el set actual de finding keys.
+- Si una dedup row activa ya no aparece en `activeFindings`, intentar `dispatchWatchdogRecovery()`.
+- Si Teams recovery falla, conservar dedup row para reintento posterior.
+- Si el finding activo cambia de metadata pero mantiene key estable, actualizar metadata en alert path normal; no emitir recovery falso.
+- Para las rows legacy `aggregate/0`, definir migracion logica en runtime:
+  - no emitir recovery granular para `aggregate/0` si no se puede inferir el blocker real;
+  - permitir cleanup manual documentado o cleanup seguro solo cuando todos los signals del `alertKind` esten `ok`.
+
+Definition of done:
+
+- Unit tests prueban transicion `active -> resolved` para los 3 alert kinds.
+- Unit tests prueban que recovery no borra dedup si `sendManualTeamsAnnouncement()` falla.
+- Manual dry-run muestra recovery candidates sin enviar Teams.
 
 ### Slice 3 — Unknown / Degraded Severity Policy
 
@@ -182,11 +238,53 @@ Reglas obligatorias:
   - missing optional source puede quedar warning si hay evidence suficiente.
 - Alinear la matriz con `production-preflight` y `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`.
 
+Policy minima esperada:
+
+| Source unknown | Contexto local sin `--fail-on-error` | Scheduled / `--fail-on-error` | Razon |
+|---|---|---|---|
+| GitHub API/token para stale approvals | `warning` visible, exit 0 | `error`, exit 1 | sin GitHub no se detectan blockers de release |
+| GitHub API/token para pending jobs | `warning` visible, exit 0 | `error`, exit 1 | sin GitHub no se detecta concurrency deadlock |
+| Postgres manifest read para worker drift, con fallback GitHub exitoso | `warning` visible, exit 0 | `warning`, exit 0 si evidence suficiente | fallback permite comparacion aproximada, pero no SSoT |
+| Cloud Run/GCP para worker drift | `warning` visible, exit 0 | `error`, exit 1 | sin Cloud Run no se puede detectar drift real |
+| Sentry readiness enrichment | `warning` visible, exit 0 | `warning` salvo que preflight lo marque blocker | enrichment no debe romper todo si el release preflight ya gobierna |
+
+Definition of done:
+
+- `unknown` aparece en JSON/job summary como degraded evidence, nunca desaparece en aggregate `ok`.
+- Tests puros cubren matriz local vs scheduled.
+- `--fail-on-error` falla ante unknown critico de GitHub/GCP/Postgres cuando no hay fallback suficiente.
+
 ### Slice 4 — Worker-Specific Remediation
 
 - Generar `recommended_action` por cada worker mapeado en `WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION`.
 - Incluir workflow file, environment, expected SHA, region/service y verification steps.
 - Evitar break-glass automatico: las acciones recomendadas deben ser comandos operator-facing, no side effects ejecutados por el watchdog.
+
+Required action shape:
+
+- `cloudRunService`
+- `cloudRunRegion`
+- `workflowName`
+- `workflowFile`
+- `environment`
+- `expectedSha`
+- `actualSha`
+- `verificationCommands`
+- `safeDefaultAction`
+- `breakGlassAction`, solo texto y siempre marcado como requiere aprobacion explicita
+
+Worker coverage minima:
+
+- `ops-worker`
+- `commercial-cost-worker`
+- `ico-batch-worker`
+- `hubspot-greenhouse-integration`
+
+Definition of done:
+
+- Los 4 workers mapeados generan accion concreta.
+- La accion normal recomienda orchestrator/release path cuando corresponde; workflow individual queda como break-glass/operator-approved, no como automatismo.
+- Tests validan que no se sugiere editar `release_manifests` por SQL ni ejecutar deploy directo con `gcloud run deploy`.
 
 ### Slice 5 — Preflight / Sentry Readiness Integration
 
@@ -195,12 +293,32 @@ Reglas obligatorias:
 - Definir si esto vive como signal nuevo `platform.release.watchdog_readiness` o como evidence enrichment del reporte watchdog.
 - Mantener budgets de timeout acotados para que el cron de 10 minutos no se vuelva fragil.
 
+Decision guidance:
+
+- Preferir enrichment del reporte watchdog si la evidence no tiene identidad propia de incidente.
+- Crear signal nuevo solo si existe steady state, severity policy y owner operacional claros.
+- No correr todo `production-preflight` de forma pesada si basta con snapshot acotado de checks criticos.
+- Cada check debe tener timeout individual y summary degradado; no dejar que un provider colgado consuma el cron completo.
+
+Definition of done:
+
+- El reporte muestra claramente que sources fueron consultadas, cuales se omitieron por presupuesto/contexto y cuales quedaron unknown.
+- La integracion no duplica reglas de `production-preflight`; enlaza o reusa helpers existentes.
+- El cron sigue dentro de `timeout-minutes: 10` con margen razonable.
+
 ### Slice 6 — Workflow, Docs, Skills & Runbooks
 
 - Actualizar `.github/workflows/production-release-watchdog.yml` si cambian flags/output/exit policy.
 - Actualizar runbook, manual y arquitectura con el comportamiento real.
 - Actualizar `.codex/skills/greenhouse-production-release/SKILL.md` y `.claude/skills/greenhouse-production-release/SKILL.md` si cambia flujo critico.
 - Documentar relacion con TASK-865 y TASK-866 para no duplicar responsabilidades.
+
+Definition of done:
+
+- Runbook/manual ya no prometen recovery automatico si el runtime no lo hace.
+- Skill Codex y skill Claude describen la policy real de unknown/recovery/finding identity.
+- `changelog.md` registra el cambio operacional del watchdog.
+- `Handoff.md` deja claro que el drift vivo no fue corregido por esta task si TASK-865/TASK-866 siguen abiertas.
 
 ## Out of Scope
 
@@ -232,13 +350,16 @@ Reglas obligatorias:
 
 ### Current live evidence to preserve in task context
 
-Read-only watchdog run 2026-05-16 observed:
+Read-only watchdog run 2026-05-19 observed:
 
 - `platform.release.worker_revision_drift`: `error`
-- drift workers: `ops-worker`, `commercial-cost-worker`
-- synced workers: `ico-batch-worker`, `hubspot-greenhouse-integration`
-- expected manifest SHA prefix: `2f048eb26324`
-- drifted Cloud Run SHA prefix: `0fff2d8e1b25`
+- drift workers: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker`
+- synced workers: `hubspot-greenhouse-integration`
+- expected manifest SHA prefix: `c699197902a4`
+- drifted Cloud Run SHA prefixes:
+  - `ops-worker`: `550c0e679693`
+  - `commercial-cost-worker`: `a8567937b695`
+  - `ico-batch-worker`: `a8567937b695`
 
 ## Rollout Plan & Risk Matrix
 

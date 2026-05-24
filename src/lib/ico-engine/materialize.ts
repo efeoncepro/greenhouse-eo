@@ -115,6 +115,7 @@ const materializeDeliveryTaskMonthlySnapshot = async (
        rpa_value, open_frame_comments, client_review_open, workflow_review_open, blocker_count,
        due_date, original_due_date, completed_at, last_edited_time, synced_at, created_at,
        period_anchor_date, fase_csc, cycle_time_days, hours_since_update, is_stuck, delivery_signal,
+       gh_otd_bucket,
        operating_business_unit, snapshot_status, locked_at, materialized_at, engine_version)
     SELECT
       CONCAT(
@@ -165,6 +166,7 @@ const materializeDeliveryTaskMonthlySnapshot = async (
       hours_since_update,
       is_stuck,
       delivery_signal,
+      gh_otd_bucket,
       operating_business_unit,
       @snapshotStatus AS snapshot_status,
       CASE WHEN @snapshotStatus = 'locked' THEN CURRENT_TIMESTAMP() ELSE NULL END AS locked_at,

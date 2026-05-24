@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { PayrollKpiDiagnostics, PayrollKpiSnapshot } from '@/types/payroll'
 
-import { computeMetricsByContext, readMemberMetricsBatch } from '@/lib/ico-engine/read-metrics'
+import { computeMemberMetricsBatch, readMemberMetricsBatch } from '@/lib/ico-engine/read-metrics'
 import { ensureIcoEngineInfrastructure } from '@/lib/ico-engine/schema'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -173,15 +173,11 @@ export const fetchKpisForPeriod = async ({
   const missingMemberIds = filteredMemberIds.filter(memberId => !snapshots.has(memberId))
 
   if (missingMemberIds.length > 0) {
-    const liveResults = await Promise.all(
-      missingMemberIds.map(async memberId => {
-        const liveSnapshot = await computeMetricsByContext('member', memberId, periodYear, periodMonth)
+    const liveSnapshots = await computeMemberMetricsBatch(missingMemberIds, periodYear, periodMonth)
 
-        return { memberId, liveSnapshot }
-      })
-    )
+    for (const memberId of missingMemberIds) {
+      const liveSnapshot = liveSnapshots.get(memberId) ?? null
 
-    for (const { memberId, liveSnapshot } of liveResults) {
       if (!liveSnapshot) {
         diagnostics.missingMembers += 1
         continue

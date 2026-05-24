@@ -4561,6 +4561,91 @@ Notion edit status (Efeonce/Sky) → captura prod TASK-912 (notion-status-transi
 
 **Spec canónica**: `docs/tasks/complete/TASK-916-rpa-v2-productive-compute-writeback.md`. Pattern fuente: demo siblings TASK-913/914.
 
+### OTD Bucket Classifier Ownership invariants (TASK-923, M1, desde 2026-05-24)
+
+Greenhouse es el **clasificador autoritativo del bucket OTD** (`on_time` / `late_drop` / `overdue` / `carry_over` / `na`). El cómputo del bucket vive en un helper canónico TS + su espejo BQ — NUNCA en una fórmula Notion. M1 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16: movió el clasificador desde la fórmula Notion `Indicador de Performance` (→ synced `performance_indicator_code`) a Greenhouse en **modo paridad** (freeze-off, replica la semántica cruda actual), escrito a la columna shadow `gh_otd_bucket`. Es aditivo: el bono sigue leyendo `otd_pct` legacy intacto.
+
+**Helpers canónicos** (`src/lib/notion-metrics/`):
+
+- `classifyOtdBucket(inputs: TaskInputsForOtdBucket) → OtdBucketResult` — pure helper canonical, **freeze-aware togglable** (M1 = freeze off / paridad; M2 = freeze on). Un solo helper, no dos. server-only. Importa `task-status-canonical.ts` (Aprobado/Cancelado/Archivado + `normalizeTaskStatus`).
+- `buildOtdBucketSql(cols, frozenDaysSql='0') → string` — espejo BQ CASE del helper. TS es source of truth; la expresión BQ se valida con test de paridad TS↔SQL.
+- `OTD_BUCKET_FORMULA_VERSION='otd_bucket_v1.0'` en `otd-bucket-types.ts`.
+- `isOtdClassifierGhShadowEnabled()` (`OTD_CLASSIFIER_GH_SHADOW_ENABLED`, default OFF) en `otd-classifier-flags.ts`.
+
+**Columna shadow** `gh_otd_bucket` (STRING): en `v_tasks_enriched` (VIEW additive) + `delivery_task_monthly_snapshots` (DDL + `REQUIRED_COLUMN_MIGRATIONS`). La materialize la inserta vía `buildOtdBucketSql`.
+
+**Reliability signal** `notion.metrics.shadow_paridad_otd_classifier` (PG-based, moduleKey `delivery`, kind `drift`): compara `performance_indicator_code IN ('on_time','late_drop')` legacy vs el recompute del helper, **solo sobre tareas COMPLETADAS** (buckets estables now()-independientes), últimos 90d. Severity: mismatch ≤2% ok / ≤10% warning / >10% error.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** computar el bucket OTD leyendo la fórmula Notion `Indicador de Performance` ni `performance_indicator_code` para cómputo nuevo. El bucket canónico se computa con `classifyOtdBucket`. `performance_indicator_code` queda como display/paridad legacy hasta ≥90d post-cutover M3.
+- **NUNCA** crear un helper de clasificación OTD paralelo. Si M2 (TASK-922 freeze) o futuros movimientos necesitan más semántica, **extender `classifyOtdBucket`** (es freeze-aware togglable by design) + extender `buildOtdBucketSql`. Un solo helper.
+- **NUNCA** modificar `classifyOtdBucket` sin actualizar paralelamente `buildOtdBucketSql` + el test de paridad TS↔SQL. La expresión BQ debe espejar el helper byte-semánticamente.
+- **NUNCA** el bono lee `gh_otd_bucket` antes de M3 (cutover gateado: ≥30d shadow + sign-off HR). M1/M2 escriben solo la columna shadow que el bono NO lee → matemáticamente no alteran `otd_pct`.
+- **NUNCA** medir paridad M1 sobre tareas abiertas (`overdue`/`carry_over`). Esos buckets dependen de `now()` + del gate `esMesActual` → la divergencia es esperada, no falla. La signal mide solo completadas (`on_time`/`late_drop`).
+- **NUNCA** subir `OTD_CLASSIFIER_GH_SHADOW_ENABLED` a un comportamiento que cambie un número que el bono ve. El flag es de observabilidad/shadow; el cutover real del bono es M3 (futura task gateada).
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'delivery', { tags: { source: 'otd_classifier_*' } })`.
+- **SIEMPRE** que emerja un movimiento downstream (M2 freeze, M3 cutover), reusar el helper canónico + columna shadow + signal de paridad. Cero plumbing nuevo.
+
+**Spec canónica**: `docs/tasks/complete/TASK-923-greenhouse-owns-otd-bucket-classifier-parity-shadow.md`. ADR: `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1.md` §16 (Delta 2026-05-24 — M1 shipped). Desbloquea M2 (TASK-922). Patrón fuente: TASK-908 (calculate-cycle-time + cycle-time-formula TS↔SQL mirror), TASK-901 (RpA helper canonical), Delivery Metrics Ownership Boundary (Notion = OS / Greenhouse = motor).
+
+### Due-Date Change Capture invariants (TASK-921, M0, desde 2026-05-24)
+
+`greenhouse_delivery.task_due_date_changes` es el log **append-only** canónico de cambios de fecha límite + motivo de reprogramación. M0 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16 — foundation que TASK-922 (M2 freeze/atraso imputable) consume. Reemplaza el casillero único Notion `Fecha límite original` + fórmula `Días reprogramados` por un historial real (cuántas veces, de→a, por qué). NO computa atraso — eso es TASK-922.
+
+**Captura canónica** (reusa infra TASK-912, NO segundo webhook):
+
+- El webhook `notion-status-transitions` (TASK-912) ya emite `notion.task.page_change_signal` para CUALQUIER cambio de propiedad. La captura de fecha es un **2do consumer** de ese evento (`notionDueDateChangeCaptureProjection`), NO un endpoint/HMAC/suscripción nueva.
+- Re-fetch canónico (`fetchPageDueDate` en `notion-client.ts`, sibling de `fetchPageStatus`): lee `Fecha límite` + `Fecha límite original` (baseline seed) + select `Motivo de reprogramación` (confirmación operador) + estado + `parent.data_source_id` (workspace autoritativo). NUNCA confía el payload del webhook.
+- **Flag propio** `NOTION_DUE_DATE_CAPTURE_ENABLED` (default OFF) en `status-transitions-flags.ts`. Load-bearing: el webhook de TASK-912 YA está ON en prod → sin flag propio el merge capturaría inmediato. OFF → consumer no-op.
+
+**Motivo (ADR §5/§6)**: `inferRescheduleReason()` (`reschedule-reason-inference.ts`, pure) infiere `reason_code` desde `status_at_change` + transiciones recientes. Partición disjunta: `client_requested`/`scope_change` extienden la fecha justa; `external_blocker` lo maneja el freeze; `internal_not_prioritized`/`unspecified` no extienden. El operador confirma/corrige en Notion → `reason_source='operator_confirmed'`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** crear un segundo webhook endpoint/HMAC/suscripción para capturar cambios de fecha. Reusar `notion.task.page_change_signal` con un consumer. Lo mismo para futuras propiedades capturables (otra dimensión Notion) — fan-out del mismo evento.
+- **NUNCA** confiar el payload del webhook para el valor de la fecha. Siempre re-fetch (`fetchPageDueDate`). Notion no manda valores (notion-platform Pillar 1).
+- **NUNCA** persistir en `task_due_date_changes` una tarea cuyo workspace no resuelva a Efeonce/Sky (`resolveProductiveWorkspace` null → skip). Garantía anti-contaminación de la suscripción amplia.
+- **NUNCA** usar el motivo inferido como confirmado — `reason_source` distingue; el bono (TASK-922+) SOLO usa `operator_confirmed`.
+- **NUNCA** inferir `scope_change` (indistinguible de `client_requested` desde señales de estado). Solo el operador lo confirma. La inferencia client-driven default es `client_requested`.
+- **NUNCA** computar `days_delta` ni edad de filas con `EXTRACT(EPOCH FROM (date - date))` (PG lo rechaza — gate TASK-893). Usar `date - date = integer` o computar en TS (`computeDaysDelta`).
+- **NUNCA** DELETE/UPDATE las columnas de observación (fechas, status, changed_at, source_event_id) — append-only (trigger PG). SOLO `reason_code`/`reason_source`/`reason_confidence` son mutables (confirmación operador).
+- **NUNCA** computar atraso/fecha justa/bucket en esta capa — eso es TASK-922 (M2). M0 solo captura.
+- **NUNCA** invocar `Sentry.captureException` directo — `captureWithDomain(err, 'integrations.notion', { tags: { source: 'due_date_change_capture' } })`.
+- **SIEMPRE** que el bono o un consumer downstream necesite "la fecha justa / el motivo de una reprogramación", leer `task_due_date_changes` (el motivo confirmado), NO el casillero `Fecha límite original` legacy.
+
+**Deferido a follow-up**: writeback de la sugerencia inferida a Notion (mostrar el `[Motivo sugerido]` en la propiedad) — mirror del patrón TASK-927. El path de confirmación-read del operador SÍ está incluido en M0.
+
+**Spec canónica**: `docs/tasks/complete/TASK-921-due-date-change-capture-reschedule-reason.md`. Migration: `20260524100613341_task-921-task-due-date-changes.sql`. ADR §16.8 (Delta 2026-05-24 — M0 shipped). Patrón fuente: TASK-908/912 (task_status_transitions + captura sibling), TASK-742 (defense-in-depth).
+
+### Attributable Lateness invariants (TASK-922, M2, desde 2026-05-24)
+
+El **atraso imputable** mide SOLO el slip atribuible a la agencia: días posteriores a la **fecha justa** menos el tiempo en estados de **freeze**. M2 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16 — corrige el bucket OTD que hoy refleja atraso bruto (causa raíz ISSUE-081). Construido en **shadow** (flag OFF); el bono NO cambia hasta el cutover gated (M3).
+
+**Fórmula canónica** (ADR §4): `fecha_justa = COALESCE(original, vigente) + Σ extensiones FORWARD confirmadas ∈ {client_requested, scope_change}`; `atraso = max(0, días(fin, fecha_justa) − freeze posterior)`. Mirror de `calculateCycleTime` con 3 diferencias: reloj en fecha justa, set de exclusión = 3 estados de freeze ({Listo para revisión, Bloqueado, En pausa}), solo intervalos posteriores. **El set de exclusión del atraso DIFIERE del de Cycle Time** (que solo excluye `Bloqueado`).
+
+**Helpers canónicos**:
+
+- `calculateAttributableLateness(inputs)` (`src/lib/notion-metrics/calculate-attributable-lateness.ts`, pure, server-only) — source of truth del atraso. Delega el bucket a `classifyOtdBucket`.
+- `classifyOtdBucket(... applyMonthGate: false)` — M2 reusa el clasificador M1 (single source of truth) con el gate de mes apagado (ADR §16.5). NO crear bucket classifier nuevo.
+- Consumer `notionAttributableLatenessComputeProjection` (trigger `notion.task.status_transitioned`) → UPSERT `greenhouse_delivery.task_attributable_lateness_shadow`. Flag `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (default OFF).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** extender la fecha justa por motivos que ya maneja el freeze (`external_blocker`/revisión/pausa) — doble descuento (ADR §5). Solo `client_requested`/`scope_change` extienden.
+- **NUNCA** usar motivo inferido (sin confirmar) para el bucket que afectará el bono. Solo `reason_source='operator_confirmed'`. Sin confirmar → `legacy_unknown` (conservador, mide vs vigente).
+- **NUNCA** computar el output M2 en BQ ni crear un mirror BQ del freeze. El freeze multi-ciclo (3-estado, clamp post-fairDeadline) no es un CASE BQ mantenible en paridad — el helper TS es source of truth (patrón RpA V2: helper + snapshot PG + consumer reactivo). NO clobbear `gh_otd_bucket` de M1.
+- **NUNCA** flipear `ATTRIBUTABLE_LATENESS_OTD_ENABLED=true` ni cutover del bono sin 8 stop-gates + sign-off HR + ≥30d shadow verde (ADR §16.2 M3).
+- **NUNCA** recompute en consumers — leer el helper / shadow table canónicos.
+- **NUNCA** computar días con `EXTRACT(EPOCH FROM (date - date))` (gate TASK-893); el helper computa en TS (`MS_PER_DAY`).
+- **NUNCA** `Sentry.captureException` directo — `captureWithDomain(err, 'delivery', ...)`.
+- **SIEMPRE** documentar que el set de exclusión del atraso (3 estados) difiere del de Cycle Time (1 estado).
+- **SIEMPRE** degradación honesta: sin transitions → `unavailable` (no 0 falso); reschedule extending sin confirmar → `legacy_unknown`.
+
+**Reliability signals** (subsystem `delivery`): `delivery.attributable_lateness.shadow_paridad` (% buckets que el freeze cambia; ok ≤30%, warning >30% sanity) + `delivery.attributable_lateness.freeze_reschedule_overlap` (invariante anti-doble-descuento, steady=0). `delivery.reschedule.pending_reason_confirmation` se reusa de TASK-921.
+
+**Spec canónica**: `docs/architecture/metrics/ATTRIBUTABLE_LATENESS_V1.md` + ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1.md` §4-7, §16.9. Task: `docs/tasks/complete/TASK-922-attributable-lateness-helper-otd-bucket-shadow.md`. Migration: `20260524104127717`. Patrón fuente: TASK-908 (calculate-cycle-time interval pattern), TASK-913/916 (RpA V2 helper + snapshot + consumer), TASK-923 (classifyOtdBucket).
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

@@ -10,7 +10,7 @@
 | Created | 2026-05-17 by sesión deep-dive ICO + arch reasoning |
 | Last updated | 2026-05-17 |
 | Writeback state | `not_implemented` (TASK-902 futura implementa writeback canonical) |
-| Cross-refs | TASK-902 (writeback futuro) · TASK-908 (CT SLO% separación) · RPA_V1 · FTR_V1 · CT_SLO_PCT_V1 · CUMPLIMIENTO_V1 · ADR boundary · ADR metric spec pattern |
+| Cross-refs | TASK-902 (writeback futuro) · TASK-908 (CT SLO% separación) · TASK-921/922 (atraso imputable + bucket reason-aware) · RPA_V1 · FTR_V1 · CT_SLO_PCT_V1 · CUMPLIMIENTO_V1 · ADR boundary · ADR metric spec pattern · **ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` (bucket OTD reason-aware + freeze — corrige ISSUE-081)** |
 
 ---
 
@@ -454,3 +454,9 @@ OTD% agregado per-cliente per-período aparece en reportes ejecutivos al cliente
 ### 13.5 Distinción canonical vs CT SLO% (NO confundir downstream)
 
 OTD% (promise compliance) y CT SLO% (competitive benchmark) son **inputs distintos a UI / dashboards / reports**. Bonus consume **solo OTD%** V1 — CT SLO% NO entra al cálculo. Ver [`CT_SLO_PCT_V1.md`](CT_SLO_PCT_V1.md) §6.1 + §13 para razón canonical.
+
+## Delta 2026-05-24 — bucket reason-aware (TASK-922 M2, shadow)
+
+El bucket OTD se **redefine** como reason-aware (ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §7): los 4 buckets se recalculan con la **fecha justa** (original + extensiones cliente/scope confirmadas) + **freeze** (descuento de tiempo en {Listo para revisión, Bloqueado, En pausa} posterior a la fecha justa). Esto corrige ISSUE-081 (el bucket actual refleja atraso bruto, incluye demoras no imputables a la agencia).
+
+**Estado**: shadow (M2 SHIPPED 2026-05-24, flag `ATTRIBUTABLE_LATENESS_OTD_ENABLED` default OFF). El cómputo vive en `calculateAttributableLateness` + `classifyOtdBucket` (freeze ON, `applyMonthGate: false`), persistido en `greenhouse_delivery.task_attributable_lateness_shadow`. **El bono sigue leyendo el `otd_pct` legacy intacto** hasta el cutover gated (M3: 8 stop-gates + sign-off HR + ≥30d shadow verde). Spec de la métrica: [`ATTRIBUTABLE_LATENESS_V1.md`](ATTRIBUTABLE_LATENESS_V1.md).
