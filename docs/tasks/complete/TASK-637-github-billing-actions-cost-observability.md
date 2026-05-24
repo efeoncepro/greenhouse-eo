@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-007`
-- Status real: `En implementacion`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none` — TASK-586 y TASK-636 ya estan complete; se reutiliza el patron GCP/Vercel Billing + Reliability.
@@ -396,13 +396,13 @@ Rollout:
 
 ## Acceptance Criteria
 
-- [ ] Existe reader server-side para GitHub Billing Usage con tests unitarios de parsing/agregacion.
-- [ ] Existe `GET /api/admin/cloud/github-billing` protegido por admin tenant context.
-- [ ] La UI admin muestra costo GitHub/Actions, forecast, top repo, top SKU/producto y estado de configuracion.
-- [ ] Reliability expone una senal `cloud.billing.github` con severidad basada en configuracion, API health y thresholds.
-- [ ] La ausencia de token/org o datos no se representa como gasto cero sano.
-- [ ] `.env.example`, `project_context.md`, `changelog.md` y documentacion funcional quedan actualizados.
-- [ ] La task documenta claramente que V1 no promete costo por workflow si REST API no entrega `workflow_path`.
+- [x] Existe reader server-side para GitHub Billing Usage con tests unitarios de parsing/agregacion.
+- [x] Existe `GET /api/admin/cloud/github-billing` protegido por admin tenant context.
+- [x] La UI admin muestra costo GitHub/Actions, forecast, top repo, top SKU/producto y estado de configuracion.
+- [x] Reliability expone una senal `cloud.billing.github` con severidad basada en configuracion, API health y thresholds.
+- [x] La ausencia de token/org o datos no se representa como gasto cero sano.
+- [x] `.env.example`, `project_context.md`, `changelog.md` y documentacion funcional quedan actualizados.
+- [x] La task documenta claramente que V1 no promete costo por workflow si REST API no entrega `workflow_path`.
 
 ## Verification
 
@@ -417,14 +417,14 @@ Rollout:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] se reviso que `TASK-586` y `TASK-636` no tengan conflictos de ownership en archivos de reliability/admin billing
-- [ ] si se agregaron env vars, quedaron documentadas con proposito, entornos y formato
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] se reviso que `TASK-586` y `TASK-636` no tengan conflictos de ownership en archivos de reliability/admin billing
+- [x] si se agregaron env vars, quedaron documentadas con proposito, entornos y formato
 
 ## Follow-ups
 

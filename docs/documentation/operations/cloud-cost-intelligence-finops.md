@@ -6,7 +6,7 @@
 > **Modulo:** operaciones / cloud / FinOps
 > **Ruta en portal:** `/admin/integrations`
 > **Arquitectura relacionada:** [GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1](../../architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md), [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1](../../architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md)
-> **Task relacionada:** [TASK-769](../../tasks/complete/TASK-769-cloud-cost-intelligence-ai-finops-copilot.md), [TASK-636](../../tasks/complete/TASK-636-vercel-billing-focus-observability.md), [TASK-637](../../tasks/in-progress/TASK-637-github-billing-actions-cost-observability.md)
+> **Task relacionada:** [TASK-769](../../tasks/complete/TASK-769-cloud-cost-intelligence-ai-finops-copilot.md), [TASK-636](../../tasks/complete/TASK-636-vercel-billing-focus-observability.md), [TASK-637](../../tasks/complete/TASK-637-github-billing-actions-cost-observability.md)
 
 ## Para que sirve
 

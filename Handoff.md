@@ -1,6 +1,6 @@
-# Sesion 2026-05-24 — TASK-637 GitHub Billing & Actions Cost Observability — 🚧 IN PROGRESS
+# Sesion 2026-05-24 — TASK-637 GitHub Billing & Actions Cost Observability — ✅ COMPLETE
 
-**Status**: tomado directo en `develop` por instruccion explicita del operador (sin branch switch). Discovery/Audit/Mapa/Plan completados antes de implementar.
+**Status**: ✅ COMPLETE directo en `develop` por instruccion explicita del operador (sin branch switch). Discovery/Audit/Mapa/Plan completados antes de implementar.
 
 **Decisiones cerradas antes de implementar**:
 - Scope canonico GitHub Billing: org `efeoncepro`; repo queda como filtro opcional. Smoke live con `gh api` confirmo mayo 2026: 49 usage items, producto `actions`, gross `USD 93.18099132`, net `USD 0`; top repo `greenhouse-eo`.
@@ -11,20 +11,24 @@
 
 **Drift detectado**: TASK-637 referenciaba TASK-586/TASK-636 como pendientes y `AdminCloudIntegrationsView`; runtime real tiene TASK-586/TASK-636 completas y surface vigente `AdminIntegrationGovernanceView`.
 
-**Entregado hasta ahora**:
+**Entregado**:
 - Reader server-side `src/lib/cloud/github-billing.ts` + tipos `src/types/github-billing.ts` + tests de parsing/agregacion/error/not_configured.
 - API admin `GET /api/admin/cloud/github-billing` protegida por `requireAdminTenantContext`.
 - Signal reliability `cloud.billing.github` con severidad por config/API/thresholds/spike.
 - UI: `GitHubBillingCard` en `/admin/integrations`, spotlight en `/admin/ops-health`, y Admin Center inyecta el source en `getReliabilityOverview`.
 - Docs/env: `.env.example`, `project_context.md`, `changelog.md`, doc funcional FinOps. `GREENHOUSE_GITHUB_BILLING_ORG=efeoncepro` provisionada en Vercel `production`, `staging` y `development`.
 
-**Validacion parcial**:
+**Validacion**:
 - `pnpm exec vitest run src/lib/cloud/github-billing.test.ts` -> 5/5.
 - `pnpm exec vitest run src/lib/cloud/github-billing.test.ts src/lib/reliability` -> 331 passed, 4 skipped.
 - `pnpm exec tsc --noEmit --pretty false` -> verde.
+- `pnpm lint` -> verde.
+- `pnpm design:lint` -> 0 errors / 0 warnings.
+- `pnpm build` -> verde.
+- `pnpm task:lint --task TASK-637` -> 0 errors / 0 warnings.
 - Smoke local con token real de `gh` sin persistirlo: `availability=configured`, mayo 2026 `USD 93.18 gross / USD 0 net`, `Actions Linux` 15.339 min gross `USD 92.03`, storage 3.413,46 GB-h gross `USD 1.15`, top repo `greenhouse-eo`, latest usage date `2026-05-24`.
 
-**Pendiente antes de cierre**: `pnpm lint`, `pnpm design:lint`, `pnpm build`, lifecycle task a `complete`, README/Handoff final y commit de cierre. Token productivo dedicado sigue pendiente; no se subio el PAT amplio de `gh` a Secret Manager.
+**No validado / pendiente externo**: no se hizo request autenticado a `/api/admin/cloud/github-billing` en staging porque el codigo aun no esta desplegado y no hay token productivo dedicado. Token productivo dedicado sigue pendiente; no se subio el PAT amplio de `gh` a Secret Manager.
 
 # Sesion 2026-05-24 — TASK-636 Vercel Billing FOCUS Observability — ✅ COMPLETE
 
