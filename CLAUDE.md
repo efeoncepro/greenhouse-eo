@@ -1964,7 +1964,7 @@ Ambos consultan GitHub API via `GITHUB_RELEASE_OBSERVER_TOKEN` con degradación 
 
 ### Production Release Watchdog invariants (TASK-849)
 
-Watchdog scheduled GH Actions `*/30 * * * *` que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale approvals + pending sin jobs + worker revision drift) y emite alertas Teams a `production-release-alerts` con dedup canonico. **Convierte los 2 signals pasivos de TASK-848 V1.0 en alertas activas**.
+Watchdog manual-only temporal (desde 2026-05-24 hasta TASK-920) que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale approvals + pending sin jobs + worker revision drift). Originalmente corría scheduled en GitHub Actions y emitía alertas Teams a `production-release-alerts`; el schedule se pausó porque los últimos 100 runs tuvieron 72 fallos y generaban falsos positivos. El CLI/workflow manual siguen disponibles.
 
 **Helpers canonicos** (V1.0 + V1.1 obligatorios al tocar release watchdog):
 
@@ -1993,14 +1993,14 @@ Watchdog scheduled GH Actions `*/30 * * * *` que detecta los 3 sintomas del inci
 
 **Worker GIT_SHA env var** (TASK-849 Slice 1): pre-requisito para `worker_revision_drift` reader. Cada worker emite `GIT_SHA` env var con commit SHA del deploy. Resolution: `$GITHUB_SHA → git rev-parse HEAD → 'unknown'`. Workers sin GIT_SHA aun deployado producen `data_missing` (NO falso drift).
 
-**Hosting decision**: GitHub Actions schedule (NO Vercel cron, NO Cloud Scheduler). Razon: detector consume primariamente GH API → execute dentro de GH Actions evita roundtrips cross-cloud + usa `github.token` auto-provisto. Tooling/monitoring read-only, NOT async-critical (clasificacion `tooling` per `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`).
+**Hosting decision vigente**: manual-only hasta TASK-920. Hosting decision original: GitHub Actions schedule (NO Vercel cron, NO Cloud Scheduler), porque el detector consume primariamente GH API. No reactivar schedule sin corregir falsos positivos/failures en TASK-920 o documentar incidente explícito.
 
 **Concurrency**: `cancel-in-progress: true` en watchdog workflow. La ultima foto siempre gana — NO causa deadlock como los workers pre-TASK-848 porque watchdog NO tiene environment approval gate.
 
 **⚠️ Reglas duras**:
 
 - **NUNCA** ejecutar `gh run cancel` o `gh run approve` automaticamente desde el watchdog. El watchdog SOLO recomienda; humano decide.
-- **NUNCA** desactivar el watchdog por más de 7 días sin justificación documentada. Es la única detección activa del bug class del incidente.
+- **NUNCA** reactivar el schedule del watchdog antes de TASK-920 sin justificarlo como incidente explícito y documentar evidencia. Mientras esté manual-only, ejecutar `workflow_dispatch`/CLI post-release cuando se necesite una foto.
 - **NUNCA** introducir un signal coarse `platform.release.watchdog.health` que lumpee los 3 failure modes. Greenhouse pattern (TASK-742, TASK-774, TASK-768) es 1 signal por failure mode.
 - **NUNCA** loggear payload completo de respuesta GitHub/Cloud Run sin pasar por `redactSensitive`/`redactErrorForResponse`. GitHub responses pueden incluir email del actor que dispara el run.
 - **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'cloud', { tags: { source: 'production_release_watchdog', stage: '<...>' } })`.
@@ -2046,11 +2046,11 @@ GCP_PROJECT=efeonce-group GITHUB_APP_ID=3665723 \
 # worker_revision_drift: warning (data_missing — esperado pre-merge develop→main)
 ```
 
-**Pendiente para activacion total** (post merge develop → main):
+**Estado vigente 2026-05-24**:
 
-1. Workers se re-deployan con `GIT_SHA` env var (TASK-849 Slice 1) → `worker_revision_drift` retorna `ok` para los 4 workers
-2. Workflow scheduled `production-release-watchdog.yml` se registra en GH Actions (cron `*/30` activa)
-3. Cron emite alertas Teams a `production-release-alerts` cuando detecte blockers (con dedup canonico)
+1. Workflow `production-release-watchdog.yml` mantiene `workflow_dispatch`.
+2. Schedule removido temporalmente por ruido/falsos positivos.
+3. TASK-920 debe corregir la semántica antes de reactivar alertas automáticas.
 
 ### Production Preflight CLI invariants (TASK-850)
 
@@ -2147,7 +2147,7 @@ pnpm release:preflight --override-batch-policy --fail-on-error
 
 #### Lesson 2 — Production Release Watchdog self-reference loop
 
-El workflow `Production Release Watchdog` (scheduled cada 30min, TASK-849) reporta `worker_revision_drift` cuando detecta workers Cloud Run en SHAs distintos al último deploy.yml successful. Cuando hay drift pre-existente, el watchdog **FAILA loud**. El preflight `ci_green` cuenta esa failure como CI block.
+El workflow `Production Release Watchdog` (originalmente scheduled cada 30min, TASK-849; manual-only desde 2026-05-24 hasta TASK-920) reporta `worker_revision_drift` cuando detecta workers Cloud Run en SHAs distintos al último deploy.yml successful. Cuando hay drift pre-existente, el watchdog **FAILA loud**. El preflight `ci_green` cuenta esa failure como CI block.
 
 **Patrón canónico**: el watchdog DEBE estar en `RELEASE_DEPLOY_WORKFLOWS` allowlist (`src/lib/release/workflow-allowlist.ts`) — mismo pattern que `Production Release Orchestrator` ya tenía documentado para su propia self-reference loop. Sin esto, drift pre-existente bloquea TODA promoción a producción incluso cuando el release ES la solución al drift.
 

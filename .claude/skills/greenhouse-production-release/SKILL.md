@@ -14,6 +14,11 @@ production".
 This skill is intentionally conservative. Production release is a control-plane
 workflow, not a sequence of ad hoc deploy commands.
 
+Current watchdog posture as of 2026-05-24: `.github/workflows/production-release-watchdog.yml`
+is manual-only until TASK-920 repairs the false-positive signal. Use
+`workflow_dispatch` or `pnpm release:watchdog --json` for post-release checks.
+Do not re-enable a schedule without TASK-920 or an explicit incident rationale.
+
 ## First Reads
 
 Read only what the task needs, in this order:

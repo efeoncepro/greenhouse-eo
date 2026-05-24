@@ -1,28 +1,26 @@
 name: Production Release Watchdog
 
-# TASK-849 — Watchdog scheduled que detecta y alerta temprano approvals
-# obsoletos de Production, runs productivos sin jobs y drift de deploy de
-# workers. Garantiza que un bloqueo de release no vuelva a permanecer 14-22
-# dias invisible (incidente 2026-04-26 → 2026-05-09).
+# TASK-849 — Watchdog que detecta approvals obsoletos de Production, runs
+# productivos sin jobs y drift de deploy de workers.
 #
-# **Hosting decision** (TASK-849 §Slice 2): GitHub Actions schedule, NO
-# Vercel cron, NO Cloud Scheduler. Razon:
+# Mitigacion temporal 2026-05-24: manual-only hasta TASK-920. La señal
+# scheduled tuvo 72 fallos en los ultimos 100 runs y generaba ruido falso.
+# Mantener workflow_dispatch permite verificación ad-hoc post-release sin
+# quemar runs scheduled ni alertar con evidencia no confiable.
+#
+# **Hosting decision original** (TASK-849 §Slice 2): GitHub Actions schedule, NO
+# Vercel cron, NO Cloud Scheduler. Estado vigente: schedule pausado hasta
+# TASK-920. Razon original:
 # - Detector consume primariamente GitHub API → execute dentro de GH Actions
 #   evita roundtrips cross-cloud y usa GITHUB_TOKEN auto-provisto.
 # - Tooling/monitoring read-only, NOT async-critical (clasificacion `tooling`
 #   per `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`).
 #
-# **Residual risk conocido**: GH Actions schedule puede tener delays >30min
-# en horarios pico GitHub. Para warning threshold 2h es OK; si emerge
-# unreliability sostenida, fallback es Vercel cron `/api/cron/release-watchdog`
-# (categoria `tooling`).
+# **Residual risk conocido**: el watchdog scheduled puede fallar loud por
+# drift/semántica stale y contaminar CI/release con falsos positivos. TASK-920
+# debe hacerlo resiliente antes de reactivar el schedule.
 
 on:
-  schedule:
-    # Cada 60 min — sigue dando 2 oportunidades antes del warning threshold
-    # 2h y reduce a la mitad los runs scheduled. `workflow_dispatch` queda
-    # disponible para checks inmediatos antes/despues de un release.
-    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       enable_teams:

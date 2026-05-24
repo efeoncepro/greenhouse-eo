@@ -2,6 +2,8 @@
 
 **Audit**: `docs/audits/cloud-cost/CLOUD_COST_AUDIT_2026-05-24.md`. Datos reales (GCP billing en CLP ÷898; Vercel `/v1/billing/charges`; GitHub via TASK-637). Total ~$249/mo: GCP ~$132, Actions ~$93, **Vercel ~$24 (el más barato)**.
 
+**Mitigacion Watchdog 2026-05-24**: Production Release Watchdog queda **manual-only** hasta TASK-920. Dato live: ultimos 100 runs = 72 failures / 28 success, 89.37 min, ~$0.54 estimado; no era el gran driver de costo, pero si una senal erronea con ruido operativo. Se removio `schedule` de `.github/workflows/production-release-watchdog.yml`; siguen disponibles `workflow_dispatch` y `pnpm release:watchdog --json` para post-release/manual checks. No reactivar schedule sin TASK-920 o incidente explicito documentado.
+
 **Trío instant (~$42/mo casi gratis):**
 - **Gemini Code Assist seat ~$22** — seat de `julio.reyes` ocioso (0 uso API 30d). ✅ rol IAM `cloudaicompanion.user` removido (reversible). ❌ API disable descartado: cascada a `geminicloudassist` (asistente consola GCP) — NO forzar. ⏳ verificar que el SKU diario (~$0.735/d) caiga a ~$0 en 1-2 días; si no, soltar licencia en consola. **Verificado**: Nexa/reliability/finops usan Vertex AI (`aiplatform`), NO cloudaicompanion → no afectado.
 - **Artifact Registry ~$9-13** — `gcr.io` 185GB imágenes worker viejas. Cleanup policy keep-15+>14d en **dry-run** (no borra). Script `scripts/cloud/verify-artifact-cleanup-dryrun.sh`. **TASK-932** cierra el flip a enforced (gate doble señal).
@@ -25,7 +27,7 @@
 - **Validacion:** `pnpm local:check` (lint + tsc), `pnpm test scripts/ci/__tests__/github-actions-cost-audit.test.ts`, Ruby YAML parser sobre `.github/workflows/*.yml`, `pnpm task:lint --task TASK-931`, `git diff --check`.
 - **No validado:** `pnpm test` full suite y `pnpm build` full; no hay evidencia post-push de workflows nuevos porque el cambio queda local en `develop` hasta que el operador autorice push. Los cambios CI remotos empiezan a aplicar despues del proximo push/merge.
 - **Riesgos/follow-ups:** Vercel threshold envs aplican en el proximo deployment; budget GitHub Actions existente con `budget_amount=0` no se modifico sin aprobacion porque puede bloquear releases/uso pago; TASK-859 debe decidir si persiste workflow metrics/DORA/flaky detector; PR #125 sigue siendo coordinacion adjacent para `.github/workflows/claude.yml`.
-- **Delta costo-eficiente post-cierre:** segunda pasada implementada localmente tras auditoria de los ultimos runs. `CI` conserva lint/typecheck/tests en `push:develop`, pero `pnpm build` corre solo en PRs, `main` y dispatch manual porque Vercel ya build-ea develop; se agrega cache de ESLint; `Production Release Watchdog` baja a hourly con dispatch manual; `actions:cost:audit` sube buffer para ventanas mensuales grandes. Playwright lanes NO se partieron en esta pasada porque el dato live muestra ~2.5 min/run y el setup domina; partirlo hoy puede sumar overhead sin ahorro material.
+- **Delta costo-eficiente post-cierre:** segunda pasada implementada tras auditoria de los ultimos runs. `CI` conserva lint/typecheck/tests en `push:develop`, pero `pnpm build` corre solo en PRs, `main` y dispatch manual porque Vercel ya build-ea develop; se agrega cache de ESLint; `Production Release Watchdog` primero bajo a hourly y luego quedo manual-only por falsos positivos hasta TASK-920; `actions:cost:audit` sube buffer para ventanas mensuales grandes. Playwright lanes NO se partieron en esta pasada porque el dato live muestra ~2.5 min/run y el setup domina; partirlo hoy puede sumar overhead sin ahorro material.
 - **Post-push fix:** primer run remoto `26366437406` confirmo que `Build` queda `skipped` en `push:develop`, pero fallo `Lint` porque `pnpm lint -- --cache` pasa `--cache` como pattern a ESLint 9. Se corrigio a `pnpm build:icons` + `pnpm exec eslint . --cache --cache-location .eslintcache`.
 
 # Sesion 2026-05-24 — Local-first development workflow — ✅ OPERATING MODEL
@@ -3482,7 +3484,7 @@ Documentadas en CLAUDE.md sección "Production Release Operational Playbook (TAS
 - **Hard Rules canonizadas en CLAUDE.md** sección "Production Release Watchdog invariants (TASK-849)".
 - **Tests/build:** tsc clean. Lint clean. 62/62 verdes nuevos/extendidos. Migration aplicada en dev (386 tablas PG).
 - **Skills invocadas:** `arch-architect` (constante per instrucción usuario) + `greenhouse-backend` para implementación.
-- **Próximo paso:** configurar `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel env vars production para activar dashboards reliability automaticamente. Cron scheduled YA esta activo en GH Actions runner (usa `github.token` auto-provisto). Operador puede ejecutar manualmente `pnpm release:watchdog --json` para validar local. Post-merge a `main` el watchdog corre cada 30 min y emite alertas Teams a `production-release-alerts` cuando detecte blockers.
+- **Próximo paso original (superado 2026-05-24):** configurar `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel env vars production para activar dashboards reliability automaticamente. El schedule automatico del watchdog fue pausado posteriormente por falsos positivos; usar `pnpm release:watchdog --json` o `workflow_dispatch` hasta TASK-920.
 
 ---
 

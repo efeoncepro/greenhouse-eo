@@ -41,7 +41,7 @@ de drift:
 - **Ledger normalizado**: `greenhouse_sync.github_release_webhook_events` guarda delivery/event/workflow/sha/status/conclusion redacted, match result, transition result y evidence JSON.
 - **Reconciliación segura**: match primario por `target_sha`; fallback por `workflow_run_id` en `workflow_runs`. Si no hay match verificable, queda `unmatched` y no crea ni muta manifests.
 - **Transiciones acotadas**: solo eventos de falla de workflows allowlisted pueden mover estado, y únicamente si `assertValidReleaseStateTransition` lo permite (`ready|deploying -> aborted`, `verifying -> degraded`). Eventos exitosos se registran como `matched`; no declaran `released`.
-- **Watchdog permanece activo**: TASK-849 sigue siendo backstop scheduled. El webhook reduce latencia, no reemplaza la verificación periódica.
+- **Watchdog manual-only temporal**: TASK-849 queda disponible como `workflow_dispatch`/CLI, pero el schedule está pausado desde 2026-05-24 hasta TASK-920. El webhook reduce latencia y la verificación manual post-release sigue disponible; no reactivar schedule sin corregir falsos positivos/failures.
 - **Sin outbox nuevo en V1.2**: las transiciones siguen emitiendo los 7 `platform.release.*` existentes. Los eventos GitHub recibidos no emiten outbox propio hasta que exista un consumer real.
 
 Steady state: `platform.release.github_webhook_unmatched = ok` con `0 unmatched / 0 failed` en 24h.
@@ -627,7 +627,7 @@ Resultado:
 ### Pendiente para activacion total (post merge develop → main)
 
 1. Workers se re-deployan con `GIT_SHA` env var (TASK-849 Slice 1) → `worker_revision_drift` retorna `ok` para los 4 workers
-2. Workflow scheduled `production-release-watchdog.yml` se registra en GH Actions (cron `*/30 * * * *` activa)
+2. Workflow `production-release-watchdog.yml` se registra en GH Actions. **Estado vigente 2026-05-24:** schedule pausado; usar `workflow_dispatch`/CLI manual hasta TASK-920.
 3. Cron emite alertas Teams a `production-release-alerts` cuando detecte blockers (con dedup canonico)
 
 ## Delta 2026-05-10 — TASK-849 Production Release Watchdog Alerts CERRADA
@@ -640,7 +640,7 @@ Cierra el bucle del control plane production: detección activa + alertas Teams.
 - **Tabla dedup minima** (Slice 3): `greenhouse_sync.release_watchdog_alert_state` (PK compuesta `(workflow_name, run_id, alert_kind)` + CHECK enum + indexes). NO audit append-only — YAGNI per spec Out of Scope. Audit deriva de GH Actions + Cloud Run history.
 - **Capability granular** `platform.release.watchdog.read` (least-privilege, NO reusa execute).
 - **Detector CLI** `scripts/release/production-release-watchdog.ts` (Slice 4) con flags `--json|--fail-on-error|--enable-teams|--dry-run`. Output machine-readable consumible por preflight CLI futuro (TASK-850). Exit codes: 0 ok/warning, 1 error/critical (con `--fail-on-error`).
-- **Scheduled GH workflow** `production-release-watchdog.yml` (Slice 5) — `*/30 * * * *` + workflow_dispatch + `cancel-in-progress: true` (la última foto siempre gana). WIF GCP para gcloud queries Cloud Run. Auto-emit summary a `$GITHUB_STEP_SUMMARY` + artifact 30d retention.
+- **GH workflow** `production-release-watchdog.yml` (Slice 5) — originalmente `*/30 * * * *` + workflow_dispatch + `cancel-in-progress: true`. **Schedule pausado 2026-05-24** por 72 fallos en los últimos 100 runs; manual dispatch y CLI quedan disponibles hasta TASK-920. WIF GCP para gcloud queries Cloud Run. Auto-emit summary a `$GITHUB_STEP_SUMMARY` + artifact 30d retention.
 - **Teams alerts dispatcher canónico** (Slice 5): `src/lib/release/watchdog-alerts-dispatcher.ts` con `dispatchWatchdogAlert()` + `dispatchWatchdogRecovery()`. Dedup logic: alerta SOLO cuando (a) blocker nuevo, (b) escalation severity, (c) ultimo alert > 24h. At-least-once delivery: dedup state se actualiza SOLO si Teams send tuvo éxito.
 - **Teams destination** `production-release-alerts` registrada en `src/config/manual-teams-announcements.ts` apuntando al canal **"EO - Admin"** del Equipo Efeonce (`recipientKind: 'channel'`, `teamId: aae47836-...`, `channelId: 19:19Ug...@thread.tacv2`). Mismo canal físico que `ops-alerts` en `teams_notification_channels`; channelCode separado para audit trazable del origen.
 - **Runbook canónico** `docs/operations/runbooks/production-release-watchdog.md` (13 secciones: detección, ejecución, severities, recovery procedures, dedup state ops, configuración, decision tree alert vs incident, hard rules, V1.1 follow-ups).

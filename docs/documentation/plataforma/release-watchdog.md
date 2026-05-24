@@ -3,13 +3,15 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-05-10 por TASK-849 V1.1
-> **Ultima actualizacion:** 2026-05-10
+> **Ultima actualizacion:** 2026-05-24
 > **Documentacion tecnica:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Manual operativo:** [release-watchdog manual de uso](../../manual-de-uso/plataforma/release-watchdog.md)
 
 ## Que es
 
 El **Release Watchdog** es un sistema automatizado que vigila los despliegues a produccion de Greenhouse y alerta a operadores cuando algo se traba. Forma parte del **Production Release Control Plane** (TASK-848 + TASK-849), el conjunto de herramientas que governance la promocion `develop → main`.
+
+**Estado vigente:** el modo automático scheduled está pausado desde el 2026-05-24 hasta TASK-920. El workflow y CLI siguen existiendo para ejecución manual. Motivo: los últimos 100 runs scheduled tuvieron 72 fallos y la señal estaba generando ruido/falsos positivos.
 
 ## Por que existe
 
@@ -28,7 +30,7 @@ El root cause operativo fue una combinacion: `cancel-in-progress: false` + `Prod
 
 ### Detectores
 
-El Watchdog corre 3 detectores cada 30 minutos:
+El Watchdog corre 3 detectores cuando se ejecuta manualmente:
 
 | Detector | Que detecta | Cuando alerta |
 |---|---|---|
@@ -55,11 +57,11 @@ El Watchdog vigila exclusivamente los 6 workflows que despliegan a produccion:
 
 | Trigger | Frecuencia | Donde corre |
 |---|---|---|
-| **Cron scheduled** | Cada 30 min, automatico | GitHub Actions runner |
+| **Cron scheduled** | Pausado hasta TASK-920 | N/A |
 | **Manual dispatch** | Bajo demanda | UI Actions o `gh workflow run` |
 | **CLI local** | Bajo demanda | Computadora del operador |
 
-> **Detalle tecnico**: workflow [.github/workflows/production-release-watchdog.yml](../../../.github/workflows/production-release-watchdog.yml). El cron `*/30 * * * *` solo activa cuando el workflow esta en la default branch (`main`).
+> **Detalle tecnico**: workflow [.github/workflows/production-release-watchdog.yml](../../../.github/workflows/production-release-watchdog.yml). El `schedule` fue removido temporalmente; reactivarlo requiere TASK-920 o una decisión explícita de incidente.
 
 ### Como alerta
 

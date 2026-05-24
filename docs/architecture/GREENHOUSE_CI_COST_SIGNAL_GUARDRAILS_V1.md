@@ -48,7 +48,7 @@ Remote CI is integration/release evidence, not the exploratory workbench.
 - `CI` may cache deterministic lint/build-support artifacts such as `.eslintcache` when cache miss only affects runtime cost and never changes the check set.
 - Playwright smoke on `develop` is path-aware for UI/runtime/auth/admin/payroll/reliability/API-critical paths.
 - Staging worker deploys on `develop` are latest-only; production worker deploys remain orchestrator-owned and retain release evidence.
-- `Production Release Watchdog` scheduled cadence is hourly by default. Manual dispatch remains available for immediate release checks; lowering the cadence below hourly requires a replacement signal or explicit incident rationale.
+- `Production Release Watchdog` is temporarily manual-only as of 2026-05-24 until TASK-920 fixes false-positive/failure semantics. Manual dispatch remains available for post-release checks; scheduled reactivation requires TASK-920 or an explicit incident rationale with replacement evidence.
 - Production workflows must preserve auditable evidence and release semantics from `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`.
 - Any persisted workflow/job metrics belong to TASK-859 or a superseding ADR; TASK-931 V1 uses read-only API reporting.
 
