@@ -3721,6 +3721,21 @@ export interface GreenhouseDeliveryStaffAugPlacements {
   updated_by_user_id: string | null;
 }
 
+export interface GreenhouseDeliveryTaskAttributableLatenessShadow {
+  attributable_days_late: Generated<Numeric>;
+  bucket_attributable: string;
+  bucket_legacy: string | null;
+  bucket_no_freeze: string;
+  computed_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  data_status: string;
+  fair_deadline: Timestamp | null;
+  formula_version: string;
+  frozen_days_excluded: Generated<Numeric>;
+  task_source_id: string;
+  workspace_id: string;
+}
+
 export interface GreenhouseDeliveryTaskDueDateChanges {
   captured_at: Generated<Timestamp>;
   change_id: Generated<string>;
@@ -9353,6 +9368,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_events": GreenhouseDeliveryStaffAugEvents;
   "greenhouse_delivery.staff_aug_onboarding_items": GreenhouseDeliveryStaffAugOnboardingItems;
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
+  "greenhouse_delivery.task_attributable_lateness_shadow": GreenhouseDeliveryTaskAttributableLatenessShadow;
   "greenhouse_delivery.task_due_date_changes": GreenhouseDeliveryTaskDueDateChanges;
   "greenhouse_delivery.task_rpa_demo_snapshots": GreenhouseDeliveryTaskRpaDemoSnapshots;
   "greenhouse_delivery.task_rpa_snapshots": GreenhouseDeliveryTaskRpaSnapshots;

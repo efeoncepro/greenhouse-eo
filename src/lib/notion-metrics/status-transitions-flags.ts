@@ -34,3 +34,18 @@ export const isNotionStatusTransitionsWebhookEnabled = (): boolean =>
  */
 export const isNotionDueDateCaptureEnabled = (): boolean =>
   process.env.NOTION_DUE_DATE_CAPTURE_ENABLED === 'true'
+
+/**
+ * TASK-922 (M2) — Kill-switch del cómputo shadow de atraso imputable
+ * (`task_attributable_lateness_shadow`). El consumer reactivo
+ * `notion_attributable_lateness_compute` reusa el evento
+ * `notion.task.status_transitioned` (TASK-912) y, con el flag OFF (default),
+ * hace no-op (cero compute, cero persist).
+ *
+ * **Default OFF es load-bearing**: M2 toca (al cutover) el bono. En shadow solo
+ * computa + persiste en una tabla que NADIE lee. Mergear TASK-922 NO afecta nada.
+ * La activación de la captura/cómputo es operador-side; el cutover real del bono
+ * es una task futura gated (8 stop-gates + sign-off HR + ≥30d shadow verde — ADR §16.2).
+ */
+export const isAttributableLatenessOtdEnabled = (): boolean =>
+  process.env.ATTRIBUTABLE_LATENESS_OTD_ENABLED === 'true'
