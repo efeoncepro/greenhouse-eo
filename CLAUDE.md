@@ -4596,6 +4596,45 @@ Notion edit status (Efeonce/Sky) → captura prod TASK-912 (notion-status-transi
 
 **Spec canónica**: `docs/tasks/complete/TASK-916-rpa-v2-productive-compute-writeback.md`. Pattern fuente: demo siblings TASK-913/914.
 
+### FTR writeback invariants (TASK-903, sibling de TASK-916, desde 2026-05-24)
+
+Pipeline FTR writeback PRODUCTIVO (Efeonce + Sky) — **clone mecánico de TASK-916 RpA repointeado a FTR**, NO rediseño. FTR es **derivada pura de RpA** (`FTR pass ⇔ RpA.value === 0`); el compute delega a `calculateFtr` (TASK-909, que delega a `calculateRpaV2`). Default flag OFF → cero escrituras a Notion al merge.
+
+**Pipeline canónico** (siblings físicamente separados del RpA):
+
+```text
+notion.task.status_transitioned (captura TASK-912)
+  → notionFtrComputeProjection: calculateFtr → persist task_ftr_snapshots → emit notion.task.ftr_writeback_requested (solo si ftr_data_status='valid' + pass/fail)
+    → notionFtrWritebackProjection (gated NOTION_FTR_WRITEBACK_ENABLED default OFF):
+      re-read PG defensive → PATCH select [GH] FTR (Pass/Fail) → mark written
+```
+
+**Archivos canónicos**:
+- `src/lib/sync/projections/notion-ftr-compute.ts` + `.test.ts`
+- `src/lib/sync/projections/notion-ftr-writeback.ts` + `.test.ts`
+- `migrations/20260524200315533_task-903-ftr-snapshots.sql` (`task_ftr_snapshots`, CHECK workspace_id IN efeonce/sky, append-only triggers, writeback cols mutables)
+- `src/lib/reliability/queries/notion-metrics-ftr-signals.ts` (2 signals)
+- `EVENT_TYPES.notionTaskFtrWritebackRequested` ('notion.task.ftr_writeback_requested') v1
+- `NotionPropertyValue.select` (forward-compat, extendido por esta task)
+
+**⚠️ Reglas duras** (mirror TASK-916):
+
+- **NUNCA** recomputar el veredicto FTR inline — toda lectura vía `calculateFtr`. Lint rule `greenhouse/no-inline-ftr-calculation` (warn) lo bloquea.
+- **NUNCA** crear formula property en Notion para FTR — compute en Greenhouse + writeback select `[GH] FTR`.
+- **NUNCA** confiar el `ftrValue` del payload del chain event en el writeback — re-read del snapshot desde `task_ftr_snapshots` por `snapshot_id` (defensive re-read, pattern TASK-771).
+- **NUNCA** escribir a `[GH] FTR` con el flag OFF. Default OFF + override per-cliente `NOTION_FTR_WRITEBACK_ENABLED_<EFEONCE|SKY>`.
+- **NUNCA** emitir el chain event cuando `ftr_data_status != 'valid'` (low_confidence/unavailable no se escriben — degraded honest, mirror RpA `valid`-only).
+- **NUNCA** drift entre los siblings FTR y RpA (compute/writeback) — clone + repoint, NO `if (isFtr)`. Físicamente separados.
+- **NUNCA** invocar `Sentry.captureException` directo — `captureWithDomain(err, 'integrations.notion', { tags: { source: 'ftr_compute' | 'ftr_writeback' } })`.
+
+**Paridad**: NO existe `notion.metrics.shadow_paridad_ftr` standalone — FTR es derivada pura de RpA y no tiene fórmula Notion legacy que diffear; su paridad queda cubierta por `notion.metrics.shadow_paridad_rpa` (TASK-916) por construcción (RpA paridad ≥95% ⇒ FTR paridad ≥95%).
+
+**Activación (flip `NOTION_FTR_WRITEBACK_ENABLED=true`)** — gated por FTR_V1 §9.1: TASK-916 RpA writeback `enabled` 30d + TASK-912 captura activa + `[GH] FTR` creada en Efeonce/Sky + decisión explícita "FTR explícito vale vs derivar de RpA" (ver TASK-903 "Why This Task Exists").
+
+**Estado**: SHIPPED `develop` 2026-05-24 (flag OFF). Migration aplicada + tipos regenerados. 42 tests focales + tsc 0 + lint 0. Smoke PG real: tabla queryable, CHECK rechaza demo, signals = 0.
+
+**Spec canónica**: `docs/tasks/complete/TASK-903-ftr-writeback-notion-gh-property.md`. Pattern fuente: TASK-916 (RpA productive writeback). Consumer real de `calculateFtr` (TASK-909).
+
 ### OTD Bucket Classifier Ownership invariants (TASK-923, M1, desde 2026-05-24)
 
 Greenhouse es el **clasificador autoritativo del bucket OTD** (`on_time` / `late_drop` / `overdue` / `carry_over` / `na`). El cómputo del bucket vive en un helper canónico TS + su espejo BQ — NUNCA en una fórmula Notion. M1 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16: movió el clasificador desde la fórmula Notion `Indicador de Performance` (→ synced `performance_indicator_code`) a Greenhouse en **modo paridad** (freeze-off, replica la semántica cruda actual), escrito a la columna shadow `gh_otd_bucket`. Es aditivo: el bono sigue leyendo `otd_pct` legacy intacto.

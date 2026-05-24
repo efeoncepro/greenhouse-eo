@@ -15,6 +15,20 @@
 
 ---
 
+# Sesion 2026-05-24 — TASK-903 FTR writeback a Notion (infra, flag OFF) — ✅ COMPLETE
+
+Clone mecánico de TASK-916 (RpA productive writeback) repointeado a FTR. **Flag `NOTION_FTR_WRITEBACK_ENABLED` default OFF → cero escrituras a Notion al merge.**
+
+- **Slice 0**: migration `20260524200315533_task-903-ftr-snapshots.sql` (clone de `task_rpa_snapshots`, CHECK workspace IN efeonce/sky, append-only triggers, writeback cols mutables) — aplicada al Cloud SQL dev + tipos regenerados. `EVENT_TYPES.notionTaskFtrWritebackRequested` v1. `NotionPropertyValue.select` (forward-compat).
+- **Slice 1+2**: `notion-ftr-compute` (delega a `calculateFtr` TASK-909, persiste snapshot, emite chain event solo si `valid`+pass/fail) + `notion-ftr-writeback` (PATCH select `[GH] FTR` Pass/Fail, gated OFF + override per-cliente, re-read PG defensive, maxRetries=4) + registradas. Siblings físicamente separados de RpA.
+- **Slice 3**: 2 signals `notion.metrics.ftr_writeback_{dead_letter,lag}` (subsystem delivery, steady=0). Verificados contra PG real: severity ok, count 0. `shadow_paridad_ftr` NO creado — FTR es derivada pura de RpA, su paridad queda cubierta por `shadow_paridad_rpa` (TASK-916); un signal sin comparando legacy sería placeholder.
+
+**Open Question resuelta** ("Why This Task Exists": ¿vale FTR explícito vs derivar de RpA?): es decisión de **activación** (flip flag), NO de implementación. El user instruyó implementar → infra shippeada con flag OFF (reversible, cero impacto runtime), cierra el gap "calculateFtr sin consumer". El flip queda gated por §9.1 + decisión explícita.
+
+Gate cierre: lint 0 · tsc 0 · `pnpm test` 5380 passed · `pnpm build` OK. Trabajado en `develop` sin branch. 4 commits (Slice 0, 1+2, 3, cierre). Consumer real de `calculateFtr` (TASK-909).
+
+---
+
 # Sesion 2026-05-24 — TASK-909 FTR canonical helper V1 — ✅ COMPLETE
 
 Shipped el helper canonical `calculateFtr` ([src/lib/notion-metrics/calculate-ftr.ts](src/lib/notion-metrics/calculate-ftr.ts)): delegación pura a `calculateRpaV2` (`FTR = RpA.value === 0 ? 'pass' : 'fail'`, `ftr_v1.0`). 13 tests. Mapping canonizado: `unavailable`/`suppressed`/`value=null` → FTR `unavailable`; `low_confidence` propagado.

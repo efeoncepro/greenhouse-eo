@@ -315,8 +315,8 @@ Out of scope V1. Hipótesis: GIFs y banners estáticos tienen FTR esperado más 
 | Aspecto | Valor |
 |---|---|
 | Target property Notion | `[GH] FTR` (select `Pass` / `Fail` / `N/A`, read-only para operadores) |
-| Estado actual | `not_implemented` |
-| Task de writeback | **TASK-903** (futura, post TASK-901 RpA writeback verde 30+ días) |
+| Estado actual | `infra_shipped_flag_off` (TASK-903 SHIPPED 2026-05-24 — pipeline compute+writeback con flag `NOTION_FTR_WRITEBACK_ENABLED` default OFF; cero escrituras a Notion hasta el flip gated) |
+| Task de writeback | **TASK-903** (SHIPPED 2026-05-24; activación gated post TASK-916 RpA writeback `enabled` 30+ días + decisión FTR-explícito) |
 | Frecuencia | Per-edit (webhook reactive) + nightly safety net |
 | Latencia esperada | 5-30s post-edit (mismo pattern TASK-901) |
 | Feature flag | `NOTION_FTR_WRITEBACK_ENABLED` (default `false`) |
@@ -349,6 +349,13 @@ Pre-flip de `NOTION_FTR_WRITEBACK_ENABLED=true`:
 - TASK-901 + TASK-908 SHIPPED → TASK-909 está **desbloqueada** (era el estado pendiente correcto).
 - **4 decisiones semánticas canonical pre-aprobadas en sesión** (Q1-Q4 sección 6.1): post-completion only, "completada" incluye Sky `Aprobado` post fix B.2, helper per-task + SQL agregado coexisten, threshold 85% mantenido.
 - TASK-909 implementa Slice 1 (helper). TASK-903 futura implementa writeback completo cuando TASK-901 esté en `enabled` 30d.
+
+### 2026-05-24 — Writeback infra SHIPPED flag OFF (TASK-903)
+
+- Pipeline FTR writeback PRODUCTIVO shipped: `notionFtrComputeProjection` (calculateFtr → `task_ftr_snapshots` → chain event `notion.task.ftr_writeback_requested`) + `notionFtrWritebackProjection` (PATCH select `[GH] FTR` Pass/Fail) — clone mecánico de TASK-916 RpA repointeado a FTR. Gated `NOTION_FTR_WRITEBACK_ENABLED` default OFF → cero escrituras a Notion al merge.
+- 2 reliability signals operacionales: `notion.metrics.ftr_writeback_dead_letter` + `notion.metrics.ftr_writeback_lag` (subsystem delivery, steady=0).
+- **`notion.metrics.shadow_paridad_ftr` NO se creó standalone**: FTR es derivada pura de RpA y no tiene fórmula Notion legacy que diffear; su paridad queda cubierta por `notion.metrics.shadow_paridad_rpa` (TASK-916) por construcción. Crear un signal sin comparando legacy sería placeholder no-funcional.
+- Consumer real de `calculateFtr` (TASK-909). Migration `20260524200315533` aplicada + tipos regenerados. 42 tests focales. Activación (flip flag) gated por §9.1 + decisión "FTR explícito vale vs derivar de RpA" (ver TASK-903 "Why This Task Exists").
 
 ### 2026-05-24 — Helper SHIPPED (TASK-909 Slice 1)
 

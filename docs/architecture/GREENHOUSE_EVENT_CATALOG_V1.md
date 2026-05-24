@@ -2,6 +2,21 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-24 — TASK-903: FTR productive writeback chain event (1 event v1)
+
+Aggregate type: `notion_task`. Sibling de TASK-916 repointeado a FTR (derivada pura de RpA).
+
+| Event Type | Disparado por | Payload v1 contract | Consumers |
+|---|---|---|---|
+| `notion.task.ftr_writeback_requested` | Reactive consumer `notion_ftr_compute` (productivo) post `calculateFtr`, cuando `ftrDataStatus='valid'` con veredicto pass/fail y el snapshot persistió (no ON CONFLICT skip) | `{schemaVersion:1, taskSourceId, workspaceId:'efeonce' or 'sky', ftrValue:'pass' or 'fail', ftrDataStatus:'valid', snapshotId, formulaVersion:'ftr_v1.0', computedAt}` | `notion_ftr_writeback` (productivo) — PATCH propiedad Notion select `[GH] FTR` (Pass/Fail), gated `NOTION_FTR_WRITEBACK_ENABLED` (default OFF) |
+
+Reglas duras:
+
+- Sibling físicamente separado de `notion.task.metrics_writeback_requested` (RpA, TASK-916). FTR no tiene carril demo. Tabla `task_ftr_snapshots` separada de `task_rpa_snapshots`.
+- Chain event pattern (TASK-771): compute y writeback decoupled via outbox. El writeback re-lee el snapshot de PG por `snapshotId` (NUNCA confía el `ftrValue` del payload).
+- `ftrDataStatus != 'valid'` (low_confidence/unavailable) NO emite el evento — degraded honest, mirror RpA `valid`-only.
+- Aditivo + gated OFF por default — cero escrituras a Notion productivo al merge. Activación gated por FTR_V1 §9.1.
+
 ## Delta 2026-05-21 — TASK-916: RpA V2 productive writeback chain event (1 event v1)
 
 Aggregate type: `notion_task`.
