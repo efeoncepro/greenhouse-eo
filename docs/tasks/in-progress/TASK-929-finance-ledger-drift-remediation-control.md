@@ -299,11 +299,23 @@ Resueltas con la opcion mas robusta/segura/resiliente antes de FASE 5. Ninguna r
 
 **Rationale**: separar deteccion de routing evita esconder deuda (detecta todo) y a la vez evita ahogar la cola con ruido inmaterial. Valores finales de unanchored se calibran con sign-off finance, pero el default conservador no bloquea el build (apply gated por flag+allowlist). Lente contable: es performance materiality sobre un SUM, no bajar el umbral de deteccion.
 
-### OQ2 / OQ6 — ¿Las 6 dimensiones fuera de scope estan en 0? → RESUELTA (verificada live)
+### OQ2 / OQ6 — ¿Las 6 dimensiones fuera de scope estan en 0? → CORREGIDA (2026-05-24, post-hardening)
 
-**Hallazgo (probe live 2026-05-24 contra `greenhouse-pg-dev`)**: las 6 dimensiones fuera de scope estan en **0** (`task708`, `task708d`, `task714d`, `task720`, `task721`). `JAVASCRIPT-NEXTJS-4Q` esta driveado **exclusivamente por settlement drift = 4 incomes**. Phantoms / freshness / unanchored = 0 hoy.
+**⚠️ CORRECCION**: la afirmacion original ("6 dims en 0, 4Q cierra con esta task") era **falsa** — se baso en un probe que estaba **corrupto por el mismo bug `.catch(()=>[])`** que Slice 2 arreglo (varias queries devolvieron `[]` por un blip transitorio del proxy → falso 0). El probe limpio post-hardening (`degradedChecks=[]`, confiable) revela el estado REAL:
 
-**Conclusion**: 4Q **puede cerrar con el scope de esta task** una vez resueltos los 4 settlement drifts y mantenidos en 0. No requiere tasks derivadas para el cierre Sentry.
+| Dimension | Estado real | Scope |
+|---|---:|---|
+| settlement drift | **0** (Slice 1 lo arreglo) | in-scope ✓ resuelto |
+| income/expense phantoms | 0 | — |
+| stale balances | 0 | — |
+| **unanchored paid expenses** | **20 (cap LIMIT 20; 28 en 60d, 37 total)** | **in-scope** → cola de revision (Slice 3 NO es para set vacio) |
+| task708 / task708d | 0 | — |
+| **task714d (internal_transfer imbalance)** | **3** | **OUT OF SCOPE** (territorio TASK-714d) |
+| task720 / task721 | 0 | — |
+
+**Conclusion corregida**: 4Q **NO cierra solo con esta task**. Para `healthy=true` se requiere ademas: (a) los 37 unanchored ruteados/aceptados via la cola de revision (in-scope, Slice 3), y (b) los **3 internal_transfer groups con par faltante resueltos via TASK-714d** (`createInternalTransferSettlement` o backfill TASK-714d — fuera de scope de TASK-929). Mientras task714d>0, el cron seguira reportando `healthy=false` honestamente.
+
+**Leccion meta**: este es el caso de uso exacto del Slice 2 — sin honest degradation, el probe corrupto hubiera llevado a cerrar 4Q prematuramente declarando "todo en 0". El hardening expuso la realidad.
 
 ### OQ3 — ¿Cola de revision necesita UI propia? → RESUELTA
 

@@ -4,16 +4,22 @@
 
 **Skills**: greenhouse-finance-accounting-operator + arch-architect (loop de verificación constante).
 
-**Hallazgos live (probe contra `greenhouse-pg-dev`)**:
-- `JAVASCRIPT-NEXTJS-4Q` está driveado **solo por settlement drift = 4 incomes**. Las 6 dimensiones fuera de scope (task708/708d/714d/720/721) + phantoms + freshness + unanchored = **0**. → 4Q **puede cerrar con el scope de esta task**.
-- Los 4 drifts se parten en 2 sub-clases: **A auto-remediable** (`INC-NB-26004360`, `INC-202602-001` — `amount_paid` cache stale, fix = `fn_recompute_income_amount_paid`) y **B needs-review** (`INC-NB-25302941`, `INC-NB-26639047` — facturas factorizadas con `payments_total` ~2x invoice, pago duplicado, fix = identificar + `dismissIncomePhantom`).
-- **Bug nuevo descubierto**: `getFinanceLedgerHealth` envuelve sus ~19 queries en `.catch(()=>[])` → un blip de conexión en la query de settlement reporta `healthy=true` FALSO (verificado: probe local dio healthy=true mientras la VIEW tenía 4 drifts). Bug class ISSUE-071 / Pillar 3. Slice 4 lo endurece (distinguir `unknown` de `0`).
+**Slices commiteados en develop** (1-3):
+- **Slice 1** (`f171a506`): VIEW `income_settlement_reconciliation` excluye superseded en `payments_total` (alinea con `fn_recompute_income_amount_paid`). Causa raíz de 2 de los 4 settlement drifts (falsos positivos en facturas factorizadas). Drift settlement 4→0. Cero mutación de ledger.
+- **Slice 2** (`951497e5`): `getFinanceLedgerHealth` honest degradation — `degradedChecks[]` + `tracked()` wrapper; `healthy` exige sin checks DECISION_CRITICAL degradados. Mata el bug false-healthy. ops-worker incluye degradedChecks en signature/record/Sentry. 3 tests.
+- **Slice 3** (`851822f4`): signal `finance.ledger.unresolved_drift_items` (tiered: settlement>0=error, solo unanchored>0=warning, 0=ok). Wire-up canónico. 4 tests.
 
-**Open Questions resueltas pre-execution** (en el task doc): OQ1 materialidad gobierna routing no detección (VIEW intacta, umbral en reader); OQ2/6 las 6 dims en 0 → 4Q cierra; OQ3 V1 = admin endpoint + report, sin UI page.
+**⚠️ CORRECCIÓN de supuesto roto (premise broke)**: mi primer probe estaba **corrupto por el mismo `.catch(()=>[])`** que Slice 2 arregló → documenté falsamente "6 dims en 0, 4Q cierra con esta task". El probe limpio post-hardening (`degradedChecks=[]`) revela el estado REAL:
+- settlement: **0** ✓ (Slice 1)
+- **unanchored paid expenses: 20 (cap; 28 en 60d, 37 total)** — IN SCOPE, los 37 tienen `economic_category` (data-completeness, no integridad). La cola de revisión (Slice 3 del task) NO es para set vacío.
+- **task714d (internal_transfer imbalance): 3** — **OUT OF SCOPE** (territorio TASK-714d).
+- resto (phantoms/freshness/task708/708d/720/721): 0.
 
-**Canonical primitives a reusar** (no inventar): `account-balances-fx-drift-remediation.ts` (policy/dryRun/decision/evidenceGuard shape), `income_settlement_reconciliation` VIEW + `income-settlement.ts`, `dismissIncomePhantom`/`fn_recompute_income_amount_paid`, `payment_order_state_transitions` (state-machine+CHECK+append-only exemplar), capability seed pattern (`finance.payments.repair_clp`), signal reader pattern (`expense-payments-clp-drift.ts`).
+**Conclusión corregida**: **4Q NO cierra solo con esta task**. Falta (a) rutear/aceptar los 37 unanchored via cola de revisión (in-scope), y (b) resolver los 3 internal_transfer imbalance via **TASK-714d** (`createInternalTransferSettlement`/backfill — fuera de scope). Mientras task714d>0 el cron reporta `healthy=false` honestamente. Lección meta: sin Slice 2 (honest degradation), el probe corrupto hubiera llevado a cerrar 4Q prematuramente.
 
-**Próximo paso**: esperar aprobación humana del Plan (FASE 4, P1) antes de FASE 5 implementación. Plan de 5 slices presentado en el chat.
+**Sub-clases de los 4 settlement drifts originales** (todos resueltos por Slice 1 + sync live): 2 falsos positivos de VIEW (factoring superseded) + 2 transitorios stale ya consistentes.
+
+**Próximo paso**: decisión sobre task714d (flag-only vs spawn TASK-714d remediation) + continuar slices in-scope restantes (recompute remediator + inventory + review queue + docs).
 
 ---
 
