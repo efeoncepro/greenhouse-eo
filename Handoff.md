@@ -1,10 +1,15 @@
-# Sesion 2026-05-24 — TASK-931 GitHub Actions cost guardrails — IN PROGRESS
+# Sesion 2026-05-24 — TASK-931 GitHub Actions cost guardrails — ✅ COMPLETE
 
 - **Branch:** `develop` por instruccion explicita del operador; no se crea ni cambia a `task/TASK-931-*`.
-- **Lifecycle:** task movida `to-do/` → `in-progress/`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
-- **Ownership:** libre al tomarla. No existe branch TASK-931 ni archivo previo en `in-progress`. PR abierto #125 (`ci/claude-pr-review-action`) agrega `.github/workflows/claude.yml`; se tratará como riesgo de coordinación para no pisar ese workflow.
+- **Lifecycle:** task movida `to-do/` → `in-progress/` → `complete/`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
+- **Ownership:** libre al tomarla. No existia branch TASK-931 ni archivo previo en `in-progress`. PR abierto #125 (`ci/claude-pr-review-action`) agrega `.github/workflows/claude.yml`; se trato como riesgo de coordinacion y no se toco ese workflow.
 - **Discovery inicial:** GitHub Billing Usage mayo 2026 sigue mostrando `USD 93.18989776300002` gross total y `USD 0` net total; Actions Runs API confirma CI + Playwright + release/watchdog como drivers recientes. TASK-859 sigue en `to-do`, por lo que TASK-931 no debe crear tablas persistidas workflow/job salvo ADR explícito.
 - **Runtime env TASK-931:** thresholds GitHub Actions provisionados en Vercel `production`, `staging` y `development`: warn `100`, critical `150`, daily spike `100`. GitHub Budgets API confirma budget Actions org-level existente (`id=7f36dec2-18a4-4575-9f49-c5b0470ff929`, `prevent_further_usage=true`, `budget_amount=0`, alerts a `cesargrowth11`). Token productivo dedicado para Billing Usage sigue pendiente; no se persiste el PAT personal `gho_*`.
+- **Entregado:** `pnpm actions:cost:audit` read-only por workflow/job; ADR `GREENHOUSE_CI_COST_SIGNAL_GUARDRAILS_V1`; CI split fast/deep (`ci.yml` + `ci-deep.yml`); Playwright/reliability path-aware; worker deploys latest-only en staging/develop sin recortar path filters ambiguos; docs FinOps/local-first actualizadas.
+- **Smoke real 2026-05-24:** 20 runs / 43 jobs / 128.45 min / `USD 0.77` estimated gross; top workflows: `CI` `USD 0.47`, `Production Release Orchestrator` `USD 0.17`, `Playwright E2E smoke` `USD 0.04`, `Ops Worker Deploy` `USD 0.04`.
+- **Validacion:** `pnpm local:check` (lint + tsc), `pnpm test scripts/ci/__tests__/github-actions-cost-audit.test.ts`, Ruby YAML parser sobre `.github/workflows/*.yml`, `pnpm task:lint --task TASK-931`, `git diff --check`.
+- **No validado:** `pnpm test` full suite y `pnpm build` full; no hay evidencia post-push de workflows nuevos porque el cambio queda local en `develop` hasta que el operador autorice push. Los cambios CI remotos empiezan a aplicar despues del proximo push/merge.
+- **Riesgos/follow-ups:** Vercel threshold envs aplican en el proximo deployment; budget GitHub Actions existente con `budget_amount=0` no se modifico sin aprobacion porque puede bloquear releases/uso pago; TASK-859 debe decidir si persiste workflow metrics/DORA/flaky detector; PR #125 sigue siendo coordinacion adjacent para `.github/workflows/claude.yml`.
 
 # Sesion 2026-05-24 — Local-first development workflow — ✅ OPERATING MODEL
 

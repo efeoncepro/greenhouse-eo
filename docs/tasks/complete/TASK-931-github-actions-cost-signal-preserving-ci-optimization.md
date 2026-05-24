@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `platform|ci|reliability|ops`
 - Blocked by: `none`
@@ -317,36 +317,36 @@ El contrato de gates debe optimizar por "costo por señal util":
 
 ## Acceptance Criteria
 
-- [ ] Existe reporte reproducible de Actions por workflow/job para una ventana configurable.
-- [ ] Existe contrato documentado de gates (`fast`, `full`, `smoke`, `release`, `scheduled/deep`) con decision de cuando corre cada uno.
-- [ ] `AGENTS.md`, `CLAUDE.md` y `project_context.md` mantienen referencias vigentes al flujo local-first y comandos `pnpm local:*`.
-- [ ] CI mantiene full verification antes de release/main y evita runs obsoletos/docs-only sin perder gates especializados.
-- [ ] Playwright/reliability verification quedan path-aware con critical paths documentados.
-- [ ] Worker deploy path filters estan auditados contra imports/runtime real o se deja rationale de no cambiarlos.
-- [ ] GitHub Actions budgets/thresholds quedan configurados o documentados con blocker externo explicito.
-- [ ] `cloud.billing.github` o una signal relacionada permite detectar spike/top workflow antes de cierre de mes.
-- [ ] Docs vivas y Handoff registran baseline before/after y riesgos residuales.
+- [x] Existe reporte reproducible de Actions por workflow/job para una ventana configurable (`pnpm actions:cost:audit`).
+- [x] Existe contrato documentado de gates (`fast`, `full`, `smoke`, `release`, `scheduled/deep`) con decision de cuando corre cada uno (`GREENHOUSE_CI_COST_SIGNAL_GUARDRAILS_V1`).
+- [x] `AGENTS.md`, `CLAUDE.md` y `project_context.md` mantienen referencias vigentes al flujo local-first y comandos `pnpm local:*`.
+- [x] CI mantiene full verification antes de release/main y evita runs obsoletos/docs-only sin perder gates especializados.
+- [x] Playwright/reliability verification quedan path-aware con critical paths documentados.
+- [x] Worker deploy path filters estan auditados contra imports/runtime real o se deja rationale de no cambiarlos.
+- [x] GitHub Actions budgets/thresholds quedan configurados o documentados con blocker externo explicito.
+- [x] `cloud.billing.github` mantiene deteccion de monthly/spike y el reporte local cubre top workflow antes de cierre de mes; persistencia workflow/job queda para TASK-859 si se requiere runtime UI.
+- [x] Docs vivas y Handoff registran baseline before/after y riesgos residuales.
 
 ## Verification
 
 - `ruby -e 'require "yaml"; Dir[".github/workflows/*.yml"].each { |f| YAML.load_file(f) }'`
 - `pnpm lint`
 - `pnpm tsc --noEmit`
-- `pnpm test`
+- `pnpm test` (focal en el script; full suite no ejecutada por proporcionalidad/costo local)
 - `pnpm task:lint --task TASK-931`
 - Workflow dry-runs / GitHub run evidence segun slices modificados.
 - Smoke con GitHub Billing reader o `gh api` para validar cifras actuales.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `TASK_ID_REGISTRY.md` refleja lifecycle/path final
-- [ ] si se cambiaron gates de release o CI, `DECISIONS_INDEX.md` y arquitectura aplicable quedaron sincronizados
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `TASK_ID_REGISTRY.md` refleja lifecycle/path final
+- [x] si se cambiaron gates de release o CI, `DECISIONS_INDEX.md` y arquitectura aplicable quedaron sincronizados
 
 ## Follow-ups
 
@@ -354,10 +354,37 @@ El contrato de gates debe optimizar por "costo por señal util":
 - Evaluar cache/artifacts avanzados si el costo dominante pasa de frecuencia a build/test time por run.
 - Si TASK-859 sigue vigente, decidir si absorbe workflow metrics persistidos o si TASK-931 cierra parte de su scope.
 
-## Delta YYYY-MM-DD
+## Delta 2026-05-24
 
-N/A — task creada 2026-05-24 como follow-up del primer guardrail `ci: reduce obsolete actions runs`.
+TASK-931 cerrada directo en `develop` por override del operador, sin cambio de rama.
+
+Entregado:
+
+- `pnpm actions:cost:audit`: script read-only via `gh api` que agrega workflow/job minutes, run counts, max duration y estimated gross USD por ventana configurable. El billing oficial sigue siendo `cloud.billing.github`/TASK-637; este reporte solo atribuye hotspots por job-min.
+- ADR/contrato `docs/architecture/GREENHOUSE_CI_COST_SIGNAL_GUARDRAILS_V1.md`: define lanes `fast feedback`, `full verification`, `e2e smoke`, `release gate` y `scheduled/deep`; `latest commit wins` aplica a PR/develop, nunca a `main`/release.
+- CI split: `.github/workflows/ci.yml` queda como fast integration con lint/typecheck/tests/build y sin coverage frecuente; `.github/workflows/ci-deep.yml` conserva coverage + observability artifacts en `main`, weekly y manual.
+- Playwright/reliability path-aware: Playwright ahora corre por critical runtime/UI/auth/admin/payroll/reliability/API paths; `reliability-verify.yml` ignora docs-only.
+- Worker deploys: no se redujeron path filters ambiguos para evitar fixes stranded; se aplico latest-only staging/develop en `ops-worker`, `commercial-cost-worker` e `ico-batch`.
+- Budgets/thresholds: Vercel envs provisionados para `production`, `staging` y `development`: `GREENHOUSE_GITHUB_BILLING_MONTHLY_WARN_USD=100`, `GREENHOUSE_GITHUB_BILLING_MONTHLY_CRITICAL_USD=150`, `GREENHOUSE_GITHUB_ACTIONS_DAILY_SPIKE_PCT=100`. GitHub Budgets API confirma budget org-level de Actions existente con `prevent_further_usage=true`, `budget_amount=0`, alertas a `cesargrowth11`; no se modifico sin aprobacion humana porque podria bloquear uso pago/release.
+
+Baseline y smoke:
+
+- GitHub Billing mayo 2026: `USD 93.18989776300002` gross total, `USD 0` net total; driver principal `actions`.
+- Smoke `pnpm actions:cost:audit --repo efeoncepro/greenhouse-eo --from 2026-05-24 --to 2026-05-24 --limit-runs 20 --format json`: 20 runs, 43 jobs, 128.45 min, estimated gross `USD 0.77`; top workflows: `CI` `USD 0.47`, `Production Release Orchestrator` `USD 0.17`, `Playwright E2E smoke` `USD 0.04`, `Ops Worker Deploy` `USD 0.04`.
+
+Validado:
+
+- `pnpm local:check` (incluye `pnpm lint` + `pnpm exec tsc --noEmit`)
+- `pnpm test scripts/ci/__tests__/github-actions-cost-audit.test.ts`
+- Ruby YAML parser sobre `.github/workflows/*.yml`
+- `pnpm task:lint --task TASK-931`
+- `git diff --check`
+
+No validado:
+
+- `pnpm test` full suite y `pnpm build` full; se uso `local:check` + tests focales por proporcionalidad.
+- Evidencia post-push de workflows nuevos porque el operador pidio permanecer en `develop` y no se hizo push. Los cambios remotos empiezan a operar despues del proximo push/merge.
 
 ## Open Questions
 
-- No bloqueantes al crear la task. Discovery debe resolver si el reporte workflow/job vive como script local, endpoint admin, reliability signal o combinacion gradual.
+- Resuelta: el reporte workflow/job vive como script local read-only en V1. Rationale: evita duplicar TASK-859 (workflow metrics persistidos/DORA/flaky detector), no agrega DB ni UI prematura y ya permite auditoria mensual reproducible.
