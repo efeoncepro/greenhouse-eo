@@ -1,3 +1,18 @@
+# Sesion 2026-05-24 — Diagnóstico de costos cloud (GCP + Actions + Vercel) — 🔨 acciones en curso
+
+**Audit**: `docs/audits/cloud-cost/CLOUD_COST_AUDIT_2026-05-24.md`. Datos reales (GCP billing en CLP ÷898; Vercel `/v1/billing/charges`; GitHub via TASK-637). Total ~$249/mo: GCP ~$132, Actions ~$93, **Vercel ~$24 (el más barato)**.
+
+**Trío instant (~$42/mo casi gratis):**
+- **Gemini Code Assist seat ~$22** — seat de `julio.reyes` ocioso (0 uso API 30d). ✅ rol IAM `cloudaicompanion.user` removido (reversible). ❌ API disable descartado: cascada a `geminicloudassist` (asistente consola GCP) — NO forzar. ⏳ verificar que el SKU diario (~$0.735/d) caiga a ~$0 en 1-2 días; si no, soltar licencia en consola. **Verificado**: Nexa/reliability/finops usan Vertex AI (`aiplatform`), NO cloudaicompanion → no afectado.
+- **Artifact Registry ~$9-13** — `gcr.io` 185GB imágenes worker viejas. Cleanup policy keep-15+>14d en **dry-run** (no borra). Script `scripts/cloud/verify-artifact-cleanup-dryrun.sh`. **TASK-932** cierra el flip a enforced (gate doble señal).
+- **Secret Manager ~$8** — 152 versiones OAuth Frame.io muertas (flujo dormido desde 2026-03-24). ✅ desactivadas 1-75 de ambos secrets (reversible, deja la 76). **TASK-933** cierra el destroy irreversible (tras grace) + fix destroy-on-rotate root-cause.
+
+**Estructural**: Cloud SQL ~$57 floor (CUD 1año ~−$15/mo si se compromete); Vertex AI ~$8.8 (trim prompts, TASK-928 empezó).
+
+**Check de mañana**: verificar billing Gemini cayó + cerrar TASK-932 (Artifact Registry enforce) + TASK-933 (Secret Manager destroy).
+
+---
+
 # Sesion 2026-05-24 — TASK-931 GitHub Actions cost guardrails — ✅ COMPLETE
 
 - **Branch:** `develop` por instruccion explicita del operador; no se crea ni cambia a `task/TASK-931-*`.

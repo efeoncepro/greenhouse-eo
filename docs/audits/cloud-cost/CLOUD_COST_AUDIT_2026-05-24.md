@@ -65,7 +65,14 @@ Procedimiento canónico GCP: dry-run → revisar logs → enforce.
 
 El **"Gemini Code Assist monthly subscription" (~$22/mo)** es el **asistente de código en el IDE** (autocomplete/chat al programar). **NO lo usa nexa ni ningún flujo de runtime.**
 
-**Oportunidad (~$22/mo):** cancelar el seat si nadie del equipo programa con Gemini en el IDE (el equipo codea con Claude Code). **Verificación operador-side** (consola GCP, es por-usuario) antes de cancelar — no rompe producción, solo quita la herramienta IDE a quien la tenga.
+**Oportunidad (~$22/mo):** cancelar el seat si nadie del equipo programa con Gemini en el IDE (el equipo codea con Claude Code).
+
+**Resolución (2026-05-24):**
+- El seat es de `julio.reyes@efeonce.org` (auto-asignado vía `EntitlementService.SelfAssignLicense` el 2026-03-24). **0 actividad del API en 30 días** → ocioso. Owner confirmó que no lo usa.
+- ✅ **Removido el rol IAM `roles/cloudaicompanion.user`** de julio.reyes (reversible). En el modelo self-serve ese rol es el grant de licencia → probablemente corta el seat. `geminidataanalytics` (Gemini BigQuery) intacto.
+- ❌ **API disable DESCARTADO**: `gcloud services disable cloudaicompanion.googleapis.com` aborta (sin `--force`) porque `geminicloudassist.googleapis.com` (asistente Gemini de la consola GCP) depende de él. Forzarlo arrastraría Cloud Assist — blast radius demasiado grande. NO forzar.
+- ⏳ **Verificación pendiente (1-2 días):** el SKU se cobra diario-prorrateado (~$0.735/día); confirmar que cae a ~$0. Si NO cae → fallback: soltar la licencia en consola (`console.cloud.google.com/gemini/code-assist` → Subscription → cancel) o desde el plugin Gemini del IDE.
+- **Crítico verificado:** Nexa Insights + reliability AI + finops-ai + hero-ai usan `aiplatform.googleapis.com` (Vertex AI), NO cloudaicompanion. 0 referencias a `cloudaicompanion` en el código del runtime. El cambio no toca producción.
 
 ---
 
@@ -108,7 +115,7 @@ Drivers (mayo): `CI` (5.157 min / 339 runs) + `Playwright` (933 min / 287 runs) 
 
 | # | Oportunidad | USD/mes | Tipo | Estado |
 |---|---|---|---|---|
-| 1 | Cancelar Gemini Code Assist seat (si no se usa) | ~$22 | Instant | ⏳ verificación operador-side |
+| 1 | Cancelar Gemini Code Assist seat (ocioso, de julio.reyes) | ~$22 | Instant | ✅ IAM removido 2026-05-24; API disable descartado (cascada a geminicloudassist); ⏳ verificar billing cae 1-2d |
 | 2 | Artifact Registry cleanup recurrente | ~$9-13 | Instant + recurrente | 🔄 dry-run activo, TASK-932 |
 | 3 | Secret Manager — limpiar tokens Frame.io muertos | ~$8 | Instant + fix root-cause | 🆕 ver §5 + §9 |
 | 4 | Cloud SQL — committed use discount 1 año | ~$15 | Estructural | decisión (compromiso) |
