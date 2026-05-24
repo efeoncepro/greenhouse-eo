@@ -44,7 +44,7 @@ export interface AiPromptContext {
   pendingBoundaries: number
 }
 
-const TOP_SIGNALS_PER_MODULE = 4
+const TOP_SIGNALS_PER_MODULE = 3
 
 const summarizeModule = (module: ReliabilityModuleSnapshot): AiPromptModuleContext => ({
   moduleKey: module.moduleKey,
@@ -119,10 +119,11 @@ Tu tarea: producir un resumen ejecutivo + observaciones por módulo.
 REGLAS DURAS:
 - Output SIEMPRE en JSON estricto siguiendo el schema. Sin texto antes/después.
 - En español neutro, sin jerga corporate. Tono operativo, factual, directo.
-- "summary" del overview entre 200 y 500 chars: arranca con UN diagnóstico ejecutivo (qué cambió, qué duele, qué está sano), luego una frase breve por cada módulo en warning/error mencionando la señal o subsistema concreto que lo disparó. NO seas telegráfico — escribe oraciones completas que un operador pueda leer sin más contexto.
-- "summary" por módulo entre 80 y 250 chars: cita la señal concreta (kind + label) que disparó el estado. Ejemplo bueno: "Notion sync falló en últimas 2 corridas (signal freshness=error). Tareas no se están actualizando hace 3h." Ejemplo malo: "Notion en warning."
-- "recommendedAction" ≤ 200 chars y SOLO se llena si hay error/warning concreto Y la acción es ejecutable (revisar tal cosa, abrir tal task, escalar a tal owner). Si no hay acción clara, dejar null.
+- "summary" del overview entre 120 y 260 chars: arranca con UN diagnóstico ejecutivo y menciona solo los módulos en warning/error más relevantes. Oraciones completas, sin relleno.
+- "summary" por módulo entre 60 y 180 chars: cita la señal concreta (kind + label) que disparó el estado. Ejemplo bueno: "Notion sync falló en últimas 2 corridas (signal freshness=error)." Ejemplo malo: "Notion en warning."
+- "recommendedAction" ≤ 140 chars y SOLO se llena si hay error/warning concreto Y la acción es ejecutable (revisar tal cosa, abrir tal task, escalar a tal owner). Si no hay acción clara, dejar null.
 - Para overviewSeverity, refleja el peor caso entre módulos. NO uses "ok" si hay aunque sea un módulo en warning.
+- "modules" incluye SOLO módulos con status warning/error/not_configured/awaiting_data/unknown. Máximo 4 entradas, ordenadas por severidad.
 - Si todos los módulos están en 'ok', el resumen ejecutivo describe el estado sano (no solo dice "todo ok") y "modules" queda como array vacío.
 - NO inventes datos. Si una señal dice "awaiting_data", reportar eso, no asumir cosas.
 - NO prometas acciones que requieran ejecución externa que no está en el contexto. Solo describe lo que ves + sugiere acción concreta auditable.

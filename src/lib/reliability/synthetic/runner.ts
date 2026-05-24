@@ -14,6 +14,7 @@ import {
   generateProbeId,
   generateSweepRunId,
   recordProbeResult,
+  recordProbeResults,
   recordSweepFinished,
   recordSweepStarted
 } from './persist'
@@ -280,16 +281,23 @@ export const runReliabilitySyntheticSweep = async ({
 
     probes.push(...chunkProbes)
 
-    await Promise.all(
-      chunkProbes.map(probe =>
-        recordProbeResult(probe).catch(error => {
-          console.warn('[reliability-synthetic] persist probe failed', {
-            probeId: probe.probeId,
-            error: (error as Error).message
+    await recordProbeResults(chunkProbes).catch(async error => {
+      console.warn('[reliability-synthetic] bulk persist probes failed; falling back to per-probe writes', {
+        count: chunkProbes.length,
+        error: (error as Error).message
+      })
+
+      await Promise.all(
+        chunkProbes.map(probe =>
+          recordProbeResult(probe).catch(probeError => {
+            console.warn('[reliability-synthetic] persist probe failed', {
+              probeId: probe.probeId,
+              error: (probeError as Error).message
+            })
           })
-        })
+        )
       )
-    )
+    })
   }
 
   const routesOk = probes.filter(p => p.ok).length

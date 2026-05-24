@@ -71,6 +71,51 @@ export const recordProbeResult = async (probe: SyntheticProbeRecord): Promise<vo
 }
 
 /**
+ * Persiste un lote de probes en una sola ronda DB. Esto evita el patrón N+1
+ * del cron synthetic (un INSERT por ruta) manteniendo la misma idempotencia
+ * por `probe_id`.
+ */
+export const recordProbeResults = async (probes: SyntheticProbeRecord[]): Promise<void> => {
+  if (probes.length === 0) return
+
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_sync.reliability_synthetic_runs (
+       probe_id, sweep_run_id, module_key, route_path,
+       http_status, ok, latency_ms, error_message,
+       triggered_by, started_at, finished_at
+     )
+     SELECT *
+     FROM UNNEST(
+       $1::text[],
+       $2::text[],
+       $3::text[],
+       $4::text[],
+       $5::int[],
+       $6::boolean[],
+       $7::int[],
+       $8::text[],
+       $9::text[],
+       $10::timestamptz[],
+       $11::timestamptz[]
+     )
+     ON CONFLICT (probe_id) DO NOTHING`,
+    [
+      probes.map(probe => probe.probeId),
+      probes.map(probe => probe.sweepRunId),
+      probes.map(probe => probe.moduleKey),
+      probes.map(probe => probe.routePath),
+      probes.map(probe => probe.httpStatus),
+      probes.map(probe => probe.ok),
+      probes.map(probe => probe.latencyMs),
+      probes.map(probe => probe.errorMessage),
+      probes.map(probe => probe.triggeredBy),
+      probes.map(probe => probe.startedAt),
+      probes.map(probe => probe.finishedAt)
+    ]
+  )
+}
+
+/**
  * Cierra el sweep en source_sync_runs con el resumen agregado.
  */
 export const recordSweepFinished = async (summary: SyntheticSweepSummary): Promise<void> => {

@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { Type } from '@google/genai'
+
 import { getGoogleGenAIClient, getGreenhouseAgentRuntimeConfig } from '@/lib/ai/google-genai'
 import { getReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
 import type { ReliabilityModuleKey, ReliabilityOverview, ReliabilitySeverity } from '@/types/reliability'
@@ -108,6 +110,50 @@ interface RunAiObserverArgs {
   force?: boolean
 }
 
+const AI_RESPONSE_SCHEMA = {
+  type: Type.OBJECT,
+  required: ['overviewSummary', 'overviewSeverity', 'modules'],
+  propertyOrdering: ['overviewSummary', 'overviewSeverity', 'modules'],
+  properties: {
+    overviewSummary: { type: Type.STRING, maxLength: '320' },
+    overviewSeverity: {
+      type: Type.STRING,
+      format: 'enum',
+      enum: ['ok', 'warning', 'error', 'unknown', 'not_configured', 'awaiting_data']
+    },
+    modules: {
+      type: Type.ARRAY,
+      maxItems: '4',
+      items: {
+        type: Type.OBJECT,
+        required: ['moduleKey', 'severity', 'summary', 'recommendedAction'],
+        propertyOrdering: ['moduleKey', 'severity', 'summary', 'recommendedAction'],
+        properties: {
+          moduleKey: {
+            type: Type.STRING,
+            format: 'enum',
+            enum: ['finance', 'integrations.notion', 'cloud', 'delivery']
+          },
+          severity: {
+            type: Type.STRING,
+            format: 'enum',
+            enum: ['ok', 'warning', 'error', 'unknown', 'not_configured', 'awaiting_data']
+          },
+          summary: { type: Type.STRING, maxLength: '220' },
+          recommendedAction: { type: Type.STRING, nullable: true, maxLength: '180' }
+        }
+      }
+    }
+  }
+} as const
+
+const BASE_GENERATION_CONFIG = {
+  temperature: 0.1,
+  responseMimeType: 'application/json',
+  responseSchema: AI_RESPONSE_SCHEMA,
+  maxOutputTokens: 2048
+} as const
+
 const stripJsonFence = (raw: string): string => {
   const trimmed = raw.trim()
 
@@ -118,9 +164,51 @@ const stripJsonFence = (raw: string): string => {
   return trimmed
 }
 
+const findBalancedJsonObject = (raw: string): string | null => {
+  const start = raw.indexOf('{')
+
+  if (start === -1) return null
+
+  let depth = 0
+  let inString = false
+  let escaped = false
+
+  for (let i = start; i < raw.length; i += 1) {
+    const char = raw[i]
+
+    if (escaped) {
+      escaped = false
+      continue
+    }
+
+    if (char === '\\') {
+      escaped = true
+      continue
+    }
+
+    if (char === '"') {
+      inString = !inString
+      continue
+    }
+
+    if (inString) continue
+
+    if (char === '{') depth += 1
+    if (char === '}') depth -= 1
+
+    if (depth === 0) return raw.slice(start, i + 1)
+  }
+
+  return null
+}
+
 const safeParseJson = (raw: string): AiOverviewResponse | null => {
   try {
-    const cleaned = stripJsonFence(raw)
+    const fenced = stripJsonFence(raw)
+    const cleaned = fenced.startsWith('{') ? fenced : findBalancedJsonObject(fenced)
+
+    if (!cleaned) return null
+
     const parsed = JSON.parse(cleaned)
 
     if (!parsed || typeof parsed !== 'object') return null
@@ -129,10 +217,8 @@ const safeParseJson = (raw: string): AiOverviewResponse | null => {
     if (!Array.isArray(parsed.modules)) return null
 
     /**
-     * Normalizar cada modulo: si la IA omite `recommendedAction` o lo deja
-     * como string vacio, lo coercemos a null. Si falta `summary` pero el
-     * modulo tiene `severity` valida, descartamos el modulo individual sin
-     * tirar toda la respuesta.
+     * Normalize each module: missing or empty `recommendedAction` becomes null.
+     * Invalid module entries are dropped without rejecting the full response.
      */
     const validModules = parsed.modules
       .filter(
@@ -154,6 +240,29 @@ const safeParseJson = (raw: string): AiOverviewResponse | null => {
   } catch {
     return null
   }
+}
+
+const describeInvalidJsonResponse = (raw: string): string => {
+  const trimmed = raw.trim()
+
+  if (trimmed.length === 0) return 'empty'
+  if (!trimmed.includes('{')) return 'no_json_object'
+  if (!findBalancedJsonObject(trimmed)) return 'unbalanced_or_truncated_json'
+
+  return 'schema_mismatch'
+}
+
+const buildRetryPrompt = (userPrompt: string, invalidReason: string): string =>
+  `${userPrompt}
+
+La respuesta anterior del modelo fue rechazada por el parser (${invalidReason}).
+Regenera SOLO el JSON valido, compacto, sin markdown, maximo 4 modulos y usando null para recommendedAction cuando no aplique.`
+
+export const __reliabilityAiRunnerInternalsForTests = {
+  safeParseJson,
+  describeInvalidJsonResponse,
+  findBalancedJsonObject,
+  AI_RESPONSE_SCHEMA
 }
 
 const buildSummary = (
@@ -210,9 +319,7 @@ export const runReliabilityAiObserver = async ({
     contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
     config: {
       systemInstruction: systemPrompt,
-      temperature: 0.1,
-      responseMimeType: 'application/json',
-      maxOutputTokens: 4096
+      ...BASE_GENERATION_CONFIG
     }
   })
 
@@ -228,29 +335,48 @@ export const runReliabilityAiObserver = async ({
     }
   }
 
-  const parsed = safeParseJson(rawText)
+  let parsed = safeParseJson(rawText)
+  let responseForUsage = response
+  let invalidJsonReason: string | null = null
 
   if (!parsed) {
-    /**
-     * Loguear el raw response truncado para auditar fallos de parser.
-     * Esto va a Cloud Logging — el sanitizer ya corrió antes de mandarlo
-     * al modelo, asi que el output deberia ser PII-safe (modulo lo que
-     * Gemini invente). Limitamos a 800 chars para no inflar logs.
-     */
-    console.error(
-      `[ai-observer] JSON parse failed — raw response (truncated 800 chars): ${rawText.slice(0, 800)}`
-    )
+    invalidJsonReason = describeInvalidJsonResponse(rawText)
+
+    const retryResponse = await client.models.generateContent({
+      model,
+      contents: [{ role: 'user', parts: [{ text: buildRetryPrompt(userPrompt, invalidJsonReason) }] }],
+      config: {
+        systemInstruction: systemPrompt,
+        ...BASE_GENERATION_CONFIG,
+        maxOutputTokens: 1536
+      }
+    })
+
+    const retryRawText = retryResponse.text?.trim()
+
+    if (retryRawText) {
+      parsed = safeParseJson(retryRawText)
+      responseForUsage = retryResponse
+      if (!parsed) invalidJsonReason = describeInvalidJsonResponse(retryRawText)
+    }
+  }
+
+  if (!parsed) {
+    console.warn('[ai-observer] JSON parse failed after schema retry', {
+      reason: invalidJsonReason ?? 'unknown',
+      initialChars: rawText.length
+    })
 
     return {
       summary: buildSummary(
         { sweepRunId, startedAt, triggeredBy, model },
-        { skippedReason: 'Gemini response was not valid JSON conforming to schema' }
+        { skippedReason: `Gemini response was not valid JSON after schema retry (${invalidJsonReason ?? 'unknown'})` }
       ),
       observations: []
     }
   }
 
-  const usage = response.usageMetadata
+  const usage = responseForUsage.usageMetadata
   const promptTokens = typeof usage?.promptTokenCount === 'number' ? usage.promptTokenCount : null
   const outputTokens = typeof usage?.candidatesTokenCount === 'number' ? usage.candidatesTokenCount : null
 

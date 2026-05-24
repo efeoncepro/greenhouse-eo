@@ -1,3 +1,34 @@
+# Sesion 2026-05-24 — Sentry weekly remediation hardening (May 15-22)
+
+**Status**: 🔨 IMPLEMENTADO LOCALMENTE, pendiente de release/deploy y verificacion Sentry 24-48h. Se aplico el plan sin parches: no sampling, no fingerprint hiding, no ignore/mute. Finance drift sigue visible.
+
+**Qué se implementó**:
+- **Reliability AI Observer**: prompts compactos + schema Gemini (`responseMimeType=application/json`, `responseSchema`, `maxOutputTokens`), parser de JSON balanceado, un unico retry de reparacion y logging acotado sin respuesta cruda. Archivos: `src/lib/reliability/ai/build-prompt.ts`, `src/lib/reliability/ai/runner.ts`, test `src/lib/reliability/ai/runner.test.ts`.
+- **Synthetic probes**: `recordProbeResults()` bulk insert por chunk con `UNNEST`, fallback per-probe si el batch falla. Archivos: `src/lib/reliability/synthetic/persist.ts`, `runner.ts`, test `persist.test.ts`.
+- **Finance ledger health**: firma deterministica de drift + tracking diario en `greenhouse_sync.source_sync_runs` (`source_system='finance_ledger_health'`). Sentry solo alerta si el drift aparece o cambia materialmente; no se oculta el estado unhealthy ni se autoclasifica contabilidad.
+
+**Sentry closeout**:
+- Auditoria versionada: `docs/audits/sentry/SENTRY_WEEKLY_REMEDIATION_AUDIT_2026-05-24.md`.
+- Intento de resolver issues stale/fixed via Sentry API con `greenhouse-sentry-incidents-auth-token` fallo para todos con `You do not have permission to perform this action`. No reintentar con credenciales improvisadas; se necesita token/identidad con permiso de resolver issues.
+- Candidatos stale/fixed quedan documentados con issue IDs. Issues activos que NO se cierran: `JAVASCRIPT-NEXTJS-4Q` finance drift y N+1 restantes.
+
+**Tasks derivadas**:
+- `TASK-928` — Reliability/Admin N+1 batching and request cache.
+- `TASK-929` — Finance ledger drift remediation control.
+
+**Validación local**:
+- `pnpm exec vitest run src/lib/reliability/ai/runner.test.ts src/lib/reliability/synthetic/persist.test.ts` → 2 files / 6 tests passing.
+- `pnpm exec tsc --noEmit` → green.
+- `pnpm lint` → green.
+- `pnpm build` → green.
+
+**Post-deploy requerido**:
+- Cloud Run logs: confirmar que desaparece el log viejo `JSON parse failed — raw response`.
+- Sentry: 24-48h sin recurrencia antes de resolver stale/fixed; performance N+1 no se resuelve hasta `TASK-928`.
+- Finance: verificar que `finance_ledger_health` escriba una fila diaria y que `JAVASCRIPT-NEXTJS-4Q` solo alerte cuando la firma cambia.
+
+---
+
 # Sesion 2026-05-24 — TASK-923 M1: Greenhouse owns OTD bucket classifier (parity, shadow) — ✅ SHIPPED
 
 **Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M1 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16. Movió el clasificador del bucket OTD (on_time/late_drop/overdue/carry_over) de Notion (`Indicador de Performance` formula → synced `performance_indicator_code`) a Greenhouse, en **modo paridad** (replica semántica cruda, sin freeze) → columna nueva `gh_otd_bucket` en `v_tasks_enriched` + `delivery_task_monthly_snapshots`, **shadow + flag `OTD_CLASSIFIER_GH_SHADOW_ENABLED` OFF**. Legacy `performance_indicator_code` + `otd_pct` + **bono INTACTOS**. Contexto crítico: nómina en ~6 días → nada toca el bono (M1 es columna nueva que nadie lee).
