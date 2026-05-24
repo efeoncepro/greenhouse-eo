@@ -44,7 +44,7 @@ export interface AiPromptContext {
   pendingBoundaries: number
 }
 
-const TOP_SIGNALS_PER_MODULE = 3
+export const TOP_SIGNALS_PER_MODULE = 3
 
 const summarizeModule = (module: ReliabilityModuleSnapshot): AiPromptModuleContext => ({
   moduleKey: module.moduleKey,
