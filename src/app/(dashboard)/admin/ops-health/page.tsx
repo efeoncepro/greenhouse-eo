@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 
 
 import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { getVercelBillingOverview } from '@/lib/cloud/vercel-billing'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
 import { readReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
@@ -31,10 +32,11 @@ export default async function Page() {
     redirect(tenant.portalHomePath)
   }
 
-  const [data, reactiveBreakdown, gcpBilling, notionOperationalOverview] = await Promise.all([
+  const [data, reactiveBreakdown, gcpBilling, vercelBilling, notionOperationalOverview] = await Promise.all([
     getOperationsOverview(),
     readReactiveProjectionBreakdown().catch(() => null),
     getGcpBillingOverview().catch(() => null),
+    getVercelBillingOverview().catch(() => null),
     getNotionSyncOperationalOverview().catch(() => null)
   ])
 
@@ -43,6 +45,7 @@ export default async function Page() {
       data={data}
       reactiveBreakdown={reactiveBreakdown}
       gcpBilling={gcpBilling}
+      vercelBilling={vercelBilling}
       notionOperationalOverview={notionOperationalOverview}
     />
   )

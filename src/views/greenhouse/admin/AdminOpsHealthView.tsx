@@ -29,6 +29,7 @@ import type {
 import type { ReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
 import type { GcpBillingOverview } from '@/types/billing-export'
 import type { IntegrationDataQualityRunResult, IntegrationDataQualityStatus } from '@/types/integration-data-quality'
+import type { VercelBillingOverview } from '@/types/vercel-billing'
 import AdminHandlerAcknowledgeButton from './AdminHandlerAcknowledgeButton'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
@@ -43,6 +44,7 @@ type Props = {
   data: OperationsOverview
   reactiveBreakdown?: ReactiveProjectionBreakdown | null
   gcpBilling?: GcpBillingOverview | null
+  vercelBilling?: VercelBillingOverview | null
   notionOperationalOverview?: NotionSyncOperationalOverview | null
 }
 
@@ -279,6 +281,7 @@ const AdminOpsHealthView = ({
   data,
   reactiveBreakdown = null,
   gcpBilling = null,
+  vercelBilling = null,
   notionOperationalOverview = null
 }: Props) => {
   const subsystems = healthSubsystems(data.subsystems)
@@ -613,10 +616,10 @@ const AdminOpsHealthView = ({
       </ExecutiveCardShell>
 
       {/* Spotlight observabilidad TASK-586: incidentes de costo cloud + sync Notion stale */}
-      {(gcpBilling || notionOperationalOverview) && (
+      {(gcpBilling || vercelBilling || notionOperationalOverview) && (
         <ExecutiveCardShell
           title='Spotlight observabilidad'
-          subtitle='Anomalías relevantes del Billing Export y del flujo Notion. La lectura completa vive en Cloud & Integrations.'
+          subtitle='Anomalías relevantes de costo cloud y del flujo Notion. La lectura completa vive en Cloud & Integrations.'
         >
           <Box
             sx={{
@@ -667,6 +670,51 @@ const AdminOpsHealthView = ({
                           {gcpBilling.spotlights.notionBqSync.share}% del total cloud.
                         </Typography>
                       )}
+                  </Stack>
+                </CardContent>
+              </Card>
+            )}
+
+            {vercelBilling && (
+              <Card variant='outlined'>
+                <CardContent sx={{ p: 3 }}>
+                  <Stack spacing={1.5}>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                      <Typography variant='subtitle2'>Vercel cost (Billing FOCUS)</Typography>
+                      <Chip
+                        size='small'
+                        color={
+                          vercelBilling.availability === 'configured'
+                            ? 'success'
+                            : vercelBilling.availability === 'awaiting_data'
+                              ? 'info'
+                              : vercelBilling.availability === 'not_configured'
+                                ? 'warning'
+                                : 'error'
+                        }
+                        label={
+                          vercelBilling.availability === 'configured'
+                            ? 'Activo'
+                            : vercelBilling.availability === 'awaiting_data'
+                              ? 'Esperando datos'
+                              : vercelBilling.availability === 'not_configured'
+                                ? 'Sin configurar'
+                                : 'Error'
+                        }
+                      />
+                    </Stack>
+                    <Typography variant='body2'>
+                      {vercelBilling.availability === 'configured'
+                        ? `Total ${vercelBilling.currency} ${formatGreenhouseNumber(Math.round(vercelBilling.totalBilledCost), 'en-US')} en ${vercelBilling.period.days} dias.`
+                        : (vercelBilling.error ?? vercelBilling.notes[0] ?? 'Vercel Billing aun no rinde datos.')}
+                    </Typography>
+                    {vercelBilling.availability === 'configured' && vercelBilling.forecast && (
+                      <Typography variant='caption' color='text.secondary'>
+                        Forecast mensual: {vercelBilling.currency}{' '}
+                        {formatGreenhouseNumber(Math.round(vercelBilling.forecast.monthEndBilledCost), 'en-US')} ·{' '}
+                        estado {vercelBilling.forecast.thresholdStatus}.
+                      </Typography>
+                    )}
                   </Stack>
                 </CardContent>
               </Card>

@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-007`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-586`
-- Branch: `task/TASK-636-vercel-billing-focus-observability`
+- Blocked by: `none` — TASK-586 está complete y el patrón GCP Billing/Reliability ya existe.
+- Branch: `develop` — override explícito del operador; no cambiar de rama.
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
@@ -77,7 +77,7 @@ Reglas obligatorias:
 
 - `project_context.md`
 - `Handoff.md`
-- `docs/tasks/in-progress/TASK-586-notion-sync-billing-observability.md`
+- `docs/tasks/complete/TASK-586-notion-sync-billing-observability.md`
 - `docs/tasks/complete/TASK-600-reliability-registry-signal-foundation.md`
 - `docs/documentation/operations/postura-cloud-gcp.md`
 
@@ -115,7 +115,7 @@ Referencias externas verificadas el `2026-04-25`:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-636-vercel-billing-focus-observability.md`
+- `docs/tasks/complete/TASK-636-vercel-billing-focus-observability.md`
 - `src/lib/cloud/vercel-billing.ts`
 - `src/lib/cloud/vercel-billing.test.ts`
 - `src/types/vercel-billing.ts`
@@ -135,12 +135,12 @@ Referencias externas verificadas el `2026-04-25`:
 ### Already exists
 
 - `TASK-600` ya entrego el `Reliability Control Plane V1` con `billing` como kind valido.
-- `TASK-586` esta en progreso y ya agrego una primera capa para GCP Billing Export:
+- `TASK-586` está complete y agregó la capa canónica para GCP Billing Export:
   - `src/lib/cloud/gcp-billing.ts`
   - `src/app/api/admin/cloud/gcp-billing/route.ts`
   - `src/types/billing-export.ts`
   - adapters `buildGcpBillingSignals` en `src/lib/reliability/signals.ts`
-- `Admin Center`, `Cloud & Integrations` y `Ops Health` ya existen como surfaces admin.
+- `Admin Center`, `Cloud & Integrations` y `Ops Health` ya existen como surfaces admin. En runtime actual, la lectura operativa de `Cloud & Integrations` vive en `/admin/integrations` con `AdminIntegrationGovernanceView`; `AdminCloudIntegrationsView` queda como referencia histórica/no entrypoint para esta implementación.
 - El repo ya tiene reglas operativas fuertes para Vercel, deployment protection, proyecto unico y variables por ambiente.
 
 ### Gap
@@ -362,6 +362,27 @@ El objetivo no es solo ver la factura, sino detectar riesgo temprano:
 - `daily_spike`: el costo de un dia supera el promedio de la ventana anterior por `GREENHOUSE_VERCEL_BILLING_DAILY_SPIKE_PCT`.
 - Si no hay baseline suficiente, rendir `awaiting_data` o summary explicito, no alerta falsa.
 
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1: reader server-side + tipos + tests de parsing/agregacion.
+- Slice 2: API admin protegida por `requireAdminTenantContext`.
+- Slice 3: adapter `cloud.billing.vercel` en Reliability Control Plane.
+- Slice 4: UI admin en Cloud & Integrations, Ops Health y Admin Center source injection.
+- Slice 5: docs/env/lifecycle/verificacion.
+
+No hay migracion ni backfill. La capacidad queda activa en codigo, pero degrada a `not_configured` hasta provisionar `GREENHOUSE_VERCEL_API_TOKEN(_SECRET_REF)` y team scope.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Token Vercel sin permiso de Billing API | cloud / reliability | medium | `resolveSecret` server-only, errores 401/403 sanitizados, estado `error` | `cloud.billing.vercel` |
+| Env vars faltantes en Vercel runtime | cloud / admin UI | high hasta provisionamiento | Estado `not_configured`, notas accionables, no costo cero sano | `cloud.billing.vercel` |
+| Thresholds inventados generen falso healthy | FinOps / reliability | low | Umbrales env-only; ausencia = `unconfigured` | `cloud.billing.vercel.forecast` solo si cruza umbral configurado |
+| API FOCUS cambia shape o JSONL invalido | cloud / admin API | low | Parser JSONL defensivo + tests + error operacional sin token/raw payload | `cloud.billing.vercel` |
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      "Como compruebo que termine y que actualizo?"
@@ -371,35 +392,39 @@ El objetivo no es solo ver la factura, sino detectar riesgo temprano:
 
 ## Acceptance Criteria
 
-- [ ] Existe reader server-side para Vercel Billing FOCUS JSONL con tests unitarios de parsing/agregacion.
-- [ ] Existe `GET /api/admin/cloud/vercel-billing` protegido por admin tenant context.
-- [ ] La UI admin muestra costo Vercel, forecast, top service/proyecto y estado de configuracion.
-- [ ] Reliability expone una senal `cloud.billing.vercel` con severidad basada en configuracion, API health y thresholds.
-- [ ] La ausencia de token/team o datos no se representa como gasto cero sano.
-- [ ] `.env.example`, `project_context.md`, `changelog.md` y documentacion funcional quedan actualizados.
-- [ ] La task documenta claramente si V1 sigue read-only o si Discovery justifico persistencia.
+- [x] Existe reader server-side para Vercel Billing FOCUS JSONL con tests unitarios de parsing/agregacion.
+- [x] Existe `GET /api/admin/cloud/vercel-billing` protegido por admin tenant context.
+- [x] La UI admin muestra costo Vercel, forecast, top service/proyecto y estado de configuracion.
+- [x] Reliability expone una senal `cloud.billing.vercel` con severidad basada en configuracion, API health y thresholds.
+- [x] La ausencia de token/team o datos no se representa como gasto cero sano.
+- [x] `.env.example`, `project_context.md`, `changelog.md` y documentacion funcional quedan actualizados.
+- [x] La task documenta claramente si V1 sigue read-only o si Discovery justifico persistencia.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test -- src/lib/cloud/vercel-billing.test.ts`
-- `pnpm test -- src/lib/reliability`
-- Smoke manual con token real en ambiente seguro:
+- [x] `pnpm lint`
+- [x] `pnpm tsc --noEmit`
+- [x] `pnpm exec vitest run src/lib/cloud/vercel-billing.test.ts`
+- [x] `pnpm exec vitest run src/lib/cloud/vercel-billing.test.ts src/lib/reliability`
+- [x] `pnpm design:lint`
+- [x] `pnpm build`
+- [ ] Smoke manual con token real en ambiente seguro:
   - `vercel usage --format json`
   - request autenticado a `/api/admin/cloud/vercel-billing`
-- Validacion visual/manual de `Cloud & Integrations` y `Ops Health` si se modifica UI.
+- [ ] Validacion visual/manual de `Cloud & Integrations` y `Ops Health` con datos reales.
+
+No validado: smoke con token real y validacion visual con cargos Vercel reales. Discovery verifico con `vercel env ls --scope efeonce-7670142f` que no existen env vars `GREENHOUSE_VERCEL_*` configuradas todavia, por lo que el runtime real debe degradar a `not_configured` hasta provisionarlas.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] se reviso que `TASK-586` no tenga conflictos de ownership en archivos de reliability/admin billing
-- [ ] si se agregaron env vars, quedaron documentadas con proposito, entornos y formato
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] se reviso que `TASK-586` no tenga conflictos de ownership en archivos de reliability/admin billing
+- [x] si se agregaron env vars, quedaron documentadas con proposito, entornos y formato
 
 ## Follow-ups
 
@@ -410,6 +435,13 @@ El objetivo no es solo ver la factura, sino detectar riesgo temprano:
 
 ## Open Questions
 
-- Definir los thresholds iniciales concretos para `warn` y `critical` segun presupuesto operativo real.
-- Confirmar si el team Vercel canónico se identifica mejor por `teamId` o `slug` en los ambientes de Greenhouse.
-- Confirmar si el token Vercel disponible tiene permisos de Billing/Usage suficientes sin elevarlo a owner innecesariamente.
+- Resuelta: no se definieron thresholds inventados. V1 deja `GREENHOUSE_VERCEL_BILLING_MONTHLY_WARN_USD`, `GREENHOUSE_VERCEL_BILLING_MONTHLY_CRITICAL_USD` y `GREENHOUSE_VERCEL_BILLING_DAILY_SPIKE_PCT` como env vars opcionales; si faltan, `thresholdStatus='unconfigured'`.
+- Resuelta: el team Vercel canonico se identifica por `GREENHOUSE_VERCEL_TEAM_ID=team_gmNiF4YCHmc1wqsHUTCvqjmN` preferido y `GREENHOUSE_VERCEL_TEAM_SLUG=efeonce-7670142f` como fallback, verificado por Vercel CLI.
+- Resuelta parcialmente: no hay token `GREENHOUSE_VERCEL_API_TOKEN(_SECRET_REF)` provisionado aun. La implementacion usa el resolver canonico de secretos y reporta 401/403 como `error` operacional sin exponer tokens; la validacion de permisos queda para el smoke post-provisionamiento.
+
+## Implementation Notes
+
+- V1 sigue read-only y sin persistencia PostgreSQL.
+- Reusa el patron `getGcpBillingOverview`/`buildGcpBillingSignals` de TASK-586, pero separa el signal como `cloud.billing.vercel` para no colapsar fuentes cloud.
+- Access model: `routeGroups=admin`; views reutilizadas `administracion.admin_center`, `administracion.cloud_integrations`, `administracion.ops_health`; entitlements nuevos no aplican en V1; startup policy sin cambios.
+- No se agrego `@vercel/sdk`; el contrato JSONL FOCUS se consume con `fetch` server-side.

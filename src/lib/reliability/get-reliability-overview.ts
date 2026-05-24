@@ -3,6 +3,7 @@ import 'server-only'
 import type { CloudSentryIncidentsSnapshot } from '@/lib/cloud/contracts'
 import { getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { getVercelBillingOverview } from '@/lib/cloud/vercel-billing'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import {
@@ -23,6 +24,7 @@ import type {
   ReliabilitySignalKind
 } from '@/types/reliability'
 import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
+import type { VercelBillingOverview } from '@/types/vercel-billing'
 
 import { buildAiSummarySignals } from './ai/build-ai-summary-signals'
 import { getLatestAiObservationsByScope, type AiObservation } from './ai/reader'
@@ -154,6 +156,7 @@ import {
   buildDomainIncidentSignals,
   buildFinanceSmokeLaneSignals,
   buildGcpBillingSignals,
+  buildVercelBillingSignals,
   buildNotionDataQualitySignals,
   buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
@@ -178,6 +181,14 @@ const RELIABILITY_INTEGRATION_BOUNDARIES: ReliabilityIntegrationBoundary[] = [
     expectedSource: 'getGcpBillingOverview',
     status: 'ready',
     note: 'TASK-586 entregó el reader Billing Export con degradación honesta (awaiting_data cuando tablas no rinden). Adapter: buildGcpBillingSignals.'
+  },
+  {
+    taskId: 'TASK-636',
+    moduleKey: 'cloud',
+    expectedSignalKind: 'billing',
+    expectedSource: 'getVercelBillingOverview',
+    status: 'ready',
+    note: 'TASK-636 agrega Vercel Billing FOCUS v1.3 read-only con degradación honesta y adapter buildVercelBillingSignals.'
   },
   {
     taskId: 'TASK-586',
@@ -332,6 +343,7 @@ const sortSignalsForDisplay = (signals: ReliabilitySignal[]): ReliabilitySignal[
 
 interface ReliabilityOverviewSources {
   billing?: GcpBillingOverview | null
+  vercelBilling?: VercelBillingOverview | null
   notionOperational?: NotionSyncOperationalOverview | null
   syntheticSnapshots?: SyntheticRouteSnapshot[] | null
   financeSmokeLane?: FinanceSmokeLaneStatus | null
@@ -710,6 +722,7 @@ export const buildReliabilityOverview = (
     buildObservabilityPostureSignal(operations.cloud.observability.posture),
     ...buildNotionDataQualitySignals(operations.notionDeliveryDataQuality ?? null),
     ...(sources.billing ? buildGcpBillingSignals(sources.billing) : []),
+    ...(sources.vercelBilling ? buildVercelBillingSignals(sources.vercelBilling) : []),
     ...(sources.notionOperational ? [buildNotionFreshnessSignal(sources.notionOperational)] : []),
     ...buildSyntheticRouteSignals(syntheticSnapshots),
     ...buildSyntheticModuleSignals(syntheticSnapshots),
@@ -925,6 +938,11 @@ export const getReliabilityOverview = async (
     preloadedSources.billing !== undefined
       ? preloadedSources.billing
       : await getGcpBillingOverview().catch(() => null)
+
+  const vercelBilling =
+    preloadedSources.vercelBilling !== undefined
+      ? preloadedSources.vercelBilling
+      : await getVercelBillingOverview().catch(() => null)
 
   const notionOperational =
     preloadedSources.notionOperational !== undefined
@@ -1435,6 +1453,7 @@ export const getReliabilityOverview = async (
 
   return buildReliabilityOverview(operations, {
     billing,
+    vercelBilling,
     notionOperational,
     syntheticSnapshots,
     financeSmokeLane,

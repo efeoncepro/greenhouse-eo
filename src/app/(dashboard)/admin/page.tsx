@@ -4,6 +4,7 @@ import AdminCenterView from '@/views/greenhouse/admin/AdminCenterView'
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { getAdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { getVercelBillingOverview } from '@/lib/cloud/vercel-billing'
 import { getInternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
@@ -42,6 +43,7 @@ export default async function Page() {
     controlTower,
     operations,
     billing,
+    vercelBilling,
     notionOperational,
     syntheticSnapshots,
     syntheticSweep,
@@ -53,6 +55,7 @@ export default async function Page() {
     getInternalDashboardOverview(),
     getOperationsOverview(),
     getGcpBillingOverview().catch(() => null),
+    getVercelBillingOverview().catch(() => null),
     getNotionSyncOperationalOverview().catch(() => null),
     getLatestSyntheticSnapshotsByRoute().catch(() => []),
     getLatestSweepRun().catch(() => null),
@@ -70,6 +73,7 @@ export default async function Page() {
 
   const reliability = await getReliabilityOverview(operations, {
     billing,
+    vercelBilling,
     notionOperational,
     syntheticSnapshots,
     modules: reliabilityModules,

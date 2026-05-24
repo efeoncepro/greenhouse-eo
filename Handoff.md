@@ -1,3 +1,25 @@
+# Sesion 2026-05-24 — TASK-636 Vercel Billing FOCUS Observability — ✅ COMPLETE
+
+**Status**: ✅ COMPLETE directo en `develop` por instrucción explícita del operador (sin branch switch). Discovery/Audit/Plan completados antes de implementar.
+
+**Decisiones cerradas antes de FASE 1**:
+- TASK-586 ya está `complete`, aunque TASK-636 la marcaba como blocker; se corrigió la task y se reutiliza el patrón existente de GCP Billing + Reliability.
+- V1 será read-only/API-driven sin persistencia PostgreSQL: no hay migraciones ni cambios de schema.
+- Team Vercel runtime verificado por CLI: `team_gmNiF4YCHmc1wqsHUTCvqjmN` (scope `efeonce-7670142f`) y proyecto `greenhouse-eo`. No existen env vars `GREENHOUSE_VERCEL_*` configuradas todavía.
+- Guardrails de costo no inventan presupuesto: `GREENHOUSE_VERCEL_BILLING_MONTHLY_WARN_USD`, `GREENHOUSE_VERCEL_BILLING_MONTHLY_CRITICAL_USD` y `GREENHOUSE_VERCEL_BILLING_DAILY_SPIKE_PCT` son opcionales; si faltan, el estado queda `unconfigured`, no “healthy”.
+- Access model: `routeGroups=admin`; views reutilizadas `administracion.admin_center`, `administracion.cloud_integrations`, `administracion.ops_health`; sin entitlements nuevos V1; startup policy sin cambios.
+
+**Entregado**:
+- Reader server-side `src/lib/cloud/vercel-billing.ts` + tipos `src/types/vercel-billing.ts` + tests de parsing/agregacion/error/not_configured.
+- API admin `GET /api/admin/cloud/vercel-billing` protegida por `requireAdminTenantContext`.
+- Signal reliability `cloud.billing.vercel` con severidad por config/API/thresholds/spike.
+- UI: `VercelBillingCard` en `/admin/integrations`, spotlight en `/admin/ops-health`, y Admin Center inyecta el source en `getReliabilityOverview`.
+- Docs/env: `.env.example`, `project_context.md`, `changelog.md`, doc funcional FinOps y task lifecycle movida a `complete`.
+
+**Validación**: `pnpm exec vitest run src/lib/cloud/vercel-billing.test.ts`; `pnpm exec vitest run src/lib/cloud/vercel-billing.test.ts src/lib/reliability` (42 passed, 2 skipped; 331 tests passed, 4 skipped); `pnpm lint`; `pnpm exec tsc --noEmit`; `pnpm design:lint`; `pnpm build`.
+
+**No validado**: smoke con token real/request autenticado y visual con cargos reales porque `vercel env ls --scope efeonce-7670142f` no muestra env vars `GREENHOUSE_VERCEL_*`; runtime esperado hasta provisionarlas: `not_configured`.
+
 # Sesion 2026-05-24 — RELEASE develop→main (43 commits) — ✅ RELEASED
 
 **Status**: ✅ Producción promovida vía orchestrator canónico (skill `greenhouse-production-release`). Manifest **`released`**.

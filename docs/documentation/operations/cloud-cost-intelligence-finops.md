@@ -1,16 +1,16 @@
 # Cloud Cost Intelligence y Copiloto FinOps
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-03 por Codex
 > **Modulo:** operaciones / cloud / FinOps
 > **Ruta en portal:** `/admin/integrations`
 > **Arquitectura relacionada:** [GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1](../../architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md), [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1](../../architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md)
-> **Task relacionada:** [TASK-769](../../tasks/complete/TASK-769-cloud-cost-intelligence-ai-finops-copilot.md)
+> **Task relacionada:** [TASK-769](../../tasks/complete/TASK-769-cloud-cost-intelligence-ai-finops-copilot.md), [TASK-636](../../tasks/complete/TASK-636-vercel-billing-focus-observability.md)
 
 ## Para que sirve
 
-Cloud Cost Intelligence permite mirar los costos de Google Cloud desde Greenhouse sin depender de entrar a GCP Console para entender lo basico.
+Cloud Cost Intelligence permite mirar los costos de Google Cloud y Vercel desde Greenhouse sin depender de entrar a cada consola para entender lo basico.
 
 La capacidad responde tres preguntas operativas:
 
@@ -18,11 +18,11 @@ La capacidad responde tres preguntas operativas:
 - que servicio, recurso o SKU explica el gasto
 - que conviene revisar primero para evitar que la cuenta siga subiendo
 
-La capa se apoya en `Billing Export` de Google Cloud hacia BigQuery. Greenhouse no reemplaza la factura oficial de GCP ni modifica budgets desde el portal; interpreta datos exportados para hacerlos accionables dentro del flujo operativo.
+La capa se apoya en `Billing Export` de Google Cloud hacia BigQuery y en la API oficial de Vercel Billing FOCUS (`/v1/billing/charges`) para Vercel. Greenhouse no reemplaza facturas oficiales ni modifica budgets desde el portal; interpreta datos exportados o leidos por API para hacerlos accionables dentro del flujo operativo.
 
 ## Que muestra Greenhouse
 
-En `/admin/integrations`, la tarjeta de costo cloud muestra:
+En `/admin/integrations`, las tarjetas de costo cloud muestran:
 
 - total del periodo observado
 - moneda reportada por Billing Export
@@ -32,8 +32,9 @@ En `/admin/integrations`, la tarjeta de costo cloud muestra:
 - recursos y SKUs que explican el gasto
 - alertas tempranas cuando un driver cruza umbral
 - ultima observacion del Copiloto FinOps AI, si existe
+- costo Vercel observado, forecast mensual, top servicios/proyectos y spike diario cuando la API Billing FOCUS esta configurada
 
-El dato puede tener latencia natural de Billing Export. Por eso Greenhouse muestra el ultimo dia de uso detectado y no asume que el dia actual esta completo.
+El dato puede tener latencia natural de Billing Export o del feed FOCUS. Por eso Greenhouse muestra el ultimo dia de uso detectado y no asume que el dia actual esta completo.
 
 ## Como se calculan los drivers
 
@@ -57,6 +58,31 @@ El forecast es deterministico y esta pensado para ser conservador:
 - si no hay suficientes datos, baja la confianza y lo declara
 
 Esto puede diferir de la proyeccion que muestra GCP Console, porque Google puede usar reglas propietarias o datos internos no expuestos igual en Billing Export. La lectura de Greenhouse debe tratarse como una explicacion operativa y reproducible, no como reemplazo de la factura.
+
+## Vercel Billing FOCUS
+
+Vercel se lee en modo read-only con token API institucional. La V1 no persiste cargos en PostgreSQL y no agrega dependencias nuevas: usa `fetch` server-side contra `/v1/billing/charges`, que retorna JSONL FOCUS v1.3.
+
+Variables runtime:
+
+```text
+GREENHOUSE_VERCEL_API_TOKEN_SECRET_REF=greenhouse-vercel-api-token
+GREENHOUSE_VERCEL_TEAM_ID=team_gmNiF4YCHmc1wqsHUTCvqjmN
+GREENHOUSE_VERCEL_TEAM_SLUG=efeonce-7670142f
+GREENHOUSE_VERCEL_BILLING_MONTHLY_WARN_USD=
+GREENHOUSE_VERCEL_BILLING_MONTHLY_CRITICAL_USD=
+GREENHOUSE_VERCEL_BILLING_DAILY_SPIKE_PCT=
+```
+
+`GREENHOUSE_VERCEL_TEAM_ID` es preferido; `GREENHOUSE_VERCEL_TEAM_SLUG` queda como fallback. Si faltan token o team, el portal muestra `not_configured`. Si faltan umbrales, el forecast queda informativo (`unconfigured`) en lugar de inventar un presupuesto sano.
+
+La senal reliability canonical es `cloud.billing.vercel`. Puede quedar:
+
+- `ok`: costo configurado y dentro de umbrales definidos.
+- `warning`: forecast o spike cruza warning.
+- `error`: token sin permiso, API falla o forecast/spike cruza nivel critico.
+- `not_configured`: faltan token/team.
+- `awaiting_data`: la API respondio sin cargos para el rango observado.
 
 ## Alertas tempranas
 
@@ -112,9 +138,17 @@ Vive en GCP Console:
 - permisos IAM de billing
 - pricing catalog oficial
 
+Vive en Vercel:
+
+- factura oficial
+- permisos del token de Billing API
+- pricing y commitments oficiales
+- budgets/alerts nativos de Vercel si el equipo decide configurarlos fuera del portal
+
 Vive en Greenhouse:
 
 - lectura operativa de Billing Export
+- lectura operativa de Vercel Billing FOCUS
 - drivers deterministicos
 - forecast explicable
 - proyeccion a Reliability Control Plane
@@ -135,7 +169,7 @@ Al 2026-05-03, Greenhouse verifico:
 
 ## Limitaciones conocidas
 
-- La lectura depende de que Billing Export siga poblando BigQuery.
+- La lectura depende de que Billing Export siga poblando BigQuery y de que el token Vercel tenga acceso a Billing API.
 - La latencia natural puede hacer que el dia actual este incompleto.
 - La proyeccion puede diferir de GCP Console.
 - La capa AI requiere Vertex AI/configuracion runtime y esta apagada por defecto.
@@ -144,8 +178,11 @@ Al 2026-05-03, Greenhouse verifico:
 ## Referencias tecnicas
 
 - Reader: `src/lib/cloud/gcp-billing.ts`
+- Reader Vercel: `src/lib/cloud/vercel-billing.ts`
 - Tipos: `src/types/billing-export.ts`
+- Tipos Vercel: `src/types/vercel-billing.ts`
 - UI: `src/components/greenhouse/admin/GcpBillingCard.tsx`
+- UI Vercel: `src/components/greenhouse/admin/VercelBillingCard.tsx`
 - Alert sweep: `src/lib/cloud/gcp-billing-alerts.ts`
 - Copiloto AI: `src/lib/cloud/finops-ai/`
 - ops-worker: `services/ops-worker/server.ts`
