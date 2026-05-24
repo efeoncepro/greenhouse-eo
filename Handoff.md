@@ -1,3 +1,18 @@
+# Sesion 2026-05-24 — Local-first development workflow — ✅ OPERATING MODEL
+
+**Status**: ✅ Implementado como contrato documental + scripts locales. Objetivo: evitar que cada flujo de agente gaste GitHub Actions/Vercel/GCP antes de que el cambio este listo.
+
+**Nuevo contrato**: `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md` define `local = taller`, `branch/PR = validacion remota acotada`, `develop = integracion compartida`, `main = produccion`. Agentes deben iterar y validar localmente, levantar `pnpm dev` para UI visible y esperar confirmacion humana antes de push remoto salvo instruccion explicita/hotfix/release.
+
+**Scripts nuevos**:
+- `pnpm local:check` → `pnpm lint` + `pnpm exec tsc --noEmit`.
+- `pnpm local:check:ui` → `local:check` + `pnpm design:lint` + `pnpm build`.
+- `pnpm local:check:full` → `local:check` + `pnpm test` + `pnpm build`.
+
+**Enforcement real**: `.husky/pre-push` ahora ejecuta `pnpm local:check`, por lo que el minimo local-first queda bloqueante antes de cualquier push normal. `local:check:ui/full` quedan como gates proporcionales por riesgo en el operating model; no se fuerzan en cada push para evitar friccion excesiva.
+
+**Docs sincronizadas**: `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `changelog.md` y `TASK-931` referencian el flujo local-first.
+
 # Sesion 2026-05-24 — GitHub Actions cost guardrail — ✅ SAFE SLICE
 
 **Status**: ✅ Implementado en `develop` como primer slice conservador tras auditoria live de billing/runs. No reduce el set de checks del ultimo commit de codigo; reduce trabajo obsoleto y docs-only.

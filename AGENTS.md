@@ -44,6 +44,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 - Copy visible: antes de escribir labels, CTAs, empty states, alerts, tooltips, aria-labels o mensajes, buscar/crear la entrada en la capa canonica. `src/lib/copy/*` guarda microcopy funcional y copy reutilizable por dominio; `src/config/greenhouse-nomenclature.ts` guarda solo nomenclatura de producto, navegacion y labels institucionales. No hardcodear copy reusable en JSX.
 - Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
 - Reutilizar antes de crear: buscar helpers, readers, components, routes, signals, capabilities y docs existentes antes de introducir piezas nuevas.
+- Desarrollo local-first: por defecto, los agentes iteran y validan en local antes de gastar GitHub Actions/Vercel/GCP. Usar `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`; no hacer push a `develop` o ramas remotas como cierre automatico sin confirmacion humana, salvo instruccion explicita o hotfix/release documentado.
 - Aislamiento multi-agente: no cambiar la rama de un checkout donde otra persona/agente trabaja; usar `git worktree` y documentar coordinacion en `Handoff.md`.
 - Skills y subagentes: usar skills cuando el dominio matchee y subagentes solo para trabajo paralelo independiente con ownership claro. No delegar el bloqueo inmediato del hilo principal.
 - Seguridad runtime: no improvisar credenciales, pools, env vars, access paths, bypasses, raw errors ni acciones destructivas. Usar los CLIs autenticados con guardrails.
@@ -241,6 +242,12 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 
 - `main` es solo para codigo listo para produccion.
 - `develop` debe funcionar como rama de integracion y rama asociada a `Staging` en Vercel.
+- **Local-first obligatorio por defecto:** `local = taller`, `develop = integracion`, `main = produccion`. Antes de pedir o ejecutar push remoto, validar localmente con el comando proporcional:
+  - `pnpm local:check` para cambios de codigo normales (`lint` + `tsc`).
+  - `pnpm local:check:ui` para UI/rutas/frontend visible (`lint` + `tsc` + `design:lint` + `build`).
+  - `pnpm local:check:full` para shared runtime, cloud, billing, auth, finance/payroll, CI/release o alto blast radius (`lint` + `tsc` + tests + `build`).
+- Si el cambio toca UI visible, levantar `pnpm dev` y entregar la URL `localhost` exacta para revision antes de push, salvo que el usuario pida explicitamente preview remoto.
+- No usar `develop`, Vercel Preview o GitHub Actions como loop de exploracion si el cambio puede validarse en local. Push remoto requiere confirmacion humana o instruccion explicita.
 - Todo trabajo de agentes debe salir desde rama propia salvo cambios minimos de emergencia.
 - Si varios agentes trabajan en paralelo, cada uno debe usar rama propia y, cuando compartan máquina/workspace físico, worktree propio para no alterar el branch visible del otro agente.
 - Formato recomendado de ramas:
@@ -265,7 +272,7 @@ Desde 2026-05-05 el repo tiene 2 git hooks instalados que se activan automaticam
 | Hook | Que corre | Que bloquea | Latencia |
 | --- | --- | --- | --- |
 | **`.husky/pre-commit`** | `pnpm exec lint-staged` → `eslint --fix --cache` sobre archivos staged | Errores no auto-fixable | < 5s |
-| **`.husky/pre-push`** | `pnpm lint` (full repo) + `pnpm exec tsc --noEmit` | Cualquier 1+ error de lint o tsc | < 90s |
+| **`.husky/pre-push`** | `pnpm local:check` (`pnpm lint` full repo + `pnpm exec tsc --noEmit`) | Cualquier 1+ error de lint o tsc | < 90s |
 
 **Reglas duras** (multi-agente):
 

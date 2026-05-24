@@ -32,7 +32,7 @@ Causa raiz no era "los agentes no saben programar". Era que los agentes NO corri
 ┌────────────────────────────────────────────────────────────┐
 │  Layer 2 — pre-push hook (.husky/pre-push)                 │
 │  Trigger: git push                                          │
-│  Runs:    pnpm lint (full repo) + pnpm exec tsc --noEmit  │
+│  Runs:    pnpm local:check (lint full + tsc --noEmit)     │
 │  Blocks:  cualquier 1+ error de lint o tsc                 │
 │  Latency: < 90s (tsc --incremental cache)                  │
 │  Scope:   repo COMPLETO (no solo staged)                   │
@@ -57,7 +57,7 @@ Causa raiz no era "los agentes no saben programar". Era que los agentes NO corri
 | File | Purpose |
 | --- | --- |
 | `.husky/pre-commit` | Shell script que invoca `pnpm exec lint-staged` |
-| `.husky/pre-push` | Shell script que corre `pnpm lint` + `pnpm tsc --noEmit` |
+| `.husky/pre-push` | Shell script que corre `pnpm local:check` (`pnpm lint` + `pnpm exec tsc --noEmit`) |
 | `package.json` → `"prepare": "husky"` | Script lifecycle de npm/pnpm que activa los hooks al `pnpm install` |
 | `package.json` → `"lint-staged"` block | Config glob → comandos por extension |
 | `node_modules/.cache/eslint-staged/` | Cache local de eslint para latencia minima (gitignored) |
@@ -89,16 +89,13 @@ Idempotent. Si lint-staged sale con exit 0, commit procede. Si exit ≠ 0, commi
 #!/usr/bin/env sh
 set -e
 
-echo "[pre-push] Running pnpm lint (full repo)…"
-pnpm lint
-
-echo "[pre-push] Running pnpm tsc --noEmit…"
-pnpm exec tsc --noEmit
+echo "[pre-push] Running pnpm local:check (lint + tsc)…"
+pnpm local:check
 
 echo "[pre-push] OK — pushing."
 ```
 
-`set -e` aborta el hook al primer comando que falle. Sin `set -e`, un lint error con tsc clean dejaria pasar el push (incorrecto).
+`set -e` aborta el hook si `pnpm local:check` falla. `local:check` es el comando local-first canonico para el minimo pre-push: `pnpm lint` + `pnpm exec tsc --noEmit`.
 
 ### Activation lifecycle
 

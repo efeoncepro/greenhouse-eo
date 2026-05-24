@@ -65,6 +65,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`
 - `docs/architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md`
 - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`
+- `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
 
 Reglas obligatorias:
 
@@ -81,6 +82,7 @@ Reglas obligatorias:
 - `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
 - `docs/architecture/DECISIONS_INDEX.md`
 - `docs/documentation/operations/cloud-cost-intelligence-finops.md`
+- `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
 - GitHub Docs oficiales para Billing/Usage, runner pricing, workflow syntax, concurrency, path filters y budgets (revalidar al ejecutar; pricing cambia).
 
 ## Dependencies & Impact
@@ -114,6 +116,11 @@ Reglas obligatorias:
 - `src/lib/reliability/signals.ts`
 - `src/lib/reliability/get-reliability-overview.ts`
 - `scripts/`
+- `package.json`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `project_context.md`
+- `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
 - `docs/documentation/operations/cloud-cost-intelligence-finops.md`
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`
 - `docs/architecture/GREENHOUSE_GIT_HOOKS_AUTOENFORCEMENT_V1.md`
@@ -130,6 +137,7 @@ Reglas obligatorias:
 - `.github/workflows/playwright.yml` ejecuta smoke e2e en `push` a `develop`.
 - `task-contract.yml` y `design-contract.yml` cubren subconjuntos documentales especificos.
 - `reliability-verify.yml` puede mapear cambios a smoke specs por modulo.
+- `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md` define el plano humano/agente: iterar en local, validar con `pnpm local:*`, revisar localhost para UI y esperar confirmacion antes de push remoto.
 - Primer safe slice ya aplicado: `CI` cancela runs obsoletos en PR/develop y `CI`/`Playwright` ignoran docs-only.
 
 ### Gap
@@ -177,6 +185,7 @@ Reglas obligatorias:
   - `scheduled/deep`: coverage/build/e2e ampliado cuando no bloquea iteracion.
 - Declarar explicitamente que "latest commit wins" aplica a PR/develop, no a `main`.
 - Indexar ADR si emerge decision nueva en `docs/architecture/DECISIONS_INDEX.md`.
+- Alinear el contrato remoto con `LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`: CI remoto es integracion/release, no loop de exploracion.
 
 ### Slice 3 — CI split sin perdida de señal
 
@@ -310,6 +319,7 @@ El contrato de gates debe optimizar por "costo por señal util":
 
 - [ ] Existe reporte reproducible de Actions por workflow/job para una ventana configurable.
 - [ ] Existe contrato documentado de gates (`fast`, `full`, `smoke`, `release`, `scheduled/deep`) con decision de cuando corre cada uno.
+- [ ] `AGENTS.md`, `CLAUDE.md` y `project_context.md` mantienen referencias vigentes al flujo local-first y comandos `pnpm local:*`.
 - [ ] CI mantiene full verification antes de release/main y evita runs obsoletos/docs-only sin perder gates especializados.
 - [ ] Playwright/reliability verification quedan path-aware con critical paths documentados.
 - [ ] Worker deploy path filters estan auditados contra imports/runtime real o se deja rationale de no cambiarlos.

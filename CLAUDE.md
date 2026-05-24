@@ -45,6 +45,33 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - **Staging** → `develop` (Custom Environment) → `dev-greenhouse.efeoncepro.com`
 - **Preview** → ramas `feature/*`, `fix/*`, `hotfix/*`
 
+### Local-First Development Workflow
+
+**Spec canonica:** `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`.
+
+Regla base: `local = taller`, `branch/PR = validacion remota acotada`, `develop = integracion compartida`, `main = produccion via release control plane`.
+
+Para reducir costo GitHub Actions/Vercel/GCP sin perder calidad, Claude/agents deben iterar y validar en local por defecto. No hacer push remoto como cierre automatico de cada flujo salvo instruccion explicita del operador, hotfix documentado o release controlado.
+
+Comandos canonicos:
+
+```bash
+pnpm local:check       # lint + tsc
+pnpm local:check:ui    # local:check + design:lint + build
+pnpm local:check:full  # local:check + test + build
+```
+
+Si el cambio toca UI visible, levantar `pnpm dev` y entregar la URL `localhost` exacta antes de pedir push. No usar Vercel Preview como loop de exploracion si localhost puede validar el cambio.
+
+Prompt operativo recomendado:
+
+```text
+Implementa esto local-first. No hagas push.
+Trabaja slice por slice, valida con pnpm local:check y tests focales.
+Si toca UI, levanta pnpm dev y dame la URL localhost exacta.
+Espera mi confirmacion antes de empujar a develop o crear preview remoto.
+```
+
 ### Vercel Deployment Protection
 
 - **SSO habilitada** (`deploymentType: "all_except_custom_domains"`) — protege TODO salvo custom domains de Production.
@@ -4654,7 +4681,7 @@ automaticamente al `pnpm install`):
 - **`.husky/pre-commit`**: corre `pnpm exec lint-staged` → `eslint --fix` sobre
   archivos staged. Errores auto-fixable se aplican; errores no-fixable bloquean
   el commit. Latencia tipica < 5s (cache eslint en `node_modules/.cache/eslint-staged`).
-- **`.husky/pre-push`**: corre `pnpm lint` (full repo) + `pnpm exec tsc --noEmit`.
+- **`.husky/pre-push`**: corre `pnpm local:check` (`pnpm lint` full repo + `pnpm exec tsc --noEmit`).
   Bloquea push si hay 1+ error. Latencia tipica < 90s. Defense in depth sobre
   pre-commit (cubre archivos NO staged que otro agente pudo dejar rotos).
 
