@@ -109,6 +109,15 @@ Reglas obligatorias:
 
 Slices: 1 `classifyOtdBucket applyMonthGate` (26 tests) · 2 `calculateAttributableLateness` helper (16 tests) · 3 migration shadow table + flag · 4 consumer `notion_attributable_lateness_compute` (11 tests) · 5 2 signals · 6 docs. Reusa: `classifyOtdBucket` (M1), patrón cycle-time (intervalos), patrón RpA V2 (consumer+snapshot), `RESCHEDULE_REASON_CODES` (M0). Flag OFF → bono intacto. Test pre-existente roto en develop `ai/build-prompt.test.ts` ajeno a M2 (Codex lo arregló en paralelo).
 
+### Verificación de runtime contra DATA REAL (no solo mocks) — "¿cómo sabemos que funciona si está apagado?"
+
+Los 53 tests unitarios mockean `runGreenhousePostgresQuery` → prueban el ALGORITMO pero codifican el shape *asumido*, no el real (lección Real-Artifact Verification Loop / BUG-CLASS-002). Con flag OFF + tabla shadow vacía, el SQL de los signals parsea pero contra 0 filas. Para probar el runtime real **sin flipear el flag de prod ni tocar el bono**, se corrió contra la data ya capturada por TASK-912 (live desde 2026-05-21: **72 transitions, 31 tareas con historial, 30 con estados de freeze**), en sesión proxy local:
+
+- **Dry-run read-only (31 tareas reales)**: las queries reales del consumer + `reconstructFreezeIntervals` + `calculateAttributableLateness` + `classifyOtdBucket` corrieron end-to-end → 28 valid / 3 unavailable / 0 legacy_unknown (esperado: `task_due_date_changes` vacío porque M0 capture sigue OFF → fairDeadline = original), 19 con intervalos de freeze, **0 anomalías** (invariante anti-doble-descuento se sostiene en data real). Buckets sanos y mayormente coincidentes con legacy; la única divergencia vs legacy observada es la esperada por remover el gate `esMesActual` (ADR §16.5).
+- **Write path (5 tareas, flag forzado ON solo en la sesión local)**: el consumer `refresh()` ejecutó el **UPSERT real** → 5 filas escritas en `task_attributable_lateness_shadow` (confirma nombres/tipos de columna del INSERT contra PG real). Ambos signals **leyeron las filas reales**: `shadow_paridad`=ok (0/5 divergencia), `overlap`=ok (invariante intacto). **CLEANUP**: `DELETE` restauró la tabla a 0 filas (estado flag-OFF). El flag de producción NUNCA se flipeó; el bono nunca se tocó.
+
+**Conclusión**: el pipeline M2 está probado end-to-end contra data real (read+compute+write+signals), con producción restaurada a flag-OFF/tabla-vacía. Cuando el operador active `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (+ `NOTION_DUE_DATE_CAPTURE_ENABLED` para fairDeadline con extensiones), el shadow empieza a acumular para los ≥30d que pide M3.
+
 ## Follow-ups
 - **Cutover del OTD-bono (M3, gated, sign-off HR)** — cuando shadow ≥30d verde. Único movimiento que toca el bono / cierra ISSUE-081 en producción.
 - Para que el shadow acumule datos: operador activa `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2).

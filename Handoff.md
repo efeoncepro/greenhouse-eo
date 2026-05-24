@@ -6,6 +6,8 @@
 
 **Decisión clave**: output M2 en **PG shadow table + consumer reactivo** (patrón RpA V2), NO mirror BQ del freeze (multi-ciclo no mantenible en CASE BQ). Reusa `classifyOtdBucket` (M1) extendido con `applyMonthGate` — single source of truth del bucket. Preserva `gh_otd_bucket` de M1 intacto.
 
+**Verificación runtime contra DATA REAL** (no solo mocks; respuesta a "¿cómo sabemos que funciona si está apagado?"): se corrió el pipeline real contra la data capturada por TASK-912 (72 transitions live, 31 tareas, 30 con freeze) en sesión proxy local — dry-run read-only de 31 tareas (28 valid, 19 con freeze, **0 anomalías**) + write path de 5 tareas con flag forzado ON solo local (UPSERT real → 5 filas, ambos signals leyeron ok) + CLEANUP (DELETE → tabla vacía, estado flag-OFF restaurado). El flag de prod NUNCA se flipeó, el bono nunca se tocó. Detalle en la Delta de la task.
+
 **Camino restante ISSUE-081**: M3 (cutover bono) — task futura gated. Operador activa `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2) para acumular shadow ≥30d.
 
 **Nota multi-agente**: Codex trabajó TASK-926/928 en paralelo en el árbol; los docs compartidos (README/REGISTRY/changelog/este Handoff) llevan ediciones de ambos. NO toqué el código de Codex (scripts/ci/task-lint, workflow, package.json, reliability/payroll WIP).
@@ -15,6 +17,8 @@
 # Sesion 2026-05-24 — TASK-926 Task Spec Compliance Linter — ✅ SHIPPED
 
 **Status**: ✅ COMPLETE directo en `develop` por override del operador (sin branch switch). Repo-only tooling; no toca runtime, DB, Payroll, access model ni UI.
+
+**Delta post-ship — debt boundary robusto**: se agrego `pnpm task:lint --active` y una frontera explicita de deuda activa post-adopcion. Resultado actual: `pnpm task:lint` = 1011 scanned, 590 `complete/` historicas exentas, 418 activas pre-TASK-926 exentas, 0 errors / 0 warnings. `pnpm task:lint --active` = 421 scanned, 418 pre-adoption active exentas, 0 errors / 0 warnings. `--changed` y `--task TASK-###` siguen siendo estrictos para drift nuevo o revision focal.
 
 **Entregado**:
 - `pnpm task:lint` con parser reusable (`scripts/ci/task-lint/parser.mjs`), rule catalog declarativo (`rules.mjs`) y CLI (`scripts/ci/task-lint.mjs`) con `--format json|human`, `--changed`, `--task` y `--strict`.
