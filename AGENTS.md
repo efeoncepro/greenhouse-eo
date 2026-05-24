@@ -246,6 +246,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
   - `pnpm local:check` para cambios de codigo normales (`lint` + `tsc`).
   - `pnpm local:check:ui` para UI/rutas/frontend visible (`lint` + `tsc` + `design:lint` + `build`).
   - `pnpm local:check:full` para shared runtime, cloud, billing, auth, finance/payroll, CI/release o alto blast radius (`lint` + `tsc` + tests + `build`).
+- Antes de reducir o redisenar GitHub Actions por costo, correr `pnpm actions:cost:audit --from YYYY-MM-DD --to YYYY-MM-DD` para obtener hotspots estimados por workflow/job. La factura oficial sigue viviendo en `cloud.billing.github`; el reporte local solo atribuye minutos.
 - Si el cambio toca UI visible, levantar `pnpm dev` y entregar la URL `localhost` exacta para revision antes de push, salvo que el usuario pida explicitamente preview remoto.
 - No usar `develop`, Vercel Preview o GitHub Actions como loop de exploracion si el cambio puede validarse en local. Push remoto requiere confirmacion humana o instruccion explicita.
 - Todo trabajo de agentes debe salir desde rama propia salvo cambios minimos de emergencia.

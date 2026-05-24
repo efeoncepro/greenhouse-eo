@@ -61,6 +61,14 @@ pnpm local:check:ui    # local:check + design:lint + build
 pnpm local:check:full  # local:check + test + build
 ```
 
+Antes de reducir o redisenar GitHub Actions por costo:
+
+```bash
+pnpm actions:cost:audit --from YYYY-MM-DD --to YYYY-MM-DD
+```
+
+Ese reporte local usa GitHub Actions Runs/Jobs API via `gh` para estimar hotspots por workflow/job. La factura oficial sigue siendo `cloud.billing.github`; no mezclar `estimatedGrossUsd` con billing neto.
+
 Si el cambio toca UI visible, levantar `pnpm dev` y entregar la URL `localhost` exacta antes de pedir push. No usar Vercel Preview como loop de exploracion si localhost puede validar el cambio.
 
 Prompt operativo recomendado:

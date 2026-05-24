@@ -118,6 +118,18 @@ La senal reliability canonical es `cloud.billing.github`. Puede quedar:
 
 Budgets GitHub siguen siendo un guardrail externo complementario. Si el equipo quiere stop-usage o alertas 75/90/100%, se configuran en GitHub Billing & Licensing; Greenhouse solo observa y reporta.
 
+### Atribucion por workflow/job
+
+Para responder "que workflow esta quemando minutos", usar el reporte local:
+
+```bash
+pnpm actions:cost:audit --from 2026-05-01 --to 2026-05-24
+```
+
+Ese reporte usa GitHub Actions Runs/Jobs API via `gh` y calcula `estimatedGrossUsd` con un rate configurable (`--rate-usd`, default USD 0.006/min para `actions_linux`). Es una atribucion operativa, no factura oficial. Puede diferir de GitHub Billing por cuota incluida, descuentos, rounding, storage/cache y ajustes de billing.
+
+Decision canonica: [GREENHOUSE_CI_COST_SIGNAL_GUARDRAILS_V1](../../architecture/GREENHOUSE_CI_COST_SIGNAL_GUARDRAILS_V1.md).
+
 ## Alertas tempranas
 
 Las alertas viven en el `ops-worker`, no en la UI.

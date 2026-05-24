@@ -62,6 +62,14 @@ pnpm local:check:full
 
 Corre `local:check` + `pnpm test` + `pnpm build`. Usar para cambios compartidos, backend/data/runtime, helpers transversales, release/CI, billing, auth, payroll, finance, cloud o alto blast radius.
 
+Para investigar costo GitHub Actions antes de tocar gates:
+
+```bash
+pnpm actions:cost:audit --from YYYY-MM-DD --to YYYY-MM-DD
+```
+
+El comando usa GitHub Actions Runs/Jobs API via `gh` y entrega hotspots estimados por workflow/job. No reemplaza la factura oficial ni `cloud.billing.github`.
+
 Además:
 
 - tests focales siguen siendo obligatorios cuando existe suite especifica;
