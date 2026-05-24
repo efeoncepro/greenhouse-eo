@@ -75,6 +75,10 @@ import {
   getNotionMetricsWritebackDeadLetterSignal,
   getNotionMetricsWritebackLagSignal
 } from './queries/notion-metrics-rpa-signals'
+import {
+  getNotionMetricsFtrWritebackDeadLetterSignal,
+  getNotionMetricsFtrWritebackLagSignal
+} from './queries/notion-metrics-ftr-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
@@ -715,6 +719,13 @@ interface ReliabilityOverviewSources {
    * OFF) reportan steady (writeback skipea sin tocar attempt_count).
    */
   notionMetricsRpa?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-903 — FTR writeback signals (Efeonce/Sky). Roll up bajo moduleKey
+   * 'delivery'. Pre-flip (NOTION_FTR_WRITEBACK_ENABLED OFF) reportan steady
+   * (writeback skipea sin tocar attempt_count).
+   */
+  notionMetricsFtr?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -845,6 +856,7 @@ export const buildReliabilityOverview = (
     ...(sources.notionStatusTransitions ?? []),
     // TASK-916 — Notion RpA V2 productive writeback signals (2).
     ...(sources.notionMetricsRpa ?? []),
+    ...(sources.notionMetricsFtr ?? []),
     // TASK-921 — Reschedule (due-date change) capture signals (2).
     ...(sources.notionMetricsReschedule ?? []),
     // TASK-922 — Attributable lateness shadow signals (2).
@@ -1447,6 +1459,17 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-903 — Notion FTR writeback signals (Efeonce/Sky).
+  const notionMetricsFtr =
+    preloadedSources.notionMetricsFtr !== undefined
+      ? preloadedSources.notionMetricsFtr
+      : await Promise.all([
+          getNotionMetricsFtrWritebackDeadLetterSignal().catch(() => null),
+          getNotionMetricsFtrWritebackLagSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-921 — Notion reschedule (due-date change) capture signals.
   const notionMetricsReschedule =
     preloadedSources.notionMetricsReschedule !== undefined
@@ -1519,6 +1542,7 @@ export const getReliabilityOverview = async (
     notionMetricsDemo,
     notionStatusTransitions,
     notionMetricsRpa,
+    notionMetricsFtr,
     notionMetricsReschedule,
     attributableLateness
   })
