@@ -20,6 +20,7 @@ import type { TimelineProps } from '@mui/lab/Timeline'
 
 import { ExecutiveCardShell, ExecutiveMiniStatCard, GreenhouseRouteLink } from '@/components/greenhouse'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_GITHUB_BILLING_COPY } from '@/lib/copy/github-billing'
 import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type {
   OperationsHealthStatus,
@@ -28,6 +29,7 @@ import type {
 } from '@/lib/operations/get-operations-overview'
 import type { ReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
 import type { GcpBillingOverview } from '@/types/billing-export'
+import type { GitHubBillingOverview } from '@/types/github-billing'
 import type { IntegrationDataQualityRunResult, IntegrationDataQualityStatus } from '@/types/integration-data-quality'
 import type { VercelBillingOverview } from '@/types/vercel-billing'
 import AdminHandlerAcknowledgeButton from './AdminHandlerAcknowledgeButton'
@@ -45,6 +47,7 @@ type Props = {
   reactiveBreakdown?: ReactiveProjectionBreakdown | null
   gcpBilling?: GcpBillingOverview | null
   vercelBilling?: VercelBillingOverview | null
+  githubBilling?: GitHubBillingOverview | null
   notionOperationalOverview?: NotionSyncOperationalOverview | null
 }
 
@@ -282,6 +285,7 @@ const AdminOpsHealthView = ({
   reactiveBreakdown = null,
   gcpBilling = null,
   vercelBilling = null,
+  githubBilling = null,
   notionOperationalOverview = null
 }: Props) => {
   const subsystems = healthSubsystems(data.subsystems)
@@ -616,7 +620,7 @@ const AdminOpsHealthView = ({
       </ExecutiveCardShell>
 
       {/* Spotlight observabilidad TASK-586: incidentes de costo cloud + sync Notion stale */}
-      {(gcpBilling || vercelBilling || notionOperationalOverview) && (
+      {(gcpBilling || vercelBilling || githubBilling || notionOperationalOverview) && (
         <ExecutiveCardShell
           title='Spotlight observabilidad'
           subtitle='Anomalías relevantes de costo cloud y del flujo Notion. La lectura completa vive en Cloud & Integrations.'
@@ -713,6 +717,44 @@ const AdminOpsHealthView = ({
                         Forecast mensual: {vercelBilling.currency}{' '}
                         {formatGreenhouseNumber(Math.round(vercelBilling.forecast.monthEndBilledCost), 'en-US')} ·{' '}
                         estado {vercelBilling.forecast.thresholdStatus}.
+                      </Typography>
+                    )}
+                  </Stack>
+                </CardContent>
+              </Card>
+            )}
+
+            {githubBilling && (
+              <Card variant='outlined'>
+                <CardContent sx={{ p: 3 }}>
+                  <Stack spacing={1.5}>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                      <Typography variant='subtitle2'>{GH_GITHUB_BILLING_COPY.title}</Typography>
+                      <Chip
+                        size='small'
+                        color={
+                          githubBilling.availability === 'configured'
+                            ? 'success'
+                            : githubBilling.availability === 'awaiting_data'
+                              ? 'info'
+                              : githubBilling.availability === 'not_configured'
+                                ? 'warning'
+                                : 'error'
+                        }
+                        label={GH_GITHUB_BILLING_COPY.status[githubBilling.availability]}
+                      />
+                    </Stack>
+                    <Typography variant='body2'>
+                      {githubBilling.availability === 'configured'
+                        ? `Gross ${githubBilling.currency} ${formatGreenhouseNumber(Math.round(githubBilling.totalGrossAmount), 'en-US')} · net ${githubBilling.currency} ${formatGreenhouseNumber(Math.round(githubBilling.totalNetAmount), 'en-US')}.`
+                        : (githubBilling.error ?? githubBilling.notes[0] ?? GH_GITHUB_BILLING_COPY.unavailableFallback)}
+                    </Typography>
+                    {githubBilling.availability === 'configured' && githubBilling.forecast && (
+                      <Typography variant='caption' color='text.secondary'>
+                        Forecast gross: {githubBilling.currency}{' '}
+                        {formatGreenhouseNumber(Math.round(githubBilling.forecast.monthEndGrossAmount), 'en-US')} ·{' '}
+                        top repo {githubBilling.actions.topRepository ?? 'sin dato'} · estado{' '}
+                        {githubBilling.forecast.thresholdStatus}.
                       </Typography>
                     )}
                   </Stack>

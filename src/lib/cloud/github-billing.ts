@@ -124,13 +124,13 @@ const daysInMonth = (year: number, month: number): number =>
   new Date(Date.UTC(year, month, 0)).getUTCDate()
 
 const isValidYear = (year: number | undefined): year is number =>
-  Number.isInteger(year) && year >= 2020 && year <= 2100
+  typeof year === 'number' && Number.isInteger(year) && year >= 2020 && year <= 2100
 
 const isValidMonth = (month: number | undefined): month is number =>
-  Number.isInteger(month) && month >= 1 && month <= 12
+  typeof month === 'number' && Number.isInteger(month) && month >= 1 && month <= 12
 
 const isValidDay = (year: number, month: number, day: number | undefined): day is number =>
-  Number.isInteger(day) && day >= 1 && day <= daysInMonth(year, month)
+  typeof day === 'number' && Number.isInteger(day) && day >= 1 && day <= daysInMonth(year, month)
 
 const buildPeriod = (options: GitHubBillingOptions = {}, reference = new Date()): GitHubBillingPeriod => {
   const currentYear = reference.getUTCFullYear()
