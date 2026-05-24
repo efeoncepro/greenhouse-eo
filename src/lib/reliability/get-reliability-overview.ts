@@ -39,6 +39,7 @@ import {
 import { getClientPortalResolverFailureRateSignal } from './queries/client-portal-resolver-failure-rate'
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
+import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
 import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
 import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
@@ -522,6 +523,13 @@ interface ReliabilityOverviewSources {
   accountBalancesFxDrift?: ReliabilitySignal | null
 
   /**
+   * TASK-929 Slice 3 — Unresolved finance ledger drift items (settlement
+   * has_drift + unanchored paid expenses). Steady=0. Always-on dashboard metric
+   * complementing the daily ledger-health cron.
+   */
+  ledgerUnresolvedDriftItems?: ReliabilitySignal | null
+
+  /**
    * TASK-777 Slice 3 — Expense distribution management-accounting gates.
    * Protege P&L/overhead: cuenta expenses sin lane canónico y filas que el
    * pool legacy tomaría como overhead aunque son payroll provider, regulatorio
@@ -809,6 +817,7 @@ export const buildReliabilityOverview = (
     ...(sources.cronStagingDrift ? [sources.cronStagingDrift] : []),
     // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
     ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
+    ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
     // TASK-780 Phase 3 — Home rollout drift (PG flag vs env + opt-out rate).
@@ -1152,6 +1161,13 @@ export const getReliabilityOverview = async (
     preloadedSources.accountBalancesFxDrift !== undefined
       ? preloadedSources.accountBalancesFxDrift
       : await getAccountBalancesFxDriftSignal().catch(() => null)
+
+  // TASK-929 Slice 3 — Unresolved finance ledger drift items (settlement +
+  // unanchored). Always-on steady-state metric. Degrada honestamente a `unknown`.
+  const ledgerUnresolvedDriftItems =
+    preloadedSources.ledgerUnresolvedDriftItems !== undefined
+      ? preloadedSources.ledgerUnresolvedDriftItems
+      : await getLedgerUnresolvedDriftItemsSignal().catch(() => null)
 
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
@@ -1516,6 +1532,7 @@ export const getReliabilityOverview = async (
     emailRenderFailure,
     cronStagingDrift,
     accountBalancesFxDrift,
+    ledgerUnresolvedDriftItems,
     expenseDistribution,
     homeRolloutDrift,
     shortcutsInvalidPins,
