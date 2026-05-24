@@ -1,16 +1,16 @@
 # Cloud Cost Intelligence y Copiloto FinOps
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-03 por Codex
 > **Modulo:** operaciones / cloud / FinOps
 > **Ruta en portal:** `/admin/integrations`
 > **Arquitectura relacionada:** [GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1](../../architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md), [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1](../../architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md)
-> **Task relacionada:** [TASK-769](../../tasks/complete/TASK-769-cloud-cost-intelligence-ai-finops-copilot.md), [TASK-636](../../tasks/complete/TASK-636-vercel-billing-focus-observability.md)
+> **Task relacionada:** [TASK-769](../../tasks/complete/TASK-769-cloud-cost-intelligence-ai-finops-copilot.md), [TASK-636](../../tasks/complete/TASK-636-vercel-billing-focus-observability.md), [TASK-637](../../tasks/in-progress/TASK-637-github-billing-actions-cost-observability.md)
 
 ## Para que sirve
 
-Cloud Cost Intelligence permite mirar los costos de Google Cloud y Vercel desde Greenhouse sin depender de entrar a cada consola para entender lo basico.
+Cloud Cost Intelligence permite mirar los costos de Google Cloud, Vercel y GitHub Actions desde Greenhouse sin depender de entrar a cada consola para entender lo basico.
 
 La capacidad responde tres preguntas operativas:
 
@@ -18,7 +18,7 @@ La capacidad responde tres preguntas operativas:
 - que servicio, recurso o SKU explica el gasto
 - que conviene revisar primero para evitar que la cuenta siga subiendo
 
-La capa se apoya en `Billing Export` de Google Cloud hacia BigQuery y en la API oficial de Vercel Billing FOCUS (`/v1/billing/charges`) para Vercel. Greenhouse no reemplaza facturas oficiales ni modifica budgets desde el portal; interpreta datos exportados o leidos por API para hacerlos accionables dentro del flujo operativo.
+La capa se apoya en `Billing Export` de Google Cloud hacia BigQuery, en la API oficial de Vercel Billing FOCUS (`/v1/billing/charges`) y en GitHub Billing Usage API para GitHub Actions/productos metered. Greenhouse no reemplaza facturas oficiales ni modifica budgets desde el portal; interpreta datos exportados o leidos por API para hacerlos accionables dentro del flujo operativo.
 
 ## Que muestra Greenhouse
 
@@ -33,8 +33,9 @@ En `/admin/integrations`, las tarjetas de costo cloud muestran:
 - alertas tempranas cuando un driver cruza umbral
 - ultima observacion del Copiloto FinOps AI, si existe
 - costo Vercel observado, forecast mensual, top servicios/proyectos y spike diario cuando la API Billing FOCUS esta configurada
+- costo GitHub Actions observado, forecast mensual, top repo/SKU/producto y spike diario cuando GitHub Billing Usage esta configurado
 
-El dato puede tener latencia natural de Billing Export o del feed FOCUS. Por eso Greenhouse muestra el ultimo dia de uso detectado y no asume que el dia actual esta completo.
+El dato puede tener latencia natural de Billing Export, del feed FOCUS o de GitHub Billing Usage. Por eso Greenhouse muestra el ultimo dia de uso detectado y no asume que el dia actual esta completo.
 
 ## Como se calculan los drivers
 
@@ -83,6 +84,39 @@ La senal reliability canonical es `cloud.billing.vercel`. Puede quedar:
 - `error`: token sin permiso, API falla o forecast/spike cruza nivel critico.
 - `not_configured`: faltan token/team.
 - `awaiting_data`: la API respondio sin cargos para el rango observado.
+
+## GitHub Billing Usage
+
+GitHub se lee en modo read-only con token server-side. La V1 no persiste usage en PostgreSQL y no scrapea la UI de Billing: usa `fetch` server-side contra los endpoints oficiales de GitHub Billing Usage.
+
+Variables runtime:
+
+```text
+GREENHOUSE_GITHUB_BILLING_TOKEN_SECRET_REF=
+GREENHOUSE_GITHUB_BILLING_ORG=efeoncepro
+GREENHOUSE_GITHUB_BILLING_MONTHLY_WARN_USD=
+GREENHOUSE_GITHUB_BILLING_MONTHLY_CRITICAL_USD=
+GREENHOUSE_GITHUB_ACTIONS_DAILY_SPIKE_PCT=
+```
+
+El token recomendado es dedicado y least-privilege, con permiso de organizacion `Administration: read` para el scope que recibe el cobro. `GREENHOUSE_GITHUB_BILLING_TOKEN` existe como fallback local, pero para staging/production se prefiere Secret Manager via `GREENHOUSE_GITHUB_BILLING_TOKEN_SECRET_REF`.
+
+Greenhouse muestra dos montos:
+
+- `grossAmount`: consumo bruto de Actions/SKUs antes de descuentos o cuota incluida.
+- `netAmount`: impacto facturable despues de descuentos o cuota incluida.
+
+Esto es importante porque GitHub puede mostrar consumo bruto positivo con `netAmount=0` cuando la cuota incluida absorbe el cargo. En ese caso Greenhouse no debe decir "sin uso"; debe decir "uso cubierto por descuento/cuota".
+
+La senal reliability canonical es `cloud.billing.github`. Puede quedar:
+
+- `ok`: GitHub Billing configurado y dentro de umbrales definidos.
+- `warning`: forecast o spike cruza warning.
+- `error`: token sin permiso, API falla o forecast/spike cruza nivel critico.
+- `not_configured`: faltan token/org.
+- `awaiting_data`: la API respondio sin usage items para el periodo observado.
+
+Budgets GitHub siguen siendo un guardrail externo complementario. Si el equipo quiere stop-usage o alertas 75/90/100%, se configuran en GitHub Billing & Licensing; Greenhouse solo observa y reporta.
 
 ## Alertas tempranas
 
