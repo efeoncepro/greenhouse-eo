@@ -1,6 +1,10 @@
-# Sesion 2026-05-24 — TASK-921 M0: captura `task_due_date_changes` + motivo de reprogramación — 🔨 IN PROGRESS
+# Sesion 2026-05-24 — TASK-921 M0: captura `task_due_date_changes` + motivo de reprogramación — ✅ SHIPPED
 
-**Status**: 🔨 IN PROGRESS **directo en develop** (override operador: sin branch). M0 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16 — foundation que TASK-922 (M2 freeze/atraso imputable) consume. Crea el log append-only `greenhouse_delivery.task_due_date_changes` + captura de cambios de `Fecha límite` + inferencia de motivo de reprogramación.
+**Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M0 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16 — foundation que TASK-922 (M2 freeze/atraso imputable) consume. Creó el log append-only `greenhouse_delivery.task_due_date_changes` + captura de cambios de `Fecha límite` + inferencia de motivo de reprogramación.
+
+**Shipped (5 slices committeados, flag OFF)**: `06fbce8a` migration (16 cols, 2 triggers append-only excepto motivo, 4 indexes, verificada live) · `98616eef` helper `inferRescheduleReason` pure (16 tests) · `5e6b8bd6` `fetchPageDueDate` + consumer `notionDueDateChangeCaptureProjection` (reusa `page_change_signal`) + flag `NOTION_DUE_DATE_CAPTURE_ENABLED` (16 tests) · `e050d4be` 2 reliability signals (SQL verificado live, steady 0/null) · cierre docs. **32 tests focales verdes**, lint + tsc limpios para mis archivos. **Desbloquea TASK-922 (M2)**.
+
+**Pendiente de push**: el pre-push (`tsc --noEmit` full) choca con el WIP de Codex (no mío) → push con stash selectivo al final, como en sesiones previas. Hay además un test pre-existente roto en develop `src/lib/reliability/ai/build-prompt.test.ts` (byte-idéntico a origin/develop, ajeno a M0).
 
 **Decisiones de diseño pre-FASE 1 (documentadas en Audit)**:
 - **Reusar `notion.task.page_change_signal`** (ya emitido por el webhook `notion-status-transitions` de TASK-912 para CUALQUIER cambio de propiedad) con un consumer nuevo → NO segundo endpoint/HMAC/suscripción. Más DRY/robusto.

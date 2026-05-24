@@ -268,3 +268,19 @@ M1 cerró en `develop` (directo, sin branch, override operador). Estado por slic
 **Verificación**: full suite 5239 passed, build green, tsc clean. Signal LIVE contra PG real → **100% paridad (198/198)**. BQ dry-run + SELECT read-only confirmaron materialización (`on_time` 192 / `carry_over` 149 / `overdue` 13 / `late_drop` 6 / NA 4931). Bono + `otd_pct` + `performance_indicator_code` intactos.
 
 **Desbloquea M2** (TASK-922): el helper freeze-aware togglable ya existe GH-owned; M2 solo flipea freeze on + reason-aware sobre el mismo `gh_otd_bucket`.
+
+### 16.8 Delta 2026-05-24 — M0 SHIPPED (TASK-921)
+
+M0 cerró en `develop` (directo, sin branch, override operador). La captura de cambios de fecha límite + motivo de reprogramación está construida (flag OFF). Estado:
+
+- **Tabla** `greenhouse_delivery.task_due_date_changes` append-only (migration `20260524100613341`). Triggers anti-DELETE + anti-UPDATE excepto columnas de motivo (`reason_code`/`reason_source`/`reason_confidence` mutables para confirmación operador). CHECK enums + UNIQUE partial `source_event_id`. Verificada live: 16 cols, 2 triggers, 4 indexes.
+- **Helper de inferencia** `inferRescheduleReason()` en `src/lib/delivery/reschedule-reason-inference.ts` (pure). Partición disjunta §5: `external_blocker`/`client_requested`/`internal_not_prioritized`/`unspecified`. `scope_change` NUNCA inferido (solo operador). + vocabulario Notion option↔code. 16 tests.
+- **Captura**: **reusa** `notion.task.page_change_signal` (webhook `notion-status-transitions` de TASK-912, ya ON en prod) con un 2do consumer `notionDueDateChangeCaptureProjection` — NO segundo endpoint/HMAC. Re-fetch (`fetchPageDueDate`) → workspace autoritativo → persist-if-changed (baseline seed backfilled de `Fecha límite original`) → motivo inferido o `operator_confirmed` (lee select Notion) + confirmation-only path. 16 tests.
+- **Flag propio** `NOTION_DUE_DATE_CAPTURE_ENABLED` (default OFF) — necesario porque el webhook de TASK-912 ya está ON; sin él el merge capturaría inmediato.
+- **2 reliability signals** (subsystem `delivery`): `delivery.reschedule.capture_lag` + `delivery.reschedule.pending_reason_confirmation`. SQL verificados live (steady 0/null).
+
+**Decisiones de diseño**: writeback-de-sugerencia a Notion (mostrar el motivo inferido en la propiedad) **DEFERIDO a follow-up** (mirror TASK-927) — es el componente más pesado (Cloud Tasks + echo-loop) y NO es lo que TASK-922 consume; el path de CONFIRMACIÓN del operador SÍ está (el consumer LEE `Motivo de reprogramación`). `days_delta` computado en TS (no `EXTRACT(EPOCH FROM date-date)`, gate TASK-893).
+
+**Verificación**: 32 tests focales nuevos + lint + tsc verdes (test pre-existente roto en develop `ai/build-prompt.test.ts` ajeno a M0). NO computa atraso — eso es TASK-922.
+
+**Desbloquea M2** (TASK-922): el compute de atraso imputable ya tiene su fuente de eventos de fecha + motivo confirmado.

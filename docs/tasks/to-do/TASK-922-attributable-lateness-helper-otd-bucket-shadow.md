@@ -13,14 +13,15 @@
 - Status real: `Diseno (compute del ADR Attributable Lateness V1)`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|payroll|reliability`
-- Blocked by: `~~TASK-923 (M1)~~ ✅ SHIPPED 2026-05-24 + TASK-921 (log task_due_date_changes + motivo) + TASK-908/912 (task_status_transitions con captura activa). M2 del ADR §16: agrega la semántica freeze sobre el clasificador ya GH-owned por M1. Sin M1 no hay clasificador GH al cual aplicarle freeze.`
+- Blocked by: `~~TASK-923 (M1)~~ ✅ SHIPPED 2026-05-24 + ~~TASK-921 (M0 log task_due_date_changes + motivo)~~ ✅ SHIPPED 2026-05-24 + TASK-908/912 (task_status_transitions con captura activa, live en prod). M2 del ADR §16: agrega la semántica freeze sobre el clasificador ya GH-owned por M1 + lee el motivo confirmado de M0. Dependencias resueltas — listo para tomar.`
 - Branch: `task/TASK-922-attributable-lateness-helper-otd-bucket-shadow`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
 ## Delta 2026-05-24
 
-- **M1 (TASK-923) SHIPPED** — el clasificador OTD ya es GH-owned. Esta task **reusa** el helper canónico `classifyOtdBucket(inputs)` en `src/lib/notion-metrics/classify-otd-bucket.ts` (que nació freeze-aware togglable): M2 = **flipea freeze ON** + agrega reason-awareness sobre el MISMO helper + escribe al MISMO `gh_otd_bucket` shadow column (ya existe en `v_tasks_enriched` + `delivery_task_monthly_snapshots`). NO crear helper nuevo ni columna nueva. La reliability signal `notion.metrics.shadow_paridad_otd_classifier` (M1) medirá divergencia esperada cuando M2 flipee freeze (M2 NO target 100% paridad — la divergencia es el valor del freeze, debe medirse + revisarse, no fallar). Dependencias restantes: TASK-921 (`task_due_date_changes`) + TASK-908/912 captura activa.
+- **M1 (TASK-923) SHIPPED** — el clasificador OTD ya es GH-owned. Esta task **reusa** el helper canónico `classifyOtdBucket(inputs)` en `src/lib/notion-metrics/classify-otd-bucket.ts` (que nació freeze-aware togglable): M2 = **flipea freeze ON** + agrega reason-awareness sobre el MISMO helper + escribe al MISMO `gh_otd_bucket` shadow column (ya existe en `v_tasks_enriched` + `delivery_task_monthly_snapshots`). NO crear helper nuevo ni columna nueva. La reliability signal `notion.metrics.shadow_paridad_otd_classifier` (M1) medirá divergencia esperada cuando M2 flipee freeze (M2 NO target 100% paridad — la divergencia es el valor del freeze, debe medirse + revisarse, no fallar).
+- **M0 (TASK-921) SHIPPED** — el log `greenhouse_delivery.task_due_date_changes` existe (append-only) con `reason_code` + `reason_source`. Esta task lee la **fecha justa** = `original + extensiones cliente/scope` desde ese log, usando SOLO `reason_source='operator_confirmed'` (los inferidos no alimentan el bono — ADR §6). El helper de inferencia `inferRescheduleReason` (M0) y el vocabulario reason (`RESCHEDULE_REASON_CODES`) son reutilizables. La captura está gated por `NOTION_DUE_DATE_CAPTURE_ENABLED` (default OFF) — para que M2 tenga datos, el operador debe activar ese flag primero (cuando se priorice). **Todas las dependencias de M2 están resueltas.**
 
 ## Summary
 

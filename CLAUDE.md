@@ -4589,6 +4589,35 @@ Greenhouse es el **clasificador autoritativo del bucket OTD** (`on_time` / `late
 
 **Spec canónica**: `docs/tasks/complete/TASK-923-greenhouse-owns-otd-bucket-classifier-parity-shadow.md`. ADR: `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1.md` §16 (Delta 2026-05-24 — M1 shipped). Desbloquea M2 (TASK-922). Patrón fuente: TASK-908 (calculate-cycle-time + cycle-time-formula TS↔SQL mirror), TASK-901 (RpA helper canonical), Delivery Metrics Ownership Boundary (Notion = OS / Greenhouse = motor).
 
+### Due-Date Change Capture invariants (TASK-921, M0, desde 2026-05-24)
+
+`greenhouse_delivery.task_due_date_changes` es el log **append-only** canónico de cambios de fecha límite + motivo de reprogramación. M0 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16 — foundation que TASK-922 (M2 freeze/atraso imputable) consume. Reemplaza el casillero único Notion `Fecha límite original` + fórmula `Días reprogramados` por un historial real (cuántas veces, de→a, por qué). NO computa atraso — eso es TASK-922.
+
+**Captura canónica** (reusa infra TASK-912, NO segundo webhook):
+
+- El webhook `notion-status-transitions` (TASK-912) ya emite `notion.task.page_change_signal` para CUALQUIER cambio de propiedad. La captura de fecha es un **2do consumer** de ese evento (`notionDueDateChangeCaptureProjection`), NO un endpoint/HMAC/suscripción nueva.
+- Re-fetch canónico (`fetchPageDueDate` en `notion-client.ts`, sibling de `fetchPageStatus`): lee `Fecha límite` + `Fecha límite original` (baseline seed) + select `Motivo de reprogramación` (confirmación operador) + estado + `parent.data_source_id` (workspace autoritativo). NUNCA confía el payload del webhook.
+- **Flag propio** `NOTION_DUE_DATE_CAPTURE_ENABLED` (default OFF) en `status-transitions-flags.ts`. Load-bearing: el webhook de TASK-912 YA está ON en prod → sin flag propio el merge capturaría inmediato. OFF → consumer no-op.
+
+**Motivo (ADR §5/§6)**: `inferRescheduleReason()` (`reschedule-reason-inference.ts`, pure) infiere `reason_code` desde `status_at_change` + transiciones recientes. Partición disjunta: `client_requested`/`scope_change` extienden la fecha justa; `external_blocker` lo maneja el freeze; `internal_not_prioritized`/`unspecified` no extienden. El operador confirma/corrige en Notion → `reason_source='operator_confirmed'`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** crear un segundo webhook endpoint/HMAC/suscripción para capturar cambios de fecha. Reusar `notion.task.page_change_signal` con un consumer. Lo mismo para futuras propiedades capturables (otra dimensión Notion) — fan-out del mismo evento.
+- **NUNCA** confiar el payload del webhook para el valor de la fecha. Siempre re-fetch (`fetchPageDueDate`). Notion no manda valores (notion-platform Pillar 1).
+- **NUNCA** persistir en `task_due_date_changes` una tarea cuyo workspace no resuelva a Efeonce/Sky (`resolveProductiveWorkspace` null → skip). Garantía anti-contaminación de la suscripción amplia.
+- **NUNCA** usar el motivo inferido como confirmado — `reason_source` distingue; el bono (TASK-922+) SOLO usa `operator_confirmed`.
+- **NUNCA** inferir `scope_change` (indistinguible de `client_requested` desde señales de estado). Solo el operador lo confirma. La inferencia client-driven default es `client_requested`.
+- **NUNCA** computar `days_delta` ni edad de filas con `EXTRACT(EPOCH FROM (date - date))` (PG lo rechaza — gate TASK-893). Usar `date - date = integer` o computar en TS (`computeDaysDelta`).
+- **NUNCA** DELETE/UPDATE las columnas de observación (fechas, status, changed_at, source_event_id) — append-only (trigger PG). SOLO `reason_code`/`reason_source`/`reason_confidence` son mutables (confirmación operador).
+- **NUNCA** computar atraso/fecha justa/bucket en esta capa — eso es TASK-922 (M2). M0 solo captura.
+- **NUNCA** invocar `Sentry.captureException` directo — `captureWithDomain(err, 'integrations.notion', { tags: { source: 'due_date_change_capture' } })`.
+- **SIEMPRE** que el bono o un consumer downstream necesite "la fecha justa / el motivo de una reprogramación", leer `task_due_date_changes` (el motivo confirmado), NO el casillero `Fecha límite original` legacy.
+
+**Deferido a follow-up**: writeback de la sugerencia inferida a Notion (mostrar el `[Motivo sugerido]` en la propiedad) — mirror del patrón TASK-927. El path de confirmación-read del operador SÍ está incluido en M0.
+
+**Spec canónica**: `docs/tasks/complete/TASK-921-due-date-change-capture-reschedule-reason.md`. Migration: `20260524100613341_task-921-task-due-date-changes.sql`. ADR §16.8 (Delta 2026-05-24 — M0 shipped). Patrón fuente: TASK-908/912 (task_status_transitions + captura sibling), TASK-742 (defense-in-depth).
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa
