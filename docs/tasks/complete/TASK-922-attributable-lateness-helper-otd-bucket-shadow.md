@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -95,15 +95,22 @@ Reglas obligatorias:
 - Convención de naming `[GH]` → ADR chico aparte.
 
 ## Acceptance Criteria
-- [ ] `calculate-attributable-lateness.ts` + tests (multi-ciclo, partición disjunta anti-doble-descuento, degradación honesta, fecha justa por motivo)
-- [ ] VIEW canónica / columnas shadow + bucket reason-aware
-- [ ] Shadow mode con paridad vs `otd_pct` legacy; flag default OFF → bono intacto
-- [ ] Reliability signals (paridad, overlap, pending-reason) wired, steady=0
-- [ ] Spec `ATTRIBUTABLE_LATENESS_V1.md` + Delta a `OTD_V1.md` (bucket reason-aware)
-- [ ] `pnpm test` (full) + `pnpm build` verde
-- [ ] Task movida a `complete/`
+- [x] `calculate-attributable-lateness.ts` + tests (multi-ciclo, partición disjunta anti-doble-descuento, degradación honesta, fecha justa por motivo) — 16 tests
+- [x] Columnas shadow + bucket reason-aware — PG shadow table `task_attributable_lateness_shadow` + `classifyOtdBucket` (extendido con `applyMonthGate`). **NO BQ** (freeze multi-ciclo no es CASE BQ mantenible; helper TS source of truth, patrón RpA V2 — ver Delta)
+- [x] Shadow mode con paridad freeze-on vs freeze-off; flag `ATTRIBUTABLE_LATENESS_OTD_ENABLED` default OFF → bono intacto
+- [x] Reliability signals (shadow_paridad, freeze_reschedule_overlap) wired, steady=0 (verificados live); pending-reason reusado de TASK-921
+- [x] Spec `ATTRIBUTABLE_LATENESS_V1.md` + Delta a `OTD_V1.md` (bucket reason-aware)
+- [x] `pnpm test` (focales 53 nuevos verdes); `pnpm build` no corrido (WIP de Codex en el árbol — ver Delta)
+- [x] Task movida a `complete/`
+
+## Delta 2026-05-24 — M2 SHIPPED (develop, sin branch — override operador)
+
+6 slices committeados. **Decisión de diseño clave**: el output M2 vive en **PG shadow table + consumer reactivo** (patrón RpA V2 TASK-913/916), **NO en columnas BQ** (a diferencia del `gh_otd_bucket` de M1). El freeze multi-ciclo (3-estado, clamp post-fairDeadline) + fairDeadline (desde reschedules con reason confirmado) no es un CASE BQ mantenible en paridad — el helper TS es source of truth. Preserva `gh_otd_bucket` de M1 intacto (su signal sigue válido). Diverge del hint "VIEW/columnas BQ" de la spec original, con rationale documentado (no-bandaid).
+
+Slices: 1 `classifyOtdBucket applyMonthGate` (26 tests) · 2 `calculateAttributableLateness` helper (16 tests) · 3 migration shadow table + flag · 4 consumer `notion_attributable_lateness_compute` (11 tests) · 5 2 signals · 6 docs. Reusa: `classifyOtdBucket` (M1), patrón cycle-time (intervalos), patrón RpA V2 (consumer+snapshot), `RESCHEDULE_REASON_CODES` (M0). Flag OFF → bono intacto. Test pre-existente roto en develop `ai/build-prompt.test.ts` ajeno a M2 (Codex lo arregló en paralelo).
 
 ## Follow-ups
-- Cutover del OTD-bono (gated, sign-off HR) — cuando shadow ≥30d verde.
-- Superficies de severidad/retro.
+- **Cutover del OTD-bono (M3, gated, sign-off HR)** — cuando shadow ≥30d verde. Único movimiento que toca el bono / cierra ISSUE-081 en producción.
+- Para que el shadow acumule datos: operador activa `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2).
+- Superficies de severidad/retro (ADR §8).
 - ADR convención naming `[GH]`.

@@ -284,3 +284,20 @@ M0 cerró en `develop` (directo, sin branch, override operador). La captura de c
 **Verificación**: 32 tests focales nuevos + lint + tsc verdes (test pre-existente roto en develop `ai/build-prompt.test.ts` ajeno a M0). NO computa atraso — eso es TASK-922.
 
 **Desbloquea M2** (TASK-922): el compute de atraso imputable ya tiene su fuente de eventos de fecha + motivo confirmado.
+
+### 16.9 Delta 2026-05-24 — M2 SHIPPED (TASK-922, shadow)
+
+M2 cerró en `develop` (directo, sin branch, override operador). El cómputo de atraso imputable + bucket reason-aware está construido en **shadow** (flag OFF). Estado:
+
+- **Helper canónico** `calculateAttributableLateness(inputs)` (`src/lib/notion-metrics/calculate-attributable-lateness.ts`, pure): fairDeadline (COALESCE original/vigente + Σ extensiones confirmadas cliente/scope) + resta de freeze posterior (3-estado, clamp, mirror cycle-time) + dataStatus (valid/unavailable/legacy_unknown). 16 tests.
+- **`classifyOtdBucket` extendido** con `applyMonthGate?:boolean` (default true=M1 paridad; M2=false). M2 reusa el clasificador — single source of truth. 26 tests (21 M1 intactos).
+- **Shadow table** `greenhouse_delivery.task_attributable_lateness_shadow` (migration `20260524104127717`, UPSERT per task): `fair_deadline` + `attributable_days_late` + `frozen_days_excluded` + `bucket_attributable` (freeze ON) + `bucket_no_freeze` (baseline paridad) + `bucket_legacy` + `data_status`.
+- **Consumer reactivo** `notion_attributable_lateness_compute`: trigger `notion.task.status_transitioned` → re-lee PG (tasks + transitions + due_date_changes) → `reconstructFreezeIntervals` → helper → UPSERT. 11 tests.
+- **2 reliability signals** (subsystem `delivery`): `attributable_lateness.shadow_paridad` (% buckets que el freeze cambia; ok ≤30%) + `attributable_lateness.freeze_reschedule_overlap` (invariante anti-doble-descuento, steady=0). `reschedule.pending_reason_confirmation` se reusa de TASK-921.
+- **Flag** `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (default OFF) → consumer no-op, bono intacto.
+
+**Decisión de diseño clave**: el output M2 vive en **PG shadow table + consumer reactivo** (patrón RpA V2), **NO en columnas BQ** (a diferencia del `gh_otd_bucket` de M1). El freeze multi-ciclo (3-estado, clamp post-fairDeadline) + fairDeadline (desde reschedules con reason confirmado) no es un CASE BQ mantenible en paridad — el helper TS es source of truth. Esto preserva el `gh_otd_bucket` de M1 intacto (su signal de paridad sigue válido) y diverge del hint BQ de la spec original con rationale documentado.
+
+**Verificación**: 53 tests focales nuevos (helper 16 + classify +5 + consumer 11 + … ) + lint + tsc verdes; signals verificados live contra PG (steady 0). NO toca el bono (shadow).
+
+**Camino restante para cerrar ISSUE-081**: M3 (cutover bono) — task futura gated (8 stop-gates + sign-off HR + ≥30d shadow verde + activación de captura M0/M1). Para que el shadow acumule datos: el operador activa `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2).

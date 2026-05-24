@@ -1,3 +1,35 @@
+# Sesion 2026-05-24 — TASK-922 M2: atraso imputable + bucket OTD reason-aware (shadow) — ✅ SHIPPED
+
+**Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M2 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16. Computa el atraso imputable + bucket OTD reason-aware en **shadow** (flag `ATTRIBUTABLE_LATENESS_OTD_ENABLED` OFF) → bono intacto. Cierra el compute que TASK-921 (M0) + TASK-923 (M1) habilitaron; desbloquea M3 (cutover bono, gated) que cierra ISSUE-081 en prod.
+
+**Shipped (6 slices)**: `6c847583` classifyOtdBucket applyMonthGate (26 tests) · `03452444` calculateAttributableLateness pure helper (16 tests) · `289959cd` migration shadow table + flag · `2d572cca` consumer reactivo (11 tests) · `ad1b67b3` 2 reliability signals · cierre docs. **53 tests focales verdes**, tsc 0, lint limpio, SQL signals verificado live (steady 0). 326 reliability tests verdes.
+
+**Decisión clave**: output M2 en **PG shadow table + consumer reactivo** (patrón RpA V2), NO mirror BQ del freeze (multi-ciclo no mantenible en CASE BQ). Reusa `classifyOtdBucket` (M1) extendido con `applyMonthGate` — single source of truth del bucket. Preserva `gh_otd_bucket` de M1 intacto.
+
+**Camino restante ISSUE-081**: M3 (cutover bono) — task futura gated. Operador activa `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2) para acumular shadow ≥30d.
+
+**Nota multi-agente**: Codex trabajó TASK-926/928 en paralelo en el árbol; los docs compartidos (README/REGISTRY/changelog/este Handoff) llevan ediciones de ambos. NO toqué el código de Codex (scripts/ci/task-lint, workflow, package.json, reliability/payroll WIP).
+
+---
+
+# Sesion 2026-05-24 — TASK-926 Task Spec Compliance Linter — ✅ SHIPPED
+
+**Status**: ✅ COMPLETE directo en `develop` por override del operador (sin branch switch). Repo-only tooling; no toca runtime, DB, Payroll, access model ni UI.
+
+**Entregado**:
+- `pnpm task:lint` con parser reusable (`scripts/ci/task-lint/parser.mjs`), rule catalog declarativo (`rules.mjs`) y CLI (`scripts/ci/task-lint.mjs`) con `--format json|human`, `--changed`, `--task` y `--strict`.
+- Workflow `.github/workflows/task-contract.yml` en rollout warn-first: CI revisa `docs/tasks/**` con `--changed`; warnings reportan, errores bloquean drift nuevo/focal.
+- Tests focales `pnpm task:lint:test`: multiline `## Status`, lifecycle-folder mismatch, registry warning-only, next-id marker y shape JSON.
+- `docs/tasks/TASK_PROCESS.md`, `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, `changelog.md` y task markdown sincronizados; TASK-926 movida a `complete/`.
+
+**Decisión de rollout**: full backlog queda warning-only (`pnpm --silent task:lint --format json`) porque hay deuda histórica/pre-template real. `--changed` y `--task` mantienen errores duros para evitar drift nuevo sin incendiar el backlog.
+
+**Validación local**: `pnpm task:lint:test`, `pnpm --silent task:lint --format json`, `pnpm task:lint --changed`, `pnpm --silent task:lint --task TASK-926 --format json`, ESLint focal del linter.
+
+**Cuidado multi-agente**: el checkout `develop` está ahead de `origin/develop` con commits ajenos TASK-922 y WIP documental/metrics no mío. No push desde este estado sin coordinar, porque empujaría commits ajenos junto con TASK-926.
+
+---
+
 # Sesion 2026-05-24 — TASK-928 Reliability/Admin N+1 batching — 🔨 IN PROGRESS
 
 **Status**: 🔨 IN PROGRESS directo en `develop` por override del operador (sin branch switch). Implementacion local de batching para N+1 Sentry; **no cerrar Sentry** hasta evidencia post-deploy 24-48h.

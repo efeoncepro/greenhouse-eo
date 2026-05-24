@@ -4618,6 +4618,34 @@ Greenhouse es el **clasificador autoritativo del bucket OTD** (`on_time` / `late
 
 **Spec canónica**: `docs/tasks/complete/TASK-921-due-date-change-capture-reschedule-reason.md`. Migration: `20260524100613341_task-921-task-due-date-changes.sql`. ADR §16.8 (Delta 2026-05-24 — M0 shipped). Patrón fuente: TASK-908/912 (task_status_transitions + captura sibling), TASK-742 (defense-in-depth).
 
+### Attributable Lateness invariants (TASK-922, M2, desde 2026-05-24)
+
+El **atraso imputable** mide SOLO el slip atribuible a la agencia: días posteriores a la **fecha justa** menos el tiempo en estados de **freeze**. M2 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16 — corrige el bucket OTD que hoy refleja atraso bruto (causa raíz ISSUE-081). Construido en **shadow** (flag OFF); el bono NO cambia hasta el cutover gated (M3).
+
+**Fórmula canónica** (ADR §4): `fecha_justa = COALESCE(original, vigente) + Σ extensiones FORWARD confirmadas ∈ {client_requested, scope_change}`; `atraso = max(0, días(fin, fecha_justa) − freeze posterior)`. Mirror de `calculateCycleTime` con 3 diferencias: reloj en fecha justa, set de exclusión = 3 estados de freeze ({Listo para revisión, Bloqueado, En pausa}), solo intervalos posteriores. **El set de exclusión del atraso DIFIERE del de Cycle Time** (que solo excluye `Bloqueado`).
+
+**Helpers canónicos**:
+
+- `calculateAttributableLateness(inputs)` (`src/lib/notion-metrics/calculate-attributable-lateness.ts`, pure, server-only) — source of truth del atraso. Delega el bucket a `classifyOtdBucket`.
+- `classifyOtdBucket(... applyMonthGate: false)` — M2 reusa el clasificador M1 (single source of truth) con el gate de mes apagado (ADR §16.5). NO crear bucket classifier nuevo.
+- Consumer `notionAttributableLatenessComputeProjection` (trigger `notion.task.status_transitioned`) → UPSERT `greenhouse_delivery.task_attributable_lateness_shadow`. Flag `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (default OFF).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** extender la fecha justa por motivos que ya maneja el freeze (`external_blocker`/revisión/pausa) — doble descuento (ADR §5). Solo `client_requested`/`scope_change` extienden.
+- **NUNCA** usar motivo inferido (sin confirmar) para el bucket que afectará el bono. Solo `reason_source='operator_confirmed'`. Sin confirmar → `legacy_unknown` (conservador, mide vs vigente).
+- **NUNCA** computar el output M2 en BQ ni crear un mirror BQ del freeze. El freeze multi-ciclo (3-estado, clamp post-fairDeadline) no es un CASE BQ mantenible en paridad — el helper TS es source of truth (patrón RpA V2: helper + snapshot PG + consumer reactivo). NO clobbear `gh_otd_bucket` de M1.
+- **NUNCA** flipear `ATTRIBUTABLE_LATENESS_OTD_ENABLED=true` ni cutover del bono sin 8 stop-gates + sign-off HR + ≥30d shadow verde (ADR §16.2 M3).
+- **NUNCA** recompute en consumers — leer el helper / shadow table canónicos.
+- **NUNCA** computar días con `EXTRACT(EPOCH FROM (date - date))` (gate TASK-893); el helper computa en TS (`MS_PER_DAY`).
+- **NUNCA** `Sentry.captureException` directo — `captureWithDomain(err, 'delivery', ...)`.
+- **SIEMPRE** documentar que el set de exclusión del atraso (3 estados) difiere del de Cycle Time (1 estado).
+- **SIEMPRE** degradación honesta: sin transitions → `unavailable` (no 0 falso); reschedule extending sin confirmar → `legacy_unknown`.
+
+**Reliability signals** (subsystem `delivery`): `delivery.attributable_lateness.shadow_paridad` (% buckets que el freeze cambia; ok ≤30%, warning >30% sanity) + `delivery.attributable_lateness.freeze_reschedule_overlap` (invariante anti-doble-descuento, steady=0). `delivery.reschedule.pending_reason_confirmation` se reusa de TASK-921.
+
+**Spec canónica**: `docs/architecture/metrics/ATTRIBUTABLE_LATENESS_V1.md` + ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1.md` §4-7, §16.9. Task: `docs/tasks/complete/TASK-922-attributable-lateness-helper-otd-bucket-shadow.md`. Migration: `20260524104127717`. Patrón fuente: TASK-908 (calculate-cycle-time interval pattern), TASK-913/916 (RpA V2 helper + snapshot + consumer), TASK-923 (classifyOtdBucket).
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa
