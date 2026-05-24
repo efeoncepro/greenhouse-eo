@@ -98,7 +98,7 @@ Cuando `calculateRpaV2` extienda inputs con Frame.io signals, `calculateFtr` se 
 
 | Helper | File | Status |
 |---|---|---|
-| `calculateFtr(inputs)` | `src/lib/notion-metrics/calculate-ftr.ts` | Designed (TASK-909 Slice 1, pending ship) |
+| `calculateFtr(inputs)` | `src/lib/notion-metrics/calculate-ftr.ts` | **SHIPPED** (TASK-909 Slice 1, 2026-05-24) |
 
 ### 4.1 Signature canonical V1
 
@@ -349,6 +349,13 @@ Pre-flip de `NOTION_FTR_WRITEBACK_ENABLED=true`:
 - TASK-901 + TASK-908 SHIPPED → TASK-909 está **desbloqueada** (era el estado pendiente correcto).
 - **4 decisiones semánticas canonical pre-aprobadas en sesión** (Q1-Q4 sección 6.1): post-completion only, "completada" incluye Sky `Aprobado` post fix B.2, helper per-task + SQL agregado coexisten, threshold 85% mantenido.
 - TASK-909 implementa Slice 1 (helper). TASK-903 futura implementa writeback completo cuando TASK-901 esté en `enabled` 30d.
+
+### 2026-05-24 — Helper SHIPPED (TASK-909 Slice 1)
+
+- `calculateFtr` shipped en `src/lib/notion-metrics/calculate-ftr.ts` — delegación pura a `calculateRpaV2`, tipos inline, `FTR_FORMULA_VERSION = 'ftr_v1.0'`. 13 tests (9 paths spec §4.2 + idempotencia + version anti-regresión). Mapping canonizado: `unavailable`/`suppressed`/`value=null` → FTR `unavailable`; `low_confidence` propagado (no colapsado a `valid`).
+- Lint rule `greenhouse/no-inline-ftr-calculation` (modo `warn`) shipped — **precisa al recompute del veredicto FTR** (P1 `client_change_round_final` + literal `'pass'/'fail'`, P2 `.value === 0 ? 'pass'`, P3 `formula.ftr` legacy). NO matchea `client_change_round_final = 0` a secas (agregados BQ legítimos "tareas sin ajustes" en dashboard/capability-queries/sla-compliance/ico-engine). Full-source scan, ZERO false positives verificado. Override block exime helper + tests + rule.
+- **Slices 2/3/4 ya estaban hechos** por la sesión doc-only 2026-05-17 (THROUGHPUT_V1.md + PIPELINE_VELOCITY_V1.md Accepted, Engine doc Delta 2026-05-17 head, Contrato sección H, DECISIONS_INDEX entries METRIC_SPEC_PATTERN + OWNERSHIP_BOUNDARY) → TASK-909 ejecutó solo Slice 1 (código) + Slice 5 (METRICS_INDEX/CLAUDE.md touch-up + closing).
+- Zero cambios de código en `metric-registry.ts` (FTR/throughput/pipeline_velocity intactos — confirma boundary "código es source of truth").
 
 ---
 

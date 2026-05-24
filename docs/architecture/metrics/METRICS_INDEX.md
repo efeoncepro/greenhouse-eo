@@ -12,8 +12,8 @@
 
 | Métrica | Spec canonical | Helper canonical | Agregado registry | Writeback Notion | Status spec |
 |---|---|---|---|---|---|
-| **RpA** (Rounds per Asset) | [RPA_V1.md](RPA_V1.md) | `src/lib/notion-metrics/calculate-rpa.ts` (TASK-901 Slice 1, pending) | `metric-registry.ts:166-193` | `not_implemented` → TASK-901 V1 | Accepted 2026-05-17 |
-| **FTR** (First-Time Right) | [FTR_V1.md](FTR_V1.md) | `src/lib/notion-metrics/calculate-ftr.ts` (TASK-909 Slice 1, pending) | `metric-registry.ts:225-255` | `not_implemented` → TASK-903 (futura) | Accepted 2026-05-17 |
+| **RpA** (Rounds per Asset) | [RPA_V1.md](RPA_V1.md) | `src/lib/notion-metrics/calculate-rpa-v2.ts` (`calculateRpaV2` — TASK-901 Slice 1, SHIPPED) | `metric-registry.ts:225-255` | productivo via TASK-916 (`[GH] RpA v2`, SHIPPED flag OFF) | Accepted 2026-05-17 |
+| **FTR** (First-Time Right) | [FTR_V1.md](FTR_V1.md) | `src/lib/notion-metrics/calculate-ftr.ts` (`calculateFtr` — TASK-909 Slice 1, **SHIPPED 2026-05-24**) | `metric-registry.ts:280-309` | `not_implemented` → TASK-903 (futura) | Accepted 2026-05-17 |
 
 ### Cluster B — Delivery compliance (compromiso vs benchmark)
 

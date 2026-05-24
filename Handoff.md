@@ -15,6 +15,18 @@
 
 ---
 
+# Sesion 2026-05-24 — TASK-909 FTR canonical helper V1 — ✅ COMPLETE
+
+Shipped el helper canonical `calculateFtr` ([src/lib/notion-metrics/calculate-ftr.ts](src/lib/notion-metrics/calculate-ftr.ts)): delegación pura a `calculateRpaV2` (`FTR = RpA.value === 0 ? 'pass' : 'fail'`, `ftr_v1.0`). 13 tests. Mapping canonizado: `unavailable`/`suppressed`/`value=null` → FTR `unavailable`; `low_confidence` propagado.
+
+Lint rule `greenhouse/no-inline-ftr-calculation` (warn, plugin v1.9.0) — **precisa al recompute del veredicto FTR** (P1 `client_change_round_final`+`'pass'/'fail'`, P2 `.value === 0 ? 'pass'`, P3 `formula.ftr` legacy). Decisión robusta pre-execution: NO matchear `client_change_round_final = 0` a secas porque se usa en ~6 agregados BQ legítimos ("tareas sin ajustes" en dashboard/capability-queries/sla-compliance/ico-engine). Full-source scan, **0 hits en todo el repo** verificado (zero false positives). Override block exime helper + tests + rule.
+
+**Drift descubierto pre-execution**: Slices 2/3/4 (specs THROUGHPUT/PIPELINE_VELOCITY + Engine doc Delta + Contrato sección H + DECISIONS_INDEX entries) **ya estaban hechos** por la sesión doc-only 2026-05-17 → SKIP. Solo se ejecutó Slice 1 (código) + Slice 5 (docs touch-up: METRICS_INDEX FTR row → SHIPPED, CLAUDE.md helpers list, FTR_V1.md §4+§10). Cero cambios en `metric-registry.ts`.
+
+Gate cierre: `pnpm lint` 0 · `pnpm tsc --noEmit` 0 · `pnpm test` 5338 passed · `pnpm build` OK. Trabajado en `develop` (sin branch, per instrucción). Desbloquea TASK-903 (FTR writeback — su consumer real; Delta agregado a su spec).
+
+---
+
 # Sesion 2026-05-24 — TASK-931 GitHub Actions cost guardrails — ✅ COMPLETE
 
 - **Branch:** `develop` por instruccion explicita del operador; no se crea ni cambia a `task/TASK-931-*`.

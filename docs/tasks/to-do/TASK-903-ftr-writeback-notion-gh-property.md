@@ -1,5 +1,10 @@
 # TASK-903 — FTR writeback a Notion `[GH] FTR` (sibling de TASK-916 RpA writeback)
 
+## Delta 2026-05-24
+
+- Dependencia **TASK-909 Slice 1 SATISFECHA**: el helper canonical `calculateFtr` shipped en `src/lib/notion-metrics/calculate-ftr.ts` (delegación pura a `calculateRpaV2`, `ftr_v1.0`, 13 tests). Esta task ya puede invocarlo como su consumer real — gap "calculate-ftr.ts aún no existe" cerrado.
+- Lint rule `greenhouse/no-inline-ftr-calculation` (warn) activa — esta task DEBE consumir `calculateFtr` (NO recomputar el veredicto FTR inline) o disparará la regla.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -106,7 +111,7 @@ Reglas obligatorias canonical:
 
 ### Gap
 
-- `calculate-ftr.ts` aún no existe (lo crea TASK-909 Slice 1)
+- ~~`calculate-ftr.ts` aún no existe (lo crea TASK-909 Slice 1)~~ → **cerrado 2026-05-24**: `src/lib/notion-metrics/calculate-ftr.ts` SHIPPED (TASK-909 Slice 1)
 - No existe pipeline de writeback FTR (compute + writeback projections, snapshot table, signals)
 - Propiedad `[GH] FTR` aún no creada en Notion (operador-side)
 

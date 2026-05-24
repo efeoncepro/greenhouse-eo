@@ -4244,8 +4244,8 @@ Plus safety net nocturno: Cloud Run Job escanea tareas con `last_edited_time > c
 
 No es ronda interna, no es comentario sin resolver, no es review del workflow team. Es específicamente "el cliente vio el entregable y pidió cambios", observado como evento de transición de estado capturado por TASK-908.
 
-- `calculateRpa(taskId)` (TASK-901 Slice 1) **delega a** `countCorrectionTransitions(taskId)` (TASK-908). NO lee propiedad Notion `Correcciones`.
-- `calculateFtr(taskId)` (TASK-909 Slice 1) **delega a** `calculateRpa(taskId) === 0`. NO duplica lógica.
+- `calculateRpaV2(inputs)` (TASK-901 Slice 1, SHIPPED) **delega a** `countCorrectionTransitions(taskId)` (TASK-908). NO lee propiedad Notion `Correcciones`.
+- `calculateFtr(inputs)` (TASK-909 Slice 1, SHIPPED 2026-05-24) **delega a** `calculateRpaV2(inputs).value === 0 ? 'pass' : 'fail'`. NO duplica lógica.
 
 Forward-compat Frame.io: cuando exista la integración, `calculateRpa` extiende inputs sin breaking change (combinar `correctionTransitionsCount` + `clientReviewOpen` + `workflowReviewOpen` + `openFrameComments` bajo policy a definir).
 
@@ -4280,8 +4280,8 @@ Cada Vn ship con shadow mode mínimo 7 días verde antes de activar writeback. D
 
 - `countCorrectionTransitions(taskId) → number` — en TASK-908 foundation, lee `greenhouse_delivery.task_status_transitions`
 - `calculateCycleTime(taskId) → CycleTimeResult` — en TASK-908, lee transitions + descuenta Bloqueado
-- `calculateRpa(taskId) → RpaResult` — en TASK-901 Slice 1, delega a `countCorrectionTransitions`
-- `calculateFtr(taskId) → FtrResult` — en TASK-909 Slice 1, delega a `calculateRpa`
+- `calculateRpaV2(inputs) → RpaV2Result` — `src/lib/notion-metrics/calculate-rpa-v2.ts` (TASK-901 Slice 1 SHIPPED, estrangulador RpA V2), delega a `countCorrectionTransitions`
+- `calculateFtr(inputs) → FtrResult` — `src/lib/notion-metrics/calculate-ftr.ts` (TASK-909 Slice 1 SHIPPED 2026-05-24), delegación pura a `calculateRpaV2` (`FTR = RpA.value === 0 ? 'pass' : 'fail'`, `ftr_v1.0`). Lint rule `greenhouse/no-inline-ftr-calculation` (warn) bloquea recompute inline del veredicto. NO duplica lógica; cuando Frame.io shippee se extiende `calculateRpaV2` y FTR se beneficia automático
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` (ADR canonical). Cross-refs: `docs/architecture/Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 secciones F + G; `docs/architecture/Greenhouse_ICO_Engine_v1.md` (conceptual spec, drift por resolver post-TASK-908/909/901). Patrones fuente: TASK-742 (defense-in-depth 7-layer), TASK-773 (outbox publisher canonical), TASK-771 (decoupling write paths via outbox), TASK-706 (HMAC webhook ingestion), TASK-720 (TS-only declarative reader pattern).
 
