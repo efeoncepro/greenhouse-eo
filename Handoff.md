@@ -1,3 +1,19 @@
+# Sesion 2026-05-24 — GitHub Actions cost guardrail — ✅ SAFE SLICE
+
+**Status**: ✅ Implementado en `develop` como primer slice conservador tras auditoria live de billing/runs. No reduce el set de checks del ultimo commit de codigo; reduce trabajo obsoleto y docs-only.
+
+**Contexto live**: GitHub Billing mayo 2026 muestra `greenhouse-eo` como driver casi total (`USD 93.18 gross`, `Actions Linux` 15.339 min). Ranking por job-min visibles: `CI` 5.157 min / 339 runs, `Playwright E2E smoke` 933 min / 287 runs, `Production Release Orchestrator` 1.038 min, `Ops Worker Deploy` 562 min, `Commercial Cost Worker Deploy` 234 min.
+
+**Decision arquitectonica**: para Vibe Coding, el contrato correcto es **latest commit wins** en PR/develop: si un agente empuja commits sucesivos, se cancela el CI obsoleto y se conserva el gate completo para el ultimo estado. `main` no cancela runs para preservar evidencia de release/integracion.
+
+**Cambios**:
+- `.github/workflows/ci.yml`: agrega `concurrency` con `cancel-in-progress` solo para PRs y `develop`; agrega `paths-ignore` para `*.md`, `docs/**`, `.claude/**`, `.codex/**`.
+- `.github/workflows/playwright.yml`: agrega `paths-ignore` para el mismo scope documental; mantiene la concurrency existente y la suite completa para cambios de codigo.
+
+**Observabilidad preservada**: docs/tasks siguen cubiertos por `Task Contract`; `DESIGN.md`/tokens siguen cubiertos por `Design Contract`; codigo/config no-documental sigue disparando CI/Playwright segun el workflow.
+
+**Pendiente recomendado**: abrir task formal para Slice 2: split CI fast/full, revisar path filters de workers, budgets GitHub Actions y dashboard de runs por workflow. No hacer esos cambios sin task porque cambian contratos de release/QA.
+
 # Sesion 2026-05-24 — TASK-637 GitHub Billing & Actions Cost Observability — ✅ COMPLETE
 
 **Status**: ✅ COMPLETE directo en `develop` por instruccion explicita del operador (sin branch switch). Discovery/Audit/Mapa/Plan completados antes de implementar.
