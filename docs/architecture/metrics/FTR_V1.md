@@ -9,8 +9,8 @@
 | Owner domain | `delivery|ico` |
 | Created | 2026-05-17 by sesión deep-dive FTR + arch reasoning |
 | Last updated | 2026-05-17 |
-| Writeback state | `not_implemented` (TASK-903 futura implementa writeback per-task; agregado SQL existe hoy en registry) |
-| Cross-refs | TASK-909 (helper canonical V1) · TASK-901 (calculateRpaV2 prerequisito — SHIPPED) · TASK-908 (foundation transitions prerequisito — SHIPPED) · TASK-903 (writeback futuro) · RPA_V1 · ADR boundary · ADR metric spec pattern |
+| Writeback state | `infra_shipped_flag_off` (TASK-903 SHIPPED 2026-05-24 — pipeline compute+writeback con flag `NOTION_FTR_WRITEBACK_ENABLED` default OFF; agregado SQL `ftr_pct` ya existe en registry) |
+| Cross-refs | TASK-909 (helper canonical V1 — SHIPPED) · TASK-901 (calculateRpaV2 prerequisito — SHIPPED) · TASK-908 (foundation transitions prerequisito — SHIPPED) · TASK-903 (writeback infra — SHIPPED flag OFF) · RPA_V1 · ADR boundary · ADR metric spec pattern |
 
 ---
 
@@ -86,7 +86,7 @@ La versión de FTR trackea **su propia lógica de mapping** (`pass/fail`), desac
 
 - **Notion** captura: status edits + completion flag (cambio de `Status` a `Completado` / `Aprobado`)
 - **Greenhouse** computa: vía delegación → `calculateRpaV2` → `countCorrectionTransitions` → lee `task_status_transitions`
-- **Greenhouse devuelve a Notion**: property read-only `[GH] FTR` (TASK-903 futura, no V1)
+- **Greenhouse devuelve a Notion**: property read-only `[GH] FTR` (TASK-903 SHIPPED infra, flag OFF — activación gated)
 
 ### 3.2 Forward-compat Frame.io (V2)
 
@@ -217,7 +217,7 @@ CANONICAL_FTR_PASSED_SQL = <CANONICAL_COMPLETED_TASK_SQL>
 
 | Layer | Cuándo se usa | Source data |
 |---|---|---|
-| `calculateFtr(taskId)` per-task helper | Writeback Notion (TASK-903 futura) + UI per-task drawer + investigación per-task | Live: `calculateRpaV2` → `countCorrectionTransitions` (TASK-908 transitions table) |
+| `calculateFtr(taskId)` per-task helper | Writeback Notion (TASK-903 SHIPPED, flag OFF) + UI per-task drawer + investigación per-task | Live: `calculateRpaV2` → `countCorrectionTransitions` (TASK-908 transitions table) |
 | `ftr_pct` SQL aggregate registry | Dashboards mensuales (Person 360, Pulse, ICO scorecards) | Materializado: `v_tasks_enriched.rpa` (post TASK-901 writeback, viene del compute canonical) |
 
 Pre-TASK-901 writeback: `v_tasks_enriched.rpa` viene del sync legacy `notion-bq-sync` (con bug class TASK-877 follow-up). Post-TASK-901: `v_tasks_enriched.rpa` viene del compute canonical Greenhouse via writeback → bug class eliminado upstream.
@@ -320,7 +320,7 @@ Out of scope V1. Hipótesis: GIFs y banners estáticos tienen FTR esperado más 
 | Frecuencia | Per-edit (webhook reactive) + nightly safety net |
 | Latencia esperada | 5-30s post-edit (mismo pattern TASK-901) |
 | Feature flag | `NOTION_FTR_WRITEBACK_ENABLED` (default `false`) |
-| Reliability signal de paridad | `notion.metrics.shadow_paridad_ftr` (TASK-903 shadow mode futuro) |
+| Reliability signal de paridad | **Cubierto por `notion.metrics.shadow_paridad_rpa` (TASK-916)** — NO existe signal `shadow_paridad_ftr` standalone. FTR es derivada pura de RpA (`pass ⇔ RpA===0`) sin fórmula Notion legacy que diffear; si RpA paridad ≥95%, FTR paridad ≥95% por construcción. Signals FTR operacionales: `notion.metrics.ftr_writeback_{dead_letter,lag}` (SHIPPED) |
 
 ### 9.1 Pre-condiciones de activación canonical
 
@@ -328,9 +328,10 @@ Pre-flip de `NOTION_FTR_WRITEBACK_ENABLED=true`:
 
 1. TASK-908 Slices 0-3.5 shipped + backfill verde
 2. TASK-901 SHIPPED + writeback RpA en `enabled` 30+ días verde
-3. TASK-903 shadow mode FTR 7 días verde
-4. `notion.metrics.shadow_paridad_ftr` signal steady=0
+3. TASK-903 shadow mode FTR 7 días verde (flag ON observado, signals `ftr_writeback_{dead_letter,lag}` steady=0)
+4. `notion.metrics.shadow_paridad_rpa` (TASK-916) steady=0 — cubre FTR por construcción (no existe `shadow_paridad_ftr` standalone)
 5. Allowlist en `Handoff.md` con `[GH] FTR` property confirmada en Sky + Efeonce DBs
+6. Decisión explícita: FTR explícito vale vs derivarlo del número RpA ya visible (ver "Why This Task Exists" en TASK-903)
 
 ---
 
@@ -348,7 +349,7 @@ Pre-flip de `NOTION_FTR_WRITEBACK_ENABLED=true`:
 - **Versionado**: `ftr_v1.0` delega a `rpa_v2.0` — no es mismatch; cada métrica versiona su propia transformación (§2.3).
 - TASK-901 + TASK-908 SHIPPED → TASK-909 está **desbloqueada** (era el estado pendiente correcto).
 - **4 decisiones semánticas canonical pre-aprobadas en sesión** (Q1-Q4 sección 6.1): post-completion only, "completada" incluye Sky `Aprobado` post fix B.2, helper per-task + SQL agregado coexisten, threshold 85% mantenido.
-- TASK-909 implementa Slice 1 (helper). TASK-903 futura implementa writeback completo cuando TASK-901 esté en `enabled` 30d.
+- TASK-909 implementa Slice 1 (helper). TASK-903 implementa la infra de writeback (SHIPPED 2026-05-24, flag OFF); el flip a writeback activo queda gated post TASK-916 RpA `enabled` 30d.
 
 ### 2026-05-24 — Writeback infra SHIPPED flag OFF (TASK-903)
 
@@ -370,7 +371,7 @@ Pre-flip de `NOTION_FTR_WRITEBACK_ENABLED=true`:
 
 - **ADRs**: `../GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md`, `../GREENHOUSE_METRIC_SPEC_PATTERN_V1.md`
 - **Specs hermanas**: [RPA_V1.md](RPA_V1.md) (FTR delega a RpA — source canonical único)
-- **Tasks**: TASK-909 (helper canonical V1) · TASK-901 (calculateRpaV2 prerequisite — SHIPPED) · TASK-908 (foundation transitions prerequisite — SHIPPED) · TASK-903 (writeback futuro, post TASK-901 30d)
+- **Tasks**: TASK-909 (helper canonical V1 — SHIPPED) · TASK-901 (calculateRpaV2 prerequisite — SHIPPED) · TASK-908 (foundation transitions prerequisite — SHIPPED) · TASK-903 (writeback infra — SHIPPED flag OFF, activación gated post TASK-916 30d)
 - **Código**:
   - Helper canonical: `src/lib/notion-metrics/calculate-ftr.ts` (TASK-909 Slice 1, pending)
   - Helper delegado: `src/lib/notion-metrics/calculate-rpa-v2.ts` (`calculateRpaV2` — TASK-901 Slice 1, SHIPPED)
