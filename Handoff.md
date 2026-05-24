@@ -1,3 +1,19 @@
+# Sesion 2026-05-24 — TASK-921 M0: captura `task_due_date_changes` + motivo de reprogramación — 🔨 IN PROGRESS
+
+**Status**: 🔨 IN PROGRESS **directo en develop** (override operador: sin branch). M0 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16 — foundation que TASK-922 (M2 freeze/atraso imputable) consume. Crea el log append-only `greenhouse_delivery.task_due_date_changes` + captura de cambios de `Fecha límite` + inferencia de motivo de reprogramación.
+
+**Decisiones de diseño pre-FASE 1 (documentadas en Audit)**:
+- **Reusar `notion.task.page_change_signal`** (ya emitido por el webhook `notion-status-transitions` de TASK-912 para CUALQUIER cambio de propiedad) con un consumer nuevo → NO segundo endpoint/HMAC/suscripción. Más DRY/robusto.
+- **Flag propio `NOTION_DUE_DATE_CAPTURE_ENABLED` (default OFF)**: el webhook de TASK-912 YA está ON en prod → sin flag propio el merge capturaría inmediato (viola cero-impacto). El flag gatea el PERSIST del consumer.
+- **Writeback-de-sugerencia a Notion → DEFERIDO a follow-up** (mirror TASK-927). El path de CONFIRMACIÓN del operador SÍ se incluye: el consumer LEE la propiedad Notion `Motivo de reprogramación` en el re-fetch → `reason_source='operator_confirmed'`. TASK-922 solo consume motivos confirmados.
+- **Baseline seed** desde `Fecha límite original` en primera observación (best-effort histórico); `scope_change` NUNCA se infiere (solo operador), default ambiguo = `unspecified` (conservador, no extiende fecha_justa).
+
+**Plan**: Slice 1 migration → 2 helper inferencia → 3 fetchPageDueDate + consumer + flag → 4 signals → 5 docs+cierre. Additive, flag OFF → cero impacto al merge.
+
+**NOTA**: hay WIP de Codex sin commitear en `src/lib/reliability/ai|synthetic` + `services/ops-worker/server.ts` — NO tocar; staging selectivo por slice.
+
+---
+
 # Sesion 2026-05-24 — Sentry weekly remediation hardening (May 15-22)
 
 **Status**: 🔨 IMPLEMENTADO LOCALMENTE, pendiente de release/deploy y verificacion Sentry 24-48h. Se aplico el plan sin parches: no sampling, no fingerprint hiding, no ignore/mute. Finance drift sigue visible.
