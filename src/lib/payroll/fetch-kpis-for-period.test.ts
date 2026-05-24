@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const {
   ensureIcoEngineInfrastructure,
   readMemberMetricsBatch,
-  computeMetricsByContext
+  computeMemberMetricsBatch
 } = vi.hoisted(() => ({
   ensureIcoEngineInfrastructure: vi.fn(),
   readMemberMetricsBatch: vi.fn(),
-  computeMetricsByContext: vi.fn()
+  computeMemberMetricsBatch: vi.fn()
 }))
 
 vi.mock('@/lib/ico-engine/schema', () => ({
@@ -16,7 +16,7 @@ vi.mock('@/lib/ico-engine/schema', () => ({
 
 vi.mock('@/lib/ico-engine/read-metrics', () => ({
   readMemberMetricsBatch,
-  computeMetricsByContext
+  computeMemberMetricsBatch
 }))
 
 import { fetchKpisForPeriod } from './fetch-kpis-for-period'
@@ -84,7 +84,7 @@ describe('fetchKpisForPeriod', () => {
   beforeEach(() => {
     ensureIcoEngineInfrastructure.mockReset()
     readMemberMetricsBatch.mockReset()
-    computeMetricsByContext.mockReset()
+    computeMemberMetricsBatch.mockReset()
   })
 
   it('uses materialized ICO metrics first and fills gaps with live compute', async () => {
@@ -103,16 +103,19 @@ describe('fetchKpisForPeriod', () => {
       ])
     )
 
-    computeMetricsByContext.mockImplementation(async (_dimension, memberId) =>
-      memberId === 'member-2'
-        ? buildIcoSnapshot({
+    computeMemberMetricsBatch.mockResolvedValue(
+      new Map([
+        [
+          'member-2',
+          buildIcoSnapshot({
             memberId: 'member-2',
             rpa: 2.1,
             otd: 88,
             completedTasks: 7,
             source: 'live'
           })
-        : null
+        ]
+      ])
     )
 
     const result = await fetchKpisForPeriod({
@@ -123,7 +126,7 @@ describe('fetchKpisForPeriod', () => {
 
     expect(ensureIcoEngineInfrastructure).toHaveBeenCalledTimes(1)
     expect(readMemberMetricsBatch).toHaveBeenCalledWith(['member-1', 'member-2'], 2026, 3)
-    expect(computeMetricsByContext).toHaveBeenCalledWith('member', 'member-2', 2026, 3)
+    expect(computeMemberMetricsBatch).toHaveBeenCalledWith(['member-2'], 2026, 3)
 
     expect(result.snapshots.get('member-1')).toEqual({
       memberId: 'member-1',
@@ -174,7 +177,7 @@ describe('fetchKpisForPeriod', () => {
 
   it('tracks members with no ICO metrics even after live fallback', async () => {
     readMemberMetricsBatch.mockResolvedValue(new Map())
-    computeMetricsByContext.mockResolvedValue(null)
+    computeMemberMetricsBatch.mockResolvedValue(new Map())
 
     const result = await fetchKpisForPeriod({
       memberIds: ['member-3'],

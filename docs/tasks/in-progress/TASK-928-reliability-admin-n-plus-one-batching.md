@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno derivado de auditoria Sentry semanal 2026-05-24`
+- Status real: `En implementacion directa en develop por override operador 2026-05-24`
 - Rank: `TBD`
 - Domain: `platform|reliability|performance|payroll`
 - Blocked by: `none`
-- Branch: `task/TASK-928-reliability-admin-n-plus-one-batching`
+- Branch: `develop` (operator override: no branch switch)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -79,11 +79,22 @@ Reglas obligatorias:
 - Readers de reliability overview y admin health.
 - Sentry performance issues detectando N+1.
 - Synthetic cron bulk insert implementado como primer slice acotado.
+- Platform Health ya tiene cache TTL in-process y `getReliabilityOverview()` ya acepta sources preloaded.
+- `syncViewRegistryCatalog()` sincroniza el registry en cada GET de `/admin/views`, pero antes de esta task lo hacia con un UPSERT por vista.
+- Payroll projected reutiliza `fetchKpisForPeriod()`; el fallback live ICO para miembros no materializados/stale debe batcharse en el reader canonical, no en la UI.
 
 ### Gap
 
 - Admin/integrations/views y payroll siguen haciendo lecturas repetidas por request.
-- No hay request cache canonica para health/locale/table-presence compartidos.
+- No hace falta crear cache global nuevo: el slice seguro es deduplicar promises/preloaded sources dentro de la request y reemplazar loops por bulk readers.
+
+## Discovery / Audit Decisions 2026-05-24
+
+- `pnpm pg:doctor` verde contra `efeonce-group:us-east4:greenhouse-pg-dev`; no hay migraciones requeridas.
+- No se cambia sampling, fingerprint ni estado Sentry. El closeout queda post-deploy 24-48h.
+- Access model sin cambios: `routeGroups`, `views`, `entitlements` y startup policy preservan semantica actual.
+- Worktree en `develop` tiene WIP ajeno/previo; la implementacion debe stagear selectivamente y no revertir archivos no relacionados.
+- Se descarta cache cross-request nuevo para V1: se reutiliza el TTL de Platform Health donde existe y se hace request fan-out dedupe/preload.
 
 ## Scope
 
@@ -161,3 +172,25 @@ Sin flag para refactors internos request-scoped y readers agregados. Si aparece 
 - `pnpm lint`
 - `pnpm build`
 - Sentry performance post-deploy.
+
+## Implementation Progress 2026-05-24
+
+### Delivered locally
+
+- `/admin/views`: `syncViewRegistryCatalog()` reemplaza el UPSERT por vista por un bulk upsert con `UNNEST`, dentro de la misma transaccion y preservando el deactivate de vistas removidas.
+- `/admin/views`: `getAdminPersistedViewAccessGovernance()` resuelve acceso role/view una sola vez y deriva `roleAccess` + `roleAccessSource` desde el mismo resultado.
+- Platform Health: `fetchAllSources()` reutiliza las promises de operations y synthetics y las entrega como preloaded sources a `getReliabilityOverview()` cuando estan sanas.
+- Payroll projected: `fetchKpisForPeriod()` reemplaza el fallback live por-miembro por `computeMemberMetricsBatch()`, manteniendo materialized-first y missing-member accounting.
+
+### Verification local
+
+- `pnpm pg:doctor` -> green.
+- `pnpm exec vitest run src/lib/admin/view-access-store.test.ts src/lib/platform-health/composer.test.ts src/lib/platform-health/composer-fetch.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts` -> 4 files / 13 tests passing.
+- `pnpm exec vitest run src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/project-payroll.test.ts src/views/greenhouse/payroll/ProjectedPayrollView.test.tsx` -> 3 files / 23 tests passing.
+- `pnpm exec tsc --noEmit` -> green.
+- `pnpm lint` -> green.
+
+### Pending before lifecycle complete
+
+- Optional `pnpm build` if this remains the final integration batch on `develop`.
+- Post-deploy Sentry performance review for 24-48h before resolving N+1 issues.

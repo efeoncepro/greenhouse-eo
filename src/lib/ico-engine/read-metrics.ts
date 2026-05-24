@@ -545,6 +545,103 @@ export const computeMetricsByContext = async (
   }
 }
 
+export const computeMemberMetricsBatch = async (
+  memberIds: string[],
+  periodYear: number,
+  periodMonth: number
+): Promise<Map<string, IcoMetricSnapshot>> => {
+  const normalizedMemberIds = Array.from(
+    new Set(memberIds.map(memberId => normalizeString(memberId)).filter(Boolean))
+  )
+
+  if (normalizedMemberIds.length === 0) {
+    return new Map()
+  }
+
+  const projectId = getIcoEngineProjectId()
+  const baseTable = `\`${projectId}.${ICO_DATASET}.v_tasks_enriched\``
+
+  const [metricRows, cscRows] = await Promise.all([
+    runIcoEngineQuery<GenericMetricRow>(`
+      SELECT
+        primary_owner_member_id AS dimension_value,
+        ${buildMetricSelectSQL()}
+      FROM ${baseTable}
+      WHERE primary_owner_member_id IN UNNEST(@memberIds)
+        AND (${buildPeriodFilterSQL()})
+      GROUP BY dimension_value
+    `, { memberIds: normalizedMemberIds, periodYear, periodMonth }),
+
+    runIcoEngineQuery<CscDistributionRow>(`
+      SELECT
+        primary_owner_member_id AS space_id,
+        fase_csc,
+        COUNT(*) AS task_count
+      FROM ${baseTable}
+      WHERE primary_owner_member_id IN UNNEST(@memberIds)
+        AND ${CANONICAL_ACTIVE_CSC_TASK_SQL}
+        AND (${buildPeriodFilterSQL()})
+      GROUP BY space_id, fase_csc
+      ORDER BY space_id, fase_csc
+    `, { memberIds: normalizedMemberIds, periodYear, periodMonth })
+  ])
+
+  const cscRowsByMember = new Map<string, CscDistributionRow[]>()
+
+  for (const row of cscRows) {
+    const memberId = normalizeString(row.space_id)
+
+    if (!memberId) continue
+
+    const rows = cscRowsByMember.get(memberId) ?? []
+
+    rows.push(row)
+    cscRowsByMember.set(memberId, rows)
+  }
+
+  const snapshots = new Map<string, IcoMetricSnapshot>()
+
+  for (const row of metricRows) {
+    const memberId = normalizeString(row.dimension_value)
+
+    if (!memberId) continue
+
+    const activeTasks = toNumber(row.active_tasks)
+
+    const cscDistribution: CscDistributionEntry[] = (cscRowsByMember.get(memberId) ?? []).map(csc => ({
+      phase: normalizeString(csc.fase_csc) as CscPhase,
+      label: CSC_PHASE_LABELS[normalizeString(csc.fase_csc) as CscPhase] ?? normalizeString(csc.fase_csc),
+      count: toNumber(csc.task_count),
+      pct: activeTasks > 0 ? Math.round((toNumber(csc.task_count) / activeTasks) * 1000) / 10 : 0
+    }))
+
+    snapshots.set(memberId, {
+      dimension: 'member',
+      dimensionValue: memberId,
+      dimensionLabel: null,
+      periodYear,
+      periodMonth,
+      metrics: buildMetricValuesFromRow(row),
+      cscDistribution,
+      context: {
+        totalTasks: toNumber(row.total_tasks),
+        completedTasks: toNumber(row.completed_tasks),
+        activeTasks,
+        onTimeTasks: toNumber(row.on_time_count),
+        lateDropTasks: toNumber(row.late_drop_count),
+        overdueTasks: toNumber(row.overdue_count),
+        carryOverTasks: toNumber(row.carry_over_count),
+        overdueCarriedForwardTasks: toNumber(row.overdue_carried_forward_count)
+      },
+      computedAt: new Date().toISOString(),
+      engineVersion: ENGINE_VERSION,
+      source: 'live'
+    })
+  }
+
+  return snapshots
+}
+
 // ─── Project-Level Metrics ──────────────────────────────────────────────────
 
 interface ProjectMetricRow {
@@ -821,14 +918,9 @@ export const readMemberMetricsBatch = async (
   }
 
   if (staleMemberIds.length > 0) {
-    const liveSnapshots = await Promise.all(
-      staleMemberIds.map(async memberId => ({
-        memberId,
-        snapshot: await computeMetricsByContext('member', memberId, periodYear, periodMonth)
-      }))
-    )
+    const liveSnapshots = await computeMemberMetricsBatch(staleMemberIds, periodYear, periodMonth)
 
-    for (const { memberId, snapshot } of liveSnapshots) {
+    for (const [memberId, snapshot] of liveSnapshots.entries()) {
       if (snapshot) {
         snapshots.set(memberId, snapshot)
       }

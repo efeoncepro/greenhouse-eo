@@ -1,3 +1,25 @@
+# Sesion 2026-05-24 — TASK-928 Reliability/Admin N+1 batching — 🔨 IN PROGRESS
+
+**Status**: 🔨 IN PROGRESS directo en `develop` por override del operador (sin branch switch). Implementacion local de batching para N+1 Sentry; **no cerrar Sentry** hasta evidencia post-deploy 24-48h.
+
+**Slices entregados localmente**:
+- `/admin/views`: `syncViewRegistryCatalog()` ahora hace bulk upsert con `UNNEST` en una transaccion (antes 1 UPSERT por view en cada GET). `getAdminPersistedViewAccessGovernance()` resuelve role/view una sola vez y deriva access + source desde el mismo resultado.
+- Platform Health: `fetchAllSources()` reutiliza `operationsPromise` y `syntheticsPromise` y pasa esas sources preloaded a `getReliabilityOverview()` cuando estan sanas, evitando lecturas duplicadas en cache miss.
+- Payroll projected: `fetchKpisForPeriod()` usa `computeMemberMetricsBatch()` para el fallback live de miembros faltantes/stale. No toca `buildPayrollEntry`, periodos, liquidaciones ni UI; conserva materialized-first y missing-member accounting.
+
+**Validacion local**:
+- `pnpm pg:doctor` -> green.
+- `pnpm exec vitest run src/lib/admin/view-access-store.test.ts src/lib/platform-health/composer.test.ts src/lib/platform-health/composer-fetch.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts` -> 4 files / 13 tests passing.
+- `pnpm exec vitest run src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/project-payroll.test.ts src/views/greenhouse/payroll/ProjectedPayrollView.test.tsx` -> 3 files / 23 tests passing.
+- `pnpm exec tsc --noEmit` -> green.
+- `pnpm lint` -> green.
+
+**Pendiente**: si este queda como batch final de integracion, `pnpm build`. Mantener la task en `in-progress` hasta revisar Sentry performance 24-48h post-deploy.
+
+**Cuidado multi-agente**: el worktree en `develop` contiene cambios/commits de TASK-921 y otros docs no relacionados. Stagear selectivamente; no revertir WIP ajeno.
+
+---
+
 # Sesion 2026-05-24 — TASK-921 M0: captura `task_due_date_changes` + motivo de reprogramación — ✅ SHIPPED
 
 **Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M0 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16 — foundation que TASK-922 (M2 freeze/atraso imputable) consume. Creó el log append-only `greenhouse_delivery.task_due_date_changes` + captura de cambios de `Fecha límite` + inferencia de motivo de reprogramación.

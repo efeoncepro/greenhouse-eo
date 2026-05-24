@@ -260,16 +260,40 @@ const buildDegradedSourceList = (input: ComposerInput): PlatformHealthDegradedSo
  * could fail the whole response — it always uses a per-source budget.
  */
 const fetchAllSources = async (): Promise<ComposerInput> => {
+  const operationsPromise = withSourceTimeout(() => getOperationsOverview(), {
+    source: 'operations_overview',
+    timeoutMs: 5_000
+  })
+
+  const syntheticsPromise = withSourceTimeout(() => getLatestSyntheticSnapshotsByRoute(), {
+    source: 'synthetic_monitoring',
+    timeoutMs: 3_000
+  })
+
+  const reliabilityPromise = withSourceTimeout(async () => {
+    const [operationsResult, syntheticsResult] = await Promise.all([
+      operationsPromise,
+      syntheticsPromise
+    ])
+
+    return getReliabilityOverview(
+      operationsResult.status === 'ok' && operationsResult.value ? operationsResult.value : undefined,
+      {
+        syntheticSnapshots:
+          syntheticsResult.status === 'ok' && syntheticsResult.value
+            ? syntheticsResult.value
+            : undefined
+      }
+    )
+  }, {
+    source: 'reliability_control_plane',
+    timeoutMs: 6_000
+  })
+
   const [reliability, operations, cloudHealth, observability, sentry, synthetics, integrations] =
     await Promise.all([
-      withSourceTimeout(() => getReliabilityOverview(), {
-        source: 'reliability_control_plane',
-        timeoutMs: 6_000
-      }),
-      withSourceTimeout(() => getOperationsOverview(), {
-        source: 'operations_overview',
-        timeoutMs: 5_000
-      }),
+      reliabilityPromise,
+      operationsPromise,
       withSourceTimeout(() => getCloudPlatformHealthSnapshot(), {
         source: 'internal_runtime_health',
         timeoutMs: 5_000
@@ -282,10 +306,7 @@ const fetchAllSources = async (): Promise<ComposerInput> => {
         source: 'sentry_incidents',
         timeoutMs: 3_000
       }),
-      withSourceTimeout(() => getLatestSyntheticSnapshotsByRoute(), {
-        source: 'synthetic_monitoring',
-        timeoutMs: 3_000
-      }),
+      syntheticsPromise,
       withSourceTimeout(
         () => getIntegrationHealthSnapshots([...TRACKED_INTEGRATION_KEYS]),
         { source: 'integration_readiness', timeoutMs: 4_000 }
@@ -367,6 +388,7 @@ export const getPlatformHealth = async (
 
 export const __composerInternalsForTests = {
   detectEnvironment,
+  fetchAllSources,
   rollupOverallStatus,
   rollupConfidence,
   buildModule,
