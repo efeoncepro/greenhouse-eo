@@ -3721,6 +3721,25 @@ export interface GreenhouseDeliveryStaffAugPlacements {
   updated_by_user_id: string | null;
 }
 
+export interface GreenhouseDeliveryTaskDueDateChanges {
+  captured_at: Generated<Timestamp>;
+  change_id: Generated<string>;
+  changed_at: Timestamp;
+  changed_by: string | null;
+  created_at: Generated<Timestamp>;
+  days_delta: number | null;
+  new_due_date: Timestamp | null;
+  previous_due_date: Timestamp | null;
+  reason_code: Generated<string>;
+  reason_confidence: string | null;
+  reason_source: Generated<string>;
+  source_event_id: string | null;
+  source_quality: Generated<string>;
+  status_at_change: string | null;
+  task_source_id: string;
+  workspace_id: string;
+}
+
 export interface GreenhouseDeliveryTaskRpaDemoSnapshots {
   computed_at: Generated<Timestamp>;
   correction_transitions_count: Generated<number>;
@@ -9334,6 +9353,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_events": GreenhouseDeliveryStaffAugEvents;
   "greenhouse_delivery.staff_aug_onboarding_items": GreenhouseDeliveryStaffAugOnboardingItems;
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
+  "greenhouse_delivery.task_due_date_changes": GreenhouseDeliveryTaskDueDateChanges;
   "greenhouse_delivery.task_rpa_demo_snapshots": GreenhouseDeliveryTaskRpaDemoSnapshots;
   "greenhouse_delivery.task_rpa_snapshots": GreenhouseDeliveryTaskRpaSnapshots;
   "greenhouse_delivery.task_status_transitions": GreenhouseDeliveryTaskStatusTransitions;
