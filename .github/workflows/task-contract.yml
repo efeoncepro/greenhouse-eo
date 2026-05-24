@@ -1,0 +1,94 @@
+name: Task Contract
+
+# TASK-926 — docs/tasks contract gate.
+# Warn-first rollout: errors block, warnings report only. Flip the workflow step
+# to `pnpm task:lint --changed --strict --format json` after false positives are
+# triaged and registry drift is clean enough to make warnings blocking.
+
+on:
+  pull_request:
+    paths:
+      - 'docs/tasks/**'
+      - 'scripts/ci/task-lint.mjs'
+      - 'scripts/ci/task-lint/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/task-contract.yml'
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'docs/tasks/**'
+      - 'scripts/ci/task-lint.mjs'
+      - 'scripts/ci/task-lint/**'
+      - '.github/workflows/task-contract.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    name: Validate docs/tasks contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run task:lint (JSON)
+        id: task_lint
+        run: |
+          pnpm --silent task:lint --changed --format json > task-lint.json
+          echo "Lint output saved to task-lint.json"
+
+      - name: Parse summary
+        id: summary
+        if: always()
+        run: |
+          ERRORS=$(jq -r '.summary.errors // 0' task-lint.json)
+          WARNINGS=$(jq -r '.summary.warnings // 0' task-lint.json)
+          SCANNED=$(jq -r '.summary.tasksScanned // 0' task-lint.json)
+          TEMPLATE=$(jq -r '.summary.templateTasks // 0' task-lint.json)
+          LEGACY=$(jq -r '.summary.legacyTasks // 0' task-lint.json)
+          echo "errors=$ERRORS" >> "$GITHUB_OUTPUT"
+          echo "warnings=$WARNINGS" >> "$GITHUB_OUTPUT"
+          echo "## docs/tasks lint summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Count |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Scanned | $SCANNED |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Template tasks | $TEMPLATE |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Legacy tasks | $LEGACY |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Errors | $ERRORS |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Warnings | $WARNINGS |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Report findings
+        if: always()
+        run: |
+          jq -r '.errors[]? | "::error file=\(.file),line=\(.line // 1)::\(.rule) — \(.message)"' task-lint.json
+          jq -r '.warnings[]? | "::warning file=\(.file),line=\(.line // 1)::\(.rule) — \(.message)"' task-lint.json
+          if [ "${{ steps.summary.outputs.errors }}" != "0" ]; then
+            exit 1
+          fi
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: task-lint-report
+          path: task-lint.json
+          retention-days: 30

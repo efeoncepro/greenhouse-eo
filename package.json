@@ -12,6 +12,8 @@
     "design:lint": "design.md lint DESIGN.md",
     "design:diff": "node scripts/design-diff.mjs",
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md",
+    "task:lint": "node scripts/ci/task-lint.mjs",
+    "task:lint:test": "node scripts/ci/__tests__/task-lint.test.mjs",
     "docs:context-check": "node scripts/check-context-handoff.mjs",
     "docs:context-check:strict": "node scripts/check-context-handoff.mjs --strict",
     "start": "node scripts/run-next-start.mjs",

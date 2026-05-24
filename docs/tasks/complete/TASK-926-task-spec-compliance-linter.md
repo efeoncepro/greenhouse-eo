@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `none`
-- Branch: `task/TASK-926-task-spec-compliance-linter`
+- Branch: `develop` (operator override; no branch switch)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -196,15 +196,15 @@ N/A — repo-only change.
 
 ## Acceptance Criteria
 
-- [ ] `pnpm task:lint` corre sin crashear sobre el backlog completo y reporta summary (`tasksScanned/templateTasks/legacyTasks`).
-- [ ] Detecta lifecycle↔carpeta mismatch como `error` (verificado con fixture).
-- [ ] Detecta task `template` en carpeta sin fila en `TASK_ID_REGISTRY.md` (regla registry-parity, `warning`-only en V1 hasta saneo del registry; flip a `error` posterior).
-- [ ] Detecta marcador "siguiente ID disponible" desactualizado vs `max(ID registry)+1` como `warning`.
-- [ ] Tasks `CODEX_TASK_*` y briefs no generan `error` estructural (solo paridad registry warn).
-- [ ] Parsea correctamente un `## Status` con `Blocked by:` multi-línea/prosa (fixture real del backlog, ej. TASK-921) sin truncar ni romper.
-- [ ] `--format json` emite shape `{ errors, warnings, summary }`.
-- [ ] `--changed` limita el scan al diff del PR.
-- [ ] `.github/workflows/task-contract.yml` corre en PRs que tocan `docs/tasks/**` (warn-only en el primer merge).
+- [x] `pnpm task:lint` corre sin crashear sobre el backlog completo y reporta summary (`tasksScanned/templateTasks/legacyTasks`).
+- [x] Detecta lifecycle↔carpeta mismatch como `error` (verificado con fixture).
+- [x] Detecta task `template` en carpeta sin fila en `TASK_ID_REGISTRY.md` (regla registry-parity, `warning`-only en V1 hasta saneo del registry; flip a `error` posterior).
+- [x] Detecta marcador "siguiente ID disponible" desactualizado vs `max(ID registry)+1` como `warning`.
+- [x] Tasks `CODEX_TASK_*` y briefs no generan `error` estructural (solo paridad registry warn).
+- [x] Parsea correctamente un `## Status` con `Blocked by:` multi-línea/prosa (fixture real del backlog, ej. TASK-921) sin truncar ni romper.
+- [x] `--format json` emite shape `{ errors, warnings, summary }`.
+- [x] `--changed` limita el scan al diff del PR.
+- [x] `.github/workflows/task-contract.yml` corre en PRs que tocan `docs/tasks/**` (warn-only en el primer merge).
 
 ## Verification
 
@@ -215,13 +215,17 @@ N/A — repo-only change.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado con el cierre
-- [ ] `Handoff.md` actualizado si hubo aprendizajes/deuda
-- [ ] `changelog.md` actualizado (gate CI nuevo = protocolo visible)
-- [ ] chequeo de impacto cruzado (follow-up collision detector declarado)
-- [ ] `pnpm task:lint` corre verde sobre sí misma (esta task debe pasar su propio linter)
+- [x] `Lifecycle` del markdown sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado con el cierre
+- [x] `Handoff.md` actualizado si hubo aprendizajes/deuda
+- [x] `changelog.md` actualizado (gate CI nuevo = protocolo visible)
+- [x] chequeo de impacto cruzado (follow-up collision detector declarado)
+- [x] `pnpm task:lint` corre verde sobre sí misma (esta task debe pasar su propio linter)
+
+## Delta 2026-05-24
+
+V1 shipped en `develop` por override del operador (sin branch switch). Entrega `pnpm task:lint` con parser reusable, rule catalog declarativo, CLI human/JSON, `--changed`, `--task`, `--strict`, tests focales y workflow `.github/workflows/task-contract.yml` en rollout warn-first. El modo backlog completo reporta deuda historica como warnings para no bloquear por formatos pre-template; `--changed` y `--task` mantienen errores duros para drift nuevo/focal. No toca runtime, DB, Payroll, access model ni UI.
 
 ## Follow-ups
 
