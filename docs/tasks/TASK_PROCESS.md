@@ -114,7 +114,9 @@ TASK-926 agrega `pnpm task:lint` como enforcement mecanico del contrato de tasks
 
 Uso canonico:
 
-- `pnpm task:lint` — revisa `docs/tasks/{to-do,in-progress,complete}` en modo backlog report; deuda historica sale como `warning`.
+- `pnpm task:lint` — revisa el backlog en modo report; `complete/` historico queda exento de deuda activa.
+- `pnpm task:lint --active` — revisa solo `to-do/` + `in-progress/` creadas bajo el contrato
+  TASK-926+; es el indicador de deuda operativa viva post-adopcion.
 - `pnpm task:lint --task TASK-###` — revision focal de una task; errores estructurales bloquean.
 - `pnpm task:lint --changed` — revision rapida para PRs; errores estructurales bloquean y es el modo usado por CI.
 - `pnpm task:lint --format json` — salida consumible por workflow/dashboard.
@@ -127,6 +129,11 @@ Reglas V1:
   `Acceptance Criteria` con checkboxes y rollout no vacio para `implementation`.
 - Tasks `CODEX_TASK_*` y formatos pre-template quedan legacy-exempt de reglas
   estructurales.
+- Tasks en `complete/` previas al contrato se tratan como historico: no cuentan como
+  deuda activa salvo que se modifiquen (`--changed`) o se revisen explicitamente
+  con `--task TASK-###`.
+- Tasks activas pre-TASK-926 no cuentan como deuda activa global; al ejecutarlas o tocarlas
+  se revisan con `--task TASK-###` / `--changed` y el agente debe normalizarlas si corresponde.
 - Paridad contra `TASK_ID_REGISTRY.md` y marcador "siguiente ID disponible" nacen como
   `warning` para rollout warn-first; no deben bloquear hasta que el registry este saneado.
 

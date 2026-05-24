@@ -42,6 +42,8 @@ Fixture.
 
 - Validate parser.
 
+<!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
+
 ## Architecture Alignment
 
 - \`docs/tasks/TASK_TEMPLATE.md\`
@@ -73,6 +75,10 @@ Fixture.
 ### Gap
 
 - Fixture.
+
+<!-- ZONE 2 — PLAN MODE -->
+
+<!-- ZONE 3 — EXECUTION SPEC -->
 
 ## Scope
 
@@ -205,6 +211,70 @@ const cases = [
       assert.equal(result.summary.tasksScanned, 1)
       assert.equal(result.summary.templateTasks, 1)
       assert.equal(result.summary.legacyTasks, 0)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'active mode scans only to-do and in-progress tasks',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture())
+      write(join(root, 'docs', 'tasks', 'complete', 'TASK-998-fixture.md'), taskFixture({ lifecycle: 'complete', id: 'TASK-998' }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, active: true, task: null } })
+
+      assert.equal(result.summary.tasksScanned, 1)
+      assert.equal(result.summary.active, true)
+      assert.equal(result.summary.completedHistoricalTasks, 0)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'active mode exempts pre-adoption active backlog from debt findings',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-100-fixture.md'), taskFixture({ id: 'TASK-100' }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, active: true, task: null } })
+
+      assert.equal(result.summary.tasksScanned, 1)
+      assert.equal(result.summary.preAdoptionActiveTasks, 1)
+      assert.equal(result.warnings.length, 0)
+      assert.equal(result.errors.length, 0)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'default mode exempts completed historical tasks from debt findings',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'complete', 'TASK-998-fixture.md'), taskFixture({ lifecycle: 'complete', id: 'TASK-998' }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, active: false, task: null } })
+
+      assert.equal(result.summary.tasksScanned, 1)
+      assert.equal(result.summary.completedHistoricalTasks, 1)
+      assert.equal(result.warnings.length, 0)
+      assert.equal(result.errors.length, 0)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'default mode also exempts pre-adoption active backlog from global debt',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-100-fixture.md'), taskFixture({ id: 'TASK-100' }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, active: false, task: null } })
+
+      assert.equal(result.summary.tasksScanned, 1)
+      assert.equal(result.summary.preAdoptionActiveTasks, 1)
+      assert.equal(result.warnings.length, 0)
+      assert.equal(result.errors.length, 0)
       rmSync(root, { recursive: true, force: true })
     }
   }

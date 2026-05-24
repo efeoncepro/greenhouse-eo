@@ -12,8 +12,10 @@ import {
 } from './task-lint/parser.mjs'
 import { runRules } from './task-lint/rules.mjs'
 
-const TASK_DIRS = ['to-do', 'in-progress', 'complete']
+const ACTIVE_TASK_DIRS = ['to-do', 'in-progress']
+const TASK_DIRS = [...ACTIVE_TASK_DIRS, 'complete']
 const DEFAULT_BASE_BRANCH = 'develop'
+const TASK_CONTRACT_ADOPTION_ID = 926
 const VALID_FORMATS = new Set(['human', 'json'])
 
 const __filename = fileURLToPath(import.meta.url)
@@ -24,6 +26,7 @@ const parseArgs = argv => {
     format: 'human',
     strict: false,
     changed: false,
+    active: false,
     task: null
   }
 
@@ -37,6 +40,11 @@ const parseArgs = argv => {
 
     if (arg === '--changed') {
       options.changed = true
+      continue
+    }
+
+    if (arg === '--active') {
+      options.active = true
       continue
     }
 
@@ -71,6 +79,10 @@ const parseArgs = argv => {
 
   if (options.task && !/^TASK-\d{3}(?:\.\d+)?$/.test(options.task)) {
     throw new Error(`Invalid --task "${options.task}". Expected TASK-###.`)
+  }
+
+  if (options.changed && options.active) {
+    throw new Error('Use either --changed or --active, not both.')
   }
 
   return options
@@ -109,6 +121,12 @@ const listAllTaskFiles = repoRoot => {
   const tasksRoot = join(repoRoot, 'docs', 'tasks')
 
   return TASK_DIRS.flatMap(dir => listMarkdownFiles(join(tasksRoot, dir))).sort()
+}
+
+const listActiveTaskFiles = repoRoot => {
+  const tasksRoot = join(repoRoot, 'docs', 'tasks')
+
+  return ACTIVE_TASK_DIRS.flatMap(dir => listMarkdownFiles(join(tasksRoot, dir))).sort()
 }
 
 const listChangedTaskFiles = repoRoot => {
@@ -171,8 +189,15 @@ const loadContext = repoRoot => {
 
 export const lintTasks = ({ repoRoot, options }) => {
   const context = loadContext(repoRoot)
-  const enforceErrors = options.changed || Boolean(options.task)
-  const files = options.changed ? listChangedTaskFiles(repoRoot) : listAllTaskFiles(repoRoot)
+  const enforceErrors = options.changed || options.active || Boolean(options.task)
+
+  const files = options.task
+    ? listAllTaskFiles(repoRoot)
+    : options.changed
+      ? listChangedTaskFiles(repoRoot)
+      : options.active
+        ? listActiveTaskFiles(repoRoot)
+        : listAllTaskFiles(repoRoot)
 
   const selectedFiles = options.task
     ? files.filter(file => file.includes(`${options.task}-`) || file.endsWith(`${options.task}.md`))
@@ -187,8 +212,22 @@ export const lintTasks = ({ repoRoot, options }) => {
   )
 
   const findings = []
+  const skipCompletedHistory = !options.changed && !options.active && !options.task
+  const skipPreAdoptionActive = !options.changed && !options.task
+  let completedHistoricalTasks = 0
+  let preAdoptionActiveTasks = 0
 
   for (let index = 0; index < tasks.length; index += 1) {
+    if (skipCompletedHistory && tasks[index].folderLifecycle === 'complete') {
+      completedHistoricalTasks += 1
+      continue
+    }
+
+    if (skipPreAdoptionActive && tasks[index].idNumber && tasks[index].idNumber < TASK_CONTRACT_ADOPTION_ID) {
+      preAdoptionActiveTasks += 1
+      continue
+    }
+
     findings.push(
       ...runRules(tasks[index], {
         ...context,
@@ -208,10 +247,13 @@ export const lintTasks = ({ repoRoot, options }) => {
       tasksScanned: tasks.length,
       templateTasks: tasks.filter(task => task.kind === 'template').length,
       legacyTasks: tasks.filter(task => task.kind === 'legacy').length,
+      completedHistoricalTasks,
+      preAdoptionActiveTasks,
       errors: errors.length,
       warnings: warnings.length,
       strict: options.strict,
       changed: options.changed,
+      active: options.active,
       enforceErrors,
       task: options.task
     }
@@ -230,6 +272,7 @@ const printHuman = result => {
   console.log('Task lint summary')
   console.log(
     `- scanned=${summary.tasksScanned} template=${summary.templateTasks} legacy=${summary.legacyTasks} ` +
+      `completedHistorical=${summary.completedHistoricalTasks} preAdoptionActive=${summary.preAdoptionActiveTasks} ` +
       `errors=${summary.errors} warnings=${summary.warnings}`
   )
 

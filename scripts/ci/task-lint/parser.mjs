@@ -170,6 +170,7 @@ export const parseTaskMarkdown = ({ filePath, repoRoot, source }) => {
   const relativePath = repoRoot ? relative(repoRoot, filePath) : filePath
   const filename = basename(filePath)
   const id = filename.match(TASK_ID_RE)?.[0] ?? null
+  const idNumber = id ? Number(id.match(/^TASK-(\d{3})/)?.[1] ?? 0) : null
   const status = extractStatusBlock(lines)
   const headings = extractHeadings(normalizedSource, lineStarts)
   const sections = extractSections(normalizedSource, headings)
@@ -177,7 +178,10 @@ export const parseTaskMarkdown = ({ filePath, repoRoot, source }) => {
   const type = status.fields.Type ?? status.fields.type ?? null
   const effort = status.fields.Effort ?? status.fields.effort ?? null
   const domain = status.fields.Domain ?? status.fields.domain ?? null
-  const hasTemplateShape = normalizedSource.includes('ZONE 0') && normalizedSource.includes('ZONE 4')
+
+  const hasTemplateShape = ['ZONE 0', 'ZONE 1', 'ZONE 2', 'ZONE 3', 'ZONE 4'].every(marker =>
+    normalizedSource.includes(marker)
+  )
 
   const template =
     CANONICAL_TASK_FILE_RE.test(filename) &&
@@ -193,6 +197,7 @@ export const parseTaskMarkdown = ({ filePath, repoRoot, source }) => {
     filePath,
     filename,
     id,
+    idNumber,
     kind: template ? 'template' : 'legacy',
     folderLifecycle: detectFolderLifecycle(relativePath),
     status,
