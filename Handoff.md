@@ -1,3 +1,18 @@
+# Sesion 2026-05-24 — RELEASE develop→main (43 commits) — ✅ RELEASED
+
+**Status**: ✅ Producción promovida vía orchestrator canónico (skill `greenhouse-production-release`). Manifest **`released`**.
+
+- **Target SHA**: `2a24a5bbe00116a6fd6ea495f0c9c57151e866ad` (merge commit `release: develop→main 2026-05-24`).
+- **Orchestrator run**: `26362339597` · **release_id**: `2a24a5bbe001-ff805fe5-2eb3-4112-8ca7-fc44f3fd1ce4`.
+- **Scope**: TASK-921/922/923 (attributable lateness M0+M2+M1, **shadow**) + TASK-926 (task linter) + TASK-928 (N+1 batching, payroll read-path) + Sentry remediation hardening + ADRs SDD/onboarding. 2 migraciones shadow (TASK-921/922) ya aplicadas al instance Cloud SQL compartido.
+- **Activación intencional**: 2 flags shadow ON en ops-worker prod (`NOTION_DUE_DATE_CAPTURE_ENABLED` + `ATTRIBUTABLE_LATENESS_OTD_ENABLED`) — pueblan tablas que nadie lee, **NO tocan el bono** (cutover M3 gated aparte). Operador autorizó scope completo + shadow ON.
+- **Preflight in-CI**: passed (Sentry 0 activos ventana 15m; `split_batch` payroll+cloud_release esperado, bajado a warning vía `bypass_preflight_reason` → `--override-batch-policy --bypass-preflight-warnings`).
+- **Gates Production**: 2 aprobados (gate 1 = 4 workers; gate 2 = Azure skip-deploy, sin diff `infra/azure`).
+- **Verificación post-release**: 4 Cloud Run en SHA `2a24a5bb` (ops-worker / commercial-cost-worker / ico-batch-worker us-east4 + hubspot-greenhouse-integration us-central1) ✅ MATCH · Vercel production READY (`greenhouse.efeoncepro.com`, dpl creado al push) · post-release `/api/auth/health` ✓ · **watchdog run `26362641346` `drift_count=0`** (resuelve los watchdog scheduled que venían fallando por worker_revision_drift pre-release).
+- **No validado / nota**: warnings de deprecación Node 20 en actions (no-bloqueante, removal sep-2026). Sentry: 25 issues unresolved totales pero 0 activos en ventana — quedan como deuda visible (no se cierran sin token con permiso de resolve).
+
+---
+
 # Sesion 2026-05-24 — TASK-922 M2: atraso imputable + bucket OTD reason-aware (shadow) — ✅ SHIPPED
 
 **Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M2 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16. Computa el atraso imputable + bucket OTD reason-aware en **shadow** (flag `ATTRIBUTABLE_LATENESS_OTD_ENABLED` OFF) → bono intacto. Cierra el compute que TASK-921 (M0) + TASK-923 (M1) habilitaron; desbloquea M3 (cutover bono, gated) que cierra ISSUE-081 en prod.
