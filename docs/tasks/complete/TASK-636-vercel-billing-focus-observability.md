@@ -408,12 +408,12 @@ No hay migracion ni backfill. La capacidad queda activa en codigo, pero degrada 
 - [x] `pnpm exec vitest run src/lib/cloud/vercel-billing.test.ts src/lib/reliability`
 - [x] `pnpm design:lint`
 - [x] `pnpm build`
-- [ ] Smoke manual con token real en ambiente seguro:
+- [x] Smoke manual con token real en ambiente seguro:
   - `vercel usage --format json`
   - request autenticado a `/api/admin/cloud/vercel-billing`
 - [ ] Validacion visual/manual de `Cloud & Integrations` y `Ops Health` con datos reales.
 
-No validado: smoke con token real y validacion visual con cargos Vercel reales. Discovery verifico con `vercel env ls --scope efeonce-7670142f` que no existen env vars `GREENHOUSE_VERCEL_*` configuradas todavia, por lo que el runtime real debe degradar a `not_configured` hasta provisionarlas.
+No validado: validacion visual con cargos Vercel reales en UI desplegada. Post-cierre se provisionaron env vars requeridas en Vercel y el smoke local del reader con Secret Manager retornó `availability='configured'`, total 30d USD 23.94 billed / USD 38.91 effective, latestChargeDate `2026-05-23`.
 
 ## Closing Protocol
 
@@ -437,7 +437,7 @@ No validado: smoke con token real y validacion visual con cargos Vercel reales. 
 
 - Resuelta: no se definieron thresholds inventados. V1 deja `GREENHOUSE_VERCEL_BILLING_MONTHLY_WARN_USD`, `GREENHOUSE_VERCEL_BILLING_MONTHLY_CRITICAL_USD` y `GREENHOUSE_VERCEL_BILLING_DAILY_SPIKE_PCT` como env vars opcionales; si faltan, `thresholdStatus='unconfigured'`.
 - Resuelta: el team Vercel canonico se identifica por `GREENHOUSE_VERCEL_TEAM_ID=team_gmNiF4YCHmc1wqsHUTCvqjmN` preferido y `GREENHOUSE_VERCEL_TEAM_SLUG=efeonce-7670142f` como fallback, verificado por Vercel CLI.
-- Resuelta parcialmente: no hay token `GREENHOUSE_VERCEL_API_TOKEN(_SECRET_REF)` provisionado aun. La implementacion usa el resolver canonico de secretos y reporta 401/403 como `error` operacional sin exponer tokens; la validacion de permisos queda para el smoke post-provisionamiento.
+- Resuelta: token runtime provisionado en GCP Secret Manager (`greenhouse-vercel-api-token`) y Vercel envs `GREENHOUSE_VERCEL_API_TOKEN_SECRET_REF`, `GREENHOUSE_VERCEL_TEAM_ID`, `GREENHOUSE_VERCEL_TEAM_SLUG` cargadas en `production`, `staging` y `development`. Smoke local validó permisos Billing API sin exponer token.
 
 ## Implementation Notes
 

@@ -20,6 +20,8 @@
 
 **No validado**: smoke con token real/request autenticado y visual con cargos reales porque `vercel env ls --scope efeonce-7670142f` no muestra env vars `GREENHOUSE_VERCEL_*`; runtime esperado hasta provisionarlas: `not_configured`.
 
+**Delta operacional post-cierre**: env vars requeridas ya provisionadas en Vercel `production`, `staging` y `development`: `GREENHOUSE_VERCEL_API_TOKEN_SECRET_REF=greenhouse-vercel-api-token`, `GREENHOUSE_VERCEL_TEAM_ID=team_gmNiF4YCHmc1wqsHUTCvqjmN`, `GREENHOUSE_VERCEL_TEAM_SLUG=efeonce-7670142f`. Token guardado en GCP Secret Manager `greenhouse-vercel-api-token` con `roles/secretmanager.secretAccessor` para `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`. Smoke local del reader con Secret Manager: `availability=configured`, 30d rolling USD 23.94 billed / USD 38.91 effective, top services Pro, Build CPU Minutes, Build Minutes, Fluid Active CPU, Fluid Provisioned Memory; latest charge date `2026-05-23`. Threshold envs siguen sin configurar por diseño.
+
 # Sesion 2026-05-24 — RELEASE develop→main (43 commits) — ✅ RELEASED
 
 **Status**: ✅ Producción promovida vía orchestrator canónico (skill `greenhouse-production-release`). Manifest **`released`**.
