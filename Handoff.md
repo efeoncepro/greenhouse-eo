@@ -19,7 +19,7 @@
 
 **Sub-clases de los 4 settlement drifts originales** (todos resueltos por Slice 1 + sync live): 2 falsos positivos de VIEW (factoring superseded) + 2 transitorios stale ya consistentes.
 
-**Próximo paso**: decisión sobre task714d (flag-only vs spawn TASK-714d remediation) + continuar slices in-scope restantes (recompute remediator + inventory + review queue + docs).
+**CERRADA 2026-05-24** (scope reducido por operador): 5 slices entregados (VIEW fix + honest degradation + signal + inventory + docs). Full suite 5390 passed + build OK. Lifecycle `complete`. Diagnóstico task714d: 3 grupos `stlgrp-itx-{20260306-amcg,20260312-l45c,20260406-9uwu}`, ~$2.3M outgoing desde santander-clp sin pata incoming → **TASK-714d** (necesita identificar cuentas destino). Queue/anchoring de los 37 unanchored → **TASK-934** (derivada creada). **4Q honesto-abierto**: cerrar en Sentry solo cuando TASK-934 + TASK-714d converjan a 0 sostenido 24-48h. Próximo: deploy staging auto (push develop) → verificar signal `finance.ledger.unresolved_drift_items` en steady (warning por 37 unanchored) + cron ledger-health honesto.
 
 ---
 

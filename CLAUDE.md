@@ -1552,6 +1552,25 @@ Cualquier diferencia es **`drift`** — un problema real de integridad de ledger
 - Cuando aparezca un nuevo mecanismo de settlement (notas de crédito, write-offs parciales, retenciones extranjeras, etc.), extender **ambos**: la VIEW (migración nueva con `CREATE OR REPLACE VIEW`) y el helper TypeScript. Nunca branchear la lógica en un consumer.
 - El Reliability Control Plane (`Finance Data Quality > drift de ledger`) lee desde esta VIEW. Bypass = dashboards inconsistentes.
 
+### Finance — Ledger drift detection: superseded exclusion + honest degradation (TASK-929, desde 2026-05-24)
+
+Dos invariantes canónicos descubiertos/canonizados live al remediar `JAVASCRIPT-NEXTJS-4Q`:
+
+**1. La VIEW `income_settlement_reconciliation` DEBE excluir pagos superseded en `payments_total`.** El subquery de pagos filtra `superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL AND superseded_at IS NULL` — mirror EXACTO de `fn_recompute_income_amount_paid`. Antes de TASK-929 la VIEW sumaba TODOS los `income_payments` (incluyendo superseded) mientras el `fn` los excluía → **dos definiciones de la misma ecuación desalineadas** → falsos positivos de drift en facturas factorizadas (el pago NUBOX original superseded por el modelo factoring se contaba doble). Con el ledger churning (Nubox re-sync supersede/re-add constante), la VIEW vieja **flickeaba** drift.
+- **NUNCA** modificar `income_settlement_reconciliation` (ni `fn_recompute_income_amount_paid`) sin actualizar el otro en paralelo. Son la MISMA ecuación canónica — settlement = `SUM(pagos activos) + factoring_fee (active) + withholding`. Drift entre ambos = falsos positivos/negativos de drift.
+- **NUNCA** sumar `income_payments` sin filtrar las 3 cadenas de supersede (`superseded_by_payment_id`, `superseded_by_otb_id`, `superseded_at`) cuando el propósito es reconciliación de `amount_paid`.
+
+**2. `getFinanceLedgerHealth` NO debe colapsar un error de query a "0 drift" (false-healthy).** Cada check va envuelto en `tracked(name, promise, fallback)` que registra el check en `degradedChecks: string[]` cuando su query falla. `healthy` exige `degradedChecks` sin ningún check `DECISION_CRITICAL` degradado — no se puede declarar el ledger sano estando ciego a un check. Bug class ISSUE-071 / Pillar 3: verificado live 2026-05-24 (un probe con blip de proxy devolvió `healthy=true` mientras la VIEW tenía 4 drift rows).
+- **NUNCA** envolver un check de `getFinanceLedgerHealth` en `.catch(() => [])` plano. Usar `tracked(...)` para que el fallo sea visible en `degradedChecks`, no silencioso.
+- **NUNCA** agregar un check decision-critical nuevo sin añadirlo al set `DECISION_CRITICAL_CHECKS`. Los checks `*_sample`/informacionales degradados se surfacing pero NO flipean `healthy`.
+- El `driftSignature` del cron ops-worker (`buildFinanceLedgerDriftSignature`) incluye `degradedChecks` → un check degradado cambia la firma y dispara alerta Sentry distinta del drift normal.
+
+**Signal canónico**: `finance.ledger.unresolved_drift_items` (`src/lib/reliability/queries/ledger-unresolved-drift-items.ts`, subsystem Finance Data Quality). Severidad tiered: settlement drift > 0 → `error` (integridad); solo unanchored > 0 → `warning` (data-completeness — los gastos sin FK-anchor que tienen `economic_category` no rompen P&L); ambos 0 → `ok`.
+
+**Inventory read-only** (control surface, NO muta): `getLedgerDriftInventory()` + `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/ledger-drift-inventory.ts`. Clasifica drift por tipo + rutea unanchored por materialidad ($50k CLP default, `LEDGER_DRIFT_UNANCHORED_MATERIALITY_CLP` env). La materialidad gobierna **routing**, NUNCA detección (la VIEW detecta todo a tolerancia 0.01).
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-929-finance-ledger-drift-remediation-control.md`.
+
 ### Finance — FX P&L canónico para tesorería (Banco "Resultado cambiario")
 
 El "Resultado cambiario" del Banco se compone de **3 fuentes legítimas** y debe leerse SIEMPRE desde la VIEW canónica + helper, no re-derivar:

@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno derivado de auditoria Sentry semanal 2026-05-24`
+- Status real: `Scope reducido entregado 2026-05-24 (VIEW fix + honest degradation + signal + inventory + docs). Queue/remediator → TASK-934. 4Q honesto-abierto hasta TASK-934 + TASK-714d.`
 - Rank: `TBD`
 - Domain: `finance|accounting|data|reliability`
 - Blocked by: `none`
@@ -19,6 +19,29 @@
 ## Summary
 
 Remediar `JAVASCRIPT-NEXTJS-4Q` como deuda contable real, no como ruido Sentry. La task separa settlement drift resoluble por reconciliacion canonica de gastos pagados sin anchor, que requieren evidencia supplier/tool/payroll/tax/loan/linked income o cola de revision humana.
+
+## Implementación entregada (2026-05-24, directo en `develop`)
+
+Scope reducido por decisión del operador (inventory + docs + flag; queue/remediator diferidos a **TASK-934**). 4 slices + docs, todo verde (full suite 5390 passed, build OK).
+
+| Slice | Commit | Entrega |
+|---|---|---|
+| 1 | `f171a506` | Migración: `income_settlement_reconciliation` excluye superseded en `payments_total` (alinea con `fn_recompute_income_amount_paid`). Causa raíz de 2/4 settlement drifts. Drift settlement 4→0. Cero mutación de ledger. DO-block verifica. |
+| 2 | `951497e5` | `getFinanceLedgerHealth` honest degradation: `tracked()` + `degradedChecks[]`; `healthy` exige sin check DECISION_CRITICAL degradado. Mata el false-healthy (bug descubierto en discovery). ops-worker propaga degradedChecks. 3 tests. |
+| 3 | `851822f4` | Signal `finance.ledger.unresolved_drift_items` (tiered: settlement=error, unanchored=warning). Wire-up canónico. 4 tests. |
+| 4 | `463fc958` | Inventory read-only `getLedgerDriftInventory()` + CLI `scripts/finance/ledger-drift-inventory.ts`. Routing por materialidad ($50k default, env-configurable). 3 tests. |
+| 5 | (este) | Docs: CLAUDE.md invariantes + changelog + README + Handoff. Derivada TASK-934. |
+
+### Hallazgo central (lente finance + arch)
+
+Los 4 settlement drifts de 4Q NO eran deuda contable: **2 falsos positivos de la VIEW** (facturas factorizadas cuyo pago NUBOX superseded se contaba doble — la VIEW no filtraba supersede mientras el `fn` sí) + **2 transitorios stale** (ya consistentes vía sync). El fix canónico fue **alinear la VIEW al `fn`**, no mutar el ledger. Bonus: el discovery expuso que `getFinanceLedgerHealth` podía reportar `healthy=true` falso (swallowed errors) — arreglado en Slice 2.
+
+### Residuales — 4Q NO cierra todavía (honesto-abierto)
+
+1. **37 gastos pagados sin FK-anchor** ($8.2M; 21 material, 16 inmaterial; todos con `economic_category` → data-completeness, no integridad) → **TASK-934** (cola de revisión + anchoring + acknowledgedDebt + recompute remediator).
+2. **3 internal_transfer imbalance** (`stlgrp-itx-20260306-amcg`, `-20260312-l45c`, `-20260406-9uwu`; ~$2.3M outgoing desde santander-clp sin pata incoming) → **OUT OF SCOPE, TASK-714d** (`createInternalTransferSettlement`). Necesita identificar las cuentas destino (conocimiento finance).
+
+El cron `ops-finance-ledger-health` reporta `healthy=false` honestamente hasta resolver ambos. El signal `finance.ledger.unresolved_drift_items` (warning por los 37) + el cron son la visibilidad ongoing. **Cerrar `JAVASCRIPT-NEXTJS-4Q` en Sentry solo cuando TASK-934 + TASK-714d converjan a 0 sostenido 24-48h.**
 
 ## Why This Task Exists
 
