@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -18,7 +18,7 @@
 - Rank: `TBD`
 - Domain: `platform|ci|reliability|ops`
 - Blocked by: `none`
-- Branch: `task/TASK-931-github-actions-cost-signal-preserving-ci-optimization`
+- Branch: `develop` (operator override: no branch switch)
 - Legacy ID: `optional`
 - GitHub Issue: `optional`
 

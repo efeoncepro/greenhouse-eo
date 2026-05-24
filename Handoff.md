@@ -1,3 +1,10 @@
+# Sesion 2026-05-24 — TASK-931 GitHub Actions cost guardrails — IN PROGRESS
+
+- **Branch:** `develop` por instruccion explicita del operador; no se crea ni cambia a `task/TASK-931-*`.
+- **Lifecycle:** task movida `to-do/` → `in-progress/`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
+- **Ownership:** libre al tomarla. No existe branch TASK-931 ni archivo previo en `in-progress`. PR abierto #125 (`ci/claude-pr-review-action`) agrega `.github/workflows/claude.yml`; se tratará como riesgo de coordinación para no pisar ese workflow.
+- **Discovery inicial:** GitHub Billing Usage mayo 2026 sigue mostrando `USD 93.18989776300002` gross total y `USD 0` net total; Actions Runs API confirma CI + Playwright + release/watchdog como drivers recientes. TASK-859 sigue en `to-do`, por lo que TASK-931 no debe crear tablas persistidas workflow/job salvo ADR explícito.
+
 # Sesion 2026-05-24 — Local-first development workflow — ✅ OPERATING MODEL
 
 **Status**: ✅ Implementado como contrato documental + scripts locales. Objetivo: evitar que cada flujo de agente gaste GitHub Actions/Vercel/GCP antes de que el cambio este listo.
