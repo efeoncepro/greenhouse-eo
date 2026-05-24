@@ -64,6 +64,10 @@ import {
   getReschedulePendingReasonSignal
 } from './queries/reschedule-signals'
 import {
+  getAttributableLatenessShadowParidadSignal,
+  getAttributableLatenessOverlapSignal
+} from './queries/attributable-lateness-signals'
+import {
   getNotionMetricsWritebackDeadLetterSignal,
   getNotionMetricsWritebackLagSignal
 } from './queries/notion-metrics-rpa-signals'
@@ -677,6 +681,7 @@ interface ReliabilityOverviewSources {
    */
   notionStatusTransitions?: ReliabilitySignal[] | null
   notionMetricsReschedule?: ReliabilitySignal[] | null
+  attributableLateness?: ReliabilitySignal[] | null
 
   /**
    * TASK-916 — Notion RpA V2 productive writeback signals (Efeonce/Sky).
@@ -815,7 +820,9 @@ export const buildReliabilityOverview = (
     // TASK-916 — Notion RpA V2 productive writeback signals (2).
     ...(sources.notionMetricsRpa ?? []),
     // TASK-921 — Reschedule (due-date change) capture signals (2).
-    ...(sources.notionMetricsReschedule ?? [])
+    ...(sources.notionMetricsReschedule ?? []),
+    // TASK-922 — Attributable lateness shadow signals (2).
+    ...(sources.attributableLateness ?? [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -1415,6 +1422,17 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-922 — Attributable lateness shadow signals (M2).
+  const attributableLateness =
+    preloadedSources.attributableLateness !== undefined
+      ? preloadedSources.attributableLateness
+      : await Promise.all([
+          getAttributableLatenessShadowParidadSignal().catch(() => null),
+          getAttributableLatenessOverlapSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
@@ -1463,7 +1481,8 @@ export const getReliabilityOverview = async (
     notionMetricsDemo,
     notionStatusTransitions,
     notionMetricsRpa,
-    notionMetricsReschedule
+    notionMetricsReschedule,
+    attributableLateness
   })
 }
 
