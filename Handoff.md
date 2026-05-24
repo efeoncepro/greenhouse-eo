@@ -4,6 +4,7 @@
 - **Lifecycle:** task movida `to-do/` → `in-progress/`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
 - **Ownership:** libre al tomarla. No existe branch TASK-931 ni archivo previo en `in-progress`. PR abierto #125 (`ci/claude-pr-review-action`) agrega `.github/workflows/claude.yml`; se tratará como riesgo de coordinación para no pisar ese workflow.
 - **Discovery inicial:** GitHub Billing Usage mayo 2026 sigue mostrando `USD 93.18989776300002` gross total y `USD 0` net total; Actions Runs API confirma CI + Playwright + release/watchdog como drivers recientes. TASK-859 sigue en `to-do`, por lo que TASK-931 no debe crear tablas persistidas workflow/job salvo ADR explícito.
+- **Runtime env TASK-931:** thresholds GitHub Actions provisionados en Vercel `production`, `staging` y `development`: warn `100`, critical `150`, daily spike `100`. GitHub Budgets API confirma budget Actions org-level existente (`id=7f36dec2-18a4-4575-9f49-c5b0470ff929`, `prevent_further_usage=true`, `budget_amount=0`, alerts a `cesargrowth11`). Token productivo dedicado para Billing Usage sigue pendiente; no se persiste el PAT personal `gho_*`.
 
 # Sesion 2026-05-24 — Local-first development workflow — ✅ OPERATING MODEL
 

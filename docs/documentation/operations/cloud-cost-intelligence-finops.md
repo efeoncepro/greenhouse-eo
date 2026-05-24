@@ -94,9 +94,9 @@ Variables runtime:
 ```text
 GREENHOUSE_GITHUB_BILLING_TOKEN_SECRET_REF=
 GREENHOUSE_GITHUB_BILLING_ORG=efeoncepro
-GREENHOUSE_GITHUB_BILLING_MONTHLY_WARN_USD=
-GREENHOUSE_GITHUB_BILLING_MONTHLY_CRITICAL_USD=
-GREENHOUSE_GITHUB_ACTIONS_DAILY_SPIKE_PCT=
+GREENHOUSE_GITHUB_BILLING_MONTHLY_WARN_USD=100
+GREENHOUSE_GITHUB_BILLING_MONTHLY_CRITICAL_USD=150
+GREENHOUSE_GITHUB_ACTIONS_DAILY_SPIKE_PCT=100
 ```
 
 El token recomendado es dedicado y least-privilege, con permiso de organizacion `Administration: read` para el scope que recibe el cobro. `GREENHOUSE_GITHUB_BILLING_TOKEN` existe como fallback local, pero para staging/production se prefiere Secret Manager via `GREENHOUSE_GITHUB_BILLING_TOKEN_SECRET_REF`.
@@ -116,7 +116,7 @@ La senal reliability canonical es `cloud.billing.github`. Puede quedar:
 - `not_configured`: faltan token/org.
 - `awaiting_data`: la API respondio sin usage items para el periodo observado.
 
-Budgets GitHub siguen siendo un guardrail externo complementario. Si el equipo quiere stop-usage o alertas 75/90/100%, se configuran en GitHub Billing & Licensing; Greenhouse solo observa y reporta.
+Budgets GitHub siguen siendo un guardrail externo complementario. La org `efeoncepro` ya tiene un budget de Actions a nivel organización con `prevent_further_usage=true`, `budget_amount=0` y alertas activas para `cesargrowth11` (verificado 2026-05-24 via GitHub Budgets API, budget id `7f36dec2-18a4-4575-9f49-c5b0470ff929`). Greenhouse observa y reporta; no debe cambiar ese budget sin confirmación humana porque puede bloquear uso pagado.
 
 ### Atribucion por workflow/job
 
