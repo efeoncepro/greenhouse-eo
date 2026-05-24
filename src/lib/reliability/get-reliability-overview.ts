@@ -42,6 +42,7 @@ import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
 import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
+import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
 import {
   getNotionMetricsShadowParidadRpaDemoSignal,
   getNotionMetricsEchoLoopDemoSignal,
@@ -391,6 +392,12 @@ interface ReliabilityOverviewSources {
   notionCorrectionTransitionsSourceAvailability?: ReliabilitySignal | null
 
   /**
+   * TASK-923 (M1) — shadow paridad del clasificador OTD GH-owned vs synced
+   * Notion. Steady: paridad alta (mismatch ~0%). Roll up moduleKey='delivery'.
+   */
+  notionMetricsOtdClassifierParity?: ReliabilitySignal | null
+
+  /**
    * TASK-893 Slice 5 — Payroll Participation Window signals (3 readers):
    * full_month_entry_drift + source_date_disagreement + projection_delta_anomaly.
    * Subsystem rollup `Finance Data Quality` via moduleKey='finance'. Cada
@@ -725,6 +732,10 @@ export const buildReliabilityOverview = (
     // foundation que sustenta calculateRpa (TASK-901) + calculateFtr (TASK-909).
     ...(sources.notionCorrectionTransitionsSourceAvailability
       ? [sources.notionCorrectionTransitionsSourceAvailability]
+      : []),
+    // TASK-923 (M1) — shadow paridad clasificador OTD GH vs Notion synced.
+    ...(sources.notionMetricsOtdClassifierParity
+      ? [sources.notionMetricsOtdClassifierParity]
       : []),
     // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
     // Subsystem rollup Finance Data Quality via moduleKey='finance'. Each
@@ -1276,6 +1287,12 @@ export const getReliabilityOverview = async (
       ? preloadedSources.notionCorrectionTransitionsSourceAvailability
       : await getNotionCorrectionTransitionsSourceAvailabilitySignal().catch(() => null)
 
+  // TASK-923 (M1) — shadow paridad clasificador OTD. PG-based, degrada a `unknown`.
+  const notionMetricsOtdClassifierParity =
+    preloadedSources.notionMetricsOtdClassifierParity !== undefined
+      ? preloadedSources.notionMetricsOtdClassifierParity
+      : await getNotionMetricsOtdClassifierParitySignal().catch(() => null)
+
   // TASK-848 Slice 7 + TASK-849 Slice 2 + TASK-854 Slice 0 + TASK-857 —
   // Production Release Control Plane signals. 6 readers en paralelo. Cada
   // uno degrada a `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN /
@@ -1424,6 +1441,7 @@ export const getReliabilityOverview = async (
     productionRelease,
     icoMaterializerSkippedSafety,
     notionCorrectionTransitionsSourceAvailability,
+    notionMetricsOtdClassifierParity,
     notionMetricsDemo,
     notionStatusTransitions,
     notionMetricsRpa
