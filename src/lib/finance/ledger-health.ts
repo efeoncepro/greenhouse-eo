@@ -136,6 +136,17 @@ export interface LedgerHealthSnapshot {
       assetStatus: string | null
     }>
   }
+  /**
+   * TASK-929 — Honest degradation. Names of drift checks whose underlying query
+   * threw instead of returning rows. Each check is wrapped so a swallowed
+   * transient error (e.g. connection blip) is NEVER silently collapsed to
+   * "0 drift" → false `healthy=true` (the ISSUE-071 / Pillar 3 bug class
+   * verified live 2026-05-24: a probe returned healthy=true while the VIEW had
+   * 4 drift rows). When a DECISION-CRITICAL check is degraded, `healthy` is
+   * forced FALSE — we cannot claim the ledger is clean while blind to a check.
+   * Steady state: `[]`.
+   */
+  degradedChecks: string[]
 }
 
 const STALE_THRESHOLD_DAYS = 2
@@ -623,7 +634,35 @@ const readCount = (rows: Array<{ total: string | number | null }>): number => {
   return Number.isFinite(n) ? Math.trunc(n) : 0
 }
 
+// TASK-929 — decision-critical checks whose query failure forces healthy=false.
+// (Sample / informational queries can fail without flipping healthy — they only
+// enrich the snapshot, they don't decide ledger health.)
+const DECISION_CRITICAL_CHECKS = new Set<string>([
+  'settlement_drift',
+  'phantoms_income',
+  'phantoms_expense',
+  'balance_freshness',
+  'unanchored_expenses',
+  'task708_pending_runtime',
+  'task708_promoted_invariant',
+  'task708d_cohort_d',
+  'task714d_imbalance',
+  'task720_kpi_rule',
+  'task721_broken_evidence'
+])
+
 export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> => {
+  // TASK-929: capture WHICH check failed instead of silently collapsing to "0
+  // results". A swallowed transient error must never be reported as healthy.
+  const degradedChecks: string[] = []
+
+  const tracked = <T>(name: string, promise: Promise<T[]>, fallback: T[]): Promise<T[]> =>
+    promise.catch(() => {
+      degradedChecks.push(name)
+
+      return fallback
+    })
+
   const [
     drifted,
     phantomsIncome,
@@ -645,26 +684,26 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     task721CountRows,
     task721SampleRows
   ] = await Promise.all([
-    runGreenhousePostgresQuery<{ income_id: string; total_amount: string; amount_paid: string; expected_settlement: string; drift: string }>(SETTLEMENT_DRIFT_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ payment_id: string; income_id: string; payment_date: string; amount: string }>(PHANTOMS_INCOME_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ payment_id: string; expense_id: string; payment_date: string; amount: string }>(PHANTOMS_EXPENSE_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ account_id: string; last_materialized_at: string | null; days_stale: number | null }>(FRESHNESS_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ expense_id: string; expense_type: string; total_amount: string; payment_date: string | null }>(UNANCHORED_EXPENSES_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_PAYMENTS_PENDING_ACCOUNT_RUNTIME_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_PAYMENTS_PENDING_ACCOUNT_HISTORICAL_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_SETTLEMENT_LEGS_PRINCIPAL_WITHOUT_INSTRUMENT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_RECONCILED_AGAINST_UNSCOPED_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_UNRESOLVED_OVER_THRESHOLD_SQL, [EXTERNAL_SIGNALS_UNRESOLVED_THRESHOLD_DAYS]).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_PROMOTED_INVARIANT_VIOLATION_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_COUNT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{
+    tracked('settlement_drift', runGreenhousePostgresQuery<{ income_id: string; total_amount: string; amount_paid: string; expected_settlement: string; drift: string }>(SETTLEMENT_DRIFT_SQL), []),
+    tracked('phantoms_income', runGreenhousePostgresQuery<{ payment_id: string; income_id: string; payment_date: string; amount: string }>(PHANTOMS_INCOME_SQL), []),
+    tracked('phantoms_expense', runGreenhousePostgresQuery<{ payment_id: string; expense_id: string; payment_date: string; amount: string }>(PHANTOMS_EXPENSE_SQL), []),
+    tracked('balance_freshness', runGreenhousePostgresQuery<{ account_id: string; last_materialized_at: string | null; days_stale: number | null }>(FRESHNESS_SQL), []),
+    tracked('unanchored_expenses', runGreenhousePostgresQuery<{ expense_id: string; expense_type: string; total_amount: string; payment_date: string | null }>(UNANCHORED_EXPENSES_SQL), []),
+    tracked('task708_pending_runtime', runGreenhousePostgresQuery<{ total: string }>(TASK708_PAYMENTS_PENDING_ACCOUNT_RUNTIME_SQL), [{ total: '0' }]),
+    tracked('task708_pending_historical', runGreenhousePostgresQuery<{ total: string }>(TASK708_PAYMENTS_PENDING_ACCOUNT_HISTORICAL_SQL), [{ total: '0' }]),
+    tracked('task708_legs_without_instrument', runGreenhousePostgresQuery<{ total: string }>(TASK708_SETTLEMENT_LEGS_PRINCIPAL_WITHOUT_INSTRUMENT_SQL), [{ total: '0' }]),
+    tracked('task708_reconciled_unscoped', runGreenhousePostgresQuery<{ total: string }>(TASK708_RECONCILED_AGAINST_UNSCOPED_SQL), [{ total: '0' }]),
+    tracked('task708_signals_unresolved', runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_UNRESOLVED_OVER_THRESHOLD_SQL, [EXTERNAL_SIGNALS_UNRESOLVED_THRESHOLD_DAYS]), [{ total: '0' }]),
+    tracked('task708_promoted_invariant', runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_PROMOTED_INVARIANT_VIOLATION_SQL), [{ total: '0' }]),
+    tracked('task714d_imbalance', runGreenhousePostgresQuery<{ total: string }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_COUNT_SQL), [{ total: '0' }]),
+    tracked('task714d_imbalance_sample', runGreenhousePostgresQuery<{
       settlement_group_id: string
       out_count: number
       in_count: number
       instruments: string[]
-    }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_SAMPLE_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708D_COHORT_D_COUNT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{
+    }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_SAMPLE_SQL), []),
+    tracked('task708d_cohort_d', runGreenhousePostgresQuery<{ total: string }>(TASK708D_COHORT_D_COUNT_SQL), [{ total: '0' }]),
+    tracked('task708d_cohort_d_sample', runGreenhousePostgresQuery<{
       payment_kind: 'income' | 'expense'
       payment_id: string
       document_id: string
@@ -672,22 +711,22 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
       payment_date: string
       amount: string
       signal_id: string
-    }>(TASK708D_COHORT_D_SAMPLE_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ total: string }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_COUNT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{
+    }>(TASK708D_COHORT_D_SAMPLE_SQL), []),
+    tracked('task720_kpi_rule', runGreenhousePostgresQuery<{ total: string }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_COUNT_SQL), [{ total: '0' }]),
+    tracked('task720_kpi_rule_sample', runGreenhousePostgresQuery<{
       account_id: string
       account_name: string
       instrument_category: string
       currency: string
-    }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_SAMPLE_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ total: string }>(TASK721_BROKEN_EVIDENCE_COUNT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{
+    }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_SAMPLE_SQL), []),
+    tracked('task721_broken_evidence', runGreenhousePostgresQuery<{ total: string }>(TASK721_BROKEN_EVIDENCE_COUNT_SQL), [{ total: '0' }]),
+    tracked('task721_broken_evidence_sample', runGreenhousePostgresQuery<{
       snapshot_id: string
       account_id: string
       snapshot_at: string
       evidence_asset_id: string
       asset_status: string | null
-    }>(TASK721_BROKEN_EVIDENCE_SAMPLE_SQL).catch(() => [])
+    }>(TASK721_BROKEN_EVIDENCE_SAMPLE_SQL), [])
   ])
 
   const incomePhantoms = phantomsIncome.map(p => ({
@@ -792,7 +831,13 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     }))
   }
 
+  // TASK-929: a degraded decision-critical check means we are blind to part of
+  // the ledger — we cannot honestly claim healthy. Sample/informational check
+  // failures (e.g. *_sample) do not flip healthy, only enrich the snapshot.
+  const degradedCritical = degradedChecks.some(check => DECISION_CRITICAL_CHECKS.has(check))
+
   const healthy =
+    !degradedCritical &&
     settlementDrift.driftedIncomesCount === 0 &&
     phantoms.incomePhantomsCount === 0 &&
     phantoms.expensePhantomsCount === 0 &&
@@ -825,6 +870,7 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     task708d,
     task714d,
     task720,
-    task721
+    task721,
+    degradedChecks
   }
 }
