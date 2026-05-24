@@ -1,0 +1,54 @@
+# Claude PR assistant — responde a menciones @claude en PRs/issues.
+#
+# Diseño acotado por costo + seguridad (decisión 2026-05-24):
+#   - Modelo: Sonnet (~5x más barato que Opus para review). Alias `sonnet`
+#     resuelve siempre al último Sonnet; pin a un id específico si se quiere
+#     costo 100% predecible.
+#   - Gated: solo corre cuando el comentario contiene '@claude' (el `if`
+#     evita levantar el runner + gastar API en cada comentario del repo).
+#   - Comment-only: `permissions.contents: read` (NO write) → Claude puede
+#     leer el repo y comentar/revisar, pero NO puede pushear commits.
+#   - `--max-turns` acota el loop agéntico (principal driver de tokens).
+#   - Prompt caching: lo maneja el runtime de Claude Code automáticamente.
+#
+# REQUISITO operador-side antes de que funcione:
+#   - Crear el secret de repo `ANTHROPIC_API_KEY` (Settings > Secrets and
+#     variables > Actions). Es billing aparte (API Anthropic por uso).
+#   - Sin el secret, el workflow falla loud en el step de la action.
+#
+# NO interactúa con el flujo de release ni con deploys: es read + comment.
+
+name: Claude PR Assistant
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+# Una corrida por hilo de comentario; cancelar en duplicados ahorra API.
+concurrency:
+  group: claude-assistant-${{ github.event.issue.number || github.event.pull_request.number }}-${{ github.event.comment.id }}
+  cancel-in-progress: false
+
+jobs:
+  claude:
+    # Gate de costo: solo en menciones explícitas @claude.
+    if: contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read # NO write — comment-only, no puede pushear
+      pull-requests: write # comentar / revisar el PR
+      issues: write # responder en el hilo (issue_comment)
+    steps:
+      - name: Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Sin `prompt` fijo → Claude actúa según el texto del comentario
+          # @claude (modo interactivo). El usuario controla el scope por
+          # invocación (ej. "@claude revisá X" / "@claude ¿por qué Y?").
+          claude_args: |
+            --model sonnet
+            --max-turns 15
