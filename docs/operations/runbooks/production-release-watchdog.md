@@ -7,7 +7,7 @@
 
 Este runbook opera el watchdog que detecta y alerta temprano sobre approvals obsoletos de Production, runs productivos sin jobs y drift de deploy de workers.
 
-**Estado vigente 2026-05-24:** el schedule automático está pausado hasta TASK-920. Motivo: los últimos 100 runs tuvieron 72 fallos y la señal scheduled estaba generando ruido/falsos positivos. El workflow sigue disponible por `workflow_dispatch` y el CLI local sigue disponible para checks post-release o diagnóstico puntual.
+**Estado vigente 2026-05-24:** el schedule automático está pausado hasta TASK-920. Motivo: los últimos 100 runs tuvieron 72 fallos y la señal scheduled estaba generando ruido/falsos positivos. Como el schedule activo vive en default branch `main`, se deshabilitó temporalmente el workflow remoto (`disabled_manually`) hasta que `main` reciba este archivo sin `schedule`; mientras tanto, el CLI local `pnpm release:watchdog --json` sigue disponible para checks post-release o diagnóstico puntual.
 
 ## 1. Qué detecta
 
@@ -22,7 +22,7 @@ Este runbook opera el watchdog que detecta y alerta temprano sobre approvals obs
 | Modo | Cuándo | Comando |
 |---|---|---|
 | **Scheduled GH Actions** | Pausado hasta TASK-920 | N/A |
-| **Manual GH dispatch** | Operator quiere validar ad-hoc | UI Actions → Production Release Watchdog → Run workflow |
+| **Manual GH dispatch** | Operador quiere validar ad-hoc, despues de re-enablear el workflow remoto | UI Actions → Production Release Watchdog → Run workflow |
 | **CLI local** | Pre-release verification | `pnpm release:watchdog` |
 | **CLI local con alertas Teams** | Validar dispatch end-to-end | `ENABLE_TEAMS_DISPATCH=true pnpm release:watchdog --enable-teams` |
 | **CLI dry-run** | Ver qué se enviaría sin enviar | `pnpm release:watchdog --enable-teams --dry-run` |

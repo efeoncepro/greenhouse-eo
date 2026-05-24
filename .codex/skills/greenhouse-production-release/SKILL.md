@@ -13,10 +13,12 @@ production".
 This skill is intentionally conservative. Production release is a control-plane
 workflow, not a sequence of ad hoc deploy commands.
 
-Note 2026-05-24: `production-release-watchdog.yml` is manual-only until
-TASK-920 fixes false-positive/failure semantics. Use `workflow_dispatch` or
-`pnpm release:watchdog --json` for ad-hoc checks; do not reactivate `schedule`
-without the TASK-920 fix or an explicit incident rationale.
+Note 2026-05-24: `production-release-watchdog.yml` is manual-only in repo
+until TASK-920 fixes false-positive/failure semantics. The GitHub workflow is
+also `disabled_manually` as an emergency stop while `main` still has the old
+schedule. Use `pnpm release:watchdog --json` until the no-schedule workflow
+reaches `main` and the workflow is re-enabled. Do not reactivate `schedule`
+without TASK-920 or an explicit incident rationale.
 
 ## First Reads
 

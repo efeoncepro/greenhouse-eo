@@ -41,7 +41,7 @@ de drift:
 - **Ledger normalizado**: `greenhouse_sync.github_release_webhook_events` guarda delivery/event/workflow/sha/status/conclusion redacted, match result, transition result y evidence JSON.
 - **Reconciliación segura**: match primario por `target_sha`; fallback por `workflow_run_id` en `workflow_runs`. Si no hay match verificable, queda `unmatched` y no crea ni muta manifests.
 - **Transiciones acotadas**: solo eventos de falla de workflows allowlisted pueden mover estado, y únicamente si `assertValidReleaseStateTransition` lo permite (`ready|deploying -> aborted`, `verifying -> degraded`). Eventos exitosos se registran como `matched`; no declaran `released`.
-- **Watchdog manual-only temporal**: TASK-849 queda disponible como `workflow_dispatch`/CLI, pero el schedule está pausado desde 2026-05-24 hasta TASK-920. El webhook reduce latencia y la verificación manual post-release sigue disponible; no reactivar schedule sin corregir falsos positivos/failures.
+- **Watchdog manual-only temporal**: TASK-849 queda manual-only en repo, pero el workflow remoto está `disabled_manually` como emergency stop mientras `main` aún tiene el schedule viejo. El CLI `pnpm release:watchdog --json` sigue disponible para verificación puntual; no reactivar schedule sin corregir falsos positivos/failures en TASK-920.
 - **Sin outbox nuevo en V1.2**: las transiciones siguen emitiendo los 7 `platform.release.*` existentes. Los eventos GitHub recibidos no emiten outbox propio hasta que exista un consumer real.
 
 Steady state: `platform.release.github_webhook_unmatched = ok` con `0 unmatched / 0 failed` en 24h.

@@ -988,9 +988,9 @@ Pipeline canonical RpA V2 demo end-to-end: status transition Notion → captura 
 
 ### Production Release Watchdog (TASK-848 + TASK-849, 2026-05-10)
 
-- **Estado vigente 2026-05-24**: schedule automatico pausado hasta TASK-920. Los ultimos 100 runs scheduled tuvieron 72 fallos y generaban alertas erradas. El watchdog queda manual-only para verificacion ad-hoc.
+- **Estado vigente 2026-05-24**: schedule automatico pausado hasta TASK-920. Los ultimos 100 runs scheduled tuvieron 72 fallos y generaban alertas erradas. El workflow remoto quedó `disabled_manually` como emergency stop mientras `main` conserva el schedule viejo; usar CLI local hasta promover el archivo sin `schedule` y re-enablear el workflow.
 - **Que hace**: detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale Production approvals, pending sin jobs, worker revision drift) y puede emitir alertas Teams a `production-release-alerts` con dedup canonico via `greenhouse_sync.release_watchdog_alert_state` cuando se ejecuta con alertas habilitadas.
-- **Workflow**: `.github/workflows/production-release-watchdog.yml`. Manual dispatch: `gh workflow run production-release-watchdog.yml --ref main`.
+- **Workflow**: `.github/workflows/production-release-watchdog.yml`. Manual dispatch vuelve a estar disponible tras re-enablear el workflow sin `schedule` en `main`: `gh workflow run production-release-watchdog.yml --ref main`.
 - **CLI local canonico**: `pnpm release:watchdog [--json|--fail-on-error|--enable-teams|--dry-run]`. Si vas a correrlo desde fuera de Vercel runtime, set `GCP_PROJECT=efeonce-group` + las 3 GH App env vars (App ID `3665723`, Installation ID `131127026`, secret ref `greenhouse-github-app-private-key`).
 - **GitHub auth strategy canonica**: GitHub App `Greenhouse Release Watchdog` (App ID `3665723`) instalada en `efeoncepro` org con permissions `Actions:read + Deployments:read + Metadata:read`. Private key vive en GCP Secret Manager `greenhouse-github-app-private-key` (project `efeonce-group`). Resolver `src/lib/release/github-app-token-resolver.ts` mintea installation token con cache 1h. Fallback a PAT (`GITHUB_RELEASE_OBSERVER_TOKEN`/`GITHUB_TOKEN`) solo si GH App no esta configurado. Beneficios: token NO ligado a usuario, rate limit 15K req/h vs 5K, auditoria per-installation.
 - **Setup scripts canonicos**:

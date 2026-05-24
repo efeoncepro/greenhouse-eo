@@ -8,7 +8,7 @@
 
 ## Estado vigente
 
-El Watchdog está **manual-only temporalmente** desde el 2026-05-24 hasta que TASK-920 corrija la señal. Los últimos 100 runs scheduled tuvieron 72 fallos y generaban alertas erradas. Puedes ejecutarlo manualmente desde GitHub Actions o con `pnpm release:watchdog --json` cuando necesites una verificación puntual.
+El Watchdog está **manual-only temporalmente** en el repo desde el 2026-05-24 hasta que TASK-920 corrija la señal. Los últimos 100 runs scheduled tuvieron 72 fallos y generaban alertas erradas. Para cortar el cron viejo que aún vivía en `main`, el workflow remoto quedó `disabled_manually`; hasta re-enablearlo después de promover el archivo sin `schedule`, usa `pnpm release:watchdog --json` cuando necesites una verificación puntual.
 
 ## Para que sirve
 

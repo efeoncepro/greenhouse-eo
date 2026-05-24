@@ -1964,7 +1964,7 @@ Ambos consultan GitHub API via `GITHUB_RELEASE_OBSERVER_TOKEN` con degradación 
 
 ### Production Release Watchdog invariants (TASK-849)
 
-Watchdog manual-only temporal (desde 2026-05-24 hasta TASK-920) que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale approvals + pending sin jobs + worker revision drift). Originalmente corría scheduled en GitHub Actions y emitía alertas Teams a `production-release-alerts`; el schedule se pausó porque los últimos 100 runs tuvieron 72 fallos y generaban falsos positivos. El CLI/workflow manual siguen disponibles.
+Watchdog manual-only temporal (desde 2026-05-24 hasta TASK-920) que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale approvals + pending sin jobs + worker revision drift). Originalmente corría scheduled en GitHub Actions y emitía alertas Teams a `production-release-alerts`; el schedule se pausó porque los últimos 100 runs tuvieron 72 fallos y generaban falsos positivos. El workflow remoto quedó `disabled_manually` como emergency stop mientras `main` conserva el schedule viejo; usar CLI local hasta promover el archivo sin `schedule` y re-enablear el workflow.
 
 **Helpers canonicos** (V1.0 + V1.1 obligatorios al tocar release watchdog):
 
