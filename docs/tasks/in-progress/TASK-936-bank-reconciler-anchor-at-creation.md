@@ -2,14 +2,29 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto` (corrige doble conteo en P&L)
 - Effort: `Medio-Alto`
 - Type: `bugfix|data`
 - Domain: `finance`
 - Blocked by: `none`
+- Branch: `develop` (override operador 2026-05-25: sin branch, igual que TASK-929/934/935)
+- Session start: 2026-05-25
 - Supersedes scope of: draft original "anchor-at-creation"
+
+## Audit recalibration 2026-05-25 (FASE 2 — premise corregida)
+
+Discovery reveló que **la premisa original de la task era falsa**. Correcciones canónicas:
+
+1. **NO existe un "bank reconciler productivo" que cree duplicados.** Verificado: `EXP-RECON-*` se genera SOLO en `src/lib/finance/payment-instruments/anchored-payments.ts:236`; su único caller es el seed/backfill one-time `scripts/finance/conciliate-march-april-2026.ts` (TASK-702, cartolas reales mar/abr). `auto-match.ts`/`postgres-reconciliation.ts` NO hacen `INSERT INTO expenses` (solo MATCH). 0 API routes / 0 reactive consumers crean EXP-RECON.
+2. **→ Slice 2 (reconciler MATCH-not-CREATE) = DROPPED (moot).** No hay path productivo que arreglar; construirlo es resolver un problema inexistente (YAGNI). Si en el futuro se construye un create-path en la UI de conciliación, ese nace MATCH-first (otra task).
+3. **Origen real del doble conteo**: el seed modeló pagos de nómina como `supplier_payment`/`bank_fee` porque los `payroll_entries` no estaban linkeados al correr el backfill (comentarios del propio script: líneas 183/189/190). Es data histórica de UN run, **no recurrente**.
+4. **Urgencia real: BAJA** (no "P1 creciente" como se dijo antes). ~CLP 3-4M de doble conteo histórico, sin sangrado activo.
+5. **Período status** (verificado): `santander-clp 2026-03` = **reconciled (cerrado)**; `global66-clp 2026-04` y `santander-corp-clp 2026-04` = **open**. La mayoría del cleanup toca períodos ABIERTOS (sin restatement). Solo Valentina (595.656, Mar 6) y Humberly (300k, Mar 2) tocan el cerrado.
+6. **No todo "pago a persona" es duplicado**: Humberly no tenía payroll en marzo (su 1ª nómina es abril) → su transfer de marzo no duplica nada → es caso aparte (advance/sin obligación), NO dismiss-as-duplicate.
+
+**Scope corregido**: corrección one-time de un backfill (no fix de código productivo). Per-bucket, **match propuesto + gate humano** (no auto-apply de re-linkeo de dinero real), dry-run first, supersede-not-delete, helpers canónicos. Detalle abajo (sección "Plan corregido").
 
 ## Summary
 
@@ -61,12 +76,26 @@ Solo **[A]** y **[D]** son filas a eliminar (dismiss). **[B]** se reclasifica. *
   - [D]: dismiss (test residue).
 - Outbox + audit por cada mutación. Reason ≥ 10 chars.
 
-### Slice 2 — Reconciler MATCH-not-CREATE (causa raíz prospectiva)
+### Slice 2 — Reconciler MATCH-not-CREATE — ~~prospectivo~~ **DROPPED (moot)**
 
-- En el punto de creación (`postgres-reconciliation.ts`), antes de crear un `expense` desde un egreso bancario: intentar matchear a una obligación existente (`expenses` unpaid con monto≈ + fecha cercana + contraparte) y registrar como pago.
-- Resolución de contraparte name-first (cascada de arriba).
-- Si no hay match con confianza → crear unanchored explícito (no inventar ancla) → inventory de TASK-934.
-- Tests: egreso que paga nómina existente → match (no nuevo gasto); egreso de vendor internacional nuevo → crea gasto anclado por nombre; egreso sin match → unanchored explícito.
+**No se implementa.** Verificado en Audit: no hay path productivo que cree `EXP-RECON` (solo el seed one-time). Construir un matcher prospectivo para un path inexistente = YAGNI. Si en el futuro se crea un create-path en la UI de conciliación, nace MATCH-first como task propia.
+
+## Plan corregido (2026-05-25) — corrección one-time, dry-run + gate humano
+
+**Etapa 1 — Tooling dry-run (no mutativo, seguro de correr):**
+Script idempotente `scripts/finance/fix-reconciliation-double-count-mar-apr-2026.ts` con `--dry-run` default. Clasifica cada uno de los 37 unanchored paid en [A]/[B]/[C]/[D] y, para [A], **propone** el match a la `Nomina neta` correspondiente (por member + mes-de-pago, considerando el offset pago-mes vs nómina-mes) con el delta FX que resultaría. NO escribe. Imprime: bucket, monto, período (open/closed), y para [A] la nómina candidata + si tiene match o no (Humberly mar sin payroll → flag "sin obligación").
+
+**Etapa 2 — Gate humano (checkpoint):**
+Presentar el dry-run. El operador confirma los matches [A] (re-linkeo de dinero real) y autoriza explícitamente los items de período cerrado (`santander-clp 2026-03`: Valentina). Sin esa confirmación, NO se aplica.
+
+**Etapa 3 — Apply (`--apply`, tras gate):** por bucket, helpers canónicos, supersede-not-delete, idempotente, per-row try/catch:
+
+- [A] match confirmado: `dismissExpensePhantom` del duplicado + `recordExpensePayment` contra la nómina (computa `fx_gain_loss_clp` solo). Rematerializar `account_balances` + verificar closing vs cartola.
+- [A] sin obligación (Humberly mar): NO dismiss → dejar para decisión (advance/loan/acknowledge), fuera de este apply.
+- [B] FX: reclasificar a FX P&L / economic_category.
+- [C] vendor real: anclar `supplier_id` (name-first) / `tool_catalog_id`. No borra.
+- [D] test residue: dismiss.
+- Outbox + audit por mutación. Reason ≥ 10 chars.
 
 ## Out of Scope
 
@@ -83,7 +112,7 @@ Solo **[A]** y **[D]** son filas a eliminar (dismiss). **[B]** se reclasifica. *
 
 ## Verification
 
-- Dry-run del Slice 1 lista clasificación + montos antes de aplicar.
-- Post-apply: `finance.ledger.unresolved_drift_items` baja; doble conteo eliminado; `pnpm pg:doctor`.
-- Slice 2: tests focales del reconciler (match nómina, vendor internacional, no-match→unanchored).
+- Dry-run lista clasificación + montos + período (open/closed) + match candidato [A] antes de aplicar.
+- Post-apply: `finance.ledger.unresolved_drift_items` baja; doble conteo [A] eliminado; `pnpm pg:doctor`.
 - Validar P&L del mes: el costo de cada persona/vendor aparece **una sola vez**.
+- account_balances rematerializado y closing ≈ cartola (ground truth) por cuenta tocada.

@@ -1,3 +1,21 @@
+# Sesion 2026-05-25 — TASK-936 dedup doble conteo P&L — 🔄 IN-PROGRESS (Audit done, premise corregida, dry-run pendiente)
+
+Skills arch + finance en loop. La validación de TASK-929/934 reveló **doble conteo en P&L**: el neto de nómina de varios colaboradores aparece 2x en `expenses` (la nómina devengada `EXP-202xxx` + un `EXP-RECON-* "Envío a X"` que paga esa misma nómina).
+
+**Audit (FASE 2) corrigió la premise de la task** (era falsa):
+
+- NO hay reconciler productivo creando duplicados. `EXP-RECON-*` solo se genera en `anchored-payments.ts:236`, único caller = seed one-time `scripts/finance/conciliate-march-april-2026.ts` (TASK-702, cartolas reales). `auto-match`/`postgres-reconciliation` no hacen INSERT INTO expenses. 0 API/0 reactive.
+- → **Slice 2 (MATCH-not-CREATE prospectivo) DROPPED** (resolvería un path inexistente, YAGNI).
+- El seed modeló pagos de nómina como `supplier_payment` porque payroll_entries no estaban linkeados (comentarios propios líneas 183/189/190).
+- **Corrección honesta de urgencia**: NO es "bug activo que crece" (claim previo erróneo) — es data histórica de UN run. **Urgencia BAJA**, ~CLP 3-4M.
+- Períodos: `global66-clp abr` + `santander-corp-clp abr` = OPEN; `santander-clp mar` = reconciled (solo Valentina 595.656 + Humberly 300k tocan el cerrado). Humberly mar NO tiene payroll → no es duplicado (caso aparte).
+
+**Buckets de los 37 unanchored**: [A] duplicados nómina (dismiss + recordExpensePayment contra la nómina, computa FX) · [B] FX legítimo (reclasificar) · [C] vendors reales sin supplier_id (anclar name-first — muchos internacionales sin RUT) · [D] test residue (dismiss). Solo [A]+[D] se eliminan.
+
+**Plan corregido**: corrección one-time, **dry-run + gate humano** antes de aplicar (re-linkeo dinero real + período cerrado). Helpers canónicos: `dismissExpensePhantom`, `recordExpensePayment` (dual-mode), `resolveExpenseEconomicCategory`. **Próximo paso**: construir script dry-run `fix-reconciliation-double-count-mar-apr-2026.ts` + presentar propuesta de matches [A].
+
+---
+
 # Sesion 2026-05-25 — TASK-714d detector fix (internal_transfer falso positivo) — 🔨 detector slice DONE, umbrella sigue in-progress
 
 Skills arch + finance en loop. Fix del falso positivo diagnosticado en TASK-929. El detector `task714d` filtraba patas superseded y comparaba **patas activas**; el invariante bilateral real es **"el par fue creado"** (supersede-independiente). Patas retiradas legítimamente (OTB re-anchor TASK-703b, backfill Slice 2) dejaban los conteos activos asimétricos → falso positivo.
