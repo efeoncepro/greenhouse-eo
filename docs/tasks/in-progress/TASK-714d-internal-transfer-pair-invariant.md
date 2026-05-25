@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do` (umbrella, parcialmente cerrada)
+- Lifecycle: `in-progress` (umbrella; detector fix slice 2026-05-25)
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto` (ya ejecutados Slice 1 + Slice 2 Global66)
@@ -89,15 +89,23 @@ Sin esas decisiones, no se puede ejecutar la reclasificación. La task queda blo
 - Verificación drift: `labor_allocation_saturation_drift` en 0.
 - Closing Global66 NO debe cambiar (cambio interno de categoría).
 
-### Slice 4 — TC (Santander Corp) backfill ⏳ DEFERIDA
+### Slice 4 — TC (Santander Corp) backfill ❌ OBVIADA 2026-05-25 (eran falsos positivos del detector)
 
-Los 3 grupos TC pendientes:
+Los 3 grupos TC NO necesitan backfill. El diagnóstico de TASK-929 + el detector fix (Delta abajo) probaron que son **pares completos**: outgoing `santander-clp` ACTIVE + incoming `santander-corp-clp` OTB-absorbida (re-anchor TASK-703b). El detector viejo los flagueaba por contar solo patas activas; con el fix (contar todas las patas creadas) `task714d = 0`. No hay imbalance real → nada que backfillear.
 
-| Group | Date | Amount | Notas |
+| Group | Date | Amount | Estado real |
 |---|---|---|---|
-| stlgrp-itx-20260306-amcg | 03/06 | $597,697 | santander-clp → santander-corp-clp |
-| stlgrp-itx-20260312-l45c | 03/12 | $1,003,975 | santander-clp → santander-corp-clp |
-| stlgrp-itx-20260406-9uwu | 04/06 | $696,198 | santander-clp → santander-corp-clp |
+| stlgrp-itx-20260306-amcg | 03/06 | $597,697 | par completo (out ACTIVE + in OTB) — no imbalance |
+| stlgrp-itx-20260312-l45c | 03/12 | $1,003,975 | par completo (out ACTIVE + in OTB) — no imbalance |
+| stlgrp-itx-20260406-9uwu | 04/06 | $696,198 | par completo (out ACTIVE + in OTB) — no imbalance |
+
+## Delta 2026-05-25 — Detector fix IMPLEMENTADO (Slice 1 corregido) + Slice 4 obviada
+
+El detector de Slice 1 tenía un **bug de falso positivo** (confirmado live): filtraba `superseded_at IS NULL AND superseded_by_otb_id IS NULL` y comparaba **patas activas**, pero el invariante bilateral real es **"el par fue CREADO"** (1 outgoing + 1 incoming), supersede-independiente. Cuando una pata se retira legítimamente (OTB re-anchor TASK-703b, o reemplazo por el backfill de Slice 2), las patas activas quedan asimétricas aunque el par se creó completo.
+
+**Fix** (commit `babe141d`): contar TODAS las patas en `TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_{COUNT,SAMPLE}_SQL` (quitar el filtro de supersede). Verificado live `task714d: 3 → 0`. Los 8 grupos que el filtro viejo flagueaba (3 TC + 5 Global66 reemplazadas por Slice 2) eran todos pares completos. El fix sigue catcheando el bug real (outgoing sin incoming jamás creado → 1≠0). Test actualizado (asserta NO filtro de supersede).
+
+**Estado umbrella post-fix**: Slice 1 ✅ (corregido), Slice 2 ✅, Slice 4 ❌ obviada. `task714d=0` + settlement=0 (TASK-929) → el cron `healthy=false` queda driveado SOLO por los 20 unanchored. **Slice 3 sigue ⏳ bloqueada** por input humano (member_id/atribución/payroll period de Daniela/Andrés/David) y ahora **overlap con TASK-934**: esos pagos labor están entre los 37 unanchored — el operador puede (a) acknowledgear (TASK-934) o (b) reclasificar a payroll con member_id (Slice 3). Decisión operador. El umbrella queda `in-progress` por Slice 3.
 
 **Razón de deferral**: TC es liability. Las legs `incoming` faltantes, si se backfillean, se interpretarán como "pagos recibidos = reducción de deuda". PERO esos pagos pueden estar siendo modelados como `expense_payments` con `payment_account_id='santander-corp-clp'` (cargos a TC con la app), lo cual causa **doble conteo si ambos modelos coexisten**.
 

@@ -1,3 +1,15 @@
+# Sesion 2026-05-25 — TASK-714d detector fix (internal_transfer falso positivo) — 🔨 detector slice DONE, umbrella sigue in-progress
+
+Skills arch + finance en loop. Fix del falso positivo diagnosticado en TASK-929. El detector `task714d` filtraba patas superseded y comparaba **patas activas**; el invariante bilateral real es **"el par fue creado"** (supersede-independiente). Patas retiradas legítimamente (OTB re-anchor TASK-703b, backfill Slice 2) dejaban los conteos activos asimétricos → falso positivo.
+
+- **Fix** (`babe141d`): contar TODAS las patas en el detector (count + sample). Verificado live: los 8 grupos flagueados (3 TC CLP→tarjeta con incoming OTB-absorbida + 5 Global66 reemplazadas por Slice 2) eran pares completos → `task714d: 3 → 0`. Sigue catcheando el bug real (outgoing sin incoming jamás creado). Test actualizado.
+- **Slice 4 (TC backfill) OBVIADA**: no había imbalance real.
+- **Umbrella sigue in-progress**: Slice 3 (reclasificación payroll Global66 — Daniela España/Andrés/David) bloqueada por input humano (member_id/atribución/payroll period) + overlap con TASK-934 (esos pagos están entre los 37 unanchored → el operador puede acknowledgear o reclasificar).
+
+**Estado `JAVASCRIPT-NEXTJS-4Q` post-sesión**: settlement=0 (TASK-929) + task714d=0 (este fix) → el cron `healthy=false` queda driveado SOLO por los 20 unanchored = acción operador (TASK-934 acknowledge/anchor). Cerrar Sentry cuando los 20 se resuelvan + healthy=true 24-48h.
+
+---
+
 # Sesion 2026-05-25 — TASK-935 Capability governance reconciliation — ✅ COMPLETE (develop, sin branch)
 
 Derivada de TASK-934 (los 2 hallazgos ajenos). Skills arch + finance en loop. **Cierra bug class sistémico TASK-873**: audit comprehensivo encontró **13 latent-403** (no 3) — capabilities can()-checked en endpoints `/api/admin/*` sin runtime grant → 403 incluso para EFEONCE_ADMIN. Causa raíz: specs documentaron roles intended (`DEVOPS_OPERATOR`/`commercial_admin`/`operations`) que **nunca existieron como ROLE_CODES** → grant nunca escrito. Como los 13 pasan por `requireAdminTenantContext` (solo efeonce_admin llega), los grants colapsan a EFEONCE_ADMIN + FINANCE_ADMIN.
