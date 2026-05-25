@@ -60,6 +60,8 @@ const QUERY_SQL = `
         AND e.tax_type IS NULL
         AND e.loan_account_id IS NULL
         AND e.linked_income_id IS NULL
+        -- TASK-934: acknowledged-as-known-debt expenses leave the unresolved set.
+        AND e.unanchored_acknowledged_at IS NULL
     )::int AS unanchored_expenses
 `
 

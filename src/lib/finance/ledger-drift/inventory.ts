@@ -55,6 +55,12 @@ export type InternalTransferImbalanceItem = {
   inCount: number
 }
 
+export type AcknowledgedExpenseItem = UnanchoredExpenseItem & {
+  acknowledgedAt: string | null
+  acknowledgedBy: string | null
+  acknowledgedReason: string | null
+}
+
 export interface LedgerDriftInventory {
   generatedAt: string
   materialityThresholdClp: number
@@ -68,6 +74,12 @@ export interface LedgerDriftInventory {
     immaterialCount: number
     material: UnanchoredExpenseItem[]
     immaterial: UnanchoredExpenseItem[]
+  }
+  /** TASK-934 — accepted as known debt (excluded from pending/unresolved). */
+  acknowledged: {
+    count: number
+    totalClp: number
+    items: AcknowledgedExpenseItem[]
   }
   /** OUT OF SCOPE — flagged as a 4Q closure blocker owned by TASK-714d. */
   internalTransferImbalance: {
@@ -107,16 +119,34 @@ const SETTLEMENT_SQL = `
   ORDER BY ABS(drift) DESC
 `
 
-const UNANCHORED_SQL = `
-  SELECT e.expense_id, e.expense_type, e.economic_category, e.total_amount::text, e.payment_date::text
-  FROM greenhouse_finance.expenses e
-  WHERE e.payment_status = 'paid'
+// Shared anchor predicate: paid expense with NO FK anchor.
+const UNANCHORED_PREDICATE = `
+  e.payment_status = 'paid'
     AND e.payroll_entry_id IS NULL
     AND e.tool_catalog_id IS NULL
     AND e.supplier_id IS NULL
     AND e.tax_type IS NULL
     AND e.loan_account_id IS NULL
     AND e.linked_income_id IS NULL
+`
+
+// Pending = unanchored AND NOT acknowledged (TASK-934).
+const UNANCHORED_SQL = `
+  SELECT e.expense_id, e.expense_type, e.economic_category, e.total_amount::text, e.payment_date::text
+  FROM greenhouse_finance.expenses e
+  WHERE ${UNANCHORED_PREDICATE}
+    AND e.unanchored_acknowledged_at IS NULL
+  ORDER BY e.total_amount DESC
+`
+
+// Acknowledged-as-known-debt (TASK-934): accepted, classified via
+// economic_category, no FK anchor appropriate. The SUM-of-unadjusted ledger.
+const ACKNOWLEDGED_SQL = `
+  SELECT e.expense_id, e.expense_type, e.economic_category, e.total_amount::text, e.payment_date::text,
+         e.unanchored_acknowledged_at::text, e.unanchored_acknowledged_by, e.unanchored_acknowledged_reason
+  FROM greenhouse_finance.expenses e
+  WHERE ${UNANCHORED_PREDICATE}
+    AND e.unanchored_acknowledged_at IS NOT NULL
   ORDER BY e.total_amount DESC
 `
 
@@ -135,7 +165,7 @@ const ITX_IMBALANCE_SQL = `
 `
 
 export const getLedgerDriftInventory = async (): Promise<LedgerDriftInventory> => {
-  const [settlementRows, unanchoredRows, itxRows] = await Promise.all([
+  const [settlementRows, unanchoredRows, acknowledgedRows, itxRows] = await Promise.all([
     runGreenhousePostgresQuery<{
       income_id: string
       total_amount: string
@@ -150,6 +180,16 @@ export const getLedgerDriftInventory = async (): Promise<LedgerDriftInventory> =
       total_amount: string
       payment_date: string | null
     }>(UNANCHORED_SQL),
+    runGreenhousePostgresQuery<{
+      expense_id: string
+      expense_type: string
+      economic_category: string | null
+      total_amount: string
+      payment_date: string | null
+      unanchored_acknowledged_at: string | null
+      unanchored_acknowledged_by: string | null
+      unanchored_acknowledged_reason: string | null
+    }>(ACKNOWLEDGED_SQL),
     runGreenhousePostgresQuery<{ settlement_group_id: string; out_count: number; in_count: number }>(
       ITX_IMBALANCE_SQL
     )
@@ -176,6 +216,17 @@ export const getLedgerDriftInventory = async (): Promise<LedgerDriftInventory> =
     UNANCHORED_MATERIALITY_THRESHOLD_CLP
   )
 
+  const acknowledged: AcknowledgedExpenseItem[] = acknowledgedRows.map(row => ({
+    expenseId: row.expense_id,
+    expenseType: row.expense_type,
+    economicCategory: row.economic_category,
+    totalAmount: Number(row.total_amount),
+    paymentDate: row.payment_date,
+    acknowledgedAt: row.unanchored_acknowledged_at,
+    acknowledgedBy: row.unanchored_acknowledged_by,
+    acknowledgedReason: row.unanchored_acknowledged_reason
+  }))
+
   const internalTransferItems = itxRows.map(row => ({
     settlementGroupId: row.settlement_group_id,
     outCount: Number(row.out_count),
@@ -195,6 +246,11 @@ export const getLedgerDriftInventory = async (): Promise<LedgerDriftInventory> =
       immaterialCount: immaterial.length,
       material,
       immaterial
+    },
+    acknowledged: {
+      count: acknowledged.length,
+      totalClp: acknowledged.reduce((sum, item) => sum + item.totalAmount, 0),
+      items: acknowledged
     },
     internalTransferImbalance: {
       count: internalTransferItems.length,

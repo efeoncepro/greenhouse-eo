@@ -48,6 +48,16 @@ export interface LedgerHealthSnapshot {
     sample: Array<{ expenseId: string; type: string; amount: number; paymentDate: string | null }>
   }
   /**
+   * TASK-934 — acknowledgedDebt: gastos pagados sin FK-anchor que el operador
+   * aceptó como deuda conocida (clasificados por economic_category, sin supplier
+   * apropiado). Equivalente al SUM-of-unadjusted-misstatements de auditoría:
+   * visible pero NO afecta `healthy` (ya no cuentan como unanchored pendiente).
+   */
+  acknowledgedDebt: {
+    count: number
+    totalClp: number
+  }
+  /**
    * TASK-708 Slice 6 — phantom cohorts diferenciadas runtime vs historico.
    * `runtime` deberia ser 0 post-cutover (CHECK income/expense_payments_account_required_after_cutover).
    * `historical` solo baja cuando TASK-708b ejecuta la remediacion.
@@ -622,9 +632,26 @@ const UNANCHORED_EXPENSES_SQL = `
     AND e.tax_type IS NULL
     AND e.loan_account_id IS NULL
     AND e.linked_income_id IS NULL
+    -- TASK-934: acknowledged-as-known-debt expenses no cuentan para healthy.
+    AND e.unanchored_acknowledged_at IS NULL
     AND e.payment_date >= CURRENT_DATE - INTERVAL '60 days'
   ORDER BY e.payment_date DESC NULLS LAST
   LIMIT 20
+`
+
+// TASK-934 — acknowledgedDebt (SUM-of-unadjusted): unanchored paid expenses the
+// operator accepted as known debt. Surfaced separately; does NOT affect healthy.
+const ACKNOWLEDGED_DEBT_SQL = `
+  SELECT COUNT(*)::int AS count, COALESCE(SUM(e.total_amount), 0)::text AS total_clp
+  FROM greenhouse_finance.expenses e
+  WHERE e.payment_status = 'paid'
+    AND e.payroll_entry_id IS NULL
+    AND e.tool_catalog_id IS NULL
+    AND e.supplier_id IS NULL
+    AND e.tax_type IS NULL
+    AND e.loan_account_id IS NULL
+    AND e.linked_income_id IS NULL
+    AND e.unanchored_acknowledged_at IS NOT NULL
 `
 
 const readCount = (rows: Array<{ total: string | number | null }>): number => {
@@ -682,7 +709,8 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     task720CountRows,
     task720SampleRows,
     task721CountRows,
-    task721SampleRows
+    task721SampleRows,
+    acknowledgedDebtRows
   ] = await Promise.all([
     tracked('settlement_drift', runGreenhousePostgresQuery<{ income_id: string; total_amount: string; amount_paid: string; expected_settlement: string; drift: string }>(SETTLEMENT_DRIFT_SQL), []),
     tracked('phantoms_income', runGreenhousePostgresQuery<{ payment_id: string; income_id: string; payment_date: string; amount: string }>(PHANTOMS_INCOME_SQL), []),
@@ -726,7 +754,8 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
       snapshot_at: string
       evidence_asset_id: string
       asset_status: string | null
-    }>(TASK721_BROKEN_EVIDENCE_SAMPLE_SQL), [])
+    }>(TASK721_BROKEN_EVIDENCE_SAMPLE_SQL), []),
+    tracked('acknowledged_debt', runGreenhousePostgresQuery<{ count: number; total_clp: string }>(ACKNOWLEDGED_DEBT_SQL), [{ count: 0, total_clp: '0' }])
   ])
 
   const incomePhantoms = phantomsIncome.map(p => ({
@@ -776,6 +805,12 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
       amount: Number(u.total_amount),
       paymentDate: u.payment_date
     }))
+  }
+
+  // TASK-934 — informational (not decision-critical): accepted known debt.
+  const acknowledgedDebt = {
+    count: Number(acknowledgedDebtRows[0]?.count ?? 0),
+    totalClp: Number(acknowledgedDebtRows[0]?.total_clp ?? 0)
   }
 
   const task708 = {
@@ -866,6 +901,7 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     phantoms,
     balanceFreshness: { accountsWithStaleBalances },
     unanchoredExpenses,
+    acknowledgedDebt,
     task708,
     task708d,
     task714d,

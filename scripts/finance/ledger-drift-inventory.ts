@@ -51,6 +51,16 @@ return
 
   console.log(`   inmaterial (< umbral, batch-accept candidate): ${inv.unanchored.immaterialCount}`)
 
+  console.log(
+    `\n-- Acknowledged como deuda conocida (aceptados, fuera de pendientes): ${inv.acknowledged.count} · total $${fmtClp(inv.acknowledged.totalClp)} CLP --`
+  )
+
+  for (const a of inv.acknowledged.items) {
+    console.log(
+      `   ${a.expenseId}  $${fmtClp(a.totalAmount)}  econ=${a.economicCategory ?? '—'}  por=${a.acknowledgedBy ?? '—'}  ${a.acknowledgedAt ?? ''}`
+    )
+  }
+
   console.log(`\n-- Internal transfer imbalance (OUT OF SCOPE — TASK-714d): ${inv.internalTransferImbalance.count} --`)
 
   for (const g of inv.internalTransferImbalance.items) {
