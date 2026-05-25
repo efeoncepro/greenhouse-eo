@@ -1,3 +1,9 @@
+# Sesion 2026-05-25 — TASK-934 Unanchored paid expense acknowledgment — 🔨 in-progress (develop, sin branch)
+
+Derivada de TASK-929. Skills finance + arch en loop. **Recalibración de diseño pre-execution** (Discovery reveló los 37 son pagos reales: 18 vendor_cost_saas anclables a supplier vía PUT existente, 19 labor/regulatory — Daniela España/Andrés Colombia/Valentina + regulatory/bank_fee — que son personas/regulatorios, no suppliers). **Pivote**: NO tabla-cola state-machine (sync risk, anti-patrón) → **acknowledgment-on-expense** (columnas `unanchored_acknowledged_*` + helper mirror `dismiss-phantom.ts` + capability `finance.expenses.acknowledge_unanchored`). Anclar vendors = reuse PUT `/api/finance/expenses/[id]` (ya existe). `acknowledgedDebt` separado de `healthy`; inventory + signal excluyen acknowledged. Sin write-off/2º actor (no destructivo, gastos reales quedan en P&L). Plan 3 slices. Próximo: Slice 1 (migración + helper + capability).
+
+---
+
 # Sesion 2026-05-24 — TASK-929 Finance ledger drift remediation — 🔨 Discovery+Audit+Plan completos, P1 STOP checkpoint pre-FASE 5
 
 **Rama**: `develop` (override del operador, sin branch nuevo). Lifecycle: `in-progress`.
