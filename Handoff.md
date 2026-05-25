@@ -1,4 +1,18 @@
-# Sesion 2026-05-25 — TASK-934 Unanchored paid expense acknowledgment — 🔨 in-progress (develop, sin branch)
+# Sesion 2026-05-25 — TASK-935 Capability governance reconciliation — ✅ COMPLETE (develop, sin branch)
+
+Derivada de TASK-934 (los 2 hallazgos ajenos). Skills arch + finance en loop. **Cierra bug class sistémico TASK-873**: audit comprehensivo encontró **13 latent-403** (no 3) — capabilities can()-checked en endpoints `/api/admin/*` sin runtime grant → 403 incluso para EFEONCE_ADMIN. Causa raíz: specs documentaron roles intended (`DEVOPS_OPERATOR`/`commercial_admin`/`operations`) que **nunca existieron como ROLE_CODES** → grant nunca escrito. Como los 13 pasan por `requireAdminTenantContext` (solo efeonce_admin llega), los grants colapsan a EFEONCE_ADMIN + FINANCE_ADMIN.
+
+- **Slice 1** `71477315`: 13 runtime grants + **guard de regresión** `capability-grant-coverage.test.ts` (puro/CI: parsea can() usages + asserta ≥1 grant; rompe build si falta). 0 latent 403 verificado.
+- **Slice 2** `f55cb065`: módulo `delivery` + 4 catalog entries (caps DB-only TASK-908/912) + migración module drift `reconcile_drift` (DB identity→people). `parity.live` verde (0 mismatches).
+- **Slice 3**: CLAUDE.md TASK-873 reforzado (guard mecánico reemplaza enforcement humano) + changelog/README/registry.
+
+Gate: full suite **5398 passed** + build exit 0 (1er build falló por flaky de concurrencia test+build; re-run aislado verde) + parity.live + tsc + lint. Lifecycle `complete`.
+
+**Sin follow-ups nuevos** — el guard previene la recurrencia. Roles inexistentes (`DEVOPS_OPERATOR` etc.) quedan como decisión futura si se necesita delegación más fina que EFEONCE_ADMIN (hoy suficiente porque requireAdminTenantContext ya gate a efeonce_admin).
+
+---
+
+# Sesion 2026-05-25 — TASK-934 Unanchored paid expense acknowledgment — ✅ COMPLETE (develop, sin branch)
 
 Derivada de TASK-929. Skills finance + arch en loop. **Recalibración de diseño pre-execution** (Discovery reveló los 37 son pagos reales: 18 vendor_cost_saas anclables a supplier vía PUT existente, 19 labor/regulatory — Daniela España/Andrés Colombia/Valentina + regulatory/bank_fee — que son personas/regulatorios, no suppliers). **Pivote**: NO tabla-cola state-machine (sync risk, anti-patrón) → **acknowledgment-on-expense** (columnas `unanchored_acknowledged_*` + helper mirror `dismiss-phantom.ts` + capability `finance.expenses.acknowledge_unanchored`). Anclar vendors = reuse PUT `/api/finance/expenses/[id]` (ya existe). `acknowledgedDebt` separado de `healthy`; inventory + signal excluyen acknowledged. Sin write-off/2º actor (no destructivo, gastos reales quedan en P&L).
 

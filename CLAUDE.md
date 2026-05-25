@@ -3672,7 +3672,7 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 
 **⚠️ Reglas duras**:
 
-- **NUNCA** agregar entry al `ENTITLEMENT_CAPABILITY_CATALOG` en `src/config/entitlements-catalog.ts` sin agregar grant correspondiente en `src/lib/entitlements/runtime.ts` en el mismo PR. La parity test live `src/lib/capabilities-registry/parity.live.test.ts` NO detecta esto — solo valida TS↔DB shape parity, no runtime grant coverage. Code review es el enforcement humano.
+- **NUNCA** agregar entry al `ENTITLEMENT_CAPABILITY_CATALOG` en `src/config/entitlements-catalog.ts` que se chequee vía `can()` sin agregar grant correspondiente en `src/lib/entitlements/runtime.ts` en el mismo PR. **Enforcement mecánico desde TASK-935**: el guard `src/lib/entitlements/capability-grant-coverage.test.ts` (puro, no-DB, corre en CI) parsea todos los `can()` usages en `src/app`+`src/lib` y asserta que toda capability del catalog chequeada vía `can()` está granteada a ≥1 rol. Si agregás un `can()` sobre una capability sin grant, este test rompe el build. (La parity test live `parity.live.test.ts` es complementaria: valida TS↔DB shape/module parity, NO grant coverage.)
 - **NUNCA** agregar grant en runtime.ts sin un comentario `// TASK-XXX — <descripción del fix>` que documente la decisión + el set canónico de roles. El comentario es lo que permite al próximo agente entender el alcance del gate.
 - **NUNCA** asumir que "la capability ya está en DB" significa "los usuarios tienen acceso". DB registry es **gobernanza** (qué capabilities existen + auditoría); runtime.ts es **policy** (qué subjects las tienen). Son ortogonales.
 - **NUNCA** branchear `roleCodes.includes(...)` inline en route handlers o views. Toda autorización pasa por `can(subject, capability, action, scope)`. Los grants en runtime son la única fuente.
@@ -3682,6 +3682,8 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 **Defense in depth**: cuando una capability es operacionalmente crítica (e.g. transición state machine, mutación HR/Finance, reveal sensitive), agregar smoke test E2E en `tests/e2e/smoke/` que verifique el flow con un usuario del rol esperado. Sin smoke, el endpoint queda en "shipped pero inaccesible" hasta que un usuario real lo reporta.
 
 **Spec canónica**: `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (Slice 1 fix). Pattern fuente: `src/lib/entitlements/runtime.ts` líneas con grant `workforce.member.complete_intake` (matriz `hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN`).
+
+**TASK-935 (2026-05-25) — reconciliación sistémica + guard mecánico**: el bug class TASK-873 había recurrido 13 veces (capabilities can()-checked en endpoints `/api/admin/*` sin runtime grant → 403 para todos). Causa raíz: specs documentaron roles intended (`DEVOPS_OPERATOR`, `commercial_admin`, `operations`) que **nunca existieron como `ROLE_CODES`**, así que el grant nunca se escribió. TASK-935 agregó los 13 grants (colapsando a `EFEONCE_ADMIN` + `FINANCE_ADMIN`, el set real que pasa `requireAdminTenantContext`) + el guard `capability-grant-coverage.test.ts` que **previene la recurrencia mecánicamente**. **NUNCA** documentar un rol intended en una spec/capability sin verificar que existe en `src/config/role-codes.ts`; si no existe, el grant colapsa al rol real más cercano (típicamente `EFEONCE_ADMIN`). Spec: `docs/tasks/complete/TASK-935-capability-governance-reconciliation.md`.
 
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 

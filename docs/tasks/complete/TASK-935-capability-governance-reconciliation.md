@@ -2,12 +2,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `bugfix|hardening`
-- Status real: `In-progress 2026-05-25 (develop, sin branch). Derivada de hallazgos TASK-934.`
+- Status real: `COMPLETE 2026-05-25 (develop). 13 latent-403 grants + guard de regresión + parity catalog↔DB reconciliado.`
 - Domain: `identity|platform|finance|delivery`
 - Blocked by: `none`
 - Branch: `task/TASK-935-capability-governance-reconciliation`
@@ -42,6 +42,16 @@ Nota: los roles documentados inexistentes (`DEVOPS_OPERATOR`, `commercial_admin`
 ## 4 caps DB-only (parity drift TASK-908/912)
 
 `cycle_time.compute.execute` (delivery, execute/all), `correction_transitions.compute.read` (delivery, read/all), `notion.webhook.ingest_status_transitions` (delivery, execute/tenant), `notion.status_transitions.backfill_execute` (delivery, execute/all). Seedeadas en DB sin módulo `delivery` en el catalog TS. NO son can()-checked (auth de CLI/worker, sin 403). Reconciliar = agregar módulo `delivery` + 4 entries.
+
+## Implementación entregada (2026-05-25, directo en `develop`)
+
+| Slice | Commit | Entrega |
+|---|---|---|
+| 1 | `71477315` | 13 runtime grants (finance/commercial 6 → FINANCE_ADMIN+EFEONCE_ADMIN; platform/client_portal 6 → EFEONCE_ADMIN) + guard `capability-grant-coverage.test.ts` (puro/CI). Verificado: 0 latent 403 restantes. |
+| 2 | `f55cb065` | Módulo `delivery` + 4 catalog entries (caps DB-only TASK-908/912) + migración module drift `reconcile_drift` (DB identity→people). `parity.live` verde. |
+| 3 | (este) | CLAUDE.md (TASK-873 reforzado con el guard) + changelog/README/registry/Handoff. |
+
+Skills arch + finance (loop). El guard es el fix de fondo: previene la recurrencia del bug class mecánicamente (rompe el build si un `can()` nuevo no tiene grant).
 
 ## Scope
 
