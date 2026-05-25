@@ -160,3 +160,37 @@ Verificación pendiente:
 - Cero rematerialize de cuentas fuera del scope de cada slice.
 - Verificación pre/post-flight de closing balances en cada apply.
 - WHERE clauses enforcement por scope explícito.
+
+## Delta 2026-05-25 — El detector de imbalance produce falsos positivos por OTB-supersede (diagnóstico TASK-929)
+
+Durante TASK-929 (finance ledger drift remediation) se trazaron los 3 grupos que el detector `TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_COUNT_SQL` ([src/lib/finance/ledger-health.ts](../../../src/lib/finance/ledger-health.ts)) reporta como desbalanceados. **No son transferencias incompletas — son falsos positivos del detector, misma bug class que TASK-929 Slice 1 arregló en la VIEW de settlement.**
+
+### Los 3 grupos (trazados live 2026-05-25 contra greenhouse-pg-dev)
+
+| settlement_group_id | De | A | Monto | Fecha transfer |
+|---|---|---|---|---|
+| `stlgrp-itx-20260306-amcg` | `santander-clp` | `santander-corp-clp` (tarjeta crédito) | $597.697 | 2026-03-06 |
+| `stlgrp-itx-20260312-l45c` | `santander-clp` | `santander-corp-clp` | $1.003.975 | 2026-03-12 |
+| `stlgrp-itx-20260406-9uwu` | `santander-clp` | `santander-corp-clp` | $696.198 | 2026-04-06 |
+
+Son **pagos de la cuenta corriente Santander hacia la tarjeta de crédito Santander Corp** (abonos a la deuda de la tarjeta).
+
+### Causa raíz del falso positivo
+
+Cada grupo **SÍ tiene ambas patas** (outgoing + incoming, creadas juntas el backfill 2026-04-27). Pero la **pata `incoming` (lado tarjeta) fue superseded por un re-anclaje OTB (TASK-703b)** el 2026-04-28 (`superseded_by_otb_id = obtb-santander-corp-clp-2026040{6,7}-...`): cuando se recalibró el OTB de la tarjeta al cierre de ciclo de marzo, el cascade-supersede absorbió esos abonos pre-anchor dentro del saldo de apertura. La pata `outgoing` (lado cuenta corriente) queda activa porque a `santander-clp` NO se la re-ancló.
+
+El detector filtra `superseded_at IS NULL AND superseded_by_otb_id IS NULL` y cuenta patas activas → ve `out=1, in=0` → flag. Pero la transferencia está completa y ambas cuentas consistentes (la tarjeta absorbió la entrada en su saldo de apertura). **El ledger está correcto; el detector no entiende el OTB-supersede.**
+
+### Fix canónico (espejar TASK-929 Slice 1)
+
+El detector debe chequear **completitud del par ORIGINAL** (todas las patas creadas, incluyendo superseded), no solo patas activas. Casos a distinguir con tests:
+
+1. **Nunca existió pata incoming** (0 incoming en el historial completo) → desbalance REAL (mantener flag — el caso para el que nació TASK-714d, e.g. salidas Global66 sin pata).
+2. **Pata incoming superseded por OTB** (`superseded_by_otb_id IS NOT NULL`) → falso positivo (par completo, entrada absorbida en saldo de apertura). NO flag.
+3. **Pata superseded por payment** (`superseded_by_payment_id IS NOT NULL`) → mirar el reemplazo antes de decidir.
+
+**Regla candidata provably-safe**: un grupo es imbalance solo si `COUNT(outgoing ever) <> COUNT(incoming ever)` (contando TODAS las patas, superseded incluidas) — esto NO puede ocultar el caso "nunca existió" (sigue dando 1≠0 → flag) y des-flaggea el caso OTB-absorbed (1 ever out, 1 ever in → balanceado). Edge a cubrir con tests: patas reemplazadas por payment-supersede (una pata + su reemplazo darían 2 vs 1).
+
+**Por qué NO se arregló en TASK-929**: el detector es invariante canónico de TASK-714d (su dueño). Un fix demasiado permisivo ocultaría un faltante real de plata (false-negative = el modo de falla más grave en un ledger). Hacerlo robusto requiere el razonamiento de historial de patas + tests por caso + entender la interacción con `createInternalTransferSettlement` + el OTB cascade — dominio de TASK-714d. Decisión 4-pillar documentada en TASK-929 (lente arch-architect): el rojo honesto del detector es más seguro que un verde tuneado sin owner del invariante.
+
+**Estado**: estos 3 NO son plata a recuperar. El detector debe arreglarse (read-only, blast bajo) para dejar de generar el falso positivo. Bloquea el cierre de `JAVASCRIPT-NEXTJS-4Q` mientras el detector siga reportándolos.

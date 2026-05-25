@@ -39,9 +39,13 @@ Los 4 settlement drifts de 4Q NO eran deuda contable: **2 falsos positivos de la
 ### Residuales — 4Q NO cierra todavía (honesto-abierto)
 
 1. **37 gastos pagados sin FK-anchor** ($8.2M; 21 material, 16 inmaterial; todos con `economic_category` → data-completeness, no integridad) → **TASK-934** (cola de revisión + anchoring + acknowledgedDebt + recompute remediator).
-2. **3 internal_transfer imbalance** (`stlgrp-itx-20260306-amcg`, `-20260312-l45c`, `-20260406-9uwu`; ~$2.3M outgoing desde santander-clp sin pata incoming) → **OUT OF SCOPE, TASK-714d** (`createInternalTransferSettlement`). Necesita identificar las cuentas destino (conocimiento finance).
+2. **3 "internal_transfer imbalance"** (`stlgrp-itx-20260306-amcg`, `-20260312-l45c`, `-20260406-9uwu`) → **RECLASIFICADO a falso positivo del detector** tras traza completa (2026-05-25). NO son ~$2.3M a recuperar: son 3 pagos completos `santander-clp` → tarjeta `santander-corp-clp` ($597.697 / $1.003.975 / $696.198) donde la pata `incoming` (lado tarjeta) fue superseded por un re-anclaje OTB (TASK-703b, `superseded_by_otb_id`) — absorbida en el saldo de apertura de la tarjeta. El detector cuenta solo patas activas → ve `out=1, in=0` y flag, pero el ledger está consistente (misma bug class que el fix de la VIEW en Slice 1). **Fix del detector** (superseded-awareness, regla "completitud del par original" + 3 casos) documentado en **TASK-714d Delta 2026-05-25** por ser su invariante canónico. Decisión 4-pillar (arch-architect): NO se parcheó acá — un false-negative en un detector de ledger es el peor modo de falla; el rojo honesto es más seguro que un verde tuneado sin owner del invariante.
 
-El cron `ops-finance-ledger-health` reporta `healthy=false` honestamente hasta resolver ambos. El signal `finance.ledger.unresolved_drift_items` (warning por los 37) + el cron son la visibilidad ongoing. **Cerrar `JAVASCRIPT-NEXTJS-4Q` en Sentry solo cuando TASK-934 + TASK-714d converjan a 0 sostenido 24-48h.**
+El cron `ops-finance-ledger-health` reporta `healthy=false` honestamente hasta resolver ambos. El signal `finance.ledger.unresolved_drift_items` (warning por los 37) + el cron son la visibilidad ongoing. **Cerrar `JAVASCRIPT-NEXTJS-4Q` en Sentry solo cuando TASK-934 (37 unanchored) + fix detector TASK-714d converjan a 0 sostenido 24-48h.**
+
+### Traza de los 3 internal_transfer (2026-05-25, evidencia)
+
+Patrón idéntico en los 3: `santander-clp` (cuenta corriente) → `santander-corp-clp` (tarjeta de crédito), ambas patas creadas juntas en el backfill 2026-04-27, pata `incoming` superseded el 2026-04-28 por `obtb-santander-corp-clp-2026040{6,7}-...`. El re-anchor OTB de la tarjeta al cierre de ciclo de marzo absorbió esos abonos pre-anchor dentro del "cupo utilizado" del saldo de apertura — por eso la entrada está superseded y la salida activa. Cero dinero perdido o sin registrar.
 
 ## Why This Task Exists
 

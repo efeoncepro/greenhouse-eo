@@ -19,7 +19,11 @@
 
 **Sub-clases de los 4 settlement drifts originales** (todos resueltos por Slice 1 + sync live): 2 falsos positivos de VIEW (factoring superseded) + 2 transitorios stale ya consistentes.
 
-**CERRADA 2026-05-24** (scope reducido por operador): 5 slices entregados (VIEW fix + honest degradation + signal + inventory + docs). Full suite 5390 passed + build OK. Lifecycle `complete`. Diagnóstico task714d: 3 grupos `stlgrp-itx-{20260306-amcg,20260312-l45c,20260406-9uwu}`, ~$2.3M outgoing desde santander-clp sin pata incoming → **TASK-714d** (necesita identificar cuentas destino). Queue/anchoring de los 37 unanchored → **TASK-934** (derivada creada). **4Q honesto-abierto**: cerrar en Sentry solo cuando TASK-934 + TASK-714d converjan a 0 sostenido 24-48h. Próximo: deploy staging auto (push develop) → verificar signal `finance.ledger.unresolved_drift_items` en steady (warning por 37 unanchored) + cron ledger-health honesto.
+**CERRADA 2026-05-24** (scope reducido por operador): 5 slices entregados (VIEW fix + honest degradation + signal + inventory + docs). Full suite 5390 passed + build OK. Lifecycle `complete`. Queue/anchoring de los 37 unanchored → **TASK-934** (derivada creada).
+
+**Traza task714d (2026-05-25, post re-auth ADC) — RECLASIFICADO a falso positivo del detector**: los 3 grupos `stlgrp-itx-{20260306-amcg,20260312-l45c,20260406-9uwu}` (CLP→tarjeta Santander Corp, $597.697/$1.003.975/$696.198) **SÍ tienen ambas patas**; la `incoming` (lado tarjeta) fue superseded por re-anclaje OTB TASK-703b (`superseded_by_otb_id`) → el detector cuenta solo patas activas y ve out=1/in=0. **NO son ~$2.3M a recuperar** — son 3 pagos completos bien contabilizados (la tarjeta absorbió la entrada en su saldo de apertura). Misma bug class que el fix de la VIEW (Slice 1). Fix del detector (superseded-awareness, regla "completitud del par original") documentado en **TASK-714d Delta 2026-05-25** — queda ahí por ser su invariante canónico (decisión 4-pillar: false-negative en detector de ledger = peor modo de falla → al owner; el rojo honesto es más seguro que un verde tuneado sin owner).
+
+**4Q honesto-abierto**: cerrar en Sentry solo cuando TASK-934 (37 unanchored) + fix detector TASK-714d converjan a 0 sostenido 24-48h. Próximo: deploy staging auto (push develop) → verificar signal `finance.ledger.unresolved_drift_items` en steady (warning por 37 unanchored).
 
 ---
 
