@@ -523,13 +523,21 @@ const TASK708D_COHORT_D_COUNT_SQL = `
 // superseded_by_otb_id NOT NULL — esas son audit chains, no movimientos
 // activos.
 
+// TASK-714d detector fix (2026-05-25, diagnóstico TASK-929): el invariante
+// bilateral es "el par fue CREADO" (1 outgoing + 1 incoming), NO "las patas
+// activas balancean". El filtro de supersede anterior producía FALSOS POSITIVOS:
+// cuando una pata se retira legítimamente (absorbida por un re-anchor OTB
+// TASK-703b, o reemplazada por el propio backfill TASK-714d Slice 2), las patas
+// activas quedan asimétricas aunque el par se creó completo. Verificado live: 8
+// grupos flagueados por el filtro viejo eran todos pares completos (CLP→tarjeta
+// con incoming OTB-absorbida, y CLP→global66 reemplazadas por Slice 2). Contar
+// TODAS las patas (supersede-independiente) catchea el bug real — outgoing
+// creado sin incoming jamás creado (1≠0) — sin falsos positivos por supersede.
 const TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_COUNT_SQL = `
   SELECT COUNT(*) AS total FROM (
     SELECT settlement_group_id
     FROM greenhouse_finance.settlement_legs
     WHERE leg_type = 'internal_transfer'
-      AND superseded_at IS NULL
-      AND superseded_by_otb_id IS NULL
     GROUP BY settlement_group_id
     HAVING SUM(CASE WHEN direction = 'outgoing' THEN 1 ELSE 0 END)
         <> SUM(CASE WHEN direction = 'incoming' THEN 1 ELSE 0 END)
@@ -544,8 +552,6 @@ const TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_SAMPLE_SQL = `
     array_agg(DISTINCT instrument_id) AS instruments
   FROM greenhouse_finance.settlement_legs
   WHERE leg_type = 'internal_transfer'
-    AND superseded_at IS NULL
-    AND superseded_by_otb_id IS NULL
   GROUP BY settlement_group_id
   HAVING SUM(CASE WHEN direction = 'outgoing' THEN 1 ELSE 0 END)
       <> SUM(CASE WHEN direction = 'incoming' THEN 1 ELSE 0 END)
