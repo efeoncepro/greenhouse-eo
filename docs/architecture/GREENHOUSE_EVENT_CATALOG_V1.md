@@ -864,3 +864,15 @@ Nuevo evento productivo `notion.task.page_change_signal` (sibling del demo `noti
 - No lleva `metadata.demo_mode`: el consumer demo lo ignora (filtra `=== true`), el productivo lo procesa. Tablas físicamente separadas (`task_status_transitions` vs `task_status_transitions_demo`).
 
 Spec: `docs/tasks/in-progress/TASK-912-ico-status-transition-webhook-ingestion-and-bq-formula.md`.
+
+## Delta 2026-05-25 — TASK-934: `finance.expense.unanchored_acknowledged`
+
+Nuevo evento audit `finance.expense.unanchored_acknowledged` (aggregate type `finance.expense`).
+
+- **Emisor**: helper canónico `acknowledgeUnanchoredExpense` (`src/lib/finance/ledger-drift/acknowledge-unanchored.ts`), invocado por `POST /api/admin/finance/expenses/[id]/acknowledge-unanchored` (gated por capability granular `finance.expenses.acknowledge_unanchored`, FINANCE_ADMIN + EFEONCE_ADMIN).
+- **Semántica**: un gasto pagado sin FK-anchor (no payroll/tool/supplier/tax/loan/linked-income) pero clasificado por `economic_category` se acepta como **deuda conocida**. NO es write-off ni supersede — el gasto se queda en P&L; solo se setean las columnas `unanchored_acknowledged_at/by/reason`. Equivale al SUM-of-unadjusted-misstatements de auditoría.
+- **Schema v1**: `{ expenseId, economicCategory: string | null, reason: string (>=10 chars), actorUserId: string | null, acknowledgedAt: ISO }`.
+- **Idempotente**: si el gasto ya está acknowledged, el helper hace no-op y NO emite evento.
+- **Consumers**: ninguno reactivo en V1 (audit-only). Los readers `getFinanceLedgerHealth` (campo `acknowledgedDebt`), `getLedgerDriftInventory` (sección `acknowledged`) y el signal `finance.ledger.unresolved_drift_items` excluyen los acknowledged del conteo de pendientes leyendo la columna directamente.
+
+Spec: `docs/tasks/in-progress/TASK-934-unanchored-paid-expense-anchoring-review-queue.md`.

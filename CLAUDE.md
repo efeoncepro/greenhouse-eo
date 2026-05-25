@@ -1571,6 +1571,23 @@ Dos invariantes canónicos descubiertos/canonizados live al remediar `JAVASCRIPT
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-929-finance-ledger-drift-remediation-control.md`.
 
+### Finance — Unanchored paid expense acknowledgment (TASK-934, desde 2026-05-25)
+
+Un gasto pagado sin FK-anchor (todos `payroll_entry_id`/`tool_catalog_id`/`supplier_id`/`tax_type`/`loan_account_id`/`linked_income_id` NULL) pero CON `economic_category` es **data-completeness, no integridad**. Dos resoluciones canónicas:
+
+- **Anclar** (vendor real, ej. Vercel/Beeconta): reuse del PUT existente `/api/finance/expenses/[id]` con `supplierId`. NO endpoint nuevo.
+- **Aceptar como deuda conocida** (labor a personas — contratistas internacionales, staff interno — + regulatory/bank fees, donde un `supplier_id` sería category error): helper canónico `acknowledgeUnanchoredExpense` (`src/lib/finance/ledger-drift/acknowledge-unanchored.ts`) + `POST /api/admin/finance/expenses/[id]/acknowledge-unanchored` (capability `finance.expenses.acknowledge_unanchored`).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** modelar la "cola de revisión" de unanchored como tabla-cola paralela con state machine. El acknowledgment vive ON the expense (columnas `unanchored_acknowledged_at/by/reason`), single source of truth — espejo de `dismiss-phantom.ts` (que usa `superseded_at` en la fila). Una tabla-cola duplicaría el estado del expense → sync risk.
+- **NUNCA** usar las columnas `unanchored_acknowledged_*` para VOID/supersede. El gasto se queda íntegro en P&L; acknowledgment solo registra "aceptado, clasificado por economic_category, sin supplier apropiado". NO confundir con `dismiss-phantom` (que sí anula un payment phantom).
+- **NUNCA** acknowledgear un gasto que tenga cualquier FK-anchor o que no esté `paid`. El helper hace guards defensivos (throw 422 `ACKNOWLEDGE_ALREADY_ANCHORED` / `ACKNOWLEDGE_NOT_PAID`).
+- **NUNCA** mutar `unanchored_acknowledged_*` por SQL directo. Toda aceptación pasa por `acknowledgeUnanchoredExpense` (idempotente, reason >= 10 chars, outbox `finance.expense.unanchored_acknowledged v1`).
+- **SIEMPRE** que un consumer lea "unanchored pendiente" (health/inventory/signal), filtrar `AND unanchored_acknowledged_at IS NULL`. Los acknowledged se exponen separados (`acknowledgedDebt` en health, sección `acknowledged` en inventory) — SUM-of-unadjusted, visible pero fuera de pendientes; NO afectan `healthy`.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-934-unanchored-paid-expense-anchoring-review-queue.md`. Capability: `finance.expenses.acknowledge_unanchored` (FINANCE_ADMIN + EFEONCE_ADMIN). Evento: `finance.expense.unanchored_acknowledged v1`.
+
 ### Finance — FX P&L canónico para tesorería (Banco "Resultado cambiario")
 
 El "Resultado cambiario" del Banco se compone de **3 fuentes legítimas** y debe leerse SIEMPRE desde la VIEW canónica + helper, no re-derivar:
