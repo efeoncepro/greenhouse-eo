@@ -655,6 +655,16 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source
     })
+
+    // TASK-934 — Aceptar gasto pagado sin FK-anchor como deuda conocida.
+    // Grant runtime explícito (TASK-873 invariant: capability sin grant = 403).
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.expenses.acknowledge_unanchored',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
   }
 
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {

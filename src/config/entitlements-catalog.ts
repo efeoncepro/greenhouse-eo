@@ -343,6 +343,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-934 — Aceptar un gasto pagado sin FK-anchor como deuda conocida
+  // (clasificado por economic_category). NO es write-off (el gasto se queda en
+  // P&L). Reservada FINANCE_ADMIN + EFEONCE_ADMIN. Outbox audit event
+  // finance.expense.unanchored_acknowledged v1.
+  {
+    key: 'finance.expenses.acknowledge_unanchored',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'finance.income.reclassify_economic_category',
     module: 'finance',

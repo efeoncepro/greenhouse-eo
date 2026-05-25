@@ -4659,6 +4659,15 @@ export interface GreenhouseFinanceExpenses {
   tool_catalog_id: string | null;
   total_amount: Numeric;
   total_amount_clp: Numeric;
+  /**
+   * TASK-934: timestamp when an operator accepted this unanchored paid expense as known debt (classified via economic_category, no FK anchor appropriate). NULL = not acknowledged. Set only via acknowledgeUnanchoredExpense() helper. The expense stays in P&L — this is NOT a void/supersede.
+   */
+  unanchored_acknowledged_at: Timestamp | null;
+  unanchored_acknowledged_by: string | null;
+  /**
+   * TASK-934: operator reason (>= 10 chars) for accepting the unanchored expense as known debt. Append-only via outbox event finance.expense.unanchored_acknowledged v1.
+   */
+  unanchored_acknowledged_reason: string | null;
   updated_at: Generated<Timestamp>;
   vat_common_use_amount: Numeric | null;
   vat_fixed_assets_amount: Numeric | null;
