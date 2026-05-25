@@ -1,6 +1,14 @@
 # Sesion 2026-05-25 — TASK-934 Unanchored paid expense acknowledgment — 🔨 in-progress (develop, sin branch)
 
-Derivada de TASK-929. Skills finance + arch en loop. **Recalibración de diseño pre-execution** (Discovery reveló los 37 son pagos reales: 18 vendor_cost_saas anclables a supplier vía PUT existente, 19 labor/regulatory — Daniela España/Andrés Colombia/Valentina + regulatory/bank_fee — que son personas/regulatorios, no suppliers). **Pivote**: NO tabla-cola state-machine (sync risk, anti-patrón) → **acknowledgment-on-expense** (columnas `unanchored_acknowledged_*` + helper mirror `dismiss-phantom.ts` + capability `finance.expenses.acknowledge_unanchored`). Anclar vendors = reuse PUT `/api/finance/expenses/[id]` (ya existe). `acknowledgedDebt` separado de `healthy`; inventory + signal excluyen acknowledged. Sin write-off/2º actor (no destructivo, gastos reales quedan en P&L). Plan 3 slices. Próximo: Slice 1 (migración + helper + capability).
+Derivada de TASK-929. Skills finance + arch en loop. **Recalibración de diseño pre-execution** (Discovery reveló los 37 son pagos reales: 18 vendor_cost_saas anclables a supplier vía PUT existente, 19 labor/regulatory — Daniela España/Andrés Colombia/Valentina + regulatory/bank_fee — que son personas/regulatorios, no suppliers). **Pivote**: NO tabla-cola state-machine (sync risk, anti-patrón) → **acknowledgment-on-expense** (columnas `unanchored_acknowledged_*` + helper mirror `dismiss-phantom.ts` + capability `finance.expenses.acknowledge_unanchored`). Anclar vendors = reuse PUT `/api/finance/expenses/[id]` (ya existe). `acknowledgedDebt` separado de `healthy`; inventory + signal excluyen acknowledged. Sin write-off/2º actor (no destructivo, gastos reales quedan en P&L).
+
+**COMPLETE 2026-05-25** — 3 slices (`28b0bd44` migración+helper+capability, `d1a6f1e0` wire acknowledgedDebt, `bejmdz49p`/Slice 3 endpoint+docs). Full suite 5396 passed (CI-equiv, `.live` skipped) + build OK. Verificado live round-trip (37→36→revert + idempotencia). Lifecycle `complete`.
+
+**Hallazgos ajenos flagged (NO arreglados — capability governance reconciliation pendiente)**:
+- 403 latentes (bug class TASK-873): `finance.expenses.reclassify_economic_category` (×2) + `finance.payments.repair_clp` en TS catalog + DB registry pero SIN runtime grant → `can()`=false para EFEONCE_ADMIN+FINANCE_ADMIN. Endpoints TASK-766/768 shipped pero inaccesibles.
+- 4 capabilities DB-only de TASK-908/912 (`cycle_time.compute.execute`, `correction_transitions.compute.read`, `notion.webhook.ingest_status_transitions`, `notion.status_transitions.backfill_execute`) sin entry TS catalog → `parity.live.test` rojo (skipea en CI sin proxy).
+
+**4Q honesto-abierto** (3 tasks dan las herramientas; cierre = acción operador): (a) TASK-929 ✅ settlement; (b) TASK-934 ✅ tooling acknowledgment — operador debe acknowledgear los 19 labor/regulatory + anclar los 18 vendors; (c) TASK-714d fix detector internal_transfer (falso positivo). Cerrar Sentry cuando los 3 converjan a `healthy=true` 24-48h.
 
 ---
 

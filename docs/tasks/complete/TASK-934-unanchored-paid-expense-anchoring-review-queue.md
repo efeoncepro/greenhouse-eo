@@ -2,19 +2,38 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Derivada de TASK-929 (scope diferido por decisión del operador 2026-05-24)`
+- Status real: `COMPLETE 2026-05-25 (develop). Write-path entregado (acknowledgment + reuse anchor). Resolución de datos de los 37 + cierre 4Q = acción operador + fix detector TASK-714d.`
 - Domain: `finance|accounting|data|reliability`
 - Blocked by: `none`
 - Branch: `task/TASK-934-unanchored-paid-expense-anchoring-review-queue`
 
 ## Summary
 
-Rutear y resolver los gastos pagados sin FK-anchor que TASK-929 dejó visibles vía el inventory + el signal `finance.ledger.unresolved_drift_items`. TASK-929 construyó la detección + clasificación + materialidad (read-only). Esta task construye el **write-path**: anclar (link a supplier/tool/payroll/tax/loan/linked-income con evidencia) o aceptar como deuda conocida (`acknowledgedDebt`), vía una cola de revisión modelada como cuenta de suspenso.
+Rutear y resolver los gastos pagados sin FK-anchor que TASK-929 dejó visibles vía el inventory + el signal `finance.ledger.unresolved_drift_items`. TASK-929 construyó la detección + clasificación + materialidad (read-only). Esta task construye el **write-path**: anclar (vendor → `supplier_id`, reuse del PUT existente) o aceptar como deuda conocida (`acknowledgedDebt`), vía acknowledgment-on-expense.
+
+## Implementación entregada (2026-05-25, directo en `develop`)
+
+3 slices. Diseño recalibrado pre-execution (acknowledgment-on-expense, NO tabla-cola). Skills finance + arch en loop.
+
+| Slice | Commit | Entrega |
+|---|---|---|
+| 1 | `28b0bd44` | Migración: 3 columnas `unanchored_acknowledged_*` en `expenses` + capability `finance.expenses.acknowledge_unanchored` (catalog + runtime grant + registry seed). Helper `acknowledgeUnanchoredExpense` (mirror `dismiss-phantom`: tx + idempotente + reason>=10 + guards + outbox). 6 tests. |
+| 2 | `d1a6f1e0` | Wire `acknowledgedDebt` en `getFinanceLedgerHealth` (campo separado, NO afecta healthy) + `getLedgerDriftInventory` (sección acknowledged) + signal (excluye acknowledged). CLI imprime acknowledged. Verificado live round-trip (37→36→revert). |
+| 3 | (este) | Endpoint `POST /api/admin/finance/expenses/[id]/acknowledge-unanchored` (capability gate + delega al helper). EVENT_CATALOG + CLAUDE.md. |
+
+### Hallazgos ajenos (NO arreglados — scope creep; flagged para follow-up)
+
+Durante Discovery emergieron 2 problemas de governance de capabilities, ajenos a esta task:
+
+1. **403 latentes (bug class TASK-873)**: `finance.expenses.reclassify_economic_category` (×2 expense+income) + `finance.payments.repair_clp` están en TS catalog + DB registry pero **sin runtime grant** → `can()` devuelve `false` para EFEONCE_ADMIN Y FINANCE_ADMIN. Los endpoints de TASK-766/768 que las usan (`payments-clp-repair`, `economic-category` reclassify) están **shipped pero inaccesibles** (403 para todos). Verificado con eval de `can()`.
+2. **Parity drift**: 4 capabilities DB-only de TASK-908/912 (`cycle_time.compute.execute`, `correction_transitions.compute.read`, `notion.webhook.ingest_status_transitions`, `notion.status_transitions.backfill_execute`) sin entry en TS catalog → `parity.live.test.ts` rojo (skipea en CI sin proxy; mi capability sí está en ambos lados).
+
+Ambos merecen una task de reconciliación de capability governance (no creada acá para no scope-creep). Mi `finance.expenses.acknowledge_unanchored` está limpia (TS + DB + runtime grant verificado).
 
 ## Why This Task Exists
 
