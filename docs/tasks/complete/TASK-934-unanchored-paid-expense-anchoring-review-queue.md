@@ -12,6 +12,18 @@
 - Blocked by: `none`
 - Branch: `task/TASK-934-unanchored-paid-expense-anchoring-review-queue`
 
+## Delta 2026-05-25 — `acknowledge` NO aplica a duplicados de nómina (corrección post-verificación)
+
+Verificación con lente finance (control de duplicación, Pattern A) **después** de entregar esta task reveló que parte de los 37 unanchored — los pagos a personas (Daniela, Andrés, Valentina; aparecen como "Envío a `<nombre>`" o "Transf.Internet a `<RUT de member>`") — **NO son labor a aceptar como deuda: son DUPLICADOS de la `Nomina neta` ya booked** (`payroll_entry_id`). El bank reconciler acuñó un gasto nuevo para el giro que *pagaba* esa nómina, en vez de registrarlo como su pago → doble conteo en P&L.
+
+**Corrección de alcance:**
+
+- `acknowledgeUnanchoredExpense` (esta task) aplica **SOLO a unanchored genuinos sin contraparte** (regulatory/bank_fee que no estén ya devengados). **NUNCA** a un pago que duplica una obligación existente — eso lo congelaría como deuda aceptada (enmascararía el doble conteo).
+- La línea 57 abajo ("Aceptar labor/regulatory … Daniela/Andrés/David/Valentina") está **obsoleta**: esos son duplicados de nómina → van a **TASK-936** (dismiss + link-as-payment), no a acknowledge.
+- El detector/inventory de TASK-929 sigue válido; lo que cambia es la **vía de resolución** de los duplicados.
+
+Tratamiento canónico corregido de los 37 → ver **TASK-936** (dedup retroactivo [A]/[B]/[C]/[D] + reconciler MATCH-not-CREATE).
+
 ## Summary
 
 Rutear y resolver los gastos pagados sin FK-anchor que TASK-929 dejó visibles vía el inventory + el signal `finance.ledger.unresolved_drift_items`. TASK-929 construyó la detección + clasificación + materialidad (read-only). Esta task construye el **write-path**: anclar (vendor → `supplier_id`, reuse del PUT existente) o aceptar como deuda conocida (`acknowledgedDebt`), vía acknowledgment-on-expense.
