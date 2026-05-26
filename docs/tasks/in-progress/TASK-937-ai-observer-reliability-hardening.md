@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -133,17 +133,27 @@ Reglas obligatorias (del veredicto arch-architect 4-pillar + overlay Greenhouse)
 
 - Nuevo helper `src/lib/reliability/ai/ai-observer-run-tracker.ts` siguiendo el pattern de `reactive-run-tracker.ts`, con `source_system='reliability_ai_observer'`:
   - `writeAiObserverRunStart({ runId, triggeredBy })` → INSERT `source_sync_runs` (`status='running'`).
-  - `writeAiObserverRunComplete({ runId, status, evaluated, persisted, skippedReason, finishReason })` → UPDATE con `status ∈ ('succeeded'|'skipped'|'failed')`, `records_read=evaluated`, `records_written_raw=persisted`, `notes` = skippedReason + finishReason, `finished_at=NOW()`.
+  - `writeAiObserverRunComplete({ runId, summary })` → UPDATE con `records_read=evaluated`, `records_written_raw=persisted`, `notes` = skippedReason + finishReason, `finished_at=NOW()`, status derivado (ver mapeo).
   - `getLastAiObserverRun()` / `getRecentAiObserverRuns(n)` para liveness + parse-fail-rate.
-- Wire en `runReliabilityAiObserver` (runner.ts): start al inicio, complete en cada return (incluido el path `disabled`, el `skipped` por JSON, el `done`). El heartbeat NO debe romper el sweep si falla (try/catch + warn).
-- Mapear status: flag OFF → `status='skipped'` notes=`disabled`; JSON fail → `skipped` notes=`parse_failed:<finishReason>`; dedup-only → `succeeded` (evaluated>0, persisted=0); persist → `succeeded`.
+- Wire vía **wrapper boundary** en `runReliabilityAiObserver` (runner.ts): renombrar impl actual a `runReliabilityAiObserverInner`; el wrapper público hace writeStart → inner → writeComplete(summary) / writeFailure(err) en try/catch. Evita tocar los múltiples return paths del inner. El heartbeat NO debe romper el sweep si falla (try/catch + warn alrededor de cada write).
+- **Mapeo de status canónico (corrección Audit 2026-05-26):** el CHECK `source_sync_runs_status_check` solo permite `('running','succeeded','failed','partial','cancelled')` — `'skipped'` NO existe. Mapeo:
+  - flag OFF (disabled) → `status='cancelled'`, notes=`disabled:kill-switch-off`
+  - JSON parse-fail / empty response → `status='failed'`, notes=`parse_failed:<finishReason>` / `empty_response`
+  - dedup-only (evaluated>0, persisted=0, sin skippedReason) → `status='succeeded'`
+  - persist → `status='succeeded'`
+- Agregar campo `finishReason: string | null` a `AiSweepSummary` + `buildSummary`, seteado en el path parse-fail (corrección review GCP/Vertex).
+
+### Slice 2b — Índice parcial (corrección Audit)
+
+- Migration `pnpm migrate:create` con índice parcial mirror de `idx_source_sync_runs_reactive_worker`:
+  `CREATE INDEX ... ON source_sync_runs (source_system, started_at DESC) WHERE source_system='reliability_ai_observer'`. El reader del signal filtra `source_system` + ORDER BY → sin índice = seq scan sobre toda la tabla de sync runs.
 
 ### Slice 3 — Reliability signal del observer (P1)
 
 - Nuevo reader `src/lib/reliability/queries/ai-observer-unhealthy.ts` → signal `reliability.ai_observer.unhealthy` (kind=`drift`, steady=0). Lee `source_sync_runs WHERE source_system='reliability_ai_observer'`:
   - Sin run en > 2.5h (cron/worker caído) → `error`.
-  - Últimos N (≥4) runs todos `status='skipped'` con notes `parse_failed:*` → `error` (modelo roto).
-  - Último run `disabled` (flag OFF) → `not_configured` (opt-in, no es error).
+  - Últimos N (≥4) runs todos `status='failed'` con notes `parse_failed:*` → `error` (modelo roto).
+  - Último run `status='cancelled'` con notes `disabled:*` (flag OFF) → `not_configured` (opt-in, no es error).
   - Sin runs nunca → `awaiting_data`.
   - Caso normal → `ok`.
 - Test `ai-observer-unhealthy.test.ts`: cubrir ok / no-run / parse-fail-streak / disabled / awaiting_data / degraded (query throws → `unknown`).
@@ -287,8 +297,12 @@ Mapeo de columnas (mismo shape que `reactive-run-tracker.ts`):
 - **SIEMPRE** que el heartbeat falle, degradar silencioso (try/catch + warn) — nunca romper el sweep.
 - **SIEMPRE** revisar la microcopy del banner con `greenhouse-ux-writing` (TASK-265).
 
-## Open Questions
+## Open Questions — RESUELTAS pre-execution (2026-05-26)
 
-- ¿Cadencia de 1h sigue bien o bajar a 30min? (tuning, no toca el diseño).
-- ¿El signal `unhealthy` debe alertar a Teams o solo pintar en `/admin/operations`? (sugerencia: solo dashboard en V1).
-- ¿Subsystem rollup exacto del signal en `RELIABILITY_REGISTRY`? (confirmar al implementar — el observer pertenece al control plane mismo).
+- **Q1 — ¿Cadencia 1h vs 30min?** → MANTENER 1h. Rationale: cada call cuesta tokens Vertex; un resumen ejecutivo horario es suficiente operativamente; bajar a 30min duplica costo sin valor. No bloqueante, no toca diseño.
+- **Q2 — ¿Signal alerta Teams o solo dashboard?** → SOLO dashboard `/admin/operations` en V1. Rationale: evitar alert fatigue (es observabilidad de una herramienta de observabilidad); el dashboard es el surface correcto; Teams se evalúa en follow-up si el signal prueba ser accionable. Opción más robusta/least-surprise.
+- **Q3 — ¿Subsystem rollup del signal?** → `moduleKey: 'cloud'` (signalId `reliability.ai_observer.unhealthy`). Rationale: el observer corre en ops-worker/Cloud Run, dominio observability; reusa el rollup `cloud` existente (igual que `observability.cloud_run.silent_failure_rate`) — NO requiere módulo nuevo en `RELIABILITY_REGISTRY` (extend-don't-parallel). Verificado: `moduleKey 'cloud'` + `kind 'drift'` válidos en `types/reliability.ts`.
+
+## Branch note
+
+Implementación directa en `develop` por instrucción explícita del operador (2026-05-26) — sin branch `task/*`. Commits por slice con co-author trailer.
