@@ -41,6 +41,32 @@ interface Props {
    * tener que abrir cada `ReliabilityModuleCard` por separado.
    */
   moduleObservations?: AiModuleObservationView[]
+
+  /**
+   * TASK-937 — Liveness del observer derivada del signal
+   * `reliability.ai_observer.unhealthy` (heartbeat). Desacopla "¿corre/está
+   * sano?" de "¿hay narrativa fresca?". Determina el estado del banner:
+   *  - not_configured → kill-switch OFF (mensaje de configuración)
+   *  - error/warning  → degradado (cron caído / JSON inválido sostenido)
+   *  - ok/awaiting    → render normal o "esperando primer resumen"
+   * null = no se pudo resolver (fallback legacy al mensaje de configuración).
+   */
+  liveness?: { severity: ReliabilitySeverity; summary: string } | null
+}
+
+type AiWatcherBannerState = 'not_configured' | 'unhealthy' | 'render' | 'empty'
+
+const resolveBannerState = (
+  liveness: Props['liveness'],
+  observation: AiObservationView | null
+): AiWatcherBannerState => {
+  if (liveness?.severity === 'not_configured') return 'not_configured'
+  if (liveness?.severity === 'error' || liveness?.severity === 'warning') return 'unhealthy'
+  if (observation) return 'render'
+  if (liveness) return 'empty'
+
+  // Sin liveness ni observación: fallback legacy seguro (mensaje de config).
+  return 'not_configured'
 }
 
 const MODULE_LABELS: Record<string, string> = {
@@ -99,23 +125,41 @@ const SEVERITY_RANK: Record<ReliabilitySeverity, number> = {
   ok: 5
 }
 
-const ReliabilityAiWatcherCard = ({ observation, moduleObservations = [] }: Props) => {
+const ReliabilityAiWatcherCard = ({ observation, moduleObservations = [], liveness = null }: Props) => {
   const sortedModules = [...moduleObservations].sort(
     (a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]
   )
 
-  
-return (
+  const bannerState = resolveBannerState(liveness, observation)
+
+  return (
     <ExecutiveCardShell
       title='AI Observer'
       subtitle='Resumen ejecutivo generado por Gemini Flash a partir del snapshot del Reliability Control Plane. No reemplaza señales determinísticas — agrega contexto narrativo.'
     >
-      {observation === null ? (
+      {bannerState === 'not_configured' && (
         <Alert severity='info' variant='outlined'>
-          AI Observer no activo todavía. Configura `RELIABILITY_AI_OBSERVER_ENABLED=true` en
-          `ops-worker` para empezar a recibir resúmenes ejecutivos cada hora.
+          AI Observer apagado. Configura `RELIABILITY_AI_OBSERVER_ENABLED=true` en `ops-worker`
+          para empezar a recibir resúmenes ejecutivos cada hora.
         </Alert>
-      ) : (
+      )}
+
+      {bannerState === 'unhealthy' && (
+        <Alert severity={liveness?.severity === 'error' ? 'error' : 'warning'} variant='outlined'>
+          <Typography variant='body2'>
+            <strong>AI Observer degradado.</strong> {liveness?.summary}
+          </Typography>
+        </Alert>
+      )}
+
+      {bannerState === 'empty' && (
+        <Alert severity='info' variant='outlined'>
+          AI Observer activo. Todavía no hay un resumen ejecutivo — se generará en la próxima
+          corrida con cambios en el estado del portal.
+        </Alert>
+      )}
+
+      {bannerState === 'render' && observation && (
         <Stack spacing={2}>
           <Stack
             direction={{ xs: 'column', md: 'row' }}

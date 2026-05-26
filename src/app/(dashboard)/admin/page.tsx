@@ -11,6 +11,7 @@ import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
 import { getLatestAiObservationsByScope } from '@/lib/reliability/ai/reader'
 import { getReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
+import { AI_OBSERVER_UNHEALTHY_SIGNAL_ID } from '@/lib/reliability/queries/ai-observer-unhealthy'
 import { getReliabilityRegistry } from '@/lib/reliability/registry-store'
 import {
   getLatestSweepRun,
@@ -84,6 +85,16 @@ export default async function Page() {
     aiObservations
   })
 
+  // TASK-937 — Liveness del AI Observer desde el signal `reliability.ai_observer.unhealthy`
+  // (heartbeat). Decide el estado del banner del card sin acoplarlo a la frescura del overview.
+  const aiObserverSignal = reliability.modules
+    .flatMap(module => module.signals)
+    .find(signal => signal.signalId === AI_OBSERVER_UNHEALTHY_SIGNAL_ID)
+
+  const aiObserverLiveness = aiObserverSignal
+    ? { severity: aiObserverSignal.severity, summary: aiObserverSignal.summary }
+    : null
+
   return (
     <AdminCenterView
       access={access}
@@ -104,6 +115,7 @@ export default async function Page() {
             }))
           : []
       }
+      aiObserverLiveness={aiObserverLiveness}
     />
   )
 }

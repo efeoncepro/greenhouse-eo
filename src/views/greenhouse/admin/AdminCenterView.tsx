@@ -89,6 +89,16 @@ type Props = {
     summary: string
     recommendedAction: string | null
   }>
+
+  /**
+   * TASK-937 — Liveness del AI Observer derivada del signal
+   * `reliability.ai_observer.unhealthy` (heartbeat). Pasa al card para
+   * decidir el estado del banner (configurado / degradado / sano).
+   */
+  aiObserverLiveness?: {
+    severity: ReliabilityOverview['modules'][number]['status']
+    summary: string
+  } | null
 }
 
 type DomainCard = {
@@ -440,7 +450,8 @@ const AdminCenterView = ({
   syntheticSnapshots,
   syntheticSweep,
   aiObservation,
-  aiModuleObservations
+  aiModuleObservations,
+  aiObserverLiveness = null
 }: Props) => {
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -835,7 +846,11 @@ const AdminCenterView = ({
       </ExecutiveCardShell>
 
       {/* ── AI Observer (TASK-638) ── */}
-      <ReliabilityAiWatcherCard observation={aiObservation} moduleObservations={aiModuleObservations} />
+      <ReliabilityAiWatcherCard
+        observation={aiObservation}
+        moduleObservations={aiModuleObservations}
+        liveness={aiObserverLiveness}
+      />
 
       {/* ── Synthetic Monitor (TASK-632) ── */}
       <ReliabilitySyntheticCard snapshots={syntheticSnapshots} sweep={syntheticSweep} />

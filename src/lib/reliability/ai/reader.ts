@@ -101,9 +101,21 @@ export const getLatestAiObservationsByScope = async (): Promise<{
   byModule: Record<string, AiObservation>
 }> => {
   /**
-   * Ventana corta: solo se toman observations de las últimas 24h. Esto evita
-   * que el AI Observer renderice un resumen rancio si el runner se detuvo
-   * por kill-switch o falla puntual de Gemini.
+   * TASK-937 — Ventana asimétrica por scope:
+   *
+   *  - OVERVIEW: se devuelve el último SIN importar la edad. El overview se
+   *    deduplica por fingerprint del snapshot determinístico, así que una
+   *    postura estable hace que no se re-persista por días — eso es sano, no
+   *    "apagado". El banner muestra la edad ("hace X") y la liveness real
+   *    viene del signal `reliability.ai_observer.unhealthy` (heartbeat), no de
+   *    ocultar el overview. (Antes la ventana de 24h lo escondía → banner
+   *    falso "AI Observer no activo".)
+   *
+   *  - MÓDULOS: se mantiene la ventana de 24h. `byModule` alimenta
+   *    `buildAiSummarySignals` que inyecta narrativa `ai_summary` en los
+   *    módulos del Reliability Control Plane vivo — una narrativa rancia ahí
+   *    sí confundiría al operador, así que solo se exponen observaciones
+   *    frescas.
    */
   const rows = await runGreenhousePostgresQuery<AiObservationRow>(
     `WITH ranked AS (
@@ -111,12 +123,12 @@ export const getLatestAiObservationsByScope = async (): Promise<{
               summary, recommended_action, model, prompt_tokens, output_tokens, observed_at,
               ROW_NUMBER() OVER (PARTITION BY scope, module_key ORDER BY observed_at DESC) AS rn
          FROM greenhouse_ai.reliability_ai_observations
-        WHERE observed_at > NOW() - INTERVAL '24 hours'
      )
      SELECT observation_id, sweep_run_id, module_key, scope, severity, fingerprint,
             summary, recommended_action, model, prompt_tokens, output_tokens, observed_at
        FROM ranked
-      WHERE rn = 1`
+      WHERE rn = 1
+        AND (scope = 'overview' OR observed_at > NOW() - INTERVAL '24 hours')`
   )
 
   const byModule: Record<string, AiObservation> = {}
