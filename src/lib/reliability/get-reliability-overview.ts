@@ -18,6 +18,7 @@ import type { FinanceSmokeLaneStatus } from '@/types/finance-smoke-lane'
 import type { GitHubBillingOverview } from '@/types/github-billing'
 import type {
   ReliabilityIntegrationBoundary,
+  ReliabilityModuleKey,
   ReliabilityModuleDefinition,
   ReliabilityModuleSnapshot,
   ReliabilityOverview,
@@ -119,6 +120,7 @@ import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
 import { getCloudRunSilentObservabilitySignal } from './queries/cloud-run-silent-observability'
+import { getAiObserverUnhealthySignal } from './queries/ai-observer-unhealthy'
 import { getSecretsEnvRefFormatDriftSignal } from './queries/secrets-env-ref-format-drift'
 import { getPostgresConnectionSaturationSignal } from './queries/postgres-connection-saturation'
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
@@ -648,6 +650,15 @@ interface ReliabilityOverviewSources {
   cloudRunSilentObservability?: ReliabilitySignal | null
 
   /**
+   * TASK-937 — AI Observer health (heartbeat).
+   *   - reliability.ai_observer.unhealthy (drift)
+   * Lee el heartbeat en source_sync_runs (source_system='reliability_ai_observer').
+   * Detecta cron caído / kill-switch OFF / JSON truncado sostenido. Roll up
+   * bajo moduleKey 'cloud'.
+   */
+  aiObserverUnhealthy?: ReliabilitySignal | null
+
+  /**
    * TASK-856 Slice 3 — Secret-ref env var format drift (detección activa).
    *   - secrets.env_ref_format_drift (drift, error si > 0)
    * Detecta env vars `*_SECRET_REF` con shape no canónico (quotes, `\n` literal,
@@ -848,6 +859,8 @@ export const buildReliabilityOverview = (
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
     ...(sources.cloudRunSilentObservability ? [sources.cloudRunSilentObservability] : []),
+    // TASK-937 — AI Observer health (heartbeat-based liveness).
+    ...(sources.aiObserverUnhealthy ? [sources.aiObserverUnhealthy] : []),
     // TASK-856 Slice 3 — Secret-ref env var format drift (active upstream detection).
     ...(sources.secretsEnvRefFormatDrift ? [sources.secretsEnvRefFormatDrift] : []),
     // TASK-845 Slice 6 — PG connection saturation (data-driven V2 trigger).
@@ -1312,6 +1325,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.cloudRunSilentObservability
       : await getCloudRunSilentObservabilitySignal().catch(() => null)
 
+  // TASK-937 — AI Observer health desde el heartbeat (source_sync_runs).
+  // Steady=0; detecta cron caído, kill-switch OFF o JSON truncado sostenido.
+  // Degrada `unknown` si la query falla.
+  const aiObserverUnhealthy =
+    preloadedSources.aiObserverUnhealthy !== undefined
+      ? preloadedSources.aiObserverUnhealthy
+      : await getAiObserverUnhealthySignal().catch(() => null)
+
   // TASK-856 Slice 3 — Secret-ref env var format drift. Detección activa
   // upstream del Sentry burst downstream cuando un env var `*_SECRET_REF`
   // queda persistido con shape no canónico (quotes, `\n` literal, etc.).
@@ -1548,6 +1569,7 @@ export const getReliabilityOverview = async (
     notionConformedDrainFreshness,
     criticalTablesMissing,
     cloudRunSilentObservability,
+    aiObserverUnhealthy,
     secretsEnvRefFormatDrift,
     postgresConnectionSaturation,
     servicesEngagement,
@@ -1566,10 +1588,17 @@ export const getReliabilityOverview = async (
 }
 
 /**
- * Fetch Sentry incident snapshots in parallel for every module whose registry
- * entry declares an `incidentDomainTag`. Failures are isolated per domain so a
- * Sentry hiccup on one module never poisons the others.
+ * Fetch Sentry incident snapshots for every module whose registry entry
+ * declares an `incidentDomainTag`. Sentry currently rate-limits this endpoint
+ * around 5 requests/sec, so we batch the domain reads instead of firing the
+ * whole registry at once. Failures are still isolated per domain so a Sentry
+ * hiccup on one module never poisons the others.
  */
+const SENTRY_DOMAIN_INCIDENT_BATCH_SIZE = 4
+const SENTRY_DOMAIN_INCIDENT_BATCH_DELAY_MS = 1100
+
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 const hydrateDomainIncidents = async (
   registry: ReliabilityModuleDefinition[]
 ): Promise<Record<string, CloudSentryIncidentsSnapshot> | null> => {
@@ -1577,19 +1606,31 @@ const hydrateDomainIncidents = async (
 
   if (taggedModules.length === 0) return null
 
-  const entries = await Promise.all(
-    taggedModules.map(async module => {
-      try {
-        const snapshot = await getCloudSentryIncidents(process.env, {
-          domain: module.incidentDomainTag ?? null
-        })
+  const entries: Array<readonly [ReliabilityModuleKey, CloudSentryIncidentsSnapshot] | null> = []
 
-        return [module.moduleKey, snapshot] as const
-      } catch {
-        return null
-      }
-    })
-  )
+  for (let index = 0; index < taggedModules.length; index += SENTRY_DOMAIN_INCIDENT_BATCH_SIZE) {
+    const batch = taggedModules.slice(index, index + SENTRY_DOMAIN_INCIDENT_BATCH_SIZE)
+
+    const batchEntries = await Promise.all(
+      batch.map(async module => {
+        try {
+          const snapshot = await getCloudSentryIncidents(process.env, {
+            domain: module.incidentDomainTag ?? null
+          })
+
+          return [module.moduleKey, snapshot] as const
+        } catch {
+          return null
+        }
+      })
+    )
+
+    entries.push(...batchEntries)
+
+    if (index + SENTRY_DOMAIN_INCIDENT_BATCH_SIZE < taggedModules.length) {
+      await wait(SENTRY_DOMAIN_INCIDENT_BATCH_DELAY_MS)
+    }
+  }
 
   const out: Record<string, CloudSentryIncidentsSnapshot> = {}
 
