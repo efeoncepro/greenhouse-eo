@@ -1,5 +1,45 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Architecture Decision 2026-05-25 -- Payroll Payment Calendar: pago en arrears (primeros 5 días del mes siguiente)
+
+- Status: Accepted
+- Date: 2026-05-25
+- Owner: Payroll / Finance (boundary)
+- Scope: timing de pago de nómina, conciliación bank↔payroll, prevención de doble conteo de gastos
+- Reversibility: two-way (convención operativa documentada)
+- Confidence: high
+- Validated as of: 2026-05-25 (confirmado por operador + verificado contra giros bancarios reales mar/abr 2026)
+
+### Context
+
+Efeonce paga los sueldos **en arrears**: el sueldo devengado en el mes N se transfiere en los **primeros ~5 días del mes N+1**. Ejemplos confirmados por el operador: sueldo de febrero → pagado primeros 5 días de marzo; sueldo de marzo → primeros 5 días de abril; sueldo de abril → primeros 5 días de mayo. Esta convención no estaba escrita en ninguna spec, y al conciliar los giros bancarios contra las obligaciones de nómina causó confusión: un giro de marzo que paga el sueldo de febrero parecía "del mes equivocado", un adelanto, o un duplicado ambiguo. Fue la causa de la ambigüedad detectada en el cleanup de doble conteo (TASK-936).
+
+### Decision
+
+Convención canónica: **el salario del mes N se paga en los primeros ~5 días del mes N+1** (arrears, lag de ~1 mes). La descripción de un giro ("Pago Nómina `<mes>`") refiere al **mes de DEVENGO**, no al mes del egreso bancario. Toda lógica que concilie egresos bancarios contra obligaciones de nómina DEBE mapear un giro del mes N+1 a la obligación de nómina del mes N.
+
+### Alternatives Considered
+
+- **No documentar (status quo)**: rechazado — la ausencia de esta regla causó el doble conteo + la clasificación ambigua de pagos a personas en TASK-936.
+- **Asumir pago same-month**: rechazado — falso; los giros bancarios reales muestran un lag de ~1 mes consistente.
+
+### Consequences
+
+- Conciliación bank↔payroll usa el lag: un giro en `N+1` settlea la nómina de `N` (no de `N+1`).
+- Un giro a una persona **sin nómina registrada en el mes de devengo NO es un adelanto por defecto**: lo más probable es que **falte registrar esa nómina**. Caso real: los giros de febrero a Andrés y Humberly eran sueldos reales de febrero pagados a principios de marzo, pero su nómina de febrero nunca se registró en el sistema → no eran duplicados ni adelantos, eran sueldos con registro de nómina faltante. Antes de tratar un pago como adelanto/préstamo, verificar si corresponde a un sueldo devengado no registrado.
+- Un giro en `N+1` cuyo sueldo del mes `N` **sí** está registrado como nómina **y además** se modeló como gasto standalone = doble conteo (bug class TASK-936).
+
+### Runtime Contract
+
+- `payroll_entries` / gasto `Nomina neta` = obligación **devengada** en su mes.
+- El egreso bancario que la paga ocurre el **mes siguiente** (primeros ~5 días) y debe registrarse como **PAGO** (`expense_payment` / settlement) de esa obligación — **nunca** como gasto nuevo.
+- Clave de matching de conciliación: `(member, mes_devengo = mes_egreso − 1)`.
+
+### Revisit When
+
+- Efeonce cambie el calendario de pago (quincenal, same-month, u otra fecha).
+- Se incorpore un régimen/país con calendario de pago distinto → documentar por régimen.
+
 ## Delta 2026-05-16 — TASK-894: International Internal Contract Type Foundation
 
 Payroll reconoce seis perfiles contractuales canónicos. El nuevo perfil `international_internal` cubre colaboradores internacionales pagados internamente por Efeonce/Greenhouse, sin Deel/EOR y sin payroll estatutario Chile.
