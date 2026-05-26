@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -306,3 +306,21 @@ Mapeo de columnas (mismo shape que `reactive-run-tracker.ts`):
 ## Branch note
 
 Implementación directa en `develop` por instrucción explícita del operador (2026-05-26) — sin branch `task/*`. Commits por slice con co-author trailer.
+
+## Delta 2026-05-26 — COMPLETE (live-verified)
+
+5 commits en `develop` (`48a3e7f6` baseline → `8191ed9b` Slice 4). Deploy `ops-worker` a staging exitoso (run `26449627163`). Verificación end-to-end en vivo (cron forzado + DB):
+
+| Check | Antes | Después |
+|---|---|---|
+| Sweep result | `skipped parse_failed` ~5/6 corridas | `done — evaluated=5 persisted=5 skipped=0` |
+| Heartbeat `source_sync_runs` (`reliability_ai_observer`) | inexistente | `status=succeeded`, notes `persisted=5 evaluated=5` |
+| Overview persistido | stale 4 días (2026-05-22) | fresco (hace <1min) |
+| Signal `reliability.ai_observer.unhealthy` | inexistente | `ok` |
+| Banner | "AI Observer no activo" (falso) | renderiza overview real |
+
+**Slices entregados:** S1 config (`thinkingBudget:0`+4096+`finishReason`), S2+2b heartbeat + índice parcial, S3 signal `reliability.ai_observer.unhealthy` (moduleKey `cloud`), S4 reader ventana asimétrica + banner 4 estados. **Tests:** 15 nuevos (8 tracker + 7 signal); full suite 5419 passed / 0 failed; build ✓ tsc ✓ lint ✓.
+
+**Correcciones de Audit (pre-execution):** status `skipped`→ mapeo a `cancelled|failed|succeeded` (CHECK enum real); índice parcial agregado (Slice 2b); `finishReason` (review GCP/Vertex). **Open Questions:** Q1 cadencia 1h, Q2 dashboard-only, Q3 moduleKey `cloud` — todas resueltas.
+
+**Cierre de docs diferido (no bloqueante):** `Handoff.md` + `changelog.md` + sección CLAUDE.md tenían WIP sin commitear de otra sesión en el working tree al momento del cierre → no se tocaron para no entrelazar trabajo ajeno. Pendiente: entrada en Handoff/changelog + (opcional) invariante CLAUDE.md sobre el patrón "liveness por heartbeat, no por output".
