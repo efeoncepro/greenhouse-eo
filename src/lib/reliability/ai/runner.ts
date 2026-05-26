@@ -6,6 +6,13 @@ import { getGoogleGenAIClient, getGreenhouseAgentRuntimeConfig } from '@/lib/ai/
 import { getReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
 import type { ReliabilityModuleKey, ReliabilityOverview, ReliabilitySeverity } from '@/types/reliability'
 
+import {
+  AI_OBSERVER_DISABLED_REASON,
+  generateAiObserverRunId,
+  writeAiObserverRunComplete,
+  writeAiObserverRunFailure,
+  writeAiObserverRunStart
+} from './ai-observer-run-tracker'
 import { buildPrompts, fingerprintModule, fingerprintOverview } from './build-prompt'
 import { isReliabilityAiObserverEnabled } from './kill-switch'
 import {
@@ -307,7 +314,7 @@ const buildSummary = (
   }
 }
 
-export const runReliabilityAiObserver = async ({
+const runReliabilityAiObserverInner = async ({
   triggeredBy = 'cron',
   env = process.env,
   preloadedOverview,
@@ -321,7 +328,7 @@ export const runReliabilityAiObserver = async ({
     return {
       summary: buildSummary(
         { sweepRunId, startedAt, triggeredBy, model },
-        { skippedReason: 'RELIABILITY_AI_OBSERVER_ENABLED=false (opt-in default OFF)' }
+        { skippedReason: AI_OBSERVER_DISABLED_REASON }
       ),
       observations: []
     }
@@ -490,5 +497,70 @@ export const runReliabilityAiObserver = async ({
       }
     ),
     observations: persisted
+  }
+}
+
+/**
+ * TASK-937 — Wrapper boundary que envuelve el runner con un heartbeat en
+ * `source_sync_runs` (`source_system='reliability_ai_observer'`).
+ *
+ * Por qué wrapper y no instrumentar cada return del inner: el inner tiene
+ * múltiples salidas (disabled, empty response, parse-fail, done). Envolver en
+ * el boundary captura todos los outcomes en un solo lugar sin tocar la lógica
+ * del sweep.
+ *
+ * Robustez: el heartbeat NUNCA debe romper el sweep. Cada write va en
+ * try/catch + warn — si PG está caído, el observer sigue produciendo su
+ * resultado y el signal `reliability.ai_observer.unhealthy` detectará la
+ * ausencia de heartbeats por otra vía (sin run reciente).
+ */
+export const runReliabilityAiObserver = async (
+  args: RunAiObserverArgs = {}
+): Promise<AiSweepResult> => {
+  const runId = generateAiObserverRunId()
+  const triggeredBy = args.triggeredBy ?? 'cron'
+
+  try {
+    await writeAiObserverRunStart({ runId, triggeredBy })
+  } catch (error) {
+    console.warn('[ai-observer] heartbeat writeStart failed (non-blocking)', {
+      runId,
+      error: error instanceof Error ? error.message : String(error)
+    })
+  }
+
+  try {
+    const result = await runReliabilityAiObserverInner(args)
+
+    try {
+      await writeAiObserverRunComplete({
+        runId,
+        outcome: {
+          skippedReason: result.summary.skippedReason,
+          finishReason: result.summary.finishReason,
+          observationsEvaluated: result.summary.observationsEvaluated,
+          observationsPersisted: result.summary.observationsPersisted,
+          observationsSkipped: result.summary.observationsSkipped
+        }
+      })
+    } catch (error) {
+      console.warn('[ai-observer] heartbeat writeComplete failed (non-blocking)', {
+        runId,
+        error: error instanceof Error ? error.message : String(error)
+      })
+    }
+
+    return result
+  } catch (error) {
+    try {
+      await writeAiObserverRunFailure({ runId, error })
+    } catch (heartbeatError) {
+      console.warn('[ai-observer] heartbeat writeFailure failed (non-blocking)', {
+        runId,
+        error: heartbeatError instanceof Error ? heartbeatError.message : String(heartbeatError)
+      })
+    }
+
+    throw error
   }
 }
