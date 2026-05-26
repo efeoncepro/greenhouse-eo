@@ -12,7 +12,17 @@ Skills arch + finance en loop. La validación de TASK-929/934 reveló **doble co
 
 **Buckets de los 37 unanchored**: [A] duplicados nómina (dismiss + recordExpensePayment contra la nómina, computa FX) · [B] FX legítimo (reclasificar) · [C] vendors reales sin supplier_id (anclar name-first — muchos internacionales sin RUT) · [D] test residue (dismiss). Solo [A]+[D] se eliminan.
 
-**Plan corregido**: corrección one-time, **dry-run + gate humano** antes de aplicar (re-linkeo dinero real + período cerrado). Helpers canónicos: `dismissExpensePhantom`, `recordExpensePayment` (dual-mode), `resolveExpenseEconomicCategory`. **Próximo paso**: construir script dry-run `fix-reconciliation-double-count-mar-apr-2026.ts` + presentar propuesta de matches [A].
+**Fix aplicado (2026-05-25, con OK explícito del operador)**: script `scripts/finance/fix-reconciliation-double-count-mar-apr-2026.ts` (dry-run default + `--apply` gateado). Modelo final **simplificado** tras Discovery: los 3 giros global66 son **pre-anchor** (< Abr 5, OTB global66) con **0 settlement_legs vivos** → su egreso ya está en el opening, el saldo NO se mueve. El doble conteo es **puramente P&L**. Fix = `is_annulled=TRUE` en el gasto-banco duplicado (sale del P&L; todos los consumers filtran `COALESCE(is_annulled,FALSE)=FALSE`) + `dismissExpensePhantom` del pago. Reversible.
+
+- **3 anulados** (commit `3fcbf525` el script): Daniela Feb (`EXP-RECON-20260306-fscy` $1.034.522), Daniela Mar (`...dit1` $1.090.731), Andrés Mar (`...4wx6` $688.058). **−$2,8M de doble conteo fuera del P&L.**
+- **Verificado live**: 3 `is_annulled=true` · global66-clp closing **−2.603,41 sin cambio** · unanchored **37→34**, suma $8,2M→$5,37M.
+- **Descartado el approach recordExpensePayment+FX** (era complejo E incompleto — dismiss-phantom no saca el gasto del P&L; el annul sí).
+
+**Pendiente (TASK-936 sigue in-progress)**:
+- **Valentina Mar** (`...baj9` $595.656): post-anchor en santander-clp + período **cerrado** → necesita re-home del pago + autorización de restatement. Excluido (`--include-closed` gateado).
+- **2 ambiguos** (Humberly mar $300k, Andrés "feb" $632k): NO duplican nómina (1ª nómina posterior) → input humano (¿adelanto?).
+- **Grupo abril ya-pagado** (Valentina/Humberly abr): nómina ya `paid` → revisar origen del pago antes de anular el duplicado.
+- **[B] FX (4), [C] vendors sin supplier_id (~22), [D] test residue (2)**: resolución separada (no son doble conteo).
 
 ---
 

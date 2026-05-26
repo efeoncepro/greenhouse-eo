@@ -80,6 +80,16 @@ Solo **[A]** y **[D]** son filas a eliminar (dismiss). **[B]** se reclasifica. *
 
 **No se implementa.** Verificado en Audit: no hay path productivo que cree `EXP-RECON` (solo el seed one-time). Construir un matcher prospectivo para un path inexistente = YAGNI. Si en el futuro se crea un create-path en la UI de conciliación, nace MATCH-first como task propia.
 
+## Aplicado 2026-05-25 (Etapa 3, parcial — 3 de los duplicados [A])
+
+Modelo final **simplificado** tras Discovery: los 3 giros global66 son **pre-anchor** (< Abr 5, OTB global66) con **0 settlement_legs vivos** → el egreso ya está en el opening, el saldo NO se mueve. El doble conteo es **puramente P&L**. Fix aplicado = `is_annulled=TRUE` en el gasto-banco duplicado + `dismissExpensePhantom` del pago. Reversible. (Se descartó recordExpensePayment+FX: era complejo e incompleto — dismiss-phantom no saca el gasto del P&L.)
+
+Script: `scripts/finance/fix-reconciliation-double-count-mar-apr-2026.ts` (dry-run default, `--apply` con OK humano).
+
+Anulados (verificado live): Daniela Feb `EXP-RECON-20260306-fscy` ($1.034.522), Daniela Mar `...dit1` ($1.090.731), Andrés Mar `...4wx6` ($688.058). **−$2,8M doble conteo fuera del P&L.** global66-clp closing **−2.603,41 sin cambio**; unanchored **37→34**.
+
+**Pendiente**: Valentina Mar (post-anchor + cerrado, `--include-closed` gateado), 2 ambiguos (Humberly mar / Andrés "feb" sin nómina → input humano), grupo abril ya-pagado (revisar origen del pago), [B] FX / [C] vendors / [D] test residue (no son doble conteo).
+
 ## Plan corregido (2026-05-25) — corrección one-time, dry-run + gate humano
 
 **Etapa 1 — Tooling dry-run (no mutativo, seguro de correr):**
