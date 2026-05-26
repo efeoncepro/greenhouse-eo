@@ -204,6 +204,23 @@ const buildAccountBalancesFxDriftSql = (
       -- nativas tienen period_inflows/outflows en moneda nativa (NO en CLP)
       -- y compararlas contra payment_amount_clp generaria falsos positivos.
       AND a.currency = 'CLP'
+      -- TASK-938: NO reconciliar fechas anteriores al genesis del OTB activo.
+      -- Esas fechas son pre-anchor — el OTB (TASK-703b) las absorbe en su
+      -- opening_balance bank-verified, y los pagos pre-genesis no entran en el
+      -- saldo post-anchor. Filas account_balances pre-genesis son proyecciones
+      -- stale (regresion del rematerializer sin genesis floor, cerrada en
+      -- TASK-938 Slice 3); el detector las ignora en vez de gritar un drift
+      -- artificial. COALESCE a la propia fecha cuando la cuenta no tiene OTB
+      -- activo (sin floor → no filtra). MAX por si hubiera >1 OTB activo.
+      AND ab.balance_date >= COALESCE(
+        (
+          SELECT MAX(otb_floor.genesis_date::date)
+          FROM greenhouse_finance.account_opening_trial_balance otb_floor
+          WHERE otb_floor.account_id = ab.account_id
+            AND otb_floor.superseded_by IS NULL
+        ),
+        ab.balance_date
+      )
     GROUP BY
       ab.account_id,
       a.account_name,
