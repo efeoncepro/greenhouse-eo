@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Bajo`
 - Effort: `Bajo`
 - Type: `ops`
 - Epic: `optional`
-- Status real: `75 versiones desactivadas (reversible); pendiente grace + destroy irreversible`
+- Status real: `COMPLETE 2026-05-25 — 150 versiones destruidas (v1-75 × 2), v76 viva. Causa raíz documentada en TASK-020 (ver Delta).`
 - Rank: `TBD`
 - Domain: `ops|cloud|cost|security`
 - Blocked by: `grace period (confirmar que nada se rompe antes del destroy irreversible)`
@@ -97,6 +97,14 @@ done
 - [ ] `Handoff.md` actualizado con ahorro real
 - [ ] `changelog.md` actualizado
 - [ ] `TASK_ID_REGISTRY.md` refleja lifecycle final
+
+## Delta 2026-05-25 — Destroy ejecutado + causa raíz corregida y documentada
+
+**Grace period OK** (>24h): las v1-75 quedaron `disabled` sin que nada las re-habilitara → ningún consumer las necesitó. Verificado además que **ningún código del repo** lee `frameio-access-token`/`frameio-refresh-token` (las refs a "frame.io" son catálogo de tools / URLs Notion, no los tokens OAuth). Flujo de refresh externo + dormido desde 2026-03-24.
+
+**Paso 2 (destroy) ejecutado con OK del operador**: `gcloud secrets versions destroy` v1-75 en ambos secrets. Verificado: ambos quedan **v76 `enabled`, v1-75 `destroyed`, 0 `disabled`**. 150 versiones destruidas, 0 fallos. Libera ~$8/mes de storage **+ baja el blast radius de seguridad** (150 credenciales OAuth viejas eliminadas; disabled≠destruido las dejaba latentes). Los tokens OAuth rotados están muertos al instante → destroy seguro.
+
+**Paso 3 (causa raíz) — supuesto corregido**: la spec asumía "verificar que `secrets:rotate` destruye superseded; si no, agregarlo". **Corrección**: `scripts/secrets/rotate.ts` NO destruye superseded **a propósito** (línea 257: disable manual tras soak, preserva rollback). Auto-destroy-on-rotate ahí sería **inseguro** (perdés rollback si la rotación sale mal). La causa raíz NO es el helper genérico — es el **productor** Frame.io que rotó 76× sin limpieza. Requisito documentado en **TASK-020** (Delta 2026-05-25): el flujo OAuth de Frame.io debe hacer keep-N + destroy on-rotate cuando se productivice. Helper `secrets:rotate` queda **sin cambios** (su patrón es el correcto para secrets críticos que rotan raramente).
 
 ## Delta 2026-05-24
 

@@ -1,3 +1,12 @@
+# Sesion 2026-05-25 — TASK-933 Secret Manager cleanup Frame.io + causa raíz — ✅ COMPLETE
+
+Review + cierre del 2º quick-win de costo. Grace period OK (>24h, las v1-75 disabled sin que nada las re-habilitara; 0 consumers en repo — las refs a "frame.io" son catálogo de tools/URLs Notion, no los tokens). Flujo OAuth externo dormido desde 2026-03-24.
+
+- **Destroy ejecutado (OK operador)**: 150 versiones (`frameio-access-token`/`frameio-refresh-token` v1-75) → `destroyed`. Verificado: ambos quedan v76 enabled, 0 disabled, 75 destroyed c/u. Libera ~$8/mo + baja blast radius (disabled≠destruido dejaba 150 credenciales OAuth latentes; los tokens rotados están muertos al instante → destroy seguro).
+- **Causa raíz — supuesto de la task corregido (review)**: `scripts/secrets/rotate.ts` NO destruye superseded **a propósito** (línea 257: disable manual tras soak, preserva rollback). Auto-destroy-on-rotate ahí sería inseguro. La causa raíz NO es el helper — es el productor Frame.io que rotó 76× sin limpieza. Requisito keep-N+destroy documentado en **TASK-020** (Delta 2026-05-25). Helper `secrets:rotate` queda **sin cambios** (su patrón es correcto para secrets críticos que rotan raramente).
+
+---
+
 # Sesion 2026-05-25 — TASK-932 Artifact Registry cleanup flip a enforced — ✅ COMPLETE
 
 Review + cierre del quick-win de costo. Corrí el script de verificación (read-only) >24h después de crear la task. **Hallazgo de la review**: la "2da señal" via Cloud Logging **no es obtenible** — el cleanup dry-run de Artifact Registry NO emite logs de evaluación per-corrida queryables (`resource.type="artifactregistry.googleapis.com/Repository"` vacío); es un job interno periódico. El gate original habría dejado la task bloqueada para siempre esperando una señal que en ese formato no llega.

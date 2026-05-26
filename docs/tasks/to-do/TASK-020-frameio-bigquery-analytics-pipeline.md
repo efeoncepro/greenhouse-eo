@@ -1,5 +1,13 @@
 # CODEX TASK -- Frame.io Analytics Pipeline v2: enrichment canonico de delivery e ICO sobre source sync existente
 
+## Delta 2026-05-25 — Requisito: el flujo OAuth de Frame.io DEBE limpiar versiones de secret on-rotate (keep-N)
+
+Heredado de **TASK-933** (Secret Manager cost/security cleanup). El flujo de refresh OAuth de Frame.io acumuló **76 versiones** en cada uno de `frameio-access-token` / `frameio-refresh-token` (152 = 70% de las versiones del proyecto) porque rotaba el token sin destruir las viejas. Los refresh tokens OAuth quedan **muertos al instante** después de rotar (solo el último vale).
+
+**Requisito canónico cuando se productivice el pipeline**: el flujo de refresh DEBE hacer **keep-N + destroy** de versiones viejas on-rotate (e.g. keep-2: la activa + 1 de rollback inmediato; destruir el resto). NO acumular.
+
+**Nota importante (no confundir con `secrets:rotate`)**: el helper canónico `scripts/secrets/rotate.ts` **NO** destruye superseded on-rotate **a propósito** (preserva rollback; disable manual tras soak — línea 257). NO replicar auto-destroy ahí. La limpieza frecuente es responsabilidad del **productor** que rota seguido (OAuth refresh), no del helper genérico de rotación de secrets críticos (NextAuth/Azure/Nubox rotan raramente → acumulación trivial).
+
 ## Delta 2026-04-03
 
 - Esta lane debe alinearse explícitamente a `docs/architecture/Contrato_Metricas_ICO_v1.md`.
