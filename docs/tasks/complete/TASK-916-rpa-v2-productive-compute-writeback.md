@@ -160,6 +160,12 @@ Clonado mecánico de los siblings demo (TASK-913/914) repointeado a producción,
 
 **Pendiente TASK-917 Flip A**: crear propiedad `[GH] RpA v2` en Efeonce/Sky + activar `NOTION_RPA_WRITEBACK_ENABLED` + materializar `rpa_avg_v2` + paridad shadow vs legacy + flip bono.
 
+## Delta 2026-05-26 — BigQuery raw echo alias
+
+La propiedad Notion literal `[GH] RpA v2` ya existe como target de writeback productivo, pero cuando el sync genérico `notion-bq-sync` aplana propiedades dinámicas hacia `notion_ops.tareas`, su alias raw BigQuery-safe es `gh_rpa_v2`.
+
+Esto no cambia el motor RpA V2: `calculateRpaV2` sigue leyendo `task_status_transitions`, el writeback sigue haciendo PATCH a `[GH] RpA v2`, y `stg_tareas.rpa` sigue siendo el carril legacy V1 (`RpA` formula). El alias `notion_ops.tareas.gh_rpa_v2` queda reservado para auditoría/paridad del eco Notion.
+
 ## Verification
 
 `pnpm test` (full 5197 passed) + `pnpm build` (✓ compiled) + `pnpm lint` (0 errors) + `pnpm tsc --noEmit` (0) + smoke PG real (tabla queryable 0 rows, signals dead_letter/lag = 0, CHECK rechaza `workspace='demo'`). Smoke con tarea real Efeonce + flag ON queda para TASK-917 Flip A staging.

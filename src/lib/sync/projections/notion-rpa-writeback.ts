@@ -52,6 +52,8 @@ import type { ProjectionDefinition } from '../projection-registry'
  * - Demo sibling: src/lib/sync/projections/notion-rpa-writeback-demo.ts
  * - Notion client: src/lib/space-notion/notion-client.ts (patchNotionPage)
  * - Notion property target: `[GH] RpA v2` (number) en Efeonce/Sky
+ * - Raw BigQuery echo from notion-bq-sync: `notion_ops.tareas.gh_rpa_v2`
+ *   (solo para auditoria/paridad; el motor no lee ese eco).
  */
 
 const NOTION_PROPERTY_RPA_V2 = '[GH] RpA v2'

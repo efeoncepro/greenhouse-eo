@@ -450,17 +450,29 @@ return n != null ? Math.round(n) : null }
   }
 }
 
+const BIGQUERY_FIELD_FORBIDDEN_CHARS_RE = /[\[\]{};:,=+*?\\"'`<>|~!@#$^&]/g
+
 /**
- * Normalize a Notion property name to the BigQuery column format used by notion-bq-sync:
- * lowercase, trim, spaces → underscores, dots → underscores, accented chars → ASCII.
+ * Normalize a Notion property name to the BigQuery column format used by notion-bq-sync.
+ * Contract example: `[GH] RpA v2` is stored in raw BigQuery as `gh_rpa_v2`.
  */
-const normalizeNotionKey = (name: string): string =>
-  name
+const normalizeNotionKey = (name: string): string => {
+  let key = name
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
-    .replace(/[\s.]+/g, '_')
+    .replace(/%/g, 'pct')
+    .replace(/[\s./-]+/g, '_')
+    .replace(/[()]/g, '')
+    .replace(BIGQUERY_FIELD_FORBIDDEN_CHARS_RE, '_')
+
+  while (key.includes('__')) {
+    key = key.replace(/__/g, '_')
+  }
+
+  return key.replace(/^_+|_+$/g, '')
+}
 
 /**
  * Apply config-driven property mappings to a raw Notion row.

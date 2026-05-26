@@ -47,7 +47,9 @@ import {
  * edits del operador; Greenhouse observa via webhook (TASK-912 futuro), persiste
  * transitions canonical en PG, computa RpA V2 acá y eventualmente escribe el
  * valor de vuelta a Notion property `[GH] RpA v2` (writeback path Fase C, NO
- * en Slice 1). NUNCA fallback a Notion `Correcciones` rollup en ningún path.
+ * en Slice 1). El eco raw de esa propiedad en BigQuery es
+ * `notion_ops.tareas.gh_rpa_v2`, pero NO es input del motor. NUNCA fallback a
+ * Notion `Correcciones` rollup ni al eco raw en ningún path.
  *
  * **Null-not-zero contract canonical** (CLAUDE.md sección "Delivery Metrics
  * Ownership Boundary invariants"): cuando `countCorrectionTransitions` retorna

@@ -1,3 +1,29 @@
+# Sesion 2026-05-26 — RpA V2 Notion raw alias contract — implemented
+
+- Owner: Codex.
+- Status: implemented and focused validation passed.
+- Context:
+  - Follow-up to the Admin Center audit/root-cause fix in `../notion-bigquery`.
+  - User asked whether normalizing `[GH] RpA v2` to `gh_rpa_v2` could break RpA V2, then asked to apply the clarification everywhere relevant.
+- What changed:
+  - Portal normalizers now treat forbidden BigQuery field chars the same way for Notion property lookup/governance:
+    - `scripts/sync-source-runtime-projections.ts`
+    - `src/lib/space-notion/notion-governance-contract.ts`
+  - Added regression test for `normalizeNotionPropertyKey('[GH] RpA v2') === 'gh_rpa_v2'`.
+  - Documented the contract in ADR, sync architecture, onboarding provisioning, admin reliability audit, TASK-916, changelog and project context.
+  - Updated `../notion-bigquery` docs and added a Python smoke test for `_normalize_prop_key()`.
+- Canonical contract:
+  - Notion property remains literal `[GH] RpA v2`.
+  - Raw BigQuery echo is `notion_ops.tareas.gh_rpa_v2`.
+  - RpA V2 engine does **not** read that raw echo; it computes from `task_status_transitions` and writes snapshots, then PATCHes `[GH] RpA v2`.
+  - `notion_ops.stg_tareas.rpa` / `notion_ops.tareas.rpa` remain legacy V1.
+- Validation:
+  - `pnpm exec vitest run src/lib/space-notion/notion-governance-contract.test.ts` — 1 file / 2 tests passed.
+  - `python3 tests/test_normalize_prop_key.py` in `../notion-bigquery` — OK.
+  - `python3 -m py_compile main.py tests/test_normalize_prop_key.py` in `../notion-bigquery` — OK.
+
+---
+
 # Sesion 2026-05-26 — TASK-937 AI Observer reliability hardening — ✅ COMPLETE (live-verified)
 
 El AI Observer (TASK-638) llevaba días mostrando "AI Observer no activo" en `/admin` aunque el flag estaba ON, el cron horario disparaba y Vertex respondía. Causa raíz (una sola falla de diseño): la liveness se infería del **output** (una fila `overview` fresca) en vez de un **run record propio**. Combinado con dos síntomas: (A) `gemini-2.5-flash` truncaba el JSON ~5/6 corridas porque corre con *thinking* ON por default y se comía el `maxOutputTokens`; (B) el overview se deduplica por fingerprint determinístico → postura estable = no re-persiste → la ventana de 24h del reader lo escondía → banner falso.

@@ -10,6 +10,17 @@
 
 ---
 
+## Delta 2026-05-26 — Alias raw BigQuery para `[GH] RpA v2`
+
+El nombre canónico de writeback en Notion sigue siendo la propiedad literal `[GH] RpA v2`. El writer upstream `notion-bq-sync` aplana propiedades dinámicas de Notion a columnas BigQuery-safe; por eso el eco raw en `notion_ops.tareas` es `gh_rpa_v2`.
+
+Contrato operativo:
+
+- El motor RpA V2 **no lee** `notion_ops.tareas.gh_rpa_v2`. Computa desde `task_status_transitions` → `calculateRpaV2` → `task_rpa_snapshots`.
+- El writeback productivo **no escribe** `gh_rpa_v2`. Hace PATCH a la propiedad Notion literal `[GH] RpA v2`.
+- `notion_ops.tareas.rpa` y `notion_stg.stg_tareas.rpa` siguen representando el carril legacy V1 (`RpA` formula), no V2.
+- Cualquier auditoría/paridad que inspeccione el eco raw de Notion debe usar `notion_ops.tareas.gh_rpa_v2`; el nombre inválido `[gh]_rpa_v2` queda prohibido como alias.
+
 ## Delta 2026-05-21 — TASK-916: límite de MUESTREO del re-fetch (BUG-CLASS-003) + Flip A writeback activado
 
 **Flip A writeback activado** en producción (Efeonce + Sky) vía `NOTION_RPA_WRITEBACK_ENABLED=true` (override de dueño del stop-gate "Efeonce primero"; legacy `RpA` formula + bono intactos — ver Handoff 2026-05-21). Propiedad `[GH] RpA v2` (number) creada en ambos data sources. Pipeline verificado end-to-end con caso real: click humano → captura → compute → writeback → `[GH] RpA v2=1`.

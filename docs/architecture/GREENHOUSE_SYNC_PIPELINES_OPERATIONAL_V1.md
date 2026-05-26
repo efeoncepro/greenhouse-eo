@@ -3,6 +3,15 @@
 ## Overview
 Greenhouse uses a multi-layer sync architecture to move data between external sources (Notion, HubSpot, Frame.io), BigQuery (warehouse), PostgreSQL (operational store), and the Next.js application.
 
+## Delta 2026-05-26 — Notion dynamic property aliases
+
+`notion-bq-sync` is allowed to ingest dynamic Notion properties as raw BigQuery columns, but every dynamic property name must be normalized into a BigQuery-safe alias before load.
+
+- Contract example: Notion property `[GH] RpA v2` → raw column `notion_ops.tareas.gh_rpa_v2`.
+- Invalid aliases such as `[gh]_rpa_v2` are not allowed because BigQuery rejects them and the raw load can fail after per-space delete.
+- Curated `notion_stg.stg_tareas.rpa` remains the legacy `RpA` formula. It is not RpA V2.
+- Greenhouse metric engines must use their canonical runtime sources (`task_status_transitions`, snapshots, conformed tables) and treat raw `[GH]` echoes as audit/parity inputs only.
+
 ## Delta 2026-04-19 — FX sync coverage matrix (TASK-475 + TASK-484)
 
 Fuente de verdad operativa de tasas: `greenhouse_finance.exchange_rates` (PostgreSQL dual-write con BigQuery `greenhouse.fin_exchange_rates` como fallback). Cobertura por moneda, declarada en `src/lib/finance/currency-registry.ts`:

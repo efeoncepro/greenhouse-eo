@@ -276,6 +276,7 @@ Hallazgos remediados tras la auditoría:
 
 - **REL-ADMIN-002 / Notion flags**:
   - Causa raíz confirmada para `raw=0`: el writer upstream `notion-bq-sync` eliminaba filas existentes de `notion_ops.tareas` por space y luego fallaba la carga BigQuery por una propiedad Notion nueva `[GH] RpA v2`, normalizada a un field inválido (`[gh]_rpa_v2`).
+  - Contrato post-fix: el eco raw válido de esa propiedad es `notion_ops.tareas.gh_rpa_v2`; el writeback RpA V2 sigue apuntando a la propiedad Notion literal `[GH] RpA v2` y el motor no usa el eco raw como input.
   - Fix aplicado fuera del portal: normalización defensiva en `../notion-bigquery/main.py` para convertir caracteres prohibidos en nombres dinámicos de propiedades a `_`; desplegado a Cloud Run revision `notion-bq-sync-00017-pct` y tráfico actualizado al 100%.
   - Remediación live: `notion-bq-daily-sync` post-fix terminó `7 ok, 0 skipped, 0 errors` y restauró `notion_ops.tareas` (Efeonce 1345, Sky 3989).
   - Se ejecutó `ops-notion-conformed-sync`; el drain PG escribió `152 projects`, `35 sprints`, `5334 tasks`.
