@@ -78,11 +78,25 @@ describe('github release webhook reconciler', () => {
     expect(mocks.transitionReleaseState).not.toHaveBeenCalled()
   })
 
-  it('marks allowlisted events unmatched when no recent release manifest exists', async () => {
+  it('ignores non-failure allowlisted events when no recent release manifest exists', async () => {
     mocks.query.mockResolvedValueOnce([])
     mocks.query.mockResolvedValueOnce([])
 
     const result = await reconcileGithubReleaseWebhookEvent(baseEvent)
+
+    expect(result.processingStatus).toBe('ignored')
+    expect(result.errorCode).toBe('non_failure_without_release_manifest')
+    expect(mocks.transitionReleaseState).not.toHaveBeenCalled()
+  })
+
+  it('marks failure allowlisted events unmatched when no recent release manifest exists', async () => {
+    mocks.query.mockResolvedValueOnce([])
+    mocks.query.mockResolvedValueOnce([])
+
+    const result = await reconcileGithubReleaseWebhookEvent({
+      ...baseEvent,
+      githubConclusion: 'failure'
+    })
 
     expect(result.processingStatus).toBe('unmatched')
     expect(result.errorCode).toBe('release_manifest_not_found')

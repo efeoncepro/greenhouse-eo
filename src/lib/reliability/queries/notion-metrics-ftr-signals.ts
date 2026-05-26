@@ -125,6 +125,16 @@ export const FTR_WRITEBACK_LAG_SIGNAL_ID = 'notion.metrics.ftr_writeback_lag'
 // token corrupto, snapshot fuera del happy path).
 const FTR_WRITEBACK_LAG_THRESHOLD_MIN = 30
 
+const PRODUCTIVE_WORKSPACE_IDS = ['EFEONCE', 'SKY'] as const
+
+const isAnyFtrWritebackFlagEnabled = (): boolean => {
+  if (process.env.NOTION_FTR_WRITEBACK_ENABLED === 'true') return true
+
+  return PRODUCTIVE_WORKSPACE_IDS.some(
+    workspaceId => process.env[`NOTION_FTR_WRITEBACK_ENABLED_${workspaceId}`] === 'true'
+  )
+}
+
 export const getNotionMetricsFtrWritebackLagSignal = async (): Promise<ReliabilitySignal> => {
   const observedAt = new Date().toISOString()
 
@@ -144,6 +154,37 @@ export const getNotionMetricsFtrWritebackLagSignal = async (): Promise<Reliabili
 
     const count = Number(rows[0]?.count ?? 0)
     const oldestAgeMin = rows[0]?.oldest_age_minutes ? Math.round(Number(rows[0].oldest_age_minutes)) : 0
+    const writebackEnabled = isAnyFtrWritebackFlagEnabled()
+
+    if (!writebackEnabled) {
+      return {
+        signalId: FTR_WRITEBACK_LAG_SIGNAL_ID,
+        moduleKey: MODULE_KEY,
+        kind: 'lag',
+        source: 'getNotionMetricsFtrWritebackLagSignal',
+        label: 'Writeback lag FTR (Efeonce/Sky)',
+        severity: 'ok',
+        summary:
+          'Writeback FTR deshabilitado por flag — snapshots pendientes se reportan como backlog dormido, no como lag operativo.',
+        observedAt,
+        evidence: [
+          { kind: 'metric', label: 'lag_count_if_enabled', value: String(count) },
+          { kind: 'metric', label: 'threshold_minutes', value: String(FTR_WRITEBACK_LAG_THRESHOLD_MIN) },
+          { kind: 'metric', label: 'oldest_age_minutes', value: String(oldestAgeMin) },
+          { kind: 'metric', label: 'NOTION_FTR_WRITEBACK_ENABLED', value: process.env.NOTION_FTR_WRITEBACK_ENABLED ?? 'unset' },
+          {
+            kind: 'metric',
+            label: 'NOTION_FTR_WRITEBACK_ENABLED_EFEONCE',
+            value: process.env.NOTION_FTR_WRITEBACK_ENABLED_EFEONCE ?? 'unset'
+          },
+          {
+            kind: 'metric',
+            label: 'NOTION_FTR_WRITEBACK_ENABLED_SKY',
+            value: process.env.NOTION_FTR_WRITEBACK_ENABLED_SKY ?? 'unset'
+          }
+        ]
+      }
+    }
 
     const severity: ReliabilitySignal['severity'] = count === 0 ? 'ok' : count <= 3 ? 'warning' : 'error'
 

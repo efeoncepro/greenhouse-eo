@@ -151,6 +151,39 @@ describe('processReactiveEvents (V2)', () => {
     expect(mockMarkRefreshCompleted).toHaveBeenCalledWith('test_projection:finance_period:2026-04')
   })
 
+  it('can replay active failed rows scoped to explicit handler keys', async () => {
+    const projectionA = buildProjection({ name: 'projection_a' })
+    const projectionB = buildProjection({ name: 'projection_b' })
+
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projectionA, projectionB])
+
+    const events = [buildEventRow('failed-1', 'finance.expense.created')]
+
+    mockQuery.mockResolvedValueOnce(events)
+    mockQuery.mockResolvedValue([])
+
+    const result = await processReactiveEvents({
+      replayFailedHandlers: true,
+      handlerKeys: ['projection_a:finance.expense.created']
+    })
+
+    expect(result.eventsFetched).toBe(1)
+    expect(projectionA.refresh).toHaveBeenCalledTimes(1)
+    expect(projectionB.refresh).not.toHaveBeenCalled()
+
+    const selectCall = mockQuery.mock.calls.find(call =>
+      typeof call[0] === 'string' && call[0].includes('FROM greenhouse_sync.outbox_events e')
+    )
+
+    expect(selectCall?.[0]).toContain("r.result IN ('retry', 'dead-letter')")
+    expect(selectCall?.[1]).toEqual([
+      ['finance.expense.created'],
+      ['projection_a:finance.expense.created'],
+      500
+    ])
+  })
+
   it('marks events with no registered projection as no-op:no-handler', async () => {
     mockGetAllTriggerEventTypes.mockReturnValue(['orphan.event'])
     mockGetProjectionsForEvent.mockReturnValue([]) // no projection consumes this

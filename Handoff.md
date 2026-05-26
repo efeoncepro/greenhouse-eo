@@ -1,3 +1,58 @@
+# Sesion 2026-05-26 — Remediación audit `/admin` hallazgos 1, 2 y 5 — ✅ PARTIAL ROOT FIX
+
+Se resolvieron los hallazgos pedidos de forma root-cause, sin silenciar UI:
+
+- **1 Platform/Data sync/reactive**:
+  - `greenhouse_runtime` ya tenía permisos correctos sobre `greenhouse_serving`; el problema vivo era deuda histórica en `outbox_reactive_log`.
+  - Se agregó replay scoped real al control plane reactivo: `processReactiveEvents({ replayFailedHandlers, handlerKeys })` + `POST /api/admin/ops/replay-reactive` acepta `handlerKeys`, `domain`, `batchSize`, `replayFailedHandlers`. El replay prioriza `retry/dead-letter` activos y filtra por event types de los handlers para no drenar backlog global ni marcar no-ops indebidos.
+  - Remediación live ejecutada por handler: desaparecieron los `infra.db_privilege` activos (`active_infra_failures=0`). Se re-procesaron commercial cost attribution, service attribution, person intelligence, member capacity economics y Notion status transition capture con el consumer real.
+  - Quedan **62 failures activas** de aplicación/configuración no mezcladas con el fix de permisos: HubSpot outbound token faltante, HubSpot company payload inválido, payment profile SQL drift, payroll receipt insert shape, etc.
+- **2 Notion/Delivery**:
+  - Causa raíz real de `raw=0`: el writer upstream `../notion-bigquery` borraba `notion_ops.tareas` por space y luego fallaba al cargar porque Notion introdujo propiedad `[GH] RpA v2`; el normalizador producía el field inválido BigQuery `[gh]_rpa_v2`.
+  - Fix aplicado y desplegado en `notion-bq-sync` Cloud Run `us-central1`: normalizador de propiedades dinámicas convierte caracteres prohibidos de BigQuery a `_`, preservando nombres existentes como `fecha_límite`.
+  - Remediación live:
+    - `notion-bq-daily-sync` post-fix: `7 ok, 0 skipped, 0 errors`, `notion_ops.tareas` restaurado con Efeonce 1345 rows y Sky 3989 rows.
+    - `ops-notion-conformed-sync`: PG drain `projects=152`, `sprints=35`, `tasks=5334`.
+    - DQ persistida quedó healthy: Efeonce `raw=60/conformed=60/diff=0`; Sky `raw=358/conformed=358/diff=0`.
+  - `notion.metrics.ftr_writeback_lag` ahora distingue backlog dormido por `NOTION_FTR_WRITEBACK_ENABLED` OFF de lag operativo real. No se esconde el conteo: queda como evidencia `lag_count_if_enabled`.
+  - `notion.correction_transitions.source_availability` ahora reporta `unknown` cuando `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED` está OFF, con métricas de cobertura visibles. Cuando el flag está ON mantiene thresholds 10/50 y alerta normal.
+  - Se reprocesó el retry de `notion_status_transition_capture` y quedó `noop:unchanged` sin error.
+  - Se agregó `NOTION_TOKEN` a Vercel `staging` desde Secret Manager para evitar recurrencia del retry en runtime staging.
+- **5 Release observer**:
+  - Root cause de los `unmatched`: eventos GitHub exitosos/no-failure sin release manifest se clasificaban como `unmatched`.
+  - `github-webhook-reconciler` ahora los marca `ignored` con `non_failure_without_release_manifest`; los failures sin manifest siguen `unmatched`.
+  - Remediación live: 2722 eventos benignos históricos reclasificados; últimos 24h quedan 0 `unmatched/failed`.
+  - Se agregó GitHub App observer config a Vercel `staging` (`GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF`) para que los readers no dependan de PAT personal.
+
+Validación:
+- `pnpm exec vitest run src/lib/release/github-webhook-reconciler.test.ts src/lib/reliability/queries/notion-correction-transitions-source-availability.test.ts src/lib/reliability/queries/notion-metrics-ftr-signals.test.ts src/lib/sync/reactive-consumer.test.ts` OK.
+- ESLint focal OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- SQL live: release `unmatched/failed` 24h = 0; reactive `active_infra_failures = 0`.
+- BigQuery/Cloud Run live: `notion-bq-sync` nueva revisión `notion-bq-sync-00017-pct` con 100% traffic; raw/conformed/DQ Notion healthy post-sync.
+- Visual capture pendiente: `pnpm fe:capture --route=/admin --env=staging --hold=3000` no pudo correr porque `.env.local` no expone `VERCEL_AUTOMATION_BYPASS_SECRET` en este checkout.
+
+# Sesion 2026-05-26 — browser diagnostics hook para usuario agente + Playwright/Chromium — ✅ DOC/SKILL
+
+Se agregó el contrato operativo que faltaba para que futuros agentes no dependan de que el usuario recuerde "usa el usuario agente, tienes Playwright y Chromium". Nueva skill Codex `.codex/skills/greenhouse-browser-diagnostics/SKILL.md` con metadata amplia para disparar en pedidos de abrir/revisar/diagnosticar/capturar/testear rutas Greenhouse. Regla sincronizada en `AGENTS.md`, `CLAUDE.md` y `project_context.md`: usar automáticamente `agent@greenhouse.efeonce.org` + `scripts/playwright-auth-setup.mjs` + Playwright/Chromium; para `dev-greenhouse.efeoncepro.com`, automatizar contra la URL staging `.vercel.app` con bypass, no pedir login ni navegar anónimo primero. También quedó canonizado el aprendizaje de esta sesión: `x-vercel-protection-bypass` debe aplicarse solo a origins Greenhouse/Vercel, no a terceros como Sentry.
+
+La auditoría anterior de `/admin` quedó versionada como documento reusable en `docs/audits/reliability/ADMIN_CENTER_RELIABILITY_AUDIT_2026-05-26.md`, con README de categoría e índice `docs/audits/README.md` actualizado.
+
+# Sesion 2026-05-26 — `/admin` reliability diagnostic + Sentry 429 root fix — 🔎 DIAGNOSIS + SMALL FIX
+
+Ruta revisada con usuario agente dedicado contra staging canónico (`greenhouse-eo-env-staging-efeonce-7670142f.vercel.app/admin`; el custom domain `dev-greenhouse.efeoncepro.com` redirige a Vercel SSO si no se usa el flujo de bypass). Captura guardada en `.captures/admin-diagnostic-2026-05-26T11-19-01-072Z/`. La página carga 200; los problemas visibles son señales reales del Reliability Control Plane, no errores de render.
+
+**Fix aplicado (código):** `src/lib/reliability/get-reliability-overview.ts` ya no consulta todos los `incidentDomainTag` de Sentry en paralelo. Sentry estaba devolviendo `HTTP 429` (`Limit is 5 requests in 1 seconds`) para Commercial/Delivery/Finance/Sync/etc. Se cambió a batches de 4 + pausa 1.1s. No silencia incidentes: reduce rate-limit para que el reader pueda mostrar la señal real. Validado: `pnpm exec eslint src/lib/reliability/get-reliability-overview.ts` OK, `pnpm exec tsc --noEmit --pretty false` OK.
+
+**Hallazgos subyacentes live (no resueltos en esta sesión):**
+- Notion/Delivery: `integration_data_quality_runs` broken para 2 spaces; raw Notion vacío (`raw=0`, conformed 313 y 59), checks `missing_in_raw`, `row_count_parity`, `raw_freshness`. `task_status_transitions`: 19 Efeonce + 116 Sky, pero coverage últimos 90d = 1902/1911 unavailable. Vercel env muestra `NOTION_TOKEN` en Production/Preview(develop), no en `staging`; `NOTION_STATUS_TRANSITIONS_*` solo Production.
+- FTR: 63 `task_ftr_snapshots` valid pending writeback >30m (53 Sky, 10 Efeonce), `attempted=0`; `NOTION_FTR_WRITEBACK_ENABLED` no está configurado, por diseño default OFF de TASK-903, así que el signal es esperado hasta decisión de activación o ajuste del signal pre-flag.
+- Finance: `account_balances.fx_drift` real en `global66-clp` (2026-04-04 drift CLP 1,778,789; 2026-03-06 drift CLP 1,034,522). `expense_distribution.unresolved` = 4 mayo 2026 (Santander, Nubox, X Capital, Luis Reyes). `finance.ledger.unresolved_drift_items` = 34 unanchored, settlement=0; inventory muestra 18 materiales/16 inmateriales, acknowledged=0; los 3 internal_transfer imbalances del inventory son el detector legacy que TASK-714d ya documentó como falso positivo.
+- Identity: 4 members Chile sin CL_RUT verificado (Felipe Zurita, Humberly Henriquez, Julio Reyes, Luis Reyes); 7 drift contract/relationship (honorarios/Deel con relación legal `employee` activa); 1 SCIM user interno sin member (`support@efeoncepro.com`); además 2 internos sin member en `session_360`.
+- Payroll: 13 `final_settlement_documents` legacy de Valentina Hoyos en `superseded` con `pdf_asset_id` cuyo asset no tiene `metadata_json.documentStatusAtRender`; max drift ~493h. No afecta cálculo, sí la coherencia de PDF/status hasta reissue o backfill metadata.
+- Release/platform: 58 GitHub release webhook events `unmatched` en 24h, 0 `failed`; `gh run list --status waiting` devolvió vacío. `GITHUB_RELEASE_OBSERVER_TOKEN` no aparece en Vercel env, por eso stale/pending/revision drift readers degradan a `unknown`.
+- Sync/reactive: outbox dead-letter está vacío, pero `outbox_reactive_log` conserva fallos no recuperados por handler, sobre todo `permission denied for schema greenhouse_serving` en commercial/member/person projections y `hubspot_services_intake` con `Sentry.captureException is not a function` (último 2026-05-09).
+
 # Sesion 2026-05-25 — TASK-933 Secret Manager cleanup Frame.io + causa raíz — ✅ COMPLETE
 
 Review + cierre del 2º quick-win de costo. Grace period OK (>24h, las v1-75 disabled sin que nada las re-habilitara; 0 consumers en repo — las refs a "frame.io" son catálogo de tools/URLs Notion, no los tokens). Flujo OAuth externo dormido desde 2026-03-24.

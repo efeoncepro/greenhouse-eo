@@ -413,6 +413,8 @@ export const processReactiveEvents = async (options?: {
   batchSize?: number
   domain?: ProjectionDomain
   circuitBreakerConfig?: CircuitBreakerConfig
+  handlerKeys?: string[]
+  replayFailedHandlers?: boolean
 }): Promise<ReactiveConsumerResult> => {
   const startMs = Date.now()
   const runId = `react-${randomUUID()}`
@@ -422,6 +424,14 @@ export const processReactiveEvents = async (options?: {
   const batchSize = options?.batchSize ?? 500
   const domain = options?.domain
   const breakerConfig = options?.circuitBreakerConfig ?? DEFAULT_CIRCUIT_BREAKER_CONFIG
+  const scopedHandlerKeys = options?.handlerKeys?.filter(Boolean) ?? []
+  const scopedHandlerKeySet = scopedHandlerKeys.length > 0 ? new Set(scopedHandlerKeys) : null
+
+  const scopedEventTypeSet = scopedHandlerKeys.length > 0
+    ? new Set(scopedHandlerKeys.map(handlerKey => handlerKey.split(':').slice(1).join(':')).filter(Boolean))
+    : null
+
+  const replayFailedHandlers = options?.replayFailedHandlers === true
   const actions: string[] = []
   const perProjection: Record<string, ReactiveProjectionStats> = {}
   let scopeGroupsFailed = 0
@@ -432,7 +442,11 @@ export const processReactiveEvents = async (options?: {
 
   const triggerEventTypes = getAllTriggerEventTypes(domain)
 
-  if (triggerEventTypes.length === 0) {
+  const eventTypesForFetch = scopedEventTypeSet
+    ? triggerEventTypes.filter(eventType => scopedEventTypeSet.has(eventType))
+    : triggerEventTypes
+
+  if (eventTypesForFetch.length === 0) {
     return {
       runId,
       eventsFetched: 0,
@@ -457,29 +471,58 @@ export const processReactiveEvents = async (options?: {
   // events behind: the post-processing acknowledgement guarantees they will
   // not be re-fetched.
 
+  const handlerKeys = scopedHandlerKeys.length > 0
+    ? scopedHandlerKeys
+    : eventTypesForFetch.flatMap(eventType =>
+        getProjectionsForEvent(eventType, domain).map(projection =>
+          buildReactiveHandlerKey(projection.name, eventType)
+        )
+      )
+
+  const replayPredicate = replayFailedHandlers
+    ? `OR EXISTS (
+          SELECT 1
+            FROM greenhouse_sync.outbox_reactive_log r
+           WHERE r.event_id = e.event_id
+             AND r.handler = ANY($2)
+             AND r.result IN ('retry', 'dead-letter')
+             AND r.acknowledged_at IS NULL
+             AND r.recovered_at IS NULL
+        )`
+    : ''
+
+  const replayOrderBy = replayFailedHandlers
+    ? `CASE WHEN EXISTS (
+          SELECT 1
+            FROM greenhouse_sync.outbox_reactive_log r
+           WHERE r.event_id = e.event_id
+             AND r.handler = ANY($2)
+             AND r.result IN ('retry', 'dead-letter')
+             AND r.acknowledged_at IS NULL
+             AND r.recovered_at IS NULL
+        ) THEN 0 ELSE 1 END,
+        e.occurred_at ASC`
+    : 'e.occurred_at ASC'
+
   const events = await runGreenhousePostgresQuery<ReactiveEventRow>(
     `SELECT e.event_id, e.aggregate_type, e.aggregate_id, e.event_type, e.payload_json, e.occurred_at
        FROM greenhouse_sync.outbox_events e
       WHERE e.status = 'published'
         AND e.event_type = ANY($1)
-        AND NOT EXISTS (
-          SELECT 1
-            FROM greenhouse_sync.outbox_reactive_log r
-           WHERE r.event_id = e.event_id
-             AND r.handler = ANY($2)
+        AND (
+          NOT EXISTS (
+            SELECT 1
+              FROM greenhouse_sync.outbox_reactive_log r
+             WHERE r.event_id = e.event_id
+               AND r.handler = ANY($2)
+          )
+          ${replayPredicate}
         )
-      ORDER BY e.occurred_at ASC
+      ORDER BY ${replayOrderBy}
       LIMIT $3`,
     [
-      triggerEventTypes,
-
-      // Pre-compute every possible handler key for the trigger events. Keeps
-      // the NOT EXISTS subquery tight and indexable.
-      triggerEventTypes.flatMap(eventType =>
-        getProjectionsForEvent(eventType, domain).map(projection =>
-          buildReactiveHandlerKey(projection.name, eventType)
-        )
-      ),
+      eventTypesForFetch,
+      handlerKeys,
       batchSize
     ]
   )
@@ -541,9 +584,15 @@ export const processReactiveEvents = async (options?: {
       continue
     }
 
-    const projections = getProjectionsForEvent(event.event_type, domain)
+    const projections = getProjectionsForEvent(event.event_type, domain).filter(projection => {
+      if (!scopedHandlerKeySet) return true
+
+      return scopedHandlerKeySet.has(buildReactiveHandlerKey(projection.name, event.event_type))
+    })
 
     if (projections.length === 0) {
+      if (scopedHandlerKeySet) continue
+
       noOpAcks.push({
         eventId: event.event_id,
         handler: NO_HANDLER_SENTINEL,

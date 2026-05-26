@@ -66,6 +66,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - **Vercel CLI (`vercel`)**: autenticado contra el team `efeonce-7670142f`. Sirve para env vars, deployments, project config.
 - **PostgreSQL CLI (`psql`)** via `pnpm pg:connect`: levanta proxy Cloud SQL + conexion auto, sin credenciales manuales.
 - **Frontend Capture (`pnpm fe:capture`)**: helper canonico Playwright + agent auth para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patron ad-hoc de `_cap.mjs`. Scenario DSL declarativo bajo `scripts/frontend/scenarios/`. Output `.captures/<ISO>_<scenario>/` (gitignored). Triple gate para production. Comandos: `pnpm fe:capture <scenario> --env=staging [--gif] [--headed]` o `pnpm fe:capture --route=/path --env=staging --hold=3000`. GC: `pnpm fe:capture:gc [--apply]` purga >30d. Doc: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`. Usalo cuando una verificacion visual o de microinteractions sea util — sale del ciclo "escribo un _cap.mjs cada vez".
+- **Hook operativo de browser diagnostics:** si el usuario pide abrir, revisar, diagnosticar, capturar o testear una ruta/URL del portal, invocar automaticamente `greenhouse-browser-diagnostics` y usar usuario agente dedicado + Playwright/Chromium. No pedir login al usuario ni navegar anonimo como primer intento. Para `dev-greenhouse.efeoncepro.com`, automatizar contra la URL `.vercel.app` canonica con bypass, salvo que el objetivo sea inspeccionar la SSO wall.
 
 **Regla operativa**: si diagnosticas que la causa raiz de un incidente vive en una de estas plataformas, ejecuta el fix con el CLI con guardrails y verificacion. Documentar pasos manuales para que el usuario los haga es **antipatron** salvo que la accion sea destructiva (eliminar app registration, drop database, force-push), en cuyo caso confirma con el usuario primero.
 
@@ -552,6 +553,7 @@ La skill referencia obligatoriamente `docs/operations/PRODUCTION_RELEASE_INCIDEN
 ### Agent Auth (acceso headless para agentes y E2E)
 
 - Endpoint: `POST /api/auth/agent-session` — genera un JWT NextAuth válido sin pasar por login interactivo.
+- **Regla de uso:** cualquier diagnostico de ruta con browser/Chromium/Playwright debe usar este flujo por defecto con el usuario dedicado de agente. Si hace falta bypass de Vercel, enviarlo solo a origins Greenhouse/Vercel; no propagar `x-vercel-protection-bypass` a terceros como Sentry.
 - Requiere `AGENT_AUTH_SECRET` en `.env.local`. Sin esa variable, el endpoint devuelve 404.
 - **Bloqueado en production** por defecto (`VERCEL_ENV === 'production'` → 403), salvo `AGENT_AUTH_ALLOW_PRODUCTION=true`.
 - El caller envía `{ secret, email }` y recibe `{ cookieName, cookieValue, portalHomePath }` para montar la cookie de sesión.

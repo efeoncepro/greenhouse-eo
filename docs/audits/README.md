@@ -13,8 +13,10 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 ## Categorias
 
 - [Design Tokens](design-tokens/README.md)
+- [Cloud Cost](cloud-cost/README.md)
 - [Finance](finance/README.md)
 - [ICO](ico/README.md)
 - [Notion](notion/README.md)
 - [Payroll](payroll/README.md)
+- [Reliability](reliability/README.md)
 - [Sentry](sentry/README.md)
