@@ -1,3 +1,17 @@
+# Sesion 2026-05-25 — TASK-932 Artifact Registry cleanup flip a enforced — ✅ COMPLETE
+
+Review + cierre del quick-win de costo. Corrí el script de verificación (read-only) >24h después de crear la task. **Hallazgo de la review**: la "2da señal" via Cloud Logging **no es obtenible** — el cleanup dry-run de Artifact Registry NO emite logs de evaluación per-corrida queryables (`resource.type="artifactregistry.googleapis.com/Repository"` vacío); es un job interno periódico. El gate original habría dejado la task bloqueada para siempre esperando una señal que en ese formato no llega.
+
+**Corrección del gate**: señal-2 = **verificación post-flip** (enforced + 4 workers healthy con imagen viva intacta), válida porque el flip es reversible (1 comando vuelve a dry-run) y la señal-1 (mirror exacto de la policy + hard gate) salió **0 colisiones**. Operador aprobó el flip con ese criterio.
+
+- Flip aplicado: `set-cleanup-policies gcr.io ... --no-dry-run` (KEEP-15 + DELETE >14d).
+- Verificado: `cleanupPolicyDryRun=null` (antes True); 643 versiones, 479 a borrar, **4 vivas preservadas** (hard gate=0); ~138GB/~$13,8/mo.
+- 4 workers post-flip en sus revisiones vivas pre-flip (ops `...00278-l8v`, commercial `...00210-5sf`, ico-batch `...00118-cbj`, hubspot `/health` 200) → imagen intacta.
+- Repo size (~201GB) baja async (GC de AR en horas/días).
+- **Rollback**: re-set policy con `--dry-run` o `delete-cleanup-policies`.
+
+---
+
 # Sesion 2026-05-25 — TASK-936 dedup doble conteo P&L — 🔄 IN-PROGRESS (Audit done, premise corregida, dry-run pendiente)
 
 Skills arch + finance en loop. La validación de TASK-929/934 reveló **doble conteo en P&L**: el neto de nómina de varios colaboradores aparece 2x en `expenses` (la nómina devengada `EXP-202xxx` + un `EXP-RECON-* "Envío a X"` que paga esa misma nómina).

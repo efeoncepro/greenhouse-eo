@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Bajo`
 - Effort: `Bajo`
 - Type: `ops`
 - Epic: `optional`
-- Status real: `Esperando segunda señal (GCP dry-run log)`
+- Status real: `COMPLETE 2026-05-25 — flip a enforced aplicado + verificado. Gate de señal-2 corregido (ver Delta).`
 - Rank: `TBD`
 - Domain: `ops|cloud|cost`
 - Blocked by: `GCP dry-run evaluation timer (AR evalúa la policy en horas / hasta ~24h)`
@@ -107,6 +107,21 @@ gcloud artifacts repositories set-cleanup-policies gcr.io \
 - [ ] `Handoff.md` actualizado con ahorro real
 - [ ] `changelog.md` actualizado
 - [ ] `TASK_ID_REGISTRY.md` refleja lifecycle final
+
+## Delta 2026-05-25 — Flip a enforced aplicado + corrección del gate de señal-2
+
+**Review (2026-05-25)**: se corrió el script de verificación >24h después de crear la task. Hallazgo: la **señal 2 (logs de evaluación dry-run en Cloud Logging) NO apareció** — y no es timing, es estructural: el cleanup dry-run de Artifact Registry **no emite logs de evaluación per-corrida queryables** vía `resource.type="artifactregistry.googleapis.com/Repository"` (es un job interno periódico que no instrumenta cada evaluación a Cloud Logging). El gate original habría dejado la task bloqueada indefinidamente esperando una señal que en ese formato no llega.
+
+**Corrección del gate**: la señal-2 obtenible no es Cloud Logging sino la **verificación post-flip** (estado enforced + 4 workers healthy con imagen viva intacta), válida porque el flip es **reversible** (vuelve a dry-run en 1 comando) y la señal-1 (mirror exacto de la policy + hard gate) salió **0 colisiones**. El operador aprobó el flip con este criterio.
+
+**Aplicado (con OK del operador)**:
+- `gcloud artifacts repositories set-cleanup-policies gcr.io --location=us --project=efeonce-group --policy=... --no-dry-run` → enforced.
+- Verificado: `cleanupPolicyDryRun = null` (antes `True`); las 2 reglas activas (KEEP-15 + DELETE >14d).
+- Señal-1 al momento del flip: 643 versiones totales, **479 a borrar**, **hard gate = 0** (las 4 imágenes vivas preservadas), ~138 GB / ~$13,8/mes.
+- 4 workers healthy post-flip: hubspot `/health` 200; ops-worker `...00278-l8v`, commercial `...00210-5sf`, ico-batch `...00118-cbj` = mismas revisiones vivas que pre-flip (imagen intacta).
+- Repo size baja async (GC de AR en horas/días).
+
+**Rollback**: `gcloud artifacts repositories set-cleanup-policies gcr.io --location=us --project=efeonce-group --policy=... --dry-run` (vuelve a dry-run) o `delete-cleanup-policies`.
 
 ## Delta 2026-05-24
 
