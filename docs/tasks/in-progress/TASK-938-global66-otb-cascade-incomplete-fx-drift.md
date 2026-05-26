@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -169,7 +169,28 @@ Sin flag — recovery one-time + (si aplica) fix de contrato. Dry-run obligatori
 - **NUNCA** DELETE manual de account_balances — usar el cascade.
 - **SIEMPRE** dry-run + autorización antes de mutar finance.
 
-## Open Questions
+## Slice 1 — Findings (read-only, 2026-05-26) — CONFIRMADO regresión sistémica
 
-- ¿El rematerialize del dedup (TASK-936/929) re-crea filas pre-genesis? (Slice 1 lo confirma — define si hay fix sistémico Slice 3.)
-- ¿Hay otras cuentas con OTB re-anchor afectadas por la misma regresión? (escanear post-Slice 1.)
+**Timeline decisivo (timestamps PG):**
+
+| Evento | Timestamp |
+|---|---|
+| OTB 04-05 declarado + cascade (borra pre-genesis) | 2026-04-28 01:21 |
+| account_balances pre-genesis (03-24..04-04) CREADOS | 2026-04-28 **23:07** (~22h DESPUÉS del cascade) |
+| account_balances post-genesis (04-05, 04-06) | 2026-04-29 09:00 |
+
+Las filas pre-genesis fueron re-creadas ~22h después del cascade que las borró. NO fue el dedup reciente (los timestamps son del 04-28, no del 05-24).
+
+**Mecanismo exacto** (`account-balances-rematerialize.ts:186-270`):
+- `seedMode='active_otb'` (default): usa `otb.genesisDate` como seed → seguro, nunca pre-genesis.
+- `seedMode='explicit'`: usa `input.seedDate` directo. Un rematerialize explicit seedeado < genesis (como el del 04-28 23:07) materializa días pre-genesis, deshaciendo el prune del cascade. **No hay genesis-floor.**
+
+**Corrección de supuesto previo:** el cascade nuevo (`20260428085056958` "cascade-only-ledger-not-costs") por diseño NO toca expense/income_payments (solo settlement_legs + DELETE account_balances). Que los payments tengan `superseded_by_otb_id=0` es CORRECTO, no síntoma. El síntoma es las filas account_balances pre-genesis que no debieron existir.
+
+**Recurrencia real:** el daily cron `ops-finance-rematerialize-balances` usa ventana rolling 7 días (>> genesis 04-05), así que NO re-toca pre-genesis — las filas stale del 04-28 no se regeneran en operación normal. El riesgo es solo un rematerialize histórico manual seedeado < genesis. Aún así, el fix robusto (no bandaid) es el genesis-floor (Slice 3) para que NINGÚN rematerialize pueda re-introducir pre-genesis.
+
+## Open Questions — RESUELTAS pre-execution (2026-05-26)
+
+- **Q1 — ¿El rematerialize re-crea filas pre-genesis?** → **SÍ, confirmado.** Mecanismo: `seedMode='explicit'` sin genesis-floor (ver Slice 1 findings). → Justifica Slice 3 (genesis-floor) como fix sistémico, no solo Slice 2 one-time.
+- **Q2 — ¿Otras cuentas con OTB re-anchor afectadas?** → Escanear en Slice 1.5 (read-only): cualquier cuenta con `account_balances.balance_date < su OTB activo genesis_date`. Si aparecen, el cascade + genesis-floor las cubre igual (fix genérico).
+- **Decisión de diseño (robusta, no bandaid):** Slice 3 (genesis-floor en el rematerializer, ambos modos: si `seedDate < otb.genesisDate` → clamp a genesis + opening del OTB + warn `captureWithDomain('finance')`) ANTES de Slice 2 (cleanup one-time via cascade), para que el cleanup no se deshaga. Clamp (no throw) para no romper callers legítimos; el clamp es "correcto por construcción" (no se puede materializar antes del anchor).
