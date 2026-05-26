@@ -1,3 +1,27 @@
+# Sesion 2026-05-26 — TASK-937 AI Observer reliability hardening — ✅ COMPLETE (live-verified)
+
+El AI Observer (TASK-638) llevaba días mostrando "AI Observer no activo" en `/admin` aunque el flag estaba ON, el cron horario disparaba y Vertex respondía. Causa raíz (una sola falla de diseño): la liveness se infería del **output** (una fila `overview` fresca) en vez de un **run record propio**. Combinado con dos síntomas: (A) `gemini-2.5-flash` truncaba el JSON ~5/6 corridas porque corre con *thinking* ON por default y se comía el `maxOutputTokens`; (B) el overview se deduplica por fingerprint determinístico → postura estable = no re-persiste → la ventana de 24h del reader lo escondía → banner falso.
+
+Fix shipped (5 commits `48a3e7f6`→`8191ed9b`, develop directo por instrucción operador):
+
+- **S1 — config modelo**: `thinkingConfig:{thinkingBudget:0}` + `maxOutputTokens 4096` + captura de `finishReason` (distingue `MAX_TOKENS` de JSON malformado).
+- **S2/2b — heartbeat**: cada sweep escribe un run record en `source_sync_runs` (`source_system='reliability_ai_observer'`, reusa el primitivo canónico, NO tabla nueva) vía wrapper boundary non-blocking + índice parcial. Status mapping respeta el CHECK enum real (`disabled→cancelled`, `parse-fail→failed`, `persist/dedup→succeeded`).
+- **S3 — signal**: `reliability.ai_observer.unhealthy` (moduleKey `cloud`) lee el heartbeat, NO la frescura del overview. Severidad: sin runs→awaiting_data, >2.5h→error, disabled→not_configured, ≥4 failed→error, 1-3 failed→warning.
+- **S4 — banner honesto**: reader con ventana asimétrica (overview sin filtro de edad con label "hace X"; módulos 24h para no contaminar `ai_summary` del RCP vivo) + 4 estados (not_configured / unhealthy / render / empty).
+
+Revisado pre-execution con `arch-architect` (4-pillar) + `gcp-vertex-ai` (shape `thinkingBudget` confirmado en `@google/genai@1.45`). Correcciones de Audit: status `skipped` no existe en el CHECK → remap; índice parcial agregado; `finishReason` agregado.
+
+Verificación en vivo (cron forzado tras deploy ops-worker, run `26449627163`):
+- Sweep: `done — evaluated=5 persisted=5 skipped=0` (antes `skipped parse_failed`).
+- Heartbeat: `status=succeeded`, notes `persisted=5 evaluated=5`.
+- Overview: fresco (<1min; antes stale 4 días).
+- Signal `reliability.ai_observer.unhealthy`: `ok`.
+- Reader devuelve overview → banner renderiza el resumen real.
+
+Gates: full suite **5419 passed / 0 failed**, build ✓, tsc ✓, lint ✓. 15 tests nuevos. Spec: `docs/tasks/complete/TASK-937-ai-observer-reliability-hardening.md`.
+
+---
+
 # Sesion 2026-05-26 — Remediación audit `/admin` hallazgos 1, 2 y 5 — ✅ PARTIAL ROOT FIX
 
 Se resolvieron los hallazgos pedidos de forma root-cause, sin silenciar UI:

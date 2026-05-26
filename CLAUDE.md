@@ -916,6 +916,28 @@ Cuatro patrones que evitan que el dashboard muestre falsos positivos o señales 
 - **NO** leer Playwright results desde filesystem en runtime (Vercel/Cloud Run no tienen el archivo). Usar `greenhouse_sync.smoke_lane_runs`. El fallback fs queda solo para dev local.
 - **NO** usar `Sentry.captureException()` directo en code paths con dominio claro — el tag `domain` no se setea y el módulo correspondiente NUNCA ve el incidente. Usar `captureWithDomain()`.
 
+### Async observer liveness — heartbeat, no output freshness (TASK-937, desde 2026-05-26)
+
+Cuando un proceso async produce un artefacto que también se **deduplica** (el AI Observer del RCP persiste `overview`/módulos solo si el fingerprint del snapshot cambió), su **liveness NO puede inferirse de la frescura de su output**. Una postura estable hace que el artefacto no se re-persista por días — eso es sano, no "apagado". El bug class (TASK-637/638 → TASK-937, detectado live 2026-05-26): el banner `/admin` gateaba "AI Observer no activo" sobre una observación `overview` fresca en ventana de 24h; con el portal estable el overview no se re-persistía (4 días) → banner falso, aunque el cron horario corría y Vertex respondía.
+
+**El patrón canónico desacopla tres preguntas distintas que NO deben colapsarse en un booleano**:
+
+| Pregunta | Fuente de verdad | NUNCA |
+|---|---|---|
+| ¿El proceso **corre**? | heartbeat append-only en `greenhouse_sync.source_sync_runs` | inferir de la frescura/presencia del output |
+| ¿Está **sano**? | reliability signal que lee el heartbeat | medir solo "hay output reciente" |
+| ¿Hay **artefacto fresco**? | el último artefacto (sin filtro de edad, con label "hace X") | esconderlo tras una ventana que se confunde con "apagado" |
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** inferir la liveness de un observer/cron/proyección async desde la frescura de su output cuando ese output se deduplica. Liveness = heartbeat propio.
+- **NUNCA** crear tabla de run-tracking nueva para un heartbeat. Reusar `source_sync_runs` con un `source_system` nuevo (precedentes: `reactive_worker`, `reliability_synthetic`, `reliability_ai_observer`). El `status` debe respetar el CHECK enum (`running|succeeded|failed|partial|cancelled`) — `skipped` NO existe; mapear "deshabilitado" a `cancelled` y "falló" a `failed`.
+- **NUNCA** dejar que el heartbeat rompa el proceso principal. Va en wrapper boundary con `try/catch + warn` (non-blocking).
+- **NUNCA** togglear off el `thinkingConfig:{thinkingBudget:0}` del AI Observer (`src/lib/reliability/ai/runner.ts`). `gemini-2.5-flash` corre con *thinking* ON por default y quema el `maxOutputTokens` → trunca el JSON estructurado (`unbalanced_or_truncated_json`). Con `responseSchema` (constrained decoding) + thinking apagado + budget adecuado, el JSON sale válido. Loggear `candidates[0].finishReason` para distinguir `MAX_TOKENS` (truncado por budget) de JSON malformado.
+- **SIEMPRE** que un async path nuevo necesite "¿está vivo/sano?", shippear (a) heartbeat en `source_sync_runs`, (b) reliability signal que lo lee, (c) el reader del artefacto distingue `loading|empty|degraded|healthy_stable` sin colapsar en un estado ambiguo.
+
+**Spec canónica**: `docs/tasks/complete/TASK-937-ai-observer-reliability-hardening.md`. Helpers: `src/lib/reliability/ai/ai-observer-run-tracker.ts` (heartbeat), `src/lib/reliability/queries/ai-observer-unhealthy.ts` (signal `reliability.ai_observer.unhealthy`, moduleKey `cloud`).
+
 ### Platform Health API Contract — preflight programático para agentes (TASK-672)
 
 Contrato versionado `platform-health.v1` que un agente, MCP, Teams bot, cron de CI o cualquier app puede consultar antes de actuar. Compone Reliability Control Plane + Operations Overview + runtime checks + integration readiness + synthetic monitoring + webhook delivery + posture en una sola respuesta read-only con timeouts por fuente y degradación honesta.

@@ -323,4 +323,4 @@ Implementación directa en `develop` por instrucción explícita del operador (2
 
 **Correcciones de Audit (pre-execution):** status `skipped`→ mapeo a `cancelled|failed|succeeded` (CHECK enum real); índice parcial agregado (Slice 2b); `finishReason` (review GCP/Vertex). **Open Questions:** Q1 cadencia 1h, Q2 dashboard-only, Q3 moduleKey `cloud` — todas resueltas.
 
-**Cierre de docs diferido (no bloqueante):** `Handoff.md` + `changelog.md` + sección CLAUDE.md tenían WIP sin commitear de otra sesión en el working tree al momento del cierre → no se tocaron para no entrelazar trabajo ajeno. Pendiente: entrada en Handoff/changelog + (opcional) invariante CLAUDE.md sobre el patrón "liveness por heartbeat, no por output".
+**Cierre de docs — COMPLETO 2026-05-26.** El WIP de otra sesión (remediación audit `/admin`) que bloqueaba el working tree fue commiteado por el operador (`a22390d9`); con el tree limpio se sincronizaron: `Handoff.md` (sección TASK-937 COMPLETE), `changelog.md` (entrada 2026-05-26) y `CLAUDE.md` (invariante nuevo "Async observer liveness — heartbeat, no output freshness").
