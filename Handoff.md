@@ -1,3 +1,19 @@
+# Sesion 2026-05-26 — TASK-938 Global66 OTB cascade incompleto → fx_drift — ✅ COMPLETE (cero mutación de saldos)
+
+El smoke `finance-account-balances-fx-drift.spec.ts` (Playwright develop) fallaba porque el signal `finance.account_balances.fx_drift` reportaba `error` (2 drifts en global66-clp). **No era TASK-937 ni false-positive del detector.**
+
+**Causa raíz (Slice 1, read-only):** el rematerializer en modo `explicit` seedeado < genesis del OTB activo re-crea `account_balances` pre-anchor que el cascade TASK-703b había borrado. Confirmado por timestamps: filas pre-genesis de global66 creadas 2026-04-28 23:07, ~22h DESPUÉS del cascade (01:21). El rematerializer no tenía genesis floor. **Scope: 4 cuentas** (global66 30 + santander-clp 333 + santander-usd 303 + sha-cca 303), todas OTBs legítimos; solo global66 trippea el detector (días pre-genesis con payments en ventana 90d).
+
+**Fix (2 slices, develop directo):**
+- **Slice 3** — `applyGenesisFloor` (pura) en `rematerializeAccountBalanceRange`: clampea seed al genesis del OTB activo cuando seed < genesis. Previene recurrencia en las 4 cuentas. Rolling jobs (TASK-871) seedean >> genesis → nunca se dispara.
+- **Slice 2 (pivot por seguridad)** — el operador (con razón) tuvo miedo de mutar saldos bancarios. En vez de borrar filas (mutación + wrinkle de itx legs Santander↔global66 no resuelto), el detector `fx_drift` ahora **ignora fechas < genesis del OTB activo** (son pre-anchor; el OTB las absorbe). **Cero mutación de datos.**
+
+**Verificación de seguridad (read-only, antes de cualquier cambio):** saldo vigente global66 (-2.603,41) NO depende de filas pre-genesis (anchor 04-05 opening=8.562 independiente); 8 expense_payments reales intactos; 0 filas cerradas. Signal verificado en vivo: `error(2)` → `ok` sin tocar un saldo. Gate: build ✓, 5426 tests / 0 fail, tsc ✓, lint ✓.
+
+**Diferido (no urgente, no ejecutado):** limpieza física de las ~970 filas pre-genesis stale (4 cuentas) — bloqueado por wrinkle de transferencias internas (TASK-714) + blast radius 2025 + requiere review finance. No necesario para apagar la alarma (el detector + genesis floor ya lo resuelven). Spec: `docs/tasks/complete/TASK-938-global66-otb-cascade-incomplete-fx-drift.md`.
+
+---
+
 # Sesion 2026-05-26 — RpA V2 Notion raw alias contract — implemented
 
 - Owner: Codex.

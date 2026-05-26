@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -23,6 +23,20 @@
 ## Summary
 
 El signal `finance.account_balances.fx_drift` reporta `error` (2 drifts en `global66-clp`, fechas 2026-03-06 y 2026-04-04) y eso hace fallar el smoke `finance-account-balances-fx-drift.spec.ts` (Playwright en develop). **NO es false-positive del detector ni regresión de TASK-937** — es un **OTB cascade incompleto**: el OTB re-anchor bank-verified de 04-05 ($8.562) existe, pero las transacciones/`account_balances` pre-genesis no quedaron superseded/pruned. Esta task completa el cascade (recovery) e investiga la causa de por qué quedó incompleto (posible regresión: el rematerialize del dedup reciente re-creó filas pre-genesis).
+
+## Delta 2026-05-26 — Execution log (approach pivot por seguridad)
+
+Implementada en `develop` (sin branch, instrucción operador). **El approach pivotó de "borrar filas" a "detector con genesis floor" porque el operador (con razón) tuvo miedo de mutar saldos bancarios.** Verificación read-only exhaustiva antes de decidir.
+
+- **Slice 1 (read-only):** CONFIRMADO regresión sistémica. Las filas pre-genesis de global66 se crearon 2026-04-28 23:07, ~22h DESPUÉS del cascade (01:21) que las borró. El rematerializer en modo `explicit` seedeado < genesis las re-creó (no tenía genesis floor).
+- **Slice 1.5 (read-only):** el scope son **4 cuentas** con filas pre-genesis (global66 30 + santander-clp 333 + santander-usd 303 + sha-cca 303), todas OTBs legítimos del 27-28/04. Solo global66 trippea el detector (sus días pre-genesis con payments caen en la ventana de 90d).
+- **Slice 3 (SHIPPED):** genesis floor en `rematerializeAccountBalanceRange` (`applyGenesisFloor` pura + clamp + `captureWithDomain` warning + `genesisFloorApplied` en result). Previene recurrencia en las 4 cuentas. 5 tests.
+- **Slice 2 (SHIPPED — versión segura, cero mutación):** en vez de borrar filas (mutación de saldos + wrinkle de itx legs Santander→global66 que no tracé al 100%), el detector `fx_drift` ahora **ignora fechas < genesis del OTB activo** (son pre-anchor; el OTB las absorbe). Verificado en vivo read-only: signal pasó de `error(2)` → `ok`, sin tocar ningún saldo.
+- **Verificación de seguridad (read-only) antes del pivot:** (1) saldo vigente global66 (-2.603,41) NO depende de filas pre-genesis (el día del anchor 04-05 tiene opening=8.562 independiente); (2) los 8 expense_payments reales pre-genesis NO se tocan; (3) 0 de las 30 filas están cerradas; (4) el cascade marcaría 5 itx legs entrantes (Santander→global66) solo de un lado → wrinkle no resuelto → por eso NO se ejecutó el borrado.
+
+### Diferido a follow-up (NO ejecutado, no urgente)
+
+Limpieza física de las ~970 filas pre-genesis stale (4 cuentas) vía cascade. Bloqueado por: (a) wrinkle de transferencias internas (superseder un lado del par Santander↔global66 puede desbalancear, área TASK-714); (b) alto blast radius (940 filas 2025 en santander/sha-cca); (c) requiere review finance de si esos OTBs 02-28 deben absorber historia 2025. **No es necesario para apagar la alarma ni el smoke** — el detector + el genesis floor ya lo resuelven sin tocar plata. Las filas quedan como ruido inofensivo (no afectan saldos vigentes).
 
 ## Why This Task Exists
 
