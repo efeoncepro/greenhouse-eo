@@ -87,6 +87,14 @@ export interface AiSweepSummary {
   promptTokens: number | null
   outputTokens: number | null
   skippedReason: string | null
+
+  /**
+   * TASK-937 — `finishReason` del candidate de Gemini en el path que falló
+   * (parse-fail / empty response). `MAX_TOKENS` distingue "truncado por
+   * budget" de "JSON malformado" — diagnóstico clave para el heartbeat.
+   * null cuando el sweep no falló o no hay candidate.
+   */
+  finishReason: string | null
 }
 
 export interface AiSweepResult {
@@ -151,7 +159,17 @@ const BASE_GENERATION_CONFIG = {
   temperature: 0.1,
   responseMimeType: 'application/json',
   responseSchema: AI_RESPONSE_SCHEMA,
-  maxOutputTokens: 2048
+  maxOutputTokens: 4096,
+
+  /**
+   * TASK-937 — gemini-2.5-flash tiene *thinking* ON por default y quema el
+   * budget de output en reasoning tokens, truncando el JSON estructurado
+   * (`unbalanced_or_truncated_json` en ~5/6 corridas). La tarea es extracción
+   * determinística de un snapshot — baja necesidad de reasoning. Apagar
+   * thinking libera el budget y, junto con `responseSchema` (constrained
+   * decoding), garantiza JSON válido. También baja costo y latencia.
+   */
+  thinkingConfig: { thinkingBudget: 0 }
 } as const
 
 const stripJsonFence = (raw: string): string => {
@@ -284,6 +302,7 @@ const buildSummary = (
     promptTokens: null,
     outputTokens: null,
     skippedReason: null,
+    finishReason: null,
     ...overrides
   }
 }
@@ -329,7 +348,10 @@ export const runReliabilityAiObserver = async ({
     return {
       summary: buildSummary(
         { sweepRunId, startedAt, triggeredBy, model },
-        { skippedReason: 'Gemini returned empty response' }
+        {
+          skippedReason: 'Gemini returned empty response',
+          finishReason: response.candidates?.[0]?.finishReason ?? null
+        }
       ),
       observations: []
     }
@@ -370,7 +392,10 @@ export const runReliabilityAiObserver = async ({
     return {
       summary: buildSummary(
         { sweepRunId, startedAt, triggeredBy, model },
-        { skippedReason: `Gemini response was not valid JSON after schema retry (${invalidJsonReason ?? 'unknown'})` }
+        {
+          skippedReason: `Gemini response was not valid JSON after schema retry (${invalidJsonReason ?? 'unknown'})`,
+          finishReason: responseForUsage.candidates?.[0]?.finishReason ?? null
+        }
       ),
       observations: []
     }
