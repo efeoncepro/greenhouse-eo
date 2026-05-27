@@ -61,7 +61,11 @@ Mismo patrón de status en el worker de Finance.
 
 ### Finance — root cause SEPARADO
 
-Finance no usa BQ (escribe a `greenhouse_serving.finance_ai_signals` en PG, lee `greenhouse_finance.client_economics` en PG) → **no** tiene el bug de timestamp. Su vacío se debe a que **falta `client_economics` de Mayo 2026** (materialización financiera atrasada): el job corre para mayo, evalúa 0 snapshots, produce 0 señales y queda `succeeded` por el mismo falso-sano.
+Finance no usa BQ (escribe a `greenhouse_serving.finance_ai_signals` en PG, lee `greenhouse_finance.client_economics` en PG) → **no** tiene el bug de timestamp.
+
+**Verificado 2026-05-27 (corrige el framing inicial "client_economics atrasada"):** el vacío de Finance Mayo es **benigno**. `client_economics` es una projection reactiva que materializa cuando cierra el payroll del mes; funciona por diseño. Estado real: último `client_economics` = **Abril** (computado 2026-05-08, post-export de payroll Abril); **NO existe payroll period de Mayo** (último cierre = Abril `exported` 2026-05-01); 0 `cost_allocations` Mayo. Mayo está **abierto** → legítimamente sin economics. **`client_economics` NO está roto y no hay nada que backfillear.**
+
+El defecto real de Finance es **scoping + falso-sano**: el cron Finance AI corre sobre el **mes corriente** (`getRollingPeriods` desde `now`) → consulta un período abierto sin materializar → 0 signals → `succeeded` engañoso. Fix: scopear al último período cerrado (Abril) + degradación honesta que distinga "período abierto sin data" (skip benigno) de "data elegible no procesada" (degraded). NO requiere ISSUE separado — `client_economics` opera correctamente.
 
 ## Blast radius (verificado)
 

@@ -118,9 +118,21 @@ Recomendación inicial: **(A)** para BQ (alineado a MERGE TASK-900), **(B) atóm
 
 - Post-fix: re-materializar Mar/Abr/May (idempotente) → re-enriquecer → reproyectar PG. Verificar `generated_at IS NOT NULL` + serving fresco. Dry-run primero.
 
-### Slice 7 — Finance client_economics gap
+### Slice 7 — Finance: scoping + honest degradation (NO backfill de Mayo)
 
-- Materializar `greenhouse_finance.client_economics` Mayo 2026 (root cause separado del timestamp). Confirmar que tras el backfill Finance produce señales.
+**Verificado 2026-05-27 (corrige el framing inicial de Codex):** el vacío de Finance Mayo es **benigno**. Mayo está **abierto** — NO existe payroll period de Mayo (último cierre = Abril, `exported` 2026-05-01); `client_economics` llega a Abril (computado 2026-05-08, post-export); 0 `cost_allocations` Mayo. `client_economics` es reactiva y **funciona por diseño** (materializa cuando cierra el payroll del mes). **NO hay nada que backfillear y NO está roto. NO requiere ISSUE separado.**
+
+El defecto real es **scoping + falso-sano**, no data faltante:
+- El cron Finance AI (`getRollingPeriods` desde `now`) corre sobre el **mes corriente** (Mayo) → consulta economics de un período abierto sin materializar → 0 signals → `succeeded` engañoso.
+- Fix: scopear el cron Finance AI al **último período materializado/cerrado** (Abril), o tolerar período abierto sin economics como **skip honesto**.
+- El invariante del Slice 2 (Finance) debe **distinguir** "0 porque el período está abierto y aún no hay data elegible" (skip benigno) de "0 porque hay data elegible pero no se procesó" (degraded). No todo 0 es falla — pero ningún 0 sobre data elegible es `succeeded`.
+
+### Slice 8 — Recurrence prevention (guard mecánico, anti-bandaid)
+
+El bug de timestamp puede regresar el día que alguien escriba otro BQ DML UNNEST. Hoy **no existe guard mecánico** (verificado). Cerrar la clase, no solo el caso:
+- **Lint rule** `greenhouse/no-bq-struct-string-timestamp` (modo `error`): detecta `INSERT … SELECT FROM UNNEST(@rows)` con `types` declarando un campo `TIMESTAMP`/`DATETIME`/`DATE` cuyo valor JS se construye como string ISO en lugar de `Date` / `BigQuery.timestamp()` / STRING-con-CAST-en-SELECT. Patrón fuente: `no-untokenized-fx-math`, `no-extract-epoch-from-date-subtraction`.
+- **Helper canónico** de serialización de timestamps para structs BQ DML (e.g. `toBqTimestampStructField`) — todos los writers BQ DML lo usan; único lugar que decide la representación correcta.
+- **CLAUDE.md hard rules** nuevas: (a) "Nunca pasar timestamp como ISO string en un `ARRAY<STRUCT<TIMESTAMP>>` de BQ DML; usar el helper canónico o STRING+`TIMESTAMP()` en el SELECT." (b) "Nunca ejecutar DELETE destructivo de período antes de tener un payload de reemplazo validado; si no se puede validar → skip + degradar, jamás destruir." (c) "Un run que ve data cruda elegible pero materializa 0 nunca es `succeeded`."
 
 ## Out of Scope
 
@@ -134,9 +146,10 @@ Recomendación inicial: **(A)** para BQ (alineado a MERGE TASK-900), **(B) atóm
 - [ ] Un run con raw signals presentes y 0 mapeables → status NO `succeeded` (ICO + Finance).
 - [ ] No existe `DELETE` destructivo de período sin payload reemplazo validado; freshness gate skipea en lugar de borrar.
 - [ ] Serving `ico_ai_signal_enrichments` fresco para el período corriente; Home/Agency/Person 360 muestran insights frescos.
-- [ ] `finance_ai_signals > 0` con `client_economics` Mayo presente.
+- [ ] Finance AI corre sobre el último período cerrado/materializado (Abril) y produce señales; período abierto sin economics → **skip honesto**, nunca `succeeded` engañoso. (NO backfill de Mayo — Mayo está abierto por diseño.)
 - [ ] Signal `nexa.insights.stale_with_eligible_signals` en steady=0.
 - [ ] ADR `GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md` actualizado: patrón extendido al AI signals path.
+- [ ] Lint rule `greenhouse/no-bq-struct-string-timestamp` (modo error) + helper canónico de serialización de timestamps BQ DML; CLAUDE.md hard rules nuevas (timestamp struct, no-destructive-replace, no-false-healthy).
 
 ## Verification
 
