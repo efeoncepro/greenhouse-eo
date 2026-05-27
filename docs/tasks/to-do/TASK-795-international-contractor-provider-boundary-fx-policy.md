@@ -99,6 +99,16 @@ Reglas obligatorias:
 
 - Map provider/direct contractor costs to correct economic category and obligation metadata.
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+795 modela contractors internacionales/provider; el motor de nómina dependiente Chile no participa. Auditado con `greenhouse-payroll-auditor`.
+
+- **NUNCA** aplicar deducciones estatutarias Chile (AFP/Fonasa/Isapre/AFC/SIS/mutual/IUSC) a contractors internacionales o provider-owned. Default sin deducciones; tax owner = provider / manual_review / country_engine.
+- **NUNCA** mutar `members.{pay_regime,payroll_via,contract_type}` al modelar el canal internacional del engagement. `payRegime='international'` y `payrollVia='deel'` del member siguen siendo del dominio payroll/member, no del engagement.
+- **NUNCA** clasificar payout/charge/fee de provider como remuneración dependiente. Economic category = `labor_cost_external`/provider; fees y FX spread a sus categorías propias.
+- **NUNCA** generar `payroll_entries` desde un payable internacional.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` al cierre (la task ya declara aplicar el payroll auditor checklist).
+
 ## Out of Scope
 
 - Full Deel/Remote/Oyster API sync.
@@ -117,6 +127,7 @@ Reglas obligatorias:
 - `pnpm exec tsc --noEmit --pretty false`
 - Unit tests for policy resolver and FX readiness.
 - Payroll auditor checklist applied in task audit.
+- `pnpm vitest run src/lib/payroll` — payroll non-regression gate.
 
 ## Closing Protocol
 

@@ -94,6 +94,17 @@ Reglas obligatorias:
 - Keep payroll legacy consumers safe.
 - Document cutover from honorarios payroll legacy to contractor payables.
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+⚠️ Máximo riesgo del programa: esta task **edita archivos del motor de nómina** (`src/lib/payroll/calculate-honorarios.ts`, `src/types/hr-contracts.ts`). Cualquier cambio a `SII_RETENTION_RATES` o al helper honorarios impacta el payroll honorarios legacy en producción. Auditado con `greenhouse-payroll-auditor`.
+
+- **NUNCA** romper el cálculo honorarios legacy de payroll al converger hacia contractor payable. Los consumers payroll existentes de `calculate-honorarios.ts` deben seguir verde bit-for-bit, salvo cambio de tasa SII explícito y versionado.
+- **NUNCA** aplicar AFP, Fonasa/Isapre, AFC, SIS, mutual ni IUSC dependiente a honorarios — ni en el path payroll legacy ni en el contractor payable. Solo retención SII.
+- **NUNCA** hardcodear la tasa SII inline. Versionar en `tax_withholding_policy_code` + snapshot. Tasa 2026 = 15.25% desde 2026-01-01; verificar contra SII oficial ANTES de cerrar y documentarlo en el audit de la task.
+- **NUNCA** migrar masivamente honorarios payroll legacy a contractor payables en esta task. Convergencia gradual; los pagos legacy no se rompen.
+- **NUNCA** crear `final_settlements` para honorarios (su cierre es `contractor_closure`, TASK-797).
+- **SIEMPRE** correr la suite completa `pnpm vitest run src/lib/payroll` como gate de cierre obligatorio; cero deltas inesperados en honorarios ni en regímenes dependientes.
+
 ## Out of Scope
 
 - F29 filing automation.
@@ -106,6 +117,7 @@ Reglas obligatorias:
 - [ ] AFP/salud/AFC/IUSC dependent deductions cannot appear.
 - [ ] Missing verified RUT or required boleta data blocks readiness as configured.
 - [ ] Classification risk can block payable approval.
+- [ ] Payroll honorarios legacy parity probado: consumers existentes de `calculate-honorarios.ts` verde bit-for-bit; suite `src/lib/payroll` completa sin deltas inesperados.
 
 ## Verification
 

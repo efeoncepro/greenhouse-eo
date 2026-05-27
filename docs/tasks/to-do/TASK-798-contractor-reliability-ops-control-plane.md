@@ -90,6 +90,14 @@ Reglas obligatorias:
 
 - Add functional docs and manuales for HR, Finance and contractor self-service once surfaces exist.
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+798 agrega signals read-only; observabilidad nunca muta payroll ni finance.
+
+- **NUNCA** escribir en tablas de payroll/finance desde un signal reader. Los readers de contractor reliability son estrictamente read-only.
+- **NUNCA** validar las queries SQL de los signals contra `db.d.ts` como ground truth; verificar tipos reales contra PG (gate TASK-893: `date - date = integer`, no `EXTRACT(EPOCH FROM date)`).
+- **NUNCA** invocar `Sentry.captureException` directo; usar `captureWithDomain` para el rollup correcto del subsystem.
+
 ## Out of Scope
 
 - AI recommendations beyond deterministic evidence.

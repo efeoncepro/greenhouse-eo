@@ -102,6 +102,15 @@ Reglas obligatorias:
 
 - Link or embed the canonical `TASK-753` self-service payment profile flow.
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+796 es UI self-service de contractor; no toca cálculo. Riesgo de presentación: confundir al contractor con semántica de empleado/nómina. Copy validado con `greenhouse-ux-writing`.
+
+- **NUNCA** mostrar copy que implique nómina dependiente, sueldo, finiquito, AFP/salud ni liquidación. El contractor ve invoices/payables/payment state, no recibos de nómina.
+- **NUNCA** mezclar la surface `/my/contractor` con `/my/payroll`. Audiencias y regímenes distintos; no reutilizar el componente de recibo de nómina dependiente.
+- **NUNCA** filtrar al contractor datos de payroll dependiente ni montos de otros regímenes/colaboradores.
+- **SIEMPRE** validar el copy con `greenhouse-ux-writing` (es-CL) para no sugerir relación laboral dependiente.
+
 ## Out of Scope
 
 - Rebuilding payment profiles.
