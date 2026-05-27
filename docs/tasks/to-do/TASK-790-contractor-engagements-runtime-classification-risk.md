@@ -11,10 +11,22 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-789`
+- Blocked by: `none` (TASK-789 ✅ complete — substrate listo)
 - Branch: `task/TASK-790-contractor-engagements-runtime`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-05-27
+
+Revisión arquitectura + payroll antes de tomar. El substrate canónico shippeó después de redactar esta task; el header estaba desactualizado.
+
+- **Desbloqueada.** `TASK-789` ✅ complete: `transitionEmployeeToContractor()` + helpers en `src/lib/person-legal-entity-relationships/**` ya existen. `TASK-890` ✅ (exit eligibility, lane `relationship_transition`) y `TASK-891` ✅ (`reconcileMemberContractDrift`) también shippearon. Los tres son el substrate que 790 integra.
+- **Conexión con TASK-890 (exit eligibility).** 890 es la compuerta de SALIDA (excluye al colaborador transicionado del payroll dependiente mensual vía lane `relationship_transition`); 790 es el modelo de ENTRADA (cómo se le paga como contractor). Llave compartida: el mismo `person_legal_entity_relationship_id`. Cero solapamiento — 890 nunca paga, 790 nunca toca `payroll_entries`.
+- **Decisión D1 (anchor).** El engagement hace FK a la relación contractor **activa** vía el reader canónico de `src/lib/person-legal-entity-relationships/store.ts`. NO crea relaciones (eso es 789/891). Slice 2 consume helpers existentes, no los recrea.
+- **Decisión D2 (subtype SSOT).** Alinear vocabulario: 789/store persiste `metadata.relationshipSubtype` (ej. `honorarios`); 790 propone columna `relationship_subtype` (ej. `honorarios_cl`). El engagement **deriva** el subtype de la relación o lo declara como SSOT propio — decidir UNO; no pueden divergir. Reconciliar `honorarios` vs `honorarios_cl`.
+- **Decisión D3 (payroll_via ortogonal).** `contractor_engagements.payroll_via` es el canal del engagement; es dimensión **distinta** de `members.payroll_via` (que el motor payroll usa para clasificar régimen y la lane `external_payroll` de 890 consume). 790 **NUNCA** sobrescribe `members.payroll_via`.
+- **Decisión D4 (flag posture).** La exclusión dependiente de 890 vive detrás de `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (default OFF). La readiness/classification de 790 no debe asumir que la exclusión está siempre activa.
+- **Scope real.** 790 sola no paga a nadie — es la fundación. El canal de pago requiere `TASK-791` (assets) → `TASK-792` (work submissions) → `TASK-793` (bridge a Finance).
 
 ## Summary
 
@@ -50,9 +62,14 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-789`.
-- `TASK-784` for person legal identity.
+- `TASK-789` ✅ complete — relationship transition + `person-legal-entity-relationships` helpers (substrate del anchor D1).
+- `TASK-784` ✅ for person legal identity.
 - `TASK-787` for declared/tax country reconciliation when available.
+
+### Integrates with (shipped substrate)
+
+- `TASK-890` ✅ exit eligibility — compuerta de salida del payroll dependiente (lane `relationship_transition`). Comparte `person_legal_entity_relationship_id` con el engagement. Ver Delta D-conexión.
+- `TASK-891` ✅ relationship drift reconciliation (`reconcileMemberContractDrift`) — segundo path que abre relación contractor; el engagement debe anclar a la relación activa sin importar cuál la creó.
 
 ### Blocks / Impacts
 
@@ -90,6 +107,8 @@ Reglas obligatorias:
 
 - Create canonical readers and mutations using repo DB primitives.
 - Add idempotent create/update/pause/end commands.
+- **D1 anchor**: resolver la relación contractor activa vía el reader canónico de `src/lib/person-legal-entity-relationships/store.ts`. El engagement hace FK a esa relación; NO crea relaciones (eso es 789/891).
+- **D3 payroll_via**: `contractor_engagements.payroll_via` es el canal del engagement, ortogonal a `members.payroll_via`. NUNCA sobrescribir `members.payroll_via`.
 
 ### Slice 3 — Classification risk gates
 
@@ -100,13 +119,15 @@ Reglas obligatorias:
 
 - Add capabilities for read/manage/review classification.
 - Keep routeGroups/views separate from entitlements.
+- **Grant coverage (TASK-873/935 invariant)**: toda capability seedeada en catalog + `capabilities_registry` DEBE recibir su grant en `src/lib/entitlements/runtime.ts` en el MISMO PR, o `capability-grant-coverage.test.ts` rompe el build. Verificar que el rol documentado exista en `src/config/role-codes.ts` (si no, colapsar a `EFEONCE_ADMIN`/`FINANCE_ADMIN`).
 
 ## Out of Scope
 
-- Invoice upload/assets.
-- Payables bridge.
-- Full UI self-service.
+- Invoice upload/assets (TASK-791).
+- Payables bridge (TASK-793).
+- Full UI self-service (TASK-796).
 - Legal advice or global tax engine.
+- **Honorarios legacy migration**: 790 modela engagements nuevos. NO migra payroll honorarios existente hacia Contractor Payables (convergencia futura, fuera de V1).
 
 ## Acceptance Criteria
 
