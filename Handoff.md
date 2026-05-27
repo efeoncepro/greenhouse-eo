@@ -1,3 +1,19 @@
+# Sesion 2026-05-27 — Release a producción develop→main — ✅ RELEASED
+
+Pase a producción de todo el develop acumulado (~3 días desde el release 2026-05-24). Path canónico vía orchestrator, sin incidentes.
+
+**SHA:** merge `82f307450b528931dd9158b111b087136e1b889b` (mirror exacto de develop, `--no-ff`). **Manifest:** `82f307450b52-ce288dee-a49b-4d7a-baa0-d66cfbb5bae2` → `released`. **Orchestrator run:** [26528213915](https://github.com/efeoncepro/greenhouse-eo/actions/runs/26528213915) (`success`, ~10 min, started 17:43 / completed 17:53 UTC).
+
+**Bundle:** finance ledger drift (TASK-929/934/938/939/714d/936), identity capability governance (TASK-935 + auth route group drift), delivery FTR (TASK-903/909, flags OFF), reliability AI Observer (TASK-937), cloud ops (TASK-931/932/933 + billing observability + CI trims). 5 migraciones (TASK-903/929/934/935/937) ya aplicadas en Cloud SQL compartida (verificado pre-release).
+
+**Preflight:** `release_batch_policy=split_batch` (finance+auth independientes, esperado en bundle multi-task) + `playwright_smoke` warning (HEAD docs-only) cubiertos por `bypass_preflight_reason` → `--override-batch-policy --bypass-preflight-warnings`. Sentry limpio (0 issues <60min), migraciones OK, Vercel READY, sin stale/pending runs.
+
+**Verificación post-deploy:** Vercel production READY (`greenhouse-cfv8fdvnq`); 4 Cloud Run workers con `GIT_SHA=82f30745` (ops-worker/commercial-cost-worker/ico-batch-worker us-east4 + hubspot-greenhouse-integration us-central1); Azure sin diff Bicep (health-check ✓, deploy skipped); post-release health ✓; watchdog `worker_revision_drift=ok` (4/4 synced, drift_count=0). Gates Production auto-aprobados vía `gh api` (autorización operador). 1 solo gate apareció (Azure no requirió 2do gate por no-diff).
+
+**No validado:** smoke funcional manual en browser (login / finance / agency) post-release — el orchestrator solo corrió `/api/auth/health`. Recomendado si se quiere confirmación visual.
+
+---
+
 # Sesion 2026-05-27 — Daniela Ferreira redirect loop post-SSO — ✅ ROOT FIX LOCAL
 
 Incidente: Daniela autenticaba correctamente con Microsoft SSO (`last_login_at=2026-05-27 14:59 UTC`) pero terminaba en `ERR_TOO_MANY_REDIRECTS` en `https://greenhouse.efeoncepro.com/hr/payroll`.
