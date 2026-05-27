@@ -121,6 +121,20 @@ Reglas obligatorias:
 - Keep routeGroups/views separate from entitlements.
 - **Grant coverage (TASK-873/935 invariant)**: toda capability seedeada en catalog + `capabilities_registry` DEBE recibir su grant en `src/lib/entitlements/runtime.ts` en el MISMO PR, o `capability-grant-coverage.test.ts` rompe el build. Verificar que el rol documentado exista en `src/config/role-codes.ts` (si no, colapsar a `EFEONCE_ADMIN`/`FINANCE_ADMIN`).
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+TASK-790 vive bajo Workforce/HR y **no debe romper Payroll**. El motor de nómina dependiente clasifica régimen por `members.{contract_type, pay_regime, payroll_via}` y materializa `payroll_entries`; cualquier mutación cruzada desde el engagement corrompe clasificación, deducciones, retención, finiquito o roster. Auditado con `greenhouse-payroll-auditor`.
+
+- **NUNCA** escribir, mutar ni leer-para-escribir `greenhouse_payroll.payroll_entries` desde el engagement. Contractor payables jamás entran como `payroll_entries` (nacen en 791-793 hacia Finance, no en payroll).
+- **NUNCA** usar `payroll_adjustments` para pagar semanas, hitos, proyectos o boletas de contractor.
+- **NUNCA** crear `compensation_versions` desde `contractor_engagements`.
+- **NUNCA** habilitar `final_settlements` / `final_settlement_documents` ni el flujo "Calcular finiquito" para contractor/honorarios. Su cierre futuro es `contractor_closure` (TASK-797), no finiquito laboral dependiente.
+- **NUNCA** aplicar deducciones Chile dependientes (AFP, Fonasa/Isapre, AFC, SIS, mutual, IUSC) a honorarios. Solo retención SII versionada (`tax_withholding_policy_code`), tasa 2026 = 15.25% — verificar contra `src/types/hr-contracts.ts` (`SII_RETENTION_RATES`).
+- **NUNCA** sobrescribir `members.payroll_via`, `members.contract_type` ni `members.pay_regime` (D3). El engagement declara su propio canal; el motor payroll sigue clasificando por las columnas del member.
+- **NUNCA** reactivar la relación dependiente cerrada ni asumir que la exclusión de payroll de TASK-890 está siempre activa (vive tras `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED`, default OFF) (D4).
+- **NUNCA** tocar fórmulas Chile (`calculate-chile-deductions`, `compute-chile-tax`, `chile-previsional-helpers`) ni el cálculo mensual. A lo sumo tests focales que prueben no-regresión.
+- **SIEMPRE** correr la suite payroll completa como gate de cierre (`pnpm vitest run src/lib/payroll`) para probar que el engagement no rompió clasificación, roster ni cálculo. Cero deltas inesperados.
+
 ## Out of Scope
 
 - Invoice upload/assets (TASK-791).
@@ -136,12 +150,14 @@ Reglas obligatorias:
 - [ ] Tax/compliance owner is mandatory.
 - [ ] Classification risk status is computed/stored and can block readiness.
 - [ ] Events/audit capture material lifecycle changes.
+- [ ] Payroll non-regression probado: suite `src/lib/payroll` verde, sin escritura a `payroll_entries`/`payroll_adjustments`/`compensation_versions`/`final_settlements`, sin mutar `members.{payroll_via,contract_type,pay_regime}`.
 
 ## Verification
 
 - `pnpm pg:doctor`
 - `pnpm exec tsc --noEmit --pretty false`
 - Focused unit tests for readers, mutations and risk gates.
+- `pnpm vitest run src/lib/payroll` — payroll non-regression gate (obligatorio al cierre).
 
 ## Closing Protocol
 
