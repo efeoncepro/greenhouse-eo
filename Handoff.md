@@ -1,3 +1,18 @@
+# Sesion 2026-05-27 — Daniela Ferreira redirect loop post-SSO — ✅ ROOT FIX LOCAL
+
+Incidente: Daniela autenticaba correctamente con Microsoft SSO (`last_login_at=2026-05-27 14:59 UTC`) pero terminaba en `ERR_TOO_MANY_REDIRECTS` en `https://greenhouse.efeoncepro.com/hr/payroll`.
+
+**Causa raíz:** no era Azure/Google/SCIM. El resolver `resolveAuthorizedViewsForUser()` estaba promoviendo `authorizedViews` a `routeGroups`: como Daniela tiene vistas HR limitadas (`equipo.personas`, `equipo.organigrama`) pero `equipo.nomina` está denegada explícitamente, su JWT podía quedar con `routeGroups.includes('hr')`; el callback de NextAuth recalculaba `portalHomePath` como `/hr/payroll`, y esa ruta la rechazaba por no tener `equipo.nomina`, generando loop.
+
+**Fix robusto:**
+- `src/lib/admin/view-access-store.ts`: `authorizedViews` ya no derivan `routeGroups`; los route groups broad quedan solo desde roles/sesión (`fallbackRouteGroups`).
+- `src/lib/auth.ts`: el JWT refresca claims de acceso desde `getTenantAccessRecordByUserId()` con TTL de 5 minutos para corregir sesiones existentes sin pedir borrar cookies. No toca secrets, providers, Azure/Google callback link, ni SCIM.
+- `src/lib/admin/view-access-store.test.ts`: regresión para impedir que una vista HR parcial vuelva a materializar routeGroup `hr`.
+
+**Verificación:** Daniela runtime local contra PG real queda `routeGroups={employee,internal,my}`, `authorizedViews` conserva `equipo.personas`, `equipo.organigrama`, `mi_ficha.mi_nomina`, y `portalHomePath=/home`. Gates: `vitest` focal 2 archivos/11 tests ✓, auth/access focal 7 archivos/40 tests ✓, `tsc --noEmit` ✓, ESLint focal ✓. Pendiente: deploy/push no ejecutado sin confirmación humana.
+
+---
+
 # Sesion 2026-05-26 — TASK-938 Global66 OTB cascade incompleto → fx_drift — ✅ COMPLETE (cero mutación de saldos)
 
 El smoke `finance-account-balances-fx-drift.spec.ts` (Playwright develop) fallaba porque el signal `finance.account_balances.fx_drift` reportaba `error` (2 drifts en global66-clp). **No era TASK-937 ni false-positive del detector.**
