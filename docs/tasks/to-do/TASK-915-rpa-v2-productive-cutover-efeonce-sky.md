@@ -4,6 +4,8 @@
 
 El segundo hijo del umbrella (TASK-916 — compute + writeback productivos) está COMPLETE V1.0 en `develop`. Estado de los hijos: TASK-912 (captura) ACTIVADA EN PRODUCCIÓN + verificada E2E; TASK-916 (compute/writeback) SHIPPED con writeback gated OFF; **falta TASK-917** (wiring consumers + flag bono + ejecución de los dos flips). El pipeline V2 prod ya está completo end-to-end en código (captura → compute → snapshot → chain → writeback gated). Lo que resta es operacional: crear `[GH] RpA v2` en Notion + activar el writeback flag bajo los 8 stop-gates + materializar `rpa_avg_v2` + paridad shadow + flip bono (todo en TASK-917). Spec TASK-916: `complete/TASK-916-rpa-v2-productive-compute-writeback.md`.
 
+Delta 2026-05-26: el eco raw BigQuery de la propiedad Notion `[GH] RpA v2` es `notion_ops.tareas.gh_rpa_v2`. Usarlo solo para auditoría/paridad; el cutover de bono debe seguir leyendo el agregado canónico V2, no la tabla raw.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

@@ -112,6 +112,7 @@ declare module 'next-auth/jwt' {
     featureFlags?: string[]
     timezone?: string
     portalHomePath?: string
+    accessClaimsRefreshedAt?: number
     authMode?: string
     provider?: string
     microsoftEmail?: string | null

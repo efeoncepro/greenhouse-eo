@@ -44,6 +44,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 - Copy visible: antes de escribir labels, CTAs, empty states, alerts, tooltips, aria-labels o mensajes, buscar/crear la entrada en la capa canonica. `src/lib/copy/*` guarda microcopy funcional y copy reutilizable por dominio; `src/config/greenhouse-nomenclature.ts` guarda solo nomenclatura de producto, navegacion y labels institucionales. No hardcodear copy reusable en JSX.
 - Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
 - Reutilizar antes de crear: buscar helpers, readers, components, routes, signals, capabilities y docs existentes antes de introducir piezas nuevas.
+- Desarrollo local-first: por defecto, los agentes iteran y validan en local antes de gastar GitHub Actions/Vercel/GCP. Usar `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`; no hacer push a `develop` o ramas remotas como cierre automatico sin confirmacion humana, salvo instruccion explicita o hotfix/release documentado.
 - Aislamiento multi-agente: no cambiar la rama de un checkout donde otra persona/agente trabaja; usar `git worktree` y documentar coordinacion en `Handoff.md`.
 - Skills y subagentes: usar skills cuando el dominio matchee y subagentes solo para trabajo paralelo independiente con ownership claro. No delegar el bloqueo inmediato del hilo principal.
 - Seguridad runtime: no improvisar credenciales, pools, env vars, access paths, bypasses, raw errors ni acciones destructivas. Usar los CLIs autenticados con guardrails.
@@ -65,6 +66,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - **Vercel CLI (`vercel`)**: autenticado contra el team `efeonce-7670142f`. Sirve para env vars, deployments, project config.
 - **PostgreSQL CLI (`psql`)** via `pnpm pg:connect`: levanta proxy Cloud SQL + conexion auto, sin credenciales manuales.
 - **Frontend Capture (`pnpm fe:capture`)**: helper canonico Playwright + agent auth para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patron ad-hoc de `_cap.mjs`. Scenario DSL declarativo bajo `scripts/frontend/scenarios/`. Output `.captures/<ISO>_<scenario>/` (gitignored). Triple gate para production. Comandos: `pnpm fe:capture <scenario> --env=staging [--gif] [--headed]` o `pnpm fe:capture --route=/path --env=staging --hold=3000`. GC: `pnpm fe:capture:gc [--apply]` purga >30d. Doc: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`. Usalo cuando una verificacion visual o de microinteractions sea util — sale del ciclo "escribo un _cap.mjs cada vez".
+- **Hook operativo de browser diagnostics:** si el usuario pide abrir, revisar, diagnosticar, capturar o testear una ruta/URL del portal, invocar automaticamente `greenhouse-browser-diagnostics` y usar usuario agente dedicado + Playwright/Chromium. No pedir login al usuario ni navegar anonimo como primer intento. Para `dev-greenhouse.efeoncepro.com`, automatizar contra la URL `.vercel.app` canonica con bypass, salvo que el objetivo sea inspeccionar la SSO wall.
 
 **Regla operativa**: si diagnosticas que la causa raiz de un incidente vive en una de estas plataformas, ejecuta el fix con el CLI con guardrails y verificacion. Documentar pasos manuales para que el usuario los haga es **antipatron** salvo que la accion sea destructiva (eliminar app registration, drop database, force-push), en cuyo caso confirma con el usuario primero.
 
@@ -241,6 +243,13 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 
 - `main` es solo para codigo listo para produccion.
 - `develop` debe funcionar como rama de integracion y rama asociada a `Staging` en Vercel.
+- **Local-first obligatorio por defecto:** `local = taller`, `develop = integracion`, `main = produccion`. Antes de pedir o ejecutar push remoto, validar localmente con el comando proporcional:
+  - `pnpm local:check` para cambios de codigo normales (`lint` + `tsc`).
+  - `pnpm local:check:ui` para UI/rutas/frontend visible (`lint` + `tsc` + `design:lint` + `build`).
+  - `pnpm local:check:full` para shared runtime, cloud, billing, auth, finance/payroll, CI/release o alto blast radius (`lint` + `tsc` + tests + `build`).
+- Antes de reducir o redisenar GitHub Actions por costo, correr `pnpm actions:cost:audit --from YYYY-MM-DD --to YYYY-MM-DD` para obtener hotspots estimados por workflow/job. La factura oficial sigue viviendo en `cloud.billing.github`; el reporte local solo atribuye minutos.
+- Si el cambio toca UI visible, levantar `pnpm dev` y entregar la URL `localhost` exacta para revision antes de push, salvo que el usuario pida explicitamente preview remoto.
+- No usar `develop`, Vercel Preview o GitHub Actions como loop de exploracion si el cambio puede validarse en local. Push remoto requiere confirmacion humana o instruccion explicita.
 - Todo trabajo de agentes debe salir desde rama propia salvo cambios minimos de emergencia.
 - Si varios agentes trabajan en paralelo, cada uno debe usar rama propia y, cuando compartan máquina/workspace físico, worktree propio para no alterar el branch visible del otro agente.
 - Formato recomendado de ramas:
@@ -265,7 +274,7 @@ Desde 2026-05-05 el repo tiene 2 git hooks instalados que se activan automaticam
 | Hook | Que corre | Que bloquea | Latencia |
 | --- | --- | --- | --- |
 | **`.husky/pre-commit`** | `pnpm exec lint-staged` → `eslint --fix --cache` sobre archivos staged | Errores no auto-fixable | < 5s |
-| **`.husky/pre-push`** | `pnpm lint` (full repo) + `pnpm exec tsc --noEmit` | Cualquier 1+ error de lint o tsc | < 90s |
+| **`.husky/pre-push`** | `pnpm local:check` (`pnpm lint` full repo + `pnpm exec tsc --noEmit`) | Cualquier 1+ error de lint o tsc | < 90s |
 
 **Reglas duras** (multi-agente):
 
@@ -544,6 +553,7 @@ La skill referencia obligatoriamente `docs/operations/PRODUCTION_RELEASE_INCIDEN
 ### Agent Auth (acceso headless para agentes y E2E)
 
 - Endpoint: `POST /api/auth/agent-session` — genera un JWT NextAuth válido sin pasar por login interactivo.
+- **Regla de uso:** cualquier diagnostico de ruta con browser/Chromium/Playwright debe usar este flujo por defecto con el usuario dedicado de agente. Si hace falta bypass de Vercel, enviarlo solo a origins Greenhouse/Vercel; no propagar `x-vercel-protection-bypass` a terceros como Sentry.
 - Requiere `AGENT_AUTH_SECRET` en `.env.local`. Sin esa variable, el endpoint devuelve 404.
 - **Bloqueado en production** por defecto (`VERCEL_ENV === 'production'` → 403), salvo `AGENT_AUTH_ALLOW_PRODUCTION=true`.
 - El caller envía `{ secret, email }` y recibe `{ cookieName, cookieValue, portalHomePath }` para montar la cookie de sesión.
@@ -980,8 +990,9 @@ Pipeline canonical RpA V2 demo end-to-end: status transition Notion → captura 
 
 ### Production Release Watchdog (TASK-848 + TASK-849, 2026-05-10)
 
-- **Que hace**: scheduled GH Actions cron `*/30 * * * *` que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale Production approvals, pending sin jobs, worker revision drift) y emite alertas Teams a `production-release-alerts` con dedup canonico via `greenhouse_sync.release_watchdog_alert_state`.
-- **Workflow**: `.github/workflows/production-release-watchdog.yml`. Cron solo activa cuando esta en `main` (default branch). Manual dispatch: `gh workflow run production-release-watchdog.yml --ref main`.
+- **Estado vigente 2026-05-24**: schedule automatico pausado hasta TASK-920. Los ultimos 100 runs scheduled tuvieron 72 fallos y generaban alertas erradas. El workflow remoto quedó `disabled_manually` como emergency stop mientras `main` conserva el schedule viejo; usar CLI local hasta promover el archivo sin `schedule` y re-enablear el workflow.
+- **Que hace**: detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale Production approvals, pending sin jobs, worker revision drift) y puede emitir alertas Teams a `production-release-alerts` con dedup canonico via `greenhouse_sync.release_watchdog_alert_state` cuando se ejecuta con alertas habilitadas.
+- **Workflow**: `.github/workflows/production-release-watchdog.yml`. Manual dispatch vuelve a estar disponible tras re-enablear el workflow sin `schedule` en `main`: `gh workflow run production-release-watchdog.yml --ref main`.
 - **CLI local canonico**: `pnpm release:watchdog [--json|--fail-on-error|--enable-teams|--dry-run]`. Si vas a correrlo desde fuera de Vercel runtime, set `GCP_PROJECT=efeonce-group` + las 3 GH App env vars (App ID `3665723`, Installation ID `131127026`, secret ref `greenhouse-github-app-private-key`).
 - **GitHub auth strategy canonica**: GitHub App `Greenhouse Release Watchdog` (App ID `3665723`) instalada en `efeoncepro` org con permissions `Actions:read + Deployments:read + Metadata:read`. Private key vive en GCP Secret Manager `greenhouse-github-app-private-key` (project `efeonce-group`). Resolver `src/lib/release/github-app-token-resolver.ts` mintea installation token con cache 1h. Fallback a PAT (`GITHUB_RELEASE_OBSERVER_TOKEN`/`GITHUB_TOKEN`) solo si GH App no esta configurado. Beneficios: token NO ligado a usuario, rate limit 15K req/h vs 5K, auditoria per-installation.
 - **Setup scripts canonicos**:

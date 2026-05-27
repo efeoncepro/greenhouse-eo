@@ -1,5 +1,6 @@
 import type { PoolClient } from 'pg'
 
+import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 import { materializeAccountBalance } from './account-balances'
@@ -78,6 +79,12 @@ export interface RematerializeAccountResult {
   daysMaterialized: number
   closedDaysSkipped: number
   evidenceGuard: AccountBalanceEvidenceGuardResult
+  /**
+   * TASK-938 — Set cuando el genesis floor clampeó el seed solicitado hacia
+   * arriba al genesis del OTB activo (el caller pidió materializar < genesis).
+   * `undefined` = no se aplicó (caso normal).
+   */
+  genesisFloorApplied?: { requestedSeed: string; otbGenesis: string }
 }
 
 const ymd = (d: Date): string => {
@@ -183,6 +190,35 @@ const getExistingSeedClosing = async (
   return result.rows.length > 0 ? Number(result.rows[0].closing_balance) : null
 }
 
+/**
+ * TASK-938 — Decisión pura del genesis floor. Si el seed resuelto cae antes del
+ * genesis del OTB activo, clampea al genesis + usa el opening del OTB (no se
+ * puede materializar antes del anchor canónico, TASK-703). Pura/testable: el
+ * side-effect (captureWithDomain) lo hace el caller. Comparación lexicográfica
+ * segura porque ambas fechas son `YYYY-MM-DD`.
+ */
+export const applyGenesisFloor = (params: {
+  seedDate: string
+  openingBalance: number
+  activeOtb: { genesisDate: string; openingBalance: number } | null
+}): {
+  seedDate: string
+  openingBalance: number
+  genesisFloorApplied?: { requestedSeed: string; otbGenesis: string }
+} => {
+  const { seedDate, openingBalance, activeOtb } = params
+
+  if (activeOtb && seedDate < activeOtb.genesisDate) {
+    return {
+      seedDate: activeOtb.genesisDate,
+      openingBalance: activeOtb.openingBalance,
+      genesisFloorApplied: { requestedSeed: seedDate, otbGenesis: activeOtb.genesisDate }
+    }
+  }
+
+  return { seedDate, openingBalance }
+}
+
 export const rematerializeAccountBalanceRange = async (
   input: RematerializeAccountInput
 ): Promise<RematerializeAccountResult> => {
@@ -191,12 +227,44 @@ export const rematerializeAccountBalanceRange = async (
   // Full replays prefer OTB declaration over the input seed — OTB is the
   // canonical opening source per TASK-703. Rolling/incremental jobs must
   // preserve their explicit seed so they do not rewrite historical periods.
-  const otb = seedMode === 'active_otb'
-    ? await getActiveOpeningTrialBalance(input.accountId)
-    : null
+  //
+  // TASK-938: se resuelve el OTB activo en AMBOS modos. `active_otb` lo usa
+  // como seed canónico; `explicit` lo necesita igual para el genesis floor.
+  const activeOtb = await getActiveOpeningTrialBalance(input.accountId)
+  const otb = seedMode === 'active_otb' ? activeOtb : null
 
-  const seedDate = otb?.genesisDate ?? input.seedDate
-  const openingBalance = otb?.openingBalance ?? input.openingBalance
+  // TASK-938 — Genesis floor (decisión pura). NUNCA materializar
+  // `balance_date < genesis` del OTB activo.
+  const floored = applyGenesisFloor({
+    seedDate: otb?.genesisDate ?? input.seedDate,
+    openingBalance: otb?.openingBalance ?? input.openingBalance,
+    activeOtb
+  })
+
+  const seedDate = floored.seedDate
+  const openingBalance = floored.openingBalance
+  const genesisFloorApplied = floored.genesisFloorApplied
+
+  if (genesisFloorApplied) {
+    // Un rematerialize en modo `explicit` seedeado antes del genesis re-crea
+    // `account_balances` pre-anchor que el cascade TASK-703b prunea — la
+    // regresión que dejó global66-clp con filas stale 03-06/04-04 (re-creadas
+    // ~22h después del cascade). Observabilidad como warning; el clamp ya es
+    // correct-by-construction. Rolling jobs (TASK-871) seedean >> genesis →
+    // nunca se dispara.
+    captureWithDomain(
+      new Error(
+        `rematerialize seed ${genesisFloorApplied.requestedSeed} below active OTB genesis ${genesisFloorApplied.otbGenesis} for ${input.accountId} — clamped to genesis`
+      ),
+      'finance',
+      {
+        level: 'warning',
+        tags: { source: 'account_balances_rematerialize_genesis_floor', account_id: input.accountId },
+        extra: { ...genesisFloorApplied, seedMode }
+      }
+    )
+  }
+
   const endDate = input.endDate ?? ymd(new Date())
 
   if (seedDate > endDate) {
@@ -287,7 +355,8 @@ export const rematerializeAccountBalanceRange = async (
       finalClosingBalance,
       daysMaterialized,
       closedDaysSkipped: closedDays.length,
-      evidenceGuard
+      evidenceGuard,
+      genesisFloorApplied
     }
   })
 }

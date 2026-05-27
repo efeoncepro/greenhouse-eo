@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { getGitHubBillingOverview } from '@/lib/cloud/github-billing'
+import { getVercelBillingOverview } from '@/lib/cloud/vercel-billing'
 import { getIntegrationHealthSnapshots } from '@/lib/integrations/health'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
@@ -14,9 +16,11 @@ import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import type { SisterPlatformBindingRecord } from '@/lib/sister-platforms/types'
 import type { GcpBillingOverview } from '@/types/billing-export'
+import type { GitHubBillingOverview } from '@/types/github-billing'
 import type { IntegrationDataQualityOverview } from '@/types/integration-data-quality'
 import type { NotionSyncOrchestrationOverview } from '@/types/notion-sync-orchestration'
 import type { IntegrationWithHealth } from '@/types/integrations'
+import type { VercelBillingOverview } from '@/types/vercel-billing'
 import AdminIntegrationGovernanceView from '@/views/greenhouse/admin/AdminIntegrationGovernanceView'
 
 export const metadata: Metadata = { title: 'Integration Governance | Admin Center | Greenhouse' }
@@ -44,6 +48,8 @@ export default async function Page() {
   let notionOrchestrationOverview: NotionSyncOrchestrationOverview | null = null
   let sisterPlatformBindings: SisterPlatformBindingRecord[] = []
   let gcpBilling: GcpBillingOverview | null = null
+  let vercelBilling: VercelBillingOverview | null = null
+  let githubBilling: GitHubBillingOverview | null = null
   let notionOperationalOverview: NotionSyncOperationalOverview | null = null
 
   try {
@@ -56,6 +62,8 @@ export default async function Page() {
       notionOrchestrationOverview,
       sisterPlatformBindings,
       gcpBilling,
+      vercelBilling,
+      githubBilling,
       notionOperationalOverview
     ] = await Promise.all([
       getNotionDeliveryDataQualityOverview({ limit: 12 }),
@@ -63,6 +71,16 @@ export default async function Page() {
       listSisterPlatformBindings({ tenant, limit: 24 }),
       getGcpBillingOverview({ includeAiCopilot: true }).catch(error => {
         console.warn('[admin/integrations] GCP billing overview failed:', error)
+
+        return null
+      }),
+      getVercelBillingOverview().catch(error => {
+        console.warn('[admin/integrations] Vercel billing overview failed:', error)
+
+        return null
+      }),
+      getGitHubBillingOverview().catch(error => {
+        console.warn('[admin/integrations] GitHub billing overview failed:', error)
 
         return null
       }),
@@ -96,6 +114,8 @@ export default async function Page() {
       notionOrchestrationOverview={notionOrchestrationOverview}
       sisterPlatformBindings={sisterPlatformBindings}
       gcpBilling={gcpBilling}
+      vercelBilling={vercelBilling}
+      githubBilling={githubBilling}
       notionOperationalOverview={notionOperationalOverview}
     />
   )

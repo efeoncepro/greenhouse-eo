@@ -5,7 +5,8 @@
  *   1. Reports task714d.internalTransferGroupsWithMissingPair = 0 in steady state.
  *   2. Surfaces sample of imbalanced groups (group_id, out_count, in_count, instruments).
  *   3. healthy = false when count > 0 (imbalance is structural drift).
- *   4. SQL excludes superseded/by_otb_id legs from the count.
+ *   4. SQL cuenta TODAS las patas (invariante = "par creado", supersede-independiente;
+ *      el filtro de supersede anterior producía falsos positivos — fix 2026-05-25).
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -113,7 +114,12 @@ describe('TASK-714d internal_transfer pair invariant detector', () => {
     expect(snapshot.healthy).toBe(false)
   })
 
-  it('SQL filters out superseded legs from imbalance count', async () => {
+  it('SQL counts ALL legs (pair-creation invariant, supersede-independent)', async () => {
+    // TASK-714d detector fix 2026-05-25: el invariante bilateral es "el par fue
+    // CREADO", NO "las patas activas balancean". El filtro de supersede anterior
+    // producía falsos positivos (patas retiradas legítimamente por OTB re-anchor
+    // o por el backfill Slice 2 dejaban los conteos activos asimétricos). Verificado
+    // live: 8 grupos que el filtro viejo flagueaba eran todos pares completos.
     await getFinanceLedgerHealth()
 
     const sqlCalls = mockRunQuery.mock.calls
@@ -124,14 +130,12 @@ describe('TASK-714d internal_transfer pair invariant detector', () => {
 
     const allSql = sqlCalls.join('\n')
 
-    // Must exclude both supersede axes
-    expect(allSql).toContain('superseded_at IS NULL')
-    expect(allSql).toContain('superseded_by_otb_id IS NULL')
+    // El detector NO debe filtrar por supersede — contar todas las patas creadas.
+    expect(allSql).not.toContain('superseded_at IS NULL')
+    expect(allSql).not.toContain('superseded_by_otb_id IS NULL')
 
-    // Must filter only internal_transfer
+    // Sigue filtrando solo internal_transfer y comparando out vs in.
     expect(allSql).toContain("leg_type = 'internal_transfer'")
-
-    // Must compare out vs in counts
     expect(allSql).toContain("direction = 'outgoing'")
     expect(allSql).toContain("direction = 'incoming'")
   })

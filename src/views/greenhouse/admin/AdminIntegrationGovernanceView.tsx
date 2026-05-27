@@ -20,12 +20,15 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import { ExecutiveCardShell, ExecutiveMiniStatCard, GreenhouseRouteLink } from '@/components/greenhouse'
+import GitHubBillingCard from '@/components/greenhouse/admin/GitHubBillingCard'
 import GcpBillingCard from '@/components/greenhouse/admin/GcpBillingCard'
 import NotionSyncOperationalCard from '@/components/greenhouse/admin/NotionSyncOperationalCard'
+import VercelBillingCard from '@/components/greenhouse/admin/VercelBillingCard'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type { SisterPlatformBindingRecord } from '@/lib/sister-platforms/types'
 import type { GcpBillingOverview } from '@/types/billing-export'
+import type { GitHubBillingOverview } from '@/types/github-billing'
 import type {
   IntegrationDataQualityOverview,
   IntegrationDataQualityRunResult,
@@ -36,6 +39,7 @@ import type {
   NotionSyncOrchestrationStatus
 } from '@/types/notion-sync-orchestration'
 import type { IntegrationHealth, IntegrationReadiness, IntegrationType, IntegrationWithHealth } from '@/types/integrations'
+import type { VercelBillingOverview } from '@/types/vercel-billing'
 import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 import AdminOpsActionButton from './AdminOpsActionButton'
 import HubSpotServicesManualQueueCard from './HubSpotServicesManualQueueCard'
@@ -49,6 +53,8 @@ type Props = {
   notionOrchestrationOverview: NotionSyncOrchestrationOverview | null
   sisterPlatformBindings: SisterPlatformBindingRecord[]
   gcpBilling: GcpBillingOverview | null
+  vercelBilling: VercelBillingOverview | null
+  githubBilling: GitHubBillingOverview | null
   notionOperationalOverview: NotionSyncOperationalOverview | null
 }
 
@@ -202,6 +208,8 @@ const AdminIntegrationGovernanceView = ({
   notionOrchestrationOverview,
   sisterPlatformBindings,
   gcpBilling,
+  vercelBilling,
+  githubBilling,
   notionOperationalOverview
 }: Props) => {
   const activeCount = integrations.filter(i => i.active).length
@@ -313,6 +321,12 @@ const AdminIntegrationGovernanceView = ({
 
       {/* GCP cost spotlight desde Billing Export (TASK-586) */}
       {gcpBilling && <GcpBillingCard overview={gcpBilling} />}
+
+      {/* Vercel cost spotlight desde Billing FOCUS (TASK-636) */}
+      {vercelBilling && <VercelBillingCard overview={vercelBilling} />}
+
+      {/* GitHub Actions cost spotlight desde Billing Usage API (TASK-637) */}
+      {githubBilling && <GitHubBillingCard overview={githubBilling} />}
 
       <HubSpotServicesManualQueueCard />
 

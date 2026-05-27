@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador)
 > **Version:** 1.0
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-05-10 por Claude
+> **Ultima actualizacion:** 2026-05-24 por Codex
 > **Documentacion tecnica:** [CLAUDE.md §Production Release Orchestrator invariants (TASK-851)](../../../CLAUDE.md), [Spec TASK-851](../../tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Production Release Orchestrator
@@ -89,7 +89,7 @@ Cada transition: UPDATE atomic en `release_manifests` + audit row en `release_st
 - **NUNCA** correr `production-release.yml` cuando hay otro release ACTIVO en `main` con SHA distinto. El partial UNIQUE INDEX en DB lo bloquea (recordReleaseStarted falla); operador debe esperar a que el activo termine o abortarlo manualmente.
 - **NUNCA** forzar transitions fuera de la matrix canónica via CLI. `assertValidReleaseStateTransition` lo throw fail-loud.
 - **NUNCA** flagear `--override-batch-policy` (en preflight) sin reason >=20 chars + capability + post-mortem comprometido. Audit row registra la decisión.
-- **NUNCA** disparar el orquestador cuando staging tiene blockers (Sentry critical issues, watchdog alertando). Resolverlos primero.
+- **NUNCA** disparar el orquestador cuando staging tiene blockers (Sentry critical issues o watchdog manual rojo verificado). Resolverlos primero.
 
 ## Problemas comunes
 

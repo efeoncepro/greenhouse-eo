@@ -16,13 +16,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Listo para implementar (desbloqueada 2026-05-23 — prerequisitos SHIPPED, spec corregida)`
+- Status real: `SHIPPED 2026-05-24 — Slice 1 (helper + lint + tests) + Slice 5 (docs + closing). Slices 2/3/4 ya estaban hechos por sesión doc-only 2026-05-17.`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|reliability`
 - Blocked by: `DESBLOQUEADA 2026-05-23 — TASK-908 (countCorrectionTransitions) + TASK-901 (calculateRpaV2) AMBAS SHIPPED en develop. El helper delegado existe como calculateRpaV2 en src/lib/notion-metrics/calculate-rpa-v2.ts (estrangulador RpA V2), NO calculateRpa. La cadena de source confiable está completa.`
@@ -298,18 +298,26 @@ Reglas obligatorias canonical:
 
 ## Acceptance Criteria
 
-- [ ] `src/lib/notion-metrics/calculate-ftr.ts` existe + tests mínimo 9 paths verde
-- [ ] Helper `calculateFtr` delega a `calculateRpaV2` (zero lógica propia — solo mapping `value === 0 ? 'pass' : 'fail'` + propagación de `dataStatus`)
-- [ ] Lint rule `greenhouse/no-inline-ftr-calculation` modo warn activa + tests del rule
-- [ ] `Greenhouse_ICO_Engine_v1.md` actualizado con Delta 2026-05-17 al inicio + cross-refs ADR + secciones FTR/Throughput/Pipeline Velocity con resoluciones canonical
-- [ ] `CLAUDE.md` sección boundary actualizada con pointer a `calculateFtr`
-- [ ] `Contrato_Metricas_ICO_v1.md` Delta sección G actualizada con shipping notice TASK-909
-- [ ] README + Handoff + changelog actualizados
-- [ ] `pnpm test src/lib/notion-metrics/calculate-ftr.test.ts` verde
-- [ ] `pnpm lint` verde (incluye nueva lint rule)
-- [ ] `pnpm tsc --noEmit` verde
-- [ ] Zero cambios de código en `metric-registry.ts` (throughput + pipeline_velocity)
-- [ ] Task movida a `complete/`
+- [x] `src/lib/notion-metrics/calculate-ftr.ts` existe + tests 13 paths verde (9 spec §4.2 + idempotencia/version)
+- [x] Helper `calculateFtr` delega a `calculateRpaV2` (zero lógica propia — solo mapping `value === 0 ? 'pass' : 'fail'` + propagación de `dataStatus`)
+- [x] Lint rule `greenhouse/no-inline-ftr-calculation` modo warn activa + tests del rule (7 valid + 6 invalid via node)
+- [x] `Greenhouse_ICO_Engine_v1.md` Delta 2026-05-17 al inicio + specs canonical → **YA EXISTÍA** (sesión doc-only 2026-05-17, verificado head líneas 3-38)
+- [x] `CLAUDE.md` sección boundary actualizada con pointer a `calculateFtr` (`calculate-ftr.ts`, delega a `calculateRpaV2`)
+- [x] `Contrato_Metricas_ICO_v1.md` migración progresiva → **YA EXISTÍA** como sección H (verificado línea 330)
+- [x] README + Handoff + changelog actualizados
+- [x] `pnpm test src/lib/notion-metrics/calculate-ftr.test.ts` verde (13/13)
+- [x] `pnpm lint` verde (incluye nueva lint rule, 0 hits en repo — zero false positives)
+- [x] `pnpm tsc --noEmit` verde
+- [x] Zero cambios de código en `metric-registry.ts` (throughput + pipeline_velocity intactos)
+- [x] Task movida a `complete/`
+
+## Delta 2026-05-24 — SHIPPED
+
+- **Slice 1 (código)**: helper `calculateFtr` ([calculate-ftr.ts](../../../src/lib/notion-metrics/calculate-ftr.ts)) delegación pura a `calculateRpaV2` + 13 tests + lint rule `greenhouse/no-inline-ftr-calculation` (warn) precisa al recompute del veredicto FTR (NO matchea `client_change_round_final = 0` a secas — agregados BQ legítimos quedan limpios). Plugin v1.9.0. Commit `feat(ico): TASK-909 Slice 1`.
+- **Slice 5 (cierre)**: METRICS_INDEX FTR row → SHIPPED (+ corregido RpA row a `calculate-rpa-v2.ts`), CLAUDE.md helpers canonical list actualizado, FTR_V1.md §4 → SHIPPED + §10 Delta.
+- **Slices 2/3/4 SKIP**: ya estaban hechos por la sesión doc-only 2026-05-17 (THROUGHPUT_V1.md + PIPELINE_VELOCITY_V1.md Accepted, Engine doc Delta head, Contrato sección H, DECISIONS_INDEX entries METRIC_SPEC_PATTERN + OWNERSHIP_BOUNDARY) — verificado pre-execution, NO re-hecho.
+- **Decisión robusta pre-execution**: lint rule PRECISA (recompute del veredicto FTR: P1/P2/P3) en vez de matchear la columna `client_change_round_final` a secas — esta última generaría ruido en ~6 agregados BQ legítimos ("tareas sin ajustes"). Verificado ZERO false positives en todo el repo.
+- **Gate cierre**: `pnpm lint` 0 · `pnpm tsc --noEmit` 0 · `pnpm test` 5338 passed · `pnpm build` OK.
 
 ## Verification
 

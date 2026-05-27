@@ -15,14 +15,14 @@
 - Status real: `Diseno (writeback display del bucket OTD GH-owned por TASK-923 M1)`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|reliability`
-- Blocked by: `TASK-923 (M1 — gh_otd_bucket GH-owned) ✅ SHIPPED 2026-05-24. Soft-dep: TASK-912 captura de transiciones ACTIVA en prod (ya live) para el componente event-driven de completion; el componente batch (overdue/carry_over) NO depende de captura.`
+- Blocked by: `TASK-922 (M2 — bucket_attributable freeze-aware en task_attributable_lateness_shadow) ✅ SHIPPED 2026-05-24, shadow compute ACTIVO en prod (ATTRIBUTABLE_LATENESS_OTD_ENABLED=true). TASK-923 (M1) ✅ SHIPPED es el clasificador base que M2 reusa. Soft-dep: TASK-912 captura de transiciones ACTIVA en prod (alimenta el shadow event-driven); el batch recomputa los buckets now()-dependientes.`
 - Branch: `task/TASK-927-otd-bucket-notion-writeback`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
 ## Summary
 
-Escribir de vuelta a Notion el bucket OTD canónico (`on_time`/`late_drop`/`overdue`/`carry_over`/`na`) computado por Greenhouse (`gh_otd_bucket`, TASK-923 M1) en una propiedad **nueva read-only** `[GH] OTD` de la DB Tareas de Efeonce/Sky. **Display-only**: coexiste con la fórmula Notion legacy `Indicador de Performance` y NO toca el bono (`otd_pct` sigue intacto). Gated por flag `NOTION_OTD_WRITEBACK_ENABLED` (default OFF). Sibling del patrón writeback de RpA V2 (TASK-916), con una diferencia clave de diseño: el bucket OTD tiene componente `now()`-dependiente → **daily batch writeback**, no solo event-driven.
+Escribir de vuelta a Notion el bucket OTD **reason-aware corregido por freeze** (`on_time`/`late_drop`/`overdue`/`carry_over`/`na`) que Greenhouse computa en M2 — fuente canónica `greenhouse_delivery.task_attributable_lateness_shadow.bucket_attributable` (PG, TASK-922), **NO** `gh_otd_bucket` (BQ, que es M1 crudo SIN freeze — ver Delta 2026-05-27) — en una propiedad **nueva read-only** `[GH] OTD` de la DB Tareas de Efeonce/Sky. **Display-only**: coexiste con la fórmula Notion legacy `Indicador de Performance` y NO toca el bono (`otd_pct` sigue intacto). Gated por flag `NOTION_OTD_WRITEBACK_ENABLED` (default OFF). Sibling del patrón writeback de RpA V2 (TASK-916), con una diferencia clave de diseño: el bucket OTD tiene componente `now()`-dependiente → **daily batch** que recomputa el shadow de tareas abiertas antes de escribir, no solo event-driven.
 
 ## Why This Task Exists
 
@@ -31,7 +31,7 @@ TASK-923 M1 hizo a Greenhouse el clasificador autoritativo del bucket OTD, pero 
 ## Goal
 
 - Propiedad Notion **read-only** `[GH] OTD` (select) en la DB Tareas de Efeonce + Sky, escrita exclusivamente por la integración Greenhouse.
-- Writeback **daily batch** que lee `gh_otd_bucket` per-tarea del período activo desde `v_tasks_enriched` y PATCHea Notion vía Cloud Tasks throttled (≤3 req/s), idempotente.
+- Writeback **daily batch** que recomputa `bucket_attributable` (freeze-aware) per-tarea abierta del período activo y lo PATCHea a Notion vía Cloud Tasks throttled (≤3 req/s), idempotente. Fuente: `task_attributable_lateness_shadow` (PG), NO `gh_otd_bucket` (BQ M1 crudo).
 - Tabla de snapshot/log de writeback (sibling de `task_rpa_snapshots`) + 2 reliability signals (`writeback_dead_letter_otd`, `writeback_lag_otd`).
 - Flag global `NOTION_OTD_WRITEBACK_ENABLED` (default OFF) + per-cliente `NOTION_OTD_WRITEBACK_ENABLED_<EFEONCE|SKY>` (mirror TASK-919). Cero impacto en bono.
 
@@ -64,7 +64,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- **TASK-923 M1 ✅ SHIPPED** — `gh_otd_bucket` en `v_tasks_enriched` + `delivery_task_monthly_snapshots`; helper `classifyOtdBucket` + `buildOtdBucketSql`.
+- **TASK-922 M2 ✅ SHIPPED** — `task_attributable_lateness_shadow.bucket_attributable` (freeze-aware) + helper `calculateAttributableLateness`. **Fuente canónica del valor a escribir.**
+- **TASK-923 M1 ✅ SHIPPED** — `classifyOtdBucket` + `buildOtdBucketSql` (clasificador base que M2 reusa con freeze ON). `gh_otd_bucket` (BQ) NO se usa como fuente (es M1 crudo).
 - Propiedad Notion `[GH] OTD` creada en Efeonce + Sky (out-of-band, operador-side — NO existe aún).
 - Infra Cloud Tasks + ops-worker reactive/batch (ya existe para RpA writeback).
 
@@ -117,7 +118,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Daily batch writeback projection
 
-- Job batch (Cloud Run + Cloud Scheduler diario, o rides ops-reactive-delivery) que: lee `gh_otd_bucket` per-tarea del período activo desde `v_tasks_enriched` → diff vs último snapshot → enqueue Cloud Tasks (≤3 req/s) → `patchNotionPage` `[GH] OTD` → marca snapshot `written_to_notion_at`. Idempotente (skip si bucket == último escrito). Gated por flag.
+- Job batch (Cloud Run + Cloud Scheduler diario, o rides ops-reactive-delivery) que: **recomputa** `calculateAttributableLateness` per-tarea abierta del período activo (porque el shadow se materializa por evento y los buckets `overdue`/`carry_over` dependen de `now()` sin disparar evento Notion) → UPSERT `task_attributable_lateness_shadow` → lee `bucket_attributable` → diff vs último escrito → enqueue Cloud Tasks (≤3 req/s) → `patchNotionPage` `[GH] OTD` → marca `written_to_notion_at`. Idempotente. Gated por flag. **Si `data_status` ≠ `valid`** (legacy_unknown/unavailable), NO escribe (degraded honesto).
 
 ### Slice 4 — Reliability signals
 
@@ -130,7 +131,7 @@ Reglas obligatorias:
 ## Out of Scope
 
 - **NO** cutover del bono (eso es M3 — TASK futura gateada). Este task es display-only.
-- **NO** freeze/reason-aware (eso es M2 — TASK-922). Este task escribe el bucket tal como lo computa M1 (paridad cruda); cuando M2 flipee freeze, el mismo writeback reflejará el bucket freeze-aware automáticamente (lee `gh_otd_bucket`).
+- **NO** el bucket M1 crudo de BQ (`gh_otd_bucket`). Esta task escribe el bucket **freeze-aware** de M2 (`bucket_attributable`, PG). **Corrección 2026-05-27**: el supuesto original de esta task ("el writeback reflejará freeze automáticamente leyendo `gh_otd_bucket`") era **falso** — M2 (spec §9) deliberadamente NO espeja el freeze a BQ; `gh_otd_bucket` es M1 crudo para siempre. La fuente freeze-corregida vive solo en PG. Ver Delta 2026-05-27.
 - **NO** componente event-driven obligatorio en V1 — el daily batch cubre todos los buckets (incluido completion). Event-driven (PATCH inmediato al completar) puede ser follow-up si se necesita latencia <24h.
 
 ## Detailed Spec
@@ -139,7 +140,7 @@ Reglas obligatorias:
 
 **Echo-loop safety**: el writeback escribe un `select` (`[GH] OTD`), NO el `Estado`. El webhook que dispara → captura prod (TASK-912) re-fetchea STATUS → unchanged → no `status_transitioned` → no recompute. Sin loop (idéntico al razonamiento de RpA writeback que escribe un number).
 
-**Fuente del valor**: re-read `v_tasks_enriched.gh_otd_bucket` per-tarea (NO recomputar inline con `classifyOtdBucket` en el batch — la VIEW ya es la fuente canónica materializada y respeta el flag M1; si el flag M1 estuviera OFF, el batch debe degradar honesto y no escribir). Decisión a confirmar en plan: leer de VIEW vs llamar helper directo per-tarea.
+**Fuente del valor (CORREGIDA 2026-05-27)**: `task_attributable_lateness_shadow.bucket_attributable` (PG, freeze-corregido por M2/TASK-922). **NO** `v_tasks_enriched.gh_otd_bucket` (BQ) — ese es el clasificador **M1 crudo sin freeze** y, por decisión de M2 (spec §9 "NO mirror BQ del freeze"), nunca reflejará el freeze. Como el shadow se materializa por evento y los buckets `overdue`/`carry_over` dependen de `now()`, el batch **recomputa** `calculateAttributableLateness` para las tareas abiertas del período antes de leer/escribir (no basta leer la fila persistida, puede estar stale). Plan decide: recompute inline en el batch vs un trigger de recompute periódico previo.
 
 ## Rollout Plan & Risk Matrix
 
@@ -221,8 +222,17 @@ Reglas obligatorias:
 - Componente event-driven (PATCH inmediato al completar) si se necesita latencia <24h.
 - M3 (cutover bono OTD): TASK futura gateada (≥30d shadow + sign-off HR) — ortogonal a este display writeback.
 
+## Delta 2026-05-27 — fuente corregida a M2 freeze-aware (PG), no M1 crudo (BQ)
+
+Reconciliación a pedido del operador (sesión de verificación ICO 2026-05-27). El diseño original de esta task escribía el bucket **M1 crudo** (`gh_otd_bucket`, BQ) y asumía que el freeze de M2 fluiría a esa misma columna BQ automáticamente. **Ese supuesto es falso**: el spec de M2 (`ATTRIBUTABLE_LATENESS_V1.md` §9) decidió explícitamente **NO** espejar el freeze a BQ (el cómputo multi-ciclo no es un CASE BQ mantenible; el helper TS es source of truth). El bucket freeze-corregido vive **solo en PG** (`task_attributable_lateness_shadow.bucket_attributable`).
+
+Cambios aplicados: fuente del writeback = PG shadow `bucket_attributable` (M2, TASK-922) en vez de `gh_otd_bucket` (BQ, M1); el daily batch **recomputa** el shadow de tareas abiertas antes de escribir (el shadow es event-materializado, no una VIEW viva, y los buckets `overdue`/`carry_over` dependen de `now()`); Blocked-by repointeado a TASK-922; escribe solo `data_status='valid'` (degraded honesto). Se preserva el diseño daily-batch + flag + signals + echo-loop safety.
+
+**Verificación empírica del shadow live 2026-05-27** (relevante para decidir el flip): el freeze SÍ descuenta días reales (ej. Efeonce 41.6 días en una tarea) pero **no está flipeando ningún bucket** (`freeze_changed_bucket=0`: las tareas `overdue` lo están por márgenes mayores al freeze), y la fecha justa **no se extiende** porque hay **0 reprogramaciones `operator_confirmed`** (TASK-921 capturó 105 cambios, todos `inferred`). O sea: hoy `[GH] OTD` mostraría un bucket casi idéntico al legacy en la mayoría de casos. El plumbing vale igual (transparencia + de-risk, patrón RpA Flip A), pero la divergencia visible llegará recién cuando los operadores empiecen a confirmar motivos en Notion.
+
 ## Open Questions
 
+- **¿Activar el display ya o esperar divergencia?** Con freeze sin flipear buckets + 0 motivos confirmados (ver Delta 2026-05-27), `[GH] OTD` ≈ legacy hoy. Recomendación: shippear plumbing con flag OFF; decidir el flip per-cliente con datos acumulados y/o tras empujar la confirmación de motivos (follow-up de TASK-921).
 - Nombre/labels de la propiedad: `[GH] OTD` con codes `on_time/...` vs labels es-CL ("A tiempo", "Tardío", "Vencido", "Arrastre", "N/A"). Definir en plan con `greenhouse-ux-writing`.
 - Tipo de propiedad: `select` (recomendado, enum cerrado) vs `status` vs `rich_text`. Plan decide.
 - Batch dedicado (Cloud Scheduler nuevo) vs rides en `ops-reactive-delivery` existente.

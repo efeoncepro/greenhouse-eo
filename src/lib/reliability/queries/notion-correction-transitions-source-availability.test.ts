@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   query: vi.fn(),
@@ -15,9 +15,20 @@ vi.mock('@/lib/observability/capture', () => ({
 
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './notion-correction-transitions-source-availability'
 
+const originalWebhookFlag = process.env.NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED
+
 beforeEach(() => {
   mocks.query.mockReset()
   mocks.captureWithDomain.mockReset()
+  process.env.NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED = 'true'
+})
+
+afterEach(() => {
+  if (originalWebhookFlag === undefined) {
+    delete process.env.NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED
+  } else {
+    process.env.NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED = originalWebhookFlag
+  }
 })
 
 describe('getNotionCorrectionTransitionsSourceAvailabilitySignal — TASK-908 Slice 3.5', () => {
@@ -84,6 +95,23 @@ describe('getNotionCorrectionTransitionsSourceAvailabilitySignal — TASK-908 Sl
 
     expect(signal.severity).toBe('error')
     expect(signal.summary).toContain('100%')
+  })
+
+  it('flag disabled with unavailable rows → severity=unknown, not false critical', async () => {
+    process.env.NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED = 'false'
+    mocks.query.mockResolvedValueOnce([{ total_completed: 100, unavailable_count: 100 }])
+
+    const signal = await getNotionCorrectionTransitionsSourceAvailabilitySignal()
+
+    expect(signal.severity).toBe('unknown')
+    expect(signal.summary).toContain('deshabilitada por flag')
+    expect(signal.evidence).toContainEqual(
+      expect.objectContaining({
+        kind: 'metric',
+        label: 'NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED',
+        value: 'false'
+      })
+    )
   })
 
   it('query throws → severity=unknown + captureWithDomain delivery', async () => {

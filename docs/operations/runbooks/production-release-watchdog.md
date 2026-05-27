@@ -3,9 +3,11 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md) §2.9
 > **Source task:** TASK-849
-> **Last updated:** 2026-05-10
+> **Last updated:** 2026-05-24
 
-Este runbook opera el watchdog scheduled que detecta y alerta temprano sobre approvals obsoletos de Production, runs productivos sin jobs y drift de deploy de workers.
+Este runbook opera el watchdog que detecta y alerta temprano sobre approvals obsoletos de Production, runs productivos sin jobs y drift de deploy de workers.
+
+**Estado vigente 2026-05-24:** el schedule automático está pausado hasta TASK-920. Motivo: los últimos 100 runs tuvieron 72 fallos y la señal scheduled estaba generando ruido/falsos positivos. Como el schedule activo vive en default branch `main`, se deshabilitó temporalmente el workflow remoto (`disabled_manually`) hasta que `main` reciba este archivo sin `schedule`; mientras tanto, el CLI local `pnpm release:watchdog --json` sigue disponible para checks post-release o diagnóstico puntual.
 
 ## 1. Qué detecta
 
@@ -19,8 +21,8 @@ Este runbook opera el watchdog scheduled que detecta y alerta temprano sobre app
 
 | Modo | Cuándo | Comando |
 |---|---|---|
-| **Scheduled GH Actions** | Cada 30 min, automático | `.github/workflows/production-release-watchdog.yml` |
-| **Manual GH dispatch** | Operator quiere validar ad-hoc | UI Actions → Production Release Watchdog → Run workflow |
+| **Scheduled GH Actions** | Pausado hasta TASK-920 | N/A |
+| **Manual GH dispatch** | Operador quiere validar ad-hoc, despues de re-enablear el workflow remoto | UI Actions → Production Release Watchdog → Run workflow |
 | **CLI local** | Pre-release verification | `pnpm release:watchdog` |
 | **CLI local con alertas Teams** | Validar dispatch end-to-end | `ENABLE_TEAMS_DISPATCH=true pnpm release:watchdog --enable-teams` |
 | **CLI dry-run** | Ver qué se enviaría sin enviar | `pnpm release:watchdog --enable-teams --dry-run` |
@@ -70,7 +72,7 @@ Cuando recibes alerta Teams `[WARNING|ERROR|CRITICAL] Approval pendiente product
    gh run watch <new_run_id>
    ```
 
-5. **Confirmar Teams recovery alert**: el watchdog detecta resolución en el próximo cron run y emite `[RECOVERED] stale_approval — Ops Worker Deploy` automáticamente.
+5. **Confirmar recuperación manualmente**: ejecutar el watchdog por `workflow_dispatch` o `pnpm release:watchdog --json`; las recovery alerts automáticas no corren mientras el schedule esté pausado.
 
 ## 5. Pending-without-jobs recovery
 
@@ -332,7 +334,7 @@ Subject canónico: `assertion.repository == 'efeoncepro/greenhouse-eo'`.
 
 - **NUNCA** ejecutar `gh run cancel` o `gh run approve` automáticamente desde el watchdog. El watchdog SOLO recomienda; humano decide.
 - **NUNCA** modificar la concurrency config de los 3 worker workflows a `cancel-in-progress: false` para production. Reintroduce el deadlock TASK-848.
-- **NUNCA** desactivar el watchdog por más de 7 días sin justificación documentada. Es la única detección activa del bug class del incidente.
+- **NUNCA** reactivar el schedule automatico antes de TASK-920 sin justificación documentada. Mientras este manual-only, `workflow_dispatch` y `pnpm release:watchdog --json` son el camino de verificacion puntual.
 - **NUNCA** introducir un signal coarse `platform.release.health` que lumpee los 3 failure modes. Greenhouse pattern (TASK-742, TASK-774, TASK-768) es 1 signal por failure mode.
 - **NUNCA** loggear payload completo de respuesta GitHub/Cloud Run sin pasar por `redactSensitive`. GitHub responses pueden incluir email del actor.
 - **SIEMPRE** que emerja un workflow nuevo de deploy production, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` en `src/lib/release/workflow-allowlist.ts` ANTES del primer deploy. Sin esto, el watchdog NO lo detecta.
@@ -348,7 +350,7 @@ gh workflow list | grep "Production Release Watchdog"
 gh workflow run production-release-watchdog.yml --ref develop \
   -f enable_teams=false -f fail_on_error=false
 
-# 3. Verificar que el cron está activo (próximos runs scheduled)
+# 3. Verificar últimos runs manuales o historicos; no debe existir schedule activo
 gh workflow view production-release-watchdog.yml --json runs --jq '.runs[0:5]'
 
 # 4. CLI local sin enviar Teams
@@ -373,7 +375,7 @@ psql -c "SELECT COUNT(*) FROM greenhouse_sync.release_watchdog_alert_state"
 
 ## 13. V1 limitations & V1.1 follow-ups
 
-V1 entrega watchdog + 3 signals + alerting end-to-end con dedup. V1.1 (TASK derivada conditional):
+V1 entrega watchdog + 3 signals + alerting end-to-end con dedup. Estado vigente 2026-05-24: schedule pausado hasta TASK-920, manual dispatch/CLI disponibles. V1.1 (TASK derivada conditional):
 
 - **Per-finding alerts** (vs aggregate signal alerts): cuando emerja necesidad operativa de saber QUE workflow + QUE run_id en cada alert (en lugar del summary del signal), expandir parser de evidence en CLI dispatch loop.
 - **CI gate workflow allowlist**: cuando un workflow nuevo emerge en `.github/workflows/*-deploy.yml` con `environment: production`, CI verifica que aparezca en `RELEASE_DEPLOY_WORKFLOWS`. Sin esto, un workflow nuevo queda invisible al watchdog.

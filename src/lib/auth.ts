@@ -21,6 +21,7 @@ import {
   getTenantAccessRecordByGoogleSub,
   getTenantAccessRecordByInternalMicrosoftAlias,
   getTenantAccessRecordByMicrosoftOid,
+  getTenantAccessRecordByUserId,
   isEligibleForExternalSSOSignIn,
   linkGoogleIdentity,
   linkMicrosoftIdentity,
@@ -62,6 +63,47 @@ const refreshLocaleToken = async (token: JWT) => {
     console.warn('Unable to refresh locale preference for session token.', { userId }, error)
     token.effectiveLocale = normalizeLocale(token.effectiveLocale) ?? defaultLocale
   }
+}
+
+const ACCESS_CLAIMS_REFRESH_INTERVAL_MS = 5 * 60 * 1000
+
+type TenantAccessClaims = NonNullable<Awaited<ReturnType<typeof getTenantAccessRecordByUserId>>>
+
+const applyTenantAccessClaimsToToken = (token: JWT, tenant: TenantAccessClaims) => {
+  token.sub = tenant.userId
+  token.userId = tenant.userId
+  token.email = tenant.email
+  token.name = tenant.fullName
+  token.avatarUrl = tenant.avatarUrl
+  token.clientId = tenant.clientId
+  token.clientName = tenant.clientName
+  token.tenantType = tenant.tenantType
+  token.roleCodes = tenant.roleCodes
+  token.primaryRoleCode = tenant.primaryRoleCode
+  token.routeGroups = tenant.routeGroups
+  token.authorizedViews = tenant.authorizedViews
+  token.projectScopes = tenant.projectScopes
+  token.campaignScopes = tenant.campaignScopes
+  token.businessLines = tenant.businessLines
+  token.serviceModules = tenant.serviceModules
+  token.projectIds = tenant.projectIds
+  token.role = tenant.role
+  token.featureFlags = tenant.featureFlags
+  token.timezone = tenant.timezone
+  token.portalHomePath = tenant.portalHomePath
+  token.authMode = tenant.authMode
+  token.microsoftEmail = tenant.microsoftEmail
+  token.googleEmail = tenant.googleEmail
+
+  token.spaceId = tenant.spaceId ?? undefined
+  token.organizationId = tenant.organizationId ?? undefined
+  token.organizationName = tenant.organizationName ?? undefined
+
+  token.memberId = tenant.memberId ?? undefined
+  token.identityProfileId = tenant.identityProfileId ?? undefined
+
+  applyLocaleToToken(token, tenant)
+  token.accessClaimsRefreshedAt = Date.now()
 }
 
 const getMicrosoftProfileIdentity = ({
@@ -737,6 +779,23 @@ const createAuthOptions = (): NextAuthOptions => {
           token.identityProfileId = tenant.identityProfileId ?? undefined
 
           applyLocaleToToken(token, tenant)
+        }
+      }
+
+      const shouldRefreshAccessClaims =
+        !user &&
+        !account &&
+        typeof token.userId === 'string' &&
+        (typeof token.accessClaimsRefreshedAt !== 'number' ||
+          Date.now() - token.accessClaimsRefreshedAt > ACCESS_CLAIMS_REFRESH_INTERVAL_MS)
+
+      if (shouldRefreshAccessClaims) {
+        const tenant = await getTenantAccessRecordByUserId(token.userId as string)
+
+        if (tenant?.active && tenant.status === 'active') {
+          applyTenantAccessClaimsToToken(token, tenant)
+        } else {
+          token.accessClaimsRefreshedAt = Date.now()
         }
       }
 

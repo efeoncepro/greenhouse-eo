@@ -3,8 +3,12 @@
 > **Tipo de documento:** Manual operativo (lenguaje simple, paso a paso)
 > **Version:** 1.0
 > **Creado:** 2026-05-10 por TASK-849 V1.1
-> **Ultima actualizacion:** 2026-05-10
+> **Ultima actualizacion:** 2026-05-24
 > **Documentacion tecnica:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md), [runbook operativo](../../operations/runbooks/production-release-watchdog.md)
+
+## Estado vigente
+
+El Watchdog está **manual-only temporalmente** en el repo desde el 2026-05-24 hasta que TASK-920 corrija la señal. Los últimos 100 runs scheduled tuvieron 72 fallos y generaban alertas erradas. Para cortar el cron viejo que aún vivía en `main`, el workflow remoto quedó `disabled_manually`; hasta re-enablearlo después de promover el archivo sin `schedule`, usa `pnpm release:watchdog --json` cuando necesites una verificación puntual.
 
 ## Para que sirve
 
@@ -25,7 +29,7 @@ Para que el Watchdog opere correctamente:
 | GitHub App instalada | ✅ live | https://github.com/organizations/efeoncepro/settings/apps/greenhouse-release-watchdog |
 | Vercel env vars production | ✅ live | `vercel env ls \| grep GITHUB_APP` (3 vars deben existir) |
 | GCP secret private key | ✅ live | `gcloud secrets describe greenhouse-github-app-private-key --project=efeonce-group` |
-| Workflow scheduled | ⚠️ pending merge develop→main | `gh workflow list \| grep -i watchdog` |
+| Workflow scheduled | ⏸️ pausado hasta TASK-920 | usar `workflow_dispatch` manual |
 | Workers con GIT_SHA env var | ⚠️ pending re-deploy post-merge | `gcloud run services describe ops-worker --region=us-east4 --format='value(spec.template.spec.containers[0].env)' \| grep GIT_SHA` |
 
 ## Como ver el estado del Watchdog
@@ -136,7 +140,7 @@ gh run cancel <run_id>
 
 **4. Verificar resolucion**
 
-El Watchdog detecta automaticamente que se resolvio en el proximo cron run (max 30 min). Recibirias alerta Teams `[RECOVERED] stale_approval — Ops Worker Deploy`.
+Mientras el schedule esté pausado, ejecuta manualmente `Production Release Watchdog` o `pnpm release:watchdog --json` para confirmar que se resolvió.
 
 ### Cuando llega alerta `[ERROR] Deploy pending sin jobs (concurrency deadlock)`
 
@@ -200,9 +204,9 @@ gh run watch <new_run_id>
 pnpm release:setup-github-app
 ```
 
-### "El cron `*/30 *` no esta corriendo"
+### "El cron del Watchdog no esta corriendo"
 
-→ El workflow file `production-release-watchdog.yml` esta en `develop` pero no en `main`. GitHub Actions solo registra crons cuando el workflow esta en la default branch. Hacer merge `develop → main` activa el cron.
+→ Estado esperado desde 2026-05-24: no debe correr cron automatico. El Watchdog esta manual-only hasta TASK-920. Si necesitas una foto puntual, usa `workflow_dispatch` o `pnpm release:watchdog --json`. Reactivar cron requiere TASK-920 o una decision explicita de incidente.
 
 ### "Worker revision drift dice data_missing siempre"
 
@@ -216,9 +220,9 @@ gh workflow run "ICO Batch Worker Deploy" --ref main
 
 Despues del deploy, el watchdog detecta GIT_SHA en la nueva revision y devuelve severity `ok`.
 
-### "Recibo el mismo alert Teams cada 30 min — spam"
+### "Recibo alertas Teams erradas o spam del Watchdog"
 
-→ El dedup logic deberia prevenir esto. Verificar:
+→ Desde el 2026-05-24 el schedule automático está pausado justamente por este bug class. Si vuelve a pasar, confirmar que el workflow no tenga `schedule:` activo antes de TASK-920. Si el schedule ya está pausado y aun llegan alertas, revisar dedup:
 
 ```bash
 psql -c "SELECT * FROM greenhouse_sync.release_watchdog_alert_state WHERE workflow_name='<name>' AND run_id=<run_id>"

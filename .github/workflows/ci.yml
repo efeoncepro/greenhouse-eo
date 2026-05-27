@@ -1,18 +1,35 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.claude/**'
+      - '.codex/**'
   push:
     branches:
       - main
       - develop
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.claude/**'
+      - '.codex/**'
+
+concurrency:
+  # Vibe-coding produces many superseded commits in minutes. Keep the latest
+  # signal for PR/develop, but never cancel a main verification run.
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/develop' }}
 
 permissions:
   contents: read
 
 jobs:
   quality:
-    name: Lint, test and build
+    name: Fast feedback and conditional build
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -44,6 +61,14 @@ jobs:
           node-version: 20
           cache: pnpm
 
+      - name: Restore ESLint cache
+        uses: actions/cache@v5
+        with:
+          path: .eslintcache
+          key: eslint-${{ runner.os }}-${{ hashFiles('eslint.config.mjs', 'package.json', 'pnpm-lock.yaml', 'tsconfig.json') }}
+          restore-keys: |
+            eslint-${{ runner.os }}-
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -65,8 +90,14 @@ jobs:
           echo ""
           echo "=== Migration count: $(ls migrations/*.sql 2>/dev/null | wc -l | tr -d ' ') ==="
 
+      - name: Build icons for lint
+        run: pnpm build:icons
+
       - name: Lint
-        run: pnpm lint
+        run: pnpm exec eslint . --cache --cache-location .eslintcache
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
 
       - name: Vercel cron async-critical gate (TASK-775)
         # Bloquea PRs que agreguen entries `async-critical` a vercel.json sin
@@ -97,10 +128,6 @@ jobs:
         # room for reporter/artifact flushing so a healthy run is not killed.
         timeout-minutes: 8
 
-      - name: Coverage
-        run: pnpm test:coverage
-        timeout-minutes: 10
-
       - name: Test observability summary
         if: always()
         run: pnpm test:observability:summary
@@ -120,7 +147,10 @@ jobs:
           if-no-files-found: warn
           path: |
             artifacts/tests/**
-            artifacts/coverage/**
 
       - name: Build
+        # Vercel already builds every develop push. Keep GitHub build as a PR,
+        # main and manual checkpoint gate to avoid paying for duplicate develop
+        # builds while preserving pre-release evidence.
+        if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
         run: pnpm build

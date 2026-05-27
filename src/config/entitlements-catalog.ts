@@ -19,7 +19,12 @@ export const ENTITLEMENT_MODULES = [
   // Distinto de `hr` (procesos HR transversales) y `people` (directorio operativo).
   // V1: workforce.member.complete_intake (transición pending_intake → completed).
   // V1.1 follow-up (TASK-874): workforce.member.activation_readiness.{read,override}.
-  'workforce'
+  'workforce',
+  // TASK-935 — namespace de delivery/ICO metrics compute (cycle_time, correction
+  // transitions, notion status-transition ingestion). Las capabilities ya estaban
+  // seedeadas en capabilities_registry por TASK-908/912 pero faltaba el módulo en
+  // el catalog TS → parity drift. NO son can()-checked (auth de CLI/cron/worker).
+  'delivery'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -339,6 +344,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // event finance.expense.economic_category_changed v1.
   {
     key: 'finance.expenses.reclassify_economic_category',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-934 — Aceptar un gasto pagado sin FK-anchor como deuda conocida
+  // (clasificado por economic_category). NO es write-off (el gasto se queda en
+  // P&L). Reservada FINANCE_ADMIN + EFEONCE_ADMIN. Outbox audit event
+  // finance.expense.unanchored_acknowledged v1.
+  {
+    key: 'finance.expenses.acknowledge_unanchored',
     module: 'finance',
     actions: ['update'] as const,
     defaultScope: 'tenant'
@@ -1202,6 +1217,35 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'admin',
     actions: ['read'] as const,
     defaultScope: 'tenant'
+  },
+  // TASK-935 — reconciliación catalog↔DB: capabilities ya seedeadas en
+  // capabilities_registry por TASK-908 (delivery/ICO metrics compute) y TASK-912
+  // (notion status-transition ingestion) que faltaban en el catalog TS. NO son
+  // can()-checked (auth de CLI/cron/ops-worker, no endpoints con can()), por eso
+  // no llevan runtime grant ni disparan latent 403.
+  {
+    key: 'cycle_time.compute.execute',
+    module: 'delivery',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'correction_transitions.compute.read',
+    module: 'delivery',
+    actions: ['read'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'notion.webhook.ingest_status_transitions',
+    module: 'delivery',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'notion.status_transitions.backfill_execute',
+    module: 'delivery',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
   }
 ] as const
 

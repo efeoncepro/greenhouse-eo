@@ -95,6 +95,23 @@ export const reconcileGithubReleaseWebhookEvent = async (
   const match = await findReleaseMatch(event)
 
   if (!match.release) {
+    if (!isFailureEvent(event)) {
+      return {
+        processingStatus: 'ignored',
+        releaseId: null,
+        matchedBy: null,
+        transitionApplied: false,
+        transitionFromState: null,
+        transitionToState: null,
+        errorCode: 'non_failure_without_release_manifest',
+        errorMessage: null,
+        evidence: {
+          ...event.evidence,
+          ignoredReason: 'non_failure_event_without_recent_release_manifest'
+        }
+      }
+    }
+
     return {
       processingStatus: 'unmatched',
       releaseId: null,

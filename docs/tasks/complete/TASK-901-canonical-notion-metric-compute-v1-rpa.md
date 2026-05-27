@@ -1,5 +1,13 @@
 # TASK-901 — Canonical Notion Metric Compute V1 (RpA-only progressive migration)
 
+> ## Delta 2026-05-26 — BigQuery raw echo alias
+>
+> El naming canonical V2 no cambia: la propiedad Notion sigue siendo `[GH] RpA v2` y el agregado del motor sigue siendo `rpa_avg_v2`. Para auditoría/paridad contra el sync Notion -> BigQuery, el eco raw de esa propiedad en `notion_ops.tareas` se llama `gh_rpa_v2`.
+>
+> Regla: ningún compute/cutover de RpA V2 debe leer `gh_rpa_v2` como source of truth. Ese campo solo confirma qué valor quedó reflejado en Notion después del writeback.
+>
+> ---
+
 > ## Delta 2026-05-18 — Slice 1 SHIPPED (calculateRpaV2 canonical helper Fase A)
 >
 > ✅ **Slice 1 V2 helper canonical shipped end-to-end** directo en `develop` (sin branch switch) en 2 commits canonical:

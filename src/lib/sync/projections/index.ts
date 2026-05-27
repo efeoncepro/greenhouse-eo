@@ -68,6 +68,8 @@ import { notionRpaComputeDemoProjection } from './notion-rpa-compute-demo'
 import { notionRpaWritebackDemoProjection } from './notion-rpa-writeback-demo'
 import { notionRpaComputeProjection } from './notion-rpa-compute'
 import { notionRpaWritebackProjection } from './notion-rpa-writeback'
+import { notionFtrComputeProjection } from './notion-ftr-compute'
+import { notionFtrWritebackProjection } from './notion-ftr-writeback'
 import { sampleSprintHubSpotOutboundProjection } from './sample-sprint-hubspot-outbound'
 import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 
@@ -150,4 +152,6 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(notionRpaWritebackDemoProjection) // TASK-913 Slice 2 — PATCH Notion [GH] RpA v2 con valor del snapshot (re-read PG defensive, retryable, idempotent — sibling físicamente separado del writeback productivo futuro)
   registerProjection(notionRpaComputeProjection) // TASK-916 Slice 3 — compute RpA V2 PRODUCTIVO (Efeonce/Sky) via calculateRpaV2 post notion.task.status_transitioned + snapshot task_rpa_snapshots + chain event metrics_writeback_requested
   registerProjection(notionRpaWritebackProjection) // TASK-916 Slice 4 — PATCH Notion [GH] RpA v2 PRODUCTIVO con valor del snapshot, gated NOTION_RPA_WRITEBACK_ENABLED (default OFF hasta TASK-917 Flip A)
+  registerProjection(notionFtrComputeProjection) // TASK-903 Slice 1 — compute FTR PRODUCTIVO (Efeonce/Sky) via calculateFtr post notion.task.status_transitioned + snapshot task_ftr_snapshots + chain event ftr_writeback_requested
+  registerProjection(notionFtrWritebackProjection) // TASK-903 Slice 2 — PATCH Notion select [GH] FTR PRODUCTIVO con veredicto del snapshot, gated NOTION_FTR_WRITEBACK_ENABLED (default OFF)
 }

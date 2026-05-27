@@ -12,6 +12,7 @@ import type {
 } from '@/lib/operations/get-operations-overview'
 import type { GcpBillingOverview } from '@/types/billing-export'
 import type { FinanceSmokeLaneStatus } from '@/types/finance-smoke-lane'
+import type { GitHubBillingOverview } from '@/types/github-billing'
 import type { IntegrationDataQualityOverview } from '@/types/integration-data-quality'
 import type {
   ReliabilityModuleKey,
@@ -20,6 +21,7 @@ import type {
   ReliabilitySignalKind
 } from '@/types/reliability'
 import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
+import type { VercelBillingOverview } from '@/types/vercel-billing'
 
 import { correlateIncident } from './incident-mapping'
 import {
@@ -711,6 +713,299 @@ export const buildGcpBillingSignals = (overview: GcpBillingOverview): Reliabilit
           kind: 'metric',
           label: 'detectionStrategy',
           value: notion.detectionStrategy
+        }
+      ]
+    })
+  }
+
+  return signals
+}
+
+export const buildVercelBillingSignals = (overview: VercelBillingOverview): ReliabilitySignal[] => {
+  const baseEvidence = [
+    {
+      kind: 'endpoint' as const,
+      label: 'Vercel Billing API',
+      value: overview.source.endpoint
+    },
+    {
+      kind: 'helper' as const,
+      label: 'Reader',
+      value: 'src/lib/cloud/vercel-billing.ts:getVercelBillingOverview'
+    },
+    {
+      kind: 'metric' as const,
+      label: 'FOCUS',
+      value: `v${overview.source.focusVersion}`
+    }
+  ]
+
+  if (overview.availability !== 'configured') {
+    const severity: ReliabilitySeverity =
+      overview.availability === 'awaiting_data'
+        ? 'awaiting_data'
+        : overview.availability === 'not_configured'
+          ? 'not_configured'
+          : 'error'
+
+    return [
+      {
+        signalId: 'cloud.billing.vercel',
+        moduleKey: 'cloud',
+        kind: 'billing',
+        source: 'getVercelBillingOverview',
+        label: 'Vercel cost (Billing FOCUS)',
+        severity,
+        summary: overview.error ?? (overview.notes[0] ?? 'Vercel Billing no rinde datos todavia.'),
+        observedAt: overview.generatedAt,
+        evidence: baseEvidence
+      }
+    ]
+  }
+
+  const forecastSeverity =
+    overview.forecast?.thresholdStatus === 'critical'
+      ? 'error'
+      : overview.forecast?.thresholdStatus === 'warning'
+        ? 'warning'
+        : 'ok'
+
+  const spikeSeverity =
+    overview.guardrails.spikeSeverity === 'critical'
+      ? 'error'
+      : overview.guardrails.spikeSeverity === 'warning'
+        ? 'warning'
+        : 'ok'
+
+  const severity: ReliabilitySeverity =
+    forecastSeverity === 'error' || spikeSeverity === 'error'
+      ? 'error'
+      : forecastSeverity === 'warning' || spikeSeverity === 'warning'
+        ? 'warning'
+        : 'ok'
+
+  const signals: ReliabilitySignal[] = [
+    {
+      signalId: 'cloud.billing.vercel',
+      moduleKey: 'cloud',
+      kind: 'billing',
+      source: 'getVercelBillingOverview',
+      label: `Vercel cost (${overview.period.days} dias)`,
+      severity,
+      summary: `Total ${formatCurrency(overview.totalBilledCost, overview.currency)} · forecast ${
+        overview.forecast ? formatCurrency(overview.forecast.monthEndBilledCost, overview.currency) : 'n/d'
+      } · top servicio: ${overview.costByService[0]?.serviceName ?? 'n/d'}.`,
+      observedAt: overview.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'metric',
+          label: 'Proyecto top',
+          value: overview.costByProject[0]?.projectName ?? 'n/d'
+        },
+        ...(overview.forecast
+          ? [
+              {
+                kind: 'metric' as const,
+                label: 'Forecast mensual',
+                value: formatCurrency(overview.forecast.monthEndBilledCost, overview.currency)
+              }
+            ]
+          : [])
+      ]
+    }
+  ]
+
+  if (overview.forecast && ['warning', 'critical'].includes(overview.forecast.thresholdStatus)) {
+    signals.push({
+      signalId: 'cloud.billing.vercel.forecast',
+      moduleKey: 'cloud',
+      kind: 'billing',
+      source: 'getVercelBillingOverview',
+      label: 'Vercel forecast threshold',
+      severity: overview.forecast.thresholdStatus === 'critical' ? 'error' : 'warning',
+      summary: `Vercel proyecta ${formatCurrency(
+        overview.forecast.monthEndBilledCost,
+        overview.currency
+      )} al cierre de mes.`,
+      observedAt: overview.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'metric',
+          label: 'Threshold status',
+          value: overview.forecast.thresholdStatus
+        }
+      ]
+    })
+  }
+
+  if (overview.guardrails.spikeDetected) {
+    signals.push({
+      signalId: 'cloud.billing.vercel.daily_spike',
+      moduleKey: 'cloud',
+      kind: 'billing',
+      source: 'getVercelBillingOverview',
+      label: 'Vercel daily spend spike',
+      severity: overview.guardrails.spikeSeverity === 'critical' ? 'error' : 'warning',
+      summary: overview.guardrails.spikeSummary ?? 'Spike diario detectado en Vercel Billing.',
+      observedAt: overview.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'metric',
+          label: 'Spike threshold',
+          value: overview.guardrails.dailySpikePct ? `${overview.guardrails.dailySpikePct}%` : 'n/a'
+        }
+      ]
+    })
+  }
+
+  return signals
+}
+
+export const buildGitHubBillingSignals = (overview: GitHubBillingOverview): ReliabilitySignal[] => {
+  const baseEvidence = [
+    {
+      kind: 'endpoint' as const,
+      label: 'GitHub Billing Usage API',
+      value: overview.source.endpoint
+    },
+    {
+      kind: 'helper' as const,
+      label: 'Reader',
+      value: 'src/lib/cloud/github-billing.ts:getGitHubBillingOverview'
+    },
+    {
+      kind: 'metric' as const,
+      label: 'API version',
+      value: overview.source.apiVersion
+    }
+  ]
+
+  if (overview.availability !== 'configured') {
+    const severity: ReliabilitySeverity =
+      overview.availability === 'awaiting_data'
+        ? 'awaiting_data'
+        : overview.availability === 'not_configured'
+          ? 'not_configured'
+          : 'error'
+
+    return [
+      {
+        signalId: 'cloud.billing.github',
+        moduleKey: 'cloud',
+        kind: 'billing',
+        source: 'getGitHubBillingOverview',
+        label: 'GitHub Actions cost',
+        severity,
+        summary: overview.error ?? (overview.notes[0] ?? 'GitHub Billing no rinde datos todavia.'),
+        observedAt: overview.generatedAt,
+        evidence: baseEvidence
+      }
+    ]
+  }
+
+  const forecastSeverity =
+    overview.forecast?.thresholdStatus === 'critical'
+      ? 'error'
+      : overview.forecast?.thresholdStatus === 'warning'
+        ? 'warning'
+        : 'ok'
+
+  const spikeSeverity =
+    overview.guardrails.spikeSeverity === 'critical'
+      ? 'error'
+      : overview.guardrails.spikeSeverity === 'warning'
+        ? 'warning'
+        : 'ok'
+
+  const severity: ReliabilitySeverity =
+    forecastSeverity === 'error' || spikeSeverity === 'error'
+      ? 'error'
+      : forecastSeverity === 'warning' || spikeSeverity === 'warning'
+        ? 'warning'
+        : 'ok'
+
+  const signals: ReliabilitySignal[] = [
+    {
+      signalId: 'cloud.billing.github',
+      moduleKey: 'cloud',
+      kind: 'billing',
+      source: 'getGitHubBillingOverview',
+      label: `GitHub Actions cost (${overview.period.startDate} -> ${overview.period.endDate})`,
+      severity,
+      summary: `Gross ${formatCurrency(overview.totalGrossAmount, overview.currency)} · net ${
+        formatCurrency(overview.totalNetAmount, overview.currency)
+      } · top repo: ${overview.byRepository[0]?.repositoryName ?? 'n/d'} · top SKU: ${
+        overview.actions.topSku ?? 'n/d'
+      }.`,
+      observedAt: overview.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'metric',
+          label: 'Org',
+          value: overview.source.org ?? 'n/d'
+        },
+        ...(overview.forecast
+          ? [
+              {
+                kind: 'metric' as const,
+                label: 'Forecast net mensual',
+                value: formatCurrency(overview.forecast.monthEndNetAmount, overview.currency)
+              },
+              {
+                kind: 'metric' as const,
+                label: 'Forecast gross mensual',
+                value: formatCurrency(overview.forecast.monthEndGrossAmount, overview.currency)
+              }
+            ]
+          : [])
+      ]
+    }
+  ]
+
+  if (overview.forecast && ['warning', 'critical'].includes(overview.forecast.thresholdStatus)) {
+    signals.push({
+      signalId: 'cloud.billing.github.forecast',
+      moduleKey: 'cloud',
+      kind: 'billing',
+      source: 'getGitHubBillingOverview',
+      label: 'GitHub forecast threshold',
+      severity: overview.forecast.thresholdStatus === 'critical' ? 'error' : 'warning',
+      summary: `GitHub proyecta net ${formatCurrency(
+        overview.forecast.monthEndNetAmount,
+        overview.currency
+      )} al cierre de mes.`,
+      observedAt: overview.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'metric',
+          label: 'Threshold status',
+          value: overview.forecast.thresholdStatus
+        }
+      ]
+    })
+  }
+
+  if (overview.guardrails.spikeDetected) {
+    signals.push({
+      signalId: 'cloud.billing.github.daily_spike',
+      moduleKey: 'cloud',
+      kind: 'billing',
+      source: 'getGitHubBillingOverview',
+      label: 'GitHub daily spend spike',
+      severity: overview.guardrails.spikeSeverity === 'critical' ? 'error' : 'warning',
+      summary: overview.guardrails.spikeSummary ?? 'Spike diario detectado en GitHub Billing.',
+      observedAt: overview.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'metric',
+          label: 'Spike threshold',
+          value: overview.guardrails.dailySpikePct ? `${overview.guardrails.dailySpikePct}%` : 'n/a'
         }
       ]
     })

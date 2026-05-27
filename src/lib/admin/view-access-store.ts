@@ -62,6 +62,12 @@ export type PersistedUserViewOverrideInput = {
 
 export type ResolvedUserViewAccess = {
   authorizedViews: string[]
+  /**
+   * Broad route groups come from role/session assignment, not from view access.
+   * A user may have a narrow HR view such as `equipo.organigrama` without being
+   * a broad HR/payroll operator. Returning view-derived groups here turns UI
+   * surface access into module access and can poison startup policy.
+   */
   routeGroups: string[]
 }
 
@@ -1065,17 +1071,9 @@ export const resolveAuthorizedViewsForUser = async ({
       }, new Set([...baseAuthorizedViews, ...permissionSetViews]))
     )
 
-    const routeGroups = Array.from(
-      new Set(
-        registryRows
-          .filter(view => authorizedViews.includes(view.viewCode))
-          .map(view => view.routeGroup)
-      )
-    )
-
     return {
       authorizedViews,
-      routeGroups: routeGroups.length > 0 ? routeGroups : fallbackRouteGroups
+      routeGroups: fallbackRouteGroups
     }
   } catch (error) {
     if (error instanceof ViewAccessStoreError && error.code === 'SCHEMA_NOT_READY') {

@@ -8,8 +8,8 @@
 | Status | Accepted |
 | Owner domain | `delivery|ico` |
 | Created | 2026-05-17 by sesión deep-dive RpA + arch reasoning |
-| Last updated | 2026-05-17 |
-| Writeback state | `not_implemented` (TASK-901 V1 implementa el primer writeback completo) |
+| Last updated | 2026-05-26 |
+| Writeback state | Productive writeback shipped via TASK-916/TASK-917 Flip A to `[GH] RpA v2`; raw BigQuery echo `notion_ops.tareas.gh_rpa_v2` |
 | Cross-refs | TASK-877 (bridge regression fuente) · TASK-901 (writeback V1) · TASK-908 (foundation transitions) · TASK-909 (FTR consume RpA) · TASK-215 (confidence policy) · ADR boundary · ADR metric spec pattern |
 
 ---
@@ -78,7 +78,7 @@ Bump a `rpa_v2.0` cuando Frame.io integration shippee y `calculateRpa` extienda 
 
 - **Notion** captura: status edits del operador (cambio de `Status` property → `Listo para revisión` o `En Feedback`)
 - **Greenhouse** observa: webhook `page.properties_updated` filtrado por `Estado 1` property → persiste transition row → `countCorrectionTransitions` consume tabla
-- **Greenhouse devuelve a Notion**: property read-only `[GH] RpA` con el valor computado (TASK-901 V1 writeback)
+- **Greenhouse devuelve a Notion**: property read-only `[GH] RpA v2` con el valor computado. El eco raw en BigQuery es `notion_ops.tareas.gh_rpa_v2`, solo para auditoría/paridad; el motor no lo usa como input.
 
 **Propiedad Notion legacy deprecada para RpA V1**: `Correcciones` rollup. Pre-2026-05-17 era el source primario (`Auto` path del dispatcher Notion). Post-decisión boundary 2026-05-17 + TASK-908 ship: `Correcciones` rollup queda como fallback histórico para tareas pre-TASK-908 deployment, NO se consulta en compute canonical.
 
@@ -278,9 +278,9 @@ Out of scope V1. Hipótesis: video y sitios web tienen RpA esperado más alto (3
 
 | Aspecto | Valor |
 |---|---|
-| Target property Notion | `[GH] RpA` (number, read-only para operadores) |
-| Estado actual | `not_implemented` |
-| Task de writeback | **TASK-901** (V1, primera writeback completa del pattern) |
+| Target property Notion | `[GH] RpA v2` (number, read-only para operadores) |
+| Estado actual | Productive writeback shipped; raw echo `notion_ops.tareas.gh_rpa_v2` |
+| Task de writeback | **TASK-916/TASK-917 Flip A** (productivo) |
 | Frecuencia | Per-edit (webhook reactive) + nightly safety net (Cloud Run Job) |
 | Latencia esperada | 5-30s post-edit (webhook → outbox → consumer → Cloud Tasks → bulk PATCH) |
 | Feature flag | `NOTION_RPA_WRITEBACK_ENABLED` (default `false`) |
@@ -293,7 +293,7 @@ Pre-flip de `NOTION_RPA_WRITEBACK_ENABLED=true` en producción:
 1. TASK-908 Slices 0-3.5 shipped (transitions capture + countCorrectionTransitions) + backfill (Slice 9) verde
 2. TASK-901 Slice 4 shadow mode activo 7 días verde
 3. `notion.metrics.shadow_paridad_rpa` signal steady=0 (paridad calculateRpa vs RpA formula Notion en > 95% tareas con transitions completas)
-4. Allowlist explícita en `Handoff.md` con properties target Notion confirmadas (`[GH] RpA` existe en Sky + Efeonce DBs)
+4. Allowlist explícita en `Handoff.md` con properties target Notion confirmadas (`[GH] RpA v2` existe en Sky + Efeonce DBs; raw alias `gh_rpa_v2`)
 5. Approval HR (compensación variable consume RpA → cambio cross-team)
 
 ---

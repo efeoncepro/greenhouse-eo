@@ -1,0 +1,210 @@
+# TASK-938 — Global66 OTB cascade incompleto → fx_drift falso-real + posible regresión de rematerialize
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `complete`
+- Priority: `P2`
+- Impact: `Medio`
+- Effort: `Medio`
+- Type: `remediation`
+- Epic: `none`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `finance`
+- Blocked by: `none`
+- Branch: `task/TASK-938-global66-otb-cascade-incomplete`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+El signal `finance.account_balances.fx_drift` reporta `error` (2 drifts en `global66-clp`, fechas 2026-03-06 y 2026-04-04) y eso hace fallar el smoke `finance-account-balances-fx-drift.spec.ts` (Playwright en develop). **NO es false-positive del detector ni regresión de TASK-937** — es un **OTB cascade incompleto**: el OTB re-anchor bank-verified de 04-05 ($8.562) existe, pero las transacciones/`account_balances` pre-genesis no quedaron superseded/pruned. Esta task completa el cascade (recovery) e investiga la causa de por qué quedó incompleto (posible regresión: el rematerialize del dedup reciente re-creó filas pre-genesis).
+
+## Delta 2026-05-26 — Execution log (approach pivot por seguridad)
+
+Implementada en `develop` (sin branch, instrucción operador). **El approach pivotó de "borrar filas" a "detector con genesis floor" porque el operador (con razón) tuvo miedo de mutar saldos bancarios.** Verificación read-only exhaustiva antes de decidir.
+
+- **Slice 1 (read-only):** CONFIRMADO regresión sistémica. Las filas pre-genesis de global66 se crearon 2026-04-28 23:07, ~22h DESPUÉS del cascade (01:21) que las borró. El rematerializer en modo `explicit` seedeado < genesis las re-creó (no tenía genesis floor).
+- **Slice 1.5 (read-only):** el scope son **4 cuentas** con filas pre-genesis (global66 30 + santander-clp 333 + santander-usd 303 + sha-cca 303), todas OTBs legítimos del 27-28/04. Solo global66 trippea el detector (sus días pre-genesis con payments caen en la ventana de 90d).
+- **Slice 3 (SHIPPED):** genesis floor en `rematerializeAccountBalanceRange` (`applyGenesisFloor` pura + clamp + `captureWithDomain` warning + `genesisFloorApplied` en result). Previene recurrencia en las 4 cuentas. 5 tests.
+- **Slice 2 (SHIPPED — versión segura, cero mutación):** en vez de borrar filas (mutación de saldos + wrinkle de itx legs Santander→global66 que no tracé al 100%), el detector `fx_drift` ahora **ignora fechas < genesis del OTB activo** (son pre-anchor; el OTB las absorbe). Verificado en vivo read-only: signal pasó de `error(2)` → `ok`, sin tocar ningún saldo.
+- **Verificación de seguridad (read-only) antes del pivot:** (1) saldo vigente global66 (-2.603,41) NO depende de filas pre-genesis (el día del anchor 04-05 tiene opening=8.562 independiente); (2) los 8 expense_payments reales pre-genesis NO se tocan; (3) 0 de las 30 filas están cerradas; (4) el cascade marcaría 5 itx legs entrantes (Santander→global66) solo de un lado → wrinkle no resuelto → por eso NO se ejecutó el borrado.
+
+### Diferido a follow-up (NO ejecutado, no urgente)
+
+Limpieza física de las ~970 filas pre-genesis stale (4 cuentas) vía cascade. Bloqueado por: (a) wrinkle de transferencias internas (superseder un lado del par Santander↔global66 puede desbalancear, área TASK-714); (b) alto blast radius (940 filas 2025 en santander/sha-cca); (c) requiere review finance de si esos OTBs 02-28 deben absorber historia 2025. **No es necesario para apagar la alarma ni el smoke** — el detector + el genesis floor ya lo resuelven sin tocar plata. Las filas quedan como ruido inofensivo (no afectan saldos vigentes).
+
+## Why This Task Exists
+
+Investigación en vivo 2026-05-26 (disparada por el fallo de Playwright en el commit `a22390d9`):
+
+- El detector fx_drift (TASK-774) está **correcto**: su SQL filtra `superseded_by_otb_id IS NULL` en settlement_legs y consume las VIEWs normalizadas (TASK-766) que excluyen OTB-superseded. Verificado en `src/lib/reliability/queries/account-balances-fx-drift.ts:188-279`.
+- Existe el OTB `obtb-global66-clp-20260405-dcd6d635`: `genesis_date=2026-04-05 SOD`, `opening_balance=8562`, `audit_status=reconciled`, bank-verified (screenshot `global66.com/wallets/2303987` + cartola xls). Supersede el OTB viejo de $380.
+- Pero el `cascade_supersede_pre_otb_transactions` (TASK-703b) **no quedó aplicado** para estas fechas:
+
+  | Evidencia (PG live 2026-05-26) | Estado actual | Esperado post-cascade |
+  |---|---|---|
+  | `expense_payments` 03-06/04-04 `superseded_by_otb_id` | `0` (solo superseded por dedup TASK-936) | marcados con el obtb-id |
+  | `account_balances` 03-06 (closing 721.615) | existe | pruned (pre-genesis) |
+  | `account_balances` 04-04 (closing 52.790) | existe | pruned (pre-genesis) |
+  | `account_balances` 04-05 (closing 8.562) | existe ✓ | correcto (= OTB = banco) |
+
+- El detector flaggea esas 2 filas pre-anchor stale. Su "expected" (1.83M / 1.75M) recomputa el día asumiendo que la fila debe existir — pero **no debe existir** (el OTB la absorbe en $8.562). Por eso ni el persisted (52.790) ni el expected (1.83M) son la verdad: la verdad es el OTB ($8.562).
+- **Trampa evitada:** rematerializar a "expected" (1.83M) habría corrompido el saldo alejándolo de la verdad bancaria ($8.562). El fix correcto NO es corregir el día, es completar el cascade para que los días pre-genesis desaparezcan.
+
+**Hipótesis de causa raíz (a confirmar en Slice 1):** el OTB+cascade corrió OK al declararse (2026-04-28), pero el **rematerialize del dedup reciente de Global66 (TASK-936/929, commits ~2026-05-24/25) re-creó los `account_balances` pre-genesis** que el cascade había pruned, porque el seed del rematerialize no respeta el genesis del OTB. Si se confirma, es una regresión sistémica (mirror inverso de TASK-871: en vez de no materializar el seed, materializa días < genesis).
+
+## Goal
+
+- `finance.account_balances.fx_drift` vuelve a `ok` para global66-clp (0 drifts) respetando la verdad bancaria ($8.562 @ 04-05).
+- Smoke `finance-account-balances-fx-drift.spec.ts` vuelve verde.
+- Confirmar/descartar la regresión del rematerialize (¿re-crea filas pre-genesis?). Si se confirma, fix sistémico para que el rematerialize respete el genesis del OTB.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` (OTB cascade-supersede, TASK-703b Delta)
+- `docs/tasks/complete/TASK-703-canonical-opening-trial-balance-and-liability-accounting.md`
+- `docs/tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md` (detector fx_drift)
+- `docs/tasks/complete/TASK-871-account-balance-rolling-anchor-contract.md` (seed/anchor contract)
+- CLAUDE.md — "Finance — OTB cascade-supersede (TASK-703b)" + "Finance — Rolling rematerialize anchor contract (TASK-871)"
+
+Reglas obligatorias:
+
+- **NUNCA** rematerializar a "expected" cuando hay un OTB bank-verified — la verdad es el OTB, no el recompute de los días pre-anchor.
+- **NUNCA** DELETE manual de `account_balances` — usar `cascade_supersede_pre_otb_transactions` (TASK-703b).
+- **NUNCA** bypassear `evidenceGuard` para "arreglar" estos días — el snapshot 04-04 es reconciled bank-verified; el fix es completar el cascade, no restatear sobre el reconciled.
+- Toda mutación es finance → dry-run + autorización operador + idempotencia + reversibilidad documentada.
+
+## Dependencies & Impact
+
+### Depends on
+
+- `greenhouse_finance.cascade_supersede_pre_otb_transactions(account_id, obtb_id, genesis_date, reason)` (migration `20260428000125705` + `20260428085056958`).
+- `greenhouse_finance.account_opening_trial_balance` (OTB `obtb-global66-clp-20260405-dcd6d635`).
+- `scripts/finance/rematerialize-account.ts` / `rematerialize-account-balances.ts`.
+- `declareOpeningTrialBalance` (`src/lib/finance/account-opening-trial-balance.ts:190`).
+
+### Blocks / Impacts
+
+- Desbloquea el smoke `finance-account-balances-fx-drift.spec.ts` (Playwright develop, rojo desde commit `8191ed9b`/`a22390d9`).
+- Relacionada con TASK-929/934/936 (dedup Global66) — el dedup reciente es el sospechoso de re-crear las filas pre-genesis.
+- Si se confirma regresión del rematerialize: impacta el contrato TASK-871 (rolling anchor) y cualquier cuenta con OTB re-anchor.
+
+### Files owned
+
+- `docs/tasks/to-do/TASK-938-*.md`
+- (Slice 2, si aplica) `src/lib/finance/account-balances-rematerialize.ts` o el seed resolver, para respetar genesis OTB.
+
+## Current Repo State
+
+### Already exists
+
+- Detector fx_drift correcto (respeta `superseded_by_otb_id`).
+- Función cascade canónica TASK-703b.
+- OTB bank-verified declarado.
+- Scripts de rematerialize + diagnóstico (`scripts/finance/diagnose-fx-drift.ts`).
+
+### Gap
+
+- El cascade del OTB 04-05 no está aplicado a la data actual (payments no superseded_by_otb_id, account_balances pre-genesis no pruned).
+- No está confirmado QUÉ re-creó las filas pre-genesis (dedup rematerialize sospechoso).
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 1 — Confirmar causa raíz (read-only)
+
+- Verificar si el rematerialize/dedup reciente re-crea filas `account_balances` con `balance_date < genesis_date` del OTB. Reproducir: rematerializar global66-clp en un entorno seguro y observar si re-aparecen 03-06/04-04.
+- Determinar si el `cascade_supersede_pre_otb_transactions` original (2026-04-28) realmente pruned esas filas y algo las re-creó, o si nunca corrió completo.
+- Decisión: ¿fix one-time (re-correr cascade) o fix sistémico (rematerialize respeta genesis)?
+
+### Slice 2 — Recovery one-time (gated, dry-run primero)
+
+- Re-correr `cascade_supersede_pre_otb_transactions('global66-clp', 'obtb-global66-clp-20260405-dcd6d635', '2026-04-05', 'TASK-938 re-run cascade — pre-anchor rows re-created post-dedup')`.
+- Rematerializar desde genesis 04-05 (`scripts/finance/rematerialize-account.ts`).
+- Verificar: account_balances 03-06/04-04 pruned, payments superseded_by_otb_id, closing 04-05 = 8.562, signal fx_drift = ok.
+
+### Slice 3 — Fix sistémico (solo si Slice 1 confirma regresión)
+
+- Que el rematerialize/seed resolver **no materialice días `< genesis_date`** del OTB activo (extender el contrato TASK-871). Tests anti-regresión.
+
+### Slice 4 — Verificación
+
+- `pnpm staging:request '/api/admin/reliability'` → fx_drift ok.
+- Re-disparar Playwright smoke `finance-account-balances-fx-drift.spec.ts` → verde.
+
+## Out of Scope
+
+- Tocar el detector fx_drift (está correcto).
+- Bypassear evidenceGuard / restatear el snapshot reconciled 04-04 (es bank-verified, no se toca).
+- Rematerializar a "expected" (corrompería la verdad bancaria).
+
+## Rollout Plan & Risk Matrix
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal |
+|---|---|---|---|---|
+| Re-correr cascade sin confirmar causa → se vuelve a re-crear post próximo rematerialize | finance/OTB | medium | Slice 1 confirma causa antes de Slice 2; si es regresión, Slice 3 la cierra | `finance.account_balances.fx_drift` |
+| Rematerialize corrompe saldo vs bank truth | finance | low | genesis OTB ancla en 8.562 bank-verified; cascade prunea pre-anchor; dry-run primero | fx_drift |
+| Cascade marca de más (payments post-genesis) | finance | low | la función filtra `transaction_date < genesis_date` (04-05); payments 04-05+ intactos | fx_drift |
+
+### Feature flags / cutover
+
+Sin flag — recovery one-time + (si aplica) fix de contrato. Dry-run obligatorio antes de cualquier apply.
+
+### Rollback plan per slice
+
+- Slice 2: el supersede es append-only (audit-preserved); los account_balances pruned se rematerializan. Si algo sale mal, re-rematerializar desde genesis. El OTB original intacto.
+
+## 4-Pillar Score
+
+- **Safety**: mutación finance gated por autorización operador + dry-run; no toca el snapshot reconciled bank-verified; blast radius = 1 cuenta (global66-clp). Residual: si Slice 1 no se hace, Slice 2 puede recurrir.
+- **Robustness**: cascade idempotente (filtra por genesis_date); rematerialize idempotente.
+- **Resilience**: signal `finance.account_balances.fx_drift` detecta recurrencia (steady=0).
+- **Scalability**: 1 cuenta, 1 OTB — trivial.
+
+## Hard Rules
+
+- **NUNCA** rematerializar a expected con OTB bank-verified presente.
+- **NUNCA** DELETE manual de account_balances — usar el cascade.
+- **SIEMPRE** dry-run + autorización antes de mutar finance.
+
+## Slice 1 — Findings (read-only, 2026-05-26) — CONFIRMADO regresión sistémica
+
+**Timeline decisivo (timestamps PG):**
+
+| Evento | Timestamp |
+|---|---|
+| OTB 04-05 declarado + cascade (borra pre-genesis) | 2026-04-28 01:21 |
+| account_balances pre-genesis (03-24..04-04) CREADOS | 2026-04-28 **23:07** (~22h DESPUÉS del cascade) |
+| account_balances post-genesis (04-05, 04-06) | 2026-04-29 09:00 |
+
+Las filas pre-genesis fueron re-creadas ~22h después del cascade que las borró. NO fue el dedup reciente (los timestamps son del 04-28, no del 05-24).
+
+**Mecanismo exacto** (`account-balances-rematerialize.ts:186-270`):
+- `seedMode='active_otb'` (default): usa `otb.genesisDate` como seed → seguro, nunca pre-genesis.
+- `seedMode='explicit'`: usa `input.seedDate` directo. Un rematerialize explicit seedeado < genesis (como el del 04-28 23:07) materializa días pre-genesis, deshaciendo el prune del cascade. **No hay genesis-floor.**
+
+**Corrección de supuesto previo:** el cascade nuevo (`20260428085056958` "cascade-only-ledger-not-costs") por diseño NO toca expense/income_payments (solo settlement_legs + DELETE account_balances). Que los payments tengan `superseded_by_otb_id=0` es CORRECTO, no síntoma. El síntoma es las filas account_balances pre-genesis que no debieron existir.
+
+**Recurrencia real:** el daily cron `ops-finance-rematerialize-balances` usa ventana rolling 7 días (>> genesis 04-05), así que NO re-toca pre-genesis — las filas stale del 04-28 no se regeneran en operación normal. El riesgo es solo un rematerialize histórico manual seedeado < genesis. Aún así, el fix robusto (no bandaid) es el genesis-floor (Slice 3) para que NINGÚN rematerialize pueda re-introducir pre-genesis.
+
+## Open Questions — RESUELTAS pre-execution (2026-05-26)
+
+- **Q1 — ¿El rematerialize re-crea filas pre-genesis?** → **SÍ, confirmado.** Mecanismo: `seedMode='explicit'` sin genesis-floor (ver Slice 1 findings). → Justifica Slice 3 (genesis-floor) como fix sistémico, no solo Slice 2 one-time.
+- **Q2 — ¿Otras cuentas con OTB re-anchor afectadas?** → Escanear en Slice 1.5 (read-only): cualquier cuenta con `account_balances.balance_date < su OTB activo genesis_date`. Si aparecen, el cascade + genesis-floor las cubre igual (fix genérico).
+- **Decisión de diseño (robusta, no bandaid):** Slice 3 (genesis-floor en el rematerializer, ambos modos: si `seedDate < otb.genesisDate` → clamp a genesis + opening del OTB + warn `captureWithDomain('finance')`) ANTES de Slice 2 (cleanup one-time via cascade), para que el cleanup no se deshaga. Clamp (no throw) para no romper callers legítimos; el clamp es "correcto por construcción" (no se puede materializar antes del anchor).

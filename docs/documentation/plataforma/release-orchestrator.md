@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-05-10 por Claude
+> **Ultima actualizacion:** 2026-05-24 por Codex
 > **Documentacion tecnica:** [TASK-851](../../tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md), [CLAUDE.md §Production Release Orchestrator invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Orquestador de Release a Producción
@@ -10,7 +10,7 @@
 
 Greenhouse promueve código de `develop` (staging) a `main` (production) varias veces al mes. Antes de TASK-851 ese flujo era manual y propenso a errores. El **orquestador** (`production-release.yml`) lo convierte en una sola corrida workflow GitHub Actions con 8 jobs canónicos, audit completo y verificación post-deploy.
 
-Es el **brazo activo** del control plane de releases junto al **preflight** (CLI que valida antes de actuar) y al **watchdog** (alerta en runtime cada 30 min).
+Es el **brazo activo** del control plane de releases junto al **preflight** (CLI que valida antes de actuar) y al **watchdog** (verificacion runtime manual mientras TASK-920 corrige sus falsos positivos).
 
 ## Por que existe
 
@@ -77,7 +77,7 @@ normal se ejecuta via `workflow_call` dentro de `production-release.yml`.
 
 ```text
 TASK-848 V1.0 manifest tables ─────┐
-TASK-849 watchdog (alerta runtime)─┼─→ El orquestador consume TODO esto
+TASK-849 watchdog (manual runtime)─┼─→ El orquestador consume TODO esto
 TASK-850 preflight CLI ────────────┤   y orquesta el release end-to-end
 TASK-851 worker workflow_call  ────┤
 TASK-851 worker deploy.sh verify ──┘
@@ -115,7 +115,7 @@ Reusa capabilities ya existentes (least-privilege per TASK-848):
 | Fase | Estado | Descripción |
 |---|---|---|
 | V1.0 (TASK-848) | SHIPPED 2026-05-10 | Foundation: tablas, capabilities, signals, concurrency fix, rollback CLI |
-| V1.1 watchdog (TASK-849) | SHIPPED 2026-05-10 | Detector + alertas Teams cada 30min |
+| V1.1 watchdog (TASK-849) | SHIPPED 2026-05-10; schedule pausado 2026-05-24 | Detector manual hasta TASK-920 |
 | V1.1 preflight (TASK-850) | SHIPPED 2026-05-10 | CLI 12 checks fail-fast |
 | **V1.1 orchestrator (TASK-851)** | **SHIPPED 2026-05-10** | **Workflow end-to-end + worker SHA verification** |
 | V1.1 Azure gating (TASK-853) | Por venir | Job condicional Bicep deploy gated por diff |

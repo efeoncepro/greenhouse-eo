@@ -304,7 +304,12 @@ export default [
       'greenhouse/no-inline-payroll-scope-gate': 'warn',
       // TASK-893 hotfix #3 (2026-05-16) — modo error desde commit-1 (tolerancia
       // cero: bug class ya genero 2 Sentry alerts en producción hoy).
-      'greenhouse/no-extract-epoch-from-date-subtraction': 'error'
+      'greenhouse/no-extract-epoch-from-date-subtraction': 'error',
+      // TASK-909 Slice 1 — modo warn durante V1.0 (defense para consumers
+      // futuros; el helper per-task FTR aún no tiene consumers — writeback es
+      // TASK-903 futura). Promote a `error` cuando emerja el primer consumer
+      // real + zero drift sostenido.
+      'greenhouse/no-inline-ftr-calculation': 'warn'
     }
   },
   {
@@ -370,6 +375,22 @@ export default [
     ],
     rules: {
       'greenhouse/no-extract-epoch-from-date-subtraction': 'off'
+    }
+  },
+
+  // TASK-909 Slice 1 — la lint rule no-inline-ftr-calculation se desactiva SOLO
+  // en el helper canonical (que tiene legítimamente `rpa.value === 0 ? 'pass' :
+  // 'fail'`) + su test + el rule mismo + su test (donde el patrón aparece en
+  // docstrings y assertion strings). Anywhere else el recompute está prohibido.
+  {
+    files: [
+      'src/lib/notion-metrics/calculate-ftr.ts',
+      'src/lib/notion-metrics/calculate-ftr.test.ts',
+      'eslint-plugins/greenhouse/rules/no-inline-ftr-calculation.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/no-inline-ftr-calculation.test.mjs'
+    ],
+    rules: {
+      'greenhouse/no-inline-ftr-calculation': 'off'
     }
   },
 

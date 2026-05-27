@@ -48,6 +48,16 @@ export interface LedgerHealthSnapshot {
     sample: Array<{ expenseId: string; type: string; amount: number; paymentDate: string | null }>
   }
   /**
+   * TASK-934 — acknowledgedDebt: gastos pagados sin FK-anchor que el operador
+   * aceptó como deuda conocida (clasificados por economic_category, sin supplier
+   * apropiado). Equivalente al SUM-of-unadjusted-misstatements de auditoría:
+   * visible pero NO afecta `healthy` (ya no cuentan como unanchored pendiente).
+   */
+  acknowledgedDebt: {
+    count: number
+    totalClp: number
+  }
+  /**
    * TASK-708 Slice 6 — phantom cohorts diferenciadas runtime vs historico.
    * `runtime` deberia ser 0 post-cutover (CHECK income/expense_payments_account_required_after_cutover).
    * `historical` solo baja cuando TASK-708b ejecuta la remediacion.
@@ -136,6 +146,17 @@ export interface LedgerHealthSnapshot {
       assetStatus: string | null
     }>
   }
+  /**
+   * TASK-929 — Honest degradation. Names of drift checks whose underlying query
+   * threw instead of returning rows. Each check is wrapped so a swallowed
+   * transient error (e.g. connection blip) is NEVER silently collapsed to
+   * "0 drift" → false `healthy=true` (the ISSUE-071 / Pillar 3 bug class
+   * verified live 2026-05-24: a probe returned healthy=true while the VIEW had
+   * 4 drift rows). When a DECISION-CRITICAL check is degraded, `healthy` is
+   * forced FALSE — we cannot claim the ledger is clean while blind to a check.
+   * Steady state: `[]`.
+   */
+  degradedChecks: string[]
 }
 
 const STALE_THRESHOLD_DAYS = 2
@@ -502,13 +523,21 @@ const TASK708D_COHORT_D_COUNT_SQL = `
 // superseded_by_otb_id NOT NULL — esas son audit chains, no movimientos
 // activos.
 
+// TASK-714d detector fix (2026-05-25, diagnóstico TASK-929): el invariante
+// bilateral es "el par fue CREADO" (1 outgoing + 1 incoming), NO "las patas
+// activas balancean". El filtro de supersede anterior producía FALSOS POSITIVOS:
+// cuando una pata se retira legítimamente (absorbida por un re-anchor OTB
+// TASK-703b, o reemplazada por el propio backfill TASK-714d Slice 2), las patas
+// activas quedan asimétricas aunque el par se creó completo. Verificado live: 8
+// grupos flagueados por el filtro viejo eran todos pares completos (CLP→tarjeta
+// con incoming OTB-absorbida, y CLP→global66 reemplazadas por Slice 2). Contar
+// TODAS las patas (supersede-independiente) catchea el bug real — outgoing
+// creado sin incoming jamás creado (1≠0) — sin falsos positivos por supersede.
 const TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_COUNT_SQL = `
   SELECT COUNT(*) AS total FROM (
     SELECT settlement_group_id
     FROM greenhouse_finance.settlement_legs
     WHERE leg_type = 'internal_transfer'
-      AND superseded_at IS NULL
-      AND superseded_by_otb_id IS NULL
     GROUP BY settlement_group_id
     HAVING SUM(CASE WHEN direction = 'outgoing' THEN 1 ELSE 0 END)
         <> SUM(CASE WHEN direction = 'incoming' THEN 1 ELSE 0 END)
@@ -523,8 +552,6 @@ const TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_SAMPLE_SQL = `
     array_agg(DISTINCT instrument_id) AS instruments
   FROM greenhouse_finance.settlement_legs
   WHERE leg_type = 'internal_transfer'
-    AND superseded_at IS NULL
-    AND superseded_by_otb_id IS NULL
   GROUP BY settlement_group_id
   HAVING SUM(CASE WHEN direction = 'outgoing' THEN 1 ELSE 0 END)
       <> SUM(CASE WHEN direction = 'incoming' THEN 1 ELSE 0 END)
@@ -611,9 +638,26 @@ const UNANCHORED_EXPENSES_SQL = `
     AND e.tax_type IS NULL
     AND e.loan_account_id IS NULL
     AND e.linked_income_id IS NULL
+    -- TASK-934: acknowledged-as-known-debt expenses no cuentan para healthy.
+    AND e.unanchored_acknowledged_at IS NULL
     AND e.payment_date >= CURRENT_DATE - INTERVAL '60 days'
   ORDER BY e.payment_date DESC NULLS LAST
   LIMIT 20
+`
+
+// TASK-934 — acknowledgedDebt (SUM-of-unadjusted): unanchored paid expenses the
+// operator accepted as known debt. Surfaced separately; does NOT affect healthy.
+const ACKNOWLEDGED_DEBT_SQL = `
+  SELECT COUNT(*)::int AS count, COALESCE(SUM(e.total_amount), 0)::text AS total_clp
+  FROM greenhouse_finance.expenses e
+  WHERE e.payment_status = 'paid'
+    AND e.payroll_entry_id IS NULL
+    AND e.tool_catalog_id IS NULL
+    AND e.supplier_id IS NULL
+    AND e.tax_type IS NULL
+    AND e.loan_account_id IS NULL
+    AND e.linked_income_id IS NULL
+    AND e.unanchored_acknowledged_at IS NOT NULL
 `
 
 const readCount = (rows: Array<{ total: string | number | null }>): number => {
@@ -623,7 +667,35 @@ const readCount = (rows: Array<{ total: string | number | null }>): number => {
   return Number.isFinite(n) ? Math.trunc(n) : 0
 }
 
+// TASK-929 — decision-critical checks whose query failure forces healthy=false.
+// (Sample / informational queries can fail without flipping healthy — they only
+// enrich the snapshot, they don't decide ledger health.)
+const DECISION_CRITICAL_CHECKS = new Set<string>([
+  'settlement_drift',
+  'phantoms_income',
+  'phantoms_expense',
+  'balance_freshness',
+  'unanchored_expenses',
+  'task708_pending_runtime',
+  'task708_promoted_invariant',
+  'task708d_cohort_d',
+  'task714d_imbalance',
+  'task720_kpi_rule',
+  'task721_broken_evidence'
+])
+
 export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> => {
+  // TASK-929: capture WHICH check failed instead of silently collapsing to "0
+  // results". A swallowed transient error must never be reported as healthy.
+  const degradedChecks: string[] = []
+
+  const tracked = <T>(name: string, promise: Promise<T[]>, fallback: T[]): Promise<T[]> =>
+    promise.catch(() => {
+      degradedChecks.push(name)
+
+      return fallback
+    })
+
   const [
     drifted,
     phantomsIncome,
@@ -643,28 +715,29 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     task720CountRows,
     task720SampleRows,
     task721CountRows,
-    task721SampleRows
+    task721SampleRows,
+    acknowledgedDebtRows
   ] = await Promise.all([
-    runGreenhousePostgresQuery<{ income_id: string; total_amount: string; amount_paid: string; expected_settlement: string; drift: string }>(SETTLEMENT_DRIFT_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ payment_id: string; income_id: string; payment_date: string; amount: string }>(PHANTOMS_INCOME_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ payment_id: string; expense_id: string; payment_date: string; amount: string }>(PHANTOMS_EXPENSE_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ account_id: string; last_materialized_at: string | null; days_stale: number | null }>(FRESHNESS_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ expense_id: string; expense_type: string; total_amount: string; payment_date: string | null }>(UNANCHORED_EXPENSES_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_PAYMENTS_PENDING_ACCOUNT_RUNTIME_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_PAYMENTS_PENDING_ACCOUNT_HISTORICAL_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_SETTLEMENT_LEGS_PRINCIPAL_WITHOUT_INSTRUMENT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_RECONCILED_AGAINST_UNSCOPED_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_UNRESOLVED_OVER_THRESHOLD_SQL, [EXTERNAL_SIGNALS_UNRESOLVED_THRESHOLD_DAYS]).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_PROMOTED_INVARIANT_VIOLATION_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{ total: string }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_COUNT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{
+    tracked('settlement_drift', runGreenhousePostgresQuery<{ income_id: string; total_amount: string; amount_paid: string; expected_settlement: string; drift: string }>(SETTLEMENT_DRIFT_SQL), []),
+    tracked('phantoms_income', runGreenhousePostgresQuery<{ payment_id: string; income_id: string; payment_date: string; amount: string }>(PHANTOMS_INCOME_SQL), []),
+    tracked('phantoms_expense', runGreenhousePostgresQuery<{ payment_id: string; expense_id: string; payment_date: string; amount: string }>(PHANTOMS_EXPENSE_SQL), []),
+    tracked('balance_freshness', runGreenhousePostgresQuery<{ account_id: string; last_materialized_at: string | null; days_stale: number | null }>(FRESHNESS_SQL), []),
+    tracked('unanchored_expenses', runGreenhousePostgresQuery<{ expense_id: string; expense_type: string; total_amount: string; payment_date: string | null }>(UNANCHORED_EXPENSES_SQL), []),
+    tracked('task708_pending_runtime', runGreenhousePostgresQuery<{ total: string }>(TASK708_PAYMENTS_PENDING_ACCOUNT_RUNTIME_SQL), [{ total: '0' }]),
+    tracked('task708_pending_historical', runGreenhousePostgresQuery<{ total: string }>(TASK708_PAYMENTS_PENDING_ACCOUNT_HISTORICAL_SQL), [{ total: '0' }]),
+    tracked('task708_legs_without_instrument', runGreenhousePostgresQuery<{ total: string }>(TASK708_SETTLEMENT_LEGS_PRINCIPAL_WITHOUT_INSTRUMENT_SQL), [{ total: '0' }]),
+    tracked('task708_reconciled_unscoped', runGreenhousePostgresQuery<{ total: string }>(TASK708_RECONCILED_AGAINST_UNSCOPED_SQL), [{ total: '0' }]),
+    tracked('task708_signals_unresolved', runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_UNRESOLVED_OVER_THRESHOLD_SQL, [EXTERNAL_SIGNALS_UNRESOLVED_THRESHOLD_DAYS]), [{ total: '0' }]),
+    tracked('task708_promoted_invariant', runGreenhousePostgresQuery<{ total: string }>(TASK708_EXTERNAL_SIGNALS_PROMOTED_INVARIANT_VIOLATION_SQL), [{ total: '0' }]),
+    tracked('task714d_imbalance', runGreenhousePostgresQuery<{ total: string }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_COUNT_SQL), [{ total: '0' }]),
+    tracked('task714d_imbalance_sample', runGreenhousePostgresQuery<{
       settlement_group_id: string
       out_count: number
       in_count: number
       instruments: string[]
-    }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_SAMPLE_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ total: string }>(TASK708D_COHORT_D_COUNT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{
+    }>(TASK714D_INTERNAL_TRANSFER_PAIR_IMBALANCE_SAMPLE_SQL), []),
+    tracked('task708d_cohort_d', runGreenhousePostgresQuery<{ total: string }>(TASK708D_COHORT_D_COUNT_SQL), [{ total: '0' }]),
+    tracked('task708d_cohort_d_sample', runGreenhousePostgresQuery<{
       payment_kind: 'income' | 'expense'
       payment_id: string
       document_id: string
@@ -672,22 +745,23 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
       payment_date: string
       amount: string
       signal_id: string
-    }>(TASK708D_COHORT_D_SAMPLE_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ total: string }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_COUNT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{
+    }>(TASK708D_COHORT_D_SAMPLE_SQL), []),
+    tracked('task720_kpi_rule', runGreenhousePostgresQuery<{ total: string }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_COUNT_SQL), [{ total: '0' }]),
+    tracked('task720_kpi_rule_sample', runGreenhousePostgresQuery<{
       account_id: string
       account_name: string
       instrument_category: string
       currency: string
-    }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_SAMPLE_SQL).catch(() => []),
-    runGreenhousePostgresQuery<{ total: string }>(TASK721_BROKEN_EVIDENCE_COUNT_SQL).catch(() => [{ total: '0' }]),
-    runGreenhousePostgresQuery<{
+    }>(TASK720_ACCOUNTS_WITHOUT_KPI_RULE_SAMPLE_SQL), []),
+    tracked('task721_broken_evidence', runGreenhousePostgresQuery<{ total: string }>(TASK721_BROKEN_EVIDENCE_COUNT_SQL), [{ total: '0' }]),
+    tracked('task721_broken_evidence_sample', runGreenhousePostgresQuery<{
       snapshot_id: string
       account_id: string
       snapshot_at: string
       evidence_asset_id: string
       asset_status: string | null
-    }>(TASK721_BROKEN_EVIDENCE_SAMPLE_SQL).catch(() => [])
+    }>(TASK721_BROKEN_EVIDENCE_SAMPLE_SQL), []),
+    tracked('acknowledged_debt', runGreenhousePostgresQuery<{ count: number; total_clp: string }>(ACKNOWLEDGED_DEBT_SQL), [{ count: 0, total_clp: '0' }])
   ])
 
   const incomePhantoms = phantomsIncome.map(p => ({
@@ -737,6 +811,12 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
       amount: Number(u.total_amount),
       paymentDate: u.payment_date
     }))
+  }
+
+  // TASK-934 — informational (not decision-critical): accepted known debt.
+  const acknowledgedDebt = {
+    count: Number(acknowledgedDebtRows[0]?.count ?? 0),
+    totalClp: Number(acknowledgedDebtRows[0]?.total_clp ?? 0)
   }
 
   const task708 = {
@@ -792,7 +872,13 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     }))
   }
 
+  // TASK-929: a degraded decision-critical check means we are blind to part of
+  // the ledger — we cannot honestly claim healthy. Sample/informational check
+  // failures (e.g. *_sample) do not flip healthy, only enrich the snapshot.
+  const degradedCritical = degradedChecks.some(check => DECISION_CRITICAL_CHECKS.has(check))
+
   const healthy =
+    !degradedCritical &&
     settlementDrift.driftedIncomesCount === 0 &&
     phantoms.incomePhantomsCount === 0 &&
     phantoms.expensePhantomsCount === 0 &&
@@ -821,10 +907,12 @@ export const getFinanceLedgerHealth = async (): Promise<LedgerHealthSnapshot> =>
     phantoms,
     balanceFreshness: { accountsWithStaleBalances },
     unanchoredExpenses,
+    acknowledgedDebt,
     task708,
     task708d,
     task714d,
     task720,
-    task721
+    task721,
+    degradedChecks
   }
 }

@@ -1,3 +1,419 @@
+# Sesion 2026-05-27 — Daniela Ferreira redirect loop post-SSO — ✅ ROOT FIX LOCAL
+
+Incidente: Daniela autenticaba correctamente con Microsoft SSO (`last_login_at=2026-05-27 14:59 UTC`) pero terminaba en `ERR_TOO_MANY_REDIRECTS` en `https://greenhouse.efeoncepro.com/hr/payroll`.
+
+**Causa raíz:** no era Azure/Google/SCIM. El resolver `resolveAuthorizedViewsForUser()` estaba promoviendo `authorizedViews` a `routeGroups`: como Daniela tiene vistas HR limitadas (`equipo.personas`, `equipo.organigrama`) pero `equipo.nomina` está denegada explícitamente, su JWT podía quedar con `routeGroups.includes('hr')`; el callback de NextAuth recalculaba `portalHomePath` como `/hr/payroll`, y esa ruta la rechazaba por no tener `equipo.nomina`, generando loop.
+
+**Fix robusto:**
+- `src/lib/admin/view-access-store.ts`: `authorizedViews` ya no derivan `routeGroups`; los route groups broad quedan solo desde roles/sesión (`fallbackRouteGroups`).
+- `src/lib/auth.ts`: el JWT refresca claims de acceso desde `getTenantAccessRecordByUserId()` con TTL de 5 minutos para corregir sesiones existentes sin pedir borrar cookies. No toca secrets, providers, Azure/Google callback link, ni SCIM.
+- `src/lib/admin/view-access-store.test.ts`: regresión para impedir que una vista HR parcial vuelva a materializar routeGroup `hr`.
+
+**Verificación:** Daniela runtime local contra PG real queda `routeGroups={employee,internal,my}`, `authorizedViews` conserva `equipo.personas`, `equipo.organigrama`, `mi_ficha.mi_nomina`, y `portalHomePath=/home`. Gates: `vitest` focal 2 archivos/11 tests ✓, auth/access focal 7 archivos/40 tests ✓, `tsc --noEmit` ✓, ESLint focal ✓. Pendiente: deploy/push no ejecutado sin confirmación humana.
+
+---
+
+# Sesion 2026-05-26 — TASK-938 Global66 OTB cascade incompleto → fx_drift — ✅ COMPLETE (cero mutación de saldos)
+
+El smoke `finance-account-balances-fx-drift.spec.ts` (Playwright develop) fallaba porque el signal `finance.account_balances.fx_drift` reportaba `error` (2 drifts en global66-clp). **No era TASK-937 ni false-positive del detector.**
+
+**Causa raíz (Slice 1, read-only):** el rematerializer en modo `explicit` seedeado < genesis del OTB activo re-crea `account_balances` pre-anchor que el cascade TASK-703b había borrado. Confirmado por timestamps: filas pre-genesis de global66 creadas 2026-04-28 23:07, ~22h DESPUÉS del cascade (01:21). El rematerializer no tenía genesis floor. **Scope: 4 cuentas** (global66 30 + santander-clp 333 + santander-usd 303 + sha-cca 303), todas OTBs legítimos; solo global66 trippea el detector (días pre-genesis con payments en ventana 90d).
+
+**Fix (2 slices, develop directo):**
+- **Slice 3** — `applyGenesisFloor` (pura) en `rematerializeAccountBalanceRange`: clampea seed al genesis del OTB activo cuando seed < genesis. Previene recurrencia en las 4 cuentas. Rolling jobs (TASK-871) seedean >> genesis → nunca se dispara.
+- **Slice 2 (pivot por seguridad)** — el operador (con razón) tuvo miedo de mutar saldos bancarios. En vez de borrar filas (mutación + wrinkle de itx legs Santander↔global66 no resuelto), el detector `fx_drift` ahora **ignora fechas < genesis del OTB activo** (son pre-anchor; el OTB las absorbe). **Cero mutación de datos.**
+
+**Verificación de seguridad (read-only, antes de cualquier cambio):** saldo vigente global66 (-2.603,41) NO depende de filas pre-genesis (anchor 04-05 opening=8.562 independiente); 8 expense_payments reales intactos; 0 filas cerradas. Signal verificado en vivo: `error(2)` → `ok` sin tocar un saldo. Gate: build ✓, 5426 tests / 0 fail, tsc ✓, lint ✓.
+
+**Diferido (no urgente, no ejecutado):** limpieza física de las ~970 filas pre-genesis stale (4 cuentas) — bloqueado por wrinkle de transferencias internas (TASK-714) + blast radius 2025 + requiere review finance. No necesario para apagar la alarma (el detector + genesis floor ya lo resuelven). Spec: `docs/tasks/complete/TASK-938-global66-otb-cascade-incomplete-fx-drift.md`.
+
+---
+
+# Sesion 2026-05-26 — RpA V2 Notion raw alias contract — implemented
+
+- Owner: Codex.
+- Status: implemented and focused validation passed.
+- Context:
+  - Follow-up to the Admin Center audit/root-cause fix in `../notion-bigquery`.
+  - User asked whether normalizing `[GH] RpA v2` to `gh_rpa_v2` could break RpA V2, then asked to apply the clarification everywhere relevant.
+- What changed:
+  - Portal normalizers now treat forbidden BigQuery field chars the same way for Notion property lookup/governance:
+    - `scripts/sync-source-runtime-projections.ts`
+    - `src/lib/space-notion/notion-governance-contract.ts`
+  - Added regression test for `normalizeNotionPropertyKey('[GH] RpA v2') === 'gh_rpa_v2'`.
+  - Documented the contract in ADR, sync architecture, onboarding provisioning, admin reliability audit, TASK-916, changelog and project context.
+  - Updated `../notion-bigquery` docs and added a Python smoke test for `_normalize_prop_key()`.
+- Canonical contract:
+  - Notion property remains literal `[GH] RpA v2`.
+  - Raw BigQuery echo is `notion_ops.tareas.gh_rpa_v2`.
+  - RpA V2 engine does **not** read that raw echo; it computes from `task_status_transitions` and writes snapshots, then PATCHes `[GH] RpA v2`.
+  - `notion_ops.stg_tareas.rpa` / `notion_ops.tareas.rpa` remain legacy V1.
+- Validation:
+  - `pnpm exec vitest run src/lib/space-notion/notion-governance-contract.test.ts` — 1 file / 2 tests passed.
+  - `python3 tests/test_normalize_prop_key.py` in `../notion-bigquery` — OK.
+  - `python3 -m py_compile main.py tests/test_normalize_prop_key.py` in `../notion-bigquery` — OK.
+
+---
+
+# Sesion 2026-05-26 — TASK-937 AI Observer reliability hardening — ✅ COMPLETE (live-verified)
+
+El AI Observer (TASK-638) llevaba días mostrando "AI Observer no activo" en `/admin` aunque el flag estaba ON, el cron horario disparaba y Vertex respondía. Causa raíz (una sola falla de diseño): la liveness se infería del **output** (una fila `overview` fresca) en vez de un **run record propio**. Combinado con dos síntomas: (A) `gemini-2.5-flash` truncaba el JSON ~5/6 corridas porque corre con *thinking* ON por default y se comía el `maxOutputTokens`; (B) el overview se deduplica por fingerprint determinístico → postura estable = no re-persiste → la ventana de 24h del reader lo escondía → banner falso.
+
+Fix shipped (5 commits `48a3e7f6`→`8191ed9b`, develop directo por instrucción operador):
+
+- **S1 — config modelo**: `thinkingConfig:{thinkingBudget:0}` + `maxOutputTokens 4096` + captura de `finishReason` (distingue `MAX_TOKENS` de JSON malformado).
+- **S2/2b — heartbeat**: cada sweep escribe un run record en `source_sync_runs` (`source_system='reliability_ai_observer'`, reusa el primitivo canónico, NO tabla nueva) vía wrapper boundary non-blocking + índice parcial. Status mapping respeta el CHECK enum real (`disabled→cancelled`, `parse-fail→failed`, `persist/dedup→succeeded`).
+- **S3 — signal**: `reliability.ai_observer.unhealthy` (moduleKey `cloud`) lee el heartbeat, NO la frescura del overview. Severidad: sin runs→awaiting_data, >2.5h→error, disabled→not_configured, ≥4 failed→error, 1-3 failed→warning.
+- **S4 — banner honesto**: reader con ventana asimétrica (overview sin filtro de edad con label "hace X"; módulos 24h para no contaminar `ai_summary` del RCP vivo) + 4 estados (not_configured / unhealthy / render / empty).
+
+Revisado pre-execution con `arch-architect` (4-pillar) + `gcp-vertex-ai` (shape `thinkingBudget` confirmado en `@google/genai@1.45`). Correcciones de Audit: status `skipped` no existe en el CHECK → remap; índice parcial agregado; `finishReason` agregado.
+
+Verificación en vivo (cron forzado tras deploy ops-worker, run `26449627163`):
+- Sweep: `done — evaluated=5 persisted=5 skipped=0` (antes `skipped parse_failed`).
+- Heartbeat: `status=succeeded`, notes `persisted=5 evaluated=5`.
+- Overview: fresco (<1min; antes stale 4 días).
+- Signal `reliability.ai_observer.unhealthy`: `ok`.
+- Reader devuelve overview → banner renderiza el resumen real.
+
+Gates: full suite **5419 passed / 0 failed**, build ✓, tsc ✓, lint ✓. 15 tests nuevos. Spec: `docs/tasks/complete/TASK-937-ai-observer-reliability-hardening.md`.
+
+---
+
+# Sesion 2026-05-26 — Remediación audit `/admin` hallazgos 1, 2 y 5 — ✅ PARTIAL ROOT FIX
+
+Se resolvieron los hallazgos pedidos de forma root-cause, sin silenciar UI:
+
+- **1 Platform/Data sync/reactive**:
+  - `greenhouse_runtime` ya tenía permisos correctos sobre `greenhouse_serving`; el problema vivo era deuda histórica en `outbox_reactive_log`.
+  - Se agregó replay scoped real al control plane reactivo: `processReactiveEvents({ replayFailedHandlers, handlerKeys })` + `POST /api/admin/ops/replay-reactive` acepta `handlerKeys`, `domain`, `batchSize`, `replayFailedHandlers`. El replay prioriza `retry/dead-letter` activos y filtra por event types de los handlers para no drenar backlog global ni marcar no-ops indebidos.
+  - Remediación live ejecutada por handler: desaparecieron los `infra.db_privilege` activos (`active_infra_failures=0`). Se re-procesaron commercial cost attribution, service attribution, person intelligence, member capacity economics y Notion status transition capture con el consumer real.
+  - Quedan **62 failures activas** de aplicación/configuración no mezcladas con el fix de permisos: HubSpot outbound token faltante, HubSpot company payload inválido, payment profile SQL drift, payroll receipt insert shape, etc.
+- **2 Notion/Delivery**:
+  - Causa raíz real de `raw=0`: el writer upstream `../notion-bigquery` borraba `notion_ops.tareas` por space y luego fallaba al cargar porque Notion introdujo propiedad `[GH] RpA v2`; el normalizador producía el field inválido BigQuery `[gh]_rpa_v2`.
+  - Fix aplicado y desplegado en `notion-bq-sync` Cloud Run `us-central1`: normalizador de propiedades dinámicas convierte caracteres prohibidos de BigQuery a `_`, preservando nombres existentes como `fecha_límite`.
+  - Remediación live:
+    - `notion-bq-daily-sync` post-fix: `7 ok, 0 skipped, 0 errors`, `notion_ops.tareas` restaurado con Efeonce 1345 rows y Sky 3989 rows.
+    - `ops-notion-conformed-sync`: PG drain `projects=152`, `sprints=35`, `tasks=5334`.
+    - DQ persistida quedó healthy: Efeonce `raw=60/conformed=60/diff=0`; Sky `raw=358/conformed=358/diff=0`.
+  - `notion.metrics.ftr_writeback_lag` ahora distingue backlog dormido por `NOTION_FTR_WRITEBACK_ENABLED` OFF de lag operativo real. No se esconde el conteo: queda como evidencia `lag_count_if_enabled`.
+  - `notion.correction_transitions.source_availability` ahora reporta `unknown` cuando `NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED` está OFF, con métricas de cobertura visibles. Cuando el flag está ON mantiene thresholds 10/50 y alerta normal.
+  - Se reprocesó el retry de `notion_status_transition_capture` y quedó `noop:unchanged` sin error.
+  - Se agregó `NOTION_TOKEN` a Vercel `staging` desde Secret Manager para evitar recurrencia del retry en runtime staging.
+- **5 Release observer**:
+  - Root cause de los `unmatched`: eventos GitHub exitosos/no-failure sin release manifest se clasificaban como `unmatched`.
+  - `github-webhook-reconciler` ahora los marca `ignored` con `non_failure_without_release_manifest`; los failures sin manifest siguen `unmatched`.
+  - Remediación live: 2722 eventos benignos históricos reclasificados; últimos 24h quedan 0 `unmatched/failed`.
+  - Se agregó GitHub App observer config a Vercel `staging` (`GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF`) para que los readers no dependan de PAT personal.
+
+Validación:
+- `pnpm exec vitest run src/lib/release/github-webhook-reconciler.test.ts src/lib/reliability/queries/notion-correction-transitions-source-availability.test.ts src/lib/reliability/queries/notion-metrics-ftr-signals.test.ts src/lib/sync/reactive-consumer.test.ts` OK.
+- ESLint focal OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- SQL live: release `unmatched/failed` 24h = 0; reactive `active_infra_failures = 0`.
+- BigQuery/Cloud Run live: `notion-bq-sync` nueva revisión `notion-bq-sync-00017-pct` con 100% traffic; raw/conformed/DQ Notion healthy post-sync.
+- Visual capture pendiente: `pnpm fe:capture --route=/admin --env=staging --hold=3000` no pudo correr porque `.env.local` no expone `VERCEL_AUTOMATION_BYPASS_SECRET` en este checkout.
+
+# Sesion 2026-05-26 — browser diagnostics hook para usuario agente + Playwright/Chromium — ✅ DOC/SKILL
+
+Se agregó el contrato operativo que faltaba para que futuros agentes no dependan de que el usuario recuerde "usa el usuario agente, tienes Playwright y Chromium". Nueva skill Codex `.codex/skills/greenhouse-browser-diagnostics/SKILL.md` con metadata amplia para disparar en pedidos de abrir/revisar/diagnosticar/capturar/testear rutas Greenhouse. Regla sincronizada en `AGENTS.md`, `CLAUDE.md` y `project_context.md`: usar automáticamente `agent@greenhouse.efeonce.org` + `scripts/playwright-auth-setup.mjs` + Playwright/Chromium; para `dev-greenhouse.efeoncepro.com`, automatizar contra la URL staging `.vercel.app` con bypass, no pedir login ni navegar anónimo primero. También quedó canonizado el aprendizaje de esta sesión: `x-vercel-protection-bypass` debe aplicarse solo a origins Greenhouse/Vercel, no a terceros como Sentry.
+
+La auditoría anterior de `/admin` quedó versionada como documento reusable en `docs/audits/reliability/ADMIN_CENTER_RELIABILITY_AUDIT_2026-05-26.md`, con README de categoría e índice `docs/audits/README.md` actualizado.
+
+# Sesion 2026-05-26 — `/admin` reliability diagnostic + Sentry 429 root fix — 🔎 DIAGNOSIS + SMALL FIX
+
+Ruta revisada con usuario agente dedicado contra staging canónico (`greenhouse-eo-env-staging-efeonce-7670142f.vercel.app/admin`; el custom domain `dev-greenhouse.efeoncepro.com` redirige a Vercel SSO si no se usa el flujo de bypass). Captura guardada en `.captures/admin-diagnostic-2026-05-26T11-19-01-072Z/`. La página carga 200; los problemas visibles son señales reales del Reliability Control Plane, no errores de render.
+
+**Fix aplicado (código):** `src/lib/reliability/get-reliability-overview.ts` ya no consulta todos los `incidentDomainTag` de Sentry en paralelo. Sentry estaba devolviendo `HTTP 429` (`Limit is 5 requests in 1 seconds`) para Commercial/Delivery/Finance/Sync/etc. Se cambió a batches de 4 + pausa 1.1s. No silencia incidentes: reduce rate-limit para que el reader pueda mostrar la señal real. Validado: `pnpm exec eslint src/lib/reliability/get-reliability-overview.ts` OK, `pnpm exec tsc --noEmit --pretty false` OK.
+
+**Hallazgos subyacentes live (no resueltos en esta sesión):**
+- Notion/Delivery: `integration_data_quality_runs` broken para 2 spaces; raw Notion vacío (`raw=0`, conformed 313 y 59), checks `missing_in_raw`, `row_count_parity`, `raw_freshness`. `task_status_transitions`: 19 Efeonce + 116 Sky, pero coverage últimos 90d = 1902/1911 unavailable. Vercel env muestra `NOTION_TOKEN` en Production/Preview(develop), no en `staging`; `NOTION_STATUS_TRANSITIONS_*` solo Production.
+- FTR: 63 `task_ftr_snapshots` valid pending writeback >30m (53 Sky, 10 Efeonce), `attempted=0`; `NOTION_FTR_WRITEBACK_ENABLED` no está configurado, por diseño default OFF de TASK-903, así que el signal es esperado hasta decisión de activación o ajuste del signal pre-flag.
+- Finance: `account_balances.fx_drift` real en `global66-clp` (2026-04-04 drift CLP 1,778,789; 2026-03-06 drift CLP 1,034,522). `expense_distribution.unresolved` = 4 mayo 2026 (Santander, Nubox, X Capital, Luis Reyes). `finance.ledger.unresolved_drift_items` = 34 unanchored, settlement=0; inventory muestra 18 materiales/16 inmateriales, acknowledged=0; los 3 internal_transfer imbalances del inventory son el detector legacy que TASK-714d ya documentó como falso positivo.
+- Identity: 4 members Chile sin CL_RUT verificado (Felipe Zurita, Humberly Henriquez, Julio Reyes, Luis Reyes); 7 drift contract/relationship (honorarios/Deel con relación legal `employee` activa); 1 SCIM user interno sin member (`support@efeoncepro.com`); además 2 internos sin member en `session_360`.
+- Payroll: 13 `final_settlement_documents` legacy de Valentina Hoyos en `superseded` con `pdf_asset_id` cuyo asset no tiene `metadata_json.documentStatusAtRender`; max drift ~493h. No afecta cálculo, sí la coherencia de PDF/status hasta reissue o backfill metadata.
+- Release/platform: 58 GitHub release webhook events `unmatched` en 24h, 0 `failed`; `gh run list --status waiting` devolvió vacío. `GITHUB_RELEASE_OBSERVER_TOKEN` no aparece en Vercel env, por eso stale/pending/revision drift readers degradan a `unknown`.
+- Sync/reactive: outbox dead-letter está vacío, pero `outbox_reactive_log` conserva fallos no recuperados por handler, sobre todo `permission denied for schema greenhouse_serving` en commercial/member/person projections y `hubspot_services_intake` con `Sentry.captureException is not a function` (último 2026-05-09).
+
+# Sesion 2026-05-25 — TASK-933 Secret Manager cleanup Frame.io + causa raíz — ✅ COMPLETE
+
+Review + cierre del 2º quick-win de costo. Grace period OK (>24h, las v1-75 disabled sin que nada las re-habilitara; 0 consumers en repo — las refs a "frame.io" son catálogo de tools/URLs Notion, no los tokens). Flujo OAuth externo dormido desde 2026-03-24.
+
+- **Destroy ejecutado (OK operador)**: 150 versiones (`frameio-access-token`/`frameio-refresh-token` v1-75) → `destroyed`. Verificado: ambos quedan v76 enabled, 0 disabled, 75 destroyed c/u. Libera ~$8/mo + baja blast radius (disabled≠destruido dejaba 150 credenciales OAuth latentes; los tokens rotados están muertos al instante → destroy seguro).
+- **Causa raíz — supuesto de la task corregido (review)**: `scripts/secrets/rotate.ts` NO destruye superseded **a propósito** (línea 257: disable manual tras soak, preserva rollback). Auto-destroy-on-rotate ahí sería inseguro. La causa raíz NO es el helper — es el productor Frame.io que rotó 76× sin limpieza. Requisito keep-N+destroy documentado en **TASK-020** (Delta 2026-05-25). Helper `secrets:rotate` queda **sin cambios** (su patrón es correcto para secrets críticos que rotan raramente).
+
+---
+
+# Sesion 2026-05-25 — TASK-932 Artifact Registry cleanup flip a enforced — ✅ COMPLETE
+
+Review + cierre del quick-win de costo. Corrí el script de verificación (read-only) >24h después de crear la task. **Hallazgo de la review**: la "2da señal" via Cloud Logging **no es obtenible** — el cleanup dry-run de Artifact Registry NO emite logs de evaluación per-corrida queryables (`resource.type="artifactregistry.googleapis.com/Repository"` vacío); es un job interno periódico. El gate original habría dejado la task bloqueada para siempre esperando una señal que en ese formato no llega.
+
+**Corrección del gate**: señal-2 = **verificación post-flip** (enforced + 4 workers healthy con imagen viva intacta), válida porque el flip es reversible (1 comando vuelve a dry-run) y la señal-1 (mirror exacto de la policy + hard gate) salió **0 colisiones**. Operador aprobó el flip con ese criterio.
+
+- Flip aplicado: `set-cleanup-policies gcr.io ... --no-dry-run` (KEEP-15 + DELETE >14d).
+- Verificado: `cleanupPolicyDryRun=null` (antes True); 643 versiones, 479 a borrar, **4 vivas preservadas** (hard gate=0); ~138GB/~$13,8/mo.
+- 4 workers post-flip en sus revisiones vivas pre-flip (ops `...00278-l8v`, commercial `...00210-5sf`, ico-batch `...00118-cbj`, hubspot `/health` 200) → imagen intacta.
+- Repo size (~201GB) baja async (GC de AR en horas/días).
+- **Rollback**: re-set policy con `--dry-run` o `delete-cleanup-policies`.
+
+---
+
+# Sesion 2026-05-25 — TASK-936 dedup doble conteo P&L — 🔄 IN-PROGRESS (Audit done, premise corregida, dry-run pendiente)
+
+Skills arch + finance en loop. La validación de TASK-929/934 reveló **doble conteo en P&L**: el neto de nómina de varios colaboradores aparece 2x en `expenses` (la nómina devengada `EXP-202xxx` + un `EXP-RECON-* "Envío a X"` que paga esa misma nómina).
+
+**Audit (FASE 2) corrigió la premise de la task** (era falsa):
+
+- NO hay reconciler productivo creando duplicados. `EXP-RECON-*` solo se genera en `anchored-payments.ts:236`, único caller = seed one-time `scripts/finance/conciliate-march-april-2026.ts` (TASK-702, cartolas reales). `auto-match`/`postgres-reconciliation` no hacen INSERT INTO expenses. 0 API/0 reactive.
+- → **Slice 2 (MATCH-not-CREATE prospectivo) DROPPED** (resolvería un path inexistente, YAGNI).
+- El seed modeló pagos de nómina como `supplier_payment` porque payroll_entries no estaban linkeados (comentarios propios líneas 183/189/190).
+- **Corrección honesta de urgencia**: NO es "bug activo que crece" (claim previo erróneo) — es data histórica de UN run. **Urgencia BAJA**, ~CLP 3-4M.
+- Períodos: `global66-clp abr` + `santander-corp-clp abr` = OPEN; `santander-clp mar` = reconciled (solo Valentina 595.656 + Humberly 300k tocan el cerrado). Humberly mar NO tiene payroll → no es duplicado (caso aparte).
+
+**Buckets de los 37 unanchored**: [A] duplicados nómina (dismiss + recordExpensePayment contra la nómina, computa FX) · [B] FX legítimo (reclasificar) · [C] vendors reales sin supplier_id (anclar name-first — muchos internacionales sin RUT) · [D] test residue (dismiss). Solo [A]+[D] se eliminan.
+
+**Fix aplicado (2026-05-25, con OK explícito del operador)**: script `scripts/finance/fix-reconciliation-double-count-mar-apr-2026.ts` (dry-run default + `--apply` gateado). Modelo final **simplificado** tras Discovery: los 3 giros global66 son **pre-anchor** (< Abr 5, OTB global66) con **0 settlement_legs vivos** → su egreso ya está en el opening, el saldo NO se mueve. El doble conteo es **puramente P&L**. Fix = `is_annulled=TRUE` en el gasto-banco duplicado (sale del P&L; todos los consumers filtran `COALESCE(is_annulled,FALSE)=FALSE`) + `dismissExpensePhantom` del pago. Reversible.
+
+- **3 anulados** (commit `3fcbf525` el script): Daniela Feb (`EXP-RECON-20260306-fscy` $1.034.522), Daniela Mar (`...dit1` $1.090.731), Andrés Mar (`...4wx6` $688.058). **−$2,8M de doble conteo fuera del P&L.**
+- **Verificado live**: 3 `is_annulled=true` · global66-clp closing **−2.603,41 sin cambio** · unanchored **37→34**, suma $8,2M→$5,37M.
+- **Descartado el approach recordExpensePayment+FX** (era complejo E incompleto — dismiss-phantom no saca el gasto del P&L; el annul sí).
+
+**Pendiente (TASK-936 sigue in-progress)**:
+- **Valentina Mar** (`...baj9` $595.656): post-anchor en santander-clp + período **cerrado** → necesita re-home del pago + autorización de restatement. Excluido (`--include-closed` gateado).
+- **2 ambiguos** (Humberly mar $300k, Andrés "feb" $632k): NO duplican nómina (1ª nómina posterior) → input humano (¿adelanto?).
+- **Grupo abril ya-pagado** (Valentina/Humberly abr): nómina ya `paid` → revisar origen del pago antes de anular el duplicado.
+- **[B] FX (4), [C] vendors sin supplier_id (~22), [D] test residue (2)**: resolución separada (no son doble conteo).
+
+---
+
+# Sesion 2026-05-25 — TASK-714d detector fix (internal_transfer falso positivo) — 🔨 detector slice DONE, umbrella sigue in-progress
+
+Skills arch + finance en loop. Fix del falso positivo diagnosticado en TASK-929. El detector `task714d` filtraba patas superseded y comparaba **patas activas**; el invariante bilateral real es **"el par fue creado"** (supersede-independiente). Patas retiradas legítimamente (OTB re-anchor TASK-703b, backfill Slice 2) dejaban los conteos activos asimétricos → falso positivo.
+
+- **Fix** (`babe141d`): contar TODAS las patas en el detector (count + sample). Verificado live: los 8 grupos flagueados (3 TC CLP→tarjeta con incoming OTB-absorbida + 5 Global66 reemplazadas por Slice 2) eran pares completos → `task714d: 3 → 0`. Sigue catcheando el bug real (outgoing sin incoming jamás creado). Test actualizado.
+- **Slice 4 (TC backfill) OBVIADA**: no había imbalance real.
+- **Umbrella sigue in-progress**: Slice 3 (reclasificación payroll Global66 — Daniela España/Andrés/David) bloqueada por input humano (member_id/atribución/payroll period) + overlap con TASK-934 (esos pagos están entre los 37 unanchored → el operador puede acknowledgear o reclasificar).
+
+**Estado `JAVASCRIPT-NEXTJS-4Q` post-sesión**: settlement=0 (TASK-929) + task714d=0 (este fix) → el cron `healthy=false` queda driveado SOLO por los 20 unanchored = acción operador (TASK-934 acknowledge/anchor). Cerrar Sentry cuando los 20 se resuelvan + healthy=true 24-48h.
+
+---
+
+# Sesion 2026-05-25 — TASK-935 Capability governance reconciliation — ✅ COMPLETE (develop, sin branch)
+
+Derivada de TASK-934 (los 2 hallazgos ajenos). Skills arch + finance en loop. **Cierra bug class sistémico TASK-873**: audit comprehensivo encontró **13 latent-403** (no 3) — capabilities can()-checked en endpoints `/api/admin/*` sin runtime grant → 403 incluso para EFEONCE_ADMIN. Causa raíz: specs documentaron roles intended (`DEVOPS_OPERATOR`/`commercial_admin`/`operations`) que **nunca existieron como ROLE_CODES** → grant nunca escrito. Como los 13 pasan por `requireAdminTenantContext` (solo efeonce_admin llega), los grants colapsan a EFEONCE_ADMIN + FINANCE_ADMIN.
+
+- **Slice 1** `71477315`: 13 runtime grants + **guard de regresión** `capability-grant-coverage.test.ts` (puro/CI: parsea can() usages + asserta ≥1 grant; rompe build si falta). 0 latent 403 verificado.
+- **Slice 2** `f55cb065`: módulo `delivery` + 4 catalog entries (caps DB-only TASK-908/912) + migración module drift `reconcile_drift` (DB identity→people). `parity.live` verde (0 mismatches).
+- **Slice 3**: CLAUDE.md TASK-873 reforzado (guard mecánico reemplaza enforcement humano) + changelog/README/registry.
+
+Gate: full suite **5398 passed** + build exit 0 (1er build falló por flaky de concurrencia test+build; re-run aislado verde) + parity.live + tsc + lint. Lifecycle `complete`.
+
+**Sin follow-ups nuevos** — el guard previene la recurrencia. Roles inexistentes (`DEVOPS_OPERATOR` etc.) quedan como decisión futura si se necesita delegación más fina que EFEONCE_ADMIN (hoy suficiente porque requireAdminTenantContext ya gate a efeonce_admin).
+
+---
+
+# Sesion 2026-05-25 — TASK-934 Unanchored paid expense acknowledgment — ✅ COMPLETE (develop, sin branch)
+
+Derivada de TASK-929. Skills finance + arch en loop. **Recalibración de diseño pre-execution** (Discovery reveló los 37 son pagos reales: 18 vendor_cost_saas anclables a supplier vía PUT existente, 19 labor/regulatory — Daniela España/Andrés Colombia/Valentina + regulatory/bank_fee — que son personas/regulatorios, no suppliers). **Pivote**: NO tabla-cola state-machine (sync risk, anti-patrón) → **acknowledgment-on-expense** (columnas `unanchored_acknowledged_*` + helper mirror `dismiss-phantom.ts` + capability `finance.expenses.acknowledge_unanchored`). Anclar vendors = reuse PUT `/api/finance/expenses/[id]` (ya existe). `acknowledgedDebt` separado de `healthy`; inventory + signal excluyen acknowledged. Sin write-off/2º actor (no destructivo, gastos reales quedan en P&L).
+
+**COMPLETE 2026-05-25** — 3 slices (`28b0bd44` migración+helper+capability, `d1a6f1e0` wire acknowledgedDebt, `bejmdz49p`/Slice 3 endpoint+docs). Full suite 5396 passed (CI-equiv, `.live` skipped) + build OK. Verificado live round-trip (37→36→revert + idempotencia). Lifecycle `complete`.
+
+**Hallazgos ajenos flagged (NO arreglados — capability governance reconciliation pendiente)**:
+- 403 latentes (bug class TASK-873): `finance.expenses.reclassify_economic_category` (×2) + `finance.payments.repair_clp` en TS catalog + DB registry pero SIN runtime grant → `can()`=false para EFEONCE_ADMIN+FINANCE_ADMIN. Endpoints TASK-766/768 shipped pero inaccesibles.
+- 4 capabilities DB-only de TASK-908/912 (`cycle_time.compute.execute`, `correction_transitions.compute.read`, `notion.webhook.ingest_status_transitions`, `notion.status_transitions.backfill_execute`) sin entry TS catalog → `parity.live.test` rojo (skipea en CI sin proxy).
+
+**4Q honesto-abierto** (3 tasks dan las herramientas; cierre = acción operador): (a) TASK-929 ✅ settlement; (b) TASK-934 ✅ tooling acknowledgment — operador debe acknowledgear los 19 labor/regulatory + anclar los 18 vendors; (c) TASK-714d fix detector internal_transfer (falso positivo). Cerrar Sentry cuando los 3 converjan a `healthy=true` 24-48h.
+
+---
+
+# Sesion 2026-05-24 — TASK-929 Finance ledger drift remediation — 🔨 Discovery+Audit+Plan completos, P1 STOP checkpoint pre-FASE 5
+
+**Rama**: `develop` (override del operador, sin branch nuevo). Lifecycle: `in-progress`.
+
+**Skills**: greenhouse-finance-accounting-operator + arch-architect (loop de verificación constante).
+
+**Slices commiteados en develop** (1-3):
+- **Slice 1** (`f171a506`): VIEW `income_settlement_reconciliation` excluye superseded en `payments_total` (alinea con `fn_recompute_income_amount_paid`). Causa raíz de 2 de los 4 settlement drifts (falsos positivos en facturas factorizadas). Drift settlement 4→0. Cero mutación de ledger.
+- **Slice 2** (`951497e5`): `getFinanceLedgerHealth` honest degradation — `degradedChecks[]` + `tracked()` wrapper; `healthy` exige sin checks DECISION_CRITICAL degradados. Mata el bug false-healthy. ops-worker incluye degradedChecks en signature/record/Sentry. 3 tests.
+- **Slice 3** (`851822f4`): signal `finance.ledger.unresolved_drift_items` (tiered: settlement>0=error, solo unanchored>0=warning, 0=ok). Wire-up canónico. 4 tests.
+
+**⚠️ CORRECCIÓN de supuesto roto (premise broke)**: mi primer probe estaba **corrupto por el mismo `.catch(()=>[])`** que Slice 2 arregló → documenté falsamente "6 dims en 0, 4Q cierra con esta task". El probe limpio post-hardening (`degradedChecks=[]`) revela el estado REAL:
+- settlement: **0** ✓ (Slice 1)
+- **unanchored paid expenses: 20 (cap; 28 en 60d, 37 total)** — IN SCOPE, los 37 tienen `economic_category` (data-completeness, no integridad). La cola de revisión (Slice 3 del task) NO es para set vacío.
+- **task714d (internal_transfer imbalance): 3** — **OUT OF SCOPE** (territorio TASK-714d).
+- resto (phantoms/freshness/task708/708d/720/721): 0.
+
+**Conclusión corregida**: **4Q NO cierra solo con esta task**. Falta (a) rutear/aceptar los 37 unanchored via cola de revisión (in-scope), y (b) resolver los 3 internal_transfer imbalance via **TASK-714d** (`createInternalTransferSettlement`/backfill — fuera de scope). Mientras task714d>0 el cron reporta `healthy=false` honestamente. Lección meta: sin Slice 2 (honest degradation), el probe corrupto hubiera llevado a cerrar 4Q prematuramente.
+
+**Sub-clases de los 4 settlement drifts originales** (todos resueltos por Slice 1 + sync live): 2 falsos positivos de VIEW (factoring superseded) + 2 transitorios stale ya consistentes.
+
+**CERRADA 2026-05-24** (scope reducido por operador): 5 slices entregados (VIEW fix + honest degradation + signal + inventory + docs). Full suite 5390 passed + build OK. Lifecycle `complete`. Queue/anchoring de los 37 unanchored → **TASK-934** (derivada creada).
+
+**Traza task714d (2026-05-25, post re-auth ADC) — RECLASIFICADO a falso positivo del detector**: los 3 grupos `stlgrp-itx-{20260306-amcg,20260312-l45c,20260406-9uwu}` (CLP→tarjeta Santander Corp, $597.697/$1.003.975/$696.198) **SÍ tienen ambas patas**; la `incoming` (lado tarjeta) fue superseded por re-anclaje OTB TASK-703b (`superseded_by_otb_id`) → el detector cuenta solo patas activas y ve out=1/in=0. **NO son ~$2.3M a recuperar** — son 3 pagos completos bien contabilizados (la tarjeta absorbió la entrada en su saldo de apertura). Misma bug class que el fix de la VIEW (Slice 1). Fix del detector (superseded-awareness, regla "completitud del par original") documentado en **TASK-714d Delta 2026-05-25** — queda ahí por ser su invariante canónico (decisión 4-pillar: false-negative en detector de ledger = peor modo de falla → al owner; el rojo honesto es más seguro que un verde tuneado sin owner).
+
+**4Q honesto-abierto**: cerrar en Sentry solo cuando TASK-934 (37 unanchored) + fix detector TASK-714d converjan a 0 sostenido 24-48h. Próximo: deploy staging auto (push develop) → verificar signal `finance.ledger.unresolved_drift_items` en steady (warning por 37 unanchored).
+
+---
+
+# Sesion 2026-05-24 — Diagnóstico de costos cloud (GCP + Actions + Vercel) — 🔨 acciones en curso
+
+**Audit**: `docs/audits/cloud-cost/CLOUD_COST_AUDIT_2026-05-24.md`. Datos reales (GCP billing en CLP ÷898; Vercel `/v1/billing/charges`; GitHub via TASK-637). Total ~$249/mo: GCP ~$132, Actions ~$93, **Vercel ~$24 (el más barato)**.
+
+**Mitigacion Watchdog 2026-05-24**: Production Release Watchdog queda **manual-only en repo** hasta TASK-920. Dato live: ultimos 100 runs = 72 failures / 28 success, 89.37 min, ~$0.54 estimado; no era el gran driver de costo, pero si una senal erronea con ruido operativo. Se removio `schedule` de `.github/workflows/production-release-watchdog.yml` en `develop`. Como GitHub schedules corren desde default branch `main`, se aplico emergency stop operativo: `gh workflow disable production-release-watchdog.yml --repo efeoncepro/greenhouse-eo` y el workflow remoto quedo `disabled_manually`. Hasta promover el cambio a `main` y re-enablear el workflow, usar `pnpm release:watchdog --json` para checks manuales. No reactivar schedule sin TASK-920 o incidente explicito documentado.
+
+**Trío instant (~$42/mo casi gratis):**
+- **Gemini Code Assist seat ~$22** — seat de `julio.reyes` ocioso (0 uso API 30d). ✅ rol IAM `cloudaicompanion.user` removido (reversible). ❌ API disable descartado: cascada a `geminicloudassist` (asistente consola GCP) — NO forzar. ⏳ verificar que el SKU diario (~$0.735/d) caiga a ~$0 en 1-2 días; si no, soltar licencia en consola. **Verificado**: Nexa/reliability/finops usan Vertex AI (`aiplatform`), NO cloudaicompanion → no afectado.
+- **Artifact Registry ~$9-13** — `gcr.io` 185GB imágenes worker viejas. Cleanup policy keep-15+>14d en **dry-run** (no borra). Script `scripts/cloud/verify-artifact-cleanup-dryrun.sh`. **TASK-932** cierra el flip a enforced (gate doble señal).
+- **Secret Manager ~$8** — 152 versiones OAuth Frame.io muertas (flujo dormido desde 2026-03-24). ✅ desactivadas 1-75 de ambos secrets (reversible, deja la 76). **TASK-933** cierra el destroy irreversible (tras grace) + fix destroy-on-rotate root-cause.
+
+**Estructural**: Cloud SQL ~$57 floor (CUD 1año ~−$15/mo si se compromete); Vertex AI ~$8.8 (trim prompts, TASK-928 empezó).
+
+**Check de mañana**: verificar billing Gemini cayó + cerrar TASK-932 (Artifact Registry enforce) + TASK-933 (Secret Manager destroy).
+
+---
+
+# Sesion 2026-05-24 — TASK-903 FTR writeback a Notion (infra, flag OFF) — ✅ COMPLETE
+
+Clone mecánico de TASK-916 (RpA productive writeback) repointeado a FTR. **Flag `NOTION_FTR_WRITEBACK_ENABLED` default OFF → cero escrituras a Notion al merge.**
+
+- **Slice 0**: migration `20260524200315533_task-903-ftr-snapshots.sql` (clone de `task_rpa_snapshots`, CHECK workspace IN efeonce/sky, append-only triggers, writeback cols mutables) — aplicada al Cloud SQL dev + tipos regenerados. `EVENT_TYPES.notionTaskFtrWritebackRequested` v1. `NotionPropertyValue.select` (forward-compat).
+- **Slice 1+2**: `notion-ftr-compute` (delega a `calculateFtr` TASK-909, persiste snapshot, emite chain event solo si `valid`+pass/fail) + `notion-ftr-writeback` (PATCH select `[GH] FTR` Pass/Fail, gated OFF + override per-cliente, re-read PG defensive, maxRetries=4) + registradas. Siblings físicamente separados de RpA.
+- **Slice 3**: 2 signals `notion.metrics.ftr_writeback_{dead_letter,lag}` (subsystem delivery, steady=0). Verificados contra PG real: severity ok, count 0. `shadow_paridad_ftr` NO creado — FTR es derivada pura de RpA, su paridad queda cubierta por `shadow_paridad_rpa` (TASK-916); un signal sin comparando legacy sería placeholder.
+
+**Open Question resuelta** ("Why This Task Exists": ¿vale FTR explícito vs derivar de RpA?): es decisión de **activación** (flip flag), NO de implementación. El user instruyó implementar → infra shippeada con flag OFF (reversible, cero impacto runtime), cierra el gap "calculateFtr sin consumer". El flip queda gated por §9.1 + decisión explícita.
+
+Gate cierre: lint 0 · tsc 0 · `pnpm test` 5380 passed · `pnpm build` OK. Trabajado en `develop` sin branch. 4 commits (Slice 0, 1+2, 3, cierre). Consumer real de `calculateFtr` (TASK-909).
+
+---
+
+# Sesion 2026-05-24 — TASK-909 FTR canonical helper V1 — ✅ COMPLETE
+
+Shipped el helper canonical `calculateFtr` ([src/lib/notion-metrics/calculate-ftr.ts](src/lib/notion-metrics/calculate-ftr.ts)): delegación pura a `calculateRpaV2` (`FTR = RpA.value === 0 ? 'pass' : 'fail'`, `ftr_v1.0`). 13 tests. Mapping canonizado: `unavailable`/`suppressed`/`value=null` → FTR `unavailable`; `low_confidence` propagado.
+
+Lint rule `greenhouse/no-inline-ftr-calculation` (warn, plugin v1.9.0) — **precisa al recompute del veredicto FTR** (P1 `client_change_round_final`+`'pass'/'fail'`, P2 `.value === 0 ? 'pass'`, P3 `formula.ftr` legacy). Decisión robusta pre-execution: NO matchear `client_change_round_final = 0` a secas porque se usa en ~6 agregados BQ legítimos ("tareas sin ajustes" en dashboard/capability-queries/sla-compliance/ico-engine). Full-source scan, **0 hits en todo el repo** verificado (zero false positives). Override block exime helper + tests + rule.
+
+**Drift descubierto pre-execution**: Slices 2/3/4 (specs THROUGHPUT/PIPELINE_VELOCITY + Engine doc Delta + Contrato sección H + DECISIONS_INDEX entries) **ya estaban hechos** por la sesión doc-only 2026-05-17 → SKIP. Solo se ejecutó Slice 1 (código) + Slice 5 (docs touch-up: METRICS_INDEX FTR row → SHIPPED, CLAUDE.md helpers list, FTR_V1.md §4+§10). Cero cambios en `metric-registry.ts`.
+
+Gate cierre: `pnpm lint` 0 · `pnpm tsc --noEmit` 0 · `pnpm test` 5338 passed · `pnpm build` OK. Trabajado en `develop` (sin branch, per instrucción). Desbloquea TASK-903 (FTR writeback — su consumer real; Delta agregado a su spec).
+
+---
+
+# Sesion 2026-05-24 — TASK-931 GitHub Actions cost guardrails — ✅ COMPLETE
+
+- **Branch:** `develop` por instruccion explicita del operador; no se crea ni cambia a `task/TASK-931-*`.
+- **Lifecycle:** task movida `to-do/` → `in-progress/` → `complete/`; `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados.
+- **Ownership:** libre al tomarla. No existia branch TASK-931 ni archivo previo en `in-progress`. PR abierto #125 (`ci/claude-pr-review-action`) agrega `.github/workflows/claude.yml`; se trato como riesgo de coordinacion y no se toco ese workflow.
+- **Discovery inicial:** GitHub Billing Usage mayo 2026 sigue mostrando `USD 93.18989776300002` gross total y `USD 0` net total; Actions Runs API confirma CI + Playwright + release/watchdog como drivers recientes. TASK-859 sigue en `to-do`, por lo que TASK-931 no debe crear tablas persistidas workflow/job salvo ADR explícito.
+- **Runtime env TASK-931:** thresholds GitHub Actions provisionados en Vercel `production`, `staging` y `development`: warn `100`, critical `150`, daily spike `100`. GitHub Budgets API confirma budget Actions org-level existente (`id=7f36dec2-18a4-4575-9f49-c5b0470ff929`, `prevent_further_usage=true`, `budget_amount=0`, alerts a `cesargrowth11`). Token productivo dedicado para Billing Usage sigue pendiente; no se persiste el PAT personal `gho_*`.
+- **Entregado:** `pnpm actions:cost:audit` read-only por workflow/job; ADR `GREENHOUSE_CI_COST_SIGNAL_GUARDRAILS_V1`; CI split fast/deep (`ci.yml` + `ci-deep.yml`); Playwright/reliability path-aware; worker deploys latest-only en staging/develop sin recortar path filters ambiguos; docs FinOps/local-first actualizadas.
+- **Smoke real 2026-05-24:** 20 runs / 43 jobs / 128.45 min / `USD 0.77` estimated gross; top workflows: `CI` `USD 0.47`, `Production Release Orchestrator` `USD 0.17`, `Playwright E2E smoke` `USD 0.04`, `Ops Worker Deploy` `USD 0.04`.
+- **Validacion:** `pnpm local:check` (lint + tsc), `pnpm test scripts/ci/__tests__/github-actions-cost-audit.test.ts`, Ruby YAML parser sobre `.github/workflows/*.yml`, `pnpm task:lint --task TASK-931`, `git diff --check`.
+- **No validado:** `pnpm test` full suite y `pnpm build` full; no hay evidencia post-push de workflows nuevos porque el cambio queda local en `develop` hasta que el operador autorice push. Los cambios CI remotos empiezan a aplicar despues del proximo push/merge.
+- **Riesgos/follow-ups:** Vercel threshold envs aplican en el proximo deployment; budget GitHub Actions existente con `budget_amount=0` no se modifico sin aprobacion porque puede bloquear releases/uso pago; TASK-859 debe decidir si persiste workflow metrics/DORA/flaky detector; PR #125 sigue siendo coordinacion adjacent para `.github/workflows/claude.yml`.
+- **Delta costo-eficiente post-cierre:** segunda pasada implementada tras auditoria de los ultimos runs. `CI` conserva lint/typecheck/tests en `push:develop`, pero `pnpm build` corre solo en PRs, `main` y dispatch manual porque Vercel ya build-ea develop; se agrega cache de ESLint; `Production Release Watchdog` primero bajo a hourly y luego quedo manual-only por falsos positivos hasta TASK-920; `actions:cost:audit` sube buffer para ventanas mensuales grandes. Playwright lanes NO se partieron en esta pasada porque el dato live muestra ~2.5 min/run y el setup domina; partirlo hoy puede sumar overhead sin ahorro material.
+- **Post-push fix:** primer run remoto `26366437406` confirmo que `Build` queda `skipped` en `push:develop`, pero fallo `Lint` porque `pnpm lint -- --cache` pasa `--cache` como pattern a ESLint 9. Se corrigio a `pnpm build:icons` + `pnpm exec eslint . --cache --cache-location .eslintcache`.
+
+# Sesion 2026-05-24 — Local-first development workflow — ✅ OPERATING MODEL
+
+**Status**: ✅ Implementado como contrato documental + scripts locales. Objetivo: evitar que cada flujo de agente gaste GitHub Actions/Vercel/GCP antes de que el cambio este listo.
+
+**Nuevo contrato**: `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md` define `local = taller`, `branch/PR = validacion remota acotada`, `develop = integracion compartida`, `main = produccion`. Agentes deben iterar y validar localmente, levantar `pnpm dev` para UI visible y esperar confirmacion humana antes de push remoto salvo instruccion explicita/hotfix/release.
+
+**Scripts nuevos**:
+- `pnpm local:check` → `pnpm lint` + `pnpm exec tsc --noEmit`.
+- `pnpm local:check:ui` → `local:check` + `pnpm design:lint` + `pnpm build`.
+- `pnpm local:check:full` → `local:check` + `pnpm test` + `pnpm build`.
+
+**Enforcement real**: `.husky/pre-push` ahora ejecuta `pnpm local:check`, por lo que el minimo local-first queda bloqueante antes de cualquier push normal. `local:check:ui/full` quedan como gates proporcionales por riesgo en el operating model; no se fuerzan en cada push para evitar friccion excesiva.
+
+**Docs sincronizadas**: `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `changelog.md` y `TASK-931` referencian el flujo local-first.
+
+# Sesion 2026-05-24 — GitHub Actions cost guardrail — ✅ SAFE SLICE
+
+**Status**: ✅ Implementado en `develop` como primer slice conservador tras auditoria live de billing/runs. No reduce el set de checks del ultimo commit de codigo; reduce trabajo obsoleto y docs-only.
+
+**Contexto live**: GitHub Billing mayo 2026 muestra `greenhouse-eo` como driver casi total (`USD 93.18 gross`, `Actions Linux` 15.339 min). Ranking por job-min visibles: `CI` 5.157 min / 339 runs, `Playwright E2E smoke` 933 min / 287 runs, `Production Release Orchestrator` 1.038 min, `Ops Worker Deploy` 562 min, `Commercial Cost Worker Deploy` 234 min.
+
+**Decision arquitectonica**: para Vibe Coding, el contrato correcto es **latest commit wins** en PR/develop: si un agente empuja commits sucesivos, se cancela el CI obsoleto y se conserva el gate completo para el ultimo estado. `main` no cancela runs para preservar evidencia de release/integracion.
+
+**Cambios**:
+- `.github/workflows/ci.yml`: agrega `concurrency` con `cancel-in-progress` solo para PRs y `develop`; agrega `paths-ignore` para `*.md`, `docs/**`, `.claude/**`, `.codex/**`.
+- `.github/workflows/playwright.yml`: agrega `paths-ignore` para el mismo scope documental; mantiene la concurrency existente y la suite completa para cambios de codigo.
+
+**Observabilidad preservada**: docs/tasks siguen cubiertos por `Task Contract`; `DESIGN.md`/tokens siguen cubiertos por `Design Contract`; codigo/config no-documental sigue disparando CI/Playwright segun el workflow.
+
+**Pendiente recomendado**: abrir task formal para Slice 2: split CI fast/full, revisar path filters de workers, budgets GitHub Actions y dashboard de runs por workflow. No hacer esos cambios sin task porque cambian contratos de release/QA.
+
+# Sesion 2026-05-24 — TASK-637 GitHub Billing & Actions Cost Observability — ✅ COMPLETE
+
+**Status**: ✅ COMPLETE directo en `develop` por instruccion explicita del operador (sin branch switch). Discovery/Audit/Mapa/Plan completados antes de implementar.
+
+**Decisiones cerradas antes de implementar**:
+- Scope canonico GitHub Billing: org `efeoncepro`; repo queda como filtro opcional. Smoke live con `gh api` confirmo mayo 2026: 49 usage items, producto `actions`, gross `USD 93.18099132`, net `USD 0`; top repo `greenhouse-eo`.
+- Token: el token local de `gh` tiene `admin:org` y lee la API, pero no se persistira como secreto productivo por ser amplio/personal. La implementacion soportara `GREENHOUSE_GITHUB_BILLING_TOKEN` o `GREENHOUSE_GITHUB_BILLING_TOKEN_SECRET_REF`; produccion requiere token dedicado least-privilege con org Administration read.
+- Thresholds: no se inventa budget. `GREENHOUSE_GITHUB_BILLING_MONTHLY_WARN_USD`, `GREENHOUSE_GITHUB_BILLING_MONTHLY_CRITICAL_USD` y `GREENHOUSE_GITHUB_ACTIONS_DAILY_SPIKE_PCT` seran opcionales; sin valores queda `unconfigured`.
+- Access model: `routeGroups=admin`; views reutilizadas `administracion.admin_center`, `administracion.cloud_integrations`, `administracion.ops_health`; sin entitlements nuevos V1; startup policy sin cambios.
+- V1 no persiste en PostgreSQL: sin migraciones ni schema nuevo; reader/API/UI/reliability snapshot read-only.
+
+**Drift detectado**: TASK-637 referenciaba TASK-586/TASK-636 como pendientes y `AdminCloudIntegrationsView`; runtime real tiene TASK-586/TASK-636 completas y surface vigente `AdminIntegrationGovernanceView`.
+
+**Entregado**:
+- Reader server-side `src/lib/cloud/github-billing.ts` + tipos `src/types/github-billing.ts` + tests de parsing/agregacion/error/not_configured.
+- API admin `GET /api/admin/cloud/github-billing` protegida por `requireAdminTenantContext`.
+- Signal reliability `cloud.billing.github` con severidad por config/API/thresholds/spike.
+- UI: `GitHubBillingCard` en `/admin/integrations`, spotlight en `/admin/ops-health`, y Admin Center inyecta el source en `getReliabilityOverview`.
+- Docs/env: `.env.example`, `project_context.md`, `changelog.md`, doc funcional FinOps. `GREENHOUSE_GITHUB_BILLING_ORG=efeoncepro` provisionada en Vercel `production`, `staging` y `development`.
+
+**Validacion**:
+- `pnpm exec vitest run src/lib/cloud/github-billing.test.ts` -> 5/5.
+- `pnpm exec vitest run src/lib/cloud/github-billing.test.ts src/lib/reliability` -> 331 passed, 4 skipped.
+- `pnpm exec tsc --noEmit --pretty false` -> verde.
+- `pnpm lint` -> verde.
+- `pnpm design:lint` -> 0 errors / 0 warnings.
+- `pnpm build` -> verde.
+- `pnpm task:lint --task TASK-637` -> 0 errors / 0 warnings.
+- Smoke local con token real de `gh` sin persistirlo: `availability=configured`, mayo 2026 `USD 93.18 gross / USD 0 net`, `Actions Linux` 15.339 min gross `USD 92.03`, storage 3.413,46 GB-h gross `USD 1.15`, top repo `greenhouse-eo`, latest usage date `2026-05-24`.
+
+**No validado / pendiente externo**: no se hizo request autenticado a `/api/admin/cloud/github-billing` en staging porque el codigo aun no esta desplegado y no hay token productivo dedicado. Token productivo dedicado sigue pendiente; no se subio el PAT amplio de `gh` a Secret Manager.
+
+# Sesion 2026-05-24 — TASK-636 Vercel Billing FOCUS Observability — ✅ COMPLETE
+
+**Status**: ✅ COMPLETE directo en `develop` por instrucción explícita del operador (sin branch switch). Discovery/Audit/Plan completados antes de implementar.
+
+**Decisiones cerradas antes de FASE 1**:
+- TASK-586 ya está `complete`, aunque TASK-636 la marcaba como blocker; se corrigió la task y se reutiliza el patrón existente de GCP Billing + Reliability.
+- V1 será read-only/API-driven sin persistencia PostgreSQL: no hay migraciones ni cambios de schema.
+- Team Vercel runtime verificado por CLI: `team_gmNiF4YCHmc1wqsHUTCvqjmN` (scope `efeonce-7670142f`) y proyecto `greenhouse-eo`. No existen env vars `GREENHOUSE_VERCEL_*` configuradas todavía.
+- Guardrails de costo no inventan presupuesto: `GREENHOUSE_VERCEL_BILLING_MONTHLY_WARN_USD`, `GREENHOUSE_VERCEL_BILLING_MONTHLY_CRITICAL_USD` y `GREENHOUSE_VERCEL_BILLING_DAILY_SPIKE_PCT` son opcionales; si faltan, el estado queda `unconfigured`, no “healthy”.
+- Access model: `routeGroups=admin`; views reutilizadas `administracion.admin_center`, `administracion.cloud_integrations`, `administracion.ops_health`; sin entitlements nuevos V1; startup policy sin cambios.
+
+**Entregado**:
+- Reader server-side `src/lib/cloud/vercel-billing.ts` + tipos `src/types/vercel-billing.ts` + tests de parsing/agregacion/error/not_configured.
+- API admin `GET /api/admin/cloud/vercel-billing` protegida por `requireAdminTenantContext`.
+- Signal reliability `cloud.billing.vercel` con severidad por config/API/thresholds/spike.
+- UI: `VercelBillingCard` en `/admin/integrations`, spotlight en `/admin/ops-health`, y Admin Center inyecta el source en `getReliabilityOverview`.
+- Docs/env: `.env.example`, `project_context.md`, `changelog.md`, doc funcional FinOps y task lifecycle movida a `complete`.
+
+**Validación**: `pnpm exec vitest run src/lib/cloud/vercel-billing.test.ts`; `pnpm exec vitest run src/lib/cloud/vercel-billing.test.ts src/lib/reliability` (42 passed, 2 skipped; 331 tests passed, 4 skipped); `pnpm lint`; `pnpm exec tsc --noEmit`; `pnpm design:lint`; `pnpm build`.
+
+**No validado**: smoke con token real/request autenticado y visual con cargos reales porque `vercel env ls --scope efeonce-7670142f` no muestra env vars `GREENHOUSE_VERCEL_*`; runtime esperado hasta provisionarlas: `not_configured`.
+
+**Delta operacional post-cierre**: env vars requeridas ya provisionadas en Vercel `production`, `staging` y `development`: `GREENHOUSE_VERCEL_API_TOKEN_SECRET_REF=greenhouse-vercel-api-token`, `GREENHOUSE_VERCEL_TEAM_ID=team_gmNiF4YCHmc1wqsHUTCvqjmN`, `GREENHOUSE_VERCEL_TEAM_SLUG=efeonce-7670142f`. Token guardado en GCP Secret Manager `greenhouse-vercel-api-token` con `roles/secretmanager.secretAccessor` para `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`. Smoke local del reader con Secret Manager: `availability=configured`, 30d rolling USD 23.94 billed / USD 38.91 effective, top services Pro, Build CPU Minutes, Build Minutes, Fluid Active CPU, Fluid Provisioned Memory; latest charge date `2026-05-23`. Threshold envs siguen sin configurar por diseño.
+
+# Sesion 2026-05-24 — RELEASE develop→main (43 commits) — ✅ RELEASED
+
+**Status**: ✅ Producción promovida vía orchestrator canónico (skill `greenhouse-production-release`). Manifest **`released`**.
+
+- **Target SHA**: `2a24a5bbe00116a6fd6ea495f0c9c57151e866ad` (merge commit `release: develop→main 2026-05-24`).
+- **Orchestrator run**: `26362339597` · **release_id**: `2a24a5bbe001-ff805fe5-2eb3-4112-8ca7-fc44f3fd1ce4`.
+- **Scope**: TASK-921/922/923 (attributable lateness M0+M2+M1, **shadow**) + TASK-926 (task linter) + TASK-928 (N+1 batching, payroll read-path) + Sentry remediation hardening + ADRs SDD/onboarding. 2 migraciones shadow (TASK-921/922) ya aplicadas al instance Cloud SQL compartido.
+- **Activación intencional**: 2 flags shadow ON en ops-worker prod (`NOTION_DUE_DATE_CAPTURE_ENABLED` + `ATTRIBUTABLE_LATENESS_OTD_ENABLED`) — pueblan tablas que nadie lee, **NO tocan el bono** (cutover M3 gated aparte). Operador autorizó scope completo + shadow ON.
+- **Preflight in-CI**: passed (Sentry 0 activos ventana 15m; `split_batch` payroll+cloud_release esperado, bajado a warning vía `bypass_preflight_reason` → `--override-batch-policy --bypass-preflight-warnings`).
+- **Gates Production**: 2 aprobados (gate 1 = 4 workers; gate 2 = Azure skip-deploy, sin diff `infra/azure`).
+- **Verificación post-release**: 4 Cloud Run en SHA `2a24a5bb` (ops-worker / commercial-cost-worker / ico-batch-worker us-east4 + hubspot-greenhouse-integration us-central1) ✅ MATCH · Vercel production READY (`greenhouse.efeoncepro.com`, dpl creado al push) · post-release `/api/auth/health` ✓ · **watchdog run `26362641346` `drift_count=0`** (resuelve los watchdog scheduled que venían fallando por worker_revision_drift pre-release).
+- **No validado / nota**: warnings de deprecación Node 20 en actions (no-bloqueante, removal sep-2026). Sentry: 25 issues unresolved totales pero 0 activos en ventana — quedan como deuda visible (no se cierran sin token con permiso de resolve).
+
+---
+
 # Sesion 2026-05-24 — TASK-922 M2: atraso imputable + bucket OTD reason-aware (shadow) — ✅ SHIPPED
 
 **Status**: ✅ COMPLETE **directo en develop** (override operador: sin branch). M2 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16. Computa el atraso imputable + bucket OTD reason-aware en **shadow** (flag `ATTRIBUTABLE_LATENESS_OTD_ENABLED` OFF) → bono intacto. Cierra el compute que TASK-921 (M0) + TASK-923 (M1) habilitaron; desbloquea M3 (cutover bono, gated) que cierra ISSUE-081 en prod.
@@ -3350,7 +3766,7 @@ Documentadas en CLAUDE.md sección "Production Release Operational Playbook (TAS
 - **Hard Rules canonizadas en CLAUDE.md** sección "Production Release Watchdog invariants (TASK-849)".
 - **Tests/build:** tsc clean. Lint clean. 62/62 verdes nuevos/extendidos. Migration aplicada en dev (386 tablas PG).
 - **Skills invocadas:** `arch-architect` (constante per instrucción usuario) + `greenhouse-backend` para implementación.
-- **Próximo paso:** configurar `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel env vars production para activar dashboards reliability automaticamente. Cron scheduled YA esta activo en GH Actions runner (usa `github.token` auto-provisto). Operador puede ejecutar manualmente `pnpm release:watchdog --json` para validar local. Post-merge a `main` el watchdog corre cada 30 min y emite alertas Teams a `production-release-alerts` cuando detecte blockers.
+- **Próximo paso original (superado 2026-05-24):** configurar `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel env vars production para activar dashboards reliability automaticamente. El schedule automatico del watchdog fue pausado posteriormente por falsos positivos; usar `pnpm release:watchdog --json` o `workflow_dispatch` hasta TASK-920.
 
 ---
 

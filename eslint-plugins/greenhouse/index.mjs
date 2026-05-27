@@ -15,6 +15,7 @@
 //   - no-untokenized-business-line-branching        (TASK-827) — UI components must NOT branch by session.user.tenantType/businessLines/serviceModules/tenant_capabilities — use resolver canonical (TASK-825)
 //   - no-inline-payroll-scope-gate                  (TASK-890) — consumers MUST NOT recompose the offboarding × payroll scope gate inline; use canonical resolver
 //   - no-extract-epoch-from-date-subtraction        (TASK-893 hotfix #3) — bloquea EXTRACT(EPOCH FROM (X - Y)) cuando X o Y es DATE (rompe runtime PG)
+//   - no-inline-ftr-calculation                     (TASK-909) — prohibe recomputar el veredicto FTR inline; usar helper canonical calculateFtr
 
 import noRawTableWithoutShell from './rules/no-raw-table-without-shell.mjs'
 import noHardcodedFontfamily from './rules/no-hardcoded-fontfamily.mjs'
@@ -29,11 +30,12 @@ import noCrossDomainImportFromClientPortal from './rules/no-cross-domain-import-
 import noUntokenizedBusinessLineBranching from './rules/no-untokenized-business-line-branching.mjs'
 import noInlinePayrollScopeGate from './rules/no-inline-payroll-scope-gate.mjs'
 import noExtractEpochFromDateSubtraction from './rules/no-extract-epoch-from-date-subtraction.mjs'
+import noInlineFtrCalculation from './rules/no-inline-ftr-calculation.mjs'
 
 const plugin = {
   meta: {
     name: 'eslint-plugin-greenhouse',
-    version: '1.8.0'
+    version: '1.9.0'
   },
   rules: {
     'no-raw-table-without-shell': noRawTableWithoutShell,
@@ -48,7 +50,8 @@ const plugin = {
     'no-cross-domain-import-from-client-portal': noCrossDomainImportFromClientPortal,
     'no-untokenized-business-line-branching': noUntokenizedBusinessLineBranching,
     'no-inline-payroll-scope-gate': noInlinePayrollScopeGate,
-    'no-extract-epoch-from-date-subtraction': noExtractEpochFromDateSubtraction
+    'no-extract-epoch-from-date-subtraction': noExtractEpochFromDateSubtraction,
+    'no-inline-ftr-calculation': noInlineFtrCalculation
   }
 }
 

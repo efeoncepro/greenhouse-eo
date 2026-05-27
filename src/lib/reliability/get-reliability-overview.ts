@@ -3,6 +3,8 @@ import 'server-only'
 import type { CloudSentryIncidentsSnapshot } from '@/lib/cloud/contracts'
 import { getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { getGitHubBillingOverview } from '@/lib/cloud/github-billing'
+import { getVercelBillingOverview } from '@/lib/cloud/vercel-billing'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import {
@@ -13,8 +15,10 @@ import { getFinanceSmokeLaneStatus } from '@/lib/reliability/finance/get-finance
 import { getLatestSyntheticSnapshotsByRoute } from '@/lib/reliability/synthetic/reader'
 import type { GcpBillingOverview } from '@/types/billing-export'
 import type { FinanceSmokeLaneStatus } from '@/types/finance-smoke-lane'
+import type { GitHubBillingOverview } from '@/types/github-billing'
 import type {
   ReliabilityIntegrationBoundary,
+  ReliabilityModuleKey,
   ReliabilityModuleDefinition,
   ReliabilityModuleSnapshot,
   ReliabilityOverview,
@@ -23,6 +27,7 @@ import type {
   ReliabilitySignalKind
 } from '@/types/reliability'
 import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
+import type { VercelBillingOverview } from '@/types/vercel-billing'
 
 import { buildAiSummarySignals } from './ai/build-ai-summary-signals'
 import { getLatestAiObservationsByScope, type AiObservation } from './ai/reader'
@@ -35,6 +40,7 @@ import {
 import { getClientPortalResolverFailureRateSignal } from './queries/client-portal-resolver-failure-rate'
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
+import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
 import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
 import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
@@ -71,6 +77,10 @@ import {
   getNotionMetricsWritebackDeadLetterSignal,
   getNotionMetricsWritebackLagSignal
 } from './queries/notion-metrics-rpa-signals'
+import {
+  getNotionMetricsFtrWritebackDeadLetterSignal,
+  getNotionMetricsFtrWritebackLagSignal
+} from './queries/notion-metrics-ftr-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
@@ -110,6 +120,7 @@ import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
 import { getCloudRunSilentObservabilitySignal } from './queries/cloud-run-silent-observability'
+import { getAiObserverUnhealthySignal } from './queries/ai-observer-unhealthy'
 import { getSecretsEnvRefFormatDriftSignal } from './queries/secrets-env-ref-format-drift'
 import { getPostgresConnectionSaturationSignal } from './queries/postgres-connection-saturation'
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
@@ -152,8 +163,10 @@ import {
 import {
   buildCloudSignals,
   buildDomainIncidentSignals,
+  buildGitHubBillingSignals,
   buildFinanceSmokeLaneSignals,
   buildGcpBillingSignals,
+  buildVercelBillingSignals,
   buildNotionDataQualitySignals,
   buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
@@ -178,6 +191,22 @@ const RELIABILITY_INTEGRATION_BOUNDARIES: ReliabilityIntegrationBoundary[] = [
     expectedSource: 'getGcpBillingOverview',
     status: 'ready',
     note: 'TASK-586 entregó el reader Billing Export con degradación honesta (awaiting_data cuando tablas no rinden). Adapter: buildGcpBillingSignals.'
+  },
+  {
+    taskId: 'TASK-636',
+    moduleKey: 'cloud',
+    expectedSignalKind: 'billing',
+    expectedSource: 'getVercelBillingOverview',
+    status: 'ready',
+    note: 'TASK-636 agrega Vercel Billing FOCUS v1.3 read-only con degradación honesta y adapter buildVercelBillingSignals.'
+  },
+  {
+    taskId: 'TASK-637',
+    moduleKey: 'cloud',
+    expectedSignalKind: 'billing',
+    expectedSource: 'getGitHubBillingOverview',
+    status: 'ready',
+    note: 'TASK-637 agrega GitHub Billing Usage read-only con degradación honesta y adapter buildGitHubBillingSignals.'
   },
   {
     taskId: 'TASK-586',
@@ -332,6 +361,8 @@ const sortSignalsForDisplay = (signals: ReliabilitySignal[]): ReliabilitySignal[
 
 interface ReliabilityOverviewSources {
   billing?: GcpBillingOverview | null
+  vercelBilling?: VercelBillingOverview | null
+  githubBilling?: GitHubBillingOverview | null
   notionOperational?: NotionSyncOperationalOverview | null
   syntheticSnapshots?: SyntheticRouteSnapshot[] | null
   financeSmokeLane?: FinanceSmokeLaneStatus | null
@@ -494,6 +525,13 @@ interface ReliabilityOverviewSources {
   accountBalancesFxDrift?: ReliabilitySignal | null
 
   /**
+   * TASK-929 Slice 3 — Unresolved finance ledger drift items (settlement
+   * has_drift + unanchored paid expenses). Steady=0. Always-on dashboard metric
+   * complementing the daily ledger-health cron.
+   */
+  ledgerUnresolvedDriftItems?: ReliabilitySignal | null
+
+  /**
    * TASK-777 Slice 3 — Expense distribution management-accounting gates.
    * Protege P&L/overhead: cuenta expenses sin lane canónico y filas que el
    * pool legacy tomaría como overhead aunque son payroll provider, regulatorio
@@ -612,6 +650,15 @@ interface ReliabilityOverviewSources {
   cloudRunSilentObservability?: ReliabilitySignal | null
 
   /**
+   * TASK-937 — AI Observer health (heartbeat).
+   *   - reliability.ai_observer.unhealthy (drift)
+   * Lee el heartbeat en source_sync_runs (source_system='reliability_ai_observer').
+   * Detecta cron caído / kill-switch OFF / JSON truncado sostenido. Roll up
+   * bajo moduleKey 'cloud'.
+   */
+  aiObserverUnhealthy?: ReliabilitySignal | null
+
+  /**
    * TASK-856 Slice 3 — Secret-ref env var format drift (detección activa).
    *   - secrets.env_ref_format_drift (drift, error si > 0)
    * Detecta env vars `*_SECRET_REF` con shape no canónico (quotes, `\n` literal,
@@ -691,6 +738,13 @@ interface ReliabilityOverviewSources {
    * OFF) reportan steady (writeback skipea sin tocar attempt_count).
    */
   notionMetricsRpa?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-903 — FTR writeback signals (Efeonce/Sky). Roll up bajo moduleKey
+   * 'delivery'. Pre-flip (NOTION_FTR_WRITEBACK_ENABLED OFF) reportan steady
+   * (writeback skipea sin tocar attempt_count).
+   */
+  notionMetricsFtr?: ReliabilitySignal[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -710,6 +764,8 @@ export const buildReliabilityOverview = (
     buildObservabilityPostureSignal(operations.cloud.observability.posture),
     ...buildNotionDataQualitySignals(operations.notionDeliveryDataQuality ?? null),
     ...(sources.billing ? buildGcpBillingSignals(sources.billing) : []),
+    ...(sources.vercelBilling ? buildVercelBillingSignals(sources.vercelBilling) : []),
+    ...(sources.githubBilling ? buildGitHubBillingSignals(sources.githubBilling) : []),
     ...(sources.notionOperational ? [buildNotionFreshnessSignal(sources.notionOperational)] : []),
     ...buildSyntheticRouteSignals(syntheticSnapshots),
     ...buildSyntheticModuleSignals(syntheticSnapshots),
@@ -772,6 +828,7 @@ export const buildReliabilityOverview = (
     ...(sources.cronStagingDrift ? [sources.cronStagingDrift] : []),
     // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
     ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
+    ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
     // TASK-780 Phase 3 — Home rollout drift (PG flag vs env + opt-out rate).
@@ -802,6 +859,8 @@ export const buildReliabilityOverview = (
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
     ...(sources.cloudRunSilentObservability ? [sources.cloudRunSilentObservability] : []),
+    // TASK-937 — AI Observer health (heartbeat-based liveness).
+    ...(sources.aiObserverUnhealthy ? [sources.aiObserverUnhealthy] : []),
     // TASK-856 Slice 3 — Secret-ref env var format drift (active upstream detection).
     ...(sources.secretsEnvRefFormatDrift ? [sources.secretsEnvRefFormatDrift] : []),
     // TASK-845 Slice 6 — PG connection saturation (data-driven V2 trigger).
@@ -819,6 +878,7 @@ export const buildReliabilityOverview = (
     ...(sources.notionStatusTransitions ?? []),
     // TASK-916 — Notion RpA V2 productive writeback signals (2).
     ...(sources.notionMetricsRpa ?? []),
+    ...(sources.notionMetricsFtr ?? []),
     // TASK-921 — Reschedule (due-date change) capture signals (2).
     ...(sources.notionMetricsReschedule ?? []),
     // TASK-922 — Attributable lateness shadow signals (2).
@@ -925,6 +985,16 @@ export const getReliabilityOverview = async (
     preloadedSources.billing !== undefined
       ? preloadedSources.billing
       : await getGcpBillingOverview().catch(() => null)
+
+  const vercelBilling =
+    preloadedSources.vercelBilling !== undefined
+      ? preloadedSources.vercelBilling
+      : await getVercelBillingOverview().catch(() => null)
+
+  const githubBilling =
+    preloadedSources.githubBilling !== undefined
+      ? preloadedSources.githubBilling
+      : await getGitHubBillingOverview().catch(() => null)
 
   const notionOperational =
     preloadedSources.notionOperational !== undefined
@@ -1105,6 +1175,13 @@ export const getReliabilityOverview = async (
       ? preloadedSources.accountBalancesFxDrift
       : await getAccountBalancesFxDriftSignal().catch(() => null)
 
+  // TASK-929 Slice 3 — Unresolved finance ledger drift items (settlement +
+  // unanchored). Always-on steady-state metric. Degrada honestamente a `unknown`.
+  const ledgerUnresolvedDriftItems =
+    preloadedSources.ledgerUnresolvedDriftItems !== undefined
+      ? preloadedSources.ledgerUnresolvedDriftItems
+      : await getLedgerUnresolvedDriftItemsSignal().catch(() => null)
+
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
       ? preloadedSources.expenseDistribution
@@ -1247,6 +1324,14 @@ export const getReliabilityOverview = async (
     preloadedSources.cloudRunSilentObservability !== undefined
       ? preloadedSources.cloudRunSilentObservability
       : await getCloudRunSilentObservabilitySignal().catch(() => null)
+
+  // TASK-937 — AI Observer health desde el heartbeat (source_sync_runs).
+  // Steady=0; detecta cron caído, kill-switch OFF o JSON truncado sostenido.
+  // Degrada `unknown` si la query falla.
+  const aiObserverUnhealthy =
+    preloadedSources.aiObserverUnhealthy !== undefined
+      ? preloadedSources.aiObserverUnhealthy
+      : await getAiObserverUnhealthySignal().catch(() => null)
 
   // TASK-856 Slice 3 — Secret-ref env var format drift. Detección activa
   // upstream del Sentry burst downstream cuando un env var `*_SECRET_REF`
@@ -1411,6 +1496,17 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-903 — Notion FTR writeback signals (Efeonce/Sky).
+  const notionMetricsFtr =
+    preloadedSources.notionMetricsFtr !== undefined
+      ? preloadedSources.notionMetricsFtr
+      : await Promise.all([
+          getNotionMetricsFtrWritebackDeadLetterSignal().catch(() => null),
+          getNotionMetricsFtrWritebackLagSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-921 — Notion reschedule (due-date change) capture signals.
   const notionMetricsReschedule =
     preloadedSources.notionMetricsReschedule !== undefined
@@ -1435,6 +1531,8 @@ export const getReliabilityOverview = async (
 
   return buildReliabilityOverview(operations, {
     billing,
+    vercelBilling,
+    githubBilling,
     notionOperational,
     syntheticSnapshots,
     financeSmokeLane,
@@ -1455,6 +1553,7 @@ export const getReliabilityOverview = async (
     emailRenderFailure,
     cronStagingDrift,
     accountBalancesFxDrift,
+    ledgerUnresolvedDriftItems,
     expenseDistribution,
     homeRolloutDrift,
     shortcutsInvalidPins,
@@ -1470,6 +1569,7 @@ export const getReliabilityOverview = async (
     notionConformedDrainFreshness,
     criticalTablesMissing,
     cloudRunSilentObservability,
+    aiObserverUnhealthy,
     secretsEnvRefFormatDrift,
     postgresConnectionSaturation,
     servicesEngagement,
@@ -1481,16 +1581,24 @@ export const getReliabilityOverview = async (
     notionMetricsDemo,
     notionStatusTransitions,
     notionMetricsRpa,
+    notionMetricsFtr,
     notionMetricsReschedule,
     attributableLateness
   })
 }
 
 /**
- * Fetch Sentry incident snapshots in parallel for every module whose registry
- * entry declares an `incidentDomainTag`. Failures are isolated per domain so a
- * Sentry hiccup on one module never poisons the others.
+ * Fetch Sentry incident snapshots for every module whose registry entry
+ * declares an `incidentDomainTag`. Sentry currently rate-limits this endpoint
+ * around 5 requests/sec, so we batch the domain reads instead of firing the
+ * whole registry at once. Failures are still isolated per domain so a Sentry
+ * hiccup on one module never poisons the others.
  */
+const SENTRY_DOMAIN_INCIDENT_BATCH_SIZE = 4
+const SENTRY_DOMAIN_INCIDENT_BATCH_DELAY_MS = 1100
+
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 const hydrateDomainIncidents = async (
   registry: ReliabilityModuleDefinition[]
 ): Promise<Record<string, CloudSentryIncidentsSnapshot> | null> => {
@@ -1498,19 +1606,31 @@ const hydrateDomainIncidents = async (
 
   if (taggedModules.length === 0) return null
 
-  const entries = await Promise.all(
-    taggedModules.map(async module => {
-      try {
-        const snapshot = await getCloudSentryIncidents(process.env, {
-          domain: module.incidentDomainTag ?? null
-        })
+  const entries: Array<readonly [ReliabilityModuleKey, CloudSentryIncidentsSnapshot] | null> = []
 
-        return [module.moduleKey, snapshot] as const
-      } catch {
-        return null
-      }
-    })
-  )
+  for (let index = 0; index < taggedModules.length; index += SENTRY_DOMAIN_INCIDENT_BATCH_SIZE) {
+    const batch = taggedModules.slice(index, index + SENTRY_DOMAIN_INCIDENT_BATCH_SIZE)
+
+    const batchEntries = await Promise.all(
+      batch.map(async module => {
+        try {
+          const snapshot = await getCloudSentryIncidents(process.env, {
+            domain: module.incidentDomainTag ?? null
+          })
+
+          return [module.moduleKey, snapshot] as const
+        } catch {
+          return null
+        }
+      })
+    )
+
+    entries.push(...batchEntries)
+
+    if (index + SENTRY_DOMAIN_INCIDENT_BATCH_SIZE < taggedModules.length) {
+      await wait(SENTRY_DOMAIN_INCIDENT_BATCH_DELAY_MS)
+    }
+  }
 
   const out: Record<string, CloudSentryIncidentsSnapshot> = {}
 

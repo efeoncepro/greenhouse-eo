@@ -1,0 +1,7 @@
+interface:
+  display_name: "Greenhouse Browser Diagnostics"
+  short_description: "Authenticated Playwright route diagnostics"
+  default_prompt: "Use $greenhouse-browser-diagnostics to inspect a Greenhouse route with the dedicated agent user, Playwright, and Chromium."
+
+policy:
+  allow_implicit_invocation: true

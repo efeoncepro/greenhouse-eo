@@ -2,6 +2,21 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-24 — TASK-903: FTR productive writeback chain event (1 event v1)
+
+Aggregate type: `notion_task`. Sibling de TASK-916 repointeado a FTR (derivada pura de RpA).
+
+| Event Type | Disparado por | Payload v1 contract | Consumers |
+|---|---|---|---|
+| `notion.task.ftr_writeback_requested` | Reactive consumer `notion_ftr_compute` (productivo) post `calculateFtr`, cuando `ftrDataStatus='valid'` con veredicto pass/fail y el snapshot persistió (no ON CONFLICT skip) | `{schemaVersion:1, taskSourceId, workspaceId:'efeonce' or 'sky', ftrValue:'pass' or 'fail', ftrDataStatus:'valid', snapshotId, formulaVersion:'ftr_v1.0', computedAt}` | `notion_ftr_writeback` (productivo) — PATCH propiedad Notion select `[GH] FTR` (Pass/Fail), gated `NOTION_FTR_WRITEBACK_ENABLED` (default OFF) |
+
+Reglas duras:
+
+- Sibling físicamente separado de `notion.task.metrics_writeback_requested` (RpA, TASK-916). FTR no tiene carril demo. Tabla `task_ftr_snapshots` separada de `task_rpa_snapshots`.
+- Chain event pattern (TASK-771): compute y writeback decoupled via outbox. El writeback re-lee el snapshot de PG por `snapshotId` (NUNCA confía el `ftrValue` del payload).
+- `ftrDataStatus != 'valid'` (low_confidence/unavailable) NO emite el evento — degraded honest, mirror RpA `valid`-only.
+- Aditivo + gated OFF por default — cero escrituras a Notion productivo al merge. Activación gated por FTR_V1 §9.1.
+
 ## Delta 2026-05-21 — TASK-916: RpA V2 productive writeback chain event (1 event v1)
 
 Aggregate type: `notion_task`.
@@ -849,3 +864,15 @@ Nuevo evento productivo `notion.task.page_change_signal` (sibling del demo `noti
 - No lleva `metadata.demo_mode`: el consumer demo lo ignora (filtra `=== true`), el productivo lo procesa. Tablas físicamente separadas (`task_status_transitions` vs `task_status_transitions_demo`).
 
 Spec: `docs/tasks/in-progress/TASK-912-ico-status-transition-webhook-ingestion-and-bq-formula.md`.
+
+## Delta 2026-05-25 — TASK-934: `finance.expense.unanchored_acknowledged`
+
+Nuevo evento audit `finance.expense.unanchored_acknowledged` (aggregate type `finance.expense`).
+
+- **Emisor**: helper canónico `acknowledgeUnanchoredExpense` (`src/lib/finance/ledger-drift/acknowledge-unanchored.ts`), invocado por `POST /api/admin/finance/expenses/[id]/acknowledge-unanchored` (gated por capability granular `finance.expenses.acknowledge_unanchored`, FINANCE_ADMIN + EFEONCE_ADMIN).
+- **Semántica**: un gasto pagado sin FK-anchor (no payroll/tool/supplier/tax/loan/linked-income) pero clasificado por `economic_category` se acepta como **deuda conocida**. NO es write-off ni supersede — el gasto se queda en P&L; solo se setean las columnas `unanchored_acknowledged_at/by/reason`. Equivale al SUM-of-unadjusted-misstatements de auditoría.
+- **Schema v1**: `{ expenseId, economicCategory: string | null, reason: string (>=10 chars), actorUserId: string | null, acknowledgedAt: ISO }`.
+- **Idempotente**: si el gasto ya está acknowledged, el helper hace no-op y NO emite evento.
+- **Consumers**: ninguno reactivo en V1 (audit-only). Los readers `getFinanceLedgerHealth` (campo `acknowledgedDebt`), `getLedgerDriftInventory` (sección `acknowledged`) y el signal `finance.ledger.unresolved_drift_items` excluyen los acknowledged del conteo de pendientes leyendo la columna directamente.
+
+Spec: `docs/tasks/in-progress/TASK-934-unanchored-paid-expense-anchoring-review-queue.md`.

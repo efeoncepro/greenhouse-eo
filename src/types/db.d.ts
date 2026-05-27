@@ -3755,6 +3755,26 @@ export interface GreenhouseDeliveryTaskDueDateChanges {
   workspace_id: string;
 }
 
+export interface GreenhouseDeliveryTaskFtrSnapshots {
+  computed_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  formula_version: Generated<string>;
+  ftr_data_status: string;
+  ftr_value: string | null;
+  notion_writeback_attempt_count: Generated<number>;
+  notion_writeback_event_id: string | null;
+  notion_writeback_last_error: string | null;
+  rpa_data_status: string | null;
+  rpa_value: number | null;
+  snapshot_id: Generated<string>;
+  source_event_id: string | null;
+  source_event_received_at: Timestamp | null;
+  source_mode: string;
+  task_source_id: string;
+  workspace_id: string;
+  written_to_notion_at: Timestamp | null;
+}
+
 export interface GreenhouseDeliveryTaskRpaDemoSnapshots {
   computed_at: Generated<Timestamp>;
   correction_transitions_count: Generated<number>;
@@ -4639,6 +4659,15 @@ export interface GreenhouseFinanceExpenses {
   tool_catalog_id: string | null;
   total_amount: Numeric;
   total_amount_clp: Numeric;
+  /**
+   * TASK-934: timestamp when an operator accepted this unanchored paid expense as known debt (classified via economic_category, no FK anchor appropriate). NULL = not acknowledged. Set only via acknowledgeUnanchoredExpense() helper. The expense stays in P&L — this is NOT a void/supersede.
+   */
+  unanchored_acknowledged_at: Timestamp | null;
+  unanchored_acknowledged_by: string | null;
+  /**
+   * TASK-934: operator reason (>= 10 chars) for accepting the unanchored expense as known debt. Append-only via outbox event finance.expense.unanchored_acknowledged v1.
+   */
+  unanchored_acknowledged_reason: string | null;
   updated_at: Generated<Timestamp>;
   vat_common_use_amount: Numeric | null;
   vat_fixed_assets_amount: Numeric | null;
@@ -9370,6 +9399,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
   "greenhouse_delivery.task_attributable_lateness_shadow": GreenhouseDeliveryTaskAttributableLatenessShadow;
   "greenhouse_delivery.task_due_date_changes": GreenhouseDeliveryTaskDueDateChanges;
+  "greenhouse_delivery.task_ftr_snapshots": GreenhouseDeliveryTaskFtrSnapshots;
   "greenhouse_delivery.task_rpa_demo_snapshots": GreenhouseDeliveryTaskRpaDemoSnapshots;
   "greenhouse_delivery.task_rpa_snapshots": GreenhouseDeliveryTaskRpaSnapshots;
   "greenhouse_delivery.task_status_transitions": GreenhouseDeliveryTaskStatusTransitions;

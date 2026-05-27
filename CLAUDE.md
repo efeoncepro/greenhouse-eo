@@ -45,11 +45,47 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - **Staging** → `develop` (Custom Environment) → `dev-greenhouse.efeoncepro.com`
 - **Preview** → ramas `feature/*`, `fix/*`, `hotfix/*`
 
+### Local-First Development Workflow
+
+**Spec canonica:** `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`.
+
+Regla base: `local = taller`, `branch/PR = validacion remota acotada`, `develop = integracion compartida`, `main = produccion via release control plane`.
+
+Para reducir costo GitHub Actions/Vercel/GCP sin perder calidad, Claude/agents deben iterar y validar en local por defecto. No hacer push remoto como cierre automatico de cada flujo salvo instruccion explicita del operador, hotfix documentado o release controlado.
+
+Comandos canonicos:
+
+```bash
+pnpm local:check       # lint + tsc
+pnpm local:check:ui    # local:check + design:lint + build
+pnpm local:check:full  # local:check + test + build
+```
+
+Antes de reducir o redisenar GitHub Actions por costo:
+
+```bash
+pnpm actions:cost:audit --from YYYY-MM-DD --to YYYY-MM-DD
+```
+
+Ese reporte local usa GitHub Actions Runs/Jobs API via `gh` para estimar hotspots por workflow/job. La factura oficial sigue siendo `cloud.billing.github`; no mezclar `estimatedGrossUsd` con billing neto.
+
+Si el cambio toca UI visible, levantar `pnpm dev` y entregar la URL `localhost` exacta antes de pedir push. No usar Vercel Preview como loop de exploracion si localhost puede validar el cambio.
+
+Prompt operativo recomendado:
+
+```text
+Implementa esto local-first. No hagas push.
+Trabaja slice por slice, valida con pnpm local:check y tests focales.
+Si toca UI, levanta pnpm dev y dame la URL localhost exacta.
+Espera mi confirmacion antes de empujar a develop o crear preview remoto.
+```
+
 ### Vercel Deployment Protection
 
 - **SSO habilitada** (`deploymentType: "all_except_custom_domains"`) — protege TODO salvo custom domains de Production.
 - El custom domain de staging (`dev-greenhouse.efeoncepro.com`) **SÍ tiene SSO** — no es excepción.
 - Para acceso programático (agentes, Playwright, curl): usar la URL `.vercel.app` + header `x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET`.
+- Hook operativo browser diagnostics: si el usuario pide abrir, revisar, diagnosticar, capturar o testear una ruta/URL del portal, usar automáticamente usuario agente dedicado + Playwright/Chromium. No pedir login ni navegar anónimo como primer intento. Enviar `x-vercel-protection-bypass` solo a origins Greenhouse/Vercel, no a terceros como Sentry.
 - **NUNCA crear manualmente** `VERCEL_AUTOMATION_BYPASS_SECRET` en Vercel — la variable es auto-gestionada por el sistema. Si se crea manualmente, sombrea el valor real y rompe el bypass.
 - URLs de staging:
   - Custom domain (SSO, no para agentes): `dev-greenhouse.efeoncepro.com`
@@ -880,6 +916,28 @@ Cuatro patrones que evitan que el dashboard muestre falsos positivos o señales 
 - **NO** leer Playwright results desde filesystem en runtime (Vercel/Cloud Run no tienen el archivo). Usar `greenhouse_sync.smoke_lane_runs`. El fallback fs queda solo para dev local.
 - **NO** usar `Sentry.captureException()` directo en code paths con dominio claro — el tag `domain` no se setea y el módulo correspondiente NUNCA ve el incidente. Usar `captureWithDomain()`.
 
+### Async observer liveness — heartbeat, no output freshness (TASK-937, desde 2026-05-26)
+
+Cuando un proceso async produce un artefacto que también se **deduplica** (el AI Observer del RCP persiste `overview`/módulos solo si el fingerprint del snapshot cambió), su **liveness NO puede inferirse de la frescura de su output**. Una postura estable hace que el artefacto no se re-persista por días — eso es sano, no "apagado". El bug class (TASK-637/638 → TASK-937, detectado live 2026-05-26): el banner `/admin` gateaba "AI Observer no activo" sobre una observación `overview` fresca en ventana de 24h; con el portal estable el overview no se re-persistía (4 días) → banner falso, aunque el cron horario corría y Vertex respondía.
+
+**El patrón canónico desacopla tres preguntas distintas que NO deben colapsarse en un booleano**:
+
+| Pregunta | Fuente de verdad | NUNCA |
+|---|---|---|
+| ¿El proceso **corre**? | heartbeat append-only en `greenhouse_sync.source_sync_runs` | inferir de la frescura/presencia del output |
+| ¿Está **sano**? | reliability signal que lee el heartbeat | medir solo "hay output reciente" |
+| ¿Hay **artefacto fresco**? | el último artefacto (sin filtro de edad, con label "hace X") | esconderlo tras una ventana que se confunde con "apagado" |
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** inferir la liveness de un observer/cron/proyección async desde la frescura de su output cuando ese output se deduplica. Liveness = heartbeat propio.
+- **NUNCA** crear tabla de run-tracking nueva para un heartbeat. Reusar `source_sync_runs` con un `source_system` nuevo (precedentes: `reactive_worker`, `reliability_synthetic`, `reliability_ai_observer`). El `status` debe respetar el CHECK enum (`running|succeeded|failed|partial|cancelled`) — `skipped` NO existe; mapear "deshabilitado" a `cancelled` y "falló" a `failed`.
+- **NUNCA** dejar que el heartbeat rompa el proceso principal. Va en wrapper boundary con `try/catch + warn` (non-blocking).
+- **NUNCA** togglear off el `thinkingConfig:{thinkingBudget:0}` del AI Observer (`src/lib/reliability/ai/runner.ts`). `gemini-2.5-flash` corre con *thinking* ON por default y quema el `maxOutputTokens` → trunca el JSON estructurado (`unbalanced_or_truncated_json`). Con `responseSchema` (constrained decoding) + thinking apagado + budget adecuado, el JSON sale válido. Loggear `candidates[0].finishReason` para distinguir `MAX_TOKENS` (truncado por budget) de JSON malformado.
+- **SIEMPRE** que un async path nuevo necesite "¿está vivo/sano?", shippear (a) heartbeat en `source_sync_runs`, (b) reliability signal que lo lee, (c) el reader del artefacto distingue `loading|empty|degraded|healthy_stable` sin colapsar en un estado ambiguo.
+
+**Spec canónica**: `docs/tasks/complete/TASK-937-ai-observer-reliability-hardening.md`. Helpers: `src/lib/reliability/ai/ai-observer-run-tracker.ts` (heartbeat), `src/lib/reliability/queries/ai-observer-unhealthy.ts` (signal `reliability.ai_observer.unhealthy`, moduleKey `cloud`).
+
 ### Platform Health API Contract — preflight programático para agentes (TASK-672)
 
 Contrato versionado `platform-health.v1` que un agente, MCP, Teams bot, cron de CI o cualquier app puede consultar antes de actuar. Compone Reliability Control Plane + Operations Overview + runtime checks + integration readiness + synthetic monitoring + webhook delivery + posture en una sola respuesta read-only con timeouts por fuente y degradación honesta.
@@ -1517,6 +1575,42 @@ Cualquier diferencia es **`drift`** — un problema real de integridad de ledger
 - Cuando aparezca un nuevo mecanismo de settlement (notas de crédito, write-offs parciales, retenciones extranjeras, etc.), extender **ambos**: la VIEW (migración nueva con `CREATE OR REPLACE VIEW`) y el helper TypeScript. Nunca branchear la lógica en un consumer.
 - El Reliability Control Plane (`Finance Data Quality > drift de ledger`) lee desde esta VIEW. Bypass = dashboards inconsistentes.
 
+### Finance — Ledger drift detection: superseded exclusion + honest degradation (TASK-929, desde 2026-05-24)
+
+Dos invariantes canónicos descubiertos/canonizados live al remediar `JAVASCRIPT-NEXTJS-4Q`:
+
+**1. La VIEW `income_settlement_reconciliation` DEBE excluir pagos superseded en `payments_total`.** El subquery de pagos filtra `superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL AND superseded_at IS NULL` — mirror EXACTO de `fn_recompute_income_amount_paid`. Antes de TASK-929 la VIEW sumaba TODOS los `income_payments` (incluyendo superseded) mientras el `fn` los excluía → **dos definiciones de la misma ecuación desalineadas** → falsos positivos de drift en facturas factorizadas (el pago NUBOX original superseded por el modelo factoring se contaba doble). Con el ledger churning (Nubox re-sync supersede/re-add constante), la VIEW vieja **flickeaba** drift.
+- **NUNCA** modificar `income_settlement_reconciliation` (ni `fn_recompute_income_amount_paid`) sin actualizar el otro en paralelo. Son la MISMA ecuación canónica — settlement = `SUM(pagos activos) + factoring_fee (active) + withholding`. Drift entre ambos = falsos positivos/negativos de drift.
+- **NUNCA** sumar `income_payments` sin filtrar las 3 cadenas de supersede (`superseded_by_payment_id`, `superseded_by_otb_id`, `superseded_at`) cuando el propósito es reconciliación de `amount_paid`.
+
+**2. `getFinanceLedgerHealth` NO debe colapsar un error de query a "0 drift" (false-healthy).** Cada check va envuelto en `tracked(name, promise, fallback)` que registra el check en `degradedChecks: string[]` cuando su query falla. `healthy` exige `degradedChecks` sin ningún check `DECISION_CRITICAL` degradado — no se puede declarar el ledger sano estando ciego a un check. Bug class ISSUE-071 / Pillar 3: verificado live 2026-05-24 (un probe con blip de proxy devolvió `healthy=true` mientras la VIEW tenía 4 drift rows).
+- **NUNCA** envolver un check de `getFinanceLedgerHealth` en `.catch(() => [])` plano. Usar `tracked(...)` para que el fallo sea visible en `degradedChecks`, no silencioso.
+- **NUNCA** agregar un check decision-critical nuevo sin añadirlo al set `DECISION_CRITICAL_CHECKS`. Los checks `*_sample`/informacionales degradados se surfacing pero NO flipean `healthy`.
+- El `driftSignature` del cron ops-worker (`buildFinanceLedgerDriftSignature`) incluye `degradedChecks` → un check degradado cambia la firma y dispara alerta Sentry distinta del drift normal.
+
+**Signal canónico**: `finance.ledger.unresolved_drift_items` (`src/lib/reliability/queries/ledger-unresolved-drift-items.ts`, subsystem Finance Data Quality). Severidad tiered: settlement drift > 0 → `error` (integridad); solo unanchored > 0 → `warning` (data-completeness — los gastos sin FK-anchor que tienen `economic_category` no rompen P&L); ambos 0 → `ok`.
+
+**Inventory read-only** (control surface, NO muta): `getLedgerDriftInventory()` + `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/ledger-drift-inventory.ts`. Clasifica drift por tipo + rutea unanchored por materialidad ($50k CLP default, `LEDGER_DRIFT_UNANCHORED_MATERIALITY_CLP` env). La materialidad gobierna **routing**, NUNCA detección (la VIEW detecta todo a tolerancia 0.01).
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-929-finance-ledger-drift-remediation-control.md`.
+
+### Finance — Unanchored paid expense acknowledgment (TASK-934, desde 2026-05-25)
+
+Un gasto pagado sin FK-anchor (todos `payroll_entry_id`/`tool_catalog_id`/`supplier_id`/`tax_type`/`loan_account_id`/`linked_income_id` NULL) pero CON `economic_category` es **data-completeness, no integridad**. Dos resoluciones canónicas:
+
+- **Anclar** (vendor real, ej. Vercel/Beeconta): reuse del PUT existente `/api/finance/expenses/[id]` con `supplierId`. NO endpoint nuevo.
+- **Aceptar como deuda conocida** (labor a personas — contratistas internacionales, staff interno — + regulatory/bank fees, donde un `supplier_id` sería category error): helper canónico `acknowledgeUnanchoredExpense` (`src/lib/finance/ledger-drift/acknowledge-unanchored.ts`) + `POST /api/admin/finance/expenses/[id]/acknowledge-unanchored` (capability `finance.expenses.acknowledge_unanchored`).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** modelar la "cola de revisión" de unanchored como tabla-cola paralela con state machine. El acknowledgment vive ON the expense (columnas `unanchored_acknowledged_at/by/reason`), single source of truth — espejo de `dismiss-phantom.ts` (que usa `superseded_at` en la fila). Una tabla-cola duplicaría el estado del expense → sync risk.
+- **NUNCA** usar las columnas `unanchored_acknowledged_*` para VOID/supersede. El gasto se queda íntegro en P&L; acknowledgment solo registra "aceptado, clasificado por economic_category, sin supplier apropiado". NO confundir con `dismiss-phantom` (que sí anula un payment phantom).
+- **NUNCA** acknowledgear un gasto que tenga cualquier FK-anchor o que no esté `paid`. El helper hace guards defensivos (throw 422 `ACKNOWLEDGE_ALREADY_ANCHORED` / `ACKNOWLEDGE_NOT_PAID`).
+- **NUNCA** mutar `unanchored_acknowledged_*` por SQL directo. Toda aceptación pasa por `acknowledgeUnanchoredExpense` (idempotente, reason >= 10 chars, outbox `finance.expense.unanchored_acknowledged v1`).
+- **SIEMPRE** que un consumer lea "unanchored pendiente" (health/inventory/signal), filtrar `AND unanchored_acknowledged_at IS NULL`. Los acknowledged se exponen separados (`acknowledgedDebt` en health, sección `acknowledged` en inventory) — SUM-of-unadjusted, visible pero fuera de pendientes; NO afectan `healthy`.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-934-unanchored-paid-expense-anchoring-review-queue.md`. Capability: `finance.expenses.acknowledge_unanchored` (FINANCE_ADMIN + EFEONCE_ADMIN). Evento: `finance.expense.unanchored_acknowledged v1`.
+
 ### Finance — FX P&L canónico para tesorería (Banco "Resultado cambiario")
 
 El "Resultado cambiario" del Banco se compone de **3 fuentes legítimas** y debe leerse SIEMPRE desde la VIEW canónica + helper, no re-derivar:
@@ -1641,6 +1735,7 @@ Todo callsite que invoque `rematerializeAccountBalanceRange` desde un cron rolli
 
 - **NUNCA** pasar a `rematerializeAccountBalanceRange` un `seedDate` que tenga `settlement_legs` / `income_payments_normalized` / `expense_payments_normalized` con `transaction_date = seedDate`. La primitive seed = ancla muda; movements ahí desaparecen del materialized. El integrity check `resolveCleanSeedDate` es la única forma canónica de garantizarlo.
 - **NUNCA** modificar el contrato de `rematerializeAccountBalanceRange` (seed no se materializa). Es load-bearing para reconciliation snapshots TASK-721 + OTB anchor TASK-703.
+- **NUNCA** (TASK-938) materializar `account_balances` con `balance_date < genesis_date` del OTB activo de la cuenta. El `rematerializeAccountBalanceRange` aplica un **genesis floor** vía `applyGenesisFloor` (pura): si el seed resuelto cae antes del genesis, clampea al genesis + opening del OTB. Sin ese floor, un rematerialize en modo `explicit` seedeado < genesis re-crea filas pre-anchor que el cascade TASK-703b prunea (regresión real: global66-clp quedó con filas stale 03-06/04-04 re-creadas ~22h después del cascade). Cualquier callsite nuevo que invoque el rematerializer hereda el floor — NO lo bypasees. Espejo en el detector: `finance.account_balances.fx_drift` ignora fechas `< genesis` (son pre-anchor; el OTB las absorbe), evitando drift artificial. Si emerge necesidad de limpiar filas pre-genesis stale ya existentes, hacerlo vía `cascade_supersede_pre_otb_transactions` (gated, dry-run, ojo con transferencias internas que superseden un solo lado) — NUNCA con DELETE manual.
 - **NUNCA** modificar `computeRollingRematerializationWindow` para devolver `seedDate = targetStartDate`. El contracto `seedDate = materializeStartDate − 1` es invariante canónico.
 - **NUNCA** usar `seedMode='active_otb'` en un cron rolling. Mutaría `accounts.opening_balance` cache para drift transitorio. Reservado para audited backfills / full replays.
 - **NUNCA** usar `evidenceGuard: 'warn_only'` en rolling repair. `warn_only` se reserva para `known_bug_class_restatement` con intent operador explícito.
@@ -1929,7 +2024,7 @@ Ambos consultan GitHub API via `GITHUB_RELEASE_OBSERVER_TOKEN` con degradación 
 
 ### Production Release Watchdog invariants (TASK-849)
 
-Watchdog scheduled GH Actions `*/30 * * * *` que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale approvals + pending sin jobs + worker revision drift) y emite alertas Teams a `production-release-alerts` con dedup canonico. **Convierte los 2 signals pasivos de TASK-848 V1.0 en alertas activas**.
+Watchdog manual-only temporal (desde 2026-05-24 hasta TASK-920) que detecta los 3 sintomas del incidente 2026-04-26 → 2026-05-09 (stale approvals + pending sin jobs + worker revision drift). Originalmente corría scheduled en GitHub Actions y emitía alertas Teams a `production-release-alerts`; el schedule se pausó porque los últimos 100 runs tuvieron 72 fallos y generaban falsos positivos. El workflow remoto quedó `disabled_manually` como emergency stop mientras `main` conserva el schedule viejo; usar CLI local hasta promover el archivo sin `schedule` y re-enablear el workflow.
 
 **Helpers canonicos** (V1.0 + V1.1 obligatorios al tocar release watchdog):
 
@@ -1958,14 +2053,14 @@ Watchdog scheduled GH Actions `*/30 * * * *` que detecta los 3 sintomas del inci
 
 **Worker GIT_SHA env var** (TASK-849 Slice 1): pre-requisito para `worker_revision_drift` reader. Cada worker emite `GIT_SHA` env var con commit SHA del deploy. Resolution: `$GITHUB_SHA → git rev-parse HEAD → 'unknown'`. Workers sin GIT_SHA aun deployado producen `data_missing` (NO falso drift).
 
-**Hosting decision**: GitHub Actions schedule (NO Vercel cron, NO Cloud Scheduler). Razon: detector consume primariamente GH API → execute dentro de GH Actions evita roundtrips cross-cloud + usa `github.token` auto-provisto. Tooling/monitoring read-only, NOT async-critical (clasificacion `tooling` per `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`).
+**Hosting decision vigente**: manual-only hasta TASK-920. Hosting decision original: GitHub Actions schedule (NO Vercel cron, NO Cloud Scheduler), porque el detector consume primariamente GH API. No reactivar schedule sin corregir falsos positivos/failures en TASK-920 o documentar incidente explícito.
 
 **Concurrency**: `cancel-in-progress: true` en watchdog workflow. La ultima foto siempre gana — NO causa deadlock como los workers pre-TASK-848 porque watchdog NO tiene environment approval gate.
 
 **⚠️ Reglas duras**:
 
 - **NUNCA** ejecutar `gh run cancel` o `gh run approve` automaticamente desde el watchdog. El watchdog SOLO recomienda; humano decide.
-- **NUNCA** desactivar el watchdog por más de 7 días sin justificación documentada. Es la única detección activa del bug class del incidente.
+- **NUNCA** reactivar el schedule del watchdog antes de TASK-920 sin justificarlo como incidente explícito y documentar evidencia. Mientras esté manual-only, ejecutar `workflow_dispatch`/CLI post-release cuando se necesite una foto.
 - **NUNCA** introducir un signal coarse `platform.release.watchdog.health` que lumpee los 3 failure modes. Greenhouse pattern (TASK-742, TASK-774, TASK-768) es 1 signal por failure mode.
 - **NUNCA** loggear payload completo de respuesta GitHub/Cloud Run sin pasar por `redactSensitive`/`redactErrorForResponse`. GitHub responses pueden incluir email del actor que dispara el run.
 - **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'cloud', { tags: { source: 'production_release_watchdog', stage: '<...>' } })`.
@@ -2011,11 +2106,11 @@ GCP_PROJECT=efeonce-group GITHUB_APP_ID=3665723 \
 # worker_revision_drift: warning (data_missing — esperado pre-merge develop→main)
 ```
 
-**Pendiente para activacion total** (post merge develop → main):
+**Estado vigente 2026-05-24**:
 
-1. Workers se re-deployan con `GIT_SHA` env var (TASK-849 Slice 1) → `worker_revision_drift` retorna `ok` para los 4 workers
-2. Workflow scheduled `production-release-watchdog.yml` se registra en GH Actions (cron `*/30` activa)
-3. Cron emite alertas Teams a `production-release-alerts` cuando detecte blockers (con dedup canonico)
+1. Workflow `production-release-watchdog.yml` mantiene `workflow_dispatch`.
+2. Schedule removido temporalmente por ruido/falsos positivos.
+3. TASK-920 debe corregir la semántica antes de reactivar alertas automáticas.
 
 ### Production Preflight CLI invariants (TASK-850)
 
@@ -2112,7 +2207,7 @@ pnpm release:preflight --override-batch-policy --fail-on-error
 
 #### Lesson 2 — Production Release Watchdog self-reference loop
 
-El workflow `Production Release Watchdog` (scheduled cada 30min, TASK-849) reporta `worker_revision_drift` cuando detecta workers Cloud Run en SHAs distintos al último deploy.yml successful. Cuando hay drift pre-existente, el watchdog **FAILA loud**. El preflight `ci_green` cuenta esa failure como CI block.
+El workflow `Production Release Watchdog` (originalmente scheduled cada 30min, TASK-849; manual-only desde 2026-05-24 hasta TASK-920) reporta `worker_revision_drift` cuando detecta workers Cloud Run en SHAs distintos al último deploy.yml successful. Cuando hay drift pre-existente, el watchdog **FAILA loud**. El preflight `ci_green` cuenta esa failure como CI block.
 
 **Patrón canónico**: el watchdog DEBE estar en `RELEASE_DEPLOY_WORKFLOWS` allowlist (`src/lib/release/workflow-allowlist.ts`) — mismo pattern que `Production Release Orchestrator` ya tenía documentado para su propia self-reference loop. Sin esto, drift pre-existente bloquea TODA promoción a producción incluso cuando el release ES la solución al drift.
 
@@ -3601,7 +3696,7 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 
 **⚠️ Reglas duras**:
 
-- **NUNCA** agregar entry al `ENTITLEMENT_CAPABILITY_CATALOG` en `src/config/entitlements-catalog.ts` sin agregar grant correspondiente en `src/lib/entitlements/runtime.ts` en el mismo PR. La parity test live `src/lib/capabilities-registry/parity.live.test.ts` NO detecta esto — solo valida TS↔DB shape parity, no runtime grant coverage. Code review es el enforcement humano.
+- **NUNCA** agregar entry al `ENTITLEMENT_CAPABILITY_CATALOG` en `src/config/entitlements-catalog.ts` que se chequee vía `can()` sin agregar grant correspondiente en `src/lib/entitlements/runtime.ts` en el mismo PR. **Enforcement mecánico desde TASK-935**: el guard `src/lib/entitlements/capability-grant-coverage.test.ts` (puro, no-DB, corre en CI) parsea todos los `can()` usages en `src/app`+`src/lib` y asserta que toda capability del catalog chequeada vía `can()` está granteada a ≥1 rol. Si agregás un `can()` sobre una capability sin grant, este test rompe el build. (La parity test live `parity.live.test.ts` es complementaria: valida TS↔DB shape/module parity, NO grant coverage.)
 - **NUNCA** agregar grant en runtime.ts sin un comentario `// TASK-XXX — <descripción del fix>` que documente la decisión + el set canónico de roles. El comentario es lo que permite al próximo agente entender el alcance del gate.
 - **NUNCA** asumir que "la capability ya está en DB" significa "los usuarios tienen acceso". DB registry es **gobernanza** (qué capabilities existen + auditoría); runtime.ts es **policy** (qué subjects las tienen). Son ortogonales.
 - **NUNCA** branchear `roleCodes.includes(...)` inline en route handlers o views. Toda autorización pasa por `can(subject, capability, action, scope)`. Los grants en runtime son la única fuente.
@@ -3611,6 +3706,8 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 **Defense in depth**: cuando una capability es operacionalmente crítica (e.g. transición state machine, mutación HR/Finance, reveal sensitive), agregar smoke test E2E en `tests/e2e/smoke/` que verifique el flow con un usuario del rol esperado. Sin smoke, el endpoint queda en "shipped pero inaccesible" hasta que un usuario real lo reporta.
 
 **Spec canónica**: `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (Slice 1 fix). Pattern fuente: `src/lib/entitlements/runtime.ts` líneas con grant `workforce.member.complete_intake` (matriz `hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN`).
+
+**TASK-935 (2026-05-25) — reconciliación sistémica + guard mecánico**: el bug class TASK-873 había recurrido 13 veces (capabilities can()-checked en endpoints `/api/admin/*` sin runtime grant → 403 para todos). Causa raíz: specs documentaron roles intended (`DEVOPS_OPERATOR`, `commercial_admin`, `operations`) que **nunca existieron como `ROLE_CODES`**, así que el grant nunca se escribió. TASK-935 agregó los 13 grants (colapsando a `EFEONCE_ADMIN` + `FINANCE_ADMIN`, el set real que pasa `requireAdminTenantContext`) + el guard `capability-grant-coverage.test.ts` que **previene la recurrencia mecánicamente**. **NUNCA** documentar un rol intended en una spec/capability sin verificar que existe en `src/config/role-codes.ts`; si no existe, el grant colapsa al rol real más cercano (típicamente `EFEONCE_ADMIN`). Spec: `docs/tasks/complete/TASK-935-capability-governance-reconciliation.md`.
 
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 
@@ -4209,8 +4306,8 @@ Plus safety net nocturno: Cloud Run Job escanea tareas con `last_edited_time > c
 
 No es ronda interna, no es comentario sin resolver, no es review del workflow team. Es específicamente "el cliente vio el entregable y pidió cambios", observado como evento de transición de estado capturado por TASK-908.
 
-- `calculateRpa(taskId)` (TASK-901 Slice 1) **delega a** `countCorrectionTransitions(taskId)` (TASK-908). NO lee propiedad Notion `Correcciones`.
-- `calculateFtr(taskId)` (TASK-909 Slice 1) **delega a** `calculateRpa(taskId) === 0`. NO duplica lógica.
+- `calculateRpaV2(inputs)` (TASK-901 Slice 1, SHIPPED) **delega a** `countCorrectionTransitions(taskId)` (TASK-908). NO lee propiedad Notion `Correcciones`.
+- `calculateFtr(inputs)` (TASK-909 Slice 1, SHIPPED 2026-05-24) **delega a** `calculateRpaV2(inputs).value === 0 ? 'pass' : 'fail'`. NO duplica lógica.
 
 Forward-compat Frame.io: cuando exista la integración, `calculateRpa` extiende inputs sin breaking change (combinar `correctionTransitionsCount` + `clientReviewOpen` + `workflowReviewOpen` + `openFrameComments` bajo policy a definir).
 
@@ -4245,8 +4342,8 @@ Cada Vn ship con shadow mode mínimo 7 días verde antes de activar writeback. D
 
 - `countCorrectionTransitions(taskId) → number` — en TASK-908 foundation, lee `greenhouse_delivery.task_status_transitions`
 - `calculateCycleTime(taskId) → CycleTimeResult` — en TASK-908, lee transitions + descuenta Bloqueado
-- `calculateRpa(taskId) → RpaResult` — en TASK-901 Slice 1, delega a `countCorrectionTransitions`
-- `calculateFtr(taskId) → FtrResult` — en TASK-909 Slice 1, delega a `calculateRpa`
+- `calculateRpaV2(inputs) → RpaV2Result` — `src/lib/notion-metrics/calculate-rpa-v2.ts` (TASK-901 Slice 1 SHIPPED, estrangulador RpA V2), delega a `countCorrectionTransitions`
+- `calculateFtr(inputs) → FtrResult` — `src/lib/notion-metrics/calculate-ftr.ts` (TASK-909 Slice 1 SHIPPED 2026-05-24), delegación pura a `calculateRpaV2` (`FTR = RpA.value === 0 ? 'pass' : 'fail'`, `ftr_v1.0`). Lint rule `greenhouse/no-inline-ftr-calculation` (warn) bloquea recompute inline del veredicto. NO duplica lógica; cuando Frame.io shippee se extiende `calculateRpaV2` y FTR se beneficia automático
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_DELIVERY_METRICS_OWNERSHIP_BOUNDARY_V1.md` (ADR canonical). Cross-refs: `docs/architecture/Contrato_Metricas_ICO_v1.md` Delta 2026-05-17 secciones F + G; `docs/architecture/Greenhouse_ICO_Engine_v1.md` (conceptual spec, drift por resolver post-TASK-908/909/901). Patrones fuente: TASK-742 (defense-in-depth 7-layer), TASK-773 (outbox publisher canonical), TASK-771 (decoupling write paths via outbox), TASK-706 (HMAC webhook ingestion), TASK-720 (TS-only declarative reader pattern).
 
@@ -4561,6 +4658,45 @@ Notion edit status (Efeonce/Sky) → captura prod TASK-912 (notion-status-transi
 
 **Spec canónica**: `docs/tasks/complete/TASK-916-rpa-v2-productive-compute-writeback.md`. Pattern fuente: demo siblings TASK-913/914.
 
+### FTR writeback invariants (TASK-903, sibling de TASK-916, desde 2026-05-24)
+
+Pipeline FTR writeback PRODUCTIVO (Efeonce + Sky) — **clone mecánico de TASK-916 RpA repointeado a FTR**, NO rediseño. FTR es **derivada pura de RpA** (`FTR pass ⇔ RpA.value === 0`); el compute delega a `calculateFtr` (TASK-909, que delega a `calculateRpaV2`). Default flag OFF → cero escrituras a Notion al merge.
+
+**Pipeline canónico** (siblings físicamente separados del RpA):
+
+```text
+notion.task.status_transitioned (captura TASK-912)
+  → notionFtrComputeProjection: calculateFtr → persist task_ftr_snapshots → emit notion.task.ftr_writeback_requested (solo si ftr_data_status='valid' + pass/fail)
+    → notionFtrWritebackProjection (gated NOTION_FTR_WRITEBACK_ENABLED default OFF):
+      re-read PG defensive → PATCH select [GH] FTR (Pass/Fail) → mark written
+```
+
+**Archivos canónicos**:
+- `src/lib/sync/projections/notion-ftr-compute.ts` + `.test.ts`
+- `src/lib/sync/projections/notion-ftr-writeback.ts` + `.test.ts`
+- `migrations/20260524200315533_task-903-ftr-snapshots.sql` (`task_ftr_snapshots`, CHECK workspace_id IN efeonce/sky, append-only triggers, writeback cols mutables)
+- `src/lib/reliability/queries/notion-metrics-ftr-signals.ts` (2 signals)
+- `EVENT_TYPES.notionTaskFtrWritebackRequested` ('notion.task.ftr_writeback_requested') v1
+- `NotionPropertyValue.select` (forward-compat, extendido por esta task)
+
+**⚠️ Reglas duras** (mirror TASK-916):
+
+- **NUNCA** recomputar el veredicto FTR inline — toda lectura vía `calculateFtr`. Lint rule `greenhouse/no-inline-ftr-calculation` (warn) lo bloquea.
+- **NUNCA** crear formula property en Notion para FTR — compute en Greenhouse + writeback select `[GH] FTR`.
+- **NUNCA** confiar el `ftrValue` del payload del chain event en el writeback — re-read del snapshot desde `task_ftr_snapshots` por `snapshot_id` (defensive re-read, pattern TASK-771).
+- **NUNCA** escribir a `[GH] FTR` con el flag OFF. Default OFF + override per-cliente `NOTION_FTR_WRITEBACK_ENABLED_<EFEONCE|SKY>`.
+- **NUNCA** emitir el chain event cuando `ftr_data_status != 'valid'` (low_confidence/unavailable no se escriben — degraded honest, mirror RpA `valid`-only).
+- **NUNCA** drift entre los siblings FTR y RpA (compute/writeback) — clone + repoint, NO `if (isFtr)`. Físicamente separados.
+- **NUNCA** invocar `Sentry.captureException` directo — `captureWithDomain(err, 'integrations.notion', { tags: { source: 'ftr_compute' | 'ftr_writeback' } })`.
+
+**Paridad**: NO existe `notion.metrics.shadow_paridad_ftr` standalone — FTR es derivada pura de RpA y no tiene fórmula Notion legacy que diffear; su paridad queda cubierta por `notion.metrics.shadow_paridad_rpa` (TASK-916) por construcción (RpA paridad ≥95% ⇒ FTR paridad ≥95%).
+
+**Activación (flip `NOTION_FTR_WRITEBACK_ENABLED=true`)** — gated por FTR_V1 §9.1: TASK-916 RpA writeback `enabled` 30d + TASK-912 captura activa + `[GH] FTR` creada en Efeonce/Sky + decisión explícita "FTR explícito vale vs derivar de RpA" (ver TASK-903 "Why This Task Exists").
+
+**Estado**: SHIPPED `develop` 2026-05-24 (flag OFF). Migration aplicada + tipos regenerados. 42 tests focales + tsc 0 + lint 0. Smoke PG real: tabla queryable, CHECK rechaza demo, signals = 0.
+
+**Spec canónica**: `docs/tasks/complete/TASK-903-ftr-writeback-notion-gh-property.md`. Pattern fuente: TASK-916 (RpA productive writeback). Consumer real de `calculateFtr` (TASK-909).
+
 ### OTD Bucket Classifier Ownership invariants (TASK-923, M1, desde 2026-05-24)
 
 Greenhouse es el **clasificador autoritativo del bucket OTD** (`on_time` / `late_drop` / `overdue` / `carry_over` / `na`). El cómputo del bucket vive en un helper canónico TS + su espejo BQ — NUNCA en una fórmula Notion. M1 del ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16: movió el clasificador desde la fórmula Notion `Indicador de Performance` (→ synced `performance_indicator_code`) a Greenhouse en **modo paridad** (freeze-off, replica la semántica cruda actual), escrito a la columna shadow `gh_otd_bucket`. Es aditivo: el bono sigue leyendo `otd_pct` legacy intacto.
@@ -4654,7 +4790,7 @@ automaticamente al `pnpm install`):
 - **`.husky/pre-commit`**: corre `pnpm exec lint-staged` → `eslint --fix` sobre
   archivos staged. Errores auto-fixable se aplican; errores no-fixable bloquean
   el commit. Latencia tipica < 5s (cache eslint en `node_modules/.cache/eslint-staged`).
-- **`.husky/pre-push`**: corre `pnpm lint` (full repo) + `pnpm exec tsc --noEmit`.
+- **`.husky/pre-push`**: corre `pnpm local:check` (`pnpm lint` full repo + `pnpm exec tsc --noEmit`).
   Bloquea push si hay 1+ error. Latencia tipica < 90s. Defense in depth sobre
   pre-commit (cubre archivos NO staged que otro agente pudo dejar rotos).
 

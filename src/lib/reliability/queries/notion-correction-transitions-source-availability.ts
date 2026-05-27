@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { isNotionStatusTransitionsWebhookEnabled } from '@/lib/notion-metrics/status-transitions-flags'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import type { ReliabilitySignal } from '@/types/reliability'
@@ -110,6 +111,59 @@ export const getNotionCorrectionTransitionsSourceAvailabilitySignal =
       const unavailable = Number(row?.unavailable_count ?? 0)
 
       const unavailablePct = total > 0 ? Math.round((unavailable / total) * 1000) / 10 : 0
+      const captureEnabled = isNotionStatusTransitionsWebhookEnabled()
+
+      if (!captureEnabled && total > 0) {
+        return {
+          signalId: NOTION_CORRECTION_TRANSITIONS_SOURCE_AVAILABILITY_SIGNAL_ID,
+          moduleKey: 'delivery',
+          kind: 'data_quality',
+          source: 'getNotionCorrectionTransitionsSourceAvailabilitySignal',
+          label: 'Cobertura canonical de correction transitions',
+          severity: 'unknown',
+          summary:
+            `Captura de correction transitions deshabilitada por flag — ${unavailablePct}% unavailable (${unavailable}/${total}). La cobertura no es accionable hasta activar NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED.`,
+          observedAt,
+          evidence: [
+            {
+              kind: 'sql',
+              label: 'Query',
+              value:
+                'greenhouse_delivery.tasks completed last 90d LEFT JOIN task_status_transitions — count NULL rate'
+            },
+            {
+              kind: 'metric',
+              label: 'unavailable_pct',
+              value: String(unavailablePct)
+            },
+            {
+              kind: 'metric',
+              label: 'total_completed_tasks_90d',
+              value: String(total)
+            },
+            {
+              kind: 'metric',
+              label: 'unavailable_count',
+              value: String(unavailable)
+            },
+            {
+              kind: 'metric',
+              label: 'NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED',
+              value: process.env.NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED ?? 'unset'
+            },
+            {
+              kind: 'doc',
+              label: 'Tracking table',
+              value: 'greenhouse_delivery.task_status_transitions'
+            },
+            {
+              kind: 'doc',
+              label: 'Spec canonical',
+              value: 'docs/architecture/metrics/RPA_V1.md §4'
+            }
+          ]
+        }
+      }
 
       const severity: 'ok' | 'warning' | 'error' | 'unknown' =
         total === 0

@@ -205,13 +205,25 @@ const NAME_PATTERNS: Record<string, string[]> = {
   completed_at: ['fecha_de_completado', 'completed_at', 'completed_date', 'fecha_completado']
 }
 
-export const normalizeNotionPropertyKey = (name: string): string =>
-  name
+const BIGQUERY_FIELD_FORBIDDEN_CHARS_RE = /[\[\]{};:,=+*?\\"'`<>|~!@#$^&]/g
+
+export const normalizeNotionPropertyKey = (name: string): string => {
+  let key = name
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
-    .replace(/[\s.\-]+/g, '_')
+    .replace(/%/g, 'pct')
+    .replace(/[\s./-]+/g, '_')
+    .replace(/[()]/g, '')
+    .replace(BIGQUERY_FIELD_FORBIDDEN_CHARS_RE, '_')
+
+  while (key.includes('__')) {
+    key = key.replace(/__/g, '_')
+  }
+
+  return key.replace(/^_+|_+$/g, '')
+}
 
 export const typesCompatible = (notionType: string, targetType: string): boolean => {
   const compatiblePairs = new Set([

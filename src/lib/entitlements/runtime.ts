@@ -655,6 +655,78 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source
     })
+
+    // TASK-934 — Aceptar gasto pagado sin FK-anchor como deuda conocida.
+    // Grant runtime explícito (TASK-873 invariant: capability sin grant = 403).
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.expenses.acknowledge_unanchored',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    // TASK-935 — Capability governance reconciliation: grants faltantes para
+    // endpoints /api/admin/* que chequeaban estas capabilities vía can() pero
+    // NUNCA tuvieron grant (403 latente incluso para EFEONCE_ADMIN). Roles
+    // documentados inexistentes (commercial_admin) colapsan a FINANCE_ADMIN +
+    // EFEONCE_ADMIN, el único set real que pasa requireAdminTenantContext.
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.expenses.reclassify_economic_category',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.income.reclassify_economic_category',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payments.repair_clp',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_orders.recover',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payroll.rematerialize',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    // commercial.engagement.recover_outbound se chequea con read Y approve.
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.recover_outbound',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.engagement.recover_outbound',
+      action: 'approve',
+      scope: 'tenant',
+      source
+    })
   }
 
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
@@ -662,6 +734,57 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       module: 'finance',
       capability: 'finance.payment_instruments.reveal_sensitive',
       action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    // TASK-935 — platform + client_portal admin endpoints (latent 403). Roles
+    // documentados inexistentes (DEVOPS_OPERATOR, commercial_admin) colapsan a
+    // EFEONCE_ADMIN, el único que pasa requireAdminTenantContext en estos paths.
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.release.execute',
+      action: 'execute',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'client_portal',
+      capability: 'client_portal.catalog.manage',
+      action: 'read',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'client_portal',
+      capability: 'client_portal.module.read_assignment',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'client_portal',
+      capability: 'client_portal.module.enable',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'client_portal',
+      capability: 'client_portal.module.disable',
+      action: 'delete',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'client_portal',
+      capability: 'client_portal.module.override_business_line_default',
+      action: 'approve',
       scope: 'tenant',
       source: 'role'
     })

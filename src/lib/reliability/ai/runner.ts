@@ -6,6 +6,13 @@ import { getGoogleGenAIClient, getGreenhouseAgentRuntimeConfig } from '@/lib/ai/
 import { getReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
 import type { ReliabilityModuleKey, ReliabilityOverview, ReliabilitySeverity } from '@/types/reliability'
 
+import {
+  AI_OBSERVER_DISABLED_REASON,
+  generateAiObserverRunId,
+  writeAiObserverRunComplete,
+  writeAiObserverRunFailure,
+  writeAiObserverRunStart
+} from './ai-observer-run-tracker'
 import { buildPrompts, fingerprintModule, fingerprintOverview } from './build-prompt'
 import { isReliabilityAiObserverEnabled } from './kill-switch'
 import {
@@ -87,6 +94,14 @@ export interface AiSweepSummary {
   promptTokens: number | null
   outputTokens: number | null
   skippedReason: string | null
+
+  /**
+   * TASK-937 — `finishReason` del candidate de Gemini en el path que falló
+   * (parse-fail / empty response). `MAX_TOKENS` distingue "truncado por
+   * budget" de "JSON malformado" — diagnóstico clave para el heartbeat.
+   * null cuando el sweep no falló o no hay candidate.
+   */
+  finishReason: string | null
 }
 
 export interface AiSweepResult {
@@ -151,7 +166,17 @@ const BASE_GENERATION_CONFIG = {
   temperature: 0.1,
   responseMimeType: 'application/json',
   responseSchema: AI_RESPONSE_SCHEMA,
-  maxOutputTokens: 2048
+  maxOutputTokens: 4096,
+
+  /**
+   * TASK-937 — gemini-2.5-flash tiene *thinking* ON por default y quema el
+   * budget de output en reasoning tokens, truncando el JSON estructurado
+   * (`unbalanced_or_truncated_json` en ~5/6 corridas). La tarea es extracción
+   * determinística de un snapshot — baja necesidad de reasoning. Apagar
+   * thinking libera el budget y, junto con `responseSchema` (constrained
+   * decoding), garantiza JSON válido. También baja costo y latencia.
+   */
+  thinkingConfig: { thinkingBudget: 0 }
 } as const
 
 const stripJsonFence = (raw: string): string => {
@@ -284,11 +309,12 @@ const buildSummary = (
     promptTokens: null,
     outputTokens: null,
     skippedReason: null,
+    finishReason: null,
     ...overrides
   }
 }
 
-export const runReliabilityAiObserver = async ({
+const runReliabilityAiObserverInner = async ({
   triggeredBy = 'cron',
   env = process.env,
   preloadedOverview,
@@ -302,7 +328,7 @@ export const runReliabilityAiObserver = async ({
     return {
       summary: buildSummary(
         { sweepRunId, startedAt, triggeredBy, model },
-        { skippedReason: 'RELIABILITY_AI_OBSERVER_ENABLED=false (opt-in default OFF)' }
+        { skippedReason: AI_OBSERVER_DISABLED_REASON }
       ),
       observations: []
     }
@@ -329,7 +355,10 @@ export const runReliabilityAiObserver = async ({
     return {
       summary: buildSummary(
         { sweepRunId, startedAt, triggeredBy, model },
-        { skippedReason: 'Gemini returned empty response' }
+        {
+          skippedReason: 'Gemini returned empty response',
+          finishReason: response.candidates?.[0]?.finishReason ?? null
+        }
       ),
       observations: []
     }
@@ -370,7 +399,10 @@ export const runReliabilityAiObserver = async ({
     return {
       summary: buildSummary(
         { sweepRunId, startedAt, triggeredBy, model },
-        { skippedReason: `Gemini response was not valid JSON after schema retry (${invalidJsonReason ?? 'unknown'})` }
+        {
+          skippedReason: `Gemini response was not valid JSON after schema retry (${invalidJsonReason ?? 'unknown'})`,
+          finishReason: responseForUsage.candidates?.[0]?.finishReason ?? null
+        }
       ),
       observations: []
     }
@@ -465,5 +497,70 @@ export const runReliabilityAiObserver = async ({
       }
     ),
     observations: persisted
+  }
+}
+
+/**
+ * TASK-937 — Wrapper boundary que envuelve el runner con un heartbeat en
+ * `source_sync_runs` (`source_system='reliability_ai_observer'`).
+ *
+ * Por qué wrapper y no instrumentar cada return del inner: el inner tiene
+ * múltiples salidas (disabled, empty response, parse-fail, done). Envolver en
+ * el boundary captura todos los outcomes en un solo lugar sin tocar la lógica
+ * del sweep.
+ *
+ * Robustez: el heartbeat NUNCA debe romper el sweep. Cada write va en
+ * try/catch + warn — si PG está caído, el observer sigue produciendo su
+ * resultado y el signal `reliability.ai_observer.unhealthy` detectará la
+ * ausencia de heartbeats por otra vía (sin run reciente).
+ */
+export const runReliabilityAiObserver = async (
+  args: RunAiObserverArgs = {}
+): Promise<AiSweepResult> => {
+  const runId = generateAiObserverRunId()
+  const triggeredBy = args.triggeredBy ?? 'cron'
+
+  try {
+    await writeAiObserverRunStart({ runId, triggeredBy })
+  } catch (error) {
+    console.warn('[ai-observer] heartbeat writeStart failed (non-blocking)', {
+      runId,
+      error: error instanceof Error ? error.message : String(error)
+    })
+  }
+
+  try {
+    const result = await runReliabilityAiObserverInner(args)
+
+    try {
+      await writeAiObserverRunComplete({
+        runId,
+        outcome: {
+          skippedReason: result.summary.skippedReason,
+          finishReason: result.summary.finishReason,
+          observationsEvaluated: result.summary.observationsEvaluated,
+          observationsPersisted: result.summary.observationsPersisted,
+          observationsSkipped: result.summary.observationsSkipped
+        }
+      })
+    } catch (error) {
+      console.warn('[ai-observer] heartbeat writeComplete failed (non-blocking)', {
+        runId,
+        error: error instanceof Error ? error.message : String(error)
+      })
+    }
+
+    return result
+  } catch (error) {
+    try {
+      await writeAiObserverRunFailure({ runId, error })
+    } catch (heartbeatError) {
+      console.warn('[ai-observer] heartbeat writeFailure failed (non-blocking)', {
+        runId,
+        error: heartbeatError instanceof Error ? heartbeatError.message : String(heartbeatError)
+      })
+    }
+
+    throw error
   }
 }

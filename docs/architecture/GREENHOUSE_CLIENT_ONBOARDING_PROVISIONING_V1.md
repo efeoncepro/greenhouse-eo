@@ -53,7 +53,7 @@ Reusa el canónico de TASK-742 — el template **solo declara primitivas**, NO f
 
 - Property `Estado` (status) con los **11 estados canónicos V1** (no custom per-cliente).
 - Propiedades primitivas: `Fecha límite`, `Fecha de Completado`, `Fecha límite original`, asignado/responsable, tipo de entregable, etc.
-- Propiedades **`[GH]` read-only** (targets del writeback): `[GH] RpA v2`, `[GH] OTD bucket`, `[GH] FTR`, `Días de retraso`/`gh_otd_bucket` display, etc. — el operador no las edita.
+- Propiedades **`[GH]` read-only** (targets del writeback): `[GH] RpA v2`, `[GH] OTD bucket`, `[GH] FTR`, `Días de retraso`/`gh_otd_bucket` display, etc. — el operador no las edita. Cuando `notion-bq-sync` las expone en raw BigQuery, el alias debe ser BigQuery-safe; ejemplo canónico: `[GH] RpA v2` → `notion_ops.tareas.gh_rpa_v2`.
 - **Cero fórmulas de cómputo ICO** (RpA/OTD/Indicador de Performance/Días de retraso freeze): el motor es Greenhouse.
 
 ## 5. Flujo `provision-tenant` (5 pasos idempotentes)

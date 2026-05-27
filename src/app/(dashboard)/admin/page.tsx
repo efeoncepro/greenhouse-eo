@@ -4,11 +4,14 @@ import AdminCenterView from '@/views/greenhouse/admin/AdminCenterView'
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { getAdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { getGitHubBillingOverview } from '@/lib/cloud/github-billing'
+import { getVercelBillingOverview } from '@/lib/cloud/vercel-billing'
 import { getInternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
 import { getLatestAiObservationsByScope } from '@/lib/reliability/ai/reader'
 import { getReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
+import { AI_OBSERVER_UNHEALTHY_SIGNAL_ID } from '@/lib/reliability/queries/ai-observer-unhealthy'
 import { getReliabilityRegistry } from '@/lib/reliability/registry-store'
 import {
   getLatestSweepRun,
@@ -42,6 +45,8 @@ export default async function Page() {
     controlTower,
     operations,
     billing,
+    vercelBilling,
+    githubBilling,
     notionOperational,
     syntheticSnapshots,
     syntheticSweep,
@@ -53,6 +58,8 @@ export default async function Page() {
     getInternalDashboardOverview(),
     getOperationsOverview(),
     getGcpBillingOverview().catch(() => null),
+    getVercelBillingOverview().catch(() => null),
+    getGitHubBillingOverview().catch(() => null),
     getNotionSyncOperationalOverview().catch(() => null),
     getLatestSyntheticSnapshotsByRoute().catch(() => []),
     getLatestSweepRun().catch(() => null),
@@ -70,11 +77,23 @@ export default async function Page() {
 
   const reliability = await getReliabilityOverview(operations, {
     billing,
+    vercelBilling,
+    githubBilling,
     notionOperational,
     syntheticSnapshots,
     modules: reliabilityModules,
     aiObservations
   })
+
+  // TASK-937 — Liveness del AI Observer desde el signal `reliability.ai_observer.unhealthy`
+  // (heartbeat). Decide el estado del banner del card sin acoplarlo a la frescura del overview.
+  const aiObserverSignal = reliability.modules
+    .flatMap(module => module.signals)
+    .find(signal => signal.signalId === AI_OBSERVER_UNHEALTHY_SIGNAL_ID)
+
+  const aiObserverLiveness = aiObserverSignal
+    ? { severity: aiObserverSignal.severity, summary: aiObserverSignal.summary }
+    : null
 
   return (
     <AdminCenterView
@@ -96,6 +115,7 @@ export default async function Page() {
             }))
           : []
       }
+      aiObserverLiveness={aiObserverLiveness}
     />
   )
 }

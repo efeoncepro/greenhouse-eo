@@ -1327,6 +1327,7 @@ const buildFinanceLedgerDriftSignature = (health: Awaited<ReturnType<typeof getF
     task714d: health.task714d.internalTransferGroupsWithMissingPair,
     task720: health.task720.instrumentCategoriesWithoutKpiRule,
     task721: health.task721.reconciliationSnapshotsWithBrokenEvidence,
+    degradedChecks: [...health.degradedChecks].sort(),
     settlementSample: health.settlementDrift.sampleDrifted.map(row => row.incomeId).slice(0, 5).sort(),
     unanchoredSample: health.unanchoredExpenses.sample.map(row => row.expenseId).slice(0, 5).sort()
   })
@@ -1384,7 +1385,8 @@ const recordFinanceLedgerHealthRun = async ({
       task714d: health.task714d.internalTransferGroupsWithMissingPair,
       task720: health.task720.instrumentCategoriesWithoutKpiRule,
       task721: health.task721.reconciliationSnapshotsWithBrokenEvidence
-    }
+    },
+    degradedChecks: health.degradedChecks
   })
 
   await runGreenhousePostgresQuery(
@@ -1427,8 +1429,13 @@ const handleFinanceLedgerHealthCheck = async (_req: IncomingMessage, res: Server
       if (lastDriftSignature !== driftSignature) {
         sentryAlerted = true
 
+        const degradedSuffix =
+          health.degradedChecks.length > 0
+            ? ` degraded_checks=[${[...health.degradedChecks].sort().join(',')}]`
+            : ''
+
         captureMessageWithDomain(
-          `Finance ledger drift detected on daily probe (settlement=${health.settlementDrift.driftedIncomesCount}, phantoms=${health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount}, stale_balances=${health.balanceFreshness.accountsWithStaleBalances.length}, unanchored=${health.unanchoredExpenses.count}).`,
+          `Finance ledger drift detected on daily probe (settlement=${health.settlementDrift.driftedIncomesCount}, phantoms=${health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount}, stale_balances=${health.balanceFreshness.accountsWithStaleBalances.length}, unanchored=${health.unanchoredExpenses.count}).${degradedSuffix}`,
           'finance',
           {
             level: 'warning',
@@ -1439,7 +1446,8 @@ const handleFinanceLedgerHealthCheck = async (_req: IncomingMessage, res: Server
               settlementDriftCount: health.settlementDrift.driftedIncomesCount,
               phantomsCount: health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount,
               staleBalancesCount: health.balanceFreshness.accountsWithStaleBalances.length,
-              unanchoredExpensesCount: health.unanchoredExpenses.count
+              unanchoredExpensesCount: health.unanchoredExpenses.count,
+              degradedChecks: health.degradedChecks
             },
             fingerprint: ['finance-ledger-drift-daily']
           }

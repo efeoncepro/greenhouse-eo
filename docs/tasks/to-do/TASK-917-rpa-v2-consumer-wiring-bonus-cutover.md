@@ -4,6 +4,8 @@
 
 TASK-916 está COMPLETE V1.0 en `develop` (writeback flag OFF). El compute prod (`notionRpaComputeProjection`) persiste snapshots en `task_rpa_snapshots`; el writeback prod (`notionRpaWritebackProjection`) hace PATCH a `[GH] RpA v2` **gated por `NOTION_RPA_WRITEBACK_ENABLED` (default OFF)**. Por lo tanto el blocker "compute/writeback prod" queda resuelto — TASK-917 ya puede wirear consumers + ejecutar el cutover.
 
+Delta 2026-05-26: cuando esta task valide paridad contra el eco de Notion en BigQuery, debe leer `notion_ops.tareas.gh_rpa_v2`. Ese alias es solo raw echo de `[GH] RpA v2`; el motor y el bonus no deben leerlo como source of truth.
+
 **Dos precondiciones de Flip A que TASK-916 dejó explícitas (NO las hizo, son de este task)**:
 
 1. **Crear la propiedad `[GH] RpA v2` en Efeonce + Sky** (read-only para operadores). Verificado 2026-05-21 vía Notion `data_sources` API: NO existe en ninguno de los dos (solo `RpA` legacy + `Semáforo RpA`). El writeback fallaría con error Notion si se activa sin crearla. Crearla justo antes del Flip A (no antes — evita propiedad vacía visible en el workspace del cliente Sky por semanas).

@@ -1,18 +1,23 @@
 # TASK-903 — FTR writeback a Notion `[GH] FTR` (sibling de TASK-916 RpA writeback)
 
+## Delta 2026-05-24
+
+- Dependencia **TASK-909 Slice 1 SATISFECHA**: el helper canonical `calculateFtr` shipped en `src/lib/notion-metrics/calculate-ftr.ts` (delegación pura a `calculateRpaV2`, `ftr_v1.0`, 13 tests). Esta task ya puede invocarlo como su consumer real — gap "calculate-ftr.ts aún no existe" cerrado.
+- Lint rule `greenhouse/no-inline-ftr-calculation` (warn) activa — esta task DEBE consumir `calculateFtr` (NO recomputar el veredicto FTR inline) o disparará la regla.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Bajo`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno (bloqueada — ver Dependencies)`
+- Status real: `SHIPPED 2026-05-24 — infra compute+writeback+signals con flag NOTION_FTR_WRITEBACK_ENABLED default OFF (cero escrituras a Notion). Activación gated aparte.`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|reliability`
 - Blocked by: `TASK-909 Slice 1 (calculateFtr helper) + TASK-916/917 (RpA V2 writeback productivo en estado 'enabled' 30+ días verde) + TASK-912 (captura de transiciones activa) + creación de la propiedad [GH] FTR en las DBs Tareas de Efeonce + Sky.`
@@ -106,7 +111,7 @@ Reglas obligatorias canonical:
 
 ### Gap
 
-- `calculate-ftr.ts` aún no existe (lo crea TASK-909 Slice 1)
+- ~~`calculate-ftr.ts` aún no existe (lo crea TASK-909 Slice 1)~~ → **cerrado 2026-05-24**: `src/lib/notion-metrics/calculate-ftr.ts` SHIPPED (TASK-909 Slice 1)
 - No existe pipeline de writeback FTR (compute + writeback projections, snapshot table, signals)
 - Propiedad `[GH] FTR` aún no creada en Notion (operador-side)
 
@@ -150,13 +155,21 @@ Reglas obligatorias canonical:
 
 ## Acceptance Criteria
 
-- [ ] `task_ftr_snapshots` migration aplicada + tipos regenerados + CHECK rechaza `workspace_id='demo'`
-- [ ] `notionFtrComputeProjection` + `notionFtrWritebackProjection` registradas + tests
-- [ ] Writeback gated `NOTION_FTR_WRITEBACK_ENABLED` default OFF → smoke confirma skip honest sin escrituras a Notion
-- [ ] 2 signals wired en `get-reliability-overview` + steady=0 verificado
-- [ ] `calculateFtr` invocado (consumidor real); re-read PG defensive en writeback (no confía payload)
-- [ ] `pnpm test` (full) + `pnpm build` verde
-- [ ] Task movida a `complete/`
+- [x] `task_ftr_snapshots` migration aplicada + tipos regenerados + CHECK rechaza `workspace_id='demo'` (verificado contra PG real)
+- [x] `notionFtrComputeProjection` + `notionFtrWritebackProjection` registradas + tests (18 + 24 = 42 tests)
+- [x] Writeback gated `NOTION_FTR_WRITEBACK_ENABLED` default OFF → tests confirman skip honest sin lecturas PG ni PATCH
+- [x] 2 signals wired en `get-reliability-overview` (source `notionMetricsFtr`) + steady=0 verificado contra PG real
+- [x] `calculateFtr` invocado (consumidor real); re-read PG defensive en writeback (no confía payload)
+- [x] `pnpm test` (full) + `pnpm build` verde
+- [x] Task movida a `complete/`
+
+## Delta 2026-05-24 — SHIPPED
+
+- **Slice 0**: migration `20260524200315533_task-903-ftr-snapshots.sql` (clone de `task_rpa_snapshots`) aplicada + tipos regenerados. `EVENT_TYPES.notionTaskFtrWritebackRequested` + `NotionPropertyValue.select` (forward-compat).
+- **Slice 1+2**: `notion-ftr-compute.ts` (delega a `calculateFtr`, emite chain event solo si `valid`+pass/fail) + `notion-ftr-writeback.ts` (PATCH select `[GH] FTR`, gated OFF + override per-cliente, re-read PG, maxRetries=4) + registradas. Siblings físicamente separados de RpA TASK-916.
+- **Slice 3**: 2 signals `notion.metrics.ftr_writeback_{dead_letter,lag}` wired. `shadow_paridad_ftr` NO creado (cubierto por RpA paridad por construcción — FTR = RpA===0; un signal sin comparando legacy sería placeholder).
+- **Decisión robusta pre-execution** (Open Question "Why This Task Exists"): es decisión de ACTIVACIÓN, no de implementación. Infra shippeada con flag OFF (cero impacto runtime, reversible). Activación gated por §9.1 + decisión FTR-explícito-vs-derivar-de-RpA.
+- **Gate cierre**: lint 0 · tsc 0 · test (full) verde · build OK. Trabajado en `develop` sin branch. Flag OFF → cero escrituras a Notion al merge.
 
 ## Pre-condiciones de activación (flip a `NOTION_FTR_WRITEBACK_ENABLED=true`) — FTR_V1 §9.1
 

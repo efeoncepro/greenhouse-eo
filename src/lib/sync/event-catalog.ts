@@ -822,6 +822,33 @@ export const EVENT_TYPES = {
   // (task_rpa_snapshots vs task_rpa_demo_snapshots).
   notionTaskMetricsWritebackRequested: 'notion.task.metrics_writeback_requested',
 
+  // TASK-903 Slice 1 — FTR writeback request (PRODUCTIVO, sibling de
+  // notion.task.metrics_writeback_requested repointeado a FTR).
+  //
+  // Emitido por el reactive consumer compute `notion-ftr-compute` post
+  // `calculateFtr` invocation cuando ftr_data_status='valid' (worth writing back
+  // to Notion). Consumed por el reactive consumer writeback `notion-ftr-writeback`
+  // (Slice 2) que hace PATCH a la propiedad Notion `[GH] FTR` (select Pass/Fail)
+  // de la página (Efeonce/Sky), gated por `NOTION_FTR_WRITEBACK_ENABLED` (default
+  // OFF — no escribe hasta el flip gated por los 8 stop-gates ADR Strangler).
+  //
+  // Payload canonical V1:
+  //   {
+  //     schemaVersion: 1,
+  //     taskSourceId: string,        // Notion page UUID productivo
+  //     workspaceId: 'efeonce' | 'sky',
+  //     ftrValue: 'pass' | 'fail',   // solo pass/fail triggers writeback
+  //     ftrDataStatus: 'valid',      // solo 'valid' triggers writeback
+  //     snapshotId: string,          // UUID PK del task_ftr_snapshots row
+  //     formulaVersion: 'ftr_v1.0',
+  //     computedAt: string           // ISO 8601
+  //   }
+  //
+  // NO lleva `metadata.demo_mode` — FTR demo no existe (sin sibling demo). El
+  // writeback productivo procesa workspaceId IN (efeonce,sky). FTR es derivada
+  // pura de RpA (FTR = RpA===0 ? pass : fail) — el compute delega a calculateFtr.
+  notionTaskFtrWritebackRequested: 'notion.task.ftr_writeback_requested',
+
   // TASK-908 / TASK-910 / TASK-912 — Notion task status transition event.
   // Emitido por webhook handler `notion-tasks` (productivo, TASK-912) o
   // `notion-tasks-demo` (TASK-910) cuando una task cambia de status en Notion.
