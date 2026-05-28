@@ -220,6 +220,44 @@ const persistSignals = async (
   }
 }
 
+// ─── Latest materializable period resolver (TASK-941 Slice 7) ───────────────
+//
+// `client_economics` es una projection reactiva que materializa cuando cierra el
+// payroll del mes (lag respecto al período corriente). Correr el cron Finance AI
+// sobre el mes corriente (abierto, sin economics) producía 0 señales + run
+// `succeeded` engañoso (ISSUE-082, root cause Finance separado del timestamp).
+// Este resolver devuelve el último período CON economics para anclar el cron ahí,
+// no en `now`. Self-healing: cuando Mayo cierre y obtenga economics, MAX avanza.
+
+export const getLatestClientEconomicsPeriod = async (): Promise<{
+  year: number
+  month: number
+} | null> => {
+  const rows = await query<{ period_year: number | string; period_month: number | string }>(
+    `
+      SELECT period_year, period_month
+      FROM greenhouse_finance.client_economics
+      ORDER BY period_year DESC, period_month DESC
+      LIMIT 1
+    `
+  )
+
+  const row = rows[0]
+
+  if (!row) {
+    return null
+  }
+
+  const year = Number(row.period_year)
+  const month = Number(row.period_month)
+
+  if (!Number.isInteger(year) || !Number.isInteger(month)) {
+    return null
+  }
+
+  return { year, month }
+}
+
 // ─── Entry point ────────────────────────────────────────────────────────────
 
 export const materializeFinanceSignals = async (
