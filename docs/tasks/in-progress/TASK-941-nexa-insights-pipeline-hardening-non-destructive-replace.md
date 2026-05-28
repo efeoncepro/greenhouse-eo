@@ -30,12 +30,16 @@
 
 **Estado del bleeding: DETENIDO.** No más NULL (S1), no más falso-sano (S2), no más serving wipe (S4), recurrencia bloqueada (S8), detección activa (S5), finance honesto (S7).
 
-**Pendiente (sesión 2 — ameritan trabajo enfocado, NO rush):**
+**Slice 3 EXTRAÍDO → `TASK-942`** (non-destructive MERGE write-path, defense-in-depth, alto blast radius — amerita task propia con diseño dedicado). NO bloquea la resolución del incidente: el bleeding ya está detenido por S1/S2/S4.
 
-- ⏳ **Slice 3** — non-destructive MERGE en el write path BQ (DELETE+INSERT → freshness gate + MERGE + tracking, patrón TASK-900). **Alto blast radius** (reescribe semántica core del materializer + maneja set-shrink con generation-stamp, toca read path). Defense-in-depth: el bleeding ya está detenido por S1/S2/S4; esto previene pérdida de data ante futuras degradaciones. Merece diseño cuidadoso + tests, no fin-de-sesión.
-- ⏳ **Slice 6** — backfill Mar/Abr/May. **Probablemente moot**: el cron diario re-materializa ai_signals con el fix S1 → generated_at poblado → self-heal sin script manual. Se reduce a verificación post-deploy. Gate de cualquier apply live.
+**Cierre de TASK-941 pendiente (no requiere S3):**
 
-**Cierre pendiente:** `pnpm build` + `pnpm test` full (gate), live post-deploy (próximo cron self-heal + `bq COUNTIF(generated_at IS NULL)=0` + signal steady), docs (CLAUDE.md invariante, ADR delta, EVENT_CATALOG/RELIABILITY, changelog, ISSUE-082 → resolved). NO marcar complete hasta cerrar S3 + verificar live.
+- ⏳ **Slice 6 / verificación** — el cron diario re-materializa ai_signals con el fix S1 → generated_at poblado → **self-heal** sin backfill manual. Reducido a verificación post-deploy.
+- ⏳ `pnpm build` + `pnpm test` full (gate de cierre).
+- ⏳ Live post-deploy: próximo cron self-heal + `bq COUNTIF(generated_at IS NULL)=0` + signal `nexa.insights.stale_with_eligible_signals` steady.
+- ⏳ Docs: CLAUDE.md invariante (timestamp struct + no-false-healthy), changelog, RELIABILITY_CONTROL_PLANE signal nuevo, mover **ISSUE-082 → resolved**.
+
+NO marcar complete hasta verificar live + docs. (El scope estructural MERGE ya NO es parte de TASK-941 — vive en TASK-942.)
 
 ## Summary
 
