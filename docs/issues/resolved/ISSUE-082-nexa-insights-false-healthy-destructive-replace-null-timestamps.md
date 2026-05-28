@@ -4,8 +4,9 @@
 > **Ambiente:** production (Efeonce) + staging
 > **Detectado:** 2026-05-27 (diagnóstico Codex + verificación profunda Claude con skills ICO + arquitectura)
 > **Severidad:** Alta — falso positivo operacional (no es crash visible; los runs quedan verdes)
-> **Estado:** open
+> **Estado:** resolved
 > **Task de remediación:** `TASK-941`
+> **Resuelto:** 2026-05-28
 
 ## Síntoma
 
@@ -17,9 +18,31 @@ Los Nexa Insights (ICO AI signals → LLM enrichment → predictions) **no gener
 - Person 360 muestra Nexa Insights con fallback histórico (último análisis 18-may-2026).
 - UI y endpoints responden; no hay error visible.
 
+## Resolución 2026-05-28
+
+Resuelto por `TASK-941` con ruta estricta:
+
+- Serialización BQ DML corregida con patrón canónico STRING + `TIMESTAMP(s.col)` y helper `toBigQueryStructTimestamp()` para writers `ARRAY<STRUCT>`.
+- Invariante anti-falso-sano: raw elegible > 0 y 0 mapeadas ya no puede terminar como `succeeded`.
+- Guard no-destructivo del serving: si las señales son inválidas/unmappable, no se borra el último estado bueno.
+- Signal `nexa.insights.stale_with_eligible_signals` agregado al Reliability Control Plane.
+- Finance AI scopeado al último período con economics; mayo abierto queda como skip honesto, no como éxito engañoso.
+- Lint rule `greenhouse/no-bq-struct-string-timestamp` activa en modo error para prevenir recurrencia.
+
+Verificación live:
+
+| Check | Resultado |
+|---|---|
+| `ico_engine.ai_signals.generated_at` | 0 NULL en períodos activos (`2026-05`: 20 señales, max `2026-05-28 07:16:17`) |
+| `ico_engine.ai_prediction_log.predicted_at` | 40 filas históricas remediadas desde `ai_signals.generated_at`; 0 NULL final |
+| `ico_engine.ai_enrichment_runs` | Mayo `succeeded`, `signals_seen=20`, `signals_enriched=20`, `signals_failed=0` |
+| Serving/API | Home totalAnalyzed=20; Agency `aiLlm.total=20`; Person 360 source activo |
+| Reliability | `nexa.insights.stale_with_eligible_signals=ok` |
+| Gates | focal 54 tests OK; `pnpm build` OK; `pnpm pg:doctor` OK; `pnpm test` 5427 OK |
+
 ## Evidencia verificada (no solo reportada)
 
-**BigQuery `ico_engine.ai_signals` — `generated_at` por período:**
+**BigQuery `ico_engine.ai_signals` — `generated_at` por período al detectar:**
 
 | Período | Señales | `generated_at` NULL | OK |
 |---|---|---|---|
@@ -30,7 +53,7 @@ Los Nexa Insights (ICO AI signals → LLM enrichment → predictions) **no gener
 
 **BigQuery `ico_engine.ai_enrichment_runs`** — runs del **2026-05-19** (Mar/Abr/May): `signals_seen=0, signals_enriched=0, signals_failed=0, status=succeeded`. Falso-sano confirmado.
 
-**BigQuery `ico_engine.ai_prediction_log`** May: 40/123 `predicted_at` NULL (mismo bug).
+**BigQuery `ico_engine.ai_prediction_log`** May: 40/123 `predicted_at` NULL (mismo bug). Remediado 2026-05-28 con DML acotado a `predicted_at IS NULL` usando `ai_signals.generated_at` como fuente canónica; filas afectadas: 40; NULL final: 0.
 
 **Postgres serving:**
 - `greenhouse_serving.ico_ai_signal_enrichments`: solo Feb 2026 (6 filas), `last_processed=2026-04-30`. Es lo que leen Home/Agency/Person 360.
@@ -79,15 +102,22 @@ El defecto real de Finance es **scoping + falso-sano**: el cron Finance AI corre
 - Predicciones con `predicted_at` NULL → cualquier consumidor temporal de predicciones queda inconsistente.
 - Riesgo de confianza: "salud operativa falsa" — el sistema reporta verde mientras no produce nada.
 
-## Solución propuesta
+## Solución aplicada
 
-Ver `TASK-941`. Resumen: (1) fix de serialización (transportar timestamp como STRING + `TIMESTAMP(col)` en el SELECT, o `BigQuery.timestamp()`) + test de round-trip real; (2) invariante anti-falso-sano (raw>0 && mapeadas==0 → degraded/failed, ICO + Finance); (3) **estructural**: traer el path de AI signals/prediction/enrichment bajo el patrón canónico TASK-900 (freshness gate + MERGE sin delete destructivo + tracking + signal), eliminando el DELETE+INSERT; (4) PG serving con replace atómico (transacción) o generation-stamp; (5) reliability signal de freshness (`nexa.insights.stale_with_eligible_signals`); (6) backfill Mar/Abr/May + reproyección; (7) Finance: materializar `client_economics` Mayo + mismo invariante.
+Ver `TASK-941`. Resumen: (1) fix de serialización (transportar timestamp como STRING + `TIMESTAMP(col)` en el SELECT) + helper canónico + test/lint de regresión; (2) invariante anti-falso-sano (raw>0 && mapeadas==0 → degraded/failed, ICO + Finance); (3) guard no-destructivo para no borrar serving bueno ante señales inválidas; (4) reliability signal de freshness (`nexa.insights.stale_with_eligible_signals`); (5) self-heal live Mar/Abr/May y remediación acotada de `ai_prediction_log.predicted_at`; (6) Finance: scope al último período cerrado/materializado y skip honesto de períodos abiertos.
+
+Follow-ups fuera de este issue:
+
+- `TASK-942` cerró el freshness gate defensivo del write-path.
+- `TASK-943` lleva el modelo estructural append-only/event-log para preservar evolución intra-período.
+- `TASK-944`/`TASK-945`/`TASK-946` cubren mejoras visuales de timeline/lifecycle/degradación honesta.
 
 ## Verificación al resolver
 
-- `ico_engine.ai_signals.generated_at IS NOT NULL` para todo período post-fix.
-- Run con raw signals presentes y 0 mapeables → status NO `succeeded`.
-- Serving `ico_ai_signal_enrichments` fresco para el período corriente.
-- `finance_ai_signals > 0` con `client_economics` Mayo presente.
-- Signal `nexa.insights.stale_with_eligible_signals` en steady=0.
-- Test de regresión: round-trip real de timestamp por el insert (no mock).
+- [x] `ico_engine.ai_signals.generated_at IS NOT NULL` para todo período post-fix.
+- [x] `ico_engine.ai_prediction_log.predicted_at IS NOT NULL` tras remediación acotada.
+- [x] Run con raw signals presentes y 0 mapeables → status NO `succeeded`.
+- [x] Serving `ico_ai_signal_enrichments` fresco para el período corriente.
+- [x] Finance distingue período abierto sin data elegible de falla real; no requiere `client_economics` Mayo porque mayo sigue abierto.
+- [x] Signal `nexa.insights.stale_with_eligible_signals` en steady=0.
+- [x] Test/lint de regresión para timestamp struct.

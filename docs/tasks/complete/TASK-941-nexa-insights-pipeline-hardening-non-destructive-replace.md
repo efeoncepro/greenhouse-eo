@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Implementacion`
+- Status real: `Completada 2026-05-28`
 - Rank: `TBD`
 - Domain: `ico|data|reliability|finance`
 - Blocked by: `none`
@@ -16,6 +16,20 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 - Resuelve: `ISSUE-082`
+
+## Progress 2026-05-28 (cierre estricto)
+
+**TASK-941 COMPLETE.** El cierre se hizo por ruta estricta: verificación live post-deploy, remediación de residuo histórico, full test y documentación sincronizada.
+
+- ✅ **Self-heal live verificado:** `ico_engine.ai_signals.generated_at` quedó poblado para los períodos activos (`2026-05`: 20 señales, 0 NULL, `max=2026-05-28 07:16:17`; `2026-04`: 1/0; `2026-03`: 7/0; `2026-02`: 6/0).
+- ✅ **LLM enrichment fresco:** `ico_engine.ai_enrichment_runs` último run Mayo `2026-05-28 07:45:06→07:45:52`, `status=succeeded`, `signals_seen=20`, `signals_enriched=20`, `signals_failed=0`; `ai_signal_enrichments` Mayo `20`, `processed_at_nulls=0`.
+- ✅ **Predictions remediadas:** `ai_prediction_log.predicted_at` tenía 40 NULL históricos de la corrida defectuosa; se corrigieron con DML acotado (`predicted_at IS NULL`) usando `ai_signals.generated_at` como fuente canónica por `space_id + metric_name + período + model_version`. Filas afectadas: 40. Resultado: `predicted_at_nulls=0`. `actual_recorded_at` permanece NULL por diseño hasta cierre/actuals del período.
+- ✅ **Serving y APIs:** `/api/home/snapshot` reporta `nexaInsights.totalAnalyzed=20`, `lastAnalysis=2026-05-28 07:45:06.438+00`, `runStatus=succeeded`; `/api/ico-engine/metrics/agency?year=2026&month=5` reporta `aiLlm.total=20`, `succeeded=20`, `failed=0`, `timelineCount=20`; Person 360 Melkin reporta source activo con `lastAnalysis=2026-05-28 07:45:06.438+00`.
+- ✅ **Reliability steady:** `nexa.insights.stale_with_eligible_signals` en `severity=ok`: "Nexa Insights frescos: 20 señales elegibles → 20 enrichments para 2026-05."
+- ✅ **Gates:** focal AI/reliability/lint rule `54 tests` OK; `pnpm build` OK; `pnpm pg:doctor` OK; `pnpm test` full OK (`784 files`, `5427 tests`, `42 skipped`).
+- ✅ **Guard mecánico:** helper canónico `toBigQueryStructTimestamp()` agregado en `src/lib/bigquery.ts` y usado por writers BQ DML de Nexa; lint rule `greenhouse/no-bq-struct-string-timestamp` mantiene el contrato STRING + `TIMESTAMP(s.col)`.
+
+`ISSUE-082` movido a `resolved/`. El scope estructural append-only/event-log queda fuera de este cierre y vive en `TASK-943`.
 
 ## Progress 2026-05-27 (sesión 1 — develop, sin branch)
 
@@ -32,14 +46,14 @@
 
 **Slice 3 EXTRAÍDO → `TASK-942`** (non-destructive write-path, defense-in-depth). ✅ **TASK-942 COMPLETE 2026-05-27**: recalibrado de MERGE a freshness gate + full-replace (ai_signals es set volátil); gate dormant hasta activar flag compartido `ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED`. NO bloqueaba la resolución del incidente: el bleeding ya estaba detenido por S1/S2/S4.
 
-**Cierre de TASK-941 pendiente (no requiere S3):**
+**Cierre de TASK-941 resuelto 2026-05-28 (no requiere S3):**
 
-- ⏳ **Slice 6 / verificación** — el cron diario re-materializa ai_signals con el fix S1 → generated_at poblado → **self-heal** sin backfill manual. Reducido a verificación post-deploy.
-- ⏳ `pnpm build` + `pnpm test` full (gate de cierre).
-- ⏳ Live post-deploy: próximo cron self-heal + `bq COUNTIF(generated_at IS NULL)=0` + signal `nexa.insights.stale_with_eligible_signals` steady.
-- ⏳ Docs: CLAUDE.md invariante (timestamp struct + no-false-healthy), changelog, RELIABILITY_CONTROL_PLANE signal nuevo, mover **ISSUE-082 → resolved**.
+- ✅ **Slice 6 / verificación** — cron diario re-materializó ai_signals con fix S1 → generated_at poblado → self-heal verificado.
+- ✅ `pnpm build` + `pnpm test` full verdes.
+- ✅ Live post-deploy: `COUNTIF(generated_at IS NULL)=0`, `COUNTIF(predicted_at IS NULL)=0`, signal `nexa.insights.stale_with_eligible_signals` steady.
+- ✅ Docs: CLAUDE.md invariante, changelog, RELIABILITY_CONTROL_PLANE signal nuevo, **ISSUE-082 → resolved**.
 
-NO marcar complete hasta verificar live + docs. (El scope estructural MERGE ya NO es parte de TASK-941 — vive en TASK-942.)
+El scope estructural append-only/event-log ya NO es parte de TASK-941 — vive en TASK-943. El hardening defensivo inmediato de write-path vive en TASK-942.
 
 ## Summary
 
@@ -166,26 +180,27 @@ El bug de timestamp puede regresar el día que alguien escriba otro BQ DML UNNES
 
 ## Acceptance Criteria
 
-- [ ] `ico_engine.ai_signals.generated_at` (y `ai_prediction_log.predicted_at`) NOT NULL para todo período post-fix; test de round-trip real verde.
-- [ ] Un run con raw signals presentes y 0 mapeables → status NO `succeeded` (ICO + Finance).
-- [ ] No existe `DELETE` destructivo de período sin payload reemplazo validado; freshness gate skipea en lugar de borrar.
-- [ ] Serving `ico_ai_signal_enrichments` fresco para el período corriente; Home/Agency/Person 360 muestran insights frescos.
-- [ ] Finance AI corre sobre el último período cerrado/materializado (Abril) y produce señales; período abierto sin economics → **skip honesto**, nunca `succeeded` engañoso. (NO backfill de Mayo — Mayo está abierto por diseño.)
-- [ ] Signal `nexa.insights.stale_with_eligible_signals` en steady=0.
-- [ ] ADR `GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md` actualizado: patrón extendido al AI signals path.
-- [ ] Lint rule `greenhouse/no-bq-struct-string-timestamp` (modo error) + helper canónico de serialización de timestamps BQ DML; CLAUDE.md hard rules nuevas (timestamp struct, no-destructive-replace, no-false-healthy).
+- [x] `ico_engine.ai_signals.generated_at` (y `ai_prediction_log.predicted_at`) NOT NULL para todo período post-fix; test de round-trip real verde.
+- [x] Un run con raw signals presentes y 0 mapeables → status NO `succeeded` (ICO + Finance).
+- [x] No existe wipe del serving sin payload reemplazo validado; guard skipea/degrada en lugar de borrar.
+- [x] Serving `ico_ai_signal_enrichments` fresco para el período corriente; Home/Agency/Person 360 muestran insights frescos.
+- [x] Finance AI corre sobre el último período cerrado/materializado y el período abierto sin economics queda como **skip honesto**, nunca `succeeded` engañoso. (NO backfill de Mayo — Mayo está abierto por diseño.)
+- [x] Signal `nexa.insights.stale_with_eligible_signals` en steady=0.
+- [x] ADR/deltas actualizados: TASK-942 cubre el gate defensivo; TASK-943 cubre append-only event log; Reliability Control Plane documenta el signal.
+- [x] Lint rule `greenhouse/no-bq-struct-string-timestamp` (modo error) + helper canónico de serialización de timestamps BQ DML; CLAUDE.md hard rules nuevas (timestamp struct, no-destructive-replace, no-false-healthy).
 
 ## Verification
 
-- `pnpm vitest run src/lib/ico-engine/ai src/lib/finance/ai src/lib/reliability`
-- `pnpm exec tsc --noEmit --pretty false`
-- `pnpm pg:doctor`
-- bq: `SELECT period_year, period_month, COUNTIF(generated_at IS NULL) FROM ico_engine.ai_signals GROUP BY 1,2` → 0 NULL post-backfill.
-- Staging: `/api/home/snapshot`, `/api/ico-engine/metrics/agency`, `/api/finance/intelligence/nexa-insights` → insights frescos.
+- `pnpm exec vitest run src/lib/ico-engine/ai src/lib/finance/ai src/lib/reliability/queries/nexa-insights-freshness.ts eslint-plugins/greenhouse/rules/__tests__/no-bq-struct-string-timestamp.test.mjs` → 54 tests OK.
+- `pnpm build` → OK.
+- `pnpm pg:doctor` → OK.
+- `pnpm test` → 784 files OK, 5427 tests OK, 42 skipped.
+- bq: `ico_engine.ai_signals.generated_at` NULL = 0; `ico_engine.ai_prediction_log.predicted_at` NULL = 0.
+- Staging: `/api/home/snapshot`, `/api/ico-engine/metrics/agency`, `/api/people/melkin-hernandez/intelligence`, `/api/admin/reliability` → insights frescos + signal steady.
 
 ## Closing Protocol
 
-- [ ] Lifecycle and folder synchronized.
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` synchronized.
-- [ ] `Handoff.md` + `changelog.md` updated.
-- [ ] `ISSUE-082` movido a `resolved/` + tracker actualizado.
+- [x] Lifecycle and folder synchronized.
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` synchronized.
+- [x] `Handoff.md` + `changelog.md` updated.
+- [x] `ISSUE-082` movido a `resolved/` + tracker actualizado.

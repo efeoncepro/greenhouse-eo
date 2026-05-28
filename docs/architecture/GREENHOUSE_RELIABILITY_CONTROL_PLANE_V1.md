@@ -2,12 +2,33 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.8`
+> Versión: `1.9`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-18` por TASK-900 (ICO Materializer skipped_safety signal)
+> Última actualización: `2026-05-28` por TASK-941 (Nexa Insights freshness signal)
 
 ---
+
+## Delta 2026-05-28 — TASK-941: signal `nexa.insights.stale_with_eligible_signals`
+
+Nuevo signal canonical bajo `moduleKey='delivery'` que compara el plano BigQuery de Nexa AI signals contra el serving PostgreSQL de enrichments. Cierra el bug class de falso-sano de `ISSUE-082`: un worker vivo o un run `succeeded` no prueba que haya insights frescos si existen señales elegibles sin enrichments servibles.
+
+Contrato:
+
+- BQ `ico_engine.ai_signals` es la fuente de señales elegibles por período.
+- PG `greenhouse_serving.ico_ai_signal_enrichments` es la fuente servida para Home/Agency/Person 360.
+- Si hay señales elegibles frescas y el serving está vacío/stale para el último período relevante, el signal escala.
+- Si no hay período con señales elegibles, el signal degrada honestamente a `awaiting_data`/`ok` según evidencia, no a falso error.
+- Query throws → `unknown` + `captureWithDomain('delivery', ...)`.
+
+Severity matrix:
+
+- eligible=0 → `ok`/awaiting-data honesto según contexto del reader
+- eligible>0 y served=0 → `error`
+- eligible>served o serving stale → `warning`/`error` según SLA
+- eligible=served y latest serving fresco → `ok`
+
+Reader canonical: `src/lib/reliability/queries/nexa-insights-freshness.ts`. Wire-up en `getReliabilityOverview` via source `nexaInsightsFreshness`. Verificación de cierre TASK-941: `2026-05` con 20 señales elegibles y 20 enrichments servidos, `severity=ok`.
 
 ## Delta 2026-05-18 — TASK-900: signal `delivery.ico_materializer.skipped_safety`
 
