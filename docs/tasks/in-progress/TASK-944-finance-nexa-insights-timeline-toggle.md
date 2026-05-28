@@ -9,17 +9,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `finance|ui`
 - Blocked by: `none`
-- Branch: `task/TASK-944-finance-nexa-timeline-toggle`
+- Branch: `develop` (operador-decision, sin branch dedicada)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

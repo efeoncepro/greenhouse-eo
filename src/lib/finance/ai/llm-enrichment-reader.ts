@@ -5,7 +5,8 @@ import { query } from '@/lib/db'
 import type {
   FinanceLlmRunStatus,
   FinanceNexaInsightItem,
-  FinanceNexaInsightsPayload
+  FinanceNexaInsightsPayload,
+  FinanceNexaTimelineItem
 } from './finance-signal-types'
 
 type RawRow = Record<string, unknown>
@@ -22,6 +23,72 @@ const mapInsightItem = (row: RawRow): FinanceNexaInsightItem => ({
   recommendedAction: toText(row.recommended_action)
 })
 
+const mapTimelineItem = (row: RawRow): FinanceNexaTimelineItem => ({
+  ...mapInsightItem(row),
+  processedAt: String(row.processed_at ?? '')
+})
+
+// ─── Timeline canonical (TASK-944) ──────────────────────────────────────────
+//
+// Patron mirror del Agency `readAgencyAiLlmTimeline` (TASK-914) pero adaptado al
+// estado canonico Finance: NO existe `finance_ai_signal_enrichment_history`
+// todavia (out of scope per TASK-944 spec; follow-up TASK-948+ canoniza Finance
+// al patron append-only event log TASK-943).
+//
+// Honest degradation V1: lee del current table `finance_ai_signal_enrichments`
+// ordenado por `processed_at DESC LIMIT N`. UI consumira esto como timeline
+// funcional (semanticamente cronologico, NO evolutivo intra-periodo). Cuando
+// emerja el history table Finance, este helper migra a leer del history sin
+// cambiar el shape publico `FinanceNexaTimelineItem[]`.
+//
+// Default limit alineado con `TIMELINE_DEFAULT_LIMIT` Agency = 20.
+// Cap = 50 (mirror `TIMELINE_MAX_LIMIT` Agency).
+
+export const FINANCE_TIMELINE_DEFAULT_LIMIT = 20
+export const FINANCE_TIMELINE_MAX_LIMIT = 50
+
+/**
+ * Read canonical timeline de Finance Nexa Insights.
+ *
+ * Pre-TASK-948 (sin history table): devuelve los enrichments mas recientes del
+ * current table ordenados cronologicamente. UI lo consume como timeline
+ * funcional sin distinguir vs evolution-true.
+ *
+ * Post-TASK-948 (con history table): migrar a leer
+ * `greenhouse_serving.finance_ai_signal_enrichment_history` con `DISTINCT ON
+ * (enrichment_id)` y ORDER BY `processed_at DESC` (mirror Agency pattern).
+ * Shape publico inmutable: cero cambio en consumers.
+ */
+export const readFinanceAiLlmTimeline = async (
+  limit = FINANCE_TIMELINE_DEFAULT_LIMIT
+): Promise<FinanceNexaTimelineItem[]> => {
+  const boundedLimit = Math.min(
+    Math.max(Math.trunc(limit), 1),
+    FINANCE_TIMELINE_MAX_LIMIT
+  )
+
+  const rows = await query<RawRow>(
+    `
+      SELECT
+        enrichment_id,
+        signal_type,
+        metric_name,
+        severity,
+        explanation_summary,
+        root_cause_narrative,
+        recommended_action,
+        processed_at::text AS processed_at
+      FROM greenhouse_serving.finance_ai_signal_enrichments
+      WHERE status = 'succeeded'
+      ORDER BY processed_at DESC
+      LIMIT $1
+    `,
+    [boundedLimit]
+  ).catch(() => [] as RawRow[])
+
+  return rows.map(mapTimelineItem)
+}
+
 // ─── Portfolio-wide read (Finance Dashboard) ───────────────────────────────
 // Surfaces the top-ranked finance enrichments for a period across all clients
 // the caller is allowed to see. Current tenant isolation: Finance users have
@@ -32,7 +99,7 @@ export const readFinanceAiLlmSummary = async (
   periodMonth: number,
   limit = 5
 ): Promise<FinanceNexaInsightsPayload> => {
-  const [totalsRows, recentRows, latestRunRows] = await Promise.all([
+  const [totalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
     query<RawRow>(
       `
         SELECT
@@ -87,7 +154,11 @@ export const readFinanceAiLlmSummary = async (
         LIMIT 1
       `,
       [periodYear, periodMonth]
-    ).catch(() => [] as RawRow[])
+    ).catch(() => [] as RawRow[]),
+    // TASK-944 — timeline canonical (mirror cross-surface contract).
+    readFinanceAiLlmTimeline(FINANCE_TIMELINE_DEFAULT_LIMIT).catch(
+      () => [] as FinanceNexaTimelineItem[]
+    )
   ])
 
   const totalsRow = totalsRows[0] ?? {}
@@ -101,7 +172,8 @@ export const readFinanceAiLlmSummary = async (
     runStatus: latestRunRow
       ? ((toText(latestRunRow.status) ?? 'failed') as FinanceLlmRunStatus)
       : null,
-    insights
+    insights,
+    timeline: timelineItems
   }
 }
 
@@ -179,6 +251,14 @@ export const readClientFinanceAiLlmSummary = async (
     runStatus: latestRunRow
       ? ((toText(latestRunRow.status) ?? 'failed') as FinanceLlmRunStatus)
       : null,
-    insights: recentRows.map(mapInsightItem)
+    insights: recentRows.map(mapInsightItem),
+    // TASK-944 — timeline canonical (client-scoped). Reusa el helper portfolio
+    // sin filtro por client_id porque el current contract de timeline cross-surface
+    // muestra los enrichments mas recientes del portfolio (no del cliente). Cuando
+    // emerja Finance history table (TASK-948+) + se decida exponer client-scoped
+    // timeline, sumar variant `readClientFinanceAiLlmTimeline(clientId, limit)`.
+    timeline: await readFinanceAiLlmTimeline(FINANCE_TIMELINE_DEFAULT_LIMIT).catch(
+      () => [] as FinanceNexaTimelineItem[]
+    )
   }
 }

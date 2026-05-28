@@ -189,11 +189,39 @@ export interface FinanceNexaInsightItem {
   recommendedAction: string | null
 }
 
+/**
+ * TASK-944 — Timeline item shape canonical para Finance Nexa Insights.
+ *
+ * Espejo exacto del `NexaTimelineItem` que consume el componente UI
+ * `NexaInsightsTimeline` (canonical cross-surface). Extiende `FinanceNexaInsightItem`
+ * con `processedAt` (timestamp del enrichment) — el resto del shape se mantiene
+ * idéntico para que el bento `NexaInsightsBlock` lo consuma sin transformaciones.
+ *
+ * Path canonical Finance: leído de `greenhouse_serving.finance_ai_signal_enrichments`
+ * (current table) ordenado por `processed_at DESC LIMIT 20`. Honest degradation
+ * vs Agency (que lee `ico_ai_signal_enrichment_history` — append-only history):
+ * Finance no tiene history table todavía (out of scope TASK-944 per spec;
+ * follow-up TASK-948+). V1 muestra "los más recientes del período actual" como
+ * timeline funcional. Cuando emerja Finance history, el helper migra a leer
+ * del history sin cambiar este shape público.
+ */
+export interface FinanceNexaTimelineItem extends FinanceNexaInsightItem {
+  processedAt: string
+}
+
 export interface FinanceNexaInsightsPayload {
   totalAnalyzed: number
   lastAnalysis: string | null
   runStatus: FinanceLlmRunStatus | null
   insights: FinanceNexaInsightItem[]
+  /**
+   * TASK-944 — Timeline canonical (mismo contract shape que las otras 4 surfaces
+   * Nexa Insights del portal). Devuelto ordenado por `processedAt DESC`.
+   * Default limit 20 (alineado con `TIMELINE_DEFAULT_LIMIT` Agency).
+   * V1 lee de current `finance_ai_signal_enrichments` (honest degradation —
+   * Finance history table queda como follow-up TASK-948+).
+   */
+  timeline: FinanceNexaTimelineItem[]
 }
 
 // ─── Stable IDs ─────────────────────────────────────────────────────────────
