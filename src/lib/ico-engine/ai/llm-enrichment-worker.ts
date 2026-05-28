@@ -294,7 +294,7 @@ const deleteBigQueryCurrentState = async (input: {
 const persistServingState = async (
   records: AiSignalEnrichmentRecord[],
   run: AiEnrichmentRunRecord,
-  options?: { historyOnly?: boolean }
+  options?: { historyOnly?: boolean; signalsUnmappable?: boolean }
 ) => {
   for (const record of records) {
     await query(
@@ -398,25 +398,32 @@ const persistServingState = async (
     return
   }
 
-  if (run.spaceId) {
-    await query(
-      `
-        DELETE FROM greenhouse_serving.ico_ai_signal_enrichments
-        WHERE period_year = $1
-          AND period_month = $2
-          AND space_id = $3
-      `,
-      [run.periodYear, run.periodMonth, run.spaceId]
-    )
-  } else {
-    await query(
-      `
-        DELETE FROM greenhouse_serving.ico_ai_signal_enrichments
-        WHERE period_year = $1
-          AND period_month = $2
-      `,
-      [run.periodYear, run.periodMonth]
-    )
+  // TASK-941 Slice 4 — non-destructive serving guard: si signalsUnmappable
+  // (contrato inválido, 0 records por bug timestamp), NO borrar el período del
+  // serving — preserva el último estado bueno. El run row sí se escribe abajo
+  // (status='failed'). Cuando el contrato es válido, replace-current-period
+  // normal (records puede ser 0 legítimamente si el período no tiene señales).
+  if (!options?.signalsUnmappable) {
+    if (run.spaceId) {
+      await query(
+        `
+          DELETE FROM greenhouse_serving.ico_ai_signal_enrichments
+          WHERE period_year = $1
+            AND period_month = $2
+            AND space_id = $3
+        `,
+        [run.periodYear, run.periodMonth, run.spaceId]
+      )
+    } else {
+      await query(
+        `
+          DELETE FROM greenhouse_serving.ico_ai_signal_enrichments
+          WHERE period_year = $1
+            AND period_month = $2
+        `,
+        [run.periodYear, run.periodMonth]
+      )
+    }
   }
 
   for (const record of records) {
@@ -809,7 +816,10 @@ export const materializeAiLlmEnrichments = async (
   }
 
   // BigQuery write: best-effort. If streaming buffer blocks DELETE, continue with PostgreSQL serving.
-  if (!historyOnly) {
+  // TASK-941 Slice 4 — non-destructive guard: si signalsUnmappable (contrato
+  // inválido) NO tocar BQ enrichments (el delete borraría el último estado bueno
+  // sin reemplazo válido). Preserva BQ enrichments; el run row se escribe en PG.
+  if (!historyOnly && !signalsUnmappable) {
     try {
       await deleteBigQueryCurrentState({
         projectId,
@@ -927,7 +937,7 @@ export const materializeAiLlmEnrichments = async (
     }
   }
 
-  await persistServingState(records, run, { historyOnly })
+  await persistServingState(records, run, { historyOnly, signalsUnmappable })
 
   if (!historyOnly) {
     await publishOutboxEvent({
