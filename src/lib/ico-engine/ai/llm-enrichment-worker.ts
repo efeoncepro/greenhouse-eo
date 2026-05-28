@@ -2,6 +2,7 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { ensureIcoEngineInfrastructure, ICO_DATASET } from '@/lib/ico-engine/schema'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -657,6 +658,31 @@ export const materializeAiLlmEnrichments = async (
     .map(mapSignalRow)
     .filter((row): row is AiSignalRecord => Boolean(row))
 
+  // TASK-941/ISSUE-082 anti-false-healthy invariant: si hay raw signals en BQ
+  // pero 0 quedan mapeables, es un contrato inválido (típicamente generated_at
+  // NULL). El run NO puede quedar 'succeeded'. Distinto de rawCount===0 (período
+  // sin señales = benigno, no falla).
+  const rawSignalRowCount = Array.isArray(rawRows) ? rawRows.length : 0
+  const signalsUnmappable = rawSignalRowCount > 0 && signals.length === 0
+
+  if (signalsUnmappable) {
+    captureWithDomain(
+      new Error(
+        `ICO AI enrichment contract violation: ${rawSignalRowCount} raw signals present but 0 mappable for ${input.periodYear}-${String(input.periodMonth).padStart(2, '0')}`
+      ),
+      'delivery',
+      {
+        tags: { source: 'ico_ai_enrichment', stage: 'map_signals' },
+        extra: {
+          periodYear: input.periodYear,
+          periodMonth: input.periodMonth,
+          spaceId: input.spaceId ?? null,
+          rawSignalRowCount
+        }
+      }
+    )
+  }
+
   const resolvedContext = await resolveSignalContext(signals)
 
   const records: AiSignalEnrichmentRecord[] = []
@@ -748,11 +774,13 @@ export const materializeAiLlmEnrichments = async (
   const completedAt = new Date().toISOString()
 
   const runStatus =
-    failed > 0 && succeeded === 0
+    signalsUnmappable
       ? 'failed'
-      : failed > 0
-        ? 'partial'
-        : 'succeeded'
+      : failed > 0 && succeeded === 0
+        ? 'failed'
+        : failed > 0
+          ? 'partial'
+          : 'succeeded'
 
   const run: AiEnrichmentRunRecord = {
     runId,
@@ -771,7 +799,11 @@ export const materializeAiLlmEnrichments = async (
     tokensIn: records.reduce((sum, record) => sum + (record.tokensIn ?? 0), 0),
     tokensOut: records.reduce((sum, record) => sum + (record.tokensOut ?? 0), 0),
     latencyMs: records.reduce((sum, record) => sum + (record.latencyMs ?? 0), 0),
-    errorMessage: failed > 0 && succeeded === 0 ? 'All enrichments failed for this run' : null,
+    errorMessage: signalsUnmappable
+      ? `${rawSignalRowCount} raw AI signals present but 0 mappable (invalid contract — likely null generated_at, ISSUE-082)`
+      : failed > 0 && succeeded === 0
+        ? 'All enrichments failed for this run'
+        : null,
     startedAt,
     completedAt
   }
