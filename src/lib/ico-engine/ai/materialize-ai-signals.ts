@@ -280,6 +280,16 @@ export const buildRecommendationSignals = ({
 // El BQ Node.js client requiere `types` explícitos para ARRAY<STRUCT> params
 // porque JS objects no llevan type metadata. Mantener en sync con
 // `toBigQuerySignalRow` / `toBigQueryPredictionLogRow` y el schema BQ canonical.
+//
+// ─── Canonical timestamp serialization (TASK-941 / ISSUE-082) ──────────────
+//
+// Los campos timestamp se declaran `STRING` en el struct y se pasan como ISO
+// string; la conversión a TIMESTAMP ocurre en SQL vía `TIMESTAMP(s.col)` en el
+// SELECT del UNNEST. NO declarar `TIMESTAMP` en el struct: el cliente Node de
+// BigQuery NO coacciona un ISO string al tipo TIMESTAMP dentro de un STRUCT y
+// escribe NULL silenciosamente (bug class ISSUE-082: ai_signals Mar-May 100%
+// NULL). STRING + CAST-en-SQL elimina por completo la dependencia de la
+// coerción struct del cliente. Enforced por lint `greenhouse/no-bq-struct-string-timestamp`.
 
 const AI_SIGNAL_STRUCT_TYPES = {
   signal_id: 'STRING',
@@ -304,7 +314,7 @@ const AI_SIGNAL_STRUCT_TYPES = {
   action_summary: 'STRING',
   action_target_id: 'STRING',
   model_version: 'STRING',
-  generated_at: 'TIMESTAMP',
+  generated_at: 'STRING', // CAST a TIMESTAMP en el SELECT (ver nota canonical arriba)
   ai_eligible: 'BOOL',
   payload_json: 'STRING'
 } as const
@@ -316,10 +326,10 @@ const AI_PREDICTION_LOG_STRUCT_TYPES = {
   period_year: 'INT64',
   period_month: 'INT64',
   predicted_value: 'FLOAT64',
-  predicted_at: 'TIMESTAMP',
+  predicted_at: 'STRING', // CAST a TIMESTAMP en el SELECT (ver nota canonical arriba)
   confidence: 'FLOAT64',
   actual_value: 'FLOAT64',
-  actual_recorded_at: 'TIMESTAMP',
+  actual_recorded_at: 'STRING', // CAST a TIMESTAMP en el SELECT (ver nota canonical arriba)
   error_pct: 'FLOAT64',
   model_version: 'STRING'
 } as const
@@ -360,7 +370,7 @@ const replaceBigQuerySignalsForPeriod = async (
               s.period_year, s.period_month, s.severity, s.current_value, s.expected_value, s.z_score,
               s.predicted_value, s.confidence, s.prediction_horizon, s.contribution_pct,
               s.dimension, s.dimension_id, s.action_type, s.action_summary, s.action_target_id,
-              s.model_version, s.generated_at, s.ai_eligible, s.payload_json
+              s.model_version, TIMESTAMP(s.generated_at), s.ai_eligible, s.payload_json
             FROM UNNEST(@rows) AS s`,
     params: { rows },
     types: { rows: [AI_SIGNAL_STRUCT_TYPES] }
@@ -394,8 +404,8 @@ const replacePredictionLogs = async (projectId: string, rows: AiPredictionLogRow
             )
             SELECT
               s.prediction_id, s.space_id, s.metric_name, s.period_year, s.period_month,
-              s.predicted_value, s.predicted_at, s.confidence,
-              s.actual_value, s.actual_recorded_at, s.error_pct, s.model_version
+              s.predicted_value, TIMESTAMP(s.predicted_at), s.confidence,
+              s.actual_value, TIMESTAMP(s.actual_recorded_at), s.error_pct, s.model_version
             FROM UNNEST(@rows) AS s`,
     params: { rows: logRows },
     types: { rows: [AI_PREDICTION_LOG_STRUCT_TYPES] }

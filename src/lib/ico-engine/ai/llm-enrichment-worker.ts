@@ -809,7 +809,7 @@ export const materializeAiLlmEnrichments = async (
                     s.quality_score, s.explanation_summary, s.root_cause_narrative,
                     s.recommended_action, s.explanation_json, s.model_id, s.prompt_version,
                     s.prompt_hash, s.confidence, s.tokens_in, s.tokens_out, s.latency_ms,
-                    s.status, s.error_message, s.input_signal_snapshot, s.processed_at, s._synced_at
+                    s.status, s.error_message, s.input_signal_snapshot, TIMESTAMP(s.processed_at), TIMESTAMP(s._synced_at)
                   FROM UNNEST(@rows) AS s`,
           params: { rows: enrichmentRows },
           types: {
@@ -840,8 +840,9 @@ export const materializeAiLlmEnrichments = async (
               status: 'STRING',
               error_message: 'STRING',
               input_signal_snapshot: 'STRING',
-              processed_at: 'TIMESTAMP',
-              _synced_at: 'TIMESTAMP'
+              // TASK-941/ISSUE-082: STRING + TIMESTAMP() cast en SELECT (no 'TIMESTAMP' en struct → NULL)
+              processed_at: 'STRING',
+              _synced_at: 'STRING'
             }]
           }
         })
@@ -860,7 +861,7 @@ export const materializeAiLlmEnrichments = async (
                   s.run_id, s.trigger_event_id, s.space_id, s.period_year, s.period_month,
                   s.trigger_type, s.status, s.signals_seen, s.signals_enriched, s.signals_failed,
                   s.model_id, s.prompt_version, s.prompt_hash, s.tokens_in, s.tokens_out,
-                  s.latency_ms, s.error_message, s.started_at, s.completed_at, s._synced_at
+                  s.latency_ms, s.error_message, TIMESTAMP(s.started_at), TIMESTAMP(s.completed_at), TIMESTAMP(s._synced_at)
                 FROM UNNEST(@rows) AS s`,
         params: { rows: [runRow] },
         types: {
@@ -882,9 +883,10 @@ export const materializeAiLlmEnrichments = async (
             tokens_out: 'INT64',
             latency_ms: 'INT64',
             error_message: 'STRING',
-            started_at: 'TIMESTAMP',
-            completed_at: 'TIMESTAMP',
-            _synced_at: 'TIMESTAMP'
+            // TASK-941/ISSUE-082: STRING + TIMESTAMP() cast en SELECT (no 'TIMESTAMP' en struct → NULL)
+            started_at: 'STRING',
+            completed_at: 'STRING',
+            _synced_at: 'STRING'
           }]
         }
       })

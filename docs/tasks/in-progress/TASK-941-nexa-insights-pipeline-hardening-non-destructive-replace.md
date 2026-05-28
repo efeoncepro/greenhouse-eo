@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `ico|data|reliability|finance`
 - Blocked by: `none`
-- Branch: `task/TASK-941-nexa-insights-pipeline-hardening`
+- Branch: `develop` (operador pidió quedarse en develop, sin branch dedicada)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 - Resuelve: `ISSUE-082`
