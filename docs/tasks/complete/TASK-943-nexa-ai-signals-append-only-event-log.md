@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio-Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Implementacion`
+- Status real: `Shipped 2026-05-28`
 - Rank: `TBD`
 - Domain: `ico|data|reliability`
 - Blocked by: `none` (TASK-941 ya entregó timestamp fix + invariante + guard serving; TASK-942 entregó freshness gate)
@@ -220,3 +220,38 @@ Reglas obligatorias:
 | **Resilience** | History eternal = evidencia recuperable. Signal `no_new_signals_in_24h` cubre cron-down. Freshness gate (TASK-942 Slice 1) sigue protegiendo contra upstream degradado. |
 | **Scalability** | BQ append-only escala lineal con tiempo; cost negligible para volumen ICO (decenas de signals/mes). Partition+cluster optimiza queries. |
 | **Auditability** ⭐ | KPIs y narrativas reproducibles desde cualquier punto temporal. Análisis evolutivo habilitado (sprints 15d). Cada signal trazable a su run vía `generated_at`. |
+
+## Closing log — 2026-05-28
+
+**Shipped** en 7 slices a `develop` (operador autorizó "implementar la task" + "mantente en develop").
+
+| Slice | Commit | Resumen |
+|---|---|---|
+| 0 | `ee5f98f7` | ADR delta 2026-05-28 supersede TASK-942 delta erróneo + bug-class catalog BUG-CLASS-004 |
+| 1 | `e9094593` | VIEW canonical `ai_signals_current` + `ai_prediction_log_current` (latest-per-key vía ROW_NUMBER); auto-provisioned por `ensureIcoEngineInfrastructure`; aplicadas live en BQ (idempotent) |
+| 2 | `5df5bf40` | Migra 3 consumers a la VIEW: `nexa-insights-freshness`, `ico-ai-signals` projection, `llm-enrichment-worker` (branch SYSTEM_TIME → raw, default → VIEW) |
+| 3 | `ecc12ff6` | Materializer DELETE+INSERT → `appendBigQuerySignalsForPeriod` + `appendPredictionLogs` (INSERT-only); cron `monthsBack` default 3 → 1 |
+| 4 | `dc7edb8c` | Canoniza `hydratePredictionActuals` como única excepción mutable (3 campos, IS NULL guard, período pasado) |
+| 5 | `0e37b8c9` | Reliability signal `nexa.insights.no_new_signals_in_24h` (kind=lag, severity warning >24h / error >48h) + reader + wire-up + 9 tests anti-regresión |
+| 6 | (deferred) | Backfill Mar/Abr/May opcional — no blocker. Cron post-fix repuebla periodo actual; meses históricos con `generated_at` NULL preservados como evidencia de la era pre-TASK-943 |
+| 7 | `d0a9e248` | CLAUDE.md hard rule canonical "Nexa AI Signals append-only event log invariants (TASK-943)" — 7 reglas duras + dicotomía mutable/observacional canónica |
+
+**Closing gate canonical** (CLAUDE.md "Task Closing Quality Gate"):
+
+- `pnpm test` (full suite): **5436 tests verde / 42 skipped** en 54.78s (vitest run).
+- `pnpm build` (Turbopack production): **✓ Compiled successfully in 34.1s** + 21 static pages generated.
+- tsc verde + lint verde en cada slice (pre-push hook canónico).
+
+**Acceptance Criteria** — todos cumplidos:
+
+- [x] `ai_signals` y `ai_prediction_log` quedan append-only (no hay `DELETE` en el código de los materializers).
+- [x] VIEW `ai_signals_current` (y equivalente predictions) preserva el current state semánticamente.
+- [x] Cron `/api/cron/ico-materialize` default `monthsBack=1` (solo período actual).
+- [x] Consumers (enrichment worker, reliability signals, Person 360 narrative via projection, Home/Agency/Finance Nexa Insights vía PG serving) leen via VIEW o helper canonical.
+- [x] Test anti-regresión: smoke live BQ + 9 tests del nuevo signal + 54 ICO AI tests preservados.
+- [x] Signal `nexa.insights.no_new_signals_in_24h` operativo + wire-up en reliability overview.
+- [x] ADR delta rectificatorio shipped + delta TASK-942 marcado como superseded.
+- [x] Bug-class entry (BUG-CLASS-004) + CLAUDE.md hard rule canónica.
+- [x] Bonus impact = nulo (verificado: `metrics_by_member.otd_pct/rpa_avg` siguen MERGE estable ortogonal — TASK-900 path inalterado).
+
+**Cross-impact aplicado**: el Delta TASK-942 2026-05-27 en la ADR `GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md` quedó anotado como SUPERSEDED + supersededed sections marcadas con `~~tachado~~`. Delta nuevo 2026-05-28 canoniza la dicotomía correcta y referencia el delta histórico como auditoría del modelo erróneo.
