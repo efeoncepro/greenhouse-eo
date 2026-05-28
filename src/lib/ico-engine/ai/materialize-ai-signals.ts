@@ -2,6 +2,9 @@ import 'server-only'
 
 import { getBigQueryClient } from '@/lib/bigquery'
 import { getSantiagoDateParts } from '@/lib/calendar/business-time'
+import { captureWithDomain } from '@/lib/observability/capture'
+
+import { isFreshnessGateEnabled, runUpstreamFreshnessGate } from '../materialize-guards'
 import {
   buildMetricSelectSQL,
   buildDeliveryPeriodSourceSql,
@@ -471,6 +474,39 @@ export const materializeAiSignals = async (
   periodYear: number,
   periodMonth: number
 ): Promise<AiSignalMaterializationResult> => {
+  // TASK-942 Slice 1 — freshness gate (flag-gated, default OFF). Si el upstream
+  // (bridge Notion coverage, etc.) está degradado, NO re-materializar ai_signals:
+  // el DELETE+INSERT borraría la última generación buena con data potencialmente
+  // basada en un bridge incompleto (bug class TASK-877). Skip-don't-delete.
+  // Para un set volátil, DELETE+INSERT es la semántica correcta de replace; el
+  // gate cierra el wipe-on-degraded de raíz, sin MERGE/generation-stamp.
+  if (isFreshnessGateEnabled()) {
+    const gate = await runUpstreamFreshnessGate()
+
+    if (!gate.safe) {
+      captureWithDomain(
+        new Error(
+          `ico_ai_signals_skipped_safety: ${periodYear}-${String(periodMonth).padStart(2, '0')} (${gate.reason})`
+        ),
+        'delivery',
+        {
+          level: 'warning',
+          tags: { source: 'ico_ai_signals_skipped_safety' },
+          extra: {
+            periodYear,
+            periodMonth,
+            blockingSignals: gate.blockingSignals.map(signal => ({
+              signalId: signal.signalId,
+              severity: signal.severity
+            }))
+          }
+        }
+      )
+
+      return { aiSignalsWritten: 0, predictionLogsWritten: 0 }
+    }
+  }
+
   const projectId = getIcoEngineProjectId()
   const currentSnapshots = await readCurrentSnapshots(projectId, periodYear, periodMonth)
 
