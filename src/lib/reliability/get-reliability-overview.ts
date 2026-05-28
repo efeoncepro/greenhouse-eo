@@ -47,6 +47,7 @@ import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
 import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
+import { getNexaInsightsFreshnessSignal } from './queries/nexa-insights-freshness'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
 import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
 import {
@@ -421,6 +422,7 @@ interface ReliabilityOverviewSources {
    * bug class TASK-877.
    */
   icoMaterializerSkippedSafety?: ReliabilitySignal | null
+  nexaInsightsFreshness?: ReliabilitySignal | null
 
   /**
    * TASK-908 Slice 3.5 — Notion correction transitions source availability.
@@ -792,6 +794,7 @@ export const buildReliabilityOverview = (
     // ICO está protegiendo data buena del bug class TASK-877 (upstream bridge
     // Notion→member regresión silente). Steady=0.
     ...(sources.icoMaterializerSkippedSafety ? [sources.icoMaterializerSkippedSafety] : []),
+    ...(sources.nexaInsightsFreshness ? [sources.nexaInsightsFreshness] : []),
     // TASK-908 Slice 3.5 — Notion correction transitions source availability.
     // Pre-TASK-908b deployment: 100% unavailable esperado (tabla vacía).
     // Post-deployment + backfill: < 10% steady state. Visibiliza coverage del
@@ -1378,6 +1381,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.icoMaterializerSkippedSafety
       : await getIcoMaterializerSkippedSafetySignal().catch(() => null)
 
+  // TASK-941 Slice 5 — Nexa Insights freshness (stale_with_eligible_signals).
+  // Cross-store: BQ ai_signals latest período vs PG serving enrichments.
+  // Degrada honestamente a `unknown` si la query falla.
+  const nexaInsightsFreshness =
+    preloadedSources.nexaInsightsFreshness !== undefined
+      ? preloadedSources.nexaInsightsFreshness
+      : await getNexaInsightsFreshnessSignal().catch(() => null)
+
   // TASK-908 Slice 3.5 — Notion correction transitions source availability.
   // Single reader; LEFT JOIN tasks completadas vs task_status_transitions.
   // Degrada honestamente a `unknown` si la query falla.
@@ -1576,6 +1587,7 @@ export const getReliabilityOverview = async (
     commercialHealth,
     productionRelease,
     icoMaterializerSkippedSafety,
+    nexaInsightsFreshness,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsOtdClassifierParity,
     notionMetricsDemo,
