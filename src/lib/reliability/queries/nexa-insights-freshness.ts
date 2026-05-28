@@ -66,9 +66,14 @@ export const getNexaInsightsFreshnessSignal =
     try {
       const projectId = getIcoEngineProjectId()
 
+      // TASK-943 Slice 2: lee el VIEW canonical (latest-per-signal_id) en vez
+      // de la raw table. Pre-Slice 3 la raw tiene 1 generation por signal_id
+      // (DELETE+INSERT) → VIEW.count === raw.count (verificado live 2026-05-28:
+      // 34 = 34). Post-Slice 3 INSERT-only acumula N generations; el VIEW filtra
+      // latest correctamente y el COUNT refleja "señales current del período".
       const latestRows = await runIcoEngineQuery<LatestSignalPeriodRow>(
         `SELECT period_year, period_month, COUNT(*) AS signal_count
-         FROM \`${projectId}.ico_engine.ai_signals\`
+         FROM \`${projectId}.ico_engine.ai_signals_current\`
          GROUP BY period_year, period_month
          ORDER BY period_year DESC, period_month DESC
          LIMIT 1`
@@ -123,7 +128,7 @@ export const getNexaInsightsFreshnessSignal =
           {
             kind: 'sql',
             label: 'BQ',
-            value: 'ico_engine.ai_signals GROUP BY period ORDER BY period DESC LIMIT 1'
+            value: 'ico_engine.ai_signals_current GROUP BY period ORDER BY period DESC LIMIT 1 (TASK-943 VIEW canonical)'
           },
           {
             kind: 'sql',

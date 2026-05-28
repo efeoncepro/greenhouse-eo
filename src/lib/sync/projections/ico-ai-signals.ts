@@ -278,10 +278,14 @@ export const icoAiSignalsProjection: ProjectionDefinition = {
 
       await deleteServingRows(year, month, effectiveSpaceId)
 
+      // TASK-943 Slice 2: lee VIEW canonical (latest-per-signal_id). El BQ→PG
+      // projection se asegura que `ico_ai_signals` serving PG refleje el current
+      // state — si N generations coexisten en raw post-Slice 3, solo la latest
+      // se proyecta al serving. La historia evolutiva queda en BQ raw.
       const query = effectiveSpaceId
         ? `
           SELECT *
-          FROM \`${projectId}.ico_engine.ai_signals\`
+          FROM \`${projectId}.ico_engine.ai_signals_current\`
           WHERE period_year = @periodYear
             AND period_month = @periodMonth
             AND space_id = @spaceId
@@ -289,7 +293,7 @@ export const icoAiSignalsProjection: ProjectionDefinition = {
         `
         : `
           SELECT *
-          FROM \`${projectId}.ico_engine.ai_signals\`
+          FROM \`${projectId}.ico_engine.ai_signals_current\`
           WHERE period_year = @periodYear
             AND period_month = @periodMonth
           ORDER BY generated_at DESC, signal_id ASC

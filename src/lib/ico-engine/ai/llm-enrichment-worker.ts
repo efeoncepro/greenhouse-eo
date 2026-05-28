@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
-import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { getBigQueryClient, getBigQueryProjectId, toBigQueryStructTimestamp } from '@/lib/bigquery'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { ensureIcoEngineInfrastructure, ICO_DATASET } from '@/lib/ico-engine/schema'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -236,8 +236,8 @@ const toBigQueryEnrichmentRow = (record: AiSignalEnrichmentRecord) => ({
   status: record.status,
   error_message: record.errorMessage,
   input_signal_snapshot: JSON.stringify(record.inputSignalSnapshot),
-  processed_at: record.processedAt,
-  _synced_at: record.processedAt
+  processed_at: toBigQueryStructTimestamp(record.processedAt),
+  _synced_at: toBigQueryStructTimestamp(record.processedAt)
 })
 
 const toBigQueryRunRow = (run: AiEnrichmentRunRecord) => ({
@@ -258,9 +258,9 @@ const toBigQueryRunRow = (run: AiEnrichmentRunRecord) => ({
   tokens_out: run.tokensOut,
   latency_ms: run.latencyMs,
   error_message: run.errorMessage,
-  started_at: run.startedAt,
-  completed_at: run.completedAt,
-  _synced_at: run.completedAt ?? run.startedAt
+  started_at: toBigQueryStructTimestamp(run.startedAt),
+  completed_at: toBigQueryStructTimestamp(run.completedAt),
+  _synced_at: toBigQueryStructTimestamp(run.completedAt ?? run.startedAt)
 })
 
 const deleteBigQueryCurrentState = async (input: {
@@ -638,10 +638,19 @@ export const materializeAiLlmEnrichments = async (
   const recordProcessedAt = asOfTime ?? startedAt
   const systemTimeClause = asOfTime ? ' FOR SYSTEM_TIME AS OF TIMESTAMP(@asOfTime)' : ''
 
+  // TASK-943 Slice 2: source canonical depende del path:
+  // - asOfTime present (historyOnly replay) → leer raw `ai_signals` con
+  //   FOR SYSTEM_TIME AS OF. BQ time travel funciona sobre TABLES, NO sobre
+  //   VIEWS — la VIEW se re-evalúa cada vez sin historia propia.
+  // - default path → leer VIEW `ai_signals_current` (latest-per-signal_id).
+  //   Post-Slice 3 INSERT-only la raw acumula N generations intra-período;
+  //   el enrichment debe operar sobre la latest, no sobre históricas.
+  const sourceTable = asOfTime ? 'ai_signals' : 'ai_signals_current'
+
   const queryText = input.spaceId
     ? `
       SELECT *
-      FROM \`${projectId}.${ICO_DATASET}.ai_signals\`${systemTimeClause}
+      FROM \`${projectId}.${ICO_DATASET}.${sourceTable}\`${systemTimeClause}
       WHERE period_year = @periodYear
         AND period_month = @periodMonth
         AND space_id = @spaceId
@@ -649,7 +658,7 @@ export const materializeAiLlmEnrichments = async (
     `
     : `
       SELECT *
-      FROM \`${projectId}.${ICO_DATASET}.ai_signals\`${systemTimeClause}
+      FROM \`${projectId}.${ICO_DATASET}.${sourceTable}\`${systemTimeClause}
       WHERE period_year = @periodYear
         AND period_month = @periodMonth
       ORDER BY generated_at DESC, signal_id ASC
