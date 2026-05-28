@@ -436,6 +436,32 @@ const appendPredictionLogs = async (projectId: string, rows: AiPredictionLogRow[
   return rows.length
 }
 
+/**
+ * TASK-943 — Único mutador legítimo del append-only contract de `ai_prediction_log`.
+ *
+ * Las predictions son observaciones históricas (event-sourced) salvo por **un
+ * caso pragmático**: cuando la realidad se observa post-hoc (el mes terminó,
+ * `metric_snapshots_monthly` tiene la actual), hidratamos `actual_value` +
+ * `actual_recorded_at` + `error_pct` (derivado puro de los dos primeros) en el
+ * row de la prediction original. Event-sourcing puro requeriría tabla separada
+ * `ai_prediction_actuals` — over-engineering para volumen ICO actual.
+ *
+ * **Invariante canonical (ADR Delta 2026-05-28)**:
+ *
+ * 1. Esta función es la ÚNICA fuente legítima de UPDATE sobre `ai_prediction_log`.
+ * 2. SOLO mutan 3 campos: `actual_value`, `actual_recorded_at`, `error_pct`
+ *    (los 3 dependen de la misma observación post-hoc, son una unidad atómica).
+ * 3. `actual_value` se hidrata UNA SOLA VEZ por prediction (guard `WHERE
+ *    actual_value IS NULL`). No re-overwrites — el primer dato observado es la
+ *    fuente de verdad.
+ * 4. SOLO períodos cerrados (`period < currentPeriod`). El período en curso no
+ *    se hidrata porque la métrica observada aún no es definitiva.
+ * 5. **Cualquier mutación adicional (más campos, double-overwrite, período
+ *    actual) es una violación del contract append-only canonizado.**
+ *
+ * Pattern análogo: outbox `*_events.delivered_at` (append-only excepto por el
+ * latch de delivery). audit logs no tienen excepciones — pero predictions, sí.
+ */
 const hydratePredictionActuals = async (
   projectId: string,
   currentYear: number,
