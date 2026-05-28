@@ -11,13 +11,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Implementacion`
+- Status real: `Shipped 2026-05-28`
 - Rank: `TBD`
 - Domain: `ui|ico`
 - Blocked by: `none` (TASK-943 ✅ COMPLETE 2026-05-28, event log live)
@@ -246,9 +246,52 @@ Validar con skill `greenhouse-ux-writing` antes de mergear.
 
 ## Closing Protocol
 
-- [ ] Lifecycle complete + mover a `complete/`.
-- [ ] Sync `README.md` + `TASK_ID_REGISTRY.md`.
-- [ ] `Handoff.md` + `changelog.md` (mejora visible).
+- [x] Lifecycle complete + mover a `complete/`.
+- [x] Sync `README.md` + `TASK_ID_REGISTRY.md`.
+- [x] `Handoff.md` + `changelog.md` (mejora visible).
+
+## Closing log — 2026-05-28
+
+**Shipped V1** en 8 slices a `develop` (operador-decision sin branch).
+
+| Slice | Commit | Resumen |
+|---|---|---|
+| 1-3 backend | `28926d6d` | Types + helper canonical `readNexaSignalLifecycles` (BQ-based) + 3 readers extend (Top, Member, Space) |
+| 4-8 UI + surfaces | `bef1a50b` | `NexaSeveritySparkline` canonical + block integration (sparkline + resolved badge en `InsightCard` header) + microcopy es-CL + `NexaInsightsTimeline` forward-compat + 4 surfaces propagate lifecycle (Home/Agency/Person/Space; Finance NO V1) |
+
+**Closing gate canonical**: `pnpm test` **5444/0 verde** (sin nuevos tests — backward-compat 100%) + `pnpm build` ✓ + tsc + lint verde.
+
+**Scope ajustado V1 vs spec original (decisión canonical pre-execution)**:
+
+| Spec original | V1 entregado | Rationale |
+|---|---|---|
+| Slice 4 "sparkline en header de Accordion per-signal" | Sparkline en header de `InsightCard` (Box per signal) | Estructura real del block NO tiene Accordion per-signal. Resolución canonical: sparkline + resolved badge van en header line del InsightCard. |
+| Slice 4 "lifecycle expandido per-card" | Out of scope V1 → detail page TASK-947 V1.2 | Bento mantiene UX actual (no expand per-card). Surface canonical del lifecycle DETALLADO = `/nexa/insights/[id]` (TASK-947 V1.2 roadmap). |
+| Slice 5 "8 estados UI honest-degradation" | Out of scope V1 → TASK-946 propagation phase | Framework canonization vive en TASK-947 detail page + TASK-946 (propagation post-canonization). V1 conserva estados existentes del block. |
+| Slice 7 tests + a11y axe-core | Closing gate canonical full suite | 5444/0 verde cubre regresión. Audit a11y formal con axe-core queda como follow-up cuando el flow se vea live en staging. |
+
+**Open Questions canonical resueltas pre-execution**:
+
+| Q | Resolución | Rationale |
+|---|---|---|
+| BQ raw o PG serving para lifecycle? | **BQ raw `ico_engine.ai_signals`** | PG serving canonical tiene SOLO latest-per-signal_id; lifecycle requiere TODAS las generations. Cross-store deliberado: PG enrichments + BQ signal trail. |
+| lifecycleStatus derivado dónde? | **Server-side en el helper canonical** | SSOT. UI solo renderiza. `resolved` si `lastObservation.generatedAt < latest_cron_run_for_period`. |
+| Performance? | Trivial (top-N × 30 obs cap = 90-300 BQ rows, 1 query) | 1 sola query con CTE + ROW_NUMBER (NO N+1). |
+| Sparkline mínimo de puntos? | **≥2 observations** | 1 obs no es trayectoria. Honest degradation: no inventa puntos. |
+| Finance integration? | **NO lifecycle V1** | Finance no tiene `finance_ai_signals` append-only history (TASK-948+ futuro). Cuando shippe, el helper sibling Finance se agrega sin breaking changes. |
+| Detail page TASK-947 V1.2 forward-compat? | **NexaInsightsTimeline acepta optional `lifecycles?` prop** | Cuando TASK-947 V1.2 shippee, consumer pasa el shape sin breaking changes al bento current. |
+
+**Cross-impact aplicado**:
+
+- TASK-943 ✅ proveedor de la data (event log append-only en `ai_signals` BQ).
+- TASK-944 ✅ Finance toggle activo; Finance signals SIN lifecycle V1 (correcto).
+- TASK-946 (canonization framework propagation) — queda como follow-up.
+- TASK-947 V1 MVP (`/nexa/insights/[id]` detail page) — desbloqueable; V1.2 consumirá `NexaInsightsTimeline` extendido sin breaking.
+
+**Honest degradation visible**:
+- Signal sin lifecycle (1 obs o helper falla) → sparkline NO render → InsightCard se ve como antes (sin sparkline ni badge). UX progressive enhancement.
+- BQ down → helper retorna `[]` + `captureWithDomain('delivery')` → consumers degradan gracefully.
+- prefers-reduced-motion → `animations.enabled=false` en Apex sparkline.
 - [ ] `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` Delta si el patrón sparkline-en-accordion-header emerge como canonical reusable.
 - [ ] Doc funcional `docs/documentation/...` si el operador descubre nueva capacidad.
 - [ ] Cross-ref: TASK-943 (proveedor data), TASK-944 (Finance toggle), TASK-946 (states), ISSUE-082 (parent incident).
