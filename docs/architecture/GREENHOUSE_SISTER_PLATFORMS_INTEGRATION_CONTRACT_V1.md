@@ -578,3 +578,44 @@ Antes de abrir una integracion nueva, confirmar:
 4. Todo bridge cross-platform requiere tenancy explicita.
 5. MCP y agentes son read-only por defecto.
 6. Cada plataforma activa del ecosistema debe tener anexo propio sobre este contrato marco.
+
+---
+
+## 15. Delta 2026-05-28 — Identity broker lane for sister-platform SSO
+
+El contrato marco agrega un carril interactivo de identidad para sister platforms: Greenhouse puede actuar como identity broker / authorization server para plataformas hermanas aprobadas.
+
+Este carril no convierte a una sister platform en modulo embebido del portal. La plataforma consumidora conserva su runtime y su sesion local; Greenhouse conserva el source of truth de identidad, access checks y auditoria.
+
+Este carril es aditivo. No autoriza cambios al SSO existente de Greenhouse, SCIM, Microsoft Entra provisioning, Graph sync, callbacks de sesion, cookies ni reglas globales de identidad.
+
+### 15.1 Contrato canonico
+
+- La sister platform redirige al usuario a Greenhouse con una solicitud authorization-code style.
+- Greenhouse autentica al usuario con sus providers existentes: Microsoft SSO, Google o credenciales.
+- Greenhouse emite un authorization code corto, one-time-use, bound a client, redirect URI y PKCE.
+- La sister platform intercambia el code server-to-server.
+- Greenhouse devuelve solo un payload minimo de identidad/acceso autorizado para esa platform.
+
+### 15.2 Prohibiciones
+
+- No compartir password, password hash, cookies Greenhouse, Microsoft access tokens, Microsoft refresh tokens ni upstream provider secrets.
+- No wildcard redirect URIs.
+- No usar este carril para acceso machine-to-machine; eso sigue usando tokens server-to-server scoped.
+- No generalizar a terceros arbitrarios sin una nueva decision de arquitectura.
+- No modificar SCIM, Entra provisioning, Graph sync, providers SSO existentes ni callback/session semantics del portal para implementar una sister-platform SSO.
+
+### 15.3 Estado V1
+
+Kortex es el primer consumer de este carril. La implementacion y el rollout viven en `docs/tasks/in-progress/TASK-948-greenhouse-identity-broker-kortex-sso.md`.
+
+El endpoint password-based `/api/integrations/v1/sister-platforms/identity` queda como bridge transicional/break-glass mientras se valida el SSO broker; su hardening sigue separado en TASK-413.
+
+### 15.4 Gate de no-regresion
+
+Antes de habilitar este carril en produccion, la task consumidora debe verificar:
+
+- login Greenhouse con Microsoft SSO sigue funcionando sin cambios visibles.
+- login Greenhouse con credenciales/otros providers existentes sigue funcionando.
+- SCIM/Entra provisioning contract sigue sano en modo read-only o smoke controlado.
+- no hay diff no documentado en provider config, callbacks, cookies, claims globales ni app registration.

@@ -91,6 +91,11 @@ import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
   getIdentityGovernancePendingApprovalOverdueSignal
 } from './queries/identity-governance-signals'
+import {
+  getSisterPlatformOAuthExchangeFailureRateSignal,
+  getSisterPlatformOAuthRedirectRejectedSignal,
+  getSisterPlatformOAuthStaleClientConfigSignal
+} from './queries/sister-platform-oauth-signals'
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
@@ -595,6 +600,7 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   identityGovernance?: ReliabilitySignal[] | null
+  sisterPlatformOAuth?: ReliabilitySignal[] | null
 
   /**
    * TASK-611 Slice 5 — Organization Workspace projection signals (2):
@@ -860,6 +866,9 @@ export const buildReliabilityOverview = (
     ...(sources.workforceRoleTitle ?? []),
     // TASK-839 — Admin Center entitlement governance signals (2).
     ...(sources.identityGovernance ?? []),
+    // TASK-948 — Sister-platform OAuth broker signals (exchange failures,
+    // redirect rejects, stale client config). Roll up bajo identity.
+    ...(sources.sisterPlatformOAuth ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
     // TASK-872 Slice 6 — SCIM Internal Collaborator + workforce intake signals (6).
@@ -1274,6 +1283,19 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-948 — Sister-platform OAuth broker signals. Estos readers se basan
+  // en el audit log append-only del broker; no leen secretos ni tokens raw.
+  const sisterPlatformOAuth =
+    preloadedSources.sisterPlatformOAuth !== undefined
+      ? preloadedSources.sisterPlatformOAuth
+      : await Promise.all([
+          getSisterPlatformOAuthExchangeFailureRateSignal().catch(() => null),
+          getSisterPlatformOAuthRedirectRejectedSignal().catch(() => null),
+          getSisterPlatformOAuthStaleClientConfigSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-611 Slice 5 — Organization Workspace projection signals (2 readers en
   // paralelo). Cada uno degrada honestamente a `unknown` si su query/cómputo falla.
   // Roll up bajo moduleKey 'identity'.
@@ -1596,6 +1618,7 @@ export const getReliabilityOverview = async (
     identityLegalProfile,
     workforceRoleTitle,
     identityGovernance,
+    sisterPlatformOAuth,
     workspaceProjection,
     scimWorkforce,
     entraWebhookSubscriptionHealth,

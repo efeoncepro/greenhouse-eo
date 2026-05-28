@@ -332,6 +332,8 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     apis: [
       { path: '/api/my/legal-profile', label: 'Self-service legal profile' },
       { path: '/api/auth/health', label: 'Auth readiness' },
+      { path: '/api/auth/sister-platforms/authorize', label: 'Sister-platform OAuth authorize' },
+      { path: '/api/integrations/v1/sister-platforms/oauth/token', label: 'Sister-platform OAuth token exchange' },
       { path: '/api/hr/workforce/role-title-drift', label: 'Role title drift queue' }
     ],
     dependencies: [
@@ -350,8 +352,11 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     filesOwned: [
       'src/lib/person-legal-profile/**',
       'src/lib/auth/**',
+      'src/lib/sister-platforms/oauth-broker.ts',
       'src/lib/entra/**',
       'src/lib/workforce/role-title/**',
+      'src/app/api/auth/sister-platforms/**',
+      'src/app/api/integrations/v1/sister-platforms/oauth/**',
       'src/app/api/my/legal-profile/**',
       'src/app/api/hr/people/**/legal-profile/**',
       'src/app/api/hr/workforce/**',

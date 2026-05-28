@@ -3083,6 +3083,34 @@ export interface GreenhouseCoreServiceSlaDefinitions {
   warning_threshold: Numeric | null;
 }
 
+export interface GreenhouseCoreSisterPlatformAuthorizationCodes {
+  code_challenge: string;
+  code_challenge_method: Generated<string>;
+  code_hash: string;
+  code_prefix: string;
+  consume_failure_count: Generated<number>;
+  consumed_at: Timestamp | null;
+  consumed_by_consumer_id: string | null;
+  created_at: Generated<Timestamp>;
+  expires_at: Timestamp;
+  hash_algorithm: Generated<string>;
+  identity_profile_id: string | null;
+  ip_hash: string | null;
+  last_failure_at: Timestamp | null;
+  last_failure_code: string | null;
+  metadata_json: Generated<Json>;
+  nonce_hash: string;
+  redirect_uri: string;
+  requested_scopes: string[];
+  sister_platform_authorization_code_id: string;
+  sister_platform_consumer_id: string;
+  sister_platform_oauth_client_id: string;
+  state_hash: string;
+  updated_at: Generated<Timestamp>;
+  user_agent_hash: string | null;
+  user_id: string;
+}
+
 export interface GreenhouseCoreSisterPlatformBindings {
   activated_at: Timestamp | null;
   activated_by_user_id: string | null;
@@ -3135,6 +3163,69 @@ export interface GreenhouseCoreSisterPlatformConsumers {
   suspended_by_user_id: string | null;
   token_hash: string;
   token_prefix: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreSisterPlatformOauthAccessTokens {
+  created_at: Generated<Timestamp>;
+  expires_at: Timestamp;
+  hash_algorithm: Generated<string>;
+  identity_profile_id: string | null;
+  last_used_at: Timestamp | null;
+  metadata_json: Generated<Json>;
+  revoked_at: Timestamp | null;
+  scopes: string[];
+  sister_platform_authorization_code_id: string | null;
+  sister_platform_consumer_id: string;
+  sister_platform_oauth_access_token_id: string;
+  sister_platform_oauth_client_id: string;
+  token_hash: string;
+  token_prefix: string;
+  updated_at: Generated<Timestamp>;
+  user_id: string;
+}
+
+export interface GreenhouseCoreSisterPlatformOauthAuditLog {
+  client_id: string | null;
+  created_at: Generated<Timestamp>;
+  duration_ms: Generated<number>;
+  error_code: string | null;
+  event_type: string;
+  identity_profile_id: string | null;
+  ip_hash: string | null;
+  metadata_json: Generated<Json>;
+  outcome: string;
+  redirect_uri: string | null;
+  requested_scopes: string[] | null;
+  response_status: number | null;
+  sister_platform_authorization_code_id: string | null;
+  sister_platform_consumer_id: string | null;
+  sister_platform_oauth_access_token_id: string | null;
+  sister_platform_oauth_audit_log_id: string;
+  sister_platform_oauth_client_id: string | null;
+  user_agent_hash: string | null;
+  user_id: string | null;
+}
+
+export interface GreenhouseCoreSisterPlatformOauthClients {
+  access_token_ttl_seconds: Generated<number>;
+  allowed_scopes: Generated<string[]>;
+  client_id: string;
+  client_name: string;
+  client_status: Generated<string>;
+  code_ttl_seconds: Generated<number>;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  deprecated_at: Timestamp | null;
+  deprecated_by_user_id: string | null;
+  issue_identity_inline: Generated<boolean>;
+  metadata_json: Generated<Json>;
+  redirect_uris: string[];
+  require_pkce: Generated<boolean>;
+  sister_platform_consumer_id: string;
+  sister_platform_oauth_client_id: string;
+  suspended_at: Timestamp | null;
+  suspended_by_user_id: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -9364,8 +9455,12 @@ export interface DB {
   "greenhouse_core.service_skill_requirements": GreenhouseCoreServiceSkillRequirements;
   "greenhouse_core.service_sla_definitions": GreenhouseCoreServiceSlaDefinitions;
   "greenhouse_core.services": GreenhouseCoreServices;
+  "greenhouse_core.sister_platform_authorization_codes": GreenhouseCoreSisterPlatformAuthorizationCodes;
   "greenhouse_core.sister_platform_bindings": GreenhouseCoreSisterPlatformBindings;
   "greenhouse_core.sister_platform_consumers": GreenhouseCoreSisterPlatformConsumers;
+  "greenhouse_core.sister_platform_oauth_access_tokens": GreenhouseCoreSisterPlatformOauthAccessTokens;
+  "greenhouse_core.sister_platform_oauth_audit_log": GreenhouseCoreSisterPlatformOauthAuditLog;
+  "greenhouse_core.sister_platform_oauth_clients": GreenhouseCoreSisterPlatformOauthClients;
   "greenhouse_core.sister_platform_request_logs": GreenhouseCoreSisterPlatformRequestLogs;
   "greenhouse_core.skill_catalog": GreenhouseCoreSkillCatalog;
   "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
