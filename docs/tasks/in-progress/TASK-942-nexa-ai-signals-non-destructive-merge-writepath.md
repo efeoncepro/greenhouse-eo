@@ -37,6 +37,17 @@ TASK-941 cerró el trigger (timestamp), el falso-sano (invariante), la recurrenc
 
 Esto **reduce** el blast radius (sin tocar el read path, sin generation-stamp, sin GC) y es más robusto Y más simple (no-bandaid). El título/slug de la task se mantiene por estabilidad de tracking, pero el approach es gate+track, no MERGE.
 
+## Progress 2026-05-27 (develop, sin branch)
+
+- ✅ Recalibración pre-execution (`99e29d0b`) — MERGE → gate+track (set volátil).
+- ✅ **Slice 1** (`c72565dc`) — freshness gate en `materializeAiSignals` (skip-don't-delete, flag-gated default OFF, reusa primitiva TASK-900). **Core de TASK-942 entregado.**
+- ✅ ADR delta en `GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md` — invariante canonizado: sets estables → MERGE; sets volátiles → freshness gate + full-replace.
+- 🚫 **Slice 2 (PG tracking) reconsiderado-out** — el tracking del orchestrator está acoplado a `useMerge` (los 5 metrics materializers NO trackean en legacy DELETE+INSERT). ai_signals (no-merge) trackear divergiría del patrón. La observabilidad del skip = el warning Sentry del gate (`ico_ai_signals_skipped_safety`), consistente. NO migration, NO extend enum.
+
+**Activación**: el gate es dormant (flag `ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED` default OFF, compartido con metrics). ai_signals queda protegido cuando ese flag se active en el rollout de TASK-900. TASK-942 entrega el **wiring**; la activación es decisión de rollout compartida.
+
+**Cierre pendiente**: full gate (build+test), changelog, mover a complete.
+
 ## Architecture Alignment
 
 Revisar y respetar:

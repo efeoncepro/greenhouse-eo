@@ -225,3 +225,15 @@ Diseño + implementación shipped:
 - Slice 7 (esta ADR + CLAUDE.md hard rule)
 
 ICO test suite: 20 archivos / 141 tests verde. Cero regresión cross-file. Defaults flags OFF garantizan zero behavioral change post-merge.
+
+### Delta 2026-05-27 — TASK-942: extensión del freshness gate a `ai_signals` (set volátil)
+
+El write path de Nexa AI signals (`materialize-ai-signals.ts`) era el path ICO que quedó fuera del hardening TASK-900 (ISSUE-082). TASK-942 lo extiende con una **decisión arquitectónica deliberada que difiere del patrón `metrics_by_*`**:
+
+- **Freshness gate SÍ** (reuso de `runUpstreamFreshnessGate` + `isFreshnessGateEnabled`, flag compartido): `materializeAiSignals` skipea sin borrar cuando el upstream (bridge Notion coverage) está degradado. Cierra el wipe-on-degraded de raíz. Flag default OFF → dormant hasta la activación de rollout compartida con los metrics materializers.
+- **MERGE NO** (recalibración del approach pre-decidido): `ai_signals` es un set **VOLÁTIL** (anomalías aparecen/desaparecen por corrida). Aun con `signal_id` determinístico (`stableAiId`), MERGE-sin-delete dejaría STALE las señales que desaparecen → forzaría generation-stamp + latest-gen-reader + GC (complejidad que resuelve un problema que el propio MERGE introduce). Para un set volátil, `DELETE+INSERT` (full replace) es la semántica correcta. El gate es lo que faltaba, no el MERGE.
+- **PG tracking (`ico_materialization_runs`) NO**: el tracking del orchestrator está acoplado a `useMerge` (los 5 metrics materializers NO trackean en modo legacy DELETE+INSERT). Como `ai_signals` no usa merge, no trackea por la misma razón — sería el único divergiendo. La observabilidad del skip de ai_signals es el `captureWithDomain('delivery', warning, source='ico_ai_signals_skipped_safety')` del gate (Sentry-visible), consistente con el legacy mode de los metrics materializers.
+
+**Invariante canonizado**: el patrón MERGE+tracking de TASK-900 aplica a sets **ESTABLES** (`metrics_by_*`). Para sets **VOLÁTILES** (ai_signals y futuros downstream de anomalías/eventos), la protección no-destructiva canonical es **freshness gate + full-replace** (NO MERGE). El gate skip-don't-delete es la primitiva compartida; la semántica de replace se elige según la estabilidad del set.
+
+Shipped: TASK-942 Slice 1 (gate wiring + recalibración). MERGE/generation-stamp/PG-tracking reconsiderados-out con rationale. Cross-ref: ISSUE-082, TASK-941 (incident remediation).
