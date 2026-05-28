@@ -298,6 +298,15 @@ export const readAgencyAiLlmSummary = async (
   const totalsRow = totalsRows[0] ?? {}
   const latestRunRow = latestRunRows[0]
 
+  // TASK-945 — enriquece recentEnrichments con lifecycle (mismo pattern Member/Space).
+  // mapSummaryItem ya incluye signalId via String(row.signal_id), por lo que el
+  // helper canonical readNexaSignalLifecycles encuentra los signal_ids.
+  const recentEnrichments = await enrichInsightItemsWithLifecycle(
+    recentRows.map(mapSummaryItem),
+    periodYear,
+    periodMonth
+  )
+
   return {
     totals: {
       total: Number(totalsRow.total ?? 0),
@@ -316,7 +325,7 @@ export const readAgencyAiLlmSummary = async (
           signalsFailed: Number(latestRunRow.signals_failed ?? 0)
         }
       : null,
-    recentEnrichments: recentRows.map(mapSummaryItem),
+    recentEnrichments,
     timeline: timelineItems,
     lastProcessedAt: toText(totalsRow.last_processed_at)
   }

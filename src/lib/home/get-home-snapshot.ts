@@ -3,6 +3,7 @@ import 'server-only'
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
 import { readAgencyAiLlmSummary, readTopAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
+import type { NexaSignalLifecycleStatus, NexaSignalObservation } from '@/lib/ico-engine/ai/llm-types'
 import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { HomeSnapshot, HomeNexaInsightItem, ModuleCard, PendingTask } from '@/types/home'
@@ -44,6 +45,9 @@ const mapHomeInsight = (row: {
   rootCauseNarrative: string | null
   recommendedAction: string | null
   processedAt: string
+  // TASK-945 — lifecycle fields propagated from readTopAiLlmEnrichments enrichment
+  lifecycle?: NexaSignalObservation[]
+  lifecycleStatus?: NexaSignalLifecycleStatus
 }): HomeNexaInsightItem => ({
   id: row.enrichmentId,
   signalType: row.signalType,
@@ -52,7 +56,9 @@ const mapHomeInsight = (row: {
   explanation: row.explanationSummary,
   rootCauseNarrative: row.rootCauseNarrative,
   recommendedAction: row.recommendedAction,
-  processedAt: row.processedAt
+  processedAt: row.processedAt,
+  lifecycle: row.lifecycle,
+  lifecycleStatus: row.lifecycleStatus
 })
 
 const getHomeCurrentPeriod = () => {

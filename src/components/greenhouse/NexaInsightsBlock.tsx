@@ -27,6 +27,11 @@ import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRoot
 import NexaInsightsTimeline, {
   type NexaTimelineItem
 } from '@/components/greenhouse/NexaInsightsTimeline'
+import NexaSeveritySparkline from '@/components/greenhouse/NexaSeveritySparkline'
+import type {
+  NexaSignalLifecycleStatus,
+  NexaSignalObservation
+} from '@/lib/ico-engine/ai/llm-types'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ─── Public Types ──────────────────────────────────────────────────────────
@@ -39,6 +44,13 @@ export type NexaInsightItem = {
   explanation: string | null
   rootCauseNarrative: string | null
   recommendedAction: string | null
+  /** TASK-945 — lifecycle observations (signal evolution intra-period). Optional
+   * for backward-compat: consumers that don't pass it degrade gracefully (sin
+   * sparkline). Mostrar sparkline requiere length >= 2. */
+  lifecycle?: NexaSignalObservation[]
+  /** TASK-945 — lifecycle status derived server-side. When 'resolved', el
+   * header del InsightCard muestra badge "Resuelta hace X". */
+  lifecycleStatus?: NexaSignalLifecycleStatus
 }
 
 type NexaInsightsViewMode = 'recent' | 'timeline'
@@ -101,6 +113,12 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
   const severityColor = GH_NEXA.severity_color[item.severity ?? ''] ?? 'secondary'
   const metricName = getMetricDisplayName(item.metricId)
 
+  // TASK-945 — lifecycle gating: sparkline solo si >= 2 observations.
+  // resolved badge solo si lifecycleStatus === 'resolved'.
+  const lifecycleObservations = item.lifecycle ?? []
+  const showSparkline = lifecycleObservations.length >= 2
+  const isResolved = item.lifecycleStatus === 'resolved'
+
   const content = (
     <Box
       sx={{
@@ -112,8 +130,13 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
       }}
     >
       <Stack spacing={1}>
-        {/* Header: signal type + metric */}
-        <Stack direction='row' spacing={1} alignItems='center'>
+        {/* Header: signal type + metric + TASK-945 sparkline + resolved badge */}
+        <Stack
+          direction='row'
+          spacing={1}
+          alignItems='center'
+          sx={{ flexWrap: 'wrap', rowGap: 0.5 }}
+        >
           <CustomChip
             round='true'
             size='small'
@@ -125,6 +148,34 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
           <Typography variant='subtitle2' sx={{ color: theme => theme.palette.customColors.midnight }}>
             {metricName}
           </Typography>
+          {showSparkline && (
+            <Box sx={{ display: { xs: 'none', sm: 'inline-flex' } }}>
+              <NexaSeveritySparkline observations={lifecycleObservations} />
+            </Box>
+          )}
+          {showSparkline && (
+            <Box sx={{ display: { xs: 'inline-flex', sm: 'none' } }}>
+              <NexaSeveritySparkline observations={lifecycleObservations} compact />
+            </Box>
+          )}
+          {isResolved && (
+            <CustomChip
+              round='true'
+              size='small'
+              variant='tonal'
+              color='success'
+              label={GH_NEXA.lifecycle_resolved_badge}
+              icon={<i className='tabler-circle-check' style={{ fontSize: 12 }} aria-hidden='true' />}
+              sx={{
+                height: 20,
+                fontSize: '0.64rem',
+                fontWeight: 600,
+                ml: 'auto',
+                '& .MuiChip-icon': { ml: 0.5 }
+              }}
+              aria-label={GH_NEXA.lifecycle_status_resolved}
+            />
+          )}
         </Stack>
 
         {/* Explanation */}

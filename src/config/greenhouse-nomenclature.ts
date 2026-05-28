@@ -329,7 +329,26 @@ export const GH_NEXA = {
 
   // Empty state
   empty_title: 'Aún no hay señales analizadas',
-  empty_description: 'Nexa analiza automáticamente las señales del ICO Engine después de cada sincronización. Las señales aparecerán aquí cuando estén listas.'
+  empty_description: 'Nexa analiza automáticamente las señales del ICO Engine después de cada sincronización. Las señales aparecerán aquí cuando estén listas.',
+
+  // ─── TASK-945 — Signal lifecycle (sparkline + resolved badge) ────────────
+  severity_label: {
+    critical: 'Crítico',
+    warning: 'Atención',
+    info: 'Informativo',
+    ok: 'Óptimo'
+  } as Record<string, string>,
+  severity_label_unknown: 'Sin clasificar',
+
+  lifecycle_status_active: 'Activa',
+  lifecycle_status_resolved: 'Resuelta',
+  lifecycle_resolved_badge: 'Resuelta',
+  lifecycle_resolved_relative: (when: string) => `Resuelta hace ${when}`,
+  lifecycle_sparkline_series_label: 'Severidad',
+  lifecycle_sparkline_aria_label: (count: number, lastSeverity: string) =>
+    `Evolución de severidad: ${count} ${count === 1 ? 'observación' : 'observaciones'}. Última: ${lastSeverity}.`,
+  lifecycle_observations_count: (n: number) =>
+    `${n} ${n === 1 ? 'observación' : 'observaciones'} este período`
 } as const
 
 /* ─────────────────── Skills & Certifications ─────────────────── */

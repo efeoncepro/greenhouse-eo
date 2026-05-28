@@ -1,4 +1,5 @@
 import type { GreenhouseEntitlementModule } from '@/config/entitlements-catalog'
+import type { NexaSignalLifecycleStatus, NexaSignalObservation } from '@/lib/ico-engine/ai/llm-types'
 import type { PortalHomePolicyKey } from '@/lib/tenant/resolve-portal-home-path'
 
 export interface ModuleCard {
@@ -38,6 +39,10 @@ export interface HomeNexaInsightItem {
   rootCauseNarrative: string | null
   recommendedAction: string | null
   processedAt: string
+  /** TASK-945 — lifecycle observations (sparkline). Opcional. */
+  lifecycle?: NexaSignalObservation[]
+  /** TASK-945 — derivado server-side por helper canonical. Opcional. */
+  lifecycleStatus?: NexaSignalLifecycleStatus
 }
 
 export interface HomeNexaInsightsPayload {

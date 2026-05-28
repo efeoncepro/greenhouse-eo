@@ -86,6 +86,10 @@ export interface AgencyAiLlmSummaryItem {
   recommendedAction: string | null
   confidence: number | null
   processedAt: string
+  /** TASK-945 — lifecycle observations (forward declared abajo). Opcional. */
+  lifecycle?: NexaSignalObservation[]
+  /** TASK-945 — derivado server-side. Opcional. */
+  lifecycleStatus?: NexaSignalLifecycleStatus
 }
 
 export interface AgencyAiLlmSummary {
