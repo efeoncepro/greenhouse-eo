@@ -17,6 +17,26 @@
 - GitHub Issue: `none`
 - Resuelve: `ISSUE-082`
 
+## Progress 2026-05-27 (sesión 1 — develop, sin branch)
+
+**6 slices funcionales shippeados a develop (7 commits), cada uno tsc+lint+tests verdes + pre-push verde:**
+
+- ✅ **Slice 1** (`63044239`) — timestamp fix STRING+CAST en `materialize-ai-signals.ts` (ai_signals.generated_at, ai_prediction_log.predicted_at/actual_recorded_at) + writer enrichments/runs. **Detiene el NULL going-forward.**
+- ✅ **Slice 2** (`1629b653`) — invariante anti-falso-sano en ICO worker: raw>0 && mapeadas==0 → run `failed` + captureWithDomain. Finance NO recibe guard (mapRowToSignal nunca descarta — decisión documentada).
+- ✅ **Slice 8** (`c790457a`) — lint rule `greenhouse/no-bq-struct-string-timestamp` (error), acotada a ARRAY<STRUCT> tras verificar 3 falsos positivos (schema CREATE TABLE + params escalares = seguros). Confirmó que el bug class está contenido.
+- ✅ **Slice 5** (`983b3513`) — signal `nexa.insights.stale_with_eligible_signals` (cross-store BQ vs PG serving) + wiring en get-reliability-overview.
+- ✅ **Slice 7** (`915e92cb`) — Finance cron ancla en último período con economics + skip honesto. Verificado: Mayo benigno (abierto), NO backfill.
+- ✅ **Slice 4** (`8021f5ff`) — guard no-destructivo del serving PG + BQ enrichments (no wipe cuando signalsUnmappable).
+
+**Estado del bleeding: DETENIDO.** No más NULL (S1), no más falso-sano (S2), no más serving wipe (S4), recurrencia bloqueada (S8), detección activa (S5), finance honesto (S7).
+
+**Pendiente (sesión 2 — ameritan trabajo enfocado, NO rush):**
+
+- ⏳ **Slice 3** — non-destructive MERGE en el write path BQ (DELETE+INSERT → freshness gate + MERGE + tracking, patrón TASK-900). **Alto blast radius** (reescribe semántica core del materializer + maneja set-shrink con generation-stamp, toca read path). Defense-in-depth: el bleeding ya está detenido por S1/S2/S4; esto previene pérdida de data ante futuras degradaciones. Merece diseño cuidadoso + tests, no fin-de-sesión.
+- ⏳ **Slice 6** — backfill Mar/Abr/May. **Probablemente moot**: el cron diario re-materializa ai_signals con el fix S1 → generated_at poblado → self-heal sin script manual. Se reduce a verificación post-deploy. Gate de cualquier apply live.
+
+**Cierre pendiente:** `pnpm build` + `pnpm test` full (gate), live post-deploy (próximo cron self-heal + `bq COUNTIF(generated_at IS NULL)=0` + signal steady), docs (CLAUDE.md invariante, ADR delta, EVENT_CATALOG/RELIABILITY, changelog, ISSUE-082 → resolved). NO marcar complete hasta cerrar S3 + verificar live.
+
 ## Summary
 
 Cerrar el falso-sano de Nexa Insights (ICO AI signals + LLM enrichment + predictions, y Finance AI signals) atacando las **tres** causas verificadas en ISSUE-082: (1) serialización de timestamp ISO-string → NULL en BQ DML structs, (2) el patrón **DELETE+INSERT destructivo de período completo** que borra data buena cuando el escritor produce basura/vacío, y (3) runs marcados `succeeded` con 0 señales. La pieza central no es el bug de timestamp — es traer el path de AI signals bajo el patrón canónico de hardening **TASK-900** (freshness gate + MERGE sin delete destructivo + tracking + reliability signal) que hoy protege los materializadores de métricas pero **nunca se aplicó a este path**.
