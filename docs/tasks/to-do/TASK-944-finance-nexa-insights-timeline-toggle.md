@@ -1,5 +1,12 @@
 # TASK-944 — Finance Nexa Insights: habilitar timeline toggle
 
+## Delta 2026-05-28 — Composabilidad con TASK-947 detail page canonical
+
+- **Routing canonical aplicado**: el drill-in desde el Finance Nexa Insights bento usa `/nexa/insights/[id]` top-level (NO `/finance/insights/...`). Patrón canonical alias `/finance/insights/[id]` puede coexistir reusando el mismo shell `NexaInsightDetailView` (TASK-947) con dispatch por dominio (`subject.domain==='finance'` → helper sibling Finance Signal Engine). Decisión arch-architect + greenhouse-ico (2026-05-28).
+- **Drill key Finance**: `EO-FAIE-*` (Finance AI Enrichment ID, path separado canonical preservado — `finance_ai_signals`). El resolver del page detail dispatch por prefix incluye este caso.
+- **Pre-requisito TASK-947 V1 MVP**: necesita estar shipped antes para que el toggle Finance tenga target funcional. Sin TASK-947, el timeline toggle apunta a 404.
+- **NUEVO Depends on**: `TASK-947` (detail page canonical) — agregar a la sección Dependencies.
+
 ## Status
 
 - Lifecycle: `to-do`

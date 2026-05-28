@@ -1,5 +1,17 @@
 # TASK-449 — Nexa Insights Interaction Layer (Read / Pin / Dismiss / Share)
 
+## Delta 2026-05-28 — Routing canonical resuelto por TASK-947
+
+- **Drift TASK-696 → routing canonical resuelto**: el path `/agency/insights/<id>` que TASK-696 dejó sin materializar quedó canonizado en **TASK-947** como `/nexa/insights/[id]` top-level cross-domain (NO bajo `/agency/...`). Decisión arch-architect + greenhouse-ico 4+5-pillar (2026-05-28) + ADR canonical en `DECISIONS_INDEX.md`.
+- **Cambio TASK-449 scope**: las acciones de TASK-449 (Read / Pin / Dismiss / Share) viven AMBAS en cards (Home/Agency/Person 360/Space 360/Finance) Y en el detail page canonical `/nexa/insights/[id]`. El share button genera permalink anclado por **`enrichment_id`** explícito (`EO-AIE-*`) preservando semántica "esto vio el operador cuando capturó la URL"; cards default usan **`signal_id`** (`EO-AIS-*`) anchor estable append-only-aware (TASK-943).
+- **Capabilities granulares ortogonales** emergen post TASK-947 (que ship `nexa.insights.read` para lectura):
+  - `nexa.insights.mark_read` (action `update`, scope `own`)
+  - `nexa.insights.pin` (action `update`, scope `own`)
+  - `nexa.insights.share` (action `update`, scope `own`)
+  - `nexa.insights.dismiss` (action `update`, scope `own`)
+- **TASK-449 es V1.3 dependiente de TASK-947 V1 MVP** (page detail) — sin la page, share buttons no tienen target.
+- **NUEVO blocker**: TASK-947 (`to-do`). Re-clasificar TASK-449.1 como dependiente.
+
 ## Delta 2026-04-26
 
 - **Subsumida parcialmente por TASK-696** (Smart Home v2 Enterprise-grade redesign).

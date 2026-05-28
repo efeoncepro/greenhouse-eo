@@ -1,5 +1,13 @@
 # TASK-946 — Nexa Insights: honest degradation states (12 canonical UI states)
 
+## Delta 2026-05-28 — Canonizado en TASK-947 detail page + propaga a las 5 surfaces
+
+- **Primer adopter canonical**: el detail page `/nexa/insights/[id]` (TASK-947) **canoniza** los 12 UI states framework para Nexa Insights. Mapping explícito en TASK-947 Slice 3: `current`→`ready`, `superseded`→`partial`, `expired`→`empty-positive`, `not_found`→`notFound()`, `degraded`→`stale/degraded`, loader throws→`error`, in-flight→`loading`.
+- **Patrón canonical reusable**: una vez TASK-947 V1 ship, las 5 surfaces existentes (`NexaInsightsBlock` en Home/Agency/Person 360/Space 360/Finance) adoptan el mismo mapping. TASK-946 pasa de "diseñar 12 states" a "propagar el mapping canonical del detail page a las 5 surfaces".
+- **Desbloqueo cross-domain**: el framework canonical de honest-degradation cierra el último gap UX del falso-sano de ISSUE-082. Mientras TASK-941/942/943 cerraron el motor backend, TASK-946 + TASK-947 cierran el motor UX que evita que un operador vuelva a ver "Sin datos" cuando realmente debería ver "Pendiente" / "Anomalía resuelta" / "Versión histórica".
+- **Composabilidad**: TASK-944 + TASK-945 heredan el mapping (Finance toggle + lifecycle timeline reusan los mismos estados).
+- **NUEVO Depends on**: `TASK-947` (canonization first). TASK-946 = propagation phase post canonization.
+
 ## Status
 
 - Lifecycle: `to-do`

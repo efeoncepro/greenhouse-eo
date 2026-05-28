@@ -1,5 +1,14 @@
 # TASK-945 — Nexa Insights: signal lifecycle timeline + severity sparkline
 
+## Delta 2026-05-28 — Embedded en TASK-947 detail page canonical
+
+- **Surface canonical del timeline**: vive embebido dentro del detail page `/nexa/insights/[id]` (TASK-947) — NO como bento standalone. Decisión arch-architect + greenhouse-ico (2026-05-28): el timeline es el corazón del detail view; surfaces lista (Home/Agency bento) muestran sparkline mínimo y delegan la exploración temporal al detail page.
+- **Drill key canonical signal-anchored**: el timeline opera por `signal_id` (estable cross-period TASK-943 append-only) — permite navegar todas las generations históricas del mismo signal. URL canonical `/nexa/insights/EO-AIS-*` (NO enrichment_id, que es snapshot puntual).
+- **Time-travel canonical**: query param `?at=YYYY-MM-DD` o `?at=<generated_at>` permite anclar el timeline a un punto histórico específico. Esto convierte el detail page en superficie de análisis evolutivo que TASK-943 habilitó.
+- **Helper canonical reutilizado**: `readNexaInsightDrill(id, subject)` (TASK-947) retorna `lifecycleTimeline[]` en su discriminated union — zero new query, zero código nuevo de aggregation.
+- **8 estados UI canonical**: composables con los 12 UI states del detail page (TASK-946 framework heredado). Estados específicos del timeline: emerged / severity changed / severity stable / suppressed / resolved / superseded.
+- **NUEVO Depends on**: `TASK-947` (detail page V1 MVP + helper canonical). Timeline = V1.2 de TASK-947 roadmap.
+
 ## Status
 
 - Lifecycle: `to-do`
