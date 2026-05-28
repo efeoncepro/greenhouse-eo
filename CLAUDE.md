@@ -11,6 +11,14 @@ Greenhouse EO — portal operativo de Efeonce Group. Next.js 16 App Router + MUI
 - Patrón de lectura: **Postgres first, BigQuery fallback**
 - Schemas PostgreSQL activos: `greenhouse_core`, `greenhouse_serving`, `greenhouse_sync`, `greenhouse_payroll`, `greenhouse_finance`, `greenhouse_hr`, `greenhouse_crm`, `greenhouse_delivery`, `greenhouse_ai`
 
+### BigQuery DML Struct Timestamp Hard Rules (ISSUE-082 / TASK-941)
+
+- Nunca declarar un campo temporal como `TIMESTAMP`/`DATETIME`/`DATE` dentro de `types: { rows: [STRUCT] }` si el valor JS viene como ISO string. El cliente Node de BigQuery puede escribir NULL silenciosamente dentro de `ARRAY<STRUCT>`.
+- Patrón canónico: serializar con `toBigQueryStructTimestamp()` y declarar el campo como `STRING`; convertir en SQL con `TIMESTAMP(s.<col>)` en el `SELECT FROM UNNEST(@rows)`.
+- El lint rule `greenhouse/no-bq-struct-string-timestamp` queda en modo error. Si un writer necesita otro patrón, debe documentar el motivo y probar round-trip real.
+- Un run que ve data cruda elegible pero materializa 0 records nunca es `succeeded`: debe degradar/fallar con evidencia observable.
+- No ejecutar un DELETE destructivo de período antes de validar el payload reemplazo. Si no se puede validar, skip/degrade y preservar el último estado bueno.
+
 ### Payroll Operational Calendar
 
 - Calendario operativo canónico: `src/lib/calendar/operational-calendar.ts`
@@ -4213,6 +4221,42 @@ WHEN NOT MATCHED THEN INSERT (...) VALUES (...)
 - Migration: `migrations/20260518141020881_ico-materializer-tracking.sql`
 - Signal reader: `src/lib/reliability/queries/ico-materializer-skipped-safety.ts`
 - Wire-up: `src/lib/reliability/get-reliability-overview.ts` (`icoMaterializerSkippedSafety` source)
+
+### Nexa AI Signals append-only event log invariants (TASK-943, desde 2026-05-28)
+
+`ico_engine.ai_signals` y `ico_engine.ai_prediction_log` son **observaciones históricas event-sourced** (hermanas de `task_status_transitions` TASK-908, outbox events TASK-773, audit logs TASK-742) — NO estado mutable. Una anomalía detectada el 5 de mayo "Daniela OTD bajó 30%" sigue siendo verdad sobre el 5 de mayo aunque el 20 ya no se observe; full-replace destruye evidencia operativa irrecuperable. Para sprints de 15 días, la evolución intra-mes ES la señal de gestión.
+
+**Dicotomía canonical** (supersede el framing erróneo "estable vs volátil" del Delta TASK-942 2026-05-27 en la ADR — ver Delta 2026-05-28):
+
+| Tipo de dato | Patrón canonical |
+|---|---|
+| Estado mutable (`metrics_by_*.otd_pct`) | **MERGE upsert por key** (TASK-900) |
+| Observación histórica (`ai_signals`, `ai_prediction_log`, `task_status_transitions`, outbox, audit) | **Append-only event log** (TASK-943) |
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** ejecutar `DELETE FROM ai_signals` ni `DELETE FROM ai_prediction_log` (excepto cleanup operativo manual auditado con capability). Materializer canónico (`appendBigQuerySignalsForPeriod`, `appendPredictionLogs`) es INSERT-only.
+- **SIEMPRE** leer "qué señales aplican AHORA al período X" via la VIEW canonical `ai_signals_current` (latest-per-`signal_id`) — NO la raw `ai_signals`. Idem `ai_prediction_log_current` para predictions. Raw tables se leen SOLO cuando se quiere historia evolutiva intra-período o cuando se usa `FOR SYSTEM_TIME AS OF` (BQ time travel no funciona sobre VIEWs).
+- **SIEMPRE** el cron `/api/cron/ico-materialize` opera con `monthsBack=1` por default (solo período actual). Meses cerrados quedan inmutables. Operator override via `?monthsBack=N` (cap 1..6) para backfill manual auditado.
+- **ÚNICA excepción mutable** del contract append-only: `ai_prediction_log.actual_value` + `actual_recorded_at` (+ `error_pct` derivado) vía `hydratePredictionActuals`. Esta función es la ÚNICA fuente legítima de UPDATE sobre `ai_prediction_log`, guarded por `WHERE actual_value IS NULL` (no double-overwrite) + `period < currentPeriod` (no toca in-progress). NUNCA agregar campos al UPDATE ni quitar los guards.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'delivery', { tags: { source: 'ico_ai_*' } })` para rollup canonical en `/admin/operations`.
+- **NUNCA** consumers downstream (Person 360 narrative, Home Nexa Insights, Agency ICO `aiLlm.totals`, Finance Nexa Insights, reliability signals) leen raw `ai_signals` directo. Toda lectura pasa por:
+  - VIEW canonical `ai_signals_current` (default), o
+  - PG serving `greenhouse_serving.ico_ai_signals` (proyectado desde la VIEW por `icoAiSignalsProjection`), o
+  - PG history `greenhouse_serving.ico_ai_signal_enrichment_history` (append-only, narrativas enriquecidas — TASK-914).
+- **SIEMPRE** que emerja una entidad nueva en ICO cuyo dato responde a "qué se vio cuando" (no "cuál es el valor actual"), nacer como append-only event log + VIEW current. NO usar replace semantics. La pregunta correcta es semántica del dato, no si "el set parece volátil entre runs".
+
+**Signal de heartbeat canonical**: `nexa.insights.no_new_signals_in_24h` (kind=`lag`, severity warning >24h, error >48h, unknown sin signals, steady=ok). Reader `src/lib/reliability/queries/nexa-insights-no-new-signals.ts`. Cierra la pérdida de observabilidad implícita del DELETE+INSERT (un cron caído ya no "borra" la última corrida, queda silente).
+
+**Bug class fuente** (canonizado live 2026-05-28 ISSUE-082 RCA): el delta TASK-942 (2026-05-27) modeló `ai_signals` como "set volátil → full-replace canonical". El operador identificó el error de framing: las anomalías son observaciones temporales con valor histórico, no estado mutable. Rolling 3 meses con DELETE+INSERT era doble error (borra evidencia ya capturada + recomputa lo que ya no cambia). El delta TASK-942 queda supersedido por el delta TASK-943 (2026-05-28) en la ADR. Cross-ref: `BUG-CLASS-004` en `~/.claude/skills/greenhouse-ico/reference/bug-class-catalog.md`.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md` Delta 2026-05-28. Files canónicos:
+
+- Writer: `src/lib/ico-engine/ai/materialize-ai-signals.ts` (`appendBigQuerySignalsForPeriod` + `appendPredictionLogs` + `hydratePredictionActuals` única excepción mutable).
+- VIEW canonical: `src/lib/ico-engine/schema.ts` (`buildAiSignalsCurrentView`, `buildAiPredictionLogCurrentView`) — auto-provisioned por `ensureIcoEngineInfrastructure`.
+- Cron: `src/app/api/cron/ico-materialize/route.ts` (default `monthsBack=1`).
+- Consumers migrados (lectura via VIEW): `src/lib/reliability/queries/nexa-insights-freshness.ts`, `src/lib/sync/projections/ico-ai-signals.ts`, `src/lib/ico-engine/ai/llm-enrichment-worker.ts` (branch SYSTEM_TIME → raw, default → VIEW).
+- Heartbeat signal: `src/lib/reliability/queries/nexa-insights-no-new-signals.ts` + wire-up en `get-reliability-overview.ts`.
 
 Patrones fuente reusados: TASK-571/699/766/774 (VIEW + helper + reliability + lint), TASK-742 (defense in depth 7-layer), TASK-848 (state machine + tracking append-only), TASK-873 (capability granularity), TASK-720/768/777 (declarative config + lint rule pattern para futuros materializers).
 
