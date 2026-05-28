@@ -30,7 +30,7 @@
 
 **Estado del bleeding: DETENIDO.** No más NULL (S1), no más falso-sano (S2), no más serving wipe (S4), recurrencia bloqueada (S8), detección activa (S5), finance honesto (S7).
 
-**Slice 3 EXTRAÍDO → `TASK-942`** (non-destructive MERGE write-path, defense-in-depth, alto blast radius — amerita task propia con diseño dedicado). NO bloquea la resolución del incidente: el bleeding ya está detenido por S1/S2/S4.
+**Slice 3 EXTRAÍDO → `TASK-942`** (non-destructive write-path, defense-in-depth). ✅ **TASK-942 COMPLETE 2026-05-27**: recalibrado de MERGE a freshness gate + full-replace (ai_signals es set volátil); gate dormant hasta activar flag compartido `ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED`. NO bloqueaba la resolución del incidente: el bleeding ya estaba detenido por S1/S2/S4.
 
 **Cierre de TASK-941 pendiente (no requiere S3):**
 

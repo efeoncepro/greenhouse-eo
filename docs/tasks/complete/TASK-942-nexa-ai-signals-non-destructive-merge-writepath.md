@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Complete 2026-05-27 (gate wiring; MERGE/tracking reconsiderados-out con rationale)`
 - Rank: `TBD`
 - Domain: `ico|data|reliability`
 - Blocked by: `none` (TASK-941 Slices 1/2/4 ya en develop; este es defense-in-depth encima)

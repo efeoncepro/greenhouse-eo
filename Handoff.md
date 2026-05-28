@@ -1,5 +1,7 @@
 # Sesion 2026-05-27 — Release a producción develop→main — ✅ RELEASED
 
+> **Sesión Nexa Insights (2026-05-27, posterior al release — ISSUE-082):** falso-sano de ICO AI signals (timestamps ISO-string → NULL en BQ DML structs → runs `succeeded` con 0 señales). **TASK-941** in-progress: 6 slices shipped en develop (timestamp STRING+CAST, invariante anti-falso-sano, lint rule, signal freshness, finance scoping, guard serving) — bleeding detenido; cierre pendiente de verificación live post-deploy (cron self-heal) + mover ISSUE-082 → resolved. **TASK-942** ✅ complete: freshness gate en write path de ai_signals (recalibrado MERGE→gate+full-replace por set volátil; PG tracking reconsiderado-out); gate de cierre full test 5427/0 + build OK; dormant hasta activar flag compartido `ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED` (rollout TASK-900). Todo en `develop` sin branch.
+
 Pase a producción de todo el develop acumulado (~3 días desde el release 2026-05-24). Path canónico vía orchestrator, sin incidentes.
 
 **SHA:** merge `82f307450b528931dd9158b111b087136e1b889b` (mirror exacto de develop, `--no-ff`). **Manifest:** `82f307450b52-ce288dee-a49b-4d7a-baa0-d66cfbb5bae2` → `released`. **Orchestrator run:** [26528213915](https://github.com/efeoncepro/greenhouse-eo/actions/runs/26528213915) (`success`, ~10 min, started 17:43 / completed 17:53 UTC).
