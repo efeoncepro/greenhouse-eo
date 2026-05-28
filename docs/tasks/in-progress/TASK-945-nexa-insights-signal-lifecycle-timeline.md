@@ -11,17 +11,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno (refinado con skills state-design + dataviz-design + greenhouse-ux)`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `ui|ico`
-- Blocked by: `TASK-943` (event log append-only — sin él, no hay lifecycle real)
-- Branch: `task/TASK-945-nexa-insights-signal-lifecycle-timeline`
+- Blocked by: `none` (TASK-943 ✅ COMPLETE 2026-05-28, event log live)
+- Branch: `develop` (operador-decision, sin branch dedicada)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 - Compose con: `TASK-944` (Finance toggle) + `TASK-946` (states honest degradation)

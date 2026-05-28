@@ -123,6 +123,27 @@ export interface OrganizationAiLlmEnrichmentItem {
   processedAt: string
 }
 
+// ─── TASK-945 — Signal lifecycle canonical types ───────────────────────────
+//
+// Aprovecha el event log append-only de TASK-943 (BQ `ai_signals` raw) para
+// exponer la evolucion intra-periodo de cada anomalia. El lifecycle es la
+// secuencia de observaciones del mismo `signal_id` ordenada cronologicamente.
+//
+// - `NexaSignalObservation` = una observacion individual (point del cron diario
+//   sobre un signal_id especifico en el periodo).
+// - `NexaSignalLifecycleStatus` = estado del lifecycle derivado server-side
+//   en el helper canonical (`active` cuando el ultimo cron run todavia ve la
+//   anomalia; `resolved` cuando la ultima observacion del signal es anterior
+//   al ultimo cron run del periodo, semanticamente "ya no se ve").
+
+export interface NexaSignalObservation {
+  generatedAt: string
+  severity: string | null
+  currentValue: number | null
+}
+
+export type NexaSignalLifecycleStatus = 'active' | 'resolved'
+
 export interface TopAiLlmEnrichmentItem {
   enrichmentId: string
   signalId: string
@@ -136,6 +157,19 @@ export interface TopAiLlmEnrichmentItem {
   recommendedAction: string | null
   confidence: number | null
   processedAt: string
+  /**
+   * TASK-945 — Lifecycle del signal (secuencia de observaciones cronologica
+   * ASC). Opcional: cuando el surface NO carga lifecycle data o cuando el
+   * signal tiene < 2 observaciones, este campo viene undefined o array vacio
+   * y los consumers UI lo tratan como honest degradation (sparkline NO render).
+   */
+  lifecycle?: NexaSignalObservation[]
+  /**
+   * TASK-945 — Estado del lifecycle derivado server-side. `active` por default;
+   * `resolved` cuando el helper determina que el signal ya no se observa en el
+   * ultimo cron run del periodo (consumer UI muestra badge "Resuelta hace X").
+   */
+  lifecycleStatus?: NexaSignalLifecycleStatus
 }
 
 export interface MemberNexaInsightItem {
@@ -147,6 +181,15 @@ export interface MemberNexaInsightItem {
   rootCauseNarrative: string | null
   recommendedAction: string | null
   processedAt: string
+  /** TASK-945 — opcional, ver TopAiLlmEnrichmentItem.lifecycle */
+  lifecycle?: NexaSignalObservation[]
+  /** TASK-945 — opcional, ver TopAiLlmEnrichmentItem.lifecycleStatus */
+  lifecycleStatus?: NexaSignalLifecycleStatus
+  /** TASK-945 — signal_id canonical (estable cross-period TASK-943 append-only).
+   * Necesario para que el surface UI pueda navegar al detail page TASK-947 V1.2
+   * via `/nexa/insights/EO-AIS-*` cuando shippee. Backward-compat: undefined
+   * cuando reader no lo expone todavia. */
+  signalId?: string
 }
 
 export type NexaSummarySource = 'active' | 'historical' | 'empty'
@@ -173,6 +216,12 @@ export interface SpaceNexaInsightItem {
   rootCauseNarrative: string | null
   recommendedAction: string | null
   processedAt: string
+  /** TASK-945 — opcional, ver TopAiLlmEnrichmentItem.lifecycle */
+  lifecycle?: NexaSignalObservation[]
+  /** TASK-945 — opcional, ver TopAiLlmEnrichmentItem.lifecycleStatus */
+  lifecycleStatus?: NexaSignalLifecycleStatus
+  /** TASK-945 — signal_id canonical (mismo patron MemberNexaInsightItem) */
+  signalId?: string
 }
 
 export interface SpaceNexaInsightsPayload {
