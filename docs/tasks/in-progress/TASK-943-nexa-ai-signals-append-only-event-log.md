@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio-Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `ico|data|reliability`
 - Blocked by: `none` (TASK-941 ya entregó timestamp fix + invariante + guard serving; TASK-942 entregó freshness gate)
-- Branch: `task/TASK-943-nexa-ai-signals-append-only-event-log`
+- Branch: `develop` (operador pidió quedarse en develop, sin branch dedicada)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 - **Rectifica**: `TASK-942` (su ADR delta canonizó MAL "volátiles → full-replace"; este task lo supersede)
