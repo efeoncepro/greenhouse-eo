@@ -48,6 +48,7 @@ import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
 import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
 import { getNexaInsightsFreshnessSignal } from './queries/nexa-insights-freshness'
+import { getNexaInsightsNoNewSignalsSignal } from './queries/nexa-insights-no-new-signals'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
 import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
 import {
@@ -425,6 +426,16 @@ interface ReliabilityOverviewSources {
   nexaInsightsFreshness?: ReliabilitySignal | null
 
   /**
+   * TASK-943 Slice 5 — Nexa Insights heartbeat (`no_new_signals_in_24h`).
+   * Post-TASK-943 el materializer es append-only; un cron caído ya no
+   * "borra" la última corrida — se vuelve silente. Este signal cierra la
+   * pérdida de observabilidad que daba DELETE+INSERT, midiendo edad de la
+   * última `generated_at` en `ai_signals_current`. Severity warning >24h,
+   * error >48h, unknown si sin signals. Subsystem rollup 'delivery'.
+   */
+  nexaInsightsNoNewSignals?: ReliabilitySignal | null
+
+  /**
    * TASK-908 Slice 3.5 — Notion correction transitions source availability.
    * % de tareas completadas en 90d sin rows en `task_status_transitions`.
    * Pre-TASK-908b deployment: severity=error 100% esperado. Post-deployment +
@@ -795,6 +806,11 @@ export const buildReliabilityOverview = (
     // Notion→member regresión silente). Steady=0.
     ...(sources.icoMaterializerSkippedSafety ? [sources.icoMaterializerSkippedSafety] : []),
     ...(sources.nexaInsightsFreshness ? [sources.nexaInsightsFreshness] : []),
+    // TASK-943 Slice 5 — Nexa Insights heartbeat. Post append-only el cron caído
+    // ya no "borra" la última corrida; este signal mide edad de la última
+    // generation. Complementario a nexaInsightsFreshness (que cruza BQ vs PG
+    // serving) + icoMaterializerSkippedSafety (que detecta gate active).
+    ...(sources.nexaInsightsNoNewSignals ? [sources.nexaInsightsNoNewSignals] : []),
     // TASK-908 Slice 3.5 — Notion correction transitions source availability.
     // Pre-TASK-908b deployment: 100% unavailable esperado (tabla vacía).
     // Post-deployment + backfill: < 10% steady state. Visibiliza coverage del
@@ -1389,6 +1405,15 @@ export const getReliabilityOverview = async (
       ? preloadedSources.nexaInsightsFreshness
       : await getNexaInsightsFreshnessSignal().catch(() => null)
 
+  // TASK-943 Slice 5 — Nexa Insights heartbeat (no_new_signals_in_24h).
+  // BQ-only: MAX(generated_at) FROM ai_signals_current vs NOW(). Cierra la
+  // pérdida de observabilidad post append-only (un cron caído ya no "borra"
+  // la última corrida → silente sin este signal). Degrada honestamente.
+  const nexaInsightsNoNewSignals =
+    preloadedSources.nexaInsightsNoNewSignals !== undefined
+      ? preloadedSources.nexaInsightsNoNewSignals
+      : await getNexaInsightsNoNewSignalsSignal().catch(() => null)
+
   // TASK-908 Slice 3.5 — Notion correction transitions source availability.
   // Single reader; LEFT JOIN tasks completadas vs task_status_transitions.
   // Degrada honestamente a `unknown` si la query falla.
@@ -1588,6 +1613,7 @@ export const getReliabilityOverview = async (
     productionRelease,
     icoMaterializerSkippedSafety,
     nexaInsightsFreshness,
+    nexaInsightsNoNewSignals,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsOtdClassifierParity,
     notionMetricsDemo,
