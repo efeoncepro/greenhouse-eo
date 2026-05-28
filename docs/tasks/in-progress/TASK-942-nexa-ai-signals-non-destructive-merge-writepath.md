@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -12,7 +12,7 @@
 - Rank: `TBD`
 - Domain: `ico|data|reliability`
 - Blocked by: `none` (TASK-941 Slices 1/2/4 ya en develop; este es defense-in-depth encima)
-- Branch: `task/TASK-942-nexa-ai-signals-non-destructive-merge`
+- Branch: `develop` (operador pidió quedarse en develop, sin branch dedicada)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 - Derivada de: `TASK-941` (Slice 3 extraído) / `ISSUE-082`
@@ -25,7 +25,17 @@ Traer el write path de Nexa AI signals/predictions/enrichments bajo el patrón c
 
 El operador preguntó lo correcto en TASK-941: *"¿entonces cada vez escribe y borra todo?"*. Sí — `replaceBigQuerySignalsForPeriod` ([src/lib/ico-engine/ai/materialize-ai-signals.ts](../../../src/lib/ico-engine/ai/materialize-ai-signals.ts)) hace `DELETE` de todo el período + `INSERT`. Si el escritor produce 0/garbage (el caso ISSUE-082 era timestamps NULL; futuros podrían ser `metric_snapshots` vacíos), el DELETE ya destruyó lo bueno. El repo ya resolvió esta clase exacta en **TASK-900** para `metrics_by_*` (helpers `runIcoMaterializerCycle` / `runUpstreamFreshnessGate` / `buildMergeSql` / tracking `ico_materialization_runs`), pero **nunca se aplicó al path de AI signals**. Este es ese path.
 
-TASK-941 cerró el trigger (timestamp), el falso-sano (invariante), la recurrencia (lint), la detección (signal), finance (scoping) y el wipe del serving PG (guard). Queda el amplificador estructural: el DELETE+INSERT del **signal writer BQ** (`materialize-ai-signals.ts`), que no recibió guard en TASK-941 porque amerita el rediseño MERGE completo.
+TASK-941 cerró el trigger (timestamp), el falso-sano (invariante), la recurrencia (lint), la detección (signal), finance (scoping) y el wipe del serving PG (guard). Queda el amplificador estructural: el DELETE+INSERT del **signal writer BQ** (`materialize-ai-signals.ts`), que no recibió guard en TASK-941.
+
+## Recalibración pre-execution 2026-05-27 (corrige el approach de esta spec)
+
+**Decisión: freshness-gated full-replace + tracking — NO MERGE + generation-stamp.** La spec original (heredada del Slice 3 de TASK-941) pre-decidió aplicar el patrón MERGE de TASK-900. Verificado en Discovery que está **descalibrado**:
+
+- TASK-900 MERGE se diseñó para sets **ESTABLES** (`metrics_by_*`, donde cada key persiste período a período). `WHEN NOT MATCHED BY SOURCE THEN DELETE` está prohibido ahí porque borraría métricas de entidades temporalmente ausentes.
+- `ai_signals` es un set **VOLÁTIL**: las anomalías aparecen y desaparecen por corrida. `signal_id` es determinístico (`stableAiId`), así que MERGE-by-key sobrescribe las señales que persisten — **pero las que desaparecen (ya no son anomalía) quedan como filas STALE** bajo MERGE-sin-delete. Para limpiarlas habría que agregar generation-stamp + latest-gen-reader + GC: **complejidad que resuelve un problema que el propio MERGE introduce**.
+- Para un set volátil, `DELETE+INSERT` (full replace) es la semántica **correcta**. El gap de robustez no es el replace — es que se borra **a ciegas** aunque el upstream esté degradado. Eso se cierra de raíz con un **freshness gate** (skip sin borrar cuando upstream degradado) + tracking, reusando las primitivas TASK-900 (`runUpstreamFreshnessGate`, `beginIcoMaterializationRun`, …). `materializeAiSignals` ya tiene un early-return cuando `currentSnapshots.length===0`; el gate extiende esa protección al caso "metric_snapshots tiene filas pero el bridge Notion está degradado" (la bug class TASK-877 exacta).
+
+Esto **reduce** el blast radius (sin tocar el read path, sin generation-stamp, sin GC) y es más robusto Y más simple (no-bandaid). El título/slug de la task se mantiene por estabilidad de tracking, pero el approach es gate+track, no MERGE.
 
 ## Architecture Alignment
 
@@ -83,25 +93,23 @@ Reglas obligatorias:
 - Sin tracking en `ico_materialization_runs` para el AI signals path.
 - Read path no filtra por generación (asume replace completo).
 
-## Scope
+## Scope (recalibrado — gate+track, NO MERGE)
 
-### Slice 0 — Diseño (ADR delta)
+### Slice 1 — Freshness gate en el write path de ai_signals
 
-- Confirmar generation-stamp strategy contra schema BQ real (`ai_signals`, `ai_prediction_log`).
-- Decidir reuse de `generated_at` vs columna `materialization_run_id` dedicada.
-- ADR delta en `GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md`: patrón extendido al AI signals path.
+- En `materializeAiSignals`: antes de tocar ai_signals (DELETE+INSERT), correr `runUpstreamFreshnessGate()` (reusar primitiva, flag `isFreshnessGateEnabled`). Si `!safe` → skip (return early, **NO delete**) + `captureWithDomain('delivery', warning, source='ico_ai_signals_skipped_safety')`. Extiende el early-return existente (`currentSnapshots.length===0`) al caso bridge-degradado (TASK-877 class).
+- Mantener DELETE+INSERT (semántica correcta para set volátil). NO MERGE.
 
-### Slice 1 — Freshness gate + MERGE (signals)
+### Slice 2 — Tracking del write path (liveness + skipped_safety signal)
 
-- `materialize-ai-signals.ts`: reemplazar `replaceBigQuerySignalsForPeriod` (DELETE+INSERT) por: `runUpstreamFreshnessGate` (si `metric_snapshots` vacío/degradado → skip, NO delete, run `skipped_safety`) + MERGE por `signal_id` (sin `DELETE BY SOURCE`) + tracking en `ico_materialization_runs`.
+- Extender `IcoMaterializerTableName` + CHECK de `greenhouse_sync.ico_materialization_runs` (migration) para incluir `ai_signals`.
+- Componer las primitivas de tracking (`beginIcoMaterializationRun`/`complete`/`skip`/`fail`) en `materializeAiSignals`: begin al arrancar, skip cuando el gate bloquea, complete con rowCount, fail+rethrow on error. El signal existente `delivery.ico_materializer.skipped_safety` (TASK-900) cubre ai_signals automáticamente.
 
-### Slice 2 — Predictions + enrichments
+### Out of scope (vs spec original)
 
-- Mismo patrón para `replacePredictionLogs` (ai_prediction_log) y el writer BQ de enrichments/runs en `llm-enrichment-worker.ts`.
-
-### Slice 3 — Read path latest-generation
-
-- Si generation-stamp: el enrichment worker SELECT + `nexa-insights-freshness` filtran a la última generación exitosa por (período, space). GC de generaciones viejas.
+- ~~MERGE por signal_id~~ — rechazado (set volátil → staleness). DELETE+INSERT es correcto.
+- ~~generation-stamp + latest-gen-reader + GC~~ — innecesario sin MERGE.
+- ~~read path changes (enrichment worker SELECT, nexa-insights)~~ — no cambian (replace completo se mantiene).
 
 ### Slice 4 — Tests + verificación
 
