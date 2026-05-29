@@ -68,7 +68,17 @@ export const loadHomeAiInsightsBento = async (): Promise<HomeAiInsightsBentoData
     headline: row.explanationSummary ?? row.metricName,
     rootCauseSummary: row.rootCauseNarrative ?? null,
     recommendedAction: row.recommendedAction ?? null,
-    drillHref: `/agency/insights/${row.enrichmentId}`,
+
+    // TASK-947 — drillHref canonical:
+    // - Routing top-level `/nexa/insights/[id]` (NO `/agency/insights/*`
+    //   legacy roto, TASK-696 drift cerrado).
+    // - Drill key = `signalId` (signal-anchored, prefix `EO-AIS-*`), estable
+    //   cross-period TASK-943 append-only. NUNCA `enrichmentId` para cards
+    //   "Ver causa raíz" del current — `enrichmentId` queda reservado para
+    //   share permalinks (TASK-449 V1.3).
+    // - El helper canonical `readNexaInsightDrill` (TASK-947) dispatchea
+    //   ambos prefijos (`EO-AIS-*` + `EO-AIE-*` + `EO-AIH-*`).
+    drillHref: `/nexa/insights/${row.signalId}`,
     processedAt: row.processedAt
   }))
 
