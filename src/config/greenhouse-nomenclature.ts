@@ -424,7 +424,12 @@ export const GH_NEXA = {
   detail_error_cta: 'Reintentar',
 
   // Loading + skeleton aria
-  detail_loading_aria: 'Cargando observación de Nexa'
+  detail_loading_aria: 'Cargando observación de Nexa',
+
+  // TASK-950 — list page stub (microcopy completo es-CL canonical lands en Slice 3
+  // post UX skills audit). Solo `list_loading_aria` queda aquí para que
+  // `loading.tsx` compile end-to-end con Slice 2.
+  list_loading_aria: 'Cargando observaciones del período'
 } as const
 
 /* ─────────────────── Skills & Certifications ─────────────────── */
