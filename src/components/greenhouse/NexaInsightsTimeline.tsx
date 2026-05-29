@@ -19,6 +19,7 @@ import NexaMentionText from '@/components/greenhouse/NexaMentionText'
 import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRootCauseSection'
 import { GH_NEXA } from '@/config/greenhouse-nomenclature'
 import { formatDate as formatGreenhouseDate, formatISODateKey, formatTime as formatGreenhouseTime } from '@/lib/format'
+import type { NexaSignalLifecycleStatus, NexaSignalObservation } from '@/lib/ico-engine/ai/llm-types'
 import { getMetricById } from '@/lib/ico-engine/metric-registry'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -34,8 +35,30 @@ export type NexaTimelineItem = {
   processedAt: string
 }
 
+/**
+ * TASK-945 — Signal lifecycle shape canonical para detail page TASK-947 V1.2.
+ *
+ * Mientras el bento NexaInsightsBlock usa el shape `insights[]` (1 item = 1
+ * enrichment LLM), el detail page de TASK-947 (futuro) consumira este shape
+ * `lifecycles[]` (1 lifecycle = 1 signal con todas sus observations cronologicas).
+ *
+ * V1 forward-compat: la prop es OPCIONAL; el componente actual sigue usando
+ * `insights[]`. Cuando TASK-947 V1.2 shippee, el detail page pasa `lifecycles[]`
+ * y el componente extiende el render con MUI Timeline detallada per-signal.
+ */
+export type NexaSignalLifecycle = {
+  signalId: string
+  signalType: string
+  metricId: string
+  observations: NexaSignalObservation[]
+  status: NexaSignalLifecycleStatus
+}
+
 export type NexaInsightsTimelineProps = {
   insights: NexaTimelineItem[]
+  /** TASK-945 — V1 forward-compat: detail page TASK-947 V1.2 lo consumira;
+   * el bento bento actual NO lo pasa todavia (backward-compat). */
+  lifecycles?: NexaSignalLifecycle[]
 }
 
 // ─── Styled Timeline ────────────────────────────────────────────────────────

@@ -1,7 +1,10 @@
 import 'server-only'
 
-import { getBigQueryClient } from '@/lib/bigquery'
+import { getBigQueryClient, toBigQueryStructTimestamp } from '@/lib/bigquery'
 import { getSantiagoDateParts } from '@/lib/calendar/business-time'
+import { captureWithDomain } from '@/lib/observability/capture'
+
+import { isFreshnessGateEnabled, runUpstreamFreshnessGate } from '../materialize-guards'
 import {
   buildMetricSelectSQL,
   buildDeliveryPeriodSourceSql,
@@ -57,7 +60,7 @@ const toBigQuerySignalRow = (signal: AiSignalRecord) => ({
   action_summary: signal.actionSummary,
   action_target_id: signal.actionTargetId,
   model_version: signal.modelVersion,
-  generated_at: signal.generatedAt,
+  generated_at: toBigQueryStructTimestamp(signal.generatedAt),
   ai_eligible: signal.aiEligible,
   payload_json: serializeSignalPayload(signal.payloadJson)
 })
@@ -69,10 +72,10 @@ const toBigQueryPredictionLogRow = (row: AiPredictionLogRow) => ({
   period_year: row.periodYear,
   period_month: row.periodMonth,
   predicted_value: row.predictedValue,
-  predicted_at: row.predictedAt,
+  predicted_at: toBigQueryStructTimestamp(row.predictedAt),
   confidence: row.confidence,
   actual_value: row.actualValue,
-  actual_recorded_at: row.actualRecordedAt,
+  actual_recorded_at: toBigQueryStructTimestamp(row.actualRecordedAt),
   error_pct: row.errorPct,
   model_version: row.modelVersion
 })
@@ -280,6 +283,16 @@ export const buildRecommendationSignals = ({
 // El BQ Node.js client requiere `types` explícitos para ARRAY<STRUCT> params
 // porque JS objects no llevan type metadata. Mantener en sync con
 // `toBigQuerySignalRow` / `toBigQueryPredictionLogRow` y el schema BQ canonical.
+//
+// ─── Canonical timestamp serialization (TASK-941 / ISSUE-082) ──────────────
+//
+// Los campos timestamp se declaran `STRING` en el struct y se pasan como ISO
+// string; la conversión a TIMESTAMP ocurre en SQL vía `TIMESTAMP(s.col)` en el
+// SELECT del UNNEST. NO declarar `TIMESTAMP` en el struct: el cliente Node de
+// BigQuery NO coacciona un ISO string al tipo TIMESTAMP dentro de un STRUCT y
+// escribe NULL silenciosamente (bug class ISSUE-082: ai_signals Mar-May 100%
+// NULL). STRING + CAST-en-SQL elimina por completo la dependencia de la
+// coerción struct del cliente. Enforced por lint `greenhouse/no-bq-struct-string-timestamp`.
 
 const AI_SIGNAL_STRUCT_TYPES = {
   signal_id: 'STRING',
@@ -304,7 +317,7 @@ const AI_SIGNAL_STRUCT_TYPES = {
   action_summary: 'STRING',
   action_target_id: 'STRING',
   model_version: 'STRING',
-  generated_at: 'TIMESTAMP',
+  generated_at: 'STRING', // CAST a TIMESTAMP en el SELECT (ver nota canonical arriba)
   ai_eligible: 'BOOL',
   payload_json: 'STRING'
 } as const
@@ -316,35 +329,49 @@ const AI_PREDICTION_LOG_STRUCT_TYPES = {
   period_year: 'INT64',
   period_month: 'INT64',
   predicted_value: 'FLOAT64',
-  predicted_at: 'TIMESTAMP',
+  predicted_at: 'STRING', // CAST a TIMESTAMP en el SELECT (ver nota canonical arriba)
   confidence: 'FLOAT64',
   actual_value: 'FLOAT64',
-  actual_recorded_at: 'TIMESTAMP',
+  actual_recorded_at: 'STRING', // CAST a TIMESTAMP en el SELECT (ver nota canonical arriba)
   error_pct: 'FLOAT64',
   model_version: 'STRING'
 } as const
 
-const replaceBigQuerySignalsForPeriod = async (
+/**
+ * TASK-943 — append-only event log writer for `ai_signals`.
+ *
+ * SIN DELETE. Cada run inserta una nueva generation con su propio `generated_at`;
+ * la VIEW canonical `ai_signals_current` (TASK-943 Slice 1) filtra latest-per-
+ * `signal_id` para consumers que necesitan "qué señales aplican AHORA". Raw
+ * table preserva la historia evolutiva intra-período (sprints 15d ya no pierden
+ * evidencia).
+ *
+ * Idempotencia: composite natural key (`signal_id`, `generated_at`). Mismo run
+ * (mismo `generated_at`) sobre los mismos signal_ids es un no-op semántico
+ * porque BigQuery DML INSERT no deduplica por key — pero el cron diario NUNCA
+ * llama 2 veces con el mismo `generated_at` (es `new Date().toISOString()` por
+ * invocación). Si por alguna razón emerge una doble-invocación, la VIEW canónica
+ * sigue devolviendo latest por signal_id; raw conservaría 2 generations
+ * idénticas (anomalía operacional visible vía `nexa.insights.no_new_signals_in_24h`
+ * + auditable). Trade-off aceptado: idempotencia perfecta requeriría MERGE+stamp,
+ * complejidad que vence el propósito append-only.
+ *
+ * Cross-ref: ISSUE-082 (incident), TASK-908 (canonical sibling pattern), ADR
+ * Delta 2026-05-28 en GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.
+ */
+const appendBigQuerySignalsForPeriod = async (
   projectId: string,
-  periodYear: number,
-  periodMonth: number,
   signals: AiSignalRecord[]
 ) => {
-  const bigQuery = getBigQueryClient()
-
-  await runIcoEngineQuery(
-    `DELETE FROM \`${projectId}.ico_engine.ai_signals\`
-     WHERE period_year = @periodYear
-       AND period_month = @periodMonth`,
-    { periodYear, periodMonth }
-  )
-
   if (signals.length === 0) {
     return 0
   }
 
+  const bigQuery = getBigQueryClient()
+
   // DML INSERT canonical (not streaming insert) — durable storage path.
-  // Subsequent DML (e.g. next cron's DELETE) works immediately.
+  // STRING+TIMESTAMP() cast in SELECT (TASK-941 S1, ISSUE-082) — lint
+  // `greenhouse/no-bq-struct-string-timestamp` enforces this.
   const rows = signals.map(toBigQuerySignalRow)
 
   await bigQuery.query({
@@ -360,7 +387,7 @@ const replaceBigQuerySignalsForPeriod = async (
               s.period_year, s.period_month, s.severity, s.current_value, s.expected_value, s.z_score,
               s.predicted_value, s.confidence, s.prediction_horizon, s.contribution_pct,
               s.dimension, s.dimension_id, s.action_type, s.action_summary, s.action_target_id,
-              s.model_version, s.generated_at, s.ai_eligible, s.payload_json
+              s.model_version, TIMESTAMP(s.generated_at), s.ai_eligible, s.payload_json
             FROM UNNEST(@rows) AS s`,
     params: { rows },
     types: { rows: [AI_SIGNAL_STRUCT_TYPES] }
@@ -369,19 +396,24 @@ const replaceBigQuerySignalsForPeriod = async (
   return signals.length
 }
 
-const replacePredictionLogs = async (projectId: string, rows: AiPredictionLogRow[]) => {
+/**
+ * TASK-943 — append-only event log writer for `ai_prediction_log`.
+ *
+ * SIN DELETE. Cada run inserta predictions con su propio `predicted_at`. La
+ * VIEW canonical `ai_prediction_log_current` filtra latest-per-`prediction_id`.
+ * Excepción documentada: `hydratePredictionActuals` UPDATE-ea `actual_value`
+ * + `actual_recorded_at` cuando la realidad se observa post-hoc (única
+ * mutación legítima del contract append-only — ver Slice 4).
+ *
+ * Idempotencia: composite natural key (`prediction_id`, `predicted_at`). Mismo
+ * razonamiento que ai_signals.
+ */
+const appendPredictionLogs = async (projectId: string, rows: AiPredictionLogRow[]) => {
   if (rows.length === 0) {
     return 0
   }
 
   const bigQuery = getBigQueryClient()
-  const predictionIds = rows.map(row => row.predictionId)
-
-  await runIcoEngineQuery(
-    `DELETE FROM \`${projectId}.ico_engine.ai_prediction_log\`
-     WHERE prediction_id IN UNNEST(@predictionIds)`,
-    { predictionIds }
-  )
 
   // DML INSERT canonical (not streaming insert) — same rationale as ai_signals.
   const logRows = rows.map(toBigQueryPredictionLogRow)
@@ -394,8 +426,8 @@ const replacePredictionLogs = async (projectId: string, rows: AiPredictionLogRow
             )
             SELECT
               s.prediction_id, s.space_id, s.metric_name, s.period_year, s.period_month,
-              s.predicted_value, s.predicted_at, s.confidence,
-              s.actual_value, s.actual_recorded_at, s.error_pct, s.model_version
+              s.predicted_value, TIMESTAMP(s.predicted_at), s.confidence,
+              s.actual_value, TIMESTAMP(s.actual_recorded_at), s.error_pct, s.model_version
             FROM UNNEST(@rows) AS s`,
     params: { rows: logRows },
     types: { rows: [AI_PREDICTION_LOG_STRUCT_TYPES] }
@@ -404,6 +436,32 @@ const replacePredictionLogs = async (projectId: string, rows: AiPredictionLogRow
   return rows.length
 }
 
+/**
+ * TASK-943 — Único mutador legítimo del append-only contract de `ai_prediction_log`.
+ *
+ * Las predictions son observaciones históricas (event-sourced) salvo por **un
+ * caso pragmático**: cuando la realidad se observa post-hoc (el mes terminó,
+ * `metric_snapshots_monthly` tiene la actual), hidratamos `actual_value` +
+ * `actual_recorded_at` + `error_pct` (derivado puro de los dos primeros) en el
+ * row de la prediction original. Event-sourcing puro requeriría tabla separada
+ * `ai_prediction_actuals` — over-engineering para volumen ICO actual.
+ *
+ * **Invariante canonical (ADR Delta 2026-05-28)**:
+ *
+ * 1. Esta función es la ÚNICA fuente legítima de UPDATE sobre `ai_prediction_log`.
+ * 2. SOLO mutan 3 campos: `actual_value`, `actual_recorded_at`, `error_pct`
+ *    (los 3 dependen de la misma observación post-hoc, son una unidad atómica).
+ * 3. `actual_value` se hidrata UNA SOLA VEZ por prediction (guard `WHERE
+ *    actual_value IS NULL`). No re-overwrites — el primer dato observado es la
+ *    fuente de verdad.
+ * 4. SOLO períodos cerrados (`period < currentPeriod`). El período en curso no
+ *    se hidrata porque la métrica observada aún no es definitiva.
+ * 5. **Cualquier mutación adicional (más campos, double-overwrite, período
+ *    actual) es una violación del contract append-only canonizado.**
+ *
+ * Pattern análogo: outbox `*_events.delivered_at` (append-only excepto por el
+ * latch de delivery). audit logs no tienen excepciones — pero predictions, sí.
+ */
 const hydratePredictionActuals = async (
   projectId: string,
   currentYear: number,
@@ -461,6 +519,39 @@ export const materializeAiSignals = async (
   periodYear: number,
   periodMonth: number
 ): Promise<AiSignalMaterializationResult> => {
+  // TASK-942 Slice 1 — freshness gate (flag-gated, default OFF). Si el upstream
+  // (bridge Notion coverage, etc.) está degradado, NO re-materializar ai_signals:
+  // el DELETE+INSERT borraría la última generación buena con data potencialmente
+  // basada en un bridge incompleto (bug class TASK-877). Skip-don't-delete.
+  // Para un set volátil, DELETE+INSERT es la semántica correcta de replace; el
+  // gate cierra el wipe-on-degraded de raíz, sin MERGE/generation-stamp.
+  if (isFreshnessGateEnabled()) {
+    const gate = await runUpstreamFreshnessGate()
+
+    if (!gate.safe) {
+      captureWithDomain(
+        new Error(
+          `ico_ai_signals_skipped_safety: ${periodYear}-${String(periodMonth).padStart(2, '0')} (${gate.reason})`
+        ),
+        'delivery',
+        {
+          level: 'warning',
+          tags: { source: 'ico_ai_signals_skipped_safety' },
+          extra: {
+            periodYear,
+            periodMonth,
+            blockingSignals: gate.blockingSignals.map(signal => ({
+              signalId: signal.signalId,
+              severity: signal.severity
+            }))
+          }
+        }
+      )
+
+      return { aiSignalsWritten: 0, predictionLogsWritten: 0 }
+    }
+  }
+
   const projectId = getIcoEngineProjectId()
   const currentSnapshots = await readCurrentSnapshots(projectId, periodYear, periodMonth)
 
@@ -513,14 +604,15 @@ export const materializeAiSignals = async (
     generatedAt
   })
 
-  const aiSignalsWritten = await replaceBigQuerySignalsForPeriod(
+  // TASK-943 — append-only writes. NUNCA DELETE. Cada run aporta una nueva
+  // generation (mismo `generated_at` para todas las signals del run). La VIEW
+  // `ai_signals_current` filtra latest; la raw table conserva la historia.
+  const aiSignalsWritten = await appendBigQuerySignalsForPeriod(
     projectId,
-    periodYear,
-    periodMonth,
     [...anomalies, ...predictionSignals, ...rootCauses, ...recommendations]
   )
 
-  const predictionLogsWritten = await replacePredictionLogs(projectId, predictionLogs)
+  const predictionLogsWritten = await appendPredictionLogs(projectId, predictionLogs)
 
   await hydratePredictionActuals(projectId, generatedPeriod.year, generatedPeriod.month)
 

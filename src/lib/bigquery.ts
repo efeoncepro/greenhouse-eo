@@ -63,6 +63,27 @@ export const getBigQueryClient = () => {
 export const getBigQueryProjectId = () => getGoogleProjectId()
 export { getBigQueryQueryOptions }
 
+/**
+ * Canonical timestamp serializer for BigQuery DML ARRAY<STRUCT> params.
+ *
+ * Keep the struct field typed as STRING and cast it in SQL with TIMESTAMP(s.col).
+ * The BigQuery Node client silently writes NULL when an ISO string is passed to
+ * a TIMESTAMP field inside a STRUCT param (ISSUE-082 / TASK-941).
+ */
+export const toBigQueryStructTimestamp = (value: Date | string | null | undefined): string | null => {
+  if (value == null) {
+    return null
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString()
+  }
+
+  const trimmedValue = value.trim()
+
+  return trimmedValue.length > 0 ? trimmedValue : null
+}
+
 // ── Blocked query tracking ──
 
 interface BlockedQueryEntry {

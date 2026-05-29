@@ -441,3 +441,82 @@ TASK-889 Slice 5 configura **un binding sandbox Kortex** con `provisioning_mode=
 - TASK-885 — registry + catalog (incluye seed Kortex).
 - TASK-886..888 — desired/observed/applied state lifecycle.
 - TASK-889 Slice 5 — Kortex pilot.
+
+---
+
+## 17. Architecture Decision 2026-05-28 — Greenhouse Identity Broker for Kortex SSO
+
+### 17.1 Metadata
+
+- Status: **Accepted**
+- Owner: Platform / Identity / Ecosystem / Kortex
+- Scope: Greenhouse sister-platform identity, Kortex operator console auth, Auth.js custom provider, `/api/auth/sister-platforms/authorize`, `/api/integrations/v1/sister-platforms/oauth/*`, `greenhouse_core.sister_platform_*` auth records.
+- Reversibility: two-way but slow. Runtime cutover is flag-reversible; schema and client registration are additive.
+- Confidence: high.
+- Validated as of: 2026-05-28 with `software-architect-2026` and official Microsoft/Auth.js OAuth guidance.
+
+### 17.2 Context
+
+Kortex currently validates email/password credentials by delegating to Greenhouse through the sister-platform identity bridge. That contract is correct for Greenhouse credentials, but it does not let an operator use the Microsoft SSO flow they already use in Greenhouse.
+
+Adding Microsoft Entra directly to Kortex would solve the immediate login symptom, but would duplicate redirect URI governance, identity mapping, claims handling, lifecycle decisions and audit ownership. It would also make Kortex a parallel identity authority instead of a peer consumer of Greenhouse identity.
+
+### 17.3 Decision
+
+Greenhouse will act as the identity broker / authorization server for Kortex SSO.
+
+This is an additive broker lane. It does **not** authorize rewriting Greenhouse identity, SSO providers, SCIM, Microsoft Entra provisioning, Graph sync, session cookies or existing NextAuth callback semantics.
+
+Kortex becomes a relying party / confidential client:
+
+1. Kortex sends the operator to Greenhouse `/api/auth/sister-platforms/authorize` with `client_id`, exact `redirect_uri`, `state`, `nonce`, scopes and PKCE challenge.
+2. Greenhouse authenticates the operator with its existing providers: Microsoft SSO, Google or Greenhouse credentials.
+3. Greenhouse validates that the authenticated subject is eligible for Kortex access.
+4. Greenhouse issues a short-lived, one-time authorization code bound to client, redirect URI, nonce/state and PKCE.
+5. Kortex exchanges the code server-to-server against `/api/integrations/v1/sister-platforms/oauth/token`.
+6. Kortex receives a minimal Greenhouse identity/access payload and creates its own local session.
+
+Greenhouse must not share passwords, password hashes, Greenhouse session cookies, Microsoft access tokens, Microsoft refresh tokens or upstream provider secrets with Kortex.
+
+### 17.4 Alternatives considered
+
+| Alternative | Decision | Reason |
+| --- | --- | --- |
+| Kortex integrates Microsoft Entra directly | Rejected as primary architecture | Duplicates identity ownership, app registration governance and claims mapping across repos. |
+| Keep password bridge as the only login lane | Rejected as primary UX | It excludes operators who use Greenhouse through Microsoft SSO and pushes password semantics into a sister platform. |
+| Share Greenhouse DB/session/cookies with Kortex | Rejected | Breaks peer-system isolation, increases blast radius and violates the non-goals in this spec. |
+| Greenhouse identity broker with authorization-code lane | Accepted | Centralizes identity and access decisions in Greenhouse while preserving Kortex runtime/session ownership. |
+
+### 17.5 Runtime contract
+
+- Authorization codes are opaque, hashed at rest, TTL-bound, one-time-use and PKCE-bound.
+- Redirect URIs are exact-match allowlisted per consumer; no wildcard or prefix matching.
+- `state` and `nonce` are required.
+- The identity payload is minimal: stable Greenhouse subject, email, display name, tenant, identity profile, allowed Kortex capabilities and short expiry.
+- Kortex owns its local session after exchange.
+- No refresh token is issued in V1. Re-authentication goes through Greenhouse again.
+- The existing password identity endpoint remains transitional/break-glass until a separate deprecation decision.
+- Existing Greenhouse Microsoft SSO, Google/credentials login, SCIM provisioning, Microsoft Graph sync and Entra app registration remain unchanged.
+
+### 17.6 Consequences
+
+- Greenhouse becomes the source of truth for sister-platform interactive SSO, not just server-to-server API authentication.
+- Kortex avoids direct Microsoft provider configuration and consumes "Continue with Greenhouse" as its enterprise login path.
+- The same lane can later be generalized to other sister platforms, but TASK-948 must ship Kortex-only first.
+- Observability becomes mandatory: authorize/exchange success, failures, redirect rejects and replay attempts must be audit-visible.
+
+### 17.7 Non-regression boundary
+
+TASK-948 must be implemented without changing:
+
+- `/api/auth/[...nextauth]` provider definitions except additive integration points explicitly required by the broker.
+- Microsoft Entra app registration, tenant config, redirect URIs, scopes or claim mapping for the existing Greenhouse portal login.
+- SCIM endpoints, SCIM flags, Entra provisioning jobs, Graph sync or `GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md` semantics.
+- Global session/JWT cookie shape, `portalHomePath`, route group derivation, `authorizedViews`, entitlements or role assignment semantics as a side effect.
+- Existing client user/member/identity profile lifecycle semantics.
+
+If implementation appears to require any of the above, the agent must stop and open a new architecture decision before proceeding. Required verification includes Greenhouse Microsoft SSO smoke, credentials login smoke, and SCIM/Entra provisioning health read-only checks before any production flip.
+
+### 17.8 Implementation owner
+
+Implementation is tracked by `docs/tasks/in-progress/TASK-948-greenhouse-identity-broker-kortex-sso.md`.

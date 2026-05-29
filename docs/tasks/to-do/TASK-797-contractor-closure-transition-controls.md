@@ -91,6 +91,16 @@ Reglas obligatorias:
 - Allow documented post-closure invoices only when service period/evidence policy permits.
 - Prevent new work submissions after closure.
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+797 implementa cierre contractor y toca `src/lib/workforce/offboarding/**`, compartido con el exit de payroll dependiente (TASK-890). Doble cuidado: no disparar finiquito y no romper la exclusión de nómina. Auditado con `greenhouse-payroll-auditor`.
+
+- **NUNCA** disparar `final_settlements` / `final_settlement_documents` ni el flujo "Calcular finiquito" desde el cierre contractor. El cierre contractor es lifecycle propio (`contractor_closure`), no finiquito laboral dependiente.
+- **NUNCA** usar causales DT ni documento de finiquito para contractor/honorarios.
+- **NUNCA** alterar las lanes de `work_relationship_offboarding_cases` (`relationship_transition`, `internal_payroll`, `external_payroll`, `non_payroll`, `identity_only`) que consume el exit eligibility resolver de TASK-890. Agregar el closure contractor sin romper la clasificación de lanes existente.
+- **NUNCA** reactivar la relación dependiente cerrada al cerrar la contractor.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` + los tests de offboarding al cierre, para probar que el exit eligibility (890) y el roster de nómina siguen intactos.
+
 ## Out of Scope
 
 - Automated provider termination API.
@@ -100,6 +110,7 @@ Reglas obligatorias:
 ## Acceptance Criteria
 
 - [ ] Contractor closure never exposes "Calcular finiquito".
+- [ ] Exit eligibility (TASK-890) lanes intactas: closure contractor no altera la clasificación de `work_relationship_offboarding_cases` ni reactiva relación dependiente.
 - [ ] Open invoice/submission/payable blockers are visible.
 - [ ] Post-closure invoice path is explicit and audited.
 - [ ] New work submissions are blocked after closure.
@@ -108,6 +119,7 @@ Reglas obligatorias:
 
 - `pnpm exec tsc --noEmit --pretty false`
 - Unit tests for closure readiness and post-closure policy.
+- `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` — finiquito boundary + exit eligibility (890) non-regression gate.
 - UI smoke if closure surface is implemented.
 
 ## Closing Protocol

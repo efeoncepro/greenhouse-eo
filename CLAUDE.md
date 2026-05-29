@@ -11,6 +11,14 @@ Greenhouse EO — portal operativo de Efeonce Group. Next.js 16 App Router + MUI
 - Patrón de lectura: **Postgres first, BigQuery fallback**
 - Schemas PostgreSQL activos: `greenhouse_core`, `greenhouse_serving`, `greenhouse_sync`, `greenhouse_payroll`, `greenhouse_finance`, `greenhouse_hr`, `greenhouse_crm`, `greenhouse_delivery`, `greenhouse_ai`
 
+### BigQuery DML Struct Timestamp Hard Rules (ISSUE-082 / TASK-941)
+
+- Nunca declarar un campo temporal como `TIMESTAMP`/`DATETIME`/`DATE` dentro de `types: { rows: [STRUCT] }` si el valor JS viene como ISO string. El cliente Node de BigQuery puede escribir NULL silenciosamente dentro de `ARRAY<STRUCT>`.
+- Patrón canónico: serializar con `toBigQueryStructTimestamp()` y declarar el campo como `STRING`; convertir en SQL con `TIMESTAMP(s.<col>)` en el `SELECT FROM UNNEST(@rows)`.
+- El lint rule `greenhouse/no-bq-struct-string-timestamp` queda en modo error. Si un writer necesita otro patrón, debe documentar el motivo y probar round-trip real.
+- Un run que ve data cruda elegible pero materializa 0 records nunca es `succeeded`: debe degradar/fallar con evidencia observable.
+- No ejecutar un DELETE destructivo de período antes de validar el payload reemplazo. Si no se puede validar, skip/degrade y preservar el último estado bueno.
+
 ### Payroll Operational Calendar
 
 - Calendario operativo canónico: `src/lib/calendar/operational-calendar.ts`
@@ -86,6 +94,7 @@ Espera mi confirmacion antes de empujar a develop o crear preview remoto.
 - El custom domain de staging (`dev-greenhouse.efeoncepro.com`) **SÍ tiene SSO** — no es excepción.
 - Para acceso programático (agentes, Playwright, curl): usar la URL `.vercel.app` + header `x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET`.
 - Hook operativo browser diagnostics: si el usuario pide abrir, revisar, diagnosticar, capturar o testear una ruta/URL del portal, usar automáticamente usuario agente dedicado + Playwright/Chromium. No pedir login ni navegar anónimo como primer intento. Enviar `x-vercel-protection-bypass` solo a origins Greenhouse/Vercel, no a terceros como Sentry.
+- Hook operativo de verificación visual UI: si el trabajo toca UI visible, screenshots, microinteractions, responsive, design QA, frame sequences o revisión visual, la evidencia primaria debe generarse con `pnpm fe:capture` / `pnpm fe:capture:review` y sus relacionados. Usar scenario existente cuando exista; usar `pnpm fe:capture --route=<path> --env=staging --hold=3000` para evidencia rápida; crear scenario en `scripts/frontend/scenarios/` si el flujo es repetible o tiene interacciones; usar `pnpm fe:capture:diff` para before/after y `pnpm fe:capture:health` para salud local del helper. Playwright ad-hoc solo como complemento cuando se necesiten console/network/API payloads o una interacción no soportada por el DSL; guardar artifacts bajo `.captures/` y documentar por qué no bastó el helper canónico.
 - **NUNCA crear manualmente** `VERCEL_AUTOMATION_BYPASS_SECRET` en Vercel — la variable es auto-gestionada por el sistema. Si se crea manualmente, sombrea el valor real y rompe el bypass.
 - URLs de staging:
   - Custom domain (SSO, no para agentes): `dev-greenhouse.efeoncepro.com`
@@ -204,6 +213,41 @@ CI corre ambos. Si tu task no los corre local pre-close, CI los descubre post-pu
 Ambos fueron escapes de mi proceso pre-close. Esta regla canonical los previene.
 
 **Trade-off explicito**: ~20 min extra pre-close vs 12+ min de CI failure + email burst de Vercel + push fix + nueva ronda CI. Net positive cuando count tests + build cost local < (CI roundtrip + dev context switch + reputational cost de "shipped roto").
+
+**Bug class adicional canonizado live 2026-05-28 (TASK-943 follow-up)**: cuando tu working tree contiene **orphan uncommitted changes** de sesiones previas (e.g. stashed code, lifecycle moves pendientes, helpers half-committed), tu `pnpm build` local pasa porque ejercita el WT completo — pero Vercel construye contra el SHA exacto que recibió, sin el orphan state. Si tus commits dependen del orphan (e.g. `import { helper } from '@/lib/x'` donde `helper` solo existe uncommitted), **Vercel rompe en build aunque local esté verde**. Detectado live: Slice 2 + Slice 3 de TASK-943 importaban `toBigQueryStructTimestamp` desde `@/lib/bigquery` cuya exportación vivía solo en mi WT como orphan TASK-941 closure — 4 deploys staging consecutivos en Error hasta que un commit ajeno agregó el export al remoto.
+
+**Reglas duras** (adicionales al gate canonical):
+
+- **NUNCA** committear código que dependa de un símbolo exportado por archivo cuyas modificaciones estén uncommitted/stashed. **ANTES de cada commit**, correr `git status --short` y verificar que cualquier archivo modificado del cual dependo está incluido en el stage o ya está pusheado. Si emerge orphan state al stagear (sesión anterior dejó cosas a medio cerrar), o (a) committearlo formalmente PRIMERO como su propio commit cerrando la sesión anterior, o (b) stashearlo y volver después — NUNCA dejarlo "convivir" con commits que dependen de él.
+- **SIEMPRE** que detectes orphan state en `git status --short` antes de empezar trabajo nuevo, decidir explícitamente: (1) commit + push para cerrar la sesión anterior, (2) stash con nombre claro para preservar, o (3) revert si era residual no deseado. NUNCA dejarlo flotante asumiendo que "no afecta mis commits nuevos" — los Vercel builds remotos no ven tu WT.
+- **SIEMPRE** que tu commit toque `import X from '@/lib/foo'` para un símbolo nuevo, verificar con `git ls-tree -r origin/develop --name-only | grep foo` que el archivo está en remoto Y `git show origin/develop:src/lib/foo.ts | grep "export.*X"` que el símbolo está exportado. Si no, primer commit = agregar el export; segundo commit = usarlo.
+
+**Pre-push defense-in-depth recomendado**: cuando un commit toca imports cross-module críticos, correr `git stash --keep-index && pnpm build && git stash pop` ANTES del push — eso ejercita el build solo con lo staged, replicando lo que Vercel verá. Es ~30s extra que detecta este bug class sin pasar por el CI roundtrip.
+
+**Post-push verificación obligatoria de despliegues Cloud Run workers** (canonizado live 2026-05-28 TASK-943 follow-up): cualquier commit pushado a `develop` que toque archivos bajo `src/lib/**` que sean consumidos por los 4 workers Cloud Run (`ops-worker`, `ico-batch-worker`, `commercial-cost-worker`, `hubspot-greenhouse-integration`) — es decir, **casi cualquier cambio backend** — DEBE verificarse en GitHub Actions ANTES de declarar la task complete. Pre-push hook (lint + tsc) NO ejercita el bundle esbuild de los workers; Vercel build NO ejercita los workers tampoco. Los workers tienen su propia pipeline de deploy con esbuild bundler distinto al Turbopack de Next.js, y pueden fallar independientemente.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** mover una task a `complete/` sin verificar que los 4 workflows de Cloud Run workers afectados por los commits de la task estén en `conclusion=success`. Verificar con: `gh run list --workflow=ico-batch-deploy.yml --limit 5` + idem `ops-worker-deploy.yml`, `commercial-cost-worker-deploy.yml`, `hubspot-greenhouse-integration-deploy.yml`. Si alguno está `failure`/`cancelled`, **re-disparar** con `gh workflow run <workflow> --ref develop -f environment=staging -f expected_sha=$(git rev-parse origin/develop)` y monitorear hasta success.
+- **NUNCA** asumir que un workflow `cancelled` por commit subsequent es "OK porque el siguiente lo cubre" — workflows production-deploy son SEPARADOS por workflow, NO por commit; cada uno necesita su propio run success para garantizar que el último SHA de develop está deployado a las revisions Cloud Run productivas.
+- **NUNCA** pushear múltiples commits al hilo a `develop` sin verificar entre pushes que el deploy del commit anterior completó (o aceptar que el siguiente cancelará al anterior — y entonces re-disparar el último al final).
+- **SIEMPRE** que la task touch `src/lib/{bigquery,ico-engine,sync,reliability,observability,postgres}/**` (consumed by workers), el cierre canonical INCLUYE: `gh run list --workflow=<deploy>.yml --limit 1 --json conclusion` para los 4 workers + estado terminal `success` + revision Cloud Run actualizada con `GIT_SHA == expected_sha`.
+
+**Patrón canonical de cierre post-Vercel-Ready** (TASK-943 follow-up canonizado):
+
+```bash
+# 1. Verifica que los 4 deploy workflows estén success en el último SHA
+LATEST_SHA=$(git rev-parse origin/develop)
+for WF in ico-batch-deploy.yml ops-worker-deploy.yml commercial-cost-worker-deploy.yml hubspot-greenhouse-integration-deploy.yml; do
+  STATUS=$(gh run list --workflow=$WF --limit 1 --json status,conclusion,headSha -q '.[0] | "\(.status) \(.conclusion) \(.headSha)"')
+  echo "$WF: $STATUS"
+done
+
+# 2. Si alguno NO matchea LATEST_SHA con conclusion=success, re-disparar:
+gh workflow run <workflow>.yml --ref develop -f environment=staging -f expected_sha=$LATEST_SHA
+
+# 3. Monitorear hasta success (Monitor canonical or gh run watch <run-id>)
+```
 
 **Excepcion legitima** (documentar): hotfix critico bajo incident response real (ej. ISSUE-### activo, production down) puede saltar este gate priorizando velocidad. En ese caso, post-push correr ambos comandos remoto via CI (`gh run watch`) y reportar verde como cierre.
 
@@ -1975,7 +2019,7 @@ La promoción `develop → main` vive en un control plane canónico con manifest
 - State machine cerrado (8 estados): `preflight → ready → deploying → verifying → released | degraded | aborted`; `released → rolled_back`; `degraded → rolled_back | released`. CHECK constraint a nivel DB.
 - Partial UNIQUE INDEX `WHERE state IN ('preflight','ready','deploying','verifying')` garantiza 1 release activo por branch.
 - Outbox events versionados v1: `platform.release.{started, deploying, verifying, released, degraded, rolled_back, aborted}`. Documentados en `GREENHOUSE_EVENT_CATALOG_V1.md`.
-- 3 capabilities granulares least-privilege: `platform.release.execute` (EFEONCE_ADMIN + DEVOPS_OPERATOR), `platform.release.rollback` (EFEONCE_ADMIN solo), `platform.release.bypass_preflight` (EFEONCE_ADMIN solo, requiere `reason >= 20 chars` + audit).
+- 3 capabilities granulares least-privilege: `platform.release.execute` (EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->), `platform.release.rollback` (EFEONCE_ADMIN solo), `platform.release.bypass_preflight` (EFEONCE_ADMIN solo, requiere `reason >= 20 chars` + audit).
 
 **Concurrency fix Opción A (V1 deployed)**:
 
@@ -2047,7 +2091,7 @@ Watchdog manual-only temporal (desde 2026-05-24 hasta TASK-920) que detecta los 
 - Owner `greenhouse_ops`, GRANT SELECT/INSERT/UPDATE/DELETE a `greenhouse_runtime` (NO triggers anti-DELETE — cuando blocker se resuelve, row se borra)
 - Indexes: `(first_observed_at)` para recovery sweep, `(workflow_name, alert_kind, last_alerted_at DESC)` para drilldown
 
-**Capability granular**: `platform.release.watchdog.read` (scope=all, EFEONCE_ADMIN + DEVOPS_OPERATOR). NO reusa `platform.release.execute` — semantica distinta (leer estado vs disparar release).
+**Capability granular**: `platform.release.watchdog.read` (scope=all, EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->). NO reusa `platform.release.execute` — semantica distinta (leer estado vs disparar release).
 
 **GitHub auth strategy canonica (V1.1)**: GitHub App installation token primary, PAT fallback. Setup one-time documented en runbook §8.1 (App ID + Installation ID + private key en GCP Secret Manager `greenhouse-github-app-private-key`). Vercel env vars: `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF`. Costo: $0 GitHub side, ~$0.72/anio GCP secret. Beneficios sobre PAT: token NO ligado a usuario, rate limit 15K req/h vs 5K, auditoria per-installation.
 
@@ -2149,8 +2193,8 @@ CLI `pnpm release:preflight` que ejecuta los **12 checks fail-fast** ANTES de pr
 
 **3 capabilities granulares least-privilege** (migration `20260510144012098_task-850-preflight-capabilities.sql`):
 
-- `platform.release.preflight.execute` — disparar CLI / orchestrator. EFEONCE_ADMIN + DEVOPS_OPERATOR.
-- `platform.release.preflight.read_results` — leer JSON output desde dashboards futuros (TASK-855). EFEONCE_ADMIN + DEVOPS_OPERATOR + FINANCE_ADMIN (observabilidad).
+- `platform.release.preflight.execute` — disparar CLI / orchestrator. EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->.
+- `platform.release.preflight.read_results` — leer JSON output desde dashboards futuros (TASK-855). EFEONCE_ADMIN + FINANCE_ADMIN (observabilidad) <!-- spec original menciona DEVOPS_OPERATOR — removido por TASK-935 (rol no existe en ROLE_CODES) -->.
 - `platform.release.preflight.override_batch_policy` — break-glass override del check release_batch_policy. **EFEONCE_ADMIN solo**. Requires reason >= 20 chars + audit row.
 
 **CLI usage canonico**:
@@ -2499,7 +2543,7 @@ Wire-up canonico: `getReliabilityOverview` source `productionRelease[]` ahora in
 - **NUNCA** ajustar thresholds (30min warning, 60min error) sin observar 30 dias de steady state real. La spec V1 marca explicitly "tune post-30d steady-state observados".
 - **NUNCA** expandir `last_status` a leer ultimos N releases. La semantica del signal es "el ultimo" — para tendencias usar el dashboard `/admin/releases` o el deploy_duration_p95.
 - **NUNCA** computar duration o severity en cliente. La server-side se encarga via reader → wire-up → `productionRelease[]` source. Cliente solo renderiza.
-- **NUNCA** mostrar el dashboard a roles distintos de EFEONCE_ADMIN + DEVOPS_OPERATOR. Capability `platform.release.execute` es read-equivalent V1; para audiencias distintas (FINANCE_ADMIN observabilidad), V1.2 introducira `platform.release.read_results` granular.
+- **NUNCA** mostrar el dashboard a roles distintos de EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->. Capability `platform.release.execute` es read-equivalent V1; para audiencias distintas (FINANCE_ADMIN observabilidad), V1.2 introducira `platform.release.read_results` granular.
 - **NUNCA** disparar release desde el dashboard. V1 es read-only por design — operator dispara via `gh workflow run production-release.yml` o GitHub UI. Add release CTA queda como follow-up V1.2 con capability separada.
 - **NUNCA** invocar `Sentry.captureException` directo en este path. Use `captureWithDomain(err, 'cloud', { tags: { source: 'admin_releases_*', stage: '<step>' } })`.
 - **NUNCA** componer la decision banner show/hide en cliente. La server-side calcula `lastStatusSignal.severity`, cliente solo renderiza si severity in {error, warning}.
@@ -2896,7 +2940,7 @@ Estos CLIs están autenticados localmente. Cuando una task toca su dominio, **ú
 - **GitHub CLI (`gh`)**: autenticado contra `efeoncepro/greenhouse-eo`. Usar para issues, PRs, workflow runs, releases.
 - **Vercel CLI (`vercel`)**: autenticado contra el team `efeonce-7670142f`. Usar para env vars, deployments, project config. Token en `.env.local` o config global.
 - **PostgreSQL CLI (`psql`)** vía `pnpm pg:connect`: levanta proxy Cloud SQL + conexión auto. No requiere credenciales manuales.
-- **Frontend Capture (`pnpm fe:capture`)**: helper canónico para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal via Playwright + agent auth. Reemplaza el patrón ad-hoc de `_cap.mjs`. Scenario DSL declarativo bajo `scripts/frontend/scenarios/`. Output `.captures/<ISO>_<scenario>/` (gitignored). Triple gate para production. Comandos: `pnpm fe:capture <scenario> --env=staging [--gif] [--headed]` o `pnpm fe:capture --route=/path --env=staging --hold=3000`. GC: `pnpm fe:capture:gc [--apply]` purga >30d. Spec arquitectónica vía `arch-architect`. Doc: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`.
+- **Frontend Capture (`pnpm fe:capture`)**: helper canónico para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal via Playwright + agent auth. Reemplaza el patrón ad-hoc de `_cap.mjs`. Scenario DSL declarativo bajo `scripts/frontend/scenarios/`. Output `.captures/<ISO>_<scenario>/` (gitignored). Triple gate para production. Comandos: `pnpm fe:capture <scenario> --env=staging [--gif] [--headed]` o `pnpm fe:capture --route=/path --env=staging --hold=3000`. Relacionados: `pnpm fe:capture:review <scenario|capture-dir>` para dossier UI review, `pnpm fe:capture:diff <prev> <curr>` para before/after, `pnpm fe:capture:health` para salud local y `pnpm fe:capture:gc [--apply]` para purga >30d. Spec arquitectónica vía `arch-architect`. Doc: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`.
 
 **Regla operativa**: cuando un agente diagnostica un incidente y la causa raíz vive en una de estas plataformas, debe **ejecutar el fix con el CLI** (con guardrails y verificación), no documentar pasos manuales. Si el fix es destructivo (eliminar app registration, drop database, force-push) sí confirma con el usuario primero.
 
@@ -2964,6 +3008,57 @@ Toda flag que controle variantes de shell o features rollouteables del módulo h
 - Cuando emerja una flag nueva (e.g. `home_v3_shell`, `home_layout_experimental`), extender CHECK constraint `home_rollout_flags_key_check` + agregar al type union `HomeRolloutFlagKey` + agregar admin UI eventualmente.
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-780-home-rollout-flag-platform.md`.
+
+### Nexa Insights detail page canonical invariants (TASK-947, desde 2026-05-28)
+
+Toda surface que necesite "navegar al detail de un Nexa Insight" (Home bento, Agency ICO, Person 360 narrative, Space 360 overview, Finance dashboard, Weekly Digest email, Teams notifications, futuras superficies) **debe** apuntar al routing canonical `/nexa/insights/[id]` y consumir el helper `readNexaInsightDrill(id, subject)` para resolver el detail. Cierra el bug class 404 sistemático del CTA "Ver causa raíz" (drift TASK-696).
+
+**Read API canónico**:
+
+- Routing: `/nexa/insights/[id]` (top-level cross-domain, NO `/agency/insights/*` legacy). Mirror del precedente `/admin/...` (lane cross-domain, no dominio).
+- Dispatch prefix canonical:
+  - `EO-AIS-*` (12 hex) — signal-anchored (default cards "Ver causa raíz" del current). Estable cross-period TASK-943 append-only. Generado por `stableAiId('AIS', ...)` (ico-engine/ai/types.ts:80).
+  - `EO-AIE-*` (8 hex) — enrichment-anchored (share permalinks TASK-449). Snapshot específico. Generado por `stableEnrichmentId(signalId, promptHash)` (llm-types.ts:343).
+  - `EO-AIH-*` (8 hex) — enrichment-history forensic. Generado por `stableEnrichmentHistoryId(runId, enrichmentId)` (llm-types.ts:346).
+- Helper canonical único: `readNexaInsightDrill(id, subject) → NexaInsightDrillResult` server-only en `src/lib/ico-engine/ai/nexa-insight-drill-reader.ts`. Detecta prefix → dispatchea lookup → aplica subject-aware filter → retorna discriminated union.
+- 5 states canonical: `current` | `superseded` (con `currentSignalDrillId` link al vigente) | `expired` (con `resolvedAt`) | `not_found` | `degraded` (con `reason: 'pg_read_failed' | 'history_unavailable' | 'pg_stale'`).
+- Capability: `nexa.insights.read` (module `delivery`, action `read`, scope `tenant/all`). Seedeada en `greenhouse_core.capabilities_registry` (migration `20260529004012583`). Grant matriz canonical V1: `EFEONCE_ADMIN ∪ FINANCE_ADMIN ∪ HR_MANAGER` (role) + route_groups `internal/finance/hr` (broad operational).
+- Helper URL: `buildNexaInsightDrillHref(id)` → `/nexa/insights/<id>`. Centraliza la shape para evitar drift cross-surface.
+
+**3-tier lookup canonical** (enrichment-anchored `EO-AIE-*`):
+
+1. PG serving `greenhouse_serving.ico_ai_signal_enrichments` (current `status='succeeded'`).
+2. Fallback `greenhouse_serving.ico_ai_signal_enrichment_history` (TASK-914 history). Si hit → `superseded` state con link al `signalId` vigente.
+3. Miss → `not_found`.
+
+**Subject-aware filter canonical** (sin 403, anti-oracle TASK-872):
+
+- `tenantType='client'` → SIEMPRE `not_found` (V1 internal-only).
+- `EFEONCE_ADMIN` → SIEMPRE permitido.
+- `route_groups` broad `internal/finance/hr` → permitido (acceso operacional).
+- Collaborator sin route_group broad → solo si `subject.memberId === insight.memberId` (self-access).
+- Cualquier fallback → `not_found`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** crear detail page de Nexa Insights bajo route_group de dominio (`/agency/...`, `/finance/...`, `/people/...`). Canonical es `/nexa/insights/[id]` top-level. Mismo principio que `/admin/...` lane.
+- **NUNCA** consumer downstream compone su propio drawer/modal/detail para Nexa Insights. Toda navegación pasa por `/nexa/insights/[id]` (deep-linkable, share-friendly, estable cross-time/tenant/domain).
+- **NUNCA** crear URLs canonical ancladas al `enrichmentId` para cards "Ver causa raíz" del current. Cards usan `signalId` (estable cross-period). `enrichmentId` reservado para share/forensic explícito (TASK-449 V1.3).
+- **NUNCA** retornar `403` desde el detail page cuando subject sin acceso. `notFound()` siempre (anti-oracle TASK-872). 403 leakea info de existencia al atacante; legítimos bloqueados se detectan via reliability signals upstream.
+- **NUNCA** read directo de `ico_engine.ai_signals` raw BQ ni de `ico_ai_signal_enrichments`/`ico_ai_signal_enrichment_history` PG en consumers. Pasa por `readNexaInsightDrill`. VIEW canonical `ai_signals_current` TASK-943.
+- **NUNCA** colapsar UI states `not_found` + `expired` + `superseded` + `degraded` en un único "Sin datos" ambiguo. Mapping explícito TASK-946 framework (`current → default` / `superseded → partial banner amber` / `expired → empty-positive` / `not_found → notFound()` / `degraded → error banner`).
+- **NUNCA** mostrar narrativa superseded sin banner explícito "versión histórica" + link al `currentSignalDrillId` cuando exista.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'delivery', { tags: { source: 'nexa_insight_detail', stage: 'pg_read' | 'page_loader' } })`.
+- **NUNCA** seed `nexa.insights.read` en TS catalog sin grant en `runtime.ts` mismo PR (invariant TASK-873 + TASK-935). Guard mecánico `capability-grant-coverage.test.ts` rompe build si emerge drift.
+- **NUNCA** emit URL `/agency/insights/*` desde loader/componente nuevo. Canonical `/nexa/insights/[id]`. Grep `rg "/agency/insights/" src --include='*.ts' --include='*.tsx'` debe estar vacío (excepto comentarios y tests).
+- **NUNCA** romper el dispatch prefix `EO-AIS-*` / `EO-AIE-*` / `EO-AIH-*` en el resolver. Semántica anchor estable vs snapshot share-friendly vs forensic — los 3 tienen propósitos distintos.
+- **NUNCA** modificar la `severity_color` / `severity_label` map en `GH_NEXA` para un caso específico del detail. Reusa los tokens canonical existentes (TASK-696 / TASK-945) — single source of truth.
+- **SIEMPRE** que email/Teams notification incluya link a insight, usar `/nexa/insights/<signalId>` (estable cross-time + cross-tenant + cross-domain). Cards default = `signalId`; share buttons = `enrichmentId` explícito.
+- **SIEMPRE** que emerja consumer cross-surface nuevo que necesite "detail de un Nexa Insight", navegar al canonical — cero composición ad-hoc.
+- **SIEMPRE** que el LLM-enrichment-worker regenere un enrichment, el URL `/nexa/insights/EO-AIS-*` sigue válido apuntando al current (signal-anchored = estable cross-regeneration por design).
+- **SIEMPRE** que se introduzca una nueva surface emisora de drillHref a Nexa Insights, agregar test focal anti-regresión que assert (a) la URL es `/nexa/insights/*` (NO `/agency/insights/*`) y (b) usa `signalId` (NO `enrichmentId`) para cards default.
+
+**Spec canónica**: `docs/tasks/complete/TASK-947-nexa-insights-detail-page-canonical.md`. Patrones fuente: TASK-611 (organization workspace projection — detail page server-side con projection + degraded honest), TASK-872 (anti-oracle `notFound()` pattern), TASK-873 (capability runtime grant invariant + guard mecánico), TASK-935 (capability grants reconciliation + DEVOPS_OPERATOR no-existe enforcement), TASK-946 (12 canonical UI states framework). Helpers canónicos: `readNexaInsightDrill`, `buildNexaInsightDrillHref`, `detectNexaIdKind`, `NEXA_ID_PREFIXES` (todos en `src/lib/ico-engine/ai/nexa-insight-drill-reader.ts`).
 
 ### Quick Access Shortcuts Platform (TASK-553)
 
@@ -3681,7 +3776,7 @@ SCIM POST `/api/scim/v2/Users` con `tenant_type='efeonce_internal'` Y eligibilit
 
 **Capabilities granulares canónicas (4 nuevas)**:
 
-- `scim.eligibility_override.create` (organization, create, tenant) — EFEONCE_ADMIN + DEVOPS_OPERATOR
+- `scim.eligibility_override.create` (organization, create, tenant) — EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->
 - `scim.eligibility_override.delete` (organization, delete, tenant) — EFEONCE_ADMIN only
 - `scim.backfill.execute` (organization, execute, all) — EFEONCE_ADMIN only
 - `workforce.member.complete_intake` (workforce, update, tenant) — FINANCE_ADMIN + EFEONCE_ADMIN
@@ -3708,6 +3803,71 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 **Spec canónica**: `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (Slice 1 fix). Pattern fuente: `src/lib/entitlements/runtime.ts` líneas con grant `workforce.member.complete_intake` (matriz `hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN`).
 
 **TASK-935 (2026-05-25) — reconciliación sistémica + guard mecánico**: el bug class TASK-873 había recurrido 13 veces (capabilities can()-checked en endpoints `/api/admin/*` sin runtime grant → 403 para todos). Causa raíz: specs documentaron roles intended (`DEVOPS_OPERATOR`, `commercial_admin`, `operations`) que **nunca existieron como `ROLE_CODES`**, así que el grant nunca se escribió. TASK-935 agregó los 13 grants (colapsando a `EFEONCE_ADMIN` + `FINANCE_ADMIN`, el set real que pasa `requireAdminTenantContext`) + el guard `capability-grant-coverage.test.ts` que **previene la recurrencia mecánicamente**. **NUNCA** documentar un rol intended en una spec/capability sin verificar que existe en `src/config/role-codes.ts`; si no existe, el grant colapsa al rol real más cercano (típicamente `EFEONCE_ADMIN`). Spec: `docs/tasks/complete/TASK-935-capability-governance-reconciliation.md`.
+
+**Reflejo canonical antes de citar cualquier rol** (TASK-947 follow-up 2026-05-29): cuando un agente o spec mencione un rol, DEBE verificarlo primero contra el snapshot canonical de abajo (single source of truth: `src/config/role-codes.ts`, `ROLE_CODES` const). El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capability sin grant, pero el daño documental (specs/CLAUDE.md/AGENTS.md confusos) NO lo atrapa el guard. Esta regla cubre el lado documental.
+
+#### ROLE_CODES vigentes (snapshot 2026-05-29, V1.0 canonical)
+
+**13 roles reales** — son los ÚNICOS valores legítimos para `roleCodes`/`primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`. Cualquier mención fuera de esta tabla es bug documental. Fuente: `src/config/role-codes.ts:5-19` + `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` §"Role codes internos actuales" + `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`.
+
+**Internos Efeonce (10)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups típicos |
+|---|---|---|---|
+| `efeonce_admin` | Superadministrador | Control total de Greenhouse (usuarios, roles, settings, vistas). Override global. Pasa `requireAdminTenantContext`. Es el colapso canonical de roles fantasma (DEVOPS_OPERATOR, commercial_admin). | `internal`, `admin` + acceso transversal |
+| `finance_admin` | Administrador de Finanzas | Configuración + operaciones financieras sensibles. Pasa `requireFinanceTenantContext`. Co-grant canonical para observabilidad financiera. | `internal`, `finance` |
+| `finance_analyst` | Analista de Finanzas | Operación financiera del día a día (read-write acotado, no settings sensibles). | `internal`, `finance` |
+| `hr_payroll` | Nómina | Gestión de payroll, compensaciones y períodos. | `internal`, `hr` |
+| `hr_manager` | Gestión HR | Gestión HR de personas, estructura y approvals de dominio. **NO confundir con `HR_ADMIN` (fantasma).** | `internal`, `hr` |
+| `efeonce_operations` | Operaciones | Visibilidad operativa cross-space y cross-tenant. **NO confundir con `operations` (fantasma — no es rol, es término genérico).** | `internal` |
+| `efeonce_account` | Líder de Cuenta | Responsabilidad comercial y salud de cuentas. | `internal` |
+| `people_viewer` | Lectura de Personas | Lectura de People, capacidad, assignments y memberships. | `internal`, `people` |
+| `ai_tooling_admin` | Administrador de Herramientas AI | Gobierno de catálogo, licencias y wallets AI. | `internal`, `ai_tooling` |
+| `collaborator` | Colaborador | Experiencia personal del miembro en Greenhouse (Mi Ficha, Mi Nómina). Lo tiene todo colaborador interno además de su rol funcional. | `my` |
+
+**Externos cliente (3)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups |
+|---|---|---|---|
+| `client_executive` | Cliente Ejecutivo | CMO/VP-level. Dashboard ejecutivo, KPIs alto nivel, overview de equipo. | `client` |
+| `client_manager` | Cliente Manager | Marketing manager. Contexto operativo profundo, drilldowns de proyecto, detalle de sprint. | `client` |
+| `client_specialist` | Cliente Specialist | Coordinador externo. Restringido a proyectos o campañas específicas via scope filters. | `client` |
+
+**Helpers TS canonical para citar roles** (no escribir strings literales):
+
+```ts
+import { ROLE_CODES, type RoleCode, isRoleCode, isSuperadmin } from '@/config/role-codes'
+
+// CORRECTO
+hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+addEntitlement(entries, { source: 'role', ... }) // donde tenant.roleCodes.includes(ROLE_CODES.FINANCE_ADMIN)
+
+// PROHIBIDO
+subject.roleCodes.includes('devops_operator') // fantasma — no existe
+subject.roleCodes.includes('hr_admin') // fantasma — el real es hr_manager
+subject.roleCodes.includes('commercial_admin') // fantasma — colapsa a efeonce_admin
+```
+
+**Mapping route_groups (NO son roles, no confundir)**: `internal`, `admin`, `client`, `finance`, `hr`, `people`, `my`, `ai_tooling`. Son derivados del rol según `src/lib/tenant/access.ts`. Un rol puede pertenecer a múltiples route_groups.
+
+#### Bug class — roles fantasma que han contaminado specs
+
+Estos NO existen en `ROLE_CODES` pero se siguen citando incorrectamente. Cuando emerjan en draft de task / spec / análisis, colapsar inmediatamente al rol real más cercano:
+
+| Rol fantasma | Origen del bug | Colapso canonical |
+|---|---|---|
+| `DEVOPS_OPERATOR` / `devops_operator` | TASK-848/849/850/854/872/908 specs (release/SCIM/delivery). | `EFEONCE_ADMIN` solo (release ops + SCIM admin), opcional `+ FINANCE_ADMIN` para observabilidad. |
+| `HR_ADMIN` / `hr_admin` | TASK-908 spec (ICO status transitions). | `HR_MANAGER`. |
+| `commercial_admin` / `COMMERCIAL_ADMIN` | Drafts comerciales pre-TASK-935. | `EFEONCE_ADMIN`. |
+| `operations` (como rol) | Confusión con route_group `internal` / con `efeonce_operations`. | `EFEONCE_OPERATIONS` si el intent es el rol; `internal` como route_group si el intent era acceso broad. |
+
+**Protocolo obligatorio cuando un agente vaya a citar un rol** (nuevo draft, capability matrix, grant analysis, doc nueva, edit a CLAUDE.md/AGENTS.md):
+
+1. Leer `src/config/role-codes.ts` (`ROLE_CODES` const) — los 13 valores arriba.
+2. Listar los roles que el draft/análisis menciona.
+3. Flag cualquier rol que no esté en la tabla.
+4. Proponer colapso canonical (típicamente `EFEONCE_ADMIN` para admin/release, `+ FINANCE_ADMIN` para finance observability, `HR_MANAGER` para HR governance).
+5. Documentar el colapso con marcador inline si la spec original tiene valor histórico (patrón: `<!-- spec original menciona X — colapsado a Y por TASK-935 -->`).
 
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 
@@ -4214,6 +4374,42 @@ WHEN NOT MATCHED THEN INSERT (...) VALUES (...)
 - Signal reader: `src/lib/reliability/queries/ico-materializer-skipped-safety.ts`
 - Wire-up: `src/lib/reliability/get-reliability-overview.ts` (`icoMaterializerSkippedSafety` source)
 
+### Nexa AI Signals append-only event log invariants (TASK-943, desde 2026-05-28)
+
+`ico_engine.ai_signals` y `ico_engine.ai_prediction_log` son **observaciones históricas event-sourced** (hermanas de `task_status_transitions` TASK-908, outbox events TASK-773, audit logs TASK-742) — NO estado mutable. Una anomalía detectada el 5 de mayo "Daniela OTD bajó 30%" sigue siendo verdad sobre el 5 de mayo aunque el 20 ya no se observe; full-replace destruye evidencia operativa irrecuperable. Para sprints de 15 días, la evolución intra-mes ES la señal de gestión.
+
+**Dicotomía canonical** (supersede el framing erróneo "estable vs volátil" del Delta TASK-942 2026-05-27 en la ADR — ver Delta 2026-05-28):
+
+| Tipo de dato | Patrón canonical |
+|---|---|
+| Estado mutable (`metrics_by_*.otd_pct`) | **MERGE upsert por key** (TASK-900) |
+| Observación histórica (`ai_signals`, `ai_prediction_log`, `task_status_transitions`, outbox, audit) | **Append-only event log** (TASK-943) |
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** ejecutar `DELETE FROM ai_signals` ni `DELETE FROM ai_prediction_log` (excepto cleanup operativo manual auditado con capability). Materializer canónico (`appendBigQuerySignalsForPeriod`, `appendPredictionLogs`) es INSERT-only.
+- **SIEMPRE** leer "qué señales aplican AHORA al período X" via la VIEW canonical `ai_signals_current` (latest-per-`signal_id`) — NO la raw `ai_signals`. Idem `ai_prediction_log_current` para predictions. Raw tables se leen SOLO cuando se quiere historia evolutiva intra-período o cuando se usa `FOR SYSTEM_TIME AS OF` (BQ time travel no funciona sobre VIEWs).
+- **SIEMPRE** el cron `/api/cron/ico-materialize` opera con `monthsBack=1` por default (solo período actual). Meses cerrados quedan inmutables. Operator override via `?monthsBack=N` (cap 1..6) para backfill manual auditado.
+- **ÚNICA excepción mutable** del contract append-only: `ai_prediction_log.actual_value` + `actual_recorded_at` (+ `error_pct` derivado) vía `hydratePredictionActuals`. Esta función es la ÚNICA fuente legítima de UPDATE sobre `ai_prediction_log`, guarded por `WHERE actual_value IS NULL` (no double-overwrite) + `period < currentPeriod` (no toca in-progress). NUNCA agregar campos al UPDATE ni quitar los guards.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'delivery', { tags: { source: 'ico_ai_*' } })` para rollup canonical en `/admin/operations`.
+- **NUNCA** consumers downstream (Person 360 narrative, Home Nexa Insights, Agency ICO `aiLlm.totals`, Finance Nexa Insights, reliability signals) leen raw `ai_signals` directo. Toda lectura pasa por:
+  - VIEW canonical `ai_signals_current` (default), o
+  - PG serving `greenhouse_serving.ico_ai_signals` (proyectado desde la VIEW por `icoAiSignalsProjection`), o
+  - PG history `greenhouse_serving.ico_ai_signal_enrichment_history` (append-only, narrativas enriquecidas — TASK-914).
+- **SIEMPRE** que emerja una entidad nueva en ICO cuyo dato responde a "qué se vio cuando" (no "cuál es el valor actual"), nacer como append-only event log + VIEW current. NO usar replace semantics. La pregunta correcta es semántica del dato, no si "el set parece volátil entre runs".
+
+**Signal de heartbeat canonical**: `nexa.insights.no_new_signals_in_24h` (kind=`lag`, severity warning >24h, error >48h, unknown sin signals, steady=ok). Reader `src/lib/reliability/queries/nexa-insights-no-new-signals.ts`. Cierra la pérdida de observabilidad implícita del DELETE+INSERT (un cron caído ya no "borra" la última corrida, queda silente).
+
+**Bug class fuente** (canonizado live 2026-05-28 ISSUE-082 RCA): el delta TASK-942 (2026-05-27) modeló `ai_signals` como "set volátil → full-replace canonical". El operador identificó el error de framing: las anomalías son observaciones temporales con valor histórico, no estado mutable. Rolling 3 meses con DELETE+INSERT era doble error (borra evidencia ya capturada + recomputa lo que ya no cambia). El delta TASK-942 queda supersedido por el delta TASK-943 (2026-05-28) en la ADR. Cross-ref: `BUG-CLASS-004` en `~/.claude/skills/greenhouse-ico/reference/bug-class-catalog.md`.
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_ICO_MATERIALIZER_HARDENING_V1.md` Delta 2026-05-28. Files canónicos:
+
+- Writer: `src/lib/ico-engine/ai/materialize-ai-signals.ts` (`appendBigQuerySignalsForPeriod` + `appendPredictionLogs` + `hydratePredictionActuals` única excepción mutable).
+- VIEW canonical: `src/lib/ico-engine/schema.ts` (`buildAiSignalsCurrentView`, `buildAiPredictionLogCurrentView`) — auto-provisioned por `ensureIcoEngineInfrastructure`.
+- Cron: `src/app/api/cron/ico-materialize/route.ts` (default `monthsBack=1`).
+- Consumers migrados (lectura via VIEW): `src/lib/reliability/queries/nexa-insights-freshness.ts`, `src/lib/sync/projections/ico-ai-signals.ts`, `src/lib/ico-engine/ai/llm-enrichment-worker.ts` (branch SYSTEM_TIME → raw, default → VIEW).
+- Heartbeat signal: `src/lib/reliability/queries/nexa-insights-no-new-signals.ts` + wire-up en `get-reliability-overview.ts`.
+
 Patrones fuente reusados: TASK-571/699/766/774 (VIEW + helper + reliability + lint), TASK-742 (defense in depth 7-layer), TASK-848 (state machine + tracking append-only), TASK-873 (capability granularity), TASK-720/768/777 (declarative config + lint rule pattern para futuros materializers).
 
 ### ICO Status Transition Foundation invariants (TASK-908, desde 2026-05-18)
@@ -4249,8 +4445,8 @@ TASK-908 (foundation, esta task)                TASK-901 (RpA)                  
 
 **Capabilities canonical V1.0** (granular least-privilege):
 
-- `cycle_time.compute.execute` (delivery / execute / all) — EFEONCE_ADMIN + DEVOPS_OPERATOR
-- `correction_transitions.compute.read` (delivery / read / all) — EFEONCE_ADMIN + DEVOPS_OPERATOR + HR_ADMIN
+- `cycle_time.compute.execute` (delivery / execute / all) — EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->
+- `correction_transitions.compute.read` (delivery / read / all) — EFEONCE_ADMIN + HR_MANAGER <!-- spec original menciona DEVOPS_OPERATOR + HR_ADMIN — colapsado a EFEONCE_ADMIN + HR_MANAGER por TASK-935 (DEVOPS_OPERATOR no existe; HR_ADMIN no existe, el real es HR_MANAGER) -->
 
 **Fix B.1 canonical (Slice 6)**: `EXCLUDED_FROM_METRICS_STATUSES = EXCLUDED_STATUSES ∪ BLOCKED_STATUSES`. Tareas en `Bloqueado` / `En pausa` / legacy `Detenido` ahora excluidas del denominador OTD/RpA/FTR via `CANONICAL_OPEN_TASK_SQL`. Pre-fix: contaminaban métricas. Post-fix: métricas suben ligeramente (ESPERADO).
 

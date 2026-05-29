@@ -99,6 +99,16 @@ Reglas obligatorias:
 
 - Add tests for duplicate replay, missing profile, missing FX, missing invoice asset and provider split.
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+793 puentea contractor payables → Finance obligations. Finance es owner del banco; Payroll no participa. Riesgo: que un payable contamine el motor de nómina o la categoría económica. Auditado con `greenhouse-payroll-auditor`.
+
+- **NUNCA** generar `payroll_entries` ni `payroll_adjustments` desde un payable. El payable listo crea una Finance payment obligation, no un movimiento de nómina.
+- **NUNCA** clasificar el payout del contractor como remuneración dependiente. Economic category = `labor_cost_external` / `provider_payroll` según source; fees de plataforma y FX spread van a sus categorías propias, nunca a `payroll` dependiente.
+- **NUNCA** invocar el materializador de gastos de nómina (`materializePayrollExpensesForExportedPeriod`) ni reusar el path de payment orders de payroll para contractor. El bridge contractor es propio e idempotente por `contractor_payable_id`.
+- **NUNCA** mutar `members.{payroll_via,contract_type,pay_regime}` al resolver el payment routing del contractor.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` además de las suites contractor/finance, para probar no-regresión del motor dependiente.
+
 ## Out of Scope
 
 - Executing the bank payment.
@@ -112,11 +122,13 @@ Reglas obligatorias:
 - [ ] Missing FX policy blocks cross-currency readiness.
 - [ ] Duplicate invoice/submission/payable candidates are blocked or flagged.
 - [ ] Finance obligation preserves source aggregate `contractor_payable`.
+- [ ] Payroll non-regression: no `payroll_entries`/`payroll_adjustments` desde payables; economic category nunca `payroll` dependiente; suite `src/lib/payroll` verde.
 
 ## Verification
 
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm vitest run src/lib/contractor-engagements src/lib/finance/payment-routing`
+- `pnpm vitest run src/lib/payroll` — payroll non-regression gate.
 - `pnpm pg:doctor`
 
 ## Closing Protocol

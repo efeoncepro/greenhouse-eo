@@ -5,7 +5,7 @@
  * to Greenhouse routes and tokens.
  */
 
-[cmdk-overlay] {
+.gh-cmdk-overlay {
   position: fixed;
   inset: 0;
   background: var(--mui-palette-background-paper);
@@ -14,7 +14,7 @@
   animation: gh-cmdk-fade 150ms cubic-bezier(0.2, 0, 0, 1) both;
 }
 
-[cmdk-dialog] {
+.gh-cmdk-dialog {
   position: fixed;
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);
@@ -32,6 +32,21 @@
   animation: gh-cmdk-pop 200ms cubic-bezier(0.2, 0, 0, 1) both;
 }
 
+.gh-cmdk-dialog [cmdk-root] {
+  display: flex;
+  flex-direction: column;
+  position: static;
+  inset: auto;
+  transform: none;
+  width: 100%;
+  height: min(520px, 80vh);
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+  z-index: auto;
+}
+
 @keyframes gh-cmdk-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -43,12 +58,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [cmdk-overlay], [cmdk-dialog] {
+  .gh-cmdk-overlay, .gh-cmdk-dialog {
     animation: none;
   }
 }
 
-[cmdk-input] {
+.gh-cmdk-dialog [cmdk-input] {
   font-family: inherit;
   font-size: 15px;
   font-weight: 400;
@@ -60,22 +75,22 @@
   padding-block: 4px;
 }
 
-[cmdk-input]::placeholder {
+.gh-cmdk-dialog [cmdk-input]::placeholder {
   color: var(--mui-palette-text-disabled);
 }
 
-[cmdk-list] {
+.gh-cmdk-dialog [cmdk-list] {
   overflow-y: auto;
   flex: 1;
   padding: 8px 0;
   scroll-padding-block: 8px;
 }
 
-[cmdk-group] + [cmdk-group] {
+.gh-cmdk-dialog [cmdk-group] + [cmdk-group] {
   margin-top: 4px;
 }
 
-[cmdk-group-heading] {
+.gh-cmdk-dialog [cmdk-group-heading] {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -84,7 +99,7 @@
   padding: 6px 16px 4px;
 }
 
-[cmdk-item] {
+.gh-cmdk-dialog [cmdk-item] {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -98,23 +113,23 @@
   transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-[cmdk-item][data-selected='true'],
-[cmdk-item][aria-selected='true'] {
+.gh-cmdk-dialog [cmdk-item][data-selected='true'],
+.gh-cmdk-dialog [cmdk-item][aria-selected='true'] {
   background: color-mix(in oklch, var(--mui-palette-primary-main) 12%, transparent);
 }
 
-[cmdk-item][data-disabled='true'] {
+.gh-cmdk-dialog [cmdk-item][data-disabled='true'] {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-[cmdk-item] i {
+.gh-cmdk-dialog [cmdk-item] i {
   font-size: 18px;
   color: var(--mui-palette-text-secondary);
 }
 
-[cmdk-item][data-selected='true'] i,
-[cmdk-item][aria-selected='true'] i {
+.gh-cmdk-dialog [cmdk-item][data-selected='true'] i,
+.gh-cmdk-dialog [cmdk-item][aria-selected='true'] i {
   color: var(--mui-palette-primary-main);
 }
 

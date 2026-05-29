@@ -1,6 +1,5 @@
 import { createRequire } from 'node:module'
 
-import { closeGreenhousePostgres } from '@/lib/db'
 import type {
   CreateSisterPlatformBindingInput,
   SisterPlatformBindingRecord,
@@ -72,6 +71,25 @@ const readCsvScopes = (key: string, fallback: SisterPlatformGreenhouseScopeType[
   return Array.from(new Set(values))
 }
 
+const readCsvText = (key: string, fallback: string[]) => {
+  const raw = readEnv(key)
+
+  if (!raw) {
+    return fallback
+  }
+
+  const values = raw
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean)
+
+  if (values.length === 0) {
+    throw new Error(`${key} debe incluir al menos un valor.`)
+  }
+
+  return Array.from(new Set(values))
+}
+
 const readBindingStatus = () => {
   const status = readEnv('KORTEX_BINDING_STATUS') ?? 'draft'
 
@@ -80,6 +98,16 @@ const readBindingStatus = () => {
   }
 
   return status as SisterPlatformBindingStatus
+}
+
+const readOAuthClientStatus = () => {
+  const status = readEnv('KORTEX_OAUTH_CLIENT_STATUS') ?? 'active'
+
+  if (status !== 'draft' && status !== 'active' && status !== 'suspended' && status !== 'deprecated') {
+    throw new Error('KORTEX_OAUTH_CLIENT_STATUS debe ser draft, active, suspended o deprecated.')
+  }
+
+  return status
 }
 
 const readScopeInput = (): ScopeInput => {
@@ -227,7 +255,23 @@ async function main() {
   const rotateToken = readEnv('KORTEX_ROTATE_CONSUMER_TOKEN') === 'true'
   const providedToken = readEnv('KORTEX_CONSUMER_TOKEN')
   const bindingStatus = readBindingStatus()
+  const oauthClientStatus = readOAuthClientStatus()
   const allowedGreenhouseScopeTypes = readCsvScopes('KORTEX_ALLOWED_GREENHOUSE_SCOPE_TYPES', ['client', 'space'])
+
+  const oauthRedirectUris = readCsvText('KORTEX_OAUTH_REDIRECT_URIS', [
+    'https://kortex-kappa.vercel.app/api/auth/callback/greenhouse',
+    'https://kortex.efeoncepro.com/api/auth/callback/greenhouse',
+    'http://localhost:3000/api/auth/callback/greenhouse',
+    'http://localhost:3001/api/auth/callback/greenhouse'
+  ])
+
+  const oauthAllowedScopes = readCsvText('KORTEX_OAUTH_ALLOWED_SCOPES', [
+    'openid',
+    'profile',
+    'email',
+    'kortex.operator_console.access'
+  ])
+
   const scope = readScopeInput()
 
   if (!externalScopeId) {
@@ -278,6 +322,28 @@ async function main() {
     lastVerifiedAt: new Date().toISOString()
   })
 
+  const { upsertSisterPlatformOAuthClient } = await import('@/lib/sister-platforms/oauth-broker')
+
+  const oauthClient = await upsertSisterPlatformOAuthClient({
+    sisterPlatformConsumerId: consumerResult.consumer.consumerId,
+    clientId: readEnv('KORTEX_OAUTH_CLIENT_ID') ?? 'kortex',
+    clientName: readEnv('KORTEX_OAUTH_CLIENT_NAME') ?? 'Kortex Operator Console',
+    clientStatus: oauthClientStatus,
+    redirectUris: oauthRedirectUris,
+    allowedScopes: oauthAllowedScopes,
+    codeTtlSeconds: readPositiveInt('KORTEX_OAUTH_CODE_TTL_SECONDS', 300),
+    accessTokenTtlSeconds: readPositiveInt('KORTEX_OAUTH_ACCESS_TOKEN_TTL_SECONDS', 300),
+    requirePkce: true,
+    issueIdentityInline: true,
+    metadata: {
+      source: 'scripts/seed-kortex-sister-platform-pilot.ts',
+      installationId,
+      taskId: 'TASK-948',
+      previousTaskId: 'TASK-377'
+    },
+    actorUserId
+  })
+
   console.log('Kortex pilot seed completado.')
   console.log('')
   console.log('Consumer listo:')
@@ -299,10 +365,25 @@ async function main() {
   printBindingSummary(bindingResult.binding)
 
   console.log('')
+  console.log('OAuth client listo:')
+  console.log(`- clientId: ${oauthClient.clientId}`)
+  console.log(`- status: ${oauthClient.clientStatus}`)
+  console.log(`- consumerPublicId: ${consumerResult.consumer.publicId}`)
+  console.log(`- redirectUris: ${oauthClient.redirectUris.join(', ')}`)
+  console.log(`- allowedScopes: ${oauthClient.allowedScopes.join(' ')}`)
+  console.log(`- ttl: code=${oauthClient.codeTtlSeconds}s accessToken=${oauthClient.accessTokenTtlSeconds}s`)
+
+  console.log('')
   console.log('Smoke call sugerido:')
   console.log(
     `curl \"$GREENHOUSE_BASE_URL/api/integrations/v1/sister-platforms/context?externalScopeType=portal&externalScopeId=${encodeURIComponent(externalScopeId)}\" -H \"x-greenhouse-sister-platform-key: <TOKEN_KORTEX>\"`
   )
+  console.log('')
+  console.log('Kortex env sugeridas para SSO:')
+  console.log(`KORTEX_GREENHOUSE_SSO_ENABLED=true`)
+  console.log(`GREENHOUSE_OAUTH_CLIENT_ID=${oauthClient.clientId}`)
+  console.log(`GREENHOUSE_OAUTH_CLIENT_SECRET=<TOKEN_KORTEX>`)
+  console.log(`GREENHOUSE_OAUTH_ISSUER=$GREENHOUSE_BASE_URL`)
 }
 
 main()
@@ -312,5 +393,7 @@ main()
     process.exitCode = 1
   })
   .finally(async () => {
+    const { closeGreenhousePostgres } = await import('@/lib/db')
+
     await closeGreenhousePostgres().catch(() => {})
   })

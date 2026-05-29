@@ -13,6 +13,18 @@ Greenhouse incluye una herramienta para **grabar lo que pasa en una pantalla del
 
 La idea: en vez de que cada persona escriba código nuevo cada vez que necesita ver "¿cómo se ve esta página en staging?", hay UN comando único.
 
+## Regla vigente para agentes
+
+Para cambios o diagnósticos de UI visible, `pnpm fe:capture` es el camino canónico de evidencia visual. Esto aplica a screenshots, secuencias de frames, microinteractions, responsive, revisión visual, design QA y comparaciones antes/después.
+
+El orden esperado es:
+
+1. Usar un scenario existente con `pnpm fe:capture <scenario> --env=staging`.
+2. Si no hay scenario, usar `pnpm fe:capture --route=<path> --env=staging --hold=3000`.
+3. Si la revisión requiere checklist UI/UX, correr `pnpm fe:capture:review`.
+4. Si se compara antes/después, correr `pnpm fe:capture:diff`.
+5. Solo usar Playwright ad-hoc como complemento para consola, red, payloads API o un gesto no soportado por el DSL; los artifacts igual deben quedar bajo `.captures/`.
+
 ## Para qué sirve
 
 | Caso | Comando |

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -80,6 +80,7 @@ const LoginV2 = ({
   })
 
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   // TASK-742 Capa 2 — Live provider readiness probe (cached 30s server-side).
   // Hides/disables provider buttons when their underlying secret/discovery
@@ -136,15 +137,26 @@ const LoginV2 = ({
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
+  const resolveSafeCallbackUrl = () => {
+    const redirectTo = searchParams.get('redirectTo')?.trim()
+
+    if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
+      return redirectTo
+    }
+
+    return '/auth/landing'
+  }
+
   const onSubmit = handleSubmit(async values => {
     setError('')
+    const callbackUrl = resolveSafeCallbackUrl()
 
     try {
       const result = await signIn('credentials', {
         email: values.email,
         password: values.password,
         redirect: false,
-        callbackUrl: '/auth/landing'
+        callbackUrl
       })
 
       if (result?.error) {
@@ -154,7 +166,7 @@ const LoginV2 = ({
       }
 
       setIsTransitioning(true)
-      router.replace('/auth/landing')
+      router.replace(callbackUrl)
       router.refresh()
     } catch {
       setError(GH_MESSAGES.login_error_network)
@@ -166,7 +178,7 @@ const LoginV2 = ({
     setSsoLoading('microsoft')
 
     try {
-      await signIn('azure-ad', { callbackUrl: '/auth/landing' })
+      await signIn('azure-ad', { callbackUrl: resolveSafeCallbackUrl() })
     } catch {
       setSsoLoading(null)
       setError(GH_MESSAGES.login_error_provider_unavailable)
@@ -178,7 +190,7 @@ const LoginV2 = ({
     setSsoLoading('google')
 
     try {
-      await signIn('google', { callbackUrl: '/auth/landing' })
+      await signIn('google', { callbackUrl: resolveSafeCallbackUrl() })
     } catch {
       setSsoLoading(null)
       setError(GH_MESSAGES.login_error_provider_unavailable)

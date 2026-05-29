@@ -17,7 +17,10 @@ const IcoAdvisoryBlock = ({ aiLlm }: Props) => {
     severity: item.severity,
     explanation: item.explanationSummary,
     rootCauseNarrative: item.rootCauseNarrative,
-    recommendedAction: item.recommendedAction
+    recommendedAction: item.recommendedAction,
+    // TASK-945 — propaga lifecycle (sparkline + resolved badge en bento)
+    lifecycle: item.lifecycle,
+    lifecycleStatus: item.lifecycleStatus
   }))
 
   const timelineInsights: NexaTimelineItem[] = (aiLlm.timeline ?? []).map(item => ({
@@ -38,6 +41,7 @@ const IcoAdvisoryBlock = ({ aiLlm }: Props) => {
       lastAnalysis={aiLlm.lastProcessedAt}
       runStatus={aiLlm.latestRun?.status ?? null}
       timelineInsights={timelineInsights}
+      dataStatus={aiLlm.dataStatus}
     />
   )
 }

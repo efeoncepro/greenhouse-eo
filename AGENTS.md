@@ -65,7 +65,8 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - **GitHub CLI (`gh`)**: autenticado contra `efeoncepro/greenhouse-eo`. Sirve para issues, PRs, workflow runs, releases.
 - **Vercel CLI (`vercel`)**: autenticado contra el team `efeonce-7670142f`. Sirve para env vars, deployments, project config.
 - **PostgreSQL CLI (`psql`)** via `pnpm pg:connect`: levanta proxy Cloud SQL + conexion auto, sin credenciales manuales.
-- **Frontend Capture (`pnpm fe:capture`)**: helper canonico Playwright + agent auth para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patron ad-hoc de `_cap.mjs`. Scenario DSL declarativo bajo `scripts/frontend/scenarios/`. Output `.captures/<ISO>_<scenario>/` (gitignored). Triple gate para production. Comandos: `pnpm fe:capture <scenario> --env=staging [--gif] [--headed]` o `pnpm fe:capture --route=/path --env=staging --hold=3000`. GC: `pnpm fe:capture:gc [--apply]` purga >30d. Doc: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`. Usalo cuando una verificacion visual o de microinteractions sea util — sale del ciclo "escribo un _cap.mjs cada vez".
+- **Frontend Capture (`pnpm fe:capture`)**: helper canonico Playwright + agent auth para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patron ad-hoc de `_cap.mjs`. Scenario DSL declarativo bajo `scripts/frontend/scenarios/`. Output `.captures/<ISO>_<scenario>/` (gitignored). Triple gate para production. Comandos: `pnpm fe:capture <scenario> --env=staging [--gif] [--headed]` o `pnpm fe:capture --route=/path --env=staging --hold=3000`. Comandos relacionados: `pnpm fe:capture:review <scenario|capture-dir>` genera dossier para UI review, `pnpm fe:capture:diff <prev> <curr>` compara before/after, `pnpm fe:capture:health` audita salud local reciente y `pnpm fe:capture:gc [--apply]` purga >30d. Doc: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`.
+- **Hook operativo de verificacion visual UI:** cuando una tarea o diagnostico toca UI visible, microinteractions, responsive, screenshots, secuencias de frames, design QA o "se ve bien/mal", la evidencia visual primaria debe salir de `pnpm fe:capture` o `pnpm fe:capture:review`. Si existe scenario, usarlo; si no, usar `--route` para evidencia rapida y crear scenario bajo `scripts/frontend/scenarios/` cuando el flujo vaya a repetirse o tenga interacciones. Solo usar Playwright ad-hoc como camino principal si hace falta consola/red/API payloads o una interaccion que el DSL aun no soporte; en ese caso guardar artifacts bajo `.captures/`, explicar por que no basto `fe:capture` y preferir convertir el caso en scenario despues. Si `fe:capture` falla por env faltante (por ejemplo `VERCEL_AUTOMATION_BYPASS_SECRET`), reportar el bloqueo exacto y probar `--env=local` cuando aplique, no reemplazar silenciosamente por screenshots sueltas.
 - **Hook operativo de browser diagnostics:** si el usuario pide abrir, revisar, diagnosticar, capturar o testear una ruta/URL del portal, invocar automaticamente `greenhouse-browser-diagnostics` y usar usuario agente dedicado + Playwright/Chromium. No pedir login al usuario ni navegar anonimo como primer intento. Para `dev-greenhouse.efeoncepro.com`, automatizar contra la URL `.vercel.app` canonica con bypass, salvo que el objetivo sea inspeccionar la SSO wall.
 
 **Regla operativa**: si diagnosticas que la causa raiz de un incidente vive en una de estas plataformas, ejecuta el fix con el CLI con guardrails y verificacion. Documentar pasos manuales para que el usuario los haga es **antipatron** salvo que la accion sea destructiva (eliminar app registration, drop database, force-push), en cuyo caso confirma con el usuario primero.
@@ -149,6 +150,68 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - Aplicar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
 - Revisar `git status` y no asumir que el arbol esta limpio.
 - Confirmar si el cambio toca layout global, navegacion, autenticacion, tema o deploy. Si toca alguno, documentarlo en `Handoff.md`.
+
+### 1.1 ROLE_CODES vigentes (snapshot 2026-05-29) y bug class de roles fantasma
+
+Cuando un agente o spec mencione un rol (`EFEONCE_ADMIN`, `FINANCE_ADMIN`, `HR_MANAGER`, etc.), DEBE verificarlo primero contra el snapshot canonical de abajo. Fuente: `src/config/role-codes.ts` (`ROLE_CODES` const). Es bug documental conocido (TASK-935 reconciliation) que specs antiguas siguen citando roles que NO existen.
+
+**13 roles reales** — los ÚNICOS valores legítimos para `roleCodes` / `primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`.
+
+**Internos Efeonce (10)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups típicos |
+|---|---|---|---|
+| `efeonce_admin` | Superadministrador | Control total de Greenhouse (usuarios, roles, settings). Override global. Pasa `requireAdminTenantContext`. Es el colapso canonical de roles fantasma (DEVOPS_OPERATOR, commercial_admin). | `internal`, `admin` + transversal |
+| `finance_admin` | Administrador de Finanzas | Configuración + operaciones financieras sensibles. Pasa `requireFinanceTenantContext`. Co-grant canonical para observabilidad financiera. | `internal`, `finance` |
+| `finance_analyst` | Analista de Finanzas | Operación financiera del día a día (sin settings sensibles). | `internal`, `finance` |
+| `hr_payroll` | Nómina | Gestión de payroll, compensaciones y períodos. | `internal`, `hr` |
+| `hr_manager` | Gestión HR | Gestión HR de personas, estructura, approvals. **NO confundir con `HR_ADMIN` (fantasma).** | `internal`, `hr` |
+| `efeonce_operations` | Operaciones | Visibilidad operativa cross-space y cross-tenant. **NO confundir con `operations` (fantasma — término genérico, no rol).** | `internal` |
+| `efeonce_account` | Líder de Cuenta | Responsabilidad comercial y salud de cuentas. | `internal` |
+| `people_viewer` | Lectura de Personas | Lectura de People, capacidad, assignments, memberships. | `internal`, `people` |
+| `ai_tooling_admin` | Administrador de Herramientas AI | Gobierno de catálogo, licencias, wallets AI. | `internal`, `ai_tooling` |
+| `collaborator` | Colaborador | Experiencia personal del miembro (Mi Ficha, Mi Nómina). Lo tiene todo colaborador interno además de su rol funcional. | `my` |
+
+**Externos cliente (3)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups |
+|---|---|---|---|
+| `client_executive` | Cliente Ejecutivo | CMO/VP-level. Dashboard ejecutivo, KPIs alto nivel. | `client` |
+| `client_manager` | Cliente Manager | Marketing manager. Contexto operativo profundo, drilldowns. | `client` |
+| `client_specialist` | Cliente Specialist | Coordinador externo. Restringido a proyectos/campañas específicas. | `client` |
+
+**Roles fantasma (NO existen — colapsar al canonical)**:
+
+| Fantasma | Colapso canonical |
+|---|---|
+| `DEVOPS_OPERATOR` / `devops_operator` | `EFEONCE_ADMIN` (release ops + SCIM admin); opcional `+ FINANCE_ADMIN` para observabilidad. |
+| `HR_ADMIN` / `hr_admin` | `HR_MANAGER`. |
+| `commercial_admin` / `COMMERCIAL_ADMIN` | `EFEONCE_ADMIN`. |
+| `operations` (como rol) | `EFEONCE_OPERATIONS` si es rol; `internal` si es route_group. |
+
+**Helpers TS canonical** (no string literals):
+
+```ts
+import { ROLE_CODES, type RoleCode, isRoleCode, isSuperadmin } from '@/config/role-codes'
+
+// CORRECTO
+hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+
+// PROHIBIDO
+subject.roleCodes.includes('devops_operator') // fantasma
+```
+
+**Route groups (NO son roles)**: `internal`, `admin`, `client`, `finance`, `hr`, `people`, `my`, `ai_tooling`. Derivados del rol según `src/lib/tenant/access.ts`. Un rol puede pertenecer a múltiples.
+
+**Protocolo obligatorio antes de citar un rol nuevo en spec/doc/edit**:
+
+1. Leer `src/config/role-codes.ts` (los 13 valores arriba).
+2. Listar los roles que el draft/análisis menciona.
+3. Flag cualquier rol que no esté en la tabla.
+4. Proponer colapso canonical (típicamente `EFEONCE_ADMIN` para admin, `+ FINANCE_ADMIN` para finance observability, `HR_MANAGER` para HR governance).
+5. Documentar el colapso con marcador inline si la spec original tiene valor histórico: `<!-- spec original menciona X — colapsado a Y por TASK-935 -->`.
+
+El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capability sin grant. El daño documental (spec confusa) NO lo atrapa el guard — esta regla lo cubre. Spec canonical: `docs/tasks/complete/TASK-935-capability-governance-reconciliation.md`. Reglas extendidas: `CLAUDE.md` sección "Reflejo canonical antes de citar cualquier rol".
 
 ### 2. Limites de trabajo
 
@@ -1021,8 +1084,8 @@ Pipeline canonical RpA V2 demo end-to-end: status transition Notion → captura 
   - STRICT (Sentry, GCP WIF, Postgres health/migrations, target_sha, ci, playwright, batch_policy, stale_approvals, pending_without_jobs): failure → error/block
   - DEGRADED (Vercel, Azure WIF): failure → warning, degradedSources entry
 - **3 capabilities granulares least-privilege** (migration `20260510144012098_task-850-preflight-capabilities.sql`):
-  - `platform.release.preflight.execute` (EFEONCE_ADMIN + DEVOPS_OPERATOR)
-  - `platform.release.preflight.read_results` (EFEONCE_ADMIN + DEVOPS_OPERATOR + FINANCE_ADMIN observabilidad)
+  - `platform.release.preflight.execute` (EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->)
+  - `platform.release.preflight.read_results` (EFEONCE_ADMIN + FINANCE_ADMIN observabilidad <!-- spec original menciona DEVOPS_OPERATOR — removido por TASK-935 (rol no existe en ROLE_CODES) -->)
   - `platform.release.preflight.override_batch_policy` (EFEONCE_ADMIN solo, break-glass)
 - **Helpers canonicos** (single source of truth, reusables):
   - `src/lib/release/preflight/composer.ts` (composeFromCheckResults puro)
@@ -1074,7 +1137,7 @@ Pipeline canonical RpA V2 demo end-to-end: status transition Notion → captura 
 
 ### Release Observability Completion (TASK-854, 2026-05-10)
 
-- **Que hace**: cierra el subsystem `Platform Release` con 5 of 5 reliability signals canonicos (los 2 nuevos requieren `release_manifests` populated por TASK-851 orquestador) + dashboard read-only `/admin/releases` para EFEONCE_ADMIN + DEVOPS_OPERATOR.
+- **Que hace**: cierra el subsystem `Platform Release` con 5 of 5 reliability signals canonicos (los 2 nuevos requieren `release_manifests` populated por TASK-851 orquestador) + dashboard read-only `/admin/releases` para EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->.
 - **2 signals nuevos**:
   - `platform.release.deploy_duration_p95` (kind=lag): p95 de `completed_at - started_at` para releases en estado `released`, ventana 30d. Severity: ok <30min, warning 30-60min, error >=60min, unknown sin samples.
   - `platform.release.last_status` (kind=drift): ultimo release de main. ok si `released`, error si `degraded|aborted|rolled_back` <24h, warning 24h-7d, ok >7d (resolved historicamente), unknown si in-flight o sin releases.

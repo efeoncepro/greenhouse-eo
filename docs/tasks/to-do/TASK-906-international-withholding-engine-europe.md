@@ -22,6 +22,11 @@
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
+## Delta 2026-05-27
+
+- **Linkage de programa.** Rastreada junto a EPIC-013 / TASK-905 como parte de "pagos a fuerza laboral internacional". Extiende la foundation de TASK-905 (no crea motor nuevo). Misma aclaración: ⚠️ `international_internal` ≠ contractor; vive dentro del motor de Payroll, no es Contractor Engagements. `Epic: optional` se mantiene a propósito.
+- **Guardrails de no-regresión payroll** consolidados abajo. Auditado con `greenhouse-payroll-auditor`.
+
 ## Summary
 
 Extender el motor canonico de retenciones internacionales de `international_internal` hacia Europa. Esta task reutiliza la foundation de TASK-905 y agrega el catalogo europeo fail-closed, soporte para circulares MFN SII, MLI/PPT, cobertura territorial y reglas por pais/tipo de servicio/evidencia.
@@ -200,6 +205,18 @@ Reglas obligatorias:
 - Generate country-specific follow-ups if any current collaborator besides Spain appears in Europe.
 - Document unresolved Tax/Legal questions in Handoff and docs.
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+906 extiende el motor de TASK-905 a Europa fail-closed. No crea motor nuevo; hereda todos los guardrails de 905 y agrega los europeos. Auditado con `greenhouse-payroll-auditor`.
+
+- **NUNCA** crear un segundo motor/resolver/schema. Reutiliza el de TASK-905.
+- **NUNCA** aplicar a `international_internal` europeo deducciones Chile dependientes ni retención honorarios SII (heredado de 905).
+- **NUNCA** promover una regla Europa a `approved_*` sin signoff Tax/Legal auditado; default `draft_tax_review`/`needs_tax_review`.
+- **NUNCA** aplicar reducción por convenio en Europa sin evidencia + circular MFN/MLI vigente + cobertura territorial confirmada. `EU` no es residencia fiscal válida → `blocked_invalid_tax_residency`.
+- **NUNCA** romper el catálogo/resolver Americas (905) ni los otros 4 regímenes (Chile dependiente, honorarios, contractor/Deel, EOR) al sumar Europa. Regression Americas + suite payroll verde.
+- **NUNCA** mover a Daniela/España fuera de `needs_tax_review`; eso es TASK-907 con signoff Tax/Legal.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` (suite completa) además de `international-withholding`, como gate de cierre.
+
 ## Out of Scope
 
 - Approving any Europe country rule without written Tax/Legal signoff.
@@ -305,11 +322,13 @@ Rules or sources must be able to store:
 - [ ] Germany transport-only and Guernsey/Jersey TIEA-only do not produce treaty reduced payroll service rates.
 - [ ] DTA Europe rules remain `draft_tax_review`/blocked until audited Tax/Legal approval.
 - [ ] Resolver tests cover Spain, Germany, UK/France/Ireland/Spain Art. 14 employment distinction, MFN source rates and territorial caveats.
+- [ ] Payroll non-regression: catálogo/resolver Americas (905) intacto y suite `src/lib/payroll` verde; los otros 4 regímenes sin deltas.
 - [ ] Docs, architecture delta, changelog and Handoff are synchronized.
 
 ## Verification
 
 - `pnpm vitest run src/lib/payroll/international-withholding`
+- `pnpm vitest run src/lib/payroll` — payroll non-regression gate (Americas + otros regímenes).
 - `pnpm exec eslint src/lib/payroll src/types/payroll.ts`
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm pg:doctor`

@@ -29,6 +29,8 @@ Use this method when a change affects:
 
 ## Standard Local Flow
 
+> **2026-05-29 update:** Para Greenhouse, el capturador canónico es `pnpm fe:capture`. El patrón Playwright manual de este documento queda como fallback histórico para casos que el helper no cubra todavía.
+
 ### 1. Prepare local env
 
 - Use a Git-ignored `.env.local`.
@@ -57,8 +59,12 @@ Recommended local pattern:
 
 ### 4. Capture the real page
 
-- Use Playwright for deterministic validation.
-- Run Playwright from a temporary workspace outside the repo if the project does not already depend on it.
+- Use `pnpm fe:capture` for deterministic validation:
+  - `pnpm fe:capture <scenario> --env=staging` when a scenario exists.
+  - `pnpm fe:capture --route=/path --env=staging --hold=3000` for quick route evidence.
+  - `pnpm fe:capture:review <scenario-or-capture-dir>` when the output feeds UI/UX review.
+  - `pnpm fe:capture:diff <prev> <curr>` for before/after.
+- Use focused Playwright only as a fallback for console/network/API payloads or interactions not yet supported by the scenario DSL.
 - Wait for:
   - login redirect
   - route transition to complete
@@ -81,6 +87,8 @@ Check at minimum:
 - do not commit validation artifacts unless they are intentionally part of repo tooling
 
 ## Playwright Pattern Used In This Repo
+
+This section documents the historical manual pattern. Prefer `pnpm fe:capture` for current work and convert repeatable manual flows into `scripts/frontend/scenarios/<name>.scenario.ts`.
 
 This is the pattern validated during the dashboard hero/capacity iteration on `2026-03-11`:
 

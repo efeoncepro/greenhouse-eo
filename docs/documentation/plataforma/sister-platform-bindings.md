@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-11 por Codex (TASK-375)
-> **Ultima actualizacion:** 2026-04-11 por Codex (Kortex pilot seed follow-up)
+> **Ultima actualizacion:** 2026-05-28 por Codex (TASK-948 Kortex SSO broker)
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
 
 ---
@@ -59,6 +59,14 @@ La API read-only nueva permite:
 Tambien existe ahora un seed operativo para dejar listo el primer consumer Kortex sin crear registros a mano:
 
 - `pnpm seed:kortex-pilot`
+
+Para login interactivo de operadores, Greenhouse tambien expone un carril separado de SSO para apps hermanas:
+
+- `/api/auth/sister-platforms/authorize`
+- `/api/integrations/v1/sister-platforms/oauth/token`
+- `/api/integrations/v1/sister-platforms/oauth/userinfo`
+
+Ese carril usa authorization code one-time + PKCE + redirect URI allowlist. No comparte passwords, hashes, cookies Greenhouse ni tokens Microsoft con Kortex.
 
 ## Que estados puede tener
 
@@ -167,12 +175,24 @@ Defaults operativos:
 - binding en `draft`
 - consumer en `active`
 - scopes permitidos `client,space`
+- OAuth client Kortex en `active` salvo override `KORTEX_OAUTH_CLIENT_STATUS`
+- redirect URIs allowlisted por `KORTEX_OAUTH_REDIRECT_URIS`
+- scopes OAuth permitidos `openid,profile,email,kortex.operator_console.access`
 
 El script es idempotente:
 
 - si el consumer existe, lo actualiza
 - si el binding existe, lo actualiza
+- si el OAuth client `kortex` existe, lo actualiza
 - solo imprime token nuevo cuando lo crea o cuando se pide rotacion
+
+Flags de rollout:
+
+- Greenhouse: `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED=false` por default.
+- Greenhouse allowlist: `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS=kortex`.
+- Kortex: `KORTEX_GREENHOUSE_SSO_ENABLED=false` por default.
+
+Rollback operativo: apagar primero `KORTEX_GREENHOUSE_SSO_ENABLED`; si hace falta, apagar tambien `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED`. El bridge de password queda como break-glass hasta cerrar el cutover.
 
 ## Quien deberia tocarlo
 

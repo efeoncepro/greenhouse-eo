@@ -47,6 +47,7 @@ import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import NexaInsightsBlock, { type NexaInsightItem } from '@/components/greenhouse/NexaInsightsBlock'
+import type { NexaTimelineItem } from '@/components/greenhouse/NexaInsightsTimeline'
 import CustomTextField from '@core/components/mui/TextField'
 import { fuzzyFilter } from '@/components/tableUtils'
 
@@ -391,10 +392,13 @@ const FinanceDashboardView = () => {
 
   const [nexaInsights, setNexaInsights] = useState<{
     insights: NexaInsightItem[]
+    timeline: NexaTimelineItem[]
     totalAnalyzed: number
     lastAnalysis: string | null
     runStatus: 'succeeded' | 'partial' | 'failed' | null
-  }>({ insights: [], totalAnalyzed: 0, lastAnalysis: null, runStatus: null })
+    /** TASK-946 — honest degradation state propagated from `/api/finance/intelligence/nexa-insights`. */
+    dataStatus?: 'ready' | 'empty-pending' | 'empty-positive' | 'stale-degraded'
+  }>({ insights: [], timeline: [], totalAnalyzed: 0, lastAnalysis: null, runStatus: null })
 
   const fetchData = useCallback(async () => {
     let cancelled = false
@@ -527,11 +531,26 @@ const FinanceDashboardView = () => {
       if (nexaRes.ok) {
         const nexaData = await nexaRes.json()
 
+        // TASK-946 — narrow dataStatus al enum cerrado canonical (honest
+        // degradation: cualquier valor desconocido del endpoint => undefined,
+        // backward-compat con block fallback a comportamiento legacy hasData).
+        const allowedStatuses = ['ready', 'empty-pending', 'empty-positive', 'stale-degraded'] as const
+        const incomingStatus = typeof nexaData.dataStatus === 'string' ? nexaData.dataStatus : null
+
+        const dataStatus = allowedStatuses.includes(incomingStatus as (typeof allowedStatuses)[number])
+          ? (incomingStatus as (typeof allowedStatuses)[number])
+          : undefined
+
         setNexaInsights({
           insights: Array.isArray(nexaData.insights) ? (nexaData.insights as NexaInsightItem[]) : [],
+          // TASK-944 — timeline canonical alineado con las otras 4 surfaces Nexa Insights.
+          // El endpoint Finance ya devuelve `timeline` post TASK-944; honest degradation a []
+          // cuando el current table está vacío o el shape no coincide.
+          timeline: Array.isArray(nexaData.timeline) ? (nexaData.timeline as NexaTimelineItem[]) : [],
           totalAnalyzed: typeof nexaData.totalAnalyzed === 'number' ? nexaData.totalAnalyzed : 0,
           lastAnalysis: typeof nexaData.lastAnalysis === 'string' ? nexaData.lastAnalysis : null,
-          runStatus: nexaData.runStatus ?? null
+          runStatus: nexaData.runStatus ?? null,
+          dataStatus
         })
       }
 
@@ -757,13 +776,18 @@ const FinanceDashboardView = () => {
         </Grid>
       </Grid>
 
-      {/* Finance Nexa Insights — advisory layer */}
-      {(nexaInsights.totalAnalyzed > 0 || nexaInsights.runStatus) && (
+      {/* Finance Nexa Insights — advisory layer (TASK-944: timeline toggle
+        * alineado con las otras 4 surfaces; TASK-946: honest degradation state). */}
+      {(nexaInsights.totalAnalyzed > 0 ||
+        nexaInsights.runStatus ||
+        nexaInsights.dataStatus) && (
         <NexaInsightsBlock
           insights={nexaInsights.insights}
           totalAnalyzed={nexaInsights.totalAnalyzed}
           lastAnalysis={nexaInsights.lastAnalysis}
           runStatus={nexaInsights.runStatus}
+          timelineInsights={nexaInsights.timeline}
+          dataStatus={nexaInsights.dataStatus}
         />
       )}
 

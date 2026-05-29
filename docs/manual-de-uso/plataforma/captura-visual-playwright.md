@@ -25,6 +25,23 @@ Casos de uso:
 
 Reemplaza el patrón de cada agente escribiendo su `_cap.mjs` ad-hoc.
 
+## Hook obligatorio para revisiones visuales de UI
+
+Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visual primaria debe salir de este helper y no de screenshots sueltos:
+
+| Necesidad | Comando canónico |
+|---|---|
+| Ruta simple / sanity visual | `pnpm fe:capture --route=/ruta --env=staging --hold=3000` |
+| Flujo repetible o microinteraction | `pnpm fe:capture <scenario> --env=staging` |
+| Dossier para review UI/UX | `pnpm fe:capture:review <scenario-or-capture-dir> --env=staging` |
+| Before/after | `pnpm fe:capture:diff .captures/<prev> .captures/<curr>` |
+| Salud del pipeline local | `pnpm fe:capture:health` |
+| Limpieza de artifacts | `pnpm fe:capture:gc [--apply]` |
+
+Playwright ad-hoc solo debe usarse como complemento cuando haga falta inspeccionar consola, network, payloads de API o un gesto que el DSL todavía no soporte. En ese caso, guardá artifacts bajo `.captures/`, explicá por qué no alcanzó el helper canónico y convertí el flujo en scenario si se va a repetir.
+
+Si la captura staging falla por configuración local, por ejemplo `VERCEL_AUTOMATION_BYPASS_SECRET ausente`, documentá ese bloqueo exacto y probá `--env=local` si la ruta puede validarse contra `pnpm dev`.
+
 ## Antes de empezar
 
 Verificá que están las variables en `.env.local`:

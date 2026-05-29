@@ -93,6 +93,15 @@ Reglas obligatorias:
 - Expose approved submission as input to contractor payable readiness.
 - Prevent duplicate payable candidates for same submission/payable kind.
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+792 modela evidencia de trabajo contractor; aprobación operacional ≠ pago ejecutado. No debe filtrar hacia el motor de nómina. Auditado con `greenhouse-payroll-auditor`.
+
+- **NUNCA** alimentar `payroll_adjustments` ni `payroll_entries` desde una work submission aprobada. La submission aprobada es input de readiness del payable (TASK-793), no de payroll.
+- **NUNCA** crear `compensation_versions` desde una submission.
+- **NUNCA** tratar la aprobación de trabajo como ejecución de pago. Approval es operacional; el pago nace en payable → Finance.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` al cierre para probar que el flujo de submissions no alteró clasificación ni cálculo dependiente.
+
 ## Out of Scope
 
 - Finance bridge.
@@ -106,12 +115,14 @@ Reglas obligatorias:
 - [ ] Evidence refs are preserved and retrievable.
 - [ ] Approved submission can be consumed by payable readiness.
 - [ ] Duplicate payable candidates are blocked or flagged.
+- [ ] Payroll non-regression: suite `src/lib/payroll` verde; sin escritura a `payroll_adjustments`/`payroll_entries`/`compensation_versions` desde submissions.
 
 ## Verification
 
 - `pnpm exec tsc --noEmit --pretty false`
 - Unit tests for state machine and duplicate guard.
 - Focused API tests where route patterns exist.
+- `pnpm vitest run src/lib/payroll` — payroll non-regression gate.
 
 ## Closing Protocol
 

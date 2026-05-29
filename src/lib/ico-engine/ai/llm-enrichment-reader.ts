@@ -1,6 +1,10 @@
 import 'server-only'
 
+import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { query } from '@/lib/db'
+import { captureWithDomain } from '@/lib/observability/capture'
+
+import { resolveNexaInsightsDataStatus } from './nexa-data-status'
 
 import type {
   AgencyAiLlmSummary,
@@ -8,6 +12,8 @@ import type {
   IcoLlmRunStatus,
   MemberNexaInsightItem,
   MemberNexaInsightsPayload,
+  NexaSignalLifecycleStatus,
+  NexaSignalObservation,
   OrganizationAiLlmEnrichmentItem,
   SpaceNexaInsightItem,
   SpaceNexaInsightsPayload,
@@ -86,7 +92,10 @@ const mapMemberInsightItem = (row: RawRow): MemberNexaInsightItem => ({
   explanation: toText(row.explanation_summary),
   rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action),
-  processedAt: String(row.processed_at)
+  processedAt: String(row.processed_at),
+  // TASK-945 — propaga signal_id canonical para enrichment con lifecycle
+  // + deep link al detail page TASK-947 V1 cuando shippee.
+  signalId: typeof row.signal_id === 'string' ? row.signal_id : undefined
 })
 
 const mapSpaceInsightItem = (row: RawRow): SpaceNexaInsightItem => ({
@@ -97,8 +106,37 @@ const mapSpaceInsightItem = (row: RawRow): SpaceNexaInsightItem => ({
   explanation: toText(row.explanation_summary),
   rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action),
-  processedAt: String(row.processed_at)
+  processedAt: String(row.processed_at),
+  // TASK-945 — propaga signal_id canonical (mismo pattern member)
+  signalId: typeof row.signal_id === 'string' ? row.signal_id : undefined
 })
+
+// ─── TASK-945 — Helper canonical para enriquecer cualquier lista de items
+// con lifecycle data. Single source of truth; usado por todos los readers.
+
+const enrichInsightItemsWithLifecycle = async <T extends {
+  signalId?: string
+  lifecycle?: NexaSignalObservation[]
+  lifecycleStatus?: NexaSignalLifecycleStatus
+}>(items: T[], periodYear: number, periodMonth: number): Promise<T[]> => {
+  const signalIds = Array.from(new Set(items.map(item => item.signalId).filter((id): id is string => Boolean(id))))
+
+  if (signalIds.length === 0) return items
+
+  const lifecycles = await readNexaSignalLifecycles(signalIds, periodYear, periodMonth)
+
+  return items.map(item => {
+    const entry = item.signalId ? lifecycles.get(item.signalId) : undefined
+
+    if (!entry) return item
+
+    return {
+      ...item,
+      lifecycle: entry.observations,
+      lifecycleStatus: entry.status
+    }
+  })
+}
 
 const TIMELINE_DEFAULT_LIMIT = 20
 const TIMELINE_MAX_LIMIT = 50
@@ -262,10 +300,28 @@ export const readAgencyAiLlmSummary = async (
   const totalsRow = totalsRows[0] ?? {}
   const latestRunRow = latestRunRows[0]
 
+  // TASK-945 — enriquece recentEnrichments con lifecycle (mismo pattern Member/Space).
+  // mapSummaryItem ya incluye signalId via String(row.signal_id), por lo que el
+  // helper canonical readNexaSignalLifecycles encuentra los signal_ids.
+  const recentEnrichments = await enrichInsightItemsWithLifecycle(
+    recentRows.map(mapSummaryItem),
+    periodYear,
+    periodMonth
+  )
+
+  const succeededCount = Number(totalsRow.succeeded ?? 0)
+
+  // TASK-946 — honest degradation state canonical derivado server-side.
+  const dataStatus = await resolveNexaInsightsDataStatus({
+    insightsCount: succeededCount,
+    periodYear,
+    periodMonth
+  })
+
   return {
     totals: {
       total: Number(totalsRow.total ?? 0),
-      succeeded: Number(totalsRow.succeeded ?? 0),
+      succeeded: succeededCount,
       failed: Number(totalsRow.failed ?? 0),
       avgQualityScore: toNumber(totalsRow.avg_quality_score)
     },
@@ -280,9 +336,10 @@ export const readAgencyAiLlmSummary = async (
           signalsFailed: Number(latestRunRow.signals_failed ?? 0)
         }
       : null,
-    recentEnrichments: recentRows.map(mapSummaryItem),
+    recentEnrichments,
     timeline: timelineItems,
-    lastProcessedAt: toText(totalsRow.last_processed_at)
+    lastProcessedAt: toText(totalsRow.last_processed_at),
+    dataStatus
   }
 }
 
@@ -399,6 +456,173 @@ export const readOrganizationAiLlmEnrichments = async (
   return rows.map(mapOrganizationItem)
 }
 
+// ─── TASK-945 — Signal lifecycle canonical helper ──────────────────────────
+//
+// Lee de BQ `ico_engine.ai_signals` (raw append-only event log TASK-943) la
+// historia completa de generations de los signal_ids del top-N para el periodo
+// solicitado. NO usa la VIEW `ai_signals_current` (que filtra latest-per-signal)
+// porque el lifecycle requiere TODAS las observaciones cronologicas del periodo.
+//
+// Cross-store deliberado: el reader principal de Insights es PG-based (lee
+// `ico_ai_signal_enrichments` PG serving que tiene LLM enrichments). El lifecycle
+// del SIGNAL (no del enrichment) vive en BQ append-only. Esta primitiva los une
+// post-fetch sin acoplar.
+//
+// lifecycleStatus canonical derivado server-side:
+//   - `active`   si el ultimo cron run del periodo todavia observo el signal
+//   - `resolved` si la ultima observacion del signal es anterior al ultimo
+//     cron run del periodo (semantica: "ya no se ve").
+//
+// Honest degradation: si BQ falla o el signal no tiene >= 2 observations,
+// retorna `lifecycle: []`. El consumer UI (sparkline) NO renderiza con < 2 pts.
+//
+// Performance: top-N suele ser 3-10 signals × 30 obs cap = 90-300 BQ rows.
+// Una sola query (NO N+1). Cache HTTP en endpoint canonical 60s suficiente.
+
+const LIFECYCLE_OBSERVATIONS_PER_SIGNAL_LIMIT = 30
+
+export interface NexaSignalLifecycleEntry {
+  observations: NexaSignalObservation[]
+  status: NexaSignalLifecycleStatus
+}
+
+export const readNexaSignalLifecycles = async (
+  signalIds: string[],
+  periodYear: number,
+  periodMonth: number
+): Promise<Map<string, NexaSignalLifecycleEntry>> => {
+  const result = new Map<string, NexaSignalLifecycleEntry>()
+
+  if (signalIds.length === 0) {
+    return result
+  }
+
+  try {
+    const projectId = getBigQueryProjectId()
+    const bigQuery = getBigQueryClient()
+
+    const [rows] = await bigQuery.query({
+      query: `
+        WITH period_signals AS (
+          SELECT
+            signal_id,
+            generated_at,
+            severity,
+            current_value
+          FROM \`${projectId}.ico_engine.ai_signals\`
+          WHERE period_year = @periodYear
+            AND period_month = @periodMonth
+            AND signal_id IN UNNEST(@signalIds)
+        ),
+        latest_run AS (
+          SELECT MAX(generated_at) AS run_at
+          FROM \`${projectId}.ico_engine.ai_signals\`
+          WHERE period_year = @periodYear
+            AND period_month = @periodMonth
+        ),
+        ranked AS (
+          SELECT
+            signal_id,
+            generated_at,
+            severity,
+            current_value,
+            ROW_NUMBER() OVER (PARTITION BY signal_id ORDER BY generated_at ASC) AS asc_rn,
+            ROW_NUMBER() OVER (PARTITION BY signal_id ORDER BY generated_at DESC) AS desc_rn
+          FROM period_signals
+        )
+        SELECT
+          r.signal_id,
+          r.generated_at,
+          r.severity,
+          r.current_value,
+          r.asc_rn,
+          MAX(r.desc_rn = 1) OVER (PARTITION BY r.signal_id) AS is_last,
+          (SELECT run_at FROM latest_run) AS latest_run_at
+        FROM ranked r
+        WHERE r.asc_rn <= @perSignalLimit
+        ORDER BY r.signal_id, r.generated_at ASC
+      `,
+      params: {
+        periodYear,
+        periodMonth,
+        signalIds,
+        perSignalLimit: LIFECYCLE_OBSERVATIONS_PER_SIGNAL_LIMIT
+      },
+      types: {
+        periodYear: 'INT64',
+        periodMonth: 'INT64',
+        signalIds: ['STRING'],
+        perSignalLimit: 'INT64'
+      }
+    })
+
+    interface BqLifecycleRow {
+      signal_id?: string | null
+      generated_at?: string | { value?: string } | null
+      severity?: string | null
+      current_value?: number | string | null
+      latest_run_at?: string | { value?: string } | null
+    }
+
+    const toIso = (value: BqLifecycleRow['generated_at']): string => {
+      if (typeof value === 'string') return value
+      if (value && typeof value === 'object' && 'value' in value && typeof value.value === 'string') return value.value
+
+      return ''
+    }
+
+    const toCurrentValue = (value: BqLifecycleRow['current_value']): number | null => {
+      if (typeof value === 'number') return Number.isFinite(value) ? value : null
+
+      if (typeof value === 'string' && value.trim()) {
+        const parsed = Number(value)
+
+        return Number.isFinite(parsed) ? parsed : null
+      }
+
+      return null
+    }
+
+    const observationsBySignal = new Map<string, NexaSignalObservation[]>()
+    let latestRunAt: string | null = null
+
+    for (const raw of (rows as BqLifecycleRow[])) {
+      const signalId = typeof raw.signal_id === 'string' ? raw.signal_id : null
+
+      if (!signalId) continue
+
+      latestRunAt = latestRunAt ?? (toIso(raw.latest_run_at) || null)
+
+      const list = observationsBySignal.get(signalId) ?? []
+
+      list.push({
+        generatedAt: toIso(raw.generated_at),
+        severity: typeof raw.severity === 'string' ? raw.severity : null,
+        currentValue: toCurrentValue(raw.current_value)
+      })
+
+      observationsBySignal.set(signalId, list)
+    }
+
+    for (const [signalId, observations] of observationsBySignal) {
+      const lastObservation = observations[observations.length - 1]
+
+      const status: NexaSignalLifecycleStatus =
+        lastObservation && latestRunAt && lastObservation.generatedAt < latestRunAt
+          ? 'resolved'
+          : 'active'
+
+      result.set(signalId, { observations, status })
+    }
+  } catch (error) {
+    captureWithDomain(error, 'delivery', {
+      tags: { source: 'nexa_signal_lifecycles', stage: 'bq_read' }
+    })
+  }
+
+  return result
+}
+
 export const readTopAiLlmEnrichments = async (
   periodYear: number,
   periodMonth: number,
@@ -437,7 +661,30 @@ export const readTopAiLlmEnrichments = async (
     [periodYear, periodMonth, limit]
   ).catch(() => [])
 
-  return rows.map(mapTopItem)
+  const items = rows.map(mapTopItem)
+
+  // TASK-945 — enriquece con lifecycle desde BQ append-only event log
+  // (TASK-943). Honest degradation: si BQ falla o signal sin observaciones,
+  // `lifecycle` no se setea y el consumer UI degrada sin sparkline.
+  const signalIds = Array.from(new Set(items.map(item => item.signalId).filter(Boolean)))
+
+  if (signalIds.length === 0) {
+    return items
+  }
+
+  const lifecycles = await readNexaSignalLifecycles(signalIds, periodYear, periodMonth)
+
+  return items.map(item => {
+    const entry = lifecycles.get(item.signalId)
+
+    if (!entry) return item
+
+    return {
+      ...item,
+      lifecycle: entry.observations,
+      lifecycleStatus: entry.status
+    }
+  })
 }
 
 export const readMemberAiLlmTimeline = async (
@@ -498,6 +745,7 @@ export const readMemberAiLlmSummary = async (
       `
         SELECT
           enrichment_id,
+          signal_id,
           signal_type,
           metric_name,
           severity,
@@ -548,7 +796,14 @@ export const readMemberAiLlmSummary = async (
   const historicalTotalsRow = historicalTotalsRows[0] ?? { total: 0, last_processed_at: null }
   const latestRunRow = latestRunRows[0]
 
-  const activePreview = recentRows.map(mapMemberInsightItem)
+  // TASK-945 — enriquece con lifecycle ANTES de buildScopedSummarySelection
+  // para que insights / activePreview heredados ya tengan lifecycle data.
+  const activePreview = await enrichInsightItemsWithLifecycle(
+    recentRows.map(mapMemberInsightItem),
+    periodYear,
+    periodMonth
+  )
+
   const historicalPreview = timelineItems.slice(0, Math.max(1, limit))
 
   const scopedSummary = buildScopedSummarySelection(
@@ -557,6 +812,15 @@ export const readMemberAiLlmSummary = async (
     activePreview,
     historicalPreview
   )
+
+  // TASK-946 — honest degradation state canonical derivado server-side.
+  // `insightsCount` usa el conteo activo (period actual): Member views priorizan
+  // datos del periodo actual sobre historical fallback.
+  const dataStatus = await resolveNexaInsightsDataStatus({
+    insightsCount: scopedSummary.activeAnalyzed,
+    periodYear,
+    periodMonth
+  })
 
   return {
     summarySource: scopedSummary.summarySource,
@@ -570,7 +834,8 @@ export const readMemberAiLlmSummary = async (
     insights: scopedSummary.insights,
     activePreview: scopedSummary.activePreview,
     historicalPreview: scopedSummary.historicalPreview,
-    timeline: timelineItems
+    timeline: timelineItems,
+    dataStatus
   }
 }
 
@@ -604,6 +869,7 @@ export const readSpaceAiLlmSummary = async (
       `
         SELECT
           enrichment_id,
+          signal_id,
           signal_type,
           metric_name,
           severity,
@@ -655,7 +921,13 @@ export const readSpaceAiLlmSummary = async (
   const historicalTotalsRow = historicalTotalsRows[0] ?? { total: 0, last_processed_at: null }
   const latestRunRow = latestRunRows[0]
 
-  const activePreview = recentRows.map(mapSpaceInsightItem)
+  // TASK-945 — enriquece con lifecycle (pattern member reader)
+  const activePreview = await enrichInsightItemsWithLifecycle(
+    recentRows.map(mapSpaceInsightItem),
+    periodYear,
+    periodMonth
+  )
+
   const historicalPreview = timelineItems.slice(0, Math.max(1, limit))
 
   const scopedSummary = buildScopedSummarySelection(
@@ -664,6 +936,13 @@ export const readSpaceAiLlmSummary = async (
     activePreview,
     historicalPreview
   )
+
+  // TASK-946 — honest degradation state canonical (pattern member reader).
+  const dataStatus = await resolveNexaInsightsDataStatus({
+    insightsCount: scopedSummary.activeAnalyzed,
+    periodYear,
+    periodMonth
+  })
 
   return {
     summarySource: scopedSummary.summarySource,
@@ -677,6 +956,7 @@ export const readSpaceAiLlmSummary = async (
     insights: scopedSummary.insights,
     activePreview: scopedSummary.activePreview,
     historicalPreview: scopedSummary.historicalPreview,
-    timeline: timelineItems
+    timeline: timelineItems,
+    dataStatus
   }
 }

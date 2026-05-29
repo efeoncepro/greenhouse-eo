@@ -48,7 +48,10 @@ const OverviewTab = ({ detail }: Props) => {
     totalAnalyzed: 0,
     lastAnalysis: null,
     runStatus: null,
-    timeline: []
+    timeline: [],
+    // TASK-946 — fallback conservador (Space360 detail loader devolvió null):
+    // default canonical = empty-pending para que UI no infiera salud falsa.
+    dataStatus: 'empty-pending' as const
   }
 
   return (
@@ -60,6 +63,7 @@ const OverviewTab = ({ detail }: Props) => {
         runStatus={nexaInsights.runStatus}
         defaultExpanded={nexaInsights.totalAnalyzed > 0}
         timelineInsights={nexaInsights.timeline ?? []}
+        dataStatus={nexaInsights.dataStatus}
       />
 
       <Grid container spacing={6}>

@@ -291,6 +291,7 @@ export default [
     rules: {
       'greenhouse/no-untokenized-fx-math': 'error',
       'greenhouse/no-untokenized-expense-type-for-analytics': 'error',
+      'greenhouse/no-bq-struct-string-timestamp': 'error',
       'greenhouse/no-inline-facet-visibility-check': 'error',
       'greenhouse/cloud-run-services-must-init-sentry': 'error',
       'greenhouse/no-cross-domain-import-from-client-portal': 'error',

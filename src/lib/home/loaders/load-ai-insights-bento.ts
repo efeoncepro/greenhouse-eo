@@ -1,14 +1,13 @@
 import 'server-only'
 
+import { getCurrentPeriodSantiago } from '@/lib/home/period'
 import { readAgencyAiLlmSummary, readTopAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 
 import type { HomeAiInsightCard, HomeAiInsightsBentoData } from '../contract'
 
-const HOME_PERIOD_FORMATTER = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'America/Santiago',
-  year: 'numeric',
-  month: '2-digit'
-})
+// TASK-950 — `HOME_PERIOD_FORMATTER` inline removido. Consume helper canonical
+// `getCurrentPeriodSantiago()` desde `src/lib/home/period.ts` (single source of
+// truth cross-module).
 
 const inferDomain = (signalType: string | null | undefined): HomeAiInsightCard['domain'] => {
   if (!signalType) return 'agency'
@@ -37,19 +36,24 @@ const inferSeverity = (severity: string | null | undefined): HomeAiInsightCard['
 const HOME_INSIGHTS_LIMIT = 4
 
 export const loadHomeAiInsightsBento = async (): Promise<HomeAiInsightsBentoData> => {
-  const parts = HOME_PERIOD_FORMATTER.formatToParts(new Date())
-  const year = Number(parts.find(part => part.type === 'year')?.value ?? new Date().getFullYear())
-  const month = Number(parts.find(part => part.type === 'month')?.value ?? new Date().getMonth() + 1)
+  const { year, month } = getCurrentPeriodSantiago()
 
   const [topInsights, summary] = await Promise.all([
     readTopAiLlmEnrichments(year, month, HOME_INSIGHTS_LIMIT).catch(() => []),
-    readAgencyAiLlmSummary(year, month, 1).catch(() => ({
-      totals: { total: 0, succeeded: 0, failed: 0, avgQualityScore: null },
-      latestRun: null,
-      recentEnrichments: [],
-      timeline: [],
-      lastProcessedAt: null
-    }))
+    readAgencyAiLlmSummary(year, month, 1).catch(
+      () =>
+        ({
+          totals: { total: 0, succeeded: 0, failed: 0, avgQualityScore: null },
+          latestRun: null,
+          recentEnrichments: [],
+          timeline: [],
+          lastProcessedAt: null,
+          // TASK-946 — honest degradation: si el summary read falla por
+          // completo, no podemos afirmar cron status; default canonical
+          // conservador = empty-pending (igual contract que helper interno).
+          dataStatus: 'empty-pending' as const
+        })
+    )
   ])
 
   const cards: HomeAiInsightCard[] = topInsights.map(row => ({
@@ -61,13 +65,27 @@ export const loadHomeAiInsightsBento = async (): Promise<HomeAiInsightsBentoData
     headline: row.explanationSummary ?? row.metricName,
     rootCauseSummary: row.rootCauseNarrative ?? null,
     recommendedAction: row.recommendedAction ?? null,
-    drillHref: `/agency/insights/${row.enrichmentId}`,
+
+    // TASK-947 — drillHref canonical:
+    // - Routing top-level `/nexa/insights/[id]` (NO `/agency/insights/*`
+    //   legacy roto, TASK-696 drift cerrado).
+    // - Drill key = `signalId` (signal-anchored, prefix `EO-AIS-*`), estable
+    //   cross-period TASK-943 append-only. NUNCA `enrichmentId` para cards
+    //   "Ver causa raíz" del current — `enrichmentId` queda reservado para
+    //   share permalinks (TASK-449 V1.3).
+    // - El helper canonical `readNexaInsightDrill` (TASK-947) dispatchea
+    //   ambos prefijos (`EO-AIS-*` + `EO-AIE-*` + `EO-AIH-*`).
+    drillHref: `/nexa/insights/${row.signalId}`,
     processedAt: row.processedAt
   }))
 
   return {
     cards,
     totalAnalyzed: summary.totals.succeeded,
-    lastAnalysisAt: summary.lastProcessedAt
+    lastAnalysisAt: summary.lastProcessedAt,
+    // TASK-946 — propagate honest degradation state desde el summary canonical.
+    // El Home bento decide su render UI via este flag (4 estados server-side +
+    // loading local). Backward-compat: undefined si summary no lo expone.
+    dataStatus: summary.dataStatus
   }
 }

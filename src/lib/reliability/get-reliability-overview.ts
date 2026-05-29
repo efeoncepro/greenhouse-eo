@@ -47,6 +47,8 @@ import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity
 import { getIdentityLegalProfilePendingOverdueSignal } from './queries/identity-legal-profile-pending-overdue'
 import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-legal-profile-reveal-anomaly'
 import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
+import { getNexaInsightsFreshnessSignal } from './queries/nexa-insights-freshness'
+import { getNexaInsightsNoNewSignalsSignal } from './queries/nexa-insights-no-new-signals'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
 import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
 import {
@@ -89,6 +91,11 @@ import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
   getIdentityGovernancePendingApprovalOverdueSignal
 } from './queries/identity-governance-signals'
+import {
+  getSisterPlatformOAuthExchangeFailureRateSignal,
+  getSisterPlatformOAuthRedirectRejectedSignal,
+  getSisterPlatformOAuthStaleClientConfigSignal
+} from './queries/sister-platform-oauth-signals'
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
@@ -421,6 +428,17 @@ interface ReliabilityOverviewSources {
    * bug class TASK-877.
    */
   icoMaterializerSkippedSafety?: ReliabilitySignal | null
+  nexaInsightsFreshness?: ReliabilitySignal | null
+
+  /**
+   * TASK-943 Slice 5 — Nexa Insights heartbeat (`no_new_signals_in_24h`).
+   * Post-TASK-943 el materializer es append-only; un cron caído ya no
+   * "borra" la última corrida — se vuelve silente. Este signal cierra la
+   * pérdida de observabilidad que daba DELETE+INSERT, midiendo edad de la
+   * última `generated_at` en `ai_signals_current`. Severity warning >24h,
+   * error >48h, unknown si sin signals. Subsystem rollup 'delivery'.
+   */
+  nexaInsightsNoNewSignals?: ReliabilitySignal | null
 
   /**
    * TASK-908 Slice 3.5 — Notion correction transitions source availability.
@@ -582,6 +600,7 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   identityGovernance?: ReliabilitySignal[] | null
+  sisterPlatformOAuth?: ReliabilitySignal[] | null
 
   /**
    * TASK-611 Slice 5 — Organization Workspace projection signals (2):
@@ -792,6 +811,12 @@ export const buildReliabilityOverview = (
     // ICO está protegiendo data buena del bug class TASK-877 (upstream bridge
     // Notion→member regresión silente). Steady=0.
     ...(sources.icoMaterializerSkippedSafety ? [sources.icoMaterializerSkippedSafety] : []),
+    ...(sources.nexaInsightsFreshness ? [sources.nexaInsightsFreshness] : []),
+    // TASK-943 Slice 5 — Nexa Insights heartbeat. Post append-only el cron caído
+    // ya no "borra" la última corrida; este signal mide edad de la última
+    // generation. Complementario a nexaInsightsFreshness (que cruza BQ vs PG
+    // serving) + icoMaterializerSkippedSafety (que detecta gate active).
+    ...(sources.nexaInsightsNoNewSignals ? [sources.nexaInsightsNoNewSignals] : []),
     // TASK-908 Slice 3.5 — Notion correction transitions source availability.
     // Pre-TASK-908b deployment: 100% unavailable esperado (tabla vacía).
     // Post-deployment + backfill: < 10% steady state. Visibiliza coverage del
@@ -841,6 +866,9 @@ export const buildReliabilityOverview = (
     ...(sources.workforceRoleTitle ?? []),
     // TASK-839 — Admin Center entitlement governance signals (2).
     ...(sources.identityGovernance ?? []),
+    // TASK-948 — Sister-platform OAuth broker signals (exchange failures,
+    // redirect rejects, stale client config). Roll up bajo identity.
+    ...(sources.sisterPlatformOAuth ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
     // TASK-872 Slice 6 — SCIM Internal Collaborator + workforce intake signals (6).
@@ -1255,6 +1283,19 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-948 — Sister-platform OAuth broker signals. Estos readers se basan
+  // en el audit log append-only del broker; no leen secretos ni tokens raw.
+  const sisterPlatformOAuth =
+    preloadedSources.sisterPlatformOAuth !== undefined
+      ? preloadedSources.sisterPlatformOAuth
+      : await Promise.all([
+          getSisterPlatformOAuthExchangeFailureRateSignal().catch(() => null),
+          getSisterPlatformOAuthRedirectRejectedSignal().catch(() => null),
+          getSisterPlatformOAuthStaleClientConfigSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-611 Slice 5 — Organization Workspace projection signals (2 readers en
   // paralelo). Cada uno degrada honestamente a `unknown` si su query/cómputo falla.
   // Roll up bajo moduleKey 'identity'.
@@ -1377,6 +1418,23 @@ export const getReliabilityOverview = async (
     preloadedSources.icoMaterializerSkippedSafety !== undefined
       ? preloadedSources.icoMaterializerSkippedSafety
       : await getIcoMaterializerSkippedSafetySignal().catch(() => null)
+
+  // TASK-941 Slice 5 — Nexa Insights freshness (stale_with_eligible_signals).
+  // Cross-store: BQ ai_signals latest período vs PG serving enrichments.
+  // Degrada honestamente a `unknown` si la query falla.
+  const nexaInsightsFreshness =
+    preloadedSources.nexaInsightsFreshness !== undefined
+      ? preloadedSources.nexaInsightsFreshness
+      : await getNexaInsightsFreshnessSignal().catch(() => null)
+
+  // TASK-943 Slice 5 — Nexa Insights heartbeat (no_new_signals_in_24h).
+  // BQ-only: MAX(generated_at) FROM ai_signals_current vs NOW(). Cierra la
+  // pérdida de observabilidad post append-only (un cron caído ya no "borra"
+  // la última corrida → silente sin este signal). Degrada honestamente.
+  const nexaInsightsNoNewSignals =
+    preloadedSources.nexaInsightsNoNewSignals !== undefined
+      ? preloadedSources.nexaInsightsNoNewSignals
+      : await getNexaInsightsNoNewSignalsSignal().catch(() => null)
 
   // TASK-908 Slice 3.5 — Notion correction transitions source availability.
   // Single reader; LEFT JOIN tasks completadas vs task_status_transitions.
@@ -1560,6 +1618,7 @@ export const getReliabilityOverview = async (
     identityLegalProfile,
     workforceRoleTitle,
     identityGovernance,
+    sisterPlatformOAuth,
     workspaceProjection,
     scimWorkforce,
     entraWebhookSubscriptionHealth,
@@ -1576,6 +1635,8 @@ export const getReliabilityOverview = async (
     commercialHealth,
     productionRelease,
     icoMaterializerSkippedSafety,
+    nexaInsightsFreshness,
+    nexaInsightsNoNewSignals,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsOtdClassifierParity,
     notionMetricsDemo,

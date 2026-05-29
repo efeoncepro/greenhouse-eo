@@ -5,6 +5,8 @@ import { useState } from 'react'
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
@@ -27,6 +29,11 @@ import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRoot
 import NexaInsightsTimeline, {
   type NexaTimelineItem
 } from '@/components/greenhouse/NexaInsightsTimeline'
+import NexaSeveritySparkline from '@/components/greenhouse/NexaSeveritySparkline'
+import type {
+  NexaSignalLifecycleStatus,
+  NexaSignalObservation
+} from '@/lib/ico-engine/ai/llm-types'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 // ─── Public Types ──────────────────────────────────────────────────────────
@@ -39,9 +46,30 @@ export type NexaInsightItem = {
   explanation: string | null
   rootCauseNarrative: string | null
   recommendedAction: string | null
+  /** TASK-945 — lifecycle observations (signal evolution intra-period). Optional
+   * for backward-compat: consumers that don't pass it degrade gracefully (sin
+   * sparkline). Mostrar sparkline requiere length >= 2. */
+  lifecycle?: NexaSignalObservation[]
+  /** TASK-945 — lifecycle status derived server-side. When 'resolved', el
+   * header del InsightCard muestra badge "Resuelta hace X". */
+  lifecycleStatus?: NexaSignalLifecycleStatus
 }
 
 type NexaInsightsViewMode = 'recent' | 'timeline'
+
+/**
+ * TASK-946 — Honest degradation canonical UI states.
+ *
+ * Server-side derived (4 valores) + cliente añade `loading` local durante
+ * fetch in-flight. Backward-compat: prop opcional; si los consumers no la
+ * pasan, el bloque cae al comportamiento legacy (hasData-based).
+ */
+export type NexaInsightsDataStatusUi =
+  | 'loading'
+  | 'ready'
+  | 'empty-pending'
+  | 'empty-positive'
+  | 'stale-degraded'
 
 export type NexaInsightsBlockProps = {
   insights: NexaInsightItem[]
@@ -50,6 +78,12 @@ export type NexaInsightsBlockProps = {
   runStatus: 'succeeded' | 'partial' | 'failed' | null
   defaultExpanded?: boolean
   timelineInsights?: NexaTimelineItem[]
+  /**
+   * TASK-946 — Honest degradation state derived server-side. Opcional
+   * (backward-compat); si no llega, el bloque usa la lógica legacy `hasData`.
+   * Pattern: server-side SSOT; UI solo renderiza, no deriva.
+   */
+  dataStatus?: NexaInsightsDataStatusUi
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -101,6 +135,12 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
   const severityColor = GH_NEXA.severity_color[item.severity ?? ''] ?? 'secondary'
   const metricName = getMetricDisplayName(item.metricId)
 
+  // TASK-945 — lifecycle gating: sparkline solo si >= 2 observations.
+  // resolved badge solo si lifecycleStatus === 'resolved'.
+  const lifecycleObservations = item.lifecycle ?? []
+  const showSparkline = lifecycleObservations.length >= 2
+  const isResolved = item.lifecycleStatus === 'resolved'
+
   const content = (
     <Box
       sx={{
@@ -112,8 +152,13 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
       }}
     >
       <Stack spacing={1}>
-        {/* Header: signal type + metric */}
-        <Stack direction='row' spacing={1} alignItems='center'>
+        {/* Header: signal type + metric + TASK-945 sparkline + resolved badge */}
+        <Stack
+          direction='row'
+          spacing={1}
+          alignItems='center'
+          sx={{ flexWrap: 'wrap', rowGap: 0.5 }}
+        >
           <CustomChip
             round='true'
             size='small'
@@ -125,6 +170,34 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
           <Typography variant='subtitle2' sx={{ color: theme => theme.palette.customColors.midnight }}>
             {metricName}
           </Typography>
+          {showSparkline && (
+            <Box sx={{ display: { xs: 'none', sm: 'inline-flex' } }}>
+              <NexaSeveritySparkline observations={lifecycleObservations} />
+            </Box>
+          )}
+          {showSparkline && (
+            <Box sx={{ display: { xs: 'inline-flex', sm: 'none' } }}>
+              <NexaSeveritySparkline observations={lifecycleObservations} compact />
+            </Box>
+          )}
+          {isResolved && (
+            <CustomChip
+              round='true'
+              size='small'
+              variant='tonal'
+              color='success'
+              label={GH_NEXA.lifecycle_resolved_badge}
+              icon={<i className='tabler-circle-check' style={{ fontSize: 12 }} aria-hidden='true' />}
+              sx={{
+                height: 20,
+                fontSize: '0.64rem',
+                fontWeight: 600,
+                ml: 'auto',
+                '& .MuiChip-icon': { ml: 0.5 }
+              }}
+              aria-label={GH_NEXA.lifecycle_status_resolved}
+            />
+          )}
         </Stack>
 
         {/* Explanation */}
@@ -192,7 +265,8 @@ const NexaInsightsBlock = ({
   lastAnalysis,
   runStatus,
   defaultExpanded,
-  timelineInsights
+  timelineInsights,
+  dataStatus
 }: NexaInsightsBlockProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
@@ -204,7 +278,13 @@ const NexaInsightsBlock = ({
   const [viewMode, setViewMode] = useState<NexaInsightsViewMode>('recent')
   const activeView: NexaInsightsViewMode = timelineAvailable ? viewMode : 'recent'
 
-  if (!hasData) {
+  // TASK-946 — Honest degradation dispatcher. Si el server pasa `dataStatus`,
+  // routea al render canonical correspondiente. Si NO lo pasa (backward-compat
+  // pre-TASK-946), cae al comportamiento legacy basado en `hasData`.
+  const effectiveStatus: NexaInsightsDataStatusUi =
+    dataStatus ?? (hasData ? 'ready' : 'empty-pending')
+
+  if (effectiveStatus !== 'ready') {
     return (
       <Card elevation={0} sx={{ border: `1px solid ${theme.palette.customColors.lightAlloy}` }}>
         <Accordion disableGutters elevation={0} defaultExpanded={defaultExpanded}>
@@ -216,20 +296,64 @@ const NexaInsightsBlock = ({
                 round='true'
                 size='small'
                 variant='tonal'
-                color='secondary'
+                color={
+                  effectiveStatus === 'stale-degraded'
+                    ? 'warning'
+                    : effectiveStatus === 'empty-positive'
+                      ? 'success'
+                      : 'secondary'
+                }
                 label={GH_NEXA.insights_chip_no_data}
                 sx={{ height: 20, fontSize: '0.64rem', fontWeight: 600 }}
               />
             </Box>
           </AccordionSummary>
           <AccordionDetails>
-            <EmptyState
-              icon='tabler-sparkles'
-              animatedIcon='/animations/empty-inbox.json'
-              title={GH_NEXA.empty_title}
-              description={GH_NEXA.empty_description}
-              minHeight={160}
-            />
+            <Box
+              role={effectiveStatus === 'stale-degraded' ? undefined : 'status'}
+              aria-live='polite'
+            >
+              {effectiveStatus === 'loading' && (
+                <EmptyState
+                  icon='tabler-loader-2'
+                  title={GH_NEXA.state_loading_aria}
+                  description=''
+                  minHeight={160}
+                />
+              )}
+              {effectiveStatus === 'empty-pending' && (
+                <EmptyState
+                  icon='tabler-clock'
+                  animatedIcon='/animations/empty-inbox.json'
+                  title={GH_NEXA.state_empty_pending_title}
+                  description={GH_NEXA.state_empty_pending_description}
+                  minHeight={160}
+                />
+              )}
+              {effectiveStatus === 'empty-positive' && (
+                <EmptyState
+                  icon='tabler-circle-check'
+                  title={GH_NEXA.state_empty_positive_title}
+                  description={GH_NEXA.state_empty_positive_description}
+                  minHeight={160}
+                />
+              )}
+              {effectiveStatus === 'stale-degraded' && (
+                <Alert
+                  severity='warning'
+                  variant='outlined'
+                  role='alert'
+                  icon={<i className='tabler-alert-triangle' aria-hidden='true' />}
+                >
+                  <AlertTitle sx={{ fontWeight: 600 }}>
+                    {GH_NEXA.state_stale_degraded_title}
+                  </AlertTitle>
+                  <Typography variant='body2'>
+                    {GH_NEXA.state_stale_degraded_description(24)}
+                  </Typography>
+                </Alert>
+              )}
+            </Box>
           </AccordionDetails>
         </Accordion>
       </Card>

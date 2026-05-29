@@ -22,6 +22,11 @@
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
+## Delta 2026-05-27
+
+- **Linkage de programa.** Se rastrea junto a EPIC-013 (contractor engagements, TASK-790→798) como parte del cuerpo "pagos a fuerza laboral internacional". Pero ⚠️ **`international_internal` NO es contractor**: es régimen de Payroll interno (`payroll_via='internal'`) para un residente fiscal no-Chile pagado directo por Efeonce. El contractor program cubre `contractor`/`honorarios`/EOR vía Engagements→Payables→Finance; 905/906 viven **dentro del motor de Payroll**. No confundir con `international_contractor`/`direct_international` (TASK-795). Se mantiene `Epic: optional` a propósito (flippear a EPIC-013 sería category error).
+- **Guardrails de no-regresión payroll** consolidados abajo (ya distribuidos en Reglas obligatorias + Slice 4; cristalizados en el formato escaneable del programa). Auditado con `greenhouse-payroll-auditor`.
+
 ## Summary
 
 Crear el motor canónico de retenciones internacionales para `international_internal`: Payroll calcula bruto, retención, neto y evidencia; Finance/Tesorería consume el resultado para pagar, declarar/registrar obligación y conciliar. V1 debe ser agnóstico al colaborador y resolver por país de residencia fiscal, tipo de servicio, convenio/evidencia y vigencia.
@@ -338,6 +343,20 @@ Estas conclusiones de las auditorias SII 2026-05-17 deben quedar reflejadas en e
   - Melkin/Nicaragua debe permanecer Deel si realmente es Deel; si no, mostrar fallback review.
   - Daniela/España debe quedar `needs_tax_review` por estar fuera de scope Europa V1.
 - No mutar colaboradores reales sin allowlist escrita HR/Finance/Legal y autorización explícita.
+
+## Payroll Non-Regression Guardrails (hard rules)
+
+905 extiende el motor de Payroll para `international_internal`. Regla central: agregar el cálculo de retención internacional **sin romper los otros 4 regímenes** (Chile dependiente, honorarios, contractor/Deel, EOR) y sin que `international_internal` caiga jamás en payroll estatutario Chile.
+
+- **NUNCA** aplicar a `international_internal` deducciones Chile dependientes (AFP/Fonasa/Isapre/AFC/SIS/mutual/IUSC) ni retención honorarios SII. Es `bruto − retención internacional aplicable = neto`.
+- **NUNCA** alterar el cálculo de Chile dependiente, honorarios, contractor/Deel ni EOR al integrar el resolver. Los tests de regresión (Slice 4) deben quedar verde antes de cerrar.
+- **NUNCA** activar el cálculo productivo sin `PAYROLL_INTERNATIONAL_WITHHOLDING_ENABLED` default OFF + signoff Tax/Legal del catálogo aprobado.
+- **NUNCA** aplicar tasa 0%/reducida por convenio sin evidencia completa (residencia fiscal + no EP/base fija cuando aplique + invoice/contrato + categoría de servicio + beneficiario efectivo + vigencia). Fail-closed.
+- **NUNCA** pagar bruto cuando falta regla aprobada o evidencia → estado `needs_tax_review`/`blocked_*`, nunca asumir 0%.
+- **NUNCA** recalcular periodos cerrados con reglas nuevas. Snapshots inmutables en `payroll_entries`; cambios requieren reliquidación/reapertura formal.
+- **NUNCA** mezclar la retención internacional con Previred ni F29 honorarios en recibos/reportes; subtotal separado.
+- **NUNCA** mutar colaboradores reales a `international_internal` en esta task (Slice 9 es dry-run, con allowlist HR/Finance/Legal).
+- **SIEMPRE** correr la suite completa `pnpm vitest run src/lib/payroll` (no solo `international-withholding`) como gate de cierre; cero deltas en los otros regímenes.
 
 ## Out of Scope
 

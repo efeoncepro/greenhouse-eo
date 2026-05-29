@@ -1,7 +1,8 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
-import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { getBigQueryClient, getBigQueryProjectId, toBigQueryStructTimestamp } from '@/lib/bigquery'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { ensureIcoEngineInfrastructure, ICO_DATASET } from '@/lib/ico-engine/schema'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -235,8 +236,8 @@ const toBigQueryEnrichmentRow = (record: AiSignalEnrichmentRecord) => ({
   status: record.status,
   error_message: record.errorMessage,
   input_signal_snapshot: JSON.stringify(record.inputSignalSnapshot),
-  processed_at: record.processedAt,
-  _synced_at: record.processedAt
+  processed_at: toBigQueryStructTimestamp(record.processedAt),
+  _synced_at: toBigQueryStructTimestamp(record.processedAt)
 })
 
 const toBigQueryRunRow = (run: AiEnrichmentRunRecord) => ({
@@ -257,9 +258,9 @@ const toBigQueryRunRow = (run: AiEnrichmentRunRecord) => ({
   tokens_out: run.tokensOut,
   latency_ms: run.latencyMs,
   error_message: run.errorMessage,
-  started_at: run.startedAt,
-  completed_at: run.completedAt,
-  _synced_at: run.completedAt ?? run.startedAt
+  started_at: toBigQueryStructTimestamp(run.startedAt),
+  completed_at: toBigQueryStructTimestamp(run.completedAt),
+  _synced_at: toBigQueryStructTimestamp(run.completedAt ?? run.startedAt)
 })
 
 const deleteBigQueryCurrentState = async (input: {
@@ -293,7 +294,7 @@ const deleteBigQueryCurrentState = async (input: {
 const persistServingState = async (
   records: AiSignalEnrichmentRecord[],
   run: AiEnrichmentRunRecord,
-  options?: { historyOnly?: boolean }
+  options?: { historyOnly?: boolean; signalsUnmappable?: boolean }
 ) => {
   for (const record of records) {
     await query(
@@ -397,25 +398,32 @@ const persistServingState = async (
     return
   }
 
-  if (run.spaceId) {
-    await query(
-      `
-        DELETE FROM greenhouse_serving.ico_ai_signal_enrichments
-        WHERE period_year = $1
-          AND period_month = $2
-          AND space_id = $3
-      `,
-      [run.periodYear, run.periodMonth, run.spaceId]
-    )
-  } else {
-    await query(
-      `
-        DELETE FROM greenhouse_serving.ico_ai_signal_enrichments
-        WHERE period_year = $1
-          AND period_month = $2
-      `,
-      [run.periodYear, run.periodMonth]
-    )
+  // TASK-941 Slice 4 — non-destructive serving guard: si signalsUnmappable
+  // (contrato inválido, 0 records por bug timestamp), NO borrar el período del
+  // serving — preserva el último estado bueno. El run row sí se escribe abajo
+  // (status='failed'). Cuando el contrato es válido, replace-current-period
+  // normal (records puede ser 0 legítimamente si el período no tiene señales).
+  if (!options?.signalsUnmappable) {
+    if (run.spaceId) {
+      await query(
+        `
+          DELETE FROM greenhouse_serving.ico_ai_signal_enrichments
+          WHERE period_year = $1
+            AND period_month = $2
+            AND space_id = $3
+        `,
+        [run.periodYear, run.periodMonth, run.spaceId]
+      )
+    } else {
+      await query(
+        `
+          DELETE FROM greenhouse_serving.ico_ai_signal_enrichments
+          WHERE period_year = $1
+            AND period_month = $2
+        `,
+        [run.periodYear, run.periodMonth]
+      )
+    }
   }
 
   for (const record of records) {
@@ -630,10 +638,19 @@ export const materializeAiLlmEnrichments = async (
   const recordProcessedAt = asOfTime ?? startedAt
   const systemTimeClause = asOfTime ? ' FOR SYSTEM_TIME AS OF TIMESTAMP(@asOfTime)' : ''
 
+  // TASK-943 Slice 2: source canonical depende del path:
+  // - asOfTime present (historyOnly replay) → leer raw `ai_signals` con
+  //   FOR SYSTEM_TIME AS OF. BQ time travel funciona sobre TABLES, NO sobre
+  //   VIEWS — la VIEW se re-evalúa cada vez sin historia propia.
+  // - default path → leer VIEW `ai_signals_current` (latest-per-signal_id).
+  //   Post-Slice 3 INSERT-only la raw acumula N generations intra-período;
+  //   el enrichment debe operar sobre la latest, no sobre históricas.
+  const sourceTable = asOfTime ? 'ai_signals' : 'ai_signals_current'
+
   const queryText = input.spaceId
     ? `
       SELECT *
-      FROM \`${projectId}.${ICO_DATASET}.ai_signals\`${systemTimeClause}
+      FROM \`${projectId}.${ICO_DATASET}.${sourceTable}\`${systemTimeClause}
       WHERE period_year = @periodYear
         AND period_month = @periodMonth
         AND space_id = @spaceId
@@ -641,7 +658,7 @@ export const materializeAiLlmEnrichments = async (
     `
     : `
       SELECT *
-      FROM \`${projectId}.${ICO_DATASET}.ai_signals\`${systemTimeClause}
+      FROM \`${projectId}.${ICO_DATASET}.${sourceTable}\`${systemTimeClause}
       WHERE period_year = @periodYear
         AND period_month = @periodMonth
       ORDER BY generated_at DESC, signal_id ASC
@@ -656,6 +673,31 @@ export const materializeAiLlmEnrichments = async (
   const signals = (rawRows as BigQuerySignalRow[])
     .map(mapSignalRow)
     .filter((row): row is AiSignalRecord => Boolean(row))
+
+  // TASK-941/ISSUE-082 anti-false-healthy invariant: si hay raw signals en BQ
+  // pero 0 quedan mapeables, es un contrato inválido (típicamente generated_at
+  // NULL). El run NO puede quedar 'succeeded'. Distinto de rawCount===0 (período
+  // sin señales = benigno, no falla).
+  const rawSignalRowCount = Array.isArray(rawRows) ? rawRows.length : 0
+  const signalsUnmappable = rawSignalRowCount > 0 && signals.length === 0
+
+  if (signalsUnmappable) {
+    captureWithDomain(
+      new Error(
+        `ICO AI enrichment contract violation: ${rawSignalRowCount} raw signals present but 0 mappable for ${input.periodYear}-${String(input.periodMonth).padStart(2, '0')}`
+      ),
+      'delivery',
+      {
+        tags: { source: 'ico_ai_enrichment', stage: 'map_signals' },
+        extra: {
+          periodYear: input.periodYear,
+          periodMonth: input.periodMonth,
+          spaceId: input.spaceId ?? null,
+          rawSignalRowCount
+        }
+      }
+    )
+  }
 
   const resolvedContext = await resolveSignalContext(signals)
 
@@ -748,11 +790,13 @@ export const materializeAiLlmEnrichments = async (
   const completedAt = new Date().toISOString()
 
   const runStatus =
-    failed > 0 && succeeded === 0
+    signalsUnmappable
       ? 'failed'
-      : failed > 0
-        ? 'partial'
-        : 'succeeded'
+      : failed > 0 && succeeded === 0
+        ? 'failed'
+        : failed > 0
+          ? 'partial'
+          : 'succeeded'
 
   const run: AiEnrichmentRunRecord = {
     runId,
@@ -771,13 +815,20 @@ export const materializeAiLlmEnrichments = async (
     tokensIn: records.reduce((sum, record) => sum + (record.tokensIn ?? 0), 0),
     tokensOut: records.reduce((sum, record) => sum + (record.tokensOut ?? 0), 0),
     latencyMs: records.reduce((sum, record) => sum + (record.latencyMs ?? 0), 0),
-    errorMessage: failed > 0 && succeeded === 0 ? 'All enrichments failed for this run' : null,
+    errorMessage: signalsUnmappable
+      ? `${rawSignalRowCount} raw AI signals present but 0 mappable (invalid contract — likely null generated_at, ISSUE-082)`
+      : failed > 0 && succeeded === 0
+        ? 'All enrichments failed for this run'
+        : null,
     startedAt,
     completedAt
   }
 
   // BigQuery write: best-effort. If streaming buffer blocks DELETE, continue with PostgreSQL serving.
-  if (!historyOnly) {
+  // TASK-941 Slice 4 — non-destructive guard: si signalsUnmappable (contrato
+  // inválido) NO tocar BQ enrichments (el delete borraría el último estado bueno
+  // sin reemplazo válido). Preserva BQ enrichments; el run row se escribe en PG.
+  if (!historyOnly && !signalsUnmappable) {
     try {
       await deleteBigQueryCurrentState({
         projectId,
@@ -809,7 +860,7 @@ export const materializeAiLlmEnrichments = async (
                     s.quality_score, s.explanation_summary, s.root_cause_narrative,
                     s.recommended_action, s.explanation_json, s.model_id, s.prompt_version,
                     s.prompt_hash, s.confidence, s.tokens_in, s.tokens_out, s.latency_ms,
-                    s.status, s.error_message, s.input_signal_snapshot, s.processed_at, s._synced_at
+                    s.status, s.error_message, s.input_signal_snapshot, TIMESTAMP(s.processed_at), TIMESTAMP(s._synced_at)
                   FROM UNNEST(@rows) AS s`,
           params: { rows: enrichmentRows },
           types: {
@@ -840,8 +891,9 @@ export const materializeAiLlmEnrichments = async (
               status: 'STRING',
               error_message: 'STRING',
               input_signal_snapshot: 'STRING',
-              processed_at: 'TIMESTAMP',
-              _synced_at: 'TIMESTAMP'
+              // TASK-941/ISSUE-082: STRING + TIMESTAMP() cast en SELECT (no 'TIMESTAMP' en struct → NULL)
+              processed_at: 'STRING',
+              _synced_at: 'STRING'
             }]
           }
         })
@@ -860,7 +912,7 @@ export const materializeAiLlmEnrichments = async (
                   s.run_id, s.trigger_event_id, s.space_id, s.period_year, s.period_month,
                   s.trigger_type, s.status, s.signals_seen, s.signals_enriched, s.signals_failed,
                   s.model_id, s.prompt_version, s.prompt_hash, s.tokens_in, s.tokens_out,
-                  s.latency_ms, s.error_message, s.started_at, s.completed_at, s._synced_at
+                  s.latency_ms, s.error_message, TIMESTAMP(s.started_at), TIMESTAMP(s.completed_at), TIMESTAMP(s._synced_at)
                 FROM UNNEST(@rows) AS s`,
         params: { rows: [runRow] },
         types: {
@@ -882,9 +934,10 @@ export const materializeAiLlmEnrichments = async (
             tokens_out: 'INT64',
             latency_ms: 'INT64',
             error_message: 'STRING',
-            started_at: 'TIMESTAMP',
-            completed_at: 'TIMESTAMP',
-            _synced_at: 'TIMESTAMP'
+            // TASK-941/ISSUE-082: STRING + TIMESTAMP() cast en SELECT (no 'TIMESTAMP' en struct → NULL)
+            started_at: 'STRING',
+            completed_at: 'STRING',
+            _synced_at: 'STRING'
           }]
         }
       })
@@ -893,7 +946,7 @@ export const materializeAiLlmEnrichments = async (
     }
   }
 
-  await persistServingState(records, run, { historyOnly })
+  await persistServingState(records, run, { historyOnly, signalsUnmappable })
 
   if (!historyOnly) {
     await publishOutboxEvent({

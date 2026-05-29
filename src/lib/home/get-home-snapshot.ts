@@ -2,7 +2,9 @@ import 'server-only'
 
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
+import { getCurrentPeriodSantiago } from '@/lib/home/period'
 import { readAgencyAiLlmSummary, readTopAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
+import type { NexaSignalLifecycleStatus, NexaSignalObservation } from '@/lib/ico-engine/ai/llm-types'
 import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { HomeSnapshot, HomeNexaInsightItem, ModuleCard, PendingTask } from '@/types/home'
@@ -27,13 +29,10 @@ export interface HomeSnapshotInput {
 
 const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 const HOME_INSIGHTS_LIMIT = 3
-const HOME_TIMEZONE = 'America/Santiago'
-
-const HOME_PERIOD_FORMATTER = new Intl.DateTimeFormat('en-CA', {
-  timeZone: HOME_TIMEZONE,
-  year: 'numeric',
-  month: '2-digit'
-})
+// TASK-950 — `HOME_TIMEZONE` y el formatter inline preexistente quedaron
+// reemplazados por el helper canonical `getCurrentPeriodSantiago()` desde
+// `src/lib/home/period.ts` (single source of truth cross-module). La timezone
+// canonical America/Santiago vive ahora en period.ts.
 
 const mapHomeInsight = (row: {
   enrichmentId: string
@@ -44,6 +43,9 @@ const mapHomeInsight = (row: {
   rootCauseNarrative: string | null
   recommendedAction: string | null
   processedAt: string
+  // TASK-945 — lifecycle fields propagated from readTopAiLlmEnrichments enrichment
+  lifecycle?: NexaSignalObservation[]
+  lifecycleStatus?: NexaSignalLifecycleStatus
 }): HomeNexaInsightItem => ({
   id: row.enrichmentId,
   signalType: row.signalType,
@@ -52,16 +54,11 @@ const mapHomeInsight = (row: {
   explanation: row.explanationSummary,
   rootCauseNarrative: row.rootCauseNarrative,
   recommendedAction: row.recommendedAction,
-  processedAt: row.processedAt
+  processedAt: row.processedAt,
+  lifecycle: row.lifecycle,
+  lifecycleStatus: row.lifecycleStatus
 })
 
-const getHomeCurrentPeriod = () => {
-  const parts = HOME_PERIOD_FORMATTER.formatToParts(new Date())
-  const year = Number(parts.find(part => part.type === 'year')?.value ?? new Date().getFullYear())
-  const month = Number(parts.find(part => part.type === 'month')?.value ?? new Date().getMonth() + 1)
-
-  return { year, month }
-}
 
 export const getHomeFinanceStatus = async () => {
   const [currentPeriod, latestMargin] = await Promise.all([
@@ -119,7 +116,7 @@ export const getHomeFinanceStatus = async () => {
 export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSnapshot> {
   const now = new Date()
   const hour = now.getHours()
-  const { year: currentYear, month: currentMonth } = getHomeCurrentPeriod()
+  const { year: currentYear, month: currentMonth } = getCurrentPeriodSantiago()
 
   // 1. Resolve Greeting
   let greetingPool = HOME_GREETINGS.default
@@ -184,7 +181,10 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
       latestRun: null,
       recentEnrichments: [],
       timeline: [],
-      lastProcessedAt: null
+      lastProcessedAt: null,
+      // TASK-946 — fallback conservador: si el summary read falla por
+      // completo, default canonical = empty-pending (conservador honest).
+      dataStatus: 'empty-pending' as const
     }
   })
 
@@ -226,7 +226,10 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
       rootCauseNarrative: item.rootCauseNarrative,
       recommendedAction: item.recommendedAction,
       processedAt: item.processedAt
-    })).map(mapHomeInsight)
+    })).map(mapHomeInsight),
+    // TASK-946 — propaga honest degradation state desde reader canonical.
+    // Backward-compat: undefined si reader no lo expone todavía.
+    dataStatus: insightsSummary.dataStatus
   }
 
   // 5. Nexa Intro (Simple logic for now)

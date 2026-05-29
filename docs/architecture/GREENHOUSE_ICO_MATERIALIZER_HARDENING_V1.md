@@ -225,3 +225,54 @@ Diseño + implementación shipped:
 - Slice 7 (esta ADR + CLAUDE.md hard rule)
 
 ICO test suite: 20 archivos / 141 tests verde. Cero regresión cross-file. Defaults flags OFF garantizan zero behavioral change post-merge.
+
+### Delta 2026-05-27 — TASK-942: extensión del freshness gate a `ai_signals` (set volátil)
+
+> **⚠️ SUPERSEDED 2026-05-28 por TASK-943.** El framing "set volátil → full-replace" fue un error de modelo. Las señales Nexa son **observaciones históricas** (event-sourced), no estado mutable; el patrón canonical correcto es **append-only event log** + VIEW canonical para current state. Mantener este delta solo como auditoría histórica de la decisión. Ver Delta 2026-05-28 abajo (canonical vigente).
+
+El write path de Nexa AI signals (`materialize-ai-signals.ts`) era el path ICO que quedó fuera del hardening TASK-900 (ISSUE-082). TASK-942 lo extiende con una **decisión arquitectónica deliberada que difiere del patrón `metrics_by_*`**:
+
+- **Freshness gate SÍ** (reuso de `runUpstreamFreshnessGate` + `isFreshnessGateEnabled`, flag compartido): `materializeAiSignals` skipea sin borrar cuando el upstream (bridge Notion coverage) está degradado. Cierra el wipe-on-degraded de raíz. Flag default OFF → dormant hasta la activación de rollout compartida con los metrics materializers. **Esta primitiva sigue vigente post-TASK-943 — es ortogonal al modelo de escritura (append-only no contradice el gate; ambos protegen contra wipe-on-degraded).**
+- **MERGE NO** (recalibración del approach pre-decidido): ~~`ai_signals` es un set **VOLÁTIL** (anomalías aparecen/desaparecen por corrida)~~. **Error de framing**: las anomalías son observaciones temporales con valor histórico, no estado mutable. La dicotomía correcta (canonizada en Delta 2026-05-28) es **estado mutable → MERGE; observación histórica → append-only**, no "estable vs volátil".
+- **PG tracking (`ico_materialization_runs`) NO**: sigue vigente — append-only INSERT-only tampoco necesita tracking del orchestrator porque cada run es trivialmente idempotente por `(signal_id, generated_at)` natural key.
+
+~~**Invariante canonizado**: el patrón MERGE+tracking de TASK-900 aplica a sets **ESTABLES**. Para sets **VOLÁTILES**, la protección no-destructiva canonical es **freshness gate + full-replace** (NO MERGE).~~ Superseded — ver Delta 2026-05-28.
+
+Shipped: TASK-942 Slice 1 (gate wiring). Cross-ref: ISSUE-082, TASK-941 (incident remediation), TASK-943 (rectificación canonical).
+
+### Delta 2026-05-28 — TASK-943: rectificación append-only event log para observaciones históricas
+
+**Supersede el Delta 2026-05-27 (TASK-942)**. El framing pre-TASK-943 modeló `ai_signals` como "set volátil" cuando son **observaciones históricas event-sourced**, hermanas de `task_status_transitions` (TASK-908), outbox events (TASK-773) y audit logs (TASK-742). Una anomalía detectada el 5 de mayo "Daniela OTD bajó 30%" sigue siendo verdad sobre el 5 de mayo aunque el 20 ya no se observe — perderla con full-replace elimina evidencia operativa irrecuperable. Para sprints de 15 días, la evolución intra-mes ES la señal de gestión.
+
+**Dicotomía canonical correcta** (reemplaza "estable vs volátil"):
+
+| Tipo de dato | Semántica | Patrón canonical | Ejemplos |
+|---|---|---|---|
+| **Estado mutable** | "Valor actual del KPI" | **MERGE upsert por key** (TASK-900) | `metrics_by_member.otd_pct`, `metrics_by_project.cycle_time_days` |
+| **Observación histórica** | "Qué se vio en este momento" | **Append-only event log** (TASK-943) | `ai_signals`, `ai_prediction_log`, `task_status_transitions`, outbox `*_events`, audit logs |
+
+**Decisiones canónicas TASK-943**:
+
+- **Write path INSERT-only**: `replaceBigQuerySignalsForPeriod` → `appendBigQuerySignalsForPeriod`. Sin `DELETE`. Idempotencia por `(signal_id, generated_at)` como key compuesta natural (mismo run = mismo `generated_at` → idempotente; nuevo run = nuevo `generated_at` → coexisten en historia).
+- **Current view derivada**: VIEW canonical `ai_signals_current` filtra latest-per-`signal_id` vía `ROW_NUMBER() OVER (PARTITION BY signal_id ORDER BY generated_at DESC) = 1`. Consumers que quieren "qué señales aplican AHORA" leen la VIEW; consumers que quieren historia evolutiva leen la tabla raw.
+- **Cron scope**: `monthsBack=1` (solo período actual). Meses cerrados quedan inmutables — no se "recomputa lo que ya no va a cambiar". Backfill retroactivo es **manual auditado** (Slice 6 opcional gated).
+- **Predictions con excepción documentada**: `ai_prediction_log` INSERT-only para `predicted_value` + `predicted_at` + `confidence` + `model_version`; `actual_value` + `actual_recorded_at` son la **única excepción mutable** vía `hydratePredictionActuals` (UPDATE explícito de esos 2 campos cuando la realidad se observa post-hoc). Event-sourcing puro requeriría `ai_prediction_actuals` separada — over-engineering para el volumen ICO actual; la excepción está documentada + restringida a 2 campos.
+- **Particionamiento**: agregar partition by `DATE(generated_at)` + cluster por `signal_id, period_year, period_month` (`ai_signals`) y mismo patrón para `ai_prediction_log` con `DATE(predicted_at)`. Optimiza queries point-in-time + queries por signal_id.
+- **Retention**: eternal. Mismo contrato que `task_status_transitions` y outbox. Cost negligible para el volumen ICO (decenas de signals/mes).
+- **Signal de actividad**: `nexa.insights.no_new_signals_in_24h` (kind=`lag`, severity warning >24h, error >48h) sustituye la observabilidad que el delete daba implícitamente (run vacío = visible).
+
+**Invariante canonizado vigente**: Para `ico_engine.ai_signals` y `ico_engine.ai_prediction_log`:
+
+1. **NUNCA** `DELETE FROM ai_signals` ni `DELETE FROM ai_prediction_log` (excepto cleanup operativo manual auditado con capability).
+2. **SIEMPRE** leer "qué señales aplican AHORA al período X" via la VIEW canonical `ai_signals_current` (idem predictions current).
+3. **SIEMPRE** el cron diario opera sobre el período actual únicamente. Meses cerrados intactos.
+4. **ÚNICA excepción mutable**: `ai_prediction_log.actual_value` + `actual_recorded_at` (hidratación lateral post-observación).
+
+**Beneficios canónicos**:
+
+- Análisis evolutivo intra-período habilitado (sprints 15d ya no pierden evidencia).
+- Pipeline ICO 100% no-destructivo by construction (alineado con `task_status_transitions`, outbox, audit logs).
+- Eliminación de la complejidad MERGE+generation-stamp+GC que el delta TASK-942 evitaba con razón pero por modelo equivocado.
+- Auditoría reproducible: cualquier KPI/narrativa Nexa es trazable a su signal + generated_at específico.
+
+Shipped: TASK-943 Slices 0-7. Cross-ref: ISSUE-082, TASK-908 (patrón canonical hermano), TASK-773 (outbox append-only canonical), TASK-742 (audit log append-only canonical).

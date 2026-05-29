@@ -99,6 +99,14 @@ Reglas obligatorias:
 - Allow XML/JSON only for structured tax artifacts and explicit contractor invoice contexts.
 - Keep ZIP/executables out of V1.
 
+## Payroll Non-Regression Guardrails (hard rules)
+
+791 maneja assets de contractor/provider; no toca cálculo de nómina. Único riesgo: colisión de contextos/retention con artefactos payroll.
+
+- **NUNCA** reusar los contextos `contractor_invoice*` / `provider_*` para recibos de nómina ni documentos de finiquito. Son retention classes y aggregates distintos (los recibos de payroll y finiquito viven en su propio dominio).
+- **NUNCA** modificar contextos ni retention classes de assets payroll existentes al agregar los de contractor. Solo agregar; no mutar.
+- **NUNCA** adjuntar un `contractor_invoice_asset` a un `payroll_entry`, `final_settlement_document` ni a un aggregate de nómina.
+
 ## Out of Scope
 
 - Work submission approval.

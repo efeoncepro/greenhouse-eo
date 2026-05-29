@@ -179,6 +179,11 @@ export interface HomeAiInsightsBentoData {
   cards: HomeAiInsightCard[]
   totalAnalyzed: number
   lastAnalysisAt: string | null
+  /**
+   * TASK-946 — Honest degradation state derived server-side. Opcional
+   * (backward-compat). Ver `AgencyAiLlmSummary.dataStatus` para semántica.
+   */
+  dataStatus?: 'ready' | 'empty-pending' | 'empty-positive' | 'stale-degraded'
 }
 
 export interface HomeRecentItem {

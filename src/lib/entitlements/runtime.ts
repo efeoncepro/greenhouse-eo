@@ -353,6 +353,42 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-947 — Nexa Insights detail page canonical /nexa/insights/[id].
+  // Capability `nexa.insights.read` seedeada en capabilities_registry; este
+  // grant garantiza que el page render sea accesible end-to-end (invariant
+  // TASK-873 + TASK-935; guard mecánico capability-grant-coverage.test.ts).
+  //
+  // Matriz canonical V1.0: EFEONCE_ADMIN ∪ FINANCE_ADMIN ∪ HR_MANAGER (role)
+  // + route_groups internal/finance/hr (broad operational). DEVOPS_OPERATOR
+  // mencionado en draft original NO existe en ROLE_CODES (CLAUDE.md TASK-935).
+  // El page aplica subject-aware filter adicional dentro de `readNexaInsightDrill`
+  // (space/member assignment) — esta capability es el primer gate; el filter
+  // fino es el segundo. Anti-oracle: cuando subject no autorizado al insight,
+  // page devuelve notFound() (NO 403). TASK-872 pattern.
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRouteGroup(subject, 'finance') ||
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER)
+  ) {
+    const source: TenantEntitlementSource =
+      hasRouteGroup(subject, 'internal') ||
+      hasRouteGroup(subject, 'finance') ||
+      hasRouteGroup(subject, 'hr')
+        ? 'route_group'
+        : 'role'
+
+    addEntitlement(entries, {
+      module: 'delivery',
+      capability: 'nexa.insights.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+  }
+
   // TASK-890 Slice 4 — Workforce offboarding external provider close.
   // Capability granular para cerrar offboarding cases en lane `external_payroll`
   // (Deel/EOR/proveedor externo). Operador firma decision (Greenhouse no emite

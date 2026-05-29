@@ -32,12 +32,17 @@ export async function GET(request: Request) {
   }
 
   try {
+    // TASK-943 — Default scope = current period only (monthsBack=1).
+    // Pre-TASK-943 default was 3 meses rolling, que para append-only event log
+    // significaba "recomputar lo que ya no va a cambiar" (meses cerrados).
+    // Operator override via ?monthsBack=N permite backfill manual auditado
+    // (cap a 6 para evitar abuso). Meses cerrados quedan inmutables by default.
     const { searchParams } = new URL(request.url)
-    const requestedMonthsBack = Number(searchParams.get('monthsBack') || '3')
+    const requestedMonthsBack = Number(searchParams.get('monthsBack') || '1')
 
     const monthsBack = Number.isInteger(requestedMonthsBack)
       ? Math.min(Math.max(requestedMonthsBack, 1), 6)
-      : 3
+      : 1
 
     const periods = getRollingPeriods(monthsBack)
     const results = []

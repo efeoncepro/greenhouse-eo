@@ -18,6 +18,7 @@ import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
+import { GH_NEXA } from '@/config/greenhouse-nomenclature'
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
@@ -191,9 +192,9 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
             variant='text'
             color='primary'
             endIcon={<i className='tabler-arrow-right text-base' />}
-            onClick={() => router.push('/agency/insights')}
+            onClick={() => router.push('/nexa/insights')}
           >
-            Ver todos los insights del mes
+            {GH_NEXA.home_bento_view_all_cta}
           </Button>
         </Stack>
       </CardContent>

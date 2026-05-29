@@ -8,6 +8,13 @@ vi.mock('@/lib/db', () => ({
   query: (...args: unknown[]) => mockQuery(...args)
 }))
 
+// TASK-946 — stub canonical: el helper resolveNexaInsightsDataStatus es probado
+// independientemente (nexa-data-status.test.ts). Aquí lo fijamos a 'ready'
+// para que estos tests sigan asseritando shape limpio sin necesidad de mockear BQ.
+vi.mock('./nexa-data-status', () => ({
+  resolveNexaInsightsDataStatus: vi.fn(async () => 'ready' as const)
+}))
+
 const {
   readAgencyAiLlmTimeline,
   readMemberAiLlmSummary,
@@ -236,7 +243,8 @@ describe('readMemberAiLlmSummary', () => {
         }
       ],
       historicalPreview: [],
-      timeline: []
+      timeline: [],
+      dataStatus: 'ready'
     })
   })
 
@@ -324,7 +332,8 @@ describe('readMemberAiLlmSummary', () => {
           recommendedAction: 'Revisar con Daniela',
           processedAt: '2026-04-16T10:20:18.447Z'
         }
-      ]
+      ],
+      dataStatus: 'ready'
     })
   })
 })
@@ -434,7 +443,8 @@ describe('readSpaceAiLlmSummary', () => {
         }
       ],
       historicalPreview: [],
-      timeline: []
+      timeline: [],
+      dataStatus: 'ready'
     })
   })
 
@@ -522,7 +532,8 @@ describe('readSpaceAiLlmSummary', () => {
           recommendedAction: 'Replanificar entregables',
           processedAt: '2026-04-16T08:45:00.000Z'
         }
-      ]
+      ],
+      dataStatus: 'ready'
     })
   })
 })

@@ -55,6 +55,7 @@ export interface CommandPaletteProps {
   recentItems?: PaletteRoute[]
   triggerLabel?: string
   showTrigger?: boolean
+  enableGlobalShortcut?: boolean
 }
 
 const DEFAULT_ICON_FOR_SECTION: Record<GovernanceSection, string> = {
@@ -145,7 +146,8 @@ export const CommandPalette = ({
   actions,
   recentItems,
   triggerLabel = 'Buscar ⌘K',
-  showTrigger = true
+  showTrigger = true,
+  enableGlobalShortcut = true
 }: CommandPaletteProps) => {
   const router = useRouter()
   const currentPath = usePathname() ?? '/'
@@ -159,9 +161,14 @@ export const CommandPalette = ({
   const showRecents = !search && recentItems && recentItems.length > 0
 
   useEffect(() => {
+    if (!enableGlobalShortcut) return undefined
+
     const handler = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return
+
       if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
         event.preventDefault()
+        event.stopImmediatePropagation()
         setOpen(value => !value)
       }
     }
@@ -169,7 +176,7 @@ export const CommandPalette = ({
     document.addEventListener('keydown', handler)
 
     return () => document.removeEventListener('keydown', handler)
-  }, [])
+  }, [enableGlobalShortcut])
 
   useEffect(() => {
     if (!open && search) setSearch('')
@@ -200,8 +207,8 @@ export const CommandPalette = ({
       ) : null}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogPortal>
-          <DialogOverlay cmdk-overlay='' />
-          <DialogContent cmdk-dialog='' aria-describedby='gh-cmdk-description'>
+          <DialogOverlay className='gh-cmdk-overlay' />
+          <DialogContent className='gh-cmdk-dialog' aria-describedby='gh-cmdk-description'>
             <DialogTitle hidden>Greenhouse Command Palette</DialogTitle>
             <DialogDescription id='gh-cmdk-description' hidden>
               Buscar vistas, acciones y atajos en Greenhouse. ⌘K para abrir, esc para cerrar.

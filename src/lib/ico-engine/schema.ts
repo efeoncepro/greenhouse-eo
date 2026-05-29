@@ -293,6 +293,34 @@ const buildAiSignalsTable = (projectId: string) => `
 `
 
 /**
+ * TASK-943 — Current view canonical para `ai_signals` (append-only event log).
+ *
+ * Filtra latest-per-`signal_id` (signal_id es determinístico via `stableAiId`).
+ * Consumers que necesitan "qué señales aplican AHORA al período X" leen esta
+ * VIEW; consumers que quieren historia evolutiva intra-período leen la tabla
+ * raw. La VIEW preserva shape semánticamente: cuando un signal_id aparece
+ * solo 1 vez (caso actual pre-TASK-943), el output es idéntico a la raw table.
+ *
+ * Pattern fuente: hermano canónico de `task_status_transitions` + `v_metric_latest`.
+ * Window function ROW_NUMBER OVER (PARTITION BY signal_id ORDER BY generated_at DESC) = 1
+ * es la forma canónica latest-per-key en BQ.
+ */
+const buildAiSignalsCurrentView = (projectId: string) => `
+  CREATE OR REPLACE VIEW \`${projectId}.${ICO_DATASET}.ai_signals_current\` AS
+  SELECT * EXCEPT(__row_num)
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (
+        PARTITION BY signal_id
+        ORDER BY generated_at DESC
+      ) AS __row_num
+    FROM \`${projectId}.${ICO_DATASET}.ai_signals\`
+  )
+  WHERE __row_num = 1
+`
+
+/**
  * Historical prediction audit log for AI signals.
  * Predictions are written at generation time and hydrated with actuals later.
  */
@@ -313,6 +341,32 @@ const buildAiPredictionLogTable = (projectId: string) => `
   )
   PARTITION BY RANGE_BUCKET(period_year, GENERATE_ARRAY(2024, 2030, 1))
   CLUSTER BY period_month, space_id, metric_name
+`
+
+/**
+ * TASK-943 — Current view canonical para `ai_prediction_log` (append-only event log).
+ *
+ * Filtra latest-per-`prediction_id`. Para predictions tiene un sabor adicional:
+ * `actual_value` + `actual_recorded_at` son la **única excepción mutable** del
+ * append-only contract (hidratación lateral cuando la realidad se observa post-hoc
+ * via `hydratePredictionActuals`). El ORDER BY usa `predicted_at` (no updated_at)
+ * porque el `predicted_at` ya cambia run-a-run y la UPDATE mantiene el row PK.
+ *
+ * Pattern simétrico con `ai_signals_current`.
+ */
+const buildAiPredictionLogCurrentView = (projectId: string) => `
+  CREATE OR REPLACE VIEW \`${projectId}.${ICO_DATASET}.ai_prediction_log_current\` AS
+  SELECT * EXCEPT(__row_num)
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (
+        PARTITION BY prediction_id
+        ORDER BY predicted_at DESC
+      ) AS __row_num
+    FROM \`${projectId}.${ICO_DATASET}.ai_prediction_log\`
+  )
+  WHERE __row_num = 1
 `
 
 /**
@@ -1001,6 +1055,20 @@ export const ensureIcoEngineInfrastructure = async () => {
       await bigQuery.query({ query: buildLatestMetricsView(projectId) })
     } catch (viewError) {
       console.warn('[ICO] Could not create v_metric_latest:', viewError instanceof Error ? viewError.message : viewError)
+    }
+
+    // TASK-943 — current view canonical for ai_signals (append-only event log)
+    try {
+      await bigQuery.query({ query: buildAiSignalsCurrentView(projectId) })
+    } catch (viewError) {
+      console.warn('[ICO] Could not create ai_signals_current:', viewError instanceof Error ? viewError.message : viewError)
+    }
+
+    // TASK-943 — current view canonical for ai_prediction_log (append-only with actual_value mutable exception)
+    try {
+      await bigQuery.query({ query: buildAiPredictionLogCurrentView(projectId) })
+    } catch (viewError) {
+      console.warn('[ICO] Could not create ai_prediction_log_current:', viewError instanceof Error ? viewError.message : viewError)
     }
   })().catch(error => {
     ensureIcoEngineInfrastructurePromise = null
