@@ -1,3 +1,13 @@
+# Sesion 2026-05-29 — TASK-790 Contractor Engagements Runtime + Classification Risk — ⏳ IN PROGRESS (develop, sin branch)
+
+Implementando el agregado canónico `ContractorEngagement` (`greenhouse_hr.contractor_engagements`) — fundación de Contractor Payables (EPIC-013). Trabajo **in-place en `develop`** por instrucción del operador (no se crea rama). Skills validadas pre-write: **greenhouse-payroll-auditor** (PASS — guardrails de no-regresión payroll confirmados: nunca toca `payroll_entries/adjustments/compensation_versions/final_settlements` ni `members.{payroll_via,contract_type,pay_regime}`; honorarios CL solo retención SII versionada) + **arch-architect** (4-pilar: aditivo, blast radius LOW, reversibilidad HIGH; D1 anchor a `relationship_id` vía `resolveActivePersonLegalEntityRelationships`; D2 subtype SSOT propio + consistency check; D3 payroll_via enum propio ortogonal).
+
+**Supuestos de spec corregidos en discovery:** (1) reader del anchor vive en `src/lib/account-360/person-legal-entity-relationships.ts`, no en `store.ts`; (2) PK del relationship es `relationship_id` (no `person_legal_entity_relationship_id`); (3) subtype del relationship es coarse `{contractor,honorarios}` en `metadata_json`, el engagement declara su propio `relationship_subtype` fino (5 valores) como SSOT + family-consistency check. Módulo: `src/lib/contractor-engagements/` (Files-owned de la task).
+
+**Plan (4 slices):** S1 migration (tablas + CHECK + triggers transición/anti-UPDATE-DELETE + GRANTs) · S2 types+helpers puros+store+tests · S3 classification risk gate + reliability signal `hr.contractor_engagement.classification_risk_open` (moduleKey identity) · S4 capabilities (`hr.contractor_engagement.{read,manage}` + `hr.contractor_classification.review`) + grants runtime + API routes `/api/hr/contractors`. Gate de cierre: `pnpm vitest run src/lib/payroll`.
+
+---
+
 # Sesion 2026-05-29 — TASK-951 Weekly Digest deep-link a Nexa Insight detail — ✅ COMPLETE (develop, sin branch)
 
 El CTA per-insight del **Weekly Executive Digest email** ahora deep-linkea al detail page canonical `/nexa/insights/<signalId>` (TASK-947) en lugar del Space heredado (`/agency/spaces/<id>`), dando al ejecutivo causa raíz + narrativa + acción en cero clicks adicionales.

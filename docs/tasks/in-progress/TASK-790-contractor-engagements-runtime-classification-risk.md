@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none` (TASK-789 ✅ complete — substrate listo)
-- Branch: `task/TASK-790-contractor-engagements-runtime`
+- Branch: `develop` (operator instruction 2026-05-29: trabajar in-place en develop, no crear rama)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

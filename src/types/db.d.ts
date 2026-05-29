@@ -5889,6 +5889,58 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   vat_position_id: string;
 }
 
+export interface GreenhouseHrContractorEngagementEvents {
+  actor_user_id: string | null;
+  contractor_engagement_id: string;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  from_classification_risk_status: string | null;
+  from_status: string | null;
+  metadata_json: Generated<Json>;
+  reason: string | null;
+  to_classification_risk_status: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrContractorEngagements {
+  bonus_policy: Generated<string>;
+  classification_reviewed: Generated<boolean>;
+  classification_risk_factors: Generated<Json>;
+  classification_risk_status: Generated<string>;
+  contractor_engagement_id: string;
+  country_code: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  currency: string;
+  end_date: Timestamp | null;
+  fx_policy_code: string | null;
+  legal_entity_organization_id: string;
+  member_id: string | null;
+  metadata_json: Generated<Json>;
+  payment_cadence: string;
+  payment_currency: string | null;
+  payment_model: string;
+  payroll_via: string;
+  person_legal_entity_relationship_id: string;
+  profile_id: string;
+  provider_contract_id: string | null;
+  provider_worker_id: string | null;
+  public_id: string;
+  rate_amount: Numeric | null;
+  rate_type: string;
+  relationship_subtype: string;
+  requires_invoice: Generated<boolean>;
+  requires_work_approval: Generated<boolean>;
+  start_date: Timestamp;
+  status: Generated<string>;
+  tax_compliance_owner: string;
+  tax_residency_country_code: string | null;
+  tax_withholding_policy_code: string | null;
+  tax_withholding_rate_snapshot: Numeric | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHrEvalAssignments {
   assignment_id: string;
   created_at: Generated<Timestamp>;
@@ -9568,6 +9620,8 @@ export interface DB {
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
+  "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
+  "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
   "greenhouse_hr.eval_assignments": GreenhouseHrEvalAssignments;
   "greenhouse_hr.eval_competencies": GreenhouseHrEvalCompetencies;
   "greenhouse_hr.eval_cycles": GreenhouseHrEvalCycles;
