@@ -10,17 +10,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Bajo-Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `ui|reliability`
-- Blocked by: `none` (puede shipear sin TASK-943; complementario)
-- Branch: `task/TASK-946-nexa-insights-honest-degradation-states`
+- Blocked by: `none` (TASK-943 ✅ + TASK-945 ✅ shipped 2026-05-28; signals live)
+- Branch: `develop` (operador-decision; canonization phase como primer adopter — TASK-947 hereda después)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 - Cross-ref: `ISSUE-082` (el falso-sano fue parcialmente UI: estados vacíos ambiguos)

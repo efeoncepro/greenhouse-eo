@@ -5,6 +5,8 @@ import { useState } from 'react'
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
@@ -55,6 +57,20 @@ export type NexaInsightItem = {
 
 type NexaInsightsViewMode = 'recent' | 'timeline'
 
+/**
+ * TASK-946 — Honest degradation canonical UI states.
+ *
+ * Server-side derived (4 valores) + cliente añade `loading` local durante
+ * fetch in-flight. Backward-compat: prop opcional; si los consumers no la
+ * pasan, el bloque cae al comportamiento legacy (hasData-based).
+ */
+export type NexaInsightsDataStatusUi =
+  | 'loading'
+  | 'ready'
+  | 'empty-pending'
+  | 'empty-positive'
+  | 'stale-degraded'
+
 export type NexaInsightsBlockProps = {
   insights: NexaInsightItem[]
   totalAnalyzed: number
@@ -62,6 +78,12 @@ export type NexaInsightsBlockProps = {
   runStatus: 'succeeded' | 'partial' | 'failed' | null
   defaultExpanded?: boolean
   timelineInsights?: NexaTimelineItem[]
+  /**
+   * TASK-946 — Honest degradation state derived server-side. Opcional
+   * (backward-compat); si no llega, el bloque usa la lógica legacy `hasData`.
+   * Pattern: server-side SSOT; UI solo renderiza, no deriva.
+   */
+  dataStatus?: NexaInsightsDataStatusUi
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -243,7 +265,8 @@ const NexaInsightsBlock = ({
   lastAnalysis,
   runStatus,
   defaultExpanded,
-  timelineInsights
+  timelineInsights,
+  dataStatus
 }: NexaInsightsBlockProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
@@ -255,7 +278,13 @@ const NexaInsightsBlock = ({
   const [viewMode, setViewMode] = useState<NexaInsightsViewMode>('recent')
   const activeView: NexaInsightsViewMode = timelineAvailable ? viewMode : 'recent'
 
-  if (!hasData) {
+  // TASK-946 — Honest degradation dispatcher. Si el server pasa `dataStatus`,
+  // routea al render canonical correspondiente. Si NO lo pasa (backward-compat
+  // pre-TASK-946), cae al comportamiento legacy basado en `hasData`.
+  const effectiveStatus: NexaInsightsDataStatusUi =
+    dataStatus ?? (hasData ? 'ready' : 'empty-pending')
+
+  if (effectiveStatus !== 'ready') {
     return (
       <Card elevation={0} sx={{ border: `1px solid ${theme.palette.customColors.lightAlloy}` }}>
         <Accordion disableGutters elevation={0} defaultExpanded={defaultExpanded}>
@@ -267,20 +296,64 @@ const NexaInsightsBlock = ({
                 round='true'
                 size='small'
                 variant='tonal'
-                color='secondary'
+                color={
+                  effectiveStatus === 'stale-degraded'
+                    ? 'warning'
+                    : effectiveStatus === 'empty-positive'
+                      ? 'success'
+                      : 'secondary'
+                }
                 label={GH_NEXA.insights_chip_no_data}
                 sx={{ height: 20, fontSize: '0.64rem', fontWeight: 600 }}
               />
             </Box>
           </AccordionSummary>
           <AccordionDetails>
-            <EmptyState
-              icon='tabler-sparkles'
-              animatedIcon='/animations/empty-inbox.json'
-              title={GH_NEXA.empty_title}
-              description={GH_NEXA.empty_description}
-              minHeight={160}
-            />
+            <Box
+              role={effectiveStatus === 'stale-degraded' ? undefined : 'status'}
+              aria-live='polite'
+            >
+              {effectiveStatus === 'loading' && (
+                <EmptyState
+                  icon='tabler-loader-2'
+                  title={GH_NEXA.state_loading_aria}
+                  description=''
+                  minHeight={160}
+                />
+              )}
+              {effectiveStatus === 'empty-pending' && (
+                <EmptyState
+                  icon='tabler-clock'
+                  animatedIcon='/animations/empty-inbox.json'
+                  title={GH_NEXA.state_empty_pending_title}
+                  description={GH_NEXA.state_empty_pending_description}
+                  minHeight={160}
+                />
+              )}
+              {effectiveStatus === 'empty-positive' && (
+                <EmptyState
+                  icon='tabler-circle-check'
+                  title={GH_NEXA.state_empty_positive_title}
+                  description={GH_NEXA.state_empty_positive_description}
+                  minHeight={160}
+                />
+              )}
+              {effectiveStatus === 'stale-degraded' && (
+                <Alert
+                  severity='warning'
+                  variant='outlined'
+                  role='alert'
+                  icon={<i className='tabler-alert-triangle' aria-hidden='true' />}
+                >
+                  <AlertTitle sx={{ fontWeight: 600 }}>
+                    {GH_NEXA.state_stale_degraded_title}
+                  </AlertTitle>
+                  <Typography variant='body2'>
+                    {GH_NEXA.state_stale_degraded_description(24)}
+                  </Typography>
+                </Alert>
+              )}
+            </Box>
           </AccordionDetails>
         </Accordion>
       </Card>

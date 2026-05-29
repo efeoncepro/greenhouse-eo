@@ -348,7 +348,20 @@ export const GH_NEXA = {
   lifecycle_sparkline_aria_label: (count: number, lastSeverity: string) =>
     `Evolución de severidad: ${count} ${count === 1 ? 'observación' : 'observaciones'}. Última: ${lastSeverity}.`,
   lifecycle_observations_count: (n: number) =>
-    `${n} ${n === 1 ? 'observación' : 'observaciones'} este período`
+    `${n} ${n === 1 ? 'observación' : 'observaciones'} este período`,
+
+  // ─── TASK-946 — Honest degradation states (4 canonical UI states) ────────
+  state_empty_pending_title: 'Aún sin observaciones para este período',
+  state_empty_pending_description:
+    'El análisis diario corre en la madrugada. Volvé en unas horas.',
+  state_empty_positive_title: 'Sin anomalías detectadas',
+  state_empty_positive_description:
+    'Nexa analizó las señales del período y no encontró desviaciones. Salud operativa OK.',
+  state_stale_degraded_title: 'Análisis del pipeline pausado',
+  state_stale_degraded_description: (hours: number) =>
+    `Sin observaciones nuevas en las últimas ${hours} horas. El pipeline puede estar caído — revisá el estado del cron diario antes de asumir que todo está sano.`,
+  state_stale_degraded_action: 'Ver estado del pipeline',
+  state_loading_aria: 'Cargando observaciones de Nexa'
 } as const
 
 /* ─────────────────── Skills & Certifications ─────────────────── */
