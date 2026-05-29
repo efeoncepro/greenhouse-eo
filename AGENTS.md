@@ -150,6 +150,68 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - Revisar `git status` y no asumir que el arbol esta limpio.
 - Confirmar si el cambio toca layout global, navegacion, autenticacion, tema o deploy. Si toca alguno, documentarlo en `Handoff.md`.
 
+### 1.1 ROLE_CODES vigentes (snapshot 2026-05-29) y bug class de roles fantasma
+
+Cuando un agente o spec mencione un rol (`EFEONCE_ADMIN`, `FINANCE_ADMIN`, `HR_MANAGER`, etc.), DEBE verificarlo primero contra el snapshot canonical de abajo. Fuente: `src/config/role-codes.ts` (`ROLE_CODES` const). Es bug documental conocido (TASK-935 reconciliation) que specs antiguas siguen citando roles que NO existen.
+
+**13 roles reales** — los ÚNICOS valores legítimos para `roleCodes` / `primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`.
+
+**Internos Efeonce (10)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups típicos |
+|---|---|---|---|
+| `efeonce_admin` | Superadministrador | Control total de Greenhouse (usuarios, roles, settings). Override global. Pasa `requireAdminTenantContext`. Es el colapso canonical de roles fantasma (DEVOPS_OPERATOR, commercial_admin). | `internal`, `admin` + transversal |
+| `finance_admin` | Administrador de Finanzas | Configuración + operaciones financieras sensibles. Pasa `requireFinanceTenantContext`. Co-grant canonical para observabilidad financiera. | `internal`, `finance` |
+| `finance_analyst` | Analista de Finanzas | Operación financiera del día a día (sin settings sensibles). | `internal`, `finance` |
+| `hr_payroll` | Nómina | Gestión de payroll, compensaciones y períodos. | `internal`, `hr` |
+| `hr_manager` | Gestión HR | Gestión HR de personas, estructura, approvals. **NO confundir con `HR_ADMIN` (fantasma).** | `internal`, `hr` |
+| `efeonce_operations` | Operaciones | Visibilidad operativa cross-space y cross-tenant. **NO confundir con `operations` (fantasma — término genérico, no rol).** | `internal` |
+| `efeonce_account` | Líder de Cuenta | Responsabilidad comercial y salud de cuentas. | `internal` |
+| `people_viewer` | Lectura de Personas | Lectura de People, capacidad, assignments, memberships. | `internal`, `people` |
+| `ai_tooling_admin` | Administrador de Herramientas AI | Gobierno de catálogo, licencias, wallets AI. | `internal`, `ai_tooling` |
+| `collaborator` | Colaborador | Experiencia personal del miembro (Mi Ficha, Mi Nómina). Lo tiene todo colaborador interno además de su rol funcional. | `my` |
+
+**Externos cliente (3)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups |
+|---|---|---|---|
+| `client_executive` | Cliente Ejecutivo | CMO/VP-level. Dashboard ejecutivo, KPIs alto nivel. | `client` |
+| `client_manager` | Cliente Manager | Marketing manager. Contexto operativo profundo, drilldowns. | `client` |
+| `client_specialist` | Cliente Specialist | Coordinador externo. Restringido a proyectos/campañas específicas. | `client` |
+
+**Roles fantasma (NO existen — colapsar al canonical)**:
+
+| Fantasma | Colapso canonical |
+|---|---|
+| `DEVOPS_OPERATOR` / `devops_operator` | `EFEONCE_ADMIN` (release ops + SCIM admin); opcional `+ FINANCE_ADMIN` para observabilidad. |
+| `HR_ADMIN` / `hr_admin` | `HR_MANAGER`. |
+| `commercial_admin` / `COMMERCIAL_ADMIN` | `EFEONCE_ADMIN`. |
+| `operations` (como rol) | `EFEONCE_OPERATIONS` si es rol; `internal` si es route_group. |
+
+**Helpers TS canonical** (no string literals):
+
+```ts
+import { ROLE_CODES, type RoleCode, isRoleCode, isSuperadmin } from '@/config/role-codes'
+
+// CORRECTO
+hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+
+// PROHIBIDO
+subject.roleCodes.includes('devops_operator') // fantasma
+```
+
+**Route groups (NO son roles)**: `internal`, `admin`, `client`, `finance`, `hr`, `people`, `my`, `ai_tooling`. Derivados del rol según `src/lib/tenant/access.ts`. Un rol puede pertenecer a múltiples.
+
+**Protocolo obligatorio antes de citar un rol nuevo en spec/doc/edit**:
+
+1. Leer `src/config/role-codes.ts` (los 13 valores arriba).
+2. Listar los roles que el draft/análisis menciona.
+3. Flag cualquier rol que no esté en la tabla.
+4. Proponer colapso canonical (típicamente `EFEONCE_ADMIN` para admin, `+ FINANCE_ADMIN` para finance observability, `HR_MANAGER` para HR governance).
+5. Documentar el colapso con marcador inline si la spec original tiene valor histórico: `<!-- spec original menciona X — colapsado a Y por TASK-935 -->`.
+
+El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capability sin grant. El daño documental (spec confusa) NO lo atrapa el guard — esta regla lo cubre. Spec canonical: `docs/tasks/complete/TASK-935-capability-governance-reconciliation.md`. Reglas extendidas: `CLAUDE.md` sección "Reflejo canonical antes de citar cualquier rol".
+
 ### 2. Limites de trabajo
 
 - Un agente debe trabajar un objetivo claro por vez.

@@ -3803,14 +3803,70 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 
 **TASK-935 (2026-05-25) — reconciliación sistémica + guard mecánico**: el bug class TASK-873 había recurrido 13 veces (capabilities can()-checked en endpoints `/api/admin/*` sin runtime grant → 403 para todos). Causa raíz: specs documentaron roles intended (`DEVOPS_OPERATOR`, `commercial_admin`, `operations`) que **nunca existieron como `ROLE_CODES`**, así que el grant nunca se escribió. TASK-935 agregó los 13 grants (colapsando a `EFEONCE_ADMIN` + `FINANCE_ADMIN`, el set real que pasa `requireAdminTenantContext`) + el guard `capability-grant-coverage.test.ts` que **previene la recurrencia mecánicamente**. **NUNCA** documentar un rol intended en una spec/capability sin verificar que existe en `src/config/role-codes.ts`; si no existe, el grant colapsa al rol real más cercano (típicamente `EFEONCE_ADMIN`). Spec: `docs/tasks/complete/TASK-935-capability-governance-reconciliation.md`.
 
-**Reflejo canonical antes de citar cualquier rol** (TASK-947 follow-up 2026-05-29): cuando un agente o spec mencione un rol (`EFEONCE_ADMIN`, `FINANCE_ADMIN`, `HR_MANAGER`, etc.), DEBE verificarlo primero contra `src/config/role-codes.ts` (`ROLE_CODES` const, 13 roles canonical V1: EFEONCE_ADMIN, FINANCE_ADMIN, FINANCE_ANALYST, HR_PAYROLL, HR_MANAGER, EFEONCE_OPERATIONS, EFEONCE_ACCOUNT, PEOPLE_VIEWER, AI_TOOLING_ADMIN, COLLABORATOR, CLIENT_EXECUTIVE, CLIENT_MANAGER, CLIENT_SPECIALIST). Roles que NO existen y se siguen citando incorrectamente en specs/drafts:
+**Reflejo canonical antes de citar cualquier rol** (TASK-947 follow-up 2026-05-29): cuando un agente o spec mencione un rol, DEBE verificarlo primero contra el snapshot canonical de abajo (single source of truth: `src/config/role-codes.ts`, `ROLE_CODES` const). El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capability sin grant, pero el daño documental (specs/CLAUDE.md/AGENTS.md confusos) NO lo atrapa el guard. Esta regla cubre el lado documental.
 
-- `DEVOPS_OPERATOR` — NO existe. Colapsa a `EFEONCE_ADMIN` (operaciones release).
-- `HR_ADMIN` — NO existe. El real es `HR_MANAGER`.
-- `commercial_admin` / `COMMERCIAL_ADMIN` — NO existe. Colapsa a `EFEONCE_ADMIN`.
-- `operations` (como rol) — NO existe. El real es `EFEONCE_OPERATIONS`. (`internal` sí existe como route_group, no como rol.)
+#### ROLE_CODES vigentes (snapshot 2026-05-29, V1.0 canonical)
 
-Cuando emerja un draft de task nuevo o un análisis de capability matrix, el agente DEBE: (1) leer `ROLE_CODES` const real, (2) listar los roles que la spec menciona, (3) flag cualquier rol que no esté en el const, (4) proponer el colapso canonical (típicamente `EFEONCE_ADMIN` para administrativos, `+ FINANCE_ADMIN` cuando aplique observabilidad financiera). El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capability sin grant, pero el daño documental (specs/CLAUDE.md/AGENTS.md confusos) no lo atrapa el guard. Esta regla cubre el lado documental.
+**13 roles reales** — son los ÚNICOS valores legítimos para `roleCodes`/`primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`. Cualquier mención fuera de esta tabla es bug documental. Fuente: `src/config/role-codes.ts:5-19` + `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` §"Role codes internos actuales" + `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`.
+
+**Internos Efeonce (10)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups típicos |
+|---|---|---|---|
+| `efeonce_admin` | Superadministrador | Control total de Greenhouse (usuarios, roles, settings, vistas). Override global. Pasa `requireAdminTenantContext`. Es el colapso canonical de roles fantasma (DEVOPS_OPERATOR, commercial_admin). | `internal`, `admin` + acceso transversal |
+| `finance_admin` | Administrador de Finanzas | Configuración + operaciones financieras sensibles. Pasa `requireFinanceTenantContext`. Co-grant canonical para observabilidad financiera. | `internal`, `finance` |
+| `finance_analyst` | Analista de Finanzas | Operación financiera del día a día (read-write acotado, no settings sensibles). | `internal`, `finance` |
+| `hr_payroll` | Nómina | Gestión de payroll, compensaciones y períodos. | `internal`, `hr` |
+| `hr_manager` | Gestión HR | Gestión HR de personas, estructura y approvals de dominio. **NO confundir con `HR_ADMIN` (fantasma).** | `internal`, `hr` |
+| `efeonce_operations` | Operaciones | Visibilidad operativa cross-space y cross-tenant. **NO confundir con `operations` (fantasma — no es rol, es término genérico).** | `internal` |
+| `efeonce_account` | Líder de Cuenta | Responsabilidad comercial y salud de cuentas. | `internal` |
+| `people_viewer` | Lectura de Personas | Lectura de People, capacidad, assignments y memberships. | `internal`, `people` |
+| `ai_tooling_admin` | Administrador de Herramientas AI | Gobierno de catálogo, licencias y wallets AI. | `internal`, `ai_tooling` |
+| `collaborator` | Colaborador | Experiencia personal del miembro en Greenhouse (Mi Ficha, Mi Nómina). Lo tiene todo colaborador interno además de su rol funcional. | `my` |
+
+**Externos cliente (3)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups |
+|---|---|---|---|
+| `client_executive` | Cliente Ejecutivo | CMO/VP-level. Dashboard ejecutivo, KPIs alto nivel, overview de equipo. | `client` |
+| `client_manager` | Cliente Manager | Marketing manager. Contexto operativo profundo, drilldowns de proyecto, detalle de sprint. | `client` |
+| `client_specialist` | Cliente Specialist | Coordinador externo. Restringido a proyectos o campañas específicas via scope filters. | `client` |
+
+**Helpers TS canonical para citar roles** (no escribir strings literales):
+
+```ts
+import { ROLE_CODES, type RoleCode, isRoleCode, isSuperadmin } from '@/config/role-codes'
+
+// CORRECTO
+hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+addEntitlement(entries, { source: 'role', ... }) // donde tenant.roleCodes.includes(ROLE_CODES.FINANCE_ADMIN)
+
+// PROHIBIDO
+subject.roleCodes.includes('devops_operator') // fantasma — no existe
+subject.roleCodes.includes('hr_admin') // fantasma — el real es hr_manager
+subject.roleCodes.includes('commercial_admin') // fantasma — colapsa a efeonce_admin
+```
+
+**Mapping route_groups (NO son roles, no confundir)**: `internal`, `admin`, `client`, `finance`, `hr`, `people`, `my`, `ai_tooling`. Son derivados del rol según `src/lib/tenant/access.ts`. Un rol puede pertenecer a múltiples route_groups.
+
+#### Bug class — roles fantasma que han contaminado specs
+
+Estos NO existen en `ROLE_CODES` pero se siguen citando incorrectamente. Cuando emerjan en draft de task / spec / análisis, colapsar inmediatamente al rol real más cercano:
+
+| Rol fantasma | Origen del bug | Colapso canonical |
+|---|---|---|
+| `DEVOPS_OPERATOR` / `devops_operator` | TASK-848/849/850/854/872/908 specs (release/SCIM/delivery). | `EFEONCE_ADMIN` solo (release ops + SCIM admin), opcional `+ FINANCE_ADMIN` para observabilidad. |
+| `HR_ADMIN` / `hr_admin` | TASK-908 spec (ICO status transitions). | `HR_MANAGER`. |
+| `commercial_admin` / `COMMERCIAL_ADMIN` | Drafts comerciales pre-TASK-935. | `EFEONCE_ADMIN`. |
+| `operations` (como rol) | Confusión con route_group `internal` / con `efeonce_operations`. | `EFEONCE_OPERATIONS` si el intent es el rol; `internal` como route_group si el intent era acceso broad. |
+
+**Protocolo obligatorio cuando un agente vaya a citar un rol** (nuevo draft, capability matrix, grant analysis, doc nueva, edit a CLAUDE.md/AGENTS.md):
+
+1. Leer `src/config/role-codes.ts` (`ROLE_CODES` const) — los 13 valores arriba.
+2. Listar los roles que el draft/análisis menciona.
+3. Flag cualquier rol que no esté en la tabla.
+4. Proponer colapso canonical (típicamente `EFEONCE_ADMIN` para admin/release, `+ FINANCE_ADMIN` para finance observability, `HR_MANAGER` para HR governance).
+5. Documentar el colapso con marcador inline si la spec original tiene valor histórico (patrón: `<!-- spec original menciona X — colapsado a Y por TASK-935 -->`).
 
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 
