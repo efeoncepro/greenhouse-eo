@@ -27,13 +27,14 @@ import { useSettings } from '@core/hooks/useSettings'
 import './styles.css'
 
 // Data Imports
-import data from '@/data/searchData'
+import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceSection } from '@/lib/admin/view-access-catalog'
 
 type Item = {
   id: string
   name: string
   url: string
   icon: string
+  description?: string
   shortcut?: string
 }
 
@@ -51,22 +52,37 @@ type SearchItemProps = {
   onSelect?: () => void
 }
 
-// Transform the data to group items by their sections
-const transformedData = data.reduce((acc: Section[], item) => {
-  const existingSection = acc.find(section => section.title === item.section)
+const DEFAULT_ICON_FOR_SECTION: Record<GovernanceSection, string> = {
+  gestion: 'tabler-building',
+  equipo: 'tabler-users-group',
+  comercial: 'tabler-briefcase',
+  finanzas: 'tabler-report-money',
+  ia: 'tabler-sparkles',
+  administracion: 'tabler-shield-lock',
+  mi_ficha: 'tabler-user-circle',
+  cliente: 'tabler-folders'
+}
+
+const sectionLabel = (section: GovernanceSection): string =>
+  GOVERNANCE_SECTIONS.find(entry => entry.key === section)?.label ?? section
+
+// Transform the canonical Greenhouse view registry to the Vuexy command palette shape.
+const transformedData = VIEW_REGISTRY.reduce((acc: Section[], view) => {
+  const title = sectionLabel(view.section)
+  const existingSection = acc.find(section => section.title === title)
 
   const newItem = {
-    id: item.id,
-    name: item.name,
-    url: item.url,
-    icon: item.icon,
-    shortcut: item.shortcut
+    id: view.viewCode,
+    name: view.label,
+    url: view.routePath,
+    icon: DEFAULT_ICON_FOR_SECTION[view.section],
+    description: view.description
   }
 
   if (existingSection) {
     existingSection.items.push(newItem)
   } else {
-    acc.push({ title: item.section, items: [newItem] })
+    acc.push({ title, items: [newItem] })
   }
 
   return acc
@@ -159,6 +175,8 @@ const NavSearch = () => {
         const itemsMatch = section.items.some(
           item =>
             item.name.toLowerCase().includes(searchQuery) ||
+            item.id.toLowerCase().includes(searchQuery) ||
+            (item.description && item.description.toLowerCase().includes(searchQuery)) ||
             (item.shortcut && item.shortcut.toLowerCase().includes(searchQuery))
         )
 
@@ -170,6 +188,8 @@ const NavSearch = () => {
           item =>
             section.title.toLowerCase().includes(searchQuery) ||
             item.name.toLowerCase().includes(searchQuery) ||
+            item.id.toLowerCase().includes(searchQuery) ||
+            (item.description && item.description.toLowerCase().includes(searchQuery)) ||
             (item.shortcut && item.shortcut.toLowerCase().includes(searchQuery))
         )
       }))
@@ -180,8 +200,11 @@ const NavSearch = () => {
   // Toggle the menu when ⌘K is pressed
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      if (e.defaultPrevented) return
+
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
+        e.stopImmediatePropagation()
         setOpen(open => !open)
       }
     }
@@ -234,7 +257,7 @@ const NavSearch = () => {
                         key={idx}
                         currentPath={pathName}
                         url={item.url}
-                        value={`${item.name} ${section.title} ${item.shortcut || ''}`}
+                        value={`${item.name} ${item.id} ${section.title} ${item.description ?? ''} ${item.shortcut || ''}`}
                         onSelect={() => onSearchItemSelect(item)}
                       >
                         {item.icon && <i className={classnames('text-xl', item.icon)} />}

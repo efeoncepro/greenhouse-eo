@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react'
 
-import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 
@@ -16,7 +15,6 @@ import type {
   HomeUiDensity
 } from '@/lib/home/contract'
 
-import { CommandPalette } from '@/components/greenhouse/CommandPalette'
 import { HomeBlockRenderer } from './HomeBlockRenderer'
 import { HomeDayActions } from './HomeDayActions'
 
@@ -73,11 +71,6 @@ export const HomeShellV2 = ({ snapshot }: HomeShellV2Props) => {
 
   return (
     <Stack spacing={spacing} component='main'>
-      {/* Top utility row: command palette */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <CommandPalette triggerLabel='Buscar ⌘K' />
-      </Box>
-
       {/* Hero */}
       {heroBlocks.length > 0 ? (
         <Stack spacing={spacing}>

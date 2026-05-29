@@ -34,7 +34,7 @@
   position: fixed;
   inset: 0;
   background-color: var(--backdrop-color);
-  z-index: var(--search-z-index);
+  z-index: calc(var(--search-z-index) - 1);
 }
 
 [cmdk-input] {

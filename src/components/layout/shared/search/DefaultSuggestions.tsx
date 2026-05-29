@@ -4,6 +4,8 @@ import Link from 'next/link'
 // Third-party Imports
 import classnames from 'classnames'
 
+import { VIEW_REGISTRY } from '@/lib/admin/view-access-catalog'
+
 type DefaultSuggestionsType = {
   sectionLabel: string
   items: {
@@ -13,121 +15,61 @@ type DefaultSuggestionsType = {
   }[]
 }
 
+const routeByViewCode = new Map(VIEW_REGISTRY.map(view => [view.viewCode, view]))
+
+const buildSuggestion = (viewCode: string, icon: string) => {
+  const view = routeByViewCode.get(viewCode)
+
+  if (!view) return null
+
+  return {
+    label: view.label,
+    href: view.routePath,
+    icon
+  }
+}
+
+const compact = <T,>(items: Array<T | null>): T[] => items.filter((item): item is T => item !== null)
+
 const defaultSuggestions: DefaultSuggestionsType[] = [
   {
     sectionLabel: 'Accesos frecuentes',
-    items: [
-      {
-        label: 'Pulse',
-        href: '/home',
-        icon: 'tabler-smart-home'
-      },
-      {
-        label: 'Spaces',
-        href: '/admin/tenants',
-        icon: 'tabler-building'
-      },
-      {
-        label: 'Usuarios',
-        href: '/admin/users',
-        icon: 'tabler-users'
-      },
-      {
-        label: 'Personas',
-        href: '/people',
-        icon: 'tabler-users-group'
-      }
-    ]
+    items: compact([
+      buildSuggestion('cliente.home', 'tabler-smart-home'),
+      buildSuggestion('gestion.agencia', 'tabler-building'),
+      buildSuggestion('equipo.personas', 'tabler-users-group'),
+      buildSuggestion('administracion.admin_center', 'tabler-layout-dashboard')
+    ])
   },
   {
     sectionLabel: 'Finanzas',
-    items: [
-      {
-        label: 'Resumen',
-        href: '/finance',
-        icon: 'tabler-chart-bar'
-      },
-      {
-        label: 'Ventas',
-        href: '/finance/income',
-        icon: 'tabler-cash'
-      },
-      {
-        label: 'Compras',
-        href: '/finance/expenses',
-        icon: 'tabler-receipt'
-      },
-      {
-        label: 'Proveedores',
-        href: '/finance/suppliers',
-        icon: 'tabler-address-book'
-      }
-    ]
+    items: compact([
+      buildSuggestion('finanzas.resumen', 'tabler-chart-bar'),
+      buildSuggestion('finanzas.ingresos', 'tabler-cash'),
+      buildSuggestion('finanzas.egresos', 'tabler-receipt'),
+      buildSuggestion('finanzas.proveedores', 'tabler-address-book')
+    ])
   },
   {
     sectionLabel: 'Equipo',
-    items: [
-      {
-        label: 'Nómina',
-        href: '/hr/payroll',
-        icon: 'tabler-receipt'
-      },
-      {
-        label: 'Jerarquía',
-        href: '/hr/hierarchy',
-        icon: 'tabler-hierarchy-2'
-      },
-      {
-        label: 'Organigrama',
-        href: '/hr/org-chart',
-        icon: 'tabler-hierarchy-3'
-      },
-      {
-        label: 'Departamentos',
-        href: '/hr/departments',
-        icon: 'tabler-sitemap'
-      },
-      {
-        label: 'Permisos',
-        href: '/hr/leave',
-        icon: 'tabler-calendar-event'
-      },
-      {
-        label: 'Asistencia',
-        href: '/hr/attendance',
-        icon: 'tabler-clock-check'
-      }
-    ]
+    items: compact([
+      buildSuggestion('equipo.nomina', 'tabler-receipt'),
+      buildSuggestion('equipo.jerarquia', 'tabler-hierarchy-2'),
+      buildSuggestion('equipo.organigrama', 'tabler-hierarchy-3'),
+      buildSuggestion('equipo.departamentos', 'tabler-sitemap'),
+      buildSuggestion('equipo.permisos', 'tabler-calendar-event'),
+      buildSuggestion('equipo.asistencia', 'tabler-clock-check')
+    ])
   },
   {
     sectionLabel: 'Administración',
-    items: [
-      {
-        label: 'Roles y permisos',
-        href: '/admin/roles',
-        icon: 'tabler-lock'
-      },
-      {
-        label: 'Herramientas IA',
-        href: '/admin/ai-tools',
-        icon: 'tabler-robot'
-      },
-      {
-        label: 'Home',
-        href: '/home',
-        icon: 'tabler-smart-home'
-      },
-      {
-        label: 'Torre de control',
-        href: '/admin',
-        icon: 'tabler-layout-dashboard'
-      },
-      {
-        label: 'Agencia',
-        href: '/agency',
-        icon: 'tabler-building'
-      }
-    ]
+    items: compact([
+      buildSuggestion('administracion.roles', 'tabler-lock'),
+      buildSuggestion('ia.herramientas', 'tabler-robot'),
+      buildSuggestion('administracion.vistas', 'tabler-eye-cog'),
+      buildSuggestion('administracion.usuarios', 'tabler-users'),
+      buildSuggestion('administracion.ops_health', 'tabler-activity')
+    ])
   }
 ]
 
