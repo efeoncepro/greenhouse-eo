@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { GH_NEXA } from '@/config/greenhouse-nomenclature'
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
 
@@ -101,8 +102,10 @@ export type NexaInsightListRenderableResult = NexaInsightListResult
 
 const DEFAULT_LIMIT = 24
 
+// es-CL canonical via microcopy helper ("mayo 2026" lowercase) — single source
+// of truth de format. NO recompute inline en consumers.
 const buildPeriodLabel = (year: number, month: number): string =>
-  `${String(month).padStart(2, '0')}/${year}`
+  GH_NEXA.list_period_format(year, month)
 
 // ─── Public canonical reader ────────────────────────────────────────────────
 

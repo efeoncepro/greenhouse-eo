@@ -14,13 +14,13 @@ export const scenario: CaptureScenario = {
   initialHoldMs: 2000,
   steps: [
     { kind: 'wait', selector: 'h1', timeout: 8000 },
+    { kind: 'sleep', ms: 800 },
     { kind: 'mark', label: 'initial-ready' },
-    { kind: 'sleep', ms: 400 },
-    { kind: 'hover', selector: 'article[aria-label*="Observación"]' },
-    { kind: 'sleep', ms: 300 },
-    { kind: 'mark', label: 'card-hover' },
     { kind: 'scroll', scrollY: 400 },
+    { kind: 'sleep', ms: 400 },
+    { kind: 'mark', label: 'scrolled' },
+    { kind: 'scroll', scrollY: 0 },
     { kind: 'sleep', ms: 300 },
-    { kind: 'mark', label: 'scrolled' }
+    { kind: 'mark', label: 'back-to-top' }
   ]
 }

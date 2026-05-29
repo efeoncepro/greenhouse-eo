@@ -86,7 +86,7 @@ describe('listNexaInsightsForPeriod — anti-oracle subject filter (TASK-950)', 
     expect(result.state).toBe('empty-positive')
 
     if (result.state === 'empty-positive') {
-      expect(result.periodLabel).toBe('05/2026')
+      expect(result.periodLabel).toBe('mayo 2026')
     }
 
     expect(mockQuery).not.toHaveBeenCalled()
@@ -111,7 +111,7 @@ describe('listNexaInsightsForPeriod — ready / empty-positive de PG', () => {
     if (result.state === 'ready') {
       expect(result.insights).toHaveLength(2)
       expect(result.totalCount).toBe(2)
-      expect(result.periodLabel).toBe('05/2026')
+      expect(result.periodLabel).toBe('mayo 2026')
       expect(result.insights[0].enrichmentId).toBe('EO-AIE-12345678')
     }
   })
@@ -124,7 +124,7 @@ describe('listNexaInsightsForPeriod — ready / empty-positive de PG', () => {
     expect(result.state).toBe('empty-positive')
 
     if (result.state === 'empty-positive') {
-      expect(result.periodLabel).toBe('05/2026')
+      expect(result.periodLabel).toBe('mayo 2026')
     }
   })
 
