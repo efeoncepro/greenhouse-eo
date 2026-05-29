@@ -5,7 +5,7 @@ import { cleanup } from '@testing-library/react'
 
 import { renderWithTheme } from '@/test/render'
 
-import NexaInsightsBlock from './NexaInsightsBlock'
+import NexaInsightsBlock, { type NexaInsightItem } from './NexaInsightsBlock'
 
 afterEach(() => {
   cleanup()
@@ -42,12 +42,12 @@ beforeAll(() => {
 
 describe('NexaInsightsBlock — honest degradation states (TASK-946)', () => {
   const baseProps = {
-    insights: [],
+    insights: [] as NexaInsightItem[],
     totalAnalyzed: 0,
     lastAnalysis: null,
-    runStatus: null,
+    runStatus: null as null,
     defaultExpanded: true
-  } as const
+  }
 
   it('dataStatus=empty-pending renderea microcopy es-CL canonical', () => {
     const { getAllByText } = renderWithTheme(
