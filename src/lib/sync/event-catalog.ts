@@ -76,6 +76,7 @@ export const AGGREGATE_TYPES = {
 
   // HR Core / People
   member: 'member',
+  contractorEngagement: 'contractor_engagement',
   memberSkill: 'member_skill',
   memberTool: 'member_tool',
   memberCertification: 'member_certification',
@@ -734,6 +735,17 @@ export const EVENT_TYPES = {
 
   // TASK-876 — Workforce Activation remediation before final completion.
   workforceMemberIntakeUpdated: 'workforce.member.intake_updated',
+
+  // TASK-790 — Contractor Engagements runtime + classification risk (v1).
+  // Aggregate canonico bajo Workforce/HR. Material lifecycle changes del
+  // engagement contractor/honorarios. Payload schemaVersion:1.
+  contractorEngagementCreated: 'workforce.contractor_engagement.created',
+  contractorEngagementActivated: 'workforce.contractor_engagement.activated',
+  contractorEngagementPaused: 'workforce.contractor_engagement.paused',
+  contractorEngagementEnded: 'workforce.contractor_engagement.ended',
+  contractorEngagementCancelled: 'workforce.contractor_engagement.cancelled',
+  contractorEngagementClassificationRiskFlagged:
+    'workforce.contractor_engagement.classification_risk_flagged',
 
   // TASK-878 — HubSpot Companies async intake (canonical pattern TASK-813b).
   // Webhook handler emite este event y retorna <100ms; el reactive consumer
