@@ -1,3 +1,19 @@
+# Sesion 2026-05-29 — TASK-951 Weekly Digest deep-link a Nexa Insight detail — ✅ COMPLETE (develop, sin branch)
+
+El CTA per-insight del **Weekly Executive Digest email** ahora deep-linkea al detail page canonical `/nexa/insights/<signalId>` (TASK-947) en lugar del Space heredado (`/agency/spaces/<id>`), dando al ejecutivo causa raíz + narrativa + acción en cero clicks adicionales.
+
+**Cambio:** `src/lib/nexa/digest/build-weekly-digest.ts` — helper local `buildNexaInsightDrillUrl(signalId, portalUrl)` absolutiza el path-only canonical `buildNexaInsightDrillHref` (TASK-950, SSOT del shape) con prefix `portalUrl` para el email pipeline (los clients de email no infieren origin). `actionLabel` migró de literal `'Abrir Space'` → token canonical `GH_NEXA.list_card_drill_cta = 'Ver causa raíz'` (cero literals JSX). Fallback canonical a `buildSpaceHref(row.space_id, portalUrl)` cuando `row.signal_id` está vacío (degradación honesta, no rompe el email). Header del space section (`WeeklyExecutiveDigestSpaceSection.href`) PRESERVA link al Space — invariante verificado en el snapshot diff.
+
+**Skills validadas pre-write:** greenhouse-email (preview API existe en `/api/admin/emails/preview`) + greenhouse-ico (boundary check: la task NO toca metric compute/bonus/writeback, solo el CTA URL; `signal_id` = `EO-AIS-*` signal-anchored, canonical para card-default drill) + arch-architect (4-pillar: SSOT del path preservado, fallback robusto, revert <5min, sin nuevo query/compute). **Open Question resuelta:** digest recipients = `EFEONCE_ADMIN` + `EFEONCE_OPERATIONS` (recipient-resolver.ts) — ambos con `nexa.insights.read` per CLAUDE.md TASK-947 grant matrix → sin guard pre-link; `notFound()` anti-oracle cubre edge cases.
+
+**Commits (develop):** `0bc004bc` Slice 1+2 (builder refactor + fallback) · `8481ed8b` Slice 3+4 (3 tests anti-regresión: deep-link / fallback / header-preserved + EmailTemplateBaseline fixture + snapshot refresh).
+
+**Gates:** `pnpm test` 5503 passed / 1 failed (fallo **pre-existente ajeno** — `OrganizationWorkspaceShell.test.tsx:227` "No tenés acceso a ninguna sección", deterministic en aislamiento, TASK-611/612 territory, NUNCA tocado por TASK-951; probable drift del refactor `f76ed364`) + `pnpm build` Turbopack ✓ + tsc ✓ + lint ✓. Cross-impact scan: `agency/spaces` en nexa/emails queda solo en section header (preservado) + narrative mentions (out of scope) + CTA fallback (intencional). Sin migration, capability, flag, signal, ni event nuevo.
+
+**Próximo paso:** deploy via push develop (ops-worker bundlea el builder → redeploy por pipeline normal). V1.1 follow-ups separable: reliability signal `nexa.weekly_digest.deep_link_ctr` + Teams notifications deep-links (TASK-716). Pendiente menor de tracker: el fallo pre-existente de OrganizationWorkspaceShell debería abrirse como fix-task separada (no es TASK-951).
+
+---
+
 # Sesion 2026-05-29 — Nexa Insights first-click 500 + microcopy locale — ✅ ROOT FIX LOCAL
 
 Incidente reportado en `dev-greenhouse.efeoncepro.com/nexa/insights/EO-AIS-7AD995BA4096`: primer click/render mostraba el error boundary "No pudimos cargar esta observación"; al presionar `Reintentar`, la misma URL cargaba el insight. Diagnóstico con usuario agente `agent@greenhouse.efeonce.org` contra staging canónico `.vercel.app` + bypass, artifacts en `.captures/nexa-detail-first-click-20260529T131813Z/`. Evidencia runtime: `GET /nexa/insights/EO-AIS-7AD995BA4096` devolvía 500 y Vercel logs mostraban `Functions cannot be passed directly to Client Components ... {elevation: 0, sx: function sx}`.
