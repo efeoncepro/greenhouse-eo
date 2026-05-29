@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Implementacion`
+- Status real: `Complete 2026-05-28`
 - Rank: `TBD`
 - Domain: `ui|delivery|reliability`
 - Blocked by: `none` (TASK-941/942/943 ya entregaron el motor backend canonical)
@@ -270,3 +270,55 @@ Rationale: V1 MVP cierra el bug class concreto (404 sistemático Home → 5 surf
 - **SIEMPRE** que email/Teams notification incluya link a insight, usar `/nexa/insights/[id]` (estable cross-time + cross-tenant + cross-domain).
 - **SIEMPRE** que emerja consumer cross-surface nuevo que necesite "detail de un Nexa Insight", navegar al canonical — cero composición ad-hoc.
 - **SIEMPRE** que el LLM-enrichment-worker regenere un enrichment, el URL `/nexa/insights/EO-AIS-*` sigue válido apuntando al current.
+
+## Delta 2026-05-28 — V1 MVP SHIPPED (4 commits a develop sin branch)
+
+**Slice 0 (`37a97827`)** — Lifecycle move to-do→in-progress + spec delta V1 MVP scope-control. Q3 ajustada post verify live (DEVOPS_OPERATOR no existe en ROLE_CODES; matriz canonical = EFEONCE_ADMIN ∪ FINANCE_ADMIN ∪ HR_MANAGER + route_groups internal/finance/hr). Slice 4 simplificado a 1 surface (verificación live: solo `load-ai-insights-bento.ts:71` emite drillHref roto). Slices 5+6 deferred a V1.1.
+
+**Slice 1 (`15917f90`)** — Capability + helper canonical:
+
+- Migration `20260529004012583_task-947-nexa-insights-read-capability.sql` seed `nexa.insights.read` en `greenhouse_core.capabilities_registry` + anti pre-up-marker check + down migration marca `deprecated_at` (append-only governance).
+- `entitlements-catalog.ts` entry canonical (module=`delivery`, action=`read`, scope=`tenant/all`).
+- `runtime.ts` grant dual-plane TASK-873 invariant (catalog + runtime mismo PR + capability-grant-coverage guard).
+- `src/lib/ico-engine/ai/nexa-insight-drill-reader.ts` (NEW) — helper canonical único reusable. Dispatch prefix `EO-AIS-*` / `EO-AIE-*` / `EO-AIH-*`. Discriminated union return: `current | superseded | expired | not_found | degraded`. Subject-aware filter sin 403 (client tenant + collaborator no-match → not_found). 3-tier lookup current→history→notFound para enrichment-anchored. Honest degradation PG fail → state `degraded` + `captureWithDomain('delivery')`.
+- Helper `buildNexaInsightDrillHref(id)` canonical para emit URLs (cero drift cross-surface).
+- 19 tests anti-regresión focal en `nexa-insight-drill-reader.test.ts`: dispatch prefix detection + 5 states + subject filter (admin/internal/collaborator/client) + degraded + honest degradation.
+
+**Slice 2 (`f1464b16`)** — Server page + view + states canonical:
+
+- `src/app/(dashboard)/nexa/insights/[id]/page.tsx` (NEW) — server component. `getTenantContext` + `redirect('/login')` + `buildTenantEntitlementSubject` + `can(subject, 'nexa.insights.read', 'read', 'tenant')` + `notFound()` anti-oracle TASK-872. Next 16 App Router: `params: Promise<{id: string}>` awaited.
+- `loading.tsx` (NEW) — skeleton dimensionado a contenido final para prevenir CLS (back link + title + 3 section cards + metadata) + `role='status'` + `aria-busy='true'` + `aria-label`.
+- `not-found.tsx` (NEW) — EmptyState canonical anti-oracle indistinguible (4 casos colapsados al mismo render).
+- `error.tsx` (NEW) — error boundary client-side con Reintentar + console.error log.
+- `src/views/greenhouse/nexa/insights/NexaInsightDetailView.tsx` (NEW) — discriminated union (excl. not_found) → 4 render branches TASK-946 framework. 3 section cards (Anomalía observada / Causa raíz / Acción sugerida) con accent border-left severity color. Reusa `NexaMentionText` (mentions) + `NexaInsightRootCauseSection` (TASK-696). CopyLinkButton client-side con `aria-live='polite'` feedback. MetadataAccordion collapsado (IDs forensic). Severity chip canonical: icon + label + color (NUNCA color-only — WCAG 2.2). Reusa tokens existentes `GH_NEXA.severity_color` + `severity_label` (single source of truth).
+- Microcopy es-CL canonical extendida `GH_NEXA` (≈30 entries nuevas): detail_title_template + section titles + CTAs + banners superseded/degraded + empty/not-found/error narratives + metadata labels + severity_aria helper. Cero literals JSX (respeta TASK-265 hygiene). Reusa severity_color/severity_label existentes (NO duplica).
+
+**Slice 3 (`968c49cf`)** — Surface drift fix Home drillHref:
+
+- `src/lib/home/loaders/load-ai-insights-bento.ts:71` flip canonical `/agency/insights/${enrichmentId}` → `/nexa/insights/${signalId}`. Drill key signal-anchored (`EO-AIS-*` estable cross-period TASK-943). `enrichmentId` reservado para share permalinks TASK-449 V1.3.
+- Test focal anti-regresión `load-ai-insights-bento.test.ts` (NEW) — 2 tests: drillHref top-level (NO `/agency/*`) + signalId (NO enrichmentId).
+
+**Skills invocadas pre-implementación**:
+
+- `greenhouse-backend` — Slice 1 helper canonical + capability + runtime grant.
+- `greenhouse-ux` + `state-design` + `greenhouse-ux-writing` — Slice 2 UI design plan (canonizado pre-write code): layout single-column + accent border-left + Vuexy primitives + TASK-946 framework mapping + honest degradation pattern + es-CL tuteo + active voice + 4 narrativas distintas cero "Sin datos" ambiguo.
+- `greenhouse-dev` — Slice 2 implementation per design plan.
+
+**Cierre del bug class 404 sistemático**: el CTA "Ver causa raíz" del Home Nexa Insights bento ahora funciona end-to-end. Drift TASK-696 cerrado. Future surfaces (TASK-449 / TASK-944 Finance alias / TASK-945 timeline embedded / TASK-946 propagation) reusan el path canonical sin cambios al helper.
+
+**Out of V1 MVP (V1.1 follow-up gated)**:
+
+- Slice 5 reliability signal `home.insights.drill_404_rate`.
+- Slice 6 E2E Playwright + ADR DECISIONS_INDEX detailed entry + doc funcional + manual de uso.
+- Finance alias `/finance/insights/[id]` (`EO-FSIG-*` + `EO-FAIE-*`).
+- Time-travel `?at=YYYY-MM-DD`.
+- TASK-449 interaction layer (Read/Pin/Dismiss/Share inline).
+- Lista `/nexa/insights` (sin id).
+
+**Quality gate canonical (pre-cierre)**:
+
+- 21 tests focal verde (19 reader + 2 drillHref).
+- 2 capability-grant-coverage tests verde.
+- `pnpm exec tsc --noEmit` ✓.
+- `pnpm lint` focal ✓.
+- `pnpm test` full + `pnpm build` corren en closing protocol.
