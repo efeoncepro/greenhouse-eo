@@ -1021,8 +1021,8 @@ Pipeline canonical RpA V2 demo end-to-end: status transition Notion → captura 
   - STRICT (Sentry, GCP WIF, Postgres health/migrations, target_sha, ci, playwright, batch_policy, stale_approvals, pending_without_jobs): failure → error/block
   - DEGRADED (Vercel, Azure WIF): failure → warning, degradedSources entry
 - **3 capabilities granulares least-privilege** (migration `20260510144012098_task-850-preflight-capabilities.sql`):
-  - `platform.release.preflight.execute` (EFEONCE_ADMIN + DEVOPS_OPERATOR)
-  - `platform.release.preflight.read_results` (EFEONCE_ADMIN + DEVOPS_OPERATOR + FINANCE_ADMIN observabilidad)
+  - `platform.release.preflight.execute` (EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->)
+  - `platform.release.preflight.read_results` (EFEONCE_ADMIN + FINANCE_ADMIN observabilidad <!-- spec original menciona DEVOPS_OPERATOR — removido por TASK-935 (rol no existe en ROLE_CODES) -->)
   - `platform.release.preflight.override_batch_policy` (EFEONCE_ADMIN solo, break-glass)
 - **Helpers canonicos** (single source of truth, reusables):
   - `src/lib/release/preflight/composer.ts` (composeFromCheckResults puro)
@@ -1074,7 +1074,7 @@ Pipeline canonical RpA V2 demo end-to-end: status transition Notion → captura 
 
 ### Release Observability Completion (TASK-854, 2026-05-10)
 
-- **Que hace**: cierra el subsystem `Platform Release` con 5 of 5 reliability signals canonicos (los 2 nuevos requieren `release_manifests` populated por TASK-851 orquestador) + dashboard read-only `/admin/releases` para EFEONCE_ADMIN + DEVOPS_OPERATOR.
+- **Que hace**: cierra el subsystem `Platform Release` con 5 of 5 reliability signals canonicos (los 2 nuevos requieren `release_manifests` populated por TASK-851 orquestador) + dashboard read-only `/admin/releases` para EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->.
 - **2 signals nuevos**:
   - `platform.release.deploy_duration_p95` (kind=lag): p95 de `completed_at - started_at` para releases en estado `released`, ventana 30d. Severity: ok <30min, warning 30-60min, error >=60min, unknown sin samples.
   - `platform.release.last_status` (kind=drift): ultimo release de main. ok si `released`, error si `degraded|aborted|rolled_back` <24h, warning 24h-7d, ok >7d (resolved historicamente), unknown si in-flight o sin releases.

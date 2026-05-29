@@ -141,7 +141,7 @@ Rationale: V1 MVP cierra el bug class concreto (404 sistemático Home → 5 surf
 
 - Migration: seed `nexa.insights.read` en `capabilities_registry` (module `delivery`, action `read`, scope `tenant`).
 - `entitlements-catalog.ts`: agregar entry al union + catalog.
-- `runtime.ts`: grant dual-plane (EFEONCE_ADMIN + FINANCE_ADMIN + HR_MANAGER + DEVOPS_OPERATOR + assigned member scope-filtered) — **mismo PR** (invariant TASK-873).
+- `runtime.ts`: grant dual-plane (EFEONCE_ADMIN + FINANCE_ADMIN + HR_MANAGER + assigned member scope-filtered) — **mismo PR** (invariant TASK-873). <!-- draft original mencionaba DEVOPS_OPERATOR — removido pre-execution porque NO existe en ROLE_CODES (CLAUDE.md TASK-935 invariant). Ver Q3 § Open Questions arriba para matriz canonical V1.0 ajustada. -->
 - Helper `src/lib/ico-engine/ai/nexa-insight-drill-reader.ts`:
   - `readNexaInsightDrill(id: string, subject: TenantEntitlementSubject) → Promise<NexaInsightDrillResult>`
   - Dispatch prefix:

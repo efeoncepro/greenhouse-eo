@@ -2018,7 +2018,7 @@ La promoción `develop → main` vive en un control plane canónico con manifest
 - State machine cerrado (8 estados): `preflight → ready → deploying → verifying → released | degraded | aborted`; `released → rolled_back`; `degraded → rolled_back | released`. CHECK constraint a nivel DB.
 - Partial UNIQUE INDEX `WHERE state IN ('preflight','ready','deploying','verifying')` garantiza 1 release activo por branch.
 - Outbox events versionados v1: `platform.release.{started, deploying, verifying, released, degraded, rolled_back, aborted}`. Documentados en `GREENHOUSE_EVENT_CATALOG_V1.md`.
-- 3 capabilities granulares least-privilege: `platform.release.execute` (EFEONCE_ADMIN + DEVOPS_OPERATOR), `platform.release.rollback` (EFEONCE_ADMIN solo), `platform.release.bypass_preflight` (EFEONCE_ADMIN solo, requiere `reason >= 20 chars` + audit).
+- 3 capabilities granulares least-privilege: `platform.release.execute` (EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->), `platform.release.rollback` (EFEONCE_ADMIN solo), `platform.release.bypass_preflight` (EFEONCE_ADMIN solo, requiere `reason >= 20 chars` + audit).
 
 **Concurrency fix Opción A (V1 deployed)**:
 
@@ -2090,7 +2090,7 @@ Watchdog manual-only temporal (desde 2026-05-24 hasta TASK-920) que detecta los 
 - Owner `greenhouse_ops`, GRANT SELECT/INSERT/UPDATE/DELETE a `greenhouse_runtime` (NO triggers anti-DELETE — cuando blocker se resuelve, row se borra)
 - Indexes: `(first_observed_at)` para recovery sweep, `(workflow_name, alert_kind, last_alerted_at DESC)` para drilldown
 
-**Capability granular**: `platform.release.watchdog.read` (scope=all, EFEONCE_ADMIN + DEVOPS_OPERATOR). NO reusa `platform.release.execute` — semantica distinta (leer estado vs disparar release).
+**Capability granular**: `platform.release.watchdog.read` (scope=all, EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->). NO reusa `platform.release.execute` — semantica distinta (leer estado vs disparar release).
 
 **GitHub auth strategy canonica (V1.1)**: GitHub App installation token primary, PAT fallback. Setup one-time documented en runbook §8.1 (App ID + Installation ID + private key en GCP Secret Manager `greenhouse-github-app-private-key`). Vercel env vars: `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF`. Costo: $0 GitHub side, ~$0.72/anio GCP secret. Beneficios sobre PAT: token NO ligado a usuario, rate limit 15K req/h vs 5K, auditoria per-installation.
 
@@ -2192,8 +2192,8 @@ CLI `pnpm release:preflight` que ejecuta los **12 checks fail-fast** ANTES de pr
 
 **3 capabilities granulares least-privilege** (migration `20260510144012098_task-850-preflight-capabilities.sql`):
 
-- `platform.release.preflight.execute` — disparar CLI / orchestrator. EFEONCE_ADMIN + DEVOPS_OPERATOR.
-- `platform.release.preflight.read_results` — leer JSON output desde dashboards futuros (TASK-855). EFEONCE_ADMIN + DEVOPS_OPERATOR + FINANCE_ADMIN (observabilidad).
+- `platform.release.preflight.execute` — disparar CLI / orchestrator. EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->.
+- `platform.release.preflight.read_results` — leer JSON output desde dashboards futuros (TASK-855). EFEONCE_ADMIN + FINANCE_ADMIN (observabilidad) <!-- spec original menciona DEVOPS_OPERATOR — removido por TASK-935 (rol no existe en ROLE_CODES) -->.
 - `platform.release.preflight.override_batch_policy` — break-glass override del check release_batch_policy. **EFEONCE_ADMIN solo**. Requires reason >= 20 chars + audit row.
 
 **CLI usage canonico**:
@@ -2542,7 +2542,7 @@ Wire-up canonico: `getReliabilityOverview` source `productionRelease[]` ahora in
 - **NUNCA** ajustar thresholds (30min warning, 60min error) sin observar 30 dias de steady state real. La spec V1 marca explicitly "tune post-30d steady-state observados".
 - **NUNCA** expandir `last_status` a leer ultimos N releases. La semantica del signal es "el ultimo" — para tendencias usar el dashboard `/admin/releases` o el deploy_duration_p95.
 - **NUNCA** computar duration o severity en cliente. La server-side se encarga via reader → wire-up → `productionRelease[]` source. Cliente solo renderiza.
-- **NUNCA** mostrar el dashboard a roles distintos de EFEONCE_ADMIN + DEVOPS_OPERATOR. Capability `platform.release.execute` es read-equivalent V1; para audiencias distintas (FINANCE_ADMIN observabilidad), V1.2 introducira `platform.release.read_results` granular.
+- **NUNCA** mostrar el dashboard a roles distintos de EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->. Capability `platform.release.execute` es read-equivalent V1; para audiencias distintas (FINANCE_ADMIN observabilidad), V1.2 introducira `platform.release.read_results` granular.
 - **NUNCA** disparar release desde el dashboard. V1 es read-only por design — operator dispara via `gh workflow run production-release.yml` o GitHub UI. Add release CTA queda como follow-up V1.2 con capability separada.
 - **NUNCA** invocar `Sentry.captureException` directo en este path. Use `captureWithDomain(err, 'cloud', { tags: { source: 'admin_releases_*', stage: '<step>' } })`.
 - **NUNCA** componer la decision banner show/hide en cliente. La server-side calcula `lastStatusSignal.severity`, cliente solo renderiza si severity in {error, warning}.
@@ -3775,7 +3775,7 @@ SCIM POST `/api/scim/v2/Users` con `tenant_type='efeonce_internal'` Y eligibilit
 
 **Capabilities granulares canónicas (4 nuevas)**:
 
-- `scim.eligibility_override.create` (organization, create, tenant) — EFEONCE_ADMIN + DEVOPS_OPERATOR
+- `scim.eligibility_override.create` (organization, create, tenant) — EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->
 - `scim.eligibility_override.delete` (organization, delete, tenant) — EFEONCE_ADMIN only
 - `scim.backfill.execute` (organization, execute, all) — EFEONCE_ADMIN only
 - `workforce.member.complete_intake` (workforce, update, tenant) — FINANCE_ADMIN + EFEONCE_ADMIN
@@ -3802,6 +3802,15 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 **Spec canónica**: `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (Slice 1 fix). Pattern fuente: `src/lib/entitlements/runtime.ts` líneas con grant `workforce.member.complete_intake` (matriz `hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN`).
 
 **TASK-935 (2026-05-25) — reconciliación sistémica + guard mecánico**: el bug class TASK-873 había recurrido 13 veces (capabilities can()-checked en endpoints `/api/admin/*` sin runtime grant → 403 para todos). Causa raíz: specs documentaron roles intended (`DEVOPS_OPERATOR`, `commercial_admin`, `operations`) que **nunca existieron como `ROLE_CODES`**, así que el grant nunca se escribió. TASK-935 agregó los 13 grants (colapsando a `EFEONCE_ADMIN` + `FINANCE_ADMIN`, el set real que pasa `requireAdminTenantContext`) + el guard `capability-grant-coverage.test.ts` que **previene la recurrencia mecánicamente**. **NUNCA** documentar un rol intended en una spec/capability sin verificar que existe en `src/config/role-codes.ts`; si no existe, el grant colapsa al rol real más cercano (típicamente `EFEONCE_ADMIN`). Spec: `docs/tasks/complete/TASK-935-capability-governance-reconciliation.md`.
+
+**Reflejo canonical antes de citar cualquier rol** (TASK-947 follow-up 2026-05-29): cuando un agente o spec mencione un rol (`EFEONCE_ADMIN`, `FINANCE_ADMIN`, `HR_MANAGER`, etc.), DEBE verificarlo primero contra `src/config/role-codes.ts` (`ROLE_CODES` const, 13 roles canonical V1: EFEONCE_ADMIN, FINANCE_ADMIN, FINANCE_ANALYST, HR_PAYROLL, HR_MANAGER, EFEONCE_OPERATIONS, EFEONCE_ACCOUNT, PEOPLE_VIEWER, AI_TOOLING_ADMIN, COLLABORATOR, CLIENT_EXECUTIVE, CLIENT_MANAGER, CLIENT_SPECIALIST). Roles que NO existen y se siguen citando incorrectamente en specs/drafts:
+
+- `DEVOPS_OPERATOR` — NO existe. Colapsa a `EFEONCE_ADMIN` (operaciones release).
+- `HR_ADMIN` — NO existe. El real es `HR_MANAGER`.
+- `commercial_admin` / `COMMERCIAL_ADMIN` — NO existe. Colapsa a `EFEONCE_ADMIN`.
+- `operations` (como rol) — NO existe. El real es `EFEONCE_OPERATIONS`. (`internal` sí existe como route_group, no como rol.)
+
+Cuando emerja un draft de task nuevo o un análisis de capability matrix, el agente DEBE: (1) leer `ROLE_CODES` const real, (2) listar los roles que la spec menciona, (3) flag cualquier rol que no esté en el const, (4) proponer el colapso canonical (típicamente `EFEONCE_ADMIN` para administrativos, `+ FINANCE_ADMIN` cuando aplique observabilidad financiera). El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capability sin grant, pero el daño documental (specs/CLAUDE.md/AGENTS.md confusos) no lo atrapa el guard. Esta regla cubre el lado documental.
 
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 
@@ -4379,8 +4388,8 @@ TASK-908 (foundation, esta task)                TASK-901 (RpA)                  
 
 **Capabilities canonical V1.0** (granular least-privilege):
 
-- `cycle_time.compute.execute` (delivery / execute / all) — EFEONCE_ADMIN + DEVOPS_OPERATOR
-- `correction_transitions.compute.read` (delivery / read / all) — EFEONCE_ADMIN + DEVOPS_OPERATOR + HR_ADMIN
+- `cycle_time.compute.execute` (delivery / execute / all) — EFEONCE_ADMIN <!-- spec original menciona DEVOPS_OPERATOR — colapsado a EFEONCE_ADMIN solo por TASK-935 (rol DEVOPS_OPERATOR no existe en ROLE_CODES) -->
+- `correction_transitions.compute.read` (delivery / read / all) — EFEONCE_ADMIN + HR_MANAGER <!-- spec original menciona DEVOPS_OPERATOR + HR_ADMIN — colapsado a EFEONCE_ADMIN + HR_MANAGER por TASK-935 (DEVOPS_OPERATOR no existe; HR_ADMIN no existe, el real es HR_MANAGER) -->
 
 **Fix B.1 canonical (Slice 6)**: `EXCLUDED_FROM_METRICS_STATUSES = EXCLUDED_STATUSES ∪ BLOCKED_STATUSES`. Tareas en `Bloqueado` / `En pausa` / legacy `Detenido` ahora excluidas del denominador OTD/RpA/FTR via `CANONICAL_OPEN_TASK_SQL`. Pre-fix: contaminaban métricas. Post-fix: métricas suben ligeramente (ESPERADO).
 
