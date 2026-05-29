@@ -159,6 +159,41 @@ describe('buildWeeklyDigest', () => {
     expect(formatWeeklyDigestNarrativeText(digest.spaces[0].insights[0].narrative)).toContain(
       'Valentina Hoyos'
     )
+
+    // TASK-951 — CTA per-insight deep-linkea al detail page canonical (signal-anchored).
+    expect(digest.spaces[0].insights[0].actionUrl).toBe(
+      'https://greenhouse.efeoncepro.com/nexa/insights/EO-AIS-1'
+    )
+    expect(digest.spaces[0].insights[0].actionLabel).toBe('Ver causa raíz')
+
+    // TASK-951 invariante — el header del space section PRESERVA link al Space.
+    expect(digest.spaces[0].href).toContain('/agency/spaces/space-1')
+    expect(digest.spaces[0].href).not.toContain('/nexa/insights/')
+  })
+
+  it('fallback canonical: cuando signal_id está vacío, el CTA apunta al Space (backward compat)', async () => {
+    mockSelectPresentableEnrichments.mockResolvedValue([
+      {
+        ...baseEnrichment,
+        signal_id: '',
+        space_id: 'space-legacy',
+        space_name: 'Space Legacy'
+      }
+    ])
+
+    mockLoadMentionContext.mockResolvedValue(
+      createContext({ spaces: [['space-legacy', 'Space Legacy']] })
+    )
+
+    const digest = await buildWeeklyDigest({ now: new Date('2026-04-16T12:00:00.000Z'), limit: 8 })
+
+    const insight = digest.spaces[0].insights[0]
+
+    // Degradación honesta: sin signal_id, el CTA cae al Space en lugar de romper el email.
+    expect(insight.actionUrl).toBe('https://greenhouse.efeoncepro.com/agency/spaces/space-legacy')
+    expect(insight.actionUrl).not.toContain('/nexa/insights/')
+    // El label canonical se conserva (mismo CTA semántico cross-surface).
+    expect(insight.actionLabel).toBe('Ver causa raíz')
   })
 
   it('sanitizes sentinels ("Sin nombre") and produces clean output (TASK-598 regression fixture)', async () => {
