@@ -426,10 +426,56 @@ export const GH_NEXA = {
   // Loading + skeleton aria
   detail_loading_aria: 'Cargando observación de Nexa',
 
-  // TASK-950 — list page stub (microcopy completo es-CL canonical lands en Slice 3
-  // post UX skills audit). Solo `list_loading_aria` queda aquí para que
-  // `loading.tsx` compile end-to-end con Slice 2.
-  list_loading_aria: 'Cargando observaciones del período'
+  // ── TASK-950 Slice 3 — List page /nexa/insights microcopy canonical es-CL ──
+  // UX Specification source: greenhouse-ux + state-design + greenhouse-ux-writing
+  // skills audit pre-write. Tone: tuteo es-CL, active voice, honest degradation,
+  // cero false friends, sentence case, numerals para counts.
+
+  list_loading_aria: 'Cargando observaciones del período',
+
+  // Title + chrome
+  list_page_title: 'Nexa Insights del mes',
+  list_page_subtitle: (periodLabel: string, count: number) =>
+    `${periodLabel} · ${count === 1 ? '1 observación' : `${count} observaciones`}`,
+
+  // Period label es-CL (mayo 2026, lowercase month name)
+  list_period_format: (year: number, month: number) => {
+    const MONTHS = [
+      '',
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre'
+    ]
+
+    return `${MONTHS[month] ?? ''} ${year}`.trim()
+  },
+
+  // Empty-positive (señal de SALUD operativa, no de error — TASK-946 framework)
+  list_empty_positive_title: 'Sin anomalías este período',
+  list_empty_positive_body:
+    'Nexa analizó las señales del mes y no encontró desviaciones. Salud operativa OK.',
+  list_empty_positive_cta: 'Volver a Home',
+
+  // Card item
+  list_card_drill_cta: 'Ver causa raíz',
+  list_card_aria_label: (metric: string, severity: string) =>
+    `Observación de ${metric}, severidad ${severity.toLowerCase()}. Click para ver causa raíz.`,
+  list_card_scope_template: (space: string, metric: string) => `${space} · ${metric}`,
+
+  // Degraded banner (honest, accionable, escalation a /admin/operations)
+  list_degraded_title: 'No pudimos cargar las observaciones',
+  list_degraded_body:
+    'El pipeline de Nexa está respondiendo lento o tuvo un fallo transitorio. Probá de nuevo en unos minutos.',
+  list_degraded_cta: 'Ver estado del pipeline'
 } as const
 
 /* ─────────────────── Skills & Certifications ─────────────────── */
