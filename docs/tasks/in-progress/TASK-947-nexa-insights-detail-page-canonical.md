@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `ui|delivery|reliability`
 - Blocked by: `none` (TASK-941/942/943 ya entregaron el motor backend canonical)
@@ -59,14 +59,23 @@ Reglas obligatorias (extendidas en §Hard rules):
 | Q | Resolución | Rationale |
 |---|---|---|
 | ¿URL bajo `/agency/insights/` o top-level? | **Top-level `/nexa/insights/[id]`** | Nexa Insights se renderea en 5 surfaces (Home, Agency, Person 360, Space 360, Finance) que viven en route_groups distintos; anclar a `/agency/...` fuerza cross-tenant violations. Top-level + capability dedicada es canonical. Mirror del precedente `/admin/...` (lane cross-domain, no dominio). |
-| ¿Drill key `enrichment_id` o `signal_id`? | **Dual con dispatch prefix**: `EO-AIS-*` → signal-anchored (default cards); `EO-AIE-*` → enrichment-anchored (share permalinks de TASK-449) | TASK-943 append-only: `signal_id` es estable cross-period (correcto para "Ver causa raíz" del current); `enrichment_id` es snapshot específico (correcto para share semantics "esto vio el operador"). Cards default = signal_id; share button = enrichment_id explícito. |
-| ¿Capability nueva o reusar existente? | **Nueva dedicada `nexa.insights.read`** (module `delivery`, scope `tenant`) | Granular (decisión canonical #7), NO heredar de route_group. Grant dual-plane TASK-873: catalog + runtime mismo PR + smoke E2E. |
+| ¿Drill key `enrichment_id` o `signal_id`? | **Dual con dispatch prefix**: `EO-AIS-*` → signal-anchored (default cards); `EO-AIE-*` → enrichment-anchored (share permalinks de TASK-449); `EO-AIH-*` → enrichment-history-anchored (forensic snapshot) | TASK-943 append-only: `signal_id` es estable cross-period (correcto para "Ver causa raíz" del current); `enrichment_id` es snapshot específico (correcto para share semantics "esto vio el operador"). Cards default = signal_id; share button = enrichment_id explícito; forensic = history_id. **Prefijos canonical verificados live**: `stableAiId('AIS', ...)` → `EO-AIS-<hex12>` (anomaly-detector.ts:112); `stableEnrichmentId(...)` → `EO-AIE-<hex8>` (llm-types.ts:343); `stableEnrichmentHistoryId(...)` → `EO-AIH-<hex8>` (llm-types.ts:346). |
+| ¿Capability nueva o reusar existente? | **Nueva dedicada `nexa.insights.read`** (module `delivery`, scope `tenant`) | Granular (decisión canonical #7), NO heredar de route_group. Grant dual-plane TASK-873: catalog + runtime mismo PR + smoke E2E. **Matriz canonical ajustada pre-execution (post-verify ROLE_CODES live)**: el rol `DEVOPS_OPERATOR` mencionado en draft original NO existe en `src/config/role-codes.ts` (verificado live 2026-05-28; invariant CLAUDE.md TASK-935 prohíbe grants a roles inexistentes). Matriz canonical V1.0: `EFEONCE_ADMIN ∪ FINANCE_ADMIN ∪ HR_MANAGER` (via `ROLE_CODES`) + route_groups broad `internal`, `finance`, `hr` (cubren delivery operacional + comerciales + ops). |
 | ¿Helper canonical centralizado o per-surface? | **Único** `readNexaInsightDrill(id, subject)` server-only con dispatch prefix + 3-tier lookup current→history→notFound + subject-aware filter | Single source of truth canonical (decisión #4). Habilita TASK-945 timeline + TASK-449 share + TASK-944 Finance alias sin duplicación. |
 | ¿Cómo manejar enrichment superseded? | **Banner amber + link al signal_id current** (NO redirect transparente) | Share semantics preservadas: el operador que compartió un link específico debe ver lo que vio, con contexto histórico explícito. |
 | ¿403 o 404 cuando subject sin acceso? | **`notFound()` siempre** + signal observability vía `captureWithDomain('home', warn, ...)` | Anti-oracle de existencia (mirror RCA TASK-872). 403 leakea info al atacante; legítimos bloqueados se detectan en Sentry. |
 | ¿Mismo path para Finance signals `EO-FAIE-*`? | **Alias `/finance/insights/[id]`** reusa el mismo shell con helper sibling Finance | Path Finance `finance_ai_signals` canonical separado preservado. Single shell, dispatch por dominio dentro del loader. |
 | ¿Cache HTTP en el page? | **`Cache-Control: private, max-age=60`** + revalidate al cron diario | TASK-943 cron ya escribe 1x/día; cache 60s es safe + reduce queries PG. |
 | ¿Cambiar `drillHref` en las 5 surfaces ahora? | **Sí, mismo PR del V1 MVP** | Drift fix end-to-end. Hotfix puente (disable tooltip "Próximamente") solo si se difiere V1. |
+
+## Delta 2026-05-28 — V1 MVP scope-control pre-execution
+
+Tras Discovery live 2026-05-28, dos ajustes canonical al scope V1 MVP (rationale documentado pre-implementación):
+
+1. **Slice 4 simplificado a 1 surface (Home)**. Verificación live: `grep -rn "drillHref\|/agency/insights/" src` revela que **solo `src/lib/home/loaders/load-ai-insights-bento.ts:71`** emite el `drillHref` roto a `/agency/insights/${enrichmentId}`. Los otros 4 surfaces (Agency `IcoAdvisoryBlock`, Person 360 `PersonActivityTab`, Space 360 `OverviewTab`, Finance `FinanceDashboardView`) renderean `NexaInsightsBlock` inline SIN drillHref per-card hoy. **Slice 4 V1 fixes el único drift activo**; agregar drill links a las otras 4 surfaces queda como follow-up V1.1 cuando emerja necesidad UX concreta (no es bloqueante del 404 fix).
+2. **Slices 5 (signal V1.1) + 6 (E2E + ADR DECISIONS_INDEX) deferred a V1.1 separable**. La spec ya los marca como separable; V1 MVP entrega el 404 fix + helper canonical + capability + page + microcopy + tests focal. ADR DECISIONS_INDEX + reliability signal + E2E Playwright + doc funcional/manual de uso quedan como V1.1 follow-up gated.
+
+Rationale: V1 MVP cierra el bug class concreto (404 sistemático Home → 5 surfaces que heredarán cuando emerja UX). Scope-control alineado con principio CLAUDE.md "Don't add features beyond what the task requires" y mantiene el bar de quality canonical (gate `pnpm test` + `pnpm build` + tsc + lint).
 
 ## Dependencies & Impact
 
