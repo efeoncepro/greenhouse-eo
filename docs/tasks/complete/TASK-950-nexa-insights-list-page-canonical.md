@@ -6,20 +6,56 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
-- Effort: `Bajo-Medio`
+- Effort: `Bajo-Medio` → `Medio` (Slice 3 round 2 polish post-visual-audit + hotfix server-only TASK-827 reaprendido live)
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Implementacion`
+- Status real: `Shipped V1`
 - Rank: `TBD`
 - Domain: `ui|delivery`
 - Blocked by: `none` (TASK-947 V1 ya shipped 2026-05-28; capability + helper + detail page ya canonical)
 - Branch: `develop` (operador-decision; sin branch dedicada, mismo patrón TASK-944/945/946/947)
 - Legacy ID: `none`
 - GitHub Issue: `none`
-- Cross-ref: `TASK-947` (detail page V1 MVP shipped 2026-05-28 — esta task era V1.1 follow-up gated, promovida a V1 por bug class activo), `TASK-696` (drift fuente — el patrón de "CTA shipped sin destino" recurre acá idéntico para el CTA "Ver todos los insights del mes"), `TASK-449` (interaction layer dependiente; reusa list page como surface base de Pin/Dismiss), `TASK-946` (12 UI states framework — list page hereda mapping canonical), `ISSUE-082` (bug class UX raíz post-falso-sano).
+- Cross-ref: `TASK-947` (detail page V1 MVP shipped 2026-05-28 — esta task era V1.1 follow-up gated, promovida a V1 por bug class activo), `TASK-696` (drift fuente — el patrón de "CTA shipped sin destino" recurre acá idéntico para el CTA "Ver todos los insights del mes"), `TASK-449` (interaction layer dependiente; reusa list page como surface base de Pin/Dismiss), `TASK-946` (12 UI states framework — list page hereda mapping canonical), `ISSUE-082` (bug class UX raíz post-falso-sano), `TASK-827` (server-only client bundle bug class reaprendido live durante Slice 3 → hotfix canonical extract pure helper).
+
+## Closing Summary (2026-05-29)
+
+Shipped V1 en develop en 6 commits atómicos sin branch dedicada:
+
+1. **`31ac2be7` Slice 0** — Task spec creada (lifecycle in-progress).
+2. **`894340d3` Slice 1** — `listNexaInsightsForPeriod` helper canonical + extract reusables (`mapEnrichmentRow`, `subjectCanReadInsight`, `isEfeonceAdmin`, `hasInternalRouteGroup` reexportados del drill reader) + `period.ts` canonical helper (single source of truth `getCurrentPeriodSantiago` eliminando duplicación entre `get-home-snapshot.ts` y `load-ai-insights-bento.ts`) + 11 tests anti-regresión.
+3. **`a199900d` Slice 2** — Server page `/nexa/insights/page.tsx` + chrome (`loading.tsx` skeleton dimensionado + `error.tsx` boundary) + placeholder view (compile end-to-end + tipo contract).
+4. **`4fb2d575` Slice 3 (broken)** — View canonical 3 branches + NexaInsightListItemCard + microcopy es-CL canonical ~9 entries GH_NEXA. **Failed Vercel deploy** por bug class TASK-827: card `'use client'` importaba `buildNexaInsightDrillHref` desde `nexa-insight-drill-reader.ts` (server-only) → Turbopack pulleo todo el reader transitivamente → `child_process`/`dns` errors desde `@grpc/grpc-js`. Detectado **localmente con `pnpm build`** pre-push (gate canonical TASK-827 funcionó — yo no había corrido `pnpm build` antes del push, lección reaprendida).
+5. **`c9b2c671` Slice 3 hotfix** — Extract pure helper canonical: NEW `src/lib/ico-engine/ai/nexa-insight-href.ts` (client-safe, no server-only) + `nexa-insight-drill-reader.ts` ahora reexporta para back-compat 100% con TASK-947 import path + card repointea import al módulo puro. Vercel deploy verde post-hotfix. 30 tests verde (19 drill-reader + 11 list-reader).
+6. **`30b6b92e` Slice 3 round 2 polish** — Visual audit loop fe:capture staging detectó 2 polish items vs UX spec: (a) periodLabel canonical = "mayo 2026" lowercase es-CL natural (NO "05/2026" MM/YYYY) — reader ahora delega a `GH_NEXA.list_period_format(year, month)` single source of truth + 3 test assertions actualizadas. (b) Scenario hover selector frágil → swap a scroll-only marks robustos. 3-skill audit verde (greenhouse-ux + state-design + greenhouse-ux-writing).
+7. **`571630ba` Slice 4 (ÚLTIMO)** — Flip `HomeAiInsightsBento.tsx:194` `/agency/insights` → `/nexa/insights` + microcopy canonical `GH_NEXA.home_bento_view_all_cta` (cero literals JSX) + 3 anti-regression tests source-scan pattern (mismo que TASK-775 cron-staging-drift).
+
+**Quality gate canonical pre-push**: `pnpm test` 5500/0 passed (+14 vs TASK-947 baseline 5486) + `pnpm build` Turbopack production ✓. Visual audit captured frames `.captures/2026-05-29T08-49-32_nexa-insights-list-page/` (initial-ready + scrolled views) confirmaron render canonical 20 insights grid 3-col responsive con severity tokens + NexaMentionText mentions + CTA "Ver causa raíz".
+
+**End-to-end flow ahora funciona**: Home V2 bento → click "Ver todos los insights del mes" → `/nexa/insights` (list page Slice 1+2+3 canonical 3-state union) → click cualquier card → `/nexa/insights/<signalId>` (detail TASK-947). Cierra el bug class TASK-696 sistemático sobre los 2 CTAs Nexa Insights del bento V2 (drill + view all).
+
+**Lecciones canonizadas live 2026-05-29**:
+
+- **CLAUDE.md TASK-827 bug class reaprendido**: tsc + lint + vitest NO sustituyen `pnpm build` producción para detectar server-only transitivo a client bundle. El gate pre-close canónico es `pnpm test && pnpm build` ANTES de push, no después de fallar Vercel. Esta vez se aplicó disciplina pre-push (Slice 3 hotfix), pero el Slice 3 original mergeó sin gate `pnpm build` previo — lo cual disparó el error en Vercel que el usuario reportó. La lección quedó canonizada en CLAUDE.md desde 2026-05-13 (TASK-827 follow-up) y se reaprendió live.
+- **Pattern canonical para drill href builders + similares en módulos server-only readers**: pure helpers que TS clients pueden necesitar (href builders, type-only exports) viven en módulos puros sin `'server-only'`; el reader server-only los reexporta para back-compat de import paths.
+- **Real-Artifact Iterative Verification Loop reusado (TASK-863 canonizado)**: visual audit con `pnpm fe:capture` staging + 3-skill re-audit + iterate polish hasta verde. Detectó 2 polish items que solo emergen con render real (no fixtures sintéticos): periodLabel format + selector hover fragility. Costo: ~10 min extra; valor: alineación con UX plan + scenario robusto para futuras capturas.
+
+**Single source of truth canonicales nuevos**:
+
+- `src/lib/home/period.ts` — `getCurrentPeriodSantiago()` + `formatPeriodLabel()` (Home V2 internal helpers).
+- `src/lib/ico-engine/ai/nexa-insight-href.ts` — `buildNexaInsightDrillHref(id)` pure, client-safe.
+- `src/lib/ico-engine/ai/nexa-insight-list-reader.ts` — `listNexaInsightsForPeriod` con subject-aware filter + discriminated union return + honest degradation TASK-946.
+
+**Out of V1.0 (deferred a V1.1+ separable)**:
+
+- Pagination / infinite scroll (V1 cap canonical 24 insights, suficiente per período típico).
+- Filter chips (severity / signal_type / space) — surface UI no requerida V1 (data ya sortable por defecto).
+- Empty-positive + degraded states visual audit live (V1 captura solo ready state real; los otros 2 branches validados unit-test-only en Slice 1 reader tests).
+- Reliability signal `nexa.insights.list_page_view_count` (analytics surface) — V1.2 cuando emerja necesidad.
+- TASK-449 interaction layer inline en cards (Read/Pin/Dismiss/Share) — V1.3 separable (depende de list page existir, que TASK-950 V1 ya ship).
 
 ## Summary
 
