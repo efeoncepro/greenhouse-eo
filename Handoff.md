@@ -1,3 +1,19 @@
+# Sesion 2026-05-29 — Release a producción develop→main — ✅ RELEASED
+
+Pase a producción de todo el develop acumulado (66 commits / 127 archivos desde el release del 2026-05-27). Path canónico vía orchestrator, sin incidentes.
+
+**SHA:** merge `bec1c46e2dfa96a513b3a63c093d96adf0fa2053` (mirror exacto de develop, `--no-ff`, tree-identical verificado). **Manifest:** `bec1c46e2dfa-36666131-a740-4444-87af-e1aa71e17ed4` → `released` (started 09:54 / completed 10:05 UTC, ~11 min). **Orchestrator run:** [26630587047](https://github.com/efeoncepro/greenhouse-eo/actions/runs/26630587047) (`completed:success`).
+
+**Bundle:** Nexa Insights surfaces (TASK-944/945/946/947/950/951 — detail `/nexa/insights/[id]` + list `/nexa/insights` + severity sparkline + honest degradation 12 estados + wiring Finance/Home/Agency), ICO ai_signals append-only event log (TASK-941/942/943 + ISSUE-082 — VIEW `ai_signals_current` + materializer INSERT-only + BQ struct timestamp STRING+CAST fix + signals freshness/no-new-signals), Kortex SSO broker foundation (TASK-948 sister-platform identity broker, flags OFF), ROLE_CODES canonization (snapshot + cleanup ghost DEVOPS_OPERATOR), payroll non-regression guardrails docs (TASK-790/905/906/940, EPIC-013). 2 migraciones (TASK-947 nexa capability, TASK-948 sister-platform broker) ya aplicadas en Cloud SQL compartida (verificado pre-release: "No migrations to run").
+
+**Preflight:** `release_batch_policy=split_batch` (finance+auth_access independientes, esperado en bundle acumulado; documentado en merge marker `[release-coupled: ...]`) cubierto por `bypass_preflight_reason` → `--override-batch-policy --bypass-preflight-warnings`. Sentry limpio (0 issues <15min), migraciones OK, Vercel production READY pre-dispatch, CI verde en merge SHA (CI + CI Deep Verification + Task Contract).
+
+**Verificación post-deploy:** Vercel production READY (`greenhouse-lzgpdp3mm`); 4 Cloud Run workers con `GIT_SHA=bec1c46e2dfa96a513b3a63c093d96adf0fa2053` (ops-worker/commercial-cost-worker/ico-batch-worker us-east4 + hubspot-greenhouse-integration us-central1); Azure sin diff Bicep (health-check ✓, deploy skipped); post-release health ✓; watchdog (CLI, workflow manual-only pre-TASK-920) `aggregateSeverity=ok` (stale_approval / pending_without_jobs / worker_revision_drift todos ok, drift 0). Gates Production aprobados 2× vía `gh api` (workers + Azure, autorización operador).
+
+**No validado:** smoke funcional manual en browser (login / finance / agency) post-release — el orchestrator solo corrió `/api/auth/health`. Recomendado si se quiere confirmación visual.
+
+---
+
 # Sesion 2026-05-27 — Release a producción develop→main — ✅ RELEASED
 
 > **Sesión macOS timeout tooling (2026-05-29 — local tool + docs):** A pedido del operador se instaló `coreutils` vía Homebrew para disponer de `/opt/homebrew/bin/gtimeout` (GNU coreutils 9.11), equivalente de `timeout` en macOS. Regla documentada en `AGENTS.md`, `CLAUDE.md` y `project_context.md`: usar `gtimeout <duración> <comando>` en recetas locales; no usar `timeout` crudo en macOS; para scripts portables detectar `gtimeout || timeout` o implementar timeout en Node. Validado con `command -v gtimeout` + `gtimeout --version`.
