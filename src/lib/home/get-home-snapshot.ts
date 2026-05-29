@@ -2,6 +2,7 @@ import 'server-only'
 
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
+import { getCurrentPeriodSantiago } from '@/lib/home/period'
 import { readAgencyAiLlmSummary, readTopAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import type { NexaSignalLifecycleStatus, NexaSignalObservation } from '@/lib/ico-engine/ai/llm-types'
 import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
@@ -28,13 +29,10 @@ export interface HomeSnapshotInput {
 
 const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 const HOME_INSIGHTS_LIMIT = 3
-const HOME_TIMEZONE = 'America/Santiago'
-
-const HOME_PERIOD_FORMATTER = new Intl.DateTimeFormat('en-CA', {
-  timeZone: HOME_TIMEZONE,
-  year: 'numeric',
-  month: '2-digit'
-})
+// TASK-950 — `HOME_TIMEZONE` y el formatter inline preexistente quedaron
+// reemplazados por el helper canonical `getCurrentPeriodSantiago()` desde
+// `src/lib/home/period.ts` (single source of truth cross-module). La timezone
+// canonical America/Santiago vive ahora en period.ts.
 
 const mapHomeInsight = (row: {
   enrichmentId: string
@@ -61,13 +59,6 @@ const mapHomeInsight = (row: {
   lifecycleStatus: row.lifecycleStatus
 })
 
-const getHomeCurrentPeriod = () => {
-  const parts = HOME_PERIOD_FORMATTER.formatToParts(new Date())
-  const year = Number(parts.find(part => part.type === 'year')?.value ?? new Date().getFullYear())
-  const month = Number(parts.find(part => part.type === 'month')?.value ?? new Date().getMonth() + 1)
-
-  return { year, month }
-}
 
 export const getHomeFinanceStatus = async () => {
   const [currentPeriod, latestMargin] = await Promise.all([
@@ -125,7 +116,7 @@ export const getHomeFinanceStatus = async () => {
 export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSnapshot> {
   const now = new Date()
   const hour = now.getHours()
-  const { year: currentYear, month: currentMonth } = getHomeCurrentPeriod()
+  const { year: currentYear, month: currentMonth } = getCurrentPeriodSantiago()
 
   // 1. Resolve Greeting
   let greetingPool = HOME_GREETINGS.default

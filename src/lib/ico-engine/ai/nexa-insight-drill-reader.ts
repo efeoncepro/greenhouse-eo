@@ -143,7 +143,12 @@ export interface NexaInsightDrillSubject {
 
 // ─── Row mapping helpers ────────────────────────────────────────────────────
 
-const mapEnrichmentRow = (row: RawRow): NexaInsightDetailSnapshot => ({
+/**
+ * TASK-950 — Exportado canonical para reuso desde `nexa-insight-list-reader.ts`
+ * (list page sibling). Single source of truth: el row → snapshot mapping de
+ * `ico_ai_signal_enrichments` vive solo acá. Cero drift cross-reader.
+ */
+export const mapEnrichmentRow = (row: RawRow): NexaInsightDetailSnapshot => ({
   enrichmentId: String(row.enrichment_id ?? ''),
   signalId: String(row.signal_id ?? ''),
   signalType: String(row.signal_type ?? ''),
@@ -164,10 +169,18 @@ const mapEnrichmentRow = (row: RawRow): NexaInsightDetailSnapshot => ({
 
 // ─── Subject-aware authorization ────────────────────────────────────────────
 
-const isEfeonceAdmin = (subject: NexaInsightDrillSubject): boolean =>
+/**
+ * TASK-950 — Exportado canonical para reuso desde sibling readers (list, future
+ * surfaces). Mismo concepto cross-reader: matchea contra `ROLE_CODES.EFEONCE_ADMIN`.
+ */
+export const isEfeonceAdmin = (subject: NexaInsightDrillSubject): boolean =>
   subject.roleCodes.includes('efeonce_admin')
 
-const hasInternalRouteGroup = (subject: NexaInsightDrillSubject): boolean =>
+/**
+ * TASK-950 — Exportado canonical para reuso desde sibling readers. Operational
+ * broad access (route_groups internal/finance/hr).
+ */
+export const hasInternalRouteGroup = (subject: NexaInsightDrillSubject): boolean =>
   subject.routeGroups.includes('internal') ||
   subject.routeGroups.includes('finance') ||
   subject.routeGroups.includes('hr')
@@ -187,8 +200,12 @@ const hasInternalRouteGroup = (subject: NexaInsightDrillSubject): boolean =>
  *    internal-only, spec Out of Scope V1 línea 196).
  *
  * NUNCA 403: si false → caller retorna `state: 'not_found'`. Anti-oracle.
+ *
+ * TASK-950 — Exportado canonical para reuso desde `nexa-insight-list-reader.ts`.
+ * Single source of truth: el subject-aware filter vive solo acá; siblings
+ * importan + reusan (cero divergencia cross-reader, blast radius dual).
  */
-const subjectCanReadInsight = (
+export const subjectCanReadInsight = (
   subject: NexaInsightDrillSubject,
   insight: NexaInsightDetailSnapshot
 ): boolean => {

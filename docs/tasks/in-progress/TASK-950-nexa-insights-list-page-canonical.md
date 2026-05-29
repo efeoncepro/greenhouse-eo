@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo-Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `ui|delivery`
 - Blocked by: `none` (TASK-947 V1 ya shipped 2026-05-28; capability + helper + detail page ya canonical)

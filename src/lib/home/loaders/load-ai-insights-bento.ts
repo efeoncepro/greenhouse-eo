@@ -1,14 +1,13 @@
 import 'server-only'
 
+import { getCurrentPeriodSantiago } from '@/lib/home/period'
 import { readAgencyAiLlmSummary, readTopAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 
 import type { HomeAiInsightCard, HomeAiInsightsBentoData } from '../contract'
 
-const HOME_PERIOD_FORMATTER = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'America/Santiago',
-  year: 'numeric',
-  month: '2-digit'
-})
+// TASK-950 — `HOME_PERIOD_FORMATTER` inline removido. Consume helper canonical
+// `getCurrentPeriodSantiago()` desde `src/lib/home/period.ts` (single source of
+// truth cross-module).
 
 const inferDomain = (signalType: string | null | undefined): HomeAiInsightCard['domain'] => {
   if (!signalType) return 'agency'
@@ -37,9 +36,7 @@ const inferSeverity = (severity: string | null | undefined): HomeAiInsightCard['
 const HOME_INSIGHTS_LIMIT = 4
 
 export const loadHomeAiInsightsBento = async (): Promise<HomeAiInsightsBentoData> => {
-  const parts = HOME_PERIOD_FORMATTER.formatToParts(new Date())
-  const year = Number(parts.find(part => part.type === 'year')?.value ?? new Date().getFullYear())
-  const month = Number(parts.find(part => part.type === 'month')?.value ?? new Date().getMonth() + 1)
+  const { year, month } = getCurrentPeriodSantiago()
 
   const [topInsights, summary] = await Promise.all([
     readTopAiLlmEnrichments(year, month, HOME_INSIGHTS_LIMIT).catch(() => []),
