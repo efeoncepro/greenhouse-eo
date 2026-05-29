@@ -475,7 +475,10 @@ export const GH_NEXA = {
   list_degraded_title: 'No pudimos cargar las observaciones',
   list_degraded_body:
     'El pipeline de Nexa está respondiendo lento o tuvo un fallo transitorio. Probá de nuevo en unos minutos.',
-  list_degraded_cta: 'Ver estado del pipeline'
+  list_degraded_cta: 'Ver estado del pipeline',
+
+  // Home V2 bento footer CTA (TASK-950 Slice 4) → list page canonical
+  home_bento_view_all_cta: 'Ver todos los insights del mes'
 } as const
 
 /* ─────────────────── Skills & Certifications ─────────────────── */
