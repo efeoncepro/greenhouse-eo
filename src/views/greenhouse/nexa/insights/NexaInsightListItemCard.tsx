@@ -31,7 +31,7 @@ import CustomChip from '@core/components/mui/Chip'
 
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
 import { GH_NEXA } from '@/config/greenhouse-nomenclature'
-import { buildNexaInsightDrillHref } from '@/lib/ico-engine/ai/nexa-insight-drill-reader'
+import { buildNexaInsightDrillHref } from '@/lib/ico-engine/ai/nexa-insight-href'
 
 import type { NexaInsightDetailSnapshot } from '@/lib/ico-engine/ai/nexa-insight-drill-reader'
 

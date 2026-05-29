@@ -488,6 +488,11 @@ export const readNexaInsightDrill = async (
 
 /**
  * Helper canonical para construir el drillHref desde un signalId.
- * Mantener el shape de URL centralizado evita drift cross-surface.
+ *
+ * Reexportado desde `nexa-insight-href.ts` (módulo puro, client-safe) para
+ * preservar el import path canonical de TASK-947 sin pullear este reader
+ * server-only al bundle cliente. Consumers client deben importar de
+ * `@/lib/ico-engine/ai/nexa-insight-href`; consumers server pueden seguir
+ * importando de aquí. Single source of truth: `nexa-insight-href.ts`.
  */
-export const buildNexaInsightDrillHref = (id: string): string => `/nexa/insights/${id}`
+export { buildNexaInsightDrillHref } from './nexa-insight-href'
