@@ -86,6 +86,7 @@ import {
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
+import { getContractorEngagementClassificationRiskOpenSignal } from './queries/contractor-engagement-classification-risk-open'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
@@ -1252,7 +1253,10 @@ export const getReliabilityOverview = async (
           // Notion bridge coverage drift — detecta regresión del resolver
           // Notion-user-id → member-id (caso fuente: incidente 2026-05-16
           // post-TASK-877 dejó coverage en 3.7%, colapsando OTD/RpA bonuses).
-          getIdentityNotionBridgeCoverageSignal().catch(() => null)
+          getIdentityNotionBridgeCoverageSignal().catch(() => null),
+          // TASK-790 — contractor engagements con riesgo de clasificación
+          // bloqueante (legal_review_required|blocked) y no terminales.
+          getContractorEngagementClassificationRiskOpenSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
