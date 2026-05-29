@@ -24,6 +24,18 @@ Output: `.captures/<ISO>_<scenario>/` (gitignored).
 
 Ver doc completa: [docs/manual-de-uso/plataforma/captura-visual-playwright.md](../../docs/manual-de-uso/plataforma/captura-visual-playwright.md).
 
+## Hook operativo para agentes
+
+Toda verificación visual de UI Greenhouse debe pasar primero por este helper:
+
+- `pnpm fe:capture <scenario> --env=staging` si existe un scenario.
+- `pnpm fe:capture --route=/path --env=staging --hold=3000` para evidencia rápida sin scenario.
+- `pnpm fe:capture:review <scenario|capture-dir>` cuando la captura alimenta una revisión UI/UX.
+- `pnpm fe:capture:diff <prev> <curr>` para comparar before/after.
+- `pnpm fe:capture:health` para revisar salud local del pipeline de capturas.
+
+Playwright ad-hoc queda como complemento para consola/red/API payloads o pasos que el DSL no soporte. Si se usa, guardar artifacts bajo `.captures/` y documentar por qué no bastó `fe:capture`. Si el flujo se repetirá, agregar o actualizar un scenario en `scripts/frontend/scenarios/`.
+
 ## Estructura
 
 ```

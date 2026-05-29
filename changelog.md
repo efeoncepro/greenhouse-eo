@@ -2,6 +2,7 @@
 
 ## 2026-05-29
 
+- **Hook operativo de verificación visual UI.** Se elevó `pnpm fe:capture` de helper recomendado a camino obligatorio de evidencia visual para UI visible, microinteractions, responsive, screenshots, secuencias de frames y design QA. El hook quedó sincronizado en `AGENTS.md`, `CLAUDE.md`, `project_context.md`, la skill Codex `greenhouse-browser-diagnostics`, `scripts/frontend/README.md`, la arquitectura `GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1`, el UI delivery loop, `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`, la documentación funcional y el manual de uso. `fe:capture:review`, `fe:capture:diff`, `fe:capture:health` y `fe:capture:gc` quedan declarados como relacionados canónicos; Playwright ad-hoc queda como complemento documentado para consola/red/API o gaps del DSL.
 - **Command palette / búsqueda global Greenhouse.** Se consolidó la experiencia sobre el `CommandDialog` Vuexy del navbar y se retiró el trigger duplicado de Home v2. La búsqueda global ahora se alimenta desde `VIEW_REGISTRY` canónico (labels, rutas y descripciones Greenhouse) y las sugerencias iniciales usan vistas reales del portal. Se corrigió el bug visual donde el backdrop quedaba por encima del panel (`overlay` y `root` compartían z-index, sumado a selectores `cmdk` globales del palette Greenhouse). El palette Greenhouse legado queda aislado con clases propias para no contaminar el buscador Vuexy.
 
 ## 2026-05-28

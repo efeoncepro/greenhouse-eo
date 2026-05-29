@@ -3,15 +3,17 @@
 ## Status
 
 - Estado: `accepted`
-- Version: `1.1`
+- Version: `1.2`
 - Fecha V1.0: `2026-05-12 mañana` — Slice 0-3 (CLI + scenario + recorder + docs)
 - Fecha V1.1: `2026-05-12 tarde` — Delta OQ-1..OQ-6 (upload, device, diff, capability, reliability, ui-review scaffolding)
+- Fecha V1.2: `2026-05-29` — Hook operativo para verificación visual UI obligatoria vía `pnpm fe:capture` y comandos relacionados
 - Owner: `Claude / Greenhouse frontend tooling`
 - Relacionado con:
   - `scripts/frontend/` (implementación canónica)
   - `scripts/playwright-auth-setup.mjs` (primitiva de auth reusada)
   - `docs/manual-de-uso/plataforma/captura-visual-playwright.md`
   - `docs/documentation/plataforma/captura-visual.md`
+  - `docs/operations/GREENHOUSE_UI_DELIVERY_LOOP_V1.md`
   - `CLAUDE.md` sección "Tooling disponible"
   - `AGENTS.md` sección "Tooling disponible"
 
@@ -26,6 +28,19 @@
 Reemplaza el patrón de `_cap.mjs` ad-hoc que se observó 6 veces en una sola sesión durante la auditoría visual de `/hr/offboarding` (mayo 2026). Cada ad-hoc reimplementa: autenticación, header bypass, viewport, recording, screenshot, output path — con drift inevitable.
 
 Spec arquitectónica diseñada vía `arch-architect` skill con 4-pillar scoring (Safety, Robustness, Resilience, Scalability) y 5-layer defense-in-depth Safety. Verificado E2E contra staging en su primera versión (commit `1f03f019`).
+
+## Delta 2026-05-29 — Visual UI Verification Hook
+
+`pnpm fe:capture` queda elevado de helper recomendado a **hook operativo obligatorio** para evidencia visual de UI:
+
+- Cualquier cambio o diagnóstico que toque UI visible, microinteractions, responsive, screenshots, secuencias de frames, design QA o revisión visual debe intentar primero `pnpm fe:capture` o `pnpm fe:capture:review`.
+- Si existe scenario, se usa el scenario. Si no existe, se usa `--route` para evidencia rápida y se crea un scenario cuando el flujo sea repetible o tenga interacciones.
+- `pnpm fe:capture:diff` es el camino canónico para before/after.
+- `pnpm fe:capture:health` sirve para verificar salud local del pipeline de capturas cuando una revisión depende de varios runs.
+- Playwright ad-hoc queda permitido solo como complemento para consola, network, payloads API, auth local especial o interacciones no soportadas por el DSL. Ese bypass debe quedar explicado y sus artifacts deben vivir bajo `.captures/`.
+- Si el helper falla por env faltante, se documenta el bloqueo exacto y se intenta `--env=local` cuando aplique; no se sustituye silenciosamente por screenshots manuales.
+
+Este delta sincroniza `AGENTS.md`, `CLAUDE.md`, `project_context.md`, la skill Codex `greenhouse-browser-diagnostics`, el UI delivery loop, los manuales de captura, `scripts/frontend/README.md` y el método histórico en `docs/ui/`.
 
 ## Por qué
 
@@ -223,12 +238,16 @@ Append-only JSONL en `.captures/audit.jsonl`. Cada run agrega: timestamp, route,
 
 - **NUNCA** ejecutar contra production sin Triple Gate completo (env var + flag + capability futuro).
 - **NUNCA** reinventar agent-session. SIEMPRE delegar a `scripts/playwright-auth-setup.mjs`.
+- **NUNCA** cerrar una verificación visual de UI con screenshots ad-hoc si `pnpm fe:capture` podía producir la evidencia.
+- **NUNCA** usar Playwright ad-hoc como path visual primario sin explicar por qué `fe:capture`/scenario DSL no bastó.
 - **NUNCA** scenarios con `mutating: true` sin `safeForCapture: true` explícito.
 - **NUNCA** invocar `tsx scripts/frontend/capture.ts` directo — usar `pnpm fe:capture` para que tsx resuelva paths correctamente.
 - **NUNCA** committear `.captures/` ni `.auth/` — ambos en `.gitignore`.
 - **NUNCA** loggear bypass secret a stdout / manifest / audit / stderr.
 - **NUNCA** recording sin `applySecretMask` activo (incluso si el scenario no toca password inputs — defense-in-depth).
 - **SIEMPRE** output bajo `<repo>/.captures/<ISO>_<scenario>/`.
+- **SIEMPRE** preferir `pnpm fe:capture:review` cuando la captura alimenta una auditoría UI/UX o skill review.
+- **SIEMPRE** crear/actualizar scenario si el flujo visual será reusable por otro agente.
 - **SIEMPRE** timeout default 60s por step (configurable per step).
 - **SIEMPRE** `headless: true` por default. `--headed` solo opt-in para debug local.
 - **SIEMPRE** acompañar un scenario nuevo con `note` en cada `mark` explicando qué microinteraction valida.

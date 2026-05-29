@@ -36,7 +36,7 @@ Run this loop for:
 8. **Build**
    - implement in the repo or mockup route.
 9. **Screenshot QA**
-   - capture desktop, laptop, mobile via Playwright/Chromium.
+   - capture desktop, laptop, mobile with `pnpm fe:capture` or `pnpm fe:capture:review`; use scenario files for repeated or interactive flows and `--route` only for quick route evidence.
 10. **Critique**
    - invoke `visual-regression-product-critic`.
 11. **Enterprise Gate**
@@ -54,7 +54,9 @@ Minimum:
 - laptop: 1440x900/1000
 - mobile: 390x844
 
-Capture after meaningful layout changes and after final polish.
+Capture after meaningful layout changes and after final polish. Primary evidence must be the structured `.captures/<ISO>_<scenario>/` output: `.webm`, marker PNG frames, `manifest.json`, optional `flipbook.gif`, and `review-dossier.md` when using `pnpm fe:capture:review`.
+
+Use `pnpm fe:capture:diff <previous-run> <current-run>` for before/after comparisons and `pnpm fe:capture:health` before long review loops. A focused Playwright/Chromium script is allowed only when console logs, network/API payloads, local-only auth state, or an unsupported interaction is required; keep its artifacts under `.captures/`, explain why the canonical helper was insufficient, and prefer promoting the flow to a scenario afterwards.
 
 ## Stop Conditions
 
