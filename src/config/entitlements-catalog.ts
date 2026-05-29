@@ -151,6 +151,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-790 — Contractor Engagements (Workforce/HR). read=ver engagement;
+    // manage=create/update/transition/pause/end del engagement contractor.
+    // NO reutiliza permisos de finiquito (cierre contractor != finiquito laboral).
+    key: 'hr.contractor_engagement',
+    module: 'hr',
+    actions: ['read', 'create', 'update', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-790 — revision del riesgo de reclasificacion laboral del contractor.
+    // approve=registrar revision (factors + reviewed) que puede limpiar o
+    // escalar a legal_review_required/blocked. Mas restrictiva que manage.
+    key: 'hr.contractor_classification',
+    module: 'hr',
+    actions: ['read', 'approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-030 — plantillas reutilizables de checklist HRIS.
     key: 'hr.onboarding_template',
     module: 'hr',

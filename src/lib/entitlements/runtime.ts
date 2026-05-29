@@ -432,6 +432,83 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-790 — Contractor Engagements (Workforce/HR). El engagement vive bajo HR
+  // y NO reutiliza permisos de finiquito. read+manage siguen la matriz operador
+  // canonica de workforce: HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_engagement',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_engagement',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_engagement',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_engagement',
+      action: 'manage',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  // TASK-790 — revision del riesgo de reclasificacion laboral. Mas restrictiva:
+  // legal-sensitive. read para HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN;
+  // approve (registrar la revision que limpia/escala el riesgo) reservada a
+  // EFEONCE_ADMIN ∪ FINANCE_ADMIN ∪ HR_MANAGER.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_classification',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER)
+  ) {
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_classification',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-874 — Workforce Activation readiness.
   // Read access follows the same operator matrix as complete_intake because the
   // workspace exposes blockers without sensitive values. Override is deliberately
