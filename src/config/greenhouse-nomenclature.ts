@@ -361,7 +361,70 @@ export const GH_NEXA = {
   state_stale_degraded_description: (hours: number) =>
     `Sin observaciones nuevas en las últimas ${hours} horas. El pipeline puede estar caído — revisá el estado del cron diario antes de asumir que todo está sano.`,
   state_stale_degraded_action: 'Ver estado del pipeline',
-  state_loading_aria: 'Cargando observaciones de Nexa'
+  state_loading_aria: 'Cargando observaciones de Nexa',
+
+  // ── TASK-947 — Detail page /nexa/insights/[id] microcopy canonical (es-CL tuteo) ──
+
+  // Title + chrome
+  detail_title_template: (metricLabel: string) => `Causa raíz · ${metricLabel}`,
+  detail_back_to_home: 'Volver a Home',
+  detail_last_updated: (label: string) => `Última actualización ${label}`,
+
+  // Section cards
+  detail_section_anomaly_title: 'Anomalía observada',
+  detail_section_root_cause_title: 'Causa raíz',
+  detail_section_action_title: 'Acción sugerida',
+
+  // CTAs + feedback
+  detail_action_view_metric: 'Ver KPI',
+  detail_action_copy_link: 'Copiar enlace',
+  detail_action_copy_link_success: 'Enlace copiado al portapapeles',
+  detail_action_copy_link_failure: 'No pudimos copiar el enlace. Probá de nuevo.',
+
+  // Metadata accordion
+  detail_metadata_title: 'Detalle técnico',
+  detail_metadata_label_enrichment_id: 'ID del análisis',
+  detail_metadata_label_signal_id: 'ID de la señal',
+  detail_metadata_label_processed_at: 'Procesado',
+  detail_metadata_label_confidence: 'Confianza del modelo',
+  detail_metadata_label_quality_score: 'Puntaje de calidad',
+  detail_metadata_label_signal_type: 'Tipo de señal',
+  detail_metadata_label_metric: 'Métrica',
+  detail_metadata_label_period: 'Período',
+
+  // Severity aria helper (severity_label + severity_color ya existen arriba)
+  detail_aria_severity: (label: string) => `Severidad: ${label}`,
+
+  // Banner: superseded (TASK-946 state mapping)
+  detail_banner_superseded_title: 'Estás viendo una versión histórica de esta observación',
+  detail_banner_superseded_body:
+    'Nexa ya analizó esta señal de nuevo. La narrativa actual puede haber cambiado.',
+  detail_banner_superseded_cta: 'Ver versión actual',
+
+  // Banner: degraded (honest)
+  detail_banner_degraded_title: 'No pudimos cargar toda la información',
+  detail_banner_degraded_body:
+    'El pipeline de Nexa devolvió una respuesta parcial. Probá de nuevo en unos minutos o revisá el estado del sistema.',
+  detail_banner_degraded_cta: 'Ver estado del sistema',
+
+  // Empty: expired (anomaly resolved — empty-positive)
+  detail_expired_title: 'Anomalía resuelta',
+  detail_expired_body: (when: string) =>
+    `Nexa observó esta señal por última vez el ${when}. Ya no aparece en el período actual.`,
+
+  // Not-found page (anti-oracle TASK-872: indistinguishable from no-access)
+  detail_not_found_title: 'No encontramos esta observación',
+  detail_not_found_body:
+    'Es posible que el ID no exista, que la observación se haya archivado o que no tengas acceso a ella.',
+  detail_not_found_cta: 'Volver a Home',
+
+  // Error boundary
+  detail_error_title: 'No pudimos cargar esta observación',
+  detail_error_body: 'Algo salió mal de nuestro lado. Probá actualizar en unos segundos.',
+  detail_error_cta: 'Reintentar',
+
+  // Loading + skeleton aria
+  detail_loading_aria: 'Cargando observación de Nexa'
 } as const
 
 /* ─────────────────── Skills & Certifications ─────────────────── */
