@@ -31,7 +31,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 
 import NexaInsightListItemCard from './NexaInsightListItemCard'
 

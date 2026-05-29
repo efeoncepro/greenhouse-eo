@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
 

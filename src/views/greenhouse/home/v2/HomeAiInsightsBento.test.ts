@@ -41,7 +41,8 @@ describe('HomeAiInsightsBento — "Ver todos" CTA flip canonical (TASK-950 Slice
     expect(source).not.toMatch(/>\s*Ver todos los insights del mes\s*</)
   })
 
-  it('importa GH_NEXA desde el módulo canonical de nomenclatura', () => {
-    expect(source).toMatch(/import\s*\{\s*GH_NEXA\s*\}\s*from\s*'@\/config\/greenhouse-nomenclature'/)
+  it('importa GH_NEXA desde el módulo canonical de copy de dominio', () => {
+    expect(source).toMatch(/import\s*\{\s*GH_NEXA\s*\}\s*from\s*'@\/lib\/copy\/nexa'/)
+    expect(source).not.toMatch(/import\s*\{\s*GH_NEXA\s*\}\s*from\s*'@\/config\/greenhouse-nomenclature'/)
   })
 })

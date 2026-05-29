@@ -37,7 +37,7 @@ import CustomChip from '@core/components/mui/Chip'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRootCauseSection'
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 import type { NexaInsightDrillResult } from '@/lib/ico-engine/ai/nexa-insight-drill-reader'

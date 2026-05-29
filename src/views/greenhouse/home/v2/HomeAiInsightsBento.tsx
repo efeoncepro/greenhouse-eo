@@ -18,7 +18,7 @@ import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 

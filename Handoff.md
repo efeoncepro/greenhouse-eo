@@ -1,3 +1,15 @@
+# Sesion 2026-05-29 — Nexa Insights first-click 500 + microcopy locale — ✅ ROOT FIX LOCAL
+
+Incidente reportado en `dev-greenhouse.efeoncepro.com/nexa/insights/EO-AIS-7AD995BA4096`: primer click/render mostraba el error boundary "No pudimos cargar esta observación"; al presionar `Reintentar`, la misma URL cargaba el insight. Diagnóstico con usuario agente `agent@greenhouse.efeonce.org` contra staging canónico `.vercel.app` + bypass, artifacts en `.captures/nexa-detail-first-click-20260529T131813Z/`. Evidencia runtime: `GET /nexa/insights/EO-AIS-7AD995BA4096` devolvía 500 y Vercel logs mostraban `Functions cannot be passed directly to Client Components ... {elevation: 0, sx: function sx}`.
+
+**Causa raíz:** los route-level `loading.tsx` de Nexa (`/nexa/insights` y `/nexa/insights/[id]`) son Server Components y pasaban funciones `sx={theme => ...}` a MUI Client Components. En el primer click Next renderizaba el skeleton y rompía el stream RSC; en el retry el dato ya llegaba suficientemente rápido y no pasaba por ese loading, por eso parecía "transitorio".
+
+**Fix robusto local:** skeletons/not-found/error route chrome de Nexa ahora usan `sx` serializable (`border`, `borderColor`, `borderLeftColor`), sin funciones pasadas desde Server Components. Se agregó `nexa-insights-route-contract.test.ts` para bloquear esta regresión. Se corrigió el segundo problema de microcopy sin parchar JSX: `GH_NEXA` se movió a `src/lib/copy/nexa.ts` como módulo canónico de copy de dominio (TASK-811); `greenhouse-nomenclature.ts` queda solo como re-export transicional. Imports Nexa migrados al módulo nuevo. Copy con voseo argentino en Nexa/Agency/Pricing normalizada a español neutro/tuteo chileno (`Vuelve`, `Intenta`, `Revisa`, `haz clic`) y guard de regresión agregado.
+
+**Validación:** `pnpm exec vitest run 'src/app/(dashboard)/nexa/insights/nexa-insights-route-contract.test.ts' src/views/greenhouse/home/v2/HomeAiInsightsBento.test.ts src/lib/ico-engine/ai/nexa-insight-drill-reader.test.ts src/lib/ico-engine/ai/nexa-insight-list-reader.test.ts` → 4 files / 36 tests passed. ESLint focal OK. `pnpm exec tsc --noEmit --pretty false` OK. `pnpm design:lint` 0 errors / 0 warnings. `pnpm build` production Turbopack OK. `pnpm fe:capture --route=/nexa/insights/EO-AIS-7AD995BA4096 --env=local --hold=3000` OK con env cargada desde `.env.local`, artifacts en `.captures/2026-05-29T13-32-07_inline-nexa-insights-eo-ais-7ad995ba4096/`. Log local post-capture: `GET /nexa/insights/EO-AIS-7AD995BA4096 200`, sin `Functions cannot be passed...`.
+
+---
+
 # Sesion 2026-05-29 — Release a producción develop→main — ✅ RELEASED
 
 Pase a producción de todo el develop acumulado (66 commits / 127 archivos desde el release del 2026-05-27). Path canónico vía orchestrator, sin incidentes.
