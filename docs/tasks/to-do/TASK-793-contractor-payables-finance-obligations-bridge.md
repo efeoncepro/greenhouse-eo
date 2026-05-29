@@ -1,5 +1,9 @@
 # TASK-793 — Contractor Payables to Finance Payment Obligations Bridge
 
+## Delta 2026-05-29
+
+- Desbloqueado por **TASK-790 ✅ complete**: el aggregate `contractor_engagements` existe. El `ContractorPayable` de esta task FK-ancla al engagement + invoice/work submission. **Recordatorio de invariante TASK-790**: el engagement NUNCA escribe a `payroll_entries`/`compensation_versions`/`final_settlements` — el payable nace aquí (793) hacia Finance (`payment_obligations` → `payment_orders`), idempotente por `contractor_payable_id`, con `tax_compliance_owner` + `payroll_via` del engagement como input. Outbox bridge: input `workforce.contractor_payable.ready_for_finance.v1` → output `finance.payment_obligation.generated.v1`.
+
 ## Status
 
 - Lifecycle: `to-do`

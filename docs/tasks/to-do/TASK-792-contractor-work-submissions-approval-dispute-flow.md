@@ -1,5 +1,9 @@
 # TASK-792 — Contractor Work Submissions + Approval/Dispute Flow
 
+## Delta 2026-05-29
+
+- Desbloqueado por **TASK-790 ✅ complete**: `greenhouse_hr.contractor_engagements` ya existe con módulo `src/lib/contractor-engagements/`. Las work submissions FK-anclan a `contractor_engagement_id`. Respetar `requires_work_approval` del engagement como gate de approval antes de payable. Outbox events nuevos siguen el patrón v1 (`workforce.contractor_work_submission.*`) ya documentado en el arch doc.
+
 ## Status
 
 - Lifecycle: `to-do`

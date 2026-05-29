@@ -4238,6 +4238,39 @@ El bug class observado live 2026-05-15 con María Camila Hoyos: case `executed` 
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md` (Delta 2026-05-15). Task: `docs/tasks/in-progress/TASK-892-offboarding-closure-completeness-aggregate.md`. Reliability signal: `hr.offboarding.completeness_partial` (kind=drift, severity warning >0, steady=0, subsystem Identity & Access). Patrones fuente: TASK-742 (4-pillar checklist), TASK-672 (composer + degraded honest), TASK-880 (decision tree por capability + audience), TASK-873 (capability triple-layer canonical).
 
+### Contractor Engagements invariants (TASK-790, desde 2026-05-29)
+
+`ContractorEngagement` (`greenhouse_hr.contractor_engagements`) es el agregado canónico del contrato operativo contractor/honorarios, bajo **Workforce/HR — NO Payroll**. Fundación de Contractor Payables (EPIC-013). El pago real NO nace aquí (eso es TASK-791..793 hacia Finance). Módulo TS: `src/lib/contractor-engagements/` (barrel **pure-only**; el store es server-only y se importa directo desde `@/lib/contractor-engagements/store` para no arrastrar `import 'server-only'` a un client bundle — bug class TASK-827).
+
+**Anchor (D1)**: el engagement FK-anchora a `greenhouse_core.person_legal_entity_relationships.relationship_id` (PK real `relationship_id`) `ON DELETE RESTRICT`. La relación contractor **activa** se resuelve vía `resolveActivePersonLegalEntityRelationships({profileId, relationshipTypes:['contractor']})` en `src/lib/account-360/person-legal-entity-relationships.ts`. El engagement **NUNCA** crea relaciones (eso es TASK-789 `transitionEmployeeToContractor` / TASK-891 `reconcileMemberContractDrift`).
+
+**Subtype SSOT (D2)**: `contractor_engagements.relationship_subtype` (5 valores finos: `honorarios_cl`, `freelance`, `independent_professional`, `international_contractor`, `provider_platform`) es SSOT propio del engagement, validado por **consistencia de familia** contra el subtype coarse de la relación (`{contractor,honorarios}` en `metadata.relationshipSubtype`) vía `assertSubtypeConsistency` (honorarios→honorarios_cl; contractor→el resto). Sin write-back a la relación.
+
+**payroll_via ortogonal (D3)**: `contractor_engagements.payroll_via` es el canal del engagement (enum propio `internal/deel/remote/oyster/manual_provider/direct_international`, tipo TS `ContractorEngagementPayrollVia` **distinto** del `PayrollVia` de payroll).
+
+**State machine + CHECK + audit trio** (pattern TASK-700/765): `contractor_engagements` (mutable, CHECK enums + BEFORE UPDATE `contractor_engagements_validate_transition` trigger + CHECK `contractor_engagements_active_requires_clear_risk`) + append-only `contractor_engagement_events` (triggers anti-UPDATE/anti-DELETE). Matriz: `draft→{pending_review,active,cancelled}`, `pending_review→{active,draft,cancelled}`, `active→{paused,ending,cancelled}`, `paused→{active,ending,cancelled}`, `ending→{ended,active,cancelled}`, `ended`/`cancelled` terminales. Mirror TS: `assertValidEngagementTransition` (`state-machine.ts`).
+
+**Classification risk first-class**: `computeClassificationRisk({factors, reviewed, block})` (`classification-risk.ts`) determinístico. `clear` requiere review explícito (`reviewed=true`) — un engagement fresco nunca auto-clarea (floor `needs_review`). Subordinación material (schedule+supervision, o exclusividad+dependencia económica, o rol interno indistinguible) → `legal_review_required`; `blocked` solo escala manual. Riesgo bloqueante (`legal_review_required`/`blocked`) impide `active` (CHECK DB + app guard); escalar riesgo en un engagement `active` lo **auto-pausa**.
+
+**Tax owner mandatory**: `tax_compliance_owner` NOT NULL (default por `resolveDefaultTaxComplianceOwner`: honorarios_cl→greenhouse_policy; deel/remote/oyster→provider_owned; resto→manual_review_required). honorarios CL snapshot de tasa SII (`getSiiRetentionRate` — SSOT del valor) + `tax_withholding_policy_code` versionado (`cl_honorarios_2026_15_25`).
+
+**⚠️ Reglas duras (no-regresión Payroll)**:
+
+- **NUNCA** escribir/mutar `greenhouse_payroll.payroll_entries`, `payroll_adjustments`, `compensation_versions`, `final_settlements`/`final_settlement_documents` desde el engagement. Contractor payables jamás entran como payroll dependiente (nacen en 791-793 hacia Finance).
+- **NUNCA** sobrescribir `members.payroll_via`, `members.contract_type` ni `members.pay_regime`. El motor payroll clasifica por las columnas del member; el engagement declara su propio canal (D3).
+- **NUNCA** aplicar deducciones Chile dependientes (AFP/Fonasa/Isapre/AFC/SIS/mutual/IUSC) a honorarios. Solo retención SII versionada.
+- **NUNCA** habilitar finiquito laboral para contractor/honorarios — su cierre futuro es `contractor_closure` (TASK-797).
+- **NUNCA** componer un internal account number, transición, ni riesgo de clasificación inline en consumers. Usar los helpers canónicos del módulo.
+- **NUNCA** re-exportar el store desde el barrel `index.ts` (server-only transitive). Importar `@/lib/contractor-engagements/store` directo en server.
+- **NUNCA** seedear una capability del engagement sin grant en `runtime.ts` en el mismo PR (guard `capability-grant-coverage.test.ts`).
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` como gate al tocar este dominio.
+
+**Access**: capabilities `hr.contractor_engagement` (read/create/update/manage) + `hr.contractor_classification` (read/approve). Grants: read+manage → HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN; classification.approve → EFEONCE_ADMIN ∪ FINANCE_ADMIN ∪ HR_MANAGER. API `/api/hr/contractors` (GET/POST) + `/api/hr/contractors/[id]` (GET/PATCH action=transition|update|review_classification).
+
+**Reliability signal**: `hr.contractor_engagement.classification_risk_open` (kind=drift, moduleKey=identity, steady=0) — cuenta engagements no terminales con riesgo bloqueante. **Outbox v1**: `workforce.contractor_engagement.{created,activated,paused,ended,cancelled,classification_risk_flagged}` (aggregateType `contractor_engagement`).
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (V1.1 Delta 2026-05-29). Task: `docs/tasks/complete/TASK-790-contractor-engagements-runtime-classification-risk.md`. Migración: `20260529221452562`. Patrones fuente: TASK-789/891 (substrate anchor), TASK-700/765 (state machine + CHECK + audit), TASK-742 (defense-in-depth), TASK-873/935 (capability grant coverage), TASK-758 (SII retention SSOT).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

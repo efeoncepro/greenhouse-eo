@@ -2,6 +2,21 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-29 — TASK-790: Contractor Engagements lifecycle (6 events v1)
+
+Aggregate type: `contractor_engagement`. Cambios materiales del lifecycle del engagement contractor/honorarios (Workforce/HR). Payload base `{schemaVersion:1, contractorEngagementId, publicId, profileId, memberId, personLegalEntityRelationshipId, legalEntityOrganizationId, relationshipSubtype, payrollVia, paymentModel, status, classificationRiskStatus, ...}`.
+
+| Evento | Trigger | Notas |
+| --- | --- | --- |
+| `workforce.contractor_engagement.created` | `createContractorEngagement()` | Nace en `draft`; incluye `relationshipSubtype` |
+| `workforce.contractor_engagement.activated` | transición → `active` | hard gate: relación activa + riesgo no bloqueante |
+| `workforce.contractor_engagement.paused` | transición → `paused` (incl. auto-pause por escalada de riesgo) | `reason:'classification_risk_escalation'` cuando es auto-pause |
+| `workforce.contractor_engagement.ended` | transición → `ended` | terminal |
+| `workforce.contractor_engagement.cancelled` | transición → `cancelled` | terminal |
+| `workforce.contractor_engagement.classification_risk_flagged` | riesgo escala a `legal_review_required`/`blocked` | bloquea readiness/activación |
+
+V1 NO tiene consumer reactivo (Finance bridge es TASK-793). Son eventos de auditoría/notificación. NO se agregan a `REACTIVE_EVENT_TYPES`.
+
 ## Delta 2026-05-24 — TASK-903: FTR productive writeback chain event (1 event v1)
 
 Aggregate type: `notion_task`. Sibling de TASK-916 repointeado a FTR (derivada pura de RpA).

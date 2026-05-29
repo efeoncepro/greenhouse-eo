@@ -1,8 +1,26 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.0
+**Version:** 1.1
 **Created:** 2026-05-05
-**Status:** Architecture proposal; runtime not implemented yet
+**Status:** `ContractorEngagement` aggregate implemented (TASK-790, 2026-05-29). WorkSubmission/Invoice/Payable + Finance bridge remain proposals (TASK-791..798).
+
+## Delta 2026-05-29 — TASK-790 ContractorEngagement runtime shipped
+
+El aggregate raíz `ContractorEngagement` está implementado en runtime (Workforce/HR). Slices entregados:
+
+- **Schema** `greenhouse_hr.contractor_engagements` (state machine + CHECK enums + risk-gate CHECK `active ⇒ classification_risk no bloqueante` + BEFORE UPDATE transition-validation trigger) + append-only `greenhouse_hr.contractor_engagement_events` (anti-UPDATE/anti-DELETE triggers). Migración `20260529221452562`.
+- **Anchor (D1)**: el engagement hace FK a `person_legal_entity_relationships.relationship_id` (PK real es `relationship_id`, NO `person_legal_entity_relationship_id`) `ON DELETE RESTRICT`. La relación activa se resuelve vía `resolveActivePersonLegalEntityRelationships` (en `src/lib/account-360/person-legal-entity-relationships.ts`). El engagement NO crea relaciones (eso es TASK-789/891).
+- **Subtype SSOT (D2)**: `contractor_engagements.relationship_subtype` (5 valores finos: `honorarios_cl`, `freelance`, `independent_professional`, `international_contractor`, `provider_platform`) es SSOT propio, validado por consistencia de familia contra el subtype coarse de la relación (`{contractor,honorarios}` en `metadata.relationshipSubtype`). Sin write-back. Helper `assertSubtypeConsistency`.
+- **payroll_via (D3)**: enum propio del engagement (`internal/deel/remote/oyster/manual_provider/direct_international`), tipo TS distinto del `PayrollVia` de payroll. NUNCA se escribe a `members.{payroll_via,contract_type,pay_regime}`.
+- **Tax owner mandatory** + honorarios CL: `tax_compliance_owner` NOT NULL (default resuelto por `resolveDefaultTaxComplianceOwner`); honorarios snapshot de tasa SII (`getSiiRetentionRate`, 2026=0.1525) + `tax_withholding_policy_code` versionado (`cl_honorarios_2026_15_25`).
+- **Classification risk first-class**: `computeClassificationRisk(factors, reviewed, block)` determinístico; `clear` requiere review explícito; subordinación material → `legal_review_required` (bloquea `active` por CHECK + app guard). Escalar riesgo en un engagement `active` lo auto-pausa.
+- **Módulo TS**: `src/lib/contractor-engagements/` (barrel pure-only; store server-only importado directo). Helpers puros con tests (`state-machine`, `subtype-consistency`, `classification-risk`, `tax-policy`).
+- **Access**: capabilities `hr.contractor_engagement` (read/create/update/manage) + `hr.contractor_classification` (read/approve) + grants en `runtime.ts`. API `/api/hr/contractors` (GET/POST) + `/api/hr/contractors/[id]` (GET/PATCH: transition|update|review_classification).
+- **Reliability**: signal `hr.contractor_engagement.classification_risk_open` (kind=drift, moduleKey=identity, steady=0).
+- **Outbox v1**: `workforce.contractor_engagement.{created,activated,paused,ended,cancelled,classification_risk_flagged}` (aggregateType `contractor_engagement`).
+- **Payroll non-regression**: suite `src/lib/payroll` verde (522 tests). Cero escritura a `payroll_entries`/`payroll_adjustments`/`compensation_versions`/`final_settlements`.
+
+Pendiente (no implementado): WorkSubmission (TASK-792), Invoice + assets (TASK-791), ContractorPayable + Finance bridge (TASK-793), Chile honorarios readiness layer, provider imports.
 
 ## Purpose
 

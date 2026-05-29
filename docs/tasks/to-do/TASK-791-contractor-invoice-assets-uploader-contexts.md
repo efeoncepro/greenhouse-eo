@@ -1,5 +1,9 @@
 # TASK-791 — Contractor Invoice Assets + Greenhouse Uploader Contexts
 
+## Delta 2026-05-29
+
+- Desbloqueado por **TASK-790 ✅ complete**: el aggregate `greenhouse_hr.contractor_engagements` ya existe (módulo `src/lib/contractor-engagements/`). Las invoices/assets de esta task deben FK-ancla al `contractor_engagement_id` canónico. El `document_asset_id` se adjunta vía el uploader canónico (TASK-721) — no inventar bucket nuevo.
+
 ## Status
 
 - Lifecycle: `to-do`

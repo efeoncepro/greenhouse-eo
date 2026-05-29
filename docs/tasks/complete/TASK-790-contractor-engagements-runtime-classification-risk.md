@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Implementacion`
+- Status real: `Complete (2026-05-29, develop)`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none` (TASK-789 ✅ complete — substrate listo)
@@ -145,12 +145,27 @@ TASK-790 vive bajo Workforce/HR y **no debe romper Payroll**. El motor de nómin
 
 ## Acceptance Criteria
 
-- [ ] `ContractorEngagement` can be created for an active contractor relationship.
-- [ ] Payment model and cadence are explicit and validated.
-- [ ] Tax/compliance owner is mandatory.
-- [ ] Classification risk status is computed/stored and can block readiness.
-- [ ] Events/audit capture material lifecycle changes.
-- [ ] Payroll non-regression probado: suite `src/lib/payroll` verde, sin escritura a `payroll_entries`/`payroll_adjustments`/`compensation_versions`/`final_settlements`, sin mutar `members.{payroll_via,contract_type,pay_regime}`.
+- [x] `ContractorEngagement` can be created for an active contractor relationship. — `createContractorEngagement` resuelve y valida el anchor activo (`loadActiveContractorAnchor`) vía FK a `relationship_id`.
+- [x] Payment model and cadence are explicit and validated. — CHECK enums DB + `requireEnum` en API + types `CONTRACTOR_PAYMENT_MODELS`/`CONTRACTOR_PAYMENT_CADENCES`.
+- [x] Tax/compliance owner is mandatory. — `tax_compliance_owner` NOT NULL + default `resolveDefaultTaxComplianceOwner`.
+- [x] Classification risk status is computed/stored and can block readiness. — `computeClassificationRisk` + CHECK `active_requires_clear_risk` + app guard (auto-pause on escalation).
+- [x] Events/audit capture material lifecycle changes. — append-only `contractor_engagement_events` (anti-UPDATE/DELETE) + outbox v1 events.
+- [x] Payroll non-regression probado: suite `src/lib/payroll` verde (522 passed, 0 failed), sin escritura a `payroll_entries`/`payroll_adjustments`/`compensation_versions`/`final_settlements`, sin mutar `members.{payroll_via,contract_type,pay_regime}`.
+
+## Closing Note (2026-05-29)
+
+Implementado en `develop` (sin rama, instrucción del operador). 4 slices + close.
+
+- **Slice 1** migration `20260529221452562` (commit Slice 1) — schema + state machine trigger + risk-gate CHECK + audit triggers + GRANTs + anti pre-up-marker guard.
+- **Slice 2** `src/lib/contractor-engagements/` — types + pure helpers (state-machine, subtype-consistency D2, classification-risk, tax-policy) + store (anchor/idempotent commands + outbox v1) + 27 unit tests.
+- **Slice 3** reliability signal `hr.contractor_engagement.classification_risk_open` (moduleKey identity, steady=0) wired into `getReliabilityOverview`.
+- **Slice 4** capabilities `hr.contractor_engagement` + `hr.contractor_classification` (catalog + runtime grants, grant-coverage guard verde) + API `/api/hr/contractors` (+ `[id]`).
+
+**Gates verdes**: tsc 0 · full lint 0 · `pnpm build` (ambas rutas compiladas) · `pnpm test` 5531 passed / 0 failed · `pnpm vitest run src/lib/payroll` 522 passed / 0 failed · grant-coverage guard passed · DB defense-in-depth verificado live en transacción rolled-back (transition trigger 23514, risk-gate CHECK 23514, anti-UPDATE/DELETE 23001) · signal live steady=0.
+
+**Skills**: greenhouse-payroll-auditor (PASS), arch-architect (4-pillar: blast radius LOW, reversibilidad HIGH), greenhouse-backend.
+
+**Pendiente (out of scope V1, desbloqueado)**: TASK-791 (invoice assets), TASK-792 (work submissions), TASK-793 (payables → Finance bridge), TASK-797 (contractor closure).
 
 ## Verification
 

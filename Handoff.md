@@ -1,10 +1,20 @@
-# Sesion 2026-05-29 — TASK-790 Contractor Engagements Runtime + Classification Risk — ⏳ IN PROGRESS (develop, sin branch)
+# Sesion 2026-05-29 — TASK-790 Contractor Engagements Runtime + Classification Risk — ✅ COMPLETE (develop, sin branch)
 
-Implementando el agregado canónico `ContractorEngagement` (`greenhouse_hr.contractor_engagements`) — fundación de Contractor Payables (EPIC-013). Trabajo **in-place en `develop`** por instrucción del operador (no se crea rama). Skills validadas pre-write: **greenhouse-payroll-auditor** (PASS — guardrails de no-regresión payroll confirmados: nunca toca `payroll_entries/adjustments/compensation_versions/final_settlements` ni `members.{payroll_via,contract_type,pay_regime}`; honorarios CL solo retención SII versionada) + **arch-architect** (4-pilar: aditivo, blast radius LOW, reversibilidad HIGH; D1 anchor a `relationship_id` vía `resolveActivePersonLegalEntityRelationships`; D2 subtype SSOT propio + consistency check; D3 payroll_via enum propio ortogonal).
+Agregado canónico `ContractorEngagement` (`greenhouse_hr.contractor_engagements`) materializado bajo Workforce/HR — fundación de Contractor Payables (EPIC-013). Trabajo **in-place en `develop`** (instrucción del operador). Skills pre-write: greenhouse-payroll-auditor (PASS), arch-architect (4-pilar: blast radius LOW, reversibilidad HIGH), greenhouse-backend.
 
-**Supuestos de spec corregidos en discovery:** (1) reader del anchor vive en `src/lib/account-360/person-legal-entity-relationships.ts`, no en `store.ts`; (2) PK del relationship es `relationship_id` (no `person_legal_entity_relationship_id`); (3) subtype del relationship es coarse `{contractor,honorarios}` en `metadata_json`, el engagement declara su propio `relationship_subtype` fino (5 valores) como SSOT + family-consistency check. Módulo: `src/lib/contractor-engagements/` (Files-owned de la task).
+**4 slices + close, 4 commits atómicos:**
+- **S1** migración `20260529221452562` — `contractor_engagements` (state machine + CHECK enums + risk-gate CHECK + BEFORE UPDATE transition trigger) + append-only `contractor_engagement_events` (anti-UPDATE/DELETE) + GRANTs + anti pre-up-marker guard.
+- **S2** `src/lib/contractor-engagements/` — types + helpers puros (state-machine, subtype-consistency D2, classification-risk, tax-policy) + store (anchor + idempotent commands + outbox v1); barrel pure-only (store directo, anti TASK-827). 27 unit tests.
+- **S3** signal `hr.contractor_engagement.classification_risk_open` (drift, moduleKey identity, steady=0) wired en `getReliabilityOverview`.
+- **S4** capabilities `hr.contractor_engagement` + `hr.contractor_classification` (catalog + runtime grants, grant-coverage verde) + API `/api/hr/contractors` (+ `[id]` PATCH transition|update|review_classification).
 
-**Plan (4 slices):** S1 migration (tablas + CHECK + triggers transición/anti-UPDATE-DELETE + GRANTs) · S2 types+helpers puros+store+tests · S3 classification risk gate + reliability signal `hr.contractor_engagement.classification_risk_open` (moduleKey identity) · S4 capabilities (`hr.contractor_engagement.{read,manage}` + `hr.contractor_classification.review`) + grants runtime + API routes `/api/hr/contractors`. Gate de cierre: `pnpm vitest run src/lib/payroll`.
+**Decisiones (supuestos de spec corregidos en discovery):** D1 anchor FK a `relationship_id` (PK real) vía `resolveActivePersonLegalEntityRelationships` (en `account-360/`); D2 `relationship_subtype` SSOT propio (5 valores) + family-consistency check, sin write-back; D3 `payroll_via` enum propio ortogonal (nunca muta `members`).
+
+**Gates verdes:** tsc 0 · full lint 0 · `pnpm build` ✓ (ambas rutas) · `pnpm test` 5531/0 · `pnpm vitest run src/lib/payroll` 522/0 (non-regression) · grant-coverage guard ✓ · DB defense-in-depth verificado live en tx rolled-back (transition 23514, risk-gate 23514, anti-UPDATE/DELETE 23001) · signal live steady=0.
+
+**Cross-impact:** desbloquea TASK-791/792/793 (Delta notes agregados). Docs: CLAUDE.md (invariantes nuevos), arch V1.1 Delta, EVENT_CATALOG Delta (6 events), README, changelog.
+
+**Próximo paso:** push a `develop` (pendiente confirmación del operador — el trabajo está commiteado local). Luego TASK-791 (invoice assets) como siguiente en la cadena EPIC-013.
 
 ---
 
