@@ -364,6 +364,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
             runStatus={nexaInsights.runStatus}
             defaultExpanded={nexaInsights.totalAnalyzed > 0}
             timelineInsights={nexaInsights.timeline ?? []}
+            dataStatus={nexaInsights.dataStatus}
           />
         </Grid>
       )}

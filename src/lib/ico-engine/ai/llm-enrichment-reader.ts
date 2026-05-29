@@ -4,6 +4,8 @@ import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
 
+import { resolveNexaInsightsDataStatus } from './nexa-data-status'
+
 import type {
   AgencyAiLlmSummary,
   AgencyAiLlmSummaryItem,
@@ -307,10 +309,19 @@ export const readAgencyAiLlmSummary = async (
     periodMonth
   )
 
+  const succeededCount = Number(totalsRow.succeeded ?? 0)
+
+  // TASK-946 — honest degradation state canonical derivado server-side.
+  const dataStatus = await resolveNexaInsightsDataStatus({
+    insightsCount: succeededCount,
+    periodYear,
+    periodMonth
+  })
+
   return {
     totals: {
       total: Number(totalsRow.total ?? 0),
-      succeeded: Number(totalsRow.succeeded ?? 0),
+      succeeded: succeededCount,
       failed: Number(totalsRow.failed ?? 0),
       avgQualityScore: toNumber(totalsRow.avg_quality_score)
     },
@@ -327,7 +338,8 @@ export const readAgencyAiLlmSummary = async (
       : null,
     recentEnrichments,
     timeline: timelineItems,
-    lastProcessedAt: toText(totalsRow.last_processed_at)
+    lastProcessedAt: toText(totalsRow.last_processed_at),
+    dataStatus
   }
 }
 
@@ -801,6 +813,15 @@ export const readMemberAiLlmSummary = async (
     historicalPreview
   )
 
+  // TASK-946 — honest degradation state canonical derivado server-side.
+  // `insightsCount` usa el conteo activo (period actual): Member views priorizan
+  // datos del periodo actual sobre historical fallback.
+  const dataStatus = await resolveNexaInsightsDataStatus({
+    insightsCount: scopedSummary.activeAnalyzed,
+    periodYear,
+    periodMonth
+  })
+
   return {
     summarySource: scopedSummary.summarySource,
     activeAnalyzed: scopedSummary.activeAnalyzed,
@@ -813,7 +834,8 @@ export const readMemberAiLlmSummary = async (
     insights: scopedSummary.insights,
     activePreview: scopedSummary.activePreview,
     historicalPreview: scopedSummary.historicalPreview,
-    timeline: timelineItems
+    timeline: timelineItems,
+    dataStatus
   }
 }
 
@@ -915,6 +937,13 @@ export const readSpaceAiLlmSummary = async (
     historicalPreview
   )
 
+  // TASK-946 — honest degradation state canonical (pattern member reader).
+  const dataStatus = await resolveNexaInsightsDataStatus({
+    insightsCount: scopedSummary.activeAnalyzed,
+    periodYear,
+    periodMonth
+  })
+
   return {
     summarySource: scopedSummary.summarySource,
     activeAnalyzed: scopedSummary.activeAnalyzed,
@@ -927,6 +956,7 @@ export const readSpaceAiLlmSummary = async (
     insights: scopedSummary.insights,
     activePreview: scopedSummary.activePreview,
     historicalPreview: scopedSummary.historicalPreview,
-    timeline: timelineItems
+    timeline: timelineItems,
+    dataStatus
   }
 }

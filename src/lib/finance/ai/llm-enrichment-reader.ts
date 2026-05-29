@@ -2,6 +2,8 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 
+import { resolveFinanceNexaInsightsDataStatus } from './nexa-data-status'
+
 import type {
   FinanceLlmRunStatus,
   FinanceNexaInsightItem,
@@ -165,15 +167,24 @@ export const readFinanceAiLlmSummary = async (
   const latestRunRow = latestRunRows[0]
 
   const insights = recentRows.map(mapInsightItem)
+  const totalAnalyzed = Number(totalsRow.succeeded ?? 0)
+
+  // TASK-946 — honest degradation state canonical via PG mirror reader.
+  const dataStatus = await resolveFinanceNexaInsightsDataStatus({
+    insightsCount: totalAnalyzed,
+    periodYear,
+    periodMonth
+  })
 
   return {
-    totalAnalyzed: Number(totalsRow.succeeded ?? 0),
+    totalAnalyzed,
     lastAnalysis: toText(totalsRow.last_processed_at),
     runStatus: latestRunRow
       ? ((toText(latestRunRow.status) ?? 'failed') as FinanceLlmRunStatus)
       : null,
     insights,
-    timeline: timelineItems
+    timeline: timelineItems,
+    dataStatus
   }
 }
 
@@ -244,9 +255,19 @@ export const readClientFinanceAiLlmSummary = async (
 
   const totalsRow = totalsRows[0] ?? {}
   const latestRunRow = latestRunRows[0]
+  const totalAnalyzed = Number(totalsRow.succeeded ?? 0)
+
+  // TASK-946 — honest degradation state canonical (client-scoped variant
+  // reusa el resolver PG-based; lastCronRun y eligibleCount son portfolio-wide
+  // porque finance_ai_enrichment_runs no tiene client filter granular V1).
+  const dataStatus = await resolveFinanceNexaInsightsDataStatus({
+    insightsCount: totalAnalyzed,
+    periodYear,
+    periodMonth
+  })
 
   return {
-    totalAnalyzed: Number(totalsRow.succeeded ?? 0),
+    totalAnalyzed,
     lastAnalysis: toText(totalsRow.last_processed_at),
     runStatus: latestRunRow
       ? ((toText(latestRunRow.status) ?? 'failed') as FinanceLlmRunStatus)
@@ -259,6 +280,7 @@ export const readClientFinanceAiLlmSummary = async (
     // timeline, sumar variant `readClientFinanceAiLlmTimeline(clientId, limit)`.
     timeline: await readFinanceAiLlmTimeline(FINANCE_TIMELINE_DEFAULT_LIMIT).catch(
       () => [] as FinanceNexaTimelineItem[]
-    )
+    ),
+    dataStatus
   }
 }

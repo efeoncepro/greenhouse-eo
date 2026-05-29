@@ -190,7 +190,10 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
       latestRun: null,
       recentEnrichments: [],
       timeline: [],
-      lastProcessedAt: null
+      lastProcessedAt: null,
+      // TASK-946 — fallback conservador: si el summary read falla por
+      // completo, default canonical = empty-pending (conservador honest).
+      dataStatus: 'empty-pending' as const
     }
   })
 
@@ -232,7 +235,10 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
       rootCauseNarrative: item.rootCauseNarrative,
       recommendedAction: item.recommendedAction,
       processedAt: item.processedAt
-    })).map(mapHomeInsight)
+    })).map(mapHomeInsight),
+    // TASK-946 — propaga honest degradation state desde reader canonical.
+    // Backward-compat: undefined si reader no lo expone todavía.
+    dataStatus: insightsSummary.dataStatus
   }
 
   // 5. Nexa Intro (Simple logic for now)

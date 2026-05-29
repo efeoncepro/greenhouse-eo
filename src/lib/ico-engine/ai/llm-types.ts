@@ -111,6 +111,14 @@ export interface AgencyAiLlmSummary {
   recentEnrichments: AgencyAiLlmSummaryItem[]
   timeline: AgencyAiLlmSummaryItem[]
   lastProcessedAt: string | null
+  /**
+   * TASK-946 — Honest degradation canonical state derived server-side.
+   * Opcional (backward-compat); UI consumer decide cómo renderizar via
+   * `NexaInsightsBlock dataStatus` prop. 4 valores: `ready` |
+   * `empty-pending` | `empty-positive` | `stale-degraded`. Loading es
+   * estado local del cliente, NO se serializa server-side.
+   */
+  dataStatus?: 'ready' | 'empty-pending' | 'empty-positive' | 'stale-degraded'
 }
 
 export interface OrganizationAiLlmEnrichmentItem {
@@ -209,6 +217,8 @@ export interface MemberNexaInsightsPayload {
   activePreview: MemberNexaInsightItem[]
   historicalPreview: MemberNexaInsightItem[]
   timeline: MemberNexaInsightItem[]
+  /** TASK-946 — honest degradation state. Ver AgencyAiLlmSummary.dataStatus. */
+  dataStatus?: 'ready' | 'empty-pending' | 'empty-positive' | 'stale-degraded'
 }
 
 export interface SpaceNexaInsightItem {
@@ -239,6 +249,8 @@ export interface SpaceNexaInsightsPayload {
   activePreview: SpaceNexaInsightItem[]
   historicalPreview: SpaceNexaInsightItem[]
   timeline: SpaceNexaInsightItem[]
+  /** TASK-946 — honest degradation state. Ver AgencyAiLlmSummary.dataStatus. */
+  dataStatus?: 'ready' | 'empty-pending' | 'empty-positive' | 'stale-degraded'
 }
 
 // ─── Metric Glossary (dynamic from registry) ──────────────────────────────

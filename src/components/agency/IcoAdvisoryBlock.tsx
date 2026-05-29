@@ -41,6 +41,7 @@ const IcoAdvisoryBlock = ({ aiLlm }: Props) => {
       lastAnalysis={aiLlm.lastProcessedAt}
       runStatus={aiLlm.latestRun?.status ?? null}
       timelineInsights={timelineInsights}
+      dataStatus={aiLlm.dataStatus}
     />
   )
 }

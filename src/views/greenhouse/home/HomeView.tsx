@@ -189,6 +189,8 @@ type HomeInsightsPayload = {
   lastAnalysis: string | null
   runStatus: 'succeeded' | 'partial' | 'failed' | null
   timeline?: Array<NexaInsightItem & { processedAt: string }>
+  /** TASK-946 — honest degradation state. Opcional (backward-compat). */
+  dataStatus?: 'ready' | 'empty-pending' | 'empty-positive' | 'stale-degraded'
 }
 
 type HomeSnapshotWithInsights = HomeSnapshot & {
@@ -264,6 +266,7 @@ const HomeContent = ({
                       runStatus={homeInsights.runStatus}
                       defaultExpanded={homeInsights.totalAnalyzed > 0}
                       timelineInsights={homeInsights.timeline}
+                      dataStatus={homeInsights.dataStatus}
                     />
                   </Grid>
                 )}

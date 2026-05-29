@@ -222,6 +222,13 @@ export interface FinanceNexaInsightsPayload {
    * Finance history table queda como follow-up TASK-948+).
    */
   timeline: FinanceNexaTimelineItem[]
+  /**
+   * TASK-946 — Honest degradation state derived server-side. Opcional
+   * (backward-compat). 4 valores: `ready` | `empty-pending` |
+   * `empty-positive` | `stale-degraded`. UI consumer decide cómo renderizar
+   * via `NexaInsightsBlock dataStatus` prop.
+   */
+  dataStatus?: 'ready' | 'empty-pending' | 'empty-positive' | 'stale-degraded'
 }
 
 // ─── Stable IDs ─────────────────────────────────────────────────────────────
