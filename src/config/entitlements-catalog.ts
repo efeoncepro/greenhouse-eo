@@ -1246,6 +1246,17 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'delivery',
     actions: ['execute'] as const,
     defaultScope: 'all'
+  },
+  // TASK-947 — Nexa Insights detail page canonical /nexa/insights/[id].
+  // Grant matriz (runtime.ts): EFEONCE_ADMIN + FINANCE_ADMIN + HR_MANAGER (role)
+  // + route_groups internal/finance/hr (broad). NUNCA seed sin grant en
+  // runtime.ts mismo PR (invariant TASK-873 + TASK-935; guard mecánico en
+  // capability-grant-coverage.test.ts).
+  {
+    key: 'nexa.insights.read',
+    module: 'delivery',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
   }
 ] as const
 
