@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -241,4 +241,14 @@ Reglas obligatorias (de CLAUDE.md, load-bearing):
 
 1. **(BLOQUEANTE de Slice B, requiere greenhouse-finance-accounting-operator)** Valor destino de la tupla `(contract_type, pay_regime, payroll_via)` para un contractor honorarios CL pagado por el riel Greenhouse contractor-payable. Ningún valor actual encaja: `'honorarios'` rutea al riel SII legacy (PROHIBIDO — doble declaración), `'contractor'`/`'eor'` implican Deel/internacional (es CL), `'international_internal'` es no-residente (es residente CL). Opciones: (a) nuevo valor de enum (blast radius: CHECK matrix members + compensation_versions + `CONTRACT_DERIVATIONS` + ruteo del motor + UI); (b) `member.contract_type` queda como snapshot del último empleo y el `relationship_subtype='honorarios_cl'` del engagement es el SSOT de clasificación contractor. Decidir con la mecánica F29 en mano.
 2. ¿El comando de Slice B debe correr eventualmente dentro del comando de transición TASK-956 (una vez Slice A vivo), o quedarse como reconciliación separada disparada por HR? arch-architect recomienda separado por blast-radius; reconsiderar tras estabilizar Slice A.
-3. ¿La señal `double_rail_overlap` debe escalar a `error` (no solo warning) cuando el overlap persiste >1 período cerrado? Definir threshold tras observar steady-state.
+3. ¿La señal `double_rail_overlap` debe escalar a `error` (no solo warning) cuando el overlap persiste >1 período cerrado? Definir threshold tras observar steady-state. **Resuelta**: error si count>0 (integridad fiscal, sin tier soft V1).
+
+## Delta 2026-05-30 — Slice A shipped (gate + signal) + hallazgo live
+
+Slice A implementado y committeado (commit `983279d4`): módulo `src/lib/payroll/contractor-exclusion/` + post-filtro en `pgGetApplicableCompensationVersionsForPeriod` (gateado por `PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED`, default OFF, parity bit-for-bit) + señal `payroll.contractor.double_rail_overlap` wired en `get-reliability-overview`. Gate de no-regresión verde (673 tests; +12 policy). tsc/lint limpios.
+
+**Hallazgo live (la señal hizo su trabajo)**: live-verify contra PG real → la señal detectó **1 overlap real**: **Valentina Hoyos** tiene su `compensation_versions` v2 (`indefinido`/`chile`) con **`effective_to = NULL` (nunca cerrada)** pese a su offboarding `EO-OFF-2026-45EC8688` `executed` (last_working_day 2026-04-30). El offboarding tiene la lógica `closeFuturePayrollEligibility` (`offboarding/store.ts:349`) que debió cerrarla, pero NO corrió en su ejecución (su offboarding fue seedeado en dev, no pasó por `executeOffboarding` completo). Hoy solo la protege el roster gate por offboarding-`executed`; su comp version de empleada está abierta → si ese gate fallara se calcularía como empleada dependiente chilena a sueldo completo (peor que el doble honorarios). La señal es el detector canónico de exactamente este vector residual.
+
+**Remediación BLOQUEADA (requiere decisión humana)**: la mutación para cerrar su comp version (`effective_to = 2026-04-30`, espejo de `closeFuturePayrollEligibility`) fue **denegada por el auto-mode classifier** — correctamente: es una mutación de data payroll de una persona real con fecha inferida por el agente, fuera del scope gate/señal de Slice A. Requiere consentimiento explícito del operador. Opciones de remediación (a decidir): (a) cerrar su comp version a 2026-04-30 vía script documentado revisado por el operador; (b) re-ejecutar el path canónico de offboarding closure; (c) dejar la señal en `error=1` hasta que se priorice. El finiquito NO se afecta (lee comp version vigente al last_working_day; effective_to=2026-04-30 sigue cubriendo ese día).
+
+**Slice B NO implementado** (Q1 bloqueante — tupla destino toca la taxonomía gobernada `payroll.contract_taxonomy.invalid_tuple_drift` + mecánica F29 con finance-accounting).
