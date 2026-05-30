@@ -674,6 +674,16 @@ export const assessPayableReadiness = async (
       Math.round(payable.netPayable * 100) / 100 === expected.netPayable
   }
 
+  // ── TASK-795 Fase A — tax-owner boundary gate ───────────────────────────────
+  // Block when the tax treatment needs human review or a country withholding
+  // engine that does not yet exist. `manual_review_required` = explicit human
+  // review; `country_engine_owned` = the international_internal engine (TASK-905)
+  // owns it — until that engine ships, the withholding is unresolved, so block.
+  // The contractor domain NEVER applies a Chile→non-resident rate itself (D-795-4).
+  const taxOwnerReviewRequired =
+    engagement.taxComplianceOwner === 'manual_review_required' ||
+    engagement.taxComplianceOwner === 'country_engine_owned'
+
   const readinessInputs: PayableReadinessInputs = {
     sourceApproved,
     requiresInvoice: engagement.requiresInvoice,
@@ -692,7 +702,9 @@ export const assessPayableReadiness = async (
     isHonorarios,
     rutVerified,
     rutBlockerDetail,
-    honorariosWithholdingConsistent
+    honorariosWithholdingConsistent,
+    taxOwnerReviewRequired,
+    taxOwnerDetail: taxOwnerReviewRequired ? engagement.taxComplianceOwner : null
   }
 
   return evaluatePayableReadiness(readinessInputs)

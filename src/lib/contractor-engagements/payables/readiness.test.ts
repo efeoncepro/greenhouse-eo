@@ -20,7 +20,8 @@ const ready: PayableReadinessInputs = {
   classificationRiskBlocking: false,
   isHonorarios: false,
   rutVerified: true,
-  honorariosWithholdingConsistent: true
+  honorariosWithholdingConsistent: true,
+  taxOwnerReviewRequired: false
 }
 
 const honorariosReady: PayableReadinessInputs = {
@@ -162,5 +163,33 @@ describe('contractor payable readiness — Chile honorarios compliance (TASK-794
     const r = evaluatePayableReadiness({ ...ready, isHonorarios: false, honorariosWithholdingConsistent: false })
 
     expect(r.blockers.map(b => b.code)).not.toContain('honorarios_withholding_mismatch')
+  })
+})
+
+describe('contractor payable readiness — international tax-owner boundary (TASK-795 Fase A)', () => {
+  it('passes when tax owner does not require review (e.g. greenhouse_policy / provider_owned)', () => {
+    const r = evaluatePayableReadiness({ ...ready, taxOwnerReviewRequired: false })
+
+    expect(r.ready).toBe(true)
+  })
+
+  it('blocks when tax owner requires human review (manual_review_required / country_engine_owned)', () => {
+    const r = evaluatePayableReadiness({
+      ...ready,
+      taxOwnerReviewRequired: true,
+      taxOwnerDetail: 'manual_review_required'
+    })
+
+    expect(r.ready).toBe(false)
+    const blocker = r.blockers.find(b => b.code === 'tax_owner_review_required')
+
+    expect(blocker).toBeDefined()
+    expect(blocker?.message).toContain('manual_review_required')
+  })
+
+  it('the tax-owner gate is universal (applies regardless of honorarios)', () => {
+    const r = evaluatePayableReadiness({ ...honorariosReady, taxOwnerReviewRequired: true })
+
+    expect(r.blockers.map(b => b.code)).toContain('tax_owner_review_required')
   })
 })

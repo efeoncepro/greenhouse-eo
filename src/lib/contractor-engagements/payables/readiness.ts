@@ -21,6 +21,12 @@
  *   - honorarios withholding is SII-only and reconciles vs the snapshot rate
  *     (`honorarios_withholding_mismatch` — catches any dependent deduction /
  *      wrong rate slipping into an honorarios payable)
+ *
+ * TASK-795 Fase A — International contractor / provider boundary (fail-closed):
+ *   - tax owner not pending human review / a missing country engine
+ *     (`tax_owner_review_required`). The contractor domain NEVER computes a
+ *     Chile→non-resident withholding rate itself — it blocks and escalates to the
+ *     `international_internal` withholding engine (TASK-905/906/907). See D-795-4.
  */
 
 export const PAYABLE_READINESS_BLOCKER_CODES = [
@@ -34,7 +40,9 @@ export const PAYABLE_READINESS_BLOCKER_CODES = [
   // TASK-794 — Chile honorarios compliance
   'classification_risk_blocking',
   'rut_unverified',
-  'honorarios_withholding_mismatch'
+  'honorarios_withholding_mismatch',
+  // TASK-795 Fase A — international contractor / provider boundary
+  'tax_owner_review_required'
 ] as const
 export type PayableReadinessBlockerCode = (typeof PAYABLE_READINESS_BLOCKER_CODES)[number]
 
@@ -75,6 +83,17 @@ export interface PayableReadinessInputs {
    * is embedded in the payable.
    */
   honorariosWithholdingConsistent: boolean
+  // ── TASK-795 Fase A — international contractor / provider boundary ───────────
+  /**
+   * The engagement's tax treatment needs human review or a withholding engine
+   * that is not yet available (`tax_compliance_owner ∈ {manual_review_required,
+   * country_engine_owned}`). Fail-closed: the payable cannot reach Finance until
+   * a human reviews it or the `international_internal` engine (TASK-905) resolves
+   * the withholding. The contractor domain NEVER applies a rate itself (D-795-4).
+   */
+  taxOwnerReviewRequired: boolean
+  /** Surfaced detail (the actual tax_compliance_owner value) for the message. */
+  taxOwnerDetail?: string | null
 }
 
 export interface PayableReadinessResult {
@@ -171,6 +190,19 @@ export const evaluatePayableReadiness = (
           'La retención del honorarios no coincide con la retención SII versionada (solo se permite retención SII, sin deducciones dependientes).'
       })
     }
+  }
+
+  // ── TASK-795 Fase A — international contractor / provider boundary ───────────
+  // Tax treatment pending human review or a country withholding engine that is
+  // not yet available. Fail-closed: escalate to TASK-905 / human, never apply a
+  // rate here (D-795-4).
+  if (inputs.taxOwnerReviewRequired) {
+    const detail = inputs.taxOwnerDetail ? ` (${inputs.taxOwnerDetail})` : ''
+
+    blockers.push({
+      code: 'tax_owner_review_required',
+      message: `El tratamiento tributario requiere revisión humana o un motor de retención aún no disponible${detail}; escala a revisión/withholding engine antes de pagar.`
+    })
   }
 
   return {
