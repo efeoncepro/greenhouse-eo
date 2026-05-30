@@ -4371,6 +4371,31 @@ Toda invoice/boleta, evidencia de trabajo o documento de proveedor de un contrac
 
 **Spec canónica**: `docs/tasks/complete/TASK-793-contractor-payables-finance-obligations-bridge.md`. Migración: `20260531010000000`. Patrones fuente: TASK-790 (engagement anchor + trio), TASK-791 (invoice-asset readiness), TASK-792 (submission consume dup-guard), TASK-748/765 (payment_obligations + idempotencia), TASK-771 (reactive projection + re-read defensivo), TASK-873/935 (capability grant coverage).
 
+### Chile Honorarios Compliance invariants (TASK-794, desde 2026-05-30)
+
+`src/lib/contractor-engagements/chile-honorarios/` es la **capa de compliance Chile honorarios** sobre Contractor Engagements + Payables. **NO es dueña de la tasa SII**: la tasa vive en `getSiiRetentionRate` (payroll SSOT, `src/types/hr-contracts.ts`) y se expone a contractors vía `resolveHonorariosWithholdingPolicy` (TASK-790). El módulo reusa esas primitivas + el `computeContractorWithholding` (TASK-793) y agrega los invariantes honorarios. Barrel pure-only; `readiness.ts` server-only importado directo (TASK-827).
+
+**Tasa SII oficial** (Ley 21.133 schedule gradual, verificado watchlist payroll-auditor): 2024=13.75%, 2025=14.5%, **2026=15.25%** (desde 2026-01-01), 2027=16%, 2028=17%. Vive en `SII_RETENTION_RATES` — **NUNCA tocar desde este dominio**.
+
+**3 gates fail-closed** en `evaluatePayableReadiness` + `assessPayableReadiness`:
+- `classification_risk_blocking` — **universal** (todos los lanes). Defensa payable-level que espeja el CHECK del engagement `active ⇒ classification_risk no bloqueante` (`isClassificationRiskBlocking`).
+- `rut_unverified` — **honorarios only**. RUT chileno verificado vía person-legal-profile `honorarios_closure` (CL_RUT `verified`; sin dirección; fail-closed: lookup que falla = bloqueado).
+- `honorarios_withholding_mismatch` — **honorarios only**. Recompute SII-only (`computeChileHonorariosPayout`) y bloquea si el `withholding`/`net` persistido difiere → atrapa cualquier deducción dependiente o tasa errónea.
+
+**⚠️ Reglas duras (no-regresión payroll + canónicas)**:
+- **NUNCA** romper el cálculo honorarios legacy de payroll (`src/lib/payroll/calculate-honorarios.ts`) ni mutar `SII_RETENTION_RATES` al converger hacia contractor payable. Cero cambio de números — gate `pnpm vitest run src/lib/payroll` bit-for-bit.
+- **NUNCA** aplicar AFP/Fonasa/Isapre/AFC/SIS/mutual/IUSC/APV/gratificación legal a honorarios (ni payroll legacy ni contractor payable). Solo retención SII. El guard `assertNoDependentDeductions` + `DEPENDENT_DEDUCTION_KINDS` es el SSOT de lo prohibido.
+- **NUNCA** re-implementar `gross * rate` para honorarios — `computeChileHonorariosPayout` delega a `computeContractorWithholding` (TASK-793 SSOT). El número del payable nace del path genérico (parity garantizada); el módulo honorarios lo **recompute en readiness** como defensa.
+- **NUNCA** hardcodear la tasa SII inline. Versionada en `tax_withholding_policy_code` (`cl_honorarios_<year>_<rate>`) + `tax_withholding_rate_snapshot` (snapshot al start del engagement, TASK-790).
+- **NUNCA** crear `final_settlements`/`final_settlement_documents` para honorarios — su cierre es `contractor_closure` (TASK-797), NUNCA finiquito.
+- **NUNCA** migrar masivamente honorarios payroll legacy a contractor payables. Convergencia gradual por miembro; los pagos legacy no se rompen (cutover documentado en arch Delta 2026-05-30).
+- **SIEMPRE** que un payable honorarios necesite "¿se puede pagar?", pasar por `assessPayableReadiness` (los 3 gates corren ahí, solo honorarios_cl salvo classification que es universal). Cero recompute inline en consumers.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll src/lib/contractor-engagements` como gate al tocar este dominio.
+
+**Reliability**: `hr.contractor_payable.honorarios_rut_unverified` (kind=data_quality, moduleKey=identity, steady=0) — honorarios_cl activos sin CL_RUT verificado (payable bloqueado). **Sin migración, sin capabilities/outbox nuevos** (reusa `finance.contractor_payable:manage` + evento `workforce.contractor_payable.blocked v1`).
+
+**Spec canónica**: `docs/tasks/complete/TASK-794-chile-honorarios-compliance-sii-retention.md`. Arch Delta: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (2026-05-30). Patrones fuente: TASK-790 (tax-policy SSOT + classification-risk), TASK-793 (withholding + readiness fail-closed), TASK-784 (person-legal-profile readiness), TASK-758 (SII retention SSOT payroll), TASK-721/766/774 (VIEW/helper + reliability signal pattern).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

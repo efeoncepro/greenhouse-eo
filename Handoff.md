@@ -1,18 +1,22 @@
-# Sesion 2026-05-30 — TASK-794 Chile Honorarios Compliance + SII Retention — 🚧 IN PROGRESS
+# Sesion 2026-05-30 — TASK-794 Chile Honorarios Compliance + SII Retention — ✅ COMPLETE
 
-Rama: `develop` (el operador pidió mantenerse en develop, sin branch nueva).
+Rama: `develop` (el operador pidió mantenerse en develop, sin branch nueva). 4 commits atómicos por slice.
 
-Objetivo: capa de compliance Chile honorarios sobre Contractor Engagements + Payables (TASK-790/793). NO toca el motor de nómina legacy (`calculate-honorarios.ts`, `SII_RETENTION_RATES`) — cero cambio de números payroll.
+Objetivo cumplido: capa de compliance Chile honorarios sobre Contractor Engagements + Payables (TASK-790/793). NO toca el motor de nómina legacy (`calculate-honorarios.ts`, `SII_RETENTION_RATES` sin cambios — git diff vacío) — cero cambio de números payroll.
 
 Decisiones de diseño (verificadas con skills greenhouse-payroll-auditor + arch-architect):
-- **Sin migración**: el schema existente (`contractor_payables.readiness_json`, `sourceSnapshot`, `tax_withholding_*`, `contractor_engagements.classification_risk_status`) soporta todo el alcance. Menor blast radius.
+- **Sin migración**: el schema existente (`contractor_payables.readiness_json`/`source_snapshot_json`, `tax_withholding_*`, `contractor_engagements.classification_risk_status`) soporta todo el alcance. Menor blast radius.
 - **Reuso de primitivas canónicas**: `resolveHonorariosWithholdingPolicy` (TASK-790, SSOT de tasa) + `computeContractorWithholding` (TASK-793). La tasa SII vive en `getSiiRetentionRate` (payroll SSOT); 2026=15.25% verificado oficial (Ley 21.133, watchlist payroll-auditor). NO se duplica ni se toca.
-- **Módulo nuevo** `src/lib/contractor-engagements/chile-honorarios/`: policy (folio boleta + snapshot + exclusión deducciones dependientes) + readiness (RUT verificado via person-legal-profile `honorarios_closure`).
-- **3 gates nuevos fail-closed** en `assessPayableReadiness` (solo honorarios_cl salvo classification): `rut_unverified`, `classification_risk_blocking` (universal), `honorarios_withholding_mismatch`.
-- **1 reliability signal** `hr.contractor_payable.honorarios_rut_unverified` (moduleKey identity, steady=0).
-- Sin capabilities/outbox nuevos (reusa `finance.contractor_payable:manage` + evento `contractorPayableBlocked` con blockerCodes).
+- **Módulo nuevo** `src/lib/contractor-engagements/chile-honorarios/`: policy (folio boleta + snapshot + `assertNoDependentDeductions` + `computeChileHonorariosPayout`) + readiness server-only (RUT verificado via person-legal-profile `honorarios_closure`).
+- **3 gates nuevos fail-closed** en `evaluatePayableReadiness`/`assessPayableReadiness` (solo honorarios_cl salvo classification): `rut_unverified`, `classification_risk_blocking` (universal), `honorarios_withholding_mismatch`.
+- **1 reliability signal** `hr.contractor_payable.honorarios_rut_unverified` (moduleKey identity, steady=0; validado live count=0).
+- Sin capabilities/outbox nuevos (reusa `finance.contractor_payable:manage` + evento `workforce.contractor_payable.blocked v1` con blockerCodes).
 
-Estado: Discovery + Audit + Plan completos. Implementación por slices en curso.
+Slices: 1 (módulo, 12 tests) · 2 (gates readiness + snapshot, 33 tests) · 2b (signal) · 3 (paridad payroll + cutover docs).
+
+Gates de cierre: tsc 0 repo-wide · lint 0 · `pnpm vitest run src/lib/payroll src/lib/contractor-engagements` 602 passed / 6 skipped · signal SQL validado contra PG live (count=0) · cero `new Pool` / `getServerAuthSession` directo / `NextResponse.json({error:<raw>})` nuevos. Docs: CLAUDE.md (invariants TASK-794) + arch Delta V1.5 (cutover) + README + registry + changelog.
+
+Próximo paso: TASK-795 (international/provider + FX) / TASK-796 (self-service UI) / TASK-797 (contractor_closure). El detail/quoting de honorarios UI queda para TASK-796+.
 
 ---
 

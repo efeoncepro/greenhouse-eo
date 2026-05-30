@@ -880,7 +880,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-791` | `to-do` | Contractor Invoice Assets + Greenhouse Uploader Contexts (EPIC-013 child 3/10) | `docs/tasks/to-do/TASK-791-contractor-invoice-assets-uploader-contexts.md` |
 | `TASK-792` | `to-do` | Contractor Work Submissions + Approval/Dispute Flow (EPIC-013 child 4/10) | `docs/tasks/to-do/TASK-792-contractor-work-submissions-approval-dispute-flow.md` |
 | `TASK-793` | `to-do` | Contractor Payables to Finance Payment Obligations Bridge (EPIC-013 child 5/10) | `docs/tasks/to-do/TASK-793-contractor-payables-finance-obligations-bridge.md` |
-| `TASK-794` | `to-do` | Chile Honorarios Compliance + SII Retention (EPIC-013 child 6/10) | `docs/tasks/to-do/TASK-794-chile-honorarios-compliance-sii-retention.md` |
+| `TASK-794` | `complete` | Chile Honorarios Compliance + SII Retention (EPIC-013 child 6/10) | `docs/tasks/complete/TASK-794-chile-honorarios-compliance-sii-retention.md` |
 | `TASK-795` | `to-do` | International Contractor + Provider Boundary + FX Policy (EPIC-013 child 7/10) | `docs/tasks/to-do/TASK-795-international-contractor-provider-boundary-fx-policy.md` |
 | `TASK-796` | `to-do` | Contractor Self-Service Hub (EPIC-013 child 8/10) | `docs/tasks/to-do/TASK-796-contractor-self-service-hub.md` |
 | `TASK-797` | `to-do` | Contractor Closure + Transition Controls (EPIC-013 child 9/10) | `docs/tasks/to-do/TASK-797-contractor-closure-transition-controls.md` |

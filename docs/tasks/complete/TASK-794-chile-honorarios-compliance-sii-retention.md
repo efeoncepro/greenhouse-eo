@@ -2,19 +2,40 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `Shipped`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `TASK-790, TASK-793`
-- Branch: `task/TASK-794-chile-honorarios-compliance`
+- Branch: `develop` (operador pidió mantenerse en develop)
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## SII Rate Verification (pre-execution, required by spec)
+
+La tasa SII de retención de honorarios sigue el schedule gradual de la **Ley 21.133** (incorporación obligatoria de trabajadores independientes a seguridad social, retención de boletas para cotizaciones previsionales):
+
+| Año emisión | Tasa | Fuente |
+|---|---|---|
+| 2024 | 13.75% | Ley 21.133 schedule |
+| 2025 | 14.5% | Ley 21.133 schedule |
+| **2026** | **15.25%** | **Ley 21.133, vigente desde 2026-01-01** |
+| 2027 | 16% | Ley 21.133 schedule |
+| 2028 | 17% | Ley 21.133 schedule |
+
+Verificado contra `SII_RETENTION_RATES` (`src/types/hr-contracts.ts:75-83`) + watchlist `greenhouse-payroll-auditor` ("official SII rate is 15.25 percent from January 1, 2026"). **El valor existente es correcto — NO se modificó.** Esta task NO toca `SII_RETENTION_RATES` ni `calculate-honorarios.ts`.
+
+## Resolución de Decisiones (pre-execution)
+
+- **Sin migración**: el schema existente (`contractor_payables.readiness_json` / `source_snapshot_json`, `contractor_engagements.classification_risk_status` + `tax_withholding_*`) soporta el alcance completo. Menor blast radius. Verificado con arch-architect (reversibilidad alta).
+- **Reuso > crear**: `resolveHonorariosWithholdingPolicy` (TASK-790) + `computeContractorWithholding` (TASK-793) + `assessPersonLegalReadiness` honorarios_closure (TASK-784) + `isClassificationRiskBlocking` (TASK-790). El módulo nuevo `chile-honorarios/` agrega solo los invariantes honorarios.
+- **RUT = blocker fail-closed** (arch L490). Dirección fuera (honorarios_closure no la requiere).
+- **Folio boleta** en `source_snapshot_json.honorariosPolicy` (where present), NO columna nueva — ContractorInvoice aggregate completo = TASK-796+.
 
 ## Summary
 
@@ -113,11 +134,11 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Chile honorarios payable computes retention from versioned SII policy.
-- [ ] AFP/salud/AFC/IUSC dependent deductions cannot appear.
-- [ ] Missing verified RUT or required boleta data blocks readiness as configured.
-- [ ] Classification risk can block payable approval.
-- [ ] Payroll honorarios legacy parity probado: consumers existentes de `calculate-honorarios.ts` verde bit-for-bit; suite `src/lib/payroll` completa sin deltas inesperados.
+- [x] Chile honorarios payable computes retention from versioned SII policy. → `computeChileHonorariosPayout` + `resolveChileHonorariosPolicy` (reusa TASK-790 policy code `cl_honorarios_<year>_<rate>` + snapshot persistido en `source_snapshot_json.honorariosPolicy`).
+- [x] AFP/salud/AFC/IUSC dependent deductions cannot appear. → guard `assertNoDependentDeductions` + `DEPENDENT_DEDUCTION_KINDS` + gate readiness `honorarios_withholding_mismatch` (recompute SII-only bloquea cualquier deducción extra).
+- [x] Missing verified RUT or required boleta data blocks readiness as configured. → gate `rut_unverified` (CL_RUT verificado vía person-legal-profile `honorarios_closure`, fail-closed) + gate existente `invoice_asset_missing` (boleta cuando `requires_invoice`).
+- [x] Classification risk can block payable approval. → gate `classification_risk_blocking` (universal) en `assessPayableReadiness` (`isClassificationRiskBlocking`).
+- [x] Payroll honorarios legacy parity probado: `calculate-honorarios.ts` y `SII_RETENTION_RATES` sin cambios (git diff vacío); suite `pnpm vitest run src/lib/payroll src/lib/contractor-engagements` verde (602 passed, 6 skipped).
 
 ## Verification
 
@@ -127,6 +148,16 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Lifecycle and folder synchronized.
-- [ ] `docs/tasks/README.md` synchronized.
-- [ ] `Handoff.md` updated.
+- [x] Lifecycle and folder synchronized (`complete`, moved to `complete/`).
+- [x] `docs/tasks/README.md` synchronized.
+- [x] `Handoff.md` updated.
+- [x] `changelog.md` entry added.
+- [x] Arch doc Delta 2026-05-30 (cutover legacy → contractor payables).
+- [x] CLAUDE.md invariants section (Chile Honorarios Compliance TASK-794).
+
+## Slices Entregados
+
+- **Slice 1** — Módulo `src/lib/contractor-engagements/chile-honorarios/` (policy + readiness + errors + barrel + 12 tests).
+- **Slice 2** — 3 gates fail-closed en `evaluatePayableReadiness` + `assessPayableReadiness` (RUT, classification, withholding-mismatch) + snapshot `honorariosPolicy` en ambos create paths. 33 tests focales.
+- **Slice 2b** — Reliability signal `hr.contractor_payable.honorarios_rut_unverified` (validado contra PG live, count=0).
+- **Slice 3** — Gate de paridad payroll legacy (suite verde, cero cambios al engine) + cutover docs.

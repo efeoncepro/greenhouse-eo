@@ -1,8 +1,36 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.4
+**Version:** 1.5
 **Created:** 2026-05-05
-**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets uploader/ledger (TASK-791) + Contractor Work Submissions (TASK-792) + **ContractorPayable + Finance bridge (TASK-793)** implemented. ContractorInvoice aggregate + self-service UI + closure remain proposals (TASK-794..798).
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets uploader/ledger (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + **Chile Honorarios Compliance + Readiness Layer (TASK-794)** implemented. ContractorInvoice aggregate + self-service UI + closure remain proposals (TASK-795..798).
+
+## Delta 2026-05-30 — TASK-794 Chile Honorarios Compliance + SII Retention shipped
+
+La capa de compliance Chile honorarios sobre Contractor Engagements + Payables está implementada. **No toca el motor de nómina legacy** (`src/lib/payroll/calculate-honorarios.ts`, `SII_RETENTION_RATES`) — cero cambio de números payroll (suite `src/lib/payroll` verde, 602 tests). **Sin migración**: el schema existente (`contractor_payables.readiness_json` / `source_snapshot_json`, `contractor_engagements.classification_risk_status` + `tax_withholding_*`) soporta todo el alcance.
+
+- **Módulo canónico** `src/lib/contractor-engagements/chile-honorarios/` — capa de compliance honorarios. NO es dueño de la tasa SII: la tasa vive en `getSiiRetentionRate` (payroll SSOT) y se expone a contractors vía `resolveHonorariosWithholdingPolicy` (TASK-790). El módulo reusa esas primitivas + agrega los invariantes honorarios.
+  - `resolveChileHonorariosPolicy({emissionYear, boletaFolio?})` → snapshot versionado (`policyCode` `cl_honorarios_<year>_<rate>` + `rateSnapshot` + `emissionYear` + `boletaFolio` where present).
+  - `computeChileHonorariosPayout({grossAmount, rateSnapshot})` → breakdown **SII-only** (`deductions: [{kind:'sii_retention', amount}]`), delega a `computeContractorWithholding` (TASK-793 SSOT) — nunca re-implementa `gross * rate`.
+  - `assertNoDependentDeductions(kinds)` + `DEPENDENT_DEDUCTION_KINDS` (afp/fonasa/isapre/afc/sis/mutual/iusc/apv/gratificacion_legal): guard canónico — el SSOT de "qué está prohibido en honorarios".
+  - `buildHonorariosPolicySnapshot(...)` → snapshot auditable persistido en `payable.source_snapshot_json.honorariosPolicy` (ambos create paths).
+  - `resolveHonorariosReadiness({profileId})` (server-only) → RUT verificado vía person-legal-profile `honorarios_closure` (CL_RUT `verified`; fail-closed; sin dirección).
+- **3 gates fail-closed nuevos** en `evaluatePayableReadiness` + `assessPayableReadiness`:
+  - `classification_risk_blocking` — **universal** (todos los lanes). Defensa payable-level que espeja el CHECK del engagement `active ⇒ classification_risk no bloqueante`: un payable creado cuando el engagement estaba clear no llega a Finance si el engagement escaló a `legal_review_required`/`blocked`.
+  - `rut_unverified` — **honorarios only**. Bloquea si el profile no tiene CL_RUT verificado.
+  - `honorarios_withholding_mismatch` — **honorarios only**. Recompute SII-only del payout y bloquea si el `withholding`/`net` persistido difiere → atrapa cualquier deducción dependiente o tasa errónea embebida.
+- **Reliability signal** `hr.contractor_payable.honorarios_rut_unverified` (kind=data_quality, moduleKey=identity, steady=0): cuenta honorarios_cl activos sin CL_RUT verificado (payable bloqueado). Análogo contractor de `identity.legal_profile.payroll_chile_blocking_finiquito`.
+- **Sin migración, sin capabilities/outbox nuevos**: reusa `finance.contractor_payable:manage` (gate de `transitionPayableToReadyForFinance`) + evento `workforce.contractor_payable.blocked v1` (ya lleva `blockerCodes`).
+
+### Cutover: payroll honorarios legacy → contractor payables
+
+Honorarios coexiste hoy en **dos canales**, ambos usando la MISMA tasa SII SSOT (`getSiiRetentionRate`):
+
+| Canal | Cómputo | Estado |
+|---|---|---|
+| **Payroll legacy** (`calculate-honorarios.ts` → `payroll_entries.siiRetentionAmount`) | retención SII en la corrida de nómina mensual | Vigente. NO se migra masivamente. Los pagos legacy no se rompen. |
+| **Contractor payable** (TASK-794, este canal) | payable con readiness fail-closed (RUT + classification + SII-only) → `payment_obligation` Finance | Canal canónico para pago flexible/honorarios gobernado hacia adelante. |
+
+**Convergencia gradual** (no big-bang): el pago flexible de honorarios fluye hacia Contractor Engagements + Payables; las entradas de payroll honorarios legacy continúan hasta una migración explícita por miembro. El cierre del honorarios es `contractor_closure` (TASK-797), **NUNCA** finiquito (`final_settlements`). Ni el canal legacy ni el contractor payable aplican jamás AFP/Fonasa/Isapre/AFC/SIS/mutual/IUSC dependiente — solo retención SII.
 
 ## Delta 2026-05-30 — TASK-793 ContractorPayable + Finance bridge shipped
 
