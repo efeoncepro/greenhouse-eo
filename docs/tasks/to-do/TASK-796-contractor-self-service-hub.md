@@ -31,6 +31,8 @@
 
 Crear la surface self-service para contractors y su companion HR/admin workbench: contractor ve engagement activo, sube invoice/boleta/evidencia, revisa approval/payment state y gestiona o enlaza perfil de pago sin duplicar `TASK-753`; HR/admin revisa cola, disputa/evidencia, timeline y paso hacia Finance sin exponer datos Finance-only al contractor.
 
+> **Alineación dimensión Entidad Contratante (2026-05-30):** la UI muestra al contractor su **entidad contratante** (`legal_entity_organization_id`, hoy `Efeonce Group SpA`) — leída del campo, NUNCA hardcodeada (Efeonce abrirá entidades por país, EEUU primero). NUNCA exponer al contractor el detalle de payee/provider ni datos Finance-only. SSOT del modelo: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30.
+
 ## Why This Task Exists
 
 Si contractors envian invoices por correo o chat, Greenhouse pierde ownership, audit, dedup, access policy y readiness. La surface debe ser portal-first, pero el perfil de pago debe reutilizar Payment Profiles Self-Service.

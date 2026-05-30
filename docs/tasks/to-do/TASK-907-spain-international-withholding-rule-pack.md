@@ -28,6 +28,10 @@ Crear el rule pack especifico para Espana dentro del motor de retenciones intern
 
 No muta a Daniela ni a ningun colaborador real sin allowlist escrita HR/Finance/Legal. El objetivo es dejar Espana lista para aprobacion auditada y calculo automatico cuando exista signoff.
 
+## Frontera con Contractor Engagements (TASK-790-798) — Entidad Contratante (2026-05-30)
+
+Single source of truth: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30. Este rule pack es el dueño del withholding **Chile→residente España** (caso Daniela). Contractor Engagements/Payables **delega** acá; el engagement directo de un contractor en España queda `manual_review_required` hasta que exista la regla España aprobada, y nunca aplica una tasa por su cuenta. La activación se condiciona a **entidad contratante = Operating Entity chilena** (hoy `Efeonce Group SpA`) × residente España. Si mañana Daniela fuese contratada por una entidad legal europea/US de Efeonce, sale del scope de este motor (otro régimen). **NUNCA hardcodear "Efeonce/Chile"**: leer `legal_entity_organization_id`.
+
 ## Why This Task Exists
 
 Espana aparece como caso operativo concreto y no debe quedar como excepcion manual por persona. La investigacion SII Europa muestra que Espana requiere tratamiento propio: el Art. 14 del convenio es rentas del trabajo dependiente, no servicios personales independientes; el Art. 12 tiene rebaja por Circular SII N°50/2018; y cualquier no retencion por Art. 7 depende de no tener PE/service PE, evidencia y clasificacion correcta del servicio.

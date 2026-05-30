@@ -20,6 +20,8 @@
 
 Agregar reliability signals, Ops Health surfacing, docs/manuales y runbooks para contractor engagements/payables: missing tax owner, FX blocked, duplicate candidates, unapproved invoices, finance bridge lag and provider reconciliation drift.
 
+> **Alineación dimensión Entidad Contratante (2026-05-30):** los signals consolidan los introducidos por las tasks previas, incluyendo los de TASK-795 (`manual_review_overdue`, `fx_unresolved_overdue`, `provider_settlement_unreconciled`) y `hr.contractor_payable.honorarios_rut_unverified` (TASK-794, ya shipped). Cuando exista multi-entidad (Efeonce US Inc), agregar un signal de "engagement con entidad contratante chilena + no-residente + sin policy de withholding (905) resuelta" para visibilizar los que quedan en manual. SSOT del modelo: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30.
+
 ## Why This Task Exists
 
 El dominio contractor cruza HR, Payroll, Finance, Identity y providers. Sin señales operativas, los bloqueos quedan como estados locales invisibles hasta que alguien no cobra o se paga duplicado.

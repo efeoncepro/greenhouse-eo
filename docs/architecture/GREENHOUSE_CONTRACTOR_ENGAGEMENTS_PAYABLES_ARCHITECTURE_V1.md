@@ -1,8 +1,35 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.5
+**Version:** 1.6
 **Created:** 2026-05-05
 **Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets uploader/ledger (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + **Chile Honorarios Compliance + Readiness Layer (TASK-794)** implemented. ContractorInvoice aggregate + self-service UI + closure remain proposals (TASK-795..798).
+
+## Delta 2026-05-30 — Modelo dimensional canónico del Contractor (entidad contratante + frontera tributaria)
+
+> Design note (NO cambia código ni el modelo de payroll — lo robustece y le da single source of truth a TASK-795/796/797/798/905/906/907). Origen: diseño pre-ejecución de TASK-795 con `arch-architect` + `greenhouse-payroll-auditor`.
+
+Un Contractor se describe por **6 dimensiones ortogonales** que NUNCA se colapsan en un solo enum. Verificadas en el modelo TASK-790:
+
+| # | Dimensión | Campo canónico | Valores hoy |
+|---|---|---|---|
+| 1 | Persona que trabaja | `contractor_engagements.profile_id` | Persona / Colaborador (`identity_profiles`) |
+| 2 | **Entidad contratante / legal** (raíz) | `contractor_engagements.legal_entity_organization_id` (NOT NULL) | **Efeonce Group SpA** (Operating Entity, `organizations.is_operating_entity=TRUE`) |
+| 3 | Canal de pago | `payroll_via` (enum propio) | `internal` (directo) / `deel` / `remote` / `oyster` / `manual_provider` / `direct_international` |
+| 4 | Tax / compliance owner | `tax_compliance_owner` | `greenhouse_policy` / `provider_owned` / `manual_review_required` / `country_engine_owned` |
+| 5 | Payee de la obligación | `contractor_payables.beneficiary_*` | persona (directo) / provider (EOR) |
+| 6 | Sujeto de atribución de costo | la persona del engagement | **SIEMPRE la persona** |
+
+**Invariantes canónicos (robustecimiento, no cambio):**
+
+- **La entidad contratante (dim 2) es la dimensión raíz.** El payee (dim 5) y el tax owner (dim 4) son **consecuencias** de ella, no dimensiones independientes. Reusa la **Operating Entity canónica** (`is_operating_entity=TRUE`) — extender, no parallelizar.
+- **El contractor (la persona) NUNCA es un `greenhouse_core.providers`.** Solo la plataforma/EOR (Deel/Remote/Oyster) es un Provider comercial (payee de facturas EOR/fee). El catálogo TASK-701 ya contempla `provider_type='payroll_processor'/'payment_platform'`.
+- **Payee ≠ atribución de costo.** En EOR el banco paga a Deel (provider), pero el costo laboral se atribuye SIEMPRE a la persona (member loaded cost / client economics).
+- **La entidad contratante × país del contractor determina el régimen tributario:**
+  - Efeonce SpA (Chile) × honorario CL residente → retención SII (TASK-794) ✅
+  - Efeonce SpA (Chile) × no-residente → Chile→no-residente LIR Art. 59/74 → **TASK-905/906/907** (`international_internal`)
+  - Deel (EOR) × worker en su país → payroll/tax local del provider → `provider_owned`
+- **Frontera dura Contractor Payables ↔ Withholding Engine:** este dominio (790-798) **NUNCA computa retención Chile→no-residente** (treaty rates, certificados de residencia). Eso es el régimen `international_internal` + TASK-905/906/907. Un engagement directo internacional queda `manual_review_required`/`country_engine_owned` y **escala** al motor de withholding; nunca aplica una tasa por su cuenta.
+- **Roadmap multi-entidad (operador 2026-05-30):** HOY la única entidad contratante es `Efeonce Group SpA` (Santiago, Chile). Efeonce abrirá entidades legales en varios países (**EEUU primero** → `Efeonce US Inc`). Cada una será **una fila nueva en `organizations`** (`is_operating_entity=TRUE`, country distinto), un valor nuevo de `legal_entity_organization_id`, **sin rediseño del engagement** — pero cambia el régimen (un US contractor bajo `Efeonce US Inc` = US doméstico, no retención chilena). Eso es una **task futura multi-entidad/multi-jurisdicción**. **Regla dura: leer la entidad contratante del campo `legal_entity_organization_id`; NUNCA hardcodear "Efeonce/Chile" en código.** El modelo de "operating entity única" actual deberá volverse multi-entidad cuando abra EEUU (consideración futura, fuera de 790-798/905).
 
 ## Delta 2026-05-30 — TASK-794 Chile Honorarios Compliance + SII Retention shipped
 

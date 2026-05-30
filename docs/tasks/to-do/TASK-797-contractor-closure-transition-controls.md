@@ -20,6 +20,8 @@
 
 Implementar cierre contractor como lifecycle propio: no finiquito, no payroll dependent, con checks de invoices/submissions pendientes, provider termination refs, access handoff, assets/documentos y pagos futuros.
 
+> **Alineación dimensión Entidad Contratante (2026-05-30):** el cierre depende de la **entidad contratante** (`legal_entity_organization_id`): cierre de honorario CL (Efeonce SpA) ≠ cierre de provider/EOR (termination ref del provider). NUNCA es finiquito (`final_settlements`), regardless de la entidad. La provider termination ref solo aplica al carril EOR/provider (minoría). SSOT del modelo: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30.
+
 ## Why This Task Exists
 
 Terminar una relacion contractor no debe disparar finiquito laboral. Pero tampoco puede ser solo desactivar usuario: quedan invoices, work submissions, provider refs, documentos, access handoff y payment obligations pendientes.
