@@ -90,6 +90,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // TASK-727 — Supervisor scope canonical (derivado de reporting_lines/operational_responsibilities,
   // inyectado en el JWT por auth.ts). Reemplaza la heurística previa basada en `dashboardHref`.
   const supervisorAccess = session?.user?.supervisorAccess ?? null
+  // TASK-796 — dynamic /my/contractor visibility: only when the member has a live engagement.
+  const hasActiveContractorEngagement = session?.user?.hasActiveContractorEngagement ?? false
 
   const canSupervise =
     Boolean(session?.user?.memberId) && supervisorAccess?.canAccessSupervisorLeave === true
@@ -259,11 +261,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_HR_NAV.team), href: '/hr/team' },
               { label: nl(GH_HR_NAV.approvals), href: '/hr/approvals' },
               { label: nl(GH_HR_NAV.departments), href: '/hr/departments' },
+              { label: nl(GH_HR_NAV.contractors), href: '/hr/contractors' },
               { label: nl(GH_HR_NAV.offboarding), href: '/hr/offboarding' }
             ].filter(item => {
               if (item.href === '/hr/team') return canSeeHrTeamWorkspace
               if (item.href === '/hr/approvals') return canSeeHrTeamWorkspace
               if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
+              if (item.href === '/hr/contractors') return canSeeView('equipo.contratistas', true)
               if (item.href === '/hr/offboarding') return canSeeView('equipo.offboarding', true)
 
               return true
@@ -577,6 +581,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.delivery), href: '/my/delivery', icon: 'tabler-list-check' },
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
+          { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
           { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
           { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
@@ -588,6 +593,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/delivery') return canSeeView('mi_ficha.mi_delivery', true)
           if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
+          // TASK-796 — dynamic: only show when the member has a live contractor engagement.
+          if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
           if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
           if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
@@ -700,6 +707,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.delivery), href: '/my/delivery', icon: 'tabler-list-check' },
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
+          { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
           { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
           { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
@@ -711,6 +719,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/delivery') return canSeeView('mi_ficha.mi_delivery', true)
           if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
+          // TASK-796 — dynamic: only show when the member has a live contractor engagement.
+          if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
           if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
           if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)

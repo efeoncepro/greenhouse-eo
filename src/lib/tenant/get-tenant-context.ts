@@ -44,6 +44,9 @@ export interface TenantContext {
 
   // Supervisor scope (TASK-727): JWT-safe summary of supervisor authority for menu/UI gating.
   supervisorAccess?: SupervisorAccessSummary | null
+
+  // Contractor self-service flag (TASK-796): drives dynamic /my/contractor menu visibility.
+  hasActiveContractorEngagement?: boolean
 }
 
 export const getTenantContext = async (): Promise<TenantContext | null> => {
@@ -95,6 +98,7 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
     ...(session.user.identityProfileId ? { identityProfileId: session.user.identityProfileId } : {}),
 
     // Supervisor scope (TASK-727): pasamos el summary tal como viene del JWT.
-    supervisorAccess: session.user.supervisorAccess ?? null
+    supervisorAccess: session.user.supervisorAccess ?? null,
+    hasActiveContractorEngagement: session.user.hasActiveContractorEngagement ?? false
   }
 }

@@ -210,6 +210,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
+    viewCode: 'equipo.contratistas',
+    section: 'equipo',
+    label: 'Contratistas',
+    description: 'Workbench HR de engagements contractor: envíos, revisión y paso a Finance.',
+    routePath: '/hr/contractors',
+    routeGroup: 'hr'
+  },
+  {
     viewCode: 'equipo.workforce_activation',
     section: 'equipo',
     label: 'Workforce Activation',
@@ -569,6 +577,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Mi Nómina',
     description: 'Liquidaciones y compensación personal.',
     routePath: '/my/payroll',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mi_contratacion',
+    section: 'mi_ficha',
+    label: 'Mis Servicios Contractor',
+    description: 'Soporte, revisión y estado de pago de tus servicios contractor.',
+    routePath: '/my/contractor',
     routeGroup: 'my'
   },
   {
