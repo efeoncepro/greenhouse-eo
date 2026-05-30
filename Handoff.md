@@ -1,3 +1,19 @@
+# Sesion 2026-05-30 — TASK-953 Greenhouse Visual Capture Evidence Hardening — 🆕 TASK CREADA
+
+Pedido: crear una task para robustecer GVC más allá de scroll/full-page: readiness, assertions ligeros, quality guards, reportes, multi-viewport, health taxonomy y baseline mockup→runtime.
+
+Resultado:
+- Nueva task: `docs/tasks/to-do/TASK-953-greenhouse-visual-capture-evidence-hardening.md`.
+- Tipo `implementation`, P2 / Alto / Alto, domain `ui|platform|ops`.
+- Scope: page readiness contract, lightweight assertions, frame quality guards, multi-viewport, HTML report/dossier V2, baseline/mockup→runtime contract y health V2.
+- Registro actualizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+- `docs/tasks/README.md` actualizado con `TASK-953` y siguiente ID disponible `TASK-954`.
+
+Validacion:
+- `pnpm task:lint --task TASK-953` -> 0 errors / 0 warnings.
+
+---
+
 # Sesion 2026-05-30 — TASK-796 mockups + fe:capture scroll robusto — ✅ VALIDADO LOCAL
 
 Pedido: crear mockups contractor/admin para `TASK-796` dentro del programa `TASK-789..798`, validar visualmente con `pnpm fe:capture`, y robustecer el helper para capturar pantallas con scroll de forma escalable/resiliente para agentes futuros.
