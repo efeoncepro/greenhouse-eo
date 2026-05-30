@@ -1,8 +1,16 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.9
+**Version:** 1.10
 **Created:** 2026-05-05
-**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + **Employee→Contractor connected command (TASK-956)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955), contractor closure (TASK-797) and ops control plane (TASK-798) remain proposals.
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + Employee→Contractor connected command (TASK-956) + **Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification (TASK-957)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955), contractor closure (TASK-797) and ops control plane (TASK-798) remain proposals.
+
+## Delta 2026-05-30 — TASK-957 Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification
+
+Cierra la open question de TASK-956 con veredicto 3-skill (finance + payroll + arch). Una persona podía cobrar por **dos rieles** sin exclusión mutua: nómina legacy honorarios (motor rutea por `compensation_versions.contract_type='honorarios'` → retención SII) + contractor payable (TASK-794, misma retención). Ambos corriendo → **doble-pago + doble declaración F29** (Efeonce remesa doble al SII + doble crédito tributario). SSOT canónico: **existencia de `ContractorEngagement` activo, NO `member.contract_type`**.
+
+- **Slice A** — gate `src/lib/payroll/contractor-exclusion/` (espejo exit-eligibility): excluye del roster legacy a quien tiene engagement engaged (active/paused/ending), flag `PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED` default OFF (parity bit-for-bit), keyed por engagement (NO `contract_type` → contractors Deel legacy sin engagement intactos). Señal `payroll.contractor.double_rail_overlap` (moduleKey payroll, error si count>0, corre regardless del flag). Hallazgo live: Valentina tenía comp version v2 sin cerrar (`effective_to=NULL`) pese a offboarding executed → remediado vía `scripts/payroll/close-contractor-orphan-comp-version-task957.ts` → señal steady=0.
+- **Slice B** — `member.contract_type` NO se muta (es tipo de contrato de EMPLEO, historia cuando termina; `'honorarios'` rutearía al riel SII legacy; nuevo enum = SSOT competidor + extiende taxonomía gobernada + rompe boundary). Resolver canónico `resolveCurrentWorkClassification` (`src/lib/account-360/`) lee la relación/engagement activa → clasificación vigente. Person 360 (`PersonProfileTab`) muestra "Estado vigente" (Contractor · Honorarios) + "Contrato de empleo" (historia). Fix latente: `toDateStr` robusto a Date (getPersonHrContext lanzaba para cualquier hire_date no-null).
+- Gates: no-regresión (payroll+offboarding+contractor) 673 · `pnpm test` 5637/0 · `pnpm build` ✓ · GVC Person 360 Valentina mostrando "Estado vigente: Contractor · Honorarios". Audit: 0 callsites legacy filtran empleados activos por contract_type+active.
 
 ## Delta 2026-05-30 — TASK-956 Employee→Contractor connected command (entry point cableado)
 
