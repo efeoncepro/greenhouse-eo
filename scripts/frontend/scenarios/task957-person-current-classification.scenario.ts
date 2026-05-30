@@ -13,7 +13,7 @@ export const scenario: CaptureScenario = {
   initialHoldMs: 9000,
   finalHoldMs: 600,
   steps: [
-    { kind: 'wait', selector: 'h4', timeout: 12000 },
+    { kind: 'wait', selector: 'text=Datos laborales', timeout: 14000 },
     { kind: 'mark', label: 'top' },
     { kind: 'scroll', scrollTo: 'bottom' },
     { kind: 'sleep', ms: 1500 },
