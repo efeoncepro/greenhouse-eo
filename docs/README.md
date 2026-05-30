@@ -60,17 +60,20 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md](architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md)
 - [GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md](architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md)
 - [GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md](architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md)
+- [GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md)
 - [12-testing-development.md](architecture/12-testing-development.md)
 
 ### Documentation
 
 - [Portal Functional Documentation](documentation/README.md)
+- [Greenhouse Visual Capture](documentation/plataforma/captura-visual.md)
 - [Sistema de Observabilidad de Tests](documentation/plataforma/sistema-observabilidad-de-tests.md)
 - [Sister Platform Bindings](documentation/plataforma/sister-platform-bindings.md)
 
 ### Manual de uso
 
 - [Manual de Uso](manual-de-uso/README.md)
+- [Greenhouse Visual Capture](manual-de-uso/plataforma/captura-visual-playwright.md)
 - [Sugerencias asistidas de conciliacion](manual-de-uso/finance/sugerencias-asistidas-conciliacion.md)
 - [Finance Movement Feed](documentation/finance/finance-movement-feed.md)
 

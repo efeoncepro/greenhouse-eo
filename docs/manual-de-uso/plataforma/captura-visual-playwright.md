@@ -1,15 +1,15 @@
-# Capturar visuales + microinteractions con Playwright
+# Greenhouse Visual Capture — Capturar visuales + microinteractions
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-12
 > **Modulo:** Plataforma (frontend tooling)
 > **Ruta en portal:** Transversal (uso desde CLI local o CI)
-> **Documentacion relacionada:** [scripts/frontend/README.md](../../../scripts/frontend/README.md) · [Agent Auth canónico](../../../CLAUDE.md#agent-auth-acceso-headless-para-agentes-y-e2e)
+> **Documentacion relacionada:** [Arquitectura Greenhouse Visual Capture](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md) · [scripts/frontend/README.md](../../../scripts/frontend/README.md) · [Agent Auth canónico](../../../CLAUDE.md#agent-auth-acceso-headless-para-agentes-y-e2e)
 
 ## Para que sirve
 
-Esta guía explica cómo usar el helper canónico `pnpm fe:capture` para grabar una sesión Playwright contra una ruta del portal y obtener:
+Esta guía explica cómo usar **Greenhouse Visual Capture** (`GVC`), la herramienta canónica cuyo comando principal es `pnpm fe:capture`, para grabar una sesión Playwright contra una ruta del portal y obtener:
 
 - `recording.webm` — video continuo del lifecycle
 - `frames/NN-<label>.png` — stills PNG sync en momentos clave (marker-based)
@@ -19,6 +19,7 @@ Esta guía explica cómo usar el helper canónico `pnpm fe:capture` para grabar 
 Casos de uso:
 
 - Validar microinteractions (hover, click, transitions) que no se ven en captura estática
+- Capturar pantallas largas completas o secciones específicas luego de hacer scroll
 - Documentar visualmente un cambio de UI para PR review
 - Capturar evidencia para auditorías de QA / accesibilidad
 - Reproducir bugs visuales con artifacts adjuntables
@@ -33,6 +34,8 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 |---|---|
 | Ruta simple / sanity visual | `pnpm fe:capture --route=/ruta --env=staging --hold=3000` |
 | Flujo repetible o microinteraction | `pnpm fe:capture <scenario> --env=staging` |
+| Pantalla larga completa | Scenario con `{ kind: 'mark', label: 'full-page', fullPage: true }` |
+| Sección específica tras scroll | Scenario con `scroll selector` + `mark clipSelector` |
 | Dossier para review UI/UX | `pnpm fe:capture:review <scenario-or-capture-dir> --env=staging` |
 | Before/after | `pnpm fe:capture:diff .captures/<prev> .captures/<curr>` |
 | Salud del pipeline local | `pnpm fe:capture:health` |
@@ -152,6 +155,34 @@ pnpm fe:capture mi-feature-microinteractions --env=staging
 ```
 
 Ver el DSL completo en `scripts/frontend/scenarios/_README.md`.
+
+### Caso 5.1 — Pantallas con scroll y secciones largas
+
+Para pantallas largas, evitá offsets a ojo. El DSL soporta scroll robusto por selector y captura de sección:
+
+```ts
+steps: [
+  { kind: 'wait', selector: 'h4', timeout: 5000 },
+  { kind: 'mark', label: 'first-fold' },
+  { kind: 'scroll', selector: '[data-capture="timeline"]', scrollBlock: 'center' },
+  { kind: 'mark', label: 'timeline', clipSelector: '[data-capture="timeline"]' }
+]
+```
+
+Si necesitás auditar toda la pantalla, usá `fullPage`:
+
+```ts
+{ kind: 'mark', label: 'full-page', fullPage: true }
+```
+
+Para ir al inicio o final sin calcular píxeles:
+
+```ts
+{ kind: 'scroll', scrollTo: 'top' }
+{ kind: 'scroll', scrollTo: 'bottom' }
+```
+
+Convención recomendada: agregar `data-capture="<nombre-seccion>"` en el wrapper de secciones importantes solo en mockups/scenarios o en componentes donde ese atributo no afecte producto. Esto hace que la captura sea estable ante cambios de copy, spacing o altura de contenido.
 
 ### Caso 6 — Purgar capturas viejas
 

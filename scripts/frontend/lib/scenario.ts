@@ -37,8 +37,23 @@ export interface CaptureScenarioStep {
   /** Para `press`: key sequence (e.g. 'Enter', 'Escape', 'Control+K') */
   key?: string
 
-  /** Para `scroll`: y offset en px (positivo down, negativo up) */
+  /** Para `scroll`: y offset en px (positivo down, negativo up). Con selector, se aplica como ajuste post-scrollIntoView. */
   scrollY?: number
+
+  /** Para `scroll`: destino absoluto de la pagina. Evita offsets para top/bottom. */
+  scrollTo?: 'top' | 'bottom'
+
+  /** Para `scroll` con selector: alineación vertical del elemento. Default `center`. */
+  scrollBlock?: ScrollLogicalPosition
+
+  /** Para `scroll` con selector: alineación horizontal del elemento. Default `nearest`. */
+  scrollInline?: ScrollLogicalPosition
+
+  /** Para `mark`: captura toda la página, incluyendo contenido fuera del viewport. */
+  fullPage?: boolean
+
+  /** Para `mark`: captura solo un elemento/section después de esperar que exista. */
+  clipSelector?: string
 
   /** Comentario opcional, va a manifest.json */
   note?: string
@@ -78,10 +93,19 @@ export interface ScenarioRunContext {
   outputDir: string
   log: (msg: string) => void
   /** Llamado por step `mark` — captura sync PNG + agrega entry a manifest */
-  onMark: (label: string, note?: string) => Promise<void>
+  onMark: (
+    label: string,
+    note?: string,
+    options?: {
+      fullPage?: boolean
+      clipSelector?: string
+      timeout?: number
+    }
+  ) => Promise<void>
 }
 
 const DEFAULT_TIMEOUT = 5000
+const SCROLL_POSITIONS = new Set<ScrollLogicalPosition>(['start', 'center', 'end', 'nearest'])
 
 export const validateScenario = (s: CaptureScenario): void => {
   if (!s.name || !/^[a-z0-9-]+$/.test(s.name)) {
@@ -106,7 +130,25 @@ export const validateScenario = (s: CaptureScenario): void => {
         throw new Error(`step ${index}: label "${step.label}" duplicado`)
       }
 
+      if (step.fullPage && step.clipSelector) {
+        throw new Error(`step ${index}: mark no puede combinar fullPage con clipSelector`)
+      }
+
       usedLabels.add(step.label)
+    } else if (step.fullPage || step.clipSelector) {
+      throw new Error(`step ${index}: fullPage/clipSelector solo aplican a mark`)
+    }
+
+    if (step.scrollBlock && !SCROLL_POSITIONS.has(step.scrollBlock)) {
+      throw new Error(`step ${index}: scrollBlock inválido "${step.scrollBlock}"`)
+    }
+
+    if (step.scrollInline && !SCROLL_POSITIONS.has(step.scrollInline)) {
+      throw new Error(`step ${index}: scrollInline inválido "${step.scrollInline}"`)
+    }
+
+    if ((step.scrollBlock || step.scrollInline || step.scrollTo) && step.kind !== 'scroll') {
+      throw new Error(`step ${index}: scrollBlock/scrollInline/scrollTo solo aplican a scroll`)
     }
 
     const mutatingKinds = new Set(['fill', 'press'])
@@ -139,7 +181,11 @@ export const runStep = async (
     }
 
     case 'mark': {
-      await ctx.onMark(step.label as string, step.note)
+      await ctx.onMark(step.label as string, step.note, {
+        fullPage: step.fullPage,
+        clipSelector: step.clipSelector,
+        timeout: step.timeout
+      })
       break
     }
 
@@ -158,7 +204,33 @@ export const runStep = async (
     case 'scroll': {
       const y = step.scrollY ?? 0
 
-      await ctx.page.evaluate(offset => window.scrollBy(0, offset), y)
+      if (step.scrollTo) {
+        await ctx.page.evaluate(target => {
+          window.scrollTo({
+            top: target === 'top' ? 0 : document.documentElement.scrollHeight,
+            behavior: 'instant'
+          })
+        }, step.scrollTo)
+      } else if (step.selector) {
+        const locator = ctx.page.locator(step.selector).first()
+
+        await locator.waitFor({ state: 'attached', timeout: step.timeout ?? DEFAULT_TIMEOUT })
+        await locator.evaluate((element, options) => {
+          element.scrollIntoView({
+            block: options.block,
+            inline: options.inline,
+            behavior: 'instant'
+          })
+        }, {
+          block: step.scrollBlock ?? 'center',
+          inline: step.scrollInline ?? 'nearest'
+        })
+      }
+
+      if (y !== 0 || (!step.selector && !step.scrollTo)) {
+        await ctx.page.evaluate(offset => window.scrollBy(0, offset), y)
+      }
+
       break
     }
 

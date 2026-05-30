@@ -1,3 +1,32 @@
+# Sesion 2026-05-30 — TASK-796 mockups + fe:capture scroll robusto — ✅ VALIDADO LOCAL
+
+Pedido: crear mockups contractor/admin para `TASK-796` dentro del programa `TASK-789..798`, validar visualmente con `pnpm fe:capture`, y robustecer el helper para capturar pantallas con scroll de forma escalable/resiliente para agentes futuros.
+
+Resultado:
+- Mockups reales de portal agregados en `/my/contractor/mockup` y `/hr/contractors/mockup`, con data tipada bajo `src/views/greenhouse/contractors/mockup/*`.
+- Se corrigio bug visual en timeline admin: en MUI `width: 1` se interpretaba como `100%`; el conector ahora usa `width: '2px'`.
+- `pnpm fe:capture` ahora soporta scroll por selector, `scrollTo: 'top' | 'bottom'`, captura `mark fullPage`, captura `mark clipSelector`, y validaciones del DSL para evitar combinaciones ambiguas.
+- La herramienta queda nombrada y documentada como **Greenhouse Visual Capture** (`GVC`): CLI `pnpm fe:capture`; arquitectura `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`; manual `docs/manual-de-uso/plataforma/captura-visual-playwright.md`; documentacion funcional `docs/documentation/plataforma/captura-visual.md`; metodo UI `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`. `AGENTS.md`, `CLAUDE.md`, `project_context.md`, indices y changelog quedan sincronizados.
+- `docs/tasks/to-do/TASK-796-contractor-self-service-hub.md` queda actualizado con los mockups aprobados como contrato de implementacion: `/my/contractor/mockup` y `/hr/contractors/mockup`, sources bajo `src/views/greenhouse/contractors/mockup/*`, artifacts GVC aprobados y regla explicita de "dar vida" a esos mockups en runtime sin redisenar el flujo.
+- Nuevos scenarios repetibles:
+  - `contractor-admin-workbench`: `/hr/contractors/mockup`, selector scroll + `clipSelector`.
+  - `offboarding-fullpage-capture`: `/hr/offboarding/mockup`, `fullPage`.
+  - `sample-sprints-scroll-anchors`: `/agency/sample-sprints/mockup`, scroll top/bottom.
+
+Validacion:
+- `pnpm fe:capture contractor-admin-workbench --env=local`: OK. Artefacto final `.captures/2026-05-30T12-42-40_contractor-admin-workbench`; dossier generado con `pnpm fe:capture:review`.
+- `pnpm fe:capture offboarding-fullpage-capture --env=local`: OK. Artefacto `.captures/2026-05-30T12-43-07_offboarding-fullpage-capture`.
+- `pnpm fe:capture sample-sprints-scroll-anchors --env=local`: OK. Artefacto `.captures/2026-05-30T12-43-31_sample-sprints-scroll-anchors`.
+- `pnpm fe:capture:health`: verde, 5% failures ultimos 20; ultimo failure preexistente de `nexa-insights-list-page` el 2026-05-29.
+- `pnpm exec vitest run scripts/frontend/lib/scenario.test.ts`: 5 tests OK.
+- `pnpm exec eslint ...` focal para helper/scenarios/mockups: OK.
+- `pnpm design:lint`: 0 errors / 0 warnings.
+- `pnpm exec tsc --noEmit --pretty false` intentado previamente: bloqueado por cambios ajenos de `TASK-793` en `src/app/api/finance/contractor-payables/**` que referencian `@/lib/entitlements/subject`; sin errores observados en archivos de este scope.
+
+Nota: dev server local sigue disponible en `http://localhost:3000` para revisar las rutas.
+
+---
+
 # Sesion 2026-05-30 — TASK-952 Modern Web Guidance agent UI workflow — 🆕 TASK CREADA
 
 Pedido: crear una task para adoptar la investigacion de Chrome Modern Web Guidance como workflow operativo de agentes.

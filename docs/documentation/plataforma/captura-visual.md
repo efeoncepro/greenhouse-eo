@@ -1,15 +1,17 @@
-# Captura Visual con Playwright
+# Greenhouse Visual Capture
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-12 por Claude (round 4 deep audit / sesión de microinteractions)
-> **Ultima actualizacion:** 2026-05-12 por Claude
+> **Ultima actualizacion:** 2026-05-30 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md)
 > **Manual operativo:** [captura-visual-playwright.md](../../manual-de-uso/plataforma/captura-visual-playwright.md)
 
 ## Qué es
 
-Greenhouse incluye una herramienta para **grabar lo que pasa en una pantalla del portal** sin que tengas que abrir el browser y hacer screenshot manual. Sirve para revisar visualmente cómo se ve y cómo se comporta una ruta — incluyendo las animaciones, los hover, los cambios de estado y las transiciones.
+**Greenhouse Visual Capture** (`GVC`) es la herramienta interna para **grabar lo que pasa en una pantalla del portal** sin que tengas que abrir el browser y hacer screenshots manuales. Su comando principal es `pnpm fe:capture`.
+
+Sirve para revisar visualmente cómo se ve y cómo se comporta una ruta — incluyendo pantallas largas con scroll, animaciones, hover, cambios de estado y transiciones.
 
 La idea: en vez de que cada persona escriba código nuevo cada vez que necesita ver "¿cómo se ve esta página en staging?", hay UN comando único.
 
@@ -29,8 +31,12 @@ El orden esperado es:
 
 | Caso | Comando |
 |---|---|
-| "¿Cómo se ve esta página en staging?" | `pnpm fe:capture --route=/finance/cash-out --env=staging` |
+| "¿Cómo se ve esta página en staging?" | `pnpm fe:capture --route=/finance/cash-out --env=staging --hold=3000` |
 | "Quiero validar que la animación del filtro funciona" | `pnpm fe:capture offboarding-queue-microinteractions --env=staging` |
+| "Quiero capturar una pantalla larga completa" | scenario con `mark fullPage: true` |
+| "Quiero capturar una sección específica después de hacer scroll" | scenario con `scroll selector` + `mark clipSelector` |
+| "Quiero comparar antes/después" | `pnpm fe:capture:diff .captures/<prev> .captures/<curr>` |
+| "Quiero revisar la salud de capturas recientes" | `pnpm fe:capture:health` |
 | "Necesito un GIF para adjuntar al PR review" | mismo comando + `--gif` |
 | "Quiero ver el browser mientras corre" | mismo comando + `--headed` |
 
@@ -76,9 +82,9 @@ pnpm fe:capture --route=/hr/offboarding --env=staging --hold=3000
 
 `--hold` controla cuántos ms espera post-mount antes de la screenshot.
 
-### Nivel 2 — Scenario con interacciones
+### Nivel 2 — Scenario con interacciones o scroll estable
 
-Si necesitás validar microinteractions (hover, click, transitions), escribís un scenario:
+Si necesitás validar microinteractions, pantallas largas o secciones específicas, escribís un scenario:
 
 ```ts
 import type { CaptureScenario } from '../lib/scenario'
@@ -91,12 +97,29 @@ export const scenario: CaptureScenario = {
     { kind: 'wait', selector: 'h4', timeout: 5000 },
     { kind: 'mark', label: 'initial' },
     { kind: 'hover', selector: '[role="tab"]:nth-child(2)' },
-    { kind: 'mark', label: 'tab-hover' }
+    { kind: 'mark', label: 'tab-hover' },
+    { kind: 'scroll', selector: '[data-capture="timeline"]', scrollBlock: 'center' },
+    { kind: 'mark', label: 'timeline', clipSelector: '[data-capture="timeline"]' }
   ]
 }
 ```
 
 Y lo corrés: `pnpm fe:capture mi-feature --env=staging`.
+
+Para una pantalla completa con scroll:
+
+```ts
+{ kind: 'mark', label: 'full-page', fullPage: true }
+```
+
+Para ir al inicio o final del documento:
+
+```ts
+{ kind: 'scroll', scrollTo: 'bottom' }
+{ kind: 'scroll', scrollTo: 'top' }
+```
+
+Convención: si una sección se va a capturar más de una vez, agregar `data-capture="<nombre-seccion>"` al wrapper de esa sección. Esto es más estable que depender de texto visible, posición o cantidad de cards.
 
 ### Nivel 3 — Captura con mutaciones (escritura)
 
@@ -118,6 +141,8 @@ Esta doble confirmación previene que alguien grabe un screenshot y termine crea
 | Password / secret en el recording | CSS blur + transparent + text-shadow sobre password inputs |
 | Outputs commiteados al repo | `.captures/` está en `.gitignore` |
 | Capturas viejas acumulando GBs | `pnpm fe:capture:gc --apply` purga >30 días |
+| Scroll que cambia por copy o layout | Selectores estables + `scrollBlock` + `clipSelector` |
+| Captura incompleta de pantallas largas | `mark fullPage: true` |
 | Scenarios mutating ejecutándose sin querer | Doble flag (`mutating: true` + `safeForCapture: true`) requerido |
 | Agente reinventa la autenticación | El helper delega siempre a `scripts/playwright-auth-setup.mjs` |
 
@@ -132,14 +157,15 @@ Esta doble confirmación previene que alguien grabe un screenshot y termine crea
 
 - **Production users**: nunca tienen acceso al CLI. Es interno.
 - **Tests de CI** que necesitan assertions: para eso están los Playwright Tests bajo `tests/e2e/`. Este helper produce artifacts, no aserta nada.
-- **Visual regression diffing**: fuera de scope V1. Otra herramienta lo hará en V2.
+- **Tests visuales con assert pixel-perfect**: `GVC` produce evidencia y diff estructural; no reemplaza un visual regression gate pixel-perfect si se define uno futuro.
 
 ## Cómo extender
 
 - **Nuevo scenario**: agregar `scripts/frontend/scenarios/<name>.scenario.ts`. Ver guía completa en `scripts/frontend/scenarios/_README.md`.
-- **Nuevo tipo de step**: extender `CaptureScenarioStep` en `scripts/frontend/lib/scenario.ts` + agregar caso en `runStep`.
-- **Mobile viewport**: pasar a `--device=iPhone13` (no implementado V1; en backlog OQ-2).
-- **Visual regression**: en backlog OQ-3.
+- **Nuevo tipo de step**: extender `CaptureScenarioStep` en `scripts/frontend/lib/scenario.ts` + agregar caso en `runStep`, tests en `scripts/frontend/lib/scenario.test.ts` y ejemplo en `scripts/frontend/scenarios/_README.md`.
+- **Nuevo caso de scroll/captura larga**: primero intentar componer con `selector`, `scrollTo`, `fullPage` y `clipSelector` antes de agregar primitives nuevas.
+- **Mobile viewport**: pasar `--device="iPhone 13"` o cualquier preset Playwright.
+- **Visual diff**: usar `pnpm fe:capture:diff`; pixel-perfect sigue fuera del contrato V1.
 
 > Detalle técnico: [GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md) describe el contrato completo, los tipos del DSL, las 5 capas de defense-in-depth, y el roadmap V1.1+.
 
@@ -154,4 +180,15 @@ Esta doble confirmación previene que alguien grabe un screenshot y termine crea
 5. **UI review dossier** — `pnpm fe:capture:review <scenario>` corre la captura + genera `review-dossier.md` con la 13-row checklist canónica, listo para pegar en Claude Code con la skill `greenhouse-ui-review`.
 6. **Triple Gate completo** — capability `platform.frontend.capture_prod` declarada en `entitlements-catalog` + migration seed canónica. Production captures requieren los 3 gates (env var + flag + capability declaration).
 
-V1.2 backlog: pixel-perfect diff, PG-backed reliability signal, Anthropic SDK orchestration directa, validación PG real del actor capability.
+## V1.3 — Delta 2026-05-30
+
+Greenhouse Visual Capture agrega soporte robusto para scroll y pantallas largas:
+
+1. `scroll selector` + `scrollBlock` / `scrollInline` para llegar a secciones sin offsets frágiles.
+2. `scrollTo: 'top' | 'bottom'` para anclas de documento.
+3. `mark fullPage: true` para capturar la pantalla completa.
+4. `mark clipSelector` para capturar solo una sección.
+5. Validación del DSL para rechazar combinaciones ambiguas.
+6. Scenarios de referencia: `contractor-admin-workbench`, `offboarding-fullpage-capture` y `sample-sprints-scroll-anchors`.
+
+Backlog: pixel-perfect diff, PG-backed reliability signal, Anthropic SDK orchestration directa, validación PG real del actor capability.

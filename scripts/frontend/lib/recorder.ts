@@ -58,14 +58,21 @@ export const runScenario = async ({
   const frames: FrameRecord[] = []
   const startedAt = Date.now()
 
-  const onMark = async (label: string, note?: string): Promise<void> => {
+  const onMark: ScenarioRunContext['onMark'] = async (label, note, options): Promise<void> => {
     const tMs = Date.now() - startedAt
     const index = frames.length + 1
     const safeLabel = label.replace(/[^a-z0-9-]+/gi, '-').toLowerCase()
     const fileName = `${pad2(index)}-${safeLabel}.png`
     const absPath = join(framesDir, fileName)
 
-    await page.screenshot({ path: absPath, fullPage: false })
+    if (options?.clipSelector) {
+      const locator = page.locator(options.clipSelector).first()
+
+      await locator.waitFor({ state: 'visible', timeout: options.timeout ?? 5000 })
+      await locator.screenshot({ path: absPath })
+    } else {
+      await page.screenshot({ path: absPath, fullPage: options?.fullPage ?? false })
+    }
 
     frames.push({
       index,

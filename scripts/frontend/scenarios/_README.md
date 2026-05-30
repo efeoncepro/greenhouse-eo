@@ -1,6 +1,8 @@
-# Scenarios — DSL para captura visual
+# Scenarios — DSL de Greenhouse Visual Capture
 
 Cada archivo `<name>.scenario.ts` exporta una constante `scenario` tipada como `CaptureScenario`.
+
+Estos scenarios son el contrato repetible de **Greenhouse Visual Capture** (`GVC`, `pnpm fe:capture`). Si una verificación visual depende de interacciones, scroll, captura full-page o se va a repetir por otro agente, debe vivir aquí en vez de un script Playwright ad-hoc.
 
 ## Estructura mínima
 
@@ -30,10 +32,32 @@ export const scenario: CaptureScenario = {
 | `mark`  | Captura PNG sync + entry en manifest             | `label`, `note?`    |
 | `hover` | Mouse over selector                              | `selector`, `timeout?` |
 | `click` | Click selector. Si mutating-UI, requiere `mutating:true` + `safeForCapture:true` | `selector` |
-| `scroll`| Scroll Y offset                                  | `scrollY` (px)      |
+| `scroll`| Scroll Y offset, destino absoluto o scroll robusto hacia selector | `scrollY?`, `scrollTo?`, `selector?`, `scrollBlock?`, `scrollInline?` |
 | `fill`  | Type en input. **Requiere** `mutating:true`     | `selector`, `value` |
 | `press` | Key sequence. **Requiere** `mutating:true`      | `selector?`, `key`  |
 | `sleep` | Delay puro sin espera de selector                | `ms`                |
+
+### Capturas largas y secciones scrolleadas
+
+Para evitar offsets fragiles en pantallas con scroll, preferir `scroll` por selector y luego capturar el panel con `clipSelector`:
+
+```ts
+{ kind: 'scroll', selector: '[data-capture="timeline"]', scrollBlock: 'center' },
+{ kind: 'mark', label: 'timeline', clipSelector: '[data-capture="timeline"]' }
+```
+
+Para auditar una pantalla completa, usar `fullPage` en el mark:
+
+```ts
+{ kind: 'mark', label: 'full-page', fullPage: true }
+```
+
+Para ir al inicio o final sin depender de offsets:
+
+```ts
+{ kind: 'scroll', scrollTo: 'top' }
+{ kind: 'scroll', scrollTo: 'bottom' }
+```
 
 ## Convenciones de label
 
