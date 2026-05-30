@@ -5941,6 +5941,21 @@ export interface GreenhouseHrContractorEngagements {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHrContractorInvoiceAssets {
+  artifact_kind: string;
+  asset_id: string;
+  asset_role: string;
+  contractor_engagement_id: string;
+  contractor_invoice_id: string | null;
+  country_code: string | null;
+  created_at: Generated<Timestamp>;
+  invoice_asset_id: string;
+  metadata_json: Generated<Json>;
+  public_id: string;
+  source: string;
+  uploaded_by_user_id: string | null;
+}
+
 export interface GreenhouseHrEvalAssignments {
   assignment_id: string;
   created_at: Generated<Timestamp>;
@@ -9622,6 +9637,7 @@ export interface DB {
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
   "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
+  "greenhouse_hr.contractor_invoice_assets": GreenhouseHrContractorInvoiceAssets;
   "greenhouse_hr.eval_assignments": GreenhouseHrEvalAssignments;
   "greenhouse_hr.eval_competencies": GreenhouseHrEvalCompetencies;
   "greenhouse_hr.eval_cycles": GreenhouseHrEvalCycles;
