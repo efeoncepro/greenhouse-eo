@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-790`
-- Branch: `task/TASK-791-contractor-invoice-assets-uploader`
+- Blocked by: `TASK-790` ✅ complete
+- Branch: `develop` (operator instruction 2026-05-30: trabajar in-place en develop, no crear rama)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
