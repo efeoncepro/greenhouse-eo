@@ -1,3 +1,14 @@
+# Sesion 2026-05-30 — TASK-795 International Contractor + Provider Boundary + FX — 🚧 IN PROGRESS (Fase A V1)
+
+Rama: `develop` (operador pidió mantenerse en develop, sin branch). Scope confirmado: **Fase A V1**, Fase B (provider/EOR split) diferida (minoría; el grueso son contractors directos).
+
+Diseño pre-ejecución ya committeado en el spec (D-795-1..5 + invariantes contables + review finanzas). Fase A reusa el patrón TASK-794: cero migración, cero capability, cero código payroll. Slices:
+- Slice 1: tax-owner readiness gate (`tax_owner_review_required` fail-closed cuando `manual_review_required`/`country_engine_owned`; frontera D-795-4 escala a 905, nunca aplica tasa).
+- Slice 2: FX policy explícita (`fx_policy_unresolved` cuando cross-currency sin `fx_policy_code`).
+- Slice 3: signals `commercial.contractor_payable.{manual_review_overdue, fx_unresolved_overdue}` + docs.
+
+---
+
 # Sesion 2026-05-30 — TASK-794 Chile Honorarios Compliance + SII Retention — ✅ COMPLETE
 
 Rama: `develop` (el operador pidió mantenerse en develop, sin branch nueva). 4 commits atómicos por slice.
