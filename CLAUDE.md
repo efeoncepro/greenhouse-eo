@@ -4483,6 +4483,29 @@ El dominio Contractor Engagements (TASK-790→796 + la transición employee→co
 
 **Reliability signal**: `hr.contractor.transition_orphan` (moduleKey identity, kind drift, steady=0) — relaciones contractor activas creadas por transición sin engagement asociado. **Spec**: `docs/tasks/complete/TASK-956-employee-to-contractor-transition-connected-command.md`.
 
+### Contractor ↔ Legacy Payroll double-rail exclusion + current work classification (TASK-957, desde 2026-05-30)
+
+Una persona puede cobrar por **dos rieles de pago que no se hablan**: la nómina legacy honorarios (el motor rutea por `compensation_versions.contract_type='honorarios'` → `calculateHonorariosTotals` aplica retención SII) y el contractor payable nuevo (TASK-794, misma retención SII por el riel contractor → payable → Finance). Si ambos corren para la misma persona/período → **doble-pago + doble declaración F29 retenciones honorarios** (Efeonce remesa doble al SII + doble crédito tributario). Veredicto 3-skill (finance + payroll + arch): el **SSOT de "¿se paga por nómina interna?" es la existencia de un `ContractorEngagement` activo, NO `member.contract_type`**.
+
+**Slice A — gate de exclusión + señal (SHIPPED)**:
+- Módulo canónico `src/lib/payroll/contractor-exclusion/` (espejo de `exit-eligibility/`): `resolveContractorEngagementPayrollExclusion` / `resolveContractorExcludedMemberIds`. Post-filtro en `pgGetApplicableCompensationVersionsForPeriod` gateado por `PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED` (default OFF → parity bit-for-bit). Excluye del roster legacy a quien tiene engagement engaged (active/paused/ending). NO foldear dentro de `resolveExitEligibilityForMembers` (dimensión ortogonal).
+- Señal `payroll.contractor.double_rail_overlap` (moduleKey payroll, kind drift, severity error si count>0, steady=0): detecta engagement no-terminal + compensation_version vigente. Corre **regardless del flag** (detector temprano).
+
+**Slice B — clasificación laboral vigente (SHIPPED)**:
+- Resolver canónico `resolveCurrentWorkClassification({profileId, memberContractType?})` (`src/lib/account-360/current-work-classification.ts`): lee la relación activa (`person_legal_entity_relationships`) + `ContractorEngagement` activo → `{kind, employmentContractType, contractorSubtype, classificationRiskStatus, displayLabel, source}`. Prioriza `employee` (conservador si ambas activas). Person 360 (`PersonProfileTab`, el tab vivo) muestra "Estado vigente" desde el resolver + "Contrato de empleo" (historia).
+
+**⚠️ Reglas duras**:
+- **NUNCA** mutar `member.contract_type` para reflejar una relación contractor. Es el tipo de contrato de **EMPLEO** — queda como historia cuando el empleo termina. `'honorarios'` rutearía al riel SII legacy → doble declaración F29. Un nuevo valor de enum = SSOT competidor del `relationship_subtype` del engagement + extiende la taxonomía gobernada `payroll.contract_taxonomy.invalid_tuple_drift` (3 tuplas) + rompe el boundary payroll↔contractor. PROHIBIDO.
+- **NUNCA** branchear la clasificación laboral vigente inline en una surface. Pasa por `resolveCurrentWorkClassification`. El SSOT de estado vigente es `person_legal_entity_relationships` + `ContractorEngagement`; `member.contract_type` es derivación histórica de empleo.
+- **NUNCA** filtrar "empleados activos" por `contract_type IN ('indefinido','plazo_fijo') AND active=TRUE` (incluiría por error a un contractor ex-empleado activo). Filtrar por relación de empleo activa. (Audit 2026-05-30: 0 callsites legacy.)
+- **NUNCA** keyear el gate de exclusión por `contract_type='contractor'`. Keyea por engagement → los contractors internacionales legacy modelados como `member.contract_type='contractor'`+`payroll_via='deel'` SIN engagement (Andrés/Daniela/Melkin) NO son tocados (siguen su passthrough Deel).
+- **NUNCA** invocar `Sentry.captureException` directo. Usar `captureWithDomain(err, 'payroll' | 'identity', ...)`.
+- **SIEMPRE** que un contractor con engagement activo NO debe tener compensation_version vigente (su compensación vive en el engagement); cerrar la comp version al transicionar (canónicamente vía el `closeFuturePayrollEligibility` del offboarding o el script `scripts/payroll/close-contractor-orphan-comp-version-task957.ts`). La señal `double_rail_overlap` lo detecta.
+
+**Nota toDateStr (Slice B)**: `getPersonHrContext` lanzaba `v.slice is not a function` para cualquier miembro con `hire_date` no-null (pg devuelve DATE como objeto Date; `toDateStr` asumía string) → toda la sección HR fallaba. Fix: `toDateStr` robusto a string|Date (espejo del `toDateString` de account-360). Bug latente pre-existente surfaceado por la feature (patrón TASK-765).
+
+**Spec canónica**: `docs/tasks/complete/TASK-957-contractor-payroll-double-rail-exclusion-contract-type-reconciliation.md`. Arch: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30. Helpers: `resolveContractorExcludedMemberIds`, `resolveCurrentWorkClassification`. Señal: `payroll.contractor.double_rail_overlap`.
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).
