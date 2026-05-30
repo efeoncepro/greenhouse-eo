@@ -114,6 +114,7 @@ import { getPayrollParticipationWindowFullMonthEntryDriftSignal } from './querie
 import { getPayrollParticipationWindowProjectionDeltaAnomalySignal } from './queries/payroll-participation-window-projection-delta-anomaly'
 import { getPayrollParticipationWindowSourceDateDisagreementSignal } from './queries/payroll-participation-window-source-date-disagreement'
 import { getLeaveAccrualOvershootDriftSignal } from './queries/leave-accrual-overshoot-drift'
+import { getPayrollContractorDoubleRailOverlapSignal } from './queries/payroll-contractor-double-rail-overlap'
 import { getPayrollContractTaxonomyFallbackResolutionLegacySignal } from './queries/payroll-contract-taxonomy-fallback-resolution-legacy'
 import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/payroll-contract-taxonomy-invalid-tuple-drift'
 import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './queries/payroll-contract-taxonomy-invalid-statutory-application'
@@ -425,6 +426,7 @@ interface ReliabilityOverviewSources {
    * latest artifacts with failed validation or entries newer than artifact.
    */
   payrollComplianceExportDrift?: ReliabilitySignal | null
+  payrollContractorDoubleRailOverlap?: ReliabilitySignal | null
   finalSettlementPdfStatusDrift?: ReliabilitySignal | null
 
   /**
@@ -824,6 +826,7 @@ export const buildReliabilityOverview = (
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
     // PDF asset metadata.documentStatusAtRender). Defense-in-depth para detectar
     // regen failure o transition agregada al state machine sin pasar por el helper.
+    ...(sources.payrollContractorDoubleRailOverlap ? [sources.payrollContractorDoubleRailOverlap] : []),
     ...(sources.finalSettlementPdfStatusDrift ? [sources.finalSettlementPdfStatusDrift] : []),
     // TASK-900 Slice 6 — ICO Materializer skipped_safety signal. Roll up bajo
     // moduleKey='delivery'. Visibiliza cuando el freshness gate del materializer
@@ -1115,6 +1118,14 @@ export const getReliabilityOverview = async (
     preloadedSources.payrollComplianceExportDrift !== undefined
       ? preloadedSources.payrollComplianceExportDrift
       : await getPayrollComplianceExportDriftSignal().catch(() => null)
+
+  // TASK-957 Slice A — Contractor double-rail overlap. Corre regardless del flag
+  // PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED (detector temprano). Steady=0:
+  // un contractor con engagement no debe tener comp-version vigente.
+  const payrollContractorDoubleRailOverlap =
+    preloadedSources.payrollContractorDoubleRailOverlap !== undefined
+      ? preloadedSources.payrollContractorDoubleRailOverlap
+      : await getPayrollContractorDoubleRailOverlapSignal().catch(() => null)
 
   // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
   // Subsystem rollup `Finance Data Quality` vía moduleKey='finance' (alineado
@@ -1666,6 +1677,7 @@ export const getReliabilityOverview = async (
     domainIncidents,
     paymentOrderSettlement,
     payrollComplianceExportDrift,
+    payrollContractorDoubleRailOverlap,
     finalSettlementPdfStatusDrift,
     payrollParticipationWindow,
     leaveAccrual,

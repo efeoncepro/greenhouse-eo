@@ -59,6 +59,7 @@ import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-
 import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
 import { buildPayrollTaxTableVersion } from '@/lib/payroll/tax-table-version-format'
 import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
+import { resolveContractorExcludedMemberIds } from '@/lib/payroll/contractor-exclusion'
 import {
   resolveExitEligibilityForMembers,
   type WorkforceExitPayrollEligibilityWindow
@@ -997,12 +998,38 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (
     [periodStart, periodEnd]
   )
 
+  // TASK-957 Slice A: contractor-engagement payroll exclusion. SSOT = engagement
+  // activo (NO contract_type). Flag-gated: cuando OFF, devuelve Set vacío sin
+  // tocar la DB → `.has(...)` siempre false → parity bit-for-bit. Excluye del
+  // roster legacy a quien tiene un ContractorEngagement "engaged" (rail
+  // contractor-payable vivo) para evitar doble-pago + doble declaración F29.
+  // Degradación honesta: si el resolver falla, NO excluye a nadie (fail-open
+  // sobre el set de exclusión = comportamiento legacy) + captureWithDomain.
+  let contractorExcluded: Set<string>
+
+  try {
+    contractorExcluded = await resolveContractorExcludedMemberIds(rows.map(r => r.member_id))
+  } catch (error) {
+    captureWithDomain(error, 'payroll', {
+      extra: {
+        source: 'contractor_engagement_exclusion.integration_degraded',
+        stage: 'resolver_fetch',
+        periodStart,
+        periodEnd,
+        roster_size: rows.length
+      }
+    })
+    contractorExcluded = new Set()
+  }
+
   // Flag off → return legacy shape (no exitEligibilityWindow field attached).
   if (!exitWindowEnabled) {
-    return rows.map(row => ({
-      ...mapCompensationVersion(row),
-      hasCompensationVersion: Boolean(row.version_id)
-    }))
+    return rows
+      .filter(row => !contractorExcluded.has(row.member_id))
+      .map(row => ({
+        ...mapCompensationVersion(row),
+        hasCompensationVersion: Boolean(row.version_id)
+      }))
   }
 
   // Flag on → post-filter via canonical resolver. Defensive degradation: if
@@ -1039,6 +1066,10 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (
   const filtered: ApplicableCompensationVersionRow[] = []
 
   for (const row of rows) {
+    // TASK-957 Slice A: contractor-engagement exclusion también aplica en la
+    // rama flag-on (ortogonal a exit-eligibility). Set vacío cuando su flag OFF.
+    if (contractorExcluded.has(row.member_id)) continue
+
     const window = windows.get(row.member_id)
 
     if (!window) {
