@@ -541,6 +541,39 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     }
   }
 
+  // TASK-793 — Contractor payables (finance.* domain). read/create/manage para
+  // finance route_group ∪ FINANCE_ADMIN ∪ EFEONCE_ADMIN. El waiver del gate de
+  // payment profile queda mas restringido (admins only).
+  if (
+    hasRouteGroup(subject, 'finance') ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance')
+      ? 'route_group'
+      : 'role'
+
+    for (const action of ['read', 'create', 'manage'] as const) {
+      addEntitlement(entries, {
+        module: 'finance',
+        capability: 'finance.contractor_payable',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
+  if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.contractor_payable.waive_payment_profile',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-874 — Workforce Activation readiness.
   // Read access follows the same operator matrix as complete_intake because the
   // workspace exposes blockers without sensitive values. Override is deliberately

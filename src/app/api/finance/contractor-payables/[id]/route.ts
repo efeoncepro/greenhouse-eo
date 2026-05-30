@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 
 import { getContractorPayableById } from '@/lib/contractor-engagements/payables/store'
 import { can } from '@/lib/entitlements/runtime'
-import { getTenantEntitlementSubject } from '@/lib/entitlements/subject'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
@@ -14,9 +13,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const subject = await getTenantEntitlementSubject(tenant)
-
-  if (!can(subject, 'finance.contractor_payable', 'read', 'tenant')) {
+  if (!can(tenant, 'finance.contractor_payable', 'read', 'tenant')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
