@@ -41,6 +41,8 @@ import { getClientPortalResolverFailureRateSignal } from './queries/client-porta
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
+import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
+import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
 import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
 import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
@@ -553,6 +555,13 @@ interface ReliabilityOverviewSources {
   ledgerUnresolvedDriftItems?: ReliabilitySignal | null
 
   /**
+   * TASK-793 Slice 3 — Contractor payable → Finance bridge signals (lag +
+   * dead-letter). Single signals; degradan honestamente a null si la query falla.
+   */
+  contractorPayableReadyWithoutObligation?: ReliabilitySignal | null
+  contractorPayableBridgeDeadLetter?: ReliabilitySignal | null
+
+  /**
    * TASK-777 Slice 3 — Expense distribution management-accounting gates.
    * Protege P&L/overhead: cuenta expenses sin lane canónico y filas que el
    * pool legacy tomaría como overhead aunque son payroll provider, regulatorio
@@ -857,6 +866,11 @@ export const buildReliabilityOverview = (
     // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
     ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
     ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
+    // TASK-793 Slice 3 — contractor payable → Finance bridge (lag + dead-letter).
+    ...(sources.contractorPayableReadyWithoutObligation
+      ? [sources.contractorPayableReadyWithoutObligation]
+      : []),
+    ...(sources.contractorPayableBridgeDeadLetter ? [sources.contractorPayableBridgeDeadLetter] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
     // TASK-780 Phase 3 — Home rollout drift (PG flag vs env + opt-out rate).
@@ -1212,6 +1226,19 @@ export const getReliabilityOverview = async (
     preloadedSources.ledgerUnresolvedDriftItems !== undefined
       ? preloadedSources.ledgerUnresolvedDriftItems
       : await getLedgerUnresolvedDriftItemsSignal().catch(() => null)
+
+  // TASK-793 Slice 3 — Contractor payable → Finance bridge (lag + dead-letter).
+  // Cada reader degrada honestamente a null si su query falla — un solo signal
+  // roto NO envenena el overview entero.
+  const contractorPayableReadyWithoutObligation =
+    preloadedSources.contractorPayableReadyWithoutObligation !== undefined
+      ? preloadedSources.contractorPayableReadyWithoutObligation
+      : await getContractorPayableReadyWithoutObligationSignal().catch(() => null)
+
+  const contractorPayableBridgeDeadLetter =
+    preloadedSources.contractorPayableBridgeDeadLetter !== undefined
+      ? preloadedSources.contractorPayableBridgeDeadLetter
+      : await getContractorPayableBridgeDeadLetterSignal().catch(() => null)
 
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
@@ -1623,6 +1650,8 @@ export const getReliabilityOverview = async (
     cronStagingDrift,
     accountBalancesFxDrift,
     ledgerUnresolvedDriftItems,
+    contractorPayableReadyWithoutObligation,
+    contractorPayableBridgeDeadLetter,
     expenseDistribution,
     homeRolloutDrift,
     shortcutsInvalidPins,
