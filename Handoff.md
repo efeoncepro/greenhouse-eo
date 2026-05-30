@@ -1,3 +1,46 @@
+# Sesion 2026-05-30 — TASK-952 Modern Web Guidance agent UI workflow — 🆕 TASK CREADA
+
+Pedido: crear una task para adoptar la investigacion de Chrome Modern Web Guidance como workflow operativo de agentes.
+
+Resultado:
+- Nueva task: `docs/tasks/to-do/TASK-952-modern-web-guidance-agent-ui-workflow-adoption.md`.
+- Tipo `policy`, P2 / Medio / Bajo, domain `ui|platform|ops|documentation`.
+- Scope: fuente canonica breve, sync de `AGENTS.md`/`project_context.md`/skills UI, comandos con `DISABLE_TELEMETRY=1 gtimeout 60s`, y guardrail SDD para no convertir recomendaciones externas en lint rules por reflejo.
+- Registro actualizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+- `docs/tasks/README.md` actualizado con `TASK-952` y siguiente ID disponible `TASK-953`.
+
+Validacion:
+- `pnpm task:lint --task TASK-952` -> 0 errors / 0 warnings.
+- `pnpm docs:context-check` -> 0 errors; warnings esperados por tamano historico de `Handoff.md`.
+- `git diff --check` -> OK.
+
+Nota multi-agente: no se tocaron cambios ajenos como `src/lib/sync/event-catalog.ts` ni el rename de `TASK-792`; quedan fuera de este scope.
+
+---
+
+# Sesion 2026-05-30 — Programa Mercado Publico / Compra Agil tasks architecture pass — ✅ BACKLOG AJUSTADO
+
+Pedido: revisar las tasks del programa de Compra Agil y licitaciones con criterio de arquitectura/commercial y ajustarlas si era necesario.
+
+Resultado: backlog ajustado sin tocar runtime ni migraciones. Se uso `software-architect-2026`; no existe skill local separada llamada `commercial`, asi que el pase commercial se hizo con `greenhouse-agent` + arquitectura `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1` / `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1`.
+
+Cambios clave:
+- `TASK-678` sube a P1 y queda `Type: policy`: ya no es "watch"; es gate de contrato para API Compra Agil v2 live + COT mensual historico/backfill/fallback + OC post-award + adjuntos metadata-only.
+- `TASK-677` ahora depende de `TASK-678` y no puede modelar COT mensual como source live.
+- `TASK-675` y `TASK-676` dependen tambien de `TASK-680` para no duplicar mappings de codigos/procedimientos.
+- `TASK-679`, `TASK-682`, `TASK-683` y `TASK-687` quedan alineadas a Compra Agil API v2, freshness/source status y documentos metadata-only.
+- `RESEARCH-007` sube a v0.6 y reordena cuts: Compra Agil live pasa a Data Foundation; companion extension queda solo despues de control room/compliance.
+- `EPIC-016` y `docs/tasks/README.md` quedan sincronizados con la secuencia ajustada.
+
+Validacion:
+- `pnpm task:lint --task TASK-675/676/677/678/679/682/683/687` -> 0 errors / 0 warnings.
+- `pnpm docs:context-check` -> 0 errors; warnings esperados por tamano historico de `Handoff.md`.
+- `git diff --check` -> OK.
+
+Nota multi-agente: existe un rename ajeno `docs/tasks/to-do/TASK-792... -> docs/tasks/in-progress/TASK-792...`; no fue tocado por este pase.
+
+---
+
 # Sesion 2026-05-30 — Mercado Publico Compra Agil v2 Beta API — ✅ INVESTIGACION VALIDADA
 
 Pedido: confirmar si la llave/ticket existente de Mercado Publico sirve para la API nueva de Compra Agil.

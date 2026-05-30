@@ -1,7 +1,7 @@
 # RESEARCH-007 — Commercial Public Tenders Module
 
 > **Tipo de documento:** Research brief (modulo naciente)
-> **Version:** 0.5
+> **Version:** 0.6
 > **Creado:** 2026-04-26 por Julio + Codex
 > **Status:** Active
 > **Alcance:** Dominio Commercial / Comercial, licitaciones publicas ChileCompra, Mercado Publico API, adjuntos de licitacion, opportunity-to-bid, bid desk interno
@@ -22,6 +22,8 @@ El objetivo no es solo listar licitaciones de Mercado Publico. El objetivo es co
 Este brief nace despues de validar acceso real a la API de Mercado Publico y comprobar que los adjuntos de una licitacion se pueden recuperar desde la ficha publica usando el flujo WebForms de MercadoPublico.cl.
 
 > **Delta 2026-04-26:** `TASK-673` implemento un POC standalone de matcher comercial en `scripts/research/mercadopublico-poc/`. Hallazgos iniciales: el listado `estado=activas` trae solo campos resumidos; `Descripcion` e `Items` requieren llamada por `codigo`; las senales no canonicas como medios/PR/influencers deben vivir separadas de `servicios_matched`. Resultados en `docs/research/TASK-673-findings.md`.
+
+> **Delta 2026-05-30:** revision arquitectonica del programa despues de validar Compra Agil API v2 Beta. `TASK-678` pasa a ser P1/policy gate para congelar convivencia API v2 live + COT mensual historico/fallback + OC post-award; `TASK-677` queda explicitamente historico/backfill/benchmark/fallback; `TASK-675/676/682/683/687` quedan ajustadas para depender del registry/freeze correcto antes de implementar runtime.
 
 ## Contexto Confirmado
 
@@ -2104,18 +2106,19 @@ Sinergias esperadas:
 
 ### Implementation Cuts Recomendados
 
-#### Cut 0 — Research Hardening / Watch
+#### Cut 0 — Architecture + Source Contract Freeze
 
-- Monitorear publicacion API Beta Compra Agil en mayo 2026.
-- Validar si Beta incluye oportunidades abiertas, adjuntos y autenticacion por ticket.
+- Cerrar `TASK-674` con arquitectura canonica `public_procurement_opportunity`.
+- Ejecutar `TASK-678` como freeze de contrato Compra Agil v2: API live oficial, COT mensual historico/backfill/benchmark/fallback, OC como cierre/post-award y adjuntos API v2 metadata-only.
 - Cerrar rubros/keywords/organismos objetivo Efeonce.
 
 #### Cut 1 — Data Foundation
 
 - Crear tablas `public_procurement_*`.
 - Ingerir licitaciones activas + detalle.
+- Ingerir Compra Agil API v2 como radar live/near-real-time si `TASK-678` confirma el adapter productivo.
 - Ingerir OC diaria.
-- Ingerir `COT_YYYY-MM.zip` historico mensual.
+- Ingerir `COT_YYYY-MM.zip` historico mensual como backfill/benchmark/fallback.
 - Exponer CLI/job dry-run con metrics.
 
 #### Cut 2 — Matching + Review Queue
@@ -2136,10 +2139,10 @@ Sinergias esperadas:
 - Owner, approvals, Teams alerts.
 - Bridge a deal/quote draft.
 
-#### Cut 5 — Compra Agil Live / Extension
+#### Cut 5 — Assisted Submission / Extension
 
-- Integrar API Beta si cumple contrato.
-- Evaluar companion extension solo si hay necesidad y compliance claro.
+- Evaluar companion extension solo si hay necesidad, compliance claro y control room ya operativo.
+- Mantener cualquier accion browser-mediated fuera del contrato core de datos.
 
 ## Ready For Task
 
@@ -2167,10 +2170,10 @@ Este research puede convertirse en tasks cuando se cierren estas decisiones:
   - Implementa ingestion `licitaciones.json`, detail hydration por `codigo`, retries, watermarks and source sync runs.
 - `TASK-676` — Mercado Publico OC reconciliation foundation.
   - Ingiere `ordenesdecompra.json`, detecta `Tipo=AG`, parsea `CodigoCotizacion` cuando exista y reconcilia adjudicaciones/OC con oportunidades.
+- `TASK-678` — Compra Agil v2 Beta API adapter spike.
+  - Actualizado 2026-05-30: API v2 Beta publicada y autenticacion validada con el ticket canonico; debe cerrar decision live source + COT historico/fallback + OC reconciliation antes de modelar Compra Agil productiva.
 - `TASK-677` — Compra Agil monthly COT ingestion foundation.
-  - Descarga `COT_YYYY-MM.zip`, procesa CSV en streaming, normaliza encoding/separador, dedupe por `CodigoCotizacion` y persiste respuestas por proveedor.
-- `TASK-678` — Compra Agil Beta API watch + adapter spike.
-  - Actualizado 2026-05-30: API v2 Beta publicada y autenticacion validada con el ticket canonico; debe pivotear de watch a adapter spike/productization plan.
+  - Descarga `COT_YYYY-MM.zip`, procesa CSV en streaming, normaliza encoding/separador, dedupe por `CodigoCotizacion` y persiste respuestas por proveedor como historico/backfill/benchmark/fallback, sin reemplazar campos live de API v2.
 - `TASK-679` — Mercado Publico document ingestion + private assets.
   - Implementa discovery/download de adjuntos de licitaciones, storage privado, checksums, DLQ, parser canaries and source sync runs.
 - `TASK-680` — Mercado Publico procedure taxonomy registry.
@@ -2197,6 +2200,8 @@ Este research puede convertirse en tasks cuando se cierren estas decisiones:
 ## Fuentes
 
 - ChileCompra — API Mercado Publico: https://www.chilecompra.cl/api/
+- ChileCompra — noticia API Compra Agil v2 Beta, 2026-05-25: https://www.chilecompra.cl/2026/05/nueva-api-de-compra-agil-mejora-el-acceso-y-analisis-de-datos-de-compras-publicas/
+- ChileCompra — guia API Compra Agil PDF v3.0 mayo 2026: https://www.chilecompra.cl/wp-content/uploads/2026/05/Documentacion_API_Compra_Agil-2-1.pdf
 - Mercado Publico API condiciones de uso: https://api.mercadopublico.cl/modules/CondicionesUso.aspx
 - Diccionario API Licitaciones: https://api.mercadopublico.cl/documentos/Documentaci%C3%B3n%20API%20Mercado%20Publico%20-%20Licitaciones.pdf
 - Ficha publica MercadoPublico.cl validada por smoke: `DetailsAcquisition.aspx?idlicitacion=<codigo>`

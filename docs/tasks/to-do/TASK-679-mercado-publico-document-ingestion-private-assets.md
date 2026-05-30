@@ -11,7 +11,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-674`, `TASK-675`
+- Blocked by: `TASK-674`, `TASK-675`, `TASK-678`
 - Branch: `task/TASK-679-mercado-publico-documents-assets`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -61,6 +61,7 @@ Reglas obligatorias:
 
 - `TASK-674`
 - `TASK-675`
+- `TASK-678`
 - `src/lib/integrations/mercado-publico/tenders.ts`
 
 ### Blocks / Impacts
@@ -100,7 +101,7 @@ Reglas obligatorias:
 
 - Crear tabla de documentos/versiones segun contrato de `TASK-674`.
 - Persistir filename, content type, size, hash, source reference y download status.
-- Soportar filas metadata-only para Compra Agil v2 con `source_document_id`, `filename`, `source_surface='mercado_publico_compra_agil_v2'` y estado `discovered`.
+- Soportar filas metadata-only para Compra Agil v2 con `source_document_id`, `filename`, `source_surface='mercado_publico_compra_agil_v2'` y estado `discovered`/`blocked` hasta que exista descarga autorizada.
 
 ### Slice 2 — Asset Storage
 

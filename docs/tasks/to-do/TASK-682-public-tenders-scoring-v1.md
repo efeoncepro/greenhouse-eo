@@ -11,14 +11,14 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-675`, `TASK-677`, `TASK-680`
+- Blocked by: `TASK-675`, `TASK-678`, `TASK-680`
 - Branch: `task/TASK-682-public-tenders-scoring-v1`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
 ## Summary
 
-Implementa scoring deterministico y explicable para oportunidades publicas usando nombre, descripcion, items, comprador, fechas, documentos y catalogo Greenhouse. El resultado debe priorizar oportunidades accionables sin inventar metricas inline ni depender de un LLM como fuente primaria.
+Implementa scoring deterministico y explicable para oportunidades publicas usando nombre, descripcion, items, comprador, fechas, documentos y catalogo Greenhouse. Debe cubrir licitaciones clasicas y Compra Agil live desde API v2; COT mensual queda como historico/benchmark/fallback. El resultado debe priorizar oportunidades accionables sin inventar metricas inline ni depender de un LLM como fuente primaria.
 
 ## Why This Task Exists
 
@@ -55,8 +55,9 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-675`
-- `TASK-677`
+- `TASK-678`
 - `TASK-680`
+- `TASK-677` como dataset historico/benchmark cuando este disponible.
 - Catalogos comerciales existentes bajo `src/lib/commercial/`.
 
 ### Blocks / Impacts

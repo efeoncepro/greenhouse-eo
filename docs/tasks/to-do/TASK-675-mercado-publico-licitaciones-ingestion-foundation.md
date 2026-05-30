@@ -11,7 +11,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-674`
+- Blocked by: `TASK-674`, `TASK-680`
 - Branch: `task/TASK-675-mercado-publico-licitaciones-ingestion`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -26,7 +26,7 @@ El POC demostro que la API oficial permite listar e hidratar licitaciones, pero 
 
 ## Goal
 
-- Crear DDL y repositorios Kysely para oportunidades e items de licitaciones.
+- Crear DDL y repositorios Kysely para oportunidades e items de licitaciones clasicas dentro del agregado amplio `public_procurement_opportunity`.
 - Implementar sync incremental/replay desde `licitaciones.json`.
 - Emitir eventos y observabilidad compatible con `source_sync_runs` y `source_sync_watermarks`.
 
@@ -60,6 +60,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-674`
+- `TASK-680`
 - `src/lib/integrations/mercado-publico/tenders.ts`
 - `greenhouse_sync.source_sync_runs` y `greenhouse_sync.source_sync_watermarks` en `docs/architecture/schema-snapshot-baseline.sql`
 
@@ -96,7 +97,7 @@ Reglas obligatorias:
 
 ### Slice 1 — DDL Foundation
 
-- Crear tablas target definidas por `TASK-674` para oportunidades e items de licitaciones.
+- Crear tablas target definidas por `TASK-674` para oportunidades e items de licitaciones, reutilizando el registry de `TASK-680` para mapear codigos externos y degradar codigos desconocidos.
 - Incluir unique constraints por `space_id + source_system + external_code`.
 - Incluir raw payload JSONB acotado, timestamps, estado externo y lifecycle interno.
 
@@ -115,7 +116,7 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Adjuntos.
-- Compra Agil COT.
+- Compra Agil COT o API v2.
 - Scoring.
 - UI.
 - Postulacion.

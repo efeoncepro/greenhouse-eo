@@ -11,14 +11,14 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-675`, `TASK-682`
+- Blocked by: `TASK-675`, `TASK-678`, `TASK-682`
 - Branch: `task/TASK-683-public-tenders-workbench`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
 ## Summary
 
-Crea la primera experiencia visible de `Commercial / Licitaciones Publicas`: listado priorizado, filtros, detalle de oportunidad, items, comprador, fechas, score, documentos disponibles y estado interno. Debe ser una herramienta operativa, no una landing page.
+Crea la primera experiencia visible de `Commercial / Licitaciones Publicas`: listado priorizado, filtros, detalle de oportunidad, items, comprador, fechas, score, documentos disponibles y estado interno. Debe soportar licitaciones clasicas y Compra Agil RFQ-like sin prometer que toda oportunidad tiene binarios descargables. Debe ser una herramienta operativa, no una landing page.
 
 ## Why This Task Exists
 
@@ -56,6 +56,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-675`
+- `TASK-678`
 - `TASK-682`
 - `TASK-679` para descargas de documentos completas; el listado puede mostrar `documents_unavailable` si aun no esta.
 
@@ -93,7 +94,7 @@ Reglas obligatorias:
 ### Slice 2 — APIs And Readers
 
 - Crear endpoints read-only con filtros, pagination y detail.
-- Incluir score explanation y document summary.
+- Incluir score explanation, document summary y freshness/source status (`live`, `monthly_backfill`, `metadata_only`, `source_degraded`).
 
 ### Slice 3 — UI
 

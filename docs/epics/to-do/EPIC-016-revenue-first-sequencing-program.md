@@ -119,14 +119,20 @@ Líneas que no compiten con T1-T4 porque viven en superficies separadas.
 **Sub-tier 5a — Mercado Público (state procurement Chile)**:
 - `TASK-674` — Architecture contract.
 - `TASK-675` — Licitaciones ingestion foundation.
+- `TASK-676` — OC/post-award reconciliation foundation.
+- `TASK-678` — Compra Agil v2 Beta API adapter spike.
+- `TASK-677` — Compra Agil COT monthly historical/backfill/fallback ingestion.
 - `TASK-679` — Document ingestion private assets.
 - `TASK-680` — Procedure taxonomy registry.
-- `TASK-682` — Public tenders scoring V1.
+- `TASK-681` — Consulta al Mercado / RFI discovery spike.
+- `TASK-682` — Public procurement scoring V1.
 - `TASK-683` — Workbench list+detail.
 - `TASK-684` — Bid/No-bid workflow.
+- `TASK-685` — Document intelligence and requirement extraction.
 - `TASK-686` — Tender→Deal/Quote bridge.
 - `TASK-687` — Notifications reliability.
 - `TASK-688` — Submission control room.
+- `TASK-689` — Companion extension research only after control room/compliance.
 
 **Sub-tier 5b — Partnership programs (20+ partners sin registry)**:
 - `TASK-307` — Schema + partner programs registry.

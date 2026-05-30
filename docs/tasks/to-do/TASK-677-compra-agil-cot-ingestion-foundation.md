@@ -11,7 +11,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-674`, `TASK-680`
+- Blocked by: `TASK-674`, `TASK-678`, `TASK-680`
 - Branch: `task/TASK-677-compra-agil-cot-ingestion`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -26,7 +26,7 @@ El research inicial valido que Compra Agil existia como dataset mensual COT ante
 
 ## Goal
 
-- Descargar, validar, parsear y persistir archivos COT mensuales.
+- Descargar, validar, parsear y persistir archivos COT mensuales como carril historico/backfill/benchmark/fallback.
 - Normalizar `CodigoCotizacion`, items, fechas, comprador, proveedor/oferta y `CodigoOC`.
 - Soportar replay idempotente y freshness mensual.
 
@@ -56,6 +56,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-674`
+- `TASK-678`
 - `TASK-680`
 - Dataset oficial `https://transparenciachc.blob.core.windows.net/trnspchc/COT_<YYYY-MM>.zip`
 
@@ -85,7 +86,7 @@ Reglas obligatorias:
 
 - No hay downloader/parser ni tablas conformed para Compra Agil.
 - No hay policy de retention para raw zip/csv.
-- No hay decision final de convivencia entre COT mensual, API v2 live y OC `Tipo=AG`; coordinar con `TASK-678`.
+- La decision operativa debe venir de `TASK-678`: API v2 como live source, COT mensual como historico/backfill/benchmark/fallback y OC como cierre/post-award.
 
 ## Scope
 
@@ -98,7 +99,7 @@ Reglas obligatorias:
 ### Slice 2 — Parser And Conformed Upsert
 
 - Parsear COT1/COT2 segun columnas reales.
-- Upsert de oportunidades Compra Agil, supplier quotes/items y OC links.
+- Upsert de oportunidades Compra Agil, supplier quotes/items y OC links sin sobreescribir campos live ya observados por API v2 con datos mensuales mas antiguos.
 - Mantener raw row hash para idempotencia y drift detection.
 
 ### Slice 3 — Operations
@@ -108,7 +109,7 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- Implementar API v2 Beta live adapter (ver `TASK-678`).
+- Implementar API v2 Beta live adapter o modificar su source-of-truth decision (ver `TASK-678`).
 - Web scraping del portal Compra Agil.
 - UI.
 - Postulacion/cotizacion automatica.

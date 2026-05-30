@@ -3,10 +3,10 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P2`
-- Impact: `Medio`
+- Priority: `P1`
+- Impact: `Alto`
 - Effort: `Medio`
-- Type: `research+implementation-spike`
+- Type: `policy`
 - Epic: `optional`
 - Status real: `Diseno`
 - Rank: `TBD`
@@ -18,7 +18,7 @@
 
 ## Summary
 
-Documenta y prototipa el adapter oficial de Compra Agil v2 Beta publicado por ChileCompra en mayo 2026, comparandolo contra el carril COT mensual. La API ya esta disponible en `api2.mercadopublico.cl` y autentica con el ticket canonico de Mercado Publico mediante header HTTP `ticket`.
+Documenta y especifica el adapter oficial de Compra Agil v2 Beta publicado por ChileCompra en mayo 2026, comparandolo contra el carril COT mensual. La API ya esta disponible en `api2.mercadopublico.cl` y autentica con el ticket canonico de Mercado Publico mediante header HTTP `ticket`.
 
 ## Why This Task Exists
 
@@ -28,7 +28,7 @@ El research encontro senales oficiales de una Beta API de Compra Agil, y el 2026
 
 - Congelar el contrato oficial de API Compra Agil v2 Beta.
 - Comparar cobertura, freshness, auth, rate limits y campos contra COT.
-- Proponer/prototipar adapter y plan de convivencia con COT y OC.
+- Proponer adapter productivo y plan de convivencia con COT y OC.
 
 ## Architecture Alignment
 
@@ -62,8 +62,8 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- Puede crear una task de implementacion futura para adapter Beta API.
-- Ajusta `TASK-677` si la Beta API reemplaza o complementa COT.
+- Bloquea la implementacion definitiva de `TASK-677` para evitar que el COT mensual se modele como source live.
+- Ajusta `TASK-676`, `TASK-679`, `TASK-682`, `TASK-683` y `TASK-687` si la API v2 define campos live, OC, documentos metadata-only o freshness distinta.
 
 ### Files owned
 
@@ -88,7 +88,7 @@ Reglas obligatorias:
 ### Gap
 
 - No hay adapter productivo ni types/runtime helpers para Compra Agil v2.
-- No hay decision cerrada de convivencia live API v2 + COT mensual + OC `Tipo=AG`.
+- No hay decision cerrada versionada en arquitectura de convivencia live API v2 + COT mensual + OC `Tipo=AG`.
 - No hay carril oficial de descarga binaria de documentos Compra Agil; solo metadata de adjuntos por API v2.
 
 ## Scope
@@ -107,7 +107,7 @@ Reglas obligatorias:
 ### Slice 3 — Adapter Recommendation
 
 - Documentar decision: adoptar API v2 como live source y mantener COT para historico/backfill/benchmark, salvo hallazgo contrario.
-- Crear follow-up implementation task si procede.
+- Crear follow-up implementation task o convertir una task hija existente si procede.
 - Definir estado `documents_discovered_only` o equivalente hasta que `TASK-679` resuelva descarga autorizada.
 
 ## Out of Scope
