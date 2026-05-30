@@ -88,6 +88,7 @@ import { getIdentityRelationshipMemberContractDriftSignal } from './queries/iden
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
 import { getContractorEngagementClassificationRiskOpenSignal } from './queries/contractor-engagement-classification-risk-open'
 import { getContractorInvoiceAssetsBrokenEvidenceSignal } from './queries/contractor-invoice-assets-broken-evidence'
+import { getContractorWorkSubmissionReviewOverdueSignal } from './queries/contractor-work-submission-review-overdue'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
@@ -1260,7 +1261,9 @@ export const getReliabilityOverview = async (
           getContractorEngagementClassificationRiskOpenSignal().catch(() => null),
           // TASK-791 — contractor invoice assets cuyo asset_id apunta a un asset
           // inexistente/eliminado (integridad de evidencia).
-          getContractorInvoiceAssetsBrokenEvidenceSignal().catch(() => null)
+          getContractorInvoiceAssetsBrokenEvidenceSignal().catch(() => null),
+          // TASK-792 — work submissions estancadas en review (submitted|disputed) > 14d.
+          getContractorWorkSubmissionReviewOverdueSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
