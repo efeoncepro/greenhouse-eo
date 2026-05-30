@@ -24,7 +24,7 @@
 
 ## Summary
 
-Endurecer **Greenhouse Visual Capture** (`GVC`, `pnpm fe:capture`) para que no solo genere screenshots/videos, sino evidencia visual confiable: readiness de página, assertions ligeros, frame quality guards, reportes HTML ricos, multi-viewport, consola/red opcional, diff/baseline usable y contrato mockup aprobado → runtime.
+Endurecer **Greenhouse Visual Capture** (`GVC`, `pnpm fe:capture`) para que no solo genere screenshots/videos, sino evidencia visual confiable: readiness de página, assertions ligeros, microinteraction evidence layer, frame quality guards, reportes HTML ricos, multi-viewport, consola/red opcional, diff/baseline usable y contrato mockup aprobado → runtime.
 
 ## Why This Task Exists
 
@@ -34,6 +34,7 @@ GVC ya reemplaza scripts Playwright ad-hoc y soporta scroll robusto, full-page y
 
 - Agregar readiness explícito para páginas Greenhouse antes de capturar.
 - Agregar assertions ligeros y frame quality guards sin convertir GVC en un test E2E completo.
+- Convertir los scenarios de microinteracciones en evidencia más rica: video segmentado, frames antes/durante/después, focus/keyboard, reduced-motion y timing metadata.
 - Generar reportes HTML/dossiers más ricos y comparables entre runs.
 - Soportar multi-viewport por scenario de forma declarativa.
 - Formalizar baseline/mockup → runtime como flujo visual repetible para tasks como `TASK-796`.
@@ -53,11 +54,14 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`
 - `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`
 - `docs/operations/GREENHOUSE_UI_DELIVERY_LOOP_V1.md`
+- `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
+- `docs/ui/GREENHOUSE_ACCESSIBILITY_GUIDELINES_V1.md`
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
 
 Reglas obligatorias:
 
 - GVC sigue siendo herramienta de evidencia visual, no reemplazo de Playwright E2E assertions.
+- Los checks de microinteraccion deben evaluar evidencia de feedback, timing y accesibilidad; no deben promover motion decorativo ni exigir animaciones donde la UI debe permanecer estable.
 - No reintroducir `_cap.mjs` ni scripts por task como camino principal.
 - No loggear secretos, bypass headers, cookies, emails personales ni payloads sensibles en manifest/reportes/console dumps.
 - Toda nueva primitive del DSL debe tener validación, tests y documentación.
@@ -119,6 +123,7 @@ Reglas obligatorias:
 - Manifest JSON por run y audit local `.captures/audit.jsonl`.
 - Scroll por selector, `scrollTo`, `mark fullPage`, `mark clipSelector`.
 - Scenarios de referencia:
+  - `offboarding-queue-microinteractions`
   - `contractor-admin-workbench`
   - `offboarding-fullpage-capture`
   - `sample-sprints-scroll-anchors`
@@ -132,6 +137,7 @@ Reglas obligatorias:
 - Multi-viewport requiere corridas separadas o override manual.
 - `health` clasifica poco: no distingue auth failure, selector failure, app 500, timeout visual o helper failure.
 - No hay flujo canónico para comparar mockup aprobado contra runtime final en tasks UI.
+- Los scenarios de microinteracciones funcionan, pero el análisis sigue siendo manual: el manifest no segmenta clips por interacción, no captura frames transitorios a offsets consistentes, no diferencia hover/focus/pressed/selected, no corre variante reduced-motion y no produce findings sobre timing o feedback.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -177,7 +183,31 @@ Reglas obligatorias:
   - `helper_error`
 - Mantener estos asserts como evidence guards, no como suite E2E de negocio.
 
-### Slice 3 — Frame Quality Guards
+### Slice 3 — Microinteraction Evidence Layer
+
+- Formalizar un patrón declarativo para microinteracciones que hoy se escriben a mano como `hover` + `sleep` + `mark`.
+- Agregar una primitive o macro additive, por ejemplo `interaction`, que pueda describir:
+  - acción: `hover`, `click`, `press`, `focus`
+  - selector target
+  - frames relativos: `before`, `at 75ms`, `at 150ms`, `at 300ms`, `after`
+  - expected semantic state: `hovered`, `focused`, `pressed`, `selected`, `expanded`, `loading`, `success`, `error`
+  - nota de intención: que incertidumbre reduce o que feedback confirma
+- Permitir capturar clips/segmentos lógicos dentro del `.webm` mediante metadata de `startMs/endMs` por interacción, aunque el archivo siga siendo un video continuo V1.
+- Agregar soporte para keyboard/focus path como primera clase:
+  - `focus` por selector
+  - `press Tab`
+  - `press Enter/Space`
+  - frame de focus visible
+- Agregar variante `reducedMotion` opt-in por scenario o interaction para validar que la interacción conserva feedback sin depender de motion decorativo.
+- Registrar findings de microinteracción en manifest/reporte:
+  - target no visible o no focusable
+  - no hubo frame posterior al action
+  - delay excesivo entre acción y feedback observado (best-effort por timestamps, no pixel-perfect)
+  - interaction sin `note`/intención
+  - hover-only sobre acción esencial sin evidencia keyboard equivalente
+- Migrar o duplicar `offboarding-queue-microinteractions` como scenario de regresión V2 para probar la capa sin romper el scenario V1.
+
+### Slice 4 — Frame Quality Guards
 
 - Agregar análisis automático de frames para detectar:
   - imagen casi blanca/vacía
@@ -188,14 +218,14 @@ Reglas obligatorias:
 - Registrar findings en manifest y reporte, con severidad `warning`/`error`.
 - Permitir opt-out explícito por scenario cuando un frame vacío/loading sea intencional, con `note` y razón.
 
-### Slice 4 — Multi-Viewport Scenario Runs
+### Slice 5 — Multi-Viewport Scenario Runs
 
 - Permitir viewports declarativos por scenario sin duplicar archivos, por ejemplo `viewports` o `variants`.
 - Generar output ordenado por viewport/device dentro del run dir.
 - Mantener compatibilidad con `--device` actual.
 - Asegurar que manifest represente múltiples viewports sin romper consumers V1; usar schema additive.
 
-### Slice 5 — Rich HTML Report & Review Dossier V2
+### Slice 6 — Rich HTML Report & Review Dossier V2
 
 - Generar `index.html` por captura con:
   - frames por viewport
@@ -203,11 +233,13 @@ Reglas obligatorias:
   - manifest resumido
   - route/env/actor/viewport/timing
   - readiness/assertions/frame-quality findings
+  - microinteraction clips/segments with before/during/after frames
+  - focus/reduced-motion evidence when present
   - links relativos a artifacts
 - Evolucionar `review-dossier.md` para incluir findings automáticos, no solo checklist.
 - No introducir dependencia pesada de UI runtime; report puede ser HTML estático generado por Node.
 
-### Slice 6 — Baseline & Mockup-to-Runtime Contract
+### Slice 7 — Baseline & Mockup-to-Runtime Contract
 
 - Agregar convención para registrar baseline por scenario o capture dir, por ejemplo:
   - `surfaceId`
@@ -217,15 +249,16 @@ Reglas obligatorias:
 - Documentar el flujo para tasks UI:
   - capturar mockup aprobado
   - capturar runtime final
+  - capturar microinteracciones runtime cuando el mockup aprobado describe transiciones/feedback
   - generar diff/review
   - documentar desviaciones justificadas en la task
 - Usar `TASK-796` como caso de referencia documental, sin acoplar GVC a contractor.
 
-### Slice 7 — Health V2 & Documentation
+### Slice 8 — Health V2 & Documentation
 
 - Mejorar `pnpm fe:capture:health` para agrupar fallos por taxonomy.
 - Actualizar arquitectura, manual, documentación funcional, UI method, `AGENTS.md`/`CLAUDE.md` si cambia el contrato operativo.
-- Agregar escenarios de regresión que cubran readiness, assertions, multi-viewport y report.
+- Agregar escenarios de regresión que cubran readiness, assertions, microinteraction evidence, multi-viewport y report.
 
 ## Out of Scope
 
@@ -234,6 +267,8 @@ Reglas obligatorias:
 - Invocar automáticamente Claude/Anthropic SDK desde `fe:capture:review`.
 - Capturar datos sensibles o payloads completos de API.
 - Reemplazar `tests/e2e/` Playwright smoke.
+- Medir motion pixel-perfect o imponer thresholds universales de animación para todo el producto.
+- Forzar que toda UI tenga animación; microinteractions solo deben existir si reducen incertidumbre, confirman estado, guían el próximo paso o previenen error.
 - Crear una UI web persistente dentro del portal para browsing de `.captures/`.
 
 ## Detailed Spec
@@ -257,6 +292,23 @@ export const scenario: CaptureScenario = {
     { kind: 'notVisible', selector: '[data-testid="login-card"]', reason: 'authenticated route expected' },
     { kind: 'notVisible', selector: '[role="alert"][data-severity="error"]', reason: 'no blocking app error' }
   ],
+  interactions: [
+    {
+      name: 'review-filter-hover',
+      action: { kind: 'hover', selector: '[role="tab"][aria-label*="Requieren acción"]' },
+      intent: 'Confirmar affordance del filtro antes de activar',
+      frames: [
+        { label: 'before', atMs: 0 },
+        { label: 'hover-feedback', atMs: 150 },
+        { label: 'hover-settled', atMs: 300 }
+      ],
+      keyboardEquivalent: {
+        action: { kind: 'press', key: 'Tab' },
+        expected: 'focus-visible'
+      },
+      reducedMotion: 'capture'
+    }
+  ],
   viewports: [
     { name: 'desktop', width: 1440, height: 900 },
     { name: 'tablet', width: 1024, height: 900 },
@@ -269,6 +321,43 @@ export const scenario: CaptureScenario = {
   ]
 }
 ```
+
+### Microinteraction Evidence Contract
+
+Los scenarios actuales ya pueden capturar microinteracciones con pasos manuales. Esta task debe preservar ese modelo y agregar una capa de conveniencia/evidencia, no reemplazarlo de golpe.
+
+Un microinteraction evidence item debe producir:
+
+- al menos un frame antes y uno después de la acción
+- timestamps relativos a la acción, no solo al inicio del run
+- nota de intención obligatoria (`intent` o `note`)
+- segmento lógico del video (`startMs/endMs`) en manifest
+- evidencia de keyboard/focus cuando la acción sea esencial para completar la tarea
+- variante reduced-motion cuando la interacción use motion custom o meaningful motion
+
+Ejemplo de migración conceptual desde V1:
+
+```ts
+// V1 actual: válido, pero manual
+{ kind: 'hover', selector: '[role="tab"][aria-label*="Requieren acción"]' },
+{ kind: 'sleep', ms: 250 },
+{ kind: 'mark', label: 'kpi-tile-hover' }
+
+// V2 esperado: mismo comportamiento, más evidencia
+{
+  kind: 'interaction',
+  name: 'kpi-tile-hover',
+  action: { kind: 'hover', selector: '[role="tab"][aria-label*="Requieren acción"]' },
+  intent: 'Hover refuerza que el KPI filtra la cola',
+  frames: [
+    { label: 'before', atMs: 0 },
+    { label: 'hover-feedback', atMs: 150 },
+    { label: 'settled', atMs: 300 }
+  ]
+}
+```
+
+El agente que ejecute puede elegir si `interaction` vive como `kind` nuevo o como campo top-level `interactions[]`, pero debe mantener compatibilidad con scenarios V1.
 
 ### Manifest Additions
 
@@ -294,17 +383,20 @@ El manifest debe crecer de forma compatible:
 
 ### Slice ordering hard rule
 
-- Slice 1 -> Slice 2 -> Slice 3 porque readiness y assertions alimentan quality guards.
-- Slice 4 puede correr después de Slice 1, pero debe integrarse con manifest antes de Slice 5.
-- Slice 5 depende de manifest/finding shape estable.
-- Slice 6 depende de report/diff baseline usable.
-- Slice 7 cierra docs, health y regression scenarios.
+- Slice 1 -> Slice 2 porque readiness y assertions alimentan el resto de findings.
+- Slice 3 depende de Slice 2 si reutiliza failure taxonomy, pero puede diseñarse en paralelo durante Plan Mode.
+- Slice 4 depende de Slice 2/3 porque frame quality debe conocer marks e interaction frames.
+- Slice 5 puede correr después de Slice 1, pero debe integrarse con manifest antes de Slice 6.
+- Slice 6 depende de manifest/finding shape estable.
+- Slice 7 depende de report/diff baseline usable.
+- Slice 8 cierra docs, health y regression scenarios.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Falsos negativos por readiness demasiado estricta | UI/tooling | medium | Defaults conservadores, opt-in por scenario, timeout accionable | `fe:capture:health` failure taxonomy `visual_timeout` |
+| Microinteraction checks se vuelven frágiles/pixel-perfect | UI/tooling | medium | Evidence-first, semantic findings, no thresholds universales | Review de `offboarding-queue-microinteractions` V2 |
 | Reporte guarda datos sensibles | Security/tooling | low | Redacción por defecto, no DOM dump, console/network opt-in | Review de artifacts + tests de redaction |
 | Multi-viewport rompe consumers de manifest V1 | Tooling | medium | Shape additive o schemaVersion 2 con compatibility reader | Tests de manifest/review/diff |
 | Assertions duplican Playwright E2E | QA/tooling | low | Limitar asserts a evidence guards, documentar out-of-scope | Code review contra docs |
@@ -320,11 +412,12 @@ Sin feature flag runtime. GVC es tooling local/agent-facing. Los cambios deben s
 |---|---|---|---|
 | Slice 1 | Revert del commit de readiness o desactivar uso en scenarios | <10 min | si |
 | Slice 2 | Revert del commit de assertions/taxonomy; manifests antiguos siguen válidos | <10 min | si |
-| Slice 3 | Revert quality guard o bajar findings a warning | <10 min | si |
-| Slice 4 | Revert multi-viewport; scenarios vuelven a viewport único | <10 min | si |
-| Slice 5 | Revert report HTML; artifacts base siguen existiendo | <10 min | si |
-| Slice 6 | Revert baseline/mockup diff helpers; `fe:capture:diff` legacy sigue | <10 min | si |
-| Slice 7 | Revert docs/scenarios si hay drift documental | <10 min | si |
+| Slice 3 | Revert interaction macro; scenarios V1 manuales siguen funcionando | <10 min | si |
+| Slice 4 | Revert quality guard o bajar findings a warning | <10 min | si |
+| Slice 5 | Revert multi-viewport; scenarios vuelven a viewport único | <10 min | si |
+| Slice 6 | Revert report HTML; artifacts base siguen existiendo | <10 min | si |
+| Slice 7 | Revert baseline/mockup diff helpers; `fe:capture:diff` legacy sigue | <10 min | si |
+| Slice 8 | Revert docs/scenarios si hay drift documental | <10 min | si |
 
 ### Production verification sequence
 
@@ -345,13 +438,15 @@ No hay deploy productivo directo. Verificar local y staging cuando aplique:
 
 - [ ] GVC soporta readiness explícito con tests y docs.
 - [ ] GVC soporta assertions ligeros y failure taxonomy en manifest/audit.
+- [ ] GVC soporta microinteraction evidence con before/during/after frames, timestamps relativos, intent, video segments y compatibilidad con scenarios V1.
+- [ ] GVC puede capturar focus/keyboard evidence y reduced-motion evidence cuando un scenario lo declara.
 - [ ] GVC detecta frames inútiles o engañosos con findings visibles.
 - [ ] GVC puede ejecutar un scenario en múltiples viewports sin duplicar archivos.
 - [ ] Cada captura genera o puede generar un reporte HTML estático navegable.
 - [ ] `fe:capture:review` incorpora findings automáticos en el dossier.
 - [ ] Existe flujo documentado de baseline/mockup aprobado → runtime final.
 - [ ] `fe:capture:health` agrupa fallos por categoría.
-- [ ] Scenarios de regresión cubren readiness, assertions, multi-viewport y report.
+- [ ] Scenarios de regresión cubren readiness, assertions, microinteractions, multi-viewport y report.
 - [ ] Docs y entrypoints de agentes quedan sincronizados si cambia el contrato operativo.
 
 ## Verification
