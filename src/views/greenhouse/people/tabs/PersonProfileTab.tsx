@@ -241,10 +241,14 @@ const PersonProfileTab = ({ detail }: Props) => {
 
   const hrFields: FieldEntry[] = hrContext
     ? [
+        // TASK-957 Slice B — estado laboral vigente desde la relación/engagement
+        // activa (SSOT), no desde contract_type. "Tipo de contrato" queda como
+        // contrato de empleo (historia cuando el empleo terminó).
+        { label: 'Estado vigente', value: hrContext.currentWorkClassification?.displayLabel ?? '' },
         { label: 'Departamento', value: hrContext.departmentName ?? '' },
         { label: 'Nivel de cargo', value: hrContext.jobLevel ?? '' },
         { label: 'Tipo de empleo', value: hrContext.employmentType ?? '' },
-        { label: 'Tipo de contrato', value: hrContext.compensation?.contractType ?? '' },
+        { label: 'Contrato de empleo', value: hrContext.compensation?.contractType ?? '' },
         { label: 'Fecha de ingreso', value: formatDate(effectiveHireDate) },
         { label: 'Fin de contrato', value: formatDate(hrContext.contractEndDate) },
         { label: 'Supervisor', value: hrContext.supervisorName ?? '' },
