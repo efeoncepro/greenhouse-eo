@@ -94,6 +94,7 @@ export interface ContractorInvoiceAsset {
   publicId: string
   contractorEngagementId: string
   contractorInvoiceId: string | null
+  contractorWorkSubmissionId: string | null
   assetId: string
   assetRole: ContractorInvoiceAssetRole
   artifactKind: ContractorInvoiceArtifactKind
@@ -107,6 +108,8 @@ export interface ContractorInvoiceAsset {
 export interface AttachContractorInvoiceAssetInput {
   contractorEngagementId: string
   contractorInvoiceId?: string | null
+  /** TASK-792 — link the evidence asset to a work submission (e.g. work_evidence). */
+  contractorWorkSubmissionId?: string | null
   assetId: string
   assetRole: ContractorInvoiceAssetRole
   artifactKind: ContractorInvoiceArtifactKind

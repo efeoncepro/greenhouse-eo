@@ -25,6 +25,7 @@ interface ContractorInvoiceAssetRow {
   public_id: string
   contractor_engagement_id: string
   contractor_invoice_id: string | null
+  contractor_work_submission_id: string | null
   asset_id: string
   asset_role: string
   artifact_kind: string
@@ -46,8 +47,8 @@ const toTimestamp = (value: string | Date): string =>
 
 const SELECT_COLUMNS = `
   invoice_asset_id, public_id, contractor_engagement_id, contractor_invoice_id,
-  asset_id, asset_role, artifact_kind, source, country_code, uploaded_by_user_id,
-  metadata_json, created_at
+  contractor_work_submission_id, asset_id, asset_role, artifact_kind, source,
+  country_code, uploaded_by_user_id, metadata_json, created_at
 `
 
 export const mapContractorInvoiceAsset = (
@@ -57,6 +58,7 @@ export const mapContractorInvoiceAsset = (
   publicId: row.public_id,
   contractorEngagementId: row.contractor_engagement_id,
   contractorInvoiceId: row.contractor_invoice_id,
+  contractorWorkSubmissionId: row.contractor_work_submission_id,
   assetId: row.asset_id,
   assetRole: row.asset_role as ContractorInvoiceAsset['assetRole'],
   artifactKind: row.artifact_kind as ContractorInvoiceAsset['artifactKind'],
@@ -163,18 +165,19 @@ export const attachContractorInvoiceAsset = async (
     const result = await client.query<ContractorInvoiceAssetRow>(
       `INSERT INTO greenhouse_hr.contractor_invoice_assets (
          invoice_asset_id, public_id, contractor_engagement_id, contractor_invoice_id,
-         asset_id, asset_role, artifact_kind, source, country_code, uploaded_by_user_id,
-         metadata_json
+         contractor_work_submission_id, asset_id, asset_role, artifact_kind, source,
+         country_code, uploaded_by_user_id, metadata_json
        ) VALUES (
          $1,
          'EO-CIA-' || LPAD(nextval('greenhouse_hr.seq_contractor_invoice_asset_public_id')::text, 4, '0'),
-         $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb
+         $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb
        )
        RETURNING ${SELECT_COLUMNS}`,
       [
         `cia-${randomUUID()}`,
         input.contractorEngagementId,
         input.contractorInvoiceId ?? null,
+        input.contractorWorkSubmissionId ?? null,
         input.assetId,
         input.assetRole,
         input.artifactKind,

@@ -77,6 +77,7 @@ export const AGGREGATE_TYPES = {
   // HR Core / People
   member: 'member',
   contractorEngagement: 'contractor_engagement',
+  contractorWorkSubmission: 'contractor_work_submission',
   memberSkill: 'member_skill',
   memberTool: 'member_tool',
   memberCertification: 'member_certification',
@@ -746,6 +747,15 @@ export const EVENT_TYPES = {
   contractorEngagementCancelled: 'workforce.contractor_engagement.cancelled',
   contractorEngagementClassificationRiskFlagged:
     'workforce.contractor_engagement.classification_risk_flagged',
+
+  // TASK-792 — Contractor work submissions lifecycle (v1). Evidencia de trabajo
+  // (timesheet/milestone/deliverable/...) con approval/dispute/reject. Aprobación
+  // operacional NO es pago. Payload schemaVersion:1.
+  contractorWorkSubmissionSubmitted: 'workforce.contractor_work_submission.submitted',
+  contractorWorkSubmissionApproved: 'workforce.contractor_work_submission.approved',
+  contractorWorkSubmissionDisputed: 'workforce.contractor_work_submission.disputed',
+  contractorWorkSubmissionRejected: 'workforce.contractor_work_submission.rejected',
+  contractorWorkSubmissionCancelled: 'workforce.contractor_work_submission.cancelled',
 
   // TASK-878 — HubSpot Companies async intake (canonical pattern TASK-813b).
   // Webhook handler emite este event y retorna <100ms; el reactive consumer

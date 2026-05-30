@@ -169,6 +169,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-792 — Contractor work submissions (timesheet/milestone/deliverable…).
+    // read=ver; create=submit/registrar; update=editar borrador + submit;
+    // manage=cancelar. La revision (approve/dispute/reject) usa la capability
+    // dedicada hr.contractor_work_submission.review (separacion operacional).
+    key: 'hr.contractor_work_submission',
+    module: 'hr',
+    actions: ['read', 'create', 'update', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-792 — revision operacional de la work submission. approve cubre
+    // approve/dispute/reject (dispute/reject requieren reason >= 10 chars).
+    key: 'hr.contractor_work_submission.review',
+    module: 'hr',
+    actions: ['read', 'approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-030 — plantillas reutilizables de checklist HRIS.
     key: 'hr.onboarding_template',
     module: 'hr',

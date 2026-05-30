@@ -509,6 +509,38 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-792 — Contractor work submissions. read/create/update/manage para la
+  // matriz operador canónica HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN.
+  // La revision (approve/dispute/reject) usa la capability dedicada
+  // hr.contractor_work_submission.review (mismo set V1, granularidad para tightening futuro).
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    for (const action of ['read', 'create', 'update', 'manage'] as const) {
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'hr.contractor_work_submission',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+
+    for (const action of ['read', 'approve'] as const) {
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'hr.contractor_work_submission.review',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
   // TASK-874 — Workforce Activation readiness.
   // Read access follows the same operator matrix as complete_intake because the
   // workspace exposes blockers without sensitive values. Override is deliberately
