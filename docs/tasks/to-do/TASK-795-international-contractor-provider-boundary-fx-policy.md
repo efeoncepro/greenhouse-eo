@@ -62,6 +62,27 @@
 
 **Por qué.** Sin esta frontera explícita, 795 y 905+ se solapan y generan deuda + riesgo tributario. El payroll-auditor lo marca como decisión nº1. Invariante dura a documentar en el arch doc + CLAUDE.md al cierre.
 
+### D-795-5 — La "entidad contratante" es la dimensión raíz (ya modelada como `legal_entity_organization_id`); el grueso = Efeonce SpA directo
+
+**Decisión.** La dimensión que gobierna todo es **quién es la entidad legal contratante**, ya modelada en `contractor_engagements.legal_entity_organization_id` (**NOT NULL** en TASK-790). El `beneficiary` (D-795-3) y el `tax_compliance_owner` (D-795-4) son **consecuencias** de esta dimensión, no la raíz. Reusar la entidad canónica **Operating Entity** (`greenhouse_core.organizations.is_operating_entity=TRUE`), donde hoy vive `Efeonce Group SpA` (empleador, emisor DTE, entidad payroll). **NUNCA** parallelizar ni hardcodear "Efeonce = el pagador".
+
+Matriz canónica (la entidad contratante × país del contractor determina el régimen tributario):
+
+| Entidad contratante (`legal_entity_organization_id`) | Contractor | Régimen tributario | Owner |
+|---|---|---|---|
+| Efeonce Group SpA (Chile) | honorario CL residente | retención SII | TASK-794 ✅ |
+| Efeonce Group SpA (Chile) | no-residente (directo internacional, **el grueso internacional**) | Chile→no-residente (LIR Art. 59/74) | TASK-905/906/907 |
+| Deel (entidad legal externa, EOR) | worker en su país | payroll/tax local del provider | `provider_owned` |
+| **Efeonce US Inc (futuro)** | persona en EEUU | US doméstico (1099/W-9, no retención chilena) | **futura task multi-entidad** |
+
+**Estado HOY (operador 2026-05-30):** la **única** entidad contratante es **`Efeonce Group SpA` (casa matriz, Santiago, Chile)**. Todo engagement directo apunta su `legal_entity_organization_id` a esa Operating Entity. Por lo tanto el régimen hoy es siempre "entidad chilena paga" → honorarios (794) o Chile→no-residente (905).
+
+**Roadmap declarado:** Efeonce abrirá entidades legales en varios países; **la primera será EEUU** (`Efeonce US Inc`). Cuando exista, es **una nueva fila `organizations` (is_operating_entity=TRUE, country=US)** — un nuevo valor de `legal_entity_organization_id`, sin rediseño del engagement. Pero **cambia el régimen tributario**: un contractor US contratado por `Efeonce US Inc` deja de ser "Chile→no-residente (905)" y pasa a "US doméstico" (otro motor). Eso es una **task futura multi-entidad/multi-jurisdicción**, NO 795 ni 905.
+
+**Por qué (4-pilar — Scalability paga).** El que la entidad contratante sea una FK (`legal_entity_organization_id`) y no un hardcode es exactamente lo que permite que EEUU (y los siguientes países) entren como datos, no como rediseño. La regla dura: **795 debe leer la entidad contratante del campo y derivar de ahí el tax owner; NUNCA asumir "Efeonce SpA / Chile" en código.** Hoy es un valor único, pero el código no debe pin-earlo.
+
+**Open Question diferida (no se decide en 795):** cuando haya >1 Operating Entity del grupo (Chile + US + …), (a) el modelo de "operating entity única" actual debe volverse multi-entidad, y (b) el resolver de tax owner debe convertirse en una matriz `(país_entidad_contratante × país_contractor)`. Eso es la task futura multi-entidad; 795 solo deja la dimensión lista (no la hardcodea).
+
 ### Reestructuración de scope en 2 fases (separables)
 
 Dado el tamaño real, el Scope de abajo se reorganiza en **Fase A** (acotada, bajo riesgo, reusa 790/793) y **Fase B** (la pesada, toca Finance). **Fase B puede promoverse a una task derivada** (p.ej. TASK-799) si se quiere PR separado — decisión del operador al arrancar.
