@@ -78,6 +78,7 @@ export const AGGREGATE_TYPES = {
   member: 'member',
   contractorEngagement: 'contractor_engagement',
   contractorWorkSubmission: 'contractor_work_submission',
+  contractorPayable: 'contractor_payable',
   memberSkill: 'member_skill',
   memberTool: 'member_tool',
   memberCertification: 'member_certification',
@@ -756,6 +757,15 @@ export const EVENT_TYPES = {
   contractorWorkSubmissionDisputed: 'workforce.contractor_work_submission.disputed',
   contractorWorkSubmissionRejected: 'workforce.contractor_work_submission.rejected',
   contractorWorkSubmissionCancelled: 'workforce.contractor_work_submission.cancelled',
+
+  // TASK-793 — Contractor payables lifecycle (v1). Obligación económica aprobada
+  // previa a Finance. `ready_for_finance` dispara el bridge reactivo que crea la
+  // payment_obligation. Payload schemaVersion:1.
+  contractorPayableCreated: 'workforce.contractor_payable.created',
+  contractorPayableReadyForFinance: 'workforce.contractor_payable.ready_for_finance',
+  contractorPayableObligationCreated: 'workforce.contractor_payable.obligation_created',
+  contractorPayableBlocked: 'workforce.contractor_payable.blocked',
+  contractorPayableCancelled: 'workforce.contractor_payable.cancelled',
 
   // TASK-878 — HubSpot Companies async intake (canonical pattern TASK-813b).
   // Webhook handler emite este event y retorna <100ms; el reactive consumer
