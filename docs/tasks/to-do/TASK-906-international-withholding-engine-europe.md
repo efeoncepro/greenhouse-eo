@@ -341,3 +341,12 @@ Rules or sources must be able to store:
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm pg:doctor`
 - dry-run script/API from TASK-905 for current collaborators, staging only.
+
+## Closing Protocol
+
+- [ ] Lifecycle and folder synchronized.
+- [ ] `docs/tasks/README.md` synchronized.
+- [ ] `Handoff.md` updated.
+- [ ] `changelog.md` + architecture docs updated.
+- [ ] Document which European country/territory rules are `approved_*` vs `needs_tax_review`.
+- [ ] `pnpm vitest run src/lib/payroll` green (payroll non-regression gate).

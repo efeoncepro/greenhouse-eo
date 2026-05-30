@@ -245,7 +245,7 @@ Snapshot must include:
 | Slice 0 | Revert docs decision memo | <10 min | si |
 | Slice 1 | Mark Spain rules inactive/needs review | <10 min | si |
 | Slice 2 | Disable readiness branch via flag or revert evidence requirement delta | <10 min | si |
-| Slice 3 | Tests/dry-run only; no production rollback | N/A | si |
+| Slice 3 | Dry-run read-only — no production runtime impact, nothing to roll back | inmediato | si |
 | Slice 4 | Revoke Spain rule approval, set status back to `needs_tax_review` | <10 min | si |
 
 ### Production verification sequence
@@ -287,3 +287,12 @@ Snapshot must include:
 - `pnpm exec eslint src/lib/payroll src/types/payroll.ts`
 - `pnpm exec tsc --noEmit --pretty false`
 - staging dry-run for Spain/Daniela with no mutation.
+
+## Closing Protocol
+
+- [ ] Lifecycle and folder synchronized.
+- [ ] `docs/tasks/README.md` synchronized.
+- [ ] `Handoff.md` updated.
+- [ ] `changelog.md` + architecture docs updated.
+- [ ] Spain rule pack documented as `approved_*` only after written HR/Finance/Legal sign-off; no real collaborator (Daniela) mutated without allowlist.
+- [ ] `pnpm vitest run src/lib/payroll` green (payroll non-regression gate).

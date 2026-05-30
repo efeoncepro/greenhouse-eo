@@ -517,7 +517,7 @@ V1 puede soportar `contractor` primero y dejar `efeonce` como warning/needs revi
 - `pnpm test`
 - `pnpm build`
 
-## Closing Requirements
+## Closing Protocol
 
 - Move task to `docs/tasks/complete/`.
 - Set `Lifecycle: complete`.
