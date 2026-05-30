@@ -120,6 +120,18 @@ Resultado: el dominio 790-796 asume que un engagement EXISTE, pero no hay camino
 - El payout del contractor fluye SOLO por el dominio contractor (engagement → payable → Finance), nunca `payroll_entries`.
 - El finiquito (ratificación notarial pendiente) está **desacoplado** del cierre de relación: el comando cierra la relación canónicamente sin requerir ratificación (caso Valentina). El documento de finiquito sigue su ciclo TASK-863 aparte.
 
+## Payroll & Offboarding Non-Regression Guardrails (hard rules)
+
+El flujo de transición a contractor **NUNCA** debe romper el cálculo de finiquito ni el flujo de offboarding existente (ambos costaron mucho desarrollar — TASK-863 finiquito, TASK-862/890/892 offboarding). El comando SOLO **cierra la relación legal + abre la contractor + crea el engagement**; todo lo de finiquito/offboarding es read-only o append-only.
+
+- **NUNCA** escribir/mutar `greenhouse_payroll.final_settlements` ni `final_settlement_documents`. El finiquito es owner exclusivo de Payroll (TASK-863). El comando contractor NO crea, modifica, anula ni regenera ningún finiquito.
+- **NUNCA** modificar el motor de cálculo de finiquito (`src/lib/payroll/final-settlement/calculator.ts`, `policies.ts`, `document-*.ts`) ni su state machine. El comando no lo importa siquiera.
+- **NUNCA** gatear el cierre de la relación a la ratificación del finiquito, ni forzar/disparar la ratificación notarial. Relación legal y finiquito están **desacoplados** (verificado: offboarding executed no cierra la relación). La transición cierra la relación canónicamente con el finiquito en cualquier estado (caso Valentina: finiquito issued sin ratificar).
+- **NUNCA** modificar el state machine, lanes, work-queue ni la ejecución del offboarding de forma que altere comportamiento existente. El wiring del lane `relationship_transition` es **ADITIVO**: dispara el comando + appendea el evento canónico `offboarding_case.relationship_transition_completed` (ya emitido por TASK-789). El offboarding case se lee `FOR UPDATE` pero **solo se le appendea evento** — nunca se re-ejecuta, re-clasifica ni se muta su `status`/`rule_lane`/`separation_type`.
+- **NUNCA** re-ejecutar un offboarding case ya `executed`. La precondición es `status='executed'`; el comando consume ese estado, no lo cambia.
+- **NUNCA** tocar `members.{contract_type,pay_regime,payroll_via}` (riesgo doble-pago payroll legacy — ver Open Question #1). El payout del contractor fluye SOLO por engagement → payable → Finance, jamás por `payroll_entries` ni finiquito.
+- **SIEMPRE** correr como gate de cierre obligatorio de CADA slice: `pnpm vitest run src/lib/payroll` (incluye toda la suite de finiquito) + los tests de offboarding (`pnpm vitest run src/lib/workforce/offboarding`). Cualquier rojo en finiquito u offboarding = **NO cerrar el slice**; es regresión, no "test ajeno".
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
