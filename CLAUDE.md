@@ -4396,6 +4396,31 @@ Toda invoice/boleta, evidencia de trabajo o documento de proveedor de un contrac
 
 **Spec canónica**: `docs/tasks/complete/TASK-794-chile-honorarios-compliance-sii-retention.md`. Arch Delta: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (2026-05-30). Patrones fuente: TASK-790 (tax-policy SSOT + classification-risk), TASK-793 (withholding + readiness fail-closed), TASK-784 (person-legal-profile readiness), TASK-758 (SII retention SSOT payroll), TASK-721/766/774 (VIEW/helper + reliability signal pattern).
 
+### International Contractor Boundary invariants (TASK-795 Fase A, desde 2026-05-30)
+
+Fase A de TASK-795 sobre Contractor Payables. Establece la **frontera tributaria** del contractor internacional/provider en el readiness fail-closed, **sin computar withholding** (eso es el motor `international_internal`, TASK-905/906/907). **Cero migración, cero capability, cero outbox, cero código payroll** (mismo patrón TASK-794). Fase B (provider settlement split + EOR beneficiary + reconciliación) **diferida** (minoría; el grueso de contractors son directos por `Efeonce Group SpA`).
+
+**2 gates nuevos** en `evaluatePayableReadiness` + `assessPayableReadiness`:
+- `tax_owner_review_required` — **universal, fail-closed**. Bloquea cuando `engagement.taxComplianceOwner ∈ {manual_review_required, country_engine_owned}`. El dominio contractor **NUNCA** aplica una tasa Chile→no-residente por su cuenta; bloquea y **escala** al withholding engine (TASK-905) o a revisión humana (D-795-4).
+- `fx_policy_unresolved` — **solo cross-currency** (`fxNeeded`). Exige `fx_policy_code` declarado en el engagement; una tasa que existe (`fxSupported`) NO basta — el cambio debe ser auditable, no incidental (D-795-1). `payment_currency` ∈ {CLP,USD} ya lo refuerza `currency_unsupported`.
+
+**Dimensión raíz canónica** (D-795-5): la **entidad contratante** vive en `contractor_engagements.legal_entity_organization_id` (NOT NULL, Operating Entity `is_operating_entity=TRUE`). El `tax_compliance_owner` (de ahí los gates) es **consecuencia** de la entidad contratante × país del contractor. Hoy la única es `Efeonce Group SpA` (Chile); roadmap multi-entidad (EEUU) → leer del campo, **NUNCA hardcodear "Efeonce/Chile"**.
+
+**⚠️ Reglas duras**:
+- **NUNCA** computar una retención Chile→no-residente desde el dominio contractor (790-798). Ese motor es `international_internal` (TASK-905/906/907). El gate `tax_owner_review_required` bloquea y escala; jamás aplica una tasa.
+- **NUNCA** aplicar deducciones estatutarias Chile a un payable internacional/provider (ya garantizado: `computeContractorWithholding` retorna 0 para no-honorarios).
+- **NUNCA** liquidar un payable cross-currency sin `fx_policy_code` declarado (gate `fx_policy_unresolved`) ni en moneda fuera de {CLP,USD} (gate `currency_unsupported`). Lo exótico → `manual_review`/off-rail.
+- **NUNCA** mutar `members.{pay_regime,payroll_via,contract_type}` ni generar `payroll_entries` desde un payable contractor.
+- **NUNCA** hardcodear "Efeonce/Chile" como el pagador; leer `legal_entity_organization_id`.
+- **SIEMPRE** que un payable necesite "¿se puede pagar?", pasar por `assessPayableReadiness` (los gates corren ahí). Cero recompute inline.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll src/lib/contractor-engagements` al tocar este dominio.
+
+**Reliability** (moduleKey finance, steady=0): `finance.contractor_payable.tax_review_overdue` (drift, blocked por tax-owner >7d) + `finance.contractor_payable.fx_unresolved_overdue` (lag, blocked por FX >3d).
+
+**Invariantes contables** (review `greenhouse-finance-accounting-operator`): la retención es **pasivo a remesar al SII** (F29/F50), no resta de costo (gasto = bruto); reconocimiento por **devengo** en el período del trabajo; clasificación P&L con categorías canónicas existentes (worker→`labor_cost_external`, provider fee→`vendor_cost_professional_services`, FX spread→`financial_cost`, remesa→`tax`). Detalle en el arch doc.
+
+**Spec canónica**: `docs/tasks/complete/TASK-795-international-contractor-provider-boundary-fx-policy.md` (D-795-1..5). Arch: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (Delta 2026-05-30). Fase B diferida → promovible a task derivada cuando exista un contractor real por plataforma/EOR. Patrones fuente: TASK-794 (readiness gate + signal pattern), TASK-790 (tax-policy + entidad contratante), TASK-893 (timestamp arithmetic gate).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

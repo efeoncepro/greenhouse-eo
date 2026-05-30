@@ -1,11 +1,16 @@
-# Sesion 2026-05-30 — TASK-795 International Contractor + Provider Boundary + FX — 🚧 IN PROGRESS (Fase A V1)
+# Sesion 2026-05-30 — TASK-795 International Contractor + Provider Boundary + FX — ✅ COMPLETE (Fase A V1)
 
-Rama: `develop` (operador pidió mantenerse en develop, sin branch). Scope confirmado: **Fase A V1**, Fase B (provider/EOR split) diferida (minoría; el grueso son contractors directos).
+Rama: `develop` (operador pidió mantenerse en develop, sin branch). Scope confirmado vía AskUserQuestion: **Fase A V1**, Fase B (provider/EOR split) **diferida** (minoría; el grueso son contractors directos por Efeonce SpA). 4 commits (3 slices + lifecycle).
 
-Diseño pre-ejecución ya committeado en el spec (D-795-1..5 + invariantes contables + review finanzas). Fase A reusa el patrón TASK-794: cero migración, cero capability, cero código payroll. Slices:
-- Slice 1: tax-owner readiness gate (`tax_owner_review_required` fail-closed cuando `manual_review_required`/`country_engine_owned`; frontera D-795-4 escala a 905, nunca aplica tasa).
-- Slice 2: FX policy explícita (`fx_policy_unresolved` cuando cross-currency sin `fx_policy_code`).
-- Slice 3: signals `commercial.contractor_payable.{manual_review_overdue, fx_unresolved_overdue}` + docs.
+Diseño pre-ejecución ya committeado en el spec (D-795-1..5 + invariantes contables + review finanzas). Fase A reusa el patrón TASK-794: **cero migración, cero capability, cero outbox, cero código payroll**.
+
+- Slice 1: gate `tax_owner_review_required` (universal, fail-closed cuando `manual_review_required`/`country_engine_owned`; frontera D-795-4 escala a 905, nunca aplica tasa). Pure + store + tests.
+- Slice 2: gate `fx_policy_unresolved` (cross-currency exige `fx_policy_code` declarado). Pure + store + tests.
+- Slice 3: signals `finance.contractor_payable.{tax_review_overdue (drift), fx_unresolved_overdue (lag)}` (moduleKey finance, steady=0), validados contra PG live (count=0).
+
+Gates de cierre: tsc 0 · lint 0 · `pnpm vitest run src/lib/payroll src/lib/contractor-engagements` 608 passed · reliability 358 passed · `pnpm test` 5603 passed / 0 failed · `pnpm build` exit 0. Cero cambio a `calculate-honorarios.ts`/`SII_RETENTION_RATES`. Docs: CLAUDE.md (International Contractor Boundary invariants) + arch Delta V1.7 + README + registry + changelog.
+
+Fase B (provider settlement split + EOR beneficiary + reconciliación) queda como follow-up promovible a task derivada cuando emerja un contractor real por plataforma/EOR. Decisiones ya documentadas (D-795-2/3).
 
 ---
 

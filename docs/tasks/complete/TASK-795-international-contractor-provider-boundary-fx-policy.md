@@ -2,19 +2,30 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno — Open Questions resueltas pre-ejecución (2026-05-30)`
+- Status real: `Fase A V1 shipped (2026-05-30) — Fase B (provider/EOR split) diferida a task derivada`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Blocked by: `TASK-790, TASK-793`
-- Branch: `task/TASK-795-international-contractor-provider-fx`
+- Branch: `develop` (operador pidió mantenerse en develop)
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Slices Entregados (Fase A V1, 2026-05-30 — develop)
+
+- **Slice 1** — Gate `tax_owner_review_required` (universal, fail-closed): bloquea `tax_compliance_owner ∈ {manual_review_required, country_engine_owned}`; escala a TASK-905/humano, nunca aplica tasa (D-795-4). Pure + store + tests.
+- **Slice 2** — Gate `fx_policy_unresolved` (cross-currency): exige `fx_policy_code` declarado (D-795-1). Pure + store + tests.
+- **Slice 3** — Signals `finance.contractor_payable.{tax_review_overdue (drift), fx_unresolved_overdue (lag)}` (moduleKey finance, steady=0), validados contra PG live.
+- Cero migración / capability / outbox / código payroll. 22 readiness tests + suites payroll (608) / reliability (358) / full (5603) / build verdes.
+
+## Fase B — DIFERIDA (promovible a task derivada)
+
+Provider settlement split (charge/payout/fee/FX-spread) + `beneficiary_type='provider'` (Deel como `greenhouse_core.providers`) + EOR + reconciliación + Finance classification. Requiere migración + seed Deel. **Diferida** porque el grueso de contractors son directos por `Efeonce Group SpA`; el carril provider/EOR es minoría (YAGNI hasta que exista un contractor real por plataforma). Decisiones ya documentadas (D-795-2/3). Promover a task derivada cuando emerja el caso real.
 
 ## Decisiones Pre-Ejecución (Open Questions resueltas — 2026-05-30)
 
@@ -194,17 +205,17 @@ Cierra AC#1, #3, #4 y entrega valor sin tocar el split de Finance.
 
 ## Acceptance Criteria
 
-**Fase A:**
+**Fase A (V1 SHIPPED 2026-05-30):**
 
-- [ ] Direct international / `manual_review_required` contractor no alcanza `ready_for_finance` sin revisión humana (gate `tax_owner_review_required` fail-closed).
-- [ ] Cross-currency payable no alcanza `ready` sin FX policy explícita (source + date + spread owner); `payment_currency` exótica (no CLP/USD) bloquea (`currency_unsupported`) y rutea a `manual_review` (D-795-1).
-- [ ] Chile deductions nunca se aplican a payables internacionales/provider (ya garantizado por `computeContractorWithholding`; verificado con test).
-- [ ] 795 nunca aplica withholding Chile→no-residente: ese caso escala a `international_internal`/TASK-905 (frontera D-795-4).
+- [x] Direct international / `manual_review_required` contractor no alcanza `ready_for_finance` sin revisión humana (gate `tax_owner_review_required` fail-closed). → readiness.ts + store + tests.
+- [x] Cross-currency payable no alcanza `ready` sin FX policy explícita (`fx_policy_unresolved`); `payment_currency` exótica bloquea (`currency_unsupported`) (D-795-1). → readiness.ts + store + tests.
+- [x] Chile deductions nunca se aplican a payables internacionales/provider (garantizado por `computeContractorWithholding`; cubierto por tests).
+- [x] 795 nunca aplica withholding Chile→no-residente: escala a `international_internal`/TASK-905 (frontera D-795-4; gate bloquea, nunca aplica tasa).
 
-**Fase B:**
+**Fase B (DIFERIDA — promovible a task derivada):**
 
 - [ ] El contractor-persona NUNCA se persiste como `greenhouse_core.providers`; el payee `provider` es solo la plataforma/EOR (Deel) (D-795-3).
-- [ ] Provider-owned/EOR payable almacena provider refs + `beneficiary_type='provider'`; el split charge/payout/fee/FX-spread reconcilia (`charge ≈ payout + fee + provider_withheld_tax + fx_spread`) o bloquea (`provider_settlement_unreconciled`).
+- [ ] Provider-owned/EOR payable almacena provider refs + `beneficiary_type='provider'`; el split charge/payout/fee/FX-spread reconcilia o bloquea (`provider_settlement_unreconciled`).
 - [ ] `net_payable` del worker nunca absorbe provider fee ni FX spread (invariante TASK-793 intacto).
 - [ ] La atribución de costo laboral apunta SIEMPRE a la persona contractor, sin importar el payee de la obligación (D-795-3).
 
@@ -217,6 +228,8 @@ Cierra AC#1, #3, #4 y entrega valor sin tocar el split de Finance.
 
 ## Closing Protocol
 
-- [ ] Lifecycle and folder synchronized.
-- [ ] `docs/tasks/README.md` synchronized.
-- [ ] `Handoff.md` updated.
+- [x] Lifecycle and folder synchronized (`complete`, moved to `complete/`).
+- [x] `docs/tasks/README.md` synchronized.
+- [x] `Handoff.md` + `changelog.md` updated.
+- [x] CLAUDE.md invariants (International Contractor Boundary TASK-795 Fase A) + arch Delta.
+- [x] Full gates: payroll non-regression (608) + reliability (358) + full suite (5603) + build verde. Signals live count=0.

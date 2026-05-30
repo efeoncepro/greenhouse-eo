@@ -881,7 +881,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-792` | `complete` | Contractor Work Submissions + Approval/Dispute Flow (EPIC-013 child 4/10) | `docs/tasks/complete/TASK-792-contractor-work-submissions-approval-dispute-flow.md` |
 | `TASK-793` | `complete` | Contractor Payables to Finance Payment Obligations Bridge (EPIC-013 child 5/10) | `docs/tasks/complete/TASK-793-contractor-payables-finance-obligations-bridge.md` |
 | `TASK-794` | `complete` | Chile Honorarios Compliance + SII Retention (EPIC-013 child 6/10) | `docs/tasks/complete/TASK-794-chile-honorarios-compliance-sii-retention.md` |
-| `TASK-795` | `to-do` | International Contractor + Provider Boundary + FX Policy (EPIC-013 child 7/10) | `docs/tasks/to-do/TASK-795-international-contractor-provider-boundary-fx-policy.md` |
+| `TASK-795` | `complete` | International Contractor + Provider Boundary + FX Policy (EPIC-013 child 7/10) — Fase A V1 shipped; Fase B (provider/EOR split) diferida | `docs/tasks/complete/TASK-795-international-contractor-provider-boundary-fx-policy.md` |
 | `TASK-796` | `to-do` | Contractor Self-Service Hub (EPIC-013 child 8/10) | `docs/tasks/to-do/TASK-796-contractor-self-service-hub.md` |
 | `TASK-797` | `to-do` | Contractor Closure + Transition Controls (EPIC-013 child 9/10) | `docs/tasks/to-do/TASK-797-contractor-closure-transition-controls.md` |
 | `TASK-798` | `to-do` | Contractor Reliability + Ops Control Plane (EPIC-013 child 10/10) | `docs/tasks/to-do/TASK-798-contractor-reliability-ops-control-plane.md` |

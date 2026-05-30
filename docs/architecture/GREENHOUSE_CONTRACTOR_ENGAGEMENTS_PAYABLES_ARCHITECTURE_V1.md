@@ -1,8 +1,18 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.6
+**Version:** 1.7
 **Created:** 2026-05-05
-**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets uploader/ledger (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + **Chile Honorarios Compliance + Readiness Layer (TASK-794)** implemented. ContractorInvoice aggregate + self-service UI + closure remain proposals (TASK-795..798).
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + **International Contractor Boundary Fase A (TASK-795)** implemented. Provider settlement split + EOR (TASK-795 Fase B), self-service UI + closure remain proposals (TASK-795 Fase B / 796 / 797 / 798).
+
+## Delta 2026-05-30 — TASK-795 Fase A: International Contractor Boundary + FX Policy shipped
+
+Fase A de TASK-795 está implementada (develop). Establece la **frontera tributaria** del contractor internacional/provider en el readiness fail-closed, **sin computar withholding** (eso es `international_internal`, TASK-905/906/907). **Cero migración, cero capability, cero outbox, cero código payroll** (patrón TASK-794). **Fase B diferida** (provider settlement split + EOR beneficiary + reconciliación) — el grueso de contractors son directos por `Efeonce Group SpA`; el carril provider/EOR es minoría (YAGNI hasta que exista un contractor real por plataforma).
+
+- **2 gates fail-closed** en `evaluatePayableReadiness` + `assessPayableReadiness`:
+  - `tax_owner_review_required` (universal): bloquea cuando `tax_compliance_owner ∈ {manual_review_required, country_engine_owned}`. El dominio contractor NUNCA aplica una tasa Chile→no-residente; bloquea + escala al motor `international_internal` (TASK-905) o a revisión humana (D-795-4).
+  - `fx_policy_unresolved` (solo cross-currency): exige `fx_policy_code` declarado en el engagement; una tasa que existe no basta — el cambio debe ser auditable (D-795-1).
+- **2 reliability signals** (moduleKey finance, steady=0): `finance.contractor_payable.tax_review_overdue` (drift >7d) + `finance.contractor_payable.fx_unresolved_overdue` (lag >3d). Leen `readiness_json->'blockers'` (JSONB `@>`), timestamp arithmetic (gate TASK-893).
+- **Decisiones canónicas** (ya en spec D-795-1..5): moneda CLP/USD rail (lo exótico → manual), split fee/spread separado (Fase B), contractor ≠ Provider + payee ≠ atribución, frontera dura vs 905, entidad contratante (`legal_entity_organization_id`) como dimensión raíz + roadmap multi-entidad (EEUU). Ver el "Modelo dimensional canónico" Delta de esta misma fecha.
 
 ## Delta 2026-05-30 — Modelo dimensional canónico del Contractor (entidad contratante + frontera tributaria)
 
