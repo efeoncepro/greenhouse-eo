@@ -1,8 +1,20 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.8
+**Version:** 1.9
 **Created:** 2026-05-05
-**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + **Self-Service Hub UI (TASK-796)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955), contractor closure (TASK-797) and ops control plane (TASK-798) remain proposals.
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + **Employee→Contractor connected command (TASK-956)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955), contractor closure (TASK-797) and ops control plane (TASK-798) remain proposals.
+
+## Delta 2026-05-30 — TASK-956 Employee→Contractor connected command (entry point cableado)
+
+Cierra el **seam huérfano** del dominio: la transición employee→contractor que abre el `ContractorEngagement` no tenía caller ni entry point — `transitionEmployeeToContractor` (TASK-789) tenía 0 callers y la creación de engagement vivía solo en seeds/tests. Un colaborador que renunciaba (offboarding `executed`) y volvía como contractor quedaba sin engagement → sin superficie self-service (TASK-796) → sin payables. **Additive, cero código payroll, read-only/append-only sobre finiquito + offboarding.**
+
+- **Comando conectado atómico** `transitionEmployeeToContractorEngagement(input)` (`src/lib/contractor-engagements/transition-from-employee.ts`): cierra la relación `employee` + abre la `contractor` + crea el `ContractorEngagement` en **una sola `withGreenhousePostgresTransaction`**. Compone `transitionEmployeeToContractor` (TASK-789) + `createContractorEngagement` (TASK-790) vía **dual-mode** (`client?: PoolClient` opcional — patrón TASK-765/771/872). Idempotente/orphan-resume (`already_complete` / `engagement_created_on_existing_relationship` / `transitioned`). Mapper puro `mapRelationshipSubtypeToEngagementSubtype` (honorarios→honorarios_cl; contractor+CL→freelance; contractor+non-CL→international_contractor).
+- **Keyed en el offboarding case `executed`** (decoupled de la ratificación notarial del finiquito) → cierra por el camino canónico sin forzar. **NUNCA muta** `member.contract_type`, `final_settlements` ni el status del offboarding (solo el evento append-only de TASK-789).
+- **Entry point HR**: `POST /api/hr/contractors/transition-from-offboarding` (`requireHrTenantContext` + reuse capability `hr.contractor_engagement:manage` — su contrato canónico TASK-790 ya cubre "transition"; sin proliferar capability).
+- **Reliability signal** `hr.contractor.transition_orphan` (moduleKey identity, kind drift, steady=0): relaciones `contractor` activas creadas por transición (`source_of_truth IN (workforce_relationship_transition, operator_reconciliation)`) **sin** `ContractorEngagement` no-cancelado asociado — el estado parcial que el comando atómico previene pero que reconcile-drift (TASK-891, que NO crea engagement) podría dejar. Defense-in-depth observable.
+- **Fix latente TASK-790 expuesto** (patrón TASK-765 "mi cambio expuso un bug de dependencia → lo arreglo"): `createContractorEngagement` insertaba 31 columnas pero suplía 30 params (`classification_reviewed` $26 faltaba) — nunca surfaceó porque dev tenía 0 engagements y los tests mockeaban. El rollback atómico del comando mantuvo a Valentina pristine durante el intento fallido.
+- **Valentina Hoyos ejecutada por el camino canónico** (renunció 30/04, offboarding `executed`, contractor honorarios desde 01/06): employee ended 2026-04-30, contractor honorarios active 2026-06-01, engagement `EO-CENG-0001` (`honorarios_cl`, `needs_review`, SII `cl_honorarios_2026_15_25`). Member (`indefinido`), finiquito y offboarding **intactos**. GVC poblado verificado (self-service `honorarios_ready`/"Falta soporte", entidad `Efeonce Group SpA`).
+- Gates: hard-rule `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding src/lib/contractor-engagements` 661 passed · `pnpm test` 5626 passed · `pnpm build` ✓. **TASK-955** (provider settlement split + EOR) recoge el caso provider/plataforma.
 
 ## Delta 2026-05-30 — TASK-796 Contractor Self-Service Hub shipped
 

@@ -4466,7 +4466,22 @@ El dominio Contractor Engagements (TASK-790→796 + la transición employee→co
 - **NUNCA** mutar `members.{contract_type,pay_regime,payroll_via}` desde la transición a contractor sin resolver primero el riesgo de doble-pago (reclasificar a `honorarios` puede re-incluir a la persona en el payroll honorarios legacy). El payout del contractor fluye SOLO por engagement → payable → Finance, jamás por `payroll_entries` ni finiquito. La exclusión de payroll post-salida la da el offboarding case `executed` (TASK-890), no `member.contract_type`.
 - **SIEMPRE** correr como gate de cierre obligatorio de cualquier slice que toque el dominio contractor o su transición: `pnpm vitest run src/lib/payroll` (incluye toda la suite de finiquito) + `pnpm vitest run src/lib/workforce/offboarding`. Cualquier rojo en finiquito u offboarding es **regresión** (no "test ajeno") → NO cerrar.
 
-**Spec canónica**: `docs/tasks/to-do/TASK-956-employee-to-contractor-transition-connected-command.md` (§Payroll & Offboarding Non-Regression Guardrails). Arch: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (§Non-Negotiable Distinctions: contractor cierre ≠ finiquito).
+**Spec canónica**: `docs/tasks/complete/TASK-956-employee-to-contractor-transition-connected-command.md` (§Payroll & Offboarding Non-Regression Guardrails). Arch: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (§Non-Negotiable Distinctions: contractor cierre ≠ finiquito).
+
+### Employee→Contractor connected command invariants (TASK-956, desde 2026-05-30)
+
+`transitionEmployeeToContractorEngagement(input)` (`src/lib/contractor-engagements/transition-from-employee.ts`) es el **único entry point canónico** para convertir a un colaborador en contractor con engagement. Cierra el seam huérfano: antes `transitionEmployeeToContractor` (TASK-789) tenía 0 callers y la creación de engagement vivía solo en seeds/tests. El comando compone, en **una sola transacción atómica**, el cierre de la relación `employee` + la apertura de la `contractor` + la creación del `ContractorEngagement` (TASK-790). Keyed en el offboarding case `executed` (decoupled de la ratificación del finiquito → cierra sin forzar notaría).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** convertir a un colaborador en contractor llamando `endPersonLegalEntityRelationship` + `createContractorEngagement` por separado desde un consumer. Toda transición employee→contractor con engagement pasa por `transitionEmployeeToContractorEngagement` — single source of truth atómico. Llamadas separadas dejan estado parcial (relación cerrada sin engagement, o engagement sin relación) que el signal `hr.contractor.transition_orphan` detecta.
+- **NUNCA** componer la transición sin pasar `client` (el `PoolClient` de la tx) a los helpers dual-mode (`transitionEmployeeToContractor`, `createContractorEngagement`). El dual-mode (`client?: PoolClient` opcional, patrón TASK-765/771/872) es lo que garantiza atomicidad — sin él, un fallo a mitad deja estado parcial sin rollback.
+- **NUNCA** mutar `member.contract_type`/`pay_regime`/`payroll_via`, el finiquito ni el status del offboarding desde el comando (ver §boundary arriba). El comando es read-only/append-only sobre esos dominios.
+- **NUNCA** crear el engagement con un subtype derivado inline. Usar el mapper puro `mapRelationshipSubtypeToEngagementSubtype` (honorarios→honorarios_cl; contractor+CL→freelance; contractor+non-CL→international_contractor).
+- **SIEMPRE** el comando debe ser idempotente/orphan-resume: re-ejecutar sobre un case ya transicionado retorna `already_complete`; si la relación contractor existe pero falta el engagement, lo crea (`engagement_created_on_existing_relationship`). NUNCA re-ejecutar un cierre de relación ya cerrado.
+- **SIEMPRE** que emerja una transición desde otro contexto (provider/plataforma, EOR — TASK-955), reusar este comando extendiendo el mapper + el subtype, NO duplicar el wiring atómico.
+
+**Reliability signal**: `hr.contractor.transition_orphan` (moduleKey identity, kind drift, steady=0) — relaciones contractor activas creadas por transición sin engagement asociado. **Spec**: `docs/tasks/complete/TASK-956-employee-to-contractor-transition-connected-command.md`.
 
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
