@@ -1,28 +1,9 @@
 #!/usr/bin/env tsx
 /**
- * Greenhouse Frontend Capture Helper — CLI canónico.
+ * Greenhouse Visual Capture — CLI canónico.
  *
- * Reemplaza el patrón "cada agente escribe su _cap.mjs ad-hoc". Reusa
- * scripts/playwright-auth-setup.mjs (agent session canónico) + storage
- * states existentes (.auth/storageState.<env>.json) + bypass header
- * canónico para staging.
- *
- * Usage:
- *   pnpm fe:capture <scenario-name> --env=staging
- *   pnpm fe:capture --route=/hr/offboarding --env=staging --hold=3000
- *   pnpm fe:capture <scenario-name> --env=staging --gif
- *   pnpm fe:capture <scenario-name> --env=staging --headed
- *
- * Output: .captures/<ISO>_<scenario>/
- *   - recording.webm        (continuous video del session)
- *   - frames/01-<label>.png (marker-based stills sync)
- *   - flipbook.gif          (opt, ffmpeg)
- *   - manifest.json         (scenario meta + timings + frames)
- *   - stdout.log            (debug)
- *
- * Spec arquitectónica: design via arch-architect, 4 pillars scored,
- * 5-layer defense-in-depth Safety. Ver docs/manual-de-uso/plataforma/
- * captura-visual-playwright.md.
+ * Reusa agent auth, Vercel bypass y scenarios declarativos para producir
+ * evidencia visual: video, frames, manifest, audit e index.html estático.
  */
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
@@ -31,14 +12,16 @@ import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 
 import { appendAudit, resolveActor } from './lib/audit'
-import { assertNotRedirectedToLogin, launchCaptureSession } from './lib/browser'
-import { isValidEnv, resolveEnvConfig, type CaptureEnv } from './lib/env'
 import { ensureStorageStateFresh, refreshStorageState } from './lib/auth'
+import { assertNotRedirectedToLogin, launchCaptureSession } from './lib/browser'
+import { isValidEnv, resolveEnvConfig, type CaptureEnv, type EnvConfig } from './lib/env'
+import { classifyCaptureFailure } from './lib/failure-taxonomy'
 import { composeGif } from './lib/gif'
-import { writeManifest, type CaptureManifest, type FrameRecord } from './lib/manifest'
+import { writeManifest, type CaptureManifest } from './lib/manifest'
 import { runScenario } from './lib/recorder'
+import { writeCaptureReport } from './lib/report'
 import { applySecretMask, assertSafeOutputPath, enforceProductionGate } from './lib/safety'
-import type { CaptureScenario } from './lib/scenario'
+import type { CaptureScenario, CaptureViewportVariant } from './lib/scenario'
 import { uploadCaptureToGcs } from './lib/upload'
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
@@ -84,8 +67,185 @@ const buildInlineScenario = (route: string, holdMs: number): CaptureScenario => 
   viewport: { width: 1440, height: 900 },
   initialHoldMs: holdMs,
   finalHoldMs: 200,
+  assertions: [
+    { kind: 'noLoginRedirect', reason: 'authenticated route expected' },
+    { kind: 'noErrorBoundary', reason: 'visual evidence should not capture app error' }
+  ],
   steps: [{ kind: 'mark', label: 'snapshot' }]
 })
+
+const viewportFromVariant = (
+  scenario: CaptureScenario,
+  variant?: CaptureViewportVariant
+): { width: number; height: number } => {
+  if (!variant || variant.device) return scenario.viewport
+
+  return {
+    width: variant.width ?? scenario.viewport.width,
+    height: variant.height ?? scenario.viewport.height
+  }
+}
+
+interface RunOneArgs {
+  env: CaptureEnv
+  envConfig: EnvConfig
+  scenario: CaptureScenario
+  outputDir: string
+  headed: boolean
+  gif: boolean
+  deviceName?: string
+  viewportName?: string
+  viewport: { width: number; height: number }
+}
+
+const runOneCapture = async ({
+  env,
+  envConfig,
+  scenario,
+  outputDir,
+  headed,
+  gif,
+  deviceName,
+  viewportName,
+  viewport
+}: RunOneArgs): Promise<CaptureManifest> => {
+  const videoDir = resolve(outputDir, '_video-tmp')
+
+  mkdirSync(videoDir, { recursive: true })
+
+  PRINT(`  output:   ${outputDir.replace(REPO_ROOT, '<repo>')}`)
+
+  const session = await launchCaptureSession({
+    envConfig,
+    viewport,
+    headed,
+    deviceName,
+    recordVideoDir: videoDir
+  })
+
+  let exitCode: 0 | 1 = 0
+  let stepError: { message: string; stepIndex: number } | undefined
+  let outcome = {
+    frames: [],
+    startedAt: Date.now(),
+    finishedAt: Date.now(),
+    assertions: [],
+    qualityFindings: [],
+    interactions: []
+  } as Awaited<ReturnType<typeof runScenario>>
+
+  try {
+    PRINT(`→ goto ${envConfig.baseUrl}${scenario.route}`)
+    await session.page.goto(`${envConfig.baseUrl}${scenario.route}`, {
+      waitUntil: 'networkidle',
+      timeout: 60000
+    })
+
+    try {
+      assertNotRedirectedToLogin(session.page, scenario.route)
+    } catch (redirectErr) {
+      PRINT(`  stale auth detectado, forzando refresh…`)
+      refreshStorageState(env, envConfig)
+      throw redirectErr
+    }
+
+    await applySecretMask(session.page, scenario.extraMaskSelectors ?? [])
+
+    outcome = await runScenario({
+      page: session.page,
+      scenario,
+      outputDir,
+      log: PRINT
+    })
+
+    if (outcome.error) {
+      exitCode = 1
+      stepError = outcome.error
+    }
+  } catch (err) {
+    exitCode = 1
+    stepError = {
+      message: err instanceof Error ? err.message : String(err),
+      stepIndex: -1
+    }
+    PRINT(`✗ captura abortada: ${stepError.message}`)
+  }
+
+  const webmTmpPath = await session.finalizeRecording()
+  let webmPath: string | null = null
+
+  if (webmTmpPath) {
+    webmPath = resolve(outputDir, 'recording.webm')
+
+    try {
+      const { renameSync, rmSync } = await import('node:fs')
+
+      renameSync(webmTmpPath, webmPath)
+      rmSync(videoDir, { recursive: true, force: true })
+    } catch {
+      webmPath = webmTmpPath
+    }
+
+    PRINT(`✓ recording.webm guardado`)
+  } else {
+    PRINT(`⚠ no se generó recording`)
+  }
+
+  let gifPath: string | null = null
+
+  if (gif && webmPath) {
+    PRINT(`→ componiendo GIF con ffmpeg…`)
+
+    const { gifPath: g, warning } = composeGif(webmPath, { fps: 12, maxWidth: 800 })
+
+    gifPath = g
+    if (warning) PRINT(`  ⚠ ${warning}`)
+    if (g) PRINT(`✓ flipbook.gif guardado`)
+  }
+
+  const failureCategory = classifyCaptureFailure(stepError?.message)
+
+  const reportManifest: CaptureManifest = {
+    schemaVersion: 1,
+    scenarioName: scenario.name,
+    route: scenario.route,
+    env,
+    viewport,
+    viewportName,
+    startedAt: new Date(outcome.startedAt).toISOString(),
+    finishedAt: new Date(outcome.finishedAt).toISOString(),
+    durationMs: outcome.finishedAt - outcome.startedAt,
+    outputs: {
+      recordingWebm: webmPath ? webmPath.replace(`${outputDir}/`, '') : null,
+      framesDir: 'frames/',
+      flipbookGif: gifPath ? gifPath.replace(`${outputDir}/`, '') : null
+    },
+    frames: outcome.frames,
+    readiness: outcome.readiness,
+    assertions: outcome.assertions,
+    qualityFindings: outcome.qualityFindings,
+    interactions: outcome.interactions,
+    failureCategory,
+    baseline: scenario.baseline,
+    exitCode,
+    error: stepError
+  }
+
+  const reportHtml = writeCaptureReport(outputDir, reportManifest)
+  const manifest: CaptureManifest = { ...reportManifest, reportHtml }
+
+  writeManifest(outputDir, manifest)
+  PRINT(`✓ manifest.json escrito`)
+  PRINT(`✓ index.html escrito`)
+
+  writeFileSync(
+    resolve(outputDir, 'stdout.log'),
+    `# Run actor=${resolveActor()} env=${env}\n# scenario=${scenario.name}\n# exitCode=${exitCode}\n`,
+    'utf8'
+  )
+
+  return manifest
+}
 
 const main = async (): Promise<void> => {
   const { values, positionals } = parseArgs({
@@ -123,8 +283,6 @@ const main = async (): Promise<void> => {
   PRINT(`  env:      ${env}`)
   PRINT(`  baseUrl:  ${envConfig.baseUrl}`)
   PRINT(`  actor:    ${resolveActor()}`)
-
-  // Auth check + refresh proactivo si <1h restante o ausente
   PRINT(`  auth:     checking storage state…`)
 
   try {
@@ -140,145 +298,92 @@ const main = async (): Promise<void> => {
     ? await loadScenarioByName(scenarioName)
     : buildInlineScenario(values.route as string, Number(values.hold))
 
+  const cliDevice = values.device as string | undefined
+  const scenarioVariants = !cliDevice && scenario.viewports?.length ? scenario.viewports : undefined
+
+  const variants: CaptureViewportVariant[] = scenarioVariants ?? [
+    {
+      name: cliDevice ? cliDevice.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase() : 'default',
+      device: cliDevice,
+      width: scenario.viewport.width,
+      height: scenario.viewport.height
+    }
+  ]
+
   PRINT(`  scenario: ${scenario.name}`)
   PRINT(`  route:    ${scenario.route}`)
-  PRINT(`  viewport: ${scenario.viewport.width}x${scenario.viewport.height}`)
-
-  const outputDir = buildOutputDir(scenario.name)
-  const videoDir = resolve(outputDir, '_video-tmp')
-
-  mkdirSync(videoDir, { recursive: true })
-  PRINT(`  output:   ${outputDir.replace(REPO_ROOT, '<repo>')}`)
+  PRINT(`  variants: ${variants.map(v => v.name).join(', ')}`)
   PRINT('')
 
-  const session = await launchCaptureSession({
-    envConfig,
-    viewport: scenario.viewport,
-    headed: values.headed === true,
-    deviceName: values.device,
-    recordVideoDir: videoDir
-  })
+  const rootOutputDir = buildOutputDir(scenario.name)
+  const variantSummaries = []
+  let rootExitCode: 0 | 1 = 0
+  let primaryManifest: CaptureManifest | null = null
 
-  if (values.device) {
-    PRINT(`  device:   ${values.device} (Playwright preset)`)
-  }
+  for (const [index, variant] of variants.entries()) {
+    const multi = variants.length > 1
+    const outputDir = multi ? resolve(rootOutputDir, `${String(index + 1).padStart(2, '0')}-${variant.name}`) : rootOutputDir
 
-  let exitCode: 0 | 1 = 0
-  let stepError: { message: string; stepIndex: number } | undefined
-  let frames: FrameRecord[] = []
-  let startedAt = Date.now()
-  let finishedAt = startedAt
+    mkdirSync(outputDir, { recursive: true })
 
-  try {
-    PRINT(`→ goto ${envConfig.baseUrl}${scenario.route}`)
-    await session.page.goto(`${envConfig.baseUrl}${scenario.route}`, {
-      waitUntil: 'networkidle',
-      timeout: 60000
-    })
+    PRINT(`▶ variant ${variant.name}`)
+    PRINT(`  viewport: ${variant.device ? `device ${variant.device}` : `${variant.width}x${variant.height}`}`)
 
-    // Stale auth detection — si redirigió a /login después de goto, refresh + retry
-    try {
-      assertNotRedirectedToLogin(session.page, scenario.route)
-    } catch (redirectErr) {
-      PRINT(`  ⚠️  stale auth detectado, forzando refresh…`)
-      refreshStorageState(env, envConfig)
-      throw redirectErr // No re-launch en V1; usuario re-ejecuta. V1.1 puede auto-retry.
-    }
-
-    await applySecretMask(session.page, scenario.extraMaskSelectors ?? [])
-
-    const outcome = await runScenario({
-      page: session.page,
+    const manifest = await runOneCapture({
+      env,
+      envConfig,
       scenario,
       outputDir,
-      log: PRINT
+      headed: values.headed === true,
+      gif: values.gif === true,
+      deviceName: variant.device,
+      viewportName: variant.name,
+      viewport: viewportFromVariant(scenario, variant)
     })
 
-    frames = outcome.frames
-    startedAt = outcome.startedAt
-    finishedAt = outcome.finishedAt
+    if (!primaryManifest) primaryManifest = manifest
+    if (manifest.exitCode !== 0) rootExitCode = 1
 
-    if (outcome.error) {
-      exitCode = 1
-      stepError = outcome.error
-    }
-  } catch (err) {
-    exitCode = 1
-    stepError = {
-      message: err instanceof Error ? err.message : String(err),
-      stepIndex: -1
-    }
-    PRINT(`✗ captura abortada: ${stepError.message}`)
+    variantSummaries.push({
+      name: variant.name,
+      viewport: manifest.viewport,
+      device: variant.device,
+      outputDir: outputDir.replace(`${rootOutputDir}/`, ''),
+      manifestPath: `${outputDir.replace(`${rootOutputDir}/`, '')}/manifest.json`,
+      exitCode: manifest.exitCode,
+      durationMs: manifest.durationMs,
+      frameCount: manifest.frames.length
+    })
   }
 
-  const webmTmpPath = await session.finalizeRecording()
-  let webmPath: string | null = null
-
-  if (webmTmpPath) {
-    // Mover el webm fuera del videoDir tmp al outputDir final
-    webmPath = resolve(outputDir, 'recording.webm')
-
-    try {
-      const { renameSync, rmSync } = await import('node:fs')
-
-      renameSync(webmTmpPath, webmPath)
-      rmSync(videoDir, { recursive: true, force: true })
-    } catch {
-      // Si rename falla (cross-device, etc.) dejá el webm en videoDir
-      webmPath = webmTmpPath
+  if (variants.length > 1 && primaryManifest) {
+    const rootManifest: CaptureManifest = {
+      ...primaryManifest,
+      viewportName: undefined,
+      outputs: {
+        recordingWebm: null,
+        framesDir: '',
+        flipbookGif: null
+      },
+      frames: [],
+      variants: variantSummaries,
+      exitCode: rootExitCode,
+      error: rootExitCode === 1 ? { message: 'One or more variants failed', stepIndex: -1 } : undefined,
+      failureCategory: rootExitCode === 1 ? 'helper_error' : undefined,
+      reportHtml: undefined
     }
 
-    PRINT(`✓ recording.webm guardado`)
-  } else {
-    PRINT(`⚠️  no se generó recording (¿context cerró antes?)`)
+    const reportHtml = writeCaptureReport(rootOutputDir, rootManifest)
+
+    writeManifest(rootOutputDir, { ...rootManifest, reportHtml })
   }
 
-  let gifPath: string | null = null
-
-  if (values.gif && webmPath) {
-    PRINT(`→ componiendo GIF con ffmpeg…`)
-
-    const { gifPath: g, warning } = composeGif(webmPath, { fps: 12, maxWidth: 800 })
-
-    gifPath = g
-
-    if (warning) PRINT(`  ⚠️  ${warning}`)
-
-    if (g) PRINT(`✓ flipbook.gif guardado`)
-  }
-
-  // Manifest
-  const manifest: CaptureManifest = {
-    schemaVersion: 1,
-    scenarioName: scenario.name,
-    route: scenario.route,
-    env,
-    viewport: scenario.viewport,
-    startedAt: new Date(startedAt).toISOString(),
-    finishedAt: new Date(finishedAt).toISOString(),
-    durationMs: finishedAt - startedAt,
-    outputs: {
-      recordingWebm: webmPath ? webmPath.replace(`${outputDir}/`, '') : null,
-      framesDir: 'frames/',
-      flipbookGif: gifPath ? gifPath.replace(`${outputDir}/`, '') : null
-    },
-    frames,
-    exitCode,
-    error: stepError
-  }
-
-  writeManifest(outputDir, manifest)
-  PRINT(`✓ manifest.json escrito`)
-
-  // OQ-1: opt-in GCS upload
   if (values.upload) {
     PRINT(`→ subiendo a gs://${values.upload}/ …`)
 
-    const result = uploadCaptureToGcs(outputDir, values.upload)
+    const result = uploadCaptureToGcs(rootOutputDir, values.upload)
 
-    if (result.warning) {
-      PRINT(`  ⚠️  ${result.warning}`)
-    }
+    if (result.warning) PRINT(`  ⚠ ${result.warning}`)
 
     if (result.signedUrl) {
       PRINT(`✓ subido a ${result.bucketPath}`)
@@ -288,38 +393,38 @@ const main = async (): Promise<void> => {
     }
   }
 
-  // Audit
   appendAudit({
     timestamp: new Date().toISOString(),
     scenarioName: scenario.name,
     route: scenario.route,
     env,
-    outputDir: outputDir.replace(REPO_ROOT, '<repo>'),
-    exitCode,
-    durationMs: finishedAt - startedAt,
+    outputDir: rootOutputDir.replace(REPO_ROOT, '<repo>'),
+    exitCode: rootExitCode,
+    durationMs: variantSummaries.reduce((acc, v) => acc + v.durationMs, 0),
     actor: resolveActor(),
-    error: stepError?.message
+    error: rootExitCode === 1
+      ? variants.length === 1
+        ? primaryManifest?.error?.message ?? 'Capture failed'
+        : 'One or more variants failed'
+      : undefined,
+    failureCategory: rootExitCode === 1
+      ? variants.length === 1
+        ? primaryManifest?.failureCategory ?? 'helper_error'
+        : 'helper_error'
+      : undefined
   })
 
-  // Summary
   PRINT('')
   PRINT(`═══════════════════════════════════════`)
-  PRINT(`  ${exitCode === 0 ? '✅' : '❌'} capture ${exitCode === 0 ? 'OK' : 'FALLÓ'}`)
-  PRINT(`  ${frames.length} frame${frames.length === 1 ? '' : 's'} · ${finishedAt - startedAt}ms`)
-  PRINT(`  → ${outputDir.replace(REPO_ROOT, '<repo>')}`)
+  PRINT(`  ${rootExitCode === 0 ? 'OK' : 'FALLÓ'} capture ${rootExitCode === 0 ? 'OK' : 'FALLÓ'}`)
+  PRINT(`  ${variantSummaries.length} variant${variantSummaries.length === 1 ? '' : 's'} · ${variantSummaries.reduce((acc, v) => acc + v.frameCount, 0)} frames`)
+  PRINT(`  → ${rootOutputDir.replace(REPO_ROOT, '<repo>')}`)
   PRINT(`═══════════════════════════════════════`)
 
-  // Write stdout.log placeholder (full piped log requires shell redirect)
-  writeFileSync(
-    resolve(outputDir, 'stdout.log'),
-    `# Run actor=${resolveActor()} env=${env}\n# scenario=${scenario.name}\n# exitCode=${exitCode}\n`,
-    'utf8'
-  )
-
-  process.exit(exitCode)
+  process.exit(rootExitCode)
 }
 
 main().catch(err => {
-  console.error('✗', err instanceof Error ? err.message : err)
+  console.error(err instanceof Error ? err.stack : String(err))
   process.exit(1)
 })

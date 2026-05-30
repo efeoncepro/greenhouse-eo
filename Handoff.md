@@ -28327,3 +28327,26 @@ Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. N
 **Test coverage final TASK-872**: 500+ tests verde. SCIM/eligibility/primitive: 49 tests. Reliability signals: 3 live tests. Payroll legacy: 420 tests (incluye 12 fixes pre-existentes). Lint + tsc verdes.
 
 **Push pendiente**: 11 commits en `develop` local. Operador autoriza push cuando esté listo. Deploy staging via Vercel auto-trigger en push a develop.
+# Sesion 2026-05-30 — TASK-953 Greenhouse Visual Capture Evidence Hardening — ✅ COMPLETE
+
+Rama: `develop` por instrucción explícita del operador; no se creó branch. Task cerrada en `docs/tasks/complete/TASK-953-greenhouse-visual-capture-evidence-hardening.md`; registry/README sincronizados y plan en `docs/tasks/plans/TASK-953-plan.md`.
+
+Discovery: no hay PR ni branch activo para TASK-953. GVC runtime real confirmado en `scripts/frontend/*`; el ADR/spec vigente es `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`. Access model no aplica: no cambia views, entitlements, routeGroups ni startup policy. El delta se implementa como tooling local additive y compatible con scenarios V1.
+
+Resultado:
+- DSL/runtime: `readiness`, `assertions`, `interaction` V2, `viewports`, `baseline`, quality findings, failure taxonomy y manifest aditivo.
+- CLIs: `fe:capture` genera `index.html`; `fe:capture:review` incorpora findings/assertions/interactions; `fe:capture:health` agrupa taxonomy; `fe:capture:diff` muestra baseline/findings.
+- Scenarios nuevos: `gvc-readiness-assertions-report`, `offboarding-queue-microinteractions-v2`, `gvc-multi-viewport`, `contractor-admin-runtime-baseline`.
+- Docs sincronizadas: AGENTS, CLAUDE, project_context, arquitectura GVC V1.4, manual, doc funcional, scripts README/scenarios README y changelog.
+
+Validación:
+- `pnpm exec vitest run scripts/frontend/lib` OK (9 tests).
+- `pnpm exec eslint scripts/frontend` OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `pnpm fe:capture gvc-readiness-assertions-report --env=local` OK -> `.captures/2026-05-30T20-34-29_gvc-readiness-assertions-report` (`manifest.json`, `index.html`, `review-dossier.md` generado).
+- `pnpm fe:capture gvc-multi-viewport --env=local` OK -> `.captures/2026-05-30T20-34-46_gvc-multi-viewport` (3 variants, 6 frames).
+- `pnpm fe:capture offboarding-queue-microinteractions-v2 --env=local` OK -> `.captures/2026-05-30T20-35-51_offboarding-queue-microinteractions-v2` (interaction V2 + keyboard + reduced-motion frame).
+- `pnpm fe:capture:diff .captures/2026-05-30T20-34-29_gvc-readiness-assertions-report .captures/2026-05-30T20-34-29_gvc-readiness-assertions-report` OK.
+- `pnpm fe:capture:health` OK; reportó 5% failure por el primer run esperado de calibración readiness con selector demasiado estricto, taxonomy visible.
+- `pnpm docs:context-check` OK (solo warnings históricos de tamaño de Handoff).
+- `pnpm task:lint --task TASK-953` OK antes del move final; re-ejecutar si se toca la task después del cierre.

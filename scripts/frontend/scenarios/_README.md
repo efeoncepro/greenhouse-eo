@@ -24,6 +24,24 @@ export const scenario: CaptureScenario = {
 }
 ```
 
+## Readiness y assertions
+
+Para evitar capturas falsas de login, loading o error boundary, los scenarios importantes pueden declarar readiness y assertions:
+
+```ts
+readiness: {
+  selector: '[data-gvc-ready="mi-feature"]',
+  absentSelectors: ['[data-testid="login-card"]', '[data-loading="true"]', '.MuiSkeleton-root'],
+  waitForFonts: true,
+  postReadyDelayMs: 150,
+  timeout: 8000
+},
+assertions: [
+  { kind: 'noLoginRedirect', reason: 'ruta autenticada esperada' },
+  { kind: 'noErrorBoundary', reason: 'la evidencia no debe ser un error de app' }
+]
+```
+
 ## Tipos de step
 
 | `kind`  | Uso                                              | Campos              |
@@ -36,6 +54,63 @@ export const scenario: CaptureScenario = {
 | `fill`  | Type en input. **Requiere** `mutating:true`     | `selector`, `value` |
 | `press` | Key sequence. **Requiere** `mutating:true`      | `selector?`, `key`  |
 | `sleep` | Delay puro sin espera de selector                | `ms`                |
+| `assert` | Assertion ligera en medio del timeline          | `assertion`         |
+| `interaction` | Microinteraction V2 con intención + frames relativos | `interaction` |
+
+## Microinteraction evidence V2
+
+Usá `interaction` cuando la incertidumbre sea el feedback de una acción, no solo una captura estática:
+
+```ts
+{
+  kind: 'interaction',
+  interaction: {
+    name: 'filter-hover',
+    action: { kind: 'hover', selector: '[role="tab"]' },
+    intent: 'Confirmar affordance del filtro antes de activarlo',
+    frames: [
+      { label: 'before', atMs: 0 },
+      { label: 'feedback', atMs: 150 },
+      { label: 'settled', atMs: 300 }
+    ],
+    keyboardEquivalent: {
+      action: { kind: 'press', key: 'Tab' },
+      expected: 'focus visible'
+    },
+    reducedMotion: 'capture'
+  }
+}
+```
+
+El manifest registra segmentos lógicos del video y `index.html` muestra los frames por interacción.
+
+## Multi-viewport
+
+Un scenario puede declarar viewports sin duplicar archivos:
+
+```ts
+viewports: [
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'tablet', width: 1024, height: 900 },
+  { name: 'mobile', device: 'iPhone 13' }
+]
+```
+
+El output crea subdirectorios por variante y un manifest raíz con `variants`.
+
+## Baseline mockup -> runtime
+
+Para tasks UI con mockup aprobado:
+
+```ts
+baseline: {
+  surfaceId: 'hr.contractors',
+  baselineName: 'contractor-admin-workbench-mockup',
+  approvedMockupCaptureDir: '.captures/<approved-run>'
+}
+```
+
+Capturá mockup y runtime, luego compará con `pnpm fe:capture:diff <mockup-run> <runtime-run>`.
 
 ### Capturas largas y secciones scrolleadas
 

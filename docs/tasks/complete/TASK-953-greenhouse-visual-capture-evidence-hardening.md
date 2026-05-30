@@ -12,13 +12,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `ui|platform|ops`
 - Blocked by: `none`
@@ -440,18 +440,18 @@ No hay deploy productivo directo. Verificar local y staging cuando aplique:
 
 ## Acceptance Criteria
 
-- [ ] GVC soporta readiness explícito con tests y docs.
-- [ ] GVC soporta assertions ligeros y failure taxonomy en manifest/audit.
-- [ ] GVC soporta microinteraction evidence con before/during/after frames, timestamps relativos, intent, video segments y compatibilidad con scenarios V1.
-- [ ] GVC puede capturar focus/keyboard evidence y reduced-motion evidence cuando un scenario lo declara.
-- [ ] GVC detecta frames inútiles o engañosos con findings visibles.
-- [ ] GVC puede ejecutar un scenario en múltiples viewports sin duplicar archivos.
-- [ ] Cada captura genera o puede generar un reporte HTML estático navegable.
-- [ ] `fe:capture:review` incorpora findings automáticos en el dossier.
-- [ ] Existe flujo documentado de baseline/mockup aprobado → runtime final.
-- [ ] `fe:capture:health` agrupa fallos por categoría.
-- [ ] Scenarios de regresión cubren readiness, assertions, microinteractions, multi-viewport y report.
-- [ ] Docs y entrypoints de agentes quedan sincronizados si cambia el contrato operativo.
+- [x] GVC soporta readiness explícito con tests y docs.
+- [x] GVC soporta assertions ligeros y failure taxonomy en manifest/audit.
+- [x] GVC soporta microinteraction evidence con before/during/after frames, timestamps relativos, intent, video segments y compatibilidad con scenarios V1.
+- [x] GVC puede capturar focus/keyboard evidence y reduced-motion evidence cuando un scenario lo declara.
+- [x] GVC detecta frames inútiles o engañosos con findings visibles.
+- [x] GVC puede ejecutar un scenario en múltiples viewports sin duplicar archivos.
+- [x] Cada captura genera o puede generar un reporte HTML estático navegable.
+- [x] `fe:capture:review` incorpora findings automáticos en el dossier.
+- [x] Existe flujo documentado de baseline/mockup aprobado → runtime final.
+- [x] `fe:capture:health` agrupa fallos por categoría.
+- [x] Scenarios de regresión cubren readiness, assertions, microinteractions, multi-viewport y report.
+- [x] Docs y entrypoints de agentes quedan sincronizados si cambia el contrato operativo.
 
 ## Verification
 
@@ -465,9 +465,9 @@ No hay deploy productivo directo. Verificar local y staging cuando aplique:
 
 ## Closing Protocol
 
-- [ ] Lifecycle and folder synchronized.
-- [ ] `docs/tasks/README.md` synchronized.
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
-- [ ] `Handoff.md` updated with validation artifacts.
-- [ ] `changelog.md` updated if workflow behavior changed.
-- [ ] GVC docs/manual/architecture synchronized.
+- [x] Lifecycle and folder synchronized.
+- [x] `docs/tasks/README.md` synchronized.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
+- [x] `Handoff.md` updated with validation artifacts.
+- [x] `changelog.md` updated if workflow behavior changed.
+- [x] GVC docs/manual/architecture synchronized.

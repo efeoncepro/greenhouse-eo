@@ -48,6 +48,7 @@ Una carpeta nueva en `.captures/` con:
 - **Stills PNG** en momentos clave (por ejemplo: "antes del hover", "durante el hover", "después del click")
 - **Un GIF** opcional (loop reproducible en cualquier visor)
 - **Un manifest JSON** con metadata (qué ruta, qué env, cuándo, cuánto duró)
+- **Un reporte HTML** (`index.html`) con readiness, assertions, findings automáticos, microinteractions y frames
 
 Todo eso queda fuera del repo (gitignored). Si querés compartirlo, lo adjuntás manualmente.
 
@@ -105,6 +106,18 @@ export const scenario: CaptureScenario = {
 ```
 
 Y lo corrés: `pnpm fe:capture mi-feature --env=staging`.
+
+### Nivel 2.5 — Evidencia endurecida
+
+Los scenarios pueden declarar:
+
+- `readiness`: espera que la página esté lista y sin loading dominante.
+- `assertions`: evita capturas falsas de login, error boundary o toasts críticos.
+- `interaction`: captura microinteractions con intención, frames relativos y evidencia keyboard/focus.
+- `viewports`: ejecuta desktop/tablet/mobile en una sola corrida.
+- `baseline`: documenta la comparación mockup aprobado → runtime final.
+
+El manifest agrega `failureCategory` para clasificar fallos (`auth_redirect`, `selector_timeout`, `app_error`, `visual_timeout`, `frame_quality`, `assertion_failed`, `helper_error`) y `fe:capture:health` agrupa esos fallos por categoría.
 
 Para una pantalla completa con scroll:
 
@@ -192,3 +205,15 @@ Greenhouse Visual Capture agrega soporte robusto para scroll y pantallas largas:
 6. Scenarios de referencia: `contractor-admin-workbench`, `offboarding-fullpage-capture` y `sample-sprints-scroll-anchors`.
 
 Backlog: pixel-perfect diff, PG-backed reliability signal, Anthropic SDK orchestration directa, validación PG real del actor capability.
+
+## V1.4 — Delta 2026-05-30
+
+Evidence hardening:
+
+1. Readiness explícito por selector, fuentes y ausencia de loading.
+2. Assertions ligeros para login/error/loading sin convertir GVC en E2E.
+3. `interaction` step para microinteractions con frames relativos, intención y keyboard evidence.
+4. Quality findings por frame y `failureCategory` en manifest/audit.
+5. Reporte HTML `index.html` por captura.
+6. Multi-viewport declarativo por scenario.
+7. Metadata baseline/mockup→runtime para comparar con `fe:capture:diff`.

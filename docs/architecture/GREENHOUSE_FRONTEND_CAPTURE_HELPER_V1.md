@@ -12,6 +12,7 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 - Fecha V1.1: `2026-05-12 tarde` — Delta OQ-1..OQ-6 (upload, device, diff, capability, reliability, ui-review scaffolding)
 - Fecha V1.2: `2026-05-29` — Hook operativo para verificación visual UI obligatoria vía `pnpm fe:capture` y comandos relacionados
 - Fecha V1.3: `2026-05-30` — Greenhouse Visual Capture named tool + scroll/captura full-page resiliente para pantallas largas
+- Fecha V1.4: `2026-05-30` — evidence hardening: readiness/assertions, quality findings, report HTML, multi-viewport, microinteraction V2 y baseline mockup→runtime
 - Owner: `Claude / Greenhouse frontend tooling`
 - Relacionado con:
   - `scripts/frontend/` (implementación canónica)
@@ -71,6 +72,26 @@ Scenarios de regresión de la capacidad V1.3:
 - `contractor-admin-workbench`: valida `/hr/contractors/mockup` con scroll por selector y `clipSelector`.
 - `offboarding-fullpage-capture`: valida `/hr/offboarding/mockup` con `fullPage`.
 - `sample-sprints-scroll-anchors`: valida `/agency/sample-sprints/mockup` con `scrollTo: 'bottom'` y regreso a top.
+
+## Delta 2026-05-30 — Evidence hardening V1.4
+
+GVC deja de ser solo un grabador y pasa a producir evidencia visual con guardrails explícitos:
+
+- `readiness`: espera selector(es) estables, ausencia de loading/login, `document.fonts.ready` y delay post-ready antes de capturar.
+- `assertions`: guards ligeros (`visible`, `notVisible`, `noLoginRedirect`, `noErrorBoundary`, `noCriticalToast`) para evitar evidencia falsa. No reemplazan Playwright E2E.
+- `interaction`: step V2 para microinteractions con intención, acción, frames relativos, segmento lógico en manifest y evidencia keyboard/focus opcional.
+- `qualityFindings`: análisis automático de frames para detectar login, error boundary, loading visible o frames sospechosamente vacíos.
+- `viewports`: variantes declarativas por scenario; una corrida puede producir sub-runs desktop/tablet/mobile sin duplicar archivos.
+- `index.html`: cada captura genera reporte HTML estático con metadata, readiness, assertions, findings, interactions y frames.
+- `failureCategory`: audit/manifest clasifican fallos como `auth_redirect`, `selector_timeout`, `app_error`, `visual_timeout`, `frame_quality`, `assertion_failed` o `helper_error`.
+- `baseline`: metadata `surfaceId`, `baselineName`, `approvedMockupCaptureDir` para flujos mockup aprobado → runtime.
+
+Scenarios de regresión V1.4:
+
+- `gvc-readiness-assertions-report`: readiness + assertions + report HTML.
+- `offboarding-queue-microinteractions-v2`: interaction step con frames before/during/after y keyboard evidence.
+- `gvc-multi-viewport`: variantes desktop/tablet/mobile en un solo scenario.
+- `contractor-admin-runtime-baseline`: caso vivo TASK-796 mockup→runtime sobre `/hr/contractors`.
 
 ## Por qué
 
@@ -198,6 +219,14 @@ interface CaptureManifest {
     tMs: number             // ms desde startedAt
     note?: string
   }>
+  readiness?: { status: 'passed' | 'failed' | 'skipped'; durationMs: number; error?: string }
+  assertions?: Array<{ kind: string; status: 'passed' | 'failed'; selector?: string; reason?: string; message?: string }>
+  qualityFindings?: Array<{ severity: 'info' | 'warning' | 'error'; category: string; code: string; message: string }>
+  interactions?: Array<{ name: string; intent: string; actionKind: string; startMs: number; endMs: number; frameLabels: string[] }>
+  failureCategory?: 'auth_redirect' | 'selector_timeout' | 'app_error' | 'visual_timeout' | 'frame_quality' | 'assertion_failed' | 'helper_error'
+  reportHtml?: string
+  variants?: Array<{ name: string; viewport: { width: number; height: number }; outputDir: string; manifestPath: string; exitCode: 0 | 1 }>
+  baseline?: { surfaceId?: string; baselineName?: string; approvedMockupCaptureDir?: string }
   exitCode: 0 | 1
   error?: { message: string; stepIndex: number }
 }

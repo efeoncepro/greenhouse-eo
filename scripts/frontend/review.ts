@@ -42,13 +42,37 @@ interface ManifestLike {
   route: string
   env: string
   viewport: { width: number; height: number }
+  viewportName?: string
   frames: FrameMeta[]
+  readiness?: { status: string; durationMs: number; error?: string }
+  assertions?: Array<{ kind: string; status: string; selector?: string; reason?: string; message?: string }>
+  qualityFindings?: Array<{ severity: string; category: string; code: string; message: string; frameLabel?: string }>
+  interactions?: Array<{ name: string; intent: string; actionKind: string; frameLabels: string[] }>
+  reportHtml?: string
 }
 
 const buildDossier = (captureDir: string, manifest: ManifestLike): string => {
   const frameList = manifest.frames
     .map(f => `- **${f.label}** (\`frames/${f.path.replace(/^frames\//, '')}\`, +${f.tMs}ms)${f.note ? ` — ${f.note}` : ''}`)
     .join('\n')
+
+  const findings = manifest.qualityFindings?.length
+    ? manifest.qualityFindings
+        .map(f => `- **${f.severity}** \`${f.category}/${f.code}\`${f.frameLabel ? ` (${f.frameLabel})` : ''}: ${f.message}`)
+        .join('\n')
+    : '- Sin findings automáticos.'
+
+  const assertions = manifest.assertions?.length
+    ? manifest.assertions
+        .map(a => `- **${a.status}** \`${a.kind}\`${a.selector ? ` — \`${a.selector}\`` : ''}${a.reason || a.message ? ` — ${a.reason ?? a.message}` : ''}`)
+        .join('\n')
+    : '- Sin assertions declaradas.'
+
+  const interactions = manifest.interactions?.length
+    ? manifest.interactions
+        .map(i => `- \`${i.name}\` (${i.actionKind}) — ${i.intent}. Frames: ${i.frameLabels.join(', ')}`)
+        .join('\n')
+    : '- Sin interactions V2 declaradas.'
 
   return `# UI Review Dossier — ${manifest.scenarioName}
 
@@ -61,10 +85,24 @@ const buildDossier = (captureDir: string, manifest: ManifestLike): string => {
 - **env**: \`${manifest.env}\`
 - **viewport**: ${manifest.viewport.width}×${manifest.viewport.height}
 - **capture dir**: \`${captureDir}\`
+- **report HTML**: ${manifest.reportHtml ? `\`${manifest.reportHtml}\`` : '`index.html` no registrado'}
+- **readiness**: ${manifest.readiness?.status ?? 'skipped'}${manifest.readiness?.error ? ` — ${manifest.readiness.error}` : ''}
 
 ## Frames disponibles para análisis
 
 ${frameList}
+
+## Findings automáticos GVC
+
+${findings}
+
+## Assertions ligeros
+
+${assertions}
+
+## Evidencia de microinteracciones
+
+${interactions}
 
 ## Petición canónica
 

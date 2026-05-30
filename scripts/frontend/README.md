@@ -24,6 +24,8 @@ pnpm fe:capture offboarding-queue-microinteractions --env=staging --headed
 
 Output: `.captures/<ISO>_<scenario>/` (gitignored).
 
+Desde V1.4, cada run también genera `index.html` y manifest enriquecido con readiness, assertions ligeros, findings de calidad de frame, failure taxonomy y segmentos de microinteractions cuando el scenario los declara.
+
 Ver doc completa: [docs/manual-de-uso/plataforma/captura-visual-playwright.md](../../docs/manual-de-uso/plataforma/captura-visual-playwright.md).
 Arquitectura: [docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](../../docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md).
 
@@ -46,6 +48,14 @@ Para pantallas con scroll, no uses offsets frágiles como primera opción. Escri
 
 Convención recomendada: `data-capture="<nombre-seccion>"` en wrappers que deban capturarse de forma repetible.
 
+Para evidencia confiable en rutas importantes, preferí además:
+
+- `readiness` para esperar una señal estable de página lista.
+- `assertions` para bloquear capturas de login, error boundary o loading dominante.
+- `interaction` para microinteractions con frames relativos e intención explícita.
+- `viewports` para desktop/tablet/mobile en un solo scenario.
+- `baseline` para comparar mockup aprobado contra runtime final con `fe:capture:diff`.
+
 Playwright ad-hoc queda como complemento para consola/red/API payloads o pasos que el DSL no soporte. Si se usa, guardar artifacts bajo `.captures/` y documentar por qué no bastó `fe:capture`. Si el flujo se repetirá, agregar o actualizar un scenario en `scripts/frontend/scenarios/`.
 
 ## Estructura
@@ -62,6 +72,8 @@ scripts/frontend/
 │   ├── scenario.ts            # DSL tipado + runner de steps
 │   ├── recorder.ts            # ciclo webm + frames marker-based + manifest
 │   ├── manifest.ts            # CaptureManifest writer
+│   ├── quality.ts             # frame quality findings
+│   ├── report.ts              # index.html por captura
 │   ├── gif.ts                 # ffmpeg compose (opcional)
 │   ├── audit.ts               # JSONL append
 │   └── safety.ts              # prod gate triple + secret mask

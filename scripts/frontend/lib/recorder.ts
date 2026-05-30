@@ -21,17 +21,24 @@ import type { Page } from 'playwright'
 
 import {
   runStep,
+  runAssertion,
+  runReadiness,
   validateScenario,
   type CaptureScenario,
   type ScenarioRunContext
 } from './scenario'
-import type { FrameRecord } from './manifest'
+import type { AssertionResult, CaptureFinding, FrameRecord, InteractionSegment, ReadinessResult } from './manifest'
+import { analyzeFrameQuality } from './quality'
 
 export interface RecorderOutcome {
   frames: FrameRecord[]
   startedAt: number
   finishedAt: number
   error?: { message: string; stepIndex: number }
+  readiness?: ReadinessResult
+  assertions: AssertionResult[]
+  qualityFindings: CaptureFinding[]
+  interactions: InteractionSegment[]
 }
 
 export interface RecorderArgs {
@@ -56,6 +63,9 @@ export const runScenario = async ({
   mkdirSync(framesDir, { recursive: true })
 
   const frames: FrameRecord[] = []
+  const assertions: AssertionResult[] = []
+  const qualityFindings: CaptureFinding[] = []
+  const interactions: InteractionSegment[] = []
   const startedAt = Date.now()
 
   const onMark: ScenarioRunContext['onMark'] = async (label, note, options): Promise<void> => {
@@ -74,12 +84,26 @@ export const runScenario = async ({
       await page.screenshot({ path: absPath, fullPage: options?.fullPage ?? false })
     }
 
+    const frameQualityFindings = await analyzeFrameQuality(page, {
+      frameLabel: label,
+      framePath: absPath,
+      allowEmpty: scenario.quality?.allowEmpty,
+      allowLoading: scenario.quality?.allowLoading,
+      allowLogin: scenario.quality?.allowLogin,
+      allowErrorBoundary: scenario.quality?.allowErrorBoundary,
+      fullPage: options?.fullPage
+    })
+
+    qualityFindings.push(...frameQualityFindings)
+
     frames.push({
       index,
       label,
       path: `frames/${fileName}`,
       tMs,
-      note
+      note,
+      interactionName: options?.interactionName,
+      qualityFindings: frameQualityFindings.length ? frameQualityFindings : undefined
     })
 
     log(`  ✓ mark[${index}] "${label}" (+${tMs}ms)`)
@@ -89,12 +113,58 @@ export const runScenario = async ({
     page,
     outputDir,
     log,
-    onMark
+    onMark,
+    addFinding: finding => qualityFindings.push(finding),
+    addAssertionResult: result => assertions.push(result),
+    addInteractionSegment: segment => interactions.push(segment),
+    getElapsedMs: () => Date.now() - startedAt
   }
 
   // Initial hold for hydration
   if (scenario.initialHoldMs && scenario.initialHoldMs > 0) {
     await page.waitForTimeout(scenario.initialHoldMs)
+  }
+
+  const readiness = await runReadiness(scenario, page)
+
+  if (readiness.status === 'failed') {
+    const message = `Readiness failed: ${readiness.error ?? 'unknown'}`
+
+    log(`  ✗ ${message}`)
+
+    return {
+      frames,
+      startedAt,
+      finishedAt: Date.now(),
+      readiness,
+      assertions,
+      qualityFindings,
+      interactions,
+      error: { message, stepIndex: -1 }
+    }
+  }
+
+  for (const assertion of scenario.assertions ?? []) {
+    const result = await runAssertion(assertion, page)
+
+    assertions.push(result)
+
+    if (result.status === 'failed') {
+      const message = `Assertion failed (${result.kind}): ${result.message}`
+
+      log(`  ✗ ${message}`)
+
+      return {
+        frames,
+        startedAt,
+        finishedAt: Date.now(),
+        readiness,
+        assertions,
+        qualityFindings,
+        interactions,
+        error: { message, stepIndex: -1 }
+      }
+    }
   }
 
   // Run each step
@@ -120,6 +190,10 @@ export const runScenario = async ({
         frames,
         startedAt,
         finishedAt: Date.now(),
+        readiness,
+        assertions,
+        qualityFindings,
+        interactions,
         error: { message, stepIndex: index }
       }
     }
@@ -130,5 +204,5 @@ export const runScenario = async ({
     await page.waitForTimeout(scenario.finalHoldMs ?? 500)
   }
 
-  return { frames, startedAt, finishedAt: Date.now() }
+  return { frames, startedAt, finishedAt: Date.now(), readiness, assertions, qualityFindings, interactions }
 }

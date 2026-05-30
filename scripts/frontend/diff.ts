@@ -36,6 +36,12 @@ interface ManifestLike {
   durationMs: number
   frames: FrameMeta[]
   outputs: { recordingWebm: string | null }
+  baseline?: {
+    surfaceId?: string
+    baselineName?: string
+    approvedMockupCaptureDir?: string
+  }
+  qualityFindings?: Array<{ severity: string; category: string; code: string; message: string }>
 }
 
 const readManifest = (dir: string): ManifestLike => {
@@ -105,6 +111,14 @@ const computeFrameDiffs = (prev: ManifestLike, curr: ManifestLike, prevDir: stri
 }
 
 const buildHtmlReport = (prev: ManifestLike, curr: ManifestLike, diffs: FrameDiff[], prevDir: string, currDir: string): string => {
+  const baseline = curr.baseline?.approvedMockupCaptureDir
+    ? `<p><strong>baseline:</strong> <code>${curr.baseline.approvedMockupCaptureDir}</code>${curr.baseline.surfaceId ? ` · <code>${curr.baseline.surfaceId}</code>` : ''}</p>`
+    : ''
+
+  const findings = curr.qualityFindings?.length
+    ? `<h2>Current findings</h2><ul>${curr.qualityFindings.map(f => `<li><strong>${f.severity}</strong> <code>${f.category}/${f.code}</code> ${f.message}</li>`).join('')}</ul>`
+    : ''
+
   const rows = diffs
     .map(d => {
       const badge = d.status === 'same' ? '🟢' : d.status === 'changed' ? '🟡' : d.status === 'added' ? '🔵' : '⚪'
@@ -151,7 +165,9 @@ const buildHtmlReport = (prev: ManifestLike, curr: ManifestLike, diffs: FrameDif
     <strong>previo:</strong> ${basename(prevDir)} (${prev.durationMs}ms, ${prev.frames.length} frames)<br>
     <strong>actual:</strong> ${basename(currDir)} (${curr.durationMs}ms, ${curr.frames.length} frames)<br>
     <strong>route:</strong> <code>${curr.route}</code> · <strong>scenario:</strong> <code>${curr.scenarioName}</code>
+    ${baseline}
   </div>
+  ${findings}
   <table>
     <thead>
       <tr><th>Frame label</th><th>Anterior</th><th>Actual</th></tr>

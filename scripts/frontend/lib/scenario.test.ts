@@ -41,4 +41,71 @@ describe('frontend capture scenario DSL', () => {
       { kind: 'mark', label: 'bad-scroll-option', scrollTo: 'bottom' }
     ]))).toThrow('scrollBlock/scrollInline/scrollTo solo aplican a scroll')
   })
+
+  it('accepts readiness, assertions and multi-viewport variants', () => {
+    expect(() => validateScenario({
+      ...baseScenario([
+        { kind: 'assert', assertion: { kind: 'noLoginRedirect', reason: 'authenticated route expected' } },
+        { kind: 'mark', label: 'ready' }
+      ]),
+      readiness: {
+        selector: '[data-gvc-ready="test"]',
+        absentSelectors: ['[role="progressbar"]'],
+        waitForFonts: true
+      },
+      assertions: [
+        { kind: 'notVisible', selector: '[data-testid="login-card"]', reason: 'no login wall' }
+      ],
+      viewports: [
+        { name: 'desktop', width: 1440, height: 900 },
+        { name: 'mobile', device: 'iPhone 13' }
+      ]
+    })).not.toThrow()
+  })
+
+  it('accepts V2 interaction evidence steps', () => {
+    expect(() => validateScenario(baseScenario([
+      {
+        kind: 'interaction',
+        interaction: {
+          name: 'filter-hover',
+          action: { kind: 'hover', selector: '[role="tab"]' },
+          intent: 'Confirma affordance del filtro antes de activar',
+          frames: [
+            { label: 'before', atMs: 0 },
+            { label: 'feedback', atMs: 150 }
+          ],
+          keyboardEquivalent: {
+            action: { kind: 'press', key: 'Tab' },
+            expected: 'focus visible'
+          },
+          reducedMotion: 'capture'
+        }
+      }
+    ]))).not.toThrow()
+  })
+
+  it('rejects interaction steps without intent', () => {
+    expect(() => validateScenario(baseScenario([
+      {
+        kind: 'interaction',
+        interaction: {
+          name: 'bad-hover',
+          action: { kind: 'hover', selector: '[role="tab"]' },
+          intent: '',
+          frames: [{ label: 'feedback', atMs: 150 }]
+        }
+      }
+    ]))).toThrow('requiere intent descriptivo')
+  })
+
+  it('rejects duplicate viewport names', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'initial' }]),
+      viewports: [
+        { name: 'desktop', width: 1440, height: 900 },
+        { name: 'desktop', width: 1280, height: 800 }
+      ]
+    })).toThrow('viewport "desktop" duplicado')
+  })
 })

@@ -54,6 +54,17 @@ const main = (): void => {
   console.log(`  mean duration:  ${signal.meanDurationMs}ms`)
   console.log(`  thresholds:     warning ≥${signal.threshold.warning * 100}%, error ≥${signal.threshold.error * 100}%`)
 
+  const categories = Object.entries(signal.failuresByCategory).filter(([, count]) => count > 0)
+
+  if (categories.length > 0) {
+    console.log('')
+    console.log('  failure taxonomy:')
+
+    for (const [category, count] of categories) {
+      console.log(`    ${category.padEnd(18)} ${count}`)
+    }
+  }
+
   if (signal.lastFailure) {
     console.log('')
     console.log(`  ⚠️ last failure: ${signal.lastFailure.timestamp}`)

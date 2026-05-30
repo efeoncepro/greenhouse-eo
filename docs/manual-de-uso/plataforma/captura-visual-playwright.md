@@ -14,6 +14,7 @@ Esta guía explica cómo usar **Greenhouse Visual Capture** (`GVC`), la herramie
 - `recording.webm` — video continuo del lifecycle
 - `frames/NN-<label>.png` — stills PNG sync en momentos clave (marker-based)
 - `manifest.json` — scenario metadata + timings + frame paths
+- `index.html` — reporte HTML navegable con readiness, assertions, findings y frames
 - `flipbook.gif` — opcional, requiere `ffmpeg` instalado
 
 Casos de uso:
@@ -192,6 +193,48 @@ Para ir al inicio o final sin calcular píxeles:
 
 Convención recomendada: agregar `data-capture="<nombre-seccion>"` en el wrapper de secciones importantes solo en mockups/scenarios o en componentes donde ese atributo no afecte producto. Esto hace que la captura sea estable ante cambios de copy, spacing o altura de contenido.
 
+### Caso 5.2 — Readiness, assertions y report HTML
+
+Para que una captura no pase verde cuando en realidad grabó login, loading o error boundary, agregá guards ligeros:
+
+```ts
+readiness: {
+  selector: 'h4',
+  absentSelectors: ['[data-testid="login-card"]', '[data-loading="true"]', '.MuiSkeleton-root'],
+  waitForFonts: true,
+  postReadyDelayMs: 150
+},
+assertions: [
+  { kind: 'noLoginRedirect', reason: 'ruta autenticada esperada' },
+  { kind: 'noErrorBoundary', reason: 'la evidencia no debe ser un error de app' }
+]
+```
+
+Cada captura genera `index.html` dentro del run dir. Ese reporte lista readiness, assertions, failure taxonomy, findings automáticos y frames.
+
+### Caso 5.3 — Microinteractions V2
+
+Para capturar feedback de hover/focus/click con intención explícita:
+
+```ts
+{
+  kind: 'interaction',
+  interaction: {
+    name: 'filter-hover',
+    action: { kind: 'hover', selector: '[role="tab"]' },
+    intent: 'Confirmar affordance del filtro antes de activarlo',
+    frames: [
+      { label: 'before', atMs: 0 },
+      { label: 'feedback', atMs: 150 },
+      { label: 'settled', atMs: 300 }
+    ],
+    keyboardEquivalent: { action: { kind: 'press', key: 'Tab' }, expected: 'focus visible' }
+  }
+}
+```
+
+El video sigue siendo continuo, pero el manifest registra segmentos lógicos por interacción.
+
 ### Caso 6 — Purgar capturas viejas
 
 ```bash
@@ -212,6 +255,20 @@ pnpm fe:capture <scenario> --env=staging --device="Galaxy S9+"
 ```
 
 El preset overridea viewport + userAgent + DPR del scenario. Útil para validar responsive layouts + mobile microinteractions.
+
+### Caso 7.1 — Multi-viewport por scenario
+
+Para correr desktop/tablet/mobile en una sola invocación:
+
+```ts
+viewports: [
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'tablet', width: 1024, height: 900 },
+  { name: 'mobile', device: 'iPhone 13' }
+]
+```
+
+El output crea subdirectorios por viewport y un manifest raíz con `variants`.
 
 ### Caso 8 — Visual diff entre 2 capturas (V1.1)
 
