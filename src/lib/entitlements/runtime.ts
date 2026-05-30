@@ -1304,6 +1304,25 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'own',
       source
     })
+
+    // TASK-796 — Self-service contractor: lectura del propio engagement/estado +
+    // envío de work submission con adjuntos. Scope 'own' siempre. La aprobación
+    // es surface HR (hr.contractor_work_submission.review).
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'personal_workspace.contractor.read_self',
+      action: 'read',
+      scope: 'own',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'personal_workspace.contractor.submit_self',
+      action: 'create',
+      scope: 'own',
+      source
+    })
   }
 
   if (hasRouteGroup(subject, 'ai_tooling')) {

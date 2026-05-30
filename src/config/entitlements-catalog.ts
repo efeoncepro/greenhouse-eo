@@ -914,6 +914,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'own'
   },
   {
+    // TASK-796 — Self-service: el contractor lee su propio engagement, envíos y
+    // estado de pago (Finance-only data filtrada). Scope 'own'. Distinto de
+    // hr.contractor_engagement.read (admin op tenant-scope).
+    key: 'personal_workspace.contractor.read_self',
+    module: 'my_workspace',
+    actions: ['read'] as const,
+    defaultScope: 'own'
+  },
+  {
+    // TASK-796 — Self-service: el contractor crea/envía su propia work submission
+    // (timesheet/milestone/deliverable) + adjunta boleta/evidencia. La aprobación
+    // es surface HR (hr.contractor_work_submission.review). Scope 'own'.
+    key: 'personal_workspace.contractor.submit_self',
+    module: 'my_workspace',
+    actions: ['create'] as const,
+    defaultScope: 'own'
+  },
+  {
     key: 'person.legal_profile.hr_update',
     module: 'hr',
     actions: ['create', 'update'] as const,
