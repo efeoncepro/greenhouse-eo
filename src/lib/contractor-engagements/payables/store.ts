@@ -5,12 +5,17 @@ import { randomUUID } from 'crypto'
 import type { PoolClient } from 'pg'
 
 import { query, withGreenhousePostgresTransaction } from '@/lib/db'
+import { getLatestStoredExchangeRatePair } from '@/lib/finance/exchange-rates'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { ContractorEngagementValidationError } from '../errors'
+import { listContractorInvoiceAssetsByEngagement } from '../invoice-assets'
 import { getContractorEngagementById } from '../store'
 
+import { evaluatePayableReadiness } from './readiness'
+import type { PayableReadinessInputs, PayableReadinessResult } from './readiness'
+import { assertValidPayableTransition, isTerminalPayableStatus } from './state-machine'
 import { computeContractorWithholding } from './withholding'
 import type {
   ContractorPayable,
@@ -18,6 +23,9 @@ import type {
   CreateContractorPayableFromSubmissionInput,
   CreateContractorPayableOffCycleInput
 } from './types'
+
+const PROVIDER_OWNED_PAYROLL_VIA = new Set(['deel', 'remote', 'oyster'])
+const FINANCE_CURRENCIES = new Set(['CLP', 'USD'])
 
 interface ContractorPayableRow {
   contractor_payable_id: string
@@ -186,11 +194,19 @@ export const listContractorPayables = async (
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
+type PayableEventType =
+  | 'created'
+  | 'ready_for_finance'
+  | 'obligation_created'
+  | 'blocked'
+  | 'cancelled'
+  | 'updated'
+
 export const appendPayableEvent = async (
   client: PoolClient,
   params: {
     contractorPayableId: string
-    eventType: 'created' | 'ready_for_finance' | 'obligation_created' | 'blocked' | 'cancelled' | 'updated'
+    eventType: PayableEventType
     fromStatus?: string | null
     toStatus?: string | null
     actorUserId: string
@@ -244,28 +260,30 @@ export const publishPayableEvent = async (
   )
 }
 
+interface InsertPayableValues {
+  contractorEngagementId: string
+  contractorWorkSubmissionId: string | null
+  payableSourceKind: string
+  beneficiaryType: string
+  beneficiaryId: string
+  grossAmount: number
+  withholdingAmount: number
+  netPayable: number
+  currency: string
+  paymentCurrency: string | null
+  fxPolicyCode: string | null
+  taxComplianceOwner: string
+  taxWithholdingPolicyCode: string | null
+  payrollVia: string
+  paymentProfileId: string | null
+  dueDate: string | null
+  sourceSnapshot: Record<string, unknown>
+  actorUserId: string
+}
+
 const insertPayable = async (
   client: PoolClient,
-  values: {
-    contractorEngagementId: string
-    contractorWorkSubmissionId: string | null
-    payableSourceKind: string
-    beneficiaryType: string
-    beneficiaryId: string
-    grossAmount: number
-    withholdingAmount: number
-    netPayable: number
-    currency: string
-    paymentCurrency: string | null
-    fxPolicyCode: string | null
-    taxComplianceOwner: string
-    taxWithholdingPolicyCode: string | null
-    payrollVia: string
-    paymentProfileId: string | null
-    dueDate: string | null
-    sourceSnapshot: Record<string, unknown>
-    actorUserId: string
-  }
+  values: InsertPayableValues
 ): Promise<ContractorPayable> => {
   const result = await client.query<ContractorPayableRow>(
     `INSERT INTO greenhouse_hr.contractor_payables (
@@ -307,13 +325,12 @@ const insertPayable = async (
   return mapContractorPayable(result.rows[0])
 }
 
-// ── Commands ──────────────────────────────────────────────────────────────────
+// ── Create commands ───────────────────────────────────────────────────────────
 
 /**
  * Create a payable from an approved work submission. Marks the submission
  * consumed in the SAME transaction (dup-guard: DB UNIQUE index + the
- * approved+unconsumed lock here). Mirrors `markContractorWorkSubmissionConsumed`
- * inline so both writes are atomic.
+ * approved+unconsumed lock here).
  */
 export const createContractorPayableFromSubmission = async (
   input: CreateContractorPayableFromSubmissionInput
@@ -418,7 +435,6 @@ export const createContractorPayableFromSubmission = async (
       actorUserId: input.actorUserId
     })
 
-    // Consume the submission in the same tx (idempotency / dup guard).
     await client.query(
       `UPDATE greenhouse_hr.contractor_work_submissions
        SET consumed_by_payable_id = $2, consumed_at = NOW()
@@ -541,3 +557,330 @@ export const createContractorPayableOffCycle = async (
     return payable
   })
 }
+
+// ── Readiness + lifecycle ───────────────────────────────────────────────────
+
+/**
+ * Resolve readiness inputs (invoice asset, FX, source approval) and evaluate the
+ * fail-closed gate. Payment-profile gate (V1): explicit `payment_profile_id` OR a
+ * governed waiver. Auto-resolution via resolvePaymentRoute is a V1.1 enhancement.
+ */
+export const assessPayableReadiness = async (
+  payable: ContractorPayable
+): Promise<PayableReadinessResult> => {
+  const engagement = await getContractorEngagementById(payable.contractorEngagementId)
+
+  if (!engagement) {
+    throw new ContractorEngagementValidationError(
+      'El engagement contractor no existe.',
+      'engagement_not_found',
+      404
+    )
+  }
+
+  let sourceApproved = true
+
+  if (payable.payableSourceKind === 'work_submission' && payable.contractorWorkSubmissionId) {
+    const subRows = await query<{ status: string; [column: string]: unknown }>(
+      `SELECT status FROM greenhouse_hr.contractor_work_submissions
+       WHERE contractor_work_submission_id = $1`,
+      [payable.contractorWorkSubmissionId]
+    )
+
+    sourceApproved = subRows[0]?.status === 'approved'
+  }
+
+  let hasRequiredInvoiceAsset = true
+
+  if (engagement.requiresInvoice) {
+    const assets = await listContractorInvoiceAssetsByEngagement(payable.contractorEngagementId)
+
+    hasRequiredInvoiceAsset = assets.some(
+      a => a.assetRole === 'invoice_pdf' || a.assetRole === 'tax_xml'
+    )
+  }
+
+  const obligationCurrency = payable.paymentCurrency ?? payable.currency
+  const fxNeeded = payable.paymentCurrency !== null && payable.paymentCurrency !== payable.currency
+  let fxSupported = !fxNeeded
+
+  if (
+    fxNeeded &&
+    FINANCE_CURRENCIES.has(payable.currency) &&
+    FINANCE_CURRENCIES.has(obligationCurrency)
+  ) {
+    const rate = await getLatestStoredExchangeRatePair({
+      fromCurrency: payable.currency as 'CLP' | 'USD',
+      toCurrency: obligationCurrency as 'CLP' | 'USD'
+    })
+
+    fxSupported = rate !== null
+  }
+
+  const readinessInputs: PayableReadinessInputs = {
+    sourceApproved,
+    requiresInvoice: engagement.requiresInvoice,
+    hasRequiredInvoiceAsset,
+    grossAmount: payable.grossAmount,
+    withholdingAmount: payable.withholdingAmount,
+    netPayable: payable.netPayable,
+    obligationCurrency,
+    fxNeeded,
+    fxSupported,
+    paymentProfileResolved: payable.paymentProfileId !== null,
+    paymentProfileWaived: payable.paymentProfileWaiverReason !== null,
+    providerOwned: PROVIDER_OWNED_PAYROLL_VIA.has(engagement.payrollVia),
+    hasProviderRef: engagement.providerContractId !== null
+  }
+
+  return evaluatePayableReadiness(readinessInputs)
+}
+
+const lockPayable = async (
+  client: PoolClient,
+  contractorPayableId: string
+): Promise<ContractorPayable> => {
+  const result = await client.query<ContractorPayableRow>(
+    `SELECT ${PAYABLE_SELECT_COLUMNS}
+     FROM greenhouse_hr.contractor_payables
+     WHERE contractor_payable_id = $1
+     FOR UPDATE`,
+    [contractorPayableId]
+  )
+
+  if (!result.rows[0]) {
+    throw new ContractorEngagementValidationError('El payable no existe.', 'payable_not_found', 404)
+  }
+
+  return mapContractorPayable(result.rows[0])
+}
+
+const updatePayableStatus = async (
+  client: PoolClient,
+  contractorPayableId: string,
+  status: ContractorPayableStatus,
+  patch: { readiness?: PayableReadinessResult } = {}
+): Promise<ContractorPayable> => {
+  const sets = ['status = $2']
+  const params: unknown[] = [contractorPayableId, status]
+
+  if (patch.readiness) {
+    params.push(JSON.stringify(patch.readiness))
+    sets.push(`readiness_json = $${params.length}::jsonb`)
+  }
+
+  const result = await client.query<ContractorPayableRow>(
+    `UPDATE greenhouse_hr.contractor_payables
+     SET ${sets.join(', ')}
+     WHERE contractor_payable_id = $1
+     RETURNING ${PAYABLE_SELECT_COLUMNS}`,
+    params
+  )
+
+  return mapContractorPayable(result.rows[0])
+}
+
+/**
+ * Evaluate readiness and, if ready, transition to `ready_for_finance` (emits the
+ * event that triggers the Finance bridge). If blocked, persist the blockers and
+ * move to `blocked`, then throw so the caller surfaces why.
+ */
+export const transitionPayableToReadyForFinance = async (input: {
+  contractorPayableId: string
+  actorUserId: string
+}): Promise<ContractorPayable> =>
+  withGreenhousePostgresTransaction(async (client) => {
+    const current = await lockPayable(client, input.contractorPayableId)
+
+    if (current.status === 'ready_for_finance') {
+      return current
+    }
+
+    if (current.status !== 'pending_readiness' && current.status !== 'blocked') {
+      throw new ContractorEngagementValidationError(
+        `No se puede evaluar readiness desde el estado ${current.status}.`,
+        'payable_not_assessable',
+        409
+      )
+    }
+
+    const readiness = await assessPayableReadiness(current)
+
+    if (!readiness.ready) {
+      assertValidPayableTransition(current.status, 'blocked')
+
+      const blocked = await updatePayableStatus(client, current.contractorPayableId, 'blocked', {
+        readiness
+      })
+
+      await appendPayableEvent(client, {
+        contractorPayableId: blocked.contractorPayableId,
+        eventType: 'blocked',
+        fromStatus: current.status,
+        toStatus: blocked.status,
+        actorUserId: input.actorUserId,
+        metadata: { blockers: readiness.blockers }
+      })
+      await publishPayableEvent(client, blocked, EVENT_TYPES.contractorPayableBlocked, {
+        blockerCodes: readiness.blockers.map(b => b.code)
+      })
+
+      throw new ContractorEngagementValidationError(
+        'El payable no cumple readiness para Finance.',
+        'payable_not_ready',
+        409,
+        { blockers: readiness.blockers }
+      )
+    }
+
+    assertValidPayableTransition(current.status, 'ready_for_finance')
+
+    const ready = await updatePayableStatus(
+      client,
+      current.contractorPayableId,
+      'ready_for_finance',
+      { readiness }
+    )
+
+    await appendPayableEvent(client, {
+      contractorPayableId: ready.contractorPayableId,
+      eventType: 'ready_for_finance',
+      fromStatus: current.status,
+      toStatus: ready.status,
+      actorUserId: input.actorUserId
+    })
+
+    await publishPayableEvent(client, ready, EVENT_TYPES.contractorPayableReadyForFinance)
+
+    return ready
+  })
+
+/** Governed waiver of the payment-profile gate (capability-gated upstream). */
+export const waivePayablePaymentProfile = async (input: {
+  contractorPayableId: string
+  reason: string
+  actorUserId: string
+}): Promise<ContractorPayable> =>
+  withGreenhousePostgresTransaction(async (client) => {
+    if ((input.reason ?? '').trim().length < 10) {
+      throw new ContractorEngagementValidationError(
+        'El motivo del waiver es obligatorio (mínimo 10 caracteres).',
+        'waiver_reason_required',
+        400
+      )
+    }
+
+    const current = await lockPayable(client, input.contractorPayableId)
+
+    if (isTerminalPayableStatus(current.status)) {
+      throw new ContractorEngagementValidationError(
+        'No se puede waivear un payable terminal.',
+        'payable_terminal',
+        409
+      )
+    }
+
+    const result = await client.query<ContractorPayableRow>(
+      `UPDATE greenhouse_hr.contractor_payables
+       SET payment_profile_waiver_reason = $2
+       WHERE contractor_payable_id = $1
+       RETURNING ${PAYABLE_SELECT_COLUMNS}`,
+      [input.contractorPayableId, input.reason.trim()]
+    )
+
+    const updated = mapContractorPayable(result.rows[0])
+
+    await appendPayableEvent(client, {
+      contractorPayableId: updated.contractorPayableId,
+      eventType: 'updated',
+      actorUserId: input.actorUserId,
+      reason: input.reason.trim(),
+      metadata: { paymentProfileWaiver: true }
+    })
+
+    return updated
+  })
+
+export const cancelContractorPayable = async (input: {
+  contractorPayableId: string
+  reason?: string | null
+  actorUserId: string
+}): Promise<ContractorPayable> =>
+  withGreenhousePostgresTransaction(async (client) => {
+    const current = await lockPayable(client, input.contractorPayableId)
+
+    if (current.status === 'cancelled') {
+      return current
+    }
+
+    assertValidPayableTransition(current.status, 'cancelled')
+
+    const updated = await updatePayableStatus(client, current.contractorPayableId, 'cancelled')
+
+    await appendPayableEvent(client, {
+      contractorPayableId: updated.contractorPayableId,
+      eventType: 'cancelled',
+      fromStatus: current.status,
+      toStatus: updated.status,
+      actorUserId: input.actorUserId,
+      reason: input.reason ?? null
+    })
+    await publishPayableEvent(client, updated, EVENT_TYPES.contractorPayableCancelled, {
+      fromStatus: current.status
+    })
+
+    return updated
+  })
+
+/**
+ * Mark the payable as having generated its Finance obligation (called by the
+ * bridge after createPaymentObligation). Idempotent: re-delivery of the same
+ * obligation is a no-op.
+ */
+export const markPayableObligationCreated = async (input: {
+  contractorPayableId: string
+  financeObligationId: string
+  actorUserId: string
+}): Promise<ContractorPayable> =>
+  withGreenhousePostgresTransaction(async (client) => {
+    const current = await lockPayable(client, input.contractorPayableId)
+
+    if (
+      current.status === 'obligation_created' &&
+      current.financeObligationId === input.financeObligationId
+    ) {
+      return current
+    }
+
+    if (current.status !== 'ready_for_finance') {
+      throw new ContractorEngagementValidationError(
+        `No se puede registrar la obligación desde el estado ${current.status}.`,
+        'payable_not_ready_for_obligation',
+        409
+      )
+    }
+
+    const result = await client.query<ContractorPayableRow>(
+      `UPDATE greenhouse_hr.contractor_payables
+       SET status = 'obligation_created', finance_obligation_id = $2
+       WHERE contractor_payable_id = $1
+       RETURNING ${PAYABLE_SELECT_COLUMNS}`,
+      [input.contractorPayableId, input.financeObligationId]
+    )
+
+    const updated = mapContractorPayable(result.rows[0])
+
+    await appendPayableEvent(client, {
+      contractorPayableId: updated.contractorPayableId,
+      eventType: 'obligation_created',
+      fromStatus: current.status,
+      toStatus: updated.status,
+      actorUserId: input.actorUserId,
+      metadata: { financeObligationId: input.financeObligationId }
+    })
+    await publishPayableEvent(client, updated, EVENT_TYPES.contractorPayableObligationCreated, {
+      financeObligationId: input.financeObligationId
+    })
+
+    return updated
+  })

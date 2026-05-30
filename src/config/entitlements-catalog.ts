@@ -187,6 +187,23 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-793 — Contractor payables (Finance domain). read=ver; create=generar
+    // payable desde submission/off-cycle; manage=evaluar readiness/transicionar/
+    // cancelar. El payable listo dispara el bridge a Finance obligations.
+    key: 'finance.contractor_payable',
+    module: 'finance',
+    actions: ['read', 'create', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-793 — waiver gobernado del gate de payment profile. Mas restrictiva:
+    // permite marcar ready_for_finance sin perfil de pago aprobado.
+    key: 'finance.contractor_payable.waive_payment_profile',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-030 — plantillas reutilizables de checklist HRIS.
     key: 'hr.onboarding_template',
     module: 'hr',
