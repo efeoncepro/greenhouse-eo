@@ -145,8 +145,16 @@ return Number.isFinite(n) ? n : 0 }
   return 0
 }
 
-const toDateStr = (v: string | null): string | null =>
-  v ? v.slice(0, 10) : null
+// TASK-957 Slice B: robust to both string and Date (pg returns DATE columns as
+// Date objects, which the previous `v.slice` assumed away → TypeError that threw
+// the whole HR context for any member with a non-null date column). Mirrors the
+// canonical account-360 `toDateString`.
+const toDateStr = (v: string | Date | null): string | null => {
+  if (!v) return null
+  if (typeof v === 'string') return v.slice(0, 10)
+
+  return v.toISOString().slice(0, 10)
+}
 
 // ── Main function ──
 
