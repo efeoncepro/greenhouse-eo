@@ -23,9 +23,11 @@
 - **Slice 3** — Signals `finance.contractor_payable.{tax_review_overdue (drift), fx_unresolved_overdue (lag)}` (moduleKey finance, steady=0), validados contra PG live.
 - Cero migración / capability / outbox / código payroll. 22 readiness tests + suites payroll (608) / reliability (358) / full (5603) / build verdes.
 
-## Fase B — DIFERIDA (promovible a task derivada)
+## Fase B — DIFERIDA → **TASK-955**
 
-Provider settlement split (charge/payout/fee/FX-spread) + `beneficiary_type='provider'` (Deel como `greenhouse_core.providers`) + EOR + reconciliación + Finance classification. Requiere migración + seed Deel. **Diferida** porque el grueso de contractors son directos por `Efeonce Group SpA`; el carril provider/EOR es minoría (YAGNI hasta que exista un contractor real por plataforma). Decisiones ya documentadas (D-795-2/3). Promover a task derivada cuando emerja el caso real.
+Provider settlement split (charge/payout/fee/FX-spread) + `beneficiary_type='provider'` (Deel como `greenhouse_core.providers`) + EOR + reconciliación + Finance classification. Requiere migración + seed Deel. **Diferida** porque el grueso de contractors son directos por `Efeonce Group SpA`; el carril provider/EOR es minoría (YAGNI hasta que exista un contractor real por plataforma). Decisiones ya documentadas (D-795-2/3).
+
+**Task derivada creada: `TASK-955` — Contractor Provider Settlement Split + EOR Beneficiary** (`docs/tasks/to-do/TASK-955-contractor-provider-settlement-split-eor.md`). Ejecutar cuando emerja un contractor real por plataforma/EOR.
 
 ## Decisiones Pre-Ejecución (Open Questions resueltas — 2026-05-30)
 
