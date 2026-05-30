@@ -457,6 +457,13 @@ const runCreateContractorEngagement = async (
         taxWithholdingRateSnapshot,
         input.bonusPolicy ?? 'none',
         classificationRiskStatus,
+        // TASK-956 fix: classification_reviewed ($26) value was missing from the
+        // params array (pre-existing TASK-790 latent bug — no engagement was ever
+        // created in dev so the "30 params vs 31 placeholders" error never surfaced
+        // until the first real insert via transitionEmployeeToContractorEngagement).
+        // A fresh engagement is never auto-reviewed (computeClassificationRisk above
+        // is called with reviewed:false), so classification_reviewed is always false here.
+        false,
         JSON.stringify(classificationRiskFactors),
         input.startDate,
         input.endDate ?? null,
