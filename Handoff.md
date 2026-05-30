@@ -1,3 +1,19 @@
+# Sesion 2026-05-30 — TASK-796 Contractor Self-Service Hub — 🔧 IN PROGRESS
+
+Rama: `develop` (operador pidió mantenerse en develop, sin branch). Objetivo: cablear los mockups aprobados (`/my/contractor` self-service + `/hr/contractors` workbench HR) al backend contractor TASK-790→795, sin redisenar la IA aprobada.
+
+**Discovery + decisiones pre-ejecución (cerradas con el operador):**
+- Capa de datos = **projection canónica server-only** (patrón `sample-sprints/runtime-projection.ts`): produce el view-model `ContractorScenario` (el mismo tipo que ya consumen los mockups) → wiring de cambio mínimo en las vistas. Cache TTL 30s + degradación honesta + filtrado Finance-only.
+- **API self-service nueva** `/api/my/contractor/*` (gap real: todo lo entregado es HR/Finance-gated). Patrón `requireMyTenantContext` (`/api/my/payment-profile`).
+- Scope = **V1 completo**: ambas superficies + companions (composer, dispute, admin review, payment-profile handoff, closure visibility).
+- TASK-753 ✅ existe en `/my/payment-profile` (handoff solo enlaza). Closure = visibility-only (TASK-797 no shipped).
+
+**Readers backend reutilizables** (server-only): `getContractorEngagementById`, `listContractorEngagementsByProfile`, `listContractorWorkSubmissionsByEngagement`, `listContractorPayablesByEngagement`, `listContractorInvoiceAssetsByEngagement`, `assessPayableReadiness`, `resolveHonorariosReadiness`, `createContractorWorkSubmission`+`submitContractorWorkSubmission`, `attachContractorInvoiceAsset`. Gap conveniencia: `getActiveContractorEngagementForProfile`. Gap HR: cola agregada (componer 3 listers).
+
+**Estado**: lifecycle → in-progress, README sync, spec recalibrada (commit `09b3d49a`). Slice 0 (scaffolding) en curso.
+
+---
+
 # Sesion 2026-05-30 — TASK-795 International Contractor + Provider Boundary + FX — ✅ COMPLETE (Fase A V1)
 
 Rama: `develop` (operador pidió mantenerse en develop, sin branch). Scope confirmado vía AskUserQuestion: **Fase A V1**, Fase B (provider/EOR split) **diferida** (minoría; el grueso son contractors directos por Efeonce SpA). 4 commits (3 slices + lifecycle).
