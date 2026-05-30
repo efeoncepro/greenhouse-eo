@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react'
 
+import { useSearchParams } from 'next/navigation'
+
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -26,7 +28,11 @@ import {
 import { formatCurrency } from '@/lib/format'
 
 import ContractorTimeline from './ContractorTimeline'
+import ContractorClosureSidecarMockup from './ContractorClosureSidecarMockup'
+import ContractorDisputeResponseMockup from './ContractorDisputeResponseMockup'
+import ContractorSubmissionComposerMockup from './ContractorSubmissionComposerMockup'
 import { contractorScenarios } from './data'
+import PaymentProfileHandoffMockup from './PaymentProfileHandoffMockup'
 import type { ContractorScenario, ContractorScenarioId, ContractorTone } from './types'
 
 const toneToColor: Record<ContractorTone, 'success' | 'warning' | 'error' | 'info' | 'secondary'> = {
@@ -71,7 +77,13 @@ const ScenarioSelector = ({
   </CustomTextField>
 )
 
-const HeroPanel = ({ scenario }: { scenario: ContractorScenario }) => {
+const HeroPanel = ({
+  scenario,
+  onPrimaryAction
+}: {
+  scenario: ContractorScenario
+  onPrimaryAction: () => void
+}) => {
   const theme = useTheme()
 
   return (
@@ -116,6 +128,8 @@ const HeroPanel = ({ scenario }: { scenario: ContractorScenario }) => {
                 variant='contained'
                 startIcon={<i className={scenario.primaryActionIcon} />}
                 disabled={scenario.primaryActionDisabled}
+                onClick={onPrimaryAction}
+                data-capture='contractor-primary-action'
               >
                 {scenario.primaryAction}
               </Button>
@@ -279,31 +293,17 @@ const SubmissionDraftPanel = ({ scenario }: { scenario: ContractorScenario }) =>
   </OperationalPanel>
 )
 
-const PaymentProfilePanel = ({ scenario }: { scenario: ContractorScenario }) => (
-  <OperationalPanel
-    title='Mi cuenta de pago'
-    subheader={scenario.paymentProfileDetail}
-    icon='tabler-credit-card'
-    iconColor={scenario.paymentProfileLabel.includes('pendiente') ? 'warning' : 'success'}
-    action={<Button variant='tonal' size='small' startIcon={<i className='tabler-external-link' />}>Abrir</Button>}
-  >
-    <Stack spacing={2}>
-      <CustomChip
-        round='true'
-        size='small'
-        variant='tonal'
-        color={scenario.paymentProfileLabel.includes('pendiente') ? 'warning' : 'success'}
-        label={scenario.paymentProfileLabel}
-      />
-      <Typography variant='body2' color='text.secondary'>
-        Los cambios de cuenta usan el flujo canónico de Mi cuenta de pago y requieren aprobación de Finance.
-      </Typography>
-    </Stack>
-  </OperationalPanel>
-)
-
 const ContractorSelfServiceMockupView = () => {
-  const [scenarioId, setScenarioId] = useState<ContractorScenarioId>('honorarios_ready')
+  const searchParams = useSearchParams()
+  const requestedScenario = searchParams.get('scenario') as ContractorScenarioId | null
+
+  const initialScenario = contractorScenarios.some(item => item.id === requestedScenario)
+    ? requestedScenario ?? 'honorarios_ready'
+    : 'honorarios_ready'
+
+  const [scenarioId, setScenarioId] = useState<ContractorScenarioId>(initialScenario)
+  const [composerOpen, setComposerOpen] = useState(searchParams.get('drawer') === 'composer')
+  const [disputeOpen, setDisputeOpen] = useState(searchParams.get('drawer') === 'dispute')
 
   const scenario = useMemo(
     () => contractorScenarios.find(item => item.id === scenarioId) ?? contractorScenarios[0],
@@ -319,6 +319,16 @@ const ContractorSelfServiceMockupView = () => {
     statusIcon: toneToStatusIcon[blocker.tone]
   }))
 
+  const handlePrimaryAction = () => {
+    if (scenario.id === 'disputed') {
+      setDisputeOpen(true)
+
+      return
+    }
+
+    setComposerOpen(true)
+  }
+
   return (
     <Stack spacing={6}>
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} justifyContent='space-between' alignItems={{ xs: 'stretch', md: 'center' }}>
@@ -331,7 +341,7 @@ const ContractorSelfServiceMockupView = () => {
         <ScenarioSelector value={scenarioId} onChange={setScenarioId} />
       </Stack>
 
-      <HeroPanel scenario={scenario} />
+      <HeroPanel scenario={scenario} onPrimaryAction={handlePrimaryAction} />
 
       <Grid container spacing={6}>
         {scenario.kpis.map(kpi => (
@@ -358,6 +368,7 @@ const ContractorSelfServiceMockupView = () => {
                 <OperationalSignalList items={blockerSignals} columns={{ xs: 1, md: 2 }} />
               </OperationalPanel>
             ) : null}
+            {scenario.id === 'closure_pending' ? <ContractorClosureSidecarMockup scenario={scenario} /> : null}
             <SupportUploaderPanel scenario={scenario} />
             <SubmissionDraftPanel scenario={scenario} />
           </Stack>
@@ -380,7 +391,7 @@ const ContractorSelfServiceMockupView = () => {
                 <DetailRow label='Compliance' value={scenario.taxResponsable} />
               </Stack>
             </OperationalPanel>
-            <PaymentProfilePanel scenario={scenario} />
+            <PaymentProfileHandoffMockup scenario={scenario} />
             <OperationalPanel title='Timeline' icon='tabler-timeline' iconColor='info'>
               <ContractorTimeline steps={scenario.timeline} />
             </OperationalPanel>
@@ -422,6 +433,17 @@ const ContractorSelfServiceMockupView = () => {
           </Alert>
         )}
       </OperationalPanel>
+
+      <ContractorSubmissionComposerMockup
+        open={composerOpen}
+        scenario={scenario}
+        onClose={() => setComposerOpen(false)}
+      />
+      <ContractorDisputeResponseMockup
+        open={disputeOpen}
+        scenario={scenario}
+        onClose={() => setDisputeOpen(false)}
+      />
     </Stack>
   )
 }

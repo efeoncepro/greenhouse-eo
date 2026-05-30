@@ -10,6 +10,12 @@
   - Captura GVC final del admin workbench: `.captures/2026-05-30T12-42-40_contractor-admin-workbench`
   - Capturas de apoyo: `.captures/2026-05-30T12-20-24_inline-my-contractor-mockup` y `.captures/2026-05-30T12-26-35_inline-hr-contractors-mockup`
   - Dossier UI: `.captures/2026-05-30T12-42-40_contractor-admin-workbench/review-dossier.md`
+- **Expansion de mockups accionables aprobada para implementacion**: ademas de las dos superficies madre, el runtime debe implementar los microflujos companion o documentar explicitamente la constraint backend que obliga a diferirlos:
+  - Contractor submission composer: drawer de `/my/contractor/mockup?drawer=composer`
+  - Contractor dispute response: drawer de `/my/contractor/mockup?scenario=disputed&drawer=dispute`
+  - Admin review decision: drawer de `/hr/contractors/mockup?scenario=disputed&drawer=review&decision=dispute`
+  - Payment profile handoff: panel dentro de self-service; no duplica TASK-753.
+  - Contractor closure sidecar: panel del escenario `closure_pending`; no implementa cierre completo de TASK-797.
 
 ## Status
 
@@ -64,6 +70,11 @@ Approved mockup source:
 - `src/app/(dashboard)/hr/contractors/mockup/page.tsx`
 - `src/views/greenhouse/contractors/mockup/ContractorSelfServiceMockupView.tsx`
 - `src/views/greenhouse/contractors/mockup/ContractorAdminWorkbenchMockupView.tsx`
+- `src/views/greenhouse/contractors/mockup/ContractorSubmissionComposerMockup.tsx`
+- `src/views/greenhouse/contractors/mockup/ContractorDisputeResponseMockup.tsx`
+- `src/views/greenhouse/contractors/mockup/AdminReviewDecisionDrawerMockup.tsx`
+- `src/views/greenhouse/contractors/mockup/PaymentProfileHandoffMockup.tsx`
+- `src/views/greenhouse/contractors/mockup/ContractorClosureSidecarMockup.tsx`
 - `src/views/greenhouse/contractors/mockup/ContractorTimeline.tsx`
 - `src/views/greenhouse/contractors/mockup/data.ts`
 - `src/views/greenhouse/contractors/mockup/types.ts`
@@ -71,9 +82,13 @@ Approved mockup source:
 Implementation rule:
 
 - Treat the mockups as the approved interaction and information architecture. Runtime implementation should replace typed mock data with canonical readers/actions, extract reusable pieces when justified, and preserve the approved hierarchy, lane language, timeline semantics, empty/warning states, and role separation.
+- Treat the companion drawers/panels as part of the approved action architecture, not optional decoration: submission composer, dispute response and admin review decision are required for a usable V1; payment-profile handoff and closure sidecar are bounded integration contracts with TASK-753 and TASK-797.
 - Do not invent a parallel visual direction, landing page, wizard, payroll-like view, or finance console. If backend reality requires a deviation, document the reason in this task before implementing the deviation.
 - Use **Greenhouse Visual Capture** (`pnpm fe:capture`) as visual evidence. Existing scenarios:
   - `contractor-admin-workbench`
+  - `contractor-self-service-actions`
+  - `contractor-dispute-response`
+  - `contractor-admin-review-decision`
   - `offboarding-fullpage-capture` (helper regression only)
   - `sample-sprints-scroll-anchors` (helper regression only)
 
@@ -136,6 +151,13 @@ Reglas obligatorias:
 - Use `GreenhouseFileUploader` contexts from `TASK-791`.
 - Submit invoice metadata and asset refs.
 - Preserve approved self-service composition from `/my/contractor/mockup`: engagement summary, work submission lane, upload/evidence panel, payment profile CTA and status timeline.
+- Implement the approved submission composer drawer: type, service period, gross amount, invoice asset, evidence asset, summary and submit/draft actions.
+
+### Slice 2b — Dispute recovery
+
+- Implement the approved dispute response drawer for contractor-owned blockers.
+- Show reviewer observation, observed evidence, response text, corrected evidence upload and re-submit action.
+- Keep the copy explicit that responding reopens operational review and does not create a Finance obligation.
 
 ### Slice 3 — Status timeline
 
@@ -145,6 +167,7 @@ Reglas obligatorias:
 ### Slice 4 — Payment profile integration
 
 - Link or embed the canonical `TASK-753` self-service payment profile flow.
+- Preserve the approved handoff panel: status, owner, CTA and warning state. Do not rebuild payment profile inside TASK-796.
 
 ### Slice 5 — HR/admin review workbench
 
@@ -156,7 +179,13 @@ Reglas obligatorias:
   - Finance handoff cards that clarify obligation creation vs direct payment
   - operational signals without creating a parallel ops console
 - Use review capabilities from `TASK-792` for approve/dispute/reject where implemented.
+- Implement the approved admin review decision drawer: evidence checklist, decision toggle, mandatory contractor-visible reason for dispute/reject, and explicit "approval does not execute payment" copy.
 - Keep Finance-only amounts, provider statements and internal fees out of contractor-facing surfaces.
+
+### Slice 6 — Closure visibility bridge
+
+- Preserve the approved closure sidecar when a contractor engagement is ending or closed with pending items.
+- Show post-closure invoice policy and access handoff as visibility only; full closure state/checklist belongs to TASK-797.
 
 ## Payroll Non-Regression Guardrails (hard rules)
 
@@ -177,10 +206,15 @@ Reglas obligatorias:
 ## Acceptance Criteria
 
 - [ ] Contractor can submit invoice/boleta with asset upload.
+- [ ] Contractor can create or edit a work submission through the approved composer drawer.
+- [ ] Contractor can respond to a dispute through the approved recovery drawer.
 - [ ] Contractor can see approval/payment state without Finance-only data leaks.
 - [ ] Contractor cannot see provider statements by default.
 - [ ] Payment profile call-to-action reuses `TASK-753` surface.
+- [ ] Payment profile UI is only a handoff/status panel; no duplicate account-management flow is created.
 - [ ] HR/admin can review contractor work submissions from a workbench aligned to `/hr/contractors/mockup`.
+- [ ] HR/admin approve/dispute/reject uses the approved decision drawer and requires reason for contractor-visible dispute/reject.
+- [ ] Closure-adjacent states show contractor closure language and never expose finiquito/payroll semantics.
 - [ ] Runtime UI preserves the approved mockup hierarchy and role separation unless a documented backend constraint forces a task update.
 - [ ] UI passes `DESIGN.md` and design lint where applicable.
 - [ ] GVC evidence exists for contractor and admin runtime routes, including at least one long/scrolling admin capture.
@@ -193,7 +227,20 @@ Reglas obligatorias:
 - Browser smoke for desktop/mobile if UI implemented.
 - `pnpm fe:capture --route=/my/contractor --env=local --hold=3000` or scenario equivalent.
 - `pnpm fe:capture contractor-admin-workbench --env=local` updated to target the runtime route once `/hr/contractors` ships.
+- `pnpm fe:capture contractor-self-service-actions --env=local`
+- `pnpm fe:capture contractor-dispute-response --env=local`
+- `pnpm fe:capture contractor-admin-review-decision --env=local`
 - `pnpm fe:capture:review <contractor/admin capture>` when final visual QA is ready.
+
+## Mockup Expansion Validation — 2026-05-30
+
+- `pnpm exec eslint src/views/greenhouse/contractors/mockup scripts/frontend/scenarios/contractor-self-service-actions.scenario.ts scripts/frontend/scenarios/contractor-dispute-response.scenario.ts scripts/frontend/scenarios/contractor-admin-review-decision.scenario.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec vitest run scripts/frontend/lib/scenario.test.ts`
+- `pnpm fe:capture contractor-self-service-actions --env=local` -> `.captures/2026-05-30T17-15-39_contractor-self-service-actions`
+- `pnpm fe:capture contractor-dispute-response --env=local` -> `.captures/2026-05-30T17-16-01_contractor-dispute-response`
+- `pnpm fe:capture contractor-admin-review-decision --env=local` -> `.captures/2026-05-30T17-16-12_contractor-admin-review-decision`
+- `pnpm fe:capture contractor-admin-workbench --env=local` regression -> `.captures/2026-05-30T17-16-58_contractor-admin-workbench`
 
 ## Closing Protocol
 

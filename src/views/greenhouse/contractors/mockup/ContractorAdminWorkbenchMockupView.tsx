@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react'
 
+import { useSearchParams } from 'next/navigation'
+
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -26,9 +28,12 @@ import {
   OperationalSignalList
 } from '@/components/greenhouse/primitives'
 
+import AdminReviewDecisionDrawerMockup from './AdminReviewDecisionDrawerMockup'
 import ContractorTimeline from './ContractorTimeline'
 import { adminQueue, adminSignals, contractorScenarios } from './data'
 import type { ContractorScenario, ContractorScenarioId, ContractorTone } from './types'
+
+type ReviewDecision = 'approve' | 'dispute' | 'reject'
 
 const toneToColor: Record<ContractorTone, 'success' | 'warning' | 'error' | 'info' | 'secondary'> = {
   success: 'success',
@@ -46,7 +51,13 @@ const toneToIcon: Record<ContractorTone, string> = {
   secondary: 'tabler-circle'
 }
 
-const AdminHero = ({ selected }: { selected: ContractorScenario }) => (
+const AdminHero = ({
+  selected,
+  onReview
+}: {
+  selected: ContractorScenario
+  onReview: (decision: ReviewDecision) => void
+}) => (
   <Card
     sx={theme => ({
       border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
@@ -77,7 +88,12 @@ const AdminHero = ({ selected }: { selected: ContractorScenario }) => (
           </Typography>
         </Stack>
         <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-          <Button variant='contained' startIcon={<i className='tabler-checkup-list' />}>
+          <Button
+            variant='contained'
+            startIcon={<i className='tabler-checkup-list' />}
+            onClick={() => onReview(selected.id === 'disputed' ? 'dispute' : 'approve')}
+            data-capture='admin-review-selected'
+          >
             Revisar seleccionado
           </Button>
           <Button variant='tonal' color='secondary' startIcon={<i className='tabler-building-bank' />}>
@@ -163,7 +179,13 @@ const AdminQueueTable = ({
   </OperationalPanel>
 )
 
-const AdminInspector = ({ scenario }: { scenario: ContractorScenario }) => {
+const AdminInspector = ({
+  scenario,
+  onReview
+}: {
+  scenario: ContractorScenario
+  onReview: (decision: ReviewDecision) => void
+}) => {
   const supportComplete = scenario.supportItems.filter(item => item.tone === 'success').length
 
   return (
@@ -189,13 +211,33 @@ const AdminInspector = ({ scenario }: { scenario: ContractorScenario }) => {
         <Stack spacing={2}>
           <Typography variant='subtitle2'>Acciones de revisión</Typography>
           <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-            <Button variant='contained' size='small' startIcon={<i className='tabler-check' />}>
+            <Button
+              variant='contained'
+              size='small'
+              startIcon={<i className='tabler-check' />}
+              onClick={() => onReview('approve')}
+              data-capture='admin-approve-action'
+            >
               Aprobar
             </Button>
-            <Button variant='tonal' color='warning' size='small' startIcon={<i className='tabler-message-report' />}>
+            <Button
+              variant='tonal'
+              color='warning'
+              size='small'
+              startIcon={<i className='tabler-message-report' />}
+              onClick={() => onReview('dispute')}
+              data-capture='admin-dispute-action'
+            >
               Disputar
             </Button>
-            <Button variant='tonal' color='error' size='small' startIcon={<i className='tabler-x' />}>
+            <Button
+              variant='tonal'
+              color='error'
+              size='small'
+              startIcon={<i className='tabler-x' />}
+              onClick={() => onReview('reject')}
+              data-capture='admin-reject-action'
+            >
               Rechazar
             </Button>
           </Stack>
@@ -315,12 +357,32 @@ const PasoStep = ({
 )
 
 const ContractorAdminWorkbenchMockupView = () => {
-  const [selectedId, setSelectedId] = useState<ContractorScenarioId>('disputed')
+  const searchParams = useSearchParams()
+  const requestedScenario = searchParams.get('scenario') as ContractorScenarioId | null
+  const requestedDecision = searchParams.get('decision') as ReviewDecision | null
+
+  const initialScenario = contractorScenarios.some(item => item.id === requestedScenario)
+    ? requestedScenario ?? 'disputed'
+    : 'disputed'
+
+  const initialDecision: ReviewDecision =
+    requestedDecision === 'approve' || requestedDecision === 'reject' || requestedDecision === 'dispute'
+      ? requestedDecision
+      : 'dispute'
+
+  const [selectedId, setSelectedId] = useState<ContractorScenarioId>(initialScenario)
+  const [reviewDrawerOpen, setReviewDrawerOpen] = useState(searchParams.get('drawer') === 'review')
+  const [reviewDecision, setReviewDecision] = useState<ReviewDecision>(initialDecision)
 
   const selected = useMemo(
     () => contractorScenarios.find(scenario => scenario.id === selectedId) ?? contractorScenarios[0],
     [selectedId]
   )
+
+  const handleReview = (decision: ReviewDecision) => {
+    setReviewDecision(decision)
+    setReviewDrawerOpen(true)
+  }
 
   return (
     <Stack spacing={6}>
@@ -331,7 +393,7 @@ const ContractorAdminWorkbenchMockupView = () => {
         </Typography>
       </Stack>
 
-      <AdminHero selected={selected} />
+      <AdminHero selected={selected} onReview={handleReview} />
 
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, md: 3 }}>
@@ -390,7 +452,7 @@ const ContractorAdminWorkbenchMockupView = () => {
         </Grid>
         <Grid size={{ xs: 12, xl: 4 }}>
           <Stack spacing={6}>
-            <AdminInspector scenario={selected} />
+            <AdminInspector scenario={selected} onReview={handleReview} />
             <Box data-capture='contractor-timeline'>
               <OperationalPanel title='Timeline del caso' icon='tabler-timeline' iconColor='info'>
                 <ContractorTimeline steps={selected.timeline} />
@@ -408,6 +470,13 @@ const ContractorAdminWorkbenchMockupView = () => {
       >
         <OperationalSignalList items={adminSignals} columns={{ xs: 1, md: 2, xl: 4 }} />
       </OperationalPanel>
+
+      <AdminReviewDecisionDrawerMockup
+        open={reviewDrawerOpen}
+        scenario={selected}
+        initialDecision={reviewDecision}
+        onClose={() => setReviewDrawerOpen(false)}
+      />
     </Stack>
   )
 }

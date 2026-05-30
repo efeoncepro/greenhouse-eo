@@ -20,6 +20,35 @@ Próximo paso: TASK-795 (international/provider + FX) / TASK-796 (self-service U
 
 ---
 
+# Sesion 2026-05-30 — TASK-796 companion mockups accionables — ✅ VALIDADO LOCAL
+
+Pedido: revisar si los mockups aprobados de TASK-796 cubrian lo necesario y expandir los microflujos faltantes con skill de product design antes de implementacion runtime.
+
+Resultado:
+- Se preservan las dos superficies madre aprobadas: `/my/contractor/mockup` y `/hr/contractors/mockup`.
+- Se agregaron companion mockups accionables dentro del mismo stack Greenhouse/Vuexy:
+  - `ContractorSubmissionComposerMockup` — drawer contractor para preparar envio con periodo, monto, invoice/evidencia y submit/draft.
+  - `ContractorDisputeResponseMockup` — drawer contractor para responder observacion con evidencia corregida.
+  - `AdminReviewDecisionDrawerMockup` — drawer HR/admin para approve/dispute/reject con checklist, razon visible y advertencia de que aprobar no ejecuta pago.
+  - `PaymentProfileHandoffMockup` — panel de estado/handoff a TASK-753 sin duplicar cuenta de pago.
+  - `ContractorClosureSidecarMockup` — sidecar de cierre contractor sin finiquito, como puente visual a TASK-797.
+- Se agregaron escenarios GVC repetibles:
+  - `contractor-self-service-actions`
+  - `contractor-dispute-response`
+  - `contractor-admin-review-decision`
+- `docs/tasks/to-do/TASK-796-contractor-self-service-hub.md` quedó actualizado: estos companion mockups son parte del contrato aprobado; runtime debe implementarlos o documentar constraint backend para diferirlos.
+
+Validacion:
+- `pnpm exec eslint src/views/greenhouse/contractors/mockup scripts/frontend/scenarios/contractor-self-service-actions.scenario.ts scripts/frontend/scenarios/contractor-dispute-response.scenario.ts scripts/frontend/scenarios/contractor-admin-review-decision.scenario.ts` OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `pnpm exec vitest run scripts/frontend/lib/scenario.test.ts` OK (5 tests).
+- `pnpm fe:capture contractor-self-service-actions --env=local` OK -> `.captures/2026-05-30T17-15-39_contractor-self-service-actions`.
+- `pnpm fe:capture contractor-dispute-response --env=local` OK -> `.captures/2026-05-30T17-16-01_contractor-dispute-response`.
+- `pnpm fe:capture contractor-admin-review-decision --env=local` OK -> `.captures/2026-05-30T17-16-12_contractor-admin-review-decision`.
+- `pnpm fe:capture contractor-admin-workbench --env=local` regression OK -> `.captures/2026-05-30T17-16-58_contractor-admin-workbench`.
+
+---
+
 # Sesion 2026-05-30 — TASK-954 Agent Role Personas — ✅ COMPLETE
 
 Pedido: crear y ejecutar una task para sumar usuarios agente dedicados por rol, no solo para diseño sino para cualquier flujo donde permisos/navegación/experiencia dependan del rol.
