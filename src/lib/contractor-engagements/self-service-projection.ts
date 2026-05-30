@@ -18,6 +18,7 @@ import 'server-only'
  */
 
 import { query } from '@/lib/db'
+import { resolveProfileDisplayName } from '@/lib/identity/profile-display-names'
 import { listSelfServicePaymentProfiles } from '@/lib/finance/beneficiary-payment-profiles/self-service'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { isSourceDegraded, withSourceTimeout, type SourceResult } from '@/lib/platform-health/with-source-timeout'
@@ -111,14 +112,8 @@ export const getActiveContractorEngagementForProfile = async (
 
 // ── Secondary source resolvers ────────────────────────────────────────────────
 
-const resolveContractorName = async (profileId: string): Promise<string> => {
-  const rows = await query<{ full_name: string | null }>(
-    `SELECT full_name FROM greenhouse_core.identity_profiles WHERE identity_profile_id = $1`,
-    [profileId]
-  )
-
-  return rows[0]?.full_name?.trim() || 'Contractor'
-}
+const resolveContractorName = async (profileId: string): Promise<string> =>
+  (await resolveProfileDisplayName(profileId)) ?? 'Contractor'
 
 const resolveLegalEntityLabel = async (organizationId: string): Promise<string> => {
   const rows = await query<{ organization_name: string | null; legal_name: string | null }>(

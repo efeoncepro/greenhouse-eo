@@ -14,8 +14,8 @@ import 'server-only'
  */
 
 import { captureWithDomain } from '@/lib/observability/capture'
+import { resolveProfileDisplayNames } from '@/lib/identity/profile-display-names'
 import { isSourceDegraded, withSourceTimeout, type SourceResult } from '@/lib/platform-health/with-source-timeout'
-import { query } from '@/lib/db'
 
 import { listContractorPayables } from './payables/store'
 import type { ContractorPayable } from './payables/types'
@@ -64,25 +64,6 @@ const hoursSince = (iso: string | null): number => {
   if (Number.isNaN(t)) return 0
 
   return (Date.now() - t) / 3_600_000
-}
-
-const resolveNames = async (profileIds: string[]): Promise<Map<string, string>> => {
-  const map = new Map<string, string>()
-
-  if (profileIds.length === 0) return map
-
-  const rows = await query<{ identity_profile_id: string; full_name: string | null }>(
-    `SELECT identity_profile_id, full_name
-     FROM greenhouse_core.identity_profiles
-     WHERE identity_profile_id = ANY($1::text[])`,
-    [profileIds]
-  )
-
-  for (const row of rows) {
-    map.set(row.identity_profile_id, row.full_name?.trim() || 'Contractor')
-  }
-
-  return map
 }
 
 export const resolveContractorHrWorkbenchProjection =
@@ -192,7 +173,7 @@ export const resolveContractorHrWorkbenchProjection =
       if (e) engagementById.set(e.contractorEngagementId, e)
     }
 
-    const names = await resolveNames(
+    const names = await resolveProfileDisplayNames(
       [...engagementById.values()].map(e => e.profileId)
     ).catch(() => new Map<string, string>())
 
