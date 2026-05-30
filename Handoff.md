@@ -10,7 +10,23 @@ Rama: `develop` (operador pidió mantenerse en develop, sin branch). Objetivo: c
 
 **Readers backend reutilizables** (server-only): `getContractorEngagementById`, `listContractorEngagementsByProfile`, `listContractorWorkSubmissionsByEngagement`, `listContractorPayablesByEngagement`, `listContractorInvoiceAssetsByEngagement`, `assessPayableReadiness`, `resolveHonorariosReadiness`, `createContractorWorkSubmission`+`submitContractorWorkSubmission`, `attachContractorInvoiceAsset`. Gap conveniencia: `getActiveContractorEngagementForProfile`. Gap HR: cola agregada (componer 3 listers).
 
-**Estado**: lifecycle → in-progress, README sync, spec recalibrada (commit `09b3d49a`). Slice 0 (scaffolding) en curso.
+**Decisiones de checkpoint (operador, 2026-05-30):** (1) `/my/contractor` en nav con **visibilidad dinámica** (solo si hay engagement activo) → patrón flag JWT `hasActiveContractorEngagement` (como `supervisorAccess`); (2) workbench `/hr/contractors` grant a **HR + Finance + Admin** (hr_manager + hr_payroll + efeonce_admin + finance_admin). Re-secuencia: Slice 4 (migración governance + nav + flag JWT) se mueve a DESPUÉS de las UIs para reducir blast radius (las pages funcionan por route-group fallback antes de seedear el viewCode).
+
+**Slices entregados (7 commits en develop local, sin push):**
+- Slice 0 — lifecycle in-progress + README/Handoff + spec recalibrada (`09b3d49a`).
+- Slice 1 — projections (self-service + HR workbench) + mapper puro + `getActiveContractorEngagementForProfile` + 14 tests. `src/lib/contractor-engagements/{projection-types,self-service-scenario,self-service-projection,hr-workbench-projection}.ts`.
+- Slice 2 — API `/api/my/contractor/*` (GET projection · POST work-submissions · POST attach-asset) + 2 capabilities (`personal_workspace.contractor.{read_self,submit_self}`) + grants. grant-coverage verde.
+- Slice 3 — API `GET /api/hr/contractors/workbench`.
+- Slice 5 — UI `/my/contractor` (page + ContractorSelfServiceView + composer + dispute + handoff + closure + timeline). Mockups intactos.
+- Slice 6 — UI `/hr/contractors` (page + ContractorAdminWorkbenchView + AdminReviewDecisionDrawer).
+- Gates por slice: tsc 0 (filtrado) · eslint 0 · 14 mapper tests · grant-coverage verde. Copy es-CL sin semántica nómina dependiente.
+
+**PENDIENTE (próxima sesión / requiere entorno + confirmación):**
+- **Slice 4 (blast radius)**: migración seed `greenhouse_core.{view_registry,role_view_assignments,capabilities_registry}` (viewCodes `mi_ficha.mi_contratacion` + `equipo.contratistas`; grants self-service + HR/Finance/Admin) + entry TS en `view-access-catalog.ts` + flag JWT `hasActiveContractorEngagement` en `auth.ts` (mirror `supervisorAccess`) + `next-auth.d.ts` + `get-tenant-context.ts` + `VerticalMenu.tsx` (item dinámico /my/contractor + item /hr/contractors) + `GH_MY_NAV.contractor`/`GH_HR_NAV.contratistas` en nomenclature. Requiere `pnpm migrate:create` + run contra dev PG (Cloud SQL proxy).
+- **Slice 8 (verificación + cierre)**: `pnpm test` full + `pnpm build` + GVC captures (`pnpm fe:capture contractor-self-service-actions` etc. — requiere dev server + engagement contractor seedeado para el agente) + docs (CLAUDE.md invariants, arch Delta, doc funcional, manual) + closing protocol (mover a complete/, README, changelog).
+- **Push**: 7 commits locales sin pushear — operador autoriza push a develop.
+
+**Nota funcional**: las pages YA funcionan por route-group fallback (alcanzables sin el viewCode seedeado); lo que falta para discoverability es el nav dinámico (Slice 4). Nada está roto: todo additive + verde.
 
 ---
 
