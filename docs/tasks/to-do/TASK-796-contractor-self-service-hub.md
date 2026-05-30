@@ -17,6 +17,21 @@
   - Payment profile handoff: panel dentro de self-service; no duplica TASK-753.
   - Contractor closure sidecar: panel del escenario `closure_pending`; no implementa cierre completo de TASK-797.
 
+## Delta 2026-05-30 — Hallazgos de revisión pre-implementación (corrige supuestos obsoletos + desviación documentada)
+
+Revisión profunda del backend entregado (TASK-789→795) contra los mockups aprobados. Resultado: la task queda **100% desbloqueada** y se corrigen 3 supuestos obsoletos + se documenta 1 desviación obligatoria (regla CLAUDE.md "If backend reality requires a deviation, document the reason in this task before implementing").
+
+- **Todos los blockers están `complete`.** TASK-789/790/791/792/793/794/795 (Fase A) shipped en develop + **TASK-753 también shipped** (ver punto siguiente). El campo `Blocked by` de abajo queda obsoleto: la task puede arrancar ya.
+- **CORRECCIÓN — TASK-753 NO está ausente.** Existe completa: spec `docs/tasks/complete/TASK-753-payment-profiles-self-service.md` + ruta runtime `src/app/(dashboard)/my/payment-profile/page.tsx` + API `/api/my/payment-profile/*` (`requireMyTenantContext`). El texto previo ("file currently missing; recover/create before implementation" / "spec file is absent") es **stale**. El Payment Profile Handoff de Slice 4 solo **enlaza/lee estado** de esa surface; no recupera ni reconstruye nada.
+- **DESVIACIÓN DOCUMENTADA — no existe API self-service de contractor (gap load-bearing).** Todas las rutas entregadas (`/api/hr/contractors/*`, `/api/finance/contractor-payables/*`) están gated por `requireHrTenantContext` / `requireFinanceTenantContext`. Un contractor (`route_group=my`, `collaborator`) no puede llamarlas. Para que `/my/contractor` funcione hay que **crear `/api/my/contractor/*`** (member-scoped, patrón canónico de `/api/my/payment-profile/route.ts` con `requireMyTenantContext` → `{ tenant, memberId }`):
+  - `GET /api/my/contractor` — engagement activo + work submissions + payables propios (scoped por `identityProfileId`/`memberId` de sesión; el backend lo permite vía `listContractorEngagementsByProfile` + readers by-engagement).
+  - `POST /api/my/contractor/work-submissions` — create+submit scoped al engagement propio (el POST HR-gated existente NO sirve para self-service).
+  - endpoint de attach de invoice/evidencia tras el upload (`attachContractorInvoiceAsset`, TASK-791).
+  - El backend domain readers/writers ya existen y son server-only; lo que falta es exclusivamente el carril API `/my` + su capa de proyección.
+- **Capa de datos canónica — projection server-only.** El view-model que consumen los mockups (`ContractorScenario`: readiness label/tone, timeline `done|current|blocked|upcoming`, blockers con `responsable`, KPIs formateados, supportItems) NO es la forma del backend; se compone de 4-5 readers. Se implementa como **projection canónica** (réplica del patrón `src/lib/commercial/sample-sprints/runtime-projection.ts` / `src/lib/organization-workspace/projection.ts`): `import 'server-only'`, cache TTL 30s, degradación honesta (nunca `$0` falso → "Pendiente" con razón), filtrado de fuga Finance-only en un único lugar. NO mapper inline en el route handler.
+- **Helpers/readers existentes a reutilizar** (server-only): `getContractorEngagementById`, `listContractorEngagementsByProfile`, `listContractorWorkSubmissionsByEngagement`, `listContractorPayablesByEngagement`, `listContractorInvoiceAssetsByEngagement`, `assessPayableReadiness`, `resolveHonorariosReadiness`, `createContractorWorkSubmission` + `submitContractorWorkSubmission`, `attachContractorInvoiceAsset`. **Gap de conveniencia**: no hay reader "engagement activo del member" → agregar `getActiveContractorEngagementForProfile(identityProfileId)`. **Gap HR**: no hay cola agregada → la projection HR compone `listContractorEngagements({status:'pending_review'})` + work submissions `submitted/disputed` + payables `blocked`.
+- **Capabilities ya seedeadas** (790/792/793): `hr.contractor_engagement`, `hr.contractor_classification`, `hr.contractor_work_submission(.review)`, `finance.contractor_payable(.waive_payment_profile)`. **Falta seedear**: capability(es) self-service `contractor.own.*` (o `personal_workspace.contractor.*`) + grant en `runtime.ts` (mismo PR, guard `capability-grant-coverage.test.ts`) + viewCodes nuevos para las rutas productivas (`mi_ficha.*` self-service, `equipo.*` HR) con su migración View Registry (governance pattern TASK-827).
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -102,10 +117,13 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-790`
-- `TASK-791`
-- `TASK-793`
-- `TASK-753` registered but file currently missing; recover/create before implementation.
+- `TASK-790` ✅ complete
+- `TASK-791` ✅ complete
+- `TASK-792` ✅ complete
+- `TASK-793` ✅ complete
+- `TASK-794` ✅ complete
+- `TASK-795` (Fase A) ✅ complete
+- `TASK-753` ✅ complete — spec `docs/tasks/complete/TASK-753-payment-profiles-self-service.md`, ruta `/my/payment-profile`, API `/api/my/payment-profile/*`. (El texto previo "file currently missing" era obsoleto; ver Delta 2026-05-30.)
 
 ### Blocks / Impacts
 
@@ -115,19 +133,25 @@ Reglas obligatorias:
 
 - `src/app/(dashboard)/my/contractor/**`
 - `src/app/(dashboard)/hr/contractors/**`
+- `src/app/api/my/contractor/**` (NUEVO — carril self-service member-scoped; ver Delta 2026-05-30)
 - `src/views/greenhouse/my/**`
 - `src/views/greenhouse/contractors/**`
+- `src/lib/contractor-engagements/**` (NUEVO — projections self-service + HR workbench + reader `getActiveContractorEngagementForProfile`)
 - `src/components/greenhouse/GreenhouseFileUploader.tsx`
 - `src/config/entitlements-catalog.ts`
 - `src/lib/entitlements/runtime.ts`
+- `migrations/**` (NUEVO — seed View Registry de los viewCodes productivos `mi_ficha.*` + `equipo.*`, governance pattern TASK-827)
+- `src/lib/admin/view-access-catalog.ts` (NUEVO — VIEW_REGISTRY entries)
 
 ## Current Repo State
 
 ### Already exists
 
 - My Payroll/payment surfaces exist.
-- Uploader is reusable after `TASK-791`.
-- Payment Profile self-service is registered as `TASK-753` but spec file is absent in the current tree.
+- Uploader is reusable after `TASK-791` (contexts `contractor_invoice_draft` / `contractor_work_evidence_draft` confirmados en el union `DraftUploadContext`).
+- Payment Profile self-service (`TASK-753`) **ya existe y está completo**: ruta `/my/payment-profile` + API `/api/my/payment-profile/*`. Slice 4 solo enlaza/lee estado; no se reconstruye.
+- Backend contractor domain (`src/lib/contractor-engagements/**`) completo y server-only: engagements, work submissions, payables, readiness, honorarios, invoice assets.
+- Mockups aprobados + scenarios GVC existen y deben promoverse, no rediseñarse.
 
 ### Gap
 
