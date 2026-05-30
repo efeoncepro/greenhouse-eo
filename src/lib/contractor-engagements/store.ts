@@ -368,10 +368,10 @@ const publishEngagementEvent = async (
 
 // ── Commands ──────────────────────────────────────────────────────────────────
 
-export const createContractorEngagement = async (
+const runCreateContractorEngagement = async (
+  client: PoolClient,
   input: CreateContractorEngagementInput
-): Promise<ContractorEngagement> =>
-  withGreenhousePostgresTransaction(async (client) => {
+): Promise<ContractorEngagement> => {
     const anchor = await loadActiveContractorAnchor(
       client,
       input.personLegalEntityRelationshipId,
@@ -488,7 +488,28 @@ export const createContractorEngagement = async (
     }
 
     return engagement
-  })
+}
+
+/**
+ * Creates a contractor engagement anchored to an already-active contractor
+ * relationship.
+ *
+ * Dual-mode (TASK-765/771/872 pattern): pass an existing `client` to run inside
+ * a caller-owned transaction (e.g. the connected employee→contractor-engagement
+ * command, where the contractor relationship is created in the SAME tx and is
+ * therefore visible to `loadActiveContractorAnchor`). Omitting `client` wraps
+ * the work in its own transaction. Behavior + return shape are identical.
+ */
+export const createContractorEngagement = async (
+  input: CreateContractorEngagementInput,
+  client?: PoolClient
+): Promise<ContractorEngagement> => {
+  if (client) {
+    return runCreateContractorEngagement(client, input)
+  }
+
+  return withGreenhousePostgresTransaction((c) => runCreateContractorEngagement(c, input))
+}
 
 const LIFECYCLE_EVENT_BY_STATUS: Partial<Record<ContractorEngagementStatus, string>> = {
   active: EVENT_TYPES.contractorEngagementActivated,

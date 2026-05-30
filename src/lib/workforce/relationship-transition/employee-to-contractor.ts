@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
 import { withTransaction } from '@/lib/db'
 import { HrCoreValidationError, assertDateString, normalizeNullableString } from '@/lib/hr-core/shared'
 import {
@@ -85,18 +87,13 @@ const assertTransitionableCase = (row: OffboardingTransitionRow) => {
   }
 }
 
-export const transitionEmployeeToContractor = async (
-  input: TransitionEmployeeToContractorInput
+const runTransition = async (
+  client: PoolClient,
+  input: TransitionEmployeeToContractorInput,
+  contractorEffectiveFrom: string,
+  reason: string
 ): Promise<EmployeeToContractorTransitionResult> => {
-  const contractorEffectiveFrom = assertDateString(input.contractorEffectiveFrom, 'contractorEffectiveFrom')
-  const reason = normalizeNullableString(input.reason)
-
-  if (!reason || reason.length < 10) {
-    throw new HrCoreValidationError('A transition reason with at least 10 characters is required.', 400)
-  }
-
-  return withTransaction(async client => {
-    const caseResult = await client.query<OffboardingTransitionRow>(
+  const caseResult = await client.query<OffboardingTransitionRow>(
       `
         SELECT
           offboarding_case_id,
@@ -251,10 +248,37 @@ export const transitionEmployeeToContractor = async (
       ]
     )
 
-    return {
-      offboardingCaseId: offboardingCase.offboarding_case_id,
-      closedEmployeeRelationship,
-      openedContractorRelationship
-    }
-  })
+  return {
+    offboardingCaseId: offboardingCase.offboarding_case_id,
+    closedEmployeeRelationship,
+    openedContractorRelationship
+  }
+}
+
+/**
+ * Closes the employee relationship + opens the contractor relationship for an
+ * executed offboarding case, appending an offboarding-case event. Append-only
+ * over the offboarding case (never mutates its status/rule_lane/separation_type).
+ *
+ * Dual-mode (TASK-765/771/872 pattern): pass an existing `client` to run inside
+ * a caller-owned transaction (e.g. the connected employee→contractor-engagement
+ * command). Omitting `client` wraps the work in its own transaction. Behavior +
+ * validations + return shape are identical in both modes.
+ */
+export const transitionEmployeeToContractor = async (
+  input: TransitionEmployeeToContractorInput,
+  client?: PoolClient
+): Promise<EmployeeToContractorTransitionResult> => {
+  const contractorEffectiveFrom = assertDateString(input.contractorEffectiveFrom, 'contractorEffectiveFrom')
+  const reason = normalizeNullableString(input.reason)
+
+  if (!reason || reason.length < 10) {
+    throw new HrCoreValidationError('A transition reason with at least 10 characters is required.', 400)
+  }
+
+  if (client) {
+    return runTransition(client, input, contractorEffectiveFrom, reason)
+  }
+
+  return withTransaction(c => runTransition(c, input, contractorEffectiveFrom, reason))
 }
