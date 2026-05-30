@@ -4271,6 +4271,33 @@ El bug class observado live 2026-05-15 con María Camila Hoyos: case `executed` 
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (V1.1 Delta 2026-05-29). Task: `docs/tasks/complete/TASK-790-contractor-engagements-runtime-classification-risk.md`. Migración: `20260529221452562`. Patrones fuente: TASK-789/891 (substrate anchor), TASK-700/765 (state machine + CHECK + audit), TASK-742 (defense-in-depth), TASK-873/935 (capability grant coverage), TASK-758 (SII retention SSOT).
 
+### Contractor Invoice Assets invariants (TASK-791, desde 2026-05-30)
+
+Toda invoice/boleta, evidencia de trabajo o documento de proveedor de un contractor se sube y adjunta vía el **uploader privado canónico** (`createPrivatePendingAsset` + `attachAssetToAggregate` + `greenhouse_core.assets`, TASK-721) — **NUNCA** un bucket, storage helper, `gs://`, signed URL ni URL externa como contrato primario. La asociación al dominio contractor vive en el ledger append-only `greenhouse_hr.contractor_invoice_assets`.
+
+**Contexts canónicos** (en `src/types/assets.ts` `GreenhouseAssetContext`): `contractor_invoice_draft`/`contractor_invoice`, `contractor_work_evidence_draft`/`contractor_work_evidence`, `provider_invoice_draft`/`provider_invoice`, `provider_payout_statement`. Los 3 `*_draft` están en `DraftUploadContext` (uploadables vía `/api/assets/private`). Retention classes: `contractor_invoice`, `contractor_work_evidence` (nuevas); provider reusa `provider_supporting_doc`.
+
+**Anchor (D-791-1)**: `contractor_invoice_assets` FK NOT NULL a `contractor_engagements.contractor_engagement_id` ON DELETE RESTRICT. `contractor_invoice_id` queda `TEXT NULL` sin FK (forward-compat: TASK-792 crea `contractor_invoices` + agrega la FK). El asset se adjunta vía `attachAssetToAggregate(ownerAggregateType=<final context>, ownerAggregateId=invoice_asset_id, client)` en la **misma tx** que el INSERT del link row (patrón TASK-721). Helper canónico: `attachContractorInvoiceAsset` (`src/lib/contractor-engagements/invoice-assets.ts`).
+
+**Access (D-791-2)**: usa el patrón canónico de assets `hasRouteGroup`/`hasRoleCode` (NO nuevas capabilities `can()`). Contractor invoice/evidence → self (ownerMemberId==memberId) ∪ HR ∪ Finance ∪ admin. Provider invoice/payout → HR ∪ Finance ∪ admin (oculto al contractor por defecto — pueden contener fees/márgenes/otros trabajadores).
+
+**MIME (D-791-4)**: `CONTEXT_EXTRA_MIME_TYPES` agrega `application/xml`/`text/xml`/`application/json` SOLO a `contractor_invoice_draft` + `provider_invoice_draft` (factura electrónica estructurada). El resto sigue pdf/jpeg/png/webp. ZIP/ejecutables fuera (V1).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** crear bucket/uploader/storage helper paralelo para invoices de contractor. Reusar `createPrivatePendingAsset`/`attachAssetToAggregate`.
+- **NUNCA** reusar los contextos `contractor_invoice*`/`contractor_work_evidence*`/`provider_*` para recibos de nómina ni documentos de finiquito. Son retention classes + aggregates distintos.
+- **NUNCA** mutar contextos ni retention classes de assets payroll existentes al agregar contractor (solo agregar).
+- **NUNCA** adjuntar un `contractor_invoice_asset` a un `payroll_entry`, `final_settlement_document` ni aggregate de nómina. `resolveFinalAttachContext` solo resuelve contextos contractor/provider (retorna null para el resto → el helper rechaza con `asset_context_not_contractor`).
+- **NUNCA** UPDATE/DELETE sobre `contractor_invoice_assets` (triggers append-only). Reemplazar un documento = subir nuevo asset + nueva fila; el histórico se preserva.
+- **NUNCA** adjuntar el mismo asset dos veces al mismo engagement (UNIQUE `(contractor_engagement_id, asset_id)`).
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'identity', ...)`.
+- **SIEMPRE** que un consumer downstream (TASK-792 invoices, TASK-793 payables, TASK-796 UI) necesite adjuntar un soporte, pasar por `attachContractorInvoiceAsset`. Cuando TASK-792 cree `contractor_invoices`, agregar la FK `contractor_invoice_id` (additiva) + setearla en el helper.
+
+**Reliability signal**: `hr.contractor_invoice_assets.broken_evidence` (kind=data_quality, moduleKey=identity, steady=0) — cuenta link rows cuyo `asset_id` apunta a un asset inexistente/eliminado. Mirror TASK-721.
+
+**Spec canónica**: `docs/tasks/complete/TASK-791-contractor-invoice-assets-uploader-contexts.md`. Migración: `20260530203116605`. Patrones fuente: TASK-721 (evidence uploader + attach-in-tx + broken-evidence signal), TASK-790 (contractor engagement anchor), TASK-700/765 (append-only ledger + CHECK + triggers).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

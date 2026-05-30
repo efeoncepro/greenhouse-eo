@@ -1,5 +1,9 @@
 # TASK-796 — Contractor Self-Service Hub
 
+## Delta 2026-05-30
+
+- Desbloqueado (parcial) por **TASK-791 ✅ complete**: el contractor puede subir su propia boleta/invoice + evidencia con `<GreenhouseFileUploader contextType='contractor_invoice_draft' | 'contractor_work_evidence_draft'>` (self-upload ya permitido vía member facet) y luego adjuntar con `attachContractorInvoiceAsset`. El access policy ya garantiza que el contractor ve solo lo propio y NO ve provider statements. La UI self-service consume esta infra; no inventar uploader nuevo.
+
 ## Status
 
 - Lifecycle: `to-do`

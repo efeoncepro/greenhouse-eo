@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Implementacion`
+- Status real: `Complete (2026-05-30, develop)`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `TASK-790` ✅ complete
@@ -119,11 +119,27 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Contractor invoice PDF/image can be uploaded as pending asset.
-- [ ] Asset can be attached to contractor invoice aggregate and audited.
-- [ ] Contractor can access own asset; HR/Finance access follows policy.
-- [ ] Provider statement is not visible to contractor by default.
-- [ ] XML/JSON acceptance is restricted to tax structured artifacts.
+- [x] Contractor invoice PDF/image can be uploaded as pending asset. — contexts `contractor_invoice_draft`/`contractor_work_evidence_draft` en `DRAFT_CONTEXT_VALUES` + `canUploadForContext` (self/HR/admin) + maps reuse `createPrivatePendingAsset`.
+- [x] Asset can be attached to contractor invoice aggregate and audited. — `attachContractorInvoiceAsset` (tx: INSERT `contractor_invoice_assets` + `attachAssetToAggregate` → asset.uploaded/attached outbox + asset_access_log).
+- [x] Contractor can access own asset; HR/Finance access follows policy. — `canAccessContractorInvoiceAsset` (self via ownerMemberId + HR/Finance/admin).
+- [x] Provider statement is not visible to contractor by default. — `canAccessProviderSupportingAsset` (HR/Finance/admin only; NO self).
+- [x] XML/JSON acceptance is restricted to tax structured artifacts. — `CONTEXT_EXTRA_MIME_TYPES` solo para `contractor_invoice_draft` + `provider_invoice_draft`.
+
+## Closing Note (2026-05-30)
+
+Implementado en `develop` (sin rama, instrucción del operador). 3 slices + close.
+
+- **Slice 1** — `src/types/assets.ts` (+7 contexts, +3 drafts, +2 retention classes) + `greenhouse-assets.ts` maps (size/retention/prefix) + per-context MIME (`CONTEXT_EXTRA_MIME_TYPES`) + access policy (`canTenantAccessAsset` cases + 2 helpers) + upload policy (`route.ts`). NUNCA mutó contextos/retention payroll existentes (guardrail).
+- **Slice 2** — migración `20260530203116605` `greenhouse_hr.contractor_invoice_assets` (append-only ledger, CHECK enums, UNIQUE(engagement,asset), anti-UPDATE/DELETE triggers, FK a `contractor_engagements` D-791-1 + `contractor_invoice_id` NULL forward-compat) + helper canónico `attachContractorInvoiceAsset` (patrón TASK-721 tx) + módulo puro `invoice-asset-contracts.ts` + 7 unit tests.
+- **Slice 3** — signal `hr.contractor_invoice_assets.broken_evidence` (data_quality, moduleKey identity, steady=0) wired en `getReliabilityOverview`.
+
+**Decisiones (Open Questions resueltas pre-execution):** D-791-1 anchor a `contractor_engagement_id` (NOT NULL) + `contractor_invoice_id` NULL forward-compat (TASK-792 agrega FK); D-791-2 access vía `hasRouteGroup`/`hasRoleCode` (patrón canónico de assets, NO nuevas capabilities `can()`); D-791-3 retention `contractor_invoice`+`contractor_work_evidence` nuevas, provider reusa `provider_supporting_doc`; D-791-4 XML/JSON solo invoice drafts; D-791-5 `provider_payout_statement` finance-only sin draft.
+
+**Gates verdes:** tsc 0 · full lint 0 · `pnpm build` ✓ · `pnpm test` 5538 passed / 0 failed · `pnpm vitest run src/lib/payroll` 522 passed / 0 failed · DB defense-in-depth verificado live en tx rolled-back (UNIQUE 23505, CHECK 23514, anti-UPDATE/DELETE 23001) · signal live steady=0.
+
+**Skills:** greenhouse-backend. (Reuso total de la infra TASK-721; sin bucket/uploader nuevo.)
+
+**Pendiente (out of scope V1, desbloqueado):** TASK-792 (work submissions + `contractor_invoices` aggregate + FK desde `contractor_invoice_assets.contractor_invoice_id`), TASK-793 (payables → Finance), TASK-796 (self-service UI con `GreenhouseFileUploader contextType='contractor_invoice_draft'`).
 
 ## Verification
 

@@ -1,8 +1,21 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.1
+**Version:** 1.2
 **Created:** 2026-05-05
-**Status:** `ContractorEngagement` aggregate implemented (TASK-790, 2026-05-29). WorkSubmission/Invoice/Payable + Finance bridge remain proposals (TASK-791..798).
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets uploader/ledger (TASK-791) implemented. WorkSubmission, ContractorInvoice aggregate, ContractorPayable + Finance bridge remain proposals (TASK-792..798).
+
+## Delta 2026-05-30 — TASK-791 Contractor Invoice Assets shipped
+
+La capa de assets del "Contractor Invoice Upload / Asset Contract" está implementada, reutilizando el uploader privado canónico (TASK-721) sin bucket nuevo.
+
+- **Contexts** (`src/types/assets.ts`): `contractor_invoice_draft`/`contractor_invoice`, `contractor_work_evidence_draft`/`contractor_work_evidence`, `provider_invoice_draft`/`provider_invoice`, `provider_payout_statement`. Retention: `contractor_invoice` + `contractor_work_evidence` nuevas; provider reusa `provider_supporting_doc`.
+- **Tabla hija** `greenhouse_hr.contractor_invoice_assets` (migración `20260530203116605`): ledger append-only (anti-UPDATE/DELETE) con `asset_role` / `artifact_kind` / `source` (CHECK enums del arch doc) + `country_code` + `uploaded_by_user_id`. FK NOT NULL a `contractor_engagements` (D-791-1); `contractor_invoice_id` NULL forward-compat (TASK-792 agrega la FK al crear `contractor_invoices`). UNIQUE `(contractor_engagement_id, asset_id)`.
+- **Helper** `attachContractorInvoiceAsset` (`src/lib/contractor-engagements/invoice-assets.ts`): valida engagement + asset (pre-flight) → INSERT link + `attachAssetToAggregate` (pending→attached) en una sola tx. `resolveFinalAttachContext` mapea draft→final y rechaza contextos no-contractor.
+- **Access**: `canTenantAccessAsset` extendido — contractor self + HR/Finance/admin para docs de contractor; provider docs ocultos al contractor. **MIME**: XML/JSON solo para invoice drafts.
+- **Reliability**: signal `hr.contractor_invoice_assets.broken_evidence` (data_quality, steady=0, mirror TASK-721).
+- **Access model decision**: se usa el patrón de assets `hasRouteGroup`/`hasRoleCode` (NO se seedearon los entitlements propuestos `hr.contractor_invoice.*` — quedan para una task derivada uniforme si emerge governance fina). Decisión D-791-2.
+
+Pendiente: WorkSubmission (TASK-792), ContractorInvoice aggregate + FK `contractor_invoice_id` (TASK-792), ContractorPayable + Finance bridge (TASK-793), self-service UI (TASK-796).
 
 ## Delta 2026-05-29 — TASK-790 ContractorEngagement runtime shipped
 

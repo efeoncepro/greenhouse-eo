@@ -1,5 +1,9 @@
 # TASK-792 — Contractor Work Submissions + Approval/Dispute Flow
 
+## Delta 2026-05-30
+
+- **TASK-791 ✅ complete**: existe `greenhouse_hr.contractor_invoice_assets` (ledger append-only de soportes) + contexts de asset contractor + helper `attachContractorInvoiceAsset`. Cuando esta task cree el aggregate `greenhouse_hr.contractor_invoices`, debe (a) agregar la FK `contractor_invoice_assets.contractor_invoice_id → contractor_invoices` (additivo, la columna ya existe NULL), y (b) setear `contractorInvoiceId` al llamar `attachContractorInvoiceAsset`. Evidencia de work submissions usa contexto `contractor_work_evidence_draft` vía el uploader canónico.
+
 ## Delta 2026-05-29
 
 - Desbloqueado por **TASK-790 ✅ complete**: `greenhouse_hr.contractor_engagements` ya existe con módulo `src/lib/contractor-engagements/`. Las work submissions FK-anclan a `contractor_engagement_id`. Respetar `requires_work_approval` del engagement como gate de approval antes de payable. Outbox events nuevos siguen el patrón v1 (`workforce.contractor_work_submission.*`) ya documentado en el arch doc.
