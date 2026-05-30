@@ -135,6 +135,7 @@ Reglas obligatorias (de CLAUDE.md, load-bearing):
 - NO el carril provider/EOR (TASK-955) — esta task cubre el contractor directo (incluye honorarios CL); el gate de Slice A sirve a todos pero la decisión de tupla de Slice B se valida para honorarios CL primero.
 - NO migración masiva de honorarios legacy existentes a contractor payables.
 - NO auto-ejecutar Slice B dentro del comando de transición TASK-956 (desacoplado por blast-radius).
+- **NO toca a los contractors internacionales legacy (modelo Deel)**. Cohorte real verificada en dev (2026-05-30): **Andrés Carlosama** (`3wpjyxp`), **Daniela Ferreira** (`3rz7g72`), **Melkin Hernández** (sin Deel ID) — todos `member.contract_type='contractor'`, `pay_regime='international'`, `payroll_via='deel'`, comp-version activa, y **SIN `ContractorEngagement`** (modelo legacy, NO el dominio TASK-790→796). El gate de Slice A keyea por **existencia de `ContractorEngagement` activo, NO por `contract_type='contractor'`** — precisamente para NO barrerlos. Siguen pagándose por el passthrough Deel exactamente como hoy. Esta es la razón de diseño por la que el SSOT es el engagement y no `contract_type`: keyear por `contract_type` rompería su passthrough Deel. Para internacionales el riesgo nunca es doble-declaración SII (eso es honorarios CL); sería doble-conteo de costo/pago — que el mismo gate cubre cuando exista engagement.
 
 ## Detailed Spec
 
@@ -160,6 +161,7 @@ Reglas obligatorias (de CLAUDE.md, load-bearing):
 |---|---|---|---|---|
 | Doble declaración F29 (retención SII legacy + contractor payable) | payroll / finance (SII) | medium (si Slice B corre sin A) | Slice ordering hard rule + flag dependency code-side + gate de exclusión SSOT | `payroll.contractor.double_rail_overlap` |
 | Gate excluye de más (un empleado legítimo con engagement residual cancelado) | payroll | low | filtro solo sobre engagement `status` activo (no-cancelado); shadow-compare flag-off vs flag-on antes de prender | `payroll.contractor.double_rail_overlap` + diff shadow |
+| Gate barre por error a contractors Deel legacy (Andrés/Daniela/Melkin, sin engagement) → rompe su passthrough Deel | payroll | low | gate keyea por **existencia de engagement activo, NUNCA por `contract_type='contractor'`**; acceptance criterion explícito + shadow-compare verifica que permanecen en el roster | diff shadow (su fila debe seguir presente) |
 | `contract_type` reconciliado a valor que rutea mal el motor | payroll | medium | Open Question resuelta con finance ANTES de Slice B; prohibido default `'honorarios'`; CHECK matrix en members/comp_versions | tests de ruteo `calculate-payroll` + señal |
 | Honorarios encubierto (subordinación) blanqueado por la reconciliación | identity / legal | medium | comando exige `classification_risk='clear'` (revisión humana); NUNCA auto-limpia | `contractor_engagement.classification_risk_open` (TASK-790) |
 | Compensación de contractor escrita en compensation_versions | payroll | low | invariante + señal `double_rail_overlap` detecta comp-version + engagement activo | `payroll.contractor.double_rail_overlap` |
@@ -196,6 +198,7 @@ Reglas obligatorias (de CLAUDE.md, load-bearing):
 
 - [ ] Con `PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED=false`, el roster de `pgGetApplicableCompensationVersionsForPeriod` es idéntico al actual (parity test).
 - [ ] Con el flag ON, un member con ContractorEngagement activo (riel contractor-payable) es excluido del roster legacy del período.
+- [ ] Con el flag ON, los contractors internacionales legacy SIN engagement (Andrés Carlosama, Daniela Ferreira, Melkin Hernández — `contract_type='contractor'`/`payroll_via='deel'`) **permanecen** en el roster legacy (NO excluidos) y su passthrough Deel es idéntico al flag-OFF.
 - [ ] La señal `payroll.contractor.double_rail_overlap` reporta steady=0 cuando no hay overlap y >0 (warning/error) cuando un member tiene engagement activo + comp-version aplicable en el mismo período abierto; corre con el flag OFF.
 - [ ] La señal está wired en `getReliabilityOverview` y aparece en `/admin/operations` bajo el rollup de payroll/finance data quality.
 - [ ] El SQL de la señal fue ejercitado contra PG real (proxy) antes del merge (sin `EXTRACT(EPOCH FROM (date - date))`).
@@ -231,6 +234,8 @@ Reglas obligatorias (de CLAUDE.md, load-bearing):
 
 - TASK-955 (provider/EOR settlement split): hereda el gate de Slice A; validar la tupla destino para lanes provider/EOR cuando emerja.
 - Si Slice B decide un nuevo valor de enum `ContractType`, evaluar migración de los honorarios CL existentes que sean realmente contractors al riel nuevo (separado, no en esta task).
+- **Migración de contractors internacionales legacy (Deel) al modelo engagement**: cuando Andrés/Daniela/Melkin (y futuros Deel) se migren al dominio TASK-790→796, tendrán a la vez su comp-version legacy (passthrough Deel) **y** un `ContractorEngagement` → el gate de Slice A se vuelve **load-bearing** para ellos (los saca del passthrough para que no se cuenten dos veces). La migración DEBE mover su visibilidad de pago **completa** al riel nuevo (payable → Finance) antes/junto con crear el engagement, y verificar la señal `double_rail_overlap=0`. Task derivada separada cuando se priorice.
+- **Drift de datos pre-existente (ajeno a TASK-957)**: **Melkin Hernández** tiene `member.contract_type='contractor'` pero su comp-version activa dice `contract_type='indefinido'` y `deel_contract_id=NULL`. Hoy el motor lo rutea bien por `payroll_via='deel'` (passthrough), pero si `payroll_via` se limpiara lo calcularía como empleado dependiente chileno sobre un sueldo USD/internacional (incorrecto). La señal `double_rail_overlap` NO lo captura (no hay engagement). Crear issue/task de limpieza de consistencia `(member.contract_type ↔ compensation_version.contract_type ↔ deel_contract_id)` para contractors Deel.
 
 ## Open Questions
 
