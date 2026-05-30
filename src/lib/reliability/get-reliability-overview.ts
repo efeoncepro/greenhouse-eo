@@ -91,6 +91,7 @@ import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-c
 import { getContractorEngagementClassificationRiskOpenSignal } from './queries/contractor-engagement-classification-risk-open'
 import { getContractorInvoiceAssetsBrokenEvidenceSignal } from './queries/contractor-invoice-assets-broken-evidence'
 import { getContractorWorkSubmissionReviewOverdueSignal } from './queries/contractor-work-submission-review-overdue'
+import { getContractorPayableHonorariosRutUnverifiedSignal } from './queries/contractor-payable-honorarios-rut-unverified'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
@@ -1290,7 +1291,10 @@ export const getReliabilityOverview = async (
           // inexistente/eliminado (integridad de evidencia).
           getContractorInvoiceAssetsBrokenEvidenceSignal().catch(() => null),
           // TASK-792 — work submissions estancadas en review (submitted|disputed) > 14d.
-          getContractorWorkSubmissionReviewOverdueSignal().catch(() => null)
+          getContractorWorkSubmissionReviewOverdueSignal().catch(() => null),
+          // TASK-794 — honorarios_cl activos sin RUT chileno verificado (payable
+          // bloqueado por readiness fail-closed antes de Finance).
+          getContractorPayableHonorariosRutUnverifiedSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
