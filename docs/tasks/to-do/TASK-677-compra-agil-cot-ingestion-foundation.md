@@ -18,11 +18,11 @@
 
 ## Summary
 
-Implementa la ingesta durable de Compra Agil desde archivos mensuales `COT_<YYYY-MM>.zip` de datos abiertos ChileCompra, normalizando cotizaciones, items/ofertas y links a OC. Este carril permite abordar oportunidades RFQ-like aunque la API oficial Beta aun no este disponible para produccion.
+Implementa la ingesta durable de Compra Agil desde archivos mensuales `COT_<YYYY-MM>.zip` de datos abiertos ChileCompra, normalizando cotizaciones, items/ofertas y links a OC. Tras la publicacion y validacion de la API Compra Agil v2 Beta el 2026-05-30, este carril debe tratarse como historico/backfill/benchmark y fallback, no como la unica fuente oficial live.
 
 ## Why This Task Exists
 
-El research valido que Compra Agil no aparece como endpoint estable en la API publica actual, pero si existe como dataset mensual COT. Sin este carril, Greenhouse quedaria ciego a una parte clave del mercado publico chileno.
+El research inicial valido que Compra Agil existia como dataset mensual COT antes de tener API oficial disponible. Aunque la API Compra Agil v2 Beta ya autentica con el ticket canonico de Mercado Publico, el dataset COT sigue siendo necesario para historico mensual, backfills, benchmarks y reconciliacion de brechas si la Beta degrada.
 
 ## Goal
 
@@ -79,11 +79,13 @@ Reglas obligatorias:
 ### Already exists
 
 - Research con smoke de `COT_2026-03.zip`, columnas y volumen aproximado.
+- Research actualizado 2026-05-30 con API Compra Agil v2 Beta oficial validada via `api2.mercadopublico.cl` y header `ticket`.
 
 ### Gap
 
 - No hay downloader/parser ni tablas conformed para Compra Agil.
 - No hay policy de retention para raw zip/csv.
+- No hay decision final de convivencia entre COT mensual, API v2 live y OC `Tipo=AG`; coordinar con `TASK-678`.
 
 ## Scope
 
@@ -106,7 +108,7 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- Beta API.
+- Implementar API v2 Beta live adapter (ver `TASK-678`).
 - Web scraping del portal Compra Agil.
 - UI.
 - Postulacion/cotizacion automatica.

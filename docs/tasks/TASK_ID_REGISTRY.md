@@ -753,7 +753,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-675` | `to-do` | Mercado Publico Licitaciones Ingestion Foundation | `docs/tasks/to-do/TASK-675-mercado-publico-licitaciones-ingestion-foundation.md` |
 | `TASK-676` | `to-do` | Mercado Publico Purchase Order Reconciliation Foundation | `docs/tasks/to-do/TASK-676-mercado-publico-purchase-order-reconciliation.md` |
 | `TASK-677` | `to-do` | Compra Agil Monthly COT Ingestion Foundation | `docs/tasks/to-do/TASK-677-compra-agil-cot-ingestion-foundation.md` |
-| `TASK-678` | `to-do` | Compra Agil Beta API Watch And Adapter Spike | `docs/tasks/to-do/TASK-678-compra-agil-beta-api-watch-adapter-spike.md` |
+| `TASK-678` | `to-do` | Compra Agil v2 Beta API Adapter Spike | `docs/tasks/to-do/TASK-678-compra-agil-beta-api-watch-adapter-spike.md` |
 | `TASK-679` | `to-do` | Mercado Publico Document Ingestion And Private Assets | `docs/tasks/to-do/TASK-679-mercado-publico-document-ingestion-private-assets.md` |
 | `TASK-680` | `to-do` | Mercado Publico Procedure Taxonomy Registry | `docs/tasks/to-do/TASK-680-mercado-publico-procedure-taxonomy-registry.md` |
 | `TASK-681` | `to-do` | Consulta al Mercado / RFI Discovery Spike | `docs/tasks/to-do/TASK-681-consulta-mercado-rfi-discovery-spike.md` |

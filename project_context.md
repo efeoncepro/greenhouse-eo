@@ -397,6 +397,25 @@
 - El secreto canonico ya existe en GCP Secret Manager (`efeonce-group`) y debe consumirse como scalar crudo. No imprimir ni persistir el ticket en logs o documentos.
 - Scope actual: helper puro sin persistencia. El siguiente slice debe decidir almacenamiento de metadata, assets privados y scheduling antes de exponerlo en UI o API Greenhouse.
 
+## Delta 2026-05-30 Mercado Publico Compra Agil API v2 Beta validada
+
+- ChileCompra publico la API Compra Agil v2 Beta en mayo 2026. Contrato oficial observado:
+  - Base URL: `https://api2.mercadopublico.cl`.
+  - Listado/busqueda: `GET /v2/compra-agil`.
+  - Detalle: `GET /v2/compra-agil/{codigo}`.
+  - Autenticacion: header HTTP `ticket: <ticket>`, no query param `ticket=...`.
+- El mismo secreto canonico existente `greenhouse-mercado-publico-ticket` funciona contra Compra Agil v2. Smoke 2026-05-30:
+  - API clasica licitaciones con query ticket: `HTTP 200`, `Cantidad=4210`.
+  - API Compra Agil v2 con header ticket: `HTTP 200`, `success=OK`.
+  - Rango publicado `2026-05-29..2026-05-30`: `total_resultados=3114`, `total_paginas=312`, `items_count=10`.
+- Adjuntos Compra Agil v2:
+  - el detalle oficial expone metadata `documentos[].id` y `documentos[].nombre` (ej. `1540510 / CARROS.pdf`, `68071 / ANEXO ADQUISICIÓN DE MATERIALES ELÉCTRICOS EXPO PATAGONIA.docx`);
+  - la guia oficial no documenta endpoint de descarga de binarios;
+  - rutas probables en `api2.mercadopublico.cl` devolvieron `403 Missing Authentication Token`;
+  - endpoints internos del portal bajo `servicios-compra-agil.mercadopublico.cl/v1/*/descargar*` devolvieron `401 Unauthorized` o `503` sin sesion, por lo que no son contrato backend productivo.
+- Implicacion operativa: `TASK-678` debe pivotear de watch a adapter spike/productization plan. `TASK-677` COT mensual queda como historico/backfill/benchmark/fallback, no como unica fuente live de Compra Agil.
+- Guardrail: no imprimir el ticket, manejar `429`, paginacion (`tamano_pagina` 10..50), watermarks por `fechas.fecha_ultimo_cambio` y degradacion honesta si la Beta falla. Para documentos Compra Agil, modelar `discovered` metadata-only hasta que `TASK-679` resuelva descarga autorizada.
+
 ## Delta 2026-04-26 TASK-617 cerrado y TASK-647 abre MCP read-only
 
 - `TASK-617` queda cerrado documentalmente: `TASK-617.1` a `TASK-617.4` ya cubren REST hardening, first-party app lane, event control plane y developer docs.

@@ -43,6 +43,7 @@ Reglas obligatorias:
 
 - Copy/UI debe decir claramente que el envio externo ocurre en Mercado Publico, no por API Greenhouse.
 - No almacenar credenciales de usuarios Mercado Publico.
+- Cuando una oportunidad Compra Agil solo tenga metadata de adjuntos (`documentos[].id`/`nombre`) y no binario descargado, el control room debe mostrarlo como documento detectado/no disponible, no como archivo listo para revisar.
 - Usar `greenhouse-agent`, `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility`; API routes usan `vercel:nextjs`.
 
 ## Normative Docs
@@ -73,10 +74,12 @@ Reglas obligatorias:
 ### Already exists
 
 - Workbench y bridge quedan definidos por tasks previas.
+- Compra Agil v2 permite detectar metadata de adjuntos, pero descarga binaria no esta cubierta por API oficial documentada; ver `TASK-679`.
 
 ### Gap
 
 - No hay control operativo de postulacion/preparacion.
+- No hay UI state para distinguir documentos externos detectados de assets internos descargados/listos.
 
 ## Scope
 
@@ -84,6 +87,7 @@ Reglas obligatorias:
 
 - Crear checklist/status por oportunidad.
 - Modelar responsables, due dates, evidence y manual external status.
+- Incluir estado documental: `document_required`, `external_document_discovered`, `asset_downloaded`, `asset_missing_or_blocked`.
 
 ### Slice 2 — Commands And UI
 
@@ -107,6 +111,7 @@ Reglas obligatorias:
 - [ ] Checklist y evidencia quedan auditables.
 - [ ] Estados manuales tienen usuario/fecha/rationale.
 - [ ] Permisos controlan update/mark submitted.
+- [ ] El control room no permite tratar adjuntos metadata-only como archivos revisados.
 
 ## Verification
 

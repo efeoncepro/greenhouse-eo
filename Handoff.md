@@ -1,3 +1,27 @@
+# Sesion 2026-05-30 — Mercado Publico Compra Agil v2 Beta API — ✅ INVESTIGACION VALIDADA
+
+Pedido: confirmar si la llave/ticket existente de Mercado Publico sirve para la API nueva de Compra Agil.
+
+Resultado: **sí, el ticket canonico existente `greenhouse-mercado-publico-ticket` autentica contra Compra Agil v2 Beta**. Se reautentico GCP con ambos flujos obligatorios (`gcloud auth login` + `gcloud auth application-default login`) y se valido sin imprimir el secreto:
+- API clasica licitaciones `https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?estado=activas&ticket=...` -> `HTTP 200`, `Cantidad=4210`.
+- API Compra Agil v2 `https://api2.mercadopublico.cl/v2/compra-agil?ttl_cambio_ms=300000&tamano_pagina=10` con header `ticket: ...` -> `HTTP 200`, `success=OK`.
+- Rango publicado `2026-05-29T00:00:00Z..2026-05-30T23:59:59Z` -> `HTTP 200`, `success=OK`, `total_resultados=3114`, `total_paginas=312`, `items_count=10`.
+
+Contrato oficial actualizado en docs:
+- Base URL `https://api2.mercadopublico.cl`.
+- Endpoints `GET /v2/compra-agil` y `GET /v2/compra-agil/{codigo}`.
+- Auth por header HTTP `ticket`, no query param.
+- `tamano_pagina` debe estar entre 10 y 50.
+- No hay filtro `codigo_organismo`; filtrar por region y luego `institucion.rut`/`institucion.organismo_comprador`.
+- Para detectar OC emitida usar detalle `orden_compra.id_orden_compra != null`; ChileCompra documenta que `estado=oc_emitida` no aparece en la practica.
+- Adjuntos Compra Agil v2: el detalle oficial expone metadata `documentos[].id` + `documentos[].nombre` (ej. `1540510 / CARROS.pdf`, `68071 / ANEXO ADQUISICIÓN DE MATERIALES ELÉCTRICOS EXPO PATAGONIA.docx`), pero la guia oficial no documenta descarga binaria. Smokes contra rutas probables de `api2.mercadopublico.cl` devolvieron `403 Missing Authentication Token`; endpoints internos del portal `servicios-compra-agil.../v1/*/descargar*` devolvieron `401 Unauthorized` o `503` sin sesion. No usarlos como contrato productivo. Modelar como `discovered` metadata-only hasta que `TASK-679` resuelva descarga autorizada.
+
+Docs tocadas: `docs/research/RESEARCH-007-commercial-public-tenders-module.md`, `docs/tasks/to-do/TASK-674-commercial-public-procurement-architecture-contract.md`, `docs/tasks/to-do/TASK-677-compra-agil-cot-ingestion-foundation.md`, `docs/tasks/to-do/TASK-678-compra-agil-beta-api-watch-adapter-spike.md`, `docs/tasks/to-do/TASK-679-mercado-publico-document-ingestion-private-assets.md`, `docs/tasks/to-do/TASK-688-public-tender-submission-control-room.md`, `project_context.md`, `Handoff.md`.
+
+Next step recomendado: ejecutar `TASK-678` como adapter spike/productization plan para `mercado_publico_compra_agil_v2`; mantener `TASK-677` COT mensual como historico/backfill/benchmark/fallback, no como unica fuente live.
+
+---
+
 # Sesion 2026-05-29 — TASK-790 Contractor Engagements Runtime + Classification Risk — ✅ COMPLETE (develop, sin branch)
 
 Agregado canónico `ContractorEngagement` (`greenhouse_hr.contractor_engagements`) materializado bajo Workforce/HR — fundación de Contractor Payables (EPIC-013). Trabajo **in-place en `develop`** (instrucción del operador). Skills pre-write: greenhouse-payroll-auditor (PASS), arch-architect (4-pilar: blast radius LOW, reversibilidad HIGH), greenhouse-backend.
