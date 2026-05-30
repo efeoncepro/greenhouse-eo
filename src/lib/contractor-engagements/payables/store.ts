@@ -9,6 +9,13 @@ import { getLatestStoredExchangeRatePair } from '@/lib/finance/exchange-rates'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import {
+  buildHonorariosPolicySnapshot,
+  CHILE_HONORARIOS_SUBTYPE,
+  computeChileHonorariosPayout
+} from '../chile-honorarios'
+import { resolveHonorariosReadiness } from '../chile-honorarios/readiness'
+import { isClassificationRiskBlocking } from '../classification-risk'
 import { ContractorEngagementValidationError } from '../errors'
 import { listContractorInvoiceAssetsByEngagement } from '../invoice-assets'
 import { getContractorEngagementById } from '../store'
@@ -409,6 +416,13 @@ export const createContractorPayableFromSubmission = async (
     const beneficiaryType = engagement.memberId ? 'member' : 'other'
     const beneficiaryId = engagement.memberId ?? engagement.profileId
 
+    const honorariosPolicy = buildHonorariosPolicySnapshot({
+      relationshipSubtype: engagement.relationshipSubtype,
+      taxWithholdingPolicyCode: engagement.taxWithholdingPolicyCode,
+      taxWithholdingRateSnapshot: engagement.taxWithholdingRateSnapshot,
+      startDate: engagement.startDate
+    })
+
     const payable = await insertPayable(client, {
       contractorEngagementId: engagement.contractorEngagementId,
       contractorWorkSubmissionId: input.contractorWorkSubmissionId,
@@ -430,7 +444,8 @@ export const createContractorPayableFromSubmission = async (
         engagementPublicId: engagement.publicId,
         relationshipSubtype: engagement.relationshipSubtype,
         paymentModel: engagement.paymentModel,
-        taxWithholdingRateSnapshot: engagement.taxWithholdingRateSnapshot
+        taxWithholdingRateSnapshot: engagement.taxWithholdingRateSnapshot,
+        ...(honorariosPolicy ? { honorariosPolicy } : {})
       },
       actorUserId: input.actorUserId
     })
@@ -515,6 +530,13 @@ export const createContractorPayableOffCycle = async (
   const beneficiaryType = engagement.memberId ? 'member' : 'other'
   const beneficiaryId = engagement.memberId ?? engagement.profileId
 
+  const honorariosPolicy = buildHonorariosPolicySnapshot({
+    relationshipSubtype: engagement.relationshipSubtype,
+    taxWithholdingPolicyCode: engagement.taxWithholdingPolicyCode,
+    taxWithholdingRateSnapshot: engagement.taxWithholdingRateSnapshot,
+    startDate: engagement.startDate
+  })
+
   return withGreenhousePostgresTransaction(async (client) => {
     const payable = await insertPayable(client, {
       contractorEngagementId: engagement.contractorEngagementId,
@@ -536,7 +558,8 @@ export const createContractorPayableOffCycle = async (
       sourceSnapshot: {
         engagementPublicId: engagement.publicId,
         relationshipSubtype: engagement.relationshipSubtype,
-        reason: input.reason.trim()
+        reason: input.reason.trim(),
+        ...(honorariosPolicy ? { honorariosPolicy } : {})
       },
       actorUserId: input.actorUserId
     })
@@ -617,6 +640,40 @@ export const assessPayableReadiness = async (
     fxSupported = rate !== null
   }
 
+  // ── TASK-794 — Chile honorarios compliance gates ────────────────────────────
+  // Classification risk blocks ANY lane (universal). Mirrors the engagement
+  // lifecycle CHECK `active ⇒ classification_risk no bloqueante` as a payable-level
+  // defense: a payable created while the engagement was clear must not reach
+  // Finance if the engagement later escalated to legal_review_required/blocked.
+  const classificationRiskBlocking = isClassificationRiskBlocking(engagement.classificationRiskStatus)
+
+  const isHonorarios = engagement.relationshipSubtype === CHILE_HONORARIOS_SUBTYPE
+
+  let rutVerified = true
+  let rutBlockerDetail: string | null = null
+  let honorariosWithholdingConsistent = true
+
+  if (isHonorarios) {
+    // Verified CL_RUT is a fail-closed blocker for honorarios (boleta). Address
+    // not required (person-legal-profile `honorarios_closure` excludes it).
+    const honorariosReadiness = await resolveHonorariosReadiness({ profileId: engagement.profileId })
+
+    rutVerified = honorariosReadiness.rutVerified
+    rutBlockerDetail = honorariosReadiness.blockerCode
+
+    // Recompute the SII-only payout from the engagement snapshot rate and assert
+    // the persisted withholding/net match. Any divergence means a dependent
+    // deduction or a wrong rate is embedded in the payable → block.
+    const expected = computeChileHonorariosPayout({
+      grossAmount: payable.grossAmount,
+      rateSnapshot: engagement.taxWithholdingRateSnapshot
+    })
+
+    honorariosWithholdingConsistent =
+      Math.round(payable.withholdingAmount * 100) / 100 === expected.withholdingAmount &&
+      Math.round(payable.netPayable * 100) / 100 === expected.netPayable
+  }
+
   const readinessInputs: PayableReadinessInputs = {
     sourceApproved,
     requiresInvoice: engagement.requiresInvoice,
@@ -630,7 +687,12 @@ export const assessPayableReadiness = async (
     paymentProfileResolved: payable.paymentProfileId !== null,
     paymentProfileWaived: payable.paymentProfileWaiverReason !== null,
     providerOwned: PROVIDER_OWNED_PAYROLL_VIA.has(engagement.payrollVia),
-    hasProviderRef: engagement.providerContractId !== null
+    hasProviderRef: engagement.providerContractId !== null,
+    classificationRiskBlocking,
+    isHonorarios,
+    rutVerified,
+    rutBlockerDetail,
+    honorariosWithholdingConsistent
   }
 
   return evaluatePayableReadiness(readinessInputs)

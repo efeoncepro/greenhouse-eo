@@ -87,6 +87,35 @@ export const resolveChileHonorariosPolicy = (params: {
 }
 
 /**
+ * Build the auditable honorarios policy snapshot for a payable's
+ * `source_snapshot_json`. Prefers the engagement's persisted SII snapshot (SSOT,
+ * resolved at engagement start year) and falls back to re-resolving from the
+ * emission year. Returns null for non-honorarios lanes. Boleta folio is captured
+ * "where present" (deferred to the ContractorInvoice aggregate, TASK-796+).
+ */
+export const buildHonorariosPolicySnapshot = (params: {
+  relationshipSubtype: string
+  taxWithholdingPolicyCode: string | null
+  taxWithholdingRateSnapshot: number | null
+  startDate: string
+  boletaFolio?: string | null
+}): ChileHonorariosPolicySnapshot | null => {
+  if (params.relationshipSubtype !== CHILE_HONORARIOS_SUBTYPE) {
+    return null
+  }
+
+  const emissionYear = Number(params.startDate.slice(0, 4))
+  const fallback = resolveChileHonorariosPolicy({ emissionYear, boletaFolio: params.boletaFolio })
+
+  return {
+    policyCode: params.taxWithholdingPolicyCode ?? fallback.policyCode,
+    rateSnapshot: params.taxWithholdingRateSnapshot ?? fallback.rateSnapshot,
+    emissionYear,
+    boletaFolio: fallback.boletaFolio
+  }
+}
+
+/**
  * Guard: throws if any deduction kind is a dependent-payroll deduction. The
  * canonical SSOT for "what is forbidden on honorarios". Future honorarios
  * surfaces (self-service quoting, deduction breakdowns) MUST call this before

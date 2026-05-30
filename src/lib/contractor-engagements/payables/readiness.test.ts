@@ -16,7 +16,18 @@ const ready: PayableReadinessInputs = {
   paymentProfileResolved: true,
   paymentProfileWaived: false,
   providerOwned: false,
-  hasProviderRef: false
+  hasProviderRef: false,
+  classificationRiskBlocking: false,
+  isHonorarios: false,
+  rutVerified: true,
+  honorariosWithholdingConsistent: true
+}
+
+const honorariosReady: PayableReadinessInputs = {
+  ...ready,
+  isHonorarios: true,
+  rutVerified: true,
+  honorariosWithholdingConsistent: true
 }
 
 describe('contractor payable readiness (TASK-793)', () => {
@@ -101,5 +112,55 @@ describe('contractor payable readiness (TASK-793)', () => {
     const ok = evaluatePayableReadiness({ ...ready, providerOwned: true, hasProviderRef: true })
 
     expect(ok.ready).toBe(true)
+  })
+})
+
+describe('contractor payable readiness — Chile honorarios compliance (TASK-794)', () => {
+  it('classification risk blocks ANY lane (universal gate)', () => {
+    const r = evaluatePayableReadiness({ ...ready, classificationRiskBlocking: true })
+
+    expect(r.ready).toBe(false)
+    expect(r.blockers.map(b => b.code)).toContain('classification_risk_blocking')
+  })
+
+  it('honorarios passes when RUT verified + withholding consistent + classification clear', () => {
+    const r = evaluatePayableReadiness(honorariosReady)
+
+    expect(r.ready).toBe(true)
+    expect(r.blockers).toHaveLength(0)
+  })
+
+  it('blocks honorarios when CL_RUT not verified', () => {
+    const r = evaluatePayableReadiness({
+      ...honorariosReady,
+      rutVerified: false,
+      rutBlockerDetail: 'cl_rut_missing'
+    })
+
+    expect(r.ready).toBe(false)
+    const rutBlocker = r.blockers.find(b => b.code === 'rut_unverified')
+
+    expect(rutBlocker).toBeDefined()
+    expect(rutBlocker?.message).toContain('cl_rut_missing')
+  })
+
+  it('does NOT require verified RUT for non-honorarios lanes', () => {
+    const r = evaluatePayableReadiness({ ...ready, isHonorarios: false, rutVerified: false })
+
+    expect(r.ready).toBe(true)
+    expect(r.blockers.map(b => b.code)).not.toContain('rut_unverified')
+  })
+
+  it('blocks honorarios when withholding is inconsistent with the SII snapshot (dependent deduction guard)', () => {
+    const r = evaluatePayableReadiness({ ...honorariosReady, honorariosWithholdingConsistent: false })
+
+    expect(r.ready).toBe(false)
+    expect(r.blockers.map(b => b.code)).toContain('honorarios_withholding_mismatch')
+  })
+
+  it('does NOT apply the honorarios withholding gate to non-honorarios lanes', () => {
+    const r = evaluatePayableReadiness({ ...ready, isHonorarios: false, honorariosWithholdingConsistent: false })
+
+    expect(r.blockers.map(b => b.code)).not.toContain('honorarios_withholding_mismatch')
   })
 })

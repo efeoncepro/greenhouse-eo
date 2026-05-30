@@ -14,6 +14,13 @@
  *   - FX resolved when contract currency ≠ payment currency
  *   - payment profile resolved OR governed waiver present
  *   - provider split present when provider-owned (deel/remote/oyster)
+ *
+ * TASK-794 — Chile honorarios compliance gates (fail-closed):
+ *   - classification risk not blocking (universal — all lanes)
+ *   - verified CL_RUT present when honorarios_cl (`rut_unverified`)
+ *   - honorarios withholding is SII-only and reconciles vs the snapshot rate
+ *     (`honorarios_withholding_mismatch` — catches any dependent deduction /
+ *      wrong rate slipping into an honorarios payable)
  */
 
 export const PAYABLE_READINESS_BLOCKER_CODES = [
@@ -23,7 +30,11 @@ export const PAYABLE_READINESS_BLOCKER_CODES = [
   'currency_unsupported',
   'fx_unresolved',
   'payment_profile_unresolved',
-  'provider_split_missing'
+  'provider_split_missing',
+  // TASK-794 — Chile honorarios compliance
+  'classification_risk_blocking',
+  'rut_unverified',
+  'honorarios_withholding_mismatch'
 ] as const
 export type PayableReadinessBlockerCode = (typeof PAYABLE_READINESS_BLOCKER_CODES)[number]
 
@@ -49,6 +60,21 @@ export interface PayableReadinessInputs {
   /** engagement.payrollVia ∈ {deel,remote,oyster}. */
   providerOwned: boolean
   hasProviderRef: boolean
+  // ── TASK-794 — Chile honorarios compliance ──────────────────────────────────
+  /** engagement.classificationRiskStatus ∈ {legal_review_required, blocked}. Universal gate. */
+  classificationRiskBlocking: boolean
+  /** engagement.relationshipSubtype === 'honorarios_cl'. Gates the honorarios-only checks below. */
+  isHonorarios: boolean
+  /** Profile has a CL_RUT with verification_status='verified' (only enforced when isHonorarios). */
+  rutVerified: boolean
+  /** Optional person-legal-profile blocker code (e.g. cl_rut_missing) surfaced in the message. */
+  rutBlockerDetail?: string | null
+  /**
+   * Persisted withholding/net equals the recomputed SII-only honorarios payout
+   * (only enforced when isHonorarios). False ⇒ a dependent deduction / wrong rate
+   * is embedded in the payable.
+   */
+  honorariosWithholdingConsistent: boolean
 }
 
 export interface PayableReadinessResult {
@@ -116,6 +142,35 @@ export const evaluatePayableReadiness = (
       code: 'provider_split_missing',
       message: 'Falta la referencia del proveedor (contrato/worker) para un payable provider-owned.'
     })
+  }
+
+  // ── TASK-794 — Chile honorarios compliance gates ────────────────────────────
+  // Universal: classification risk blocks approval/payment of any lane.
+  if (inputs.classificationRiskBlocking) {
+    blockers.push({
+      code: 'classification_risk_blocking',
+      message:
+        'El engagement tiene riesgo de clasificación laboral bloqueante; requiere revisión legal antes de pagar.'
+    })
+  }
+
+  if (inputs.isHonorarios) {
+    if (!inputs.rutVerified) {
+      const detail = inputs.rutBlockerDetail ? ` (${inputs.rutBlockerDetail})` : ''
+
+      blockers.push({
+        code: 'rut_unverified',
+        message: `Falta el RUT chileno verificado del prestador para emitir honorarios${detail}.`
+      })
+    }
+
+    if (!inputs.honorariosWithholdingConsistent) {
+      blockers.push({
+        code: 'honorarios_withholding_mismatch',
+        message:
+          'La retención del honorarios no coincide con la retención SII versionada (solo se permite retención SII, sin deducciones dependientes).'
+      })
+    }
   }
 
   return {
