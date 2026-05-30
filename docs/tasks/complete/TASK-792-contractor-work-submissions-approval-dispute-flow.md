@@ -118,12 +118,28 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Timesheet/milestone/deliverable submissions can be created.
-- [ ] Approval/dispute/reject transitions are validated and audited.
-- [ ] Evidence refs are preserved and retrievable.
-- [ ] Approved submission can be consumed by payable readiness.
-- [ ] Duplicate payable candidates are blocked or flagged.
-- [ ] Payroll non-regression: suite `src/lib/payroll` verde; sin escritura a `payroll_adjustments`/`payroll_entries`/`compensation_versions` desde submissions.
+- [x] Timesheet/milestone/deliverable submissions can be created. — `createContractorWorkSubmission` (6 submission_types, gross derivado para timesheet).
+- [x] Approval/dispute/reject transitions are validated and audited. — `reviewContractorWorkSubmission` + state-machine trigger DB + append-only events; dispute/reject reason ≥10.
+- [x] Evidence refs are preserved and retrievable. — D-792-1: `contractor_invoice_assets.contractor_work_submission_id` (additivo) + `attachContractorInvoiceAsset` extendido; delivery refs en metadata_json.
+- [x] Approved submission can be consumed by payable readiness. — `listWorkSubmissionsReadyForPayable` (approved ∧ unconsumed) + `markContractorWorkSubmissionConsumed`.
+- [x] Duplicate payable candidates are blocked or flagged. — D-792-3: `consumed_by_payable_id` + markConsumed idempotente rechaza doble consumo.
+- [x] Payroll non-regression: suite `src/lib/payroll` verde (522 passed, 0 failed); cero escritura a `payroll_adjustments`/`payroll_entries`/`compensation_versions`.
+
+## Closing Note (2026-05-30)
+
+Implementado en `develop` (sin rama, instrucción del operador). 3 slices + close.
+
+- **Slice 1** — migración `20260531000000000` (timestamp ubicado después de TASK-791): `contractor_work_submissions` (state machine + CHECK enums + approved-requires-gross CHECK + transition trigger) + append-only `contractor_work_submission_events` (anti-UPDATE/DELETE) + ALTER `contractor_invoice_assets` ADD `contractor_work_submission_id` (D-792-1) + `consumed_by_payable_id` forward-compat (D-792-3) + types + pure state-machine (8 tests) + readers (incl. readiness).
+- **Slice 2** — workflow (create/updateDraft/submit/review/cancel/markConsumed) en tx + outbox v1 (5 events) + capabilities `hr.contractor_work_submission` + `.review` (catalog + grants, grant-coverage verde) + API `/api/hr/contractors/work-submissions` (+ `[id]`) + extensión del helper de evidencia TASK-791.
+- **Slice 3** — signal `hr.contractor_work_submission.review_overdue` (drift, moduleKey identity, steady=0).
+
+**Decisiones (no había `## Open Questions`):** D-792-1 evidencia reusa el ledger TASK-791 (columna additiva); D-792-2 amount basis (quantity/unit/rate_snapshot/gross); D-792-3 consumed_by_payable_id forward-compat + readiness reader; D-792-4 2 capabilities least-privilege; D-792-5 state machine + reason ≥10 dispute/reject; D-792-6 UI deferida a TASK-796.
+
+**Gates verdes:** tsc 0 · full lint 0 · `pnpm build` ✓ (rutas compiladas) · `pnpm test` 5546 passed / 0 failed · `pnpm vitest run src/lib/payroll` 522 passed / 0 failed · grant-coverage guard ✓ · DB defense-in-depth verificado live en tx rolled-back (transition 23514, approve-requires-gross 23514, anti-UPDATE/DELETE 23001, enum CHECK 23514) · signal live steady=0.
+
+**Skills:** greenhouse-backend. (Payroll non-regression: cero touch a payroll.)
+
+**Pendiente (out of scope V1, desbloqueado):** TASK-793 (payables → Finance — consume `listWorkSubmissionsReadyForPayable` + `markContractorWorkSubmissionConsumed` + agrega FK a `consumed_by_payable_id`), TASK-796 (self-service UI).
 
 ## Verification
 

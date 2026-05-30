@@ -2,6 +2,7 @@
 
 ## Delta 2026-05-30
 
+- Desbloqueado (parcial) por **TASK-792 ✅ complete**: el backend de work submissions existe (`/api/hr/contractors/work-submissions` + store). La UI self-service consume estos endpoints (crear/editar borrador/enviar timesheet/milestone/deliverable + ver estado approved/disputed/rejected). La revisión (approve/dispute/reject) es surface de HR, no del contractor (capability `hr.contractor_work_submission.review`). El backend ya está; esta task agrega la UI.
 - Desbloqueado (parcial) por **TASK-791 ✅ complete**: el contractor puede subir su propia boleta/invoice + evidencia con `<GreenhouseFileUploader contextType='contractor_invoice_draft' | 'contractor_work_evidence_draft'>` (self-upload ya permitido vía member facet) y luego adjuntar con `attachContractorInvoiceAsset`. El access policy ya garantiza que el contractor ve solo lo propio y NO ve provider statements. La UI self-service consume esta infra; no inventar uploader nuevo.
 
 ## Status

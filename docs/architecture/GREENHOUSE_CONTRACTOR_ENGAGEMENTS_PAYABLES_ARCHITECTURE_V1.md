@@ -1,8 +1,22 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.2
+**Version:** 1.3
 **Created:** 2026-05-05
-**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets uploader/ledger (TASK-791) implemented. WorkSubmission, ContractorInvoice aggregate, ContractorPayable + Finance bridge remain proposals (TASK-792..798).
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets uploader/ledger (TASK-791) + Contractor Work Submissions (TASK-792) implemented. ContractorInvoice aggregate, ContractorPayable + Finance bridge remain proposals (TASK-793..798).
+
+## Delta 2026-05-30 — TASK-792 Contractor Work Submissions shipped
+
+El agregado `ContractorWorkSubmission` está implementado: evidencia de trabajo con lifecycle de aprobación/disputa/rechazo, ANTES de generar un payable. La aprobación operacional NO es ejecución de pago.
+
+- **Tabla** `greenhouse_hr.contractor_work_submissions` (migración `20260531000000000`): tipos {timesheet, milestone, deliverable, project_fee, expense, off_cycle_adjustment}, estados {draft, submitted, approved, disputed, rejected, cancelled} con state machine + CHECK enums + CHECK `approved ⇒ gross_amount NOT NULL` + trigger de transición. Append-only `contractor_work_submission_events` (anti-UPDATE/DELETE).
+- **Evidencia (D-792-1)**: reusa el ledger TASK-791 vía columna additiva `contractor_invoice_assets.contractor_work_submission_id`; `attachContractorInvoiceAsset` extendido. Delivery refs (project/sprint) en `metadata_json`.
+- **Readiness + dup guard (D-792-3)**: `listWorkSubmissionsReadyForPayable` (approved ∧ unconsumed) + `markContractorWorkSubmissionConsumed` (idempotente) + columna `consumed_by_payable_id` NULL forward-compat (TASK-793 agrega la FK).
+- **Workflow** (`work-submissions/store.ts`): create/updateDraft/submit/review(approve|dispute|reject)/cancel/markConsumed en tx + outbox v1 + audit. dispute/reject reason ≥10; approve exige gross; cancel bloqueado si consumido.
+- **Access (D-792-4)**: capabilities `hr.contractor_work_submission` (read/create/update/manage) + `.review` (read/approve). API `/api/hr/contractors/work-submissions` (+ `[id]`).
+- **Reliability**: signal `hr.contractor_work_submission.review_overdue` (drift, steady=0).
+- **UI** deferida a TASK-796 (D-792-6).
+
+Pendiente: ContractorInvoice aggregate + FK `contractor_invoice_id`/`consumed_by_payable_id` (TASK-792 follow-up / TASK-793), ContractorPayable + Finance bridge (TASK-793), self-service UI (TASK-796).
 
 ## Delta 2026-05-30 — TASK-791 Contractor Invoice Assets shipped
 

@@ -4298,6 +4298,36 @@ Toda invoice/boleta, evidencia de trabajo o documento de proveedor de un contrac
 
 **Spec canónica**: `docs/tasks/complete/TASK-791-contractor-invoice-assets-uploader-contexts.md`. Migración: `20260530203116605`. Patrones fuente: TASK-721 (evidence uploader + attach-in-tx + broken-evidence signal), TASK-790 (contractor engagement anchor), TASK-700/765 (append-only ledger + CHECK + triggers).
 
+### Contractor Work Submissions invariants (TASK-792, desde 2026-05-30)
+
+`greenhouse_hr.contractor_work_submissions` es la evidencia de trabajo del contractor (timesheet/milestone/deliverable/project_fee/expense/off_cycle_adjustment) con lifecycle de aprobación/disputa/rechazo. **La aprobación operacional NO es ejecución de pago** — una submission aprobada es INPUT de la readiness del payable (TASK-793), nunca alimenta payroll. Módulo: `src/lib/contractor-engagements/work-submissions/` (barrel pure-only; store server-only importado directo).
+
+**State machine + CHECK + audit trio** (patrón TASK-700/765/790): `contractor_work_submissions` (CHECK enums + CHECK `status='approved' ⇒ gross_amount NOT NULL` + BEFORE UPDATE transition trigger) + append-only `contractor_work_submission_events` (anti-UPDATE/DELETE). Matriz: `draft→{submitted,cancelled}`, `submitted→{approved,disputed,rejected,cancelled}`, `disputed→{submitted,rejected,cancelled}`, `approved→{cancelled}`, `rejected`/`cancelled` terminales. Mirror TS: `assertValidWorkSubmissionTransition` (`work-submissions/state-machine.ts`).
+
+**Evidencia (D-792-1)**: las submissions NO tienen tabla de evidencia propia — reusan el ledger TASK-791 `contractor_invoice_assets` vía la columna additiva `contractor_work_submission_id` (FK). `attachContractorInvoiceAsset` acepta `contractorWorkSubmissionId` opcional. Delivery refs (project/sprint/document) viven en `metadata_json` (refs canónicas, NUNCA texto libre como única evidencia).
+
+**Readiness + dup guard (D-792-3)**: `listWorkSubmissionsReadyForPayable(engagementId)` retorna `status='approved' AND consumed_by_payable_id IS NULL`. `markContractorWorkSubmissionConsumed` (idempotente) la marca consumida — rechaza doble consumo. `consumed_by_payable_id` es `TEXT NULL` forward-compat (TASK-793 agrega la FK).
+
+**Access (D-792-4)**: 2 capabilities least-privilege — `hr.contractor_work_submission` (read/create/update/manage: submit/editar-borrador/cancelar) + `hr.contractor_work_submission.review` (read/approve: approve/dispute/reject). Grants: HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN. API `/api/hr/contractors/work-submissions` (GET/POST) + `[id]` (GET/PATCH action=update|submit|approve|dispute|reject|cancel).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** alimentar `payroll_entries`, `payroll_adjustments` ni crear `compensation_versions` desde una work submission. La submission aprobada es input de readiness del payable (TASK-793), NO de payroll.
+- **NUNCA** tratar la aprobación de trabajo como ejecución de pago. El pago nace en payable → Finance (TASK-793).
+- **NUNCA** aprobar una submission sin `gross_amount` (app guard `approve_requires_gross_amount` + DB CHECK). El monto se declara en create/draft.
+- **NUNCA** disputar/rechazar sin `reason` (≥10 chars) — app guard + audit.
+- **NUNCA** cancelar una submission ya consumida por un payable (`consumed_by_payable_id` NOT NULL).
+- **NUNCA** UPDATE/DELETE sobre `contractor_work_submission_events` (triggers append-only).
+- **NUNCA** transicionar fuera de la matriz canónica (trigger DB + `assertValidWorkSubmissionTransition`).
+- **NUNCA** consumer downstream recomputa "qué submissions están listas" inline — usar `listWorkSubmissionsReadyForPayable`.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'identity', ...)`.
+- **SIEMPRE** que TASK-793 cree `contractor_payables`, agregar la FK `consumed_by_payable_id → contractor_payables` (additiva) + setearla vía `markContractorWorkSubmissionConsumed` dentro de la tx de creación del payable.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` como gate al tocar este dominio.
+
+**Reliability signal**: `hr.contractor_work_submission.review_overdue` (kind=drift, moduleKey=identity, steady=0) — submissions en submitted|disputed > 14d. **Outbox v1**: `workforce.contractor_work_submission.{submitted,approved,disputed,rejected,cancelled}` (aggregateType `contractor_work_submission`).
+
+**Spec canónica**: `docs/tasks/complete/TASK-792-contractor-work-submissions-approval-dispute-flow.md`. Migración: `20260531000000000`. Patrones fuente: TASK-790 (engagement anchor + state machine trio), TASK-791 (evidence ledger reuse), TASK-700/765 (append-only audit + CHECK + triggers), TASK-873/935 (capability grant coverage).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

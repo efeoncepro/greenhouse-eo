@@ -2,6 +2,20 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-30 — TASK-792: Contractor Work Submissions lifecycle (5 events v1)
+
+Aggregate type: `contractor_work_submission`. Evidencia de trabajo del contractor (timesheet/milestone/deliverable/…) con approval/dispute/reject. Aprobación operacional ≠ pago. Payload base `{schemaVersion:1, contractorWorkSubmissionId, publicId, contractorEngagementId, submissionType, status, grossAmount, currency, ...}`.
+
+| Evento | Trigger | Notas |
+| --- | --- | --- |
+| `workforce.contractor_work_submission.submitted` | `submitContractorWorkSubmission()` | draft|disputed → submitted |
+| `workforce.contractor_work_submission.approved` | `reviewContractorWorkSubmission(approve)` | requiere gross_amount; input de readiness del payable |
+| `workforce.contractor_work_submission.disputed` | `reviewContractorWorkSubmission(dispute)` | reason ≥10 |
+| `workforce.contractor_work_submission.rejected` | `reviewContractorWorkSubmission(reject)` | reason ≥10; terminal |
+| `workforce.contractor_work_submission.cancelled` | `cancelContractorWorkSubmission()` | bloqueado si ya consumido; terminal |
+
+V1 sin consumer reactivo (Finance bridge es TASK-793). Eventos de auditoría/notificación. NO se agregan a `REACTIVE_EVENT_TYPES`.
+
 ## Delta 2026-05-29 — TASK-790: Contractor Engagements lifecycle (6 events v1)
 
 Aggregate type: `contractor_engagement`. Cambios materiales del lifecycle del engagement contractor/honorarios (Workforce/HR). Payload base `{schemaVersion:1, contractorEngagementId, publicId, profileId, memberId, personLegalEntityRelationshipId, legalEntityOrganizationId, relationshipSubtype, payrollVia, paymentModel, status, classificationRiskStatus, ...}`.

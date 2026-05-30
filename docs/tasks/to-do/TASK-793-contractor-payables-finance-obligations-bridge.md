@@ -2,6 +2,7 @@
 
 ## Delta 2026-05-30
 
+- **TASK-792 ✅ complete**: existen las work submissions (`greenhouse_hr.contractor_work_submissions`). El payable PAYG/milestone consume las submissions aprobadas vía `listWorkSubmissionsReadyForPayable(engagementId)` (approved ∧ no consumidas) y DEBE llamar `markContractorWorkSubmissionConsumed({submissionId, payableId})` dentro de la misma tx de creación del payable (dup-guard idempotente). Agregar la FK `contractor_work_submissions.consumed_by_payable_id → contractor_payables` (additiva, la columna ya existe NULL) cuando se cree la tabla `contractor_payables`. La aprobación de la submission NO es pago — el pago nace aquí (793) hacia Finance.
 - **TASK-791 ✅ complete**: los soportes (invoice PDF, tax XML, work evidence, provider statement/payout, FX receipt) viven en `greenhouse_hr.contractor_invoice_assets` adjuntos vía el uploader canónico. El readiness `ready_for_finance` del payable debe verificar que existe el asset principal (`asset_role='invoice_pdf'` o el artefacto requerido) cuando `requires_invoice=true`, leyendo `listContractorInvoiceAssetsByEngagement`. NUNCA aceptar `gs://`/URLs externas como contrato de invoice.
 
 ## Delta 2026-05-29
