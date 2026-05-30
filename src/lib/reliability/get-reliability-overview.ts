@@ -94,6 +94,7 @@ import { getContractorEngagementClassificationRiskOpenSignal } from './queries/c
 import { getContractorInvoiceAssetsBrokenEvidenceSignal } from './queries/contractor-invoice-assets-broken-evidence'
 import { getContractorWorkSubmissionReviewOverdueSignal } from './queries/contractor-work-submission-review-overdue'
 import { getContractorPayableHonorariosRutUnverifiedSignal } from './queries/contractor-payable-honorarios-rut-unverified'
+import { getContractorTransitionOrphanSignal } from './queries/contractor-transition-orphan'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
@@ -1315,7 +1316,10 @@ export const getReliabilityOverview = async (
           getContractorWorkSubmissionReviewOverdueSignal().catch(() => null),
           // TASK-794 — honorarios_cl activos sin RUT chileno verificado (payable
           // bloqueado por readiness fail-closed antes de Finance).
-          getContractorPayableHonorariosRutUnverifiedSignal().catch(() => null)
+          getContractorPayableHonorariosRutUnverifiedSignal().catch(() => null),
+          // TASK-956 — relaciones contractor por transición sin engagement
+          // asociado (transición incompleta; defense-in-depth del comando atómico).
+          getContractorTransitionOrphanSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
