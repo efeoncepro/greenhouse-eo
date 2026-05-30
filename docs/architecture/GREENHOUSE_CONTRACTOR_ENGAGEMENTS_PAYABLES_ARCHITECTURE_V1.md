@@ -1,8 +1,18 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.7
+**Version:** 1.8
 **Created:** 2026-05-05
-**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + **International Contractor Boundary Fase A (TASK-795)** implemented. Provider settlement split + EOR (TASK-795 Fase B), self-service UI + closure remain proposals (TASK-795 Fase B / 796 / 797 / 798).
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + **Self-Service Hub UI (TASK-796)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955), contractor closure (TASK-797) and ops control plane (TASK-798) remain proposals.
+
+## Delta 2026-05-30 — TASK-796 Contractor Self-Service Hub shipped
+
+Las dos superficies UI del dominio están implementadas (develop), cableando los mockups aprobados al backend TASK-790→795 sin redisenar la IA. **Cero código payroll, additive.**
+
+- **Projection canónica server-only** (patrón TASK-835/611), único productor del view-model: `src/lib/contractor-engagements/{projection-types,self-service-scenario (mapper puro),self-service-projection,hr-workbench-projection,active-engagement-flag}.ts`. `withSourceTimeout` + degradación honesta + cache TTL 30s. El mapper filtra Finance-only (provider statements/fees) — el contractor nunca los ve.
+- **Carril API self-service member-scoped** (el gap load-bearing — todo lo previo era HR/Finance-gated): `GET /api/my/contractor`, `POST /api/my/contractor/work-submissions` (create+submit), `POST /api/my/contractor/attach-asset`. `requireMyTenantContext` + 2 capabilities `personal_workspace.contractor.{read_self,submit_self}` (scope own). Engagement resuelto del `identityProfileId` de sesión (anti-IDOR). HR workbench: `GET /api/hr/contractors/workbench` + review por el PATCH existente TASK-792.
+- **UI**: `/my/contractor` (hero + KPIs + blockers + closure sidecar + uploaders + composer/dispute drawers + payment-profile handoff que enlaza TASK-753 + timeline + historial) y `/hr/contractors` (cola + KPIs + readiness/finance-step + inspector + signals + admin review drawer con motivo contractor-visible ≥10 chars para dispute/reject).
+- **Governance**: migración `20260531030000000` seed `view_registry` + `role_view_assignments` (collaborator → self-service; HR+Finance+Admin → workbench) + `capabilities_registry` parity. **Nav dinámico** `/my/contractor` solo si hay engagement activo (flag JWT `hasActiveContractorEngagement`, mirror supervisorAccess).
+- Gates: `pnpm build` ✓ · `pnpm test` 5617 passed · tsc/lint clean · grant-coverage + view-registry tests verde. Closure real = TASK-797; payment profile NO se reconstruye (TASK-753).
 
 ## Delta 2026-05-30 — TASK-795 Fase A: International Contractor Boundary + FX Policy shipped
 

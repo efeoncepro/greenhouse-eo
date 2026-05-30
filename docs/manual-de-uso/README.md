@@ -46,6 +46,7 @@ _Pendiente._
 - [Periodos de nomina](hr/periodos-de-nomina.md) — como crear, editar y calcular periodos sin adivinar la version tributaria Chile; cuando Greenhouse la resuelve solo y cuando un override manual si aplica.
 - [Descargar y reconciliar la nomina mensual](hr/descargar-y-reconciliar-nomina.md) — paso a paso para descargar recibos individuales, PDF reporte mensual y Excel; donde leer los totales para reconciliar contra Previred (cotizaciones) y F29 (retencion SII honorarios) sin manipular el archivo.
 - [Exportar Previred y LRE](hr/payroll-compliance-exports-chile.md) — como descargar los artefactos compliance Chile desde periodos cerrados, permisos requeridos y cuidados de upload externo manual.
+- [Contratistas — Self-Service y revision HR](hr/contratistas.md) — como un contratista sube su boleta/factura + evidencia, envia entregas y responde observaciones desde `/my/contractor`; y como HR revisa la cola, aprueba, observa o rechaza desde `/hr/contractors` sin confundir aprobar con pagar.
 
 ### Agencia y Operaciones
 

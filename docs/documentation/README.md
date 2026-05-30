@@ -83,6 +83,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Compliance Exports Chile](hr/payroll-compliance-exports-chile.md) — Previred y LRE como proyecciones auditadas sobre payroll cerrado, con RUT verificado, registry de artefactos, eventos y boundary TASK-707a
 - [Reliquidacion de Nomina](hr/reliquidacion-de-nomina.md) — reapertura de periodos exportados, versionamiento de entradas (v1/v2), delta a finanzas, ventana de 45 dias, auditoria inmutable
 - [Objetivos y OKRs](hr/objetivos-okrs.md) — ciclos de objetivos, goals en cascada (empresa, departamento, individual), key results medibles, elegibilidad por contrato, self-service y admin
+- [Contratistas — Self-Service y Workbench HR](hr/contratistas-self-service.md) — las 2 superficies TASK-796: `/my/contractor` (el contratista ve su contratacion, sube boleta/factura + evidencia, envia entregas y responde observaciones) y `/hr/contractors` (workbench HR para revisar la cola, aprobar/observar/rechazar). Ciclo contratacion -> envio -> revision -> obligacion a Finanzas -> pago, sin semantica de nomina/finiquito; aprobar no ejecuta pago
 
 ### Personas
 

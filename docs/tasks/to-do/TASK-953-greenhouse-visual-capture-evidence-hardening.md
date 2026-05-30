@@ -1,5 +1,9 @@
 # TASK-953 — Greenhouse Visual Capture Evidence Hardening
 
+## Delta 2026-05-30 — rutas runtime contractor ya existen (por TASK-796)
+
+`TASK-796` (Contractor Self-Service Hub) **completó**: las rutas runtime `/my/contractor` y `/hr/contractors` ya existen en producción (no solo `/mockup`). El scenario de ejemplo `contractor-admin-runtime` (route `/hr/contractors`) de esta task ahora apunta a una ruta real. TASK-796 dejó **pendiente la captura GVC de runtime** (requiere dev server + un engagement contractor seedeado para el usuario agente) — es exactamente el caso mockup→runtime que esta task formaliza. Al implementar TASK-953, usar `/my/contractor` + `/hr/contractors` como casos vivos de baseline(mockup)→runtime.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

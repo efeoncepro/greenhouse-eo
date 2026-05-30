@@ -4421,6 +4421,41 @@ Fase A de TASK-795 sobre Contractor Payables. Establece la **frontera tributaria
 
 **Spec canónica**: `docs/tasks/complete/TASK-795-international-contractor-provider-boundary-fx-policy.md` (D-795-1..5). Arch: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (Delta 2026-05-30). Fase B diferida → promovible a task derivada cuando exista un contractor real por plataforma/EOR. Patrones fuente: TASK-794 (readiness gate + signal pattern), TASK-790 (tax-policy + entidad contratante), TASK-893 (timestamp arithmetic gate).
 
+### Contractor Self-Service Hub invariants (TASK-796, desde 2026-05-30)
+
+Las dos superficies UI del dominio contractor (`/my/contractor` self-service + `/hr/contractors` workbench HR) consumen **una projection canónica server-only** que es el ÚNICO productor del view-model. La UI NUNCA re-deriva readiness, timeline, blockers ni KPIs desde rows de dominio. Los mockups (`src/views/greenhouse/contractors/mockup/**`) quedan intactos como referencia aprobada + escenarios GVC; el runtime vive en `src/views/greenhouse/contractors/*` (sin `/mockup`).
+
+**Capa de datos canónica** (patrón TASK-835 sample-sprints / TASK-611 organization-workspace):
+
+- `src/lib/contractor-engagements/projection-types.ts` — view-model puro `ContractorSelfServiceScenario` + `ContractorHrWorkbenchProjection` (NOT server-only; shared client+server). Mirror del mockup `ContractorScenario` para wiring de cambio mínimo.
+- `self-service-scenario.ts` — mapper PURO (no IO, testeable). Deriva kind/readiness/timeline/blockers/KPIs/supportItems. **Filtra Finance-only** (provider_statement/payout_receipt/fx_receipt) — el contractor NUNCA ve provider statements/fees.
+- `self-service-projection.ts` — orquestador server-only: `getActiveContractorEngagementForProfile(identityProfileId)` + composición via `withSourceTimeout` + degradación honesta + cache TTL 30s. El engagement se resuelve del `identityProfileId` de sesión (sin IDOR).
+- `hr-workbench-projection.ts` — compone la cola HR de los 3 listers (engagements `pending_review` + submissions `submitted/disputed` + payables `blocked/ready/paid`) + signals derivados honestamente. Cache TTL 30s.
+- `active-engagement-flag.ts` — EXISTS barato fail-safe para el flag JWT del nav (NO importar la projection desde auth.ts — pulls el grafo finance).
+
+**API self-service canónica** (`requireMyTenantContext`, scope=own, member-scoped — el carril que faltaba; todo lo entregado en 790-795 era HR/Finance-gated):
+
+- `GET /api/my/contractor` (capability `personal_workspace.contractor.read_self`) — projection propia.
+- `POST /api/my/contractor/work-submissions` (capability `personal_workspace.contractor.submit_self`) — create+submit contra el engagement PROPIO (engagementId resuelto server-side, NUNCA del cliente).
+- `POST /api/my/contractor/attach-asset` — adjunta boleta/evidencia via `attachContractorInvoiceAsset` (TASK-791); rechaza roles provider-only.
+- HR workbench: `GET /api/hr/contractors/workbench` (reusa `hr.contractor_work_submission:read`); review por el PATCH existente `/api/hr/contractors/work-submissions/[id]` (TASK-792).
+
+**Nav dinámico** (decisión operador 2026-05-30): el ítem `/my/contractor` aparece SOLO si el member tiene engagement activo → flag JWT `hasActiveContractorEngagement` resuelto una vez por sesión en `auth.ts` (mirror `supervisorAccess`, fail-safe) → session → `TenantContext` → `VerticalMenu`. `/hr/contractors` gated por viewCode `equipo.contratistas` (HR + Finance + Admin).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** modificar los mockups bajo `src/views/greenhouse/contractors/mockup/**` — son la referencia aprobada + escenarios GVC. El runtime vive en `src/views/greenhouse/contractors/*`.
+- **NUNCA** re-derivar readiness/timeline/blockers/KPIs en la UI ni en el route handler. Toda derivación pasa por el mapper puro `self-service-scenario.ts`. La projection es el único productor.
+- **NUNCA** exponer al contractor provider statements / fees / montos Finance-only. El mapper filtra los asset roles `provider_statement/payout_receipt/fx_receipt`; los blockers se mapean a responsable `Contractor` vs `Finance`.
+- **NUNCA** copy que implique nómina dependiente / sueldo / finiquito / AFP / liquidación en las superficies contractor. Validar con `greenhouse-ux-writing`. La aprobación operacional NO ejecuta el pago.
+- **NUNCA** aceptar un `contractorEngagementId` del cliente en el carril self-service. El engagement se resuelve server-side del `identityProfileId` de sesión (anti-IDOR).
+- **NUNCA** importar `self-service-projection.ts` (ni su grafo) desde `auth.ts`. El flag JWT usa `active-engagement-flag.ts` (módulo mínimo fail-safe). Un error en la resolución del flag NUNCA debe romper auth (degrada a `false` → el ítem no aparece).
+- **NUNCA** reconstruir Payment Profiles dentro de TASK-796. El handoff solo enlaza/lee estado de `/my/payment-profile` (TASK-753). Closure es visibility-only (cierre real = TASK-797).
+- **NUNCA** agregar viewCode a `VIEW_REGISTRY` TS sin migración seed acompañante en el mismo PR (governance TASK-827) — aplica a `mi_ficha.mi_contratacion` + `equipo.contratistas` (migración `20260531030000000`).
+- **SIEMPRE** que emerja una surface contractor nueva, consumir la projection canónica + reusar las primitivas; cero composición ad-hoc.
+
+**Spec canónica**: `docs/tasks/complete/TASK-796-contractor-self-service-hub.md`. Doc funcional: `docs/documentation/hr/contratistas-self-service.md`. Manual: `docs/manual-de-uso/hr/contratistas.md`. Patrones fuente: TASK-835 (runtime projection), TASK-611 (projection + degraded honest), TASK-753 (`/api/my/*` member-scoped + payment profile handoff), TASK-791/792 (assets + work submissions), TASK-827 (View Registry Governance), TASK-727 (flag JWT por sesión).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

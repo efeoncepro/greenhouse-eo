@@ -32,9 +32,25 @@ Revisión profunda del backend entregado (TASK-789→795) contra los mockups apr
 - **Helpers/readers existentes a reutilizar** (server-only): `getContractorEngagementById`, `listContractorEngagementsByProfile`, `listContractorWorkSubmissionsByEngagement`, `listContractorPayablesByEngagement`, `listContractorInvoiceAssetsByEngagement`, `assessPayableReadiness`, `resolveHonorariosReadiness`, `createContractorWorkSubmission` + `submitContractorWorkSubmission`, `attachContractorInvoiceAsset`. **Gap de conveniencia**: no hay reader "engagement activo del member" → agregar `getActiveContractorEngagementForProfile(identityProfileId)`. **Gap HR**: no hay cola agregada → la projection HR compone `listContractorEngagements({status:'pending_review'})` + work submissions `submitted/disputed` + payables `blocked`.
 - **Capabilities ya seedeadas** (790/792/793): `hr.contractor_engagement`, `hr.contractor_classification`, `hr.contractor_work_submission(.review)`, `finance.contractor_payable(.waive_payment_profile)`. **Falta seedear**: capability(es) self-service `contractor.own.*` (o `personal_workspace.contractor.*`) + grant en `runtime.ts` (mismo PR, guard `capability-grant-coverage.test.ts`) + viewCodes nuevos para las rutas productivas (`mi_ficha.*` self-service, `equipo.*` HR) con su migración View Registry (governance pattern TASK-827).
 
+## Delta 2026-05-30 — Cierre (implementación completa)
+
+Implementado en `develop` (8 commits, sin branch por override del operador). Backend + ambas superficies UI + governance + nav cableados al backend TASK-790→795.
+
+- **Slice 1** — projection canónica server-only (`projection-types` + `self-service-scenario` mapper puro + `self-service-projection` + `hr-workbench-projection` + `active-engagement-flag`) + 14 tests. Único productor del view-model; filtra Finance-only.
+- **Slice 2** — API `/api/my/contractor/*` (GET projection · POST work-submissions · POST attach-asset) + 2 capabilities self-service + grants. Cierra el gap load-bearing (todo lo previo era HR/Finance-gated).
+- **Slice 3** — API `GET /api/hr/contractors/workbench`.
+- **Slice 5** — UI `/my/contractor` (view + composer + dispute + handoff + closure + timeline).
+- **Slice 6** — UI `/hr/contractors` (workbench + admin review drawer).
+- **Slice 4** — migración governance `20260531030000000` (view_registry + role_view_assignments + capabilities_registry, aplicada a dev PG) + nav dinámico (flag JWT `hasActiveContractorEngagement` mirror supervisorAccess) + nomenclature + view-access-catalog TS.
+- **Decisiones de checkpoint**: visibilidad dinámica `/my/contractor` (solo con engagement) · workbench HR grant HR+Finance+Admin · re-secuencia (governance/nav después de UIs).
+
+**Gates de cierre**: `pnpm build` ✓ · `pnpm test` 5617 passed / 0 failed · tsc 0 · lint 0 · grant-coverage + view-registry tests verde. Copy es-CL sin semántica nómina dependiente (validado greenhouse-ux-writing).
+
+**Pendiente (verificación visual)**: GVC capture de las rutas runtime (`/my/contractor`, `/hr/contractors`) requiere dev server + un engagement contractor seedeado para el usuario agente — recomendado post-deploy staging. La UI es promoción fiel de mockups ya GVC-aprobados; el gate canónico (build+test) está verde.
+
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`

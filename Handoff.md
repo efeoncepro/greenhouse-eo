@@ -1,4 +1,10 @@
-# Sesion 2026-05-30 — TASK-796 Contractor Self-Service Hub — 🔧 IN PROGRESS
+# Sesion 2026-05-30 — TASK-796 Contractor Self-Service Hub — ✅ COMPLETE
+
+**Cierre**: 9 commits en `develop` (pusheados). Backend (projections + API self-service `/api/my/contractor/*` + HR workbench API) + ambas UIs (`/my/contractor` + `/hr/contractors`, mockups intactos) + governance (migración `20260531030000000` aplicada a dev PG: view_registry + role_view_assignments + capabilities_registry) + nav dinámico (flag JWT `hasActiveContractorEngagement`). Lifecycle complete + movida a `complete/`. Docs: CLAUDE.md invariants + arch Delta V1.8 + funcional `docs/documentation/hr/contratistas-self-service.md` + manual `docs/manual-de-uso/hr/contratistas.md`. **Gates**: `pnpm build` ✓ · `pnpm test` 5617 passed / 0 failed · tsc 0 · lint 0 · grant-coverage + view-registry verde. **Pendiente (no bloqueante)**: GVC capture de rutas runtime — requiere dev server + engagement contractor seedeado para el agente; recomendado post-deploy staging. La UI es promoción fiel de mockups ya GVC-aprobados.
+
+---
+
+## Detalle de la sesión (histórico)
 
 Rama: `develop` (operador pidió mantenerse en develop, sin branch). Objetivo: cablear los mockups aprobados (`/my/contractor` self-service + `/hr/contractors` workbench HR) al backend contractor TASK-790→795, sin redisenar la IA aprobada.
 
