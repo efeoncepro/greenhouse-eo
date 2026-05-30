@@ -1,3 +1,23 @@
+# Sesion 2026-05-30 — TASK-793 Contractor Payables → Finance Bridge — ✅ COMPLETE
+
+Implementado end-to-end en `develop` (sin rama, sin push; local-first). EPIC-013.
+
+Resultado:
+- `greenhouse_hr.contractor_payables` + `contractor_payable_events` (state machine + CHECK net=gross−withholding + CHECK economic_category=labor_cost_external + audit append-only). Migración `20260531010000000`.
+- Consume work submissions aprobadas (dup-guard misma tx, cierra FK `consumed_by_payable_id` de TASK-792) + off-cycle. Withholding SII solo honorarios CL.
+- Readiness fail-closed (7 gates + waiver gobernado) + API `/api/finance/contractor-payables` + capabilities `finance.contractor_payable` + `.waive_payment_profile` (grant-coverage verde).
+- Bridge reactivo `contractor_payable_finance_obligation`: `ready_for_finance` → UNA `payment_obligation` idempotente (`amount=net`, `source_kind=contractor_payable`). Outbox v1 (5 eventos). 2 signals (lag + dead_letter) wired en overview.
+- Guardrail payroll: NUNCA payroll_entries/adjustments/compensation_versions/final_settlements ni muta members.
+
+Validación:
+- `tsc` 0 repo-wide · lint 0 · 31 tests dominio + 8 bridge · `pnpm vitest run src/lib/payroll` 522 passed (non-regression) · DB guards live (rolled back).
+- Commits: `07f9dec8` `c3e986cf` `72fd2329` `a310105f` `ba96c9a8` `ba761519` `e97aadd7`.
+- Pendiente operador: `pnpm test` + `pnpm build` full antes de push a `develop` (gate de cierre canónico).
+
+Próximo: TASK-794 (honorarios CL), TASK-795 (international/provider + FX), TASK-796 (self-service UI).
+
+---
+
 # Sesion 2026-05-30 — TASK-953 Greenhouse Visual Capture Evidence Hardening — 🆕 TASK CREADA
 
 Pedido: crear una task para robustecer GVC más allá de scroll/full-page: readiness, assertions ligeros, quality guards, reportes, multi-viewport, health taxonomy y baseline mockup→runtime.

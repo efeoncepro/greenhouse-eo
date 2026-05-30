@@ -4328,6 +4328,39 @@ Toda invoice/boleta, evidencia de trabajo o documento de proveedor de un contrac
 
 **Spec canónica**: `docs/tasks/complete/TASK-792-contractor-work-submissions-approval-dispute-flow.md`. Migración: `20260531000000000`. Patrones fuente: TASK-790 (engagement anchor + state machine trio), TASK-791 (evidence ledger reuse), TASK-700/765 (append-only audit + CHECK + triggers), TASK-873/935 (capability grant coverage).
 
+### Contractor Payables → Finance bridge invariants (TASK-793, desde 2026-05-30)
+
+`greenhouse_hr.contractor_payables` es la **obligación económica aprobada del contractor, PREVIA a Finance** (Workforce/HR → Finance). El payable listo genera UNA `payment_obligation` vía bridge reactivo. Finance sigue siendo owner de payment orders, banco y conciliación. Módulo: `src/lib/contractor-engagements/payables/` (barrel pure-only: types/state-machine/withholding/readiness; el store es server-only, importado directo). El payout del contractor es `economic_category='labor_cost_external'` — **NUNCA payroll dependiente**.
+
+**State machine + CHECK + audit trio** (patrón TASK-700/765/790/792): `contractor_payables` (CHECK enums + CHECK `net_payable = gross_amount - withholding_amount` + CHECK `economic_category = 'labor_cost_external'` + BEFORE UPDATE transition trigger) + append-only `contractor_payable_events` (anti-UPDATE/DELETE). Matriz: `pending_readiness→{ready_for_finance,blocked,cancelled}`, `ready_for_finance→{obligation_created,blocked,cancelled}`, `obligation_created→{payment_order_created,cancelled}`, `payment_order_created→{paid,cancelled}`, `blocked→{pending_readiness,cancelled}`, `paid`/`cancelled` terminales. Mirror TS: `assertValidPayableTransition` (`payables/state-machine.ts`).
+
+**Anchor + dup guard**: FK NOT NULL a `contractor_engagements` (RESTRICT) + FK opcional a `contractor_work_submissions`. `createContractorPayableFromSubmission` lockea la submission `approved ∧ consumed_by_payable_id IS NULL`, inserta el payable y setea `consumed_by_payable_id` **en la misma tx** (dup-guard: lock + DB UNIQUE partial `WHERE status<>'cancelled'`). El ALTER de TASK-793 cierra la FK que TASK-792 dejó NULL forward-compat. `createContractorPayableOffCycle` (reason ≥10) para ajustes/bonus sin submission.
+
+**Withholding (D-793-8)**: `computeContractorWithholding` (pure) retiene SOLO honorarios CL bajo `taxComplianceOwner='greenhouse_policy'` con `taxWithholdingRateSnapshot` del engagement (TASK-790 — **NUNCA recomputa la tasa SII**); todo otro lane retiene 0 (provider/country engine maneja su tax local). `net = gross − withholding` enforced por CHECK DB.
+
+**Readiness fail-closed**: `evaluatePayableReadiness` (pure, 7 gates) — source aprobado / invoice-asset presente cuando `requires_invoice` / net reconcilia / `obligationCurrency ∈ {CLP,USD}` / FX resuelto cuando `payment_currency ≠ currency` / payment-profile resuelto **o waiver gobernado** / provider-split presente cuando `payroll_via ∈ {deel,remote,oyster}`. `assessPayableReadiness` (server) resuelve los inputs (invoice via `listContractorInvoiceAssetsByEngagement`, FX via `getLatestStoredExchangeRatePair`) y alimenta el evaluador puro. `transitionPayableToReadyForFinance` → si OK `ready_for_finance` (+emite el evento que dispara el bridge); si no, persiste blockers + `blocked` + throw.
+
+**Bridge (TASK-771 reactive pattern)**: projection `contractor_payable_finance_obligation` consume `workforce.contractor_payable.ready_for_finance`, **re-lee el payable de PG (NUNCA confía el payload)**, skip idempotente si no existe / no-ready / unsupported currency, crea UNA `payment_obligation` (`createPaymentObligation`, idempotente por su UNIQUE; `source_kind=contractor_payable`, `sourceRef=payableId`, `amount=net_payable`, `obligation_kind=provider_payroll`) y marca `obligation_created` (`markPayableObligationCreated`, no-op si ya linkeado al mismo id). `maxRetries=5`. ALTER `payment_obligations` source_kind `+contractor_payable` (additivo, shared Finance infra — solo agrega un valor al enum).
+
+**Access**: capabilities `finance.contractor_payable` (read/create/manage) + `finance.contractor_payable.waive_payment_profile` (update, **admins-only**) + runtime grants (finance route_group ∪ FINANCE_ADMIN ∪ EFEONCE_ADMIN; waiver solo FINANCE_ADMIN ∪ EFEONCE_ADMIN) — grant-coverage test verde. API `/api/finance/contractor-payables` (GET list / POST create) + `[id]` (GET) + `[id]/{ready,cancel,waive-payment-profile}` (POST), gated por `can(tenant,…)` (el helper acepta el tenant context directo — NO existe `@/lib/entitlements/subject`).
+
+**⚠️ Reglas duras** (no-regresión Payroll + canónicas):
+
+- **NUNCA** escribir/mutar `payroll_entries`, `payroll_adjustments`, `compensation_versions`, `final_settlements` desde el payable ni desde el bridge. El payout contractor jamás entra como payroll dependiente.
+- **NUNCA** sobrescribir `members.{payroll_via,contract_type,pay_regime}`. El payable usa `payroll_via`/`tax_compliance_owner` del engagement como input read-only.
+- **NUNCA** aplicar deducciones Chile dependientes (AFP/Fonasa/AFC/SIS/IUSC) — solo retención SII versionada para honorarios CL.
+- **NUNCA** crear el `payment_obligation` con `amount=gross`. SIEMPRE `amount=net_payable` (la retención ya se descontó; provider fees/FX spread son obligaciones separadas — TASK-795).
+- **NUNCA** confiar el payload del evento en el bridge — re-leer el payable de PG por `contractorPayableId` (defensive re-read, TASK-771).
+- **NUNCA** transicionar fuera de la matriz canónica (trigger DB + `assertValidPayableTransition`) ni UPDATE/DELETE sobre `contractor_payable_events`.
+- **NUNCA** marcar `ready_for_finance` sin pasar el readiness fail-closed; el waiver de payment-profile requiere capability admin + reason ≥10.
+- **NUNCA** invocar `Sentry.captureException` directo — usar `captureWithDomain(err, 'finance', …)`.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` como gate al tocar este dominio (verde: 522 passed).
+- **SIEMPRE** que emerja un mecanismo nuevo de payout contractor (provider fee, FX leg — TASK-795), modelarlo como obligación separada, NO mezclarlo en el `net_payable` del payable.
+
+**Reliability** (moduleKey finance, rollup Finance Data Quality, steady=0): `finance.contractor_payable.ready_without_obligation` (lag, ready >30min sin `finance_obligation_id`) + `finance.contractor_payable.bridge_dead_letter` (dead_letter, reactive log `handler='contractor_payable_finance_obligation:…' AND result='dead-letter'`). **Outbox v1**: `workforce.contractor_payable.{created,ready_for_finance,obligation_created,blocked,cancelled}` (aggregateType `contractor_payable`).
+
+**Spec canónica**: `docs/tasks/complete/TASK-793-contractor-payables-finance-obligations-bridge.md`. Migración: `20260531010000000`. Patrones fuente: TASK-790 (engagement anchor + trio), TASK-791 (invoice-asset readiness), TASK-792 (submission consume dup-guard), TASK-748/765 (payment_obligations + idempotencia), TASK-771 (reactive projection + re-read defensivo), TASK-873/935 (capability grant coverage).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

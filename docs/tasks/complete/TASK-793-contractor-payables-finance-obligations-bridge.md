@@ -1,5 +1,22 @@
 # TASK-793 — Contractor Payables to Finance Payment Obligations Bridge
 
+## Delta 2026-05-30 — CLOSED ✅ (complete)
+
+Shipped end-to-end en `develop` (sin push remoto; local-first). Commits:
+`07f9dec8` (Slice 1 schema), `c3e986cf` + `72fd2329` (Slice 2 readiness/API/caps + fix),
+`a310105f` (Slice 3 bridge projection), `ba96c9a8` (Slice 3 signals fix),
+`ba761519` (Slice 3 wiring overview), `e97aadd7` (Slice 4 bridge test).
+
+- **Schema**: `greenhouse_hr.contractor_payables` (state-machine `pending_readiness → ready_for_finance → obligation_created → payment_order_created → paid` + `blocked`/`cancelled`) + `contractor_payable_events` append-only + CHECK `net = gross − withholding` + CHECK `economic_category = 'labor_cost_external'` + ALTER `contractor_work_submissions` FK `consumed_by_payable_id` + ALTER `payment_obligations` source_kind `+contractor_payable`. DB guards verificados en vivo (rolled back).
+- **Runtime**: types + state-machine + withholding (SII honorarios CL únicamente, resto 0) + readers + `createContractorPayableFromSubmission` (consume submission misma tx, dup-guard) + `createContractorPayableOffCycle`.
+- **Readiness fail-closed** (7 gates): source/invoice/net/currency/FX/payment-profile/provider-split + waiver gobernado.
+- **API** `/api/finance/contractor-payables` (list/create + detail + ready + cancel + waive) gated por `can(tenant, …)`.
+- **Capabilities** `finance.contractor_payable{,.waive_payment_profile}` + runtime grants (finance route_group ∪ FINANCE_ADMIN ∪ EFEONCE_ADMIN; waiver admins-only) — grant-coverage test verde.
+- **Bridge** projection `contractor_payable_finance_obligation`: `ready_for_finance` → UNA `payment_obligation` (idempotente, `amount=net_payable`, `obligation_kind=provider_payroll`) → `obligation_created`. 8 tests.
+- **Reliability**: `finance.contractor_payable.ready_without_obligation` (lag) + `finance.contractor_payable.bridge_dead_letter` (dead_letter), wired en `getReliabilityOverview` (moduleKey finance).
+- **Outbox v1**: `workforce.contractor_payable.{created,ready_for_finance,obligation_created,blocked,cancelled}`.
+- Verificación final: `tsc` 0 repo-wide, lint 0, payroll non-regression gate verde (522 passed), 31 tests focales del dominio payable + 8 del bridge.
+
 ## Delta 2026-05-30
 
 - **TASK-792 ✅ complete**: existen las work submissions (`greenhouse_hr.contractor_work_submissions`). El payable PAYG/milestone consume las submissions aprobadas vía `listWorkSubmissionsReadyForPayable(engagementId)` (approved ∧ no consumidas) y DEBE llamar `markContractorWorkSubmissionConsumed({submissionId, payableId})` dentro de la misma tx de creación del payable (dup-guard idempotente). Agregar la FK `contractor_work_submissions.consumed_by_payable_id → contractor_payables` (additiva, la columna ya existe NULL) cuando se cree la tabla `contractor_payables`. La aprobación de la submission NO es pago — el pago nace aquí (793) hacia Finance.
@@ -11,7 +28,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`

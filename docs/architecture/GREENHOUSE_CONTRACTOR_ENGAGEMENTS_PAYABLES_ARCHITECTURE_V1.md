@@ -1,8 +1,21 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.3
+**Version:** 1.4
 **Created:** 2026-05-05
-**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets uploader/ledger (TASK-791) + Contractor Work Submissions (TASK-792) implemented. ContractorInvoice aggregate, ContractorPayable + Finance bridge remain proposals (TASK-793..798).
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets uploader/ledger (TASK-791) + Contractor Work Submissions (TASK-792) + **ContractorPayable + Finance bridge (TASK-793)** implemented. ContractorInvoice aggregate + self-service UI + closure remain proposals (TASK-794..798).
+
+## Delta 2026-05-30 — TASK-793 ContractorPayable + Finance bridge shipped
+
+`greenhouse_hr.contractor_payables` es el agregado de **obligación económica aprobada PREVIA a Finance** (Workforce/HR → Finance). El payable listo genera UNA `payment_obligation` vía bridge reactivo; Finance sigue siendo owner de payment orders + banco + conciliación.
+
+- **State-machine + CHECK + audit-trio** (patrón TASK-700/765/790/792): `contractor_payables` (CHECK enums + CHECK `net = gross − withholding` + CHECK `economic_category = 'labor_cost_external'` + BEFORE UPDATE transition trigger) + append-only `contractor_payable_events`. Estados: `pending_readiness → ready_for_finance → obligation_created → payment_order_created → paid`, + `blocked` (recoverable) + `cancelled`. Mirror TS `assertValidPayableTransition`.
+- **Anchor**: FK NOT NULL a `contractor_engagements` (RESTRICT) + FK opcional a `contractor_work_submissions` (lane PAYG/milestone). El `createFromSubmission` consume la submission (`consumed_by_payable_id`) en la misma tx — dup-guard DB UNIQUE + lock approved∧unconsumed. ALTER `contractor_work_submissions` cierra la FK que TASK-792 dejó NULL forward-compat.
+- **Withholding**: `computeContractorWithholding` retiene SOLO honorarios CL bajo `greenhouse_policy` con `taxWithholdingRateSnapshot` del engagement (TASK-790, NUNCA recomputa la tasa SII); resto = 0 (provider/country engine maneja su tax). `net = gross − withholding` (CHECK DB).
+- **Readiness fail-closed** (`evaluatePayableReadiness`, pure, 7 gates): source aprobado / invoice-asset cuando `requires_invoice` / net reconcilia / currency ∈ {CLP,USD} / FX resuelto cuando `payment_currency ≠ currency` / payment-profile resuelto **o waiver gobernado** / provider-split cuando `payroll_via ∈ {deel,remote,oyster}`. `assessPayableReadiness` resuelve los inputs (invoice via `listContractorInvoiceAssetsByEngagement`, FX via `getLatestStoredExchangeRatePair`) y alimenta el evaluador puro. Bloqueado → `blocked` + `blockerCodes[]` + throw.
+- **Bridge** (TASK-771 reactive pattern): projection `contractor_payable_finance_obligation` consume `workforce.contractor_payable.ready_for_finance`, re-lee el payable de PG (NUNCA confía el payload), skip idempotente si no existe / no-ready / unsupported currency, crea UNA `payment_obligation` (`createPaymentObligation`, idempotente por UNIQUE; `source_kind=contractor_payable`, `amount=net_payable`, `obligation_kind=provider_payroll`) y marca `obligation_created` (`markPayableObligationCreated`, no-op si ya linkeado). `maxRetries=5` + dead-letter del reactive log. ALTER `payment_obligations` source_kind `+contractor_payable` (additivo, shared Finance infra).
+- **Access**: capabilities `finance.contractor_payable` (read/create/manage) + `finance.contractor_payable.waive_payment_profile` (update, admins-only) + runtime grants (finance route_group ∪ FINANCE_ADMIN ∪ EFEONCE_ADMIN). API `/api/finance/contractor-payables` (list/create + detail + ready + cancel + waive) con `can(tenant,…)` + es-CL errors + `captureWithDomain`/`redactErrorForResponse`.
+- **Reliability** (moduleKey finance, rollup Finance Data Quality): `finance.contractor_payable.ready_without_obligation` (lag, payables ready >30min sin obligación) + `finance.contractor_payable.bridge_dead_letter` (dead_letter, reactive log `result='dead-letter'`). Wired en `getReliabilityOverview`. Steady=0.
+- **Guardrail payroll (no-regresión)**: el payable NUNCA escribe `payroll_entries`/`payroll_adjustments`/`compensation_versions`/`final_settlements` ni muta `members.{payroll_via,contract_type,pay_regime}`. Gate `pnpm vitest run src/lib/payroll` verde (522 passed).
 
 ## Delta 2026-05-30 — TASK-792 Contractor Work Submissions shipped
 
