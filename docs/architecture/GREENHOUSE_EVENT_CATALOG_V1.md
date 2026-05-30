@@ -8,7 +8,7 @@ Aggregate type: `contractor_work_submission`. Evidencia de trabajo del contracto
 
 | Evento | Trigger | Notas |
 | --- | --- | --- |
-| `workforce.contractor_work_submission.submitted` | `submitContractorWorkSubmission()` | draft|disputed → submitted |
+| `workforce.contractor_work_submission.submitted` | `submitContractorWorkSubmission()` | draft/disputed → submitted |
 | `workforce.contractor_work_submission.approved` | `reviewContractorWorkSubmission(approve)` | requiere gross_amount; input de readiness del payable |
 | `workforce.contractor_work_submission.disputed` | `reviewContractorWorkSubmission(dispute)` | reason ≥10 |
 | `workforce.contractor_work_submission.rejected` | `reviewContractorWorkSubmission(reject)` | reason ≥10; terminal |
