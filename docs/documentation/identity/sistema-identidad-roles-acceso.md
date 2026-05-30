@@ -404,19 +404,19 @@ Los agentes de desarrollo (Claude, Copilot, Codex) y los tests de Playwright nec
 4. Genera una cookie de sesion valida identica a la que obtendria un usuario al hacer login normal
 5. El agente usa esa cookie para navegar el portal como si fuera ese usuario
 
-### El usuario de agente
+### Personas agente
 
-Existe un usuario dedicado exclusivamente para agentes y tests automatizados:
+Existen usuarios dedicados exclusivamente para agentes y tests automatizados. No deben usarse para acceso humano.
 
-| Dato           | Valor                            |
-| -------------- | -------------------------------- |
-| Email          | `agent@greenhouse.efeonce.org`   |
-| Password       | `Gh-Agent-2026!`                 |
-| ID de usuario  | `user-agent-e2e-001`             |
-| Tipo de tenant | Interno de Efeonce               |
-| Roles          | Superadministrador + Colaborador |
+| Persona | Email | ID de usuario | Tipo de tenant | Roles | Cuando usar |
+|---|---|---|---|---|---|
+| Superadmin | `agent@greenhouse.efeonce.org` | `user-agent-e2e-001` | Interno de Efeonce | Superadministrador + Colaborador | Diagnostico transversal, admin, permisos y smoke amplio |
+| Collaborator | `agent-collaborator@greenhouse.efeonce.org` | `user-agent-collaborator-001` | Interno de Efeonce | Colaborador | Experiencia personal `/my`, self-service y validacion sin permisos admin |
+| Client | `agent-client@greenhouse.efeonce.org` | `user-agent-client-001` | Cliente sandbox | Cliente Ejecutivo + Cliente Manager + Cliente Specialist | Portal cliente general y validacion client-facing sin acceso interno |
 
-Este usuario fue creado via migracion de base de datos (`20260405151705425_provision-agent-e2e-user.sql`) y no debe usarse para acceso humano.
+Todas usan password `Gh-Agent-2026!` en modo credentials. Fueron creadas via migraciones de base de datos (`20260405151705425_provision-agent-e2e-user.sql` y `20260531020000000_task-954-agent-role-personas.sql`).
+
+La persona cliente combina los tres roles cliente para cubrir la experiencia client-facing general. Si se necesita validar diferencias exactas entre Ejecutivo, Manager y Specialist, se deben crear personas separadas por rol.
 
 ### Modos de uso
 

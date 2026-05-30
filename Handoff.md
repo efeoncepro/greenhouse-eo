@@ -1,9 +1,38 @@
+# Sesion 2026-05-30 — TASK-954 Agent Role Personas — ✅ COMPLETE
+
+Pedido: crear y ejecutar una task para sumar usuarios agente dedicados por rol, no solo para diseño sino para cualquier flujo donde permisos/navegación/experiencia dependan del rol.
+
+Resultado:
+- Nueva task cerrada: `docs/tasks/complete/TASK-954-agent-role-personas.md`.
+- Nueva migración: `migrations/20260531020000000_task-954-agent-role-personas.sql`.
+- Personas agente:
+  - `agent@greenhouse.efeonce.org` — superadmin (`efeonce_admin` + `collaborator`), reservado para admin/permisos/diagnóstico transversal.
+  - `agent-collaborator@greenhouse.efeonce.org` — collaborator puro (`collaborator`), para `/my`, self-service y validación sin privilegios admin.
+  - `agent-client@greenhouse.efeonce.org` — cliente compuesto (`client_executive` + `client_manager` + `client_specialist`) anclado a `agent-client-sandbox`, para portal cliente general sin acceso interno.
+- Se sincronizó el contrato en `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `GREENHOUSE_IDENTITY_ACCESS_V2`, docs funcionales de identidad, acceso programático staging, manual GVC, task registry, README y changelog.
+- Regla operativa: usar la persona agente de menor privilegio que represente el caso. La persona client es compuesta y no valida límites finos entre roles cliente; crear personas separadas por rol si una task depende de esas diferencias.
+
+Validación:
+- `pnpm pg:connect:migrate` OK tras desbloquear la cadena real: se removió el marker stale de TASK-791, se agregó la forward-fix migration `20260531021000000_task-793-contractor-payables-schema-forward-fix.sql` porque la 793 original ya estaba registrada como aplicada, y se aplicó TASK-954 con `node-pg-migrate`.
+- `pnpm pg:connect:status` OK (`No migrations to run!`).
+- DB live confirma `contractor_payables`, `contractor_payable_events`, FK `contractor_work_submissions_consumed_by_payable_fkey` y CHECK de `payment_obligations.source_kind` con `contractor_payable`.
+- `public.pgmigrations` queda consistente: TASK-791 vigente `20260530203116605`, TASK-792, TASK-793, TASK-954 y forward fix `20260531021000000`; sin alias stale `20260530104907111`.
+- `greenhouse_serving.session_360` confirma:
+  - collaborator: roles `{collaborator}`, routeGroups `{my}`, home `/my`.
+  - client: roles `{client_executive,client_manager,client_specialist}`, routeGroups `{client}`, tenant `agent-client-sandbox`, home `/home`.
+- `POST /api/auth/agent-session` local OK para superadmin, collaborator y client.
+- `scripts/playwright-auth-setup.mjs` generó storageState para ambos usuarios nuevos: `.auth/task-954-collaborator.json` y `.auth/task-954-client.json`.
+- `pnpm exec vitest run src/lib/contractor-engagements/payables/state-machine.test.ts src/lib/contractor-engagements/payables/readiness.test.ts src/lib/contractor-engagements/payables/withholding.test.ts` OK (21 tests).
+- `pnpm task:lint --task TASK-954` OK; `git diff --check` OK.
+
+---
+
 # Sesion 2026-05-30 — TASK-793 Contractor Payables → Finance Bridge — ✅ COMPLETE
 
 Implementado end-to-end en `develop` (sin rama, sin push; local-first). EPIC-013.
 
 Resultado:
-- `greenhouse_hr.contractor_payables` + `contractor_payable_events` (state machine + CHECK net=gross−withholding + CHECK economic_category=labor_cost_external + audit append-only). Migración `20260531010000000`.
+- `greenhouse_hr.contractor_payables` + `contractor_payable_events` (state machine + CHECK net=gross−withholding + CHECK economic_category=labor_cost_external + audit append-only). Runtime schema garantizado por forward fix `20260531021000000` tras detectar que `20260531010000000` quedó aplicada como stub vacío.
 - Consume work submissions aprobadas (dup-guard misma tx, cierra FK `consumed_by_payable_id` de TASK-792) + off-cycle. Withholding SII solo honorarios CL.
 - Readiness fail-closed (7 gates + waiver gobernado) + API `/api/finance/contractor-payables` + capabilities `finance.contractor_payable` + `.waive_payment_profile` (grant-coverage verde).
 - Bridge reactivo `contractor_payable_finance_obligation`: `ready_for_finance` → UNA `payment_obligation` idempotente (`amount=net`, `source_kind=contractor_payable`). Outbox v1 (5 eventos). 2 signals (lag + dead_letter) wired en overview.

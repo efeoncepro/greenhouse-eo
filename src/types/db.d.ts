@@ -5947,6 +5947,7 @@ export interface GreenhouseHrContractorInvoiceAssets {
   asset_role: string;
   contractor_engagement_id: string;
   contractor_invoice_id: string | null;
+  contractor_work_submission_id: string | null;
   country_code: string | null;
   created_at: Generated<Timestamp>;
   invoice_asset_id: string;
@@ -5954,6 +5955,95 @@ export interface GreenhouseHrContractorInvoiceAssets {
   public_id: string;
   source: string;
   uploaded_by_user_id: string | null;
+}
+
+export interface GreenhouseHrContractorPayableEvents {
+  actor_user_id: string | null;
+  contractor_payable_id: string;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  from_status: string | null;
+  metadata_json: Generated<Json>;
+  reason: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrContractorPayables {
+  beneficiary_id: string;
+  beneficiary_type: string;
+  contractor_engagement_id: string;
+  contractor_invoice_id: string | null;
+  contractor_payable_id: string;
+  contractor_work_submission_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  currency: string;
+  due_date: Timestamp | null;
+  /**
+   * Always labor_cost_external. Contractor payables do not feed dependent payroll.
+   */
+  economic_category: Generated<string>;
+  finance_obligation_id: string | null;
+  fx_policy_code: string | null;
+  gross_amount: Numeric;
+  net_payable: Numeric;
+  payable_source_kind: string;
+  payment_currency: string | null;
+  payment_order_id: string | null;
+  payment_profile_id: string | null;
+  payment_profile_waiver_reason: string | null;
+  payroll_via: string;
+  public_id: string;
+  /**
+   * Fail-closed readiness snapshot used before emitting the Finance obligation bridge.
+   */
+  readiness_json: Generated<Json>;
+  source_snapshot_json: Generated<Json>;
+  status: Generated<string>;
+  tax_compliance_owner: string;
+  tax_withholding_policy_code: string | null;
+  updated_at: Generated<Timestamp>;
+  withholding_amount: Generated<Numeric>;
+}
+
+export interface GreenhouseHrContractorWorkSubmissionEvents {
+  actor_user_id: string | null;
+  contractor_work_submission_id: string;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  from_status: string | null;
+  metadata_json: Generated<Json>;
+  reason: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrContractorWorkSubmissions {
+  consumed_at: Timestamp | null;
+  consumed_by_payable_id: string | null;
+  contractor_engagement_id: string;
+  contractor_work_submission_id: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  currency: string | null;
+  gross_amount: Numeric | null;
+  metadata_json: Generated<Json>;
+  public_id: string;
+  quantity: Numeric | null;
+  rate_amount_snapshot: Numeric | null;
+  review_reason: string | null;
+  reviewed_at: Timestamp | null;
+  reviewed_by_user_id: string | null;
+  service_period_end: Timestamp | null;
+  service_period_start: Timestamp | null;
+  status: Generated<string>;
+  submission_type: string;
+  submitted_at: Timestamp | null;
+  submitted_by_user_id: string | null;
+  title: string | null;
+  unit: string | null;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseHrEvalAssignments {
@@ -9638,6 +9728,10 @@ export interface DB {
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
   "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
   "greenhouse_hr.contractor_invoice_assets": GreenhouseHrContractorInvoiceAssets;
+  "greenhouse_hr.contractor_payable_events": GreenhouseHrContractorPayableEvents;
+  "greenhouse_hr.contractor_payables": GreenhouseHrContractorPayables;
+  "greenhouse_hr.contractor_work_submission_events": GreenhouseHrContractorWorkSubmissionEvents;
+  "greenhouse_hr.contractor_work_submissions": GreenhouseHrContractorWorkSubmissions;
   "greenhouse_hr.eval_assignments": GreenhouseHrEvalAssignments;
   "greenhouse_hr.eval_competencies": GreenhouseHrEvalCompetencies;
   "greenhouse_hr.eval_cycles": GreenhouseHrEvalCycles;

@@ -622,7 +622,12 @@ La skill referencia obligatoriamente `docs/operations/PRODUCTION_RELEASE_INCIDEN
 - **Bloqueado en production** por defecto (`VERCEL_ENV === 'production'` → 403), salvo `AGENT_AUTH_ALLOW_PRODUCTION=true`.
 - El caller envía `{ secret, email }` y recibe `{ cookieName, cookieValue, portalHomePath }` para montar la cookie de sesión.
 - El email debe existir como usuario activo en la tabla de acceso de tenants; no crea usuarios.
-- **Usuario dedicado de agente**: `agent@greenhouse.efeonce.org` (user_id: `user-agent-e2e-001`, roles: `efeonce_admin` + `collaborator`). Provisionado via migración `20260405151705425_provision-agent-e2e-user.sql`. Password: `Gh-Agent-2026!`.
+- **Personas agente operativas**: usar siempre la persona de menor privilegio que represente el caso, no superadmin por reflejo.
+  - Superadmin: `agent@greenhouse.efeonce.org` (`user-agent-e2e-001`, roles `efeonce_admin` + `collaborator`). Usar para admin, permisos, diagnóstico transversal y smoke amplio. Migración `20260405151705425_provision-agent-e2e-user.sql`.
+  - Collaborator: `agent-collaborator@greenhouse.efeonce.org` (`user-agent-collaborator-001`, rol `collaborator`). Usar para `/my`, self-service, experiencia personal y validación sin privilegios admin.
+  - Client: `agent-client@greenhouse.efeonce.org` (`user-agent-client-001`, roles `client_executive` + `client_manager` + `client_specialist`, tenant `agent-client-sandbox`). Usar para portal cliente general, rutas `client`, dashboards/reporting client-facing y validación sin acceso interno.
+  - Password compartido para modo credentials: `Gh-Agent-2026!`. Las personas collaborator/client se provisionan via `20260531020000000_task-954-agent-role-personas.sql`.
+  - La persona client es compuesta; no valida límites finos entre `client_executive`, `client_manager` y `client_specialist`. Si la task depende de esas diferencias, crear personas separadas por rol antes de cerrar.
 - Script de setup: `node scripts/playwright-auth-setup.mjs` — genera `.auth/storageState.json` con la cookie lista para Playwright.
 - Dos modos:
   - **API** (default): llama al endpoint, no necesita browser (`AGENT_AUTH_SECRET` + `AGENT_AUTH_EMAIL`).

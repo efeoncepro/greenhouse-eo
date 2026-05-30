@@ -2,7 +2,7 @@
  * TASK-793 — Contractor payable lifecycle state machine (pure).
  *
  * Mirror of the DB trigger `greenhouse_hr.contractor_payables_validate_transition`
- * (migration 20260531010000000). Both layers MUST stay aligned.
+ * (forward-fix migration 20260531021000000). Both layers MUST stay aligned.
  *
  *   pending_readiness     -> ready_for_finance | blocked | cancelled
  *   ready_for_finance     -> obligation_created | blocked | cancelled

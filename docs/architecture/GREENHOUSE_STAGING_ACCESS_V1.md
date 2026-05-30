@@ -95,6 +95,12 @@ Response:
 
 The returned `cookieName=cookieValue` cookie must be sent on all subsequent requests, alongside the bypass header.
 
+Use the least-privilege agent persona that matches the route or workflow under review:
+
+- `agent@greenhouse.efeonce.org` — superadmin/admin/permissions/broad smoke.
+- `agent-collaborator@greenhouse.efeonce.org` — collaborator-only `/my` and personal self-service.
+- `agent-client@greenhouse.efeonce.org` — client-facing portal general coverage.
+
 Full Agent Auth spec: [GREENHOUSE_IDENTITY_ACCESS_V2.md § Agent Auth](./GREENHOUSE_IDENTITY_ACCESS_V2.md)
 
 ## 5. Canonical Tool: `staging-request.mjs`
@@ -184,7 +190,7 @@ node scripts/staging-request.mjs /api/agency/operations | jq '.subsystems'
 | Team ID      | `efeonce-7670142f`                                              |
 | Project name | `greenhouse-eo`                                                 |
 | Staging URL  | `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app` |
-| Agent user   | `agent@greenhouse.efeonce.org` (`user-agent-e2e-001`)           |
+| Agent users  | `agent@greenhouse.efeonce.org`, `agent-collaborator@greenhouse.efeonce.org`, `agent-client@greenhouse.efeonce.org` |
 
 ## 9. Troubleshooting
 

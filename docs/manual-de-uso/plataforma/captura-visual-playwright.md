@@ -55,6 +55,14 @@ AGENT_AUTH_EMAIL=agent@greenhouse.efeonce.org
 VERCEL_AUTOMATION_BYPASS_SECRET=...
 ```
 
+Elegí `AGENT_AUTH_EMAIL` según el rol que querés validar:
+
+| Caso | Email recomendado |
+|---|---|
+| Admin, permisos, diagnóstico transversal | `agent@greenhouse.efeonce.org` |
+| Experiencia personal `/my` y collaborator puro | `agent-collaborator@greenhouse.efeonce.org` |
+| Portal cliente general y rutas client-facing | `agent-client@greenhouse.efeonce.org` |
+
 Si vas a generar GIFs, instalá ffmpeg:
 
 ```bash

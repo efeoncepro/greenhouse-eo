@@ -3,7 +3,7 @@
  *
  * Pure types shared by the server store + Finance bridge + API DTOs + tests.
  * Mirrors the CHECK enums of `greenhouse_hr.contractor_payables`
- * (migration 20260531010000000).
+ * (forward-fix migration 20260531021000000).
  *
  * A ContractorPayable is an approved economic obligation PRIOR to Finance. A
  * ready payable generates exactly ONE Finance payment_obligation via the bridge.
