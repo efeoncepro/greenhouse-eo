@@ -21,7 +21,8 @@ const ready: PayableReadinessInputs = {
   isHonorarios: false,
   rutVerified: true,
   honorariosWithholdingConsistent: true,
-  taxOwnerReviewRequired: false
+  taxOwnerReviewRequired: false,
+  fxPolicyDeclared: true
 }
 
 const honorariosReady: PayableReadinessInputs = {
@@ -191,5 +192,39 @@ describe('contractor payable readiness — international tax-owner boundary (TAS
     const r = evaluatePayableReadiness({ ...honorariosReady, taxOwnerReviewRequired: true })
 
     expect(r.blockers.map(b => b.code)).toContain('tax_owner_review_required')
+  })
+})
+
+describe('contractor payable readiness — explicit FX policy (TASK-795 Fase A)', () => {
+  it('does NOT require FX policy when same-currency (fxNeeded=false)', () => {
+    const r = evaluatePayableReadiness({ ...ready, fxNeeded: false, fxPolicyDeclared: false })
+
+    expect(r.ready).toBe(true)
+    expect(r.blockers.map(b => b.code)).not.toContain('fx_policy_unresolved')
+  })
+
+  it('blocks cross-currency without an explicit FX policy even if a rate exists', () => {
+    const r = evaluatePayableReadiness({
+      ...ready,
+      obligationCurrency: 'USD',
+      fxNeeded: true,
+      fxSupported: true,
+      fxPolicyDeclared: false
+    })
+
+    expect(r.ready).toBe(false)
+    expect(r.blockers.map(b => b.code)).toContain('fx_policy_unresolved')
+  })
+
+  it('passes cross-currency when FX policy is declared and a rate exists', () => {
+    const r = evaluatePayableReadiness({
+      ...ready,
+      obligationCurrency: 'USD',
+      fxNeeded: true,
+      fxSupported: true,
+      fxPolicyDeclared: true
+    })
+
+    expect(r.ready).toBe(true)
   })
 })

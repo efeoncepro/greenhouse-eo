@@ -704,7 +704,9 @@ export const assessPayableReadiness = async (
     rutBlockerDetail,
     honorariosWithholdingConsistent,
     taxOwnerReviewRequired,
-    taxOwnerDetail: taxOwnerReviewRequired ? engagement.taxComplianceOwner : null
+    taxOwnerDetail: taxOwnerReviewRequired ? engagement.taxComplianceOwner : null,
+    // TASK-795 Fase A — cross-currency must declare an explicit FX policy.
+    fxPolicyDeclared: (payable.fxPolicyCode ?? engagement.fxPolicyCode) !== null
   }
 
   return evaluatePayableReadiness(readinessInputs)

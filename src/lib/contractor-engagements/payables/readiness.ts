@@ -27,6 +27,9 @@
  *     (`tax_owner_review_required`). The contractor domain NEVER computes a
  *     Chile→non-resident withholding rate itself — it blocks and escalates to the
  *     `international_internal` withholding engine (TASK-905/906/907). See D-795-4.
+ *   - explicit FX policy declared when cross-currency (`fx_policy_unresolved`).
+ *     A cross-currency payout must declare WHICH FX policy governs the conversion
+ *     (`engagement.fx_policy_code`), not just that a rate happens to exist. D-795-1.
  */
 
 export const PAYABLE_READINESS_BLOCKER_CODES = [
@@ -42,7 +45,8 @@ export const PAYABLE_READINESS_BLOCKER_CODES = [
   'rut_unverified',
   'honorarios_withholding_mismatch',
   // TASK-795 Fase A — international contractor / provider boundary
-  'tax_owner_review_required'
+  'tax_owner_review_required',
+  'fx_policy_unresolved'
 ] as const
 export type PayableReadinessBlockerCode = (typeof PAYABLE_READINESS_BLOCKER_CODES)[number]
 
@@ -94,6 +98,13 @@ export interface PayableReadinessInputs {
   taxOwnerReviewRequired: boolean
   /** Surfaced detail (the actual tax_compliance_owner value) for the message. */
   taxOwnerDetail?: string | null
+  /**
+   * An explicit FX policy (`engagement.fx_policy_code`) is declared. Only enforced
+   * when `fxNeeded` (cross-currency). A reliable rate existing (`fxSupported`) is
+   * NOT enough — the governance policy (source/date convention/spread owner) must
+   * be declared so the conversion is auditable, not incidental. D-795-1.
+   */
+  fxPolicyDeclared: boolean
 }
 
 export interface PayableReadinessResult {
@@ -146,6 +157,15 @@ export const evaluatePayableReadiness = (
     blockers.push({
       code: 'fx_unresolved',
       message: 'No hay tasa FX confiable entre la moneda contractual y la de pago.'
+    })
+  }
+
+  // TASK-795 Fase A — cross-currency requires an EXPLICIT FX policy, not just a rate.
+  if (inputs.fxNeeded && !inputs.fxPolicyDeclared) {
+    blockers.push({
+      code: 'fx_policy_unresolved',
+      message:
+        'Falta declarar una política FX explícita (fx_policy_code) para el pago cross-currency; el cambio debe ser auditable, no incidental.'
     })
   }
 
