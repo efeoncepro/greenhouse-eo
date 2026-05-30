@@ -577,7 +577,10 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
                 <DetailRow label='Pago vía' value={viewModel.employment.payrollVia ? payrollViaLabel[viewModel.employment.payrollVia] ?? viewModel.employment.payrollVia : '—'} />
                 <DetailRow label='Moneda' value={viewModel.employment.currency ?? '—'} />
                 <DetailRow label='Salario base' value={formatCurrency(viewModel.employment.baseSalary, viewModel.employment.currency)} />
-                <DetailRow label='Contrato' value={viewModel.employment.contractType ? contractTypeLabel[viewModel.employment.contractType] ?? viewModel.employment.contractType : '—'} />
+                {viewModel.employment.currentClassificationLabel && (
+                  <DetailRow label='Estado vigente' value={viewModel.employment.currentClassificationLabel} />
+                )}
+                <DetailRow label='Contrato de empleo' value={viewModel.employment.contractType ? contractTypeLabel[viewModel.employment.contractType] ?? viewModel.employment.contractType : '—'} />
                 {viewModel.employment.deelContractId && (
                   <DetailRow label='Contrato Deel' value={viewModel.employment.deelContractId} />
                 )}
