@@ -177,6 +177,11 @@ Hard rule:
 | `TASK-965` | `4` | `to-do` | Unified Worker Create/Edit Workflow: futuro write-path convergence People-first, bloqueado hasta estabilizar read models, compensation profile y assignment timeline. |
 | `TASK-966` | `5` | `to-do` | Workforce Reporting Foundation: headcount/workforce reporting persona-centrico, sin doble conteo y con sensitivity gates. |
 | `TASK-967` | `1/2` | `to-do` | Workforce Reliability Signals Control Plane: señales cross-rail basadas en gap taxonomy/dispositions para relationship, compensation, payment rail y readiness. |
+| `TASK-969` | `3/4` | `to-do` | M04 Person Workforce Documents Rail Mockup Approval: aprobar `/people/mockup/workforce-documents` como contrato visual antes de runtime `TASK-964`, consumiendo EPIC-001 sin vault paralelo. |
+| `TASK-970` | `1/2` | `to-do` | M05 Workforce Reliability Signals Mockup Approval: aprobar `/people/mockup/workforce-reliability` antes de runtime `TASK-967`, con observabilidad read-only y sin remediation controls. |
+| `TASK-971` | `5` | `to-do` | M06 Workforce Reporting Foundation Mockup Approval: aprobar `/people/mockup/workforce-reporting` antes de runtime `TASK-966`, con reporting persona-centrico, redaction y no double count. |
+| `TASK-972` | `4` | `to-do` | M07 Unified Worker Change Workflow Mockup Approval: aprobar `/people/mockup/worker-change-workflow` como shell futuro antes de runtime `TASK-965`, sin habilitar writes. |
+| `TASK-973` | `5` | `to-do` | M08 Agent-Safe Workforce Context Mockup Approval: aprobar `/people/mockup/workforce-agent-context` antes de reframing/runtime `TASK-652`, con redaction, lineage y denied action states. |
 
 Las tasks se agregaran de forma iterativa cuando cumplan este protocolo:
 
@@ -227,11 +232,15 @@ The approved product direction for EPIC-017 mockups is now a hard implementation
 
 The concrete build plan for those mockups lives in [RESEARCH-008 EPIC-017 Mockup Execution Plan](../../research/RESEARCH-008-epic017-mockup-execution-plan-2026-05-31.md).
 
-Agents implementing `TASK-961` through `TASK-967`, or reframing `TASK-652`, must treat those appendices as the approved UI/interaction contract and execution plan. Implementation work should wire real read models, access gates, copy and GVC scenarios into the approved mockups; it must not redesign the flow, remove existing Person 360 operational surfaces, move Payroll ownership into People, or create parallel Documents/Payment systems without explicit task/ADR approval.
+Agents implementing `TASK-961` through `TASK-973`, or reframing `TASK-652`, must treat those appendices as the approved UI/interaction contract and execution plan. Implementation work should wire real read models, access gates, copy and GVC scenarios into the approved mockups; it must not redesign the flow, remove existing Person 360 operational surfaces, move Payroll ownership into People, or create parallel Documents/Payment systems without explicit task/ADR approval.
+
+Dedicated mockup approval tasks now exist for every remaining planned surface: `TASK-969` (M04 documents/signature rail), `TASK-970` (M05 reliability signals), `TASK-971` (M06 reporting), `TASK-972` (M07 worker change workflow) and `TASK-973` (M08 agent-safe workforce context).
 
 Delta `2026-05-31`: `TASK-963` / M02 People Workforce Command Center is now approved as a built mockup at `/people/mockup/workforce-command`. The approved runtime direction is a lightweight enterprise command surface: compact header/metrics, exception queue, roster as primary work area, lightweight filter/saved-view pills, row-level evidence summarized into one primary state plus short count/summary, inspector/drawer for detailed evidence, no page-level horizontal overflow, and stable input IDs to avoid hydration/dev-overlay regressions.
 
 Delta `2026-05-31`: `TASK-962` / M03 Workforce Coverage & Readiness Control Room is now approved as a built mockup at `/people/mockup/workforce-readiness`. The approved runtime direction is diagnostic/read-only: real active worker cohort separated from fixtures/demo, baseline coverage matrix, disposition board, owner domain, severity, source codes, masked evidence samples, next safe action and remediation queue preview. It must not introduce inline fixes, payroll recalculation, payment execution or document-signing controls.
+
+Delta `2026-05-31`: `TASK-969`..`TASK-973` were created to finish the mockup approval track before runtime wiring. These tasks are mockup-only and must use product design skills plus GVC review loops. They explicitly do not authorize new writes, migrations, document storage, signature execution, payroll calculation, payment execution, agent commands or MCP tools.
 
 ## Existing Related Work
 

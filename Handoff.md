@@ -1,3 +1,18 @@
+# Sesion 2026-05-31 — EPIC-017 Remaining Mockup Approval Tasks — ✅ DOCS-ONLY
+
+**Rama**: `develop`. Scope documental/task planning only; no runtime, DB, migrations, APIs or mockup implementation.
+
+Se crearon las tasks canonicas para completar la pista de mockups aprobables del EPIC-017 antes de cablear runtime:
+- `TASK-969` — M04 Person Workforce Documents Rail Mockup Approval (`/people/mockup/workforce-documents`), bloquea drift documental y fuerza consumo de EPIC-001.
+- `TASK-970` — M05 Workforce Reliability Signals Mockup Approval (`/people/mockup/workforce-reliability`), observabilidad read-only antes de `TASK-967`.
+- `TASK-971` — M06 Workforce Reporting Foundation Mockup Approval (`/people/mockup/workforce-reporting`), reporting persona-centrico antes de `TASK-966`.
+- `TASK-972` — M07 Unified Worker Change Workflow Mockup Approval (`/people/mockup/worker-change-workflow`), shell futuro sin autorizacion de writes.
+- `TASK-973` — M08 Agent-Safe Workforce Context Mockup Approval (`/people/mockup/workforce-agent-context`), preview read-only Nexa/API/MCP con redaction/lineage/denied actions.
+
+Docs sincronizados: `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`; `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` ya tenian reservados `TASK-969`..`TASK-976` y quedan consistentes con los archivos creados. Siguiente recomendacion operativa: ejecutar `TASK-969` primero porque cierra la frontera Documents/e-signature antes de que `TASK-964` pueda moverse a runtime. Nota de coordinacion: `TASK-974`..`TASK-976` pertenecen a EPIC-013 contractor UI y quedan fuera de este lote EPIC-017.
+
+---
+
 # Sesion 2026-05-31 — TASK-968 Contractor Compensation Setup + Agreed-Amount Guardrail — ✅ SHIPPED
 
 **Rama**: `develop` (no branch, per instrucción del operador). 4 slices commiteados: `25f7d2ec` (S1 editor admin), `8e3eb5f5` (S2 bruto derivado), `21655075` (S3 guardrail), `380a2e7e` (S4 signals) + commit de docs/cierre.
