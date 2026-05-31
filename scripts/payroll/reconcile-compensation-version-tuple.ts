@@ -139,7 +139,13 @@ const parseArgs = () => {
 
   return {
     memberId: memberArg ? memberArg.slice('--member-id='.length).trim() : '',
-    apply: args.includes('--apply')
+    apply: args.includes('--apply'),
+    // Default: solo comp versions VIGENTES (clasificación actual). Con --include-historical
+    // también reconcilia versiones históricas (effective_to en el pasado) — necesario para
+    // poder VALIDAR el CHECK (que verifica TODAS las filas). Payroll-safe igual: las versiones
+    // históricas no re-tocan los payroll_entries pagados (snapshots congelados en otra tabla);
+    // el assert payroll-neutral aplica per-versión.
+    includeHistorical: args.includes('--include-historical')
   }
 }
 
@@ -187,7 +193,9 @@ const monetarySnapshot = (entry: PayrollEntry): Record<string, unknown> => {
 }
 
 const main = async () => {
-  const { memberId, apply } = parseArgs()
+  const { memberId, apply, includeHistorical } = parseArgs()
+  // Filtro de vigencia: por defecto solo vigentes; con --include-historical, todas.
+  const vigenciaFilter = includeHistorical ? '' : 'AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)'
 
   if (!memberId) {
     console.error('ERROR: --member-id=<id> is required.')
@@ -238,7 +246,7 @@ const main = async () => {
             effective_from::text AS effective_from, effective_to::text AS effective_to, is_current
      FROM greenhouse_payroll.compensation_versions
      WHERE member_id = $1
-       AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+       ${vigenciaFilter}
        AND (contract_type IS DISTINCT FROM $2 OR pay_regime IS DISTINCT FROM $3)
      ORDER BY version`,
     [memberId, targetContractType, targetPayRegime]
@@ -305,7 +313,7 @@ const main = async () => {
       `UPDATE greenhouse_payroll.compensation_versions
        SET contract_type = $2, pay_regime = $3
        WHERE member_id = $1
-         AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+         ${vigenciaFilter}
          AND (contract_type IS DISTINCT FROM $2 OR pay_regime IS DISTINCT FROM $3)
        RETURNING version_id, version`,
       [memberId, targetContractType, targetPayRegime]
