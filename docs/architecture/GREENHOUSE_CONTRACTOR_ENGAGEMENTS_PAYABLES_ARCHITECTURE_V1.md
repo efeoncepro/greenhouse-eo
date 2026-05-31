@@ -4,6 +4,36 @@
 **Created:** 2026-05-05
 **Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + Employee→Contractor connected command (TASK-956) + **Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification (TASK-957)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955), contractor closure (TASK-797) and ops control plane (TASK-798) remain proposals.
 
+## Delta 2026-05-31 — Audit: End-to-end settlement gap + Monthly payment convergence target (verified, no inference)
+
+Revisión exhaustiva del backend de pago end-to-end (2026-05-31, leyendo el código). Documenta dos hechos verificados y un target de diseño explícito. **No es una implementación nueva — es la captura honesta de un gap y un objetivo.**
+
+### Hecho verificado 1 — El settlement al banco está fuera de scope para contractors en V1
+
+La cadena de pago de un contractor payable es: `ready_for_finance` → (bridge reactivo) `payment_obligation` (`source_kind='contractor_payable'`, `obligation_kind='provider_payroll'`, `amount=net_payable`) → `payment_order` (Finanzas) → settle al banco. **El último paso está bloqueado para contractors**:
+
+- `src/lib/finance/payment-orders/mark-paid-atomic.ts` (~línea 348) y `src/lib/finance/payment-orders/record-payment-from-order.ts` (~línea 218) **ambos** filtran `if (line.source_kind !== 'payroll' || line.obligation_kind !== 'employee_net_pay') throw PaymentOrderSettlementBlockedError('out_of_scope_v1')`.
+- Un contractor payable tiene `source_kind='contractor_payable'` + `obligation_kind='provider_payroll'` → **lanza `out_of_scope_v1` en el path atómico Y en el safety-net** → la orden no se marca pagada por el camino canónico.
+- El CHECK de `payment_obligations.obligation_kind` SÍ admite `provider_payroll`, pero el comentario de la migración (`20260501140545647`) lo describe literalmente como "placeholder Deel/EOR".
+- Consecuencia: hoy la obligación + la orden de pago de un contractor se pueden crear, pero **el dinero no sale del banco por el motor canónico de liquidación**. Es un gap de **backend**, NO de UI — ninguna de las tasks de pantallas (TASK-974/975/976) lo cubre.
+
+**Invariante a respetar al cerrar el gap**: extender el resolver de settlement para soportar `source_kind='contractor_payable'`/`obligation_kind='provider_payroll'` debe resolver el `expense_id` por un camino propio (el actual lo busca en `expenses WHERE payroll_period_id=...`, que no aplica a contractors) y clasificar el expense como `economic_category='labor_cost_external'` — NUNCA como nómina dependiente. El gross/withholding/net se leen verbatim del payable (TASK-793/794).
+
+### Hecho verificado 2 — No existe lógica de calendario de pago (cierre + 5 días) para contractors
+
+Grep exhaustivo (`first 5 days`, `cierre.*5`, `month_close`, `payout_due`, etc.) en `contractor-engagements/`, `payment-obligations/`, `payment-orders/`, `calendar/` → **vacío**. El `ContractorPayable.due_date` se setea por **input manual** (`body.dueDate ?? null` en `POST /api/finance/contractor-payables`), default vacío; no se computa desde el cierre del período operativo. El compromiso operativo de "pagar dentro de los primeros 5 días posteriores al cierre de mes" hoy es **manual/operativo**, no enforced por el sistema.
+
+### Target de diseño — Convergencia con el ciclo de pago mensual
+
+El punto canónico de convergencia entre nómina y contractors es **la capa de payment_obligations → payment_orders** (TASK-748/750): ambos rieles (`employee_net_pay` desde payroll, `provider_payroll` desde contractor payables) llegan a la misma tabla de obligaciones y se pagan desde el mismo workbench `/finance/payment-orders`. Para honrar el compromiso de los 5 días de forma sistémica se necesita (open design items, NO implementados):
+
+1. Cerrar el gap de settlement (`provider_payroll` → bank) — **prerequisito duro**; sin esto el contractor no se paga por el camino canónico.
+2. Una regla de `due_date` derivada del cierre del período (cierre + N días hábiles) en lugar de input manual.
+3. Opcional: una "corrida mensual" que arme las órdenes de pago de contractors del período (hoy es ad-hoc).
+4. Un signal de SLA ("payables/obligaciones de contractor vencidas vs el compromiso de 5 días") — hoy no existe.
+
+Doc funcional asociado: `docs/documentation/hr/contratistas-flujo-de-pago-completo.md` (explica el flujo + estos gaps en lenguaje simple).
+
 ## Delta 2026-05-30 — TASK-957 Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification
 
 Cierra la open question de TASK-956 con veredicto 3-skill (finance + payroll + arch). Una persona podía cobrar por **dos rieles** sin exclusión mutua: nómina legacy honorarios (motor rutea por `compensation_versions.contract_type='honorarios'` → retención SII) + contractor payable (TASK-794, misma retención). Ambos corriendo → **doble-pago + doble declaración F29** (Efeonce remesa doble al SII + doble crédito tributario). SSOT canónico: **existencia de `ContractorEngagement` activo, NO `member.contract_type`**.
