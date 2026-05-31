@@ -4506,6 +4506,20 @@ Una persona puede cobrar por **dos rieles de pago que no se hablan**: la nómina
 
 **Spec canónica**: `docs/tasks/complete/TASK-957-contractor-payroll-double-rail-exclusion-contract-type-reconciliation.md`. Arch: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30. Helpers: `resolveContractorExcludedMemberIds`, `resolveCurrentWorkClassification`. Señal: `payroll.contractor.double_rail_overlap`.
 
+### Compensation version tuple drift — payroll-safe reconcile + validated CHECK (TASK-958, desde 2026-05-31)
+
+`members.contract_type` (CHECK 3-way `members_contract_payroll_tuple_check`, validado) y `compensation_versions.contract_type` pueden divergir. El CHECK `compensation_versions_contract_pay_regime_check` estaba **NOT VALID** → filas viejas con tuplas inconsistentes (`(indefinido, international)`) quedaban grandfathered. Caso fundacional: contractors internacionales Deel (Melkin/Andres/Daniela) con comp versions tempranas mal clasificadas como `indefinido`. TASK-958 cerró el drift class.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** reconciliar la tupla `(contract_type, pay_regime)` de una `compensation_version` sin **probar payroll-neutralidad before/after**: el primitivo canónico `scripts/payroll/reconcile-compensation-version-tuple.ts` computa `buildPayrollEntry` con la tupla actual vs target y solo aplica si los campos **monetarios** (`grossTotal`, `netTotalCalculated`, todas `chile*`, `siiRetentionAmount`) son byte-idénticos; si difieren, **aborta sin mutar**. Las etiquetas (`contractTypeSnapshot`, `payRegime`, `deelContractId`) cambian a propósito y se excluyen de la comparación.
+- **NUNCA** asumir que tocar una `compensation_version` afecta sueldos ya pagados: los `payroll_entries` guardan sus **propios montos snapshot** (`gross_total`, `net_total`, `contract_type_snapshot`) en tabla separada — congelados. El reconcile UPDATEa solo `compensation_versions` → los pagos son intocables (verificado: payroll_entries byte-idénticos before/after).
+- **NUNCA** reconciliar la tupla del member-side: el `member` es el SSOT canónico; se reconcilia la **comp version PARA matchear al member** (el primitivo aborta si el member tuple no es canónico). Para versiones históricas usar `--include-historical` (necesario para VALIDAR el CHECK, que verifica todas las filas).
+- **SIEMPRE** que se valide un CHECK `NOT VALID` poblado, remediar TODOS los violadores (vigentes + históricos) primero; la migración incluye un DO block que aborta si quedan violadores (fuerza el orden remediación → VALIDATE) + un DO block post-VALIDATE que confirma `convalidated=true`.
+- **NUNCA** crear un member `payroll_via='deel'` (`contractor`/`eor`) sin `deel_contract_id`. La señal `payroll.deel_member_without_contract_id` (moduleKey payroll, data_quality, steady=0) lo detecta; el valor real se backfillea operacionalmente desde Deel.
+
+**Spec canónica**: `docs/tasks/complete/TASK-958-compensation-version-tuple-drift-remediation.md`. Script: `scripts/payroll/reconcile-compensation-version-tuple.ts` (dry-run default, `--apply`, `--include-historical`, assert payroll-neutral). Migración: `20260531105200124`. Señal: `payroll.deel_member_without_contract_id`.
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).
