@@ -4561,7 +4561,7 @@ El **monto acordado** del contractor (`contractor_engagements.rate_amount` + `ra
 | --- | --- | --- |
 | Admin compensation editor (`ContractorEngagementCompensationDrawer` + `CompensationPanel` en el workbench) | HR/Finance/admin (`hr.contractor_engagement:update`) | Fija `rateType`/`rateAmount`/`paymentCadence` vía `PATCH /api/hr/contractors/[id]` action `update`. **Moneda read-only** (se define al crear el engagement). |
 | Contractor self-service (`ContractorSubmissionComposer` + `ContractorSelfServiceView`) | Contractor (own) | Ve el monto **derivado read-only** (`agreedRate`); NO existe campo libre de bruto. El bruto se deriva del rate acordado (fixed → rate; timesheet → qty × rate). Sin rate → submit deshabilitado + warning "contacta a HR". |
-| Finance guardrail (`ContractorGuardrailPanel` en el inspector) | Finance admin (`finance.contractor_payable.override_agreed_amount`) | Lista payables bloqueados por exceder lo acordado + autoriza override gobernado (reason ≥10, auditado). |
+| Finance workbench (`ContractorPaymentsWorkbenchView` en `/finance/contractor-payments`, TASK-974) | Finance admin (`finance.contractor_payable.override_agreed_amount`) | Autoriza el override gobernado (reason ≥10, auditado) desde el detalle del payable en Finanzas. El panel HR `ContractorGuardrailPanel` quedó **read-only** (muestra el bloqueo + link a Finanzas) — la autorización NO vive en superficie HR (cierra la ambigüedad SoD, ver TASK-974). |
 
 **Guardrail fail-closed** (`evaluatePayableReadiness`, gate `payment_exceeds_agreed_amount`):
 

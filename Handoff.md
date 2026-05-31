@@ -1,3 +1,21 @@
+# Sesion 2026-05-31 — TASK-974 Finance Contractor Payments Workbench — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (no se creó branch, no se pusheó — esperando confirmación del operador). EPIC-013 contractor UI.
+
+Cerró el gap #1 de la auditoría de superficies UI del EPIC contractors: Finanzas tenía **0% UI** pese a 7 endpoints listos. Workbench `/finance/contractor-payments` (item nuevo en **Tesorería**): lista por estado (`DataTableShell`) + filtros + 4 KPIs + detalle con breakdown bruto/retención/neto **verbatim** (acento verde en el neto + nota contable F29) + panel de readiness (13 blockers con responsable Finanzas/HR/Contractor) + crear desde envío/off-cycle + ready/cancel/waive/override.
+
+**SoD cerrada (lo medular)**: override (`finance.contractor_payable.override_agreed_amount`) + waiver **reubicados a Finanzas**; el panel HR `ContractorGuardrailPanel` quedó **read-only** + link al workbench → "HR fija ≠ contractor cobra ≠ Finance paga" sin ambigüedad (cerró la deuda de TASK-968).
+
+**UI-only sobre backend existente** (cero cambios a state machine/helpers/endpoints/payroll/finiquito). Reader `listContractorPaymentsForWorkbench` vía `GET /api/finance/contractor-payables?workbench=1` (backward-compatible). viewCode `finanzas.contractor_payables` + seed `20260531195526233` (TASK-827) → actualizó 2 pins TASK-727 (15º view de finanzas).
+
+**Gates verde**: tsc 0 · lint 0 · design:lint 0 · `pnpm vitest run src/lib/payroll` 532 (boundary TASK-957) · `pnpm build` exit 0 · `pnpm test` full verde · GVC runtime end-to-end OK. Mockup aprobado vinculante.
+
+**Pendiente para pagar end-to-end**: TASK-974 da la pantalla, pero el pago al banco necesita el flip del flag `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED` (TASK-977, post staging + finance sign-off).
+
+Spec: `complete/TASK-974-finance-contractor-payments-workbench.md`. CLAUDE.md (Delta TASK-968 row + arch Delta). Doc funcional + manual `finance/pagos-a-contractors.md`.
+
+---
+
 # Sesion 2026-05-31 — Payroll mensual deadline operativo + pre-nomina draft — ✅ READY TO PUSH
 
 **Rama**: `develop`. Scope payroll mensual + docs HR. No toca DB, migrations, `calculatePayroll`, `payroll_entries`, cierre, aprobacion, exportaciones, recibos ni payment orders.

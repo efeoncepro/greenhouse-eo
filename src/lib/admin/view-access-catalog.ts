@@ -322,6 +322,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'finance'
   },
   {
+    viewCode: 'finanzas.contractor_payables',
+    section: 'finanzas',
+    label: 'Pagos a contractors',
+    description: 'Prepara, revisa y autoriza los pagos a contractors antes de la orden de pago (readiness, override, waiver).',
+    routePath: '/finance/contractor-payments',
+    routeGroup: 'finance'
+  },
+  {
     viewCode: 'finanzas.banco',
     section: 'finanzas',
     label: 'Banco',

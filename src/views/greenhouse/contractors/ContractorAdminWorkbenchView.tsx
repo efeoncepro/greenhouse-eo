@@ -553,7 +553,7 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
             {selected ? (
               <>
                 <CompensationPanel row={selected} onEdit={() => setCompDrawerOpen(true)} />
-                <ContractorGuardrailPanel row={selected} onResolved={() => void refetch()} />
+                <ContractorGuardrailPanel row={selected} />
                 <AdminInspector row={selected} onReview={() => openReview('approve')} />
               </>
             ) : (

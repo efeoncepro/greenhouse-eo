@@ -85,6 +85,7 @@ export const GH_FINANCE_NAV = {
   suppliers: { label: 'Proveedores', subtitle: 'Directorio de proveedores' },
   reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' },
   paymentOrders: { label: 'Órdenes de pago', subtitle: 'Obligaciones, ordenes y calendario de pagos' },
+  contractorPayments: { label: 'Pagos a contractors', subtitle: 'Readiness, override y autorización de payouts' },
   paymentProfiles: { label: 'Perfiles de pago', subtitle: 'Cola de aprobación y drift cross-entity' },
   intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' },
   purchaseOrders: { label: 'Órdenes de compra', subtitle: 'OC de clientes, saldos y consumo' },

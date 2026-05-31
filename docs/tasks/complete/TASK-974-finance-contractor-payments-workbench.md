@@ -24,7 +24,7 @@ Cualquier desviación visual requiere update + re-aprobación del mockup ANTES d
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -219,12 +219,12 @@ Comunicar a Finanzas que ya tienen pantalla para procesar pagos de contractors (
 
 ## Acceptance Criteria
 
-- [ ] Mockup aprobado por el operador (loop GVC + skills de diseño).
-- [ ] Finanzas puede ver, crear (desde envío + off-cycle), evaluar readiness, enviar a Finanzas, cancelar, waivear y autorizar override de un payable desde `/finance/contractor-payables`.
-- [ ] El breakdown bruto/retención/neto se lee verbatim del backend (cero recompute).
-- [ ] El override quedó reubicado en Finanzas; el panel HR es read-only.
-- [ ] Copy es-CL tokenizado (skill UX writing); densidad de tabla respeta `DataTableShell`.
-- [ ] viewCode + migración seed (regla TASK-827).
+- [x] Mockup aprobado por el operador (loop GVC + skills de diseño). Aprobado 2026-05-31.
+- [x] Finanzas puede ver, crear (desde envío + off-cycle), evaluar readiness, enviar a Finanzas, cancelar, waivear y autorizar override de un payable desde `/finance/contractor-payments`.
+- [x] El breakdown bruto/retención/neto se lee verbatim del backend (cero recompute).
+- [x] El override quedó reubicado en Finanzas; el panel HR (`ContractorGuardrailPanel`) es read-only + link al workbench.
+- [x] Copy es-CL tokenizado (`GH_FINANCE_CONTRACTOR_PAYMENTS` + `GH_CONTRACTOR_COMPENSATION.guardrail`); densidad respeta `DataTableShell`.
+- [x] viewCode `finanzas.contractor_payables` + migración seed `20260531195526233` (regla TASK-827).
 
 ## Verification
 
@@ -237,13 +237,19 @@ Comunicar a Finanzas que ya tienen pantalla para procesar pagos de contractors (
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-968 panel HR, TASK-970/971)
-- [ ] CLAUDE.md invariants + arch Delta + doc funcional + manual
+- [x] `Lifecycle` sincronizado (complete)
+- [x] archivo en carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-968 panel HR → read-only; TASK-970/971 sin impacto)
+- [x] CLAUDE.md invariants (TASK-968 row + Delta arch) + arch Delta + doc funcional + manual
+
+## Closing Evidence (2026-05-31)
+
+- Gates: `tsc --noEmit` 0 · `pnpm lint` 0 · `pnpm design:lint` 0 err/0 warn · `pnpm vitest run src/lib/payroll` 532 passed · `pnpm build` exit 0 · `pnpm test` full suite verde (2 view-count pins TASK-727 actualizados por el 15º view `finanzas.contractor_payables` + 1 flake HrLeaveView que pasa en aislamiento).
+- GVC runtime: `/finance/contractor-payments` renderiza end-to-end (header + 4 KPIs + DataTableShell + empty state honesto "Sin payables" + 2 CTAs) — `.captures/2026-05-31T20-02-35_inline-finance-contractor-payments`.
+- Migración `20260531195526233` aplicada (view_registry + role_view_assignments efeonce_admin/finance_admin/finance_analyst).
 
 ## Follow-ups
 

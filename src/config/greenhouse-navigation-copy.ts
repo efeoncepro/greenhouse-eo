@@ -125,6 +125,7 @@ const enUS: NavigationCopy = {
     suppliers: { label: 'Suppliers', subtitle: 'Supplier directory' },
     reconciliation: { label: 'Reconciliation', subtitle: 'Bank reconciliation' },
     paymentOrders: { label: 'Payment orders', subtitle: 'Obligations, orders and payment calendar' },
+    contractorPayments: { label: 'Contractor payments', subtitle: 'Prepare and authorize contractor payouts' },
     paymentProfiles: { label: 'Payment profiles', subtitle: 'Approval queue and cross-entity drift' },
     intelligence: { label: 'Economics', subtitle: 'Period close and operational P&L' },
     purchaseOrders: { label: 'Purchase orders', subtitle: 'Client POs, balances and consumption' },

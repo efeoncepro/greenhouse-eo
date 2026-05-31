@@ -49,7 +49,7 @@ const TASK_727_GRANTS: Record<string, string[]> = {
     'equipo.jerarquia', 'equipo.organigrama', 'equipo.departamentos', 'equipo.asistencia',
     'equipo.objetivos', 'equipo.evaluaciones', 'equipo.onboarding',
     'finanzas.resumen', 'finanzas.ingresos', 'finanzas.egresos', 'finanzas.conciliacion',
-    'finanzas.ordenes_pago',
+    'finanzas.ordenes_pago', 'finanzas.contractor_payables',
     'finanzas.banco', 'finanzas.cuenta_corriente_accionista', 'finanzas.clientes',
     'finanzas.proveedores', 'finanzas.inteligencia', 'finanzas.asignaciones_costos',
     'finanzas.cotizaciones', 'finanzas.ordenes_compra', 'finanzas.hes',
@@ -153,8 +153,9 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mi_contratacion')
   })
 
-  it('finanzas has 14 views', () => {
-    expect(FINANZAS_VIEW_CODES).toHaveLength(14)
+  it('finanzas has 15 views (incluye contractor_payables, TASK-974)', () => {
+    expect(FINANZAS_VIEW_CODES).toHaveLength(15)
+    expect(FINANZAS_VIEW_CODES).toContain('finanzas.contractor_payables')
   })
 
   it('comercial has 6 transitional commercial-domain views', () => {

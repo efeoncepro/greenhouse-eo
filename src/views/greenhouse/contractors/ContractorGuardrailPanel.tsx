@@ -1,33 +1,27 @@
 'use client'
 
-// TASK-968 Slice 3 — Agreed-amount guardrail panel (Finance surface C).
+// TASK-968 Slice 3 / TASK-974 Slice 4 — Agreed-amount guardrail panel (HR surface, READ-ONLY).
 //
 // Surfaces payables blocked by `payment_exceeds_agreed_amount` for the selected
-// engagement and lets a Finance admin authorize a governed override (maker-checker,
-// SoD vs the HR capability that SETS the amount). Promoted from the approved mockup
-// surface C. The server enforces the capability + the gate regardless of this UI.
+// engagement. SoD: HR fija el monto acordado, NO autoriza la excepción. La excepción
+// (override gobernado, maker-checker) se opera desde el workbench de Finanzas
+// (`/finance/contractor-payments`). Aquí es solo lectura + link.
 
 import { useCallback, useEffect, useState } from 'react'
+
+import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import CustomTextField from '@core/components/mui/TextField'
 import { OperationalPanel } from '@/components/greenhouse/primitives'
 import { GH_CONTRACTOR_COMPENSATION as CC } from '@/lib/copy/contractor-compensation'
 import { formatCurrency, type CurrencyCode } from '@/lib/format'
-import { getMicrocopy } from '@/lib/copy'
 import type { ContractorWorkbenchQueueRow } from '@/lib/contractor-engagements/projection-types'
-
-const aria = getMicrocopy('es-CL').aria
 
 interface BlockedPayable {
   contractorPayableId: string
@@ -38,19 +32,9 @@ interface BlockedPayable {
 
 const EXCEEDS_CODE = 'payment_exceeds_agreed_amount'
 
-const ContractorGuardrailPanel = ({
-  row,
-  onResolved
-}: {
-  row: ContractorWorkbenchQueueRow
-  onResolved: () => void
-}) => {
+const ContractorGuardrailPanel = ({ row }: { row: ContractorWorkbenchQueueRow }) => {
   const [loading, setLoading] = useState(true)
   const [breached, setBreached] = useState<BlockedPayable[]>([])
-  const [dialogFor, setDialogFor] = useState<BlockedPayable | null>(null)
-  const [reason, setReason] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const money = (n: number, currency: string) =>
     formatCurrency(n, currency as CurrencyCode, { currencySymbolSpacing: ' ' }, 'es-CL')
@@ -86,42 +70,8 @@ const ContractorGuardrailPanel = ({
     void load()
   }, [load])
 
-  const confirmOverride = async () => {
-    if (!dialogFor || reason.trim().length < 10) return
-
-    setSubmitting(true)
-    setError(null)
-
-    try {
-      const res = await fetch(
-        `/api/finance/contractor-payables/${encodeURIComponent(dialogFor.contractorPayableId)}/override-agreed-amount`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reason: reason.trim() })
-        }
-      )
-
-      if (!res.ok) {
-        setError(CC.guardrail.overrideError)
-
-        return
-      }
-
-      setDialogFor(null)
-      setReason('')
-      await load()
-      onResolved()
-    } catch {
-      setError(CC.guardrail.overrideError)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
   return (
-    <>
-      <OperationalPanel
+    <OperationalPanel
         title={CC.guardrail.panelTitle}
         subheader={CC.guardrail.panelSubheader}
         icon='tabler-shield-dollar'
@@ -160,75 +110,26 @@ const ContractorGuardrailPanel = ({
                       {agreed !== null ? ` · Acordado ${money(agreed, row.agreedRate.currency)}` : ''}
                     </Typography>
                   </Box>
-                  <Box>
-                    <Button
-                      variant='tonal'
-                      color='error'
-                      startIcon={<i className='tabler-lock-open' />}
-                      onClick={() => {
-                        setDialogFor(p)
-                        setReason('')
-                        setError(null)
-                      }}
-                    >
-                      {CC.guardrail.authorizeCta}
-                    </Button>
-                  </Box>
                 </Stack>
               )
             })}
+            <Alert severity='info' icon={<i className='tabler-info-circle' />}>
+              {CC.guardrail.resolvedInFinanceNote}
+            </Alert>
+            <Box>
+              <Button
+                component={Link}
+                href='/finance/contractor-payments'
+                variant='tonal'
+                color='primary'
+                endIcon={<i className='tabler-arrow-up-right' />}
+              >
+                {CC.guardrail.reviewInFinanceCta}
+              </Button>
+            </Box>
           </Stack>
         )}
-      </OperationalPanel>
-
-      <Dialog
-        open={dialogFor !== null}
-        onClose={() => setDialogFor(null)}
-        maxWidth='xs'
-        fullWidth
-        aria-labelledby='guardrail-override-title'
-      >
-        <DialogTitle id='guardrail-override-title' sx={{ fontWeight: 600 }}>
-          {CC.guardrail.overrideTitle}
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={3} sx={{ pt: 1 }}>
-            <Typography variant='body2' sx={{ color: 'text.secondary' }}>
-              {CC.guardrail.overrideIntro}
-            </Typography>
-            <CustomTextField
-              label={CC.guardrail.reasonLabel}
-              placeholder={CC.guardrail.reasonPlaceholder}
-              value={reason}
-              onChange={e => setReason(e.target.value)}
-              multiline
-              minRows={3}
-              fullWidth
-              helperText={CC.guardrail.reasonHelper}
-            />
-            {error ? <Alert severity='error'>{error}</Alert> : null}
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ px: 6, pb: 5 }}>
-          <Button
-            variant='tonal'
-            color='secondary'
-            onClick={() => setDialogFor(null)}
-            aria-label={aria.closeDrawer}
-          >
-            {CC.guardrail.cancel}
-          </Button>
-          <Button
-            variant='contained'
-            color='error'
-            disabled={reason.trim().length < 10 || submitting}
-            onClick={() => void confirmOverride()}
-          >
-            {submitting ? CC.guardrail.confirming : CC.guardrail.confirm}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    </OperationalPanel>
   )
 }
 

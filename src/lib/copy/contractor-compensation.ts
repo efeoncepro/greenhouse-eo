@@ -43,21 +43,13 @@ export const GH_CONTRACTOR_COMPENSATION = {
   },
   guardrail: {
     panelTitle: 'Guardrail del monto acordado',
-    panelSubheader: 'Bloquea pagar por encima de lo acordado. La excepción se autoriza y queda auditada.',
+    panelSubheader: 'Bloquea pagar por encima de lo acordado. La excepción la autoriza Finanzas (SoD) y queda auditada.',
     breachTitle: 'Excede el monto acordado',
     okTitle: 'Sin payables bloqueados por monto',
     okDescription: 'Ningún payable de este engagement supera el monto acordado.',
-    authorizeCta: 'Autorizar excepción',
-    overrideTitle: 'Autorizar excepción de pago',
-    overrideIntro:
-      'Vas a autorizar un pago por encima del monto acordado. Requiere una firma distinta a quien fijó el monto (SoD) y queda registrado.',
-    reasonLabel: 'Motivo de la excepción',
-    reasonPlaceholder: 'Ej. bono por entrega extraordinaria aprobado por…',
-    reasonHelper: 'Mínimo 10 caracteres.',
-    confirm: 'Autorizar excepción',
-    confirming: 'Autorizando…',
-    cancel: 'Cancelar',
-    overrideError: 'No pudimos autorizar la excepción. Intenta de nuevo.',
-    overrodeNote: 'Excepción autorizada y registrada (auditada).'
+    // SoD: quien fija el monto (HR) no autoriza la excepción. Aquí es solo lectura;
+    // la excepción se resuelve en el workbench de Finanzas.
+    resolvedInFinanceNote: 'La excepción la autoriza Finanzas, no HR. Acá solo ves el bloqueo.',
+    reviewInFinanceCta: 'Revisar en Pagos a contractors'
   }
 } as const

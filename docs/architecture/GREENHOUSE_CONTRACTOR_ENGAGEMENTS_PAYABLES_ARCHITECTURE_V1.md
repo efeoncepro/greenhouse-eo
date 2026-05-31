@@ -1247,3 +1247,14 @@ Todas las preguntas originalmente abiertas quedan resueltas en `Resolved Archite
 - `member_id` no se crea automaticamente; solo cuando existe participacion operacional.
 - weekly/fixed payables no tienen auto-approval en V1.
 - VAT/IVA y facturas comerciales quedan en Finance AP, fuera de Contractor Payables V1.
+
+## Delta 2026-05-31 — Finance Contractor Payments Workbench (TASK-974)
+
+Cierra el gap de UI de Finanzas: el backend de payables (TASK-793/794/795/968) estaba completo pero Finanzas tenía 0% de pantalla. Esta task es **UI-only sobre los 7 endpoints existentes** (cero cambios a state machine, helpers o endpoints).
+
+- **Ruta canónica**: `/finance/contractor-payments`, ítem nuevo en el submenú **Tesorería** (junto a `payment-orders` + `cash-out`; lifecycles distintos, NO un tab). viewCode de gobernanza `finanzas.contractor_payables` (routePath `/finance/contractor-payments`) seedeado en `view_registry` + `role_view_assignments` para `efeonce_admin`/`finance_admin`/`finance_analyst` (migración `20260531195526233`, regla TASK-827).
+- **Reader canónico**: `listContractorPaymentsForWorkbench` (`src/lib/finance/contractor-payments/workbench-reader.ts`) enriquece los payables con `contractorName` + `engagementPublicId`. Expuesto vía `GET /api/finance/contractor-payables?workbench=1` (backward-compatible: sin el flag, el endpoint mantiene su shape previo).
+- **Breakdown verbatim**: bruto/retención/neto se leen del payable, NUNCA se recalculan en cliente. La tasa de retención honorarios CL viene del snapshot del engagement (TASK-794). El neto (`#2E7D32`) es lo que va al banco; la retención se remesa al SII por separado (F29) — refleja el invariante contable de TASK-795/977 ("gasto = bruto, retención = pasivo a remesar").
+- **SoD — override reubicado**: la autorización de pago que excede el monto acordado (`finance.contractor_payable.override_agreed_amount`) y el waiver de perfil de pago se operan **desde Finanzas** (workbench), no desde HR. El panel HR `ContractorGuardrailPanel` quedó **read-only**: muestra el bloqueo informativamente + link a `/finance/contractor-payments`. Esto cierra la ambigüedad de SoD de TASK-968 (la capability era de Finanzas pero el botón vivía en superficie HR).
+- **Boundary EPIC-013/TASK-957 preservado**: cero cambios a payroll engine / `payroll_entries` / `contract_type` / finiquito. Gate de cierre `pnpm vitest run src/lib/payroll` verde (532 passed).
+- **Mockup aprobado vinculante**: `src/views/greenhouse/finance/contractor-payments/mockup/` (regla TASK-863). Runtime GVC-verificado end-to-end (header + 4 KPIs + DataTableShell + empty state honesto + 2 CTAs).
