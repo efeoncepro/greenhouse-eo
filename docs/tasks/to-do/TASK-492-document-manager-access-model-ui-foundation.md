@@ -53,6 +53,8 @@ Skill `arch-architect` (Greenhouse overlay) revisó la spec aplicando patrones c
 
 ## Summary
 
+> **EPIC-017 alignment 2026-05-31:** el document manager/access model debe servir tambien como substrate para la rail documental de People/Person 360 Workforce. People puede embeber evidencia/document facets, pero las acciones de upload/reveal/signature siguen owned by EPIC-001. Ver `TASK-964`.
+
 Construir el primer gestor documental visible del portal: surfaces, componentes y access model V2 para listar, filtrar, descargar, cargar y revisar documentos desde una base shared, sin obligar a cada módulo a inventar su propia UI.
 
 ## Why This Task Exists
@@ -152,4 +154,3 @@ Reglas obligatorias:
 - [ ] `Lifecycle` y carpeta sincronizados
 - [ ] `docs/tasks/README.md` actualizado
 - [ ] `Handoff.md` actualizado
-

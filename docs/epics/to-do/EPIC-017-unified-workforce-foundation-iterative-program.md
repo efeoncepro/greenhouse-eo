@@ -170,6 +170,11 @@ Hard rule:
 | `TASK-959` | `0/1` | `complete` | Workforce Foundation Read-Only Object Map Audit: contrato/mapa read-only implementado con gap codes, parity 100% contra current classification en dev real activo, audit script y candidate reliability signals documentados. |
 | `TASK-961` | `3` | `to-do` | Person 360 Workforce Facet Read-Only Promotion: promover People/Person 360 como hub workforce read-only consumiendo `WorkforceFoundationMap`, manteniendo Payroll como rail especializada y sin writes. |
 | `TASK-962` | `1/2` | `to-do` | Workforce Coverage & Readiness Remediation Plan: clasificar read-only gaps de compensation/readiness/payment rail antes de data fixes, signals o write paths. |
+| `TASK-963` | `3` | `to-do` | People List Workforce Overview: convertir la lista de People en overview operativo con status, worker type, pais, assignment, payment rail, compensation coverage y readiness, consumiendo el read model de `TASK-961`/`TASK-962`. |
+| `TASK-964` | `3/4` | `to-do` | Person Workforce Documents Rail + EPIC-001 Alignment: conectar People/Person 360 Workforce con Document Vault + Signature Orchestration sin crear document manager paralelo. |
+| `TASK-965` | `4` | `to-do` | Unified Worker Create/Edit Workflow: futuro write-path convergence People-first, bloqueado hasta estabilizar read models, compensation profile y assignment timeline. |
+| `TASK-966` | `5` | `to-do` | Workforce Reporting Foundation: headcount/workforce reporting persona-centrico, sin doble conteo y con sensitivity gates. |
+| `TASK-967` | `1/2` | `to-do` | Workforce Reliability Signals Control Plane: señales cross-rail basadas en gap taxonomy/dispositions para relationship, compensation, payment rail y readiness. |
 
 Las tasks se agregaran de forma iterativa cuando cumplan este protocolo:
 
@@ -192,8 +197,12 @@ Esta cola es deliberadamente conceptual. No reserva IDs.
 | Workforce coverage/readiness remediation plan | 1/2 | Explicar gaps reales de compensation/readiness/payment rail antes de remediation o write paths. | Creada como `TASK-962`; read-only, sin data fixes. |
 | Compensation profile timeline | 2/3 | Leer compensacion como historia versionada, no solo version actual. | Definir si scope es relationship, assignment o composite. |
 | Person 360 workforce journey facet | 3 | Mostrar relacion, assignment, compensation, readiness y rails en un lugar. | Creada como `TASK-961`; ejecutar solo como read-only/aditiva y con redaction/access explicitos. |
+| People list workforce overview | 3 | Mostrar workforce status, worker type, rail y gaps directamente en la lista de People. | Creada como `TASK-963`; ejecutar despues de `TASK-961`/`TASK-962`. |
+| Person documents/signature rail | 3/4 | Mostrar contratos, addenda, receipts, final settlements y firma como evidencia del journey laboral. | Creada como `TASK-964`; debe consumir EPIC-001, no duplicarlo. |
 | Workforce rail drift signals | 1/2 | Detectar doble rail, rail sin evidencia, relationship sin payment readiness y compensation drift. | Definir steady state esperado por signal. |
 | Relationship-first activation command | 4 | Crear/activar worker desde person + relationship + assignment + compensation. | Parity projection y approval del write-path ADR/delta. |
+| Unified worker create/edit workflow | 4 | Orquestar identity, relationship, assignment, compensation, documents/compliance y payment rail desde People. | Creada como `TASK-965`; bloqueada por read models y checkpoint de write path. |
+| Workforce reporting foundation | 5 | Headcount, worker type, countries, coverage y readiness reporting persona-centrico. | Creada como `TASK-966`; requiere `TASK-961`/`TASK-962`/`TASK-963`. |
 | Agent-safe workforce context | 5 | Exponer contexto seguro para Nexa/MCP sin heuristicas por tabla. | Field-level redaction + autonomy tier definidos. |
 
 ## Existing Payroll Backlog Triage
@@ -206,6 +215,7 @@ Operational rule:
 - `TASK-961` is now the People/Person 360 hub promotion lane and precedes deeper compensation/write-path convergence.
 - `TASK-962` is the read-only coverage/readiness plan required before opening data remediation tasks.
 - Existing tasks such as `TASK-338`, `TASK-340`, `TASK-614`, `TASK-652`, `TASK-788` and `TASK-798` are useful, but must be reframed before execution if they become EPIC-017 work.
+- Documents and e-signature are not a new EPIC-017 platform. They must consume `EPIC-001` (`TASK-489`..`TASK-495`, `TASK-868`) through `TASK-964`.
 - Payroll compliance, receipts, close gates, Previred and smoke lanes remain valid separate Payroll work unless a later EPIC-017 task explicitly consumes their outputs.
 - Reframed tasks must declare the EPIC phase, source-of-truth boundary, read/write scope, and payroll/finiquito/contractor/finance hard rules before moving to `in-progress`.
 
@@ -258,6 +268,8 @@ Pre-task gate agregado: `docs/research/RESEARCH-008-pre-task-considerations.md` 
 Primera child task agregada: `TASK-959` (`docs/tasks/complete/TASK-959-workforce-foundation-read-only-object-map-audit.md`). Scope estrictamente read-only; no acepta el ADR implicitamente ni habilita writes/UI/migrations.
 
 Payroll backlog triage agregado: `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md` clasifica tasks existentes de Payroll/Workforce/Compensation que sirven al objetivo, marca cuales requieren replanteo antes de ejecucion y preserva lanes separadas para compliance, receipts, close gates y smoke tests.
+
+Delta posterior: se agregaron `TASK-963` a `TASK-967` como lanes faltantes para alcanzar la vision tipo Deel sin duplicar plataformas existentes: People List Workforce Overview, Documents/e-signature rail via EPIC-001, Unified Worker Create/Edit Workflow, Workforce Reporting Foundation y Workforce Reliability Signals Control Plane.
 
 Delta posterior 6: `TASK-959` ejecutada y cerrada. Se agrego `src/lib/workforce/foundation/*` + `scripts/workforce/audit-workforce-foundation-map.ts`, todo read-only. Hallazgos dev reales sin demo: relationship coverage `9/9`, current classification parity `9/9`, current compensation `5/9`, payment rail evidence `8/9`, sin gaps `error`. El audit inicial con demo detecto 5 fixtures `demo-%@demo.greenhouse.efeonce.org` como `data.demo_or_fixture_tolerated_gap`/info; luego se limpiaron de dev junto a sus rows materiales derivadas, por lo que `--active-only --include-demo` vuelve a reportar solo 9 activos reales. Candidate signals documentadas en `RESEARCH-008-current-state-gap-analysis-2026-05-31.md`; no se cablearon señales productivas, UI, APIs ni migrations.
 

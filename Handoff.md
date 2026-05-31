@@ -1,3 +1,25 @@
+# Sesion 2026-05-31 — EPIC-017 missing Deel-like lanes opened — ✅ DOCS-ONLY
+
+**Rama**: `develop`. Scope docs-only; no runtime, DB, UI, migration, API or lifecycle moves. Worktree had unrelated/in-progress TASK-960 remittance changes before this pass (`TASK-960` moved to in-progress + remittance code/migration); those were not touched.
+
+Nuevas tasks creadas para completar la vision tipo Deel:
+- `TASK-963` — People List Workforce Overview: lista People como roster workforce con status, worker type, pais, assignment, payment rail, compensation coverage y readiness.
+- `TASK-964` — Person Workforce Documents Rail + EPIC-001 Alignment: conecta EPIC-017 con EPIC-001 Document Vault + Signature Orchestration; People/Person 360 consume evidencia documental sin crear document vault paralelo.
+- `TASK-965` — Unified Worker Create/Edit Workflow: write-path convergence People-first, bloqueado por read models/compensation/assignment/checkpoint.
+- `TASK-966` — Workforce Reporting Foundation: reporting persona-centrico sin doble conteo ni heuristicas por tabla.
+- `TASK-967` — Workforce Reliability Signals Control Plane: signals cross-rail basadas en gap taxonomy/dispositions y alineadas con `TASK-798`.
+
+Docs sincronizados:
+- `EPIC-017` child tasks/intake queue.
+- `EPIC-001` delta People/Workforce consumer.
+- Cross-link notes en `TASK-489`, `TASK-490`, `TASK-492`, `TASK-494`.
+- `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md`.
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`; siguiente ID disponible queda `TASK-968`.
+
+Proxima secuencia recomendada: `TASK-961` + `TASK-962`, luego `TASK-963`; ejecutar `TASK-964` antes de cualquier People-local document UI; no tomar `TASK-965` hasta read models/checkpoints.
+
+---
+
 # Sesion 2026-05-31 — EPIC-017 backlog task rewrites applied — ✅ DOCS-ONLY
 
 **Rama**: `develop` por continuidad del operador. Scope docs-only: se aplicó la disposición del audit `RESEARCH-008-payroll-backlog-triage-2026-05-31` a las tasks existentes del backlog Payroll/Workforce/Compensation para que no se ejecuten con framing viejo.

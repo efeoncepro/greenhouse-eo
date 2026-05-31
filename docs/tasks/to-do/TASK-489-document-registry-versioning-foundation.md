@@ -238,6 +238,8 @@ V2 (esta sección de arriba) consolida estos 8 gaps + resuelve 6 open questions 
 
 ## Summary
 
+> **EPIC-017 alignment 2026-05-31:** este registry es la foundation que People/Person 360 Workforce consumira para mostrar contratos, addenda, finiquitos, payroll/remittance linked docs y document evidence. No crear registry paralelo en People. Ver `TASK-964`.
+
 Crear la foundation canónica del dominio documental de Greenhouse: documento, versión, clasificación, vínculo con assets privados, bridges a canonical 360 objects y metadatos completos de lifecycle. Esta task fija el contrato reusable antes de conectar HR (TASK-494), MSA/SOW (TASK-495), signature orchestration (TASK-490/491), document manager UI (TASK-492) o template rendering (TASK-493).
 
 ## Why This Task Exists

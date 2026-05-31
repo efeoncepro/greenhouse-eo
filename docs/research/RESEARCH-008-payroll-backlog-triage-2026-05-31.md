@@ -18,17 +18,18 @@
 
 This appendix records which existing Payroll-adjacent backlog items can support the Unified Workforce Foundation objective, and which ones must be reframed before execution.
 
-It does not change task lifecycle, reserve new IDs or authorize implementation. It is an intake guide for EPIC-017 so Greenhouse can reuse existing backlog instead of creating duplicate tasks.
+The original triage did not change task lifecycle, reserve new IDs or authorize implementation. It remains an intake guide for EPIC-017 so Greenhouse can reuse existing backlog instead of creating duplicate tasks.
 
 ## Applied Disposition Update - 2026-05-31
 
-The triage below has now been applied to the relevant to-do specs and task indexes as a documentation-only rewrite:
+The triage below has now been applied in two passes:
 
 - Reframed / frozen: `TASK-338`, `TASK-340`, `TASK-341`, `TASK-342`, `TASK-614`, `TASK-652`, `TASK-788`, `TASK-798`.
 - Lightly aligned / kept separate: `TASK-787`, `TASK-797`, `TASK-955`, `TASK-960`.
 - Umbrella adjusted: `TASK-336` now treats the old compensation thread as historical and subordinates the sequence to EPIC-017.
+- New missing lanes opened: `TASK-963` People List Workforce Overview, `TASK-964` Person Workforce Documents Rail + EPIC-001 Alignment, `TASK-965` Unified Worker Create/Edit Workflow, `TASK-966` Workforce Reporting Foundation, `TASK-967` Workforce Reliability Signals Control Plane.
 
-No lifecycle was moved, no runtime behavior changed, and no new task IDs were reserved in this update.
+No lifecycle was moved and no runtime behavior changed in either pass. The second pass reserved `TASK-963` through `TASK-967` to cover Deel-like lanes outside the payroll backlog itself.
 
 ## Triage Labels
 
@@ -164,10 +165,15 @@ This matrix is the current operating answer for "align, rewrite or discard".
 If `TASK-961` validates that the People/Person 360 hub can safely consume the read-only map, the next candidates should be:
 
 1. `TASK-962` coverage/readiness remediation plan if not already completed.
-2. Reframed `TASK-338` as `CompensationProfile` read model/foundation.
-3. Reframed `TASK-788` assignment/title effective-dating read model, with promotion write path split out if needed.
-4. Reframed or superseded `TASK-614` as a narrower People Economy/Payroll rail hardening task.
-5. Reframed `TASK-652` API/agent-safe workforce read surface.
-6. Reframed `TASK-340` bridge/write-path convergence only after parity and architecture checkpoint.
+2. `TASK-963` People List Workforce Overview, so the hub is visible at roster level and not only profile level.
+3. Reframed `TASK-338` as `CompensationProfile` read model/foundation.
+4. Reframed `TASK-788` assignment/title effective-dating read model, with promotion write path split out if needed.
+5. `TASK-964` Person Workforce Documents Rail + EPIC-001 Alignment, before any People-local document UI is attempted.
+6. `TASK-967` Workforce Reliability Signals Control Plane, once `TASK-962` dispositions are stable.
+7. Reframed or superseded `TASK-614` as a narrower People Economy/Payroll rail hardening task.
+8. `TASK-966` Workforce Reporting Foundation.
+9. Reframed `TASK-652` API/agent-safe workforce read surface.
+10. Reframed `TASK-340` bridge/write-path convergence only after parity and architecture checkpoint.
+11. `TASK-965` Unified Worker Create/Edit Workflow, only after read models, documents boundary and write-path ADR/checkpoint are accepted.
 
 If `TASK-962` finds that the compensation/readiness gaps are data debt rather than intentional lifecycle states, do not proceed to write paths. Open targeted remediation tasks first.
