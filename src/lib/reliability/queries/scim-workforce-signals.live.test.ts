@@ -1,38 +1,32 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  IDENTITY_SCIM_ALLOWLIST_BLOCKLIST_CONFLICT_SIGNAL_ID,
-  IDENTITY_SCIM_INELIGIBLE_ACCOUNTS_IN_SCOPE_SIGNAL_ID,
-  IDENTITY_SCIM_MEMBER_IDENTITY_DRIFT_SIGNAL_ID,
-  IDENTITY_SCIM_USERS_WITHOUT_IDENTITY_PROFILE_SIGNAL_ID,
-  IDENTITY_SCIM_USERS_WITHOUT_MEMBER_SIGNAL_ID,
-  WORKFORCE_SCIM_MEMBERS_PENDING_PROFILE_COMPLETION_SIGNAL_ID,
-  getScimWorkforceSignals
-} from './scim-workforce-signals'
+import { SCIM_WORKFORCE_SIGNAL_READERS, getScimWorkforceSignals } from './scim-workforce-signals'
 
 /**
- * TASK-872 Slice 6 — Live PG tests for the 6 SCIM + workforce intake reliability
- * signals. Each reader degrades to severity='unknown' on PG failure; here we
- * assert they execute against staging PG without errors + return canonical shape.
+ * Live PG tests para los signal readers SCIM + workforce intake.
+ *
+ * El CONTRATO (set de signals, unicidad, signalId declarado === retornado, no
+ * silent drop) se verifica en CI sin PG en `scim-workforce-signals.test.ts`
+ * derivando del registry SSOT `SCIM_WORKFORCE_SIGNAL_READERS` — sin número mágico.
+ *
+ * Acá solo verificamos lo que REQUIERE PG real: que cada reader ejecute contra
+ * staging sin error y que el steady-state de severidad sea sano. La cantidad y los
+ * IDs esperados se derivan del registry (no se hardcodean).
  */
 
 const hasPgConfig =
   Boolean(process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME) || Boolean(process.env.GREENHOUSE_POSTGRES_HOST)
 
 describe.skipIf(!hasPgConfig)('getScimWorkforceSignals — live PG', () => {
-  it('returns 6 signals with canonical shape', async () => {
+  it('emits exactly the registry signals against real PG', async () => {
     const signals = await getScimWorkforceSignals()
 
-    expect(signals).toHaveLength(6)
+    expect(signals).toHaveLength(SCIM_WORKFORCE_SIGNAL_READERS.length)
 
-    const ids = signals.map(s => s.signalId)
+    const emitted = signals.map(s => s.signalId).sort()
+    const declared = SCIM_WORKFORCE_SIGNAL_READERS.map(reader => reader.signalId).sort()
 
-    expect(ids).toContain(IDENTITY_SCIM_USERS_WITHOUT_IDENTITY_PROFILE_SIGNAL_ID)
-    expect(ids).toContain(IDENTITY_SCIM_USERS_WITHOUT_MEMBER_SIGNAL_ID)
-    expect(ids).toContain(IDENTITY_SCIM_INELIGIBLE_ACCOUNTS_IN_SCOPE_SIGNAL_ID)
-    expect(ids).toContain(IDENTITY_SCIM_MEMBER_IDENTITY_DRIFT_SIGNAL_ID)
-    expect(ids).toContain(WORKFORCE_SCIM_MEMBERS_PENDING_PROFILE_COMPLETION_SIGNAL_ID)
-    expect(ids).toContain(IDENTITY_SCIM_ALLOWLIST_BLOCKLIST_CONFLICT_SIGNAL_ID)
+    expect(emitted).toEqual(declared)
   })
 
   it('every signal has the canonical fields populated', async () => {
@@ -50,27 +44,27 @@ describe.skipIf(!hasPgConfig)('getScimWorkforceSignals — live PG', () => {
     }
   })
 
-  it('steady-state: most signals should be ok or warning, NOT error (after fresh staging)', async () => {
+  it('no reader degrades to severity=unknown against healthy PG (queries execute cleanly)', async () => {
+    const signals = await getScimWorkforceSignals()
+    const unknown = signals.filter(s => s.severity === 'unknown')
+
+    // severity='unknown' contra PG sano = la query del reader falló (schema drift,
+    // columna renombrada, etc.). Es exactamente lo que este live test debe atrapar.
+    if (unknown.length > 0) {
+      console.log('[scim-workforce live] readers degraded to unknown (query failed):', unknown.map(s => s.signalId))
+    }
+
+    expect(unknown).toHaveLength(0)
+  })
+
+  it('steady-state: error signals are documented, not silent (Felipe/Maria backfill gap allowed)', async () => {
     const signals = await getScimWorkforceSignals()
     const errorSignals = signals.filter(s => s.severity === 'error')
-
-    // En staging, post-migration sin SCIM activity histórica, esperamos:
-    //  - users_without_identity_profile = 0 (Felipe/Maria ya tienen profile linkeado)
-    //  - users_without_member = 2 (Felipe/Maria — backfill pendiente Slice 5)
-    //  - ineligible_accounts_in_scope = 0
-    //  - member_identity_drift = 0
-    //  - workforce_scim_members_pending_profile_completion = 0 (no SCIM-provisioned members yet)
-    //  - allowlist_blocklist_conflict = 0
-    //
-    // Esperado: users_without_member podría estar en error (count=2, Felipe+Maria).
-    // Es el motivo del backfill Sesión 2. NO bloquea Slice 6 — el signal está alertando
-    // correctamente sobre el gap real.
 
     if (errorSignals.length > 0) {
       const errorIds = errorSignals.map(s => `${s.signalId}=${s.severity}`)
 
-      // Permitido pero documentado en log
-      console.log('[Slice 6 live] error signals (expected if Felipe/Maria pending backfill):', errorIds)
+      console.log('[scim-workforce live] error signals (expected if Felipe/Maria pending backfill):', errorIds)
     }
 
     expect(signals.length).toBeGreaterThan(0)

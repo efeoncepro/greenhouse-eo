@@ -7,7 +7,10 @@ import { listPendingIntakeMembers } from '@/lib/workforce/intake-queue/list-pend
 import type { ReliabilityModuleKey, ReliabilitySignal } from '@/types/reliability'
 
 /**
- * TASK-872 Slice 6 — SCIM + Workforce reliability signals (6 readers).
+ * SCIM + Workforce reliability signals. El set canónico vive en el registry
+ * `SCIM_WORKFORCE_SIGNAL_READERS` (SSOT, abajo) — NO hay número fijo: nació con 6
+ * (TASK-872 Slice 6) y creció con workforce.activation (TASK-874) y
+ * external_identity.notion (TASK-877). Agregar uno = una entrada en el registry.
  *
  * Cada reader degrada honestamente a `severity: 'unknown'` si su query falla
  * (e.g. proxy PG caído, migration no aplicada). NO bloquea el dashboard.
@@ -540,21 +543,48 @@ export const getIdentityExternalNotionLinkConflictsSignal = async (): Promise<Re
   }
 }
 
-// ── Aggregator: readers in parallel, filter out null catches ────────────────
+// ── Canonical registry (SSOT) ───────────────────────────────────────────────
+
+export type ScimWorkforceSignalReader = {
+  /** Declared signal id. MUST equal the `signalId` the reader returns (enforced by tests). */
+  readonly signalId: string
+  readonly read: () => Promise<ReliabilitySignal>
+}
+
+/**
+ * Single source of truth para los signal readers SCIM + workforce. El aggregator
+ * `getScimWorkforceSignals` y los tests de contrato (`scim-workforce-signals.test.ts`)
+ * derivan ambos de este array.
+ *
+ * Agregar un signal nuevo = UNA entrada aquí → aggregator + tests quedan en sync
+ * automáticamente, sin número mágico que actualizar. El contrato verificado:
+ *  - signalIds únicos (sin duplicados)
+ *  - el `signalId` declarado === el `signalId` que el reader retorna
+ *  - el aggregator emite exactamente estos signals (no silent drop)
+ *
+ * Nota: cada reader degrada a `severity:'unknown'` con su signalId correcto cuando
+ * PG falla → el contrato se valida en CI sin base de datos.
+ */
+export const SCIM_WORKFORCE_SIGNAL_READERS: ReadonlyArray<ScimWorkforceSignalReader> = [
+  { signalId: IDENTITY_SCIM_USERS_WITHOUT_IDENTITY_PROFILE_SIGNAL_ID, read: getScimUsersWithoutIdentityProfileSignal },
+  { signalId: IDENTITY_SCIM_USERS_WITHOUT_MEMBER_SIGNAL_ID, read: getScimUsersWithoutMemberSignal },
+  { signalId: IDENTITY_SCIM_INELIGIBLE_ACCOUNTS_IN_SCOPE_SIGNAL_ID, read: getScimIneligibleAccountsInScopeSignal },
+  { signalId: IDENTITY_SCIM_MEMBER_IDENTITY_DRIFT_SIGNAL_ID, read: getScimMemberIdentityDriftSignal },
+  {
+    signalId: WORKFORCE_SCIM_MEMBERS_PENDING_PROFILE_COMPLETION_SIGNAL_ID,
+    read: getWorkforceScimMembersPendingProfileCompletionSignal
+  },
+  { signalId: WORKFORCE_ACTIVATION_BLOCKER_BACKLOG_SIGNAL_ID, read: getWorkforceActivationBlockerBacklogSignal },
+  { signalId: WORKFORCE_ACTIVATION_READY_NOT_COMPLETED_SIGNAL_ID, read: getWorkforceActivationReadyNotCompletedSignal },
+  { signalId: IDENTITY_SCIM_ALLOWLIST_BLOCKLIST_CONFLICT_SIGNAL_ID, read: getScimAllowlistBlocklistConflictSignal },
+  { signalId: IDENTITY_EXTERNAL_NOTION_REQUIRED_MISSING_SIGNAL_ID, read: getIdentityExternalNotionRequiredMissingSignal },
+  { signalId: IDENTITY_EXTERNAL_NOTION_LINK_CONFLICTS_SIGNAL_ID, read: getIdentityExternalNotionLinkConflictsSignal }
+]
+
+// ── Aggregator: registry readers in parallel, filter out null catches ────────
 
 export const getScimWorkforceSignals = async (): Promise<ReliabilitySignal[]> => {
-  const results = await Promise.all([
-    getScimUsersWithoutIdentityProfileSignal().catch(() => null),
-    getScimUsersWithoutMemberSignal().catch(() => null),
-    getScimIneligibleAccountsInScopeSignal().catch(() => null),
-    getScimMemberIdentityDriftSignal().catch(() => null),
-    getWorkforceScimMembersPendingProfileCompletionSignal().catch(() => null),
-    getWorkforceActivationBlockerBacklogSignal().catch(() => null),
-    getWorkforceActivationReadyNotCompletedSignal().catch(() => null),
-    getScimAllowlistBlocklistConflictSignal().catch(() => null),
-    getIdentityExternalNotionRequiredMissingSignal().catch(() => null),
-    getIdentityExternalNotionLinkConflictsSignal().catch(() => null)
-  ])
+  const results = await Promise.all(SCIM_WORKFORCE_SIGNAL_READERS.map(reader => reader.read().catch(() => null)))
 
   return results.filter((s): s is ReliabilitySignal => s !== null)
 }
