@@ -481,6 +481,19 @@ const ContractorSelfServiceView = ({ initialProjection }: ContractorSelfServiceV
                 <DetailRow label='Tipo' value={scenario.relationshipSubtype} />
                 <DetailRow label='País' value={scenario.country} />
                 <DetailRow label='Entidad contratante' value={scenario.legalEntityLabel} />
+                <DetailRow
+                  label='Monto acordado'
+                  value={
+                    scenario.agreedRate.rateAmount !== null
+                      ? formatCurrency(
+                          scenario.agreedRate.rateAmount,
+                          scenario.agreedRate.currency as CurrencyCode,
+                          { currencySymbolSpacing: ' ' },
+                          'es-CL'
+                        )
+                      : 'Por definir (HR)'
+                  }
+                />
                 <DetailRow label='Modelo' value={scenario.paymentModel} />
                 <DetailRow label='Cadencia' value={scenario.paymentCadence} />
                 <DetailRow label='Responsable tributario' value={scenario.taxResponsable} />

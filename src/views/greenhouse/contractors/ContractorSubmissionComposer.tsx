@@ -13,11 +13,16 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { alpha } from '@mui/material/styles'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_CONTRACTOR_COMPENSATION as CC } from '@/lib/copy/contractor-compensation'
+import { formatCurrency, type CurrencyCode } from '@/lib/format'
 import type { ContractorSelfServiceScenario } from '@/lib/contractor-engagements/projection-types'
 
 const GREENHOUSE_COPY = getMicrocopy()
@@ -38,7 +43,7 @@ const ContractorSubmissionComposer = ({ open, scenario, onClose, onSubmitted }: 
   const [submissionType, setSubmissionType] = useState<SubmissionType>(resolveDefaultType(scenario.paymentModel))
   const [servicePeriod, setServicePeriod] = useState(scenario.servicePeriod)
   const [currency, setCurrency] = useState(scenario.currency)
-  const [grossAmount, setGrossAmount] = useState('')
+  const [quantity, setQuantity] = useState('')
   const [invoiceAsset, setInvoiceAsset] = useState<UploadedFileValue | null>(null)
   const [evidenceAsset, setEvidenceAsset] = useState<UploadedFileValue | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -46,6 +51,23 @@ const ContractorSubmissionComposer = ({ open, scenario, onClose, onSubmitted }: 
 
   const requiresInvoice = scenario.supportItems.some(item => item.kind === 'invoice' && item.tone !== 'success')
   const needsEvidence = scenario.supportItems.some(item => item.kind === 'evidence' && item.tone !== 'success')
+
+  // The amount is DERIVED from the agreed rate (set by HR). The contractor declares
+  // the work (period / quantity for timesheet) — never the amount (TASK-968 SoD).
+  const agreedAmount = scenario.agreedRate.rateAmount
+  const hasRate = agreedAmount !== null
+  const parsedQuantity = Number(quantity.replace(/[^\d.-]/g, ''))
+
+  const derivedGross =
+    agreedAmount === null
+      ? null
+      : submissionType === 'timesheet'
+        ? Number.isFinite(parsedQuantity) && parsedQuantity > 0
+          ? Math.round(parsedQuantity * agreedAmount * 100) / 100
+          : null
+        : agreedAmount
+
+  const money = (n: number) => formatCurrency(n, currency as CurrencyCode, { currencySymbolSpacing: ' ' }, 'es-CL')
 
   const attachAsset = async (assetId: string, assetRole: 'invoice_pdf' | 'work_evidence', submissionId?: string) => {
     const response = await fetch('/api/my/contractor/attach-asset', {
@@ -70,8 +92,6 @@ const ContractorSubmissionComposer = ({ open, scenario, onClose, onSubmitted }: 
     setError(null)
 
     try {
-      const parsedAmount = Number(grossAmount.replace(/[^\d.-]/g, ''))
-
       const response = await fetch('/api/my/contractor/work-submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -79,7 +99,12 @@ const ContractorSubmissionComposer = ({ open, scenario, onClose, onSubmitted }: 
           submissionType,
           servicePeriodStart: servicePeriod.trim() || null,
           currency: currency.trim() || scenario.currency,
-          grossAmount: Number.isFinite(parsedAmount) && parsedAmount > 0 ? parsedAmount : null,
+          // The amount is derived server-side from the agreed rate — never typed by the contractor (SoD).
+          grossAmount: null,
+          quantity:
+            submissionType === 'timesheet' && Number.isFinite(parsedQuantity) && parsedQuantity > 0
+              ? parsedQuantity
+              : undefined,
           submit
         })
       })
@@ -177,16 +202,51 @@ const ContractorSubmissionComposer = ({ open, scenario, onClose, onSubmitted }: 
                   onChange={event => setCurrency(event.target.value)}
                 />
               </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <CustomTextField
-                  fullWidth
-                  label='Monto bruto'
-                  value={grossAmount}
-                  onChange={event => setGrossAmount(event.target.value)}
-                  placeholder={scenario.kpis[0]?.value ?? 'ej. 530'}
-                />
-              </Grid>
+              {submissionType === 'timesheet' ? (
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <CustomTextField
+                    fullWidth
+                    label='Cantidad'
+                    value={quantity}
+                    onChange={event => setQuantity(event.target.value)}
+                    placeholder='ej. 40'
+                    helperText='Horas o días trabajados.'
+                    slotProps={{ input: { inputMode: 'decimal' } }}
+                  />
+                </Grid>
+              ) : null}
             </Grid>
+
+            {/* Derived amount — read-only. The contractor never types the amount (SoD). */}
+            {hasRate ? (
+              <Box
+                sx={theme => ({
+                  p: 4,
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                  bgcolor: alpha(theme.palette.info.main, 0.05),
+                  border: `1px solid ${alpha(theme.palette.info.main, 0.18)}`
+                })}
+              >
+                <Stack direction='row' spacing={2} alignItems='center'>
+                  <i className='tabler-lock' style={{ fontSize: 20 }} aria-hidden />
+                  <Box>
+                    <Typography variant='caption' color='text.secondary'>
+                      {CC.contractor.derivedTitle}
+                    </Typography>
+                    <Typography variant='h5' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
+                      {derivedGross !== null ? money(derivedGross) : 'Indica la cantidad'}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {CC.contractor.derivedNote}
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Box>
+            ) : (
+              <Alert severity='warning' icon={<i className='tabler-alert-circle' />}>
+                {CC.contractor.missingDescription}
+              </Alert>
+            )}
           </Stack>
 
           <Divider />
@@ -252,6 +312,7 @@ const ContractorSubmissionComposer = ({ open, scenario, onClose, onSubmitted }: 
               <SummaryRow label='Engagement' value={scenario.engagementPublicId} />
               <SummaryRow label='Relación' value={scenario.relationshipSubtype} />
               <SummaryRow label='Periodo' value={servicePeriod || scenario.servicePeriod} />
+              <SummaryRow label='Monto del período' value={derivedGross !== null ? money(derivedGross) : '—'} />
               <SummaryRow label='Estado siguiente' value='Revisión operacional' />
             </Stack>
           </Stack>
@@ -266,12 +327,12 @@ const ContractorSubmissionComposer = ({ open, scenario, onClose, onSubmitted }: 
         <Divider />
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end' sx={{ p: 6 }}>
-          <Button variant='tonal' color='secondary' disabled={isSaving} onClick={() => handleSave(false)}>
+          <Button variant='tonal' color='secondary' disabled={isSaving || !hasRate} onClick={() => handleSave(false)}>
             Guardar borrador
           </Button>
           <Button
             variant='contained'
-            disabled={isSaving}
+            disabled={isSaving || !hasRate}
             startIcon={isSaving ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-send' />}
             onClick={() => handleSave(true)}
           >

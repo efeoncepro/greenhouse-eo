@@ -323,18 +323,21 @@ export const createContractorWorkSubmission = async (
     )
   }
 
-  // Snapshot del rate del engagement; gross derivado para timesheet si no se declara.
+  // Snapshot del rate del engagement; el bruto se DERIVA del monto acordado — el
+  // contractor nunca lo tipea (TASK-968 SoD: HR fija el monto, no el contractor).
+  // timesheet → cantidad × tarifa; resto (fijo/deliverable/milestone) → la tarifa.
   const rateAmountSnapshot = engagement.rateAmount
   const currency = input.currency ?? engagement.currency
   let grossAmount = input.grossAmount ?? null
 
-  if (
-    grossAmount === null &&
-    input.submissionType === 'timesheet' &&
-    typeof input.quantity === 'number' &&
-    typeof rateAmountSnapshot === 'number'
-  ) {
-    grossAmount = Math.round(input.quantity * rateAmountSnapshot * 100) / 100
+  if (grossAmount === null && typeof rateAmountSnapshot === 'number') {
+    if (input.submissionType === 'timesheet') {
+      if (typeof input.quantity === 'number') {
+        grossAmount = Math.round(input.quantity * rateAmountSnapshot * 100) / 100
+      }
+    } else {
+      grossAmount = rateAmountSnapshot
+    }
   }
 
   return withGreenhousePostgresTransaction(async (client) => {

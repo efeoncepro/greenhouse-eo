@@ -640,6 +640,12 @@ export const mapEngagementToSelfServiceScenario = (
     paymentModel: PAYMENT_MODEL_LABEL[engagement.paymentModel],
     paymentCadence: PAYMENT_CADENCE_LABEL[engagement.paymentCadence],
     taxResponsable: resolveTaxResponsable(engagement),
+    agreedRate: {
+      rateType: engagement.rateType,
+      rateAmount: engagement.rateAmount,
+      paymentCadence: engagement.paymentCadence,
+      currency: engagement.currency
+    },
     readinessLabel: readiness.label,
     readinessTone: readiness.tone,
     readinessDetail: readiness.detail,

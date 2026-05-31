@@ -133,6 +133,8 @@ export interface ContractorSelfServiceScenario {
   paymentModel: string
   paymentCadence: string
   taxResponsable: string
+  /** Agreed compensation (read-only for the contractor — set by HR, TASK-968). */
+  agreedRate: ContractorAgreedRate
   readinessLabel: string
   readinessTone: ContractorTone
   readinessDetail: string
