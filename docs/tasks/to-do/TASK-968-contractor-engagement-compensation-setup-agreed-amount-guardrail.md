@@ -74,6 +74,18 @@ Reglas obligatorias (síntesis de skills payroll + finance + arch + product desi
 - **SIEMPRE** correr `pnpm vitest run src/lib/payroll src/lib/contractor-engagements` como gate de no-regresión (EPIC-013).
 - Invocar skills `greenhouse-payroll-auditor` (boundary honorarios), `greenhouse-finance-accounting-operator` (commitment/variance control), `greenhouse-ux` + `greenhouse-ux-writing` (form + copy), `greenhouse-backend`/`greenhouse-dev` (implementación) antes de implementar.
 
+**⚠️ Reglas duras — MOCKUP APROBADO (cablear, NO rehacer)** (operador aprobó 2026-05-31):
+
+El diseño visual de las 3 superficies ya está **resuelto, aprobado y es vinculante**. Vive en `src/views/greenhouse/contractors/mockup/` (`CompensationMockupView.tsx` + `ContractorCompensationDrawer.tsx` + `compensation-data.ts`) + ruta `/hr/contractors/compensation/mockup` + scenario GVC `contractor-compensation`. Verificado en loop GVC (3 iteraciones, 4 frames, 3 estados) con `greenhouse-ux` + `modern-ui` + `forms-ux` + `greenhouse-ux-writing` → sin hallazgos abiertos, nivel enterprise 2026. La implementación **promueve y cabla** ese mockup a datos reales, NO lo reconstruye.
+
+- **NUNCA** rediseñar el editor, el bloque derivado del contractor ni el guardrail desde cero. El mockup es la dirección visual vinculante.
+- **NUNCA** cambiar la dirección aprobada: **un acento semántico por superficie** (primary en el editor, info en el derivado del contractor, success/error en el guardrail) — semántico-de-estado, no decorativo. Restraint editorial: sin gradientes, sin elevation en cards internas (outlined), tokens (`customBorderRadius`, spacing scale, DM Sans, `fontVariantNumeric: 'tabular-nums'`, **prohibido monospace**). NO reintroducir colores compitiendo.
+- **NUNCA** dejar que el contractor edite el monto. El **campo de monto libre del composer se remueve/bloquea**; el bruto se muestra **derivado read-only** con la leyenda "Según tu compensación acordada. No editable." (SoD expresado en el diseño — es load-bearing, no cosmético).
+- **SIEMPRE** promover los componentes del mockup a su lugar canónico preservando el render: `mockup/ContractorCompensationDrawer.tsx` → `src/views/greenhouse/contractors/ContractorEngagementCompensationDrawer.tsx` (runtime), consumiendo el form real (react-hook-form + `PATCH /api/hr/contractors/[id]`). El JSX/estructura/tokens NO cambian; solo cambia la fuente de datos (mock → engagement real) y el submit (mock state-machine → server action + audit).
+- **SIEMPRE** preservar las **microinteracciones aprobadas** (todas reduced-motion-aware): `AnimatedCounter` en montos, save state-machine (spinner→check), hover lift, fade entre estados, pulso de atención en el breach, stagger reveal al montar. Reusar los wrappers canónicos (`@/libs/FramerMotion`, `@/components/greenhouse/AnimatedCounter`, `useReducedMotion`).
+- **SIEMPRE** mover el copy es-CL inline del mock (labels, helpers, CTAs, leyendas SoD) a `src/lib/copy/*` (TASK-265) — el contenido de los strings está aprobado; solo cambia dónde viven. Validar con `greenhouse-ux-writing`.
+- **SIEMPRE** que la superficie real difiera del mockup aprobado (p. ej. un campo extra que el runtime exige), actualizar el mockup + re-aprobar visualmente vía GVC ANTES de mergear — el mockup es el contrato visual.
+
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-790-contractor-engagements-runtime-classification-risk.md` (engagement + rate fields + store + audit)
@@ -123,6 +135,12 @@ Reglas obligatorias (síntesis de skills payroll + finance + arch + product desi
 - Work submission gross derivation `quantity × rate_amount_snapshot` para timesheet (`work-submissions/store.ts:337`); composer con campo "Monto bruto" libre.
 - Payable readiness fail-closed con waiver auditado (`payment_profile_waiver_reason`, TASK-793) — patrón a espejar para el guardrail.
 - Workbench Inspector (`AdminInspector`) que ya muestra detalle del engagement seleccionado.
+- **Mockup APROBADO (vinculante, 2026-05-31)** — el diseño visual de las 3 superficies ya está resuelto + aprobado + verificado GVC (enterprise 2026). La implementación lo cabla, NO lo rehace:
+  - `src/views/greenhouse/contractors/mockup/CompensationMockupView.tsx` — showcase de las 3 superficies × 3 estados (Sin definir / Definido / Excede acuerdo) con la dirección visual vinculante.
+  - `src/views/greenhouse/contractors/mockup/ContractorCompensationDrawer.tsx` — el editor (drawer) admin: form single-column + preview derivado + save state-machine.
+  - `src/views/greenhouse/contractors/mockup/compensation-data.ts` — tipos (`CompensationFormValue`, `CompensationMock`) + opciones (rate_type/cadence/currency) + builder por estado. El shape ES el contrato.
+  - `src/app/(dashboard)/hr/contractors/compensation/mockup/page.tsx` — ruta del mockup.
+  - `scripts/frontend/scenarios/contractor-compensation.scenario.ts` — scenario GVC de regresión visual (4 frames, 3 estados + drawer).
 
 ### Gap
 
@@ -184,6 +202,20 @@ Reglas obligatorias (síntesis de skills payroll + finance + arch + product desi
 **Guardrail (Slice 3)** — `payment_exceeds_agreed_amount`: el payable cuyo bruto excede el "esperado por pago" (con tolerancia configurable) entra `blocked` salvo override auditado. Espejo exacto del patrón waiver de TASK-793 (`payment_profile_waiver_reason` + capability + maker-checker). NO es un cap acumulado (eso es follow-up).
 
 **Boundary payroll (TASK-957/794)**: el monto acordado es el **bruto del contractor**; la retención SII (15.25% 2026) la aplica el payable (TASK-794) — esta task NO calcula retención ni toca payroll. NUNCA mutar `contract_type` a `'honorarios'`.
+
+**Mapping mockup aprobado → implementación (cablear, NO rehacer)**:
+
+| Mockup aprobado (existe) | Implementación canónica (cablear) | Qué cambia |
+|---|---|---|
+| `mockup/compensation-data.ts` → `CompensationFormValue` type | `src/lib/contractor-engagements/types.ts` (ya existe en `ContractorEngagement`) | El shape del form mapea 1:1 a los campos del engagement; reusar, no duplicar. |
+| `mockup/ContractorCompensationDrawer.tsx` (form + save state-machine simulada) | `src/views/greenhouse/contractors/ContractorEngagementCompensationDrawer.tsx` | Promover sin tocar JSX/tokens/microinteracciones; react-hook-form + `PATCH /api/hr/contractors/[id]` real + audit event. Save state-machine pasa de `setTimeout` a la respuesta del server action. |
+| `mockup/CompensationMockupView.tsx` Surface A (panel "Compensación") | integración en `ContractorAdminWorkbenchView.tsx` (`AdminInspector`) | Replicar el panel + CTA "Editar compensación" en el Inspector real; el monto sale de la projection (read-only number). |
+| `mockup/CompensationMockupView.tsx` Surface B (derivado read-only) | `ContractorSelfServiceView.tsx` + `ContractorSubmissionComposer.tsx` | Reemplazar el campo de monto libre por el bloque derivado read-only (Slice 2). El cálculo sale del rate acordado server-side. |
+| `mockup/CompensationMockupView.tsx` Surface C (guardrail + override dialog) | `ContractorAdminWorkbenchView.tsx` + `payables/readiness.ts` | Wire del gate `payment_exceeds_agreed_amount` + dialog de override con razón ≥10 (Slice 3, espejo waiver TASK-793). |
+| copy es-CL inline del mock (`COPY`, labels, leyendas SoD) | `src/lib/copy/*` (TASK-265, namespace nuevo) | Strings aprobados; solo cambia dónde viven. |
+| `scenarios/contractor-compensation.scenario.ts` | reusar tal cual como regresión visual post-implementación | Apuntar a las superficies reales cuando dejen de ser mock. |
+
+El agente que implemente: parte del mockup aprobado, NO de cero. La verificación visual final (real-artifact loop) compara las superficies reales contra el mockup aprobado (debe ser idéntico en dirección visual + microinteracciones).
 
 **Sinergia TASK-965**: cuando el Unified Worker Create/Edit Workflow aterrice, debe **componer** este editor (mismo store + endpoint + audit), no duplicarlo. El form de esta task nace como pieza reusable.
 
@@ -252,3 +284,7 @@ Slice 1 (editor — cierra el gap inmediato, desbloquea setear la tarifa) → Sl
 - **¿La tarifa es valor-vigente o efectivo-datada?** RESUELTO V1: valor vigente en el engagement + audit event en `contractor_engagement_events`. Rationale (arch reversibility + YAGNI): additivo, se promueve a tabla versionada solo si proration mid-período se vuelve necesidad real. Versionado = follow-up.
 - **¿El guardrail es por período o acumulado?** RESUELTO V1: **por período** (fail-closed + override auditado). El **tope acumulado** (total/anual) es follow-up declarado — es un control financiero más pesado (variance + encumbrance) que requiere su propio modelado.
 - **¿Tolerancia del guardrail?** Decisión en Plan Mode: tolerancia configurable (e.g. 0% estricto vs 5% por redondeos/bonos) — nace con un default conservador (estricto) + override.
+
+## Delta 2026-05-31 — MOCKUP APROBADO
+
+Mockup de las 3 superficies plasmado y **APROBADO por el operador**: ruta TSX real `src/views/greenhouse/contractors/mockup/` (`CompensationMockupView` + `ContractorCompensationDrawer` + `compensation-data`) + ruta `/hr/contractors/compensation/mockup` + scenario GVC `contractor-compensation`. **Planificado con las 4 skills de product design** (greenhouse-ux + modern-ui + forms-ux + greenhouse-ux-writing) y **verificado en loop GVC** (3 iteraciones, 4 frames, 3 estados Sin definir/Definido/Excede). 2 hallazgos cerrados en el loop: (1) el drawer no cargaba el monto actual al abrir → init-on-open; (2) timing de captura del guardrail → sleep steps. Polish "modern 2026": stagger reveal al montar + pulso en el breach. Dirección visual vinculante: **un acento semántico por superficie**, restraint editorial, tokens, SoD expresado en el diseño (editor admin / "No editable" contractor / guardrail Finance), microinteracciones reduced-motion-aware (AnimatedCounter, save state-machine, hover lift, fade, breach pulse, stagger). Calidad: tsc 0 · eslint 0 · local:check EXIT=0 · design:lint 0/0. Commit `f7f26fce`. **La implementación cabla estos mockups, NO los rehace** — ver mapping en Detailed Spec + reglas duras "MOCKUP APROBADO" en Architecture Alignment.
