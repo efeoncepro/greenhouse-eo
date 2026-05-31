@@ -66,6 +66,14 @@ const registerFontsOnce = async (): Promise<void> => {
     tryRegister('Poppins', resolve(FONT_DIR, 'Poppins-SemiBold.ttf'))
     tryRegister('Poppins Bold', resolve(FONT_DIR, 'Poppins-Bold.ttf'))
 
+    // Poppins ExtraBold / Black (+ italics) — Efeonce slogan "Empower your Growth".
+    // Source: Google Fonts (fonts.gstatic.com Poppins v24, Latin subset), SIL OFL 1.1.
+    // Typography contract in src/config/efeonce-brand.ts (EFEONCE_SLOGAN_PARTS).
+    tryRegister('Poppins ExtraBold', resolve(FONT_DIR, 'Poppins-ExtraBold.ttf'))
+    tryRegister('Poppins ExtraBold Italic', resolve(FONT_DIR, 'Poppins-ExtraBoldItalic.ttf'))
+    tryRegister('Poppins Black', resolve(FONT_DIR, 'Poppins-Black.ttf'))
+    tryRegister('Poppins Black Italic', resolve(FONT_DIR, 'Poppins-BlackItalic.ttf'))
+
     // DM Sans — DEPRECATED per DESIGN.md. Kept registered until last
     // consumer migrates; see register-fonts.ts header comment.
     tryRegister('DM Sans', resolve(FONT_DIR, 'DMSans-Regular.ttf'))
