@@ -92,8 +92,31 @@ El recorrido del caso, en orden: contratacion -> soporte -> revision -> obligaci
 
 Bruto, retencion (cuando aplica) y neto, siempre como mejor estimacion disponible. Si todavia no hay datos, la vista lo dice en vez de mostrar un cero que confunda.
 
+## Definir el monto acordado (RR.HH.) — TASK-968
+
+El **monto acordado** lo fija RR.HH., nunca el contratista. Desde el workbench HR (`/hr/contractors`):
+
+1. Selecciona la contratacion en la cola. En el inspector aparece el panel **Compensacion**.
+2. Si dice "Sin monto acordado", pulsa **Definir compensacion**. Si ya tiene monto, **Editar compensacion**.
+3. Ingresa el tipo de tarifa (fija, por hora, por hito, etc.), el monto y la cadencia. La **moneda no se edita** aqui (se eligio al crear la contratacion).
+4. Guarda. El cambio queda registrado (quien y cuando) y el contratista vera el monto como dato de solo lectura.
+
+Mientras una contratacion activa no tenga monto, el contratista **no puede enviar trabajo** y una senal de salud lo marca para RR.HH.
+
+## Autorizar un pago que excede lo acordado (Finanzas) — TASK-968
+
+Cuando un pago supera el monto acordado, queda **bloqueado**. En el inspector del workbench, el panel **Guardrail del monto acordado** lista esos pagos:
+
+1. Revisa el detalle: cuanto se quiere pagar vs cuanto se acordo.
+2. Si corresponde, pulsa **Autorizar excepcion**, escribe el motivo (minimo 10 caracteres) y confirma.
+3. La excepcion queda registrada. La autoriza Finanzas admin, y **no puede ser la misma persona** que fijo el monto (doble firma).
+
+Si el monto del pago esta mal, corrigelo en lugar de autorizar la excepcion.
+
 ## Que no hacer
 
+- No dejes que el contratista defina o escriba su monto acordado: se fija solo desde las vistas admin (RR.HH.).
+- No autorices una excepcion de pago si la diferencia se debe a un error: corrige el monto del pago.
 - No interpretes esta contratacion como una relacion de nomina: no hay sueldo, finiquito ni descuentos previsionales.
 - No esperes ejecutar un pago desde estas pantallas. Aprobar deja lista la obligacion; el pago lo procesa Finanzas.
 - Como contratista, no busques aca tus datos de pago para editarlos: usa el acceso a `/my/payment-profile`. Esta vista solo enlaza, no reconstruye tu perfil de pago.

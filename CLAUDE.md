@@ -4551,6 +4551,40 @@ El **Comprobante de Pago / Remittance Advice** es una **proyección read-only de
 
 **Spec canónica**: `docs/tasks/complete/TASK-960-contractor-remittance-advice.md`. Migración: `20260531131226949`. Doc funcional: `docs/documentation/hr/contratistas-comprobante-de-pago.md`. Manual: `docs/manual-de-uso/hr/contratistas-comprobante-de-pago.md`. Patrones fuente: TASK-758 (presenter struct → MUI + PDF), TASK-700 (allocator gapless atómico), TASK-796 (self-service hub + projection), TASK-784 (tax id masked), TASK-872 (anti-oracle 404).
 
+### Contractor Agreed-Amount SoD + Guardrail invariants (TASK-968, desde 2026-05-31)
+
+El **monto acordado** del contractor (`contractor_engagements.rate_amount` + `rate_type` + `payment_cadence`) lo **FIJA HR desde las vistas admin** — el contractor NUNCA lo tipea, solo lo ve derivado. Es la separación de funciones (SoD) canónica del dominio: **HR fija ≠ contractor cobra ≠ Finance paga**. Tres superficies + un guardrail fail-closed lo enforzan; el mockup aprobado (`src/views/greenhouse/contractors/mockup/ContractorCompensationMockupView.tsx`) es la referencia visual vinculante.
+
+**Las 3 superficies canónicas**:
+
+| Superficie | Quién | Qué hace |
+| --- | --- | --- |
+| Admin compensation editor (`ContractorEngagementCompensationDrawer` + `CompensationPanel` en el workbench) | HR/Finance/admin (`hr.contractor_engagement:update`) | Fija `rateType`/`rateAmount`/`paymentCadence` vía `PATCH /api/hr/contractors/[id]` action `update`. **Moneda read-only** (se define al crear el engagement). |
+| Contractor self-service (`ContractorSubmissionComposer` + `ContractorSelfServiceView`) | Contractor (own) | Ve el monto **derivado read-only** (`agreedRate`); NO existe campo libre de bruto. El bruto se deriva del rate acordado (fixed → rate; timesheet → qty × rate). Sin rate → submit deshabilitado + warning "contacta a HR". |
+| Finance guardrail (`ContractorGuardrailPanel` en el inspector) | Finance admin (`finance.contractor_payable.override_agreed_amount`) | Lista payables bloqueados por exceder lo acordado + autoriza override gobernado (reason ≥10, auditado). |
+
+**Guardrail fail-closed** (`evaluatePayableReadiness`, gate `payment_exceeds_agreed_amount`):
+
+- Flag `CONTRACTOR_AGREED_AMOUNT_GUARDRAIL_ENABLED` (default OFF → parity bit-for-bit). ON: un payable cuyo `gross > agreedAmount` (tolerancia 0.01) se bloquea salvo override.
+- **Solo aplica a rate types de PERÍODO** (`fixed`/`retainer`/`milestone`/`project` — `PERIOD_AGREED_RATE_TYPES`). Unit-rate (`hourly`/`daily`) = no-op (qty × rate excede legítimamente el rate unitario; comparar un solo gross contra un rate por-unidad no tiene sentido → `agreedAmount=null`).
+- Override: `agreed_amount_override_reason` en el payable (espejo del waiver `payment_profile_waiver_reason` TASK-793); actor + timestamp viven en `contractor_payable_events` (append-only). Helper `overridePayableAgreedAmount` + endpoint `POST /api/finance/contractor-payables/[id]/override-agreed-amount`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** permitir que el contractor defina/tipee/edite su monto acordado. Se fija SOLO desde admin (`hr.contractor_engagement:update`). El composer del contractor NO tiene campo libre de bruto — lo deriva read-only del rate acordado. Cualquier UI nueva contractor-facing que muestre el monto lo muestra read-only.
+- **NUNCA** otorgar la capability de override (`finance.contractor_payable.override_agreed_amount`) al mismo rol/persona que fija el monto. Es maker-checker: capability **distinta** de `hr.contractor_engagement` (HR fija; Finance no lo supera sin override). Admin-only (FINANCE_ADMIN + EFEONCE_ADMIN).
+- **NUNCA** aplicar el guardrail a un rate type unit-rate (`hourly`/`daily`) — `agreedAmount` resuelve a `null` para esos → gate no-op. Solo `PERIOD_AGREED_RATE_TYPES` carga un monto comparable.
+- **NUNCA** quitar el flag `CONTRACTOR_AGREED_AMOUNT_GUARDRAIL_ENABLED` ni cambiar su default OFF sin staging shadow-compare verde + sign-off Finance. OFF = `assessPayableReadiness` no evalúa el gate (parity pre-TASK-968).
+- **NUNCA** mutar `agreed_amount_override_reason` por SQL directo. Toda autorización pasa por `overridePayableAgreedAmount` (reason ≥10, audit append-only en `contractor_payable_events`).
+- **NUNCA** derivar/recomputar el monto del período en la UI del contractor o en un consumer — el bruto derivado lo computa el composer desde `agreedRate` (fixed → rate; timesheet → qty × rate); la projection (`self-service-scenario.ts`) expone `agreedRate` read-only.
+- **NUNCA** invocar `Sentry.captureException` directo en estos paths. Usar `captureWithDomain(err, 'finance' | 'identity', ...)`.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` como gate de cierre al tocar este dominio (boundary EPIC-013/TASK-957: no romper finiquito ni nómina legacy).
+- **SIEMPRE** que emerja un mecanismo nuevo de pago contractor que pueda exceder lo acordado, pasarlo por `evaluatePayableReadiness` (el gate corre ahí). Cero comparación inline en consumers.
+
+**Reliability signals** (steady=0): `hr.contractor_engagement.rate_unset` (data_quality, moduleKey identity, warning>0 — engagements activos sin `rate_amount`, detecta "falta fijar el monto") + `finance.contractor_payable.exceeds_agreed_amount` (drift, moduleKey finance, warning>0 — payables bloqueados por el guardrail sin override).
+
+**Spec canónica**: `docs/tasks/complete/TASK-968-contractor-engagement-compensation-setup-agreed-amount-guardrail.md`. Migración: `20260531160513123`. Mockup aprobado: `src/views/greenhouse/contractors/mockup/`. Patrones fuente: TASK-790 (engagement rate fields), TASK-793 (waiver/override + readiness fail-closed), TASK-796 (self-service projection + composer), TASK-758 (presenter read-only), TASK-873/935 (capability grant coverage + SoD distinct capability).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

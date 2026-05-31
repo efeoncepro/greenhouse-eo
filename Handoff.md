@@ -1,3 +1,19 @@
+# Sesion 2026-05-31 — TASK-968 Contractor Compensation Setup + Agreed-Amount Guardrail — ✅ SHIPPED
+
+**Rama**: `develop` (no branch, per instrucción del operador). 4 slices commiteados: `25f7d2ec` (S1 editor admin), `8e3eb5f5` (S2 bruto derivado), `21655075` (S3 guardrail), `380a2e7e` (S4 signals) + commit de docs/cierre.
+
+Cerró el gap "¿dónde se setea el monto acordado del contractor?" con SoD dura **HR fija ≠ contractor cobra ≠ Finance paga**:
+- **S1** editor admin (`ContractorEngagementCompensationDrawer` + `CompensationPanel`, moneda read-only) + engagements sin rate alcanzables (`missingRate` / "Falta compensación").
+- **S2** composer del contractor SIN campo libre de bruto → derivado read-only del rate; self-service muestra "Monto acordado" read-only.
+- **S3** guardrail fail-closed `payment_exceeds_agreed_amount` (flag `CONTRACTOR_AGREED_AMOUNT_GUARDRAIL_ENABLED` default OFF; solo rate types de período) + migración `agreed_amount_override_reason` (`20260531160513123`) + capability `finance.contractor_payable.override_agreed_amount` (admin-only, distinta de HR) + endpoint override + `ContractorGuardrailPanel`.
+- **S4** signals `hr.contractor_engagement.rate_unset` (identity) + `finance.contractor_payable.exceeds_agreed_amount` (finance); smoke live `rate_unset = warning 1` (Valentina `EO-CENG-0001`).
+
+**Boundary duro (TASK-957/EPIC-013)**: cero cambios a payroll engine / `payroll_entries` / `contract_type` / finiquito. Gates: `pnpm test` 5678/0 · `pnpm vitest run src/lib/payroll` verde · tsc/eslint 0. **`pnpm build`**: el primer run local falló por un módulo **untracked de EPIC-017** (`WorkforceReadinessMockupView` de la sesión concurrente People Workforce, creado mid-build) — NO de TASK-968 (mis archivos pasan tsc limpio + mis commits no incluyen esos untracked; Vercel construirá mi SHA sin ellos). Re-verificación de build en curso. **Valentina queda con `rate_amount=null` a propósito** — el operador fija los $600k mensuales vía la UI (`/hr/contractors` → seleccionar engagement → panel Compensación → Definir compensación). Mockup aprobado vinculante en `src/views/greenhouse/contractors/mockup/`. **No pusheado** (esperando instrucción del operador).
+
+Pendiente operador: (1) fijar el monto de Valentina vía UI; (2) push a `develop` cuando lo indique.
+
+---
+
 # Sesion 2026-05-31 — EPIC-017 M02 People Workforce Command Center — ✅ MOCKUP APROBADO
 
 **Rama**: `develop`. Scope docs + mockup refinements locales; no runtime productivo, DB, migraciones, API ni lifecycle moves.

@@ -95,6 +95,18 @@ El contractor pagado ahora recibe un **Comprobante de Pago / Remittance Advice**
 
 Invariantes duros en `CLAUDE.md` → "Contractor Remittance Advice invariants (TASK-960)". Spec: `docs/tasks/complete/TASK-960-contractor-remittance-advice.md`.
 
+## Delta 2026-05-31 — TASK-968 Contractor Agreed-Amount Setup + SoD + Guardrail shipped
+
+Cierra el gap "¿dónde se setea el monto acordado del contractor?": los campos `contractor_engagements.rate_amount`/`rate_type`/`payment_cadence` existían (TASK-790) + el PATCH `update`, pero NO había UI para fijarlos (Valentina `EO-CENG-0001` quedó con `rate_amount=null`). Ahora el monto se fija desde admin con **separación de funciones (SoD)** dura: **HR fija ≠ contractor cobra ≠ Finance paga**.
+
+- **3 superficies (mockup aprobado vinculante):** (A) **Admin compensation editor** — `ContractorEngagementCompensationDrawer` + `CompensationPanel` en el workbench; HR fija `rateType`/`rateAmount`/`paymentCadence` vía `PATCH /api/hr/contractors/[id]` action `update` (capability `hr.contractor_engagement:update`); **moneda read-only** (se define al crear el engagement). (B) **Contractor self-service** — `ContractorSubmissionComposer` ya NO tiene campo libre de bruto; lo **deriva read-only** del rate acordado (fixed → rate; timesheet → qty × rate); sin rate → submit deshabilitado + warning. `ContractorSelfServiceView` muestra "Monto acordado" read-only. (C) **Finance guardrail** — `ContractorGuardrailPanel` lista payables bloqueados por exceder lo acordado + autoriza override.
+- **Guardrail fail-closed (`evaluatePayableReadiness`, gate `payment_exceeds_agreed_amount`):** flag `CONTRACTOR_AGREED_AMOUNT_GUARDRAIL_ENABLED` (default OFF → parity bit-for-bit). ON: payable con `gross > agreedAmount` (tolerancia 0.01) se bloquea salvo override. **Solo rate types de período** (`fixed`/`retainer`/`milestone`/`project` — `PERIOD_AGREED_RATE_TYPES`); unit-rate (`hourly`/`daily`) = no-op (`agreedAmount=null`, porque qty × rate excede legítimamente el rate por-unidad).
+- **Override gobernado (maker-checker, SoD):** capability `finance.contractor_payable.override_agreed_amount` (admin-only, **distinta** de la HR que fija el monto) + columna `agreed_amount_override_reason` (espejo del waiver TASK-793; actor+timestamp en `contractor_payable_events` append-only) + helper `overridePayableAgreedAmount` + endpoint `POST /api/finance/contractor-payables/[id]/override-agreed-amount`. Migración additive `20260531160513123`.
+- **2 reliability signals (steady=0):** `hr.contractor_engagement.rate_unset` (data_quality, identity, warning>0 — engagements activos sin `rate_amount`; detecta el gap "falta fijar el monto", verificado live = Valentina) + `finance.contractor_payable.exceeds_agreed_amount` (drift, finance, warning>0 — payables bloqueados sin override).
+- **Boundary (TASK-957/EPIC-013):** cero cambios a payroll engine / `payroll_entries` / `contract_type` / finiquito; `pnpm vitest run src/lib/payroll` verde como gate de cierre.
+
+Invariantes duros en `CLAUDE.md` → "Contractor Agreed-Amount SoD + Guardrail invariants (TASK-968)". Spec: `docs/tasks/complete/TASK-968-contractor-engagement-compensation-setup-agreed-amount-guardrail.md`.
+
 ## Delta 2026-05-30 — TASK-794 Chile Honorarios Compliance + SII Retention shipped
 
 La capa de compliance Chile honorarios sobre Contractor Engagements + Payables está implementada. **No toca el motor de nómina legacy** (`src/lib/payroll/calculate-honorarios.ts`, `SII_RETENTION_RATES`) — cero cambio de números payroll (suite `src/lib/payroll` verde, 602 tests). **Sin migración**: el schema existente (`contractor_payables.readiness_json` / `source_snapshot_json`, `contractor_engagements.classification_risk_status` + `tax_withholding_*`) soporta todo el alcance.

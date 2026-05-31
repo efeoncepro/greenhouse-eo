@@ -1,18 +1,29 @@
 # TASK-968 — Contractor Engagement Compensation Setup + Agreed-Amount Guardrail
 
+## Delta 2026-05-31 — SHIPPED (4 slices)
+
+Implementado en `develop` (no branch, per instrucción del operador). SoD dura: **HR fija ≠ contractor cobra ≠ Finance paga**.
+
+- **Slice 1** (`25f7d2ec`) — Admin compensation editor: `ContractorEngagementCompensationDrawer` + `CompensationPanel` en el workbench; engagements sin rate alcanzables vía filtro `missingRate` + status "Falta compensación"; moneda read-only. `compensation-display.ts` + copy `GH_CONTRACTOR_COMPENSATION`.
+- **Slice 2** (`8e3eb5f5`) — Contractor deriva el bruto: removido el campo libre "Monto bruto" del composer; bruto derivado read-only del rate (fixed → rate; timesheet → qty × rate); self-service muestra "Monto acordado" read-only; projection expone `agreedRate`.
+- **Slice 3** (`21655075`) — Guardrail fail-closed: gate `payment_exceeds_agreed_amount` (flag `CONTRACTOR_AGREED_AMOUNT_GUARDRAIL_ENABLED` default OFF; solo `PERIOD_AGREED_RATE_TYPES`); migración additive `agreed_amount_override_reason` (`20260531160513123`); capability `finance.contractor_payable.override_agreed_amount` (admin-only, SoD); endpoint `POST /api/finance/contractor-payables/[id]/override-agreed-amount` + helper `overridePayableAgreedAmount`; UI `ContractorGuardrailPanel` (panel + dialog override); 6 tests focales.
+- **Slice 4** (`380a2e7e`) — 2 reliability signals: `hr.contractor_engagement.rate_unset` (identity, data_quality) + `finance.contractor_payable.exceeds_agreed_amount` (finance, drift); smoke live verde (rate_unset = warning 1, Valentina `EO-CENG-0001`).
+
+Gates de cierre: `pnpm test` full (5678 passed) + `pnpm build` + `pnpm vitest run src/lib/payroll` (no-regresión EPIC-013/TASK-957). Valentina queda con `rate_amount=null` a propósito (el operador fija los $600k vía la UI). Invariantes: `CLAUDE.md` → "Contractor Agreed-Amount SoD + Guardrail invariants (TASK-968)". Arch Delta: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`. Docs: `docs/documentation/hr/contratistas-compensacion.md` + manual `docs/manual-de-uso/hr/contratistas.md`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `Shipped`
 - Rank: `TBD`
 - Domain: `hr|finance|ui`
 - Blocked by: `none`
