@@ -95,6 +95,7 @@ const payable = (overrides: Partial<ContractorPayable> = {}): ContractorPayable 
   payrollVia: 'internal',
   paymentProfileId: 'pp-1',
   paymentProfileWaiverReason: null,
+  agreedAmountOverrideReason: null,
   dueDate: null,
   status: 'ready_for_finance',
   financeObligationId: null,

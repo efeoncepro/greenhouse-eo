@@ -5970,6 +5970,7 @@ export interface GreenhouseHrContractorPayableEvents {
 }
 
 export interface GreenhouseHrContractorPayables {
+  agreed_amount_override_reason: string | null;
   beneficiary_id: string;
   beneficiary_type: string;
   contractor_engagement_id: string;

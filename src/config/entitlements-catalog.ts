@@ -204,6 +204,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-968 — override gobernado del guardrail de monto acordado. Admin-only:
+    // permite pasar el gate `payment_exceeds_agreed_amount` cuando el bruto supera
+    // el monto acordado fijado por HR. SoD: distinta de la capability HR que fija
+    // el monto (hr.contractor_engagement) — HR fija, Finance no lo supera sin override.
+    key: 'finance.contractor_payable.override_agreed_amount',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-030 — plantillas reutilizables de checklist HRIS.
     key: 'hr.onboarding_template',
     module: 'hr',

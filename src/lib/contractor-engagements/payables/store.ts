@@ -20,6 +20,7 @@ import { ContractorEngagementValidationError } from '../errors'
 import { listContractorInvoiceAssetsByEngagement } from '../invoice-assets'
 import { getContractorEngagementById } from '../store'
 
+import { isContractorAgreedAmountGuardrailEnabled } from './agreed-amount-guardrail-flag'
 import { evaluatePayableReadiness } from './readiness'
 import type { PayableReadinessInputs, PayableReadinessResult } from './readiness'
 import { assertValidPayableTransition, isTerminalPayableStatus } from './state-machine'
@@ -33,6 +34,14 @@ import type {
 
 const PROVIDER_OWNED_PAYROLL_VIA = new Set(['deel', 'remote', 'oyster'])
 const FINANCE_CURRENCIES = new Set(['CLP', 'USD'])
+
+/**
+ * TASK-968 — rate types whose `rate_amount` is a PERIOD/lump total the gross can be
+ * compared against (the agreed-amount guardrail applies). Unit-rate types (`hourly`,
+ * `daily`) are excluded: a period gross is qty × rate, which legitimately exceeds the
+ * unit rate, so a single comparison is meaningless → guardrail no-op for those.
+ */
+const PERIOD_AGREED_RATE_TYPES = new Set(['fixed', 'retainer', 'milestone', 'project'])
 
 interface ContractorPayableRow {
   contractor_payable_id: string
@@ -55,6 +64,7 @@ interface ContractorPayableRow {
   payroll_via: string
   payment_profile_id: string | null
   payment_profile_waiver_reason: string | null
+  agreed_amount_override_reason: string | null
   due_date: string | Date | null
   status: string
   finance_obligation_id: string | null
@@ -108,6 +118,7 @@ export const mapContractorPayable = (row: ContractorPayableRow): ContractorPayab
   payrollVia: row.payroll_via,
   paymentProfileId: row.payment_profile_id,
   paymentProfileWaiverReason: row.payment_profile_waiver_reason,
+  agreedAmountOverrideReason: row.agreed_amount_override_reason,
   dueDate: toDateString(row.due_date),
   status: row.status as ContractorPayableStatus,
   financeObligationId: row.finance_obligation_id,
@@ -124,7 +135,8 @@ export const PAYABLE_SELECT_COLUMNS = `
   contractor_invoice_id, payable_source_kind, beneficiary_type, beneficiary_id, gross_amount,
   withholding_amount, net_payable, currency, payment_currency, fx_policy_code,
   tax_compliance_owner, tax_withholding_policy_code, economic_category, payroll_via,
-  payment_profile_id, payment_profile_waiver_reason, due_date, status, finance_obligation_id,
+  payment_profile_id, payment_profile_waiver_reason, agreed_amount_override_reason,
+  due_date, status, finance_obligation_id,
   payment_order_id, readiness_json, source_snapshot_json, created_by_user_id, created_at, updated_at
 `
 
@@ -706,7 +718,15 @@ export const assessPayableReadiness = async (
     taxOwnerReviewRequired,
     taxOwnerDetail: taxOwnerReviewRequired ? engagement.taxComplianceOwner : null,
     // TASK-795 Fase A — cross-currency must declare an explicit FX policy.
-    fxPolicyDeclared: (payable.fxPolicyCode ?? engagement.fxPolicyCode) !== null
+    fxPolicyDeclared: (payable.fxPolicyCode ?? engagement.fxPolicyCode) !== null,
+    // TASK-968 — agreed-amount guardrail. Only meaningful when the engagement
+    // declares a period agreed amount (not a unit rate). Override lives on the payable.
+    agreedAmountGuardrailEnabled: isContractorAgreedAmountGuardrailEnabled(),
+    agreedAmount:
+      PERIOD_AGREED_RATE_TYPES.has(engagement.rateType) && engagement.rateAmount !== null
+        ? engagement.rateAmount
+        : null,
+    agreedAmountOverridden: payable.agreedAmountOverrideReason !== null
   }
 
   return evaluatePayableReadiness(readinessInputs)
@@ -872,6 +892,58 @@ export const waivePayablePaymentProfile = async (input: {
       actorUserId: input.actorUserId,
       reason: input.reason.trim(),
       metadata: { paymentProfileWaiver: true }
+    })
+
+    return updated
+  })
+
+/**
+ * TASK-968 — Governed override of the agreed-amount guardrail (capability-gated
+ * upstream: `finance.contractor_payable.override_agreed_amount`, admin-only).
+ * Maker-checker: the actor here MUST differ from whoever SET the engagement amount
+ * (SoD enforced at the capability layer — distinct HR vs Finance capabilities).
+ * The reason lives on the payable; actor + timestamp live in the append-only audit.
+ */
+export const overridePayableAgreedAmount = async (input: {
+  contractorPayableId: string
+  reason: string
+  actorUserId: string
+}): Promise<ContractorPayable> =>
+  withGreenhousePostgresTransaction(async (client) => {
+    if ((input.reason ?? '').trim().length < 10) {
+      throw new ContractorEngagementValidationError(
+        'El motivo del override es obligatorio (mínimo 10 caracteres).',
+        'agreed_amount_override_reason_required',
+        400
+      )
+    }
+
+    const current = await lockPayable(client, input.contractorPayableId)
+
+    if (isTerminalPayableStatus(current.status)) {
+      throw new ContractorEngagementValidationError(
+        'No se puede aplicar override a un payable terminal.',
+        'payable_terminal',
+        409
+      )
+    }
+
+    const result = await client.query<ContractorPayableRow>(
+      `UPDATE greenhouse_hr.contractor_payables
+       SET agreed_amount_override_reason = $2
+       WHERE contractor_payable_id = $1
+       RETURNING ${PAYABLE_SELECT_COLUMNS}`,
+      [input.contractorPayableId, input.reason.trim()]
+    )
+
+    const updated = mapContractorPayable(result.rows[0])
+
+    await appendPayableEvent(client, {
+      contractorPayableId: updated.contractorPayableId,
+      eventType: 'updated',
+      actorUserId: input.actorUserId,
+      reason: input.reason.trim(),
+      metadata: { agreedAmountOverride: true }
     })
 
     return updated

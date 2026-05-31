@@ -40,5 +40,24 @@ export const GH_CONTRACTOR_COMPENSATION = {
     missingTitle: 'Aún no tienes monto acordado',
     missingDescription:
       'Tu engagement aún no tiene monto acordado definido. Contacta a HR para habilitar tus envíos.'
+  },
+  guardrail: {
+    panelTitle: 'Guardrail del monto acordado',
+    panelSubheader: 'Bloquea pagar por encima de lo acordado. La excepción se autoriza y queda auditada.',
+    breachTitle: 'Excede el monto acordado',
+    okTitle: 'Sin payables bloqueados por monto',
+    okDescription: 'Ningún payable de este engagement supera el monto acordado.',
+    authorizeCta: 'Autorizar excepción',
+    overrideTitle: 'Autorizar excepción de pago',
+    overrideIntro:
+      'Vas a autorizar un pago por encima del monto acordado. Requiere una firma distinta a quien fijó el monto (SoD) y queda registrado.',
+    reasonLabel: 'Motivo de la excepción',
+    reasonPlaceholder: 'Ej. bono por entrega extraordinaria aprobado por…',
+    reasonHelper: 'Mínimo 10 caracteres.',
+    confirm: 'Autorizar excepción',
+    confirming: 'Autorizando…',
+    cancel: 'Cancelar',
+    overrideError: 'No pudimos autorizar la excepción. Intenta de nuevo.',
+    overrodeNote: 'Excepción autorizada y registrada (auditada).'
   }
 } as const

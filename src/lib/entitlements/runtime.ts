@@ -572,6 +572,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+
+    // TASK-968 — agreed-amount guardrail override (admin-only, SoD vs HR set-amount).
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.contractor_payable.override_agreed_amount',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   // TASK-874 — Workforce Activation readiness.

@@ -22,7 +22,10 @@ const ready: PayableReadinessInputs = {
   rutVerified: true,
   honorariosWithholdingConsistent: true,
   taxOwnerReviewRequired: false,
-  fxPolicyDeclared: true
+  fxPolicyDeclared: true,
+  agreedAmountGuardrailEnabled: false,
+  agreedAmount: null,
+  agreedAmountOverridden: false
 }
 
 const honorariosReady: PayableReadinessInputs = {
@@ -226,5 +229,81 @@ describe('contractor payable readiness — explicit FX policy (TASK-795 Fase A)'
     })
 
     expect(r.ready).toBe(true)
+  })
+})
+
+describe('contractor payable readiness — agreed-amount guardrail (TASK-968)', () => {
+  // Keep net reconciliation valid (net = gross − withholding) so only the
+  // guardrail gate is under test, not `net_mismatch`.
+  const withGross = (grossAmount: number): PayableReadinessInputs => ({
+    ...ready,
+    grossAmount,
+    withholdingAmount: 0,
+    netPayable: grossAmount
+  })
+
+  it('no-op when the guardrail flag is OFF, even if gross exceeds the agreed amount', () => {
+    const r = evaluatePayableReadiness({
+      ...withGross(800_000),
+      agreedAmountGuardrailEnabled: false,
+      agreedAmount: 600_000
+    })
+
+    expect(r.ready).toBe(true)
+    expect(r.blockers.map(b => b.code)).not.toContain('payment_exceeds_agreed_amount')
+  })
+
+  it('no-op when agreedAmount is null (unit-rate engagement / amount not set)', () => {
+    const r = evaluatePayableReadiness({
+      ...withGross(800_000),
+      agreedAmountGuardrailEnabled: true,
+      agreedAmount: null
+    })
+
+    expect(r.ready).toBe(true)
+    expect(r.blockers.map(b => b.code)).not.toContain('payment_exceeds_agreed_amount')
+  })
+
+  it('blocks when gross exceeds the agreed amount and the flag is ON', () => {
+    const r = evaluatePayableReadiness({
+      ...withGross(800_000),
+      agreedAmountGuardrailEnabled: true,
+      agreedAmount: 600_000
+    })
+
+    expect(r.ready).toBe(false)
+    expect(r.blockers.map(b => b.code)).toContain('payment_exceeds_agreed_amount')
+  })
+
+  it('passes when gross equals the agreed amount (within rounding tolerance)', () => {
+    const r = evaluatePayableReadiness({
+      ...withGross(600_000),
+      agreedAmountGuardrailEnabled: true,
+      agreedAmount: 600_000
+    })
+
+    expect(r.ready).toBe(true)
+  })
+
+  it('passes when gross is below the agreed amount', () => {
+    const r = evaluatePayableReadiness({
+      ...withGross(500_000),
+      agreedAmountGuardrailEnabled: true,
+      agreedAmount: 600_000
+    })
+
+    expect(r.ready).toBe(true)
+  })
+
+  it('a governed override lets a payment exceed the agreed amount', () => {
+    const r = evaluatePayableReadiness({
+      ...withGross(800_000),
+      agreedAmountGuardrailEnabled: true,
+      agreedAmount: 600_000,
+      agreedAmountOverridden: true
+    })
+
+    expect(r.ready).toBe(true)
+    expect(r.blockers.map(b => b.code)).not.toContain('payment_exceeds_agreed_amount')
   })
 })

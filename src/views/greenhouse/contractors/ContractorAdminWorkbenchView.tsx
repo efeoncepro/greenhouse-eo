@@ -33,6 +33,7 @@ import type {
 
 import AdminReviewDecisionDrawer, { type ReviewDecision } from './AdminReviewDecisionDrawer'
 import ContractorEngagementCompensationDrawer from './ContractorEngagementCompensationDrawer'
+import ContractorGuardrailPanel from './ContractorGuardrailPanel'
 
 const toneToColor: Record<ContractorTone, 'success' | 'warning' | 'error' | 'info' | 'secondary'> = {
   success: 'success',
@@ -552,6 +553,7 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
             {selected ? (
               <>
                 <CompensationPanel row={selected} onEdit={() => setCompDrawerOpen(true)} />
+                <ContractorGuardrailPanel row={selected} onResolved={() => void refetch()} />
                 <AdminInspector row={selected} onReview={() => openReview('approve')} />
               </>
             ) : (

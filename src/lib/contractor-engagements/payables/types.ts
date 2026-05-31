@@ -53,6 +53,8 @@ export interface ContractorPayable {
   payrollVia: string
   paymentProfileId: string | null
   paymentProfileWaiverReason: string | null
+  /** TASK-968 — governed override of the agreed-amount guardrail (Finance, admin-only). */
+  agreedAmountOverrideReason: string | null
   dueDate: string | null
   status: ContractorPayableStatus
   financeObligationId: string | null

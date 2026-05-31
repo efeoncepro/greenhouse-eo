@@ -30,6 +30,13 @@
  *   - explicit FX policy declared when cross-currency (`fx_policy_unresolved`).
  *     A cross-currency payout must declare WHICH FX policy governs the conversion
  *     (`engagement.fx_policy_code`), not just that a rate happens to exist. D-795-1.
+ *
+ * TASK-968 — Agreed-amount guardrail (fail-closed, flag-gated):
+ *   - the payable gross must not exceed the engagement's HR-set agreed amount
+ *     (`payment_exceeds_agreed_amount`). Only evaluated when the guardrail flag is
+ *     ON, the engagement declares a period agreed amount (fixed/retainer/milestone/
+ *     project — NOT a unit rate like hourly/daily), and no governed override is
+ *     present. SoD: HR fija ≠ contractor cobra ≠ Finance paga.
  */
 
 export const PAYABLE_READINESS_BLOCKER_CODES = [
@@ -46,7 +53,9 @@ export const PAYABLE_READINESS_BLOCKER_CODES = [
   'honorarios_withholding_mismatch',
   // TASK-795 Fase A — international contractor / provider boundary
   'tax_owner_review_required',
-  'fx_policy_unresolved'
+  'fx_policy_unresolved',
+  // TASK-968 — agreed-amount guardrail
+  'payment_exceeds_agreed_amount'
 ] as const
 export type PayableReadinessBlockerCode = (typeof PAYABLE_READINESS_BLOCKER_CODES)[number]
 
@@ -105,6 +114,17 @@ export interface PayableReadinessInputs {
    * be declared so the conversion is auditable, not incidental. D-795-1.
    */
   fxPolicyDeclared: boolean
+  // ── TASK-968 — agreed-amount guardrail ──────────────────────────────────────
+  /** The guardrail flag (`CONTRACTOR_AGREED_AMOUNT_GUARDRAIL_ENABLED`) is ON. */
+  agreedAmountGuardrailEnabled: boolean
+  /**
+   * The engagement's HR-set period agreed amount, or null when it does not apply
+   * (no amount set yet, OR a unit-rate engagement like hourly/daily where a single
+   * gross cannot be compared against a per-unit rate). When null the gate is a no-op.
+   */
+  agreedAmount: number | null
+  /** A governed override (`agreed_amount_override_reason`) is present on the payable. */
+  agreedAmountOverridden: boolean
 }
 
 export interface PayableReadinessResult {
@@ -222,6 +242,24 @@ export const evaluatePayableReadiness = (
     blockers.push({
       code: 'tax_owner_review_required',
       message: `El tratamiento tributario requiere revisión humana o un motor de retención aún no disponible${detail}; escala a revisión/withholding engine antes de pagar.`
+    })
+  }
+
+  // ── TASK-968 — agreed-amount guardrail ──────────────────────────────────────
+  // Block when the gross exceeds the HR-set agreed amount, unless a governed
+  // override is present. Flag-gated (default OFF) + only meaningful when the
+  // engagement declares a period amount (agreedAmount non-null). Tolerance 0.01
+  // absorbs rounding. SoD: HR fija el monto; Finance no lo supera sin override.
+  if (
+    inputs.agreedAmountGuardrailEnabled &&
+    inputs.agreedAmount !== null &&
+    !inputs.agreedAmountOverridden &&
+    Math.round(inputs.grossAmount * 100) / 100 > Math.round(inputs.agreedAmount * 100) / 100 + 0.01
+  ) {
+    blockers.push({
+      code: 'payment_exceeds_agreed_amount',
+      message:
+        'El monto bruto del payable supera el monto acordado del engagement (fijado por HR); requiere un override gobernado de Finance antes de pagar.'
     })
   }
 
