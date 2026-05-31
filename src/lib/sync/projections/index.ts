@@ -28,6 +28,7 @@ import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
 import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
 import { contractorPayableFinanceObligationProjection } from './contractor-payable-finance-obligation'
+import { contractorPayableExpenseMaterializeProjection } from './contractor-payable-expense-materialize'
 import { paymentObligationsFromPayrollProjection } from './payment-obligations-from-payroll'
 import { recordExpensePaymentFromOrderProjection } from './record-expense-payment-from-order'
 import { payrollReliquidationDeltaProjection } from './payroll-reliquidation-delta'
@@ -108,6 +109,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(financeExpenseReactiveIntakeProjection)
   registerProjection(paymentObligationsFromPayrollProjection)
 registerProjection(contractorPayableFinanceObligationProjection)
+registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(recordExpensePaymentFromOrderProjection)
   registerProjection(payrollReliquidationDeltaProjection)
   registerProjection(accountBalancesProjection)

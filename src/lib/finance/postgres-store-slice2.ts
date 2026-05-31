@@ -2296,7 +2296,8 @@ export const createFinanceExpenseInPostgres = async ({
   otherTaxesAmount,
   withholdingAmount,
   notes,
-  actorUserId
+  actorUserId,
+  contractorPayableId = null
 }: {
   expenseId: string
   clientId: string | null
@@ -2369,6 +2370,8 @@ export const createFinanceExpenseInPostgres = async ({
   withholdingAmount: number | null
   notes: string | null
   actorUserId: string | null
+  /** TASK-977 — FK-anchor for a contractor payable's expense (settlement lookup). */
+  contractorPayableId?: string | null
 }, opts?: { client?: PoolClient }) => {
   await assertFinanceSlice2PostgresReady()
 
@@ -2417,6 +2420,7 @@ export const createFinanceExpenseInPostgres = async ({
             receipt_date, purchase_type, vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
             dte_type_code, dte_folio, exempt_amount, other_taxes_amount, withholding_amount,
             notes, created_by_user_id, economic_category,
+            contractor_payable_id,
             created_at, updated_at
           )
           VALUES (
@@ -2439,6 +2443,7 @@ export const createFinanceExpenseInPostgres = async ({
             $60::date, $61, $62, $63, $64,
             $65, $66, $67, $68, $69,
             $70, $71, $72,
+            $73,
             CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
           )
           RETURNING *
@@ -2489,7 +2494,8 @@ export const createFinanceExpenseInPostgres = async ({
         directOverheadScope, directOverheadKind, directOverheadMemberId,
         receiptDate, purchaseType, vatUnrecoverableAmount, vatFixedAssetsAmount, vatCommonUseAmount,
         dteTypeCode, dteFolio, exemptAmount, otherTaxesAmount, withholdingAmount,
-        notes, actorUserId, economicCategoryResolution.category
+        notes, actorUserId, economicCategoryResolution.category,
+        contractorPayableId
       ],
       client
     )
