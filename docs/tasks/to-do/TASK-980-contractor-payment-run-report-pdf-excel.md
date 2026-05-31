@@ -133,9 +133,16 @@ Diseñado con `modern-ui` + `greenhouse-ux` + `greenhouse-finance-accounting-ope
 
 **`EfeoncePdfFooter`** institucional (ya construido): entidad · RUT + dirección (Dr. Manuel Barros Borgoño 71 Of 1105, Providencia, RM — Chile) + `efeoncepro.com` + generado · **página X de Y** (`fixed`). Reusa el footer canónico, no rollear uno propio.
 
-### F. Tipografía / tokens
+### F. Tipografía / tokens — ⚠️ DECISIÓN PENDIENTE (no asumir Geist)
 
-- Header: logo + eslogan Poppins. Títulos en Poppins; **cuerpo + montos en Geist** (tabular nums). Acento verde solo en el neto. Tokens canónicos `customBorderRadius`/`GH_COLORS`, sin hex crudo.
+Verificado 2026-05-31: el **web** usa Geist como body canónico (`layout.tsx` + `mergedTheme.ts` + DESIGN.md), PERO el **PDF hermano** — el **comprobante de contractor (TASK-960)** y los PDFs de payroll — usan **`Helvetica`** (builtin react-pdf), NO Geist. Solo el PDF de cotización (TASK-629) usa Geist vía `register-fonts`.
+
+→ El body del PDF de la nómina de contractors debe **decidirse, no asumirse**:
+
+- **Opción A (consistencia)**: **Helvetica**, igual que el comprobante hermano (TASK-960). Coherente hoy sin tocar otros PDFs.
+- **Opción B (canónico DESIGN.md)**: **Geist** — pero entonces **subir también el comprobante (TASK-960) a Geist** en el mismo PR para que el reporte y el comprobante no se vean distintos (no shippear el reporte en Geist mientras el comprobante queda en Helvetica).
+
+Recomendación: **Opción B** si se quiere alinear al canónico (mejor a largo plazo, una sola familia de documentos), tratando la migración del comprobante a Geist como parte del scope. **Opción A** si se prioriza no tocar TASK-960. En ambas: **títulos/eslogan en Poppins**, acento verde solo en el neto, montos con tabular nums, tokens `customBorderRadius`/`GH_COLORS` sin hex crudo. Decidir en Plan Mode con greenhouse-ux.
 
 ### G. Excel (espejo TASK-782)
 
