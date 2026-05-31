@@ -45,6 +45,7 @@ El concepto contablemente correcto y global es un **Remittance Advice** (aviso d
 - Que el documento sea **jurisdiction-neutral** en título y estructura: el desglose (retención SII / withholding internacional / 0 si lo maneja el provider) se resuelve por la política de retención y `taxComplianceOwner`, nunca por el nombre.
 - Que el documento **refuerce el límite no-laboral** (disclaimer explícito de prestación de servicios) y **referencie el documento tributario del propio contractor** (BHE/invoice).
 - Que **tanto el contractor (Self-Service Hub, TASK-796) como el admin/Finance (Admin Workbench)** puedan **verlo in-app (visor MUI) Y descargarlo en PDF** — ambas superficies, ambas acciones.
+- Que el documento sea **bilingüe (es-CL + en-US)** vía el i18n canónico de Greenhouse: el idioma se resuelve del **locale del contractor** (espejo de `src/lib/email/locale-resolver.ts` — el documento sigue al destinatario, no al viewer), con toggle es/en para el admin in-app. Montos/fechas/moneda formateados por locale (`src/lib/format/locale-context.ts`).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
