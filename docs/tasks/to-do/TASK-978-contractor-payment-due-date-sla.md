@@ -200,5 +200,23 @@ Confirmar con HR/Finanzas el ancla del cierre + el N de días (default 5) antes 
 
 ## Open Questions
 
-- ¿El ancla del cierre es `service_period_end` del payable o el cierre del mes operativo vigente? (Plan Mode + finance skill).
-- ¿N días hábiles o corridos? (compromiso "5 días posteriores al cierre" — confirmar con HR/Finanzas si son hábiles o corridos).
+- ~~¿El ancla del cierre es `service_period_end` del payable o el cierre del mes operativo vigente?~~ **RESUELTA** (ver Análisis pre-ejecución).
+- ~~¿N días hábiles o corridos?~~ **RESUELTA → días hábiles** (ver Análisis pre-ejecución).
+
+## Análisis pre-ejecución 2026-05-31 (3-skill: finance + payroll + arch) — ajustes verificados contra el código
+
+Verificado contra `src/lib/calendar/operational-calendar.ts`, `src/lib/contractor-engagements/payables/types.ts`, `src/lib/finance/payment-obligations/materialize-payroll.ts`, `src/lib/sync/projections/contractor-payable-finance-obligation.ts`, `src/lib/finance/pdf/sections/investment-timeline.tsx`:
+
+1. **OQ#2 RESUELTA → días HÁBILES (business days), no corridos.** Confirmado por la constante canónica `DEFAULT_OPERATIONAL_CLOSE_WINDOW_BUSINESS_DAYS = 5` + `isWithinPayrollCloseWindow` (cuenta business days) + el PDF `investment-timeline.tsx` ("Pagos los primeros 5 días **hábiles** del periodo correspondiente").
+
+2. **OQ#1 RESUELTA → ancla = cierre del mes operativo del payable.** El supuesto "anclar a `service_period_end` del payable" es **imposible**: el `contractor_payable` NO tiene columna `service_period_end` (solo `due_date`). Ancla canónica V1 = **último día hábil del mes operativo** del payable (`getLastBusinessDayOfMonth` vía `getOperationalPayrollMonth` de `created_at`); el path `createContractorPayableFromSubmission` puede pasar el período real del work submission si lo tiene. Agregar un `service_period` al payable es mejora de precisión futura (no V1).
+
+3. **AJUSTE — el helper "N-ésimo día hábil posterior" va en el calendario CANÓNICO, no contractor-local.** `operational-calendar.ts` tiene `countBusinessDays`/`getLastBusinessDayOfMonth` pero **NO** un `addBusinessDays(date, n)`. → Agregar `addBusinessDays`/`nthBusinessDayAfter` a `operational-calendar.ts` (SSOT, +tests con feriados). `resolveContractorPaymentDueDate` queda como wrapper delgado que compone `getLastBusinessDayOfMonth` (ancla) + el nuevo `addBusinessDays`. **Rationale cross-domain**: las obligaciones de **nómina hoy usan `dueDate: periodEnd`** (no cierre+5) — inconsistente con el compromiso de 5 días que aplica a colaboradores Y contractors; el helper SSOT permite que una task futura alinee nómina (eleva el Follow-up).
+
+4. **AJUSTE — reusar `DEFAULT_OPERATIONAL_CLOSE_WINDOW_BUSINESS_DAYS` (=5), NO crear `CONTRACTOR_PAYMENT_SLA_BUSINESS_DAYS`.** La constante ya existe; un config nuevo la duplica. Si se necesita override, env var que **defaultea a la constante canónica**.
+
+5. **INCORPORAR (finance/payroll) — distinguir el pago NETO del compromiso vs la remesa de retención.** El SLA mide el **pago NETO al contractor** (cierre + 5 hábiles). La **remesa de la retención SII** (honorarios CL, 15,25% 2026) es una **obligación DISTINTA** con su propio deadline **F29 (día 12 papel / 20 electrónico del mes siguiente)** — out of scope, pero la spec/doc debe flaggearlo explícitamente para que nadie confunda el SLA de pago al contractor con el deadline de remesa al SII. Es el punto "retención como pasivo a remesar": vence en otra fecha, a otro beneficiario.
+
+6. **AJUSTE del signal** — mide el `contractor_payable` comprometido (`ready_for_finance`+ y no `paid`) con `due_date < hoy`; severidad tiered por antigüedad. La obligación **hereda** el `due_date` del payable (el bridge ya pasa `dueDate: payable.dueDate`), así que medir el payable es la fuente correcta (la obligación es downstream).
+
+**Files owned actualizado**: helper de días hábiles en `src/lib/calendar/operational-calendar.ts` (canónico, +tests); `src/lib/contractor-engagements/payables/due-date.ts` como wrapper delgado del dominio. Sin `CONTRACTOR_PAYMENT_SLA_BUSINESS_DAYS` config nuevo.

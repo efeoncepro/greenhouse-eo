@@ -195,5 +195,25 @@ Confirmar con Finanzas el flujo operativo de la corrida mensual (quién la dispa
 
 ## Open Questions
 
-- ¿La corrida se dispara manual (Finanzas) o por schedule post-cierre? (Plan Mode + cron-sync-ops).
-- ¿Una orden por moneda/cuenta, o una por contractor? (Plan Mode + finance skill, respetando la regla V1 de moneda uniforme).
+- ~~¿La corrida se dispara manual (Finanzas) o por schedule post-cierre?~~ **RESUELTA → manual primero, schedule opcional detrás de flag** (ver Análisis pre-ejecución).
+- ~~¿Una orden por moneda/cuenta, o una por contractor?~~ **RESUELTA → por (moneda, cuenta origen, processor); NUNCA por contractor** (ver Análisis pre-ejecución).
+
+## Análisis pre-ejecución 2026-05-31 (3-skill: finance + payroll + arch 4-pillar) — ajustes verificados contra el código
+
+Verificado contra `src/lib/finance/payment-orders/`, `src/lib/finance/payment-obligations/create-obligation.ts`, `src/lib/sync/projections/contractor-payable-finance-obligation.ts`, `src/lib/ico-engine/materialize-tracking.ts` (patrón TASK-900):
+
+1. **OQ "manual o schedule" RESUELTA → manual primero (Finanzas), schedule opcional detrás de flag `CONTRACTOR_MONTHLY_RUN_ENABLED` (default OFF).** maker-checker + cron-lens favorecen human-initiated en V1; el schedule (Cloud Scheduler + ops-worker, NO Vercel cron, TASK-775) solo se activa post TASK-977 ON + staging validado. La corrida **prepara** órdenes en `draft`/`pending_approval` — la aprobación doble-firma + el mark-paid siguen humanos (SoD intacto).
+
+2. **OQ "agrupación" RESUELTA → una orden por (moneda, cuenta origen, processor); NUNCA por contractor.** El batching es el objetivo; agrupar por contractor lo anula. Respeta la regla V1 "no mezclar monedas en una orden" + reusa `createPaymentOrderFromObligations` (TASK-750).
+
+3. **AJUSTE de idempotencia (arch 4-pillar Robustness) — "reusar el index de obligaciones" NO alcanza.** El orquestador crea **órdenes**, no obligaciones; el partial unique index de obligaciones (TASK-793) no previene crear una 2da orden sobre las mismas obligaciones. **Idempotencia canónica: el barrido solo toma obligaciones `provider_payroll` del período NO ya ligadas a una orden no-cancelada** (filtro un-ordered). Esto hace el re-run safe sin tabla nueva.
+
+4. **INCORPORAR (arch — observabilidad + auditoría): tabla append-only `contractor_payment_run`** (período, status, triggered_by, prepared_order_ids[], counts, created_at) espejo de `ico_materialization_runs` (TASK-900). Da: (a) idempotencia explícita por período (no dos corridas del mismo mes pisándose), (b) auditoría ("¿quién corrió la de mayo y qué preparó?"), (c) observabilidad para el signal de cobertura. **Recomendado** (no estrictamente bloqueante si el filtro un-ordered es robusto, pero es el patrón canónico para un batch del que Finanzas depende mensualmente). Triggers anti-UPDATE/DELETE (append-only).
+
+5. **INCORPORAR (finance) — priorización por SLA (TASK-978).** La corrida debe ordenar/priorizar por el `due_date`/SLA de TASK-978 (pagar primero lo más vencido contra el compromiso de 5 días hábiles). Dependencia explícita: TASK-978 ship primero (es P1 + independiente).
+
+6. **AJUSTE del signal de cobertura** — payables `ready_for_finance` con obligación creada pero **NO** incluidos en ninguna orden no-cancelada, **pasada la ventana SLA** (cierre + 5 hábiles). Steady=0. Distinto del `ready_without_obligation` (TASK-793) que cubre el tramo anterior del pipeline.
+
+7. **Boundary confirmado (payroll skill)** — la corrida toca SOLO contractor payables (`labor_cost_external`); cero nómina/`contract_type`/finiquito. Gate de cierre: `pnpm vitest run src/lib/payroll` + `src/lib/finance/payment-orders` + `src/lib/contractor-engagements`. La **remesa de retención SII al SII (F29)** NO es parte de la corrida — es una obligación distinta (ver TASK-978 análisis); la corrida paga el NETO al contractor.
+
+**Files owned actualizado**: + `src/lib/contractor-engagements/payables/payment-run-store.ts` (tracking append-only) + migración de la tabla `contractor_payment_run` (si se incorpora el punto 4).
