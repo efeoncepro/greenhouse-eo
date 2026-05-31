@@ -98,6 +98,42 @@ export const getOperatingEntityIdentity = async (): Promise<OperatingEntityIdent
   return cachedOperatingEntity
 }
 
+/**
+ * Resolves the issuer identity (legal name, tax id, address, country) of a SPECIFIC
+ * organization by id — the Operating Entity that pays a contractor (TASK-960). Unlike
+ * `getOperatingEntityIdentity` this does NOT assume the singleton flag, so the
+ * remittance advice inherits multi-entity support for free (the issuer is the
+ * engagement's `legal_entity_organization_id`). Not cached (low-volume, per-document).
+ */
+export const getOrganizationIssuerIdentityById = async (
+  organizationId: string,
+  client?: QueryableClient
+): Promise<OperatingEntityIdentity | null> => {
+  const rows = await queryRows<OperatingEntityRow & { legal_name: string | null }>(
+    `SELECT organization_id,
+            COALESCE(NULLIF(legal_name, ''), organization_name) AS legal_name,
+            tax_id, tax_id_type, legal_address, country
+     FROM greenhouse_core.organizations
+     WHERE organization_id = $1 AND active = TRUE
+     LIMIT 1`,
+    [organizationId],
+    client
+  )
+
+  if (rows.length === 0) return null
+
+  const row = rows[0]
+
+  return {
+    organizationId: row.organization_id,
+    legalName: row.legal_name ?? '',
+    taxId: row.tax_id,
+    taxIdType: row.tax_id_type,
+    legalAddress: row.legal_address,
+    country: row.country
+  }
+}
+
 // ─── Find Organization by Tax ID ────────────────────────────────────────
 
 /**
