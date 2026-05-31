@@ -1,12 +1,30 @@
 # TASK-974 — Finance Contractor Payments Workbench
 
+## MOCKUP APROBADO 2026-05-31 — reglas duras (vinculante)
+
+El operador aprobó el mockup (Slice 0, commit del mockup en `develop`). El runtime DEBE basarse en él, no rediseñar. Referencia visual vinculante: `src/views/greenhouse/finance/contractor-payments/mockup/`. Ruta del mockup: `/finance/contractor-payments/mockup`.
+
+**Decisiones aprobadas (no cambiar sin re-aprobación):**
+
+- **Ruta runtime canónica**: `/finance/contractor-payments`, item nuevo en el submenú **Tesorería** (junto a `payment-orders` + `cash-out`). NO tab dentro de payment-orders ni cash-out (lifecycles distintos).
+- **Layout**: header (eyebrow TESORERÍA + título + 2 CTAs) → KPI row (4: Por preparar / Bloqueados / Listos para Finanzas / Pagados, con count + monto neto) → 2 columnas **`lg={8}/lg={4}`** (lista + detalle al lado a 1440, NO `xl`).
+- **Lista**: `DataTableShell` + filtro por estado. Columnas: Contractor, Origen, Bruto, Neto (bold), Vence, Estado (chip por `STATUS_TONE`), Acción.
+- **Detalle**: desglose **Bruto − Retención SII = Neto** (acento verde `#2E7D32` solo en el neto) + nota contable "el neto va al banco, la retención se remesa al SII por separado" (refleja TASK-977). Readiness panel con los 13 blockers + **responsable** (Finanzas/HR/Contractor). Acciones de gobernanza.
+- **Override reubicado**: aparece en el detalle del payable en **Finanzas** (no en el workbench HR), solo cuando el blocker es `payment_exceeds_agreed_amount`. El waiver aparece cuando es `payment_profile_unresolved`.
+- **Crear**: diálogo desde-envío (preview neto) + off-cycle (engagement + bruto + motivo ≥10 + preview neto).
+- **Copy**: `GH_FINANCE_CONTRACTOR_PAYMENTS` (`src/lib/copy/finance-payments.ts`) — tokenizado, es-CL.
+- **Microinteracciones**: entrada escalonada framer-motion + fade en cambio de selección, reduced-motion aware.
+- **Breakdown verbatim**: bruto/retención/neto se leen del payable, NUNCA se recalculan en runtime (la retención viene del snapshot del engagement, TASK-794).
+
+Cualquier desviación visual requiere update + re-aprobación del mockup ANTES de mergear (regla TASK-863).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Alto`
