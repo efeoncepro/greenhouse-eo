@@ -45,6 +45,7 @@ import { getContractorPayableReadyWithoutObligationSignal } from './queries/cont
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
 import { getContractorPayableTaxReviewOverdueSignal } from './queries/contractor-payable-tax-review-overdue'
 import { getContractorPayableFxUnresolvedOverdueSignal } from './queries/contractor-payable-fx-unresolved-overdue'
+import { getContractorPayableExceedsAgreedAmountSignal } from './queries/contractor-payable-exceeds-agreed-amount'
 import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
 import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
@@ -95,6 +96,7 @@ import { getContractorInvoiceAssetsBrokenEvidenceSignal } from './queries/contra
 import { getContractorWorkSubmissionReviewOverdueSignal } from './queries/contractor-work-submission-review-overdue'
 import { getContractorPayableHonorariosRutUnverifiedSignal } from './queries/contractor-payable-honorarios-rut-unverified'
 import { getContractorTransitionOrphanSignal } from './queries/contractor-transition-orphan'
+import { getContractorEngagementRateUnsetSignal } from './queries/contractor-engagement-rate-unset'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
@@ -571,6 +573,8 @@ interface ReliabilityOverviewSources {
   /** TASK-795 Fase A — international boundary block signals (tax review + FX). */
   contractorPayableTaxReviewOverdue?: ReliabilitySignal | null
   contractorPayableFxUnresolvedOverdue?: ReliabilitySignal | null
+  /** TASK-968 — payables blocked by the agreed-amount guardrail (no override). */
+  contractorPayableExceedsAgreedAmount?: ReliabilitySignal | null
 
   /**
    * TASK-777 Slice 3 — Expense distribution management-accounting gates.
@@ -888,6 +892,10 @@ export const buildReliabilityOverview = (
     ...(sources.contractorPayableTaxReviewOverdue ? [sources.contractorPayableTaxReviewOverdue] : []),
     ...(sources.contractorPayableFxUnresolvedOverdue
       ? [sources.contractorPayableFxUnresolvedOverdue]
+      : []),
+    // TASK-968 — payables blocked by the agreed-amount guardrail (no override).
+    ...(sources.contractorPayableExceedsAgreedAmount
+      ? [sources.contractorPayableExceedsAgreedAmount]
       : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
@@ -1284,6 +1292,12 @@ export const getReliabilityOverview = async (
       ? preloadedSources.contractorPayableFxUnresolvedOverdue
       : await getContractorPayableFxUnresolvedOverdueSignal().catch(() => null)
 
+  // TASK-968 — payables blocked by the agreed-amount guardrail (no override).
+  const contractorPayableExceedsAgreedAmount =
+    preloadedSources.contractorPayableExceedsAgreedAmount !== undefined
+      ? preloadedSources.contractorPayableExceedsAgreedAmount
+      : await getContractorPayableExceedsAgreedAmountSignal().catch(() => null)
+
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
       ? preloadedSources.expenseDistribution
@@ -1340,7 +1354,9 @@ export const getReliabilityOverview = async (
           getContractorPayableHonorariosRutUnverifiedSignal().catch(() => null),
           // TASK-956 — relaciones contractor por transición sin engagement
           // asociado (transición incompleta; defense-in-depth del comando atómico).
-          getContractorTransitionOrphanSignal().catch(() => null)
+          getContractorTransitionOrphanSignal().catch(() => null),
+          // TASK-968 — engagements contractor activos sin monto acordado fijado por HR.
+          getContractorEngagementRateUnsetSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
@@ -1706,6 +1722,7 @@ export const getReliabilityOverview = async (
     contractorPayableBridgeDeadLetter,
     contractorPayableTaxReviewOverdue,
     contractorPayableFxUnresolvedOverdue,
+    contractorPayableExceedsAgreedAmount,
     expenseDistribution,
     homeRolloutDrift,
     shortcutsInvalidPins,
