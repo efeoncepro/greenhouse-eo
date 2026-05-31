@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -320,3 +320,24 @@ Refinamiento de scope post-creación (operador):
 - Scope pasó de 3 a 4 slices: (1) allocator → (2) presenter → (3) PDF → (4) visor + endpoints + ambas superficies.
 - **Bilingüe (es-CL + en-US)** vía i18n canónico; el documento sigue el locale del contractor (pattern `email/locale-resolver`).
 - **Mockups plasmados y APROBADOS por el operador (2026-05-31)**: ruta TSX real `src/views/greenhouse/contractors/mockup/` + scenario GVC `remittance-advice`. Verificados via GVC local (5 frames, ambos locales + 4 regímenes) + loop de auditoría modern-ui (paleta colapsada a un solo acento: título neutro, chip neutro, disclaimer neutro, verde del neto único acento → documento legal sobrio). **La implementación cablea estos mockups, NO los rehace** — ver mapping en Detailed Spec + reglas duras "MOCKUP APROBADO" en Architecture Alignment.
+
+## Delta 2026-05-31 — COMPLETE (4 slices shipped en `develop`)
+
+Implementada end-to-end en `develop` (sin branch, por override del operador). Las 4 slices en orden estricto:
+
+- **Slice 1** — allocator `EO-RA-NNNNNN` gapless + atómico (advisory lock por issuer, mirror TASK-700) + idempotente por payable. Registry append-only `greenhouse_hr.remittance_advice_numbers` + SQL fn `allocate_remittance_advice_number(issuer, payable)` + CHECK shape + anti pre-up-marker guard (migración `20260531131226949`). TS wrapper `allocateRemittanceAdviceNumber` / `getRemittanceAdviceNumber` / `getRemittanceAdviceNumbersForPayables`. 6 tests. *Nota: no hay payables `paid` en dev → el E2E del allocator (secuencia/idempotencia contra FK real) se ejercita cuando exista un payable real o se seedee en staging; el patrón es mirror exacto de TASK-700 + CHECK + unit tests del wrapper.*
+- **Slice 2** — presenter PURO `buildRemittanceAdvice(input, locale)` (montos verbatim, cero recompute) + resolver server-only `resolveRemittanceAdvice` (issuer por id multi-entidad vía nuevo `getOrganizationIssuerIdentityById`, beneficiario tax masked TASK-784, locale `identity_profiles.preferred_locale`, gate `paid`, `engagementProfileId` anti-IDOR) + copy bilingüe `src/lib/copy/remittance.ts`. 7 tests (4 regímenes + degrade + bilingüe).
+- **Slice 3** — react-pdf `generate-contractor-remittance-pdf.tsx` (mismo struct, dirección visual aprobada, sin firma). **Verificado visualmente** con PDFs reales (es-CL + en-US + provider-managed). 5 tests. `REMITTANCE_TEMPLATE_VERSION='1'`.
+- **Slice 4** — `RemittanceAdviceViewer` promovido del mockup (JSX byte-idéntico, diff-verificado) + `RemittanceAdviceSection` (cards self / tabla admin + drawer) + 2 endpoints (`/api/my/contractor/remittance/[payableId]` own anti-IDOR 404 / `/api/hr/contractors/remittance/[payableId]` tenant `?locale`) + projecciones extendidas (`paidRemittances` / `remittances`). Section integrada en ambas vistas reales.
+
+**Open Questions resueltas pre-ejecución**: (1) **sin firma** del representante (el mockup aprobado la omite; un remittance advice no la requiere); (2) numeración `EO-RA-NNNNNN` ya resuelta en spec; (3) serie **scoped por `issuer_organization_id`** (V1 una entidad; multi-entidad hereda serie-por-entidad gratis). **FX V1 omitido** (honest degrade — el payable tiene `fxPolicyCode`, no la tasa aplicada) → follow-up.
+
+**Sin capability/outbox/reliability signal nuevos** (read-only; reusa `personal_workspace.contractor.read_self` + `hr.contractor_engagement`).
+
+**Gates**: `pnpm vitest run src/lib/contractor-engagements` 123 + `src/lib/payroll` 528 (no-regresión EPIC-013) · `pnpm test` full exit 0 · `pnpm build` ✓ (boundaries clean) · tsc 0 · lint 0. Skills: greenhouse-backend, greenhouse-finance-accounting-operator, greenhouse-ux-writing, greenhouse-dev.
+
+**Verificación visual**: PDF (artefacto legal de mayor riesgo) verificado en 3 variantes; viewer byte-idéntico al mockup GVC-aprobado. **Pendiente staging** (production verification sequence): emitir el comprobante de un payable `paid` real → verificar breakdown contra el payable + visor/PDF poblados + anti-IDOR (A no baja el de B). Review legal del disclaimer/naming antes de la primera emisión a un contratista real.
+
+**Cross-impact**: TASK-796 (hub) — projecciones extendidas aditivamente (`paidRemittances` / `remittances`), sin romper su contrato. TASK-797 (contractor closure) — no afectada. EPIC-017 (Person 360 Workforce) — sin acoplamiento (este documento vive en contractor/finance/self-service, no en People; TASK-961 podrá linkear comprobantes pagados a futuro sin generarlos).
+
+**Follow-ups**: Withholding Certificate anual (Certificado N°21 SII); línea FX informacional cuando se capture la tasa aplicada en el payable; cache GCS del PDF (hoy on-demand).

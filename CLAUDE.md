@@ -4520,6 +4520,37 @@ Una persona puede cobrar por **dos rieles de pago que no se hablan**: la nómina
 
 **Spec canónica**: `docs/tasks/complete/TASK-958-compensation-version-tuple-drift-remediation.md`. Script: `scripts/payroll/reconcile-compensation-version-tuple.ts` (dry-run default, `--apply`, `--include-historical`, assert payroll-neutral). Migración: `20260531105200124`. Señal: `payroll.deel_member_without_contract_id`.
 
+### Contractor Remittance Advice invariants (TASK-960, desde 2026-05-31)
+
+El **Comprobante de Pago / Remittance Advice** es una **proyección read-only del `ContractorPayable` pagado** (TASK-793) hacia el contractor — confirmación de pago de cuentas por pagar, jurisdiction-neutral, **NO laboral, NO documento tributario**. Módulo: `src/lib/contractor-engagements/remittance/`. Un solo `RemittancePresentation` struct alimenta dos renderers (visor MUI in-app + react-pdf descargable) → cero drift de contenido (patrón TASK-758). El struct shape ES el contrato (idéntico al mockup aprobado).
+
+**Numeración `EO-RA-NNNNNN`** — correlativa **gapless**, **atómica** (advisory lock por issuer, mirror TASK-700) y **persistida una sola vez por payable** (idempotente — re-emitir muestra el mismo número). Registry append-only `greenhouse_hr.remittance_advice_numbers` + SQL fn `allocate_remittance_advice_number(issuer, payable)`. Serie scoped por `issuer_organization_id` (Operating Entity) → V1 una entidad, multi-entidad hereda serie-por-entidad gratis. Asignación **lazy en la primera emisión** (view/download); el read path de las listas solo LEE números (`getRemittanceAdviceNumbersForPayables`, batched) — null hasta primera emisión. Un hueco en la serie = comprobante anulado = red flag de auditoría.
+
+**Helpers canónicos**:
+- `allocateRemittanceAdviceNumber({issuerOrganizationId, contractorPayableId, client?})` / `getRemittanceAdviceNumber(payableId)` / `getRemittanceAdviceNumbersForPayables(payableIds)` — `remittance-number-allocator.ts`.
+- `buildRemittanceAdvice(input, locale)` — PURE (`remittance-presenter.ts`). Mapea el data bag → struct; gross/withholding/net leídos **verbatim** del payable (cero recompute). Honest degrade para tax id / provider doc ausentes.
+- `resolveRemittanceAdvice(payableId, {localeOverride?})` — server-only (`remittance-resolver.ts`). Gate `status='paid'`, issuer por id, beneficiario (name + tax masked) + locale (`identity_profiles.preferred_locale`) + número idempotente; surface `engagementProfileId` para anti-IDOR.
+- `generateContractorRemittancePdf(presentation)` — react-pdf (`generate-contractor-remittance-pdf.tsx`, `REMITTANCE_TEMPLATE_VERSION`).
+- `RemittanceAdviceViewer` + `RemittanceAdviceSection` — `src/components/greenhouse/contractors/`.
+
+**Endpoints**: `GET /api/my/contractor/remittance/[payableId]` (own, anti-IDOR `engagementProfileId === session.identityProfileId`, 404 no 403) + `GET /api/hr/contractors/remittance/[payableId]` (tenant, `?locale` toggle). Ambos: JSON struct o `?format=pdf` (`?disposition=inline|attachment`). Capabilities reusadas: `personal_workspace.contractor.read_self` (own) + `hr.contractor_engagement` (tenant) — sin capability nueva.
+
+**⚠️ Reglas duras**:
+- **NUNCA** llamar al documento "liquidación", "recibo (de sueldo)" ni anclar el título a un régimen/jurisdicción (`honorarios`/`SII`/`Chile`). Canónico técnico `Remittance Advice`; label es-CL **"Comprobante de Pago"**. Título único global; solo el **breakdown** varía.
+- **NUNCA** recomputar montos en el presenter ni en consumers. Se leen verbatim del `ContractorPayable` (SSOT TASK-793/794). La retención SII 15.25% (2026) viene de `engagement.taxWithholdingRateSnapshot` (TASK-794), NUNCA recalculada.
+- **NUNCA** componer el número `EO-RA` en TS ni con `nextval` (no gapless). Toda allocación pasa por la SQL fn (advisory lock + idempotencia + CHECK shape). NUNCA reasignar/re-numerar un payable ya emitido.
+- **NUNCA** renderear el documento desde dos fuentes. Visor MUI + PDF consumen el **mismo struct** del presenter. NUNCA tocar la dirección visual aprobada (un solo acento verde `#2E7D32` en el neto, título neutro, chip neutro, disclaimer caja neutra, logo Efeonce única marca, **sin firma**).
+- **NUNCA** hardcodear el emisor ("Efeonce", RUT, domicilio). El issuer se resuelve desde `contractor_engagements.legal_entity_organization_id` → `getOrganizationIssuerIdentityById` (multi-entidad forward-compat).
+- **NUNCA** servir el comprobante al contractor sin re-validar `engagementProfileId === session.identityProfileId` server-side. Mismatch/unpaid/missing → `404` (anti-oracle, nunca leak de existencia). Finance-only fields nunca visibles al contractor.
+- **NUNCA** emitir para un payable no `paid`. El resolver gatea `status='paid'`.
+- **NUNCA** tratar el documento como comprobante tributario del contractor. Referencia su BHE/invoice (`contractorInvoiceId`, TASK-791) pero no lo reemplaza; footer lo declara explícito.
+- **NUNCA** invocar `Sentry.captureException` directo — usar `captureWithDomain(err, 'finance', { tags: { source: 'remittance_*' } })`.
+- **NUNCA** mutar/borrar filas de `remittance_advice_numbers` (append-only). Un hueco = comprobante anulado.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` como gate al tocar este dominio (EPIC-013 no-regresión).
+- **V1**: línea FX informacional omitida (el payable tiene `fxPolicyCode`, no la tasa aplicada → honest degrade, nunca inventa FX). Follow-up: poblar `fx` cuando se capture la tasa aplicada.
+
+**Spec canónica**: `docs/tasks/complete/TASK-960-contractor-remittance-advice.md`. Migración: `20260531131226949`. Doc funcional: `docs/documentation/hr/contratistas-comprobante-de-pago.md`. Manual: `docs/manual-de-uso/hr/contratistas-comprobante-de-pago.md`. Patrones fuente: TASK-758 (presenter struct → MUI + PDF), TASK-700 (allocator gapless atómico), TASK-796 (self-service hub + projection), TASK-784 (tax id masked), TASK-872 (anti-oracle 404).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

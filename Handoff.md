@@ -1,3 +1,28 @@
+# Sesion 2026-05-31 — TASK-960 Contractor Remittance Advice — ✅ COMPLETE
+
+**Rama**: `develop` (sin branch, por override del operador "mantente en develop"). 4 slices + docs, todo pusheado a `develop`.
+
+Cerrada **TASK-960 — Contractor Remittance Advice ("Comprobante de Pago")**: el contratista pagado recibe un comprobante de pago read-only del `ContractorPayable` (TASK-793), jurisdiction-neutral, NO laboral, NO documento tributario. Ver in-app + descargar PDF en ambas superficies (Self-Service Hub + Admin Workbench HR/Finance).
+
+- **Slice 1** — allocator `EO-RA-NNNNNN` gapless + atómico (advisory lock por issuer, mirror TASK-700) + idempotente por payable. Registry append-only `greenhouse_hr.remittance_advice_numbers` + SQL fn (migración `20260531131226949`). TS wrapper + batched reader. 6 tests. *(No live E2E del allocator: no hay payables `paid` en dev — FK impide synthetic; se ejercita cuando exista un payable real / staging.)*
+- **Slice 2** — presenter PURO `buildRemittanceAdvice(input, locale)` (montos verbatim, cero recompute; retención SII desde `taxWithholdingRateSnapshot`) + resolver server-only (issuer por id multi-entidad, beneficiario tax masked TASK-784, locale `identity_profiles.preferred_locale`, gate `paid`, surface `engagementProfileId` anti-IDOR) + copy bilingüe `src/lib/copy/remittance.ts`. 7 tests (4 regímenes + degrade + bilingüe).
+- **Slice 3** — react-pdf `generate-contractor-remittance-pdf.tsx` (mismo struct, dirección visual aprobada: un acento verde neto, título/chip/disclaimer neutros, logo única marca, sin firma). **Verificado visualmente** con PDFs reales (es-CL + en-US + provider-managed) vía Read PDF. 5 tests.
+- **Slice 4** — `RemittanceAdviceViewer` promovido del mockup (JSX byte-idéntico, diff-verificado) + `RemittanceAdviceSection` (cards self / tabla admin + drawer) + 2 endpoints (my own anti-IDOR 404 / hr tenant `?locale`) + projecciones extendidas (`paidRemittances` / `remittances`, números read-only batched). Section integrada en ambas vistas reales.
+
+**Sin capability/outbox/reliability signal nuevos** (read-only; reusa `personal_workspace.contractor.read_self` + `hr.contractor_engagement`).
+
+**Gates**: `pnpm vitest run src/lib/contractor-engagements` 123 + `src/lib/payroll` 528 (no-regresión EPIC-013) · `pnpm test` full exit 0 · `pnpm build` ✓ (Compiled successfully, boundaries clean) · tsc 0 · lint 0.
+
+**Skills invocadas**: greenhouse-backend, greenhouse-finance-accounting-operator, greenhouse-ux-writing, greenhouse-dev.
+
+**Verificación visual**: PDF (artefacto legal, el de mayor riesgo) verificado este sesión en 3 variantes; viewer byte-idéntico al mockup GVC-aprobado (TASK-960 mockup). **Pendiente staging** (production verification sequence de la spec): generar el comprobante de un payable `paid` real → confirmar breakdown contra el payable + visor/PDF poblados + anti-IDOR (contractor A no baja el de B). Hoy dev no tiene payables `paid`, así que la superficie poblada se valida cuando exista uno (o se seedee en staging). Review legal del disclaimer/naming antes de la primera emisión a un contratista real (es-CL formal-legal).
+
+**Decisiones (Open Questions resueltas pre-ejecución)**: (1) **sin firma** del representante — el mockup aprobado la omite y un remittance advice no la requiere; (2) numeración `EO-RA` ya resuelta en spec; (3) serie **scoped por issuer_organization_id** (V1 una entidad, multi-entidad gratis). **FX V1 omitido** (honest degrade: el payable tiene `fxPolicyCode`, no la tasa aplicada) → follow-up. **Out of scope**: Withholding Certificate anual (Certificado N°21) → follow-up.
+
+Spec: `complete/TASK-960-contractor-remittance-advice.md`. Docs: CLAUDE.md invariants + arch Delta `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1` (2026-05-31) + doc funcional + manual `hr/contratistas-comprobante-de-pago.md` + changelog + README.
+
+---
+
 # Sesion 2026-05-31 — EPIC-017 missing Deel-like lanes opened — ✅ DOCS-ONLY
 
 **Rama**: `develop`. Scope docs-only; no runtime, DB, UI, migration, API or lifecycle moves. Worktree had unrelated/in-progress TASK-960 remittance changes before this pass (`TASK-960` moved to in-progress + remittance code/migration); those were not touched.
