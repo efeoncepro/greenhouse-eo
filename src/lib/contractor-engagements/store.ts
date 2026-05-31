@@ -196,6 +196,10 @@ export const listContractorEngagementsByRelationship = async (
 export interface ListContractorEngagementsFilters {
   status?: ContractorEngagementStatus
   classificationRiskStatus?: ContractorEngagement['classificationRiskStatus']
+  /** Only engagements without an agreed rate (rate_amount IS NULL) — TASK-968. */
+  missingRate?: boolean
+  /** Exclude terminal engagements (ended/cancelled). */
+  excludeTerminal?: boolean
   limit?: number
   offset?: number
 }
@@ -214,6 +218,14 @@ export const listContractorEngagements = async (
   if (filters.classificationRiskStatus) {
     params.push(filters.classificationRiskStatus)
     conditions.push(`classification_risk_status = $${params.length}`)
+  }
+
+  if (filters.missingRate) {
+    conditions.push(`rate_amount IS NULL`)
+  }
+
+  if (filters.excludeTerminal) {
+    conditions.push(`status NOT IN ('ended', 'cancelled')`)
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''

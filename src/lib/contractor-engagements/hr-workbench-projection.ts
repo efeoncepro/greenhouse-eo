@@ -76,7 +76,7 @@ export const resolveContractorHrWorkbenchProjection =
 
     const degraded: ContractorProjectionDegradedReason[] = []
 
-    const [submittedRes, disputedRes, blockedRes, readyRes, paidRes, pendingEngRes] = await Promise.all([
+    const [submittedRes, disputedRes, blockedRes, readyRes, paidRes, pendingEngRes, missingRateEngRes] = await Promise.all([
       withSourceTimeout(() => listContractorWorkSubmissions({ status: 'submitted', limit: 200 }), {
         source: 'submitted_submissions',
         timeoutMs: SOURCE_TIMEOUT_MS
@@ -100,6 +100,12 @@ export const resolveContractorHrWorkbenchProjection =
       withSourceTimeout(() => listContractorEngagements({ status: 'pending_review', limit: 200 }), {
         source: 'pending_engagements',
         timeoutMs: SOURCE_TIMEOUT_MS
+      }),
+      // TASK-968 — engagements without an agreed rate need HR attention (and are
+      // reachable here so HR can define the compensation).
+      withSourceTimeout(() => listContractorEngagements({ missingRate: true, excludeTerminal: true, limit: 200 }), {
+        source: 'missing_rate_engagements',
+        timeoutMs: SOURCE_TIMEOUT_MS
       })
     ])
 
@@ -118,6 +124,7 @@ export const resolveContractorHrWorkbenchProjection =
     record(readyRes, 'No pudimos cargar los payables listos a Finance.')
     record(paidRes, 'No pudimos cargar los pagos completados.')
     record(pendingEngRes, 'No pudimos cargar los engagements pendientes de revisión.')
+    record(missingRateEngRes, 'No pudimos cargar los engagements sin compensación definida.')
 
     const submitted = submittedRes.value ?? []
     const disputed = disputedRes.value ?? []
@@ -125,6 +132,7 @@ export const resolveContractorHrWorkbenchProjection =
     const ready = readyRes.value ?? []
     const paid = paidRes.value ?? []
     const pendingEngagements = pendingEngRes.value ?? []
+    const missingRateEngagements = missingRateEngRes.value ?? []
 
     // Build the union of engagement ids needing attention.
     const submissionsByEngagement = new Map<string, ContractorWorkSubmission[]>()
@@ -148,13 +156,15 @@ export const resolveContractorHrWorkbenchProjection =
     const engagementIds = new Set<string>([
       ...submissionsByEngagement.keys(),
       ...blockedByEngagement.keys(),
-      ...pendingEngagements.map(e => e.contractorEngagementId)
+      ...pendingEngagements.map(e => e.contractorEngagementId),
+      ...missingRateEngagements.map(e => e.contractorEngagementId)
     ])
 
-    // Resolve engagement rows (reuse pending rows; fetch the rest by id).
+    // Resolve engagement rows (reuse pending + missing-rate rows; fetch the rest by id).
     const engagementById = new Map<string, ContractorEngagement>()
 
     for (const e of pendingEngagements) engagementById.set(e.contractorEngagementId, e)
+    for (const e of missingRateEngagements) engagementById.set(e.contractorEngagementId, e)
 
     const missingIds = [...engagementIds].filter(id => !engagementById.has(id))
 
@@ -189,10 +199,12 @@ export const resolveContractorHrWorkbenchProjection =
         const hasDisputed = subs.some(s => s.status === 'disputed')
         const hasSubmitted = subs.some(s => s.status === 'submitted')
 
-        let statusLabel = 'Pendiente revisión'
+        const missingRate = engagement.rateAmount === null
+
+        let statusLabel = missingRate ? 'Falta compensación' : 'Pendiente revisión'
         let statusTone: ContractorTone = 'warning'
         let responsable = 'Revisor HR'
-        let nextAction = 'Revisar engagement'
+        let nextAction = missingRate ? 'Definir monto acordado' : 'Revisar engagement'
 
         if (hasBlocked) {
           statusLabel = 'Bloqueado'
@@ -225,6 +237,12 @@ export const resolveContractorHrWorkbenchProjection =
           relationshipSubtype: SUBTYPE_LABEL[engagement.relationshipSubtype],
           country: engagement.countryCode,
           legalEntityLabel: engagement.legalEntityOrganizationId,
+          agreedRate: {
+            rateType: engagement.rateType,
+            rateAmount: engagement.rateAmount,
+            paymentCadence: engagement.paymentCadence,
+            currency: engagement.currency
+          },
           pendingCount: subs.filter(s => s.status === 'submitted' || s.status === 'disputed').length,
           blockedPayableCount: blockedPayables.length,
           statusLabel,

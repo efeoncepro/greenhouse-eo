@@ -22,6 +22,9 @@ import CustomChip from '@core/components/mui/Chip'
 
 import RemittanceAdviceSection from '@/components/greenhouse/contractors/RemittanceAdviceSection'
 import { MetricSummaryCard, OperationalPanel, OperationalSignalList } from '@/components/greenhouse/primitives'
+import { formatCurrency, type CurrencyCode } from '@/lib/format'
+import { cadenceLabel, cadencePaymentUnitLabel, rateTypeLabel } from '@/lib/contractor-engagements/compensation-display'
+import { GH_CONTRACTOR_COMPENSATION as CC } from '@/lib/copy/contractor-compensation'
 import type {
   ContractorHrWorkbenchProjection,
   ContractorTone,
@@ -29,6 +32,7 @@ import type {
 } from '@/lib/contractor-engagements/projection-types'
 
 import AdminReviewDecisionDrawer, { type ReviewDecision } from './AdminReviewDecisionDrawer'
+import ContractorEngagementCompensationDrawer from './ContractorEngagementCompensationDrawer'
 
 const toneToColor: Record<ContractorTone, 'success' | 'warning' | 'error' | 'info' | 'secondary'> = {
   success: 'success',
@@ -351,6 +355,58 @@ const AdminInspector = ({
   </OperationalPanel>
 )
 
+const CompensationPanel = ({
+  row,
+  onEdit
+}: {
+  row: ContractorWorkbenchQueueRow
+  onEdit: () => void
+}) => {
+  const hasRate = row.agreedRate.rateAmount !== null
+
+  const money = (n: number, currency: string) =>
+    formatCurrency(n, currency as CurrencyCode, { currencySymbolSpacing: ' ' }, 'es-CL')
+
+  return (
+    <OperationalPanel
+      title={CC.editor.panelTitle}
+      subheader={CC.editor.panelSubheader}
+      icon='tabler-coin'
+      iconColor={hasRate ? 'primary' : 'warning'}
+      action={
+        hasRate ? (
+          <Button size='small' variant='tonal' startIcon={<i className='tabler-edit' />} onClick={onEdit}>
+            {CC.editor.editCta}
+          </Button>
+        ) : null
+      }
+    >
+      {hasRate ? (
+        <Stack spacing={0.5}>
+          <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+            {CC.editor.amountLabel} · {rateTypeLabel(row.agreedRate.rateType)} · {cadenceLabel(row.agreedRate.paymentCadence)}
+          </Typography>
+          <Typography variant='h5' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
+            {money(row.agreedRate.rateAmount as number, row.agreedRate.currency)}
+            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', fontWeight: 400 }}>
+              {' '}/ {cadencePaymentUnitLabel(row.agreedRate.paymentCadence)}
+            </Typography>
+          </Typography>
+        </Stack>
+      ) : (
+        <Stack spacing={3} alignItems='flex-start'>
+          <Alert severity='warning' icon={<i className='tabler-alert-triangle' />} sx={{ width: '100%' }}>
+            {CC.editor.emptyDescription}
+          </Alert>
+          <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={onEdit}>
+            {CC.editor.defineCta}
+          </Button>
+        </Stack>
+      )}
+    </OperationalPanel>
+  )
+}
+
 const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWorkbenchViewProps) => {
   const [projection, setProjection] = useState<ContractorHrWorkbenchProjection>(initialProjection)
 
@@ -360,6 +416,7 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerDecision, setDrawerDecision] = useState<ReviewDecision>('approve')
+  const [compDrawerOpen, setCompDrawerOpen] = useState(false)
 
   const selected = useMemo(
     () => projection.queue.find(row => row.contractorEngagementId === selectedId) ?? null,
@@ -493,7 +550,10 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
         <Grid size={{ xs: 12, xl: 4 }}>
           <Stack spacing={6}>
             {selected ? (
-              <AdminInspector row={selected} onReview={() => openReview('approve')} />
+              <>
+                <CompensationPanel row={selected} onEdit={() => setCompDrawerOpen(true)} />
+                <AdminInspector row={selected} onReview={() => openReview('approve')} />
+              </>
             ) : (
               <OperationalPanel title='Inspector' icon='tabler-user-check' iconColor='secondary'>
                 <Alert severity='info' icon={<i className='tabler-info-circle' />} role='status'>
@@ -533,6 +593,27 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
         onClose={() => setDrawerOpen(false)}
         onReviewed={handleReviewed}
       />
+
+      {selected ? (
+        <ContractorEngagementCompensationDrawer
+          open={compDrawerOpen}
+          engagement={{
+            contractorEngagementId: selected.contractorEngagementId,
+            publicId: selected.engagementPublicId,
+            contractorName: selected.contractorName,
+            relationshipSubtypeLabel: selected.relationshipSubtype,
+            rateType: selected.agreedRate.rateType,
+            rateAmount: selected.agreedRate.rateAmount,
+            paymentCadence: selected.agreedRate.paymentCadence,
+            currency: selected.agreedRate.currency
+          }}
+          onClose={() => setCompDrawerOpen(false)}
+          onSaved={() => {
+            setCompDrawerOpen(false)
+            void refetch()
+          }}
+        />
+      ) : null}
     </Stack>
   )
 }

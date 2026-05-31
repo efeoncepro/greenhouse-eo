@@ -16,6 +16,8 @@
  * GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1 §Access policy).
  */
 
+import type { ContractorPaymentCadence, ContractorRateType } from './types'
+
 export const CONTRACTOR_SELF_SERVICE_CONTRACT_VERSION = 'contractor-self-service.v1' as const
 export const CONTRACTOR_HR_WORKBENCH_CONTRACT_VERSION = 'contractor-hr-workbench.v1' as const
 
@@ -165,6 +167,14 @@ export interface ContractorSelfServiceProjection {
 
 // ── HR workbench ────────────────────────────────────────────────────────────
 
+/** Agreed compensation snapshot (TASK-968) — set ONLY by HR; the contractor never edits it. */
+export interface ContractorAgreedRate {
+  rateType: ContractorRateType
+  rateAmount: number | null
+  paymentCadence: ContractorPaymentCadence
+  currency: string
+}
+
 export interface ContractorWorkbenchQueueRow {
   contractorEngagementId: string
   engagementPublicId: string
@@ -172,6 +182,8 @@ export interface ContractorWorkbenchQueueRow {
   relationshipSubtype: string
   country: string
   legalEntityLabel: string
+  /** Agreed compensation for the inspector compensation panel (TASK-968). */
+  agreedRate: ContractorAgreedRate
   /** Pending review work submissions for this engagement (submitted/disputed). */
   pendingCount: number
   /** Blocked payables for this engagement. */
