@@ -61,6 +61,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja](finance/modulos-caja-cobros-pagos.md) — cobros (cash in), pagos (cash out), tesoreria por instrumento, cuenta corriente accionista y diferencia devengado vs caja
 - [Distribución de costos para P&L operativo](finance/distribucion-costos-pnl.md) — contrato funcional TASK-777 para separar labor/provider payroll, regulatorio, financiero y overhead operacional antes de materializar márgenes por cliente
 - [Finance Movement Feed](finance/finance-movement-feed.md) — primitive reusable para mostrar movimientos financieros con identidad visual, instrumento, estado, subtotales y virtualizacion sin mezclar UI con calculos de saldo
+- [Pagos a Contractors — Workbench de Finanzas](finance/pagos-a-contractors.md) — superficie operador `/finance/contractor-payments` (Tesorería) para preparar, revisar y autorizar pagos a contractors: estados del payable, breakdown bruto/retención/neto leído verbatim, readiness con responsable, crear desde envío/off-cycle, y SoD (override + waiver solo desde Finanzas; panel HR read-only). Shipped en TASK-974.
 
 ### Comercial
 

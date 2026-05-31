@@ -16,6 +16,7 @@ La diferencia con otras capas de documentacion:
 - [Sugerencias asistidas de conciliacion](finance/sugerencias-asistidas-conciliacion.md) — como generar, revisar, aceptar o descartar sugerencias AI sin alterar saldos automaticamente.
 - [Saldos bancarios FX drift](finance/saldos-bancarios-fx-drift-remediation.md) — como diagnosticar, auditar y remediar drift FX de saldos bancarios usando el control plane canonico sin SQL/backfills ad hoc.
 - [Finance Movement Feed](../documentation/finance/finance-movement-feed.md) — contrato reusable para mostrar movimientos financieros sin duplicar tablas, hardcodes de logos ni calculos de saldo en UI.
+- [Pagos a Contractors (Finanzas)](finance/pagos-a-contractors.md) — como ver, crear (desde envio + off-cycle), revisar readiness, enviar a Finanzas, cancelar, waivear y autorizar override de un pago de contractor desde `/finance/contractor-payments`, sin confundir el monto acordado (lo fija HR) con autorizar la excepcion (lo hace Finanzas).
 
 ### Comercial
 
