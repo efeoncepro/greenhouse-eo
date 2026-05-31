@@ -1,3 +1,28 @@
+# Sesion 2026-05-31 — TASK-968 Contractor Compensation Setup — 🔨 IN-PROGRESS (Slice 1/4)
+
+**Rama**: `develop` (sin branch, override del operador). En progreso.
+
+**TASK-968 — Contractor Engagement Compensation Setup + Agreed-Amount Guardrail** (P1, EPIC-013). Cierra el gap descubierto al cerrar TASK-960: no había UI para setear el monto acordado del contractor (`rate_amount` existe en schema + PATCH endpoint pero sin form → Valentina `EO-CENG-0001` con `rate_amount=null`). Planificada con las 4 skills de product design + payroll + finance + arch. Mockup APROBADO (3 superficies, enterprise 2026, commit `f7f26fce`).
+
+**Slice 1 SHIPPED + VERIFICADO** (commit `25f7d2ec`): editor de compensación admin.
+- `ContractorEngagementCompensationDrawer` promovido del mockup (JSX/tokens/microinteracciones intactos) cableado al `PATCH /api/hr/contractors/[id]` real (`action='update'`) + audit event. **Currency READ-ONLY** (decisión: cambiar denominación cascadea FX/payable = acto deliberado fuera V1 — el PATCH update no acepta `currency`, solo `paymentCurrency`).
+- Panel "Compensación" en el AdminInspector del workbench + CTA Editar/Definir.
+- Engagements sin tarifa (`rate_amount IS NULL`) ahora aparecen en el workbench con status "Falta compensación" (alcanzables) — filtro `missingRate`/`excludeTerminal` en `listContractorEngagements` + source nuevo en `hr-workbench-projection`. `ContractorWorkbenchQueueRow.agreedRate` aditivo.
+- Helpers `compensation-display.ts` + copy `copy/contractor-compensation.ts`.
+- **SoD**: el monto se setea SOLO desde admin; sin nuevo endpoint/capability/migración en Slice 1.
+- Verificado runtime: `/hr/contractors` 200 con Valentina "Falta compensación" + panel "Definir compensación". NO se disparó el save (no se seteó el monto de Valentina — decisión operador: lo hace él por la UI).
+- Gates: tsc 0 · eslint 0 · design:lint 0/0 · contractor 123 + payroll 528 (no-regresión EPIC-013).
+
+**Slices pendientes** (checkpoint operador):
+- **Slice 2** — composer deriva el bruto (remueve el campo libre `grossAmount`) + self-service muestra el rate read-only. Toca `ContractorSubmissionComposer` + self-service projection/view + `work-submissions/store.ts` (derivar fixed/monthly). Contractor-facing behavioral change.
+- **Slice 3** — guardrail `payment_exceeds_agreed_amount` en `payables/readiness.ts` (fail-closed, flag) + migración col override + capability `finance.contractor_payable.override_agreed_amount` + dialog override (espejo waiver TASK-793). **Mayor blast radius** (readiness compartido TASK-793/794/795 + migración).
+- **Slice 4** — 2 reliability signals (`hr.contractor_engagement.rate_unset` + `finance.contractor_payable.exceeds_agreed_amount`).
+- Cierre: CLAUDE.md invariants + arch Delta + doc funcional + manual + GVC runtime.
+
+**Boundary duro**: NO tocar payroll engine / `payroll_entries` / `contract_type` (TASK-957). Precursor contractor-scoped de TASK-965.
+
+---
+
 # Sesion 2026-05-31 — TASK-960 Contractor Remittance Advice — ✅ COMPLETE
 
 **Rama**: `develop` (sin branch, por override del operador "mantente en develop"). 4 slices + docs, todo pusheado a `develop`.
