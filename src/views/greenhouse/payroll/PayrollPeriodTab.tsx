@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react'
 import { useSession } from 'next-auth/react'
 
 import Alert from '@mui/material/Alert'
+import type { AlertColor } from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -35,7 +36,11 @@ import {
   canEditPayrollPeriodMetadata,
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
-import { GH_PAYROLL_COMPLIANCE_EXPORTS } from '@/lib/copy/payroll'
+import {
+  GH_PAYROLL_CALCULATION_DEADLINE,
+  GH_PAYROLL_COMPLIANCE_EXPORTS,
+  GH_PAYROLL_DRAFT_ROSTER
+} from '@/lib/copy/payroll'
 import PayrollEntryTable from './PayrollEntryTable'
 import PayrollPaymentStatusCard from './PayrollPaymentStatusCard'
 import ReopenPeriodDialog from './ReopenPeriodDialog'
@@ -471,8 +476,18 @@ const PayrollPeriodTab = ({
   const draftEligibleMembers =
     entries.length === 0 && readiness
       ? readiness.includedMemberIds
-          .map(memberId => membersById.get(memberId))
-          .filter((member): member is PayrollCompensationMember => Boolean(member))
+          .map(memberId => ({
+            memberId,
+            member: membersById.get(memberId) ?? null
+          }))
+      : []
+
+  const draftMissingCompensationMembers =
+    entries.length === 0 && readiness
+      ? readiness.missingCompensationMemberIds.map(memberId => ({
+          memberId,
+          member: membersById.get(memberId) ?? null
+        }))
       : []
 
   const displayedCollaboratorCount = entries.length > 0 ? entries.length : readiness?.includedMemberIds.length ?? 0
@@ -484,17 +499,25 @@ const PayrollPeriodTab = ({
         ? `${displayedCollaboratorCount} elegible${displayedCollaboratorCount !== 1 ? 's' : ''} para cálculo`
         : `${displayedCollaboratorCount} colaborador${displayedCollaboratorCount !== 1 ? 'es' : ''}`
 
-  const calculationOperationalLabel = calculationDeadline
-    ? calculationDeadline.calculatedOnTime === true
-      ? 'Calculada en fecha'
-      : calculationDeadline.calculatedOnTime === false
-        ? 'Calculada fuera de fecha'
-        : calculationDeadline.isOverdue
-          ? 'Bloqueada o fuera de fecha'
-          : calculationDeadline.isDue
-            ? 'Pendiente hoy'
-            : 'Pendiente'
-    : 'Sin evaluación'
+  const calculationOperationalLabel = readiness?.calculation.ready === false
+    ? GH_PAYROLL_CALCULATION_DEADLINE.blockedByReadiness
+    : calculationDeadline?.state === 'calculated_on_time'
+      ? GH_PAYROLL_CALCULATION_DEADLINE.calculatedOnTime
+      : calculationDeadline?.state === 'calculated_late'
+        ? GH_PAYROLL_CALCULATION_DEADLINE.calculatedLate
+        : calculationDeadline?.state === 'overdue_allowed'
+          ? GH_PAYROLL_CALCULATION_DEADLINE.overdueAllowed
+          : calculationDeadline?.state === 'due_today'
+            ? GH_PAYROLL_CALCULATION_DEADLINE.dueToday
+            : calculationDeadline
+              ? GH_PAYROLL_CALCULATION_DEADLINE.pending
+              : 'Sin evaluación'
+
+  const calculationDeadlineSeverity: AlertColor = readiness?.calculation.ready === false
+    ? 'error'
+    : calculationDeadline?.isOverdue || calculationDeadline?.isDue
+      ? 'warning'
+      : 'info'
 
   return (
     <>
@@ -881,20 +904,20 @@ const PayrollPeriodTab = ({
 
           {readiness && (
             <Stack spacing={2} sx={{ mb: 3 }}>
-              <Alert severity={calculationDeadline?.isOverdue ? 'error' : calculationDeadline?.isDue ? 'warning' : 'info'}>
-                Deadline de cálculo:
+              <Alert severity={calculationDeadlineSeverity}>
+                {GH_PAYROLL_CALCULATION_DEADLINE.deadlineLabel}:
                 {' '}
                 {calculationDeadline?.lastBusinessDay ?? 'Sin definir'}
                 {' · '}
-                Estado operativo:
+                {GH_PAYROLL_CALCULATION_DEADLINE.operationalStateLabel}:
                 {' '}
                 {calculationOperationalLabel}
                 {' · '}
-                Readiness cálculo:
+                {GH_PAYROLL_CALCULATION_DEADLINE.calculationReadinessLabel}:
                 {' '}
                 {readiness.calculation.ready ? 'lista para calcular' : 'con blockers'}
                 {' · '}
-                Readiness aprobación:
+                {GH_PAYROLL_CALCULATION_DEADLINE.approvalReadinessLabel}:
                 {' '}
                 {readiness.approval.ready ? 'lista para aprobar' : 'con blockers'}
               </Alert>
@@ -946,23 +969,108 @@ const PayrollPeriodTab = ({
                   Este período todavía no tiene entries materializadas. Revisa los blockers y, cuando el readiness quede listo,
                   presiona &quot;Calcular&quot; para generar la nómina oficial.
                 </Typography>
-                {draftEligibleMembers.length > 0 && (
-                  <Stack spacing={1.5} sx={{ width: '100%', maxWidth: 720 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      Colaboradores elegibles para este período
-                    </Typography>
-                    <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap' justifyContent='center'>
-                      {draftEligibleMembers.map(member => (
-                        <CustomChip
-                          key={member.memberId}
-                          round='true'
-                          size='small'
-                          label={member.memberName}
-                          color='primary'
-                        />
-                      ))}
+                {readiness && (
+                  <Box
+                    sx={{
+                      width: '100%',
+                      maxWidth: 900,
+                      mt: 2,
+                      p: 3,
+                      border: theme => `1px solid ${theme.palette.divider}`,
+                      borderRadius: 1,
+                      bgcolor: 'background.paper',
+                      textAlign: 'left'
+                    }}
+                  >
+                    <Stack spacing={3}>
+                      <Stack spacing={0.5}>
+                        <Typography variant='subtitle1'>{GH_PAYROLL_DRAFT_ROSTER.title}</Typography>
+                        <Typography variant='body2' color='text.secondary'>
+                          {GH_PAYROLL_DRAFT_ROSTER.helper}
+                        </Typography>
+                      </Stack>
+
+                      <Stack spacing={1.5}>
+                        <Typography variant='body2' color='text.secondary'>
+                          {GH_PAYROLL_DRAFT_ROSTER.includedTitle}
+                        </Typography>
+                        {draftEligibleMembers.length === 0 ? (
+                          <Typography variant='body2' color='text.secondary'>
+                            {GH_PAYROLL_DRAFT_ROSTER.emptyIncluded}
+                          </Typography>
+                        ) : (
+                          draftEligibleMembers.map(({ memberId, member }) => (
+                            <Stack
+                              key={memberId}
+                              direction={{ xs: 'column', sm: 'row' }}
+                              spacing={1.5}
+                              alignItems={{ xs: 'flex-start', sm: 'center' }}
+                              justifyContent='space-between'
+                              sx={{
+                                px: 2,
+                                py: 1.5,
+                                borderRadius: 1,
+                                bgcolor: 'action.hover'
+                              }}
+                            >
+                              <Box>
+                                <Typography variant='subtitle2'>
+                                  {member?.memberName ?? GH_PAYROLL_DRAFT_ROSTER.unknownMember(memberId)}
+                                </Typography>
+                                <Typography variant='caption' color='text.secondary'>
+                                  {member?.currentContractType ?? 'sin contrato'} · {member?.currentPayRegime ?? 'sin régimen'} · {member?.currentCurrency ?? 'sin moneda'}
+                                </Typography>
+                              </Box>
+                              <CustomChip
+                                round='true'
+                                size='small'
+                                label={GH_PAYROLL_DRAFT_ROSTER.includedState}
+                                color='success'
+                              />
+                            </Stack>
+                          ))
+                        )}
+                      </Stack>
+
+                      {draftMissingCompensationMembers.length > 0 && (
+                        <Stack spacing={1.5}>
+                          <Typography variant='body2' color='text.secondary'>
+                            {GH_PAYROLL_DRAFT_ROSTER.excludedTitle}
+                          </Typography>
+                          {draftMissingCompensationMembers.map(({ memberId, member }) => (
+                            <Stack
+                              key={memberId}
+                              direction={{ xs: 'column', sm: 'row' }}
+                              spacing={1.5}
+                              alignItems={{ xs: 'flex-start', sm: 'center' }}
+                              justifyContent='space-between'
+                              sx={{
+                                px: 2,
+                                py: 1.5,
+                                borderRadius: 1,
+                                bgcolor: 'warning.lightOpacity'
+                              }}
+                            >
+                              <Box>
+                                <Typography variant='subtitle2'>
+                                  {member?.memberName ?? GH_PAYROLL_DRAFT_ROSTER.unknownMember(memberId)}
+                                </Typography>
+                                <Typography variant='caption' color='text.secondary'>
+                                  {member?.memberEmail ?? memberId}
+                                </Typography>
+                              </Box>
+                              <CustomChip
+                                round='true'
+                                size='small'
+                                label={GH_PAYROLL_DRAFT_ROSTER.excludedMissingCompensation}
+                                color='warning'
+                              />
+                            </Stack>
+                          ))}
+                        </Stack>
+                      )}
                     </Stack>
-                  </Stack>
+                  </Box>
                 )}
               </Stack>
             </Box>

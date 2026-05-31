@@ -1,3 +1,32 @@
+# Sesion 2026-05-31 — Payroll mensual deadline operativo + pre-nomina draft — ✅ READY TO PUSH
+
+**Rama**: `develop`. Scope payroll mensual + docs HR. No toca DB, migrations, `calculatePayroll`, `payroll_entries`, cierre, aprobacion, exportaciones, recibos ni payment orders.
+
+Contexto: el operador intento calcular la nomina de mayo 2026 el 31/05. El sistema mostraba `deadline=2026-05-29` porque la regla canonica es **ultimo dia habil operativo**, no ultimo dia calendario. El problema real no era que el 31/05 debiera ser deadline: era que la UI comunicaba "bloqueada o fuera de fecha" como si el deadline fuera un gate duro y, en borrador sin entries, no mostraba una pre-nomina operable hasta promover desde nomina proyectada.
+
+Cambio realizado:
+- Nuevo helper canonico `src/lib/payroll/calculation-deadline.ts`: separa SLA operativo de bloqueo real. Estados: `pending`, `due_today`, `overdue_allowed`, `calculated_on_time`, `calculated_late`; `blocksCalculation=false` por diseno.
+- `payroll-readiness` y `current-payroll-period` delegan deadline al helper compartido.
+- `PayrollPeriodTab` muestra deadline como warning si esta vencido pero la readiness esta lista; solo pinta error cuando hay blockers reales de readiness.
+- La nomina mensual en `draft` sin entries ahora muestra una **pre-nomina read-only** con colaboradores incluidos y excluidos por falta de compensacion, usando fallback por `memberId` si el catalogo local no trae el member.
+- Copy canonico agregado en `src/lib/copy/payroll.ts`; docs HR actualizados para dejar claro que el deadline es SLA, no gate de calculo.
+
+No-regresion/impacto:
+- La nomina de mayo ya cerrada no se recalcula, no se reabre y no cambia montos. El cambio puede ajustar copy/estado visual ("calculada fuera de fecha") pero no entries ni exportaciones.
+- Verificado diff limpio en paths mutativos: `calculate-payroll`, APIs de periodos, store, compliance exports, receipts y payment orders sin cambios.
+
+Validacion:
+- `pnpm vitest run src/lib/payroll/calculation-deadline.test.ts src/lib/payroll/current-payroll-period.test.ts src/lib/payroll/payroll-readiness.test.ts src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+- `pnpm vitest run src/lib/payroll`
+- `pnpm exec eslint ...` focalizado
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm local:check`
+- `git diff --check`
+
+Nota visual: GVC local de `/hr/payroll` se pudo capturar, pero el periodo ya estaba calculado/cerrado por el operador; por eso no hay evidencia visual natural del nuevo estado draft en mayo. La cobertura principal del draft queda en test de componente.
+
+---
+
 # Sesion 2026-05-31 — TASK-977 Contractor Payable Bank Settlement — ✅ SHIPPED (flag OFF)
 
 **Rama**: `develop` (no branch). 4 slices + cierre commiteados. **No pusheado.**

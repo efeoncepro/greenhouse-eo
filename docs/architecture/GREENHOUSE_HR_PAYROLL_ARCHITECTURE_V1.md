@@ -389,9 +389,11 @@ Este documento es la fuente canónica del módulo. No reemplaza:
 ## Delta 2026-03-29 — TASK-117 cerrada: cálculo el último día hábil
 
 - Payroll ya formaliza que el período oficial del mes debe quedar en `calculated` el último día hábil del mes operativo.
-- La semántica temporal vive en `src/lib/calendar/operational-calendar.ts` con:
+- La semántica de calendario vive en `src/lib/calendar/operational-calendar.ts` con:
   - `getLastBusinessDayOfMonth()`
   - `isLastBusinessDayOfMonth()`
+- La semántica de deadline de cálculo vive en `src/lib/payroll/calculation-deadline.ts`.
+- El deadline es un SLA operativo, no un blocker de cálculo por sí mismo. Un período `draft` fuera del último día hábil debe mostrarse como fuera de plazo, pero puede seguir calculándose manualmente cuando `calculation readiness` no tiene blockers y el lifecycle permite recalcular.
 - El runtime ya separa `calculation readiness` de `approval readiness`.
 - El job idempotente `runPayrollAutoCalculation()` y la route `GET /api/cron/payroll-auto-calculate` reutilizan el path oficial de cálculo y auto-crean el período si falta.
 - El hito `payroll_period.calculated` ya notifica a stakeholders operativos por el dominio reactivo `notifications` con categoría `payroll_ops`.

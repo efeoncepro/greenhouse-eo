@@ -59,7 +59,9 @@ describe('PayrollPeriodTab readiness', () => {
               lastBusinessDay: '2026-03-31',
               isDue: false,
               isOverdue: true,
-              calculatedOnTime: null
+              calculatedOnTime: null,
+              state: 'overdue_allowed',
+              blocksCalculation: false
             }
           },
           approval: {
@@ -125,10 +127,125 @@ describe('PayrollPeriodTab readiness', () => {
 
     expect(getByText('1 colaborador(es) activos quedarían fuera por no tener compensación vigente.')).toBeInTheDocument()
     expect(getByText(/Deadline de cálculo:/)).toBeInTheDocument()
-    expect(getByText(/Bloqueada o fuera de fecha/)).toBeInTheDocument()
+    expect(getByText(/Bloqueada por readiness/)).toBeInTheDocument()
     expect(queryByText('La asistencia aún se resume desde attendance_daily + leave_requests.')).not.toBeInTheDocument()
     expect(queryByText('La integración futura objetivo para asistencia es Microsoft Teams.')).not.toBeInTheDocument()
     expect(getByRole('button', { name: 'Calcular' })).toBeDisabled()
+  })
+
+  it('keeps late-but-ready payroll calculable and shows the draft roster preview', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        periodId: '2026-03',
+        ready: true,
+        calculation: {
+          ready: true,
+          blockingIssues: [],
+          warnings: [
+            {
+              code: 'missing_compensation',
+              severity: 'warning',
+              message: '1 colaborador(es) activos quedarían fuera por no tener compensación vigente.',
+              memberIds: ['member-2']
+            }
+          ],
+          deadline: {
+            lastBusinessDay: '2026-03-31',
+            isDue: false,
+            isOverdue: true,
+            calculatedOnTime: null,
+            state: 'overdue_allowed',
+            blocksCalculation: false
+          }
+        },
+        approval: {
+          ready: true,
+          blockingIssues: []
+        },
+        includedMemberIds: ['member-1'],
+        missingCompensationMemberIds: ['member-2'],
+        missingKpiMemberIds: [],
+        missingAttendanceMemberIds: [],
+        requiresUfValue: false,
+        attendanceDiagnostics: {
+          source: 'legacy_attendance_daily_plus_hr_leave',
+          integrationTarget: 'microsoft_teams',
+          blocking: false,
+          notes: []
+        },
+        blockingIssues: [],
+        warnings: [
+          {
+            code: 'missing_compensation',
+            severity: 'warning',
+            message: '1 colaborador(es) activos quedarían fuera por no tener compensación vigente.',
+            memberIds: ['member-2']
+          }
+        ]
+      })
+    } as Response)
+
+    const { findByText, getByRole, getByText } = render(
+      <PayrollPeriodTab
+        period={period}
+        entries={[]}
+        members={[
+          {
+            memberId: 'member-1',
+            memberName: 'Daniela Ferreira',
+            memberEmail: 'daniela@efeoncepro.com',
+            memberAvatarUrl: null,
+            notionUserId: null,
+            active: true,
+            hasCurrentCompensation: true,
+            hasCompensationHistory: true,
+            compensationVersionCount: 1,
+            currentCompensationVersionId: 'cv-1',
+            currentCompensationEffectiveFrom: '2026-03-01',
+            currentContractType: 'eor',
+            currentPayRegime: 'international',
+            currentPayrollVia: 'deel',
+            currentScheduleRequired: false,
+            currentDeelContractId: 'deel-1',
+            currentContractEndDate: null,
+            currentCurrency: 'USD'
+          },
+          {
+            memberId: 'member-2',
+            memberName: 'Julio Reyes',
+            memberEmail: 'julio@efeoncepro.com',
+            memberAvatarUrl: null,
+            notionUserId: null,
+            active: true,
+            hasCurrentCompensation: false,
+            hasCompensationHistory: false,
+            compensationVersionCount: 0,
+            currentCompensationVersionId: null,
+            currentCompensationEffectiveFrom: null,
+            currentContractType: null,
+            currentPayRegime: null,
+            currentPayrollVia: null,
+            currentScheduleRequired: null,
+            currentDeelContractId: null,
+            currentContractEndDate: null,
+            currentCurrency: null
+          }
+        ]}
+        onRefresh={vi.fn()}
+        onCreatePeriod={vi.fn()}
+        createPeriodLabel='Abril 2026'
+      />
+    )
+
+    await findByText(/Fuera de plazo operativo; cálculo manual permitido/)
+
+    expect(getByRole('button', { name: 'Calcular' })).toBeEnabled()
+    expect(getByText('Pre-nómina del período')).toBeInTheDocument()
+    expect(getByText('Daniela Ferreira')).toBeInTheDocument()
+    expect(getByText('Entraría al cálculo')).toBeInTheDocument()
+    expect(getByText('Julio Reyes')).toBeInTheDocument()
+    expect(getByText('Fuera: falta compensación')).toBeInTheDocument()
   })
 
   it('renders the operational empty state when no period is selected', () => {
