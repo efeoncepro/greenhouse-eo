@@ -24,7 +24,9 @@
 
 Hoy **no existe superficie para setear el monto acordado de pago de un contractor** (`contractor_engagements.rate_amount`). El campo existe en el schema (TASK-790) y hay endpoints de escritura (`POST /api/hr/contractors`, `PATCH /api/hr/contractors/[id]`), pero **ningún formulario en la UI** lo expone — los engagements creados por la transición desde offboarding (TASK-956) nacen con `rate_amount = NULL` (caso real: Valentina Hoyos `EO-CENG-0001`, honorarios CL, acordado 600k mensual, hoy `rate_amount=null`). Sin tarifa acordada: el contractor **escribe a mano** el monto bruto en el composer de envíos (TASK-792) sin validación, no hay default, no hay control de "no pagar más de lo acordado", y el comprobante (TASK-960) termina mostrando un monto sin respaldo de un acuerdo registrado.
 
-Esta task agrega: (1) un **editor de compensación del engagement** (form HR en el workbench) para setear/editar `rate_amount`/`rate_type`/`payment_cadence`/`currency`; (2) que el monto acordado **pre-llene** el bruto del work submission y se muestre read-only al contractor; (3) un **guardrail fail-closed en el payable** que bloquea pagar por encima de lo acordado (override con razón + capability, maker-checker). **No toca el motor de payroll, no muta `contract_type`** (boundary TASK-957), y queda forward-compat con el futuro write-path unificado de TASK-965.
+Esta task agrega: (1) un **editor de compensación del engagement** (form HR en el workbench) para setear/editar `rate_amount`/`rate_type`/`payment_cadence`/`currency`; (2) que el monto del pago se **derive** del monto acordado (admin-set) y se muestre **read-only al contractor** — el contractor declara el trabajo (período/evidencia/cantidad), **nunca el monto**; (3) un **guardrail fail-closed en el payable** que bloquea pagar por encima de lo acordado (override con razón + capability, maker-checker). **No toca el motor de payroll, no muta `contract_type`** (boundary TASK-957), y queda forward-compat con el futuro write-path unificado de TASK-965.
+
+**Principio de control (segregación de funciones):** el monto acordado se **acuerda y setea exclusivamente desde las vistas admin (HR)**. El contractor **NUNCA** lo define ni lo edita — su input es la evidencia/cantidad del trabajo, no la plata. Esto cierra el anti-patrón actual (el composer deja al contractor escribir cualquier `grossAmount`) y alinea SoD: quien fija la tarifa (HR) ≠ quien la cobra (contractor) ≠ quien paga (Finance).
 
 ## Why This Task Exists
 
@@ -39,7 +41,7 @@ El comprobante (TASK-960) es read-only y muestra lo que el payable resolvió; si
 ## Goal
 
 - Que HR pueda **setear y editar el monto acordado** del engagement (`rate_amount` + `rate_type` + `payment_cadence` + `currency`) desde la UI del workbench, con audit append-only y capability, reusando el `updateContractorEngagement` existente (NO un store nuevo).
-- Que el monto acordado **pre-llene el bruto** del work submission (fixed/monthly → `rate_amount`; timesheet → `quantity × rate`) y se muestre **read-only al contractor** en su hub (transparencia).
+- Que el bruto del work submission se **derive del monto acordado** (admin-set) — fixed/monthly → `rate_amount`; timesheet → `quantity × rate` — y sea **read-only para el contractor** (el contractor declara trabajo/cantidad, nunca el monto). El monto acordado se acuerda y setea **solo desde las vistas admin (HR)**.
 - Que exista un **guardrail fail-closed en el payable** (`payment_exceeds_agreed_amount`) que bloquee pagar por encima de lo acordado para el período, **overridable con razón ≥ N chars + capability** (maker-checker, espejo del payment-profile waiver TASK-793).
 - Que el monto acordado fluya correctamente hacia el comprobante (TASK-960) y el read-model workforce (TASK-959/961) **sin recomputar nada inline** (SSOT = engagement).
 - **NUNCA** tocar el motor de payroll ni mutar `contract_type` (boundary TASK-957). El pago sigue el riel engagement → payable → Finance.
@@ -60,6 +62,7 @@ Revisar y respetar:
 
 Reglas obligatorias (síntesis de skills payroll + finance + arch + product design):
 
+- **NUNCA** permitir que el contractor defina o edite el monto del pago. El monto acordado se **acuerda y setea exclusivamente desde las vistas admin (HR)** con capability `hr.contractor_engagement:manage`. El bruto del work submission se **deriva** del monto acordado (no lo escribe el contractor); el campo de monto libre del composer se **remueve/bloquea** para el contractor. SoD: HR fija ≠ contractor cobra ≠ Finance paga.
 - **NUNCA** crear una entidad de compensación paralela. El monto acordado vive en `contractor_engagements` (`rate_amount`/`rate_type`/`payment_cadence`/`currency`) — extender el store existente (`updateContractorEngagement`, `store.ts:639`), no paralelizar (arch: extend-don't-parallel; SSOT).
 - **NUNCA** mezclar dimensiones ortogonales en un enum: `rate_type` (cómo se factura) ≠ `payment_cadence` (cada cuánto) ≠ un eventual `cap_period` (ventana del tope). Ya son columnas separadas — mantenerlo así.
 - **NUNCA** tocar el motor de payroll (`src/lib/payroll/calculate-*`), ni `payroll_entries`, ni mutar `members.contract_type`/`pay_regime`/`payroll_via` (boundary TASK-957: `'honorarios'` rutearía al riel SII legacy → doble declaración F29). El monto acordado feed el work submission → payable → Finance, jamás el payroll dependiente.
@@ -141,10 +144,12 @@ Reglas obligatorias (síntesis de skills payroll + finance + arch + product desi
 - Self-service: exponer el monto acordado **read-only** en el hub del contractor (transparencia). Projection extendida aditivamente (`agreedRate: { amount, currency, rateType, cadence } | null`).
 - Copy es-CL via `src/lib/copy/*` (validar con `greenhouse-ux-writing`).
 
-### Slice 2 — Default + soft-warn en el work submission
+### Slice 2 — Bruto derivado del monto acordado (contractor no lo define)
 
-- El composer pre-llena `grossAmount` desde el monto acordado: fixed/monthly → `rate_amount`; timesheet → `quantity × rate_amount`. Editable, pero con **soft-warn** (no bloquea) cuando el monto declarado se desvía del esperado (mostrar el acordado + el delta).
-- Si `rate_amount` es null → no pre-llena + hint "Falta definir el monto acordado" (degradación honesta, no crash).
+- **Remover/bloquear el campo de monto libre del composer** (`ContractorSubmissionComposer`, hoy `grossAmount` editable). El contractor declara solo **trabajo**: período, evidencia, y `quantity` cuando el `rate_type` es timesheet (hourly/daily). El monto **no es input del contractor**.
+- El bruto se **deriva server-side del monto acordado** (admin-set): fixed/monthly/retainer → `rate_amount`; timesheet → `quantity × rate_amount`; milestone/project → `rate_amount` por hito declarado. El composer muestra el bruto **read-only** (calculado) + el monto acordado de referencia.
+- Si `rate_amount` es null → el composer **no permite declarar monto** y muestra hint "Tu engagement aún no tiene monto acordado definido; contacta a HR" (degradación honesta, no crash). HR lo setea en Slice 1.
+- Ajustes/excepciones al monto (bonus, descuento puntual) son **acción admin** (off-cycle payable o override Slice 3), nunca input del contractor.
 
 ### Slice 3 — Guardrail fail-closed en el payable (override auditado)
 
@@ -214,7 +219,7 @@ Slice 1 (editor — cierra el gap inmediato, desbloquea setear la tarifa) → Sl
 ## Acceptance Criteria
 
 - [ ] HR puede setear/editar `rate_amount`/`rate_type`/`payment_cadence`/`currency` de un engagement desde el workbench, con audit append-only y capability — reusando `updateContractorEngagement` (sin store nuevo).
-- [ ] El monto acordado pre-llena el bruto del work submission y se muestra read-only al contractor; si falta, degrada honesto (no crash).
+- [ ] El monto acordado se setea SOLO desde las vistas admin (HR); el contractor NUNCA lo define ni edita. El bruto del work submission se deriva del monto acordado y es read-only para el contractor; si falta, degrada honesto (no crash).
 - [ ] Existe un guardrail fail-closed en el payable que bloquea pagar por encima de lo acordado, overridable con razón + capability (maker-checker), detrás de flag.
 - [ ] Reliability signal detecta engagements engaged sin tarifa (`rate_unset`) y overrides del guardrail.
 - [ ] El comprobante (TASK-960) y el read-model (TASK-959/961) leen el monto del engagement (SSOT) sin recomputar.
