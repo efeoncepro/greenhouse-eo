@@ -207,3 +207,9 @@ Reglas obligatorias:
 
 1. ¿El primitivo debe ser un script one-shot (como el de TASK-957) o un helper canónico + endpoint admin? Recomendación: script one-shot para V1 (cohorte = 1); promover a helper si emerge una segunda cohorte (ver Follow-ups).
 2. ¿Agregar el CHECK `deel_contract_id NOT NULL` ahora (NOT VALID) o esperar al backfill? Recomendación: esperar — sin el valor real, un CHECK NOT VALID no aporta hasta poder validarlo; la señal cubre la detección mientras tanto.
+
+## Delta 2026-05-31 — Deel contract ID de Melkin provisto + verificación payroll-neutral
+
+- **Valor del gap operacional resuelto**: el operador proveyó el Deel contract ID de **Melkin Hernández = `m4ye2qg`**. Al ejecutar Slice 1, backfillear `members.deel_contract_id = 'm4ye2qg'` para `member_id='melkin-hernandez'` (hoy NULL).
+- **Verificado payroll-neutral** (`grep` en `src/lib/payroll/`): `deel_contract_id` es **puramente informativo** — fluye al payroll entry como label de display (`calculate-payroll.ts:395`, receibo/PDF/Excel: `Contrato Deel: <id>`) y NO entra en ningún cálculo ni gate de readiness. Setearlo de NULL → `m4ye2qg` solo agrega la referencia visible en su recibo; ningún monto cambia. Igualmente correr el gate `pnpm vitest run src/lib/payroll` antes/después.
+- **Pendiente de acceso a PG**: al momento de capturar el valor, la sesión local GCP ADC estaba expirada (`invalid_rapt` / reauth). Aplicar requiere `gcloud auth login` + `gcloud auth application-default login` previo. El valor queda registrado aquí; se aplica al ejecutar Slice 1 (junto con el backfill) o ad-hoc con PG re-autenticado.
