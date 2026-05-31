@@ -14,7 +14,7 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-017`
-- Status real: `Diseno`
+- Status real: `Mockup aprobado`
 - Rank: `TBD`
 - Domain: `cross-domain` (`people|hr|payroll|finance|identity|ui|data`)
 - Blocked by: `TASK-961`, `TASK-962`
@@ -27,6 +27,29 @@
 Evolucionar la lista de People desde un directorio de colaboradores hacia un overview workforce persona-centrico: status, worker type, pais, assignment, manager, payment rail, compensation coverage y readiness/gaps.
 
 Esta task materializa en la lista lo que `TASK-961` materializa en el detalle: People es el hub operativo; Payroll, Contractor y Finance son rails especializadas.
+
+## Approved Mockup Lock
+
+El mockup aprobado por el usuario el `2026-05-31` es el contrato visual/UX obligatorio para esta task.
+
+- Ruta local aprobada: `/people/mockup/workforce-command`
+- Route file: `src/app/(dashboard)/people/mockup/workforce-command/page.tsx`
+- View mockup: `src/views/greenhouse/people/mockup/workforce-command/PeopleWorkforceCommandMockupView.tsx`
+- Mock data tipada: `src/views/greenhouse/people/mockup/workforce-command/data.ts`
+- GVC scenario: `scripts/frontend/scenarios/people-workforce-command-center.scenario.ts`
+- Ultima evidencia GVC aprobable: `.captures/2026-05-31T15-44-37_people-workforce-command-center`
+
+Decision aprobada:
+
+- People List evoluciona a **People Workforce Command Center**: header compacto, command strip, exception queue lateral, roster como area principal, filtros/saved views livianos e inspector/drawer para evidencia.
+- La UI debe sentirse enterprise-operacional, no pesada ni tipo dashboard marketing.
+- Los controles de filtro/saved views deben ser pills compactas/livianas, no botones grandes dominantes.
+- El roster debe priorizar lectura y decision rapida; no debe convertir cada fila en una mini ficha persona.
+- La columna `Evidence` debe mostrar un estado principal + resumen compacto; no repetir varios chips por fila cuando eso aprieta la tabla.
+- El layout no debe generar scroll horizontal de pagina. Cualquier overflow horizontal debe considerarse regresion visual salvo que sea un contenedor tecnico explicitamente justificado y aprobado.
+- La correccion del issue rojo de hydration forma parte del contrato: inputs MUI del mockup y superficies persistentes asociadas deben tener IDs estables cuando el componente genera IDs SSR/client distintos.
+
+Regla de implementacion UI: construir la UI runtime desde este mockup aprobado. El agente implementador puede cablear datos reales, redaction, permisos, copy canonico, estados vacios y responsive fixes, pero no debe redisenar la jerarquia, volver a una tabla tradicional ni aumentar densidad/chips inline sin aprobacion explicita.
 
 ## Why This Task Exists
 
@@ -164,6 +187,7 @@ Reglas obligatorias:
 - Add filters for status, worker type, country, department/assignment, manager, payment rail and readiness.
 - Preserve existing search/sort behavior.
 - Keep layout dense and operational, not dashboard/hero-like.
+- Preserve the approved lightweight pill treatment for saved views and filters; avoid large filled buttons that make the command surface feel heavy.
 
 ### Slice 3 — Table Columns and Row States
 
@@ -177,6 +201,8 @@ Reglas obligatorias:
   - Compensation state.
   - Readiness.
 - Ensure long labels do not resize rows unpredictably.
+- Keep row evidence summarized: one primary evidence/readiness state plus concise count/summary text. Detailed evidence belongs in the inspector/drawer, not as many chips inside the row.
+- Preserve desktop/laptop no-page-horizontal-overflow behavior from the approved mockup.
 - Link row drilldown to `/people/[memberId]` with the selected workforce tab/section if `TASK-961` exposes one.
 
 ### Slice 4 — Copy, Tests and GVC

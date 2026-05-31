@@ -82,8 +82,13 @@ Hard rules:
 
 ### M02 - People List Workforce Overview
 
-- Status: `approved to design/build as mockup`
-- Planned mock route: `/people/mockup/workforce-command`
+- Status: `approved and built as mockup`
+- Current mock route: `/people/mockup/workforce-command`
+- Source files:
+  - `src/app/(dashboard)/people/mockup/workforce-command/page.tsx`
+  - `src/views/greenhouse/people/mockup/workforce-command/PeopleWorkforceCommandMockupView.tsx`
+  - `src/views/greenhouse/people/mockup/workforce-command/data.ts`
+  - `scripts/frontend/scenarios/people-workforce-command-center.scenario.ts`
 - Primary task: `TASK-963`
 - Product role: People Workforce Command Center: roster-level command surface with exception queue, workforce filters, summary coverage and row inspector.
 
@@ -92,11 +97,15 @@ Hard rules:
 - This is not just a table. It is the approved future `/people` command surface, with the roster as the main working area.
 - The list must stay scan-friendly; do not turn every row into a mini profile.
 - Rows must expose person status, worker type, country, assignment/title, manager, payment rail, compensation coverage, readiness and attention state.
+- Row evidence must stay summarized: one primary state plus concise count/summary text. Detailed compensation, document, readiness and rail evidence belongs in the inspector/drawer.
 - Summary cards must prioritize exceptions and readiness, not vanity totals.
 - Filters must include worker type, country, assignment/team, manager, payment rail, compensation coverage and readiness.
+- Filter and saved-view controls must remain lightweight pills/segmented controls; large dominant filled buttons are not approved for this command surface.
 - Row selection should open an inspector/drawer with evidence and next safe action; it must not duplicate every row action inline.
 - Salary/cost fields are redacted by default unless the user has the correct capability.
 - Payroll state in the list is a summary/link. It must not show payroll calculations, statutory deductions or period-close operations.
+- The approved desktop/laptop layout must not generate page-level horizontal scroll. Horizontal overflow is a regression unless explicitly re-approved.
+- Hydration/dev-overlay issues are blockers for approval: MUI inputs or persistent controls that generate unstable SSR/client IDs must receive stable IDs.
 - GVC must prove filter changes, row inspector, horizontal density and mobile behavior.
 
 ### M03 - Workforce Coverage & Readiness Control Room

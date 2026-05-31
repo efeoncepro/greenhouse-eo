@@ -26,7 +26,7 @@ Implementation agents should use this as the build plan for the remaining EPIC-0
 | ID | Mockup | Planned route | Primary task | Purpose |
 | --- | --- | --- | --- | --- |
 | `M01` | Person 360 Workforce Command Profile - Daniela | `/people/mockup/daniela-workforce` | `TASK-961` | Approved individual person/workforce hub. Built. |
-| `M02` | People Workforce Command Center | `/people/mockup/workforce-command` | `TASK-963` | Future `/people` command surface: roster, filters, exception queues, workforce coverage and inspector. |
+| `M02` | People Workforce Command Center | `/people/mockup/workforce-command` | `TASK-963` | Approved `/people` command surface mockup: roster, filters, exception queues, workforce coverage and inspector. |
 | `M03` | Workforce Coverage & Readiness Control Room | `/people/mockup/workforce-readiness` | `TASK-962` | Diagnostic planning surface for gaps, dispositions and remediation candidates. |
 | `M04` | Person Workforce Documents & Signature Rail | `/people/mockup/workforce-documents` | `TASK-964` | Documents/signature evidence as People rail, consuming EPIC-001. |
 | `M05` | Workforce Reliability Signals Control Plane | `/people/mockup/workforce-reliability` | `TASK-967` | Cross-rail confidence signals and owner-domain runbooks. |
@@ -60,10 +60,17 @@ Implementation agents should use this as the build plan for the remaining EPIC-0
 
 ### Route and ownership
 
-- Planned route: `/people/mockup/workforce-command`
+- Approved route: `/people/mockup/workforce-command`
 - View folder: `src/views/greenhouse/people/mockup/workforce-command/*`
 - Scenario: `people-workforce-command-center`
 - Owning task: `TASK-963`
+
+### Current state
+
+- Built route: `/people/mockup/workforce-command`
+- Built scenario: `people-workforce-command-center`
+- Approval status: approved as the target People Workforce Command Center direction after density and hydration fixes.
+- Last approved visual evidence candidate: `.captures/2026-05-31T15-44-37_people-workforce-command-center`
 
 ### Product question
 
@@ -110,11 +117,14 @@ This is the mockup previously described as the People command surface. It is not
    - Readiness state.
    - Documents state.
    - View presets: All workforce, Needs attention, Contractors, International rails, Missing comp, Payment setup.
+   - Approved treatment: lightweight pills/segmented controls. Do not replace with large filled buttons unless product explicitly re-approves the density.
 
 5. Workforce roster:
    - Columns: person, status, worker type, country, assignment/title, manager, payment rail, compensation coverage, readiness, documents, attention.
    - Row density: operational, scannable, no mini-profile cards.
    - Sensitive values: redacted by default; show coverage/status instead of money unless capability allows.
+   - Approved evidence treatment: each row shows one primary evidence/readiness state plus concise count/summary text. Multi-chip evidence stacks in the row are too dense and must move to the inspector.
+   - Approved responsive behavior: desktop/laptop must not create page-level horizontal scroll.
 
 6. Right inspector:
    - Opens on row click.

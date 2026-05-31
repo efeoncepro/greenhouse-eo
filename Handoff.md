@@ -1,3 +1,24 @@
+# Sesion 2026-05-31 — EPIC-017 M02 People Workforce Command Center — ✅ MOCKUP APROBADO
+
+**Rama**: `develop`. Scope docs + mockup refinements locales; no runtime productivo, DB, migraciones, API ni lifecycle moves.
+
+El usuario aprobó el diseño del mockup `M02` / `TASK-963` tras la segunda iteración de densidad:
+- Ruta local aprobada: `/people/mockup/workforce-command`.
+- Contrato visual: command surface enterprise liviana, no tabla pesada; header/command strip compactos, exception queue lateral, roster como área principal, filtros/saved views tipo pills, inspector/drawer para evidencia.
+- Ajuste clave aprobado: la columna `Evidence` no debe apilar múltiples chips por fila; usar un estado principal + resumen corto y mover detalle al inspector.
+- Regresión visual prohibida: page-level horizontal scroll en desktop/laptop.
+- Issue rojo resuelto: hydration mismatch por IDs MUI inestables; inputs persistentes deben tener IDs estables.
+
+Docs sincronizados:
+- `TASK-963` ahora declara `Status real: Mockup aprobado` + `Approved Mockup Lock`.
+- `RESEARCH-008-approved-mockup-contracts-2026-05-31` marca M02 como `approved and built as mockup`.
+- `RESEARCH-008-epic017-mockup-execution-plan-2026-05-31` registra estado construido/aprobado y reglas de densidad.
+- `EPIC-017` registra delta M02 aprobado.
+
+Validación previa de la iteración aprobada: eslint focalizado 0, `pnpm design:lint` 0/0, Playwright console clean, `pnpm fe:capture people-workforce-command-center --env=local` OK, dossier en `.captures/2026-05-31T15-44-37_people-workforce-command-center/review-dossier.md`.
+
+---
+
 # Sesion 2026-05-31 — TASK-968 Contractor Compensation Setup — 🔨 IN-PROGRESS (Slice 1/4)
 
 **Rama**: `develop` (sin branch, override del operador). En progreso.

@@ -9,7 +9,6 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Collapse from '@mui/material/Collapse'
-import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
@@ -33,7 +32,6 @@ import CustomTextField from '@core/components/mui/TextField'
 import DataTableShell from '@/components/greenhouse/data-table/DataTableShell'
 import {
   ContextChipStrip,
-  MetricSummaryCard,
   OperationalPanel,
   OperationalStatusBadge
 } from '@/components/greenhouse/primitives'
@@ -105,6 +103,24 @@ const readinessRows = (person: WorkforcePerson) => [
   ['Tax/provider review', person.readiness.taxProviderReview]
 ] as const
 
+const evidenceSummary = (person: WorkforcePerson) => {
+  const states = [
+    person.compensationCoverage,
+    person.documents,
+    person.readiness.payrollCalculation,
+    person.readiness.paymentRail,
+    person.readiness.documentsSignature
+  ]
+
+  const missing = states.filter(state => state === 'missing' || state === 'blocked').length
+  const review = states.filter(state => state === 'warning').length
+
+  if (missing > 0) return { label: person.attentionLabel, tone: 'warning' as MockupTone, caption: `${missing} missing · ${review} review` }
+  if (review > 0) return { label: person.attentionLabel, tone: 'warning' as MockupTone, caption: `${review} review checks` }
+
+  return { label: person.attentionLabel, tone: 'success' as MockupTone, caption: 'Comp · docs · readiness OK' }
+}
+
 const applySavedView = (view: SavedView, people: WorkforcePerson[]) => {
   if (view.filter === 'attention') return people.filter(person => person.attentionCodes.length > 0)
 
@@ -133,10 +149,10 @@ const Header = ({ selectedView, onLineageClick }: { selectedView: SavedView; onL
       overflow: 'hidden'
     })}
   >
-    <CardContent sx={{ p: { xs: 4, md: 5 } }}>
-      <Stack spacing={4}>
-        <Stack direction={{ xs: 'column', lg: 'row' }} justifyContent='space-between' spacing={4}>
-          <Stack spacing={2} sx={{ minWidth: 0 }}>
+    <CardContent sx={{ p: { xs: 2.5, md: 4 } }}>
+      <Stack spacing={{ xs: 2, md: 3 }}>
+        <Stack direction={{ xs: 'column', lg: 'row' }} justifyContent='space-between' spacing={{ xs: 2, md: 3 }}>
+          <Stack spacing={1.5} sx={{ minWidth: 0 }}>
             <Button
               component={Link}
               href='/people'
@@ -144,33 +160,61 @@ const Header = ({ selectedView, onLineageClick }: { selectedView: SavedView; onL
               color='secondary'
               size='small'
               startIcon={<i className='tabler-arrow-left' aria-hidden='true' />}
-              sx={{ alignSelf: 'flex-start', px: 0 }}
+              sx={{ alignSelf: 'flex-start', px: 0, fontSize: { xs: '0.875rem', md: '0.9375rem' } }}
             >
               Back to current people
             </Button>
             <Box>
-              <Typography variant='h3' sx={{ fontSize: { xs: '1.8rem', md: '2.125rem' }, lineHeight: 1.15 }}>
+              <Typography variant='h4' sx={{ fontSize: { xs: '1.35rem', md: '1.5rem' }, fontWeight: 700, lineHeight: 1.15 }}>
                 People
               </Typography>
-              <Typography color='text.secondary'>
-                Workforce command center · {selectedView.label} · as of May 31st 2026 10:42
+              <Typography color='text.secondary' sx={{ fontSize: { xs: '0.875rem', md: '1rem' } }}>
+                9 active · 5 need attention · {selectedView.label} · May 31st 2026 10:42
               </Typography>
             </Box>
           </Stack>
 
-          <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap alignItems='center'>
+          <Stack direction='row' spacing={1.5} flexWrap='wrap' useFlexGap alignItems='center'>
             <Button
-              variant='tonal'
+              variant='outlined'
               color='primary'
+              size='small'
               startIcon={<i className='tabler-user-plus' aria-hidden='true' />}
               data-capture='people-command-add-worker'
+              sx={theme => ({
+                bgcolor: alpha(theme.palette.primary.main, 0.03),
+                fontSize: { xs: '0.8125rem', md: '0.875rem' },
+                '&:hover': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.07)
+                }
+              })}
             >
               Add worker
             </Button>
-            <Button variant='tonal' color='secondary' startIcon={<i className='tabler-layout-list' aria-hidden='true' />}>
+            <Button
+              variant='text'
+              color='secondary'
+              size='small'
+              startIcon={<i className='tabler-layout-list' aria-hidden='true' />}
+              sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
+                color: 'text.secondary',
+                '&:hover': { color: 'text.primary' }
+              }}
+            >
               Saved views
             </Button>
-            <Button variant='tonal' color='secondary' startIcon={<i className='tabler-download' aria-hidden='true' />}>
+            <Button
+              variant='text'
+              color='secondary'
+              size='small'
+              startIcon={<i className='tabler-download' aria-hidden='true' />}
+              sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
+                color: 'text.secondary',
+                '&:hover': { color: 'text.primary' }
+              }}
+            >
               Export view
             </Button>
             <Tooltip title='More actions'>
@@ -181,15 +225,22 @@ const Header = ({ selectedView, onLineageClick }: { selectedView: SavedView; onL
           </Stack>
         </Stack>
 
-        <ContextChipStrip ariaLabel='People command center status' scrollMobile={false}>
-          <OperationalStatusBadge label='Relationship coverage 9/9' tone='success' icon='tabler-link' />
-          <OperationalStatusBadge label='Classification parity 9/9' tone='success' icon='tabler-shield-check' />
+        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+          <ContextChipStrip ariaLabel='People command center status' scrollMobile={false}>
+            <OperationalStatusBadge label='9/9 relationship' tone='success' icon='tabler-link' />
+            <OperationalStatusBadge label='5 attention' tone='warning' icon='tabler-alert-circle' />
+            <Box component='button' onClick={onLineageClick} sx={{ all: 'unset', cursor: 'pointer', display: 'inline-flex' }}>
+              <OperationalStatusBadge label='Lineage' tone='primary' icon='tabler-chart-dots' />
+            </Box>
+            <OperationalStatusBadge label='Payroll read-only' tone='secondary' icon='tabler-calculator' />
+          </ContextChipStrip>
+        </Box>
+        <Stack direction='row' spacing={1} sx={{ display: { xs: 'flex', sm: 'none' } }}>
           <Box component='button' onClick={onLineageClick} sx={{ all: 'unset', cursor: 'pointer', display: 'inline-flex' }}>
-            <OperationalStatusBadge label='Read model confidence' tone='primary' icon='tabler-chart-dots' />
+            <CustomChip round='true' size='small' variant='tonal' color='primary' label='Lineage' icon={<i className='tabler-chart-dots' aria-hidden='true' />} />
           </Box>
-          <OperationalStatusBadge label='Payroll remains rail' tone='warning' icon='tabler-calculator' />
-          <OperationalStatusBadge label='Documents via EPIC-001' tone='secondary' icon='tabler-file-certificate' />
-        </ContextChipStrip>
+          <CustomChip round='true' size='small' variant='tonal' color='secondary' label='Payroll read-only' icon={<i className='tabler-calculator' aria-hidden='true' />} />
+        </Stack>
       </Stack>
     </CardContent>
   </Card>
@@ -202,25 +253,128 @@ const SavedViewSelector = ({
   activeView: SavedView
   onSelect: (view: SavedView) => void
 }) => (
-  <Stack direction='row' spacing={2} useFlexGap flexWrap='wrap' data-capture='people-command-saved-views'>
+  <Stack
+    direction='row'
+    spacing={1}
+    useFlexGap
+    flexWrap={{ xs: 'nowrap', md: 'wrap' }}
+    data-capture='people-command-saved-views'
+    sx={{
+      width: '100%',
+      minWidth: 0,
+      overflowX: { xs: 'auto', md: 'visible' },
+      overflowY: 'hidden',
+      pb: { xs: 0.5, md: 0 },
+      scrollbarWidth: 'none',
+      '&::-webkit-scrollbar': { display: 'none' }
+    }}
+  >
     {savedViews.map(view => {
       const selected = view.id === activeView.id
 
       return (
-        <Button
+        <Box
           key={view.id}
-          variant={selected ? 'contained' : 'tonal'}
-          color={selected ? 'primary' : 'secondary'}
-          size='small'
+          component='button'
+          type='button'
           onClick={() => onSelect(view)}
           aria-pressed={selected}
-          sx={{ minHeight: 36 }}
+          sx={theme => ({
+            all: 'unset',
+            boxSizing: 'border-box',
+            flex: '0 0 auto',
+            minWidth: 'max-content',
+            minHeight: { xs: 28, md: 32 },
+            px: { xs: 1.5, md: 2 },
+            borderRadius: 999,
+            border: `1px solid ${selected ? alpha(theme.palette.primary.main, 0.42) : theme.palette.divider}`,
+            bgcolor: selected ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+            color: selected ? 'primary.main' : 'text.secondary',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            fontSize: { xs: '0.8125rem', md: '0.875rem' },
+            fontWeight: selected ? 700 : 600,
+            lineHeight: 1,
+            transition: 'border-color 160ms ease, background-color 160ms ease, color 160ms ease',
+            '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+            '&:hover': {
+              borderColor: selected ? alpha(theme.palette.primary.main, 0.54) : alpha(theme.palette.primary.main, 0.28),
+              bgcolor: selected ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.primary.main, 0.04),
+              color: selected ? 'primary.main' : 'text.primary'
+            },
+            '&:focus-visible': {
+              outline: `2px solid ${alpha(theme.palette.primary.main, 0.44)}`,
+              outlineOffset: 2
+            }
+          })}
         >
           {view.label}
-        </Button>
+        </Box>
       )
     })}
   </Stack>
+)
+
+const CommandStrip = () => (
+  <Card
+    data-capture='people-command-summary'
+    sx={theme => ({
+      border: `1px solid ${theme.palette.divider}`,
+      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+      overflow: 'hidden'
+    })}
+  >
+    <CardContent sx={{ p: { xs: 1.5, md: 2.5 } }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: 'none', sm: 'repeat(3, minmax(0, 1fr))', lg: 'repeat(5, minmax(0, 1fr))' },
+          gridAutoColumns: { xs: 'max-content', sm: 'auto' },
+          gridAutoFlow: { xs: 'column', sm: 'row' },
+          gap: { xs: 1, md: 0 },
+          overflowX: { xs: 'auto', sm: 'visible' },
+          pb: { xs: 0.5, sm: 0 },
+          scrollbarWidth: 'none',
+          '&::-webkit-scrollbar': { display: 'none' }
+        }}
+      >
+        {commandMetrics.map(metric => (
+          <Box
+            key={metric.id}
+            sx={theme => ({
+              px: { xs: 1.5, md: 2.5 },
+              py: { xs: 1, md: 1 },
+              width: { xs: 132, sm: 'auto' },
+              minWidth: 0,
+              borderRight: { lg: `1px solid ${theme.palette.divider}` },
+              borderRadius: { xs: `${theme.shape.customBorderRadius.md}px`, lg: 0 },
+              bgcolor: { xs: alpha(theme.palette[metric.tone].main, 0.04), lg: 'transparent' },
+              '&:last-child': { borderRight: 0 }
+            })}
+          >
+            <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0 }}>
+              <CustomAvatar skin='light' color={metric.tone} variant='rounded' size={28}>
+                <i className={metric.icon} aria-hidden='true' />
+              </CustomAvatar>
+              <Box sx={{ minWidth: 0 }}>
+                <Stack direction='row' spacing={1} alignItems='baseline'>
+                  <Typography variant='subtitle1' sx={{ fontSize: { xs: '0.9375rem', md: '1rem' }, fontWeight: 700, lineHeight: 1 }}>
+                    {metric.value}
+                  </Typography>
+                  <Typography variant='body2' sx={{ fontSize: { xs: '0.8125rem', md: '0.875rem' }, fontWeight: 700 }} noWrap>
+                    {metric.title}
+                  </Typography>
+                </Stack>
+                <Typography variant='caption' color='text.secondary' noWrap sx={{ display: { xs: 'none', sm: 'block' } }}>
+                  {metric.subtitle}
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+        ))}
+      </Box>
+    </CardContent>
+  </Card>
 )
 
 const ExceptionQueue = ({
@@ -232,7 +386,7 @@ const ExceptionQueue = ({
 }) => (
   <OperationalPanel
     title='Exception queue'
-    subheader='Prioritized workforce gaps. Every item opens evidence; no remediation happens here.'
+    subheader='Gaps that filter the roster. Remediation stays in the owning domain.'
     icon='tabler-alert-triangle'
     iconColor='warning'
     action={
@@ -243,7 +397,7 @@ const ExceptionQueue = ({
       ) : null
     }
   >
-    <Stack spacing={2.5} data-capture='people-command-exception-queue'>
+    <Stack spacing={1.5} data-capture='people-command-exception-queue'>
       {exceptionGroups.map(group => {
         const selected = selectedCode ? group.codes.includes(selectedCode) : false
 
@@ -259,7 +413,7 @@ const ExceptionQueue = ({
               border: `1px solid ${selected ? theme.palette[group.tone].main : theme.palette.divider}`,
               bgcolor: selected ? alpha(theme.palette[group.tone].main, 0.08) : 'background.paper',
               borderRadius: `${theme.shape.customBorderRadius.md}px`,
-              p: 3,
+              p: 2,
               cursor: 'pointer',
               transition: 'transform 160ms ease, border-color 160ms ease, background-color 160ms ease',
               '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
@@ -270,20 +424,17 @@ const ExceptionQueue = ({
               }
             })}
           >
-            <Stack direction='row' spacing={3} alignItems='flex-start'>
-              <CustomAvatar skin='light' color={group.tone} variant='rounded'>
+            <Stack direction='row' spacing={2} alignItems='center'>
+              <CustomAvatar skin='light' color={group.tone} variant='rounded' size={34}>
                 <i className={group.icon} aria-hidden='true' />
               </CustomAvatar>
-              <Stack spacing={1} sx={{ minWidth: 0, flex: 1 }}>
-                <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
-                  <Typography variant='subtitle2' sx={{ fontWeight: 700, minWidth: 0 }}>
+              <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
+                <Stack direction='row' spacing={1.5} alignItems='center' justifyContent='space-between'>
+                  <Typography variant='body2' sx={{ fontWeight: 700, minWidth: 0 }} noWrap>
                     {group.title}
                   </Typography>
                   <OperationalStatusBadge label={group.count} tone={group.tone} />
                 </Stack>
-                <Typography variant='body2' color='text.secondary'>
-                  {group.description}
-                </Typography>
                 <Typography variant='caption' color='text.secondary'>
                   Owner: {group.owner}
                 </Typography>
@@ -344,136 +495,123 @@ const RosterTable = ({
   selectedPerson: WorkforcePerson | null
   onSelect: (person: WorkforcePerson) => void
 }) => (
-  <OperationalPanel
-    title='Workforce roster'
-    subheader='Person-first rows with regime, rail and evidence coverage.'
-    icon='tabler-table'
-    iconColor='primary'
-    action={<OperationalStatusBadge label={`${people.length} shown`} tone='primary' icon='tabler-filter' />}
-  >
-    <Box data-capture='people-command-roster-table'>
-      <DataTableShell identifier='people-workforce-command-roster' ariaLabel='People workforce roster' density='compact' stickyFirstColumn>
-        <Table size='small' sx={{ minWidth: 1040 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Person</TableCell>
-              <TableCell>Regime</TableCell>
-              <TableCell>Country</TableCell>
-              <TableCell>Assignment</TableCell>
-              <TableCell>Manager</TableCell>
-              <TableCell>Payment rail</TableCell>
-              <TableCell>Comp</TableCell>
-              <TableCell>Readiness</TableCell>
-              <TableCell>Documents</TableCell>
-              <TableCell>Attention</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {people.map(person => {
-              const selected = selectedPerson?.id === person.id
-              const blocked = Object.values(person.readiness).some(state => state === 'blocked')
-              const warning = person.attentionCodes.length > 0
+  <Box data-capture='people-command-roster-table'>
+    <DataTableShell identifier='people-workforce-command-roster' ariaLabel='People workforce roster' density='compact' stickyFirstColumn>
+      <Table
+        size='small'
+        sx={{
+          width: '100%',
+          minWidth: 0,
+          tableLayout: 'fixed',
+          '& .MuiTableCell-root': {
+            px: { lg: 2, xl: 2.5 },
+            py: 2
+          },
+          '& tbody .MuiTableRow-root': {
+            transition: 'background-color 160ms ease'
+          }
+        }}
+      >
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ width: { lg: '24%', xl: '23%' } }}>Person</TableCell>
+            <TableCell sx={{ width: { lg: '23%', xl: '22%' } }}>Work setup</TableCell>
+            <TableCell sx={{ width: { lg: '25%', xl: '22%' } }}>Assignment</TableCell>
+            <TableCell sx={{ display: { xs: 'none', xl: 'table-cell' }, width: '12%' }}>Manager</TableCell>
+            <TableCell sx={{ width: { lg: '28%', xl: '21%' } }}>Evidence</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {people.map(person => {
+            const selected = selectedPerson?.id === person.id
+            const evidence = evidenceSummary(person)
 
-              return (
-                <TableRow
-                  key={person.id}
-                  hover
-                  selected={selected}
-                  onClick={() => onSelect(person)}
-                  tabIndex={0}
-                  onKeyDown={event => {
-                    if (event.key === 'Enter' || event.key === ' ') onSelect(person)
-                  }}
-                  sx={theme => ({
-                    cursor: 'pointer',
-                    '&.Mui-selected': {
-                      bgcolor: alpha(theme.palette.primary.main, 0.08)
-                    }
-                  })}
-                >
-                  <TableCell>
-                    <Stack direction='row' spacing={2} alignItems='center' sx={{ minWidth: 220 }}>
-                      <CustomAvatar skin='light' color={statusTone(person.status)} size={34}>
-                        {person.initials}
-                      </CustomAvatar>
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography variant='subtitle2' sx={{ fontWeight: 700 }} noWrap>
-                          {person.displayName}
-                        </Typography>
-                        <Typography variant='caption' color='text.secondary' noWrap>
-                          {person.team}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>
-                    <Stack spacing={1}>
-                      <OperationalStatusBadge label={person.regimeLabel} tone={regimeTone(person.regime)} />
-                      <Typography variant='caption' color='text.secondary' noWrap>
-                        {person.regimeDetail}
+            return (
+              <TableRow
+                key={person.id}
+                hover
+                selected={selected}
+                onClick={() => onSelect(person)}
+                tabIndex={0}
+                onKeyDown={event => {
+                  if (event.key === 'Enter' || event.key === ' ') onSelect(person)
+                }}
+                sx={theme => ({
+                  cursor: 'pointer',
+                  '&.Mui-selected': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.08)
+                  }
+                })}
+              >
+                <TableCell>
+                  <Stack direction='row' spacing={2} alignItems='center' sx={{ minWidth: 0 }}>
+                    <CustomAvatar skin='light' color={statusTone(person.status)} size={34}>
+                      {person.initials}
+                    </CustomAvatar>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant='subtitle2' sx={{ fontWeight: 700 }} noWrap>
+                        {person.displayName}
                       </Typography>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>{person.country}</TableCell>
-                  <TableCell>
-                    <Typography variant='body2' noWrap>
-                      {person.role}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>{person.manager}</TableCell>
-                  <TableCell>
-                    <Typography variant='body2' noWrap>
+                      <Typography variant='caption' color='text.secondary' noWrap>
+                        {person.team}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </TableCell>
+                <TableCell>
+                  <Stack spacing={1} sx={{ minWidth: 0 }}>
+                    <OperationalStatusBadge label={person.regimeLabel} tone={regimeTone(person.regime)} />
+                    <Typography variant='caption' color='text.secondary'>
                       {person.paymentRail}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
+                  </Stack>
+                </TableCell>
+                <TableCell>
+                  <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                    {person.role}
+                  </Typography>
+                  <Typography variant='caption' color='text.secondary'>
+                    {person.country} · {person.team}
+                  </Typography>
+                </TableCell>
+                <TableCell sx={{ display: { xs: 'none', xl: 'table-cell' } }}>{person.manager}</TableCell>
+                <TableCell>
+                  <Stack spacing={1} sx={{ minWidth: 0 }}>
                     <OperationalStatusBadge
-                      label={labelForCoverage(person.compensationCoverage)}
-                      tone={toneForCoverage(person.compensationCoverage)}
+                      label={evidence.label}
+                      tone={evidence.tone}
+                      icon={evidence.tone === 'success' ? 'tabler-circle-check' : 'tabler-alert-circle'}
                     />
-                  </TableCell>
-                  <TableCell>
-                    <OperationalStatusBadge
-                      label={blocked ? 'Blocked' : warning ? 'Review' : 'Ready'}
-                      tone={blocked ? 'error' : warning ? 'warning' : 'success'}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <OperationalStatusBadge label={labelForCoverage(person.documents)} tone={toneForCoverage(person.documents)} />
-                  </TableCell>
-                  <TableCell>
-                    <OperationalStatusBadge
-                      label={person.attentionLabel}
-                      tone={person.attentionCodes.length ? 'warning' : 'success'}
-                      icon={person.attentionCodes.length ? 'tabler-alert-circle' : 'tabler-circle-check'}
-                    />
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-      </DataTableShell>
-      {!people.length ? (
-        <Box
-          sx={theme => ({
-            mt: 4,
-            border: `1px dashed ${theme.palette.divider}`,
-            borderRadius: `${theme.shape.customBorderRadius.md}px`,
-            p: 5,
-            textAlign: 'center'
+                    <Typography variant='caption' color='text.secondary' noWrap>
+                      {evidence.caption}
+                    </Typography>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            )
           })}
-        >
-          <Typography variant='subtitle1' sx={{ fontWeight: 700 }}>
-            No people match this view
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            Clear filters or switch saved view.
-          </Typography>
-        </Box>
-      ) : null}
-    </Box>
-  </OperationalPanel>
+        </TableBody>
+      </Table>
+    </DataTableShell>
+    {!people.length ? (
+      <Box
+        sx={theme => ({
+          mt: 4,
+          border: `1px dashed ${theme.palette.divider}`,
+          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+          p: 5,
+          textAlign: 'center'
+        })}
+      >
+        <Typography variant='subtitle1' sx={{ fontWeight: 700 }}>
+          No people match this view
+        </Typography>
+        <Typography variant='body2' color='text.secondary'>
+          Clear filters or switch saved view.
+        </Typography>
+      </Box>
+    ) : null}
+  </Box>
 )
 
 const MobileRoster = ({
@@ -514,9 +652,9 @@ const MobileRoster = ({
                 {person.role}
               </Typography>
             </Box>
-            <OperationalStatusBadge label={person.attentionLabel} tone={person.attentionCodes.length ? 'warning' : 'success'} />
           </Stack>
           <Stack direction='row' spacing={1.5} useFlexGap flexWrap='wrap'>
+            <OperationalStatusBadge label={person.attentionLabel} tone={person.attentionCodes.length ? 'warning' : 'success'} />
             <OperationalStatusBadge label={person.regimeLabel} tone={regimeTone(person.regime)} />
             <OperationalStatusBadge label={person.country} tone='secondary' icon='tabler-map-pin' />
             <OperationalStatusBadge label={labelForCoverage(person.compensationCoverage)} tone={toneForCoverage(person.compensationCoverage)} />
@@ -525,6 +663,100 @@ const MobileRoster = ({
       </Box>
     ))}
   </Stack>
+)
+
+const RosterWorksurface = ({
+  activeView,
+  filteredPeople,
+  isMobile,
+  search,
+  selectedCode,
+  selectedPerson,
+  onClearCode,
+  onClearSearch,
+  onSearch,
+  onSelectPerson,
+  onSelectView
+}: {
+  activeView: SavedView
+  filteredPeople: WorkforcePerson[]
+  isMobile: boolean
+  search: string
+  selectedCode: string | null
+  selectedPerson: WorkforcePerson | null
+  onClearCode: () => void
+  onClearSearch: () => void
+  onSearch: (value: string) => void
+  onSelectPerson: (person: WorkforcePerson) => void
+  onSelectView: (view: SavedView) => void
+}) => (
+  <OperationalPanel
+    title='Workforce roster'
+    subheader='Person-first roster with regime, rail and evidence coverage.'
+    icon='tabler-table'
+    iconColor='primary'
+    action={<OperationalStatusBadge label={`${filteredPeople.length} shown`} tone='primary' icon='tabler-filter' />}
+  >
+    <Stack spacing={3} data-capture='people-command-roster'>
+      <Stack spacing={3}>
+        <SavedViewSelector activeView={activeView} onSelect={onSelectView} />
+        <CustomTextField
+          id='people-workforce-command-search'
+          fullWidth
+          value={search}
+          onChange={event => onSearch(event.target.value)}
+          placeholder='Search people, manager, country, rail'
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position='start'>
+                <i className='tabler-search' aria-hidden='true' />
+              </InputAdornment>
+            )
+          }}
+        />
+        <FilterChips search={search} selectedCode={selectedCode} onClearSearch={onClearSearch} onClearCode={onClearCode} />
+      </Stack>
+
+      <Box
+        sx={theme => ({
+          border: `1px solid ${alpha(theme.palette.warning.main, 0.24)}`,
+          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+          px: 3,
+          py: 2,
+          bgcolor: alpha(theme.palette.warning.main, 0.05)
+        })}
+      >
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ sm: 'center' }} justifyContent='space-between'>
+          <Stack direction='row' spacing={1.5} alignItems='center'>
+            <i className='tabler-shield-lock text-warning' aria-hidden='true' />
+            <Typography variant='body2' sx={{ fontWeight: 700 }}>
+              Payroll boundary
+            </Typography>
+          </Stack>
+          <Typography variant='body2' color='text.secondary'>
+            People shows evidence and links; payroll calculations, exports and payments stay in owning rails.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Box>
+        <LinearProgress
+          variant='determinate'
+          value={Math.round((filteredPeople.length / workforcePeople.length) * 100)}
+          sx={{ height: 5, borderRadius: 999, mb: 1 }}
+        />
+        <Typography variant='caption' color='text.secondary'>
+          {filteredPeople.length} of {workforcePeople.length} people in this view
+        </Typography>
+      </Box>
+
+      {isMobile ? (
+        <MobileRoster people={filteredPeople} selectedPerson={selectedPerson} onSelect={onSelectPerson} />
+      ) : (
+        <RosterTable people={filteredPeople} selectedPerson={selectedPerson} onSelect={onSelectPerson} />
+      )}
+    </Stack>
+  </OperationalPanel>
 )
 
 const Inspector = ({ person, open, onClose }: { person: WorkforcePerson | null; open: boolean; onClose: () => void }) => {
@@ -729,123 +961,39 @@ const PeopleWorkforceCommandMockupView = () => {
   }
 
   return (
-    <Box data-capture='people-workforce-command-mockup' sx={{ pb: 8 }}>
-      <Stack spacing={6}>
+    <Box data-capture='people-workforce-command-mockup' sx={{ maxWidth: '100%', overflowX: 'clip', pb: 8 }}>
+      <Stack spacing={4}>
         <Header selectedView={activeView} onLineageClick={event => setLineageAnchor(event.currentTarget)} />
 
-        <Box
-          data-capture='people-command-summary'
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(5, minmax(0, 1fr))' },
-            gap: 3
-          }}
-        >
-          {commandMetrics.map(metric => (
-            <MetricSummaryCard
-              key={metric.id}
-              title={metric.title}
-              value={metric.value}
-              subtitle={metric.subtitle}
-              icon={metric.icon}
-              iconColor={metric.tone}
-              statusLabel={metric.status}
-              statusTone={metric.statusTone}
-            />
-          ))}
-        </Box>
+        <CommandStrip />
 
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', xl: '360px minmax(0, 1fr)' },
-            gap: 5,
+            gridTemplateColumns: { xs: '1fr', lg: '304px minmax(0, 1fr)' },
+            gap: 4,
             alignItems: 'start'
           }}
         >
-          <ExceptionQueue selectedCode={selectedCode} onSelectCode={setSelectedCode} />
+          <Box sx={{ order: { xs: 2, lg: 1 } }}>
+            <ExceptionQueue selectedCode={selectedCode} onSelectCode={setSelectedCode} />
+          </Box>
 
-          <Stack spacing={4} sx={{ minWidth: 0 }}>
-            <OperationalPanel
-              title='Roster controls'
-              subheader='Saved views and filters update the command surface without changing source data.'
-              icon='tabler-adjustments-horizontal'
-              iconColor='secondary'
-            >
-              <Stack spacing={4}>
-                <SavedViewSelector activeView={activeView} onSelect={view => setActiveView(view)} />
-                <CustomTextField
-                  fullWidth
-                  value={search}
-                  onChange={event => setSearch(event.target.value)}
-                  placeholder='Search people, manager, country, rail'
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position='start'>
-                        <i className='tabler-search' aria-hidden='true' />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-                <FilterChips
-                  search={search}
-                  selectedCode={selectedCode}
-                  onClearSearch={() => setSearch('')}
-                  onClearCode={() => setSelectedCode(null)}
-                />
-                <Box>
-                  <LinearProgress
-                    variant='determinate'
-                    value={Math.round((filteredPeople.length / workforcePeople.length) * 100)}
-                    sx={{ height: 6, borderRadius: 999 }}
-                  />
-                  <Typography variant='caption' color='text.secondary'>
-                    {filteredPeople.length} of {workforcePeople.length} people in this view
-                  </Typography>
-                </Box>
-              </Stack>
-            </OperationalPanel>
-
-            <Box data-capture='people-command-roster'>
-              {isMobile ? (
-                <MobileRoster people={filteredPeople} selectedPerson={selectedPerson} onSelect={handleSelectPerson} />
-              ) : (
-                <RosterTable people={filteredPeople} selectedPerson={selectedPerson} onSelect={handleSelectPerson} />
-              )}
-            </Box>
-
-            <Card
-              sx={theme => ({
-                borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-                border: `1px solid ${alpha(theme.palette.warning.main, 0.24)}`
-              })}
-            >
-              <CardContent>
-                <Stack spacing={3}>
-                  <Stack direction='row' spacing={2} alignItems='center'>
-                    <CustomAvatar skin='light' color='warning' variant='rounded'>
-                      <i className='tabler-shield-lock' aria-hidden='true' />
-                    </CustomAvatar>
-                    <Box>
-                      <Typography variant='subtitle1' sx={{ fontWeight: 700 }}>
-                        Payroll boundary
-                      </Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        This command center shows evidence, coverage and links. Payroll calculations, receipts, exports and payment execution stay in their owning domains.
-                      </Typography>
-                    </Box>
-                  </Stack>
-                  <Divider />
-                  <Stack direction='row' spacing={1.5} useFlexGap flexWrap='wrap'>
-                    <OperationalStatusBadge label='No statutory deduction detail' tone='warning' />
-                    <OperationalStatusBadge label='No payment execution' tone='warning' />
-                    <OperationalStatusBadge label='Regime badges required' tone='primary' />
-                    <OperationalStatusBadge label='Cost redacted by default' tone='secondary' />
-                  </Stack>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Stack>
+          <Box sx={{ minWidth: 0, order: { xs: 1, lg: 2 } }}>
+            <RosterWorksurface
+              activeView={activeView}
+              filteredPeople={filteredPeople}
+              isMobile={isMobile}
+              search={search}
+              selectedCode={selectedCode}
+              selectedPerson={selectedPerson}
+              onClearCode={() => setSelectedCode(null)}
+              onClearSearch={() => setSearch('')}
+              onSearch={setSearch}
+              onSelectPerson={handleSelectPerson}
+              onSelectView={setActiveView}
+            />
+          </Box>
         </Box>
       </Stack>
 
