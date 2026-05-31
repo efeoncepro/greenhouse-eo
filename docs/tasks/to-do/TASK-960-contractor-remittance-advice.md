@@ -73,6 +73,16 @@ Reglas obligatorias:
 - **NUNCA** invocar `Sentry.captureException` directo — usar `captureWithDomain(err, 'finance', ...)`.
 - Invocar la skill `greenhouse-finance-accounting-operator` (régimen de retención + naming contable) y `greenhouse-ux-writing` (copy es-CL + disclaimer no-laboral) antes de implementar. El cálculo ya está cubierto por TASK-793/794 — esta task NO recalcula.
 
+**⚠️ Reglas duras — MOCKUP APROBADO (cablear, NO rehacer)** (operador aprobó 2026-05-31):
+
+- **NUNCA** rediseñar el visor ni el documento desde cero. El mockup en `src/views/greenhouse/contractors/mockup/` (`RemittanceAdviceViewer.tsx` + `RemittanceAdviceMockupView.tsx` + `remittance-data.ts`) está **aprobado y es vinculante**. La implementación **promueve y cablea** ese mockup a datos reales, NO lo reconstruye. Verificado via GVC (scenario `remittance-advice`, 5 frames, ambos locales) + auditoría modern-ui.
+- **NUNCA** cambiar la dirección visual aprobada: **un solo acento** (verde `#2E7D32` en el neto pagado), título del documento **neutro** (`text.primary`, NO primary morado), chip de régimen **neutro** (`secondary`), disclaimer en **caja neutra** (`divider` + bg sutil, NO warning ámbar), logo Efeonce azul como única presencia de marca. Colapsar a un acento es la decisión de diseño aprobada — no reintroducir colores compitiendo.
+- **SIEMPRE** promover el componente del mockup a su lugar canónico preservando el render: `RemittanceAdviceViewer.tsx` (mockup) → `src/components/greenhouse/contractors/RemittanceAdviceViewer.tsx` (compartido), consumiendo el struct canónico. El JSX/estructura/tokens NO cambian; solo cambia la fuente del struct (mock → presenter real).
+- **SIEMPRE** convertir `buildRemittancePresentation(regime, locale)` (mock) en el presenter canónico `buildRemittanceAdvice(payable, issuer, locale)` (`src/lib/contractor-engagements/remittance/`) que produce el **mismo shape** `RemittancePresentation`. El shape del struct del mockup ES el contrato; el presenter real lo llena desde el `ContractorPayable` + Operating Entity + locale resuelto.
+- **SIEMPRE** el react-pdf (`generate-contractor-remittance-pdf.tsx`) **reproduce la dirección visual del visor aprobado** (mismo struct, mismo layout, misma paleta de un acento). Visor MUI y PDF son dos renderers del mismo struct — NO dos diseños.
+- **SIEMPRE** mover el copy es-CL/en-US inline del mock (`remittance-data.ts` COPY) a `src/lib/copy/dictionaries/{es-CL,en-US}/` (namespace nuevo) — el contenido de los strings está aprobado; solo cambia dónde viven. El locale lo resuelve `src/lib/email/locale-resolver.ts` pattern (locale del contractor).
+- **SIEMPRE** integrar el visor en las superficies REALES (`ContractorSelfServiceView` + `ContractorAdminWorkbenchView`) replicando la integración mostrada en el mockup (sección "Comprobantes de pago" + tabla "Comprobantes emitidos" con CTAs Ver / Descargar PDF por payable `paid`).
+
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-758-receipt-render-4-regimes.md` (pattern del presenter + PDF a espejar)
@@ -122,6 +132,12 @@ Reglas obligatorias:
 - Referencia al documento del contractor (`contractorInvoiceId` → invoice asset, TASK-791).
 - Self-Service Hub runtime (`ContractorSelfServiceView`, projection canónica TASK-796).
 - Pattern de presenter + PDF (`receipt-presenter.ts` + `generate-payroll-pdf.tsx`, TASK-758) + legal signatures helper (TASK-863).
+- **Mockup APROBADO (vinculante, 2026-05-31)** — el diseño visual ya está resuelto y aprobado por el operador. La implementación lo cablea, NO lo rehace:
+  - `src/views/greenhouse/contractors/mockup/RemittanceAdviceViewer.tsx` — visor MUI (la dirección visual vinculante).
+  - `src/views/greenhouse/contractors/mockup/RemittanceAdviceMockupView.tsx` — showcase con toggles locale/régimen + integración en ambas superficies.
+  - `src/views/greenhouse/contractors/mockup/remittance-data.ts` — `RemittancePresentation` type + `buildRemittancePresentation(regime, locale)` mock (el shape ES el contrato).
+  - `src/app/(dashboard)/my/contractor/remittance/mockup/page.tsx` — ruta del mockup.
+  - `scripts/frontend/scenarios/remittance-advice.scenario.ts` — scenario GVC de regresión visual (ambos locales fullpage + variantes de régimen).
 
 ### Gap
 
@@ -188,6 +204,20 @@ Reglas obligatorias:
 **Arquitectura ver + descargar (cero drift)**: el `RemittanceAdvicePresentation` struct (presenter) es la única fuente de la presentación. Lo consumen DOS renderers — `RemittanceAdviceViewer` (MUI, visor in-app responsive/accesible) y `generate-contractor-remittance-pdf` (react-pdf, descargable/imprimible). El contenido (emisor, montos, retención, disclaimer, N°) no puede diverger entre vista y PDF porque ambos leen el mismo struct (patrón TASK-758). El visor MUI es la vista primaria in-app; el endpoint sirve además el PDF inline (`?inline`) para un "Ver PDF" fiel y `?download` (attachment) para descarga.
 
 **Cuándo se genera/disponibiliza**: cuando el payable alcanza `paid` (confirmación real de pago). El número `EO-RA` se asigna en ese momento. Forward-compat: preview en estados previos marcado "borrador/no pagado" SIN número correlativo (no V1).
+
+**Mapping mockup aprobado → implementación (cablear, NO rehacer)**:
+
+| Mockup aprobado (existe) | Implementación canónica (cablear) | Qué cambia |
+|---|---|---|
+| `remittance-data.ts` → `RemittancePresentation` type | `src/lib/contractor-engagements/remittance/types.ts` | Mover el type tal cual (el shape ES el contrato). |
+| `remittance-data.ts` → `buildRemittancePresentation(regime, locale)` mock | `src/lib/contractor-engagements/remittance/remittance-presenter.ts` → `buildRemittanceAdvice(payable, issuer, locale)` | Mismo shape de salida; la fuente pasa de mock a `ContractorPayable` + Operating Entity + locale resuelto. Cero recálculo de montos. |
+| `remittance-data.ts` → `COPY` (es-CL/en-US inline) | `src/lib/copy/dictionaries/{es-CL,en-US}/` (namespace nuevo) | Strings aprobados; solo cambia dónde viven. |
+| `mockup/RemittanceAdviceViewer.tsx` | `src/components/greenhouse/contractors/RemittanceAdviceViewer.tsx` | Promover sin tocar JSX/tokens; consume el struct canónico. |
+| `mockup/RemittanceAdviceMockupView.tsx` (showcase) | integración en `ContractorSelfServiceView` + `ContractorAdminWorkbenchView` reales | El showcase NO se promueve; se replica la integración (sección "Comprobantes" + tabla) en las vistas reales. |
+| (no existe en mock) | `generate-contractor-remittance-pdf.tsx` (react-pdf) | NUEVO, pero **reproduce** el visor aprobado desde el mismo struct (no es un diseño nuevo). |
+| `scenarios/remittance-advice.scenario.ts` | reusar tal cual como regresión visual post-implementación | Apuntar a las superficies reales cuando dejen de ser mock. |
+
+El agente que implemente: parte del mockup aprobado, NO de cero. La verificación visual final (real-artifact loop TASK-863) compara el PDF + visor reales contra el mockup aprobado (debe ser idéntico en dirección visual).
 
 ## Rollout Plan & Risk Matrix
 
@@ -284,3 +314,5 @@ Refinamiento de scope post-creación (operador):
 - **Identidad del emisor**: el documento lleva razón social + tax id + domicilio + **logo** de la Operating Entity, resueltos desde `legal_entity_organization_id` (NUNCA hardcodeado — multi-entidad forward-compat).
 - **Numeración correlativa propia `EO-RA-NNNNNN`** (gapless, atómica, persistida) — convención `EO-` de Greenhouse. Nueva Slice 1 (allocator).
 - Scope pasó de 3 a 4 slices: (1) allocator → (2) presenter → (3) PDF → (4) visor + endpoints + ambas superficies.
+- **Bilingüe (es-CL + en-US)** vía i18n canónico; el documento sigue el locale del contractor (pattern `email/locale-resolver`).
+- **Mockups plasmados y APROBADOS por el operador (2026-05-31)**: ruta TSX real `src/views/greenhouse/contractors/mockup/` + scenario GVC `remittance-advice`. Verificados via GVC local (5 frames, ambos locales + 4 regímenes) + loop de auditoría modern-ui (paleta colapsada a un solo acento: título neutro, chip neutro, disclaimer neutro, verde del neto único acento → documento legal sobrio). **La implementación cablea estos mockups, NO los rehace** — ver mapping en Detailed Spec + reglas duras "MOCKUP APROBADO" en Architecture Alignment.
