@@ -102,20 +102,27 @@ Reglas obligatorias:
 
 - `prepareMonthlyContractorPaymentRun({ periodYear, periodMonth })`: barre contractor payables `ready_for_finance` del período con obligación creada, los agrupa (moneda/cuenta/processor), y crea las órdenes de pago en `draft`/`pending_approval`. Idempotente (no duplica).
 
-### Slice 2 — Trigger (manual + opcional schedule)
+### Slice 2 — Trigger (endpoint manual + opcional schedule)
 
 - Endpoint `POST /api/finance/contractor-payables/monthly-run` (capability finance) para disparar manual.
 - Opcional: Cloud Scheduler job en ops-worker que lo dispare post-cierre (NO Vercel cron).
 
-### Slice 3 — Reliability + cierre
+### Slice 3 — Botón "Iniciar corrida mensual" en el workbench Finanzas (REQUERIDO — pedido operador 2026-05-31)
 
-- Signal de cobertura de la corrida (payables ready del período no incluidos en ninguna orden). Steady=0.
+- Botón en `/finance/contractor-payments` (TASK-974) que invoca el endpoint del orquestador: selector de período (default = mes operativo vigente), preview de cuántos payables `ready_for_finance` entran + total neto por moneda, confirmación → POST.
+- Surface honesto del resultado (órdenes creadas / payables incluidos / idempotente "ya estaba preparada"). El botón **prepara**, no paga (las órdenes quedan `draft`/`pending_approval`).
+- **Skills de product design** (greenhouse-ux + forms-ux para el dialog de confirmación + greenhouse-ux-writing) — es un add chico al workbench existente, no un wizard nuevo; mockup ligero + GVC.
+
+### Slice 4 — Reliability + cierre
+
+- Signal de cobertura de la corrida (payables ready del período no incluidos en ninguna orden, pasada la ventana SLA TASK-978). Steady=0.
 - Docs + arch Delta.
 
 ## Out of Scope
 
-- Settlement al banco → TASK-977 (blocker).
-- Pantalla de la corrida → TASK-974 (esta task expone el orquestador; la UI lo invoca).
+- Settlement al banco → TASK-977 (blocker, ya completa).
+- Reporte PDF/Excel "nómina de contractors" de la corrida → **TASK-980** (espejo del reporte de payroll TASK-782).
+- Email al contractor con comprobante al pagar → **TASK-981**.
 - Aprobación/pago automáticos (siempre humano).
 
 ## Detailed Spec
