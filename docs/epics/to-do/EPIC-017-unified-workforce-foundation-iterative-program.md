@@ -167,7 +167,8 @@ Hard rule:
 
 | Task | Phase | Status | Purpose |
 | --- | --- | --- | --- |
-| `TASK-959` | `0/1` | `to-do` | Workforce Foundation Read-Only Object Map Audit: primer mapa/audit read-only persona-centrico con gap codes, parity contra current classification y candidate reliability signals. |
+| `TASK-959` | `0/1` | `complete` | Workforce Foundation Read-Only Object Map Audit: contrato/mapa read-only implementado con gap codes, parity 100% contra current classification en dev real activo, audit script y candidate reliability signals documentados. |
+| `TASK-961` | `3` | `to-do` | Person 360 Workforce Facet Read-Only Promotion: promover People/Person 360 como hub workforce read-only consumiendo `WorkforceFoundationMap`, manteniendo Payroll como rail especializada y sin writes. |
 
 Las tasks se agregaran de forma iterativa cuando cumplan este protocolo:
 
@@ -188,7 +189,7 @@ Esta cola es deliberadamente conceptual. No reserva IDs.
 | Workforce object map audit | 0/1 | Mapear `members`, `identity_profiles`, relationships, engagements, compensation, payroll y payables contra conceptos canonicos. | ADR review checkpoint. |
 | Current work classification canonical projection | 1/2 | Promover estado vigente persona-relacion-rail como read model compartido. | Parity contra TASK-957 resolver y Person 360. |
 | Compensation profile timeline | 2/3 | Leer compensacion como historia versionada, no solo version actual. | Definir si scope es relationship, assignment o composite. |
-| Person 360 workforce journey facet | 3 | Mostrar relacion, assignment, compensation, readiness y rails en un lugar. | Modelo de read-only projection estable. |
+| Person 360 workforce journey facet | 3 | Mostrar relacion, assignment, compensation, readiness y rails en un lugar. | Creada como `TASK-961`; ejecutar solo como read-only/aditiva y con redaction/access explicitos. |
 | Workforce rail drift signals | 1/2 | Detectar doble rail, rail sin evidencia, relationship sin payment readiness y compensation drift. | Definir steady state esperado por signal. |
 | Relationship-first activation command | 4 | Crear/activar worker desde person + relationship + assignment + compensation. | Parity projection y approval del write-path ADR/delta. |
 | Agent-safe workforce context | 5 | Exponer contexto seguro para Nexa/MCP sin heuristicas por tabla. | Field-level redaction + autonomy tier definidos. |
@@ -250,6 +251,12 @@ Appendix agregado: `docs/research/RESEARCH-008-current-state-gap-analysis-2026-0
 
 Pre-task gate agregado: `docs/research/RESEARCH-008-pre-task-considerations.md` documenta las consideraciones que deben resolverse antes de abrir la primera task. La recomendacion operativa sigue siendo que la primera task, si se abre, sea un audit/mapa read-only y no un write path.
 
-Primera child task agregada: `TASK-959` (`docs/tasks/to-do/TASK-959-workforce-foundation-read-only-object-map-audit.md`). Scope estrictamente read-only; no acepta el ADR implicitamente ni habilita writes/UI/migrations.
+Primera child task agregada: `TASK-959` (`docs/tasks/complete/TASK-959-workforce-foundation-read-only-object-map-audit.md`). Scope estrictamente read-only; no acepta el ADR implicitamente ni habilita writes/UI/migrations.
 
 Payroll backlog triage agregado: `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md` clasifica tasks existentes de Payroll/Workforce/Compensation que sirven al objetivo, marca cuales requieren replanteo antes de ejecucion y preserva lanes separadas para compliance, receipts, close gates y smoke tests.
+
+Delta posterior 6: `TASK-959` ejecutada y cerrada. Se agrego `src/lib/workforce/foundation/*` + `scripts/workforce/audit-workforce-foundation-map.ts`, todo read-only. Hallazgos dev reales sin demo: relationship coverage `9/9`, current classification parity `9/9`, current compensation `5/9`, payment rail evidence `8/9`, sin gaps `error`. El audit inicial con demo detecto 5 fixtures `demo-%@demo.greenhouse.efeonce.org` como `data.demo_or_fixture_tolerated_gap`/info; luego se limpiaron de dev junto a sus rows materiales derivadas, por lo que `--active-only --include-demo` vuelve a reportar solo 9 activos reales. Candidate signals documentadas en `RESEARCH-008-current-state-gap-analysis-2026-05-31.md`; no se cablearon señales productivas, UI, APIs ni migrations.
+
+Delta posterior 7: se reviso una captura de Deel worker profile como evidencia de materializacion del articulo. Correccion importante: la captura pertenece al dominio People / Worker Profile, no a Payroll. Payroll aparece como una rail secundaria dentro del perfil de persona. Lectura agregada en `RESEARCH-008-current-state-gap-analysis-2026-05-31.md`: Deel presenta la persona/worker como primer viewport con facets de worker information, role details, compensation summary, relationship, org chart, documents, compliance, time off, apps y quick actions. Implicacion para Greenhouse: Person 360/People debe ser el hub de workforce; Payroll sigue siendo vista especializada separada para calculo, periodos, recibos y salidas estatutarias.
+
+Delta posterior 8: se creo `TASK-961` como siguiente paso operativo. La task promueve el hub existente People/Person 360 con una faceta/seccion `workforce` read-only consumiendo `WorkforceFoundationMap` (TASK-959). Mantiene el limite canonico: People/Person 360 es el hub de estado laboral vigente; Payroll, Finance y Contractor Payables siguen siendo rails especializadas y no reciben writes desde esta task.

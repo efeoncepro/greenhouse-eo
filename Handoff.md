@@ -4,13 +4,41 @@
 
 ---
 
+# Sesion 2026-05-31 — TASK-959 Workforce Foundation Read-Only Object Map Audit — ✅ COMPLETE
+
+**Rama**: `develop` por instruccion explicita del operador; no se creo branch. Task cerrada en `docs/tasks/complete/TASK-959-workforce-foundation-read-only-object-map-audit.md`, README/registry sincronizados. Scope ejecutado: mapa read-only `Person -> WorkRelationship -> WorkAssignment candidate -> CompensationProfile candidate -> PaymentRail -> readiness/compliance -> gap codes`; sin writes, UI, migrations, API routes, outbox ni acceptance implicita del ADR `Proposed`. Skills usados: `greenhouse-agent` + `greenhouse-payroll-auditor`.
+
+Resultado:
+- Nuevo contrato/mapa: `src/lib/workforce/foundation/gap-codes.ts`, `object-map-types.ts`, `object-map.ts`.
+- Tests: `src/lib/workforce/foundation/object-map.test.ts`.
+- Script read-only: `scripts/workforce/audit-workforce-foundation-map.ts` con `--active-only`, `--include-demo`, `--profile-id`, `--member-id`, `--json-out`, `--fail-on-error-gap`, `--limit`.
+- Docs: `RESEARCH-008-current-state-gap-analysis-2026-05-31.md` actualizado con audit real y candidate signals; `EPIC-017` actualizado con TASK-959 complete.
+
+Hallazgos dev DB:
+- Sin demo: relationship coverage `9/9`, current classification parity `9/9`, current compensation `5/9`, payment rail evidence `8/9`, gaps error `0`; gaps warning principales: `readiness.unresolved_or_blocked=8`, `compensation.missing_current_version=4`.
+- Con demo pre-cleanup: 5 fixtures quedaban como gaps tolerados/info (`person.member_without_profile`, `person.no_identity_profile`, `relationship.missing_active_work_relationship`, `data.demo_or_fixture_tolerated_gap`).
+- Cleanup posterior dev: eliminados 5 demo members `demo-%@demo.greenhouse.efeonce.org` (`is_demo=true`, `identity_profile_id=NULL`) + derivadas materiales (`member_role_cost_basis_snapshots=5`, `person_operational_360=15`, `member_capacity_economics=15`). Verificacion: demo members restantes `0`, referencias restantes a esos member ids `0`, audit `--active-only --include-demo` vuelve a `9/9` activos reales.
+- Captura Deel revisada y corregida por operador: pertenece al dominio People / Worker Profile, no a Payroll. Payroll aparece como una rail secundaria; la pantalla principal es la ficha persona/worker con facets de worker information, role details, compensation summary, relationship, org chart, documents, compliance, time off, apps y quick actions. Lectura documentada en `RESEARCH-008-current-state-gap-analysis-2026-05-31.md`.
+- Recomendacion siguiente: no UI/write path; primero investigar/remediar cobertura compensation/readiness de activos reales y decidir que parte es onboarding intencional vs deuda de datos.
+
+Validacion:
+- `pnpm pg:doctor` OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `pnpm vitest run src/lib/workforce src/lib/account-360/current-work-classification.test.ts` OK (14 files / 92 tests).
+- Audit script OK con `--active-only` y con `--active-only --include-demo`.
+- `pnpm task:lint --task TASK-959` OK.
+- `pnpm docs:context-check` OK con 2 warnings historicos de tamano de Handoff.
+- `git diff --check` OK.
+
+---
+
 # Sesion 2026-05-31 — Unified Workforce Foundation research/architecture/ADR abiertos — 🧭 PROPOSED
 
 Pedido: tomar la senal de Deel como input estratégico, sin modificar runtime ni planificar tasks todavía. Resultado: se abrio el paquete documental pre-task para discutir si Greenhouse debe converger a una fundacion workforce persona-centrica ("one workforce, multiple rails"). Nuevos docs: `docs/research/RESEARCH-008-unified-workforce-foundation.md`, `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md` y `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_DECISION_V1.md`. Indices actualizados: `docs/research/README.md` y `docs/architecture/DECISIONS_INDEX.md`. El ADR queda en `Proposed`: no autoriza runtime changes, migraciones, UI redesign ni tasks hasta review/aceptacion humana.
 
 Delta posterior: se creo `EPIC-017` como contenedor iterativo del programa (`docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`) y se actualizo `docs/epics/EPIC_ID_REGISTRY.md` + `docs/epics/README.md`. El epic no crea child tasks iniciales; define fases e intake protocol para agregarlas gradualmente cuando research/ADR habiliten scopes ejecutables.
 
-Delta posterior 2: se agrego el deep-dive `docs/research/RESEARCH-008-current-state-gap-analysis-2026-05-31.md` con interpretacion del articulo de Deel, tendencias de mercado (Deel/Rippling/Remote/Workday/ADP), auditoria de stack/codebase/DB live dev y matriz `tenemos vs necesitamos`. Evidencia DB: `pnpm pg:doctor` OK contra `greenhouse-pg-dev`; `members=146`, `person_legal_entity_relationships=11`, `person_360=164`, `contractor_engagements=1`, `compensation_versions=14`, `payment_obligations=14`; 5 demos activos international/internal sin relationship activo; compensation tuple drift live=0. No se modifico runtime ni se abrieron tasks.
+Delta posterior 2: se agrego el deep-dive `docs/research/RESEARCH-008-current-state-gap-analysis-2026-05-31.md` con interpretacion del articulo de Deel, tendencias de mercado (Deel/Rippling/Remote/Workday/ADP), auditoria de stack/codebase/DB live dev y matriz `tenemos vs necesitamos`. Evidencia DB inicial: `pnpm pg:doctor` OK contra `greenhouse-pg-dev`; `members=146`, `person_legal_entity_relationships=11`, `person_360=164`, `contractor_engagements=1`, `compensation_versions=14`, `payment_obligations=14`; 5 demos activos international/internal sin relationship activo (limpiados posteriormente tras TASK-959); compensation tuple drift live=0. No se modifico runtime ni se abrieron tasks durante ese research.
 
 Delta posterior 3: se documento el gate previo a la primera task en `docs/research/RESEARCH-008-pre-task-considerations.md`. Contiene las decisiones a considerar antes de abrir `TASK-###`: pregunta inicial read-only, doctrina de persona, cobertura de relationships, scope de compensation, shape de assignment, boundaries payroll/contractor/finance, redaction/access y criterios de exito. Recomendacion: primera task eventual = audit/mapa read-only, sin writes ni UI.
 
@@ -28371,6 +28399,30 @@ Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. N
 **Test coverage final TASK-872**: 500+ tests verde. SCIM/eligibility/primitive: 49 tests. Reliability signals: 3 live tests. Payroll legacy: 420 tests (incluye 12 fixes pre-existentes). Lint + tsc verdes.
 
 **Push pendiente**: 11 commits en `develop` local. Operador autoriza push cuando esté listo. Deploy staging via Vercel auto-trigger en push a develop.
+
+---
+
+## 2026-05-31 — EPIC-017 / TASK-959 cierre + TASK-961 creada
+
+Contexto: el operador corrigio el enfoque tras la captura de Deel: la captura corresponde a People / Worker Profile, no a Payroll. Decision operativa: Person 360 ya es un hub parcial y debe evolucionar como hub workforce; Payroll queda como vista/rail especializada para calculos, periodos, recibos y salidas estatutarias.
+
+Trabajo realizado:
+- `TASK-959` quedo cerrada como complete con mapa/audit read-only (`src/lib/workforce/foundation/*` + `scripts/workforce/audit-workforce-foundation-map.ts`).
+- Se limpio dev DB de 5 fixtures `demo-%@demo.greenhouse.efeonce.org` y sus rows materializadas derivadas (`member_role_cost_basis_snapshots`, `person_operational_360`, `member_capacity_economics`, `members`). Post-cleanup quedan 0 demo members y 0 referencias a esos member ids.
+- Auditoria real activa post-cleanup: relationship coverage `9/9`, classification parity `9/9`, current compensation `5/9`, payment rail evidence `8/9`, gaps `readiness.unresolved_or_blocked=8` y `compensation.missing_current_version=4`, sin gaps `error`.
+- `RESEARCH-008` y `EPIC-017` quedaron actualizados con la lectura People-vs-Payroll de Deel.
+- Se creo `TASK-961` (`docs/tasks/to-do/TASK-961-person-360-workforce-facet-read-only-promotion.md`) como siguiente task: promover People/Person 360 con faceta/seccion `workforce` read-only consumiendo `WorkforceFoundationMap`, sin writes ni mutaciones de payroll/finance/contractor.
+
+Validacion documental actual:
+- `pnpm task:lint --task TASK-959` OK.
+- `pnpm task:lint --task TASK-961` OK.
+- `git diff --check` OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `pnpm vitest run src/lib/workforce src/lib/account-360/current-work-classification.test.ts` OK (14 files / 92 tests).
+- `pnpm docs:context-check` OK con 2 warnings historicos de tamano de `Handoff.md`.
+
+Pendiente antes de commit/push:
+- Staging selectivo: no incluir cambios/untracked de `TASK-960`/remittance salvo instruccion explicita del operador.
 # Sesion 2026-05-30 — TASK-953 Greenhouse Visual Capture Evidence Hardening — ✅ COMPLETE
 
 Rama: `develop` por instrucción explícita del operador; no se creó branch. Task cerrada en `docs/tasks/complete/TASK-953-greenhouse-visual-capture-evidence-hardening.md`; registry/README sincronizados y plan en `docs/tasks/plans/TASK-953-plan.md`.

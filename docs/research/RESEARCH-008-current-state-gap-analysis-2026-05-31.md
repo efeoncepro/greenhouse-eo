@@ -9,8 +9,8 @@
 - Related architecture: [GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md](../architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md)
 - Related epic: [EPIC-017 - Unified Workforce Foundation Iterative Program](../epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md)
 - Scope: market signal, Greenhouse codebase, live dev PostgreSQL, stack readiness, gap analysis
-- Runtime changes: none
-- Task creation: none
+- Runtime changes: none during research; later dev fixture cleanup recorded in the TASK-959 data hygiene delta below
+- Task creation: `TASK-959` was created and completed after the research checkpoint
 
 ## Executive Read
 
@@ -20,7 +20,7 @@ Greenhouse is already directionally aligned, but incompletely:
 
 - The stack is sufficient for this path: Next.js, PostgreSQL, Kysely/pg, migrations, outbox/reliability patterns, Person 360, Playwright/GVC and Vitest are already in place.
 - The codebase already has strong primitives: `identity_profiles`, Person 360 facets, `person_legal_entity_relationships`, relationship transitions, contractor engagements, compensation versions, payment obligations and reliability signals.
-- The live dev database shows the current gap clearly: `members` has 146 rows, but `person_legal_entity_relationships` has only 11 rows; 5 active demo international/internal members have no active employee or contractor relationship coverage.
+- The initial live dev database showed the gap class clearly: `members` had 146 rows, `person_legal_entity_relationships` had 11 rows, and 5 active demo international/internal members had no active employee or contractor relationship coverage. Those demo fixtures were later cleaned from dev after TASK-959 so future audits focus on real active workers.
 - The current architecture can support a unified workforce foundation, but Greenhouse still lacks the canonical cross-domain projection that answers: who is this person, what relationship is current, what assignment is current, what compensation applies, which rail pays, what compliance gates remain, and what history explains it.
 
 Recommended interpretation:
@@ -75,6 +75,32 @@ Deel is a global HR/payroll provider and can collapse more workflows inside its 
 - `members.contract_type` cannot be treated as current truth where relationship/engagement state says otherwise.
 
 The right copy is the data foundation doctrine, not a one-shot product clone.
+
+### Product capture interpretation
+
+User-provided Deel worker-profile capture reviewed on 2026-05-31.
+
+The capture materially confirms the article's doctrine in product form. It is a People / Worker Profile screen, not a Payroll screen. Payroll appears as one navigation rail inside the worker profile, while the primary object on screen is the person/worker:
+
+- header identity: name, worker id, active state, role, country, team calendar and org chart;
+- left navigation inside People: overview, payroll, worker information, time off, documents, coworking, equity/benefits, history, immigration, apps, verifications and compliance;
+- overview cards: role details, base compensation, total target compensation and contract;
+- relationship card: manager/reporting line;
+- personal/general cards: legal/personal fields, external worker id, work email, start date and work location;
+- quick actions: edit worker details and schedule termination;
+- organization position/role: explicit position and additional role slots.
+
+Interpretation for Greenhouse:
+
+- Person 360 / People should become the natural first viewport for workforce state, not a payroll, contractor or finance page.
+- Payroll should remain a separate specialized view/rail for calculations, periods, receipts and statutory outputs.
+- The People profile should expose payroll-adjacent facts only as worker facets: compensation summary, contract/relationship state, payment rail readiness and document/compliance status.
+- Contractor, documents, compliance, org chart, time off and app access should also read as facets of the worker journey, not as competing person roots.
+- `WorkAssignment` needs first-class treatment: role, manager, position, additional role, country/location and team/org context are visible alongside compensation and contract.
+- `CompensationProfile` should expose both current base compensation and total target compensation, but still preserve payroll/contractor/finance ownership behind the rail.
+- Quick actions should be relationship-aware commands, not table-specific shortcuts.
+
+Greenhouse should copy this shape carefully: unified profile first, specialized rails second.
 
 ## Market Pattern
 
@@ -343,7 +369,7 @@ Interpretation:
 
 ### Active relationship coverage anomaly
 
-Live query found 5 active demo international/internal members with no active employee or contractor relationship:
+Initial live query found 5 active demo international/internal members with no active employee or contractor relationship:
 
 - Demo Ana Internacional
 - Demo Carlos Internacional
@@ -353,8 +379,9 @@ Live query found 5 active demo international/internal members with no active emp
 
 Interpretation:
 
-- This may be intentional demo data, but it proves the migration gap class.
+- This was test/demo residue, but it proved the migration gap class.
 - A future `workforce.relationship_coverage` reliability signal should distinguish demo/fixture tolerated gaps from real production drift.
+- Post TASK-959 cleanup removed these 5 demo members and their derived materialized rows from dev, so current audits no longer include this fixture noise.
 
 ### Contractor engagement state
 
@@ -438,6 +465,134 @@ Recommended next sequence:
 5. Define `CompensationProfile` scope before moving any compensation write path.
 6. Only then evaluate relationship-first activation or compensation-change commands.
 7. Expose agent-safe context last, with field redaction, capabilities, audit and kill-switch.
+
+## TASK-959 Read-Only Audit Delta
+
+TASK-959 implemented the first internal, read-only `WorkforceFoundationMap` contract and audit script under:
+
+- `src/lib/workforce/foundation/object-map-types.ts`
+- `src/lib/workforce/foundation/object-map.ts`
+- `src/lib/workforce/foundation/gap-codes.ts`
+- `scripts/workforce/audit-workforce-foundation-map.ts`
+
+The mapper is explicitly an evidence layer, not a new source of truth. It reuses `resolveCurrentWorkClassification()` for current state and classifies the rest as relationship, assignment, compensation, payment rail, readiness and gap evidence.
+
+### Dev audit results
+
+Command:
+
+```bash
+pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/workforce/audit-workforce-foundation-map.ts --active-only
+```
+
+Result:
+
+| Metric | Count | Denominator | Rate |
+| --- | ---: | ---: | ---: |
+| Relationship coverage | 9 | 9 | 100% |
+| Current classification parity | 9 | 9 | 100% |
+| Current compensation coverage | 5 | 9 | 55.56% |
+| Payment rail evidence coverage | 8 | 9 | 88.89% |
+
+Gap summary without demo fixtures:
+
+| Gap code | Count | Severity |
+| --- | ---: | --- |
+| `readiness.unresolved_or_blocked` | 8 | warning |
+| `compensation.missing_current_version` | 4 | warning |
+
+Command with demo fixtures included before fixture cleanup:
+
+```bash
+pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/workforce/audit-workforce-foundation-map.ts --active-only --include-demo
+```
+
+Result:
+
+| Metric | Count | Denominator | Rate |
+| --- | ---: | ---: | ---: |
+| Relationship coverage | 9 | 14 | 64.29% |
+| Current classification parity | 9 | 9 | 100% |
+| Current compensation coverage | 5 | 14 | 35.71% |
+| Payment rail evidence coverage | 8 | 14 | 57.14% |
+
+Demo/fixture gap summary:
+
+| Gap code | Count | Severity posture |
+| --- | ---: | --- |
+| `person.member_without_profile` | 5 | info, tolerated fixture |
+| `person.no_identity_profile` | 5 | info, tolerated fixture |
+| `relationship.missing_active_work_relationship` | 5 | info, tolerated fixture |
+| `data.demo_or_fixture_tolerated_gap` | 5 | info |
+
+Interpretation:
+
+- For real active members in dev, the relationship layer is now coherent enough for a read-only Person-centered projection.
+- `resolveCurrentWorkClassification()` has 100% parity with the relationship-derived map for the real active cohort.
+- The next data weakness is not relationship classification; it is compensation/readiness coverage for active members.
+- Demo members are correctly classified as tolerated fixture gaps and should not drive production remediation work.
+
+### TASK-959 Data Hygiene Delta
+
+After reviewing the demo rows, the 5 active demo members were confirmed as test residue:
+
+- `is_demo = true`
+- `identity_profile_id IS NULL`
+- `primary_email LIKE 'demo-%@demo.greenhouse.efeonce.org'`
+- no current compensation, payroll entries or real person relationship coverage
+
+Cleanup applied on dev PostgreSQL in one transaction:
+
+| Object | Rows deleted |
+| --- | ---: |
+| `greenhouse_commercial.member_role_cost_basis_snapshots` | 5 |
+| `greenhouse_serving.person_operational_360` | 15 |
+| `greenhouse_serving.member_capacity_economics` | 15 |
+| `greenhouse_core.members` | 5 |
+
+The serving objects `member_360`, `member_leave_360` and `member_payroll_360` are views, so they were not directly deleted; they disappeared from audit output after deleting the member roots.
+
+Verification:
+
+- remaining demo members: `0`
+- remaining references to the deleted member ids in `member_id`/manager reference columns: `0`
+- `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/workforce/audit-workforce-foundation-map.ts --active-only --include-demo` now returns the same 9 real active members as `--active-only`.
+
+Post-cleanup audit:
+
+| Metric | Count | Denominator | Rate |
+| --- | ---: | ---: | ---: |
+| Relationship coverage | 9 | 9 | 100% |
+| Current classification parity | 9 | 9 | 100% |
+| Current compensation coverage | 5 | 9 | 55.56% |
+| Payment rail evidence coverage | 8 | 9 | 88.89% |
+
+Remaining gaps:
+
+| Gap code | Count | Severity |
+| --- | ---: | --- |
+| `readiness.unresolved_or_blocked` | 8 | warning |
+| `compensation.missing_current_version` | 4 | warning |
+
+### Candidate reliability signal specs
+
+These are proposed only. TASK-959 did not wire production signals.
+
+| Candidate signal | Module key | Source sketch | Expected steady state | Warning threshold | Error threshold | Epic phase |
+| --- | --- | --- | --- | --- | --- | --- |
+| `workforce.foundation.relationship_coverage_gap` | `workforce` | Active non-demo `members` left joined to active employee/contractor `person_legal_entity_relationships`. | 0 real active members without active relationship. | count > 0 for non-payroll-blocking cohort. | count > 0 for payroll/contractor active cohort. | Phase 1 |
+| `workforce.foundation.classification_parity_gap` | `workforce` | `WorkforceFoundationMap.classification.parity = false` compared to `resolveCurrentWorkClassification()`. | 0 mismatches. | N/A. | count > 0. | Phase 1 |
+| `workforce.foundation.compensation_lineage_gap` | `payroll` | Active non-demo members left joined to current `compensation_versions`; include tuple mismatch and member-scoped-without-relationship evidence. | 0 payroll-relevant active members missing current compensation. | count > 0 for non-payroll-ready/intake cohorts. | count > 0 for completed payroll-ready cohort. | Phase 1/2 |
+| `workforce.foundation.payment_rail_evidence_gap` | `finance` | Foundation map payment rail evidence by `payroll_via`, Deel/provider refs, payment profiles and obligations. | 0 active workers with missing rail evidence. | missing profile/evidence for non-immediate-pay cohort. | missing evidence for payment-due cohort. | Phase 1/2 |
+| `workforce.foundation.obligation_lineage_gap` | `finance` | `payment_obligations` with workforce source kind but missing `source_ref` or lineage metadata. | 0 workforce obligations without lineage. | count > 0 generated obligations. | count > 0 approved/paid obligations. | Phase 2 |
+
+### Recommended next single task
+
+After `TASK-959` and the Deel People/Worker Profile correction, the next task is no longer a Payroll task and should not be write-path convergence.
+
+`TASK-961` was created as the next executable step: promote the existing People/Person 360 hub with a read-only `workforce` facet/section that consumes `WorkforceFoundationMap`. The explicit product boundary is that People/Person 360 becomes the first viewport for workforce state, while Payroll remains a specialized rail for calculations, periods, receipts and statutory outputs.
+
+Follow-up after `TASK-961`: relationship/compensation/readiness coverage remediation plan, read-only first. It should explain why four real active members lack current compensation, why readiness is blocked/unresolved for eight of nine real active members, and which gaps are intentional onboarding state versus data debt.
 
 ## Non-Negotiables
 

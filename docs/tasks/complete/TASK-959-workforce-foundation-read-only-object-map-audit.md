@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-017`
-- Status real: `Diseno — primera task read-only del programa Unified Workforce Foundation`
+- Status real: `Complete — read-only map, audit script, dev DB findings and candidate signals documented`
 - Rank: `TBD`
 - Domain: `cross-domain` (`hr|payroll|finance|identity|platform|data`)
 - Blocked by: `none` (permitida como discovery/read-only aunque el ADR siga `Proposed`; no autoriza writes ni UI)
-- Branch: `task/TASK-959-workforce-foundation-read-only-object-map-audit`
+- Branch: `develop` (operator override; no task branch)
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -212,6 +212,12 @@ If the executing agent finds a better existing folder than `src/lib/workforce/fo
   - `data.demo_or_fixture_tolerated_gap`
 - Add pure unit tests for gap severity classification and redaction/sensitive field classification.
 
+Execution result:
+
+- Added `src/lib/workforce/foundation/gap-codes.ts`.
+- Added `src/lib/workforce/foundation/object-map-types.ts`.
+- Added pure tests in `src/lib/workforce/foundation/object-map.test.ts`.
+
 ### Slice 2 — Read-Only Mapper Over Existing Sources
 
 - Implement `buildWorkforceFoundationMapForMember()` and/or `buildWorkforceFoundationMapForProfile()` as read-only server functions.
@@ -230,6 +236,13 @@ If the executing agent finds a better existing folder than `src/lib/workforce/fo
   - compensation tuple mismatch;
   - Deel rail without contract id;
   - profile/member with tolerated demo fixture gap.
+
+Execution result:
+
+- Added `src/lib/workforce/foundation/object-map.ts`.
+- Reused `resolveCurrentWorkClassification()`.
+- Kept the mapper server-only and read-only; no writes, migrations, routes, outbox, API or UI.
+- The pure builder covers employee, contractor, missing relationship, missing profile, tuple mismatch, Deel rail without provider ref and demo tolerated gaps.
 
 ### Slice 3 — Dev DB Audit Script
 
@@ -255,6 +268,13 @@ If the executing agent finds a better existing folder than `src/lib/workforce/fo
   - `--json-out <path>` optional.
 - The script must fail loud only for infrastructure/query errors. Data gaps are reported as findings, not process failures, unless `--fail-on-error-gap` is explicitly passed.
 
+Execution result:
+
+- Added `scripts/workforce/audit-workforce-foundation-map.ts`.
+- Supports `--active-only`, `--include-demo`, `--profile-id`, `--member-id`, `--json-out`, `--fail-on-error-gap` and `--limit`.
+- Loads local tool env through `loadGreenhouseToolEnv()` + runtime Postgres profile.
+- Masks examples by initials and does not write generated artifacts unless `--json-out` is supplied.
+
 ### Slice 4 — Parity Report + Candidate Signals
 
 - Run the audit against dev PostgreSQL after `pnpm pg:doctor`.
@@ -274,6 +294,23 @@ If the executing agent finds a better existing folder than `src/lib/workforce/fo
   - tolerated demo/fixture behavior;
   - whether it should be Phase 1 or Phase 2 of EPIC-017.
 
+Execution result:
+
+- Audit without demo:
+  - relationship coverage: `9/9` (`100%`)
+  - classification parity: `9/9` (`100%`)
+  - current compensation coverage: `5/9` (`55.56%`)
+  - payment rail evidence coverage: `8/9` (`88.89%`)
+  - gap counts: `readiness.unresolved_or_blocked=8`, `compensation.missing_current_version=4`, `error=0`
+- Audit with demo:
+  - initial pre-cleanup relationship coverage: `9/14` (`64.29%`)
+  - initial pre-cleanup classification parity: `9/9` (`100%`)
+  - initial pre-cleanup current compensation coverage: `5/14` (`35.71%`)
+  - initial pre-cleanup payment rail evidence coverage: `8/14` (`57.14%`)
+  - initial demo gaps were `info` and marked with `data.demo_or_fixture_tolerated_gap`.
+  - post-cleanup: the 5 `demo-%@demo.greenhouse.efeonce.org` members and derived materialized rows were removed from dev; `--active-only --include-demo` now returns the same 9 real active members as `--active-only`.
+- Candidate signals documented in `docs/research/RESEARCH-008-current-state-gap-analysis-2026-05-31.md`.
+
 ### Slice 5 — Documentation and Handoff
 
 - Update `RESEARCH-008` docs with actual audit results and recommendation:
@@ -284,6 +321,13 @@ If the executing agent finds a better existing folder than `src/lib/workforce/fo
 - Update `EPIC-017` with `TASK-959` as first child task and any revised intake learnings.
 - Update `Handoff.md` with findings, commands run, validation, and explicitly what was not changed.
 - Do not open follow-up tasks automatically unless the user explicitly asks after reviewing the results.
+
+Execution result:
+
+- Updated `docs/research/RESEARCH-008-current-state-gap-analysis-2026-05-31.md`.
+- Updated `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`.
+- Updated `Handoff.md`.
+- No follow-up task was opened automatically.
 
 ## Out of Scope
 
@@ -465,38 +509,39 @@ N/A — repo-only/read-only. If the audit identifies a real production data reme
 
 ## Acceptance Criteria
 
-- [ ] A read-only `WorkforceFoundationMap` type/contract exists under `src/lib/workforce/foundation/` with explicit `person`, `relationship`, `assignment`, `compensation`, `paymentRail`, `readiness`, `classification`, `gaps` and `sensitiveFields` sections.
-- [ ] The mapper reuses `resolveCurrentWorkClassification()` and does not treat `member.contract_type` as current contractor truth when relationship/engagement state differs.
-- [ ] The mapper produces explicit gap codes and confidence values; no missing relationship/compensation/payment lineage gap is silently inferred away.
-- [ ] Unit tests cover employee, contractor, active member without relationship, missing profile/member, compensation tuple mismatch, missing Deel contract id and demo/fixture tolerated gaps.
-- [ ] The audit script runs read-only against dev PostgreSQL and reports coverage/parity/gap metrics with masked examples.
-- [ ] The audit compares map classification against `resolveCurrentWorkClassification()` and documents any mismatch.
-- [ ] Candidate reliability signal specs are documented, but no production signal is wired into `getReliabilityOverview()` in this task.
-- [ ] Research/EPIC docs are updated with findings and the recommended next single task.
-- [ ] No migrations, API routes, UI files, payroll formulas, contractor payable state machines or Finance settlement behavior are changed.
-- [ ] `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, EPIC-017 and `Handoff.md` are synchronized at close.
+- [x] A read-only `WorkforceFoundationMap` type/contract exists under `src/lib/workforce/foundation/` with explicit `person`, `relationship`, `assignment`, `compensation`, `paymentRail`, `readiness`, `classification`, `gaps` and `sensitiveFields` sections.
+- [x] The mapper reuses `resolveCurrentWorkClassification()` and does not treat `member.contract_type` as current contractor truth when relationship/engagement state differs.
+- [x] The mapper produces explicit gap codes and confidence values; no missing relationship/compensation/payment lineage gap is silently inferred away.
+- [x] Unit tests cover employee, contractor, active member without relationship, missing profile/member, compensation tuple mismatch, missing Deel contract id and demo/fixture tolerated gaps.
+- [x] The audit script runs read-only against dev PostgreSQL and reports coverage/parity/gap metrics with masked examples.
+- [x] The audit compares map classification against `resolveCurrentWorkClassification()` and documents any mismatch.
+- [x] Candidate reliability signal specs are documented, but no production signal is wired into `getReliabilityOverview()` in this task.
+- [x] Research/EPIC docs are updated with findings and the recommended next single task.
+- [x] No migrations, API routes, UI files, payroll formulas, contractor payable state machines or Finance settlement behavior are changed.
+- [x] `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, EPIC-017 and `Handoff.md` are synchronized at close.
 
 ## Verification
 
-- `pnpm task:lint --task TASK-959`
-- `pnpm pg:doctor`
-- `pnpm exec tsc --noEmit --pretty false`
-- `pnpm vitest run src/lib/workforce src/lib/account-360/current-work-classification.test.ts`
-- `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/workforce/audit-workforce-foundation-map.ts --active-only --include-demo`
-- `pnpm docs:context-check`
-- `git diff --check`
+- `pnpm task:lint --task TASK-959` — OK before initial in-progress move; re-run after close move.
+- `pnpm pg:doctor` — OK.
+- `pnpm exec tsc --noEmit --pretty false` — OK.
+- `pnpm vitest run src/lib/workforce src/lib/account-360/current-work-classification.test.ts` — OK, 14 files / 92 tests.
+- `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/workforce/audit-workforce-foundation-map.ts --active-only --include-demo` — OK.
+- `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/workforce/audit-workforce-foundation-map.ts --active-only` — OK.
+- `pnpm docs:context-check` — pending final close check.
+- `git diff --check` — pending final close check.
 
 Full `pnpm test` and `pnpm build` are recommended before closing if runtime code is introduced beyond pure server-side mapper/script files. If skipped, document why in `Handoff.md`.
 
 ## Closing Protocol
 
-- [ ] Move file to `docs/tasks/in-progress/` when taking ownership and to `docs/tasks/complete/` only when all criteria are met.
-- [ ] Keep `Lifecycle` aligned with folder.
-- [ ] Update `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md`.
-- [ ] Update `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`.
-- [ ] Update `RESEARCH-008` docs with actual findings.
-- [ ] Update `Handoff.md` with commands run, results, non-changes and follow-up recommendation.
-- [ ] Do not create follow-up tasks automatically without operator confirmation.
+- [x] Move file to `docs/tasks/in-progress/` when taking ownership and to `docs/tasks/complete/` only when all criteria are met.
+- [x] Keep `Lifecycle` aligned with folder.
+- [x] Update `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md`.
+- [x] Update `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`.
+- [x] Update `RESEARCH-008` docs with actual findings.
+- [x] Update `Handoff.md` with commands run, results, non-changes and follow-up recommendation.
+- [x] Do not create follow-up tasks automatically without operator confirmation.
 
 ## Follow-ups To Consider After Review
 
