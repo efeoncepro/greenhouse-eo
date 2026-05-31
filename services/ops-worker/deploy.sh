@@ -320,6 +320,15 @@ ENV_VARS="${ENV_VARS},NOTION_DUE_DATE_CAPTURE_ENABLED=${NOTION_DUE_DATE_CAPTURE_
 ATTRIBUTABLE_LATENESS_OTD_ENABLED="${ATTRIBUTABLE_LATENESS_OTD_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},ATTRIBUTABLE_LATENESS_OTD_ENABLED=${ATTRIBUTABLE_LATENESS_OTD_ENABLED}"
 
+# CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED (TASK-977): habilita la liquidación al banco de
+# contractor payables vía el safety-net reactivo `record-payment-from-order` (rama aditiva;
+# el path de nómina NO cambia). Declarativo acá para que `--set-env-vars` (destructivo) NO lo
+# borre. Activado 2026-05-31 (prod + staging) con finance sign-off del operador. Rollback (<5min):
+# `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED=false ENV=<env> bash services/ops-worker/deploy.sh`
+# o `gcloud run services update ops-worker --update-env-vars CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED=false`.
+CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED="${CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED=${CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED}"
+
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 else
