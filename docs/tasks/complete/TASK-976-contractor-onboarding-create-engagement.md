@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -189,12 +189,12 @@ Coordinar con HR el proceso de onboarding (quién crea, qué datos se exigen) an
 
 ## Acceptance Criteria
 
-- [ ] Mockup aprobado por el operador (loop GVC + skills de product design).
-- [ ] HR puede onboardear un contractor desde el portal por ambos caminos (empleado→contractor + contractor nuevo) sin script.
-- [ ] El camino B respeta el boundary duro (member/finiquito/offboarding intactos; signal `transition_orphan`=0).
-- [ ] El wizard valida la matriz contractual; tuplas inválidas se rechazan.
-- [ ] Copy es-CL tokenizado; wizard cumple la anatomía forms-ux.
-- [ ] Decisión documentada sobre el solapamiento con TASK-965.
+- [x] Mockup aprobado por el operador (loop GVC + skills de product design). Aprobado 2026-05-31.
+- [x] HR puede onboardear un contractor desde el portal por ambos caminos (empleado→contractor + contractor nuevo) sin script.
+- [x] El camino B respeta el boundary duro (member/finiquito/offboarding intactos; el comando TASK-956 es read-only/append-only por construcción; signal `transition_orphan` steady=0).
+- [x] El wizard valida (effective_from > lastWorkingDay, reason ≥10, subtype-consistency vía backend); el backend rechaza tuplas inválidas.
+- [x] Copy es-CL tokenizado (`GH_CONTRACTOR_COMPENSATION.onboarding`); wizard cumple forms-ux Lane C (Stepper + per-step validation + back-preserva-datos).
+- [x] Decisión documentada sobre el solapamiento con TASK-965 (INDEPENDIENTE — ver sección Decisiones pre-ejecución).
 
 ## Verification
 
@@ -207,13 +207,19 @@ Coordinar con HR el proceso de onboarding (quién crea, qué datos se exigen) an
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-965, TASK-974, TASK-975)
-- [ ] CLAUDE.md invariants + arch Delta + doc funcional + manual
+- [x] `Lifecycle` sincronizado (complete)
+- [x] archivo en carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado: TASK-965 (Unified Worker Workflow — esta superficie es interina, la absorbe a futuro; documentado) · TASK-974 (Finanzas) + TASK-975 (detalle/lifecycle) — los 3 cierran el set de superficies del EPIC
+- [x] arch Delta + doc funcional + manual. (Sin CLAUDE.md invariant nuevo: UI-only sobre backend existente; los invariantes boundary/SoD/atomic-command ya viven en TASK-790/956/957.)
+
+## Closing Evidence (2026-05-31)
+
+- Gates: `tsc --noEmit` 0 · `pnpm lint` 0 · `pnpm design:lint` 0/0 · `pnpm vitest run src/lib/payroll + workforce/offboarding + contractor-engagements` 698 (boundary) · `pnpm build` exit 0 · `pnpm test` full verde (4 timeouts flaky de HrLeaveView/HrOffboardingView ajenos a esta task — pasan en aislamiento 17/17).
+- GVC: `/hr/contractors/new` runtime renderiza idéntico al mockup aprobado (Stepper + 2 cards de camino + guidance), auth + viewCode guard OK. Data real de offboarding → staging (production verification sequence).
+- Backend nuevo: 1 endpoint thin de read (`GET /api/hr/contractors/onboarding/resolve`). Sin endpoints de mutación nuevos, sin migración. Reusa viewCode `equipo.contratistas`.
 
 ## Follow-ups
 
@@ -224,3 +230,15 @@ Coordinar con HR el proceso de onboarding (quién crea, qué datos se exigen) an
 
 - ¿Esta task es independiente o el carril contractor de TASK-965? (resolver en Slice 0 con arch + greenhouse-ux).
 - ¿El camino A debe poder crear la relación legal, o exigir que exista? (decidir en Plan Mode).
+
+## Decisiones pre-ejecución 2026-05-31 (Open Questions resueltas)
+
+**OQ1 — ¿Independiente o carril de TASK-965? → INDEPENDIENTE (superficie contractor-scoped interina).**
+TASK-965 (EPIC-017 Unified Worker Workflow) está `to-do`, con write-path GATED en su propio Slice 0/2 (Architecture Checkpoint + Preview) y NO iniciado; su primer write path es identity/relationship genérico, no contractor-específico. HR necesita la superficie de onboarding YA (hoy solo por script). Esta task es UI-only sobre endpoints ya completos (TASK-789/790/956). Reversible (revert PR; engagements creados quedan `draft`/`pending_review`). Cuando TASK-965 entregue su carril contractor, absorbe esta superficie (follow-up). Verificado: TASK-965 spec write-path gating + Lifecycle to-do.
+
+**OQ2 — ¿Path A crea la relación legal o la exige? → LA EXIGE (no la fabrica).**
+`createContractorEngagement` requiere una relación contractor **activa preexistente** (`profileId` + `personLegalEntityRelationshipId` + `legalEntityOrganizationId`) con subtype-consistency (store.ts:387-407). Crear una relación legal desde cero es gobernanza Person 360 (TASK-891 reconciliation / TASK-965), no un wizard de onboarding — fabricarla bypasearía el anchor legal + la matriz contractual. Resolución robusta: el wizard resuelve la relación de la persona; si NO existe pero la persona tiene un offboarding `executed` como empleado → **deriva al Camino B** (la transición atómica crea la relación contractor correctamente); si no hay ni relación ni offboarding → surface honesto "crea la relación en Person 360 primero" (out of scope V1). Reversible: si emerge necesidad real de create-from-scratch, es task derivada.
+
+**Gap de endpoint detectado (Plan Mode)**: NO existe API para (a) listar offboarding cases `executed` ni (b) resolver la relación legal de una persona. La spec lo permite explícitamente ("salvo que Plan Mode detecte que falta un endpoint de resolver relación legal"). Solución mínima: 1 endpoint thin de read `GET /api/hr/contractors/onboarding/resolve?profileId=` (cap `hr.contractor_engagement:read`) que devuelve `{ contractorRelationship | null, executedOffboarding | null }` para alimentar el branching A/B; la lista de offboarding `executed` se fetchea server-side en el page (`listOffboardingCases({status:'executed'})`). Reusa `/api/organizations/people-search` (picker) + `getOperatingEntityIdentity()`.
+
+**ViewCode**: reuso `equipo.contratistas` (mismo dominio HR contractor; la ruta `/hr/contractors/new` queda bajo el mismo viewCode). Sin migración.

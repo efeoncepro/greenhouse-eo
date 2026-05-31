@@ -192,6 +192,157 @@ export const GH_CONTRACTOR_COMPENSATION = {
     loadError: 'No pudimos cargar el detalle del engagement. Intenta de nuevo.',
     retryCta: 'Reintentar'
   },
+  // TASK-976 — Contractor onboarding wizard (employee→contractor + new contractor).
+  // Path B = "Desde una salida laboral" (transición empleado→contractor sobre un
+  // offboarding ejecutado). Path A = "Contractor nuevo" (relación contractor ya
+  // existente). Lane C — wizard multi-paso. SoD: el camino B es read-only sobre
+  // finiquito + offboarding + member (no muta contract_type ni finiquito).
+  onboarding: {
+    // Header
+    pageTitle: 'Nuevo contractor',
+    pageSubtitle:
+      'Crea el engagement de un contractor: desde una salida laboral o desde una relación contractor existente.',
+
+    // Scenario preview bar (mockup-only).
+    previewLegend: 'Vista previa',
+    previewPathB: 'Camino B · Desde salida',
+    previewPathA: 'Camino A · Contractor nuevo',
+    previewOutcomeLabel: 'Resultado camino B',
+    previewResolveLabel: 'Estado persona camino A',
+
+    // Stepper labels (per path).
+    stepOnboardingType: 'Tipo de onboarding',
+    stepPickOffboarding: 'Elegir salida laboral',
+    stepPickPerson: 'Elegir persona',
+    stepTerms: 'Términos del engagement',
+    stepConfirm: 'Confirmación',
+
+    // Step 1 — path choice cards.
+    typeStepTitle: '¿Cómo entra este contractor?',
+    typeStepSubtitle: 'Elige el camino. Define los pasos siguientes.',
+    pathBCardTitle: 'Desde una salida laboral',
+    pathBCardSubtitle: 'Un colaborador que dejó de ser empleado y sigue como contractor.',
+    pathBCardDetail: 'Cierra la relación de empleado, abre la de contractor y crea el engagement.',
+    pathACardTitle: 'Contractor nuevo',
+    pathACardSubtitle: 'Una persona con relación de contractor ya existente.',
+    pathACardDetail: 'Crea el engagement sobre la relación contractor activa de la persona.',
+    pathSelectedAria: 'Camino seleccionado',
+
+    // Step B2 — pick executed offboarding.
+    pickOffboardingTitle: 'Elige la salida laboral',
+    pickOffboardingSubtitle: 'Solo aparecen salidas ya ejecutadas. La transición se ancla a ese caso.',
+    offboardingLastDay: 'Último día',
+    offboardingSeparation: 'Tipo de salida',
+    offboardingEmptyTitle: 'Sin salidas ejecutadas',
+    offboardingEmptyDescription: 'No hay salidas laborales ejecutadas disponibles para transicionar.',
+    pickOffboardingError: 'Selecciona una salida laboral para continuar.',
+
+    // Step A2 — pick person + resolve outcomes.
+    pickPersonTitle: 'Elige la persona',
+    pickPersonSubtitle: 'Busca por nombre o correo. Validamos su relación contractor al seleccionarla.',
+    personSearchLabel: 'Buscar persona',
+    personSearchPlaceholder: 'ej. nombre o correo@empresa.com',
+    personSearchEmpty: 'No hay resultados para esa búsqueda. Revisa la ortografía o intenta con otras palabras.',
+    personResolving: 'Validando la relación de la persona…',
+    // Outcome: has contractor relationship (continue).
+    resolveOkTitle: 'Relación contractor activa',
+    resolveOkDescription: 'Esta persona tiene una relación de contractor vigente. Puedes continuar.',
+    resolveRelationLabel: 'Relación',
+    // Outcome: has executed offboarding → derive to Path B.
+    deriveToBTitle: 'Esta persona viene de una relación laboral',
+    deriveToBDescription: 'Tiene una salida laboral ejecutada. Usá el camino “Desde una salida laboral”.',
+    deriveToBCta: 'Cambiar a ese camino',
+    // Outcome: no relationship → Person 360 dead-end.
+    noRelationTitle: 'Sin relación de contractor activa',
+    noRelationDescription:
+      'Esta persona no tiene una relación de contractor activa. Primero creá la relación en Person 360.',
+    noRelationHint: 'Person 360 está fuera del alcance de este asistente.',
+    pickPersonError: 'Selecciona una persona con relación contractor activa para continuar.',
+
+    // Step 3 — engagement terms (shared field copy).
+    termsTitle: 'Términos del engagement',
+    termsSubtitleB: 'Define el subtipo, la fecha de inicio como contractor y los términos económicos.',
+    termsSubtitleA: 'Define el subtipo de la relación y los términos económicos del engagement.',
+    contractorSubtypeLabel: 'Subtipo de contractor',
+    contractorSubtypeHelper: 'Define el régimen de la relación que se abre.',
+    relationshipSubtypeLabel: 'Subtipo de la relación',
+    effectiveFromLabel: 'Inicio como contractor',
+    effectiveFromHelper: 'Debe ser posterior al último día como empleado.',
+    effectiveFromError: 'La fecha debe ser posterior al último día como empleado ({lastDay}).',
+    startDateLabel: 'Fecha de inicio',
+    startDateHelper: 'Cuándo empieza a regir el engagement.',
+    startDateError: 'Ingresa una fecha de inicio para continuar.',
+    payrollViaLabel: 'Canal de pago',
+    paymentModelLabel: 'Modelo de pago',
+    rateTypeLabel: 'Tipo de tarifa',
+    cadenceLabel: 'Cadencia',
+    rateAmountLabel: 'Monto acordado',
+    rateAmountHelper: 'Opcional. Monto bruto antes de retención.',
+    rateAmountPreview: 'Vista previa',
+    currencyLabel: 'Moneda',
+    requiresInvoiceLabel: 'Requiere invoice',
+    requiresWorkApprovalLabel: 'Requiere aprobación de trabajo',
+    taxOwnerLabel: 'Responsable tributario',
+    taxOwnerHelper: 'Opcional. Quién asume el cumplimiento tributario.',
+    bonusPolicyLabel: 'Política de bono',
+    reasonLabel: 'Motivo de la transición',
+    reasonHelper: 'Explica brevemente el cambio. Mínimo 10 caracteres.',
+    reasonError: 'Ingresa un motivo de al menos 10 caracteres.',
+    resolvedPersonLabel: 'Persona',
+    operatingEntityLabel: 'Entidad contratante',
+    // Boundary note shown on Path B terms.
+    boundaryNote:
+      'El camino B no modifica el finiquito ni el tipo de contrato del empleado. Solo cierra la relación laboral, abre la de contractor y crea el engagement.',
+
+    // Step 4 — confirmation + outcomes.
+    confirmTitleB: 'Confirma la transición a contractor',
+    confirmTitleA: 'Confirma la creación del contractor',
+    confirmSubtitleB: 'Revisa qué va a pasar antes de crear el engagement.',
+    confirmSubtitleA: 'Revisa los términos antes de crear el engagement.',
+    confirmWillHappen: 'Qué va a pasar',
+    confirmStepCloseEmployee: 'Se cierra la relación de empleado (append-only, auditada).',
+    confirmStepOpenContractor: 'Se abre la relación de contractor.',
+    confirmStepCreateEngagement: 'Se crea el engagement en estado Borrador.',
+    confirmStepCreateEngagementA: 'Se crea el engagement sobre la relación contractor existente.',
+    confirmStepDraftReview: 'Queda en Borrador con clasificación pendiente de revisión.',
+    createCta: 'Crear contractor',
+    backCta: 'Atrás',
+    nextCta: 'Siguiente',
+
+    // Idempotent outcomes (Path B) — honest preview of the 3 server states.
+    outcomeTransitioned: 'transitioned',
+    outcomeEngagementOnExisting: 'engagement_created_on_existing_relationship',
+    outcomeAlreadyComplete: 'already_complete',
+    outcomeTransitionedTitle: 'Contractor creado',
+    outcomeTransitionedDescription:
+      'Se cerró la relación de empleado, se abrió la de contractor y se creó el engagement.',
+    outcomeEngagementTitle: 'Engagement creado sobre relación existente',
+    outcomeEngagementDescription:
+      'La relación de contractor ya existía. Se creó el engagement sobre ella.',
+    outcomeAlreadyTitle: 'Ya estaba completo',
+    outcomeAlreadyDescription: 'Esta salida ya había sido transicionada. No se creó nada nuevo.',
+    outcomeEngagementId: 'ID del engagement',
+    outcomeDraftNote: 'Queda en estado Borrador. Revisá la clasificación antes de activar.',
+
+    // Outcome (Path A) success.
+    outcomeCreatedTitle: 'Contractor creado',
+    outcomeCreatedDescription: 'El engagement se creó sobre la relación contractor de la persona.',
+
+    // aria
+    stepperAria: 'Pasos del asistente de onboarding',
+    previewBarAria: 'Controles de vista previa del asistente',
+
+    // --- Runtime-only (wiring): loading + fetch/submit errors + success CTAs ---
+    searchMinCharsHint: 'Escribe al menos 2 caracteres para buscar.',
+    searchError: 'No pudimos buscar personas. Intenta de nuevo.',
+    resolveError: 'No pudimos validar la relación de la persona. Intenta de nuevo.',
+    submitError: 'No pudimos crear el contractor. Revisa los datos e intenta de nuevo.',
+    creatingCta: 'Creando…',
+    workbenchCta: 'Ir a contractors',
+    onboardAnotherCta: 'Onboardear otro',
+    noManagePermissionNote: 'No tienes permiso para crear contractors desde una salida laboral.',
+    noCreatePermissionNote: 'No tienes permiso para crear contractors.'
+  },
   terms: {
     drawerTitle: 'Editar términos del engagement',
     paymentModelLabel: 'Modelo de pago',

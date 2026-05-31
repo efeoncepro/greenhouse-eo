@@ -149,6 +149,37 @@ Observar y rechazar exigen una razon visible para el contratista de al menos 10 
 
 Aprobar no ejecuta el pago: deja lista la obligacion para Finanzas. El pago corre por los flujos de Finanzas, fuera de esta pantalla.
 
+## Dar de alta un contractor (onboarding, TASK-976)
+
+Desde `/hr/contractors/new` (botón en el workbench) abrís el wizard. Elegís el camino:
+
+### Camino B — Desde una salida laboral (empleado → contractor)
+
+Para un colaborador que dejó de ser empleado y sigue como contractor:
+
+1. Elegí el **caso de salida ejecutado** de la lista.
+2. Completá los términos: tipo (contractor/honorarios), **fecha efectiva** (tiene que ser posterior al último día trabajado), canal de pago, modelo, tarifa, cadencia, y un **motivo** (mínimo 10 caracteres).
+3. Confirmá. El sistema cierra la relación de empleado, abre la de contractor y crea el engagement, **todo junto**. No toca el finiquito ni la salida laboral.
+
+El resultado es honesto: "transición completa", "engagement sobre relación existente" o "ya estaba completo" (si lo corrés dos veces, no duplica).
+
+### Camino A — Contractor nuevo (relación existente)
+
+Para una persona que ya tiene una relación de contractor activa:
+
+1. Buscá la persona.
+2. El sistema **resuelve** su situación:
+   - tiene relación contractor → continuás;
+   - viene de una relación laboral → te manda al **Camino B**;
+   - no tiene relación → te dice que **primero la crees en Person 360** (fuera de esta pantalla).
+3. Completá los términos → crear.
+
+El engagement nace en **Borrador** con clasificación **Necesita revisión**. Para activarlo, andá al detalle y revisá la clasificación (ver abajo).
+
+### Qué no hace el onboarding
+
+No paga. No activa el engagement (queda en Borrador). No crea la relación legal desde cero (Person 360). No requiere `hr.contractor_engagement:create` (Camino A) o `:manage` (Camino B) — si no lo tenés, el botón no aparece.
+
 ## Gestionar el ciclo de vida del engagement (TASK-975)
 
 En el inspector (columna derecha, al seleccionar un engagement) ahora tenés:

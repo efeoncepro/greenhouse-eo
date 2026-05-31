@@ -1,3 +1,41 @@
+# Sesion 2026-05-31 — Journey Intelligence Layer + Touchpoint Ledger — ✅ DOCS-ONLY
+
+**Rama**: `develop`. Scope arquitectura/documentacion only; no runtime, DB migrations, APIs, UI ni task lifecycle moves.
+
+Se formalizo ADR + doc canonico `docs/architecture/GREENHOUSE_JOURNEY_INTELLIGENCE_LAYER_V1.md`: capa transversal read-only para journeys y touchpoints cross-domain (ej. AD/SCIM → primer pago; lead → primera factura; contractor engagement → pago confirmado). Decision: observar/correlacionar/explicar, no ejecutar. V1 consume outbox/audit/Notification Hub/Email/Teams/Webhooks, modela Journey Definitions, Journey Event Log, Touchpoint Ledger, Correlator, Instances/Milestones y Timeline Readers. Regla dura: no reemplaza sources of truth ni guarda cuerpos completos de email/Teams por default; persiste evidencia redacted + `evidence_quality`.
+
+Docs sincronizados: `DECISIONS_INDEX.md`, `project_context.md`, `changelog.md`. Skills/contexto: `software-architect-2026`; referencias externas validadas 2026-05-31: OpenTelemetry traces, CloudEvents CNCF, Temporal durable execution (solo comparativo futuro, no V1).
+
+---
+
+# Sesion 2026-05-31 — TASK-976 Contractor Onboarding / Create Engagement — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013 contractor UI, gap #3. **Esperando confirmación del operador para push.** **Cierra el set de superficies del EPIC contractors** (TASK-974 Finanzas + TASK-975 detalle/lifecycle + TASK-976 onboarding).
+
+**Resultado**: wizard `/hr/contractors/new` branching A/B. Camino B (empleado→contractor desde offboarding executed, transición atómica TASK-956, 3 outcomes idempotentes, boundary read-only). Camino A (contractor nuevo; resuelve relación → deriva a B o guía a Person 360, no fabrica). +1 endpoint thin de read (`/api/hr/contractors/onboarding/resolve`). OQ: INDEPENDIENTE de TASK-965; Camino A exige la relación. Mockup aprobado + GVC. forms-ux Lane C + capability gating server-side.
+
+**Gates verde**: tsc/lint/design 0 · `pnpm vitest payroll+offboarding+contractor-engagements` 698 (boundary 956/957) · `pnpm build` exit 0 · `pnpm test` full verde (4 timeouts flaky HrLeaveView/HrOffboardingView ajenos, pasan aislados 17/17). Reusa viewCode `equipo.contratistas`.
+
+Spec: `complete/TASK-976-...md`. Arch Delta + doc funcional `hr/contratistas-onboarding.md` + manual.
+
+---
+
+# (histórico) TASK-976 IN PROGRESS
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013 contractor UI, gap #3 (onboarding solo por script).
+
+Wizard HR para onboardear contractor sin script, UI-only sobre 2 endpoints existentes: Path A `POST /api/hr/contractors` (`create`, exige relación contractor preexistente) + Path B `POST /api/hr/contractors/transition-from-offboarding` (`manage`, empleado→contractor desde offboarding executed, idempotente 3 outcomes, boundary read-only/append-only). Discovery completo (3 Explore agents).
+
+**Open Questions resueltas**: (OQ1) INDEPENDIENTE de TASK-965 (gated + no iniciado; HR necesita la superficie ya; reversible). (OQ2) Path A EXIGE la relación (no la fabrica); si no existe pero hay offboarding executed → deriva a B; si no → guidance Person 360. **Gap de endpoint detectado**: +1 thin read `GET /api/hr/contractors/onboarding/resolve` (cap read) para branching A/B; lista offboarding executed server-side. Reusa people-search + getOperatingEntityIdentity. Reusa viewCode `equipo.contratistas`.
+
+**Plan**: Slice 0 mockup (wizard branching A/B) → 1 endpoint+page → 2 camino B → 3 camino A → 4 cierre. Boundary EPIC-013/956/957 (gate payroll+offboarding). Wizard template: SampleSprints (Stepper+validación+draft).
+
+**Próximo paso**: construir mockup Slice 0, GVC, aprobación operador.
+
+Spec: `in-progress/TASK-976-contractor-onboarding-create-engagement.md`.
+
+---
+
 # Sesion 2026-05-31 — TASK-975 Contractor Engagement Detail + Lifecycle + Classification — ✅ COMPLETE (sin push)
 
 **Rama**: `develop` (sin branch, por instrucción). EPIC-013 contractor UI, gap #2 (workbench HR ~20%). **Esperando confirmación del operador para push.**
