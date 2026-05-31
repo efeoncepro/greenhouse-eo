@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -191,11 +191,11 @@ N/A — repo-only change (la revisión de clasificación es decisión HR interna
 
 ## Acceptance Criteria
 
-- [ ] Mockup aprobado por el operador (loop GVC + skills de product design).
-- [ ] HR puede ver el detalle del engagement, ejecutar transiciones de lifecycle válidas, revisar clasificación y editar términos completos desde `/hr/contractors`.
-- [ ] La UI solo ofrece transiciones válidas del estado actual; "activar" oculto si el riesgo es bloqueante.
-- [ ] El modal de clasificación usa la capability distinta + exige motivo.
-- [ ] Copy es-CL tokenizado.
+- [x] Mockup aprobado por el operador (loop GVC + skills de product design). Aprobado 2026-05-31.
+- [x] HR puede ver el detalle del engagement, ejecutar transiciones de lifecycle válidas, revisar clasificación y editar términos completos desde `/hr/contractors`.
+- [x] La UI solo ofrece transiciones válidas del estado actual; "activar" oculto si el riesgo es bloqueante (`ENGAGEMENT_TRANSITIONS` + `isClassificationRiskBlocking`).
+- [x] El modal de clasificación usa la capability distinta (`hr.contractor_classification:approve`) + exige motivo ≥10.
+- [x] Copy es-CL tokenizado (`GH_CONTRACTOR_COMPENSATION` namespaces lifecycle/classification/detail/terms).
 
 ## Verification
 
@@ -208,13 +208,19 @@ N/A — repo-only change (la revisión de clasificación es decisión HR interna
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-968, TASK-974, TASK-976)
-- [ ] CLAUDE.md invariants + arch Delta + doc funcional + manual
+- [x] `Lifecycle` sincronizado (complete)
+- [x] archivo en carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado: TASK-968 (compensación — intacta, sigue editando rate/cadencia) · TASK-974 (Finanzas — complementaria) · TASK-976 (onboarding/transición empleado→contractor — sigue out of scope, sin impacto)
+- [x] arch Delta + doc funcional + manual. (Sin CLAUDE.md invariant nuevo: UI-only sobre backend existente, los invariantes de boundary/SoD ya viven en TASK-790/957.)
+
+## Closing Evidence (2026-05-31)
+
+- Gates: `tsc --noEmit` 0 · `pnpm lint` 0 · `pnpm design:lint` 0/0 · `pnpm vitest run src/lib/payroll` 532 (boundary) · `pnpm vitest run src/lib/contractor-engagements` 132 · `pnpm test` full exit 0 · `pnpm build` exit 0.
+- GVC: `/hr/contractors` runtime renderiza limpio (mi cambio no rompió la projection); cola vacía en dev (comportamiento pre-existente — sin engagements que califiquen en este env). Mockup aprobado GVC-verificado (inspector + detail drawer + classification dialog). Verificación con data real (Valentina `needs_review`) → staging (production verification sequence).
+- Cambio backend additive único: `ContractorWorkbenchQueueRow.lifecycleStatus` + `classificationRiskStatus` enum. Sin endpoints/migración. Reusa viewCode `equipo.contratistas`.
 
 ## Follow-ups
 
@@ -223,3 +229,11 @@ N/A — repo-only change (la revisión de clasificación es decisión HR interna
 ## Open Questions
 
 - ¿Detalle como drawer dentro del workbench o página dedicada `/hr/contractors/[id]`? (decidir en Plan Mode con greenhouse-ux).
+
+## Decisión pre-ejecución 2026-05-31 (Open Question resuelta)
+
+**Drawer + dialogs DENTRO del workbench `/hr/contractors`. NO página dedicada `/hr/contractors/[id]`.**
+
+Rationale: el workbench ya es dueño del flujo "seleccionar → inspeccionar → actuar" con la inspector column (`ContractorAdminWorkbenchView.tsx:488-568`). Extenderla preserva un único surface HR contractor, evita duplicar viewCode/route/breadcrumb/back-nav y mantiene al operador en el flujo de la cola. El detalle (más rico que las ~8 filas del inspector) va en un **Detail Drawer** right-anchored (~640px) que hace `GET /api/hr/contractors/[id]` para hidratar el `ContractorEngagement` completo. Las transiciones de lifecycle y la revisión de clasificación son decisiones focales → **Dialogs** (forms-ux: modal, centrado, motivo). El full-terms edit va en superficie propia (NO se bloatea el `ContractorEngagementCompensationDrawer` de TASK-968 que el mockup referencia). Página dedicada = YAGNI V1 (sin requerimiento de deep-link; bulk-actions son V1.1 explícito). Reversible: si emerge deep-link, se promueve a ruta sin rehacer la lógica.
+
+Verificado en discovery: GET/PATCH route + 3 helpers server-only + state machine pura (`ENGAGEMENT_TRANSITIONS`, `isValidEngagementTransition`) + classification pura (`computeClassificationRisk`, `isClassificationRiskBlocking`) + 2 capabilities con SoD (`hr.contractor_engagement:update` vs `hr.contractor_classification:approve`, approve restringido a EFEONCE_ADMIN+FINANCE_ADMIN+HR_MANAGER).

@@ -85,6 +85,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Reliquidacion de Nomina](hr/reliquidacion-de-nomina.md) — reapertura de periodos exportados, versionamiento de entradas (v1/v2), delta a finanzas, ventana de 45 dias, auditoria inmutable
 - [Objetivos y OKRs](hr/objetivos-okrs.md) — ciclos de objetivos, goals en cascada (empresa, departamento, individual), key results medibles, elegibilidad por contrato, self-service y admin
 - [Contratistas — Self-Service y Workbench HR](hr/contratistas-self-service.md) — las 2 superficies TASK-796: `/my/contractor` (el contratista ve su contratacion, sube boleta/factura + evidencia, envia entregas y responde observaciones) y `/hr/contractors` (workbench HR para revisar la cola, aprobar/observar/rechazar). Ciclo contratacion -> envio -> revision -> obligacion a Finanzas -> pago, sin semantica de nomina/finiquito; aprobar no ejecuta pago
+- [Contratistas — Detalle, Ciclo de Vida y Clasificación (HR)](hr/contratistas-engagement-ciclo-de-vida.md) — la gestión del engagement en `/hr/contractors` (TASK-975): detalle completo de términos, controles de ciclo de vida (activar/pausar/cerrar/cancelar — solo transiciones válidas; "Activar" oculto si el riesgo es bloqueante), revisión de riesgo de clasificación laboral (7 factores, recálculo en vivo, SoD) y edición de términos. UI-only sobre GET/PATCH `/api/hr/contractors/[id]`
 
 ### Personas
 

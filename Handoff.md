@@ -1,3 +1,31 @@
+# Sesion 2026-05-31 — TASK-975 Contractor Engagement Detail + Lifecycle + Classification — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013 contractor UI, gap #2 (workbench HR ~20%). **Esperando confirmación del operador para push.**
+
+**Resultado**: HR gestiona el engagement desde el inspector de `/hr/contractors`: detalle completo (drawer GET /[id]: términos + máquina de estados + factores read-only), controles de ciclo de vida (solo transiciones válidas; "Activar" oculto si riesgo bloqueante; confirm con motivo), revisión de clasificación (7 factores + reviewed/block + resultado en vivo, SoD capability `hr.contractor_classification:approve`), editar términos (PATCH action=update). Mockup aprobado + GVC. 4 componentes runtime + helper `engagement-display.ts` + projection additive `lifecycleStatus`. Capability gating server-side en el page.
+
+**Gates verde**: tsc/lint/design 0 · `pnpm vitest run src/lib/payroll` 532 (boundary 957) · contractor-engagements 132 · `pnpm test` full exit 0 · `pnpm build` exit 0. Cola vacía en dev (projection pre-existente sin engagements que califiquen); verificación con data real → staging.
+
+Spec: `complete/TASK-975-...md`. Arch Delta + doc funcional `hr/contratistas-engagement-ciclo-de-vida.md` + manual.
+
+---
+
+# (histórico) TASK-975 IN PROGRESS
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013 contractor UI, gap #2 (workbench HR ~20%).
+
+UI-only sobre backend existente (`GET /api/hr/contractors/[id]` + `PATCH` con `action=transition|review_classification|update`). Discovery completo (2 Explore agents): backend 100% listo — 3 helpers server-only, state machine pura (`ENGAGEMENT_TRANSITIONS`/`isValidEngagementTransition`), classification pura (`computeClassificationRisk`/`isClassificationRiskBlocking`), 2 capabilities con SoD (`hr.contractor_engagement:update` vs `hr.contractor_classification:approve` restringido a EFEONCE_ADMIN+FINANCE_ADMIN+HR_MANAGER).
+
+**Open Question resuelta**: Drawer + dialogs DENTRO del workbench (NO página dedicada `/hr/contractors/[id]`) — extender la inspector column, no fragmentar. Detail Drawer right-anchored hace GET /[id]; lifecycle + classification = Dialogs (forms-ux).
+
+**Plan**: Slice 0 mockup (skills product design + GVC + aprobación) → 1 detail drawer → 2 lifecycle controls → 3 classification review + terms edit → 4 cierre. Boundary EPIC-013/957 (gate `pnpm vitest run src/lib/payroll`). Reusa viewCode `equipo.contratistas` (sin migración).
+
+**Próximo paso**: construir mockup Slice 0, GVC loop, presentar para aprobación del operador.
+
+Spec: `in-progress/TASK-975-contractor-engagement-detail-lifecycle-classification.md`.
+
+---
+
 # Sesion 2026-05-31 — TASK-974 Finance Contractor Payments Workbench — ✅ COMPLETE (sin push)
 
 **Rama**: `develop` (no se creó branch, no se pusheó — esperando confirmación del operador). EPIC-013 contractor UI.

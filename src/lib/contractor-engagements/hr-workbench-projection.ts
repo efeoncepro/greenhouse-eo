@@ -251,7 +251,8 @@ export const resolveContractorHrWorkbenchProjection =
             amountSource !== null ? `${amountCurrency} ${amountSource.toLocaleString('es-CL')}` : '—',
           responsable,
           nextAction,
-          classificationRiskStatus: engagement.classificationRiskStatus
+          classificationRiskStatus: engagement.classificationRiskStatus,
+          lifecycleStatus: engagement.status
         }
       })
       .sort((a, b) => {

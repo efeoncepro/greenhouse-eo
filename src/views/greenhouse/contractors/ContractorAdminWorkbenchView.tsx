@@ -31,9 +31,16 @@ import type {
   ContractorWorkbenchQueueRow
 } from '@/lib/contractor-engagements/projection-types'
 
+import { throwIfNotOk } from '@/lib/api/parse-error-response'
+import type { ContractorEngagement } from '@/lib/contractor-engagements/types'
+
 import AdminReviewDecisionDrawer, { type ReviewDecision } from './AdminReviewDecisionDrawer'
+import ContractorClassificationReviewDialog from './ContractorClassificationReviewDialog'
 import ContractorEngagementCompensationDrawer from './ContractorEngagementCompensationDrawer'
+import ContractorEngagementDetailDrawer from './ContractorEngagementDetailDrawer'
+import ContractorEngagementTermsDrawer from './ContractorEngagementTermsDrawer'
 import ContractorGuardrailPanel from './ContractorGuardrailPanel'
+import ContractorLifecycleControls from './ContractorLifecycleControls'
 
 const toneToColor: Record<ContractorTone, 'success' | 'warning' | 'error' | 'info' | 'secondary'> = {
   success: 'success',
@@ -45,6 +52,10 @@ const toneToColor: Record<ContractorTone, 'success' | 'warning' | 'error' | 'inf
 
 interface ContractorAdminWorkbenchViewProps {
   initialProjection: ContractorHrWorkbenchProjection
+  /** `hr.contractor_classification:approve` — gates the classification review dialog (SoD). */
+  canReviewClassification?: boolean
+  /** `hr.contractor_engagement:update` — gates lifecycle transitions + term edits. */
+  canManage?: boolean
 }
 
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
@@ -309,10 +320,20 @@ const FinanceStepPanel = ({ row }: { row: ContractorWorkbenchQueueRow }) => {
 
 const AdminInspector = ({
   row,
-  onReview
+  onReview,
+  onOpenDetail,
+  onReviewClassification,
+  onTransitioned,
+  canManage,
+  canReviewClassification
 }: {
   row: ContractorWorkbenchQueueRow
   onReview: () => void
+  onOpenDetail: () => void
+  onReviewClassification: () => void
+  onTransitioned: () => void
+  canManage: boolean
+  canReviewClassification: boolean
 }) => (
   <OperationalPanel
     title='Inspector'
@@ -330,9 +351,40 @@ const AdminInspector = ({
         <DetailRow label='Relación' value={row.relationshipSubtype} />
         <DetailRow label='País' value={row.country} />
         <DetailRow label='Entidad contratante' value={row.legalEntityLabel} />
-        <DetailRow label='Compliance' value={row.classificationRiskStatus} />
+        <DetailRow label='Compliance' value={CC.classification.status[row.classificationRiskStatus]} />
         <DetailRow label='Envíos en revisión' value={String(row.pendingCount)} />
         <DetailRow label='Payables bloqueados' value={String(row.blockedPayableCount)} />
+      </Stack>
+
+      <Divider />
+
+      {/* TASK-975 — lifecycle transitions for the selected engagement. */}
+      <ContractorLifecycleControls
+        engagementId={row.contractorEngagementId}
+        lifecycleStatus={row.lifecycleStatus}
+        classificationRiskStatus={row.classificationRiskStatus}
+        canManage={canManage}
+        onTransitioned={onTransitioned}
+      />
+
+      <Divider />
+
+      {/* TASK-975 — detail + classification entry points. */}
+      <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
+        <Button variant='contained' size='small' startIcon={<i className='tabler-file-text' />} onClick={onOpenDetail}>
+          {CC.detail.openCta}
+        </Button>
+        {canReviewClassification ? (
+          <Button
+            variant='tonal'
+            color='secondary'
+            size='small'
+            startIcon={<i className='tabler-gavel' />}
+            onClick={onReviewClassification}
+          >
+            {CC.classification.reviewCta}
+          </Button>
+        ) : null}
       </Stack>
 
       <Divider />
@@ -408,7 +460,11 @@ const CompensationPanel = ({
   )
 }
 
-const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWorkbenchViewProps) => {
+const ContractorAdminWorkbenchView = ({
+  initialProjection,
+  canReviewClassification = false,
+  canManage = false
+}: ContractorAdminWorkbenchViewProps) => {
   const [projection, setProjection] = useState<ContractorHrWorkbenchProjection>(initialProjection)
 
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -418,6 +474,17 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerDecision, setDrawerDecision] = useState<ReviewDecision>('approve')
   const [compDrawerOpen, setCompDrawerOpen] = useState(false)
+
+  // TASK-975 — detail drawer + terms drawer + classification dialog state.
+  const [detailDrawerOpen, setDetailDrawerOpen] = useState(false)
+  const [detailEngagementId, setDetailEngagementId] = useState<string | null>(null)
+  const [termsEngagement, setTermsEngagement] = useState<ContractorEngagement | null>(null)
+
+  const [classificationDialog, setClassificationDialog] = useState<{
+    engagementId: string
+    initialFactors: ContractorEngagement['classificationRiskFactors']
+    initialReviewed: boolean
+  } | null>(null)
 
   const selected = useMemo(
     () => projection.queue.find(row => row.contractorEngagementId === selectedId) ?? null,
@@ -458,6 +525,38 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
     void refetch()
     setDrawerOpen(false)
   }, [refetch])
+
+  // TASK-975 — open the full detail drawer for an engagement id.
+  const openDetail = useCallback((engagementId: string) => {
+    setDetailEngagementId(engagementId)
+    setDetailDrawerOpen(true)
+  }, [])
+
+  // Open the classification dialog with the engagement already fetched (from the
+  // detail drawer, which has the full object — no extra fetch).
+  const openClassificationForEngagement = useCallback((engagement: ContractorEngagement) => {
+    setClassificationDialog({
+      engagementId: engagement.contractorEngagementId,
+      initialFactors: engagement.classificationRiskFactors,
+      initialReviewed: engagement.classificationReviewed
+    })
+  }, [])
+
+  // Standalone inspector CTA: fetch the engagement on demand, then open the dialog.
+  const openClassificationById = useCallback(async (engagementId: string) => {
+    try {
+      const response = await fetch(`/api/hr/contractors/${engagementId}`, { cache: 'no-store' })
+
+      await throwIfNotOk(response, 'No pudimos abrir la revisión de clasificación.')
+
+      const payload = (await response.json()) as { engagement: ContractorEngagement }
+
+      openClassificationForEngagement(payload.engagement)
+    } catch {
+      // On failure, fall back to opening the detail drawer where the user can retry.
+      openDetail(engagementId)
+    }
+  }, [openClassificationForEngagement, openDetail])
 
   const signalItems = projection.signals.map(signal => ({
     id: signal.id,
@@ -554,7 +653,15 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
               <>
                 <CompensationPanel row={selected} onEdit={() => setCompDrawerOpen(true)} />
                 <ContractorGuardrailPanel row={selected} />
-                <AdminInspector row={selected} onReview={() => openReview('approve')} />
+                <AdminInspector
+                  row={selected}
+                  onReview={() => openReview('approve')}
+                  onOpenDetail={() => openDetail(selected.contractorEngagementId)}
+                  onReviewClassification={() => void openClassificationById(selected.contractorEngagementId)}
+                  onTransitioned={() => void refetch()}
+                  canManage={canManage}
+                  canReviewClassification={canReviewClassification}
+                />
               </>
             ) : (
               <OperationalPanel title='Inspector' icon='tabler-user-check' iconColor='secondary'>
@@ -612,6 +719,48 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
           onClose={() => setCompDrawerOpen(false)}
           onSaved={() => {
             setCompDrawerOpen(false)
+            void refetch()
+          }}
+        />
+      ) : null}
+
+      {/* TASK-975 — engagement detail drawer (read-only sections + entry points). */}
+      <ContractorEngagementDetailDrawer
+        engagementId={detailEngagementId}
+        open={detailDrawerOpen}
+        onClose={() => setDetailDrawerOpen(false)}
+        onEditTerms={engagement => {
+          setDetailDrawerOpen(false)
+          setTermsEngagement(engagement)
+        }}
+        onReviewClassification={engagement => {
+          setDetailDrawerOpen(false)
+          openClassificationForEngagement(engagement)
+        }}
+        canReviewClassification={canReviewClassification}
+      />
+
+      {/* TASK-975 — editable terms drawer (model, provider, FX, flags, end date). */}
+      <ContractorEngagementTermsDrawer
+        engagement={termsEngagement}
+        open={termsEngagement !== null}
+        onClose={() => setTermsEngagement(null)}
+        onSaved={() => {
+          setTermsEngagement(null)
+          void refetch()
+        }}
+      />
+
+      {/* TASK-975 — classification review dialog (SoD: hr.contractor_classification:approve). */}
+      {classificationDialog ? (
+        <ContractorClassificationReviewDialog
+          engagementId={classificationDialog.engagementId}
+          open
+          initialFactors={classificationDialog.initialFactors}
+          initialReviewed={classificationDialog.initialReviewed}
+          onClose={() => setClassificationDialog(null)}
+          onReviewed={() => {
+            setClassificationDialog(null)
             void refetch()
           }}
         />

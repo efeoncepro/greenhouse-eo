@@ -149,12 +149,39 @@ Observar y rechazar exigen una razon visible para el contratista de al menos 10 
 
 Aprobar no ejecuta el pago: deja lista la obligacion para Finanzas. El pago corre por los flujos de Finanzas, fuera de esta pantalla.
 
+## Gestionar el ciclo de vida del engagement (TASK-975)
+
+En el inspector (columna derecha, al seleccionar un engagement) ahora tenés:
+
+### Ver el detalle completo
+
+"Ver detalle completo" abre un panel con todos los terminos: economicos (modelo de pago, tarifa, cadencia, monedas, bono), tributario (responsable, tasa de retencion, invoice/aprobacion), proveedor (contrato/worker/FX), fechas, maquina de estados y los factores de clasificacion. Desde ahi podes "Editar terminos".
+
+### Mover el ciclo de vida
+
+Los botones de ciclo de vida muestran **solo las transiciones validas** del estado actual (activar / pausar / reanudar / iniciar cierre / finalizar / cancelar). Pausar, cerrar y cancelar piden un **motivo**. Los estados terminales (finalizado/cancelado) no admiten cambios.
+
+> "Activar" **no aparece** si el riesgo de clasificacion esta bloqueante. Primero revisa la clasificacion.
+
+### Revisar la clasificacion laboral
+
+"Revisar clasificacion" abre un dialogo con los 7 factores de subordinacion. Marca los presentes (el riesgo se recalcula en vivo), marca "revisado" (sin revisar nunca queda "sin riesgo"), opcionalmente "escalar a bloqueado", y deja un motivo. Si un engagement activo escala a bloqueante, el sistema lo **pausa solo**. Lo revisa una firma distinta (SoD, capability `hr.contractor_classification:approve`).
+
+### Editar terminos
+
+"Editar terminos" abre un drawer para cambiar modelo de pago, politica FX, referencias del proveedor, flags de invoice/aprobacion, politica de bono y fecha de termino. La **tarifa** se edita aparte (el editor de compensacion). Requiere `hr.contractor_engagement:update`.
+
+### Que no hace
+
+No paga ni prepara payables (eso es Finanzas, `/finance/contractor-payments`). No crea engagements ni convierte empleados (onboarding, futuro). No toca nomina ni finiquito.
+
 ## Referencias tecnicas
 
 - `src/lib/contractor-engagements/self-service-projection.ts`
 - `src/lib/contractor-engagements/hr-workbench-projection.ts`
+- `src/views/greenhouse/contractors/{ContractorEngagementDetailDrawer,ContractorLifecycleControls,ContractorClassificationReviewDialog,ContractorEngagementTermsDrawer}.tsx`
 - `/api/my/contractor/*`
-- `/api/hr/contractors/workbench`
+- `/api/hr/contractors/workbench` · `GET/PATCH /api/hr/contractors/[id]` (action transition|review_classification|update)
 - viewCodes `mi_ficha.mi_contratacion` (contratista) · `equipo.contratistas` (HR)
-- capabilities `personal_workspace.contractor.read_self` · `.submit_self` · `hr.contractor_work_submission.review`
+- capabilities `personal_workspace.contractor.read_self` · `.submit_self` · `hr.contractor_work_submission.review` · `hr.contractor_engagement:update` · `hr.contractor_classification:approve`
 - [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)

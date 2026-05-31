@@ -16,7 +16,12 @@
  * GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1 §Access policy).
  */
 
-import type { ContractorPaymentCadence, ContractorRateType } from './types'
+import type {
+  ContractorClassificationRiskStatus,
+  ContractorEngagementStatus,
+  ContractorPaymentCadence,
+  ContractorRateType
+} from './types'
 
 export const CONTRACTOR_SELF_SERVICE_CONTRACT_VERSION = 'contractor-self-service.v1' as const
 export const CONTRACTOR_HR_WORKBENCH_CONTRACT_VERSION = 'contractor-hr-workbench.v1' as const
@@ -195,7 +200,19 @@ export interface ContractorWorkbenchQueueRow {
   amount: string
   responsable: string
   nextAction: string
-  classificationRiskStatus: string
+  /**
+   * Raw engagement classification-risk enum value (`clear` / `needs_review` /
+   * `legal_review_required` / `blocked`). Typed `string` for tolerance, but
+   * carries the canonical enum so the inspector lifecycle controls can gate
+   * "activar" via `isClassificationRiskBlocking`.
+   */
+  classificationRiskStatus: ContractorClassificationRiskStatus
+  /**
+   * TASK-975 — the engagement's raw lifecycle status (NOT the work-queue
+   * `statusLabel`/`statusTone`, which describe the review state). The inspector
+   * lifecycle controls derive valid transitions from this.
+   */
+  lifecycleStatus: ContractorEngagementStatus
 }
 
 export interface ContractorWorkbenchSignal {
