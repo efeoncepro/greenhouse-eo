@@ -79,6 +79,8 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-959-workforce-foundation-read-only-object-map-audit.md`
 - `docs/research/RESEARCH-008-current-state-gap-analysis-2026-05-31.md`
 - `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md`
+- `docs/research/RESEARCH-008-approved-mockup-contracts-2026-05-31.md`
+- `docs/research/RESEARCH-008-epic017-mockup-execution-plan-2026-05-31.md`
 - `docs/tasks/TASK_PROCESS.md`
 - `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
 

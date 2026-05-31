@@ -73,6 +73,8 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`
+- `docs/research/RESEARCH-008-approved-mockup-contracts-2026-05-31.md`
+- `docs/research/RESEARCH-008-epic017-mockup-execution-plan-2026-05-31.md`
 - `docs/epics/to-do/EPIC-001-document-vault-signature-orchestration-platform.md`
 - `docs/tasks/to-do/TASK-489-document-registry-versioning-foundation.md`
 - `docs/tasks/to-do/TASK-490-signature-orchestration-foundation.md`

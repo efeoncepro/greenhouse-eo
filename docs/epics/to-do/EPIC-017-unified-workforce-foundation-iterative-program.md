@@ -57,6 +57,8 @@ Este epic existe para mantener la evolucion en modo iterativo:
 - `docs/research/RESEARCH-008-current-state-gap-analysis-2026-05-31.md`
 - `docs/research/RESEARCH-008-pre-task-considerations.md`
 - `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md`
+- `docs/research/RESEARCH-008-approved-mockup-contracts-2026-05-31.md`
+- `docs/research/RESEARCH-008-epic017-mockup-execution-plan-2026-05-31.md`
 - `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md`
 - `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -219,6 +221,14 @@ Operational rule:
 - Payroll compliance, receipts, close gates, Previred and smoke lanes remain valid separate Payroll work unless a later EPIC-017 task explicitly consumes their outputs.
 - Reframed tasks must declare the EPIC phase, source-of-truth boundary, read/write scope, and payroll/finiquito/contractor/finance hard rules before moving to `in-progress`.
 
+## Approved Mockup Contracts
+
+The approved product direction for EPIC-017 mockups is now a hard implementation guardrail in [RESEARCH-008 Approved Mockup Contracts](../../research/RESEARCH-008-approved-mockup-contracts-2026-05-31.md).
+
+The concrete build plan for those mockups lives in [RESEARCH-008 EPIC-017 Mockup Execution Plan](../../research/RESEARCH-008-epic017-mockup-execution-plan-2026-05-31.md).
+
+Agents implementing `TASK-961` through `TASK-967`, or reframing `TASK-652`, must treat those appendices as the approved UI/interaction contract and execution plan. Implementation work should wire real read models, access gates, copy and GVC scenarios into the approved mockups; it must not redesign the flow, remove existing Person 360 operational surfaces, move Payroll ownership into People, or create parallel Documents/Payment systems without explicit task/ADR approval.
+
 ## Existing Related Work
 
 - `RESEARCH-008` — Unified Workforce Foundation research brief.
@@ -278,3 +288,7 @@ Delta posterior 7: se reviso una captura de Deel worker profile como evidencia d
 Delta posterior 8: se creo `TASK-961` como siguiente paso operativo. La task promueve el hub existente People/Person 360 con una faceta/seccion `workforce` read-only consumiendo `WorkforceFoundationMap` (TASK-959). Mantiene el limite canonico: People/Person 360 es el hub de estado laboral vigente; Payroll, Finance y Contractor Payables siguen siendo rails especializadas y no reciben writes desde esta task.
 
 Delta posterior 9: se actualizo el backlog triage para reflejar la nueva secuencia post-captura Deel: `TASK-961` antes de reescribir compensation/assignment; `TASK-962` como plan read-only de coverage/readiness antes de data fixes; `TASK-614` marcado como absorb/supersede post-961; `TASK-338`, `TASK-340`, `TASK-652`, `TASK-788` y `TASK-798` quedan para rewrite/split antes de ejecucion; `TASK-797`, `TASK-787`, `TASK-960` y `TASK-955` quedan separados o livianamente alineados.
+
+Delta posterior 10: se agrego `RESEARCH-008-approved-mockup-contracts-2026-05-31.md` como contrato duro de mockups aprobados para EPIC-017. Incluye el target aprobado de Person 360 Daniela, la cartera de mockups restantes, reglas de no-regresion para ICO/Nexa/People surfaces, limites Payroll/Finance/Documents y checklist obligatorio para agentes de implementacion.
+
+Delta posterior 11: se agrego `RESEARCH-008-epic017-mockup-execution-plan-2026-05-31.md` para planificar concretamente los mockups restantes. Corrige la omision del People Workforce Command Center (`/people/mockup/workforce-command`) y define layout, data story, microinteractions, payroll boundaries, GVC scenarios y batches de ejecucion para M02-M08.

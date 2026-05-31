@@ -60,6 +60,8 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-658-api-platform-resource-authorization-bridge.md`
 - `docs/tasks/to-do/TASK-961-person-360-workforce-facet-read-only-promotion.md`
 - `docs/tasks/to-do/TASK-962-workforce-coverage-readiness-remediation-plan.md`
+- `docs/research/RESEARCH-008-approved-mockup-contracts-2026-05-31.md`
+- `docs/research/RESEARCH-008-epic017-mockup-execution-plan-2026-05-31.md`
 
 ## Dependencies & Impact
 

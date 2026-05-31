@@ -77,6 +77,8 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-963-people-list-workforce-overview.md`
 - `docs/tasks/to-do/TASK-966-workforce-reporting-foundation.md`
 - `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`
+- `docs/research/RESEARCH-008-approved-mockup-contracts-2026-05-31.md`
+- `docs/research/RESEARCH-008-epic017-mockup-execution-plan-2026-05-31.md`
 
 ## Dependencies & Impact
 

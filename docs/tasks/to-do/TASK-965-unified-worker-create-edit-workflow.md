@@ -78,6 +78,8 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`
+- `docs/research/RESEARCH-008-approved-mockup-contracts-2026-05-31.md`
+- `docs/research/RESEARCH-008-epic017-mockup-execution-plan-2026-05-31.md`
 - `docs/tasks/to-do/TASK-961-person-360-workforce-facet-read-only-promotion.md`
 - `docs/tasks/to-do/TASK-962-workforce-coverage-readiness-remediation-plan.md`
 - `docs/tasks/to-do/TASK-338-compensation-arrangement-canonical-runtime-foundation.md`
