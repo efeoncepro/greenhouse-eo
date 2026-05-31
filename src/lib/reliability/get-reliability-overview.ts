@@ -43,6 +43,7 @@ import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
 import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
 import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
+import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
 import { getContractorPayableTaxReviewOverdueSignal } from './queries/contractor-payable-tax-review-overdue'
 import { getContractorPayableFxUnresolvedOverdueSignal } from './queries/contractor-payable-fx-unresolved-overdue'
@@ -578,6 +579,7 @@ interface ReliabilityOverviewSources {
   contractorPayableExceedsAgreedAmount?: ReliabilitySignal | null
   /** TASK-977 — committed payables without a materialized expense (settlement precondition). */
   contractorPayableExpenseUnmaterialized?: ReliabilitySignal | null
+  contractorPayablePaymentSlaOverdue?: ReliabilitySignal | null
 
   /**
    * TASK-777 Slice 3 — Expense distribution management-accounting gates.
@@ -904,6 +906,7 @@ export const buildReliabilityOverview = (
     ...(sources.contractorPayableExpenseUnmaterialized
       ? [sources.contractorPayableExpenseUnmaterialized]
       : []),
+    ...(sources.contractorPayablePaymentSlaOverdue ? [sources.contractorPayablePaymentSlaOverdue] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
     // TASK-780 Phase 3 — Home rollout drift (PG flag vs env + opt-out rate).
@@ -1310,6 +1313,12 @@ export const getReliabilityOverview = async (
     preloadedSources.contractorPayableExpenseUnmaterialized !== undefined
       ? preloadedSources.contractorPayableExpenseUnmaterialized
       : await getContractorPayableExpenseUnmaterializedSignal().catch(() => null)
+
+  // TASK-978 — contractor payment SLA: committed payables overdue vs the 5-business-day commitment.
+  const contractorPayablePaymentSlaOverdue =
+    preloadedSources.contractorPayablePaymentSlaOverdue !== undefined
+      ? preloadedSources.contractorPayablePaymentSlaOverdue
+      : await getContractorPayablePaymentSlaOverdueSignal().catch(() => null)
 
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
@@ -1733,6 +1742,7 @@ export const getReliabilityOverview = async (
     ledgerUnresolvedDriftItems,
     contractorPayableReadyWithoutObligation,
     contractorPayableExpenseUnmaterialized,
+    contractorPayablePaymentSlaOverdue,
     contractorPayableBridgeDeadLetter,
     contractorPayableTaxReviewOverdue,
     contractorPayableFxUnresolvedOverdue,
