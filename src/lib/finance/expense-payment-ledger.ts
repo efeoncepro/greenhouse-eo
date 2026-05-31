@@ -26,7 +26,13 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
-type ExpensePaymentSource = 'manual' | 'payroll_system' | 'nubox_sync' | 'bank_statement'
+type ExpensePaymentSource =
+  | 'manual'
+  | 'payroll_system'
+  | 'nubox_sync'
+  | 'bank_statement'
+  // TASK-977 — contractor payable settlement (distinct from payroll).
+  | 'contractor_system'
 
 export interface RecordExpensePaymentInput {
   expenseId: string

@@ -6,6 +6,9 @@ import { query, withTransaction } from '@/lib/db'
 
 import { recordExpensePayment } from '@/lib/finance/expense-payment-ledger'
 import { materializePayrollExpensesForExportedPeriod } from '@/lib/finance/payroll-expense-reactive'
+import { materializeContractorPayableExpense } from '@/lib/finance/contractor-payable-expense-reactive'
+import { getContractorPayableById } from '@/lib/contractor-engagements/payables/store'
+import { isContractorPayableSettlementEnabled } from './contractor-settlement-flag'
 
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
@@ -81,6 +84,39 @@ const resolvePayrollExpenseIdViaTx = async (
       ORDER BY created_at DESC
       LIMIT 1`,
     [line.period_id, line.beneficiary_id]
+  )
+
+  return result.rows[0]?.expense_id ?? null
+}
+
+/**
+ * TASK-977 — contractor settlement line predicate. Only when the flag is ON does
+ * a contractor payable line become settle-able; OFF keeps it in `out_of_scope_v1`.
+ */
+const isContractorSettlementLine = (line: LineForExecution): boolean =>
+  isContractorPayableSettlementEnabled() &&
+  line.source_kind === 'contractor_payable' &&
+  line.obligation_kind === 'provider_payroll'
+
+/**
+ * TASK-977 — resolve the contractor's expense by its canonical anchor
+ * (`contractor_payable_id` = the line's `source_ref`). The expense is materialized
+ * reactively when the payable reaches `ready_for_finance` (Slice 2).
+ */
+const resolveContractorExpenseIdViaTx = async (
+  c: PoolClient,
+  line: LineForExecution
+): Promise<string | null> => {
+  if (!line.source_ref) return null
+
+  const result = await c.query<{ expense_id: string }>(
+    `SELECT expense_id
+       FROM greenhouse_finance.expenses
+      WHERE contractor_payable_id = $1
+        AND COALESCE(is_annulled, FALSE) = FALSE
+      ORDER BY created_at DESC
+      LIMIT 1`,
+    [line.source_ref]
   )
 
   return result.rows[0]?.expense_id ?? null
@@ -215,10 +251,15 @@ export async function recordPaymentForOrder(
       continue
     }
 
-    if (line.source_kind !== 'payroll' || line.obligation_kind !== 'employee_net_pay') {
-      // V1 solo cubre payroll/employee_net_pay. Otros kinds NO se skipean
-      // silenciosamente — emiten settlement_blocked + throw para que el
-      // operador (o un V2 path) los resuelva explicitamente.
+    const isPayrollLine =
+      line.source_kind === 'payroll' && line.obligation_kind === 'employee_net_pay'
+
+    const isContractorLine = isContractorSettlementLine(line)
+
+    if (!isPayrollLine && !isContractorLine) {
+      // V1 cubre payroll/employee_net_pay + contractor (TASK-977, detrás de flag).
+      // Otros kinds NO se skipean silenciosamente — emiten settlement_blocked + throw
+      // para que el operador (o un V2 path) los resuelva explicitamente.
       const detail = `out_of_scope_v1 (source=${line.source_kind ?? 'null'}, kind=${line.obligation_kind})`
 
       await publishSettlementBlockedEvent({
@@ -238,50 +279,27 @@ export async function recordPaymentForOrder(
 
     let expenseId: string | null = null
 
-    await withTransaction(async c => {
-      expenseId = await resolvePayrollExpenseIdViaTx(c, line)
-    })
+    if (isContractorLine) {
+      // TASK-977 — resolve by the contractor payable anchor. The expense is
+      // materialized reactively on `ready_for_finance` (Slice 2); on-demand
+      // materialize is the defensive fallback if the reactive path lagged.
+      await withTransaction(async c => {
+        expenseId = await resolveContractorExpenseIdViaTx(c, line)
+      })
 
-    // Materialize-or-throw: si el lookup miss, intentar materializar
-    // expenses para ese periodo (idempotente — skipea filas existentes)
-    // y re-lookup. Si sigue ausente, es un settlement bloqueado real.
-    if (!expenseId) {
-      const ym = parseYearMonthFromPeriodId(line.period_id)
+      if (!expenseId && line.source_ref) {
+        const payable = await getContractorPayableById(line.source_ref)
 
-      if (ym && line.period_id) {
-        try {
-          await materializePayrollExpensesForExportedPeriod({
-            periodId: line.period_id,
-            year: ym.year,
-            month: ym.month
+        if (payable) {
+          await materializeContractorPayableExpense(payable)
+          await withTransaction(async c => {
+            expenseId = await resolveContractorExpenseIdViaTx(c, line)
           })
-        } catch (matErr) {
-          // El materializer tambien fallo — esto es materializer dead-letter.
-          const detail = `materializer failed: ${matErr instanceof Error ? matErr.message : String(matErr)}`
-
-          await publishSettlementBlockedEvent({
-            orderId: input.orderId,
-            reason: 'materializer_dead_letter',
-            detail,
-            affectedLineIds: [line.line_id]
-          })
-
-          throw new PaymentOrderSettlementBlockedError(
-            input.orderId,
-            'materializer_dead_letter',
-            detail,
-            line.line_id
-          )
         }
-
-        // Re-lookup despues de materializar.
-        await withTransaction(async c => {
-          expenseId = await resolvePayrollExpenseIdViaTx(c, line)
-        })
       }
 
       if (!expenseId) {
-        const detail = `expense_not_found despues de materializer (period=${line.period_id}, member=${line.beneficiary_id})`
+        const detail = `expense_not_found contractor (payable=${line.source_ref ?? 'null'})`
 
         await publishSettlementBlockedEvent({
           orderId: input.orderId,
@@ -297,6 +315,67 @@ export async function recordPaymentForOrder(
           line.beneficiary_id
         )
       }
+    } else {
+      await withTransaction(async c => {
+        expenseId = await resolvePayrollExpenseIdViaTx(c, line)
+      })
+
+      // Materialize-or-throw: si el lookup miss, intentar materializar
+      // expenses para ese periodo (idempotente — skipea filas existentes)
+      // y re-lookup. Si sigue ausente, es un settlement bloqueado real.
+      if (!expenseId) {
+        const ym = parseYearMonthFromPeriodId(line.period_id)
+
+        if (ym && line.period_id) {
+          try {
+            await materializePayrollExpensesForExportedPeriod({
+              periodId: line.period_id,
+              year: ym.year,
+              month: ym.month
+            })
+          } catch (matErr) {
+            // El materializer tambien fallo — esto es materializer dead-letter.
+            const detail = `materializer failed: ${matErr instanceof Error ? matErr.message : String(matErr)}`
+
+            await publishSettlementBlockedEvent({
+              orderId: input.orderId,
+              reason: 'materializer_dead_letter',
+              detail,
+              affectedLineIds: [line.line_id]
+            })
+
+            throw new PaymentOrderSettlementBlockedError(
+              input.orderId,
+              'materializer_dead_letter',
+              detail,
+              line.line_id
+            )
+          }
+
+          // Re-lookup despues de materializar.
+          await withTransaction(async c => {
+            expenseId = await resolvePayrollExpenseIdViaTx(c, line)
+          })
+        }
+
+        if (!expenseId) {
+          const detail = `expense_not_found despues de materializer (period=${line.period_id}, member=${line.beneficiary_id})`
+
+          await publishSettlementBlockedEvent({
+            orderId: input.orderId,
+            reason: 'expense_unresolved',
+            detail,
+            affectedLineIds: [line.line_id]
+          })
+
+          throw new PaymentOrderExpenseUnresolvedError(
+            input.orderId,
+            line.line_id,
+            line.period_id,
+            line.beneficiary_id
+          )
+        }
+      }
     }
 
     try {
@@ -307,7 +386,7 @@ export async function recordPaymentForOrder(
         currency: line.currency,
         paymentMethod: order.payment_method ?? null,
         paymentAccountId: order.source_account_id ?? null,
-        paymentSource: 'payroll_system',
+        paymentSource: isContractorLine ? 'contractor_system' : 'payroll_system',
         reference: order.external_reference ?? `order:${order.order_id}/line:${line.line_id}`,
         actorUserId: input.actorUserId ?? null,
         paymentOrderLineId: line.line_id,
