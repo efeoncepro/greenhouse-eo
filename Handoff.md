@@ -1,3 +1,18 @@
+# Sesion 2026-05-31 — EPIC-017 backlog task rewrites applied — ✅ DOCS-ONLY
+
+**Rama**: `develop` por continuidad del operador. Scope docs-only: se aplicó la disposición del audit `RESEARCH-008-payroll-backlog-triage-2026-05-31` a las tasks existentes del backlog Payroll/Workforce/Compensation para que no se ejecuten con framing viejo.
+
+Cambios principales:
+- Reframed/frozen: `TASK-338` (`CompensationProfile` read model/foundation), `TASK-340` (bridge congelado hasta parity/checkpoint), `TASK-341`/`TASK-342` (bloqueadas por `CompensationProfile`), `TASK-614` (absorb/supersede candidate post-`TASK-961`), `TASK-652` (defer API/agent surface hasta facet + redaction), `TASK-788` (split a WorkAssignment effective-dating; write command cargo+comp diferido), `TASK-798` (signals contractor deben reutilizar gap taxonomy EPIC-017).
+- Aligned/kept separate: `TASK-787`, `TASK-797`, `TASK-955`, `TASK-960`.
+- Umbrella adjusted: `TASK-336` conserva valor histórico, pero subordina el tramo compensation a EPIC-017 y al reframe de `TASK-338`.
+- Índices sincronizados: `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`.
+- Research appendix actualizado con "Applied Disposition Update - 2026-05-31".
+
+No hubo cambios runtime, migraciones, UI, API, DB ni lifecycle moves. Próximo paso recomendado: ejecutar `TASK-961` o `TASK-962`; no tomar `TASK-338/340/614/652/788/798` sin respetar sus gates nuevos.
+
+---
+
 # Sesion 2026-05-31 — TASK-958 Compensation Version Tuple Drift Remediation — 🔧 IN-PROGRESS
 
 **Rama**: `develop` (override operador, sin branch). Follow-up de TASK-957. Remedia drift `member.contract_type` vs `compensation_versions.contract_type` (caso Melkin: contractor Nicaragua/Deel, comp version vigente `(indefinido, international)` grandfathered por CHECK `compensation_versions_contract_pay_regime_check` que está NOT VALID). Open questions resueltas (no bloqueantes): Q1→script one-shot (cohorte=1), Q2→esperar CHECK deel-NULL (gap ya 0: `deel_contract_id='m4ye2qg'` de Melkin backfilleado 2026-05-31). Slice 1: primitivo `reconcile-compensation-version-tuple` con aserción payroll before/after (buildPayrollEntry indefinido vs contractor → idéntico o aborta). Slice 2: VALIDATE del CHECK. Slice 3: señal `payroll.deel_member_without_contract_id`. Garantía "no rompe payroll" + gate `pnpm vitest run src/lib/payroll`. NO toca finiquito/offboarding.

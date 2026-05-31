@@ -12,12 +12,23 @@
 - Scope: `docs/tasks/to-do` Payroll/Workforce/Compensation backlog triage
 - Runtime changes: none
 - Task creation: none
+- Applied to task specs: 2026-05-31
 
 ## Purpose
 
 This appendix records which existing Payroll-adjacent backlog items can support the Unified Workforce Foundation objective, and which ones must be reframed before execution.
 
 It does not change task lifecycle, reserve new IDs or authorize implementation. It is an intake guide for EPIC-017 so Greenhouse can reuse existing backlog instead of creating duplicate tasks.
+
+## Applied Disposition Update - 2026-05-31
+
+The triage below has now been applied to the relevant to-do specs and task indexes as a documentation-only rewrite:
+
+- Reframed / frozen: `TASK-338`, `TASK-340`, `TASK-341`, `TASK-342`, `TASK-614`, `TASK-652`, `TASK-788`, `TASK-798`.
+- Lightly aligned / kept separate: `TASK-787`, `TASK-797`, `TASK-955`, `TASK-960`.
+- Umbrella adjusted: `TASK-336` now treats the old compensation thread as historical and subordinates the sequence to EPIC-017.
+
+No lifecycle was moved, no runtime behavior changed, and no new task IDs were reserved in this update.
 
 ## Triage Labels
 

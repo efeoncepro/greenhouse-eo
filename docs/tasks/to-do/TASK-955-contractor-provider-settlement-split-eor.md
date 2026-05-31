@@ -20,6 +20,8 @@
 
 Implementar el carril **provider/EOR** del contractor payable: payee provider (Deel/Remote/Oyster como `greenhouse_core.providers`), split charge/payout/fee/FX-spread con reconciliación, y clasificación Finance de cada componente. Es la **Fase B diferida de TASK-795** — las decisiones de diseño ya están tomadas y documentadas (D-795-2, D-795-3); esta task las implementa.
 
+> **Alineación EPIC-017 (2026-05-31):** esta task sigue diferida y separada. Cuando emerja un provider/EOR real, su split debe alimentar `PaymentRail`/lineage de la persona, pero no debe adelantar la Unified Workforce Foundation ni convertir provider IDs en identidad persona. `TASK-961` puede mostrar evidencia de rail; `TASK-955` sigue owner del settlement provider.
+
 ## Why This Task Exists
 
 TASK-795 Fase A entregó la frontera tributaria + FX policy del contractor internacional/provider, pero **difirió** el carril provider/EOR porque el grueso de contractors de Efeonce son **directos** (entidad contratante `Efeonce Group SpA`, payee = la persona) y el carril plataforma/EOR es minoría — construir el split + reconciliación + EOR antes de tener un contractor real por Deel sería especulativo (YAGNI).
@@ -41,11 +43,13 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_FINANCE_ECONOMIC_CATEGORY_DIMENSION_V1.md` (TASK-768)
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` (Proveedor canónico)
 - `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md` (contexto para PaymentRail lineage)
 
 Decisiones canónicas ya tomadas (NO re-litigar — implementar):
 
 - **D-795-2**: `net_payable` del worker NUNCA absorbe provider fee ni FX spread (invariante TASK-793 intacto). Split en `provider_settlement_breakdown_json` (charge / worker_payout / provider_fee / provider_withheld_tax / fx_spread) + assertion de reconciliación con tolerancia (`charge ≈ worker_payout + provider_fee + provider_withheld_tax + fx_spread`). Provider fee = obligación separada (`payable_source_kind='provider_fee'`); FX spread = metadata + clasificación, no payee. Clasificación: worker → `labor_cost_external`, provider fee → `vendor_cost_professional_services`, FX spread → `financial_cost`, provider-withheld-tax → informativo (NO es retención de Efeonce). El FX realizado en settlement ya fluye por `expense_payments.fx_gain_loss_clp` (TASK-699/766).
 - **D-795-3**: el contractor-persona NUNCA es `greenhouse_core.providers`. Solo la plataforma/EOR (Deel) es Provider comercial. Separar **payee de la obligación** (`beneficiary_type='provider'` + `beneficiary_id = providers.provider_id` para EOR/provider-fee) de **sujeto de atribución de costo** (SIEMPRE la persona). Loaded cost en EOR = invoice completo, NO solo payout.
+- EPIC-017 boundary: provider IDs son referencias de ejecución/settlement, no identidad persona. Cualquier read model workforce debe mostrar provider rail como evidencia, no como root.
 
 ## Dependencies & Impact
 

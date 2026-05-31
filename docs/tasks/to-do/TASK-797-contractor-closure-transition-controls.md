@@ -22,6 +22,8 @@ Implementar cierre contractor como lifecycle propio: no finiquito, no payroll de
 
 > **Alineación dimensión Entidad Contratante (2026-05-30):** el cierre depende de la **entidad contratante** (`legal_entity_organization_id`): cierre de honorario CL (Efeonce SpA) ≠ cierre de provider/EOR (termination ref del provider). NUNCA es finiquito (`final_settlements`), regardless de la entidad. La provider termination ref solo aplica al carril EOR/provider (minoría). SSOT del modelo: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30.
 
+> **Alineación EPIC-017 (2026-05-31):** esta task se mantiene separada del Unified Workforce Foundation. Contractor closure es lifecycle contractor, no hub People ni payroll. Cuando se ejecute, puede consumir estado de Person/Workforce (`TASK-961`) para visibilidad y gap context, pero no debe mover su ownership ni bloquear el read-only workforce hub.
+
 ## Why This Task Exists
 
 Terminar una relacion contractor no debe disparar finiquito laboral. Pero tampoco puede ser solo desactivar usuario: quedan invoices, work submissions, provider refs, documentos, access handoff y payment obligations pendientes.
@@ -40,12 +42,14 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md` (solo como contexto; no convierte esta task en child EPIC-017)
 
 Reglas obligatorias:
 
 - Contractor closure does not trigger `final_settlements`.
 - Access offboarding remains separate from contractual closure.
 - Open invoices and approved post-closure invoices must be explicit.
+- Person 360/Workforce may display closure state later, but closure command/readiness remains contractor-owned.
 
 ## Dependencies & Impact
 

@@ -26,6 +26,8 @@ Los contractors (honorarios CL, freelance, independent professional, internacion
 
 **Tanto el contractor (Self-Service Hub) como el admin/Finance (Admin Workbench)** deben poder **verlo in-app** (visor) **y descargarlo en PDF** — ambas superficies, ambas acciones. Arquitectura: presenter struct único → visor MUI in-app + react-pdf descargable (patrón TASK-758, cero drift de contenido entre vista y PDF).
 
+> **Alineación EPIC-017 (2026-05-31):** esta task se mantiene separada del hub People/Person 360. Remittance Advice es documento de contractor payable/finance/self-service, no source of truth workforce ni payroll. Person 360 Workforce (`TASK-961`) podrá linkear comprobantes pagados en el futuro, pero no debe generar ni recalcular este documento.
+
 ## Why This Task Exists
 
 El programa de contractors (TASK-790→796) modela el contrato, la evidencia, las work submissions, el payable y el bridge a Finance — pero deja un gap de transparencia hacia el contractor: cuando se le paga, no recibe ningún comprobante de la transacción. El colaborador dependiente tiene su recibo (TASK-758); el contractor no tiene equivalente.
@@ -59,6 +61,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` (spec raíz del programa contractor — V1.1 Delta 2026-05-30)
 - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` §25 (receipt-presenter pattern TASK-758, a espejar)
 - `docs/architecture/GREENHOUSE_LEGAL_SIGNATURES_PLATFORM_V1.md` (helper canónico de firma del representante, si el documento la requiere)
+- `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md` (solo como contexto de People hub/payment rail lineage; no convierte esta task en EPIC-017)
 
 Reglas obligatorias:
 
@@ -69,6 +72,7 @@ Reglas obligatorias:
 - **NUNCA** mostrar el documento al contractor sin re-validar acceso self (own) server-side (patrón `/api/my/*` member-scoped, TASK-796). Finance-only fields (provider fees/márgenes) NUNCA visibles al contractor.
 - **NUNCA** hardcodear los datos del emisor ("Efeonce", RUT, domicilio, logo). El emisor es la **Operating Entity** del payable, resuelta desde `contractor_engagements.legal_entity_organization_id` → `greenhouse_core.organizations` (`is_operating_entity=TRUE`) (TASK-795 D-795-5). Hoy es Efeonce Group SpA; el roadmap multi-entidad hereda gratis.
 - **NUNCA** rendear el documento dos veces desde dos fuentes distintas. El visor MUI in-app y el PDF react-pdf consumen el **mismo `RemittanceAdvicePresentation` struct** → cero drift de contenido (patrón TASK-758). El visor in-app es MUI (responsive/accesible); el PDF es el artefacto descargable/imprimible.
+- **NUNCA** convertir Person 360 en emisor/generador del Remittance Advice. Person 360 puede mostrar/linkear evidencia de payment rail; el documento vive en contractor/finance/self-service.
 - **NUNCA** recomputar ni reasignar la numeración `EO-RA-NNNNNN`. Es correlativa **gapless** (un hueco = documento anulado = red flag de auditoría), allocada **atómicamente** y **persistida** una sola vez (la misma payable muestra siempre el mismo número). Disciplina de allocación: espejo de TASK-700 (`account_number_registry`, advisory lock), con formato `EO-` (convención correlativa Greenhouse, igual que Nexa `EO-AIS-*`).
 - **NUNCA** invocar `Sentry.captureException` directo — usar `captureWithDomain(err, 'finance', ...)`.
 - Invocar la skill `greenhouse-finance-accounting-operator` (régimen de retención + naming contable) y `greenhouse-ux-writing` (copy es-CL + disclaimer no-laboral) antes de implementar. El cálculo ya está cubierto por TASK-793/794 — esta task NO recalcula.

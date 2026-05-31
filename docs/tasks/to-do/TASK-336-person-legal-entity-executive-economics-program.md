@@ -11,7 +11,7 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `umbrella`
-- Status real: `Diseno`
+- Status real: `Reframe parcial requerido por EPIC-017 / CompensationProfile`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -23,12 +23,14 @@
 
 Coordinar la evolución de Greenhouse para modelar relaciones explícitas `persona ↔ entidad legal`, separar `compensación ejecutiva` de `cuenta corriente accionista` y alinear `Finance`, `Payroll`, `Costs` y `360` sobre un mismo backbone canónico.
 
+> **Reframe 2026-05-31:** el tramo de compensación de este programa ya no debe decir `CompensationArrangement` como contrato canónico final. `TASK-338` se reescribe como `CompensationProfile` read model/foundation y `TASK-340` queda congelada hasta parity/checkpoint. Esta umbrella conserva valor histórico para relación persona ↔ entidad legal y CCA, pero su secuencia debe subordinarse a EPIC-017.
+
 ## Why This Task Exists
 
 La arquitectura ya formalizó que `identity_profile` es la raíz humana y que `Efeonce Group SpA` debe leerse como contraparte jurídica/económica, pero el runtime todavía no tiene una lane explícita para representar esas relaciones. Hoy:
 
 - la `CCA` está anclada principalmente a `profile_id` / `member_id` / `space_id`
-- `Payroll` materializa compensación formal, pero no existe un objeto previo tipo `CompensationArrangement`
+- `Payroll` materializa compensación formal, pero falta un read model/foundation tipo `CompensationProfile` que explique compensación sin convertir Payroll en root
 - `Costs` y `360` no tienen una forma limpia de consumir esas relaciones sin mezclar semánticas
 
 Sin un programa coordinado, cada módulo resolvería el problema con extensiones parciales y roots paralelos.
@@ -122,12 +124,12 @@ Reglas obligatorias:
 ### Slice 1 — Foundations
 
 - `TASK-337` — runtime mínimo de relaciones `person ↔ legal entity`
-- `TASK-338` — `CompensationArrangement` como contrato canónico
+- `TASK-338` — `CompensationProfile` read model/foundation (reframe de `CompensationArrangement`)
 
 ### Slice 2 — Domain bridges
 
 - `TASK-339` — realineamiento semántico de `shareholder_account`
-- `TASK-340` — puente explícito `CompensationArrangement -> Payroll`
+- `TASK-340` — puente explícito `CompensationProfile -> Payroll` (frozen hasta parity/checkpoint)
 
 ### Slice 3 — Consumers
 

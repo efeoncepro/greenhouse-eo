@@ -11,17 +11,19 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Blocked/reframe after CompensationProfile + bridge checkpoint`
 - Rank: `TBD`
 - Domain: `identity`
-- Blocked by: `TASK-340`
+- Blocked by: `TASK-338 reframe`, `TASK-340 frozen`, `TASK-962`
 - Branch: `task/TASK-341-executive-economics-360-read-model`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Crear un read model privado para consumir de forma unificada relaciones `persona ↔ entidad legal`, `CompensationArrangement`, `Payroll` y `Cuenta accionista`, sin mezclar ownership ni abrir una vista ejecutiva final antes de tiempo.
+Crear un read model privado para consumir de forma unificada relaciones `persona ↔ entidad legal`, `CompensationProfile`, `Payroll` y `Cuenta accionista`, sin mezclar ownership ni abrir una vista ejecutiva final antes de tiempo.
+
+> **Reframe 2026-05-31:** no ejecutar hasta que `TASK-338` cierre el nuevo contrato `CompensationProfile` y `TASK-340` sea revalidada o reemplazada. El término `CompensationArrangement` queda como antecedente histórico.
 
 ## Why This Task Exists
 
@@ -68,6 +70,7 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-338-compensation-arrangement-canonical-runtime-foundation.md`
 - `docs/tasks/to-do/TASK-339-shareholder-account-legal-entity-alignment.md`
 - `docs/tasks/to-do/TASK-340-compensation-arrangement-payroll-bridge.md`
+- `docs/tasks/to-do/TASK-962-workforce-coverage-readiness-remediation-plan.md`
 - `src/lib/person-360/person-complete-360.ts`
 - `src/lib/person-360/get-person-finance.ts`
 - `src/lib/account-360/account-complete-360.ts`

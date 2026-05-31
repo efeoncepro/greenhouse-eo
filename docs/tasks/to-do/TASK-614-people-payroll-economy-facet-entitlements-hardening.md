@@ -13,18 +13,20 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Epic: `—`
-- Status real: `Diseno`
+- Epic: `EPIC-017`
+- Status real: `Absorb/supersede candidate — no ejecutar as-is; reassess after TASK-961`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-611` (capabilities_registry table + FK + parity test infrastructure)
+- Blocked by: `TASK-961` (People/Person 360 workforce hub promotion), then reassess residual scope
 - Branch: `task/TASK-614-people-payroll-economy-facet-entitlements-hardening`
 - Legacy ID: `—`
 - GitHub Issue: `—`
 
 ## Summary
 
-Endurecer la convergencia ya existente entre `People` y `Payroll` para que la faceta económica del colaborador deje de depender tanto de `roleCodes`, reduzca mezcla conceptual dentro del tab `economy`, y termine de apoyarse en readers canónicos `person-360` en vez de helpers transitorios/deprecated.
+**Disposition 2026-05-31:** no ejecutar esta task as-is. `TASK-961` ahora es la task que promueve People/Person 360 como hub workforce read-only. Esta task queda como fuente de contexto para un posible hardening posterior del rail Economy/Payroll/Payment, pero su scope debe ser absorbido, reducido o superseded después de `TASK-961`.
+
+El objetivo residual, si sobrevive, será endurecer las rails económicas de People para que consuman la faceta `workforce`/Person 360 y mantengan views + entitlements separados, sin inventar una proyección paralela.
 
 **Spec canónico vinculante**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md` — esta task aplica el mismo patrón (capabilities registry + relationship resolver + projection helper + 7-layer defense) al objeto canónico `Persona` (member). El spec V1 es transversal: organizations + persons usan la misma infraestructura, solo cambian facets y relationships.
 
@@ -45,14 +47,14 @@ Pero todavía quedan gaps de hardening importantes:
 - existen readers transitorios (`getPersonFinanceOverviewFromPostgres`) marcados como deprecated y pendientes de convergencia a `person-complete-360`
 - el modelo de capabilities finas todavía no expresa con precisión quién puede ver qué parte del contexto económico del colaborador
 
-Sin esta lane, la UX sigue siendo usable, pero el access model y la arquitectura de readers quedan a medio consolidar y dificultan escalar People como workspace enterprise.
+Sin embargo, el artículo/captura de Deel y `TASK-961` corrigieron el orden: primero hay que consolidar el hub People/Person 360 como superficie workforce. Solo después conviene decidir si este hardening sigue siendo una task separada o si quedó absorbido por la nueva faceta `workforce`.
 
 ## Goal
 
-- Formalizar permisos finos para la faceta económica del colaborador.
-- Reducir la mezcla conceptual del tab `economy` sin romper el patrón actual `Payroll -> People`.
-- Converger readers deprecated hacia la capa `person-360`/`person-complete-360`.
-- Dejar una base más robusta para futuras surfaces HR/Finance sobre persona.
+- Esperar el cierre de `TASK-961`.
+- Identificar qué queda realmente fuera de la faceta `workforce`.
+- Si queda scope residual, reescribir como "People Economy/Payroll Rail Hardening" post-`TASK-961`.
+- Mantener la regla: People/Person 360 es el hub; Payroll es rail especializada.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -69,6 +71,8 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md`
+- `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
@@ -79,6 +83,8 @@ Reglas obligatorias:
 
 - `People` sigue siendo la surface canónica del colaborador; esta task no debe crear un detail paralelo dentro de Payroll.
 - `Payroll` puede seguir teniendo entrypoints operativos propios, pero el detalle persona-céntrico debe mantenerse en `People`.
+- `TASK-961` owns the first workforce hub promotion; this task cannot duplicate that UI/facet.
+- Any residual economy/payroll hardening must consume the `workforce` facet/read model and not create another person economy projection.
 - **Capability namespace canónico**: `person.<facet>.<action>` transversal con `scope ∈ {own, tenant, all}`. `person` se agrega al modules union (mismo patrón que `organization` en V1 spec). Entrypoint NO es dimensión de autorización.
 - **Reuso obligatorio de primitives V1**: `capabilities_registry` (TASK-611), `home_rollout_flags`/`feature_rollout_flags` (TASK-780), `captureWithDomain('identity', ...)`, defense-in-depth 7-layer (TASK-742). NO recrear infraestructura.
 - **Reuso de TASK-784**: `person.legal_profile.*` ya canonizado — esta task lo extiende con facets adicionales, NO lo redecide.
@@ -93,6 +99,9 @@ Reglas obligatorias:
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
 - `docs/architecture/ACCOUNT_360_IMPLEMENTATION_V1.md`
 - `docs/tasks/in-progress/TASK-274-account-complete-360-federated-serving-layer.md`
+- `docs/tasks/to-do/TASK-961-person-360-workforce-facet-read-only-promotion.md`
+- `docs/tasks/to-do/TASK-962-workforce-coverage-readiness-remediation-plan.md`
+- `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md`
 
 ## Dependencies & Impact
 
@@ -125,7 +134,9 @@ Reglas obligatorias:
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
 
-## Current Repo State (verified inventory 2026-05-07)
+## Current Repo State
+
+Verified inventory date: 2026-05-07.
 
 ### Already exists
 
@@ -171,6 +182,16 @@ Bounded set — solo navegación interna:
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Rollout Plan & Risk Matrix
+
+This task is not executable as-is after the EPIC-017 reframe. Rollout must be reassessed after `TASK-961` closes:
+
+| Risk | Mitigation |
+| --- | --- |
+| Duplicating the Person 360 `workforce` facet | Run Slice -1 first and close this task as superseded if `TASK-961` covers the hub scope. |
+| Exposing payroll/economy data too broadly | Require field-level capability and sensitivity review before any residual implementation. |
+| Breaking existing People/Payroll deep links | Keep `/people/[memberId]` and `/hr/payroll/member/[memberId]` compatibility unless a separate migration plan exists. |
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
@@ -179,6 +200,15 @@ Bounded set — solo navegación interna:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
+
+### Slice -1 — Reassessment after TASK-961 (mandatory)
+
+- Compare `TASK-961` implementation against this task's original scope.
+- Mark each original slice as:
+  - delivered by `TASK-961`;
+  - still needed as People Economy/Payroll rail hardening;
+  - obsolete/superseded.
+- If more than half the scope is delivered by `TASK-961`, close this task as superseded and open a narrower follow-up only if needed.
 
 ### Slice 0 — Caller inventory + degraded path UX spec
 

@@ -18,6 +18,8 @@
 
 Cuando el colaborador declara una direccion legal con `country_code` distinto al `members.location_country` que Entra/SCIM sincronizo desde Microsoft Graph, hoy el sistema NO reconcilia ambos. Lo declarado se persiste en `person_addresses` (correcto, identidad legal), pero `members.location_country` sigue mostrando lo de Entra (correcto, identidad operacional). Esa coexistencia esta bien hasta que alguien las disagree-ee — ahi necesita governance, no override silencioso.
 
+> **Alineación EPIC-017 (2026-05-31):** esta task se mantiene independiente. Su output debe poder alimentar un futuro `ComplianceRail`/country confidence en Person 360 Workforce (`TASK-961`), pero no bloquea el hub ni debe convertirse en source of truth laboral. Entra country y declared legal country siguen siendo fuentes distintas con reconciliation governance.
+
 ## Why This Task Exists
 
 Durante la implementacion de TASK-784 propuse un cascade que prefiriera lo declarado sobre Entra. El usuario observo (correctamente) que eso rompe el modelo SCIM/Entra: el siguiente sync revierte el override silenciosamente, generando un boomerang. Mismo bug class que TASK-785 documenta para `role_title`.
@@ -39,6 +41,7 @@ La solucion robusta no es elegir una fuente sobre la otra — es **reconciliar**
 
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`
+- `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md` (solo como contexto de ComplianceRail)
 - `docs/tasks/to-do/TASK-785-workforce-role-title-source-of-truth-governance.md` (mismo patron — extender governance shape)
 
 ## Dependencies & Impact
@@ -85,6 +88,7 @@ La solucion robusta no es elegir una fuente sobre la otra — es **reconciliar**
 ## Out of Scope
 - Reconciliacion de OTROS atributos (job_title — ese es TASK-785, mismo patron).
 - Auto-resolve sin intervencion HR.
+- Bloquear `TASK-961`/Person 360 Workforce por country drift; el drift se expone como compliance evidence, no como current work classification.
 
 ## Acceptance Criteria
 - [ ] Drift Entra ↔ declared visible en `/people/[slug]` con banner.
