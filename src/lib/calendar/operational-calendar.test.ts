@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  addBusinessDays,
   countBusinessDays,
   DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
   getLastBusinessDayOfMonth,
@@ -111,5 +112,31 @@ describe('operational-calendar', () => {
     })
 
     expect(dateKey).toBe('2026-03-31')
+  })
+
+  it('addBusinessDays skips weekends (5 business days after a Monday → next Monday)', () => {
+    expect(addBusinessDays('2026-03-02', 5, { timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE })).toBe(
+      '2026-03-09'
+    )
+  })
+
+  it('addBusinessDays skips holidays', () => {
+    expect(
+      addBusinessDays('2026-03-02', 5, {
+        timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
+        holidayDates: ['2026-03-04']
+      })
+    ).toBe('2026-03-10')
+  })
+
+  it('addBusinessDays is exclusive of the reference date (1 business day after Friday → Monday)', () => {
+    expect(addBusinessDays('2026-03-06', 1, { timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE })).toBe(
+      '2026-03-09'
+    )
+  })
+
+  it('addBusinessDays rejects non-positive business-day counts', () => {
+    expect(() => addBusinessDays('2026-03-02', 0)).toThrow(RangeError)
+    expect(() => addBusinessDays('2026-03-02', -1)).toThrow(RangeError)
   })
 })

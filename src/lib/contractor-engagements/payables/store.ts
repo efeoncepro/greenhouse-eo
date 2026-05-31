@@ -21,6 +21,7 @@ import { listContractorInvoiceAssetsByEngagement } from '../invoice-assets'
 import { getContractorEngagementById } from '../store'
 
 import { isContractorAgreedAmountGuardrailEnabled } from './agreed-amount-guardrail-flag'
+import { resolveContractorPaymentDueDate } from './due-date'
 import { evaluatePayableReadiness } from './readiness'
 import type { PayableReadinessInputs, PayableReadinessResult } from './readiness'
 import { assertValidPayableTransition, isTerminalPayableStatus } from './state-machine'
@@ -451,7 +452,7 @@ export const createContractorPayableFromSubmission = async (
       taxWithholdingPolicyCode: engagement.taxWithholdingPolicyCode,
       payrollVia: engagement.payrollVia,
       paymentProfileId: input.paymentProfileId ?? null,
-      dueDate: input.dueDate ?? null,
+      dueDate: input.dueDate ?? resolveContractorPaymentDueDate(),
       sourceSnapshot: {
         engagementPublicId: engagement.publicId,
         relationshipSubtype: engagement.relationshipSubtype,
@@ -566,7 +567,7 @@ export const createContractorPayableOffCycle = async (
       taxWithholdingPolicyCode: engagement.taxWithholdingPolicyCode,
       payrollVia: engagement.payrollVia,
       paymentProfileId: input.paymentProfileId ?? null,
-      dueDate: input.dueDate ?? null,
+      dueDate: input.dueDate ?? resolveContractorPaymentDueDate(),
       sourceSnapshot: {
         engagementPublicId: engagement.publicId,
         relationshipSubtype: engagement.relationshipSubtype,
