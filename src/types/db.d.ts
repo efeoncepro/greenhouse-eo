@@ -4614,6 +4614,7 @@ export interface GreenhouseFinanceExpenses {
   amount_paid: Generated<Numeric>;
   balance_nubox: Numeric | null;
   client_id: string | null;
+  contractor_payable_id: string | null;
   /**
    * direct_labor | indirect_labor | operational | infrastructure | tax_social
    */
