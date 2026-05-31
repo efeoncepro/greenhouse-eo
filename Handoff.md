@@ -1,3 +1,9 @@
+# Sesion 2026-05-31 — TASK-958 Compensation Version Tuple Drift Remediation — 🔧 IN-PROGRESS
+
+**Rama**: `develop` (override operador, sin branch). Follow-up de TASK-957. Remedia drift `member.contract_type` vs `compensation_versions.contract_type` (caso Melkin: contractor Nicaragua/Deel, comp version vigente `(indefinido, international)` grandfathered por CHECK `compensation_versions_contract_pay_regime_check` que está NOT VALID). Open questions resueltas (no bloqueantes): Q1→script one-shot (cohorte=1), Q2→esperar CHECK deel-NULL (gap ya 0: `deel_contract_id='m4ye2qg'` de Melkin backfilleado 2026-05-31). Slice 1: primitivo `reconcile-compensation-version-tuple` con aserción payroll before/after (buildPayrollEntry indefinido vs contractor → idéntico o aborta). Slice 2: VALIDATE del CHECK. Slice 3: señal `payroll.deel_member_without_contract_id`. Garantía "no rompe payroll" + gate `pnpm vitest run src/lib/payroll`. NO toca finiquito/offboarding.
+
+---
+
 # Sesion 2026-05-30 — Claude `greenhouse-backend` skill refresh — ✅ COMPLETE
 
 Se investigó el repo + Cloud live para corregir la skill global Claude `~/.claude/skills/greenhouse-backend/SKILL.md`, que estaba BQ-focused y desalineada con el runtime vigente. Nueva baseline de la skill: PostgreSQL/Cloud SQL como OLTP y default para workflows mutables; BigQuery como OLAP/raw/conformed/marts/fallback transicional; uso canónico de `src/lib/postgres/client.ts`, `src/lib/db.ts`, migrations `node-pg-migrate`, outbox/reactive, API Platform, roles reales, views+entitlements y Cloud Run workers. Evidencia read-only usada: package/runtime repo, arquitectura vigente, `gcloud` (Cloud SQL/Run/Functions/Scheduler/Secrets/Buckets/SAs), `bq ls`, `vercel env ls`, `gh workflow list/run list`, `az ad app list`, y `pnpm pg:doctor` live OK. No se tocaron archivos de código de TASK-957.
