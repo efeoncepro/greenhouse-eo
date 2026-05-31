@@ -6346,6 +6346,16 @@ export interface GreenhouseHrOnboardingTemplates {
   updated_by_user_id: string | null;
 }
 
+export interface GreenhouseHrRemittanceAdviceNumbers {
+  allocated_at: Generated<Timestamp>;
+  contractor_payable_id: string;
+  format_version: Generated<number>;
+  issuer_organization_id: string;
+  registry_id: Generated<Int8>;
+  remittance_number: string;
+  sequential_value: number;
+}
+
 export interface GreenhouseHrWorkflowApprovalSnapshots {
   authority_source: string;
   created_at: Generated<Timestamp>;
@@ -9751,6 +9761,7 @@ export interface DB {
   "greenhouse_hr.onboarding_instances": GreenhouseHrOnboardingInstances;
   "greenhouse_hr.onboarding_template_items": GreenhouseHrOnboardingTemplateItems;
   "greenhouse_hr.onboarding_templates": GreenhouseHrOnboardingTemplates;
+  "greenhouse_hr.remittance_advice_numbers": GreenhouseHrRemittanceAdviceNumbers;
   "greenhouse_hr.work_relationship_offboarding_case_events": GreenhouseHrWorkRelationshipOffboardingCaseEvents;
   "greenhouse_hr.work_relationship_offboarding_cases": GreenhouseHrWorkRelationshipOffboardingCases;
   "greenhouse_hr.work_relationship_onboarding_case_events": GreenhouseHrWorkRelationshipOnboardingCaseEvents;
