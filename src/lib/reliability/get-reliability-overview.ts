@@ -115,6 +115,7 @@ import { getPayrollParticipationWindowProjectionDeltaAnomalySignal } from './que
 import { getPayrollParticipationWindowSourceDateDisagreementSignal } from './queries/payroll-participation-window-source-date-disagreement'
 import { getLeaveAccrualOvershootDriftSignal } from './queries/leave-accrual-overshoot-drift'
 import { getPayrollContractorDoubleRailOverlapSignal } from './queries/payroll-contractor-double-rail-overlap'
+import { getPayrollDeelMemberWithoutContractIdSignal } from './queries/payroll-deel-member-without-contract-id'
 import { getPayrollContractTaxonomyFallbackResolutionLegacySignal } from './queries/payroll-contract-taxonomy-fallback-resolution-legacy'
 import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/payroll-contract-taxonomy-invalid-tuple-drift'
 import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './queries/payroll-contract-taxonomy-invalid-statutory-application'
@@ -427,6 +428,7 @@ interface ReliabilityOverviewSources {
    */
   payrollComplianceExportDrift?: ReliabilitySignal | null
   payrollContractorDoubleRailOverlap?: ReliabilitySignal | null
+  payrollDeelMemberWithoutContractId?: ReliabilitySignal | null
   finalSettlementPdfStatusDrift?: ReliabilitySignal | null
 
   /**
@@ -827,6 +829,7 @@ export const buildReliabilityOverview = (
     // PDF asset metadata.documentStatusAtRender). Defense-in-depth para detectar
     // regen failure o transition agregada al state machine sin pasar por el helper.
     ...(sources.payrollContractorDoubleRailOverlap ? [sources.payrollContractorDoubleRailOverlap] : []),
+    ...(sources.payrollDeelMemberWithoutContractId ? [sources.payrollDeelMemberWithoutContractId] : []),
     ...(sources.finalSettlementPdfStatusDrift ? [sources.finalSettlementPdfStatusDrift] : []),
     // TASK-900 Slice 6 — ICO Materializer skipped_safety signal. Roll up bajo
     // moduleKey='delivery'. Visibiliza cuando el freshness gate del materializer
@@ -1126,6 +1129,13 @@ export const getReliabilityOverview = async (
     preloadedSources.payrollContractorDoubleRailOverlap !== undefined
       ? preloadedSources.payrollContractorDoubleRailOverlap
       : await getPayrollContractorDoubleRailOverlapSignal().catch(() => null)
+
+  // TASK-958 Slice 3 — Deel member sin deel_contract_id (gap operacional). Steady=0
+  // tras backfill (Melkin 'm4ye2qg' aplicado 2026-05-31).
+  const payrollDeelMemberWithoutContractId =
+    preloadedSources.payrollDeelMemberWithoutContractId !== undefined
+      ? preloadedSources.payrollDeelMemberWithoutContractId
+      : await getPayrollDeelMemberWithoutContractIdSignal().catch(() => null)
 
   // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
   // Subsystem rollup `Finance Data Quality` vía moduleKey='finance' (alineado
@@ -1678,6 +1688,7 @@ export const getReliabilityOverview = async (
     paymentOrderSettlement,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
+    payrollDeelMemberWithoutContractId,
     finalSettlementPdfStatusDrift,
     payrollParticipationWindow,
     leaveAccrual,
