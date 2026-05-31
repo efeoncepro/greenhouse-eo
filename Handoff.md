@@ -35,6 +35,25 @@ Validación previa de la iteración aprobada: eslint focalizado 0, `pnpm design:
 
 ---
 
+# Sesion 2026-05-31 — EPIC-017 M03 Workforce Readiness Control Room — ✅ MOCKUP APROBADO
+
+**Rama**: `develop`. Scope mockup-only + docs. No DB, migrations, API, runtime remediation, payroll calculation, payment execution or document signing.
+
+Se construyó y el usuario aprobó `M03` como contrato visual/producto:
+- Ruta local: `/people/mockup/workforce-readiness`.
+- View: `src/views/greenhouse/people/mockup/workforce-readiness/WorkforceReadinessMockupView.tsx`.
+- Data: `src/views/greenhouse/people/mockup/workforce-readiness/data.ts`.
+- GVC scenario: `scripts/frontend/scenarios/workforce-readiness-control-room.scenario.ts`.
+- Capture: `.captures/2026-05-31T16-35-51_workforce-readiness-control-room` + review dossier.
+
+Contrato aprobado: control room diagnóstico/read-only para `TASK-962`; separa real active workers vs fixtures, muestra baseline coverage, disposition board, masked samples, owner domain, next safe action y remediation queue preview. No incluye "fix now".
+
+Validación corrida: eslint focalizado 0, `pnpm exec tsc --noEmit --pretty false` 0, `pnpm design:lint` 0/0, GVC local 3 viewports OK, `pnpm fe:capture:review` OK.
+
+Docs sincronizados: `TASK-962` ahora declara `Status real: Mockup aprobado` + `Approved Mockup Lock`; los anexos `RESEARCH-008` marcan M03 como `approved and built as mockup`; `EPIC-017` registra delta M03 aprobado.
+
+---
+
 # Sesion 2026-05-31 — TASK-968 Contractor Compensation Setup — 🔨 IN-PROGRESS (Slice 1/4)
 
 **Rama**: `develop` (sin branch, override del operador). En progreso.

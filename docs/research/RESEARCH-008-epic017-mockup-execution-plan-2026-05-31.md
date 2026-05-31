@@ -27,7 +27,7 @@ Implementation agents should use this as the build plan for the remaining EPIC-0
 | --- | --- | --- | --- | --- |
 | `M01` | Person 360 Workforce Command Profile - Daniela | `/people/mockup/daniela-workforce` | `TASK-961` | Approved individual person/workforce hub. Built. |
 | `M02` | People Workforce Command Center | `/people/mockup/workforce-command` | `TASK-963` | Approved `/people` command surface mockup: roster, filters, exception queues, workforce coverage and inspector. |
-| `M03` | Workforce Coverage & Readiness Control Room | `/people/mockup/workforce-readiness` | `TASK-962` | Diagnostic planning surface for gaps, dispositions and remediation candidates. |
+| `M03` | Workforce Coverage & Readiness Control Room | `/people/mockup/workforce-readiness` | `TASK-962` | Approved diagnostic planning surface for gaps, dispositions and remediation candidates. |
 | `M04` | Person Workforce Documents & Signature Rail | `/people/mockup/workforce-documents` | `TASK-964` | Documents/signature evidence as People rail, consuming EPIC-001. |
 | `M05` | Workforce Reliability Signals Control Plane | `/people/mockup/workforce-reliability` | `TASK-967` | Cross-rail confidence signals and owner-domain runbooks. |
 | `M06` | Workforce Reporting Foundation | `/people/mockup/workforce-reporting` | `TASK-966` | Aggregate workforce reporting without double-counting. |
@@ -186,10 +186,17 @@ Mock data should include at least:
 
 ### Route and ownership
 
-- Planned route: `/people/mockup/workforce-readiness`
+- Current route: `/people/mockup/workforce-readiness`
 - View folder: `src/views/greenhouse/people/mockup/workforce-readiness/*`
 - Scenario: `workforce-readiness-control-room`
 - Owning task: `TASK-962`
+
+### Current state
+
+- Built route: `/people/mockup/workforce-readiness`
+- Built scenario: `workforce-readiness-control-room`
+- Approval status: approved by user on `2026-05-31`.
+- Approved visual evidence: `.captures/2026-05-31T16-35-51_workforce-readiness-control-room`
 
 ### Product question
 

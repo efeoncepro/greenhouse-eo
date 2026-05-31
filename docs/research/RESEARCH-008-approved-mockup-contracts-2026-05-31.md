@@ -110,8 +110,13 @@ Hard rules:
 
 ### M03 - Workforce Coverage & Readiness Control Room
 
-- Status: `approved to design/build as mockup`
-- Planned mock route: `/people/mockup/workforce-readiness`
+- Status: `approved and built as mockup`
+- Current mock route: `/people/mockup/workforce-readiness`
+- Source files:
+  - `src/app/(dashboard)/people/mockup/workforce-readiness/page.tsx`
+  - `src/views/greenhouse/people/mockup/workforce-readiness/WorkforceReadinessMockupView.tsx`
+  - `src/views/greenhouse/people/mockup/workforce-readiness/data.ts`
+  - `scripts/frontend/scenarios/workforce-readiness-control-room.scenario.ts`
 - Primary task: `TASK-962`
 - Product role: read-only gap classification and remediation planning surface.
 

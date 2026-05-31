@@ -14,7 +14,7 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-017`
-- Status real: `Diseno listo para discovery`
+- Status real: `Mockup aprobado`
 - Rank: `TBD`
 - Domain: `cross-domain` (`people|hr|payroll|finance|identity|data|reliability`)
 - Blocked by: `TASK-959` complete; can run before or alongside `TASK-961` only as read-only analysis
@@ -27,6 +27,26 @@
 Explain the real workforce coverage gaps found by `TASK-959` before Greenhouse treats Person 360 workforce state as operationally complete.
 
 This task is read-only. It classifies the four active workers without current compensation and the eight active workers with unresolved/blocked readiness into intentional lifecycle state, data debt, model gap, access/redaction gap or fixture/demo residue. It produces a remediation plan and follow-up task candidates, but does not mutate data.
+
+## Approved Mockup Lock
+
+El mockup `M03 - Workforce Coverage & Readiness Control Room` fue aprobado por el usuario el `2026-05-31` y queda como contrato visual/UX obligatorio para esta task. Es un artefacto de aprobacion visual/producto, no una implementacion runtime de remediation.
+
+- Ruta local: `/people/mockup/workforce-readiness`
+- Route file: `src/app/(dashboard)/people/mockup/workforce-readiness/page.tsx`
+- View mockup: `src/views/greenhouse/people/mockup/workforce-readiness/WorkforceReadinessMockupView.tsx`
+- Mock data tipada: `src/views/greenhouse/people/mockup/workforce-readiness/data.ts`
+- GVC scenario: `scripts/frontend/scenarios/workforce-readiness-control-room.scenario.ts`
+- Evidencia GVC aprobada: `.captures/2026-05-31T16-35-51_workforce-readiness-control-room`
+
+Reglas del mockup:
+
+- Es una superficie diagnostica/read-only. No tiene botones de fix, recalculo payroll, payment execution ni signing.
+- Separa real active workers de fixtures/demo para evitar falsos blockers.
+- Clasifica gaps por disposition, owner domain, severity, source codes, masked samples y next safe action.
+- La remediation queue es preview de tareas futuras; no ejecuta cambios.
+
+Regla de implementacion UI: construir cualquier surface runtime futura desde este mockup aprobado. El agente implementador puede cablear audit outputs reales, owner domains, redaction, copy canonico, estados vacios y responsive fixes, pero no debe agregar acciones de remediation, convertir el control room en una consola de fixes ni mezclar fixtures/demo con el real active cohort sin aprobacion explicita.
 
 ## Why This Task Exists
 
@@ -78,6 +98,7 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - This task is **read-only**. No DB writes, migrations, backfills, UI changes, API routes, outbox events, payroll recalculation, contractor payable transitions or payment obligation mutations.
+- Mockup-only routes under `/people/mockup/**` are allowed as approval artifacts when explicitly requested by the operator; they do not count as runtime remediation UI and must not create API routes, writes or source-of-truth behavior.
 - Do not convert data classification into data remediation inside this task.
 - Do not treat `member.contract_type` as universal current truth. Use `WorkforceFoundationMap` and `resolveCurrentWorkClassification()`.
 - Do not invent local drift categories if a `TASK-959` gap code already exists.
@@ -138,6 +159,9 @@ Reglas obligatorias:
 ### Files owned
 
 - `docs/tasks/to-do/TASK-962-workforce-coverage-readiness-remediation-plan.md`
+- `src/app/(dashboard)/people/mockup/workforce-readiness/page.tsx` (mockup-only approval route)
+- `src/views/greenhouse/people/mockup/workforce-readiness/*` (mockup-only approval artifact)
+- `scripts/frontend/scenarios/workforce-readiness-control-room.scenario.ts` (GVC mockup scenario)
 - `docs/research/RESEARCH-008-current-state-gap-analysis-2026-05-31.md`
 - `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md`
 - `docs/research/RESEARCH-008-workforce-coverage-readiness-remediation-2026-05-31.md` (new output, if executing agent chooses a dedicated appendix)

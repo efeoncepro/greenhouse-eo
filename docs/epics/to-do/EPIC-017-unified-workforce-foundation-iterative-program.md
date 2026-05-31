@@ -231,6 +231,8 @@ Agents implementing `TASK-961` through `TASK-967`, or reframing `TASK-652`, must
 
 Delta `2026-05-31`: `TASK-963` / M02 People Workforce Command Center is now approved as a built mockup at `/people/mockup/workforce-command`. The approved runtime direction is a lightweight enterprise command surface: compact header/metrics, exception queue, roster as primary work area, lightweight filter/saved-view pills, row-level evidence summarized into one primary state plus short count/summary, inspector/drawer for detailed evidence, no page-level horizontal overflow, and stable input IDs to avoid hydration/dev-overlay regressions.
 
+Delta `2026-05-31`: `TASK-962` / M03 Workforce Coverage & Readiness Control Room is now approved as a built mockup at `/people/mockup/workforce-readiness`. The approved runtime direction is diagnostic/read-only: real active worker cohort separated from fixtures/demo, baseline coverage matrix, disposition board, owner domain, severity, source codes, masked evidence samples, next safe action and remediation queue preview. It must not introduce inline fixes, payroll recalculation, payment execution or document-signing controls.
+
 ## Existing Related Work
 
 - `RESEARCH-008` — Unified Workforce Foundation research brief.
