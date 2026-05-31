@@ -42,6 +42,7 @@ import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
 import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
+import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
 import { getContractorPayableTaxReviewOverdueSignal } from './queries/contractor-payable-tax-review-overdue'
 import { getContractorPayableFxUnresolvedOverdueSignal } from './queries/contractor-payable-fx-unresolved-overdue'
@@ -575,6 +576,8 @@ interface ReliabilityOverviewSources {
   contractorPayableFxUnresolvedOverdue?: ReliabilitySignal | null
   /** TASK-968 — payables blocked by the agreed-amount guardrail (no override). */
   contractorPayableExceedsAgreedAmount?: ReliabilitySignal | null
+  /** TASK-977 — committed payables without a materialized expense (settlement precondition). */
+  contractorPayableExpenseUnmaterialized?: ReliabilitySignal | null
 
   /**
    * TASK-777 Slice 3 — Expense distribution management-accounting gates.
@@ -896,6 +899,10 @@ export const buildReliabilityOverview = (
     // TASK-968 — payables blocked by the agreed-amount guardrail (no override).
     ...(sources.contractorPayableExceedsAgreedAmount
       ? [sources.contractorPayableExceedsAgreedAmount]
+      : []),
+    // TASK-977 — committed payables without a materialized expense (settlement precondition).
+    ...(sources.contractorPayableExpenseUnmaterialized
+      ? [sources.contractorPayableExpenseUnmaterialized]
       : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
@@ -1297,6 +1304,12 @@ export const getReliabilityOverview = async (
     preloadedSources.contractorPayableExceedsAgreedAmount !== undefined
       ? preloadedSources.contractorPayableExceedsAgreedAmount
       : await getContractorPayableExceedsAgreedAmountSignal().catch(() => null)
+
+  // TASK-977 — committed payables without a materialized expense (settlement precondition).
+  const contractorPayableExpenseUnmaterialized =
+    preloadedSources.contractorPayableExpenseUnmaterialized !== undefined
+      ? preloadedSources.contractorPayableExpenseUnmaterialized
+      : await getContractorPayableExpenseUnmaterializedSignal().catch(() => null)
 
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
@@ -1719,6 +1732,7 @@ export const getReliabilityOverview = async (
     accountBalancesFxDrift,
     ledgerUnresolvedDriftItems,
     contractorPayableReadyWithoutObligation,
+    contractorPayableExpenseUnmaterialized,
     contractorPayableBridgeDeadLetter,
     contractorPayableTaxReviewOverdue,
     contractorPayableFxUnresolvedOverdue,
