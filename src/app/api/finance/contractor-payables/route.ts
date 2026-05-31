@@ -7,6 +7,7 @@ import {
   listContractorPayables
 } from '@/lib/contractor-engagements/payables/store'
 import type { ContractorPayableStatus } from '@/lib/contractor-engagements/payables/types'
+import { listContractorPaymentsForWorkbench } from '@/lib/finance/contractor-payments/workbench-reader'
 import { can } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
@@ -40,6 +41,20 @@ export async function GET(request: Request) {
   const statusParam = searchParams.get('status')
 
   try {
+    // TASK-974 — workbench=1 enriches each item with contractorName +
+    // engagementPublicId (read-side). Default response stays the raw list
+    // (backward-compatible with existing consumers, e.g. ContractorGuardrailPanel).
+    if (searchParams.get('workbench') === '1') {
+      const items = await listContractorPaymentsForWorkbench({
+        contractorEngagementId: searchParams.get('engagementId') ?? undefined,
+        status: (statusParam as ContractorPayableStatus | null) ?? undefined,
+        limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined,
+        offset: searchParams.get('offset') ? Number(searchParams.get('offset')) : undefined
+      })
+
+      return NextResponse.json({ items })
+    }
+
     const items = await listContractorPayables({
       contractorEngagementId: searchParams.get('engagementId') ?? undefined,
       status: (statusParam as ContractorPayableStatus | null) ?? undefined,
