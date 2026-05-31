@@ -1,3 +1,20 @@
+# Sesion 2026-05-31 — TASK-977 Contractor Payable Bank Settlement — ✅ SHIPPED (flag OFF)
+
+**Rama**: `develop` (no branch). 4 slices + cierre commiteados. **No pusheado.**
+
+Cerró el gap de **backend** del flujo de pago contractor: el motor de liquidación compartido con nómina lanzaba `out_of_scope_v1` para contractor → ahora se liquida al banco por una **rama aditiva detrás de flag** (`CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED`, default OFF → parity nómina bit-for-bit).
+
+- **S1** (`ba1ff9c2`) anchor `expenses.contractor_payable_id` (migración).
+- **S2** (`26d7575e`) materializador reactivo del expense al `ready_for_finance` (bruto, labor_cost_external, resolver Rule 0).
+- **S3** (`22b8fa28`) settlement rama contractor (flag OFF) + payment_source CHECK widened.
+- **S4** (`135bd6a9`) signal `finance.contractor_payable.expense_unmaterialized` + test.
+
+**Diseño**: STOP checkpoint humano aprobado ("Avanza"). Decisiones: expense reactivo (no lazy), expense=bruto / retención=pasivo separado (honorarios queda `partial` hasta remesa SII — out of scope), flag OFF. **Gates**: `pnpm test` 5687/0 · `pnpm build` verde · payroll+payment-orders no-regresión 585 · tsc/eslint 0.
+
+**Pendiente del operador**: (1) push a `develop`; (2) para pagar contractor end-to-end: flip del flag (post staging + finance sign-off) + UI Finanzas (TASK-974). **Follow-ups**: remesa SII de la retención, TASK-978 (due_date+SLA), TASK-979 (corrida mensual).
+
+---
+
 # Sesion 2026-05-31 — EPIC-017 Remaining Mockup Approval Tasks — ✅ DOCS-ONLY
 
 **Rama**: `develop`. Scope documental/task planning only; no runtime, DB, migrations, APIs or mockup implementation.

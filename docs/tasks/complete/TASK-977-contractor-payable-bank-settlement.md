@@ -1,12 +1,27 @@
 # TASK-977 — Contractor Payable Bank Settlement (provider_payroll → banco)
 
+## Delta 2026-05-31 — SHIPPED (4 slices, flag OFF)
+
+Implementado en `develop` (no branch). El contractor payable **se puede liquidar al banco** por el motor canónico, detrás de flag (default OFF → parity nómina bit-for-bit). Open Questions resueltas pre-ejecución (ver abajo).
+
+- **Slice 1** (`ba1ff9c2`) — Migración `20260531184945430`: columna FK-anchor `expenses.contractor_payable_id` (+ index) — mirror de `payroll_entry_id`. El beneficiary puede ser member o identity_profile → el payable id es el ancla, no member_id.
+- **Slice 2** (`26d7575e`) — Materializador reactivo `materializeContractorPayableExpense` + proyección `contractor_payable_expense_materialize` (sibling del bridge, mismo evento `ready_for_finance`). Expense = bruto, `economic_category='labor_cost_external'` (resolver Rule 0 source-driven, first-match — crítico para member-contractor), `expense_type='contractor'`, `source_type='contractor_payable'`, anclado. Idempotente.
+- **Slice 3** (`22b8fa28`) — Flag `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED` (default OFF) + rama aditiva en `record-payment-from-order.ts` + `mark-paid-atomic.ts`: resuelve el expense por `contractor_payable_id` → `recordExpensePayment(net, paymentSource='contractor_system')` → settlement_leg → bank. Migración `20260531185842386` (payment_source CHECK widened). Path nómina 100% intacto.
+- **Slice 4** (`135bd6a9`) — Signal `finance.contractor_payable.expense_unmaterialized` (data_quality, warning>0, steady=0; smoke live ok) + test del materializador.
+
+**Open Questions resueltas:** (Q1) el expense lo crea la **proyección reactiva al ready_for_finance** (espejo de nómina al exported), NO el settlement — simetría + idempotencia + el expense existe antes del pago. (Q2) **NO supplier** (el contractor es persona; supplier_id nulo como nómina); ancla = columna nueva `contractor_payable_id`.
+
+**Accounting:** gasto=bruto, pago=neto, retención SII=pasivo a remesar **separado (F29, out of scope)** → honorarios queda `partial` hasta esa remesa. Aprobado por el operador en el STOP checkpoint.
+
+Gates: `pnpm test` full 5687/0 · `pnpm vitest run src/lib/payroll src/lib/finance/payment-orders` 585 (no-regresión) · tsc/eslint 0. **Pendiente para pagar end-to-end:** flip del flag (post staging + finance sign-off) + UI Finanzas (TASK-974). Invariantes: `CLAUDE.md` → "Contractor Payable Bank Settlement invariants (TASK-977)". Arch Delta + doc funcional `hr/contratistas-flujo-de-pago-completo.md`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Alto`

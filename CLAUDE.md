@@ -4585,6 +4585,35 @@ El **monto acordado** del contractor (`contractor_engagements.rate_amount` + `ra
 
 **Spec canónica**: `docs/tasks/complete/TASK-968-contractor-engagement-compensation-setup-agreed-amount-guardrail.md`. Migración: `20260531160513123`. Mockup aprobado: `src/views/greenhouse/contractors/mockup/`. Patrones fuente: TASK-790 (engagement rate fields), TASK-793 (waiver/override + readiness fail-closed), TASK-796 (self-service projection + composer), TASK-758 (presenter read-only), TASK-873/935 (capability grant coverage + SoD distinct capability).
 
+### Contractor Payable Bank Settlement invariants (TASK-977, desde 2026-05-31)
+
+El **settlement al banco de un contractor payable** (el net que efectivamente se le paga) corre por el **mismo motor de liquidación compartido con nómina** (`recordPaymentForOrder` + `markPaymentOrderPaidAtomic`), extendido con una **rama aditiva detrás de flag**. Cierra el gap verificado donde el motor lanzaba `out_of_scope_v1` para todo lo que no fuera `payroll`/`employee_net_pay` → el contractor no se podía pagar al banco. El path de nómina queda **100% intacto**.
+
+**El expense del contractor es la precondición del settlement** (igual que nómina). Se materializa **reactivamente** cuando el payable llega a `ready_for_finance` (espejo de `payroll-expense-reactive` al `exported`), NO en el settlement:
+
+- Helper: `materializeContractorPayableExpense` (`src/lib/finance/contractor-payable-expense-reactive.ts`) → `createFinanceExpenseInPostgres` con `expense_type='contractor'`, `source_type='contractor_payable'`, `economic_category='labor_cost_external'`, `total_amount=GROSS`, `supplier_id=NULL`, anclado por la columna nueva `expenses.contractor_payable_id` (FK, mirror de `payroll_entry_id`).
+- Proyección reactiva: `contractor_payable_expense_materialize` (sibling del bridge `contractor_payable_finance_obligation`, mismo evento `workforce.contractor_payable.ready_for_finance`). Idempotente (dedup por `contractor_payable_id`).
+- El settlement (rama contractor) resuelve el expense por `contractor_payable_id` → `recordExpensePayment(amount=net, paymentSource='contractor_system')` → settlement_leg → bank debit. Fallback defensivo: materialize on-demand si la proyección reactiva lagueó.
+
+**Accounting canónico (invariante TASK-795 "gasto = bruto, retención = pasivo"):** `expense.total_amount = bruto`; `expense_payment.amount = neto`; la retención SII (bruto−neto) es **pasivo a remesar al SII por separado (F29)** — **out of scope de TASK-977**. Consecuencia: para honorarios CL el expense queda `partial` hasta que exista el flujo de remesa SII; para withholding=0 queda `paid`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** modificar la rama `payroll`/`employee_net_pay` del motor de settlement al extenderlo. La rama contractor es **aditiva** (predicate `isContractorSettlementLine` + resolver `resolveContractorExpenseId*`); el path de nómina debe quedar bit-for-bit. Gate de cierre: `pnpm vitest run src/lib/payroll` + `src/lib/finance/payment-orders` verde.
+- **NUNCA** quitar el flag `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED` ni cambiar su default OFF. OFF = el contractor sigue lanzando `out_of_scope_v1` (parity pre-TASK-977). Flip a ON solo post staging shadow + finance sign-off del tratamiento contable.
+- **NUNCA** clasificar el expense del contractor como nómina. `economic_category='labor_cost_external'` (resolver Rule 0 `CONTRACTOR_PAYABLE_SOURCE`, source-driven, first-match — crítico: un contractor que también es member activo resolvería a `labor_cost_internal` por Rule 1 si la regla source no fuera primera).
+- **NUNCA** deducir la retención SII del `total_amount` del expense. El gasto es el bruto; la retención es pasivo. `withholding_amount` se persiste solo para audit.
+- **NUNCA** anclar el expense del contractor por `member_id` (el beneficiary puede ser `identity_profile`, no member). El ancla canónica es `contractor_payable_id`.
+- **NUNCA** usar `paymentSource='payroll_system'` para un pago de contractor. Es `'contractor_system'` (CHECK widened, distinguible/queryable).
+- **NUNCA** invocar `Sentry.captureException` directo en estos paths. Usar `captureWithDomain(err, 'finance', ...)`.
+- **SIEMPRE** que emerja un mecanismo nuevo de payout (provider split/EOR multi-leg — TASK-795 Fase B/955), modelarlo como rama aditiva del settlement con su propio resolver, NO mezclarlo con la rama contractor ni con nómina.
+
+**Reliability signal**: `finance.contractor_payable.expense_unmaterialized` (data_quality, moduleKey finance, warning>0, steady=0) — payables comprometidos (>30min) sin expense materializado = precondición del settlement rota (materializador dead-letter).
+
+**Out of scope (follow-ups)**: remesa SII de la retención (el expense honorarios queda `partial`); regla de `due_date` cierre+5d + SLA (TASK-978); corrida mensual (TASK-979). **Pendiente para pagar al banco end-to-end**: flip del flag + la UI de Finanzas (TASK-974).
+
+**Spec canónica**: `docs/tasks/complete/TASK-977-contractor-payable-bank-settlement.md`. Migraciones: `20260531184945430` (anchor) + `20260531185842386` (payment_source CHECK). Patrones fuente: TASK-765 (settlement engine + atomic), TASK-793 (bridge reactivo), TASK-768 (economic_category resolver), TASK-795 (gasto=bruto/retención=pasivo), TASK-411 (payroll expense materializer reactivo).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

@@ -4,6 +4,18 @@
 **Created:** 2026-05-05
 **Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + Employee→Contractor connected command (TASK-956) + **Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification (TASK-957)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955), contractor closure (TASK-797) and ops control plane (TASK-798) remain proposals.
 
+## Delta 2026-05-31 — TASK-977 Contractor Payable Bank Settlement shipped (flag OFF)
+
+Cierra el **Hecho verificado 1** del audit de abajo: el contractor payable ahora **se puede liquidar al banco** por el motor canónico de settlement, detrás de flag (default OFF → parity bit-for-bit). El path de nómina queda 100% intacto.
+
+- **Expense reactivo (precondición):** el expense del contractor se materializa cuando el payable llega a `ready_for_finance` (espejo de `payroll-expense-reactive` al `exported`) — proyección `contractor_payable_expense_materialize`, helper `materializeContractorPayableExpense`. `total_amount=bruto`, `economic_category='labor_cost_external'` (resolver Rule 0 source-driven), `expense_type='contractor'`, `source_type='contractor_payable'`, `supplier_id=NULL`, anclado por la columna nueva `expenses.contractor_payable_id` (FK, migración `20260531184945430`). Idempotente (dedup por anchor).
+- **Settlement (rama aditiva, flag `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED`):** `recordPaymentForOrder` + `markPaymentOrderPaidAtomic` ganan una rama para `source_kind='contractor_payable'`/`obligation_kind='provider_payroll'` que resuelve el expense por `contractor_payable_id` → `recordExpensePayment(net, paymentSource='contractor_system')` → settlement_leg → bank debit. OFF mantiene `out_of_scope_v1`. `payment_source` CHECK widened a `'contractor_system'` (migración `20260531185842386`).
+- **Accounting (invariante TASK-795):** gasto=bruto, pago=neto, retención SII=pasivo a remesar **separado (F29, out of scope)** → honorarios queda `partial` hasta la remesa SII; withholding=0 queda `paid`.
+- **Signal:** `finance.contractor_payable.expense_unmaterialized` (data_quality, warning>0, steady=0).
+- **No-regresión:** `pnpm vitest run src/lib/payroll src/lib/finance/payment-orders` 585 verde con flag OFF.
+
+**Pendiente para pagar end-to-end:** flip del flag (post staging + finance sign-off) + la UI de Finanzas (TASK-974). **Follow-ups:** remesa SII (TASK-#), due_date cierre+5d + SLA (TASK-978), corrida mensual (TASK-979). Invariantes duros en `CLAUDE.md` → "Contractor Payable Bank Settlement invariants (TASK-977)". Spec: `docs/tasks/complete/TASK-977-contractor-payable-bank-settlement.md`.
+
 ## Delta 2026-05-31 — Audit: End-to-end settlement gap + Monthly payment convergence target (verified, no inference)
 
 Revisión exhaustiva del backend de pago end-to-end (2026-05-31, leyendo el código). Documenta dos hechos verificados y un target de diseño explícito. **No es una implementación nueva — es la captura honesta de un gap y un objetivo.**
