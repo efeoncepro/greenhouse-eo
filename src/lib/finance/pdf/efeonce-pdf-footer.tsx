@@ -47,16 +47,16 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center'
   },
-  entity: { fontSize: 6.5, color: TEXT_MUTED, fontFamily: 'Helvetica-Bold' },
-  address: { fontSize: 6.5, color: TEXT_FAINT, fontFamily: 'Helvetica', textAlign: 'right' },
+  entity: { fontSize: 6.5, color: TEXT_MUTED, fontFamily: 'Geist Bold' },
+  address: { fontSize: 6.5, color: TEXT_FAINT, fontFamily: 'Geist', textAlign: 'right' },
   line2: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 1
   },
-  url: { fontSize: 6.5, color: TEXT_MUTED, fontFamily: 'Helvetica-Bold' },
-  meta: { fontSize: 6, color: TEXT_FAINT, fontFamily: 'Helvetica' }
+  url: { fontSize: 6.5, color: TEXT_MUTED, fontFamily: 'Geist Bold' },
+  meta: { fontSize: 6, color: TEXT_FAINT, fontFamily: 'Geist' }
 })
 
 export interface EfeoncePdfFooterOperatingEntity {

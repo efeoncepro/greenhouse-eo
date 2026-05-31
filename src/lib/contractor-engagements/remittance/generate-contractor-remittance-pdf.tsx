@@ -9,7 +9,7 @@ import 'server-only'
  * neutral regime chip, neutral disclaimer box, Efeonce logo as the only brand mark.
  * NO signature — a remittance advice does not require one (approved mockup decision).
  *
- * Mirrors the TASK-758 receipt PDF infrastructure (logo data-URI, Helvetica,
+ * Mirrors the TASK-758 receipt PDF infrastructure (logo data-URI, Geist (canonical body font, DESIGN.md),
  * StyleSheet, renderToStream → Buffer) but with the OPPOSITE legal framing: no
  * "líquido a pagar" laboral; a non-employment disclaimer; references the provider's
  * own tax document.
@@ -23,6 +23,7 @@ import { Fragment } from 'react'
 import { Document, Image, Page, StyleSheet, Text, View, renderToStream } from '@react-pdf/renderer'
 
 import { formatCurrency, type CurrencyCode } from '@/lib/format'
+import { ensurePdfFontsRegistered } from '@/lib/finance/pdf/register-fonts'
 
 import type { RemittancePresentation } from './types'
 
@@ -54,8 +55,11 @@ const getLogoDataUri = (): string | null => {
  * v1 (2026-05-31, TASK-960): one-accent sober legal layout consuming the canonical
  * RemittancePresentation struct (issuer → beneficiary + provider doc → breakdown →
  * payment → non-employment disclaimer). Bilingual via the resolved struct.
+ * v2 (2026-05-31): body font migrated Helvetica → Geist (canonical body, DESIGN.md)
+ * via ensurePdfFontsRegistered() — aligns the contractor remittance with the canonical
+ * font so it matches the contractor payment report (TASK-980). Slogan stays Poppins.
  */
-export const REMITTANCE_TEMPLATE_VERSION = '1'
+export const REMITTANCE_TEMPLATE_VERSION = '2'
 
 const TEXT_PRIMARY = '#1a1a1a'
 const TEXT_MUTED = '#5c5c5c'
@@ -70,7 +74,7 @@ const money = (amount: number, currency: string, locale: RemittancePresentation[
 
 const s = StyleSheet.create({
   page: {
-    fontFamily: 'Helvetica',
+    fontFamily: 'Geist',
     fontSize: 9,
     paddingTop: 48,
     paddingBottom: 64,
@@ -86,11 +90,11 @@ const s = StyleSheet.create({
   },
   issuerBlock: { flexDirection: 'column', maxWidth: 280 },
   logo: { width: 110, height: 26, objectFit: 'contain', marginBottom: 10 },
-  issuerName: { fontFamily: 'Helvetica-Bold', fontSize: 10, marginBottom: 2 },
+  issuerName: { fontFamily: 'Geist Bold', fontSize: 10, marginBottom: 2 },
   issuerLine: { fontSize: 8, color: TEXT_MUTED, marginBottom: 1 },
 
   headerRight: { flexDirection: 'column', alignItems: 'flex-end', maxWidth: 240 },
-  title: { fontFamily: 'Helvetica-Bold', fontSize: 16, color: TEXT_PRIMARY, marginBottom: 6 },
+  title: { fontFamily: 'Geist Bold', fontSize: 16, color: TEXT_PRIMARY, marginBottom: 6 },
   chip: {
     backgroundColor: CHIP_BG,
     color: TEXT_MUTED,
@@ -114,7 +118,7 @@ const s = StyleSheet.create({
     letterSpacing: 0.5,
     marginBottom: 5
   },
-  partyName: { fontFamily: 'Helvetica-Bold', fontSize: 9.5, marginBottom: 2 },
+  partyName: { fontFamily: 'Geist Bold', fontSize: 9.5, marginBottom: 2 },
   partyLine: { fontSize: 8, color: TEXT_MUTED, marginBottom: 1 },
 
   breakdownRow: {
@@ -128,8 +132,8 @@ const s = StyleSheet.create({
   breakdownAmountMuted: { fontSize: 9, color: TEXT_MUTED },
   netDivider: { borderBottomWidth: 1, borderBottomColor: BORDER_LIGHT, marginVertical: 6 },
   netRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 2 },
-  netLabel: { fontFamily: 'Helvetica-Bold', fontSize: 11 },
-  netAmount: { fontFamily: 'Helvetica-Bold', fontSize: 14, color: NET_ACCENT },
+  netLabel: { fontFamily: 'Geist Bold', fontSize: 11 },
+  netAmount: { fontFamily: 'Geist Bold', fontSize: 14, color: NET_ACCENT },
   fxCaption: { fontSize: 7.5, color: TEXT_MUTED, marginTop: 5 },
 
   paymentRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 2 },
@@ -258,6 +262,7 @@ const RemittanceDocument = ({ presentation }: { presentation: RemittancePresenta
 export const generateContractorRemittancePdf = async (
   presentation: RemittancePresentation
 ): Promise<Buffer> => {
+  await ensurePdfFontsRegistered()
   const stream = await renderToStream(<RemittanceDocument presentation={presentation} />)
 
   const chunks: Uint8Array[] = []

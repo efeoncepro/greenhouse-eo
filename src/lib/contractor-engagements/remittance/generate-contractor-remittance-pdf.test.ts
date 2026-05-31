@@ -28,7 +28,7 @@ const isPdf = (buf: Buffer) => buf.length > 1000 && buf.subarray(0, 5).toString(
 
 describe('generateContractorRemittancePdf', () => {
   it('exposes a template version constant', () => {
-    expect(REMITTANCE_TEMPLATE_VERSION).toBe('1')
+    expect(REMITTANCE_TEMPLATE_VERSION).toBe('2')
   })
 
   it('renders honorarios CL (es-CL) to a valid PDF buffer', async () => {
