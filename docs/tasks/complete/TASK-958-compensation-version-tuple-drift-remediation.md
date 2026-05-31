@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -213,3 +213,13 @@ Reglas obligatorias:
 - **Valor del gap operacional resuelto**: el operador proveyó el Deel contract ID de **Melkin Hernández = `m4ye2qg`**. Al ejecutar Slice 1, backfillear `members.deel_contract_id = 'm4ye2qg'` para `member_id='melkin-hernandez'` (hoy NULL).
 - **Verificado payroll-neutral** (`grep` en `src/lib/payroll/`): `deel_contract_id` es **puramente informativo** — fluye al payroll entry como label de display (`calculate-payroll.ts:395`, receibo/PDF/Excel: `Contrato Deel: <id>`) y NO entra en ningún cálculo ni gate de readiness. Setearlo de NULL → `m4ye2qg` solo agrega la referencia visible en su recibo; ningún monto cambia. Igualmente correr el gate `pnpm vitest run src/lib/payroll` antes/después.
 - **Pendiente de acceso a PG**: al momento de capturar el valor, la sesión local GCP ADC estaba expirada (`invalid_rapt` / reauth). Aplicar requiere `gcloud auth login` + `gcloud auth application-default login` previo. El valor queda registrado aquí; se aplica al ejecutar Slice 1 (junto con el backfill) o ad-hoc con PG re-autenticado.
+
+## Delta 2026-05-31 — Cerrada (3 slices) + cohorte histórica + prueba sueldos pagados intactos
+
+- **Slice 1** (`feat 84333790`): primitivo `scripts/payroll/reconcile-compensation-version-tuple.ts` con aserción payroll-neutral (buildPayrollEntry before/after; aplica solo si campos monetarios idénticos, aborta si no). Melkin comp v2 `(indefinido)→(contractor)` reconciliada. **Descubrimiento en ejecución**: el VALIDATE verifica TODAS las filas, no solo vigentes → cohorte real = **5 históricas across 3 Deel contractors** (Andres v1+v2, Daniela v1+v2, Melkin v1), no 1. Se agregó flag `--include-historical`.
+- **Garantía "no rompe sueldos pagados"** (decisión del operador): se capturaron los **11 payroll_entries pagados** de los 3 antes y después de reconciliar las 5 históricas → **byte-idénticos**. Los `payroll_entries` guardan montos snapshot propios (tabla separada); el reconcile UPDATEa solo `compensation_versions`. Sueldos ejecutados/pagados **intactos**.
+- **Slice 2** (`feat 0b32c8ef`, migración `20260531105200124`): VALIDATE del CHECK `compensation_versions_contract_pay_regime_check` (NOT VALID → VALID) tras 0-violadores. Verificado: `convalidated=true` + rechaza `(indefinido, international)` going-forward. Drift class cerrado.
+- **Slice 3** (`feat c75614de`): señal `payroll.deel_member_without_contract_id` (data_quality, moduleKey payroll, steady=0). Live ok/0 (Melkin `deel_contract_id='m4ye2qg'` backfilleado).
+- **Gates**: payroll 534 verde antes/después de cada reconcile · build ✓ · tsc/lint ✓. 1 fallo ajeno pre-existente `scim-workforce-signals.live.test.ts` (6 vs 10 señales SCIM, confirmado vía git stash, skipea en CI sin PG) — NO regresión de TASK-958.
+- **Open Questions**: ambas resueltas (Q1 script one-shot; Q2 señal ahora, CHECK deel-NULL a follow-up — gap ya 0 tras backfill).
+- **Nota git**: Handoff.md no se commitea en este cierre — contiene trabajo documental uncommitted de Codex (Unified Workforce Foundation) que no debe barrerse; la completitud queda en changelog + registry + README + esta Delta.
