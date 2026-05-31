@@ -169,6 +169,7 @@ Hard rule:
 | --- | --- | --- | --- |
 | `TASK-959` | `0/1` | `complete` | Workforce Foundation Read-Only Object Map Audit: contrato/mapa read-only implementado con gap codes, parity 100% contra current classification en dev real activo, audit script y candidate reliability signals documentados. |
 | `TASK-961` | `3` | `to-do` | Person 360 Workforce Facet Read-Only Promotion: promover People/Person 360 como hub workforce read-only consumiendo `WorkforceFoundationMap`, manteniendo Payroll como rail especializada y sin writes. |
+| `TASK-962` | `1/2` | `to-do` | Workforce Coverage & Readiness Remediation Plan: clasificar read-only gaps de compensation/readiness/payment rail antes de data fixes, signals o write paths. |
 
 Las tasks se agregaran de forma iterativa cuando cumplan este protocolo:
 
@@ -188,6 +189,7 @@ Esta cola es deliberadamente conceptual. No reserva IDs.
 | --- | --- | --- | --- |
 | Workforce object map audit | 0/1 | Mapear `members`, `identity_profiles`, relationships, engagements, compensation, payroll y payables contra conceptos canonicos. | ADR review checkpoint. |
 | Current work classification canonical projection | 1/2 | Promover estado vigente persona-relacion-rail como read model compartido. | Parity contra TASK-957 resolver y Person 360. |
+| Workforce coverage/readiness remediation plan | 1/2 | Explicar gaps reales de compensation/readiness/payment rail antes de remediation o write paths. | Creada como `TASK-962`; read-only, sin data fixes. |
 | Compensation profile timeline | 2/3 | Leer compensacion como historia versionada, no solo version actual. | Definir si scope es relationship, assignment o composite. |
 | Person 360 workforce journey facet | 3 | Mostrar relacion, assignment, compensation, readiness y rails en un lugar. | Creada como `TASK-961`; ejecutar solo como read-only/aditiva y con redaction/access explicitos. |
 | Workforce rail drift signals | 1/2 | Detectar doble rail, rail sin evidencia, relationship sin payment readiness y compensation drift. | Definir steady state esperado por signal. |
@@ -201,6 +203,8 @@ Detailed triage lives in [RESEARCH-008 Payroll Backlog Triage](../../research/RE
 Operational rule:
 
 - `TASK-959` remains the first child task.
+- `TASK-961` is now the People/Person 360 hub promotion lane and precedes deeper compensation/write-path convergence.
+- `TASK-962` is the read-only coverage/readiness plan required before opening data remediation tasks.
 - Existing tasks such as `TASK-338`, `TASK-340`, `TASK-614`, `TASK-652`, `TASK-788` and `TASK-798` are useful, but must be reframed before execution if they become EPIC-017 work.
 - Payroll compliance, receipts, close gates, Previred and smoke lanes remain valid separate Payroll work unless a later EPIC-017 task explicitly consumes their outputs.
 - Reframed tasks must declare the EPIC phase, source-of-truth boundary, read/write scope, and payroll/finiquito/contractor/finance hard rules before moving to `in-progress`.
@@ -260,3 +264,5 @@ Delta posterior 6: `TASK-959` ejecutada y cerrada. Se agrego `src/lib/workforce/
 Delta posterior 7: se reviso una captura de Deel worker profile como evidencia de materializacion del articulo. Correccion importante: la captura pertenece al dominio People / Worker Profile, no a Payroll. Payroll aparece como una rail secundaria dentro del perfil de persona. Lectura agregada en `RESEARCH-008-current-state-gap-analysis-2026-05-31.md`: Deel presenta la persona/worker como primer viewport con facets de worker information, role details, compensation summary, relationship, org chart, documents, compliance, time off, apps y quick actions. Implicacion para Greenhouse: Person 360/People debe ser el hub de workforce; Payroll sigue siendo vista especializada separada para calculo, periodos, recibos y salidas estatutarias.
 
 Delta posterior 8: se creo `TASK-961` como siguiente paso operativo. La task promueve el hub existente People/Person 360 con una faceta/seccion `workforce` read-only consumiendo `WorkforceFoundationMap` (TASK-959). Mantiene el limite canonico: People/Person 360 es el hub de estado laboral vigente; Payroll, Finance y Contractor Payables siguen siendo rails especializadas y no reciben writes desde esta task.
+
+Delta posterior 9: se actualizo el backlog triage para reflejar la nueva secuencia post-captura Deel: `TASK-961` antes de reescribir compensation/assignment; `TASK-962` como plan read-only de coverage/readiness antes de data fixes; `TASK-614` marcado como absorb/supersede post-961; `TASK-338`, `TASK-340`, `TASK-652`, `TASK-788` y `TASK-798` quedan para rewrite/split antes de ejecucion; `TASK-797`, `TASK-787`, `TASK-960` y `TASK-955` quedan separados o livianamente alineados.

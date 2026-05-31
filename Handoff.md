@@ -28423,6 +28423,37 @@ Validacion documental actual:
 
 Pendiente antes de commit/push:
 - Staging selectivo: no incluir cambios/untracked de `TASK-960`/remittance salvo instruccion explicita del operador.
+
+---
+
+## 2026-05-31 — EPIC-017 backlog alignment + TASK-962 creada
+
+Contexto: tras confirmar que People/Person 360 es el hub y Payroll una rail especializada, se actualizo el triage de backlog para no ejecutar tasks antiguas en orden numerico ni con framing Payroll-as-root.
+
+Trabajo realizado:
+- `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md` actualizado con la secuencia post-`TASK-961`.
+- Disposition matrix agregada:
+  - `TASK-338`: rewrite como `CompensationProfile` read model.
+  - `TASK-340`: freeze/rewrite later, bloqueada por compensation parity y checkpoint arquitectonico.
+  - `TASK-614`: absorb/supersede post-`TASK-961`; no ejecutar as-is.
+  - `TASK-652`: rewrite later para API/agent-safe read surface.
+  - `TASK-788`: split entre WorkAssignment effective-dating read model y promotion/write command posterior.
+  - `TASK-798`: rewrite para consumir gap taxonomy EPIC-017.
+  - `TASK-797`, `TASK-960`: keep separate.
+  - `TASK-787`, `TASK-955`: align lightly/defer.
+- `TASK-962` creada en `docs/tasks/to-do/TASK-962-workforce-coverage-readiness-remediation-plan.md`.
+- `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `RESEARCH-008-current-state-gap-analysis` y `EPIC-017` sincronizados.
+
+Alcance de `TASK-962`:
+- Re-auditar gaps de `TASK-959` read-only.
+- Clasificar los 4 activos sin current compensation, 8 readiness blocked/unresolved y 1 payment rail evidence gap.
+- Producir matriz de remediacion y owner domain.
+- No mutar datos, no abrir batch de tasks, no tocar UI/API/payroll/finance.
+
+Validacion:
+- `pnpm task:lint --task TASK-962` OK.
+- `pnpm docs:context-check` OK con 2 warnings historicos de tamano de `Handoff.md`.
+- `git diff --check` OK.
 # Sesion 2026-05-30 — TASK-953 Greenhouse Visual Capture Evidence Hardening — ✅ COMPLETE
 
 Rama: `develop` por instrucción explícita del operador; no se creó branch. Task cerrada en `docs/tasks/complete/TASK-953-greenhouse-visual-capture-evidence-hardening.md`; registry/README sincronizados y plan en `docs/tasks/plans/TASK-953-plan.md`.

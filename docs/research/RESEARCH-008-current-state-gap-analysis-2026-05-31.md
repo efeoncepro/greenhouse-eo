@@ -592,7 +592,7 @@ After `TASK-959` and the Deel People/Worker Profile correction, the next task is
 
 `TASK-961` was created as the next executable step: promote the existing People/Person 360 hub with a read-only `workforce` facet/section that consumes `WorkforceFoundationMap`. The explicit product boundary is that People/Person 360 becomes the first viewport for workforce state, while Payroll remains a specialized rail for calculations, periods, receipts and statutory outputs.
 
-Follow-up after `TASK-961`: relationship/compensation/readiness coverage remediation plan, read-only first. It should explain why four real active members lack current compensation, why readiness is blocked/unresolved for eight of nine real active members, and which gaps are intentional onboarding state versus data debt.
+`TASK-962` was created as the next coverage/readiness control: relationship/compensation/readiness remediation plan, read-only first. It should explain why four real active members lack current compensation, why readiness is blocked/unresolved for eight of nine real active members, and which gaps are intentional onboarding state versus data debt before any data fix or write path.
 
 ## Non-Negotiables
 
