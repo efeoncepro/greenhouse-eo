@@ -98,6 +98,60 @@ Reglas obligatorias:
 
 **Montos verbatim**: leer del payable (TASK-960 presenter pattern); cero recompute. Multi-moneda: CLP y USD segmentados.
 
+## Plan de diseño — "Nómina de Contractors" (product design skills, 2026-05-31)
+
+Diseñado con `modern-ui` + `greenhouse-ux` + `greenhouse-finance-accounting-operator` + `greenhouse-payroll-auditor`. Espejo del reporte de payroll (TASK-782) + rigor contable. **Piensa en todo lo que debe tener:**
+
+### A. Masthead / header (brand-zone)
+
+- **Logo Efeonce** + **eslogan "Empower your Growth"** (componente canónico `EfeonceSloganPdf`, Poppins — ya construido). El eslogan vive acá, NO en el footer.
+- **Título**: "Nómina de Contractors" + período (mes operativo, anclado al cierre — consistente con TASK-978; el payable no tiene `service_period`).
+- **Emisor**: operating entity (`getOperatingEntityIdentity()`: legalName + RUT).
+- **Meta**: generado (timestamp) + correlativo de la corrida (si viene de TASK-979) + tasa SII vigente (snapshot).
+
+### B. Summary strip (KPIs, máx una fila)
+
+- N contractors / N payables del período.
+- **Por moneda (CLP / USD segmentado)**: total bruto · total retención SII · **total neto** (acento verde, consistente con el comprobante TASK-960).
+- Counters por régimen (Honorarios CL / Internacional) + por estado (pagados / pendientes / bloqueados).
+
+### C. Body — tabla por régimen (subtotales mutuamente excluyentes)
+
+- **Grupo Honorarios CL**: Contractor · Engagement (EO-CENG) · Modelo · Bruto · **Retención SII (tasa)** · **Neto** · Estado · Fecha de pago · **Comprobante (EO-RA-NNNNNN)** si pagado.
+- **Grupo Internacional** (Deel/EOR/sin retención CL): Contractor · Engagement · payrollVia · Bruto = Neto · Moneda · Estado.
+- **Subtotales separados** (regla dura): "Total retención SII honorarios" (reconcilia **F29**) ≠ "Total neto pagado" (reconcilia **banco**). NUNCA un total que los mezcle.
+- **Régimen column** (CL-HON / INT). Celdas N/A con `—` (no `$0`). Estado por **color + icono + texto** (no color solo).
+- **Multi-moneda segmentada** (CLP vs USD en secciones/subtotales separados; nunca sumar monedas).
+- **Incluidos vs excluidos**: payables `paid`/`ready_for_finance` incluidos; bloqueados/no-listos en sección/flag visible (como el reporte de payroll muestra excluidos por falta de algo).
+- Estado **`partial`** (honorarios con retención SII pendiente de remesa, TASK-977) mostrado con claridad — el neto se pagó, la remesa al SII es aparte.
+
+### D. Nota contable (disclaimer)
+
+"El **neto** es lo pagado al contractor. La **retención SII** es un pasivo a remesar al SII (F29, día 12/20 mes siguiente), no se le paga al contractor." — evita que se confunda el reporte con un comprobante de remesa.
+
+### E. Footer
+
+**`EfeoncePdfFooter`** institucional (ya construido): entidad · RUT + dirección (Dr. Manuel Barros Borgoño 71 Of 1105, Providencia, RM — Chile) + `efeoncepro.com` + generado · **página X de Y** (`fixed`). Reusa el footer canónico, no rollear uno propio.
+
+### F. Tipografía / tokens
+
+- Header: logo + eslogan Poppins. Títulos en Poppins; **cuerpo + montos en Geist** (tabular nums). Acento verde solo en el neto. Tokens canónicos `customBorderRadius`/`GH_COLORS`, sin hex crudo.
+
+### G. Excel (espejo TASK-782)
+
+- Sheets: **Resumen** (subtotales separados por régimen + moneda) · **Honorarios CL** · **Internacional** · **Detalle** (audit raw). Régimen column. Formato de celdas (moneda CLP sin decimales, USD con; fechas). Agregaciones reconciliables (retención SII / neto separados).
+
+### H. Estados / edge cases
+
+- Período sin contractors → empty state honesto.
+- Multi-moneda → segmentado (no un total mezclado).
+- Reuse: `EfeoncePdfFooter` + `EfeonceSloganPdf` + register-fonts (Geist+Poppins) + presenter TASK-960/758 + patrón TASK-782.
+
+### I. Acceso + verificación
+
+- Endpoint de descarga gated por capability finance + botón en `/finance/contractor-payments`.
+- **Documento operador-facing con montos por entidad/parte → aplica TASK-863 Semantic Column Invariants** (cada columna = una entidad; no mezclar bruto/retención/neto de contractors distintos en la misma celda). Si va a clientes/auditoría externa, **loop de verificación real** (emitir 1 caso real + audit 3-skill, TASK-863).
+
 ## Acceptance Criteria
 
 - [ ] Reporte de período de contractors descargable en PDF + Excel desde `/finance/contractor-payments`.
