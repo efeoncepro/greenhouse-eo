@@ -94,3 +94,25 @@ export const getRemittanceAdviceNumber = async (
 
   return rows[0] ? mapRow(rows[0]) : null
 }
+
+/**
+ * Batched read of already-allocated numbers for a set of payables (read-only,
+ * never allocates). Returns a Map keyed by payable id; payables not yet emitted
+ * are simply absent. Used by the list surfaces to show the number when present.
+ */
+export const getRemittanceAdviceNumbersForPayables = async (
+  contractorPayableIds: string[],
+  client?: PoolClient
+): Promise<Map<string, string>> => {
+  if (contractorPayableIds.length === 0) return new Map()
+
+  const rows = await runRows<{ contractor_payable_id: string; remittance_number: string }>(
+    `SELECT contractor_payable_id, remittance_number
+     FROM greenhouse_hr.remittance_advice_numbers
+     WHERE contractor_payable_id = ANY($1)`,
+    [contractorPayableIds],
+    client
+  )
+
+  return new Map(rows.map(r => [r.contractor_payable_id, r.remittance_number]))
+}

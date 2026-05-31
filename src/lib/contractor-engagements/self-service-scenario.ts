@@ -21,6 +21,7 @@ import type { ContractorWorkSubmission } from './work-submissions/types'
 
 import type {
   ContractorBlockerResponsable,
+  ContractorRemittanceItem,
   ContractorScenarioBlocker,
   ContractorScenarioKind,
   ContractorScenarioKpi,
@@ -45,6 +46,8 @@ export interface MapSelfServiceScenarioInput {
   /** Masked payment-profile status line (resolved server-side; never raw account data). */
   paymentProfileLabel: string
   paymentProfileDetail: string
+  /** Paid payables' remittance advices, resolved server-side (TASK-960). */
+  paidRemittances: ContractorRemittanceItem[]
 }
 
 // ── Blocker responsable mapping ───────────────────────────────────────────────
@@ -647,6 +650,7 @@ export const mapEngagementToSelfServiceScenario = (
     supportItems,
     submissions: buildSubmissions(submissions, engagement),
     timeline: buildTimeline(kind, engagement, latestSubmission, latestPayable),
-    blockers: buildBlockers(kind, latestPayableReadiness, supportItems, latestSubmission)
+    blockers: buildBlockers(kind, latestPayableReadiness, supportItems, latestSubmission),
+    paidRemittances: input.paidRemittances
   }
 }

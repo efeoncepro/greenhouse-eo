@@ -18,6 +18,7 @@ import { alpha, useTheme } from '@mui/material/styles'
 import CustomChip from '@core/components/mui/Chip'
 
 import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
+import RemittanceAdviceSection from '@/components/greenhouse/contractors/RemittanceAdviceSection'
 import { MetricSummaryCard, OperationalPanel, OperationalSignalList } from '@/components/greenhouse/primitives'
 import { formatCurrency } from '@/lib/format'
 import type { CurrencyCode } from '@/lib/format'
@@ -537,6 +538,12 @@ const ContractorSelfServiceView = ({ initialProjection }: ContractorSelfServiceV
           </Alert>
         )}
       </OperationalPanel>
+
+      <RemittanceAdviceSection
+        items={scenario.paidRemittances}
+        audience='self'
+        endpointBase='/api/my/contractor/remittance'
+      />
 
       <ContractorSubmissionComposer
         open={composerOpen}

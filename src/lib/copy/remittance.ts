@@ -123,3 +123,63 @@ const REMITTANCE_COPY: Record<RemittanceLocale, RemittanceCopy> = {
 }
 
 export const getRemittanceCopy = (locale: RemittanceLocale): RemittanceCopy => REMITTANCE_COPY[locale]
+
+// ── Surface copy (list sections on the self-service hub + admin workbench) ────
+
+export interface RemittanceSurfaceCopy {
+  listTitle: string
+  hubHint: string
+  adminTitle: string
+  view: string
+  download: string
+  emptyTitle: string
+  emptyDescription: string
+  pendingNumber: string
+  payeeCol: string
+  numberCol: string
+  netCol: string
+  dateCol: string
+  actionsCol: string
+  drawerTitle: string
+  loadError: string
+}
+
+const REMITTANCE_SURFACE_COPY: Record<RemittanceLocale, RemittanceSurfaceCopy> = {
+  'es-CL': {
+    listTitle: 'Comprobantes de pago',
+    hubHint: 'Disponible para cada pago liquidado de tus servicios.',
+    adminTitle: 'Comprobantes emitidos',
+    view: 'Ver',
+    download: 'Descargar PDF',
+    emptyTitle: 'Aún no hay comprobantes',
+    emptyDescription: 'Cuando un pago quede liquidado verás aquí su comprobante para ver y descargar.',
+    pendingNumber: 'Al emitir',
+    payeeCol: 'Beneficiario',
+    numberCol: 'N°',
+    netCol: 'Neto',
+    dateCol: 'Fecha',
+    actionsCol: 'Acciones',
+    drawerTitle: 'Comprobante de pago',
+    loadError: 'No pudimos cargar el comprobante. Intenta de nuevo.'
+  },
+  'en-US': {
+    listTitle: 'Payment remittances',
+    hubHint: 'Available for each settled payment of your services.',
+    adminTitle: 'Issued remittances',
+    view: 'View',
+    download: 'Download PDF',
+    emptyTitle: 'No remittances yet',
+    emptyDescription: 'Once a payment is settled, its remittance advice will appear here to view and download.',
+    pendingNumber: 'On issue',
+    payeeCol: 'Payee',
+    numberCol: 'No.',
+    netCol: 'Net',
+    dateCol: 'Date',
+    actionsCol: 'Actions',
+    drawerTitle: 'Remittance advice',
+    loadError: 'We could not load the remittance. Try again.'
+  }
+}
+
+export const getRemittanceSurfaceCopy = (locale: RemittanceLocale): RemittanceSurfaceCopy =>
+  REMITTANCE_SURFACE_COPY[locale]

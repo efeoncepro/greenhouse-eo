@@ -130,7 +130,8 @@ const labels = {
   legalEntityLabel: 'Efeonce Group SpA',
   contractorName: 'Valentina Hoyos',
   paymentProfileLabel: 'Cuenta activa',
-  paymentProfileDetail: 'Banco de Chile.'
+  paymentProfileDetail: 'Banco de Chile.',
+  paidRemittances: []
 }
 
 describe('deriveScenarioKind', () => {

@@ -20,6 +20,7 @@ import { alpha } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 
+import RemittanceAdviceSection from '@/components/greenhouse/contractors/RemittanceAdviceSection'
 import { MetricSummaryCard, OperationalPanel, OperationalSignalList } from '@/components/greenhouse/primitives'
 import type {
   ContractorHrWorkbenchProjection,
@@ -518,6 +519,12 @@ const ContractorAdminWorkbenchView = ({ initialProjection }: ContractorAdminWork
           </Alert>
         )}
       </OperationalPanel>
+
+      <RemittanceAdviceSection
+        items={projection.remittances}
+        audience='admin'
+        endpointBase='/api/hr/contractors/remittance'
+      />
 
       <AdminReviewDecisionDrawer
         open={drawerOpen}

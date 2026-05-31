@@ -19,6 +19,7 @@ import { isSourceDegraded, withSourceTimeout, type SourceResult } from '@/lib/pl
 
 import { listContractorPayables } from './payables/store'
 import type { ContractorPayable } from './payables/types'
+import { getRemittanceAdviceNumbersForPayables } from './remittance/remittance-number-allocator'
 import { getContractorEngagementById, listContractorEngagements } from './store'
 import type { ContractorEngagement } from './types'
 import { listContractorWorkSubmissions } from './work-submissions/store'
@@ -28,6 +29,7 @@ import {
   CONTRACTOR_HR_WORKBENCH_CONTRACT_VERSION,
   type ContractorHrWorkbenchProjection,
   type ContractorProjectionDegradedReason,
+  type ContractorRemittanceItem,
   type ContractorTone,
   type ContractorWorkbenchQueueRow,
   type ContractorWorkbenchSignal
@@ -242,6 +244,62 @@ export const resolveContractorHrWorkbenchProjection =
         return rank(b.statusLabel) - rank(a.statusLabel)
       })
 
+    // ── Remittance advices for paid payables (TASK-960) ────────────────────────
+    const paidEngagementIds = [...new Set(paid.map(p => p.contractorEngagementId))]
+    const paidEngagementById = new Map<string, ContractorEngagement>()
+
+    for (const id of paidEngagementIds) {
+      const existing = engagementById.get(id)
+
+      if (existing) paidEngagementById.set(id, existing)
+    }
+
+    const missingPaidIds = paidEngagementIds.filter(id => !paidEngagementById.has(id))
+
+    const fetchedPaidEngagements = await Promise.all(
+      missingPaidIds.map(id =>
+        getContractorEngagementById(id).catch(error => {
+          captureWithDomain(error, 'identity', {
+            tags: { source: 'contractor_hr_workbench_projection', stage: 'fetch_paid_engagement' },
+            extra: { contractorEngagementId: id }
+          })
+
+          return null
+        })
+      )
+    )
+
+    for (const e of fetchedPaidEngagements) {
+      if (e) paidEngagementById.set(e.contractorEngagementId, e)
+    }
+
+    const paidNames = await resolveProfileDisplayNames(
+      [...paidEngagementById.values()].map(e => e.profileId)
+    ).catch(() => new Map<string, string>())
+
+    const remittanceNumbers = await getRemittanceAdviceNumbersForPayables(
+      paid.map(p => p.contractorPayableId)
+    ).catch(() => new Map<string, string>())
+
+    const remittances: ContractorRemittanceItem[] = paid
+      .map((p): ContractorRemittanceItem | null => {
+        const eng = paidEngagementById.get(p.contractorEngagementId)
+
+        if (!eng) return null
+
+        return {
+          payableId: p.contractorPayableId,
+          number: remittanceNumbers.get(p.contractorPayableId) ?? null,
+          net: p.netPayable,
+          currency: p.currency,
+          dateIso: (p.updatedAt ?? p.createdAt).slice(0, 10),
+          regimeLabel: SUBTYPE_LABEL[eng.relationshipSubtype],
+          contractorName: paidNames.get(eng.profileId) ?? names.get(eng.profileId) ?? 'Contractor'
+        }
+      })
+      .filter((r): r is ContractorRemittanceItem => r !== null)
+      .sort((a, b) => b.dateIso.localeCompare(a.dateIso))
+
     // ── Signals derived honestly from fetched data ─────────────────────────────
     const classificationOpen = [...engagementById.values()].filter(e =>
       isBlockingRisk(e.classificationRiskStatus)
@@ -296,6 +354,7 @@ export const resolveContractorHrWorkbenchProjection =
         readyForFinance: ready.length,
         paid: paid.length
       },
+      remittances,
       signals,
       degraded,
       generatedAt: new Date().toISOString(),

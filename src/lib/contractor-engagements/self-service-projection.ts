@@ -27,16 +27,49 @@ import { listContractorInvoiceAssetsByEngagement } from './invoice-assets'
 import { assessPayableReadiness, listContractorPayablesByEngagement } from './payables/store'
 import type { PayableReadinessResult } from './payables/readiness'
 import type { ContractorPayable } from './payables/types'
+import { getRemittanceAdviceNumbersForPayables } from './remittance/remittance-number-allocator'
 import { listContractorEngagementsByProfile } from './store'
 import { mapEngagementToSelfServiceScenario } from './self-service-scenario'
-import type { ContractorEngagement, ContractorEngagementStatus } from './types'
+import type { ContractorEngagement, ContractorEngagementStatus, ContractorEngagementSubtype } from './types'
 import { listContractorWorkSubmissionsByEngagement } from './work-submissions/store'
 
 import {
   CONTRACTOR_SELF_SERVICE_CONTRACT_VERSION,
   type ContractorProjectionDegradedReason,
+  type ContractorRemittanceItem,
   type ContractorSelfServiceProjection
 } from './projection-types'
+
+const SUBTYPE_LABEL: Record<ContractorEngagementSubtype, string> = {
+  honorarios_cl: 'Honorarios Chile',
+  freelance: 'Freelance',
+  independent_professional: 'Profesional independiente',
+  international_contractor: 'Contractor internacional',
+  provider_platform: 'Plataforma proveedor'
+}
+
+/** Build the remittance-advice availability list for a profile's paid payables (read-only numbers). */
+const buildPaidRemittances = async (
+  payables: ContractorPayable[],
+  engagement: ContractorEngagement
+): Promise<ContractorRemittanceItem[]> => {
+  const paid = payables.filter(p => p.status === 'paid')
+
+  if (paid.length === 0) return []
+
+  const numbers = await getRemittanceAdviceNumbersForPayables(paid.map(p => p.contractorPayableId)).catch(
+    () => new Map<string, string>()
+  )
+
+  return paid.map(p => ({
+    payableId: p.contractorPayableId,
+    number: numbers.get(p.contractorPayableId) ?? null,
+    net: p.netPayable,
+    currency: p.currency,
+    dateIso: (p.updatedAt ?? p.createdAt).slice(0, 10),
+    regimeLabel: SUBTYPE_LABEL[engagement.relationshipSubtype]
+  }))
+}
 
 const SOURCE_TIMEOUT_MS = 4_000
 const CACHE_TTL_MS = 30_000
@@ -282,6 +315,8 @@ export const resolveContractorSelfServiceProjection = async (
     recordIfDegraded(readinessResult, 'warning', 'No pudimos evaluar la preparación del pago.')
   }
 
+  const paidRemittances = await buildPaidRemittances(payables, engagement)
+
   const projection: ContractorSelfServiceProjection = {
     state: 'active',
     scenario: mapEngagementToSelfServiceScenario({
@@ -294,7 +329,8 @@ export const resolveContractorSelfServiceProjection = async (
       contractorName: contractorNameResult.value ?? 'Contractor',
       paymentProfileLabel: paymentProfileResult.value?.label ?? 'Cuenta de pago',
       paymentProfileDetail:
-        paymentProfileResult.value?.detail ?? 'Revisa el estado de tu cuenta en Mi cuenta de pago.'
+        paymentProfileResult.value?.detail ?? 'Revisa el estado de tu cuenta en Mi cuenta de pago.',
+      paidRemittances
     }),
     degraded,
     generatedAt: new Date().toISOString(),

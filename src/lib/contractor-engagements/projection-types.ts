@@ -86,6 +86,23 @@ export interface ContractorScenarioBlocker {
 }
 
 /**
+ * TASK-960 — a paid payable's remittance advice ("Comprobante de Pago") availability,
+ * surfaced on the self-service hub + admin workbench. The `number` (EO-RA-NNNNNN) is
+ * read-only here; it is allocated lazily (idempotent) the first time the document is
+ * emitted (viewed/downloaded), so it is null until first emission.
+ */
+export interface ContractorRemittanceItem {
+  payableId: string
+  number: string | null
+  net: number
+  currency: string
+  dateIso: string
+  regimeLabel: string
+  /** Populated on the admin surface (the contractor's name); absent on self-service. */
+  contractorName?: string
+}
+
+/**
  * Contractor-facing scenario view-model. Mirrors the approved mockup
  * `ContractorScenario` field-for-field so the runtime view reuses the approved
  * information architecture.
@@ -126,6 +143,8 @@ export interface ContractorSelfServiceScenario {
   submissions: ContractorSubmissionItem[]
   timeline: ContractorTimelineStep[]
   blockers: ContractorScenarioBlocker[]
+  /** Paid payables with a remittance advice available (TASK-960). */
+  paidRemittances: ContractorRemittanceItem[]
 }
 
 export interface ContractorProjectionDegradedReason {
@@ -183,6 +202,8 @@ export interface ContractorHrWorkbenchProjection {
     readyForFinance: number
     paid: number
   }
+  /** Issued remittance advices for paid payables (TASK-960). */
+  remittances: ContractorRemittanceItem[]
   signals: ContractorWorkbenchSignal[]
   degraded: ContractorProjectionDegradedReason[]
   generatedAt: string
