@@ -12,9 +12,22 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
+
 const runQueryMock = vi.fn()
 const requireFinanceMock = vi.fn()
 const isPostgresEnabledMock = vi.fn()
+
+// Reloj fijo determinístico (mediodía UTC, mitad de mes → mismo mes en UTC y en
+// America/Santiago). El route bucketea el "mes corriente" con
+// `getFinanceCurrentPeriod()` (America/Santiago); este test fijaba `todayMonth`
+// en UTC, así que en la ventana de ~4h del cambio de mes (UTC ya en el mes
+// siguiente, Santiago todavía en el anterior) los buckets divergían y el total
+// del mes corriente caía a 0. Pinear el reloj + derivar el mes del MISMO SSOT
+// del route elimina la fragilidad de borde de mes/timezone de forma estable.
+const FIXED_NOW = new Date('2026-06-15T12:00:00.000Z')
+
+let todayMonth: string
 
 vi.mock('@/lib/postgres/client', () => ({
   onGreenhousePostgresReset: () => () => {},
@@ -33,6 +46,14 @@ vi.mock('@/lib/tenant/authorization', () => ({
 import { GET } from './route'
 
 beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(FIXED_NOW)
+  // Mismo SSOT que el route, bajo el reloj fijo → el bucket "mes corriente"
+  // siempre matchea los fixtures, sin importar tz/día/operational close window.
+  const { year, month } = getFinanceCurrentPeriod()
+
+  todayMonth = `${year}-${String(month).padStart(2, '0')}`
+
   runQueryMock.mockReset()
   requireFinanceMock.mockReset()
   isPostgresEnabledMock.mockReset()
@@ -63,9 +84,8 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.clearAllMocks()
+  vi.useRealTimers()
 })
-
-const todayMonth = new Date().toISOString().slice(0, 7) // YYYY-MM
 
 describe('GET /api/finance/income/summary — TASK-766 Slice 4b anti-regresión', () => {
   it('reads payment_amount_clp from income_payments_normalized VIEW (NEVER ip.amount × rate)', async () => {
