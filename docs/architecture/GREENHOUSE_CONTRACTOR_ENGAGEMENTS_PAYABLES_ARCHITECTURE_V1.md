@@ -1291,6 +1291,16 @@ Hace visible el compromiso de Efeonce de pagar a contractors dentro de los **pri
 - **Distinción crítica (finance)**: el SLA mide el **pago NETO al contractor**. La **remesa de la retención SII** (honorarios CL) es una **obligación DISTINTA** con su propio deadline **F29 (día 12/20 del mes siguiente)** y otro beneficiario (el SII) — NO se confunde con este SLA (out of scope, TASK-977 invariant).
 - **Sin migración, sin capability/outbox nuevos.** Date arithmetic `CURRENT_DATE - due_date` (integer days, no `EXTRACT(EPOCH FROM date)` — gate TASK-893). Gates: vitest calendar+due-date 16/16 · payables 43/43 · payroll+calendar 552 (boundary) · signal 4/4 + **live PG smoke severity=ok count=0** · tsc/lint 0.
 
+## Delta 2026-05-31 — Contractor Run Report "Nómina de Contractors" (TASK-980)
+
+Reporte de período (PDF + Excel) de pagos a contractors — espejo del reporte de payroll (TASK-782) + infra del comprobante individual (TASK-960). **Read-only**, monto verbatim.
+
+- **Reader** `buildContractorRunReport` (`run-report-reader.ts`, server-only): lista los payables del **mes operativo** (`getOperationalPayrollMonth(due_date ?? created_at)`, mismo ancla TASK-978/979 — query con ventana calendario acotada + refine en TS), agrupa en 2 grupos contables (Honorarios CL con retención SII vs Internacional) con subtotales por moneda **mutuamente excluyentes** (retención SII solo honorarios → F29; neto pagado solo `paid` → banco). Incluidos = comprometidos (ready/obligation/payment_order/paid); excluidos = blocked/pending; cancelled omitido. Enrichment: nombre + EO-CENG + EO-RA (read) + rate snapshot.
+- **Clasificador de régimen compartido**: `deriveContractorRemittanceRegime` extraído de `remittance-resolver.ts` (TASK-960) a `remittance/regime.ts` (single source of truth que ahora consumen el comprobante Y el reporte). `toContractorReportRegimeGroup` colapsa los 4 régimenes a 2.
+- **Generadores puros** (transforman el `ContractorRunReport`, el reader hace el IO): `generateContractorRunPdf` (masthead con logo + `EfeonceSloganPdf` Poppins + título/período/emisor; summary strip por moneda con neto en verde; tabla por régimen con subtotales; nota contable; `EfeoncePdfFooter` fixed + página X de Y; Geist body via `ensurePdfFontsRegistered`) + `generateContractorRunExcel` (ExcelJS: Resumen/Honorarios CL/Internacional/Excluidos, header verde, CLP `#,##0`/USD `#,##0.00`, `—` para N/A). Render visual verificado (PDF real → PNG).
+- **Endpoint** `GET /api/finance/contractor-payables/run-report?periodYear=&periodMonth=&format=pdf|excel` (capability `finance.contractor_payable:read`, reuso) → `NextResponse(Uint8Array, Content-Disposition attachment)`. Botón "Descargar nómina" + dialog (mes/año + PDF/Excel) en el workbench.
+- **Boundary EPIC-013/957**: cero nómina/`contract_type`/finiquito. La remesa SII (F29) NO es el neto (nota contable explícita). Gates: tsc/lint/design 0 · régime 6/6 + reader 6/6 + excel 2/2 + pdf 2/2 + boundary contractor 148 · live PG smoke · end-to-end agent auth (PDF `%PDF` + Excel `PK`).
+
 ## Delta 2026-05-31 — Monthly Contractor Payment Run (TASK-979)
 
 La **corrida mensual** cierra operativamente el compromiso de los 5 días: en vez de armar órdenes de a una, barre el período y prepara las órdenes agrupadas. **Prepara — NO paga** (maker-checker intacto).

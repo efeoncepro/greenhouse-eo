@@ -6,13 +6,13 @@ La corrida mensual ya existe y persiste cada corrida en `greenhouse_sync.contrac
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `Complete (2026-05-31)`
 - Rank: `TBD`
 - Domain: `finance|hr|ui`
 - Blocked by: `none` (mejor con TASK-979 para anclar el batch, pero puede listar por período sin la corrida)
@@ -188,5 +188,47 @@ Decisión operador 2026-05-31: **Geist** (Opción B, canónico DESIGN.md). El co
 
 ## Open Questions
 
-- ¿El reporte se ancla a un período (mes operativo) o a una corrida específica de TASK-979? (Plan Mode: período es más simple y no depende de TASK-979; la corrida puede linkear su reporte después.)
-- ¿Incluye solo `paid` o también `ready_for_finance` pendientes del período? (Plan Mode + finance skill — probablemente ambos con estado visible, como el reporte de payroll muestra incluidos/excluidos.)
+- ~~¿El reporte se ancla a un período (mes operativo) o a una corrida específica de TASK-979?~~ **RESUELTA → mes operativo** (ver Análisis pre-ejecución).
+- ~~¿Incluye solo `paid` o también `ready_for_finance` pendientes del período?~~ **RESUELTA → todos los estados comprometidos con estado visible + sección de excluidos** (ver Análisis pre-ejecución).
+
+## Análisis pre-ejecución 2026-05-31 (skills finance + payroll + arch) — Open Questions resueltas
+
+**OQ1 — período vs corrida → RESUELTA: mes operativo (operational month), NO corrida específica.**
+
+Rationale (robusto + consistente + sin dependencia dura de TASK-979):
+
+- El reporte de payroll (TASK-782, el espejo) es **por período**. Mantener el mismo modelo mental: "Nómina de contractors de \<mes operativo\>".
+- Ancla canónica = `getOperationalPayrollMonth(COALESCE(due_date, created_at))` — **idéntica** a TASK-978/979 (el `due_date` = cierre del mes operativo + 5 hábiles). Un payable de "mayo operativo" tiene `due_date` a inicios de junio y se reporta bajo **Mayo** (semántica correcta del operador: es la nómina de mayo, pagada en la ventana de inicios de junio). NO calendar-month de `due_date` (eso lo pondría en junio — mismatch con la corrida).
+- El reader fetchea candidatos en un rango calendario generoso (mes ±1) y filtra en TS por `getOperationalPayrollMonth(anchor) === (Y,M)` usando el helper canónico (volúmenes contractor bajos → costo trivial). `COALESCE(due_date, created_at::date)` cubre payables sin `due_date` (override ausente / legacy), mirror del `(due_date IS NULL OR ...)` de TASK-979.
+- **Anclar a `paymentRunId`** queda como extensión trivial futura (filtrar por los `prepared_order_ids[]` de `contractor_payment_runs`) — NO V1. El reader nace período-anchored; un parámetro opcional `paymentRunId` se agrega sin romper contrato cuando se necesite.
+
+**OQ2 — qué estados incluir → RESUELTA: todos los comprometidos con estado visible + excluidos en sección aparte (espejo payroll).**
+
+Rationale (visión completa para Finanzas, no solo cash):
+
+- **Incluidos** (cuerpo principal): `ready_for_finance`, `obligation_created`, `payment_order_created`, `paid` — el período comprometido, con **columna Estado visible** (color + icono + texto). Da la vista de pipeline + cash, igual que el reporte de payroll muestra las entradas del período + su estado.
+- **Excluidos** (sección/flag separado, como payroll muestra excluidos por falta de algo): `blocked` + `pending_readiness` — visibles pero fuera de los subtotales, para que el operador sepa qué falta cerrar.
+- **Omitidos**: `cancelled` (no es parte de la nómina del período).
+- **Subtotales** (regla dura): "Total retención SII honorarios" (reconcilia **F29**) ≠ "Total neto pagado" (solo `paid`, reconcilia **banco**) ≠ "Total neto comprometido" (todos los incluidos). Tres números distintos, NUNCA mezclados ni cross-moneda.
+
+**Decisiones de implementación derivadas**:
+
+- Régimen = derivado del engagement del payable (honorarios_cl → "Honorarios CL con retención SII"; resto → "Internacional sin retención CL"). Reusar el clasificador del presenter TASK-960/758, NO recomputar.
+- Montos **verbatim** del payable (`grossAmount`/`withholdingAmount`/`netPayable`). Tasa SII = snapshot del engagement (NO `getSiiRetentionRate` recomputado al render — es solo display de la tasa vigente del período).
+- Comprobante `EO-RA-NNNNNN` (TASK-960) por payable `paid` — leer el número ya asignado, NO asignar uno nuevo desde el reporte.
+
+## Closing Summary 2026-05-31 — SHIPPED (Slices 1-5)
+
+Reporte de período "Nómina de Contractors" (PDF + Excel), read-only, espejo TASK-782.
+
+- **Slice 1** — clasificador de régimen extraído a `remittance/regime.ts` (`deriveContractorRemittanceRegime` + `toContractorReportRegimeGroup`, SSOT que ahora consumen el comprobante TASK-960 Y el reporte) + `run-report-reader.ts` (`buildContractorRunReport`): mes operativo, 2 grupos contables, subtotales por moneda mutuamente excluyentes, montos verbatim, incluidos/excluidos, enrichment (nombre + EO-CENG + EO-RA read + rate snapshot).
+- **Slice 2** — `generate-contractor-run-excel.ts` (ExcelJS, sheets Resumen/Honorarios CL/Internacional/Excluidos, round-trip test).
+- **Slice 3** — `generate-contractor-run-pdf.tsx` (masthead+logo+`EfeonceSloganPdf`+título/período/emisor; summary strip neto verde; tabla por régimen con subtotales; nota contable; `EfeoncePdfFooter` fixed + página X de Y; Geist). Render visual verificado (PDF real → PNG, production-quality).
+- **Slice 4** — endpoint `GET /api/finance/contractor-payables/run-report?format=pdf|excel` (capability `finance.contractor_payable:read`, reuso) + botón "Descargar nómina" + dialog (mes/año + PDF/Excel) + copy. End-to-end agent auth: PDF 200 `%PDF`, Excel 200 `PK`, filenames `nomina-contractors-mayo-2026.{pdf,xlsx}`.
+- **Slice 5** — docs (CLAUDE.md invariant, arch Delta, doc funcional v1.3, manual) + cierre.
+
+**Sin migración / capability / outbox nuevos.** **Boundary EPIC-013/957**: cero nómina/`contract_type`/finiquito (suite contractor 148 verde). La remesa SII (F29) NO es el neto del reporte (nota contable explícita).
+
+**Gates**: tsc/lint/design 0 · régime 6/6 + reader 6/6 + excel 2/2 + pdf 2/2 + boundary contractor 148 · live PG smoke · `pnpm build` exit 0 · `pnpm test` 5719 passed (0 failures, 0 unhandled errors).
+
+**Cross-impact**: TASK-960 (comprobante) — el clasificador de régimen ahora es compartido (extraído, sin cambio de comportamiento). TASK-974 (workbench) — botón aditivo. TASK-979 (corrida) — el reporte puede anclar a `payment_run_id` como extensión futura (Delta agregado a TASK-980 desde TASK-979). Follow-up: unificar con el reporte de nómina si emerge un único "reporte de pagos del período".

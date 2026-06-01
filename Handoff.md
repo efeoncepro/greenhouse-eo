@@ -1,3 +1,22 @@
+# Sesion 2026-05-31 — TASK-980 Contractor Run Report "Nómina de Contractors" — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013. **Esperando confirmación para push.**
+
+**Resultado**: reporte de período de pagos a contractors en **PDF + Excel** (botón "Descargar nómina" en `/finance/contractor-payments`), espejo del reporte de payroll (TASK-782). Ancla al **mes operativo**; 2 grupos contables (Honorarios CL con retención SII vs Internacional) con subtotales por moneda **mutuamente excluyentes** (F29 vs banco); montos **verbatim** del payable. 5 slices:
+- **S1** — clasificador de régimen extraído a helper compartido `deriveContractorRemittanceRegime` (`remittance/regime.ts`, SSOT comprobante TASK-960 + reporte) + `run-report-reader.ts` (`buildContractorRunReport`).
+- **S2** — `generate-contractor-run-excel.ts` (ExcelJS, round-trip test).
+- **S3** — `generate-contractor-run-pdf.tsx` (masthead+slogan+footer canónicos, Geist; render visual verificado).
+- **S4** — endpoint `GET /run-report?format=pdf|excel` (cap `read`, reuso) + botón + dialog + copy. End-to-end agent auth (PDF `%PDF` + Excel `PK`).
+- **S5** — docs + cierre.
+
+**Sin migración/capability/outbox.** **Boundary EPIC-013/957**: contractor 148 verde. La remesa SII (F29) NO es el neto.
+
+**Gates**: tsc/lint/design 0 · régime 6/6 + reader 6/6 + excel 2/2 + pdf 2/2 + boundary · `pnpm build` exit 0 · `pnpm test` 5719 passed (0 failures, 0 unhandled errors). **Worker workflows de TASK-979 (SHA 4376b8b1): los 6 `success`** (monitoreo cerrado).
+
+**Files**: `remittance/regime.ts`, `payables/run-report-reader.ts`, `payables/generate-contractor-run-{pdf,excel}.ts(x)`, `api/finance/contractor-payables/run-report/route.ts`, workbench view + copy. Spec: `complete/TASK-980-...md`.
+
+---
+
 # Sesion 2026-05-31 — TASK-979 Monthly Contractor Payment Run — ✅ COMPLETE
 
 **Rama**: `develop` (sin branch, por instrucción). EPIC-013.

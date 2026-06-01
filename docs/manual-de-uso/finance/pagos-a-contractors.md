@@ -50,6 +50,14 @@ Selecciona un payable en la lista. A la derecha ves:
 | Pagado | Liquidado al banco | Link al comprobante de pago |
 | Cancelado | Cerrado sin pago | Nada |
 
+## Descargar la nómina del período (PDF / Excel)
+
+1. Click en **"Descargar nómina"** (header).
+2. Elige **mes** y **año** (mes operativo).
+3. Click en **"Descargar PDF"** o **"Descargar Excel"** — el archivo se descarga.
+
+El reporte agrupa los pagos por **Honorarios CL** (con retención SII) e **Internacional**, con el desglose **bruto − retención SII = neto**, subtotales separados (retención SII → F29 · neto pagado → banco) y los pagos bloqueados/no listos en una sección "Excluidos". El **neto** es lo pagado al contractor; la **retención SII** se remesa al SII aparte. No reemplaza el comprobante individual.
+
 ## Qué no hacer
 
 - **No** intentes cambiar el monto acordado desde acá: eso es de HR. Si hay que pagar de más, usa **Override** (queda registrado).

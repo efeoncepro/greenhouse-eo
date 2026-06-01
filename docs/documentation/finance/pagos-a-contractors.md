@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-05-31 por Claude (TASK-974)
-> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-979)
+> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-980)
 > **Documentacion tecnica:** [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
 
 # Pagos a Contractors — Workbench de Finanzas
@@ -60,6 +60,17 @@ Cómo funciona:
 - **Es idempotente**: si la corres dos veces, no duplica nada (la segunda vez no encuentra pagos nuevos y te avisa "ya estaba preparada").
 - **Prioriza lo más vencido**: ordena por la fecha de pago comprometida (los más atrasados contra el plazo de 5 días primero), e incluye cualquier pago de meses anteriores que se haya quedado sin preparar.
 - Una señal de salud (`obligaciones de contractor vencidas sin batchear`) avisa en el panel de operaciones si quedaron pagos vencidos sin preparar — la acción es justamente correr la corrida.
+
+## Descargar la nómina de contractors (PDF / Excel)
+
+El botón **"Descargar nómina"** (arriba a la derecha) genera el **reporte del período** de pagos a contractors, en **PDF** o **Excel**, igual que el reporte mensual de nómina.
+
+- Eliges el **mes** y el **año** (mes operativo) y descargas en el formato que prefieras.
+- El reporte lista los pagos del período **agrupados por régimen**: **Honorarios CL** (con retención SII) e **Internacional** (sin retención chilena). Cada fila muestra el desglose **bruto − retención SII = neto**, el estado y, si ya se pagó, el número de **comprobante** (EO-RA).
+- Los **subtotales son separados**: el total de **retención SII** (que se remesa al SII vía F29) nunca se mezcla con el **neto pagado** (que reconcilia el banco). Las monedas (CLP / USD) también van separadas.
+- Los pagos **bloqueados o no listos** del período aparecen en una sección de "Excluidos" — visibles, pero fuera de los subtotales.
+
+> **Importante**: el reporte muestra el **neto pagado al contractor**. La **retención SII** es un pasivo que Efeonce le remesa al SII por separado (F29), no se le paga al contractor. El reporte lo dice explícitamente y **no reemplaza** ni el comprobante individual ni la declaración de remesa.
 
 ## Estados de un payable
 
