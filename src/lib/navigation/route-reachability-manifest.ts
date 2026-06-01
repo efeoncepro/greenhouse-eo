@@ -20,7 +20,13 @@
  * Mockup routes (`**​/mockup/**`) are excluded.
  */
 
-export type ChildRouteVia = 'header-cta' | 'row-action' | 'inline-link' | 'wizard-step' | 'tab'
+export type ChildRouteVia =
+  | 'header-cta'
+  | 'row-action'
+  | 'inline-link'
+  | 'wizard-step'
+  | 'tab'
+  | 'redirect-alias' // legacy URL that only redirects to the canonical surface (kept for old bookmarks)
 
 export interface ChildRouteDeclaration {
   /** The child route that is intentionally NOT a top-level menu item. */
@@ -40,6 +46,22 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'header-cta',
     reason:
       'Onboarding wizard (TASK-976) — reached via the "Nuevo contractor" primary CTA in the contractors workbench header (TASK-982 Slice 1). Create-action, not a standalone nav item.'
+  },
+  {
+    // TASK-983 triage: legacy redirect-only page → /agency?tab=capacidad.
+    route: '/agency/capacity',
+    parent: '/agency',
+    via: 'redirect-alias',
+    reason:
+      'Legacy URL kept for old bookmarks; the page only `redirect("/agency?tab=capacidad")`. Canonical surface is the Agency capacity tab.'
+  },
+  {
+    // TASK-983 triage: legacy redirect-only page → /admin (LEGACY_INTERNAL_DASHBOARD_PATH).
+    route: '/internal/dashboard',
+    parent: '/admin',
+    via: 'redirect-alias',
+    reason:
+      'Legacy LEGACY_INTERNAL_DASHBOARD_PATH (resolve-portal-home-path); the page only `redirect("/admin")`. Canonical surface is the Admin Center.'
   }
 ]
 
