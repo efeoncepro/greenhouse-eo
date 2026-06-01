@@ -66,6 +66,14 @@ interface ContractorEngagementRow {
   status: string
   start_date: string | Date
   end_date: string | Date | null
+  closure_reason: string | null
+  closure_effective_date: string | Date | null
+  provider_termination_ref: string | null
+  closure_initiated_at: string | Date | null
+  closure_initiated_by: string | null
+  closure_executed_at: string | Date | null
+  closure_executed_by: string | null
+  post_closure_invoices_allowed: boolean
   metadata_json: unknown
   created_by_user_id: string | null
   created_at: string | Date
@@ -96,6 +104,9 @@ const toNullableDateString = (value: string | Date | null): string | null =>
 
 const toTimestamp = (value: string | Date): string =>
   value instanceof Date ? value.toISOString() : String(value)
+
+const toNullableTimestamp = (value: string | Date | null): string | null =>
+  value === null ? null : toTimestamp(value)
 
 export const mapContractorEngagement = (row: ContractorEngagementRow): ContractorEngagement => ({
   contractorEngagementId: row.contractor_engagement_id,
@@ -132,6 +143,14 @@ export const mapContractorEngagement = (row: ContractorEngagementRow): Contracto
   status: row.status as ContractorEngagementStatus,
   startDate: toDateString(row.start_date),
   endDate: toNullableDateString(row.end_date),
+  closureReason: row.closure_reason,
+  closureEffectiveDate: toNullableDateString(row.closure_effective_date),
+  providerTerminationRef: row.provider_termination_ref,
+  closureInitiatedAt: toNullableTimestamp(row.closure_initiated_at),
+  closureInitiatedBy: row.closure_initiated_by,
+  closureExecutedAt: toNullableTimestamp(row.closure_executed_at),
+  closureExecutedBy: row.closure_executed_by,
+  postClosureInvoicesAllowed: row.post_closure_invoices_allowed,
   metadata: toRecord(row.metadata_json),
   createdByUserId: row.created_by_user_id,
   createdAt: toTimestamp(row.created_at),
@@ -147,7 +166,10 @@ const SELECT_COLUMNS = `
   requires_work_approval, tax_compliance_owner, tax_withholding_policy_code,
   tax_withholding_rate_snapshot, bonus_policy, classification_risk_status,
   classification_reviewed, classification_risk_factors, status, start_date,
-  end_date, metadata_json, created_by_user_id, created_at, updated_at
+  end_date, closure_reason, closure_effective_date, provider_termination_ref,
+  closure_initiated_at, closure_initiated_by, closure_executed_at,
+  closure_executed_by, post_closure_invoices_allowed,
+  metadata_json, created_by_user_id, created_at, updated_at
 `
 
 // ── Readers ─────────────────────────────────────────────────────────────────

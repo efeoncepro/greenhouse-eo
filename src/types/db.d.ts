@@ -5909,6 +5909,12 @@ export interface GreenhouseHrContractorEngagements {
   classification_reviewed: Generated<boolean>;
   classification_risk_factors: Generated<Json>;
   classification_risk_status: Generated<string>;
+  closure_effective_date: Timestamp | null;
+  closure_executed_at: Timestamp | null;
+  closure_executed_by: string | null;
+  closure_initiated_at: Timestamp | null;
+  closure_initiated_by: string | null;
+  closure_reason: string | null;
   contractor_engagement_id: string;
   country_code: string;
   created_at: Generated<Timestamp>;
@@ -5924,8 +5930,10 @@ export interface GreenhouseHrContractorEngagements {
   payment_model: string;
   payroll_via: string;
   person_legal_entity_relationship_id: string;
+  post_closure_invoices_allowed: Generated<boolean>;
   profile_id: string;
   provider_contract_id: string | null;
+  provider_termination_ref: string | null;
   provider_worker_id: string | null;
   public_id: string;
   rate_amount: Numeric | null;

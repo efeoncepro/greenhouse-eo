@@ -28849,3 +28849,18 @@ Validación:
 - `pnpm fe:capture:health` OK; reportó 5% failure por el primer run esperado de calibración readiness con selector demasiado estricto, taxonomy visible.
 - `pnpm docs:context-check` OK (solo warnings históricos de tamaño de Handoff).
 - `pnpm task:lint --task TASK-953` OK antes del move final; re-ejecutar si se toca la task después del cierre.
+
+---
+
+## 2026-06-01 — TASK-797 Contractor Closure + Transition Controls (in-progress, develop)
+
+Trabajo directo en `develop` por instrucción del operador (no branch). EPIC-013. Depende de TASK-790 (engagements) + TASK-793 (payables), ambas complete.
+
+**Objetivo**: cierre contractor como lifecycle propio (NUNCA finiquito), con readiness (open invoices/submissions/payables/provider refs/access handoff) + bloqueo de nuevas work submissions post-cierre + política explícita de post-closure invoices.
+
+**Diseño canónico** (no over-engineered, reusa state machine existente `active/paused → ending → ended`):
+- Slice 1: columnas de cierre en `contractor_engagements` (closure_reason CHECK enum, closure_effective_date, provider_termination_ref, closure_initiated_at/by, closure_executed_at/by, post_closure_invoices_allowed) + `closure/` module (types + pure readiness helper espejo de payables `evaluatePayableReadiness`).
+- Slice 2: `assessContractorClosureReadiness` server resolver + `initiateContractorClosure` (→ending) + `executeContractorClosure` (→ended, gated) + reliability signal `hr.contractor_engagement.closure_blocked_open_items`.
+- Slice 3: guard post-cierre en work-submissions create (block en ending/ended/cancelled) + guard en payable create (block en ended salvo post_closure_invoices_allowed) + API route `/api/hr/contractors/[id]/closure` + reuse capability `hr.contractor_engagement:manage`.
+
+**Boundary payroll (hard rule TASK-890)**: NUNCA `final_settlements`, NUNCA tocar lanes de `work_relationship_offboarding_cases`, NUNCA reactivar relación dependiente. Gate de cierre: `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding`.

@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-790, TASK-793`
-- Branch: `task/TASK-797-contractor-closure-controls`
+- Blocked by: `TASK-790, TASK-793` (ambas complete)
+- Branch: `develop` (trabajo directo en develop por instrucción del operador 2026-06-01)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

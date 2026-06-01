@@ -153,6 +153,15 @@ export interface ContractorEngagement {
   status: ContractorEngagementStatus
   startDate: string
   endDate: string | null
+  // ── TASK-797 — Contractor closure metadata (lifecycle propio, NO finiquito) ──
+  closureReason: string | null
+  closureEffectiveDate: string | null
+  providerTerminationRef: string | null
+  closureInitiatedAt: string | null
+  closureInitiatedBy: string | null
+  closureExecutedAt: string | null
+  closureExecutedBy: string | null
+  postClosureInvoicesAllowed: boolean
   metadata: Record<string, unknown>
   createdByUserId: string | null
   createdAt: string
