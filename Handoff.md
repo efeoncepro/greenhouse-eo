@@ -1,3 +1,15 @@
+# Sesion 2026-06-01 — Skills AI Image Generator para Codex/Claude — ✅ IMPLEMENTADO
+
+**Scope**: skills/documentacion operativa para generacion de imagenes IA; no cambia runtime del helper ni secrets.
+
+**Resultado**: se agrego skill local Codex `.codex/skills/greenhouse-ai-image-generator/SKILL.md` + metadata `agents/openai.yaml` y skill Claude `.claude/skills/greenhouse-ai-image-generator/SKILL.md`. Ambas invocan la guia compartida `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`.
+
+**Capacidades cubiertas**: direccion de arte + prompt engineering profesional para iconos, elementos UI, empty states, banners, hero imagery, PNG transparentes, reference edits, materiales/acabados, composicion, lighting, paleta, iteracion single-change y QA profesional. La guia tambien canoniza cuando usar helper Greenhouse vs native image tool, OpenAI Image API vs Responses image_generation, y las limitaciones de `gpt-image-2` con transparencia.
+
+**Docs sincronizadas**: `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`, `changelog.md`.
+
+---
+
 # Sesion 2026-06-01 — OpenAI Image helper para AI Visual Asset Generator — ✅ IMPLEMENTADO (sin secret hardcodeado)
 
 **Scope**: helper interno de AI assets; no cambia el default productivo. Se agrego adapter server-only `src/lib/ai/openai-image.ts` y se cableo de forma opt-in desde `generateImage()` con `provider='openai-image'` o `GREENHOUSE_IMAGE_PROVIDER=openai-image`. Default sigue `google-imagen`, por lo que los flujos actuales de Imagen/Gemini quedan intactos.

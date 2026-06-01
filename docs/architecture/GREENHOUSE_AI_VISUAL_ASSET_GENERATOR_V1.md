@@ -55,7 +55,9 @@ git add + commit → asset servido por Vercel CDN
 | `src/app/api/internal/generate-image/route.ts` | Endpoint POST admin-only (imagen rasterizada) |
 | `src/app/api/internal/generate-animation/route.ts` | Endpoint POST admin-only (SVG animado) |
 | `scripts/generate-banners.mts` | Script batch para generar sets de banners |
-| `~/.claude/skills/generate-visual-asset/skill.md` | Skill invocable `/generate-visual-asset` |
+| `.codex/skills/greenhouse-ai-image-generator/SKILL.md` | Skill Codex para direccion de arte, prompts, generacion y QA de assets IA |
+| `.claude/skills/greenhouse-ai-image-generator/SKILL.md` | Skill Claude equivalente |
+| `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md` | Guia compartida de prompt engineering, acabados profesionales y QA |
 | `public/images/generated/` | Output de imagenes generadas |
 | `public/animations/generated/` | Output de animaciones generadas |
 | `public/images/banners/` | Banners pre-generados por categoria |
