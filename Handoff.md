@@ -1,3 +1,52 @@
+# Sesion 2026-06-01 — Contractor Directory (TASK-986) + onboarding auto-activation (TASK-985) — ✅ COMPLETE (develop, sin push)
+
+**Scope**: UI/IA + projection, sin migración/capability/mutación de data. Local-first (no push por instrucción del operador).
+
+**TASK-986 (Contractor Directory)**: `/hr/contractors` era solo **cola de revisión** (5 fuentes accionables) → un contractor activo sano sin pendientes (Valentina `EO-CENG-0001`: active, rate 600k, `needs_review`) **no aparecía en ninguna fuente → inalcanzable** (no se podía revisar clasificación ni cerrar). Fix = pierna de **browse** (patrón IA TASK-982): pestaña toggle **Cola de revisión (N) | Directorio (N)** + buscador + mismo inspector. Backend reusado (8ª fuente `listContractorEngagements({excludeTerminal})` en `resolveContractorHrWorkbenchProjection` → campo `directory`). **Verificación real vía proxy DB**: `directory: 1` → Valentina (Activo, 600k, needs_review), `degraded: []`. (El GVC local mostró 0 por timeout del connector del dev server — banner "No pudimos cargar los envíos" lo confirma; NO es bug de código.) Gates: tsc 0 · lint 0 · boundary `pnpm vitest run src/lib/contractor-engagements src/lib/payroll src/lib/workforce/offboarding` 728 · build exit 0.
+
+**TASK-985 (onboarding auto-activation)** — ya cerrada esta sesión: el onboarding auto-activa el engagement (`draft→active`) cuando la clasificación no es bloqueante; `draft` no era compuerta de compliance. Valentina quedó `active` + rate 600k (fecha 05-01 confirmada por operador).
+
+**Pendiente operador (UI, NO patch de data)**: revisar la clasificación de Valentina (`needs_review`) desde el inspector → Directorio para llevarla a `clear`.
+
+---
+
+# Sesion 2026-06-01 — Workforce Activation SCIM runtime rollout + Maggie recovery — ✅ OPERATIVO
+
+**Scope**: cambio operativo Vercel + backfill canónico SCIM + docs operativas; sin cambios de código runtime ni migraciones.
+
+**Contexto**: Maggie Borralles (`mborralles@efeoncepro.com`) fue creada por Microsoft Entra/SCIM el `2026-06-01T14:17:26Z`, pero quedó solo como `greenhouse_core.client_users` (`identity_profile_id=NULL`, `member_id=NULL`). `/hr/workforce/activation` lista `greenhouse_core.members` con `workforce_intake_status != 'completed'`, por eso no aparecía. Causa raíz verificada: los flags de rollout TASK-872 no estaban configurados en Vercel, así que SCIM corría el path legacy `createUser()`.
+
+**Cambio aplicado**: configurados en Vercel con `vercel env add --force --value true --yes`:
+- `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true`
+- `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true`
+
+**Targets verificados por `vercel env ls`**:
+- `Production`
+- `staging`
+- `Preview (develop)`
+
+**Orden usado**: primero `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED`, luego `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED`, siguiendo el rollout seguro de `docs/tasks/complete/TASK-872-scim-internal-collaborator-provisioning.md`.
+
+**Redeploys para hornear env vars**:
+- Staging/develop redeploy: `greenhouse-qy8e8hs1l-efeonce-7670142f.vercel.app`, target `staging`, aliases `dev-greenhouse.efeoncepro.com` + `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`, status `Ready`.
+- Production redeploy: `greenhouse-7c8s9j289-efeonce-7670142f.vercel.app`, target `production`, aliases `greenhouse.efeoncepro.com` + Vercel aliases, status `Ready`.
+
+**Recovery Maggie**:
+- Backfill aplicado con actor auditado `user-efeonce-admin-julio-reyes`:
+  `scripts/scim/backfill-internal-collaborators.ts --apply --allowlist mborralles@efeoncepro.com --actor user-efeonce-admin-julio-reyes`.
+- Resultado: `created_member`, `memberId=0e6a896e-f1d2-481c-9c97-ee43ab1714d8`, `cascadeOutcome=created_new`.
+- DB verificada: `client_users.identity_profile_id` + `client_users.member_id` poblados, `members.azure_oid=e0f8f69a-c1f5-40a1-a159-dced9087b318`, `workforce_intake_status='pending_intake'`, `person_memberships` activo por `profile_id`.
+- `identity.scim.users_without_member` equivalente manual queda en `1`, correspondiente a `support@efeoncepro.com` (cuenta funcional; no debe convertirse en member humano).
+
+**Verificación runtime**:
+- `pnpm staging:request '/api/hr/workforce/activation?pageSize=10' --pretty` devuelve `totalApprox=1` y lista a Maggie con `readinessStatus='blocked'`, `blockerCount=8`, `topBlockerLane='employment'`.
+- Workforce Activation ya tiene a Maggie en cola pendiente para que HR complete ficha laboral, cargo, compensación, legal profile, pago y Notion.
+
+**Docs sincronizadas**:
+- `AGENTS.md` y `CLAUDE.md` ahora declaran el gate de cierre end-to-end: no se puede declarar terminado algo que solo existe en código si faltan flags/env vars, redeploy, backfill, crons/workers/webhooks, provisioning externo o verificación runtime. Caso fuente documentado: SCIM → Workforce Activation.
+
+---
+
 # Sesion 2026-06-01 — Skills AI Image Generator para Codex/Claude — ✅ IMPLEMENTADO
 
 **Scope**: skills/documentacion operativa para generacion de imagenes IA; no cambia runtime del helper ni secrets.

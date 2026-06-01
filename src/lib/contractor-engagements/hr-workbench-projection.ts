@@ -68,6 +68,97 @@ const hoursSince = (iso: string | null): number => {
   return (Date.now() - t) / 3_600_000
 }
 
+// TASK-986 — etiqueta/tono por lifecycle para las filas del directorio que NO
+// tienen ítems accionables (un contractor activo sano se muestra "Activo", no
+// "Pendiente revisión").
+const LIFECYCLE_LABEL: Record<
+  ContractorEngagement['status'],
+  { label: string; tone: ContractorTone }
+> = {
+  draft: { label: 'Borrador', tone: 'secondary' },
+  pending_review: { label: 'Pendiente revisión', tone: 'warning' },
+  active: { label: 'Activo', tone: 'success' },
+  paused: { label: 'En pausa', tone: 'warning' },
+  ending: { label: 'En cierre', tone: 'warning' },
+  ended: { label: 'Finalizado', tone: 'secondary' },
+  cancelled: { label: 'Cancelado', tone: 'secondary' }
+}
+
+/**
+ * TASK-986 — Construye una fila de workbench (compatible con el Inspector) desde
+ * un engagement + sus envíos/payables. Reusada por la cola (attention) y el
+ * directorio (browse). El estado se deriva primero de los ítems accionables;
+ * si no hay, cae a la etiqueta de lifecycle (Activo/Borrador/…).
+ */
+const buildWorkbenchRow = (
+  engagement: ContractorEngagement,
+  subs: ContractorWorkSubmission[],
+  blockedPayables: ContractorPayable[],
+  names: Map<string, string>
+): ContractorWorkbenchQueueRow => {
+  const hasBlocked = blockedPayables.length > 0
+  const hasDisputed = subs.some(s => s.status === 'disputed')
+  const hasSubmitted = subs.some(s => s.status === 'submitted')
+  const missingRate = engagement.rateAmount === null
+
+  const lifecycle = LIFECYCLE_LABEL[engagement.status]
+
+  let statusLabel = lifecycle.label
+  let statusTone: ContractorTone = lifecycle.tone
+  let responsable = 'Revisor HR'
+  let nextAction = 'Gestionar engagement'
+
+  if (hasBlocked) {
+    statusLabel = 'Bloqueado'
+    statusTone = 'error'
+    responsable = 'Finance'
+    nextAction = 'Resolver bloqueo de preparación'
+  } else if (hasDisputed) {
+    statusLabel = 'Disputado'
+    statusTone = 'error'
+    responsable = 'Contractor'
+    nextAction = 'Esperar respuesta del contractor'
+  } else if (hasSubmitted) {
+    statusLabel = 'En revisión'
+    statusTone = 'info'
+    responsable = 'Revisor HR'
+    nextAction = 'Revisar evidencia'
+  } else if (missingRate) {
+    statusLabel = 'Falta compensación'
+    statusTone = 'warning'
+    nextAction = 'Definir monto acordado'
+  }
+
+  const amountSource =
+    blockedPayables[0]?.grossAmount ?? subs.find(s => s.grossAmount !== null)?.grossAmount ?? null
+
+  const amountCurrency = blockedPayables[0]?.currency ?? subs[0]?.currency ?? engagement.currency
+
+  return {
+    contractorEngagementId: engagement.contractorEngagementId,
+    engagementPublicId: engagement.publicId,
+    contractorName: names.get(engagement.profileId) ?? 'Contractor',
+    relationshipSubtype: SUBTYPE_LABEL[engagement.relationshipSubtype],
+    country: engagement.countryCode,
+    legalEntityLabel: engagement.legalEntityOrganizationId,
+    agreedRate: {
+      rateType: engagement.rateType,
+      rateAmount: engagement.rateAmount,
+      paymentCadence: engagement.paymentCadence,
+      currency: engagement.currency
+    },
+    pendingCount: subs.filter(s => s.status === 'submitted' || s.status === 'disputed').length,
+    blockedPayableCount: blockedPayables.length,
+    statusLabel,
+    statusTone,
+    amount: amountSource !== null ? `${amountCurrency} ${amountSource.toLocaleString('es-CL')}` : '—',
+    responsable,
+    nextAction,
+    classificationRiskStatus: engagement.classificationRiskStatus,
+    lifecycleStatus: engagement.status
+  }
+}
+
 export const resolveContractorHrWorkbenchProjection =
   async (): Promise<ContractorHrWorkbenchProjection> => {
     if (cacheEntry && cacheEntry.expiresAt >= Date.now()) {
@@ -76,7 +167,7 @@ export const resolveContractorHrWorkbenchProjection =
 
     const degraded: ContractorProjectionDegradedReason[] = []
 
-    const [submittedRes, disputedRes, blockedRes, readyRes, paidRes, pendingEngRes, missingRateEngRes] = await Promise.all([
+    const [submittedRes, disputedRes, blockedRes, readyRes, paidRes, pendingEngRes, missingRateEngRes, allEngagementsRes] = await Promise.all([
       withSourceTimeout(() => listContractorWorkSubmissions({ status: 'submitted', limit: 200 }), {
         source: 'submitted_submissions',
         timeoutMs: SOURCE_TIMEOUT_MS
@@ -106,6 +197,13 @@ export const resolveContractorHrWorkbenchProjection =
       withSourceTimeout(() => listContractorEngagements({ missingRate: true, excludeTerminal: true, limit: 200 }), {
         source: 'missing_rate_engagements',
         timeoutMs: SOURCE_TIMEOUT_MS
+      }),
+      // TASK-986 — directorio: TODOS los engagements no terminales (browse), para
+      // que un contractor activo + liquidado sin ítems en la cola siga siendo
+      // alcanzable (ver detalle / compensación / clasificación / cierre).
+      withSourceTimeout(() => listContractorEngagements({ excludeTerminal: true, limit: 500 }), {
+        source: 'all_engagements_directory',
+        timeoutMs: SOURCE_TIMEOUT_MS
       })
     ])
 
@@ -125,6 +223,7 @@ export const resolveContractorHrWorkbenchProjection =
     record(paidRes, 'No pudimos cargar los pagos completados.')
     record(pendingEngRes, 'No pudimos cargar los engagements pendientes de revisión.')
     record(missingRateEngRes, 'No pudimos cargar los engagements sin compensación definida.')
+    record(allEngagementsRes, 'No pudimos cargar el directorio de contractors.')
 
     const submitted = submittedRes.value ?? []
     const disputed = disputedRes.value ?? []
@@ -133,6 +232,7 @@ export const resolveContractorHrWorkbenchProjection =
     const paid = paidRes.value ?? []
     const pendingEngagements = pendingEngRes.value ?? []
     const missingRateEngagements = missingRateEngRes.value ?? []
+    const allEngagements = allEngagementsRes.value ?? []
 
     // Build the union of engagement ids needing attention.
     const submissionsByEngagement = new Map<string, ContractorWorkSubmission[]>()
@@ -185,76 +285,22 @@ export const resolveContractorHrWorkbenchProjection =
       if (e) engagementById.set(e.contractorEngagementId, e)
     }
 
+    // Nombres sobre la unión (attention + directorio) — una sola resolución.
     const names = await resolveProfileDisplayNames(
-      [...engagementById.values()].map(e => e.profileId)
+      [...engagementById.values(), ...allEngagements].map(e => e.profileId)
     ).catch(() => new Map<string, string>())
 
     const queue: ContractorWorkbenchQueueRow[] = [...engagementIds]
       .map(id => engagementById.get(id))
       .filter((e): e is ContractorEngagement => Boolean(e))
-      .map(engagement => {
-        const subs = submissionsByEngagement.get(engagement.contractorEngagementId) ?? []
-        const blockedPayables = blockedByEngagement.get(engagement.contractorEngagementId) ?? []
-        const hasBlocked = blockedPayables.length > 0
-        const hasDisputed = subs.some(s => s.status === 'disputed')
-        const hasSubmitted = subs.some(s => s.status === 'submitted')
-
-        const missingRate = engagement.rateAmount === null
-
-        let statusLabel = missingRate ? 'Falta compensación' : 'Pendiente revisión'
-        let statusTone: ContractorTone = 'warning'
-        let responsable = 'Revisor HR'
-        let nextAction = missingRate ? 'Definir monto acordado' : 'Revisar engagement'
-
-        if (hasBlocked) {
-          statusLabel = 'Bloqueado'
-          statusTone = 'error'
-          responsable = 'Finance'
-          nextAction = 'Resolver bloqueo de preparación'
-        } else if (hasDisputed) {
-          statusLabel = 'Disputado'
-          statusTone = 'error'
-          responsable = 'Contractor'
-          nextAction = 'Esperar respuesta del contractor'
-        } else if (hasSubmitted) {
-          statusLabel = 'En revisión'
-          statusTone = 'info'
-          responsable = 'Revisor HR'
-          nextAction = 'Revisar evidencia'
-        }
-
-        const amountSource =
-          blockedPayables[0]?.grossAmount ??
-          subs.find(s => s.grossAmount !== null)?.grossAmount ??
-          null
-
-        const amountCurrency = blockedPayables[0]?.currency ?? subs[0]?.currency ?? engagement.currency
-
-        return {
-          contractorEngagementId: engagement.contractorEngagementId,
-          engagementPublicId: engagement.publicId,
-          contractorName: names.get(engagement.profileId) ?? 'Contractor',
-          relationshipSubtype: SUBTYPE_LABEL[engagement.relationshipSubtype],
-          country: engagement.countryCode,
-          legalEntityLabel: engagement.legalEntityOrganizationId,
-          agreedRate: {
-            rateType: engagement.rateType,
-            rateAmount: engagement.rateAmount,
-            paymentCadence: engagement.paymentCadence,
-            currency: engagement.currency
-          },
-          pendingCount: subs.filter(s => s.status === 'submitted' || s.status === 'disputed').length,
-          blockedPayableCount: blockedPayables.length,
-          statusLabel,
-          statusTone,
-          amount:
-            amountSource !== null ? `${amountCurrency} ${amountSource.toLocaleString('es-CL')}` : '—',
-          responsable,
-          nextAction,
-          classificationRiskStatus: engagement.classificationRiskStatus,
-          lifecycleStatus: engagement.status
-        }
-      })
+      .map(engagement =>
+        buildWorkbenchRow(
+          engagement,
+          submissionsByEngagement.get(engagement.contractorEngagementId) ?? [],
+          blockedByEngagement.get(engagement.contractorEngagementId) ?? [],
+          names
+        )
+      )
       .sort((a, b) => {
         // Blocked first, then disputed/in-review, then pending.
         const rank = (s: string) =>
@@ -365,8 +411,23 @@ export const resolveContractorHrWorkbenchProjection =
       }
     ]
 
+    // TASK-986 — directorio: TODOS los engagements no terminales (browse),
+    // ordenados por nombre. Reusa buildWorkbenchRow (mismas filas que la cola →
+    // compatibles con el Inspector). Un activo sin ítems se muestra "Activo".
+    const directory: ContractorWorkbenchQueueRow[] = allEngagements
+      .map(engagement =>
+        buildWorkbenchRow(
+          engagement,
+          submissionsByEngagement.get(engagement.contractorEngagementId) ?? [],
+          blockedByEngagement.get(engagement.contractorEngagementId) ?? [],
+          names
+        )
+      )
+      .sort((a, b) => a.contractorName.localeCompare(b.contractorName, 'es'))
+
     const projection: ContractorHrWorkbenchProjection = {
       queue,
+      directory,
       totals: {
         inReview: submitted.length,
         blocked: blocked.length + disputed.length,

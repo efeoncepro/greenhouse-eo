@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-05-31 por Claude (TASK-975)
-> **Ultima actualizacion:** 2026-06-01 por Claude (TASK-984 — drawer de cierre operable en el workbench)
+> **Ultima actualizacion:** 2026-06-01 por Claude (TASK-986 — pestaña Directorio: browse de todos los engagements junto a la cola de revisión)
 > **Documentacion tecnica:** [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
 
 # Engagement de Contractor — Detalle, Ciclo de Vida y Clasificación (HR)
@@ -12,9 +12,20 @@ Es la parte del workbench HR (`/hr/contractors`) donde HR **gestiona un engageme
 
 Hasta antes de esto, el workbench HR solo mostraba la cola de revisión + el editor de compensación (la tarifa). Ahora HR tiene el detalle completo + los controles de ciclo de vida + la revisión de clasificación.
 
+## Encontrar el engagement: Cola de revisión vs Directorio (TASK-986)
+
+El workbench `/hr/contractors` tiene **dos pestañas**, porque son dos tareas distintas:
+
+- **Cola de revisión** — *triage*. Lista solo los engagements con algo pendiente: envíos de trabajo por aprobar, disputas, payables bloqueados o tarifa sin fijar. Es lo que HR atiende día a día.
+- **Directorio** — *browse*. Lista **todos** los engagements vigentes (activo, en pausa, borrador, terminando), buscables por nombre, ID o estado. Es donde encontrás a un contractor **sano** (activo, tarifa fijada, sin pendientes) que no aparece en la cola porque no tiene nada que atender.
+
+Ambas pestañas abren **el mismo inspector** al seleccionar: mismo detalle, mismos controles de ciclo de vida, misma revisión de clasificación, mismo cierre. El Directorio no agrega gestión nueva — solo hace **alcanzable** a cualquier engagement, no solo a los de la cola.
+
+> Por qué importa: antes, un contractor activo sin pendientes (ej. tras una transición empleado→contractor con la tarifa ya fijada) **no aparecía en ninguna fuente de la cola** y quedaba inalcanzable desde la UI. El Directorio cierra ese hueco.
+
 ## Cómo se usa (desde el inspector)
 
-1. Seleccionás un engagement en la **cola de revisión**.
+1. Seleccionás un engagement en la **cola de revisión** (pendientes) o en el **Directorio** (todos).
 2. El **inspector** (columna derecha) muestra el resumen + los **controles de ciclo de vida** (solo las transiciones válidas desde el estado actual) + dos accesos: **Ver detalle completo** y **Revisar clasificación**.
 
 ## Detalle del engagement
@@ -95,4 +106,4 @@ Resultados posibles: **Sin riesgo** / **Necesita revisión** / **Requiere revisi
 
 Acceso al workbench: route_group `hr` o `efeonce_admin` (viewCode `equipo.contratistas`). Editar términos / mover el ciclo de vida requiere `hr.contractor_engagement:update`. Revisar clasificación requiere `hr.contractor_classification:approve` (EFEONCE_ADMIN, FINANCE_ADMIN o HR_MANAGER).
 
-> Detalle técnico: vistas `src/views/greenhouse/contractors/{ContractorEngagementDetailDrawer,ContractorLifecycleControls,ContractorClassificationReviewDialog,ContractorEngagementTermsDrawer}.tsx`; endpoints `GET/PATCH /api/hr/contractors/[id]` (action transition|review_classification|update); helpers `transitionContractorEngagement`/`reviewContractorClassification`/`updateContractorEngagement`. Spec: [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md).
+> Detalle técnico: vistas `src/views/greenhouse/contractors/{ContractorAdminWorkbenchView,ContractorEngagementDetailDrawer,ContractorLifecycleControls,ContractorClassificationReviewDialog,ContractorEngagementTermsDrawer}.tsx`; el Directorio se proyecta desde `resolveContractorHrWorkbenchProjection().directory` (`listContractorEngagements({ excludeTerminal: true })`) en `src/lib/contractor-engagements/hr-workbench-projection.ts`; endpoints `GET/PATCH /api/hr/contractors/[id]` (action transition|review_classification|update); helpers `transitionContractorEngagement`/`reviewContractorClassification`/`updateContractorEngagement`. Spec: [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md).

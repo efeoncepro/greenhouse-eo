@@ -254,6 +254,19 @@ export const GH_CONTRACTOR_COMPENSATION = {
     loadError: 'No pudimos cargar el detalle del engagement. Intenta de nuevo.',
     retryCta: 'Reintentar'
   },
+  // TASK-986 — Directorio de contractors en el workbench (browse, no solo cola).
+  directory: {
+    tablistAria: 'Vista de contractors',
+    queueTab: 'Cola de revisión',
+    directoryTab: 'Directorio',
+    panelTitle: 'Directorio de contractors',
+    panelSubheader:
+      'Todos los engagements. Selecciona uno para ver detalle, compensación, clasificación o cierre.',
+    caption: 'Directorio de contractors',
+    searchPlaceholder: 'Buscar por nombre, ID o estado',
+    emptyNoMatch: 'Sin contractors que coincidan con la búsqueda.',
+    emptyNone: 'Aún no hay contractors.'
+  },
   // TASK-976 — Contractor onboarding wizard (employee→contractor + new contractor).
   // Path B = "Desde una salida laboral" (transición empleado→contractor sobre un
   // offboarding ejecutado). Path A = "Contractor nuevo" (relación contractor ya

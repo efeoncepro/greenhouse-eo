@@ -226,7 +226,10 @@ export interface ContractorWorkbenchSignal {
 }
 
 export interface ContractorHrWorkbenchProjection {
+  /** Cola de revisión: engagements con ítems accionables (triage). */
   queue: ContractorWorkbenchQueueRow[]
+  /** TASK-986 — directorio: TODOS los engagements no terminales (browse). */
+  directory: ContractorWorkbenchQueueRow[]
   totals: {
     inReview: number
     blocked: number

@@ -11,6 +11,7 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -21,6 +22,7 @@ import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
+import CustomTextField from '@core/components/mui/TextField'
 
 import RemittanceAdviceSection from '@/components/greenhouse/contractors/RemittanceAdviceSection'
 import { MetricSummaryCard, OperationalPanel, OperationalSignalList } from '@/components/greenhouse/primitives'
@@ -172,22 +174,29 @@ const AdminHero = ({
 const AdminQueueTable = ({
   rows,
   selectedId,
-  onSelect
+  onSelect,
+  title = 'Cola de revisión',
+  subheader = 'Prioriza disputas, bloqueos de preparación y soporte pendiente.',
+  icon = 'tabler-list-details',
+  emptyMessage = 'No hay casos contractor en revisión. Cuando llegue un envío o un bloqueo, aparecerá aquí.',
+  caption = 'Cola de revisión de contractors',
+  action
 }: {
   rows: ContractorWorkbenchQueueRow[]
   selectedId: string | null
   onSelect: (engagementId: string) => void
+  title?: string
+  subheader?: string
+  icon?: string
+  emptyMessage?: string
+  caption?: string
+  action?: React.ReactNode
 }) => (
-  <OperationalPanel
-    title='Cola de revisión'
-    subheader='Prioriza disputas, bloqueos de preparación y soporte pendiente.'
-    icon='tabler-list-details'
-    iconColor='primary'
-  >
+  <OperationalPanel title={title} subheader={subheader} icon={icon} iconColor='primary' action={action}>
     {rows.length > 0 ? (
       <Box sx={{ overflowX: 'auto' }}>
         <Table size='small' sx={{ minWidth: 820 }}>
-          <caption className='sr-only'>Cola de revisión de contractors</caption>
+          <caption className='sr-only'>{caption}</caption>
           <TableHead>
             <TableRow>
               <TableCell scope='col'>Contractor</TableCell>
@@ -252,7 +261,7 @@ const AdminQueueTable = ({
       </Box>
     ) : (
       <Alert severity='info' icon={<i className='tabler-clipboard-check' />} role='status'>
-        No hay casos contractor en revisión. Cuando llegue un envío o un bloqueo, aparecerá aquí.
+        {emptyMessage}
       </Alert>
     )}
   </OperationalPanel>
@@ -510,10 +519,32 @@ const ContractorAdminWorkbenchView = ({
     initialReviewed: boolean
   } | null>(null)
 
+  // TASK-986 — tab cola/directorio + búsqueda del directorio.
+  const [activeTab, setActiveTab] = useState<'queue' | 'directory'>('queue')
+  const [directorySearch, setDirectorySearch] = useState('')
+
+  // El Inspector resuelve la selección desde la cola O el directorio (un activo
+  // sano solo está en el directorio).
   const selected = useMemo(
-    () => projection.queue.find(row => row.contractorEngagementId === selectedId) ?? null,
-    [projection.queue, selectedId]
+    () =>
+      projection.queue.find(row => row.contractorEngagementId === selectedId) ??
+      projection.directory.find(row => row.contractorEngagementId === selectedId) ??
+      null,
+    [projection.queue, projection.directory, selectedId]
   )
+
+  const filteredDirectory = useMemo(() => {
+    const q = directorySearch.trim().toLowerCase()
+
+    if (!q) return projection.directory
+
+    return projection.directory.filter(
+      row =>
+        row.contractorName.toLowerCase().includes(q) ||
+        row.engagementPublicId.toLowerCase().includes(q) ||
+        row.statusLabel.toLowerCase().includes(q)
+    )
+  }, [projection.directory, directorySearch])
 
   const refetch = useCallback(async () => {
     try {
@@ -527,8 +558,10 @@ const ContractorAdminWorkbenchView = ({
 
       setProjection(next)
 
-      // Keep the current selection if it still exists; otherwise fall back to the first row.
-      const stillExists = next.queue.some(row => row.contractorEngagementId === selectedId)
+      // Keep the current selection if it still exists (cola o directorio).
+      const stillExists =
+        next.queue.some(row => row.contractorEngagementId === selectedId) ||
+        next.directory.some(row => row.contractorEngagementId === selectedId)
 
       if (!stillExists) {
         setSelectedId(next.queue[0]?.contractorEngagementId ?? null)
@@ -666,7 +699,65 @@ const ContractorAdminWorkbenchView = ({
       <Grid container spacing={6} alignItems='stretch'>
         <Grid size={{ xs: 12, xl: 8 }}>
           <Stack spacing={6}>
-            <AdminQueueTable rows={projection.queue} selectedId={selectedId} onSelect={setSelectedId} />
+            {/* TASK-986 — toggle Cola de revisión (triage) / Directorio (browse all). */}
+            <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap role='tablist' aria-label={CC.directory.tablistAria}>
+              <Button
+                role='tab'
+                aria-selected={activeTab === 'queue'}
+                variant={activeTab === 'queue' ? 'contained' : 'tonal'}
+                color='secondary'
+                size='small'
+                startIcon={<i className='tabler-list-details' />}
+                onClick={() => setActiveTab('queue')}
+              >
+                {CC.directory.queueTab} ({projection.queue.length})
+              </Button>
+              <Button
+                role='tab'
+                data-capture-tab='directory'
+                aria-selected={activeTab === 'directory'}
+                variant={activeTab === 'directory' ? 'contained' : 'tonal'}
+                color='secondary'
+                size='small'
+                startIcon={<i className='tabler-address-book' />}
+                onClick={() => setActiveTab('directory')}
+              >
+                {CC.directory.directoryTab} ({projection.directory.length})
+              </Button>
+            </Stack>
+
+            {activeTab === 'queue' ? (
+              <AdminQueueTable rows={projection.queue} selectedId={selectedId} onSelect={setSelectedId} />
+            ) : (
+              <AdminQueueTable
+                rows={filteredDirectory}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                title={CC.directory.panelTitle}
+                subheader={CC.directory.panelSubheader}
+                icon='tabler-address-book'
+                caption={CC.directory.caption}
+                emptyMessage={directorySearch.trim() ? CC.directory.emptyNoMatch : CC.directory.emptyNone}
+                action={
+                  <CustomTextField
+                    size='small'
+                    placeholder={CC.directory.searchPlaceholder}
+                    value={directorySearch}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDirectorySearch(e.target.value)}
+                    sx={{ minWidth: { xs: 160, sm: 260 } }}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position='start'>
+                            <i className='tabler-search' style={{ fontSize: 18 }} />
+                          </InputAdornment>
+                        )
+                      }
+                    }}
+                  />
+                }
+              />
+            )}
             {selected ? (
               <>
                 <ReadinessPanel row={selected} />
