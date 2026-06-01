@@ -1,3 +1,19 @@
+# Sesion 2026-06-01 — OpenAI Image helper para AI Visual Asset Generator — ✅ IMPLEMENTADO (sin secret hardcodeado)
+
+**Scope**: helper interno de AI assets; no cambia el default productivo. Se agrego adapter server-only `src/lib/ai/openai-image.ts` y se cableo de forma opt-in desde `generateImage()` con `provider='openai-image'` o `GREENHOUSE_IMAGE_PROVIDER=openai-image`. Default sigue `google-imagen`, por lo que los flujos actuales de Imagen/Gemini quedan intactos.
+
+**Capacidades OpenAI**: `generateOpenAIImage()` (Image API text-to-image), `editOpenAIImage()` (referencias/edicion con 1..10 imagenes y mascara opcional, 50MB max por archivo), `runOpenAIImageTool()` (Responses API + `image_generation` tool para iteraciones multi-turn). Modelo default `OPENAI_IMAGE_MODEL=gpt-image-2`; Responses default `OPENAI_IMAGE_RESPONSES_MODEL=gpt-5.5`.
+
+**PNG transparente**: `gpt-image-2` no soporta `background='transparent'`; el helper aplica fallback seguro a `gpt-image-1.5` por defecto cuando se pide transparencia, y devuelve `requestedModel` + `modelFallbackReason`. Se puede forzar fail-closed con `transparentBackgroundStrategy='throw'`.
+
+**Seguridad/runtime**: la API key entregada por chat NO se escribio en env examples ni codigo. Se guardo como GCP Secret Manager `greenhouse-openai-api-key` (version 1 enabled) y se concedio `roles/secretmanager.secretAccessor` a `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`. Vercel quedo configurado con `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key`, `OPENAI_IMAGE_MODEL=gpt-image-2`, `OPENAI_IMAGE_RESPONSES_MODEL=gpt-5.5` y `GREENHOUSE_IMAGE_PROVIDER=openai-image` en Production, Development y Preview branch `develop`. Resolver verificado localmente: `source=secret_manager`, `hasValue=true`, sin imprimir valor. Recomendacion: rotar esta key expuesta por chat cuando el operador lo estime.
+
+**Validacion**: `pnpm vitest run src/lib/ai/openai-image.test.ts` (13/13), ESLint focalizado (`openai-image`, `image-generator`, route), `pnpm exec tsc --noEmit --pretty false`.
+
+**Docs operativos sincronizados**: `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`, `.env.example`, `.env.local.example`. Nota: los agentes pueden elegir providers soportados por el helper (`google-imagen`, `openai-image`) por llamada; nuevos providers futuros deben entrar por el helper canonico, no por scripts paralelos.
+
+---
+
 # Sesion 2026-05-31 — TASK-980 Contractor Run Report "Nómina de Contractors" — ✅ COMPLETE (sin push)
 
 **Rama**: `develop` (sin branch, por instrucción). EPIC-013. **Esperando confirmación para push.**

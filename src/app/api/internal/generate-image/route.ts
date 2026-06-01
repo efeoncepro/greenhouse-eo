@@ -9,6 +9,22 @@ export const dynamic = 'force-dynamic'
 
 const VALID_ASPECT_RATIOS = ['1:1', '16:9', '9:16', '4:3', '3:4'] as const
 const VALID_FORMATS = ['webp', 'png'] as const
+const VALID_PROVIDERS = ['google-imagen', 'openai-image'] as const
+const VALID_OPENAI_QUALITIES = ['auto', 'low', 'medium', 'high'] as const
+const VALID_OPENAI_BACKGROUNDS = ['auto', 'opaque', 'transparent'] as const
+const VALID_OPENAI_TRANSPARENT_STRATEGIES = ['fallback-to-gpt-image-1.5', 'throw', 'opaque'] as const
+
+const VALID_OPENAI_SIZES = [
+  'auto',
+  '1024x1024',
+  '1024x1536',
+  '1536x1024',
+  '1152x2048',
+  '2048x1152',
+  '1536x2048',
+  '2048x1536',
+  '2048x2048'
+] as const
 
 export async function POST(request: Request) {
   // Production guard
@@ -47,6 +63,29 @@ export async function POST(request: Request) {
       options.format = body.format
     }
 
+    if (body.provider && VALID_PROVIDERS.includes(body.provider)) {
+      options.provider = body.provider
+    }
+
+    if (body.quality && VALID_OPENAI_QUALITIES.includes(body.quality)) {
+      options.quality = body.quality
+    }
+
+    if (body.size && VALID_OPENAI_SIZES.includes(body.size)) {
+      options.size = body.size
+    }
+
+    if (body.background && VALID_OPENAI_BACKGROUNDS.includes(body.background)) {
+      options.background = body.background
+    }
+
+    if (
+      body.transparentBackgroundStrategy &&
+      VALID_OPENAI_TRANSPARENT_STRATEGIES.includes(body.transparentBackgroundStrategy)
+    ) {
+      options.transparentBackgroundStrategy = body.transparentBackgroundStrategy
+    }
+
     if (typeof body.filename === 'string' && body.filename.trim()) {
       options.filename = body.filename.trim()
     }
@@ -57,6 +96,10 @@ export async function POST(request: Request) {
       prompt: prompt.slice(0, 100),
       path: result.path,
       format: result.format,
+      provider: result.provider,
+      model: result.model,
+      requestedModel: result.requestedModel,
+      modelFallbackReason: result.modelFallbackReason,
       sizeBytes: result.sizeBytes,
       userId: tenant.userId
     }))
