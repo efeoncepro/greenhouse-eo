@@ -4744,7 +4744,8 @@ Mockups (`**/mockup/**`) excluidos.
 - **NUNCA** centralizar un dominio multi-superficie en un grupo de menú nuevo. Organizar por audiencia/mental-model (regla dura IA). NUNCA por backend schema.
 - **NUNCA** poner 2 primary contained en un header. La acción de crear es la primary; las contextuales (selection-dependent) bajan a tonal.
 - **NUNCA** mover un item de menú a otra sección sin preservar su `canSeeView(viewCode)` filter (la capability NO cambia con el anclaje — caso TASK-982 Slice 1b: "Pagos a contractors" reubicado a Nómina conservando `finanzas.contractor_payables`).
-- **SIEMPRE** que emerja un dominio nuevo con ruta `…/new` o `…/create`, agregar el header CTA + (si no es link estático) declararla en el manifest. El gate (modo `--warn` durante adopción → `--strict` cuando el backlog legacy de 19 huérfanos se triagee) la atrapa.
+- **SIEMPRE** que emerja un dominio nuevo con ruta `…/new` o `…/create`, agregar el header CTA + (si no es link estático) declararla en el manifest. **El gate corre en `--strict` desde TASK-983** (el backlog legacy de 19 se triagió a 0): un `page.tsx` huérfano nuevo **bloquea el build**.
+- El gate reconoce 5 formas de alcanzabilidad (todas determinísticas, NUNCA heurística fuzzy `path:`/`to:`): (1) `href:`/`href=`/`push`/`replace`/`redirect` con string literal, (2) los mismos con **template literal** (`` `/ruta?x=${id}` `` → prefijo estático), (3) **`routes: ['/a','/b']`** arrays (registry data-driven, ej. `AdminCenterView` DomainCard), (4) child declarada en el manifest, (5) dinámica `[id]`.
 
 **Gate**: `scripts/ci/route-reachability-gate.mjs` (`pnpm route-reachability-gate [--strict]`), corre en `ci.yml` warn mode. Manifest SSOT: `src/lib/navigation/route-reachability-manifest.ts`. Spec: `docs/tasks/complete/TASK-982-navigation-reachability-governance-contract.md`. Skills de diseño: `info-architecture` + `greenhouse-ux`.
 

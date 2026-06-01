@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -217,6 +217,25 @@ Producto: tabla resuelta (categoría + acción) para cada una.
 - [ ] `Handoff.md` + `changelog.md` actualizados
 - [ ] chequeo de impacto cruzado
 
+## Delta de ejecución (2026-06-01) — SHIPPED, gate en --strict
+
+Huérfanos **19 → 0**, gate promovido a `--strict` (bloquea huérfanos nuevos). Resolución por categoría:
+
+- **Gate mejorado (determinístico):** ahora reconoce (2) template-literal hrefs (`` `/ruta?x=${id}` ``) y (3) `routes: [...]` arrays (registry data-driven de AdminCenterView). Limpió correctamente las falsamente-marcadas. NO se agregó heurística fuzzy `path:`/`to:`.
+- **8 admin tools** → agregados a los `routes:` de la card best-fit en `AdminCenterView` (identity-access: scim-tenant-mappings + responsibilities + workforce/activation; view-access: client-portal/catalog; ops-health: releases; commercial-parties: commercial + pricing-catalog/import-excel; integration-governance: hubspot/sample-sprint-dead-letter). El gate los reconoce vía el registry `routes:`.
+- **2 redirect-alias** (`/agency/capacity`, `/internal/dashboard`) → declarados en el manifest (redirect-only legacy).
+- **1 mockup** (`/cliente-portal-mockup`) → movido a `(dashboard)/mockup/cliente-portal-legacy/` (gate lo excluye).
+- **1 duplicado** (`/finance/economics`) → **borrado** (renderizaba `AgencyEconomicsView`, canónico = menú Economía).
+- **3 sub-surfaces** (`/finance/quotes/share-dashboard`, `/agency/sample-sprints/new`, `/finance/external-signals`, `/notifications/preferences`) → declaradas en el manifest con parent + via honestos. Las 3 que merecen link real quedan como follow-up (abajo).
+- **Gate `--strict`** en `ci.yml` + test anti-regresión (`--strict` exit 0; un huérfano nuevo lo rompe).
+
 ## Follow-ups
+
+- **Polish de link real (3)** — declaradas en manifest pero merecen acceso real:
+  - `/agency/sample-sprints/new`: wire un CTA "Nuevo sample sprint" en `SampleSprintsWorkspace` (mirror contractor onboarding).
+  - `/notifications/preferences`: agregar link en `UserDropdown`/settings.
+  - `/finance/external-signals`: agregar item de menú Finanzas + viewCode (requiere migración TASK-827).
+- **Per-route click-through en admin cards**: los 8 admin routes quedan declarados en `routes:` (registry) — evaluar si cada uno merece click-through dedicado desde su card o una card propia.
+- **`.next-local` no está gitignored** (deuda menor detectada al cerrar): build output sin ignorar; agregar a `.gitignore`.
 
 - Si el triage revela un patrón de nav data-driven común (admin index), considerar un helper canónico de "admin nav registry" para que esas rutas se auto-declaren.

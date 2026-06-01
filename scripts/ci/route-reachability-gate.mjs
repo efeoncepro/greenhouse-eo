@@ -96,11 +96,29 @@ const normalize = raw => raw.split('?')[0].split('#')[0].replace(/\/+$/, '') || 
 
 const linkedExact = new Set()
 
+// Data-driven nav registries: `routes: ['/a', '/b']` arrays declare the routes a
+// surface covers (e.g. AdminCenterView DomainCard.routes — the admin index registry).
+// Deterministic registry read, NOT a fuzzy heuristic.
+const ROUTES_ARRAY_RE = /routes:\s*\[([\s\S]*?)\]/g
+const ROUTE_LITERAL_RE = /'(\/[^'`]*)'/g
+
 const scanFiles = walk(SCAN_DIR, entry => entry.endsWith('.ts') || entry.endsWith('.tsx'))
 
 for (const file of scanFiles) {
   if (file.endsWith('.test.ts') || file.endsWith('.test.tsx')) continue
   const text = readFileSync(file, 'utf8')
+
+  ROUTES_ARRAY_RE.lastIndex = 0
+  let arr
+
+  while ((arr = ROUTES_ARRAY_RE.exec(text)) !== null) {
+    const inner = arr[1]
+
+    ROUTE_LITERAL_RE.lastIndex = 0
+    let lit
+
+    while ((lit = ROUTE_LITERAL_RE.exec(inner)) !== null) linkedExact.add(normalize(lit[1]))
+  }
 
   for (const re of TEMPLATE_NAV_PATTERNS) {
     re.lastIndex = 0

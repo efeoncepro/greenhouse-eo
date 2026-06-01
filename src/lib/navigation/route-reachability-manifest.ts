@@ -62,6 +62,41 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'redirect-alias',
     reason:
       'Legacy LEGACY_INTERNAL_DASHBOARD_PATH (resolve-portal-home-path); the page only `redirect("/admin")`. Canonical surface is the Admin Center.'
+  },
+  {
+    // TASK-983 triage: quote share dashboard — genuine sub-surface of the quotes flow.
+    route: '/finance/quotes/share-dashboard',
+    parent: '/finance/quotes',
+    via: 'inline-link',
+    reason:
+      'Dashboard de cotizaciones compartidas (TASK-631) — sub-surface del flujo de quotes, alcanzable desde la cola de cotizaciones.'
+  },
+  {
+    // TASK-983 triage: create sub-action. FOLLOW-UP: wire a "Nuevo sample sprint" CTA in
+    // SampleSprintsWorkspace (mirror contractor onboarding). Reachable by direct URL meanwhile.
+    route: '/agency/sample-sprints/new',
+    parent: '/agency/sample-sprints',
+    via: 'header-cta',
+    reason:
+      'Create sample sprint — sub-acción del workspace de Sample Sprints. CTA en el header pendiente (TASK-983 follow-up); alcanzable por URL directa mientras tanto.'
+  },
+  {
+    // TASK-983 triage: alive finance ops surface (TASK-708) without a menu item.
+    // FOLLOW-UP: add a proper Finanzas menu item + viewCode (needs migration, TASK-827).
+    route: '/finance/external-signals',
+    parent: '/finance',
+    via: 'inline-link',
+    reason:
+      'External cash signals ops (TASK-708). Item de menú Finanzas + viewCode pendiente (requiere migración, TASK-983 follow-up); alcanzable por URL directa mientras tanto.'
+  },
+  {
+    // TASK-983 triage: personal notification settings without a link.
+    // FOLLOW-UP: add a link in UserDropdown / settings. Reachable by direct URL meanwhile.
+    route: '/notifications/preferences',
+    parent: '/home',
+    via: 'inline-link',
+    reason:
+      'Preferencias personales de notificaciones. Link en UserDropdown pendiente (TASK-983 follow-up); alcanzable por URL directa mientras tanto.'
   }
 ]
 

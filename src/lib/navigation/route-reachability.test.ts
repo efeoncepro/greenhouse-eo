@@ -33,4 +33,11 @@ describe('route reachability governance (TASK-982)', () => {
     // The onboarding wizard must be reachable (header CTA + manifest) — never orphan.
     expect(output).not.toContain('/hr/contractors/new')
   })
+
+  it('gate in --strict passes with 0 orphans (TASK-983) — a new orphan would fail the build', () => {
+    // execSync throws on non-zero exit; --strict exits 1 if any orphan exists.
+    const output = execSync('node scripts/ci/route-reachability-gate.mjs --strict 2>&1', { encoding: 'utf8' })
+
+    expect(output).toContain('0 orphans')
+  })
 })

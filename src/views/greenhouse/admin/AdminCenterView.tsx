@@ -193,7 +193,14 @@ const buildDomainCards = ({
     },
     href: '/admin/users',
     primaryAction: 'Abrir usuarios',
-    routes: ['/admin/users', '/admin/roles', '/admin/team'],
+    routes: [
+      '/admin/users',
+      '/admin/roles',
+      '/admin/team',
+      '/admin/scim-tenant-mappings',
+      '/admin/responsibilities',
+      '/admin/workforce/activation'
+    ],
     points: [
       `${access.totals.totalUsers} usuarios y ${access.roles.length} roles registrados`,
       `${access.totals.invitedUsers} invitaciones pendientes`,
@@ -209,7 +216,7 @@ const buildDomainCards = ({
     status: { label: 'Baseline actual', color: 'info' },
     href: '/admin/views',
     primaryAction: 'Abrir vistas y acceso',
-    routes: ['/admin/views'],
+    routes: ['/admin/views', '/admin/client-portal/catalog'],
     points: [
       `${access.roles.length} roles visibles en la matrix actual`,
       'Preview de navegación por usuario sobre el baseline vigente',
@@ -311,7 +318,7 @@ const buildDomainCards = ({
     },
     href: '/admin/integrations',
     primaryAction: 'Abrir governance',
-    routes: ['/admin/integrations'],
+    routes: ['/admin/integrations', '/admin/integrations/hubspot/sample-sprint-dead-letter'],
     points: [
       'Taxonomia y ownership de integraciones nativas',
       'Readiness downstream por integracion',
@@ -330,7 +337,7 @@ const buildDomainCards = ({
     },
     href: '/admin/commercial/parties',
     primaryAction: 'Abrir commercial parties',
-    routes: ['/admin/commercial/parties'],
+    routes: ['/admin/commercial/parties', '/admin/commercial', '/admin/pricing-catalog/import-excel'],
     points: [
       'Embudo prospect → opportunity → active_client sobre organizations materializadas',
       'Conflictos de sync HubSpot y señales anti ping-pong visibles desde Admin',
@@ -373,7 +380,7 @@ const buildDomainCards = ({
     },
     href: '/admin/ops-health',
     primaryAction: 'Abrir ops health',
-    routes: ['/admin/ops-health'],
+    routes: ['/admin/ops-health', '/admin/releases'],
     points: [
       `${operations.kpis.outboxEvents24h} eventos en 24h`,
       operations.kpis.hiddenReactiveBacklog > 0
