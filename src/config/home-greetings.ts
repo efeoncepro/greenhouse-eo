@@ -153,7 +153,7 @@ export const HOME_GREETING_CATALOG: HomeGreetingCatalog = {
     'Buena primavera, {name}. ¿Qué tienes en mente?'
   ],
   anoNuevo: [
-    'Feliz año nuevo, {name}. ¿Arrancamos el año?',
+    'Feliz Año Nuevo, {name}. ¿Arrancamos el año?',
     'Año nuevo, operación nueva, {name}. ¿Por dónde partimos?',
     '¿Cómo empezamos el año, {name}?'
   ],

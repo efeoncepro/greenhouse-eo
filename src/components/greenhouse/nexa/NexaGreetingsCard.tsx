@@ -11,13 +11,14 @@
 // `server-only` import — safe to reuse on any surface (home hero, Nexa landing,
 // empty states, etc).
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 
 import Image from 'next/image'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Chip from '@mui/material/Chip'
+import CircularProgress from '@mui/material/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
@@ -25,6 +26,8 @@ import Typography from '@mui/material/Typography'
 import { keyframes } from '@mui/material/styles'
 
 import CustomTextField from '@core/components/mui/TextField'
+
+import useReducedMotion from '@/hooks/useReducedMotion'
 
 // Motion tokens (motion-design canonical): emphasized decelerated curve for
 // state changes. All animations below are CSS-tier (lowest of the 6-tier
@@ -50,6 +53,17 @@ const STATUS_DOTS = [
   { delay: 0.4, restOpacity: 0.3 }
 ]
 
+// Staggered entrance (choreography: hierarchy — avatar → greeting → prompt).
+const entranceUp = keyframes({
+  from: { opacity: 0, transform: 'translateY(10px)' },
+  to: { opacity: 1, transform: 'translateY(0)' }
+})
+
+const entrance = (delayMs: number) => ({
+  animation: `${entranceUp} 380ms ${EASE_EMPHASIZED} ${delayMs}ms backwards`,
+  '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
+})
+
 // Greenhouse design-system color "Secundary/secundary-700" (Figma variable).
 // Brand-blue surface for the Nexa greeting; not part of the MUI palette (whose
 // `secondary` is the neutral gray), so it lives as a named constant here.
@@ -72,6 +86,8 @@ export interface NexaGreetingsAction {
   label: string
   /** Invoked when the chip is selected. */
   onSelect: () => void
+  /** Optional leading Tabler icon class, e.g. "tabler-checklist". */
+  iconClass?: string
 }
 
 export interface NexaGreetingsCardProps {
@@ -85,8 +101,14 @@ export interface NexaGreetingsCardProps {
   actions?: NexaGreetingsAction[]
   /** Label above the prompt field. */
   inputLabel?: string
-  /** Prompt field placeholder. */
+  /** Prompt field placeholder (used when `placeholderExamples` is not provided). */
   placeholder?: string
+  /**
+   * Rotating example prompts. When 2+ are provided, the placeholder cycles
+   * through them with a crossfade — teaching what to ask Nexa. Rotation pauses
+   * on focus / while typing and is disabled under reduced motion.
+   */
+  placeholderExamples?: string[]
   /** Identity chip beside the avatar. */
   nexaChipLabel?: string
   /** Generative-AI disclaimer under the avatar. */
@@ -108,19 +130,61 @@ export const NexaGreetingsCard = ({
   actions = [],
   inputLabel = 'Comienza tu operación con una pregunta',
   placeholder = 'Pregunta sobre RpA, Cycle Time…',
+  placeholderExamples,
   nexaChipLabel = '¡Hola, soy Nexa!',
-  disclaimer = 'Nexa usa IA generativa. Verifica información importante.',
+  disclaimer = 'Nexa usa IA generativa. Verifica la información importante.',
   avatarSrc = DEFAULT_NEXA_AVATAR,
   avatarAlt = 'Nexa, asistente de IA de Greenhouse'
 }: NexaGreetingsCardProps) => {
   const [prompt, setPrompt] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const [exampleIndex, setExampleIndex] = useState(0)
+  const [placeholderVisible, setPlaceholderVisible] = useState(true)
   const inputId = useId()
+  const reducedMotion = useReducedMotion()
+  const canSend = prompt.trim().length > 0
+
+  const hasExamples = Boolean(placeholderExamples && placeholderExamples.length > 0)
+
+  const isRotating = Boolean(
+    !reducedMotion && placeholderExamples && placeholderExamples.length > 1 && !focused && prompt.length === 0
+  )
+
+  const activePlaceholder = hasExamples
+    ? placeholderExamples![exampleIndex % placeholderExamples!.length]
+    : placeholder
+
+  // Crossfade rotation: fade the placeholder out, swap the example, fade back in.
+  useEffect(() => {
+    if (!isRotating) {
+      setPlaceholderVisible(true)
+
+      return
+    }
+
+    const FADE_MS = 220
+    const HOLD_MS = 3800
+
+    const interval = window.setInterval(() => {
+      setPlaceholderVisible(false)
+      window.setTimeout(() => {
+        setExampleIndex(index => index + 1)
+        setPlaceholderVisible(true)
+      }, FADE_MS)
+    }, HOLD_MS)
+
+    return () => window.clearInterval(interval)
+  }, [isRotating])
 
   const handleSubmit = () => {
     const trimmed = prompt.trim()
 
-    if (!trimmed) return
+    if (!trimmed || submitting) return
+    setSubmitting(true)
     onSubmitPrompt(trimmed)
+    // Fallback reset for reusable consumers that don't navigate away.
+    window.setTimeout(() => setSubmitting(false), 1800)
   }
 
   return (
@@ -167,7 +231,7 @@ export const NexaGreetingsCard = ({
         <Stack
           spacing={1.25}
           alignItems='center'
-          sx={{ width: { xs: 116, sm: 124, md: 139 }, flexShrink: 0 }}
+          sx={{ width: { xs: 116, sm: 124, md: 139 }, flexShrink: 0, ...entrance(0) }}
         >
           <Box
             sx={{
@@ -228,7 +292,7 @@ export const NexaGreetingsCard = ({
 
         {/* Right: greeting, role, prompt, quick actions */}
         <Stack spacing={2} sx={{ flex: 1, minWidth: 0, width: '100%' }}>
-          <Stack direction='row' alignItems='flex-start' spacing={1}>
+          <Stack direction='row' alignItems='flex-start' spacing={1} sx={entrance(80)}>
             <Stack spacing={0.5} sx={{ flex: 1, minWidth: 0 }}>
               <Typography
                 component='h1'
@@ -265,7 +329,7 @@ export const NexaGreetingsCard = ({
             </Stack>
           </Stack>
 
-          <Stack spacing={1} sx={{ width: '100%' }}>
+          <Stack spacing={1} sx={{ width: '100%', ...entrance(160) }}>
             {/* Label rendered as a controlled element (full color control on the
                 blue surface) + associated to the input via htmlFor/id. */}
             <Typography
@@ -282,7 +346,9 @@ export const NexaGreetingsCard = ({
                 fullWidth
                 value={prompt}
                 onChange={event => setPrompt(event.target.value)}
-                placeholder={placeholder}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                placeholder={activePlaceholder}
                 aria-label={ARIA_PROMPT_INPUT}
                 sx={{
                   // CustomTextField forces `transparent !important`; on this blue
@@ -302,9 +368,14 @@ export const NexaGreetingsCard = ({
                     borderColor: 'transparent',
                     boxShadow: '0 0 0 2px var(--mui-palette-primary-main), 0 8px 28px rgba(2, 28, 56, 0.28)'
                   },
-                  // Typed text + caret: dark; placeholder: muted but readable.
+                  // Typed text + caret: dark; placeholder: muted but readable,
+                  // with a crossfade for the rotating examples.
                   '& .MuiInputBase-input': { color: 'var(--mui-palette-text-primary)', caretColor: 'var(--mui-palette-primary-main)' },
-                  '& .MuiInputBase-input::placeholder': { color: 'var(--mui-palette-text-secondary)', opacity: 1 }
+                  '& .MuiInputBase-input::placeholder': {
+                    color: 'var(--mui-palette-text-secondary)',
+                    opacity: placeholderVisible ? 1 : 0,
+                    transition: reducedMotion ? 'none' : `opacity 220ms ${EASE_EMPHASIZED}`
+                  }
                 }}
                 slotProps={{
                   input: {
@@ -317,23 +388,29 @@ export const NexaGreetingsCard = ({
                       <InputAdornment position='end'>
                         <IconButton
                           type='submit'
-                          color='primary'
                           aria-label={ARIA_SUBMIT_PROMPT}
-                          disabled={!prompt.trim()}
+                          disabled={!canSend || submitting}
                           edge='end'
                           sx={{
-                            transition: `transform 150ms ${EASE_EMPHASIZED}, opacity 150ms ${EASE_EMPHASIZED}`,
-                            '&:hover': { transform: 'scale(1.08)' },
-                            '&:active': { transform: 'scale(0.9)' },
-                            '&.Mui-disabled': { opacity: 0.45 },
+                            // Filled accent circle when there's a prompt; ghost when empty.
+                            bgcolor: canSend ? 'primary.main' : 'transparent',
+                            color: canSend ? 'common.white' : 'text.disabled',
+                            transition: `transform 150ms ${EASE_EMPHASIZED}, background-color 150ms ${EASE_EMPHASIZED}, color 150ms ${EASE_EMPHASIZED}`,
+                            '&:hover': { bgcolor: canSend ? 'primary.dark' : 'action.hover', transform: 'scale(1.06)' },
+                            '&:active': { transform: 'scale(0.92)' },
+                            '&.Mui-disabled': { bgcolor: 'transparent', color: 'text.disabled', opacity: 1 },
                             '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 2 },
                             '@media (prefers-reduced-motion: reduce)': {
-                              transition: 'opacity 150ms linear',
+                              transition: 'background-color 150ms linear, color 150ms linear',
                               '&:hover, &:active': { transform: 'none' }
                             }
                           }}
                         >
-                          <i className='tabler-send text-xl' />
+                          {submitting ? (
+                            <CircularProgress size={18} thickness={5} sx={{ color: 'common.white' }} />
+                          ) : (
+                            <i className='tabler-send text-xl' />
+                          )}
                         </IconButton>
                       </InputAdornment>
                     )
@@ -351,18 +428,20 @@ export const NexaGreetingsCard = ({
                     variant='outlined'
                     clickable
                     onClick={action.onSelect}
+                    icon={action.iconClass ? <i className={action.iconClass} /> : undefined}
                     sx={{
                       color: 'common.white',
-                      borderColor: 'common.white',
+                      borderColor: 'rgba(255, 255, 255, 0.65)',
                       bgcolor: 'transparent',
                       fontWeight: 500,
                       borderRadius: 'var(--mui-shape-customBorderRadius-sm)',
-                      transition: `background-color 150ms ${EASE_EMPHASIZED}, transform 150ms ${EASE_EMPHASIZED}`,
+                      transition: `background-color 150ms ${EASE_EMPHASIZED}, border-color 150ms ${EASE_EMPHASIZED}, transform 150ms ${EASE_EMPHASIZED}`,
+                      '& .MuiChip-icon': { color: 'common.white', fontSize: '1rem', ml: 0.75, mr: -0.25 },
                       '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.14)', borderColor: 'common.white', transform: 'translateY(-1px)' },
                       '&:active': { transform: 'translateY(0) scale(0.97)' },
                       '&:focus-visible': { outline: '2px solid', outlineColor: 'common.white', outlineOffset: 2 },
                       '@media (prefers-reduced-motion: reduce)': {
-                        transition: `background-color 150ms linear`,
+                        transition: `background-color 150ms linear, border-color 150ms linear`,
                         '&:hover, &:active': { transform: 'none' }
                       }
                     }}
