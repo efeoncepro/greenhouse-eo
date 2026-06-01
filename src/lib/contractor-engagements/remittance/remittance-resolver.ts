@@ -34,12 +34,12 @@ import type { ContractorPayable } from '../payables/types'
 
 import { buildRemittanceAdvice } from './remittance-presenter'
 import { allocateRemittanceAdviceNumber } from './remittance-number-allocator'
+import { deriveContractorRemittanceRegime } from './regime'
 import type {
   RemittanceAdviceInput,
   RemittanceLocale,
   RemittancePresentation,
-  RemittanceProviderDocKind,
-  RemittanceRegime
+  RemittanceProviderDocKind
 } from './types'
 
 const ISSUER_LOGO_SRC = '/branding/logo-full.svg'
@@ -56,21 +56,6 @@ export type RemittanceAdviceResolution =
       locale: RemittanceLocale
     }
   | { ok: false; reason: 'not_found' | 'not_paid' | 'engagement_missing' | 'issuer_unresolved' }
-
-const deriveRegime = (
-  engagement: ContractorEngagement,
-  payable: ContractorPayable
-): RemittanceRegime => {
-  if (engagement.relationshipSubtype === 'honorarios_cl') return 'honorarios_cl'
-
-  const paymentCurrency = payable.paymentCurrency ?? engagement.paymentCurrency
-
-  if (paymentCurrency && paymentCurrency !== payable.currency) return 'cross_currency'
-
-  if (payable.withholdingAmount > 0) return 'international_withholding'
-
-  return 'provider_managed'
-}
 
 const resolveProviderDocument = (
   engagement: ContractorEngagement,
@@ -156,7 +141,7 @@ export const resolveRemittanceAdvice = async (
     resolveContractorLocale(engagement.profileId, options.localeOverride)
   ])
 
-  const regime = deriveRegime(engagement, payable)
+  const regime = deriveContractorRemittanceRegime(engagement, payable)
 
   const withholdingManagedByProvider =
     payable.withholdingAmount === 0 && PROVIDER_OWNED_TAX_OWNERS.has(engagement.taxComplianceOwner)
