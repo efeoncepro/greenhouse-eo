@@ -174,6 +174,9 @@ export async function POST(request: Request) {
         body.metadata && typeof body.metadata === 'object'
           ? (body.metadata as Record<string, unknown>)
           : undefined,
+      // TASK-985 — onboarding deja el engagement activo si la clasificación no es
+      // bloqueante; queda retenido (`draft`) solo ante riesgo bloqueante.
+      activateWhenClassificationNotBlocking: true,
       actorUserId: tenant.userId
     })
 

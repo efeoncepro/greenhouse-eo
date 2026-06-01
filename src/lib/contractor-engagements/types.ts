@@ -194,6 +194,12 @@ export interface CreateContractorEngagementInput {
   startDate: string
   endDate?: string | null
   metadata?: Record<string, unknown>
+  /**
+   * TASK-985 — Onboarding opt-in: tras crear el engagement (nace `draft`),
+   * auto-activar (`draft → active`) cuando la clasificación NO es bloqueante.
+   * Default false → los callers existentes (seeds/tests) conservan el `draft`.
+   */
+  activateWhenClassificationNotBlocking?: boolean
   actorUserId: string
 }
 

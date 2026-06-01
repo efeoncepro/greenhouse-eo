@@ -9,7 +9,11 @@ import type {
 } from '@/lib/workforce/relationship-transition/employee-to-contractor'
 
 import { ContractorEngagementValidationError } from './errors'
-import { createContractorEngagement, getContractorEngagementById } from './store'
+import {
+  activateEngagementIfNotBlocking,
+  createContractorEngagement,
+  getContractorEngagementById
+} from './store'
 import type {
   ContractorEngagement,
   ContractorEngagementPayrollVia,
@@ -222,6 +226,10 @@ export const transitionEmployeeToContractorEngagement = async (
           taxComplianceOwner: input.engagement.taxComplianceOwner,
           classificationRiskFactors: { immediateEmployeeContinuity: true },
           startDate: input.contractorEffectiveFrom,
+          // TASK-985 — onboarding deja el engagement activo si la clasificación no
+          // es bloqueante; `immediateEmployeeContinuity` solo da `needs_review`
+          // (no bloqueante) → se activa. Riesgo bloqueante quedaría retenido.
+          activateWhenClassificationNotBlocking: true,
           actorUserId: input.actorUserId,
           metadata: {
             sourceOffboardingCaseId: input.offboardingCaseId,
@@ -245,7 +253,7 @@ export const transitionEmployeeToContractorEngagement = async (
       )
 
       if (existingEngagementResult.rows[0]) {
-        // Idempotent no-op: relationship + engagement already in place.
+        // Idempotent: relationship + engagement already in place.
         const engagement = await getContractorEngagementById(
           existingEngagementResult.rows[0].contractor_engagement_id
         )
@@ -259,11 +267,20 @@ export const transitionEmployeeToContractorEngagement = async (
           )
         }
 
+        // TASK-985 — heal: si el engagement existente quedó en `draft` huérfano
+        // y su clasificación no es bloqueante, lo activa (re-onboardear completa
+        // la activación que nunca corrió). No-op si ya activo / bloqueante.
+        const healed = await activateEngagementIfNotBlocking(
+          client,
+          engagement,
+          input.actorUserId
+        )
+
         return {
           status: 'already_complete' as const,
           offboardingCaseId: input.offboardingCaseId,
           relationshipId: existingRelationshipId,
-          engagement
+          engagement: healed
         }
       }
 

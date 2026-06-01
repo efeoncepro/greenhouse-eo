@@ -10,7 +10,8 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import {
   computeClassificationRisk,
-  isClassificationRiskBlocking
+  isClassificationRiskBlocking,
+  shouldAutoActivateOnOnboard
 } from './classification-risk'
 import { ContractorEngagementValidationError } from './errors'
 import { assertValidEngagementTransition, isTerminalEngagementStatus } from './state-machine'
@@ -403,6 +404,56 @@ export const publishEngagementEvent = async (
   )
 }
 
+/**
+ * TASK-985 — Onboarding auto-activation. Si el engagement está en `draft` y su
+ * clasificación NO es bloqueante, lo activa (`draft → active`) dentro del
+ * client/tx dado (append `status_changed` + outbox `contractorEngagementActivated`).
+ * No-op si ya salió de `draft` o si el riesgo es bloqueante (queda retenido para
+ * revisión legal). Idempotente + reusable por el onboarding A/B + el heal del
+ * `already_complete`.
+ */
+export const activateEngagementIfNotBlocking = async (
+  client: PoolClient,
+  engagement: ContractorEngagement,
+  actorUserId: string
+): Promise<ContractorEngagement> => {
+  if (engagement.status !== 'draft' || !shouldAutoActivateOnOnboard(engagement.classificationRiskStatus)) {
+    return engagement
+  }
+
+  assertValidEngagementTransition('draft', 'active')
+
+  const result = await client.query<ContractorEngagementRow>(
+    `UPDATE greenhouse_hr.contractor_engagements
+     SET status = 'active'
+     WHERE contractor_engagement_id = $1
+     RETURNING ${SELECT_COLUMNS}`,
+    [engagement.contractorEngagementId]
+  )
+
+  const updated = mapContractorEngagement(result.rows[0])
+
+  await appendEngagementEvent(client, {
+    contractorEngagementId: updated.contractorEngagementId,
+    eventType: 'status_changed',
+    fromStatus: 'draft',
+    toStatus: 'active',
+    actorUserId,
+    reason: 'onboarding_auto_activation',
+    metadata: {
+      lifecycle: 'onboarding_auto_activated',
+      classificationRiskStatus: updated.classificationRiskStatus
+    }
+  })
+
+  await publishEngagementEvent(client, updated, EVENT_TYPES.contractorEngagementActivated, {
+    fromStatus: 'draft',
+    reason: 'onboarding_auto_activation'
+  })
+
+  return updated
+}
+
 // ── Commands ──────────────────────────────────────────────────────────────────
 
 const runCreateContractorEngagement = async (
@@ -529,6 +580,12 @@ const runCreateContractorEngagement = async (
         EVENT_TYPES.contractorEngagementClassificationRiskFlagged,
         { classificationRiskFactors: engagement.classificationRiskFactors }
       )
+    }
+
+    // TASK-985 — Onboarding opt-in: auto-activar si la clasificación no es
+    // bloqueante. Riesgo bloqueante ya emitió el flag arriba y queda en `draft`.
+    if (input.activateWhenClassificationNotBlocking) {
+      return activateEngagementIfNotBlocking(client, engagement, input.actorUserId)
     }
 
     return engagement

@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   computeClassificationRisk,
   deriveFactorRiskLevel,
-  isClassificationRiskBlocking
+  isClassificationRiskBlocking,
+  shouldAutoActivateOnOnboard
 } from './classification-risk'
 
 describe('contractor classification risk gate', () => {
@@ -69,5 +70,14 @@ describe('contractor classification risk gate', () => {
     expect(isClassificationRiskBlocking('needs_review')).toBe(false)
     expect(isClassificationRiskBlocking('legal_review_required')).toBe(true)
     expect(isClassificationRiskBlocking('blocked')).toBe(true)
+  })
+
+  it('shouldAutoActivateOnOnboard activates clear/needs_review, retains blocking (TASK-985)', () => {
+    // clear + needs_review NO son bloqueantes → auto-activar al onboardear.
+    expect(shouldAutoActivateOnOnboard('clear')).toBe(true)
+    expect(shouldAutoActivateOnOnboard('needs_review')).toBe(true)
+    // legal_review_required + blocked → retener en draft para revisión legal.
+    expect(shouldAutoActivateOnOnboard('legal_review_required')).toBe(false)
+    expect(shouldAutoActivateOnOnboard('blocked')).toBe(false)
   })
 })

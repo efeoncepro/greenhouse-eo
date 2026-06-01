@@ -95,3 +95,16 @@ export const computeClassificationRisk = ({
 export const isClassificationRiskBlocking = (
   status: ContractorClassificationRiskStatus
 ): boolean => status === 'legal_review_required' || status === 'blocked'
+
+/**
+ * TASK-985 — Onboarding auto-activation predicate. Un engagement recién
+ * onboardeado se puede activar de inmediato cuando su clasificación NO es
+ * bloqueante (`clear` o `needs_review`). `needs_review` es una señal blanda que
+ * NO traba la activación (mirror del CHECK
+ * `contractor_engagements_active_requires_clear_risk`, que solo bloquea
+ * `legal_review_required`/`blocked`). Solo el riesgo bloqueante retiene el
+ * engagement en `draft` para revisión legal.
+ */
+export const shouldAutoActivateOnOnboard = (
+  status: ContractorClassificationRiskStatus
+): boolean => !isClassificationRiskBlocking(status)
