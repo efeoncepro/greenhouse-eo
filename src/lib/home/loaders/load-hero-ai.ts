@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
+import { HOME_DISCLAIMER, HOME_SUBTITLE, pickHomeGreeting } from '@/config/home-greetings'
 
 import type { HomeHeroAiData } from '../contract'
 import type { HomeLoaderContext } from '../registry'
@@ -47,16 +47,6 @@ const SUGGESTIONS_BY_AUDIENCE: Record<string, HomeHeroAiData['suggestions']> = {
   ]
 }
 
-const pickGreetingPool = (now: Date) => {
-  const hour = now.getHours()
-
-  if (hour >= 5 && hour < 12) return HOME_GREETINGS.morning
-  if (hour >= 12 && hour < 19) return HOME_GREETINGS.afternoon
-  if (hour >= 19 || hour < 5) return HOME_GREETINGS.evening
-
-  return HOME_GREETINGS.default
-}
-
 const GENERIC_NAME_FALLBACKS = new Set(['Usuario', 'Greenhouse', 'agent', 'Agent', ''])
 
 const ROLE_LABEL_BY_AUDIENCE: Record<string, string> = {
@@ -80,8 +70,7 @@ export const loadHomeHeroAi = async (
   options: LoadHomeHeroAiOptions
 ): Promise<HomeHeroAiData> => {
   const now = new Date(ctx.now)
-  const pool = pickGreetingPool(now)
-  const baseGreeting = pool[Math.floor(Math.random() * pool.length)]
+  const baseGreeting = pickHomeGreeting(now)
   // When the user has no real first name (agent auth, fallback) drop the
   // ", {name}" segment entirely so we don't render "Cerrando el día, Usuario".
   const hasRealName = options.firstName && !GENERIC_NAME_FALLBACKS.has(options.firstName)
@@ -109,7 +98,7 @@ export const loadHomeHeroAi = async (
     modelKey: RESOLVED_MODEL_KEY,
     suggestions,
     lastQueryAtMs: null,
-    disclaimer: 'Nexa usa IA generativa. Verifica la información importante.',
+    disclaimer: HOME_DISCLAIMER,
     identity
   }
 }
