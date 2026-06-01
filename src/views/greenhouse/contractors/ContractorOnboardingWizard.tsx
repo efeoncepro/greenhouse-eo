@@ -185,6 +185,8 @@ interface SubmitOutcome {
   path: WizardPath
   status: PathBStatus | 'created'
   engagementPublicId: string | null
+  /** TASK-985 — lifecycle real del engagement resultante (active = quedó activo). */
+  engagementStatus: string | null
   subjectName: string
 }
 
@@ -524,13 +526,14 @@ const ContractorOnboardingWizard = ({ initialExecutedCases, operatingEntity, can
 
         const payload = (await res.json()) as {
           status?: PathBStatus
-          engagement?: { publicId?: string | null } | null
+          engagement?: { publicId?: string | null; status?: string | null } | null
         }
 
         setOutcome({
           path: 'from_offboarding',
           status: payload.status ?? 'transitioned',
           engagementPublicId: payload.engagement?.publicId ?? null,
+          engagementStatus: payload.engagement?.status ?? null,
           subjectName: selectedOffboarding.personName
         })
       } else {
@@ -565,12 +568,16 @@ const ContractorOnboardingWizard = ({ initialExecutedCases, operatingEntity, can
         })
 
         await throwIfNotOk(res, O.submitError)
-        const payload = (await res.json()) as { engagement?: { publicId?: string | null } | null }
+
+        const payload = (await res.json()) as {
+          engagement?: { publicId?: string | null; status?: string | null } | null
+        }
 
         setOutcome({
           path: 'new_contractor',
           status: 'created',
           engagementPublicId: payload.engagement?.publicId ?? null,
+          engagementStatus: payload.engagement?.status ?? null,
           subjectName: personLabel(selectedPerson)
         })
       }
@@ -1538,6 +1545,8 @@ const ConfirmStep = ({
 const OutcomePanel = ({ outcome }: { outcome: SubmitOutcome }) => {
   const prefersReduced = useReducedMotion()
   const isB = outcome.path === 'from_offboarding'
+  // TASK-985 — el engagement se auto-activa si la clasificación no es bloqueante.
+  const activated = outcome.engagementStatus === 'active'
 
   const { severity, icon, title, description } = isB
     ? {
@@ -1593,9 +1602,18 @@ const OutcomePanel = ({ outcome }: { outcome: SubmitOutcome }) => {
         </Box>
 
         {outcome.engagementPublicId ? (
-          <Stack direction='row' spacing={2} alignItems='flex-start' sx={{ color: 'text.secondary' }}>
-            <i className='tabler-info-circle' style={{ fontSize: 18, marginTop: 2 }} aria-hidden />
-            <Typography variant='caption'>{O.outcomeDraftNote}</Typography>
+          <Stack
+            direction='row'
+            spacing={2}
+            alignItems='flex-start'
+            sx={{ color: activated ? 'success.main' : 'text.secondary' }}
+          >
+            <i
+              className={activated ? 'tabler-circle-check' : 'tabler-info-circle'}
+              style={{ fontSize: 18, marginTop: 2 }}
+              aria-hidden
+            />
+            <Typography variant='caption'>{activated ? O.outcomeActiveNote : O.outcomeRetainedNote}</Typography>
           </Stack>
         ) : null}
       </Stack>
@@ -1635,7 +1653,7 @@ const GuidancePanel = ({ path }: { path: WizardPath | null }) => (
       <Stack direction='row' spacing={2} alignItems='flex-start'>
         <i className='tabler-file-pencil' style={{ fontSize: 18, marginTop: 2 }} aria-hidden />
         <Typography variant='caption' sx={{ color: 'text.secondary' }}>
-          {O.outcomeDraftNote}
+          {O.confirmStepDraftReview}
         </Typography>
       </Stack>
     </Stack>

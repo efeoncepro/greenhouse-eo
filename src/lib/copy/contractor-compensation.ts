@@ -364,9 +364,10 @@ export const GH_CONTRACTOR_COMPENSATION = {
     confirmWillHappen: 'Qué va a pasar',
     confirmStepCloseEmployee: 'Se cierra la relación de empleado (append-only, auditada).',
     confirmStepOpenContractor: 'Se abre la relación de contractor.',
-    confirmStepCreateEngagement: 'Se crea el engagement en estado Borrador.',
-    confirmStepCreateEngagementA: 'Se crea el engagement sobre la relación contractor existente.',
-    confirmStepDraftReview: 'Queda en Borrador con clasificación pendiente de revisión.',
+    confirmStepCreateEngagement: 'Se crea el engagement y se activa si la clasificación no es bloqueante.',
+    confirmStepCreateEngagementA:
+      'Se crea el engagement sobre la relación contractor existente y se activa si la clasificación no es bloqueante.',
+    confirmStepDraftReview: 'Si hay riesgo de clasificación bloqueante, queda retenido para revisión legal.',
     createCta: 'Crear contractor',
     backCta: 'Atrás',
     nextCta: 'Siguiente',
@@ -385,6 +386,10 @@ export const GH_CONTRACTOR_COMPENSATION = {
     outcomeAlreadyDescription: 'Esta salida ya había sido transicionada. No se creó nada nuevo.',
     outcomeEngagementId: 'ID del engagement',
     outcomeDraftNote: 'Queda en estado Borrador. Revisá la clasificación antes de activar.',
+    // TASK-985 — nota del resultado, condicional al estado real del engagement.
+    outcomeActiveNote: 'El contractor quedó activo.',
+    outcomeRetainedNote:
+      'Quedó retenido para revisión de clasificación antes de activar (riesgo de reclasificación).',
 
     // Outcome (Path A) success.
     outcomeCreatedTitle: 'Contractor creado',
