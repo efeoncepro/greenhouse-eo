@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -133,6 +133,24 @@ Producto: tabla resuelta (categoría + acción) para cada una.
 - Cambiar `ci.yml` `pnpm route-reachability-gate` → `pnpm route-reachability-gate --strict`.
 - Verificar que CI bloquea un huérfano sintético (smoke).
 - Actualizar el comentario en `ci.yml` + el invariante CLAUDE.md (gate ahora strict).
+
+## Triage Result + Resolution Doctrine (2026-06-01)
+
+**Doctrina (veredicto arch-architect + info-architecture + greenhouse-ux):** hacer la ruta **genuinamente alcanzable en la superficie de nav canónica** (link real) **> declarar en manifest > borrar**. El manifest es la excepción (sub-acciones intencionales), no el default. Gate-improvement por regex fuzzy (`path:`/`to:`) RECHAZADO (riesgo de falso negativo = esconder huérfanos). Única mejora de gate aceptada: leer formas de nav **determinísticas** (template-literal hrefs).
+
+**Mejora de gate aplicada (commit de este task):** el gate ahora matchea **template-literal hrefs** (`` href={`/ruta?x=${id}`} ``) extrayendo el prefijo estático. Determinístico, no heurístico. Bajó huérfanos **19 → 16** correctamente (cleared: `/admin/identity/drift-reconciliation` [reached desde offboarding closure CTA], `/dashboard`, +1).
+
+**16 restantes — clasificación evidence-backed + acción canónica:**
+
+| Categoría | Rutas | Acción canónica | ¿Necesita decisión del operador? |
+|---|---|---|---|
+| **Admin tools vivos sin card** (8) | `/admin/{commercial,releases,responsibilities,scim-tenant-mappings,workforce/activation,pricing-catalog/import-excel,client-portal/catalog,integrations/hubspot/sample-sprint-dead-letter}` | Agregar card en `AdminCenterView` (índice admin canónico) — tienen view+API vivos | **Sí — IA**: ¿van todos al índice admin? (recomendado sí) |
+| **Create sub-action** (1) | `/agency/sample-sprints/new` | Header CTA "Nuevo sample sprint" en `/agency/sample-sprints` + declarar child en manifest (mirror onboarding contractors) | No — mecánico |
+| **Settings sin link** (1) | `/notifications/preferences` | Agregar link en `UserDropdown`/perfil | No — mecánico |
+| **Mockup mal ubicado** (1) | `/cliente-portal-mockup` | Mover bajo `**/mockup/**` o borrar (0 refs) | **Sí — borrar vs mover** |
+| **Posiblemente muertas** (5) | `/agency/capacity`, `/finance/{economics,external-signals,quotes/share-dashboard}`, `/internal/dashboard` (`LEGACY_INTERNAL_DASHBOARD_PATH`) | Confirmar dead-or-alive → link si viva, borrar si muerta | **Sí — producto**: dead-or-alive |
+
+**Por qué no se resolvieron las 16 automáticamente:** borrar una superficie viva o decidir su lugar en el índice admin son decisiones del operador (no se papelean en el manifest ni se borran sin confirmar cero-uso — regla dura del overlay arch + de este task). El gate queda en `--warn` hasta resolverlas; promover a `--strict` (Slice 3) es el último paso una vez en 0.
 
 ## Out of Scope
 

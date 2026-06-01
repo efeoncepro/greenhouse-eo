@@ -68,9 +68,11 @@ return '/' + segments.join('/')
 const isDynamic = route => route.includes('[')
 
 // ── Build the set of internally-linked routes (the reachability surface) ──────
-// Match static route literals in the common Next.js navigation forms. Template
-// literals (backtick) are intentionally NOT matched here — dynamic routes are
-// covered by rule (c)/(d).
+// Match route literals in the common Next.js navigation forms — including
+// TEMPLATE literals (backtick), since a very common pattern is
+// `href={`/admin/x?memberId=${id}`}`. Template targets are matched by their
+// STATIC prefix (everything before the first `${` and before `?`/`#`), which is
+// deterministic (real nav intent), NOT a fuzzy `path:`/`to:` heuristic.
 const NAV_PATTERNS = [
   /href:\s*'(\/[^'`]*)'/g, // object literal (VerticalMenu + menu data)
   /href:\s*"(\/[^"`]*)"/g,
@@ -82,6 +84,14 @@ const NAV_PATTERNS = [
   /\b(?:redirect|permanentRedirect)\(\s*"(\/[^"`]*)"/g
 ]
 
+// Template-literal nav targets: capture the static head up to the first `${`.
+const TEMPLATE_NAV_PATTERNS = [
+  /href:\s*`(\/[^`$]*)/g,
+  /href=\{?\s*`(\/[^`$]*)/g,
+  /\.(?:push|replace)\(\s*`(\/[^`$]*)/g,
+  /\b(?:redirect|permanentRedirect)\(\s*`(\/[^`$]*)/g
+]
+
 const normalize = raw => raw.split('?')[0].split('#')[0].replace(/\/+$/, '') || '/'
 
 const linkedExact = new Set()
@@ -91,6 +101,13 @@ const scanFiles = walk(SCAN_DIR, entry => entry.endsWith('.ts') || entry.endsWit
 for (const file of scanFiles) {
   if (file.endsWith('.test.ts') || file.endsWith('.test.tsx')) continue
   const text = readFileSync(file, 'utf8')
+
+  for (const re of TEMPLATE_NAV_PATTERNS) {
+    re.lastIndex = 0
+    let m
+
+    while ((m = re.exec(text)) !== null) linkedExact.add(normalize(m[1]))
+  }
 
   for (const re of NAV_PATTERNS) {
     re.lastIndex = 0
