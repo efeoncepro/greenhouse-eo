@@ -764,6 +764,7 @@ export const EVENT_TYPES = {
   contractorPayableCreated: 'workforce.contractor_payable.created',
   contractorPayableReadyForFinance: 'workforce.contractor_payable.ready_for_finance',
   contractorPayableObligationCreated: 'workforce.contractor_payable.obligation_created',
+  contractorPayablePaymentOrderCreated: 'workforce.contractor_payable.payment_order_created',
   contractorPayableBlocked: 'workforce.contractor_payable.blocked',
   contractorPayableCancelled: 'workforce.contractor_payable.cancelled',
 

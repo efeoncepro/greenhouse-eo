@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `In progress (2026-05-31, develop sin branch por instrucción)`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-977`

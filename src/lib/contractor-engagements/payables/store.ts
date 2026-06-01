@@ -218,6 +218,7 @@ type PayableEventType =
   | 'created'
   | 'ready_for_finance'
   | 'obligation_created'
+  | 'payment_order_created'
   | 'blocked'
   | 'cancelled'
   | 'updated'
@@ -1033,3 +1034,82 @@ export const markPayableObligationCreated = async (input: {
 
     return updated
   })
+
+/**
+ * TASK-979 — transición canónica `obligation_created → payment_order_created`.
+ *
+ * Es el writer ÚNICO de `payment_order_created` para contractor payables: cuando la
+ * corrida mensual (o cualquier creación de payment order desde la obligación del
+ * payable) batchea la obligación en una payment order, el payable debe avanzar a
+ * `payment_order_created` (la state machine exige este estado intermedio antes de
+ * `paid` — sin él el payable nunca llega a `paid`).
+ *
+ * Dual-mode: si recibe `client`, corre dentro de la transacción del caller
+ * (atomicidad con `createPaymentOrderFromObligations`); si no, abre su propia tx.
+ * Idempotente: re-llamar con el mismo `paymentOrderId` cuando ya está en
+ * `payment_order_created` es un no-op.
+ */
+const markPayablePaymentOrderCreatedTx = async (
+  client: PoolClient,
+  input: {
+    contractorPayableId: string
+    paymentOrderId: string
+    actorUserId: string
+  }
+): Promise<ContractorPayable> => {
+  const current = await lockPayable(client, input.contractorPayableId)
+
+  if (
+    current.status === 'payment_order_created' &&
+    current.paymentOrderId === input.paymentOrderId
+  ) {
+    return current
+  }
+
+  if (current.status !== 'obligation_created') {
+    throw new ContractorEngagementValidationError(
+      `No se puede registrar la orden de pago desde el estado ${current.status}.`,
+      'payable_not_obligation_created',
+      409
+    )
+  }
+
+  const result = await client.query<ContractorPayableRow>(
+    `UPDATE greenhouse_hr.contractor_payables
+     SET status = 'payment_order_created', payment_order_id = $2
+     WHERE contractor_payable_id = $1
+     RETURNING ${PAYABLE_SELECT_COLUMNS}`,
+    [input.contractorPayableId, input.paymentOrderId]
+  )
+
+  const updated = mapContractorPayable(result.rows[0])
+
+  await appendPayableEvent(client, {
+    contractorPayableId: updated.contractorPayableId,
+    eventType: 'payment_order_created',
+    fromStatus: current.status,
+    toStatus: updated.status,
+    actorUserId: input.actorUserId,
+    metadata: { paymentOrderId: input.paymentOrderId }
+  })
+  await publishPayableEvent(client, updated, EVENT_TYPES.contractorPayablePaymentOrderCreated, {
+    paymentOrderId: input.paymentOrderId
+  })
+
+  return updated
+}
+
+export const markPayablePaymentOrderCreated = async (
+  input: {
+    contractorPayableId: string
+    paymentOrderId: string
+    actorUserId: string
+  },
+  client?: PoolClient
+): Promise<ContractorPayable> => {
+  if (client) {
+    return markPayablePaymentOrderCreatedTx(client, input)
+  }
+
+  return withGreenhousePostgresTransaction((tx) => markPayablePaymentOrderCreatedTx(tx, input))
+}

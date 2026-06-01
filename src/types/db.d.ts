@@ -8716,6 +8716,24 @@ export interface GreenhouseServingUserRecentItems {
   visit_count: Generated<number>;
 }
 
+export interface GreenhouseSyncContractorPaymentRuns {
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  cutoff_date: Timestamp | null;
+  notes: string | null;
+  obligations_swept: number | null;
+  payables_included: number | null;
+  payment_run_id: Generated<string>;
+  period_month: number;
+  period_year: number;
+  prepared_order_ids: Generated<string[]>;
+  started_at: Generated<Timestamp>;
+  status: string;
+  totals_by_currency: Json | null;
+  trigger_source: Generated<string>;
+  triggered_by_user_id: string | null;
+}
+
 export interface GreenhouseSyncGithubReleaseWebhookEvents {
   action: string | null;
   check_run_id: Int8 | null;
@@ -9856,6 +9874,7 @@ export interface DB {
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
   "greenhouse_serving.user_360": GreenhouseServingUser360;
   "greenhouse_serving.user_recent_items": GreenhouseServingUserRecentItems;
+  "greenhouse_sync.contractor_payment_runs": GreenhouseSyncContractorPaymentRuns;
   "greenhouse_sync.github_release_webhook_events": GreenhouseSyncGithubReleaseWebhookEvents;
   "greenhouse_sync.handler_health": GreenhouseSyncHandlerHealth;
   "greenhouse_sync.handler_health_transitions": GreenhouseSyncHandlerHealthTransitions;
