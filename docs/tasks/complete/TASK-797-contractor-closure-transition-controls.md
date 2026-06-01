@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Implementacion`
+- Status real: `Complete (backend) — UI closure drawer = follow-up`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `TASK-790, TASK-793` (ambas complete)
@@ -113,13 +113,25 @@ Reglas obligatorias:
 - Device/asset management full automation.
 - Employee finiquito.
 
+## Implementation (2026-06-01, develop)
+
+Backend vertical completo. Diseño: closure = lifecycle propio sobre el state machine existente (`active/paused → ending → ended`) + columnas de metadata; sin tabla/aggregate aparte (audit en `contractor_engagement_events`).
+
+- **Slice 1** (`b…`): migration `20260601131829099` (8 columnas de cierre + CHECK enum `closure_reason` + anti pre-up-marker) + módulo `closure/` (types + pure `evaluateContractorClosureReadiness`, 8 tests).
+- **Slice 2**: `closure/store.ts` (`assessContractorClosureReadiness`, `initiateContractorClosure`, `executeContractorClosure` atómico gateado) + evento `workforce.contractor_engagement.closure_initiated v1` + signal `hr.contractor_engagement.closed_with_open_payables`.
+- **Slice 3**: guard post-cierre en work-submission create (`isPostClosureLockedEngagementStatus`) + payable create (`assertPayableCreationAllowedForClosure`) + `setPostClosureInvoicesAllowed` + API `GET/POST /api/hr/contractors/[id]/closure` + funnel de la transición genérica (`use_closure_flow`).
+
+Helpers canónicos: `evaluateContractorClosureReadiness` (pure), `assessContractorClosureReadiness` / `initiateContractorClosure` / `executeContractorClosure` / `setPostClosureInvoicesAllowed` (server). Capability reusada `hr.contractor_engagement:manage`/`:read` (sin capability nueva).
+
+**UI follow-up (no en este pase)**: closure drawer en el HR workbench `/hr/contractors` (consumiría `GET .../closure` → readiness + botón initiate/execute con acknowledge). Los 5 acceptance criteria quedan backend-enforced; la UI es surface de consumo. Recomendado abrir TASK derivada (alineado con la doctrina IA de TASK-982: header action + drawer por fila).
+
 ## Acceptance Criteria
 
-- [ ] Contractor closure never exposes "Calcular finiquito".
-- [ ] Exit eligibility (TASK-890) lanes intactas: closure contractor no altera la clasificación de `work_relationship_offboarding_cases` ni reactiva relación dependiente.
-- [ ] Open invoice/submission/payable blockers are visible.
-- [ ] Post-closure invoice path is explicit and audited.
-- [ ] New work submissions are blocked after closure.
+- [x] Contractor closure never exposes "Calcular finiquito". (Cierre es flujo propio; cero código de finiquito tocado.)
+- [x] Exit eligibility (TASK-890) lanes intactas: closure contractor no altera la clasificación de `work_relationship_offboarding_cases` ni reactiva relación dependiente. (Offboarding intacto; gate 566 verde.)
+- [x] Open invoice/submission/payable blockers are visible. (`GET .../closure` → `readiness.blockers`.)
+- [x] Post-closure invoice path is explicit and audited. (`post_closure_invoices_allowed` + `setPostClosureInvoicesAllowed` + audit event + guard en payable create.)
+- [x] New work submissions are blocked after closure. (`isPostClosureLockedEngagementStatus` en create.)
 
 ## Verification
 
@@ -130,6 +142,20 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Lifecycle and folder synchronized.
-- [ ] `docs/tasks/README.md` synchronized.
-- [ ] `Handoff.md` updated.
+- [x] Lifecycle and folder synchronized.
+- [x] `docs/tasks/README.md` synchronized.
+- [x] `Handoff.md` updated.
+- [x] `changelog.md` entry.
+- [x] Arch Delta (`GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` 1.11) + EVENT_CATALOG + RELIABILITY_CONTROL_PLANE Deltas.
+- [x] `CLAUDE.md` invariant section.
+- [x] Doc funcional `hr/contratistas-engagement-ciclo-de-vida.md` v1.1 (sección Cierre).
+- [x] Cross-impact: `## Delta` en `TASK-962`.
+
+### Verification run (2026-06-01)
+
+- `pnpm exec tsc --noEmit` → 0
+- `pnpm lint` → 0
+- `pnpm build` → exit 0 (Turbopack boundary OK; nuevo barrel export `./closure` es pure)
+- `pnpm test` → **5759 passed, 0 failures** (43 skipped)
+- `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` → **566 passed** (hard non-regression gate)
+- Live PG smoke (proxy): columnas de cierre selectables; signal `hr.contractor_engagement.closed_with_open_payables` = `ok`; `assessContractorClosureReadiness(EO-CENG-0001)` → ready=true.

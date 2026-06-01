@@ -5,9 +5,15 @@
 > Versión: `1.9`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-31` por TASK-979 (contractor unbatched-overdue signal)
+> Última actualización: `2026-06-01` por TASK-797 (contractor closed-with-open-payables signal)
 
 ---
+
+## Delta 2026-06-01 — TASK-797: signal `hr.contractor_engagement.closed_with_open_payables`
+
+Nuevo signal canonical bajo `moduleKey='identity'` (rollup `Identity & Access`, kind `data_quality`). Defense-in-depth del cierre contractor (TASK-797): cuenta engagements en estado terminal (`ended`/`cancelled`) que TODAVÍA tienen ≥1 payable NO terminal (`status NOT IN ('paid','cancelled')`). Steady state esperado = 0. Severity: 0 → ok, >0 → warning, query falla → unknown. Aparece > 0 cuando un cierre se ejecutó reconociendo (acknowledge) payables abiertos que aún deben liquidarse fuera del flujo, o ante un bypass del flujo de cierre. NUNCA es finiquito — solo integridad de payables del cierre.
+
+- Reader: [`src/lib/reliability/queries/contractor-engagement-closed-with-open-payables.ts`](../../src/lib/reliability/queries/contractor-engagement-closed-with-open-payables.ts). Wire-up en [`get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts). Mirror de `hr.contractor_engagement.classification_risk_open` (TASK-790).
 
 ## Delta 2026-06-01 — TASK-981: signal `finance.contractor_remittance_email.dead_letter`
 

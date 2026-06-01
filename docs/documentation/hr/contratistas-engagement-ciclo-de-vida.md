@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-31 por Claude (TASK-975)
-> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-975)
+> **Ultima actualizacion:** 2026-06-01 por Claude (TASK-797 — cierre contractor)
 > **Documentacion tecnica:** [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
 
 # Engagement de Contractor — Detalle, Ciclo de Vida y Clasificación (HR)
@@ -45,6 +45,30 @@ Desde el header del detalle podés **Editar términos**.
 La UI **solo ofrece las transiciones válidas** del estado actual. Las transiciones de cierre/pausa/cancelación piden **motivo**. Los estados terminales (finalizado/cancelado) no admiten más cambios.
 
 > **Importante**: "Activar" **desaparece** cuando el riesgo de clasificación está **bloqueante** (requiere revisión legal o bloqueado). Primero hay que revisar la clasificación.
+
+## Cierre del contractor (TASK-797)
+
+Cerrar un contractor es un **flujo propio — NUNCA un finiquito laboral**. No usa "Calcular finiquito", no aplica causales DT, no toca el offboarding de empleados dependientes ni reactiva relaciones.
+
+El cierre tiene **dos pasos** (sobre el ciclo de vida del engagement):
+
+1. **Iniciar cierre** → el engagement pasa a **"En cierre"** (winding-down). Desde ahí **no se aceptan nuevas work submissions**, pero los payables de trabajo ya aprobado sí se liquidan.
+2. **Ejecutar cierre** → el engagement queda **"Finalizado"**. Está **gateado por un checklist (readiness)**.
+
+**El checklist (readiness)** muestra los **bloqueadores** antes de cerrar:
+
+| Bloqueador | Qué significa |
+|---|---|
+| Work submissions abiertas | Hay trabajo sin resolver (borrador/enviado/en disputa/aprobado). |
+| Payables abiertos | Hay pagos sin liquidar. |
+| Falta ref de terminación del provider | Solo para carril EOR/plataforma (Deel/Remote/Oyster). |
+| Riesgo de clasificación bloqueante | Hay revisión legal pendiente. |
+
+Todos los bloqueadores son **reconocibles (acknowledge)**: el operador puede cerrar de todas formas **declarando una razón** (queda auditado). Sin reconocerlos, el cierre final queda bloqueado.
+
+Además aparece un **recordatorio de access offboarding** (cuando el contractor tiene usuario del portal): el cierre **no desactiva accesos** — eso es un proceso aparte.
+
+**Invoices post-cierre**: tras "Finalizado", **no se crean nuevos pagos** salvo que se habilite explícitamente la política "permitir invoices post-cierre" (decisión auditada). Un engagement **cancelado** nunca permite pagos.
 
 ## Revisión de clasificación laboral (riesgo de reclasificación)
 

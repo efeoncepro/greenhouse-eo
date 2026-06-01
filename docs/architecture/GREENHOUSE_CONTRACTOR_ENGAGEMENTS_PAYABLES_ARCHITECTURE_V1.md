@@ -1,8 +1,22 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.10
+**Version:** 1.11
 **Created:** 2026-05-05
-**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + Employee→Contractor connected command (TASK-956) + **Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification (TASK-957)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955), contractor closure (TASK-797) and ops control plane (TASK-798) remain proposals.
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + Employee→Contractor connected command (TASK-956) + Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification (TASK-957) + **Contractor Closure + Transition Controls (TASK-797)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955) and ops control plane (TASK-798) remain proposals.
+
+## Delta 2026-06-01 — TASK-797 Contractor Closure + Transition Controls shipped (backend)
+
+Cierre contractor como **lifecycle propio** (NUNCA finiquito laboral), modelado sobre el state machine existente `active/paused → ending → ended` + columnas de metadata de cierre. **NO** se creó tabla/aggregate aparte: el cierre es 1:1 con el engagement y el audit ya vive en `contractor_engagement_events` (append-only trio TASK-790).
+
+- **Schema** (migration `20260601131829099`): `contractor_engagements` += `closure_reason` (CHECK enum cerrado: contract_completed/mutual_agreement/contractor_resignation/non_renewal/terminated_for_cause/converted_to_employee/provider_terminated/other), `closure_effective_date`, `provider_termination_ref` (solo carril EOR/provider), `closure_initiated_at/by`, `closure_executed_at/by`, `post_closure_invoices_allowed` (default FALSE).
+- **Readiness** (`closure/readiness.ts`, pure — mirror de `evaluatePayableReadiness`): blockers ACKNOWLEDGEABLE (open work submissions, open payables, provider_termination_ref_missing, classification_risk_blocking) — el operador puede cerrar con override declarando razón; `ready` exige cero blockers SIN reconocer. Advisory `access_handoff_reminder` (informativo, NUNCA bloquea — el access offboarding es SEPARADO).
+- **Comandos** (`closure/store.ts`, server-only): `assessContractorClosureReadiness` (resolver read-only), `initiateContractorClosure` (→ ending, winding-down), `executeContractorClosure` (→ ended, gateado, atómico two-step), `setPostClosureInvoicesAllowed` (política post-cierre).
+- **Post-closure policy**: nuevas work submissions bloqueadas en ending/ended/cancelled (`isPostClosureLockedEngagementStatus`); payables bloqueados tras `ended` salvo `post_closure_invoices_allowed`, `cancelled` nunca permite payables; durante `ending` se liquidan los payables de trabajo aprobado.
+- **API**: `GET/POST /api/hr/contractors/[id]/closure` (initiate|execute|allow_post_closure_invoices, capability `hr.contractor_engagement:manage`/`:read`). La transición genérica `PATCH [id]` ahora rechaza `ending`/`ended` → funnel al flujo de cierre (sin bypass del gate).
+- **Eventos**: `workforce.contractor_engagement.closure_initiated v1` (nuevo) + `ended v1` reusado con payload enriquecido.
+- **Reliability signal**: `hr.contractor_engagement.closed_with_open_payables` (data_quality, moduleKey=identity, steady=0) — defense-in-depth: cierres con payables abiertos por liquidar.
+- **Boundary duro (TASK-890)**: NUNCA `final_settlements`/causales DT, NUNCA toca lanes de `work_relationship_offboarding_cases`, NUNCA reactiva relación dependiente. Gate de cierre `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde (566). Invariantes en `CLAUDE.md` → "Contractor Closure + Transition Controls invariants (TASK-797)".
+- **UI** (follow-up): el closure drawer en el HR workbench `/hr/contractors` queda como surface de consumo derivada; los 5 acceptance criteria son contratos backend-enforced (readiness vía API, submissions bloqueadas, post-closure explícito, nunca finiquito). Spec: `docs/tasks/in-progress/TASK-797-contractor-closure-transition-controls.md`.
 
 ## Delta 2026-06-01 — TASK-981 Contractor Payable `paid` lifecycle + Remittance Email shipped
 

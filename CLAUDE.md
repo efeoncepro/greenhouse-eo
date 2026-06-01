@@ -4530,6 +4530,29 @@ Una persona puede cobrar por **dos rieles de pago que no se hablan**: la nómina
 
 **Spec canónica**: `docs/tasks/complete/TASK-957-contractor-payroll-double-rail-exclusion-contract-type-reconciliation.md`. Arch: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30. Helpers: `resolveContractorExcludedMemberIds`, `resolveCurrentWorkClassification`. Señal: `payroll.contractor.double_rail_overlap`.
 
+### Contractor Closure + Transition Controls invariants (TASK-797, desde 2026-06-01)
+
+El cierre de un contractor es un **lifecycle PROPIO** — **NUNCA finiquito laboral**. Se modela sobre el state machine existente del engagement (`active/paused → ending → ended`, TASK-790) + columnas de metadata de cierre en `greenhouse_hr.contractor_engagements`. **NO** hay tabla/aggregate de cierre aparte (el cierre es 1:1 con el engagement; el audit vive en el append-only `contractor_engagement_events`). Módulo: `src/lib/contractor-engagements/closure/` (barrel pure-only: types + readiness; el store es server-only, importado directo).
+
+**Readiness** (`closure/readiness.ts`, pure — mirror de `evaluatePayableReadiness` TASK-793): blockers **ACKNOWLEDGEABLE** (`open_work_submissions`, `open_payables`, `provider_termination_ref_missing`, `classification_risk_blocking`) — el operador puede cerrar de todas formas reconociéndolos con razón (override gobernado + auditado); `ready` exige cero blockers SIN reconocer. Advisory `access_handoff_reminder` (solo si hay portal member): informativo, **NUNCA bloquea** — el access offboarding es SEPARADO del cierre contractual.
+
+**Comandos** (`closure/store.ts`, server-only): `assessContractorClosureReadiness` (resolver read-only), `initiateContractorClosure` (→ `ending`, winding-down), `executeContractorClosure` (→ `ended`, readiness-gated, atómico two-step active/paused→ending→ended en una tx), `setPostClosureInvoicesAllowed` (política post-cierre). API: `GET/POST /api/hr/contractors/[id]/closure` (capability `hr.contractor_engagement:manage`/`:read`).
+
+**⚠️ Reglas duras (boundary payroll TASK-890 + canónicas)**:
+
+- **NUNCA** disparar `greenhouse_payroll.final_settlements`/`final_settlement_documents` ni el flujo "Calcular finiquito" desde el cierre contractor. El cierre es `contractor_closure` (lifecycle propio), no finiquito dependiente. NUNCA usar causales DT ni documento de finiquito para contractor/honorarios.
+- **NUNCA** alterar las lanes de `work_relationship_offboarding_cases` (`relationship_transition`/`internal_payroll`/`external_payroll`/`non_payroll`/`identity_only`) que consume el exit eligibility resolver (TASK-890), ni reactivar una relación dependiente cerrada al cerrar la contractor.
+- **NUNCA** llevar un engagement a `ending`/`ended` por la transición genérica (`PATCH /api/hr/contractors/[id]` action `transition`). El cierre se canaliza SIEMPRE por el flujo dedicado (`POST .../closure`) que aplica readiness + metadata + eventos. El route handler rechaza targets `ending`/`ended` (`use_closure_flow`).
+- **NUNCA** crear nuevas work submissions cuando el engagement está en `ending`/`ended`/`cancelled`. Guard canónico `isPostClosureLockedEngagementStatus` (distinto de `isTerminalEngagementStatus`, que excluye `ending`).
+- **NUNCA** crear payables tras `ended` salvo `post_closure_invoices_allowed=TRUE` (política explícita auditada vía `setPostClosureInvoicesAllowed`); `cancelled` NUNCA permite payables. Durante `ending` (winding-down) SÍ se liquidan los payables de trabajo ya aprobado. Guard `assertPayableCreationAllowedForClosure` en ambos paths de create.
+- **NUNCA** recomputar la readiness de cierre inline en consumers — pasar por `evaluateContractorClosureReadiness` (pure) o `assessContractorClosureReadiness` (server). Un blocker nuevo se agrega al enum `ContractorClosureBlockerCode` + al evaluador, no inline.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'identity', { tags: { source: 'contractor_closure_*' } })`.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` como gate de cierre (boundary finiquito + exit eligibility intactos).
+
+**Eventos**: `workforce.contractor_engagement.closure_initiated v1` (nuevo, → ending) + `ended v1` reusado con payload enriquecido (`lifecycle:'closure_executed'`, `closureReason`, `postClosureInvoicesAllowed`). **Signal**: `hr.contractor_engagement.closed_with_open_payables` (data_quality, moduleKey=identity, steady=0) — defense-in-depth de cierres con payables abiertos por liquidar.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-797-contractor-closure-transition-controls.md`. Arch: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-06-01. Migración: `20260601131829099`. Patrones fuente: TASK-790 (engagement state machine + audit trio), TASK-793 (readiness fail-closed evaluator), TASK-892 (closure-completeness aggregate), TASK-890 (boundary payroll).
+
 ### Compensation version tuple drift — payroll-safe reconcile + validated CHECK (TASK-958, desde 2026-05-31)
 
 `members.contract_type` (CHECK 3-way `members_contract_payroll_tuple_check`, validado) y `compensation_versions.contract_type` pueden divergir. El CHECK `compensation_versions_contract_pay_regime_check` estaba **NOT VALID** → filas viejas con tuplas inconsistentes (`(indefinido, international)`) quedaban grandfathered. Caso fundacional: contractors internacionales Deel (Melkin/Andres/Daniela) con comp versions tempranas mal clasificadas como `indefinido`. TASK-958 cerró el drift class.

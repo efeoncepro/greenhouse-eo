@@ -28864,3 +28864,12 @@ Trabajo directo en `develop` por instrucción del operador (no branch). EPIC-013
 - Slice 3: guard post-cierre en work-submissions create (block en ending/ended/cancelled) + guard en payable create (block en ended salvo post_closure_invoices_allowed) + API route `/api/hr/contractors/[id]/closure` + reuse capability `hr.contractor_engagement:manage`.
 
 **Boundary payroll (hard rule TASK-890)**: NUNCA `final_settlements`, NUNCA tocar lanes de `work_relationship_offboarding_cases`, NUNCA reactivar relación dependiente. Gate de cierre: `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding`.
+
+### Cierre TASK-797 (2026-06-01) — backend completo, develop
+
+Shippado en `develop` (3 commits Slice 1/2/3 + docs). Contractor closure = lifecycle propio sobre `active/paused→ending→ended` + columnas de cierre (migration `20260601131829099`). NUNCA finiquito.
+
+- Módulo `src/lib/contractor-engagements/closure/` (pure readiness + server store). API `GET/POST /api/hr/contractors/[id]/closure`. Guards post-cierre en work-submission + payable create. Funnel de la transición genérica.
+- Evento `workforce.contractor_engagement.closure_initiated v1`; signal `hr.contractor_engagement.closed_with_open_payables`.
+- Gates: tsc 0 · lint 0 · build exit 0 · `pnpm test` **5759 passed / 0 fail** · payroll+offboarding **566** · live PG smoke (signal `ok`, readiness EO-CENG-0001). Boundary payroll TASK-890 intacto.
+- **Follow-up**: closure drawer UI en `/hr/contractors` (acceptance criteria ya backend-enforced). Recomendado abrir TASK derivada (doctrina IA TASK-982: header action + drawer por fila).

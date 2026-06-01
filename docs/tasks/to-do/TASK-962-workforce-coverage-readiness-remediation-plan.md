@@ -1,5 +1,9 @@
 # TASK-962 — Workforce Coverage & Readiness Remediation Plan
 
+## Delta 2026-06-01
+
+- `TASK-797` (Contractor Closure + Transition Controls) — backend shipped en `develop` (lifecycle de cierre propio, readiness, post-closure guards, API `/api/hr/contractors/[id]/closure`, signal `hr.contractor_engagement.closed_with_open_payables`). Para la disposición del backlog: el cierre contractor ya NO es proposal; queda follow-up de UI (closure drawer en `/hr/contractors`). Cerrado por trabajo en TASK-797.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

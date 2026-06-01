@@ -48,8 +48,9 @@ Aggregate type: `contractor_engagement`. Cambios materiales del lifecycle del en
 | `workforce.contractor_engagement.created` | `createContractorEngagement()` | Nace en `draft`; incluye `relationshipSubtype` |
 | `workforce.contractor_engagement.activated` | transición → `active` | hard gate: relación activa + riesgo no bloqueante |
 | `workforce.contractor_engagement.paused` | transición → `paused` (incl. auto-pause por escalada de riesgo) | `reason:'classification_risk_escalation'` cuando es auto-pause |
-| `workforce.contractor_engagement.ended` | transición → `ended` | terminal |
+| `workforce.contractor_engagement.ended` | transición → `ended` (incl. cierre ejecutado vía `executeContractorClosure`) | terminal; payload de cierre enriquecido (`lifecycle:'closure_executed'`, `closureReason`, `postClosureInvoicesAllowed`) cuando viene del flujo de cierre |
 | `workforce.contractor_engagement.cancelled` | transición → `cancelled` | terminal |
+| `workforce.contractor_engagement.closure_initiated` | `initiateContractorClosure()` (active/paused → `ending`) | TASK-797 — winding-down; no se aceptan nuevas work submissions |
 | `workforce.contractor_engagement.classification_risk_flagged` | riesgo escala a `legal_review_required`/`blocked` | bloquea readiness/activación |
 
 V1 NO tiene consumer reactivo (Finance bridge es TASK-793). Son eventos de auditoría/notificación. NO se agregan a `REACTIVE_EVENT_TYPES`.
