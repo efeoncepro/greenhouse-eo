@@ -117,6 +117,14 @@ Reglas obligatorias:
 - Verificar/normalizar que `/finance/contractor-payments` y `/my/contractor` tengan sus entradas correctas (la primera ya tiene "crear payable"; la segunda es role-gated correcta).
 - Validar con GVC (`pnpm fe:capture`) el header del workbench + el flujo click → wizard.
 
+### Slice 1b — Reubicar "Pagos a contractors" de Finanzas→Tesorería al submenú Nómina (decisión del operador 2026-06-01)
+
+- Mover el item `/finance/contractor-payments` del array de hijos de **Finanzas → Tesorería** al submenú **Nómina** en `VerticalMenu.tsx`, **preservando su filtro `canSeeView('finanzas.contractor_payables', true)`** (la capability NO cambia — solo el anclaje visual; el route y el viewCode siguen siendo finance).
+- **Mantener el label "Pagos a contractors"** (NUNCA "Nómina de contractors" ni copy que implique payroll dependiente). Mitigación del boundary EPIC-013: el menú agrupa el *workflow* del operador ("pagar a quien trabaja"), la superficie sigue dejando claro adentro que es A/P (`labor_cost_external`, neto al banco, retención SII al F29 — NO nómina dependiente ni finiquito).
+- **Rationale**: el modelo mental del operador es "Nómina = donde corro los pagos a la gente que trabaja"; TASK-979 ya creó la *corrida mensual de contractors* que espeja la corrida de nómina → paralelo operativo real. Honra la audiencia sin centralizar el dominio en un grupo nuevo.
+- **Nota auth/IA**: un operador solo-finanzas (sin `equipo.nomina`) vería el submenú "Nómina" conteniendo únicamente "Pagos a contractors" — funcional; la audiencia primaria (HR-payroll + admin) lo ve correcto. Si emerge fricción, evaluar duplicar el acceso o un grupo "Pagos" — fuera de scope V1.
+- **NO** mover `view_registry.routePath` ni el `section` del viewCode (sigue siendo `/finance/contractor-payments`, capability finance). Es puramente reubicación de anclaje en el sidebar.
+
 ### Slice 2 — Route reachability gate (anti-recurrencia, lo escalable)
 
 - `src/lib/navigation/route-reachability-manifest.ts`: declara las **rutas-hijas** (sub-acciones) con su padre + cómo se alcanzan (ej. `{ route: '/hr/contractors/new', parent: '/hr/contractors', via: 'header-cta' }`). Single source of truth.

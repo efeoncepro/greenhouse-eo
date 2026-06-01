@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo, useState } from 'react'
 
+import Link from 'next/link'
+
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -101,10 +103,12 @@ const PasoStep = ({
 
 const AdminHero = ({
   selected,
-  onReview
+  onReview,
+  canManage
 }: {
   selected: ContractorWorkbenchQueueRow | null
   onReview: () => void
+  canManage: boolean
 }) => (
   <Card
     sx={theme => ({
@@ -139,7 +143,7 @@ const AdminHero = ({
         </Stack>
         <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
           <Button
-            variant='contained'
+            variant='tonal'
             startIcon={<i className='tabler-checkup-list' />}
             disabled={!selected}
             onClick={onReview}
@@ -147,6 +151,17 @@ const AdminHero = ({
           >
             Revisar seleccionado
           </Button>
+          {canManage ? (
+            <Button
+              component={Link}
+              href='/hr/contractors/new'
+              variant='contained'
+              startIcon={<i className='tabler-plus' />}
+              data-capture='admin-new-contractor'
+            >
+              Nuevo contractor
+            </Button>
+          ) : null}
         </Stack>
       </Stack>
     </CardContent>
@@ -582,7 +597,11 @@ const ContractorAdminWorkbenchView = ({
         </Alert>
       ) : null}
 
-      <AdminHero selected={selected} onReview={() => openReview(selected?.statusTone === 'warning' ? 'dispute' : 'approve')} />
+      <AdminHero
+        selected={selected}
+        onReview={() => openReview(selected?.statusTone === 'warning' ? 'dispute' : 'approve')}
+        canManage={canManage}
+      />
 
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, md: 3 }}>

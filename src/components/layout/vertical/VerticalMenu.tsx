@@ -244,10 +244,17 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             icon: 'tabler-receipt',
             children: [
               { label: nl(GH_HR_NAV.payroll), href: '/hr/payroll' },
-              { label: nl(GH_HR_NAV.payrollProjected), href: '/hr/payroll/projected' }
+              { label: nl(GH_HR_NAV.payrollProjected), href: '/hr/payroll/projected' },
+              // TASK-982 — "Pagos a contractors" reubicado de Finanzas→Tesorería al
+              // submenú Nómina (decisión operador 2026-06-01). Route + capability
+              // siguen siendo finance (`finanzas.contractor_payables`); solo cambia
+              // el anclaje del sidebar. Label intacto — NO implica nómina dependiente
+              // (es A/P `labor_cost_external`, boundary EPIC-013/TASK-957).
+              { label: nl(GH_FINANCE_NAV.contractorPayments), href: '/finance/contractor-payments' }
             ].filter(item => {
               if (item.href === '/hr/payroll') return canSeeView('equipo.nomina', true)
               if (item.href === '/hr/payroll/projected') return canSeeView('equipo.nomina_proyectada', true)
+              if (item.href === '/finance/contractor-payments') return canSeeView('finanzas.contractor_payables', true)
 
               return true
             })
@@ -417,7 +424,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_FINANCE_NAV.cashIn), href: '/finance/cash-in' },
               { label: nl(GH_FINANCE_NAV.cashOut), href: '/finance/cash-out' },
               { label: nl(GH_FINANCE_NAV.paymentOrders), href: '/finance/payment-orders' },
-              { label: nl(GH_FINANCE_NAV.contractorPayments), href: '/finance/contractor-payments' },
               { label: nl(GH_FINANCE_NAV.paymentProfiles), href: '/finance/payment-profiles' },
               { label: nl(GH_FINANCE_NAV.bank), href: '/finance/bank' },
               { label: nl(GH_FINANCE_NAV.shareholderAccount), href: '/finance/shareholder-account' },
@@ -426,7 +432,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/finance/cash-in') return canSeeView('finanzas.ingresos', true)
               if (item.href === '/finance/cash-out') return canSeeView('finanzas.egresos', true)
               if (item.href === '/finance/payment-orders') return canSeeView('finanzas.ordenes_pago', true)
-              if (item.href === '/finance/contractor-payments') return canSeeView('finanzas.contractor_payables', true)
               if (item.href === '/finance/payment-profiles') return canSeeView('finanzas.perfiles_pago', true)
               if (item.href === '/finance/bank') return canSeeView('finanzas.banco', canSeeBankTreasury)
               if (item.href === '/finance/shareholder-account') return canSeeView('finanzas.cuenta_corriente_accionista', canSeeBankTreasury)
