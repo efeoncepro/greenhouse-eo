@@ -11,7 +11,8 @@ export const GH_FINANCE_CONTRACTOR_PAYMENTS = {
     title: 'Pagos a contractors',
     subtitle: 'Prepara, revisa y autoriza los pagos a contractors antes de la orden de pago.',
     createFromSubmissionCta: 'Crear desde envío',
-    createOffCycleCta: 'Pago off-cycle'
+    createOffCycleCta: 'Pago off-cycle',
+    monthlyRunCta: 'Iniciar corrida mensual'
   },
   kpi: {
     toPrepare: 'Por preparar',
@@ -92,6 +93,31 @@ export const GH_FINANCE_CONTRACTOR_PAYMENTS = {
     reasonHelper: 'Mínimo 10 caracteres.',
     confirm: 'Confirmar',
     cancel: 'Cancelar'
+  },
+  monthlyRun: {
+    title: 'Corrida mensual de pagos',
+    intro:
+      'Junta todos los pagos a contractors comprometidos del período y prepara las órdenes agrupadas por moneda. Prepara — no paga: las órdenes quedan pendientes de aprobación.',
+    periodLabel: 'Período (mes operativo)',
+    monthLabel: 'Mes',
+    yearLabel: 'Año',
+    previewTitle: 'Qué se va a preparar',
+    previewLoading: 'Calculando…',
+    cutoffLabel: 'Fecha límite del período',
+    payablesLabel: 'Pagos a incluir',
+    totalsLabel: 'Total neto por moneda',
+    nothingTitle: 'Nada por preparar',
+    nothing: 'No hay pagos comprometidos pendientes para este período.',
+    confirm: 'Preparar órdenes',
+    cancel: 'Cerrar',
+    preparing: 'Preparando…',
+    doneTitle: 'Corrida preparada',
+    doneOrders: 'órdenes de pago creadas',
+    donePayables: 'pagos incluidos',
+    alreadyPrepared: 'Ya estaba preparada: no había pagos nuevos para este período.',
+    note: 'Las órdenes quedan en «pendiente de aprobación». La aprobación y el pago al banco siguen siendo manuales.',
+    error: 'No se pudo preparar la corrida. Intenta de nuevo.',
+    close: 'Cerrar'
   },
   status: {
     pending_readiness: 'Por preparar',

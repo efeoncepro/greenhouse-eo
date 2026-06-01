@@ -210,6 +210,7 @@ const ContractorPaymentsWorkbenchView = () => {
               </Typography>
             </Box>
             <Stack direction='row' spacing={2} flexWrap='wrap'>
+              <MonthlyRunButton onPrepared={() => void refetch()} />
               <CreateMenu onCreated={() => void refetch()} />
             </Stack>
           </CardContent>
@@ -718,6 +719,236 @@ const CreateDialog = ({
         <Button variant='contained' disabled={!ready || submitting} onClick={() => void submit()}>
           {C.create.confirm}
         </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+// ── Monthly run (corrida mensual) ─────────────────────────────────────────────
+
+interface MonthlyRunResult {
+  cutoffDate: string
+  obligationsSwept: number
+  payablesIncluded: number
+  totalsByCurrency: Record<string, { payables: number; netTotal: string }>
+  alreadyPrepared: boolean
+  preparedOrderIds: string[]
+}
+
+const MONTH_LABELS_ES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+]
+
+const MonthlyRunButton = ({ onPrepared }: { onPrepared: () => void }) => {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <Button variant='tonal' color='primary' startIcon={<i className='tabler-calendar-bolt' />} onClick={() => setOpen(true)}>
+        {C.header.monthlyRunCta}
+      </Button>
+      {open ? <MonthlyRunDialog onClose={() => setOpen(false)} onPrepared={onPrepared} /> : null}
+    </>
+  )
+}
+
+const MonthlyRunDialog = ({ onClose, onPrepared }: { onClose: () => void; onPrepared: () => void }) => {
+  const theme = useTheme()
+  const nowMonth = useMemo(() => new Date(), [])
+  const currentYear = nowMonth.getFullYear()
+
+  const [year, setYear] = useState(currentYear)
+  const [month, setMonth] = useState(nowMonth.getMonth() + 1)
+  const [preview, setPreview] = useState<MonthlyRunResult | null>(null)
+  const [previewing, setPreviewing] = useState(false)
+  const [confirming, setConfirming] = useState(false)
+  const [done, setDone] = useState<MonthlyRunResult | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+
+  const run = useCallback(
+    async (dryRun: boolean): Promise<MonthlyRunResult | null> => {
+      const res = await fetch('/api/finance/contractor-payables/monthly-run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ periodYear: year, periodMonth: month, dryRun })
+      })
+
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null
+
+        setErr(body?.error ?? C.monthlyRun.error)
+
+        return null
+      }
+
+      const body = (await res.json().catch(() => null)) as { run?: MonthlyRunResult } | null
+
+      return body?.run ?? null
+    },
+    [year, month]
+  )
+
+  useEffect(() => {
+    if (done) return
+
+    let active = true
+
+    setPreviewing(true)
+    setErr(null)
+    void run(true).then(result => {
+      if (active) {
+        setPreview(result)
+        setPreviewing(false)
+      }
+    })
+
+    return () => {
+      active = false
+    }
+  }, [run, done])
+
+  const confirm = async () => {
+    setConfirming(true)
+    setErr(null)
+
+    const result = await run(false)
+
+    setConfirming(false)
+
+    if (result) {
+      setDone(result)
+      onPrepared()
+    }
+  }
+
+  const totals = (result: MonthlyRunResult) => Object.entries(result.totalsByCurrency)
+  const canConfirm = !previewing && !confirming && preview !== null && preview.obligationsSwept > 0
+
+  return (
+    <Dialog open onClose={onClose} maxWidth='sm' fullWidth aria-labelledby='monthly-run-title'>
+      <DialogTitle id='monthly-run-title' sx={{ fontWeight: 600 }}>
+        {C.monthlyRun.title}
+      </DialogTitle>
+      <DialogContent>
+        {done ? (
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            {done.alreadyPrepared ? (
+              <Alert severity='info' role='status'>
+                {C.monthlyRun.alreadyPrepared}
+              </Alert>
+            ) : (
+              <Alert severity='success' role='status' icon={<i className='tabler-circle-check' />}>
+                <strong>{done.preparedOrderIds.length}</strong> {C.monthlyRun.doneOrders} ·{' '}
+                <strong>{done.payablesIncluded}</strong> {C.monthlyRun.donePayables}.
+              </Alert>
+            )}
+            <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+              {C.monthlyRun.note}
+            </Typography>
+          </Stack>
+        ) : (
+          <Stack spacing={4} sx={{ pt: 1 }}>
+            <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+              {C.monthlyRun.intro}
+            </Typography>
+
+            <Stack direction='row' spacing={2}>
+              <CustomTextField
+                select
+                label={C.monthlyRun.monthLabel}
+                value={month}
+                onChange={e => setMonth(Number(e.target.value))}
+                fullWidth
+              >
+                {MONTH_LABELS_ES.map((label, i) => (
+                  <MenuItem key={label} value={i + 1}>
+                    {label.charAt(0).toUpperCase() + label.slice(1)}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+              <CustomTextField
+                select
+                label={C.monthlyRun.yearLabel}
+                value={year}
+                onChange={e => setYear(Number(e.target.value))}
+                sx={{ minWidth: 120 }}
+              >
+                {[currentYear - 1, currentYear].map(y => (
+                  <MenuItem key={y} value={y}>
+                    {y}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Stack>
+
+            <Box
+              sx={{
+                p: 4,
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.16)}`
+              }}
+            >
+              <Typography variant='overline' sx={{ color: 'text.secondary' }}>
+                {C.monthlyRun.previewTitle}
+              </Typography>
+
+              {previewing ? (
+                <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
+                  <CircularProgress size={16} />
+                  <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+                    {C.monthlyRun.previewLoading}
+                  </Typography>
+                </Stack>
+              ) : preview && preview.obligationsSwept > 0 ? (
+                <Stack spacing={1.5} sx={{ mt: 2 }}>
+                  <DetailRow label={C.monthlyRun.cutoffLabel} value={preview.cutoffDate} />
+                  <DetailRow label={C.monthlyRun.payablesLabel} value={String(preview.payablesIncluded)} />
+                  <Divider sx={{ my: 1 }} />
+                  <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+                    {C.monthlyRun.totalsLabel}
+                  </Typography>
+                  {totals(preview).map(([currency, t]) => (
+                    <Box key={currency} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant='body2'>
+                        {currency} · {t.payables} {t.payables === 1 ? 'pago' : 'pagos'}
+                      </Typography>
+                      <Typography variant='body2' sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                        {money(Number(t.netTotal), currency)}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              ) : (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
+                    {C.monthlyRun.nothingTitle}
+                  </Typography>
+                  <Typography variant='body2' sx={{ color: 'text.secondary', mt: 0.5 }}>
+                    {C.monthlyRun.nothing}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
+            <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+              {C.monthlyRun.note}
+            </Typography>
+
+            {err ? <Alert severity='error'>{err}</Alert> : null}
+          </Stack>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ px: 6, pb: 5 }}>
+        <Button variant='tonal' color='secondary' onClick={onClose}>
+          {done ? C.monthlyRun.close : C.monthlyRun.cancel}
+        </Button>
+        {done ? null : (
+          <Button variant='contained' color='primary' disabled={!canConfirm} onClick={() => void confirm()}>
+            {confirming ? C.monthlyRun.preparing : C.monthlyRun.confirm}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   )
