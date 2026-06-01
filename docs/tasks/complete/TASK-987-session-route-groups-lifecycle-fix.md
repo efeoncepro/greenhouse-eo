@@ -70,9 +70,22 @@ El menú gatea secciones por route group (`canSeePeople = internal||people||...`
 
 - TS `ROLE_ROUTE_GROUPS` vs DB `roles.route_group_scope` difieren en `people` para `efeonce_operations` y `hr_payroll`. ¿Cuál es el canónico? Decisión de gobernanza del operador (no cambiada aquí). Un parity test/signal podría surfacearlo si se decide consolidar.
 
+## Delta — verificación post-fix por usuario (GVC, 2026-06-01)
+
+Entrando como cada usuario (sesión NextAuth real vía agent-session contra la DB con la migración aplicada), capturado con GVC (`pnpm fe:capture --route=/my --env=local`, `AGENT_AUTH_EMAIL` por usuario; storageState borrado entre corridas para forzar re-auth):
+
+- **Valentina Hoyos** (`collaborator`, `[my]`): menú = **solo MI FICHA** (incl. Mis Servicios Contractor). Sin Personas, sin Comercial, sin Mi equipo/Organigrama/GESTIÓN. La over-exposure original resuelta.
+- **Humberly Henriquez** (`Finance Manager`, finance_admin+hr_manager activos): **PERSONAS Y HR** (Nómina, Supervisión, Organización, Objetivos, Evaluaciones) + **Comercial** + **Finanzas** + MI FICHA. Acceso por roles activos canónicos, no fuga.
+- **Daniela Ferreira** (`Operations Lead`, efeonce_operations activo + supervisora 3 reportes): GESTIÓN + Personas + **Aprobaciones** + Organigrama + MI FICHA. Conserva aprobaciones (route group `internal` activo + supervisorAccess).
+
+Nota de método: la primera tanda GVC reusó una sesión cacheada (storageState con cookie vigente) y salió idéntica para los 3; se detectó (3 capturas iguales), se borró el storageState entre corridas y se re-capturó por usuario.
+
 ## Closing Protocol
 
 - [x] ISSUE-083 → resolved + README issues.
 - [x] Lifecycle complete + README/registry tasks.
 - [x] Handoff + changelog.
 - [x] CLAUDE.md invariant (derivación de route_groups debe honrar lifecycle).
+- [x] AGENTS.md regla operativa (mirror).
+- [x] Doc funcional `docs/documentation/identity/sistema-identidad-roles-acceso.md` (sección "Roles revocados no dan acceso").
+- [x] Verificación GVC por usuario (Valentina/Humberly/Daniela).

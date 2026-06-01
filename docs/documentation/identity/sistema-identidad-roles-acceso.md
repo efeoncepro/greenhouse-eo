@@ -293,6 +293,14 @@ El sistema tiene protecciones automaticas que no se pueden saltar:
 
 ---
 
+## Roles revocados no dan acceso (TASK-987)
+
+Cuando se le **revoca** un rol a una persona, ese rol deja de darle acceso **de inmediato**: ni route groups, ni vistas, ni navegación. Los route groups (las familias de pantallas que ve cada persona en el menú) se derivan **solo de sus roles activos y vigentes** — un rol revocado o expirado no aporta nada.
+
+Esto importa porque alguien puede haber tenido un rol amplio (p.ej. "Líder de Cuenta" o "Finanzas") que luego se le quita: al revocarlo, su menú vuelve a reflejar únicamente lo que sus roles activos permiten. Si una persona necesita conservar un acceso, hay que **otorgarle el rol activo correspondiente** — nunca dejarlo "heredado" de un rol revocado.
+
+> **Detalle tecnico:** la derivación de `route_groups` en `greenhouse_serving.session_360` aplica el mismo filtro de ciclo de vida (`active` + vigencia) que `role_codes`. Un detector (`identity.session.route_group_drift`, steady=0) alerta si algún usuario tuviera route groups que no provienen de un rol activo. Spec: [TASK-987](../../tasks/complete/TASK-987-session-route-groups-lifecycle-fix.md) / [ISSUE-083](../../issues/resolved/ISSUE-083-session-route-groups-leak-from-revoked-roles.md).
+
 ## Registro de actividad (audit)
 
 Todo cambio importante queda registrado automaticamente como evento de auditoria:
