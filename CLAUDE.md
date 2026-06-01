@@ -4675,6 +4675,43 @@ La **remesa de la retención SII (F29)** NO es el neto del reporte — el report
 
 **Spec canónica**: `docs/tasks/complete/TASK-980-contractor-payment-run-report-pdf-excel.md`. Reader: `run-report-reader.ts`. Generadores: `generate-contractor-run-{pdf,excel}.ts(x)`. Helper compartido: `remittance/regime.ts`. Endpoint: `GET /api/finance/contractor-payables/run-report?format=pdf|excel` (capability `finance.contractor_payable:read`, reuso). Patrones fuente: TASK-782 (reporte payroll), TASK-960/758 (presenter + montos verbatim + footer/slogan/Geist), TASK-863 (Semantic Column Invariants), TASK-978/979 (mes operativo).
 
+### Contractor Payable Paid Lifecycle + Remittance Email invariants (TASK-981, desde 2026-06-01)
+
+Cierra el **tramo final del lifecycle** del contractor payable y el **pegamento reactivo** que envía el comprobante TASK-960 al contractor por email. Antes de TASK-981 **ningún writer** transicionaba el payable a `paid` ni emitía un evento (mismo gap-class que TASK-979 cerró para `payment_order_created`); consecuencia colateral: el comprobante TASK-960 (gate `status='paid'`) era **inalcanzable**. Cadena canónica decoupled:
+
+```text
+finance.payment_order.paid (settlement TASK-765/977)
+  → projection contractor-payable-paid-cascade: markPayablePaid por cada payable
+    enlazado (payment_order_id, status='payment_order_created') → emite
+    workforce.contractor_payable.paid v1
+      → projection contractor-payable-paid-email: resolveRemittanceAdvice (gate paid,
+        re-read PG) → generateContractorRemittancePdf → getProfileNotificationRecipient
+        (canonical_email) → sendEmail('contractor_remittance_paid', adjunto PDF)
+```
+
+**Helpers/archivos canónicos**:
+- `markPayablePaid(input, client?)` (`payables/store.ts`, dual-mode) — **writer ÚNICO** de `paid`; idempotente (no-op si ya `paid`, no re-emite); mirror de `markPayablePaymentOrderCreated`.
+- `listPayableIdsByPaymentOrderForPaidCascade(orderId)` — reader del cascade (filtra `status='payment_order_created'` en SQL → no-op para órdenes no-contractor).
+- `contractor-payable-paid-cascade` projection (trigger `finance.payment_order.paid`).
+- `contractor-payable-paid-email` projection (trigger `workforce.contractor_payable.paid`).
+- `ContractorRemittanceEmail.tsx` + emailType `contractor_remittance_paid` (transactional, registerTemplate + registerPreviewMeta).
+- Evento `workforce.contractor_payable.paid v1` (event-catalog `contractorPayablePaid`).
+- Migración: extiende CHECK `contractor_payable_events.event_type` con `paid` (additivo sobre TASK-979).
+
+**⚠️ Reglas duras**:
+- **NUNCA** transicionar un contractor payable a `paid` fuera de `markPayablePaid` (writer ÚNICO). Cualquier UPDATE `status='paid'` inline rompe la emisión del evento + el comprobante. La state machine ya permite `payment_order_created → paid` (TASK-793 forward-fix).
+- **NUNCA** marcar el payable `paid` desde el settlement atómico (TASK-977 marca la **orden**, no el payable). El cascade reactivo es el puente decoupled `order paid → payable paid`.
+- **NUNCA** confiar el payload del evento `.paid` en el email projection — re-leer vía `resolveRemittanceAdvice(payableId)` (gate `status='paid'`, SSOT de montos TASK-960). Mismo principio que el bridge TASK-793.
+- **NUNCA** bloquear el batch reactivo por un comprobante sin destinatario o no resoluble: el email projection **skipea honesto** (capture + return), NO throw. Sólo un fallo de envío genuinamente transitorio throwea → retry → dead-letter.
+- **NUNCA** recomputar montos para el email — el neto sale del row `emphasis` del `breakdown` de la presentation (verbatim TASK-960). El email NO es documento tributario.
+- **NUNCA** `Sentry.captureException` directo — usar `captureWithDomain(err, 'finance', { tags: { source: 'contractor_payable_paid_email' | 'contractor_payable_paid_cascade' } })`.
+- **SIEMPRE** idempotencia del email vía `sendEmail({ sourceEventId, sourceEntity })` (`wasEmailAlreadySent` dedup) — un retry del dispatcher nunca re-envía.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll` como gate al tocar este dominio (boundary EPIC-013/957).
+
+**Reliability signal**: `finance.contractor_remittance_email.dead_letter` (kind=dead_letter, moduleKey finance, steady=0) — payables `paid` cuyo email agotó retries (Resend down / render fail / recipient persistente). Skips honestos NO alertan acá.
+
+**Spec canónica**: `docs/tasks/complete/TASK-981-contractor-payment-email-remittance.md`. Patrones fuente: TASK-979 (writer único dual-mode + gap-class), TASK-793 (bridge reactivo + re-read defensivo), TASK-960 (comprobante PDF + montos verbatim), TASK-759 (payslip-on-payment-paid email projection mold), TASK-771 (decoupling reactivo).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

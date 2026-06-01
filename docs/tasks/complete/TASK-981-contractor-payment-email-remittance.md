@@ -6,7 +6,7 @@ El lifecycle del payable quedó cerrado hasta `payment_order_created` (TASK-979 
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -128,7 +128,15 @@ Reglas obligatorias:
 - Notificación in-app / Teams del pago (Notification Hub) si emerge.
 - Email de comprobante para nómina si se quiere unificar (hoy payroll tiene `PayrollReceiptEmail` — patrón compartido).
 
-## Open Questions
+## Open Questions — RESUELTAS (pre-ejecución)
 
-- ¿El email lleva el comprobante adjunto (PDF) o un link al comprobante in-app? (Plan Mode: adjunto es lo pedido; el link evita PII en el correo pero requiere auth — probablemente adjunto + link a la vista in-app.)
-- ¿El `.paid` event se emite en `store.ts` (transición) o en el settlement atómico (TASK-977 `mark-paid-atomic`)? (Plan Mode: donde ocurre la transición real a `paid`, en la misma tx.)
+- **¿Adjunto PDF o link in-app?** → **PDF adjunto**. Es lo pedido + self-contained (los contractors externos pueden no tener auth de portal). El email lleva además un CTA "Ver mis pagos" a `/my/contractor` (lo mejor de ambos). El comprobante TASK-960 ya es un generador de PDF; se adjunta verbatim.
+- **¿Dónde se emite `.paid`?** → en **`markPayablePaid` (store.ts, la transición real)**, disparado por el cascade `contractor-payable-paid-cascade` que reacciona a `finance.payment_order.paid`. NO en el settlement atómico (TASK-977 marca la **orden**, no el payable). Cadena decoupled: order paid → cascade → payable paid + `.paid` → email.
+
+## Delta de ejecución (2026-06-01)
+
+**Hallazgo crítico (verificado por grep)**: el supuesto del spec "TASK-977 settlement ya completa — el payable ya transiciona a paid" era **incorrecto**. No existía `markPayablePaid`, ningún UPDATE `status='paid'`, y los dos consumers de `finance.payment_order.paid` (`record-expense-payment-from-order`, `payslip-on-payment-paid`) NO tocaban contractor payables. Mismo gap-class que TASK-979 cerró para `payment_order_created`. Consecuencia colateral: el comprobante TASK-960 (gate `status='paid'`) era **inalcanzable**. Slice 1 cerró el gap (writer + cascade), no sólo el evento.
+
+- **Slice 1** (`3ebf6f6d`): migración (CHECK `event_type` + `paid`) + `markPayablePaid` (writer único dual-mode) + `listPayableIdsByPaymentOrderForPaidCascade` + cascade projection + event-catalog `contractorPayablePaid`. 12 tests.
+- **Slice 2** (`ae5ecebd`): `ContractorRemittanceEmail.tsx` + emailType `contractor_remittance_paid` (registerTemplate + registerPreviewMeta) + email projection (resolveRemittanceAdvice → PDF → recipient → sendEmail adjunto, idempotente, skip honesto). 12 tests.
+- **Slice 3**: signal `finance.contractor_remittance_email.dead_letter` + wire-up + docs (CLAUDE.md, EVENT_CATALOG, arch Delta, doc funcional v1.1).

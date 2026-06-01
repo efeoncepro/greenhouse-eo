@@ -46,6 +46,7 @@ import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contr
 import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
 import { getContractorPayableUnbatchedOverdueSignal } from './queries/contractor-payable-unbatched-overdue'
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
+import { getContractorRemittanceEmailDeadLetterSignal } from './queries/contractor-remittance-email-dead-letter'
 import { getContractorPayableTaxReviewOverdueSignal } from './queries/contractor-payable-tax-review-overdue'
 import { getContractorPayableFxUnresolvedOverdueSignal } from './queries/contractor-payable-fx-unresolved-overdue'
 import { getContractorPayableExceedsAgreedAmountSignal } from './queries/contractor-payable-exceeds-agreed-amount'
@@ -573,6 +574,7 @@ interface ReliabilityOverviewSources {
    */
   contractorPayableReadyWithoutObligation?: ReliabilitySignal | null
   contractorPayableBridgeDeadLetter?: ReliabilitySignal | null
+  contractorRemittanceEmailDeadLetter?: ReliabilitySignal | null
   /** TASK-795 Fase A — international boundary block signals (tax review + FX). */
   contractorPayableTaxReviewOverdue?: ReliabilitySignal | null
   contractorPayableFxUnresolvedOverdue?: ReliabilitySignal | null
@@ -896,6 +898,7 @@ export const buildReliabilityOverview = (
       ? [sources.contractorPayableReadyWithoutObligation]
       : []),
     ...(sources.contractorPayableBridgeDeadLetter ? [sources.contractorPayableBridgeDeadLetter] : []),
+    ...(sources.contractorRemittanceEmailDeadLetter ? [sources.contractorRemittanceEmailDeadLetter] : []),
     // TASK-795 Fase A — international boundary block signals (tax review + FX).
     ...(sources.contractorPayableTaxReviewOverdue ? [sources.contractorPayableTaxReviewOverdue] : []),
     ...(sources.contractorPayableFxUnresolvedOverdue
@@ -1294,6 +1297,12 @@ export const getReliabilityOverview = async (
     preloadedSources.contractorPayableBridgeDeadLetter !== undefined
       ? preloadedSources.contractorPayableBridgeDeadLetter
       : await getContractorPayableBridgeDeadLetterSignal().catch(() => null)
+
+  // TASK-981 Slice 3 — remittance email dead-letter (paid payable → comprobante).
+  const contractorRemittanceEmailDeadLetter =
+    preloadedSources.contractorRemittanceEmailDeadLetter !== undefined
+      ? preloadedSources.contractorRemittanceEmailDeadLetter
+      : await getContractorRemittanceEmailDeadLetterSignal().catch(() => null)
 
   // TASK-795 Fase A — payables blocked by the international boundary (tax review + FX).
   const contractorPayableTaxReviewOverdue =
@@ -1754,6 +1763,7 @@ export const getReliabilityOverview = async (
     contractorPayablePaymentSlaOverdue,
     contractorPayableUnbatchedOverdue,
     contractorPayableBridgeDeadLetter,
+    contractorRemittanceEmailDeadLetter,
     contractorPayableTaxReviewOverdue,
     contractorPayableFxUnresolvedOverdue,
     contractorPayableExceedsAgreedAmount,

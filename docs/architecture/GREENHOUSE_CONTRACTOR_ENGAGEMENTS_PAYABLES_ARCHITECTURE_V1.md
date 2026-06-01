@@ -4,6 +4,30 @@
 **Created:** 2026-05-05
 **Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + Employee→Contractor connected command (TASK-956) + **Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification (TASK-957)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955), contractor closure (TASK-797) and ops control plane (TASK-798) remain proposals.
 
+## Delta 2026-06-01 — TASK-981 Contractor Payable `paid` lifecycle + Remittance Email shipped
+
+Cierra el **tramo final del lifecycle** (`payment_order_created → paid`) y el **pegamento reactivo** que envía el comprobante TASK-960 al contractor por email cuando se le paga. Antes de TASK-981 **ningún writer** transicionaba el payable a `paid` ni emitía evento (mismo gap-class que TASK-979 cerró para `payment_order_created`) → el comprobante TASK-960 (gate `status='paid'`) era **inalcanzable**.
+
+Cadena canónica decoupled (mirror TASK-771):
+
+```text
+finance.payment_order.paid (settlement TASK-765/977)
+  → contractor-payable-paid-cascade: markPayablePaid por cada payable enlazado
+    (payment_order_id, status='payment_order_created') → emite
+    workforce.contractor_payable.paid v1
+      → contractor-payable-paid-email: resolveRemittanceAdvice (gate paid, re-read PG)
+        → generateContractorRemittancePdf → getProfileNotificationRecipient (canonical_email)
+        → sendEmail('contractor_remittance_paid', adjunto PDF, idempotente)
+```
+
+- **Writer ÚNICO** `markPayablePaid(input, client?)` (dual-mode, idempotente, mirror `markPayablePaymentOrderCreated`).
+- Migración additiva: CHECK `contractor_payable_events.event_type` + `paid`. State machine ya permitía `payment_order_created → paid` (TASK-793 forward-fix).
+- Template `ContractorRemittanceEmail` (es/en) + emailType `contractor_remittance_paid` (transactional). Skip honesto si no-paid / sin email (NO bloquea el batch).
+- Reliability signal `finance.contractor_remittance_email.dead_letter` (dead_letter, steady=0).
+- Idempotencia del email vía `sendEmail({ sourceEventId, sourceEntity })` (`wasEmailAlreadySent`).
+
+Spec: `docs/tasks/complete/TASK-981-contractor-payment-email-remittance.md`.
+
 ## Delta 2026-05-31 — TASK-977 Contractor Payable Bank Settlement shipped (flag OFF)
 
 Cierra el **Hecho verificado 1** del audit de abajo: el contractor payable ahora **se puede liquidar al banco** por el motor canónico de settlement, detrás de flag (default OFF → parity bit-for-bit). El path de nómina queda 100% intacto.

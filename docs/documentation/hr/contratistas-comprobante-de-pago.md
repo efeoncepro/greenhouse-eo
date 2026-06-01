@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-31 por Claude (TASK-960)
-> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-960)
+> **Ultima actualizacion:** 2026-06-01 por Claude (TASK-981 — envío automático por email)
 > **Documentacion tecnica:** [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
 
 # Comprobante de Pago del contratista (Remittance Advice)
@@ -40,6 +40,15 @@ El documento sigue el **idioma del contratista** (español o inglés). HR/Financ
 ## El número EO-RA-NNNNNN
 
 Cada comprobante lleva un número correlativo propio, sin saltos (gapless). Se asigna **una sola vez** la primera vez que el comprobante se ve o descarga, y queda fijo: el mismo pago muestra siempre el mismo número. Un salto en la numeración indicaría un comprobante anulado.
+
+## Envío automático por email (TASK-981)
+
+Cuando el pago al contratista se completa (la orden de pago que lo paga se marca como pagada), Greenhouse **le envía el comprobante por email automáticamente**, con el PDF adjunto, en el idioma del contratista. No hay que enviarlo a mano.
+
+- El correo es una confirmación breve (número de comprobante, fecha de pago, monto neto) y el detalle completo va en el PDF adjunto.
+- Si el contratista todavía no tiene un email registrado, el envío se omite sin error: igual puede descargar el comprobante en el portal. Finanzas lo verá pendiente como una señal de operación.
+- Si el envío falla por una caída del proveedor de correo, el sistema reintenta solo; si agota los reintentos, queda visible en el panel de salud (`Comprobante de pago contractor (email dead-letter)`) para revisión humana.
+- El mismo pago no genera correos duplicados aunque el sistema reintente.
 
 ## Que NO hace
 

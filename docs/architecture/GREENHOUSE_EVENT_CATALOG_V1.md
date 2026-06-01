@@ -19,6 +19,7 @@ Aggregate type: `contractor_payable`. Obligación económica aprobada del contra
 | `workforce.contractor_payable.created` | `createContractorPayableFromSubmission()` / `createContractorPayableOffCycle()` | nace en `pending_readiness`; payout = `labor_cost_external`, NUNCA payroll |
 | `workforce.contractor_payable.ready_for_finance` | `transitionPayableToReadyForFinance()` (readiness OK) | **REACTIVO** — dispara la projection `contractor_payable_finance_obligation` (bridge a Finance) |
 | `workforce.contractor_payable.obligation_created` | `markPayableObligationCreated()` (bridge) | una `payment_obligation` (`source_kind=contractor_payable`, `amount=net_payable`) creada idempotente |
+| `workforce.contractor_payable.paid` | `markPayablePaid()` (writer ÚNICO, TASK-981) | **REACTIVO** — el cascade `contractor-payable-paid-cascade` lo emite cuando la `finance.payment_order.paid` marca pagada la orden que lo paga (`payment_order_created → paid`). Payload base + `paymentOrderId` + `paidAt`. Dispara la projection `contractor-payable-paid-email` (envía el comprobante TASK-960 por email). Antes de TASK-981 nadie transicionaba el payable a `paid`; migración extiende el CHECK `contractor_payable_events.event_type`. |
 | `workforce.contractor_payable.blocked` | readiness fail-closed | payload incluye `blockerCodes[]` |
 | `workforce.contractor_payable.cancelled` | `cancelContractorPayable()` | terminal |
 
