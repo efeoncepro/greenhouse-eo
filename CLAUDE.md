@@ -4724,6 +4724,30 @@ finance.payment_order.paid (settlement TASK-765/977)
 
 **Spec canónica**: `docs/tasks/complete/TASK-981-contractor-payment-email-remittance.md`. Patrones fuente: TASK-979 (writer único dual-mode + gap-class), TASK-793 (bridge reactivo + re-read defensivo), TASK-960 (comprobante PDF + montos verbatim), TASK-759 (payslip-on-payment-paid email projection mold), TASK-771 (decoupling reactivo).
 
+### Navigation Reachability Governance (TASK-982, desde 2026-06-01)
+
+Toda ruta real bajo `src/app/(dashboard)/**/page.tsx` **debe ser alcanzable** por navegación. Cierra el bug class **"superficie huérfana"** (disparador: `/hr/contractors/new` onboarding TASK-976 sin menú ni botón → solo por URL). Es el **espejo navegacional de TASK-827** (ahí la señal `role_view_fallback_used` detecta drift `viewCode↔DB`; acá el gate detecta drift `ruta↔nav`).
+
+**Contrato de alcanzabilidad** — una ruta `(dashboard)` es alcanzable si cumple UNA de:
+- (a) es target de un link de navegación interno en `src/` (`href` / `router.push|replace` / `redirect|permanentRedirect`, literal string),
+- (b) está declarada como **child route** en `src/lib/navigation/route-reachability-manifest.ts` (sub-acción reached desde un parent surface — header CTA, row action, inline link, tab), o
+- (c) es ruta dinámica (contiene `[segment]`, reached por click de fila).
+Mockups (`**/mockup/**`) excluidos.
+
+**Patrón canónico header primary-action**: todo workbench/lista con ruta `…/new` (crear) expone esa ruta como **1 botón primary contained** ("Nuevo X", `tabler-plus`) en su header, gated por la capability de crear. Regla greenhouse-ux: 1 primary contained + N tonal (las acciones contextuales bajan a tonal). Patrón fuente: `ContractorAdminWorkbenchView` "Nuevo contractor" → `/hr/contractors/new`.
+
+**Doctrina IA de dominio multi-superficie** (4 sistemas de nav, Rosenfeld): un workbench por (dominio × audiencia) anclado en la casa de la audiencia (NO un grupo de menú nuevo por dominio); header con acción primaria; tabs locales cuando el workbench tenga >1 vista; drawers por fila para acciones por-entidad; ⌘K como red supplemental. Reusable por TASK-797/798.
+
+**⚠️ Reglas duras**:
+- **NUNCA** crear un `page.tsx` bajo `(dashboard)` sin hacerlo alcanzable por (a)/(b)/(c). El gate `pnpm route-reachability-gate` lo detecta.
+- **NUNCA** declarar una ruta-hija en el manifest sin `parent` + `via` + `reason`. El manifest es el SSOT tipado; el gate lo parsea por `route: '...'` (mantener ese formato literal).
+- **NUNCA** centralizar un dominio multi-superficie en un grupo de menú nuevo. Organizar por audiencia/mental-model (regla dura IA). NUNCA por backend schema.
+- **NUNCA** poner 2 primary contained en un header. La acción de crear es la primary; las contextuales (selection-dependent) bajan a tonal.
+- **NUNCA** mover un item de menú a otra sección sin preservar su `canSeeView(viewCode)` filter (la capability NO cambia con el anclaje — caso TASK-982 Slice 1b: "Pagos a contractors" reubicado a Nómina conservando `finanzas.contractor_payables`).
+- **SIEMPRE** que emerja un dominio nuevo con ruta `…/new` o `…/create`, agregar el header CTA + (si no es link estático) declararla en el manifest. El gate (modo `--warn` durante adopción → `--strict` cuando el backlog legacy de 19 huérfanos se triagee) la atrapa.
+
+**Gate**: `scripts/ci/route-reachability-gate.mjs` (`pnpm route-reachability-gate [--strict]`), corre en `ci.yml` warn mode. Manifest SSOT: `src/lib/navigation/route-reachability-manifest.ts`. Spec: `docs/tasks/complete/TASK-982-navigation-reachability-governance-contract.md`. Skills de diseño: `info-architecture` + `greenhouse-ux`.
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.9
+> **Version:** 1.10
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-01 — v1.10: TASK-982 Navigation Reachability Governance. Contrato canónico: toda ruta `(dashboard)` debe ser alcanzable (link interno / child route declarada / dinámica). Gate `route-reachability-gate.mjs` (espejo navegacional de TASK-827) + manifest SSOT `src/lib/navigation/route-reachability-manifest.ts`. Patrón header primary-action ("Nuevo X" en workbench, 1 primary + N tonal). Doctrina IA de dominio multi-superficie (hub-por-audiencia + tabs + drawers + ⌘K). Ver Delta 2026-06-01 abajo.
 > **Updated:** 2026-05-08 — v1.9: TASK-612 entrega Organization Workspace Shell (chrome) + FacetContentRouter + 9 facet content components, gated por flag `organization_workspace_shell_agency` (extensión de `home_rollout_flags` per V1.1). Patron canónico shell-vs-content (§4.5 spec V1) materializado: shell owns chrome, domain owns facet content via render-prop + lazy registry. Ver Delta 2026-05-08 abajo.
 > **Updated:** 2026-05-06 — v1.8: TASK-430 activa el runtime `next-intl` sin prefijar el portal privado. `src/i18n/*` resuelve locale con cookie `gh_locale` + `Accept-Language` + fallback `es-CL`, el App Router queda envuelto por `NextIntlClientProvider`, `<html lang>` usa locale efectivo y `en-US` ya cubre shell navigation + namespaces shared serializables. Ver Delta 2026-05-06c abajo.
 > **Updated:** 2026-05-06 — v1.7: TASK-428 publica `GREENHOUSE_I18N_ARCHITECTURE_V1.md`: `next-intl` como librería App Router, portal privado state-only sin locale prefix por defecto, `en-US` como primera activación, `pt-BR` planned, y TASK-431 debe absorber `client_users.locale` legacy. Ver Delta 2026-05-06b abajo.

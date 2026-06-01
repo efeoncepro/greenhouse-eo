@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -249,8 +249,17 @@ Pattern para TASK-798 ops console = hub de confiabilidad del dominio (agrega las
 - [ ] chequeo de impacto cruzado (TASK-797/798 heredan el patrón — anotar delta)
 - [ ] CLAUDE.md invariante "Navigation Reachability Governance (TASK-982)" agregado
 
+## Delta de ejecución (2026-06-01) — SHIPPED
+
+- **Slice 1** (`5157e78c`): botón primary "Nuevo contractor" en `ContractorAdminWorkbenchView` header → `/hr/contractors/new` (gated `canManage`); "Revisar seleccionado" → tonal (regla 1 primary + N tonal). Cierra el huérfano TASK-976.
+- **Slice 1b** (`5157e78c`): "Pagos a contractors" reubicado de Finanzas→Tesorería al submenú **Nómina** en `VerticalMenu.tsx`, preservando `canSeeView('finanzas.contractor_payables')` + label intacto.
+- **Slice 2** (`673bd5bd`): `route-reachability-gate.mjs` (broad-scan de todos los nav links de `src/`, no solo VerticalMenu — bajó falsos positivos 40→19) + manifest SSOT `route-reachability-manifest.ts` + `pnpm route-reachability-gate` + wire `ci.yml` (warn) + test anti-regresión. `/hr/contractors/new` ya NO es huérfano.
+- **Slice 3**: invariante CLAUDE.md "Navigation Reachability Governance (TASK-982)" + doctrina en `GREENHOUSE_UI_PLATFORM_V1.md`.
+
 ## Follow-ups
 
+- **Triage de los 19 huérfanos legacy** que el gate marca hoy (warn mode). Cada uno se resuelve por: link/CTA nuevo, declaración en el manifest, o confirmación de que es dinámico. Cuando el backlog llegue a 0, **promover el gate a `--strict`** en `ci.yml`. Lista actual:
+  `/admin/client-portal/catalog`, `/admin/commercial`, `/admin/identity/drift-reconciliation`, `/admin/integrations/hubspot/sample-sprint-dead-letter`, `/admin/pricing-catalog/import-excel`, `/admin/releases`, `/admin/responsibilities`, `/admin/scim-tenant-mappings`, `/admin/workforce/activation`, `/agency/capacity`, `/agency/sample-sprints/new`, `/campaigns`, `/cliente-portal-mockup`, `/dashboard`, `/finance/economics`, `/finance/external-signals`, `/finance/quotes/share-dashboard`, `/internal/dashboard`, `/notifications/preferences`. (Varios son alcanzables vía nav data-driven con keys que el regex no captura — el triage clasifica cada uno; algunos son genuinamente huérfanos.)
 - TASK-797 (closure) y TASK-798 (ops console) consumen el patrón header-action + el gate desde el día 1.
 - Evaluar tabs locales en el workbench HR si crece (`Engagements | Envíos | Clasif. pendiente`).
-- Auditar otros `(dashboard)` legacy que el gate marque como huérfanos al activarse (backlog de remediación separado si emergen varios).
+- Slice 3 opcional restante: auditar que ⌘K indexe rutas hijas; tabs en workbench HR.
