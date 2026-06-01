@@ -93,6 +93,7 @@ import {
   getNotionMetricsFtrWritebackLagSignal
 } from './queries/notion-metrics-ftr-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
+import { getIdentitySessionRouteGroupDriftSignal } from './queries/identity-session-route-group-drift'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
 import { getContractorEngagementClassificationReviewPendingSignal } from './queries/contractor-engagement-classification-review-pending'
@@ -1404,7 +1405,10 @@ export const getReliabilityOverview = async (
           getContractorEngagementClosedWithOpenPayablesSignal().catch(() => null),
           // TASK-985 — engagements no terminales con clasificación `needs_review`
           // (worklist de revisión; salvedad de la auto-activación de onboarding).
-          getContractorEngagementClassificationReviewPendingSignal().catch(() => null)
+          getContractorEngagementClassificationReviewPendingSignal().catch(() => null),
+          // TASK-987 — route_groups de sesión que no derivan de roles ACTIVOS
+          // (over-exposure por roles revocados; defense-in-depth del fix session_360).
+          getIdentitySessionRouteGroupDriftSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)

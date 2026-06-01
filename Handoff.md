@@ -1,3 +1,60 @@
+# Sesion 2026-06-01 — session_360 route_groups over-exposure fix (TASK-987 / ISSUE-083) — ✅ COMPLETE (develop, sin push)
+
+**Scope**: fix de raíz de seguridad (over-exposure de navegación) + remediación de gobernanza + detector. NO parche. Diseñado con arch-architect (4-pilar) + info-architecture + greenhouse-ux.
+
+**Disparador**: "¿por qué Valentina (collaborator) ve Personas?". Auditoría → bug estructural en `greenhouse_serving.session_360`: deriva `route_groups` **sin** el predicado de lifecycle (`ura.active AND effective window`) que sí aplica a `role_codes`. Roles **revocados** seguían aportando su `roles.route_group_scope`. Blast radius: 5 usuarios internos. Peor caso: **Humberly** (`collaborator`) veía **Finanzas+HR** por 3 roles revocados (finance_manager ghost + hr_payroll + efeonce_operations). El fallback BQ (`getIdentityAccessRecord`) ya filtraba activo — solo el view PG divergía.
+
+**Fix (migración atómica `20260601194051024`)**:
+1. **Raíz**: `CREATE OR REPLACE VIEW session_360` — el agregado `route_groups` ahora usa el mismo FILTER de lifecycle que `role_codes`.
+2. **Gobernanza** (misma tx, sin gap): Humberly ("Finance Manager") re-otorgada con roles ACTIVOS canónicos `finance_admin`+`hr_manager` (cargan route_groups+vistas+entitlements). **Decisión del operador** — no hardcode.
+3. **Defense-in-depth**: signal `identity.session.route_group_drift` (kind=drift, error si >0, steady=0) + 4 tests + wire-up.
+4. DO block de verificación en la migración (aborta si queda fuga o Humberly no quedó con 2 roles).
+
+**Live verify (DB compartida)**: Valentina/Andres/Melkin→`[my]`; Daniela→`[internal,my]` (conserva Aprobaciones — supervisora con 3 reportes + efeonce_operations activo); Humberly→`[commercial,finance,hr,my]`; signal count **0**. Superficies de supervisor (Mi equipo/Aprobaciones) NO dependían de route groups (se gatean por `supervisorAccess`) → intactas.
+
+**Gates**: tsc 0 · lint 0 · signal test 4/4 · reliability suite 375 · build (en cierre).
+
+**Open question (gobernanza, follow-up)**: TS `ROLE_ROUTE_GROUPS` vs DB `roles.route_group_scope` difieren en `people` para `efeonce_operations`/`hr_payroll`. No cambiado (decisión de valores de mapping del operador). Otros collaborators afectados correctamente en `[my]`; si alguno necesita acceso más amplio, otorgar rol activo (no la fuga).
+
+---
+
+# Sesion 2026-06-01 — Workforce Activation role title blocker root-cause fix — ✅ VALIDADO LOCAL + STAGING DATA OK
+
+**Scope**: causa raíz para `Falta cargo vigente` en Workforce Activation cuando el cargo ya existe en Microsoft Entra. No es patch por persona: se conectó Entra/Graph → `identity_profiles.job_title` → `members.role_title` con la primitiva gobernada de Workforce Role Title y se agregó salida UI auditada.
+
+**Caso fuente**: Maggie Borralles (`mborralles@efeoncepro.com`) tenía `jobTitle='Creative Social Media Strategist'` en Entra, pero SCIM había creado/backfilled el member sin `identity_profiles.job_title` ni `members.role_title`. El readiness mostraba blocker `role_title_missing` y el drawer no tenía campo para resolverlo.
+
+**Cambios runtime locales**:
+- `src/lib/entra/graph-client.ts`: nuevo `fetchEntraUserById()` para leer Graph por objectId.
+- `src/app/api/scim/v2/Users/route.ts`: SCIM CREATE interno enriquece `entraJobTitle` best-effort desde Graph antes de llamar la primitiva. Si Graph falla, SCIM no se cae; queda cron/sync como recuperación.
+- `src/lib/scim/provisioning-internal-collaborator.ts`: la primitiva actualiza `identity_profiles.job_title` para perfiles existentes y aplica `members.role_title` con `applyEntraRoleTitleWithClient()` dentro de la misma transacción cuando llega jobTitle.
+- `src/lib/workforce/role-title/sync-from-entra.ts`: helper transaccional reutilizable `applyEntraRoleTitleWithClient()`; mantiene HR override precedence, drift proposal, audit y outbox.
+- `src/app/api/hr/workforce/members/[memberId]/role-title/route.ts`: `PATCH` gobernado por capability `workforce.role_title.update`, razón obligatoria vía `updateMemberRoleTitle()`.
+- `WorkforceIntakeRemediationDrawer`: agrega campo **Cargo vigente** en el drawer; guarda por el endpoint canónico y requiere motivo >=10 chars cuando cambia el cargo.
+- Copy + manual `docs/manual-de-uso/hr/habilitar-colaborador-workforce.md` actualizados.
+
+**Recovery Maggie vía camino canónico, no SQL**:
+- Se ejecutó `GET /api/cron/entra-profile-sync` en staging con auth cron + Vercel bypass.
+- Resultado: `processed=21`, `profilesUpdated=1`, `membersUpdated=2`, `errors=[]`.
+- Verificación staging: `pnpm staging:request '/api/hr/workforce/activation?pageSize=10' --pretty` devuelve Maggie `ready_to_complete`, `blockerCount=0`, `roleTitle='Creative Social Media Strategist'`, `roleTitleSource='entra'`.
+
+**Validación**:
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm exec vitest run src/lib/workforce/activation/readiness.test.ts src/app/api/cron/entra-profile-sync/route.test.ts src/lib/scim/eligibility.test.ts --reporter=dot` ✅ 39/39
+- ESLint focal sobre archivos tocados ✅
+- `pnpm build` ✅
+- `pnpm lint` global falla por `.captures/**/*.mjs` generados (`2026-06-01T18-47-14_valentina-contractor-e2e`, `2026-06-01T19-21-07_valentina-menu`), no por este cambio. No se tocaron esos artifacts.
+
+**Deploy staging/dev**:
+- Primer intento `vercel deploy --target=staging --yes` falló por límite de archivos (`files > 15000`); relanzado con `--archive=tgz`.
+- Deployment staging Ready: `greenhouse-hqc2hxtdb-efeonce-7670142f.vercel.app`, target `staging`, aliases `dev-greenhouse.efeoncepro.com` + `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- Verificación post-deploy: `GET /api/hr/workforce/members/0e6a896e-f1d2-481c-9c97-ee43ab1714d8/role-title` devuelve `roleTitle='Creative Social Media Strategist'`, source `entra`, `canUpdate=true`.
+- GVC staging: `.captures/2026-06-01T19-45-57_inline-hr-workforce-activation` ✅.
+
+**Release note**: el fix de datos de Maggie ya está aplicado en staging por cron y el fix de código ya está desplegado en staging/dev. Producción no se tocó por deploy local directo: debe ir por push/merge + production orchestrator para mantener el manifest canónico.
+
+---
+
 # Sesion 2026-06-01 — Contractor Directory (TASK-986) + onboarding auto-activation (TASK-985) — ✅ COMPLETE (develop, sin push)
 
 **Scope**: UI/IA + projection, sin migración/capability/mutación de data. Local-first (no push por instrucción del operador).
