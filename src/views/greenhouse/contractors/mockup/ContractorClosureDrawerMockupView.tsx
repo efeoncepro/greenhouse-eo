@@ -138,10 +138,10 @@ const ContractorClosureDrawerMockupView = () => {
                   {C.closure.drawerTitle}
                 </Typography>
                 <Typography variant='body2' sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                  Daniela España
+                  Camila Rivas
                 </Typography>
                 <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
-                  <CustomChip round='true' size='small' variant='tonal' color='secondary' label='EO-CENG-0001' />
+                  <CustomChip round='true' size='small' variant='tonal' color='secondary' label='EO-CENG-DEMO' />
                   <CustomChip
                     round='true'
                     size='small'
