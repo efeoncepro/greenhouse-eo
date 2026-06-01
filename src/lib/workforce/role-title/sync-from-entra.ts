@@ -2,6 +2,8 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 
+import type { PoolClient } from 'pg'
+
 import { withTransaction } from '@/lib/db'
 
 import { writeRoleTitleAuditEntry } from './audit'
@@ -50,41 +52,41 @@ export interface ApplyRoleTitleResult {
 
 const buildProposalId = () => `mrtdp-${randomUUID()}`
 
-export const applyEntraRoleTitle = async (
+export const applyEntraRoleTitleWithClient = async (
+  client: PoolClient,
   input: ApplyRoleTitleInput
 ): Promise<ApplyRoleTitleResult> => {
   if (!input.entraJobTitle) {
     return { applied: false, skipped: true, driftProposed: false, reason: 'entra_value_null' }
   }
 
-  return withTransaction(async client => {
-    const lookup = await client.query<MemberRoleTitleRow>(
-      `SELECT member_id, role_title, role_title_source, last_human_update_at
-         FROM greenhouse_core.members
-        WHERE member_id = $1
-        FOR UPDATE`,
-      [input.memberId]
-    )
+  const lookup = await client.query<MemberRoleTitleRow>(
+    `SELECT member_id, role_title, role_title_source, last_human_update_at
+       FROM greenhouse_core.members
+      WHERE member_id = $1
+      FOR UPDATE`,
+    [input.memberId]
+  )
 
-    const row = lookup.rows[0]
+  const row = lookup.rows[0]
 
-    if (!row) {
-      return { applied: false, skipped: true, driftProposed: false, reason: 'member_not_found' }
-    }
+  if (!row) {
+    return { applied: false, skipped: true, driftProposed: false, reason: 'member_not_found' }
+  }
 
-    if (row.role_title === input.entraJobTitle) {
-      return { applied: false, skipped: true, driftProposed: false, reason: 'no_change' }
-    }
+  if (row.role_title === input.entraJobTitle) {
+    return { applied: false, skipped: true, driftProposed: false, reason: 'no_change' }
+  }
 
-    const hasHrOverride =
-      row.role_title_source === 'hr_manual' && row.last_human_update_at !== null
+  const hasHrOverride =
+    row.role_title_source === 'hr_manual' && row.last_human_update_at !== null
 
-    if (hasHrOverride) {
-      // Drift case — record proposal, do NOT overwrite.
-      const proposalId = buildProposalId()
+  if (hasHrOverride) {
+    // Drift case — record proposal, do NOT overwrite.
+    const proposalId = buildProposalId()
 
-      await client.query(
-        `INSERT INTO greenhouse_sync.member_role_title_drift_proposals (
+    await client.query(
+      `INSERT INTO greenhouse_sync.member_role_title_drift_proposals (
            proposal_id, member_id, source_system, source_sync_run_id,
            drift_kind, current_role_title, current_source, proposed_role_title,
            status, policy_action, evidence_json
@@ -100,51 +102,56 @@ export const applyEntraRoleTitle = async (
            current_role_title = EXCLUDED.current_role_title,
            last_detected_at = NOW(),
            occurrence_count = greenhouse_sync.member_role_title_drift_proposals.occurrence_count + 1`,
-        [proposalId, input.memberId, input.sourceSyncRunId ?? null, row.role_title, input.entraJobTitle]
-      )
+      [proposalId, input.memberId, input.sourceSyncRunId ?? null, row.role_title, input.entraJobTitle]
+    )
 
-      await writeRoleTitleAuditEntry(client, {
-        memberId: input.memberId,
-        action: 'drift_proposed',
-        source: 'entra',
-        oldRoleTitle: row.role_title,
-        newRoleTitle: input.entraJobTitle,
-        actorUserId: 'system',
-        reason: 'Entra value diverges from HR-managed role_title',
-        diff: {
-          drift_kind: 'entra_overwrite_blocked',
-          source_sync_run_id: input.sourceSyncRunId ?? null
-        }
-      })
+    await writeRoleTitleAuditEntry(client, {
+      memberId: input.memberId,
+      action: 'drift_proposed',
+      source: 'entra',
+      oldRoleTitle: row.role_title,
+      newRoleTitle: input.entraJobTitle,
+      actorUserId: 'system',
+      reason: 'Entra value diverges from HR-managed role_title',
+      diff: {
+        drift_kind: 'entra_overwrite_blocked',
+        source_sync_run_id: input.sourceSyncRunId ?? null
+      }
+    })
 
-      return { applied: false, skipped: true, driftProposed: true, reason: 'hr_override_active' }
-    }
+    return { applied: false, skipped: true, driftProposed: true, reason: 'hr_override_active' }
+  }
 
-    // No HR override — safe to apply Entra value (same as legacy behavior).
-    await client.query(
-      `UPDATE greenhouse_core.members
+  // No HR override — safe to apply Entra value (same as legacy behavior).
+  await client.query(
+    `UPDATE greenhouse_core.members
           SET role_title = $1,
               role_title_source = 'entra',
               role_title_updated_at = NOW(),
               updated_at = NOW()
         WHERE member_id = $2`,
-      [input.entraJobTitle, input.memberId]
-    )
+    [input.entraJobTitle, input.memberId]
+  )
 
-    await writeRoleTitleAuditEntry(client, {
-      memberId: input.memberId,
-      action: 'updated',
-      source: 'entra',
-      oldRoleTitle: row.role_title,
-      newRoleTitle: input.entraJobTitle,
-      actorUserId: 'system',
-      reason: 'Entra/SCIM sync',
-      diff: {
-        previous_source: row.role_title_source,
-        source_sync_run_id: input.sourceSyncRunId ?? null
-      }
-    })
-
-    return { applied: true, skipped: false, driftProposed: false }
+  await writeRoleTitleAuditEntry(client, {
+    memberId: input.memberId,
+    action: 'updated',
+    source: 'entra',
+    oldRoleTitle: row.role_title,
+    newRoleTitle: input.entraJobTitle,
+    actorUserId: 'system',
+    reason: 'Entra/SCIM sync',
+    diff: {
+      previous_source: row.role_title_source,
+      source_sync_run_id: input.sourceSyncRunId ?? null
+    }
   })
+
+  return { applied: true, skipped: false, driftProposed: false }
+}
+
+export const applyEntraRoleTitle = async (
+  input: ApplyRoleTitleInput
+): Promise<ApplyRoleTitleResult> => {
+  return withTransaction(client => applyEntraRoleTitleWithClient(client, input))
 }

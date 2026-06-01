@@ -60,6 +60,7 @@ const WorkforceIntakeRemediationDrawer = ({
   const [hireDate, setHireDate] = useState('')
   const [employmentType, setEmploymentType] = useState<HrEmploymentType>('full_time')
   const [contractType, setContractType] = useState<ContractType>('indefinido')
+  const [roleTitle, setRoleTitle] = useState('')
   const [contractEndDate, setContractEndDate] = useState('')
   const [deelContractId, setDeelContractId] = useState('')
   const [legalReviewReference, setLegalReviewReference] = useState('')
@@ -79,6 +80,7 @@ const WorkforceIntakeRemediationDrawer = ({
     setHireDate(snapshot.hireDate ?? '')
     setEmploymentType((snapshot.employmentType === 'part_time' || snapshot.employmentType === 'contractor' ? snapshot.employmentType : 'full_time') as HrEmploymentType)
     setContractType(nextContractType)
+    setRoleTitle(snapshot.roleTitle ?? '')
     setContractEndDate(snapshot.contractEndDate ?? '')
     setDeelContractId(snapshot.deelContractId ?? '')
     setLegalReviewReference('')
@@ -98,6 +100,11 @@ const WorkforceIntakeRemediationDrawer = ({
     [member]
   )
 
+  const roleTitleBlockers = useMemo(
+    () => member?.activationReadiness?.blockers.filter(blocker => blocker.lane === 'role_title') ?? [],
+    [member]
+  )
+
   if (!member) return null
 
   const handleContractChange = (next: ContractType) => {
@@ -114,10 +121,39 @@ const WorkforceIntakeRemediationDrawer = ({
   }
 
   const handleSaveLabor = async () => {
+    const normalizedRoleTitle = roleTitle.trim() || null
+    const currentRoleTitle = snapshot?.roleTitle?.trim() || null
+    const hasRoleTitleChange = normalizedRoleTitle !== currentRoleTitle
+    const trimmedReason = reason.trim()
+
+    if (hasRoleTitleChange && trimmedReason.length < 10) {
+      setError(GH_WORKFORCE_ACTIVATION.resolver_role_title_reason_required)
+      toast.error(GH_WORKFORCE_ACTIVATION.resolver_role_title_reason_required)
+
+      return
+    }
+
     setSaving(true)
     setError(null)
 
     try {
+      if (hasRoleTitleChange) {
+        const roleResponse = await fetch(`${intakeApiBasePath}/${member.memberId}/role-title`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roleTitle: normalizedRoleTitle,
+            reason: trimmedReason
+          })
+        })
+
+        const rolePayload = await roleResponse.json().catch(() => null)
+
+        if (!roleResponse.ok) {
+          throw new Error(typeof rolePayload?.error === 'string' ? rolePayload.error : GH_WORKFORCE_ACTIVATION.resolver_save_error)
+        }
+      }
+
       const response = await fetch(`${intakeApiBasePath}/${member.memberId}/intake`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -129,7 +165,7 @@ const WorkforceIntakeRemediationDrawer = ({
           dailyRequired,
           deelContractId: isDeel ? deelContractId || null : null,
           legalReviewReference: isInternationalInternal ? legalReviewReference.trim() : null,
-          reason: reason.trim() || undefined
+          reason: trimmedReason || undefined
         })
       })
 
@@ -196,6 +232,11 @@ const WorkforceIntakeRemediationDrawer = ({
                   {laborBlockers.map(blocker => blocker.label).join(', ')}
                 </Alert>
               ) : null}
+              {roleTitleBlockers.length > 0 ? (
+                <Alert severity='warning' sx={{ mb: 3 }}>
+                  {roleTitleBlockers.map(blocker => blocker.label).join(', ')}
+                </Alert>
+              ) : null}
               <Stack spacing={3}>
                 <TextField
                   fullWidth
@@ -236,6 +277,14 @@ const WorkforceIntakeRemediationDrawer = ({
                     </MenuItem>
                   ))}
                 </TextField>
+                <TextField
+                  fullWidth
+                  size='small'
+                  label={GH_WORKFORCE_ACTIVATION.resolver_role_title}
+                  value={roleTitle}
+                  onChange={event => setRoleTitle(event.target.value)}
+                  helperText={GH_WORKFORCE_ACTIVATION.resolver_role_title_helper}
+                />
                 {contractType === 'plazo_fijo' ? (
                   <TextField
                     fullWidth
