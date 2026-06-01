@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-31 por Claude (TASK-975)
-> **Ultima actualizacion:** 2026-06-01 por Claude (TASK-797 — cierre contractor)
+> **Ultima actualizacion:** 2026-06-01 por Claude (TASK-984 — drawer de cierre operable en el workbench)
 > **Documentacion tecnica:** [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
 
 # Engagement de Contractor — Detalle, Ciclo de Vida y Clasificación (HR)

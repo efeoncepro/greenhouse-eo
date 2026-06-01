@@ -28873,3 +28873,11 @@ Shippado en `develop` (3 commits Slice 1/2/3 + docs). Contractor closure = lifec
 - Evento `workforce.contractor_engagement.closure_initiated v1`; signal `hr.contractor_engagement.closed_with_open_payables`.
 - Gates: tsc 0 · lint 0 · build exit 0 · `pnpm test` **5759 passed / 0 fail** · payroll+offboarding **566** · live PG smoke (signal `ok`, readiness EO-CENG-0001). Boundary payroll TASK-890 intacto.
 - **Follow-up**: closure drawer UI en `/hr/contractors` (acceptance criteria ya backend-enforced). Recomendado abrir TASK derivada (doctrina IA TASK-982: header action + drawer por fila).
+
+### Cierre TASK-984 (2026-06-01) — contractor closure drawer UI, develop
+
+Drawer de operador `ContractorClosureDrawer` en `/hr/contractors` consumiendo el backend de cierre de TASK-797. Funnel: `ContractorLifecycleControls` filtra ending/ended + CTA "Cerrar contractor" → cierra la regresión 409 `use_closure_flow`. Discovery: `ContractorClosureSidecar` era self-service (informativo), no HR — el drawer del operador es nuevo. Copy es-CL `GH_CONTRACTOR_COMPENSATION.closure`; subtítulo nav offboarding → "Employee exit cases".
+
+Gates: tsc 0 · lint 0 · `pnpm build` exit 0 · boundary payroll+offboarding 566.
+
+**PENDIENTE — GVC visual sign-off**: NO se corrió Greenhouse Visual Capture sobre el drawer (el único engagement `EO-CENG-0001` está en `draft` → el CTA "Cerrar contractor" no aparece; requiere un engagement active/paused para capturar el drawer en sus 3 estados). Falta también pasar las skills de product design (modern-ui / greenhouse-ux / microinteractions) sobre la captura real.

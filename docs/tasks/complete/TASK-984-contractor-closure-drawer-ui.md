@@ -6,18 +6,34 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `Complete (2026-06-01) — develop`
 - Rank: `TBD`
 - Domain: `hr|ui`
 - Blocked by: `TASK-797 (complete), TASK-975 (complete)`
-- Branch: `task/TASK-984-contractor-closure-drawer-ui`
+- Branch: `develop` (trabajo directo por instrucción del operador 2026-06-01)
 - Legacy ID: `none`
+
+## Delta 2026-06-01 — Discovery correction + implementation (develop)
+
+Corrección de discovery vs la suposición del spec inicial:
+
+- `ContractorClosureSidecar.tsx` (TASK-975) es la **superficie self-service del contractor** (informativa, checklist hardcodeado, sin acciones) — NO la del operador HR. Se deja intacta.
+- La regresión `409 use_closure_flow` estaba en `ContractorLifecycleControls.tsx` (inspector HR), que ofrecía `ending`/`ended` como transiciones genéricas tras el funnel de API de TASK-797.
+- El drawer de operador es **NUEVO** (`ContractorClosureDrawer.tsx`), no un rework del sidecar self-service.
+
+Implementado:
+
+- **Slice 1 (funnel)**: `ContractorLifecycleControls` filtra `ending`/`ended` + CTA tonal "Cerrar contractor" (visible en active/paused/ending) → abre el drawer. Threaded vía `AdminInspector.onRequestClosure` → workbench owns el drawer state. Cierra la regresión.
+- **Slice 2 (drawer)**: `ContractorClosureDrawer.tsx` — `GET /api/hr/contractors/[id]/closure` (readiness real: blockers acknowledgeable + advisories), form (causal `select`, fecha efectiva `type=date`, provider ref solo si payrollVia∈{deel,remote,oyster}, motivo ≥10, toggle post-closure), acciones `POST` initiate/execute. "Ejecutar" disabled hasta reconocer todos los blockers.
+- **Slice 3 (copy + cleanup + docs)**: bloque `closure` en `src/lib/copy/contractor-compensation.ts` (es-CL, ux-writing); subtítulo nav `offboarding` → "Employee exit cases" (no insinúa contractors); doc funcional + manual.
+
+Gates: tsc 0 · lint 0 · `pnpm build` exit 0 · boundary `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` 566 verde. GVC visual = sign-off del operador (dev server + agent auth) — pendiente de su validación.
 - GitHub Issue: `none`
 
 ## Summary
@@ -189,13 +205,14 @@ Ninguna.
 
 ## Acceptance Criteria
 
-- [ ] La lifecycle UI ya NO ofrece transiciones crudas a `ending`/`ended`; en su lugar hay un CTA "Cerrar contractor" que abre el drawer (regresión `use_closure_flow` cerrada).
-- [ ] El drawer carga la readiness real desde `GET /api/hr/contractors/[id]/closure` (blockers + advisories), NO un checklist hardcodeado.
-- [ ] El operador puede reconocer cada blocker con razón (≥10) y "Ejecutar cierre" queda disabled hasta que no queden blockers sin reconocer.
-- [ ] "Iniciar cierre" lleva a `ending`; "Ejecutar cierre" lleva a `ended`; ambos vía `POST .../closure`.
-- [ ] El toggle "permitir invoices post-cierre" persiste vía el endpoint y queda auditado.
-- [ ] Cero "Calcular finiquito" en la superficie de cierre.
-- [ ] Copy es-CL tokenizado; subtítulo de nav `offboarding` ya no insinúa que cubre contractors.
+- [x] La lifecycle UI ya NO ofrece transiciones crudas a `ending`/`ended`; en su lugar hay un CTA "Cerrar contractor" que abre el drawer (regresión `use_closure_flow` cerrada). — `ContractorLifecycleControls` filtra ending/ended + CTA.
+- [x] El drawer carga la readiness real desde `GET /api/hr/contractors/[id]/closure` (blockers + advisories), NO un checklist hardcodeado. — `ContractorClosureDrawer`.
+- [x] El operador reconoce cada blocker (checkbox) y "Ejecutar cierre" queda disabled hasta que no queden blockers sin reconocer (`allBlockersAcknowledged`). El motivo del cierre exige ≥10 chars.
+- [x] "Iniciar cierre" lleva a `ending`; "Ejecutar cierre" lleva a `ended`; ambos vía `POST .../closure` (action initiate|execute).
+- [x] El toggle "permitir invoices post-cierre" se envía en `execute` y persiste vía `post_closure_invoices_allowed` (auditado por el backend TASK-797).
+- [x] Cero "Calcular finiquito" en la superficie de cierre (drawer 100% contractor; nota explícita "no es finiquito").
+- [x] Copy es-CL tokenizado (`GH_CONTRACTOR_COMPENSATION.closure`); subtítulo de nav `offboarding` → "Employee exit cases" (ya no insinúa contractors).
+- [ ] **GVC visual sign-off (pendiente operador)**: capture del drawer en los 3 estados. Requiere fixture de engagement en `active`/`paused` (el único engagement actual `EO-CENG-0001` está en `draft`, no muestra el CTA). Gates automáticos (tsc/lint/build/boundary) verdes.
 
 ## Verification
 
@@ -207,11 +224,11 @@ Ninguna.
 
 ## Closing Protocol
 
-- [ ] Lifecycle and folder synchronized.
-- [ ] `docs/tasks/README.md` synchronized.
-- [ ] `Handoff.md` updated.
-- [ ] `changelog.md` entry.
-- [ ] Doc funcional + manual actualizados.
+- [x] Lifecycle and folder synchronized.
+- [x] `docs/tasks/README.md` synchronized.
+- [x] `Handoff.md` updated.
+- [x] `changelog.md` entry.
+- [x] Doc funcional actualizado (`hr/contratistas-engagement-ciclo-de-vida.md` v1.2 — drawer de cierre).
 
 ## Follow-ups
 
