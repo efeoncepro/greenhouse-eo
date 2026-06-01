@@ -210,6 +210,7 @@ const ContractorPaymentsWorkbenchView = () => {
               </Typography>
             </Box>
             <Stack direction='row' spacing={2} flexWrap='wrap'>
+              <ReportDownloadButton />
               <MonthlyRunButton onPrepared={() => void refetch()} />
               <CreateMenu onCreated={() => void refetch()} />
             </Stack>
@@ -949,6 +950,95 @@ const MonthlyRunDialog = ({ onClose, onPrepared }: { onClose: () => void; onPrep
             {confirming ? C.monthlyRun.preparing : C.monthlyRun.confirm}
           </Button>
         )}
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+// ── Descargar nómina (reporte de período PDF / Excel) ─────────────────────────
+
+const ReportDownloadButton = () => {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <Button variant='tonal' color='secondary' startIcon={<i className='tabler-download' />} onClick={() => setOpen(true)}>
+        {C.header.reportCta}
+      </Button>
+      {open ? <ReportDownloadDialog onClose={() => setOpen(false)} /> : null}
+    </>
+  )
+}
+
+const ReportDownloadDialog = ({ onClose }: { onClose: () => void }) => {
+  const now = useMemo(() => new Date(), [])
+  const currentYear = now.getFullYear()
+
+  const [year, setYear] = useState(currentYear)
+  const [month, setMonth] = useState(now.getMonth() + 1)
+
+  const download = (format: 'pdf' | 'excel') => {
+    const href = `/api/finance/contractor-payables/run-report?periodYear=${year}&periodMonth=${month}&format=${format}`
+    const link = document.createElement('a')
+
+    link.href = href
+    link.rel = 'noopener'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    toast.success('Generando la descarga…')
+  }
+
+  return (
+    <Dialog open onClose={onClose} maxWidth='xs' fullWidth aria-labelledby='report-download-title'>
+      <DialogTitle id='report-download-title' sx={{ fontWeight: 600 }}>
+        {C.report.title}
+      </DialogTitle>
+      <DialogContent>
+        <Stack spacing={4} sx={{ pt: 1 }}>
+          <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+            {C.report.intro}
+          </Typography>
+          <Stack direction='row' spacing={2}>
+            <CustomTextField
+              select
+              label={C.report.monthLabel}
+              value={month}
+              onChange={e => setMonth(Number(e.target.value))}
+              fullWidth
+            >
+              {MONTH_LABELS_ES.map((label, i) => (
+                <MenuItem key={label} value={i + 1}>
+                  {label.charAt(0).toUpperCase() + label.slice(1)}
+                </MenuItem>
+              ))}
+            </CustomTextField>
+            <CustomTextField
+              select
+              label={C.report.yearLabel}
+              value={year}
+              onChange={e => setYear(Number(e.target.value))}
+              sx={{ minWidth: 120 }}
+            >
+              {[currentYear - 1, currentYear].map(y => (
+                <MenuItem key={y} value={y}>
+                  {y}
+                </MenuItem>
+              ))}
+            </CustomTextField>
+          </Stack>
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{ px: 6, pb: 5 }}>
+        <Button variant='tonal' color='secondary' onClick={onClose}>
+          {C.report.close}
+        </Button>
+        <Button variant='tonal' color='primary' startIcon={<i className='tabler-file-spreadsheet' />} onClick={() => download('excel')}>
+          {C.report.downloadExcel}
+        </Button>
+        <Button variant='contained' color='primary' startIcon={<i className='tabler-file-type-pdf' />} onClick={() => download('pdf')}>
+          {C.report.downloadPdf}
+        </Button>
       </DialogActions>
     </Dialog>
   )

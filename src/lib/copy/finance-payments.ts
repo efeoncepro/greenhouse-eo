@@ -12,7 +12,8 @@ export const GH_FINANCE_CONTRACTOR_PAYMENTS = {
     subtitle: 'Prepara, revisa y autoriza los pagos a contractors antes de la orden de pago.',
     createFromSubmissionCta: 'Crear desde envío',
     createOffCycleCta: 'Pago off-cycle',
-    monthlyRunCta: 'Iniciar corrida mensual'
+    monthlyRunCta: 'Iniciar corrida mensual',
+    reportCta: 'Descargar nómina'
   },
   kpi: {
     toPrepare: 'Por preparar',
@@ -117,6 +118,16 @@ export const GH_FINANCE_CONTRACTOR_PAYMENTS = {
     alreadyPrepared: 'Ya estaba preparada: no había pagos nuevos para este período.',
     note: 'Las órdenes quedan en «pendiente de aprobación». La aprobación y el pago al banco siguen siendo manuales.',
     error: 'No se pudo preparar la corrida. Intenta de nuevo.',
+    close: 'Cerrar'
+  },
+  report: {
+    title: 'Descargar nómina de contractors',
+    intro:
+      'Reporte del período con el desglose bruto − retención SII = neto, agrupado por régimen. El neto es lo pagado; la retención SII se remesa al SII por separado.',
+    monthLabel: 'Mes',
+    yearLabel: 'Año',
+    downloadPdf: 'Descargar PDF',
+    downloadExcel: 'Descargar Excel',
     close: 'Cerrar'
   },
   status: {
