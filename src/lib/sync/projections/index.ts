@@ -29,6 +29,7 @@ import { staffAugPlacementProjection } from './staff-augmentation'
 import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
 import { contractorPayableFinanceObligationProjection } from './contractor-payable-finance-obligation'
 import { contractorPayableExpenseMaterializeProjection } from './contractor-payable-expense-materialize'
+import { contractorPayablePaidCascadeProjection } from './contractor-payable-paid-cascade'
 import { paymentObligationsFromPayrollProjection } from './payment-obligations-from-payroll'
 import { recordExpensePaymentFromOrderProjection } from './record-expense-payment-from-order'
 import { payrollReliquidationDeltaProjection } from './payroll-reliquidation-delta'
@@ -110,6 +111,8 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(paymentObligationsFromPayrollProjection)
 registerProjection(contractorPayableFinanceObligationProjection)
 registerProjection(contractorPayableExpenseMaterializeProjection)
+  registerProjection(contractorPayablePaidCascadeProjection) // TASK-981 Slice 1 — finance.payment_order.paid → mark linked contractor payables paid + emit workforce.contractor_payable.paid
+
   registerProjection(recordExpensePaymentFromOrderProjection)
   registerProjection(payrollReliquidationDeltaProjection)
   registerProjection(accountBalancesProjection)

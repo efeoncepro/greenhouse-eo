@@ -219,6 +219,7 @@ type PayableEventType =
   | 'ready_for_finance'
   | 'obligation_created'
   | 'payment_order_created'
+  | 'paid'
   | 'blocked'
   | 'cancelled'
   | 'updated'
@@ -1112,4 +1113,115 @@ export const markPayablePaymentOrderCreated = async (
   }
 
   return withGreenhousePostgresTransaction((tx) => markPayablePaymentOrderCreatedTx(tx, input))
+}
+
+/**
+ * TASK-981 — transición canónica `payment_order_created → paid`.
+ *
+ * Es el writer ÚNICO de `paid` para contractor payables: cuando la payment order
+ * que paga el payable se marca `paid` (settlement TASK-765/977), el cascade reactivo
+ * `contractor-payable-paid-cascade` invoca este writer por cada payable enlazado.
+ * Appendea el evento `paid` al audit log y publica el evento de dominio canónico
+ * `workforce.contractor_payable.paid v1`, que dispara el envío del comprobante
+ * TASK-960 por email (consumer `contractor-payable-paid-email`).
+ *
+ * Antes de TASK-981 NINGÚN writer transicionaba el payable a `paid` (mismo gap-class
+ * que TASK-979 cerró para `payment_order_created`); el comprobante TASK-960 (gate
+ * `status='paid'`) era por tanto inalcanzable. Esto lo desbloquea.
+ *
+ * Dual-mode: con `client` corre en la tx del caller; sin él abre su propia tx.
+ * Idempotente: re-llamar cuando ya está `paid` es un no-op (no re-emite el evento).
+ */
+const markPayablePaidTx = async (
+  client: PoolClient,
+  input: {
+    contractorPayableId: string
+    actorUserId: string
+    paidAt?: string | null
+    paymentOrderId?: string | null
+  }
+): Promise<ContractorPayable> => {
+  const current = await lockPayable(client, input.contractorPayableId)
+
+  // Idempotente: ya pagado → no-op (no re-emite el evento de dominio).
+  if (current.status === 'paid') {
+    return current
+  }
+
+  if (current.status !== 'payment_order_created') {
+    throw new ContractorEngagementValidationError(
+      `No se puede marcar pagado desde el estado ${current.status}.`,
+      'payable_not_payment_order_created',
+      409
+    )
+  }
+
+  // Defensa: respeta la state machine (mirror del trigger DB).
+  assertValidPayableTransition(current.status, 'paid')
+
+  const result = await client.query<ContractorPayableRow>(
+    `UPDATE greenhouse_hr.contractor_payables
+     SET status = 'paid'
+     WHERE contractor_payable_id = $1
+     RETURNING ${PAYABLE_SELECT_COLUMNS}`,
+    [input.contractorPayableId]
+  )
+
+  const updated = mapContractorPayable(result.rows[0])
+
+  await appendPayableEvent(client, {
+    contractorPayableId: updated.contractorPayableId,
+    eventType: 'paid',
+    fromStatus: current.status,
+    toStatus: updated.status,
+    actorUserId: input.actorUserId,
+    metadata: {
+      paymentOrderId: input.paymentOrderId ?? updated.paymentOrderId ?? null,
+      paidAt: input.paidAt ?? null
+    }
+  })
+  await publishPayableEvent(client, updated, EVENT_TYPES.contractorPayablePaid, {
+    paymentOrderId: input.paymentOrderId ?? updated.paymentOrderId ?? null,
+    paidAt: input.paidAt ?? null
+  })
+
+  return updated
+}
+
+export const markPayablePaid = async (
+  input: {
+    contractorPayableId: string
+    actorUserId: string
+    paidAt?: string | null
+    paymentOrderId?: string | null
+  },
+  client?: PoolClient
+): Promise<ContractorPayable> => {
+  if (client) {
+    return markPayablePaidTx(client, input)
+  }
+
+  return withGreenhousePostgresTransaction((tx) => markPayablePaidTx(tx, input))
+}
+
+/**
+ * TASK-981 — reader del cascade `finance.payment_order.paid → payable paid`.
+ *
+ * Devuelve los `contractor_payable_id` enlazados a una payment order que están en
+ * estado `payment_order_created` (los únicos elegibles para transicionar a `paid`).
+ * Filtra por estado en SQL, por lo que órdenes no-contractor o payables ya pagados
+ * NO aparecen — el cascade es idempotente y un no-op para órdenes ajenas.
+ */
+export const listPayableIdsByPaymentOrderForPaidCascade = async (
+  paymentOrderId: string
+): Promise<string[]> => {
+  const rows = await query<{ contractor_payable_id: string }>(
+    `SELECT contractor_payable_id
+     FROM greenhouse_hr.contractor_payables
+     WHERE payment_order_id = $1
+       AND status = 'payment_order_created'`,
+    [paymentOrderId]
+  )
+
+  return rows.map((r) => r.contractor_payable_id)
 }

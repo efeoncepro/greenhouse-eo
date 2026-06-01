@@ -765,6 +765,10 @@ export const EVENT_TYPES = {
   contractorPayableReadyForFinance: 'workforce.contractor_payable.ready_for_finance',
   contractorPayableObligationCreated: 'workforce.contractor_payable.obligation_created',
   contractorPayablePaymentOrderCreated: 'workforce.contractor_payable.payment_order_created',
+  // TASK-981 — payable pagado: la payment order que lo paga se marcó `paid` y el
+  // cascade reactivo transicionó el payable `payment_order_created → paid`. Dispara
+  // el envío del comprobante TASK-960 por email (consumer contractor-payable-paid-email).
+  contractorPayablePaid: 'workforce.contractor_payable.paid',
   contractorPayableBlocked: 'workforce.contractor_payable.blocked',
   contractorPayableCancelled: 'workforce.contractor_payable.cancelled',
 
