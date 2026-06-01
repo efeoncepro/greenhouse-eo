@@ -28885,3 +28885,13 @@ Gates: tsc 0 · lint 0 · `pnpm build` exit 0 · boundary payroll+offboarding 56
 ### TASK-984 GVC visual loop (2026-06-01) — mockup-first canónico
 
 Cerré el gap visual: ruta mockup `/hr/contractors/closure/mockup` + scenario GVC `contractor-closure-drawer-mockup` (3 estados) + revisión con skills product design (modern-ui / greenhouse-ux / ux-writing). 2 iteraciones aplicadas a runtime + mockup: header identity-first (nombre + ID + chip estado), estado cerrado con "Resumen del cierre" (eliminado el CTA contradictorio "Puedes ejecutar el cierre"), jerarquía del blocker card, fix Spanglish "work submissions"→"envíos de trabajo". Frames revisados a bar enterprise (capturas en `.captures/*contractor-closure-drawer-mockup`). Runtime live smoke pendiente de fixture (engagement active/paused).
+
+### TASK-985 (2026-06-01) — Contractor onboarding auto-activation, develop
+
+Resuelto el "draft huérfano" (caso Valentina `EO-CENG-0001`): el onboarding (Camino A + B) auto-activa el engagement cuando la clasificación no es bloqueante; retenido solo si `legal_review_required`/`blocked`. Diagnóstico clave: el draft NO era compuerta de compliance (el CHECK solo bloquea `active` por riesgo bloqueante, no por `needs_review`); nadie avanzaba el estado.
+
+- Helper `activateEngagementIfNotBlocking` + opt-in `activateWhenClassificationNotBlocking` + heal del `already_complete` (re-onboardear cura un draft existente). Predicado `shouldAutoActivateOnOnboard`.
+- Señal `hr.contractor_engagement.classification_review_pending` (salvedad: visibiliza `needs_review`).
+- Wizard refleja estado real (activo/retenido), no "Borrador" fijo.
+- 3 commits Slice 1/2/3. Gates: tsc/lint 0 · contractor+payroll+offboarding 728 verde · `pnpm build` (en curso al cierre).
+- **No pusheado**: el operador está testeando en staging (`dev-greenhouse`); para que el fix llegue allí hay que push a `develop` (auto-deploy). Pendiente: (1) push, (2) confirmar fecha real de Valentina (01-05 vs 01-06) + monto, (3) re-onboardear Valentina en staging → el heal la activa.

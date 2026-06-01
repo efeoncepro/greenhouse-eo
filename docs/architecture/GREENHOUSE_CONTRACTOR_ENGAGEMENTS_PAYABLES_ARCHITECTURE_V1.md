@@ -4,6 +4,18 @@
 **Created:** 2026-05-05
 **Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + Employee→Contractor connected command (TASK-956) + Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification (TASK-957) + **Contractor Closure + Transition Controls (TASK-797)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955) and ops control plane (TASK-798) remain proposals.
 
+## Delta 2026-06-01 — TASK-985 Onboarding auto-activation (no más draft huérfano)
+
+El onboarding de contractor (Camino A nuevo + Camino B empleado→contractor) **auto-activa** el engagement (`draft → active`) cuando la clasificación **no es bloqueante**; queda retenido en `draft` solo ante riesgo **bloqueante** (`legal_review_required`/`blocked`).
+
+- **Causa raíz corregida**: el `draft` NO era una compuerta de compliance — el CHECK `contractor_engagements_active_requires_clear_risk` solo bloquea `active` para `legal_review_required`/`blocked`, **NO** para `needs_review`. El engagement nacía `draft` y el onboarding nunca lo avanzaba (estado huérfano; caso Valentina `EO-CENG-0001`).
+- **Helper canónico** `activateEngagementIfNotBlocking(client, engagement, actorUserId)` (store.ts): `draft → active` + evento `status_changed` + outbox `contractorEngagementActivated`; no-op si ya salió de draft o si el riesgo es bloqueante. Idempotente, reusable.
+- **Opt-in** `createContractorEngagement(input.activateWhenClassificationNotBlocking)` (default false → callers existentes intactos). Camino A route + `transitionEmployeeToContractorEngagement` lo activan. El branch `already_complete` del transition **cura** un draft huérfano existente al re-onboardear.
+- **Predicado puro** `shouldAutoActivateOnOnboard(status) = !isClassificationRiskBlocking(status)`.
+- **Salvedad / observabilidad**: nueva señal `hr.contractor_engagement.classification_review_pending` (data_quality, moduleKey=identity, warning>0) — worklist de `needs_review` no terminales (con conteo de activos), para que la revisión de clasificación quede visible y no se olvide tras la auto-activación.
+- **UI**: el wizard de onboarding refleja el estado real del resultado (Activo / Retenido para revisión), no "Borrador" fijo.
+- **Boundary (TASK-890/957)**: la activación toca solo `contractor_engagements.status`; NUNCA `member.contract_type`/finiquito/offboarding. Decisión arch-architect + greenhouse-ux (Opción A), aprobada operador. Spec: `docs/tasks/in-progress/TASK-985-contractor-onboarding-auto-activation.md`.
+
 ## Delta 2026-06-01 — TASK-797 Contractor Closure + Transition Controls shipped (backend)
 
 Cierre contractor como **lifecycle propio** (NUNCA finiquito laboral), modelado sobre el state machine existente `active/paused → ending → ended` + columnas de metadata de cierre. **NO** se creó tabla/aggregate aparte: el cierre es 1:1 con el engagement y el audit ya vive en `contractor_engagement_events` (append-only trio TASK-790).
