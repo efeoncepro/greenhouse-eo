@@ -2,7 +2,7 @@ import 'server-only'
 
 import { Text } from '@react-pdf/renderer'
 
-import { EFEONCE_SLOGAN_PARTS } from '@/config/efeonce-brand'
+import { EFEONCE_SLOGAN_COLOR, EFEONCE_SLOGAN_PARTS } from '@/config/efeonce-brand'
 
 /**
  * Efeonce slogan "Empower your Growth" for react-pdf — a brand-zone element
@@ -25,11 +25,11 @@ const SLOGAN_FAMILY_BY_TEXT: Record<string, string> = Object.fromEntries(
 export interface EfeonceSloganPdfProps {
   /** Font size in pt (default 12). */
   fontSize?: number
-  /** Text color (default Efeonce ink). */
+  /** Text color (default: canonical brand grey `#848484`). */
   color?: string
 }
 
-export const EfeonceSloganPdf = ({ fontSize = 12, color = '#1f2937' }: EfeonceSloganPdfProps) => (
+export const EfeonceSloganPdf = ({ fontSize = 12, color = EFEONCE_SLOGAN_COLOR }: EfeonceSloganPdfProps) => (
   <Text style={{ fontSize, color }}>
     {EFEONCE_SLOGAN_PARTS.map((part, index) => (
       <Text

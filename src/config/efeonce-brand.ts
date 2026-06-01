@@ -49,4 +49,14 @@ export const EFEONCE_SLOGAN_PARTS = [
 
 export const EFEONCE_SLOGAN_TEXT = 'Empower your Growth'
 
+/**
+ * Color canónico del eslogan "Empower your Growth": gris `#848484` (brand
+ * reference 2026-06-01). El eslogan es un elemento de marca INDEPENDIENTE del
+ * logo — se renderiza solo o compuesto, pero nunca se fusiona con el logo en un
+ * único asset. Tanto `EfeonceSlogan` (web) como `EfeonceSloganPdf` (PDF) usan
+ * este gris por default; un override de color es excepción (e.g. sobre fondo
+ * oscuro), no la norma.
+ */
+export const EFEONCE_SLOGAN_COLOR = '#848484'
+
 export type EfeonceSloganPart = (typeof EFEONCE_SLOGAN_PARTS)[number]

@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box'
 
-import { EFEONCE_SLOGAN_PARTS, EFEONCE_SLOGAN_TEXT } from '@/config/efeonce-brand'
+import { EFEONCE_SLOGAN_COLOR, EFEONCE_SLOGAN_PARTS, EFEONCE_SLOGAN_TEXT } from '@/config/efeonce-brand'
 
 /**
  * Efeonce slogan "Empower your Growth" for web surfaces — a brand-zone element
@@ -19,13 +19,14 @@ import { EFEONCE_SLOGAN_PARTS, EFEONCE_SLOGAN_TEXT } from '@/config/efeonce-bran
 interface EfeonceSloganProps {
   /** Font size (any CSS size; default '1.5rem'). */
   fontSize?: string | number
+  /** Text color (default: canonical brand grey `#848484`). */
   color?: string
   className?: string
 }
 
 const FONT_POPPINS = 'Poppins, var(--font-poppins), sans-serif'
 
-const EfeonceSlogan = ({ fontSize = '1.5rem', color = 'text.primary', className }: EfeonceSloganProps) => (
+const EfeonceSlogan = ({ fontSize = '1.5rem', color = EFEONCE_SLOGAN_COLOR, className }: EfeonceSloganProps) => (
   <Box
     component='span'
     role='img'

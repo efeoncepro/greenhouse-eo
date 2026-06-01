@@ -76,7 +76,7 @@ const s = StyleSheet.create({
   page: { fontFamily: 'Geist', fontSize: 8, paddingTop: 40, paddingBottom: 56, paddingHorizontal: 40, color: TEXT_PRIMARY },
 
   masthead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 },
-  brandZone: { flexDirection: 'column' },
+  brandZone: { flexDirection: 'column', alignItems: 'center' },
   logo: { width: 116, height: 28, objectFit: 'contain', marginBottom: 6 },
   mastheadRight: { flexDirection: 'column', alignItems: 'flex-end', maxWidth: 240 },
   title: { fontFamily: 'Geist Bold', fontSize: 15, color: TEXT_PRIMARY },
@@ -210,7 +210,7 @@ const ContractorRunDocument = ({ report }: { report: ContractorRunReport }) => {
         <View style={s.masthead}>
           <View style={s.brandZone}>
             {logo ? <Image src={logo} style={s.logo} /> : <Text style={{ fontFamily: 'Geist Bold', fontSize: 13 }}>Efeonce</Text>}
-            <EfeonceSloganPdf fontSize={10} />
+            <EfeonceSloganPdf fontSize={7.5} />
           </View>
           <View style={s.mastheadRight}>
             <Text style={s.title}>Nómina de Contractors</Text>
