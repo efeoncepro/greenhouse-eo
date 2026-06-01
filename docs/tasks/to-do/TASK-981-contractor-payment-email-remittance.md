@@ -1,5 +1,9 @@
 # TASK-981 — Contractor Payment Email + Remittance Attachment (+ canonical `.paid` event)
 
+## Delta 2026-05-31 — TASK-979 (Monthly Contractor Payment Run) shipped
+
+El lifecycle del payable quedó cerrado hasta `payment_order_created` (TASK-979 agregó el writer único `markPayablePaymentOrderCreated` + evento `workforce.contractor_payable.payment_order_created v1`). Falta sólo el tramo final `payment_order_created → paid`: cuando el operador marca la orden pagada (settlement TASK-977), el payable debe transicionar a `paid` y emitir el evento canónico `.paid` que dispara el email + comprobante de esta task. El patrón del writer único + dual-mode `client?` de TASK-979 es el molde a reusar para `markPayablePaid`.
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -1,3 +1,26 @@
+# Sesion 2026-05-31 — TASK-979 Monthly Contractor Payment Run — ✅ COMPLETE
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013.
+
+**Resultado**: corrida mensual que barre el período y prepara las órdenes de pago a contractors agrupadas por moneda. **Prepara — NO paga** (SoD intacto). 5 slices:
+- **S1** — orquestador `prepareMonthlyContractorPaymentRun` (atómico + dry-run) + `markPayablePaymentOrderCreated` (writer ÚNICO de `obligation_created → payment_order_created`, gap del lifecycle descubierto en discovery) + evento v1 + tabla `contractor_payment_runs` (append-only, mirror TASK-900) + migración `20260531235624882`.
+- **S2** — endpoint `POST /api/finance/contractor-payables/monthly-run` (capability `finance.contractor_payable:manage`, reuso).
+- **S3** — botón "Iniciar corrida mensual" + dialog confirm-con-preview en `/finance/contractor-payments`. GVC end-to-end verde (dry-run API 200 → "Nada por preparar").
+- **S4** — signal `finance.contractor_payable.unbatched_overdue` (drift, finance, steady=0) + 5-point wire-up.
+- **S5** — docs (CLAUDE.md invariant, arch Delta, EVENT_CATALOG, RELIABILITY, doc funcional v1.2) + cierre.
+
+**Idempotencia**: filtro un-ordered + lock UNIQUE `payment_order_lines`. **Boundary EPIC-013/957**: cero nómina/`contract_type`/finiquito (payroll 532 verde). La remesa SII (F29) NO es parte de la corrida.
+
+**Bonus — 2 incidencias de test resueltas (pedido operador, sin parches)**:
+1. **Date-fragility** en `finance/{income,expenses}/summary/route.test.ts`: fixtures en mes UTC vs route en `getFinanceCurrentPeriod()` (Santiago) → divergían en el borde de mes (cruce a junio 1 mid-sesión). Fix hermético: reloj fijo (`vi.setSystemTime`) + mes derivado del mismo SSOT del route. Verificado: solo 2 archivos con el patrón.
+2. **React-dom teardown leak** (`window is not defined` flaky en `ReliabilityModuleCard.test.tsx` y cualquier component test): `src/test/setup.ts` nunca llamaba `cleanup()` de RTL (globals off) → árboles React nunca desmontados acumulaban trabajo del scheduler que se disparaba post-teardown de jsdom. Fix canónico: `afterEach(cleanup)` en el setup compartido (con guard `document` para no-op en entorno node). Arregla la clase en TODOS los component tests.
+
+**Gates**: tsc/lint/design 0 · orchestrator 6/6 + signal 4/4 + state-machine + summary 6/6 + live PG smoke · `pnpm build` exit 0 · `pnpm test` (re-run con el cleanup fix).
+
+**Files**: `monthly-run.ts`, `payment-run-store.ts`, `store.ts` (markPayablePaymentOrderCreated), `event-catalog.ts`, `get-reliability-overview.ts`, `contractor-payable-unbatched-overdue.ts`, route, view + copy, `src/test/setup.ts`, migración. Spec: `complete/TASK-979-...md`.
+
+---
+
 # Sesion 2026-05-31 — TASK-978 Contractor Payment Due-Date + SLA Signal — ✅ COMPLETE (sin push)
 
 **Rama**: `develop` (sin branch, por instrucción). EPIC-013. **Esperando confirmación del operador para push.**

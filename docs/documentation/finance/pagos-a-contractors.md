@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-05-31 por Claude (TASK-974)
-> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-978)
+> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-979)
 > **Documentacion tecnica:** [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
 
 # Pagos a Contractors — Workbench de Finanzas
@@ -44,6 +44,22 @@ Efeonce se compromete a pagar a sus contractors (igual que a sus colaboradores) 
 - Si alguien ya escribió una fecha límite a mano, **esa fecha manda** — el cálculo automático solo aplica cuando no se indicó ninguna.
 - Una señal de salud (`SLA de pago a contractors`) vigila el compromiso: si un pago **comprometido** queda **vencido** contra esa fecha, aparece en amarillo (≤10 días de atraso) o rojo (>10 días) en el panel de operaciones. **No bloquea nada** — solo avisa.
 - **Ojo**: este plazo mide el **pago neto al contractor**. La **retención SII** (honorarios CL) se le paga al **SII** en su propio plazo (F29, día 12/20 del mes siguiente) — es otra obligación, con otro destinatario, y no se mezcla con este compromiso.
+
+## La corrida mensual
+
+En vez de armar las órdenes de pago de a una, Finanzas puede **preparar todas juntas** con el botón **"Iniciar corrida mensual"** (arriba a la derecha).
+
+Cómo funciona:
+
+1. Eliges el **mes** (por defecto el mes operativo vigente).
+2. La pantalla te muestra un **previo**: cuántos pagos entran y el total neto por moneda. Si no hay nada pendiente, lo dice ("Nada por preparar").
+3. Al confirmar **"Preparar órdenes"**, junta todos los pagos comprometidos del período y crea las **órdenes de pago agrupadas por moneda**.
+
+> **Prepara — no paga.** Las órdenes quedan en **«pendiente de aprobación»**. La aprobación (doble firma) y el pago al banco siguen siendo manuales. Es solo el barrido masivo que antes había que hacer a mano.
+
+- **Es idempotente**: si la corres dos veces, no duplica nada (la segunda vez no encuentra pagos nuevos y te avisa "ya estaba preparada").
+- **Prioriza lo más vencido**: ordena por la fecha de pago comprometida (los más atrasados contra el plazo de 5 días primero), e incluye cualquier pago de meses anteriores que se haya quedado sin preparar.
+- Una señal de salud (`obligaciones de contractor vencidas sin batchear`) avisa en el panel de operaciones si quedaron pagos vencidos sin preparar — la acción es justamente correr la corrida.
 
 ## Estados de un payable
 

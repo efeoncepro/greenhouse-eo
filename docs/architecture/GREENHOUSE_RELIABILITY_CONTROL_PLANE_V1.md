@@ -5,9 +5,17 @@
 > Versión: `1.9`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-31` por TASK-978 (contractor payment SLA signal)
+> Última actualización: `2026-05-31` por TASK-979 (contractor unbatched-overdue signal)
 
 ---
+
+## Delta 2026-05-31 — TASK-979: signal `finance.contractor_payable.unbatched_overdue`
+
+Nuevo signal canonical bajo `moduleKey='finance'` (kind `drift`). Mide la **brecha de cobertura específica de la corrida mensual**: obligations `provider_payroll` (source_kind `contractor_payable`) aún batcheables (`generated`/`partially_paid`), NO incluidas en ninguna payment order viva (`LEFT JOIN payment_order_lines` line NULL), con `due_date` ya vencido.
+
+- **Remediación canónica**: disparar la corrida mensual (`POST /api/finance/contractor-payables/monthly-run`). Es el failure mode "la corrida no corrió / no cubrió", distinto de `payment_sla_overdue` (TASK-978, más amplio → aprobar/pagar) y de `ready_without_obligation` (TASK-793, tramo anterior → bridge). Tres signals, tres remediaciones.
+- **Severidad**: count=0 → `ok`; count>0 & máx atraso ≤10 días → `warning`; máx atraso >10 días → `error`; query falla → `unknown`. Steady state = 0.
+- Date arithmetic `CURRENT_DATE - o.due_date` = integer (gate TASK-893). Reader: [`src/lib/reliability/queries/contractor-payable-unbatched-overdue.ts`](../../src/lib/reliability/queries/contractor-payable-unbatched-overdue.ts). Wire-up en [`get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) (source `contractorPayableUnbatchedOverdue`). Live PG smoke: steady=0.
 
 ## Delta 2026-05-31 — TASK-978: signal `finance.contractor_payable.payment_sla_overdue`
 

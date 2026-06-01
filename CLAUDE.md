@@ -4637,6 +4637,24 @@ El `due_date` de un `contractor_payable` se **deriva** del compromiso de Efeonce
 
 **Spec canónica**: `docs/tasks/complete/TASK-978-contractor-payment-due-date-sla.md`. Helper calendario: `addBusinessDays` en `operational-calendar.ts`. Signal: `src/lib/reliability/queries/contractor-payable-payment-sla-overdue.ts`. Sin migración/capability/outbox nuevos. Patrones fuente: TASK-571/766 (VIEW/helper + signal canónico), TASK-893 (date arithmetic gate), Payroll Operational Calendar (calendario SSOT).
 
+### Monthly Contractor Payment Run invariants (TASK-979, desde 2026-05-31)
+
+La **corrida mensual** barre los `payment_obligations` `provider_payroll` (source_kind `contractor_payable`) aún NO batcheados y los agrupa por **moneda** en payment orders `pending_approval`. **Prepara — NO paga.** Helper canónico `prepareMonthlyContractorPaymentRun` (`src/lib/contractor-engagements/payables/monthly-run.ts`, server-only): cutoff = cierre del mes operativo + 5 días hábiles (TASK-978), barre `due_date <= cutoff` (incluye overdue stranded), prioriza por `due_date ASC`.
+
+- **NUNCA** la corrida paga, aprueba ni mueve una orden a `paid`. Crea órdenes en `pending_approval`; la aprobación doble-firma + el mark-paid son acciones humanas (SoD intacto, maker-checker).
+- **NUNCA** mezclar monedas en una orden. Agrupar por moneda (regla V1 de `createPaymentOrderFromObligations`); processor/cuenta quedan null al sweep y los resuelve el operador al aprobar. `batchKind='supplier'` (label; contractors = proveedores externos).
+- **NUNCA** crear la transición `obligation_created → payment_order_created` del payable fuera del helper canónico `markPayablePaymentOrderCreated` (`store.ts`, dual-mode `client?`). Es el **writer ÚNICO** de ese estado (la state machine lo exige antes de `paid`; nadie más lo escribe). Emite `workforce.contractor_payable.payment_order_created v1`.
+- **NUNCA** confiar en una tabla para la idempotencia del barrido. La idempotencia REAL = filtro un-ordered (`LEFT JOIN payment_order_lines` line NULL) + status orderable (`generated`/`partially_paid`) + lock UNIQUE `payment_order_lines(obligation_id)` (dos corridas concurrentes: el perdedor aborta con `obligation_already_locked`). `greenhouse_sync.contractor_payment_runs` (append-only, triggers anti-UPDATE/DELETE, mirror TASK-900) es **auditoría + observabilidad**, NO el mecanismo de idempotencia.
+- **NUNCA** ejecutar el sweep + creación de órdenes + transición de payables fuera de UNA transacción. Si algo falla, rollback total (cero órdenes parciales). El dry-run (`dryRun: true`) NO crea fila de corrida ni muta nada — es solo preview.
+- **NUNCA** activar un schedule automático (Cloud Scheduler) en producción antes de que el flag `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED` (TASK-977) esté ON + staging validado. V1 es **manual** (endpoint + botón en `/finance/contractor-payments`); el schedule queda como follow-up detrás de `CONTRACTOR_MONTHLY_RUN_ENABLED` (no construido).
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'finance', { tags: { source: 'contractor_monthly_run' } })`.
+- **NUNCA** confundir el signal de cobertura `finance.contractor_payable.unbatched_overdue` (obligación vencida SIN batchear → remediación: disparar la corrida) con `finance.contractor_payable.payment_sla_overdue` (TASK-978, más amplio → aprobar/pagar) ni con `ready_without_obligation` (TASK-793, tramo anterior). Son tres failure modes distintos con tres remediaciones distintas.
+- **SIEMPRE** correr `pnpm vitest run src/lib/payroll src/lib/finance/payment-orders src/lib/contractor-engagements` como gate de cierre — la corrida toca SOLO contractor payables (`labor_cost_external`), cero nómina/`contract_type`/finiquito.
+
+La **remesa de la retención SII (F29)** NO es parte de la corrida — la corrida paga el NETO al contractor (invariante TASK-977/978).
+
+**Spec canónica**: `docs/tasks/complete/TASK-979-monthly-contractor-payment-run.md`. Helper: `prepareMonthlyContractorPaymentRun` + `markPayablePaymentOrderCreated`. Endpoint: `POST /api/finance/contractor-payables/monthly-run` (capability `finance.contractor_payable:manage`, reuso). Migración: `20260531235624882` (tabla + CHECK `event_type`). Signal: `finance.contractor_payable.unbatched_overdue`. Patrones fuente: TASK-750 (createPaymentOrderFromObligations), TASK-793 (bridge), TASK-900 (run-tracking append-only), TASK-978 (due-date/SLA).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

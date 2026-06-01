@@ -1,5 +1,9 @@
 # TASK-980 — Contractor Payment Run Report ("Nómina de Contractors" PDF + Excel)
 
+## Delta 2026-05-31 — TASK-979 (Monthly Contractor Payment Run) shipped
+
+La corrida mensual ya existe y persiste cada corrida en `greenhouse_sync.contractor_payment_runs` (append-only: período, `prepared_order_ids[]`, `payables_included`, `totals_by_currency`, `cutoff_date`). El reporte puede anclarse a un `payment_run_id` (las órdenes/payables de esa corrida) además del barrido por período. Reusar el desglose **bruto − retención SII = neto** verbatim del payable (TASK-960/758 presenter) y el agrupamiento por moneda que ya produce la corrida.
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `In progress (2026-05-31, develop sin branch por instrucción)`
+- Status real: `Complete (2026-05-31)`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-977`
@@ -224,3 +224,26 @@ Verificado contra `src/lib/finance/payment-orders/`, `src/lib/finance/payment-ob
 7. **Boundary confirmado (payroll skill)** — la corrida toca SOLO contractor payables (`labor_cost_external`); cero nómina/`contract_type`/finiquito. Gate de cierre: `pnpm vitest run src/lib/payroll` + `src/lib/finance/payment-orders` + `src/lib/contractor-engagements`. La **remesa de retención SII al SII (F29)** NO es parte de la corrida — es una obligación distinta (ver TASK-978 análisis); la corrida paga el NETO al contractor.
 
 **Files owned actualizado**: + `src/lib/contractor-engagements/payables/payment-run-store.ts` (tracking append-only) + migración de la tabla `contractor_payment_run` (si se incorpora el punto 4).
+
+## Closing Summary 2026-05-31 — SHIPPED (Slices 1-5)
+
+Implementado en `develop` (sin branch, por instrucción). **Corrida mensual que prepara — NO paga** (SoD + maker-checker intactos).
+
+- **Slice 1 — orquestador + writer canónico + tabla**:
+  - `prepareMonthlyContractorPaymentRun` (`monthly-run.ts`, server-only): cutoff = `addBusinessDays(getLastBusinessDayOfMonth(Y,M), 5)`; barre obligations `provider_payroll` (source_kind `contractor_payable`) `due_date <= cutoff` aún no batcheadas (un-ordered filter), prioriza `due_date ASC`, agrupa por moneda → `createPaymentOrderFromObligations` (`pending_approval`). Atómico (sweep + órdenes + transiciones en una tx). `dryRun` = preview.
+  - `markPayablePaymentOrderCreated` (`store.ts`, dual-mode `client?`): **writer ÚNICO** de `obligation_created → payment_order_created` (gap del lifecycle: la state machine lo exige antes de `paid` y nadie lo escribía — 0 writers/consumers, confirmado en discovery). Evento `workforce.contractor_payable.payment_order_created v1`.
+  - `greenhouse_sync.contractor_payment_runs` (append-only, triggers anti-UPDATE/DELETE, mirror TASK-900) + `payment-run-store.ts`. Migración `20260531235624882` (tabla + extiende CHECK `contractor_payable_events.event_type`).
+- **Slice 2 — endpoint**: `POST /api/finance/contractor-payables/monthly-run` (capability `finance.contractor_payable:manage`, reuso; valida período; dryRun preview; errores sanitizados).
+- **Slice 3 — UI**: botón "Iniciar corrida mensual" + dialog confirm-con-preview en `/finance/contractor-payments`. Copy tokenizado `GH_FINANCE_CONTRACTOR_PAYMENTS.monthlyRun`. **GVC end-to-end**: botón renderiza, dialog abre, dry-run API 200 → "Nada por preparar".
+- **Slice 4 — signal**: `finance.contractor_payable.unbatched_overdue` (drift, finance, steady=0) + 5-point wire-up. Distinto de `payment_sla_overdue` (TASK-978) y `ready_without_obligation` (TASK-793).
+- **Slice 5 — docs + cierre**: CLAUDE.md invariant · arch Delta · EVENT_CATALOG Delta · Reliability Control Plane Delta · doc funcional v1.2 · README/registry/Handoff/changelog.
+
+**Idempotencia** (sin tabla en hot path): un-ordered filter + status orderable + lock UNIQUE `payment_order_lines(obligation_id)`. **Trigger V1 manual**; schedule (Cloud Scheduler) = follow-up detrás de `CONTRACTOR_MONTHLY_RUN_ENABLED`, no hasta TASK-977 settlement ON. La remesa SII (F29) NO es parte de la corrida.
+
+**Gates**: tsc/lint/design 0 · orchestrator 6/6 + signal 4/4 + state-machine + live PG smoke (sweep válido, run-table triggers OK, CHECK extendido) · boundary payroll 532 · `pnpm build` exit 0 · `pnpm test` (re-run con cleanup fix).
+
+**2 incidencias de test resueltas (pedido operador, fixes robustos no parches)**:
+1. Date-fragility en `finance/{income,expenses}/summary/route.test.ts` (mes UTC vs route Santiago) → reloj hermético `vi.setSystemTime` + mes del SSOT del route. Commit `e68f7f68`.
+2. React-dom teardown leak (`window is not defined` flaky en component tests): `src/test/setup.ts` no llamaba `cleanup()` de RTL (globals off) → árboles nunca desmontados. Fix: `afterEach(cleanup)` en el setup compartido (guard `document` para node-env). Arregla la clase en todos los component tests.
+
+**Cross-impact**: TASK-977 (settlement) y TASK-978 (due-date) sin cambios de contrato — la corrida los consume. TASK-974 (workbench) extendido aditivamente (botón). Follow-up: schedule automático + unificar con corrida de nómina si emerge.

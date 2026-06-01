@@ -2,6 +2,14 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-31 — TASK-979: Monthly Contractor Payment Run (1 event v1)
+
+Aggregate type: `contractor_payable`. Extiende los 5 eventos de TASK-793 con la transición que faltaba al lifecycle del payable.
+
+| Evento | Trigger | Notas |
+| --- | --- | --- |
+| `workforce.contractor_payable.payment_order_created` | `markPayablePaymentOrderCreated()` (writer ÚNICO) | la corrida mensual batchea la obligación en una payment order → payable `obligation_created → payment_order_created`. Payload base + `paymentOrderId`. La state machine exige este estado antes de `paid`; antes de TASK-979 nadie lo escribía. Migración extiende el CHECK `contractor_payable_events.event_type`. |
+
 ## Delta 2026-05-30 — TASK-793: Contractor Payables → Finance bridge (5 events v1)
 
 Aggregate type: `contractor_payable`. Obligación económica aprobada del contractor, PREVIA a Finance (Workforce/HR → Finance). Payload base `{schemaVersion:1, contractorPayableId, publicId, contractorEngagementId, beneficiaryType, beneficiaryId, netPayable, currency, status, ...}`.
