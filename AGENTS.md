@@ -48,7 +48,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 - Aislamiento multi-agente: no cambiar la rama de un checkout donde otra persona/agente trabaja; usar `git worktree` y documentar coordinacion en `Handoff.md`.
 - Skills y subagentes: usar skills cuando el dominio matchee y subagentes solo para trabajo paralelo independiente con ownership claro. No delegar el bloqueo inmediato del hilo principal.
 - Seguridad runtime: no improvisar credenciales, pools, env vars, access paths, bypasses, raw errors ni acciones destructivas. Usar los CLIs autenticados con guardrails.
-- Verificacion y cierre: validar con build/lint/test/manual segun aplique, documentar lo no validado, sincronizar docs/task lifecycle y no declarar cerrado algo que siga incompleto.
+- Verificacion y cierre: validar con build/lint/test/manual segun aplique, documentar lo no validado, sincronizar docs/task lifecycle y no declarar cerrado algo que siga incompleto. Si una feature depende de flags/env vars, redeploy, backfill, provisioning externo, cron, webhook, worker, secret, migration aplicada, data recovery o verificacion runtime, eso es parte del cierre: no basta con que el codigo exista en repo.
 
 ## Reglas Operativas
 
@@ -71,6 +71,21 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - **Hook operativo de browser diagnostics:** si el usuario pide abrir, revisar, diagnosticar, capturar o testear una ruta/URL del portal, invocar automaticamente `greenhouse-browser-diagnostics` y usar usuario agente dedicado + Playwright/Chromium. No pedir login al usuario ni navegar anonimo como primer intento. Para `dev-greenhouse.efeoncepro.com`, automatizar contra la URL `.vercel.app` canonica con bypass, salvo que el objetivo sea inspeccionar la SSO wall.
 
 **Regla operativa**: si diagnosticas que la causa raiz de un incidente vive en una de estas plataformas, ejecuta el fix con el CLI con guardrails y verificacion. Documentar pasos manuales para que el usuario los haga es **antipatron** salvo que la accion sea destructiva (eliminar app registration, drop database, force-push), en cuyo caso confirma con el usuario primero.
+
+### 0.1 Cierre end-to-end obligatorio
+
+Un agente **NO puede** declarar una task, flujo o incidente como terminado si falta cualquier paso necesario para que el comportamiento exista en runtime. "Implementado en codigo" no equivale a "operativo".
+
+Antes de cerrar, verificar explicitamente:
+
+- flags/env vars configuradas en todos los targets que aplican (`Production`, `staging`, `Preview (develop)`, workers, crons o Cloud Run segun dominio);
+- redeploy/restart aplicado cuando la plataforma no toma env vars nuevas en caliente;
+- migraciones/backfills/recoveries ejecutados o documentados como pendiente bloqueante, no como detalle menor;
+- integraciones externas validadas con evidencia real cuando el flujo depende de Entra/SCIM, Graph, HubSpot, Notion, Teams, Vercel, GCP, Azure, webhooks o crons;
+- datos reales de prueba consultados desde el source of truth correspondiente, no solo mock/UI;
+- UI/API que consume el flujo verificada contra el runtime activo.
+
+Si falta alguno de esos pasos, el cierre debe decir `code complete, rollout pendiente` o `operativamente bloqueado`, y dejar owner/proximo paso en `Handoff.md`. Caso fuente: el flujo SCIM → Workforce Activation existia en codigo (TASK-872/874/876), pero sin `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED`, `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED`, redeploy y backfill, Entra seguia creando solo `client_users` y no `members`.
 
 ### 1. Antes de cambiar codigo
 
