@@ -1,9 +1,25 @@
 import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
+import { cleanup } from '@testing-library/react'
 
 import { server } from '@/mocks/node'
 
 vi.mock('server-only', () => ({}))
+
+// React Testing Library no registra su auto-cleanup porque `globals` no está
+// activo en vitest.config. Sin cleanup, cada componente montado en un test
+// jsdom queda montado para siempre: se acumulan árboles React que nunca se
+// desmontan y cuyo trabajo diferido (el scheduler de React 19 agenda flushes vía
+// `setImmediate`) puede dispararse DESPUÉS de que jsdom destruye `window` o ya en
+// un archivo de entorno `node` → `ReferenceError: window is not defined` flaky en
+// cualquier test que corra en esa ventana. Desmontar tras cada test cancela ese
+// trabajo agendado y aísla el DOM entre tests. El guard `document` lo hace no-op
+// en los tests de entorno `node` (que nunca renderizan).
+afterEach(() => {
+  if (typeof document !== 'undefined') {
+    cleanup()
+  }
+})
 
 // MSW: one node server shared across every Vitest suite. Handlers come from
 // `src/mocks/handlers.ts`; per-test overrides go through `server.use(...)`.
