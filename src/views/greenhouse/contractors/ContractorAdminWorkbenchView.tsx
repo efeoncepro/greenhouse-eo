@@ -38,6 +38,7 @@ import type { ContractorEngagement } from '@/lib/contractor-engagements/types'
 
 import AdminReviewDecisionDrawer, { type ReviewDecision } from './AdminReviewDecisionDrawer'
 import ContractorClassificationReviewDialog from './ContractorClassificationReviewDialog'
+import ContractorClosureDrawer from './ContractorClosureDrawer'
 import ContractorEngagementCompensationDrawer from './ContractorEngagementCompensationDrawer'
 import ContractorEngagementDetailDrawer from './ContractorEngagementDetailDrawer'
 import ContractorEngagementTermsDrawer from './ContractorEngagementTermsDrawer'
@@ -339,6 +340,7 @@ const AdminInspector = ({
   onOpenDetail,
   onReviewClassification,
   onTransitioned,
+  onRequestClosure,
   canManage,
   canReviewClassification
 }: {
@@ -347,6 +349,7 @@ const AdminInspector = ({
   onOpenDetail: () => void
   onReviewClassification: () => void
   onTransitioned: () => void
+  onRequestClosure: () => void
   canManage: boolean
   canReviewClassification: boolean
 }) => (
@@ -380,6 +383,7 @@ const AdminInspector = ({
         classificationRiskStatus={row.classificationRiskStatus}
         canManage={canManage}
         onTransitioned={onTransitioned}
+        onRequestClosure={onRequestClosure}
       />
 
       <Divider />
@@ -494,6 +498,10 @@ const ContractorAdminWorkbenchView = ({
   const [detailDrawerOpen, setDetailDrawerOpen] = useState(false)
   const [detailEngagementId, setDetailEngagementId] = useState<string | null>(null)
   const [termsEngagement, setTermsEngagement] = useState<ContractorEngagement | null>(null)
+
+  // TASK-984 — contractor closure drawer state.
+  const [closureDrawerOpen, setClosureDrawerOpen] = useState(false)
+  const [closureEngagementId, setClosureEngagementId] = useState<string | null>(null)
 
   const [classificationDialog, setClassificationDialog] = useState<{
     engagementId: string
@@ -678,6 +686,10 @@ const ContractorAdminWorkbenchView = ({
                   onOpenDetail={() => openDetail(selected.contractorEngagementId)}
                   onReviewClassification={() => void openClassificationById(selected.contractorEngagementId)}
                   onTransitioned={() => void refetch()}
+                  onRequestClosure={() => {
+                    setClosureEngagementId(selected.contractorEngagementId)
+                    setClosureDrawerOpen(true)
+                  }}
                   canManage={canManage}
                   canReviewClassification={canReviewClassification}
                 />
@@ -768,6 +780,15 @@ const ContractorAdminWorkbenchView = ({
           setTermsEngagement(null)
           void refetch()
         }}
+      />
+
+      {/* TASK-984 — contractor closure drawer (readiness + initiate/execute, NUNCA finiquito). */}
+      <ContractorClosureDrawer
+        engagementId={closureEngagementId}
+        open={closureDrawerOpen}
+        onClose={() => setClosureDrawerOpen(false)}
+        onClosed={() => void refetch()}
+        canManage={canManage}
       />
 
       {/* TASK-975 — classification review dialog (SoD: hr.contractor_classification:approve). */}

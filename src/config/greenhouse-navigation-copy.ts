@@ -152,7 +152,7 @@ const enUS: NavigationCopy = {
     departments: { label: 'Departments', subtitle: 'Organizational structure' },
     workforceActivation: { label: 'Workforce Activation', subtitle: 'Labor activation and readiness blockers' },
     contractors: { label: 'Contractors', subtitle: 'Engagements, submissions and review' },
-    offboarding: { label: 'Offboarding', subtitle: 'Labor and contractual exit cases' },
+    offboarding: { label: 'Offboarding', subtitle: 'Employee exit cases' },
     leave: { label: 'Leave', subtitle: 'Requests and leave balances' },
     attendance: { label: 'Attendance', subtitle: 'Team attendance records' },
     goals: { label: 'Goals', subtitle: 'OKRs, cycles and progress tracking' },

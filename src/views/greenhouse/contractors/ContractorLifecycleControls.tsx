@@ -51,6 +51,9 @@ interface Props {
   classificationRiskStatus: ContractorClassificationRiskStatus
   canManage: boolean
   onTransitioned: () => void
+  // TASK-984 — el cierre (ending/ended) NO se ofrece como transición genérica;
+  // se canaliza al drawer de cierre (mirror del funnel de API TASK-797).
+  onRequestClosure: () => void
 }
 
 const SectionLabel = ({ text }: { text: string }) => (
@@ -209,17 +212,25 @@ const ContractorLifecycleControls = ({
   lifecycleStatus,
   classificationRiskStatus,
   canManage,
-  onTransitioned
+  onTransitioned,
+  onRequestClosure
 }: Props) => {
   const [target, setTarget] = useState<ContractorEngagementStatus | null>(null)
 
   const blocking = isClassificationRiskBlocking(classificationRiskStatus)
   const terminal = isTerminalEngagementStatus(lifecycleStatus)
 
-  // Offer only valid next states; hide any transition to `active` when risk blocks.
+  // Offer only valid next states; hide transition to `active` when risk blocks.
+  // TASK-984: `ending`/`ended` se EXCLUYEN — el cierre se canaliza al drawer de
+  // cierre (espejo del guard de API TASK-797 que rechaza esos targets en la
+  // transición genérica). Aparece como CTA "Cerrar contractor".
   const transitions = ENGAGEMENT_TRANSITIONS[lifecycleStatus].filter(
-    to => !(to === 'active' && blocking)
+    to => to !== 'ending' && to !== 'ended' && !(to === 'active' && blocking)
   )
+
+  // El CTA de cierre aplica mientras el engagement esté vivo (no terminal).
+  const canCloseFromHere =
+    lifecycleStatus === 'active' || lifecycleStatus === 'paused' || lifecycleStatus === 'ending'
 
   return (
     <Box>
@@ -255,6 +266,18 @@ const ContractorLifecycleControls = ({
               </Button>
             )
           })}
+          {canCloseFromHere ? (
+            <Button
+              size='small'
+              variant='tonal'
+              color='warning'
+              startIcon={<i className='tabler-door-exit' />}
+              disabled={!canManage}
+              onClick={onRequestClosure}
+            >
+              {C.closure.openCta}
+            </Button>
+          ) : null}
         </Stack>
       )}
 

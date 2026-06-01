@@ -87,6 +87,61 @@ export const GH_CONTRACTOR_COMPENSATION = {
     confirmCancel: 'Cancelar',
     transitionError: 'No pudimos cambiar el estado del engagement. Intenta de nuevo.'
   },
+  // TASK-984 — Cierre contractor (drawer de operador en /hr/contractors).
+  // El cierre es un lifecycle propio: NUNCA finiquito laboral (boundary TASK-797/890).
+  closure: {
+    openCta: 'Cerrar contractor',
+    drawerTitle: 'Cerrar contractor',
+    notFiniquitoNote:
+      'Este cierre no dispara cálculo de finiquito, causales DT ni documentos laborales dependientes.',
+    loading: 'Cargando el estado de cierre…',
+    loadError: 'No pudimos cargar el estado de cierre. Intenta de nuevo.',
+    retryCta: 'Reintentar',
+    readinessLabel: 'Verificación de cierre',
+    noBlockers: 'Sin bloqueadores. Puedes ejecutar el cierre.',
+    blockersLabel: 'Bloqueadores',
+    advisoriesLabel: 'Recordatorios',
+    blocker: {
+      open_work_submissions: 'Envíos de trabajo abiertos',
+      open_payables: 'Payables sin liquidar',
+      provider_termination_ref_missing: 'Falta la referencia de terminación del provider',
+      classification_risk_blocking: 'Riesgo de clasificación bloqueante'
+    },
+    advisory: {
+      access_handoff_reminder: 'Traspaso de accesos'
+    },
+    acknowledgeCta: 'Reconocer y cerrar igual',
+    acknowledgedTag: 'Reconocido',
+    acknowledgeReasonLabel: 'Razón del reconocimiento',
+    acknowledgeReasonHelper: 'Explica por qué cierras con este ítem abierto. Mínimo 10 caracteres.',
+    causalLabel: 'Causal de cierre',
+    causalPlaceholder: 'Selecciona una causal',
+    causal: {
+      contract_completed: 'Contrato completado',
+      mutual_agreement: 'Acuerdo mutuo',
+      contractor_resignation: 'Renuncia del contractor',
+      non_renewal: 'No renovación',
+      terminated_for_cause: 'Terminación con causa',
+      converted_to_employee: 'Conversión a empleado',
+      provider_terminated: 'Terminado por el provider',
+      other: 'Otra'
+    },
+    effectiveDateLabel: 'Fecha efectiva',
+    providerRefLabel: 'Referencia de terminación del provider',
+    providerRefHelper: 'Solo para engagements vía provider/EOR (Deel, Remote, Oyster).',
+    reasonLabel: 'Motivo del cierre',
+    reasonHelper: 'Explica brevemente el cierre. Mínimo 10 caracteres.',
+    reasonError: 'Ingresa un motivo de al menos 10 caracteres.',
+    postClosureToggle: 'Permitir invoices después del cierre',
+    postClosureHelper: 'Habilita crear payables luego del cierre. Queda auditado.',
+    initiateCta: 'Iniciar cierre',
+    executeCta: 'Ejecutar cierre',
+    executeDisabledHint: 'Reconoce todos los bloqueadores para ejecutar el cierre.',
+    initiateSuccess: 'Cierre iniciado. El engagement quedó en cierre.',
+    executeSuccess: 'Engagement cerrado.',
+    actionError: 'No pudimos completar el cierre. Intenta de nuevo.',
+    closedNote: 'Este engagement ya está cerrado.'
+  },
   classification: {
     panelLabel: 'Clasificación laboral',
     statusLabel: 'Estado de clasificación',
