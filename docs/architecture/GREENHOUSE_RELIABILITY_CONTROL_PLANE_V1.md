@@ -9,6 +9,15 @@
 
 ---
 
+## Delta 2026-06-01 — TASK-981: signal `finance.contractor_remittance_email.dead_letter`
+
+Nuevo signal canonical bajo `moduleKey='finance'` (kind `dead_letter`). Mide los pagos a contractor cuyo **comprobante (TASK-960) no se pudo entregar por email** tras agotar reintentos: cuenta filas `outbox_reactive_log` con `handler='contractor_payable_paid_email:workforce.contractor_payable.paid'`, `result='dead-letter'`, sin acknowledge ni recovery.
+
+- **Remediación canónica**: revisar el motivo (Resend caído, fallo de render, destinatario persistentemente inválido) y reintentar; el contratista igual puede descargar el comprobante en el portal mientras tanto.
+- **Severidad**: count=0 → `ok`; count>0 → `error`; query falla → `unknown`. Steady state = 0.
+- **No alerta** por skips honestos: si el payable no está `paid` o el contratista no tiene email, el consumer **skipea** (no throw) → nunca llega a dead-letter.
+- Reader: [`src/lib/reliability/queries/contractor-remittance-email-dead-letter.ts`](../../src/lib/reliability/queries/contractor-remittance-email-dead-letter.ts). Wire-up en [`get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) (source `contractorRemittanceEmailDeadLetter`). Sibling de `finance.contractor_payable.bridge_dead_letter` (TASK-793).
+
 ## Delta 2026-05-31 — TASK-979: signal `finance.contractor_payable.unbatched_overdue`
 
 Nuevo signal canonical bajo `moduleKey='finance'` (kind `drift`). Mide la **brecha de cobertura específica de la corrida mensual**: obligations `provider_payroll` (source_kind `contractor_payable`) aún batcheables (`generated`/`partially_paid`), NO incluidas en ninguna payment order viva (`LEFT JOIN payment_order_lines` line NULL), con `due_date` ya vencido.
