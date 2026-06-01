@@ -748,6 +748,11 @@ export const EVENT_TYPES = {
   contractorEngagementCancelled: 'workforce.contractor_engagement.cancelled',
   contractorEngagementClassificationRiskFlagged:
     'workforce.contractor_engagement.classification_risk_flagged',
+  // TASK-797 — cierre contractor iniciado (active/paused -> ending; winding-down,
+  // no se aceptan nuevas work submissions). El cierre ejecutado (-> ended) reusa
+  // `contractorEngagementEnded` con payload enriquecido de closure.
+  contractorEngagementClosureInitiated:
+    'workforce.contractor_engagement.closure_initiated',
 
   // TASK-792 — Contractor work submissions lifecycle (v1). Evidencia de trabajo
   // (timesheet/milestone/deliverable/...) con approval/dispute/reject. Aprobación

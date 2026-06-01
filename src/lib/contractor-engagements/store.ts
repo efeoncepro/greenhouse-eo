@@ -172,6 +172,9 @@ const SELECT_COLUMNS = `
   metadata_json, created_by_user_id, created_at, updated_at
 `
 
+/** Re-export for sibling stores (e.g. closure) that lock + map engagement rows. */
+export { SELECT_COLUMNS as CONTRACTOR_ENGAGEMENT_SELECT_COLUMNS }
+
 // ── Readers ─────────────────────────────────────────────────────────────────
 
 export const getContractorEngagementById = async (
@@ -329,7 +332,7 @@ const loadActiveContractorAnchor = async (
   return row
 }
 
-const appendEngagementEvent = async (
+export const appendEngagementEvent = async (
   client: PoolClient,
   params: {
     contractorEngagementId: string
@@ -369,7 +372,7 @@ const appendEngagementEvent = async (
   )
 }
 
-const publishEngagementEvent = async (
+export const publishEngagementEvent = async (
   client: PoolClient,
   engagement: ContractorEngagement,
   eventType: string,

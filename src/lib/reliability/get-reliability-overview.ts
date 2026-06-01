@@ -96,6 +96,7 @@ import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
 import { getContractorEngagementClassificationRiskOpenSignal } from './queries/contractor-engagement-classification-risk-open'
+import { getContractorEngagementClosedWithOpenPayablesSignal } from './queries/contractor-engagement-closed-with-open-payables'
 import { getContractorInvoiceAssetsBrokenEvidenceSignal } from './queries/contractor-invoice-assets-broken-evidence'
 import { getContractorWorkSubmissionReviewOverdueSignal } from './queries/contractor-work-submission-review-overdue'
 import { getContractorPayableHonorariosRutUnverifiedSignal } from './queries/contractor-payable-honorarios-rut-unverified'
@@ -1396,7 +1397,10 @@ export const getReliabilityOverview = async (
           // asociado (transición incompleta; defense-in-depth del comando atómico).
           getContractorTransitionOrphanSignal().catch(() => null),
           // TASK-968 — engagements contractor activos sin monto acordado fijado por HR.
-          getContractorEngagementRateUnsetSignal().catch(() => null)
+          getContractorEngagementRateUnsetSignal().catch(() => null),
+          // TASK-797 — engagements contractor cerrados (ended/cancelled) que aún
+          // tienen payables abiertos (liquidar/cancelar; defense-in-depth del cierre).
+          getContractorEngagementClosedWithOpenPayablesSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
