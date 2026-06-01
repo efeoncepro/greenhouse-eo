@@ -212,7 +212,7 @@ Ninguna.
 - [x] El toggle "permitir invoices post-cierre" se envía en `execute` y persiste vía `post_closure_invoices_allowed` (auditado por el backend TASK-797).
 - [x] Cero "Calcular finiquito" en la superficie de cierre (drawer 100% contractor; nota explícita "no es finiquito").
 - [x] Copy es-CL tokenizado (`GH_CONTRACTOR_COMPENSATION.closure`); subtítulo de nav `offboarding` → "Employee exit cases" (ya no insinúa contractors).
-- [ ] **GVC visual sign-off (pendiente operador)**: capture del drawer en los 3 estados. Requiere fixture de engagement en `active`/`paused` (el único engagement actual `EO-CENG-0001` está en `draft`, no muestra el CTA). Gates automáticos (tsc/lint/build/boundary) verdes.
+- [x] **GVC visual loop (mockup-first canónico) — hecho 2026-06-01.** Ruta mockup `/hr/contractors/closure/mockup` + scenario `contractor-closure-drawer-mockup` (3 estados) capturados con `pnpm fe:capture`. Revisión con product-design skills (modern-ui + greenhouse-ux + ux-writing) → 2 iteraciones aplicadas a runtime + mockup: (1) header identity-first (nombre + ID + chip de estado); (2) estado cerrado con "Resumen del cierre" (se eliminó el CTA contradictorio "Puedes ejecutar el cierre"); (3) jerarquía del blocker card (título bold/primary); (4) fix Spanglish "work submissions" → "envíos de trabajo". Frames revisados a bar enterprise. El runtime live con un engagement active/paused queda para smoke del operador cuando exista el fixture; el mockup es la referencia aprobada.
 
 ## Verification
 

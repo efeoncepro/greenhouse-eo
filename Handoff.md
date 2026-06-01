@@ -28881,3 +28881,7 @@ Drawer de operador `ContractorClosureDrawer` en `/hr/contractors` consumiendo el
 Gates: tsc 0 · lint 0 · `pnpm build` exit 0 · boundary payroll+offboarding 566.
 
 **PENDIENTE — GVC visual sign-off**: NO se corrió Greenhouse Visual Capture sobre el drawer (el único engagement `EO-CENG-0001` está en `draft` → el CTA "Cerrar contractor" no aparece; requiere un engagement active/paused para capturar el drawer en sus 3 estados). Falta también pasar las skills de product design (modern-ui / greenhouse-ux / microinteractions) sobre la captura real.
+
+### TASK-984 GVC visual loop (2026-06-01) — mockup-first canónico
+
+Cerré el gap visual: ruta mockup `/hr/contractors/closure/mockup` + scenario GVC `contractor-closure-drawer-mockup` (3 estados) + revisión con skills product design (modern-ui / greenhouse-ux / ux-writing). 2 iteraciones aplicadas a runtime + mockup: header identity-first (nombre + ID + chip estado), estado cerrado con "Resumen del cierre" (eliminado el CTA contradictorio "Puedes ejecutar el cierre"), jerarquía del blocker card, fix Spanglish "work submissions"→"envíos de trabajo". Frames revisados a bar enterprise (capturas en `.captures/*contractor-closure-drawer-mockup`). Runtime live smoke pendiente de fixture (engagement active/paused).
