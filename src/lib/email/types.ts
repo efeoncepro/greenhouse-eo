@@ -20,6 +20,7 @@ export type EmailType =
   | 'leave_request_submitted'
   | 'leave_request_pending_review'
   | 'quote_share'
+  | 'contractor_remittance_paid'
 
 export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered' | 'dead_letter'
 
@@ -48,6 +49,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   beneficiary_payment_profile_changed: 'transactional',
   weekly_executive_digest:      'broadcast',
   quote_share:                  'transactional',
+  contractor_remittance_paid:   'transactional',
 }
 
 export interface EmailRecipient {
