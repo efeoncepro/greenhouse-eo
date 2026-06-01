@@ -140,7 +140,14 @@ export const GH_CONTRACTOR_COMPENSATION = {
     initiateSuccess: 'Cierre iniciado. El engagement quedó en cierre.',
     executeSuccess: 'Engagement cerrado.',
     actionError: 'No pudimos completar el cierre. Intenta de nuevo.',
-    closedNote: 'Este engagement ya está cerrado.'
+    closedNote: 'Este engagement ya está cerrado.',
+    // Resumen del cierre ejecutado (estado cerrado).
+    summaryLabel: 'Resumen del cierre',
+    executedAtLabel: 'Cerrado el',
+    postClosureStateLabel: 'Invoices post-cierre',
+    postClosureAllowed: 'Permitidos',
+    postClosureBlocked: 'No permitidos',
+    notSet: '—'
   },
   classification: {
     panelLabel: 'Clasificación laboral',

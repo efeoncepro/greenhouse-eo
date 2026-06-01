@@ -44,6 +44,8 @@ const PROVIDER_OWNED_PAYROLL_VIA = new Set(['deel', 'remote', 'oyster'])
 
 interface Props {
   engagementId: string | null
+  /** Nombre del contractor para el header identity-first (lo aporta el workbench). */
+  contractorName?: string | null
   open: boolean
   onClose: () => void
   /** Refetch del workbench cuando el cierre se inicia o ejecuta. */
@@ -60,7 +62,25 @@ const SectionLabel = ({ text }: { text: string }) => (
   </Typography>
 )
 
-const ContractorClosureDrawer = ({ engagementId, open, onClose, onClosed, canManage }: Props) => {
+const SummaryRow = ({ label, value }: { label: string; value: string }) => (
+  <Stack direction='row' justifyContent='space-between' alignItems='baseline' spacing={3} sx={{ py: 0.5 }}>
+    <Typography variant='body2' sx={{ color: 'text.secondary', flexShrink: 0 }}>
+      {label}
+    </Typography>
+    <Typography variant='body2' sx={{ fontWeight: 500, textAlign: 'right' }}>
+      {value}
+    </Typography>
+  </Stack>
+)
+
+const ContractorClosureDrawer = ({
+  engagementId,
+  contractorName,
+  open,
+  onClose,
+  onClosed,
+  canManage
+}: Props) => {
   const theme = useTheme()
 
   const [engagement, setEngagement] = useState<ContractorEngagement | null>(null)
@@ -219,8 +239,22 @@ const ContractorClosureDrawer = ({ engagementId, open, onClose, onClosed, canMan
               <Typography id='closure-drawer-title' variant='h5' sx={{ fontWeight: 700 }}>
                 {C.closure.drawerTitle}
               </Typography>
+              {contractorName ? (
+                <Typography variant='body2' sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                  {contractorName}
+                </Typography>
+              ) : null}
               {engagement ? (
-                <CustomChip round='true' size='small' variant='tonal' color='secondary' label={engagement.publicId} />
+                <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
+                  <CustomChip round='true' size='small' variant='tonal' color='secondary' label={engagement.publicId} />
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    variant='tonal'
+                    color={alreadyClosed ? 'success' : 'warning'}
+                    label={C.lifecycle.state[engagement.status]}
+                  />
+                </Stack>
               ) : null}
             </Stack>
             <IconButton onClick={onClose} aria-label={aria.closeDrawer} disabled={saving}>
@@ -250,12 +284,36 @@ const ContractorClosureDrawer = ({ engagementId, open, onClose, onClosed, canMan
               </Alert>
 
               {alreadyClosed ? (
-                <Alert severity='success' icon={<i className='tabler-circle-check' />} role='status'>
-                  {C.closure.closedNote}
-                </Alert>
+                <>
+                  <Alert severity='success' icon={<i className='tabler-circle-check' />} role='status'>
+                    {C.closure.closedNote}
+                  </Alert>
+                  <Box>
+                    <SectionLabel text={C.closure.summaryLabel} />
+                    <Stack spacing={1.5}>
+                      <SummaryRow
+                        label={C.closure.causalLabel}
+                        value={
+                          engagement.closureReason
+                            ? C.closure.causal[engagement.closureReason as ContractorClosureReason]
+                            : C.closure.notSet
+                        }
+                      />
+                      <SummaryRow label={C.closure.effectiveDateLabel} value={engagement.closureEffectiveDate ?? C.closure.notSet} />
+                      <SummaryRow
+                        label={C.closure.postClosureStateLabel}
+                        value={engagement.postClosureInvoicesAllowed ? C.closure.postClosureAllowed : C.closure.postClosureBlocked}
+                      />
+                      {engagement.closureExecutedAt ? (
+                        <SummaryRow label={C.closure.executedAtLabel} value={engagement.closureExecutedAt.slice(0, 10)} />
+                      ) : null}
+                    </Stack>
+                  </Box>
+                </>
               ) : null}
 
-              {/* Readiness */}
+              {/* Readiness — solo cuando el engagement aún no está cerrado. */}
+              {!alreadyClosed ? (
               <Box>
                 <SectionLabel text={C.closure.readinessLabel} />
                 {readiness.blockers.length === 0 ? (
@@ -285,7 +343,9 @@ const ContractorClosureDrawer = ({ engagementId, open, onClose, onClosed, canMan
                                 aria-hidden
                               />
                               <Box sx={{ minWidth: 0 }}>
-                                <Typography variant='subtitle2'>{C.closure.blocker[b.code]}</Typography>
+                                <Typography variant='subtitle2' sx={{ fontWeight: 600, color: 'text.primary' }}>
+                                  {C.closure.blocker[b.code]}
+                                </Typography>
                                 <Typography variant='body2' sx={{ color: 'text.secondary' }}>
                                   {b.message}
                                 </Typography>
@@ -306,8 +366,9 @@ const ContractorClosureDrawer = ({ engagementId, open, onClose, onClosed, canMan
                   </Stack>
                 )}
               </Box>
+              ) : null}
 
-              {readiness.advisories.length > 0 ? (
+              {!alreadyClosed && readiness.advisories.length > 0 ? (
                 <Box>
                   <SectionLabel text={C.closure.advisoriesLabel} />
                   <Stack spacing={2}>
@@ -326,7 +387,7 @@ const ContractorClosureDrawer = ({ engagementId, open, onClose, onClosed, canMan
                 </Box>
               ) : null}
 
-              <Divider />
+              {!alreadyClosed ? <Divider /> : null}
 
               {/* Closure form */}
               {!alreadyClosed ? (

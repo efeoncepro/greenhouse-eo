@@ -502,6 +502,7 @@ const ContractorAdminWorkbenchView = ({
   // TASK-984 — contractor closure drawer state.
   const [closureDrawerOpen, setClosureDrawerOpen] = useState(false)
   const [closureEngagementId, setClosureEngagementId] = useState<string | null>(null)
+  const [closureContractorName, setClosureContractorName] = useState<string | null>(null)
 
   const [classificationDialog, setClassificationDialog] = useState<{
     engagementId: string
@@ -688,6 +689,7 @@ const ContractorAdminWorkbenchView = ({
                   onTransitioned={() => void refetch()}
                   onRequestClosure={() => {
                     setClosureEngagementId(selected.contractorEngagementId)
+                    setClosureContractorName(selected.contractorName)
                     setClosureDrawerOpen(true)
                   }}
                   canManage={canManage}
@@ -785,6 +787,7 @@ const ContractorAdminWorkbenchView = ({
       {/* TASK-984 — contractor closure drawer (readiness + initiate/execute, NUNCA finiquito). */}
       <ContractorClosureDrawer
         engagementId={closureEngagementId}
+        contractorName={closureContractorName}
         open={closureDrawerOpen}
         onClose={() => setClosureDrawerOpen(false)}
         onClosed={() => void refetch()}

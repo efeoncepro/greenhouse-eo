@@ -32,9 +32,9 @@ export const evaluateContractorClosureReadiness = (
   if (inputs.openWorkSubmissionsCount > 0) {
     rawBlockers.push({
       code: 'open_work_submissions',
-      message: `Hay ${inputs.openWorkSubmissionsCount} work submission${
+      message: `Hay ${inputs.openWorkSubmissionsCount} envío${
         inputs.openWorkSubmissionsCount === 1 ? '' : 's'
-      } abierta${inputs.openWorkSubmissionsCount === 1 ? '' : 's'} sin resolver.`
+      } de trabajo sin resolver.`
     })
   }
 
@@ -43,7 +43,7 @@ export const evaluateContractorClosureReadiness = (
       code: 'open_payables',
       message: `Hay ${inputs.openPayablesCount} payable${
         inputs.openPayablesCount === 1 ? '' : 's'
-      } abierto${inputs.openPayablesCount === 1 ? '' : 's'} sin liquidar.`
+      } sin liquidar.`
     })
   }
 
