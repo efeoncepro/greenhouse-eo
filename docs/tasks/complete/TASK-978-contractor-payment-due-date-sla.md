@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-013`
-- Status real: `Diseno`
+- Status real: `Complete (2026-05-31)`
 - Rank: `TBD`
 - Domain: `finance|hr`
 - Blocked by: `none`
@@ -220,3 +220,20 @@ Verificado contra `src/lib/calendar/operational-calendar.ts`, `src/lib/contracto
 6. **AJUSTE del signal** — mide el `contractor_payable` comprometido (`ready_for_finance`+ y no `paid`) con `due_date < hoy`; severidad tiered por antigüedad. La obligación **hereda** el `due_date` del payable (el bridge ya pasa `dueDate: payable.dueDate`), así que medir el payable es la fuente correcta (la obligación es downstream).
 
 **Files owned actualizado**: helper de días hábiles en `src/lib/calendar/operational-calendar.ts` (canónico, +tests); `src/lib/contractor-engagements/payables/due-date.ts` como wrapper delgado del dominio. Sin `CONTRACTOR_PAYMENT_SLA_BUSINESS_DAYS` config nuevo.
+
+## Closing Summary 2026-05-31 — SHIPPED (Slices 1-3)
+
+Implementado en `develop` (3 slices, sin migración / capability / outbox nuevos):
+
+- **Slice 1 — derivación del `due_date`**:
+  - `addBusinessDays(referenceDate, businessDays)` agregado a `src/lib/calendar/operational-calendar.ts` (SSOT canónico, exclusivo del día de referencia, valida entero positivo, salta fines de semana + feriados). +4 tests.
+  - `resolveContractorPaymentDueDate({referenceDate?, businessDays?, calendarOptions?})` en `src/lib/contractor-engagements/payables/due-date.ts` (puro) = `getLastBusinessDayOfMonth(mes operativo)` + 5 días hábiles. +4 tests.
+  - Aplicado en `payables/store.ts` (`createFromSubmission` + `createOffCycle`) **solo cuando `dueDate` no fue provisto** (override manual gana). Reusa `DEFAULT_OPERATIONAL_CLOSE_WINDOW_BUSINESS_DAYS` (=5).
+- **Slice 2 — SLA signal**: `finance.contractor_payable.payment_sla_overdue` (kind `lag`, moduleKey `finance`) en `src/lib/reliability/queries/contractor-payable-payment-sla-overdue.ts` + wire-up en `get-reliability-overview.ts`. Mide payables comprometidos (`ready_for_finance`/`obligation_created`/`payment_order_created`) no pagados con `due_date < CURRENT_DATE`. Severidad ok / warning (≤10d) / error (>10d) / unknown. Date arithmetic `CURRENT_DATE - due_date` (integer, no EXTRACT EPOCH — gate TASK-893). +4 tests. **Live PG smoke**: severity=ok, count=0.
+- **Slice 3 — docs + cierre**: arch Delta en `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`; CLAUDE.md invariant "Contractor Payment Due-Date + SLA"; Reliability Control Plane Delta; doc funcional `finance/pagos-a-contractors.md` v1.1.
+
+**Distinción canonizada**: el SLA mide el **pago NETO al contractor**; la **remesa de retención SII** (honorarios CL) es obligación distinta con deadline F29 propio — fuera de scope (invariante TASK-977).
+
+**Gates**: tsc 0 · lint 0 · vitest calendar+due-date 16/16 · payables 43/43 · **boundary `src/lib/payroll src/lib/calendar` 552** (nómina intacta) · signal 4/4 + live PG smoke · `pnpm build` exit 0 · `pnpm test` full 5698 passed (1 flaky `HrLeaveView` por timeout bajo carga, verde 9/9 en aislamiento — no toca TASK-978).
+
+**Cross-impact**: TASK-977 (settlement) y TASK-974 (workbench) sin cambios de contrato — el `due_date` derivado es aditivo. **Follow-up elevado**: alinear las obligaciones de **nómina** (hoy `dueDate: periodEnd`) al mismo helper `addBusinessDays`/compromiso de 5 días — task futura.

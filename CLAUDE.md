@@ -4624,6 +4624,19 @@ El **settlement al banco de un contractor payable** (el net que efectivamente se
 
 **Spec canónica**: `docs/tasks/complete/TASK-977-contractor-payable-bank-settlement.md`. Migraciones: `20260531184945430` (anchor) + `20260531185842386` (payment_source CHECK). Patrones fuente: TASK-765 (settlement engine + atomic), TASK-793 (bridge reactivo), TASK-768 (economic_category resolver), TASK-795 (gasto=bruto/retención=pasivo), TASK-411 (payroll expense materializer reactivo).
 
+### Contractor Payment Due-Date + SLA invariants (TASK-978, desde 2026-05-31)
+
+El `due_date` de un `contractor_payable` se **deriva** del compromiso de Efeonce de pagar dentro de los **primeros 5 días hábiles posteriores al cierre de mes** (aplica a colaboradores Y contractors). Helper canónico `resolveContractorPaymentDueDate` (`src/lib/contractor-engagements/payables/due-date.ts`, puro) = **cierre del mes operativo del payable + 5 días hábiles**.
+
+- **NUNCA** computar días hábiles / ventana de cierre con lógica local. Toda aritmética de días hábiles pasa por `addBusinessDays(date, n)` en `src/lib/calendar/operational-calendar.ts` (SSOT canónico, mismo calendario que nómina — feriados Nager + overrides + timezone `America/Santiago`). NUNCA `EXTRACT(EPOCH FROM (date - date))` para días (gate TASK-893; usar `CURRENT_DATE - due_date` = integer).
+- **NUNCA** sobreescribir un `due_date` provisto manualmente. La derivación aplica **solo** cuando `dueDate` no fue provisto (override manual gana). Aplicado en `createContractorPayableFromSubmission`/`OffCycle`.
+- **NUNCA** reusar `getOperationalPayrollMonth`/`getLastBusinessDayOfMonth`/`addBusinessDays` con valores distintos a `DEFAULT_OPERATIONAL_CLOSE_WINDOW_BUSINESS_DAYS` (=5) sin razón documentada. El ancla es el **mes operativo** del payable (el payable NO tiene `service_period`).
+- **NUNCA** confundir el **SLA de pago NETO al contractor** (signal `finance.contractor_payable.payment_sla_overdue`, cierre+5 hábiles) con la **remesa de la retención SII** (honorarios CL) — esa es una obligación DISTINTA con su propio deadline **F29 (día 12 papel / 20 electrónico del mes siguiente)** y otro beneficiario (el SII). El SLA mide solo el neto al contractor; la remesa es out of scope (TASK-977 invariant).
+- **NUNCA** convertir el signal en un gate. `finance.contractor_payable.payment_sla_overdue` (kind=lag, moduleKey finance, steady=0) es **observabilidad** — mide payables comprometidos (`ready_for_finance`/`obligation_created`/`payment_order_created`) no pagados con `due_date < CURRENT_DATE`. NUNCA bloquea la creación ni el pago del payable.
+- **SIEMPRE** que emerja una regla de "N días hábiles desde el cierre" en otro dominio (e.g. alinear las obligaciones de nómina, que hoy usan `dueDate: periodEnd`), reusar `addBusinessDays` + `resolveContractorPaymentDueDate` o componer las mismas primitivas canónicas. NO duplicar la aritmética.
+
+**Spec canónica**: `docs/tasks/complete/TASK-978-contractor-payment-due-date-sla.md`. Helper calendario: `addBusinessDays` en `operational-calendar.ts`. Signal: `src/lib/reliability/queries/contractor-payable-payment-sla-overdue.ts`. Sin migración/capability/outbox nuevos. Patrones fuente: TASK-571/766 (VIEW/helper + signal canónico), TASK-893 (date arithmetic gate), Payroll Operational Calendar (calendario SSOT).
+
 ### Identity Bridge Cutover Protocol (TASK-877 follow-up, desde 2026-05-16)
 
 Cuando se migra un bridge identity / lookup table de una store legacy (BQ direct, manual, `members.<columna>`) a una nueva store canónica (PG `identity_profile_source_links`, source_links, etc.), la PR que hace el cutover **debe** incluir 3 invariantes atómicos en el mismo PR. Sin esto, la cutover degrada silenciosamente y el bug class se manifiesta días después en consumers downstream (ICO, payroll, capacity, cost attribution).

@@ -1,3 +1,17 @@
+# Sesion 2026-05-31 — TASK-978 Contractor Payment Due-Date + SLA Signal — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013. **Esperando confirmación del operador para push.**
+
+**Resultado**: hace visible el compromiso de pagar a contractors dentro de los **5 días hábiles post cierre de mes** (antes el `due_date` era input manual default vacío). (1) Nueva primitiva canónica `addBusinessDays(date, n)` en `operational-calendar.ts` (SSOT, mismo calendario que nómina). (2) `resolveContractorPaymentDueDate` (puro) = último día hábil del mes operativo + 5 hábiles → aplicado en el store del payable **solo si no hay override manual**. (3) Signal `finance.contractor_payable.payment_sla_overdue` (lag, finance, steady=0; observabilidad, no gate). Distinción canonizada: mide pago NETO al contractor; la remesa SII (F29) es obligación distinta (invariante TASK-977). Sin migración/capability/outbox.
+
+**Gates verde**: tsc/lint 0 · calendar+due-date 16/16 · payables 43/43 · signal 4/4 + **live PG smoke ok** · boundary `payroll+calendar` **552** (nómina intacta) · `pnpm build` exit 0 · `pnpm test` full 5698 passed (1 flaky `HrLeaveView` timeout bajo carga, verde 9/9 aislado).
+
+**Files**: `src/lib/calendar/operational-calendar.ts` (+`addBusinessDays`), `src/lib/contractor-engagements/payables/{due-date.ts,store.ts}`, `src/lib/reliability/queries/contractor-payable-payment-sla-overdue.ts`, `get-reliability-overview.ts` (+tests). Spec: `complete/TASK-978-...md`; CLAUDE.md invariant; arch Delta + Reliability Control Plane Delta; doc funcional `finance/pagos-a-contractors.md` v1.1.
+
+**Follow-up elevado**: alinear las obligaciones de **nómina** (hoy `dueDate: periodEnd`) al mismo helper/compromiso de 5 días.
+
+---
+
 # Sesion 2026-05-31 — Journey Intelligence Layer + Touchpoint Ledger — ✅ DOCS-ONLY
 
 **Rama**: `develop`. Scope arquitectura/documentacion only; no runtime, DB migrations, APIs, UI ni task lifecycle moves.

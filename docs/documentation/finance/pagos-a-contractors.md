@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-31 por Claude (TASK-974)
-> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-974)
+> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-978)
 > **Documentacion tecnica:** [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
 
 # Pagos a Contractors — Workbench de Finanzas
@@ -36,6 +36,14 @@ El pago a un contractor nace en HR y termina en el banco. Esta pantalla es la **
 ## Los montos NUNCA se recalculan acá
 
 El bruto, la retención y el neto se leen **tal cual vienen del payable**. La tasa de retención (honorarios CL) viene congelada del engagement (lo que estaba vigente cuando se firmó). La pantalla nunca inventa ni recalcula un número.
+
+## ¿Cuándo se paga? — el compromiso de 5 días hábiles
+
+Efeonce se compromete a pagar a sus contractors (igual que a sus colaboradores) **dentro de los primeros 5 días hábiles posteriores al cierre del mes**. Por eso, cuando se crea un payable, su **fecha límite de pago (`due_date`) se calcula automáticamente**: último día hábil del mes operativo **+ 5 días hábiles** (usando el mismo calendario de feriados y la misma zona horaria que la nómina).
+
+- Si alguien ya escribió una fecha límite a mano, **esa fecha manda** — el cálculo automático solo aplica cuando no se indicó ninguna.
+- Una señal de salud (`SLA de pago a contractors`) vigila el compromiso: si un pago **comprometido** queda **vencido** contra esa fecha, aparece en amarillo (≤10 días de atraso) o rojo (>10 días) en el panel de operaciones. **No bloquea nada** — solo avisa.
+- **Ojo**: este plazo mide el **pago neto al contractor**. La **retención SII** (honorarios CL) se le paga al **SII** en su propio plazo (F29, día 12/20 del mes siguiente) — es otra obligación, con otro destinatario, y no se mezcla con este compromiso.
 
 ## Estados de un payable
 

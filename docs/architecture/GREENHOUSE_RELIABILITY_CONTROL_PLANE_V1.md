@@ -5,9 +5,21 @@
 > Versión: `1.9`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-28` por TASK-941 (Nexa Insights freshness signal)
+> Última actualización: `2026-05-31` por TASK-978 (contractor payment SLA signal)
 
 ---
+
+## Delta 2026-05-31 — TASK-978: signal `finance.contractor_payable.payment_sla_overdue`
+
+Nuevo signal canonical bajo `moduleKey='finance'` (kind `lag`). Hace observable el **compromiso de Efeonce de pagar a contractors dentro de los 5 días hábiles posteriores al cierre de mes** (TASK-978 deriva `contractor_payables.due_date = cierre del mes operativo + 5 días hábiles` vía el helper canónico `addBusinessDays` del calendario operativo).
+
+- **Qué mide**: payables **comprometidos a Finanzas** (`status IN ('ready_for_finance','obligation_created','payment_order_created')`), aún NO `paid`/`cancelled`, con `due_date < CURRENT_DATE`.
+- **Severidad**: count=0 → `ok` · count>0 & máx atraso ≤10 días → `warning` · máx atraso >10 días → `error` · query falla → `unknown` (degradación honesta). Steady state = 0.
+- **Es observabilidad, no gate**: NUNCA bloquea la creación ni el pago del payable. Los payables bloqueados/pendientes los cubren las señales de readiness/blocker (TASK-793/977), no esta.
+- **Distinción crítica**: mide el **pago NETO al contractor**. La **remesa de la retención SII** (honorarios CL) es una obligación DISTINTA con su propio deadline **F29 (día 12/20 del mes siguiente)** y otro beneficiario (el SII) — fuera de scope (invariante TASK-977).
+- **Aritmética de fechas**: `CURRENT_DATE - due_date` = integer (ambos DATE), NUNCA `EXTRACT(EPOCH FROM (date - date))` (gate TASK-893). Validado con live PG smoke (severity=ok, count=0).
+
+Reader: [`src/lib/reliability/queries/contractor-payable-payment-sla-overdue.ts`](../../src/lib/reliability/queries/contractor-payable-payment-sla-overdue.ts). Wire-up en [`get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) (source `contractorPayablePaymentSlaOverdue`). Sibling del signal `finance.contractor_payable.expense_unmaterialized` (TASK-977).
 
 ## Delta 2026-05-28 — TASK-941: signal `nexa.insights.stale_with_eligible_signals`
 
