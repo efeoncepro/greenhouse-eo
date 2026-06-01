@@ -44,6 +44,7 @@ import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved
 import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
 import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
 import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
+import { getContractorPayableUnbatchedOverdueSignal } from './queries/contractor-payable-unbatched-overdue'
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
 import { getContractorPayableTaxReviewOverdueSignal } from './queries/contractor-payable-tax-review-overdue'
 import { getContractorPayableFxUnresolvedOverdueSignal } from './queries/contractor-payable-fx-unresolved-overdue'
@@ -580,6 +581,8 @@ interface ReliabilityOverviewSources {
   /** TASK-977 — committed payables without a materialized expense (settlement precondition). */
   contractorPayableExpenseUnmaterialized?: ReliabilitySignal | null
   contractorPayablePaymentSlaOverdue?: ReliabilitySignal | null
+  /** TASK-979 — un-batched overdue contractor obligations (monthly run coverage gap). */
+  contractorPayableUnbatchedOverdue?: ReliabilitySignal | null
 
   /**
    * TASK-777 Slice 3 — Expense distribution management-accounting gates.
@@ -907,6 +910,7 @@ export const buildReliabilityOverview = (
       ? [sources.contractorPayableExpenseUnmaterialized]
       : []),
     ...(sources.contractorPayablePaymentSlaOverdue ? [sources.contractorPayablePaymentSlaOverdue] : []),
+    ...(sources.contractorPayableUnbatchedOverdue ? [sources.contractorPayableUnbatchedOverdue] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
     // TASK-780 Phase 3 — Home rollout drift (PG flag vs env + opt-out rate).
@@ -1319,6 +1323,11 @@ export const getReliabilityOverview = async (
     preloadedSources.contractorPayablePaymentSlaOverdue !== undefined
       ? preloadedSources.contractorPayablePaymentSlaOverdue
       : await getContractorPayablePaymentSlaOverdueSignal().catch(() => null)
+
+  const contractorPayableUnbatchedOverdue =
+    preloadedSources.contractorPayableUnbatchedOverdue !== undefined
+      ? preloadedSources.contractorPayableUnbatchedOverdue
+      : await getContractorPayableUnbatchedOverdueSignal().catch(() => null)
 
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
@@ -1743,6 +1752,7 @@ export const getReliabilityOverview = async (
     contractorPayableReadyWithoutObligation,
     contractorPayableExpenseUnmaterialized,
     contractorPayablePaymentSlaOverdue,
+    contractorPayableUnbatchedOverdue,
     contractorPayableBridgeDeadLetter,
     contractorPayableTaxReviewOverdue,
     contractorPayableFxUnresolvedOverdue,
