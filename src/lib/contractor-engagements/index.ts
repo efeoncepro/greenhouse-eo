@@ -15,3 +15,6 @@ export * from './state-machine'
 export * from './subtype-consistency'
 export * from './classification-risk'
 export * from './tax-policy'
+// TASK-797 — closure pure helpers (types + readiness evaluator). The closure STORE
+// is server-only and imported directly from './closure/store' (TASK-827 bug class).
+export * from './closure'

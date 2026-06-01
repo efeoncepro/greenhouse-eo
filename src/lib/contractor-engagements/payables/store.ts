@@ -19,6 +19,7 @@ import { isClassificationRiskBlocking } from '../classification-risk'
 import { ContractorEngagementValidationError } from '../errors'
 import { listContractorInvoiceAssetsByEngagement } from '../invoice-assets'
 import { getContractorEngagementById } from '../store'
+import type { ContractorEngagement } from '../types'
 
 import { isContractorAgreedAmountGuardrailEnabled } from './agreed-amount-guardrail-flag'
 import { resolveContractorPaymentDueDate } from './due-date'
@@ -43,6 +44,30 @@ const FINANCE_CURRENCIES = new Set(['CLP', 'USD'])
  * unit rate, so a single comparison is meaningless → guardrail no-op for those.
  */
 const PERIOD_AGREED_RATE_TYPES = new Set(['fixed', 'retainer', 'milestone', 'project'])
+
+/**
+ * TASK-797 — Política de invoices/payables post-cierre. Tras `ended`, NO se crean
+ * payables salvo allowance explícito (`post_closure_invoices_allowed`). `cancelled`
+ * NUNCA permite payables. Durante `ending` (winding-down) sí se liquidan los
+ * payables de trabajo ya aprobado.
+ */
+const assertPayableCreationAllowedForClosure = (engagement: ContractorEngagement): void => {
+  if (engagement.status === 'cancelled') {
+    throw new ContractorEngagementValidationError(
+      'El engagement está cancelado; no se pueden crear payables.',
+      'engagement_cancelled_no_payables',
+      409
+    )
+  }
+
+  if (engagement.status === 'ended' && !engagement.postClosureInvoicesAllowed) {
+    throw new ContractorEngagementValidationError(
+      'El engagement está cerrado; los payables post-cierre requieren autorización explícita.',
+      'engagement_closed_payables_not_allowed',
+      409
+    )
+  }
+}
 
 interface ContractorPayableRow {
   contractor_payable_id: string
@@ -420,6 +445,8 @@ export const createContractorPayableFromSubmission = async (
       )
     }
 
+    assertPayableCreationAllowedForClosure(engagement)
+
     const withholdingAmount = computeContractorWithholding({
       relationshipSubtype: engagement.relationshipSubtype,
       taxComplianceOwner: engagement.taxComplianceOwner,
@@ -531,6 +558,8 @@ export const createContractorPayableOffCycle = async (
       404
     )
   }
+
+  assertPayableCreationAllowedForClosure(engagement)
 
   const grossAmount = Math.round(input.grossAmount * 100) / 100
 

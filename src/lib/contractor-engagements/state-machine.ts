@@ -38,6 +38,21 @@ export const TERMINAL_ENGAGEMENT_STATUSES: readonly ContractorEngagementStatus[]
 export const isTerminalEngagementStatus = (status: ContractorEngagementStatus): boolean =>
   TERMINAL_ENGAGEMENT_STATUSES.includes(status)
 
+/**
+ * TASK-797 — Estados en los que el engagement está cerrándose o cerrado, por lo
+ * que NO se aceptan nuevas work submissions. `ending` (winding-down) + terminales.
+ * Distinto de `isTerminalEngagementStatus` (que excluye `ending`).
+ */
+export const POST_CLOSURE_LOCKED_ENGAGEMENT_STATUSES: readonly ContractorEngagementStatus[] = [
+  'ending',
+  'ended',
+  'cancelled'
+]
+
+export const isPostClosureLockedEngagementStatus = (
+  status: ContractorEngagementStatus
+): boolean => POST_CLOSURE_LOCKED_ENGAGEMENT_STATUSES.includes(status)
+
 export const isValidEngagementTransition = (
   from: ContractorEngagementStatus,
   to: ContractorEngagementStatus

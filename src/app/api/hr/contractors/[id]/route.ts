@@ -106,6 +106,18 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
 
     if (action === 'transition') {
+      // TASK-797 — el cierre (ending/ended) se canaliza por el flujo de cierre
+      // dedicado (POST /api/hr/contractors/[id]/closure), que aplica readiness +
+      // metadata + eventos de closure. La transición genérica NO debe alcanzar
+      // ending/ended (evita bypass del gate de cierre).
+      if (body.targetStatus === 'ending' || body.targetStatus === 'ended') {
+        throw new ContractorEngagementValidationError(
+          'El cierre del engagement (ending/ended) se gestiona vía el flujo de cierre dedicado.',
+          'use_closure_flow',
+          409
+        )
+      }
+
       const engagement = await transitionContractorEngagement({
         contractorEngagementId: id,
         targetStatus: isMember(CONTRACTOR_ENGAGEMENT_STATUSES, body.targetStatus)

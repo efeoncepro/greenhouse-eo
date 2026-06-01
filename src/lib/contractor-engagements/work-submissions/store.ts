@@ -9,7 +9,7 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { ContractorEngagementValidationError } from '../errors'
-import { isTerminalEngagementStatus } from '../state-machine'
+import { isPostClosureLockedEngagementStatus } from '../state-machine'
 import { getContractorEngagementById } from '../store'
 
 import {
@@ -315,10 +315,12 @@ export const createContractorWorkSubmission = async (
     )
   }
 
-  if (isTerminalEngagementStatus(engagement.status)) {
+  // TASK-797 — bloquea nuevas work submissions una vez que el cierre arranca
+  // (`ending` winding-down) o el engagement es terminal (`ended`/`cancelled`).
+  if (isPostClosureLockedEngagementStatus(engagement.status)) {
     throw new ContractorEngagementValidationError(
-      'No se puede crear una work submission en un engagement terminal.',
-      'engagement_terminal',
+      'No se pueden crear nuevas work submissions: el engagement está en cierre o cerrado.',
+      'engagement_closed_or_closing',
       409
     )
   }

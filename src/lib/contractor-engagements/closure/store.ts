@@ -421,3 +421,57 @@ export const executeContractorClosure = async (
 
     return { engagement: updated, readiness }
   })
+
+export interface AllowPostClosureInvoicesInput {
+  contractorEngagementId: string
+  allowed: boolean
+  reason: string
+  actorUserId: string
+}
+
+/**
+ * Política explícita de invoices post-cierre: habilita/deshabilita la creación de
+ * payables después de `ended`. Solo aplica a engagements ya `ended` (auditado).
+ */
+export const setPostClosureInvoicesAllowed = async (
+  input: AllowPostClosureInvoicesInput
+): Promise<ContractorEngagement> =>
+  withGreenhousePostgresTransaction(async (client) => {
+    const reason = assertReason(input.reason)
+    const current = await lockEngagement(client, input.contractorEngagementId)
+
+    if (current.status !== 'ended') {
+      throw new ContractorEngagementValidationError(
+        'La política de invoices post-cierre solo aplica a engagements cerrados (ended).',
+        'engagement_not_ended_for_post_closure_policy',
+        409
+      )
+    }
+
+    if (current.postClosureInvoicesAllowed === input.allowed) {
+      return current
+    }
+
+    const result = await client.query<EngagementRow>(
+      `UPDATE greenhouse_hr.contractor_engagements
+       SET post_closure_invoices_allowed = $2
+       WHERE contractor_engagement_id = $1
+       RETURNING ${CONTRACTOR_ENGAGEMENT_SELECT_COLUMNS}`,
+      [input.contractorEngagementId, input.allowed]
+    )
+
+    const updated = mapContractorEngagement(result.rows[0])
+
+    await appendEngagementEvent(client, {
+      contractorEngagementId: updated.contractorEngagementId,
+      eventType: 'updated',
+      actorUserId: input.actorUserId,
+      reason,
+      metadata: {
+        lifecycle: 'post_closure_invoices_policy_changed',
+        postClosureInvoicesAllowed: updated.postClosureInvoicesAllowed
+      }
+    })
+
+    return updated
+  })

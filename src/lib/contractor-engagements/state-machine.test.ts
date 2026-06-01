@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   ContractorEngagementTransitionError,
   assertValidEngagementTransition,
+  isPostClosureLockedEngagementStatus,
   isTerminalEngagementStatus,
   isValidEngagementTransition
 } from './state-machine'
@@ -63,5 +64,19 @@ describe('contractor engagement state machine', () => {
       expect((error as ContractorEngagementTransitionError).from).toBe('draft')
       expect((error as ContractorEngagementTransitionError).to).toBe('ended')
     }
+  })
+
+  it('isPostClosureLockedEngagementStatus locks ending + terminals, allows live statuses (TASK-797)', () => {
+    expect(isPostClosureLockedEngagementStatus('ending')).toBe(true)
+    expect(isPostClosureLockedEngagementStatus('ended')).toBe(true)
+    expect(isPostClosureLockedEngagementStatus('cancelled')).toBe(true)
+
+    expect(isPostClosureLockedEngagementStatus('draft')).toBe(false)
+    expect(isPostClosureLockedEngagementStatus('pending_review')).toBe(false)
+    expect(isPostClosureLockedEngagementStatus('active')).toBe(false)
+    expect(isPostClosureLockedEngagementStatus('paused')).toBe(false)
+
+    // Diferencia con isTerminalEngagementStatus: `ending` está locked pero NO terminal.
+    expect(isTerminalEngagementStatus('ending')).toBe(false)
   })
 })
