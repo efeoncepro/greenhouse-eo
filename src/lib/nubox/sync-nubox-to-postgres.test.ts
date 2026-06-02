@@ -50,6 +50,13 @@ const makeProjectionSale = (overrides: Partial<NuboxProjectionSale> = {}): Nubox
   client_rut: '88417000-1',
   client_trade_name: 'SKY AIRLINE S A',
   client_main_activity: 'Transporte',
+  // TASK-990 — CLP-only quote: export foreign-currency fields stay null/none.
+  foreign_total_amount: null,
+  foreign_currency_code: null,
+  functional_total_amount_clp: 6902000,
+  exportation_detail_json: null,
+  foreign_currency_evidence_source: 'none',
+  foreign_currency_confidence: 'none',
   pdf_url: null,
   xml_url: null,
   details_url: null,
