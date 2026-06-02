@@ -1,9 +1,9 @@
 # Monedas y Tipos de Cambio — Foundation Plataforma
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-19 por Claude (TASK-475 close-out)
-> **Ultima actualizacion:** 2026-04-19 por Claude (TASK-484 — plataforma de provider adapters)
+> **Ultima actualizacion:** 2026-06-02 por Claude (TASK-990 — MXN promovido a finance-core)
 > **Documentacion tecnica:**
 > - Spec canónica: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Finance architecture: [GREENHOUSE_FINANCE_ARCHITECTURE_V1](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
@@ -41,12 +41,14 @@ Greenhouse tiene 4 dominios de moneda. Cada uno declara qué monedas acepta:
 
 | Dominio | Monedas soportadas | Para qué |
 |---|---|---|
-| `finance_core` | `CLP`, `USD` | Contabilidad transaccional (income, expense, payroll, banco, reconciliación) |
+| `finance_core` | `CLP`, `USD`, `MXN`† | Contabilidad transaccional (income, expense, payroll, banco, reconciliación) |
 | `pricing_output` | `USD`, `CLP`, `CLF`, `COP`, `MXN`, `PEN` | Superficie comercial (quotes, PDF, email al cliente) |
 | `reporting` | `CLP` | P&L, metric registry, ICO engine — todo normalizado a CLP |
 | `analytics` | `CLP` | Cost intelligence, capacity economics |
 
-Esta matriz está declarada una sola vez en `src/lib/finance/currency-domain.ts`. Si un consumer intenta usar `MXN` en `finance_core` la plataforma rechaza explícitamente — no calcula con una tasa neutral silenciosa.
+Esta matriz está declarada una sola vez en `src/lib/finance/currency-domain.ts`. Si un consumer intenta usar una moneda fuera del dominio (ej. `COP` en `finance_core`) la plataforma rechaza explícitamente — no calcula con una tasa neutral silenciosa.
+
+> † **MXN en finance_core (TASK-990, ADR aceptado 2026-06-02)**: MXN se promovió de pricing-only a finance-core. Los write paths MXN están detrás de flags apagados por defecto (`FINANCE_CORE_MXN_ENABLED` y derivados) hasta el rollout. Ver "MXN como moneda finance-core (TASK-990)" más abajo.
 
 ### 2. Política FX por dominio
 
@@ -229,3 +231,32 @@ Deliberadamente (post TASK-484):
 >   - [`src/app/api/cron/fx-sync-latam/route.ts`](../../../src/app/api/cron/fx-sync-latam/route.ts)
 >   - [`src/app/api/admin/fx/sync-pair/route.ts`](../../../src/app/api/admin/fx/sync-pair/route.ts)
 >   - [`scripts/backfill-fx-rates.ts`](../../../scripts/backfill-fx-rates.ts)
+
+## MXN como moneda finance-core (TASK-990) — Delta 2026-06-02
+
+Hasta ahora MXN solo servía para **cotizar** (pricing). Con TASK-990, MXN pasa a ser una moneda **finance-core**: Greenhouse puede registrar facturas, cobros, pagos, órdenes y reportería en MXN, no solo cotizar. El caso real es **Grupo Berel**, un cliente en México facturado vía Nubox como **exportación** (DTE 110): `MXN 89.960` nativo, `CLP 4.617.647` funcional.
+
+### Los tres planos de una factura MXN
+
+Cada hecho financiero en MXN preserva **tres montos** a la vez, anclados por el CLP:
+
+- **Nativo** — el monto en la moneda del contrato (`MXN 89.960`). Es el que el cliente debe y paga. Inmutable.
+- **Funcional (CLP)** — el equivalente legal que **Nubox/SII ya calculó** (`CLP 4.617.647`). Greenhouse **no lo recalcula**: lo toma del documento legal para que cuadre exacto contra el SII. La tasa implícita (51,33 CLP/MXN) queda guardada como **evidencia** (un "FX snapshot").
+- **Reporte (USD)** — se deriva **desde el CLP funcional** (no desde un MXN→USD directo). Es moneda de *presentación* (IAS 21): los tres planos reconcilian por un solo ancla, el CLP.
+
+> Detalle técnico: cadena canónica `MXN (nativo) → CLP (legal Nubox) → USD (snapshot CLP→USD)`. Helpers en [`src/lib/finance/multi-currency/`](../../../src/lib/finance/multi-currency/). ADR [§8.4](../../architecture/GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md).
+
+### Cómo se cobra y cómo aparece el resultado cambiario
+
+- Berel paga **MXN a la cuenta Global66 MXN** de Efeonce (cuenta propia denominada en MXN, distinta de la Global66 CLP que se usa para pagar payroll en USD). La factura se da por **pagada cuando se reciben los 89.960 MXN** — se mide en el plano nativo, no comparando MXN contra CLP.
+- La diferencia entre la tasa del documento (51,33) y la tasa del día de cobro es el **resultado cambiario realizado**. Aparece en su propio carril ("Resultado cambiario" del Banco), **nunca mezclado con ingresos**. La conversión MXN→CLP posterior es un movimiento de tesorería aparte.
+
+### Señales de seguridad (para Ops/Finance)
+
+El tablero de confiabilidad vigila el rollout MXN con: frescura del rate MXN/CLP, facturas de exportación sin monto extranjero, filas nativas sin su evidencia FX, drift entre los tres planos, y cash signals en monedas no soportadas. En estado normal todas están en verde (`ok`).
+
+### Estado del rollout
+
+Todo el soporte MXN está detrás de **flags apagados por defecto** (`FINANCE_CORE_MXN_ENABLED` y derivados). Mientras estén apagados, el comportamiento CLP/USD es idéntico al anterior. La activación (encender flags, onboardear la cuenta Global66 MXN, proyectar la factura de Berel) es una secuencia de rollout que ejecuta el operador.
+
+> Detalle técnico: implementación por slices en [TASK-990](../../tasks/in-progress/TASK-990-mxn-multi-currency-finance-core.md). Settlement nativo + resultado cambiario: [`src/lib/finance/payment-ledger.ts`](../../../src/lib/finance/payment-ledger.ts) + [`multi-currency/native-settlement.ts`](../../../src/lib/finance/multi-currency/native-settlement.ts). Señales: [`src/lib/reliability/queries/multi-currency-fx-signals.ts`](../../../src/lib/reliability/queries/multi-currency-fx-signals.ts).

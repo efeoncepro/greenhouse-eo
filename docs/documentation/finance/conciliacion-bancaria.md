@@ -312,3 +312,13 @@ Cerrar un período es una acción terminal — escala a admin. El resto del fluj
 - **Idempotente**: re-llamar "Abrir workbench" sobre un snapshot ya linkeado no crea nada nuevo, solo navega.
 
 > Detalle técnico: helper `getReconciliationFullContext` en `src/lib/finance/reconciliation/full-context.ts`. State machine `nextAction` (declare_snapshot → create_period → import_statement → resolve_matches → mark_reconciled → close_period → closed → archived). Helper atomic `createOrLinkPeriodFromSnapshot` en `src/lib/finance/reconciliation/period-from-snapshot.ts`. UNIQUE constraint en `(account_id, year, month)` aplicada en migración TASK-722.
+
+## Delta 2026-06-02 — Facturas/pagos en MXN (TASK-990)
+
+Una factura de exportación en MXN (ej. Grupo Berel) se guarda CLP-funcional pero **se concilia en su plano nativo**: se da por pagada cuando se reciben los MXN nativos (no comparando MXN contra el total CLP). Por eso:
+
+- El estado de pago (`pendiente`/`parcial`/`pagado`) de una factura nativa se mide contra el **monto nativo** (`MXN 89.960`), no contra el total CLP.
+- La VIEW canónica `income_settlement_reconciliation` **no muestra drift falso** para una factura MXN cobrada en MXN (el `amount_paid` y la suma de pagos están en el mismo plano nativo → `drift=0`).
+- El resultado cambiario realizado (diferencia entre la tasa del documento y la del cobro) vive en el carril "Resultado cambiario" del Banco, separado de la conciliación de la factura.
+
+> Detalle técnico: [TASK-990](../../tasks/in-progress/TASK-990-mxn-multi-currency-finance-core.md) Slice 7 (native-plane settlement). Migración `20260602213606548` (recompute native-aware). VIEW `income_settlement_reconciliation` (TASK-571), sin cambios — reconcilia por construcción.

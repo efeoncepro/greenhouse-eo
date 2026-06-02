@@ -452,3 +452,18 @@ The pricing engine v2 test stubs the `resolvePricingOutputFxReadiness` dep so th
 - `FinanceCurrency` kept at `CLP | USD` — compatibility rule #5 respected.
 - CLP-normalized consumers (operational_pl, member_capacity_economics, tool-cost-reader target, payroll) unchanged.
 - Follow-ups: TASK-466 for client-facing send gate; wire automatic providers for COP/MXN/PEN when volume justifies.
+
+---
+
+## Delta 2026-06-02 — MXN promovido a finance-core (TASK-990)
+
+El ADR [GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1](GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md) (**Accepted** 2026-06-02) promueve `MXN` de `pricing_output`-only a **`finance_core`** (`CLP | USD | MXN`). El blast radius se gestiona con expand-and-contract + flags default OFF; ver implementación por slices en [TASK-990](../tasks/in-progress/TASK-990-mxn-multi-currency-finance-core.md).
+
+Puntos de contacto con esta plataforma FX:
+
+- **`currency-domain.ts`**: `CURRENCY_DOMAIN_SUPPORT.finance_core = ['CLP','USD','MXN']`. `resolveFxReadiness`/`resolveFxSnapshotEvidence` ahora resuelven los 6 sentidos finance_core (CLP↔USD, MXN↔CLP, MXN↔USD vía composición USD).
+- **FX snapshots auditables** (`greenhouse_finance.fx_snapshots`, append-only): toda conversión de un hecho financiero MXN persiste su evidencia (rate + provenance + policy). Tres construcciones: `resolveFxSnapshotEvidence` (resolver canónico), `observedFxSnapshotEvidence` (rate implícito del documento legal Nubox), `manualOverrideFxSnapshotEvidence`. Helpers en `src/lib/finance/multi-currency/`.
+- **Contrato de 3 planos** (ADR §8.4): `MXN (native) → CLP (legal Nubox / resolver) → USD (snapshot CLP→USD)`. USD es presentación (IAS 21), derivado del funcional CLP, nunca native→USD directo.
+- **Settlement nativo** (TASK-990 Slice 7): un AR/AP en MXN cierra en su plano nativo; el delta CLP es **FX realizado** que fluye el lane canónico `fx_pnl_breakdown.realized_clp` (TASK-699), nunca como revenue.
+- **Señales de rollout** (Slice 8, subsystem Finance): `finance.fx.mxn_rate_freshness`, `finance.fx.snapshot_missing`, `finance.nubox_export.foreign_amount_missing`, `finance.multi_currency.native_equivalent_drift`, `finance.cash_signal.unsupported_currency`, `finance.fx_gain_loss.unclassified`, `finance.payment_order.mixed_currency_attempt`.
+- **Readiness fail-closed**: si falta/está stale el rate MXN/CLP, la emisión/pago se bloquea salvo override de Finance Admin. El `coverage` de MXN en el registry sigue `manual_only` hasta el flip post-validación (PR separado, igual que COP/PEN).

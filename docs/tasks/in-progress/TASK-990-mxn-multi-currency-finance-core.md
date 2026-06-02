@@ -51,7 +51,7 @@ TASK-991 (Slice 3) ya remedió **en vivo** la identidad de la org de Grupo Berel
 
 **Dry-runs (read-only, repetibles):** `scripts/finance/task-990-nubox-export-rfc-dryrun.ts` (RFC match: Berel auto-match, 0 orphans) · `scripts/finance/task-990-berel-income-native-dryrun.ts` (income native plane: 89960 MXN / 4617647 CLP / 51.33).
 
-**Pendiente:** Slice 9 (docs/rollout). **Diferido con documentación** (sin consumer vivo → no especular, anti-drift): (a) columnas USD en las VIEWs `*_payments_normalized` + superficies reader USD (gated `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, sin dashboard consumidor aún); (b) capability `finance.fx.manual_override` + su endpoint admin de override de rate stale/missing (no existe write surface; sembrar la capability sin consumer = drift TASK-873). El override ya es posible hoy vía `exchangeRateOverride` en los ledgers. Gate de cierre: `pnpm test` + `pnpm build` + verificar deploy workers (ops-worker consume `src/lib/nubox`).
+**Pendiente:** **rollout operativo** (acción del operador — ver "Delta Slice 9 — rollout sequence" abajo): el código está **code-complete** (Slices 1–9) pero NO **operationally complete** (flags OFF, cuenta Global66 MXN no onboardeada, income de Berel no proyectado, workers Cloud Run no redeployados con flags activos). Per la Runtime Rollout Completion Gate, la task queda `in-progress` (code complete, rollout pendiente). **Diferido con documentación** (sin consumer vivo → no especular, anti-drift): (a) columnas USD en las VIEWs `*_payments_normalized` + superficies reader USD (gated `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, sin dashboard consumidor aún); (b) capability `finance.fx.manual_override` + su endpoint admin de override de rate stale/missing (no existe write surface; sembrar la capability sin consumer = drift TASK-873). El override ya es posible hoy vía `exchangeRateOverride` en los ledgers. Gate de cierre: `pnpm test` + `pnpm build` + verificar deploy workers (ops-worker consume `src/lib/nubox`).
 
 ## Delta 2026-06-02 — PROGRESO Slice 8 (reporting USD plane + 5 signals) — anti-pérdida-de-contexto
 
@@ -67,6 +67,33 @@ TASK-991 (Slice 3) ya remedió **en vivo** la identidad de la org de Grupo Berel
 - `finance.cash_signal.unsupported_currency` (data_quality, error>0): `external_cash_signals.currency` fuera de `{CLP,USD,MXN}` (hoy 156 filas todas CLP → 0).
 
 **Gate:** `pnpm local:check` (lint+tsc) verde; suite reliability 410 verde (sin romper pins de registry/overview); 15 tests de signals + smoke PG real (5/5 `ok`). `db.d.ts` sin cambios (sin DDL nuevo en Slice 8).
+
+## Delta 2026-06-02 — PROGRESO Slice 9 (docs + rollout) — anti-pérdida-de-contexto
+
+> Commit `docs(finance): TASK-990 Slice 9 …`. **Code-complete (Slices 1–9)**; rollout operativo pendiente del operador (acciones de producción money-movement + flag flips, NO autónomas).
+
+**Docs actualizados (Slice 9):**
+- `docs/documentation/finance/monedas-y-tipos-de-cambio.md` → v1.2: sección funcional "MXN como moneda finance-core (TASK-990)" (3 planos, settlement nativo, resultado cambiario, señales, rollout) + fila de la matriz `finance_core` corregida a `CLP/USD/MXN†`.
+- `docs/architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md` → Delta 2026-06-02 (ADR aceptado, fx_snapshots, 3 planos, settlement nativo, 7 señales, readiness fail-closed).
+- `docs/documentation/finance/ordenes-de-pago.md` + `conciliacion-bancaria.md` → deltas MXN (one-order-one-currency; conciliación en plano nativo sin drift falso).
+- `docs/architecture/DECISIONS_INDEX.md` → ADR ya estaba `Accepted`; corregido el path de la task (`to-do` → `in-progress`).
+
+**Gate de cierre de task (ejecutado):** `pnpm test` (full) **5898 passed / 0 failed** (exit 0) — los cambios money-movement de Slices 7–8 pasan cross-module. `pnpm build` (Turbopack producción): [resultado en commit]. **Worker Cloud Run deploy**: los workflows de los 4 workers se disparan por cambios en `services/<worker>/**`, NO por `src/lib/**`; como TODO está gated OFF, el código MXN está **dormant** en el bundle del worker y NO requiere redeploy inmediato. El redeploy de workers es **parte de la secuencia de rollout** (abajo), para que el bundle esbuild incluya el nuevo `src/lib/{nubox,finance}` cuando los flags se enciendan.
+
+### Slice 9 — Rollout sequence (acciones del OPERADOR, money-movement; NO autónomas)
+
+Orden canónico (cada paso reversible vía flags / rollback per-slice del Risk Matrix). **No ejecutar sin OK explícito; son escrituras de producción.**
+
+1. **Staging primero.** Setear en staging (Vercel env `Preview/develop` + ops-worker) los flags uno a uno, validar, luego producción. Redeploy requerido tras cada cambio de env var.
+2. **`FINANCE_CORE_MXN_ENABLED=true`** (master). Activa: native plane en el income write de Nubox, settlement nativo + resultado cambiario, reporting USD. Verificar señales en `/admin/operations` (las 7 MXN deben quedar `ok`).
+3. **Onboardear la cuenta Global66 MXN**: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/task-990-onboard-global66-mxn-account.ts --apply` (gated tras el master flag; idempotente; expected-mutation-count=1). Declarar su OTB si corresponde.
+4. **`NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED=true`** + correr el dry-run RFC (`scripts/finance/task-990-nubox-export-rfc-dryrun.ts`) → resolver dispositions pendientes si las hay.
+5. **Backfill Berel** (gated `FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED=true`): dry-run primero (`scripts/finance/task-990-berel-income-native-dryrun.ts`), revisar payload before/after + FX snapshot + match RFC, luego `--apply --allowlist-source-object-id 28800562 --actor <id> --reason "<...>"`. Abort si mutation count ≠ esperado.
+6. **`FINANCE_MXN_PAYMENT_ORDERS_ENABLED`** / **`FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`**: encender cuando se necesiten payables MXN / readers USD (este último sin consumer vivo aún — ver "Diferido").
+7. **Redeploy workers Cloud Run** (`ops-worker` consume `src/lib/nubox` + `src/lib/finance`): `gh workflow run ops-worker-deploy.yml --ref develop -f environment=staging -f expected_sha=$(git rev-parse origin/develop)` y verificar `GIT_SHA` de la revisión. Idem si el flujo MXN corre en otros workers.
+8. **Verificación post-rollout**: factura Berel proyectada con native+functional+USD; cobro MXN → `paid` + resultado cambiario en el lane FX; señales en steady `ok`; `pnpm pg:doctor`.
+
+**Rollback**: apagar los flags (revierte comportamiento sin tocar data); el backfill de Berel se compensa vía supersede/reprojection desde la evidencia del dry-run (Risk Matrix Slice 5). Las columnas aditivas y `fx_snapshots` (append-only) se dejan.
 
 ## Delta 2026-06-02 — PROGRESO Slice 7 (treasury / settlement / FX result) — anti-pérdida-de-contexto
 

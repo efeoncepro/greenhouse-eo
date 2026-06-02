@@ -143,3 +143,12 @@ Cada accion publica un evento en `greenhouse_sync.outbox_events`:
 > Detalle tecnico: helpers en [src/lib/finance/payment-orders/](../../../src/lib/finance/payment-orders/).
 > API en [src/app/api/admin/finance/payment-orders/](../../../src/app/api/admin/finance/payment-orders/).
 > Schema en [migrations/20260501143749876_task-750-payment-orders.sql](../../../migrations/20260501143749876_task-750-payment-orders.sql).
+
+## Delta 2026-06-02 — Órdenes de pago en MXN (TASK-990)
+
+Con la promoción de MXN a moneda finance-core, las órdenes de pago aceptan `MXN` (además de `CLP`/`USD`), detrás del flag `FINANCE_MXN_PAYMENT_ORDERS_ENABLED` (apagado por defecto). Reglas que se mantienen:
+
+- **Una orden, una sola moneda** (invariante reforzado): una orden de pago no mezcla monedas. Si una orden quedaría con monedas mixtas, se rechaza con `unsupported_corridor` antes de iniciar la transacción. La señal `finance.payment_order.mixed_currency_attempt` (steady = 0) lo detecta como defensa en profundidad.
+- Con el flag apagado, una orden MXN se rechaza (`unsupported_corridor`) — el comportamiento CLP/USD es idéntico al anterior.
+
+> Detalle técnico: [TASK-990](../../tasks/in-progress/TASK-990-mxn-multi-currency-finance-core.md) Slice 6. Berel es income/AR; las órdenes MXN son infraestructura forward-looking de payables.
