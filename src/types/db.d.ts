@@ -4547,6 +4547,7 @@ export interface GreenhouseFinanceExpenseDistributionResolution {
 export interface GreenhouseFinanceExpensePayments {
   amount: Numeric;
   amount_clp: Numeric | null;
+  amount_usd: Numeric | null;
   created_at: Generated<Timestamp>;
   currency: Generated<string>;
   exchange_rate_at_payment: Numeric | null;
@@ -4570,6 +4571,7 @@ export interface GreenhouseFinanceExpensePayments {
   recorded_by_user_id: string | null;
   reference: string | null;
   requires_fx_repair: Generated<boolean>;
+  settlement_fx_snapshot_id: string | null;
   settlement_group_id: string | null;
   space_id: string | null;
   superseded_at: Timestamp | null;
@@ -4592,10 +4594,12 @@ export interface GreenhouseFinanceExpensePaymentsNormalized {
   expense_type: string | null;
   fx_gain_loss_clp: Numeric | null;
   has_clp_drift: boolean | null;
+  has_usd_drift: boolean | null;
   is_reconciled: boolean | null;
   payment_account_id: string | null;
   payment_amount_clp: Numeric | null;
   payment_amount_native: Numeric | null;
+  payment_amount_usd: Numeric | null;
   payment_currency: string | null;
   payment_date: Timestamp | null;
   payment_id: string | null;
@@ -4616,6 +4620,7 @@ export interface GreenhouseFinanceExpenses {
    * Denormalized aggregate. Derived from SUM(expense_payments.amount) by trigger trg_sync_expense_amount_paid.
    */
   amount_paid: Generated<Numeric>;
+  amount_usd: Numeric | null;
   balance_nubox: Numeric | null;
   client_id: string | null;
   contractor_payable_id: string | null;
@@ -4652,6 +4657,7 @@ export interface GreenhouseFinanceExpenses {
   exempt_amount: Numeric | null;
   expense_id: string;
   expense_type: string;
+  functional_to_reporting_fx_snapshot_id: string | null;
   is_annulled: Generated<boolean | null>;
   is_reconciled: Generated<boolean>;
   is_recurring: Generated<boolean>;
@@ -4664,6 +4670,9 @@ export interface GreenhouseFinanceExpenses {
   member_id: string | null;
   member_name: string | null;
   miscellaneous_category: string | null;
+  native_amount: Numeric | null;
+  native_currency: string | null;
+  native_to_functional_fx_snapshot_id: string | null;
   /**
    * Portion of expense tax amount capitalized into cost/gasto.
    */
@@ -4909,6 +4918,25 @@ export interface GreenhouseFinanceFxPnlBreakdown {
   translation_clp: Numeric | null;
 }
 
+export interface GreenhouseFinanceFxSnapshots {
+  composed_via: string[] | null;
+  created_at: Generated<Timestamp>;
+  from_currency: string;
+  inverse_rate: Numeric;
+  locked_at: Generated<Timestamp>;
+  locked_by: string;
+  manual_override_reason: string | null;
+  policy: string;
+  rate: Numeric;
+  rate_date: Timestamp;
+  rate_date_resolved: Timestamp | null;
+  snapshot_id: string;
+  source: string;
+  source_run_id: string | null;
+  superseded_by: string | null;
+  to_currency: string;
+}
+
 export interface GreenhouseFinanceIdempotencyKeys {
   created_at: Generated<Timestamp>;
   endpoint: string;
@@ -4925,6 +4953,7 @@ export interface GreenhouseFinanceIncome {
    * Total settled portion of the receivable. Composed of: cash payments + factoring fees (when factored) + tax withholdings. Use the canonical view greenhouse_finance.income_settlement_reconciliation (or src/lib/finance/income-settlement.ts) to validate consistency — never sum greenhouse_finance.income_payments alone, that ignores factoring + withholdings.
    */
   amount_paid: Generated<Numeric>;
+  amount_usd: Numeric | null;
   balance_nubox: Numeric | null;
   client_id: string | null;
   client_main_activity: string | null;
@@ -4947,6 +4976,7 @@ export interface GreenhouseFinanceIncome {
   economic_category: string | null;
   exchange_rate_to_clp: Numeric | null;
   exempt_amount: Numeric | null;
+  functional_to_reporting_fx_snapshot_id: string | null;
   hes_id: string | null;
   hes_number: string | null;
   /**
@@ -4986,6 +5016,9 @@ export interface GreenhouseFinanceIncome {
    * Derived flag for quick filters. True when the applied tax code is exempt or non-billable.
    */
   is_tax_exempt: Generated<boolean>;
+  native_amount: Numeric | null;
+  native_currency: string | null;
+  native_to_functional_fx_snapshot_id: string | null;
   /**
    * total_amount minus partner_share_amount
    */
@@ -5079,6 +5112,7 @@ export interface GreenhouseFinanceIncomePayments {
    * Payment amount converted to CLP at exchange_rate_at_payment. For CLP payments, equals amount.
    */
   amount_clp: Numeric | null;
+  amount_usd: Numeric | null;
   created_at: Generated<Timestamp>;
   currency: string | null;
   /**
@@ -5104,6 +5138,7 @@ export interface GreenhouseFinanceIncomePayments {
   recorded_by_user_id: string | null;
   reference: string | null;
   requires_fx_repair: Generated<boolean>;
+  settlement_fx_snapshot_id: string | null;
   settlement_group_id: string | null;
   space_id: string | null;
   superseded_at: Timestamp | null;
@@ -5124,12 +5159,14 @@ export interface GreenhouseFinanceIncomePaymentsNormalized {
   exchange_rate_at_payment: Numeric | null;
   fx_gain_loss_clp: Numeric | null;
   has_clp_drift: boolean | null;
+  has_usd_drift: boolean | null;
   income_id: string | null;
   income_type: string | null;
   is_reconciled: boolean | null;
   payment_account_id: string | null;
   payment_amount_clp: Numeric | null;
   payment_amount_native: Numeric | null;
+  payment_amount_usd: Numeric | null;
   payment_currency: string | null;
   payment_date: Timestamp | null;
   payment_id: string | null;
@@ -5681,12 +5718,14 @@ export interface GreenhouseFinanceSettlementGroups {
 export interface GreenhouseFinanceSettlementLegs {
   amount: Numeric;
   amount_clp: Numeric | null;
+  amount_usd: Numeric | null;
   counterparty_instrument_id: string | null;
   created_at: Generated<Timestamp>;
   created_by_user_id: string | null;
   currency: string;
   direction: string;
   fx_rate: Numeric | null;
+  fx_snapshot_id: string | null;
   instrument_id: string | null;
   is_reconciled: Generated<boolean>;
   leg_type: string;
@@ -9730,6 +9769,7 @@ export interface DB {
   "greenhouse_finance.external_signal_resolution_attempts": GreenhouseFinanceExternalSignalResolutionAttempts;
   "greenhouse_finance.factoring_operations": GreenhouseFinanceFactoringOperations;
   "greenhouse_finance.fx_pnl_breakdown": GreenhouseFinanceFxPnlBreakdown;
+  "greenhouse_finance.fx_snapshots": GreenhouseFinanceFxSnapshots;
   "greenhouse_finance.idempotency_keys": GreenhouseFinanceIdempotencyKeys;
   "greenhouse_finance.income": GreenhouseFinanceIncome;
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
