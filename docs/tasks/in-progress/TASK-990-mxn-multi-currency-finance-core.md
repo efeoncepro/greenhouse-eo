@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -25,6 +25,50 @@
 ## Delta 2026-06-02 — identidad de Berel remediada por TASK-991
 
 TASK-991 (Slice 3) ya remedió **en vivo** la identidad de la org de Grupo Berel: `organization_type='client'`, `country='MX'`, `tax_id='PBE970101718'` (`tax_id_type='RFC'`), `legal_name='PINTURAS BEREL SA DE CV'`. Eso **destraba el RFC match** de esta task (Slice 4-5): la org ya tiene el RFC para anclar la factura Nubox `28800562`. El facet financiero MXN (income projection + perfil con moneda MXN) sigue siendo responsabilidad de esta task. El Space operativo y el wizard de onboarding son TASK-992.
+
+## Delta 2026-06-02 — Slice 0: Discovery + Migration Map (commit pre-Slice 1)
+
+Discovery ejecutada (skill finanzas + 3 Explore subagents: ADR digest, primitivas canónicas finance, Nubox+Berel+RFC) + verificación de schema PG real vía connector. `fx_snapshots` NO existe; `total_amount_clp` (plano funcional) ya existe en `income`/`expenses`; el plano USD reporting NO existe en ninguna tabla.
+
+### Decisión #1 (binding) — el comentario `finance_core STAYS NARROW` es PRE-ADR y queda superseded
+
+`src/lib/finance/currency-domain.ts` tiene un comentario TASK-475: `finance_core: ['CLP','USD'] // STAYS NARROW — expanding breaks invariants downstream`. **El ADR aceptado 2026-06-02 lo supersede**: el Goal de TASK-990 es promover MXN de pricing-only a `finance_core`. `FinanceCurrency` pasa a `CLP | USD | MXN` (ADR §5.1). El blast radius (todo consumer de `FinanceCurrency`: `accounts`, `exchange_rates`, `postgres-store`, switches) es REAL y se gestiona con expand-and-contract + flags: Slice 1 expande el tipo detrás de flags (sin write path activo), Slice 2 expande schema, los readers clasifican MXN antes de cualquier constraint flip. Al implementar Slice 1: actualizar el comentario stale (no dejar el guard contradictorio). Un Explore subagent de Discovery leyó el comentario como "nunca expandir finance_core" — eso es interpretación del estado PRE-ADR; el ADR es autoritativo.
+
+### Migration map — verificado contra PG real
+
+**CHECK widening INSTANTÁNEO** (agregar `'MXN'` al `IN (...)` valida de inmediato, sin `NOT VALID`; rollback = re-narrow tras verificar 0 filas MXN):
+
+| Artefacto | Constraint actual | Target |
+|---|---|---|
+| `income` | `income_currency_check: currency IN ('CLP','USD')` | `+ 'MXN'` |
+| `expenses` | `expenses_currency_check` | `+ 'MXN'` |
+| `payment_obligations` | `payment_obligations_currency_check` | `+ 'MXN'` |
+| `payment_orders` | `payment_orders_currency_check` | `+ 'MXN'` |
+| `payment_order_lines` | `payment_order_lines_currency_check` | `+ 'MXN'` |
+| `beneficiary_payment_profiles` | `beneficiary_payment_profiles_currency_check` | `+ 'MXN'` |
+| `payment_order_processor_funding_policies` | `..._order_currency_check (NULL OR IN('CLP','USD'))` | `+ 'MXN'` |
+
+**Sin CHECK de currency** (ya aceptan MXN estructuralmente — el bloqueo es runtime/hardcode, NO DDL): `accounts.currency`, `external_cash_signals.currency`, `income_payments.currency` (nullable), `settlement_legs.currency`. El gate es el reader/hardcode (Slices 5/7); la cuenta Global66 MXN se inserta como fila `accounts` nueva (Slice 7).
+
+**Plano funcional CLP — YA EXISTE** (no recrear): `income.total_amount_clp NOT NULL` + `income.exchange_rate_to_clp`; idem `expenses`; `income_payments.amount_clp` + `expense_payments.amount_clp` (COALESCE chain TASK-766); `settlement_legs.amount_clp`. El cutover CHECK `*_clp_amount_required_after_cutover` (currency!='CLP' ⇒ amount_clp NOT NULL) ya fuerza el plano funcional para no-CLP → consistente con MXN.
+
+**Columnas NUEVAS additivas nullable** (no requieren `NOT VALID`; cualquier CHECK que las ate sí usa `NOT VALID + VALIDATE`):
+- `income` / `expenses`: `native_amount`, `native_currency`, `amount_usd` (reporting), `native_to_functional_fx_snapshot_id` FK, `functional_to_reporting_fx_snapshot_id` FK, `is_tax_exempt` (verificar si ya existe vía tax_code; DTE 110). Compat: filas CLP existentes dejan estas NULL; reader trata `native = COALESCE(native_currency, currency)`.
+- `income_payments` / `expense_payments`: `amount_usd`, `settlement_fx_snapshot_id`.
+- `settlement_legs`: `amount_usd`, `fx_snapshot_id`.
+
+**Tabla NUEVA** `greenhouse_finance.fx_snapshots` (ADR §7.1 default model): append-only, anti-UPDATE/anti-DELETE triggers, `superseded_by` self-FK, columnas `snapshot_id, from_currency, to_currency, rate, inverse_rate, rate_date, rate_date_resolved, source, source_run_id, composed_via, policy, locked_at, locked_by, manual_override_reason`. Legacy inline (`exchange_rate_to_clp`) se mantiene pero espeja el snapshot, nunca diverge.
+
+**VIEWs canónicas a EXTENDER** (no paralelizar):
+- `expense_payments_normalized` + `income_payments_normalized` (TASK-766): agregar `payment_amount_usd` con COALESCE análogo a `payment_amount_clp` + MXN como currency válida del filtro 3-axis supersede.
+- `income_settlement_reconciliation` (TASK-571): currency-aware para que factura MXN pagada en MXN/CLP/USD no dé `drift` falso (reconciliar en plano nativo).
+- `fx_pnl_breakdown` (TASK-699): delta MXN invoice-vs-settlement como fuente #1 realized-settlement, `economic_category='financial_cost'`.
+
+**Rollback global**: columnas additivas se dejan; comportamiento revierte por flags; CHECK widening re-narrow solo tras 0 filas MXN; `fx_snapshots` se deja (append-only).
+
+### Open Question técnica abierta (NO bloqueante para el plan, sí para Slice 3/5)
+
+El path de extracción del **código de moneda extranjera** en el payload Nubox (export DTE 110) NO está confirmado: `src/lib/nubox/types.ts` no tiene campo de moneda extranjera. Para Berel hay fallback de evidencia comercial confirmada (MXN, ADR §0). Slice 3 Discovery verifica contra el artefacto Nubox/SII real de `28800562`. **No bloquea Slices 1-2** (money primitives + schema), sí condiciona el mapper de Slice 3. Hardcodes CLP a remover (Slice 5/7): `sync-nubox-to-postgres.ts` income currency `'CLP'` + `exchange_rate_to_clp=1` + external cash signal `'CLP'`.
 
 ## Summary
 
