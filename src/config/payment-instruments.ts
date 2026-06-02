@@ -146,7 +146,10 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
     category: 'fintech',
     logo: '/images/logos/payment/global66.svg',
     compactLogo: '/images/logos/payment/global66-mark-positive.svg',
-    currencies: ['USD', 'CLP']
+    // Global66 is a multi-currency fintech that operates MXN accounts (CLABE) —
+    // the catalog was incomplete. Declares what the provider actually supports;
+    // the provider-currency validation reads this single source (TASK-990).
+    currencies: ['USD', 'CLP', 'MXN']
   },
 
   // Payment platforms
