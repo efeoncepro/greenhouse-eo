@@ -22,10 +22,10 @@ import NexaInsightsBlock from '@/components/greenhouse/NexaInsightsBlock'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
-import MetricTrendCard, { type MetricTrendPoint } from '@/components/greenhouse/MetricTrendCard'
+import { MetricTrendCard, type MetricTrendPoint } from '@/components/greenhouse/primitives'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
-import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase, getMetricById, getThresholdZone } from '@/lib/ico-engine/metric-registry'
 import type { MemberNexaInsightsPayload } from '@/lib/ico-engine/ai/llm-types'
 import type { IcoMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
 import type { PersonIntelligenceSnapshot } from '@/lib/person-intelligence/types'
@@ -105,9 +105,9 @@ const KPI_CONFIG: Array<{ id: string; label: string; icon: string; format: (v: n
 // green-up area reads correctly. Metric names are English by convention (the
 // canonical ICO metric names: On-Time Delivery, First Time Right).
 
-const TREND_CONFIG: Array<{ id: string; title: string }> = [
-  { id: 'otd_pct', title: 'On-Time Delivery' },
-  { id: 'ftr_pct', title: 'First Time Right' }
+const TREND_CONFIG: Array<{ id: string; title: string; metricName: string }> = [
+  { id: 'otd_pct', title: 'OTD%', metricName: 'On-Time Delivery' },
+  { id: 'ftr_pct', title: 'FTR%', metricName: 'First Time Right' }
 ]
 
 // ── Component ─────────────────────────────────────────────────────────
@@ -227,17 +227,21 @@ const PersonActivityTab = ({ memberId }: Props) => {
   // context when the rolling window has no snapshot (deep historical selection).
   const resolveTrendHero = (metricId: string): { value: number | null; zone: ThresholdZone | null } => {
     const anchorMetric = anchorSnapshot?.deliveryMetrics.find(m => m.metricId === metricId)
-
-    if (anchorMetric && anchorMetric.value !== null) {
-      return { value: anchorMetric.value, zone: anchorMetric.zone }
-    }
-
     const periodMetric = hasData ? getMetric(data, metricId) : undefined
 
-    return {
-      value: anchorMetric?.value ?? periodMetric?.value ?? null,
-      zone: anchorMetric?.zone ?? periodMetric?.zone ?? null
-    }
+    const heroValue = anchorMetric?.value ?? periodMetric?.value ?? null
+
+    // Zone is ALWAYS derived from the value that is displayed (the anchor month).
+    // Never inherit a snapshot zone from the selected ICO context — that is the
+    // possibly in-progress month and would colour the card by a DIFFERENT month
+    // than the headline value (GVC caught this: OTD 100% rendered critical
+    // because it inherited the in-progress June zone).
+    const definition = getMetricById(metricId)
+
+    const zone =
+      definition && heroValue !== null ? getThresholdZone(definition, heroValue) : (anchorMetric?.zone ?? null)
+
+    return { value: heroValue, zone }
   }
 
   // ── CSC Donut ───────────────────────────────────────────────────────
@@ -499,9 +503,10 @@ const PersonActivityTab = ({ memberId }: Props) => {
               <Grid size={{ xs: 12, sm: 6 }} key={cfg.id}>
                 <MetricTrendCard
                   title={cfg.title}
+                  metricName={cfg.metricName}
                   periodLabel={`Mensual · ${anchorPeriodLabel}`}
                   value={hero.value}
-                  zone={hero.zone}
+                  tone={hero.zone ? THRESHOLD_ZONE_COLOR[hero.zone] : undefined}
                   format='percentage'
                   deltaUnit='pts'
                   series={buildTrendSeries(cfg.id)}
