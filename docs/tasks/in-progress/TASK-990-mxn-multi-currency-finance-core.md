@@ -51,7 +51,22 @@ TASK-991 (Slice 3) ya remedió **en vivo** la identidad de la org de Grupo Berel
 
 **Dry-runs (read-only, repetibles):** `scripts/finance/task-990-nubox-export-rfc-dryrun.ts` (RFC match: Berel auto-match, 0 orphans) · `scripts/finance/task-990-berel-income-native-dryrun.ts` (income native plane: 89960 MXN / 4617647 CLP / 51.33).
 
-**Pendiente:** Slice 8 (readers USD vía VIEWs canónicas + 5 signals: `fx.mxn_rate_freshness`, `fx.snapshot_missing`, `nubox_export.foreign_amount_missing`, `multi_currency.native_equivalent_drift`, `cash_signal.unsupported_currency`), Slice 9 (docs/rollout). Capability adicional spec: `finance.fx.manual_override` (FINANCE_ADMIN+EFEONCE_ADMIN, override rate stale/unavailable). Gate de cierre: `pnpm test` + `pnpm build` + verificar deploy workers (ops-worker consume `src/lib/nubox`).
+**Pendiente:** Slice 9 (docs/rollout). **Diferido con documentación** (sin consumer vivo → no especular, anti-drift): (a) columnas USD en las VIEWs `*_payments_normalized` + superficies reader USD (gated `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, sin dashboard consumidor aún); (b) capability `finance.fx.manual_override` + su endpoint admin de override de rate stale/missing (no existe write surface; sembrar la capability sin consumer = drift TASK-873). El override ya es posible hoy vía `exchangeRateOverride` en los ledgers. Gate de cierre: `pnpm test` + `pnpm build` + verificar deploy workers (ops-worker consume `src/lib/nubox`).
+
+## Delta 2026-06-02 — PROGRESO Slice 8 (reporting USD plane + 5 signals) — anti-pérdida-de-contexto
+
+> Commit `feat(finance): TASK-990 Slice 8 …`. Todo gateado/data-driven → cero cambio en producción (sin filas native MXN; flag OFF). Los 5 signals leen `ok` contra PG real hoy.
+
+**Reporting USD plane (completa el snapshot 3-planos que Slice 5b difirió):** el income write de Nubox (`src/lib/nubox/sync-nubox-to-postgres.ts`, dentro del bloque `foreignActive` ya gated `FINANCE_CORE_MXN_ENABLED`) ahora resuelve **CLP→USD** al `emission_date` (`resolveFxSnapshotEvidence`, `policy='rate_at_event'`, `domain='finance_core'`), persiste el snapshot reporting y puebla `income.amount_usd` (= `total_amount_clp × rate`, derivado del MISMO functional CLP persistido → `native_equivalent_drift=0`) + `functional_to_reporting_fx_snapshot_id`. **Degradación honesta:** si no hay rate CLP→USD al emission, ambos quedan NULL y los signals lo exponen. Cadena canónica ADR §8.4: **MXN (native) → CLP (legal Nubox) → USD (snapshot CLP→USD)**, NUNCA MXN→USD directo. `ON CONFLICT` COALESCE additivo.
+
+**5 reliability signals** en `src/lib/reliability/queries/multi-currency-fx-signals.ts` (wired en `get-reliability-overview.ts`, 15 tests, todos `ok` en smoke PG real):
+- `finance.fx.mxn_rate_freshness` (lag): edad del rate MXN/CLP; ok si no hay exposición MXN nativa; warning ≥7d, error ≥30d o sin rate con exposición. Date-safe (`(CURRENT_DATE - MAX(rate_date))::int`).
+- `finance.fx.snapshot_missing` (data_quality, error>0): filas con `native_currency` sin `native_to_functional_fx_snapshot_id`.
+- `finance.nubox_export.foreign_amount_missing` (data_quality): **gated por el flag** — flag OFF → `ok` ("sourcing disabled" — pre-rollout TODO export tiene `native_amount` NULL por diseño, no alarmar); flag ON → cuenta DTE `110/111/112` (`dte_type_code` es **TEXT**) con `native_amount` NULL.
+- `finance.multi_currency.native_equivalent_drift` (drift, error>0): JOIN a `fx_snapshots` — `ABS(total_amount_clp − native_amount × rate) > 1 CLP` (functional) + `ABS(amount_usd − total_amount_clp × rate) > 0.01 USD` (reporting), income + expenses.
+- `finance.cash_signal.unsupported_currency` (data_quality, error>0): `external_cash_signals.currency` fuera de `{CLP,USD,MXN}` (hoy 156 filas todas CLP → 0).
+
+**Gate:** `pnpm local:check` (lint+tsc) verde; suite reliability 410 verde (sin romper pins de registry/overview); 15 tests de signals + smoke PG real (5/5 `ok`). `db.d.ts` sin cambios (sin DDL nuevo en Slice 8).
 
 ## Delta 2026-06-02 — PROGRESO Slice 7 (treasury / settlement / FX result) — anti-pérdida-de-contexto
 

@@ -44,6 +44,13 @@ import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved
 import { getNuboxExportOrphanRfcSignal } from './queries/nubox-export-orphan-rfc'
 import { getPaymentOrderMixedCurrencySignal } from './queries/payment-order-mixed-currency'
 import { getFxGainLossUnclassifiedSignal } from './queries/fx-gain-loss-unclassified'
+import {
+  getCashSignalUnsupportedCurrencySignal,
+  getFxSnapshotMissingSignal,
+  getMxnRateFreshnessSignal,
+  getNativeEquivalentDriftSignal,
+  getNuboxExportForeignAmountMissingSignal
+} from './queries/multi-currency-fx-signals'
 import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
 import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
 import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
@@ -589,6 +596,13 @@ interface ReliabilityOverviewSources {
   /** TASK-990 Slice 7 — pago no-CLP con resultado cambiario sin clasificar. */
   fxGainLossUnclassified?: ReliabilitySignal | null
 
+  /** TASK-990 Slice 8 — multi-currency / FX rollout signals (5). */
+  mxnRateFreshness?: ReliabilitySignal | null
+  fxSnapshotMissing?: ReliabilitySignal | null
+  nuboxExportForeignAmountMissing?: ReliabilitySignal | null
+  multiCurrencyNativeEquivalentDrift?: ReliabilitySignal | null
+  cashSignalUnsupportedCurrency?: ReliabilitySignal | null
+
   /**
    * TASK-793 Slice 3 — Contractor payable → Finance bridge signals (lag +
    * dead-letter). Single signals; degradan honestamente a null si la query falla.
@@ -917,6 +931,11 @@ export const buildReliabilityOverview = (
     ...(sources.nuboxExportOrphanRfc ? [sources.nuboxExportOrphanRfc] : []),
     ...(sources.paymentOrderMixedCurrency ? [sources.paymentOrderMixedCurrency] : []),
     ...(sources.fxGainLossUnclassified ? [sources.fxGainLossUnclassified] : []),
+    ...(sources.mxnRateFreshness ? [sources.mxnRateFreshness] : []),
+    ...(sources.fxSnapshotMissing ? [sources.fxSnapshotMissing] : []),
+    ...(sources.nuboxExportForeignAmountMissing ? [sources.nuboxExportForeignAmountMissing] : []),
+    ...(sources.multiCurrencyNativeEquivalentDrift ? [sources.multiCurrencyNativeEquivalentDrift] : []),
+    ...(sources.cashSignalUnsupportedCurrency ? [sources.cashSignalUnsupportedCurrency] : []),
     // TASK-793 Slice 3 — contractor payable → Finance bridge (lag + dead-letter).
     ...(sources.contractorPayableReadyWithoutObligation
       ? [sources.contractorPayableReadyWithoutObligation]
@@ -1323,6 +1342,31 @@ export const getReliabilityOverview = async (
     preloadedSources.fxGainLossUnclassified !== undefined
       ? preloadedSources.fxGainLossUnclassified
       : await getFxGainLossUnclassifiedSignal().catch(() => null)
+
+  const mxnRateFreshness =
+    preloadedSources.mxnRateFreshness !== undefined
+      ? preloadedSources.mxnRateFreshness
+      : await getMxnRateFreshnessSignal().catch(() => null)
+
+  const fxSnapshotMissing =
+    preloadedSources.fxSnapshotMissing !== undefined
+      ? preloadedSources.fxSnapshotMissing
+      : await getFxSnapshotMissingSignal().catch(() => null)
+
+  const nuboxExportForeignAmountMissing =
+    preloadedSources.nuboxExportForeignAmountMissing !== undefined
+      ? preloadedSources.nuboxExportForeignAmountMissing
+      : await getNuboxExportForeignAmountMissingSignal().catch(() => null)
+
+  const multiCurrencyNativeEquivalentDrift =
+    preloadedSources.multiCurrencyNativeEquivalentDrift !== undefined
+      ? preloadedSources.multiCurrencyNativeEquivalentDrift
+      : await getNativeEquivalentDriftSignal().catch(() => null)
+
+  const cashSignalUnsupportedCurrency =
+    preloadedSources.cashSignalUnsupportedCurrency !== undefined
+      ? preloadedSources.cashSignalUnsupportedCurrency
+      : await getCashSignalUnsupportedCurrencySignal().catch(() => null)
 
   // TASK-793 Slice 3 — Contractor payable → Finance bridge (lag + dead-letter).
   // Cada reader degrada honestamente a null si su query falla — un solo signal
@@ -1814,6 +1858,11 @@ export const getReliabilityOverview = async (
     nuboxExportOrphanRfc,
     paymentOrderMixedCurrency,
     fxGainLossUnclassified,
+    mxnRateFreshness,
+    fxSnapshotMissing,
+    nuboxExportForeignAmountMissing,
+    multiCurrencyNativeEquivalentDrift,
+    cashSignalUnsupportedCurrency,
     contractorPayableReadyWithoutObligation,
     contractorPayableExpenseUnmaterialized,
     contractorPayablePaymentSlaOverdue,
