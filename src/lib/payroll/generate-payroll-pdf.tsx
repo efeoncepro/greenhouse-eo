@@ -47,8 +47,28 @@ import { getPayrollPdfLogoAsset, getPayrollPdfLogoDataUri } from '@/lib/payroll/
  */
 const RECEIPT_TEMPLATE_VERSION_PREFIX = '5-logo'
 
-export const RECEIPT_TEMPLATE_VERSION =
-  `${RECEIPT_TEMPLATE_VERSION_PREFIX}-${getPayrollPdfLogoAsset().sha256.slice(0, 12)}`
+let cachedReceiptTemplateVersion: string | null = null
+
+/**
+ * Lazily resolves the receipt template version (`<prefix>-<logoFingerprint>`).
+ *
+ * MUST stay lazy. Computing it eagerly at module load reads the institutional
+ * logo asset from disk via `getPayrollPdfLogoAsset()`. This module is
+ * transitively imported by the ops-worker projection registry
+ * (`projections/index` → `payroll-receipts` → `generate-payroll-receipts` →
+ * here), so an eager read turns a missing/unreadable asset into a full
+ * ops-worker boot crash (`exit(1)`), taking down outbox publishing and every
+ * reactive consumer. Lazy + memoized evaluation contains the blast radius to
+ * receipt rendering, which degrades to the payroll-receipts projection
+ * dead-letter + reliability path instead of crashing the whole worker.
+ */
+export const getReceiptTemplateVersion = (): string => {
+  if (cachedReceiptTemplateVersion) return cachedReceiptTemplateVersion
+
+  cachedReceiptTemplateVersion = `${RECEIPT_TEMPLATE_VERSION_PREFIX}-${getPayrollPdfLogoAsset().sha256.slice(0, 12)}`
+
+  return cachedReceiptTemplateVersion
+}
 
 const BRAND_BLUE = '#023c70'
 const BRAND_LIGHT = '#F7F9FC'

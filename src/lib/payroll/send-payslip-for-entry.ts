@@ -4,7 +4,7 @@ import { Buffer } from 'node:buffer'
 
 import { getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
-import { generatePayrollReceiptPdf, RECEIPT_TEMPLATE_VERSION } from '@/lib/payroll/generate-payroll-pdf'
+import { generatePayrollReceiptPdf, getReceiptTemplateVersion } from '@/lib/payroll/generate-payroll-pdf'
 import {
   buildPayrollReceiptId,
   buildPayrollReceiptStoragePath,
@@ -321,7 +321,7 @@ export async function sendPayslipForEntry(
       status: 'email_sent',
       emailSentAt: new Date().toISOString(),
       emailDeliveryId: sendResult.resendId,
-      templateVersion: RECEIPT_TEMPLATE_VERSION,
+      templateVersion: getReceiptTemplateVersion(),
       deliveryTrigger: input.trigger,
       paymentOrderLineId: input.paymentOrderLineId ?? null
     })
@@ -340,7 +340,7 @@ export async function sendPayslipForEntry(
       status: 'sent',
       emailRecipient: entry.memberEmail,
       emailProviderId: sendResult.resendId,
-      templateVersion: RECEIPT_TEMPLATE_VERSION,
+      templateVersion: getReceiptTemplateVersion(),
       sentAt: new Date().toISOString()
     })
 

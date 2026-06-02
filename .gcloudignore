@@ -51,7 +51,13 @@ data/
 demo-configs/
 docs/
 full-version/
-public/
+# public/ is excluded to keep the Cloud Build context lean, EXCEPT
+# public/branding/ which the ops-worker carries into its runtime image for
+# PDF rendering (payroll receipts, contractor/finiquito/finance PDFs resolve
+# process.cwd()/public/branding/*). See services/ops-worker/Dockerfile.
+public/*
+!public/branding/
+!public/branding/**
 spec/
 tests/
 
