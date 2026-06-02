@@ -26,6 +26,32 @@
 
 TASK-991 (Slice 3) ya remedió **en vivo** la identidad de la org de Grupo Berel: `organization_type='client'`, `country='MX'`, `tax_id='PBE970101718'` (`tax_id_type='RFC'`), `legal_name='PINTURAS BEREL SA DE CV'`. Eso **destraba el RFC match** de esta task (Slice 4-5): la org ya tiene el RFC para anclar la factura Nubox `28800562`. El facet financiero MXN (income projection + perfil con moneda MXN) sigue siendo responsabilidad de esta task. El Space operativo y el wizard de onboarding son TASK-992.
 
+## Delta 2026-06-02 — PROGRESO Slices 1–5 (commiteados + pusheados a `develop`) — anti-pérdida-de-contexto
+
+> Bloque durable para que una compactación no pierda estado. Cada slice gateado en flags **default OFF** → cero cambio en producción. El flip de flags + el *apply* del backfill de Berel siguen pendientes de OK explícito del operador (acciones de rollout, no de código).
+
+**Commits (en `origin/develop`):**
+- `c82fca89` Slice 1 — Foundation: `FinanceCurrency += MXN` (`src/lib/finance/contracts.ts`), `finance_core` corridor, money primitives + FX snapshot evidence + canonical 3-plane snapshot (`src/lib/finance/multi-currency/{flags,money,fx-snapshot,canonical-money-snapshot,index}.ts`). 15 tests.
+- `97192169` Slice 2 — Schema (`migrations/20260602194741585_...sql`): tabla `greenhouse_finance.fx_snapshots` (append-only); 7 CHECK widenings a MXN; 12 columnas aditivas nullable (`income`/`expenses`: `native_amount, native_currency, amount_usd, native_to_functional_fx_snapshot_id, functional_to_reporting_fx_snapshot_id`; `*_payments`: `amount_usd, settlement_fx_snapshot_id`); VIEWs canónicas extendidas (USD al FINAL, sin reordenar — preservan TASK-768 economic_category JOIN); partial indexes `income.invoice_date`/`expenses.document_date`.
+- `7b047b73` Slice 3 — Conformed model: `NuboxExportationDetail` + 6 campos conformed + `isNuboxExportInvoice` (DTE 110/111/112). **OJO**: esta slice dejó un riesgo latente (mapper emitía 6 campos que la tabla BQ no tenía) — cerrado en 5a.
+- `e1a997aa` Slice 4 — Identity matching: helper RFC puro (`src/lib/finance/multi-currency/tax-identity.ts`: `normalizeTaxId`/`classifyTaxId`/`isValidRfc*`), resolver normalizado RUT/RFC en ambos lados, queue `greenhouse_finance.nubox_export_rfc_dispositions` + capability `finance.nubox_export.review_disposition` (catalog + registry migration `20260602201016706` + grant runtime.ts) + endpoints `/api/admin/finance/nubox-export-rfc-dispositions[/[id]/resolve]` + signal `finance.nubox_export.orphan_rfc` + dry-run.
+- `087a6019` Slice 5a — **XML foreign sourcing** (corrección crítica del operador): el monto MXN vive en el **XML SII** (`getNuboxSaleXml`), NO en `/sales` ni `/details`. `src/lib/nubox/dte-foreign-currency.ts` (`parseDteForeignCurrencyXml` + SII currency-name→ISO). Conformed sync `enrichExportSalesWithForeignCurrency` (gated `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`). **BQ ALTER ran live**: `greenhouse_conformed.nubox_sales` += 6 `foreign_*` columns + `ignoreUnknownValues:true` en los 3 inserts conformed (cierra el riesgo de Slice 3). `resolveNuboxIncomeTaxCode`: DTE 110/111/112 → `cl_vat_exempt` explícito. evidence enum += `nubox_xml`.
+- `f04cd6b9` Slice 5b — Income native plane: `persistFxSnapshot` (`src/lib/finance/multi-currency/fx-snapshot-store.ts`); income upsert (gated `FINANCE_CORE_MXN_ENABLED`) puebla aditivo `native_amount`/`native_currency`/`native_to_functional_fx_snapshot_id` (rate MXN→CLP `nubox_legal_document`/`rate_at_event`). Campos CLP fiscales (`currency`/`total_amount`/`total_amount_clp`) **bit-for-bit intactos**. Sign DTE 112 aplicado a native.
+
+**Datos canónicos verificados live (Berel, sale `28800562`, DTE 110):**
+- XML SII: `<Totales><TpoMoneda>PESO MEX</TpoMoneda><MntTotal>89960</MntTotal></Totales>` + `<OtraMoneda><TpoMoneda>PESO CL</TpoMoneda><TpoCambio>51</TpoCambio><MntTotOtrMnda>4617647</MntTotOtrMnda></OtraMoneda>`.
+- native = **89.960 MXN**; functional = **4.617.647 CLP** (legal, nunca recomputado); implied rate = **51,33** CLP/MXN; IVA-exento (D.L. 825).
+- El `<RUTRecep>55555555-5</RUTRecep>` del XML es el placeholder SII de receptor extranjero — el RFC real (`PBE970101718`) viene del Nubox `client.identification.value` (lo que usa el match Slice 4). Org Berel: `org-32333527-02a8-487b-819e-6f76a761777d` (MX, active_client, tax_id=RFC).
+- Income row de Berel **aún NO existe** en PG (`greenhouse_finance.income`) — el backfill apply (gated) la crearía.
+
+**Contrato de planos (binding, ya implementado):** native → columnas `native_amount`/`native_currency` (MXN). functional → `total_amount_clp` existente (CLP legal Nubox, intacto). reporting USD → `amount_usd` (**pendiente Slice 8**, requiere rate CLP→USD externo). `currency`/`total_amount` quedan CLP funcional (aditivo seguro; el CHECK ya admite MXN para evolución futura).
+
+**Flags (todas OFF):** `FINANCE_CORE_MXN_ENABLED`, `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`, `FINANCE_MXN_PAYMENT_ORDERS_ENABLED`, `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, `FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED` (en `src/lib/finance/multi-currency/flags.ts`).
+
+**Dry-runs (read-only, repetibles):** `scripts/finance/task-990-nubox-export-rfc-dryrun.ts` (RFC match: Berel auto-match, 0 orphans) · `scripts/finance/task-990-berel-income-native-dryrun.ts` (income native plane: 89960 MXN / 4617647 CLP / 51.33).
+
+**Pendiente:** Slice 6 (payment obligations/profiles/orders MXN + one-order-one-currency + signal `finance.payment_order.mixed_currency_attempt`), Slice 7 (treasury/settlement_legs MXN + FX result vía `fx_pnl_breakdown` extendida + signal `finance.fx_gain_loss.unclassified` — **checkpoint money-movement**), Slice 8 (readers USD vía VIEWs canónicas + 5 signals: `fx.mxn_rate_freshness`, `fx.snapshot_missing`, `nubox_export.foreign_amount_missing`, `multi_currency.native_equivalent_drift`, `cash_signal.unsupported_currency`), Slice 9 (docs/rollout). Capability adicional spec: `finance.fx.manual_override` (FINANCE_ADMIN+EFEONCE_ADMIN, override rate stale/unavailable). Gate de cierre: `pnpm test` + `pnpm build` + verificar deploy workers (ops-worker consume `src/lib/nubox`).
+
 ## Delta 2026-06-02 — Slice 0: Discovery + Migration Map (commit pre-Slice 1)
 
 Discovery ejecutada (skill finanzas + 3 Explore subagents: ADR digest, primitivas canónicas finance, Nubox+Berel+RFC) + verificación de schema PG real vía connector. `fx_snapshots` NO existe; `total_amount_clp` (plano funcional) ya existe en `income`/`expenses`; el plano USD reporting NO existe en ninguna tabla.
