@@ -31,6 +31,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { CURRENCY_DOMAIN_SUPPORT } from '@/lib/finance/currency-domain'
 import {
   INSTRUMENT_CATEGORIES,
   INSTRUMENT_CATEGORY_COLORS,
@@ -52,7 +53,13 @@ type Props = {
   onSuccess: () => void
 }
 
-const CURRENCIES = ['CLP', 'USD']
+// Single source of truth: a payment instrument is a finance-core account, so the
+// currencies it can hold are exactly the finance_core domain currencies
+// (CURRENCY_DOMAIN_SUPPORT.finance_core). NEVER hardcode a list here — when a
+// currency is promoted to/from finance_core (e.g. MXN, TASK-990) this dropdown
+// and the server validation (assertValidCurrency → VALID_CURRENCIES) stay in sync
+// automatically, with no drift.
+const CURRENCIES = CURRENCY_DOMAIN_SUPPORT.finance_core
 
 const BANK_ACCOUNT_TYPES: Record<string, string> = {
   corriente: 'Cuenta corriente',
