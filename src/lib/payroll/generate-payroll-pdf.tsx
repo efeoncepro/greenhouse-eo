@@ -1,8 +1,5 @@
 import 'server-only'
 
-import fs from 'fs'
-import path from 'path'
-
 import { Fragment } from 'react'
 
 import { Document, Image, Page, StyleSheet, Text, View, renderToStream } from '@react-pdf/renderer'
@@ -29,32 +26,16 @@ import {
   type ReceiptPresenterEntry,
   type ReceiptRegime
 } from '@/lib/payroll/receipt-presenter'
-
-const LOGO_PATH = path.join(process.cwd(), 'public/branding/logo-full.png')
-let cachedLogoDataUri: string | null | undefined
-
-const getLogoDataUri = (): string | null => {
-  if (cachedLogoDataUri !== undefined) return cachedLogoDataUri
-
-  try {
-    const logoBytes = fs.readFileSync(LOGO_PATH)
-
-    cachedLogoDataUri = `data:image/png;base64,${logoBytes.toString('base64')}`
-  } catch (error) {
-    console.warn('[payroll-pdf] Logo asset unavailable; rendering text fallback.', {
-      logoPath: LOGO_PATH,
-      error: error instanceof Error ? error.message : String(error)
-    })
-    cachedLogoDataUri = null
-  }
-
-  return cachedLogoDataUri
-}
+import { getPayrollPdfLogoAsset, getPayrollPdfLogoDataUri } from '@/lib/payroll/pdf-logo'
 
 /**
  * Bump this constant whenever the receipt/report PDF template changes
  * (branding, layout, fields, colors). Stale cached PDFs with a different
  * version are lazily regenerated on next access.
+ *
+ * v5 (2026-06-01): invalidates cached v4 receipts that were generated without
+ * the embedded Efeonce logo. The cache key includes the logo fingerprint so any
+ * future institutional asset change regenerates receipts automatically.
  *
  * v4 (2026-05-04, TASK-758): canonical 4-regime presenter consumed via
  * `buildReceiptPresentation` (chile_dependent / honorarios / international_deel
@@ -64,7 +45,10 @@ const getLogoDataUri = (): string | null => {
  * with degraded hero, "Monto bruto registrado" hero variant for Deel, and
  * removes filas-fantasma in honorarios/Deel.
  */
-export const RECEIPT_TEMPLATE_VERSION = '4'
+const RECEIPT_TEMPLATE_VERSION_PREFIX = '5-logo'
+
+export const RECEIPT_TEMPLATE_VERSION =
+  `${RECEIPT_TEMPLATE_VERSION_PREFIX}-${getPayrollPdfLogoAsset().sha256.slice(0, 12)}`
 
 const BRAND_BLUE = '#023c70'
 const BRAND_LIGHT = '#F7F9FC'
@@ -395,17 +379,13 @@ const PdfHeader = ({ operatingEntity, monthName, year, docType, periodId }: {
   docType: string
   periodId: string
 }) => {
-  const logoSrc = getLogoDataUri()
+  const logoSrc = getPayrollPdfLogoDataUri()
 
   return (
     <>
       <View style={s.header}>
         <View>
-          {logoSrc ? (
-            <Image src={logoSrc} style={{ width: 120, height: 28 }} />
-          ) : (
-            <Text style={s.companyText}>Efeonce Greenhouse</Text>
-          )}
+          <Image src={logoSrc} style={{ width: 120, height: 28 }} />
         <View style={s.companyBlock}>
           <Text style={s.companyText}>{operatingEntity?.legalName ?? 'Efeonce Group SpA'}</Text>
           {operatingEntity?.taxId && <Text style={s.companyText}>{`RUT ${operatingEntity.taxId}`}</Text>}
