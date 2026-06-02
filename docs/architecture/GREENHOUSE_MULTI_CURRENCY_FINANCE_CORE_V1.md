@@ -8,6 +8,8 @@
 > **Confidence:** high for the target architecture; medium for Nubox foreign-currency code extraction until XML/PDF payload confirms where Nubox exposes the currency code
 > **Related docs:** [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md), [GREENHOUSE_FINANCE_ARCHITECTURE_V1](GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1](GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md), [GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1](GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md), [Monedas y Tipos de Cambio](../documentation/finance/monedas-y-tipos-de-cambio.md)
 > **Implementation task:** [TASK-990](../tasks/to-do/TASK-990-mxn-multi-currency-finance-core.md)
+>
+> **Delta 2026-06-02 — Accepted decision (currency plane sourcing):** the reporting USD plane is derived from the functional CLP via a locked `CLP→USD` snapshot (IAS 21 presentation-currency translation), **not** from a direct `MXN→USD` market rate. The canonical chain is `MXN (native) → CLP (legal Nubox) → USD (reporting)`. Full rationale in §8.4. The rest of the ADR remains `Proposed` pending human acceptance.
 
 ---
 
@@ -326,14 +328,33 @@ For Nubox document `28800562`, the expected Greenhouse projection after identity
 native_amount: 89960
 native_currency: MXN
 functional_amount_clp: 4617647
-reporting_amount_usd: resolved from locked MXN->USD snapshot
+reporting_amount_usd: resolved from locked CLP->USD snapshot applied to functional_amount_clp (NOT a direct MXN->USD market rate) — see 8.4
 source_document_type: nubox_export_invoice
 nubox_dte_type: 110
 nubox_client_tax_id: PBE970101718
 organization_match_basis: RFC or explicit reviewed match
+is_tax_exempt: true   # DTE 110 export invoice is IVA-exempt (D.L. 825 Art 12)
 ```
 
 The CLP amount from Nubox is legal/documentary evidence. It is not allowed to overwrite the native MXN amount.
+
+### 8.4 Currency plane sourcing — ACCEPTED DECISION (2026-06-02)
+
+The three planes are sourced through a single anchor chain. This is **decided, not open**:
+
+```txt
+MXN (native)  →  CLP (functional = Nubox legal/documentary value, NOT recomputed by Greenhouse)  →  USD (reporting)
+```
+
+1. **`native`** = the document's foreign amount, immutable. Basis for revenue recognition (IFRS 15 transaction price in contract currency).
+2. **`functional` (CLP)** = the CLP legal/documentary equivalent that Nubox/SII already computed. Greenhouse does **not** recompute MXN→CLP with its own rate. The implied rate (`4,617,647 / 89,960 = 51.3300 CLP/MXN`) is stored as `FxSnapshot{source='nubox_legal_document', policy='rate_at_event'}` evidence. This preserves exact reconciliation against the SII RCV / libro de ventas.
+3. **`reporting` (USD)** = the functional CLP **translated** to USD via a locked `CLP→USD` snapshot (`rate_at_event` at emission date). It is **not** computed from an independent `MXN→USD` market rate.
+
+**Why this chain (IAS 21).** USD is a *presentation currency*, not the measurement currency. IAS 21 translates to a presentation currency **from the functional-currency figures** (CLP), not from each transaction's original currency independently. Sourcing USD from CLP guarantees the three planes reconcile through one anchor, so `native_equivalent_drift` is deterministic with no tolerance fudge. A direct `MXN→USD` would introduce permanent cross-rate inconsistency (`MXN→USD`, `CLP→USD` and the implied `MXN→CLP` never form a perfect triangle across sources/timestamps).
+
+**What is preserved.** The native MXN amount is kept forever as a first-class dimension, so a direct `MXN→USD` "market value on emission day" remains available as an **ad-hoc analytics view** — it just never becomes the consolidated reporting number.
+
+**Revisit condition.** If Finance later requires the reporting USD to be "market-pure" (direct `MXN→USD`), that is a governance change that must be recorded here and must relax the `native_equivalent_drift` tolerance contract accordingly. Until then, the chain via functional CLP is the only canonical path.
 
 ### 8.3 Orphan identity contract
 
