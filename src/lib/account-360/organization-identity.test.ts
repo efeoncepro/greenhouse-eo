@@ -61,11 +61,12 @@ describe('ensureOrganizationForSupplier', () => {
     mockQuery.mockReset()
   })
 
-  it('returns existing org_id when tax_id matches a supplier org', async () => {
+  it('upserts existing supplier org via canonical writer (TASK-991: type derivado + origin)', async () => {
     // findOrganizationByTaxId query
     mockQuery.mockResolvedValueOnce([
       { organization_id: 'org-existing', organization_type: 'supplier' }
     ])
+    mockQuery.mockResolvedValueOnce([]) // canonical UPDATE
 
     const orgId = await ensureOrganizationForSupplier({
       taxId: '76.123.456-7',
@@ -75,8 +76,21 @@ describe('ensureOrganizationForSupplier', () => {
 
     expect(orgId).toBe('org-existing')
 
-    // Should NOT call UPDATE (type is already 'supplier', not 'client')
-    expect(mockQuery).toHaveBeenCalledTimes(1)
+    // TASK-991: el writer canónico siempre upsertea (deriva type + setea origin).
+    // Para un 'supplier' existente el type se mantiene 'supplier' (idempotente).
+    expect(mockQuery).toHaveBeenCalledTimes(2)
+    expect(mockQuery.mock.calls[1][0]).toContain('UPDATE greenhouse_core.organizations')
+    expect(mockQuery.mock.calls[1][1]).toEqual([
+      'org-existing',
+      'supplier',
+      'ACME SpA',
+      'ACME SpA',
+      null,
+      '76.123.456-7',
+      'RUT',
+      'CL',
+      'manual'
+    ])
   })
 
   it('upgrades type client → both when org exists as client', async () => {
@@ -85,7 +99,7 @@ describe('ensureOrganizationForSupplier', () => {
       { organization_id: 'org-client', organization_type: 'client' }
     ])
 
-    // UPDATE to set type = 'both'
+    // canonical UPDATE to set type = 'both'
     mockQuery.mockResolvedValueOnce([])
 
     const orgId = await ensureOrganizationForSupplier({
@@ -97,9 +111,19 @@ describe('ensureOrganizationForSupplier', () => {
     expect(orgId).toBe('org-client')
     expect(mockQuery).toHaveBeenCalledTimes(2)
 
-    // Verify the UPDATE was called with the right org_id
-    expect(mockQuery.mock.calls[1][0]).toContain("organization_type = 'both'")
-    expect(mockQuery.mock.calls[1][1]).toEqual(['org-client'])
+    // deriveOrganizationType(hasSupplierRole=true, currentType='client') = 'both'
+    expect(mockQuery.mock.calls[1][0]).toContain('organization_type = $2')
+    expect(mockQuery.mock.calls[1][1]).toEqual([
+      'org-client',
+      'both',
+      'ACME SpA',
+      'ACME SpA',
+      null,
+      '76.123.456-7',
+      'RUT',
+      'CL',
+      'manual'
+    ])
   })
 
   it('creates new org with type supplier when no match exists', async () => {
@@ -205,7 +229,8 @@ describe('ensureOrganizationForClient', () => {
       null,
       '76.123.456-7',
       'RUT',
-      'CL'
+      'CL',
+      'manual'
     ])
   })
 
@@ -232,7 +257,9 @@ describe('ensureOrganizationForClient', () => {
       null,
       null,
       'US',
-      'hubspot-1'
+      'hubspot-1',
+      'client',
+      'manual'
     ])
   })
 })

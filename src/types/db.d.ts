@@ -2622,6 +2622,10 @@ export interface GreenhouseCoreOrganizations {
   organization_id: string;
   organization_name: string;
   organization_type: Generated<string | null>;
+  /**
+   * TASK-991: puerta de nacimiento del registro (hubspot_sync|nubox|manual|adopt|quote_converted|migration|bootstrap). Nullable; backfill best-effort. Escrituras nuevas lo setean explícito.
+   */
+  origin: string | null;
   public_id: string | null;
   status: Generated<string>;
   tax_id: string | null;

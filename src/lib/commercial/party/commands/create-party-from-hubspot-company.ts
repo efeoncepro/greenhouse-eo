@@ -3,6 +3,11 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { withTransaction } from '@/lib/db'
+import { nextPublicId } from '@/lib/account-360/id-generation'
+import {
+  deriveOrganizationType,
+  isCanonicalOrganizationWriteEnabled
+} from '@/lib/account-360/organization-type'
 
 import {
   DEFAULT_HUBSPOT_STAGE_MAP,
@@ -77,26 +82,70 @@ export const createPartyFromHubSpotCompany = async (
     const organizationId = normalizeOrganizationId()
     const organizationName = input.defaultName?.trim() || `HubSpot Company ${hubspotCompanyId}`
 
-    const inserted = await txClient.query<{
-      organization_id: string
-      commercial_party_id: string
-    }>(
-      `INSERT INTO greenhouse_core.organizations (
-         organization_id,
-         organization_name,
-         hubspot_company_id,
-         lifecycle_stage,
-         lifecycle_stage_since,
-         lifecycle_stage_source,
-         lifecycle_stage_by,
-         active,
-         status,
-         created_at,
-         updated_at
-       ) VALUES ($1, $2, $3, $4, NOW(), $5, $6, TRUE, 'active', NOW(), NOW())
-       RETURNING organization_id, commercial_party_id::text AS commercial_party_id`,
-      [organizationId, organizationName, hubspotCompanyId, initialStage, source, actorId]
-    )
+    // TASK-991 Slice 1 — root-cause fix de Grupo Berel (gated, shadow). Cuando
+    // CLIENT_BIRTH_CANONICAL_WRITE_ENABLED está ON, la puerta HubSpot escribe
+    // `organization_type` (derivado del lifecycle vía la SSOT `deriveOrganizationType`),
+    // `public_id` y `origin` — antes los omitía, dejando `active_client` con
+    // `organization_type='other'` (invisible en Finanzas) y `public_id` NULL.
+    // Cuando OFF, comportamiento legacy bit-for-bit.
+    const canonicalWrite = isCanonicalOrganizationWriteEnabled()
+
+    const inserted = canonicalWrite
+      ? await txClient.query<{
+          organization_id: string
+          commercial_party_id: string
+        }>(
+          `INSERT INTO greenhouse_core.organizations (
+             organization_id,
+             public_id,
+             organization_name,
+             hubspot_company_id,
+             lifecycle_stage,
+             lifecycle_stage_since,
+             lifecycle_stage_source,
+             lifecycle_stage_by,
+             organization_type,
+             origin,
+             active,
+             status,
+             created_at,
+             updated_at
+           ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, 'hubspot_sync', TRUE, 'active', NOW(), NOW())
+           RETURNING organization_id, commercial_party_id::text AS commercial_party_id`,
+          [
+            organizationId,
+            await nextPublicId('EO-ORG'),
+            organizationName,
+            hubspotCompanyId,
+            initialStage,
+            source,
+            actorId,
+            deriveOrganizationType({
+              lifecycleStage: initialStage,
+              hasClientRole: initialStage === 'active_client'
+            })
+          ]
+        )
+      : await txClient.query<{
+          organization_id: string
+          commercial_party_id: string
+        }>(
+          `INSERT INTO greenhouse_core.organizations (
+             organization_id,
+             organization_name,
+             hubspot_company_id,
+             lifecycle_stage,
+             lifecycle_stage_since,
+             lifecycle_stage_source,
+             lifecycle_stage_by,
+             active,
+             status,
+             created_at,
+             updated_at
+           ) VALUES ($1, $2, $3, $4, NOW(), $5, $6, TRUE, 'active', NOW(), NOW())
+           RETURNING organization_id, commercial_party_id::text AS commercial_party_id`,
+          [organizationId, organizationName, hubspotCompanyId, initialStage, source, actorId]
+        )
 
     const row = inserted.rows[0]
 
