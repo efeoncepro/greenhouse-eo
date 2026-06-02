@@ -1,3 +1,26 @@
+# Sesion 2026-06-02 — Contractor payables UI handoff + admin support viewer — ✅ VALIDADO LOCAL (sin crear payable)
+
+**Scope**: caso Valentina / contractors: permitir que admin vea boleta/evidencia y que Finanzas cree el payable desde el flujo existente, sin parchear datos ni crear registros por agente.
+
+**Cambios clave**:
+- HR `/hr/contractors`: el envío corregido aprobado ya no queda tapado por el envío disputado anterior. La cola usa estado actual, no histórico: disputed queda auditable, pero una corrección submitted/approved posterior del mismo contexto lo supersede en el headline.
+- HR projection: un envío `approved` y `consumed_by_payable_id IS NULL` se muestra como **Aprobado · Finance · Crear payable en Finanzas**. **No** suma como `ready_for_finance`; ese KPI queda reservado para payables reales.
+- Finanzas `/finance/contractor-payments`: `Crear desde envío` ahora lista envíos aprobados pendientes desde endpoint nuevo `GET /api/finance/contractor-payables/ready-submissions` (capability `finance.contractor_payable:create`) y sigue usando el `POST /api/finance/contractor-payables` canónico cuando el operador confirma. No se creó payable automáticamente.
+- Visor admin de soportes: panel en drawer HR con boletas/evidencia del engagement/submission + preview PDF/img por endpoint privado de assets. `react-pdf` carga lazy client-side para evitar `DOMMatrix` en SSR. Cargas de submission/soportes tienen guard contra respuestas stale.
+- Cache HR workbench se invalida en create/review/cancel/update de work submissions (`hr` y `my`) para evitar que la cola conserve estados viejos.
+
+**Verificación local**:
+- `pnpm vitest run src/lib/contractor-engagements/hr-workbench-submissions.test.ts src/lib/contractor-engagements/support-documents/summary.test.ts` ✅ 7/7.
+- ESLint focal ✅.
+- `pnpm exec tsc --noEmit --pretty false` ✅.
+- GVC: `.captures/2026-06-02T16-10-17_inline-hr-contractors` + `.captures/2026-06-02T16-10-17_inline-finance-contractor-payments` ✅.
+- Playwright read-only: Finance selector muestra `Valentina Hoyos · EO-CWS-0003 · $707.965 · EO-CENG-0001`, `writes=[]`.
+- Workbench read-only: Valentina `Aprobado`, `CLP 707.965`, responsable `Finance`, next action `Crear payable en Finanzas`; totals `{ inReview:0, blocked:0, readyForFinance:0, paid:0 }`.
+
+**Acción operador**: desde `/finance/contractor-payments` → **Crear desde envío** → seleccionar Valentina/`EO-CWS-0003` → **Crear payable**. Luego revisar readiness y enviar a Finanzas desde el flujo TASK-974/793/977/979.
+
+---
+
 # Sesion 2026-06-02 — TASK-991 Canonical Organization Write SSOT + Birth Completeness — 🔄 CODE COMPLETE (develop, rollout pendiente)
 
 **Implementado directo en `develop`** (instrucción operador, sin branch). Skills aplicadas como lente continua: arch-architect + finance-accounting-operator + commercial-expert + info-architecture/forms-ux. Cierra la causa raíz de la fragmentación del nacimiento del cliente (audit `docs/audits/client-lifecycle/CLIENT_BIRTH_FRAGMENTATION_AUDIT_2026-06-02.md`).

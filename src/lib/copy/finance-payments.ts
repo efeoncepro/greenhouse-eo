@@ -70,6 +70,8 @@ export const GH_FINANCE_CONTRACTOR_PAYMENTS = {
     fromSubmissionTitle: 'Crear payable desde envío aprobado',
     fromSubmissionIntro: 'Selecciona un envío de trabajo aprobado. El neto se calcula automáticamente (bruto − retención).',
     selectSubmission: 'Envío aprobado',
+    loadingSubmissions: 'Cargando envíos aprobados…',
+    emptySubmissions: 'No hay envíos aprobados pendientes de payable.',
     offCycleTitle: 'Crear payable off-cycle',
     offCycleIntro: 'Pago manual fuera de un envío (ajuste, bono, reembolso). Requiere motivo.',
     selectEngagement: 'Engagement',

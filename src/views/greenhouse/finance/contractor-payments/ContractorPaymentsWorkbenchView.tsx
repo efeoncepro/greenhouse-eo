@@ -79,6 +79,18 @@ export interface WorkbenchPayable {
   readiness: { blockers?: ReadinessBlocker[] }
 }
 
+interface ReadySubmission {
+  contractorWorkSubmissionId: string
+  publicId: string
+  contractorName: string
+  engagementPublicId: string
+  title: string | null
+  servicePeriodStart: string | null
+  servicePeriodEnd: string | null
+  grossAmount: number | null
+  currency: string | null
+}
+
 type GovernanceAction = 'ready' | 'cancel' | 'waive' | 'override'
 
 const STATUS_TONE: Record<WorkbenchStatus, 'secondary' | 'warning' | 'error' | 'info' | 'success' | 'primary'> = {
@@ -103,6 +115,15 @@ const STATUS_FILTERS: { value: 'all' | WorkbenchStatus; label: string }[] = [
 
 const money = (n: number, currency: string) =>
   formatCurrency(n, currency as CurrencyCode, { currencySymbolSpacing: ' ' }, 'es-CL')
+
+const readySubmissionLabel = (submission: ReadySubmission): string => {
+  const period =
+    submission.servicePeriodStart && submission.servicePeriodEnd
+      ? `${submission.servicePeriodStart} → ${submission.servicePeriodEnd}`
+      : submission.servicePeriodStart ?? submission.servicePeriodEnd ?? 'Sin período'
+
+  return `${submission.publicId} · ${period}`
+}
 
 const statusLabel = (s: WorkbenchStatus) => C.status[s] ?? s
 
@@ -652,10 +673,49 @@ const CreateDialog = ({
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [readySubmissions, setReadySubmissions] = useState<ReadySubmission[]>([])
+  const [loadingReadySubmissions, setLoadingReadySubmissions] = useState(false)
 
   const isOffCycle = mode === 'off_cycle'
   const grossNum = Number(gross.replace(/[^\d]/g, '')) || 0
   const ready = isOffCycle ? engagementId !== '' && grossNum > 0 && reason.trim().length >= 10 : submissionId.trim() !== ''
+
+  useEffect(() => {
+    setSubmissionId('')
+    setErr(null)
+
+    if (isOffCycle) return
+
+    let alive = true
+
+    const loadReadySubmissions = async () => {
+      setLoadingReadySubmissions(true)
+
+      try {
+        const res = await fetch('/api/finance/contractor-payables/ready-submissions?limit=100', { cache: 'no-store' })
+
+        if (!res.ok) {
+          if (alive) setErr('No pudimos cargar los envíos aprobados.')
+
+          return
+        }
+
+        const body = (await res.json().catch(() => null)) as { items?: ReadySubmission[] } | null
+
+        if (alive) setReadySubmissions(body?.items ?? [])
+      } catch {
+        if (alive) setErr('No pudimos cargar los envíos aprobados.')
+      } finally {
+        if (alive) setLoadingReadySubmissions(false)
+      }
+    }
+
+    void loadReadySubmissions()
+
+    return () => {
+      alive = false
+    }
+  }, [isOffCycle])
 
   const submit = async () => {
     setSubmitting(true)
@@ -707,7 +767,31 @@ const CreateDialog = ({
               <CustomTextField label={C.create.reasonLabel} value={reason} onChange={e => setReason(e.target.value)} multiline minRows={2} fullWidth helperText={C.create.reasonHelper} />
             </>
           ) : (
-            <CustomTextField label={C.create.selectSubmission} value={submissionId} onChange={e => setSubmissionId(e.target.value)} fullWidth placeholder='cws-…' />
+            <CustomTextField
+              select
+              label={C.create.selectSubmission}
+              value={submissionId}
+              onChange={e => setSubmissionId(e.target.value)}
+              fullWidth
+              disabled={loadingReadySubmissions || readySubmissions.length === 0}
+              helperText={loadingReadySubmissions ? C.create.loadingSubmissions : readySubmissions.length === 0 ? C.create.emptySubmissions : undefined}
+            >
+              {readySubmissions.map(submission => (
+                <MenuItem key={submission.contractorWorkSubmissionId} value={submission.contractorWorkSubmissionId}>
+                  <Stack spacing={0.25}>
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                      {submission.contractorName}
+                    </Typography>
+                    <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+                      {readySubmissionLabel(submission)}
+                    </Typography>
+                    <Typography variant='caption' sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
+                      {submission.grossAmount !== null ? money(submission.grossAmount, submission.currency ?? 'CLP') : 'Monto pendiente'} · {submission.engagementPublicId}
+                    </Typography>
+                  </Stack>
+                </MenuItem>
+              ))}
+            </CustomTextField>
           )}
 
           {err ? <Alert severity='error'>{err}</Alert> : null}

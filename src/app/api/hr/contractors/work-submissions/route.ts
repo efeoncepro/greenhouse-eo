@@ -9,6 +9,7 @@ import {
 } from '@/lib/contractor-engagements/work-submissions'
 import { ContractorEngagementValidationError } from '@/lib/contractor-engagements'
 import { toContractorEngagementErrorResponse } from '@/lib/contractor-engagements/error-response'
+import { __clearContractorHrWorkbenchCache } from '@/lib/contractor-engagements/hr-workbench-projection'
 import {
   createContractorWorkSubmission,
   listContractorWorkSubmissions
@@ -111,6 +112,8 @@ export async function POST(request: Request) {
           : undefined,
       actorUserId: tenant.userId
     })
+
+    __clearContractorHrWorkbenchCache()
 
     return NextResponse.json({ submission }, { status: 201 })
   } catch (error) {

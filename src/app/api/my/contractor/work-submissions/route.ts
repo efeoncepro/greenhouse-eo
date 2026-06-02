@@ -6,6 +6,7 @@ import {
   clearContractorSelfServiceCacheForProfile,
   getActiveContractorEngagementForProfile
 } from '@/lib/contractor-engagements/self-service-projection'
+import { __clearContractorHrWorkbenchCache } from '@/lib/contractor-engagements/hr-workbench-projection'
 import {
   CONTRACTOR_WORK_SUBMISSION_TYPES,
   CONTRACTOR_WORK_SUBMISSION_UNITS
@@ -135,6 +136,7 @@ export async function POST(request: Request) {
         : created
 
     clearContractorSelfServiceCacheForProfile(identityProfileId)
+    __clearContractorHrWorkbenchCache()
 
     return NextResponse.json({ submission, created: true }, { status: 201 })
   } catch (error) {

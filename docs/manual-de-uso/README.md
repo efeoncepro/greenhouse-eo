@@ -16,7 +16,7 @@ La diferencia con otras capas de documentacion:
 - [Sugerencias asistidas de conciliacion](finance/sugerencias-asistidas-conciliacion.md) — como generar, revisar, aceptar o descartar sugerencias AI sin alterar saldos automaticamente.
 - [Saldos bancarios FX drift](finance/saldos-bancarios-fx-drift-remediation.md) — como diagnosticar, auditar y remediar drift FX de saldos bancarios usando el control plane canonico sin SQL/backfills ad hoc.
 - [Finance Movement Feed](../documentation/finance/finance-movement-feed.md) — contrato reusable para mostrar movimientos financieros sin duplicar tablas, hardcodes de logos ni calculos de saldo en UI.
-- [Pagos a Contractors (Finanzas)](finance/pagos-a-contractors.md) — como ver, crear (desde envio + off-cycle), revisar readiness, enviar a Finanzas, cancelar, waivear y autorizar override de un pago de contractor desde `/finance/contractor-payments`, sin confundir el monto acordado (lo fija HR) con autorizar la excepcion (lo hace Finanzas).
+- [Pagos a Contractors (Finanzas)](finance/pagos-a-contractors.md) — flujo completo desde envio aprobado hasta payable, readiness, `ready_for_finance`, corrida mensual, orden de pago y comprobante; incluye crear desde envio/off-cycle, cancelar, waiver, override y las diferencias entre HR, payable, obligacion financiera, orden y banco.
 
 ### Comercial
 
@@ -47,7 +47,7 @@ _Pendiente._
 - [Periodos de nomina](hr/periodos-de-nomina.md) — como crear, editar y calcular periodos sin adivinar la version tributaria Chile; cuando Greenhouse la resuelve solo y cuando un override manual si aplica.
 - [Descargar y reconciliar la nomina mensual](hr/descargar-y-reconciliar-nomina.md) — paso a paso para descargar recibos individuales, PDF reporte mensual y Excel; donde leer los totales para reconciliar contra Previred (cotizaciones) y F29 (retencion SII honorarios) sin manipular el archivo.
 - [Exportar Previred y LRE](hr/payroll-compliance-exports-chile.md) — como descargar los artefactos compliance Chile desde periodos cerrados, permisos requeridos y cuidados de upload externo manual.
-- [Contratistas — Self-Service y revision HR](hr/contratistas.md) — como un contratista sube su boleta/factura + evidencia, envia entregas y responde observaciones desde `/my/contractor`; y como HR revisa la cola, aprueba, observa o rechaza desde `/hr/contractors` sin confundir aprobar con pagar.
+- [Contratistas — Self-Service y revision HR](hr/contratistas.md) — como un contratista sube boleta/factura + evidencia, envia entregas y responde observaciones; y como HR revisa soportes, aprueba/observa/rechaza y deriva el caso a Finanzas sin confundir aprobar con crear payable o pagar.
 
 ### Agencia y Operaciones
 

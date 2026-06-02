@@ -5,6 +5,7 @@ import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-enti
 import { CONTRACTOR_WORK_SUBMISSION_UNITS } from '@/lib/contractor-engagements/work-submissions'
 import { ContractorEngagementValidationError } from '@/lib/contractor-engagements'
 import { toContractorEngagementErrorResponse } from '@/lib/contractor-engagements/error-response'
+import { __clearContractorHrWorkbenchCache } from '@/lib/contractor-engagements/hr-workbench-projection'
 import {
   cancelContractorWorkSubmission,
   getContractorWorkSubmissionById,
@@ -87,6 +88,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         actorUserId: tenant.userId
       })
 
+      __clearContractorHrWorkbenchCache()
+
       return NextResponse.json({ submission })
     }
 
@@ -101,6 +104,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         actorUserId: tenant.userId
       })
 
+      __clearContractorHrWorkbenchCache()
+
       return NextResponse.json({ submission })
     }
 
@@ -114,6 +119,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         contractorWorkSubmissionId: id,
         actorUserId: tenant.userId
       })
+
+      __clearContractorHrWorkbenchCache()
 
       return NextResponse.json({ submission })
     }
@@ -136,6 +143,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             : undefined,
         actorUserId: tenant.userId
       })
+
+      __clearContractorHrWorkbenchCache()
 
       return NextResponse.json({ submission })
     }

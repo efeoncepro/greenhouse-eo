@@ -17,6 +17,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { resolveProfileDisplayNames } from '@/lib/identity/profile-display-names'
 import { isSourceDegraded, withSourceTimeout, type SourceResult } from '@/lib/platform-health/with-source-timeout'
 
+import { resolveCurrentWorkbenchSubmissions } from './hr-workbench-submissions'
 import { listContractorPayables } from './payables/store'
 import type { ContractorPayable } from './payables/types'
 import { getRemittanceAdviceNumbersForPayables } from './remittance/remittance-number-allocator'
@@ -99,6 +100,7 @@ const buildWorkbenchRow = (
   const hasBlocked = blockedPayables.length > 0
   const hasDisputed = subs.some(s => s.status === 'disputed')
   const hasSubmitted = subs.some(s => s.status === 'submitted')
+  const hasApprovedReady = subs.some(s => s.status === 'approved' && s.consumedByPayableId === null)
   const missingRate = engagement.rateAmount === null
 
   const lifecycle = LIFECYCLE_LABEL[engagement.status]
@@ -123,6 +125,11 @@ const buildWorkbenchRow = (
     statusTone = 'info'
     responsable = 'Revisor HR'
     nextAction = 'Revisar evidencia'
+  } else if (hasApprovedReady) {
+    statusLabel = 'Aprobado'
+    statusTone = 'success'
+    responsable = 'Finance'
+    nextAction = 'Crear payable en Finanzas'
   } else if (missingRate) {
     statusLabel = 'Falta compensación'
     statusTone = 'warning'
@@ -167,13 +174,17 @@ export const resolveContractorHrWorkbenchProjection =
 
     const degraded: ContractorProjectionDegradedReason[] = []
 
-    const [submittedRes, disputedRes, blockedRes, readyRes, paidRes, pendingEngRes, missingRateEngRes, allEngagementsRes] = await Promise.all([
+    const [submittedRes, disputedRes, approvedRes, blockedRes, readyRes, paidRes, pendingEngRes, missingRateEngRes, allEngagementsRes] = await Promise.all([
       withSourceTimeout(() => listContractorWorkSubmissions({ status: 'submitted', limit: 200 }), {
         source: 'submitted_submissions',
         timeoutMs: SOURCE_TIMEOUT_MS
       }),
       withSourceTimeout(() => listContractorWorkSubmissions({ status: 'disputed', limit: 200 }), {
         source: 'disputed_submissions',
+        timeoutMs: SOURCE_TIMEOUT_MS
+      }),
+      withSourceTimeout(() => listContractorWorkSubmissions({ status: 'approved', limit: 200 }), {
+        source: 'approved_submissions_ready_for_payable',
         timeoutMs: SOURCE_TIMEOUT_MS
       }),
       withSourceTimeout(() => listContractorPayables({ status: 'blocked', limit: 200 }), {
@@ -218,6 +229,7 @@ export const resolveContractorHrWorkbenchProjection =
 
     record(submittedRes, 'No pudimos cargar los envíos en revisión.')
     record(disputedRes, 'No pudimos cargar los envíos disputados.')
+    record(approvedRes, 'No pudimos cargar los envíos aprobados pendientes de payable.')
     record(blockedRes, 'No pudimos cargar los payables bloqueados.')
     record(readyRes, 'No pudimos cargar los payables listos a Finance.')
     record(paidRes, 'No pudimos cargar los pagos completados.')
@@ -227,6 +239,7 @@ export const resolveContractorHrWorkbenchProjection =
 
     const submitted = submittedRes.value ?? []
     const disputed = disputedRes.value ?? []
+    const approvedReady = (approvedRes.value ?? []).filter(s => s.consumedByPayableId === null)
     const blocked = blockedRes.value ?? []
     const ready = readyRes.value ?? []
     const paid = paidRes.value ?? []
@@ -237,7 +250,9 @@ export const resolveContractorHrWorkbenchProjection =
     // Build the union of engagement ids needing attention.
     const submissionsByEngagement = new Map<string, ContractorWorkSubmission[]>()
 
-    for (const s of [...submitted, ...disputed]) {
+    const currentSubmissions = resolveCurrentWorkbenchSubmissions([...submitted, ...disputed, ...approvedReady])
+
+    for (const s of currentSubmissions) {
       const arr = submissionsByEngagement.get(s.contractorEngagementId) ?? []
 
       arr.push(s)
@@ -302,9 +317,9 @@ export const resolveContractorHrWorkbenchProjection =
         )
       )
       .sort((a, b) => {
-        // Blocked first, then disputed/in-review, then pending.
+        // Blocked first, then disputed/in-review/approved-ready, then pending.
         const rank = (s: string) =>
-          s === 'Bloqueado' ? 3 : s === 'Disputado' ? 2 : s === 'En revisión' ? 1 : 0
+          s === 'Bloqueado' ? 4 : s === 'Disputado' ? 3 : s === 'En revisión' ? 2 : s === 'Aprobado' ? 1 : 0
 
         return rank(b.statusLabel) - rank(a.statusLabel)
       })
@@ -430,7 +445,7 @@ export const resolveContractorHrWorkbenchProjection =
       directory,
       totals: {
         inReview: submitted.length,
-        blocked: blocked.length + disputed.length,
+        blocked: blocked.length + currentSubmissions.filter(s => s.status === 'disputed').length,
         readyForFinance: ready.length,
         paid: paid.length
       },
