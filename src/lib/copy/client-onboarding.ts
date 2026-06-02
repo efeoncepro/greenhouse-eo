@@ -1,0 +1,295 @@
+// TASK-992 mockup — Client Onboarding wizard (single front door).
+// Copy es-CL (tuteo chileno) for the two-pane onboarding wizard + its surfaces
+// (HubSpot/Nubox pickers, existing-org dialog, exit dialog, success screen),
+// the redefined finance facet drawer, and the Account 360 lifecycle timeline.
+// All user-visible strings live here (greenhouse-ux-writing: no literals in JSX).
+// Tone: onboarding = cálido/alentador; errores = [qué]+[por qué]+[cómo arreglar].
+// Register: es-CL tuteo (tú) — NO voseo. Anglicismo "company" → "empresa".
+
+export const GH_CLIENT_ONBOARDING = {
+  // --- Shell / chrome --------------------------------------------------------
+  shell: {
+    pageTitle: 'Nuevo cliente',
+    pageEyebrow: 'Alta de cliente',
+    saveAndExit: 'Guardar y salir',
+    backCta: 'Atrás',
+    nextCta: 'Continuar',
+    createCta: 'Crear cliente',
+    progressLabel: 'Progreso',
+    autosaveNoChanges: 'Sin cambios',
+    autosaveIdle: 'Borrador guardado',
+    autosaveSaving: 'Guardando…',
+    stepperAria: 'Pasos del alta de cliente',
+    originChipPrefix: 'Origen',
+    // Step short labels (rail)
+    stepOrigen: 'Origen',
+    stepIdentidad: 'Identidad',
+    stepComercial: 'Comercial',
+    stepFinanzas: 'Finanzas',
+    stepSpace: 'Espacio',
+    stepConfirmar: 'Confirmar',
+    // Per-step rail status
+    statusDone: 'Completado',
+    statusActive: 'En curso',
+    statusPending: 'Pendiente',
+    statusBlocked: 'Requiere atención'
+  },
+
+  // --- Step 1: Origen --------------------------------------------------------
+  origen: {
+    title: '¿De dónde viene este cliente?',
+    subtitle: 'Elige el origen para precargar lo que ya sabemos y que no escribas de cero.',
+    hubspotCardTitle: 'Desde HubSpot',
+    hubspotCardSubtitle: 'Una empresa que ya existe en tu CRM',
+    hubspotCardDetail: 'Traemos nombre, país e identificadores. Tú confirmas y completas.',
+    nuboxCardTitle: 'Desde Nubox',
+    nuboxCardSubtitle: 'Una venta o cliente ya facturado',
+    nuboxCardDetail: 'Precargamos identidad tributaria y moneda desde el registro de Nubox.',
+    manualCardTitle: 'Manual',
+    manualCardSubtitle: 'Lo ingresas tú desde cero',
+    manualCardDetail: 'Sin precarga. Completas cada campo en los próximos pasos.',
+    pickHubspotCta: 'Buscar empresa en HubSpot',
+    pickNuboxCta: 'Buscar venta en Nubox',
+    pickedPrefix: 'Seleccionada',
+    changeSelectionCta: 'Cambiar',
+    error: 'Elige un origen para continuar.',
+    pickRequired: 'Elige una empresa para continuar, o cambia a modo manual.'
+  },
+
+  // --- HubSpot picker dialog -------------------------------------------------
+  hubspotPicker: {
+    title: 'Buscar empresa en HubSpot',
+    subtitle: 'Encuentra la empresa y la traemos con sus datos.',
+    searchLabel: 'Buscar por nombre o dominio',
+    searchPlaceholder: 'Ej: Berel, berel.com.mx…',
+    resultsCountPrefix: 'resultados',
+    loading: 'Buscando en HubSpot…',
+    emptyTitle: 'Sin resultados',
+    empty: 'No encontramos empresas con ese término. Prueba con otro nombre o dominio.',
+    clearSearchCta: 'Limpiar búsqueda',
+    degradedTitle: 'HubSpot no responde',
+    degradedDescription: 'No pudimos consultar tu CRM ahora. Reintenta o sigue en modo manual.',
+    retryCta: 'Reintentar',
+    selectCta: 'Usar esta empresa',
+    cancelCta: 'Cancelar',
+    columnCompany: 'Empresa',
+    columnDomain: 'Dominio',
+    columnCountry: 'País',
+    columnStage: 'Etapa'
+  },
+
+  // --- Nubox picker dialog ---------------------------------------------------
+  nuboxPicker: {
+    title: 'Buscar venta en Nubox',
+    subtitle: 'Traemos identidad tributaria y moneda desde el registro.',
+    searchLabel: 'Buscar por razón social o ID tributario',
+    searchPlaceholder: 'Ej: Pinturas Berel, PBE970101718…',
+    resultsCountPrefix: 'resultados',
+    emptyTitle: 'Sin resultados',
+    empty: 'No encontramos registros con ese término.',
+    clearSearchCta: 'Limpiar búsqueda',
+    selectCta: 'Usar este registro',
+    cancelCta: 'Cancelar',
+    columnName: 'Razón social',
+    columnTaxId: 'ID tributario',
+    columnCurrency: 'Moneda'
+  },
+
+  // --- Step 2: Identidad -----------------------------------------------------
+  identidad: {
+    title: 'Identidad legal',
+    subtitle: 'Confirma quién es y dónde tributa. Esto define cómo facturamos.',
+    legalNameLabel: 'Razón social',
+    legalNameHelper: 'El nombre legal completo, como aparece en sus documentos.',
+    legalNameError: 'Falta la razón social. Es el nombre legal del cliente.',
+    tradeNameLabel: 'Nombre comercial',
+    tradeNameHelper: 'Opcional. Cómo lo conoces en el día a día si difiere del legal.',
+    countryLabel: 'País',
+    countryHelper: 'Define el tipo de identificador tributario y la moneda sugerida.',
+    countryError: 'Elige el país. Sin él no podemos validar el ID tributario.',
+    taxIdLabelGeneric: 'ID tributario',
+    taxIdLabelCL: 'RUT',
+    taxIdLabelMX: 'RFC',
+    taxIdLabelUS: 'EIN',
+    taxIdHelper: 'Lo usamos para emitir y conciliar facturas. Aceptamos con o sin puntos/guiones.',
+    taxIdErrorMissing: 'Falta el ID tributario. Es obligatorio para facturar.',
+    taxIdErrorFormat: 'Ese formato no coincide con el {taxIdLabel} de {country}. Revísalo.',
+    taxIdValid: 'Formato válido',
+    legalAddressLabel: 'Dirección legal',
+    legalAddressHelper: 'Opcional. Aparece en documentos institucionales.',
+    industryLabel: 'Industria',
+    industryHelper: 'Opcional. Para reportes y segmentación.',
+    inferredFromHubspot: 'desde HubSpot',
+    inferredFromNubox: 'desde Nubox',
+    inferredFromCountry: 'auto por país',
+    inferredEditHint: 'Edita lo que no cuadre.',
+    duplicateTitle: 'Ya existe un cliente con este ID tributario',
+    duplicateDescription: 'Encontramos {name} con el mismo ID. ¿Quieres usar ese o seguir creando uno nuevo?',
+    duplicateUseExisting: 'Usar el existente',
+    duplicateCreateNew: 'Seguir creando'
+  },
+
+  // --- Step 3: Comercial -----------------------------------------------------
+  comercial: {
+    title: 'Términos comerciales',
+    subtitle: 'Cómo arranca la relación: tipo de engagement, fechas y fases.',
+    engagementKindLabel: 'Tipo de engagement',
+    engagementKindHelper: 'Define cómo se trata comercialmente desde el día uno.',
+    startDateLabel: 'Fecha de inicio',
+    startDateHelper: 'Cuándo empieza la relación comercial.',
+    startDateError: 'Falta la fecha de inicio.',
+    endDateLabel: 'Fecha de término',
+    endDateHelper: 'Opcional. Déjala vacía si es indefinida.',
+    endDateError: 'La fecha de término no puede ser anterior al inicio.',
+    ownerLabel: 'Responsable comercial',
+    ownerHelper: 'Quién lidera esta cuenta.',
+    phasesTitle: 'Fases del engagement',
+    phasesSubtitle: 'Opcional. Estructura el recorrido (kickoff, operación, reporte, decisión).',
+    addPhaseCta: 'Agregar fase',
+    addFirstPhaseCta: 'Agregar la primera fase',
+    phaseNameLabel: 'Nombre de la fase',
+    phaseStartLabel: 'Inicio',
+    phaseEndLabel: 'Término',
+    phaseSaveCta: 'Agregar',
+    phaseCancelCta: 'Cancelar',
+    phasesEmpty: 'Todavía no agregas fases. Es opcional.',
+    removePhaseAria: 'Quitar fase',
+    contractTitle: 'Contrato / MSA',
+    contractSubtitle: 'Opcional en este paso. Lo puedes cargar después en el checklist.',
+    contractUploadCta: 'Adjuntar contrato'
+  },
+
+  // --- Step 4: Finanzas ------------------------------------------------------
+  finanzas: {
+    title: 'Perfil financiero',
+    subtitle: 'Cómo y en qué moneda le facturamos.',
+    currencyLabel: 'Moneda de pago',
+    currencyHelper: 'En qué moneda emitimos y cobramos.',
+    currencyError: 'Elige la moneda de pago.',
+    currencyMxNote: 'Sugerida por país: clientes facturados en México usan MXN.',
+    paymentTermsLabel: 'Términos de pago (días)',
+    paymentTermsHelper: 'Días desde la factura hasta el pago. Ej: 30 = paga a 30 días (Net-30).',
+    requiresPoLabel: 'Requiere orden de compra (OC) antes de facturar',
+    requiresHesLabel: 'Requiere HES (hoja de entrada de servicio)',
+    poNumberLabel: 'OC vigente',
+    poNumberHelper: 'Número de la orden de compra activa.',
+    hesNumberLabel: 'HES vigente',
+    billingAddressLabel: 'Dirección de facturación',
+    billingAddressHelper: 'Opcional. Si difiere de la dirección legal.',
+    billingCountryLabel: 'País de facturación',
+    contactsTitle: 'Contactos de finanzas',
+    contactsSubtitle: 'A quién le mandamos las facturas y avisos de cobro.',
+    addContactCta: 'Agregar contacto',
+    addFirstContactCta: 'Agregar el primero',
+    contactNameLabel: 'Nombre',
+    contactEmailLabel: 'Email',
+    contactRoleLabel: 'Cargo',
+    contactSaveCta: 'Agregar',
+    contactCancelCta: 'Cancelar',
+    contactsEmpty: 'Todavía no agregas contactos de finanzas.',
+    removeContactAria: 'Quitar contacto',
+    specialConditionsLabel: 'Condiciones especiales',
+    specialConditionsHelper: 'Opcional. Acuerdos de pago o facturación fuera de lo estándar.'
+  },
+
+  // --- Step 5: Space ---------------------------------------------------------
+  space: {
+    title: 'Espacio operativo',
+    subtitle: 'El workspace donde va a vivir la operación del cliente.',
+    spaceNameLabel: 'Nombre del espacio',
+    spaceNameHelper: 'Normalmente el nombre del cliente.',
+    spaceNameError: 'Falta el nombre del espacio.',
+    spaceTypeLabel: 'Tipo de espacio',
+    numericCodeLabel: 'Código numérico',
+    numericCodeHelper: 'Dos dígitos, único. Se usa en cuentas internas y reportes.',
+    numericCodeError: 'Usa exactamente 2 dígitos (ej. 07).',
+    provisionTitle: 'Aprovisionamiento',
+    provisionSubtitle: 'Qué creamos automáticamente al dar de alta.',
+    provisionNotionLabel: 'Crear workspace de Notion',
+    provisionTeamsLabel: 'Crear canal de Teams + suscripciones de email',
+    provisionNotionEcho: 'Workspace Notion: {name}',
+    provisionTeamsEcho: 'Canal Teams: {name}',
+    provisionNote: 'Se preparan en segundo plano. Vas a poder verificarlos en el checklist.'
+  },
+
+  // --- Step 6: Confirmar -----------------------------------------------------
+  confirmar: {
+    title: 'Revisa y confirma',
+    subtitle: 'Esto abre un caso de onboarding y dispara las tareas de aprovisionamiento.',
+    sectionOrigen: 'Origen',
+    sectionIdentidad: 'Identidad',
+    sectionComercial: 'Comercial',
+    sectionFinanzas: 'Finanzas',
+    sectionSpace: 'Espacio',
+    editStepAria: 'Editar',
+    editCta: 'Editar',
+    willHappenTitle: 'Qué va a pasar al crear el cliente',
+    willHappenCreateOrg: 'Se crea o vincula el cliente con su identidad completa.',
+    willHappenOpenCase: 'Se abre un caso de onboarding con su checklist.',
+    willHappenProvision: 'Se preparan el espacio, Notion y Teams en segundo plano.',
+    willHappenChecklist: 'Vas a completar el checklist desde la ficha del cliente.',
+    confirmReviewLabel: 'Revisé los datos de arriba y confirmo que están correctos.',
+    confirmUnderstandLabel: 'Entiendo que esto crea el cliente y abre su onboarding.',
+    notSet: 'Sin definir'
+  },
+
+  // --- Success screen --------------------------------------------------------
+  success: {
+    title: 'Cliente creado',
+    description: 'Abrimos su onboarding. Ahora completa el checklist para activarlo del todo.',
+    clientLabel: 'Cliente',
+    caseLabel: 'Caso de onboarding',
+    nextChecklistTitle: 'Próximos pasos del checklist',
+    goToClientCta: 'Ir a la ficha del cliente',
+    createAnotherCta: 'Crear otro cliente',
+    checklistNote: 'Las tareas de Finanzas, Comercial y Operaciones las completa cada responsable desde la ficha del cliente.'
+  },
+
+  // --- Exit dialog -----------------------------------------------------------
+  exit: {
+    title: '¿Salir sin terminar?',
+    description: 'Tu progreso quedó guardado como borrador. Puedes retomarlo cuando quieras.',
+    confirmCta: 'Salir',
+    cancelCta: 'Seguir editando'
+  },
+
+  // --- Finance facet drawer (redefined CreateClientDrawer) -------------------
+  financeDrawer: {
+    title: 'Completar perfil financiero',
+    subtitle: 'Este cliente ya existe. Acá completas cómo facturarle.',
+    clientContextLabel: 'Cliente',
+    notACreateNote: 'Esto no crea un cliente. Solo completa su perfil financiero.',
+    saveCta: 'Guardar perfil',
+    cancelCta: 'Cancelar',
+    savedToast: 'Perfil financiero actualizado.'
+  },
+
+  // --- Account 360 lifecycle timeline ----------------------------------------
+  timeline: {
+    title: 'Recorrido del cliente',
+    subtitle: 'Dónde está en su ciclo de vida y qué falta.',
+    originLabel: 'Origen',
+    facetsTitle: 'Completitud por área',
+    facetIdentidad: 'Identidad',
+    facetComercial: 'Comercial',
+    facetOperaciones: 'Operaciones',
+    facetFinanzas: 'Finanzas',
+    facetAcceso: 'Acceso',
+    facetComplete: 'Completa',
+    facetPartial: 'En curso',
+    facetPending: 'Pendiente',
+    facetMissingPrefix: 'Falta',
+    eventsTitle: 'Línea de tiempo',
+    openCaseEvent: 'Caso de onboarding abierto',
+    healthyTitle: 'En camino',
+    healthyDescription: 'El onboarding avanza dentro de lo esperado.',
+    atRiskTitle: 'Faltan pasos para activar del todo',
+    atRiskDescription: 'Hay {count} áreas pendientes. Complétalas desde la ficha para activar al cliente.',
+    stalledTitle: 'Onboarding detenido',
+    stalledDescription: 'Lleva {days} días sin avances. Contacta al responsable de la cuenta para destrabarlo.',
+    overdueTitle: 'Vencido',
+    overdueDescription: 'Pasó la fecha objetivo por {days} días.'
+  }
+} as const
+
+export type ClientOnboardingCopy = typeof GH_CLIENT_ONBOARDING

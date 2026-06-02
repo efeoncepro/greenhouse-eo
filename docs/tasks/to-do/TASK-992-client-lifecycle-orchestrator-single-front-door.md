@@ -24,6 +24,38 @@
 
 TASK-991 (foundation) está **code complete en `develop`**: `upsertCanonicalOrganization` (SSOT) + `deriveOrganizationType` ya existen y son el writer canónico de `organizations` que esta task debe reusar (NO crear otro). La columna `origin` ya existe. Falta solo el rollout de TASK-991 (flag flip + CHECK), que NO bloquea el diseño de esta task pero sí su validación end-to-end. Al implementar: el aggregate/wizard escriben org SOLO vía `upsertCanonicalOrganization`.
 
+## Delta 2026-06-02 — Mockup visual APROBADO (referencia vinculante) + reglas duras de cableado
+
+El wizard completo + sus superficies fueron **mockeados, auditados (greenhouse-ux + modern-ui + state-design + a11y-architect + greenhouse-ux-writing en loop GVC) y APROBADOS por el operador** el 2026-06-02. La implementación de Slice 2 (wizard) y Slice 3 (timeline) **NO es un diseño de cero: es cablear estos mockups a runtime**. El mockup es la referencia visual/UX vinculante.
+
+**Artefactos aprobados (referencia — NO el runtime):**
+
+| Artefacto | Path |
+| --- | --- |
+| Shell wizard 6 pasos + 6 modales/dialogs + success | `src/views/greenhouse/agency/clients/mockup/ClientOnboardingMockupView.tsx` |
+| Drawer Finanzas redefinido ("completar facet", no parir) | `src/views/greenhouse/agency/clients/mockup/FinanceFacetDrawerMockup.tsx` |
+| Timeline lifecycle Account 360 | `src/views/greenhouse/agency/clients/mockup/LifecycleTimelineMockup.tsx` |
+| Mock data tipada | `src/views/greenhouse/agency/clients/mockup/client-onboarding-data.ts` |
+| Copy es-CL (tuteo chileno) | `src/lib/copy/client-onboarding.ts` |
+| Rutas mockup | `src/app/(dashboard)/agency/clients/{new,finance-facet,lifecycle}/mockup/page.tsx` |
+| Scenario GVC (10 frames del flujo) | `scripts/frontend/scenarios/client-onboarding-wizard.scenario.ts` |
+
+### ⚠️ Reglas duras — Mockup aprobado → Runtime
+
+- **NUNCA borrar, mover ni modificar los archivos `*/mockup/*` ni las rutas `/mockup/` al implementar.** El mockup **se mantiene** como referencia visual aprobada + escenario GVC de regresión (igual que `contractors/mockup/`, `sample-sprints/mockup/`). Es el contrato visual vinculante, no scaffolding desechable.
+- **NUNCA implementar el runtime DENTRO de `/mockup/`.** El runtime vive en rutas y vistas **fuera** de `/mockup/`: ruta real `/agency/clients/new` (+ `/agency/clients/[id]/finance` para el drawer, y el timeline en el organization workspace shell TASK-611), vistas en `src/views/greenhouse/agency/clients/*` (sin `/mockup/`). Extraer el shell runtime fuera de `/mockup/` y conectar datos reales — patrón canónico CLAUDE.md ("¿La pantalla viene de `/mockup/` y pasa a runtime? → extraer shell runtime fuera de `/mockup/` y migrar el copy productivo a `src/lib/copy/*`").
+- **NUNCA re-diseñar el layout, la jerarquía, los microcopys ni las microinteracciones aprobadas.** El runtime debe **igualar visualmente** el mockup (dos paneles: rail vertical con stepper + progreso + autosave / panel del paso / footer sticky; success conserva el rail al 100%; chips de inferencia; rail con datos derivados). Verificar paridad con `pnpm fe:capture:diff <mockup-capture> <runtime-capture>` antes de cerrar.
+- **NUNCA re-escribir el copy desde cero.** `src/lib/copy/client-onboarding.ts` ya está en **es-CL tuteo chileno** (no voseo) y revisado por `greenhouse-ux-writing`. El runtime consume ESE diccionario. Si emergen strings nuevos del cableado, extenderlo respetando el registro (tuteo chileno, `empresa` no "company", errores [qué]+[por qué]+[cómo]).
+- **NUNCA reintroducir los bug class ya cazados en el mockup:** (a) `key` spreadeado en `motion.div` (React 19 lo rechaza — pasar `key` directo, no en el spread); (b) hydration por formateo de fecha/hora con Intl en SSR (usar string determinista o `timeZone` fijo + render client-only). El runtime debe quedar **console-limpio** (verificado por probe Playwright en el mockup).
+- **NUNCA usar date inputs nativos.** El mockup ya usa `GreenhouseDatePicker` (dd/mm/yyyy). El runtime lo mantiene.
+- **SIEMPRE** convertir a comportamiento real (lo que el mockup simula) SIN cambiar la superficie visual:
+  - El commit del paso Confirmar invoca `provisionClientLifecycle` (un solo commit atómico), escribe org SOLO vía `upsertCanonicalOrganization`, y navega a `/agency/clients/[id]/lifecycle`.
+  - El picker HubSpot/Nubox hace búsqueda real (agregar **skeleton de carga + estado degradado** que el mockup dejó como copy `hubspotPicker.loading`/`degraded*` pero sin cablear — state-design).
+  - El diálogo "ya existe" debe **ramificar de verdad**: "Usar el existente" carga la org/cliente existente (no avanzar a crear duplicado); "Seguir creando" continúa. En el mockup ambos avanzan igual — eso es lo que el runtime corrige.
+  - El gate de Identidad (`tax_id` + `country`) y el gate del paso Origen (no avanzar sin empresa elegida) ya están en el mockup — preservarlos.
+- **SIEMPRE** mantener el mockup sincronizado si el contrato visual cambia durante la implementación: si el operador aprueba un cambio visual nuevo, actualizar el mockup Y el runtime en el mismo PR (el mockup nunca queda desactualizado respecto al runtime aprobado).
+- **Capabilities**: la matriz `relationship × capability` del wizard usa `requireServerSession` + capability granular (Slice 1) — el mockup no las gatea (es mock). El runtime SÍ. Grant en `runtime.ts` mismo PR (anti-rol-fantasma, colapsar a roles reales de `role-codes.ts`).
+
 ## Summary
 
 Activar el orquestador canónico `client_lifecycle_case` (caseKind `onboarding`) ya especificado en `GREENHOUSE_CLIENT_LIFECYCLE_V1` (Aceptada, no implementada), exponer UNA sola puerta de alta de cliente (wizard de onboarding que compone un comando atómico), redefinir el drawer de Finanzas a "completar el facet financiero de un cliente existente", y agregar un timeline de lifecycle/touchpoints en el Account 360. Construye sobre el helper SSOT de TASK-991.
@@ -91,8 +123,9 @@ Reglas obligatorias (lentes arch + finance + product design):
 
 - `src/lib/client-lifecycle/**` (aggregate + comandos `provisionClientLifecycle`, `advanceLifecycleChecklistItem`, `resolveLifecycleCase`, `addLifecycleBlocker`, `resolveLifecycleBlocker`)
 - `src/app/api/admin/clients/[organizationId]/lifecycle/**` + `src/app/api/admin/clients/lifecycle/**` (per CLIENT_LIFECYCLE_V1 §9)
-- `src/views/greenhouse/**/onboarding-wizard/**` [verificar path en Plan Mode]
-- `src/views/greenhouse/finance/drawers/CreateClientDrawer.tsx` (redefinir)
+- `src/views/greenhouse/agency/clients/mockup/**` + rutas `/agency/clients/{new,finance-facet,lifecycle}/mockup/` + `scripts/frontend/scenarios/client-onboarding-wizard.scenario.ts` — **referencia visual APROBADA, NO modificar/borrar al implementar** (ver Delta 2026-06-02)
+- `src/views/greenhouse/agency/clients/*` (vistas runtime del wizard + drawer, FUERA de `/mockup/`) + ruta runtime `/agency/clients/new`
+- `src/views/greenhouse/finance/drawers/CreateClientDrawer.tsx` (redefinir a "completar facet financiero")
 - `src/views/greenhouse/**/organization-workspace/**` (timeline en Account 360)
 - `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts` (capabilities + grants)
 - `src/lib/copy/*` (microcopy es-CL)
@@ -134,6 +167,8 @@ Implementar **verbatim** el contrato §6-§10 (NO re-especificar):
 - Tests: state machine (transiciones válidas/ilegales), comandos atómicos + idempotencia, cascade, capability gates.
 
 ### Slice 2 — Puerta única de onboarding (wizard) + redefinición del drawer Finanzas
+
+> **Es cablear el mockup APROBADO a runtime, no diseñar de cero.** Ver "Delta 2026-06-02 — Mockup visual APROBADO" + sus reglas duras. El mockup (`src/views/greenhouse/agency/clients/mockup/**`, copy `src/lib/copy/client-onboarding.ts`, scenario GVC) **se mantiene** como referencia vinculante; el runtime vive FUERA de `/mockup/` e iguala el mockup visualmente (`pnpm fe:capture:diff`).
 
 - Wizard canónico (forms-ux Lane C): pasos `Origen → Identidad → Comercial → Finanzas → Space → Confirmar`. Ruta `[verificar Plan Mode: /agency/clients/new (Commercial owner) vs /admin/clients/new]`. Smart prefill desde el origin (HubSpot company / Nubox sale), editable, mostrando qué se infirió. Un solo commit atómico = `provisionClientLifecycle`. Autosave por paso. Back preserva data. Validación per-step. `tax_id`/`country` como gate del paso Identidad.
 - Redefinir `CreateClientDrawer` → "Completar perfil financiero de cliente existente" (facet finance), NO parir clientes. Microcopy es-CL.
