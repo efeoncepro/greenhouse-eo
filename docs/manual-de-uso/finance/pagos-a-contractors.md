@@ -93,7 +93,9 @@ Selecciona un payable en la lista. A la derecha ves:
 ### 5. Resolver readiness
 
 - Si esta **listo**, presiona **Enviar a Finanzas**. El payable pasa a `ready_for_finance`; desde ahi el bridge genera la obligacion financiera de forma idempotente.
-- Si falta el **perfil de pago** del contractor: **Waiver de perfil de pago** (motivo ≥ 10, queda auditado).
+- El perfil de pago activo se resuelve automaticamente desde la ruta canonica del beneficiario. Si acabas de aprobar/activar el perfil, refresca la vista y vuelve a revisar readiness.
+- Si aun falta el **perfil de pago** despues de esa evaluacion viva: crea/aprueba el perfil correspondiente. El **Waiver de perfil de pago** es una excepcion auditada (motivo ≥ 10), no el camino normal.
+- El flujo puede usar un `member` **existente** como beneficiario de pago cuando el perfil bancario esta registrado ahi. Esto no crea un `member` nuevo ni crea una compensacion de Payroll. Payroll solo liquida si existe una `compensation_version` aplicable; los contractor engagements activos viven en el carril contractor-payable.
 - Si el pago **excede el monto acordado**: **Override de monto acordado** (motivo ≥ 10, queda auditado). Solo Finanzas.
 - Si ya no aplica: **Cancelar**.
 
@@ -143,6 +145,7 @@ Cuando el payable llega a **Pagado**, el comprobante individual queda disponible
 | Ready for Finance | Finanzas/backend | El payable paso readiness y entra al bridge | No necesariamente tiene orden de pago |
 | Obligacion financiera | Finance bridge | Deuda lista para agruparse en orden | No es pago bancario |
 | Orden de pago | Payment orders | Instruccion operativa de pago | No es pago hasta liquidar/mark-paid |
+| Member usado como beneficiario | Identity/HR Core | Identidad existente que tiene perfil bancario activo | No crea ni activa una liquidacion Payroll |
 | Comprobante | Contractor remittance | Evidencia de pago ya ejecutado | No reemplaza la boleta del contractor |
 
 ## Descargar la nómina del período (PDF / Excel)
@@ -160,6 +163,7 @@ El reporte agrupa los pagos por **Honorarios CL** (con retención SII) e **Inter
 - **No** envíes a Finanzas un payable con bloqueos sin resolverlos primero (te devuelve el detalle de qué falta).
 - **No** crees un off-cycle si existe un envio aprobado normal: usa **Crear desde envio**.
 - **No** interpretes **Aprobado** en HR como **Pagado** o **Listo para Finanzas**.
+- **No** crees un `member` solo para desbloquear un pago contractor. Si no existe identidad enrutable, resuelve primero el perfil de pago correcto o usa una excepcion auditada.
 - **No** canceles un payable solo porque aun esta **Por preparar**. Si no hay bloqueos, el siguiente paso es **Enviar a Finanzas**.
 - **No** ejecutes una corrida mensual sin revisar el preview de totales y moneda.
 - **No** trates la retencion SII como pago al contractor: es pasivo a remesar al SII por separado.
@@ -168,7 +172,7 @@ El reporte agrupa los pagos por **Honorarios CL** (con retención SII) e **Inter
 
 - **"Sin payables"**: no hay payables en ese estado todavía. Crea uno desde un envío aprobado.
 - **El botón Override / Waiver no aparece**: no tienes la capability. Pídela a un admin.
-- **Enviar a Finanzas falla**: el payable aún tiene bloqueos — el detalle de readiness te dice cuáles.
+- **Enviar a Finanzas falla**: refresca el detalle y revisa los bloqueos de readiness. Si el perfil de pago ya esta activo, el panel debe recalcularlo y dejarte enviar sin waiver.
 
 ### HR dice que aprobo el envio, pero no veo pago
 

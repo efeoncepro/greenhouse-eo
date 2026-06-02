@@ -50,6 +50,8 @@ export const GH_FINANCE_CONTRACTOR_PAYMENTS = {
     netNote: 'El neto es lo que viaja al banco. La retención se remesa al SII por separado.',
     readinessTitle: 'Preparación (readiness)',
     readinessOk: 'Listo para enviar a Finanzas. Sin bloqueos.',
+    readinessChecking: 'Evaluando readiness actual…',
+    readinessRefreshFailed: 'No pudimos recalcular readiness. Reintenta antes de enviar a Finanzas.',
     metaEngagement: 'Engagement',
     metaCurrency: 'Moneda',
     metaPayrollVia: 'Canal',

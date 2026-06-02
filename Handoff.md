@@ -1,3 +1,30 @@
+# Sesion 2026-06-02 — Contractor payable readiness resuelve payment profile activo — ✅ VALIDADO LOCAL
+
+**Scope**: caso Valentina `EO-CPAY-0001`: al activar su payment profile, el payable no debia pedir waiver ni quedar bloqueado por `payment_profile_unresolved`.
+
+**Causa raiz**: el payable se habia creado con `payment_profile_id = null` y beneficiary fallback `other/identity-hubspot-crm-owner-82653513`; el perfil activo real esta en `greenhouse_finance.beneficiary_payment_profiles` como `member/valentina-hoyos`. La UI ademas leia `readiness_json = {}` viejo y no la evaluacion viva.
+
+**Fix robusto**:
+- Endpoint read-only nuevo `GET /api/finance/contractor-payables/[id]/readiness` usa `assessPayableReadiness`.
+- Readiness contractor ahora resuelve ruta de pago canonica via `resolvePaymentRoute` cuando el payable no trae `payment_profile_id`.
+- Invariante agregado por alerta payroll: el resolver solo usa `greenhouse_core.members` existentes ligados a `contractor_engagements.profile_id`; **no crea members** ni sintetiza identidad para desbloquear pagos. Si no existe member enrutable, queda fail-closed (`payment_profile_unresolved`/waiver auditado).
+- `transitionPayableToReadyForFinance` adjunta transaccionalmente `beneficiary_type='member'`, `beneficiary_id=<memberId>` y `payment_profile_id=<profile activo>` antes de avanzar a `ready_for_finance`; asi el bridge posterior crea la obligation con beneficiary enrutable.
+- Creacion de payables nuevos tambien intenta resolver/guardar el perfil activo desde el engagement/member canónico.
+- UI Finance refresca readiness viva del payable seleccionado, evita el falso "sin bloqueos" por snapshot vacio y muestra blockers estructurados si el POST falla.
+- Manual `docs/manual-de-uso/finance/pagos-a-contractors.md` actualizado: waiver es excepcion auditada, no camino normal si existe perfil activo; usar member como beneficiario no crea compensacion Payroll.
+
+**Verificacion local**:
+- Staging read-only confirmo perfil activo Valentina: `bpp-7c5df3e2-1b86-4ceb-b729-f8ed9adf910a`, `beneficiaryType=member`, `beneficiaryId=valentina-hoyos`, `status=active`.
+- Local API read-only: `/api/finance/contractor-payables/<EO-CPAY-0001>/readiness` devuelve `ready: true`, `blockers: []`.
+- UI local: no muestra `payment_profile_unresolved`, no muestra waiver, si muestra **Enviar a Finanzas**.
+- GVC: `.captures/2026-06-02T17-11-32_contractor-payments-readiness` ✅.
+- Tests de contrato: `pnpm exec vitest run src/lib/contractor-engagements/payables/payment-route-resolution.test.ts src/lib/contractor-engagements/payables/readiness.test.ts src/lib/payroll/postgres-store.test.ts` ✅ (36 tests) — cubre no crear/sintetizar member y no romper payroll roster.
+- ESLint focal ✅; `pnpm exec tsc --noEmit --pretty false` ✅; `pnpm design:lint` ✅.
+
+**Accion operador**: tras deploy a `dev-greenhouse`, refrescar `/finance/contractor-payments`, abrir Valentina y presionar **Enviar a Finanzas**. No requiere waiver si el payment profile sigue activo.
+
+---
+
 # Sesion 2026-06-02 — Contractor payables UI handoff + admin support viewer — ✅ VALIDADO LOCAL (sin crear payable)
 
 **Scope**: caso Valentina / contractors: permitir que admin vea boleta/evidencia y que Finanzas cree el payable desde el flujo existente, sin parchear datos ni crear registros por agente.

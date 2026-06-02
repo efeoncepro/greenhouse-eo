@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto'
 import type { PoolClient } from 'pg'
 
 import { query, withGreenhousePostgresTransaction } from '@/lib/db'
+import { resolvePaymentRoute, type PaymentRouteSnapshot } from '@/lib/finance/payment-routing/resolve-route'
 import { getLatestStoredExchangeRatePair } from '@/lib/finance/exchange-rates'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -328,6 +329,96 @@ interface InsertPayableValues {
   actorUserId: string
 }
 
+interface ContractorPayablePaymentRouteResolution {
+  beneficiaryType: 'member'
+  beneficiaryId: string
+  profileId: string
+  route: PaymentRouteSnapshot
+}
+
+const toContractorPayRegime = (
+  engagement: ContractorEngagement
+): 'chile' | 'international' | null => {
+  if (engagement.relationshipSubtype === CHILE_HONORARIOS_SUBTYPE) return 'chile'
+
+  if (
+    engagement.relationshipSubtype === 'international_contractor' ||
+    engagement.payrollVia === 'direct_international' ||
+    engagement.payrollVia === 'deel' ||
+    engagement.payrollVia === 'remote' ||
+    engagement.payrollVia === 'oyster'
+  ) {
+    return 'international'
+  }
+
+  return null
+}
+
+export const resolveMemberIdForContractorEngagement = async (
+  engagement: ContractorEngagement
+): Promise<string | null> => {
+  if (engagement.memberId) return engagement.memberId
+
+  const rows = await query<{ member_id: string; [column: string]: unknown }>(
+    `SELECT member_id
+       FROM greenhouse_core.members
+      WHERE identity_profile_id = $1
+      ORDER BY created_at ASC
+      LIMIT 1`,
+    [engagement.profileId]
+  )
+
+  return rows[0]?.member_id ?? null
+}
+
+export const resolveContractorPayablePaymentRoute = async (
+  payable: Pick<
+    ContractorPayable,
+    'beneficiaryType' | 'beneficiaryId' | 'currency' | 'paymentCurrency'
+  >,
+  engagement: ContractorEngagement
+): Promise<ContractorPayablePaymentRouteResolution | null> => {
+  const obligationCurrency = payable.paymentCurrency ?? payable.currency
+
+  if (obligationCurrency !== 'CLP' && obligationCurrency !== 'USD') return null
+
+  const memberIds = new Set<string>()
+
+  if (payable.beneficiaryType === 'member') memberIds.add(payable.beneficiaryId)
+
+  const engagementMemberId = await resolveMemberIdForContractorEngagement(engagement)
+
+  if (engagementMemberId) memberIds.add(engagementMemberId)
+
+  for (const memberId of memberIds) {
+    const route = await resolvePaymentRoute(
+      {
+        spaceId: null,
+        beneficiaryType: 'member',
+        beneficiaryId: memberId,
+        currency: obligationCurrency,
+        obligationKind: 'provider_payroll'
+      },
+      {
+        payRegime: toContractorPayRegime(engagement),
+        payrollVia: engagement.payrollVia === 'deel' ? 'deel' : null,
+        memberCountryCode: engagement.countryCode
+      }
+    )
+
+    if (route.outcome === 'resolved' && route.profileId) {
+      return {
+        beneficiaryType: 'member',
+        beneficiaryId: memberId,
+        profileId: route.profileId,
+        route
+      }
+    }
+  }
+
+  return null
+}
+
 const insertPayable = async (
   client: PoolClient,
   values: InsertPayableValues
@@ -458,6 +549,18 @@ export const createContractorPayableFromSubmission = async (
     const beneficiaryType = engagement.memberId ? 'member' : 'other'
     const beneficiaryId = engagement.memberId ?? engagement.profileId
 
+    const paymentRoute = input.paymentProfileId
+      ? null
+      : await resolveContractorPayablePaymentRoute(
+          {
+            beneficiaryType,
+            beneficiaryId,
+            currency: submission.currency ?? engagement.currency,
+            paymentCurrency: engagement.paymentCurrency
+          },
+          engagement
+        )
+
     const honorariosPolicy = buildHonorariosPolicySnapshot({
       relationshipSubtype: engagement.relationshipSubtype,
       taxWithholdingPolicyCode: engagement.taxWithholdingPolicyCode,
@@ -469,8 +572,8 @@ export const createContractorPayableFromSubmission = async (
       contractorEngagementId: engagement.contractorEngagementId,
       contractorWorkSubmissionId: input.contractorWorkSubmissionId,
       payableSourceKind: 'work_submission',
-      beneficiaryType,
-      beneficiaryId,
+      beneficiaryType: paymentRoute?.beneficiaryType ?? beneficiaryType,
+      beneficiaryId: paymentRoute?.beneficiaryId ?? beneficiaryId,
       grossAmount,
       withholdingAmount,
       netPayable,
@@ -480,13 +583,24 @@ export const createContractorPayableFromSubmission = async (
       taxComplianceOwner: engagement.taxComplianceOwner,
       taxWithholdingPolicyCode: engagement.taxWithholdingPolicyCode,
       payrollVia: engagement.payrollVia,
-      paymentProfileId: input.paymentProfileId ?? null,
+      paymentProfileId: input.paymentProfileId ?? paymentRoute?.profileId ?? null,
       dueDate: input.dueDate ?? resolveContractorPaymentDueDate(),
       sourceSnapshot: {
         engagementPublicId: engagement.publicId,
         relationshipSubtype: engagement.relationshipSubtype,
         paymentModel: engagement.paymentModel,
         taxWithholdingRateSnapshot: engagement.taxWithholdingRateSnapshot,
+        ...(paymentRoute
+          ? {
+              paymentRoute: {
+                outcome: paymentRoute.route.outcome,
+                profileId: paymentRoute.profileId,
+                beneficiaryType: paymentRoute.beneficiaryType,
+                beneficiaryId: paymentRoute.beneficiaryId,
+                resolvedAt: paymentRoute.route.resolvedAt
+              }
+            }
+          : {}),
         ...(honorariosPolicy ? { honorariosPolicy } : {})
       },
       actorUserId: input.actorUserId
@@ -574,6 +688,18 @@ export const createContractorPayableOffCycle = async (
   const beneficiaryType = engagement.memberId ? 'member' : 'other'
   const beneficiaryId = engagement.memberId ?? engagement.profileId
 
+  const paymentRoute = input.paymentProfileId
+    ? null
+    : await resolveContractorPayablePaymentRoute(
+        {
+          beneficiaryType,
+          beneficiaryId,
+          currency: input.currency ?? engagement.currency,
+          paymentCurrency: input.paymentCurrency ?? engagement.paymentCurrency
+        },
+        engagement
+      )
+
   const honorariosPolicy = buildHonorariosPolicySnapshot({
     relationshipSubtype: engagement.relationshipSubtype,
     taxWithholdingPolicyCode: engagement.taxWithholdingPolicyCode,
@@ -586,8 +712,8 @@ export const createContractorPayableOffCycle = async (
       contractorEngagementId: engagement.contractorEngagementId,
       contractorWorkSubmissionId: null,
       payableSourceKind: 'off_cycle',
-      beneficiaryType,
-      beneficiaryId,
+      beneficiaryType: paymentRoute?.beneficiaryType ?? beneficiaryType,
+      beneficiaryId: paymentRoute?.beneficiaryId ?? beneficiaryId,
       grossAmount,
       withholdingAmount,
       netPayable,
@@ -597,12 +723,23 @@ export const createContractorPayableOffCycle = async (
       taxComplianceOwner: engagement.taxComplianceOwner,
       taxWithholdingPolicyCode: engagement.taxWithholdingPolicyCode,
       payrollVia: engagement.payrollVia,
-      paymentProfileId: input.paymentProfileId ?? null,
+      paymentProfileId: input.paymentProfileId ?? paymentRoute?.profileId ?? null,
       dueDate: input.dueDate ?? resolveContractorPaymentDueDate(),
       sourceSnapshot: {
         engagementPublicId: engagement.publicId,
         relationshipSubtype: engagement.relationshipSubtype,
         reason: input.reason.trim(),
+        ...(paymentRoute
+          ? {
+              paymentRoute: {
+                outcome: paymentRoute.route.outcome,
+                profileId: paymentRoute.profileId,
+                beneficiaryType: paymentRoute.beneficiaryType,
+                beneficiaryId: paymentRoute.beneficiaryId,
+                resolvedAt: paymentRoute.route.resolvedAt
+              }
+            }
+          : {}),
         ...(honorariosPolicy ? { honorariosPolicy } : {})
       },
       actorUserId: input.actorUserId
@@ -629,8 +766,9 @@ export const createContractorPayableOffCycle = async (
 
 /**
  * Resolve readiness inputs (invoice asset, FX, source approval) and evaluate the
- * fail-closed gate. Payment-profile gate (V1): explicit `payment_profile_id` OR a
- * governed waiver. Auto-resolution via resolvePaymentRoute is a V1.1 enhancement.
+ * fail-closed gate. Payment-profile gate: explicit `payment_profile_id`, an
+ * active canonical payment route for the engagement beneficiary, OR a governed
+ * waiver.
  */
 export const assessPayableReadiness = async (
   payable: ContractorPayable
@@ -728,6 +866,10 @@ export const assessPayableReadiness = async (
     engagement.taxComplianceOwner === 'manual_review_required' ||
     engagement.taxComplianceOwner === 'country_engine_owned'
 
+  const resolvedPaymentRoute = payable.paymentProfileId
+    ? null
+    : await resolveContractorPayablePaymentRoute(payable, engagement)
+
   const readinessInputs: PayableReadinessInputs = {
     sourceApproved,
     requiresInvoice: engagement.requiresInvoice,
@@ -738,7 +880,7 @@ export const assessPayableReadiness = async (
     obligationCurrency,
     fxNeeded,
     fxSupported,
-    paymentProfileResolved: payable.paymentProfileId !== null,
+    paymentProfileResolved: payable.paymentProfileId !== null || resolvedPaymentRoute !== null,
     paymentProfileWaived: payable.paymentProfileWaiverReason !== null,
     providerOwned: PROVIDER_OWNED_PAYROLL_VIA.has(engagement.payrollVia),
     hasProviderRef: engagement.providerContractId !== null,
@@ -808,6 +950,29 @@ const updatePayableStatus = async (
   return mapContractorPayable(result.rows[0])
 }
 
+const attachPayablePaymentRoute = async (
+  client: PoolClient,
+  contractorPayableId: string,
+  route: ContractorPayablePaymentRouteResolution
+): Promise<ContractorPayable> => {
+  const result = await client.query<ContractorPayableRow>(
+    `UPDATE greenhouse_hr.contractor_payables
+        SET beneficiary_type = $2,
+            beneficiary_id = $3,
+            payment_profile_id = $4
+      WHERE contractor_payable_id = $1
+      RETURNING ${PAYABLE_SELECT_COLUMNS}`,
+    [
+      contractorPayableId,
+      route.beneficiaryType,
+      route.beneficiaryId,
+      route.profileId
+    ]
+  )
+
+  return mapContractorPayable(result.rows[0])
+}
+
 /**
  * Evaluate readiness and, if ready, transition to `ready_for_finance` (emits the
  * event that triggers the Finance bridge). If blocked, persist the blockers and
@@ -818,7 +983,7 @@ export const transitionPayableToReadyForFinance = async (input: {
   actorUserId: string
 }): Promise<ContractorPayable> =>
   withGreenhousePostgresTransaction(async (client) => {
-    const current = await lockPayable(client, input.contractorPayableId)
+    let current = await lockPayable(client, input.contractorPayableId)
 
     if (current.status === 'ready_for_finance') {
       return current
@@ -830,6 +995,36 @@ export const transitionPayableToReadyForFinance = async (input: {
         'payable_not_assessable',
         409
       )
+    }
+
+    const engagement = await getContractorEngagementById(current.contractorEngagementId)
+
+    if (!engagement) {
+      throw new ContractorEngagementValidationError(
+        'El engagement contractor no existe.',
+        'engagement_not_found',
+        404
+      )
+    }
+
+    if (current.paymentProfileId === null) {
+      const paymentRoute = await resolveContractorPayablePaymentRoute(current, engagement)
+
+      if (paymentRoute) {
+        current = await attachPayablePaymentRoute(client, current.contractorPayableId, paymentRoute)
+
+        await appendPayableEvent(client, {
+          contractorPayableId: current.contractorPayableId,
+          eventType: 'updated',
+          actorUserId: input.actorUserId,
+          metadata: {
+            paymentRouteResolved: true,
+            paymentProfileId: paymentRoute.profileId,
+            beneficiaryType: paymentRoute.beneficiaryType,
+            beneficiaryId: paymentRoute.beneficiaryId
+          }
+        })
+      }
     }
 
     const readiness = await assessPayableReadiness(current)
@@ -857,7 +1052,7 @@ export const transitionPayableToReadyForFinance = async (input: {
         'El payable no cumple readiness para Finance.',
         'payable_not_ready',
         409,
-        { blockers: readiness.blockers }
+        { readiness, blockers: readiness.blockers }
       )
     }
 
