@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-CLIENT-360`
-- Status real: `Diseno`
+- Status real: `En ejecucion` (develop directo, sin branch — instrucción operador 2026-06-02)
 - Rank: `TBD`
 - Domain: `commercial` (owner) — touches `identity` (organizations canonical), `integrations` (HubSpot/Nubox doors), `finance` (lectura del filtro client), `reliability` (drift signals), `data`.
 - Blocked by: `none`. **Es el FOUNDATION/prerequisito.** Va PRIMERO en la secuencia `991 → 990 → 992`.
-- Branch: `task/TASK-991-canonical-organization-write-ssot`
+- Branch: `develop` (directo, sin branch dedicada — instrucción operador)
 - Legacy ID: `none`
 - GitHub Issue: `[optional]`
 

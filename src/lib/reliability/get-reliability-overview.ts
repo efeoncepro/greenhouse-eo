@@ -165,6 +165,12 @@ import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conform
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
 import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
 import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
+// TASK-991 Slice 0 — 4 reliability signals de completitud del nacimiento de la organización.
+// Todas roll up bajo subsystem `commercial`. Steady=0.
+import { getCommercialClientActiveWithoutProfileSignal } from './queries/commercial-client-active-without-profile'
+import { getCommercialClientActiveWithoutSpaceSignal } from './queries/commercial-client-active-without-space'
+import { getCommercialOrganizationIncompleteIdentitySignal } from './queries/commercial-organization-incomplete-identity'
+import { getCommercialOrganizationTypeLifecycleDriftSignal } from './queries/commercial-organization-type-lifecycle-drift'
 import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
 // TASK-837 Slice 6 — 7 reliability signals for Sample Sprint outbound projection.
 import {
@@ -1649,7 +1655,12 @@ export const getReliabilityOverview = async (
           getSampleSprintDealClosedButActiveSignal().catch(() => null),
           getSampleSprintDealAssociationsDriftSignal().catch(() => null),
           getSampleSprintOutcomeTerminalPservicesOpenSignal().catch(() => null),
-          getSampleSprintLegacyWithoutDealSignal().catch(() => null)
+          getSampleSprintLegacyWithoutDealSignal().catch(() => null),
+          // TASK-991 Slice 0 — Organization birth completeness signals (roll up bajo `commercial`).
+          getCommercialOrganizationTypeLifecycleDriftSignal().catch(() => null),
+          getCommercialOrganizationIncompleteIdentitySignal().catch(() => null),
+          getCommercialClientActiveWithoutProfileSignal().catch(() => null),
+          getCommercialClientActiveWithoutSpaceSignal().catch(() => null)
         ])
           .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
