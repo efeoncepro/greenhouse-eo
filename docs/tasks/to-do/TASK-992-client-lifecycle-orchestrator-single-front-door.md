@@ -20,6 +20,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `[optional]`
 
+## Delta 2026-06-02 — prerequisito TASK-991 code-complete
+
+TASK-991 (foundation) está **code complete en `develop`**: `upsertCanonicalOrganization` (SSOT) + `deriveOrganizationType` ya existen y son el writer canónico de `organizations` que esta task debe reusar (NO crear otro). La columna `origin` ya existe. Falta solo el rollout de TASK-991 (flag flip + CHECK), que NO bloquea el diseño de esta task pero sí su validación end-to-end. Al implementar: el aggregate/wizard escriben org SOLO vía `upsertCanonicalOrganization`.
+
 ## Summary
 
 Activar el orquestador canónico `client_lifecycle_case` (caseKind `onboarding`) ya especificado en `GREENHOUSE_CLIENT_LIFECYCLE_V1` (Aceptada, no implementada), exponer UNA sola puerta de alta de cliente (wizard de onboarding que compone un comando atómico), redefinir el drawer de Finanzas a "completar el facet financiero de un cliente existente", y agregar un timeline de lifecycle/touchpoints en el Account 360. Construye sobre el helper SSOT de TASK-991.

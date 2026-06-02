@@ -22,6 +22,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `[optional]`
 
+## Delta 2026-06-02 — identidad de Berel remediada por TASK-991
+
+TASK-991 (Slice 3) ya remedió **en vivo** la identidad de la org de Grupo Berel: `organization_type='client'`, `country='MX'`, `tax_id='PBE970101718'` (`tax_id_type='RFC'`), `legal_name='PINTURAS BEREL SA DE CV'`. Eso **destraba el RFC match** de esta task (Slice 4-5): la org ya tiene el RFC para anclar la factura Nubox `28800562`. El facet financiero MXN (income projection + perfil con moneda MXN) sigue siendo responsabilidad de esta task. El Space operativo y el wizard de onboarding son TASK-992.
+
 ## Summary
 
 Promover MXN desde soporte comercial/pricing-only a soporte finance-core end-to-end. Greenhouse debe preservar moneda nativa MXN, calcular y bloquear snapshots CLP/USD, proyectar facturas de exportacion Nubox, soportar cobros/pagos/ordenes en MXN y exponer reportería CLP/USD sin perder el detalle nativo.
