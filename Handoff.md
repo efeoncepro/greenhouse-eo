@@ -1,3 +1,15 @@
+# Sesion 2026-06-02 — Promoción completa develop→main a producción + fix bloqueante ops-worker boot — ✅ RELEASED
+
+**Scope**: pasar todo `develop` (217 commits) a producción end-to-end vía el control plane canónico. El operador aprobó todos los gates de CI/environment explícitamente. Guiado por la skill `greenhouse-production-release` + `PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1`.
+
+**Bloqueador encontrado y resuelto ANTES de promover (no parche)**: al leer el estado de develop, el `ops-worker-deploy` venía **fallando** — el container boot-crasheaba (`exit 1`, "failed to start and listen on PORT=8080"). Causa raíz: el commit v5 de recibos (`7171aecf`) volvió `RECEIPT_TEMPLATE_VERSION` un const a nivel de módulo que lee `public/branding/logo-full.png` en *import-time*; lo importa transitivamente el projection registry, y el asset no viajaba al container (`.dockerignore`/`.gcloudignore` excluyen `public/`). Crasheaba TODAS las projections (outbox, materialización, consumers). Fix robusto en 3 capas (arch-architect 4-pilar): el runner del Dockerfile carga `public/branding` + `src/assets/fonts`; re-inclusión a nivel de dir en ambos ignore-files; `RECEIPT_TEMPLATE_VERSION` → getter lazy memoizado (blast-radius containment). Commits `4d6572f7` + `1eeed338` en develop; verificado en vivo (staging ops-worker boot OK + `/health` + GIT_SHA `1eeed338`).
+
+**Release**: merge `f9485a40` (develop→main), Vercel production `Ready`, CI/Deep/Contract verdes. Orchestrator run `26815771335` → manifest `f9485a404f71-35639f30-41a9-4820-a4e5-2f88bfb48a8c` estado **`released`**. Los 4 workers Cloud Run en `f9485a40` (cero drift), Azure Bicep sin diff → skip, post-release health 200, watchdog Aggregate OK. Dos gates Production aprobados vía `gh api pending_deployments`. `bypass_preflight_reason` para `release_batch_policy=split_batch` (esperado en bundle multi-dominio). Contenido dominado por EPIC-013 (Contractor Payables) + nav governance + session route-groups fix.
+
+**Gates**: tsc/lint 0 · 50 tests focales payroll · preflight local (vercel/pg ok; resto resuelto en orchestrator) · migraciones "No migrations to run!". CLAUDE.md + changelog actualizados.
+
+---
+
 # Sesion 2026-06-01 — Nexa Greetings hero (Figma→código) + plataforma de saludos + microinteracciones — ✅ SHIPPED (develop)
 
 **Scope**: implementar el diseño Figma "Greetings" en el home como **componente reutilizable**, darle pulido enterprise + microinteracciones, una **plataforma de saludos dinámicos**, y replicar el resultado de vuelta a Figma (code→design). Diseñado iterando con product-design skills (modern-ui, forms-ux, motion-design, microinteractions-auditor, greenhouse-ux-writing) + arch-architect, verificando cada paso con **GVC**.
