@@ -73,6 +73,9 @@ src/assets/iconify-icons/generated-icons.css
 .codex/skills/greenhouse-vuexy-ui-expert/
 /CODEX_TASK_*.md
 !docs/tasks/**/CODEX_TASK*.md
+# Local generated video projects / HyperFrames pilots. Persist approved outputs
+# via canonical asset storage, not git.
+/videos/
 # Legacy AI skill artifacts (not the src/lib/ai/ module which is tracked)
 
 

@@ -1,3 +1,30 @@
+# Sesion 2026-06-02 — Creative Video Studio / HyperFrames pilot — 🆕 DOCUMENTADO
+
+**Scope**: documentar la capacidad mostrada con HyperFrames (`efeoncepro.com` -> promo 20s) como posible modulo nativo de Greenhouse, sin tocar runtime.
+
+**Decision propuesta**:
+- Nuevo ADR propuesto: `docs/architecture/GREENHOUSE_CREATIVE_VIDEO_STUDIO_V1.md`.
+- Nueva task: `docs/tasks/to-do/TASK-996-creative-video-studio.md`.
+- Greenhouse seria el control plane de producto: briefs, permisos, metadata, aprobacion humana, storage, versionado, relacion con cliente/campana y export.
+- HyperFrames queda como engine de composicion/render: HTML timeline, GSAP, media sync, lint/validate/inspect/snapshot/preview/render.
+- El artefacto publico recomendado es MP4/WebM exportado; el HTML animado queda como source editable.
+
+**Worktree / artefactos**:
+- El piloto local vive en `videos/efeoncepro-promo/` y pesa ~232 MB incluyendo `.venv`; no debe versionarse.
+- `.gitignore` ahora ignora `/videos/` para evitar commitear capturas, WAVs, screenshots, dependencias y outputs pesados.
+- Para preservar el piloto de forma compartida, exportar/subir solo outputs aprobados a storage canonico; no meter el proyecto local completo al repo.
+
+**Registros actualizados**:
+- `docs/architecture/DECISIONS_INDEX.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md` (siguiente ID `TASK-997`)
+- `changelog.md`
+
+**Validacion**:
+- `pnpm task:lint --task TASK-996` ✅ 0 errors / 0 warnings.
+
+---
+
 # Sesion 2026-06-02 — ADR + TASK-994 Workforce Payables Control Plane — 🆕 PROPUESTO
 
 **Scope**: auditoria conceptual Payroll + Contractor Payables para encontrar sinergias sin modificar runtime. El operador explicito que Payroll y Contractors son workforce pagada por Efeonce, pero pidio no tocar codigo.
