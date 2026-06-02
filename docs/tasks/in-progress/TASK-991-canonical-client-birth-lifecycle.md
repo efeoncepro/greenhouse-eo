@@ -24,6 +24,23 @@
 
 Establecer UN solo punto de escritura canónico para la fila `greenhouse_core.organizations` (`upsertCanonicalOrganization`), reconciliar la dimensión `organization_type` con `lifecycle_stage` (CHECK constraint), derivar `country`/`tax_id`/`legal_name` desde el origin (sin defaults ciegos), agregar 4 reliability signals que detecten organizaciones a medio cocinar, y remediar la **identidad** de las orgs incompletas existentes (Berel: RFC `PBE970101718` + país MX + `organization_type='client'`). Es la base estructural que destraba el matching por RFC de TASK-990 y sobre la que se construye el orquestador de lifecycle (TASK-992).
 
+## Delta 2026-06-02 — Implementación Slices 0-3 (CODE COMPLETE, CHECK+flag = rollout pendiente)
+
+Implementado directo en `develop` (instrucción operador, sin branch). Skills aplicadas como lente: arch-architect + finance-accounting-operator + commercial-expert.
+
+- **Slice 0 (commit 37591de0):** 4 reliability signals (`commercial.organization.type_lifecycle_drift`, `…incomplete_identity`, `commercial.client.active_without_profile`, `…active_without_space`) + wire-up en `get-reliability-overview.ts` + registry `commercial` (expectedSignalKinds += data_quality) + `scripts/commercial/inventory-half-baked-orgs.ts`. Read-only. 17 tests.
+- **Slice 1 (commit siguiente):** `deriveOrganizationType` (SSOT, `src/lib/account-360/organization-type.ts`) + `upsertCanonicalOrganization` (writer canónico) + las puertas finance/supplier delegan + puerta HubSpot setea type/public_id/origin detrás del flag `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED` (default OFF, shadow) + migración `organizations.origin` (nullable, backfill heurístico: 124 hubspot_sync + 29 migration). 35 tests.
+- **Slice 2 (commit 30a5690d):** `country_code` HubSpot propagado a la puerta party (flag ON) — MX real, no 'CL' ciego; NULL honesto si falta. 5 tests party.
+- **Slice 3 (commit 03fafebf):** script `remediate-half-baked-orgs.ts` (dry-run/apply/allowlist/actor/reason/override/expected-count) + modo `overrideIdentity` del helper. **Remediación LIVE aplicada:** Berel (type→client, country→MX, tax_id=PBE970101718 RFC, legal_name="PINTURAS BEREL SA DE CV") + Aguas Andinas + Motogas (type→client). Signal `type_lifecycle_drift`: **3 → 0**. `incomplete_identity`: 11→10 (Berel resuelto; resto = data-completion ops).
+
+**Gate de cierre verde:** `pnpm test` full 5817 passed + `pnpm build` exit 0 + tsc 0 + lint 0.
+
+**ROLLOUT PENDIENTE (operador) — code complete ≠ operationally complete:**
+1. Flipear `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED=true` en staging → validar que orgs HubSpot nuevas nacen con type/country correctos → flipear en producción (Vercel + ops-worker, requiere redeploy).
+2. SOLO DESPUÉS del flag ON en todos los runtimes: agregar el CHECK `organizations_type_lifecycle_consistent` (NOT VALID + VALIDATE, patrón TASK-708/708b). Con el flag OFF la puerta party legacy aún produce `active_client+other` → el CHECK rompería el HubSpot sync. El CHECK es el paso final de hardening (la garantía DB), gated en el flag.
+
+Por eso la task queda `in-progress` (rollout pendiente), NO `complete`. El flag OFF garantiza cero cambio de comportamiento al merge; la remediación de datos ya está aplicada y los signals en steady (drift=0).
+
 ## Why This Task Exists
 
 Auditoría `docs/audits/client-lifecycle/CLIENT_BIRTH_FRAGMENTATION_AUDIT_2026-06-02.md`: ≥4 puertas escriben subconjuntos distintos de la fila `organizations` sin helper SSOT. Las puertas HubSpot (`createPartyFromHubSpotCompany`) escriben `lifecycle_stage`+`hubspot_company_id` pero NUNCA `organization_type`/`tax_id`/`country`/`legal_name` → una org nacida por HubSpot no puede auto-completarse. Caso real: Grupo Berel quedó `organization_type='other'` (invisible en Finanzas), `tax_id=NULL` (factura Nubox `28800562` no matchea), `country='CL'` (default ciego, debería MX). Y nada lo detecta (`rg organization_type src/lib/reliability/` = 0). **Esta task cierra la causa raíz estructural** (el resto del programa — orquestador + wizard — es TASK-992).

@@ -5549,6 +5549,29 @@ El **atraso imputable** mide SOLO el slip atribuible a la agencia: días posteri
 
 **Spec canónica**: `docs/architecture/metrics/ATTRIBUTABLE_LATENESS_V1.md` + ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1.md` §4-7, §16.9. Task: `docs/tasks/complete/TASK-922-attributable-lateness-helper-otd-bucket-shadow.md`. Migration: `20260524104127717`. Patrón fuente: TASK-908 (calculate-cycle-time interval pattern), TASK-913/916 (RpA V2 helper + snapshot + consumer), TASK-923 (classifyOtdBucket).
 
+### Canonical Organization Write SSOT invariants (TASK-991, desde 2026-06-02)
+
+Toda escritura de la fila `greenhouse_core.organizations` por las puertas account-360 (client/supplier) pasa por el writer canónico `upsertCanonicalOrganization` (`src/lib/account-360/organization-identity.ts`), y TODA derivación de `organization_type` pasa por `deriveOrganizationType` (`src/lib/account-360/organization-type.ts`). Cierra el bug class fuente (Grupo Berel): las puertas se repartían las columnas de `organizations` sin SSOT — la puerta HubSpot (`createPartyFromHubSpotCompany`) escribía `lifecycle_stage`+`hubspot_company_id` pero NUNCA `organization_type`/`tax_id`/`country`/`legal_name`, dejando `active_client` con `organization_type='other'` (invisible en Finanzas) + `country='CL'` ciego (Berel es MX) + `public_id` NULL.
+
+- `organization_type` y `lifecycle_stage` son ortogonales pero deben reconciliarse: `active_client ⇒ client/both`, `provider_only ⇒ supplier`, dual ⇒ `both`, prospect/opportunity ⇒ `other`. `deriveOrganizationType({lifecycleStage, hasClientRole, hasSupplierRole, currentType})` es la ÚNICA fuente (reemplaza `promoteToClientCapableType` inline). NO incluye `efeonce_internal` (la operating entity usa el flag `is_operating_entity`, no `organization_type`).
+- `deriveOrganizationType` NO es columna GENERATED (necesita inputs de rol que no viven solo en el lifecycle, y la CHECK existente `organizations_type_check` + la puerta supplier la escriben). Es columna gobernada por el helper + (post-flag) CHECK de consistencia. Defense-in-depth: helper (app) + CHECK (DB) + 4 signals (drift).
+- `upsertCanonicalOrganization` llena `public_id` + `origin` en cada INSERT. Modo `overrideIdentity` (remediación dirigida, ej. country CL→MX) sobreescribe identidad provista; default COALESCE preserva (no-regresión).
+- `country`/`tax_id` se derivan del origin, NUNCA default ciego. La puerta HubSpot propaga `crm.companies.country_code` (NULL honesto si falta), no el default de columna `'CL'`. `tax_id` queda operator-supplied (HubSpot no trae RFC confiable).
+- 4 reliability signals (subsystem `Commercial Health`, steady=0): `commercial.organization.type_lifecycle_drift` (error>0), `commercial.organization.incomplete_identity` (warning, acotado a client-grade — NO a prospects), `commercial.client.active_without_profile`, `commercial.client.active_without_space`.
+- Flag `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED` (default OFF, shadow): gatea el comportamiento NUEVO de la puerta HubSpot. El CHECK `organizations_type_lifecycle_consistent` es paso de rollout POST-flag-flip (con flag OFF la puerta legacy produce `active_client+other` → el CHECK rompería el HubSpot sync).
+- Remediación de orgs a medias: SIEMPRE vía `scripts/commercial/remediate-half-baked-orgs.ts` (dry-run/apply/allowlist/actor/reason/expected-count abort), que pasa por `upsertCanonicalOrganization`. NUNCA SQL directo.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** escribir `greenhouse_core.organizations` (account-360 doors) fuera de `upsertCanonicalOrganization`. Toda puerta es caller.
+- **NUNCA** hand-setear `organization_type` inconsistente con el lifecycle. Usar `deriveOrganizationType`.
+- **NUNCA** dejar `lifecycle_stage='active_client'` con `organization_type='other'`. El helper lo reconcilia; el signal lo detecta; el CHECK (post-flag) lo bloquea.
+- **NUNCA** default ciego `'CL'` en escrituras de sync. Derivar del origin; NULL explícito si falta.
+- **NUNCA** agregar el CHECK `organizations_type_lifecycle_consistent` mientras `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED` esté OFF en cualquier runtime.
+- **SIEMPRE** que emerja una puerta nueva de nacimiento de org, hacerla caller del helper SSOT + setear `origin`.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-991-canonical-client-birth-lifecycle.md` + audit `docs/audits/client-lifecycle/CLIENT_BIRTH_FRAGMENTATION_AUDIT_2026-06-02.md`. Migración: `20260602144943699`. Orquestador lifecycle + wizard = TASK-992.
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

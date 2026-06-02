@@ -1,3 +1,23 @@
+# Sesion 2026-06-02 — TASK-991 Canonical Organization Write SSOT + Birth Completeness — 🔄 CODE COMPLETE (develop, rollout pendiente)
+
+**Implementado directo en `develop`** (instrucción operador, sin branch). Skills aplicadas como lente continua: arch-architect + finance-accounting-operator + commercial-expert + info-architecture/forms-ux. Cierra la causa raíz de la fragmentación del nacimiento del cliente (audit `docs/audits/client-lifecycle/CLIENT_BIRTH_FRAGMENTATION_AUDIT_2026-06-02.md`).
+
+**Slices (4 commits):**
+- Slice 0 `37591de0` — 4 reliability signals (subsystem Commercial Health) + inventario read-only.
+- Slice 1 — `deriveOrganizationType` (SSOT tipo) + `upsertCanonicalOrganization` (writer canónico) + puertas finance/supplier delegan + puerta HubSpot setea type/public_id/origin tras flag `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED` (default OFF, shadow) + migración `organizations.origin` (`20260602144943699`, backfill 124 hubspot_sync + 29 migration).
+- Slice 2 `30a5690d` — `country_code` HubSpot propagado (MX real, no 'CL' ciego).
+- Slice 3 `03fafebf` — script `remediate-half-baked-orgs.ts` + modo `overrideIdentity`. **Remediación LIVE**: Berel (type→client, country→MX, tax_id=PBE970101718 RFC, legal_name="PINTURAS BEREL SA DE CV") + Aguas Andinas + Motogas. Signal `type_lifecycle_drift` **3→0**.
+
+**Gates verdes:** `pnpm test` full 5817 passed · `pnpm build` exit 0 · tsc 0 · lint 0.
+
+**⚠️ ROLLOUT PENDIENTE (operador) — code complete ≠ operationally complete:**
+1. Flipear `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED=true` en staging → validar orgs HubSpot nuevas nacen con type/country correctos → flipear en prod (Vercel + **ops-worker, requiere redeploy** — la puerta party corre ahí).
+2. SOLO DESPUÉS (flag ON en todos los runtimes): agregar el CHECK `organizations_type_lifecycle_consistent` (NOT VALID + VALIDATE). Con flag OFF la puerta legacy produce `active_client+other` → el CHECK rompería el HubSpot sync. Es el hardening DB final, gated.
+
+Task `in-progress` (rollout pendiente), NO complete. Flag OFF = cero cambio al merge; datos ya remediados (drift=0). Foundation que destraba TASK-990 (factura MXN Berel) + TASK-992 (orquestador + wizard). CLAUDE.md invariant agregado.
+
+---
+
 # Sesion 2026-06-02 — ADR + TASK-990 MXN Multi-Currency Finance Core — ✅ ACEPTADO (sin runtime changes)
 
 **Update 2026-06-02 (review + aceptacion)**: tras review de aceptacion con skills `arch-architect` (overlay) + `greenhouse-finance-accounting-operator`, se endurecio el ADR y se acepto. Ajustes clave aplicados antes del flip: §8.4 USD reporting via CLP funcional (IAS 21, NO MXN→USD directo); §5.4 sourcing del CLP funcional (income=valor legal Nubox observado, NO recomputado / gastos=Greenhouse computa MXN→CLP); §5.1 precision por moneda + redondeo half-up; §7.1 FX snapshots como tabla append-only canonica + superseded_by; §16.b 4-Pillar Score; §6.1 aclara MXN↔USD es para resolver, no reporting. **3 confirmaciones de Finance resueltas (ADR §0)**: (1) moneda contractual Berel = MXN ✅; (2) Banxico NO obligatorio, fallback OK con degraded-source visible sobre plataforma FX existente ✅; (3) settlement = cuenta Global66 **MXN nativa** (CLABE), su propia fila `accounts` con `currency='MXN'`, DISTINTA de la Global66 CLP→USD de payroll internacional (no confundir) ✅. ADR Status → `Accepted`; DECISIONS_INDEX → Accepted; TASK-990 desbloqueada (Blocked by: none), lista para Slice 0. Sigue sin tocar runtime/codigo/migraciones/datos.
