@@ -86,3 +86,9 @@ src/assets/iconify-icons/generated-icons.css
 
 # RpA V2 PoC sandbox snapshots (gitignored — never commit demo state)
 .poc-snapshots/
+
+# Python virtualenvs (local scratch projects, e.g. videos/) — never commit
+.venv/
+venv/
+**/.venv/
+**/venv/

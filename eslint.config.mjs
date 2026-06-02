@@ -41,6 +41,11 @@ export default [
       '**/.next-local/**',
       'node_modules/**',
       '**/node_modules/**',
+      // Python virtualenvs (vendored pip/site-packages JS) must never be linted.
+      // Universal hygiene — applies to any local scratch project (e.g. videos/).
+      '**/.venv/**',
+      '**/venv/**',
+      'videos/**',
       'full-version/**',
       'demo-configs/**',
       '.claude/**',
