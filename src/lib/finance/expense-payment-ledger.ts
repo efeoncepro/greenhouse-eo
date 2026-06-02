@@ -20,6 +20,14 @@ import {
   ensureSettlementForExpensePayment,
   type SettlementConfigurationInput
 } from '@/lib/finance/settlement-orchestration'
+import { observedFxSnapshotEvidence } from '@/lib/finance/multi-currency/fx-snapshot'
+import { persistFxSnapshot } from '@/lib/finance/multi-currency/fx-snapshot-store'
+import {
+  computeRealizedFxClp,
+  deriveBookedFunctionalRate,
+  isSettlementCorridorSupported,
+  resolveNativeSettlementContext
+} from '@/lib/finance/multi-currency/native-settlement'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -206,11 +214,16 @@ const runRecordExpensePayment = async (
       expense_id: string
       currency: string
       total_amount: unknown
+      total_amount_clp: unknown
       amount_paid: unknown
       payment_status: string
       exchange_rate_to_clp: unknown
+      native_amount: unknown
+      native_currency: string | null
     }>(
-      `SELECT expense_id, currency, total_amount, COALESCE(amount_paid, 0) AS amount_paid, payment_status, exchange_rate_to_clp
+      `SELECT expense_id, currency, total_amount, total_amount_clp,
+              COALESCE(amount_paid, 0) AS amount_paid, payment_status, exchange_rate_to_clp,
+              native_amount, native_currency
        FROM greenhouse_finance.expenses WHERE expense_id = $1 FOR UPDATE`,
       [input.expenseId],
       client
@@ -222,12 +235,37 @@ const runRecordExpensePayment = async (
 
     const expense = expenseRows[0]
     const totalAmount = toNumber(expense.total_amount)
+    const totalAmountClp = toNumber(expense.total_amount_clp)
     const currentAmountPaid = toNumber(expense.amount_paid)
+
+    // TASK-990 Slice 7 — native-plane settlement context (mirror of income).
+    // A foreign-currency payable closes in its native currency; the CLP delta is
+    // realized FX. Data-driven on native_currency (mirrors the DB recompute).
+    const nativeSettlement = resolveNativeSettlementContext({
+      nativeCurrency: str(expense.native_currency),
+      nativeAmount: expense.native_amount != null ? toNumber(expense.native_amount) : null,
+      fallbackTotal: totalAmount
+    })
+
+    const isNativeExpense = nativeSettlement.isNative
+
+    const paymentCurrency = (input.currency || normalizeString(expense.currency) || 'CLP') as FinanceCurrency
+
+    // Fail-closed corridor: a native expense settles ONLY in its native currency
+    // in V1.
+    if (!isSettlementCorridorSupported({ isNative: isNativeExpense, nativeCurrency: nativeSettlement.nativeCurrency, paymentCurrency })) {
+      throw new FinanceValidationError(
+        `unsupported_corridor: payable native currency is ${nativeSettlement.nativeCurrency}; payment currency ${paymentCurrency} is not a supported settlement corridor.`,
+        409
+      )
+    }
+
+    const settlementTotal = nativeSettlement.settlementTotal
     const projectedAmountPaid = roundCurrency(currentAmountPaid + input.amount)
 
-    if (projectedAmountPaid - totalAmount > 0.01) {
+    if (projectedAmountPaid - settlementTotal > 0.01) {
       throw new FinanceValidationError(
-        `Payment amount (${input.amount}) exceeds pending balance (${roundCurrency(totalAmount - currentAmountPaid)}).`,
+        `Payment amount (${input.amount}) exceeds pending balance (${roundCurrency(settlementTotal - currentAmountPaid)}).`,
         409
       )
     }
@@ -250,10 +288,10 @@ const runRecordExpensePayment = async (
     }
 
     // FX resolution: compute CLP equivalents for multi-currency payments
-    const paymentCurrency = (input.currency || normalizeString(expense.currency) || 'CLP') as FinanceCurrency
     let exchangeRateAtPayment: number | null = null
     let amountClp: number | null = null
     let fxGainLossClp: number | null = null
+    let settlementFxSnapshotId: string | null = null
 
     if (paymentCurrency === 'CLP') {
       exchangeRateAtPayment = 1
@@ -268,11 +306,39 @@ const runRecordExpensePayment = async (
       exchangeRateAtPayment = rateAtPayment
       amountClp = roundCurrency(input.amount * rateAtPayment)
 
-      const documentRate = toNumber(expense.exchange_rate_to_clp)
+      // Realized FX = settlement CLP − booked CLP. Native payable → booked rate
+      // is the native→functional rate locked at issuance (total_amount_clp /
+      // native_amount); legacy foreign → expense.exchange_rate_to_clp.
+      const documentRate = deriveBookedFunctionalRate({
+        isNative: isNativeExpense,
+        totalAmountClp,
+        nativeAmount: nativeSettlement.nativeAmount,
+        legacyDocumentRate: toNumber(expense.exchange_rate_to_clp)
+      })
 
-      fxGainLossClp = documentRate > 0
-        ? roundCurrency(amountClp - roundCurrency(input.amount * documentRate))
-        : null
+      fxGainLossClp = computeRealizedFxClp({
+        paymentAmount: input.amount,
+        settlementClp: amountClp,
+        bookedRate: documentRate,
+        round: roundCurrency
+      })
+
+      // Persist the settlement-rate FX snapshot (native payables only — keeps
+      // USD-expense behavior bit-for-bit unchanged).
+      if (isNativeExpense) {
+        settlementFxSnapshotId = await persistFxSnapshot(
+          observedFxSnapshotEvidence({
+            fromCurrency: paymentCurrency,
+            toCurrency: 'CLP',
+            fromAmount: input.amount,
+            toAmount: amountClp,
+            rateDate: input.paymentDate,
+            source: 'fx_settlement_observed',
+            policy: 'rate_at_settlement'
+          }),
+          client
+        )
+      }
     }
 
     // Insert payment record
@@ -282,9 +348,9 @@ const runRecordExpensePayment = async (
         payment_method, payment_account_id, payment_source, notes,
         recorded_by_user_id, recorded_at, is_reconciled, created_at,
         exchange_rate_at_payment, amount_clp, fx_gain_loss_clp,
-        payment_order_line_id
+        payment_order_line_id, settlement_fx_snapshot_id
       )
-      VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, FALSE, CURRENT_TIMESTAMP, $12, $13, $14, $15)
+      VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, FALSE, CURRENT_TIMESTAMP, $12, $13, $14, $15, $16)
       RETURNING ${PAYMENT_COLUMNS}`,
       [
         paymentId,
@@ -301,7 +367,8 @@ const runRecordExpensePayment = async (
         exchangeRateAtPayment,
         amountClp,
         fxGainLossClp,
-        input.paymentOrderLineId || null
+        input.paymentOrderLineId || null,
+        settlementFxSnapshotId
       ],
       client
     )
@@ -337,25 +404,43 @@ const runRecordExpensePayment = async (
 
     payment.settlementGroupId = settlement.settlementGroup.settlementGroupId
 
-    // Re-derive for response (and as fallback if trigger absent)
-    const sumResult = await queryRows<{ total: string }>(
-      `SELECT COALESCE(SUM(amount), 0)::text AS total
-       FROM greenhouse_finance.expense_payments WHERE expense_id = $1`,
-      [input.expenseId],
-      client
-    )
+    // The DB trigger trg_sync_expense_amount_paid already recomputed
+    // expenses.amount_paid + payment_status canonically. For NATIVE payables that
+    // recompute is native-plane aware (TASK-990 Slice 7) — re-read it as the SSOT
+    // instead of overwriting with a legacy CLP comparison. Legacy keeps the
+    // original derive + idempotent fallback UPDATE bit-for-bit.
+    let newAmountPaid: number
+    let newStatus: string
 
-    const newAmountPaid = roundCurrency(toNumber(sumResult[0]?.total))
-    const newStatus = newAmountPaid >= totalAmount ? 'paid' : newAmountPaid > 0 ? 'partial' : 'pending'
+    if (isNativeExpense) {
+      const after = await queryRows<{ amount_paid: unknown; payment_status: string }>(
+        `SELECT amount_paid, payment_status FROM greenhouse_finance.expenses WHERE expense_id = $1`,
+        [input.expenseId],
+        client
+      )
 
-    // Fallback: ensure expense row is up to date (idempotent if trigger ran)
-    await queryRows(
-      `UPDATE greenhouse_finance.expenses SET
-        amount_paid = $2, payment_status = $3, updated_at = CURRENT_TIMESTAMP
-       WHERE expense_id = $1`,
-      [input.expenseId, newAmountPaid, newStatus],
-      client
-    )
+      newAmountPaid = roundCurrency(toNumber(after[0]?.amount_paid))
+      newStatus = normalizeString(after[0]?.payment_status) || 'pending'
+    } else {
+      const sumResult = await queryRows<{ total: string }>(
+        `SELECT COALESCE(SUM(amount), 0)::text AS total
+         FROM greenhouse_finance.expense_payments WHERE expense_id = $1`,
+        [input.expenseId],
+        client
+      )
+
+      newAmountPaid = roundCurrency(toNumber(sumResult[0]?.total))
+      newStatus = newAmountPaid >= totalAmount ? 'paid' : newAmountPaid > 0 ? 'partial' : 'pending'
+
+      // Fallback: ensure expense row is up to date (idempotent if trigger ran)
+      await queryRows(
+        `UPDATE greenhouse_finance.expenses SET
+          amount_paid = $2, payment_status = $3, updated_at = CURRENT_TIMESTAMP
+         WHERE expense_id = $1`,
+        [input.expenseId, newAmountPaid, newStatus],
+        client
+      )
+    }
 
     // Publish outbox event
     await publishOutboxEvent(
@@ -382,7 +467,9 @@ const runRecordExpensePayment = async (
       expenseId: input.expenseId,
       paymentStatus: newStatus,
       amountPaid: newAmountPaid,
-      amountPending: roundCurrency(totalAmount - newAmountPaid)
+      // Pending in the settlement plane: native units for a native payable,
+      // CLP for legacy.
+      amountPending: roundCurrency(settlementTotal - newAmountPaid)
     }
   }
 
@@ -459,8 +546,11 @@ export async function reconcileExpensePaymentTotals(expenseId: string): Promise<
     total_amount: unknown
     amount_paid: unknown
     payment_status: string
+    native_amount: unknown
+    native_currency: string | null
   }>(
-    `SELECT expense_id, total_amount, COALESCE(amount_paid, 0) AS amount_paid, payment_status
+    `SELECT expense_id, total_amount, COALESCE(amount_paid, 0) AS amount_paid, payment_status,
+            native_amount, native_currency
      FROM greenhouse_finance.expenses WHERE expense_id = $1`,
     [expenseId]
   )
@@ -472,40 +562,54 @@ export async function reconcileExpensePaymentTotals(expenseId: string): Promise<
   const expense = expenseRows[0]
   const totalAmount = toNumber(expense.total_amount)
   const currentAmountPaid = toNumber(expense.amount_paid)
+  const nativeCurrency = str(expense.native_currency)
+  const nativeAmount = expense.native_amount != null ? toNumber(expense.native_amount) : null
+  const isNativeExpense = Boolean(nativeCurrency) && nativeAmount != null
 
-  const sumResult = await runGreenhousePostgresQuery<{ total: string; cnt: string }>(
-    `SELECT COALESCE(SUM(amount), 0)::text AS total, COUNT(*)::text AS cnt
+  const sumResult = await runGreenhousePostgresQuery<{ total: string; cnt: string; native_total: string }>(
+    `SELECT COALESCE(SUM(amount), 0)::text AS total,
+            COUNT(*)::text AS cnt,
+            COALESCE(SUM(amount) FILTER (WHERE currency = $2), 0)::text AS native_total
      FROM greenhouse_finance.expense_payments WHERE expense_id = $1`,
-    [expenseId]
+    [expenseId, nativeCurrency]
   )
 
   const sumPayments = roundCurrency(toNumber(sumResult[0]?.total))
+  const nativePaid = roundCurrency(toNumber(sumResult[0]?.native_total))
   const paymentCount = Number(sumResult[0]?.cnt ?? 0)
   const isConsistent = Math.abs(currentAmountPaid - sumPayments) < 0.01
+
+  // TASK-990 Slice 7 — native payables close in the native plane (SUM native-
+  // currency payments vs native_amount); legacy compares against total_amount.
+  const deriveStatus = (): string => {
+    if (isNativeExpense) {
+      if (nativePaid >= (nativeAmount as number) - 0.01) return 'paid'
+
+      return sumPayments > 0 ? 'partial' : 'pending'
+    }
+
+    return sumPayments >= totalAmount ? 'paid' : sumPayments > 0 ? 'partial' : 'pending'
+  }
 
   let corrected = false
 
   if (!isConsistent) {
-    const newStatus = sumPayments >= totalAmount ? 'paid' : sumPayments > 0 ? 'partial' : 'pending'
-
     await runGreenhousePostgresQuery(
       `UPDATE greenhouse_finance.expenses SET
         amount_paid = $2, payment_status = $3, updated_at = CURRENT_TIMESTAMP
        WHERE expense_id = $1`,
-      [expenseId, sumPayments, newStatus]
+      [expenseId, sumPayments, deriveStatus()]
     )
 
     corrected = true
   }
-
-  const finalStatus = sumPayments >= totalAmount ? 'paid' : sumPayments > 0 ? 'partial' : 'pending'
 
   return {
     expenseId,
     totalAmount,
     sumPayments,
     amountPaid: corrected ? sumPayments : currentAmountPaid,
-    paymentStatus: finalStatus,
+    paymentStatus: deriveStatus(),
     paymentCount,
     isConsistent,
     corrected

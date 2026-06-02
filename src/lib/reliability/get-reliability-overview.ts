@@ -43,6 +43,7 @@ import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
 import { getNuboxExportOrphanRfcSignal } from './queries/nubox-export-orphan-rfc'
 import { getPaymentOrderMixedCurrencySignal } from './queries/payment-order-mixed-currency'
+import { getFxGainLossUnclassifiedSignal } from './queries/fx-gain-loss-unclassified'
 import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
 import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
 import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
@@ -585,6 +586,9 @@ interface ReliabilityOverviewSources {
   /** TASK-990 Slice 6 — payment order con currency distinta a sus obligations. */
   paymentOrderMixedCurrency?: ReliabilitySignal | null
 
+  /** TASK-990 Slice 7 — pago no-CLP con resultado cambiario sin clasificar. */
+  fxGainLossUnclassified?: ReliabilitySignal | null
+
   /**
    * TASK-793 Slice 3 — Contractor payable → Finance bridge signals (lag +
    * dead-letter). Single signals; degradan honestamente a null si la query falla.
@@ -912,6 +916,7 @@ export const buildReliabilityOverview = (
     ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
     ...(sources.nuboxExportOrphanRfc ? [sources.nuboxExportOrphanRfc] : []),
     ...(sources.paymentOrderMixedCurrency ? [sources.paymentOrderMixedCurrency] : []),
+    ...(sources.fxGainLossUnclassified ? [sources.fxGainLossUnclassified] : []),
     // TASK-793 Slice 3 — contractor payable → Finance bridge (lag + dead-letter).
     ...(sources.contractorPayableReadyWithoutObligation
       ? [sources.contractorPayableReadyWithoutObligation]
@@ -1313,6 +1318,11 @@ export const getReliabilityOverview = async (
     preloadedSources.paymentOrderMixedCurrency !== undefined
       ? preloadedSources.paymentOrderMixedCurrency
       : await getPaymentOrderMixedCurrencySignal().catch(() => null)
+
+  const fxGainLossUnclassified =
+    preloadedSources.fxGainLossUnclassified !== undefined
+      ? preloadedSources.fxGainLossUnclassified
+      : await getFxGainLossUnclassifiedSignal().catch(() => null)
 
   // TASK-793 Slice 3 — Contractor payable → Finance bridge (lag + dead-letter).
   // Cada reader degrada honestamente a null si su query falla — un solo signal
@@ -1803,6 +1813,7 @@ export const getReliabilityOverview = async (
     ledgerUnresolvedDriftItems,
     nuboxExportOrphanRfc,
     paymentOrderMixedCurrency,
+    fxGainLossUnclassified,
     contractorPayableReadyWithoutObligation,
     contractorPayableExpenseUnmaterialized,
     contractorPayablePaymentSlaOverdue,
