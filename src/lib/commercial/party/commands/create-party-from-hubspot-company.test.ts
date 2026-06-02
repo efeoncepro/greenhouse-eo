@@ -111,4 +111,41 @@ describe('createPartyFromHubSpotCompany — TASK-991 flag', () => {
 
     expect(insert.values).toContain('other')
   })
+
+  it('flag ON: propaga el country real de HubSpot (MX, no el default ciego CL) — Slice 2', async () => {
+    process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED = 'true'
+    const { client, calls } = buildTxClient()
+
+    await createPartyFromHubSpotCompany(
+      {
+        hubspotCompanyId: '55405407542',
+        hubspotLifecycleStage: 'customer',
+        country: 'MX',
+        actor: { system: true }
+      },
+      client
+    )
+
+    const insert = orgInsert(calls)
+
+    expect(insert.text).toContain('country')
+    expect(insert.values).toContain('MX')
+    expect(insert.values).not.toContain('CL')
+  })
+
+  it('flag ON: country NULL cuando HubSpot no lo trae (honesto, no CL ciego) — Slice 2', async () => {
+    process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED = 'true'
+    const { client, calls } = buildTxClient()
+
+    await createPartyFromHubSpotCompany(
+      { hubspotCompanyId: 'hs-3', hubspotLifecycleStage: 'lead', country: null, actor: { system: true } },
+      client
+    )
+
+    const insert = orgInsert(calls)
+
+    // country incluido en el INSERT con valor NULL — la DB NO aplica el default 'CL'.
+    expect(insert.text).toContain('country')
+    expect(insert.values).not.toContain('CL')
+  })
 })

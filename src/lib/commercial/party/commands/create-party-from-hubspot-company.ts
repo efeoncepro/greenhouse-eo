@@ -37,6 +37,12 @@ export interface CreatePartyFromHubSpotCompanyInput {
   hubspotCompanyId: string
   hubspotLifecycleStage?: string | null
   defaultName?: string
+  /**
+   * País real de la company HubSpot (TASK-991 Slice 2). Cuando el flag canónico
+   * está ON, se persiste tal cual (o NULL si HubSpot no lo trae) — NUNCA el
+   * default ciego 'CL' que dejó a Grupo Berel (MX) marcado como Chile.
+   */
+  country?: string | null
   actor: PartyActor
 }
 
@@ -105,12 +111,13 @@ export const createPartyFromHubSpotCompany = async (
              lifecycle_stage_source,
              lifecycle_stage_by,
              organization_type,
+             country,
              origin,
              active,
              status,
              created_at,
              updated_at
-           ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, 'hubspot_sync', TRUE, 'active', NOW(), NOW())
+           ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, $9, 'hubspot_sync', TRUE, 'active', NOW(), NOW())
            RETURNING organization_id, commercial_party_id::text AS commercial_party_id`,
           [
             organizationId,
@@ -123,7 +130,8 @@ export const createPartyFromHubSpotCompany = async (
             deriveOrganizationType({
               lifecycleStage: initialStage,
               hasClientRole: initialStage === 'active_client'
-            })
+            }),
+            input.country?.trim() || null
           ]
         )
       : await txClient.query<{

@@ -47,6 +47,7 @@ interface HubSpotCompanySourceRow {
   company_name: string
   legal_name: string | null
   lifecycle_stage: string | null
+  country_code: string | null
   source_updated_at: Date | string | null
   synced_at: Date | string
   updated_at: Date | string
@@ -132,6 +133,7 @@ const listSourceRows = async ({
       'company_name',
       'legal_name',
       'lifecycle_stage',
+      'country_code',
       'source_updated_at',
       'synced_at',
       'updated_at'
@@ -312,6 +314,9 @@ export const syncHubSpotCompanies = async (
             hubspotCompanyId: row.hubspot_company_id,
             hubspotLifecycleStage: row.lifecycle_stage,
             defaultName: row.legal_name ?? row.company_name,
+            // TASK-991 Slice 2 — propaga el country real de HubSpot (Berel: MX, no
+            // el default ciego 'CL'). Solo se persiste cuando el flag canónico está ON.
+            country: row.country_code ?? null,
             actor
           })
 
