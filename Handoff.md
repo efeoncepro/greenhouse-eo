@@ -1,3 +1,25 @@
+# Sesion 2026-06-02 — TASK-993 Contractor Payment Run Ready Email — 🆕 TASK CREADA
+
+**Scope**: follow-up operador tras validar el flujo contractor end-to-end: cuando la corrida mensual deja la nomina/ordenes listas, Finanzas quiere recibir un email como ocurre con payroll.
+
+**Decision de diseno canonica**:
+- NO enviar email al descargar la nomina (download sigue read-only).
+- Trigger correcto: corrida mensual contractor `succeeded` con `preparedOrderIds.length > 0`.
+- Nuevo evento propuesto: `finance.contractor_payment_run.ready`.
+- Email type propuesto: `contractor_payment_run_ready`.
+- Recipients: via `greenhouse_notifications.email_subscriptions`; Humberly + Julio son seed inicial a verificar, nunca hardcode en runtime.
+- Adjuntos: PDF + Excel generados por helpers TASK-980.
+- Copy obligatorio: "preparada / pendiente aprobacion", NO "pagada".
+- Debe incluir resend manual, idempotencia, kill switch y signal dead-letter.
+
+**Artefactos**:
+- Task: `docs/tasks/to-do/TASK-993-contractor-payment-run-ready-email.md`.
+- Registro: `docs/tasks/TASK_ID_REGISTRY.md`.
+- Indice: `docs/tasks/README.md` (siguiente ID `TASK-994`).
+- Epic: `docs/epics/to-do/EPIC-013-contractor-engagements-global-payables-program.md`.
+
+---
+
 # Sesion 2026-06-02 — Contractor payments end-to-end validado por operador + docs — ✅ DOCUMENTADO
 
 **Scope**: deuda cognitiva post-implementacion de agentes en pagos a contractors. El operador valido el flujo en `dev-greenhouse` desde la UI, sin que el agente hiciera mutaciones de estado.
