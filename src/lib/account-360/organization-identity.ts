@@ -219,6 +219,13 @@ export const upsertCanonicalOrganization = async (
     hasClientRole?: boolean
     hasSupplierRole?: boolean
     origin?: OrganizationOrigin
+    /**
+     * Modo remediación (TASK-991 Slice 3). Cuando true, los campos de identidad
+     * provistos NO-NULL SOBREESCRIBEN el valor existente (corrección dirigida —
+     * ej. country CL→MX de Berel). Cuando false (default), COALESCE preserva el
+     * valor existente no-vacío (no-regresión de las puertas normales).
+     */
+    overrideIdentity?: boolean
   },
   client?: QueryableClient
 ): Promise<{ organizationId: string; organizationType: OrganizationType }> => {
@@ -232,15 +239,25 @@ export const upsertCanonicalOrganization = async (
   const origin: OrganizationOrigin = input.origin ?? 'manual'
 
   if (input.existingOrganizationId?.trim()) {
+    // overrideIdentity=true: `COALESCE($n, col)` sobreescribe cuando se provee
+    // un valor (corrección). Default: `COALESCE(NULLIF(col,''), $n)` preserva.
+    const identitySql = input.overrideIdentity
+      ? `legal_name = COALESCE($4, legal_name),
+           hubspot_company_id = COALESCE($5, hubspot_company_id),
+           tax_id = COALESCE($6, tax_id),
+           tax_id_type = COALESCE($7, tax_id_type),
+           country = COALESCE($8, country)`
+      : `legal_name = COALESCE(NULLIF(legal_name, ''), $4),
+           hubspot_company_id = COALESCE(hubspot_company_id, $5),
+           tax_id = COALESCE(tax_id, $6),
+           tax_id_type = COALESCE(tax_id_type, $7),
+           country = COALESCE(NULLIF(country, ''), $8)`
+
     await queryRows(
       `UPDATE greenhouse_core.organizations
        SET organization_type = $2,
            organization_name = COALESCE(NULLIF(organization_name, ''), $3),
-           legal_name = COALESCE(NULLIF(legal_name, ''), $4),
-           hubspot_company_id = COALESCE(hubspot_company_id, $5),
-           tax_id = COALESCE(tax_id, $6),
-           tax_id_type = COALESCE(tax_id_type, $7),
-           country = COALESCE(NULLIF(country, ''), $8),
+           ${identitySql},
            origin = COALESCE(origin, $9),
            updated_at = NOW()
        WHERE organization_id = $1`,
