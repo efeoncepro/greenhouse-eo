@@ -64,7 +64,15 @@ export type NuboxSaleType = {
 // commercial disposition (Slice 4) before any income projection (Slice 5).
 export type NuboxRawExportationNode = Record<string, unknown>
 
-export type NuboxForeignCurrencyEvidenceSource = 'nubox_payload' | 'reviewed_commercial' | 'none'
+// `nubox_xml` = the authoritative SII DTE XML (`<Totales>` native + `<OtraMoneda>`
+// CLP), the legal source for foreign-currency export invoices. `nubox_payload`
+// = the (currently empty) list-payload export node. `reviewed_commercial` =
+// operator-supplied via reviewed disposition. `none` = no usable evidence yet.
+export type NuboxForeignCurrencyEvidenceSource =
+  | 'nubox_xml'
+  | 'nubox_payload'
+  | 'reviewed_commercial'
+  | 'none'
 
 export type NuboxForeignCurrencyConfidence = 'high' | 'medium' | 'low' | 'none'
 

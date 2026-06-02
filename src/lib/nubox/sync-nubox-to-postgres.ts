@@ -75,6 +75,13 @@ const resolveNuboxIncomeTaxCode = (sale: NuboxProjectionSale): 'cl_vat_19' | 'cl
   const totalAmount = Math.abs(safeNum(sale.total_amount) ?? 0)
   const exemptAmount = Math.abs(safeNum(sale.exempt_amount) ?? 0)
 
+  // TASK-990 — export DTEs (110 factura, 111 nota débito, 112 nota crédito de
+  // exportación) son IVA-exentos por D.L. 825 Art 12 letra D/E, aunque Nubox no
+  // pueble exempt_amount. Clasificar exento explícito antes de la heurística.
+  if (sale.dte_type_code === '110' || sale.dte_type_code === '111' || sale.dte_type_code === '112') {
+    return 'cl_vat_exempt'
+  }
+
   if (sale.dte_type_code === '34' || exemptAmount > 0) return 'cl_vat_exempt'
   if (vatAmount > 0 || totalAmount > netAmount) return 'cl_vat_19'
 
