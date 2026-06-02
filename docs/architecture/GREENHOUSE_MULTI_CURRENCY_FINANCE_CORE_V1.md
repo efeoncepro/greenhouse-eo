@@ -147,6 +147,8 @@ interface MoneyAmount {
 
 Storage may keep numeric/decimal columns per table, but domain helpers must expose typed money objects. Amounts must never travel as unlabelled numbers in finance core.
 
+**Precision and rounding (binding):** `precision` is fixed per currency — `CLP = 0` decimals, `USD = 2`, `MXN = 2`. Rounding is **half-up** at the declared precision, applied once at snapshot time, never re-applied on read. The equivalence tolerances used by `native_equivalent_drift` (±1 CLP, ±0.01 USD) are a direct consequence of these precisions; any consumer that rounds differently will trip the drift signal.
+
 ### 5.2 `FxSnapshot`
 
 ```ts
@@ -189,14 +191,26 @@ interface CanonicalMoneySnapshot {
   reporting: MoneyAmount & { currency: 'USD' }
   settlement?: MoneyAmount
   nativeToFunctionalFxSnapshotId: string
-  nativeToReportingFxSnapshotId: string
+  // Reporting USD is derived from the FUNCTIONAL CLP plane, not from native (see §8.4, IAS 21).
+  functionalToReportingFxSnapshotId: string
   settlementToNativeFxSnapshotId?: string | null
   settlementToFunctionalFxSnapshotId?: string | null
   settlementToReportingFxSnapshotId?: string | null
 }
 ```
 
-This is the canonical conceptual shape. Tables may store columns inline or point to snapshot rows, but every reader must be able to reconstruct this shape.
+This is the canonical conceptual shape. The reporting plane is reconstructed through `native → functional → reporting` (§8.4), never `native → reporting` directly. Every reader must be able to reconstruct this shape.
+
+### 5.4 Functional CLP sourcing rule (income legal value vs computed)
+
+The functional CLP plane has **two legitimate sources** depending on the fact's origin. This distinction is binding — the "do not recompute functional CLP" rule of §8.4 is **specific to legal-documentary income**, not universal:
+
+| Fact origin | Functional CLP source | FX snapshot `source` |
+|---|---|---|
+| Nubox export invoice / any source that carries a legal CLP equivalent (SII documentary value) | The **observed legal CLP** from the source document. Greenhouse does NOT recompute it. The implied rate is stored as evidence. | `nubox_legal_document` (or equivalent source-legal tag) |
+| MXN expense / MXN obligation / any MXN fact with **no** legal CLP from a Chilean document | Greenhouse **computes** MXN→CLP from a locked snapshot (`rate_at_event`) via the canonical FX resolver. | provider tag (`banxico_sie`, `frankfurter`, …) or `manual_override` |
+
+In both cases the reporting USD is then derived from the functional CLP (§8.4). The difference is only **where the functional CLP comes from**: an observed legal value (income from a legal document) versus a Greenhouse-locked conversion (expenses and any fact without a legal CLP anchor). Never apply a Greenhouse-computed MXN→CLP rate on top of a fact that already carries its own legal CLP — that would silently overwrite the SII-reconcilable value.
 
 ---
 
@@ -216,6 +230,8 @@ V1 must support all pairs below in both directions through the canonical resolve
 | USD -> MXN | yes |
 
 The resolver may use direct, inverse or composed routes, but the caller must only receive a classified `FxReadiness` plus snapshotable rate evidence.
+
+The `MXN↔USD` pairs are required for the **resolver** (settlement scenarios where an MXN fact is paid/funded in USD, and ad-hoc analytics), **not** for the reporting plane: per §8.4 the reporting USD is always derived `functional CLP → USD`, never `native MXN → USD`. Supporting a pair in the resolver does not mean any plane consumes it directly.
 
 ### 6.2 Resolution rules
 
@@ -266,6 +282,8 @@ Each core table that stores financial amounts must classify its columns into the
 | FX evidence | `*_fx_snapshot_id`, `exchange_rate_to_clp`, `exchange_rate_to_usd`, `rate_date`, `source` | Immutable conversion evidence. |
 
 Naming may vary by table, but the implementation task must document the final mapping table by table before migration apply.
+
+**FX snapshot storage model (binding default):** the `snapshotId` / `*_fx_snapshot_id` fields in §5.2-§5.3 imply rows, not inline scalars. The canonical model is a dedicated **append-only `greenhouse_finance.fx_snapshots` table** (anti-UPDATE / anti-DELETE triggers; replacements link to the original via a `superseded_by` column, never overwrite), referenced by `*_fx_snapshot_id` FK from each financial fact. The legacy inline columns (`exchange_rate_to_clp`, `exchange_rate_to_usd`, `rate_date`, `source`) are kept **only** for backward compatibility / fast filtering and must mirror the linked snapshot, never diverge from it. The Slice 0 migration map may choose inline-only for a specific table if it justifies why a snapshot row adds no auditable value there, but the default is the table. This makes FX evidence a first-class append-only audit object (overlay arch #5 defense-in-depth + §16 observability gap).
 
 ### 7.2 Tables that must be migrated or explicitly bounded
 
@@ -590,6 +608,44 @@ The riskiest silent failure is "invoice projected, native MXN lost". The propose
 ### Compliance/regional gap
 
 This ADR is not tax/legal advice. It preserves the Nubox/SII CLP export-invoice plane and the MXN contract plane separately. Any official export-document field mapping must be verified against Nubox/SII artifacts during TASK-990 discovery.
+
+---
+
+## 16.b 4-Pillar Score (arch-architect contract)
+
+### Safety
+
+- **What can go wrong**: an MXN invoice projected as CLP-only (native lost); Berel matched to the wrong organization by name; a stale/missing FX rate produces a wrong consolidated number; FX loss buried inside client revenue.
+- **Gates**: dedicated capabilities `finance.fx.manual_override` and `finance.nubox_export.review_disposition` (FINANCE_ADMIN + EFEONCE_ADMIN), each with `reason` + audit (TASK-990 `## Capabilities & Access`); fail-closed FX readiness (§6.2); RFC match never written by name similarity (§8.3); IVA-exempt enforced for DTE 110 (§8.2).
+- **Blast radius if wrong**: one tenant / one client's AR + cash + P&L. Cross-tenant contamination not possible (facts are client-scoped). Legacy CLP/USD rows are bit-for-bit preserved (expand-and-contract).
+- **Verified by**: signals `nubox_export.orphan_rfc`, `fx.snapshot_missing`, `fx_gain_loss.unclassified`; allowlist + dry-run + expected-mutation-count abort on backfill; append-only audit on both write surfaces.
+- **Residual risk**: the foreign-currency *code* extraction from Nubox is `medium` confidence until the XML/PDF payload is confirmed in Discovery — mitigated by reviewed-disposition fallback (Finance classifies with reason), never country-inference in a write path.
+
+### Robustness
+
+- **Idempotency**: backfill keyed by `source_object_id` allowlist + expected-mutation-count abort; reprojection is supersede, not double-insert.
+- **Atomicity**: FX snapshot lock + fact write in one transaction (§6.2 "If FX snapshot cannot be locked: no write").
+- **Race protection**: one-order-one-currency enforced by CHECK + server-side reject before tx (§9.2); active-profile uniqueness partial index for MXN profiles.
+- **Constraint coverage**: CHECK widening `IN ('CLP','USD','MXN')` on obligations/orders/lines/profiles/funding policy/accounts; `native_equivalent_drift` deterministic recompute (§5.1 precision + tolerance); functional-CLP sourcing rule (§5.4) prevents silent overwrite of SII-reconcilable values.
+- **Verified by**: mixed-currency rejection tests; CLP/USD no-regression bit-for-bit tests; Berel acceptance fixture.
+
+### Resilience
+
+- **Retry / dead letter**: BQ projection runs through the canonical outbox + reactive consumer (TASK-771/773) with `dead_letter` after bounded retries — never inline in the Nubox request path.
+- **Reliability signals**: 8 signals (§11) rolling up to `Finance Data Quality`, all steady = 0 / ok.
+- **Audit trail**: FX snapshots append-only (`fx_snapshots` table, §7.1) with `superseded_by` linkage; both write surfaces append-only.
+- **Recovery**: Berel backfill is dry-run-first with stored evidence; rollback-per-slice matrix in TASK-990; closed-period restatement is explicit (§10), never an invisible refresh.
+- **Degradation honesty**: fail-closed on missing/stale rate (§6.2) — surfaces "Pendiente" with reason, never a wrong $ value.
+
+### Scalability
+
+- **Hot path Big-O**: reads go through the canonical normalized VIEWs (TASK-766) which are already index-backed; MXN adds rows, not a new access pattern. O(log n) on `(currency, period/date, source_system)` indexes (Slice 2).
+- **Index coverage**: §12 Phase 2 mandates `(currency, period/date, source_system)` indexes before constraint flip.
+- **Async paths**: all BQ/downstream projection is async (outbox); request path only writes PG + emits event.
+- **Cost at 10x**: linear — one extra currency dimension, no fan-out, no per-row recompute (snapshots are locked once). Adding COP/PEN later is a domain decision, not a redesign (§16 "what breaks in 12 months"), because primitives avoid MXN-specific branching.
+- **Pagination**: inherited from existing finance readers (cursor-based where >1000 rows).
+
+**Tradeoff named**: Robustness (typed columns + locked snapshots + append-only evidence) is chosen over Scalability-of-change (JSON blobs would be easier to evolve). Accepted deliberately for finance integrity, queryability and audit (§14 Alt D rejected).
 
 ---
 
