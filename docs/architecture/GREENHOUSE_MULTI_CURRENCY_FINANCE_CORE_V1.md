@@ -1,7 +1,8 @@
 # Greenhouse Multi-Currency Finance Core V1
 
-> **Status:** Proposed
+> **Status:** Accepted
 > **Date:** 2026-06-02
+> **Accepted:** 2026-06-02 by operator (Julio Reyes), after arch-architect + finance-operator acceptance review. Implementation proceeds via TASK-990.
 > **Owner:** Finance / Treasury / Commercial / Integrations / Data
 > **Validated as of:** 2026-06-02 against current repo docs, code paths, migrations, Nubox sync status, BigQuery conformed sales and PostgreSQL finance projection
 > **Reversibility:** two-way-but-slow
@@ -9,7 +10,21 @@
 > **Related docs:** [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md), [GREENHOUSE_FINANCE_ARCHITECTURE_V1](GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1](GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md), [GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1](GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md), [Monedas y Tipos de Cambio](../documentation/finance/monedas-y-tipos-de-cambio.md)
 > **Implementation task:** [TASK-990](../tasks/to-do/TASK-990-mxn-multi-currency-finance-core.md)
 >
-> **Delta 2026-06-02 — Accepted decision (currency plane sourcing):** the reporting USD plane is derived from the functional CLP via a locked `CLP→USD` snapshot (IAS 21 presentation-currency translation), **not** from a direct `MXN→USD` market rate. The canonical chain is `MXN (native) → CLP (legal Nubox) → USD (reporting)`. Full rationale in §8.4. The rest of the ADR remains `Proposed` pending human acceptance.
+> **Delta 2026-06-02 — Accepted decision (currency plane sourcing):** the reporting USD plane is derived from the functional CLP via a locked `CLP→USD` snapshot (IAS 21 presentation-currency translation), **not** from a direct `MXN→USD` market rate. The canonical chain is `MXN (native) → CLP (legal Nubox) → USD (reporting)`. Full rationale in §8.4.
+
+---
+
+## 0. Acceptance Record (2026-06-02)
+
+The three out-of-band confirmations that gated acceptance are resolved (operator, 2026-06-02):
+
+| Question | Confirmed answer | Consequence in this ADR |
+|---|---|---|
+| Is Berel's contractual/invoice currency MXN? | **Yes.** | `native_currency='MXN'` is authoritative for Berel; no country-inference needed for this client. §8.2 holds. |
+| Is Banxico the required FX source for production MXN write paths? | **No — Banxico not mandatory, but an anchored source/API is required.** | MXN already syncs via the existing FX provider platform (`fx-sync-latam` evening window; provider `banxico_sie` with `frankfurter` + `fawaz_ahmed` fallbacks, USD composition hub — `currency-registry.ts`). Production MXN finance-core writes are allowed on the existing platform with **degraded-source visibility** when primary is unavailable. Promoting Banxico to a hard-required primary is a follow-up (§17 / TASK-990 Follow-ups), not a blocker. Fail-closed readiness (§6.2) still blocks on missing/stale. |
+| What is the MXN settlement path? | **Berel pays MXN into Efeonce's Global66 CLABE account denominated in MXN.** Efeonce holds several Global66 accounts (one per currency: MXN, USD, EUR…). | Settlement currency = native = MXN into the **MXN-denominated** Global66 account — its **own `accounts` row** (`currency='MXN'`, provider `global66`, CLABE identifier), distinct from the existing Global66 payment-instrument account (CLP-funded / USD-payout, outbound international-payroll transit — do NOT confuse). Inbound AR observed **directly in MXN**, no conversion at the bank-observation boundary. See §9.1. A later MXN→CLP conversion is a separate treasury/internal-transfer event, not the AR settlement. |
+
+With these resolved, the architecture is `Accepted`. Implementation (TASK-990) proceeds; the FX-source-hardening and any non-Berel MXN clients remain follow-ups.
 
 ---
 
@@ -398,6 +413,14 @@ Payment Orders keep the existing TASK-799 principle:
 - `settlement_legs` model funding, FX, fee and payout.
 
 MXN does not weaken that rule. If Berel pays MXN into an MXN bank/fintech account, the account is the settlement source. If a processor converts MXN to CLP/USD before settlement, Greenhouse must model the processor/counterparty legs instead of pretending the invoice was CLP.
+
+**Berel corridor (confirmed, §0):** Efeonce holds **multiple Global66 accounts, one per currency** (MXN, USD, EUR, …). Each is a **distinct `accounts` row with its own `currency`** — they are NOT one polymorphic account. Berel pays MXN into the **MXN-denominated** Global66 CLABE account. This is the canonical V1 inbound corridor:
+
+- `source_account` = the **Global66 MXN account** (`currency='MXN'`, provider `global66`, Mexican CLABE as the account identifier). The account currency IS the settlement-native plane for its balance (§7.2 `accounts`).
+- ⚠️ **Do NOT confuse this with the existing Global66 account already modeled in payment instruments**, which is a **CLP-funded / USD-payout** instrument used as a *transit/intermediary* for outbound international payroll (`anchored-payments.ts`, accounts like `global66-clp`). That account converts (CLP→USD) and is an intermediary. The Berel account is the **opposite shape**: a native-MXN account that *receives* MXN with no conversion at observation. Same provider (`global66`), different account, different currency, different role (inbound AR vs outbound payroll transit).
+- Settlement currency = **MXN = native**. The inbound AR collection is observed directly in MXN — **no processor conversion at the bank-observation boundary**. The realized FX gain/loss (§9.3) still arises from `settlement_functional_clp` (MXN→CLP at payment date) vs `invoice_functional_clp` (Nubox legal CLP at emission), because the two CLP values use different-date rates.
+- A subsequent **MXN→CLP conversion** (sweeping funds out of the Global66 MXN account into a CLP account) is a **separate treasury/internal-transfer event** with its own FX legs — it is NOT the AR settlement and must not be conflated with it.
+- The Global66 **MXN** account must be onboarded in `accounts` with `currency='MXN'` as its **own row** distinct from any existing Global66 (CLP/USD) account (Treasury step in TASK-990 if it does not exist yet).
 
 ### 9.2 Payment order currency invariant
 

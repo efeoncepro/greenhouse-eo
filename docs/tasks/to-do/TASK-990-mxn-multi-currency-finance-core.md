@@ -17,7 +17,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `finance` (owner) — touches `integrations` (Nubox sync), `treasury` (settlement/FX), `data` (BQ conformed), `reliability` (signals). Domain boundary per `docs/architecture/GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`: Finance owns income, expenses, payments, reconciliation, FX, P&L. Commercial (pricing MXN) is upstream evidence only, NOT modified by this task.
-- Blocked by: `ADR acceptance: docs/architecture/GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md`
+- Blocked by: `none` — ADR `GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1` ACEPTADO 2026-06-02 (ver §0 Acceptance Record). Lista para Slice 0.
 - Branch: `task/TASK-990-mxn-multi-currency-finance-core`
 - Legacy ID: `none`
 - GitHub Issue: `[optional]`
@@ -561,9 +561,9 @@ Flags must be present in Production, staging and Preview develop before the code
 
 ### Out-of-band coordination required
 
-- Finance must confirm Berel's contractual/invoice currency as MXN and approve the source of currency evidence if Nubox JSON lacks explicit currency code.
-- Finance must decide whether Banxico primary token (`BANXICO_SIE_TOKEN`) is required before production MXN finance-core writes, or whether Frankfurter/Fawaz fallback is acceptable temporarily with visible degraded source.
-- Finance/Treasury must identify the expected MXN settlement path: MXN bank account, processor, conversion to CLP, conversion to USD or manual reconciliation.
+- ✅ RESUELTO 2026-06-02 — Berel's contractual/invoice currency is **MXN** (operator-confirmed). `native_currency='MXN'` autoritativo para Berel; no country-inference. ADR §0.
+- ✅ RESUELTO 2026-06-02 — Banxico NO es obligatorio como primary; se requiere una fuente/API anclada. MXN ya sincroniza via la plataforma FX existente (`fx-sync-latam`, provider `banxico_sie` + fallbacks `frankfurter`/`fawaz_ahmed`, hub USD). Writes MXN en produccion permitidos con **degraded-source visible**; fail-closed readiness sigue bloqueando missing/stale. Hard-required Banxico queda como Follow-up. ADR §0.
+- ✅ RESUELTO 2026-06-02 — Settlement path: **Berel paga MXN a la cuenta Global66 CLABE denominada en MXN** de Efeonce. Efeonce tiene **varias cuentas Global66, una por moneda** (MXN, USD, EUR…); cada una es su **propia fila `accounts` con su `currency`**. ⚠️ NO confundir con la cuenta Global66 ya modelada en instrumentos de pago, que **recibe CLP y paga USD** (transit/intermediario para payroll internacional, `anchored-payments.ts`, ej. `global66-clp`) — esa convierte; la de Berel es nativa-MXN y solo recibe MXN sin conversión. Mismo provider, cuenta distinta, moneda distinta, rol distinto. AR inbound observada directo en MXN. Conversión MXN→CLP posterior = evento de tesorería/internal-transfer separado, NO el settlement. ADR §0 + §9.1. **Acción concreta:** onboardear la cuenta Global66 **MXN** en `greenhouse_finance.accounts` con `currency='MXN'` como fila propia, distinta de cualquier cuenta Global66 CLP/USD existente (Slice 7 / Treasury).
 - If production flags/env vars are added or changed, Vercel redeploy is required for affected targets.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -575,7 +575,7 @@ Flags must be present in Production, staging and Preview develop before the code
 
 ## Acceptance Criteria
 
-- [ ] ADR `GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1` is accepted or this task is explicitly authorized to proceed from Proposed status.
+- [x] ADR `GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1` is accepted (2026-06-02, operator — ver ADR §0 Acceptance Record).
 - [ ] `FinanceCurrency` and `finance_core` domain support include MXN.
 - [ ] All known CLP/USD finance-core DB constraints are expanded or explicitly bounded.
 - [ ] Nubox export invoices map foreign amount and currency evidence.
@@ -639,9 +639,9 @@ Flags must be present in Production, staging and Preview develop before the code
 
 ## Open Questions
 
-- Does Nubox expose explicit foreign currency code in XML/PDF or another endpoint for export invoices, or must Greenhouse use reviewed commercial evidence?
-- Will Berel pay into an MXN-denominated account, or will the bank/processor convert before Greenhouse observes settlement?
-- Does Finance require Banxico primary source for production MXN write paths, or is fallback acceptable with degraded-source evidence?
+- Does Nubox expose explicit foreign currency code in XML/PDF or another endpoint for export invoices, or must Greenhouse use reviewed commercial evidence? **(Sigue abierta — Berel ya está confirmada como MXN a nivel negocio (ADR §0); lo que queda es el path técnico de extracción del código de moneda en el payload Nubox, a verificar en Slice 0/3 Discovery. Para Berel hay fallback de evidencia comercial confirmada.)**
+- ✅ RESUELTO 2026-06-02 — Berel paga a una cuenta Global66 CLABE denominada en MXN; settlement nativo MXN sin conversión en el boundary. ADR §0 + §9.1.
+- ✅ RESUELTO 2026-06-02 — Banxico NO obligatorio; fallback aceptable con degraded-source visible sobre la plataforma FX existente. ADR §0.
 - Should `reporting` and `analytics` expose USD broadly now, or only in finance multi-currency readers behind `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED` first?
 - **Governance del plano USD — RESUELTO 2026-06-02 (operador):** se confirma la cadena canonica `MXN → CLP(legal Nubox) → USD` para V1 (IAS 21: USD es moneda de presentacion, se convierte desde la funcional CLP). Registrado en ADR §8.4 + `## Currency Plane Sourcing Contract` punto 3. El MXN→USD directo queda como analitica ad-hoc, no como numero consolidado. Reabrir solo si Finance pide reporting "market-pure".
 - **Verificacion fiscal DTE 110:** confirmar contra el artefacto Nubox/SII real (XML/PDF de `28800562`) que el income export se mapea IVA-exento (D.L. 825 Art 12) y que el equivalente CLP que trae Nubox es el valor documental legal (no un estimado). Escalar a contador si el campo de exportacion no es inequivoco.

@@ -1,6 +1,8 @@
-# Sesion 2026-06-02 — ADR + TASK-990 MXN Multi-Currency Finance Core — 🆕 PROPUESTO (sin runtime changes)
+# Sesion 2026-06-02 — ADR + TASK-990 MXN Multi-Currency Finance Core — ✅ ACEPTADO (sin runtime changes)
 
-**Scope**: modelar soporte MXN end-to-end sin implementar codigo. Se invocaron skills `software-architect-2026`, `greenhouse-finance-accounting-operator` y `greenhouse-task-planner`.
+**Update 2026-06-02 (review + aceptacion)**: tras review de aceptacion con skills `arch-architect` (overlay) + `greenhouse-finance-accounting-operator`, se endurecio el ADR y se acepto. Ajustes clave aplicados antes del flip: §8.4 USD reporting via CLP funcional (IAS 21, NO MXN→USD directo); §5.4 sourcing del CLP funcional (income=valor legal Nubox observado, NO recomputado / gastos=Greenhouse computa MXN→CLP); §5.1 precision por moneda + redondeo half-up; §7.1 FX snapshots como tabla append-only canonica + superseded_by; §16.b 4-Pillar Score; §6.1 aclara MXN↔USD es para resolver, no reporting. **3 confirmaciones de Finance resueltas (ADR §0)**: (1) moneda contractual Berel = MXN ✅; (2) Banxico NO obligatorio, fallback OK con degraded-source visible sobre plataforma FX existente ✅; (3) settlement = cuenta Global66 **MXN nativa** (CLABE), su propia fila `accounts` con `currency='MXN'`, DISTINTA de la Global66 CLP→USD de payroll internacional (no confundir) ✅. ADR Status → `Accepted`; DECISIONS_INDEX → Accepted; TASK-990 desbloqueada (Blocked by: none), lista para Slice 0. Sigue sin tocar runtime/codigo/migraciones/datos.
+
+**Scope (sesion original)**: modelar soporte MXN end-to-end sin implementar codigo. Se invocaron skills `software-architect-2026`, `greenhouse-finance-accounting-operator` y `greenhouse-task-planner`.
 
 **Resultado documental**:
 - ADR/spec propuesto: `docs/architecture/GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md`.
@@ -11,7 +13,7 @@
 
 **Caso fuente**: Nubox export invoice Berel `28800562`, DTE 110, `PINTURAS BEREL SA DE CV`, RFC `PBE970101718`, foreign amount `89.960` (MXN por contexto operador), CLP legal/documental `4.617.647`. Sync Nubox raw/conformed esta sano, pero la venta quedo orphaned sin `income_id`; si se proyectara hoy, `sync-nubox-to-postgres` hardcodearia CLP y perderia el MXN nativo.
 
-**Estado**: ADR `Proposed`; TASK-990 `to-do`, bloqueada por aceptacion humana del ADR. No se tocaron codigo, migraciones, datos, Vercel, GCP ni runtime.
+**Estado**: ADR `Accepted` (2026-06-02, ver Update arriba); TASK-990 `to-do` desbloqueada y lista para Slice 0. No se tocaron codigo, migraciones, datos, Vercel, GCP ni runtime.
 
 ---
 
