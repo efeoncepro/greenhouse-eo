@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-05-31 por Claude (TASK-974)
-> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-980)
+> **Ultima actualizacion:** 2026-06-02 por Codex — flujo completo validado hasta payment orders / paid
 > **Documentacion tecnica:** [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
 
 # Pagos a Contractors — Workbench de Finanzas
@@ -18,8 +18,11 @@ El pago a un contractor nace en HR y termina en el banco. Esta pantalla es la **
 
 1. **HR** crea el engagement y fija el **monto acordado** (lo que se pagará).
 2. El **contractor** cobra: envía su trabajo / boleta (work submission).
-3. **Finanzas** (esta pantalla) crea el *payable*, calcula el **neto** y autoriza el pago.
-4. El payable listo genera una **obligación** → **orden de pago** → **banco** (automático, reactivo).
+3. **Finanzas** (esta pantalla) crea el *payable*, calcula el **neto** y autoriza el paso a Finance.
+4. El payable listo genera una **obligación**.
+5. La **corrida mensual** agrupa obligaciones contractor por moneda y crea **órdenes de pago**.
+6. **Órdenes de pago** ejecuta maker-checker, programación, envío y marca pagada.
+7. Cuando la orden queda `paid`, el cascade marca el payable `paid` y habilita el comprobante individual.
 
 > Separación de funciones (SoD): quien **fija** el monto (HR) no es quien **paga** (Finanzas). Por eso el override de un pago que excede el monto acordado se autoriza **solo desde Finanzas**, no desde HR.
 
@@ -61,6 +64,32 @@ Cómo funciona:
 - **Prioriza lo más vencido**: ordena por la fecha de pago comprometida (los más atrasados contra el plazo de 5 días primero), e incluye cualquier pago de meses anteriores que se haya quedado sin preparar.
 - Una señal de salud (`obligaciones de contractor vencidas sin batchear`) avisa en el panel de operaciones si quedaron pagos vencidos sin preparar — la acción es justamente correr la corrida.
 
+## Flujo end-to-end validado
+
+El camino completo es:
+
+```text
+work_submission approved
+  -> contractor_payable pending_readiness
+  -> readiness live OK
+  -> contractor_payable ready_for_finance
+  -> payment_obligation provider_payroll
+  -> monthly run
+  -> payment_order pending_approval
+  -> approved / scheduled / submitted
+  -> payment_order paid
+  -> contractor_payable paid
+  -> remittance advice EO-RA + email
+```
+
+Contratos relevantes:
+
+- **Enviar a Finanzas** no crea pago bancario; solo autoriza la obligacion.
+- **Iniciar corrida mensual** no paga; crea ordenes `pending_approval`.
+- **Payment Orders** es el dueño de aprobacion, envio, pago y conciliacion.
+- El payable solo llega a **Pagado** despues de `finance.payment_order.paid` y el cascade reactivo.
+- El comprobante individual requiere `payable.status='paid'`.
+
 ## Descargar la nómina de contractors (PDF / Excel)
 
 El botón **"Descargar nómina"** (arriba a la derecha) genera el **reporte del período** de pagos a contractors, en **PDF** o **Excel**, igual que el reporte mensual de nómina.
@@ -69,6 +98,7 @@ El botón **"Descargar nómina"** (arriba a la derecha) genera el **reporte del 
 - El reporte lista los pagos del período **agrupados por régimen**: **Honorarios CL** (con retención SII) e **Internacional** (sin retención chilena). Cada fila muestra el desglose **bruto − retención SII = neto**, el estado y, si ya se pagó, el número de **comprobante** (EO-RA).
 - Los **subtotales son separados**: el total de **retención SII** (que se remesa al SII vía F29) nunca se mezcla con el **neto pagado** (que reconcilia el banco). Las monedas (CLP / USD) también van separadas.
 - Los pagos **bloqueados o no listos** del período aparecen en una sección de "Excluidos" — visibles, pero fuera de los subtotales.
+- Los pagos **Listo para Finanzas**, **Obligación creada**, **En orden de pago** y **Pagado** aparecen como incluidos del período. El subtotal de neto pagado al banco suma solo `paid`; por eso una fila en orden de pago puede aparecer sin aumentar el subtotal pagado.
 
 > **Importante**: el reporte muestra el **neto pagado al contractor**. La **retención SII** es un pasivo que Efeonce le remesa al SII por separado (F29), no se le paga al contractor. El reporte lo dice explícitamente y **no reemplaza** ni el comprobante individual ni la declaración de remesa.
 

@@ -1,15 +1,18 @@
 # Órdenes de Pago — Manual de uso
 
-> **Para que sirve:** convertir obligaciones financieras (nomina, facturas,
-> impuestos) en ordenes de pago auditables con maker-checker, programacion
-> y trazabilidad de envio al banco.
+> **Para que sirve:** convertir obligaciones financieras (nomina, contractors,
+> facturas, impuestos) en ordenes de pago auditables con maker-checker,
+> programacion y trazabilidad de envio al banco.
 
 ## Antes de empezar
 
 - Necesitas pertenecer al route group `finance` o tener rol `efeonce_admin`.
 - Las obligaciones de nomina se crean automaticamente al exportar un
-  periodo en `/hr/payroll`. Las facturas de proveedores y obligaciones
-  tributarias se materializaran en proximas iteraciones.
+  periodo en `/hr/payroll`.
+- Las obligaciones de contractors se crean desde `/finance/contractor-payments`
+  cuando el payable pasa a Finanzas y la corrida mensual prepara la orden.
+- Las facturas de proveedores y obligaciones tributarias se materializaran en
+  proximas iteraciones.
 - Para aprobar una orden necesitas un segundo usuario distinto al creador
   (regla maker-checker).
 
@@ -30,6 +33,19 @@
 
 > Si las obligaciones tienen monedas mixtas (CLP + USD), el sistema te
 > pedira crear una orden por moneda.
+
+## Orden creada por corrida de contractors
+
+Si vienes desde **Pagos a contractors**:
+
+1. Corre **Iniciar corrida mensual** en `/finance/contractor-payments`.
+2. La corrida crea una orden por moneda con titulo tipo `Corrida contractors junio 2026 · CLP`.
+3. Entra a `/finance/payment-orders`.
+4. Abre la orden en estado **Pendiente aprobacion**.
+5. Revisa las lineas `provider_payroll` y el neto de cada contractor.
+6. Continua con aprobar, programar/enviar y marcar pagada.
+
+La corrida no paga. Solo prepara la orden y mueve el payable contractor a **En orden de pago**.
 
 ## Aprobar una orden (maker-checker)
 
@@ -72,6 +88,10 @@ Las obligations vinculadas pasan a estado `paid` automaticamente. Para
 conciliar contra el extracto bancario usa el modulo `Finanzas →
 Conciliacion`.
 
+En ordenes de contractors, marcar la orden pagada tambien dispara el cascade que
+marca cada `contractor_payable` enlazado como **Pagado**. Desde ahi se habilita
+el comprobante individual del contractor.
+
 ## Cancelar una orden
 
 Solo aplica a ordenes en estado Borrador, Pendiente aprobacion, Aprobada
@@ -105,6 +125,8 @@ disponibles para una nueva orden.
 - **NO** marcar como pagada antes de tener confirmacion del banco — eso
   pasa las obligations a `paid` y el modulo Conciliacion espera ese
   pago en el extracto.
+- **NO** asumir que una corrida mensual ya pago al contractor — primero revisa
+  la orden creada y completa maker-checker + banco.
 - **NO** registrar pagos sueltos en `expense_payments` para ordenes ya
   marcadas pagadas; usa el flujo Conciliacion para vincularlos.
 

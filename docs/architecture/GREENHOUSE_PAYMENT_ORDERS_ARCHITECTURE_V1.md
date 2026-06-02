@@ -1,5 +1,34 @@
 # Greenhouse Payment Orders Architecture V1
 
+## Delta 2026-06-02 — Contractor payment orders as first-class consumer
+
+Payment Orders es el owner del tramo final de pagos a contractors. La corrida
+mensual de `/finance/contractor-payments` crea ordenes desde obligaciones con:
+
+- `source_kind='contractor_payable'`
+- `obligation_kind='provider_payroll'`
+- `amount = contractor_payables.net_payable`
+
+Estas ordenes usan la misma state machine que cualquier orden de Tesoreria:
+
+```text
+pending_approval -> approved -> scheduled/submitted -> paid -> reconciled/closed
+```
+
+Reglas:
+
+- La corrida contractor **prepara** la orden; no aprueba, no envia al banco y
+  no marca pagado.
+- Maker-checker se mantiene: el creador de la orden no debe aprobar su propia
+  orden cuando `require_approval=TRUE`.
+- Una orden es monomoneda; contractors CLP y USD se agrupan en ordenes
+  separadas.
+- Marcar la orden pagada emite `finance.payment_order.paid`; el consumer
+  contractor marca los payables asociados como `paid` y habilita el
+  remittance advice.
+- El banco paga el neto al contractor. La retencion SII no viaja al contractor;
+  queda como pasivo separado a remesar al SII.
+
 ## Delta 2026-05-05 — TASK-799 Processor Source + Settlement Policy
 
 Payment Orders V1 distingue de forma obligatoria:

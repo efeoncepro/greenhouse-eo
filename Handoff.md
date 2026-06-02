@@ -1,3 +1,35 @@
+# Sesion 2026-06-02 — Contractor payments end-to-end validado por operador + docs — ✅ DOCUMENTADO
+
+**Scope**: deuda cognitiva post-implementacion de agentes en pagos a contractors. El operador valido el flujo en `dev-greenhouse` desde la UI, sin que el agente hiciera mutaciones de estado.
+
+**Validacion operador**:
+- Valentina Hoyos `EO-CENG-0001` / payable `EO-CPAY-0001`.
+- `Enviar a Finanzas` paso el readiness y dejo el payable `Listo para Finanzas`.
+- `Iniciar corrida mensual` creo `1 orden de pago` con `1 pago incluido`.
+- El payable quedo `En orden de pago` (estado correcto: existe orden, falta approval/payment lifecycle de Tesoreria).
+
+**Contrato documentado**:
+- `ready_for_finance` = traspaso a Finance, no pago.
+- `payment_obligation` contractor = `source_kind='contractor_payable'`, `obligation_kind='provider_payroll'`, monto neto.
+- Corrida mensual = crea ordenes `pending_approval` por moneda; no aprueba ni paga.
+- Payment Orders mantiene ownership de approve/schedule/submit/mark-paid/settlement/reconciliation.
+- Solo `finance.payment_order.paid` marca el payable `paid` y habilita `EO-RA` + email.
+- Reporte de nomina de contractors puede listar compromisos; `Neto pagado` solo suma `paid`. Retencion SII queda como pasivo separado a remesar al SII.
+
+**Docs actualizados**:
+- `docs/manual-de-uso/finance/pagos-a-contractors.md`
+- `docs/manual-de-uso/finance/ordenes-de-pago.md`
+- `docs/documentation/finance/pagos-a-contractors.md`
+- `docs/documentation/finance/ordenes-de-pago.md`
+- `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
+- indices `docs/manual-de-uso/README.md` + `docs/documentation/README.md`
+- `changelog.md`
+
+**Pendiente operativo**: para cerrar Valentina hasta pago real, entrar a `/finance/payment-orders`, abrir la orden generada por la corrida contractor, aprobar con maker-checker, programar/enviar al banco, marcar pagada cuando exista confirmacion bancaria y luego conciliar. No usar scripts para avanzar estados.
+
+---
+
 # Sesion 2026-06-02 — Contractor payable readiness resuelve payment profile activo — ✅ VALIDADO LOCAL
 
 **Scope**: caso Valentina `EO-CPAY-0001`: al activar su payment profile, el payable no debia pedir waiver ni quedar bloqueado por `payment_profile_unresolved`.
