@@ -210,7 +210,10 @@ Hoy `rg organization_type src/lib/reliability/` = **cero matches**. El estado a 
 ## 9. Recomendación de cierre
 
 1. Aceptar esta auditoría como base.
-2. Crear un **TASK-### "Canonical Client Birth & Lifecycle"** (vía `greenhouse-task-planner`) que implemente los Slices 0-5, declarando como dependencia/activación a `GREENHOUSE_CLIENT_LIFECYCLE_V1` (Aceptada, no implementada) y coordinando con **TASK-990** para el facet financiero MXN de Berel.
-3. **NO** crear a Berel por el drawer de Finanzas mientras tanto — reproduciría el estado a medias. Berel queda como caso de validación de la puerta canónica.
+2. La solución se implementa partida en **dos tasks** (EPIC-CLIENT-360), por dependencia real con TASK-990:
+   - **TASK-991 — Canonical Organization Write SSOT + Birth Completeness** (FOUNDATION, prerequisito): helper SSOT `upsertCanonicalOrganization` + reconciliación `organization_type↔lifecycle_stage` + derivación country/tax + 4 signals + remediación de la **identidad** de Berel. **Va PRIMERO** — destraba el RFC match de TASK-990.
+   - **TASK-992 — Client Lifecycle Orchestrator + Single Front Door** (depende de 991): activa `client_lifecycle_case` (onboarding, per `GREENHOUSE_CLIENT_LIFECYCLE_V1` Aceptada-no-implementada) + puerta única (wizard) + timeline Account 360. **Va ÚLTIMO** — no bloquea el outcome de Berel.
+3. **Secuencia canónica: `991 → 990 → 992`.** TASK-990 puede arrancar su maquinaria de moneda en paralelo; solo su proyección de income de Berel espera a que 991 remedie la identidad de la org. El outcome de negocio de Berel (AR en MXN) se cierra con **991 + 990**; 992 es el arreglo sistémico durable.
+4. **NO** crear a Berel por el drawer de Finanzas mientras tanto — reproduciría el estado a medias. La identidad de Berel se remedia en TASK-991 (por el helper canónico) y su facet financiero MXN en TASK-990.
 
 > Patrón fuente para la implementación: TASK-760 (offboarding de colaboradores — `work_relationship_offboarding_cases`, battle-tested) espejado al dominio comercial, exactamente como `GREENHOUSE_CLIENT_LIFECYCLE_V1` ya lo prescribe.
