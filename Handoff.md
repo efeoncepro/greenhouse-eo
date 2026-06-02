@@ -1,3 +1,24 @@
+# Sesion 2026-06-02 — ADR + TASK-994 Workforce Payables Control Plane — 🆕 PROPUESTO
+
+**Scope**: auditoria conceptual Payroll + Contractor Payables para encontrar sinergias sin modificar runtime. El operador explicito que Payroll y Contractors son workforce pagada por Efeonce, pero pidio no tocar codigo.
+
+**Decision propuesta**:
+- Nuevo ADR: `docs/architecture/GREENHOUSE_WORKFORCE_PAYABLES_CONTROL_PLANE_V1.md` (`Status: Proposed`).
+- Nueva task: `docs/tasks/to-do/TASK-994-workforce-payables-control-plane.md`.
+- Tesis: converger operacionalmente en una capa read-only/projection-first de **Workforce Payables**, no meter contractors dentro de Payroll ni crear un motor universal de calculo.
+- Convergencia canonica: domain rail output -> `payment_obligations` -> `payment_orders` -> `expense_payment`/`settlement_leg` -> reconciliation -> artifacts/notifications.
+- Payroll sigue owner de calculo/entries/receipts/Previred-LRE/finiquitos.
+- Contractor Engagements sigue owner de evidencia/payables/gross-net-withholding/EO-RA.
+- Finance/Tesoreria sigue owner de Payment Orders, maker-checker, source instrument, paid, settlement y bank reconciliation.
+- V1 futura queda bloqueada por aceptacion humana del ADR.
+
+**Registros actualizados**:
+- `docs/architecture/DECISIONS_INDEX.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md` (siguiente ID `TASK-995`)
+
+---
+
 # Sesion 2026-06-02 — TASK-993 Contractor Payment Run Ready Email — 🆕 TASK CREADA
 
 **Scope**: follow-up operador tras validar el flujo contractor end-to-end: cuando la corrida mensual deja la nomina/ordenes listas, Finanzas quiere recibir un email como ocurre con payroll.
