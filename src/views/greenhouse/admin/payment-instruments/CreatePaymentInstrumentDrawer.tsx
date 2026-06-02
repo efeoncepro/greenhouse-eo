@@ -82,6 +82,7 @@ const initialForm = {
   cardLimitUsd: '',
   fintechProvider: '',
   fintechAccountId: '',
+  fintechAccountNumber: '',
   platformProvider: '',
   platformMerchantId: '',
   payrollProvider: '',
@@ -250,7 +251,11 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
             }
           }),
           ...(selectedCategory === 'fintech' && {
-            ...(form.fintechAccountId.trim() && { fintechAccountId: form.fintechAccountId.trim() })
+            ...(form.fintechAccountId.trim() && { fintechAccountId: form.fintechAccountId.trim() }),
+            // CLABE/IBAN/account number → canonical accounts.account_number (the
+            // POST route maps body.accountNumber). Distinct from the provider
+            // login id (fintechAccountId → provider_identifier).
+            ...(form.fintechAccountNumber.trim() && { accountNumber: form.fintechAccountNumber.trim() })
           }),
           ...(selectedCategory === 'payment_platform' && {
             ...(form.platformMerchantId.trim() && { merchantId: form.platformMerchantId.trim() })
@@ -523,7 +528,10 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
                     />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <CustomTextField fullWidth size='small' label='Email o ID de cuenta' value={form.fintechAccountId} onChange={event => updateForm('fintechAccountId', event.target.value)} />
+                    <CustomTextField fullWidth size='small' label='Email o ID de cuenta (login del proveedor)' value={form.fintechAccountId} onChange={event => updateForm('fintechAccountId', event.target.value)} />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <CustomTextField fullWidth size='small' label='Número de cuenta / CLABE / IBAN (opcional)' placeholder='Ej. CLABE de la cuenta Global66 MXN' value={form.fintechAccountNumber} onChange={event => updateForm('fintechAccountNumber', event.target.value)} />
                   </Grid>
                 </>
               ) : null}
