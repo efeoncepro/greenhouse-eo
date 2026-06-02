@@ -432,6 +432,157 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-790 — Contractor Engagements (Workforce/HR). El engagement vive bajo HR
+  // y NO reutiliza permisos de finiquito. read+manage siguen la matriz operador
+  // canonica de workforce: HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_engagement',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_engagement',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_engagement',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_engagement',
+      action: 'manage',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  // TASK-790 — revision del riesgo de reclasificacion laboral. Mas restrictiva:
+  // legal-sensitive. read para HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN;
+  // approve (registrar la revision que limpia/escala el riesgo) reservada a
+  // EFEONCE_ADMIN ∪ FINANCE_ADMIN ∪ HR_MANAGER.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_classification',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER)
+  ) {
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.contractor_classification',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  // TASK-792 — Contractor work submissions. read/create/update/manage para la
+  // matriz operador canónica HR route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN.
+  // La revision (approve/dispute/reject) usa la capability dedicada
+  // hr.contractor_work_submission.review (mismo set V1, granularidad para tightening futuro).
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    for (const action of ['read', 'create', 'update', 'manage'] as const) {
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'hr.contractor_work_submission',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+
+    for (const action of ['read', 'approve'] as const) {
+      addEntitlement(entries, {
+        module: 'hr',
+        capability: 'hr.contractor_work_submission.review',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
+  // TASK-793 — Contractor payables (finance.* domain). read/create/manage para
+  // finance route_group ∪ FINANCE_ADMIN ∪ EFEONCE_ADMIN. El waiver del gate de
+  // payment profile queda mas restringido (admins only).
+  if (
+    hasRouteGroup(subject, 'finance') ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance')
+      ? 'route_group'
+      : 'role'
+
+    for (const action of ['read', 'create', 'manage'] as const) {
+      addEntitlement(entries, {
+        module: 'finance',
+        capability: 'finance.contractor_payable',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
+  if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.contractor_payable.waive_payment_profile',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    // TASK-968 — agreed-amount guardrail override (admin-only, SoD vs HR set-amount).
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.contractor_payable.override_agreed_amount',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-874 — Workforce Activation readiness.
   // Read access follows the same operator matrix as complete_intake because the
   // workspace exposes blockers without sensitive values. Override is deliberately
@@ -1158,6 +1309,25 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     addEntitlement(entries, {
       module: 'my_workspace',
       capability: 'personal_workspace.payment_profile.request_change_self',
+      action: 'create',
+      scope: 'own',
+      source
+    })
+
+    // TASK-796 — Self-service contractor: lectura del propio engagement/estado +
+    // envío de work submission con adjuntos. Scope 'own' siempre. La aprobación
+    // es surface HR (hr.contractor_work_submission.review).
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'personal_workspace.contractor.read_self',
+      action: 'read',
+      scope: 'own',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'personal_workspace.contractor.submit_self',
       action: 'create',
       scope: 'own',
       source

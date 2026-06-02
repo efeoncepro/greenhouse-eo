@@ -48,3 +48,9 @@ export type {
   OperationalSignalListProps,
   OperationalSignalTone
 } from './OperationalSignalList'
+
+// Reusable KPI trend card — interactive month-over-month area chart (Recharts):
+// hover tooltip + crosshair, zone-tone semaphore, edge-to-edge line with inset
+// aligned dots/labels, draw-in + hover-lift microinteractions, a11y table.
+export { default as MetricTrendCard } from './MetricTrendCard'
+export type { MetricTrendCardProps, MetricTrendPoint, MetricTrendTone } from './MetricTrendCard'

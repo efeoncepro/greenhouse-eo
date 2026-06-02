@@ -359,8 +359,9 @@ export const GH_AGENCY = {
  *   - src/components/greenhouse/organization-workspace/FacetContentRouter.tsx
  *   - src/views/greenhouse/organizations/facets/*.tsx
  *
- * Tono es-CL tuteo. NO duplicar etiquetas que ya viven en greenhouse-nomenclature
- * (Pulse, Spaces, Ciclos), ni copy financial canónico (GH_AGENCY arriba).
+ * Tono es-CL neutro/tuteo. NO duplicar etiquetas que ya viven en
+ * greenhouse-nomenclature (Pulse, Spaces, Ciclos), ni copy financial canónico
+ * (GH_AGENCY arriba).
  */
 export const GH_ORGANIZATION_WORKSPACE = {
   shell: {
@@ -399,10 +400,10 @@ export const GH_ORGANIZATION_WORKSPACE = {
     degraded: {
       title: 'Workspace en modo degradado',
       reasons: {
-        relationship_lookup_failed: 'No pudimos resolver tu relación con esta organización. Volvé a intentar en unos segundos.',
-        entitlements_lookup_failed: 'No pudimos cargar tus permisos para esta organización. Volvé a intentar en unos segundos.',
-        no_facets_authorized: 'No tenés acceso a ninguna sección de esta organización. Hablá con un admin si necesitás acceso.',
-        unknown: 'No pudimos cargar el detalle de esta organización. Volvé a intentar en unos segundos.'
+        relationship_lookup_failed: 'No pudimos resolver tu relación con esta organización. Vuelve a intentar en unos segundos.',
+        entitlements_lookup_failed: 'No pudimos cargar tus permisos para esta organización. Vuelve a intentar en unos segundos.',
+        no_facets_authorized: 'No tienes acceso a ninguna sección de esta organización. Habla con un admin si necesitas acceso.',
+        unknown: 'No pudimos cargar el detalle de esta organización. Vuelve a intentar en unos segundos.'
       }
     },
     tabs: {

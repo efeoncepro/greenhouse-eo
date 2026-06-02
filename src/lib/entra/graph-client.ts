@@ -126,6 +126,29 @@ export const fetchEntraUserPhoto = async (
   return { buffer: Buffer.from(arrayBuffer), contentType }
 }
 
+export const fetchEntraUserById = async (
+  oid: string
+): Promise<EntraUserProfile | null> => {
+  const token = await getAccessToken()
+
+  const res = await fetch(
+    `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(oid)}?$select=${GRAPH_USER_FIELDS}`,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  )
+
+  if (res.status === 404) return null
+
+  if (!res.ok) {
+    const body = await res.text()
+
+    throw new Error(`[entra] Graph user request failed (${res.status}): ${body}`)
+  }
+
+  return (await res.json()) as EntraUserProfile
+}
+
 export const fetchEntraUsers = async (): Promise<EntraUserProfile[]> => {
   const token = await getAccessToken()
 

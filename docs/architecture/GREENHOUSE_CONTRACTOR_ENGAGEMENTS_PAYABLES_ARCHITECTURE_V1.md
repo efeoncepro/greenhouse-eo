@@ -1,8 +1,289 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.0
+**Version:** 1.11
 **Created:** 2026-05-05
-**Status:** Architecture proposal; runtime not implemented yet
+**Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + Employee→Contractor connected command (TASK-956) + Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification (TASK-957) + **Contractor Closure + Transition Controls (TASK-797)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955) and ops control plane (TASK-798) remain proposals.
+
+## Delta 2026-06-01 — TASK-985 Onboarding auto-activation (no más draft huérfano)
+
+El onboarding de contractor (Camino A nuevo + Camino B empleado→contractor) **auto-activa** el engagement (`draft → active`) cuando la clasificación **no es bloqueante**; queda retenido en `draft` solo ante riesgo **bloqueante** (`legal_review_required`/`blocked`).
+
+- **Causa raíz corregida**: el `draft` NO era una compuerta de compliance — el CHECK `contractor_engagements_active_requires_clear_risk` solo bloquea `active` para `legal_review_required`/`blocked`, **NO** para `needs_review`. El engagement nacía `draft` y el onboarding nunca lo avanzaba (estado huérfano; caso Valentina `EO-CENG-0001`).
+- **Helper canónico** `activateEngagementIfNotBlocking(client, engagement, actorUserId)` (store.ts): `draft → active` + evento `status_changed` + outbox `contractorEngagementActivated`; no-op si ya salió de draft o si el riesgo es bloqueante. Idempotente, reusable.
+- **Opt-in** `createContractorEngagement(input.activateWhenClassificationNotBlocking)` (default false → callers existentes intactos). Camino A route + `transitionEmployeeToContractorEngagement` lo activan. El branch `already_complete` del transition **cura** un draft huérfano existente al re-onboardear.
+- **Predicado puro** `shouldAutoActivateOnOnboard(status) = !isClassificationRiskBlocking(status)`.
+- **Salvedad / observabilidad**: nueva señal `hr.contractor_engagement.classification_review_pending` (data_quality, moduleKey=identity, warning>0) — worklist de `needs_review` no terminales (con conteo de activos), para que la revisión de clasificación quede visible y no se olvide tras la auto-activación.
+- **UI**: el wizard de onboarding refleja el estado real del resultado (Activo / Retenido para revisión), no "Borrador" fijo.
+- **Boundary (TASK-890/957)**: la activación toca solo `contractor_engagements.status`; NUNCA `member.contract_type`/finiquito/offboarding. Decisión arch-architect + greenhouse-ux (Opción A), aprobada operador. Spec: `docs/tasks/in-progress/TASK-985-contractor-onboarding-auto-activation.md`.
+
+## Delta 2026-06-01 — TASK-797 Contractor Closure + Transition Controls shipped (backend)
+
+Cierre contractor como **lifecycle propio** (NUNCA finiquito laboral), modelado sobre el state machine existente `active/paused → ending → ended` + columnas de metadata de cierre. **NO** se creó tabla/aggregate aparte: el cierre es 1:1 con el engagement y el audit ya vive en `contractor_engagement_events` (append-only trio TASK-790).
+
+- **Schema** (migration `20260601131829099`): `contractor_engagements` += `closure_reason` (CHECK enum cerrado: contract_completed/mutual_agreement/contractor_resignation/non_renewal/terminated_for_cause/converted_to_employee/provider_terminated/other), `closure_effective_date`, `provider_termination_ref` (solo carril EOR/provider), `closure_initiated_at/by`, `closure_executed_at/by`, `post_closure_invoices_allowed` (default FALSE).
+- **Readiness** (`closure/readiness.ts`, pure — mirror de `evaluatePayableReadiness`): blockers ACKNOWLEDGEABLE (open work submissions, open payables, provider_termination_ref_missing, classification_risk_blocking) — el operador puede cerrar con override declarando razón; `ready` exige cero blockers SIN reconocer. Advisory `access_handoff_reminder` (informativo, NUNCA bloquea — el access offboarding es SEPARADO).
+- **Comandos** (`closure/store.ts`, server-only): `assessContractorClosureReadiness` (resolver read-only), `initiateContractorClosure` (→ ending, winding-down), `executeContractorClosure` (→ ended, gateado, atómico two-step), `setPostClosureInvoicesAllowed` (política post-cierre).
+- **Post-closure policy**: nuevas work submissions bloqueadas en ending/ended/cancelled (`isPostClosureLockedEngagementStatus`); payables bloqueados tras `ended` salvo `post_closure_invoices_allowed`, `cancelled` nunca permite payables; durante `ending` se liquidan los payables de trabajo aprobado.
+- **API**: `GET/POST /api/hr/contractors/[id]/closure` (initiate|execute|allow_post_closure_invoices, capability `hr.contractor_engagement:manage`/`:read`). La transición genérica `PATCH [id]` ahora rechaza `ending`/`ended` → funnel al flujo de cierre (sin bypass del gate).
+- **Eventos**: `workforce.contractor_engagement.closure_initiated v1` (nuevo) + `ended v1` reusado con payload enriquecido.
+- **Reliability signal**: `hr.contractor_engagement.closed_with_open_payables` (data_quality, moduleKey=identity, steady=0) — defense-in-depth: cierres con payables abiertos por liquidar.
+- **Boundary duro (TASK-890)**: NUNCA `final_settlements`/causales DT, NUNCA toca lanes de `work_relationship_offboarding_cases`, NUNCA reactiva relación dependiente. Gate de cierre `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding` verde (566). Invariantes en `CLAUDE.md` → "Contractor Closure + Transition Controls invariants (TASK-797)".
+- **UI** (follow-up): el closure drawer en el HR workbench `/hr/contractors` queda como surface de consumo derivada; los 5 acceptance criteria son contratos backend-enforced (readiness vía API, submissions bloqueadas, post-closure explícito, nunca finiquito). Spec: `docs/tasks/in-progress/TASK-797-contractor-closure-transition-controls.md`.
+
+## Delta 2026-06-01 — TASK-981 Contractor Payable `paid` lifecycle + Remittance Email shipped
+
+Cierra el **tramo final del lifecycle** (`payment_order_created → paid`) y el **pegamento reactivo** que envía el comprobante TASK-960 al contractor por email cuando se le paga. Antes de TASK-981 **ningún writer** transicionaba el payable a `paid` ni emitía evento (mismo gap-class que TASK-979 cerró para `payment_order_created`) → el comprobante TASK-960 (gate `status='paid'`) era **inalcanzable**.
+
+Cadena canónica decoupled (mirror TASK-771):
+
+```text
+finance.payment_order.paid (settlement TASK-765/977)
+  → contractor-payable-paid-cascade: markPayablePaid por cada payable enlazado
+    (payment_order_id, status='payment_order_created') → emite
+    workforce.contractor_payable.paid v1
+      → contractor-payable-paid-email: resolveRemittanceAdvice (gate paid, re-read PG)
+        → generateContractorRemittancePdf → getProfileNotificationRecipient (canonical_email)
+        → sendEmail('contractor_remittance_paid', adjunto PDF, idempotente)
+```
+
+- **Writer ÚNICO** `markPayablePaid(input, client?)` (dual-mode, idempotente, mirror `markPayablePaymentOrderCreated`).
+- Migración additiva: CHECK `contractor_payable_events.event_type` + `paid`. State machine ya permitía `payment_order_created → paid` (TASK-793 forward-fix).
+- Template `ContractorRemittanceEmail` (es/en) + emailType `contractor_remittance_paid` (transactional). Skip honesto si no-paid / sin email (NO bloquea el batch).
+- Reliability signal `finance.contractor_remittance_email.dead_letter` (dead_letter, steady=0).
+- Idempotencia del email vía `sendEmail({ sourceEventId, sourceEntity })` (`wasEmailAlreadySent`).
+
+Spec: `docs/tasks/complete/TASK-981-contractor-payment-email-remittance.md`.
+
+## Delta 2026-05-31 — TASK-977 Contractor Payable Bank Settlement shipped (flag OFF)
+
+Cierra el **Hecho verificado 1** del audit de abajo: el contractor payable ahora **se puede liquidar al banco** por el motor canónico de settlement, detrás de flag (default OFF → parity bit-for-bit). El path de nómina queda 100% intacto.
+
+- **Expense reactivo (precondición):** el expense del contractor se materializa cuando el payable llega a `ready_for_finance` (espejo de `payroll-expense-reactive` al `exported`) — proyección `contractor_payable_expense_materialize`, helper `materializeContractorPayableExpense`. `total_amount=bruto`, `economic_category='labor_cost_external'` (resolver Rule 0 source-driven), `expense_type='contractor'`, `source_type='contractor_payable'`, `supplier_id=NULL`, anclado por la columna nueva `expenses.contractor_payable_id` (FK, migración `20260531184945430`). Idempotente (dedup por anchor).
+- **Settlement (rama aditiva, flag `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED`):** `recordPaymentForOrder` + `markPaymentOrderPaidAtomic` ganan una rama para `source_kind='contractor_payable'`/`obligation_kind='provider_payroll'` que resuelve el expense por `contractor_payable_id` → `recordExpensePayment(net, paymentSource='contractor_system')` → settlement_leg → bank debit. OFF mantiene `out_of_scope_v1`. `payment_source` CHECK widened a `'contractor_system'` (migración `20260531185842386`).
+- **Accounting (invariante TASK-795):** gasto=bruto, pago=neto, retención SII=pasivo a remesar **separado (F29, out of scope)** → honorarios queda `partial` hasta la remesa SII; withholding=0 queda `paid`.
+- **Signal:** `finance.contractor_payable.expense_unmaterialized` (data_quality, warning>0, steady=0).
+- **No-regresión:** `pnpm vitest run src/lib/payroll src/lib/finance/payment-orders` 585 verde con flag OFF.
+
+**Pendiente para pagar end-to-end:** flip del flag (post staging + finance sign-off) + la UI de Finanzas (TASK-974). **Follow-ups:** remesa SII (TASK-#), due_date cierre+5d + SLA (TASK-978), corrida mensual (TASK-979). Invariantes duros en `CLAUDE.md` → "Contractor Payable Bank Settlement invariants (TASK-977)". Spec: `docs/tasks/complete/TASK-977-contractor-payable-bank-settlement.md`.
+
+## Delta 2026-05-31 — Audit: End-to-end settlement gap + Monthly payment convergence target (verified, no inference)
+
+Revisión exhaustiva del backend de pago end-to-end (2026-05-31, leyendo el código). Documenta dos hechos verificados y un target de diseño explícito. **No es una implementación nueva — es la captura honesta de un gap y un objetivo.**
+
+### Hecho verificado 1 — El settlement al banco está fuera de scope para contractors en V1
+
+La cadena de pago de un contractor payable es: `ready_for_finance` → (bridge reactivo) `payment_obligation` (`source_kind='contractor_payable'`, `obligation_kind='provider_payroll'`, `amount=net_payable`) → `payment_order` (Finanzas) → settle al banco. **El último paso está bloqueado para contractors**:
+
+- `src/lib/finance/payment-orders/mark-paid-atomic.ts` (~línea 348) y `src/lib/finance/payment-orders/record-payment-from-order.ts` (~línea 218) **ambos** filtran `if (line.source_kind !== 'payroll' || line.obligation_kind !== 'employee_net_pay') throw PaymentOrderSettlementBlockedError('out_of_scope_v1')`.
+- Un contractor payable tiene `source_kind='contractor_payable'` + `obligation_kind='provider_payroll'` → **lanza `out_of_scope_v1` en el path atómico Y en el safety-net** → la orden no se marca pagada por el camino canónico.
+- El CHECK de `payment_obligations.obligation_kind` SÍ admite `provider_payroll`, pero el comentario de la migración (`20260501140545647`) lo describe literalmente como "placeholder Deel/EOR".
+- Consecuencia: hoy la obligación + la orden de pago de un contractor se pueden crear, pero **el dinero no sale del banco por el motor canónico de liquidación**. Es un gap de **backend**, NO de UI — ninguna de las tasks de pantallas (TASK-974/975/976) lo cubre.
+
+**Invariante a respetar al cerrar el gap**: extender el resolver de settlement para soportar `source_kind='contractor_payable'`/`obligation_kind='provider_payroll'` debe resolver el `expense_id` por un camino propio (el actual lo busca en `expenses WHERE payroll_period_id=...`, que no aplica a contractors) y clasificar el expense como `economic_category='labor_cost_external'` — NUNCA como nómina dependiente. El gross/withholding/net se leen verbatim del payable (TASK-793/794).
+
+### Hecho verificado 2 — No existe lógica de calendario de pago (cierre + 5 días) para contractors
+
+Grep exhaustivo (`first 5 days`, `cierre.*5`, `month_close`, `payout_due`, etc.) en `contractor-engagements/`, `payment-obligations/`, `payment-orders/`, `calendar/` → **vacío**. El `ContractorPayable.due_date` se setea por **input manual** (`body.dueDate ?? null` en `POST /api/finance/contractor-payables`), default vacío; no se computa desde el cierre del período operativo. El compromiso operativo de "pagar dentro de los primeros 5 días posteriores al cierre de mes" hoy es **manual/operativo**, no enforced por el sistema.
+
+### Target de diseño — Convergencia con el ciclo de pago mensual
+
+El punto canónico de convergencia entre nómina y contractors es **la capa de payment_obligations → payment_orders** (TASK-748/750): ambos rieles (`employee_net_pay` desde payroll, `provider_payroll` desde contractor payables) llegan a la misma tabla de obligaciones y se pagan desde el mismo workbench `/finance/payment-orders`. Para honrar el compromiso de los 5 días de forma sistémica se necesita (open design items, NO implementados):
+
+1. Cerrar el gap de settlement (`provider_payroll` → bank) — **prerequisito duro**; sin esto el contractor no se paga por el camino canónico.
+2. Una regla de `due_date` derivada del cierre del período (cierre + N días hábiles) en lugar de input manual.
+3. Opcional: una "corrida mensual" que arme las órdenes de pago de contractors del período (hoy es ad-hoc).
+4. Un signal de SLA ("payables/obligaciones de contractor vencidas vs el compromiso de 5 días") — hoy no existe.
+
+Doc funcional asociado: `docs/documentation/hr/contratistas-flujo-de-pago-completo.md` (explica el flujo + estos gaps en lenguaje simple).
+
+## Delta 2026-05-30 — TASK-957 Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification
+
+Cierra la open question de TASK-956 con veredicto 3-skill (finance + payroll + arch). Una persona podía cobrar por **dos rieles** sin exclusión mutua: nómina legacy honorarios (motor rutea por `compensation_versions.contract_type='honorarios'` → retención SII) + contractor payable (TASK-794, misma retención). Ambos corriendo → **doble-pago + doble declaración F29** (Efeonce remesa doble al SII + doble crédito tributario). SSOT canónico: **existencia de `ContractorEngagement` activo, NO `member.contract_type`**.
+
+- **Slice A** — gate `src/lib/payroll/contractor-exclusion/` (espejo exit-eligibility): excluye del roster legacy a quien tiene engagement engaged (active/paused/ending), flag `PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED` default OFF (parity bit-for-bit), keyed por engagement (NO `contract_type` → contractors Deel legacy sin engagement intactos). Señal `payroll.contractor.double_rail_overlap` (moduleKey payroll, error si count>0, corre regardless del flag). Hallazgo live: Valentina tenía comp version v2 sin cerrar (`effective_to=NULL`) pese a offboarding executed → remediado vía `scripts/payroll/close-contractor-orphan-comp-version-task957.ts` → señal steady=0.
+- **Slice B** — `member.contract_type` NO se muta (es tipo de contrato de EMPLEO, historia cuando termina; `'honorarios'` rutearía al riel SII legacy; nuevo enum = SSOT competidor + extiende taxonomía gobernada + rompe boundary). Resolver canónico `resolveCurrentWorkClassification` (`src/lib/account-360/`) lee la relación/engagement activa → clasificación vigente. Person 360 (`PersonProfileTab`) muestra "Estado vigente" (Contractor · Honorarios) + "Contrato de empleo" (historia). Fix latente: `toDateStr` robusto a Date (getPersonHrContext lanzaba para cualquier hire_date no-null).
+- Gates: no-regresión (payroll+offboarding+contractor) 673 · `pnpm test` 5637/0 · `pnpm build` ✓ · GVC Person 360 Valentina mostrando "Estado vigente: Contractor · Honorarios". Audit: 0 callsites legacy filtran empleados activos por contract_type+active.
+
+## Delta 2026-05-30 — TASK-956 Employee→Contractor connected command (entry point cableado)
+
+Cierra el **seam huérfano** del dominio: la transición employee→contractor que abre el `ContractorEngagement` no tenía caller ni entry point — `transitionEmployeeToContractor` (TASK-789) tenía 0 callers y la creación de engagement vivía solo en seeds/tests. Un colaborador que renunciaba (offboarding `executed`) y volvía como contractor quedaba sin engagement → sin superficie self-service (TASK-796) → sin payables. **Additive, cero código payroll, read-only/append-only sobre finiquito + offboarding.**
+
+- **Comando conectado atómico** `transitionEmployeeToContractorEngagement(input)` (`src/lib/contractor-engagements/transition-from-employee.ts`): cierra la relación `employee` + abre la `contractor` + crea el `ContractorEngagement` en **una sola `withGreenhousePostgresTransaction`**. Compone `transitionEmployeeToContractor` (TASK-789) + `createContractorEngagement` (TASK-790) vía **dual-mode** (`client?: PoolClient` opcional — patrón TASK-765/771/872). Idempotente/orphan-resume (`already_complete` / `engagement_created_on_existing_relationship` / `transitioned`). Mapper puro `mapRelationshipSubtypeToEngagementSubtype` (honorarios→honorarios_cl; contractor+CL→freelance; contractor+non-CL→international_contractor).
+- **Keyed en el offboarding case `executed`** (decoupled de la ratificación notarial del finiquito) → cierra por el camino canónico sin forzar. **NUNCA muta** `member.contract_type`, `final_settlements` ni el status del offboarding (solo el evento append-only de TASK-789).
+- **Entry point HR**: `POST /api/hr/contractors/transition-from-offboarding` (`requireHrTenantContext` + reuse capability `hr.contractor_engagement:manage` — su contrato canónico TASK-790 ya cubre "transition"; sin proliferar capability).
+- **Reliability signal** `hr.contractor.transition_orphan` (moduleKey identity, kind drift, steady=0): relaciones `contractor` activas creadas por transición (`source_of_truth IN (workforce_relationship_transition, operator_reconciliation)`) **sin** `ContractorEngagement` no-cancelado asociado — el estado parcial que el comando atómico previene pero que reconcile-drift (TASK-891, que NO crea engagement) podría dejar. Defense-in-depth observable.
+- **Fix latente TASK-790 expuesto** (patrón TASK-765 "mi cambio expuso un bug de dependencia → lo arreglo"): `createContractorEngagement` insertaba 31 columnas pero suplía 30 params (`classification_reviewed` $26 faltaba) — nunca surfaceó porque dev tenía 0 engagements y los tests mockeaban. El rollback atómico del comando mantuvo a Valentina pristine durante el intento fallido.
+- **Valentina Hoyos ejecutada por el camino canónico** (renunció 30/04, offboarding `executed`, contractor honorarios desde 01/06): employee ended 2026-04-30, contractor honorarios active 2026-06-01, engagement `EO-CENG-0001` (`honorarios_cl`, `needs_review`, SII `cl_honorarios_2026_15_25`). Member (`indefinido`), finiquito y offboarding **intactos**. GVC poblado verificado (self-service `honorarios_ready`/"Falta soporte", entidad `Efeonce Group SpA`).
+- Gates: hard-rule `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding src/lib/contractor-engagements` 661 passed · `pnpm test` 5626 passed · `pnpm build` ✓. **TASK-955** (provider settlement split + EOR) recoge el caso provider/plataforma.
+
+## Delta 2026-05-30 — TASK-796 Contractor Self-Service Hub shipped
+
+Las dos superficies UI del dominio están implementadas (develop), cableando los mockups aprobados al backend TASK-790→795 sin redisenar la IA. **Cero código payroll, additive.**
+
+- **Projection canónica server-only** (patrón TASK-835/611), único productor del view-model: `src/lib/contractor-engagements/{projection-types,self-service-scenario (mapper puro),self-service-projection,hr-workbench-projection,active-engagement-flag}.ts`. `withSourceTimeout` + degradación honesta + cache TTL 30s. El mapper filtra Finance-only (provider statements/fees) — el contractor nunca los ve.
+- **Carril API self-service member-scoped** (el gap load-bearing — todo lo previo era HR/Finance-gated): `GET /api/my/contractor`, `POST /api/my/contractor/work-submissions` (create+submit), `POST /api/my/contractor/attach-asset`. `requireMyTenantContext` + 2 capabilities `personal_workspace.contractor.{read_self,submit_self}` (scope own). Engagement resuelto del `identityProfileId` de sesión (anti-IDOR). HR workbench: `GET /api/hr/contractors/workbench` + review por el PATCH existente TASK-792.
+- **UI**: `/my/contractor` (hero + KPIs + blockers + closure sidecar + uploaders + composer/dispute drawers + payment-profile handoff que enlaza TASK-753 + timeline + historial) y `/hr/contractors` (cola + KPIs + readiness/finance-step + inspector + signals + admin review drawer con motivo contractor-visible ≥10 chars para dispute/reject).
+- **Governance**: migración `20260531030000000` seed `view_registry` + `role_view_assignments` (collaborator → self-service; HR+Finance+Admin → workbench) + `capabilities_registry` parity. **Nav dinámico** `/my/contractor` solo si hay engagement activo (flag JWT `hasActiveContractorEngagement`, mirror supervisorAccess).
+- Gates: `pnpm build` ✓ · `pnpm test` 5617 passed · tsc/lint clean · grant-coverage + view-registry tests verde. Closure real = TASK-797; payment profile NO se reconstruye (TASK-753).
+
+## Delta 2026-05-30 — TASK-795 Fase A: International Contractor Boundary + FX Policy shipped
+
+Fase A de TASK-795 está implementada (develop). Establece la **frontera tributaria** del contractor internacional/provider en el readiness fail-closed, **sin computar withholding** (eso es `international_internal`, TASK-905/906/907). **Cero migración, cero capability, cero outbox, cero código payroll** (patrón TASK-794). **Fase B diferida** (provider settlement split + EOR beneficiary + reconciliación) — el grueso de contractors son directos por `Efeonce Group SpA`; el carril provider/EOR es minoría (YAGNI hasta que exista un contractor real por plataforma).
+
+- **2 gates fail-closed** en `evaluatePayableReadiness` + `assessPayableReadiness`:
+  - `tax_owner_review_required` (universal): bloquea cuando `tax_compliance_owner ∈ {manual_review_required, country_engine_owned}`. El dominio contractor NUNCA aplica una tasa Chile→no-residente; bloquea + escala al motor `international_internal` (TASK-905) o a revisión humana (D-795-4).
+  - `fx_policy_unresolved` (solo cross-currency): exige `fx_policy_code` declarado en el engagement; una tasa que existe no basta — el cambio debe ser auditable (D-795-1).
+- **2 reliability signals** (moduleKey finance, steady=0): `finance.contractor_payable.tax_review_overdue` (drift >7d) + `finance.contractor_payable.fx_unresolved_overdue` (lag >3d). Leen `readiness_json->'blockers'` (JSONB `@>`), timestamp arithmetic (gate TASK-893).
+- **Decisiones canónicas** (ya en spec D-795-1..5): moneda CLP/USD rail (lo exótico → manual), split fee/spread separado (Fase B), contractor ≠ Provider + payee ≠ atribución, frontera dura vs 905, entidad contratante (`legal_entity_organization_id`) como dimensión raíz + roadmap multi-entidad (EEUU). Ver el "Modelo dimensional canónico" Delta de esta misma fecha.
+
+## Delta 2026-05-30 — Modelo dimensional canónico del Contractor (entidad contratante + frontera tributaria)
+
+> Design note (NO cambia código ni el modelo de payroll — lo robustece y le da single source of truth a TASK-795/796/797/798/905/906/907). Origen: diseño pre-ejecución de TASK-795 con `arch-architect` + `greenhouse-payroll-auditor`.
+
+Un Contractor se describe por **6 dimensiones ortogonales** que NUNCA se colapsan en un solo enum. Verificadas en el modelo TASK-790:
+
+| # | Dimensión | Campo canónico | Valores hoy |
+|---|---|---|---|
+| 1 | Persona que trabaja | `contractor_engagements.profile_id` | Persona / Colaborador (`identity_profiles`) |
+| 2 | **Entidad contratante / legal** (raíz) | `contractor_engagements.legal_entity_organization_id` (NOT NULL) | **Efeonce Group SpA** (Operating Entity, `organizations.is_operating_entity=TRUE`) |
+| 3 | Canal de pago | `payroll_via` (enum propio) | `internal` (directo) / `deel` / `remote` / `oyster` / `manual_provider` / `direct_international` |
+| 4 | Tax / compliance owner | `tax_compliance_owner` | `greenhouse_policy` / `provider_owned` / `manual_review_required` / `country_engine_owned` |
+| 5 | Payee de la obligación | `contractor_payables.beneficiary_*` | persona (directo) / provider (EOR) |
+| 6 | Sujeto de atribución de costo | la persona del engagement | **SIEMPRE la persona** |
+
+**Invariantes canónicos (robustecimiento, no cambio):**
+
+- **La entidad contratante (dim 2) es la dimensión raíz.** El payee (dim 5) y el tax owner (dim 4) son **consecuencias** de ella, no dimensiones independientes. Reusa la **Operating Entity canónica** (`is_operating_entity=TRUE`) — extender, no parallelizar.
+- **El contractor (la persona) NUNCA es un `greenhouse_core.providers`.** Solo la plataforma/EOR (Deel/Remote/Oyster) es un Provider comercial (payee de facturas EOR/fee). El catálogo TASK-701 ya contempla `provider_type='payroll_processor'/'payment_platform'`.
+- **Payee ≠ atribución de costo.** En EOR el banco paga a Deel (provider), pero el costo laboral se atribuye SIEMPRE a la persona (member loaded cost / client economics).
+- **La entidad contratante × país del contractor determina el régimen tributario:**
+  - Efeonce SpA (Chile) × honorario CL residente → retención SII (TASK-794) ✅
+  - Efeonce SpA (Chile) × no-residente → Chile→no-residente LIR Art. 59/74 → **TASK-905/906/907** (`international_internal`)
+  - Deel (EOR) × worker en su país → payroll/tax local del provider → `provider_owned`
+- **Frontera dura Contractor Payables ↔ Withholding Engine:** este dominio (790-798) **NUNCA computa retención Chile→no-residente** (treaty rates, certificados de residencia). Eso es el régimen `international_internal` + TASK-905/906/907. Un engagement directo internacional queda `manual_review_required`/`country_engine_owned` y **escala** al motor de withholding; nunca aplica una tasa por su cuenta.
+- **Roadmap multi-entidad (operador 2026-05-30):** HOY la única entidad contratante es `Efeonce Group SpA` (Santiago, Chile). Efeonce abrirá entidades legales en varios países (**EEUU primero** → `Efeonce US Inc`). Cada una será **una fila nueva en `organizations`** (`is_operating_entity=TRUE`, country distinto), un valor nuevo de `legal_entity_organization_id`, **sin rediseño del engagement** — pero cambia el régimen (un US contractor bajo `Efeonce US Inc` = US doméstico, no retención chilena). Eso es una **task futura multi-entidad/multi-jurisdicción**. **Regla dura: leer la entidad contratante del campo `legal_entity_organization_id`; NUNCA hardcodear "Efeonce/Chile" en código.** El modelo de "operating entity única" actual deberá volverse multi-entidad cuando abra EEUU (consideración futura, fuera de 790-798/905).
+
+### Invariantes contables (review `greenhouse-finance-accounting-operator` 2026-05-30)
+
+> Robustecimiento: nombra la realidad contable para que el código futuro no trate la retención como "un número" ni mezcle líneas P&L. No cambia el modelo de payroll.
+
+- **La retención NO es una reducción de costo — es un PASIVO a remesar al SII.** Contablemente: `Dr gasto laboral (BRUTO)` / `Cr banco (NETO al contractor)` / `Cr retención por enterar al SII (withholding)`. El **gasto es el bruto** (costo laboral completo); el `net` es lo que recibe el contractor; la retención (honorarios SII TASK-794 o Chile→no-residente TASK-905/F50) es una **obligación de remesa** que Efeonce, como **agente retenedor**, debe enterar vía **F29/F50 (día 12/20 del mes siguiente)**. Cuando Efeonce remesa, ese pago es `economic_category='tax'`.
+  - **Estado HOY:** la retención se computa y persiste (`siiRetentionAmount`), y la reconciliación contra F29 es **manual** (nota en `generate-payroll-excel.ts`). **NO existe** una obligación de remesa automatizada (pasivo→SII) en el flujo contractor/honorarios.
+  - **Candidate future task (cross-cutting, NO 790-798/905):** "SII Withholding Remittance Obligation + F29/F50 reconciliation" — materializar la retención como obligación de remesa + conciliarla. Abarca payroll honorarios + 794 + 905 + IVA. Fuera del scope de este epic; se nombra para que no se pierda.
+- **Reconocimiento del gasto = devengo en el período del trabajo (matching, IAS 1 / NIIF).** El costo laboral del contractor se reconoce cuando el **trabajo se realiza/aprueba** (la work submission TASK-792 lleva el período), NO cuando se paga. Para member loaded cost / client economics, **atribuir al período del trabajo**, no al `payment_date`. El payable es "obligación aprobada PREVIA a Finance" — el devengo precede al pago.
+- **Clasificación P&L de los componentes** (categorías canónicas TASK-768 que **ya existen** — no agregar enum): worker payout → `labor_cost_external` (opex), provider fee → `vendor_cost_professional_services` (opex), FX spread → `financial_cost` (resultado financiero), remesa SII → `tax`. El **FX realizado en settlement** fluye por el layer canónico de pagos (`expense_payments.fx_gain_loss_clp` → "Resultado cambiario", TASK-699/766) — el payable no recomputa FX.
+- **Defensa de tasa SII (discrepancia entre skills detectada 2026-05-30):** la tasa honorarios **2026 = 15,25%** es la canónica (Ley 21.133, +0,75 pp/año: 2024=13,75%, 2025=14,5%, 2026=15,25%, 2027=16%, 2028=17%), validada por `getSiiRetentionRate` (SSOT payroll) + watchlist `greenhouse-payroll-auditor`. Algunas referencias externas muestran un schedule viejo (2026=14,5%) — **es stale; NO bajar el código a 14,5%.** Single source of truth = `src/types/hr-contracts.ts` `SII_RETENTION_RATES`.
+
+## Delta 2026-05-31 — TASK-960 Contractor Remittance Advice ("Comprobante de Pago") shipped
+
+El contractor pagado ahora recibe un **Comprobante de Pago / Remittance Advice**: proyección **read-only** del `ContractorPayable` pagado (TASK-793), jurisdiction-neutral, **NO laboral, NO documento tributario** (referencia el BHE/invoice del contractor, no lo reemplaza). Ver + descargar en ambas superficies (Self-Service Hub del contractor + Admin Workbench HR/Finance).
+
+- **Un struct, dos renderers (cero drift, patrón TASK-758):** `RemittancePresentation` (`src/lib/contractor-engagements/remittance/types.ts`) alimenta el visor MUI in-app (`RemittanceAdviceViewer`) y el PDF descargable (`generate-contractor-remittance-pdf.tsx`). El presenter `buildRemittanceAdvice(input, locale)` es PURO y lee montos **verbatim** del payable (cero recompute; retención SII desde `taxWithholdingRateSnapshot`). El resolver server-only `resolveRemittanceAdvice` gatea `status='paid'`, resuelve issuer (Operating Entity por id, multi-entidad forward-compat), beneficiario (name + tax masked TASK-784), locale (`identity_profiles.preferred_locale`), número idempotente, y surface `engagementProfileId` para anti-IDOR.
+- **Numeración `EO-RA-NNNNNN`:** correlativa gapless + atómica (advisory lock por issuer, mirror TASK-700) + persistida una vez por payable (idempotente). Registry append-only `greenhouse_hr.remittance_advice_numbers` + SQL fn `allocate_remittance_advice_number(issuer, payable)` (migración `20260531131226949`). Asignación lazy en primera emisión; las listas solo LEEN (`getRemittanceAdviceNumbersForPayables`, batched).
+- **Endpoints:** `GET /api/my/contractor/remittance/[payableId]` (own, anti-IDOR `engagementProfileId === session.identityProfileId`, 404 no 403 anti-oracle) + `GET /api/hr/contractors/remittance/[payableId]` (tenant, `?locale` toggle). JSON struct o `?format=pdf` (`?disposition=inline|attachment`). Capabilities reusadas (`personal_workspace.contractor.read_self` + `hr.contractor_engagement`) — sin capability nueva, sin outbox nuevo, sin reliability signal nuevo (read-only).
+- **Bilingüe** es-CL/en-US (sigue el locale del contractor; copy en `src/lib/copy/remittance.ts`). **Dirección visual aprobada (vinculante):** un solo acento verde `#2E7D32` en el neto, título/chip/disclaimer neutros, logo Efeonce única marca, **sin firma**.
+- **Proyecciones (TASK-796) extendidas (aditivo):** `ContractorSelfServiceScenario.paidRemittances` + `ContractorHrWorkbenchProjection.remittances`.
+- **V1:** línea FX informacional omitida (el payable tiene `fxPolicyCode`, no la tasa aplicada → honest degrade, nunca inventa FX) — follow-up. **Out of scope:** Withholding Certificate anual (Certificado N°21 SII) — follow-up.
+
+Invariantes duros en `CLAUDE.md` → "Contractor Remittance Advice invariants (TASK-960)". Spec: `docs/tasks/complete/TASK-960-contractor-remittance-advice.md`.
+
+## Delta 2026-05-31 — TASK-968 Contractor Agreed-Amount Setup + SoD + Guardrail shipped
+
+Cierra el gap "¿dónde se setea el monto acordado del contractor?": los campos `contractor_engagements.rate_amount`/`rate_type`/`payment_cadence` existían (TASK-790) + el PATCH `update`, pero NO había UI para fijarlos (Valentina `EO-CENG-0001` quedó con `rate_amount=null`). Ahora el monto se fija desde admin con **separación de funciones (SoD)** dura: **HR fija ≠ contractor cobra ≠ Finance paga**.
+
+- **3 superficies (mockup aprobado vinculante):** (A) **Admin compensation editor** — `ContractorEngagementCompensationDrawer` + `CompensationPanel` en el workbench; HR fija `rateType`/`rateAmount`/`paymentCadence` vía `PATCH /api/hr/contractors/[id]` action `update` (capability `hr.contractor_engagement:update`); **moneda read-only** (se define al crear el engagement). (B) **Contractor self-service** — `ContractorSubmissionComposer` ya NO tiene campo libre de bruto; lo **deriva read-only** del rate acordado (fixed → rate; timesheet → qty × rate); sin rate → submit deshabilitado + warning. `ContractorSelfServiceView` muestra "Monto acordado" read-only. (C) **Finance guardrail** — `ContractorGuardrailPanel` lista payables bloqueados por exceder lo acordado + autoriza override.
+- **Guardrail fail-closed (`evaluatePayableReadiness`, gate `payment_exceeds_agreed_amount`):** flag `CONTRACTOR_AGREED_AMOUNT_GUARDRAIL_ENABLED` (default OFF → parity bit-for-bit). ON: payable con `gross > agreedAmount` (tolerancia 0.01) se bloquea salvo override. **Solo rate types de período** (`fixed`/`retainer`/`milestone`/`project` — `PERIOD_AGREED_RATE_TYPES`); unit-rate (`hourly`/`daily`) = no-op (`agreedAmount=null`, porque qty × rate excede legítimamente el rate por-unidad).
+- **Override gobernado (maker-checker, SoD):** capability `finance.contractor_payable.override_agreed_amount` (admin-only, **distinta** de la HR que fija el monto) + columna `agreed_amount_override_reason` (espejo del waiver TASK-793; actor+timestamp en `contractor_payable_events` append-only) + helper `overridePayableAgreedAmount` + endpoint `POST /api/finance/contractor-payables/[id]/override-agreed-amount`. Migración additive `20260531160513123`.
+- **2 reliability signals (steady=0):** `hr.contractor_engagement.rate_unset` (data_quality, identity, warning>0 — engagements activos sin `rate_amount`; detecta el gap "falta fijar el monto", verificado live = Valentina) + `finance.contractor_payable.exceeds_agreed_amount` (drift, finance, warning>0 — payables bloqueados sin override).
+- **Boundary (TASK-957/EPIC-013):** cero cambios a payroll engine / `payroll_entries` / `contract_type` / finiquito; `pnpm vitest run src/lib/payroll` verde como gate de cierre.
+
+Invariantes duros en `CLAUDE.md` → "Contractor Agreed-Amount SoD + Guardrail invariants (TASK-968)". Spec: `docs/tasks/complete/TASK-968-contractor-engagement-compensation-setup-agreed-amount-guardrail.md`.
+
+## Delta 2026-05-30 — TASK-794 Chile Honorarios Compliance + SII Retention shipped
+
+La capa de compliance Chile honorarios sobre Contractor Engagements + Payables está implementada. **No toca el motor de nómina legacy** (`src/lib/payroll/calculate-honorarios.ts`, `SII_RETENTION_RATES`) — cero cambio de números payroll (suite `src/lib/payroll` verde, 602 tests). **Sin migración**: el schema existente (`contractor_payables.readiness_json` / `source_snapshot_json`, `contractor_engagements.classification_risk_status` + `tax_withholding_*`) soporta todo el alcance.
+
+- **Módulo canónico** `src/lib/contractor-engagements/chile-honorarios/` — capa de compliance honorarios. NO es dueño de la tasa SII: la tasa vive en `getSiiRetentionRate` (payroll SSOT) y se expone a contractors vía `resolveHonorariosWithholdingPolicy` (TASK-790). El módulo reusa esas primitivas + agrega los invariantes honorarios.
+  - `resolveChileHonorariosPolicy({emissionYear, boletaFolio?})` → snapshot versionado (`policyCode` `cl_honorarios_<year>_<rate>` + `rateSnapshot` + `emissionYear` + `boletaFolio` where present).
+  - `computeChileHonorariosPayout({grossAmount, rateSnapshot})` → breakdown **SII-only** (`deductions: [{kind:'sii_retention', amount}]`), delega a `computeContractorWithholding` (TASK-793 SSOT) — nunca re-implementa `gross * rate`.
+  - `assertNoDependentDeductions(kinds)` + `DEPENDENT_DEDUCTION_KINDS` (afp/fonasa/isapre/afc/sis/mutual/iusc/apv/gratificacion_legal): guard canónico — el SSOT de "qué está prohibido en honorarios".
+  - `buildHonorariosPolicySnapshot(...)` → snapshot auditable persistido en `payable.source_snapshot_json.honorariosPolicy` (ambos create paths).
+  - `resolveHonorariosReadiness({profileId})` (server-only) → RUT verificado vía person-legal-profile `honorarios_closure` (CL_RUT `verified`; fail-closed; sin dirección).
+- **3 gates fail-closed nuevos** en `evaluatePayableReadiness` + `assessPayableReadiness`:
+  - `classification_risk_blocking` — **universal** (todos los lanes). Defensa payable-level que espeja el CHECK del engagement `active ⇒ classification_risk no bloqueante`: un payable creado cuando el engagement estaba clear no llega a Finance si el engagement escaló a `legal_review_required`/`blocked`.
+  - `rut_unverified` — **honorarios only**. Bloquea si el profile no tiene CL_RUT verificado.
+  - `honorarios_withholding_mismatch` — **honorarios only**. Recompute SII-only del payout y bloquea si el `withholding`/`net` persistido difiere → atrapa cualquier deducción dependiente o tasa errónea embebida.
+- **Reliability signal** `hr.contractor_payable.honorarios_rut_unverified` (kind=data_quality, moduleKey=identity, steady=0): cuenta honorarios_cl activos sin CL_RUT verificado (payable bloqueado). Análogo contractor de `identity.legal_profile.payroll_chile_blocking_finiquito`.
+- **Sin migración, sin capabilities/outbox nuevos**: reusa `finance.contractor_payable:manage` (gate de `transitionPayableToReadyForFinance`) + evento `workforce.contractor_payable.blocked v1` (ya lleva `blockerCodes`).
+
+### Cutover: payroll honorarios legacy → contractor payables
+
+Honorarios coexiste hoy en **dos canales**, ambos usando la MISMA tasa SII SSOT (`getSiiRetentionRate`):
+
+| Canal | Cómputo | Estado |
+|---|---|---|
+| **Payroll legacy** (`calculate-honorarios.ts` → `payroll_entries.siiRetentionAmount`) | retención SII en la corrida de nómina mensual | Vigente. NO se migra masivamente. Los pagos legacy no se rompen. |
+| **Contractor payable** (TASK-794, este canal) | payable con readiness fail-closed (RUT + classification + SII-only) → `payment_obligation` Finance | Canal canónico para pago flexible/honorarios gobernado hacia adelante. |
+
+**Convergencia gradual** (no big-bang): el pago flexible de honorarios fluye hacia Contractor Engagements + Payables; las entradas de payroll honorarios legacy continúan hasta una migración explícita por miembro. El cierre del honorarios es `contractor_closure` (TASK-797), **NUNCA** finiquito (`final_settlements`). Ni el canal legacy ni el contractor payable aplican jamás AFP/Fonasa/Isapre/AFC/SIS/mutual/IUSC dependiente — solo retención SII.
+
+## Delta 2026-05-30 — TASK-793 ContractorPayable + Finance bridge shipped
+
+`greenhouse_hr.contractor_payables` es el agregado de **obligación económica aprobada PREVIA a Finance** (Workforce/HR → Finance). El payable listo genera UNA `payment_obligation` vía bridge reactivo; Finance sigue siendo owner de payment orders + banco + conciliación.
+
+- **State-machine + CHECK + audit-trio** (patrón TASK-700/765/790/792): `contractor_payables` (CHECK enums + CHECK `net = gross − withholding` + CHECK `economic_category = 'labor_cost_external'` + BEFORE UPDATE transition trigger) + append-only `contractor_payable_events`. Estados: `pending_readiness → ready_for_finance → obligation_created → payment_order_created → paid`, + `blocked` (recoverable) + `cancelled`. Mirror TS `assertValidPayableTransition`.
+- **Anchor**: FK NOT NULL a `contractor_engagements` (RESTRICT) + FK opcional a `contractor_work_submissions` (lane PAYG/milestone). El `createFromSubmission` consume la submission (`consumed_by_payable_id`) en la misma tx — dup-guard DB UNIQUE + lock approved∧unconsumed. ALTER `contractor_work_submissions` cierra la FK que TASK-792 dejó NULL forward-compat.
+- **Withholding**: `computeContractorWithholding` retiene SOLO honorarios CL bajo `greenhouse_policy` con `taxWithholdingRateSnapshot` del engagement (TASK-790, NUNCA recomputa la tasa SII); resto = 0 (provider/country engine maneja su tax). `net = gross − withholding` (CHECK DB).
+- **Readiness fail-closed** (`evaluatePayableReadiness`, pure, 7 gates): source aprobado / invoice-asset cuando `requires_invoice` / net reconcilia / currency ∈ {CLP,USD} / FX resuelto cuando `payment_currency ≠ currency` / payment-profile resuelto **o waiver gobernado** / provider-split cuando `payroll_via ∈ {deel,remote,oyster}`. `assessPayableReadiness` resuelve los inputs (invoice via `listContractorInvoiceAssetsByEngagement`, FX via `getLatestStoredExchangeRatePair`) y alimenta el evaluador puro. Bloqueado → `blocked` + `blockerCodes[]` + throw.
+- **Bridge** (TASK-771 reactive pattern): projection `contractor_payable_finance_obligation` consume `workforce.contractor_payable.ready_for_finance`, re-lee el payable de PG (NUNCA confía el payload), skip idempotente si no existe / no-ready / unsupported currency, crea UNA `payment_obligation` (`createPaymentObligation`, idempotente por UNIQUE; `source_kind=contractor_payable`, `amount=net_payable`, `obligation_kind=provider_payroll`) y marca `obligation_created` (`markPayableObligationCreated`, no-op si ya linkeado). `maxRetries=5` + dead-letter del reactive log. ALTER `payment_obligations` source_kind `+contractor_payable` (additivo, shared Finance infra).
+- **Access**: capabilities `finance.contractor_payable` (read/create/manage) + `finance.contractor_payable.waive_payment_profile` (update, admins-only) + runtime grants (finance route_group ∪ FINANCE_ADMIN ∪ EFEONCE_ADMIN). API `/api/finance/contractor-payables` (list/create + detail + ready + cancel + waive) con `can(tenant,…)` + es-CL errors + `captureWithDomain`/`redactErrorForResponse`.
+- **Reliability** (moduleKey finance, rollup Finance Data Quality): `finance.contractor_payable.ready_without_obligation` (lag, payables ready >30min sin obligación) + `finance.contractor_payable.bridge_dead_letter` (dead_letter, reactive log `result='dead-letter'`). Wired en `getReliabilityOverview`. Steady=0.
+- **Guardrail payroll (no-regresión)**: el payable NUNCA escribe `payroll_entries`/`payroll_adjustments`/`compensation_versions`/`final_settlements` ni muta `members.{payroll_via,contract_type,pay_regime}`. Gate `pnpm vitest run src/lib/payroll` verde (522 passed).
+
+## Delta 2026-05-30 — TASK-792 Contractor Work Submissions shipped
+
+El agregado `ContractorWorkSubmission` está implementado: evidencia de trabajo con lifecycle de aprobación/disputa/rechazo, ANTES de generar un payable. La aprobación operacional NO es ejecución de pago.
+
+- **Tabla** `greenhouse_hr.contractor_work_submissions` (migración `20260531000000000`): tipos {timesheet, milestone, deliverable, project_fee, expense, off_cycle_adjustment}, estados {draft, submitted, approved, disputed, rejected, cancelled} con state machine + CHECK enums + CHECK `approved ⇒ gross_amount NOT NULL` + trigger de transición. Append-only `contractor_work_submission_events` (anti-UPDATE/DELETE).
+- **Evidencia (D-792-1)**: reusa el ledger TASK-791 vía columna additiva `contractor_invoice_assets.contractor_work_submission_id`; `attachContractorInvoiceAsset` extendido. Delivery refs (project/sprint) en `metadata_json`.
+- **Readiness + dup guard (D-792-3)**: `listWorkSubmissionsReadyForPayable` (approved ∧ unconsumed) + `markContractorWorkSubmissionConsumed` (idempotente) + columna `consumed_by_payable_id` NULL forward-compat (TASK-793 agrega la FK).
+- **Workflow** (`work-submissions/store.ts`): create/updateDraft/submit/review(approve|dispute|reject)/cancel/markConsumed en tx + outbox v1 + audit. dispute/reject reason ≥10; approve exige gross; cancel bloqueado si consumido.
+- **Access (D-792-4)**: capabilities `hr.contractor_work_submission` (read/create/update/manage) + `.review` (read/approve). API `/api/hr/contractors/work-submissions` (+ `[id]`).
+- **Reliability**: signal `hr.contractor_work_submission.review_overdue` (drift, steady=0).
+- **UI** deferida a TASK-796 (D-792-6).
+
+Pendiente: ContractorInvoice aggregate + FK `contractor_invoice_id`/`consumed_by_payable_id` (TASK-792 follow-up / TASK-793), ContractorPayable + Finance bridge (TASK-793), self-service UI (TASK-796).
+
+## Delta 2026-05-30 — TASK-791 Contractor Invoice Assets shipped
+
+La capa de assets del "Contractor Invoice Upload / Asset Contract" está implementada, reutilizando el uploader privado canónico (TASK-721) sin bucket nuevo.
+
+- **Contexts** (`src/types/assets.ts`): `contractor_invoice_draft`/`contractor_invoice`, `contractor_work_evidence_draft`/`contractor_work_evidence`, `provider_invoice_draft`/`provider_invoice`, `provider_payout_statement`. Retention: `contractor_invoice` + `contractor_work_evidence` nuevas; provider reusa `provider_supporting_doc`.
+- **Tabla hija** `greenhouse_hr.contractor_invoice_assets` (migración `20260530203116605`): ledger append-only (anti-UPDATE/DELETE) con `asset_role` / `artifact_kind` / `source` (CHECK enums del arch doc) + `country_code` + `uploaded_by_user_id`. FK NOT NULL a `contractor_engagements` (D-791-1); `contractor_invoice_id` NULL forward-compat (TASK-792 agrega la FK al crear `contractor_invoices`). UNIQUE `(contractor_engagement_id, asset_id)`.
+- **Helper** `attachContractorInvoiceAsset` (`src/lib/contractor-engagements/invoice-assets.ts`): valida engagement + asset (pre-flight) → INSERT link + `attachAssetToAggregate` (pending→attached) en una sola tx. `resolveFinalAttachContext` mapea draft→final y rechaza contextos no-contractor.
+- **Access**: `canTenantAccessAsset` extendido — contractor self + HR/Finance/admin para docs de contractor; provider docs ocultos al contractor. **MIME**: XML/JSON solo para invoice drafts.
+- **Reliability**: signal `hr.contractor_invoice_assets.broken_evidence` (data_quality, steady=0, mirror TASK-721).
+- **Access model decision**: se usa el patrón de assets `hasRouteGroup`/`hasRoleCode` (NO se seedearon los entitlements propuestos `hr.contractor_invoice.*` — quedan para una task derivada uniforme si emerge governance fina). Decisión D-791-2.
+
+Pendiente: WorkSubmission (TASK-792), ContractorInvoice aggregate + FK `contractor_invoice_id` (TASK-792), ContractorPayable + Finance bridge (TASK-793), self-service UI (TASK-796).
+
+## Delta 2026-05-29 — TASK-790 ContractorEngagement runtime shipped
+
+El aggregate raíz `ContractorEngagement` está implementado en runtime (Workforce/HR). Slices entregados:
+
+- **Schema** `greenhouse_hr.contractor_engagements` (state machine + CHECK enums + risk-gate CHECK `active ⇒ classification_risk no bloqueante` + BEFORE UPDATE transition-validation trigger) + append-only `greenhouse_hr.contractor_engagement_events` (anti-UPDATE/anti-DELETE triggers). Migración `20260529221452562`.
+- **Anchor (D1)**: el engagement hace FK a `person_legal_entity_relationships.relationship_id` (PK real es `relationship_id`, NO `person_legal_entity_relationship_id`) `ON DELETE RESTRICT`. La relación activa se resuelve vía `resolveActivePersonLegalEntityRelationships` (en `src/lib/account-360/person-legal-entity-relationships.ts`). El engagement NO crea relaciones (eso es TASK-789/891).
+- **Subtype SSOT (D2)**: `contractor_engagements.relationship_subtype` (5 valores finos: `honorarios_cl`, `freelance`, `independent_professional`, `international_contractor`, `provider_platform`) es SSOT propio, validado por consistencia de familia contra el subtype coarse de la relación (`{contractor,honorarios}` en `metadata.relationshipSubtype`). Sin write-back. Helper `assertSubtypeConsistency`.
+- **payroll_via (D3)**: enum propio del engagement (`internal/deel/remote/oyster/manual_provider/direct_international`), tipo TS distinto del `PayrollVia` de payroll. NUNCA se escribe a `members.{payroll_via,contract_type,pay_regime}`.
+- **Tax owner mandatory** + honorarios CL: `tax_compliance_owner` NOT NULL (default resuelto por `resolveDefaultTaxComplianceOwner`); honorarios snapshot de tasa SII (`getSiiRetentionRate`, 2026=0.1525) + `tax_withholding_policy_code` versionado (`cl_honorarios_2026_15_25`).
+- **Classification risk first-class**: `computeClassificationRisk(factors, reviewed, block)` determinístico; `clear` requiere review explícito; subordinación material → `legal_review_required` (bloquea `active` por CHECK + app guard). Escalar riesgo en un engagement `active` lo auto-pausa.
+- **Módulo TS**: `src/lib/contractor-engagements/` (barrel pure-only; store server-only importado directo). Helpers puros con tests (`state-machine`, `subtype-consistency`, `classification-risk`, `tax-policy`).
+- **Access**: capabilities `hr.contractor_engagement` (read/create/update/manage) + `hr.contractor_classification` (read/approve) + grants en `runtime.ts`. API `/api/hr/contractors` (GET/POST) + `/api/hr/contractors/[id]` (GET/PATCH: transition|update|review_classification).
+- **Reliability**: signal `hr.contractor_engagement.classification_risk_open` (kind=drift, moduleKey=identity, steady=0).
+- **Outbox v1**: `workforce.contractor_engagement.{created,activated,paused,ended,cancelled,classification_risk_flagged}` (aggregateType `contractor_engagement`).
+- **Payroll non-regression**: suite `src/lib/payroll` verde (522 tests). Cero escritura a `payroll_entries`/`payroll_adjustments`/`compensation_versions`/`final_settlements`.
+
+Pendiente (no implementado): WorkSubmission (TASK-792), Invoice + assets (TASK-791), ContractorPayable + Finance bridge (TASK-793), Chile honorarios readiness layer, provider imports.
 
 ## Purpose
 
@@ -1016,3 +1297,68 @@ Todas las preguntas originalmente abiertas quedan resueltas en `Resolved Archite
 - `member_id` no se crea automaticamente; solo cuando existe participacion operacional.
 - weekly/fixed payables no tienen auto-approval en V1.
 - VAT/IVA y facturas comerciales quedan en Finance AP, fuera de Contractor Payables V1.
+
+## Delta 2026-05-31 — Finance Contractor Payments Workbench (TASK-974)
+
+Cierra el gap de UI de Finanzas: el backend de payables (TASK-793/794/795/968) estaba completo pero Finanzas tenía 0% de pantalla. Esta task es **UI-only sobre los 7 endpoints existentes** (cero cambios a state machine, helpers o endpoints).
+
+- **Ruta canónica**: `/finance/contractor-payments`, ítem nuevo en el submenú **Tesorería** (junto a `payment-orders` + `cash-out`; lifecycles distintos, NO un tab). viewCode de gobernanza `finanzas.contractor_payables` (routePath `/finance/contractor-payments`) seedeado en `view_registry` + `role_view_assignments` para `efeonce_admin`/`finance_admin`/`finance_analyst` (migración `20260531195526233`, regla TASK-827).
+- **Reader canónico**: `listContractorPaymentsForWorkbench` (`src/lib/finance/contractor-payments/workbench-reader.ts`) enriquece los payables con `contractorName` + `engagementPublicId`. Expuesto vía `GET /api/finance/contractor-payables?workbench=1` (backward-compatible: sin el flag, el endpoint mantiene su shape previo).
+- **Breakdown verbatim**: bruto/retención/neto se leen del payable, NUNCA se recalculan en cliente. La tasa de retención honorarios CL viene del snapshot del engagement (TASK-794). El neto (`#2E7D32`) es lo que va al banco; la retención se remesa al SII por separado (F29) — refleja el invariante contable de TASK-795/977 ("gasto = bruto, retención = pasivo a remesar").
+- **SoD — override reubicado**: la autorización de pago que excede el monto acordado (`finance.contractor_payable.override_agreed_amount`) y el waiver de perfil de pago se operan **desde Finanzas** (workbench), no desde HR. El panel HR `ContractorGuardrailPanel` quedó **read-only**: muestra el bloqueo informativamente + link a `/finance/contractor-payments`. Esto cierra la ambigüedad de SoD de TASK-968 (la capability era de Finanzas pero el botón vivía en superficie HR).
+- **Boundary EPIC-013/TASK-957 preservado**: cero cambios a payroll engine / `payroll_entries` / `contract_type` / finiquito. Gate de cierre `pnpm vitest run src/lib/payroll` verde (532 passed).
+- **Mockup aprobado vinculante**: `src/views/greenhouse/finance/contractor-payments/mockup/` (regla TASK-863). Runtime GVC-verificado end-to-end (header + 4 KPIs + DataTableShell + empty state honesto + 2 CTAs).
+
+## Delta 2026-05-31 — HR Engagement Detail + Lifecycle + Classification Review (TASK-975)
+
+Cierra el gap #2 del EPIC contractors: el workbench HR (`/hr/contractors`) tenía la state machine + classification review + edición de términos en backend pero la UI cubría solo ~20% (cola + compensación). Esta task es **UI-only sobre el backend existente** (GET/PATCH `/api/hr/contractors/[id]` + 3 helpers server-only + 2 capabilities con SoD; cero endpoints/state-machine/migración).
+
+- **Decisión IA**: detalle + acciones viven como **Drawer + Dialogs dentro del workbench** (extender la inspector column), NO página dedicada `/hr/contractors/[id]` — un único surface HR contractor, sin fragmentar viewCode/route/breadcrumb. Reversible a ruta si emerge deep-link.
+- **4 componentes runtime nuevos** (`src/views/greenhouse/contractors/`): `ContractorEngagementDetailDrawer` (GET `/[id]` → términos agrupados económicos/tributario/proveedor/fechas + máquina de estados + factores read-only), `ContractorLifecycleControls` (solo transiciones válidas vía `ENGAGEMENT_TRANSITIONS`; oculta "Activar" cuando `isClassificationRiskBlocking`; confirm dialog con motivo ≥10 para pause/ending/cancel → `PATCH action=transition`), `ContractorClassificationReviewDialog` (7 factores + reviewed/block switches + motivo + preview vivo con `computeClassificationRisk` → `PATCH action=review_classification`, capability `hr.contractor_classification:approve` SoD), `ContractorEngagementTermsDrawer` (payment model/FX/provider refs/flags/bonus/end date — NO tarifa, que la edita el compensation drawer; diff de cambios → `PATCH action=update`).
+- **Helper compartido** `src/lib/contractor-engagements/engagement-display.ts` (puro, label/tone/icon maps desde `GH_CONTRACTOR_COMPENSATION`).
+- **Projection additive**: `ContractorWorkbenchQueueRow.lifecycleStatus` (raw `status` enum) + `classificationRiskStatus` retipado a enum canónico — para que el inspector derive las transiciones. Único cambio backend (read-projection, sin endpoint).
+- **Capability gating server-side**: el page computa `canManage` (`hr.contractor_engagement:update`) + `canReviewClassification` (`hr.contractor_classification:approve`) y los pasa al view; la UI esconde/deshabilita acciones según corresponde (el server enforza igual).
+- **Boundary EPIC-013/TASK-957**: cero cambios a payroll/`contract_type`/finiquito. Gates: tsc/lint/design 0 · `pnpm vitest run src/lib/payroll` 532 · contractor-engagements 132 · `pnpm test` full + `pnpm build` verde. Mockup aprobado + loop GVC (verificación con data real de la cola en staging, production verification sequence). Reusa viewCode `equipo.contratistas` (sin migración).
+
+## Delta 2026-05-31 — HR Contractor Onboarding wizard (TASK-976)
+
+Cierra el gap #3 del EPIC contractors: crear un contractor solo se podía por API/script (Valentina se creó así). Wizard HR/People-first `/hr/contractors/new` con branching A/B. **UI-only sobre 2 endpoints existentes** + 1 endpoint thin de read nuevo (justificado por gap detectado en Plan Mode).
+
+- **Decisiones (Open Questions)**: (OQ1) **INDEPENDIENTE** de TASK-965 (Unified Worker Workflow, EPIC-017) — gated + no iniciado; HR necesita la superficie ya; cuando TASK-965 entregue su carril contractor, absorbe esta. (OQ2) Camino A **EXIGE** la relación legal (no la fabrica): si la persona no tiene relación contractor pero tiene offboarding `executed` → deriva al Camino B; si no → guidance Person 360 (out of scope). Fabricar la relación bypasearía el anchor legal + la gobernanza Person 360 (TASK-891).
+- **Camino B** (`POST /api/hr/contractors/transition-from-offboarding`, cap `manage`): wizard desde un offboarding `executed` → términos → transición **atómica** empleado→contractor (TASK-956). Surface honesto de los **3 outcomes idempotentes** (`transitioned` / `engagement_created_on_existing_relationship` / `already_complete`). Boundary read-only/append-only sobre finiquito+offboarding+member.
+- **Camino A** (`POST /api/hr/contractors`, cap `create`): persona (people-search) → resuelve su relación contractor → términos → engagement `draft`+`needs_review`.
+- **Endpoint nuevo** `GET /api/hr/contractors/onboarding/resolve?profileId=` (cap `read`): compone `resolveActivePersonLegalEntityRelationships` + `listOffboardingCases({status:'executed'})` → `{contractorRelationship|null, executedOffboarding|null}` para el branching A/B. Reusa `/api/organizations/people-search` + `getOperatingEntityIdentity()`; offboarding executed se fetchea server-side en el page.
+- **Wizard runtime** (`ContractorOnboardingWizard.tsx`, forms-ux Lane C): Stepper + branching declarativo + per-step validation (effective_from > lastWorkingDay, reason ≥10) + back-preserves-state. Capability gating server-side (`canCreate`/`canManage`). Template: SampleSprints.
+- **Boundary EPIC-013/TASK-956/957**: cero cambios a payroll/`contract_type`/finiquito. Gates: tsc/lint/design 0 · `pnpm vitest run src/lib/payroll + workforce/offboarding + contractor-engagements` 698 · `pnpm test` full + `pnpm build` verde. Mockup aprobado + GVC (runtime renderiza; data real de offboarding en staging). Reusa viewCode `equipo.contratistas` (sin migración). Sin endpoints de mutación nuevos (solo 1 read).
+
+## Delta 2026-05-31 — Contractor payment due-date + SLA signal (TASK-978)
+
+Hace visible el compromiso de Efeonce de pagar a contractors dentro de los **primeros 5 días hábiles posteriores al cierre de mes** — antes 100% invisible (el `due_date` era input manual con default vacío).
+
+- **Derivación canónica del `due_date`**: `resolveContractorPaymentDueDate` (`src/lib/contractor-engagements/payables/due-date.ts`, pura) = **cierre del mes operativo del payable + 5 días hábiles**. Ancla = último día hábil del mes operativo (`getOperationalPayrollMonth` → `getLastBusinessDayOfMonth`), porque el payable NO tiene `service_period`. Aplicada en `createContractorPayableFromSubmission`/`OffCycle` **solo cuando `dueDate` no fue provisto** (override manual gana). La obligación hereda el `due_date` (el bridge ya lo pasa).
+- **Primitiva de calendario nueva `addBusinessDays(date, n)`** en `operational-calendar.ts` (SSOT, +tests). Reusa `DEFAULT_OPERATIONAL_CLOSE_WINDOW_BUSINESS_DAYS` (=5). **Reusable por nómina** (hoy las obligaciones de nómina usan `dueDate: periodEnd`, inconsistente con el compromiso de 5 días — una task futura las alinea con este helper canónico).
+- **SLA signal** `finance.contractor_payable.payment_sla_overdue` (kind=lag, moduleKey finance, steady=0): payables comprometidos (`ready_for_finance`/`obligation_created`/`payment_order_created`), no pagados, con `due_date < CURRENT_DATE`. Severidad ok / warning (≤10d) / error (>10d) / unknown. **Es observabilidad, no gate** (no bloquea el payable).
+- **Distinción crítica (finance)**: el SLA mide el **pago NETO al contractor**. La **remesa de la retención SII** (honorarios CL) es una **obligación DISTINTA** con su propio deadline **F29 (día 12/20 del mes siguiente)** y otro beneficiario (el SII) — NO se confunde con este SLA (out of scope, TASK-977 invariant).
+- **Sin migración, sin capability/outbox nuevos.** Date arithmetic `CURRENT_DATE - due_date` (integer days, no `EXTRACT(EPOCH FROM date)` — gate TASK-893). Gates: vitest calendar+due-date 16/16 · payables 43/43 · payroll+calendar 552 (boundary) · signal 4/4 + **live PG smoke severity=ok count=0** · tsc/lint 0.
+
+## Delta 2026-05-31 — Contractor Run Report "Nómina de Contractors" (TASK-980)
+
+Reporte de período (PDF + Excel) de pagos a contractors — espejo del reporte de payroll (TASK-782) + infra del comprobante individual (TASK-960). **Read-only**, monto verbatim.
+
+- **Reader** `buildContractorRunReport` (`run-report-reader.ts`, server-only): lista los payables del **mes operativo** (`getOperationalPayrollMonth(due_date ?? created_at)`, mismo ancla TASK-978/979 — query con ventana calendario acotada + refine en TS), agrupa en 2 grupos contables (Honorarios CL con retención SII vs Internacional) con subtotales por moneda **mutuamente excluyentes** (retención SII solo honorarios → F29; neto pagado solo `paid` → banco). Incluidos = comprometidos (ready/obligation/payment_order/paid); excluidos = blocked/pending; cancelled omitido. Enrichment: nombre + EO-CENG + EO-RA (read) + rate snapshot.
+- **Clasificador de régimen compartido**: `deriveContractorRemittanceRegime` extraído de `remittance-resolver.ts` (TASK-960) a `remittance/regime.ts` (single source of truth que ahora consumen el comprobante Y el reporte). `toContractorReportRegimeGroup` colapsa los 4 régimenes a 2.
+- **Generadores puros** (transforman el `ContractorRunReport`, el reader hace el IO): `generateContractorRunPdf` (masthead con logo + `EfeonceSloganPdf` Poppins + título/período/emisor; summary strip por moneda con neto en verde; tabla por régimen con subtotales; nota contable; `EfeoncePdfFooter` fixed + página X de Y; Geist body via `ensurePdfFontsRegistered`) + `generateContractorRunExcel` (ExcelJS: Resumen/Honorarios CL/Internacional/Excluidos, header verde, CLP `#,##0`/USD `#,##0.00`, `—` para N/A). Render visual verificado (PDF real → PNG).
+- **Endpoint** `GET /api/finance/contractor-payables/run-report?periodYear=&periodMonth=&format=pdf|excel` (capability `finance.contractor_payable:read`, reuso) → `NextResponse(Uint8Array, Content-Disposition attachment)`. Botón "Descargar nómina" + dialog (mes/año + PDF/Excel) en el workbench.
+- **Boundary EPIC-013/957**: cero nómina/`contract_type`/finiquito. La remesa SII (F29) NO es el neto (nota contable explícita). Gates: tsc/lint/design 0 · régime 6/6 + reader 6/6 + excel 2/2 + pdf 2/2 + boundary contractor 148 · live PG smoke · end-to-end agent auth (PDF `%PDF` + Excel `PK`).
+
+## Delta 2026-05-31 — Monthly Contractor Payment Run (TASK-979)
+
+La **corrida mensual** cierra operativamente el compromiso de los 5 días: en vez de armar órdenes de a una, barre el período y prepara las órdenes agrupadas. **Prepara — NO paga** (maker-checker intacto).
+
+- **Orquestador** `prepareMonthlyContractorPaymentRun` (`monthly-run.ts`, server-only): cutoff = `addBusinessDays(getLastBusinessDayOfMonth(Y,M), 5)`; barre obligations `provider_payroll` (source_kind `contractor_payable`) `due_date <= cutoff` aún NO batcheadas (incluye overdue stranded de meses previos), prioriza por `due_date ASC`, agrupa por **moneda** (regla single-currency de `createPaymentOrderFromObligations`, TASK-750) y crea órdenes `pending_approval`. `dryRun: true` = preview sin mutar.
+- **Atomicidad**: sweep + N órdenes + N transiciones de payable corren en UNA tx (rollback total si algo falla → re-correr safe). El run queda auditado en `greenhouse_sync.contractor_payment_runs` (append-only, triggers anti-UPDATE/DELETE, mirror TASK-900): `running → succeeded|failed`.
+- **Cierre del lifecycle del payable**: `markPayablePaymentOrderCreated` (`store.ts`, dual-mode `client?`) es el **writer ÚNICO** de la transición `obligation_created → payment_order_created` — la state machine la exige antes de `paid` y **nadie la escribía** (gap descubierto en discovery: 0 writers, 0 consumer de `finance.payment_order.created`). Emite `workforce.contractor_payable.payment_order_created v1`. Migración extiende el CHECK `contractor_payable_events.event_type` con el nuevo valor.
+- **Idempotencia** (defensa en profundidad, sin tabla en el hot path): filtro un-ordered (`LEFT JOIN payment_order_lines` line NULL) + status orderable + lock UNIQUE `payment_order_lines(obligation_id)` (concurrencia: el perdedor aborta con `obligation_already_locked`).
+- **Trigger V1: manual** — `POST /api/finance/contractor-payables/monthly-run` (capability `finance.contractor_payable:manage`, reuso) + botón "Iniciar corrida mensual" en `/finance/contractor-payments` (dialog confirm-con-preview: selector de mes operativo → dry-run preview → "Preparar órdenes"). Schedule automático (Cloud Scheduler) = follow-up detrás de `CONTRACTOR_MONTHLY_RUN_ENABLED`, no se activa hasta TASK-977 settlement ON.
+- **Signal** `finance.contractor_payable.unbatched_overdue` (kind drift, moduleKey finance, steady=0): obligación batcheable vencida sin batchear → remediación: disparar la corrida. Distinto de `payment_sla_overdue` (TASK-978, más amplio) y `ready_without_obligation` (TASK-793, tramo anterior).
+- **Boundary EPIC-013/957**: cero nómina/`contract_type`/finiquito. La remesa SII (F29) NO es parte de la corrida (paga el NETO al contractor). Gates: tsc/lint/design 0 · orchestrator 6/6 + signal 4/4 + state-machine + live PG smoke (sweep válido, run-table triggers OK, CHECK extendido) · boundary payroll 532 · GVC end-to-end (botón + dialog + dry-run API 200 → "Nada por preparar"). Migración `20260531235624882`.

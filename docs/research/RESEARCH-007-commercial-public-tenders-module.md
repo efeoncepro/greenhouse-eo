@@ -1,7 +1,7 @@
 # RESEARCH-007 — Commercial Public Tenders Module
 
 > **Tipo de documento:** Research brief (modulo naciente)
-> **Version:** 0.5
+> **Version:** 0.6
 > **Creado:** 2026-04-26 por Julio + Codex
 > **Status:** Active
 > **Alcance:** Dominio Commercial / Comercial, licitaciones publicas ChileCompra, Mercado Publico API, adjuntos de licitacion, opportunity-to-bid, bid desk interno
@@ -22,6 +22,8 @@ El objetivo no es solo listar licitaciones de Mercado Publico. El objetivo es co
 Este brief nace despues de validar acceso real a la API de Mercado Publico y comprobar que los adjuntos de una licitacion se pueden recuperar desde la ficha publica usando el flujo WebForms de MercadoPublico.cl.
 
 > **Delta 2026-04-26:** `TASK-673` implemento un POC standalone de matcher comercial en `scripts/research/mercadopublico-poc/`. Hallazgos iniciales: el listado `estado=activas` trae solo campos resumidos; `Descripcion` e `Items` requieren llamada por `codigo`; las senales no canonicas como medios/PR/influencers deben vivir separadas de `servicios_matched`. Resultados en `docs/research/TASK-673-findings.md`.
+
+> **Delta 2026-05-30:** revision arquitectonica del programa despues de validar Compra Agil API v2 Beta. `TASK-678` pasa a ser P1/policy gate para congelar convivencia API v2 live + COT mensual historico/fallback + OC post-award; `TASK-677` queda explicitamente historico/backfill/benchmark/fallback; `TASK-675/676/682/683/687` quedan ajustadas para depender del registry/freeze correcto antes de implementar runtime.
 
 ## Contexto Confirmado
 
@@ -338,16 +340,35 @@ Codigo:
 
 Hallazgo 2026-04-26: hay cinco caminos distintos para encontrar o reconstruir Compra Agil, con distintas latencias y niveles de oficialidad.
 
-**1. API Beta Compra Agil anunciada por ChileCompra**
+**1. API Compra Agil v2 Beta oficial**
 
-ChileCompra publico el 17 de abril de 2026 que lanzara en mayo una nueva **API de Compra Agil version Beta**, actualmente en certificacion y pruebas tecnicas. La consulta publica previa indica que la nueva version de APIs incorporara oportunidades de negocio de Compra Agil y Licitacion, incluyendo documentos adjuntos.
+ChileCompra publico la **API Compra Agil v2 Beta** durante mayo 2026. Fuente oficial: noticia ChileCompra del 25 de mayo de 2026 y guia `Documentacion_API_Compra_Agil.pdf` version 3.0, mayo 2026.
+
+Contrato observado/validado 2026-05-30:
+
+- Base URL oficial: `https://api2.mercadopublico.cl`.
+- Endpoints principales:
+  - `GET /v2/compra-agil`
+  - `GET /v2/compra-agil/{codigo}`
+- Autenticacion: header HTTP `ticket: <ticket>`, no query param `ticket=...`.
+- El ticket canonico existente de Mercado Publico (`greenhouse-mercado-publico-ticket`) autentica correctamente contra Compra Agil v2.
+- Smoke con `ttl_cambio_ms=300000&tamano_pagina=10` devolvio `HTTP 200` y `success=OK`.
+- Smoke con `publicado_desde=2026-05-29T00:00:00Z&publicado_hasta=2026-05-30T23:59:59Z&tamano_pagina=10` devolvio `HTTP 200`, `success=OK`, `total_resultados=3114`, `total_paginas=312`.
+- La API expone Compra Agil como codigos `COT`, estados normalizados, documentos, institucion, productos, proveedores cotizando, montos y link con orden de compra mediante `orden_compra.id_orden_compra`.
+- Adjuntos/documentos en API v2: el detalle oficial expone solo metadata `documentos[].id` y `documentos[].nombre`. Ejemplos validados 2026-05-30: `5756-282-COT26` -> `{ id: 1540510, nombre: "CARROS.pdf" }`; `1195-39-COT26` -> `{ id: 68071, nombre: "ANEXO ADQUISICIÓN DE MATERIALES ELÉCTRICOS EXPO PATAGONIA.docx" }`.
+- Descarga de adjuntos Compra Agil: la guia oficial no documenta endpoint de descarga. Smokes contra rutas probables de `api2.mercadopublico.cl` (`/v2/compra-agil/{codigo}/documentos/{id}`, `/descargar`, `/v2/documentos/{id}`, etc.) devolvieron `403 Missing Authentication Token`, indicando que no son rutas publicas del API Gateway oficial.
+- SPA Compra Agil: el bundle publico referencia endpoints internos de adjuntos bajo `servicios-compra-agil.mercadopublico.cl/v1/compra-agil/*` como `/proveedor/cotizacion/descargarAdjunto/{id}` y `/comprador/descargar?id={id}`, pero smokes anonimos devolvieron `401 Unauthorized` o `503` para variantes `compra-agil-adjuntos`. No usarlos como contrato backend productivo sin autorizacion explicita/sesion humana.
+- Limitacion documentada: no existe filtro `codigo_organismo`; para organismo especifico hay que filtrar por `region` y luego por `institucion.rut` o `institucion.organismo_comprador` en Greenhouse.
+- Nota de modelo documentada por ChileCompra: `estado=oc_emitida` no aparece en la practica; para detectar OC emitida usar detalle y `orden_compra.id_orden_compra != null`.
 
 Implicacion:
 
-- Este debe ser el carril oficial preferido apenas este publicado.
-- Greenhouse debe dejar un feature flag / provider adapter `mercado_publico_compra_agil_beta_api`.
+- Este pasa a ser el carril oficial preferido para radar near-real-time de Compra Agil.
+- Greenhouse debe implementar un provider adapter `mercado_publico_compra_agil_v2` con feature flag/kill switch y budget de cuota.
+- `TASK-677` COT mensual sigue siendo util para historico/backfill/benchmark, pero ya no debe tratarse como la unica fuente oficial de Compra Agil.
+- Para documentos Compra Agil, API v2 permite estado `discovered` con `external_document_id` y filename, pero no `downloaded`. `TASK-679` debe resolver un carril separado de descarga autorizada o dejar degradacion honesta.
 - No conviene invertir demasiado en scraping irreversible antes de ver el contrato Beta.
-- En backlog: monitorear `api.mercadopublico.cl`, `desarrolladores.mercadopublico.cl/lista-apis` y noticias ChileCompra durante mayo 2026.
+- El adapter productivo debe respetar `429`, paginacion maxima `tamano_pagina=50`, watermarks por `fechas.fecha_ultimo_cambio` y fallback a COT mensual si la Beta degrada.
 
 **2. Datos Abiertos mensuales `COT_YYYY-MM.zip`**
 
@@ -460,12 +481,14 @@ Endpoints observados en el bundle:
 - `/v1/compra-agil/proveedor/cotizacion`
 - `/v1/compra-agil/proveedor/cotizacion/adjuntos/`
 - `/v1/compra-agil/proveedor/cotizacion/descargarAdjunto/`
+- `/v1/compra-agil/comprador/listar/<codigo>`
+- `/v1/compra-agil/comprador/descargar?id=<documento_id>`
 - `/v1/compra-agil/orden-compra/crear`
 - `/v1/compra-agil/catalogo/*`
 
 Smoke sin sesion:
 
-- Los endpoints responden `401 Unauthorized` con `WWW-Authenticate: Bearer realm="chilecomprarealm"`.
+- Los endpoints responden `401 Unauthorized` con `WWW-Authenticate: Bearer realm="chilecomprarealm"` o `401` JSON. Variantes `compra-agil-adjuntos` vistas en el bundle respondieron `503` sin sesion en smoke 2026-05-30.
 
 Implicacion:
 
@@ -492,10 +515,10 @@ Fase inmediata:
 - Crear tabla hija para cotizaciones/respuestas por proveedor.
 - Reconciliar contra OC `AG` desde `ordenesdecompra.json`.
 
-Fase mayo 2026:
+Fase API v2 live:
 
-- Evaluar API Beta Compra Agil apenas ChileCompra la publique.
-- Si expone oportunidades abiertas y adjuntos, promoverla a source primaria para near-real-time.
+- Adoptar API Compra Agil v2 Beta como source primaria para radar near-real-time de oportunidades abiertas.
+- Usar adjuntos API v2 inicialmente como metadata descubierta (`documentos[].id`, `documentos[].nombre`); no prometer lectura/descarga del binario hasta resolver carril autorizado.
 - Mantener Datos Abiertos mensual como backfill/auditoria.
 
 Fase avanzada:
@@ -1876,7 +1899,7 @@ Greenhouse debe tratar Mercado Publico como un ecosistema multi-fuente. No todas
 | Adjuntos de licitacion | Ficha publica WebForms `DetailsAcquisition.aspx` | Diaria / on-demand | attachment row + file hash | Validada como tecnica, no contrato oficial JSON |
 | Ordenes de compra | `ordenesdecompra.json` | Diaria | `CodigoOC` | Validada |
 | Compra Agil historica | Datos Abiertos `COT_YYYY-MM.zip` | Mensual, mes anterior | fila CSV de cotizacion/respuesta | Validada |
-| Compra Agil near-real-time | API Beta anunciada por ChileCompra | Por confirmar | `CodigoCotizacion` esperado | Pendiente mayo 2026 |
+| Compra Agil near-real-time | API Compra Agil v2 Beta `api2.mercadopublico.cl/v2/compra-agil` | Near-real-time / incremental por cambios | `codigo` COT | Validada 2026-05-30 |
 | Compra Agil adjudicada | OC `Tipo=AG` + `CodigoOC` / nombre con COT | Diaria | `CodigoOC` + `CodigoCotizacion` parseado | Validada parcialmente |
 | Consulta al Mercado / RFI | `consulta-mercado.mercadopublico.cl` / API futura | Por investigar | `CodigoRFI/RF` | Pendiente |
 | Datos agregados / analitica | Datos Abiertos `mserv-datos-abiertos` y OCDS | Historica/agregada | mes/region/rubro/proveedor | Complementaria |
@@ -1884,9 +1907,9 @@ Greenhouse debe tratar Mercado Publico como un ecosistema multi-fuente. No todas
 Decision recomendada:
 
 - Source primaria V1 para licitaciones: API oficial `licitaciones.json`.
-- Source primaria V1 para Compra Agil historica: `COT_YYYY-MM.zip`.
+- Source primaria V1 para Compra Agil live/near-real-time: API Compra Agil v2 Beta oficial.
+- Source primaria V1 para Compra Agil historica/backfill/benchmark: `COT_YYYY-MM.zip`.
 - Source primaria V1 para cierre/adjudicacion: `ordenesdecompra.json`.
-- Source experimental: API Beta Compra Agil cuando se publique.
 - Source no productiva sin aprobacion: API interna de SPA `servicios-compra-agil`.
 
 ### Freshness / SLA Matrix
@@ -1899,7 +1922,7 @@ La UX y las alertas deben declarar la frescura de cada familia. No se debe mostr
 | Licitacion detalle/documentos | On-demand + refresh diario si activa | Decision/evidencia | Si documentos cambian |
 | OC | Diario | Win/loss, adjudicacion, reconciliacion | Si una oportunidad interna fue adjudicada o tuvo OC |
 | Compra Agil CSV mensual | Mensual | Inteligencia historica, scoring, benchmark | No alertar como oportunidad abierta |
-| Compra Agil Beta API | TBD | Radar RFQ-like | Solo cuando contrato/frescura este confirmado |
+| Compra Agil API v2 Beta | 5-60 minutos segun cuota y watermarks | Radar RFQ-like | Si fit alto y cierre cercano; degradar honestamente si cuota/API falla |
 | RFI | TBD | Market shaping / relacion | Alerta separada de bid, no quote por defecto |
 
 Regla de producto:
@@ -2083,18 +2106,19 @@ Sinergias esperadas:
 
 ### Implementation Cuts Recomendados
 
-#### Cut 0 — Research Hardening / Watch
+#### Cut 0 — Architecture + Source Contract Freeze
 
-- Monitorear publicacion API Beta Compra Agil en mayo 2026.
-- Validar si Beta incluye oportunidades abiertas, adjuntos y autenticacion por ticket.
+- Cerrar `TASK-674` con arquitectura canonica `public_procurement_opportunity`.
+- Ejecutar `TASK-678` como freeze de contrato Compra Agil v2: API live oficial, COT mensual historico/backfill/benchmark/fallback, OC como cierre/post-award y adjuntos API v2 metadata-only.
 - Cerrar rubros/keywords/organismos objetivo Efeonce.
 
 #### Cut 1 — Data Foundation
 
 - Crear tablas `public_procurement_*`.
 - Ingerir licitaciones activas + detalle.
+- Ingerir Compra Agil API v2 como radar live/near-real-time si `TASK-678` confirma el adapter productivo.
 - Ingerir OC diaria.
-- Ingerir `COT_YYYY-MM.zip` historico mensual.
+- Ingerir `COT_YYYY-MM.zip` historico mensual como backfill/benchmark/fallback.
 - Exponer CLI/job dry-run con metrics.
 
 #### Cut 2 — Matching + Review Queue
@@ -2115,10 +2139,10 @@ Sinergias esperadas:
 - Owner, approvals, Teams alerts.
 - Bridge a deal/quote draft.
 
-#### Cut 5 — Compra Agil Live / Extension
+#### Cut 5 — Assisted Submission / Extension
 
-- Integrar API Beta si cumple contrato.
-- Evaluar companion extension solo si hay necesidad y compliance claro.
+- Evaluar companion extension solo si hay necesidad, compliance claro y control room ya operativo.
+- Mantener cualquier accion browser-mediated fuera del contrato core de datos.
 
 ## Ready For Task
 
@@ -2146,10 +2170,10 @@ Este research puede convertirse en tasks cuando se cierren estas decisiones:
   - Implementa ingestion `licitaciones.json`, detail hydration por `codigo`, retries, watermarks and source sync runs.
 - `TASK-676` — Mercado Publico OC reconciliation foundation.
   - Ingiere `ordenesdecompra.json`, detecta `Tipo=AG`, parsea `CodigoCotizacion` cuando exista y reconcilia adjudicaciones/OC con oportunidades.
+- `TASK-678` — Compra Agil v2 Beta API adapter spike.
+  - Actualizado 2026-05-30: API v2 Beta publicada y autenticacion validada con el ticket canonico; debe cerrar decision live source + COT historico/fallback + OC reconciliation antes de modelar Compra Agil productiva.
 - `TASK-677` — Compra Agil monthly COT ingestion foundation.
-  - Descarga `COT_YYYY-MM.zip`, procesa CSV en streaming, normaliza encoding/separador, dedupe por `CodigoCotizacion` y persiste respuestas por proveedor.
-- `TASK-678` — Compra Agil Beta API watch + adapter spike.
-  - Monitorea publicacion mayo 2026, valida contrato, autenticacion, adjuntos, oportunidades abiertas y define adapter productivo si aplica.
+  - Descarga `COT_YYYY-MM.zip`, procesa CSV en streaming, normaliza encoding/separador, dedupe por `CodigoCotizacion` y persiste respuestas por proveedor como historico/backfill/benchmark/fallback, sin reemplazar campos live de API v2.
 - `TASK-679` — Mercado Publico document ingestion + private assets.
   - Implementa discovery/download de adjuntos de licitaciones, storage privado, checksums, DLQ, parser canaries and source sync runs.
 - `TASK-680` — Mercado Publico procedure taxonomy registry.
@@ -2176,6 +2200,8 @@ Este research puede convertirse en tasks cuando se cierren estas decisiones:
 ## Fuentes
 
 - ChileCompra — API Mercado Publico: https://www.chilecompra.cl/api/
+- ChileCompra — noticia API Compra Agil v2 Beta, 2026-05-25: https://www.chilecompra.cl/2026/05/nueva-api-de-compra-agil-mejora-el-acceso-y-analisis-de-datos-de-compras-publicas/
+- ChileCompra — guia API Compra Agil PDF v3.0 mayo 2026: https://www.chilecompra.cl/wp-content/uploads/2026/05/Documentacion_API_Compra_Agil-2-1.pdf
 - Mercado Publico API condiciones de uso: https://api.mercadopublico.cl/modules/CondicionesUso.aspx
 - Diccionario API Licitaciones: https://api.mercadopublico.cl/documentos/Documentaci%C3%B3n%20API%20Mercado%20Publico%20-%20Licitaciones.pdf
 - Ficha publica MercadoPublico.cl validada por smoke: `DetailsAcquisition.aspx?idlicitacion=<codigo>`

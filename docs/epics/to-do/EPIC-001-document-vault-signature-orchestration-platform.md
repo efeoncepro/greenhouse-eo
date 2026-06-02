@@ -51,6 +51,7 @@ El repo ya cruzó el umbral en que MSA/SOW, contratos laborales, anexos, órdene
 - `TASK-494` — Convergencia HR Document Vault sobre la plataforma común.
 - `TASK-495` — Convergencia Finance/Legal document chain para MSA, SOW y work orders.
 - `TASK-868` — Payroll Receipt Documents aggregate dedicado (mirror TASK-863 V1.5.2) + registry link como `kind='linked'` `document_type='payroll_receipt'`.
+- `TASK-964` — Alineacion con EPIC-017 Person Workforce Documents Rail: People/Person 360 consume documentos y firma como evidencia del journey laboral, sin crear document vault paralelo.
 
 ## Implementation Order (canonical sequencing)
 
@@ -173,6 +174,8 @@ Phase 3: TASK-494 (~Alto) + TASK-495 (~Alto)
 ## Existing Related Work
 
 - `docs/tasks/to-do/TASK-027-hris-document-vault.md`
+- `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`
+- `docs/tasks/to-do/TASK-964-person-workforce-documents-rail-epic001-alignment.md`
 - `docs/tasks/complete/TASK-461-msa-umbrella-clause-library.md`
 - `docs/tasks/to-do/TASK-006-webhook-infrastructure-mvp.md`
 - `docs/tasks/complete/TASK-125-webhook-activation-first-consumers.md`
@@ -222,3 +225,13 @@ Estos patrones son **prerequisito de implementación** del epic. Cualquier sub-t
 - `member_evidence` — portfolio/reputacional.
 
 El registry de TASK-489 agrupa via bridges (`document_*_link` tables); NO duplica el contenido.
+
+## Delta 2026-05-31 — EPIC-017 People/Workforce consumer
+
+La lectura de Deel y EPIC-017 agregan un consumer claro para este epic: People/Person 360 debe mostrar contratos, addenda, payroll/remittance/finiquito linked documents y estados de firma como evidencia del journey laboral.
+
+Regla de frontera:
+
+- EPIC-001 sigue siendo owner de registry, versions, assets, document manager, signature orchestration, templates y lifecycle documental.
+- EPIC-017 puede mostrar una rail documental en People/Person 360, pero no crea un storage/signature manager paralelo.
+- `TASK-964` coordina la alineacion: `TASK-489`/`TASK-492`/`TASK-494` desbloquean evidencia documental read-only; `TASK-490`/`TASK-491` solo bloquean nuevos workflows de firma iniciados desde Greenhouse, no la visualizacion de documentos ya registrados.

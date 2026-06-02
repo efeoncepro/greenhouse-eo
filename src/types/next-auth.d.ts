@@ -43,6 +43,8 @@ declare module 'next-auth' {
 
     // Supervisor scope (TASK-727): JWT-safe summary of supervisor authority for menu/UI gating.
     supervisorAccess?: SupervisorAccessSummary | null
+    // Contractor self-service flag (TASK-796): drives dynamic /my/contractor menu visibility.
+    hasActiveContractorEngagement?: boolean
   }
 
   interface Session {
@@ -86,6 +88,8 @@ declare module 'next-auth' {
 
       // Supervisor scope (TASK-727): JWT-safe summary of supervisor authority for menu/UI gating.
       supervisorAccess?: SupervisorAccessSummary | null
+    // Contractor self-service flag (TASK-796): drives dynamic /my/contractor menu visibility.
+    hasActiveContractorEngagement?: boolean
     } & DefaultSession['user']
   }
 }
@@ -133,5 +137,7 @@ declare module 'next-auth/jwt' {
 
     // Supervisor scope (TASK-727): JWT-safe summary of supervisor authority for menu/UI gating.
     supervisorAccess?: SupervisorAccessSummary | null
+    // Contractor self-service flag (TASK-796): drives dynamic /my/contractor menu visibility.
+    hasActiveContractorEngagement?: boolean
   }
 }

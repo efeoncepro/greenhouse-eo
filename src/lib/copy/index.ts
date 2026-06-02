@@ -8,7 +8,8 @@
  *     Ciclos, Mi Greenhouse) + navegación + labels institucionales
  *
  *   - src/lib/copy/ (este módulo): microcopy funcional shared (CTAs,
- *     estados, loading, empty, meses, aria, errores, feedback, time).
+ *     estados, loading, empty, meses, aria, errores, feedback, time) y
+ *     módulos de dominio reutilizables (`agency`, `pricing`, `nexa`, etc.).
  *     Locale-aware desde día uno.
  *
  * ## Uso típico

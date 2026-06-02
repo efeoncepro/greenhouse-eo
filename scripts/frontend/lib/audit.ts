@@ -12,6 +12,7 @@ import { appendFileSync, existsSync, mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 
 import type { CaptureEnv } from './env'
+import type { FailureCategory } from './manifest'
 
 export interface AuditEntry {
   timestamp: string
@@ -23,6 +24,7 @@ export interface AuditEntry {
   durationMs: number
   actor: string
   error?: string
+  failureCategory?: FailureCategory
 }
 
 const AUDIT_LOG_PATH = '.captures/audit.jsonl'

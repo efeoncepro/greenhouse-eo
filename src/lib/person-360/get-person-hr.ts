@@ -1,7 +1,9 @@
 import 'server-only'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolveCurrentWorkClassification } from '@/lib/account-360/current-work-classification'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 // ── Types ──
 
@@ -46,6 +48,18 @@ export interface PersonHrContext {
     currency: string | null
     baseSalary: number | null
     contractType: string | null
+  }
+  /**
+   * TASK-957 Slice B — current work classification, resolved from the active
+   * relationship/engagement (SSOT), NOT from `contractType` (which is employment
+   * history once employment ends). Display surfaces show this, not `contractType`.
+   */
+  currentWorkClassification?: {
+    kind: 'employee' | 'contractor' | 'none'
+    contractorSubtype: string | null
+    classificationRiskStatus: string | null
+    displayLabel: string
+    source: string
   }
   leave: {
     vacationAllowance: number
@@ -131,8 +145,16 @@ return Number.isFinite(n) ? n : 0 }
   return 0
 }
 
-const toDateStr = (v: string | null): string | null =>
-  v ? v.slice(0, 10) : null
+// TASK-957 Slice B: robust to both string and Date (pg returns DATE columns as
+// Date objects, which the previous `v.slice` assumed away → TypeError that threw
+// the whole HR context for any member with a non-null date column). Mirrors the
+// canonical account-360 `toDateString`.
+const toDateStr = (v: string | Date | null): string | null => {
+  if (!v) return null
+  if (typeof v === 'string') return v.slice(0, 10)
+
+  return v.toISOString().slice(0, 10)
+}
 
 // ── Main function ──
 
@@ -194,6 +216,38 @@ export const getPersonHrContext = async (identifier: string): Promise<PersonHrCo
     [row.identity_profile_id]
   )
 
+  // TASK-957 Slice B — resolve current work classification from the active
+  // relationship/engagement (SSOT), not from contract_type. Degrades honestly:
+  // if the resolver fails, fall back to a contract_type-derived label.
+  let currentWorkClassification: PersonHrContext['currentWorkClassification']
+
+  try {
+    const resolvedClassification = await resolveCurrentWorkClassification({
+      profileId: row.identity_profile_id,
+      memberContractType: row.contract_type
+    })
+
+    currentWorkClassification = {
+      kind: resolvedClassification.kind,
+      contractorSubtype: resolvedClassification.contractorSubtype,
+      classificationRiskStatus: resolvedClassification.classificationRiskStatus,
+      displayLabel: resolvedClassification.displayLabel,
+      source: resolvedClassification.source
+    }
+  } catch (error) {
+    captureWithDomain(error, 'identity', {
+      tags: { source: 'person_hr_current_work_classification' },
+      extra: { profileId: row.identity_profile_id }
+    })
+    currentWorkClassification = {
+      kind: row.contract_type ? 'employee' : 'none',
+      contractorSubtype: null,
+      classificationRiskStatus: null,
+      displayLabel: row.contract_type ?? 'Sin clasificación vigente',
+      source: 'degraded_fallback'
+    }
+  }
+
   return {
     identityProfileId: row.identity_profile_id,
     eoId: row.eo_id,
@@ -238,6 +292,7 @@ export const getPersonHrContext = async (identifier: string): Promise<PersonHrCo
       baseSalary: row.base_salary ? toNum(row.base_salary) : null,
       contractType: row.compensation_contract_type ?? row.contract_type
     },
+    currentWorkClassification,
     leave: {
       vacationAllowance: toNum(row.vacation_allowance),
       vacationCarried: toNum(row.vacation_carried),

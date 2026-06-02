@@ -1,24 +1,26 @@
-# Capturar visuales + microinteractions con Playwright
+# Greenhouse Visual Capture — Capturar visuales + microinteractions
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-12
 > **Modulo:** Plataforma (frontend tooling)
 > **Ruta en portal:** Transversal (uso desde CLI local o CI)
-> **Documentacion relacionada:** [scripts/frontend/README.md](../../../scripts/frontend/README.md) · [Agent Auth canónico](../../../CLAUDE.md#agent-auth-acceso-headless-para-agentes-y-e2e)
+> **Documentacion relacionada:** [Arquitectura Greenhouse Visual Capture](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md) · [scripts/frontend/README.md](../../../scripts/frontend/README.md) · [Agent Auth canónico](../../../CLAUDE.md#agent-auth-acceso-headless-para-agentes-y-e2e)
 
 ## Para que sirve
 
-Esta guía explica cómo usar el helper canónico `pnpm fe:capture` para grabar una sesión Playwright contra una ruta del portal y obtener:
+Esta guía explica cómo usar **Greenhouse Visual Capture** (`GVC`), la herramienta canónica cuyo comando principal es `pnpm fe:capture`, para grabar una sesión Playwright contra una ruta del portal y obtener:
 
 - `recording.webm` — video continuo del lifecycle
 - `frames/NN-<label>.png` — stills PNG sync en momentos clave (marker-based)
 - `manifest.json` — scenario metadata + timings + frame paths
+- `index.html` — reporte HTML navegable con readiness, assertions, findings y frames
 - `flipbook.gif` — opcional, requiere `ffmpeg` instalado
 
 Casos de uso:
 
 - Validar microinteractions (hover, click, transitions) que no se ven en captura estática
+- Capturar pantallas largas completas o secciones específicas luego de hacer scroll
 - Documentar visualmente un cambio de UI para PR review
 - Capturar evidencia para auditorías de QA / accesibilidad
 - Reproducir bugs visuales con artifacts adjuntables
@@ -33,6 +35,8 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 |---|---|
 | Ruta simple / sanity visual | `pnpm fe:capture --route=/ruta --env=staging --hold=3000` |
 | Flujo repetible o microinteraction | `pnpm fe:capture <scenario> --env=staging` |
+| Pantalla larga completa | Scenario con `{ kind: 'mark', label: 'full-page', fullPage: true }` |
+| Sección específica tras scroll | Scenario con `scroll selector` + `mark clipSelector` |
 | Dossier para review UI/UX | `pnpm fe:capture:review <scenario-or-capture-dir> --env=staging` |
 | Before/after | `pnpm fe:capture:diff .captures/<prev> .captures/<curr>` |
 | Salud del pipeline local | `pnpm fe:capture:health` |
@@ -51,6 +55,14 @@ AGENT_AUTH_SECRET=...
 AGENT_AUTH_EMAIL=agent@greenhouse.efeonce.org
 VERCEL_AUTOMATION_BYPASS_SECRET=...
 ```
+
+Elegí `AGENT_AUTH_EMAIL` según el rol que querés validar:
+
+| Caso | Email recomendado |
+|---|---|
+| Admin, permisos, diagnóstico transversal | `agent@greenhouse.efeonce.org` |
+| Experiencia personal `/my` y collaborator puro | `agent-collaborator@greenhouse.efeonce.org` |
+| Portal cliente general y rutas client-facing | `agent-client@greenhouse.efeonce.org` |
 
 Si vas a generar GIFs, instalá ffmpeg:
 
@@ -153,6 +165,76 @@ pnpm fe:capture mi-feature-microinteractions --env=staging
 
 Ver el DSL completo en `scripts/frontend/scenarios/_README.md`.
 
+### Caso 5.1 — Pantallas con scroll y secciones largas
+
+Para pantallas largas, evitá offsets a ojo. El DSL soporta scroll robusto por selector y captura de sección:
+
+```ts
+steps: [
+  { kind: 'wait', selector: 'h4', timeout: 5000 },
+  { kind: 'mark', label: 'first-fold' },
+  { kind: 'scroll', selector: '[data-capture="timeline"]', scrollBlock: 'center' },
+  { kind: 'mark', label: 'timeline', clipSelector: '[data-capture="timeline"]' }
+]
+```
+
+Si necesitás auditar toda la pantalla, usá `fullPage`:
+
+```ts
+{ kind: 'mark', label: 'full-page', fullPage: true }
+```
+
+Para ir al inicio o final sin calcular píxeles:
+
+```ts
+{ kind: 'scroll', scrollTo: 'top' }
+{ kind: 'scroll', scrollTo: 'bottom' }
+```
+
+Convención recomendada: agregar `data-capture="<nombre-seccion>"` en el wrapper de secciones importantes solo en mockups/scenarios o en componentes donde ese atributo no afecte producto. Esto hace que la captura sea estable ante cambios de copy, spacing o altura de contenido.
+
+### Caso 5.2 — Readiness, assertions y report HTML
+
+Para que una captura no pase verde cuando en realidad grabó login, loading o error boundary, agregá guards ligeros:
+
+```ts
+readiness: {
+  selector: 'h4',
+  absentSelectors: ['[data-testid="login-card"]', '[data-loading="true"]', '.MuiSkeleton-root'],
+  waitForFonts: true,
+  postReadyDelayMs: 150
+},
+assertions: [
+  { kind: 'noLoginRedirect', reason: 'ruta autenticada esperada' },
+  { kind: 'noErrorBoundary', reason: 'la evidencia no debe ser un error de app' }
+]
+```
+
+Cada captura genera `index.html` dentro del run dir. Ese reporte lista readiness, assertions, failure taxonomy, findings automáticos y frames.
+
+### Caso 5.3 — Microinteractions V2
+
+Para capturar feedback de hover/focus/click con intención explícita:
+
+```ts
+{
+  kind: 'interaction',
+  interaction: {
+    name: 'filter-hover',
+    action: { kind: 'hover', selector: '[role="tab"]' },
+    intent: 'Confirmar affordance del filtro antes de activarlo',
+    frames: [
+      { label: 'before', atMs: 0 },
+      { label: 'feedback', atMs: 150 },
+      { label: 'settled', atMs: 300 }
+    ],
+    keyboardEquivalent: { action: { kind: 'press', key: 'Tab' }, expected: 'focus visible' }
+  }
+}
+```
+
+El video sigue siendo continuo, pero el manifest registra segmentos lógicos por interacción.
+
 ### Caso 6 — Purgar capturas viejas
 
 ```bash
@@ -173,6 +255,20 @@ pnpm fe:capture <scenario> --env=staging --device="Galaxy S9+"
 ```
 
 El preset overridea viewport + userAgent + DPR del scenario. Útil para validar responsive layouts + mobile microinteractions.
+
+### Caso 7.1 — Multi-viewport por scenario
+
+Para correr desktop/tablet/mobile en una sola invocación:
+
+```ts
+viewports: [
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'tablet', width: 1024, height: 900 },
+  { name: 'mobile', device: 'iPhone 13' }
+]
+```
+
+El output crea subdirectorios por viewport y un manifest raíz con `variants`.
 
 ### Caso 8 — Visual diff entre 2 capturas (V1.1)
 

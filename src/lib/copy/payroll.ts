@@ -66,6 +66,31 @@ export const GH_PAYROLL_COMPLIANCE_EXPORTS = {
   lreAria: (periodLabel: string) => `Descargar LRE del periodo ${periodLabel}`
 } as const
 
+export const GH_PAYROLL_CALCULATION_DEADLINE = {
+  calculatedOnTime: 'Calculada en fecha',
+  calculatedLate: 'Calculada fuera de fecha',
+  overdueAllowed: 'Fuera de plazo operativo; cálculo manual permitido',
+  dueToday: 'Pendiente hoy',
+  pending: 'Pendiente',
+  blockedByReadiness: 'Bloqueada por readiness',
+  deadlineLabel: 'Deadline de cálculo',
+  operationalStateLabel: 'Estado operativo',
+  calculationReadinessLabel: 'Readiness cálculo',
+  approvalReadinessLabel: 'Readiness aprobación'
+} as const
+
+export const GH_PAYROLL_DRAFT_ROSTER = {
+  title: 'Pre-nómina del período',
+  includedTitle: 'Entrarían al cálculo',
+  excludedTitle: 'Quedarían fuera',
+  includedState: 'Entraría al cálculo',
+  excludedMissingCompensation: 'Fuera: falta compensación',
+  unknownMember: (memberId: string) => `Colaborador ${memberId}`,
+  emptyIncluded: 'No hay colaboradores listos para calcular.',
+  helper:
+    'Esta vista es una previsualización read-only del roster. Las entries oficiales aparecen después de presionar Calcular.'
+} as const
+
 export const GH_PAYROLL_CONTRACTS = {
   legalReviewReferenceLabel: 'Referencia revisión legal',
   legalReviewReferenceHelper: 'Ticket, documento o thread aprobado por Legal/PeopleOps',

@@ -18,7 +18,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 
 interface ErrorBoundaryProps {
   error: Error & { digest?: string }
@@ -47,7 +47,7 @@ const ErrorBoundary = ({ error, reset }: ErrorBoundaryProps) => {
         </Link>
       </Box>
 
-      <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}` })}>
+      <Card elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
         <CardContent>
           <EmptyState
             icon='tabler-alert-triangle'

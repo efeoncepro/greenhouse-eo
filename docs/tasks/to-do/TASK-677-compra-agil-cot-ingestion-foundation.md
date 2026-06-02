@@ -11,22 +11,22 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-674`, `TASK-680`
+- Blocked by: `TASK-674`, `TASK-678`, `TASK-680`
 - Branch: `task/TASK-677-compra-agil-cot-ingestion`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
 ## Summary
 
-Implementa la ingesta durable de Compra Agil desde archivos mensuales `COT_<YYYY-MM>.zip` de datos abiertos ChileCompra, normalizando cotizaciones, items/ofertas y links a OC. Este carril permite abordar oportunidades RFQ-like aunque la API oficial Beta aun no este disponible para produccion.
+Implementa la ingesta durable de Compra Agil desde archivos mensuales `COT_<YYYY-MM>.zip` de datos abiertos ChileCompra, normalizando cotizaciones, items/ofertas y links a OC. Tras la publicacion y validacion de la API Compra Agil v2 Beta el 2026-05-30, este carril debe tratarse como historico/backfill/benchmark y fallback, no como la unica fuente oficial live.
 
 ## Why This Task Exists
 
-El research valido que Compra Agil no aparece como endpoint estable en la API publica actual, pero si existe como dataset mensual COT. Sin este carril, Greenhouse quedaria ciego a una parte clave del mercado publico chileno.
+El research inicial valido que Compra Agil existia como dataset mensual COT antes de tener API oficial disponible. Aunque la API Compra Agil v2 Beta ya autentica con el ticket canonico de Mercado Publico, el dataset COT sigue siendo necesario para historico mensual, backfills, benchmarks y reconciliacion de brechas si la Beta degrada.
 
 ## Goal
 
-- Descargar, validar, parsear y persistir archivos COT mensuales.
+- Descargar, validar, parsear y persistir archivos COT mensuales como carril historico/backfill/benchmark/fallback.
 - Normalizar `CodigoCotizacion`, items, fechas, comprador, proveedor/oferta y `CodigoOC`.
 - Soportar replay idempotente y freshness mensual.
 
@@ -56,6 +56,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-674`
+- `TASK-678`
 - `TASK-680`
 - Dataset oficial `https://transparenciachc.blob.core.windows.net/trnspchc/COT_<YYYY-MM>.zip`
 
@@ -79,11 +80,13 @@ Reglas obligatorias:
 ### Already exists
 
 - Research con smoke de `COT_2026-03.zip`, columnas y volumen aproximado.
+- Research actualizado 2026-05-30 con API Compra Agil v2 Beta oficial validada via `api2.mercadopublico.cl` y header `ticket`.
 
 ### Gap
 
 - No hay downloader/parser ni tablas conformed para Compra Agil.
 - No hay policy de retention para raw zip/csv.
+- La decision operativa debe venir de `TASK-678`: API v2 como live source, COT mensual como historico/backfill/benchmark/fallback y OC como cierre/post-award.
 
 ## Scope
 
@@ -96,7 +99,7 @@ Reglas obligatorias:
 ### Slice 2 — Parser And Conformed Upsert
 
 - Parsear COT1/COT2 segun columnas reales.
-- Upsert de oportunidades Compra Agil, supplier quotes/items y OC links.
+- Upsert de oportunidades Compra Agil, supplier quotes/items y OC links sin sobreescribir campos live ya observados por API v2 con datos mensuales mas antiguos.
 - Mantener raw row hash para idempotencia y drift detection.
 
 ### Slice 3 — Operations
@@ -106,7 +109,7 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- Beta API.
+- Implementar API v2 Beta live adapter o modificar su source-of-truth decision (ver `TASK-678`).
 - Web scraping del portal Compra Agil.
 - UI.
 - Postulacion/cotizacion automatica.

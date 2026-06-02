@@ -73,16 +73,16 @@ Este comando hace tres cosas por ti:
 | `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app` | Acceso programatico (usar con bypass header) | Si         |
 | `dev-greenhouse.efeoncepro.com`                         | Acceso desde el navegador (login SSO humano) | Si         |
 
-## Usuario agente dedicado
+## Personas agente dedicadas
 
-El sistema tiene un usuario especial para agentes y tests automatizados:
+El sistema tiene personas especiales para agentes y tests automatizados. Usa la de menor privilegio que represente el caso:
 
-| Campo     | Valor                                       |
-| --------- | ------------------------------------------- |
-| Email     | `agent@greenhouse.efeonce.org`              |
-| Roles     | `efeonce_admin` + `collaborator`            |
-| Proposito | Autenticacion headless para agentes AI y CI |
+| Persona | Email | Roles | Proposito |
+|---|---|---|---|
+| Superadmin | `agent@greenhouse.efeonce.org` | `efeonce_admin` + `collaborator` | Admin, permisos y diagnostico transversal |
+| Collaborator | `agent-collaborator@greenhouse.efeonce.org` | `collaborator` | Experiencia personal `/my` y self-service sin privilegios admin |
+| Client | `agent-client@greenhouse.efeonce.org` | `client_executive` + `client_manager` + `client_specialist` | Portal cliente general sin acceso interno |
 
-Este usuario no se crea automaticamente — ya esta provisionado en la base de datos via migracion.
+Estas personas no se crean automaticamente en runtime — ya estan provisionadas en la base de datos via migraciones.
 
 > **Detalle tecnico:** El flujo completo, la resolucion del bypass secret via Vercel API, el modelo de seguridad y la referencia del proyecto Vercel estan documentados en [GREENHOUSE_STAGING_ACCESS_V1.md](../../architecture/GREENHOUSE_STAGING_ACCESS_V1.md). El script fuente es `scripts/staging-request.mjs`.

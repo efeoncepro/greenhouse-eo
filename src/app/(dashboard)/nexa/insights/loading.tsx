@@ -12,7 +12,7 @@ import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 
 const SKELETON_CARDS = 6
 
@@ -46,11 +46,13 @@ const Loading = () => (
         <Grid key={idx} size={{ xs: 12, sm: 6, md: 4 }}>
           <Card
             elevation={0}
-            sx={theme => ({
-              border: `1px solid ${theme.palette.divider}`,
-              borderLeft: `4px solid ${theme.palette.divider}`,
+            sx={{
+              border: 1,
+              borderColor: 'divider',
+              borderLeft: 4,
+              borderLeftColor: 'divider',
               height: '100%'
-            })}
+            }}
           >
             <CardContent>
               <Stack spacing={2}>

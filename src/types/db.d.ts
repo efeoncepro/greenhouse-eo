@@ -4614,6 +4614,7 @@ export interface GreenhouseFinanceExpenses {
   amount_paid: Generated<Numeric>;
   balance_nubox: Numeric | null;
   client_id: string | null;
+  contractor_payable_id: string | null;
   /**
    * direct_labor | indirect_labor | operational | infrastructure | tax_social
    */
@@ -5889,6 +5890,172 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   vat_position_id: string;
 }
 
+export interface GreenhouseHrContractorEngagementEvents {
+  actor_user_id: string | null;
+  contractor_engagement_id: string;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  from_classification_risk_status: string | null;
+  from_status: string | null;
+  metadata_json: Generated<Json>;
+  reason: string | null;
+  to_classification_risk_status: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrContractorEngagements {
+  bonus_policy: Generated<string>;
+  classification_reviewed: Generated<boolean>;
+  classification_risk_factors: Generated<Json>;
+  classification_risk_status: Generated<string>;
+  closure_effective_date: Timestamp | null;
+  closure_executed_at: Timestamp | null;
+  closure_executed_by: string | null;
+  closure_initiated_at: Timestamp | null;
+  closure_initiated_by: string | null;
+  closure_reason: string | null;
+  contractor_engagement_id: string;
+  country_code: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  currency: string;
+  end_date: Timestamp | null;
+  fx_policy_code: string | null;
+  legal_entity_organization_id: string;
+  member_id: string | null;
+  metadata_json: Generated<Json>;
+  payment_cadence: string;
+  payment_currency: string | null;
+  payment_model: string;
+  payroll_via: string;
+  person_legal_entity_relationship_id: string;
+  post_closure_invoices_allowed: Generated<boolean>;
+  profile_id: string;
+  provider_contract_id: string | null;
+  provider_termination_ref: string | null;
+  provider_worker_id: string | null;
+  public_id: string;
+  rate_amount: Numeric | null;
+  rate_type: string;
+  relationship_subtype: string;
+  requires_invoice: Generated<boolean>;
+  requires_work_approval: Generated<boolean>;
+  start_date: Timestamp;
+  status: Generated<string>;
+  tax_compliance_owner: string;
+  tax_residency_country_code: string | null;
+  tax_withholding_policy_code: string | null;
+  tax_withholding_rate_snapshot: Numeric | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrContractorInvoiceAssets {
+  artifact_kind: string;
+  asset_id: string;
+  asset_role: string;
+  contractor_engagement_id: string;
+  contractor_invoice_id: string | null;
+  contractor_work_submission_id: string | null;
+  country_code: string | null;
+  created_at: Generated<Timestamp>;
+  invoice_asset_id: string;
+  metadata_json: Generated<Json>;
+  public_id: string;
+  source: string;
+  uploaded_by_user_id: string | null;
+}
+
+export interface GreenhouseHrContractorPayableEvents {
+  actor_user_id: string | null;
+  contractor_payable_id: string;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  from_status: string | null;
+  metadata_json: Generated<Json>;
+  reason: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrContractorPayables {
+  agreed_amount_override_reason: string | null;
+  beneficiary_id: string;
+  beneficiary_type: string;
+  contractor_engagement_id: string;
+  contractor_invoice_id: string | null;
+  contractor_payable_id: string;
+  contractor_work_submission_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  currency: string;
+  due_date: Timestamp | null;
+  /**
+   * Always labor_cost_external. Contractor payables do not feed dependent payroll.
+   */
+  economic_category: Generated<string>;
+  finance_obligation_id: string | null;
+  fx_policy_code: string | null;
+  gross_amount: Numeric;
+  net_payable: Numeric;
+  payable_source_kind: string;
+  payment_currency: string | null;
+  payment_order_id: string | null;
+  payment_profile_id: string | null;
+  payment_profile_waiver_reason: string | null;
+  payroll_via: string;
+  public_id: string;
+  /**
+   * Fail-closed readiness snapshot used before emitting the Finance obligation bridge.
+   */
+  readiness_json: Generated<Json>;
+  source_snapshot_json: Generated<Json>;
+  status: Generated<string>;
+  tax_compliance_owner: string;
+  tax_withholding_policy_code: string | null;
+  updated_at: Generated<Timestamp>;
+  withholding_amount: Generated<Numeric>;
+}
+
+export interface GreenhouseHrContractorWorkSubmissionEvents {
+  actor_user_id: string | null;
+  contractor_work_submission_id: string;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  from_status: string | null;
+  metadata_json: Generated<Json>;
+  reason: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrContractorWorkSubmissions {
+  consumed_at: Timestamp | null;
+  consumed_by_payable_id: string | null;
+  contractor_engagement_id: string;
+  contractor_work_submission_id: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  currency: string | null;
+  gross_amount: Numeric | null;
+  metadata_json: Generated<Json>;
+  public_id: string;
+  quantity: Numeric | null;
+  rate_amount_snapshot: Numeric | null;
+  review_reason: string | null;
+  reviewed_at: Timestamp | null;
+  reviewed_by_user_id: string | null;
+  service_period_end: Timestamp | null;
+  service_period_start: Timestamp | null;
+  status: Generated<string>;
+  submission_type: string;
+  submitted_at: Timestamp | null;
+  submitted_by_user_id: string | null;
+  title: string | null;
+  unit: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHrEvalAssignments {
   assignment_id: string;
   created_at: Generated<Timestamp>;
@@ -6187,6 +6354,16 @@ export interface GreenhouseHrOnboardingTemplates {
   template_type: string;
   updated_at: Generated<Timestamp>;
   updated_by_user_id: string | null;
+}
+
+export interface GreenhouseHrRemittanceAdviceNumbers {
+  allocated_at: Generated<Timestamp>;
+  contractor_payable_id: string;
+  format_version: Generated<number>;
+  issuer_organization_id: string;
+  registry_id: Generated<Int8>;
+  remittance_number: string;
+  sequential_value: number;
 }
 
 export interface GreenhouseHrWorkflowApprovalSnapshots {
@@ -8547,6 +8724,24 @@ export interface GreenhouseServingUserRecentItems {
   visit_count: Generated<number>;
 }
 
+export interface GreenhouseSyncContractorPaymentRuns {
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  cutoff_date: Timestamp | null;
+  notes: string | null;
+  obligations_swept: number | null;
+  payables_included: number | null;
+  payment_run_id: Generated<string>;
+  period_month: number;
+  period_year: number;
+  prepared_order_ids: Generated<string[]>;
+  started_at: Generated<Timestamp>;
+  status: string;
+  totals_by_currency: Json | null;
+  trigger_source: Generated<string>;
+  triggered_by_user_id: string | null;
+}
+
 export interface GreenhouseSyncGithubReleaseWebhookEvents {
   action: string | null;
   check_run_id: Int8 | null;
@@ -9568,6 +9763,13 @@ export interface DB {
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
+  "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
+  "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
+  "greenhouse_hr.contractor_invoice_assets": GreenhouseHrContractorInvoiceAssets;
+  "greenhouse_hr.contractor_payable_events": GreenhouseHrContractorPayableEvents;
+  "greenhouse_hr.contractor_payables": GreenhouseHrContractorPayables;
+  "greenhouse_hr.contractor_work_submission_events": GreenhouseHrContractorWorkSubmissionEvents;
+  "greenhouse_hr.contractor_work_submissions": GreenhouseHrContractorWorkSubmissions;
   "greenhouse_hr.eval_assignments": GreenhouseHrEvalAssignments;
   "greenhouse_hr.eval_competencies": GreenhouseHrEvalCompetencies;
   "greenhouse_hr.eval_cycles": GreenhouseHrEvalCycles;
@@ -9587,6 +9789,7 @@ export interface DB {
   "greenhouse_hr.onboarding_instances": GreenhouseHrOnboardingInstances;
   "greenhouse_hr.onboarding_template_items": GreenhouseHrOnboardingTemplateItems;
   "greenhouse_hr.onboarding_templates": GreenhouseHrOnboardingTemplates;
+  "greenhouse_hr.remittance_advice_numbers": GreenhouseHrRemittanceAdviceNumbers;
   "greenhouse_hr.work_relationship_offboarding_case_events": GreenhouseHrWorkRelationshipOffboardingCaseEvents;
   "greenhouse_hr.work_relationship_offboarding_cases": GreenhouseHrWorkRelationshipOffboardingCases;
   "greenhouse_hr.work_relationship_onboarding_case_events": GreenhouseHrWorkRelationshipOnboardingCaseEvents;
@@ -9679,6 +9882,7 @@ export interface DB {
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
   "greenhouse_serving.user_360": GreenhouseServingUser360;
   "greenhouse_serving.user_recent_items": GreenhouseServingUserRecentItems;
+  "greenhouse_sync.contractor_payment_runs": GreenhouseSyncContractorPaymentRuns;
   "greenhouse_sync.github_release_webhook_events": GreenhouseSyncGithubReleaseWebhookEvents;
   "greenhouse_sync.handler_health": GreenhouseSyncHandlerHealth;
   "greenhouse_sync.handler_health_transitions": GreenhouseSyncHandlerHealthTransitions;

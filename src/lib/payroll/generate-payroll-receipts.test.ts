@@ -29,7 +29,7 @@ vi.mock('@/lib/payroll/get-payroll-entries', () => ({
 
 vi.mock('@/lib/payroll/generate-payroll-pdf', () => ({
   generatePayrollReceiptPdf: (...args: unknown[]) => mockGeneratePayrollReceiptPdf(...args),
-  RECEIPT_TEMPLATE_VERSION: '2026-03-28.v1'
+  getReceiptTemplateVersion: () => '2026-03-28.v1'
 }))
 
 vi.mock('@/lib/payroll/payroll-receipts-store', () => ({

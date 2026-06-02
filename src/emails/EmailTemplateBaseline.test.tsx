@@ -291,8 +291,8 @@ const EMAIL_BASELINE_CASES: EmailBaselineCase[] = [
                 severity: 'critical',
                 headline: 'Margen bajo umbral',
                 narrative: [{ type: 'text', value: 'El margen semanal quedo bajo el umbral operativo.' }],
-                actionLabel: 'Abrir espacio',
-                actionUrl: 'https://greenhouse.efeoncepro.com/spaces/bil'
+                actionLabel: 'Ver causa raíz',
+                actionUrl: 'https://greenhouse.efeoncepro.com/nexa/insights/EO-AIS-bil-margin'
               },
               {
                 severity: 'warning',

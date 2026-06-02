@@ -61,7 +61,20 @@ const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<DraftUploadContext, number> = 
   evidence_draft: 10 * 1024 * 1024,
   finance_reconciliation_evidence_draft: 10 * 1024 * 1024,
   sample_sprint_report_draft: 25 * 1024 * 1024,
-  resignation_letter_ratified_draft: 10 * 1024 * 1024
+  resignation_letter_ratified_draft: 10 * 1024 * 1024,
+  // TASK-791 — invoices/boletas + work evidence pueden ser escaneos grandes.
+  contractor_invoice_draft: 25 * 1024 * 1024,
+  contractor_work_evidence_draft: 25 * 1024 * 1024,
+  provider_invoice_draft: 25 * 1024 * 1024
+}
+
+// TASK-791 — MIME extra permitido por contexto. La factura electrónica oficial
+// de varios países es XML/JSON; se acepta SOLO en contextos de invoice de
+// contractor/provider (artefacto tributario estructurado). El resto sigue con
+// pdf/jpeg/png/webp (PRIVATE_USER_ALLOWED_MIME_TYPES). ZIP/ejecutables fuera (V1).
+const CONTEXT_EXTRA_MIME_TYPES: Partial<Record<DraftUploadContext, ReadonlySet<string>>> = {
+  contractor_invoice_draft: new Set(['application/xml', 'text/xml', 'application/json']),
+  provider_invoice_draft: new Set(['application/xml', 'text/xml', 'application/json'])
 }
 
 const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRetentionClass> = {
@@ -85,7 +98,15 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   sample_sprint_report_draft: 'commercial_engagement_report',
   sample_sprint_report: 'commercial_engagement_report',
   resignation_letter_ratified_draft: 'final_settlement_document',
-  resignation_letter_ratified: 'final_settlement_document'
+  resignation_letter_ratified: 'final_settlement_document',
+  // TASK-791 — contractor invoices/evidence retention; provider docs reuse provider_supporting_doc.
+  contractor_invoice_draft: 'contractor_invoice',
+  contractor_invoice: 'contractor_invoice',
+  contractor_work_evidence_draft: 'contractor_work_evidence',
+  contractor_work_evidence: 'contractor_work_evidence',
+  provider_invoice_draft: 'provider_supporting_doc',
+  provider_invoice: 'provider_supporting_doc',
+  provider_payout_statement: 'provider_supporting_doc'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -109,7 +130,15 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   sample_sprint_report_draft: 'sample-sprint-reports',
   sample_sprint_report: 'sample-sprint-reports',
   resignation_letter_ratified_draft: 'resignation-letters',
-  resignation_letter_ratified: 'resignation-letters'
+  resignation_letter_ratified: 'resignation-letters',
+  // TASK-791 — contractor/provider invoice + evidence bucket prefixes.
+  contractor_invoice_draft: 'contractor-invoices',
+  contractor_invoice: 'contractor-invoices',
+  contractor_work_evidence_draft: 'contractor-work-evidence',
+  contractor_work_evidence: 'contractor-work-evidence',
+  provider_invoice_draft: 'provider-invoices',
+  provider_invoice: 'provider-invoices',
+  provider_payout_statement: 'provider-payout-statements'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -288,7 +317,12 @@ const assertPrivateAssetUpload = ({
   contentType: string
   sizeBytes: number
 }) => {
-  if (!PRIVATE_USER_ALLOWED_MIME_TYPES.has(contentType)) {
+  const contextExtraMime = CONTEXT_EXTRA_MIME_TYPES[contextType]
+
+  const isAllowedMime =
+    PRIVATE_USER_ALLOWED_MIME_TYPES.has(contentType) || Boolean(contextExtraMime?.has(contentType))
+
+  if (!isAllowedMime) {
     throw new Error('unsupported_type')
   }
 
@@ -855,6 +889,27 @@ const canAccessSampleSprintReportAsset = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'admin') ||
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
+// TASK-791 — Contractor invoice + work evidence: el contractor accede a lo
+// propio (ownerMemberId == su member facet); HR/Finance revisan; admin audita.
+const canAccessContractorInvoiceAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord) => {
+  if (asset.ownerMemberId && tenant.memberId && asset.ownerMemberId === tenant.memberId) {
+    return true
+  }
+
+  return (
+    hasRouteGroup(tenant, 'hr') ||
+    hasRouteGroup(tenant, 'finance') ||
+    hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  )
+}
+
+// TASK-791 — Provider invoices/payout statements: NO visibles al contractor por
+// defecto (pueden contener fees, márgenes u otros trabajadores). Solo HR/Finance/admin.
+const canAccessProviderSupportingAsset = (tenant: TenantContext) =>
+  hasRouteGroup(tenant, 'hr') ||
+  hasRouteGroup(tenant, 'finance') ||
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+
 export const canTenantAccessAsset = ({
   tenant,
   asset
@@ -889,6 +944,17 @@ export const canTenantAccessAsset = ({
     case 'sample_sprint_report_draft':
     case 'sample_sprint_report':
       return canAccessSampleSprintReportAsset(tenant)
+    // TASK-791 — contractor invoice + work evidence (contractor self / HR / Finance / admin).
+    case 'contractor_invoice_draft':
+    case 'contractor_invoice':
+    case 'contractor_work_evidence_draft':
+    case 'contractor_work_evidence':
+      return canAccessContractorInvoiceAsset(tenant, asset)
+    // TASK-791 — provider docs hidden from contractor (HR / Finance / admin only).
+    case 'provider_invoice_draft':
+    case 'provider_invoice':
+    case 'provider_payout_statement':
+      return canAccessProviderSupportingAsset(tenant)
     default:
       return false
   }

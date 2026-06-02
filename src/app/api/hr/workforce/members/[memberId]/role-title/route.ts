@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 
+import { getServerAuthSession } from '@/lib/auth'
 import { can } from '@/lib/entitlements/runtime'
 import { requireHrCoreReadTenantContext } from '@/lib/hr-core/shared'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
-import { getRoleTitleGovernanceForMember } from '@/lib/workforce/role-title'
+import { getRoleTitleGovernanceForMember, RoleTitleError, updateMemberRoleTitle } from '@/lib/workforce/role-title'
 
 export const dynamic = 'force-dynamic'
 
@@ -63,6 +64,79 @@ export async function GET(_request: Request, { params }: RouteParams) {
   } catch (error) {
     captureWithDomain(error, 'identity', {
       extra: { route: 'hr/workforce/members/role-title', memberId, method: 'GET' }
+    })
+
+    return NextResponse.json(
+      { error: redactErrorForResponse(error), code: 'internal_error' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PATCH(request: Request, { params }: RouteParams) {
+  const { memberId } = await params
+
+  const { tenant, errorResponse: authErr } = await requireHrCoreReadTenantContext()
+
+  if (!tenant || authErr) {
+    return authErr ?? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!can(tenant, 'workforce.role_title.update', 'update', 'tenant')) {
+    return NextResponse.json(
+      { error: 'Capability missing: workforce.role_title.update', code: 'forbidden' },
+      { status: 403 }
+    )
+  }
+
+  const body = (await request.json().catch(() => ({}))) as {
+    roleTitle?: unknown
+    reason?: unknown
+  }
+
+  const roleTitle =
+    typeof body.roleTitle === 'string' && body.roleTitle.trim()
+      ? body.roleTitle.trim()
+      : null
+
+  const reason =
+    typeof body.reason === 'string' && body.reason.trim()
+      ? body.reason.trim()
+      : ''
+
+  try {
+    const session = await getServerAuthSession()
+
+    const result = await updateMemberRoleTitle({
+      memberId,
+      newRoleTitle: roleTitle,
+      reason,
+      actorUserId: tenant.userId,
+      actorEmail: session?.user?.email ?? null,
+      ipAddress: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null,
+      userAgent: request.headers.get('user-agent')
+    })
+
+    const governance = await getRoleTitleGovernanceForMember(memberId)
+
+    return NextResponse.json({
+      result,
+      governance,
+      capabilities: {
+        canUpdate: true,
+        canResolveDrift: can(tenant, 'workforce.role_title.review_drift', 'approve', 'tenant')
+      }
+    })
+  } catch (error) {
+    if (error instanceof RoleTitleError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode }
+      )
+    }
+
+    captureWithDomain(error, 'identity', {
+      extra: { route: 'hr/workforce/members/role-title', memberId, method: 'PATCH' }
     })
 
     return NextResponse.json(

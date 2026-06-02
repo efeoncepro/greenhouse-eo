@@ -188,6 +188,21 @@ export const resolveExpenseEconomicCategory = async (
 ): Promise<ResolveExpenseResult> => {
   const evidence: Record<string, unknown> = {}
 
+  // Rule 0 (TASK-977) — contractor payable is canonically labor_cost_external.
+  // Source-driven + first-match BEFORE the identity lookups: a contractor that is
+  // also an active member (e.g. an employee who transitioned to contractor) would
+  // otherwise match Rule 1 by member_id and resolve to labor_cost_internal. The
+  // payout is external labor by construction (the payable enforces
+  // economic_category='labor_cost_external' at the DB CHECK), so we pin it here.
+  if (input.sourceKind === 'contractor_payable') {
+    return {
+      category: 'labor_cost_external',
+      confidence: 'high',
+      matchedRule: 'CONTRACTOR_PAYABLE_SOURCE',
+      evidence: { ...evidence, source_kind: input.sourceKind }
+    }
+  }
+
   // Rule 1 — beneficiary ya viene como member_id explícito
   if (input.beneficiaryMemberId) {
     evidence.input_member_id = input.beneficiaryMemberId

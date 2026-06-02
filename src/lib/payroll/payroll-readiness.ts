@@ -6,7 +6,6 @@ import type {
   PayrollReadinessIssue
 } from '@/types/payroll'
 
-import { getLastBusinessDayOfMonth, getOperationalDateKey } from '@/lib/calendar/operational-calendar'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import {
   requiresPayrollAttendanceSignal,
@@ -18,6 +17,7 @@ import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
+import { resolvePayrollCalculationDeadline } from '@/lib/payroll/calculation-deadline'
 import { PayrollValidationError, getPeriodRangeFromId } from '@/lib/payroll/shared'
 import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
 
@@ -156,20 +156,19 @@ export const buildPayrollPeriodReadiness = ({
     })
   }
 
-  const lastBusinessDay = getLastBusinessDayOfMonth(period.year, period.month)
-  const referenceDateKey = getOperationalDateKey(referenceDate)
-
-  const calculatedOnTime = period.calculatedAt ? getOperationalDateKey(period.calculatedAt) <= lastBusinessDay : null
+  const deadline = resolvePayrollCalculationDeadline(period, referenceDate)
 
   const calculation: PayrollCalculationReadiness = {
     ready: blockingIssues.length === 0,
     blockingIssues,
     warnings,
     deadline: {
-      lastBusinessDay,
-      isDue: referenceDateKey === lastBusinessDay,
-      isOverdue: referenceDateKey > lastBusinessDay && period.status === 'draft',
-      calculatedOnTime
+      lastBusinessDay: deadline.lastBusinessDay,
+      isDue: deadline.isDue,
+      isOverdue: deadline.isOverdue,
+      calculatedOnTime: deadline.calculatedOnTime,
+      state: deadline.state,
+      blocksCalculation: deadline.blocksCalculation
     }
   }
 

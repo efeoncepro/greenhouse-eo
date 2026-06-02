@@ -17,6 +17,10 @@ export type GreenhouseAssetRetentionClass =
   | 'tooling_supporting_doc'
   | 'hr_certification'
   | 'hr_evidence'
+  // TASK-791 — Contractor invoice / work evidence retention classes. Provider
+  // invoice/payout statements reuse the existing `provider_supporting_doc`.
+  | 'contractor_invoice'
+  | 'contractor_work_evidence'
 
 export type GreenhouseAssetContext =
   | 'leave_request_draft'
@@ -40,6 +44,14 @@ export type GreenhouseAssetContext =
   | 'sample_sprint_report'
   | 'resignation_letter_ratified_draft'
   | 'resignation_letter_ratified'
+  // TASK-791 — Contractor / provider invoice + work evidence asset contexts.
+  | 'contractor_invoice_draft'
+  | 'contractor_invoice'
+  | 'contractor_work_evidence_draft'
+  | 'contractor_work_evidence'
+  | 'provider_invoice_draft'
+  | 'provider_invoice'
+  | 'provider_payout_statement'
 
 export interface GreenhouseAssetRecord {
   assetId: string
@@ -87,6 +99,10 @@ export type DraftUploadContext = Extract<
   | 'finance_reconciliation_evidence_draft'
   | 'sample_sprint_report_draft'
   | 'resignation_letter_ratified_draft'
+  // TASK-791 — contractor self-upload + HR/Finance on-behalf draft contexts.
+  | 'contractor_invoice_draft'
+  | 'contractor_work_evidence_draft'
+  | 'provider_invoice_draft'
 >
 
 export interface UploadPrivateAssetInput {

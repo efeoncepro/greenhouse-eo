@@ -351,6 +351,41 @@ export const isLastBusinessDayOfMonth = (
   return localDate.key === getLastBusinessDayOfMonth(localDate.year, localDate.month, context)
 }
 
+/**
+ * Returns the date key (`YYYY-MM-DD`) that is `businessDays` business days AFTER
+ * `referenceDate`, skipping weekends + holidays (Nager + persisted overrides),
+ * resolved in the operational timezone. `businessDays` must be a positive integer.
+ *
+ * Counting is exclusive of `referenceDate`: if `referenceDate` is a business day,
+ * `businessDays = 1` returns the NEXT business day. Canonical "N-th business day
+ * after the period close" primitive — reused by the contractor payment due-date
+ * rule (TASK-978) and any future payment-commitment derivation. NEVER reimplement
+ * business-day arithmetic locally; compose this helper.
+ */
+export const addBusinessDays = (
+  referenceDate: DateLike,
+  businessDays: number,
+  options?: OperationalCalendarContextInput | null
+): string => {
+  if (!Number.isInteger(businessDays) || businessDays < 1) {
+    throw new RangeError('businessDays must be a positive integer.')
+  }
+
+  const context = resolveOperationalCalendarContext(options ?? null, null, null)
+  let current = getCalendarDate(referenceDate, context.timezone)
+  let remaining = businessDays
+
+  while (remaining > 0) {
+    current = addCalendarDays(current, 1)
+
+    if (isBusinessCalendarDate(current, context)) {
+      remaining--
+    }
+  }
+
+  return current.key
+}
+
 export const isWithinPayrollCloseWindow = (
   referenceDate: DateLike,
   closeWindowBusinessDays = DEFAULT_OPERATIONAL_CLOSE_WINDOW_BUSINESS_DAYS,

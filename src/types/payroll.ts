@@ -346,6 +346,13 @@ export interface PayrollReadinessIssue {
   memberIds?: string[]
 }
 
+export type PayrollCalculationDeadlineState =
+  | 'pending'
+  | 'due_today'
+  | 'overdue_allowed'
+  | 'calculated_on_time'
+  | 'calculated_late'
+
 export interface PayrollCalculationReadiness {
   ready: boolean
   blockingIssues: PayrollReadinessIssue[]
@@ -355,6 +362,12 @@ export interface PayrollCalculationReadiness {
     isDue: boolean
     isOverdue: boolean
     calculatedOnTime: boolean | null
+    state: PayrollCalculationDeadlineState
+    /**
+     * The operational deadline is an SLA signal. It does not block calculation
+     * by itself; real blockers live in `blockingIssues`.
+     */
+    blocksCalculation: boolean
   }
 }
 

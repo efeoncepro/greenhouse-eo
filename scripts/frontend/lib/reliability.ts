@@ -28,6 +28,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 
 import type { AuditEntry } from './audit'
+import type { FailureCategory } from './manifest'
 
 const AUDIT_LOG_PATH = '.captures/audit.jsonl'
 
@@ -37,6 +38,7 @@ export interface ReliabilitySignal {
   failureRate: number
   meanDurationMs: number
   lastFailure: { timestamp: string; scenarioName: string; error?: string } | null
+  failuresByCategory: Record<FailureCategory | 'unknown', number>
   signal: 'ok' | 'warning' | 'error' | 'unknown'
   threshold: { warning: number; error: number }
 }
@@ -76,6 +78,16 @@ export const computeReliabilitySignal = (lastN = 20): ReliabilitySignal => {
       failureRate: 0,
       meanDurationMs: 0,
       lastFailure: null,
+      failuresByCategory: {
+        auth_redirect: 0,
+        selector_timeout: 0,
+        app_error: 0,
+        visual_timeout: 0,
+        frame_quality: 0,
+        assertion_failed: 0,
+        helper_error: 0,
+        unknown: 0
+      },
       signal: 'unknown',
       threshold: { warning: FAILURE_RATE_WARNING, error: FAILURE_RATE_ERROR }
     }
@@ -84,6 +96,23 @@ export const computeReliabilitySignal = (lastN = 20): ReliabilitySignal => {
   const failed = entries.filter(e => e.exitCode !== 0)
   const failureRate = failed.length / entries.length
   const meanDuration = entries.reduce((acc, e) => acc + e.durationMs, 0) / entries.length
+
+  const failuresByCategory = failed.reduce<Record<FailureCategory | 'unknown', number>>((acc, entry) => {
+    const category = entry.failureCategory ?? 'unknown'
+
+    acc[category] = (acc[category] ?? 0) + 1
+
+    return acc
+  }, {
+    auth_redirect: 0,
+    selector_timeout: 0,
+    app_error: 0,
+    visual_timeout: 0,
+    frame_quality: 0,
+    assertion_failed: 0,
+    helper_error: 0,
+    unknown: 0
+  })
 
   let signal: ReliabilitySignal['signal'] = 'ok'
 
@@ -104,6 +133,7 @@ export const computeReliabilitySignal = (lastN = 20): ReliabilitySignal => {
           error: lastFailureEntry.error
         }
       : null,
+    failuresByCategory,
     signal,
     threshold: { warning: FAILURE_RATE_WARNING, error: FAILURE_RATE_ERROR }
   }

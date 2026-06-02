@@ -1,5 +1,16 @@
 # Greenhouse Person ↔ Organization Model V1
 
+## Delta 2026-05-30 — Multi Operating Entity (forward note, roadmap EEUU)
+
+> Design note (no cambia código — anticipa una evolución declarada por el operador). Origen: diseño TASK-795.
+
+- **HOY el modelo asume UNA sola Operating Entity:** `Efeonce Group SpA` (`is_operating_entity=TRUE`, empleador / emisor DTE / entidad payroll). La resolución de sesión/tenant, la membership primaria de colaboradores internos y el régimen tributario asumen esa entidad única chilena.
+- **Roadmap declarado (2026-05-30):** Efeonce abrirá entidades legales en varios países — **EEUU primero** (`Efeonce US Inc`). Cada una será **una fila nueva en `greenhouse_core.organizations`** con `is_operating_entity=TRUE` y su `country` propio. El modelo pasa de "operating entity única" a un **conjunto de operating entities del grupo**.
+- **Impacto a anticipar (task futura multi-entidad, NO en 790-798/905):**
+  - `is_operating_entity=TRUE` deja de ser único → readers que asuman "la operating entity" deben volverse "qué operating entity" (resolución por contexto).
+  - El régimen tributario del contractor depende de **qué entidad lo contrata** (`contractor_engagements.legal_entity_organization_id`) × país del contractor — pasa a ser una matriz, no "Chile siempre". Ver `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30.
+- **Regla dura desde ya:** todo consumer que necesite "la entidad contratante / empleadora" debe leerla del campo (`legal_entity_organization_id` / `is_operating_entity`), **NUNCA hardcodear `Efeonce`/Chile**. Hoy es un valor único; pin-earlo rompería al abrir EEUU.
+
 ## Delta 2026-04-11 — Organization no reemplaza Legal Entity
 
 - El modelo `Person ↔ Organization` sigue siendo canónico para contexto organizacional, memberships y scoping operativo.

@@ -1,6 +1,8 @@
-# Scenarios — DSL para captura visual
+# Scenarios — DSL de Greenhouse Visual Capture
 
 Cada archivo `<name>.scenario.ts` exporta una constante `scenario` tipada como `CaptureScenario`.
+
+Estos scenarios son el contrato repetible de **Greenhouse Visual Capture** (`GVC`, `pnpm fe:capture`). Si una verificación visual depende de interacciones, scroll, captura full-page o se va a repetir por otro agente, debe vivir aquí en vez de un script Playwright ad-hoc.
 
 ## Estructura mínima
 
@@ -22,6 +24,24 @@ export const scenario: CaptureScenario = {
 }
 ```
 
+## Readiness y assertions
+
+Para evitar capturas falsas de login, loading o error boundary, los scenarios importantes pueden declarar readiness y assertions:
+
+```ts
+readiness: {
+  selector: '[data-gvc-ready="mi-feature"]',
+  absentSelectors: ['[data-testid="login-card"]', '[data-loading="true"]', '.MuiSkeleton-root'],
+  waitForFonts: true,
+  postReadyDelayMs: 150,
+  timeout: 8000
+},
+assertions: [
+  { kind: 'noLoginRedirect', reason: 'ruta autenticada esperada' },
+  { kind: 'noErrorBoundary', reason: 'la evidencia no debe ser un error de app' }
+]
+```
+
 ## Tipos de step
 
 | `kind`  | Uso                                              | Campos              |
@@ -30,10 +50,89 @@ export const scenario: CaptureScenario = {
 | `mark`  | Captura PNG sync + entry en manifest             | `label`, `note?`    |
 | `hover` | Mouse over selector                              | `selector`, `timeout?` |
 | `click` | Click selector. Si mutating-UI, requiere `mutating:true` + `safeForCapture:true` | `selector` |
-| `scroll`| Scroll Y offset                                  | `scrollY` (px)      |
+| `scroll`| Scroll Y offset, destino absoluto o scroll robusto hacia selector | `scrollY?`, `scrollTo?`, `selector?`, `scrollBlock?`, `scrollInline?` |
 | `fill`  | Type en input. **Requiere** `mutating:true`     | `selector`, `value` |
 | `press` | Key sequence. **Requiere** `mutating:true`      | `selector?`, `key`  |
 | `sleep` | Delay puro sin espera de selector                | `ms`                |
+| `assert` | Assertion ligera en medio del timeline          | `assertion`         |
+| `interaction` | Microinteraction V2 con intención + frames relativos | `interaction` |
+
+## Microinteraction evidence V2
+
+Usá `interaction` cuando la incertidumbre sea el feedback de una acción, no solo una captura estática:
+
+```ts
+{
+  kind: 'interaction',
+  interaction: {
+    name: 'filter-hover',
+    action: { kind: 'hover', selector: '[role="tab"]' },
+    intent: 'Confirmar affordance del filtro antes de activarlo',
+    frames: [
+      { label: 'before', atMs: 0 },
+      { label: 'feedback', atMs: 150 },
+      { label: 'settled', atMs: 300 }
+    ],
+    keyboardEquivalent: {
+      action: { kind: 'press', key: 'Tab' },
+      expected: 'focus visible'
+    },
+    reducedMotion: 'capture'
+  }
+}
+```
+
+El manifest registra segmentos lógicos del video y `index.html` muestra los frames por interacción.
+
+## Multi-viewport
+
+Un scenario puede declarar viewports sin duplicar archivos:
+
+```ts
+viewports: [
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'tablet', width: 1024, height: 900 },
+  { name: 'mobile', device: 'iPhone 13' }
+]
+```
+
+El output crea subdirectorios por variante y un manifest raíz con `variants`.
+
+## Baseline mockup -> runtime
+
+Para tasks UI con mockup aprobado:
+
+```ts
+baseline: {
+  surfaceId: 'hr.contractors',
+  baselineName: 'contractor-admin-workbench-mockup',
+  approvedMockupCaptureDir: '.captures/<approved-run>'
+}
+```
+
+Capturá mockup y runtime, luego compará con `pnpm fe:capture:diff <mockup-run> <runtime-run>`.
+
+### Capturas largas y secciones scrolleadas
+
+Para evitar offsets fragiles en pantallas con scroll, preferir `scroll` por selector y luego capturar el panel con `clipSelector`:
+
+```ts
+{ kind: 'scroll', selector: '[data-capture="timeline"]', scrollBlock: 'center' },
+{ kind: 'mark', label: 'timeline', clipSelector: '[data-capture="timeline"]' }
+```
+
+Para auditar una pantalla completa, usar `fullPage` en el mark:
+
+```ts
+{ kind: 'mark', label: 'full-page', fullPage: true }
+```
+
+Para ir al inicio o final sin depender de offsets:
+
+```ts
+{ kind: 'scroll', scrollTo: 'top' }
+{ kind: 'scroll', scrollTo: 'bottom' }
+```
 
 ## Convenciones de label
 

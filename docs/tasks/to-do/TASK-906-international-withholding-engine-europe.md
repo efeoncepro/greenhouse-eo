@@ -33,6 +33,14 @@ Extender el motor canonico de retenciones internacionales de `international_inte
 
 Europa no debe entrar como excepcion por persona ni como `rateByCountry`. Cada pais/territorio europeo debe quedar con fallback explicito `needs_tax_review` y solo promoverse a `approved_*` mediante aprobacion Tax/Legal auditada.
 
+## Frontera con Contractor Engagements (TASK-790-798) — Entidad Contratante (2026-05-30)
+
+Single source of truth: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30 (modelo dimensional canónico). Misma frontera que TASK-905:
+
+- Este motor (Europa) es el dueño del withholding **Chile→no-residente europeo**. Contractor Engagements/Payables (TASK-790-798) **delega** acá; nunca aplica una tasa por su cuenta (queda `manual_review_required`/`country_engine_owned` y escala).
+- La activación se condiciona a la **entidad contratante** (`legal_entity_organization_id` = Operating Entity chilena, hoy `Efeonce Group SpA`) × contractor residente europeo. NO al país del contractor aislado.
+- Multi-entidad: cuando abra `Efeonce US Inc` u otra entidad legal, los contractors contratados por una entidad NO chilena salen del scope de este motor. **NUNCA hardcodear "Efeonce/Chile"**: leer `legal_entity_organization_id`.
+
 ## Why This Task Exists
 
 TASK-905 cubre Americas como V1 productivo. La investigacion SII Europa demostro que Espana y Europa tienen suficientes particularidades para requerir una task propia: convenios con articulos diferentes para empleo vs servicios independientes, service PE por 183 dias/seis meses, territorios que no heredan cobertura, circulares de nacion mas favorecida que cambian tasas del PDF base y MLI/PPT anti-abuso.
@@ -333,3 +341,12 @@ Rules or sources must be able to store:
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm pg:doctor`
 - dry-run script/API from TASK-905 for current collaborators, staging only.
+
+## Closing Protocol
+
+- [ ] Lifecycle and folder synchronized.
+- [ ] `docs/tasks/README.md` synchronized.
+- [ ] `Handoff.md` updated.
+- [ ] `changelog.md` + architecture docs updated.
+- [ ] Document which European country/territory rules are `approved_*` vs `needs_tax_review`.
+- [ ] `pnpm vitest run src/lib/payroll` green (payroll non-regression gate).

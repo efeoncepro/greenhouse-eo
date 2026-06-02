@@ -16,6 +16,7 @@ import PayrollPaymentCancelledEmail from '@/emails/PayrollPaymentCancelledEmail'
 import BeneficiaryPaymentProfileChangedEmail, {
   type PaymentProfileEmailKind
 } from '@/emails/BeneficiaryPaymentProfileChangedEmail'
+import ContractorRemittanceEmail from '@/emails/ContractorRemittanceEmail'
 import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
 import { getMicrocopy } from '@/lib/copy'
@@ -848,6 +849,79 @@ registerTemplate('weekly_executive_digest', (context: WeeklyDigestEmailContext) 
       t.plainTextOpenPortal
     ].join('\n')
   }
+})
+
+// TASK-981 — Contractor remittance ("Comprobante de Pago") paid notification.
+// Lean summary + the full TASK-960 PDF attached. Transactional, jurisdiction-neutral.
+registerTemplate('contractor_remittance_paid', (context: {
+  beneficiaryName: string
+  remittanceNumber: string
+  netLabel: string
+  netAmount: number
+  netCurrency: string
+  paymentDateLabel: string
+  paymentDateValue: string
+  locale: 'es' | 'en'
+  attachmentFilename: string
+  pdfBuffer: Buffer
+}) => ({
+  subject: context.locale === 'en'
+    ? `Payment confirmation ${context.remittanceNumber}`
+    : `Comprobante de pago ${context.remittanceNumber}`,
+  react: ContractorRemittanceEmail({
+    beneficiaryName: context.beneficiaryName,
+    remittanceNumber: context.remittanceNumber,
+    netLabel: context.netLabel,
+    netAmount: context.netAmount,
+    netCurrency: context.netCurrency,
+    paymentDateLabel: context.paymentDateLabel,
+    paymentDateValue: context.paymentDateValue,
+    locale: context.locale
+  }),
+  text: [
+    context.locale === 'en' ? 'Payment confirmation' : 'Comprobante de pago',
+    `${context.remittanceNumber}`,
+    `${context.paymentDateLabel}: ${context.paymentDateValue}`,
+    `${context.netLabel}: ${formatMoney(context.netAmount, context.netCurrency)}`,
+    '',
+    context.locale === 'en'
+      ? 'The PDF confirmation is attached for your records.'
+      : 'Adjuntamos el comprobante en PDF para tus registros.'
+  ].join('\n'),
+  attachments: [{
+    filename: context.attachmentFilename,
+    content: context.pdfBuffer,
+    contentType: 'application/pdf'
+  }]
+}))
+
+registerPreviewMeta('contractor_remittance_paid', {
+  label: 'Comprobante de pago (contractor)',
+  description: 'Confirmacion de pago al contractor con el comprobante TASK-960 en PDF adjunto',
+  domain: 'finance',
+  supportsLocale: true,
+  defaultProps: {
+    beneficiaryName: 'Maria Gonzalez Rojas',
+    remittanceNumber: 'EO-RA-000123',
+    netLabel: 'Pago neto',
+    netAmount: 847500,
+    netCurrency: 'CLP',
+    paymentDateLabel: 'Fecha de pago',
+    paymentDateValue: '01-06-2026',
+    locale: 'es',
+    attachmentFilename: 'comprobante-pago-EO-RA-000123.pdf',
+    pdfBuffer: Buffer.from('')
+  },
+  propsSchema: [
+    { key: 'beneficiaryName', label: 'Nombre del contractor', type: 'text' },
+    { key: 'remittanceNumber', label: 'N° de comprobante', type: 'text' },
+    { key: 'netLabel', label: 'Etiqueta del neto', type: 'text' },
+    { key: 'netAmount', label: 'Monto neto', type: 'number' },
+    { key: 'netCurrency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'paymentDateLabel', label: 'Etiqueta fecha de pago', type: 'text' },
+    { key: 'paymentDateValue', label: 'Fecha de pago', type: 'text' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
+  ]
 })
 
 // ═══════════════════════════════════════════════════════════

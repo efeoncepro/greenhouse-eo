@@ -8,6 +8,7 @@ import { syncOperatingEntityMembershipForMember } from '@/lib/account-360/operat
 import { withTransaction } from '@/lib/db'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { applyEntraRoleTitleWithClient } from '@/lib/workforce/role-title'
 
 import type { EligibilityVerdict } from './eligibility'
 
@@ -121,7 +122,22 @@ const upsertIdentityProfile = async (
   )
 
   if (existing.rows.length > 0) {
-    return existing.rows[0].profile_id
+    const profileId = existing.rows[0].profile_id
+
+    await client.query(
+      `UPDATE greenhouse_core.identity_profiles
+          SET full_name = $1,
+              job_title = COALESCE($2, job_title),
+              updated_at = CURRENT_TIMESTAMP
+        WHERE profile_id = $3
+          AND (
+            full_name IS DISTINCT FROM $1
+            OR ($2::text IS NOT NULL AND job_title IS DISTINCT FROM $2)
+          )`,
+      [params.displayName, params.entraJobTitle, profileId]
+    )
+
+    return profileId
   }
 
   // Create new — id derived from client_user_id for deterministic linking
@@ -548,6 +564,13 @@ export const provisionInternalCollaboratorFromScim = async (
       displayName: input.displayName,
       entraJobTitle: input.entraJobTitle ?? null
     })
+
+    if (input.entraJobTitle) {
+      await applyEntraRoleTitleWithClient(client, {
+        memberId: memberResolution.memberId,
+        entraJobTitle: input.entraJobTitle
+      })
+    }
 
     // ── Step 5 — INSERT or backfill client_user ────────────────────────────
     const clientUser = await insertOrBackfillClientUser(client, {

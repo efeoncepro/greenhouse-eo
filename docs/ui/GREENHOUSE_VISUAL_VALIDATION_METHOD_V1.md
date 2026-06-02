@@ -4,6 +4,8 @@
 
 Define a repeatable method to validate Greenhouse UI changes visually before closing a dashboard or admin iteration.
 
+Canonical tool name: **Greenhouse Visual Capture** (`GVC`). CLI: `pnpm fe:capture`.
+
 This method exists because:
 - `lint` and `build` confirm structural health, not visual proportion
 - many Greenhouse surfaces depend on authenticated routes
@@ -29,7 +31,7 @@ Use this method when a change affects:
 
 ## Standard Local Flow
 
-> **2026-05-29 update:** Para Greenhouse, el capturador canónico es `pnpm fe:capture`. El patrón Playwright manual de este documento queda como fallback histórico para casos que el helper no cubra todavía.
+> **2026-05-30 update:** Para Greenhouse, el capturador canónico es **Greenhouse Visual Capture** (`GVC`, `pnpm fe:capture`). El patrón Playwright manual de este documento queda como fallback histórico para casos que el helper no cubra todavía.
 
 ### 1. Prepare local env
 
@@ -64,6 +66,10 @@ Recommended local pattern:
   - `pnpm fe:capture --route=/path --env=staging --hold=3000` for quick route evidence.
   - `pnpm fe:capture:review <scenario-or-capture-dir>` when the output feeds UI/UX review.
   - `pnpm fe:capture:diff <prev> <curr>` for before/after.
+  - For long pages, use scenario scroll primitives instead of ad-hoc screenshots:
+    - `{ kind: 'scroll', selector: '[data-capture="section"]', scrollBlock: 'center' }`
+    - `{ kind: 'mark', label: 'section', clipSelector: '[data-capture="section"]' }`
+    - `{ kind: 'mark', label: 'full-page', fullPage: true }`
 - Use focused Playwright only as a fallback for console/network/API payloads or interactions not yet supported by the scenario DSL.
 - Wait for:
   - login redirect
@@ -75,6 +81,8 @@ Recommended local pattern:
 
 Check at minimum:
 - first fold hierarchy
+- full-page continuity when the surface scrolls
+- clipped section evidence for dense workflows or timelines
 - hero height vs side cards
 - card alignment
 - typography density
@@ -88,7 +96,7 @@ Check at minimum:
 
 ## Playwright Pattern Used In This Repo
 
-This section documents the historical manual pattern. Prefer `pnpm fe:capture` for current work and convert repeatable manual flows into `scripts/frontend/scenarios/<name>.scenario.ts`.
+This section documents the historical manual pattern. Prefer Greenhouse Visual Capture for current work and convert repeatable manual flows into `scripts/frontend/scenarios/<name>.scenario.ts`.
 
 This is the pattern validated during the dashboard hero/capacity iteration on `2026-03-11`:
 

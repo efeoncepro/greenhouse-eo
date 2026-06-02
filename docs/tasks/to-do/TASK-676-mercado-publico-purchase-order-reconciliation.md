@@ -11,7 +11,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-674`
+- Blocked by: `TASK-674`, `TASK-680`
 - Branch: `task/TASK-676-mercado-publico-oc-reconciliation`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -55,11 +55,13 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-674`
+- `TASK-680`
 - Endpoint oficial `ordenesdecompra.json` documentado en research.
 
 ### Blocks / Impacts
 
 - `TASK-677`
+- `TASK-678`
 - `TASK-682`
 - `TASK-686`
 - Reporting futuro de win/loss y post-award.
@@ -92,7 +94,7 @@ Reglas obligatorias:
 ### Slice 2 — Sync And Reconciliation
 
 - Implementar sync incremental/replay de OC.
-- Implementar reconciliador deterministico con confidence y explanation.
+- Implementar reconciliador deterministico con confidence y explanation; para Compra Agil usar `id_orden_compra` del detalle API v2 cuando exista y OC `Tipo=AG`/`CodigoOC` como evidencia downstream.
 - Emitir eventos de `awarded`, `purchase_order_linked` o equivalente definido por arquitectura.
 
 ### Slice 3 — Tests And Docs

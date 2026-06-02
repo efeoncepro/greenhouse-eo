@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { fetchEntraUserById } from '@/lib/entra/graph-client'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { redactErrorForResponse } from '@/lib/observability/redact'
 import { requireScimAuth } from '@/lib/scim/auth'
@@ -30,6 +31,24 @@ const isInternalCollaboratorPrimitiveEnabled = () =>
 export const dynamic = 'force-dynamic'
 
 const MICROSOFT_OBJECT_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+const resolveEntraJobTitleForScimCreate = async (
+  externalId: string,
+  email: string
+): Promise<string | null> => {
+  try {
+    const user = await fetchEntraUserById(externalId)
+
+    return user?.jobTitle?.trim() || null
+  } catch (error) {
+    captureWithDomain(error, 'identity', {
+      tags: { source: 'scim_provisioning', stage: 'entra_job_title_enrichment' },
+      extra: { externalId, email }
+    })
+
+    return null
+  }
+}
 
 // ── GET /api/scim/v2/Users — List or filter users ──
 
@@ -250,6 +269,8 @@ export async function POST(request: Request) {
 
       // Eligible (verdict.eligible === true): full primitive
       try {
+        const entraJobTitle = await resolveEntraJobTitleForScimCreate(externalId, email)
+
         const result = await provisionInternalCollaboratorFromScim({
           email,
           externalId,
@@ -259,7 +280,7 @@ export async function POST(request: Request) {
           tenantMappingId: mapping.scim_tenant_mapping_id,
           defaultRoleCode: mapping.default_role_code,
           active,
-          entraJobTitle: null, // SCIM standard doesn't include jobTitle; cron enrichment posterior
+          entraJobTitle,
           eligibilityVerdict: verdict
         })
 

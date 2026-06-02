@@ -4,14 +4,28 @@ import { writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { getGoogleGenAIClient, getGreenhouseAgentModel } from '@/lib/ai/google-genai'
+import {
+  generateOpenAIImage,
+  type OpenAIImageBackground,
+  type OpenAIImageQuality,
+  type OpenAIImageSize,
+  type OpenAITransparentBackgroundStrategy
+} from '@/lib/ai/openai-image'
 
 // ── Types ──
+
+export type ImageGenerationProvider = 'google-imagen' | 'openai-image'
 
 export interface GenerateImageOptions {
   aspectRatio?: '1:1' | '16:9' | '9:16' | '4:3' | '3:4'
   format?: 'webp' | 'png'
   filename?: string
   numberOfImages?: number
+  provider?: ImageGenerationProvider
+  quality?: OpenAIImageQuality
+  size?: OpenAIImageSize
+  background?: OpenAIImageBackground
+  transparentBackgroundStrategy?: OpenAITransparentBackgroundStrategy
 }
 
 export interface GenerateImageResult {
@@ -19,6 +33,10 @@ export interface GenerateImageResult {
   filename: string
   format: string
   sizeBytes: number
+  provider: ImageGenerationProvider
+  model: string
+  requestedModel?: string
+  modelFallbackReason?: string | null
 }
 
 export interface GenerateAnimationOptions {
@@ -41,6 +59,7 @@ const ANIMATIONS_OUTPUT_DIR = join(process.cwd(), 'public', 'animations', 'gener
 
 // Use the latest frontier model available. Falls back gracefully if not enabled in the GCP project.
 const IMAGEN_MODEL = process.env.IMAGEN_MODEL?.trim() || 'imagen-4.0-generate-001'
+const DEFAULT_IMAGE_PROVIDER: ImageGenerationProvider = 'google-imagen'
 
 const SVG_SYSTEM_PROMPT = `You are an SVG animation specialist for the Greenhouse EO portal.
 Generate a single valid SVG file with embedded CSS animations.
@@ -90,7 +109,18 @@ const ensureDir = async (dir: string) => {
   await mkdir(dir, { recursive: true })
 }
 
-// ── Image Generation (Imagen 3) ──
+const isImageGenerationProvider = (value: string): value is ImageGenerationProvider =>
+  value === 'google-imagen' || value === 'openai-image'
+
+export const getImageGenerationProvider = (requested?: ImageGenerationProvider): ImageGenerationProvider => {
+  if (requested) return requested
+
+  const envProvider = process.env.GREENHOUSE_IMAGE_PROVIDER?.trim()
+
+  return envProvider && isImageGenerationProvider(envProvider) ? envProvider : DEFAULT_IMAGE_PROVIDER
+}
+
+// ── Image Generation ──
 
 export const generateImage = async (
   prompt: string,
@@ -102,6 +132,41 @@ export const generateImage = async (
     filename: userFilename,
     numberOfImages = 1
   } = options
+
+  const provider = getImageGenerationProvider(options.provider)
+
+  if (provider === 'openai-image') {
+    const generated = await generateOpenAIImage({
+      prompt,
+      aspectRatio,
+      format: format === 'webp' ? 'webp' : 'png',
+      numberOfImages,
+      quality: options.quality,
+      size: options.size,
+      background: options.background,
+      transparentBackgroundStrategy: options.transparentBackgroundStrategy
+    })
+
+    const buffer = Buffer.from(generated.imageBytesBase64, 'base64')
+    const filename = makeFilename(prompt, userFilename, generated.format)
+
+    await ensureDir(IMAGES_OUTPUT_DIR)
+
+    const filePath = join(IMAGES_OUTPUT_DIR, filename)
+
+    await writeFile(filePath, buffer)
+
+    return {
+      path: `/images/generated/${filename}`,
+      filename,
+      format: generated.format,
+      sizeBytes: buffer.length,
+      provider,
+      model: generated.model,
+      requestedModel: generated.requestedModel,
+      modelFallbackReason: generated.modelFallbackReason
+    }
+  }
 
   const client = await getGoogleGenAIClient()
 
@@ -133,7 +198,11 @@ export const generateImage = async (
     path: `/images/generated/${filename}`,
     filename,
     format,
-    sizeBytes: buffer.length
+    sizeBytes: buffer.length,
+    provider,
+    model: IMAGEN_MODEL,
+    requestedModel: IMAGEN_MODEL,
+    modelFallbackReason: null
   }
 }
 

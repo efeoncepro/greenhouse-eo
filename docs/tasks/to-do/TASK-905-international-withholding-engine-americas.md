@@ -33,6 +33,14 @@ Crear el motor canónico de retenciones internacionales para `international_inte
 
 El catálogo inicial cubre **América completa** para pagador `CL`: cada país/territorio americano debe quedar con una regla aprobada o con fallback explícito `needs_tax_review`. Europa, España incluida, queda fuera del seed V1 y debe bloquear como revisión manual hasta `TASK-906` / `TASK-907`.
 
+## Frontera con Contractor Engagements (TASK-790-798) — Entidad Contratante (2026-05-30)
+
+Single source of truth: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30 (modelo dimensional canónico).
+
+- **Este motor es el dueño del withholding Chile→no-residente.** El dominio Contractor Engagements/Payables (TASK-790-798) **delega** acá: nunca computa una tasa por su cuenta; un engagement directo internacional queda `tax_compliance_owner ∈ {manual_review_required, country_engine_owned}` y **escala** a este motor.
+- **La condición de activación es la dimensión raíz "entidad contratante"** (`contractor_engagements.legal_entity_organization_id`), no "el contractor es extranjero". Este motor aplica cuando **la entidad contratante es una Operating Entity chilena** (hoy `Efeonce Group SpA`, `is_operating_entity=TRUE`) **Y** el contractor es no-residente. Efeonce SpA actúa como **operational payer + agente de retención chileno**, NO como employer of record (invariante payroll `international_internal`).
+- **Roadmap multi-entidad:** cuando abra `Efeonce US Inc` (primera entidad legal fuera de Chile), un contractor US contratado **por la entidad US** sale del scope de este motor (es US doméstico, no pago chileno a no-residente). La llave es "entidad contratante = Operating Entity chilena", no el país del contractor. **NUNCA hardcodear "Efeonce/Chile" como el pagador**: leer `legal_entity_organization_id`.
+
 ## Why This Task Exists
 
 TASK-894 creó `international_internal` como contrato first-class, pero su V1 lo dejó sin descuentos Chile y con revisión legal manual por persona. La conversación operativa posterior cerró un gap: colaboradores fuera de Chile pagados directo por Efeonce no deben recibir cotizaciones/Payroll Chile, pero pueden requerir **retención de Impuesto Adicional o trato de convenio**.
@@ -509,7 +517,7 @@ V1 puede soportar `contractor` primero y dejar `efeonce` como warning/needs revi
 - `pnpm test`
 - `pnpm build`
 
-## Closing Requirements
+## Closing Protocol
 
 - Move task to `docs/tasks/complete/`.
 - Set `Lifecycle: complete`.

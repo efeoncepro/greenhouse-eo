@@ -11,14 +11,14 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ops`
-- Blocked by: `TASK-675`, `TASK-682`, `TASK-684`
+- Blocked by: `TASK-675`, `TASK-678`, `TASK-682`, `TASK-684`
 - Branch: `task/TASK-687-public-tender-notifications-reliability`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
 ## Summary
 
-Agrega notificaciones y senales operativas para oportunidades publicas: nuevos matches relevantes, deadlines cercanos, cambios de documentos/estado, sync failures y stale data. Debe integrarse con Teams/notifications y Reliability sin ruido excesivo.
+Agrega notificaciones y senales operativas para oportunidades publicas: nuevos matches relevantes, deadlines cercanos, cambios de documentos/estado, sync failures, stale data y degradacion de Compra Agil API v2. Debe integrarse con Teams/notifications y Reliability sin ruido excesivo.
 
 ## Why This Task Exists
 
@@ -57,6 +57,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-675`
+- `TASK-678`
 - `TASK-682`
 - `TASK-684`
 
@@ -97,7 +98,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Reliability Signals
 
-- Exponer freshness, failed runs, deadlines at risk y document download health.
+- Exponer freshness, failed runs, quota/degradation para Compra Agil v2, deadlines at risk y document download/metadata-only health.
 
 ## Out of Scope
 

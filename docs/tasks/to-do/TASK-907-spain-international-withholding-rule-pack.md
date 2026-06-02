@@ -28,6 +28,10 @@ Crear el rule pack especifico para Espana dentro del motor de retenciones intern
 
 No muta a Daniela ni a ningun colaborador real sin allowlist escrita HR/Finance/Legal. El objetivo es dejar Espana lista para aprobacion auditada y calculo automatico cuando exista signoff.
 
+## Frontera con Contractor Engagements (TASK-790-798) — Entidad Contratante (2026-05-30)
+
+Single source of truth: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30. Este rule pack es el dueño del withholding **Chile→residente España** (caso Daniela). Contractor Engagements/Payables **delega** acá; el engagement directo de un contractor en España queda `manual_review_required` hasta que exista la regla España aprobada, y nunca aplica una tasa por su cuenta. La activación se condiciona a **entidad contratante = Operating Entity chilena** (hoy `Efeonce Group SpA`) × residente España. Si mañana Daniela fuese contratada por una entidad legal europea/US de Efeonce, sale del scope de este motor (otro régimen). **NUNCA hardcodear "Efeonce/Chile"**: leer `legal_entity_organization_id`.
+
 ## Why This Task Exists
 
 Espana aparece como caso operativo concreto y no debe quedar como excepcion manual por persona. La investigacion SII Europa muestra que Espana requiere tratamiento propio: el Art. 14 del convenio es rentas del trabajo dependiente, no servicios personales independientes; el Art. 12 tiene rebaja por Circular SII N°50/2018; y cualquier no retencion por Art. 7 depende de no tener PE/service PE, evidencia y clasificacion correcta del servicio.
@@ -241,7 +245,7 @@ Snapshot must include:
 | Slice 0 | Revert docs decision memo | <10 min | si |
 | Slice 1 | Mark Spain rules inactive/needs review | <10 min | si |
 | Slice 2 | Disable readiness branch via flag or revert evidence requirement delta | <10 min | si |
-| Slice 3 | Tests/dry-run only; no production rollback | N/A | si |
+| Slice 3 | Dry-run read-only — no production runtime impact, nothing to roll back | inmediato | si |
 | Slice 4 | Revoke Spain rule approval, set status back to `needs_tax_review` | <10 min | si |
 
 ### Production verification sequence
@@ -283,3 +287,12 @@ Snapshot must include:
 - `pnpm exec eslint src/lib/payroll src/types/payroll.ts`
 - `pnpm exec tsc --noEmit --pretty false`
 - staging dry-run for Spain/Daniela with no mutation.
+
+## Closing Protocol
+
+- [ ] Lifecycle and folder synchronized.
+- [ ] `docs/tasks/README.md` synchronized.
+- [ ] `Handoff.md` updated.
+- [ ] `changelog.md` + architecture docs updated.
+- [ ] Spain rule pack documented as `approved_*` only after written HR/Finance/Legal sign-off; no real collaborator (Daniela) mutated without allowlist.
+- [ ] `pnpm vitest run src/lib/payroll` green (payroll non-regression gate).

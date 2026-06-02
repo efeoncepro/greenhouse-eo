@@ -13,7 +13,7 @@ import CardHeader from '@mui/material/CardHeader'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 
 const Loading = () => (
   <Stack
@@ -45,10 +45,12 @@ const Loading = () => (
       <Card
         key={idx}
         elevation={0}
-        sx={theme => ({
-          border: `1px solid ${theme.palette.divider}`,
-          borderLeft: `4px solid ${theme.palette.divider}`
-        })}
+        sx={{
+          border: 1,
+          borderColor: 'divider',
+          borderLeft: 4,
+          borderLeftColor: 'divider'
+        }}
       >
         <CardHeader
           avatar={<Skeleton variant='rounded' width={40} height={40} />}
@@ -65,7 +67,7 @@ const Loading = () => (
     ))}
 
     {/* Metadata accordion */}
-    <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}` })}>
+    <Card elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Skeleton variant='rounded' width={40} height={40} />
         <Skeleton variant='text' width={160} height={24} />

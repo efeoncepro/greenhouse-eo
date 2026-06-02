@@ -108,6 +108,15 @@ jobs:
         # a 0); promueve a strict (sin --warn) después de cierre.
         run: pnpm vercel-cron-gate --warn
 
+      - name: Route reachability gate (TASK-982/983)
+        # Detecta rutas (dashboard) huérfanas: páginas reales que NADA en src/
+        # navega (ni VerticalMenu/href, ni routes-array registry, ni template href,
+        # ni child declarado en el manifest, ni dinámica [id]). Espejo navegacional
+        # de la governance de view-registry (TASK-827). **STRICT desde TASK-983**:
+        # el backlog legacy de 19 huérfanos fue triado a 0; ahora cualquier huérfano
+        # nuevo BLOQUEA el build.
+        run: pnpm route-reachability-gate --strict
+
       - name: Migration marker gate (TASK-838 / ISSUE-068)
         # Bloquea PRs con migrations que tengan el patrón "Up Migration vacía +
         # DDL bajo Down Migration" — la clase de bug que causó ISSUE-068

@@ -7,7 +7,7 @@ import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 
 const STORAGE_KEY = 'nexa.insights.rootCause.expanded'
 

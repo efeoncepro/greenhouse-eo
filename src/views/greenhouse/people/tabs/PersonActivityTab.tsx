@@ -22,11 +22,13 @@ import NexaInsightsBlock from '@/components/greenhouse/NexaInsightsBlock'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
+import { MetricTrendCard, type MetricTrendPoint } from '@/components/greenhouse/primitives'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
-import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase, getMetricById, getThresholdZone } from '@/lib/ico-engine/metric-registry'
 import type { MemberNexaInsightsPayload } from '@/lib/ico-engine/ai/llm-types'
 import type { IcoMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
+import type { PersonIntelligenceSnapshot } from '@/lib/person-intelligence/types'
 import { getMicrocopy } from '@/lib/copy'
 
 const TASK407_ARIA_RADAR_DE_SALUD_OPERATIVA_PERSONAL = "Radar de salud operativa personal"
@@ -92,12 +94,20 @@ const EMPTY_NEXA_INSIGHTS: MemberNexaInsightsPayload = {
 // ── KPI Config ────────────────────────────────────────────────────────
 
 const KPI_CONFIG: Array<{ id: string; label: string; icon: string; format: (v: number | null) => string }> = [
-  { id: 'rpa', label: 'RpA promedio', icon: 'tabler-eye-check', format: v => (v !== null ? v.toFixed(2) : '—') },
-  { id: 'otd_pct', label: 'OTD%', icon: 'tabler-clock-check', format: v => (v !== null ? `${Math.round(v)}%` : '—') },
-  { id: 'ftr_pct', label: 'FTR%', icon: 'tabler-thumb-up', format: v => (v !== null ? `${Math.round(v)}%` : '—') },
+  { id: 'rpa', label: 'RpA', icon: 'tabler-eye-check', format: v => (v !== null ? v.toFixed(2) : '—') },
   { id: 'throughput', label: 'Throughput', icon: 'tabler-bolt', format: v => (v !== null ? String(Math.round(v)) : '—') },
-  { id: 'cycle_time', label: 'Ciclo promedio', icon: 'tabler-hourglass', format: v => (v !== null ? `${v.toFixed(1)}d` : '—') },
-  { id: 'stuck_assets', label: 'Stuck assets', icon: 'tabler-alert-triangle', format: v => (v !== null ? String(Math.round(v)) : '—') }
+  { id: 'cycle_time', label: 'Cycle Time', icon: 'tabler-hourglass', format: v => (v !== null ? `${v.toFixed(1)}d` : '—') },
+  { id: 'stuck_assets', label: 'Stuck Assets', icon: 'tabler-alert-triangle', format: v => (v !== null ? String(Math.round(v)) : '—') }
+]
+
+// ── Trend Card Config (month-over-month area sparklines, Figma 11853:17766) ──
+// OTD% + FTR% own the richer trend card; both are "higher % is better" so the
+// green-up area reads correctly. Metric names are English by convention (the
+// canonical ICO metric names: On-Time Delivery, First Time Right).
+
+const TREND_CONFIG: Array<{ id: string; title: string; metricName: string }> = [
+  { id: 'otd_pct', title: 'OTD%', metricName: 'On-Time Delivery' },
+  { id: 'ftr_pct', title: 'FTR%', metricName: 'First Time Right' }
 ]
 
 // ── Component ─────────────────────────────────────────────────────────
@@ -108,6 +118,7 @@ type Props = {
 
 type PersonActivityIntelligenceResponse = {
   nexaInsights: MemberNexaInsightsPayload | null
+  trend?: PersonIntelligenceSnapshot[]
 }
 
 const PersonActivityTab = ({ memberId }: Props) => {
@@ -119,6 +130,8 @@ const PersonActivityTab = ({ memberId }: Props) => {
   const [month, setMonth] = useState(now.getMonth() + 1)
   const [data, setData] = useState<IcoMetricSnapshot | null>(null)
   const [nexaInsights, setNexaInsights] = useState<MemberNexaInsightsPayload | null>(null)
+  const [trend, setTrend] = useState<PersonIntelligenceSnapshot[]>([])
+  const [reloadKey, setReloadKey] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -145,14 +158,17 @@ const PersonActivityTab = ({ memberId }: Props) => {
           const intelligence = await intelligenceRes.value.json() as PersonActivityIntelligenceResponse
 
           setNexaInsights(intelligence.nexaInsights ?? EMPTY_NEXA_INSIGHTS)
+          setTrend(Array.isArray(intelligence.trend) ? intelligence.trend : [])
         } else {
           setNexaInsights(EMPTY_NEXA_INSIGHTS)
+          setTrend([])
         }
       } catch {
         if (!active) return
 
         setData(null)
         setNexaInsights(EMPTY_NEXA_INSIGHTS)
+        setTrend([])
       } finally {
         if (active) setLoading(false)
       }
@@ -163,11 +179,70 @@ const PersonActivityTab = ({ memberId }: Props) => {
     return () => {
       active = false
     }
-  }, [memberId, year, month])
+  }, [memberId, year, month, reloadKey])
 
   const hasData = data !== null
   const years = Array.from({ length: 3 }, (_, i) => now.getFullYear() - i)
   const showPendingClosuresState = shouldShowPendingClosures(data)
+
+  // Trend cards share the SAME temporal mode as the period selector above — no
+  // mixed temporal modes in one render (TASK-776 doctrine). The card headlines a
+  // CLOSED month: the selected month when it is closed, otherwise the latest
+  // closed month (a partial in-progress month is never a meaningful monthly
+  // headline). The sparkline is the trailing window ending at that month, so
+  // moving the month/year selector re-anchors the line, marker, value and delta.
+  const sortedTrend = [...trend].sort((a, b) => a.period.year - b.period.year || a.period.month - b.period.month)
+  const currentRealYear = now.getFullYear()
+  const currentRealMonth = now.getMonth() + 1
+
+  const isInProgressMonth = (p: { year: number; month: number }) =>
+    p.year === currentRealYear && p.month === currentRealMonth
+
+  const selectedIsInProgress = year === currentRealYear && month === currentRealMonth
+
+  const withinSelected = (p: { year: number; month: number }) =>
+    p.year < year || (p.year === year && p.month <= month)
+
+  // Closed months only, clamped to the selected period when a past month is
+  // selected; when the in-progress month is selected we keep all closed months
+  // and headline the latest of them.
+  const closedTrend = sortedTrend.filter(s => !isInProgressMonth(s.period))
+  const windowTrend = selectedIsInProgress ? closedTrend : closedTrend.filter(s => withinSelected(s.period))
+
+  const anchorSnapshot = windowTrend.at(-1) ?? null
+  const hasTrend = windowTrend.length > 0 || hasData
+
+  // Explicit comparison period (dataviz rule): show the month the card reflects.
+  const anchorPeriodLabel = anchorSnapshot
+    ? `${MONTH_SHORT[anchorSnapshot.period.month] ?? anchorSnapshot.period.month} ${anchorSnapshot.period.year}`
+    : `${MONTH_SHORT[month] ?? month} ${year}`
+
+  const buildTrendSeries = (metricId: string): MetricTrendPoint[] =>
+    windowTrend.map(s => ({
+      label: MONTH_SHORT[s.period.month] ?? String(s.period.month),
+      value: s.deliveryMetrics.find(m => m.metricId === metricId)?.value ?? null
+    }))
+
+  // Hero = the anchor (headline) month. Fall back to the selected-period ICO
+  // context when the rolling window has no snapshot (deep historical selection).
+  const resolveTrendHero = (metricId: string): { value: number | null; zone: ThresholdZone | null } => {
+    const anchorMetric = anchorSnapshot?.deliveryMetrics.find(m => m.metricId === metricId)
+    const periodMetric = hasData ? getMetric(data, metricId) : undefined
+
+    const heroValue = anchorMetric?.value ?? periodMetric?.value ?? null
+
+    // Zone is ALWAYS derived from the value that is displayed (the anchor month).
+    // Never inherit a snapshot zone from the selected ICO context — that is the
+    // possibly in-progress month and would colour the card by a DIFFERENT month
+    // than the headline value (GVC caught this: OTD 100% rendered critical
+    // because it inherited the in-progress June zone).
+    const definition = getMetricById(metricId)
+
+    const zone =
+      definition && heroValue !== null ? getThresholdZone(definition, heroValue) : (anchorMetric?.zone ?? null)
+
+    return { value: heroValue, zone }
+  }
 
   // ── CSC Donut ───────────────────────────────────────────────────────
 
@@ -413,6 +488,43 @@ const PersonActivityTab = ({ memberId }: Props) => {
           />
         </Card>
       </Grid>
+
+      {/* Monthly trend cards — OTD% / FTR% area sparklines (Figma 11853:17766).
+          Rolling 6-month view, independent of the selected period. */}
+      {hasTrend ? (
+        <SectionErrorBoundary
+          sectionName='person-activity-trends'
+          description='No pudimos cargar las tendencias mensuales.'
+        >
+          {TREND_CONFIG.map(cfg => {
+            const hero = resolveTrendHero(cfg.id)
+
+            return (
+              <Grid size={{ xs: 12, sm: 6 }} key={cfg.id}>
+                <MetricTrendCard
+                  title={cfg.title}
+                  metricName={cfg.metricName}
+                  periodLabel={`Mensual · ${anchorPeriodLabel}`}
+                  value={hero.value}
+                  tone={hero.zone ? THRESHOLD_ZONE_COLOR[hero.zone] : undefined}
+                  format='percentage'
+                  deltaUnit='pts'
+                  series={buildTrendSeries(cfg.id)}
+                  dataCapture={`person-trend-${cfg.id}`}
+                  menuOptions={[
+                    {
+                      text: 'Actualizar',
+                      icon: 'tabler-refresh',
+                      menuItemProps: { onClick: () => setReloadKey(k => k + 1) }
+                    }
+                  ]}
+                  menuTooltip='Opciones'
+                />
+              </Grid>
+            )
+          })}
+        </SectionErrorBoundary>
+      ) : null}
 
       {loading ? (
         <Grid size={{ xs: 12 }}>

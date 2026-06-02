@@ -165,6 +165,7 @@ const UserMessage = () => (
             }}>
               <ComposerPrimitive.Input asChild>
                 <CustomTextField
+                  id='nexa-message-edit-input'
                   fullWidth
                   multiline
                   minRows={1}
@@ -468,6 +469,7 @@ const ChatComposer = () => {
         }}>
           <ComposerPrimitive.Input asChild>
             <CustomTextField
+              id='nexa-floating-composer-input'
               fullWidth
               multiline
               minRows={1}

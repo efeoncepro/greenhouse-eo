@@ -151,6 +151,69 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-790 — Contractor Engagements (Workforce/HR). read=ver engagement;
+    // manage=create/update/transition/pause/end del engagement contractor.
+    // NO reutiliza permisos de finiquito (cierre contractor != finiquito laboral).
+    key: 'hr.contractor_engagement',
+    module: 'hr',
+    actions: ['read', 'create', 'update', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-790 — revision del riesgo de reclasificacion laboral del contractor.
+    // approve=registrar revision (factors + reviewed) que puede limpiar o
+    // escalar a legal_review_required/blocked. Mas restrictiva que manage.
+    key: 'hr.contractor_classification',
+    module: 'hr',
+    actions: ['read', 'approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-792 — Contractor work submissions (timesheet/milestone/deliverable…).
+    // read=ver; create=submit/registrar; update=editar borrador + submit;
+    // manage=cancelar. La revision (approve/dispute/reject) usa la capability
+    // dedicada hr.contractor_work_submission.review (separacion operacional).
+    key: 'hr.contractor_work_submission',
+    module: 'hr',
+    actions: ['read', 'create', 'update', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-792 — revision operacional de la work submission. approve cubre
+    // approve/dispute/reject (dispute/reject requieren reason >= 10 chars).
+    key: 'hr.contractor_work_submission.review',
+    module: 'hr',
+    actions: ['read', 'approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-793 — Contractor payables (Finance domain). read=ver; create=generar
+    // payable desde submission/off-cycle; manage=evaluar readiness/transicionar/
+    // cancelar. El payable listo dispara el bridge a Finance obligations.
+    key: 'finance.contractor_payable',
+    module: 'finance',
+    actions: ['read', 'create', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-793 — waiver gobernado del gate de payment profile. Mas restrictiva:
+    // permite marcar ready_for_finance sin perfil de pago aprobado.
+    key: 'finance.contractor_payable.waive_payment_profile',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-968 — override gobernado del guardrail de monto acordado. Admin-only:
+    // permite pasar el gate `payment_exceeds_agreed_amount` cuando el bruto supera
+    // el monto acordado fijado por HR. SoD: distinta de la capability HR que fija
+    // el monto (hr.contractor_engagement) — HR fija, Finance no lo supera sin override.
+    key: 'finance.contractor_payable.override_agreed_amount',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-030 — plantillas reutilizables de checklist HRIS.
     key: 'hr.onboarding_template',
     module: 'hr',
@@ -856,6 +919,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     // perfil de pago. La creacion entra como pending_approval; finance aprueba
     // con maker-checker (NUNCA puede auto-aprobar). Scope 'own'.
     key: 'personal_workspace.payment_profile.request_change_self',
+    module: 'my_workspace',
+    actions: ['create'] as const,
+    defaultScope: 'own'
+  },
+  {
+    // TASK-796 — Self-service: el contractor lee su propio engagement, envíos y
+    // estado de pago (Finance-only data filtrada). Scope 'own'. Distinto de
+    // hr.contractor_engagement.read (admin op tenant-scope).
+    key: 'personal_workspace.contractor.read_self',
+    module: 'my_workspace',
+    actions: ['read'] as const,
+    defaultScope: 'own'
+  },
+  {
+    // TASK-796 — Self-service: el contractor crea/envía su propia work submission
+    // (timesheet/milestone/deliverable) + adjunta boleta/evidencia. La aprobación
+    // es surface HR (hr.contractor_work_submission.review). Scope 'own'.
+    key: 'personal_workspace.contractor.submit_self',
     module: 'my_workspace',
     actions: ['create'] as const,
     defaultScope: 'own'

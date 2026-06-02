@@ -304,23 +304,27 @@ The JWT is generated via `next-auth/jwt` `encode()` with the same payload shape 
 
 Output: `.auth/storageState.json` — compatible with Playwright's `storageState` option.
 
-### Dedicated agent user
+### Agent role personas
 
-A dedicated PostgreSQL-provisioned user exists exclusively for agent and E2E test sessions. This avoids using personal accounts for automated workflows.
+Dedicated PostgreSQL-provisioned users exist exclusively for agent and E2E sessions. This avoids using personal accounts for automated workflows and lets agents validate role-sensitive behavior with least privilege.
 
-| Field           | Value                                            |
-| --------------- | ------------------------------------------------ |
-| `user_id`       | `user-agent-e2e-001`                             |
-| `email`         | `agent@greenhouse.efeonce.org`                   |
-| `password`      | `Gh-Agent-2026!`                                 |
-| `password_hash` | bcrypt cost-12 (`$2b$12$Du4oz...`)               |
-| `tenant_type`   | `efeonce_internal`                               |
-| `auth_mode`     | `credentials`                                    |
-| `roles`         | `efeonce_admin` + `collaborator`                 |
-| `timezone`      | `America/Santiago`                               |
-| `migration`     | `20260405151705425_provision-agent-e2e-user.sql` |
+| Persona | `user_id` | `email` | `tenant_type` | `roles` | Canonical use |
+|---|---|---|---|---|---|
+| Superadmin | `user-agent-e2e-001` | `agent@greenhouse.efeonce.org` | `efeonce_internal` | `efeonce_admin` + `collaborator` | Admin, permissions, broad smoke, cross-domain diagnostics |
+| Collaborator | `user-agent-collaborator-001` | `agent-collaborator@greenhouse.efeonce.org` | `efeonce_internal` | `collaborator` | `/my`, personal self-service, collaborator-only access checks |
+| Client | `user-agent-client-001` | `agent-client@greenhouse.efeonce.org` | `client` | `client_executive` + `client_manager` + `client_specialist` | Client portal general coverage without internal/admin access |
 
-The migration inserts into `greenhouse_core.client_users` and two rows into `greenhouse_core.user_role_assignments`. All INSERTs use `ON CONFLICT DO NOTHING` for idempotency.
+Shared properties:
+
+- `password`: `Gh-Agent-2026!`
+- `password_hash`: bcrypt cost-12 (`$2b$12$Du4oz...`)
+- `auth_mode`: `credentials`
+- `timezone`: `America/Santiago`
+- migrations:
+  - `20260405151705425_provision-agent-e2e-user.sql`
+  - `20260531020000000_task-954-agent-role-personas.sql`
+
+The client persona is intentionally composite for broad client-facing coverage. It does not validate fine-grained differences between `client_executive`, `client_manager`, and `client_specialist`; create separate personas if a task depends on those boundaries.
 
 ### Why a dedicated user?
 

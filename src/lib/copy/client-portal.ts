@@ -268,7 +268,7 @@ export const GH_MESSAGES = {
   team_project_breakdown_empty: 'Sin distribucion visible por proyecto todavia.',
   team_no_visible_activity: 'Sin actividad este mes',
 
-  footer: 'Efeonce Greenhouse™ · El ambiente diseñado para que tu marca crezca',
+  footer: 'Greenhouse by Efeonce',
   footer_portal_link: 'Portal',
 
   hero_activity_prefix: 'Ultima actividad',

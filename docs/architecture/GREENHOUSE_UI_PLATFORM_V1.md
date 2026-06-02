@@ -1,7 +1,9 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.9
+> **Version:** 1.11
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-02 — v1.11: `MetricTrendCard` primitive nueva (`src/components/greenhouse/primitives/`). KPI card con área interactiva month-over-month en **Recharts**: tooltip on-hover + crosshair, semáforo por `tone` (success/warning/error), línea **edge-to-edge** con dots/labels inset y alineados (técnica edge-anchor), draw-in + hover-lift reduced-motion aware, tabla sr-only a11y. Data-agnostic (recibe `series`/`value`/`tone`) → reutilizable para cualquier métrica de tendencia. Primer consumer: Person 360 → Activity (OTD%/FTR%). Ver Delta 2026-06-02 abajo.
+> **Updated:** 2026-06-01 — v1.10: TASK-982 Navigation Reachability Governance. Contrato canónico: toda ruta `(dashboard)` debe ser alcanzable (link interno / child route declarada / dinámica). Gate `route-reachability-gate.mjs` (espejo navegacional de TASK-827) + manifest SSOT `src/lib/navigation/route-reachability-manifest.ts`. Patrón header primary-action ("Nuevo X" en workbench, 1 primary + N tonal). Doctrina IA de dominio multi-superficie (hub-por-audiencia + tabs + drawers + ⌘K). Ver Delta 2026-06-01 abajo.
 > **Updated:** 2026-05-08 — v1.9: TASK-612 entrega Organization Workspace Shell (chrome) + FacetContentRouter + 9 facet content components, gated por flag `organization_workspace_shell_agency` (extensión de `home_rollout_flags` per V1.1). Patron canónico shell-vs-content (§4.5 spec V1) materializado: shell owns chrome, domain owns facet content via render-prop + lazy registry. Ver Delta 2026-05-08 abajo.
 > **Updated:** 2026-05-06 — v1.8: TASK-430 activa el runtime `next-intl` sin prefijar el portal privado. `src/i18n/*` resuelve locale con cookie `gh_locale` + `Accept-Language` + fallback `es-CL`, el App Router queda envuelto por `NextIntlClientProvider`, `<html lang>` usa locale efectivo y `en-US` ya cubre shell navigation + namespaces shared serializables. Ver Delta 2026-05-06c abajo.
 > **Updated:** 2026-05-06 — v1.7: TASK-428 publica `GREENHOUSE_I18N_ARCHITECTURE_V1.md`: `next-intl` como librería App Router, portal privado state-only sin locale prefix por defecto, `en-US` como primera activación, `pt-BR` planned, y TASK-431 debe absorber `client_users.locale` legacy. Ver Delta 2026-05-06b abajo.
@@ -18,6 +20,57 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-02 — `MetricTrendCard` primitive (KPI trend chart reutilizable)
+
+`MetricTrendCard` (`src/components/greenhouse/primitives/MetricTrendCard.tsx`,
+exportado desde el barrel `@/components/greenhouse/primitives`) es la primitive
+canónica para mostrar una métrica con su **tendencia month-over-month** en una
+card. Es **data-agnostic**: recibe props genéricas, no depende de ningún dominio
+(ICO, finanzas, etc.) → reutilizable para cualquier serie temporal.
+
+**Por qué Recharts y no ApexCharts**: para sparklines en KPI cards la política de
+charts sanciona Recharts (`docs/tasks/to-do/TASK-518`). Además su `<Tooltip>` es
+React-event-driven → hoverable, keyboard-reachable y **verificable por GVC**,
+mientras que el tooltip SVG de ApexCharts no se dispara con eventos sintéticos
+(Playwright/GVC) por el check de `interactionModality`. (`StatsWithAreaChart`
+sigue siendo el sparkline Apex **decorativo sin tooltip**; `MetricTrendCard` es la
+trend card **funcional** con valores on-hover.)
+
+**API**:
+
+```tsx
+import { MetricTrendCard } from '@/components/greenhouse/primitives'
+
+<MetricTrendCard
+  title='OTD%'                                   // código de métrica (prominente, h5)
+  metricName='On-Time Delivery'                  // nombre completo (gris, al lado)
+  periodLabel='Mensual · May 2026'               // cadencia + período explícito
+  value={100}                                    // hero (mes ancla)
+  series={[{ label: 'Feb', value: 98.2 }, /* … */]}  // oldest → newest, value|null
+  tone='success'                                 // success | warning | error (semáforo)
+  format='percentage'                            // percentage | integer | decimal
+  deltaUnit='pts'
+  menuOptions={[/* OptionMenu items */]}         // 3-dot opcional
+  dataCapture='person-trend-otd'                 // hook GVC opcional
+/>
+```
+
+**Contratos canónicos**:
+
+- **Tipografía** (TASK-566): `kpiValue` + tabular-nums para el número; Poppins solo display h1–h4; nunca hardcodear font-family.
+- **Color = semáforo real** (`tone`) y **nunca el único signal**: valor + chip de delta con flecha + tooltip + tabla sr-only. La línea usa el shade `.dark` para cumplir WCAG 1.4.11 (3:1).
+- **Layout edge-to-edge**: la línea/área llega a los bordes vía edge-anchors invisibles (x=0/x=1), mientras los dots y los labels de mes quedan inset y alineados (los markers no tocan las puntas, los labels no se pegan al borde).
+- **a11y**: `role='img'` + aria-label en el plot + `<table>` visually-hidden (fallback canónico de charts).
+- **Microinteracciones reduced-motion aware**: draw-in del área on mount, tooltip + crosshair + active marker on hover, hover-lift + accent border, count-up del número (`AnimatedCounter`).
+
+**Reglas duras**:
+
+- **NUNCA** re-implementar una KPI trend card con `Box` + chart propio. Usar `MetricTrendCard`.
+- **NUNCA** pasar el tipo `ThresholdZone` de ICO directo: mapealo a `tone` (`success/warning/error`) en el consumer — la primitive es data-agnostic.
+- **NUNCA** derivar el `tone` de un período distinto al que muestra el hero (bug class GVC: el color debe salir del valor mostrado, no del mes en curso).
+
+**Verificación GVC**: escenario `person-activity-trend-microinteractions` (`scripts/frontend/scenarios/`) captura tooltip OTD/FTR, hover-lift y semáforo. **Primer consumer**: Person 360 → Activity (`PersonActivityTab.tsx`), OTD%/FTR% month-over-month.
 
 ## Delta 2026-05-08 — Organization Workspace Shell (TASK-612)
 

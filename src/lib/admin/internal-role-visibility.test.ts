@@ -49,7 +49,7 @@ const TASK_727_GRANTS: Record<string, string[]> = {
     'equipo.jerarquia', 'equipo.organigrama', 'equipo.departamentos', 'equipo.asistencia',
     'equipo.objetivos', 'equipo.evaluaciones', 'equipo.onboarding',
     'finanzas.resumen', 'finanzas.ingresos', 'finanzas.egresos', 'finanzas.conciliacion',
-    'finanzas.ordenes_pago',
+    'finanzas.ordenes_pago', 'finanzas.contractor_payables',
     'finanzas.banco', 'finanzas.cuenta_corriente_accionista', 'finanzas.clientes',
     'finanzas.proveedores', 'finanzas.inteligencia', 'finanzas.asignaciones_costos',
     'finanzas.cotizaciones', 'finanzas.ordenes_compra', 'finanzas.hes',
@@ -146,14 +146,16 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(ALL_INTERNAL_VIEW_CODES.length).toBeGreaterThanOrEqual(60)
   })
 
-  it('mi_ficha has 12 views including payment profile and onboarding self-service', () => {
-    expect(MI_FICHA_VIEW_CODES).toHaveLength(12)
+  it('mi_ficha has 13 views including payment profile, onboarding and contractor self-service', () => {
+    expect(MI_FICHA_VIEW_CODES).toHaveLength(13)
     expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mi_cuenta_pago')
     expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.onboarding')
+    expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mi_contratacion')
   })
 
-  it('finanzas has 14 views', () => {
-    expect(FINANZAS_VIEW_CODES).toHaveLength(14)
+  it('finanzas has 15 views (incluye contractor_payables, TASK-974)', () => {
+    expect(FINANZAS_VIEW_CODES).toHaveLength(15)
+    expect(FINANZAS_VIEW_CODES).toContain('finanzas.contractor_payables')
   })
 
   it('comercial has 6 transitional commercial-domain views', () => {
@@ -162,9 +164,10 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(COMERCIAL_VIEW_CODES).toContain('comercial.sow')
   })
 
-  it('equipo has 13 views (incluye workforce activation, offboarding, onboarding y nomina_proyectada)', () => {
-    expect(EQUIPO_VIEW_CODES).toHaveLength(13)
+  it('equipo has 14 views (incluye workforce activation, contratistas, offboarding, onboarding y nomina_proyectada)', () => {
+    expect(EQUIPO_VIEW_CODES).toHaveLength(14)
     expect(EQUIPO_VIEW_CODES).toContain('equipo.workforce_activation')
+    expect(EQUIPO_VIEW_CODES).toContain('equipo.contratistas')
   })
 
   // ─────────────────────────────────────────────────────────────────────────────

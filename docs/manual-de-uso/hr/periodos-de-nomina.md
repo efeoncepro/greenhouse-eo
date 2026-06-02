@@ -80,18 +80,25 @@ Eso significa:
 - el roster del periodo ya fue resuelto
 - pero la nomina oficial aun no se materializa
 - las entries apareceran solo despues de `Calcular`
+- la seccion de pre-nomina muestra quienes entrarian al calculo y quienes quedarian fuera, por ejemplo por falta de compensacion vigente
+
+### Deadline de calculo
+
+El deadline de calculo es el ultimo dia habil del mes operativo. Si el mes termina sabado o domingo, el deadline sera el viernes anterior.
+
+Si ves `Fuera de plazo operativo` pero el readiness dice `lista para calcular`, puedes calcular manualmente. Si ves `Bloqueada por readiness`, primero debes resolver los blockers indicados por la pantalla.
 
 ## Problemas comunes
 
 ### Pude crear el periodo, pero no calcular
 
-Esto suele significar que falta sincronizar la tabla tributaria Chile del mes imputable.
+Esto significa que existe al menos un blocker real de readiness. Puede ser tabla tributaria Chile faltante, UTM historica no disponible, KPI ICO obligatorio faltante, asistencia/licencias requeridas, datos de permisos degradados o una mezcla de regimenes incompatible.
 
 Que hacer:
 
 1. Confirma que el mes del periodo sea correcto.
-2. Revisa si el sistema muestra alerta de tabla tributaria faltante.
-3. Pide sincronizar la base previsional/tributaria del mes antes de recalcular.
+2. Lee el blocker especifico que aparece bajo el deadline.
+3. Resuelve la fuente indicada y vuelve a presionar `Calcular`.
 
 ### Veo colaboradores elegibles, pero aun no aparece la tabla de nomina
 

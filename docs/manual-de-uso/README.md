@@ -16,6 +16,7 @@ La diferencia con otras capas de documentacion:
 - [Sugerencias asistidas de conciliacion](finance/sugerencias-asistidas-conciliacion.md) — como generar, revisar, aceptar o descartar sugerencias AI sin alterar saldos automaticamente.
 - [Saldos bancarios FX drift](finance/saldos-bancarios-fx-drift-remediation.md) — como diagnosticar, auditar y remediar drift FX de saldos bancarios usando el control plane canonico sin SQL/backfills ad hoc.
 - [Finance Movement Feed](../documentation/finance/finance-movement-feed.md) — contrato reusable para mostrar movimientos financieros sin duplicar tablas, hardcodes de logos ni calculos de saldo en UI.
+- [Pagos a Contractors (Finanzas)](finance/pagos-a-contractors.md) — como ver, crear (desde envio + off-cycle), revisar readiness, enviar a Finanzas, cancelar, waivear y autorizar override de un pago de contractor desde `/finance/contractor-payments`, sin confundir el monto acordado (lo fija HR) con autorizar la excepcion (lo hace Finanzas).
 
 ### Comercial
 
@@ -46,6 +47,7 @@ _Pendiente._
 - [Periodos de nomina](hr/periodos-de-nomina.md) — como crear, editar y calcular periodos sin adivinar la version tributaria Chile; cuando Greenhouse la resuelve solo y cuando un override manual si aplica.
 - [Descargar y reconciliar la nomina mensual](hr/descargar-y-reconciliar-nomina.md) — paso a paso para descargar recibos individuales, PDF reporte mensual y Excel; donde leer los totales para reconciliar contra Previred (cotizaciones) y F29 (retencion SII honorarios) sin manipular el archivo.
 - [Exportar Previred y LRE](hr/payroll-compliance-exports-chile.md) — como descargar los artefactos compliance Chile desde periodos cerrados, permisos requeridos y cuidados de upload externo manual.
+- [Contratistas — Self-Service y revision HR](hr/contratistas.md) — como un contratista sube su boleta/factura + evidencia, envia entregas y responde observaciones desde `/my/contractor`; y como HR revisa la cola, aprueba, observa o rechaza desde `/hr/contractors` sin confundir aprobar con pagar.
 
 ### Agencia y Operaciones
 
@@ -61,7 +63,7 @@ _Pendiente._
 - [Formatear fechas, montos y numeros](plataforma/formateo-locale-aware.md) — como usar `@/lib/format` para UI, PDFs, Excel y emails sin reintroducir `Intl.*` o `toLocale*` directo; incluye caso Brasil.
 - [Organization Workspace — rollout y operación](plataforma/organizaciones-workspace-rollout.md) — cómo activar progresivamente el nuevo workspace de organizaciones (TASK-612) en `/agency/organizations/[id]` por usuario → rol → global, supervisar las 2 reliability signals, revertir instantáneo per-user, y diagnosticar issues comunes.
 - [Skills de Product Design](plataforma/skills-product-design.md) — qué cambió cuando se incorporó la suite de 17 skills (a11y, motion, performance, forms, state, dataviz, IA, frontend-architect, design-system-governance), cuándo se invoca cada una, cómo se componen, cuándo correr `greenhouse-ui-review` antes de commit y cómo extender el sistema sin romperlo.
-- [Captura visual con Playwright](plataforma/captura-visual-playwright.md) — `pnpm fe:capture` para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patrón de `_cap.mjs` ad-hoc. Scenario DSL declarativo, agent auth canónico, 5 capas defense-in-depth Safety, GC de artifacts.
+- [Greenhouse Visual Capture](plataforma/captura-visual-playwright.md) — `pnpm fe:capture` para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patrón de `_cap.mjs` ad-hoc. Scenario DSL declarativo, agent auth canónico, scroll robusto, captura full-page/por sección, 5 capas defense-in-depth Safety, GC de artifacts.
 
 ## Plantilla recomendada
 

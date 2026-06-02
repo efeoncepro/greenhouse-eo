@@ -27,6 +27,10 @@ import { operationalPlProjection } from './operational-pl'
 import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
 import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
+import { contractorPayableFinanceObligationProjection } from './contractor-payable-finance-obligation'
+import { contractorPayableExpenseMaterializeProjection } from './contractor-payable-expense-materialize'
+import { contractorPayablePaidCascadeProjection } from './contractor-payable-paid-cascade'
+import { contractorPayablePaidEmailProjection } from './contractor-payable-paid-email'
 import { paymentObligationsFromPayrollProjection } from './payment-obligations-from-payroll'
 import { recordExpensePaymentFromOrderProjection } from './record-expense-payment-from-order'
 import { payrollReliquidationDeltaProjection } from './payroll-reliquidation-delta'
@@ -106,6 +110,11 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(providerToolingProjection)
   registerProjection(financeExpenseReactiveIntakeProjection)
   registerProjection(paymentObligationsFromPayrollProjection)
+registerProjection(contractorPayableFinanceObligationProjection)
+registerProjection(contractorPayableExpenseMaterializeProjection)
+  registerProjection(contractorPayablePaidCascadeProjection) // TASK-981 Slice 1 — finance.payment_order.paid → mark linked contractor payables paid + emit workforce.contractor_payable.paid
+  registerProjection(contractorPayablePaidEmailProjection) // TASK-981 Slice 2 — workforce.contractor_payable.paid → email TASK-960 remittance PDF to the contractor
+
   registerProjection(recordExpensePaymentFromOrderProjection)
   registerProjection(payrollReliquidationDeltaProjection)
   registerProjection(accountBalancesProjection)

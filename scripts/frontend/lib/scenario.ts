@@ -15,9 +15,77 @@
 
 import type { Page } from 'playwright'
 
+import type { AssertionResult, CaptureFinding, InteractionSegment, ReadinessResult } from './manifest'
+
+export interface CaptureReadiness {
+  /** Selector estable que representa que la pantalla ya está lista para evidencia visual. */
+  selector?: string
+  /** Selectores que deben estar visibles/listos. Se suma a `selector` si ambos existen. */
+  selectors?: string[]
+  /** Selectores que NO deben estar visibles al capturar. */
+  absentSelectors?: string[]
+  /** Espera `document.fonts.ready` cuando el browser lo soporta. Default true. */
+  waitForFonts?: boolean
+  /** Delay corto post-ready para estabilizar layout/transiciones. */
+  postReadyDelayMs?: number
+  /** Timeout por condición. Default 10000. */
+  timeout?: number
+  note?: string
+}
+
+export interface CaptureAssertion {
+  kind: 'visible' | 'notVisible' | 'noLoginRedirect' | 'noErrorBoundary' | 'noCriticalToast'
+  selector?: string
+  timeout?: number
+  reason?: string
+}
+
+export interface CaptureInteractionAction {
+  kind: 'hover' | 'click' | 'focus' | 'press'
+  selector?: string
+  key?: string
+}
+
+export interface CaptureInteractionFrame {
+  label: string
+  /** ms relativo al momento inmediatamente posterior a la acción principal. */
+  atMs: number
+  note?: string
+  fullPage?: boolean
+  clipSelector?: string
+}
+
+export interface CaptureInteractionStep {
+  kind: 'interaction'
+  name: string
+  action: CaptureInteractionAction
+  intent: string
+  frames: CaptureInteractionFrame[]
+  timeout?: number
+  keyboardEquivalent?: {
+    action: CaptureInteractionAction
+    expected?: string
+  }
+  reducedMotion?: 'capture' | 'skip'
+}
+
+export interface CaptureViewportVariant {
+  name: string
+  width?: number
+  height?: number
+  device?: string
+}
+
+export interface CaptureQualityOptions {
+  allowEmpty?: boolean
+  allowLoading?: boolean
+  allowLogin?: boolean
+  allowErrorBoundary?: boolean
+}
+
 export interface CaptureScenarioStep {
   /** Tipo de step (state machine cerrado) */
-  kind: 'wait' | 'mark' | 'hover' | 'click' | 'scroll' | 'fill' | 'press' | 'sleep'
+  kind: 'wait' | 'mark' | 'hover' | 'click' | 'scroll' | 'fill' | 'press' | 'sleep' | 'assert' | 'interaction'
 
   /** Selector Playwright (CSS / role= / text= / xpath=) */
   selector?: string
@@ -37,11 +105,32 @@ export interface CaptureScenarioStep {
   /** Para `press`: key sequence (e.g. 'Enter', 'Escape', 'Control+K') */
   key?: string
 
-  /** Para `scroll`: y offset en px (positivo down, negativo up) */
+  /** Para `scroll`: y offset en px (positivo down, negativo up). Con selector, se aplica como ajuste post-scrollIntoView. */
   scrollY?: number
+
+  /** Para `scroll`: destino absoluto de la pagina. Evita offsets para top/bottom. */
+  scrollTo?: 'top' | 'bottom'
+
+  /** Para `scroll` con selector: alineación vertical del elemento. Default `center`. */
+  scrollBlock?: ScrollLogicalPosition
+
+  /** Para `scroll` con selector: alineación horizontal del elemento. Default `nearest`. */
+  scrollInline?: ScrollLogicalPosition
+
+  /** Para `mark`: captura toda la página, incluyendo contenido fuera del viewport. */
+  fullPage?: boolean
+
+  /** Para `mark`: captura solo un elemento/section después de esperar que exista. */
+  clipSelector?: string
 
   /** Comentario opcional, va a manifest.json */
   note?: string
+
+  /** Para `assert`: assertion embebida en el timeline. */
+  assertion?: CaptureAssertion
+
+  /** Para `interaction`: payload declarativo V2. */
+  interaction?: Omit<CaptureInteractionStep, 'kind'>
 }
 
 export interface CaptureScenario {
@@ -69,6 +158,25 @@ export interface CaptureScenario {
   /** Lista de selectores extra a enmascarar en el recording (passwords ya masked por default) */
   extraMaskSelectors?: string[]
 
+  /** Readiness explícito antes de steps/marks. */
+  readiness?: CaptureReadiness
+
+  /** Assertions ligeros de evidencia, no suite E2E de negocio. */
+  assertions?: CaptureAssertion[]
+
+  /** Viewports declarativos para una corrida multi-variante. */
+  viewports?: CaptureViewportVariant[]
+
+  /** Quality guard de frames. Opt-out explícito por scenario. */
+  quality?: CaptureQualityOptions
+
+  /** Metadata para flujo mockup aprobado -> runtime. */
+  baseline?: {
+    surfaceId?: string
+    baselineName?: string
+    approvedMockupCaptureDir?: string
+  }
+
   /** Steps en orden */
   steps: CaptureScenarioStep[]
 }
@@ -78,10 +186,25 @@ export interface ScenarioRunContext {
   outputDir: string
   log: (msg: string) => void
   /** Llamado por step `mark` — captura sync PNG + agrega entry a manifest */
-  onMark: (label: string, note?: string) => Promise<void>
+  onMark: (
+    label: string,
+    note?: string,
+    options?: {
+      fullPage?: boolean
+      clipSelector?: string
+      timeout?: number
+      interactionName?: string
+    }
+  ) => Promise<void>
+  addFinding?: (finding: CaptureFinding) => void
+  addAssertionResult?: (result: AssertionResult) => void
+  addInteractionSegment?: (segment: InteractionSegment) => void
+  getElapsedMs?: () => number
 }
 
 const DEFAULT_TIMEOUT = 5000
+const DEFAULT_READINESS_TIMEOUT = 10000
+const SCROLL_POSITIONS = new Set<ScrollLogicalPosition>(['start', 'center', 'end', 'nearest'])
 
 export const validateScenario = (s: CaptureScenario): void => {
   if (!s.name || !/^[a-z0-9-]+$/.test(s.name)) {
@@ -106,7 +229,63 @@ export const validateScenario = (s: CaptureScenario): void => {
         throw new Error(`step ${index}: label "${step.label}" duplicado`)
       }
 
+      if (step.fullPage && step.clipSelector) {
+        throw new Error(`step ${index}: mark no puede combinar fullPage con clipSelector`)
+      }
+
       usedLabels.add(step.label)
+    } else if (step.kind === 'assert') {
+      if (!step.assertion) throw new Error(`step ${index} (assert) requiere assertion`)
+    } else if (step.kind === 'interaction') {
+      const interaction = step.interaction
+
+      if (!interaction) throw new Error(`step ${index} (interaction) requiere interaction`)
+
+      if (!interaction.name || !/^[a-z0-9-]+$/.test(interaction.name)) {
+        throw new Error(`step ${index}: interaction.name inválido (kebab-case requerido)`)
+      }
+
+      if (!interaction.intent || interaction.intent.trim().length < 8) {
+        throw new Error(`step ${index}: interaction "${interaction.name}" requiere intent descriptivo`)
+      }
+
+      if (!interaction.frames.length) {
+        throw new Error(`step ${index}: interaction "${interaction.name}" requiere frames`)
+      }
+
+      if (interaction.action.kind === 'press' && !interaction.action.key) {
+        throw new Error(`step ${index}: interaction "${interaction.name}" action press requiere key`)
+      }
+
+      if (interaction.action.kind !== 'press' && !interaction.action.selector) {
+        throw new Error(`step ${index}: interaction "${interaction.name}" action requiere selector`)
+      }
+
+      for (const frame of interaction.frames) {
+        const label = `${interaction.name}-${frame.label}`
+
+        if (usedLabels.has(label)) throw new Error(`step ${index}: interaction frame label "${label}" duplicado`)
+
+        if (frame.fullPage && frame.clipSelector) {
+          throw new Error(`step ${index}: interaction frame "${label}" no puede combinar fullPage con clipSelector`)
+        }
+
+        usedLabels.add(label)
+      }
+    } else if (step.fullPage || step.clipSelector) {
+      throw new Error(`step ${index}: fullPage/clipSelector solo aplican a mark`)
+    }
+
+    if (step.scrollBlock && !SCROLL_POSITIONS.has(step.scrollBlock)) {
+      throw new Error(`step ${index}: scrollBlock inválido "${step.scrollBlock}"`)
+    }
+
+    if (step.scrollInline && !SCROLL_POSITIONS.has(step.scrollInline)) {
+      throw new Error(`step ${index}: scrollInline inválido "${step.scrollInline}"`)
+    }
+
+    if ((step.scrollBlock || step.scrollInline || step.scrollTo) && step.kind !== 'scroll') {
+      throw new Error(`step ${index}: scrollBlock/scrollInline/scrollTo solo aplican a scroll`)
     }
 
     const mutatingKinds = new Set(['fill', 'press'])
@@ -120,6 +299,283 @@ export const validateScenario = (s: CaptureScenario): void => {
       }
     }
   }
+
+  if (s.viewports) {
+    const names = new Set<string>()
+
+    for (const [index, viewport] of s.viewports.entries()) {
+      if (!viewport.name || !/^[a-z0-9-]+$/.test(viewport.name)) {
+        throw new Error(`viewport ${index}: name inválido (kebab-case requerido)`)
+      }
+
+      if (names.has(viewport.name)) throw new Error(`viewport "${viewport.name}" duplicado`)
+
+      if (!viewport.device && (!viewport.width || !viewport.height)) {
+        throw new Error(`viewport "${viewport.name}" requiere width/height o device`)
+      }
+
+      names.add(viewport.name)
+    }
+  }
+}
+
+const isVisible = async (page: Page, selector: string, timeout: number): Promise<boolean> => {
+  try {
+    return await page.locator(selector).first().isVisible({ timeout })
+  } catch {
+    return false
+  }
+}
+
+export const runReadiness = async (scenario: CaptureScenario, page: Page): Promise<ReadinessResult> => {
+  const readiness = scenario.readiness
+  const startedAt = Date.now()
+
+  if (!readiness) {
+    return { status: 'skipped', durationMs: 0 }
+  }
+
+  const timeout = readiness.timeout ?? DEFAULT_READINESS_TIMEOUT
+  const selectors = [...(readiness.selector ? [readiness.selector] : []), ...(readiness.selectors ?? [])]
+
+  try {
+    for (const selector of selectors) {
+      await page.locator(selector).first().waitFor({ state: 'visible', timeout })
+    }
+
+    for (const selector of readiness.absentSelectors ?? []) {
+      await page.locator(selector).first().waitFor({ state: 'hidden', timeout })
+    }
+
+    if (readiness.waitForFonts !== false) {
+      await page.evaluate(async () => {
+        if ('fonts' in document) await document.fonts.ready
+      })
+    }
+
+    if (readiness.postReadyDelayMs && readiness.postReadyDelayMs > 0) {
+      await page.waitForTimeout(readiness.postReadyDelayMs)
+    }
+
+    return {
+      status: 'passed',
+      selector: readiness.selector,
+      absentSelectors: readiness.absentSelectors,
+      waitForFonts: readiness.waitForFonts !== false,
+      durationMs: Date.now() - startedAt
+    }
+  } catch (err) {
+    return {
+      status: 'failed',
+      selector: readiness.selector,
+      absentSelectors: readiness.absentSelectors,
+      waitForFonts: readiness.waitForFonts !== false,
+      durationMs: Date.now() - startedAt,
+      error: err instanceof Error ? err.message : String(err)
+    }
+  }
+}
+
+export const runAssertion = async (assertion: CaptureAssertion, page: Page): Promise<AssertionResult> => {
+  const timeout = assertion.timeout ?? DEFAULT_TIMEOUT
+
+  const pass = (message?: string): AssertionResult => ({
+    kind: assertion.kind,
+    status: 'passed',
+    selector: assertion.selector,
+    reason: assertion.reason,
+    message
+  })
+
+  const fail = (message: string): AssertionResult => ({
+    kind: assertion.kind,
+    status: 'failed',
+    selector: assertion.selector,
+    reason: assertion.reason,
+    message
+  })
+
+  if (assertion.kind === 'noLoginRedirect') {
+    const url = new URL(page.url())
+    const isLogin = url.pathname.startsWith('/login') || url.pathname.startsWith('/signin') || url.pathname.startsWith('/auth/')
+
+    return isLogin ? fail(`URL actual ${url.pathname} parece login/auth`) : pass()
+  }
+
+  if (assertion.kind === 'noErrorBoundary') {
+    const selectors = [
+      assertion.selector,
+      '[data-nextjs-error-overlay]',
+      '[data-testid="error-boundary"]',
+      '[role="alert"][data-severity="error"]',
+      'text=/Application error|Unhandled Runtime Error|Something went wrong|Error inesperado/i'
+    ].filter(Boolean) as string[]
+
+    for (const selector of selectors) {
+      if (await isVisible(page, selector, Math.min(timeout, 500))) {
+        return fail(`Selector de error visible: ${selector}`)
+      }
+    }
+
+    return pass()
+  }
+
+  if (assertion.kind === 'noCriticalToast') {
+    const selector = assertion.selector ?? '[role="alert"][data-severity="error"], [role="alert"]:has-text("Error")'
+
+    return await isVisible(page, selector, Math.min(timeout, 500))
+      ? fail(`Toast/alert crítico visible: ${selector}`)
+      : pass()
+  }
+
+  if (!assertion.selector) return fail(`Assertion ${assertion.kind} requiere selector`)
+
+  const visible = await isVisible(page, assertion.selector, timeout)
+
+  if (assertion.kind === 'visible') return visible ? pass() : fail(`Selector no visible: ${assertion.selector}`)
+  if (assertion.kind === 'notVisible') return visible ? fail(`Selector visible: ${assertion.selector}`) : pass()
+
+  return fail(`Assertion no soportada: ${assertion.kind}`)
+}
+
+const runInteractionAction = async (
+  page: Page,
+  action: CaptureInteractionAction,
+  timeout: number
+): Promise<void> => {
+  switch (action.kind) {
+    case 'hover': {
+      if (!action.selector) throw new Error('interaction action hover requiere selector')
+      await page.locator(action.selector).first().hover({ timeout })
+
+return
+    }
+
+    case 'click': {
+      if (!action.selector) throw new Error('interaction action click requiere selector')
+      await page.locator(action.selector).first().click({ timeout })
+
+return
+    }
+
+    case 'focus': {
+      if (!action.selector) throw new Error('interaction action focus requiere selector')
+      await page.locator(action.selector).first().focus({ timeout })
+
+return
+    }
+
+    case 'press': {
+      if (!action.key) throw new Error('interaction action press requiere key')
+      if (action.selector) await page.locator(action.selector).first().press(action.key)
+      else await page.keyboard.press(action.key)
+
+return
+    }
+
+    default: {
+      const exhaustive: never = action.kind
+
+      throw new Error(`Unknown interaction action: ${exhaustive as string}`)
+    }
+  }
+}
+
+const runInteractionStep = async (
+  step: CaptureScenarioStep,
+  index: number,
+  ctx: ScenarioRunContext
+): Promise<void> => {
+  const interaction = step.interaction
+
+  if (!interaction) throw new Error(`step ${index} (interaction) requiere interaction`)
+
+  if (!interaction.intent) {
+    ctx.addFinding?.({
+      severity: 'warning',
+      category: 'microinteraction',
+      code: 'interaction_missing_intent',
+      message: `Interaction "${interaction.name}" no declara intent.`,
+      stepIndex: index
+    })
+  }
+
+  const timeout = interaction.timeout ?? DEFAULT_TIMEOUT
+  const relativeStart = ctx.getElapsedMs?.() ?? 0
+
+  if (interaction.action.selector && !await isVisible(ctx.page, interaction.action.selector, timeout)) {
+    ctx.addFinding?.({
+      severity: 'error',
+      category: 'microinteraction',
+      code: 'interaction_target_not_visible',
+      message: `Target no visible para interaction "${interaction.name}".`,
+      selector: interaction.action.selector,
+      stepIndex: index
+    })
+  }
+
+  await runInteractionAction(ctx.page, interaction.action, timeout)
+
+  const frameLabels: string[] = []
+
+  for (const frame of [...interaction.frames].sort((a, b) => a.atMs - b.atMs)) {
+    const elapsed = (ctx.getElapsedMs?.() ?? 0) - relativeStart
+    const waitMs = Math.max(0, frame.atMs - elapsed)
+
+    if (waitMs > 0) await ctx.page.waitForTimeout(waitMs)
+
+    const label = `${interaction.name}-${frame.label}`
+
+    await ctx.onMark(label, frame.note ?? interaction.intent, {
+      fullPage: frame.fullPage,
+      clipSelector: frame.clipSelector,
+      timeout,
+      interactionName: interaction.name
+    })
+    frameLabels.push(label)
+  }
+
+  if (interaction.keyboardEquivalent) {
+    await runInteractionAction(ctx.page, interaction.keyboardEquivalent.action, timeout)
+    await ctx.onMark(`${interaction.name}-keyboard`, interaction.keyboardEquivalent.expected ?? 'Keyboard/focus evidence', {
+      interactionName: interaction.name
+    })
+    frameLabels.push(`${interaction.name}-keyboard`)
+  } else if (interaction.action.kind === 'hover' || interaction.action.kind === 'click') {
+    ctx.addFinding?.({
+      severity: 'warning',
+      category: 'microinteraction',
+      code: 'interaction_without_keyboard_equivalent',
+      message: `Interaction "${interaction.name}" no declara evidencia keyboard/focus equivalente.`,
+      selector: interaction.action.selector,
+      stepIndex: index
+    })
+  }
+
+  if (interaction.reducedMotion === 'capture') {
+    await ctx.page.emulateMedia({ reducedMotion: 'reduce' })
+    await runInteractionAction(ctx.page, interaction.action, timeout)
+    await ctx.page.waitForTimeout(150)
+    await ctx.onMark(`${interaction.name}-reduced-motion`, 'Reduced-motion feedback evidence', {
+      interactionName: interaction.name
+    })
+    await ctx.page.emulateMedia({ reducedMotion: 'no-preference' })
+    frameLabels.push(`${interaction.name}-reduced-motion`)
+  }
+
+  ctx.addInteractionSegment?.({
+    name: interaction.name,
+    intent: interaction.intent,
+    actionKind: interaction.action.kind,
+    selector: interaction.action.selector,
+    startMs: relativeStart,
+    endMs: ctx.getElapsedMs?.() ?? relativeStart,
+    frameLabels,
+    keyboardEquivalent: interaction.keyboardEquivalent
+      ? `${interaction.keyboardEquivalent.action.kind}${interaction.keyboardEquivalent.action.key ? `:${interaction.keyboardEquivalent.action.key}` : ''}`
+      : undefined,
+    reducedMotion: interaction.reducedMotion
+  })
 }
 
 export const runStep = async (
@@ -139,7 +595,29 @@ export const runStep = async (
     }
 
     case 'mark': {
-      await ctx.onMark(step.label as string, step.note)
+      await ctx.onMark(step.label as string, step.note, {
+        fullPage: step.fullPage,
+        clipSelector: step.clipSelector,
+        timeout: step.timeout
+      })
+      break
+    }
+
+    case 'assert': {
+      if (!step.assertion) throw new Error(`${stepLabel} requiere assertion`)
+      const result = await runAssertion(step.assertion, ctx.page)
+
+      ctx.addAssertionResult?.(result)
+
+      if (result.status === 'failed') {
+        throw new Error(`Assertion failed (${result.kind}): ${result.message}`)
+      }
+
+      break
+    }
+
+    case 'interaction': {
+      await runInteractionStep(step, index, ctx)
       break
     }
 
@@ -158,7 +636,33 @@ export const runStep = async (
     case 'scroll': {
       const y = step.scrollY ?? 0
 
-      await ctx.page.evaluate(offset => window.scrollBy(0, offset), y)
+      if (step.scrollTo) {
+        await ctx.page.evaluate(target => {
+          window.scrollTo({
+            top: target === 'top' ? 0 : document.documentElement.scrollHeight,
+            behavior: 'instant'
+          })
+        }, step.scrollTo)
+      } else if (step.selector) {
+        const locator = ctx.page.locator(step.selector).first()
+
+        await locator.waitFor({ state: 'attached', timeout: step.timeout ?? DEFAULT_TIMEOUT })
+        await locator.evaluate((element, options) => {
+          element.scrollIntoView({
+            block: options.block,
+            inline: options.inline,
+            behavior: 'instant'
+          })
+        }, {
+          block: step.scrollBlock ?? 'center',
+          inline: step.scrollInline ?? 'nearest'
+        })
+      }
+
+      if (y !== 0 || (!step.selector && !step.scrollTo)) {
+        await ctx.page.evaluate(offset => window.scrollBy(0, offset), y)
+      }
+
       break
     }
 

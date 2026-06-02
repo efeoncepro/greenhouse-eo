@@ -26,7 +26,7 @@ import type { ApexOptions } from 'apexcharts'
 
 import useReducedMotion from '@/hooks/useReducedMotion'
 import type { NexaSignalObservation } from '@/lib/ico-engine/ai/llm-types'
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 

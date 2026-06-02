@@ -110,9 +110,16 @@ Un punto importante del modulo es que **elegibilidad de calculo** y **entries ya
 
 - Un periodo en `borrador` puede tener colaboradores elegibles aunque todavia no existan `payroll_entries`.
 - El readiness calcula ese roster elegible usando compensaciones vigentes del mes.
+- La vista de nomina mensual debe mostrar una pre-nomina read-only con quienes entrarian al calculo y quienes quedarian fuera por falta de compensacion.
 - Las `entries` aparecen solo despues de ejecutar `Calcular`.
 
 Por eso, ver un periodo en borrador con roster elegible no significa que la nomina ya exista; significa que Greenhouse ya sabe a quien incluir cuando el periodo quede listo para calcular.
+
+## Deadline operativo de calculo
+
+El deadline de calculo es el **ultimo dia habil operativo del mes**, no necesariamente el ultimo dia calendario. Si el mes termina en fin de semana, el deadline puede ser el viernes anterior.
+
+Ese deadline es un SLA operativo. Estar fuera de plazo debe avisarse con claridad, pero no bloquea el calculo por si solo. El calculo solo queda bloqueado cuando `calculation readiness` contiene blockers reales, por ejemplo falta de tabla tributaria requerida, UTM historica, KPI obligatorio, asistencia/licencias necesarias, datos de permisos degradados o regimenes incompatibles.
 
 ---
 

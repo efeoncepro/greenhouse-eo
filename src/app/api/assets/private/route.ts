@@ -17,7 +17,10 @@ const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>([
   'evidence_draft',
   'finance_reconciliation_evidence_draft',
   'sample_sprint_report_draft',
-  'resignation_letter_ratified_draft'
+  'resignation_letter_ratified_draft',
+  'contractor_invoice_draft',
+  'contractor_work_evidence_draft',
+  'provider_invoice_draft'
 ])
 
 const isDraftContext = (value: string): value is DraftUploadContext =>
@@ -58,6 +61,21 @@ const canUploadForContext = ({
     return hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   }
 
+  // TASK-791 — contractor sube su propia boleta/invoice + evidencia (member facet);
+  // HR sube on-behalf cuando el contractor no tiene acceso al portal.
+  if (contextType === 'contractor_invoice_draft' || contextType === 'contractor_work_evidence_draft') {
+    return Boolean(tenant.memberId) || hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  }
+
+  // TASK-791 — provider invoices/statements: solo Finance/HR/admin (NO contractor).
+  if (contextType === 'provider_invoice_draft') {
+    return (
+      hasRouteGroup(tenant, 'finance') ||
+      hasRouteGroup(tenant, 'hr') ||
+      hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+    )
+  }
+
   return hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 }
 
@@ -93,7 +111,16 @@ export async function POST(request: Request) {
     const ownerClientId = ownerClientIdRaw || tenant.clientId || null
     const ownerSpaceId = ownerSpaceIdRaw || tenant.spaceId || null
 
-    const memberOwnerContexts = ['leave_request_draft', 'certification_draft', 'evidence_draft'] as const
+    const memberOwnerContexts = [
+      'leave_request_draft',
+      'certification_draft',
+      'evidence_draft',
+      // TASK-791 — el invoice/evidencia del contractor es member-owned (self) o
+      // resuelto on-behalf por HR pasando ownerMemberId.
+      'contractor_invoice_draft',
+      'contractor_work_evidence_draft'
+    ] as const
+
     const needsMemberOwner = (memberOwnerContexts as readonly string[]).includes(contextTypeValue)
 
     const fallbackOwnerMemberId =

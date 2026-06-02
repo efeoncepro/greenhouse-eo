@@ -41,6 +41,15 @@ import { getClientPortalResolverFailureRateSignal } from './queries/client-porta
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
+import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
+import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
+import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
+import { getContractorPayableUnbatchedOverdueSignal } from './queries/contractor-payable-unbatched-overdue'
+import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
+import { getContractorRemittanceEmailDeadLetterSignal } from './queries/contractor-remittance-email-dead-letter'
+import { getContractorPayableTaxReviewOverdueSignal } from './queries/contractor-payable-tax-review-overdue'
+import { getContractorPayableFxUnresolvedOverdueSignal } from './queries/contractor-payable-fx-unresolved-overdue'
+import { getContractorPayableExceedsAgreedAmountSignal } from './queries/contractor-payable-exceeds-agreed-amount'
 import { getFinanceClientProfileUnlinkedSignal } from './queries/finance-client-profile-unlinked'
 import { getIdentityLegalProfileEvidenceOrphanSignal } from './queries/identity-legal-profile-evidence-orphan'
 import { getIdentityLegalProfilePayrollBlockingSignal } from './queries/identity-legal-profile-payroll-blocking'
@@ -84,8 +93,17 @@ import {
   getNotionMetricsFtrWritebackLagSignal
 } from './queries/notion-metrics-ftr-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
+import { getIdentitySessionRouteGroupDriftSignal } from './queries/identity-session-route-group-drift'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
+import { getContractorEngagementClassificationReviewPendingSignal } from './queries/contractor-engagement-classification-review-pending'
+import { getContractorEngagementClassificationRiskOpenSignal } from './queries/contractor-engagement-classification-risk-open'
+import { getContractorEngagementClosedWithOpenPayablesSignal } from './queries/contractor-engagement-closed-with-open-payables'
+import { getContractorInvoiceAssetsBrokenEvidenceSignal } from './queries/contractor-invoice-assets-broken-evidence'
+import { getContractorWorkSubmissionReviewOverdueSignal } from './queries/contractor-work-submission-review-overdue'
+import { getContractorPayableHonorariosRutUnverifiedSignal } from './queries/contractor-payable-honorarios-rut-unverified'
+import { getContractorTransitionOrphanSignal } from './queries/contractor-transition-orphan'
+import { getContractorEngagementRateUnsetSignal } from './queries/contractor-engagement-rate-unset'
 import { getScimWorkforceSignals } from './queries/scim-workforce-signals'
 import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
@@ -105,6 +123,8 @@ import { getPayrollParticipationWindowFullMonthEntryDriftSignal } from './querie
 import { getPayrollParticipationWindowProjectionDeltaAnomalySignal } from './queries/payroll-participation-window-projection-delta-anomaly'
 import { getPayrollParticipationWindowSourceDateDisagreementSignal } from './queries/payroll-participation-window-source-date-disagreement'
 import { getLeaveAccrualOvershootDriftSignal } from './queries/leave-accrual-overshoot-drift'
+import { getPayrollContractorDoubleRailOverlapSignal } from './queries/payroll-contractor-double-rail-overlap'
+import { getPayrollDeelMemberWithoutContractIdSignal } from './queries/payroll-deel-member-without-contract-id'
 import { getPayrollContractTaxonomyFallbackResolutionLegacySignal } from './queries/payroll-contract-taxonomy-fallback-resolution-legacy'
 import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/payroll-contract-taxonomy-invalid-tuple-drift'
 import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './queries/payroll-contract-taxonomy-invalid-statutory-application'
@@ -416,6 +436,8 @@ interface ReliabilityOverviewSources {
    * latest artifacts with failed validation or entries newer than artifact.
    */
   payrollComplianceExportDrift?: ReliabilitySignal | null
+  payrollContractorDoubleRailOverlap?: ReliabilitySignal | null
+  payrollDeelMemberWithoutContractId?: ReliabilitySignal | null
   finalSettlementPdfStatusDrift?: ReliabilitySignal | null
 
   /**
@@ -548,6 +570,24 @@ interface ReliabilityOverviewSources {
    * complementing the daily ledger-health cron.
    */
   ledgerUnresolvedDriftItems?: ReliabilitySignal | null
+
+  /**
+   * TASK-793 Slice 3 — Contractor payable → Finance bridge signals (lag +
+   * dead-letter). Single signals; degradan honestamente a null si la query falla.
+   */
+  contractorPayableReadyWithoutObligation?: ReliabilitySignal | null
+  contractorPayableBridgeDeadLetter?: ReliabilitySignal | null
+  contractorRemittanceEmailDeadLetter?: ReliabilitySignal | null
+  /** TASK-795 Fase A — international boundary block signals (tax review + FX). */
+  contractorPayableTaxReviewOverdue?: ReliabilitySignal | null
+  contractorPayableFxUnresolvedOverdue?: ReliabilitySignal | null
+  /** TASK-968 — payables blocked by the agreed-amount guardrail (no override). */
+  contractorPayableExceedsAgreedAmount?: ReliabilitySignal | null
+  /** TASK-977 — committed payables without a materialized expense (settlement precondition). */
+  contractorPayableExpenseUnmaterialized?: ReliabilitySignal | null
+  contractorPayablePaymentSlaOverdue?: ReliabilitySignal | null
+  /** TASK-979 — un-batched overdue contractor obligations (monthly run coverage gap). */
+  contractorPayableUnbatchedOverdue?: ReliabilitySignal | null
 
   /**
    * TASK-777 Slice 3 — Expense distribution management-accounting gates.
@@ -805,6 +845,8 @@ export const buildReliabilityOverview = (
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
     // PDF asset metadata.documentStatusAtRender). Defense-in-depth para detectar
     // regen failure o transition agregada al state machine sin pasar por el helper.
+    ...(sources.payrollContractorDoubleRailOverlap ? [sources.payrollContractorDoubleRailOverlap] : []),
+    ...(sources.payrollDeelMemberWithoutContractId ? [sources.payrollDeelMemberWithoutContractId] : []),
     ...(sources.finalSettlementPdfStatusDrift ? [sources.finalSettlementPdfStatusDrift] : []),
     // TASK-900 Slice 6 — ICO Materializer skipped_safety signal. Roll up bajo
     // moduleKey='delivery'. Visibiliza cuando el freshness gate del materializer
@@ -854,6 +896,27 @@ export const buildReliabilityOverview = (
     // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
     ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
     ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
+    // TASK-793 Slice 3 — contractor payable → Finance bridge (lag + dead-letter).
+    ...(sources.contractorPayableReadyWithoutObligation
+      ? [sources.contractorPayableReadyWithoutObligation]
+      : []),
+    ...(sources.contractorPayableBridgeDeadLetter ? [sources.contractorPayableBridgeDeadLetter] : []),
+    ...(sources.contractorRemittanceEmailDeadLetter ? [sources.contractorRemittanceEmailDeadLetter] : []),
+    // TASK-795 Fase A — international boundary block signals (tax review + FX).
+    ...(sources.contractorPayableTaxReviewOverdue ? [sources.contractorPayableTaxReviewOverdue] : []),
+    ...(sources.contractorPayableFxUnresolvedOverdue
+      ? [sources.contractorPayableFxUnresolvedOverdue]
+      : []),
+    // TASK-968 — payables blocked by the agreed-amount guardrail (no override).
+    ...(sources.contractorPayableExceedsAgreedAmount
+      ? [sources.contractorPayableExceedsAgreedAmount]
+      : []),
+    // TASK-977 — committed payables without a materialized expense (settlement precondition).
+    ...(sources.contractorPayableExpenseUnmaterialized
+      ? [sources.contractorPayableExpenseUnmaterialized]
+      : []),
+    ...(sources.contractorPayablePaymentSlaOverdue ? [sources.contractorPayablePaymentSlaOverdue] : []),
+    ...(sources.contractorPayableUnbatchedOverdue ? [sources.contractorPayableUnbatchedOverdue] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
     // TASK-780 Phase 3 — Home rollout drift (PG flag vs env + opt-out rate).
@@ -1087,6 +1150,21 @@ export const getReliabilityOverview = async (
       ? preloadedSources.payrollComplianceExportDrift
       : await getPayrollComplianceExportDriftSignal().catch(() => null)
 
+  // TASK-957 Slice A — Contractor double-rail overlap. Corre regardless del flag
+  // PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED (detector temprano). Steady=0:
+  // un contractor con engagement no debe tener comp-version vigente.
+  const payrollContractorDoubleRailOverlap =
+    preloadedSources.payrollContractorDoubleRailOverlap !== undefined
+      ? preloadedSources.payrollContractorDoubleRailOverlap
+      : await getPayrollContractorDoubleRailOverlapSignal().catch(() => null)
+
+  // TASK-958 Slice 3 — Deel member sin deel_contract_id (gap operacional). Steady=0
+  // tras backfill (Melkin 'm4ye2qg' aplicado 2026-05-31).
+  const payrollDeelMemberWithoutContractId =
+    preloadedSources.payrollDeelMemberWithoutContractId !== undefined
+      ? preloadedSources.payrollDeelMemberWithoutContractId
+      : await getPayrollDeelMemberWithoutContractIdSignal().catch(() => null)
+
   // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
   // Subsystem rollup `Finance Data Quality` vía moduleKey='finance' (alineado
   // con TASK-765/766/768/774 — payroll deltas son outcomes económicos, no
@@ -1210,6 +1288,59 @@ export const getReliabilityOverview = async (
       ? preloadedSources.ledgerUnresolvedDriftItems
       : await getLedgerUnresolvedDriftItemsSignal().catch(() => null)
 
+  // TASK-793 Slice 3 — Contractor payable → Finance bridge (lag + dead-letter).
+  // Cada reader degrada honestamente a null si su query falla — un solo signal
+  // roto NO envenena el overview entero.
+  const contractorPayableReadyWithoutObligation =
+    preloadedSources.contractorPayableReadyWithoutObligation !== undefined
+      ? preloadedSources.contractorPayableReadyWithoutObligation
+      : await getContractorPayableReadyWithoutObligationSignal().catch(() => null)
+
+  const contractorPayableBridgeDeadLetter =
+    preloadedSources.contractorPayableBridgeDeadLetter !== undefined
+      ? preloadedSources.contractorPayableBridgeDeadLetter
+      : await getContractorPayableBridgeDeadLetterSignal().catch(() => null)
+
+  // TASK-981 Slice 3 — remittance email dead-letter (paid payable → comprobante).
+  const contractorRemittanceEmailDeadLetter =
+    preloadedSources.contractorRemittanceEmailDeadLetter !== undefined
+      ? preloadedSources.contractorRemittanceEmailDeadLetter
+      : await getContractorRemittanceEmailDeadLetterSignal().catch(() => null)
+
+  // TASK-795 Fase A — payables blocked by the international boundary (tax review + FX).
+  const contractorPayableTaxReviewOverdue =
+    preloadedSources.contractorPayableTaxReviewOverdue !== undefined
+      ? preloadedSources.contractorPayableTaxReviewOverdue
+      : await getContractorPayableTaxReviewOverdueSignal().catch(() => null)
+
+  const contractorPayableFxUnresolvedOverdue =
+    preloadedSources.contractorPayableFxUnresolvedOverdue !== undefined
+      ? preloadedSources.contractorPayableFxUnresolvedOverdue
+      : await getContractorPayableFxUnresolvedOverdueSignal().catch(() => null)
+
+  // TASK-968 — payables blocked by the agreed-amount guardrail (no override).
+  const contractorPayableExceedsAgreedAmount =
+    preloadedSources.contractorPayableExceedsAgreedAmount !== undefined
+      ? preloadedSources.contractorPayableExceedsAgreedAmount
+      : await getContractorPayableExceedsAgreedAmountSignal().catch(() => null)
+
+  // TASK-977 — committed payables without a materialized expense (settlement precondition).
+  const contractorPayableExpenseUnmaterialized =
+    preloadedSources.contractorPayableExpenseUnmaterialized !== undefined
+      ? preloadedSources.contractorPayableExpenseUnmaterialized
+      : await getContractorPayableExpenseUnmaterializedSignal().catch(() => null)
+
+  // TASK-978 — contractor payment SLA: committed payables overdue vs the 5-business-day commitment.
+  const contractorPayablePaymentSlaOverdue =
+    preloadedSources.contractorPayablePaymentSlaOverdue !== undefined
+      ? preloadedSources.contractorPayablePaymentSlaOverdue
+      : await getContractorPayablePaymentSlaOverdueSignal().catch(() => null)
+
+  const contractorPayableUnbatchedOverdue =
+    preloadedSources.contractorPayableUnbatchedOverdue !== undefined
+      ? preloadedSources.contractorPayableUnbatchedOverdue
+      : await getContractorPayableUnbatchedOverdueSignal().catch(() => null)
+
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
       ? preloadedSources.expenseDistribution
@@ -1252,7 +1383,32 @@ export const getReliabilityOverview = async (
           // Notion bridge coverage drift — detecta regresión del resolver
           // Notion-user-id → member-id (caso fuente: incidente 2026-05-16
           // post-TASK-877 dejó coverage en 3.7%, colapsando OTD/RpA bonuses).
-          getIdentityNotionBridgeCoverageSignal().catch(() => null)
+          getIdentityNotionBridgeCoverageSignal().catch(() => null),
+          // TASK-790 — contractor engagements con riesgo de clasificación
+          // bloqueante (legal_review_required|blocked) y no terminales.
+          getContractorEngagementClassificationRiskOpenSignal().catch(() => null),
+          // TASK-791 — contractor invoice assets cuyo asset_id apunta a un asset
+          // inexistente/eliminado (integridad de evidencia).
+          getContractorInvoiceAssetsBrokenEvidenceSignal().catch(() => null),
+          // TASK-792 — work submissions estancadas en review (submitted|disputed) > 14d.
+          getContractorWorkSubmissionReviewOverdueSignal().catch(() => null),
+          // TASK-794 — honorarios_cl activos sin RUT chileno verificado (payable
+          // bloqueado por readiness fail-closed antes de Finance).
+          getContractorPayableHonorariosRutUnverifiedSignal().catch(() => null),
+          // TASK-956 — relaciones contractor por transición sin engagement
+          // asociado (transición incompleta; defense-in-depth del comando atómico).
+          getContractorTransitionOrphanSignal().catch(() => null),
+          // TASK-968 — engagements contractor activos sin monto acordado fijado por HR.
+          getContractorEngagementRateUnsetSignal().catch(() => null),
+          // TASK-797 — engagements contractor cerrados (ended/cancelled) que aún
+          // tienen payables abiertos (liquidar/cancelar; defense-in-depth del cierre).
+          getContractorEngagementClosedWithOpenPayablesSignal().catch(() => null),
+          // TASK-985 — engagements no terminales con clasificación `needs_review`
+          // (worklist de revisión; salvedad de la auto-activación de onboarding).
+          getContractorEngagementClassificationReviewPendingSignal().catch(() => null),
+          // TASK-987 — route_groups de sesión que no derivan de roles ACTIVOS
+          // (over-exposure por roles revocados; defense-in-depth del fix session_360).
+          getIdentitySessionRouteGroupDriftSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
@@ -1599,6 +1755,8 @@ export const getReliabilityOverview = async (
     domainIncidents,
     paymentOrderSettlement,
     payrollComplianceExportDrift,
+    payrollContractorDoubleRailOverlap,
+    payrollDeelMemberWithoutContractId,
     finalSettlementPdfStatusDrift,
     payrollParticipationWindow,
     leaveAccrual,
@@ -1612,6 +1770,15 @@ export const getReliabilityOverview = async (
     cronStagingDrift,
     accountBalancesFxDrift,
     ledgerUnresolvedDriftItems,
+    contractorPayableReadyWithoutObligation,
+    contractorPayableExpenseUnmaterialized,
+    contractorPayablePaymentSlaOverdue,
+    contractorPayableUnbatchedOverdue,
+    contractorPayableBridgeDeadLetter,
+    contractorRemittanceEmailDeadLetter,
+    contractorPayableTaxReviewOverdue,
+    contractorPayableFxUnresolvedOverdue,
+    contractorPayableExceedsAgreedAmount,
     expenseDistribution,
     homeRolloutDrift,
     shortcutsInvalidPins,

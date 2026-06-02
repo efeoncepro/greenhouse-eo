@@ -5,6 +5,8 @@ import type { PoolClient } from 'pg'
 import { withTransaction } from '@/lib/db'
 import { recordExpensePayment } from '@/lib/finance/expense-payment-ledger'
 import { materializePayrollExpensesForExportedPeriod } from '@/lib/finance/payroll-expense-reactive'
+import { materializeContractorPayableExpense } from '@/lib/finance/contractor-payable-expense-reactive'
+import { getContractorPayableById } from '@/lib/contractor-engagements/payables/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { publishPendingOutboxEvents } from '@/lib/sync/outbox-consumer'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -17,6 +19,7 @@ import {
   PaymentOrderSettlementBlockedError,
   PaymentOrderValidationError
 } from './errors'
+import { isContractorPayableSettlementEnabled } from './contractor-settlement-flag'
 import { mapOrderRow, type OrderRow } from './row-mapper'
 import { resolvePaymentOrderSourcePolicy } from './source-instrument-policy'
 import { recordPaymentOrderStateTransition } from './state-transitions-audit'
@@ -144,6 +147,39 @@ const resolvePayrollExpenseIdInTx = async (
       ORDER BY created_at DESC
       LIMIT 1`,
     [line.period_id, line.beneficiary_id]
+  )
+
+  return result.rows[0]?.expense_id ?? null
+}
+
+/**
+ * TASK-977 — contractor settlement line predicate (flag-gated). OFF keeps the
+ * line in `out_of_scope_v1` (parity bit-for-bit).
+ */
+const isContractorSettlementLine = (line: LineForExecution): boolean =>
+  isContractorPayableSettlementEnabled() &&
+  line.source_kind === 'contractor_payable' &&
+  line.obligation_kind === 'provider_payroll'
+
+/**
+ * TASK-977 — resolve the contractor's expense by `contractor_payable_id`
+ * (= the line's `source_ref`). The expense is materialized reactively when the
+ * payable reaches `ready_for_finance` (Slice 2).
+ */
+const resolveContractorExpenseIdInTx = async (
+  client: PoolClient,
+  line: LineForExecution
+): Promise<string | null> => {
+  if (!line.source_ref) return null
+
+  const result = await client.query<{ expense_id: string }>(
+    `SELECT expense_id
+       FROM greenhouse_finance.expenses
+      WHERE contractor_payable_id = $1
+        AND COALESCE(is_annulled, FALSE) = FALSE
+      ORDER BY created_at DESC
+      LIMIT 1`,
+    [line.source_ref]
   )
 
   return result.rows[0]?.expense_id ?? null
@@ -343,9 +379,14 @@ export async function markPaymentOrderPaidAtomic(
       // (e.g. recovery slice 8), skip silencioso.
       if (line.expense_payment_id) continue
 
-      // V1 solo cubre payroll/employee_net_pay. Lines fuera de scope:
-      // throw + rollback. (V2 wireara employer_social_security, etc.)
-      if (line.source_kind !== 'payroll' || line.obligation_kind !== 'employee_net_pay') {
+      // V1 cubre payroll/employee_net_pay + contractor (TASK-977, detrás de flag).
+      // Lines fuera de scope: throw + rollback.
+      const isPayrollLine =
+        line.source_kind === 'payroll' && line.obligation_kind === 'employee_net_pay'
+
+      const isContractorLine = isContractorSettlementLine(line)
+
+      if (!isPayrollLine && !isContractorLine) {
         throw new PaymentOrderSettlementBlockedError(
           input.orderId,
           'out_of_scope_v1',
@@ -354,34 +395,22 @@ export async function markPaymentOrderPaidAtomic(
         )
       }
 
-      // Resolver expense por (period_id, member_id).
-      let expenseId = await resolvePayrollExpenseIdInTx(client, line)
+      let expenseId: string | null
 
-      // Materialize-or-throw: si miss, materializar sincrono (idempotente)
-      // y re-lookup. NOTE: el materializer abre su propia tx — eso esta OK
-      // porque la materializacion es independiente del path atomico (las
-      // expenses que crea son commit'ed antes del re-lookup, y sobreviven
-      // un eventual rollback de la mark-paid tx).
-      if (!expenseId) {
-        const ym = parseYearMonthFromPeriodId(line.period_id)
+      if (isContractorLine) {
+        // TASK-977 — resolve by the contractor payable anchor. On-demand
+        // materialize is the defensive fallback if the reactive path lagged
+        // (the materializer opens its own tx; the expense it creates is
+        // committed before re-lookup and survives a mark-paid rollback).
+        expenseId = await resolveContractorExpenseIdInTx(client, line)
 
-        if (ym && line.period_id) {
-          try {
-            await materializePayrollExpensesForExportedPeriod({
-              periodId: line.period_id,
-              year: ym.year,
-              month: ym.month
-            })
-          } catch (matErr) {
-            throw new PaymentOrderSettlementBlockedError(
-              input.orderId,
-              'materializer_dead_letter',
-              `materializer failed: ${matErr instanceof Error ? matErr.message : String(matErr)}`,
-              line.line_id
-            )
+        if (!expenseId && line.source_ref) {
+          const payable = await getContractorPayableById(line.source_ref)
+
+          if (payable) {
+            await materializeContractorPayableExpense(payable)
+            expenseId = await resolveContractorExpenseIdInTx(client, line)
           }
-
-          expenseId = await resolvePayrollExpenseIdInTx(client, line)
         }
 
         if (!expenseId) {
@@ -391,6 +420,46 @@ export async function markPaymentOrderPaidAtomic(
             line.period_id,
             line.beneficiary_id
           )
+        }
+      } else {
+        // Resolver expense por (period_id, member_id).
+        expenseId = await resolvePayrollExpenseIdInTx(client, line)
+
+        // Materialize-or-throw: si miss, materializar sincrono (idempotente)
+        // y re-lookup. NOTE: el materializer abre su propia tx — eso esta OK
+        // porque la materializacion es independiente del path atomico (las
+        // expenses que crea son commit'ed antes del re-lookup, y sobreviven
+        // un eventual rollback de la mark-paid tx).
+        if (!expenseId) {
+          const ym = parseYearMonthFromPeriodId(line.period_id)
+
+          if (ym && line.period_id) {
+            try {
+              await materializePayrollExpensesForExportedPeriod({
+                periodId: line.period_id,
+                year: ym.year,
+                month: ym.month
+              })
+            } catch (matErr) {
+              throw new PaymentOrderSettlementBlockedError(
+                input.orderId,
+                'materializer_dead_letter',
+                `materializer failed: ${matErr instanceof Error ? matErr.message : String(matErr)}`,
+                line.line_id
+              )
+            }
+
+            expenseId = await resolvePayrollExpenseIdInTx(client, line)
+          }
+
+          if (!expenseId) {
+            throw new PaymentOrderExpenseUnresolvedError(
+              input.orderId,
+              line.line_id,
+              line.period_id,
+              line.beneficiary_id
+            )
+          }
         }
       }
 
@@ -404,7 +473,7 @@ export async function markPaymentOrderPaidAtomic(
             currency: line.currency,
             paymentMethod: order.paymentMethod ?? null,
             paymentAccountId: order.sourceAccountId ?? null,
-            paymentSource: 'payroll_system',
+            paymentSource: isContractorLine ? 'contractor_system' : 'payroll_system',
             settlementConfig: sourcePolicy.settlementConfig,
             reference:
               order.externalReference ?? `order:${order.orderId}/line:${line.line_id}`,

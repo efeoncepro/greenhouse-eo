@@ -1,4 +1,905 @@
+# Sesion 2026-06-01 — Nexa Greetings hero (Figma→código) + plataforma de saludos + microinteracciones — ✅ SHIPPED (develop)
+
+**Scope**: implementar el diseño Figma "Greetings" en el home como **componente reutilizable**, darle pulido enterprise + microinteracciones, una **plataforma de saludos dinámicos**, y replicar el resultado de vuelta a Figma (code→design). Diseñado iterando con product-design skills (modern-ui, forms-ux, motion-design, microinteractions-auditor, greenhouse-ux-writing) + arch-architect, verificando cada paso con **GVC**.
+
+**Entregado** (2 commits en `develop`: `37bc9c9c` + `3b7d2742`):
+
+- `NexaGreetingsCard` (`src/components/greenhouse/nexa/`) — presentacional, props-driven; `HomeHeroAi` quedó como adapter delgado. Superficie azul gradiente + aurora + borde iluminado, avatar Nexa, chip, saludo (Poppins-bold), rol, dots, **input blanco elevado** (fix de contraste: `CustomTextField` forza `transparent !important` → texto blanco invisible; se forzó fondo blanco + texto oscuro + label blanco controlado), **botón enviar con estado** + spinner, **chips con íconos**.
+- **Saludos**: `src/config/home-greetings.ts` + `pickHomeGreeting` (puro, testeable) — ~100 variantes context-aware (hora/día/mes/estación-sur/feriados Chile). Test `home-greetings.test.ts`. Migrados ambos consumers (V2 loader + legacy snapshot) a la única fuente.
+- **Microinteracciones** CSS-tier reduced-motion safe: float, dots pulse, entrada escalonada, **placeholder rotativo crossfade**.
+- Asset `public/images/greenhouse/nexa/nexa-avatar.png`.
+
+**Code→design (Figma)**: componente final replicado en **archivo Figma NUEVO** `VrA7BNQepWaJyFsnsUCSYF` (página "Nexa Greetings") vía Figma MCP (`use_figma` + `upload_assets`). **El archivo del design system (`yyMksCoijfMaIoYplXKZaR`) NO se tocó** (caución explícita del operador → memoria `reference_figma_design_system_file`).
+
+**Decisión parkeada — "darle vida a Nexa"** (TASK-989): (1) home hero → **tilt cursor-aware + perk-up** (CSS/Motion, sin dep); (2) mascota viva (ojos/parpadeo) → **Rive** en superficie dedicada; (3) **AI image tools alimentan el rig de Rive, NO son el motor de animación** (sprite-set IA como runtime + 3D rechazados). Memoria `project_nexa_living_mascot_decision`.
+
+**Gates**: lint+tsc 0 · `pnpm test` 5768 passed · `pnpm build` ✓ · GVC (default/focus/hover/reduced-motion/rotación). Docs: TASK-989 (to-do) + doc funcional `plataforma/saludo-nexa-home.md` + changelog.
+
+---
+
+# Sesion 2026-06-01 — session_360 route_groups over-exposure fix (TASK-987 / ISSUE-083) — ✅ COMPLETE (develop, sin push)
+
+**Scope**: fix de raíz de seguridad (over-exposure de navegación) + remediación de gobernanza + detector. NO parche. Diseñado con arch-architect (4-pilar) + info-architecture + greenhouse-ux.
+
+**Disparador**: "¿por qué Valentina (collaborator) ve Personas?". Auditoría → bug estructural en `greenhouse_serving.session_360`: deriva `route_groups` **sin** el predicado de lifecycle (`ura.active AND effective window`) que sí aplica a `role_codes`. Roles **revocados** seguían aportando su `roles.route_group_scope`. Blast radius: 5 usuarios internos. Peor caso: **Humberly** (`collaborator`) veía **Finanzas+HR** por 3 roles revocados (finance_manager ghost + hr_payroll + efeonce_operations). El fallback BQ (`getIdentityAccessRecord`) ya filtraba activo — solo el view PG divergía.
+
+**Fix (migración atómica `20260601194051024`)**:
+1. **Raíz**: `CREATE OR REPLACE VIEW session_360` — el agregado `route_groups` ahora usa el mismo FILTER de lifecycle que `role_codes`.
+2. **Gobernanza** (misma tx, sin gap): Humberly ("Finance Manager") re-otorgada con roles ACTIVOS canónicos `finance_admin`+`hr_manager` (cargan route_groups+vistas+entitlements). **Decisión del operador** — no hardcode.
+3. **Defense-in-depth**: signal `identity.session.route_group_drift` (kind=drift, error si >0, steady=0) + 4 tests + wire-up.
+4. DO block de verificación en la migración (aborta si queda fuga o Humberly no quedó con 2 roles).
+
+**Live verify (DB compartida)**: Valentina/Andres/Melkin→`[my]`; Daniela→`[internal,my]` (conserva Aprobaciones — supervisora con 3 reportes + efeonce_operations activo); Humberly→`[commercial,finance,hr,my]`; signal count **0**. Superficies de supervisor (Mi equipo/Aprobaciones) NO dependían de route groups (se gatean por `supervisorAccess`) → intactas.
+
+**Gates**: tsc 0 · lint 0 · signal test 4/4 · reliability suite 375 · build (en cierre).
+
+**Open question (gobernanza, follow-up)**: TS `ROLE_ROUTE_GROUPS` vs DB `roles.route_group_scope` difieren en `people` para `efeonce_operations`/`hr_payroll`. No cambiado (decisión de valores de mapping del operador). Otros collaborators afectados correctamente en `[my]`; si alguno necesita acceso más amplio, otorgar rol activo (no la fuga).
+
+---
+
+# Sesion 2026-06-01 — Workforce Activation role title blocker root-cause fix — ✅ VALIDADO LOCAL + STAGING DATA OK
+
+**Scope**: causa raíz para `Falta cargo vigente` en Workforce Activation cuando el cargo ya existe en Microsoft Entra. No es patch por persona: se conectó Entra/Graph → `identity_profiles.job_title` → `members.role_title` con la primitiva gobernada de Workforce Role Title y se agregó salida UI auditada.
+
+**Caso fuente**: Maggie Borralles (`mborralles@efeoncepro.com`) tenía `jobTitle='Creative Social Media Strategist'` en Entra, pero SCIM había creado/backfilled el member sin `identity_profiles.job_title` ni `members.role_title`. El readiness mostraba blocker `role_title_missing` y el drawer no tenía campo para resolverlo.
+
+**Cambios runtime locales**:
+- `src/lib/entra/graph-client.ts`: nuevo `fetchEntraUserById()` para leer Graph por objectId.
+- `src/app/api/scim/v2/Users/route.ts`: SCIM CREATE interno enriquece `entraJobTitle` best-effort desde Graph antes de llamar la primitiva. Si Graph falla, SCIM no se cae; queda cron/sync como recuperación.
+- `src/lib/scim/provisioning-internal-collaborator.ts`: la primitiva actualiza `identity_profiles.job_title` para perfiles existentes y aplica `members.role_title` con `applyEntraRoleTitleWithClient()` dentro de la misma transacción cuando llega jobTitle.
+- `src/lib/workforce/role-title/sync-from-entra.ts`: helper transaccional reutilizable `applyEntraRoleTitleWithClient()`; mantiene HR override precedence, drift proposal, audit y outbox.
+- `src/app/api/hr/workforce/members/[memberId]/role-title/route.ts`: `PATCH` gobernado por capability `workforce.role_title.update`, razón obligatoria vía `updateMemberRoleTitle()`.
+- `WorkforceIntakeRemediationDrawer`: agrega campo **Cargo vigente** en el drawer; guarda por el endpoint canónico y requiere motivo >=10 chars cuando cambia el cargo.
+- Copy + manual `docs/manual-de-uso/hr/habilitar-colaborador-workforce.md` actualizados.
+
+**Recovery Maggie vía camino canónico, no SQL**:
+- Se ejecutó `GET /api/cron/entra-profile-sync` en staging con auth cron + Vercel bypass.
+- Resultado: `processed=21`, `profilesUpdated=1`, `membersUpdated=2`, `errors=[]`.
+- Verificación staging: `pnpm staging:request '/api/hr/workforce/activation?pageSize=10' --pretty` devuelve Maggie `ready_to_complete`, `blockerCount=0`, `roleTitle='Creative Social Media Strategist'`, `roleTitleSource='entra'`.
+
+**Validación**:
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm exec vitest run src/lib/workforce/activation/readiness.test.ts src/app/api/cron/entra-profile-sync/route.test.ts src/lib/scim/eligibility.test.ts --reporter=dot` ✅ 39/39
+- ESLint focal sobre archivos tocados ✅
+- `pnpm build` ✅
+- `pnpm lint` global falla por `.captures/**/*.mjs` generados (`2026-06-01T18-47-14_valentina-contractor-e2e`, `2026-06-01T19-21-07_valentina-menu`), no por este cambio. No se tocaron esos artifacts.
+
+**Deploy staging/dev**:
+- Primer intento `vercel deploy --target=staging --yes` falló por límite de archivos (`files > 15000`); relanzado con `--archive=tgz`.
+- Deployment staging Ready: `greenhouse-hqc2hxtdb-efeonce-7670142f.vercel.app`, target `staging`, aliases `dev-greenhouse.efeoncepro.com` + `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- Verificación post-deploy: `GET /api/hr/workforce/members/0e6a896e-f1d2-481c-9c97-ee43ab1714d8/role-title` devuelve `roleTitle='Creative Social Media Strategist'`, source `entra`, `canUpdate=true`.
+- GVC staging: `.captures/2026-06-01T19-45-57_inline-hr-workforce-activation` ✅.
+
+**Release note**: el fix de datos de Maggie ya está aplicado en staging por cron y el fix de código ya está desplegado en staging/dev. Producción no se tocó por deploy local directo: debe ir por push/merge + production orchestrator para mantener el manifest canónico.
+
+---
+
+# Sesion 2026-06-01 — Contractor Directory (TASK-986) + onboarding auto-activation (TASK-985) — ✅ COMPLETE (develop, sin push)
+
+**Scope**: UI/IA + projection, sin migración/capability/mutación de data. Local-first (no push por instrucción del operador).
+
+**TASK-986 (Contractor Directory)**: `/hr/contractors` era solo **cola de revisión** (5 fuentes accionables) → un contractor activo sano sin pendientes (Valentina `EO-CENG-0001`: active, rate 600k, `needs_review`) **no aparecía en ninguna fuente → inalcanzable** (no se podía revisar clasificación ni cerrar). Fix = pierna de **browse** (patrón IA TASK-982): pestaña toggle **Cola de revisión (N) | Directorio (N)** + buscador + mismo inspector. Backend reusado (8ª fuente `listContractorEngagements({excludeTerminal})` en `resolveContractorHrWorkbenchProjection` → campo `directory`). **Verificación real vía proxy DB**: `directory: 1` → Valentina (Activo, 600k, needs_review), `degraded: []`. (El GVC local mostró 0 por timeout del connector del dev server — banner "No pudimos cargar los envíos" lo confirma; NO es bug de código.) Gates: tsc 0 · lint 0 · boundary `pnpm vitest run src/lib/contractor-engagements src/lib/payroll src/lib/workforce/offboarding` 728 · build exit 0.
+
+**TASK-985 (onboarding auto-activation)** — ya cerrada esta sesión: el onboarding auto-activa el engagement (`draft→active`) cuando la clasificación no es bloqueante; `draft` no era compuerta de compliance. Valentina quedó `active` + rate 600k (fecha 05-01 confirmada por operador).
+
+**Pendiente operador (UI, NO patch de data)**: revisar la clasificación de Valentina (`needs_review`) desde el inspector → Directorio para llevarla a `clear`.
+
+---
+
+# Sesion 2026-06-01 — Workforce Activation SCIM runtime rollout + Maggie recovery — ✅ OPERATIVO
+
+**Scope**: cambio operativo Vercel + backfill canónico SCIM + docs operativas; sin cambios de código runtime ni migraciones.
+
+**Contexto**: Maggie Borralles (`mborralles@efeoncepro.com`) fue creada por Microsoft Entra/SCIM el `2026-06-01T14:17:26Z`, pero quedó solo como `greenhouse_core.client_users` (`identity_profile_id=NULL`, `member_id=NULL`). `/hr/workforce/activation` lista `greenhouse_core.members` con `workforce_intake_status != 'completed'`, por eso no aparecía. Causa raíz verificada: los flags de rollout TASK-872 no estaban configurados en Vercel, así que SCIM corría el path legacy `createUser()`.
+
+**Cambio aplicado**: configurados en Vercel con `vercel env add --force --value true --yes`:
+- `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true`
+- `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true`
+
+**Targets verificados por `vercel env ls`**:
+- `Production`
+- `staging`
+- `Preview (develop)`
+
+**Orden usado**: primero `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED`, luego `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED`, siguiendo el rollout seguro de `docs/tasks/complete/TASK-872-scim-internal-collaborator-provisioning.md`.
+
+**Redeploys para hornear env vars**:
+- Staging/develop redeploy: `greenhouse-qy8e8hs1l-efeonce-7670142f.vercel.app`, target `staging`, aliases `dev-greenhouse.efeoncepro.com` + `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`, status `Ready`.
+- Production redeploy: `greenhouse-7c8s9j289-efeonce-7670142f.vercel.app`, target `production`, aliases `greenhouse.efeoncepro.com` + Vercel aliases, status `Ready`.
+
+**Recovery Maggie**:
+- Backfill aplicado con actor auditado `user-efeonce-admin-julio-reyes`:
+  `scripts/scim/backfill-internal-collaborators.ts --apply --allowlist mborralles@efeoncepro.com --actor user-efeonce-admin-julio-reyes`.
+- Resultado: `created_member`, `memberId=0e6a896e-f1d2-481c-9c97-ee43ab1714d8`, `cascadeOutcome=created_new`.
+- DB verificada: `client_users.identity_profile_id` + `client_users.member_id` poblados, `members.azure_oid=e0f8f69a-c1f5-40a1-a159-dced9087b318`, `workforce_intake_status='pending_intake'`, `person_memberships` activo por `profile_id`.
+- `identity.scim.users_without_member` equivalente manual queda en `1`, correspondiente a `support@efeoncepro.com` (cuenta funcional; no debe convertirse en member humano).
+
+**Verificación runtime**:
+- `pnpm staging:request '/api/hr/workforce/activation?pageSize=10' --pretty` devuelve `totalApprox=1` y lista a Maggie con `readinessStatus='blocked'`, `blockerCount=8`, `topBlockerLane='employment'`.
+- Workforce Activation ya tiene a Maggie en cola pendiente para que HR complete ficha laboral, cargo, compensación, legal profile, pago y Notion.
+
+**Docs sincronizadas**:
+- `AGENTS.md` y `CLAUDE.md` ahora declaran el gate de cierre end-to-end: no se puede declarar terminado algo que solo existe en código si faltan flags/env vars, redeploy, backfill, crons/workers/webhooks, provisioning externo o verificación runtime. Caso fuente documentado: SCIM → Workforce Activation.
+
+---
+
+# Sesion 2026-06-01 — Skills AI Image Generator para Codex/Claude — ✅ IMPLEMENTADO
+
+**Scope**: skills/documentacion operativa para generacion de imagenes IA; no cambia runtime del helper ni secrets.
+
+**Resultado**: se agrego skill local Codex `.codex/skills/greenhouse-ai-image-generator/SKILL.md` + metadata `agents/openai.yaml` y skill Claude `.claude/skills/greenhouse-ai-image-generator/SKILL.md`. Ambas invocan la guia compartida `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`.
+
+**Capacidades cubiertas**: direccion de arte + prompt engineering profesional para iconos, elementos UI, empty states, banners, hero imagery, PNG transparentes, reference edits, materiales/acabados, composicion, lighting, paleta, iteracion single-change y QA profesional. La guia tambien canoniza cuando usar helper Greenhouse vs native image tool, OpenAI Image API vs Responses image_generation, y las limitaciones de `gpt-image-2` con transparencia.
+
+**Docs sincronizadas**: `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`, `changelog.md`.
+
+---
+
+# Sesion 2026-06-01 — OpenAI Image helper para AI Visual Asset Generator — ✅ IMPLEMENTADO (sin secret hardcodeado)
+
+**Scope**: helper interno de AI assets; no cambia el default productivo. Se agrego adapter server-only `src/lib/ai/openai-image.ts` y se cableo de forma opt-in desde `generateImage()` con `provider='openai-image'` o `GREENHOUSE_IMAGE_PROVIDER=openai-image`. Default sigue `google-imagen`, por lo que los flujos actuales de Imagen/Gemini quedan intactos.
+
+**Capacidades OpenAI**: `generateOpenAIImage()` (Image API text-to-image), `editOpenAIImage()` (referencias/edicion con 1..10 imagenes y mascara opcional, 50MB max por archivo), `runOpenAIImageTool()` (Responses API + `image_generation` tool para iteraciones multi-turn). Modelo default `OPENAI_IMAGE_MODEL=gpt-image-2`; Responses default `OPENAI_IMAGE_RESPONSES_MODEL=gpt-5.5`.
+
+**PNG transparente**: `gpt-image-2` no soporta `background='transparent'`; el helper aplica fallback seguro a `gpt-image-1.5` por defecto cuando se pide transparencia, y devuelve `requestedModel` + `modelFallbackReason`. Se puede forzar fail-closed con `transparentBackgroundStrategy='throw'`.
+
+**Seguridad/runtime**: la API key entregada por chat NO se escribio en env examples ni codigo. Se guardo como GCP Secret Manager `greenhouse-openai-api-key` (version 1 enabled) y se concedio `roles/secretmanager.secretAccessor` a `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`. Vercel quedo configurado con `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key`, `OPENAI_IMAGE_MODEL=gpt-image-2`, `OPENAI_IMAGE_RESPONSES_MODEL=gpt-5.5` y `GREENHOUSE_IMAGE_PROVIDER=openai-image` en Production, Development y Preview branch `develop`. Resolver verificado localmente: `source=secret_manager`, `hasValue=true`, sin imprimir valor. Recomendacion: rotar esta key expuesta por chat cuando el operador lo estime.
+
+**Validacion**: `pnpm vitest run src/lib/ai/openai-image.test.ts` (13/13), ESLint focalizado (`openai-image`, `image-generator`, route), `pnpm exec tsc --noEmit --pretty false`.
+
+**Docs operativos sincronizados**: `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`, `.env.example`, `.env.local.example`. Nota: los agentes pueden elegir providers soportados por el helper (`google-imagen`, `openai-image`) por llamada; nuevos providers futuros deben entrar por el helper canonico, no por scripts paralelos.
+
+---
+
+# Sesion 2026-05-31 — TASK-980 Contractor Run Report "Nómina de Contractors" — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013. **Esperando confirmación para push.**
+
+**Resultado**: reporte de período de pagos a contractors en **PDF + Excel** (botón "Descargar nómina" en `/finance/contractor-payments`), espejo del reporte de payroll (TASK-782). Ancla al **mes operativo**; 2 grupos contables (Honorarios CL con retención SII vs Internacional) con subtotales por moneda **mutuamente excluyentes** (F29 vs banco); montos **verbatim** del payable. 5 slices:
+- **S1** — clasificador de régimen extraído a helper compartido `deriveContractorRemittanceRegime` (`remittance/regime.ts`, SSOT comprobante TASK-960 + reporte) + `run-report-reader.ts` (`buildContractorRunReport`).
+- **S2** — `generate-contractor-run-excel.ts` (ExcelJS, round-trip test).
+- **S3** — `generate-contractor-run-pdf.tsx` (masthead+slogan+footer canónicos, Geist; render visual verificado).
+- **S4** — endpoint `GET /run-report?format=pdf|excel` (cap `read`, reuso) + botón + dialog + copy. End-to-end agent auth (PDF `%PDF` + Excel `PK`).
+- **S5** — docs + cierre.
+
+**Sin migración/capability/outbox.** **Boundary EPIC-013/957**: contractor 148 verde. La remesa SII (F29) NO es el neto.
+
+**Gates**: tsc/lint/design 0 · régime 6/6 + reader 6/6 + excel 2/2 + pdf 2/2 + boundary · `pnpm build` exit 0 · `pnpm test` 5719 passed (0 failures, 0 unhandled errors). **Worker workflows de TASK-979 (SHA 4376b8b1): los 6 `success`** (monitoreo cerrado).
+
+**Files**: `remittance/regime.ts`, `payables/run-report-reader.ts`, `payables/generate-contractor-run-{pdf,excel}.ts(x)`, `api/finance/contractor-payables/run-report/route.ts`, workbench view + copy. Spec: `complete/TASK-980-...md`.
+
+---
+
+# Sesion 2026-05-31 — TASK-979 Monthly Contractor Payment Run — ✅ COMPLETE
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013.
+
+**Resultado**: corrida mensual que barre el período y prepara las órdenes de pago a contractors agrupadas por moneda. **Prepara — NO paga** (SoD intacto). 5 slices:
+- **S1** — orquestador `prepareMonthlyContractorPaymentRun` (atómico + dry-run) + `markPayablePaymentOrderCreated` (writer ÚNICO de `obligation_created → payment_order_created`, gap del lifecycle descubierto en discovery) + evento v1 + tabla `contractor_payment_runs` (append-only, mirror TASK-900) + migración `20260531235624882`.
+- **S2** — endpoint `POST /api/finance/contractor-payables/monthly-run` (capability `finance.contractor_payable:manage`, reuso).
+- **S3** — botón "Iniciar corrida mensual" + dialog confirm-con-preview en `/finance/contractor-payments`. GVC end-to-end verde (dry-run API 200 → "Nada por preparar").
+- **S4** — signal `finance.contractor_payable.unbatched_overdue` (drift, finance, steady=0) + 5-point wire-up.
+- **S5** — docs (CLAUDE.md invariant, arch Delta, EVENT_CATALOG, RELIABILITY, doc funcional v1.2) + cierre.
+
+**Idempotencia**: filtro un-ordered + lock UNIQUE `payment_order_lines`. **Boundary EPIC-013/957**: cero nómina/`contract_type`/finiquito (payroll 532 verde). La remesa SII (F29) NO es parte de la corrida.
+
+**Bonus — 2 incidencias de test resueltas (pedido operador, sin parches)**:
+1. **Date-fragility** en `finance/{income,expenses}/summary/route.test.ts`: fixtures en mes UTC vs route en `getFinanceCurrentPeriod()` (Santiago) → divergían en el borde de mes (cruce a junio 1 mid-sesión). Fix hermético: reloj fijo (`vi.setSystemTime`) + mes derivado del mismo SSOT del route. Verificado: solo 2 archivos con el patrón.
+2. **React-dom teardown leak** (`window is not defined` flaky en `ReliabilityModuleCard.test.tsx` y cualquier component test): `src/test/setup.ts` nunca llamaba `cleanup()` de RTL (globals off) → árboles React nunca desmontados acumulaban trabajo del scheduler que se disparaba post-teardown de jsdom. Fix canónico: `afterEach(cleanup)` en el setup compartido (con guard `document` para no-op en entorno node). Arregla la clase en TODOS los component tests.
+
+**Gates**: tsc/lint/design 0 · orchestrator 6/6 + signal 4/4 + state-machine + summary 6/6 + live PG smoke · `pnpm build` exit 0 · `pnpm test` (re-run con el cleanup fix).
+
+**Files**: `monthly-run.ts`, `payment-run-store.ts`, `store.ts` (markPayablePaymentOrderCreated), `event-catalog.ts`, `get-reliability-overview.ts`, `contractor-payable-unbatched-overdue.ts`, route, view + copy, `src/test/setup.ts`, migración. Spec: `complete/TASK-979-...md`.
+
+---
+
+# Sesion 2026-05-31 — TASK-978 Contractor Payment Due-Date + SLA Signal — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013. **Esperando confirmación del operador para push.**
+
+**Resultado**: hace visible el compromiso de pagar a contractors dentro de los **5 días hábiles post cierre de mes** (antes el `due_date` era input manual default vacío). (1) Nueva primitiva canónica `addBusinessDays(date, n)` en `operational-calendar.ts` (SSOT, mismo calendario que nómina). (2) `resolveContractorPaymentDueDate` (puro) = último día hábil del mes operativo + 5 hábiles → aplicado en el store del payable **solo si no hay override manual**. (3) Signal `finance.contractor_payable.payment_sla_overdue` (lag, finance, steady=0; observabilidad, no gate). Distinción canonizada: mide pago NETO al contractor; la remesa SII (F29) es obligación distinta (invariante TASK-977). Sin migración/capability/outbox.
+
+**Gates verde**: tsc/lint 0 · calendar+due-date 16/16 · payables 43/43 · signal 4/4 + **live PG smoke ok** · boundary `payroll+calendar` **552** (nómina intacta) · `pnpm build` exit 0 · `pnpm test` full 5698 passed (1 flaky `HrLeaveView` timeout bajo carga, verde 9/9 aislado).
+
+**Files**: `src/lib/calendar/operational-calendar.ts` (+`addBusinessDays`), `src/lib/contractor-engagements/payables/{due-date.ts,store.ts}`, `src/lib/reliability/queries/contractor-payable-payment-sla-overdue.ts`, `get-reliability-overview.ts` (+tests). Spec: `complete/TASK-978-...md`; CLAUDE.md invariant; arch Delta + Reliability Control Plane Delta; doc funcional `finance/pagos-a-contractors.md` v1.1.
+
+**Follow-up elevado**: alinear las obligaciones de **nómina** (hoy `dueDate: periodEnd`) al mismo helper/compromiso de 5 días.
+
+---
+
+# Sesion 2026-05-31 — Journey Intelligence Layer + Touchpoint Ledger — ✅ DOCS-ONLY
+
+**Rama**: `develop`. Scope arquitectura/documentacion only; no runtime, DB migrations, APIs, UI ni task lifecycle moves.
+
+Se formalizo ADR + doc canonico `docs/architecture/GREENHOUSE_JOURNEY_INTELLIGENCE_LAYER_V1.md`: capa transversal read-only para journeys y touchpoints cross-domain (ej. AD/SCIM → primer pago; lead → primera factura; contractor engagement → pago confirmado). Decision: observar/correlacionar/explicar, no ejecutar. V1 consume outbox/audit/Notification Hub/Email/Teams/Webhooks, modela Journey Definitions, Journey Event Log, Touchpoint Ledger, Correlator, Instances/Milestones y Timeline Readers. Regla dura: no reemplaza sources of truth ni guarda cuerpos completos de email/Teams por default; persiste evidencia redacted + `evidence_quality`.
+
+Docs sincronizados: `DECISIONS_INDEX.md`, `project_context.md`, `changelog.md`. Skills/contexto: `software-architect-2026`; referencias externas validadas 2026-05-31: OpenTelemetry traces, CloudEvents CNCF, Temporal durable execution (solo comparativo futuro, no V1).
+
+---
+
+# Sesion 2026-05-31 — TASK-976 Contractor Onboarding / Create Engagement — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013 contractor UI, gap #3. **Esperando confirmación del operador para push.** **Cierra el set de superficies del EPIC contractors** (TASK-974 Finanzas + TASK-975 detalle/lifecycle + TASK-976 onboarding).
+
+**Resultado**: wizard `/hr/contractors/new` branching A/B. Camino B (empleado→contractor desde offboarding executed, transición atómica TASK-956, 3 outcomes idempotentes, boundary read-only). Camino A (contractor nuevo; resuelve relación → deriva a B o guía a Person 360, no fabrica). +1 endpoint thin de read (`/api/hr/contractors/onboarding/resolve`). OQ: INDEPENDIENTE de TASK-965; Camino A exige la relación. Mockup aprobado + GVC. forms-ux Lane C + capability gating server-side.
+
+**Gates verde**: tsc/lint/design 0 · `pnpm vitest payroll+offboarding+contractor-engagements` 698 (boundary 956/957) · `pnpm build` exit 0 · `pnpm test` full verde (4 timeouts flaky HrLeaveView/HrOffboardingView ajenos, pasan aislados 17/17). Reusa viewCode `equipo.contratistas`.
+
+Spec: `complete/TASK-976-...md`. Arch Delta + doc funcional `hr/contratistas-onboarding.md` + manual.
+
+---
+
+# (histórico) TASK-976 IN PROGRESS
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013 contractor UI, gap #3 (onboarding solo por script).
+
+Wizard HR para onboardear contractor sin script, UI-only sobre 2 endpoints existentes: Path A `POST /api/hr/contractors` (`create`, exige relación contractor preexistente) + Path B `POST /api/hr/contractors/transition-from-offboarding` (`manage`, empleado→contractor desde offboarding executed, idempotente 3 outcomes, boundary read-only/append-only). Discovery completo (3 Explore agents).
+
+**Open Questions resueltas**: (OQ1) INDEPENDIENTE de TASK-965 (gated + no iniciado; HR necesita la superficie ya; reversible). (OQ2) Path A EXIGE la relación (no la fabrica); si no existe pero hay offboarding executed → deriva a B; si no → guidance Person 360. **Gap de endpoint detectado**: +1 thin read `GET /api/hr/contractors/onboarding/resolve` (cap read) para branching A/B; lista offboarding executed server-side. Reusa people-search + getOperatingEntityIdentity. Reusa viewCode `equipo.contratistas`.
+
+**Plan**: Slice 0 mockup (wizard branching A/B) → 1 endpoint+page → 2 camino B → 3 camino A → 4 cierre. Boundary EPIC-013/956/957 (gate payroll+offboarding). Wizard template: SampleSprints (Stepper+validación+draft).
+
+**Próximo paso**: construir mockup Slice 0, GVC, aprobación operador.
+
+Spec: `in-progress/TASK-976-contractor-onboarding-create-engagement.md`.
+
+---
+
+# Sesion 2026-05-31 — TASK-975 Contractor Engagement Detail + Lifecycle + Classification — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013 contractor UI, gap #2 (workbench HR ~20%). **Esperando confirmación del operador para push.**
+
+**Resultado**: HR gestiona el engagement desde el inspector de `/hr/contractors`: detalle completo (drawer GET /[id]: términos + máquina de estados + factores read-only), controles de ciclo de vida (solo transiciones válidas; "Activar" oculto si riesgo bloqueante; confirm con motivo), revisión de clasificación (7 factores + reviewed/block + resultado en vivo, SoD capability `hr.contractor_classification:approve`), editar términos (PATCH action=update). Mockup aprobado + GVC. 4 componentes runtime + helper `engagement-display.ts` + projection additive `lifecycleStatus`. Capability gating server-side en el page.
+
+**Gates verde**: tsc/lint/design 0 · `pnpm vitest run src/lib/payroll` 532 (boundary 957) · contractor-engagements 132 · `pnpm test` full exit 0 · `pnpm build` exit 0. Cola vacía en dev (projection pre-existente sin engagements que califiquen); verificación con data real → staging.
+
+Spec: `complete/TASK-975-...md`. Arch Delta + doc funcional `hr/contratistas-engagement-ciclo-de-vida.md` + manual.
+
+---
+
+# (histórico) TASK-975 IN PROGRESS
+
+**Rama**: `develop` (sin branch, por instrucción). EPIC-013 contractor UI, gap #2 (workbench HR ~20%).
+
+UI-only sobre backend existente (`GET /api/hr/contractors/[id]` + `PATCH` con `action=transition|review_classification|update`). Discovery completo (2 Explore agents): backend 100% listo — 3 helpers server-only, state machine pura (`ENGAGEMENT_TRANSITIONS`/`isValidEngagementTransition`), classification pura (`computeClassificationRisk`/`isClassificationRiskBlocking`), 2 capabilities con SoD (`hr.contractor_engagement:update` vs `hr.contractor_classification:approve` restringido a EFEONCE_ADMIN+FINANCE_ADMIN+HR_MANAGER).
+
+**Open Question resuelta**: Drawer + dialogs DENTRO del workbench (NO página dedicada `/hr/contractors/[id]`) — extender la inspector column, no fragmentar. Detail Drawer right-anchored hace GET /[id]; lifecycle + classification = Dialogs (forms-ux).
+
+**Plan**: Slice 0 mockup (skills product design + GVC + aprobación) → 1 detail drawer → 2 lifecycle controls → 3 classification review + terms edit → 4 cierre. Boundary EPIC-013/957 (gate `pnpm vitest run src/lib/payroll`). Reusa viewCode `equipo.contratistas` (sin migración).
+
+**Próximo paso**: construir mockup Slice 0, GVC loop, presentar para aprobación del operador.
+
+Spec: `in-progress/TASK-975-contractor-engagement-detail-lifecycle-classification.md`.
+
+---
+
+# Sesion 2026-05-31 — TASK-974 Finance Contractor Payments Workbench — ✅ COMPLETE (sin push)
+
+**Rama**: `develop` (no se creó branch, no se pusheó — esperando confirmación del operador). EPIC-013 contractor UI.
+
+Cerró el gap #1 de la auditoría de superficies UI del EPIC contractors: Finanzas tenía **0% UI** pese a 7 endpoints listos. Workbench `/finance/contractor-payments` (item nuevo en **Tesorería**): lista por estado (`DataTableShell`) + filtros + 4 KPIs + detalle con breakdown bruto/retención/neto **verbatim** (acento verde en el neto + nota contable F29) + panel de readiness (13 blockers con responsable Finanzas/HR/Contractor) + crear desde envío/off-cycle + ready/cancel/waive/override.
+
+**SoD cerrada (lo medular)**: override (`finance.contractor_payable.override_agreed_amount`) + waiver **reubicados a Finanzas**; el panel HR `ContractorGuardrailPanel` quedó **read-only** + link al workbench → "HR fija ≠ contractor cobra ≠ Finance paga" sin ambigüedad (cerró la deuda de TASK-968).
+
+**UI-only sobre backend existente** (cero cambios a state machine/helpers/endpoints/payroll/finiquito). Reader `listContractorPaymentsForWorkbench` vía `GET /api/finance/contractor-payables?workbench=1` (backward-compatible). viewCode `finanzas.contractor_payables` + seed `20260531195526233` (TASK-827) → actualizó 2 pins TASK-727 (15º view de finanzas).
+
+**Gates verde**: tsc 0 · lint 0 · design:lint 0 · `pnpm vitest run src/lib/payroll` 532 (boundary TASK-957) · `pnpm build` exit 0 · `pnpm test` full verde · GVC runtime end-to-end OK. Mockup aprobado vinculante.
+
+**Pendiente para pagar end-to-end**: TASK-974 da la pantalla, pero el pago al banco necesita el flip del flag `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED` (TASK-977, post staging + finance sign-off).
+
+Spec: `complete/TASK-974-finance-contractor-payments-workbench.md`. CLAUDE.md (Delta TASK-968 row + arch Delta). Doc funcional + manual `finance/pagos-a-contractors.md`.
+
+---
+
+# Sesion 2026-05-31 — Payroll mensual deadline operativo + pre-nomina draft — ✅ READY TO PUSH
+
+**Rama**: `develop`. Scope payroll mensual + docs HR. No toca DB, migrations, `calculatePayroll`, `payroll_entries`, cierre, aprobacion, exportaciones, recibos ni payment orders.
+
+Contexto: el operador intento calcular la nomina de mayo 2026 el 31/05. El sistema mostraba `deadline=2026-05-29` porque la regla canonica es **ultimo dia habil operativo**, no ultimo dia calendario. El problema real no era que el 31/05 debiera ser deadline: era que la UI comunicaba "bloqueada o fuera de fecha" como si el deadline fuera un gate duro y, en borrador sin entries, no mostraba una pre-nomina operable hasta promover desde nomina proyectada.
+
+Cambio realizado:
+- Nuevo helper canonico `src/lib/payroll/calculation-deadline.ts`: separa SLA operativo de bloqueo real. Estados: `pending`, `due_today`, `overdue_allowed`, `calculated_on_time`, `calculated_late`; `blocksCalculation=false` por diseno.
+- `payroll-readiness` y `current-payroll-period` delegan deadline al helper compartido.
+- `PayrollPeriodTab` muestra deadline como warning si esta vencido pero la readiness esta lista; solo pinta error cuando hay blockers reales de readiness.
+- La nomina mensual en `draft` sin entries ahora muestra una **pre-nomina read-only** con colaboradores incluidos y excluidos por falta de compensacion, usando fallback por `memberId` si el catalogo local no trae el member.
+- Copy canonico agregado en `src/lib/copy/payroll.ts`; docs HR actualizados para dejar claro que el deadline es SLA, no gate de calculo.
+
+No-regresion/impacto:
+- La nomina de mayo ya cerrada no se recalcula, no se reabre y no cambia montos. El cambio puede ajustar copy/estado visual ("calculada fuera de fecha") pero no entries ni exportaciones.
+- Verificado diff limpio en paths mutativos: `calculate-payroll`, APIs de periodos, store, compliance exports, receipts y payment orders sin cambios.
+
+Validacion:
+- `pnpm vitest run src/lib/payroll/calculation-deadline.test.ts src/lib/payroll/current-payroll-period.test.ts src/lib/payroll/payroll-readiness.test.ts src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+- `pnpm vitest run src/lib/payroll`
+- `pnpm exec eslint ...` focalizado
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm local:check`
+- `git diff --check`
+
+Nota visual: GVC local de `/hr/payroll` se pudo capturar, pero el periodo ya estaba calculado/cerrado por el operador; por eso no hay evidencia visual natural del nuevo estado draft en mayo. La cobertura principal del draft queda en test de componente.
+
+---
+
+# Sesion 2026-05-31 — TASK-977 Contractor Payable Bank Settlement — ✅ SHIPPED (flag OFF)
+
+**Rama**: `develop` (no branch). 4 slices + cierre commiteados. **No pusheado.**
+
+Cerró el gap de **backend** del flujo de pago contractor: el motor de liquidación compartido con nómina lanzaba `out_of_scope_v1` para contractor → ahora se liquida al banco por una **rama aditiva detrás de flag** (`CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED`, default OFF → parity nómina bit-for-bit).
+
+- **S1** (`ba1ff9c2`) anchor `expenses.contractor_payable_id` (migración).
+- **S2** (`26d7575e`) materializador reactivo del expense al `ready_for_finance` (bruto, labor_cost_external, resolver Rule 0).
+- **S3** (`22b8fa28`) settlement rama contractor (flag OFF) + payment_source CHECK widened.
+- **S4** (`135bd6a9`) signal `finance.contractor_payable.expense_unmaterialized` + test.
+
+**Diseño**: STOP checkpoint humano aprobado ("Avanza"). Decisiones: expense reactivo (no lazy), expense=bruto / retención=pasivo separado (honorarios queda `partial` hasta remesa SII — out of scope), flag OFF. **Gates**: `pnpm test` 5687/0 · `pnpm build` verde · payroll+payment-orders no-regresión 585 · tsc/eslint 0.
+
+**Pendiente del operador**: (1) push a `develop`; (2) para pagar contractor end-to-end: flip del flag (post staging + finance sign-off) + UI Finanzas (TASK-974). **Follow-ups**: remesa SII de la retención, TASK-978 (due_date+SLA), TASK-979 (corrida mensual).
+
+---
+
+# Sesion 2026-05-31 — EPIC-017 Remaining Mockup Approval Tasks — ✅ DOCS-ONLY
+
+**Rama**: `develop`. Scope documental/task planning only; no runtime, DB, migrations, APIs or mockup implementation.
+
+Se crearon las tasks canonicas para completar la pista de mockups aprobables del EPIC-017 antes de cablear runtime:
+- `TASK-969` — M04 Person Workforce Documents Rail Mockup Approval (`/people/mockup/workforce-documents`), bloquea drift documental y fuerza consumo de EPIC-001.
+- `TASK-970` — M05 Workforce Reliability Signals Mockup Approval (`/people/mockup/workforce-reliability`), observabilidad read-only antes de `TASK-967`.
+- `TASK-971` — M06 Workforce Reporting Foundation Mockup Approval (`/people/mockup/workforce-reporting`), reporting persona-centrico antes de `TASK-966`.
+- `TASK-972` — M07 Unified Worker Change Workflow Mockup Approval (`/people/mockup/worker-change-workflow`), shell futuro sin autorizacion de writes.
+- `TASK-973` — M08 Agent-Safe Workforce Context Mockup Approval (`/people/mockup/workforce-agent-context`), preview read-only Nexa/API/MCP con redaction/lineage/denied actions.
+
+Docs sincronizados: `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`; `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` ya tenian reservados `TASK-969`..`TASK-976` y quedan consistentes con los archivos creados. Siguiente recomendacion operativa: ejecutar `TASK-969` primero porque cierra la frontera Documents/e-signature antes de que `TASK-964` pueda moverse a runtime. Nota de coordinacion: `TASK-974`..`TASK-976` pertenecen a EPIC-013 contractor UI y quedan fuera de este lote EPIC-017.
+
+---
+
+# Sesion 2026-05-31 — TASK-968 Contractor Compensation Setup + Agreed-Amount Guardrail — ✅ SHIPPED
+
+**Rama**: `develop` (no branch, per instrucción del operador). 4 slices commiteados: `25f7d2ec` (S1 editor admin), `8e3eb5f5` (S2 bruto derivado), `21655075` (S3 guardrail), `380a2e7e` (S4 signals) + commit de docs/cierre.
+
+Cerró el gap "¿dónde se setea el monto acordado del contractor?" con SoD dura **HR fija ≠ contractor cobra ≠ Finance paga**:
+- **S1** editor admin (`ContractorEngagementCompensationDrawer` + `CompensationPanel`, moneda read-only) + engagements sin rate alcanzables (`missingRate` / "Falta compensación").
+- **S2** composer del contractor SIN campo libre de bruto → derivado read-only del rate; self-service muestra "Monto acordado" read-only.
+- **S3** guardrail fail-closed `payment_exceeds_agreed_amount` (flag `CONTRACTOR_AGREED_AMOUNT_GUARDRAIL_ENABLED` default OFF; solo rate types de período) + migración `agreed_amount_override_reason` (`20260531160513123`) + capability `finance.contractor_payable.override_agreed_amount` (admin-only, distinta de HR) + endpoint override + `ContractorGuardrailPanel`.
+- **S4** signals `hr.contractor_engagement.rate_unset` (identity) + `finance.contractor_payable.exceeds_agreed_amount` (finance); smoke live `rate_unset = warning 1` (Valentina `EO-CENG-0001`).
+
+**Boundary duro (TASK-957/EPIC-013)**: cero cambios a payroll engine / `payroll_entries` / `contract_type` / finiquito. Gates: `pnpm test` 5678/0 · `pnpm vitest run src/lib/payroll` verde · tsc/eslint 0 · **`pnpm build` verde** (re-run con manifest de rutas completo + exit 0). El primer build local falló por un módulo **untracked de EPIC-017** (`WorkforceReadinessMockupView` de la sesión concurrente People Workforce, creado mid-build) — NO de TASK-968 (mis archivos pasan tsc limpio + mis commits no incluyen esos untracked; el re-build con los archivos EPIC-017 completos en disco pasó limpio). **Valentina queda con `rate_amount=null` a propósito** — el operador fija los $600k mensuales vía la UI (`/hr/contractors` → seleccionar engagement → panel Compensación → Definir compensación). Mockup aprobado vinculante en `src/views/greenhouse/contractors/mockup/`. **No pusheado** (esperando instrucción del operador).
+
+Pendiente operador: (1) fijar el monto de Valentina vía UI; (2) push a `develop` cuando lo indique.
+
+---
+
+# Sesion 2026-05-31 — EPIC-017 M02 People Workforce Command Center — ✅ MOCKUP APROBADO
+
+**Rama**: `develop`. Scope docs + mockup refinements locales; no runtime productivo, DB, migraciones, API ni lifecycle moves.
+
+El usuario aprobó el diseño del mockup `M02` / `TASK-963` tras la segunda iteración de densidad:
+- Ruta local aprobada: `/people/mockup/workforce-command`.
+- Contrato visual: command surface enterprise liviana, no tabla pesada; header/command strip compactos, exception queue lateral, roster como área principal, filtros/saved views tipo pills, inspector/drawer para evidencia.
+- Ajuste clave aprobado: la columna `Evidence` no debe apilar múltiples chips por fila; usar un estado principal + resumen corto y mover detalle al inspector.
+- Regresión visual prohibida: page-level horizontal scroll en desktop/laptop.
+- Issue rojo resuelto: hydration mismatch por IDs MUI inestables; inputs persistentes deben tener IDs estables.
+
+Docs sincronizados:
+- `TASK-963` ahora declara `Status real: Mockup aprobado` + `Approved Mockup Lock`.
+- `RESEARCH-008-approved-mockup-contracts-2026-05-31` marca M02 como `approved and built as mockup`.
+- `RESEARCH-008-epic017-mockup-execution-plan-2026-05-31` registra estado construido/aprobado y reglas de densidad.
+- `EPIC-017` registra delta M02 aprobado.
+
+Validación previa de la iteración aprobada: eslint focalizado 0, `pnpm design:lint` 0/0, Playwright console clean, `pnpm fe:capture people-workforce-command-center --env=local` OK, dossier en `.captures/2026-05-31T15-44-37_people-workforce-command-center/review-dossier.md`.
+
+---
+
+# Sesion 2026-05-31 — EPIC-017 M03 Workforce Readiness Control Room — ✅ MOCKUP APROBADO
+
+**Rama**: `develop`. Scope mockup-only + docs. No DB, migrations, API, runtime remediation, payroll calculation, payment execution or document signing.
+
+Se construyó y el usuario aprobó `M03` como contrato visual/producto:
+- Ruta local: `/people/mockup/workforce-readiness`.
+- View: `src/views/greenhouse/people/mockup/workforce-readiness/WorkforceReadinessMockupView.tsx`.
+- Data: `src/views/greenhouse/people/mockup/workforce-readiness/data.ts`.
+- GVC scenario: `scripts/frontend/scenarios/workforce-readiness-control-room.scenario.ts`.
+- Capture: `.captures/2026-05-31T16-35-51_workforce-readiness-control-room` + review dossier.
+
+Contrato aprobado: control room diagnóstico/read-only para `TASK-962`; separa real active workers vs fixtures, muestra baseline coverage, disposition board, masked samples, owner domain, next safe action y remediation queue preview. No incluye "fix now".
+
+Validación corrida: eslint focalizado 0, `pnpm exec tsc --noEmit --pretty false` 0, `pnpm design:lint` 0/0, GVC local 3 viewports OK, `pnpm fe:capture:review` OK.
+
+Docs sincronizados: `TASK-962` ahora declara `Status real: Mockup aprobado` + `Approved Mockup Lock`; los anexos `RESEARCH-008` marcan M03 como `approved and built as mockup`; `EPIC-017` registra delta M03 aprobado.
+
+---
+
+# Sesion 2026-05-31 — TASK-968 Contractor Compensation Setup — 🔨 IN-PROGRESS (Slice 1/4)
+
+**Rama**: `develop` (sin branch, override del operador). En progreso.
+
+**TASK-968 — Contractor Engagement Compensation Setup + Agreed-Amount Guardrail** (P1, EPIC-013). Cierra el gap descubierto al cerrar TASK-960: no había UI para setear el monto acordado del contractor (`rate_amount` existe en schema + PATCH endpoint pero sin form → Valentina `EO-CENG-0001` con `rate_amount=null`). Planificada con las 4 skills de product design + payroll + finance + arch. Mockup APROBADO (3 superficies, enterprise 2026, commit `f7f26fce`).
+
+**Slice 1 SHIPPED + VERIFICADO** (commit `25f7d2ec`): editor de compensación admin.
+- `ContractorEngagementCompensationDrawer` promovido del mockup (JSX/tokens/microinteracciones intactos) cableado al `PATCH /api/hr/contractors/[id]` real (`action='update'`) + audit event. **Currency READ-ONLY** (decisión: cambiar denominación cascadea FX/payable = acto deliberado fuera V1 — el PATCH update no acepta `currency`, solo `paymentCurrency`).
+- Panel "Compensación" en el AdminInspector del workbench + CTA Editar/Definir.
+- Engagements sin tarifa (`rate_amount IS NULL`) ahora aparecen en el workbench con status "Falta compensación" (alcanzables) — filtro `missingRate`/`excludeTerminal` en `listContractorEngagements` + source nuevo en `hr-workbench-projection`. `ContractorWorkbenchQueueRow.agreedRate` aditivo.
+- Helpers `compensation-display.ts` + copy `copy/contractor-compensation.ts`.
+- **SoD**: el monto se setea SOLO desde admin; sin nuevo endpoint/capability/migración en Slice 1.
+- Verificado runtime: `/hr/contractors` 200 con Valentina "Falta compensación" + panel "Definir compensación". NO se disparó el save (no se seteó el monto de Valentina — decisión operador: lo hace él por la UI).
+- Gates: tsc 0 · eslint 0 · design:lint 0/0 · contractor 123 + payroll 528 (no-regresión EPIC-013).
+
+**Slices pendientes** (checkpoint operador):
+- **Slice 2** — composer deriva el bruto (remueve el campo libre `grossAmount`) + self-service muestra el rate read-only. Toca `ContractorSubmissionComposer` + self-service projection/view + `work-submissions/store.ts` (derivar fixed/monthly). Contractor-facing behavioral change.
+- **Slice 3** — guardrail `payment_exceeds_agreed_amount` en `payables/readiness.ts` (fail-closed, flag) + migración col override + capability `finance.contractor_payable.override_agreed_amount` + dialog override (espejo waiver TASK-793). **Mayor blast radius** (readiness compartido TASK-793/794/795 + migración).
+- **Slice 4** — 2 reliability signals (`hr.contractor_engagement.rate_unset` + `finance.contractor_payable.exceeds_agreed_amount`).
+- Cierre: CLAUDE.md invariants + arch Delta + doc funcional + manual + GVC runtime.
+
+**Boundary duro**: NO tocar payroll engine / `payroll_entries` / `contract_type` (TASK-957). Precursor contractor-scoped de TASK-965.
+
+---
+
+# Sesion 2026-05-31 — TASK-960 Contractor Remittance Advice — ✅ COMPLETE
+
+**Rama**: `develop` (sin branch, por override del operador "mantente en develop"). 4 slices + docs, todo pusheado a `develop`.
+
+Cerrada **TASK-960 — Contractor Remittance Advice ("Comprobante de Pago")**: el contratista pagado recibe un comprobante de pago read-only del `ContractorPayable` (TASK-793), jurisdiction-neutral, NO laboral, NO documento tributario. Ver in-app + descargar PDF en ambas superficies (Self-Service Hub + Admin Workbench HR/Finance).
+
+- **Slice 1** — allocator `EO-RA-NNNNNN` gapless + atómico (advisory lock por issuer, mirror TASK-700) + idempotente por payable. Registry append-only `greenhouse_hr.remittance_advice_numbers` + SQL fn (migración `20260531131226949`). TS wrapper + batched reader. 6 tests. *(No live E2E del allocator: no hay payables `paid` en dev — FK impide synthetic; se ejercita cuando exista un payable real / staging.)*
+- **Slice 2** — presenter PURO `buildRemittanceAdvice(input, locale)` (montos verbatim, cero recompute; retención SII desde `taxWithholdingRateSnapshot`) + resolver server-only (issuer por id multi-entidad, beneficiario tax masked TASK-784, locale `identity_profiles.preferred_locale`, gate `paid`, surface `engagementProfileId` anti-IDOR) + copy bilingüe `src/lib/copy/remittance.ts`. 7 tests (4 regímenes + degrade + bilingüe).
+- **Slice 3** — react-pdf `generate-contractor-remittance-pdf.tsx` (mismo struct, dirección visual aprobada: un acento verde neto, título/chip/disclaimer neutros, logo única marca, sin firma). **Verificado visualmente** con PDFs reales (es-CL + en-US + provider-managed) vía Read PDF. 5 tests.
+- **Slice 4** — `RemittanceAdviceViewer` promovido del mockup (JSX byte-idéntico, diff-verificado) + `RemittanceAdviceSection` (cards self / tabla admin + drawer) + 2 endpoints (my own anti-IDOR 404 / hr tenant `?locale`) + projecciones extendidas (`paidRemittances` / `remittances`, números read-only batched). Section integrada en ambas vistas reales.
+
+**Sin capability/outbox/reliability signal nuevos** (read-only; reusa `personal_workspace.contractor.read_self` + `hr.contractor_engagement`).
+
+**Gates**: `pnpm vitest run src/lib/contractor-engagements` 123 + `src/lib/payroll` 528 (no-regresión EPIC-013) · `pnpm test` full exit 0 · `pnpm build` ✓ (Compiled successfully, boundaries clean) · tsc 0 · lint 0.
+
+**Skills invocadas**: greenhouse-backend, greenhouse-finance-accounting-operator, greenhouse-ux-writing, greenhouse-dev.
+
+**Verificación visual**: PDF (artefacto legal, el de mayor riesgo) verificado este sesión en 3 variantes; viewer byte-idéntico al mockup GVC-aprobado (TASK-960 mockup). **Pendiente staging** (production verification sequence de la spec): generar el comprobante de un payable `paid` real → confirmar breakdown contra el payable + visor/PDF poblados + anti-IDOR (contractor A no baja el de B). Hoy dev no tiene payables `paid`, así que la superficie poblada se valida cuando exista uno (o se seedee en staging). Review legal del disclaimer/naming antes de la primera emisión a un contratista real (es-CL formal-legal).
+
+**Decisiones (Open Questions resueltas pre-ejecución)**: (1) **sin firma** del representante — el mockup aprobado la omite y un remittance advice no la requiere; (2) numeración `EO-RA` ya resuelta en spec; (3) serie **scoped por issuer_organization_id** (V1 una entidad, multi-entidad gratis). **FX V1 omitido** (honest degrade: el payable tiene `fxPolicyCode`, no la tasa aplicada) → follow-up. **Out of scope**: Withholding Certificate anual (Certificado N°21) → follow-up.
+
+Spec: `complete/TASK-960-contractor-remittance-advice.md`. Docs: CLAUDE.md invariants + arch Delta `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1` (2026-05-31) + doc funcional + manual `hr/contratistas-comprobante-de-pago.md` + changelog + README.
+
+---
+
+# Sesion 2026-05-31 — EPIC-017 missing Deel-like lanes opened — ✅ DOCS-ONLY
+
+**Rama**: `develop`. Scope docs-only; no runtime, DB, UI, migration, API or lifecycle moves. Worktree had unrelated/in-progress TASK-960 remittance changes before this pass (`TASK-960` moved to in-progress + remittance code/migration); those were not touched.
+
+Nuevas tasks creadas para completar la vision tipo Deel:
+- `TASK-963` — People List Workforce Overview: lista People como roster workforce con status, worker type, pais, assignment, payment rail, compensation coverage y readiness.
+- `TASK-964` — Person Workforce Documents Rail + EPIC-001 Alignment: conecta EPIC-017 con EPIC-001 Document Vault + Signature Orchestration; People/Person 360 consume evidencia documental sin crear document vault paralelo.
+- `TASK-965` — Unified Worker Create/Edit Workflow: write-path convergence People-first, bloqueado por read models/compensation/assignment/checkpoint.
+- `TASK-966` — Workforce Reporting Foundation: reporting persona-centrico sin doble conteo ni heuristicas por tabla.
+- `TASK-967` — Workforce Reliability Signals Control Plane: signals cross-rail basadas en gap taxonomy/dispositions y alineadas con `TASK-798`.
+
+Docs sincronizados:
+- `EPIC-017` child tasks/intake queue.
+- `EPIC-001` delta People/Workforce consumer.
+- Cross-link notes en `TASK-489`, `TASK-490`, `TASK-492`, `TASK-494`.
+- `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md`.
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`; siguiente ID disponible queda `TASK-968`.
+
+Proxima secuencia recomendada: `TASK-961` + `TASK-962`, luego `TASK-963`; ejecutar `TASK-964` antes de cualquier People-local document UI; no tomar `TASK-965` hasta read models/checkpoints.
+
+---
+
+# Sesion 2026-05-31 — EPIC-017 backlog task rewrites applied — ✅ DOCS-ONLY
+
+**Rama**: `develop` por continuidad del operador. Scope docs-only: se aplicó la disposición del audit `RESEARCH-008-payroll-backlog-triage-2026-05-31` a las tasks existentes del backlog Payroll/Workforce/Compensation para que no se ejecuten con framing viejo.
+
+Cambios principales:
+- Reframed/frozen: `TASK-338` (`CompensationProfile` read model/foundation), `TASK-340` (bridge congelado hasta parity/checkpoint), `TASK-341`/`TASK-342` (bloqueadas por `CompensationProfile`), `TASK-614` (absorb/supersede candidate post-`TASK-961`), `TASK-652` (defer API/agent surface hasta facet + redaction), `TASK-788` (split a WorkAssignment effective-dating; write command cargo+comp diferido), `TASK-798` (signals contractor deben reutilizar gap taxonomy EPIC-017).
+- Aligned/kept separate: `TASK-787`, `TASK-797`, `TASK-955`, `TASK-960`.
+- Umbrella adjusted: `TASK-336` conserva valor histórico, pero subordina el tramo compensation a EPIC-017 y al reframe de `TASK-338`.
+- Índices sincronizados: `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`.
+- Research appendix actualizado con "Applied Disposition Update - 2026-05-31".
+
+No hubo cambios runtime, migraciones, UI, API, DB ni lifecycle moves. Próximo paso recomendado: ejecutar `TASK-961` o `TASK-962`; no tomar `TASK-338/340/614/652/788/798` sin respetar sus gates nuevos.
+
+---
+
+# Sesion 2026-05-31 — TASK-958 Compensation Version Tuple Drift Remediation — 🔧 IN-PROGRESS
+
+**Rama**: `develop` (override operador, sin branch). Follow-up de TASK-957. Remedia drift `member.contract_type` vs `compensation_versions.contract_type` (caso Melkin: contractor Nicaragua/Deel, comp version vigente `(indefinido, international)` grandfathered por CHECK `compensation_versions_contract_pay_regime_check` que está NOT VALID). Open questions resueltas (no bloqueantes): Q1→script one-shot (cohorte=1), Q2→esperar CHECK deel-NULL (gap ya 0: `deel_contract_id='m4ye2qg'` de Melkin backfilleado 2026-05-31). Slice 1: primitivo `reconcile-compensation-version-tuple` con aserción payroll before/after (buildPayrollEntry indefinido vs contractor → idéntico o aborta). Slice 2: VALIDATE del CHECK. Slice 3: señal `payroll.deel_member_without_contract_id`. Garantía "no rompe payroll" + gate `pnpm vitest run src/lib/payroll`. NO toca finiquito/offboarding.
+
+---
+
+# Sesion 2026-05-31 — TASK-959 Workforce Foundation Read-Only Object Map Audit — ✅ COMPLETE
+
+**Rama**: `develop` por instruccion explicita del operador; no se creo branch. Task cerrada en `docs/tasks/complete/TASK-959-workforce-foundation-read-only-object-map-audit.md`, README/registry sincronizados. Scope ejecutado: mapa read-only `Person -> WorkRelationship -> WorkAssignment candidate -> CompensationProfile candidate -> PaymentRail -> readiness/compliance -> gap codes`; sin writes, UI, migrations, API routes, outbox ni acceptance implicita del ADR `Proposed`. Skills usados: `greenhouse-agent` + `greenhouse-payroll-auditor`.
+
+Resultado:
+- Nuevo contrato/mapa: `src/lib/workforce/foundation/gap-codes.ts`, `object-map-types.ts`, `object-map.ts`.
+- Tests: `src/lib/workforce/foundation/object-map.test.ts`.
+- Script read-only: `scripts/workforce/audit-workforce-foundation-map.ts` con `--active-only`, `--include-demo`, `--profile-id`, `--member-id`, `--json-out`, `--fail-on-error-gap`, `--limit`.
+- Docs: `RESEARCH-008-current-state-gap-analysis-2026-05-31.md` actualizado con audit real y candidate signals; `EPIC-017` actualizado con TASK-959 complete.
+
+Hallazgos dev DB:
+- Sin demo: relationship coverage `9/9`, current classification parity `9/9`, current compensation `5/9`, payment rail evidence `8/9`, gaps error `0`; gaps warning principales: `readiness.unresolved_or_blocked=8`, `compensation.missing_current_version=4`.
+- Con demo pre-cleanup: 5 fixtures quedaban como gaps tolerados/info (`person.member_without_profile`, `person.no_identity_profile`, `relationship.missing_active_work_relationship`, `data.demo_or_fixture_tolerated_gap`).
+- Cleanup posterior dev: eliminados 5 demo members `demo-%@demo.greenhouse.efeonce.org` (`is_demo=true`, `identity_profile_id=NULL`) + derivadas materiales (`member_role_cost_basis_snapshots=5`, `person_operational_360=15`, `member_capacity_economics=15`). Verificacion: demo members restantes `0`, referencias restantes a esos member ids `0`, audit `--active-only --include-demo` vuelve a `9/9` activos reales.
+- Captura Deel revisada y corregida por operador: pertenece al dominio People / Worker Profile, no a Payroll. Payroll aparece como una rail secundaria; la pantalla principal es la ficha persona/worker con facets de worker information, role details, compensation summary, relationship, org chart, documents, compliance, time off, apps y quick actions. Lectura documentada en `RESEARCH-008-current-state-gap-analysis-2026-05-31.md`.
+- Recomendacion siguiente: no UI/write path; primero investigar/remediar cobertura compensation/readiness de activos reales y decidir que parte es onboarding intencional vs deuda de datos.
+
+Validacion:
+- `pnpm pg:doctor` OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `pnpm vitest run src/lib/workforce src/lib/account-360/current-work-classification.test.ts` OK (14 files / 92 tests).
+- Audit script OK con `--active-only` y con `--active-only --include-demo`.
+- `pnpm task:lint --task TASK-959` OK.
+- `pnpm docs:context-check` OK con 2 warnings historicos de tamano de Handoff.
+- `git diff --check` OK.
+
+---
+
+# Sesion 2026-05-31 — Unified Workforce Foundation research/architecture/ADR abiertos — 🧭 PROPOSED
+
+Pedido: tomar la senal de Deel como input estratégico, sin modificar runtime ni planificar tasks todavía. Resultado: se abrio el paquete documental pre-task para discutir si Greenhouse debe converger a una fundacion workforce persona-centrica ("one workforce, multiple rails"). Nuevos docs: `docs/research/RESEARCH-008-unified-workforce-foundation.md`, `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md` y `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_DECISION_V1.md`. Indices actualizados: `docs/research/README.md` y `docs/architecture/DECISIONS_INDEX.md`. El ADR queda en `Proposed`: no autoriza runtime changes, migraciones, UI redesign ni tasks hasta review/aceptacion humana.
+
+Delta posterior: se creo `EPIC-017` como contenedor iterativo del programa (`docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`) y se actualizo `docs/epics/EPIC_ID_REGISTRY.md` + `docs/epics/README.md`. El epic no crea child tasks iniciales; define fases e intake protocol para agregarlas gradualmente cuando research/ADR habiliten scopes ejecutables.
+
+Delta posterior 2: se agrego el deep-dive `docs/research/RESEARCH-008-current-state-gap-analysis-2026-05-31.md` con interpretacion del articulo de Deel, tendencias de mercado (Deel/Rippling/Remote/Workday/ADP), auditoria de stack/codebase/DB live dev y matriz `tenemos vs necesitamos`. Evidencia DB inicial: `pnpm pg:doctor` OK contra `greenhouse-pg-dev`; `members=146`, `person_legal_entity_relationships=11`, `person_360=164`, `contractor_engagements=1`, `compensation_versions=14`, `payment_obligations=14`; 5 demos activos international/internal sin relationship activo (limpiados posteriormente tras TASK-959); compensation tuple drift live=0. No se modifico runtime ni se abrieron tasks durante ese research.
+
+Delta posterior 3: se documento el gate previo a la primera task en `docs/research/RESEARCH-008-pre-task-considerations.md`. Contiene las decisiones a considerar antes de abrir `TASK-###`: pregunta inicial read-only, doctrina de persona, cobertura de relationships, scope de compensation, shape de assignment, boundaries payroll/contractor/finance, redaction/access y criterios de exito. Recomendacion: primera task eventual = audit/mapa read-only, sin writes ni UI.
+
+Delta posterior 4: se creo `TASK-959` como primera task ejecutable de EPIC-017: `docs/tasks/to-do/TASK-959-workforce-foundation-read-only-object-map-audit.md`. Scope: mapa/audit read-only `Person -> current WorkRelationship -> WorkAssignment candidate -> CompensationProfile candidate -> PaymentRail -> readiness/compliance -> gap codes`, parity contra `resolveCurrentWorkClassification`, audit dev PG y candidate reliability signals. No autoriza writes, UI, migrations, Person 360 runtime ni acceptance implicita del ADR. Registry/README/EPIC sincronizados; siguiente ID `TASK-960`.
+
+Delta posterior 5: se documento el triage del backlog Payroll/Workforce/Compensation en `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md` y se enlazo desde `EPIC-017` + `docs/research/README.md`. Resultado: `TASK-338`, `TASK-340`, `TASK-614`, `TASK-652`, `TASK-788` y `TASK-798` son reutilizables pero requieren replanteo antes de ejecucion; `TASK-955`, `TASK-731`, `TASK-732`, `TASK-856`, `TASK-896` y `TASK-898` se deben alinear livianamente; compliance/receipts/close gates/smoke lanes quedan en su carril salvo consumo explicito por EPIC-017.
+
+# Sesion 2026-05-30 — Claude `greenhouse-backend` skill refresh — ✅ COMPLETE
+
+Se investigó el repo + Cloud live para corregir la skill global Claude `~/.claude/skills/greenhouse-backend/SKILL.md`, que estaba BQ-focused y desalineada con el runtime vigente. Nueva baseline de la skill: PostgreSQL/Cloud SQL como OLTP y default para workflows mutables; BigQuery como OLAP/raw/conformed/marts/fallback transicional; uso canónico de `src/lib/postgres/client.ts`, `src/lib/db.ts`, migrations `node-pg-migrate`, outbox/reactive, API Platform, roles reales, views+entitlements y Cloud Run workers. Evidencia read-only usada: package/runtime repo, arquitectura vigente, `gcloud` (Cloud SQL/Run/Functions/Scheduler/Secrets/Buckets/SAs), `bq ls`, `vercel env ls`, `gh workflow list/run list`, `az ad app list`, y `pnpm pg:doctor` live OK. No se tocaron archivos de código de TASK-957.
+
+# Sesion 2026-05-30 — TASK-957 Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification — ✅ COMPLETE
+
+**Cierre (ambos slices)**: resolvió la open question de TASK-956 (doble-pago + doble declaración F29 entre nómina legacy honorarios y contractor payable). **Slice A** (gate `src/lib/payroll/contractor-exclusion/`, SSOT=engagement, flag OFF parity, keyed por engagement → contractors Deel legacy intactos + señal `payroll.contractor.double_rail_overlap`). **Slice B** (3-skill verdict finance+payroll+arch → **Opción b: NO mutar `member.contract_type`**; resolver canónico `resolveCurrentWorkClassification` en `src/lib/account-360/`; Person 360 `PersonProfileTab` muestra "Estado vigente: Contractor · Honorarios" + "Contrato de empleo: indefinido" historia). Hallazgos live remediados: (1) comp version v2 de Valentina sin cerrar → script `scripts/payroll/close-contractor-orphan-comp-version-task957.ts` → señal steady=0; (2) bug latente `toDateStr` (getPersonHrContext lanzaba para hire_date Date) → robusto, patrón TASK-765. **GVC verificado** (Person 360 Valentina). Audit: 0 callsites legacy filtran empleados activos por contract_type+active. Gates: no-regresión 673 · `pnpm test` 5637/0 · `pnpm build` ✓. Lifecycle complete + movida a `complete/`. Docs: CLAUDE.md invariants (double-rail exclusion + contract_type-es-historia-de-empleo SSOT + resolveCurrentWorkClassification) + arch Delta V1.10 + README/registry/changelog. Hard rule no-regresión finiquito/offboarding respetada. **Decisión clave**: `member.contract_type` = tipo de contrato de EMPLEO (historia); el SSOT de estado vigente es `person_legal_entity_relationships` + `ContractorEngagement`.
+
+---
+
+# Sesion 2026-05-30 — TASK-957 (histórico, Slice A in-progress)
+
+**Estado**: **Slice A SHIPPED + pusheado** (`bb24e57b..94378da3`). La señal `payroll.contractor.double_rail_overlap` detectó 1 overlap real live → Valentina tenía su comp version v2 (`indefinido`/`chile`) con `effective_to=NULL` (su offboarding seedeado no corrió `closeFuturePayrollEligibility`). **Remediado CON consentimiento del operador** vía script documentado `scripts/payroll/close-contractor-orphan-comp-version-task957.ts` (resuelve fecha del offboarding `executed`, dry-run default, idempotente, reversible): v2 cerrada a 2026-04-30 → **señal ahora ok/steady=0**. Gates: no-regresión 673 (finiquito/offboarding intactos) + reliability 358 + pre-push lint/tsc verde. **Slice B BLOQUEADO** (Q1 — tupla destino toca taxonomía gobernada `payroll.contract_taxonomy.invalid_tuple_drift` + mecánica F29 → requiere finance-accounting). Task permanece `in-progress`. **Próximo paso**: decisión finance sobre la tupla destino antes de Slice B.
+
+**Rama**: `develop` (operador override, sin branch). **En curso**: Slice A (la red de seguridad, desbloqueada). Resuelve la open question de TASK-956 — dos rieles de pago (nómina legacy honorarios + contractor payable TASK-794) sin exclusión mutua → doble-pago + doble declaración F29. Discovery + Audit + Connection + Plan hechos. Open questions: Q2 (separado, arch verdict) + Q3 (severity error si count>0) resueltas; **Q1 (tupla destino de Slice B) BLOQUEANTE** — toca la taxonomía gobernada `payroll.contract_taxonomy.invalid_tuple_drift` (matriz de 3 tuplas válidas) + mecánica F29 → requiere finance-accounting. **Slice B NO se implementa en esta sesión** (paro antes, reporto). Cohorte real validada: Andrés/Daniela/Melkin (contractors Deel legacy, sin engagement) NO los toca el gate (keyea por engagement, no contract_type). Slice A: módulo `src/lib/payroll/contractor-exclusion/` + post-filtro en `pgGetApplicableCompensationVersionsForPeriod` + señal `payroll.contractor.double_rail_overlap` (moduleKey payroll, steady=0). Flag `PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED` default OFF (parity bit-for-bit). Hard rule no-regresión: gate `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding src/lib/contractor-engagements`.
+
+---
+
+# Sesion 2026-05-30 — TASK-956 Employee→Contractor connected command — ✅ COMPLETE
+
+**Cierre**: comando conectado atómico `transitionEmployeeToContractorEngagement` (`src/lib/contractor-engagements/transition-from-employee.ts`) que cabló el **seam huérfano** del dominio (790-796): compone `transitionEmployeeToContractor` (TASK-789, antes 0 callers) + `createContractorEngagement` (TASK-790) en **una `withGreenhousePostgresTransaction`** vía **dual-mode** (`client?: PoolClient`). Entry point HR `POST /api/hr/contractors/transition-from-offboarding` (reuse `hr.contractor_engagement:manage`). Keyed en offboarding `executed` (decoupled de ratificación → cierra sin notaría). Signal `hr.contractor.transition_orphan`. **Fix latente TASK-790** expuesto (`classification_reviewed` $26 faltante; rollback atómico mantuvo a Valentina pristine). **Valentina Hoyos ejecutada canónica**: employee ended 2026-04-30, contractor honorarios active 2026-06-01, `EO-CENG-0001` (`honorarios_cl`, `needs_review`, SII `cl_honorarios_2026_15_25`); **member `indefinido` / finiquito / offboarding INTACTOS** (hard rule no-regresión verde). **GVC poblado verificado** (cierra el gap de TASK-796): `/my/contractor` (Valentina) → `honorarios_ready`/"Falta soporte"/entidad `Efeonce Group SpA`; `/hr/contractors` → workbench KPIs + cola vacía honesta. Lifecycle complete + movida a `complete/`. Docs: CLAUDE.md (invariantes comando conectado + boundary no-regresión) + arch Delta V1.9 + README/registry/changelog. **Gates**: hard-rule (payroll+offboarding+contractor) 661 passed · `pnpm test` 5626/0 · `pnpm build` ✓ · tsc/lint 0. **Open question diferida**: V1 NO muta `member.contract_type` (riesgo doble-pago payroll honorarios legacy; la exclusión de payroll post-salida la da el offboarding `executed` TASK-890). TASK-955 recoge el carril provider/plataforma. **Pendiente push**: 5 commits TASK-956 + docs de cierre → `develop`.
+
+---
+
+# Sesion 2026-05-30 — TASK-796 Contractor Self-Service Hub — ✅ COMPLETE
+
+**Cierre**: 9 commits en `develop` (pusheados). Backend (projections + API self-service `/api/my/contractor/*` + HR workbench API) + ambas UIs (`/my/contractor` + `/hr/contractors`, mockups intactos) + governance (migración `20260531030000000` aplicada a dev PG: view_registry + role_view_assignments + capabilities_registry) + nav dinámico (flag JWT `hasActiveContractorEngagement`). Lifecycle complete + movida a `complete/`. Docs: CLAUDE.md invariants + arch Delta V1.8 + funcional `docs/documentation/hr/contratistas-self-service.md` + manual `docs/manual-de-uso/hr/contratistas.md`. **Gates**: `pnpm build` ✓ · `pnpm test` 5617 passed / 0 failed · tsc 0 · lint 0 · grant-coverage + view-registry verde. **Pendiente (no bloqueante)**: GVC capture de rutas runtime — requiere dev server + engagement contractor seedeado para el agente; recomendado post-deploy staging. La UI es promoción fiel de mockups ya GVC-aprobados.
+
+---
+
+## Detalle de la sesión (histórico)
+
+Rama: `develop` (operador pidió mantenerse en develop, sin branch). Objetivo: cablear los mockups aprobados (`/my/contractor` self-service + `/hr/contractors` workbench HR) al backend contractor TASK-790→795, sin redisenar la IA aprobada.
+
+**Discovery + decisiones pre-ejecución (cerradas con el operador):**
+- Capa de datos = **projection canónica server-only** (patrón `sample-sprints/runtime-projection.ts`): produce el view-model `ContractorScenario` (el mismo tipo que ya consumen los mockups) → wiring de cambio mínimo en las vistas. Cache TTL 30s + degradación honesta + filtrado Finance-only.
+- **API self-service nueva** `/api/my/contractor/*` (gap real: todo lo entregado es HR/Finance-gated). Patrón `requireMyTenantContext` (`/api/my/payment-profile`).
+- Scope = **V1 completo**: ambas superficies + companions (composer, dispute, admin review, payment-profile handoff, closure visibility).
+- TASK-753 ✅ existe en `/my/payment-profile` (handoff solo enlaza). Closure = visibility-only (TASK-797 no shipped).
+
+**Readers backend reutilizables** (server-only): `getContractorEngagementById`, `listContractorEngagementsByProfile`, `listContractorWorkSubmissionsByEngagement`, `listContractorPayablesByEngagement`, `listContractorInvoiceAssetsByEngagement`, `assessPayableReadiness`, `resolveHonorariosReadiness`, `createContractorWorkSubmission`+`submitContractorWorkSubmission`, `attachContractorInvoiceAsset`. Gap conveniencia: `getActiveContractorEngagementForProfile`. Gap HR: cola agregada (componer 3 listers).
+
+**Decisiones de checkpoint (operador, 2026-05-30):** (1) `/my/contractor` en nav con **visibilidad dinámica** (solo si hay engagement activo) → patrón flag JWT `hasActiveContractorEngagement` (como `supervisorAccess`); (2) workbench `/hr/contractors` grant a **HR + Finance + Admin** (hr_manager + hr_payroll + efeonce_admin + finance_admin). Re-secuencia: Slice 4 (migración governance + nav + flag JWT) se mueve a DESPUÉS de las UIs para reducir blast radius (las pages funcionan por route-group fallback antes de seedear el viewCode).
+
+**Slices entregados (7 commits en develop local, sin push):**
+- Slice 0 — lifecycle in-progress + README/Handoff + spec recalibrada (`09b3d49a`).
+- Slice 1 — projections (self-service + HR workbench) + mapper puro + `getActiveContractorEngagementForProfile` + 14 tests. `src/lib/contractor-engagements/{projection-types,self-service-scenario,self-service-projection,hr-workbench-projection}.ts`.
+- Slice 2 — API `/api/my/contractor/*` (GET projection · POST work-submissions · POST attach-asset) + 2 capabilities (`personal_workspace.contractor.{read_self,submit_self}`) + grants. grant-coverage verde.
+- Slice 3 — API `GET /api/hr/contractors/workbench`.
+- Slice 5 — UI `/my/contractor` (page + ContractorSelfServiceView + composer + dispute + handoff + closure + timeline). Mockups intactos.
+- Slice 6 — UI `/hr/contractors` (page + ContractorAdminWorkbenchView + AdminReviewDecisionDrawer).
+- Gates por slice: tsc 0 (filtrado) · eslint 0 · 14 mapper tests · grant-coverage verde. Copy es-CL sin semántica nómina dependiente.
+
+**PENDIENTE (próxima sesión / requiere entorno + confirmación):**
+- **Slice 4 (blast radius)**: migración seed `greenhouse_core.{view_registry,role_view_assignments,capabilities_registry}` (viewCodes `mi_ficha.mi_contratacion` + `equipo.contratistas`; grants self-service + HR/Finance/Admin) + entry TS en `view-access-catalog.ts` + flag JWT `hasActiveContractorEngagement` en `auth.ts` (mirror `supervisorAccess`) + `next-auth.d.ts` + `get-tenant-context.ts` + `VerticalMenu.tsx` (item dinámico /my/contractor + item /hr/contractors) + `GH_MY_NAV.contractor`/`GH_HR_NAV.contratistas` en nomenclature. Requiere `pnpm migrate:create` + run contra dev PG (Cloud SQL proxy).
+- **Slice 8 (verificación + cierre)**: `pnpm test` full + `pnpm build` + GVC captures (`pnpm fe:capture contractor-self-service-actions` etc. — requiere dev server + engagement contractor seedeado para el agente) + docs (CLAUDE.md invariants, arch Delta, doc funcional, manual) + closing protocol (mover a complete/, README, changelog).
+- **Push**: 7 commits locales sin pushear — operador autoriza push a develop.
+
+**Nota funcional**: las pages YA funcionan por route-group fallback (alcanzables sin el viewCode seedeado); lo que falta para discoverability es el nav dinámico (Slice 4). Nada está roto: todo additive + verde.
+
+---
+
+# Sesion 2026-05-30 — TASK-795 International Contractor + Provider Boundary + FX — ✅ COMPLETE (Fase A V1)
+
+Rama: `develop` (operador pidió mantenerse en develop, sin branch). Scope confirmado vía AskUserQuestion: **Fase A V1**, Fase B (provider/EOR split) **diferida** (minoría; el grueso son contractors directos por Efeonce SpA). 4 commits (3 slices + lifecycle).
+
+Diseño pre-ejecución ya committeado en el spec (D-795-1..5 + invariantes contables + review finanzas). Fase A reusa el patrón TASK-794: **cero migración, cero capability, cero outbox, cero código payroll**.
+
+- Slice 1: gate `tax_owner_review_required` (universal, fail-closed cuando `manual_review_required`/`country_engine_owned`; frontera D-795-4 escala a 905, nunca aplica tasa). Pure + store + tests.
+- Slice 2: gate `fx_policy_unresolved` (cross-currency exige `fx_policy_code` declarado). Pure + store + tests.
+- Slice 3: signals `finance.contractor_payable.{tax_review_overdue (drift), fx_unresolved_overdue (lag)}` (moduleKey finance, steady=0), validados contra PG live (count=0).
+
+Gates de cierre: tsc 0 · lint 0 · `pnpm vitest run src/lib/payroll src/lib/contractor-engagements` 608 passed · reliability 358 passed · `pnpm test` 5603 passed / 0 failed · `pnpm build` exit 0. Cero cambio a `calculate-honorarios.ts`/`SII_RETENTION_RATES`. Docs: CLAUDE.md (International Contractor Boundary invariants) + arch Delta V1.7 + README + registry + changelog.
+
+Fase B (provider settlement split + EOR beneficiary + reconciliación) queda como follow-up promovible a task derivada cuando emerja un contractor real por plataforma/EOR. Decisiones ya documentadas (D-795-2/3).
+
+---
+
+# Sesion 2026-05-30 — TASK-794 Chile Honorarios Compliance + SII Retention — ✅ COMPLETE
+
+Rama: `develop` (el operador pidió mantenerse en develop, sin branch nueva). 4 commits atómicos por slice.
+
+Objetivo cumplido: capa de compliance Chile honorarios sobre Contractor Engagements + Payables (TASK-790/793). NO toca el motor de nómina legacy (`calculate-honorarios.ts`, `SII_RETENTION_RATES` sin cambios — git diff vacío) — cero cambio de números payroll.
+
+Decisiones de diseño (verificadas con skills greenhouse-payroll-auditor + arch-architect):
+- **Sin migración**: el schema existente (`contractor_payables.readiness_json`/`source_snapshot_json`, `tax_withholding_*`, `contractor_engagements.classification_risk_status`) soporta todo el alcance. Menor blast radius.
+- **Reuso de primitivas canónicas**: `resolveHonorariosWithholdingPolicy` (TASK-790, SSOT de tasa) + `computeContractorWithholding` (TASK-793). La tasa SII vive en `getSiiRetentionRate` (payroll SSOT); 2026=15.25% verificado oficial (Ley 21.133, watchlist payroll-auditor). NO se duplica ni se toca.
+- **Módulo nuevo** `src/lib/contractor-engagements/chile-honorarios/`: policy (folio boleta + snapshot + `assertNoDependentDeductions` + `computeChileHonorariosPayout`) + readiness server-only (RUT verificado via person-legal-profile `honorarios_closure`).
+- **3 gates nuevos fail-closed** en `evaluatePayableReadiness`/`assessPayableReadiness` (solo honorarios_cl salvo classification): `rut_unverified`, `classification_risk_blocking` (universal), `honorarios_withholding_mismatch`.
+- **1 reliability signal** `hr.contractor_payable.honorarios_rut_unverified` (moduleKey identity, steady=0; validado live count=0).
+- Sin capabilities/outbox nuevos (reusa `finance.contractor_payable:manage` + evento `workforce.contractor_payable.blocked v1` con blockerCodes).
+
+Slices: 1 (módulo, 12 tests) · 2 (gates readiness + snapshot, 33 tests) · 2b (signal) · 3 (paridad payroll + cutover docs).
+
+Gates de cierre: tsc 0 repo-wide · lint 0 · `pnpm vitest run src/lib/payroll src/lib/contractor-engagements` 602 passed / 6 skipped · signal SQL validado contra PG live (count=0) · cero `new Pool` / `getServerAuthSession` directo / `NextResponse.json({error:<raw>})` nuevos. Docs: CLAUDE.md (invariants TASK-794) + arch Delta V1.5 (cutover) + README + registry + changelog.
+
+Próximo paso: TASK-795 (international/provider + FX) / TASK-796 (self-service UI) / TASK-797 (contractor_closure). El detail/quoting de honorarios UI queda para TASK-796+.
+
+---
+
+# Sesion 2026-05-30 — TASK-796 companion mockups accionables — ✅ VALIDADO LOCAL
+
+Pedido: revisar si los mockups aprobados de TASK-796 cubrian lo necesario y expandir los microflujos faltantes con skill de product design antes de implementacion runtime.
+
+Resultado:
+- Se preservan las dos superficies madre aprobadas: `/my/contractor/mockup` y `/hr/contractors/mockup`.
+- Se agregaron companion mockups accionables dentro del mismo stack Greenhouse/Vuexy:
+  - `ContractorSubmissionComposerMockup` — drawer contractor para preparar envio con periodo, monto, invoice/evidencia y submit/draft.
+  - `ContractorDisputeResponseMockup` — drawer contractor para responder observacion con evidencia corregida.
+  - `AdminReviewDecisionDrawerMockup` — drawer HR/admin para approve/dispute/reject con checklist, razon visible y advertencia de que aprobar no ejecuta pago.
+  - `PaymentProfileHandoffMockup` — panel de estado/handoff a TASK-753 sin duplicar cuenta de pago.
+  - `ContractorClosureSidecarMockup` — sidecar de cierre contractor sin finiquito, como puente visual a TASK-797.
+- Se agregaron escenarios GVC repetibles:
+  - `contractor-self-service-actions`
+  - `contractor-dispute-response`
+  - `contractor-admin-review-decision`
+- `docs/tasks/to-do/TASK-796-contractor-self-service-hub.md` quedó actualizado: estos companion mockups son parte del contrato aprobado; runtime debe implementarlos o documentar constraint backend para diferirlos.
+
+Validacion:
+- `pnpm exec eslint src/views/greenhouse/contractors/mockup scripts/frontend/scenarios/contractor-self-service-actions.scenario.ts scripts/frontend/scenarios/contractor-dispute-response.scenario.ts scripts/frontend/scenarios/contractor-admin-review-decision.scenario.ts` OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `pnpm exec vitest run scripts/frontend/lib/scenario.test.ts` OK (5 tests).
+- `pnpm fe:capture contractor-self-service-actions --env=local` OK -> `.captures/2026-05-30T17-15-39_contractor-self-service-actions`.
+- `pnpm fe:capture contractor-dispute-response --env=local` OK -> `.captures/2026-05-30T17-16-01_contractor-dispute-response`.
+- `pnpm fe:capture contractor-admin-review-decision --env=local` OK -> `.captures/2026-05-30T17-16-12_contractor-admin-review-decision`.
+- `pnpm fe:capture contractor-admin-workbench --env=local` regression OK -> `.captures/2026-05-30T17-16-58_contractor-admin-workbench`.
+
+---
+
+# Sesion 2026-05-30 — TASK-954 Agent Role Personas — ✅ COMPLETE
+
+Pedido: crear y ejecutar una task para sumar usuarios agente dedicados por rol, no solo para diseño sino para cualquier flujo donde permisos/navegación/experiencia dependan del rol.
+
+Resultado:
+- Nueva task cerrada: `docs/tasks/complete/TASK-954-agent-role-personas.md`.
+- Nueva migración: `migrations/20260531020000000_task-954-agent-role-personas.sql`.
+- Personas agente:
+  - `agent@greenhouse.efeonce.org` — superadmin (`efeonce_admin` + `collaborator`), reservado para admin/permisos/diagnóstico transversal.
+  - `agent-collaborator@greenhouse.efeonce.org` — collaborator puro (`collaborator`), para `/my`, self-service y validación sin privilegios admin.
+  - `agent-client@greenhouse.efeonce.org` — cliente compuesto (`client_executive` + `client_manager` + `client_specialist`) anclado a `agent-client-sandbox`, para portal cliente general sin acceso interno.
+- Se sincronizó el contrato en `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `GREENHOUSE_IDENTITY_ACCESS_V2`, docs funcionales de identidad, acceso programático staging, manual GVC, task registry, README y changelog.
+- Regla operativa: usar la persona agente de menor privilegio que represente el caso. La persona client es compuesta y no valida límites finos entre roles cliente; crear personas separadas por rol si una task depende de esas diferencias.
+
+Validación:
+- `pnpm pg:connect:migrate` OK tras desbloquear la cadena real: se removió el marker stale de TASK-791, se agregó la forward-fix migration `20260531021000000_task-793-contractor-payables-schema-forward-fix.sql` porque la 793 original ya estaba registrada como aplicada, y se aplicó TASK-954 con `node-pg-migrate`.
+- `pnpm pg:connect:status` OK (`No migrations to run!`).
+- DB live confirma `contractor_payables`, `contractor_payable_events`, FK `contractor_work_submissions_consumed_by_payable_fkey` y CHECK de `payment_obligations.source_kind` con `contractor_payable`.
+- `public.pgmigrations` queda consistente: TASK-791 vigente `20260530203116605`, TASK-792, TASK-793, TASK-954 y forward fix `20260531021000000`; sin alias stale `20260530104907111`.
+- `greenhouse_serving.session_360` confirma:
+  - collaborator: roles `{collaborator}`, routeGroups `{my}`, home `/my`.
+  - client: roles `{client_executive,client_manager,client_specialist}`, routeGroups `{client}`, tenant `agent-client-sandbox`, home `/home`.
+- `POST /api/auth/agent-session` local OK para superadmin, collaborator y client.
+- `scripts/playwright-auth-setup.mjs` generó storageState para ambos usuarios nuevos: `.auth/task-954-collaborator.json` y `.auth/task-954-client.json`.
+- `pnpm exec vitest run src/lib/contractor-engagements/payables/state-machine.test.ts src/lib/contractor-engagements/payables/readiness.test.ts src/lib/contractor-engagements/payables/withholding.test.ts` OK (21 tests).
+- `pnpm task:lint --task TASK-954` OK; `git diff --check` OK.
+
+---
+
+# Sesion 2026-05-30 — TASK-793 Contractor Payables → Finance Bridge — ✅ COMPLETE
+
+Implementado end-to-end en `develop` (sin rama, sin push; local-first). EPIC-013.
+
+Resultado:
+- `greenhouse_hr.contractor_payables` + `contractor_payable_events` (state machine + CHECK net=gross−withholding + CHECK economic_category=labor_cost_external + audit append-only). Runtime schema garantizado por forward fix `20260531021000000` tras detectar que `20260531010000000` quedó aplicada como stub vacío.
+- Consume work submissions aprobadas (dup-guard misma tx, cierra FK `consumed_by_payable_id` de TASK-792) + off-cycle. Withholding SII solo honorarios CL.
+- Readiness fail-closed (7 gates + waiver gobernado) + API `/api/finance/contractor-payables` + capabilities `finance.contractor_payable` + `.waive_payment_profile` (grant-coverage verde).
+- Bridge reactivo `contractor_payable_finance_obligation`: `ready_for_finance` → UNA `payment_obligation` idempotente (`amount=net`, `source_kind=contractor_payable`). Outbox v1 (5 eventos). 2 signals (lag + dead_letter) wired en overview.
+- Guardrail payroll: NUNCA payroll_entries/adjustments/compensation_versions/final_settlements ni muta members.
+
+Validación:
+- `tsc` 0 repo-wide · lint 0 · 31 tests dominio + 8 bridge · `pnpm vitest run src/lib/payroll` 522 passed (non-regression) · DB guards live (rolled back).
+- Commits: `07f9dec8` `c3e986cf` `72fd2329` `a310105f` `ba96c9a8` `ba761519` `e97aadd7`.
+- Pendiente operador: `pnpm test` + `pnpm build` full antes de push a `develop` (gate de cierre canónico).
+
+Próximo: TASK-794 (honorarios CL), TASK-795 (international/provider + FX), TASK-796 (self-service UI).
+
+---
+
+# Sesion 2026-05-30 — TASK-953 Greenhouse Visual Capture Evidence Hardening — 🆕 TASK CREADA
+
+Pedido: crear una task para robustecer GVC más allá de scroll/full-page: readiness, assertions ligeros, quality guards, reportes, multi-viewport, health taxonomy y baseline mockup→runtime.
+
+Resultado:
+- Nueva task: `docs/tasks/to-do/TASK-953-greenhouse-visual-capture-evidence-hardening.md`.
+- Tipo `implementation`, P2 / Alto / Alto, domain `ui|platform|ops`.
+- Scope: page readiness contract, lightweight assertions, frame quality guards, multi-viewport, HTML report/dossier V2, baseline/mockup→runtime contract y health V2.
+- Registro actualizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+- `docs/tasks/README.md` actualizado con `TASK-953` y siguiente ID disponible `TASK-954`.
+
+Validacion:
+- `pnpm task:lint --task TASK-953` -> 0 errors / 0 warnings.
+
+---
+
+# Sesion 2026-05-30 — TASK-796 mockups + fe:capture scroll robusto — ✅ VALIDADO LOCAL
+
+Pedido: crear mockups contractor/admin para `TASK-796` dentro del programa `TASK-789..798`, validar visualmente con `pnpm fe:capture`, y robustecer el helper para capturar pantallas con scroll de forma escalable/resiliente para agentes futuros.
+
+Resultado:
+- Mockups reales de portal agregados en `/my/contractor/mockup` y `/hr/contractors/mockup`, con data tipada bajo `src/views/greenhouse/contractors/mockup/*`.
+- Se corrigio bug visual en timeline admin: en MUI `width: 1` se interpretaba como `100%`; el conector ahora usa `width: '2px'`.
+- `pnpm fe:capture` ahora soporta scroll por selector, `scrollTo: 'top' | 'bottom'`, captura `mark fullPage`, captura `mark clipSelector`, y validaciones del DSL para evitar combinaciones ambiguas.
+- La herramienta queda nombrada y documentada como **Greenhouse Visual Capture** (`GVC`): CLI `pnpm fe:capture`; arquitectura `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`; manual `docs/manual-de-uso/plataforma/captura-visual-playwright.md`; documentacion funcional `docs/documentation/plataforma/captura-visual.md`; metodo UI `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`. `AGENTS.md`, `CLAUDE.md`, `project_context.md`, indices y changelog quedan sincronizados.
+- `docs/tasks/to-do/TASK-796-contractor-self-service-hub.md` queda actualizado con los mockups aprobados como contrato de implementacion: `/my/contractor/mockup` y `/hr/contractors/mockup`, sources bajo `src/views/greenhouse/contractors/mockup/*`, artifacts GVC aprobados y regla explicita de "dar vida" a esos mockups en runtime sin redisenar el flujo.
+- Nuevos scenarios repetibles:
+  - `contractor-admin-workbench`: `/hr/contractors/mockup`, selector scroll + `clipSelector`.
+  - `offboarding-fullpage-capture`: `/hr/offboarding/mockup`, `fullPage`.
+  - `sample-sprints-scroll-anchors`: `/agency/sample-sprints/mockup`, scroll top/bottom.
+
+Validacion:
+- `pnpm fe:capture contractor-admin-workbench --env=local`: OK. Artefacto final `.captures/2026-05-30T12-42-40_contractor-admin-workbench`; dossier generado con `pnpm fe:capture:review`.
+- `pnpm fe:capture offboarding-fullpage-capture --env=local`: OK. Artefacto `.captures/2026-05-30T12-43-07_offboarding-fullpage-capture`.
+- `pnpm fe:capture sample-sprints-scroll-anchors --env=local`: OK. Artefacto `.captures/2026-05-30T12-43-31_sample-sprints-scroll-anchors`.
+- `pnpm fe:capture:health`: verde, 5% failures ultimos 20; ultimo failure preexistente de `nexa-insights-list-page` el 2026-05-29.
+- `pnpm exec vitest run scripts/frontend/lib/scenario.test.ts`: 5 tests OK.
+- `pnpm exec eslint ...` focal para helper/scenarios/mockups: OK.
+- `pnpm design:lint`: 0 errors / 0 warnings.
+- `pnpm exec tsc --noEmit --pretty false` intentado previamente: bloqueado por cambios ajenos de `TASK-793` en `src/app/api/finance/contractor-payables/**` que referencian `@/lib/entitlements/subject`; sin errores observados en archivos de este scope.
+
+Nota: dev server local sigue disponible en `http://localhost:3000` para revisar las rutas.
+
+---
+
+# Sesion 2026-05-30 — TASK-952 Modern Web Guidance agent UI workflow — 🆕 TASK CREADA
+
+Pedido: crear una task para adoptar la investigacion de Chrome Modern Web Guidance como workflow operativo de agentes.
+
+Resultado:
+- Nueva task: `docs/tasks/to-do/TASK-952-modern-web-guidance-agent-ui-workflow-adoption.md`.
+- Tipo `policy`, P2 / Medio / Bajo, domain `ui|platform|ops|documentation`.
+- Scope: fuente canonica breve, sync de `AGENTS.md`/`project_context.md`/skills UI, comandos con `DISABLE_TELEMETRY=1 gtimeout 60s`, y guardrail SDD para no convertir recomendaciones externas en lint rules por reflejo.
+- Registro actualizado en `docs/tasks/TASK_ID_REGISTRY.md`.
+- `docs/tasks/README.md` actualizado con `TASK-952` y siguiente ID disponible `TASK-953`.
+
+Validacion:
+- `pnpm task:lint --task TASK-952` -> 0 errors / 0 warnings.
+- `pnpm docs:context-check` -> 0 errors; warnings esperados por tamano historico de `Handoff.md`.
+- `git diff --check` -> OK.
+
+Nota multi-agente: no se tocaron cambios ajenos como `src/lib/sync/event-catalog.ts` ni el rename de `TASK-792`; quedan fuera de este scope.
+
+---
+
+# Sesion 2026-05-30 — Programa Mercado Publico / Compra Agil tasks architecture pass — ✅ BACKLOG AJUSTADO
+
+Pedido: revisar las tasks del programa de Compra Agil y licitaciones con criterio de arquitectura/commercial y ajustarlas si era necesario.
+
+Resultado: backlog ajustado sin tocar runtime ni migraciones. Se uso `software-architect-2026`; no existe skill local separada llamada `commercial`, asi que el pase commercial se hizo con `greenhouse-agent` + arquitectura `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1` / `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1`.
+
+Cambios clave:
+- `TASK-678` sube a P1 y queda `Type: policy`: ya no es "watch"; es gate de contrato para API Compra Agil v2 live + COT mensual historico/backfill/fallback + OC post-award + adjuntos metadata-only.
+- `TASK-677` ahora depende de `TASK-678` y no puede modelar COT mensual como source live.
+- `TASK-675` y `TASK-676` dependen tambien de `TASK-680` para no duplicar mappings de codigos/procedimientos.
+- `TASK-679`, `TASK-682`, `TASK-683` y `TASK-687` quedan alineadas a Compra Agil API v2, freshness/source status y documentos metadata-only.
+- `RESEARCH-007` sube a v0.6 y reordena cuts: Compra Agil live pasa a Data Foundation; companion extension queda solo despues de control room/compliance.
+- `EPIC-016` y `docs/tasks/README.md` quedan sincronizados con la secuencia ajustada.
+
+Validacion:
+- `pnpm task:lint --task TASK-675/676/677/678/679/682/683/687` -> 0 errors / 0 warnings.
+- `pnpm docs:context-check` -> 0 errors; warnings esperados por tamano historico de `Handoff.md`.
+- `git diff --check` -> OK.
+
+Nota multi-agente: existe un rename ajeno `docs/tasks/to-do/TASK-792... -> docs/tasks/in-progress/TASK-792...`; no fue tocado por este pase.
+
+---
+
+# Sesion 2026-05-30 — Mercado Publico Compra Agil v2 Beta API — ✅ INVESTIGACION VALIDADA
+
+Pedido: confirmar si la llave/ticket existente de Mercado Publico sirve para la API nueva de Compra Agil.
+
+Resultado: **sí, el ticket canonico existente `greenhouse-mercado-publico-ticket` autentica contra Compra Agil v2 Beta**. Se reautentico GCP con ambos flujos obligatorios (`gcloud auth login` + `gcloud auth application-default login`) y se valido sin imprimir el secreto:
+- API clasica licitaciones `https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?estado=activas&ticket=...` -> `HTTP 200`, `Cantidad=4210`.
+- API Compra Agil v2 `https://api2.mercadopublico.cl/v2/compra-agil?ttl_cambio_ms=300000&tamano_pagina=10` con header `ticket: ...` -> `HTTP 200`, `success=OK`.
+- Rango publicado `2026-05-29T00:00:00Z..2026-05-30T23:59:59Z` -> `HTTP 200`, `success=OK`, `total_resultados=3114`, `total_paginas=312`, `items_count=10`.
+
+Contrato oficial actualizado en docs:
+- Base URL `https://api2.mercadopublico.cl`.
+- Endpoints `GET /v2/compra-agil` y `GET /v2/compra-agil/{codigo}`.
+- Auth por header HTTP `ticket`, no query param.
+- `tamano_pagina` debe estar entre 10 y 50.
+- No hay filtro `codigo_organismo`; filtrar por region y luego `institucion.rut`/`institucion.organismo_comprador`.
+- Para detectar OC emitida usar detalle `orden_compra.id_orden_compra != null`; ChileCompra documenta que `estado=oc_emitida` no aparece en la practica.
+- Adjuntos Compra Agil v2: el detalle oficial expone metadata `documentos[].id` + `documentos[].nombre` (ej. `1540510 / CARROS.pdf`, `68071 / ANEXO ADQUISICIÓN DE MATERIALES ELÉCTRICOS EXPO PATAGONIA.docx`), pero la guia oficial no documenta descarga binaria. Smokes contra rutas probables de `api2.mercadopublico.cl` devolvieron `403 Missing Authentication Token`; endpoints internos del portal `servicios-compra-agil.../v1/*/descargar*` devolvieron `401 Unauthorized` o `503` sin sesion. No usarlos como contrato productivo. Modelar como `discovered` metadata-only hasta que `TASK-679` resuelva descarga autorizada.
+
+Docs tocadas: `docs/research/RESEARCH-007-commercial-public-tenders-module.md`, `docs/tasks/to-do/TASK-674-commercial-public-procurement-architecture-contract.md`, `docs/tasks/to-do/TASK-677-compra-agil-cot-ingestion-foundation.md`, `docs/tasks/to-do/TASK-678-compra-agil-beta-api-watch-adapter-spike.md`, `docs/tasks/to-do/TASK-679-mercado-publico-document-ingestion-private-assets.md`, `docs/tasks/to-do/TASK-688-public-tender-submission-control-room.md`, `project_context.md`, `Handoff.md`.
+
+Next step recomendado: ejecutar `TASK-678` como adapter spike/productization plan para `mercado_publico_compra_agil_v2`; mantener `TASK-677` COT mensual como historico/backfill/benchmark/fallback, no como unica fuente live.
+
+---
+
+# Sesion 2026-05-29 — TASK-790 Contractor Engagements Runtime + Classification Risk — ✅ COMPLETE (develop, sin branch)
+
+Agregado canónico `ContractorEngagement` (`greenhouse_hr.contractor_engagements`) materializado bajo Workforce/HR — fundación de Contractor Payables (EPIC-013). Trabajo **in-place en `develop`** (instrucción del operador). Skills pre-write: greenhouse-payroll-auditor (PASS), arch-architect (4-pilar: blast radius LOW, reversibilidad HIGH), greenhouse-backend.
+
+**4 slices + close, 4 commits atómicos:**
+- **S1** migración `20260529221452562` — `contractor_engagements` (state machine + CHECK enums + risk-gate CHECK + BEFORE UPDATE transition trigger) + append-only `contractor_engagement_events` (anti-UPDATE/DELETE) + GRANTs + anti pre-up-marker guard.
+- **S2** `src/lib/contractor-engagements/` — types + helpers puros (state-machine, subtype-consistency D2, classification-risk, tax-policy) + store (anchor + idempotent commands + outbox v1); barrel pure-only (store directo, anti TASK-827). 27 unit tests.
+- **S3** signal `hr.contractor_engagement.classification_risk_open` (drift, moduleKey identity, steady=0) wired en `getReliabilityOverview`.
+- **S4** capabilities `hr.contractor_engagement` + `hr.contractor_classification` (catalog + runtime grants, grant-coverage verde) + API `/api/hr/contractors` (+ `[id]` PATCH transition|update|review_classification).
+
+**Decisiones (supuestos de spec corregidos en discovery):** D1 anchor FK a `relationship_id` (PK real) vía `resolveActivePersonLegalEntityRelationships` (en `account-360/`); D2 `relationship_subtype` SSOT propio (5 valores) + family-consistency check, sin write-back; D3 `payroll_via` enum propio ortogonal (nunca muta `members`).
+
+**Gates verdes:** tsc 0 · full lint 0 · `pnpm build` ✓ (ambas rutas) · `pnpm test` 5531/0 · `pnpm vitest run src/lib/payroll` 522/0 (non-regression) · grant-coverage guard ✓ · DB defense-in-depth verificado live en tx rolled-back (transition 23514, risk-gate 23514, anti-UPDATE/DELETE 23001) · signal live steady=0.
+
+**Cross-impact:** desbloquea TASK-791/792/793 (Delta notes agregados). Docs: CLAUDE.md (invariantes nuevos), arch V1.1 Delta, EVENT_CATALOG Delta (6 events), README, changelog.
+
+**Próximo paso:** push a `develop` (pendiente confirmación del operador — el trabajo está commiteado local). Luego TASK-791 (invoice assets) como siguiente en la cadena EPIC-013.
+
+---
+
+# Sesion 2026-05-29 — TASK-951 Weekly Digest deep-link a Nexa Insight detail — ✅ COMPLETE (develop, sin branch)
+
+El CTA per-insight del **Weekly Executive Digest email** ahora deep-linkea al detail page canonical `/nexa/insights/<signalId>` (TASK-947) en lugar del Space heredado (`/agency/spaces/<id>`), dando al ejecutivo causa raíz + narrativa + acción en cero clicks adicionales.
+
+**Cambio:** `src/lib/nexa/digest/build-weekly-digest.ts` — helper local `buildNexaInsightDrillUrl(signalId, portalUrl)` absolutiza el path-only canonical `buildNexaInsightDrillHref` (TASK-950, SSOT del shape) con prefix `portalUrl` para el email pipeline (los clients de email no infieren origin). `actionLabel` migró de literal `'Abrir Space'` → token canonical `GH_NEXA.list_card_drill_cta = 'Ver causa raíz'` (cero literals JSX). Fallback canonical a `buildSpaceHref(row.space_id, portalUrl)` cuando `row.signal_id` está vacío (degradación honesta, no rompe el email). Header del space section (`WeeklyExecutiveDigestSpaceSection.href`) PRESERVA link al Space — invariante verificado en el snapshot diff.
+
+**Skills validadas pre-write:** greenhouse-email (preview API existe en `/api/admin/emails/preview`) + greenhouse-ico (boundary check: la task NO toca metric compute/bonus/writeback, solo el CTA URL; `signal_id` = `EO-AIS-*` signal-anchored, canonical para card-default drill) + arch-architect (4-pillar: SSOT del path preservado, fallback robusto, revert <5min, sin nuevo query/compute). **Open Question resuelta:** digest recipients = `EFEONCE_ADMIN` + `EFEONCE_OPERATIONS` (recipient-resolver.ts) — ambos con `nexa.insights.read` per CLAUDE.md TASK-947 grant matrix → sin guard pre-link; `notFound()` anti-oracle cubre edge cases.
+
+**Commits (develop):** `0bc004bc` Slice 1+2 (builder refactor + fallback) · `8481ed8b` Slice 3+4 (3 tests anti-regresión: deep-link / fallback / header-preserved + EmailTemplateBaseline fixture + snapshot refresh).
+
+**Gates:** `pnpm test` 5503 passed / 1 failed (fallo **pre-existente ajeno** — `OrganizationWorkspaceShell.test.tsx:227` "No tenés acceso a ninguna sección", deterministic en aislamiento, TASK-611/612 territory, NUNCA tocado por TASK-951; probable drift del refactor `f76ed364`) + `pnpm build` Turbopack ✓ + tsc ✓ + lint ✓. Cross-impact scan: `agency/spaces` en nexa/emails queda solo en section header (preservado) + narrative mentions (out of scope) + CTA fallback (intencional). Sin migration, capability, flag, signal, ni event nuevo.
+
+**Próximo paso:** deploy via push develop (ops-worker bundlea el builder → redeploy por pipeline normal). V1.1 follow-ups separable: reliability signal `nexa.weekly_digest.deep_link_ctr` + Teams notifications deep-links (TASK-716). Pendiente menor de tracker: el fallo pre-existente de OrganizationWorkspaceShell debería abrirse como fix-task separada (no es TASK-951).
+
+---
+
+# Sesion 2026-05-29 — Nexa Insights first-click 500 + microcopy locale — ✅ ROOT FIX LOCAL
+
+Incidente reportado en `dev-greenhouse.efeoncepro.com/nexa/insights/EO-AIS-7AD995BA4096`: primer click/render mostraba el error boundary "No pudimos cargar esta observación"; al presionar `Reintentar`, la misma URL cargaba el insight. Diagnóstico con usuario agente `agent@greenhouse.efeonce.org` contra staging canónico `.vercel.app` + bypass, artifacts en `.captures/nexa-detail-first-click-20260529T131813Z/`. Evidencia runtime: `GET /nexa/insights/EO-AIS-7AD995BA4096` devolvía 500 y Vercel logs mostraban `Functions cannot be passed directly to Client Components ... {elevation: 0, sx: function sx}`.
+
+**Causa raíz:** los route-level `loading.tsx` de Nexa (`/nexa/insights` y `/nexa/insights/[id]`) son Server Components y pasaban funciones `sx={theme => ...}` a MUI Client Components. En el primer click Next renderizaba el skeleton y rompía el stream RSC; en el retry el dato ya llegaba suficientemente rápido y no pasaba por ese loading, por eso parecía "transitorio".
+
+**Fix robusto local:** skeletons/not-found/error route chrome de Nexa ahora usan `sx` serializable (`border`, `borderColor`, `borderLeftColor`), sin funciones pasadas desde Server Components. Se agregó `nexa-insights-route-contract.test.ts` para bloquear esta regresión. Se corrigió el segundo problema de microcopy sin parchar JSX: `GH_NEXA` se movió a `src/lib/copy/nexa.ts` como módulo canónico de copy de dominio (TASK-811); `greenhouse-nomenclature.ts` queda solo como re-export transicional. Imports Nexa migrados al módulo nuevo. Copy con voseo argentino en Nexa/Agency/Pricing normalizada a español neutro/tuteo chileno (`Vuelve`, `Intenta`, `Revisa`, `haz clic`) y guard de regresión agregado.
+
+**Validación:** `pnpm exec vitest run 'src/app/(dashboard)/nexa/insights/nexa-insights-route-contract.test.ts' src/views/greenhouse/home/v2/HomeAiInsightsBento.test.ts src/lib/ico-engine/ai/nexa-insight-drill-reader.test.ts src/lib/ico-engine/ai/nexa-insight-list-reader.test.ts` → 4 files / 36 tests passed. ESLint focal OK. `pnpm exec tsc --noEmit --pretty false` OK. `pnpm design:lint` 0 errors / 0 warnings. `pnpm build` production Turbopack OK. `pnpm fe:capture --route=/nexa/insights/EO-AIS-7AD995BA4096 --env=local --hold=3000` OK con env cargada desde `.env.local`, artifacts en `.captures/2026-05-29T13-32-07_inline-nexa-insights-eo-ais-7ad995ba4096/`. Log local post-capture: `GET /nexa/insights/EO-AIS-7AD995BA4096 200`, sin `Functions cannot be passed...`.
+
+---
+
+# Sesion 2026-05-29 — Release a producción develop→main — ✅ RELEASED
+
+Pase a producción de todo el develop acumulado (66 commits / 127 archivos desde el release del 2026-05-27). Path canónico vía orchestrator, sin incidentes.
+
+**SHA:** merge `bec1c46e2dfa96a513b3a63c093d96adf0fa2053` (mirror exacto de develop, `--no-ff`, tree-identical verificado). **Manifest:** `bec1c46e2dfa-36666131-a740-4444-87af-e1aa71e17ed4` → `released` (started 09:54 / completed 10:05 UTC, ~11 min). **Orchestrator run:** [26630587047](https://github.com/efeoncepro/greenhouse-eo/actions/runs/26630587047) (`completed:success`).
+
+**Bundle:** Nexa Insights surfaces (TASK-944/945/946/947/950/951 — detail `/nexa/insights/[id]` + list `/nexa/insights` + severity sparkline + honest degradation 12 estados + wiring Finance/Home/Agency), ICO ai_signals append-only event log (TASK-941/942/943 + ISSUE-082 — VIEW `ai_signals_current` + materializer INSERT-only + BQ struct timestamp STRING+CAST fix + signals freshness/no-new-signals), Kortex SSO broker foundation (TASK-948 sister-platform identity broker, flags OFF), ROLE_CODES canonization (snapshot + cleanup ghost DEVOPS_OPERATOR), payroll non-regression guardrails docs (TASK-790/905/906/940, EPIC-013). 2 migraciones (TASK-947 nexa capability, TASK-948 sister-platform broker) ya aplicadas en Cloud SQL compartida (verificado pre-release: "No migrations to run").
+
+**Preflight:** `release_batch_policy=split_batch` (finance+auth_access independientes, esperado en bundle acumulado; documentado en merge marker `[release-coupled: ...]`) cubierto por `bypass_preflight_reason` → `--override-batch-policy --bypass-preflight-warnings`. Sentry limpio (0 issues <15min), migraciones OK, Vercel production READY pre-dispatch, CI verde en merge SHA (CI + CI Deep Verification + Task Contract).
+
+**Verificación post-deploy:** Vercel production READY (`greenhouse-lzgpdp3mm`); 4 Cloud Run workers con `GIT_SHA=bec1c46e2dfa96a513b3a63c093d96adf0fa2053` (ops-worker/commercial-cost-worker/ico-batch-worker us-east4 + hubspot-greenhouse-integration us-central1); Azure sin diff Bicep (health-check ✓, deploy skipped); post-release health ✓; watchdog (CLI, workflow manual-only pre-TASK-920) `aggregateSeverity=ok` (stale_approval / pending_without_jobs / worker_revision_drift todos ok, drift 0). Gates Production aprobados 2× vía `gh api` (workers + Azure, autorización operador).
+
+**No validado:** smoke funcional manual en browser (login / finance / agency) post-release — el orchestrator solo corrió `/api/auth/health`. Recomendado si se quiere confirmación visual.
+
+---
+
 # Sesion 2026-05-27 — Release a producción develop→main — ✅ RELEASED
+
+> **Sesión macOS timeout tooling (2026-05-29 — local tool + docs):** A pedido del operador se instaló `coreutils` vía Homebrew para disponer de `/opt/homebrew/bin/gtimeout` (GNU coreutils 9.11), equivalente de `timeout` en macOS. Regla documentada en `AGENTS.md`, `CLAUDE.md` y `project_context.md`: usar `gtimeout <duración> <comando>` en recetas locales; no usar `timeout` crudo en macOS; para scripts portables detectar `gtimeout || timeout` o implementar timeout en Node. Validado con `command -v gtimeout` + `gtimeout --version`.
 
 > **Sesión Nexa Insights list page canonical (2026-05-29 — TASK-950 ✅ COMPLETE):** Cierra el bug class **404 sistemático recurrente** del CTA "Ver todos los insights del mes" del `HomeAiInsightsBento` V2 (línea 194 hardcoded a `/agency/insights` que **NUNCA existió** — reproduce idéntico TASK-696: CTA shipped sin destino). Mi spec TASK-947 V1 MVP scope-control la dejó como "V1.1 follow-up gated"; promovida a V1 cuando el operador hizo click live 2026-05-29 → 404 Vuexy en dev-greenhouse staging. **Decisión canonical** (post directiva operador "No me gusta hacer parches, soluciones de la forma más segura, robusta, resiliente y escalable"): rechazar opciones esconder/redirect/empty placeholder; shippear la list page proper. **V1 shipped 7 commits atómicos en `develop` sin branch dedicada**: (1) `31ac2be7` Slice 0 spec creada con UX Specification canonical pre-write (greenhouse-ux + state-design + greenhouse-ux-writing skills invocadas). (2) `894340d3` Slice 1 helper canonical `listNexaInsightsForPeriod(subject, period)` server-only sibling de `readNexaInsightDrill` con subject-aware filter SQL + discriminated union return (ready/empty-positive/degraded) + honest degradation PG fail → `captureWithDomain('delivery')` + 11 tests anti-regresión. Single source of truth nuevo `src/lib/home/period.ts` (`getCurrentPeriodSantiago()`) eliminando duplicación entre `get-home-snapshot.ts` y `load-ai-insights-bento.ts`. Extract reusables del drill reader (`mapEnrichmentRow`, `subjectCanReadInsight`, `isEfeonceAdmin`, `hasInternalRouteGroup`) reexportados para sibling reuse. (3) `a199900d` Slice 2 server page `/nexa/insights/page.tsx` con `getTenantContext` + `redirect('/login')` + capability gate `nexa.insights.read` (reusa TASK-947 Slice 1 seedeada) + `notFound()` anti-oracle TASK-872 + page chrome canonical (`loading.tsx` skeleton dimensionado + `error.tsx` boundary Reintentar) + placeholder view (compile end-to-end). (4) `4fb2d575` Slice 3 view canonical 3 branches discriminated union mapeadas a TASK-946 framework + NexaInsightListItemCard NEW + microcopy es-CL canonical ~9 entries GH_NEXA — **failed Vercel deploy** por bug class TASK-827 (server-only transitivo a client bundle): card `'use client'` importaba `buildNexaInsightDrillHref` desde `nexa-insight-drill-reader.ts` (`'server-only'`) → Turbopack pulleo el reader completo → `Module not found: child_process / dns` desde `@grpc/grpc-js`. (5) `c9b2c671` Slice 3 hotfix canonical: NEW `src/lib/ico-engine/ai/nexa-insight-href.ts` pure módulo client-safe single source of truth del shape de href + drill reader reexporta para back-compat 100% con TASK-947 import path + card repointea import al módulo puro. Vercel deploy verde post-hotfix. 30 tests verde (19 drill-reader + 11 list-reader). (6) `30b6b92e` Slice 3 round 2 polish post visual audit fe:capture staging: reader ahora delega a `GH_NEXA.list_period_format(year, month)` → "mayo 2026" es-CL canonical (no "05/2026" MM/YYYY) + 3 test assertions actualizadas + scenario hover selector frágil swap a scroll-only marks robustos. (7) `571630ba` Slice 4 ÚLTIMO (slice ordering anti-incident TASK-696): flip `HomeAiInsightsBento.tsx:194` `/agency/insights` → `/nexa/insights` + microcopy `GH_NEXA.home_bento_view_all_cta` canonical + 3 anti-regression tests source-scan pattern (mismo que TASK-775 cron-staging-drift, lightweight no React render setup, robusto contra refactor JSX). **Visual audit loop fe:capture staging** (`.captures/2026-05-29T08-49-32_nexa-insights-list-page/`): capturada ready state con 20 insights real (mix Crítico/Atención/Informativo), grid 3-col responsive desktop, severity chips canonical tonal + icon + label (WCAG 2.2 AA), NexaMentionText con mentions de personas + spaces highlighted, CTA "Ver causa raíz →" canonical verb + object, period subtitle "mayo 2026 · 20 observaciones" (pluralización correcta + es-CL lowercase). 3-skill re-audit verde (greenhouse-ux + state-design + greenhouse-ux-writing). **Lecciones canonizadas live 2026-05-29**: (a) **CLAUDE.md TASK-827 bug class reaprendido**: tsc + lint + vitest NO sustituyen `pnpm build` producción para detectar server-only transitivo a client bundle. Esta vez se aplicó disciplina post-fallo (Slice 3 hotfix con `pnpm build` local + push), pero el Slice 3 original mergeó sin gate `pnpm build` previo. Lección canonizada en CLAUDE.md desde 2026-05-13 + reaprendida live. (b) **Pattern canonical para drill href builders + helpers reusables en módulos server-only readers**: pure helpers (href builders, type-only exports) viven en módulos puros sin `'server-only'`; el reader server-only los reexporta para back-compat de import paths. (c) **Real-Artifact Iterative Verification Loop reusado** (TASK-863 canonizado en CLAUDE.md): visual audit con `pnpm fe:capture` staging + 3-skill re-audit + iterate polish hasta verde. Detectó 2 polish items que solo emergen con render real (no fixtures sintéticos). **Quality gate canonical**: `pnpm test` 5500/0 (+14 vs TASK-947 baseline 5486) + `pnpm build` Turbopack production ✓ + tsc + lint verde + visual audit staging verde. **End-to-end flow funciona**: Home V2 bento → "Ver todos los insights del mes" → `/nexa/insights` (list page Slice 1+2+3 canonical 3-state union) → click card → `/nexa/insights/<signalId>` (detail TASK-947). Cierra los 2 CTAs Nexa Insights del bento V2 sin destino post-TASK-947 (drill ✓ + view all ✓). Codex's command palette WIP preservado intacto en working tree (orphan commit pending del operador). Desbloquea TASK-449 (interaction layer V1.3) + TASK-944 follow-up Finance alias V1.1 + Weekly Digest deep-links + Teams notifications landing. Spec: `complete/TASK-950-nexa-insights-list-page-canonical.md`.
 
@@ -27995,3 +28896,127 @@ Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. N
 **Test coverage final TASK-872**: 500+ tests verde. SCIM/eligibility/primitive: 49 tests. Reliability signals: 3 live tests. Payroll legacy: 420 tests (incluye 12 fixes pre-existentes). Lint + tsc verdes.
 
 **Push pendiente**: 11 commits en `develop` local. Operador autoriza push cuando esté listo. Deploy staging via Vercel auto-trigger en push a develop.
+
+---
+
+## 2026-05-31 — EPIC-017 / TASK-959 cierre + TASK-961 creada
+
+Contexto: el operador corrigio el enfoque tras la captura de Deel: la captura corresponde a People / Worker Profile, no a Payroll. Decision operativa: Person 360 ya es un hub parcial y debe evolucionar como hub workforce; Payroll queda como vista/rail especializada para calculos, periodos, recibos y salidas estatutarias.
+
+Trabajo realizado:
+- `TASK-959` quedo cerrada como complete con mapa/audit read-only (`src/lib/workforce/foundation/*` + `scripts/workforce/audit-workforce-foundation-map.ts`).
+- Se limpio dev DB de 5 fixtures `demo-%@demo.greenhouse.efeonce.org` y sus rows materializadas derivadas (`member_role_cost_basis_snapshots`, `person_operational_360`, `member_capacity_economics`, `members`). Post-cleanup quedan 0 demo members y 0 referencias a esos member ids.
+- Auditoria real activa post-cleanup: relationship coverage `9/9`, classification parity `9/9`, current compensation `5/9`, payment rail evidence `8/9`, gaps `readiness.unresolved_or_blocked=8` y `compensation.missing_current_version=4`, sin gaps `error`.
+- `RESEARCH-008` y `EPIC-017` quedaron actualizados con la lectura People-vs-Payroll de Deel.
+- Se creo `TASK-961` (`docs/tasks/to-do/TASK-961-person-360-workforce-facet-read-only-promotion.md`) como siguiente task: promover People/Person 360 con faceta/seccion `workforce` read-only consumiendo `WorkforceFoundationMap`, sin writes ni mutaciones de payroll/finance/contractor.
+
+Validacion documental actual:
+- `pnpm task:lint --task TASK-959` OK.
+- `pnpm task:lint --task TASK-961` OK.
+- `git diff --check` OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `pnpm vitest run src/lib/workforce src/lib/account-360/current-work-classification.test.ts` OK (14 files / 92 tests).
+- `pnpm docs:context-check` OK con 2 warnings historicos de tamano de `Handoff.md`.
+
+Pendiente antes de commit/push:
+- Staging selectivo: no incluir cambios/untracked de `TASK-960`/remittance salvo instruccion explicita del operador.
+
+---
+
+## 2026-05-31 — EPIC-017 backlog alignment + TASK-962 creada
+
+Contexto: tras confirmar que People/Person 360 es el hub y Payroll una rail especializada, se actualizo el triage de backlog para no ejecutar tasks antiguas en orden numerico ni con framing Payroll-as-root.
+
+Trabajo realizado:
+- `docs/research/RESEARCH-008-payroll-backlog-triage-2026-05-31.md` actualizado con la secuencia post-`TASK-961`.
+- Disposition matrix agregada:
+  - `TASK-338`: rewrite como `CompensationProfile` read model.
+  - `TASK-340`: freeze/rewrite later, bloqueada por compensation parity y checkpoint arquitectonico.
+  - `TASK-614`: absorb/supersede post-`TASK-961`; no ejecutar as-is.
+  - `TASK-652`: rewrite later para API/agent-safe read surface.
+  - `TASK-788`: split entre WorkAssignment effective-dating read model y promotion/write command posterior.
+  - `TASK-798`: rewrite para consumir gap taxonomy EPIC-017.
+  - `TASK-797`, `TASK-960`: keep separate.
+  - `TASK-787`, `TASK-955`: align lightly/defer.
+- `TASK-962` creada en `docs/tasks/to-do/TASK-962-workforce-coverage-readiness-remediation-plan.md`.
+- `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `RESEARCH-008-current-state-gap-analysis` y `EPIC-017` sincronizados.
+
+Alcance de `TASK-962`:
+- Re-auditar gaps de `TASK-959` read-only.
+- Clasificar los 4 activos sin current compensation, 8 readiness blocked/unresolved y 1 payment rail evidence gap.
+- Producir matriz de remediacion y owner domain.
+- No mutar datos, no abrir batch de tasks, no tocar UI/API/payroll/finance.
+
+Validacion:
+- `pnpm task:lint --task TASK-962` OK.
+- `pnpm docs:context-check` OK con 2 warnings historicos de tamano de `Handoff.md`.
+- `git diff --check` OK.
+# Sesion 2026-05-30 — TASK-953 Greenhouse Visual Capture Evidence Hardening — ✅ COMPLETE
+
+Rama: `develop` por instrucción explícita del operador; no se creó branch. Task cerrada en `docs/tasks/complete/TASK-953-greenhouse-visual-capture-evidence-hardening.md`; registry/README sincronizados y plan en `docs/tasks/plans/TASK-953-plan.md`.
+
+Discovery: no hay PR ni branch activo para TASK-953. GVC runtime real confirmado en `scripts/frontend/*`; el ADR/spec vigente es `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`. Access model no aplica: no cambia views, entitlements, routeGroups ni startup policy. El delta se implementa como tooling local additive y compatible con scenarios V1.
+
+Resultado:
+- DSL/runtime: `readiness`, `assertions`, `interaction` V2, `viewports`, `baseline`, quality findings, failure taxonomy y manifest aditivo.
+- CLIs: `fe:capture` genera `index.html`; `fe:capture:review` incorpora findings/assertions/interactions; `fe:capture:health` agrupa taxonomy; `fe:capture:diff` muestra baseline/findings.
+- Scenarios nuevos: `gvc-readiness-assertions-report`, `offboarding-queue-microinteractions-v2`, `gvc-multi-viewport`, `contractor-admin-runtime-baseline`.
+- Docs sincronizadas: AGENTS, CLAUDE, project_context, arquitectura GVC V1.4, manual, doc funcional, scripts README/scenarios README y changelog.
+
+Validación:
+- `pnpm exec vitest run scripts/frontend/lib` OK (9 tests).
+- `pnpm exec eslint scripts/frontend` OK.
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `pnpm fe:capture gvc-readiness-assertions-report --env=local` OK -> `.captures/2026-05-30T20-34-29_gvc-readiness-assertions-report` (`manifest.json`, `index.html`, `review-dossier.md` generado).
+- `pnpm fe:capture gvc-multi-viewport --env=local` OK -> `.captures/2026-05-30T20-34-46_gvc-multi-viewport` (3 variants, 6 frames).
+- `pnpm fe:capture offboarding-queue-microinteractions-v2 --env=local` OK -> `.captures/2026-05-30T20-35-51_offboarding-queue-microinteractions-v2` (interaction V2 + keyboard + reduced-motion frame).
+- `pnpm fe:capture:diff .captures/2026-05-30T20-34-29_gvc-readiness-assertions-report .captures/2026-05-30T20-34-29_gvc-readiness-assertions-report` OK.
+- `pnpm fe:capture:health` OK; reportó 5% failure por el primer run esperado de calibración readiness con selector demasiado estricto, taxonomy visible.
+- `pnpm docs:context-check` OK (solo warnings históricos de tamaño de Handoff).
+- `pnpm task:lint --task TASK-953` OK antes del move final; re-ejecutar si se toca la task después del cierre.
+
+---
+
+## 2026-06-01 — TASK-797 Contractor Closure + Transition Controls (in-progress, develop)
+
+Trabajo directo en `develop` por instrucción del operador (no branch). EPIC-013. Depende de TASK-790 (engagements) + TASK-793 (payables), ambas complete.
+
+**Objetivo**: cierre contractor como lifecycle propio (NUNCA finiquito), con readiness (open invoices/submissions/payables/provider refs/access handoff) + bloqueo de nuevas work submissions post-cierre + política explícita de post-closure invoices.
+
+**Diseño canónico** (no over-engineered, reusa state machine existente `active/paused → ending → ended`):
+- Slice 1: columnas de cierre en `contractor_engagements` (closure_reason CHECK enum, closure_effective_date, provider_termination_ref, closure_initiated_at/by, closure_executed_at/by, post_closure_invoices_allowed) + `closure/` module (types + pure readiness helper espejo de payables `evaluatePayableReadiness`).
+- Slice 2: `assessContractorClosureReadiness` server resolver + `initiateContractorClosure` (→ending) + `executeContractorClosure` (→ended, gated) + reliability signal `hr.contractor_engagement.closure_blocked_open_items`.
+- Slice 3: guard post-cierre en work-submissions create (block en ending/ended/cancelled) + guard en payable create (block en ended salvo post_closure_invoices_allowed) + API route `/api/hr/contractors/[id]/closure` + reuse capability `hr.contractor_engagement:manage`.
+
+**Boundary payroll (hard rule TASK-890)**: NUNCA `final_settlements`, NUNCA tocar lanes de `work_relationship_offboarding_cases`, NUNCA reactivar relación dependiente. Gate de cierre: `pnpm vitest run src/lib/payroll src/lib/workforce/offboarding`.
+
+### Cierre TASK-797 (2026-06-01) — backend completo, develop
+
+Shippado en `develop` (3 commits Slice 1/2/3 + docs). Contractor closure = lifecycle propio sobre `active/paused→ending→ended` + columnas de cierre (migration `20260601131829099`). NUNCA finiquito.
+
+- Módulo `src/lib/contractor-engagements/closure/` (pure readiness + server store). API `GET/POST /api/hr/contractors/[id]/closure`. Guards post-cierre en work-submission + payable create. Funnel de la transición genérica.
+- Evento `workforce.contractor_engagement.closure_initiated v1`; signal `hr.contractor_engagement.closed_with_open_payables`.
+- Gates: tsc 0 · lint 0 · build exit 0 · `pnpm test` **5759 passed / 0 fail** · payroll+offboarding **566** · live PG smoke (signal `ok`, readiness EO-CENG-0001). Boundary payroll TASK-890 intacto.
+- **Follow-up**: closure drawer UI en `/hr/contractors` (acceptance criteria ya backend-enforced). Recomendado abrir TASK derivada (doctrina IA TASK-982: header action + drawer por fila).
+
+### Cierre TASK-984 (2026-06-01) — contractor closure drawer UI, develop
+
+Drawer de operador `ContractorClosureDrawer` en `/hr/contractors` consumiendo el backend de cierre de TASK-797. Funnel: `ContractorLifecycleControls` filtra ending/ended + CTA "Cerrar contractor" → cierra la regresión 409 `use_closure_flow`. Discovery: `ContractorClosureSidecar` era self-service (informativo), no HR — el drawer del operador es nuevo. Copy es-CL `GH_CONTRACTOR_COMPENSATION.closure`; subtítulo nav offboarding → "Employee exit cases".
+
+Gates: tsc 0 · lint 0 · `pnpm build` exit 0 · boundary payroll+offboarding 566.
+
+**PENDIENTE — GVC visual sign-off**: NO se corrió Greenhouse Visual Capture sobre el drawer (el único engagement `EO-CENG-0001` está en `draft` → el CTA "Cerrar contractor" no aparece; requiere un engagement active/paused para capturar el drawer en sus 3 estados). Falta también pasar las skills de product design (modern-ui / greenhouse-ux / microinteractions) sobre la captura real.
+
+### TASK-984 GVC visual loop (2026-06-01) — mockup-first canónico
+
+Cerré el gap visual: ruta mockup `/hr/contractors/closure/mockup` + scenario GVC `contractor-closure-drawer-mockup` (3 estados) + revisión con skills product design (modern-ui / greenhouse-ux / ux-writing). 2 iteraciones aplicadas a runtime + mockup: header identity-first (nombre + ID + chip estado), estado cerrado con "Resumen del cierre" (eliminado el CTA contradictorio "Puedes ejecutar el cierre"), jerarquía del blocker card, fix Spanglish "work submissions"→"envíos de trabajo". Frames revisados a bar enterprise (capturas en `.captures/*contractor-closure-drawer-mockup`). Runtime live smoke pendiente de fixture (engagement active/paused).
+
+### TASK-985 (2026-06-01) — Contractor onboarding auto-activation, develop
+
+Resuelto el "draft huérfano" (caso Valentina `EO-CENG-0001`): el onboarding (Camino A + B) auto-activa el engagement cuando la clasificación no es bloqueante; retenido solo si `legal_review_required`/`blocked`. Diagnóstico clave: el draft NO era compuerta de compliance (el CHECK solo bloquea `active` por riesgo bloqueante, no por `needs_review`); nadie avanzaba el estado.
+
+- Helper `activateEngagementIfNotBlocking` + opt-in `activateWhenClassificationNotBlocking` + heal del `already_complete` (re-onboardear cura un draft existente). Predicado `shouldAutoActivateOnOnboard`.
+- Señal `hr.contractor_engagement.classification_review_pending` (salvedad: visibiliza `needs_review`).
+- Wizard refleja estado real (activo/retenido), no "Borrador" fijo.
+- 3 commits Slice 1/2/3. Gates: tsc/lint 0 · contractor+payroll+offboarding 728 verde · `pnpm build` (en curso al cierre).
+- **No pusheado**: el operador está testeando en staging (`dev-greenhouse`); para que el fix llegue allí hay que push a `develop` (auto-deploy). Pendiente: (1) push, (2) confirmar fecha real de Valentina (01-05 vs 01-06) + monto, (3) re-onboardear Valentina en staging → el heal la activa.

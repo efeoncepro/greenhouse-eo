@@ -1,12 +1,11 @@
-import type { PayrollPeriod, PeriodStatus } from '@/types/payroll'
+import type { PayrollCalculationDeadlineState, PayrollPeriod, PeriodStatus } from '@/types/payroll'
 
 import {
   DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
-  getLastBusinessDayOfMonth,
-  getOperationalDateKey,
   getOperationalPayrollMonth,
   type OperationalCalendarContextInput
 } from '@/lib/calendar/operational-calendar'
+import { resolvePayrollCalculationDeadline } from '@/lib/payroll/calculation-deadline'
 
 const comparePayrollPeriodsDesc = (a: PayrollPeriod, b: PayrollPeriod) =>
   b.year - a.year || b.month - a.month
@@ -17,8 +16,9 @@ export interface PayrollCalculationDeadlineStatus {
   deadlineDate: string
   isDue: boolean
   isLastBusinessDay: boolean
-  calculatedOnTime: boolean
-  state: 'pending' | 'due' | 'calculated_on_time' | 'calculated_late'
+  calculatedOnTime: boolean | null
+  state: PayrollCalculationDeadlineState
+  blocksCalculation: boolean
 }
 
 export const sortPayrollPeriodsDescending = (periods: PayrollPeriod[]) =>
@@ -233,28 +233,14 @@ export const getPayrollCalculationDeadlineStatus = (
     closeWindowBusinessDays: options?.closeWindowBusinessDays ?? null
   }
 
-  const deadlineDate = getLastBusinessDayOfMonth(period.year, period.month, normalizedOptions)
-  const referenceDateKey = getOperationalDateKey(referenceDate, normalizedOptions)
-  const calculatedDateKey = period.calculatedAt ? getOperationalDateKey(period.calculatedAt, normalizedOptions) : null
-  const calculatedOnTime = calculatedDateKey != null && calculatedDateKey <= deadlineDate
-  const isDue = !period.calculatedAt && referenceDateKey >= deadlineDate
-  const isLastBusinessDay = referenceDateKey === deadlineDate
-
-  if (period.calculatedAt) {
-    return {
-      deadlineDate,
-      isDue,
-      isLastBusinessDay,
-      calculatedOnTime,
-      state: calculatedOnTime ? 'calculated_on_time' : 'calculated_late'
-    }
-  }
+  const deadline = resolvePayrollCalculationDeadline(period, referenceDate, normalizedOptions)
 
   return {
-    deadlineDate,
-    isDue,
-    isLastBusinessDay,
-    calculatedOnTime,
-    state: isDue ? 'due' : 'pending'
+    deadlineDate: deadline.lastBusinessDay,
+    isDue: deadline.isDue,
+    isLastBusinessDay: deadline.isLastBusinessDay,
+    calculatedOnTime: deadline.calculatedOnTime,
+    state: deadline.state,
+    blocksCalculation: deadline.blocksCalculation
   }
 }

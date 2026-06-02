@@ -7,7 +7,7 @@
 
 ## Que es
 
-Suite de smoke tests end-to-end que corre sobre el portal real (localhost o Staging) autenticado con una sesion headless del usuario `agent@greenhouse.efeonce.org`. Cubre los flujos criticos: login/session, home, Finance Quotes, HR Payroll, People 360, Admin.
+Suite de smoke tests end-to-end que corre sobre el portal real (localhost o Staging) autenticado con una sesion headless de una persona agente. Por defecto usa `agent@greenhouse.efeonce.org`, pero los tests o validaciones por rol deben usar la persona de menor privilegio que represente el caso: `agent-collaborator@greenhouse.efeonce.org` para `/my`/self-service y `agent-client@greenhouse.efeonce.org` para portal cliente general. Cubre los flujos criticos: login/session, home, Finance Quotes, HR Payroll, People 360, Admin.
 
 El suite es **smoke**, no integracion: verifica que los pages renderizan sin 5xx ni error boundary, que la sesion persiste entre navegaciones y que el usuario tiene acceso al shell autenticado. No ejecuta mutaciones (no crea cotizaciones, no cierra payrolls, no escribe en la DB).
 
@@ -110,6 +110,14 @@ Requiere los siguientes **GitHub Secrets** (repo-level):
 | `VERCEL_AUTOMATION_BYPASS_SECRET` | Bypass de Vercel (auto-gestionado por Vercel — copiar de env vars). |
 
 Si falta `PLAYWRIGHT_BASE_URL` o `AGENT_AUTH_SECRET`, el workflow falla en el guard inicial con un error claro.
+
+Personas agente disponibles:
+
+| Persona | Email | Uso |
+|---|---|---|
+| Superadmin | `agent@greenhouse.efeonce.org` | Admin, permisos, smoke amplio |
+| Collaborator | `agent-collaborator@greenhouse.efeonce.org` | `/my`, self-service, collaborator puro |
+| Client | `agent-client@greenhouse.efeonce.org` | Portal cliente general |
 
 **Artifacts** (retention 14 dias):
 

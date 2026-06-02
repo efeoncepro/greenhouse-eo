@@ -1,7 +1,9 @@
 import 'server-only'
 
 import { APP_URL } from '@/emails/constants'
+import { buildNexaInsightDrillHref } from '@/lib/ico-engine/ai/nexa-insight-href'
 import { ICO_METRIC_REGISTRY } from '@/lib/ico-engine/metric-registry'
+import { GH_NEXA } from '@/lib/copy/nexa'
 import {
   MENTION_PATTERN,
   emitPresentationLog,
@@ -97,6 +99,16 @@ const resolvePortalUrl = () => process.env.NEXT_PUBLIC_APP_URL?.trim() || APP_UR
 
 const buildSpaceHref = (spaceId: string, portalUrl: string) =>
   `${portalUrl.replace(/\/$/, '')}/agency/spaces/${encodeURIComponent(spaceId)}`
+
+/**
+ * Absolutiza el href canonical del detail page de Nexa Insights para el email
+ * pipeline (TASK-951). El helper canonical `buildNexaInsightDrillHref` (TASK-950)
+ * retorna path-only `/nexa/insights/<id>` porque es client-safe; el email
+ * necesita URL absoluto con `portalUrl` prefix (los clients de email no infieren
+ * origin). Single source of truth del shape del path = `buildNexaInsightDrillHref`.
+ */
+const buildNexaInsightDrillUrl = (signalId: string, portalUrl: string) =>
+  `${portalUrl.replace(/\/$/, '')}${buildNexaInsightDrillHref(signalId)}`
 
 const buildMentionHref = (type: 'space' | 'member' | 'project', id: string, portalUrl: string) => {
   const base = portalUrl.replace(/\/$/, '')
@@ -257,8 +269,13 @@ export const buildWeeklyDigest = async (
       headline: buildInsightHeadline(row),
       narrative: buildInsightNarrative(row, portalUrl),
       ...(rootCauseNarrative ? { rootCauseNarrative } : {}),
-      actionLabel: 'Abrir Space',
-      actionUrl: buildSpaceHref(row.space_id, portalUrl)
+      actionLabel: GH_NEXA.list_card_drill_cta,
+      // TASK-951 — deep-link al detail page canonical (`/nexa/insights/<signalId>`).
+      // Fallback canonical al Space cuando `signal_id` está vacío/null (legacy data
+      // pre-TASK-943 backfill o shape inesperado) — degradación honesta, no rompe el email.
+      actionUrl: row.signal_id
+        ? buildNexaInsightDrillUrl(row.signal_id, portalUrl)
+        : buildSpaceHref(row.space_id, portalUrl)
     }
 
     insightsBySpace.set(row.space_id, [...(insightsBySpace.get(row.space_id) ?? []), insight])

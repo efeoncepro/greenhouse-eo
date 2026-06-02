@@ -19,7 +19,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
-import { GH_NEXA } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/lib/copy/nexa'
 
 const NotFound = () => (
   <Stack spacing={6} sx={{ py: 4 }} component='main' role='main'>
@@ -35,7 +35,7 @@ const NotFound = () => (
       </Link>
     </Box>
 
-    <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}` })}>
+    <Card elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
       <CardContent>
         <EmptyState
           icon='tabler-search-off'
@@ -46,7 +46,6 @@ const NotFound = () => (
             <Button
               variant='contained'
               color='primary'
-              component={Link}
               href='/home'
               startIcon={<i className='tabler-home' aria-hidden='true' />}
             >

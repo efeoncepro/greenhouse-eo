@@ -76,6 +76,9 @@ export const AGGREGATE_TYPES = {
 
   // HR Core / People
   member: 'member',
+  contractorEngagement: 'contractor_engagement',
+  contractorWorkSubmission: 'contractor_work_submission',
+  contractorPayable: 'contractor_payable',
   memberSkill: 'member_skill',
   memberTool: 'member_tool',
   memberCertification: 'member_certification',
@@ -734,6 +737,45 @@ export const EVENT_TYPES = {
 
   // TASK-876 — Workforce Activation remediation before final completion.
   workforceMemberIntakeUpdated: 'workforce.member.intake_updated',
+
+  // TASK-790 — Contractor Engagements runtime + classification risk (v1).
+  // Aggregate canonico bajo Workforce/HR. Material lifecycle changes del
+  // engagement contractor/honorarios. Payload schemaVersion:1.
+  contractorEngagementCreated: 'workforce.contractor_engagement.created',
+  contractorEngagementActivated: 'workforce.contractor_engagement.activated',
+  contractorEngagementPaused: 'workforce.contractor_engagement.paused',
+  contractorEngagementEnded: 'workforce.contractor_engagement.ended',
+  contractorEngagementCancelled: 'workforce.contractor_engagement.cancelled',
+  contractorEngagementClassificationRiskFlagged:
+    'workforce.contractor_engagement.classification_risk_flagged',
+  // TASK-797 — cierre contractor iniciado (active/paused -> ending; winding-down,
+  // no se aceptan nuevas work submissions). El cierre ejecutado (-> ended) reusa
+  // `contractorEngagementEnded` con payload enriquecido de closure.
+  contractorEngagementClosureInitiated:
+    'workforce.contractor_engagement.closure_initiated',
+
+  // TASK-792 — Contractor work submissions lifecycle (v1). Evidencia de trabajo
+  // (timesheet/milestone/deliverable/...) con approval/dispute/reject. Aprobación
+  // operacional NO es pago. Payload schemaVersion:1.
+  contractorWorkSubmissionSubmitted: 'workforce.contractor_work_submission.submitted',
+  contractorWorkSubmissionApproved: 'workforce.contractor_work_submission.approved',
+  contractorWorkSubmissionDisputed: 'workforce.contractor_work_submission.disputed',
+  contractorWorkSubmissionRejected: 'workforce.contractor_work_submission.rejected',
+  contractorWorkSubmissionCancelled: 'workforce.contractor_work_submission.cancelled',
+
+  // TASK-793 — Contractor payables lifecycle (v1). Obligación económica aprobada
+  // previa a Finance. `ready_for_finance` dispara el bridge reactivo que crea la
+  // payment_obligation. Payload schemaVersion:1.
+  contractorPayableCreated: 'workforce.contractor_payable.created',
+  contractorPayableReadyForFinance: 'workforce.contractor_payable.ready_for_finance',
+  contractorPayableObligationCreated: 'workforce.contractor_payable.obligation_created',
+  contractorPayablePaymentOrderCreated: 'workforce.contractor_payable.payment_order_created',
+  // TASK-981 — payable pagado: la payment order que lo paga se marcó `paid` y el
+  // cascade reactivo transicionó el payable `payment_order_created → paid`. Dispara
+  // el envío del comprobante TASK-960 por email (consumer contractor-payable-paid-email).
+  contractorPayablePaid: 'workforce.contractor_payable.paid',
+  contractorPayableBlocked: 'workforce.contractor_payable.blocked',
+  contractorPayableCancelled: 'workforce.contractor_payable.cancelled',
 
   // TASK-878 — HubSpot Companies async intake (canonical pattern TASK-813b).
   // Webhook handler emite este event y retorna <100ms; el reactive consumer

@@ -2,6 +2,59 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-05-31 — TASK-979: Monthly Contractor Payment Run (1 event v1)
+
+Aggregate type: `contractor_payable`. Extiende los 5 eventos de TASK-793 con la transición que faltaba al lifecycle del payable.
+
+| Evento | Trigger | Notas |
+| --- | --- | --- |
+| `workforce.contractor_payable.payment_order_created` | `markPayablePaymentOrderCreated()` (writer ÚNICO) | la corrida mensual batchea la obligación en una payment order → payable `obligation_created → payment_order_created`. Payload base + `paymentOrderId`. La state machine exige este estado antes de `paid`; antes de TASK-979 nadie lo escribía. Migración extiende el CHECK `contractor_payable_events.event_type`. |
+
+## Delta 2026-05-30 — TASK-793: Contractor Payables → Finance bridge (5 events v1)
+
+Aggregate type: `contractor_payable`. Obligación económica aprobada del contractor, PREVIA a Finance (Workforce/HR → Finance). Payload base `{schemaVersion:1, contractorPayableId, publicId, contractorEngagementId, beneficiaryType, beneficiaryId, netPayable, currency, status, ...}`.
+
+| Evento | Trigger | Notas |
+| --- | --- | --- |
+| `workforce.contractor_payable.created` | `createContractorPayableFromSubmission()` / `createContractorPayableOffCycle()` | nace en `pending_readiness`; payout = `labor_cost_external`, NUNCA payroll |
+| `workforce.contractor_payable.ready_for_finance` | `transitionPayableToReadyForFinance()` (readiness OK) | **REACTIVO** — dispara la projection `contractor_payable_finance_obligation` (bridge a Finance) |
+| `workforce.contractor_payable.obligation_created` | `markPayableObligationCreated()` (bridge) | una `payment_obligation` (`source_kind=contractor_payable`, `amount=net_payable`) creada idempotente |
+| `workforce.contractor_payable.paid` | `markPayablePaid()` (writer ÚNICO, TASK-981) | **REACTIVO** — el cascade `contractor-payable-paid-cascade` lo emite cuando la `finance.payment_order.paid` marca pagada la orden que lo paga (`payment_order_created → paid`). Payload base + `paymentOrderId` + `paidAt`. Dispara la projection `contractor-payable-paid-email` (envía el comprobante TASK-960 por email). Antes de TASK-981 nadie transicionaba el payable a `paid`; migración extiende el CHECK `contractor_payable_events.event_type`. |
+| `workforce.contractor_payable.blocked` | readiness fail-closed | payload incluye `blockerCodes[]` |
+| `workforce.contractor_payable.cancelled` | `cancelContractorPayable()` | terminal |
+
+`ready_for_finance` SÍ tiene consumer reactivo (el bridge). El resto son auditoría/notificación. La obligación downstream sigue emitiendo `finance.payment_obligation.generated v1` (sin cambios). Finance es owner de payment orders + banco + conciliación.
+
+## Delta 2026-05-30 — TASK-792: Contractor Work Submissions lifecycle (5 events v1)
+
+Aggregate type: `contractor_work_submission`. Evidencia de trabajo del contractor (timesheet/milestone/deliverable/…) con approval/dispute/reject. Aprobación operacional ≠ pago. Payload base `{schemaVersion:1, contractorWorkSubmissionId, publicId, contractorEngagementId, submissionType, status, grossAmount, currency, ...}`.
+
+| Evento | Trigger | Notas |
+| --- | --- | --- |
+| `workforce.contractor_work_submission.submitted` | `submitContractorWorkSubmission()` | draft/disputed → submitted |
+| `workforce.contractor_work_submission.approved` | `reviewContractorWorkSubmission(approve)` | requiere gross_amount; input de readiness del payable |
+| `workforce.contractor_work_submission.disputed` | `reviewContractorWorkSubmission(dispute)` | reason ≥10 |
+| `workforce.contractor_work_submission.rejected` | `reviewContractorWorkSubmission(reject)` | reason ≥10; terminal |
+| `workforce.contractor_work_submission.cancelled` | `cancelContractorWorkSubmission()` | bloqueado si ya consumido; terminal |
+
+V1 sin consumer reactivo (Finance bridge es TASK-793). Eventos de auditoría/notificación. NO se agregan a `REACTIVE_EVENT_TYPES`.
+
+## Delta 2026-05-29 — TASK-790: Contractor Engagements lifecycle (6 events v1)
+
+Aggregate type: `contractor_engagement`. Cambios materiales del lifecycle del engagement contractor/honorarios (Workforce/HR). Payload base `{schemaVersion:1, contractorEngagementId, publicId, profileId, memberId, personLegalEntityRelationshipId, legalEntityOrganizationId, relationshipSubtype, payrollVia, paymentModel, status, classificationRiskStatus, ...}`.
+
+| Evento | Trigger | Notas |
+| --- | --- | --- |
+| `workforce.contractor_engagement.created` | `createContractorEngagement()` | Nace en `draft`; incluye `relationshipSubtype` |
+| `workforce.contractor_engagement.activated` | transición → `active` | hard gate: relación activa + riesgo no bloqueante |
+| `workforce.contractor_engagement.paused` | transición → `paused` (incl. auto-pause por escalada de riesgo) | `reason:'classification_risk_escalation'` cuando es auto-pause |
+| `workforce.contractor_engagement.ended` | transición → `ended` (incl. cierre ejecutado vía `executeContractorClosure`) | terminal; payload de cierre enriquecido (`lifecycle:'closure_executed'`, `closureReason`, `postClosureInvoicesAllowed`) cuando viene del flujo de cierre |
+| `workforce.contractor_engagement.cancelled` | transición → `cancelled` | terminal |
+| `workforce.contractor_engagement.closure_initiated` | `initiateContractorClosure()` (active/paused → `ending`) | TASK-797 — winding-down; no se aceptan nuevas work submissions |
+| `workforce.contractor_engagement.classification_risk_flagged` | riesgo escala a `legal_review_required`/`blocked` | bloquea readiness/activación |
+
+V1 NO tiene consumer reactivo (Finance bridge es TASK-793). Son eventos de auditoría/notificación. NO se agregan a `REACTIVE_EVENT_TYPES`.
+
 ## Delta 2026-05-24 — TASK-903: FTR productive writeback chain event (1 event v1)
 
 Aggregate type: `notion_task`. Sibling de TASK-916 repointeado a FTR (derivada pura de RpA).

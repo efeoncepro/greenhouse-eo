@@ -104,7 +104,20 @@ describe('current-payroll-period helpers', () => {
 
     expect(status.deadlineDate).toBe('2026-03-31')
     expect(status.isDue).toBe(true)
-    expect(status.state).toBe('due')
+    expect(status.state).toBe('due_today')
+    expect(status.blocksCalculation).toBe(false)
+  })
+
+  it('keeps an overdue draft as manually calculable instead of blocked', () => {
+    const status = getPayrollCalculationDeadlineStatus(
+      buildPeriod('2026-05', 'draft'),
+      '2026-05-31T15:00:00.000Z'
+    )
+
+    expect(status.deadlineDate).toBe('2026-05-29')
+    expect(status.isDue).toBe(false)
+    expect(status.state).toBe('overdue_allowed')
+    expect(status.blocksCalculation).toBe(false)
   })
 
   it('detects when a period was calculated on time', () => {

@@ -3,14 +3,14 @@
 > **Tipo de documento:** Spec de arquitectura
 > **Version:** 1.0
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-04-07
+> **Ultima actualizacion:** 2026-06-01
 > **Task:** TASK-278 — AI Visual Asset Generator
 
 ---
 
 ## Purpose
 
-Define el contrato, arquitectura y reglas del **AI Visual Asset Generator** — un modulo interno de toolchain que permite al agente AI generar assets visuales on-demand durante el desarrollo de interfaces: imagenes rasterizadas (banners, ilustraciones, fondos) via **Imagen 4** y animaciones SVG con CSS keyframes via **Gemini**.
+Define el contrato, arquitectura y reglas del **AI Visual Asset Generator** — un modulo interno de toolchain que permite al agente AI generar assets visuales on-demand durante el desarrollo de interfaces: imagenes rasterizadas (banners, ilustraciones, fondos) via **Imagen 4** o **OpenAI GPT Image** y animaciones SVG con CSS keyframes via **Gemini**.
 
 No es un feature para usuarios finales. Es infraestructura de productividad del agente.
 
@@ -24,6 +24,8 @@ Agent (Claude) durante desarrollo de UI
     |                                            |
     v                                            v
 [Imagen 4 via Vertex AI]              [Gemini via Vertex AI]
+    o
+[OpenAI GPT Image via Image API]
     |                                            |
     v                                            v
 PNG/WebP → public/images/generated/   SVG+CSS → public/animations/generated/
@@ -39,7 +41,9 @@ git add + commit → asset servido por Vercel CDN
 
 | Canal | Motor | Modelo | Output | Uso |
 |-------|-------|--------|--------|-----|
-| Imagenes rasterizadas | Imagen 4 | `imagen-4.0-generate-001` (configurable via `IMAGEN_MODEL`) | PNG/WebP | Banners, ilustraciones, fondos, thumbnails |
+| Imagenes rasterizadas default | Imagen 4 | `imagen-4.0-generate-001` (configurable via `IMAGEN_MODEL`) | PNG/WebP | Banners, ilustraciones, fondos, thumbnails |
+| Imagenes rasterizadas opt-in | OpenAI GPT Image | `gpt-image-2` (configurable via `OPENAI_IMAGE_MODEL`) | PNG/WebP/JPEG | Assets de mayor fidelidad, composicion y adherencia a prompts |
+| Imagenes PNG transparentes | OpenAI GPT Image | `gpt-image-1.5` fallback automatico cuando `background='transparent'` | PNG transparente | Batches de assets recortables, stickers, overlays, iconografia raster |
 | Animaciones SVG | Gemini | Resuelto via `resolveNexaModel()` | SVG con CSS keyframes | Loading spinners, iconos animados, empty states, micro-interacciones |
 
 ## Files
@@ -47,10 +51,13 @@ git add + commit → asset servido por Vercel CDN
 | File | Purpose |
 |------|---------|
 | `src/lib/ai/image-generator.ts` | Helper con `generateImage()` + `generateAnimation()` |
+| `src/lib/ai/openai-image.ts` | Adapter server-only para OpenAI Image API |
 | `src/app/api/internal/generate-image/route.ts` | Endpoint POST admin-only (imagen rasterizada) |
 | `src/app/api/internal/generate-animation/route.ts` | Endpoint POST admin-only (SVG animado) |
 | `scripts/generate-banners.mts` | Script batch para generar sets de banners |
-| `~/.claude/skills/generate-visual-asset/skill.md` | Skill invocable `/generate-visual-asset` |
+| `.codex/skills/greenhouse-ai-image-generator/SKILL.md` | Skill Codex para direccion de arte, prompts, generacion y QA de assets IA |
+| `.claude/skills/greenhouse-ai-image-generator/SKILL.md` | Skill Claude equivalente |
+| `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md` | Guia compartida de prompt engineering, acabados profesionales y QA |
 | `public/images/generated/` | Output de imagenes generadas |
 | `public/animations/generated/` | Output de animaciones generadas |
 | `public/images/banners/` | Banners pre-generados por categoria |
@@ -66,10 +73,49 @@ import { generateImage } from '@/lib/ai/image-generator'
 const result = await generateImage('tech banner blue gradient', {
   aspectRatio: '16:9',   // '1:1' | '16:9' | '9:16' | '4:3' | '3:4'
   format: 'png',         // 'webp' | 'png'
+  provider: 'openai-image', // optional; default env/default is google-imagen
+  quality: 'medium',     // optional for OpenAI
   filename: 'my-banner'  // optional
 })
-// result: { path, filename, format, sizeBytes }
+// result: { path, filename, format, sizeBytes, provider, model, requestedModel, modelFallbackReason }
 ```
+
+### OpenAI advanced modes
+
+`src/lib/ai/openai-image.ts` expone tres modos server-only para aprovechar el stack actual de OpenAI sin mezclarlo con UI runtime:
+
+```typescript
+import {
+  generateOpenAIImage,
+  editOpenAIImage,
+  runOpenAIImageTool
+} from '@/lib/ai/openai-image'
+
+// 1. Text-to-image directo via Image API.
+await generateOpenAIImage({
+  prompt: 'Clean app icon, transparent background, no text',
+  format: 'png',
+  background: 'transparent',
+  quality: 'high'
+})
+
+// 2. Edicion / referencia con una o varias imagenes, y mascara opcional.
+await editOpenAIImage({
+  prompt: 'Keep the product, replace only the background with a bright studio setup',
+  image: { path: '/tmp/source.png' },
+  mask: { path: '/tmp/mask.png' },
+  format: 'png'
+})
+
+// 3. Responses API para iteraciones conversacionales/multi-turn con el image_generation tool.
+await runOpenAIImageTool({
+  prompt: 'Refine the previous image into a more realistic version',
+  imageGenerationCallIds: ['igc_previous_call_id'],
+  quality: 'high'
+})
+```
+
+Para batches grandes de PNG transparente, usar `generateOpenAIImage()` / `editOpenAIImage()` con `background: 'transparent'`. El helper detecta que `gpt-image-2` no soporta transparencia y usa automaticamente `gpt-image-1.5`, dejando `requestedModel` y `modelFallbackReason` en el resultado. Si un flujo prefiere fallar en vez de degradar modelo, pasar `transparentBackgroundStrategy: 'throw'`.
 
 ### `generateAnimation(prompt, options)`
 
@@ -157,6 +203,10 @@ Las animaciones SVG generadas por Gemini siguen estas reglas (enforced via syste
 - Endpoints deshabilitados en production por defecto (`NODE_ENV === 'production'` → 403)
 - Override: `ENABLE_ASSET_GENERATOR=true` en env vars
 - Auth: `requireAdminTenantContext` — solo efeonce_admin con route group admin
+- OpenAI API key se resuelve solo server-side via `OPENAI_API_KEY` o `OPENAI_API_KEY_SECRET_REF`; nunca se hardcodea en repo ni se expone al cliente
+- Provider OpenAI es opt-in via `GREENHOUSE_IMAGE_PROVIDER=openai-image` o `options.provider='openai-image'`; el default conserva Imagen para no romper flujos existentes
+- PNG transparente: `gpt-image-2` no soporta `background='transparent'`; el helper aplica fallback seguro a `gpt-image-1.5` por default y registra el motivo
+- Inputs de edicion/referencia se limitan a 10 imagenes y 50MB por archivo antes de llamar a OpenAI
 - Los assets generados son archivos estaticos commiteados al repo — no hay generacion en runtime para usuarios
 
 ## Infraestructura reutilizada
@@ -164,8 +214,10 @@ Las animaciones SVG generadas por Gemini siguen estas reglas (enforced via syste
 | Componente | Source |
 |------------|--------|
 | GoogleGenAI client | `src/lib/ai/google-genai.ts` (singleton, Vertex AI) |
+| OpenAI Image adapter | `src/lib/ai/openai-image.ts` (Image API, server-only) |
 | Model resolution | `src/config/nexa-models.ts` (`resolveNexaModel()`) |
 | GCP auth | `src/lib/google-credentials.ts` (WIF/SA key/ADC) |
+| Secret resolution | `src/lib/secrets/secret-manager.ts` (`OPENAI_API_KEY_SECRET_REF` compatible) |
 | Admin auth guard | `src/lib/tenant/authorization.ts` (`requireAdminTenantContext`) |
 
 Zero dependencias nuevas.

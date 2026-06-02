@@ -1,0 +1,906 @@
+'use client'
+
+import { useCallback, useMemo, useState } from 'react'
+
+import Link from 'next/link'
+
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import InputAdornment from '@mui/material/InputAdornment'
+import Stack from '@mui/material/Stack'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
+
+import CustomChip from '@core/components/mui/Chip'
+import CustomTextField from '@core/components/mui/TextField'
+
+import RemittanceAdviceSection from '@/components/greenhouse/contractors/RemittanceAdviceSection'
+import { MetricSummaryCard, OperationalPanel, OperationalSignalList } from '@/components/greenhouse/primitives'
+import { formatCurrency, type CurrencyCode } from '@/lib/format'
+import { cadenceLabel, cadencePaymentUnitLabel, rateTypeLabel } from '@/lib/contractor-engagements/compensation-display'
+import { GH_CONTRACTOR_COMPENSATION as CC } from '@/lib/copy/contractor-compensation'
+import type {
+  ContractorHrWorkbenchProjection,
+  ContractorTone,
+  ContractorWorkbenchQueueRow
+} from '@/lib/contractor-engagements/projection-types'
+
+import { throwIfNotOk } from '@/lib/api/parse-error-response'
+import type { ContractorEngagement } from '@/lib/contractor-engagements/types'
+
+import AdminReviewDecisionDrawer, { type ReviewDecision } from './AdminReviewDecisionDrawer'
+import ContractorClassificationReviewDialog from './ContractorClassificationReviewDialog'
+import ContractorClosureDrawer from './ContractorClosureDrawer'
+import ContractorEngagementCompensationDrawer from './ContractorEngagementCompensationDrawer'
+import ContractorEngagementDetailDrawer from './ContractorEngagementDetailDrawer'
+import ContractorEngagementTermsDrawer from './ContractorEngagementTermsDrawer'
+import ContractorGuardrailPanel from './ContractorGuardrailPanel'
+import ContractorLifecycleControls from './ContractorLifecycleControls'
+
+const toneToColor: Record<ContractorTone, 'success' | 'warning' | 'error' | 'info' | 'secondary'> = {
+  success: 'success',
+  warning: 'warning',
+  error: 'error',
+  info: 'info',
+  secondary: 'secondary'
+}
+
+interface ContractorAdminWorkbenchViewProps {
+  initialProjection: ContractorHrWorkbenchProjection
+  /** `hr.contractor_classification:approve` — gates the classification review dialog (SoD). */
+  canReviewClassification?: boolean
+  /** `hr.contractor_engagement:update` — gates lifecycle transitions + term edits. */
+  canManage?: boolean
+}
+
+const DetailRow = ({ label, value }: { label: string; value: string }) => (
+  <Stack direction='row' justifyContent='space-between' spacing={3}>
+    <Typography variant='body2' color='text.secondary'>
+      {label}
+    </Typography>
+    <Typography variant='body2' sx={{ fontWeight: 600, textAlign: 'right' }}>
+      {value}
+    </Typography>
+  </Stack>
+)
+
+const PasoStep = ({
+  title,
+  status,
+  tone,
+  detail
+}: {
+  title: string
+  status: string
+  tone: ContractorTone
+  detail: string
+}) => (
+  <Stack
+    spacing={2}
+    sx={theme => ({
+      height: '100%',
+      border: `1px solid ${theme.palette.divider}`,
+      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+      p: 4
+    })}
+  >
+    <Stack direction='row' justifyContent='space-between' spacing={2} alignItems='flex-start'>
+      <Typography variant='subtitle1'>{title}</Typography>
+      <CustomChip round='true' size='small' variant='tonal' color={toneToColor[tone]} label={status} />
+    </Stack>
+    <Typography variant='body2' color='text.secondary'>
+      {detail}
+    </Typography>
+  </Stack>
+)
+
+const AdminHero = ({
+  selected,
+  onReview,
+  canManage
+}: {
+  selected: ContractorWorkbenchQueueRow | null
+  onReview: () => void
+  canManage: boolean
+}) => (
+  <Card
+    sx={theme => ({
+      border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+      bgcolor: alpha(theme.palette.primary.main, 0.04)
+    })}
+  >
+    <CardContent>
+      <Stack
+        direction={{ xs: 'column', lg: 'row' }}
+        spacing={4}
+        justifyContent='space-between'
+        alignItems={{ xs: 'flex-start', lg: 'center' }}
+      >
+        <Stack spacing={1.5} sx={{ maxWidth: 820 }}>
+          <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
+            <CustomChip round='true' size='small' variant='tonal' color='primary' label='Workbench HR' />
+            {selected ? (
+              <CustomChip
+                round='true'
+                size='small'
+                variant='tonal'
+                color={toneToColor[selected.statusTone]}
+                label={selected.statusLabel}
+              />
+            ) : null}
+          </Stack>
+          <Typography variant='h4'>Gestión contractor</Typography>
+          <Typography variant='body1' color='text.secondary'>
+            Revisa engagements, evidencia y bloqueos de preparación antes de que el pago pase a Finance.
+          </Typography>
+        </Stack>
+        <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
+          <Button
+            variant='tonal'
+            startIcon={<i className='tabler-checkup-list' />}
+            disabled={!selected}
+            onClick={onReview}
+            data-capture='admin-review-selected'
+          >
+            Revisar seleccionado
+          </Button>
+          {canManage ? (
+            <Button
+              component={Link}
+              href='/hr/contractors/new'
+              variant='contained'
+              startIcon={<i className='tabler-plus' />}
+              data-capture='admin-new-contractor'
+            >
+              Nuevo contractor
+            </Button>
+          ) : null}
+        </Stack>
+      </Stack>
+    </CardContent>
+  </Card>
+)
+
+const AdminQueueTable = ({
+  rows,
+  selectedId,
+  onSelect,
+  title = 'Cola de revisión',
+  subheader = 'Prioriza disputas, bloqueos de preparación y soporte pendiente.',
+  icon = 'tabler-list-details',
+  emptyMessage = 'No hay casos contractor en revisión. Cuando llegue un envío o un bloqueo, aparecerá aquí.',
+  caption = 'Cola de revisión de contractors',
+  action
+}: {
+  rows: ContractorWorkbenchQueueRow[]
+  selectedId: string | null
+  onSelect: (engagementId: string) => void
+  title?: string
+  subheader?: string
+  icon?: string
+  emptyMessage?: string
+  caption?: string
+  action?: React.ReactNode
+}) => (
+  <OperationalPanel title={title} subheader={subheader} icon={icon} iconColor='primary' action={action}>
+    {rows.length > 0 ? (
+      <Box sx={{ overflowX: 'auto' }}>
+        <Table size='small' sx={{ minWidth: 820 }}>
+          <caption className='sr-only'>{caption}</caption>
+          <TableHead>
+            <TableRow>
+              <TableCell scope='col'>Contractor</TableCell>
+              <TableCell scope='col'>Tipo</TableCell>
+              <TableCell scope='col'>Estado</TableCell>
+              <TableCell scope='col'>Monto</TableCell>
+              <TableCell scope='col'>Responsable</TableCell>
+              <TableCell scope='col' align='right'>
+                Acción
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map(row => {
+              const selected = row.contractorEngagementId === selectedId
+
+              return (
+                <TableRow
+                  key={row.contractorEngagementId}
+                  hover
+                  selected={selected}
+                  sx={theme => ({
+                    '&.Mui-selected': {
+                      bgcolor: alpha(theme.palette.primary.main, 0.08)
+                    }
+                  })}
+                >
+                  <TableCell>
+                    <Stack spacing={0.25}>
+                      <Typography variant='subtitle2'>{row.contractorName}</Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        {row.engagementPublicId} · {row.country}
+                      </Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell>{row.relationshipSubtype}</TableCell>
+                  <TableCell>
+                    <CustomChip
+                      round='true'
+                      size='small'
+                      variant='tonal'
+                      color={toneToColor[row.statusTone]}
+                      label={row.statusLabel}
+                    />
+                  </TableCell>
+                  <TableCell sx={{ fontVariantNumeric: 'tabular-nums' }}>{row.amount}</TableCell>
+                  <TableCell>{row.responsable}</TableCell>
+                  <TableCell align='right'>
+                    <Button
+                      size='small'
+                      variant={selected ? 'contained' : 'tonal'}
+                      onClick={() => onSelect(row.contractorEngagementId)}
+                    >
+                      Abrir
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </Box>
+    ) : (
+      <Alert severity='info' icon={<i className='tabler-clipboard-check' />} role='status'>
+        {emptyMessage}
+      </Alert>
+    )}
+  </OperationalPanel>
+)
+
+const BLOCKED_PAYABLE_SIGNAL = {
+  title: 'Payable bloqueado',
+  description:
+    'El payable no cumple los gates de preparación (invoice, tax owner, FX o cuenta de pago). Se resuelve en Finance.',
+  statusLabel: 'Finance'
+} as const
+
+const ReadinessPanel = ({ row }: { row: ContractorWorkbenchQueueRow }) => {
+  const hasBlocked = row.blockedPayableCount > 0
+
+  return (
+    <OperationalPanel title='Preparación del payable' icon='tabler-shield-dollar' iconColor='warning'>
+      {hasBlocked ? (
+        <OperationalSignalList
+          items={[
+            {
+              id: `${row.contractorEngagementId}-blocked`,
+              title: BLOCKED_PAYABLE_SIGNAL.title,
+              description: BLOCKED_PAYABLE_SIGNAL.description,
+              statusLabel: BLOCKED_PAYABLE_SIGNAL.statusLabel,
+              statusTone: 'warning',
+              statusIcon: 'tabler-alert-circle'
+            }
+          ]}
+          columns={{ xs: 1 }}
+        />
+      ) : (
+        <Alert severity='success' icon={<i className='tabler-circle-check' />}>
+          No hay bloqueos de preparación para este caso. El siguiente paso puede avanzar hacia Finance.
+        </Alert>
+      )}
+    </OperationalPanel>
+  )
+}
+
+const FinanceStepPanel = ({ row }: { row: ContractorWorkbenchQueueRow }) => {
+  const hasBlocked = row.blockedPayableCount > 0
+  const hasPending = row.pendingCount > 0
+
+  return (
+    <OperationalPanel
+      title='Paso hacia Finance'
+      subheader='El pago nace como obligación; no como pago directo ni ajuste de otro dominio.'
+      icon='tabler-building-bank'
+      iconColor='info'
+    >
+      <Grid container spacing={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <PasoStep
+            title='Envío de trabajo'
+            status={hasPending ? 'En revisión' : 'Sin envío pendiente'}
+            tone={hasPending ? 'info' : 'secondary'}
+            detail='Evidencia operacional y monto bruto del periodo.'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <PasoStep
+            title='Contractor payable'
+            status={hasBlocked ? 'Bloqueado' : 'Listo'}
+            tone={hasBlocked ? 'warning' : 'success'}
+            detail='Preparación de invoice, tax owner, FX y cuenta de pago.'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <PasoStep
+            title='Obligación Finance'
+            status={hasBlocked ? 'Pendiente' : 'Lista para generar'}
+            tone={hasBlocked ? 'secondary' : 'info'}
+            detail='Obligación idempotente por contractor payable.'
+          />
+        </Grid>
+      </Grid>
+    </OperationalPanel>
+  )
+}
+
+const AdminInspector = ({
+  row,
+  onReview,
+  onOpenDetail,
+  onReviewClassification,
+  onTransitioned,
+  onRequestClosure,
+  canManage,
+  canReviewClassification
+}: {
+  row: ContractorWorkbenchQueueRow
+  onReview: () => void
+  onOpenDetail: () => void
+  onReviewClassification: () => void
+  onTransitioned: () => void
+  onRequestClosure: () => void
+  canManage: boolean
+  canReviewClassification: boolean
+}) => (
+  <OperationalPanel
+    title='Inspector'
+    subheader={row.nextAction}
+    icon='tabler-user-check'
+    iconColor={toneToColor[row.statusTone]}
+    action={
+      <CustomChip round='true' size='small' variant='tonal' color={toneToColor[row.statusTone]} label={row.statusLabel} />
+    }
+  >
+    <Stack spacing={4}>
+      <Stack spacing={2}>
+        <DetailRow label='Contractor' value={row.contractorName} />
+        <DetailRow label='Engagement' value={row.engagementPublicId} />
+        <DetailRow label='Relación' value={row.relationshipSubtype} />
+        <DetailRow label='País' value={row.country} />
+        <DetailRow label='Entidad contratante' value={row.legalEntityLabel} />
+        <DetailRow label='Compliance' value={CC.classification.status[row.classificationRiskStatus]} />
+        <DetailRow label='Envíos en revisión' value={String(row.pendingCount)} />
+        <DetailRow label='Payables bloqueados' value={String(row.blockedPayableCount)} />
+      </Stack>
+
+      <Divider />
+
+      {/* TASK-975 — lifecycle transitions for the selected engagement. */}
+      <ContractorLifecycleControls
+        engagementId={row.contractorEngagementId}
+        lifecycleStatus={row.lifecycleStatus}
+        classificationRiskStatus={row.classificationRiskStatus}
+        canManage={canManage}
+        onTransitioned={onTransitioned}
+        onRequestClosure={onRequestClosure}
+      />
+
+      <Divider />
+
+      {/* TASK-975 — detail + classification entry points. */}
+      <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
+        <Button variant='contained' size='small' startIcon={<i className='tabler-file-text' />} onClick={onOpenDetail}>
+          {CC.detail.openCta}
+        </Button>
+        {canReviewClassification ? (
+          <Button
+            variant='tonal'
+            color='secondary'
+            size='small'
+            startIcon={<i className='tabler-gavel' />}
+            onClick={onReviewClassification}
+          >
+            {CC.classification.reviewCta}
+          </Button>
+        ) : null}
+      </Stack>
+
+      <Divider />
+
+      <Stack spacing={2}>
+        <Typography variant='subtitle2'>Revisión del envío</Typography>
+        <Button
+          variant='contained'
+          size='small'
+          startIcon={<i className='tabler-checkup-list' />}
+          onClick={onReview}
+          data-capture='admin-review-action'
+        >
+          Revisar envío
+        </Button>
+        <Typography variant='caption' color='text.secondary'>
+          Aprobar habilita la preparación del payable. La aprobación no ejecuta el pago.
+        </Typography>
+      </Stack>
+    </Stack>
+  </OperationalPanel>
+)
+
+const CompensationPanel = ({
+  row,
+  onEdit
+}: {
+  row: ContractorWorkbenchQueueRow
+  onEdit: () => void
+}) => {
+  const hasRate = row.agreedRate.rateAmount !== null
+
+  const money = (n: number, currency: string) =>
+    formatCurrency(n, currency as CurrencyCode, { currencySymbolSpacing: ' ' }, 'es-CL')
+
+  return (
+    <OperationalPanel
+      title={CC.editor.panelTitle}
+      subheader={CC.editor.panelSubheader}
+      icon='tabler-coin'
+      iconColor={hasRate ? 'primary' : 'warning'}
+      action={
+        hasRate ? (
+          <Button size='small' variant='tonal' startIcon={<i className='tabler-edit' />} onClick={onEdit}>
+            {CC.editor.editCta}
+          </Button>
+        ) : null
+      }
+    >
+      {hasRate ? (
+        <Stack spacing={0.5}>
+          <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+            {CC.editor.amountLabel} · {rateTypeLabel(row.agreedRate.rateType)} · {cadenceLabel(row.agreedRate.paymentCadence)}
+          </Typography>
+          <Typography variant='h5' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
+            {money(row.agreedRate.rateAmount as number, row.agreedRate.currency)}
+            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', fontWeight: 400 }}>
+              {' '}/ {cadencePaymentUnitLabel(row.agreedRate.paymentCadence)}
+            </Typography>
+          </Typography>
+        </Stack>
+      ) : (
+        <Stack spacing={3} alignItems='flex-start'>
+          <Alert severity='warning' icon={<i className='tabler-alert-triangle' />} sx={{ width: '100%' }}>
+            {CC.editor.emptyDescription}
+          </Alert>
+          <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={onEdit}>
+            {CC.editor.defineCta}
+          </Button>
+        </Stack>
+      )}
+    </OperationalPanel>
+  )
+}
+
+const ContractorAdminWorkbenchView = ({
+  initialProjection,
+  canReviewClassification = false,
+  canManage = false
+}: ContractorAdminWorkbenchViewProps) => {
+  const [projection, setProjection] = useState<ContractorHrWorkbenchProjection>(initialProjection)
+
+  const [selectedId, setSelectedId] = useState<string | null>(
+    initialProjection.queue[0]?.contractorEngagementId ?? null
+  )
+
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [drawerDecision, setDrawerDecision] = useState<ReviewDecision>('approve')
+  const [compDrawerOpen, setCompDrawerOpen] = useState(false)
+
+  // TASK-975 — detail drawer + terms drawer + classification dialog state.
+  const [detailDrawerOpen, setDetailDrawerOpen] = useState(false)
+  const [detailEngagementId, setDetailEngagementId] = useState<string | null>(null)
+  const [termsEngagement, setTermsEngagement] = useState<ContractorEngagement | null>(null)
+
+  // TASK-984 — contractor closure drawer state.
+  const [closureDrawerOpen, setClosureDrawerOpen] = useState(false)
+  const [closureEngagementId, setClosureEngagementId] = useState<string | null>(null)
+  const [closureContractorName, setClosureContractorName] = useState<string | null>(null)
+
+  const [classificationDialog, setClassificationDialog] = useState<{
+    engagementId: string
+    initialFactors: ContractorEngagement['classificationRiskFactors']
+    initialReviewed: boolean
+  } | null>(null)
+
+  // TASK-986 — tab cola/directorio + búsqueda del directorio.
+  const [activeTab, setActiveTab] = useState<'queue' | 'directory'>('queue')
+  const [directorySearch, setDirectorySearch] = useState('')
+
+  // El Inspector resuelve la selección desde la cola O el directorio (un activo
+  // sano solo está en el directorio).
+  const selected = useMemo(
+    () =>
+      projection.queue.find(row => row.contractorEngagementId === selectedId) ??
+      projection.directory.find(row => row.contractorEngagementId === selectedId) ??
+      null,
+    [projection.queue, projection.directory, selectedId]
+  )
+
+  const filteredDirectory = useMemo(() => {
+    const q = directorySearch.trim().toLowerCase()
+
+    if (!q) return projection.directory
+
+    return projection.directory.filter(
+      row =>
+        row.contractorName.toLowerCase().includes(q) ||
+        row.engagementPublicId.toLowerCase().includes(q) ||
+        row.statusLabel.toLowerCase().includes(q)
+    )
+  }, [projection.directory, directorySearch])
+
+  const refetch = useCallback(async () => {
+    try {
+      const response = await fetch('/api/hr/contractors/workbench', { cache: 'no-store' })
+
+      if (!response.ok) return
+
+      const next = (await response.json().catch(() => null)) as ContractorHrWorkbenchProjection | null
+
+      if (!next) return
+
+      setProjection(next)
+
+      // Keep the current selection if it still exists (cola o directorio).
+      const stillExists =
+        next.queue.some(row => row.contractorEngagementId === selectedId) ||
+        next.directory.some(row => row.contractorEngagementId === selectedId)
+
+      if (!stillExists) {
+        setSelectedId(next.queue[0]?.contractorEngagementId ?? null)
+      }
+    } catch {
+      // Refetch failures are non-blocking; the mutation already succeeded server-side.
+    }
+  }, [selectedId])
+
+  const openReview = (decision: ReviewDecision) => {
+    if (!selected) return
+
+    setDrawerDecision(decision)
+    setDrawerOpen(true)
+  }
+
+  const handleReviewed = useCallback(() => {
+    void refetch()
+    setDrawerOpen(false)
+  }, [refetch])
+
+  // TASK-975 — open the full detail drawer for an engagement id.
+  const openDetail = useCallback((engagementId: string) => {
+    setDetailEngagementId(engagementId)
+    setDetailDrawerOpen(true)
+  }, [])
+
+  // Open the classification dialog with the engagement already fetched (from the
+  // detail drawer, which has the full object — no extra fetch).
+  const openClassificationForEngagement = useCallback((engagement: ContractorEngagement) => {
+    setClassificationDialog({
+      engagementId: engagement.contractorEngagementId,
+      initialFactors: engagement.classificationRiskFactors,
+      initialReviewed: engagement.classificationReviewed
+    })
+  }, [])
+
+  // Standalone inspector CTA: fetch the engagement on demand, then open the dialog.
+  const openClassificationById = useCallback(async (engagementId: string) => {
+    try {
+      const response = await fetch(`/api/hr/contractors/${engagementId}`, { cache: 'no-store' })
+
+      await throwIfNotOk(response, 'No pudimos abrir la revisión de clasificación.')
+
+      const payload = (await response.json()) as { engagement: ContractorEngagement }
+
+      openClassificationForEngagement(payload.engagement)
+    } catch {
+      // On failure, fall back to opening the detail drawer where the user can retry.
+      openDetail(engagementId)
+    }
+  }, [openClassificationForEngagement, openDetail])
+
+  const signalItems = projection.signals.map(signal => ({
+    id: signal.id,
+    title: signal.title,
+    description: signal.description,
+    statusLabel: signal.statusLabel,
+    statusTone: toneToColor[signal.statusTone],
+    statusIcon: signal.statusIcon
+  }))
+
+  return (
+    <Stack spacing={6}>
+      <Box>
+        <Typography variant='h4'>Gestión contractor</Typography>
+        <Typography variant='body2' color='text.secondary'>
+          Revisión operacional de contractors, evidencia y preparación antes de Finance.
+        </Typography>
+      </Box>
+
+      {projection.degraded.length > 0 ? (
+        <Alert severity='warning' icon={<i className='tabler-alert-triangle' />}>
+          {projection.degraded[0]?.message ?? 'Algunos datos no se pudieron cargar. Intenta actualizar la página.'}
+        </Alert>
+      ) : null}
+
+      <AdminHero
+        selected={selected}
+        onReview={() => openReview(selected?.statusTone === 'warning' ? 'dispute' : 'approve')}
+        canManage={canManage}
+      />
+
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <MetricSummaryCard
+            title='En revisión'
+            value={String(projection.totals.inReview)}
+            subtitle='Envíos enviados o disputados'
+            icon='tabler-clipboard-check'
+            iconColor='info'
+            statusLabel='Operacional'
+            statusTone='info'
+            statusIcon='tabler-info-circle'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <MetricSummaryCard
+            title='Bloqueados'
+            value={String(projection.totals.blocked)}
+            subtitle='Preparación pendiente'
+            icon='tabler-lock'
+            iconColor='warning'
+            statusLabel='Requiere responsable'
+            statusTone='warning'
+            statusIcon='tabler-alert-circle'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <MetricSummaryCard
+            title='Listos a Finance'
+            value={String(projection.totals.readyForFinance)}
+            subtitle='Sin bloqueos de preparación'
+            icon='tabler-building-bank'
+            iconColor='success'
+            statusLabel='Puente'
+            statusTone='success'
+            statusIcon='tabler-circle-check'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <MetricSummaryCard
+            title='Pagados'
+            value={String(projection.totals.paid)}
+            subtitle='Obligación conciliada'
+            icon='tabler-circle-check'
+            iconColor='success'
+            statusLabel='Cerrado'
+            statusTone='success'
+            statusIcon='tabler-circle-check'
+          />
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={6} alignItems='stretch'>
+        <Grid size={{ xs: 12, xl: 8 }}>
+          <Stack spacing={6}>
+            {/* TASK-986 — toggle Cola de revisión (triage) / Directorio (browse all). */}
+            <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap role='tablist' aria-label={CC.directory.tablistAria}>
+              <Button
+                role='tab'
+                aria-selected={activeTab === 'queue'}
+                variant={activeTab === 'queue' ? 'contained' : 'tonal'}
+                color='secondary'
+                size='small'
+                startIcon={<i className='tabler-list-details' />}
+                onClick={() => setActiveTab('queue')}
+              >
+                {CC.directory.queueTab} ({projection.queue.length})
+              </Button>
+              <Button
+                role='tab'
+                data-capture-tab='directory'
+                aria-selected={activeTab === 'directory'}
+                variant={activeTab === 'directory' ? 'contained' : 'tonal'}
+                color='secondary'
+                size='small'
+                startIcon={<i className='tabler-address-book' />}
+                onClick={() => setActiveTab('directory')}
+              >
+                {CC.directory.directoryTab} ({projection.directory.length})
+              </Button>
+            </Stack>
+
+            {activeTab === 'queue' ? (
+              <AdminQueueTable rows={projection.queue} selectedId={selectedId} onSelect={setSelectedId} />
+            ) : (
+              <AdminQueueTable
+                rows={filteredDirectory}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                title={CC.directory.panelTitle}
+                subheader={CC.directory.panelSubheader}
+                icon='tabler-address-book'
+                caption={CC.directory.caption}
+                emptyMessage={directorySearch.trim() ? CC.directory.emptyNoMatch : CC.directory.emptyNone}
+                action={
+                  <CustomTextField
+                    size='small'
+                    placeholder={CC.directory.searchPlaceholder}
+                    value={directorySearch}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDirectorySearch(e.target.value)}
+                    sx={{ minWidth: { xs: 160, sm: 260 } }}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position='start'>
+                            <i className='tabler-search' style={{ fontSize: 18 }} />
+                          </InputAdornment>
+                        )
+                      }
+                    }}
+                  />
+                }
+              />
+            )}
+            {selected ? (
+              <>
+                <ReadinessPanel row={selected} />
+                <FinanceStepPanel row={selected} />
+              </>
+            ) : null}
+          </Stack>
+        </Grid>
+        <Grid size={{ xs: 12, xl: 4 }}>
+          <Stack spacing={6}>
+            {selected ? (
+              <>
+                <CompensationPanel row={selected} onEdit={() => setCompDrawerOpen(true)} />
+                <ContractorGuardrailPanel row={selected} />
+                <AdminInspector
+                  row={selected}
+                  onReview={() => openReview('approve')}
+                  onOpenDetail={() => openDetail(selected.contractorEngagementId)}
+                  onReviewClassification={() => void openClassificationById(selected.contractorEngagementId)}
+                  onTransitioned={() => void refetch()}
+                  onRequestClosure={() => {
+                    setClosureEngagementId(selected.contractorEngagementId)
+                    setClosureContractorName(selected.contractorName)
+                    setClosureDrawerOpen(true)
+                  }}
+                  canManage={canManage}
+                  canReviewClassification={canReviewClassification}
+                />
+              </>
+            ) : (
+              <OperationalPanel title='Inspector' icon='tabler-user-check' iconColor='secondary'>
+                <Alert severity='info' icon={<i className='tabler-info-circle' />} role='status'>
+                  Selecciona un caso de la cola para ver su detalle y revisar el envío.
+                </Alert>
+              </OperationalPanel>
+            )}
+          </Stack>
+        </Grid>
+      </Grid>
+
+      <OperationalPanel
+        title='Señales operativas'
+        subheader='Estado de salud de la operación contractor.'
+        icon='tabler-activity-heartbeat'
+        iconColor='primary'
+      >
+        {signalItems.length > 0 ? (
+          <OperationalSignalList items={signalItems} columns={{ xs: 1, md: 2, xl: 4 }} />
+        ) : (
+          <Alert severity='success' icon={<i className='tabler-circle-check' />} role='status'>
+            Sin señales de atención en la operación contractor.
+          </Alert>
+        )}
+      </OperationalPanel>
+
+      <RemittanceAdviceSection
+        items={projection.remittances}
+        audience='admin'
+        endpointBase='/api/hr/contractors/remittance'
+      />
+
+      <AdminReviewDecisionDrawer
+        open={drawerOpen}
+        queueRow={selected}
+        initialDecision={drawerDecision}
+        onClose={() => setDrawerOpen(false)}
+        onReviewed={handleReviewed}
+      />
+
+      {selected ? (
+        <ContractorEngagementCompensationDrawer
+          open={compDrawerOpen}
+          engagement={{
+            contractorEngagementId: selected.contractorEngagementId,
+            publicId: selected.engagementPublicId,
+            contractorName: selected.contractorName,
+            relationshipSubtypeLabel: selected.relationshipSubtype,
+            rateType: selected.agreedRate.rateType,
+            rateAmount: selected.agreedRate.rateAmount,
+            paymentCadence: selected.agreedRate.paymentCadence,
+            currency: selected.agreedRate.currency
+          }}
+          onClose={() => setCompDrawerOpen(false)}
+          onSaved={() => {
+            setCompDrawerOpen(false)
+            void refetch()
+          }}
+        />
+      ) : null}
+
+      {/* TASK-975 — engagement detail drawer (read-only sections + entry points). */}
+      <ContractorEngagementDetailDrawer
+        engagementId={detailEngagementId}
+        open={detailDrawerOpen}
+        onClose={() => setDetailDrawerOpen(false)}
+        onEditTerms={engagement => {
+          setDetailDrawerOpen(false)
+          setTermsEngagement(engagement)
+        }}
+        onReviewClassification={engagement => {
+          setDetailDrawerOpen(false)
+          openClassificationForEngagement(engagement)
+        }}
+        canReviewClassification={canReviewClassification}
+      />
+
+      {/* TASK-975 — editable terms drawer (model, provider, FX, flags, end date). */}
+      <ContractorEngagementTermsDrawer
+        engagement={termsEngagement}
+        open={termsEngagement !== null}
+        onClose={() => setTermsEngagement(null)}
+        onSaved={() => {
+          setTermsEngagement(null)
+          void refetch()
+        }}
+      />
+
+      {/* TASK-984 — contractor closure drawer (readiness + initiate/execute, NUNCA finiquito). */}
+      <ContractorClosureDrawer
+        engagementId={closureEngagementId}
+        contractorName={closureContractorName}
+        open={closureDrawerOpen}
+        onClose={() => setClosureDrawerOpen(false)}
+        onClosed={() => void refetch()}
+        canManage={canManage}
+      />
+
+      {/* TASK-975 — classification review dialog (SoD: hr.contractor_classification:approve). */}
+      {classificationDialog ? (
+        <ContractorClassificationReviewDialog
+          engagementId={classificationDialog.engagementId}
+          open
+          initialFactors={classificationDialog.initialFactors}
+          initialReviewed={classificationDialog.initialReviewed}
+          onClose={() => setClassificationDialog(null)}
+          onReviewed={() => {
+            setClassificationDialog(null)
+            void refetch()
+          }}
+        />
+      ) : null}
+    </Stack>
+  )
+}
+
+export default ContractorAdminWorkbenchView

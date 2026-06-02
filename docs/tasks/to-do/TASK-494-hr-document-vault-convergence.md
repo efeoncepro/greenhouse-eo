@@ -49,6 +49,8 @@ Skill `arch-architect` (Greenhouse overlay) revisó la spec aplicando patrones c
 
 ## Summary
 
+> **EPIC-017 alignment 2026-05-31:** esta es la lane principal para que documentos laborales aparezcan en `/my/documents`, `/hr/documents` y People/Person 360 sin duplicar storage, registry o signature workflows. `TASK-964` define el contrato de consumo desde Person Workforce.
+
 Rebaselinar el HR Document Vault sobre la plataforma documental común para que `/my/documents`, `/hr/documents` y People 360 usen el mismo registry, access model y asset pipeline del epic, sin reabrir una solución paralela solo para HR.
 
 ## Why This Task Exists

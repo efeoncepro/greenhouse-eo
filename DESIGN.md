@@ -386,3 +386,47 @@ Bad changes for `DESIGN.md`:
 - Don't hardcode raw spacing or radius values when an existing token already covers the case.
 - Don't turn every emphasis moment into a primary-colored element.
 - Don't make admin-template chrome louder than the data.
+
+## Brand assets — Efeonce (institutional)
+
+**Arquitectura de marca: Efeonce (paraguas) vs Greenhouse (plataforma).** EFEONCE es la marca paraguas/institucional; Greenhouse es la plataforma/app de Efeonce. Los dos logos **coexisten** — la elección depende del contexto, NO son intercambiables:
+
+- **Logo Greenhouse** → todo lo de la **app**: navegación, dashboards, surfaces in-app, mockups del portal.
+- **Logo + eslogan Efeonce** → todo lo **institucional/externo**: recibos/comprobantes, reportes (p. ej. nómina de contractors), finiquitos, contratos, emails transaccionales, PDFs institucionales. Un documento institucional lleva marca Efeonce, no Greenhouse.
+
+Single source of truth: `src/config/efeonce-brand.ts`. Never hardcode the URL / address / slogan elsewhere — import from there.
+
+- **URL**: `efeoncepro.com` (`EFEONCE_URL`). Already used in the payroll PDF footer + transactional emails.
+- **Legal address (fallback)**: `Dr. Manuel Barros Borgoño 71 Of 1105, Providencia, RM — Chile` (`EFEONCE_LEGAL_ADDRESS_FALLBACK`). Prefer the runtime operating entity's `legalAddress` (`getOperatingEntityIdentity()`); the constant is the canonical fallback when no DB context exists.
+- **Legal entity (fallback)**: `Efeonce Group SpA` (`EFEONCE_LEGAL_NAME_FALLBACK`).
+
+### Slogan — "Empower your Growth"
+
+A **brand-zone** element (header / masthead / brand strip), **never** the legal footer.
+
+**Independiente del logo**: el eslogan y el logo son elementos de marca separados — se renderizan solos o compuestos, pero **nunca se fusionan en un único asset/imagen**. Usa los componentes canónicos por separado y compón el lockup en el layout.
+
+**Lockup (logo + eslogan juntos)** — relación, NO tamaños fijos:
+
+- El eslogan es **subordinado** al logo: se ve **claramente más pequeño** y **no compite** con él (su ancho no debe igualar ni superar el ancho del wordmark del logo).
+- Va **centrado** respecto al logo (logo arriba, eslogan centrado debajo), con separación **mínima** (lockup compacto, sin gap grande).
+- El **tamaño absoluto del eslogan es contextual** — depende del tamaño del logo en esa superficie; elige un `fontSize` que lo mantenga visiblemente menor que el logo. No hay un pt fijo (p. ej. el reporte de contractors usa ~7.5pt contra un logo de ~116pt de ancho: es un ejemplo de la **proporción**, no una regla de tamaño).
+
+**Color canónico**: gris **`#848484`** (= token `text-disabled`). Es el default de ambos componentes; un override solo aplica sobre fondo oscuro. Single source of truth: `EFEONCE_SLOGAN_COLOR` en `src/config/efeonce-brand.ts`.
+
+Typography contract (Poppins):
+
+| Word | Family | Weight | Style |
+|---|---|---|---|
+| Empower | Poppins ExtraBold Italic | 800 | italic |
+| your | Poppins ExtraBold | 800 | — |
+| Growth | Poppins Black Italic | 900 | italic |
+
+Font assets: `src/assets/fonts/Poppins-{ExtraBold,ExtraBoldItalic,Black,BlackItalic}.ttf` (Google Fonts Poppins v24 Latin subset, SIL OFL 1.1), registered for PDF in `src/lib/finance/pdf/register-fonts.ts`. Render via the canonical components — **never** re-implement the slogan inline:
+
+- Web: `src/components/greenhouse/brand/EfeonceSlogan.tsx`
+- PDF: `src/lib/finance/pdf/efeonce-slogan-pdf.tsx`
+
+### Reusable PDF footer
+
+`src/lib/finance/pdf/efeonce-pdf-footer.tsx` (`EfeoncePdfFooter`) is the canonical institutional footer for **all** Efeonce PDFs: legal entity (legalName · RUT) + legal address (line 1), `efeoncepro.com` + optional generated/page (line 2). The footer carries **legal/contact identity only** — the marketing slogan goes in the brand zone, not here. New PDFs reuse this footer instead of rolling their own.

@@ -360,7 +360,9 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/api/my/legal-profile/**',
       'src/app/api/hr/people/**/legal-profile/**',
       'src/app/api/hr/workforce/**',
-      'src/app/api/admin/team/members/**/role-title/**'
+      'src/app/api/admin/team/members/**/role-title/**',
+      'src/lib/contractor-engagements/**',
+      'src/app/api/hr/contractors/**'
     ],
     expectedSignalKinds: ['incident', 'drift', 'data_quality'],
     incidentDomainTag: 'identity'

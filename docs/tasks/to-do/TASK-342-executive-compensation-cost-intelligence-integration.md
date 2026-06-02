@@ -11,10 +11,10 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Blocked/reframe after CompensationProfile + bridge checkpoint`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-340`
+- Blocked by: `TASK-338 reframe`, `TASK-340 frozen`, `TASK-962`
 - Branch: `task/TASK-342-executive-compensation-cost-intelligence-integration`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -23,9 +23,11 @@
 
 Integrar la compensación ejecutiva formalizada al backbone de `Costs` y `Cost Intelligence`, para que el costo empresa pueda imputarse correctamente sin depender únicamente de `payroll_entries` legacy ni mezclar CCA con costo laboral.
 
+> **Reframe 2026-05-31:** esta task no debe ejecutarse sobre `CompensationArrangement` como contrato canónico viejo. Debe esperar a `TASK-338` reescrita como `CompensationProfile` y a la decisión de si `TASK-340` será bridge write-path o solo correlation/projection.
+
 ## Why This Task Exists
 
-Hoy la mayor parte del costo laboral viaja por `Payroll -> payroll_entries -> payroll expenses / cost attribution`, pero si Greenhouse pasa a modelar `CompensationArrangement` como contrato previo, también necesita una regla explícita para que el costo empresa:
+Hoy la mayor parte del costo laboral viaja por `Payroll -> payroll_entries -> payroll expenses / cost attribution`, pero si Greenhouse pasa a modelar `CompensationProfile` como read model/foundation previo, también necesita una regla explícita para que el costo empresa:
 
 - siga siendo consistente
 - no dependa de heurísticas por fuera del contrato canónico
@@ -102,7 +104,7 @@ Reglas obligatorias:
 
 ### Gap
 
-- no existe contrato explícito para que `CompensationArrangement` alimente costos antes o junto a su materialización payroll
+- no existe contrato explícito para que `CompensationProfile` alimente costos antes o junto a su materialización payroll
 - no está formalizada la exclusión semántica de movimientos CCA del costo laboral
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -113,7 +115,7 @@ Reglas obligatorias:
 
 ### Slice 1 — Cost semantics
 
-- Definir cómo `CompensationArrangement` impacta costo empresa
+- Definir cómo `CompensationProfile` impacta costo empresa
 - Definir qué parte del costo sigue viniendo exclusivamente de payroll formal
 - Dejar explícito qué movimientos CCA jamás entran como costo laboral
 

@@ -1,4 +1,4 @@
-# TASK-788 — Workforce Role Title Effective-Dating + Compensation-Coupled Promotions
+# TASK-788 — WorkAssignment Effective-Dating (split from promotion write command)
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -13,35 +13,40 @@
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
-- Epic: `EPIC-010`
-- Status real: `Diseno`
+- Epic: `EPIC-017`
+- Status real: `Split/reframe requerido — no ejecutar compensation-coupled promotion as-is`
 - Rank: `TBD`
-- Domain: `hr`
-- Blocked by: `none`
+- Domain: `cross-domain` (`people|hr|payroll|data`)
+- Blocked by: `TASK-961`, `TASK-962`, `TASK-338 reframe for compensation-coupled writes`
 - Branch: `task/TASK-788-workforce-role-title-effective-dating-promotion-flow`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Extender el contrato canonico de `members.role_title` (TASK-785) para soportar 3 flujos operativos que hoy NO estan cubiertos: (1) cambio con `effective_at` futuro (programar ascenso), (2) historial efectivo versionado (lookup "que cargo tenia este miembro el 2026-03-01"), (3) ascenso atomico cargo + compensation (un solo gesto, una sola fecha efectiva, una sola razon HR, audit unificado).
+**Reframe 2026-05-31:** split obligatorio. La parte útil inmediata es `WorkAssignment` effective-dating/read model: cargo, rol, manager/departamento/assignment y vigencia consultable por fecha. La parte "ascenso atómico cargo + compensation" queda fuera de la primera entrega y debe esperar `CompensationProfile` (`TASK-338` reescrita) + coverage/readiness (`TASK-962`) + checkpoint de write path.
+
+No ejecutar esta task as-is con promoción + compensation acopladas.
 
 ## Why This Task Exists
 
-TASK-785 cerro la base canonica del cargo: source of truth, audit append-only, drift queue vs Entra, resolver per-context, capabilities. Pero la mutation actual (`updateMemberRoleTitle`) escribe al instante. En la operativa real de HR esto produce 3 limitaciones concretas:
+TASK-785 cerro la base canonica del cargo: source of truth, audit append-only, drift queue vs Entra, resolver per-context, capabilities. Pero la mutation actual (`updateMemberRoleTitle`) escribe al instante.
+
+EPIC-017 reubica este problema dentro de `WorkAssignment`: Person 360 necesita responder "qué rol/assignment tenía esta persona en una fecha" sin depender de payroll ni de un escalar mutable. En la operativa real de HR esto produce 3 limitaciones concretas:
 
 1. **Programar ascensos:** HR aprueba el ascenso a "Design Lead" en el ciclo Q2-2026 con efectividad 1 de mayo. Hoy hay que esperar al dia exacto y editarlo manualmente, o editar antes y aceptar que durante 2 semanas el cargo en runtime ya no refleja la realidad contractual. El campo `effectiveAt` ya existe en el contrato del endpoint pero queda como timestamp de registro — no programa nada.
 2. **Historial efectivo:** Para finiquitos, contratos historicos, auditoria SII, reportes anuales y litigios laborales, HR necesita responder "que cargo tenia X persona el 1 de enero de 2026". Hoy el audit log linealiza los cambios pero no expone una query natural por fecha; cada consumer reinventaria el lookup.
-3. **Ascenso atomico cargo + compensation:** Hoy cambiar de "Senior Designer" a "Design Lead" y subir la banda salarial son dos endpoints distintos, sin atomicidad ni razon unificada. Riesgo real: cambio de cargo con salario viejo, o cambio de salario con cargo viejo, o razones desalineadas en cada audit log.
+3. **Ascenso atomico cargo + compensation:** sigue siendo un caso real, pero queda fuera de la primera entrega porque cambia dinero y debe depender de `CompensationProfile`.
 
-La raiz: `members.role_title` es estado escalar; el dominio HR opera sobre versiones temporales con vigencia (interval-based) y a menudo acopla cargo + comp + nivel + departamento como un solo evento "promotion". Sin esto, payroll/finiquito/staffing leen el cargo del momento del render, no el contractual de la fecha relevante.
+La raiz: `members.role_title` es estado escalar; el dominio HR opera sobre versiones temporales con vigencia (interval-based). Sin esto, payroll/finiquito/staffing leen el cargo del momento del render, no el contractual de la fecha relevante.
 
 ## Goal
 
-- Modelo de versiones temporales (`member_role_title_versions`) con `effective_from` / `effective_to` no-overlapping; mutations programan futuro o registran pasado correctivo.
-- Resolver canonico extendido con parametro `at?: Date` que retorna el cargo vigente al momento solicitado (default: hoy). Single source of truth para "cargo a fecha X en surface Y" sin que cada consumer reinvente lookup.
-- Helper canonico `promoteMember(...)` atomic: cargo + (opcional) `compensation_version` + (opcional) `job_level` + razon unica + audit unificado + outbox `member.promotion.executed` v1.
-- UI: en `MemberRoleTitleSection` agregar selector de "Efectivo desde" (date picker) y, cuando capability `compensation.update` esta presente, checkbox "Acoplar cambio salarial" que abre el form de comp en el mismo dialogo. Banner inline mostrando cambios programados a futuro.
+- Modelo de versiones temporales para `WorkAssignment`/role title con `effective_from` / `effective_to` no-overlapping; mutations programan futuro o registran pasado correctivo.
+- Resolver canonico extendido con parametro `at?: Date` que retorna cargo/assignment vigente al momento solicitado (default: hoy).
+- Person 360 puede consumir assignment history sin inferir desde payroll.
+- Diferir cualquier comando atómico cargo + compensation a task posterior.
+- UI V1 solo muestra/edita effective-dating de cargo/assignment si el plan lo aprueba; no acopla compensation en esta task.
 - Reliability signals: `workforce.role_title.scheduled_change_overdue` (programado pero no aplicado, indicio de cron caido) y `workforce.role_title.version_overlap` (steady = 0, defensivo contra bugs de mutacion).
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -56,53 +61,59 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` — frontera con compensation_versions y como Payroll lee el cargo al periodo.
-- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` — agregar `member.promotion.executed` v1 + delta.
+- `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md`
+- `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` — solo si una task posterior implementa promotion write path.
 
 Reglas obligatorias:
 
 - **NUNCA** branchear el resolver por contexto sin parametro `at`. El parametro es default-hoy pero siempre disponible. Single signature.
+- **NUNCA** acoplar compensation writes en la primera entrega. Promotion + compensation atomic queda para task posterior.
+- **NUNCA** tratar `member.role_title` como suficiente para `WorkAssignment` historico.
 - **NUNCA** desincronizar el state escalar `members.role_title` (TASK-785) y la nueva tabla `member_role_title_versions`. El escalar refleja la version cuya `effective_from <= NOW() AND (effective_to IS NULL OR effective_to > NOW())`. Trigger PG mantiene consistencia.
 - **NUNCA** permitir version overlap: constraint `EXCLUDE USING gist (member_id WITH =, daterange(effective_from, effective_to, '[)') WITH &&)`.
 - **NUNCA** mutar versions historicas (effective_to no-NULL en el pasado). Para correcciones se inserta una nueva version con `correction_of=<old_version_id>` + razon + audit.
-- **NUNCA** crear un endpoint `promote` que escriba cargo y comp en transacciones separadas. Atomic tx unica o rollback completo.
+- **NUNCA** crear un endpoint `promote` en esta entrega. Cuando exista, debe ser atomic tx unica o rollback completo.
 - Cron diario `apply-scheduled-role-title-changes` corre 00:05 America/Santiago. Idempotente. Falla aislada per-version (un version roto NO bloquea el resto del batch).
 
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-785-workforce-role-title-source-of-truth-governance.md` — base canonica que esta task extiende.
 - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` (seccion compensation_versions) — frontera con comp.
+- `docs/tasks/to-do/TASK-961-person-360-workforce-facet-read-only-promotion.md`
+- `docs/tasks/to-do/TASK-962-workforce-coverage-readiness-remediation-plan.md`
+- `docs/tasks/to-do/TASK-338-compensation-arrangement-canonical-runtime-foundation.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
 - `TASK-785` ✅ (base canonica de role_title source + audit + drift) — cerrada.
+- `TASK-961` (Person 360 workforce facet placement/redaction).
+- `TASK-962` (coverage/readiness classification).
 - `greenhouse_core.members` columnas `role_title`, `role_title_source`, `last_human_update_at` (TASK-785).
-- `greenhouse_hr.compensation_versions` (modelo existente de bandas/salarios temporales) — referencia, no se modifica su shape.
-- `greenhouse_sync.outbox_events` + reactive consumer (TASK-773) — para event `member.promotion.executed`.
+- `greenhouse_hr.compensation_versions` / `greenhouse_payroll.compensation_versions` (modelo existente de salarios temporales) — referencia, no se modifica su shape in V1.
+- `greenhouse_sync.outbox_events` + reactive consumer (TASK-773) — referencia para una task posterior de promotion write path; no se usa en V1.
 - Cloud Scheduler `ops-worker` (TASK-775) — para cron diario apply-scheduled.
 
 ### Blocks / Impacts
 
-- `payroll_document` resolver context: pasara a aceptar `at` para resolver cargo a fecha del periodo, no a fecha del render.
+- `payroll_document` resolver context: future consumer may accept `at` para resolver cargo a fecha del periodo, no a fecha del render.
 - `finiquito` document generation: cargo en el PDF debera ser el vigente a `last_working_day`, no el actual.
 - `commercial_cost` y `staffing` consumers: leeran `at=NOW()` por default — sin cambio operativo.
 - TASK-786 (Person Contact & Professional Presence) y TASK-787 (Country Reconciliation) NO se acoplan; son dimensiones independientes.
 
 ### Files owned
 
-- `migrations/<timestamp>_task-788-role-title-versions-and-promotion.sql`
+- `migrations/<timestamp>_task-788-role-title-versions.sql`
 - `src/lib/workforce/role-title/versions-store.ts`
-- `src/lib/workforce/role-title/promote.ts`
 - `src/lib/workforce/role-title/resolver.ts` (extender, no romper firma actual)
 - `src/lib/workforce/role-title/scheduled-applier.ts`
-- `src/app/api/admin/team/members/[memberId]/promote/route.ts`
 - `src/app/api/hr/workforce/members/[memberId]/role-title/route.ts` (extender response con `versions[]` + `scheduledChange`)
 - `src/views/greenhouse/people/tabs/MemberRoleTitleSection.tsx` (extender UI)
 - `services/ops-worker/server.ts` + `services/ops-worker/deploy.sh` (registrar cron + handler)
 - `src/lib/reliability/queries/role-title-scheduled-overdue.ts`
 - `src/lib/reliability/queries/role-title-version-overlap.ts`
-- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` (delta nuevo evento)
 - `CLAUDE.md` (extender seccion TASK-785 con effective-dating contract)
 
 ## Current Repo State
@@ -111,7 +122,7 @@ Reglas obligatorias:
 
 - `members.role_title` + `role_title_source` + `last_human_update_at` (TASK-785, columnas escalares).
 - `member_role_title_audit_log` (append-only, TASK-785) — sigue siendo el audit canonico; las versions temporales NO lo reemplazan, ambos coexisten (versions = estado vigente; audit = quien hizo que cuando con razon).
-- `member_role_title_drift_proposals` (TASK-785) — drift queue Entra. Sigue activo; promociones programadas no afectan a Entra sync hasta que se apliquen.
+- `member_role_title_drift_proposals` (TASK-785) — drift queue Entra. Sigue activo; cambios programados no afectan a Entra sync hasta que se apliquen.
 - `updateMemberRoleTitle()` helper (TASK-785) — escribe escalar al instante. Pasara a delegar en el helper de versions internamente para mantener API publica estable.
 - `compensation_versions` (HR Payroll) — modelo temporal existente del lado de comp.
 
@@ -119,7 +130,7 @@ Reglas obligatorias:
 
 - No hay tabla de versiones temporales para `role_title`. Cualquier query "cargo a fecha X" recompone desde audit log o asume que el escalar es la verdad — falla para finiquito de gente cuyo cargo cambio entre fecha de termino y fecha de render del documento.
 - No hay forma de programar un ascenso a futuro. HR debe esperar al dia exacto.
-- No hay endpoint `promote` atomic que combine cargo + comp + (opcional) departamento + (opcional) nivel.
+- No hay endpoint `promote` atomic que combine cargo + comp + (opcional) departamento + (opcional) nivel. Ese endpoint queda explicitamente diferido.
 - El resolver firma `resolveRoleTitle({memberId, context})` no acepta `at`. Cualquier surface que necesite "cargo al periodo X" reinventaria la query contra audit log o leeria mal del escalar.
 - No hay cron que aplique versions con `effective_from` en el pasado proximo (caso: HR programo el ascenso para el 1, ya es el 2 y no se aplico). Sin signal, ningun observador lo detecta.
 
@@ -128,6 +139,13 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
+
+### Slice 0 — Split gate
+
+- Confirmar si V1 versiona solo `role_title` o un `WorkAssignment` más amplio.
+- Confirmar qué consume `TASK-961` para Person 360.
+- Extraer promotion + compensation-coupled write path a follow-up si sigue siendo necesario.
+- Documentar qué partes del scope original quedan fuera.
 
 ### Slice 1 — Schema versions + EXCLUDE constraint
 
@@ -148,19 +166,14 @@ Reglas obligatorias:
 - Extender `updateMemberRoleTitle()` (TASK-785) para que internamente delegue en `insertRoleTitleVersion` con `effective_from = NOW()` + cierre del vigente. API publica estable.
 - Tests: 12 tests cubriendo overlap rejection, scheduled future, correction historica, resolver `at` past/present/future, backfill idempotente.
 
-### Slice 3 — Promote atomic helper + endpoint
+### Slice 3 — Deferred write-path extraction
 
-- `src/lib/workforce/role-title/promote.ts`:
-  - `promoteMember({memberId, newRoleTitle, effectiveFrom, reason, actorUserId, compensationChange?, jobLevelChange?, departmentChange?})` — atomic tx:
-    1. Validar capabilities (`workforce.role_title.update` + cuando viene comp `compensation.update`).
-    2. INSERT version cargo (cierra vigente si effective_from <= NOW).
-    3. Si `compensationChange` viene: INSERT new compensation_version mismo `effective_from`.
-    4. Si `jobLevelChange` viene: INSERT version equivalente en `members.job_level` (revisar si requiere su propia tabla — probable followup).
-    5. Audit unificado en `member_role_title_audit_log` con action='promoted' + metadata referenciando comp_version_id si aplica.
-    6. Outbox event `member.promotion.executed` v1 con payload `{memberId, oldRoleTitle, newRoleTitle, effectiveFrom, compensationChanged: bool, reason}`.
-  - Rollback completo si cualquier paso falla.
-- Endpoint `POST /api/admin/team/members/[memberId]/promote` capability-gated `workforce.role_title.update:update` + `compensation.update:update` (cuando viene comp). Body: `{newRoleTitle, effectiveFrom: ISO, reason, compensation?: {newBaseSalary, currency}, jobLevel?, departmentId?}`.
-- Catalog event delta en `EVENT_CATALOG_V1.md`.
+This slice is a documentation-only extraction step for the first executable reframe.
+
+- Remove promotion/compensation-coupled assumptions from the execution plan.
+- Record the future task requirement: a later write command may coordinate role/assignment + compensation only after `CompensationProfile` is settled.
+- Do not add `promoteMember`, `/promote`, compensation mutation, job-level mutation, or `member.promotion.executed` in V1.
+- If a later task reintroduces this path, it must own its own ADR/checkpoint, event catalog delta, authorization model and payroll/finance non-regression gates.
 
 ### Slice 4 — Cron scheduled-applier
 
@@ -177,20 +190,21 @@ Reglas obligatorias:
   - Selector "Efectivo desde" (date picker) en el dialogo Editar — default hoy. Si fecha futura, copy "Programado para [fecha]".
   - Banner inline cuando hay `scheduledChange`: "Cambio programado: [cargo] efectivo [fecha]. [Cancelar]" (cancel = INSERT version correctora cerrando la programada antes de aplicarse).
   - Tab/section "Historial" mostrando timeline de versions (cargo, source, fecha, autor, razon, comp acoplada si la hubo).
-  - Cuando capability `compensation.update` presente: checkbox "Acoplar cambio salarial" en el dialogo Editar — abre sub-form con `newBaseSalary` + `currency`. Submit usa `/promote` en vez de `/role-title`.
+  - Compensation-coupled UI is deferred. Do not add checkbox "Acoplar cambio salarial" in V1.
 
 ### Slice 6 — Reliability signals + docs
 
 - `src/lib/reliability/queries/role-title-scheduled-overdue.ts`: cuenta versions con `effective_from < NOW() AND members.role_title != version.role_title` (drift escalar↔version). Steady=0; severity=error >0.
 - `src/lib/reliability/queries/role-title-version-overlap.ts`: cuenta overlaps detectados (deberia ser 0 por EXCLUDE constraint, pero defensivo). Steady=0; severity=error.
 - Wire en `get-reliability-overview.ts`. Roll up modulo `identity`.
-- CLAUDE.md: extender seccion TASK-785 con subseccion "Effective-dating + promotion (TASK-788)".
-- Doc funcional `docs/documentation/identity/cargo-laboral-promociones.md` — manual operador HR.
-- Manual de uso `docs/manual-de-uso/identity/programar-ascenso-y-cambio-de-cargo.md` — paso a paso.
+- CLAUDE.md: extender seccion TASK-785 con subseccion "Effective-dating (TASK-788)".
+- Doc funcional `docs/documentation/identity/cargo-laboral-effective-dating.md` — contrato operador HR.
+- Manual de uso `docs/manual-de-uso/identity/programar-cambio-de-cargo.md` — paso a paso.
 
 ## Out of Scope
 
 - **Workflow de aprobacion multi-step** (ej. supervisor pide → comite aprueba → HR ejecuta). Esta task solo cubre la mecanica del cambio una vez aprobado fuera del sistema (offline). Workflow de aprobacion seria una task derivada en EPIC-010.
+- **Ascenso atomico cargo + compensation** en V1. Ese write path se extrae a follow-up después de `CompensationProfile`.
 - **Bandas salariales canonicas** (catalogo de bandas con minimo/maximo/midpoint por cargo+nivel). Compensation aqui se mueve como `compensation_version` libre; bandas serian otra task.
 - **Job level history versionado** independiente. Si emerge necesidad clara de versionar `job_level` con vigencia separada del cargo, se hace en task derivada.
 - **Notificaciones automaticas al colaborador** ("tu cargo cambio efectivo X"). Email/Teams notification sale como followup.
@@ -233,28 +247,8 @@ export interface ResolveOptions {
   at?: Date  // default: now()
 }
 
-// promote helper signature (Slice 3)
-export interface PromoteMemberInput {
-  memberId: string
-  newRoleTitle: string | null
-  effectiveFrom: Date
-  reason: string  // >= 10 chars
-  actorUserId: string
-  actorEmail?: string | null
-  compensationChange?: {
-    newBaseSalary: number
-    currency: string
-  }
-  jobLevelChange?: string
-  departmentChange?: string
-}
-
-export interface PromoteMemberResult {
-  versionId: string
-  compensationVersionId: string | null
-  auditId: string
-  eventId: string
-}
+// Promotion/write-command types intentionally omitted in V1.
+// A future task must define them after CompensationProfile is settled.
 ```
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -267,9 +261,9 @@ export interface PromoteMemberResult {
 - [ ] Al llegar la fecha (cron diario o trigger), el escalar se actualiza al nuevo valor; resolver con `at=ayer` retorna el cargo viejo, con `at=hoy` el nuevo.
 - [ ] Resolver con `at=<fecha del finiquito>` retorna el cargo vigente a esa fecha — no el actual.
 - [ ] EXCLUDE constraint rechaza dos versions overlapping para el mismo miembro.
-- [ ] Endpoint `/promote` ejecuta cargo + comp en una sola tx; rollback si comp falla deja cargo intacto.
+- [ ] No se implementa endpoint `/promote` ni compensation-coupled write path en V1.
 - [ ] UI muestra banner "Cambio programado para [fecha]" cuando existe scheduled.
-- [ ] Outbox event `member.promotion.executed` v1 publicado con payload completo.
+- [ ] Cualquier outbox/event catalog work de promotion queda diferido a follow-up.
 - [ ] Reliability signals `scheduled_overdue` y `version_overlap` steady = 0 en runtime.
 - [ ] `updateMemberRoleTitle` (TASK-785 API) sigue funcionando sin cambios para callers existentes.
 - [ ] Drift queue Entra (TASK-785) sigue funcionando sin regresiones.
@@ -281,7 +275,7 @@ export interface PromoteMemberResult {
 - `pnpm test src/lib/workforce/role-title src/lib/reliability/queries`
 - `pnpm migrate:up` aplicado en local y staging.
 - Manual: programar cambio futuro en /people/[id], avanzar fecha del sistema, verificar que el cron lo aplica y resolver `at=` retorna correctamente.
-- Manual: ejecutar `/promote` con comp + cargo, verificar audit log unificado y outbox event publicado.
+- No ejecutar prueba manual de `/promote` en V1; ese endpoint queda fuera de scope.
 
 ## Closing Protocol
 
@@ -292,19 +286,20 @@ export interface PromoteMemberResult {
 - [ ] `changelog.md` actualizado
 - [ ] Chequeo de impacto cruzado (TASK-783 finiquito puede consumir resolver `at`; TASK-785 sigue siendo base canonica)
 - [ ] CLAUDE.md seccion TASK-785 extendida con effective-dating contract
-- [ ] `EVENT_CATALOG_V1.md` actualizado con `member.promotion.executed` v1
+- [ ] Documentar explicitamente que `member.promotion.executed` queda diferido y que no hay promotion write path en V1.
 - [ ] Doc funcional + manual de uso publicados
 - [ ] Cloud Scheduler job `ops-workforce-apply-scheduled-role-title` desplegado y verificado
 
 ## Follow-ups
 
-- Workflow de aprobacion multi-step (supervisor → comite → HR) sobre el helper `promoteMember`. Probable EPIC-010 task derivada.
-- Notificaciones Teams al colaborador cuando se ejecuta su promotion (TASK-786 contact governance puede ser dependencia).
+- Compensation-coupled role/assignment write command after `CompensationProfile` is settled.
+- Workflow de aprobacion multi-step (supervisor → comite → HR) sobre ese futuro write command. Probable EPIC-010/017 task derivada.
+- Notificaciones Teams al colaborador cuando se ejecuta un cambio de cargo/assignment (TASK-786 contact governance puede ser dependencia).
 - Bandas salariales canonicas con minimo/maximo/midpoint per cargo+nivel.
 - Job level history versionado independiente si emerge necesidad operativa.
 - Reportes anuales SII / cierre Q consumiendo el resolver `at` para "que cargo tenia X persona el periodo Y".
 
 ## Open Questions
 
-- Frontera exacta con `compensation_versions`: ¿el helper `promoteMember` debe SIEMPRE crear comp_version aunque el salario no cambie (solo cargo)? Decision pragmatica: solo si `compensationChange` viene explicito en el input. Cargo y comp son dimensiones independientes salvo cuando el operador las acopla intencionalmente.
+- Frontera exacta con `compensation_versions`: diferida hasta el reframe de `TASK-338`/`CompensationProfile`. Cargo y comp son dimensiones independientes salvo cuando un futuro write command las acople intencionalmente.
 - ¿Es necesario soportar `effective_from < hire_date` (correccion historica de un cargo registrado mal antes del onboarding)? Probable que si para audit limpio. EXCLUDE constraint lo permite si no overlapa con otras versions.

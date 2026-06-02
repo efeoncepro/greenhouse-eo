@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { generatePayrollReceiptPdf, RECEIPT_TEMPLATE_VERSION } from '@/lib/payroll/generate-payroll-pdf'
+import { generatePayrollReceiptPdf, getReceiptTemplateVersion } from '@/lib/payroll/generate-payroll-pdf'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { getPayrollReceiptByEntryId, updateReceiptAfterRegeneration } from '@/lib/payroll/payroll-receipts-store'
 import { buildPayrollReceiptDownloadFilename } from '@/lib/payroll/receipt-filename'
@@ -28,7 +28,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ entryId: s
     }
 
     let buffer: Buffer
-    const isStaleTemplate = storedReceipt?.templateVersion !== RECEIPT_TEMPLATE_VERSION
+    const templateVersion = getReceiptTemplateVersion()
+    const isStaleTemplate = storedReceipt?.templateVersion !== templateVersion
 
     if (storedReceipt?.storagePath && !isStaleTemplate) {
       // Fast path — cached PDF with current template version
@@ -83,7 +84,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ entryId: s
             storagePath: `gs://${bucketName}/${storagePath}`,
             storageBucket: bucketName,
             fileSizeBytes: buffer.length,
-            templateVersion: RECEIPT_TEMPLATE_VERSION
+            templateVersion
           })
         } catch {
           // Non-fatal — PDF was regenerated and will be served, cache update failed silently

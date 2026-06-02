@@ -5,9 +5,44 @@
 > Versión: `1.9`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-05-28` por TASK-941 (Nexa Insights freshness signal)
+> Última actualización: `2026-06-01` por TASK-797 (contractor closed-with-open-payables signal)
 
 ---
+
+## Delta 2026-06-01 — TASK-797: signal `hr.contractor_engagement.closed_with_open_payables`
+
+Nuevo signal canonical bajo `moduleKey='identity'` (rollup `Identity & Access`, kind `data_quality`). Defense-in-depth del cierre contractor (TASK-797): cuenta engagements en estado terminal (`ended`/`cancelled`) que TODAVÍA tienen ≥1 payable NO terminal (`status NOT IN ('paid','cancelled')`). Steady state esperado = 0. Severity: 0 → ok, >0 → warning, query falla → unknown. Aparece > 0 cuando un cierre se ejecutó reconociendo (acknowledge) payables abiertos que aún deben liquidarse fuera del flujo, o ante un bypass del flujo de cierre. NUNCA es finiquito — solo integridad de payables del cierre.
+
+- Reader: [`src/lib/reliability/queries/contractor-engagement-closed-with-open-payables.ts`](../../src/lib/reliability/queries/contractor-engagement-closed-with-open-payables.ts). Wire-up en [`get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts). Mirror de `hr.contractor_engagement.classification_risk_open` (TASK-790).
+
+## Delta 2026-06-01 — TASK-981: signal `finance.contractor_remittance_email.dead_letter`
+
+Nuevo signal canonical bajo `moduleKey='finance'` (kind `dead_letter`). Mide los pagos a contractor cuyo **comprobante (TASK-960) no se pudo entregar por email** tras agotar reintentos: cuenta filas `outbox_reactive_log` con `handler='contractor_payable_paid_email:workforce.contractor_payable.paid'`, `result='dead-letter'`, sin acknowledge ni recovery.
+
+- **Remediación canónica**: revisar el motivo (Resend caído, fallo de render, destinatario persistentemente inválido) y reintentar; el contratista igual puede descargar el comprobante en el portal mientras tanto.
+- **Severidad**: count=0 → `ok`; count>0 → `error`; query falla → `unknown`. Steady state = 0.
+- **No alerta** por skips honestos: si el payable no está `paid` o el contratista no tiene email, el consumer **skipea** (no throw) → nunca llega a dead-letter.
+- Reader: [`src/lib/reliability/queries/contractor-remittance-email-dead-letter.ts`](../../src/lib/reliability/queries/contractor-remittance-email-dead-letter.ts). Wire-up en [`get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) (source `contractorRemittanceEmailDeadLetter`). Sibling de `finance.contractor_payable.bridge_dead_letter` (TASK-793).
+
+## Delta 2026-05-31 — TASK-979: signal `finance.contractor_payable.unbatched_overdue`
+
+Nuevo signal canonical bajo `moduleKey='finance'` (kind `drift`). Mide la **brecha de cobertura específica de la corrida mensual**: obligations `provider_payroll` (source_kind `contractor_payable`) aún batcheables (`generated`/`partially_paid`), NO incluidas en ninguna payment order viva (`LEFT JOIN payment_order_lines` line NULL), con `due_date` ya vencido.
+
+- **Remediación canónica**: disparar la corrida mensual (`POST /api/finance/contractor-payables/monthly-run`). Es el failure mode "la corrida no corrió / no cubrió", distinto de `payment_sla_overdue` (TASK-978, más amplio → aprobar/pagar) y de `ready_without_obligation` (TASK-793, tramo anterior → bridge). Tres signals, tres remediaciones.
+- **Severidad**: count=0 → `ok`; count>0 & máx atraso ≤10 días → `warning`; máx atraso >10 días → `error`; query falla → `unknown`. Steady state = 0.
+- Date arithmetic `CURRENT_DATE - o.due_date` = integer (gate TASK-893). Reader: [`src/lib/reliability/queries/contractor-payable-unbatched-overdue.ts`](../../src/lib/reliability/queries/contractor-payable-unbatched-overdue.ts). Wire-up en [`get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) (source `contractorPayableUnbatchedOverdue`). Live PG smoke: steady=0.
+
+## Delta 2026-05-31 — TASK-978: signal `finance.contractor_payable.payment_sla_overdue`
+
+Nuevo signal canonical bajo `moduleKey='finance'` (kind `lag`). Hace observable el **compromiso de Efeonce de pagar a contractors dentro de los 5 días hábiles posteriores al cierre de mes** (TASK-978 deriva `contractor_payables.due_date = cierre del mes operativo + 5 días hábiles` vía el helper canónico `addBusinessDays` del calendario operativo).
+
+- **Qué mide**: payables **comprometidos a Finanzas** (`status IN ('ready_for_finance','obligation_created','payment_order_created')`), aún NO `paid`/`cancelled`, con `due_date < CURRENT_DATE`.
+- **Severidad**: count=0 → `ok` · count>0 & máx atraso ≤10 días → `warning` · máx atraso >10 días → `error` · query falla → `unknown` (degradación honesta). Steady state = 0.
+- **Es observabilidad, no gate**: NUNCA bloquea la creación ni el pago del payable. Los payables bloqueados/pendientes los cubren las señales de readiness/blocker (TASK-793/977), no esta.
+- **Distinción crítica**: mide el **pago NETO al contractor**. La **remesa de la retención SII** (honorarios CL) es una obligación DISTINTA con su propio deadline **F29 (día 12/20 del mes siguiente)** y otro beneficiario (el SII) — fuera de scope (invariante TASK-977).
+- **Aritmética de fechas**: `CURRENT_DATE - due_date` = integer (ambos DATE), NUNCA `EXTRACT(EPOCH FROM (date - date))` (gate TASK-893). Validado con live PG smoke (severity=ok, count=0).
+
+Reader: [`src/lib/reliability/queries/contractor-payable-payment-sla-overdue.ts`](../../src/lib/reliability/queries/contractor-payable-payment-sla-overdue.ts). Wire-up en [`get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) (source `contractorPayablePaymentSlaOverdue`). Sibling del signal `finance.contractor_payable.expense_unmaterialized` (TASK-977).
 
 ## Delta 2026-05-28 — TASK-941: signal `nexa.insights.stale_with_eligible_signals`
 

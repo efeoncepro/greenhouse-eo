@@ -89,6 +89,22 @@ describe('TASK-768 resolveExpenseEconomicCategory', () => {
     expect(result.matchedRule).toBe('IDENTITY_MATCH_BY_MEMBER_ID')
   })
 
+  it('Rule 0 (TASK-977): sourceKind=contractor_payable → labor_cost_external aunque sea member interno', async () => {
+    // Rule 0 must short-circuit BEFORE Rule 1: a contractor that is also an active
+    // internal member (e.g. an employee who transitioned to contractor) must resolve
+    // to labor_cost_external, not labor_cost_internal. queryMock NOT set → if Rule 1
+    // ran it would not find a member; we still assert the source rule wins first.
+    const result = await resolveExpenseEconomicCategory({
+      sourceKind: 'contractor_payable',
+      beneficiaryMemberId: 'member-luis'
+    })
+
+    expect(result.category).toBe('labor_cost_external')
+    expect(result.confidence).toBe('high')
+    expect(result.matchedRule).toBe('CONTRACTOR_PAYABLE_SOURCE')
+    expect(queryMock).not.toHaveBeenCalled()
+  })
+
   it('Rule 1: member con employment_type=contractor → labor_cost_external', async () => {
     queryMock.mockResolvedValueOnce([
       {

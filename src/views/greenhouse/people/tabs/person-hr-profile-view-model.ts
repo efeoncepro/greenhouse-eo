@@ -28,6 +28,9 @@ export type PersonHrProfileViewModel = {
     currency: string | null
     baseSalary: number | null
     contractType: string | null
+    /** TASK-957 Slice B — current work classification label (from active relationship/engagement SSOT). */
+    currentClassificationLabel: string | null
+    currentClassificationKind: 'employee' | 'contractor' | 'none' | null
     offboardingCaseId: string | null
     offboardingPublicId: string | null
     offboardingStatus: string | null
@@ -271,6 +274,8 @@ export const buildPersonHrProfileViewModel = ({
     currency: hrContext?.compensation.currency ?? null,
     baseSalary: hrContext?.compensation.baseSalary ?? null,
     contractType: hrContext?.contractType ?? hrContext?.compensation.contractType ?? null,
+    currentClassificationLabel: hrContext?.currentWorkClassification?.displayLabel ?? null,
+    currentClassificationKind: hrContext?.currentWorkClassification?.kind ?? null,
     offboardingCaseId: hrContext?.offboarding?.offboardingCaseId ?? null,
     offboardingPublicId: hrContext?.offboarding?.publicId ?? null,
     offboardingStatus: hrContext?.offboarding?.status ?? null,

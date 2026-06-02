@@ -4,8 +4,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen } from '@testing-library/react'
 
 import { renderWithTheme } from '@/test/render'
+import { GH_ORGANIZATION_WORKSPACE } from '@/lib/copy/agency'
 
 import OrganizationWorkspaceShell from '../OrganizationWorkspaceShell'
+
+// Single source of truth para el copy del shell degradado. Asertar contra el
+// token canonical (no contra literales es-CL) hace que estos tests no puedan
+// driftear cuando el copy se edita (voseo→tuteo, locale, reword) — el shell y
+// el test leen exactamente la misma fuente. Drift histórico (TASK-612 voseo →
+// normalización tuteo chileno) que pineaba 'No tenés' resuelto de raíz aquí.
+const DEGRADED_COPY = GH_ORGANIZATION_WORKSPACE.shell.degraded
 
 import type {
   FacetContentProps,
@@ -190,8 +198,8 @@ describe('TASK-612 — OrganizationWorkspaceShell', () => {
       activeFacet: null
     })
 
-    expect(screen.getByText('Workspace en modo degradado')).toBeInTheDocument()
-    expect(screen.getByText(/No pudimos resolver tu relación/)).toBeInTheDocument()
+    expect(screen.getByText(DEGRADED_COPY.title)).toBeInTheDocument()
+    expect(screen.getByText(DEGRADED_COPY.reasons.relationship_lookup_failed)).toBeInTheDocument()
     // Degraded mode: no tabs visible, no children rendered.
     expect(screen.queryByTestId('facet-content')).not.toBeInTheDocument()
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
@@ -209,7 +217,7 @@ describe('TASK-612 — OrganizationWorkspaceShell', () => {
       activeFacet: null
     })
 
-    expect(screen.getByText(/No pudimos cargar tus permisos/)).toBeInTheDocument()
+    expect(screen.getByText(DEGRADED_COPY.reasons.entitlements_lookup_failed)).toBeInTheDocument()
   })
 
   it('renders degraded mode for no_facets_authorized reason', () => {
@@ -224,7 +232,7 @@ describe('TASK-612 — OrganizationWorkspaceShell', () => {
       activeFacet: null
     })
 
-    expect(screen.getByText(/No tenés acceso a ninguna sección/)).toBeInTheDocument()
+    expect(screen.getByText(DEGRADED_COPY.reasons.no_facets_authorized)).toBeInTheDocument()
   })
 
   it('does not crash when status is unknown (renders generic label)', () => {

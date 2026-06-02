@@ -1,0 +1,3 @@
+display_name: Greenhouse AI Image Generator
+short_description: Art-direct, prompt, generate, and QA polished Greenhouse AI visual assets.
+default_prompt: Art-direct and generate this Greenhouse visual asset with a professional prompt, use the canonical AI image helper when repo-bound, validate format/transparency, and report the resulting path and model metadata.

@@ -1,12 +1,18 @@
 # GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1
 
+Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
+
+`GVC` es la herramienta operacional de captura visual del portal Greenhouse. Su interfaz CLI sigue siendo `pnpm fe:capture`; el nombre existe para que agentes, documentacion, handoffs y reviews hablen de la misma primitive sin reducirla a "un helper".
+
 ## Status
 
 - Estado: `accepted`
-- Version: `1.2`
+- Version: `1.3`
 - Fecha V1.0: `2026-05-12 mañana` — Slice 0-3 (CLI + scenario + recorder + docs)
 - Fecha V1.1: `2026-05-12 tarde` — Delta OQ-1..OQ-6 (upload, device, diff, capability, reliability, ui-review scaffolding)
 - Fecha V1.2: `2026-05-29` — Hook operativo para verificación visual UI obligatoria vía `pnpm fe:capture` y comandos relacionados
+- Fecha V1.3: `2026-05-30` — Greenhouse Visual Capture named tool + scroll/captura full-page resiliente para pantallas largas
+- Fecha V1.4: `2026-05-30` — evidence hardening: readiness/assertions, quality findings, report HTML, multi-viewport, microinteraction V2 y baseline mockup→runtime
 - Owner: `Claude / Greenhouse frontend tooling`
 - Relacionado con:
   - `scripts/frontend/` (implementación canónica)
@@ -23,7 +29,7 @@
 
 ## Decision
 
-**Adoptar `pnpm fe:capture` como herramienta canónica única**, con scenarios declarativos tipados bajo `scripts/frontend/scenarios/<name>.scenario.ts`.
+**Adoptar Greenhouse Visual Capture (`pnpm fe:capture`) como herramienta canónica única**, con scenarios declarativos tipados bajo `scripts/frontend/scenarios/<name>.scenario.ts`.
 
 Reemplaza el patrón de `_cap.mjs` ad-hoc que se observó 6 veces en una sola sesión durante la auditoría visual de `/hr/offboarding` (mayo 2026). Cada ad-hoc reimplementa: autenticación, header bypass, viewport, recording, screenshot, output path — con drift inevitable.
 
@@ -41,6 +47,51 @@ Spec arquitectónica diseñada vía `arch-architect` skill con 4-pillar scoring 
 - Si el helper falla por env faltante, se documenta el bloqueo exacto y se intenta `--env=local` cuando aplique; no se sustituye silenciosamente por screenshots manuales.
 
 Este delta sincroniza `AGENTS.md`, `CLAUDE.md`, `project_context.md`, la skill Codex `greenhouse-browser-diagnostics`, el UI delivery loop, los manuales de captura, `scripts/frontend/README.md` y el método histórico en `docs/ui/`.
+
+## Delta 2026-05-30 — Greenhouse Visual Capture y scroll resiliente
+
+La herramienta queda nombrada como **Greenhouse Visual Capture** (`GVC`) y el DSL deja de depender de offsets de scroll frágiles para pantallas largas.
+
+Capacidades nuevas:
+
+- `scroll` puede apuntar a un `selector` estable y usar `scrollBlock` / `scrollInline` como `scrollIntoView`.
+- `scroll` puede moverse al inicio o final del documento con `scrollTo: 'top' | 'bottom'`.
+- `scrollY` sigue existiendo, pero pasa a ser un ajuste relativo complementario, no el patrón recomendado para encontrar secciones.
+- `mark` acepta `fullPage: true` para auditar pantallas completas con scroll.
+- `mark` acepta `clipSelector` para capturar una sección específica sin depender del viewport completo.
+- El validador rechaza combinaciones ambiguas como `fullPage + clipSelector`, opciones de captura en steps que no sean `mark`, y opciones de scroll en steps que no sean `scroll`.
+
+Convención de estabilidad:
+
+- Cuando una sección de UI deba ser capturada repetidamente, agregar un atributo estable `data-capture="<nombre-seccion>"` en el wrapper de la sección.
+- Preferir selectors semánticos (`data-capture`, landmarks, roles) sobre selectors posicionales (`:nth-child`) para que la captura sobreviva a cambios de copy, spacing o densidad.
+- Crear un scenario cuando el flujo se repetirá, validará scroll, usará interacciones, o alimentará una revisión de UI. El modo `--route` queda para evidencia rápida de primer fold.
+
+Scenarios de regresión de la capacidad V1.3:
+
+- `contractor-admin-workbench`: valida `/hr/contractors/mockup` con scroll por selector y `clipSelector`.
+- `offboarding-fullpage-capture`: valida `/hr/offboarding/mockup` con `fullPage`.
+- `sample-sprints-scroll-anchors`: valida `/agency/sample-sprints/mockup` con `scrollTo: 'bottom'` y regreso a top.
+
+## Delta 2026-05-30 — Evidence hardening V1.4
+
+GVC deja de ser solo un grabador y pasa a producir evidencia visual con guardrails explícitos:
+
+- `readiness`: espera selector(es) estables, ausencia de loading/login, `document.fonts.ready` y delay post-ready antes de capturar.
+- `assertions`: guards ligeros (`visible`, `notVisible`, `noLoginRedirect`, `noErrorBoundary`, `noCriticalToast`) para evitar evidencia falsa. No reemplazan Playwright E2E.
+- `interaction`: step V2 para microinteractions con intención, acción, frames relativos, segmento lógico en manifest y evidencia keyboard/focus opcional.
+- `qualityFindings`: análisis automático de frames para detectar login, error boundary, loading visible o frames sospechosamente vacíos.
+- `viewports`: variantes declarativas por scenario; una corrida puede producir sub-runs desktop/tablet/mobile sin duplicar archivos.
+- `index.html`: cada captura genera reporte HTML estático con metadata, readiness, assertions, findings, interactions y frames.
+- `failureCategory`: audit/manifest clasifican fallos como `auth_redirect`, `selector_timeout`, `app_error`, `visual_timeout`, `frame_quality`, `assertion_failed` o `helper_error`.
+- `baseline`: metadata `surfaceId`, `baselineName`, `approvedMockupCaptureDir` para flujos mockup aprobado → runtime.
+
+Scenarios de regresión V1.4:
+
+- `gvc-readiness-assertions-report`: readiness + assertions + report HTML.
+- `offboarding-queue-microinteractions-v2`: interaction step con frames before/during/after y keyboard evidence.
+- `gvc-multi-viewport`: variantes desktop/tablet/mobile en un solo scenario.
+- `contractor-admin-runtime-baseline`: caso vivo TASK-796 mockup→runtime sobre `/hr/contractors`.
 
 ## Por qué
 
@@ -78,6 +129,9 @@ Este delta sincroniza `AGENTS.md`, `CLAUDE.md`, `project_context.md`, la skill C
 pnpm fe:capture <scenario-name> --env=staging
 pnpm fe:capture --route=/path --env=staging --hold=3000
 pnpm fe:capture <scenario-name> --env=staging --gif --headed --prod
+pnpm fe:capture:review <scenario-or-capture-dir> --env=staging
+pnpm fe:capture:diff .captures/<prev> .captures/<curr>
+pnpm fe:capture:health
 pnpm fe:capture:gc [--apply] [--days=N]
 ```
 
@@ -105,15 +159,28 @@ export const scenario: CaptureScenario = {
   extraMaskSelectors: ['[data-secret]'],       // CSS selectors a enmascarar
   steps: [
     { kind: 'wait',  selector, timeout? },
-    { kind: 'mark',  label, note? },
+    { kind: 'mark',  label, note?, fullPage?, clipSelector? },
     { kind: 'hover', selector, timeout? },
     { kind: 'click', selector, timeout? },
-    { kind: 'scroll', scrollY },
+    { kind: 'scroll', scrollY?, selector?, scrollBlock?, scrollInline?, scrollTo? },
     { kind: 'sleep', ms },
     { kind: 'fill',  selector, value },        // requiere mutating
     { kind: 'press', selector?, key }          // requiere mutating
   ]
 }
+```
+
+Patrones recomendados para pantallas largas:
+
+```ts
+steps: [
+  { kind: 'wait', selector: 'h4', timeout: 5000 },
+  { kind: 'mark', label: 'first-fold' },
+  { kind: 'scroll', selector: '[data-capture="timeline"]', scrollBlock: 'center' },
+  { kind: 'mark', label: 'timeline-section', clipSelector: '[data-capture="timeline"]' },
+  { kind: 'scroll', scrollTo: 'bottom' },
+  { kind: 'mark', label: 'full-page-audit', fullPage: true }
+]
 ```
 
 ### Output structure
@@ -152,6 +219,14 @@ interface CaptureManifest {
     tMs: number             // ms desde startedAt
     note?: string
   }>
+  readiness?: { status: 'passed' | 'failed' | 'skipped'; durationMs: number; error?: string }
+  assertions?: Array<{ kind: string; status: 'passed' | 'failed'; selector?: string; reason?: string; message?: string }>
+  qualityFindings?: Array<{ severity: 'info' | 'warning' | 'error'; category: string; code: string; message: string }>
+  interactions?: Array<{ name: string; intent: string; actionKind: string; startMs: number; endMs: number; frameLabels: string[] }>
+  failureCategory?: 'auth_redirect' | 'selector_timeout' | 'app_error' | 'visual_timeout' | 'frame_quality' | 'assertion_failed' | 'helper_error'
+  reportHtml?: string
+  variants?: Array<{ name: string; viewport: { width: number; height: number }; outputDir: string; manifestPath: string; exitCode: 0 | 1 }>
+  baseline?: { surfaceId?: string; baselineName?: string; approvedMockupCaptureDir?: string }
   exitCode: 0 | 1
   error?: { message: string; stepIndex: number }
 }
@@ -242,12 +317,15 @@ Append-only JSONL en `.captures/audit.jsonl`. Cada run agrega: timestamp, route,
 - **NUNCA** usar Playwright ad-hoc como path visual primario sin explicar por qué `fe:capture`/scenario DSL no bastó.
 - **NUNCA** scenarios con `mutating: true` sin `safeForCapture: true` explícito.
 - **NUNCA** invocar `tsx scripts/frontend/capture.ts` directo — usar `pnpm fe:capture` para que tsx resuelva paths correctamente.
+- **NUNCA** usar `scrollY` como unica forma de llegar a una sección estable si existe un selector posible.
+- **NUNCA** combinar `fullPage` y `clipSelector` en el mismo `mark`.
 - **NUNCA** committear `.captures/` ni `.auth/` — ambos en `.gitignore`.
 - **NUNCA** loggear bypass secret a stdout / manifest / audit / stderr.
 - **NUNCA** recording sin `applySecretMask` activo (incluso si el scenario no toca password inputs — defense-in-depth).
 - **SIEMPRE** output bajo `<repo>/.captures/<ISO>_<scenario>/`.
 - **SIEMPRE** preferir `pnpm fe:capture:review` cuando la captura alimenta una auditoría UI/UX o skill review.
 - **SIEMPRE** crear/actualizar scenario si el flujo visual será reusable por otro agente.
+- **SIEMPRE** preferir `data-capture="<seccion>"` para anclas de captura repetibles en mockups o componentes donde no afecte producto.
 - **SIEMPRE** timeout default 60s por step (configurable per step).
 - **SIEMPRE** `headless: true` por default. `--headed` solo opt-in para debug local.
 - **SIEMPRE** acompañar un scenario nuevo con `note` en cada `mark` explicando qué microinteraction valida.

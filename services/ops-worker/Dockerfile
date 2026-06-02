@@ -80,6 +80,19 @@ RUN pnpm install --frozen-lockfile --ignore-scripts --prod
 
 COPY --from=builder /app/dist/server.mjs ./dist/server.mjs
 
+# Brand + typography assets required at RUNTIME by the @react-pdf renderers
+# reused from src/lib/** (payroll receipts, contractor remittance/run reports,
+# finiquito, finance PDFs). These resolve via process.cwd():
+#   - public/branding/logo-full.png + public/branding/pdf/*.png  (institutional + sub-brand logos)
+#   - src/assets/fonts/*.ttf                                     (Geist + Poppins, DESIGN.md)
+# A document-rendering service must carry the assets it renders with. Without
+# them the renderers throw ENOENT at render time, and the payroll receipt
+# template-version read would otherwise crash this container at boot.
+# `public/` is excluded from the build context by .gcloudignore EXCEPT
+# `public/branding/` (re-included there for exactly this reason).
+COPY public/branding ./public/branding
+COPY src/assets/fonts ./src/assets/fonts
+
 ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080

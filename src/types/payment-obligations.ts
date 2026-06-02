@@ -42,7 +42,9 @@ export const PAYMENT_OBLIGATION_SOURCE_KINDS = [
   'supplier_invoice',
   'tax_obligation',
   'manual',
-  'reliquidation_delta'
+  'reliquidation_delta',
+  // TASK-793 — contractor payable bridge (greenhouse_hr.contractor_payables → obligation).
+  'contractor_payable'
 ] as const
 
 export type PaymentObligationSourceKind = (typeof PAYMENT_OBLIGATION_SOURCE_KINDS)[number]

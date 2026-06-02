@@ -5,7 +5,7 @@ import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements
 import { getCurrentPeriodSantiago } from '@/lib/home/period'
 import { readAgencyAiLlmSummary, readTopAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import type { NexaSignalLifecycleStatus, NexaSignalObservation } from '@/lib/ico-engine/ai/llm-types'
-import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
+import { HOME_SUBTITLE, pickHomeGreeting } from '@/config/home-greetings'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { HomeSnapshot, HomeNexaInsightItem, ModuleCard, PendingTask } from '@/types/home'
 
@@ -115,18 +115,10 @@ export const getHomeFinanceStatus = async () => {
  */
 export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSnapshot> {
   const now = new Date()
-  const hour = now.getHours()
   const { year: currentYear, month: currentMonth } = getCurrentPeriodSantiago()
 
-  // 1. Resolve Greeting
-  let greetingPool = HOME_GREETINGS.default
-
-  if (hour >= 5 && hour < 12) greetingPool = HOME_GREETINGS.morning
-  else if (hour >= 12 && hour < 19) greetingPool = HOME_GREETINGS.afternoon
-  else if (hour >= 19 || hour < 5) greetingPool = HOME_GREETINGS.evening
-
-  const randomGreeting = greetingPool[Math.floor(Math.random() * greetingPool.length)]
-  const resolvedGreeting = randomGreeting.replace('{name}', input.firstName)
+  // 1. Resolve Greeting (context-aware catalog — single source of truth)
+  const resolvedGreeting = pickHomeGreeting(now).replace(/,\s*\{name\}/g, `, ${input.firstName}`).replace('{name}', input.firstName)
 
   // 2. Resolve Modules (Capabilities)
   const homeEntitlements = buildHomeEntitlementsContext({

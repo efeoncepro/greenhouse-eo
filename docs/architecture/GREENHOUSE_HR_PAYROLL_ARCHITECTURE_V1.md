@@ -146,6 +146,8 @@ Regla canonica:
 
 Caso motivador: Valentina Hoyos termina relacion `indefinido` el `2026-04-30` y puede iniciar nueva relacion contractor el `2026-05-04`; el nuevo flujo debe abrir una relacion separada y pagar por `ContractorEngagement -> ContractorPayable -> Finance`, no por finiquito.
 
+**Cross-ref 2026-05-30 (robustecimiento, sin cambio al modelo payroll):** el contractor engagement declara su **entidad contratante** en `contractor_engagements.legal_entity_organization_id` (NOT NULL) — la misma **Operating Entity** canónica (`organizations.is_operating_entity=TRUE`) que payroll reconoce como empleador / emisor DTE / agente de retención. Esto conecta el invariante `international_internal` (Delta 2026-05-16: "Efeonce SpA actúa como operational payer, no como employer of record local") con la dimensión raíz del contractor: cuando Efeonce SpA (Chile) contrata directo a un no-residente, el withholding Chile→no-residente lo computa el motor `international_internal` (TASK-905/906/907), NO el dominio contractor (que escala via `manual_review_required`/`country_engine_owned`). Roadmap: cuando abra `Efeonce US Inc`, la entidad contratante cambia el régimen (US doméstico) — leer siempre del campo, nunca hardcodear "Efeonce/Chile". SSOT: `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` Delta 2026-05-30.
+
 ## Delta 2026-05-04 — Offboarding execution guard + finiquito recovery
 
 El carril de finiquito queda protegido contra dos fallas operativas:
@@ -387,9 +389,11 @@ Este documento es la fuente canónica del módulo. No reemplaza:
 ## Delta 2026-03-29 — TASK-117 cerrada: cálculo el último día hábil
 
 - Payroll ya formaliza que el período oficial del mes debe quedar en `calculated` el último día hábil del mes operativo.
-- La semántica temporal vive en `src/lib/calendar/operational-calendar.ts` con:
+- La semántica de calendario vive en `src/lib/calendar/operational-calendar.ts` con:
   - `getLastBusinessDayOfMonth()`
   - `isLastBusinessDayOfMonth()`
+- La semántica de deadline de cálculo vive en `src/lib/payroll/calculation-deadline.ts`.
+- El deadline es un SLA operativo, no un blocker de cálculo por sí mismo. Un período `draft` fuera del último día hábil debe mostrarse como fuera de plazo, pero puede seguir calculándose manualmente cuando `calculation readiness` no tiene blockers y el lifecycle permite recalcular.
 - El runtime ya separa `calculation readiness` de `approval readiness`.
 - El job idempotente `runPayrollAutoCalculation()` y la route `GET /api/cron/payroll-auto-calculate` reutilizan el path oficial de cálculo y auto-crean el período si falta.
 - El hito `payroll_period.calculated` ya notifica a stakeholders operativos por el dominio reactivo `notifications` con categoría `payroll_ops`.

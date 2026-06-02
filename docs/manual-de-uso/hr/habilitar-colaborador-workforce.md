@@ -1,8 +1,8 @@
 # Habilitar colaborador en Workforce Activation
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 2.0
-> **Ultima actualizacion:** 2026-05-14
+> **Version:** 2.1
+> **Ultima actualizacion:** 2026-06-01
 > **Modulo:** Personas y HR / Workforce Activation
 > **Ruta principal:** `/hr/workforce/activation`
 > **Ruta admin:** `/admin/workforce/activation` (governance/transicional)
@@ -56,12 +56,13 @@ Lanes principales:
    - fecha de ingreso
    - tipo de empleo
    - tipo de contrato
+   - cargo vigente
    - asistencia diaria, si aplica
-   - motivo del cambio, si necesitas dejar contexto
+   - motivo del cambio, obligatorio cuando cambias cargo
 6. Presiona **Guardar datos laborales**.
 7. Revisa **Compensacion**. Si falta o esta desactualizada, usa **Abrir compensacion** y registra la version vigente desde el flujo dueño.
 8. Revisa **Pago**. Si falta un perfil, usa **Agregar perfil**. Si existe en borrador, usa **Activar perfil**. Si requiere maker-checker y esta pendiente, un checker distinto al maker debe usar **Aprobar perfil**.
-9. Si el inspector menciona perfil legal, identidad, cargo u organizacion, resuelve desde la faceta dueña en People/HR. Workforce Activation no duplica esos editores.
+9. Si el inspector menciona perfil legal, identidad u organizacion, resuelve desde la faceta dueña en People/HR. El cargo vigente puede resolverse desde el drawer porque escribe en la primitiva canónica de Workforce Role Title, con razón y audit log.
 10. Vuelve al inspector y confirma que no queden blockers criticos.
 11. Presiona **Completar ficha**.
 12. Lee el drawer final, agrega nota si corresponde y confirma **Marcar como completada**.
@@ -72,7 +73,7 @@ Lanes principales:
 - El guard final corre en backend. Aunque la UI se quede stale, el servidor bloquea una ficha incompleta.
 - No edites `workforce_intake_status` por SQL. El cierre debe pasar por el endpoint canonico para dejar audit log y outbox event.
 - No uses override como camino normal. Si se necesita, debe tener razon de negocio explicita.
-- No crees datos duplicados de salario, cargo, legal profile o pago dentro de Workforce Activation. Usa la fuente dueña.
+- No crees datos duplicados de salario, legal profile o pago dentro de Workforce Activation. Usa la fuente dueña. Para cargo, usa solo el campo gobernado del drawer o la faceta Workforce Role Title; ambos escriben `members.role_title` con audit log.
 - Para `honorarios`/contractors, el engagement contractor aparece como warning V1 si la foundation TASK-790 aun no esta operativa; no debe bloquear por si solo.
 - Si el pago es por Deel u otro proveedor externo, el perfil de pago interno puede quedar como warning segun el caso, no necesariamente como blocker.
 
@@ -101,6 +102,7 @@ Si una persona tiene foto en Microsoft pero ves iniciales:
 | El perfil de pago existe pero sigue bloqueando | Puede estar en borrador o pendiente de aprobacion. | Activalo o apruebalo desde el bloque **Pago** segun maker-checker. |
 | No puedes aprobar un perfil de pago | El maker no puede ser checker. | Pide a otro usuario autorizado que apruebe. |
 | Compensacion aparece pero readiness no cambia | Falta version vigente o no coincide moneda/vigencia. | Abre compensacion y confirma que haya version actual aplicable. |
+| Aparece `Falta cargo vigente` pero la persona tiene cargo en Microsoft | SCIM pudo llegar antes que el enriquecimiento Graph o el sync quedo pendiente. | Usa **Resolver blockers** y guarda **Cargo vigente**; el cambio queda auditado. Si el dato ya esta en Entra, el sync canonico tambien lo puede aplicar automaticamente. |
 | Aparece blocker de legal profile | Legal Profile sigue siendo faceta dueña. | Completa documentos/direccion/RUT desde People/HR. |
 | Avatar aparece como iniciales | Falta materializar foto desde Entra o el proxy no encuentra asset. | Revisa el sync canonico de Entra; no edites avatar manualmente por SQL. |
 | La ficha no desaparece tras completar | Cache o otra ventana stale. | Recarga. Si sigue, revisa si el backend devolvio error o si otra lane volvio a bloquear. |

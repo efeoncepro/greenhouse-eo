@@ -18,6 +18,8 @@
 
 ## Summary
 
+> **EPIC-017 alignment 2026-05-31:** esta task bloquea nuevos workflows de firma iniciados desde People/Workforce, pero no bloquea visualizacion read-only de documentos o signature status ya registrado. Person 360 debe consumir la capa provider-neutral, no ZapSign directo. Ver `TASK-964`.
+
 Crear la capa provider-neutral de firma electrónica para que Greenhouse modele requests, signers, estados, eventos y artifacts firmados sin acoplar la semántica del negocio a ZapSign o a un flujo exclusivo de MSA.
 
 ## Why This Task Exists
@@ -122,4 +124,3 @@ Reglas obligatorias:
 - [ ] `Lifecycle` y carpeta sincronizados
 - [ ] `docs/tasks/README.md` actualizado
 - [ ] `Handoff.md` actualizado
-
