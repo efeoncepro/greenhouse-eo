@@ -133,7 +133,11 @@ export type SyncNuboxToPostgresResult = {
 
 // ─── Read Conformed Data ────────────────────────────────────────────────────
 
-const readConformedSales = async (projectId: string): Promise<NuboxProjectionSale[]> => {
+// Exported for the TASK-990 allowlisted Berel backfill (canonical reuse — the
+// backfill reads the conformed sale, injects the foreign plane from the SII XML,
+// and calls upsertIncomeFromSale so the income is written through the SAME path a
+// flag-on sync would use, never a replicated writer).
+export const readConformedSales = async (projectId: string): Promise<NuboxProjectionSale[]> => {
   const bq = getBigQueryClient()
 
   const [rows] = await bq.query({
@@ -211,7 +215,7 @@ const readConformedPurchases = async (projectId: string): Promise<NuboxProjectio
 
 // ─── Income Projection ─────────────────────────────────────────────────────
 
-const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
+export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
   // Skip if nubox_sale_id is not a valid number
   if (!sale.nubox_sale_id || isNaN(Number(sale.nubox_sale_id))) return 'skipped'
 
