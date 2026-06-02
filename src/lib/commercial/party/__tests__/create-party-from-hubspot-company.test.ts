@@ -7,6 +7,11 @@ vi.mock('@/lib/db', () => ({
   withTransaction: vi.fn()
 }))
 
+// TASK-991 — el write canónico (default ON) llama nextPublicId.
+vi.mock('@/lib/account-360/id-generation', () => ({
+  nextPublicId: async () => 'EO-ORG-9000'
+}))
+
 vi.mock('../party-events', () => ({
   publishPartyCreated: vi.fn(),
   publishPartyPromoted: vi.fn(),
@@ -130,10 +135,14 @@ describe('createPartyFromHubSpotCompany', () => {
 
     const insertOrgCall = txClient.query.mock.calls[1] as [string, unknown[]]
 
+    // TASK-991 — INSERT canónico (default ON): params
+    // [orgId, public_id, organization_name, hubspot_company_id, lifecycle_stage, source, actorId, organization_type, country]
     expect(insertOrgCall[0]).toContain('INSERT INTO greenhouse_core.organizations')
-    expect(insertOrgCall[1][1]).toBe('Globex SA')
-    expect(insertOrgCall[1][2]).toBe('hs-2')
-    expect(insertOrgCall[1][3]).toBe('active_client')
+    expect(insertOrgCall[1][1]).toBe('EO-ORG-9000') // public_id
+    expect(insertOrgCall[1][2]).toBe('Globex SA') // organization_name
+    expect(insertOrgCall[1][3]).toBe('hs-2') // hubspot_company_id
+    expect(insertOrgCall[1][4]).toBe('active_client') // lifecycle_stage
+    expect(insertOrgCall[1][7]).toBe('client') // organization_type derivado (customer ⇒ active_client ⇒ client)
 
     const insertHistoryCall = txClient.query.mock.calls[2] as [string, unknown[]]
 

@@ -88,12 +88,25 @@ export const deriveOrganizationType = (input: DeriveOrganizationTypeInput): Orga
 }
 
 /**
- * Flag shadow (default OFF). Gatea el comportamiento NUEVO de la puerta HubSpot
- * (`createPartyFromHubSpotCompany`): cuando ON, deriva y escribe `organization_type`
- * + `public_id` + `origin`; cuando OFF, comportamiento legacy bit-for-bit (omite
- * el type → default `'other'`). Permite mergear dark y flipear tras validar
- * no-regresión en staging. El helper `upsertCanonicalOrganization` (puertas
- * finance/supplier) es behavior-equivalent y no se gatea.
+ * Kill-switch del write canónico de la puerta HubSpot (TASK-991). **Default ON.**
+ *
+ * Gatea el comportamiento corrector de `createPartyFromHubSpotCompany` (escribir
+ * `organization_type` derivado + `public_id` + `country` + `origin`) y de
+ * `promoteParty` (reconciliar `organization_type` al promover a active_client/
+ * provider_only). Es una corrección pura, validada contra PG real (rollback) y
+ * con TODOS los writers de `active_client` cubiertos → es seguro como default.
+ *
+ * **Patrón kill-switch (no shadow):** default ON significa que la escritura
+ * correcta es el comportamiento por defecto en TODOS los runtimes (Vercel +
+ * ops-worker) sin depender de setear un env var por runtime (evita el drift
+ * dual-env que es justo la clase de bug que esta task combate). Solo
+ * `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED='false'` lo apaga (emergencia) — y eso
+ * NO debe hacerse con el CHECK `organizations_type_lifecycle_consistent` activo,
+ * porque la puerta legacy volvería a producir `active_client+other` y el CHECK
+ * lo rechazaría.
+ *
+ * El helper `upsertCanonicalOrganization` (puertas finance/supplier) deriva el
+ * type SIEMPRE (no gated) — ya es canónico.
  */
 export const isCanonicalOrganizationWriteEnabled = (): boolean =>
-  process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED === 'true'
+  process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED !== 'false'

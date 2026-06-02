@@ -63,8 +63,8 @@ afterEach(() => {
 })
 
 describe('createPartyFromHubSpotCompany — TASK-991 flag', () => {
-  it('flag OFF (default): INSERT legacy SIN organization_type/public_id/origin', async () => {
-    delete process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED
+  it("kill-switch 'false': INSERT legacy SIN organization_type/public_id/origin", async () => {
+    process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED = 'false'
     const { client, calls } = buildTxClient()
 
     await createPartyFromHubSpotCompany(
@@ -79,8 +79,8 @@ describe('createPartyFromHubSpotCompany — TASK-991 flag', () => {
     expect(insert.text).not.toContain('origin')
   })
 
-  it('flag ON: INSERT canónico con organization_type derivado (customer ⇒ client) + public_id + origin', async () => {
-    process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED = 'true'
+  it('default (kill-switch ON): INSERT canónico con organization_type derivado (customer ⇒ client) + public_id + origin', async () => {
+    delete process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED
     const { client, calls } = buildTxClient()
 
     await createPartyFromHubSpotCompany(

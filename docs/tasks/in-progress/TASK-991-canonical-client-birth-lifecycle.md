@@ -24,22 +24,30 @@
 
 Establecer UN solo punto de escritura canónico para la fila `greenhouse_core.organizations` (`upsertCanonicalOrganization`), reconciliar la dimensión `organization_type` con `lifecycle_stage` (CHECK constraint), derivar `country`/`tax_id`/`legal_name` desde el origin (sin defaults ciegos), agregar 4 reliability signals que detecten organizaciones a medio cocinar, y remediar la **identidad** de las orgs incompletas existentes (Berel: RFC `PBE970101718` + país MX + `organization_type='client'`). Es la base estructural que destraba el matching por RFC de TASK-990 y sobre la que se construye el orquestador de lifecycle (TASK-992).
 
-## Delta 2026-06-02 — Implementación Slices 0-3 (CODE COMPLETE, CHECK+flag = rollout pendiente)
+## Delta 2026-06-02 — Implementación Slices 0-3 (CODE COMPLETE)
 
 Implementado directo en `develop` (instrucción operador, sin branch). Skills aplicadas como lente: arch-architect + finance-accounting-operator + commercial-expert.
 
 - **Slice 0 (commit 37591de0):** 4 reliability signals (`commercial.organization.type_lifecycle_drift`, `…incomplete_identity`, `commercial.client.active_without_profile`, `…active_without_space`) + wire-up en `get-reliability-overview.ts` + registry `commercial` (expectedSignalKinds += data_quality) + `scripts/commercial/inventory-half-baked-orgs.ts`. Read-only. 17 tests.
-- **Slice 1 (commit siguiente):** `deriveOrganizationType` (SSOT, `src/lib/account-360/organization-type.ts`) + `upsertCanonicalOrganization` (writer canónico) + las puertas finance/supplier delegan + puerta HubSpot setea type/public_id/origin detrás del flag `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED` (default OFF, shadow) + migración `organizations.origin` (nullable, backfill heurístico: 124 hubspot_sync + 29 migration). 35 tests.
-- **Slice 2 (commit 30a5690d):** `country_code` HubSpot propagado a la puerta party (flag ON) — MX real, no 'CL' ciego; NULL honesto si falta. 5 tests party.
+- **Slice 1 (commit siguiente):** `deriveOrganizationType` (SSOT, `src/lib/account-360/organization-type.ts`) + `upsertCanonicalOrganization` (writer canónico) + las puertas finance/supplier delegan + puerta HubSpot setea type/public_id/origin detrás del flag `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED` + migración `organizations.origin` (nullable, backfill heurístico: 124 hubspot_sync + 29 migration). 35 tests.
+- **Slice 2 (commit 30a5690d):** `country_code` HubSpot propagado a la puerta party — MX real, no 'CL' ciego; NULL honesto si falta. 5 tests party.
 - **Slice 3 (commit 03fafebf):** script `remediate-half-baked-orgs.ts` (dry-run/apply/allowlist/actor/reason/override/expected-count) + modo `overrideIdentity` del helper. **Remediación LIVE aplicada:** Berel (type→client, country→MX, tax_id=PBE970101718 RFC, legal_name="PINTURAS BEREL SA DE CV") + Aguas Andinas + Motogas (type→client). Signal `type_lifecycle_drift`: **3 → 0**. `incomplete_identity`: 11→10 (Berel resuelto; resto = data-completion ops).
 
-**Gate de cierre verde:** `pnpm test` full 5817 passed + `pnpm build` exit 0 + tsc 0 + lint 0.
+## Delta 2026-06-02 (cont.) — Robustez final: flag invertido a kill-switch + CHECK diferido por deploy-ordering
 
-**ROLLOUT PENDIENTE (operador) — code complete ≠ operationally complete:**
-1. Flipear `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED=true` en staging → validar que orgs HubSpot nuevas nacen con type/country correctos → flipear en producción (Vercel + ops-worker, requiere redeploy).
-2. SOLO DESPUÉS del flag ON en todos los runtimes: agregar el CHECK `organizations_type_lifecycle_consistent` (NOT VALID + VALIDATE, patrón TASK-708/708b). Con el flag OFF la puerta party legacy aún produce `active_client+other` → el CHECK rompería el HubSpot sync. El CHECK es el paso final de hardening (la garantía DB), gated en el flag.
+Tras la validación (instrucción operador "haz lo que sea más robusto y escalable"):
 
-Por eso la task queda `in-progress` (rollout pendiente), NO `complete`. El flag OFF garantiza cero cambio de comportamiento al merge; la remediación de datos ya está aplicada y los signals en steady (drift=0).
+- **`promoteParty` reconcilia `organization_type`** en el MISMO UPDATE al promover a `active_client`/`provider_only` (segundo writer de `lifecycle_stage` cubierto, además de la puerta HubSpot INSERT). Era el writer faltante que dejaría escapar `active_client+other`.
+- **Flag invertido a kill-switch default ON** (`CLIENT_BIRTH_CANONICAL_WRITE_ENABLED !== 'false'`): la escritura correcta es el default en TODOS los runtimes sin setear env por runtime → elimina el riesgo de drift dual-env (Vercel vs ops-worker) que es la clase de bug que la task combate. Solo `=false` apaga (emergencia). Validado contra PG real (rollback): write canónico pasa, write legacy `active_client+other` sería rechazado por el CHECK cuando esté activo.
+- **CHECK `organizations_type_lifecycle_consistent` DIFERIDO a post-release** (hazard de deploy-ordering detectado y corregido): el Cloud SQL `greenhouse-pg-dev` es **compartido** por todos los runtimes. Aplicar el CHECK mientras producción corre el código viejo —que aún escribe `active_client+other`— rompería el HubSpot sync de prod con un CHECK violation. **Sin el CHECK, los writes legacy del código viejo siguen permitidos** → la ventana de deploy es segura (código nuevo escribe canónico, viejo escribe legacy-pero-permitido; el signal `type_lifecycle_drift` lo cubre). El CHECK se dropeó de la DB (como owner `greenhouse_ops`) + se removió la migración auto-aplicable, y queda como **paso manual post-develop→main** (cuando el código nuevo esté en prod). El `origin` (additivo nullable) sí queda aplicado (seguro en la ventana).
+
+**Gate de cierre verde:** `pnpm test` full 5824 passed + `pnpm build` exit 0 + tsc 0 + lint 0 + drift live 0 + migrate:status limpio.
+
+**ROLLOUT (operador) — qué queda:**
+1. Merge `develop → main`: la corrección queda **activa por defecto** en prod al deploy (kill-switch ON, sin env var que setear).
+2. **Solo después** de que el código nuevo esté en prod: aplicar el CHECK `organizations_type_lifecycle_consistent` como su propia migración (`pnpm migrate:create`, patrón NOT VALID + VALIDATE guarded). SQL canónico documentado en la sección "Detailed Spec" + CLAUDE.md. Owner del DDL = `greenhouse_ops`.
+
+Por eso la task queda `in-progress` (CHECK DB post-release pendiente), NO `complete`. La corrección de comportamiento + la remediación de datos ya están aplicadas; los signals en steady (drift=0).
 
 ## Why This Task Exists
 

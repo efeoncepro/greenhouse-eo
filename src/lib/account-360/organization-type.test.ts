@@ -75,7 +75,7 @@ describe('deriveOrganizationType — TASK-991', () => {
   })
 })
 
-describe('isCanonicalOrganizationWriteEnabled — flag shadow', () => {
+describe('isCanonicalOrganizationWriteEnabled — kill-switch (default ON)', () => {
   const original = process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED
 
   afterEach(() => {
@@ -83,9 +83,9 @@ describe('isCanonicalOrganizationWriteEnabled — flag shadow', () => {
     else process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED = original
   })
 
-  it('default (unset) ⇒ false', () => {
+  it('default (unset) ⇒ true (kill-switch, escritura correcta por defecto)', () => {
     delete process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED
-    expect(isCanonicalOrganizationWriteEnabled()).toBe(false)
+    expect(isCanonicalOrganizationWriteEnabled()).toBe(true)
   })
 
   it("'true' ⇒ true", () => {
@@ -93,7 +93,7 @@ describe('isCanonicalOrganizationWriteEnabled — flag shadow', () => {
     expect(isCanonicalOrganizationWriteEnabled()).toBe(true)
   })
 
-  it("'false' ⇒ false", () => {
+  it("'false' ⇒ false (apagado de emergencia)", () => {
     process.env.CLIENT_BIRTH_CANONICAL_WRITE_ENABLED = 'false'
     expect(isCanonicalOrganizationWriteEnabled()).toBe(false)
   })
