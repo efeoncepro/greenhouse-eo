@@ -13,6 +13,7 @@ import type {
   NuboxConformedBankMovement,
   NuboxExportationDetail
 } from '@/lib/nubox/types'
+import { normalizeTaxId } from '@/lib/finance/multi-currency/tax-identity'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -207,7 +208,9 @@ export const mapSaleToConformed = (
   identityMaps: Pick<IdentityMaps, 'orgByRut' | 'incomeByNuboxId'>
 ): NuboxConformedSale => {
   const clientRut = sale.client?.identification?.value || null
-  const orgMatch = clientRut ? identityMaps.orgByRut.get(clientRut) : undefined
+  // TASK-990 — normalize the tax-id key (RUT or Mexican RFC) on lookup so case /
+  // whitespace variance never silently orphans an export sale (overlay arch #1).
+  const orgMatch = clientRut ? identityMaps.orgByRut.get(normalizeTaxId(clientRut)) : undefined
   const incomeId = identityMaps.incomeByNuboxId.get(String(sale.id)) || null
   const exportationDetail = mapNuboxExportationDetail(sale)
 
@@ -263,8 +266,9 @@ export const mapPurchaseToConformed = (
   identityMaps: Pick<IdentityMaps, 'orgByRut' | 'supplierByRut' | 'expenseByNuboxId'>
 ): NuboxConformedPurchase => {
   const supplierRut = purchase.supplier?.identification?.value || null
-  const supplierId = supplierRut ? identityMaps.supplierByRut.get(supplierRut) || null : null
-  const orgEntry = supplierRut ? identityMaps.orgByRut.get(supplierRut) || null : null
+  const supplierKey = normalizeTaxId(supplierRut)
+  const supplierId = supplierKey ? identityMaps.supplierByRut.get(supplierKey) || null : null
+  const orgEntry = supplierKey ? identityMaps.orgByRut.get(supplierKey) || null : null
   const expenseId = identityMaps.expenseByNuboxId.get(String(purchase.id)) || null
 
   return {

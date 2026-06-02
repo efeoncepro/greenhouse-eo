@@ -5289,6 +5289,25 @@ export interface GreenhouseFinanceNuboxEmissionLog {
   response_status: number | null;
 }
 
+export interface GreenhouseFinanceNuboxExportRfcDispositions {
+  client_trade_name: string | null;
+  disposition_id: Generated<string>;
+  dte_type_code: string | null;
+  first_seen_at: Generated<Timestamp>;
+  foreign_currency_code: string | null;
+  foreign_total_amount: Numeric | null;
+  functional_total_amount_clp: Numeric | null;
+  last_seen_at: Generated<Timestamp>;
+  nubox_sale_id: string;
+  resolution_reason: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by_user_id: string | null;
+  resolved_organization_id: string | null;
+  rfc_normalized: string;
+  rfc_raw: string;
+  status: Generated<string>;
+}
+
 export interface GreenhouseFinancePaymentInstrumentAdminAuditLog {
   account_id: string;
   action: string;
@@ -9783,6 +9802,7 @@ export interface DB {
   "greenhouse_finance.known_regulators": GreenhouseFinanceKnownRegulators;
   "greenhouse_finance.loan_accounts": GreenhouseFinanceLoanAccounts;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
+  "greenhouse_finance.nubox_export_rfc_dispositions": GreenhouseFinanceNuboxExportRfcDispositions;
   "greenhouse_finance.payment_instrument_admin_audit_log": GreenhouseFinancePaymentInstrumentAdminAuditLog;
   "greenhouse_finance.payment_obligations": GreenhouseFinancePaymentObligations;
   "greenhouse_finance.payment_order_artifacts": GreenhouseFinancePaymentOrderArtifacts;

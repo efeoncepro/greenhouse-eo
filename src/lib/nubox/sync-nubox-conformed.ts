@@ -10,6 +10,9 @@ import {
   mapExpenseToConformedBankMovement,
   mapIncomeToConformedBankMovement
 } from '@/lib/nubox/mappers'
+import { normalizeTaxId } from '@/lib/finance/multi-currency/tax-identity'
+import { captureOrphanRfcExports } from '@/lib/finance/nubox-export-rfc-disposition/store'
+import { captureWithDomain } from '@/lib/observability/capture'
 import type {
   NuboxSale,
   NuboxPurchase,
@@ -19,6 +22,10 @@ import type {
   NuboxConformedPurchase,
   NuboxConformedBankMovement
 } from '@/lib/nubox/types'
+
+// TASK-990 — export DTE legal codes (SII): 110 factura exportación, 111 nota
+// débito exportación, 112 nota crédito exportación.
+const EXPORT_DTE_CODES = new Set(['110', '111', '112'])
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -53,7 +60,9 @@ export const buildNuboxOrgByRutMap = async () => {
   const map = new Map<string, { organization_id: string; client_id: string | null }>()
 
   for (const row of rows) {
-    map.set(row.tax_id, {
+    // TASK-990 — key by normalized tax id (RUT or Mexican RFC) so the conformed
+    // mapper's normalized lookup matches. Berel (MX) keys on its RFC, not a RUT.
+    map.set(normalizeTaxId(row.tax_id), {
       organization_id: row.organization_id,
       client_id: row.client_id
     })
@@ -75,7 +84,7 @@ export const buildNuboxSupplierByRutMap = async () => {
   const map = new Map<string, string>()
 
   for (const row of rows) {
-    map.set(row.tax_id, row.supplier_id)
+    map.set(normalizeTaxId(row.tax_id), row.supplier_id)
   }
 
   return map
@@ -314,6 +323,35 @@ export const syncNuboxToConformed = async (): Promise<SyncNuboxConformedResult> 
     // 4. Count orphans (no identity match)
     const orphanedSales = conformedSales.filter(s => s.client_rut && !s.organization_id).length
     const orphanedPurchases = conformedPurchases.filter(p => p.supplier_rut && !p.supplier_id).length
+
+    // 4b. TASK-990 — capture orphan EXPORT sales (DTE 110/111/112 with a tax id
+    // that did not match any organization) into the reviewed-disposition queue.
+    // Best-effort: a capture failure must never break the conformed sync.
+    const orphanExportSales = conformedSales.filter(
+      s => EXPORT_DTE_CODES.has(s.dte_type_code ?? '') && s.client_rut && !s.organization_id
+    )
+
+    if (orphanExportSales.length > 0) {
+      try {
+        await captureOrphanRfcExports(
+          orphanExportSales.map(s => ({
+            nuboxSaleId: s.nubox_sale_id,
+            dteTypeCode: s.dte_type_code,
+            rfcRaw: s.client_rut as string,
+            rfcNormalized: normalizeTaxId(s.client_rut),
+            clientTradeName: s.client_trade_name,
+            foreignTotalAmount: s.foreign_total_amount,
+            foreignCurrencyCode: s.foreign_currency_code,
+            functionalTotalAmountClp: s.functional_total_amount_clp
+          }))
+        )
+      } catch (captureError) {
+        captureWithDomain(captureError, 'finance', {
+          tags: { source: 'nubox_export_rfc_disposition_capture' },
+          extra: { orphanExportCount: orphanExportSales.length }
+        })
+      }
+    }
 
     // 5. Append conformed snapshots; downstream readers select latest snapshot per Nubox ID
     await writeNuboxConformedSales(conformedSales)

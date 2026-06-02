@@ -882,6 +882,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    // TASK-990 — Resolver/descartar disposición de factura de exportación Nubox
+    // (DTE 110/111/112) con RFC sin match automático. Grant runtime explícito
+    // (TASK-873 invariant: capability sin grant = 403 latente).
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.nubox_export.review_disposition',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
     addEntitlement(entries, {
       module: 'finance',
       capability: 'finance.payment_orders.recover',

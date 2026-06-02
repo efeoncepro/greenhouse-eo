@@ -41,6 +41,7 @@ import { getClientPortalResolverFailureRateSignal } from './queries/client-porta
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
+import { getNuboxExportOrphanRfcSignal } from './queries/nubox-export-orphan-rfc'
 import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
 import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
 import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
@@ -577,6 +578,9 @@ interface ReliabilityOverviewSources {
    */
   ledgerUnresolvedDriftItems?: ReliabilitySignal | null
 
+  /** TASK-990 Slice 4 — Nubox export RFC sin organización (disposición pendiente). */
+  nuboxExportOrphanRfc?: ReliabilitySignal | null
+
   /**
    * TASK-793 Slice 3 — Contractor payable → Finance bridge signals (lag +
    * dead-letter). Single signals; degradan honestamente a null si la query falla.
@@ -902,6 +906,7 @@ export const buildReliabilityOverview = (
     // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
     ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
     ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
+    ...(sources.nuboxExportOrphanRfc ? [sources.nuboxExportOrphanRfc] : []),
     // TASK-793 Slice 3 — contractor payable → Finance bridge (lag + dead-letter).
     ...(sources.contractorPayableReadyWithoutObligation
       ? [sources.contractorPayableReadyWithoutObligation]
@@ -1293,6 +1298,11 @@ export const getReliabilityOverview = async (
     preloadedSources.ledgerUnresolvedDriftItems !== undefined
       ? preloadedSources.ledgerUnresolvedDriftItems
       : await getLedgerUnresolvedDriftItemsSignal().catch(() => null)
+
+  const nuboxExportOrphanRfc =
+    preloadedSources.nuboxExportOrphanRfc !== undefined
+      ? preloadedSources.nuboxExportOrphanRfc
+      : await getNuboxExportOrphanRfcSignal().catch(() => null)
 
   // TASK-793 Slice 3 — Contractor payable → Finance bridge (lag + dead-letter).
   // Cada reader degrada honestamente a null si su query falla — un solo signal
@@ -1781,6 +1791,7 @@ export const getReliabilityOverview = async (
     cronStagingDrift,
     accountBalancesFxDrift,
     ledgerUnresolvedDriftItems,
+    nuboxExportOrphanRfc,
     contractorPayableReadyWithoutObligation,
     contractorPayableExpenseUnmaterialized,
     contractorPayablePaymentSlaOverdue,

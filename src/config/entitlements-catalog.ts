@@ -427,6 +427,14 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-990 — Resolver/descartar la disposición de una factura de exportación
+  // Nubox (DTE 110/111/112) cuyo RFC no matcheó automáticamente a una org.
+  {
+    key: 'finance.nubox_export.review_disposition',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'finance.cash.adopt-external-signal',
     module: 'finance',
