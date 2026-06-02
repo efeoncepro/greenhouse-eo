@@ -1,3 +1,22 @@
+# Sesion 2026-06-01 — Nexa Greetings hero (Figma→código) + plataforma de saludos + microinteracciones — ✅ SHIPPED (develop)
+
+**Scope**: implementar el diseño Figma "Greetings" en el home como **componente reutilizable**, darle pulido enterprise + microinteracciones, una **plataforma de saludos dinámicos**, y replicar el resultado de vuelta a Figma (code→design). Diseñado iterando con product-design skills (modern-ui, forms-ux, motion-design, microinteractions-auditor, greenhouse-ux-writing) + arch-architect, verificando cada paso con **GVC**.
+
+**Entregado** (2 commits en `develop`: `37bc9c9c` + `3b7d2742`):
+
+- `NexaGreetingsCard` (`src/components/greenhouse/nexa/`) — presentacional, props-driven; `HomeHeroAi` quedó como adapter delgado. Superficie azul gradiente + aurora + borde iluminado, avatar Nexa, chip, saludo (Poppins-bold), rol, dots, **input blanco elevado** (fix de contraste: `CustomTextField` forza `transparent !important` → texto blanco invisible; se forzó fondo blanco + texto oscuro + label blanco controlado), **botón enviar con estado** + spinner, **chips con íconos**.
+- **Saludos**: `src/config/home-greetings.ts` + `pickHomeGreeting` (puro, testeable) — ~100 variantes context-aware (hora/día/mes/estación-sur/feriados Chile). Test `home-greetings.test.ts`. Migrados ambos consumers (V2 loader + legacy snapshot) a la única fuente.
+- **Microinteracciones** CSS-tier reduced-motion safe: float, dots pulse, entrada escalonada, **placeholder rotativo crossfade**.
+- Asset `public/images/greenhouse/nexa/nexa-avatar.png`.
+
+**Code→design (Figma)**: componente final replicado en **archivo Figma NUEVO** `VrA7BNQepWaJyFsnsUCSYF` (página "Nexa Greetings") vía Figma MCP (`use_figma` + `upload_assets`). **El archivo del design system (`yyMksCoijfMaIoYplXKZaR`) NO se tocó** (caución explícita del operador → memoria `reference_figma_design_system_file`).
+
+**Decisión parkeada — "darle vida a Nexa"** (TASK-989): (1) home hero → **tilt cursor-aware + perk-up** (CSS/Motion, sin dep); (2) mascota viva (ojos/parpadeo) → **Rive** en superficie dedicada; (3) **AI image tools alimentan el rig de Rive, NO son el motor de animación** (sprite-set IA como runtime + 3D rechazados). Memoria `project_nexa_living_mascot_decision`.
+
+**Gates**: lint+tsc 0 · `pnpm test` 5768 passed · `pnpm build` ✓ · GVC (default/focus/hover/reduced-motion/rotación). Docs: TASK-989 (to-do) + doc funcional `plataforma/saludo-nexa-home.md` + changelog.
+
+---
+
 # Sesion 2026-06-01 — session_360 route_groups over-exposure fix (TASK-987 / ISSUE-083) — ✅ COMPLETE (develop, sin push)
 
 **Scope**: fix de raíz de seguridad (over-exposure de navegación) + remediación de gobernanza + detector. NO parche. Diseñado con arch-architect (4-pilar) + info-architecture + greenhouse-ux.
