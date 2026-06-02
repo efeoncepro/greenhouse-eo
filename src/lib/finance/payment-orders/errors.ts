@@ -28,6 +28,7 @@ export type PaymentOrderErrorCode =
   | 'obligation_not_found'
   | 'maker_checker_violation'
   | 'mixed_currencies'
+  | 'unsupported_corridor'
   | 'invalid_amount'
   | 'amount_exceeds_obligation'
 
