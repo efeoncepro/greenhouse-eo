@@ -50,7 +50,15 @@ data/
 demo-configs/
 docs/
 full-version/
-public/
+# public/ is excluded from the worker build context EXCEPT public/branding/,
+# which the ops-worker carries into its runtime image for PDF rendering
+# (payroll receipts, contractor/finiquito/finance PDFs resolve
+# process.cwd()/public/branding/*). Dir-level exception → any future brand
+# asset under public/branding/ is included automatically. Mirror of the
+# .gcloudignore exception (both ignore files filter the Cloud Build context).
+public/*
+!public/branding/
+!public/branding/**
 spec/
 tests/
 
