@@ -83,6 +83,7 @@ Estas decisiones todavia no gobiernan runtime. Sirven para discovery, research y
 
 | Decision | Status | Scope | Canonical doc | Source / notes |
 | --- | --- | --- | --- | --- |
+| Greenhouse debe promover MXN a finance_core con native/functional/reporting/settlement planes y FX snapshots auditables, no como enum edit | Proposed | Finance / Treasury / Commercial / Nubox / Payment Orders / Reporting / Data | [GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md](GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md) | Abierto 2026-06-02 desde caso Grupo Berel/Nubox export invoice `28800562` (`MXN 89.960`, `CLP 4.617.647`). Implementacion propuesta en [TASK-990](../tasks/to-do/TASK-990-mxn-multi-currency-finance-core.md). No gobierna runtime hasta aceptacion explicita. |
 | Greenhouse debe converger a una fundacion workforce persona-centrica: una persona, multiples rails legales/payroll/finance/compliance | Proposed | HR / Payroll / Finance / Identity / Platform / Person 360 / Workforce reporting / AI context | [GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_DECISION_V1.md](GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_DECISION_V1.md) | Abierto 2026-05-31 desde [RESEARCH-008](../research/RESEARCH-008-unified-workforce-foundation.md) + [GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md](GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md). No autoriza tasks ni runtime changes hasta aceptacion explicita. |
 
 ## Pendientes de formalizacion retroactiva

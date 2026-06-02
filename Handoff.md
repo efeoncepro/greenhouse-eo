@@ -1,3 +1,20 @@
+# Sesion 2026-06-02 — ADR + TASK-990 MXN Multi-Currency Finance Core — 🆕 PROPUESTO (sin runtime changes)
+
+**Scope**: modelar soporte MXN end-to-end sin implementar codigo. Se invocaron skills `software-architect-2026`, `greenhouse-finance-accounting-operator` y `greenhouse-task-planner`.
+
+**Resultado documental**:
+- ADR/spec propuesto: `docs/architecture/GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md`.
+- Task registrada: `docs/tasks/to-do/TASK-990-mxn-multi-currency-finance-core.md`.
+- Indices sincronizados: `docs/architecture/DECISIONS_INDEX.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`.
+
+**Decision propuesta**: Greenhouse debe promover MXN desde pricing-only a `finance_core` con cuatro planos por evento financiero: `native` (MXN contractual), `functional` (CLP), `reporting` (USD) y `settlement` (moneda real de caja), usando FX snapshots auditables. No es enum edit.
+
+**Caso fuente**: Nubox export invoice Berel `28800562`, DTE 110, `PINTURAS BEREL SA DE CV`, RFC `PBE970101718`, foreign amount `89.960` (MXN por contexto operador), CLP legal/documental `4.617.647`. Sync Nubox raw/conformed esta sano, pero la venta quedo orphaned sin `income_id`; si se proyectara hoy, `sync-nubox-to-postgres` hardcodearia CLP y perderia el MXN nativo.
+
+**Estado**: ADR `Proposed`; TASK-990 `to-do`, bloqueada por aceptacion humana del ADR. No se tocaron codigo, migraciones, datos, Vercel, GCP ni runtime.
+
+---
+
 # Sesion 2026-06-02 — Promoción completa develop→main a producción + fix bloqueante ops-worker boot — ✅ RELEASED
 
 **Scope**: pasar todo `develop` (217 commits) a producción end-to-end vía el control plane canónico. El operador aprobó todos los gates de CI/environment explícitamente. Guiado por la skill `greenhouse-production-release` + `PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1`.
