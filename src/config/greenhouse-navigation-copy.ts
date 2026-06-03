@@ -96,6 +96,7 @@ const enUS: NavigationCopy = {
     spaces: { label: 'Spaces', subtitle: 'Active client list' },
     capacity: { label: 'Capacity', subtitle: 'Global team workload' },
     organizations: { label: 'Organizations', subtitle: 'Accounts, relationships and structure' },
+    newClient: { label: 'New client', subtitle: 'Single onboarding front door' },
     services: { label: 'Services', subtitle: 'Services contracted by Space' },
     sampleSprints: { label: 'Sample Sprints', subtitle: 'Commercial pilots, trials and discovery' },
     staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding and assignment economics' },
