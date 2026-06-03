@@ -1,5 +1,13 @@
 # TASK-990 — MXN Multi-Currency Finance Core
 
+## Delta 2026-06-03 — MXN validado LIVE con Grupo Berel (primer cliente MXN del programa)
+
+**Contexto programa (EPIC-CLIENT-360):** esta task (soporte MXN en finance core) es el **enabler raíz** del onboarding de **Grupo Berel** — cliente mexicano cuya incorporación motivó todo el programa (MXN + vía canónica para incorporar clientes). Encadena: TASK-990 (MXN) → TASK-991 (org write SSOT) → TASK-992/997 (puerta única / wizard) → TASK-998 (teamspace link) → TASK-1000/1003 (sync diario).
+
+- ✅ **MXN consumido end-to-end por el wizard:** el composer `provisionClientFromWizard` (TASK-992 Slice 2) valida la moneda de facturación contra `CURRENCY_DOMAIN_SUPPORT.finance_core ∪ {UF,UTM}` (derivado del registry, NO hardcode) y crea `client_profiles` con moneda **MXN**. Berel quedó con perfil MXN/30 días.
+- Estado para recall: revisar el lifecycle/rollout de esta task (flags MXN en los dominios finance) — Berel es el caso real que la ejercita. Si MXN quedó code-complete con rollout pendiente, Berel es el smoke vivo.
+- Evidencia del onboarding completo: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -1,5 +1,13 @@
 # TASK-991 — Canonical Organization Write SSOT + Birth Completeness
 
+## Delta 2026-06-03 — Berel nacido por la puerta canónica (programa EPIC-CLIENT-360)
+
+**Contexto programa:** foundation del programa "incorporar clientes" disparado por **Grupo Berel** (primer cliente MXN). El nacimiento de Berel pasó por el SSOT de esta task (`upsertCanonicalOrganization` + `deriveOrganizationType` + `promoteParty`), no por las puertas fragmentadas que esta task elimina.
+
+- ✅ **Berel creado:** org `org-32333527-02a8-487b-819e-6f76a761777d`, identidad MX/RFC, `client cli-0863869c`, `lifecycle_stage=active_client` vía `promoteParty`. Es el caso real que valida el SSOT.
+- Estado para recall: code-complete en `develop`, **rollout pendiente** (flag flip + el CHECK `organizations_type_lifecycle_consistent` que se aplica como migración manual POST develop→main — ver la regla "Canonical Organization Write SSOT" en CLAUDE.md sobre el hazard de deploy-ordering del CHECK contra el Cloud SQL compartido).
+- Cadena del programa: TASK-990 (MXN) → **TASK-991 (esta)** → TASK-992/997 (wizard) → TASK-998 (link) → TASK-1000/1003 (sync). Evidencia onboarding: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

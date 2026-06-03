@@ -1,5 +1,14 @@
 # TASK-998 — Notion/Teams Teamspace Linking via Discover + Register (canonical)
 
+## Delta 2026-06-03 — Berel vinculado LIVE; sync diario bloqueado por endpoint Notion deprecado (TASK-1003)
+
+**Contexto programa (EPIC-CLIENT-360):** esta task es el paso "vincular el teamspace del cliente" dentro del onboarding de **Grupo Berel** (primer cliente MXN, ver TASK-990 MXN + TASK-991/992/997 puerta única de incorporación). El vínculo se validó live el 2026-06-03.
+
+- ✅ **Berel vinculado:** el operador creó la integración Notion scoped "Greenhouse - Berel", `discoverNotionDatabasesForToken` clasificó Tareas/Proyectos/Sprints, token → Secret Manager `notion-integration-token-greenhouse-grupo-berel`, `space_notion_sources.notion_token_secret_ref` persistido. Space `space-cli-0863869c-...`.
+- ✅ **Hecho confirmado:** los ids que guarda `discoverNotionDatabasesForToken` (vía `/v1/search`) son **data_source ids** (modelo Notion 2026) — esto es **canónico/correcto**.
+- 🔴 **El "Pendiente sync end-to-end" de esta task tiene ahora un bloqueador CONCRETO:** no basta con que `notion-bq-sync` resuelva el token por space (TASK-1000, ya desplegado+verificado). El sync usa el endpoint **deprecado** `/v1/databases/{id}/query` que **rechaza data_source ids (404)**. → **TASK-1003** (migración a `/v1/data_sources/{id}/query` + Notion-Version 2026-03-11) es el bloqueador real. Berel `sync_enabled=FALSE` hasta que TASK-1003 pase paridad.
+- Evidencia completa: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md`.
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -1,5 +1,13 @@
 # TASK-997 — Wizard Canonical External-Reference Association & Data-Quality
 
+## Delta 2026-06-03 (b) — anclajes externos de Berel ejercitados LIVE (programa EPIC-CLIENT-360)
+
+**Contexto programa:** esta task aporta el anclaje de referencias externas (Notion teamspace + Teams channel + contactos HubSpot) del wizard de incorporación. Se ejercitó live onboardeando a **Grupo Berel** (primer cliente MXN). Cadena: TASK-990 (MXN) → TASK-991 (SSOT) → **TASK-992/997 (wizard)** → TASK-998 (link) → TASK-1000/1003 (sync).
+
+- ✅ Berel quedó con `notionAnchors` (data_source ids canónicos) + `teamsAnchor` + contactos finanzas anclados vía el wizard.
+- 🔴 Nota cross-task: el anclaje Notion quedó correcto, pero el **sync** que consume esos anclajes está bloqueado por el endpoint deprecado (TASK-1003). No es problema del anclaje (esta task) sino del consumidor downstream.
+- Evidencia: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md`.
+
 ## Status
 
 - Lifecycle: `in-progress`

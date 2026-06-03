@@ -1,5 +1,16 @@
 # TASK-992 — Client Lifecycle Orchestrator + Single Front Door
 
+## Delta 2026-06-03 (b) — gaps #5/#7 del wizard RESUELTOS + Berel onboardeado LIVE end-to-end
+
+**Contexto programa (EPIC-CLIENT-360):** esta es **la "vía para incorporar clientes"** que el programa necesitaba (disparado por Grupo Berel, primer cliente MXN). Esta sesión cerró 2 gaps del wizard y onboardeó a Berel completo por la puerta única.
+
+- ✅ **Gap #5 (fases comerciales no persistían):** `handleSubmit` ahora envía `phases` → route `parsePhases` → `provisionClientFromWizard` persiste `metadata.phases` + auto-completa `declare_engagement_phases`. Commit `d91751d97`.
+- ✅ **Gap #7 (ítem Notion deshonesto):** nuevo param `autoInProgressItemCodes` en `provisionClientLifecycle`; `provision_notion_workspace` (requires_evidence) se materializa `in_progress`, no `pending`, cuando hay Notion vinculado.
+- ✅ **Verificado:** live test contra DB real (phases→completed + Notion→in_progress) + **GVC del ficha de Berel** (`/agency/clients/org-32333527.../lifecycle`): banner "Onboarding en curso — 4 de 10 completados", items honestos. Berel backfilled.
+- 📌 **Pendiente del wizard (recall):** drawer Finanzas redefinido a "completar facet" (Slice 2c) + webhook HubSpot deal (§11) + rondas GVC de estados `state-design` (loading/degraded pickers, código SuccessScreen, nav entry) + docs funcional/manual. TASK-1001 (invitar personas del portal) sigue in-progress aparte.
+- 🔴 **Único paso del onboarding de Berel que NO quedó cerrado:** el **sync diario de su Notion** — bloqueado por el endpoint deprecado (TASK-1003 → desbloquea TASK-1000). El alta de Berel en sí está completa.
+- Memoria + spec del wizard: `reference_client_onboarding_wizard`, `docs/architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md`. Evidencia sesión: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md`.
+
 ## Delta 2026-06-03 — el ítem `provision_client_users_access` ahora es interactivo (TASK-1001)
 
 El ítem #9 del checklist `standard_onboarding_v1` (`provision_client_users_access`, owner identity) dejó de ser solo lectura: TASK-1001 cableó un `PortalUsersPanel` interactivo en el timeline (`LifecycleTimeline.tsx`) que siembra candidatos desde HubSpot e invita personas al portal (`client_*`) vía el helper SSOT `inviteClientPortalUser` + capability `client.lifecycle.portal_user.invite`. **La GVC de ese panel queda incluida en la ronda GVC pendiente de esta task** (misma surface flag-gated, requiere flag ON + caso sembrado — p.ej. la validación Berel end-to-end). Nada de TASK-1001 cambia el wizard de nacimiento (vive en el checklist). Spec: `in-progress/TASK-1001-client-portal-people-provisioning-onboarding.md`.
