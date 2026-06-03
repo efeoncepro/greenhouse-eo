@@ -2416,6 +2416,9 @@ const ClientOnboardingView = () => {
           },
           effectiveDate: state.startDate ? state.startDate.toISOString().slice(0, 10) : undefined,
           clientKind: state.engagementKind,
+          // TASK-992 — fases comerciales declaradas en el paso Comercial. Se persisten
+          // en metadata del caso y satisfacen declare_engagement_phases en el checklist.
+          phases: state.phases.map(p => ({ name: p.name, start: p.start || null, end: p.end || null })),
           contacts: state.contacts.map(c => ({
             name: c.name,
             email: c.email || null,

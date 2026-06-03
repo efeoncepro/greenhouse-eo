@@ -40,6 +40,10 @@ export interface ProvisionClientLifecycleInput {
    *  etc.) → se materializan 'completed' en vez de 'pending' (si no requieren
    *  evidencia). Evita que el checklist muestre como pendiente lo que el wizard ya hizo. */
   autoCompleteItemCodes?: string[]
+  /** Item codes que el alta resolvió parcialmente (parte automática hecha, falta
+   *  confirmación/evidencia humana) → se materializan 'in_progress' en vez de 'pending'.
+   *  Ej: provision_notion_workspace cuando el wizard ya vinculó la base de Notion. */
+  autoInProgressItemCodes?: string[]
 }
 
 const deriveInitialStatus = (
@@ -172,11 +176,16 @@ export const provisionClientLifecycle = async (
     }
 
     const autoComplete = new Set(input.autoCompleteItemCodes ?? [])
+    const autoInProgress = new Set(input.autoInProgressItemCodes ?? [])
 
     for (const item of templateItems) {
       // El alta ya satisfizo este ítem y no requiere evidencia → 'completed'
       // (CHECK exige completed_at; evidence_required_check exige asset si requiresEvidence).
       const isAutoCompleted = autoComplete.has(item.itemCode) && !item.requiresEvidence
+      // El alta resolvió la parte automática pero queda confirmación humana / evidencia
+      // (p. ej. Notion vinculado pero el ítem pide evidencia) → 'in_progress', no 'pending'.
+      const isAutoInProgress = !isAutoCompleted && autoInProgress.has(item.itemCode)
+      const status = isAutoCompleted ? 'completed' : isAutoInProgress ? 'in_progress' : 'pending'
 
       await client.query(
         `INSERT INTO greenhouse_core.client_lifecycle_checklist_items (
@@ -195,10 +204,14 @@ export const provisionClientLifecycle = async (
           item.requiresEvidence,
           item.ownerRole,
           item.defaultOrder,
-          isAutoCompleted ? 'completed' : 'pending',
+          status,
           isAutoCompleted ? new Date() : null,
           isAutoCompleted ? input.triggeredByUserId : null,
-          isAutoCompleted ? 'Completado automáticamente en el alta del cliente.' : null
+          isAutoCompleted
+            ? 'Completado automáticamente en el alta del cliente.'
+            : isAutoInProgress
+              ? 'Vinculado en el alta; pendiente de confirmación/evidencia del responsable.'
+              : null
         ]
       )
     }

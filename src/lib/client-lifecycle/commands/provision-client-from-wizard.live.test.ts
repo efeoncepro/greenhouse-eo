@@ -55,6 +55,11 @@ live('provisionClientFromWizard (live) — alta de cliente completa, bug-class r
                 revisionesDbId: null
               },
               clientKind: 'regular',
+              // (3) fases comerciales → declare_engagement_phases debe quedar 'completed'
+              phases: [
+                { name: 'Kickoff', start: '2026-06-01', end: '2026-06-15' },
+                { name: 'Operación', start: '2026-06-16', end: null }
+              ],
               triggeredByUserId: 'user-agent-e2e-001'
             },
             client
@@ -78,6 +83,18 @@ live('provisionClientFromWizard (live) — alta de cliente completa, bug-class r
     expect(result?.spaceId).toBeTruthy()
     // El vínculo de Notion se persistió (IDs de 36 chars caben en TEXT).
     expect(result?.notionConnected).toBe(true)
+
+    // TASK-992 gap #5 — las fases declaradas auto-completan declare_engagement_phases.
+    const items = result?.checklistItems ?? []
+    const phasesItem = items.find(i => i.itemCode === 'declare_engagement_phases')
+
+    expect(phasesItem?.status).toBe('completed')
+
+    // TASK-992 gap #7 — Notion vinculado pero requiere evidencia → 'in_progress',
+    // NUNCA 'pending' (sería deshonesto mostrarlo como sin empezar).
+    const notionItem = items.find(i => i.itemCode === 'provision_notion_workspace')
+
+    expect(notionItem?.status).toBe('in_progress')
   })
 
   it('completa una org "media-cocida" sin Notion (path de completar cliente)', async () => {

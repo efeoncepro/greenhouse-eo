@@ -44,6 +44,7 @@ export async function POST(request: Request) {
     const financeContacts = parseFinanceContacts(body.contacts)
     const notionAnchors = parseNotionAnchors(body.notionAnchors)
     const teamsAnchor = parseTeamsAnchor(body.teamsConnect ?? body.teamsAnchor)
+    const phases = parsePhases(body.phases)
 
     // TASK-998 — connect Notion por token scoped. Provisiona el secret (auto) +
     // valida/anti-tamper ANTES de la tx (fuera del PG). El intent (secretRef + db
@@ -103,6 +104,7 @@ export async function POST(request: Request) {
         spaceName: typeof body.spaceName === 'string' ? body.spaceName : undefined,
         spaceType: typeof body.spaceType === 'string' ? body.spaceType : undefined
       },
+      phases,
       effectiveDate: typeof body.effectiveDate === 'string' ? body.effectiveDate : undefined,
       targetCompletionDate: typeof body.targetCompletionDate === 'string' ? body.targetCompletionDate : undefined,
       reason: typeof body.reason === 'string' ? body.reason : undefined,
@@ -170,6 +172,30 @@ const parseNotionAnchors = (raw: unknown): { notionDatabaseId: string; title: st
   }
 
   return anchors
+}
+
+// TASK-992 — normaliza las fases comerciales del wizard (paso Comercial). Solo
+// entran fases con nombre; las fechas son opcionales (start/end ISO o null).
+const parsePhases = (raw: unknown): { name: string; start: string | null; end: string | null }[] => {
+  if (!Array.isArray(raw)) return []
+
+  const phases: { name: string; start: string | null; end: string | null }[] = []
+
+  for (const entry of raw) {
+    if (!entry || typeof entry !== 'object') continue
+    const item = entry as Record<string, unknown>
+    const name = typeof item.name === 'string' ? item.name.trim() : ''
+
+    if (!name) continue
+
+    phases.push({
+      name,
+      start: typeof item.start === 'string' && item.start.trim() ? item.start.trim() : null,
+      end: typeof item.end === 'string' && item.end.trim() ? item.end.trim() : null
+    })
+  }
+
+  return phases
 }
 
 // TASK-998 — normaliza el connect Notion del wizard (token + las 3 db ids). Devuelve

@@ -73,6 +73,9 @@ export interface ProvisionClientFromWizardInput {
   notionConnectIntent?: NotionConnectIntent
   /** TASK-998/992 — el Space operativo del cliente. Si se omite, no se crea (legacy). */
   space?: { spaceName?: string; spaceType?: string }
+  /** TASK-992 — fases comerciales declaradas en el wizard (paso Comercial). Se
+   *  persisten en `metadata.phases` del caso y satisfacen `declare_engagement_phases`. */
+  phases?: { name: string; start: string | null; end: string | null }[]
   effectiveDate?: string
   targetCompletionDate?: string
   reason?: string
@@ -313,6 +316,15 @@ export const provisionClientFromWizard = async (
       metadata.notionConnectIntent = input.notionConnectIntent
     }
 
+    // TASK-992 — fases comerciales declaradas en el wizard (paso Comercial). Se
+    // persisten en metadata para que el caso refleje lo que el operador cargó y
+    // para satisfacer el ítem declare_engagement_phases.
+    const phases = (input.phases ?? [])
+      .map(p => ({ name: p.name?.trim() ?? '', start: p.start ?? null, end: p.end ?? null }))
+      .filter(p => p.name.length > 0)
+
+    if (phases.length > 0) metadata.phases = phases
+
     // Ítems del checklist que el wizard YA satisfizo → se materializan 'completed'
     // (no 'pending'), así el operador no ve como faltante lo que ya cargó en el alta.
     // Los que requieren trabajo humano post-alta (contrato/MSA, FTE del equipo, portal
@@ -326,8 +338,19 @@ export const provisionClientFromWizard = async (
 
     if (input.clientKind) autoCompleteItemCodes.push('declare_engagement_kind')
     if (paymentCurrency) autoCompleteItemCodes.push('declare_commercial_terms')
-    if (notionConnected) autoCompleteItemCodes.push('provision_notion_workspace')
+    if (phases.length > 0) autoCompleteItemCodes.push('declare_engagement_phases')
     if (input.teamsAnchor?.teamId) autoCompleteItemCodes.push('provision_communication_channels')
+
+    // Ítems que el alta resolvió parcialmente: la vinculación quedó hecha pero falta
+    // confirmación/evidencia del responsable. provision_notion_workspace requiere
+    // evidencia (asset) → NUNCA puede auto-completarse; el alta vinculó la base de
+    // Notion, así que se materializa 'in_progress', no 'pending' (sería deshonesto
+    // mostrarlo como "sin empezar" cuando el operador ya lo vinculó).
+    const autoInProgressItemCodes: string[] = []
+
+    if (notionConnected || (input.notionAnchors && input.notionAnchors.length > 0)) {
+      autoInProgressItemCodes.push('provision_notion_workspace')
+    }
 
     const lifecycle = await provisionClientLifecycle(
       {
@@ -340,7 +363,8 @@ export const provisionClientFromWizard = async (
         reason: input.reason,
         hubspotDealId: input.hubspotDealId,
         metadataExtra: metadata,
-        autoCompleteItemCodes
+        autoCompleteItemCodes,
+        autoInProgressItemCodes
       },
       client
     )
