@@ -32,6 +32,57 @@ fondo (arch-architect + product-design + notion-platform):
 "Espacio" quedó honesto ("crear nuevo" default + nota apuntando al checklist). El **vínculo
 real** se hace acá, con la primitiva canónica que ya conectó a Efeonce + Sky.
 
+## Terreno verificado (2026-06-03) — qué funciona y qué no
+
+Probado en vivo con Grupo Berel:
+
+| Vía | ¿Enumera/lista? | Runtime-available | Veredicto |
+|---|---|---|---|
+| Notion REST `/v1/search` | ❌ no enumera teamspaces (devuelve DBs por título; "Tareas" se repite) | sí | inservible para descubrir teamspaces |
+| **Notion MCP claude.ai** (`notion-get-teams`) | ✅ enumera por nombre (encontró "Grupo Berel" + 3 DBs) | **❌ NO** (conector interactivo de claude.ai) | sirve para que un agente obtenga IDs hoy, NO para el runtime |
+| **Cloud Run `notion-bq-sync` v3.0.0** `/discover` | ❌ devuelve **config snapshot** (los 2 spaces ya conectados), no enumeración en vivo. `/discover/{id}/sample` también devuelve config | sí (token integración) | **necesita upgrade** para enumerar en vivo |
+| **Teams bot Graph** `/v1.0/teams` + `/teams/{id}/channels` | ✅ **funciona HOY** con los permisos actuales (vio "Berel - Efeonce" › "Squad Berel") | ✅ sí (`greenhouse-teams-bot-client-credentials` en Secret Manager) | **self-serve viable ya, sin permisos nuevos** |
+| Teams Graph `/v1.0/chats` | ❌ 403 (falta `Chat.ReadBasic.All`) | — | chats 1:1 fuera de scope; los canales sí |
+
+**IDs de Berel obtenidos (vía MCP, para seed)**: teamspace `35c39c2f-efe7-8161-9727-0042ecf02b95`; Tareas `35c39c2f-efe7-80c9-bc37-e811a7b95a7c`; Proyectos `35c39c2f-efe7-8085-8fe7-ec8f4360a61e`; Sprints `35c39c2f-efe7-80ef-bf33-d63d6910eed0`. Canal Teams: "Squad Berel" `19:k20iVrjyr7rkB2mfHulI8tUSvqS…@thread.tacv2`.
+
+**Asimetría clave**: Teams es self-serve hoy (Graph runtime-available funciona). Notion NO tiene discovery en vivo runtime-available (REST no enumera; MCP no es del runtime; Cloud Run devuelve config) → requiere upgrade del Cloud Run + que el operador conecte la integración al teamspace en Notion (settings → Connections, one-time por cliente).
+
+### El bloqueo real NO es discovery — es el ACCESO de la integración (probado)
+
+`GET /v1/databases/{berel-tareas}` con el token `notion-token` → **404 object_not_found** en las 3 DBs de Berel. La integración NO tiene acceso al teamspace de Berel. El MCP las vio porque usa el **OAuth personal de claude.ai** (dueño del workspace, ve todo) — un token de backend nunca tiene ese alcance (límite de seguridad correcto).
+
+Conclusión: **ningún** camino programático (MCP, REST, Cloud Run upgrade) puede leer Berel hasta que el operador **conecte la integración Greenhouse al teamspace** en Notion (Settings → Connections). Es exactamente como se conectaron Efeonce + Sky. "Agregar el MCP al discover" no resuelve esto (a) el MCP es OAuth interactivo, no cableble a un backend headless (CLAUDE.md), y (b) aunque se pudiera, el gate es el sharing, no el discovery.
+
+### Plan canónico decidido (2026-06-03)
+
+**A) Conectar Berel + ANAM (operativo, desbloquea ahora):**
+- **A1 (operador, 1 vez por cliente — sólo el operador puede)**: en Notion conectar la integración Greenhouse al teamspace del cliente (Grupo Berel `35c39c2f-…`, ANAM `32539c2f-…`). Settings → Connections → add. Sin esto nada lee al cliente.
+- **A2 (runtime, apenas A1 esté)**: con los IDs ya conocidos, registrar las 3 DBs en `space_notion_sources` (`/register`) + el canal "Squad Berel" en `teams_notification_channels`. Berel queda igual que Efeonce/Sky.
+
+**B) Self-serve futuro (escalable, en el checklist):**
+- **B-Teams (sin bloqueos, construible ya)**: reader runtime con el bot Graph (`token-cache` + `/v1.0/teams` + `/teams/{id}/channels`) → checklist item `provision_communication_channels`: el operador elige team+canal → register `teams_notification_channels`. Los permisos del bot ya alcanzan.
+- **B-Notion (necesita upgrade del Cloud Run `notion-bq-sync`, vive en el repo hermano `efeoncepro/notion-bigquery`)**: `/discover` que enumere en vivo por REST (`POST /v1/search` filter data_source → clasificar por título tareas/proyectos/sprints → agrupar por prefijo de id de teamspace) → checklist muestra los teamspaces **conectados a la integración** → confirmar → `/register`. Precondición por cliente: A1.
+
+**Por qué REST y NO MCP para B-Notion**: no hay `/v1/teams` (400). El `parent` de un data_source es `database_id`, no teamspace → el nombre del teamspace no está en REST. Pero agrupar por **prefijo de id** (cada teamspace comparte el segmento alto del UUID: Efeonce `5126d7d8`, Sky `23039c2f`, Berel `35c39c2f`, Demo `36339c2f`) + clasificar por título da grupos funcionales por teamspace, runtime-available, sin el MCP.
+
+### Modelo de token: 1 token POR teamspace (DECIDIDO — arch-architect 4-pillar)
+
+El operador planteó: ¿un token Notion por teamspace, scoped sólo a ese teamspace, pedido al conectar? **Sí. Es el modelo correcto** (no es minimizar). Veredicto:
+
+- **Safety** ✅ — token filtrado = blast radius de 1 cliente, no todos. Hoy `notion-token` (BigQuery Sync) ve Efeonce+Sky+onboarding+wiki juntos = riesgo cross-tenant latente (mismo ISSUE que el demo compartido con BQ Sync). Greenhouse YA hace token-por-propósito para el demo (`notion-integration-token-greenhouse-metrics-demo`, restringido al teamspace demo). Token-por-cliente extiende ese precedente.
+- **Robustness** ✅ — discovery con token scoped devuelve EXACTAMENTE las DBs de ese teamspace → cero ambigüedad de agrupación (no hace falta el heurístico de prefijo). "Al conectarse ve todas las DBs de ese teamspace" = contrato limpio. El token ES la conexión (elimina el gate "¿está compartido con la integración compartida?").
+- **Resilience** ✅ — token por cliente en Secret Manager vía `resolveSecretByRef` canónico; expiración/rotación de uno no rompe a otros.
+- **Scalability** ✅ — N clientes = N secrets, manejado por el secret resolution canónico.
+
+**Implementación canónica (Secret Manager hygiene + `*_SECRET_REF`)**:
+1. `space_notion_sources.notion_token_secret_ref TEXT NULL` (columna nueva). NULL = usar el `notion-token` legacy compartido (Efeonce/Sky no se migran, back-compat). Non-NULL = token por cliente.
+2. Checklist `provision_notion_workspace`: el operador (a) en Notion crea una integración interna scoped al teamspace del cliente + copia el token; (b) en Greenhouse pega el token. El server lo escribe a GCP Secret Manager (`notion-integration-token-<client-slug>`) y guarda SOLO el `_SECRET_REF` en `space_notion_sources`. **NUNCA** el token crudo en PG/logs/Notion. Campo password, POST directo a Secret Manager server-side.
+3. `/discover` y el sync pipeline resuelven el token POR space (si `notion_token_secret_ref` non-NULL → ese; si NULL → `notion-token` legacy). Cambio en el repo hermano `notion-bigquery`.
+4. Con el token scoped, `/discover` = `POST /v1/search` con ESE token → devuelve sólo las DBs del teamspace → clasificar por título → register. Sin heurístico de prefijo, sin A1 (la conexión ES el token).
+
+**Trade-off**: el operador crea 1 integración Notion + pega 1 token por cliente al onboardear (vs 1 clic de "connect" en el modelo compartido). A cambio: aislamiento duro + discovery trivial. Greenhouse prioriza aislamiento (precedente demo). Modelo elegido: **token-por-teamspace para clientes nuevos**; `notion-token` compartido se mantiene sólo para Efeonce/Sky legacy.
+
 ## Architecture Decision
 
 El vínculo de un teamspace existente = **registrar sus 3 databases en `space_notion_sources`**
