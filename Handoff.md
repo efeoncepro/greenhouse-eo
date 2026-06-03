@@ -1,3 +1,36 @@
+# Sesion 2026-06-03 (cont.) — Wizard gaps #5/#7 ✅ + TASK-1000 rollout (infra desplegada, BLOQUEADA) + 🆕 TASK-1003 + 📋 AUDIT
+
+**Audit canónico de la sesión**: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md` — TODOS los hallazgos + estado runtime + comandos + pendientes para continuar.
+
+## 1. Wizard de alta — gaps #5/#7 ✅ RESUELTO + desplegado + verificado
+
+- **Gap #5 (fases no persistían):** `handleSubmit` ahora envía `phases` → route `parsePhases` → `provisionClientFromWizard` persiste `metadata.phases` + auto-completa `declare_engagement_phases`.
+- **Gap #7 (ítem Notion deshonesto):** nuevo param `autoInProgressItemCodes`; `provision_notion_workspace` (requires_evidence, no auto-completable) se materializa `in_progress` cuando hay Notion vinculado.
+- Commit `d91751d97` en `develop` (staging live). `tsc`/lint 0, suite focal 55, **live test contra DB real** (phases→completed + Notion→in_progress), **GVC del ficha de Berel** (banner "4 de 10 completados", honesto). Berel backfilled (Notion→in_progress).
+
+## 2. TASK-1000 (per-space Notion token) — infra DESPLEGADA + VERIFICADA, BLOQUEADA por TASK-1003
+
+- **Desplegado en Cloud Run `notion-bq-sync`** (us-central1, repo hermano `notion-bigquery`, revisión `00019-fgp`): IAM (`cloudsql.client` + `secretAccessor` en `notion-integration-token-greenhouse-grupo-berel` + `greenhouse-pg-dev-app-password`) + deploy código TASK-1000 + env flag ON + PG. **Bug resuelto:** traffic pinneado a `00017-pct` → `update-traffic --to-latest`.
+- **Verificado:** PG conecta (`Loaded 0/1 per-client space config(s) from PG SSOT`), Efeonce/Sky sincronizan OK (full sync 0 errores), degrade-to-today.
+- **Estado seguro:** Berel `sync_enabled=FALSE` (revertido). Flag ON es seguro (Berel FALSE → 0 per-client = idéntico a hoy).
+
+## 3. 🆕 TASK-1003 — el bloqueador real (endpoint Notion deprecado = bomba de tiempo payroll)
+
+- **Hallazgo:** `notion-bq-sync` usa `POST /v1/databases/{id}/query` **deprecado** (Notion 2025-09-03). Efeonce/Sky funcionan SOLO porque tienen **database ids viejos**; Berel tiene **data_source ids** (modelo 2026) → **404**. Cuando Notion apague el endpoint viejo → se rompe Efeonce/Sky → bonos payroll.
+- **Decisión (NO parche, Solution Quality Contract):** migrar el sync a `POST /v1/data_sources/{id}/query` + Notion-Version `2026-03-11`, resolver database→data_source ids de Efeonce/Sky con **gate de paridad de filas** antes del cutover. El wizard YA es canónico (data_source ids); el sync es el laggard.
+- Spec: `docs/tasks/to-do/TASK-1003-notion-bq-sync-data-sources-endpoint-migration.md`. **Bloquea TASK-1000.**
+
+## 4. Pendientes para próxima sesión
+
+- **TASK-1003** (migración endpoint, payroll-crítico) → desbloquea TASK-1000 → re-habilitar Berel.
+- **Pipeline conformed downstream** (ops-worker): el insight del operador sobre **propiedades distintas de Berel** aplica en `notion_ops`→conformed→PG (NO en este sync, schema-agnostic). Regla: enforce template L1 en Notion ANTES del onboarding, NO aliases custom.
+- **Wizard forward-looking:** extraer OriginCard/stepper/banner a `src/components` (2º wizard); smoke E2E; reconciliar Notion/Teams link vs checklist (gobernanza).
+- **Limpieza:** secreto huérfano `notion-integration-token-greenhouse-berel` (Berel usa `-grupo-berel`).
+
+**Registros sincronizados**: `TASK_ID_REGISTRY.md` + `README.md` (siguiente ID `TASK-1004`) + TASK-1000 Delta.
+
+---
+
 # Sesion 2026-06-03 (cont.) — TASK-1002 Full API Parity First Wave — 🆕 TASK CREADA
 
 **Delta ADR dedicado**: por pedido del operador, la decision ahora vive tambien como ADR dedicado en `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` (Accepted). `DECISIONS_INDEX.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, docs API y `TASK-1002` apuntan al ADR dedicado.

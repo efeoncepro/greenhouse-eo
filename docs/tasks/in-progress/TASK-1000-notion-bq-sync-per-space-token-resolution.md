@@ -1,8 +1,21 @@
 # TASK-1000 — notion-bq-sync: resolver token Notion POR space (per-space token)
 
+## Delta 2026-06-03 — infra desplegada y verificada; BLOQUEADA por TASK-1003
+
+- **Infra per-space token DESPLEGADA + VERIFICADA** en Cloud Run `notion-bq-sync` (us-central1, revisión `00019-fgp`):
+  - IAM al SA `183008134038-compute@`: `roles/cloudsql.client` + `secretAccessor` en `notion-integration-token-greenhouse-grupo-berel` + `greenhouse-pg-dev-app-password`.
+  - Deploy del código TASK-1000 (repo hermano `main` `5a6766c`, PRs #2/#3). **Bug resuelto:** el tráfico estaba pinneado a `00017-pct` (vieja) → `update-traffic --to-latest`.
+  - Env: `NOTION_PER_SPACE_TOKEN_ENABLED=true` + `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME/DB/USER` + secret `GREENHOUSE_POSTGRES_PASSWORD`.
+  - **PG conecta** (`Loaded 0/1 per-client space config(s) from PG SSOT`), **Efeonce/Sky sincronizan OK** (full sync 0 errores), **degrade-to-today confirmado**.
+- **BLOQUEADA por TASK-1003:** con Berel `sync_enabled=TRUE` el sync dio **404** porque usa el endpoint **deprecado** `/v1/databases/{id}/query` y Berel tiene **data_source ids** (modelo 2026). El token/PG/IAM están OK; el bloqueador es el endpoint/id-type. → migración en `TASK-1003`.
+- **Berel revertido a `sync_enabled=FALSE`** (estado seguro, cliente nuevo sin data).
+- **Cerrar esta task SOLO cuando TASK-1003 pase paridad + Berel sincronice nativo.**
+- Evidencia completa: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md`.
+
 ## Status
 
 - Lifecycle: `in-progress`
+- Blocked by: `TASK-1003` (migración al endpoint canónico `/v1/data_sources/{id}/query`)
 - Priority: `P1`
 - Impact: `Alto` (sin esto, los clientes nuevos conectados por TASK-998 NO sincronizan a diario)
 - Effort: `Medio` — pero **cross-repo + deploy-sensitive** (delicado)
