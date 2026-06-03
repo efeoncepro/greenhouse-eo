@@ -355,6 +355,8 @@ export const GH_CLIENT_ONBOARDING = {
     healthyDescription: 'El onboarding avanza dentro de lo esperado.',
     atRiskTitle: 'Faltan pasos para activar del todo',
     atRiskDescription: 'Hay {count} áreas pendientes. Complétalas desde la ficha para activar al cliente.',
+    progressTitle: 'Onboarding en curso',
+    progressDescription: '{completed} de {total} pasos completados. Faltan {pending} para activar del todo — complétalos desde el checklist (firma de contrato, equipo, facturación…).',
     stalledTitle: 'Onboarding detenido',
     stalledDescription: 'Lleva {days} días sin avances. Contacta al responsable de la cuenta para destrabarlo.',
     overdueTitle: 'Vencido',

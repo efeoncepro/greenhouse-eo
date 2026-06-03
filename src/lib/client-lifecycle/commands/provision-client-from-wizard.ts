@@ -313,6 +313,22 @@ export const provisionClientFromWizard = async (
       metadata.notionConnectIntent = input.notionConnectIntent
     }
 
+    // Ítems del checklist que el wizard YA satisfizo → se materializan 'completed'
+    // (no 'pending'), así el operador no ve como faltante lo que ya cargó en el alta.
+    // Los que requieren trabajo humano post-alta (contrato/MSA, FTE del equipo, portal
+    // users, facturación) quedan pendientes. Los que requieren evidencia los respeta el
+    // command (no los auto-completa sin asset).
+    const autoCompleteItemCodes: string[] = []
+
+    if (input.origin === 'hubspot_company' && input.identity.hubspotCompanyId) {
+      autoCompleteItemCodes.push('verify_hubspot_company_synced')
+    }
+
+    if (input.clientKind) autoCompleteItemCodes.push('declare_engagement_kind')
+    if (paymentCurrency) autoCompleteItemCodes.push('declare_commercial_terms')
+    if (notionConnected) autoCompleteItemCodes.push('provision_notion_workspace')
+    if (input.teamsAnchor?.teamId) autoCompleteItemCodes.push('provision_communication_channels')
+
     const lifecycle = await provisionClientLifecycle(
       {
         organizationId: org.organizationId,
@@ -323,7 +339,8 @@ export const provisionClientFromWizard = async (
         targetCompletionDate: input.targetCompletionDate,
         reason: input.reason,
         hubspotDealId: input.hubspotDealId,
-        metadataExtra: metadata
+        metadataExtra: metadata,
+        autoCompleteItemCodes
       },
       client
     )

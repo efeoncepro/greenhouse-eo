@@ -19,6 +19,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { HubSpotIsotype } from '@/components/greenhouse/brand/BrandIsotypes'
 import { OperationalPanel } from '@/components/greenhouse/primitives'
 import { PortalUsersPanel } from '@/views/greenhouse/agency/clients/PortalUsersPanel'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
@@ -206,6 +207,9 @@ const LifecycleTimeline = ({
   }
 
   const originLabel = data.origin ? ORIGIN_LABEL[data.origin] ?? data.origin : null
+  const isHubspotOrigin = data.origin === 'hubspot_company' || data.origin === 'hubspot_sync'
+  const completedStepCount = (checklist ?? []).filter(item => item.status === 'completed').length
+  const totalStepCount = (checklist ?? []).length
 
   return (
     <Box sx={{ p: { xs: 4, md: 6 }, maxWidth: 1120, mx: 'auto' }}>
@@ -216,15 +220,31 @@ const LifecycleTimeline = ({
           <Typography variant='caption' sx={{ color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             {T.timeline.originLabel}
           </Typography>
-          <CustomChip round='true' size='small' variant='tonal' color='primary' icon={<i className='tabler-brand-hipchat' />} label={originLabel} />
+          <CustomChip
+            round='true'
+            size='small'
+            variant='tonal'
+            color='primary'
+            icon={isHubspotOrigin ? <HubSpotIsotype size={14} /> : <i className='tabler-database-import' />}
+            label={originLabel}
+          />
         </Stack>
       ) : null}
 
-      {/* Health banner — severity derived from facet rollup, not hardcoded. */}
+      {/* Health banner — severity derived from facet rollup, not hardcoded.
+          Cuando ya hay pasos completados (p. ej. lo que el wizard resolvió en el alta),
+          el banner muestra PROGRESO honesto en vez de solo "faltan" (state-design). */}
       {data.pendingFacetCount > 0 ? (
         <Alert severity='warning' icon={<i className='tabler-progress-alert' />} sx={{ mb: 5 }} role='status'>
-          <AlertTitle sx={{ fontWeight: 600 }}>{T.timeline.atRiskTitle}</AlertTitle>
-          {T.timeline.atRiskDescription.replace('{count}', String(data.pendingFacetCount))}
+          <AlertTitle sx={{ fontWeight: 600 }}>
+            {completedStepCount > 0 ? T.timeline.progressTitle : T.timeline.atRiskTitle}
+          </AlertTitle>
+          {completedStepCount > 0
+            ? T.timeline.progressDescription
+                .replace('{completed}', String(completedStepCount))
+                .replace('{total}', String(totalStepCount))
+                .replace('{pending}', String(totalStepCount - completedStepCount))
+            : T.timeline.atRiskDescription.replace('{count}', String(data.pendingFacetCount))}
         </Alert>
       ) : (
         <Alert severity='info' icon={<i className='tabler-route' />} sx={{ mb: 5 }} role='status'>

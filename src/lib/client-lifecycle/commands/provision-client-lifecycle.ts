@@ -36,6 +36,10 @@ export interface ProvisionClientLifecycleInput {
   metadataExtra?: Record<string, unknown>
   /** Override the derived initial status (hubspot_deal -> draft, otherwise in_progress). */
   initialStatus?: 'draft' | 'in_progress'
+  /** Item codes que el alta YA satisfizo (engagement kind, términos, Notion, Teams,
+   *  etc.) → se materializan 'completed' en vez de 'pending' (si no requieren
+   *  evidencia). Evita que el checklist muestre como pendiente lo que el wizard ya hizo. */
+  autoCompleteItemCodes?: string[]
 }
 
 const deriveInitialStatus = (
@@ -167,12 +171,19 @@ export const provisionClientLifecycle = async (
       throw new ClientLifecycleValidationError('case_insert_failed', 'No se pudo crear el caso.', 500)
     }
 
+    const autoComplete = new Set(input.autoCompleteItemCodes ?? [])
+
     for (const item of templateItems) {
+      // El alta ya satisfizo este ítem y no requiere evidencia → 'completed'
+      // (CHECK exige completed_at; evidence_required_check exige asset si requiresEvidence).
+      const isAutoCompleted = autoComplete.has(item.itemCode) && !item.requiresEvidence
+
       await client.query(
         `INSERT INTO greenhouse_core.client_lifecycle_checklist_items (
            item_id, case_id, template_code, item_code, item_label, required,
-           blocks_completion, requires_evidence, owner_role, display_order, status
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending')`,
+           blocks_completion, requires_evidence, owner_role, display_order, status,
+           completed_at, completed_by_user_id, notes
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
         [
           newItemId(),
           caseId,
@@ -183,7 +194,11 @@ export const provisionClientLifecycle = async (
           item.blocksCompletion,
           item.requiresEvidence,
           item.ownerRole,
-          item.defaultOrder
+          item.defaultOrder,
+          isAutoCompleted ? 'completed' : 'pending',
+          isAutoCompleted ? new Date() : null,
+          isAutoCompleted ? input.triggeredByUserId : null,
+          isAutoCompleted ? 'Completado automáticamente en el alta del cliente.' : null
         ]
       )
     }
