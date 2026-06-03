@@ -229,6 +229,11 @@ export const PortalUsersPanel = ({ organizationId }: { organizationId: string })
           {rows.map((row, idx) => {
             const settled = row.rowStatus === 'invited' || row.rowStatus === 'already'
             const noEmail = !row.email
+            // El seed HubSpot cae a email como name cuando el contacto no tiene display_name;
+            // evitar mostrar el email dos veces (línea primaria + secundaria).
+            const hasRealName = !noEmail && row.name.trim().toLowerCase() !== (row.email ?? '').trim().toLowerCase()
+            const primaryText = hasRealName ? row.name : row.email ?? row.name
+            const secondaryText = [hasRealName ? row.email : null, row.jobTitle].filter(Boolean).join(' · ')
 
             return (
               <Stack
@@ -245,12 +250,18 @@ export const PortalUsersPanel = ({ organizationId }: { organizationId: string })
               >
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography variant='body2' sx={{ fontWeight: 600 }} noWrap>
-                    {row.name}
+                    {primaryText}
                   </Typography>
-                  <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block' }} noWrap>
-                    {row.email ?? T.portalUsers.noEmail}
-                    {row.jobTitle ? ` · ${row.jobTitle}` : ''}
-                  </Typography>
+                  {secondaryText ? (
+                    <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block' }} noWrap>
+                      {secondaryText}
+                    </Typography>
+                  ) : null}
+                  {noEmail ? (
+                    <Typography variant='caption' sx={{ color: 'warning.main', display: 'block' }} noWrap>
+                      {T.portalUsers.noEmail}
+                    </Typography>
+                  ) : null}
                 </Box>
 
                 <CustomTextField
