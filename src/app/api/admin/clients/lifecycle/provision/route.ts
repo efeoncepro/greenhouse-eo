@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     const finance = (body.finance ?? {}) as Record<string, unknown>
     const financeContacts = parseFinanceContacts(body.contacts)
     const notionAnchors = parseNotionAnchors(body.notionAnchors)
+    const teamsAnchor = parseTeamsAnchor(body.teamsAnchor)
 
     const result = await provisionClientFromWizard({
       origin,
@@ -60,6 +61,7 @@ export async function POST(request: Request) {
       },
       financeContacts,
       notionAnchors,
+      teamsAnchor,
       effectiveDate: typeof body.effectiveDate === 'string' ? body.effectiveDate : undefined,
       targetCompletionDate: typeof body.targetCompletionDate === 'string' ? body.targetCompletionDate : undefined,
       reason: typeof body.reason === 'string' ? body.reason : undefined,
@@ -127,4 +129,18 @@ const parseNotionAnchors = (raw: unknown): { notionDatabaseId: string; title: st
   }
 
   return anchors
+}
+
+// TASK-997 Slice 4 — normaliza el equipo de Teams anclado del wizard.
+const parseTeamsAnchor = (raw: unknown): { teamId: string; teamName: string } | null => {
+  if (!raw || typeof raw !== 'object') return null
+  const item = raw as Record<string, unknown>
+  const teamId = typeof item.teamId === 'string' ? item.teamId.trim() : ''
+
+  if (!teamId) return null
+
+  return {
+    teamId,
+    teamName: typeof item.teamName === 'string' && item.teamName.trim() ? item.teamName.trim() : teamId
+  }
 }

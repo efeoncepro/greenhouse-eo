@@ -221,6 +221,11 @@ interface NotionTeamspaceSuggestion {
   url: string | null
 }
 
+interface TeamsAnchor {
+  teamId: string
+  teamName: string
+}
+
 interface WizardState {
   origin: OnboardingOrigin | null
   hubspotCompany: HubspotCompany | null
@@ -258,6 +263,8 @@ interface WizardState {
   // TASK-997 Slice 3 — teamspace de Notion anclado (External Reference). Bases
   // existentes (Tareas/Proyectos/Sprints) elegidas del buscador; vacío ⇒ crear nuevo.
   notionAnchors: NotionAnchor[]
+  // TASK-997 Slice 4 — equipo de Teams anclado (External Reference). null ⇒ crear nuevo.
+  teamsAnchor: TeamsAnchor | null
   // Confirmar
   reviewConfirmed: boolean
   understandConfirmed: boolean
@@ -296,6 +303,7 @@ const INITIAL: WizardState = {
   provisionNotion: true,
   provisionTeams: true,
   notionAnchors: [],
+  teamsAnchor: null,
   reviewConfirmed: false,
   understandConfirmed: false,
   prefilledFields: []
@@ -1358,6 +1366,55 @@ const SpaceStep = ({
 
   const hasNotionAnchors = state.notionAnchors.length > 0
 
+  // TASK-997 Slice 4 — buscador de equipo Teams (External Reference, Graph).
+  const [teamsQuery, setTeamsQuery] = useState('')
+  const [teamsResults, setTeamsResults] = useState<TeamsAnchor[]>([])
+  const [teamsState, setTeamsState] = useState<'idle' | 'loading' | 'ready' | 'degraded'>('idle')
+
+  useEffect(() => {
+    const q = teamsQuery.trim()
+
+    if (q.length < 2) {
+      setTeamsState('idle')
+      setTeamsResults([])
+
+      return
+    }
+
+    let cancelled = false
+
+    const handle = setTimeout(() => {
+      setTeamsState('loading')
+      fetch(`/api/admin/clients/lifecycle/teams-channels?q=${encodeURIComponent(q)}`)
+        .then(res => res.json() as Promise<{ items?: TeamsAnchor[]; degraded?: boolean }>)
+        .then(payload => {
+          if (cancelled) return
+
+          if (payload.degraded) {
+            setTeamsState('degraded')
+            setTeamsResults([])
+
+            return
+          }
+
+          setTeamsResults(payload.items ?? [])
+          setTeamsState('ready')
+        })
+        .catch(() => {
+          if (cancelled) return
+          setTeamsState('degraded')
+          setTeamsResults([])
+        })
+    }, 280)
+
+    return () => {
+      cancelled = true
+      clearTimeout(handle)
+    }
+  }, [teamsQuery])
+
+  const hasTeamsAnchor = state.teamsAnchor !== null
+
   return (
     <Box>
       <StepHeading title={T.space.title} subtitle={T.space.subtitle} />
@@ -1461,6 +1518,41 @@ const SpaceStep = ({
             />
           </Box>
 
+          {/* TASK-997 Slice 4 — anclar equipo de Teams existente (External Reference) */}
+          <Box sx={{ mt: 2 }}>
+            <CustomAutocomplete
+              fullWidth
+              options={teamsResults}
+              value={state.teamsAnchor}
+              filterOptions={x => x}
+              loading={teamsState === 'loading'}
+              getOptionLabel={option => option.teamName}
+              isOptionEqualToValue={(option, value) => option.teamId === value.teamId}
+              onInputChange={(_, v) => setTeamsQuery(v)}
+              onChange={(_, value) => update('teamsAnchor', value ?? null)}
+              noOptionsText={teamsState === 'degraded' ? T.space.teamsSearchDegraded : T.space.teamsSearchEmpty}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label={T.space.teamsSearchLabel}
+                  placeholder={T.space.teamsSearchPlaceholder}
+                  helperText={teamsState === 'degraded' ? T.space.teamsSearchDegraded : T.space.teamsSearchHelper}
+                  slotProps={{
+                    input: {
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {teamsState === 'loading' ? <CircularProgress size={16} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      )
+                    }
+                  }}
+                />
+              )}
+            />
+          </Box>
+
           <Stack spacing={1} sx={{ mt: 2 }}>
             <FormControlLabel
               control={
@@ -1473,8 +1565,14 @@ const SpaceStep = ({
               label={hasNotionAnchors ? T.space.provisionNotionAnchoredLabel : T.space.provisionNotionLabel}
             />
             <FormControlLabel
-              control={<Switch checked={state.provisionTeams} onChange={() => update('provisionTeams', !state.provisionTeams)} />}
-              label={T.space.provisionTeamsLabel}
+              control={
+                <Switch
+                  checked={state.provisionTeams && !hasTeamsAnchor}
+                  disabled={hasTeamsAnchor}
+                  onChange={() => update('provisionTeams', !state.provisionTeams)}
+                />
+              }
+              label={hasTeamsAnchor ? T.space.provisionTeamsAnchoredLabel : T.space.provisionTeamsLabel}
             />
           </Stack>
           <Stack direction='row' spacing={2} alignItems='flex-start' sx={{ mt: 2, color: 'text.secondary' }}>
@@ -2410,7 +2508,8 @@ const ClientOnboardingView = () => {
             hubspotContactId: c.hubspotContactId,
             source: c.source
           })),
-          notionAnchors: state.notionAnchors
+          notionAnchors: state.notionAnchors,
+          teamsAnchor: state.teamsAnchor
         })
       })
 

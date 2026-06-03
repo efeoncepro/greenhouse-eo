@@ -61,6 +61,8 @@ export interface ProvisionClientFromWizardInput {
   financeContacts?: FinanceContactRecord[]
   /** TASK-997 Slice 3 — bases Notion ancladas (teamspace existente del cliente). */
   notionAnchors?: { notionDatabaseId: string; title: string }[]
+  /** TASK-997 Slice 4 — equipo de Teams anclado (canal existente del cliente). */
+  teamsAnchor?: { teamId: string; teamName: string } | null
   effectiveDate?: string
   targetCompletionDate?: string
   reason?: string
@@ -214,6 +216,12 @@ export const provisionClientFromWizard = async (
         notionDatabaseId: a.notionDatabaseId,
         title: a.title
       }))
+    }
+
+    // TASK-997 Slice 4 — equipo de Teams anclado (intent). El aprovisionamiento
+    // async lo consume para registrar teams_notification_channels cuando aplique.
+    if (input.teamsAnchor?.teamId) {
+      metadata.teamsAnchor = { teamId: input.teamsAnchor.teamId, teamName: input.teamsAnchor.teamName }
     }
 
     const lifecycle = await provisionClientLifecycle(

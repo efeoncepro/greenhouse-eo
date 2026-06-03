@@ -108,11 +108,22 @@ interface NotionAnchor {
   title: string
 }
 
+interface TeamsAnchor {
+  teamId: string
+  teamName: string
+}
+
 // Mock de las bases que devolvería /v1/search (teamspace existente del cliente).
 const MOCK_NOTION_TEAMSPACE_SUGGESTIONS: NotionAnchor[] = [
   { notionDatabaseId: 'db-tareas', title: 'Berel · Tareas' },
   { notionDatabaseId: 'db-proyectos', title: 'Berel · Proyectos' },
   { notionDatabaseId: 'db-sprints', title: 'Berel · Sprints' }
+]
+
+// Mock de los equipos que devolvería Graph (equipo existente del cliente).
+const MOCK_TEAMS_SUGGESTIONS: TeamsAnchor[] = [
+  { teamId: 'team-berel', teamName: 'Grupo Berel · Efeonce' },
+  { teamId: 'team-berel-mkt', teamName: 'Berel Marketing' }
 ]
 
 interface WizardState {
@@ -150,6 +161,7 @@ interface WizardState {
   provisionNotion: boolean
   provisionTeams: boolean
   notionAnchors: NotionAnchor[]
+  teamsAnchor: TeamsAnchor | null
   // Confirmar
   reviewConfirmed: boolean
   understandConfirmed: boolean
@@ -188,6 +200,7 @@ const INITIAL: WizardState = {
   provisionNotion: true,
   provisionTeams: true,
   notionAnchors: [],
+  teamsAnchor: null,
   reviewConfirmed: false,
   understandConfirmed: false,
   prefilledFields: []
@@ -1133,6 +1146,7 @@ const SpaceStep = ({
   const spaceNameError = touched && state.spaceName.trim() === ''
   const numericCodeError = touched && !/^\d{2}$/.test(state.numericCode)
   const hasNotionAnchors = state.notionAnchors.length > 0
+  const hasTeamsAnchor = state.teamsAnchor !== null
 
   return (
     <Box>
@@ -1221,6 +1235,26 @@ const SpaceStep = ({
             />
           </Box>
 
+          {/* TASK-997 Slice 4 — anclar equipo de Teams existente (mock) */}
+          <Box sx={{ mt: 2 }}>
+            <CustomAutocomplete
+              fullWidth
+              options={MOCK_TEAMS_SUGGESTIONS}
+              value={state.teamsAnchor}
+              getOptionLabel={option => option.teamName}
+              isOptionEqualToValue={(option, value) => option.teamId === value.teamId}
+              onChange={(_, value) => update('teamsAnchor', value ?? null)}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label={T.space.teamsSearchLabel}
+                  placeholder={T.space.teamsSearchPlaceholder}
+                  helperText={T.space.teamsSearchHelper}
+                />
+              )}
+            />
+          </Box>
+
           <Stack spacing={1} sx={{ mt: 2 }}>
             <FormControlLabel
               control={
@@ -1233,8 +1267,14 @@ const SpaceStep = ({
               label={hasNotionAnchors ? T.space.provisionNotionAnchoredLabel : T.space.provisionNotionLabel}
             />
             <FormControlLabel
-              control={<Switch checked={state.provisionTeams} onChange={() => update('provisionTeams', !state.provisionTeams)} />}
-              label={T.space.provisionTeamsLabel}
+              control={
+                <Switch
+                  checked={state.provisionTeams && !hasTeamsAnchor}
+                  disabled={hasTeamsAnchor}
+                  onChange={() => update('provisionTeams', !state.provisionTeams)}
+                />
+              }
+              label={hasTeamsAnchor ? T.space.provisionTeamsAnchoredLabel : T.space.provisionTeamsLabel}
             />
           </Stack>
           <Stack direction='row' spacing={2} alignItems='flex-start' sx={{ mt: 2, color: 'text.secondary' }}>
