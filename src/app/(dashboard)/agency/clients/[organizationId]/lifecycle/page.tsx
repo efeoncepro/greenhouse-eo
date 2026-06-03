@@ -99,6 +99,7 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
   return (
     <LifecycleTimeline
       organizationName={organizationName}
+      organizationId={organizationId}
       data={data}
       degraded={degraded}
       startOnboardingHref='/agency/clients/new'

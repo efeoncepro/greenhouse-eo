@@ -360,6 +360,33 @@ export const GH_CLIENT_ONBOARDING = {
     ownerOperations: 'Operaciones',
     ownerIdentity: 'Identidad',
     ownerFinance: 'Finanzas'
+  },
+
+  // --- Personas del portal (TASK-1001 — checklist provision_client_users_access) ----
+  portalUsers: {
+    title: 'Personas del portal',
+    subtitle: 'Invita a las personas del cliente que usarán el portal.',
+    loading: 'Buscando contactos…',
+    emptyTitle: 'Sin contactos sugeridos',
+    empty: 'No encontramos contactos asociados en HubSpot para esta empresa. Agrégalos en HubSpot y vuelve a intentar.',
+    degradedClientTitle: 'Falta crear el Cliente',
+    degradedClient: 'Esta organización todavía no tiene un Cliente asociado. Créalo para poder invitar personas al portal.',
+    degradedHubspotTitle: 'No pudimos cargar los contactos',
+    degradedHubspot: 'HubSpot no respondió. Reintenta en unos segundos.',
+    retryCta: 'Reintentar',
+    pickHint: 'Confirma el rol de cada persona y envíale la invitación. Recibirá un email para activar su cuenta.',
+    roleLabel: 'Rol en el portal',
+    roleExecutive: 'Ejecutivo',
+    roleManager: 'Manager',
+    roleSpecialist: 'Especialista',
+    inviteCta: 'Invitar',
+    invitingCta: 'Invitando…',
+    retryInviteCta: 'Reintentar',
+    noEmail: 'Sin email',
+    statusAlreadyChip: 'Con acceso',
+    statusInvitedChip: 'Invitación enviada',
+    statusErrorChip: 'No se pudo invitar',
+    secretNote: 'Cada persona recibe un email para crear su contraseña. Su acceso queda limitado al portal de este cliente.'
   }
 } as const
 

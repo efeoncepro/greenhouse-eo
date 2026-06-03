@@ -20,6 +20,7 @@ import CustomChip from '@core/components/mui/Chip'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { OperationalPanel } from '@/components/greenhouse/primitives'
+import { PortalUsersPanel } from '@/views/greenhouse/agency/clients/PortalUsersPanel'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
 import type {
   FacetKey,
@@ -133,6 +134,8 @@ const OWNER_LABEL: Record<string, string> = {
 
 interface Props {
   organizationName: string
+  /** TASK-1001 — org del caso; alimenta el panel interactivo de personas del portal. */
+  organizationId: string
   data: LifecycleTimelineData | null
   /** Read failed — show the honest degraded state, never fake data. */
   degraded?: boolean
@@ -148,6 +151,7 @@ interface Props {
 
 const LifecycleTimeline = ({
   organizationName,
+  organizationId,
   data,
   degraded,
   startOnboardingHref,
@@ -238,10 +242,11 @@ const LifecycleTimeline = ({
                 const st = CHECKLIST_STATUS[item.status]
                 const isNotion = item.itemCode === 'provision_notion_workspace'
                 const isTeams = item.itemCode === 'provision_communication_channels'
+                const isPortalUsers = item.itemCode === 'provision_client_users_access'
 
                 return (
+                  <Box key={item.itemCode}>
                   <Stack
-                    key={item.itemCode}
                     direction='row'
                     spacing={2}
                     alignItems='flex-start'
@@ -292,6 +297,8 @@ const LifecycleTimeline = ({
                     </Box>
                     <CustomChip round='true' size='small' variant='tonal' color={st.color} icon={<i className={st.icon} />} label={st.label} />
                   </Stack>
+                  {isPortalUsers ? <PortalUsersPanel organizationId={organizationId} /> : null}
+                  </Box>
                 )
               })}
             </Stack>
