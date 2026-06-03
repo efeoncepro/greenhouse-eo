@@ -3,6 +3,7 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { withTransaction } from '@/lib/db'
+import { coerceHubspotIndustryValue } from '@/config/hubspot-industries'
 import { upsertCanonicalOrganization } from '@/lib/account-360/organization-identity'
 import { instantiateClientForParty } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 import { promoteParty } from '@/lib/commercial/party/commands/promote-party'
@@ -47,6 +48,8 @@ export interface ProvisionClientFromWizardInput {
     taxId?: string
     taxIdType?: string
     country?: string
+    /** TASK-997 Slice 1 — canonical HubSpot industry `value` (e.g. 'RETAIL'). */
+    industry?: string
     hubspotCompanyId?: string
   }
   finance?: {
@@ -129,6 +132,7 @@ export const provisionClientFromWizard = async (
         taxId,
         taxIdType: input.identity.taxIdType?.trim() || null,
         country,
+        industry: coerceHubspotIndustryValue(input.identity.industry),
         hubspotCompanyId: input.identity.hubspotCompanyId?.trim() || null,
         hasClientRole: true,
         origin: ORG_ORIGIN_BY_WIZARD[input.origin]

@@ -214,6 +214,13 @@ export const upsertCanonicalOrganization = async (
     taxId?: string | null
     taxIdType?: string | null
     country?: string | null
+    /**
+     * TASK-997 Slice 1 — industria alineada al enum canónico HubSpot
+     * (`src/config/hubspot-industries.ts`). Se guarda el `value` estable
+     * (ej. 'RETAIL'). El caller coacciona texto libre vía `coerceHubspotIndustryValue`
+     * antes de pasarlo; aquí se persiste tal cual (COALESCE preserva en UPDATE).
+     */
+    industry?: string | null
     hubspotCompanyId?: string | null
     lifecycleStage?: string | null
     hasClientRole?: boolean
@@ -246,12 +253,14 @@ export const upsertCanonicalOrganization = async (
            hubspot_company_id = COALESCE($5, hubspot_company_id),
            tax_id = COALESCE($6, tax_id),
            tax_id_type = COALESCE($7, tax_id_type),
-           country = COALESCE($8, country)`
+           country = COALESCE($8, country),
+           industry = COALESCE($10, industry)`
       : `legal_name = COALESCE(NULLIF(legal_name, ''), $4),
            hubspot_company_id = COALESCE(hubspot_company_id, $5),
            tax_id = COALESCE(tax_id, $6),
            tax_id_type = COALESCE(tax_id_type, $7),
-           country = COALESCE(NULLIF(country, ''), $8)`
+           country = COALESCE(NULLIF(country, ''), $8),
+           industry = COALESCE(NULLIF(industry, ''), $10)`
 
     await queryRows(
       `UPDATE greenhouse_core.organizations
@@ -270,7 +279,8 @@ export const upsertCanonicalOrganization = async (
         input.taxId?.trim() || null,
         input.taxIdType?.trim() || null,
         input.country?.trim() || null,
-        origin
+        origin,
+        input.industry?.trim() || null
       ],
       client
     )
@@ -285,8 +295,8 @@ export const upsertCanonicalOrganization = async (
     `INSERT INTO greenhouse_core.organizations (
       organization_id, public_id, organization_name, legal_name,
       tax_id, tax_id_type, country, hubspot_company_id, organization_type, origin,
-      status, active, created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'active', TRUE, NOW(), NOW())`,
+      industry, status, active, created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'active', TRUE, NOW(), NOW())`,
     [
       newOrganizationId,
       publicId,
@@ -297,7 +307,8 @@ export const upsertCanonicalOrganization = async (
       input.country?.trim() || null,
       input.hubspotCompanyId?.trim() || null,
       organizationType,
-      origin
+      origin,
+      input.industry?.trim() || null
     ],
     client
   )

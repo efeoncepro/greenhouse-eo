@@ -11,6 +11,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
+import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -39,6 +40,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { GreenhouseDatePicker } from '@/components/greenhouse'
 import useReducedMotion from '@/hooks/useReducedMotion'
+import { HUBSPOT_INDUSTRIES, hubspotIndustryOption } from '@/config/hubspot-industries'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
 import { formatDate } from '@/lib/format'
 import { AnimatePresence, motion } from '@/libs/FramerMotion'
@@ -554,13 +556,22 @@ const IdentidadStep = ({
           autoComplete='off'
         />
 
-        <CustomTextField
+        <Autocomplete
           fullWidth
-          label={T.identidad.industryLabel}
-          value={state.industry}
-          onChange={e => update('industry', e.target.value)}
-          helperText={T.identidad.industryHelper}
-          autoComplete='off'
+          autoHighlight
+          options={HUBSPOT_INDUSTRIES}
+          getOptionLabel={option => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          value={hubspotIndustryOption(state.industry)}
+          onChange={(_, option) => update('industry', option?.value ?? '')}
+          renderInput={params => (
+            <CustomTextField
+              {...params}
+              label={T.identidad.industryLabel}
+              helperText={T.identidad.industryHelper}
+              placeholder={T.identidad.industryPlaceholder}
+            />
+          )}
         />
       </Stack>
     </Box>

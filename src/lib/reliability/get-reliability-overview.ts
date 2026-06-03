@@ -188,6 +188,7 @@ import {
   getClientLifecycleBlockerOverrideAnomalySignal
 } from './queries/client-lifecycle-signals'
 import { getCommercialOrganizationIncompleteIdentitySignal } from './queries/commercial-organization-incomplete-identity'
+import { getCommercialOrganizationIndustryNoncanonicalSignal } from './queries/commercial-organization-industry-noncanonical'
 import { getCommercialOrganizationTypeLifecycleDriftSignal } from './queries/commercial-organization-type-lifecycle-drift'
 import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
 // TASK-837 Slice 6 — 7 reliability signals for Sample Sprint outbound projection.
@@ -1743,6 +1744,8 @@ export const getReliabilityOverview = async (
           getCommercialOrganizationIncompleteIdentitySignal().catch(() => null),
           getCommercialClientActiveWithoutProfileSignal().catch(() => null),
           getCommercialClientActiveWithoutSpaceSignal().catch(() => null),
+          // TASK-997 Slice 1 — industria fuera del enum canónico HubSpot (data quality).
+          getCommercialOrganizationIndustryNoncanonicalSignal().catch(() => null),
           // TASK-992 — Client Lifecycle Orchestrator signals (roll up bajo `commercial`).
           getClientLifecycleOnboardingStalledSignal().catch(() => null),
           getClientLifecycleChecklistOrphanItemsSignal().catch(() => null),

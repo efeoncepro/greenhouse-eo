@@ -48,6 +48,7 @@ export async function POST(request: Request) {
         taxId: typeof identity.taxId === 'string' ? identity.taxId : undefined,
         taxIdType: typeof identity.taxIdType === 'string' ? identity.taxIdType : undefined,
         country: typeof identity.country === 'string' ? identity.country : undefined,
+        industry: typeof identity.industry === 'string' ? identity.industry : undefined,
         hubspotCompanyId: typeof identity.hubspotCompanyId === 'string' ? identity.hubspotCompanyId : undefined
       },
       finance: {

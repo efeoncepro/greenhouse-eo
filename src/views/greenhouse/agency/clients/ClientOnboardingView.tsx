@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import Alert from '@mui/material/Alert'
+import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -42,6 +43,7 @@ import { alpha, useTheme } from '@mui/material/styles'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import { HUBSPOT_INDUSTRIES, hubspotIndustryOption } from '@/config/hubspot-industries'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { GreenhouseDatePicker } from '@/components/greenhouse'
 import useReducedMotion from '@/hooks/useReducedMotion'
@@ -661,13 +663,22 @@ const IdentidadStep = ({
           autoComplete='off'
         />
 
-        <CustomTextField
+        <Autocomplete
           fullWidth
-          label={T.identidad.industryLabel}
-          value={state.industry}
-          onChange={e => update('industry', e.target.value)}
-          helperText={T.identidad.industryHelper}
-          autoComplete='off'
+          autoHighlight
+          options={HUBSPOT_INDUSTRIES}
+          getOptionLabel={option => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          value={hubspotIndustryOption(state.industry)}
+          onChange={(_, option) => update('industry', option?.value ?? '')}
+          renderInput={params => (
+            <CustomTextField
+              {...params}
+              label={T.identidad.industryLabel}
+              helperText={T.identidad.industryHelper}
+              placeholder={T.identidad.industryPlaceholder}
+            />
+          )}
         />
       </Stack>
     </Box>
@@ -2098,6 +2109,7 @@ const ClientOnboardingView = () => {
             taxId: state.taxId.trim(),
             taxIdType: taxIdLabelForCountry(state.country || null),
             country: state.country || undefined,
+            industry: state.industry || undefined,
             hubspotCompanyId: state.hubspotCompany?.hubspotCompanyId ?? undefined
           },
           finance: {
