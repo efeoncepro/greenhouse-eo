@@ -127,6 +127,21 @@ equivalente → el vínculo del canal es por selección/confirmación del canal 
 - **Pegar el link del teamspace** → rechazado por el operador (no enterprise).
 - **Auto-discovery por diff al conectar la integración** → frágil (depende de timing/permisos).
 
+## Progreso (2026-06-03) — shipped + dependencia descubierta
+
+**Shipped en `develop`** (token-por-teamspace, validado live con Berel):
+
+- Reader `discoverNotionDatabasesForToken` + clasificador por título (test) — `src/lib/client-onboarding/notion-token-connect.ts`.
+- Migración `space_notion_sources.notion_token_secret_ref`.
+- Secret-write helper `createOrAddSecretVersion` (auto-provisión, idempotente, degrada honesto si falta IAM) — `src/lib/secrets/secret-manager.ts`.
+- Connect store: `provisionNotionConnectIntent` (validar→anti-tamper→secret, sin spaceId) + `connectNotionTeamspaceForSpace` (+ upsert) — `src/lib/client-onboarding/notion-connect-store.ts` (tests 6/6).
+- Endpoint `POST /api/admin/clients/lifecycle/notion/validate`.
+- **UI paso "Espacio"**: elección segmentada Crear/Vincular + `NotionConnectPanel` (token→validar→mapear, estados honestos) + isotipos SVG Notion/Teams — **GVC verificado enterprise live** (idle + validado: 16 bases Berel, 3 auto-mapeadas).
+- **Wiring submit→provision**: el endpoint `/provision` auto-provisiona el secret + ancla el intent (`secretRef` + db ids) en la metadata del caso de onboarding.
+- Canonización: CLAUDE.md + AGENTS.md + skill `notion-platform` + memoria.
+
+**Dependencia descubierta (gap TASK-992)**: el composer `provisionClientFromWizard` **NO crea un `greenhouse_core.spaces` row** (lo dice su propio comentario). `space_notion_sources.space_id` es FK a `spaces` → el `space_notion_sources` no se puede escribir al submit. El intent queda anclado en el caso; el write a `space_notion_sources` se completa **cuando exista el Space** (creación de Space en el composer = TASK-992, o el checklist `provision_notion_workspace`). El secret YA queda provisionado.
+
 ## Scope (Slices)
 
 - **Slice 0 — Verificar el pipeline `/discover`**: hoy responde config (2 spaces configured), no `groups[]`. Confirmar/arreglar el endpoint del Cloud Run `notion-bq-sync` para que `/discover` devuelva los grupos por teamspace con clasificación (o documentar el contrato real).
