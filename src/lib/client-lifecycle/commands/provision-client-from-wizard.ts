@@ -59,6 +59,8 @@ export interface ProvisionClientFromWizardInput {
   }
   /** TASK-997 Slice 2 — contactos de finanzas con provenance (suggest HubSpot o manual). */
   financeContacts?: FinanceContactRecord[]
+  /** TASK-997 Slice 3 — bases Notion ancladas (teamspace existente del cliente). */
+  notionAnchors?: { notionDatabaseId: string; title: string }[]
   effectiveDate?: string
   targetCompletionDate?: string
   reason?: string
@@ -201,6 +203,18 @@ export const provisionClientFromWizard = async (
     const metadata: Record<string, unknown> = { origin: input.origin }
 
     if (input.clientKind) metadata.clientKind = input.clientKind
+
+    // TASK-997 Slice 3 — teamspace de Notion anclado (External Reference). Se guarda
+    // como intent en la metadata del caso; el aprovisionamiento async lo consume
+    // (checklist provision_notion_workspace) para registrar las bases en
+    // greenhouse_core.space_notion_sources cuando el space exista. NO se escribe
+    // inline (el space aún no existe en el commit del wizard).
+    if (input.notionAnchors && input.notionAnchors.length > 0) {
+      metadata.notionAnchors = input.notionAnchors.map(a => ({
+        notionDatabaseId: a.notionDatabaseId,
+        title: a.title
+      }))
+    }
 
     const lifecycle = await provisionClientLifecycle(
       {

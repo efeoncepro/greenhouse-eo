@@ -103,6 +103,18 @@ const MOCK_FINANCE_CONTACT_SUGGESTIONS: FinanceContactSuggestion[] = [
   { hubspotContactId: '902', name: 'Diego Alarcón', email: 'd.alarcon@berel.com.mx', jobTitle: 'Cuentas por Pagar' }
 ]
 
+interface NotionAnchor {
+  notionDatabaseId: string
+  title: string
+}
+
+// Mock de las bases que devolvería /v1/search (teamspace existente del cliente).
+const MOCK_NOTION_TEAMSPACE_SUGGESTIONS: NotionAnchor[] = [
+  { notionDatabaseId: 'db-tareas', title: 'Berel · Tareas' },
+  { notionDatabaseId: 'db-proyectos', title: 'Berel · Proyectos' },
+  { notionDatabaseId: 'db-sprints', title: 'Berel · Sprints' }
+]
+
 interface WizardState {
   origin: OnboardingOrigin | null
   hubspotCompany: MockHubspotCompany | null
@@ -137,6 +149,7 @@ interface WizardState {
   numericCode: string
   provisionNotion: boolean
   provisionTeams: boolean
+  notionAnchors: NotionAnchor[]
   // Confirmar
   reviewConfirmed: boolean
   understandConfirmed: boolean
@@ -174,6 +187,7 @@ const INITIAL: WizardState = {
   numericCode: '',
   provisionNotion: true,
   provisionTeams: true,
+  notionAnchors: [],
   reviewConfirmed: false,
   understandConfirmed: false,
   prefilledFields: []
@@ -1118,6 +1132,7 @@ const SpaceStep = ({
 
   const spaceNameError = touched && state.spaceName.trim() === ''
   const numericCodeError = touched && !/^\d{2}$/.test(state.numericCode)
+  const hasNotionAnchors = state.notionAnchors.length > 0
 
   return (
     <Box>
@@ -1180,10 +1195,42 @@ const SpaceStep = ({
           <Typography variant='caption' sx={{ color: 'text.secondary' }}>
             {T.space.provisionSubtitle}
           </Typography>
+          {/* TASK-997 Slice 3 — anclar teamspace de Notion existente (mock) */}
+          <Box sx={{ mt: 3 }}>
+            <CustomAutocomplete
+              multiple
+              fullWidth
+              options={MOCK_NOTION_TEAMSPACE_SUGGESTIONS}
+              value={state.notionAnchors}
+              getOptionLabel={option => option.title}
+              isOptionEqualToValue={(option, value) => option.notionDatabaseId === value.notionDatabaseId}
+              onChange={(_, value) =>
+                update(
+                  'notionAnchors',
+                  value.map(v => ({ notionDatabaseId: v.notionDatabaseId, title: v.title }))
+                )
+              }
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label={T.space.notionSearchLabel}
+                  placeholder={T.space.notionSearchPlaceholder}
+                  helperText={T.space.notionSearchHelper}
+                />
+              )}
+            />
+          </Box>
+
           <Stack spacing={1} sx={{ mt: 2 }}>
             <FormControlLabel
-              control={<Switch checked={state.provisionNotion} onChange={() => update('provisionNotion', !state.provisionNotion)} />}
-              label={T.space.provisionNotionLabel}
+              control={
+                <Switch
+                  checked={state.provisionNotion && !hasNotionAnchors}
+                  disabled={hasNotionAnchors}
+                  onChange={() => update('provisionNotion', !state.provisionNotion)}
+                />
+              }
+              label={hasNotionAnchors ? T.space.provisionNotionAnchoredLabel : T.space.provisionNotionLabel}
             />
             <FormControlLabel
               control={<Switch checked={state.provisionTeams} onChange={() => update('provisionTeams', !state.provisionTeams)} />}

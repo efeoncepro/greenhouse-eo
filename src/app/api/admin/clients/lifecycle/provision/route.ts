@@ -40,6 +40,7 @@ export async function POST(request: Request) {
     const identity = (body.identity ?? {}) as Record<string, unknown>
     const finance = (body.finance ?? {}) as Record<string, unknown>
     const financeContacts = parseFinanceContacts(body.contacts)
+    const notionAnchors = parseNotionAnchors(body.notionAnchors)
 
     const result = await provisionClientFromWizard({
       origin,
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
         paymentTermsDays: typeof finance.paymentTermsDays === 'number' ? finance.paymentTermsDays : undefined
       },
       financeContacts,
+      notionAnchors,
       effectiveDate: typeof body.effectiveDate === 'string' ? body.effectiveDate : undefined,
       targetCompletionDate: typeof body.targetCompletionDate === 'string' ? body.targetCompletionDate : undefined,
       reason: typeof body.reason === 'string' ? body.reason : undefined,
@@ -102,4 +104,27 @@ const parseFinanceContacts = (raw: unknown): FinanceContactRecord[] => {
   }
 
   return contacts
+}
+
+// TASK-997 Slice 3 — normaliza las bases Notion ancladas del wizard. Ignora
+// entradas sin id.
+const parseNotionAnchors = (raw: unknown): { notionDatabaseId: string; title: string }[] => {
+  if (!Array.isArray(raw)) return []
+
+  const anchors: { notionDatabaseId: string; title: string }[] = []
+
+  for (const entry of raw) {
+    if (!entry || typeof entry !== 'object') continue
+    const item = entry as Record<string, unknown>
+    const id = typeof item.notionDatabaseId === 'string' ? item.notionDatabaseId.trim() : ''
+
+    if (!id) continue
+
+    anchors.push({
+      notionDatabaseId: id,
+      title: typeof item.title === 'string' && item.title.trim() ? item.title.trim() : id
+    })
+  }
+
+  return anchors
 }

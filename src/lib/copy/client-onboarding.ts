@@ -203,7 +203,7 @@ export const GH_CLIENT_ONBOARDING = {
   // --- Step 5: Space ---------------------------------------------------------
   space: {
     title: 'Espacio operativo',
-    subtitle: 'El workspace donde va a vivir la operación del cliente.',
+    subtitle: 'El espacio donde va a vivir la operación del cliente.',
     spaceNameLabel: 'Nombre del espacio',
     spaceNameHelper: 'Normalmente el nombre del cliente.',
     spaceNameError: 'Falta el nombre del espacio.',
@@ -213,9 +213,15 @@ export const GH_CLIENT_ONBOARDING = {
     numericCodeError: 'Usa exactamente 2 dígitos (ej. 07).',
     provisionTitle: 'Aprovisionamiento',
     provisionSubtitle: 'Qué creamos automáticamente al dar de alta.',
-    provisionNotionLabel: 'Crear workspace de Notion',
+    notionSearchLabel: 'Teamspace de Notion',
+    notionSearchPlaceholder: 'Busca las bases del cliente (Tareas, Proyectos, Sprints)',
+    notionSearchHelper: 'Si el Teamspace ya existe, búscalo y áncalo. Si no, déjalo vacío y lo creamos.',
+    notionSearchEmpty: 'Sin resultados. Prueba con otro nombre o créalo nuevo.',
+    notionSearchDegraded: 'No pudimos buscar en Notion ahora. Puedes crear el Teamspace nuevo.',
+    provisionNotionLabel: 'Crear Teamspace nuevo en Notion',
+    provisionNotionAnchoredLabel: 'Teamspace anclado — no se crea uno nuevo',
     provisionTeamsLabel: 'Crear canal de Teams + suscripciones de email',
-    provisionNotionEcho: 'Workspace Notion: {name}',
+    provisionNotionEcho: 'Teamspace Notion: {name}',
     provisionTeamsEcho: 'Canal Teams: {name}',
     provisionNote: 'Se preparan en segundo plano. Vas a poder verificarlos en el checklist.'
   },

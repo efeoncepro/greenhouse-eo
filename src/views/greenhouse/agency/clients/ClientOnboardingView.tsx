@@ -205,6 +205,18 @@ interface FinanceContactSuggestion {
   jobTitle: string | null
 }
 
+interface NotionAnchor {
+  notionDatabaseId: string
+  title: string
+}
+
+interface NotionTeamspaceSuggestion {
+  notionDatabaseId: string
+  title: string
+  parentType: string
+  url: string | null
+}
+
 interface WizardState {
   origin: OnboardingOrigin | null
   hubspotCompany: HubspotCompany | null
@@ -239,6 +251,9 @@ interface WizardState {
   numericCode: string
   provisionNotion: boolean
   provisionTeams: boolean
+  // TASK-997 Slice 3 — teamspace de Notion anclado (External Reference). Bases
+  // existentes (Tareas/Proyectos/Sprints) elegidas del buscador; vacío ⇒ crear nuevo.
+  notionAnchors: NotionAnchor[]
   // Confirmar
   reviewConfirmed: boolean
   understandConfirmed: boolean
@@ -276,6 +291,7 @@ const INITIAL: WizardState = {
   numericCode: '',
   provisionNotion: true,
   provisionTeams: true,
+  notionAnchors: [],
   reviewConfirmed: false,
   understandConfirmed: false,
   prefilledFields: []
@@ -1287,6 +1303,57 @@ const SpaceStep = ({
   const spaceNameError = touched && state.spaceName.trim() === ''
   const numericCodeError = touched && !/^\d{2}$/.test(state.numericCode)
 
+  // TASK-997 Slice 3 — buscador de teamspace Notion (External Reference). Debounced
+  // async contra /v1/search; estados honestos (loading/ready/degraded). Anclar bases
+  // existentes evita crear un teamspace duplicado.
+  const [notionQuery, setNotionQuery] = useState('')
+  const [notionResults, setNotionResults] = useState<NotionTeamspaceSuggestion[]>([])
+  const [notionState, setNotionState] = useState<'idle' | 'loading' | 'ready' | 'degraded'>('idle')
+
+  useEffect(() => {
+    const q = notionQuery.trim()
+
+    if (q.length < 2) {
+      setNotionState('idle')
+      setNotionResults([])
+
+      return
+    }
+
+    let cancelled = false
+
+    const handle = setTimeout(() => {
+      setNotionState('loading')
+      fetch(`/api/admin/clients/lifecycle/notion-teamspaces?q=${encodeURIComponent(q)}`)
+        .then(res => res.json() as Promise<{ items?: NotionTeamspaceSuggestion[]; degraded?: boolean }>)
+        .then(payload => {
+          if (cancelled) return
+
+          if (payload.degraded) {
+            setNotionState('degraded')
+            setNotionResults([])
+
+            return
+          }
+
+          setNotionResults(payload.items ?? [])
+          setNotionState('ready')
+        })
+        .catch(() => {
+          if (cancelled) return
+          setNotionState('degraded')
+          setNotionResults([])
+        })
+    }, 280)
+
+    return () => {
+      cancelled = true
+      clearTimeout(handle)
+    }
+  }, [notionQuery])
+
+  const hasNotionAnchors = state.notionAnchors.length > 0
+
   return (
     <Box>
       <StepHeading title={T.space.title} subtitle={T.space.subtitle} />
@@ -1348,10 +1415,58 @@ const SpaceStep = ({
           <Typography variant='caption' sx={{ color: 'text.secondary' }}>
             {T.space.provisionSubtitle}
           </Typography>
+
+          {/* TASK-997 Slice 3 — anclar teamspace de Notion existente (External Reference) */}
+          <Box sx={{ mt: 3 }}>
+            <CustomAutocomplete
+              multiple
+              fullWidth
+              options={notionResults}
+              value={state.notionAnchors}
+              filterOptions={x => x}
+              loading={notionState === 'loading'}
+              getOptionLabel={option => option.title}
+              isOptionEqualToValue={(option, value) => option.notionDatabaseId === value.notionDatabaseId}
+              onInputChange={(_, v) => setNotionQuery(v)}
+              onChange={(_, value) =>
+                update(
+                  'notionAnchors',
+                  value.map(v => ({ notionDatabaseId: v.notionDatabaseId, title: v.title }))
+                )
+              }
+              noOptionsText={notionState === 'degraded' ? T.space.notionSearchDegraded : T.space.notionSearchEmpty}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  label={T.space.notionSearchLabel}
+                  placeholder={T.space.notionSearchPlaceholder}
+                  helperText={notionState === 'degraded' ? T.space.notionSearchDegraded : T.space.notionSearchHelper}
+                  slotProps={{
+                    input: {
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {notionState === 'loading' ? <CircularProgress size={16} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      )
+                    }
+                  }}
+                />
+              )}
+            />
+          </Box>
+
           <Stack spacing={1} sx={{ mt: 2 }}>
             <FormControlLabel
-              control={<Switch checked={state.provisionNotion} onChange={() => update('provisionNotion', !state.provisionNotion)} />}
-              label={T.space.provisionNotionLabel}
+              control={
+                <Switch
+                  checked={state.provisionNotion && !hasNotionAnchors}
+                  disabled={hasNotionAnchors}
+                  onChange={() => update('provisionNotion', !state.provisionNotion)}
+                />
+              }
+              label={hasNotionAnchors ? T.space.provisionNotionAnchoredLabel : T.space.provisionNotionLabel}
             />
             <FormControlLabel
               control={<Switch checked={state.provisionTeams} onChange={() => update('provisionTeams', !state.provisionTeams)} />}
@@ -2289,7 +2404,8 @@ const ClientOnboardingView = () => {
             role: c.role || null,
             hubspotContactId: c.hubspotContactId,
             source: c.source
-          }))
+          })),
+          notionAnchors: state.notionAnchors
         })
       })
 
