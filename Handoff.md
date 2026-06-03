@@ -11,10 +11,11 @@
 
 **Gates**: tsc 0 · lint 0 · design:lint 0/0 · `pnpm build` ✓ (Turbopack, exit 0) · 20 tests focales + 70 blast-radius verdes · safety greps limpias (0 `new Pool`/raw-error/`getServerAuthSession`/`GREENHOUSE_POSTGRES_` en archivos nuevos).
 
+**GVC ✅ hecha (local, flag ON, commit `86cb0bf0`)**: panel capturado en el ítem `provision_client_users_access` del timeline (GOBIERNO REGIONAL, caso temporal sembrado + cancelado, 5 contactos HubSpot reales). Estado "ready" enterprise verificado; fix de pulido aplicado en el loop (email duplicado cuando el seed HubSpot cae a email como name → corregido + warning "Sin email"). NO se clickeó Invitar (emails reales). Push a `develop` `7baa44a5..86cb0bf0`.
+
 **Pendiente rollout (NO cerrar — `code complete, rollout pendiente`)**:
-1. **GVC del panel** — bundled con la ronda GVC pendiente de TASK-992 (misma surface flag-gated; requiere flag ON + un caso de onboarding sembrado, que el operador crea en su validación Berel end-to-end). Forzar una GVC aislada ahora duplicaría/interferiría ese estado.
-2. **Flag flip** + invitación real end-to-end (email + activación de cuenta).
-3. **Docs funcional** (`docs/documentation/identity/`) + **manual** (`docs/manual-de-uso/`).
+1. **Flag flip** (`CLIENT_LIFECYCLE_ONBOARDING_ENABLED`) + invitación real end-to-end (email + activación) — bundled con el rollout de TASK-992.
+2. **Docs funcional** (`docs/documentation/identity/`) + **manual** (`docs/manual-de-uso/`).
 
 CLAUDE.md invariant "Client Portal User Invitation SSOT (TASK-1001)" agregado. README + task lifecycle sincronizados.
 
