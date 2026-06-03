@@ -405,3 +405,93 @@ export const getSecretSource = async (options: SecretResolutionOptions) => {
     secretRef: resolution.secretRef
   }
 }
+
+const SECRET_ID_SHAPE = /^[A-Za-z0-9_-]{1,255}$/
+
+export interface CreateSecretResult {
+  ok: boolean
+  /** Nombre canónico del secret (= `*_SECRET_REF` a persistir). */
+  secretId: string
+  /** Path completo de la versión creada, e.g. `projects/x/secrets/y/versions/3`. */
+  versionName?: string
+  /** `true` si el secret ya existía y solo se agregó una versión. */
+  alreadyExisted?: boolean
+  /** Razón es-CL cuando ok=false (shape inválido, IAM, error GCP). */
+  reason?: string
+  /** Discrimina causa para que el caller decida UX (IAM → escalar a infra). */
+  errorCode?: 'invalid_secret_id' | 'permission_denied' | 'gcp_error'
+}
+
+/**
+ * TASK-998 — Escribe un secret en GCP Secret Manager (canónico, server-only).
+ *
+ * Crea el secret si no existe (idempotente) y agrega una versión con `value`.
+ * Reusa el client + auth canónicos de este módulo (NO instanciar otro client).
+ * NUNCA loggea `value`. El payload se escribe como bytes UTF-8 crudos (sin
+ * newline) — mirror del `printf %s` de Secret Manager Hygiene.
+ *
+ * Degradación honesta: si el runtime SA no tiene permiso de escritura
+ * (`secretmanager.secrets.create` / `secretmanager.versions.add`), devuelve
+ * `{ ok: false, errorCode: 'permission_denied' }` para que el caller escale a
+ * infra en vez de fallar opaco.
+ */
+export const createOrAddSecretVersion = async (
+  secretId: string,
+  value: string,
+  env: NodeJS.ProcessEnv = process.env
+): Promise<CreateSecretResult> => {
+  const id = (secretId || '').trim()
+
+  if (!SECRET_ID_SHAPE.test(id)) {
+    return { ok: false, secretId: id, errorCode: 'invalid_secret_id', reason: 'El nombre del secret no es válido (letras, dígitos, guion o guion bajo, máx. 255).' }
+  }
+
+  if (!value) {
+    return { ok: false, secretId: id, errorCode: 'gcp_error', reason: 'El valor del secret está vacío.' }
+  }
+
+  const client = getSecretManagerClient()
+  const projectId = getGoogleProjectId(env)
+  const parent = `projects/${projectId}`
+  let alreadyExisted = false
+
+  try {
+    try {
+      await client.createSecret({
+        parent,
+        secretId: id,
+        secret: { replication: { automatic: {} } }
+      })
+    } catch (err) {
+      // ALREADY_EXISTS (code 6) → seguimos a agregar versión. Otro error → throw.
+      const code = (err as { code?: number })?.code
+
+      if (code === 6) {
+        alreadyExisted = true
+      } else {
+        throw err
+      }
+    }
+
+    const [version] = await client.addSecretVersion({
+      parent: `${parent}/secrets/${id}`,
+      payload: { data: Buffer.from(value, 'utf8') }
+    })
+
+    return { ok: true, secretId: id, versionName: version.name ?? undefined, alreadyExisted }
+  } catch (err) {
+    const code = (err as { code?: number })?.code
+
+    // 7 = PERMISSION_DENIED, 16 = UNAUTHENTICATED
+    if (code === 7 || code === 16) {
+      return {
+        ok: false,
+        secretId: id,
+        errorCode: 'permission_denied',
+        reason: 'El runtime no tiene permiso para escribir secrets. Escalá a infra (rol secretmanager.secretVersionAdder + create) o crea el secret manualmente.'
+      }
+    }
+
+    return { ok: false, secretId: id, errorCode: 'gcp_error', reason: 'No pudimos guardar el token en Secret Manager. Intenta de nuevo.' }
+  }
+}
