@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -101,6 +101,38 @@ interface ExternalReference {
 - **Copy fix**: "Crear workspace de Notion" → "Teamspace de Notion" (terminología correcta).
 
 Cada slice: skills `forms-ux` + `state-design` + (`modern-ui`/`greenhouse-ux`) para los controles; **actualizar mockup + runtime juntos** (regla de paridad TASK-992); GVC `fe:capture:diff`.
+
+## Delta 2026-06-03 — Slices 1-4 + prefill + enterprise pass SHIPPED (develop)
+
+Las 4 slices + el follow-up de prefill + un pase visual enterprise están en `develop`
+(flag de TASK-992 OFF — el wizard se habilita con `NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED`).
+Cada slice: diseño con skills (arch-architect 4-pilar + forms-ux + state-design +
+notion-platform + greenhouse-ux + greenhouse-ux-writing), copy-and-patch runtime↔mockup,
+verificación **GVC local**, tsc 0 / lint 0 / tests focales verdes.
+
+- **Slice 1 — Industria (Controlled Vocabulary)** ✓ — combobox `CustomAutocomplete` sobre
+  SSOT `hubspot-industries.ts` (147) + persistencia `organizations.industry` (writer SSOT)
+  + coerción legacy + drift signal `commercial.organization.industry_noncanonical` + 4 tests.
+  - **prefill** desde la org/HubSpot (org-search `industry`) → GVC: "Retail" precargado para Berel.
+- **Slice 2 — Contacto finanzas (External Reference, HubSpot)** ✓ — suggest reader sobre
+  `greenhouse_crm.contacts` + endpoint degradado + persistencia `client_profiles.finance_contacts`
+  (JSONB con provenance) + UI estados honestos (loading/ready/empty/degraded) + chips→filas
+  enterprise (avatar/nombre·cargo/email + Agregar/Agregado) + chip provenance HubSpot + 2 tests.
+- **Slice 3 — Notion teamspace+DBs (External Reference)** ✓ — `/v1/search` (Notion-Version
+  `2026-03-11`, token Greenhouse PRD) + endpoint degradado + `CustomAutocomplete` multiple async
+  (debounced) + captura en case metadata `notionAnchors` (consume el checklist async
+  `provision_notion_workspace` → `space_notion_sources`) + copy "workspace"→"Teamspace" + 3 tests.
+- **Slice 4 — Teams channel (External Reference, Graph)** ✓ — Graph `/v1.0/groups` (Teams=M365
+  groups) reusando `acquireGraphToken`+`readBotFrameworkSecret` + endpoint degradado + búsqueda
+  async + captura `teamsAnchor` (consume async → `teams_notification_channels`) + 4 tests.
+
+**Pendiente (no bloquea el wizard; cada uno su propia coordinación):**
+- Consumers async del checklist que materializan `space_notion_sources` / `teams_notification_channels`
+  desde el case metadata (`provision_notion_workspace` / `provision_communication_channels`).
+- Readiness real: conectar la integración **Greenhouse PRD** al teamspace del cliente + permisos
+  Graph `Group.Read.All` (sin eso, ambos search degradan a "crear nuevo" — comportamiento correcto).
+- Channel-level selection en Teams (V1 ancla el equipo; el canal General lo resuelve el async).
+- Validación Berel end-to-end por el operador + gate `pnpm test` full antes de mover a `complete`.
 
 ## Hard Rules (anti-regression)
 
