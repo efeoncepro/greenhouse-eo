@@ -720,6 +720,39 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-992 — Client Lifecycle Orchestrator (GREENHOUSE_CLIENT_LIFECYCLE_V1 §8).
+  // Keys collapsed to real ROLE_CODES in runtime.ts (anti-ghost-role TASK-935):
+  // the spec mentions commercial_admin/operations which do not exist.
+  {
+    key: 'client.lifecycle.case.open',
+    module: 'commercial',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'client.lifecycle.case.advance',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'client.lifecycle.case.resolve',
+    module: 'commercial',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'client.lifecycle.case.override_blocker',
+    module: 'commercial',
+    actions: ['override'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'client.lifecycle.case.read',
+    module: 'commercial',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'commercial.deal.create',
     module: 'commercial',

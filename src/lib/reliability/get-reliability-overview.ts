@@ -179,6 +179,14 @@ import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue
 // Todas roll up bajo subsystem `commercial`. Steady=0.
 import { getCommercialClientActiveWithoutProfileSignal } from './queries/commercial-client-active-without-profile'
 import { getCommercialClientActiveWithoutSpaceSignal } from './queries/commercial-client-active-without-space'
+// TASK-992 — 5 reliability signals del Client Lifecycle Orchestrator (roll up `commercial`).
+import {
+  getClientLifecycleOnboardingStalledSignal,
+  getClientLifecycleChecklistOrphanItemsSignal,
+  getClientLifecycleCascadeDeadLetterSignal,
+  getClientLifecycleCaseWithoutTemplateSignal,
+  getClientLifecycleBlockerOverrideAnomalySignal
+} from './queries/client-lifecycle-signals'
 import { getCommercialOrganizationIncompleteIdentitySignal } from './queries/commercial-organization-incomplete-identity'
 import { getCommercialOrganizationTypeLifecycleDriftSignal } from './queries/commercial-organization-type-lifecycle-drift'
 import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
@@ -1734,7 +1742,13 @@ export const getReliabilityOverview = async (
           getCommercialOrganizationTypeLifecycleDriftSignal().catch(() => null),
           getCommercialOrganizationIncompleteIdentitySignal().catch(() => null),
           getCommercialClientActiveWithoutProfileSignal().catch(() => null),
-          getCommercialClientActiveWithoutSpaceSignal().catch(() => null)
+          getCommercialClientActiveWithoutSpaceSignal().catch(() => null),
+          // TASK-992 — Client Lifecycle Orchestrator signals (roll up bajo `commercial`).
+          getClientLifecycleOnboardingStalledSignal().catch(() => null),
+          getClientLifecycleChecklistOrphanItemsSignal().catch(() => null),
+          getClientLifecycleCascadeDeadLetterSignal().catch(() => null),
+          getClientLifecycleCaseWithoutTemplateSignal().catch(() => null),
+          getClientLifecycleBlockerOverrideAnomalySignal().catch(() => null)
         ])
           .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []

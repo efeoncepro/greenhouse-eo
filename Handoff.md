@@ -1,3 +1,19 @@
+# Sesion 2026-06-03 — TASK-992 Client Lifecycle Orchestrator (Slice 1: aggregate) — 🔄 SLICE 1 CODE COMPLETE (develop, flag OFF)
+
+**Scope**: activar el orquestador canónico `client_lifecycle_case` (onboarding) ya specced en `GREENHOUSE_CLIENT_LIFECYCLE_V1` (Aceptada, 0 implementación). Sesión = **Slice 1 (aggregate)** por decisión del operador en el checkpoint humano post-Plan; Slices 2 (wizard puerta única + drawer Finanzas redefinido + triggers HubSpot/adopt + MXN) y 3 (timeline Account 360) quedan para sesiones siguientes. **En `develop`** (instrucción del operador, sin branch).
+
+**Entregado (Slice 1)**:
+- **Migración `20260603004341038`**: 4 tablas `greenhouse_core` (`client_lifecycle_cases` + `_case_events` append-only + `_checklist_templates` + `_checklist_items`), CHECK enums + UNIQUE partial (un caso activo por org/kind) + trigger de matriz de transición §6.3 + anti-UPDATE/DELETE en eventos + DO block anti pre-up-marker. Seed `standard_onboarding_v1` (10 items §5.5 verbatim). Aplicada + tipos regenerados (423 tablas). Reconciliación vs el DDL del contrato: `organization_id` TEXT (no UUID), user FK = `client_users` (no existe `greenhouse_core.users`), `template_code` columna snapshot (no FK, PK compuesta).
+- **Comandos** (`src/lib/client-lifecycle/commands/**`, atómicos + idempotentes + outbox v1, dual-mode `client?`): `provisionClientLifecycle`, `advanceLifecycleChecklistItem`, `resolveLifecycleCase` (cascade `instantiateClientForParty` en onboarding completed), `addLifecycleBlocker`/`resolveLifecycleBlocker`. State machine pura (`state-machine.ts`) + store (`store.ts`) + types.
+- **8 eventos v1** `client.lifecycle.*` (event-catalog + EVENT_CATALOG Delta). **API §9** (6 rutas `/api/admin/clients/[organizationId]/lifecycle[/onboarding]` + `/api/admin/clients/lifecycle/{cases,cases/[id]/items/[code],cases/[id]/resolve,health}`) con `authorizeLifecycle` + `can()` granular + es-CL sanitizado. **5 capabilities** `client.lifecycle.case.*` (catalog + grants en runtime.ts colapsados a ROLE_CODES reales — anti-rol-fantasma). **5 reliability signals** (subsystem Commercial Health) + wire-up.
+- **Verificación**: live smoke rollback-wrapped contra PG real (10 items materializados, idempotencia, rechazo de complete-too-early + evidencia-requerida, cascade `client_instantiated`, trigger DB bloquea `completed→draft`, append-only enforced) → todo rolled back, cero residue. Tests focales 14/14 verde + grant-coverage verde.
+
+**Flag**: `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` default OFF — el código está live pero las tablas vacías no se consumen. Cero cambio observable al merge.
+
+**Pendiente (Slices 2-3)**: cablear el mockup APROBADO (`src/views/greenhouse/agency/clients/mockup/**`) a runtime FUERA de `/mockup/`; wizard composer `POST /api/admin/clients/lifecycle/provision` (upsertCanonicalOrganization + provisionClientLifecycle atómico); redefinir `CreateClientDrawer`; triggers HubSpot deal/adopt; MXN en el paso Finanzas (widen `billingDefaults.paymentCurrency`); timeline Account 360; **Berel como caso de validación end-to-end** (org ya remediada por TASK-991). Docs funcional + manual de la puerta única quedan para cuando el wizard ship.
+
+---
+
 # Sesion 2026-06-02 — Creative Video Studio / HyperFrames pilot — 🆕 DOCUMENTADO
 
 **Scope**: documentar la capacidad mostrada con HyperFrames (`efeoncepro.com` -> promo 20s) como posible modulo nativo de Greenhouse, sin tocar runtime.

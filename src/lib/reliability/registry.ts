@@ -404,9 +404,12 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       // TASK-991 — Organization birth completeness signals.
       'src/lib/reliability/queries/commercial-organization-*.ts',
       'src/lib/reliability/queries/commercial-client-active-*.ts',
-      'src/lib/account-360/organization-identity.ts'
+      'src/lib/account-360/organization-identity.ts',
+      // TASK-992 — Client Lifecycle Orchestrator.
+      'src/lib/client-lifecycle/**',
+      'src/lib/reliability/queries/client-lifecycle-signals.ts'
     ],
-    expectedSignalKinds: ['subsystem', 'drift', 'lag', 'data_quality'],
+    expectedSignalKinds: ['subsystem', 'drift', 'lag', 'data_quality', 'dead_letter'],
     incidentDomainTag: 'integrations.hubspot'
   },
   {

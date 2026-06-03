@@ -929,3 +929,24 @@ Nuevo evento audit `finance.expense.unanchored_acknowledged` (aggregate type `fi
 - **Consumers**: ninguno reactivo en V1 (audit-only). Los readers `getFinanceLedgerHealth` (campo `acknowledgedDebt`), `getLedgerDriftInventory` (sección `acknowledged`) y el signal `finance.ledger.unresolved_drift_items` excluyen los acknowledged del conteo de pendientes leyendo la columna directamente.
 
 Spec: `docs/tasks/in-progress/TASK-934-unanchored-paid-expense-anchoring-review-queue.md`.
+
+## Delta 2026-06-03 — TASK-992: `client.lifecycle.*` (Client Lifecycle Orchestrator V1.0 onboarding)
+
+8 eventos versionados v1, aggregate type `client_lifecycle_case`, aggregate_id = `caseId` (`clc-{uuid}`). Implementan `GREENHOUSE_CLIENT_LIFECYCLE_V1` §10 (alcance onboarding/reactivation; offboarding diferido).
+
+| Event | Cuándo | Payload v1 (además de `schemaVersion:1, caseId`) | Consumers |
+|---|---|---|---|
+| `client.lifecycle.case.opened` | `provisionClientLifecycle` | `{organizationId, caseKind, triggerSource, effectiveDate, templateCode}` | UI notification, BQ projection (futuro) |
+| `client.lifecycle.case.activated` | draft → in_progress | `{activatedBy}` | dashboards (reservado) |
+| `client.lifecycle.item.advanced` | `advanceLifecycleChecklistItem` | `{itemCode, fromStatus, toStatus, evidenceAssetId?}` | UI notifications |
+| `client.lifecycle.blocker.added` | `addLifecycleBlocker` | `{reasonCode}` | reliability signal, alerts |
+| `client.lifecycle.blocker.resolved` | `resolveLifecycleBlocker` | `{reasonCode}` | reliability signal |
+| `client.lifecycle.case.completed` | `resolveLifecycleCase` (completed) | `{caseKind, organizationId}` | **cascade**: onboarding completa invoca `instantiateClientForParty` si no existe |
+| `client.lifecycle.case.cancelled` | `resolveLifecycleCase` (cancelled) | `{caseKind, organizationId}` | UI, BQ projection |
+| `client.lifecycle.blocker.overridden` | resolve con `overrideBlockers` | `{blockedReasonCodes}` | reliability signal `client.lifecycle.blocker_override_anomaly_rate`, audit |
+
+- **Emisor**: comandos en `src/lib/client-lifecycle/commands/**` vía `publishLifecycleEvent` (dual-mode, dentro de la misma tx que la mutación + el `client_lifecycle_case_events` append-only).
+- **Cascade canónico**: el `.case.completed` de kind `onboarding` invoca `instantiateClientForParty(organizationId)` dentro de la tx; swallow `OrganizationAlreadyHasClientError` (idempotente). El org row NUNCA se escribe desde el lifecycle — eso es `upsertCanonicalOrganization` (TASK-991), invocado por el wizard composer (Slice 2).
+- **Reliability**: `client.lifecycle.cascade_dead_letter` lee `outbox_events WHERE event_type LIKE 'client.lifecycle.%' AND status='dead_letter'`.
+
+Spec: `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md` §10 + `docs/tasks/in-progress/TASK-992-client-lifecycle-orchestrator-single-front-door.md`.

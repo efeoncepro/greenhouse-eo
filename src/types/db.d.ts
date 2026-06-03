@@ -2029,6 +2029,77 @@ export interface GreenhouseCoreClientFeatureFlags {
   flag_id: string;
 }
 
+export interface GreenhouseCoreClientLifecycleCaseEvents {
+  actor_user_id: string | null;
+  case_id: string;
+  event_id: string;
+  event_kind: string;
+  from_status: string | null;
+  occurred_at: Generated<Timestamp>;
+  payload_json: Generated<Json>;
+  to_status: string | null;
+}
+
+export interface GreenhouseCoreClientLifecycleCases {
+  blocked_reason_codes: Generated<string[]>;
+  cancellation_reason: string | null;
+  cancelled_at: Timestamp | null;
+  case_id: string;
+  case_kind: string;
+  client_id: string | null;
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  effective_date: Timestamp;
+  metadata_json: Generated<Json>;
+  organization_id: string;
+  previous_case_id: string | null;
+  reason: string | null;
+  status: Generated<string>;
+  target_completion_date: Timestamp | null;
+  template_code: string;
+  trigger_source: string;
+  triggered_by_user_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreClientLifecycleChecklistItems {
+  blocked_reason: string | null;
+  blocks_completion: boolean;
+  case_id: string;
+  completed_at: Timestamp | null;
+  completed_by_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  display_order: number;
+  evidence_asset_id: string | null;
+  item_code: string;
+  item_id: string;
+  item_label: string;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  owner_role: string;
+  required: boolean;
+  requires_evidence: boolean;
+  status: Generated<string>;
+  template_code: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreClientLifecycleChecklistTemplates {
+  blocks_completion: Generated<boolean>;
+  case_kind: string;
+  default_order: number;
+  effective_from: Generated<Timestamp>;
+  effective_to: Timestamp | null;
+  item_code: string;
+  item_description: string | null;
+  item_label: string;
+  metadata_json: Generated<Json | null>;
+  owner_role: string;
+  required: Generated<boolean>;
+  requires_evidence: Generated<boolean>;
+  template_code: string;
+}
+
 export interface GreenhouseCoreClients {
   active: Generated<boolean>;
   billing_currency: string | null;
@@ -9662,6 +9733,10 @@ export interface DB {
   "greenhouse_core.campaigns": GreenhouseCoreCampaigns;
   "greenhouse_core.capabilities_registry": GreenhouseCoreCapabilitiesRegistry;
   "greenhouse_core.client_feature_flags": GreenhouseCoreClientFeatureFlags;
+  "greenhouse_core.client_lifecycle_case_events": GreenhouseCoreClientLifecycleCaseEvents;
+  "greenhouse_core.client_lifecycle_cases": GreenhouseCoreClientLifecycleCases;
+  "greenhouse_core.client_lifecycle_checklist_items": GreenhouseCoreClientLifecycleChecklistItems;
+  "greenhouse_core.client_lifecycle_checklist_templates": GreenhouseCoreClientLifecycleChecklistTemplates;
   "greenhouse_core.client_service_modules": GreenhouseCoreClientServiceModules;
   "greenhouse_core.client_team_assignments": GreenhouseCoreClientTeamAssignments;
   "greenhouse_core.client_users": GreenhouseCoreClientUsers;

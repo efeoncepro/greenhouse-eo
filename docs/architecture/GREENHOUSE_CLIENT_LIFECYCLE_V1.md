@@ -10,7 +10,7 @@
 
 ## 0. Status
 
-Contrato arquitectónico nuevo desde 2026-05-07.
+Contrato arquitectónico nuevo desde 2026-05-07. **Implementada (onboarding) por TASK-992 — 2026-06-03**: el aggregate `client_lifecycle_case`, los comandos canónicos (`provisionClientLifecycle`, `advanceLifecycleChecklistItem`, `resolveLifecycleCase`, `addLifecycleBlocker`/`resolveLifecycleBlocker`), la API §9, las capabilities §8 (colapsadas a ROLE_CODES reales — anti-rol-fantasma TASK-935), los 8 eventos v1 §10 y 5 de los 6 reliability signals §13 están live en `develop` detrás del flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED`. Alcance V1.0: `caseKind='onboarding'` (+ scaffolding `reactivation`); `offboarding` y el `offboarding_blocked_overdue` signal quedan diferidos a una task derivada. El wizard (puerta única) + el timeline Account 360 + la redefinición del drawer Finanzas son Slices 2-3 de TASK-992. Ajustes vs el contrato DDL: `organization_id` es TEXT (no UUID); el user FK es `greenhouse_core.client_users(user_id)` (no existe `greenhouse_core.users`); `template_code` es columna snapshot (no FK, porque templates usa PK compuesta).
 
 Estado actual del repo:
 
