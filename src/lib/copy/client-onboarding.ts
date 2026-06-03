@@ -218,7 +218,31 @@ export const GH_CLIENT_ONBOARDING = {
     linkExistingNote: 'Si el cliente ya tiene su teamspace o canal (ej. Grupo Berel), desactiva la opción y lo vinculas en el checklist de onboarding — con el mismo flujo de conexión de Efeonce y Sky.',
     provisionNotionEcho: 'Teamspace Notion: {name}',
     provisionTeamsEcho: 'Canal Teams: {name}',
-    provisionNote: 'Se preparan en segundo plano. Vas a poder verificarlos en el checklist.'
+    provisionNote: 'Se preparan en segundo plano. Vas a poder verificarlos en el checklist.',
+
+    // TASK-998 — vínculo de teamspace Notion por token scoped (el token ES el scope)
+    notionTitle: 'Notion del cliente',
+    notionSubtitle: 'Conecta el teamspace donde vive la operación del cliente.',
+    notionModeNew: 'Crear teamspace nuevo',
+    notionModeNewHint: 'Lo creamos con sus bases (Tareas, Proyectos, Ciclos) al dar de alta.',
+    notionModeLink: 'Vincular teamspace existente',
+    notionModeLinkHint: 'El cliente ya tiene su teamspace (ej. Grupo Berel). Lo conectas con su token.',
+    notionTokenLabel: 'Token de integración Notion',
+    notionTokenHelper: 'En Notion, crea una integración interna conectada al teamspace del cliente y pega su token. Empieza con "ntn_".',
+    notionTokenPlaceholder: 'ntn_…',
+    notionHowTo: '¿Cómo creo la integración?',
+    notionValidateCta: 'Validar token',
+    notionValidating: 'Validando…',
+    notionValidOk: 'Token válido · {n} bases detectadas',
+    notionTokenRejected: 'El token fue rechazado por Notion. Verifica que lo copiaste completo.',
+    notionPickHint: 'Confirma qué base es cada una. Las marcamos automáticamente por su nombre.',
+    notionMapTareas: 'Tareas',
+    notionMapProyectos: 'Proyectos',
+    notionMapSprints: 'Ciclos (Sprints)',
+    notionMapPlaceholder: 'Elegir base…',
+    notionOtherDbs: 'Otras bases detectadas ({n})',
+    notionSecretNote: 'El token se guarda cifrado en nuestro gestor de secretos. Nunca queda en texto plano.',
+    notionMapIncomplete: 'Elige las 3 bases (Tareas, Proyectos, Ciclos) para conectar.'
   },
 
   // --- Step 6: Confirmar -----------------------------------------------------
