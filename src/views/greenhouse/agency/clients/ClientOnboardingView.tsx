@@ -53,6 +53,7 @@ import { TeamsConnectPanel, type TeamsConnectSelection } from '@/views/greenhous
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
 import type { ClientCompleteness } from '@/lib/client-lifecycle/queries/resolve-client-completeness'
+import { HubSpotIsotype } from '@/components/greenhouse/brand/BrandIsotypes'
 import { formatDate } from '@/lib/format'
 import { AnimatePresence, motion } from '@/libs/FramerMotion'
 
@@ -126,6 +127,8 @@ interface ProvisionResult {
   caseId: string
   status: 'draft' | 'in_progress'
   clientAlreadyExisted: boolean
+  /** Notion no se pudo vincular en el alta (no bloqueante) — pendiente en checklist. */
+  notionConnectWarning?: string | null
 }
 
 const fetchOrgSearch = async (params: string): Promise<OrgSearchRow[]> => {
@@ -382,6 +385,7 @@ const InferenceChip = ({ label }: { label: string }) => (
 const OriginCard = ({
   selected,
   icon,
+  iconNode,
   title,
   subtitle,
   detail,
@@ -390,6 +394,8 @@ const OriginCard = ({
 }: {
   selected: boolean
   icon: string
+  /** Cuando se provee, reemplaza el `<i className={icon}>` (p. ej. logo de marca real). */
+  iconNode?: React.ReactNode
   title: string
   subtitle: string
   detail: string
@@ -434,7 +440,7 @@ const OriginCard = ({
               color: 'primary.main'
             }}
           >
-            <i className={icon} style={{ fontSize: 22 }} aria-hidden />
+            {iconNode ?? <i className={icon} style={{ fontSize: 22 }} aria-hidden />}
           </Box>
           <i
             className={selected ? 'tabler-circle-check-filled' : 'tabler-circle'}
@@ -490,6 +496,7 @@ const OrigenStep = ({
           <OriginCard
             selected={state.origin === 'hubspot_sync'}
             icon='tabler-brand-hipchat'
+            iconNode={<HubSpotIsotype size={24} />}
             title={T.origen.hubspotCardTitle}
             subtitle={T.origen.hubspotCardSubtitle}
             detail={T.origen.hubspotCardDetail}
@@ -1616,6 +1623,13 @@ const SuccessScreen = ({
           />
         </Box>
       </Stack>
+
+      {result?.notionConnectWarning ? (
+        <Alert severity='warning' sx={{ mt: 4, maxWidth: 520, mx: 'auto' }}>
+          <AlertTitle sx={{ fontWeight: 600 }}>{T.success.notionDeferredTitle}</AlertTitle>
+          {result.notionConnectWarning} {T.success.notionDeferredNote}
+        </Alert>
+      ) : null}
 
       <Divider sx={{ my: 4 }} />
 

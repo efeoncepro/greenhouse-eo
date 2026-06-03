@@ -7,6 +7,7 @@ import { can } from '@/lib/entitlements/runtime'
 import type { EntitlementAction } from '@/config/entitlements-catalog'
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { redactErrorForResponse } from '@/lib/observability/redact'
 import { requireTenantContext } from '@/lib/tenant/authorization'
 
 import { ClientLifecycleValidationError } from './types'
@@ -75,7 +76,15 @@ export const mapLifecycleError = (error: unknown, source: string): NextResponse 
   captureWithDomain(error, 'commercial', { tags: { source: `client_lifecycle:${source}` } })
 
   return NextResponse.json(
-    { error: 'No se pudo procesar la solicitud de ciclo de vida.', code: 'internal_error', actionable: true },
+    {
+      error: 'No se pudo procesar la solicitud de ciclo de vida.',
+      code: 'internal_error',
+      actionable: true,
+      // Detalle sanitizado (sin secrets/PII/stack) para que el operador y el soporte
+      // vean QUÉ falló en vez del genérico opaco. El stack completo va a Sentry.
+      detail: redactErrorForResponse(error),
+      pgCode: (error as { code?: string })?.code ?? null
+    },
     { status: 502 }
   )
 }

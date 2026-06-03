@@ -310,7 +310,9 @@ export const GH_CLIENT_ONBOARDING = {
     nextChecklistTitle: 'Próximos pasos del checklist',
     goToClientCta: 'Ir a la ficha del cliente',
     createAnotherCta: 'Crear otro cliente',
-    checklistNote: 'Las tareas de Finanzas, Comercial y Operaciones las completa cada responsable desde la ficha del cliente.'
+    checklistNote: 'Las tareas de Finanzas, Comercial y Operaciones las completa cada responsable desde la ficha del cliente.',
+    notionDeferredTitle: 'La conexión de Notion quedó pendiente',
+    notionDeferredNote: 'El cliente se creó igual. Completá el vínculo de Notion desde el checklist del cliente.'
   },
 
   // --- Exit dialog -----------------------------------------------------------

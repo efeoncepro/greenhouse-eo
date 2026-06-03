@@ -8,6 +8,7 @@ import {
 import { ClientLifecycleValidationError } from '@/lib/client-lifecycle/types'
 import type { FinanceContactRecord } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 import { provisionNotionConnectIntent, type NotionConnectIntent } from '@/lib/client-onboarding/notion-connect-store'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,6 +51,11 @@ export async function POST(request: Request) {
     // cuando exista el Space. El token NUNCA viaja a PG ni se loggea.
     const notionConnect = parseNotionConnect(body.notionConnect)
     let notionConnectIntent: NotionConnectIntent | undefined
+    // NON-BLOCKING (TASK-998): el vínculo de Notion es un ítem del checklist de
+    // provisioning, NO una pieza del nacimiento. Si falla (token inválido, 502 de
+    // Notion, secret), NUNCA bloquea crear el cliente: se deja pendiente en el
+    // checklist (provision_notion_workspace) + warning honesto en la respuesta.
+    let notionConnectWarning: string | null = null
 
     if (notionConnect) {
       const provisioned = await provisionNotionConnectIntent({
@@ -61,14 +67,16 @@ export async function POST(request: Request) {
       })
 
       if (!provisioned.ok || !provisioned.intent) {
-        throw new ClientLifecycleValidationError(
-          provisioned.errorCode ?? 'notion_connect_failed',
-          provisioned.reason ?? 'No pudimos conectar Notion.',
-          422
-        )
+        notionConnectWarning =
+          provisioned.reason ??
+          'No pudimos vincular Notion ahora. El cliente se creó igual; completá el vínculo desde su checklist.'
+        captureWithDomain(new Error(`notion_connect_deferred: ${provisioned.errorCode ?? 'unknown'}`), 'commercial', {
+          level: 'warning',
+          tags: { source: 'client_lifecycle:notion_connect_deferred' }
+        })
+      } else {
+        notionConnectIntent = provisioned.intent
       }
-
-      notionConnectIntent = provisioned.intent
     }
 
     const result = await provisionClientFromWizard({
@@ -103,7 +111,7 @@ export async function POST(request: Request) {
       triggeredByUserId: userId
     })
 
-    return NextResponse.json(result, { status: 201 })
+    return NextResponse.json({ ...result, notionConnectWarning }, { status: 201 })
   } catch (error) {
     return mapLifecycleError(error, 'provision_from_wizard')
   }
