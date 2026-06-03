@@ -1,3 +1,42 @@
+# Sesion 2026-06-03 (cont.) — TASK-1002 Full API Parity First Wave — 🆕 TASK CREADA
+
+**Scope**: tras aceptar full API parity como principio, el operador pidio una task para materializar las oportunidades principales.
+
+**Task creada**: `docs/tasks/to-do/TASK-1002-full-api-parity-first-wave-program.md`.
+
+**Enfoque**: umbrella P1 para convertir el principio en una matriz producto→API y primera ola ejecutable sin duplicar el backlog API Platform existente. Debe reconciliar `TASK-650` a `TASK-661` antes de crear child tasks.
+
+**Primera ola a mapear**:
+- Client Lifecycle / onboarding.
+- Finance / Payment Orders / contractor payables / Workforce Payables.
+- Workforce / Payroll / Contractor lifecycle.
+- Organization 360 / brand assets / facets.
+- Creative Video Studio.
+- Reliability / Ops / recovery.
+- Notifications / Journey Intelligence / deep links.
+
+**Registros sincronizados**: `docs/tasks/TASK_ID_REGISTRY.md` + `docs/tasks/README.md` (siguiente ID disponible `TASK-1003`).
+
+---
+
+# Sesion 2026-06-03 (cont.) — Full API parity documentado como principio transversal — ✅ DOCS
+
+**Scope**: el operador pidio canonizar que todo lo que se pueda hacer dentro de Greenhouse deberia poder hacerse por API / contrato programatico.
+
+**Decision aceptada**: Greenhouse adopta **full API parity** como principio de producto/plataforma. La UI no es source of truth de logica de negocio; debe consumir primitives server-side, commands/readers/projections y contratos gobernados. La paridad se diseña contra aggregates/resources/commands, no contra botones ni handlers visuales.
+
+**Docs sincronizados**:
+- `AGENTS.md` — contrato rapido + regla operativa antes de implementar.
+- `CLAUDE.md` — invariant duro para agentes Claude.
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` — Delta 2026-06-03 + principio 5.8 + regla canonica.
+- `docs/architecture/DECISIONS_INDEX.md` — decision Accepted.
+- `README.md` + `docs/README.md` + `docs/api/GREENHOUSE_API_REFERENCE_V1.md` + `docs/api/GREENHOUSE_API_PLATFORM_V1.md` + `public/docs/greenhouse-api-platform-v1.md` + `project_context.md` — referencias cortas y mirrors.
+- `changelog.md` — registro documental.
+
+**Pendiente natural**: no cambia runtime por si solo. La materializacion por dominio debe avanzar por el backlog API Platform existente (`TASK-650` a `TASK-661` y tasks hijas), o por follow-ups explicitos cuando una feature quede temporalmente UI-only.
+
+---
+
 # Sesion 2026-06-03 (cont.) — TASK-1000 notion-bq-sync per-space token — 🔄 SLICE 0 (docs/ADR) HECHO, implementación cross-repo PENDIENTE
 
 **Scope**: el sync diario Notion→BigQuery (Cloud Run `notion-bq-sync`, repo hermano `../notion-bigquery`) usa un `notion-token` global → los clientes nuevos de TASK-998 (Berel/ANAM) no sincronizan. TASK-1000 = resolver el token POR space. **Cross-repo + sync productivo de Efeonce/Sky (alimenta métricas + bonos) → alto riesgo si se rompe.**

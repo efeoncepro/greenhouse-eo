@@ -19,6 +19,11 @@ Use this file as the first read for any agent or connector that needs to integra
 La taxonomía general de lanes, versionado, auth, resiliencia, idempotencia y rollout
 ya no se define aquí. Este archivo solo resume surfaces existentes.
 
+Principio vigente:
+- Greenhouse adopta full API parity: si una capacidad existe en el portal, debe existir o planificarse un equivalente programatico gobernado.
+- La paridad se diseña contra aggregates/resources/commands, no contra botones o componentes UI.
+- Fuente canonica: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`.
+
 ### 1. API Platform
 
 Purpose:

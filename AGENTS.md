@@ -40,6 +40,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 - ADRs: decisiones arquitectonicas viven bajo `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` y el indice `docs/architecture/DECISIONS_INDEX.md`. Si una task cambia source of truth, schema, access, auth, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, debe identificar o proponer ADR antes de implementar.
 - Contexto y auditoria: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna como usar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder memoria historica.
 - Source of truth: si task/spec, arquitectura y runtime real discrepan, prevalecen arquitectura vigente + codigo/schema/runtime verificados. Corregir la spec antes de implementar si el drift cambia contrato o bloquea.
+- Full API parity: toda capacidad que pueda ejecutarse dentro de Greenhouse debe tener o planificar un contrato programatico equivalente. La UI no debe ser el unico camino para ejecutar una accion de negocio: debe consumir primitives server-side, commands/readers y contratos API gobernados por `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`. No exponer tablas ni replicar botones como endpoints ad hoc.
 - Calidad de solucion: no entregar parches fragiles si el problema pide causa raiz. Aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`; cualquier workaround debe ser temporal, reversible, documentado y con owner/retirada.
 - Copy visible: antes de escribir labels, CTAs, empty states, alerts, tooltips, aria-labels o mensajes, buscar/crear la entrada en la capa canonica. `src/lib/copy/*` guarda microcopy funcional y copy reutilizable por dominio; `src/config/greenhouse-nomenclature.ts` guarda solo nomenclatura de producto, navegacion y labels institucionales. No hardcodear copy reusable en JSX.
 - Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
@@ -116,6 +117,13 @@ Si falta alguno de esos pasos, el cierre debe decir `code complete, rollout pend
   - si el fix correcto vive en una primitive compartida, schema, worker, env, secret, docs o arquitectura, actuar ahi en vez de parchear el caller visible
   - un workaround solo es aceptable como mitigacion temporal: reversible, documentado, con owner, condicion de retiro y task/issue asociada cuando aplique
   - fuente canonica: `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
+- **Principio full API parity**:
+  - si una accion, consulta, workflow, reporte, export, recovery, aprobacion o configuracion puede hacerse en Greenhouse, debe existir un camino programatico equivalente o una task/ADR explicita para crearlo
+  - la UI debe ser consumidor de primitives canonicas (`src/lib/**` commands/readers/projections) y no la unica implementacion de la logica
+  - nuevas capacidades deben declarar desde el diseno que contrato API/MCP/app lane las consumira o por que quedan temporalmente UI-only
+  - writes programaticos requieren command semantics explicita, authorization tenant-safe, audit/outbox cuando aplique, idempotencia si pueden reintentarse, errores sanitizados y observabilidad
+  - no crear endpoints como "click handlers remotos"; el contrato debe modelar el aggregate/recurso/command, no el componente visible
+  - fuente canonica: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` y `docs/architecture/DECISIONS_INDEX.md` decision "Full API parity".
 - Si el trabajo toca permisos, navegacion, Home, menu, guards, surfaces por rol o diseño de nuevas capacidades:
   - revisar `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
   - revisar `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
