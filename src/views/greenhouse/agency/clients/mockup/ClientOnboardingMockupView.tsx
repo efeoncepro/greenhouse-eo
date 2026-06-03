@@ -39,6 +39,8 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { NotionConnectPanel, type NotionConnectSelection } from '@/views/greenhouse/agency/clients/NotionConnectPanel'
+import { TeamsConnectPanel, type TeamsConnectSelection } from '@/views/greenhouse/agency/clients/TeamsConnectPanel'
 import { GreenhouseDatePicker } from '@/components/greenhouse'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { HUBSPOT_INDUSTRIES, hubspotIndustryOption } from '@/config/hubspot-industries'
@@ -138,6 +140,10 @@ interface WizardState {
   numericCode: string
   provisionNotion: boolean
   provisionTeams: boolean
+  notionMode: 'new' | 'link'
+  notionConnect: NotionConnectSelection | null
+  teamsMode: 'new' | 'link'
+  teamsConnect: TeamsConnectSelection | null
   // Confirmar
   reviewConfirmed: boolean
   understandConfirmed: boolean
@@ -175,6 +181,10 @@ const INITIAL: WizardState = {
   numericCode: '',
   provisionNotion: true,
   provisionTeams: true,
+  notionMode: 'new',
+  notionConnect: null,
+  teamsMode: 'new',
+  teamsConnect: null,
   reviewConfirmed: false,
   understandConfirmed: false,
   prefilledFields: []
@@ -1181,23 +1191,90 @@ const SpaceStep = ({
           <Typography variant='caption' sx={{ color: 'text.secondary' }}>
             {T.space.provisionSubtitle}
           </Typography>
-          <Stack spacing={1} sx={{ mt: 3 }}>
-            <FormControlLabel
-              control={<Switch checked={state.provisionNotion} onChange={() => update('provisionNotion', !state.provisionNotion)} />}
-              label={T.space.provisionNotionLabel}
-            />
-            <FormControlLabel
-              control={<Switch checked={state.provisionTeams} onChange={() => update('provisionTeams', !state.provisionTeams)} />}
-              label={T.space.provisionTeamsLabel}
-            />
-          </Stack>
+          {/* TASK-998 — Notion: crear teamspace nuevo o vincular existente por token scoped */}
+          <Box sx={{ mt: 3 }} role='radiogroup' aria-label={T.space.notionTitle}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              {(['new', 'link'] as const).map(mode => {
+                const active = state.notionMode === mode
 
-          {/* TASK-998 — vincular un teamspace/canal EXISTENTE se hace en el checklist (discover+register). */}
+                return (
+                  <Button
+                    key={mode}
+                    role='radio'
+                    aria-checked={active}
+                    fullWidth
+                    variant={active ? 'contained' : 'tonal'}
+                    color={active ? 'primary' : 'secondary'}
+                    onClick={() => {
+                      update('notionMode', mode)
+                      update('provisionNotion', mode === 'new')
+                      if (mode === 'new') update('notionConnect', null)
+                    }}
+                    sx={{ justifyContent: 'flex-start', flexDirection: 'column', alignItems: 'flex-start', py: 2.5, gap: 0.5, textTransform: 'none' }}
+                  >
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                      {mode === 'new' ? T.space.notionModeNew : T.space.notionModeLink}
+                    </Typography>
+                    <Typography variant='caption' sx={{ color: active ? 'inherit' : 'text.secondary', opacity: active ? 0.9 : 1, textAlign: 'left', whiteSpace: 'normal' }}>
+                      {mode === 'new' ? T.space.notionModeNewHint : T.space.notionModeLinkHint}
+                    </Typography>
+                  </Button>
+                )
+              })}
+            </Stack>
+
+            <Box sx={{ mt: 3 }}>
+              {state.notionMode === 'link' ? (
+                <NotionConnectPanel onChange={sel => update('notionConnect', sel)} />
+              ) : (
+                <Stack direction='row' spacing={2} alignItems='flex-start' sx={{ color: 'text.secondary' }}>
+                  <i className='tabler-info-circle' style={{ fontSize: 16, marginTop: 2 }} aria-hidden />
+                  <Typography variant='caption'>{T.space.linkExistingNote}</Typography>
+                </Stack>
+              )}
+            </Box>
+          </Box>
+
+          {/* TASK-998 — Teams: crear canal nuevo o vincular existente (bot Graph) */}
+          <Box sx={{ mt: 4 }} role='radiogroup' aria-label={T.space.teamsTitle}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              {(['new', 'link'] as const).map(mode => {
+                const active = state.teamsMode === mode
+
+                return (
+                  <Button
+                    key={mode}
+                    role='radio'
+                    aria-checked={active}
+                    fullWidth
+                    variant={active ? 'contained' : 'tonal'}
+                    color={active ? 'primary' : 'secondary'}
+                    onClick={() => {
+                      update('teamsMode', mode)
+                      update('provisionTeams', mode === 'new')
+                      if (mode === 'new') update('teamsConnect', null)
+                    }}
+                    sx={{ justifyContent: 'flex-start', flexDirection: 'column', alignItems: 'flex-start', py: 2.5, gap: 0.5, textTransform: 'none' }}
+                  >
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                      {mode === 'new' ? T.space.teamsModeNew : T.space.teamsModeLink}
+                    </Typography>
+                    <Typography variant='caption' sx={{ color: active ? 'inherit' : 'text.secondary', opacity: active ? 0.9 : 1, textAlign: 'left', whiteSpace: 'normal' }}>
+                      {mode === 'new' ? T.space.teamsModeNewHint : T.space.teamsModeLinkHint}
+                    </Typography>
+                  </Button>
+                )
+              })}
+            </Stack>
+
+            {state.teamsMode === 'link' ? (
+              <Box sx={{ mt: 3 }}>
+                <TeamsConnectPanel onChange={sel => update('teamsConnect', sel)} />
+              </Box>
+            ) : null}
+          </Box>
+
           <Stack direction='row' spacing={2} alignItems='flex-start' sx={{ mt: 3, color: 'text.secondary' }}>
-            <i className='tabler-info-circle' style={{ fontSize: 16, marginTop: 2 }} aria-hidden />
-            <Typography variant='caption'>{T.space.linkExistingNote}</Typography>
-          </Stack>
-          <Stack direction='row' spacing={2} alignItems='flex-start' sx={{ mt: 2, color: 'text.secondary' }}>
             <i className='tabler-info-circle' style={{ fontSize: 16, marginTop: 2 }} aria-hidden />
             <Typography variant='caption'>{T.space.provisionNote}</Typography>
           </Stack>
