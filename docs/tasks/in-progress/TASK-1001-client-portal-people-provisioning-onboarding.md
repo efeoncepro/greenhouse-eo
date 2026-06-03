@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto` (sin esto, las personas del cliente no quedan asociadas en el alta → no se les pueden dar roles de portal sin un paso manual desconectado)
 - Effort: `Medio` (las primitivas existen; lo nuevo es 1 helper + 1 ítem de checklist + 1 UI con loop GVC)

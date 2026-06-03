@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 
 import { getServerAuthSession } from '@/lib/auth'
 import { ROLE_CODES } from '@/config/role-codes'
-import { generateToken, storeToken } from '@/lib/auth-tokens'
-import { sendEmail } from '@/lib/email/delivery'
-import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
+import {
+  ClientPortalInviteError,
+  inviteClientPortalUser
+} from '@/lib/client-onboarding/invite-client-portal-user'
 
 export async function POST(request: Request) {
   try {
@@ -20,19 +21,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Campos requeridos: email, full_name, client_id.' }, { status: 400 })
     }
 
-    const normalizedEmail = email.trim().toLowerCase()
-
-    // Check if email is already registered
-    const existing = await runGreenhousePostgresQuery<{ user_id: string }>(
-      `SELECT user_id FROM greenhouse_core.client_users WHERE LOWER(email) = $1 LIMIT 1`,
-      [normalizedEmail]
-    )
-
-    if (existing.length > 0) {
-      return NextResponse.json({ error: 'Este email ya está registrado.' }, { status: 409 })
-    }
-
-    // Resolve roles
+    // Role policy (admin/invite-specific — vive en el caller, no en el helper SSOT).
     let roles: string[] = role_codes || []
 
     if (tenant_type === 'efeonce_internal' && !roles.includes(ROLE_CODES.COLLABORATOR)) {
@@ -46,66 +35,27 @@ export async function POST(request: Request) {
       roles = [ROLE_CODES.COLLABORATOR, ...roles]
     }
 
-    // Create user + role assignments in a transaction
-    const userId = await withGreenhousePostgresTransaction(async (client) => {
-      const userResult = await client.query<{ user_id: string }>(
-        `INSERT INTO greenhouse_core.client_users (email, full_name, client_id, status, auth_mode, created_at)
-         VALUES ($1, $2, $3, 'invited', 'credentials', now())
-         RETURNING user_id`,
-        [normalizedEmail, full_name, client_id]
-      )
-
-      const newUserId = userResult.rows[0].user_id
-
-      const inviterUserId = session.user?.id || null
-
-      for (const roleCode of roles) {
-        await client.query(
-          `INSERT INTO greenhouse_core.user_role_assignments (user_id, role_code, assigned_by_user_id)
-           SELECT $1, role_code, $3 FROM greenhouse_core.roles WHERE role_code = $2
-           ON CONFLICT DO NOTHING`,
-          [newUserId, roleCode, inviterUserId]
-        )
-      }
-
-      return newUserId
+    const result = await inviteClientPortalUser({
+      email,
+      fullName: full_name,
+      clientId: client_id,
+      roleCodes: roles,
+      actorUserId: session.user?.id || null,
+      actorName: session.user.name,
+      actorEmail: session.user.email,
+      onExisting: 'error'
     })
 
-    // Generate invite token (72h)
-    const token = await generateToken({
-      user_id: userId,
-      email: normalizedEmail,
-      client_id,
-      type: 'invite'
-    }, 72)
-
-    await storeToken(token, { user_id: userId, email: normalizedEmail, client_id, type: 'invite' })
-
-    const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/auth/accept-invite?token=${token}`
-    const inviterName = session.user.name || 'Un administrador'
-
-    // clientName, userName, locale → resolved automatically by context resolver
-    const delivery = await sendEmail({
-      emailType: 'invitation',
-      domain: 'identity',
-      recipients: [{
-        email: normalizedEmail,
-        userId
-      }],
-      context: {
-        inviteUrl,
-        inviterName
-      },
-      sourceEntity: 'client_users',
-      actorEmail: session.user.email || undefined
+    return NextResponse.json({
+      success: true,
+      userId: result.userId,
+      message: `Invitación enviada a ${result.email}`
     })
-
-    if (delivery.status === 'failed') {
-      console.error('[admin/invite] Email delivery failed:', delivery.error)
+  } catch (err) {
+    if (err instanceof ClientPortalInviteError) {
+      return NextResponse.json({ error: err.message, code: err.code }, { status: err.statusCode })
     }
 
-    return NextResponse.json({ success: true, userId, message: `Invitación enviada a ${normalizedEmail}` })
-  } catch (err) {
     console.error('[admin/invite] Error:', err)
 
     return NextResponse.json({ error: 'Error interno.' }, { status: 500 })
