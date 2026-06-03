@@ -2342,7 +2342,10 @@ const ClientOnboardingView = () => {
             role: c.role || null,
             hubspotContactId: c.hubspotContactId,
             source: c.source
-          }))
+          })),
+          // TASK-998 — connect Notion por token scoped (modo "Vincular existente").
+          // El server provisiona el secret + ancla el intent. null cuando se crea nuevo.
+          notionConnect: state.notionMode === 'link' && state.notionConnect ? state.notionConnect : undefined
         })
       })
 

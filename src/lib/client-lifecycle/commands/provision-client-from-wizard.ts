@@ -6,6 +6,7 @@ import { withTransaction } from '@/lib/db'
 import { coerceHubspotIndustryValue } from '@/config/hubspot-industries'
 import { upsertCanonicalOrganization } from '@/lib/account-360/organization-identity'
 import type { FinanceContactRecord } from '@/lib/commercial/party/commands/instantiate-client-for-party'
+import type { NotionConnectIntent } from '@/lib/client-onboarding/notion-connect-store'
 import { instantiateClientForParty } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 import { promoteParty } from '@/lib/commercial/party/commands/promote-party'
 import { OrganizationAlreadyHasClientError } from '@/lib/commercial/party/types'
@@ -63,6 +64,10 @@ export interface ProvisionClientFromWizardInput {
   notionAnchors?: { notionDatabaseId: string; title: string }[]
   /** TASK-997 Slice 4 — equipo de Teams anclado (canal existente del cliente). */
   teamsAnchor?: { teamId: string; teamName: string } | null
+  /** TASK-998 — intent de connect Notion: secret ya provisionado + db ids elegidos.
+   *  Se guarda como metadata del caso; el `space_notion_sources` se escribe cuando
+   *  exista el Space. El secret NUNCA queda crudo (acá solo va el `*_SECRET_REF`). */
+  notionConnectIntent?: NotionConnectIntent
   effectiveDate?: string
   targetCompletionDate?: string
   reason?: string
@@ -222,6 +227,15 @@ export const provisionClientFromWizard = async (
     // async lo consume para registrar teams_notification_channels cuando aplique.
     if (input.teamsAnchor?.teamId) {
       metadata.teamsAnchor = { teamId: input.teamsAnchor.teamId, teamName: input.teamsAnchor.teamName }
+    }
+
+    // TASK-998 — intent de connect Notion (token-por-teamspace). El secret YA está
+    // provisionado (el endpoint llamó provisionNotionConnectIntent); acá solo se
+    // ancla el `*_SECRET_REF` + los db ids. La escritura a space_notion_sources
+    // ocurre cuando el Space exista (checklist provision_notion_workspace). NUNCA
+    // se guarda el token crudo.
+    if (input.notionConnectIntent?.secretRef) {
+      metadata.notionConnectIntent = input.notionConnectIntent
     }
 
     const lifecycle = await provisionClientLifecycle(

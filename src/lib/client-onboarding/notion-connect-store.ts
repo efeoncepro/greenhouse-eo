@@ -41,6 +41,33 @@ export interface ConnectNotionTeamspaceResult {
   sourceId?: string
 }
 
+/** Intent del connect: el secret ya provisionado + los db ids elegidos. Se guarda
+ *  como metadata del caso de onboarding hasta que exista el Space y se escriba
+ *  `space_notion_sources` (el secret nunca queda crudo). */
+export interface NotionConnectIntent {
+  secretRef: string
+  tareasDbId: string
+  proyectosDbId: string
+  sprintsDbId: string
+  revisionesDbId?: string | null
+}
+
+export interface ProvisionNotionConnectIntentInput {
+  clientSlug: string
+  token: string
+  tareasDbId: string
+  proyectosDbId: string
+  sprintsDbId: string
+  revisionesDbId?: string | null
+}
+
+export interface ProvisionNotionConnectIntentResult {
+  ok: boolean
+  reason?: string
+  errorCode?: 'invalid_input' | 'token_invalid' | 'db_not_visible' | 'secret_write_failed'
+  intent?: NotionConnectIntent
+}
+
 const SLUG_SHAPE = /^[a-z0-9][a-z0-9-]{0,60}$/
 
 export const slugifyForSecret = (raw: string): string =>
@@ -52,14 +79,19 @@ export const slugifyForSecret = (raw: string): string =>
     .replace(/^-+|-+$/g, '')
     .slice(0, 60)
 
-export const connectNotionTeamspaceForSpace = async (
-  input: ConnectNotionTeamspaceInput
-): Promise<ConnectNotionTeamspaceResult> => {
-  const { spaceId, token, tareasDbId, proyectosDbId, sprintsDbId, revisionesDbId, actorUserId } = input
+/**
+ * Valida el token (discover) → anti-tampering → provisiona el secret. NO necesita
+ * spaceId ni escribe `space_notion_sources`. Reusable desde el wizard (captura el
+ * intent al submit, antes de que el Space exista) y desde el connect completo.
+ */
+export const provisionNotionConnectIntent = async (
+  input: ProvisionNotionConnectIntentInput
+): Promise<ProvisionNotionConnectIntentResult> => {
+  const { token, tareasDbId, proyectosDbId, sprintsDbId, revisionesDbId } = input
   const clientSlug = slugifyForSecret(input.clientSlug)
 
-  if (!spaceId || !clientSlug || !SLUG_SHAPE.test(clientSlug) || !tareasDbId || !proyectosDbId || !sprintsDbId) {
-    return { ok: false, errorCode: 'invalid_input', reason: 'Faltan datos para conectar el teamspace (space, slug o las 3 DBs).' }
+  if (!clientSlug || !SLUG_SHAPE.test(clientSlug) || !tareasDbId || !proyectosDbId || !sprintsDbId) {
+    return { ok: false, errorCode: 'invalid_input', reason: 'Faltan datos para conectar el teamspace (slug o las 3 DBs).' }
   }
 
   // 1. Validar token + descubrir DBs visibles (el token = el scope).
@@ -83,8 +115,39 @@ export const connectNotionTeamspaceForSpace = async (
   const secret = await createOrAddSecretVersion(secretId, token.trim())
 
   if (!secret.ok) {
-    return { ok: false, errorCode: 'secret_write_failed', reason: secret.reason, secretRef: secretId }
+    return { ok: false, errorCode: 'secret_write_failed', reason: secret.reason }
   }
+
+  return {
+    ok: true,
+    intent: { secretRef: secretId, tareasDbId, proyectosDbId, sprintsDbId, revisionesDbId: revisionesDbId ?? null }
+  }
+}
+
+export const connectNotionTeamspaceForSpace = async (
+  input: ConnectNotionTeamspaceInput
+): Promise<ConnectNotionTeamspaceResult> => {
+  const { spaceId, token, tareasDbId, proyectosDbId, sprintsDbId, revisionesDbId, actorUserId } = input
+
+  if (!spaceId) {
+    return { ok: false, errorCode: 'invalid_input', reason: 'Falta el space para conectar el teamspace.' }
+  }
+
+  // 1-3. Validar + anti-tamper + provisionar secret (helper compartido).
+  const provisioned = await provisionNotionConnectIntent({
+    clientSlug: input.clientSlug,
+    token,
+    tareasDbId,
+    proyectosDbId,
+    sprintsDbId,
+    revisionesDbId
+  })
+
+  if (!provisioned.ok || !provisioned.intent) {
+    return { ok: false, errorCode: provisioned.errorCode, reason: provisioned.reason }
+  }
+
+  const secretId = provisioned.intent.secretRef
 
   // 4. UPSERT space_notion_sources (PG SSOT). sync_enabled=FALSE (ver header).
   try {

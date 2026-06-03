@@ -7,6 +7,7 @@ import {
 } from '@/lib/client-lifecycle/commands/provision-client-from-wizard'
 import { ClientLifecycleValidationError } from '@/lib/client-lifecycle/types'
 import type { FinanceContactRecord } from '@/lib/commercial/party/commands/instantiate-client-for-party'
+import { provisionNotionConnectIntent, type NotionConnectIntent } from '@/lib/client-onboarding/notion-connect-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,6 +44,33 @@ export async function POST(request: Request) {
     const notionAnchors = parseNotionAnchors(body.notionAnchors)
     const teamsAnchor = parseTeamsAnchor(body.teamsAnchor)
 
+    // TASK-998 — connect Notion por token scoped. Provisiona el secret (auto) +
+    // valida/anti-tamper ANTES de la tx (fuera del PG). El intent (secretRef + db
+    // ids) se ancla en la metadata del caso; el space_notion_sources se completa
+    // cuando exista el Space. El token NUNCA viaja a PG ni se loggea.
+    const notionConnect = parseNotionConnect(body.notionConnect)
+    let notionConnectIntent: NotionConnectIntent | undefined
+
+    if (notionConnect) {
+      const provisioned = await provisionNotionConnectIntent({
+        clientSlug: String(identity.organizationName ?? ''),
+        token: notionConnect.token,
+        tareasDbId: notionConnect.tareasDbId,
+        proyectosDbId: notionConnect.proyectosDbId,
+        sprintsDbId: notionConnect.sprintsDbId
+      })
+
+      if (!provisioned.ok || !provisioned.intent) {
+        throw new ClientLifecycleValidationError(
+          provisioned.errorCode ?? 'notion_connect_failed',
+          provisioned.reason ?? 'No pudimos conectar Notion.',
+          422
+        )
+      }
+
+      notionConnectIntent = provisioned.intent
+    }
+
     const result = await provisionClientFromWizard({
       origin,
       existingOrganizationId: typeof body.existingOrganizationId === 'string' ? body.existingOrganizationId : undefined,
@@ -62,6 +90,7 @@ export async function POST(request: Request) {
       financeContacts,
       notionAnchors,
       teamsAnchor,
+      notionConnectIntent,
       effectiveDate: typeof body.effectiveDate === 'string' ? body.effectiveDate : undefined,
       targetCompletionDate: typeof body.targetCompletionDate === 'string' ? body.targetCompletionDate : undefined,
       reason: typeof body.reason === 'string' ? body.reason : undefined,
@@ -129,6 +158,24 @@ const parseNotionAnchors = (raw: unknown): { notionDatabaseId: string; title: st
   }
 
   return anchors
+}
+
+// TASK-998 — normaliza el connect Notion del wizard (token + las 3 db ids). Devuelve
+// null salvo que estén las 4 piezas. El token solo se usa server-side para provisionar
+// el secret; nunca se persiste crudo ni se loggea.
+const parseNotionConnect = (
+  raw: unknown
+): { token: string; tareasDbId: string; proyectosDbId: string; sprintsDbId: string } | null => {
+  if (!raw || typeof raw !== 'object') return null
+  const item = raw as Record<string, unknown>
+  const token = typeof item.token === 'string' ? item.token.trim() : ''
+  const tareasDbId = typeof item.tareasDbId === 'string' ? item.tareasDbId.trim() : ''
+  const proyectosDbId = typeof item.proyectosDbId === 'string' ? item.proyectosDbId.trim() : ''
+  const sprintsDbId = typeof item.sprintsDbId === 'string' ? item.sprintsDbId.trim() : ''
+
+  if (!token || !tareasDbId || !proyectosDbId || !sprintsDbId) return null
+
+  return { token, tareasDbId, proyectosDbId, sprintsDbId }
 }
 
 // TASK-997 Slice 4 — normaliza el equipo de Teams anclado del wizard.
