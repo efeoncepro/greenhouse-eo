@@ -194,10 +194,30 @@ export const writeSpaceNotionSourcesFromIntent = async (
 
   const params = [spaceId, intent.proyectosDbId, intent.tareasDbId, intent.sprintsDbId, intent.revisionesDbId ?? null, intent.secretRef, actorUserId]
 
+  // Cuando corre DENTRO de la tx del composer (client provisto), envolvemos el INSERT
+  // en un SAVEPOINT. Si falla, hacemos ROLLBACK TO SAVEPOINT para NO envenenar la tx
+  // padre — así el caller puede degradar (notionConnected=false) y seguir creando el
+  // cliente. Sin el savepoint, un fallo acá dejaba la tx en estado abortado (25P02) y
+  // TODO lo siguiente reventaba con el genérico "ciclo de vida" (bug class TASK-998).
+  if (client) {
+    await client.query('SAVEPOINT notion_src_write')
+
+    try {
+      const sourceId = (await client.query<{ source_id: string }>(sql, params)).rows[0]?.source_id
+
+      await client.query('RELEASE SAVEPOINT notion_src_write')
+
+      return { ok: true, sourceId }
+    } catch (err) {
+      await client.query('ROLLBACK TO SAVEPOINT notion_src_write')
+      captureWithDomain(err, 'integrations.notion', { tags: { source: 'notion_connect_store', stage: 'persist' }, extra: { spaceId } })
+
+      return { ok: false, reason: 'No pudimos registrar el teamspace. El token quedó guardado; reintenta.' }
+    }
+  }
+
   try {
-    const sourceId = client
-      ? (await client.query<{ source_id: string }>(sql, params)).rows[0]?.source_id
-      : (await runGreenhousePostgresQuery<{ source_id: string }>(sql, params))[0]?.source_id
+    const sourceId = (await runGreenhousePostgresQuery<{ source_id: string }>(sql, params))[0]?.source_id
 
     return { ok: true, sourceId }
   } catch (err) {
