@@ -7,6 +7,7 @@ import { coerceHubspotIndustryValue } from '@/config/hubspot-industries'
 import { upsertCanonicalOrganization } from '@/lib/account-360/organization-identity'
 import type { FinanceContactRecord } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 import { writeSpaceNotionSourcesFromIntent, type NotionConnectIntent } from '@/lib/client-onboarding/notion-connect-store'
+import { toCanonicalSpaceType } from '@/lib/client-onboarding/form-helpers'
 import { allocateSpaceNumericCode } from '@/lib/services/allocate-space-numeric-code'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { instantiateClientForParty } from '@/lib/commercial/party/commands/instantiate-client-for-party'
@@ -226,7 +227,7 @@ export const provisionClientFromWizard = async (
             clientId,
             org.organizationId,
             input.space?.spaceName?.trim() || name,
-            input.space?.spaceType?.trim() || 'client_space',
+            toCanonicalSpaceType(input.space?.spaceType),
             numericCode
           ]
         )

@@ -87,6 +87,16 @@ export const spaceTypeLabel = (v: SpaceType): string => {
   }
 }
 
+/** Valor canónico de `greenhouse_core.spaces.space_type` (CHECK
+ *  `spaces_space_type_check1` = {'client_space','internal_space'}). El vocabulario
+ *  presentacional del wizard (`SpaceType`) NO matchea el de la DB — este mapper es
+ *  la ÚNICA traducción UI → canónico. El INSERT del space NUNCA debe recibir el
+ *  valor crudo del wizard (rompía con error 23514). Partner = externo → client_space. */
+export type CanonicalSpaceType = 'client_space' | 'internal_space'
+
+export const toCanonicalSpaceType = (v: SpaceType | string | null | undefined): CanonicalSpaceType =>
+  v === 'internal' || v === 'internal_space' ? 'internal_space' : 'client_space'
+
 // Runtime search result shapes (real Greenhouse organizations) used by the wizard
 // pickers + the duplicate-tax-id gate. They replace the mockup fixtures.
 export interface OrgSearchResult {
