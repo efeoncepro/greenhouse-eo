@@ -11,7 +11,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
-import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -34,6 +33,8 @@ import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
+import CustomAutocomplete from '@core/components/mui/Autocomplete'
+import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -181,6 +182,15 @@ const INITIAL: WizardState = {
 // Deterministic default engagement start (no Date.now → SSR-safe). Prefill seeds it
 // so the picked-from-origin flow lands with a sensible start the operator can adjust.
 const DEFAULT_ENGAGEMENT_START = new Date('2026-06-15T12:00:00')
+
+const contactInitials = (name: string): string =>
+  name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word[0]?.toUpperCase() ?? '')
+    .join('') || '?'
 
 const STEP_KEYS = ['origen', 'identidad', 'comercial', 'finanzas', 'space', 'confirmar'] as const
 
@@ -572,7 +582,7 @@ const IdentidadStep = ({
           autoComplete='off'
         />
 
-        <Autocomplete
+        <CustomAutocomplete
           fullWidth
           autoHighlight
           options={HUBSPOT_INDUSTRIES}
@@ -954,40 +964,7 @@ const FinanzasStep = ({
             ) : null}
           </Stack>
 
-          {/* TASK-997 Slice 2 — sugeridos desde HubSpot (mock, estado ready) */}
-          {suggestions.length > 0 ? (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
-                {T.finanzas.contactSuggestTitle}
-              </Typography>
-              <Stack direction='row' spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
-                {suggestions.map(s => {
-                  const added = state.contacts.some(c => c.hubspotContactId === s.hubspotContactId)
-
-                  return (
-                    <Button
-                      key={s.hubspotContactId}
-                      size='small'
-                      variant={added ? 'tonal' : 'outlined'}
-                      color={added ? 'success' : 'primary'}
-                      disabled={added}
-                      startIcon={<i className={added ? 'tabler-check' : 'tabler-plus'} style={{ fontSize: 14 }} />}
-                      onClick={() => addSuggested(s)}
-                    >
-                      {s.jobTitle ? `${s.name} · ${s.jobTitle}` : s.name}
-                    </Button>
-                  )
-                })}
-              </Stack>
-            </Box>
-          ) : null}
-
-          {state.contacts.length === 0 && !adding ? (
-            <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', mt: 2 }}>
-              {T.finanzas.contactsEmpty}
-            </Typography>
-          ) : null}
-
+          {/* Contactos confirmados (con provenance) */}
           <Stack spacing={2} sx={{ mt: 2 }}>
             {state.contacts.map(c => (
               <Stack
@@ -1001,12 +978,19 @@ const FinanzasStep = ({
                   border: `1px solid ${theme.palette.divider}`
                 }}
               >
-                <i className='tabler-mail' style={{ fontSize: 18, color: theme.palette.text.secondary }} aria-hidden />
+                <CustomAvatar skin='light' color={c.source === 'hubspot' ? 'primary' : 'secondary'} size={34} variant='rounded'>
+                  <Typography variant='caption' sx={{ fontWeight: 600 }}>{contactInitials(c.name)}</Typography>
+                </CustomAvatar>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                    {c.name}
-                    {c.role ? <Typography component='span' variant='caption' sx={{ color: 'text.secondary', ml: 1 }}>· {c.role}</Typography> : null}
-                  </Typography>
+                  <Stack direction='row' spacing={1} alignItems='center'>
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                      {c.name}
+                      {c.role ? <Typography component='span' variant='caption' sx={{ color: 'text.secondary', ml: 1 }}>· {c.role}</Typography> : null}
+                    </Typography>
+                    {c.source === 'hubspot' ? (
+                      <CustomChip size='small' variant='tonal' color='primary' round='true' label={T.finanzas.contactFromHubspotChip} />
+                    ) : null}
+                  </Stack>
                   <Typography variant='caption' sx={{ color: 'text.secondary' }}>
                     {c.email}
                   </Typography>
@@ -1017,6 +1001,64 @@ const FinanzasStep = ({
               </Stack>
             ))}
           </Stack>
+
+          {state.contacts.length === 0 && !adding && suggestions.length === 0 ? (
+            <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', mt: 2 }}>
+              {T.finanzas.contactsEmpty}
+            </Typography>
+          ) : null}
+
+          {/* TASK-997 Slice 2 — sugeridos desde HubSpot (mock, filas consistentes) */}
+          {suggestions.length > 0 ? (
+            <Box sx={{ mt: 3 }}>
+              <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', mb: 1.5 }}>
+                {T.finanzas.contactSuggestTitle}
+              </Typography>
+              <Stack spacing={1.5}>
+                {suggestions.map(s => {
+                  const added = state.contacts.some(c => c.hubspotContactId === s.hubspotContactId)
+
+                  return (
+                    <Stack
+                      key={s.hubspotContactId}
+                      direction='row'
+                      spacing={2}
+                      alignItems='center'
+                      sx={{
+                        p: 2,
+                        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                        border: `1px solid ${theme.palette.divider}`,
+                        bgcolor: alpha(theme.palette.primary.main, 0.02)
+                      }}
+                    >
+                      <CustomAvatar skin='light' color='primary' size={32} variant='rounded'>
+                        <Typography variant='caption' sx={{ fontWeight: 600 }}>{contactInitials(s.name)}</Typography>
+                      </CustomAvatar>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant='body2' sx={{ fontWeight: 600 }} noWrap>
+                          {s.name}
+                          {s.jobTitle ? <Typography component='span' variant='caption' sx={{ color: 'text.secondary', ml: 1 }}>· {s.jobTitle}</Typography> : null}
+                        </Typography>
+                        {s.email ? (
+                          <Typography variant='caption' sx={{ color: 'text.secondary' }} noWrap>{s.email}</Typography>
+                        ) : null}
+                      </Box>
+                      <Button
+                        size='small'
+                        variant={added ? 'tonal' : 'outlined'}
+                        color={added ? 'success' : 'primary'}
+                        disabled={added}
+                        startIcon={<i className={added ? 'tabler-check' : 'tabler-plus'} style={{ fontSize: 14 }} />}
+                        onClick={() => addSuggested(s)}
+                      >
+                        {added ? T.finanzas.contactAddedCta : T.finanzas.contactAddSuggestedCta}
+                      </Button>
+                    </Stack>
+                  )
+                })}
+              </Stack>
+            </Box>
+          ) : null}
 
           {adding ? (
             <Box

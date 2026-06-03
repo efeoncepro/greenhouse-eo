@@ -192,6 +192,9 @@ export const GH_CLIENT_ONBOARDING = {
     contactSuggestLoading: 'Buscando contactos en HubSpot…',
     contactSuggestEmpty: 'No encontramos contactos asociados en HubSpot. Agrégalo manualmente.',
     contactSuggestDegraded: 'No pudimos cargar los contactos de HubSpot. Agrega el contacto manualmente.',
+    contactAddSuggestedCta: 'Agregar',
+    contactAddedCta: 'Agregado',
+    contactFromHubspotChip: 'HubSpot',
     removeContactAria: 'Quitar contacto',
     specialConditionsLabel: 'Condiciones especiales',
     specialConditionsHelper: 'Opcional. Acuerdos de pago o facturación fuera de lo estándar.'
