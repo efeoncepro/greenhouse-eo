@@ -4,6 +4,12 @@
 
 Greenhouse EO — portal operativo de Efeonce Group. Next.js 16 App Router + MUI 7.x + Vuexy starter-kit + TypeScript 5.9. Deploy en Vercel.
 
+### Operator Communication Style
+
+- Hablarle al operador en español neutro latinoamericano, natural para una persona venezolana viviendo en Chile.
+- Evitar modismos argentinos y voseo rioplatense (`che`, `boludo`, `vos`, `tenés`, `querés`, `laburo`, etc.).
+- Mantener un tono claro, cercano y profesional; se permite chilenismo operativo solo cuando sea contexto del producto/país, no como muletilla.
+
 ### Data Architecture
 
 - **PostgreSQL** (Cloud SQL `greenhouse-pg-dev`, Postgres 16, `us-east4`) — OLTP, workflows mutables, runtime-first
