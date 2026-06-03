@@ -75,6 +75,17 @@ export const scenario: CaptureScenario = {
     // Clip al panel Teams → isotipo crisp (verificar glyph bien formado, no blob)
     { kind: 'scroll', selector: '[data-capture="teams-connect-panel"]', scrollBlock: 'center' },
     { kind: 'sleep', ms: 350 },
-    { kind: 'mark', label: 'teams-isotype-crisp', clipSelector: '[data-capture="teams-connect-panel"]', note: 'Panel Teams recortado — isotipo Tabler púrpura bien formado' }
+    { kind: 'mark', label: 'teams-isotype-crisp', clipSelector: '[data-capture="teams-connect-panel"]', note: 'Panel Teams recortado — isotipo Tabler púrpura bien formado' },
+
+    // Reset a "crear nuevo" (espacio válido) y avanzar a Confirmar para ver el
+    // banner de completitud — Berel es un cliente EXISTENTE INCOMPLETO (TASK-992).
+    { kind: 'click', selector: 'button:has-text("Crear teamspace nuevo")' },
+    { kind: 'click', selector: 'button:has-text("Crear canal nuevo")' },
+    { kind: 'sleep', ms: 300 },
+    { kind: 'click', selector: '[data-capture="wizard-next"]' },
+    { kind: 'sleep', ms: 1100 },
+    { kind: 'scroll', selector: '[data-capture="wizard-create"]', scrollBlock: 'center' },
+    { kind: 'sleep', ms: 300 },
+    { kind: 'mark', label: 'completeness-incomplete', note: 'Confirmar — banner cliente incompleto (Berel) + CTA Completar cliente' }
   ]
 }

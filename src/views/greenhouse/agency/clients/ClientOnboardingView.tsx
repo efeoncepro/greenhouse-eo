@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -51,6 +52,7 @@ import { NotionConnectPanel, type NotionConnectSelection } from '@/views/greenho
 import { TeamsConnectPanel, type TeamsConnectSelection } from '@/views/greenhouse/agency/clients/TeamsConnectPanel'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
+import type { ClientCompleteness } from '@/lib/client-lifecycle/queries/resolve-client-completeness'
 import { formatDate } from '@/lib/format'
 import { AnimatePresence, motion } from '@/libs/FramerMotion'
 
@@ -2187,6 +2189,40 @@ const ClientOnboardingView = () => {
   // When the operator reuses an existing org (picker or duplicate dialog), the
   // composer updates it instead of creating a duplicate.
   const [existingOrganizationId, setExistingOrganizationId] = useState<string | null>(null)
+  // Completitud del cliente cuando se reusa una org existente (picker/duplicado).
+  // Detecta orgs "media-cocidas" (active_client sin client/space/caso) para que el
+  // wizard COMPLETE lo faltante idempotentemente en vez de fallar o duplicar.
+  const [existingCompleteness, setExistingCompleteness] = useState<ClientCompleteness | null>(null)
+
+  useEffect(() => {
+    if (!existingOrganizationId) {
+      setExistingCompleteness(null)
+
+      return
+    }
+
+    let cancelled = false
+
+    void (async () => {
+      try {
+        const res = await fetch(
+          `/api/admin/clients/lifecycle/completeness?organizationId=${encodeURIComponent(existingOrganizationId)}`
+        )
+
+        if (!res.ok) return
+
+        const data = (await res.json()) as { completeness?: ClientCompleteness }
+
+        if (!cancelled) setExistingCompleteness(data.completeness ?? null)
+      } catch {
+        // Degradación honesta: sin completitud → el wizard sigue como alta normal.
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [existingOrganizationId])
 
   // Surfaces
   const [hubspotOpen, setHubspotOpen] = useState(false)
@@ -2425,6 +2461,30 @@ const ClientOnboardingView = () => {
 
   const isLastStep = activeStep === STEP_KEYS.length - 1
 
+  // Estado de completitud del cliente reusado (media-cocido / completo / nuevo).
+  // Gobierna el CTA final: "Completar cliente" rellena gaps, "Abrir cliente" no
+  // duplica, "Crear cliente" es el alta normal. El provision es idempotente en los 3.
+  const completenessState: 'new' | 'incomplete' | 'complete' =
+    !existingCompleteness || !existingCompleteness.exists
+      ? 'new'
+      : existingCompleteness.isStructurallyComplete
+        ? 'complete'
+        : 'incomplete'
+
+  const createCtaLabel =
+    completenessState === 'incomplete'
+      ? T.completeness.completeCta
+      : completenessState === 'complete'
+        ? T.completeness.openCta
+        : T.shell.createCta
+
+  const createCtaIcon =
+    completenessState === 'incomplete'
+      ? 'tabler-wand'
+      : completenessState === 'complete'
+        ? 'tabler-external-link'
+        : 'tabler-circle-plus'
+
   const renderStep = () => {
     switch (activeStep) {
       case 0:
@@ -2519,6 +2579,25 @@ const ClientOnboardingView = () => {
                     bgcolor: 'background.paper'
                   }}
                 >
+                  {isLastStep && existingCompleteness?.exists ? (
+                    <Alert severity={completenessState === 'complete' ? 'info' : 'warning'} sx={{ mb: 3 }}>
+                      <AlertTitle sx={{ fontWeight: 600 }}>
+                        {completenessState === 'complete' ? T.completeness.completeTitle : T.completeness.incompleteTitle}
+                      </AlertTitle>
+                      {completenessState === 'complete' ? (
+                        T.completeness.completeBody
+                      ) : (
+                        <>
+                          {T.completeness.incompleteBody}
+                          <Box component='ul' sx={{ mt: 1, mb: 0, pl: 3 }}>
+                            {existingCompleteness.structuralGaps.map(gap => (
+                              <li key={gap}>{T.completeness.gaps[gap] ?? gap}</li>
+                            ))}
+                          </Box>
+                        </>
+                      )}
+                    </Alert>
+                  ) : null}
                   <Stack direction={{ xs: 'column-reverse', sm: 'row' }} spacing={2} justifyContent='space-between'>
                     <Button
                       variant='tonal'
@@ -2531,8 +2610,8 @@ const ClientOnboardingView = () => {
                     </Button>
 
                     {isLastStep ? (
-                      <Button variant='contained' startIcon={<i className='tabler-circle-plus' />} onClick={handleSubmit} disabled={submitting} data-capture='wizard-create'>
-                        {T.shell.createCta}
+                      <Button variant='contained' startIcon={<i className={createCtaIcon} />} onClick={handleSubmit} disabled={submitting} data-capture='wizard-create'>
+                        {createCtaLabel}
                       </Button>
                     ) : (
                       <Button variant='contained' endIcon={<i className='tabler-arrow-right' />} onClick={goNext} data-capture='wizard-next'>

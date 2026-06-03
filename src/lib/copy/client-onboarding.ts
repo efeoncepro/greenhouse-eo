@@ -7,6 +7,23 @@
 // Register: es-CL tuteo (tú) — NO voseo. Anglicismo "company" → "empresa".
 
 export const GH_CLIENT_ONBOARDING = {
+  // --- Completitud de cliente existente (media-cocido) -----------------------
+  // Cuando el operador selecciona una org que ya existe (picker HubSpot o gate de
+  // duplicado), el wizard detecta si quedó incompleta y adapta el CTA. Tono:
+  // tranquilizador (no es un error del operador) + claro sobre qué se completará.
+  completeness: {
+    incompleteTitle: 'Este cliente ya existe, pero quedó incompleto',
+    incompleteBody: 'Al continuar, Greenhouse completa lo que falta (no duplica nada):',
+    completeCta: 'Completar cliente',
+    completeTitle: 'Este cliente ya está activo y completo',
+    completeBody: 'No falta ninguna pieza. Al continuar abrís su ficha y su onboarding.',
+    openCta: 'Abrir cliente',
+    gaps: {
+      client_profile: 'Ficha de cliente (perfil + facturación)',
+      space: 'Space operativo',
+      onboarding_case: 'Caso de onboarding con su checklist'
+    } as Record<string, string>
+  },
   // --- Shell / chrome --------------------------------------------------------
   shell: {
     pageTitle: 'Nuevo cliente',
