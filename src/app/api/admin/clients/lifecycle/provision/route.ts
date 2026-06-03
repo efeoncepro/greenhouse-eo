@@ -6,6 +6,7 @@ import {
   type WizardOrigin
 } from '@/lib/client-lifecycle/commands/provision-client-from-wizard'
 import { ClientLifecycleValidationError } from '@/lib/client-lifecycle/types'
+import type { FinanceContactRecord } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
 
     const identity = (body.identity ?? {}) as Record<string, unknown>
     const finance = (body.finance ?? {}) as Record<string, unknown>
+    const financeContacts = parseFinanceContacts(body.contacts)
 
     const result = await provisionClientFromWizard({
       origin,
@@ -55,6 +57,7 @@ export async function POST(request: Request) {
         paymentCurrency: typeof finance.paymentCurrency === 'string' ? (finance.paymentCurrency as never) : undefined,
         paymentTermsDays: typeof finance.paymentTermsDays === 'number' ? finance.paymentTermsDays : undefined
       },
+      financeContacts,
       effectiveDate: typeof body.effectiveDate === 'string' ? body.effectiveDate : undefined,
       targetCompletionDate: typeof body.targetCompletionDate === 'string' ? body.targetCompletionDate : undefined,
       reason: typeof body.reason === 'string' ? body.reason : undefined,
@@ -67,4 +70,36 @@ export async function POST(request: Request) {
   } catch (error) {
     return mapLifecycleError(error, 'provision_from_wizard')
   }
+}
+
+// TASK-997 Slice 2 — normaliza los contactos de finanzas del wizard a la forma
+// canónica persistida (External Reference con provenance). Ignora entradas sin
+// nombre. `hubspotContactId` presente ⇒ source 'hubspot'; si no, 'manual'.
+const parseFinanceContacts = (raw: unknown): FinanceContactRecord[] => {
+  if (!Array.isArray(raw)) return []
+
+  const contacts: FinanceContactRecord[] = []
+
+  for (const entry of raw) {
+    if (!entry || typeof entry !== 'object') continue
+    const item = entry as Record<string, unknown>
+    const name = typeof item.name === 'string' ? item.name.trim() : ''
+
+    if (!name) continue
+
+    const hubspotContactId =
+      typeof item.hubspotContactId === 'string' && item.hubspotContactId.trim()
+        ? item.hubspotContactId.trim()
+        : null
+
+    contacts.push({
+      name,
+      email: typeof item.email === 'string' && item.email.trim() ? item.email.trim() : null,
+      role: typeof item.role === 'string' && item.role.trim() ? item.role.trim() : null,
+      hubspotContactId,
+      source: hubspotContactId ? 'hubspot' : 'manual'
+    })
+  }
+
+  return contacts
 }

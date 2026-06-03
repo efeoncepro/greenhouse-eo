@@ -188,6 +188,10 @@ export const GH_CLIENT_ONBOARDING = {
     contactSaveCta: 'Agregar',
     contactCancelCta: 'Cancelar',
     contactsEmpty: 'Todavía no agregas contactos de finanzas.',
+    contactSuggestTitle: 'Sugeridos desde HubSpot',
+    contactSuggestLoading: 'Buscando contactos en HubSpot…',
+    contactSuggestEmpty: 'No encontramos contactos asociados en HubSpot. Agrégalo manualmente.',
+    contactSuggestDegraded: 'No pudimos cargar los contactos de HubSpot. Agrega el contacto manualmente.',
     removeContactAria: 'Quitar contacto',
     specialConditionsLabel: 'Condiciones especiales',
     specialConditionsHelper: 'Opcional. Acuerdos de pago o facturación fuera de lo estándar.'

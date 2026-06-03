@@ -5,6 +5,7 @@ import type { PoolClient } from 'pg'
 import { withTransaction } from '@/lib/db'
 import { coerceHubspotIndustryValue } from '@/config/hubspot-industries'
 import { upsertCanonicalOrganization } from '@/lib/account-360/organization-identity'
+import type { FinanceContactRecord } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 import { instantiateClientForParty } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 import { promoteParty } from '@/lib/commercial/party/commands/promote-party'
 import { OrganizationAlreadyHasClientError } from '@/lib/commercial/party/types'
@@ -56,6 +57,8 @@ export interface ProvisionClientFromWizardInput {
     paymentCurrency?: BillingCurrency
     paymentTermsDays?: number
   }
+  /** TASK-997 Slice 2 — contactos de finanzas con provenance (suggest HubSpot o manual). */
+  financeContacts?: FinanceContactRecord[]
   effectiveDate?: string
   targetCompletionDate?: string
   reason?: string
@@ -154,6 +157,7 @@ export const provisionClientFromWizard = async (
             : input.finance?.paymentTermsDays
               ? { paymentTermsDays: input.finance.paymentTermsDays }
               : undefined,
+          financeContacts: input.financeContacts,
           actor: { userId: input.triggeredByUserId }
         },
         client

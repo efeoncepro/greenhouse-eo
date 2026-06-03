@@ -81,7 +81,8 @@ describe('upsertCanonicalOrganization — TASK-991 SSOT', () => {
       'PBE970101718',
       'RFC',
       'MX',
-      'manual'
+      'manual',
+      null
     ])
   })
 
@@ -169,7 +170,8 @@ describe('ensureOrganizationForSupplier', () => {
       '76.123.456-7',
       'RUT',
       'CL',
-      'manual'
+      'manual',
+      null
     ])
   })
 
@@ -202,7 +204,8 @@ describe('ensureOrganizationForSupplier', () => {
       '76.123.456-7',
       'RUT',
       'CL',
-      'manual'
+      'manual',
+      null
     ])
   })
 
@@ -310,7 +313,8 @@ describe('ensureOrganizationForClient', () => {
       '76.123.456-7',
       'RUT',
       'CL',
-      'manual'
+      'manual',
+      null
     ])
   })
 
@@ -339,7 +343,8 @@ describe('ensureOrganizationForClient', () => {
       'US',
       'hubspot-1',
       'client',
-      'manual'
+      'manual',
+      null
     ])
   })
 })

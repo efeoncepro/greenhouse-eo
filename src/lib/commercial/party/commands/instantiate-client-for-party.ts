@@ -28,6 +28,20 @@ interface QueryableClient {
   ) => Promise<QueryResultLike<T>>
 }
 
+/**
+ * TASK-997 Slice 2 — contacto de finanzas persistido con provenance (External
+ * Reference). `source='hubspot'` ⇒ `hubspotContactId` apunta a la persona real en
+ * `greenhouse_crm.contacts` (elegido del suggest); `source='manual'` ⇒ ingresado a
+ * mano (sin id). NUNCA un string suelto: la referencia mantiene la trazabilidad.
+ */
+export interface FinanceContactRecord {
+  name: string
+  email: string | null
+  role: string | null
+  hubspotContactId: string | null
+  source: 'hubspot' | 'manual'
+}
+
 export interface InstantiateClientForPartyInput {
   organizationId: string
   triggerEntity: LifecycleTriggerEntity
@@ -38,6 +52,8 @@ export interface InstantiateClientForPartyInput {
     paymentCurrency?: 'CLP' | 'USD' | 'MXN' | 'UF' | 'UTM'
     paymentTermsDays?: number
   }
+  /** TASK-997 Slice 2 — contactos de finanzas (suggest HubSpot o manual). */
+  financeContacts?: FinanceContactRecord[]
   actor: PartyActor
 }
 
@@ -97,6 +113,11 @@ export const instantiateClientForParty = async (
     const paymentCurrency = input.billingDefaults?.paymentCurrency ?? DEFAULT_CURRENCY
     const paymentTermsDays = input.billingDefaults?.paymentTermsDays ?? DEFAULT_PAYMENT_TERMS_DAYS
 
+    const financeContacts =
+      input.financeContacts && input.financeContacts.length > 0
+        ? JSON.stringify(input.financeContacts)
+        : null
+
     await txClient.query(
       `INSERT INTO greenhouse_finance.client_profiles (
          client_profile_id,
@@ -108,10 +129,11 @@ export const instantiateClientForParty = async (
          payment_terms_days,
          requires_po,
          requires_hes,
+         finance_contacts,
          created_by_user_id,
          created_at,
          updated_at
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, FALSE, FALSE, $8, NOW(), NOW())`,
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, FALSE, FALSE, $9::jsonb, $8, NOW(), NOW())`,
       [
         clientProfileId,
         insertedClientId,
@@ -120,7 +142,8 @@ export const instantiateClientForParty = async (
         organization.hubspot_company_id,
         paymentCurrency,
         paymentTermsDays,
-        input.actor.userId ?? 'system'
+        input.actor.userId ?? 'system',
+        financeContacts
       ]
     )
 

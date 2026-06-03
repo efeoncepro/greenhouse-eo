@@ -84,7 +84,23 @@ interface FinanceContact {
   name: string
   email: string
   role: string
+  // TASK-997 Slice 2 — provenance (External Reference).
+  hubspotContactId: string | null
+  source: 'hubspot' | 'manual'
 }
+
+interface FinanceContactSuggestion {
+  hubspotContactId: string
+  name: string
+  email: string | null
+  jobTitle: string | null
+}
+
+// Mock de los contactos asociados que vendrían de greenhouse_crm.contacts (HubSpot).
+const MOCK_FINANCE_CONTACT_SUGGESTIONS: FinanceContactSuggestion[] = [
+  { hubspotContactId: '901', name: 'María Fernanda Ríos', email: 'mf.rios@berel.com.mx', jobTitle: 'Gerente de Finanzas' },
+  { hubspotContactId: '902', name: 'Diego Alarcón', email: 'd.alarcon@berel.com.mx', jobTitle: 'Cuentas por Pagar' }
+]
 
 interface WizardState {
   origin: OnboardingOrigin | null
@@ -809,14 +825,32 @@ const FinanzasStep = ({
   const currencyError = touched && state.currency === ''
   const isMx = state.country === 'MX'
 
+  const hubspotCompanyId = state.hubspotCompany?.hubspotCompanyId ?? null
+  const suggestions = hubspotCompanyId ? MOCK_FINANCE_CONTACT_SUGGESTIONS : []
+
   const addContact = () => {
     if (!contactDraft.name.trim() || !contactDraft.email.trim()) return
     update('contacts', [
       ...state.contacts,
-      { id: `c-${state.contacts.length + 1}`, name: contactDraft.name.trim(), email: contactDraft.email.trim(), role: contactDraft.role.trim() }
+      {
+        id: `c-${state.contacts.length + 1}`,
+        name: contactDraft.name.trim(),
+        email: contactDraft.email.trim(),
+        role: contactDraft.role.trim(),
+        hubspotContactId: null,
+        source: 'manual'
+      }
     ])
     setContactDraft({ name: '', email: '', role: '' })
     setAdding(false)
+  }
+
+  const addSuggested = (s: FinanceContactSuggestion) => {
+    if (state.contacts.some(c => c.hubspotContactId === s.hubspotContactId)) return
+    update('contacts', [
+      ...state.contacts,
+      { id: `hs-${s.hubspotContactId}`, name: s.name, email: s.email ?? '', role: s.jobTitle ?? '', hubspotContactId: s.hubspotContactId, source: 'hubspot' }
+    ])
   }
 
   const removeContact = (id: string) => update('contacts', state.contacts.filter(c => c.id !== id))
@@ -919,6 +953,34 @@ const FinanzasStep = ({
               </Button>
             ) : null}
           </Stack>
+
+          {/* TASK-997 Slice 2 — sugeridos desde HubSpot (mock, estado ready) */}
+          {suggestions.length > 0 ? (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
+                {T.finanzas.contactSuggestTitle}
+              </Typography>
+              <Stack direction='row' spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+                {suggestions.map(s => {
+                  const added = state.contacts.some(c => c.hubspotContactId === s.hubspotContactId)
+
+                  return (
+                    <Button
+                      key={s.hubspotContactId}
+                      size='small'
+                      variant={added ? 'tonal' : 'outlined'}
+                      color={added ? 'success' : 'primary'}
+                      disabled={added}
+                      startIcon={<i className={added ? 'tabler-check' : 'tabler-plus'} style={{ fontSize: 14 }} />}
+                      onClick={() => addSuggested(s)}
+                    >
+                      {s.jobTitle ? `${s.name} · ${s.jobTitle}` : s.name}
+                    </Button>
+                  )
+                })}
+              </Stack>
+            </Box>
+          ) : null}
 
           {state.contacts.length === 0 && !adding ? (
             <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', mt: 2 }}>

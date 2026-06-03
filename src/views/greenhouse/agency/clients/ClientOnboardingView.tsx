@@ -191,6 +191,17 @@ interface FinanceContact {
   name: string
   email: string
   role: string
+  // TASK-997 Slice 2 — provenance (External Reference). 'hubspot' ⇒ hubspotContactId
+  // apunta a la persona real en crm.contacts; 'manual' ⇒ ingresado a mano.
+  hubspotContactId: string | null
+  source: 'hubspot' | 'manual'
+}
+
+interface FinanceContactSuggestion {
+  hubspotContactId: string
+  name: string
+  email: string | null
+  jobTitle: string | null
 }
 
 interface WizardState {
@@ -913,6 +924,50 @@ const FinanzasStep = ({
   const [contactDraft, setContactDraft] = useState<{ name: string; email: string; role: string }>({ name: '', email: '', role: '' })
   const [adding, setAdding] = useState(false)
 
+  // TASK-997 Slice 2 — sugeridos de finanzas desde HubSpot (crm.contacts). Estados
+  // honestos (state-design): loading / ready / degraded. La empty se infiere de
+  // ready + lista vacía. El fallback manual SIEMPRE funciona ante cualquier estado.
+  const hubspotCompanyId = state.hubspotCompany?.hubspotCompanyId ?? null
+  const [suggestions, setSuggestions] = useState<FinanceContactSuggestion[]>([])
+  const [suggestState, setSuggestState] = useState<'idle' | 'loading' | 'ready' | 'degraded'>('idle')
+
+  useEffect(() => {
+    if (!hubspotCompanyId) {
+      setSuggestState('idle')
+      setSuggestions([])
+
+      return
+    }
+
+    let cancelled = false
+
+    setSuggestState('loading')
+    fetch(`/api/admin/clients/lifecycle/finance-contacts?hubspotCompanyId=${encodeURIComponent(hubspotCompanyId)}`)
+      .then(res => res.json() as Promise<{ items?: FinanceContactSuggestion[]; degraded?: boolean }>)
+      .then(payload => {
+        if (cancelled) return
+
+        if (payload.degraded) {
+          setSuggestState('degraded')
+          setSuggestions([])
+
+          return
+        }
+
+        setSuggestions(payload.items ?? [])
+        setSuggestState('ready')
+      })
+      .catch(() => {
+        if (cancelled) return
+        setSuggestState('degraded')
+        setSuggestions([])
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [hubspotCompanyId])
+
   const currencyError = touched && state.currency === ''
   const isMx = state.country === 'MX'
 
@@ -920,10 +975,32 @@ const FinanzasStep = ({
     if (!contactDraft.name.trim() || !contactDraft.email.trim()) return
     update('contacts', [
       ...state.contacts,
-      { id: `c-${state.contacts.length + 1}`, name: contactDraft.name.trim(), email: contactDraft.email.trim(), role: contactDraft.role.trim() }
+      {
+        id: `c-${state.contacts.length + 1}`,
+        name: contactDraft.name.trim(),
+        email: contactDraft.email.trim(),
+        role: contactDraft.role.trim(),
+        hubspotContactId: null,
+        source: 'manual'
+      }
     ])
     setContactDraft({ name: '', email: '', role: '' })
     setAdding(false)
+  }
+
+  const addSuggested = (s: FinanceContactSuggestion) => {
+    if (state.contacts.some(c => c.hubspotContactId === s.hubspotContactId)) return
+    update('contacts', [
+      ...state.contacts,
+      {
+        id: `hs-${s.hubspotContactId}`,
+        name: s.name,
+        email: s.email ?? '',
+        role: s.jobTitle ?? '',
+        hubspotContactId: s.hubspotContactId,
+        source: 'hubspot'
+      }
+    ])
   }
 
   const removeContact = (id: string) => update('contacts', state.contacts.filter(c => c.id !== id))
@@ -1026,6 +1103,51 @@ const FinanzasStep = ({
               </Button>
             ) : null}
           </Stack>
+
+          {/* TASK-997 Slice 2 — sugeridos desde HubSpot (estados honestos) */}
+          {hubspotCompanyId ? (
+            <Box sx={{ mt: 2 }}>
+              {suggestState === 'loading' ? (
+                <Stack direction='row' spacing={1.5} alignItems='center' sx={{ color: 'text.secondary' }}>
+                  <CircularProgress size={16} />
+                  <Typography variant='caption'>{T.finanzas.contactSuggestLoading}</Typography>
+                </Stack>
+              ) : suggestState === 'degraded' ? (
+                <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block' }}>
+                  {T.finanzas.contactSuggestDegraded}
+                </Typography>
+              ) : suggestState === 'ready' && suggestions.length === 0 ? (
+                <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block' }}>
+                  {T.finanzas.contactSuggestEmpty}
+                </Typography>
+              ) : suggestState === 'ready' && suggestions.length > 0 ? (
+                <Box>
+                  <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
+                    {T.finanzas.contactSuggestTitle}
+                  </Typography>
+                  <Stack direction='row' spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+                    {suggestions.map(s => {
+                      const added = state.contacts.some(c => c.hubspotContactId === s.hubspotContactId)
+
+                      return (
+                        <Button
+                          key={s.hubspotContactId}
+                          size='small'
+                          variant={added ? 'tonal' : 'outlined'}
+                          color={added ? 'success' : 'primary'}
+                          disabled={added}
+                          startIcon={<i className={added ? 'tabler-check' : 'tabler-plus'} style={{ fontSize: 14 }} />}
+                          onClick={() => addSuggested(s)}
+                        >
+                          {s.jobTitle ? `${s.name} · ${s.jobTitle}` : s.name}
+                        </Button>
+                      )
+                    })}
+                  </Stack>
+                </Box>
+              ) : null}
+            </Box>
+          ) : null}
 
           {state.contacts.length === 0 && !adding ? (
             <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', mt: 2 }}>
@@ -2117,7 +2239,14 @@ const ClientOnboardingView = () => {
             paymentTermsDays: state.paymentTermsDays ? Number(state.paymentTermsDays) : undefined
           },
           effectiveDate: state.startDate ? state.startDate.toISOString().slice(0, 10) : undefined,
-          clientKind: state.engagementKind
+          clientKind: state.engagementKind,
+          contacts: state.contacts.map(c => ({
+            name: c.name,
+            email: c.email || null,
+            role: c.role || null,
+            hubspotContactId: c.hubspotContactId,
+            source: c.source
+          }))
         })
       })
 
