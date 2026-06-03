@@ -106,13 +106,14 @@ export interface MockHubspotCompany {
   country: CountryCode
   lifecycleStage: string
   taxId: string | null
+  industry: string | null
 }
 
 export const MOCK_HUBSPOT_COMPANIES: MockHubspotCompany[] = [
-  { hubspotCompanyId: '55405407542', name: 'Grupo Berel', domain: 'berel.com.mx', country: 'MX', lifecycleStage: 'customer', taxId: 'PBE970101718' },
-  { hubspotCompanyId: '55410093321', name: 'Aerolíneas del Sur', domain: 'sur-air.cl', country: 'CL', lifecycleStage: 'opportunity', taxId: null },
-  { hubspotCompanyId: '55418772100', name: 'Northwind Bank', domain: 'northwind.com', country: 'US', lifecycleStage: 'customer', taxId: '82-1934567' },
-  { hubspotCompanyId: '55421009988', name: 'Café Andino', domain: 'cafeandino.co', country: 'CO', lifecycleStage: 'lead', taxId: null }
+  { hubspotCompanyId: '55405407542', name: 'Grupo Berel', domain: 'berel.com.mx', country: 'MX', lifecycleStage: 'customer', taxId: 'PBE970101718', industry: 'RETAIL' },
+  { hubspotCompanyId: '55410093321', name: 'Aerolíneas del Sur', domain: 'sur-air.cl', country: 'CL', lifecycleStage: 'opportunity', taxId: null, industry: 'AIRLINES_AVIATION' },
+  { hubspotCompanyId: '55418772100', name: 'Northwind Bank', domain: 'northwind.com', country: 'US', lifecycleStage: 'customer', taxId: '82-1934567', industry: 'BANKING' },
+  { hubspotCompanyId: '55421009988', name: 'Café Andino', domain: 'cafeandino.co', country: 'CO', lifecycleStage: 'lead', taxId: null, industry: 'FOOD_BEVERAGES' }
 ]
 
 // --- Nubox sale fixtures (picker) --------------------------------------------

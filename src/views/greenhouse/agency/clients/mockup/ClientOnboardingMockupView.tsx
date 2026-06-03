@@ -2050,11 +2050,12 @@ const ClientOnboardingMockupView = () => {
       tradeName: prev.tradeName || company.name,
       country: prev.country || company.country,
       taxId: prev.taxId || company.taxId || '',
+      industry: prev.industry || company.industry || '',
       currency: prev.currency || currencyForCountry(company.country),
       billingCountry: prev.billingCountry || company.country,
       spaceName: prev.spaceName || company.name,
       startDate: prev.startDate ?? DEFAULT_ENGAGEMENT_START,
-      prefilledFields: ['legalName', 'tradeName', 'country', 'taxId', 'currency']
+      prefilledFields: ['legalName', 'tradeName', 'country', 'taxId', 'currency', ...(company.industry ? ['industry'] : [])]
     }))
     setHubspotOpen(false)
   }

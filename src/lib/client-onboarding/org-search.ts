@@ -11,6 +11,8 @@ export type OrgSearchRow = {
   country: string | null
   hubspotCompanyId: string | null
   lifecycleStage: string | null
+  // TASK-997 Slice 1 follow-up — para prefill de industria al elegir una org existente.
+  industry: string | null
 }
 
 const SELECT = `
@@ -22,7 +24,8 @@ const SELECT = `
     tax_id            AS "taxId",
     country,
     hubspot_company_id AS "hubspotCompanyId",
-    lifecycle_stage    AS "lifecycleStage"
+    lifecycle_stage    AS "lifecycleStage",
+    industry
   FROM greenhouse_core.organizations
 `
 

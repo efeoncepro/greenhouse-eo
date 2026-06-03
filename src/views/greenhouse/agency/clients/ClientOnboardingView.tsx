@@ -44,7 +44,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { HUBSPOT_INDUSTRIES, hubspotIndustryOption } from '@/config/hubspot-industries'
+import { HUBSPOT_INDUSTRIES, coerceHubspotIndustryValue, hubspotIndustryOption } from '@/config/hubspot-industries'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { GreenhouseDatePicker } from '@/components/greenhouse'
 import useReducedMotion from '@/hooks/useReducedMotion'
@@ -79,6 +79,8 @@ interface HubspotCompany {
   country: CountryCode
   lifecycleStage: string
   taxId: string | null
+  /** TASK-997 Slice 1 follow-up — industria persistida (prefill del combobox). */
+  industry: string | null
   /** Greenhouse org id when this result is an existing org (drives existingOrganizationId). */
   organizationId?: string
 }
@@ -110,6 +112,7 @@ interface OrgSearchRow {
   country: string | null
   hubspotCompanyId: string | null
   lifecycleStage: string | null
+  industry: string | null
 }
 
 // Result of the atomic wizard composer commit.
@@ -138,6 +141,7 @@ const toHubspotCompany = (row: OrgSearchRow): HubspotCompany => ({
   country: (row.country ?? '') as CountryCode,
   lifecycleStage: row.lifecycleStage ?? 'prospect',
   taxId: row.taxId,
+  industry: row.industry,
   organizationId: row.organizationId
 })
 
@@ -2339,11 +2343,12 @@ const ClientOnboardingView = () => {
       tradeName: prev.tradeName || company.name,
       country: prev.country || company.country,
       taxId: prev.taxId || company.taxId || '',
+      industry: prev.industry || coerceHubspotIndustryValue(company.industry) || '',
       currency: prev.currency || currencyForCountry(company.country),
       billingCountry: prev.billingCountry || company.country,
       spaceName: prev.spaceName || company.name,
       startDate: prev.startDate ?? DEFAULT_ENGAGEMENT_START,
-      prefilledFields: ['legalName', 'tradeName', 'country', 'taxId', 'currency']
+      prefilledFields: ['legalName', 'tradeName', 'country', 'taxId', 'currency', ...(company.industry ? ['industry'] : [])]
     }))
     if (company.organizationId) setExistingOrganizationId(company.organizationId)
     setHubspotOpen(false)
