@@ -2221,7 +2221,7 @@ const ClientOnboardingView = () => {
                       state={state}
                       result={result}
                       onReset={resetWizard}
-                      onGoToClient={() => result && router.push(`/agency/organizations/${result.organizationId}`)}
+                      onGoToClient={() => result && router.push(`/agency/clients/${result.organizationId}/lifecycle`)}
                     />
                   ) : (
                     renderStep()

@@ -54,6 +54,19 @@ export const searchOrganizations = async (query: string, limit = 12): Promise<Or
   )
 }
 
+/** Display name for an organization (timeline header). */
+export const getOrganizationDisplayName = async (organizationId: string): Promise<string | null> => {
+  const rows = await runGreenhousePostgresQuery<{ organizationName: string }>(
+    `SELECT organization_name AS "organizationName"
+     FROM greenhouse_core.organizations
+     WHERE organization_id = $1
+     LIMIT 1`,
+    [organizationId]
+  )
+
+  return rows[0]?.organizationName ?? null
+}
+
 /** Resolve an org by normalized tax id (duplicate-tax-id gate). */
 export const findOrganizationByNormalizedTaxId = async (
   normalizedTaxId: string
