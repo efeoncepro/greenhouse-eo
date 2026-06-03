@@ -151,6 +151,17 @@ Miedo del operador (legítimo): el flujo Notion→BQ alimenta métricas operativ
 
 # PROGRESS LOG (actualizar a medida que se avanza — anti-pérdida-por-compactación)
 
-- **2026-06-03 — Slice 0 (docs/ADR) HECHO.** Discovery read-only completa (8 hechos arriba). Decisión Y canonizada con el operador. Task movida to-do→in-progress. **Pendiente**: confirmar con el operador antes de tocar el sibling (cross-repo, sync productivo). Próximo: Slice 1 (IAM + deps) — empezar por lo reversible.
+- **2026-06-03 — Slice 0 (docs/ADR) HECHO.** Discovery read-only completa (8 hechos arriba). Decisión Y canonizada con el operador. Task movida to-do→in-progress.
+- **2026-06-03 — Slices 2-3 (código) HECHO + Slice 1 (deps) parcial.** En el sibling `../notion-bigquery`, rama **`task/TASK-1000-per-space-token`** pusheada (NO a `main`, NO auto-deploya). `main.py` compila (py_compile ✓):
+  - Flag `NOTION_PER_SPACE_TOKEN_ENABLED` (default OFF) + env PG (instance/db/IAM user) + proyecto Secret Manager.
+  - contextvar `_CURRENT_NOTION_TOKEN` + `_notion_headers()` lee token del space actual o global (paths legacy sin cambio).
+  - `load_per_client_space_configs_from_pg()` (SSOT PG, ref non-NULL, sync on; degrada a `[]`) + `load_all_space_configs()` (aditivo: legacy BQ + per-cliente; degrada-a-hoy). Ambos call-sites (`/health` + sync) usan el loader merged.
+  - `_resolve_notion_token_for_space()` (Secret Manager; bare/`:version`/full path; lanza si falla → loop salta ESE space).
+  - Loop: set/reset contextvar por space + skip-on-failure; aislamiento per-space preservado.
+  - Imports secret-manager/connector **lazy** (verificado: 0 module-level) → bootea sin deps con flag OFF.
+  - **Fix de Discovery live (post-auth gcloud)**: `space_notion_sources` NO tiene `client_id` (verificado en PG) → query usa `LEFT JOIN greenhouse_core.spaces` para el client_id.
+  - `requirements.txt`: +`google-cloud-secret-manager`, +`cloud-sql-python-connector[pg8000]`, +`pg8000` (solo con flag ON).
+  - **No-regresión**: con flag OFF, `load_all_space_configs()` = `load_space_configs()` (BQ legacy) + `[]` → byte-for-byte hoy. Tests del sibling (`test_normalize_prop_key.py`) ajenos al cambio (corren en su CI; pytest no local).
+  - **Pendiente (gated, prod — NO sin OK del operador)**: Slice 1 IAM (SA del sibling: `roles/cloudsql.client` + usuario PG IAM read-only `greenhouse_core.space_notion_sources`+`spaces` + `secretAccessor` sobre `notion-integration-token-greenhouse-*`); env vars en el Cloud Run (`NOTION_PER_SPACE_TOKEN_ENABLED`, `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`, `_DB`, `_IAM_USER`, `SECRET_MANAGER_PROJECT`); Slice 4 deploy (flag OFF → verificar checklist Efeonce/Sky); Slice 5 smoke Berel (tras alta por wizard); Slice 6 flip `sync_enabled`.
 <!-- nuevas entradas acá, formato: fecha — slice — qué se hizo — qué falta -->
 
