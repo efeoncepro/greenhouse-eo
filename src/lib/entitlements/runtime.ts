@@ -1520,6 +1520,9 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
 
     addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.read', action: 'read', scope: 'tenant', source })
     addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.advance', action: 'update', scope: 'tenant', source })
+    // TASK-1001 — inviting client-portal users is part of advancing the onboarding
+    // checklist (provision_client_users_access). Same tier as advance, NOT EFEONCE_ADMIN-only.
+    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.portal_user.invite', action: 'create', scope: 'tenant', source })
   }
 
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ADMIN)) {

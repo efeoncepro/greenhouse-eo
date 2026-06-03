@@ -17,13 +17,15 @@ type LifecycleCapability =
   | 'client.lifecycle.case.resolve'
   | 'client.lifecycle.case.override_blocker'
   | 'client.lifecycle.case.read'
+  | 'client.lifecycle.portal_user.invite'
 
 const ACTION_BY_CAPABILITY: Record<LifecycleCapability, EntitlementAction> = {
   'client.lifecycle.case.open': 'create',
   'client.lifecycle.case.advance': 'update',
   'client.lifecycle.case.resolve': 'approve',
   'client.lifecycle.case.override_blocker': 'override',
-  'client.lifecycle.case.read': 'read'
+  'client.lifecycle.case.read': 'read',
+  'client.lifecycle.portal_user.invite': 'create'
 }
 
 export interface LifecycleAuthResult {

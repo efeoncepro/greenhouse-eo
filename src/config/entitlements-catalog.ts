@@ -753,6 +753,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1001 — dedicated least-privilege capability for inviting client-portal users
+  // during onboarding (provision_client_users_access). Separate from case.advance
+  // (bookkeeping) because inviting GRANTS ACCESS (role assignment). Granted in
+  // runtime.ts at the advance tier (commercial/finance route group + admins).
+  {
+    key: 'client.lifecycle.portal_user.invite',
+    module: 'commercial',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'commercial.deal.create',
     module: 'commercial',
