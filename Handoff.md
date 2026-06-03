@@ -1,3 +1,21 @@
+# Sesion 2026-06-03 (cont.) — TASK-992 Slice 2 (puerta única / wizard) — 🔄 SLICES 2a/2b/2c-adopt CODE COMPLETE (develop, flag OFF)
+
+**Scope continuado**: tras Slice 1 (aggregate), se construyó la **puerta única de alta** (wizard) + sus prerequisitos backend. Todo en `develop`, detrás del flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` (OFF) → cero cambio observable al merge.
+
+**Entregado + pusheado**:
+- **Slice 2a — Composer atómico + MXN** (`fd19d75f`): `provisionClientFromWizard` — en UNA tx: `upsertCanonicalOrganization` (SSOT TASK-991) → `instantiateClientForParty` (Cliente + perfil con moneda, **incl. MXN**) → `promoteParty('active_client')` (único writer de lifecycle_stage + history; su instantiate interno es no-op → preserva perfil MXN) → `provisionClientLifecycle`. Endpoint `POST /api/admin/clients/lifecycle/provision`. Moneda validada contra `CURRENCY_DOMAIN_SUPPORT.finance_core ∪ {UF,UTM}` (registry, no hardcode). Live smoke rollback-wrapped verde (birth atómico consistente).
+- **Slice 2b — Wizard runtime** (`40df66fc`): `/agency/clients/new` (`ClientOnboardingView`, gated flag + capability) **cableado 1:1 del mockup APROBADO por copy-and-patch**. Commit real vía composer + navegación al Account 360. Pickers + gate "ya existe" buscan el backbone vía `GET /api/admin/clients/lifecycle/org-search` (verificado en vivo: detecta Berel por nombre y RFC). Ruta en route-reachability-manifest (gate strict 0 huérfanos). tsc+lint+build verdes.
+- **Slice 2c (trigger adopt)** (`47f2b5c1`): el adopt del Cotizador, cuando el party es active_client, abre el onboarding case (idempotente, flag-gated, non-blocking).
+
+**⚠️ Pendiente — requiere loop GVC / coordinación externa / data Berel (NO freehandear)**:
+- **Slice 2c (drawer + HubSpot deal webhook)**: redefinir `CreateClientDrawer` → "completar facet" (cablear `FinanceFacetDrawerMockup` + endpoint PUT facet + cutover flag-gated del host finanzas = blast radius). HubSpot deal `closedwon` → case `draft` (§11) = endpoint webhook + suscripción HubSpot Developer Portal (externa).
+- **Slice 3 — Timeline lifecycle en Account 360**: cablear `LifecycleTimelineMockup` → cabecera del org workspace shell (TASK-611) — superficie aprobada existente → loop GVC.
+- **Ronda GVC**: `pnpm fe:capture:diff` mockup vs runtime (`/agency/clients/new`, flag ON + agent auth). Visuales NUEVOS marcados para `state-design`/`modern-ui`: (1) loading/degraded pickers, (2) chip código SuccessScreen (caseId uuid vs `EO-CLC` — ¿`public_id` en cases?), (3) entrada nav discoverable (exponer flag al menú client).
+- **Validación Berel end-to-end** (flag ON, "usar existente" → Cliente + perfil MXN → backfill income → 3 planos + signals).
+- **Cierre**: docs funcional + manual; mover a `complete` con rollout (flag flip).
+
+---
+
 # Sesion 2026-06-03 — HyperFrames skills instaladas repo + global — 🆕 INSTALADO
 
 **Scope**: disponibilizar localmente las skills del plugin HyperFrames para Codex y Claude Code, tanto a nivel repo como global, sin tocar runtime Greenhouse ni el `DESIGN.md` canonico.
