@@ -3365,6 +3365,10 @@ export interface GreenhouseCoreSpaceNotionSources {
   notion_db_revisiones: string | null;
   notion_db_sprints: string | null;
   notion_db_tareas: string;
+  /**
+   * TASK-998: referencia (*_SECRET_REF) al secret de GCP Secret Manager con el token de integración Notion scoped al teamspace de este Space. NULL = token compartido legacy notion-token. NUNCA el token crudo.
+   */
+  notion_token_secret_ref: string | null;
   notion_workspace_id: string | null;
   source_id: string;
   /**
