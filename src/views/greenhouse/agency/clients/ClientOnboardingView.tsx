@@ -242,7 +242,6 @@ interface WizardState {
   // Space
   spaceName: string
   spaceType: SpaceType
-  numericCode: string
   provisionNotion: boolean
   provisionTeams: boolean
   notionMode: 'new' | 'link'
@@ -283,7 +282,6 @@ const INITIAL: WizardState = {
   specialConditions: '',
   spaceName: '',
   spaceType: 'client',
-  numericCode: '',
   provisionNotion: true,
   provisionTeams: true,
   notionMode: 'new',
@@ -515,6 +513,7 @@ const OrigenStep = ({
             subtitle={T.origen.manualCardSubtitle}
             detail={T.origen.manualCardDetail}
             onSelect={() => onSelectOrigin('manual')}
+            dataCapture='origin-manual'
           />
         </Grid>
       </Grid>
@@ -773,7 +772,7 @@ const ComercialStep = ({
   const removePhase = (id: string) => update('phases', state.phases.filter(p => p.id !== id))
 
   return (
-    <Box>
+    <Box data-capture='step-comercial'>
       <StepHeading title={T.comercial.title} subtitle={T.comercial.subtitle} />
 
       {/* Resolved context */}
@@ -840,7 +839,7 @@ const ComercialStep = ({
               </Typography>
             </Box>
             {!adding ? (
-              <Button size='small' variant='tonal' color='secondary' startIcon={<i className='tabler-plus' />} onClick={() => setAdding(true)}>
+              <Button size='small' variant='tonal' color='secondary' startIcon={<i className='tabler-plus' />} onClick={() => setAdding(true)} data-capture='add-phase'>
                 {T.comercial.addPhaseCta}
               </Button>
             ) : null}
@@ -1311,10 +1310,9 @@ const SpaceStep = ({
   const theme = useTheme()
 
   const spaceNameError = touched && state.spaceName.trim() === ''
-  const numericCodeError = touched && !/^\d{2}$/.test(state.numericCode)
 
   return (
-    <Box>
+    <Box data-capture='step-espacio'>
       <StepHeading title={T.space.title} subtitle={T.space.subtitle} />
 
       <Stack spacing={5}>
@@ -1329,36 +1327,21 @@ const SpaceStep = ({
           slotProps={{ input: { 'aria-invalid': spaceNameError } }}
         />
 
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              select
-              fullWidth
-              label={T.space.spaceTypeLabel}
-              value={state.spaceType}
-              onChange={e => update('spaceType', e.target.value as SpaceType)}
-            >
-              {SPACE_TYPE_OPTIONS.map(s => (
-                <MenuItem key={s} value={s}>
-                  {spaceTypeLabel(s)}
-                </MenuItem>
-              ))}
-            </CustomTextField>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              fullWidth
-              label={T.space.numericCodeLabel}
-              value={state.numericCode}
-              onChange={e => update('numericCode', e.target.value.replace(/[^\d]/g, '').slice(0, 2))}
-              error={numericCodeError}
-              helperText={numericCodeError ? T.space.numericCodeError : T.space.numericCodeHelper}
-              inputMode='numeric'
-              placeholder='07'
-              slotProps={{ htmlInput: { 'data-capture': 'numeric-code' } }}
-            />
-          </Grid>
-        </Grid>
+        {/* TASK-992 — el código numérico (2 dígitos, TASK-700) se ASIGNA AUTOMÁTICAMENTE en el
+            composer (allocateSpaceNumericCode, próximo libre). NO se pide al operador. */}
+        <CustomTextField
+          select
+          fullWidth
+          label={T.space.spaceTypeLabel}
+          value={state.spaceType}
+          onChange={e => update('spaceType', e.target.value as SpaceType)}
+        >
+          {SPACE_TYPE_OPTIONS.map(s => (
+            <MenuItem key={s} value={s}>
+              {spaceTypeLabel(s)}
+            </MenuItem>
+          ))}
+        </CustomTextField>
 
         <Box
           sx={{
@@ -1396,7 +1379,7 @@ const SpaceStep = ({
                     }}
                     sx={{ justifyContent: 'flex-start', flexDirection: 'column', alignItems: 'flex-start', py: 2.5, gap: 0.5, textTransform: 'none' }}
                   >
-                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                    <Typography variant='body2' sx={{ fontWeight: 600, color: 'inherit' }}>
                       {mode === 'new' ? T.space.notionModeNew : T.space.notionModeLink}
                     </Typography>
                     <Typography variant='caption' sx={{ color: active ? 'inherit' : 'text.secondary', opacity: active ? 0.9 : 1, textAlign: 'left', whiteSpace: 'normal' }}>
@@ -1440,7 +1423,7 @@ const SpaceStep = ({
                     }}
                     sx={{ justifyContent: 'flex-start', flexDirection: 'column', alignItems: 'flex-start', py: 2.5, gap: 0.5, textTransform: 'none' }}
                   >
-                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                    <Typography variant='body2' sx={{ fontWeight: 600, color: 'inherit' }}>
                       {mode === 'new' ? T.space.teamsModeNew : T.space.teamsModeLink}
                     </Typography>
                     <Typography variant='caption' sx={{ color: active ? 'inherit' : 'text.secondary', opacity: active ? 0.9 : 1, textAlign: 'left', whiteSpace: 'normal' }}>
@@ -1529,7 +1512,6 @@ const ConfirmarStep = ({
         </Section>
         <Section title={T.confirmar.sectionSpace} stepIndex={4}>
           <SummaryRow label={T.space.spaceNameLabel} value={state.spaceName || T.confirmar.notSet} />
-          <SummaryRow label={T.space.numericCodeLabel} value={state.numericCode || T.confirmar.notSet} />
         </Section>
       </Stack>
 
@@ -2249,7 +2231,7 @@ const ClientOnboardingView = () => {
       1: state.legalName.trim() !== '' && state.country !== '' && state.taxId.trim() !== '' && taxValid,
       2: state.startDate !== null && (state.endDate === null || state.endDate >= state.startDate),
       3: state.currency !== '',
-      4: state.spaceName.trim() !== '' && /^\d{2}$/.test(state.numericCode),
+      4: state.spaceName.trim() !== '',
       5: state.reviewConfirmed && state.understandConfirmed
     }
   }, [state])
@@ -2273,7 +2255,7 @@ const ClientOnboardingView = () => {
       identidad: taxValid ? `${taxLabel} válido · ${state.country}` : state.legalName ? state.legalName : null,
       comercial: state.startDate ? engagementKindLabel(state.engagementKind) : null,
       finanzas: state.currency ? `${state.currency} · Net-${state.paymentTermsDays || '—'}` : null,
-      space: state.spaceName ? provision || `Código ${state.numericCode || '—'}` : null,
+      space: state.spaceName ? provision || spaceTypeLabel(state.spaceType) : null,
       confirmar: null
     }
   }, [state])
