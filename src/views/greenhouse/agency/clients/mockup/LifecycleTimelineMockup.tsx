@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
+import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
 import { OperationalPanel } from '@/components/greenhouse/primitives'
@@ -80,6 +81,44 @@ const FacetRow = ({ facet }: { facet: MockLifecycleFacet }) => {
   )
 }
 
+// TASK-997 — checklist estático (mock) para paridad/GVC con el runtime.
+const MOCK_CHECKLIST: Array<{
+  itemCode: string
+  itemLabel: string
+  status: 'completed' | 'in_progress' | 'pending'
+  ownerRole: string
+  required: boolean
+  blocksCompletion: boolean
+}> = [
+  { itemCode: 'verify_hubspot_company_synced', itemLabel: 'Verificar company HubSpot sincronizada en Greenhouse', status: 'completed', ownerRole: 'commercial', required: true, blocksCompletion: true },
+  { itemCode: 'confirm_legal_documents', itemLabel: 'Confirmar firma de contrato/MSA', status: 'completed', ownerRole: 'commercial', required: true, blocksCompletion: true },
+  { itemCode: 'assign_team_members', itemLabel: 'Asignar miembros vía client_team_assignments con FTE', status: 'in_progress', ownerRole: 'operations', required: true, blocksCompletion: true },
+  { itemCode: 'provision_notion_workspace', itemLabel: 'Provisionar workspace Notion para el cliente', status: 'pending', ownerRole: 'operations', required: false, blocksCompletion: false },
+  { itemCode: 'provision_communication_channels', itemLabel: 'Configurar Teams channel + email subscriptions', status: 'pending', ownerRole: 'operations', required: false, blocksCompletion: false },
+  { itemCode: 'confirm_billing_setup', itemLabel: 'Confirmar setup de facturación (Nubox + payment terms)', status: 'pending', ownerRole: 'finance', required: true, blocksCompletion: true }
+]
+
+const MOCK_NOTION_ANCHORS = [
+  { notionDatabaseId: 'db-tareas', title: 'Berel · Tareas' },
+  { notionDatabaseId: 'db-proyectos', title: 'Berel · Proyectos' },
+  { notionDatabaseId: 'db-sprints', title: 'Berel · Sprints' }
+]
+
+const MOCK_TEAMS_ANCHOR = { teamId: 'team-berel', teamName: 'Grupo Berel · Efeonce' }
+
+const CHECKLIST_STATUS: Record<string, { label: string; color: 'success' | 'info' | 'secondary'; icon: string }> = {
+  completed: { label: T.checklist.statusCompleted, color: 'success', icon: 'tabler-circle-check-filled' },
+  in_progress: { label: T.checklist.statusInProgress, color: 'info', icon: 'tabler-progress' },
+  pending: { label: T.checklist.statusPending, color: 'secondary', icon: 'tabler-circle' }
+}
+
+const OWNER_LABEL: Record<string, string> = {
+  commercial: T.checklist.ownerCommercial,
+  operations: T.checklist.ownerOperations,
+  identity: T.checklist.ownerIdentity,
+  finance: T.checklist.ownerFinance
+}
+
 const LifecycleTimelineMockup = () => {
   const theme = useTheme()
   const pendingFacets = MOCK_LIFECYCLE_FACETS.filter(f => f.status !== 'complete').length
@@ -115,6 +154,60 @@ const LifecycleTimelineMockup = () => {
           {T.timeline.healthyDescription}
         </Alert>
       )}
+
+      {/* TASK-997 — checklist del caso + anchors capturados (read-only) */}
+      <Box sx={{ mb: 6 }}>
+        <OperationalPanel title={T.checklist.title} subheader={T.checklist.subtitle} icon='tabler-checklist' iconColor='primary'>
+          <Stack spacing={2}>
+            {MOCK_CHECKLIST.map((item, index) => {
+              const st = CHECKLIST_STATUS[item.status]
+              const isNotion = item.itemCode === 'provision_notion_workspace'
+              const isTeams = item.itemCode === 'provision_communication_channels'
+
+              return (
+                <Stack
+                  key={item.itemCode}
+                  direction='row'
+                  spacing={2}
+                  alignItems='flex-start'
+                  sx={{ p: 2.5, borderRadius: `${theme.shape.customBorderRadius.md}px`, border: `1px solid ${theme.palette.divider}` }}
+                >
+                  <CustomAvatar skin='light' color={st.color} size={32} variant='rounded'>
+                    <i className={st.icon} style={{ fontSize: 16 }} />
+                  </CustomAvatar>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Stack direction='row' spacing={1} alignItems='center' sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+                      <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                        {index + 1}. {item.itemLabel}
+                      </Typography>
+                      {item.required ? <CustomChip round='true' size='small' variant='tonal' color='secondary' label={T.checklist.requiredChip} /> : null}
+                      {item.blocksCompletion ? <CustomChip round='true' size='small' variant='tonal' color='warning' label={T.checklist.blockingChip} /> : null}
+                    </Stack>
+                    <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+                      {OWNER_LABEL[item.ownerRole] ?? item.ownerRole}
+                    </Typography>
+                    {isNotion ? (
+                      <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 1, flexWrap: 'wrap', rowGap: 0.5 }}>
+                        <Typography variant='caption' sx={{ color: 'text.disabled' }}>{T.checklist.anchorNotionLabel}:</Typography>
+                        {MOCK_NOTION_ANCHORS.map(a => (
+                          <CustomChip key={a.notionDatabaseId} round='true' size='small' variant='tonal' color='primary' icon={<i className='tabler-brand-notion' />} label={a.title} />
+                        ))}
+                      </Stack>
+                    ) : null}
+                    {isTeams ? (
+                      <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 1, flexWrap: 'wrap', rowGap: 0.5 }}>
+                        <Typography variant='caption' sx={{ color: 'text.disabled' }}>{T.checklist.anchorTeamsLabel}:</Typography>
+                        <CustomChip round='true' size='small' variant='tonal' color='primary' icon={<i className='tabler-brand-teams' />} label={MOCK_TEAMS_ANCHOR.teamName} />
+                      </Stack>
+                    ) : null}
+                  </Box>
+                  <CustomChip round='true' size='small' variant='tonal' color={st.color} icon={<i className={st.icon} />} label={st.label} />
+                </Stack>
+              )
+            })}
+          </Stack>
+        </OperationalPanel>
+      </Box>
 
       <Grid container spacing={6}>
         {/* Facet completeness */}

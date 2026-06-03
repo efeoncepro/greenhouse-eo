@@ -309,6 +309,26 @@ export const GH_CLIENT_ONBOARDING = {
     stalledDescription: 'Lleva {days} días sin avances. Contacta al responsable de la cuenta para destrabarlo.',
     overdueTitle: 'Vencido',
     overdueDescription: 'Pasó la fecha objetivo por {days} días.'
+  },
+
+  // --- Checklist del caso (TASK-997 — read-only) -----------------------------
+  checklist: {
+    title: 'Checklist de onboarding',
+    subtitle: 'Los pasos para activar al cliente y quién es responsable.',
+    empty: 'Este caso todavía no tiene checklist.',
+    requiredChip: 'Obligatorio',
+    blockingChip: 'Bloqueante',
+    anchorNotionLabel: 'Anclar en Notion',
+    anchorTeamsLabel: 'Anclar en Teams',
+    statusCompleted: 'Completado',
+    statusInProgress: 'En curso',
+    statusBlocked: 'Bloqueado',
+    statusSkipped: 'Omitido',
+    statusPending: 'Pendiente',
+    ownerCommercial: 'Comercial',
+    ownerOperations: 'Operaciones',
+    ownerIdentity: 'Identidad',
+    ownerFinance: 'Finanzas'
   }
 } as const
 

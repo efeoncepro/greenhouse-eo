@@ -15,6 +15,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
+import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
@@ -91,6 +92,45 @@ const FacetRow = ({ facet }: { facet: LifecycleFacet }) => {
   )
 }
 
+// TASK-997 — checklist del caso + anchors capturados (vista read-only).
+export interface LifecycleChecklistItemVm {
+  itemCode: string
+  itemLabel: string
+  status: 'pending' | 'in_progress' | 'completed' | 'skipped' | 'blocked' | 'not_applicable'
+  ownerRole: string
+  required: boolean
+  blocksCompletion: boolean
+}
+
+interface LifecycleNotionAnchorVm {
+  notionDatabaseId: string
+  title: string
+}
+
+interface LifecycleTeamsAnchorVm {
+  teamId: string
+  teamName: string
+}
+
+const CHECKLIST_STATUS: Record<
+  LifecycleChecklistItemVm['status'],
+  { label: string; color: 'success' | 'info' | 'error' | 'secondary'; icon: string }
+> = {
+  completed: { label: T.checklist.statusCompleted, color: 'success', icon: 'tabler-circle-check-filled' },
+  in_progress: { label: T.checklist.statusInProgress, color: 'info', icon: 'tabler-progress' },
+  blocked: { label: T.checklist.statusBlocked, color: 'error', icon: 'tabler-alert-triangle' },
+  skipped: { label: T.checklist.statusSkipped, color: 'secondary', icon: 'tabler-circle-minus' },
+  not_applicable: { label: T.checklist.statusSkipped, color: 'secondary', icon: 'tabler-circle-minus' },
+  pending: { label: T.checklist.statusPending, color: 'secondary', icon: 'tabler-circle' }
+}
+
+const OWNER_LABEL: Record<string, string> = {
+  commercial: T.checklist.ownerCommercial,
+  operations: T.checklist.ownerOperations,
+  identity: T.checklist.ownerIdentity,
+  finance: T.checklist.ownerFinance
+}
+
 interface Props {
   organizationName: string
   data: LifecycleTimelineData | null
@@ -98,9 +138,23 @@ interface Props {
   degraded?: boolean
   /** When set, the empty-state CTA links here (the single front door). */
   startOnboardingHref?: string
+  /** TASK-997 — checklist del caso activo (read-only). */
+  checklist?: LifecycleChecklistItemVm[]
+  /** TASK-997 — bases Notion ancladas (surface en provision_notion_workspace). */
+  notionAnchors?: LifecycleNotionAnchorVm[]
+  /** TASK-997 — equipo Teams anclado (surface en provision_communication_channels). */
+  teamsAnchor?: LifecycleTeamsAnchorVm | null
 }
 
-const LifecycleTimeline = ({ organizationName, data, degraded, startOnboardingHref }: Props) => {
+const LifecycleTimeline = ({
+  organizationName,
+  data,
+  degraded,
+  startOnboardingHref,
+  checklist,
+  notionAnchors,
+  teamsAnchor
+}: Props) => {
   const theme = useTheme()
 
   const Header = (
@@ -174,6 +228,76 @@ const LifecycleTimeline = ({ organizationName, data, degraded, startOnboardingHr
           {T.timeline.healthyDescription}
         </Alert>
       )}
+
+      {/* TASK-997 — checklist del caso + anchors capturados (read-only) */}
+      {checklist && checklist.length > 0 ? (
+        <Box sx={{ mb: 6 }}>
+          <OperationalPanel title={T.checklist.title} subheader={T.checklist.subtitle} icon='tabler-checklist' iconColor='primary'>
+            <Stack spacing={2}>
+              {checklist.map((item, index) => {
+                const st = CHECKLIST_STATUS[item.status]
+                const isNotion = item.itemCode === 'provision_notion_workspace'
+                const isTeams = item.itemCode === 'provision_communication_channels'
+
+                return (
+                  <Stack
+                    key={item.itemCode}
+                    direction='row'
+                    spacing={2}
+                    alignItems='flex-start'
+                    sx={{
+                      p: 2.5,
+                      borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                      border: `1px solid ${theme.palette.divider}`
+                    }}
+                  >
+                    <CustomAvatar skin='light' color={st.color} size={32} variant='rounded'>
+                      <i className={st.icon} style={{ fontSize: 16 }} />
+                    </CustomAvatar>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Stack direction='row' spacing={1} alignItems='center' sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                          {index + 1}. {item.itemLabel}
+                        </Typography>
+                        {item.required ? (
+                          <CustomChip round='true' size='small' variant='tonal' color='secondary' label={T.checklist.requiredChip} />
+                        ) : null}
+                        {item.blocksCompletion ? (
+                          <CustomChip round='true' size='small' variant='tonal' color='warning' label={T.checklist.blockingChip} />
+                        ) : null}
+                      </Stack>
+                      <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+                        {OWNER_LABEL[item.ownerRole] ?? item.ownerRole}
+                      </Typography>
+
+                      {isNotion && notionAnchors && notionAnchors.length > 0 ? (
+                        <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 1, flexWrap: 'wrap', rowGap: 0.5 }}>
+                          <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+                            {T.checklist.anchorNotionLabel}:
+                          </Typography>
+                          {notionAnchors.map(a => (
+                            <CustomChip key={a.notionDatabaseId} round='true' size='small' variant='tonal' color='primary' icon={<i className='tabler-brand-notion' />} label={a.title} />
+                          ))}
+                        </Stack>
+                      ) : null}
+
+                      {isTeams && teamsAnchor ? (
+                        <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 1, flexWrap: 'wrap', rowGap: 0.5 }}>
+                          <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+                            {T.checklist.anchorTeamsLabel}:
+                          </Typography>
+                          <CustomChip round='true' size='small' variant='tonal' color='primary' icon={<i className='tabler-brand-teams' />} label={teamsAnchor.teamName} />
+                        </Stack>
+                      ) : null}
+                    </Box>
+                    <CustomChip round='true' size='small' variant='tonal' color={st.color} icon={<i className={st.icon} />} label={st.label} />
+                  </Stack>
+                )
+              })}
+            </Stack>
+          </OperationalPanel>
+        </Box>
+      ) : null}
 
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, md: 7 }}>
