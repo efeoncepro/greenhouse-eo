@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     const finance = (body.finance ?? {}) as Record<string, unknown>
     const financeContacts = parseFinanceContacts(body.contacts)
     const notionAnchors = parseNotionAnchors(body.notionAnchors)
-    const teamsAnchor = parseTeamsAnchor(body.teamsAnchor)
+    const teamsAnchor = parseTeamsAnchor(body.teamsConnect ?? body.teamsAnchor)
 
     // TASK-998 — connect Notion por token scoped. Provisiona el secret (auto) +
     // valida/anti-tamper ANTES de la tx (fuera del PG). El intent (secretRef + db
@@ -182,16 +182,22 @@ const parseNotionConnect = (
   return { token, tareasDbId, proyectosDbId, sprintsDbId }
 }
 
-// TASK-997 Slice 4 — normaliza el equipo de Teams anclado del wizard.
-const parseTeamsAnchor = (raw: unknown): { teamId: string; teamName: string } | null => {
+// TASK-997 Slice 4 / TASK-998 — normaliza el equipo + canal de Teams anclado del wizard.
+const parseTeamsAnchor = (
+  raw: unknown
+): { teamId: string; teamName: string; channelId?: string; channelName?: string } | null => {
   if (!raw || typeof raw !== 'object') return null
   const item = raw as Record<string, unknown>
   const teamId = typeof item.teamId === 'string' ? item.teamId.trim() : ''
 
   if (!teamId) return null
 
+  const channelId = typeof item.channelId === 'string' && item.channelId.trim() ? item.channelId.trim() : undefined
+
   return {
     teamId,
-    teamName: typeof item.teamName === 'string' && item.teamName.trim() ? item.teamName.trim() : teamId
+    teamName: typeof item.teamName === 'string' && item.teamName.trim() ? item.teamName.trim() : teamId,
+    channelId,
+    channelName: typeof item.channelName === 'string' && item.channelName.trim() ? item.channelName.trim() : channelId
   }
 }

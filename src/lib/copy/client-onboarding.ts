@@ -242,7 +242,25 @@ export const GH_CLIENT_ONBOARDING = {
     notionMapPlaceholder: 'Elegir base…',
     notionOtherDbs: 'Otras bases detectadas ({n})',
     notionSecretNote: 'El token se guarda cifrado en nuestro gestor de secretos. Nunca queda en texto plano.',
-    notionMapIncomplete: 'Elige las 3 bases (Tareas, Proyectos, Ciclos) para conectar.'
+    notionMapIncomplete: 'Elige las 3 bases (Tareas, Proyectos, Ciclos) para conectar.',
+
+    // TASK-998 — vínculo de canal de Teams (bot Graph)
+    teamsTitle: 'Teams del cliente',
+    teamsSubtitle: 'Conecta el canal donde el equipo coordina con el cliente.',
+    teamsModeNew: 'Crear canal nuevo',
+    teamsModeNewHint: 'Creamos el canal + las suscripciones de email al dar de alta.',
+    teamsModeLink: 'Vincular canal existente',
+    teamsModeLinkHint: 'El cliente ya tiene su equipo en Teams (ej. Berel - Efeonce).',
+    teamsTeamLabel: 'Equipo',
+    teamsTeamPlaceholder: 'Elegir equipo…',
+    teamsChannelLabel: 'Canal',
+    teamsChannelPlaceholder: 'Elegir canal…',
+    teamsLoadingTeams: 'Cargando equipos…',
+    teamsLoadingChannels: 'Cargando canales…',
+    teamsEmpty: 'El bot no ve ningún equipo. Verifica que esté instalado en el tenant.',
+    teamsError: 'No pudimos listar los equipos de Teams. Intenta de nuevo.',
+    teamsPickHint: 'Elige el equipo del cliente y luego su canal.',
+    teamsSelected: 'Canal vinculado: {team} › {channel}'
   },
 
   // --- Step 6: Confirmar -----------------------------------------------------

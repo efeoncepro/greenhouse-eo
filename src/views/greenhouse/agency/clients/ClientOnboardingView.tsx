@@ -48,6 +48,7 @@ import { HUBSPOT_INDUSTRIES, coerceHubspotIndustryValue, hubspotIndustryOption }
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { GreenhouseDatePicker } from '@/components/greenhouse'
 import { NotionConnectPanel, type NotionConnectSelection } from '@/views/greenhouse/agency/clients/NotionConnectPanel'
+import { TeamsConnectPanel, type TeamsConnectSelection } from '@/views/greenhouse/agency/clients/TeamsConnectPanel'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
 import { formatDate } from '@/lib/format'
@@ -246,6 +247,8 @@ interface WizardState {
   provisionTeams: boolean
   notionMode: 'new' | 'link'
   notionConnect: NotionConnectSelection | null
+  teamsMode: 'new' | 'link'
+  teamsConnect: TeamsConnectSelection | null
   // Confirmar
   reviewConfirmed: boolean
   understandConfirmed: boolean
@@ -285,6 +288,8 @@ const INITIAL: WizardState = {
   provisionTeams: true,
   notionMode: 'new',
   notionConnect: null,
+  teamsMode: 'new',
+  teamsConnect: null,
   reviewConfirmed: false,
   understandConfirmed: false,
   prefilledFields: []
@@ -1402,13 +1407,44 @@ const SpaceStep = ({
             </Box>
           </Box>
 
-          {/* Teams */}
-          <Stack spacing={1} sx={{ mt: 4 }}>
-            <FormControlLabel
-              control={<Switch checked={state.provisionTeams} onChange={() => update('provisionTeams', !state.provisionTeams)} />}
-              label={T.space.provisionTeamsLabel}
-            />
-          </Stack>
+          {/* TASK-998 — Teams: crear canal nuevo o vincular existente (bot Graph) */}
+          <Box sx={{ mt: 4 }} role='radiogroup' aria-label={T.space.teamsTitle}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              {(['new', 'link'] as const).map(mode => {
+                const active = state.teamsMode === mode
+
+                return (
+                  <Button
+                    key={mode}
+                    role='radio'
+                    aria-checked={active}
+                    fullWidth
+                    variant={active ? 'contained' : 'tonal'}
+                    color={active ? 'primary' : 'secondary'}
+                    onClick={() => {
+                      update('teamsMode', mode)
+                      update('provisionTeams', mode === 'new')
+                      if (mode === 'new') update('teamsConnect', null)
+                    }}
+                    sx={{ justifyContent: 'flex-start', flexDirection: 'column', alignItems: 'flex-start', py: 2.5, gap: 0.5, textTransform: 'none' }}
+                  >
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                      {mode === 'new' ? T.space.teamsModeNew : T.space.teamsModeLink}
+                    </Typography>
+                    <Typography variant='caption' sx={{ color: active ? 'inherit' : 'text.secondary', opacity: active ? 0.9 : 1, textAlign: 'left', whiteSpace: 'normal' }}>
+                      {mode === 'new' ? T.space.teamsModeNewHint : T.space.teamsModeLinkHint}
+                    </Typography>
+                  </Button>
+                )
+              })}
+            </Stack>
+
+            {state.teamsMode === 'link' ? (
+              <Box sx={{ mt: 3 }}>
+                <TeamsConnectPanel onChange={sel => update('teamsConnect', sel)} />
+              </Box>
+            ) : null}
+          </Box>
 
           <Stack direction='row' spacing={2} alignItems='flex-start' sx={{ mt: 3, color: 'text.secondary' }}>
             <i className='tabler-info-circle' style={{ fontSize: 16, marginTop: 2 }} aria-hidden />
@@ -2348,7 +2384,9 @@ const ClientOnboardingView = () => {
           notionConnect: state.notionMode === 'link' && state.notionConnect ? state.notionConnect : undefined,
           // TASK-998/992 — el Space operativo del cliente (lo crea el composer).
           spaceName: state.spaceName.trim() || undefined,
-          spaceType: state.spaceType
+          spaceType: state.spaceType,
+          // TASK-998 — canal de Teams vinculado (modo "Vincular existente").
+          teamsConnect: state.teamsMode === 'link' && state.teamsConnect ? state.teamsConnect : undefined
         })
       })
 

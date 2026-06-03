@@ -64,8 +64,8 @@ export interface ProvisionClientFromWizardInput {
   financeContacts?: FinanceContactRecord[]
   /** TASK-997 Slice 3 — bases Notion ancladas (teamspace existente del cliente). */
   notionAnchors?: { notionDatabaseId: string; title: string }[]
-  /** TASK-997 Slice 4 — equipo de Teams anclado (canal existente del cliente). */
-  teamsAnchor?: { teamId: string; teamName: string } | null
+  /** TASK-997 Slice 4 / TASK-998 — equipo + canal de Teams anclado (existente del cliente). */
+  teamsAnchor?: { teamId: string; teamName: string; channelId?: string; channelName?: string } | null
   /** TASK-998 — intent de connect Notion: secret ya provisionado + db ids elegidos.
    *  Se guarda como metadata del caso; el `space_notion_sources` se escribe cuando
    *  exista el Space. El secret NUNCA queda crudo (acá solo va el `*_SECRET_REF`). */
@@ -295,7 +295,12 @@ export const provisionClientFromWizard = async (
     // TASK-997 Slice 4 — equipo de Teams anclado (intent). El aprovisionamiento
     // async lo consume para registrar teams_notification_channels cuando aplique.
     if (input.teamsAnchor?.teamId) {
-      metadata.teamsAnchor = { teamId: input.teamsAnchor.teamId, teamName: input.teamsAnchor.teamName }
+      metadata.teamsAnchor = {
+        teamId: input.teamsAnchor.teamId,
+        teamName: input.teamsAnchor.teamName,
+        channelId: input.teamsAnchor.channelId ?? null,
+        channelName: input.teamsAnchor.channelName ?? null
+      }
     }
 
     // TASK-998 — intent de connect Notion (token-por-teamspace). El secret YA está
