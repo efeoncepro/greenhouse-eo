@@ -29,6 +29,25 @@
 
 **Registros sincronizados**: `TASK_ID_REGISTRY.md` + `README.md` (siguiente ID `TASK-1004`) + TASK-1000 Delta.
 
+## 5. Cierre de sesión — programa EPIC-CLIENT-360 (onboarding Grupo Berel)
+
+Esta sesión es parte del programa para **incorporar clientes nuevos a Greenhouse**, disparado por **Grupo Berel** (primer cliente **MXN**). Requirió: (1) soporte MXN en finance core, (2) una vía canónica de incorporación (puerta única), (3) vínculo del teamspace Notion por token scoped, (4) sync diario per-space. **Berel quedó onboardeado live el 2026-06-03; lo único pendiente es su sync diario de Notion (bloqueado por endpoint deprecado).**
+
+**Cadena del programa + dónde están los deltas para recordar (cross-sesión):**
+
+- `TASK-990` (MXN finance core) — enabler raíz · Delta 2026-06-03.
+- `TASK-991` (org write SSOT) — Berel nacido por la puerta canónica · Delta 2026-06-03.
+- `TASK-992` (orquestador + wizard puerta única) — gaps #5/#7 resueltos + Berel end-to-end · Delta 2026-06-03 (b).
+- `TASK-997` (anclaje external-ref del wizard) — Notion/Teams/HubSpot de Berel · Delta 2026-06-03 (b).
+- `TASK-998` (teamspace link por token scoped) — Berel vinculado; sync bloqueado · Delta 2026-06-03.
+- `TASK-1000` (sync per-space token) — infra desplegada+verificada, BLOQUEADA · Delta 2026-06-03.
+- `TASK-1003` 🆕 (migración endpoint Notion deprecado → `/v1/data_sources`) — **el bloqueador real**, refinada con arch-architect (Slice 0 pre-flight + resolver runtime + 4-pilares).
+- `TASK-1001` (invitar personas del portal) — in-progress, aparte.
+
+**Único próximo paso para terminar Berel end-to-end:** ejecutar **TASK-1003** (payroll-crítico: gate de paridad sobre Efeonce/Sky antes del cutover) → desbloquea TASK-1000 → re-habilitar Berel `sync_enabled=TRUE`.
+
+**Fuente de verdad de la sesión:** `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md` (todos los hallazgos, estado runtime, comandos, IDs, pendientes).
+
 ---
 
 # Sesion 2026-06-03 (cont.) — TASK-1002 Full API Parity First Wave — 🆕 TASK CREADA
