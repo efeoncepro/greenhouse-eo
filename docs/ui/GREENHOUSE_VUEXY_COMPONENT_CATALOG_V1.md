@@ -274,6 +274,21 @@ Enumera lo que hoy conviene consultar primero.
 - Referencia local:
   - `src/components/greenhouse/GreenhouseFileUploader.tsx`
 
+### `brand-isotypes` (integraciones de terceros)
+- Estado: `shared`
+- Familia: `brand-integration`
+- Uso:
+  - etiquetar superficies de integración con el isotipo de la marca de terceros (Notion, Teams, futuros HubSpot/Slack)
+  - `NotionIsotype` (N negro en caja blanca) / `TeamsIsotype` (glyph púrpura `#5059C9`), prop `size`
+- Regla dura:
+  - rinden el **glyph Tabler de la marca** (`tabler-brand-notion`/`-teams`/`-*`) ya bundleado — NUNCA paths SVG hand-transcritos (rinden blob malformado + arrastran marcas retiradas de simple-icons). Decorativos (`aria-hidden`); el significado lo carga el label adyacente
+  - NO es la marca Efeonce/Greenhouse (esa vive en `efeonce-brand.ts` + DESIGN.md "Brand assets — Efeonce") y se usa distinto — estos marks de terceros NUNCA en documentos institucionales
+  - integración nueva → agregar `<XIsotype>` reusando `tabler-brand-<x>`; NUNCA hand-author SVG
+- Referencia local:
+  - `src/components/greenhouse/brand/BrandIsotypes.tsx`
+- Contrato visual:
+  - `DESIGN.md` → "Brand assets — Integraciones de terceros (Notion, Teams, …)"
+
 ## Overflow y secondary actions
 
 ### `option-menu`
