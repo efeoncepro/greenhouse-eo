@@ -141,6 +141,7 @@ export const TeamsConnectPanel = ({ onChange }: TeamsConnectPanelProps) => {
 
   return (
     <Box
+      data-capture='teams-connect-panel'
       sx={{
         p: 4,
         borderRadius: `${theme.shape.customBorderRadius.md}px`,

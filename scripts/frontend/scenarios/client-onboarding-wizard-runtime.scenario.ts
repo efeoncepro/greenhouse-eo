@@ -63,6 +63,18 @@ export const scenario: CaptureScenario = {
     // → Step 5 Espacio (CHANGED: mode-card contrast + removed numeric code)
     { kind: 'click', selector: '[data-capture="wizard-next"]' },
     { kind: 'sleep', ms: 600 },
-    { kind: 'mark', label: 'step5-espacio', note: 'Paso 5 Espacio — cards Notion/Teams (contraste), sin código numérico manual' }
+    { kind: 'mark', label: 'step5-espacio', note: 'Paso 5 Espacio — cards Notion/Teams (contraste), sin código numérico manual' },
+
+    // Revelar paneles de vínculo → verificar isotipos Notion + Teams (CHANGED: Tabler glyphs, no SVG blob)
+    { kind: 'click', selector: 'button:has-text("Vincular teamspace existente")' },
+    { kind: 'sleep', ms: 350 },
+    { kind: 'click', selector: 'button:has-text("Vincular canal existente")' },
+    { kind: 'sleep', ms: 450 },
+    { kind: 'mark', label: 'step5-link-panels', note: 'Paneles de vínculo — isotipos Notion (N en caja blanca) + Teams (glyph púrpura Tabler)' },
+
+    // Clip al panel Teams → isotipo crisp (verificar glyph bien formado, no blob)
+    { kind: 'scroll', selector: '[data-capture="teams-connect-panel"]', scrollBlock: 'center' },
+    { kind: 'sleep', ms: 350 },
+    { kind: 'mark', label: 'teams-isotype-crisp', clipSelector: '[data-capture="teams-connect-panel"]', note: 'Panel Teams recortado — isotipo Tabler púrpura bien formado' }
   ]
 }
