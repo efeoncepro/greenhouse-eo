@@ -96,6 +96,13 @@ interface ClientProfile {
 
 const ClientsListView = () => {
   const router = useRouter()
+
+  // TASK-992 Slice 2c — el alta de cliente vive en la puerta única (wizard). Cuando
+  // el flag está activo, "Nuevo cliente" navega al wizard en vez de abrir el viejo
+  // CreateClientDrawer (que creaba clientes en paralelo — anti-patrón). El drawer
+  // queda solo como fallback mientras el flag esté apagado.
+  const lifecycleWizardEnabled = process.env.NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED === 'true'
+
   const [loading, setLoading] = useState(true)
   const [clients, setClients] = useState<ClientProfile[]>([])
   const [total, setTotal] = useState(0)
@@ -244,9 +251,9 @@ const ClientsListView = () => {
             variant='contained'
             color='primary'
             startIcon={<i className='tabler-plus' />}
-            onClick={() => setDrawerOpen(true)}
+            onClick={() => (lifecycleWizardEnabled ? router.push('/agency/clients/new') : setDrawerOpen(true))}
           >
-            Nuevo perfil
+            {lifecycleWizardEnabled ? 'Nuevo cliente' : 'Nuevo perfil'}
           </Button>
         </Box>
       </Box>
