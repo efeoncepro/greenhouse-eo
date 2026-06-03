@@ -32,7 +32,10 @@ export interface InstantiateClientForPartyInput {
   organizationId: string
   triggerEntity: LifecycleTriggerEntity
   billingDefaults?: {
-    paymentCurrency?: 'CLP' | 'USD' | 'UF' | 'UTM'
+    // finance_core currencies (CLP/USD/MXN — TASK-990) + CL indexation units (UF/UTM).
+    // The valid finance_core set is governed by CURRENCY_DOMAIN_SUPPORT.finance_core;
+    // callers resolving from user input must validate against it (see the wizard composer).
+    paymentCurrency?: 'CLP' | 'USD' | 'MXN' | 'UF' | 'UTM'
     paymentTermsDays?: number
   }
   actor: PartyActor

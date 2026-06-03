@@ -32,6 +32,8 @@ export interface ProvisionClientLifecycleInput {
   templateCode?: string
   previousCaseId?: string
   hubspotDealId?: string
+  /** Extra first-class metadata persisted on the case (e.g. wizard origin, clientKind). */
+  metadataExtra?: Record<string, unknown>
   /** Override the derived initial status (hubspot_deal -> draft, otherwise in_progress). */
   initialStatus?: 'draft' | 'in_progress'
 }
@@ -129,7 +131,7 @@ export const provisionClientLifecycle = async (
       )
     }
 
-    const metadata: Record<string, unknown> = {}
+    const metadata: Record<string, unknown> = { ...(input.metadataExtra ?? {}) }
 
     if (input.hubspotDealId) metadata.hubspotDealId = input.hubspotDealId
 
