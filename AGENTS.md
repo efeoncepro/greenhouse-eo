@@ -896,6 +896,7 @@ Existen **3 integraciones Notion productivas/no-productivas** + **1 dedicada al 
 | **Greenhouse** | env `NOTION_TOKEN` (staging/dev) | Runtime no-productivo (`dev-greenhouse`, preview, local) | Efeonce + Sky (staging/dev) | **Staging/Dev** |
 | **Greenhouse PRD** | `notion-integration-token-greenhouse-prd` (2026-05-21) → env `NOTION_TOKEN` | Runtime Vercel prod + `ops-worker` (re-fetch status transitions TASK-912 + writeback `[GH]` properties TASK-916) | Efeonce + Sky (productivo) | Producción |
 | **(dedicada demo)** | `notion-integration-token-greenhouse-metrics-demo` (2026-05-19) → `NOTION_METRICS_DEMO_TOKEN_SECRET_REF` | `ops-worker` compute/writeback demo (TASK-913) | **SOLO** teamspace `Demo Greenhouse` (`36339c2f-…`) | Sandbox demo |
+| **Por cliente (scoped, TASK-998)** | `notion-integration-token-greenhouse-<slug>` → `space_notion_sources.notion_token_secret_ref` (ej. `notion-integration-token-greenhouse-berel`, 2026-06-03) | sync per-space (pendiente `notion-bigquery`) + checklist onboarding | **SOLO** el teamspace de ESE cliente (el token ES el scope) | Producción (clientes nuevos) |
 
 **⚠️ Reglas duras**:
 
@@ -908,6 +909,27 @@ Existen **3 integraciones Notion productivas/no-productivas** + **1 dedicada al 
 - **SIEMPRE** que emerja una integración Notion nueva (e.g. otro cliente, otro pipeline), agregarla a este registry con su secret + consumer + scope + entorno antes del primer uso, y enumerar a qué teamspaces se le concede acceso.
 
 **Verificación operador-side** (no es código — son settings de Notion): la lista de integraciones conectadas a un teamspace se ve en Notion → teamspace → Settings → Connections. Para auditar fuga a BQ: `bq query 'SELECT source_database_id, space_id, COUNT(*) FROM efeonce-group.notion_ops.raw_pages_snapshot GROUP BY 1,2'` — todo `source_database_id` debe pertenecer a Efeonce (`spc-c0cf6478-…`) o Sky (`spc-ae463d9f-…`); cualquier `36339c2f…` (demo) es fuga.
+
+### Notion teamspace linking — token POR teamspace + cómo enumerar DBs (TASK-998, desde 2026-06-03)
+
+Vincular el teamspace Notion de un **cliente nuevo** = **una integración interna scoped SOLO a ese teamspace**, cuyo token **es el scope**. La compartida `notion-token` queda solo para Efeonce/Sky legacy. Verificado live (Berel):
+
+- **REST NO enumera teamspaces**: `/v1/teams`=400; `parent` de un data_source es `database_id`, no teamspace; las DBs de un teamspace **no comparten prefijo de id** → heurístico de prefijo inválido.
+- **MCP claude.ai `notion-get-teams` SÍ enumera** pero es OAuth interactivo **NO runtime-available** (solo un agente lo usa para obtener IDs).
+- **Gate real = ACCESO**: el token compartido da 404 en DBs no compartidas con él. Ninguna vía lee un teamspace no compartido con su credencial.
+
+Flujo canónico (checklist `provision_notion_workspace`, NO el wizard): operador pega el token scoped → `discoverNotionDatabasesForToken` (`src/lib/client-onboarding/notion-token-connect.ts`) hace `POST /v1/search` (devuelve SOLO las DBs de ese cliente) → auto-clasifica Tareas/Proyectos/Sprints por título → operador confirma → token a Secret Manager (`notion-integration-token-greenhouse-<slug>`, `printf %s`) + `space_notion_sources.notion_token_secret_ref` (NUNCA el token crudo).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** enumerar teamspaces con `/v1/search` crudo + heurística de prefijo. Usar el token scoped por cliente + clasificación por título.
+- **NUNCA** cablear el MCP claude.ai a un backend (OAuth interactivo, absent en headless).
+- **NUNCA** agregar un teamspace de cliente nuevo a la integración compartida `notion-token` "para que el discover lo vea". Cada cliente = su integración scoped.
+- **NUNCA** persistir el token Notion crudo en PG/logs/eventos. Solo el `*_SECRET_REF`; a Secret Manager con `printf %s`.
+- **NUNCA** vincular el teamspace en el wizard de nacimiento (vive en el checklist de provisioning — separación de concerns).
+- **Teams**: el bot Graph (`/v1.0/teams` + `/teams/{id}/channels`) ya lista teams+canales sin permisos nuevos (verificado: "Berel - Efeonce" › "Squad Berel"). Chats 1:1 fuera de scope.
+
+Spec: `docs/tasks/to-do/TASK-998-notion-teams-teamspace-linking-discover-register.md`.
 
 ### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
 
