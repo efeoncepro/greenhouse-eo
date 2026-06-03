@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,6 +19,18 @@
 - Branch: `task/TASK-992-client-lifecycle-orchestrator`
 - Legacy ID: `none`
 - GitHub Issue: `[optional]`
+
+## Delta 2026-06-02 — Lifecycle → in-progress + Open Questions resueltas (pre-FASE-1)
+
+Movida a `in-progress`. Se trabaja **en `develop`** (instrucción del operador: NO crear branch `task/TASK-992-*`). Las 3 Open Questions resueltas con la opción más robusta/canónica (rationale documentado pre-Discovery, regla del proceso):
+
+- **Q1 — Ruta canónica del wizard → `/agency/clients/new` (Commercial owner).** Rationale: el domain boundary `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1` asigna el *nacimiento* del party/lifecycle a **Commercial** (Finance solo completa `client_profiles`); el `Domain` de esta task es `commercial`; `Files owned` ya declara `/agency/clients/new` + las vistas en `src/views/greenhouse/agency/clients/*`; el mockup vive en `/agency/clients/{new,...}/mockup/`. El namespace `/api/admin/clients/.../lifecycle` (CLIENT_LIFECYCLE_V1 §9/§12) es la API/drawer admin del case — NO la puerta de alta. La **puerta** (wizard UI) es Commercial → `/agency/clients/new`.
+- **Q2 — Template `standard_onboarding_v1` → default mínimo extensible, seedeado en migración (§5.5).** Items mínimos canónicos: identidad tributaria (`tax_id`+`country`), facet financiero (`client_profiles`, con moneda — MXN si TASK-990 activo), space. Rationale: la "template management UI completa" está Out of Scope; el contrato §5.3/§5.4/§5.5 ya modela templates+items data-driven (extensible sin migración nueva). Se arranca con el mínimo derivable del Goal; Comercial extiende async (no bloqueante). NO hardcodear el checklist — vive en `client_lifecycle_checklist_templates/items`.
+- **Q3 — Drawer Finanzas → coexiste (recomendación de la spec).** El wizard **pare** clientes; `CreateClientDrawer` se **redefine** a "completar facet financiero de cliente existente" (ya no pare). Distinto job. Detrás del flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED`, el drawer legacy queda disponible hasta validar el cutover (risk matrix). Rationale: el Goal lo declara redefinido (no eliminado); coexistencia con propósitos separados = no fragmentación (la puerta es una sola: el wizard).
+
+**Roles (anti-rol-fantasma, TASK-935):** CLIENT_LIFECYCLE_V1 §8 menciona `commercial_admin`/`operations` que NO existen en `ROLE_CODES`. Colapso canónico a verificar en FASE-Plan: `client.lifecycle.case.open|resolve` → `EFEONCE_ADMIN` + `FINANCE_ADMIN`; `advance|read` → route_groups reales (`internal`/`finance`) + admins. Verificar contra `src/config/role-codes.ts` + guard `capability-grant-coverage.test.ts`.
+
+> **Estado de ejecución:** la implementación (Slices 1-3, contrato 749 líneas de `CLIENT_LIFECYCLE_V1` verbatim + cablear wizard + timeline) es P1/effort Alto → requiere **checkpoint humano tras el Plan** (FASE 4). Discovery → Audit → Connections → Plan se ejecutan antes de tocar código.
 
 ## Delta 2026-06-02 — prerequisito TASK-991 code-complete
 
@@ -197,9 +209,25 @@ Contrato del aggregate, comandos, state machine, eventos, capabilities y API: **
 - Capabilities colapsadas a `ROLE_CODES` reales (anti-rol-fantasma TASK-935): `client.lifecycle.case.open|resolve` → EFEONCE_ADMIN + FINANCE_ADMIN; `advance|read` → route_groups reales (commercial/finance) + admins.
 - El wizard (no en la spec V1) es la superficie canónica de la puerta única; compone `provisionClientLifecycle`.
 
-### Berel
+### Berel — activación pendiente (estado real verificado 2026-06-02, post TASK-990)
 
-Para cuando esta task corra, Berel ya tiene identidad canónica (TASK-991) y facet financiero MXN (TASK-990). El wizard NO se usa para re-crear Berel; Berel valida el **timeline** del Account 360 (todas las facets pobladas + origin + etapas). El wizard se valida con un cliente nuevo de prueba en staging.
+> ⚠️ Corrección a la suposición previa: Berel **NO** tiene aún facet financiero ni Cliente. Tiene **organización** (TASK-991) pero le falta el registro `clients` + `client_profiles` + el income. **Berel es el caso de validación real del wizard de ESTA task** (no solo del timeline): el wizard lo crea como Cliente con billing MXN, y eso destraba su factura. Documentado acá para que la sesión nueva lo tenga servido.
+
+**Lo que YA está listo (no rehacer):**
+
+- ✅ **Organización** `org-32333527-02a8-487b-819e-6f76a761777d` (TASK-991 remedió: `organization_type='client'`, `country='MX'`, `tax_id='PBE970101718'` RFC, `legal_name='PINTURAS BEREL SA DE CV'`, `lifecycle_stage='active_client'`, `hubspot_company_id='55405407542'`).
+- ✅ **Cuenta Global66 MXN** (`account_id='global-66-mxn-mxn'`, `currency='MXN'`, fintech, provider `global66`, CLABE `703180052006860943`, activa, saldo 0) — creada por el operador en la UI de instrumentos de pago. NO recrear (PG es compartida staging/prod).
+- ✅ **Flags MXN finance** (`FINANCE_CORE_MXN_ENABLED`, `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`, `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, `FINANCE_MXN_PAYMENT_ORDERS_ENABLED`) ON en `staging` + `Preview (develop)`, live. Producción queda para el release `develop→main`.
+- ✅ **Backfill del income listo**: `scripts/finance/task-990-berel-income-native-backfill.ts` (allowlist 28800562, reusa `upsertIncomeFromSale`, inyecta plano extranjero del XML, resuelve org por RFC + client por el HubSpot link del org, dry-run default, `--apply` gated por `FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED` + `FINANCE_CORE_MXN_ENABLED`). **Hoy falla claro** porque Berel no tiene Cliente ("Onboard Berel as a client first") — por diseño, no fuerza nada.
+
+**Lo que FALTA (orden de activación, post o durante esta task):**
+
+1. **Threadear MXN en el facet financiero del wizard** (gap real de TASK-990 que esta task cierra en el paso Finanzas): `instantiateClientForParty` hoy tipa `billingDefaults.paymentCurrency` como `'CLP' | 'USD' | 'UF' | 'UTM'` — **falta MXN**. El paso Finanzas del wizard (que escribe `client_profiles.payment_currency`) debe aceptar MXN cuando TASK-990 está activo. Verificar también CHECK de `client_profiles.payment_currency` en PG (widen si existe). Single source: derivar del dominio/registry, no hardcodear (mismo patrón que el dropdown del instrumento de pago, fix `CURRENCY_DOMAIN_SUPPORT.finance_core`).
+2. **Crear a Berel por el wizard** (origin = HubSpot company `55405407542` / org existente `org-32333527`), billing **MXN**, terms 30 días. El `provisionClientLifecycle` crea el `clients` + `client_profiles` (facet financiero MXN) + space, todo atómico. El diálogo "ya existe" debe cargar el org existente (no duplicar). `tax_id`/`country` ya vienen del org.
+3. **Proyectar la factura (income/AR)**: una vez exista el Cliente, correr el backfill `--apply` (con los flags + gate en env). Crea la **factura impaga**: `native_amount=89960 MXN`, `total_amount_clp=4617647` (legal, intacto), snapshot rate 51,33, `is_tax_exempt=true` (DTE 110), `due_date=2026-07-01`, **`payment_status='pending'`, `amount_paid=0` — 30 días de crédito, AÚN NO SE COBRA. El cobro (settlement nativo + resultado cambiario) es un evento futuro y separado, cuando Berel pague.**
+4. **Verificar end-to-end**: Account 360 timeline de Berel con todas las facets pobladas (identidad + financiero MXN + space) + la factura con sus 3 planos (native/functional/reporting) + señales MXN (`finance.fx.*`, `finance.multi_currency.native_equivalent_drift`, `finance.fx_gain_loss.unclassified`) en steady `ok`.
+
+**El wizard también se valida con un cliente NUEVO de prueba en staging** (no solo Berel) — Berel es el caso MXN real; el cliente de prueba cubre el flujo genérico CLP.
 
 ## Rollout Plan & Risk Matrix
 
