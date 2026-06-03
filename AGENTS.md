@@ -123,7 +123,7 @@ Si falta alguno de esos pasos, el cierre debe decir `code complete, rollout pend
   - nuevas capacidades deben declarar desde el diseno que contrato API/MCP/app lane las consumira o por que quedan temporalmente UI-only
   - writes programaticos requieren command semantics explicita, authorization tenant-safe, audit/outbox cuando aplique, idempotencia si pueden reintentarse, errores sanitizados y observabilidad
   - no crear endpoints como "click handlers remotos"; el contrato debe modelar el aggregate/recurso/command, no el componente visible
-  - fuente canonica: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` y `docs/architecture/DECISIONS_INDEX.md` decision "Full API parity".
+  - fuente canonica: `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`, `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` y `docs/architecture/DECISIONS_INDEX.md` decision "Full API parity".
 - Si el trabajo toca permisos, navegacion, Home, menu, guards, surfaces por rol o diseño de nuevas capacidades:
   - revisar `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
   - revisar `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`

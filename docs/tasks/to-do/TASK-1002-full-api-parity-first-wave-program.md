@@ -59,6 +59,7 @@ Revisar y respetar:
 - `docs/tasks/TASK_PROCESS.md`
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `docs/architecture/DECISIONS_INDEX.md`
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -97,7 +98,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- Full API parity decision accepted in `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`.
+- Full API parity decision accepted in `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
 - Existing API Platform foundation under `src/lib/api-platform/**` and `src/app/api/platform/**`.
 - Existing Product API/domain primitives for active domains.
 - Existing task backlog `TASK-650` to `TASK-661`.

@@ -5,11 +5,13 @@
 > **Creado:** 2026-04-25
 > **Ultima actualizacion:** 2026-06-03
 > **Scope:** API platform interna, ecosystem-facing y futura external-facing de Greenhouse
-> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_MCP_ARCHITECTURE_V1.md`, `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`, `TASK-040`
+> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`, `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_MCP_ARCHITECTURE_V1.md`, `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`, `TASK-040`
 
 ---
 
 ## Delta 2026-06-03 — Full API parity como principio de producto/plataforma
+
+ADR canonico: `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
 
 Greenhouse adopta **full API parity** como principio rector:
 
@@ -1291,6 +1293,8 @@ Desde 2026-04-25 Greenhouse debe operar con estas reglas:
 ---
 
 ## 25. Delta 2026-06-03 — Full API parity queda aceptado
+
+ADR canonico: `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
 
 La decision full API parity queda aceptada como principio transversal de producto/plataforma.
 

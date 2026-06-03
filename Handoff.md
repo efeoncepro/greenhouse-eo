@@ -1,5 +1,7 @@
 # Sesion 2026-06-03 (cont.) — TASK-1002 Full API Parity First Wave — 🆕 TASK CREADA
 
+**Delta ADR dedicado**: por pedido del operador, la decision ahora vive tambien como ADR dedicado en `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` (Accepted). `DECISIONS_INDEX.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, docs API y `TASK-1002` apuntan al ADR dedicado.
+
 **Scope**: tras aceptar full API parity como principio, el operador pidio una task para materializar las oportunidades principales.
 
 **Task creada**: `docs/tasks/to-do/TASK-1002-full-api-parity-first-wave-program.md`.
