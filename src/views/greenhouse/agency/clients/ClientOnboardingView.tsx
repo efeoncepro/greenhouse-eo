@@ -209,23 +209,6 @@ interface FinanceContactSuggestion {
   jobTitle: string | null
 }
 
-interface NotionAnchor {
-  notionDatabaseId: string
-  title: string
-}
-
-interface NotionTeamspaceSuggestion {
-  notionDatabaseId: string
-  title: string
-  parentType: string
-  url: string | null
-}
-
-interface TeamsAnchor {
-  teamId: string
-  teamName: string
-}
-
 interface WizardState {
   origin: OnboardingOrigin | null
   hubspotCompany: HubspotCompany | null
@@ -260,11 +243,6 @@ interface WizardState {
   numericCode: string
   provisionNotion: boolean
   provisionTeams: boolean
-  // TASK-997 Slice 3 — teamspace de Notion anclado (External Reference). Bases
-  // existentes (Tareas/Proyectos/Sprints) elegidas del buscador; vacío ⇒ crear nuevo.
-  notionAnchors: NotionAnchor[]
-  // TASK-997 Slice 4 — equipo de Teams anclado (External Reference). null ⇒ crear nuevo.
-  teamsAnchor: TeamsAnchor | null
   // Confirmar
   reviewConfirmed: boolean
   understandConfirmed: boolean
@@ -302,8 +280,6 @@ const INITIAL: WizardState = {
   numericCode: '',
   provisionNotion: true,
   provisionTeams: true,
-  notionAnchors: [],
-  teamsAnchor: null,
   reviewConfirmed: false,
   understandConfirmed: false,
   prefilledFields: []
@@ -1315,106 +1291,6 @@ const SpaceStep = ({
   const spaceNameError = touched && state.spaceName.trim() === ''
   const numericCodeError = touched && !/^\d{2}$/.test(state.numericCode)
 
-  // TASK-997 Slice 3 — buscador de teamspace Notion (External Reference). Debounced
-  // async contra /v1/search; estados honestos (loading/ready/degraded). Anclar bases
-  // existentes evita crear un teamspace duplicado.
-  const [notionQuery, setNotionQuery] = useState('')
-  const [notionResults, setNotionResults] = useState<NotionTeamspaceSuggestion[]>([])
-  const [notionState, setNotionState] = useState<'idle' | 'loading' | 'ready' | 'degraded'>('idle')
-
-  useEffect(() => {
-    const q = notionQuery.trim()
-
-    if (q.length < 2) {
-      setNotionState('idle')
-      setNotionResults([])
-
-      return
-    }
-
-    let cancelled = false
-
-    const handle = setTimeout(() => {
-      setNotionState('loading')
-      fetch(`/api/admin/clients/lifecycle/notion-teamspaces?q=${encodeURIComponent(q)}`)
-        .then(res => res.json() as Promise<{ items?: NotionTeamspaceSuggestion[]; degraded?: boolean }>)
-        .then(payload => {
-          if (cancelled) return
-
-          if (payload.degraded) {
-            setNotionState('degraded')
-            setNotionResults([])
-
-            return
-          }
-
-          setNotionResults(payload.items ?? [])
-          setNotionState('ready')
-        })
-        .catch(() => {
-          if (cancelled) return
-          setNotionState('degraded')
-          setNotionResults([])
-        })
-    }, 280)
-
-    return () => {
-      cancelled = true
-      clearTimeout(handle)
-    }
-  }, [notionQuery])
-
-  const hasNotionAnchors = state.notionAnchors.length > 0
-
-  // TASK-997 Slice 4 — buscador de equipo Teams (External Reference, Graph).
-  const [teamsQuery, setTeamsQuery] = useState('')
-  const [teamsResults, setTeamsResults] = useState<TeamsAnchor[]>([])
-  const [teamsState, setTeamsState] = useState<'idle' | 'loading' | 'ready' | 'degraded'>('idle')
-
-  useEffect(() => {
-    const q = teamsQuery.trim()
-
-    if (q.length < 2) {
-      setTeamsState('idle')
-      setTeamsResults([])
-
-      return
-    }
-
-    let cancelled = false
-
-    const handle = setTimeout(() => {
-      setTeamsState('loading')
-      fetch(`/api/admin/clients/lifecycle/teams-channels?q=${encodeURIComponent(q)}`)
-        .then(res => res.json() as Promise<{ items?: TeamsAnchor[]; degraded?: boolean }>)
-        .then(payload => {
-          if (cancelled) return
-
-          if (payload.degraded) {
-            setTeamsState('degraded')
-            setTeamsResults([])
-
-            return
-          }
-
-          setTeamsResults(payload.items ?? [])
-          setTeamsState('ready')
-        })
-        .catch(() => {
-          if (cancelled) return
-          setTeamsState('degraded')
-          setTeamsResults([])
-        })
-    }, 280)
-
-    return () => {
-      cancelled = true
-      clearTimeout(handle)
-    }
-  }, [teamsQuery])
-
-  const hasTeamsAnchor = state.teamsAnchor !== null
-
   return (
     <Box>
       <StepHeading title={T.space.title} subtitle={T.space.subtitle} />
@@ -1477,103 +1353,23 @@ const SpaceStep = ({
             {T.space.provisionSubtitle}
           </Typography>
 
-          {/* TASK-997 Slice 3 — anclar teamspace de Notion existente (External Reference) */}
-          <Box sx={{ mt: 3 }}>
-            <CustomAutocomplete
-              multiple
-              fullWidth
-              options={notionResults}
-              value={state.notionAnchors}
-              filterOptions={x => x}
-              loading={notionState === 'loading'}
-              getOptionLabel={option => option.title}
-              isOptionEqualToValue={(option, value) => option.notionDatabaseId === value.notionDatabaseId}
-              onInputChange={(_, v) => setNotionQuery(v)}
-              onChange={(_, value) =>
-                update(
-                  'notionAnchors',
-                  value.map(v => ({ notionDatabaseId: v.notionDatabaseId, title: v.title }))
-                )
-              }
-              noOptionsText={notionState === 'degraded' ? T.space.notionSearchDegraded : T.space.notionSearchEmpty}
-              renderInput={params => (
-                <CustomTextField
-                  {...params}
-                  label={T.space.notionSearchLabel}
-                  placeholder={T.space.notionSearchPlaceholder}
-                  helperText={notionState === 'degraded' ? T.space.notionSearchDegraded : T.space.notionSearchHelper}
-                  slotProps={{
-                    input: {
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {notionState === 'loading' ? <CircularProgress size={16} /> : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      )
-                    }
-                  }}
-                />
-              )}
-            />
-          </Box>
-
-          {/* TASK-997 Slice 4 — anclar equipo de Teams existente (External Reference) */}
-          <Box sx={{ mt: 2 }}>
-            <CustomAutocomplete
-              fullWidth
-              options={teamsResults}
-              value={state.teamsAnchor}
-              filterOptions={x => x}
-              loading={teamsState === 'loading'}
-              getOptionLabel={option => option.teamName}
-              isOptionEqualToValue={(option, value) => option.teamId === value.teamId}
-              onInputChange={(_, v) => setTeamsQuery(v)}
-              onChange={(_, value) => update('teamsAnchor', value ?? null)}
-              noOptionsText={teamsState === 'degraded' ? T.space.teamsSearchDegraded : T.space.teamsSearchEmpty}
-              renderInput={params => (
-                <CustomTextField
-                  {...params}
-                  label={T.space.teamsSearchLabel}
-                  placeholder={T.space.teamsSearchPlaceholder}
-                  helperText={teamsState === 'degraded' ? T.space.teamsSearchDegraded : T.space.teamsSearchHelper}
-                  slotProps={{
-                    input: {
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {teamsState === 'loading' ? <CircularProgress size={16} /> : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      )
-                    }
-                  }}
-                />
-              )}
-            />
-          </Box>
-
-          <Stack spacing={1} sx={{ mt: 2 }}>
+          <Stack spacing={1} sx={{ mt: 3 }}>
             <FormControlLabel
-              control={
-                <Switch
-                  checked={state.provisionNotion && !hasNotionAnchors}
-                  disabled={hasNotionAnchors}
-                  onChange={() => update('provisionNotion', !state.provisionNotion)}
-                />
-              }
-              label={hasNotionAnchors ? T.space.provisionNotionAnchoredLabel : T.space.provisionNotionLabel}
+              control={<Switch checked={state.provisionNotion} onChange={() => update('provisionNotion', !state.provisionNotion)} />}
+              label={T.space.provisionNotionLabel}
             />
             <FormControlLabel
-              control={
-                <Switch
-                  checked={state.provisionTeams && !hasTeamsAnchor}
-                  disabled={hasTeamsAnchor}
-                  onChange={() => update('provisionTeams', !state.provisionTeams)}
-                />
-              }
-              label={hasTeamsAnchor ? T.space.provisionTeamsAnchoredLabel : T.space.provisionTeamsLabel}
+              control={<Switch checked={state.provisionTeams} onChange={() => update('provisionTeams', !state.provisionTeams)} />}
+              label={T.space.provisionTeamsLabel}
             />
+          </Stack>
+
+          {/* TASK-998 — el vínculo de un teamspace/canal EXISTENTE (ej. Grupo Berel)
+              se hace en el checklist de onboarding con el flujo canónico
+              discover+register (el mismo que conectó Efeonce y Sky), no acá. */}
+          <Stack direction='row' spacing={2} alignItems='flex-start' sx={{ mt: 3, color: 'text.secondary' }}>
+            <i className='tabler-info-circle' style={{ fontSize: 16, marginTop: 2 }} aria-hidden />
+            <Typography variant='caption'>{T.space.linkExistingNote}</Typography>
           </Stack>
           <Stack direction='row' spacing={2} alignItems='flex-start' sx={{ mt: 2, color: 'text.secondary' }}>
             <i className='tabler-info-circle' style={{ fontSize: 16, marginTop: 2 }} aria-hidden />
@@ -2507,9 +2303,7 @@ const ClientOnboardingView = () => {
             role: c.role || null,
             hubspotContactId: c.hubspotContactId,
             source: c.source
-          })),
-          notionAnchors: state.notionAnchors,
-          teamsAnchor: state.teamsAnchor
+          }))
         })
       })
 
