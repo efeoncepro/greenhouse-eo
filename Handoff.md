@@ -1,3 +1,30 @@
+# Sesion 2026-06-03 — HyperFrames skills instaladas repo + global — 🆕 INSTALADO
+
+**Scope**: disponibilizar localmente las skills del plugin HyperFrames para Codex y Claude Code, tanto a nivel repo como global, sin tocar runtime Greenhouse ni el `DESIGN.md` canonico.
+
+**Instalado desde**: `/Users/jreye/.codex/plugins/cache/openai-curated/hyperframes/5e86d584/skills`.
+
+**Skills instaladas completas**:
+- `gsap`
+- `hyperframes`
+- `hyperframes-cli`
+- `hyperframes-registry`
+- `website-to-hyperframes`
+
+**Destinos**:
+- Repo Codex: `.codex/skills/{gsap,hyperframes,hyperframes-cli,hyperframes-registry,website-to-hyperframes}/`
+- Repo Claude: `.claude/skills/{gsap,hyperframes,hyperframes-cli,hyperframes-registry,website-to-hyperframes}/`
+- Global Codex: `/Users/jreye/.codex/skills/{gsap,hyperframes,hyperframes-cli,hyperframes-registry,website-to-hyperframes}/`
+- Global Claude: `/Users/jreye/.claude/skills/{gsap,hyperframes,hyperframes-cli,hyperframes-registry,website-to-hyperframes}/`
+
+**Guardias / verificacion**:
+- No se copio ningun `DESIGN.md` desde el bundle HyperFrames; el bundle no contiene `DESIGN.md`/`design.md`.
+- `DESIGN.md` de raiz y `videos/efeoncepro-promo/DESIGN.md` conservaron hash durante la instalacion.
+- `diff -qr` confirmo que cada skill instalada es identica al bundle fuente en los 4 destinos.
+- No se hizo commit/push porque el worktree ya tiene cambios activos de TASK-992 / otras sesiones.
+
+---
+
 # Sesion 2026-06-03 — TASK-992 Client Lifecycle Orchestrator (Slice 1: aggregate) — 🔄 SLICE 1 CODE COMPLETE (develop, flag OFF)
 
 **Scope**: activar el orquestador canónico `client_lifecycle_case` (onboarding) ya specced en `GREENHOUSE_CLIENT_LIFECYCLE_V1` (Aceptada, 0 implementación). Sesión = **Slice 1 (aggregate)** por decisión del operador en el checkpoint humano post-Plan; Slices 2 (wizard puerta única + drawer Finanzas redefinido + triggers HubSpot/adopt + MXN) y 3 (timeline Account 360) quedan para sesiones siguientes. **En `develop`** (instrucción del operador, sin branch).
