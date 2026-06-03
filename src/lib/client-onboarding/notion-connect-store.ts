@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { createOrAddSecretVersion } from '@/lib/secrets/secret-manager'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -150,9 +152,28 @@ export const connectNotionTeamspaceForSpace = async (
   const secretId = provisioned.intent.secretRef
 
   // 4. UPSERT space_notion_sources (PG SSOT). sync_enabled=FALSE (ver header).
-  try {
-    const rows = await runGreenhousePostgresQuery<{ source_id: string }>(
-      `INSERT INTO greenhouse_core.space_notion_sources (
+  const written = await writeSpaceNotionSourcesFromIntent(spaceId, provisioned.intent, actorUserId)
+
+  if (!written.ok) {
+    return { ok: false, errorCode: 'persist_failed', reason: written.reason, secretRef: secretId }
+  }
+
+  return { ok: true, secretRef: secretId, sourceId: written.sourceId }
+}
+
+/**
+ * UPSERT canónico de `space_notion_sources` desde un intent (secret ya provisionado +
+ * db ids). Dual-mode: pasa `client` (PoolClient) para correr dentro de la tx del
+ * composer (atómico con la creación del Space). `sync_enabled=FALSE` — el pipeline
+ * legacy no toca clientes nuevos hasta que el repo hermano resuelva el token per-space.
+ */
+export const writeSpaceNotionSourcesFromIntent = async (
+  spaceId: string,
+  intent: NotionConnectIntent,
+  actorUserId: string,
+  client?: PoolClient
+): Promise<{ ok: boolean; sourceId?: string; reason?: string }> => {
+  const sql = `INSERT INTO greenhouse_core.space_notion_sources (
          source_id, space_id,
          notion_db_proyectos, notion_db_tareas, notion_db_sprints, notion_db_revisiones,
          notion_token_secret_ref, sync_enabled, sync_frequency, created_by
@@ -169,14 +190,19 @@ export const connectNotionTeamspaceForSpace = async (
          notion_db_revisiones = EXCLUDED.notion_db_revisiones,
          notion_token_secret_ref = EXCLUDED.notion_token_secret_ref,
          updated_at = CURRENT_TIMESTAMP
-       RETURNING source_id`,
-      [spaceId, proyectosDbId, tareasDbId, sprintsDbId, revisionesDbId ?? null, secretId, actorUserId]
-    )
+       RETURNING source_id`
 
-    return { ok: true, secretRef: secretId, sourceId: rows[0]?.source_id }
+  const params = [spaceId, intent.proyectosDbId, intent.tareasDbId, intent.sprintsDbId, intent.revisionesDbId ?? null, intent.secretRef, actorUserId]
+
+  try {
+    const sourceId = client
+      ? (await client.query<{ source_id: string }>(sql, params)).rows[0]?.source_id
+      : (await runGreenhousePostgresQuery<{ source_id: string }>(sql, params))[0]?.source_id
+
+    return { ok: true, sourceId }
   } catch (err) {
     captureWithDomain(err, 'integrations.notion', { tags: { source: 'notion_connect_store', stage: 'persist' }, extra: { spaceId } })
 
-    return { ok: false, errorCode: 'persist_failed', reason: 'No pudimos registrar el teamspace. El token quedó guardado; reintenta.', secretRef: secretId }
+    return { ok: false, reason: 'No pudimos registrar el teamspace. El token quedó guardado; reintenta.' }
   }
 }

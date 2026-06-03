@@ -6,7 +6,9 @@ import { withTransaction } from '@/lib/db'
 import { coerceHubspotIndustryValue } from '@/config/hubspot-industries'
 import { upsertCanonicalOrganization } from '@/lib/account-360/organization-identity'
 import type { FinanceContactRecord } from '@/lib/commercial/party/commands/instantiate-client-for-party'
-import type { NotionConnectIntent } from '@/lib/client-onboarding/notion-connect-store'
+import { writeSpaceNotionSourcesFromIntent, type NotionConnectIntent } from '@/lib/client-onboarding/notion-connect-store'
+import { allocateSpaceNumericCode } from '@/lib/services/allocate-space-numeric-code'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { instantiateClientForParty } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 import { promoteParty } from '@/lib/commercial/party/commands/promote-party'
 import { OrganizationAlreadyHasClientError } from '@/lib/commercial/party/types'
@@ -68,6 +70,8 @@ export interface ProvisionClientFromWizardInput {
    *  Se guarda como metadata del caso; el `space_notion_sources` se escribe cuando
    *  exista el Space. El secret NUNCA queda crudo (acá solo va el `*_SECRET_REF`). */
   notionConnectIntent?: NotionConnectIntent
+  /** TASK-998/992 — el Space operativo del cliente. Si se omite, no se crea (legacy). */
+  space?: { spaceName?: string; spaceType?: string }
   effectiveDate?: string
   targetCompletionDate?: string
   reason?: string
@@ -83,6 +87,10 @@ export interface ProvisionClientFromWizardResult {
   status: ProvisionClientLifecycleResult['status']
   checklistItems: ProvisionClientLifecycleResult['checklistItems']
   clientAlreadyExisted: boolean
+  /** TASK-998/992 — Space operativo creado/reusado. null si no hubo client. */
+  spaceId: string | null
+  /** TASK-998 — true si se escribió space_notion_sources desde el intent. */
+  notionConnected: boolean
 }
 
 /**
@@ -189,6 +197,67 @@ export const provisionClientFromWizard = async (
       }
     }
 
+    // 2.5 — Space operativo del cliente (canónico: un Cliente = un Space). Idempotente:
+    //   reusa el existente; si no, lo crea con numeric_code canónico (allocator con
+    //   advisory lock TASK-700). Atómico con la tx del composer.
+    let spaceId: string | null = null
+    let notionConnected = false
+
+    if (clientId) {
+      const existingSpace = await client.query<{ space_id: string }>(
+        `SELECT space_id FROM greenhouse_core.spaces WHERE client_id = $1 ORDER BY created_at ASC LIMIT 1`,
+        [clientId]
+      )
+
+      if (existingSpace.rows[0]) {
+        spaceId = existingSpace.rows[0].space_id
+      } else {
+        const numericCode = await allocateSpaceNumericCode()
+
+        spaceId = `space-${clientId}`
+
+        await client.query(
+          `INSERT INTO greenhouse_core.spaces (
+             space_id, client_id, organization_id, space_name, space_type, status, active, numeric_code, created_at, updated_at
+           ) VALUES ($1, $2, $3, $4, $5, 'active', TRUE, $6, NOW(), NOW())
+           ON CONFLICT (space_id) DO NOTHING`,
+          [
+            spaceId,
+            clientId,
+            org.organizationId,
+            input.space?.spaceName?.trim() || name,
+            input.space?.spaceType?.trim() || 'client_space',
+            numericCode
+          ]
+        )
+
+        await publishOutboxEvent(
+          {
+            aggregateType: 'space',
+            aggregateId: spaceId,
+            eventType: 'commercial.space.auto_created',
+            payload: {
+              version: 1,
+              spaceId,
+              clientId,
+              organizationId: org.organizationId,
+              clientName: name,
+              source: 'client_lifecycle_wizard',
+              createdAt: effectiveDate
+            }
+          },
+          client
+        )
+      }
+
+      // TASK-998 — completa space_notion_sources desde el intent (el Space ya existe).
+      if (spaceId && input.notionConnectIntent?.secretRef) {
+        const written = await writeSpaceNotionSourcesFromIntent(spaceId, input.notionConnectIntent, input.triggeredByUserId, client)
+
+        notionConnected = written.ok
+      }
+    }
+
     // 3. Govern the lifecycle transition to active_client (promoteParty is the
     //    canonical — and only — writer of lifecycle_stage + history; TASK-991).
     //    Its internal instantiate is a no-op here because the client already
@@ -259,7 +328,9 @@ export const provisionClientFromWizard = async (
       caseId: lifecycle.caseId,
       status: lifecycle.status,
       checklistItems: lifecycle.checklistItems,
-      clientAlreadyExisted
+      clientAlreadyExisted,
+      spaceId,
+      notionConnected
     }
   }
 

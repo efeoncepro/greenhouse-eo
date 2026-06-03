@@ -91,6 +91,10 @@ export async function POST(request: Request) {
       notionAnchors,
       teamsAnchor,
       notionConnectIntent,
+      space: {
+        spaceName: typeof body.spaceName === 'string' ? body.spaceName : undefined,
+        spaceType: typeof body.spaceType === 'string' ? body.spaceType : undefined
+      },
       effectiveDate: typeof body.effectiveDate === 'string' ? body.effectiveDate : undefined,
       targetCompletionDate: typeof body.targetCompletionDate === 'string' ? body.targetCompletionDate : undefined,
       reason: typeof body.reason === 'string' ? body.reason : undefined,
