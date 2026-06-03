@@ -727,6 +727,23 @@ const IdentidadStep = ({
 
 const PHASE_PRESETS = ['Kickoff', 'Operación', 'Reporte', 'Decisión']
 
+// Las fases guardan fecha como string yyyy-mm-dd; el GreenhouseDatePicker usa Date|null.
+// Conversión con partes LOCALES — NO `new Date('yyyy-mm-dd')` (parsea UTC → corre un día en
+// zonas con offset negativo como Chile). Memoria: greenhouse-datepicker-canonical.
+const parsePhaseDate = (s: string): Date | null => {
+  if (!s) return null
+  const [y, m, d] = s.split('-').map(Number)
+
+  return y && m && d ? new Date(y, m - 1, d) : null
+}
+
+const formatPhaseDate = (d: Date | null): string => {
+  if (!d) return ''
+  const pad = (n: number) => String(n).padStart(2, '0')
+
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
 const ComercialStep = ({
   state,
   update,
@@ -895,23 +912,18 @@ const ComercialStep = ({
                 </CustomTextField>
                 <Grid container spacing={3}>
                   <Grid size={{ xs: 6 }}>
-                    <CustomTextField
-                      fullWidth
-                      type='date'
+                    <GreenhouseDatePicker
                       label={T.comercial.phaseStartLabel}
-                      value={phaseDraft.start}
-                      onChange={e => setPhaseDraft(d => ({ ...d, start: e.target.value }))}
-                      slotProps={{ inputLabel: { shrink: true } }}
+                      value={parsePhaseDate(phaseDraft.start)}
+                      onChange={d => setPhaseDraft(dr => ({ ...dr, start: formatPhaseDate(d) }))}
                     />
                   </Grid>
                   <Grid size={{ xs: 6 }}>
-                    <CustomTextField
-                      fullWidth
-                      type='date'
+                    <GreenhouseDatePicker
                       label={T.comercial.phaseEndLabel}
-                      value={phaseDraft.end}
-                      onChange={e => setPhaseDraft(d => ({ ...d, end: e.target.value }))}
-                      slotProps={{ inputLabel: { shrink: true } }}
+                      value={parsePhaseDate(phaseDraft.end)}
+                      onChange={d => setPhaseDraft(dr => ({ ...dr, end: formatPhaseDate(d) }))}
+                      minDate={parsePhaseDate(phaseDraft.start) ?? undefined}
                     />
                   </Grid>
                 </Grid>
