@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { fetchHubSpotCompanyContactsFromBridge } from '@/lib/hubspot/list-company-contacts'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 /**
@@ -30,7 +31,8 @@ export const listFinanceContactSuggestionsForCompany = async (
 
   if (!id) return []
 
-  return runGreenhousePostgresQuery<FinanceContactSuggestion>(
+  // 1. Fast path: la proyección ya sincronizada (sin llamada externa runtime).
+  const projected = await runGreenhousePostgresQuery<FinanceContactSuggestion>(
     `SELECT hubspot_contact_id AS "hubspotContactId",
             COALESCE(NULLIF(TRIM(display_name), ''),
                      TRIM(CONCAT_WS(' ', first_name, last_name)),
@@ -46,4 +48,11 @@ export const listFinanceContactSuggestionsForCompany = async (
      LIMIT 50`,
     [id]
   )
+
+  if (projected.length > 0) return projected
+
+  // 2. Fallback en vivo: la company existe en HubSpot pero sus contactos aún no
+  //    están en la proyección (caso Berel). Lee read-only del bridge HubSpot.
+  //    Lanza si el bridge falla → el endpoint degrada honesto a "agregar manual".
+  return fetchHubSpotCompanyContactsFromBridge(id)
 }

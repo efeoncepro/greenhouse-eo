@@ -4,15 +4,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const queryMock = vi.fn()
+const bridgeMock = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => queryMock(...args)
+}))
+
+vi.mock('@/lib/hubspot/list-company-contacts', () => ({
+  fetchHubSpotCompanyContactsFromBridge: (...args: unknown[]) => bridgeMock(...args)
 }))
 
 import { listFinanceContactSuggestionsForCompany } from './finance-contact-suggestions'
 
 beforeEach(() => {
   queryMock.mockReset()
+  bridgeMock.mockReset()
 })
 
 afterEach(() => {
@@ -26,13 +32,27 @@ describe('listFinanceContactSuggestionsForCompany — TASK-997 Slice 2', () => {
     expect(queryMock).not.toHaveBeenCalled()
   })
 
-  it('consulta crm.contacts por primary o associated company id', async () => {
+  it('cae al bridge HubSpot cuando la proyección está vacía (caso Berel)', async () => {
+    queryMock.mockResolvedValueOnce([]) // proyección sin contactos sincronizados
+    bridgeMock.mockResolvedValueOnce([
+      { hubspotContactId: '211081125669', name: 'Anel Garza', email: 'anel.garza@berel.com', jobTitle: 'Digital Marketing Manager' }
+    ])
+
+    const rows = await listFinanceContactSuggestionsForCompany('55405407542')
+
+    expect(bridgeMock).toHaveBeenCalledWith('55405407542')
+    expect(rows).toHaveLength(1)
+    expect(rows[0].hubspotContactId).toBe('211081125669')
+  })
+
+  it('NO llama al bridge cuando la proyección ya tiene contactos', async () => {
     queryMock.mockResolvedValueOnce([
       { hubspotContactId: '901', name: 'María Ríos', email: 'mf@berel.mx', jobTitle: 'Finanzas' }
     ])
 
     const rows = await listFinanceContactSuggestionsForCompany('55405407542')
 
+    expect(bridgeMock).not.toHaveBeenCalled()
     expect(rows).toHaveLength(1)
     expect(rows[0].hubspotContactId).toBe('901')
 
