@@ -127,6 +127,16 @@ equivalente → el vínculo del canal es por selección/confirmación del canal 
 - **Pegar el link del teamspace** → rechazado por el operador (no enterprise).
 - **Auto-discovery por diff al conectar la integración** → frágil (depende de timing/permisos).
 
+## Lifecycle status (2026-06-03)
+
+**`code complete, rollout pendiente`** — NO cerrar todavía. El linking está shipped + GVC-verificado
+end-to-end (el operador vincula → cliente + Space + `space_notion_sources` + secret auto-provisionado),
+pero un cliente nuevo **no sincroniza data a diario** hasta que **TASK-1000** (pipeline per-space token,
+cross-repo `notion-bigquery`) resuelva el token scoped y flipee `sync_enabled=TRUE`. Por la regla
+**Runtime Rollout Completion Gate** del repo, TASK-998 queda **abierta, bloqueada por TASK-1000** para
+su cierre operativo. **Cuando TASK-1000 shippee + smoke Berel verde → cierran AMBAS juntas.**
+TASK-1001 (personas del portal) es paralela e independiente — NO bloquea a TASK-998.
+
 ## Progreso (2026-06-03) — shipped + dependencia descubierta
 
 **Shipped en `develop`** (token-por-teamspace, validado live con Berel):
