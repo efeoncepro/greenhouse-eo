@@ -37,6 +37,7 @@ const BEREL_SALE_ID = 28800562
 const apply = process.argv.includes('--apply')
 
 type ForeignInjectableSale = NuboxProjectionSale & {
+  client_id?: string | null
   client_rut?: string | null
   organization_id?: string | null
   foreign_currency_code?: string | null
@@ -95,9 +96,33 @@ const main = async () => {
     }
   }
 
+  // Resolve + inject the canonical Cliente (client_id) via the org's HubSpot link.
+  // The income writer REQUIRES client_id (skips otherwise). Berel must be onboarded
+  // as a Cliente FIRST (client wizard / TASK-992, billing_currency=MXN) — we never
+  // force a synthetic client. client_id format mirrors Sky (hubspot-company-<id>).
+  if (!sale.client_id) {
+    const clientRows = await runGreenhousePostgresQuery<{ client_id: string }>(
+      `SELECT c.client_id
+         FROM greenhouse_core.clients c
+         JOIN greenhouse_core.organizations o ON o.hubspot_company_id = c.hubspot_company_id
+        WHERE o.organization_id = $1 AND c.active = TRUE
+        LIMIT 1`,
+      [sale.organization_id]
+    )
+
+    if (clientRows[0]?.client_id) {
+      sale.client_id = clientRows[0].client_id
+    } else {
+      throw new Error(
+        `Org ${sale.organization_id} (Berel) has NO active Cliente record. Onboard Berel as a client first ` +
+          `(client wizard / TASK-992, billing_currency=MXN) — do NOT force a synthetic client_id.`
+      )
+    }
+  }
+
   console.log('\nConformed sale (allowlisted) + injected foreign plane:')
   console.log(`  nubox_sale_id   = ${sale.nubox_sale_id}  (DTE ${sale.dte_type_code}, folio ${sale.folio})`)
-  console.log(`  client          = ${sale.client_trade_name ?? '—'}  RFC=${sale.client_rut ?? '—'}  org=${sale.organization_id ?? '—'}`)
+  console.log(`  client          = ${sale.client_trade_name ?? '—'}  RFC=${sale.client_rut ?? '—'}  org=${sale.organization_id ?? '—'}  client_id=${sale.client_id ?? '—'}`)
   console.log(`  emission_date   = ${sale.emission_date}   due_date = ${sale.due_date}  (30-day credit, UNPAID)`)
   console.log(`  native          = ${parsed.nativeTotal} ${parsed.nativeCurrencyCode}`)
   console.log(`  functional CLP  = ${parsed.clpTotal}`)
