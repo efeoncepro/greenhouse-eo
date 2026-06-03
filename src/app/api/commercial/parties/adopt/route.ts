@@ -17,9 +17,33 @@ import {
   isPartyEndpointRateLimitError,
   recordPartyEndpointRequest
 } from '@/lib/commercial/party/party-endpoint-rate-limit'
+import { provisionClientLifecycle } from '@/lib/client-lifecycle/commands/provision-client-lifecycle'
+import { isClientLifecycleOnboardingEnabled } from '@/lib/client-lifecycle/flags'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
+
+// TASK-992 Slice 2c — adopting a HubSpot company that is an active client also opens
+// an observable onboarding case (idempotent, non-blocking). Flag-gated: when off,
+// adoption behaves exactly as before. The case wraps the onboarding the operator
+// completes; it never blocks the adopt response.
+const dispatchOnboardingCaseForAdopt = async (organizationId: string, userId: string) => {
+  if (!isClientLifecycleOnboardingEnabled()) return
+
+  try {
+    await provisionClientLifecycle({
+      organizationId,
+      caseKind: 'onboarding',
+      triggerSource: 'adopt',
+      triggeredByUserId: userId,
+      effectiveDate: new Date().toISOString().slice(0, 10),
+      metadataExtra: { origin: 'adopt' }
+    })
+  } catch (error) {
+    captureWithDomain(error, 'commercial', { tags: { source: 'client_lifecycle:adopt_dispatch' } })
+  }
+}
 
 const ensureClientForActiveParty = async ({
   organizationId,
@@ -141,6 +165,10 @@ export async function POST(request: Request) {
           })
         : null
 
+    if (existingParty.lifecycleStage === 'active_client') {
+      await dispatchOnboardingCaseForAdopt(existingParty.organizationId, tenant.userId)
+    }
+
     await recordPartyEndpointRequest({
       endpointKey: 'adopt',
       userId: tenant.userId,
@@ -195,6 +223,10 @@ export async function POST(request: Request) {
           userId: tenant.userId
         })
       : null
+
+  if (created.lifecycleStage === 'active_client') {
+    await dispatchOnboardingCaseForAdopt(created.organizationId, tenant.userId)
+  }
 
   await recordPartyEndpointRequest({
     endpointKey: 'adopt',
