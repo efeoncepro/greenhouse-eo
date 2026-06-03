@@ -1,3 +1,23 @@
+# Sesion 2026-06-03 (cont.) — TASK-1000 notion-bq-sync per-space token — 🔄 SLICE 0 (docs/ADR) HECHO, implementación cross-repo PENDIENTE
+
+**Scope**: el sync diario Notion→BigQuery (Cloud Run `notion-bq-sync`, repo hermano `../notion-bigquery`) usa un `notion-token` global → los clientes nuevos de TASK-998 (Berel/ANAM) no sincronizan. TASK-1000 = resolver el token POR space. **Cross-repo + sync productivo de Efeonce/Sky (alimenta métricas + bonos) → alto riesgo si se rompe.**
+
+**Decisión canonizada con el operador (arch-architect + notion-platform): camino Y.** El sync lee el SSOT (PG `space_notion_sources.notion_token_secret_ref`), NO una copia legacy en BQ. Implementación **ADITIVA + degrada-a-hoy**: no toca el path de carga/token de Efeonce/Sky; el código nuevo solo agrega clientes con ref non-NULL; si falla, cae a "solo legacy" = comportamiento idéntico al actual. Gated por `NOTION_PER_SPACE_TOKEN_ENABLED` (off default) + `sync_enabled` gate + el loop del sibling YA aísla por space (líneas 1698-1740) → **no puede romper Efeonce/Sky por construcción**.
+
+**Rechazadas**: X (replicar ref a BQ = drift PG↔BQ + deuda en servicio Deprecated), Z/híbrido (folding TASK-577 ahora = falsa economía; el sibling es Python y Z es TS → no comparten código, solo diseño; el motor caro se reescribe en Z igual). Y = puente + canonizar el contrato (ADR en la task) → Z reimplementa el diseño sin retrabajo.
+
+**Discovery verificada (read-only)**: sibling Python, deploy manual `deploy.sh` (no auto-deploy), token global línea 48/228, `load_space_configs()` lee BQ legacy que greenhouse-eo ya no escribe, per-space try/catch existe, Berel sin fila en `space_notion_sources` (la crea el wizard de TASK-992 — validación del operador, NO la pre-creo), secret de Berel ya existe, mirror BQ sin la columna del ref.
+
+**Entregado (Slice 0)**: task movida to-do→in-progress + **ADR completo + diseño de seguridad + rollout (6 slices) + checklist "Efeonce/Sky intactos" + progress log** en `in-progress/TASK-1000-...md`. README sincronizado.
+
+**Pendiente (NO hacer sin OK explícito del operador — cross-repo + prod)**:
+- Slice 1 IAM + deps (sibling SA: Cloud SQL Client + secretAccessor; Python deps) — **mutaciones GCP de prod, confirmar antes**.
+- Slices 2-3 código aditivo + per-space token (flag OFF, sin deploy = zero prod risk).
+- Slices 4-6 deploy flag OFF → verificar Efeonce/Sky → smoke Berel → flip `sync_enabled`.
+- **Bloquea el cierre operativo de TASK-998.**
+
+---
+
 # Sesion 2026-06-03 (cont.) — TASK-1001 Invitar personas del portal en el onboarding — 🔄 CODE COMPLETE (develop, flag OFF)
 
 **Scope**: cablear la invitación de usuarios de portal cliente (`client_executive`/`client_manager`/`client_specialist`) al onboarding, sembrando desde los contactos HubSpot ya capturados. Quedándome en `develop` (instrucción del operador). 3 slices, todo detrás del flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` (OFF) → cero impacto al merge.
