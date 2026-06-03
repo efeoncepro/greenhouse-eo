@@ -74,3 +74,20 @@ personas pueden ir llegando después del alta — el checklist lo soporta).
 - Roles: `src/config/role-codes.ts`; ROLE_CODES snapshot en CLAUDE.md.
 - Patrón checklist/provisioning: TASK-998 (paneles Notion/Teams) + TASK-992 (client lifecycle).
 - Modelo persona↔org: `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`.
+
+## Lifecycle status (2026-06-03) — `code complete, rollout pendiente`
+
+Shipped en `develop` (3 slices, flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` OFF → cero impacto al merge):
+
+- **Slice 1 (`376ca175`)** — helper SSOT `inviteClientPortalUser` (extraído de `/api/admin/invite`, idempotente `onExisting='error'|'ensure'`, asignación additive, emite `role.assigned` v1 in-tx) + heurística `suggestClientPortalRole(jobTitle)` + reader `listClientPortalPersonCandidates` (seed HubSpot + alreadyInvited + degradación honesta). `/api/admin/invite` refactor a SSOT (409 preservado). 18 tests.
+- **Slice 2 (`739b21c1`)** — capability dedicada `client.lifecycle.portal_user.invite` (catalog + runtime grant tier advance + api-helpers; **sin migración registry**, mirror de la familia TASK-992) + `GET portal-user-candidates` (case.read) + `POST portal-users/invite` (client_id server-side, idempotente, resultados por persona). grant-coverage + parity verdes.
+- **Slice 3 (`a8cde8f1`)** — `PortalUsersPanel` interactivo cableado al ítem **canónico existente `provision_client_users_access`** del timeline + copy `portalUsers` (es-CL). design:lint 0/0.
+
+**Decisiones clave** (pre-execution): reuso del ítem `provision_client_users_access` (NO ítem paralelo); capability dedicada least-privilege (no reusar `case.advance`); refactor admin/invite a SSOT sin romper el 409; sin reliability signal nuevo (ítem `required=FALSE`, sería falso-positivo) ni evento nuevo (reuso `role.assigned`).
+
+**Gates**: tsc 0 · lint 0 · design:lint 0/0 · `pnpm build` ✓ · 20 tests focales + 70 blast-radius verdes.
+
+**Pendiente rollout (NO cerrar)**:
+1. **GVC del panel** — bundled con la ronda GVC pendiente de TASK-992 (misma surface flag-gated; requiere flag ON + un caso de onboarding sembrado, que el operador crea en su validación Berel end-to-end). Forzar una GVC aislada ahora duplicaría/interferiría ese estado.
+2. **Flag flip** + invitación real end-to-end (email + activación de cuenta) verificada.
+3. **Docs funcional** (`docs/documentation/identity/`) + **manual** (`docs/manual-de-uso/`).

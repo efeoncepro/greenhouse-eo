@@ -1,5 +1,9 @@
 # TASK-992 — Client Lifecycle Orchestrator + Single Front Door
 
+## Delta 2026-06-03 — el ítem `provision_client_users_access` ahora es interactivo (TASK-1001)
+
+El ítem #9 del checklist `standard_onboarding_v1` (`provision_client_users_access`, owner identity) dejó de ser solo lectura: TASK-1001 cableó un `PortalUsersPanel` interactivo en el timeline (`LifecycleTimeline.tsx`) que siembra candidatos desde HubSpot e invita personas al portal (`client_*`) vía el helper SSOT `inviteClientPortalUser` + capability `client.lifecycle.portal_user.invite`. **La GVC de ese panel queda incluida en la ronda GVC pendiente de esta task** (misma surface flag-gated, requiere flag ON + caso sembrado — p.ej. la validación Berel end-to-end). Nada de TASK-1001 cambia el wizard de nacimiento (vive en el checklist). Spec: `in-progress/TASK-1001-client-portal-people-provisioning-onboarding.md`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
