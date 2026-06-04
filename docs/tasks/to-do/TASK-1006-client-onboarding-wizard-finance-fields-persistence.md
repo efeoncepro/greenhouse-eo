@@ -57,6 +57,25 @@ En el caso normal los 3 = el país de la organización; se modelan separados por
 
 **Sigue fuera de scope:** reconciliar valores ya existentes en clientes reusados con un override auditado (regla anti-data-loss del Slice 3 aplica: solo llenar si está vacío).
 
+## ⚠️ HARD RULE — no romper el wizard (no-regresión, OBLIGATORIA al cerrar)
+
+Esta task toca el **write atómico del alta** (`provisionClientFromWizard`: organización + cliente + `client_profiles` + caso de onboarding en **una sola transacción**, vía `instantiateClientForParty` + `promoteParty`). Un bug en el threading del payload, en el parser del route o en el INSERT **puede romper TODA el alta de cliente** — no solo los campos nuevos de finanzas. La puerta de alta es crítica (TASK-992, puerta única); romperla bloquea el onboarding de cualquier cliente nuevo.
+
+**NUNCA cerrar TASK-1006 (mover a `complete/`) sin verificar, con evidencia, que el wizard sigue funcionando end-to-end DESPUÉS del cambio:**
+
+- **NUNCA** asumir que "los tests unitarios verdes" = "el alta funciona". El alta es un write atómico multi-tabla contra PG real; se verifica contra PG real, no solo con mocks.
+- **SIEMPRE** correr el **live test rollback-wrapped del alta COMPLETA** contra PG real (`provision-client-from-wizard.live.test.ts`) y assert que se crean **org + cliente + client_profiles + caso de onboarding** Y que los campos nuevos (finance + `clients.country_code`) persisten. No basta con assert de los campos nuevos: el test debe confirmar que el alta entera sigue completándose.
+- **SIEMPRE** verificar los **3 caminos del wizard** que ya existen (TASK-992), no solo el feliz:
+  1. **Crear cliente nuevo** → completa OK con todos los campos.
+  2. **Completar cliente existente incompleto** → llena campos faltantes **sin borrar** los existentes (regla anti-data-loss Slice 3).
+  3. **Detectar duplicado** → sigue detectando y no crea doble.
+- **SIEMPRE** confirmar que un alta **sin** datos de finanzas (todos los campos nuevos vacíos/undefined) **sigue creando el cliente** — los campos son opcionales con defaults legacy; el INSERT no debe fallar por NULL/undefined. Caso de regresión #1 a evitar.
+- **SIEMPRE** GVC del wizard end-to-end en `localhost` (recorrer los 5 pasos → submit → success screen real), no solo capturas del paso Finanzas. Adjuntar la evidencia de que el alta completó.
+- **SIEMPRE** correr `pnpm local:check:ui` (lint + tsc + **build**) verde antes de cerrar — el wizard es `'use client'`; un import roto o un type drift solo aparece en el build de producción.
+- **Si CUALQUIERA de estas verificaciones falla → NO cerrar.** Reportar `code complete, rollout pendiente` y debuggear. El flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` permite revertir el comportamiento sin romper, pero el revert por PR es el rollback canónico.
+
+Esta regla existe porque el costo de romper la puerta de alta (bloquear todo onboarding) es órdenes de magnitud mayor que el beneficio de persistir unos campos de finanzas. La intervención es de bajo riesgo SOLO si se verifica el flujo completo, no el feliz aislado.
+
 ## Why This Task Exists
 
 El wizard muestra campos financieros operativos que el operador cree estar guardando. Sin embargo, `ClientOnboardingView.handleSubmit` solo envia moneda, terminos de pago y contactos; `provisionClientFromWizard` solo pasa `billingDefaults` y `financeContacts` a `instantiateClientForParty`. El schema real ya tiene columnas para estos datos, por lo que el problema es un contrato incompleto UI -> route -> composer -> `client_profiles`, no una falta de DDL.
@@ -352,6 +371,7 @@ N/A — repo-only change. No requiere GCP/Vercel secrets, HubSpot config, Notion
 - [ ] El path de cliente existente completa campos faltantes sin borrar valores existentes.
 - [ ] Live test verifica al menos `billing_address`, `billing_country`, `requires_po`, `current_po_number`, `requires_hes`, `current_hes_number`, `special_conditions` **y `clients.country_code`**.
 - [ ] La UI/copy no sugiere que se creen entidades PO/HES formales.
+- [ ] **(HARD RULE) El wizard completa el alta end-to-end DESPUÉS del cambio** — los 3 caminos (crear nuevo / completar existente / detectar duplicado) funcionan, un alta sin datos de finanzas sigue creando el cliente, verificado con live test rollback-wrapped + GVC del flujo completo + `pnpm local:check:ui` verde. Ver sección "HARD RULE — no romper el wizard".
 
 ## Verification
 
