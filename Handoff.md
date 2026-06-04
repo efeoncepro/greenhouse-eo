@@ -12,9 +12,15 @@ Migración `notion-bq-sync` al endpoint canónico `/v1/data_sources/{id}/query` 
 - Property shapes: CERO DIFF (Efeonce tareas misma página, 70 props ambas versiones) → conformed downstream a salvo.
 - `in_trash` confirmado (fix `main.py:1182` obligatorio); resolver try-data_source→fallback-databases confirmado.
 
-**Drift cross-repo (para el plan):** el código desplegado (`5a6766c`, PG password auth + per-space) está en `task/TASK-1000-pg-password-auth`, NO en `origin/main`. La rama TASK-1003 debe basarse en ese HEAD.
+**Drift cross-repo:** el código desplegado (`5a6766c`, PG password auth + per-space) está en `task/TASK-1000-pg-password-auth`, NO en `origin/main`. → rama TASK-1003 basada en ese HEAD (aprobado).
 
-**Estado:** P1 → STOP checkpoint humano antes de tocar `main.py` del repo hermano (payroll-crítico + decisión de base de rama). Plan slice-by-slice presentado en chat.
+**Slice 1 ✅ (repo hermano, commit `f5d93f7`):** resolver `resolve_data_source_id` (try data_source→fallback databases[0], fail-fast multi-source, hereda token per-space) + endpoint/version flag-gated + `in_trash` fallback + 404 fail-fast. **Todo detrás de `NOTION_DATA_SOURCES_ENDPOINT_ENABLED` (OFF) → sync bit-for-bit con hoy.** Test de invariantes verde + existente sin regresión + `py_compile` OK.
+
+**Slice 2 ✅ (commit `42388c4`):** `parity_check_task1003.py` (stdlib, read-only, no escribe BQ) — gate row count + page_ids + campos clave + firma de props. Corrida full = en Slice 3 pre-cutover.
+
+**⚠️ Gotcha Slice 3:** `.env.yaml` es gitignored y `deploy.sh` usa `--env-vars-file` (reemplaza todo). Las vars per-space de TASK-1000 están manuales en `00019-fgp`, NO en `.env.yaml` → deploy ciego las borra. Slice 3 debe reconciliar env+secrets antes de desplegar (el default OFF del flag vive en código, así que el código es seguro).
+
+**Estado:** Slices 0-2 hechos en `develop`/repo hermano. **STOP en Slice 3 (cutover, payroll-crítico, needs operator go-ahead):** reconciliar env → deploy → paridad full verde → flip flag → re-habilitar Berel → conformed downstream → cerrar TASK-1000. Rollback <5 min (flag OFF / traffic a `00019-fgp`).
 
 ## 1. Wizard de alta — gaps #5/#7 ✅ RESUELTO + desplegado + verificado
 

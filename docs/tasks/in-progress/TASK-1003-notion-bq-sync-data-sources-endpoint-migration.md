@@ -222,4 +222,31 @@ Probado con token `notion-token` (Efeonce/Sky) y `notion-integration-token-green
 2. **¿Multi-data-source en Efeonce/Sky?** → NO (OQ2 empírica, todos 1:1). Resolver usa `data_sources[0]` con guard: si alguna vez `len>1`, **fail-fast + log + saltar ESE space** (nunca adivinar) — defensa para clientes futuros.
 3. **¿`raw_properties_json` rompe el conformed?** → NO (OQ3 empírica, cero diff). Igual el gate de paridad (Slice 2) lo re-verifica antes del cutover y Slice 3 valida el conformed para Berel.
 4. **Modelo de ejecución de la paridad** (fork de diseño, recomendado + aprobado): comparador **read-only** que NO escribe a BQ (el sync hace DELETE+APPEND per space; dual-write arriesgaría contaminar `notion_ops` que alimenta payroll). Endpoint/modo dedicado que querea viejo vs nuevo y diffea row count + campos clave + muestra de `raw_properties_json`.
-5. **Base de la rama TASK-1003 en el repo hermano** (drift detectado): el código desplegado (`5a6766c`, PG password auth + per-space) vive en `task/TASK-1000-pg-password-auth`, **NO en `origin/main`**. La rama TASK-1003 DEBE basarse en ese HEAD (o en la rama que el operador decida mergear primero), no en main, o se pierde la infra per-space de TASK-1000. → decisión de operador en el checkpoint.
+5. **Base de la rama TASK-1003 en el repo hermano** (drift detectado): el código desplegado (`5a6766c`, PG password auth + per-space) vive en `task/TASK-1000-pg-password-auth`, **NO en `origin/main`**. La rama TASK-1003 DEBE basarse en ese HEAD (o en la rama que el operador decida mergear primero), no en main, o se pierde la infra per-space de TASK-1000. → **RESUELTO: rama `task/TASK-1003-notion-data-sources-endpoint` basada en `task/TASK-1000-pg-password-auth` (`5a6766c`)** — la más segura/robusta/escalable: artefacto de deploy coherente (= deployed + migración), topología lineal, y al mergear a main consolida el commit pg-password desplegado-pero-no-mergeado. Aprobado por operador.
+
+### Slice 1 — resolver + endpoint + versión + in_trash + 404 (2026-06-03, repo hermano, commit `f5d93f7`)
+
+Todo detrás de `NOTION_DATA_SOURCES_ENDPOINT_ENABLED` (default OFF → **sync bit-for-bit con hoy**). Cambios en `main.py`:
+- `resolve_data_source_id(configured_id)` — try `/v1/data_sources/{id}` (200=ya es data_source, Berel/nuevos) → fallback `/v1/databases/{id}`→`data_sources[0].id` (Efeonce/Sky legacy). Multi-data-source → fail-fast. Cache estable. Hereda token per-space (TASK-1000) vía `_notion_headers`.
+- `_notion_query_url(query_id, use_data_sources)` (puro, testeable) + `_notion_query_page(use_data_sources)` — endpoint flag-gated.
+- `notion_query_all` — resuelve una vez por corrida; **conserva `database_id` configurado como identidad** para snapshot/binding; solo la URL usa el id resuelto.
+- `_notion_headers` — Notion-Version atada al flag (OFF=`2022-06-28`, ON=`NOTION_VERSION` env / `2026-03-11`).
+- `build_raw_snapshot_rows` — `page.get("in_trash", page.get("archived", False))` (incondicional, safe ambas versiones; columna BQ sigue `archived`).
+- `_is_transient_sync_error` — 4xx (salvo 429) NO transitorio → mata el reintento 3x del 404.
+- `tests/test_data_sources_endpoint_migration.py` — contrato de invariantes de seguridad (flag OFF=legacy, in_trash fallback, 404 fail-fast, resolución gated). Verde + test existente sin regresión + `py_compile` OK.
+
+### Slice 2 — gate de paridad read-only (2026-06-03, repo hermano, commit `42388c4`)
+
+`parity_check_task1003.py` (stdlib urllib, sin deps): compara endpoint viejo vs canónico sobre Efeonce/Sky **sin escribir a BigQuery** — row count + page_id set + last_edited_time + flag de borrado + firma nombre→tipo de propiedades + muestra de `raw_properties_json`. Exit 1 si hay diff. **La corrida autoritativa (full) va en Slice 3, justo antes del cutover.**
+
+### ⚠️ Gotcha de deploy para Slice 3 (load-bearing — no romper el flujo per-space)
+
+`.env.yaml` está **gitignored** en el repo hermano (config local de deploy) y `deploy.sh` la pasa con `--env-vars-file` (que **reemplaza** todas las env vars). Las vars per-space de TASK-1000 (`NOTION_PER_SPACE_TOKEN_ENABLED`, `GREENHOUSE_POSTGRES_*` + secret `greenhouse-pg-dev-app-password`) se setearon **manual** sobre la revisión `00019-fgp`, NO vía `.env.yaml`. Un `deploy.sh` ciego las **borraría** → se cae el path per-space. **Slice 3 debe**: (a) capturar el env+secrets vivos de `00019-fgp`, (b) reconciliarlos (o usar `--update-env-vars`/`--set-secrets` en el paso manual post-deploy) de modo que el nuevo deploy preserve per-space + PG + agregue el flip del flag data_sources. El default OFF del flag vive en el código (`or "false"`), así que el código es seguro sin `.env.yaml`.
+
+### Próximo — Slice 3 (cutover, NEEDS operator go-ahead, payroll-crítico)
+
+1. Reconciliar env/secrets (gotcha arriba) + deploy de la rama TASK-1003.
+2. Correr `parity_check_task1003.py` (full) → debe dar PARIDAD TOTAL.
+3. Flip `NOTION_DATA_SOURCES_ENDPOINT_ENABLED=true` + smoke Efeonce/Sky.
+4. Re-habilitar Berel (`sync_enabled=TRUE`) + verificar `notion_ops` Berel + conformed downstream.
+5. Cerrar TASK-1000. Rollback < 5 min: flag OFF + redeploy o traffic a `00019-fgp`.
