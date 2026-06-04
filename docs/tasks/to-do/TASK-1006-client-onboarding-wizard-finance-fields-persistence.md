@@ -26,6 +26,24 @@
 
 Corregir el drift del wizard de alta donde varios campos visibles del paso Finanzas se capturan en UI pero no llegan al API ni se persisten en `greenhouse_finance.client_profiles`: direccion de facturacion, pais de facturacion, requiere OC/HES, numero OC/HES vigente y condiciones especiales. La solucion debe reusar columnas y primitives existentes; no crear un modelo paralelo.
 
+## Delta 2026-06-04 — Análisis pre-implementación (arch-architect + greenhouse-ux + forms-ux)
+
+Análisis con skills sobre el código real ANTES de implementar. El diagnóstico de Codex es correcto; estos son afinamientos que reducen blast radius y sharpean los slices. **Verificado en código:**
+
+- **Gap del payload confirmado** — `handleSubmit` ([ClientOnboardingView.tsx:2413-2415](../../../src/views/greenhouse/agency/clients/ClientOnboardingView.tsx)) envía `finance: { paymentCurrency, paymentTermsDays }` y NADA más. billing address/country/PO/HES/special conditions se descartan en el submit.
+- **`billingCountry` ya es canónico, NO free-text** — está tipado `CountryCode | ''` y **auto-deriva del país de la organización** (`ClientOnboardingView.tsx:642`: `if (!state.billingCountry) update('billingCountry', next)`, + prefill HubSpot/sale líneas 2361/2378). ⇒ **NO** re-modelar como texto libre ni agregar un default nuevo: ya hereda el país canónico. Solo persistir el `CountryCode` resultante. (Un input de override explícito — facturar desde un país distinto al legal — es decisión de producto, **fuera de V1**.)
+- **Condicionales PO/HES ya implementados correctamente** (forms-ux conditional reveal): Switch `requiresPo` → `poNumber` TextField visible solo si `requiresPo=true` (idem HES), `ClientOnboardingView.tsx:1097-1119`. La regla del Slice 1 ("si requiresPo=false, poNumber persiste null") ya la garantiza la UI (campo oculto → `''`→null). No tocar el reveal.
+- **🔴 Truthfulness es PEOR de lo que dice el Slice 4** (state-design + forms-ux): el resumen **Confirmar** (`ClientOnboardingView.tsx:1517-1520`) hoy muestra **solo currency + términos** — **omite por completo** billing address/país/PO/HES/condiciones. O sea: el operador los llena en el paso Finanzas, Confirmar los oculta, y el submit los descarta → honest-state violation triple. ⇒ El Slice 4 NO es "confirmar que no se oculten": es **agregar SummaryRows** para los campos persistidos al bloque Finanzas de Confirmar (condicionales: N° OC solo si `requiresPo`, N° HES solo si `requiresHes`), para que el operador revise lo que se va a guardar.
+
+**Afinamientos a los slices (ver detalle en cada Slice abajo):**
+
+1. **Slice 1 — validación PO/HES (forms-ux):** cuando `requiresPo=true`, `poNumber` queda **opcional, NO bloqueante** (el operador puede no tener el N° aún al onboardear; el alta no debe frenarse). Persistir lo que haya; trim → null. Idem HES.
+2. **Slice 2 — `billing_country`:** persistir el `CountryCode` ya auto-derivado, no recomputar. **NO** confundir con los otros 2 campos de país (ver nota SSOT abajo).
+3. **Slice 4 — re-scope a "agregar al resumen Confirmar":** los 5 campos persistibles se muestran en Confirmar (no solo "no ocultar"). Copy es-CL claro para OC/HES = "número vigente del perfil", no entidad PO/HES.
+4. **Anti-regresión = el live test** (overlay arch #8): este es un write **síncrono** del wizard, no un path async → la red de seguridad canónica es el `provision-client-from-wizard.live.test.ts` (UI payload → `client_profiles`), NO un reliability signal (sería over-engineering). El spec ya lo tiene; afirmado.
+
+**⚠️ Nota SSOT — 3 campos de país NO son el mismo (arch):** existen tres y NO deben conflarse — `organizations.country` (país legal/HQ, hoy `MX` para Berel), `clients.country_code` (país del cliente, hoy **vacío** para Berel) y `client_profiles.billing_country` (país de facturación). **TASK-1006 owns SOLO `client_profiles.billing_country`.** Que `clients.country_code` esté vacío es un gap **separado** (territorio TASK-991 org-write SSOT), **fuera de scope** — NO mezclarlo en este fix.
+
 ## Why This Task Exists
 
 El wizard muestra campos financieros operativos que el operador cree estar guardando. Sin embargo, `ClientOnboardingView.handleSubmit` solo envia moneda, terminos de pago y contactos; `provisionClientFromWizard` solo pasa `billingDefaults` y `financeContacts` a `instantiateClientForParty`. El schema real ya tiene columnas para estos datos, por lo que el problema es un contrato incompleto UI -> route -> composer -> `client_profiles`, no una falta de DDL.
