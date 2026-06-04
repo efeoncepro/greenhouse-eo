@@ -25,7 +25,11 @@ export interface ProvisionClientLifecycleInput {
   // V1.0 commands cover onboarding + reactivation (offboarding has its own command, deferred).
   caseKind: Extract<ClientLifecycleCaseKind, 'onboarding' | 'reactivation'>
   triggerSource: ClientLifecycleTriggerSource
-  triggeredByUserId: string
+  // TASK-1010 Slice 3 — nullable to support system-initiated cases (HubSpot deal
+  // webhook has no logged-in actor). triggered_by_user_id + actor_user_id FK to
+  // client_users and are NULLABLE (ON DELETE SET NULL) at the DB level. Operator
+  // (wizard) paths always pass a real userId.
+  triggeredByUserId: string | null
   reason?: string
   effectiveDate: string // ISO date
   targetCompletionDate?: string
