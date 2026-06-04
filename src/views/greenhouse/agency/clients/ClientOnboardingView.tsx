@@ -1482,8 +1482,9 @@ const ConfirmarStep = ({
   const theme = useTheme()
   const taxLabel = taxIdLabelForCountry(state.country || null)
 
-  const Section = ({ title, stepIndex, children }: { title: string; stepIndex: number; children: React.ReactNode }) => (
+  const Section = ({ title, stepIndex, children, dataCapture }: { title: string; stepIndex: number; children: React.ReactNode; dataCapture?: string }) => (
     <Box
+      data-capture={dataCapture}
       sx={{
         p: 4,
         borderRadius: `${theme.shape.customBorderRadius.md}px`,
@@ -1521,7 +1522,7 @@ const ConfirmarStep = ({
           <SummaryRow label={T.comercial.startDateLabel} value={state.startDate ? formatDate(state.startDate, { dateStyle: 'medium' }, 'es-CL') : T.confirmar.notSet} />
           <SummaryRow label={T.comercial.phasesTitle} value={state.phases.length > 0 ? state.phases.map(p => p.name).join(' · ') : T.confirmar.notSet} />
         </Section>
-        <Section title={T.confirmar.sectionFinanzas} stepIndex={3}>
+        <Section title={T.confirmar.sectionFinanzas} stepIndex={3} dataCapture='confirmar-finanzas'>
           <SummaryRow label={T.finanzas.currencyLabel} value={state.currency || T.confirmar.notSet} />
           <SummaryRow label={T.finanzas.paymentTermsLabel} value={state.paymentTermsDays ? `${state.paymentTermsDays} días` : T.confirmar.notSet} />
           {/* TASK-1006 — campos persistidos del perfil financiero (antes ocultos en Confirmar). */}

@@ -97,8 +97,10 @@ export const scenario: CaptureScenario = {
     { kind: 'sleep', ms: 300 },
     { kind: 'mark', label: 'completeness-incomplete', note: 'Confirmar — banner cliente incompleto (Berel) + CTA Completar cliente' },
 
-    // TASK-1006 — captura fullPage del resumen Confirmar: el bloque Finanzas ahora muestra
-    // dirección, país (México auto-derivado), OC requerida: Sí + N° vigente, HES, condiciones.
-    { kind: 'mark', label: 'confirmar-finanzas-summary', fullPage: true, note: 'Confirmar fullPage — resumen Finanzas con los campos persistidos (TASK-1006)' }
+    // TASK-1006 — clip legible de la sección Finanzas del Confirmar: dirección, país
+    // (México auto-derivado), OC requerida: Sí + N° vigente, HES, condiciones especiales.
+    { kind: 'scroll', selector: '[data-capture="confirmar-finanzas"]', scrollBlock: 'center' },
+    { kind: 'sleep', ms: 300 },
+    { kind: 'mark', label: 'confirmar-finanzas-summary', clipSelector: '[data-capture="confirmar-finanzas"]', note: 'Confirmar — sección Finanzas con los 5 campos persistidos (TASK-1006)' }
   ]
 }
