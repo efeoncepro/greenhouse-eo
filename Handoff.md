@@ -22,7 +22,12 @@ Migración `notion-bq-sync` al endpoint canónico `/v1/data_sources/{id}/query` 
 
 **⚠️ Gotcha Slice 3:** `.env.yaml` es gitignored y `deploy.sh` usa `--env-vars-file` (reemplaza todo). Las vars per-space de TASK-1000 están manuales en `00019-fgp`, NO en `.env.yaml` → deploy ciego las borra. Slice 3 debe reconciliar env+secrets antes de desplegar (el default OFF del flag vive en código, así que el código es seguro).
 
-**Estado:** Slices 0-2 hechos en `develop`/repo hermano. **STOP en Slice 3 (cutover, payroll-crítico, needs operator go-ahead):** reconciliar env → deploy → paridad full verde → flip flag → re-habilitar Berel → conformed downstream → cerrar TASK-1000. Rollback <5 min (flag OFF / traffic a `00019-fgp`).
+**✅ CUTOVER EJECUTADO + VERIFICADO (2026-06-04, live, autorizado):** revisión `00021-wkl`, flag ON, endpoint canónico para los 3 tenants.
+- Deploy OFF (`00020-6vw`, merge preservó per-space+PG+secrets) → paridad full VERDE → flip ON (`00021-wkl`).
+- Efeonce 1374/66/19/86 + Sky 4118/88/16 (== paridad) por endpoint nuevo, 0 errores. **Berel re-habilitado y sincroniza nativo** (80/4/0, token scoped, `Loaded 1 per-client config`) — 404 previo resuelto.
+- BQ `notion_ops` verificado (3 tenants, conteos exactos). Logs limpios (resolver OK, PG per-space OK, 0 errores). Scheduler diario intacto. Rama TASK-1003 pusheada a `origin`.
+- **TASK-1003 + TASK-1000 → complete.** Rollback <5 min (flag OFF / traffic a `00020-6vw`/`00019-fgp`).
+- **Pendiente NO bloqueante:** conformed downstream Berel (propiedades custom → template L1, Out of Scope); Slice 4 opcional (migrar ids guardados Efeonce/Sky a data_source, elimina el GET de resolución).
 
 ## 1. Wizard de alta — gaps #5/#7 ✅ RESUELTO + desplegado + verificado
 

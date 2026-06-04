@@ -1,5 +1,10 @@
 # changelog.md
 
+## 2026-06-04
+
+- **TASK-1003 — notion-bq-sync migrado al endpoint Notion canónico (✅ cutover live, payroll-crítico).** El sync que alimenta las métricas/bonos (Notion → BigQuery) usaba un endpoint que Notion **deprecó en 2025-09-03** (`/v1/databases/{id}/query`): Efeonce/Sky seguían funcionando solo por tener IDs viejos (bomba de tiempo) y los clientes nuevos (Berel) daban 404. Se migró al **endpoint canónico `/v1/data_sources/{id}/query` + Notion-Version `2026-03-11`** con un **resolver runtime** que acepta ambos tipos de ID (no hubo que migrar datos antes), `in_trash` fix y 404 fail-fast, **todo detrás de un flag (apagado por defecto)**. Antes de prender el flag se corrió un **gate de paridad de filas** (viejo vs nuevo) sobre Efeonce/Sky: **paridad total en los 7 datasets, cero diferencias**. Cutover ejecutado y verificado en vivo: **Efeonce** (1374/66/19/86) y **Sky** (4118/88/16) sincronizan idéntico por el endpoint nuevo, y **Grupo Berel ahora sincroniza nativo** (antes bloqueado por el 404) con su token propio — 0 errores, el cron diario intacto, reversible en <5 min. El alta de cliente ya era canónica; el sync era el rezagado, ahora al día. Esto **desbloqueó y cerró TASK-1000** (token Notion por cliente). Cambio en el repo hermano `efeoncepro/notion-bigquery` (rama pusheada). Spec: `complete/TASK-1003-notion-bq-sync-data-sources-endpoint-migration.md`.
+- **TASK-1000 — token Notion por cliente (✅ complete).** Desbloqueada por el cutover de TASK-1003: el resolver de token por space (PG SSOT + Secret Manager) quedó verificado end-to-end con Berel sincronizando con su token scoped. Spec: `complete/TASK-1000-notion-bq-sync-per-space-token-resolution.md`.
+
 ## 2026-06-03
 
 - **Full API parity — ADR dedicado (✅ docs).** La decision aceptada ahora vive como ADR propio en `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`, ademas de estar consumida por la arquitectura API Platform. Se sincronizaron `DECISIONS_INDEX.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, docs API y `TASK-1002` para apuntar al ADR dedicado.

@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -301,3 +301,22 @@ gcloud run services update notion-bq-sync --region=us-central1 --project=efeonce
 ```
 
 5. Cerrar TASK-1000 (re-habilitar Berel desbloqueado). Verificar conformed downstream para Berel (ojo propiedades custom → Out of Scope, template L1).
+
+### Slice 3 — CUTOVER EJECUTADO + VERIFICADO (2026-06-04, live, autorizado por operador)
+
+Secuencia ejecutada paso a paso, cada gate verde. Rama TASK-1003 pusheada a `origin/efeoncepro/notion-bigquery` (código live trazable).
+
+1. **Deploy flag OFF** (`gcloud run deploy --source --update-env-vars` merge) → revisión `00020-6vw`. Env+secrets verificados: per-space + `GREENHOUSE_POSTGRES_PASSWORD` + `NOTION_TOKEN` **preservados** + `NOTION_DATA_SOURCES_ENDPOINT_ENABLED=false`. Health 200, 2 spaces (degrade-to-today). **Hazard de deploy evitado.**
+2. **Paridad fresca full** → PARIDAD TOTAL los 7 tables.
+3. **Flip ON** (`gcloud run services update --update-env-vars`) → revisión `00021-wkl`, ambos flags `true`.
+4. **Smoke Efeonce** (POST `?space_id=spc-c0cf6478…`): 4/4 success, **1374/66/19/86** (== paridad), 0 errores, HTTP 200.
+5. **Smoke Sky** (POST `?space_id=spc-ae463d9f…`): 3/3 success, **4118/88/16** (== paridad), 0 errores, HTTP 200.
+6. **Berel re-habilitado** (`greenhouse_core.space_notion_sources.sync_enabled=TRUE`) + sync (POST `?space_id=space-cli-0863869c…`): 3/3 success, **tareas 80 / proyectos 4 / sprints 0**, 0 errores — el 404 previo **resuelto**.
+7. **BQ `notion_ops` verificado** (`raw_pages_snapshot`, últimos 20 min): los 3 tenants con conteos exactos, `archived_true=0`.
+8. **Logs limpios:** resolver loguea `database id legacy → data_source` (Efeonce/Sky), `Loaded 1 per-client space config from PG SSOT` (Berel per-space PG OK), 3× `Sync complete … 0 errors`. Scheduler diario intacto (ENABLED, `0 3 * * *`, URL 200).
+
+**Estado runtime:** revisión activa `00021-wkl` (código `42388c4`, flag ON). Endpoint canónico `/v1/data_sources/{id}/query` + `2026-03-11` para los 3 tenants. Rollback <5 min disponible (flag OFF / traffic a `00020-6vw`/`00019-fgp`).
+
+**Downstream conformed** (ops-worker `runNotionSyncOrchestration`): no se toca con esta migración (consume `notion_ops`, no Notion). Para Efeonce/Sky es **safe-by-construction** (paridad probó shape byte-idéntico) y corre en el cron diario (`ops-notion-conformed-sync` 07:20 Santiago). Berel conformed = Out of Scope (propiedades custom → template L1 antes de confiar las métricas).
+
+**Slice 4 (opcional, no requerido):** migrar los database ids guardados de Efeonce/Sky a sus data_source ids (elimina el GET de resolución por corrida). El warning del resolver es la señal. Diferido — el runtime resolver lo maneja sin costo material.

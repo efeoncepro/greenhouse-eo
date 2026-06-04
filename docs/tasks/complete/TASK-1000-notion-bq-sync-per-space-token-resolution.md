@@ -1,5 +1,13 @@
 # TASK-1000 — notion-bq-sync: resolver token Notion POR space (per-space token)
 
+## Delta 2026-06-04 — DESBLOQUEADA + CERRADA (TASK-1003 cutover live)
+
+- TASK-1003 ejecutó el cutover al endpoint canónico `/v1/data_sources/{id}/query` + `2026-03-11` (revisión `00021-wkl`, flag ON). Paridad total Efeonce/Sky verde.
+- **Berel re-habilitado (`sync_enabled=TRUE`) y SINCRONIZA nativo** por el endpoint nuevo + su token scoped: 3/3 tables, tareas 80 / proyectos 4 / sprints 0, 0 errores. Log `Loaded 1 per-client space config(s) from PG SSOT` (per-space PG OK). El 404 previo resuelto.
+- Per-space token verificado end-to-end: el contextvar `_CURRENT_NOTION_TOKEN` + resolución desde Secret Manager funcionan en runtime para Berel.
+- **Pendiente NO bloqueante:** conformed downstream para Berel (propiedades custom → template L1, Out of Scope de TASK-1000/1003).
+- Lifecycle → `complete`. Evidencia: progress log de `complete/TASK-1003-*.md` (Slice 3).
+
 ## Delta 2026-06-03 — infra desplegada y verificada; BLOQUEADA por TASK-1003
 
 - **Infra per-space token DESPLEGADA + VERIFICADA** en Cloud Run `notion-bq-sync` (us-central1, revisión `00019-fgp`):
@@ -14,8 +22,8 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
-- Blocked by: `TASK-1003` (migración al endpoint canónico `/v1/data_sources/{id}/query`)
+- Lifecycle: `complete`
+- Blocked by: `none` (TASK-1003 cutover live 2026-06-04 — Berel sincroniza nativo)
 - Priority: `P1`
 - Impact: `Alto` (sin esto, los clientes nuevos conectados por TASK-998 NO sincronizan a diario)
 - Effort: `Medio` — pero **cross-repo + deploy-sensitive** (delicado)
