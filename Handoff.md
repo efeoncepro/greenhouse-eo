@@ -2,6 +2,20 @@
 
 **Audit canónico de la sesión**: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md` — TODOS los hallazgos + estado runtime + comandos + pendientes para continuar.
 
+## 0. TASK-1003 🔄 in-progress (2026-06-03) — Slice 0 empírico ✅ + plan en checkpoint
+
+Migración `notion-bq-sync` al endpoint canónico `/v1/data_sources/{id}/query` + `2026-03-11` (mata el endpoint deprecado, bloqueador de TASK-1000/Berel). Lifecycle movido a `in-progress`, README sync, branch en greenhouse-eo: ninguna (work de código en repo hermano; docs direct a develop).
+
+**Slice 0 (read-only contra API real) — las 3 Open Questions resueltas favorablemente:**
+- Paginación: SIN CAMBIO (`has_more`/`next_cursor` idéntico en 2026-03-11). `notion_query_all` intacto.
+- Multi-data-source: SIN STOP (Efeonce 4 + Sky 3 + Berel 3, todos 1:1). `data_sources[0]` inequívoco. Mapping database→data_source id persistido en la spec (`## Progress Log`).
+- Property shapes: CERO DIFF (Efeonce tareas misma página, 70 props ambas versiones) → conformed downstream a salvo.
+- `in_trash` confirmado (fix `main.py:1182` obligatorio); resolver try-data_source→fallback-databases confirmado.
+
+**Drift cross-repo (para el plan):** el código desplegado (`5a6766c`, PG password auth + per-space) está en `task/TASK-1000-pg-password-auth`, NO en `origin/main`. La rama TASK-1003 debe basarse en ese HEAD.
+
+**Estado:** P1 → STOP checkpoint humano antes de tocar `main.py` del repo hermano (payroll-crítico + decisión de base de rama). Plan slice-by-slice presentado en chat.
+
 ## 1. Wizard de alta — gaps #5/#7 ✅ RESUELTO + desplegado + verificado
 
 - **Gap #5 (fases no persistían):** `handleSubmit` ahora envía `phases` → route `parsePhases` → `provisionClientFromWizard` persiste `metadata.phases` + auto-completa `declare_engagement_phases`.

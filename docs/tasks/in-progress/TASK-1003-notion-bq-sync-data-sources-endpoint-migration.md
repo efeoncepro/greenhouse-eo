@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -186,3 +186,40 @@ Consistente con `discoverNotionDatabasesForToken` (el wizard ya usa 2026-03-11) 
 - Berel: `POST /v1/data_sources/{ds}/query` con token scoped → 200 + páginas extraídas a `notion_ops`.
 - Logs: `Loaded N per-client space config(s) from PG SSOT` + `Sync complete` 0 errores incluyendo Berel.
 - TASK-1000 desbloqueada y cerrada.
+
+<!-- ZONE 4 — PROGRESS LOG -->
+
+## Progress Log
+
+### Slice 0 — pre-flight empírico (2026-06-03, read-only contra API real; develop)
+
+Probado con token `notion-token` (Efeonce/Sky) y `notion-integration-token-greenhouse-grupo-berel` (Berel). Las 3 Open Questions resueltas **favorablemente** — de-riesga el cutover:
+
+- **OQ1 — Paginación: RESUELTA, SIN CAMBIO.** `POST /v1/data_sources/{id}/query` con `Notion-Version: 2026-03-11` devuelve `has_more` + `next_cursor` + `results` idéntico a hoy. El `after→position` del changelog es de *append de bloques*, NO de query. → [`notion_query_all`](../../../notion-bigquery/main.py) NO se toca en su lógica de paginación.
+- **OQ2 — Multi-data-source: RESUELTA, SIN STOP.** Cada database Efeonce (tareas/proyectos/sprints/revisiones) y Sky (tareas/proyectos/sprints) tiene **exactamente 1 data_source**. Berel: sus ids configurados YA son data_sources. `data_sources[0]` es inequívoco para todos → no hay escalación a operador.
+- **OQ3 — Property shapes: RESUELTA, CERO DIFF.** Misma página Efeonce tareas (`37439c2f…`): OLD `databases/query`@2022-06-28 vs NEW `data_sources/query`@2026-03-11 → 70 props en ambas, 0 añadidas, 0 quitadas, 0 type-changes. **El `raw_properties_json` es idéntico → el pipeline conformed downstream parsea igual.**
+- **`in_trash` vs `archived`: CONFIRMADO.** Las páginas del endpoint nuevo exponen `in_trash` (no `archived`; `archived` ausente). El write actual `page.get("archived", False)` (`main.py:1182`) escribiría siempre-False bajo 2026-03-11. **Fix obligatorio:** `page.get("in_trash", page.get("archived", False))`. Campos nuevos aditivos (`is_archived`, `is_locked`, `public_url`, `created_by`, `last_edited_by`) — no rompen el extractor.
+- **Resolver confirmado empíricamente** (try data_source → fallback databases): Berel `GET /v1/data_sources/{id}`→200 (id YA es data_source, 0 resolución extra); Efeonce/Sky `GET /v1/data_sources/{id}`→404 → `GET /v1/databases/{id}`→`data_sources[0].id`. El resolver hereda el token per-space gratis vía el contextvar de `_notion_headers` (TASK-1000).
+
+**Mapping database id (configurado en BQ mirror) → data_source id (resuelto):**
+
+| Tenant | Tabla | configured (database id, BQ mirror) | resolved data_source id |
+| --- | --- | --- | --- |
+| Efeonce | tareas | `3a54f0904be14158833533ba96557a73` | `5126d7d8-bf3f-454c-80f4-be31d1ca38d4` |
+| Efeonce | proyectos | `15288d9b145940529acc75439bbd5470` | `abaeb422-4538-44d8-b43f-026a907746a2` |
+| Efeonce | sprints | `0c40f928047a4879ae702bfd0183520d` | `17f9ed19-280e-49fe-8b1f-57cecd58b849` |
+| Efeonce | revisiones | `f791ecc4f84c4cfc9d19fe0d42ec9a7f` | `15652bac-9d9b-435c-9d25-44969f3a8a94` |
+| Sky | tareas | `23039c2fefe781389d1ec8238fc40523` | `23039c2f-efe7-81f8-af2d-000b67594d18` |
+| Sky | proyectos | `23039c2fefe7817a8272ffe6be1a696a` | `23039c2f-efe7-8116-8a83-000b758078f8` |
+| Sky | sprints | `27c39c2fefe780948dd2f4cc6dcf3dc6` | `27c39c2f-efe7-8043-8a5d-000b16376e2c` |
+| Berel | tareas | `35c39c2f-efe7-8139-8448-000b7ed67b13` (YA data_source) | (id se usa directo) |
+| Berel | proyectos | `35c39c2f-efe7-818f-bfc5-000bbf660c0f` (YA data_source) | (id se usa directo) |
+| Berel | sprints | `35c39c2f-efe7-81cd-bcc3-000b78ba002d` (YA data_source) | (id se usa directo) |
+
+### Open Questions — resoluciones pre-execution (rationale)
+
+1. **¿Paginación cambia?** → NO (OQ1 empírica). `notion_query_all` intacto. *Más robusto*: igual el código no asume — itera hasta `has_more=false` (ya lo hace).
+2. **¿Multi-data-source en Efeonce/Sky?** → NO (OQ2 empírica, todos 1:1). Resolver usa `data_sources[0]` con guard: si alguna vez `len>1`, **fail-fast + log + saltar ESE space** (nunca adivinar) — defensa para clientes futuros.
+3. **¿`raw_properties_json` rompe el conformed?** → NO (OQ3 empírica, cero diff). Igual el gate de paridad (Slice 2) lo re-verifica antes del cutover y Slice 3 valida el conformed para Berel.
+4. **Modelo de ejecución de la paridad** (fork de diseño, recomendado + aprobado): comparador **read-only** que NO escribe a BQ (el sync hace DELETE+APPEND per space; dual-write arriesgaría contaminar `notion_ops` que alimenta payroll). Endpoint/modo dedicado que querea viejo vs nuevo y diffea row count + campos clave + muestra de `raw_properties_json`.
+5. **Base de la rama TASK-1003 en el repo hermano** (drift detectado): el código desplegado (`5a6766c`, PG password auth + per-space) vive en `task/TASK-1000-pg-password-auth`, **NO en `origin/main`**. La rama TASK-1003 DEBE basarse en ese HEAD (o en la rama que el operador decida mergear primero), no en main, o se pierde la infra per-space de TASK-1000. → decisión de operador en el checkpoint.
