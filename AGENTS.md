@@ -939,6 +939,23 @@ Flujo canónico (checklist `provision_notion_workspace`, NO el wizard): operador
 
 Spec: `docs/tasks/to-do/TASK-998-notion-teams-teamspace-linking-discover-register.md`.
 
+### Notion data_sources endpoint canónico — extractor notion-bq-sync (TASK-1003, desde 2026-06-04)
+
+El extractor `notion-bq-sync` (repo hermano `efeoncepro/notion-bigquery`, Cloud Run `us-central1`) queryea Notion **SIEMPRE por `POST /v1/data_sources/{id}/query` + Notion-Version `2026-03-11`** (revisión live `00021-wkl`, flag `NOTION_DATA_SOURCES_ENDPOINT_ENABLED=true`). El endpoint legacy `/v1/databases/{id}/query` (deprecado por Notion 2025-09-03) queda muerto.
+
+- **Resolver runtime** `resolve_data_source_id(configured_id)`: `GET /v1/data_sources/{id}`→200 (ya es data_source) o fallback `GET /v1/databases/{id}`→`data_sources[0].id` (legacy). Multi-data-source (>1) → fail-fast. Hereda el token per-space (TASK-1000) vía `_notion_headers`. El `database_id` configurado se conserva como identidad (snapshot/binding); solo la URL usa el id resuelto.
+- **`in_trash` (no `archived`)** bajo 2026-03-11: `page.get("in_trash", page.get("archived", False))`. **404 NO transitorio** (4xx salvo 429 → fail-fast).
+- Efeonce/Sky/Berel migrados a data_source ids en `space_notion_sources` (PG SSOT + BQ mirror, Slice 4) → consistentes con clientes nuevos.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** reintroducir `/v1/databases/{id}/query` ni Notion-Version `2022-06-28` en el extractor; ni guardar parent database ids para meter un cliente por el endpoint viejo (parche rechazado, Solution Quality Contract).
+- **NUNCA** desplegar `notion-bq-sync` con `bash deploy.sh` a secas (usa `--env-vars-file`/`--set-secrets` REPLACE → borra las vars per-space + el secret `GREENHOUSE_POSTGRES_PASSWORD` que viven manuales en la revisión; `.env.yaml` es gitignored y no los contiene). Deploy canónico: `gcloud run deploy notion-bq-sync --source --function=notion_bq_sync --update-env-vars=... --update-secrets=...` (MERGE), re-aseverando `NOTION_PER_SPACE_TOKEN_ENABLED=true` + `GREENHOUSE_POSTGRES_{INSTANCE_CONNECTION_NAME,DB,USER}` + ambos secrets.
+- **NUNCA** flipear `NOTION_DATA_SOURCES_ENDPOINT_ENABLED` ni bumpear `NOTION_VERSION` sin correr `parity_check_task1003.py` (read-only, no escribe BQ) → PARIDAD TOTAL. Rollback <5 min: flag OFF (`gcloud run services update --update-env-vars`) o traffic a revisión previa (`00020-6vw`/`00019-fgp`).
+- **SIEMPRE** un cliente nuevo entra nativo (data_source ids del wizard + token scoped + `sync_enabled=TRUE`), cero casos especiales — el cutover NO se repite por cliente (proceso idempotente/escalable).
+
+**Spec**: `docs/architecture/GREENHOUSE_NOTION_BQ_SYNC_DATA_SOURCES_MIGRATION_V1.md` · task `docs/tasks/complete/TASK-1003-notion-bq-sync-data-sources-endpoint-migration.md` · funcional `docs/documentation/operations/notion-bigquery-sync.md` · manual `docs/manual-de-uso/operations/notion-bq-sync-operacion.md`.
+
 ### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
 
 **Decisión arquitectónica (2026-04-26)**: el daily Notion sync es un SOLO ciclo de DOS pasos en `ops-worker` Cloud Run, schedulado por Cloud Scheduler. No hay otro path scheduled.

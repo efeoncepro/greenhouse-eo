@@ -319,4 +319,12 @@ Secuencia ejecutada paso a paso, cada gate verde. Rama TASK-1003 pusheada a `ori
 
 **Downstream conformed** (ops-worker `runNotionSyncOrchestration`): no se toca con esta migración (consume `notion_ops`, no Notion). Para Efeonce/Sky es **safe-by-construction** (paridad probó shape byte-idéntico) y corre en el cron diario (`ops-notion-conformed-sync` 07:20 Santiago). Berel conformed = Out of Scope (propiedades custom → template L1 antes de confiar las métricas).
 
-**Slice 4 (opcional, no requerido):** migrar los database ids guardados de Efeonce/Sky a sus data_source ids (elimina el GET de resolución por corrida). El warning del resolver es la señal. Diferido — el runtime resolver lo maneja sin costo material.
+**Slice 4 (opcional) — EJECUTADO + VERIFICADO (2026-06-04):** migrados los database ids guardados de Efeonce/Sky a sus data_source ids en **PG `greenhouse_core.space_notion_sources` (SSOT)** + **BQ mirror `greenhouse.space_notion_sources`** (lo que lee el sync). Verificado seguro con ground truth: el view `greenhouse_serving.notion_workspace_360` resuelve `client_id` vía `notion_workspaces.client_id` + JOINs por `space_id`/`client_id` (NO por el valor del database id), y lee de `notion_workspaces`/`notion_workspace_source_bindings` (NO de delivery) → cambiar `source_database_id` toca solo metadata (no join key). Backfill canónico `scripts/notion/backfill-task1003-data-source-ids.ts` (dry-run default, idempotente) + BQ DML. **Resultado:** sync completo post-Slice-4 = 10/10 tables, row counts idénticos, 0 errores, **warning "database id legacy" ausente** (el resolver resuelve directo `GET /v1/data_sources`→200). Efeonce/Sky consistentes con los clientes nuevos.
+
+### Documentación (2026-06-04)
+
+- Arquitectura (alto detalle): `docs/architecture/GREENHOUSE_NOTION_BQ_SYNC_DATA_SOURCES_MIGRATION_V1.md`
+- Funcional (lenguaje simple): `docs/documentation/operations/notion-bigquery-sync.md`
+- Manual de uso (runbook operador): `docs/manual-de-uso/operations/notion-bq-sync-operacion.md`
+- CLAUDE.md + AGENTS.md: sección "Notion data_sources endpoint canónico (TASK-1003)"
+- Backfill ids: `scripts/notion/backfill-task1003-data-source-ids.ts`
