@@ -11,8 +11,8 @@ Operate the Cloud Run service that bridges HubSpot CRM writes/webhooks ↔ `gree
 
 | System | Lives in | Canonical authority |
 |---|---|---|
-| **HubSpot portal app** (v2025.2): OAuth scopes, webhook URL config, private app tokens | `cesargrowth11/hubspot-bigquery/hsproject.json` + `src/app/` (sibling, **NOT moved** by TASK-574) | HubSpot Developer Platform |
-| **HubSpot → BigQuery CRM sync** (Cloud Function `hubspot-bq-sync`, `main.py`) | `cesargrowth11/hubspot-bigquery/main.py` + `deploy.sh` (sibling, **NOT moved**) | GCP Cloud Function + BigQuery `hubspot_crm.*` |
+| **HubSpot portal app** (v2025.2): OAuth scopes (`app-hsmeta.json`), webhook subscriptions (`webhooks-hsmeta.json`) | **MONOREPO** `greenhouse-eo/services/hubspot_greenhouse_integration/hubspot-app/hubspot-bigquery/` (`hsproject.json` + `src/app/`). Deploy: `hs project upload --account=48713323` desde ese dir. | HubSpot Developer Platform |
+| **HubSpot → BigQuery CRM sync** (ex Cloud Function `hubspot-bq-sync`, `main.py`) | **`efeoncepro/hubspot-bigquery`** (transferido desde `cesargrowth11`; ahora se **despliega por GitHub Actions**, ya no Cloud Function manual). **NO es el bridge.** Confirmado por operador (dueño de la org); puede no resolver por API si tu token no tiene acceso. | GCP + BigQuery `hubspot_crm.*`, deploy GitHub Actions |
 | **HubSpot write bridge + webhooks** (Cloud Run `hubspot-greenhouse-integration`, 23 routes) | `greenhouse-eo/services/hubspot_greenhouse_integration/` | **this skill** owns this system |
 | **Greenhouse runtime** (Next.js on Vercel) | `greenhouse-eo/src/**` | `src/lib/integrations/hubspot-greenhouse-service.ts` is the canonical client |
 | **Secret Manager** (3 secrets) | GCP project `efeonce-group` | Runtime SA `greenhouse-portal@` reads at boot |
