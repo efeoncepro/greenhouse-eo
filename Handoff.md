@@ -1,3 +1,20 @@
+# Sesion 2026-06-04 (cont.) — 🚀 RELEASE A PRODUCCIÓN (todo develop→main) + rollout TASK-1010
+
+**Release ejecutado y verificado (orquestador canónico).** Promoción acumulada de 161 commits develop→main.
+
+- **Manifest `released`** — run `26979667731` (success), release_id `94130a8504a2-ac06d4b6-cd59-4cff-9730-291ba6e9e177`, SHA `94130a850`. Merge `--no-ff` (`94130a850`) sobre main `f9485a404`.
+- **Preflight con bypass** documentado (`split_batch`: finance+auth_access+11 migraciones, release conjunto aprobado por operador). Ambos gates `Production` aprobados (workers + Azure) vía `gh api pending_deployments`.
+- **4 workers Cloud Run** en GIT_SHA `94130a8504a2` (ops/commercial-cost/ico-batch/hubspot — **drift 0**, confirmado directo). **Azure** validate + no-diff skip (stacks sin cambio). **Vercel prod** `greenhouse-2unazc7kq` Ready. `/api/auth/health` ✅.
+- **Migraciones**: ya aplicadas (Cloud SQL compartida — sin paso separado). `postgres_migrations` al día.
+- **Rollout TASK-1010** (flags ON en prod): `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` + `NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED` = `true` (`printf %s`, sin newline) + **redeploy** `greenhouse-lqr6gwlq6` (mismo SHA, rebuild con flags horneadas) → aliased al dominio prod. Ruta `/agency/clients/new` viva (307→login).
+- **Heads-up flags ya-ON al aterrizar**: `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED=true` activa su código al landear (impacto bajo documentado: solo `EO-CENG-0001`, sin órdenes materializadas).
+- **Pendiente — confirmación live del operador** (NO bloqueante de código): (1) login en prod → ver wizard `/agency/clients/new` renderizar; (2) primer deal HubSpot closed-won real → caso draft. Agent auth deshabilitado en prod por diseño + no se fabrica un deal HubSpot de prueba. Hasta esa confirmación, TASK-1010 queda `in-progress` (rollout aplicado).
+- **Watchdog**: aggregate OK / exit 0 (los 3 signals `unknown` localmente por falta de `GITHUB_RELEASE_OBSERVER_TOKEN` local — `worker_revision_drift` confirmado 0 vía SHA directo).
+
+Branch local de vuelta en `develop`. Release docs (changelog + este Handoff + estado TASK-1010) commiteados a `develop` post-release.
+
+---
+
 # Sesion 2026-06-04 (cont.) — TASK-1010 Slices 2-3 (rollout onboarding cliente)
 
 Trabajo local-first en `develop` (sin push). Continuación de TASK-1010 desde el primer slice incompleto (Slice 1 ya estaba cerrado en sesión previa, commit `101cab770`).
