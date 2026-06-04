@@ -86,6 +86,17 @@ export const scenario: CaptureScenario = {
     { kind: 'sleep', ms: 350 },
     { kind: 'mark', label: 'teams-isotype-crisp', clipSelector: '[data-capture="teams-connect-panel"]', note: 'Panel Teams recortado — isotipo Tabler púrpura bien formado' },
 
+    // TASK-1010 GVC — estado DEGRADADO del picker Notion: token inválido → POST
+    // /api/admin/clients/lifecycle/notion/validate lo rechaza → Alert error honesto
+    // (state-design idle/validating/ok/error) + el fallback manual sigue disponible.
+    // validate es READ-ONLY (no crea cliente) → determinista + safeForCapture.
+    { kind: 'scroll', selector: '[data-capture="notion-token"]', scrollBlock: 'center' },
+    { kind: 'sleep', ms: 250 },
+    { kind: 'fill', selector: '[data-capture="notion-token"]', value: 'ntn_invalid_gvc_degraded_state' },
+    { kind: 'click', selector: 'button:has-text("Validar token")' },
+    { kind: 'sleep', ms: 2200 },
+    { kind: 'mark', label: 'notion-picker-degraded', clipSelector: '[data-capture="notion-connect-panel"]', note: 'Estado DEGRADADO — token Notion rechazado: Alert error honesto + fallback manual (state-design)' },
+
     // Reset a "crear nuevo" (espacio válido) y avanzar a Confirmar para ver el
     // banner de completitud — Berel es un cliente EXISTENTE INCOMPLETO (TASK-992).
     { kind: 'click', selector: 'button:has-text("Crear teamspace nuevo")' },

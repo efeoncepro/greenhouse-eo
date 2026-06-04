@@ -142,6 +142,7 @@ export const NotionConnectPanel = ({ onChange }: NotionConnectPanelProps) => {
 
   return (
     <Box
+      data-capture='notion-connect-panel'
       sx={{
         p: 4,
         borderRadius: `${theme.shape.customBorderRadius.md}px`,
