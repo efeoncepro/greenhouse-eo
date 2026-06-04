@@ -1,3 +1,17 @@
+# Sesion 2026-06-04 (cont.) — TASK-1007 ✅ notion freshness: last_synced_at de Berel NULL → fuente canónica raw (no mirror BQ legacy)
+
+Segundo cabo de la deuda del mirror BQ legacy (mismo que TASK-1004, ahora lado escritura de freshness). `greenhouse_core.space_notion_sources.last_synced_at` quedaba **NULL para siempre** en clientes nuevos: `getNotionFreshnessFromBigQuery` leía el `last_synced_at` del mirror BQ `greenhouse.space_notion_sources` (solo Efeonce/Sky; greenhouse-eo ya no lo escribe). Berel ausente del mirror → nunca entraba al reconcile.
+
+**Fix (greenhouse-eo only, validado por arch-architect — 4 pilares ✅):** derivar la freshness de `notion_ops.raw_pages_snapshot.synced_at` (evidencia real del sync, contiene **todos** los spaces) → fix-once, zero-per-client. Alinea el último consumer divergente con la SSOT que el readiness gate + operational overview ya usan. UPDATE PG sin cambios (guard `sync_enabled=TRUE` + monotónico intactos). Mirror NO se borra (lo usa el sibling como fallback).
+
+**Verificado live:** test focal 4 + blast-radius (`sync-bq-conformed-to-postgres`) verde, tsc 0, lint 0. Reconcile one-shot → **Berel `last_synced_at` = 2026-06-04 10:51:29** (antes NULL); Efeonce/Sky intactos. Consumers mapeados (solo dashboard ops health `getEffectiveLatestNotionSyncAt`, tolerante; signal `integrations.notion.freshness.upstream` ya leía raw).
+
+**`billing_currency` de Berel (el otro cabo): NO es bug** — la moneda canónica es `client_profiles.payment_currency=MXN` (correcta). La columna legacy `clients.billing_currency` vacía la cubre TASK-1006 (Codex).
+
+**Follow-ups out-of-scope:** deprecación física del mirror BQ; clustering de `raw_pages_snapshot` por `space_id` (costo, no urgente); alinear status de Berel a canónico puro (Detenido→En pausa, Listo→Aprobado — ya cubiertos por aliases). Berel ya visible en el portal (80 tareas tras agregar 1 sprint).
+
+---
+
 # Sesion 2026-06-04 (cont.) — TASK-1004 ✅ notion-bq-sync: client_id de Berel NULL → fix de binding (deploy live + verificado)
 
 Verificación post-cierre del sync (TASK-1000/1003): el daily corre OK, pero salía `WARNING: No space_id binding found` para Berel **y** sus 80 filas en `notion_ops` tenían `client_id` NULL (Efeonce/Sky 100% SET). **Causa raíz (no cosmético):** `sync_table` re-derivaba el binding `{space_id,client_id}` contra el **mirror BQ legacy** (`_resolve_space_context`, tabla `greenhouse.space_notion_sources`) que greenhouse-eo ya no escribe para clientes nuevos → Berel ausente. El loop per-space ya tenía el `client_id` del **SSOT PG** (`greenhouse_core.space_notion_sources` + JOIN `spaces`) pero solo threadeaba `space_id`.
