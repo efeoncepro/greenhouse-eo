@@ -21,7 +21,7 @@ El ítem #9 del checklist `standard_onboarding_v1` (`provision_client_users_acce
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -340,3 +340,10 @@ Contrato del aggregate, comandos, state machine, eventos, capabilities y API: **
 - ¿Ruta canónica del wizard `/agency/clients/new` (Commercial owner) o `/admin/clients/new`? (resolver con IA + domain boundary en Plan Mode).
 - ¿El template `standard_onboarding_v1` lo define Comercial o se arranca con default mínimo extensible (identidad + finanzas + space)?
 - ¿El drawer Finanzas redefinido coexiste con el wizard o se elimina? (recomendación: coexiste — wizard pare, drawer completa facet).
+
+
+## Cierre 2026-06-04 — núcleo COMPLETE (opción A: pendientes externos → TASK-1010)
+
+✅ **Núcleo cerrado:** puerta única de alta (`provisionClientFromWizard`, commit atómico org+cliente+`client_profiles`+caso), orquestador + state machine + checklist `standard_onboarding_v1`, **Berel onboardeado end-to-end live**, wizard de 6 pasos **GVC-verificado enterprise 2026** (Origen·Identidad·Comercial·Finanzas·Espacio·Confirmar) + **nav entry discoverable** en el sidebar.
+📄 **Docs:** `docs/documentation/agency/alta-de-cliente.md` (funcional) + `docs/manual-de-uso/agency/alta-de-cliente.md` (manual).
+📌 **Diferido a TASK-1010** (split aprobado por operador): Slice 2c `CreateClientDrawer`→"completar facet", webhook HubSpot deal (§11), GVC de SuccessScreen (requiere create real) + degraded pickers (requiere inyección de falla).

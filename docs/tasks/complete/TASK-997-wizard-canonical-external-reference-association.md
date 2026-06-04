@@ -10,7 +10,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -166,3 +166,10 @@ verificación **GVC local**, tsc 0 / lint 0 / tests focales verdes.
 - Notion: registry `notion-platform` skill + secrets canónicos (CLAUDE.md "Notion Integrations Registry").
 - Teams/Graph: CLAUDE.md "Teams Bot" + Azure CLI.
 - Patrones: overlay arch-architect #4 (VIEW+helper+signal), #5 (read/write separation), #8 (SSOT), #3 (outbox async).
+
+
+## Cierre 2026-06-04 — núcleo COMPLETE (opción A: pendientes externos → TASK-1010)
+
+✅ **Núcleo cerrado:** los 4 slices del anclaje de referencias externas del wizard (industria, contactos de finanzas, teamspace Notion, canal Teams) como **External Reference con provenance** (combobox/suggest sobre SSOT, NO texto libre). `pnpm test` full verde (5963, sesión 2026-06-04).
+📄 **Docs:** sección "Anclaje de referencias externas" en `docs/documentation/agency/alta-de-cliente.md` + manual.
+📌 **Diferido a TASK-1010** (split aprobado por operador): consumers async del checklist que materializan `space_notion_sources`/`teams_notification_channels`; readiness real (integración Greenhouse PRD conectada al teamspace + permiso Graph `Group.Read.All`); selección channel-level en Teams. Todos requieren coordinación externa, no bloquean el núcleo del wizard.

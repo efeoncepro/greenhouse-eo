@@ -1,3 +1,19 @@
+# Sesion 2026-06-04 (cont.) — Onboarding de clientes: núcleo de TASK-992/997/1001 cerrado (opción A) + TASK-1010 (rollout) creada
+
+Revisión + cierre del onboarding de clientes (decisión operador: opción A — cerrar el núcleo + docs + GVC, splittear lo externo/rollout). Las tres movidas a `complete/`:
+
+- **TASK-992 ✅** (puerta única / orquestador) — wizard 6 pasos GVC-verificado enterprise + nav discoverable + Berel e2e. Diferido → TASK-1010: Slice 2c drawer→facet, webhook HubSpot deal (§11), GVC SuccessScreen+degraded pickers.
+- **TASK-997 ✅** (anclaje External Reference) — 4 slices del wizard; `pnpm test` full verde. Diferido → TASK-1010: consumers async del checklist, readiness Notion PRD + Graph `Group.Read.All`, channel-level Teams.
+- **TASK-1001 ✅** (invitación portal) — helper SSOT + panel GVC-verificado. Diferido → TASK-1010: invitación real e2e (email+activación; la GVC no clickeó Invitar para no emailear reales).
+
+**Docs nuevos:** `docs/documentation/agency/alta-de-cliente.md` (funcional) + `docs/manual-de-uso/agency/alta-de-cliente.md` (manual) — cubren las tres (escritos por subagente, basados en código real; corrigió "5 pasos"→6).
+
+**TASK-1010 🆕 (to-do)** — Client Onboarding rollout completion + superficies diferidas: agrupa todos los pendientes externos/rollout de las tres. Próximo paso real para terminar el onboarding end-to-end.
+
+**Aprendizaje GVC canonizado** (TASK-1006 loop): `mark fullPage` ilegible con sidebar `position: fixed` → usar `data-capture` + `scroll selector` + `mark clipSelector`. En `GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1` (hard rule + Delta) + manual GVC + memoria.
+
+---
+
 # Sesion 2026-06-04 (cont.) — TASK-1006 ✅ persistencia del perfil financiero del wizard de alta (en develop, 5 slices)
 
 Implementada end-to-end en `develop` (sin branch, por pedido del operador). El paso Finanzas del wizard capturaba campos que se descartaban al confirmar → ahora persisten en `client_profiles`, y los **3 campos de país** quedan llenos.
