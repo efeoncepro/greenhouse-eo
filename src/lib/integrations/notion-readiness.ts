@@ -169,15 +169,22 @@ export const evaluateNotionRawFreshnessGate = ({
     const sprintRowCount = toInteger(sprintRow?.row_count ?? 0)
     const reasons: string[] = []
 
+    // TASK-1008: `tareas` + `proyectos` son el núcleo MÍNIMO de delivery (requeridos).
+    // `sprints` es una dimensión OPCIONAL: un cliente de contenido (Berel) legítimamente
+    // puede no usar sprints → su ausencia NO bloquea la materialización. Solo se valida
+    // frescura de sprints SI el space tiene filas (no exigir frescura de algo que no existe).
+    // Efeonce/Sky (con las 3 DBs) quedan bit-for-bit.
     if (taskRowCount === 0) reasons.push('sin filas en notion_ops.tareas')
     if (projectRowCount === 0) reasons.push('sin filas en notion_ops.proyectos')
-    if (sprintRowCount === 0) reasons.push('sin filas en notion_ops.sprints')
-    if (!maxTaskSyncedAt) reasons.push('notion_ops.tareas sin _synced_at')
-    if (!maxProjectSyncedAt) reasons.push('notion_ops.proyectos sin _synced_at')
-    if (!maxSprintSyncedAt) reasons.push('notion_ops.sprints sin _synced_at')
+    if (taskRowCount > 0 && !maxTaskSyncedAt) reasons.push('notion_ops.tareas sin _synced_at')
+    if (projectRowCount > 0 && !maxProjectSyncedAt) reasons.push('notion_ops.proyectos sin _synced_at')
     if (maxTaskSyncedAt && maxTaskSyncedAt < boundaryStartAt) reasons.push(`tareas stale (${maxTaskSyncedAt})`)
     if (maxProjectSyncedAt && maxProjectSyncedAt < boundaryStartAt) reasons.push(`proyectos stale (${maxProjectSyncedAt})`)
-    if (maxSprintSyncedAt && maxSprintSyncedAt < boundaryStartAt) reasons.push(`sprints stale (${maxSprintSyncedAt})`)
+
+    // sprints OPCIONAL: solo flag si el space SÍ tiene sprints pero quedaron stale
+    if (sprintRowCount > 0 && maxSprintSyncedAt && maxSprintSyncedAt < boundaryStartAt) {
+      reasons.push(`sprints stale (${maxSprintSyncedAt})`)
+    }
 
     return {
       spaceId,

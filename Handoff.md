@@ -1,3 +1,586 @@
+# Sesion 2026-06-04 (cont.) — TASK-1010 Slices 2-3 (rollout onboarding cliente)
+
+Trabajo local-first en `develop` (sin push). Continuación de TASK-1010 desde el primer slice incompleto (Slice 1 ya estaba cerrado en sesión previa, commit `101cab770`).
+
+- **Slice 2 ✅ (commit `7646f20b9`)** — `CreateClientDrawer` → `FinanceFacetDrawer`. El drawer de Finanzas dejó de crear clientes en paralelo (anti-patrón puerta única); ahora completa el facet financiero de un cliente EXISTENTE vía el `PUT /api/finance/clients/[id]` que ya existía. Botón global "Nuevo cliente" SIEMPRE → wizard (`/agency/clients/new`); drawer montado en `ClientDetailView` (acción en CardHeader "Datos de facturación", gated finance roles). Moneda = `VALID_CURRENCIES` (CLP/USD/MXN, SSOT — NO la lista del mockup wizard que rompería el PUT). GVC verificado contra el route mockup aprobado (`/agency/clients/finance-facet/mockup`, staging) — runtime es copy-and-patch 1:1.
+- **Slice 3 ✅ (commits `2ce606826` + `3836ad591`)** — webhook deal closed-won → onboarding case `draft` (operador activa). HMAC v3 + classifier dual-format + Postgres-first con skip honesto + idempotente. Flag `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` default OFF. Migración `20260604175019856` (endpoint standalone, aplicada a dev). `provisionClientLifecycle.triggeredByUserId` widened a `string|null`.
+  - **Discovery corregido (feedback del operador)**: HubSpot = **1 webhooks component por app → UN solo target URL** (`.../hubspot-companies`). El endpoint standalone `hubspot-deals` NO recibe eventos; la entrega real es por **delegación desde `hubspot-companies`** (mismo patrón que services). Fix: `classifyHubSpotEvent` reconoce deals (0-3) → delega a `processHubSpotDealEvents` inline-con-guard (solo PG, idempotente, flag-gated). +3 tests delegación.
+  - **Webhook deal LIVE en producción**: `object.creation` deal + `object.propertyChange` deal `dealstage` en `webhooks-hsmeta.json` (monorepo canónico) + `hs project upload --account=48713323` → **Build #26 deployed** (27→29 subscriptions). Código de clasificación aún en `develop` (no pusheado) + flag OFF → deal events en prod se ignoran (unknown) hasta deploy + flip. Inofensivo.
+  - **Capacidad documentada**: SÍ puedo crear/manipular webhooks HubSpot vía CLI (memoria `reference_hubspot_webhooks.md` + sección nueva en skill `hubspot-ops`).
+- **Gates**: eslint 0 · tsc 0 · `pnpm build` exit 0 · `hubspot-deals.test` 13/13 · `hubspot-companies.test` 13/13 · `ClientDetailView.test` 1/1.
+- **TASK-1010 🔄 in-progress** (reabierta tras cierre prematuro). Código shipped en develop (Slices 1-3, **pusheado a develop/staging**) + subscription deal registrada (Build #26).
+  - **✅ Webhook deal e2e VERIFICADO contra DB real** (2026-06-04, in-process): POST firmado de deal `0-3` → `processInboundWebhook` → `{processed:true}` → caso `draft` real (ANAM, `clc-a381e90c…`) + control negativo (firma inválida rechazada) + cleanup (caso cancelado, sin residuo). Path completo HMAC→classify→delegate→processClosedWonDeal→SQL real→provisionClientLifecycle probado. **Falta sólo el round-trip de PRODUCCIÓN** (HubSpot real → endpoint prod): requiere release `develop→main` + flip del flag en prod.
+  - **✅ Persistencia canal Teams (Slice 1) VERIFICADA** e2e contra DB real: `writeTeamsChannelFromAnchor` escribe `teams_notification_channels` (team+channel, `provisioning_status='ready'`, space-scoped). Cleanup OK.
+  - **✅ Channel-level Teams + Graph perms: ya resueltos por TASK-998** (scope stale del spec) — `TeamsConnectPanel` ya hace elegir equipo→canal; el bot lista con perms actuales (sin `Group.Read.All`).
+  - **✅ Invitación al portal VERIFICADA + BUG FIXEADO (ISSUE-084)**: al probar e2e con `creative@efeoncepro.com` se detectó que el invite estaba **roto** (INSERT sin `user_id` + `auth_mode='credentials'` viola CHECK TASK-742) — afectaba onboarding **y** `/api/admin/invite`, latente. Fix robusto del lifecycle: invite `user_id`=randomUUID + `auth_mode='invited'`; `accept-invite` flipea a `credentials`/`both` al setear password. Verificado e2e (invite+activación, `emailSent:true`) + guard de regresión. Commit `41e2e0d39`.
+  - **Pendiente (operador / release)**: release a prod + flip flags (onboarding + deal trigger); invitación real con entrega a `creative@` (post-push, email desde staging); readiness Notion PRD (connect en Notion settings, acción operador); GVC SuccessScreen/degraded pickers (requiere create real en staging).
+- **Repo HubSpot — verdad reconciliada (con fuente)**: lo ABSORBIDO al monorepo fue el **bridge** (TASK-574) + el **app project** scopes/webhooks (TASK-706). Lo TRANSFERIDO a `efeoncepro/` fue **`notion-bigquery`** (Notion, 2026-05-18) — NO HubSpot. El sync **HubSpot→BQ** (`main.py`) sigue en **`cesargrowth11/hubspot-bigquery`** (verificado gh API: sin redirect; `efeoncepro/hubspot-bigquery` no existe). Skills + memorias corregidas con nota anti-confusión.
+- **TASK-1011 🆕 (to-do, P1)**: governance del repo de sync HubSpot→BQ — transfer a `efeoncepro/` (espejo notion) + deploy Actions+WIF + consolidación gated por TASK-879. Separa infra del onboarding.
+- **Próximo paso**: el operador decide push de develop (local-first hasta ahora) + ejecuta el checklist de rollout de TASK-1010. TASK-1011 espera luz verde para el transfer.
+
+---
+
+# Sesion 2026-06-04 (cont.) — Notification Hub context para TeamBot 1:1 payments
+
+Por pedido del operador se reviso el contexto de Notification Hub para encajar los envios 1:1 de Greenhouse como forma canonica futura, no como script manual permanente.
+
+- **Docs revisados:** `GREENHOUSE_NOTIFICATION_HUB_V1`, `TASK-690`/`691`/`692`/`693`, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1`, runtime actual `src/lib/notifications/*`, `teams-notify.ts`, `manual-teams-announcements`.
+- **Conclusion:** el modelo objetivo es `notification_intents.recipient_member_id` + `notification_deliveries.channel='teams_dm'`; el adapter TeamBot usa `recipient_kind='dynamic_user'` y resuelve `member_id -> aadObjectId` en runtime. No seedear una fila estatica por persona para envios recurrentes.
+- **Correccion documental aplicada:** `GREENHOUSE_TEAMS_BOT_INTERACTION_V1` bump v1.3. Crear DM por Bot Framework usa `members: [{ id: "<aadObjectId>" }]`; `29:` queda para mentions/pairwise ids, no para create-conversation.
+- **Payment-status alignment:** `GREENHOUSE_NOTIFICATION_HUB_V1` ahora tiene seccion `6.1 Payment-status 1:1 announcements`: eventos fuente preferidos `workforce.contractor_payable.paid`, `finance.payment_order.paid` / `.settled`, y evento per-member payroll si falta grano.
+- **TASK-690 Delta v0.3:** agrega discovery TeamBot 1:1 + low-PII rules + Maggie discovery-only al contrato de implementacion.
+- **Runbook actualizado:** `docs/operations/teams-bot-payroll-payment-1on1-announcements.md` ahora declara que el CLI es puente temporal hasta que el Hub sea canonico.
+
+---
+
+# Sesion 2026-06-04 (cont.) — TeamBot 1:1 discovery Maggie Borralles, sin envio
+
+Por pedido del operador se incorporo discovery de Maggie Borralles/Borrales para saber como enviarle por chat 1:1 con el TeamBot. **No se envio ningun mensaje** y **no se creo conversacion Bot Framework** durante esta discovery.
+
+- **Persona resuelta en Greenhouse/Graph:** Maggie Borralles (`mborralles@efeoncepro.com`; el pedido la escribio como Borrales).
+- **Greenhouse member id:** `0e6a896e-f1d2-481c-9c97-ee43ab1714d8`.
+- **AAD object id / recipient_user_id para 1:1:** `e0f8f69a-c1f5-40a1-a159-dced9087b318`.
+- **Estado Teams app personal:** instalada. Graph `GET /users/{aadObjectId}/teamwork/installedApps?$expand=teamsAppDefinition...` retorno `200`; entry `Greenhouse`, version `1.0.4`.
+- **Cache 1:1:** no existe row aun en `greenhouse_core.teams_bot_conversation_references` para `reference_key='user:e0f8f69a-c1f5-40a1-a159-dced9087b318'`.
+- **Envios previos Teams para Maggie:** no hay rows en `greenhouse_sync.source_sync_runs` (`source_system='teams_notification'`) con Maggie/AAD id.
+- **Como enviar en futuro, solo con autorizacion explicita:** construir `TeamsChannelRecord` transiente con `recipient_kind='chat_1on1'` y `recipient_user_id='e0f8f69a-c1f5-40a1-a159-dced9087b318'`. El primer envio real llamara `getOrCreateOneOnOneChat()` y cacheara la conversacion bajo `user:e0f8...`.
+- **Documentacion:** `docs/operations/teams-bot-payroll-payment-1on1-announcements.md` ahora tiene seccion `Additional 1:1 discovery candidates` con Maggie y shape exacto del `TeamsChannelRecord`.
+
+---
+
+# Sesion 2026-06-04 (cont.) — TeamBot 1:1 pagos nomina/honorarios enviados + fix Connector aadObjectId
+
+Por pedido del operador se notifico por Microsoft Teams 1:1 a Felipe Zurita, Daniela Ferreira, Valentina Hoyos, Melkin Hernandez y Andres Carlosama sobre pagos ya realizados/listos, con Adaptive Card + boton `Action.OpenUrl`.
+
+- **Enviados OK (5/5)** via Bot Framework Connector, `surface=chat_1on1`, correlacion operativa `manual-payment-announcement-2026-06-04`.
+- **Runs auditados en `greenhouse_sync.source_sync_runs`:**
+  - Daniela `teams-payment-9b73e8f4-9c74-4118-957e-e4a66b0025c8`, messageId `1780584804194`.
+  - Melkin `teams-payment-96bcad9e-eef6-4a80-9f27-7700eba02d98`, messageId `1780584806595`.
+  - Andres `teams-payment-a7e28b8e-17da-4c4e-94f3-82b27d651a1b`, messageId `1780584809954`.
+  - Valentina `teams-payment-ffc46b80-5b8f-48f5-85da-0542cf866237`, messageId `1780584813513`.
+  - Felipe `teams-payment-5e2eec9e-2e42-4af2-929b-0b012602abd2`, messageId `1780584815961`.
+- **Causa raiz descubierta antes del envio exitoso:** `getOrCreateOneOnOneChat()` usaba `members: [{ id: "29:<aadObjectId>" }]`; Teams Connector devuelve `403 BadArgument: Failed to decrypt pairwise id`. La forma correcta para crear 1:1 desde Entra object id es `members: [{ id: "<aadObjectId>" }]`. El prefijo `29:` queda para pairwise Teams IDs / mention entities, no para create-conversation con aadObjectId.
+- **Fix aplicado:** `src/lib/integrations/teams/bot-framework/connector-client.ts` + test focal `connector-client.test.ts` actualizado; `pnpm exec vitest run src/lib/integrations/teams/bot-framework/__tests__/connector-client.test.ts` verde (10/10).
+- **Documentacion/runbook:** `docs/operations/teams-bot-payroll-payment-1on1-announcements.md` actualizado con comando canonico, dry-run obligatorio, duplicate protection, gotcha `29:` vs aadObjectId y futuro carril Payment Orders/Notification Hub.
+- **Comando canonico:** `pnpm teams:payment-announcement --period <YYYY-MM-DD|YYYY-MM> --dry-run|--yes` (`package.json`). El script `scripts/send-payroll-payment-teams-announcements.ts` ahora:
+  - no envia por defecto;
+  - soporta `--dry-run`, `--yes`, `--triggered-by`, `--allow-duplicate`;
+  - usa copy con acentos;
+  - bloquea duplicados por `memberId` + `period` usando `source_sync_runs` (compat legacy con los 5 envios de 2026-06-04);
+  - sale con `process.exit()` para no dejar pool abierto.
+- **Verificacion anti-duplicado:** `pnpm teams:payment-announcement --period 2026-06-04 --yes --triggered-by codex` NO reenvio nada; salto 5/5 con `reason=duplicate_success` apuntando a los runIds ya enviados.
+- **Gates post-hardening:** `pnpm exec vitest run src/lib/integrations/teams/bot-framework/__tests__/connector-client.test.ts` verde (10/10) + `pnpm exec tsc --noEmit` verde.
+- **Cache verificado:** 5 rows `greenhouse_core.teams_bot_conversation_references` `reference_key='user:<aadObjectId>'`, `failure_count=0`.
+
+---
+
+# Sesion 2026-06-04 (cont.) — Onboarding de clientes: núcleo de TASK-992/997/1001 cerrado (opción A) + TASK-1010 (rollout) creada
+
+Revisión + cierre del onboarding de clientes (decisión operador: opción A — cerrar el núcleo + docs + GVC, splittear lo externo/rollout). Las tres movidas a `complete/`:
+
+- **TASK-992 ✅** (puerta única / orquestador) — wizard 6 pasos GVC-verificado enterprise + nav discoverable + Berel e2e. Diferido → TASK-1010: Slice 2c drawer→facet, webhook HubSpot deal (§11), GVC SuccessScreen+degraded pickers.
+- **TASK-997 ✅** (anclaje External Reference) — 4 slices del wizard; `pnpm test` full verde. Diferido → TASK-1010: consumers async del checklist, readiness Notion PRD + Graph `Group.Read.All`, channel-level Teams.
+- **TASK-1001 ✅** (invitación portal) — helper SSOT + panel GVC-verificado. Diferido → TASK-1010: invitación real e2e (email+activación; la GVC no clickeó Invitar para no emailear reales).
+
+**Docs nuevos:** `docs/documentation/agency/alta-de-cliente.md` (funcional) + `docs/manual-de-uso/agency/alta-de-cliente.md` (manual) — cubren las tres (escritos por subagente, basados en código real; corrigió "5 pasos"→6).
+
+**TASK-1010 🆕 (to-do)** — Client Onboarding rollout completion + superficies diferidas: agrupa todos los pendientes externos/rollout de las tres. Próximo paso real para terminar el onboarding end-to-end.
+
+**Aprendizaje GVC canonizado** (TASK-1006 loop): `mark fullPage` ilegible con sidebar `position: fixed` → usar `data-capture` + `scroll selector` + `mark clipSelector`. En `GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1` (hard rule + Delta) + manual GVC + memoria.
+
+---
+
+# Sesion 2026-06-04 (cont.) — TASK-1006 ✅ persistencia del perfil financiero del wizard de alta (en develop, 5 slices)
+
+Implementada end-to-end en `develop` (sin branch, por pedido del operador). El paso Finanzas del wizard capturaba campos que se descartaban al confirmar → ahora persisten en `client_profiles`, y los **3 campos de país** quedan llenos.
+
+- **Slice 1** (`6dad7c43d`) contract+payload · **Slice 2** (`31ad6e4e4`) persistir + `clients.country_code` · **Slice 3** (`f27ce8c89`) cliente existente anti-data-loss · **Slice 4** (`8c0ce0ae5`) truthfulness en Confirmar · **Slice 5** (`a43c0b716`) live test + arch Delta.
+- **Audit finding clave:** `selectOrganizationForLifecycleUpdate` NO seleccionaba `country` (mi spec lo asumía); se agregó `country` al SELECT + tipo (additive, promoteParty no lo consume).
+- **Open Question resuelta (V1):** cliente reusado con valor distinto no-vacío → NO overwrite silencioso; solo llenar null/vacío. Overwrite intencional = command auditado aparte.
+- **HARD RULE no-regresión cumplida:** live test rollback-wrapped contra PG real (2 verde — alta completa org+client+profile+space+case + 7 campos persistidos + `clients.country_code='MX'`), `pnpm test` full **5963 passed / 0 failed**, `pnpm local:check:ui` (lint+tsc+build) verde. Sin DDL, sin endpoints/capabilities/events/signals nuevos.
+- **Desbloquea TASK-1005** (AI preflight ya razona sobre campos que el runtime persiste).
+- **Pendiente menor:** GVC del wizard end-to-end en localhost (copy aditiva, bajo riesgo; live test + build cubren el flujo).
+
+**Orden EPIC-CLIENT-360 restante:** TASK-1009 (preflight onboarding) → TASK-1005 (AI assistants, ya desbloqueada) → TASK-999 (logos, off critical path).
+
+---
+
+# Sesion 2026-06-04 (cont.) — Sistematización onboarding clientes: TASK-998 ✅ cerrada (triage) + TASK-1008 ✅ (gate sprints opcional) + TASK-1009/1008 creadas
+
+Orden de avance acordado para EPIC-CLIENT-360 (998→1008→1006→1009→1005→999). Avanzado:
+
+- **TASK-998 ✅ complete (triage):** linking token-por-teamspace ya shippeó + su bloqueador (TASK-1000) resuelto → Berel sincroniza end-to-end. Slices 0/1 (`/discover`+heurístico) **superseded** por el modelo token-scoped; forward-looking (Teams self-serve, crear teamspace L1) diferido. Cerrada cumpliendo sus propios criterios.
+- **TASK-1008 ✅ complete:** gate de readiness del conformed (`evaluateNotionRawFreshnessGate`) relajado — `tareas`+`proyectos` requeridos, **`sprints` opcional** (frescura solo si rowCount>0). Mata la trampa del cliente de contenido sin sprints (que vivió Berel: el gate exigía las 3 DBs → invisible hasta meter un sprint postizo). Fix-once: el próximo content client entra sin sprint. Efeonce/Sky bit-for-bit (test #1). 4 tests focales + blast-radius (20) verde. Slice 2 verificado (el mirror `isSpaceFreshEnough` no re-imponía sprints).
+- **TASK-1008 + TASK-1009 creadas** (sistematización del onboarding Notion): 1008 hecha; 1009 (preflight end-to-end + validador template L1 enganchado al checklist `standard_onboarding_v1`) queda en backlog.
+
+**Siguiente en el orden:** TASK-1006 (finance fields persistence, desbloquea 1005) → TASK-1009 (preflight) → TASK-1005 (AI assistants) → TASK-999 (logos, off critical path).
+
+---
+
+# Sesion 2026-06-04 (cont.) — TASK-1007 ✅ notion freshness: last_synced_at de Berel NULL → fuente canónica raw (no mirror BQ legacy)
+
+Segundo cabo de la deuda del mirror BQ legacy (mismo que TASK-1004, ahora lado escritura de freshness). `greenhouse_core.space_notion_sources.last_synced_at` quedaba **NULL para siempre** en clientes nuevos: `getNotionFreshnessFromBigQuery` leía el `last_synced_at` del mirror BQ `greenhouse.space_notion_sources` (solo Efeonce/Sky; greenhouse-eo ya no lo escribe). Berel ausente del mirror → nunca entraba al reconcile.
+
+**Fix (greenhouse-eo only, validado por arch-architect — 4 pilares ✅):** derivar la freshness de `notion_ops.raw_pages_snapshot.synced_at` (evidencia real del sync, contiene **todos** los spaces) → fix-once, zero-per-client. Alinea el último consumer divergente con la SSOT que el readiness gate + operational overview ya usan. UPDATE PG sin cambios (guard `sync_enabled=TRUE` + monotónico intactos). Mirror NO se borra (lo usa el sibling como fallback).
+
+**Verificado live:** test focal 4 + blast-radius (`sync-bq-conformed-to-postgres`) verde, tsc 0, lint 0. Reconcile one-shot → **Berel `last_synced_at` = 2026-06-04 10:51:29** (antes NULL); Efeonce/Sky intactos. Consumers mapeados (solo dashboard ops health `getEffectiveLatestNotionSyncAt`, tolerante; signal `integrations.notion.freshness.upstream` ya leía raw).
+
+**`billing_currency` de Berel (el otro cabo): NO es bug** — la moneda canónica es `client_profiles.payment_currency=MXN` (correcta). La columna legacy `clients.billing_currency` vacía la cubre TASK-1006 (Codex).
+
+**Follow-ups out-of-scope:** deprecación física del mirror BQ; clustering de `raw_pages_snapshot` por `space_id` (costo, no urgente); alinear status de Berel a canónico puro (Detenido→En pausa, Listo→Aprobado — ya cubiertos por aliases). Berel ya visible en el portal (80 tareas tras agregar 1 sprint).
+
+---
+
+# Sesion 2026-06-04 (cont.) — TASK-1004 ✅ notion-bq-sync: client_id de Berel NULL → fix de binding (deploy live + verificado)
+
+Verificación post-cierre del sync (TASK-1000/1003): el daily corre OK, pero salía `WARNING: No space_id binding found` para Berel **y** sus 80 filas en `notion_ops` tenían `client_id` NULL (Efeonce/Sky 100% SET). **Causa raíz (no cosmético):** `sync_table` re-derivaba el binding `{space_id,client_id}` contra el **mirror BQ legacy** (`_resolve_space_context`, tabla `greenhouse.space_notion_sources`) que greenhouse-eo ya no escribe para clientes nuevos → Berel ausente. El loop per-space ya tenía el `client_id` del **SSOT PG** (`greenhouse_core.space_notion_sources` + JOIN `spaces`) pero solo threadeaba `space_id`.
+
+**Fix robusto (no parche, Solution Quality Contract):** threadear `client_id` a `sync_table`, preferir el SSOT, mirror BQ solo fallback del path legacy estático → cero backfill BQ por cliente, escala con el wizard. Repo hermano `efeoncepro/notion-bigquery`, commit `87a4391`, rama `task/TASK-1004-thread-client-id-binding` (pusheada). 12 tests verde (5 nuevos source-contract + 7 de TASK-1003).
+
+**Deploy live + verificado (autorizado por operador):** revisión `notion-bq-sync-00022-vk8` (merge `--update-env-vars`/`--update-secrets` preservó per-space + PG + secrets + flags). Sync manual: `10 ok, 0 errors, 5851 rows`. **Berel `client_id` NULL 80→0** (tareas 80/80, proyectos 4/4; autocorregido por DELETE+INSERT, sin backfill). **Efeonce 1374 / Sky 4118 NULL=0** (bit-for-bit). **0 warnings de binding.** Rollback <5 min: traffic a `00021-wkl`.
+
+**Pendiente NO bloqueante (heredado):** limpieza del secreto huérfano `notion-integration-token-greenhouse-berel` (Berel usa `-grupo-berel`); deprecación futura del mirror BQ legacy `greenhouse.space_notion_sources`.
+
+---
+
+# Sesion 2026-06-04 — Wizard AI + finance persistence follow-ups — 🆕 TASKS
+
+**Scope**: a partir del review profundo del wizard de alta de cliente (`/agency/clients/new`), se crearon dos follow-ups separados para no mezclar IA con un bug de contrato UI→persistencia.
+
+- **TASK-1006** — `docs/tasks/to-do/TASK-1006-client-onboarding-wizard-finance-fields-persistence.md`: corregir campos visibles del paso Finanzas que hoy no viajan al API ni se persisten (`billingAddress`, `billingCountry`, `requiresPo`, `poNumber`, `requiresHes`, `hesNumber`, `specialConditions`). El schema real ya tiene columnas en `greenhouse_finance.client_profiles`; la task debe reusar `provisionClientFromWizard` + `instantiateClientForParty` y evitar overwrite silencioso en clientes existentes.
+- **TASK-1005** — `docs/tasks/to-do/TASK-1005-client-onboarding-wizard-ai-assistants.md`: incorporar IA al wizard como capa advisory/editable (AI Preflight, sugerir fases, ranking de contactos, smart match, quality checks Notion/Teams). **Bloqueada por TASK-1006** para no razonar sobre campos que el runtime descarta. IA no escribe el alta, no recibe secretos/tokens y queda con `CLIENT_ONBOARDING_AI_ENABLED=false` default.
+
+**Indices sincronizados**: `docs/tasks/README.md` + `docs/tasks/TASK_ID_REGISTRY.md`; siguiente ID disponible `TASK-1007`.
+
+**Verificacion**: `pnpm task:lint --changed` verde. Nota: `pnpm task:lint --task TASK-1005` / `TASK-1006` falla por limitacion actual del linter focal con IDs de 4 digitos; las specs usan `--changed`.
+
+# Sesion 2026-06-03 (cont.) — Wizard gaps #5/#7 ✅ + TASK-1000 rollout (infra desplegada, BLOQUEADA) + 🆕 TASK-1003 + 📋 AUDIT
+
+**Audit canónico de la sesión**: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md` — TODOS los hallazgos + estado runtime + comandos + pendientes para continuar.
+
+## 0. TASK-1003 🔄 in-progress (2026-06-03) — Slice 0 empírico ✅ + plan en checkpoint
+
+Migración `notion-bq-sync` al endpoint canónico `/v1/data_sources/{id}/query` + `2026-03-11` (mata el endpoint deprecado, bloqueador de TASK-1000/Berel). Lifecycle movido a `in-progress`, README sync, branch en greenhouse-eo: ninguna (work de código en repo hermano; docs direct a develop).
+
+**Slice 0 (read-only contra API real) — las 3 Open Questions resueltas favorablemente:**
+- Paginación: SIN CAMBIO (`has_more`/`next_cursor` idéntico en 2026-03-11). `notion_query_all` intacto.
+- Multi-data-source: SIN STOP (Efeonce 4 + Sky 3 + Berel 3, todos 1:1). `data_sources[0]` inequívoco. Mapping database→data_source id persistido en la spec (`## Progress Log`).
+- Property shapes: CERO DIFF (Efeonce tareas misma página, 70 props ambas versiones) → conformed downstream a salvo.
+- `in_trash` confirmado (fix `main.py:1182` obligatorio); resolver try-data_source→fallback-databases confirmado.
+
+**Drift cross-repo:** el código desplegado (`5a6766c`, PG password auth + per-space) está en `task/TASK-1000-pg-password-auth`, NO en `origin/main`. → rama TASK-1003 basada en ese HEAD (aprobado).
+
+**Slice 1 ✅ (repo hermano, commit `f5d93f7`):** resolver `resolve_data_source_id` (try data_source→fallback databases[0], fail-fast multi-source, hereda token per-space) + endpoint/version flag-gated + `in_trash` fallback + 404 fail-fast. **Todo detrás de `NOTION_DATA_SOURCES_ENDPOINT_ENABLED` (OFF) → sync bit-for-bit con hoy.** Test de invariantes verde + existente sin regresión + `py_compile` OK.
+
+**Slice 2 ✅ (commit `42388c4`) + PARIDAD FULL VERDE:** `parity_check_task1003.py` (stdlib, read-only, no escribe BQ). Corrida full 2026-06-03 → **PARIDAD TOTAL** los 7 tables (Efeonce tareas 1374/proyectos 66/sprints 19/revisiones 86; Sky tareas 4118/proyectos 88/sprints 16): row count + page_id set + last_edited+borrado + firma props + raw_props muestra, cero diff. Exit 0.
+
+**Config viva `00019-fgp` capturada (SSOT deploy):** env per-space (`NOTION_PER_SPACE_TOKEN_ENABLED=true` + `GREENHOUSE_POSTGRES_*`) + secrets (`notion-token`, `greenhouse-pg-dev-app-password`) + SA `183008134038-compute@`. Deploy robusto = `gcloud run deploy --source --update-env-vars` (merge, preserva todo). Comandos canónicos del cutover en la spec.
+
+**⚠️ Gotcha Slice 3:** `.env.yaml` es gitignored y `deploy.sh` usa `--env-vars-file` (reemplaza todo). Las vars per-space de TASK-1000 están manuales en `00019-fgp`, NO en `.env.yaml` → deploy ciego las borra. Slice 3 debe reconciliar env+secrets antes de desplegar (el default OFF del flag vive en código, así que el código es seguro).
+
+**✅ CUTOVER EJECUTADO + VERIFICADO (2026-06-04, live, autorizado):** revisión `00021-wkl`, flag ON, endpoint canónico para los 3 tenants.
+- Deploy OFF (`00020-6vw`, merge preservó per-space+PG+secrets) → paridad full VERDE → flip ON (`00021-wkl`).
+- Efeonce 1374/66/19/86 + Sky 4118/88/16 (== paridad) por endpoint nuevo, 0 errores. **Berel re-habilitado y sincroniza nativo** (80/4/0, token scoped, `Loaded 1 per-client config`) — 404 previo resuelto.
+- BQ `notion_ops` verificado (3 tenants, conteos exactos). Logs limpios (resolver OK, PG per-space OK, 0 errores). Scheduler diario intacto. Rama TASK-1003 pusheada a `origin`.
+- **TASK-1003 + TASK-1000 → complete.** Rollback <5 min (flag OFF / traffic a `00020-6vw`/`00019-fgp`).
+- **Pendiente NO bloqueante:** conformed downstream Berel (propiedades custom → template L1, Out of Scope); Slice 4 opcional (migrar ids guardados Efeonce/Sky a data_source, elimina el GET de resolución).
+
+## 1. Wizard de alta — gaps #5/#7 ✅ RESUELTO + desplegado + verificado
+
+- **Gap #5 (fases no persistían):** `handleSubmit` ahora envía `phases` → route `parsePhases` → `provisionClientFromWizard` persiste `metadata.phases` + auto-completa `declare_engagement_phases`.
+- **Gap #7 (ítem Notion deshonesto):** nuevo param `autoInProgressItemCodes`; `provision_notion_workspace` (requires_evidence, no auto-completable) se materializa `in_progress` cuando hay Notion vinculado.
+- Commit `d91751d97` en `develop` (staging live). `tsc`/lint 0, suite focal 55, **live test contra DB real** (phases→completed + Notion→in_progress), **GVC del ficha de Berel** (banner "4 de 10 completados", honesto). Berel backfilled (Notion→in_progress).
+
+## 2. TASK-1000 (per-space Notion token) — infra DESPLEGADA + VERIFICADA, BLOQUEADA por TASK-1003
+
+- **Desplegado en Cloud Run `notion-bq-sync`** (us-central1, repo hermano `notion-bigquery`, revisión `00019-fgp`): IAM (`cloudsql.client` + `secretAccessor` en `notion-integration-token-greenhouse-grupo-berel` + `greenhouse-pg-dev-app-password`) + deploy código TASK-1000 + env flag ON + PG. **Bug resuelto:** traffic pinneado a `00017-pct` → `update-traffic --to-latest`.
+- **Verificado:** PG conecta (`Loaded 0/1 per-client space config(s) from PG SSOT`), Efeonce/Sky sincronizan OK (full sync 0 errores), degrade-to-today.
+- **Estado seguro:** Berel `sync_enabled=FALSE` (revertido). Flag ON es seguro (Berel FALSE → 0 per-client = idéntico a hoy).
+
+## 3. 🆕 TASK-1003 — el bloqueador real (endpoint Notion deprecado = bomba de tiempo payroll)
+
+- **Hallazgo:** `notion-bq-sync` usa `POST /v1/databases/{id}/query` **deprecado** (Notion 2025-09-03). Efeonce/Sky funcionan SOLO porque tienen **database ids viejos**; Berel tiene **data_source ids** (modelo 2026) → **404**. Cuando Notion apague el endpoint viejo → se rompe Efeonce/Sky → bonos payroll.
+- **Decisión (NO parche, Solution Quality Contract):** migrar el sync a `POST /v1/data_sources/{id}/query` + Notion-Version `2026-03-11`, resolver database→data_source ids de Efeonce/Sky con **gate de paridad de filas** antes del cutover. El wizard YA es canónico (data_source ids); el sync es el laggard.
+- Spec: `docs/tasks/to-do/TASK-1003-notion-bq-sync-data-sources-endpoint-migration.md`. **Bloquea TASK-1000.**
+
+## 4. Pendientes para próxima sesión
+
+- **TASK-1003** (migración endpoint, payroll-crítico) → desbloquea TASK-1000 → re-habilitar Berel.
+- **Pipeline conformed downstream** (ops-worker): el insight del operador sobre **propiedades distintas de Berel** aplica en `notion_ops`→conformed→PG (NO en este sync, schema-agnostic). Regla: enforce template L1 en Notion ANTES del onboarding, NO aliases custom.
+- **Wizard forward-looking:** extraer OriginCard/stepper/banner a `src/components` (2º wizard); smoke E2E; reconciliar Notion/Teams link vs checklist (gobernanza).
+- **Limpieza:** secreto huérfano `notion-integration-token-greenhouse-berel` (Berel usa `-grupo-berel`).
+
+**Registros sincronizados**: `TASK_ID_REGISTRY.md` + `README.md` (siguiente ID `TASK-1004`) + TASK-1000 Delta.
+
+## 5. Cierre de sesión — programa EPIC-CLIENT-360 (onboarding Grupo Berel)
+
+Esta sesión es parte del programa para **incorporar clientes nuevos a Greenhouse**, disparado por **Grupo Berel** (primer cliente **MXN**). Requirió: (1) soporte MXN en finance core, (2) una vía canónica de incorporación (puerta única), (3) vínculo del teamspace Notion por token scoped, (4) sync diario per-space. **Berel quedó onboardeado live el 2026-06-03; lo único pendiente es su sync diario de Notion (bloqueado por endpoint deprecado).**
+
+**Cadena del programa + dónde están los deltas para recordar (cross-sesión):**
+
+- `TASK-990` (MXN finance core) — enabler raíz · Delta 2026-06-03.
+- `TASK-991` (org write SSOT) — Berel nacido por la puerta canónica · Delta 2026-06-03.
+- `TASK-992` (orquestador + wizard puerta única) — gaps #5/#7 resueltos + Berel end-to-end · Delta 2026-06-03 (b).
+- `TASK-997` (anclaje external-ref del wizard) — Notion/Teams/HubSpot de Berel · Delta 2026-06-03 (b).
+- `TASK-998` (teamspace link por token scoped) — Berel vinculado; sync bloqueado · Delta 2026-06-03.
+- `TASK-1000` (sync per-space token) — infra desplegada+verificada, BLOQUEADA · Delta 2026-06-03.
+- `TASK-1003` 🆕 (migración endpoint Notion deprecado → `/v1/data_sources`) — **el bloqueador real**, refinada con arch-architect (Slice 0 pre-flight + resolver runtime + 4-pilares).
+- `TASK-1001` (invitar personas del portal) — in-progress, aparte.
+
+**Único próximo paso para terminar Berel end-to-end:** ejecutar **TASK-1003** (payroll-crítico: gate de paridad sobre Efeonce/Sky antes del cutover) → desbloquea TASK-1000 → re-habilitar Berel `sync_enabled=TRUE`.
+
+**Fuente de verdad de la sesión:** `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md` (todos los hallazgos, estado runtime, comandos, IDs, pendientes).
+
+---
+
+# Sesion 2026-06-03 (cont.) — TASK-1002 Full API Parity First Wave — 🆕 TASK CREADA
+
+**Delta ADR dedicado**: por pedido del operador, la decision ahora vive tambien como ADR dedicado en `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` (Accepted). `DECISIONS_INDEX.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, docs API y `TASK-1002` apuntan al ADR dedicado.
+
+**Scope**: tras aceptar full API parity como principio, el operador pidio una task para materializar las oportunidades principales.
+
+**Task creada**: `docs/tasks/to-do/TASK-1002-full-api-parity-first-wave-program.md`.
+
+**Enfoque**: umbrella P1 para convertir el principio en una matriz producto→API y primera ola ejecutable sin duplicar el backlog API Platform existente. Debe reconciliar `TASK-650` a `TASK-661` antes de crear child tasks.
+
+**Primera ola a mapear**:
+- Client Lifecycle / onboarding.
+- Finance / Payment Orders / contractor payables / Workforce Payables.
+- Workforce / Payroll / Contractor lifecycle.
+- Organization 360 / brand assets / facets.
+- Creative Video Studio.
+- Reliability / Ops / recovery.
+- Notifications / Journey Intelligence / deep links.
+
+**Registros sincronizados**: `docs/tasks/TASK_ID_REGISTRY.md` + `docs/tasks/README.md` (siguiente ID disponible `TASK-1003`).
+
+---
+
+# Sesion 2026-06-03 (cont.) — Full API parity documentado como principio transversal — ✅ DOCS
+
+**Scope**: el operador pidio canonizar que todo lo que se pueda hacer dentro de Greenhouse deberia poder hacerse por API / contrato programatico.
+
+**Decision aceptada**: Greenhouse adopta **full API parity** como principio de producto/plataforma. La UI no es source of truth de logica de negocio; debe consumir primitives server-side, commands/readers/projections y contratos gobernados. La paridad se diseña contra aggregates/resources/commands, no contra botones ni handlers visuales.
+
+**Docs sincronizados**:
+- `AGENTS.md` — contrato rapido + regla operativa antes de implementar.
+- `CLAUDE.md` — invariant duro para agentes Claude.
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` — Delta 2026-06-03 + principio 5.8 + regla canonica.
+- `docs/architecture/DECISIONS_INDEX.md` — decision Accepted.
+- `README.md` + `docs/README.md` + `docs/api/GREENHOUSE_API_REFERENCE_V1.md` + `docs/api/GREENHOUSE_API_PLATFORM_V1.md` + `public/docs/greenhouse-api-platform-v1.md` + `project_context.md` — referencias cortas y mirrors.
+- `changelog.md` — registro documental.
+
+**Pendiente natural**: no cambia runtime por si solo. La materializacion por dominio debe avanzar por el backlog API Platform existente (`TASK-650` a `TASK-661` y tasks hijas), o por follow-ups explicitos cuando una feature quede temporalmente UI-only.
+
+---
+
+# Sesion 2026-06-03 (cont.) — TASK-1000 notion-bq-sync per-space token — 🔄 SLICE 0 (docs/ADR) HECHO, implementación cross-repo PENDIENTE
+
+**Scope**: el sync diario Notion→BigQuery (Cloud Run `notion-bq-sync`, repo hermano `../notion-bigquery`) usa un `notion-token` global → los clientes nuevos de TASK-998 (Berel/ANAM) no sincronizan. TASK-1000 = resolver el token POR space. **Cross-repo + sync productivo de Efeonce/Sky (alimenta métricas + bonos) → alto riesgo si se rompe.**
+
+**Decisión canonizada con el operador (arch-architect + notion-platform): camino Y.** El sync lee el SSOT (PG `space_notion_sources.notion_token_secret_ref`), NO una copia legacy en BQ. Implementación **ADITIVA + degrada-a-hoy**: no toca el path de carga/token de Efeonce/Sky; el código nuevo solo agrega clientes con ref non-NULL; si falla, cae a "solo legacy" = comportamiento idéntico al actual. Gated por `NOTION_PER_SPACE_TOKEN_ENABLED` (off default) + `sync_enabled` gate + el loop del sibling YA aísla por space (líneas 1698-1740) → **no puede romper Efeonce/Sky por construcción**.
+
+**Rechazadas**: X (replicar ref a BQ = drift PG↔BQ + deuda en servicio Deprecated), Z/híbrido (folding TASK-577 ahora = falsa economía; el sibling es Python y Z es TS → no comparten código, solo diseño; el motor caro se reescribe en Z igual). Y = puente + canonizar el contrato (ADR en la task) → Z reimplementa el diseño sin retrabajo.
+
+**Discovery verificada (read-only)**: sibling Python, deploy manual `deploy.sh` (no auto-deploy), token global línea 48/228, `load_space_configs()` lee BQ legacy que greenhouse-eo ya no escribe, per-space try/catch existe, Berel sin fila en `space_notion_sources` (la crea el wizard de TASK-992 — validación del operador, NO la pre-creo), secret de Berel ya existe, mirror BQ sin la columna del ref.
+
+**Entregado (Slice 0)**: task movida to-do→in-progress + **ADR completo + diseño de seguridad + rollout (6 slices) + checklist "Efeonce/Sky intactos" + progress log** en `in-progress/TASK-1000-...md`. README sincronizado.
+
+**Pendiente (NO hacer sin OK explícito del operador — cross-repo + prod)**:
+- Slice 1 IAM + deps (sibling SA: Cloud SQL Client + secretAccessor; Python deps) — **mutaciones GCP de prod, confirmar antes**.
+- Slices 2-3 código aditivo + per-space token (flag OFF, sin deploy = zero prod risk).
+- Slices 4-6 deploy flag OFF → verificar Efeonce/Sky → smoke Berel → flip `sync_enabled`.
+- **Bloquea el cierre operativo de TASK-998.**
+
+---
+
+# Sesion 2026-06-03 (cont.) — TASK-1001 Invitar personas del portal en el onboarding — 🔄 CODE COMPLETE (develop, flag OFF)
+
+**Scope**: cablear la invitación de usuarios de portal cliente (`client_executive`/`client_manager`/`client_specialist`) al onboarding, sembrando desde los contactos HubSpot ya capturados. Quedándome en `develop` (instrucción del operador). 3 slices, todo detrás del flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` (OFF) → cero impacto al merge.
+
+**Entregado + pusheado**:
+- **Slice 1 (`376ca175`)** — helper SSOT `inviteClientPortalUser` (idempotente `onExisting='error'|'ensure'`, asignación additive, emite `role.assigned` v1 in-tx) + heurística `suggestClientPortalRole(jobTitle)` + reader `listClientPortalPersonCandidates` (seed HubSpot + alreadyInvited + degradación honesta). `/api/admin/invite` refactoreado a SSOT (409 preservado). 18 tests focales.
+- **Slice 2 (`739b21c1`)** — capability dedicada `client.lifecycle.portal_user.invite` (catalog + runtime grant tier advance + api-helpers; **sin migración registry**, mirror de la familia TASK-992) + `GET portal-user-candidates` (case.read) + `POST portal-users/invite` (client_id resuelto server-side, idempotente, resultados por persona). grant-coverage + parity verdes.
+- **Slice 3 (`a8cde8f1`)** — `PortalUsersPanel` interactivo cableado al **ítem canónico existente `provision_client_users_access`** del timeline (NO ítem nuevo) + copy `portalUsers` es-CL. design:lint 0/0.
+
+**Decisiones clave** (pre-execution, en el AUDIT): reuso del ítem `provision_client_users_access` (la spec proponía crear `provision_client_portal_users` → corregido, verificado live en PG); capability dedicada least-privilege (invitar otorga ACCESO ≠ avanzar checklist); refactor admin/invite a SSOT sin romper el 409; **sin** reliability signal nuevo (ítem `required=FALSE` → falso-positivo) ni evento nuevo (reuso `role.assigned`).
+
+**Gates**: tsc 0 · lint 0 · design:lint 0/0 · `pnpm build` ✓ (Turbopack, exit 0) · 20 tests focales + 70 blast-radius verdes · safety greps limpias (0 `new Pool`/raw-error/`getServerAuthSession`/`GREENHOUSE_POSTGRES_` en archivos nuevos).
+
+**GVC ✅ hecha (local, flag ON, commit `86cb0bf0`)**: panel capturado en el ítem `provision_client_users_access` del timeline (GOBIERNO REGIONAL, caso temporal sembrado + cancelado, 5 contactos HubSpot reales). Estado "ready" enterprise verificado; fix de pulido aplicado en el loop (email duplicado cuando el seed HubSpot cae a email como name → corregido + warning "Sin email"). NO se clickeó Invitar (emails reales). Push a `develop` `7baa44a5..86cb0bf0`.
+
+**Pendiente rollout (NO cerrar — `code complete, rollout pendiente`)**:
+1. **Flag flip** (`CLIENT_LIFECYCLE_ONBOARDING_ENABLED`) + invitación real end-to-end (email + activación) — bundled con el rollout de TASK-992.
+2. **Docs funcional** (`docs/documentation/identity/`) + **manual** (`docs/manual-de-uso/`).
+
+CLAUDE.md invariant "Client Portal User Invitation SSOT (TASK-1001)" agregado. README + task lifecycle sincronizados.
+
+---
+
+# Sesion 2026-06-03 (cont.) — TASK-992 Slice 2 (puerta única / wizard) — 🔄 SLICES 2a/2b/2c-adopt CODE COMPLETE (develop, flag OFF)
+
+**Scope continuado**: tras Slice 1 (aggregate), se construyó la **puerta única de alta** (wizard) + sus prerequisitos backend. Todo en `develop`, detrás del flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` (OFF) → cero cambio observable al merge.
+
+**Entregado + pusheado**:
+- **Slice 2a — Composer atómico + MXN** (`fd19d75f`): `provisionClientFromWizard` — en UNA tx: `upsertCanonicalOrganization` (SSOT TASK-991) → `instantiateClientForParty` (Cliente + perfil con moneda, **incl. MXN**) → `promoteParty('active_client')` (único writer de lifecycle_stage + history; su instantiate interno es no-op → preserva perfil MXN) → `provisionClientLifecycle`. Endpoint `POST /api/admin/clients/lifecycle/provision`. Moneda validada contra `CURRENCY_DOMAIN_SUPPORT.finance_core ∪ {UF,UTM}` (registry, no hardcode). Live smoke rollback-wrapped verde (birth atómico consistente).
+- **Slice 2b — Wizard runtime** (`40df66fc`): `/agency/clients/new` (`ClientOnboardingView`, gated flag + capability) **cableado 1:1 del mockup APROBADO por copy-and-patch**. Commit real vía composer + navegación al Account 360. Pickers + gate "ya existe" buscan el backbone vía `GET /api/admin/clients/lifecycle/org-search` (verificado en vivo: detecta Berel por nombre y RFC). Ruta en route-reachability-manifest (gate strict 0 huérfanos). tsc+lint+build verdes.
+- **Slice 2c (trigger adopt)** (`47f2b5c1`): el adopt del Cotizador, cuando el party es active_client, abre el onboarding case (idempotente, flag-gated, non-blocking).
+- **Slice 3 — Timeline lifecycle en Account 360** (`c8d22442`): ruta dedicada `/agency/clients/[organizationId]/lifecycle` (la URL que ya referencian el wizard success + API §9) **cableada 1:1 de `LifecycleTimelineMockup`** — origen + completitud por facet + banner salud + timeline eventos. Reader honest (`timeline-reader.ts`, deriva facets de checklist items por owner_role; null sin caso → empty; fecha pre-formateada server-side sin hydration drift). Componente con 3 estados (default/empty/degraded, state-design). Gated flag + capability `client.lifecycle.case.read`. El "ir al cliente" del wizard aterriza aquí. tsc+lint+build verdes. **Integración como ruta dedicada (no facet del org-workspace shell TASK-611) → sin blast radius en superficie aprobada; el banner "onboarding en progreso" dentro del org-workspace queda como follow-up GVC.**
+
+**⚠️ Pendiente — requiere loop GVC / coordinación externa / data Berel (NO freehandear)**:
+- **Slice 2c (drawer + HubSpot deal webhook)**: redefinir `CreateClientDrawer` → "completar facet" (cablear `FinanceFacetDrawerMockup` + endpoint PUT facet + cutover flag-gated del host finanzas = blast radius). HubSpot deal `closedwon` → case `draft` (§11) = endpoint webhook + suscripción HubSpot Developer Portal (externa).
+- **Ronda GVC**: `pnpm fe:capture:diff` mockup vs runtime (`/agency/clients/new`, flag ON + agent auth). Visuales NUEVOS marcados para `state-design`/`modern-ui`: (1) loading/degraded pickers, (2) chip código SuccessScreen (caseId uuid vs `EO-CLC` — ¿`public_id` en cases?), (3) entrada nav discoverable (exponer flag al menú client).
+- **Validación Berel end-to-end** (flag ON, "usar existente" → Cliente + perfil MXN → backfill income → 3 planos + signals).
+- **Cierre**: docs funcional + manual; mover a `complete` con rollout (flag flip).
+
+---
+
+# Sesion 2026-06-03 — HyperFrames skills instaladas repo + global — 🆕 INSTALADO
+
+**Scope**: disponibilizar localmente las skills del plugin HyperFrames para Codex y Claude Code, tanto a nivel repo como global, sin tocar runtime Greenhouse ni el `DESIGN.md` canonico.
+
+**Instalado desde**: `/Users/jreye/.codex/plugins/cache/openai-curated/hyperframes/5e86d584/skills`.
+
+**Skills instaladas completas**:
+- `gsap`
+- `hyperframes`
+- `hyperframes-cli`
+- `hyperframes-registry`
+- `website-to-hyperframes`
+
+**Destinos**:
+- Repo Codex: `.codex/skills/{gsap,hyperframes,hyperframes-cli,hyperframes-registry,website-to-hyperframes}/`
+- Repo Claude: `.claude/skills/{gsap,hyperframes,hyperframes-cli,hyperframes-registry,website-to-hyperframes}/`
+- Global Codex: `/Users/jreye/.codex/skills/{gsap,hyperframes,hyperframes-cli,hyperframes-registry,website-to-hyperframes}/`
+- Global Claude: `/Users/jreye/.claude/skills/{gsap,hyperframes,hyperframes-cli,hyperframes-registry,website-to-hyperframes}/`
+
+**Guardias / verificacion**:
+- No se copio ningun `DESIGN.md` desde el bundle HyperFrames; el bundle no contiene `DESIGN.md`/`design.md`.
+- `DESIGN.md` de raiz y `videos/efeoncepro-promo/DESIGN.md` conservaron hash durante la instalacion.
+- `diff -qr` confirmo que cada skill instalada es identica al bundle fuente en los 4 destinos.
+- No se hizo commit/push porque el worktree ya tiene cambios activos de TASK-992 / otras sesiones.
+
+---
+
+# Sesion 2026-06-03 — TASK-992 Client Lifecycle Orchestrator (Slice 1: aggregate) — 🔄 SLICE 1 CODE COMPLETE (develop, flag OFF)
+
+**Scope**: activar el orquestador canónico `client_lifecycle_case` (onboarding) ya specced en `GREENHOUSE_CLIENT_LIFECYCLE_V1` (Aceptada, 0 implementación). Sesión = **Slice 1 (aggregate)** por decisión del operador en el checkpoint humano post-Plan; Slices 2 (wizard puerta única + drawer Finanzas redefinido + triggers HubSpot/adopt + MXN) y 3 (timeline Account 360) quedan para sesiones siguientes. **En `develop`** (instrucción del operador, sin branch).
+
+**Entregado (Slice 1)**:
+- **Migración `20260603004341038`**: 4 tablas `greenhouse_core` (`client_lifecycle_cases` + `_case_events` append-only + `_checklist_templates` + `_checklist_items`), CHECK enums + UNIQUE partial (un caso activo por org/kind) + trigger de matriz de transición §6.3 + anti-UPDATE/DELETE en eventos + DO block anti pre-up-marker. Seed `standard_onboarding_v1` (10 items §5.5 verbatim). Aplicada + tipos regenerados (423 tablas). Reconciliación vs el DDL del contrato: `organization_id` TEXT (no UUID), user FK = `client_users` (no existe `greenhouse_core.users`), `template_code` columna snapshot (no FK, PK compuesta).
+- **Comandos** (`src/lib/client-lifecycle/commands/**`, atómicos + idempotentes + outbox v1, dual-mode `client?`): `provisionClientLifecycle`, `advanceLifecycleChecklistItem`, `resolveLifecycleCase` (cascade `instantiateClientForParty` en onboarding completed), `addLifecycleBlocker`/`resolveLifecycleBlocker`. State machine pura (`state-machine.ts`) + store (`store.ts`) + types.
+- **8 eventos v1** `client.lifecycle.*` (event-catalog + EVENT_CATALOG Delta). **API §9** (6 rutas `/api/admin/clients/[organizationId]/lifecycle[/onboarding]` + `/api/admin/clients/lifecycle/{cases,cases/[id]/items/[code],cases/[id]/resolve,health}`) con `authorizeLifecycle` + `can()` granular + es-CL sanitizado. **5 capabilities** `client.lifecycle.case.*` (catalog + grants en runtime.ts colapsados a ROLE_CODES reales — anti-rol-fantasma). **5 reliability signals** (subsystem Commercial Health) + wire-up.
+- **Verificación**: live smoke rollback-wrapped contra PG real (10 items materializados, idempotencia, rechazo de complete-too-early + evidencia-requerida, cascade `client_instantiated`, trigger DB bloquea `completed→draft`, append-only enforced) → todo rolled back, cero residue. Tests focales 14/14 verde + grant-coverage verde.
+
+**Flag**: `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` default OFF — el código está live pero las tablas vacías no se consumen. Cero cambio observable al merge.
+
+**Pendiente (Slices 2-3)**: cablear el mockup APROBADO (`src/views/greenhouse/agency/clients/mockup/**`) a runtime FUERA de `/mockup/`; wizard composer `POST /api/admin/clients/lifecycle/provision` (upsertCanonicalOrganization + provisionClientLifecycle atómico); redefinir `CreateClientDrawer`; triggers HubSpot deal/adopt; MXN en el paso Finanzas (widen `billingDefaults.paymentCurrency`); timeline Account 360; **Berel como caso de validación end-to-end** (org ya remediada por TASK-991). Docs funcional + manual de la puerta única quedan para cuando el wizard ship.
+
+---
+
+# Sesion 2026-06-02 — Creative Video Studio / HyperFrames pilot — 🆕 DOCUMENTADO
+
+**Scope**: documentar la capacidad mostrada con HyperFrames (`efeoncepro.com` -> promo 20s) como posible modulo nativo de Greenhouse, sin tocar runtime.
+
+**Decision propuesta**:
+- Nuevo ADR propuesto: `docs/architecture/GREENHOUSE_CREATIVE_VIDEO_STUDIO_V1.md`.
+- Nueva task: `docs/tasks/to-do/TASK-996-creative-video-studio.md`.
+- Greenhouse seria el control plane de producto: briefs, permisos, metadata, aprobacion humana, storage, versionado, relacion con cliente/campana y export.
+- HyperFrames queda como engine de composicion/render: HTML timeline, GSAP, media sync, lint/validate/inspect/snapshot/preview/render.
+- El artefacto publico recomendado es MP4/WebM exportado; el HTML animado queda como source editable.
+
+**Worktree / artefactos**:
+- El piloto local vive en `videos/efeoncepro-promo/` y pesa ~232 MB incluyendo `.venv`; no debe versionarse.
+- `.gitignore` ahora ignora `/videos/` para evitar commitear capturas, WAVs, screenshots, dependencias y outputs pesados.
+- Para preservar el piloto de forma compartida, exportar/subir solo outputs aprobados a storage canonico; no meter el proyecto local completo al repo.
+
+**Registros actualizados**:
+- `docs/architecture/DECISIONS_INDEX.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md` (siguiente ID `TASK-997`)
+- `changelog.md`
+
+**Validacion**:
+- `pnpm task:lint --task TASK-996` ✅ 0 errors / 0 warnings.
+
+---
+
+# Sesion 2026-06-02 — ADR + TASK-994 Workforce Payables Control Plane — 🆕 PROPUESTO
+
+**Scope**: auditoria conceptual Payroll + Contractor Payables para encontrar sinergias sin modificar runtime. El operador explicito que Payroll y Contractors son workforce pagada por Efeonce, pero pidio no tocar codigo.
+
+**Decision propuesta**:
+- Nuevo ADR: `docs/architecture/GREENHOUSE_WORKFORCE_PAYABLES_CONTROL_PLANE_V1.md` (`Status: Proposed`).
+- Nueva task: `docs/tasks/to-do/TASK-994-workforce-payables-control-plane.md`.
+- Tesis: converger operacionalmente en una capa read-only/projection-first de **Workforce Payables**, no meter contractors dentro de Payroll ni crear un motor universal de calculo.
+- Convergencia canonica: domain rail output -> `payment_obligations` -> `payment_orders` -> `expense_payment`/`settlement_leg` -> reconciliation -> artifacts/notifications.
+- Payroll sigue owner de calculo/entries/receipts/Previred-LRE/finiquitos.
+- Contractor Engagements sigue owner de evidencia/payables/gross-net-withholding/EO-RA.
+- Finance/Tesoreria sigue owner de Payment Orders, maker-checker, source instrument, paid, settlement y bank reconciliation.
+- V1 futura queda bloqueada por aceptacion humana del ADR.
+
+**Registros actualizados**:
+- `docs/architecture/DECISIONS_INDEX.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md` (siguiente ID `TASK-995`)
+
+---
+
+# Sesion 2026-06-02 — TASK-993 Contractor Payment Run Ready Email — 🆕 TASK CREADA
+
+**Scope**: follow-up operador tras validar el flujo contractor end-to-end: cuando la corrida mensual deja la nomina/ordenes listas, Finanzas quiere recibir un email como ocurre con payroll.
+
+**Decision de diseno canonica**:
+- NO enviar email al descargar la nomina (download sigue read-only).
+- Trigger correcto: corrida mensual contractor `succeeded` con `preparedOrderIds.length > 0`.
+- Nuevo evento propuesto: `finance.contractor_payment_run.ready`.
+- Email type propuesto: `contractor_payment_run_ready`.
+- Recipients: via `greenhouse_notifications.email_subscriptions`; Humberly + Julio son seed inicial a verificar, nunca hardcode en runtime.
+- Adjuntos: PDF + Excel generados por helpers TASK-980.
+- Copy obligatorio: "preparada / pendiente aprobacion", NO "pagada".
+- Debe incluir resend manual, idempotencia, kill switch y signal dead-letter.
+
+**Artefactos**:
+- Task: `docs/tasks/to-do/TASK-993-contractor-payment-run-ready-email.md`.
+- Registro: `docs/tasks/TASK_ID_REGISTRY.md`.
+- Indice: `docs/tasks/README.md` (siguiente ID `TASK-994`).
+- Epic: `docs/epics/to-do/EPIC-013-contractor-engagements-global-payables-program.md`.
+
+---
+
+# Sesion 2026-06-02 — Contractor payments end-to-end validado por operador + docs — ✅ DOCUMENTADO
+
+**Scope**: deuda cognitiva post-implementacion de agentes en pagos a contractors. El operador valido el flujo en `dev-greenhouse` desde la UI, sin que el agente hiciera mutaciones de estado.
+
+**Validacion operador**:
+- Valentina Hoyos `EO-CENG-0001` / payable `EO-CPAY-0001`.
+- `Enviar a Finanzas` paso el readiness y dejo el payable `Listo para Finanzas`.
+- `Iniciar corrida mensual` creo `1 orden de pago` con `1 pago incluido`.
+- El payable quedo `En orden de pago` (estado correcto: existe orden, falta approval/payment lifecycle de Tesoreria).
+
+**Contrato documentado**:
+- `ready_for_finance` = traspaso a Finance, no pago.
+- `payment_obligation` contractor = `source_kind='contractor_payable'`, `obligation_kind='provider_payroll'`, monto neto.
+- Corrida mensual = crea ordenes `pending_approval` por moneda; no aprueba ni paga.
+- Payment Orders mantiene ownership de approve/schedule/submit/mark-paid/settlement/reconciliation.
+- Solo `finance.payment_order.paid` marca el payable `paid` y habilita `EO-RA` + email.
+- Reporte de nomina de contractors puede listar compromisos; `Neto pagado` solo suma `paid`. Retencion SII queda como pasivo separado a remesar al SII.
+
+**Docs actualizados**:
+- `docs/manual-de-uso/finance/pagos-a-contractors.md`
+- `docs/manual-de-uso/finance/ordenes-de-pago.md`
+- `docs/documentation/finance/pagos-a-contractors.md`
+- `docs/documentation/finance/ordenes-de-pago.md`
+- `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
+- indices `docs/manual-de-uso/README.md` + `docs/documentation/README.md`
+- `changelog.md`
+
+**Pendiente operativo**: para cerrar Valentina hasta pago real, entrar a `/finance/payment-orders`, abrir la orden generada por la corrida contractor, aprobar con maker-checker, programar/enviar al banco, marcar pagada cuando exista confirmacion bancaria y luego conciliar. No usar scripts para avanzar estados.
+
+---
+
+# Sesion 2026-06-02 — Contractor payable readiness resuelve payment profile activo — ✅ VALIDADO LOCAL
+
+**Scope**: caso Valentina `EO-CPAY-0001`: al activar su payment profile, el payable no debia pedir waiver ni quedar bloqueado por `payment_profile_unresolved`.
+
+**Causa raiz**: el payable se habia creado con `payment_profile_id = null` y beneficiary fallback `other/identity-hubspot-crm-owner-82653513`; el perfil activo real esta en `greenhouse_finance.beneficiary_payment_profiles` como `member/valentina-hoyos`. La UI ademas leia `readiness_json = {}` viejo y no la evaluacion viva.
+
+**Fix robusto**:
+- Endpoint read-only nuevo `GET /api/finance/contractor-payables/[id]/readiness` usa `assessPayableReadiness`.
+- Readiness contractor ahora resuelve ruta de pago canonica via `resolvePaymentRoute` cuando el payable no trae `payment_profile_id`.
+- Invariante agregado por alerta payroll: el resolver solo usa `greenhouse_core.members` existentes ligados a `contractor_engagements.profile_id`; **no crea members** ni sintetiza identidad para desbloquear pagos. Si no existe member enrutable, queda fail-closed (`payment_profile_unresolved`/waiver auditado).
+- `transitionPayableToReadyForFinance` adjunta transaccionalmente `beneficiary_type='member'`, `beneficiary_id=<memberId>` y `payment_profile_id=<profile activo>` antes de avanzar a `ready_for_finance`; asi el bridge posterior crea la obligation con beneficiary enrutable.
+- Creacion de payables nuevos tambien intenta resolver/guardar el perfil activo desde el engagement/member canónico.
+- UI Finance refresca readiness viva del payable seleccionado, evita el falso "sin bloqueos" por snapshot vacio y muestra blockers estructurados si el POST falla.
+- Manual `docs/manual-de-uso/finance/pagos-a-contractors.md` actualizado: waiver es excepcion auditada, no camino normal si existe perfil activo; usar member como beneficiario no crea compensacion Payroll.
+
+**Verificacion local**:
+- Staging read-only confirmo perfil activo Valentina: `bpp-7c5df3e2-1b86-4ceb-b729-f8ed9adf910a`, `beneficiaryType=member`, `beneficiaryId=valentina-hoyos`, `status=active`.
+- Local API read-only: `/api/finance/contractor-payables/<EO-CPAY-0001>/readiness` devuelve `ready: true`, `blockers: []`.
+- UI local: no muestra `payment_profile_unresolved`, no muestra waiver, si muestra **Enviar a Finanzas**.
+- GVC: `.captures/2026-06-02T17-11-32_contractor-payments-readiness` ✅.
+- Tests de contrato: `pnpm exec vitest run src/lib/contractor-engagements/payables/payment-route-resolution.test.ts src/lib/contractor-engagements/payables/readiness.test.ts src/lib/payroll/postgres-store.test.ts` ✅ (36 tests) — cubre no crear/sintetizar member y no romper payroll roster.
+- ESLint focal ✅; `pnpm exec tsc --noEmit --pretty false` ✅; `pnpm design:lint` ✅.
+
+**Accion operador**: tras deploy a `dev-greenhouse`, refrescar `/finance/contractor-payments`, abrir Valentina y presionar **Enviar a Finanzas**. No requiere waiver si el payment profile sigue activo.
+
+---
+
+# Sesion 2026-06-02 — Contractor payables UI handoff + admin support viewer — ✅ VALIDADO LOCAL (sin crear payable)
+
+**Scope**: caso Valentina / contractors: permitir que admin vea boleta/evidencia y que Finanzas cree el payable desde el flujo existente, sin parchear datos ni crear registros por agente.
+
+**Cambios clave**:
+- HR `/hr/contractors`: el envío corregido aprobado ya no queda tapado por el envío disputado anterior. La cola usa estado actual, no histórico: disputed queda auditable, pero una corrección submitted/approved posterior del mismo contexto lo supersede en el headline.
+- HR projection: un envío `approved` y `consumed_by_payable_id IS NULL` se muestra como **Aprobado · Finance · Crear payable en Finanzas**. **No** suma como `ready_for_finance`; ese KPI queda reservado para payables reales.
+- Finanzas `/finance/contractor-payments`: `Crear desde envío` ahora lista envíos aprobados pendientes desde endpoint nuevo `GET /api/finance/contractor-payables/ready-submissions` (capability `finance.contractor_payable:create`) y sigue usando el `POST /api/finance/contractor-payables` canónico cuando el operador confirma. No se creó payable automáticamente.
+- Visor admin de soportes: panel en drawer HR con boletas/evidencia del engagement/submission + preview PDF/img por endpoint privado de assets. `react-pdf` carga lazy client-side para evitar `DOMMatrix` en SSR. Cargas de submission/soportes tienen guard contra respuestas stale.
+- Cache HR workbench se invalida en create/review/cancel/update de work submissions (`hr` y `my`) para evitar que la cola conserve estados viejos.
+
+**Verificación local**:
+- `pnpm vitest run src/lib/contractor-engagements/hr-workbench-submissions.test.ts src/lib/contractor-engagements/support-documents/summary.test.ts` ✅ 7/7.
+- ESLint focal ✅.
+- `pnpm exec tsc --noEmit --pretty false` ✅.
+- GVC: `.captures/2026-06-02T16-10-17_inline-hr-contractors` + `.captures/2026-06-02T16-10-17_inline-finance-contractor-payments` ✅.
+- Playwright read-only: Finance selector muestra `Valentina Hoyos · EO-CWS-0003 · $707.965 · EO-CENG-0001`, `writes=[]`.
+- Workbench read-only: Valentina `Aprobado`, `CLP 707.965`, responsable `Finance`, next action `Crear payable en Finanzas`; totals `{ inReview:0, blocked:0, readyForFinance:0, paid:0 }`.
+
+**Acción operador**: desde `/finance/contractor-payments` → **Crear desde envío** → seleccionar Valentina/`EO-CWS-0003` → **Crear payable**. Luego revisar readiness y enviar a Finanzas desde el flujo TASK-974/793/977/979.
+
+---
+
+# Sesion 2026-06-02 — TASK-991 Canonical Organization Write SSOT + Birth Completeness — 🔄 CODE COMPLETE (develop, rollout pendiente)
+
+**Implementado directo en `develop`** (instrucción operador, sin branch). Skills aplicadas como lente continua: arch-architect + finance-accounting-operator + commercial-expert + info-architecture/forms-ux. Cierra la causa raíz de la fragmentación del nacimiento del cliente (audit `docs/audits/client-lifecycle/CLIENT_BIRTH_FRAGMENTATION_AUDIT_2026-06-02.md`).
+
+**Slices (4 commits):**
+- Slice 0 `37591de0` — 4 reliability signals (subsystem Commercial Health) + inventario read-only.
+- Slice 1 — `deriveOrganizationType` (SSOT tipo) + `upsertCanonicalOrganization` (writer canónico) + puertas finance/supplier delegan + puerta HubSpot setea type/public_id/origin tras flag `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED` (default OFF, shadow) + migración `organizations.origin` (`20260602144943699`, backfill 124 hubspot_sync + 29 migration).
+- Slice 2 `30a5690d` — `country_code` HubSpot propagado (MX real, no 'CL' ciego).
+- Slice 3 `03fafebf` — script `remediate-half-baked-orgs.ts` + modo `overrideIdentity`. **Remediación LIVE**: Berel (type→client, country→MX, tax_id=PBE970101718 RFC, legal_name="PINTURAS BEREL SA DE CV") + Aguas Andinas + Motogas. Signal `type_lifecycle_drift` **3→0**.
+
+**Gates verdes:** `pnpm test` full 5817 passed · `pnpm build` exit 0 · tsc 0 · lint 0.
+
+**⚠️ ROLLOUT PENDIENTE (operador) — code complete ≠ operationally complete:**
+1. Flipear `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED=true` en staging → validar orgs HubSpot nuevas nacen con type/country correctos → flipear en prod (Vercel + **ops-worker, requiere redeploy** — la puerta party corre ahí).
+2. SOLO DESPUÉS (flag ON en todos los runtimes): agregar el CHECK `organizations_type_lifecycle_consistent` (NOT VALID + VALIDATE). Con flag OFF la puerta legacy produce `active_client+other` → el CHECK rompería el HubSpot sync. Es el hardening DB final, gated.
+
+Task `in-progress` (rollout pendiente), NO complete. Flag OFF = cero cambio al merge; datos ya remediados (drift=0). Foundation que destraba TASK-990 (factura MXN Berel) + TASK-992 (orquestador + wizard). CLAUDE.md invariant agregado.
+
+---
+
+# Sesion 2026-06-02 — ADR + TASK-990 MXN Multi-Currency Finance Core — ✅ ACEPTADO (sin runtime changes)
+
+**Update 2026-06-02 (review + aceptacion)**: tras review de aceptacion con skills `arch-architect` (overlay) + `greenhouse-finance-accounting-operator`, se endurecio el ADR y se acepto. Ajustes clave aplicados antes del flip: §8.4 USD reporting via CLP funcional (IAS 21, NO MXN→USD directo); §5.4 sourcing del CLP funcional (income=valor legal Nubox observado, NO recomputado / gastos=Greenhouse computa MXN→CLP); §5.1 precision por moneda + redondeo half-up; §7.1 FX snapshots como tabla append-only canonica + superseded_by; §16.b 4-Pillar Score; §6.1 aclara MXN↔USD es para resolver, no reporting. **3 confirmaciones de Finance resueltas (ADR §0)**: (1) moneda contractual Berel = MXN ✅; (2) Banxico NO obligatorio, fallback OK con degraded-source visible sobre plataforma FX existente ✅; (3) settlement = cuenta Global66 **MXN nativa** (CLABE), su propia fila `accounts` con `currency='MXN'`, DISTINTA de la Global66 CLP→USD de payroll internacional (no confundir) ✅. ADR Status → `Accepted`; DECISIONS_INDEX → Accepted; TASK-990 desbloqueada (Blocked by: none), lista para Slice 0. Sigue sin tocar runtime/codigo/migraciones/datos.
+
+**Scope (sesion original)**: modelar soporte MXN end-to-end sin implementar codigo. Se invocaron skills `software-architect-2026`, `greenhouse-finance-accounting-operator` y `greenhouse-task-planner`.
+
+**Resultado documental**:
+- ADR/spec propuesto: `docs/architecture/GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md`.
+- Task registrada: `docs/tasks/to-do/TASK-990-mxn-multi-currency-finance-core.md`.
+- Indices sincronizados: `docs/architecture/DECISIONS_INDEX.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`.
+
+**Decision propuesta**: Greenhouse debe promover MXN desde pricing-only a `finance_core` con cuatro planos por evento financiero: `native` (MXN contractual), `functional` (CLP), `reporting` (USD) y `settlement` (moneda real de caja), usando FX snapshots auditables. No es enum edit.
+
+**Caso fuente**: Nubox export invoice Berel `28800562`, DTE 110, `PINTURAS BEREL SA DE CV`, RFC `PBE970101718`, foreign amount `89.960` (MXN por contexto operador), CLP legal/documental `4.617.647`. Sync Nubox raw/conformed esta sano, pero la venta quedo orphaned sin `income_id`; si se proyectara hoy, `sync-nubox-to-postgres` hardcodearia CLP y perderia el MXN nativo.
+
+**Estado**: ADR `Accepted` (2026-06-02, ver Update arriba); TASK-990 `to-do` desbloqueada y lista para Slice 0. No se tocaron codigo, migraciones, datos, Vercel, GCP ni runtime.
+
+---
+
+# Sesion 2026-06-02 — Promoción completa develop→main a producción + fix bloqueante ops-worker boot — ✅ RELEASED
+
+**Scope**: pasar todo `develop` (217 commits) a producción end-to-end vía el control plane canónico. El operador aprobó todos los gates de CI/environment explícitamente. Guiado por la skill `greenhouse-production-release` + `PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1`.
+
+**Bloqueador encontrado y resuelto ANTES de promover (no parche)**: al leer el estado de develop, el `ops-worker-deploy` venía **fallando** — el container boot-crasheaba (`exit 1`, "failed to start and listen on PORT=8080"). Causa raíz: el commit v5 de recibos (`7171aecf`) volvió `RECEIPT_TEMPLATE_VERSION` un const a nivel de módulo que lee `public/branding/logo-full.png` en *import-time*; lo importa transitivamente el projection registry, y el asset no viajaba al container (`.dockerignore`/`.gcloudignore` excluyen `public/`). Crasheaba TODAS las projections (outbox, materialización, consumers). Fix robusto en 3 capas (arch-architect 4-pilar): el runner del Dockerfile carga `public/branding` + `src/assets/fonts`; re-inclusión a nivel de dir en ambos ignore-files; `RECEIPT_TEMPLATE_VERSION` → getter lazy memoizado (blast-radius containment). Commits `4d6572f7` + `1eeed338` en develop; verificado en vivo (staging ops-worker boot OK + `/health` + GIT_SHA `1eeed338`).
+
+**Release**: merge `f9485a40` (develop→main), Vercel production `Ready`, CI/Deep/Contract verdes. Orchestrator run `26815771335` → manifest `f9485a404f71-35639f30-41a9-4820-a4e5-2f88bfb48a8c` estado **`released`**. Los 4 workers Cloud Run en `f9485a40` (cero drift), Azure Bicep sin diff → skip, post-release health 200, watchdog Aggregate OK. Dos gates Production aprobados vía `gh api pending_deployments`. `bypass_preflight_reason` para `release_batch_policy=split_batch` (esperado en bundle multi-dominio). Contenido dominado por EPIC-013 (Contractor Payables) + nav governance + session route-groups fix.
+
+**Gates**: tsc/lint 0 · 50 tests focales payroll · preflight local (vercel/pg ok; resto resuelto en orchestrator) · migraciones "No migrations to run!". CLAUDE.md + changelog actualizados.
+
+---
+
 # Sesion 2026-06-01 — Nexa Greetings hero (Figma→código) + plataforma de saludos + microinteracciones — ✅ SHIPPED (develop)
 
 **Scope**: implementar el diseño Figma "Greetings" en el home como **componente reutilizable**, darle pulido enterprise + microinteracciones, una **plataforma de saludos dinámicos**, y replicar el resultado de vuelta a Figma (code→design). Diseñado iterando con product-design skills (modern-ui, forms-ux, motion-design, microinteractions-auditor, greenhouse-ux-writing) + arch-architect, verificando cada paso con **GVC**.

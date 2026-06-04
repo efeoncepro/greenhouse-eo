@@ -1,6 +1,10 @@
 import 'server-only'
 
 import { withTransaction } from '@/lib/db'
+import {
+  deriveOrganizationType,
+  isCanonicalOrganizationWriteEnabled
+} from '@/lib/account-360/organization-type'
 
 import { isTransitionAllowed } from '../lifecycle-state-machine'
 import { publishPartyDemoted, publishPartyPromoted } from '../party-events'
@@ -119,16 +123,46 @@ export const promoteParty = async (
 
     const historyRow = historyInsert.rows[0]
 
-    await txClient.query(
-      `UPDATE greenhouse_core.organizations
-         SET lifecycle_stage = $2,
-             lifecycle_stage_since = NOW(),
-             lifecycle_stage_source = $3,
-             lifecycle_stage_by = $4,
-             updated_at = NOW()
-       WHERE organization_id = $1`,
-      [organization.organization_id, input.toStage, input.source, actorId]
-    )
+    // TASK-991 Slice 1 — reconciliar organization_type con el lifecycle en el
+    // MISMO UPDATE (gated). Promover a active_client/provider_only sin setear el
+    // type dejaba la org inconsistente (active_client+other) — el segundo writer
+    // del bug class de Berel. Solo promueve el rol (NUNCA degrada: un churned que
+    // fue client mantiene client). Flag OFF = comportamiento legacy bit-for-bit.
+    const reconcileType =
+      isCanonicalOrganizationWriteEnabled() &&
+      (input.toStage === 'active_client' || input.toStage === 'provider_only')
+
+    if (reconcileType) {
+      const nextType = deriveOrganizationType({
+        lifecycleStage: input.toStage,
+        hasClientRole: input.toStage === 'active_client',
+        hasSupplierRole: input.toStage === 'provider_only',
+        currentType: organization.organization_type
+      })
+
+      await txClient.query(
+        `UPDATE greenhouse_core.organizations
+           SET lifecycle_stage = $2,
+               lifecycle_stage_since = NOW(),
+               lifecycle_stage_source = $3,
+               lifecycle_stage_by = $4,
+               organization_type = $5,
+               updated_at = NOW()
+         WHERE organization_id = $1`,
+        [organization.organization_id, input.toStage, input.source, actorId, nextType]
+      )
+    } else {
+      await txClient.query(
+        `UPDATE greenhouse_core.organizations
+           SET lifecycle_stage = $2,
+               lifecycle_stage_since = NOW(),
+               lifecycle_stage_source = $3,
+               lifecycle_stage_by = $4,
+               updated_at = NOW()
+         WHERE organization_id = $1`,
+        [organization.organization_id, input.toStage, input.source, actorId]
+      )
+    }
 
     if (input.toStage === 'active_client') {
       // Side-effect: every active_client must have a clients row + profile. If

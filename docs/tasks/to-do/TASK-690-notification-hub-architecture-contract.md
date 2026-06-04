@@ -275,6 +275,17 @@ Mejoras: rate limiting impide catastrofes (+Safety, +Resilience), cascade explí
 
 Slice 1 expande para incluir las 5 nuevas tablas/columns + 1 nueva tabla (`notification_rate_limits`) + 1 nueva capability (`platform.notifications.hub.bypass_rate_limit`) + 4 nuevos helpers TS (`buildCorrelationId`, `cancelPendingIntentsForMember`, `pseudonymizeIntentsForMember`, `checkRateLimit`).
 
+## Delta v0.3 (2026-06-04) — TeamBot 1:1 payment announcements discovery
+
+Discovery operativo con el Greenhouse TeamBot probó el caso que el Hub debe absorber como canal recurrente:
+
+- Bot Framework Connector crea DM 1:1 con `members: [{ id: "<aadObjectId>" }]`, no `29:<aadObjectId>`. El prefijo `29:` se mantiene para mentions / pairwise Teams ids, no para create-conversation con Entra object id.
+- Los avisos manuales de pago de nómina/honorarios son un puente temporal. Cuando el Hub exista, el patrón canónico debe ser `notification_intents.recipient_member_id` + `notification_deliveries.channel='teams_dm'`.
+- `teams_dm` debe usar `recipient_kind='dynamic_user'` y `recipient_routing_rule_json={ from: 'payload.recipientMemberId' }`; no crear ni seedear filas por persona en `teams_notification_channels`.
+- Los eventos fuente preferidos son `workforce.contractor_payable.paid` para honorarios/contractor y `finance.payment_order.paid` / `finance.payment_order.settled` para órdenes de pago. Si nómina dependiente no expone grano por colaborador pagado, crear evento canónico per-member antes de automatizar el DM.
+- Los templates de pago por Teams deben ser low-PII: estado, saludo, copy corto y botón `Action.OpenUrl` al detalle en Greenhouse. No incluir montos, bancos, cuentas, referencias de transferencia ni adjuntos.
+- Discovery adicional de Maggie Borralles confirmó el camino sin enviar: `member_id='0e6a896e-f1d2-481c-9c97-ee43ab1714d8'`, `aadObjectId='e0f8f69a-c1f5-40a1-a159-dced9087b318'`, app personal Greenhouse instalada, sin conversation reference cache aún.
+
 ## Summary
 
 Unificar las 3 superficies de notificación de Greenhouse (in-app bell, email, Microsoft Teams) detrás de un **Notification Hub** canónico: un solo registry de intentos, un router con preferencias por persona, y adapters per-canal que reusan el código de delivery existente. Este task entrega únicamente el **contrato arquitectónico** + tablas + interfaces vacías + reliability hookup, sin romper ningún flujo. Las fases siguientes (TASK-691 shadow, TASK-692 cutover, TASK-693 bidireccional + UI) lo implementan incrementalmente.

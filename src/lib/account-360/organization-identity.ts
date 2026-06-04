@@ -4,6 +4,11 @@ import type { PoolClient } from 'pg'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateOrganizationId, nextPublicId } from '@/lib/account-360/id-generation'
+import {
+  deriveOrganizationType,
+  type OrganizationOrigin,
+  type OrganizationType
+} from '@/lib/account-360/organization-type'
 
 // ─── Types ──────────────────────────────────────────────────────────────
 
@@ -182,15 +187,133 @@ const findOrganizationByHubspotCompanyId = async (
   }
 }
 
-const promoteToClientCapableType = (organizationType: string) => {
-  switch (organizationType) {
-    case 'supplier':
-      return 'both'
-    case 'other':
-      return 'client'
-    default:
-      return organizationType
+// ─── Canonical Organization Writer (SSOT) ───────────────────────────────
+
+/**
+ * TASK-991 Slice 1 — ÚNICO writer canónico de la fila `greenhouse_core.organizations`
+ * para las puertas account-360 (client + supplier). Las puertas públicas
+ * (`ensureOrganizationForClient`, `ensureOrganizationForSupplier`) resuelven la
+ * org existente y delegan la escritura aquí. Garantiza:
+ *  - `organization_type` derivado vía `deriveOrganizationType` (NUNCA hand-set
+ *    inconsistente con el lifecycle).
+ *  - `public_id` poblado en cada INSERT (la puerta party legacy lo dejaba NULL).
+ *  - `origin` capturado.
+ *  - UPDATE con COALESCE (nunca sobreescribe identidad existente no-vacía).
+ *
+ * NO impone default de `country` — el caller decide (Slice 2 deriva del origin;
+ * hasta entonces los callers preservan su default histórico).
+ */
+export const upsertCanonicalOrganization = async (
+  input: {
+    /** Org existente ya resuelta por el caller (UPDATE path). Null ⇒ INSERT. */
+    existingOrganizationId?: string | null
+    /** Tipo actual de la org existente, para el merge de roles. */
+    currentType?: string | null
+    organizationName: string
+    legalName?: string | null
+    taxId?: string | null
+    taxIdType?: string | null
+    country?: string | null
+    /**
+     * TASK-997 Slice 1 — industria alineada al enum canónico HubSpot
+     * (`src/config/hubspot-industries.ts`). Se guarda el `value` estable
+     * (ej. 'RETAIL'). El caller coacciona texto libre vía `coerceHubspotIndustryValue`
+     * antes de pasarlo; aquí se persiste tal cual (COALESCE preserva en UPDATE).
+     */
+    industry?: string | null
+    hubspotCompanyId?: string | null
+    lifecycleStage?: string | null
+    hasClientRole?: boolean
+    hasSupplierRole?: boolean
+    origin?: OrganizationOrigin
+    /**
+     * Modo remediación (TASK-991 Slice 3). Cuando true, los campos de identidad
+     * provistos NO-NULL SOBREESCRIBEN el valor existente (corrección dirigida —
+     * ej. country CL→MX de Berel). Cuando false (default), COALESCE preserva el
+     * valor existente no-vacío (no-regresión de las puertas normales).
+     */
+    overrideIdentity?: boolean
+  },
+  client?: QueryableClient
+): Promise<{ organizationId: string; organizationType: OrganizationType }> => {
+  const organizationType = deriveOrganizationType({
+    lifecycleStage: input.lifecycleStage,
+    hasClientRole: input.hasClientRole,
+    hasSupplierRole: input.hasSupplierRole,
+    currentType: input.currentType
+  })
+
+  const origin: OrganizationOrigin = input.origin ?? 'manual'
+
+  if (input.existingOrganizationId?.trim()) {
+    // overrideIdentity=true: `COALESCE($n, col)` sobreescribe cuando se provee
+    // un valor (corrección). Default: `COALESCE(NULLIF(col,''), $n)` preserva.
+    const identitySql = input.overrideIdentity
+      ? `legal_name = COALESCE($4, legal_name),
+           hubspot_company_id = COALESCE($5, hubspot_company_id),
+           tax_id = COALESCE($6, tax_id),
+           tax_id_type = COALESCE($7, tax_id_type),
+           country = COALESCE($8, country),
+           industry = COALESCE($10, industry)`
+      : `legal_name = COALESCE(NULLIF(legal_name, ''), $4),
+           hubspot_company_id = COALESCE(hubspot_company_id, $5),
+           tax_id = COALESCE(tax_id, $6),
+           tax_id_type = COALESCE(tax_id_type, $7),
+           country = COALESCE(NULLIF(country, ''), $8),
+           industry = COALESCE(NULLIF(industry, ''), $10)`
+
+    await queryRows(
+      `UPDATE greenhouse_core.organizations
+       SET organization_type = $2,
+           organization_name = COALESCE(NULLIF(organization_name, ''), $3),
+           ${identitySql},
+           origin = COALESCE(origin, $9),
+           updated_at = NOW()
+       WHERE organization_id = $1`,
+      [
+        input.existingOrganizationId.trim(),
+        organizationType,
+        input.organizationName,
+        input.legalName ?? null,
+        input.hubspotCompanyId?.trim() || null,
+        input.taxId?.trim() || null,
+        input.taxIdType?.trim() || null,
+        input.country?.trim() || null,
+        origin,
+        input.industry?.trim() || null
+      ],
+      client
+    )
+
+    return { organizationId: input.existingOrganizationId.trim(), organizationType }
   }
+
+  const newOrganizationId = generateOrganizationId()
+  const publicId = await nextPublicId('EO-ORG')
+
+  await queryRows(
+    `INSERT INTO greenhouse_core.organizations (
+      organization_id, public_id, organization_name, legal_name,
+      tax_id, tax_id_type, country, hubspot_company_id, organization_type, origin,
+      industry, status, active, created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'active', TRUE, NOW(), NOW())`,
+    [
+      newOrganizationId,
+      publicId,
+      input.organizationName,
+      input.legalName ?? null,
+      input.taxId?.trim() || null,
+      input.taxIdType?.trim() || null,
+      input.country?.trim() || null,
+      input.hubspotCompanyId?.trim() || null,
+      organizationType,
+      origin,
+      input.industry?.trim() || null
+    ],
+    client
+  )
+
+  return { organizationId: newOrganizationId, organizationType }
 }
 
 // ─── Ensure Organization for Supplier ───────────────────────────────────
@@ -215,43 +338,22 @@ export const ensureOrganizationForSupplier = async (params: {
 }): Promise<string> => {
   const { taxId, taxIdType, legalName, tradeName, country } = params
 
-  // 1. Check for existing org by tax_id
+  // Resolve existing org by tax_id; the canonical writer derives the type
+  // (supplier, or `both` when the org already has a client role) and fills
+  // public_id/origin on INSERT. TASK-991 Slice 1.
   const existing = await findOrganizationByTaxId(taxId)
 
-  if (existing) {
-    // Upgrade type to 'both' if currently 'client'
-    if (existing.organizationType === 'client') {
-      await runGreenhousePostgresQuery(
-        `UPDATE greenhouse_core.organizations
-         SET organization_type = 'both', updated_at = NOW()
-         WHERE organization_id = $1`,
-        [existing.organizationId]
-      )
-    }
-
-    return existing.organizationId
-  }
-
-  // 2. Create new organization for supplier
-  const organizationId = generateOrganizationId()
-  const publicId = await nextPublicId('EO-ORG')
-
-  await runGreenhousePostgresQuery(
-    `INSERT INTO greenhouse_core.organizations (
-      organization_id, public_id, organization_name, legal_name,
-      tax_id, tax_id_type, country, organization_type,
-      status, active, created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'supplier', 'active', TRUE, NOW(), NOW())`,
-    [
-      organizationId,
-      publicId,
-      tradeName || legalName,
-      legalName,
-      taxId,
-      taxIdType || null,
-      country || 'CL'
-    ]
-  )
+  const { organizationId } = await upsertCanonicalOrganization({
+    existingOrganizationId: existing?.organizationId ?? null,
+    currentType: existing?.organizationType ?? null,
+    organizationName: tradeName || legalName,
+    legalName,
+    taxId,
+    taxIdType: taxIdType ?? null,
+    country: country || 'CL',
+    hasSupplierRole: true,
+    origin: 'manual'
+  })
 
   return organizationId
 }
@@ -334,59 +436,26 @@ export const ensureOrganizationForClient = async (
     existing = await findOrganizationByHubspotCompanyId(hubspotCompanyId.trim(), client)
   }
 
-  if (existing) {
-    const targetType = promoteToClientCapableType(existing.organizationType)
-
-    await queryRows(
-      `UPDATE greenhouse_core.organizations
-       SET organization_type = $2,
-           organization_name = COALESCE(NULLIF(organization_name, ''), $3),
-           legal_name = COALESCE(NULLIF(legal_name, ''), $4),
-           hubspot_company_id = COALESCE(hubspot_company_id, $5),
-           tax_id = COALESCE(tax_id, $6),
-           tax_id_type = COALESCE(tax_id_type, $7),
-           country = COALESCE(NULLIF(country, ''), $8),
-           updated_at = NOW()
-       WHERE organization_id = $1`,
-      [
-        existing.organizationId,
-        targetType,
-        normalizedOrganizationName,
-        normalizedLegalName,
-        hubspotCompanyId?.trim() || null,
-        taxId?.trim() || null,
-        taxIdType?.trim() || null,
-        normalizedCountry
-      ],
-      client
-    )
-
-    return existing.organizationId
-  }
-
-  const newOrganizationId = generateOrganizationId()
-  const publicId = await nextPublicId('EO-ORG')
-
-  await queryRows(
-    `INSERT INTO greenhouse_core.organizations (
-      organization_id, public_id, organization_name, legal_name,
-      tax_id, tax_id_type, country, hubspot_company_id, organization_type,
-      status, active, created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'client', 'active', TRUE, NOW(), NOW())`,
-    [
-      newOrganizationId,
-      publicId,
-      normalizedOrganizationName,
-      normalizedLegalName,
-      taxId?.trim() || null,
-      taxIdType?.trim() || null,
-      normalizedCountry,
-      hubspotCompanyId?.trim() || null
-    ],
+  // Canonical write (SSOT): derives organization_type (client, or `both` when
+  // the org already has a supplier role), fills public_id/origin on INSERT.
+  // TASK-991 Slice 1.
+  const { organizationId: resolvedOrganizationId } = await upsertCanonicalOrganization(
+    {
+      existingOrganizationId: existing?.organizationId ?? null,
+      currentType: existing?.organizationType ?? null,
+      organizationName: normalizedOrganizationName,
+      legalName: normalizedLegalName,
+      taxId: taxId?.trim() || null,
+      taxIdType: taxIdType?.trim() || null,
+      country: normalizedCountry,
+      hubspotCompanyId: hubspotCompanyId?.trim() || null,
+      hasClientRole: true,
+      origin: 'manual'
+    },
     client
   )
 
-  return newOrganizationId
+  return resolvedOrganizationId
 }
 
 // ─── Resolve Organization for Client ────────────────────────────────────

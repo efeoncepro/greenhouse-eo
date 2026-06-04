@@ -112,64 +112,80 @@ const AdminHero = ({
   selected: ContractorWorkbenchQueueRow | null
   onReview: () => void
   canManage: boolean
-}) => (
-  <Card
-    sx={theme => ({
-      border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
-      bgcolor: alpha(theme.palette.primary.main, 0.04)
-    })}
-  >
-    <CardContent>
-      <Stack
-        direction={{ xs: 'column', lg: 'row' }}
-        spacing={4}
-        justifyContent='space-between'
-        alignItems={{ xs: 'flex-start', lg: 'center' }}
-      >
-        <Stack spacing={1.5} sx={{ maxWidth: 820 }}>
-          <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
-            <CustomChip round='true' size='small' variant='tonal' color='primary' label='Workbench HR' />
-            {selected ? (
-              <CustomChip
-                round='true'
-                size='small'
+}) => {
+  const isFinanceHandoff = selected?.nextAction === 'Crear payable en Finanzas'
+
+  return (
+    <Card
+      sx={theme => ({
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+        bgcolor: alpha(theme.palette.primary.main, 0.04)
+      })}
+    >
+      <CardContent>
+        <Stack
+          direction={{ xs: 'column', lg: 'row' }}
+          spacing={4}
+          justifyContent='space-between'
+          alignItems={{ xs: 'flex-start', lg: 'center' }}
+        >
+          <Stack spacing={1.5} sx={{ maxWidth: 820 }}>
+            <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
+              <CustomChip round='true' size='small' variant='tonal' color='primary' label='Workbench HR' />
+              {selected ? (
+                <CustomChip
+                  round='true'
+                  size='small'
+                  variant='tonal'
+                  color={toneToColor[selected.statusTone]}
+                  label={selected.statusLabel}
+                />
+              ) : null}
+            </Stack>
+            <Typography variant='h4'>Gestión contractor</Typography>
+            <Typography variant='body1' color='text.secondary'>
+              Revisa engagements, evidencia y bloqueos de preparación antes de que el pago pase a Finance.
+            </Typography>
+          </Stack>
+          <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
+            {isFinanceHandoff ? (
+              <Button
+                component={Link}
+                href='/finance/contractor-payments'
                 variant='tonal'
-                color={toneToColor[selected.statusTone]}
-                label={selected.statusLabel}
-              />
+                startIcon={<i className='tabler-building-bank' />}
+                data-capture='admin-open-finance-contractor-payments'
+              >
+                {CC.guardrail.reviewInFinanceCta}
+              </Button>
+            ) : (
+              <Button
+                variant='tonal'
+                startIcon={<i className='tabler-checkup-list' />}
+                disabled={!selected}
+                onClick={onReview}
+                data-capture='admin-review-selected'
+              >
+                Revisar seleccionado
+              </Button>
+            )}
+            {canManage ? (
+              <Button
+                component={Link}
+                href='/hr/contractors/new'
+                variant='contained'
+                startIcon={<i className='tabler-plus' />}
+                data-capture='admin-new-contractor'
+              >
+                Nuevo contractor
+              </Button>
             ) : null}
           </Stack>
-          <Typography variant='h4'>Gestión contractor</Typography>
-          <Typography variant='body1' color='text.secondary'>
-            Revisa engagements, evidencia y bloqueos de preparación antes de que el pago pase a Finance.
-          </Typography>
         </Stack>
-        <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-          <Button
-            variant='tonal'
-            startIcon={<i className='tabler-checkup-list' />}
-            disabled={!selected}
-            onClick={onReview}
-            data-capture='admin-review-selected'
-          >
-            Revisar seleccionado
-          </Button>
-          {canManage ? (
-            <Button
-              component={Link}
-              href='/hr/contractors/new'
-              variant='contained'
-              startIcon={<i className='tabler-plus' />}
-              data-capture='admin-new-contractor'
-            >
-              Nuevo contractor
-            </Button>
-          ) : null}
-        </Stack>
-      </Stack>
-    </CardContent>
-  </Card>
-)
+      </CardContent>
+    </Card>
+  )
+}
 
 const AdminQueueTable = ({
   rows,

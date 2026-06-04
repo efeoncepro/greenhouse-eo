@@ -203,7 +203,11 @@ export const AGGREGATE_TYPES = {
   // status transitions events. Aggregate identity = taskSourceId (Notion page
   // UUID). Demo y productivo comparten aggregate_type pero distinguen via
   // payload.metadata.demo_mode boolean + payload.workspaceId.
-  notionTask: 'notion_task'
+  notionTask: 'notion_task',
+
+  // TASK-992 — Client Lifecycle Orchestrator (GREENHOUSE_CLIENT_LIFECYCLE_V1).
+  // Aggregate identity = caseId ('clc-{uuid}').
+  clientLifecycleCase: 'client_lifecycle_case'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -956,7 +960,18 @@ export const EVENT_TYPES = {
   // NO lleva `metadata.demo_mode` — el consumer demo lo ignora (filtra ===true) y
   // el consumer productivo lo procesa (filtra !==true). Tablas físicamente
   // separadas (task_status_transitions vs task_status_transitions_demo).
-  notionTaskPageChangeSignal: 'notion.task.page_change_signal'
+  notionTaskPageChangeSignal: 'notion.task.page_change_signal',
+
+  // TASK-992 — Client Lifecycle Orchestrator (GREENHOUSE_CLIENT_LIFECYCLE_V1 §10).
+  // aggregate_type = client_lifecycle_case, aggregate_id = caseId.
+  clientLifecycleCaseOpened: 'client.lifecycle.case.opened',
+  clientLifecycleCaseActivated: 'client.lifecycle.case.activated',
+  clientLifecycleItemAdvanced: 'client.lifecycle.item.advanced',
+  clientLifecycleBlockerAdded: 'client.lifecycle.blocker.added',
+  clientLifecycleBlockerResolved: 'client.lifecycle.blocker.resolved',
+  clientLifecycleCaseCompleted: 'client.lifecycle.case.completed',
+  clientLifecycleCaseCancelled: 'client.lifecycle.case.cancelled',
+  clientLifecycleBlockerOverridden: 'client.lifecycle.blocker.overridden'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

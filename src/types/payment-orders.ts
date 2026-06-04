@@ -62,7 +62,10 @@ export const PAYMENT_ORDER_ARTIFACT_KINDS = [
 
 export type PaymentOrderArtifactKind = (typeof PAYMENT_ORDER_ARTIFACT_KINDS)[number]
 
-export type PaymentOrderCurrency = 'CLP' | 'USD'
+// TASK-990 — MXN added for the export/import corridor. MXN payment orders are
+// gated by FINANCE_MXN_PAYMENT_ORDERS_ENABLED; until enabled, an MXN order is
+// rejected with `unsupported_corridor` (never silently created).
+export type PaymentOrderCurrency = 'CLP' | 'USD' | 'MXN'
 
 export interface PaymentOrder {
   orderId: string

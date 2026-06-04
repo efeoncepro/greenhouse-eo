@@ -27,9 +27,11 @@ describe('resolveFxReadiness', () => {
   })
 
   it('denies unsupported currency for the domain without touching DB', async () => {
+    // MXN is now a finance_core member (TASK-990); use COP, which is NOT in
+    // finance_core, to exercise the unsupported path.
     const result = await resolveFxReadiness({
       fromCurrency: 'USD',
-      toCurrency: 'MXN',
+      toCurrency: 'COP',
       rateDate: '2026-04-19',
       domain: 'finance_core'
     })

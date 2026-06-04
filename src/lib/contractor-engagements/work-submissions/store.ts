@@ -208,6 +208,25 @@ export const listWorkSubmissionsReadyForPayable = async (
   return rows.map(mapContractorWorkSubmission)
 }
 
+export const listWorkSubmissionsReadyForPayableQueue = async (
+  filters: { limit?: number; offset?: number } = {}
+): Promise<ContractorWorkSubmission[]> => {
+  const limit = Math.min(200, Math.max(1, filters.limit ?? 100))
+  const offset = Math.max(0, filters.offset ?? 0)
+
+  const rows = await query<ContractorWorkSubmissionRow>(
+    `SELECT ${WORK_SUBMISSION_SELECT_COLUMNS}
+     FROM greenhouse_hr.contractor_work_submissions
+     WHERE status = 'approved'
+       AND consumed_by_payable_id IS NULL
+     ORDER BY created_at ASC
+     LIMIT $1 OFFSET $2`,
+    [limit, offset]
+  )
+
+  return rows.map(mapContractorWorkSubmission)
+}
+
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
 const MIN_REASON_LENGTH = 10

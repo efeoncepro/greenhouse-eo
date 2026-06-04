@@ -14,6 +14,7 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 
 - [Design Tokens](design-tokens/README.md)
 - [Cloud Cost](cloud-cost/README.md)
+- [Client Lifecycle](client-lifecycle/README.md)
 - [Finance](finance/README.md)
 - [ICO](ico/README.md)
 - [Notion](notion/README.md)

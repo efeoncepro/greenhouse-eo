@@ -16,8 +16,8 @@ import {
 
 describe('currency-domain', () => {
   describe('invariants', () => {
-    it('finance_core is limited to CLP and USD to keep FinanceCurrency stable', () => {
-      expect(CURRENCY_DOMAIN_SUPPORT.finance_core).toEqual(['CLP', 'USD'])
+    it('finance_core supports CLP, USD and MXN (MXN promoted by the multi-currency ADR, TASK-990)', () => {
+      expect(CURRENCY_DOMAIN_SUPPORT.finance_core).toEqual(['CLP', 'USD', 'MXN'])
     })
 
     it('pricing_output carries the commercial currency set', () => {
@@ -60,13 +60,14 @@ describe('currency-domain', () => {
   })
 
   describe('isSupportedCurrencyForDomain', () => {
-    it('accepts CLP + USD for finance_core', () => {
+    it('accepts CLP, USD and MXN for finance_core (TASK-990)', () => {
       expect(isSupportedCurrencyForDomain('CLP', 'finance_core')).toBe(true)
       expect(isSupportedCurrencyForDomain('USD', 'finance_core')).toBe(true)
+      expect(isSupportedCurrencyForDomain('MXN', 'finance_core')).toBe(true)
     })
 
-    it('rejects MXN for finance_core', () => {
-      expect(isSupportedCurrencyForDomain('MXN', 'finance_core')).toBe(false)
+    it('rejects a non-finance_core currency (COP) for finance_core', () => {
+      expect(isSupportedCurrencyForDomain('COP', 'finance_core')).toBe(false)
     })
 
     it('accepts MXN for pricing_output', () => {

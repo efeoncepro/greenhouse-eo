@@ -13,6 +13,10 @@ import {
 } from '@/lib/finance/expense-tax-snapshot'
 import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
 import { recordSignal } from '@/lib/finance/external-cash-signals'
+import { VALID_CURRENCIES, type FinanceCurrency } from '@/lib/finance/contracts'
+import { isFinanceCoreMxnEnabled } from '@/lib/finance/multi-currency/flags'
+import { observedFxSnapshotEvidence, resolveFxSnapshotEvidence, type FxSnapshotEvidence } from '@/lib/finance/multi-currency/fx-snapshot'
+import { persistFxSnapshot } from '@/lib/finance/multi-currency/fx-snapshot-store'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import type { NuboxConformedSale, NuboxConformedPurchase, NuboxConformedBankMovement } from '@/lib/nubox/types'
@@ -75,6 +79,13 @@ const resolveNuboxIncomeTaxCode = (sale: NuboxProjectionSale): 'cl_vat_19' | 'cl
   const totalAmount = Math.abs(safeNum(sale.total_amount) ?? 0)
   const exemptAmount = Math.abs(safeNum(sale.exempt_amount) ?? 0)
 
+  // TASK-990 — export DTEs (110 factura, 111 nota débito, 112 nota crédito de
+  // exportación) son IVA-exentos por D.L. 825 Art 12 letra D/E, aunque Nubox no
+  // pueble exempt_amount. Clasificar exento explícito antes de la heurística.
+  if (sale.dte_type_code === '110' || sale.dte_type_code === '111' || sale.dte_type_code === '112') {
+    return 'cl_vat_exempt'
+  }
+
   if (sale.dte_type_code === '34' || exemptAmount > 0) return 'cl_vat_exempt'
   if (vatAmount > 0 || totalAmount > netAmount) return 'cl_vat_19'
 
@@ -122,7 +133,11 @@ export type SyncNuboxToPostgresResult = {
 
 // ─── Read Conformed Data ────────────────────────────────────────────────────
 
-const readConformedSales = async (projectId: string): Promise<NuboxProjectionSale[]> => {
+// Exported for the TASK-990 allowlisted Berel backfill (canonical reuse — the
+// backfill reads the conformed sale, injects the foreign plane from the SII XML,
+// and calls upsertIncomeFromSale so the income is written through the SAME path a
+// flag-on sync would use, never a replicated writer).
+export const readConformedSales = async (projectId: string): Promise<NuboxProjectionSale[]> => {
   const bq = getBigQueryClient()
 
   const [rows] = await bq.query({
@@ -200,7 +215,7 @@ const readConformedPurchases = async (projectId: string): Promise<NuboxProjectio
 
 // ─── Income Projection ─────────────────────────────────────────────────────
 
-const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
+export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
   // Skip if nubox_sale_id is not a valid number
   if (!sale.nubox_sale_id || isNaN(Number(sale.nubox_sale_id))) return 'skipped'
 
@@ -289,7 +304,63 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
   const signedTaxAmountSnapshot = taxWriteFields.taxAmountSnapshot * signMultiplier
   const signedTotalAmount = taxWriteFields.totalAmount * signMultiplier
 
+  // TASK-990 Slice 5b — native (foreign) plane. Additive: the existing CLP fields
+  // (currency='CLP', total_amount, total_amount_clp) stay the legal/functional
+  // record bit-for-bit. When the conformed sync sourced a foreign plane from the
+  // SII XML (foreign_currency_code + foreign_total_amount + functional CLP) AND
+  // the currency is a finance_core member, populate native_amount/native_currency
+  // and link an FX snapshot recording the document-legal MXN→CLP implied rate
+  // (source='nubox_legal_document', never recomputed). Gated FINANCE_CORE_MXN_ENABLED.
+  // USD reporting plane (amount_usd + functional→reporting snapshot) lands in Slice 8.
+  const foreignActive =
+    isFinanceCoreMxnEnabled() &&
+    !!sale.foreign_currency_code &&
+    VALID_CURRENCIES.includes(sale.foreign_currency_code as FinanceCurrency) &&
+    safeNum(sale.foreign_total_amount) != null &&
+    safeNum(sale.functional_total_amount_clp) != null
+
+  const nativeAmount = foreignActive ? Math.abs(safeNum(sale.foreign_total_amount) ?? 0) * signMultiplier : null
+  const nativeCurrency = foreignActive ? sale.foreign_currency_code : null
+
+  const fxEvidence: FxSnapshotEvidence | null = foreignActive
+    ? observedFxSnapshotEvidence({
+        fromCurrency: sale.foreign_currency_code as FinanceCurrency,
+        toCurrency: 'CLP',
+        fromAmount: Math.abs(safeNum(sale.foreign_total_amount) ?? 0),
+        toAmount: Math.abs(safeNum(sale.functional_total_amount_clp) ?? 0),
+        rateDate: sale.emission_date ?? new Date().toISOString().slice(0, 10)
+      })
+    : null
+
   await withGreenhousePostgresTransaction(async client => {
+    const fxSnapshotId = fxEvidence ? await persistFxSnapshot(fxEvidence, client) : null
+
+    // TASK-990 Slice 8 — reporting USD plane (ADR §8.4): USD is a PRESENTATION
+    // currency derived from the functional CLP via a CLP→USD snapshot at the
+    // emission date, NEVER a direct native→USD rate. Completes the 3-plane
+    // snapshot Slice 5b deferred. Degrade-honest: if no CLP→USD rate exists at
+    // emission, amount_usd + functional_to_reporting stay NULL and the signal
+    // finance.fx.snapshot_missing / native_equivalent_drift surface it.
+    let reportingFxSnapshotId: string | null = null
+    let amountUsd: number | null = null
+
+    if (foreignActive) {
+      const reporting = await resolveFxSnapshotEvidence({
+        fromCurrency: 'CLP',
+        toCurrency: 'USD',
+        rateDate: sale.emission_date ?? new Date().toISOString().slice(0, 10),
+        policy: 'rate_at_event',
+        domain: 'finance_core'
+      })
+
+      if (reporting.evidence) {
+        reportingFxSnapshotId = await persistFxSnapshot(reporting.evidence, client)
+        // Derive from the SAME functional CLP that is persisted (signedTotalAmount
+        // → total_amount_clp) so native_equivalent_drift stays at 0.
+        amountUsd = Math.round(signedTotalAmount * Number(reporting.evidence.rate) * 100) / 100
+      }
+    }
+
     await client.query(
       `INSERT INTO greenhouse_finance.income (
         income_id, client_id, organization_id, client_name, invoice_number, invoice_date, due_date,
@@ -304,6 +375,8 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
         origin, period_year, period_month,
         nubox_pdf_url, nubox_xml_url, nubox_details_url, nubox_references_url,
         client_main_activity,
+        native_amount, native_currency, native_to_functional_fx_snapshot_id,
+        amount_usd, functional_to_reporting_fx_snapshot_id,
         created_by_user_id, created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7,
@@ -318,6 +391,8 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
         $35, $36, $37,
         $38, $39, $40, $41,
         $42,
+        $44, $45, $46,
+        $47, $48,
         NULL, NOW(), NOW()
       )
       ON CONFLICT (income_id) DO UPDATE SET
@@ -339,6 +414,11 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
         nubox_pdf_url = COALESCE(EXCLUDED.nubox_pdf_url, greenhouse_finance.income.nubox_pdf_url),
         nubox_xml_url = COALESCE(EXCLUDED.nubox_xml_url, greenhouse_finance.income.nubox_xml_url),
         nubox_last_synced_at = COALESCE($43::timestamptz, greenhouse_finance.income.nubox_last_synced_at, NOW()),
+        native_amount = COALESCE(greenhouse_finance.income.native_amount, EXCLUDED.native_amount),
+        native_currency = COALESCE(greenhouse_finance.income.native_currency, EXCLUDED.native_currency),
+        native_to_functional_fx_snapshot_id = COALESCE(greenhouse_finance.income.native_to_functional_fx_snapshot_id, EXCLUDED.native_to_functional_fx_snapshot_id),
+        amount_usd = COALESCE(greenhouse_finance.income.amount_usd, EXCLUDED.amount_usd),
+        functional_to_reporting_fx_snapshot_id = COALESCE(greenhouse_finance.income.functional_to_reporting_fx_snapshot_id, EXCLUDED.functional_to_reporting_fx_snapshot_id),
         updated_at = NOW()`,
       [
         incomeId,
@@ -383,7 +463,12 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
         sale.details_url,
         sale.references_url,
         sale.client_main_activity,
-        sale.source_last_ingested_at
+        sale.source_last_ingested_at,
+        nativeAmount,
+        nativeCurrency,
+        fxSnapshotId,
+        amountUsd,
+        reportingFxSnapshotId
       ]
     )
 

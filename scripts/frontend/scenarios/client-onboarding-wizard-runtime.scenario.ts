@@ -1,0 +1,117 @@
+// TASK-992/998/1001 runtime — Client Onboarding wizard RUNTIME (not mockup).
+// Same Berel-via-HubSpot happy path, but drives the real /agency/clients/new
+// route (flag CLIENT_LIFECYCLE_ONBOARDING_ENABLED ON) to GVC-verify the live
+// fixes: Comercial datepicker (GreenhouseDatePicker), Espacio mode-card contrast
+// (color: inherit), and the removed manual "código numérico" field.
+// Mutating + safeForCapture (the wizard only writes on the final create, which
+// this scenario does not reach — it stops at Espacio).
+
+import type { CaptureScenario } from '../lib/scenario'
+
+export const scenario: CaptureScenario = {
+  name: 'client-onboarding-wizard-runtime',
+  route: '/agency/clients/new',
+  viewport: { width: 1440, height: 900 },
+  mutating: true,
+  safeForCapture: true,
+  initialHoldMs: 1400,
+  finalHoldMs: 400,
+  readiness: {
+    selector: '[data-capture="origin-hubspot"]',
+    absentSelectors: ['.MuiSkeleton-root'],
+    waitForFonts: true,
+    postReadyDelayMs: 250,
+    timeout: 12000
+  },
+  assertions: [
+    { kind: 'noLoginRedirect', reason: 'runtime vive bajo (dashboard) autenticado' },
+    { kind: 'noErrorBoundary', reason: 'la evidencia no debe capturar un error boundary' }
+  ],
+  steps: [
+    { kind: 'mark', label: 'step1-origen', note: 'Paso 1 Origen — 3 cards' },
+
+    // Open HubSpot picker + select Berel (prefills identity + currency + start date)
+    { kind: 'click', selector: '[data-capture="origin-hubspot"]' },
+    { kind: 'sleep', ms: 700 },
+    { kind: 'mark', label: 'hubspot-picker-open', note: 'Picker HubSpot abierto' },
+    { kind: 'click', selector: '[data-capture="hubspot-row-55405407542"]' },
+    { kind: 'sleep', ms: 600 },
+
+    // → Step 2 Identidad (prefilled)
+    { kind: 'click', selector: '[data-capture="wizard-next"]' },
+    { kind: 'sleep', ms: 500 },
+    { kind: 'mark', label: 'step2-identidad', note: 'Paso 2 Identidad precargado' },
+
+    // Next → Comercial (en runtime Berel no está en PG → sin gate de duplicado)
+    { kind: 'click', selector: '[data-capture="wizard-next"]' },
+    { kind: 'sleep', ms: 600 },
+
+    // → Step 3 Comercial — GreenhouseDatePicker (CHANGED: datepicker consistency)
+    { kind: 'mark', label: 'step3-comercial', note: 'Paso 3 Comercial — GreenhouseDatePicker inicio/fin + fases' },
+    { kind: 'sleep', ms: 250 },
+
+    // Abrir form "Agregar fase" → verificar datepicker de fase consistente (CHANGED)
+    { kind: 'click', selector: '[data-capture="add-phase"]' },
+    { kind: 'sleep', ms: 450 },
+    { kind: 'mark', label: 'step3-phase-form', note: 'Form de fase — GreenhouseDatePicker inicio/fin (antes era type=date nativo)' },
+
+    // → Step 4 Finanzas (MXN prefilled)
+    { kind: 'click', selector: '[data-capture="wizard-next"]' },
+    { kind: 'sleep', ms: 500 },
+    { kind: 'mark', label: 'step4-finanzas', note: 'Paso 4 Finanzas — MXN prefilled' },
+
+    // TASK-1006 — llenar el perfil financiero (dirección + OC) para verificar que esos
+    // campos llegan al resumen Confirmar (antes se descartaban y Confirmar los ocultaba).
+    { kind: 'fill', selector: '[data-capture="finance-billing-address"] input', value: 'Av. Reforma 123, Col. Juárez, CDMX' },
+    { kind: 'click', selector: '[data-capture="finance-requires-po"] input' },
+    { kind: 'sleep', ms: 300 },
+    { kind: 'fill', selector: '[data-capture="finance-po-number"] input', value: 'OC-2026-0042' },
+    { kind: 'sleep', ms: 200 },
+    { kind: 'mark', label: 'step4-finanzas-filled', note: 'Paso 4 Finanzas — perfil financiero lleno (dirección + OC vigente)' },
+
+    // → Step 5 Espacio (CHANGED: mode-card contrast + removed numeric code)
+    { kind: 'click', selector: '[data-capture="wizard-next"]' },
+    { kind: 'sleep', ms: 600 },
+    { kind: 'mark', label: 'step5-espacio', note: 'Paso 5 Espacio — cards Notion/Teams (contraste), sin código numérico manual' },
+
+    // Revelar paneles de vínculo → verificar isotipos Notion + Teams (CHANGED: Tabler glyphs, no SVG blob)
+    { kind: 'click', selector: 'button:has-text("Vincular teamspace existente")' },
+    { kind: 'sleep', ms: 350 },
+    { kind: 'click', selector: 'button:has-text("Vincular canal existente")' },
+    { kind: 'sleep', ms: 450 },
+    { kind: 'mark', label: 'step5-link-panels', note: 'Paneles de vínculo — isotipos Notion (N en caja blanca) + Teams (glyph púrpura Tabler)' },
+
+    // Clip al panel Teams → isotipo crisp (verificar glyph bien formado, no blob)
+    { kind: 'scroll', selector: '[data-capture="teams-connect-panel"]', scrollBlock: 'center' },
+    { kind: 'sleep', ms: 350 },
+    { kind: 'mark', label: 'teams-isotype-crisp', clipSelector: '[data-capture="teams-connect-panel"]', note: 'Panel Teams recortado — isotipo Tabler púrpura bien formado' },
+
+    // TASK-1010 GVC — estado DEGRADADO del picker Notion: token inválido → POST
+    // /api/admin/clients/lifecycle/notion/validate lo rechaza → Alert error honesto
+    // (state-design idle/validating/ok/error) + el fallback manual sigue disponible.
+    // validate es READ-ONLY (no crea cliente) → determinista + safeForCapture.
+    { kind: 'scroll', selector: '[data-capture="notion-token"]', scrollBlock: 'center' },
+    { kind: 'sleep', ms: 250 },
+    { kind: 'fill', selector: '[data-capture="notion-token"]', value: 'ntn_invalid_gvc_degraded_state' },
+    { kind: 'click', selector: 'button:has-text("Validar token")' },
+    { kind: 'sleep', ms: 2200 },
+    { kind: 'mark', label: 'notion-picker-degraded', clipSelector: '[data-capture="notion-connect-panel"]', note: 'Estado DEGRADADO — token Notion rechazado: Alert error honesto + fallback manual (state-design)' },
+
+    // Reset a "crear nuevo" (espacio válido) y avanzar a Confirmar para ver el
+    // banner de completitud — Berel es un cliente EXISTENTE INCOMPLETO (TASK-992).
+    { kind: 'click', selector: 'button:has-text("Crear teamspace nuevo")' },
+    { kind: 'click', selector: 'button:has-text("Crear canal nuevo")' },
+    { kind: 'sleep', ms: 300 },
+    { kind: 'click', selector: '[data-capture="wizard-next"]' },
+    { kind: 'sleep', ms: 1100 },
+    { kind: 'scroll', selector: '[data-capture="wizard-create"]', scrollBlock: 'center' },
+    { kind: 'sleep', ms: 300 },
+    { kind: 'mark', label: 'completeness-incomplete', note: 'Confirmar — banner cliente incompleto (Berel) + CTA Completar cliente' },
+
+    // TASK-1006 — clip legible de la sección Finanzas del Confirmar: dirección, país
+    // (México auto-derivado), OC requerida: Sí + N° vigente, HES, condiciones especiales.
+    { kind: 'scroll', selector: '[data-capture="confirmar-finanzas"]', scrollBlock: 'center' },
+    { kind: 'sleep', ms: 300 },
+    { kind: 'mark', label: 'confirmar-finanzas-summary', clipSelector: '[data-capture="confirmar-finanzas"]', note: 'Confirmar — sección Finanzas con los 5 campos persistidos (TASK-1006)' }
+  ]
+}

@@ -10,6 +10,12 @@ import {
   mapExpenseToConformedBankMovement,
   mapIncomeToConformedBankMovement
 } from '@/lib/nubox/mappers'
+import { normalizeTaxId } from '@/lib/finance/multi-currency/tax-identity'
+import { isNuboxExportForeignCurrencyEnabled } from '@/lib/finance/multi-currency/flags'
+import { captureOrphanRfcExports } from '@/lib/finance/nubox-export-rfc-disposition/store'
+import { getNuboxSaleXml } from '@/lib/nubox/client'
+import { parseDteForeignCurrencyXml } from '@/lib/nubox/dte-foreign-currency'
+import { captureWithDomain } from '@/lib/observability/capture'
 import type {
   NuboxSale,
   NuboxPurchase,
@@ -19,6 +25,10 @@ import type {
   NuboxConformedPurchase,
   NuboxConformedBankMovement
 } from '@/lib/nubox/types'
+
+// TASK-990 — export DTE legal codes (SII): 110 factura exportación, 111 nota
+// débito exportación, 112 nota crédito exportación.
+const EXPORT_DTE_CODES = new Set(['110', '111', '112'])
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -53,7 +63,9 @@ export const buildNuboxOrgByRutMap = async () => {
   const map = new Map<string, { organization_id: string; client_id: string | null }>()
 
   for (const row of rows) {
-    map.set(row.tax_id, {
+    // TASK-990 — key by normalized tax id (RUT or Mexican RFC) so the conformed
+    // mapper's normalized lookup matches. Berel (MX) keys on its RFC, not a RUT.
+    map.set(normalizeTaxId(row.tax_id), {
       organization_id: row.organization_id,
       client_id: row.client_id
     })
@@ -75,7 +87,7 @@ export const buildNuboxSupplierByRutMap = async () => {
   const map = new Map<string, string>()
 
   for (const row of rows) {
-    map.set(row.tax_id, row.supplier_id)
+    map.set(normalizeTaxId(row.tax_id), row.supplier_id)
   }
 
   return map
@@ -117,6 +129,45 @@ export const buildNuboxExpenseByNuboxIdMap = async () => {
   }
 
   return map
+}
+
+// ─── Export foreign-currency enrichment (TASK-990) ──────────────────────────
+
+/**
+ * For each export DTE (110/111/112), fetch the SII XML and populate the native
+ * (MXN) + functional (CLP) foreign-currency fields from `<Totales>` /
+ * `<OtraMoneda>`. Mutates the conformed rows in place. Best-effort per sale.
+ */
+const enrichExportSalesWithForeignCurrency = async (conformedSales: NuboxConformedSale[]): Promise<void> => {
+  const exportSales = conformedSales.filter(s => EXPORT_DTE_CODES.has(s.dte_type_code ?? ''))
+
+  for (const sale of exportSales) {
+    const saleId = Number(sale.nubox_sale_id)
+
+    if (!Number.isFinite(saleId)) continue
+
+    try {
+      const xml = await getNuboxSaleXml(saleId)
+      const parsed = parseDteForeignCurrencyXml(xml)
+
+      // Only populate when the XML actually carries a foreign plane with a
+      // recognized ISO currency + native amount. Otherwise leave fields null
+      // (CLP-only export, or unrecognized currency → fail-closed, never guess).
+      if (parsed?.nativeCurrencyCode && parsed.nativeTotal !== null) {
+        sale.foreign_total_amount = parsed.nativeTotal
+        sale.foreign_currency_code = parsed.nativeCurrencyCode
+        sale.functional_total_amount_clp = parsed.clpTotal
+        sale.exportation_detail_json = JSON.stringify(parsed)
+        sale.foreign_currency_evidence_source = 'nubox_xml'
+        sale.foreign_currency_confidence = 'high'
+      }
+    } catch (xmlError) {
+      captureWithDomain(xmlError, 'finance', {
+        tags: { source: 'nubox_export_xml_enrichment' },
+        extra: { nuboxSaleId: sale.nubox_sale_id, dteTypeCode: sale.dte_type_code }
+      })
+    }
+  }
 }
 
 // ─── Read Latest Raw Snapshots ──────────────────────────────────────────────
@@ -220,7 +271,10 @@ export const writeNuboxConformedSales = async (rows: NuboxConformedSale[]) => {
 
   const bq = getBigQueryClient()
 
-  await bq.dataset('greenhouse_conformed').table('nubox_sales').insert(rows)
+  // ignoreUnknownValues: defense-in-depth so a new conformed field added in code
+  // ahead of the BQ schema (TASK-990 foreign_* columns) never breaks the stream
+  // insert; missing columns are dropped, never error.
+  await bq.dataset('greenhouse_conformed').table('nubox_sales').insert(rows, { ignoreUnknownValues: true })
 }
 
 const writeConformedPurchases = async (projectId: string, rows: NuboxConformedPurchase[]) => {
@@ -228,7 +282,7 @@ const writeConformedPurchases = async (projectId: string, rows: NuboxConformedPu
 
   const bq = getBigQueryClient()
 
-  await bq.dataset('greenhouse_conformed').table('nubox_purchases').insert(rows)
+  await bq.dataset('greenhouse_conformed').table('nubox_purchases').insert(rows, { ignoreUnknownValues: true })
 }
 
 const writeConformedBankMovements = async (projectId: string, rows: NuboxConformedBankMovement[]) => {
@@ -236,7 +290,7 @@ const writeConformedBankMovements = async (projectId: string, rows: NuboxConform
 
   const bq = getBigQueryClient()
 
-  await bq.dataset('greenhouse_conformed').table('nubox_bank_movements').insert(rows)
+  await bq.dataset('greenhouse_conformed').table('nubox_bank_movements').insert(rows, { ignoreUnknownValues: true })
 }
 
 // ─── Sync Run Tracking ──────────────────────────────────────────────────────
@@ -311,9 +365,47 @@ export const syncNuboxToConformed = async (): Promise<SyncNuboxConformedResult> 
       ...rawIncomes.map(i => mapIncomeToConformedBankMovement(i, syncRunId))
     ]
 
+    // 3b. TASK-990 — enrich export DTEs (110/111/112) with the foreign-currency
+    // planes from the authoritative SII XML (`<Totales>` native + `<OtraMoneda>`
+    // CLP). Neither the /sales list nor /details endpoints expose this. Gated by
+    // NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED; best-effort per sale (an XML fetch
+    // failure leaves the foreign fields null, never breaks the sync).
+    if (isNuboxExportForeignCurrencyEnabled()) {
+      await enrichExportSalesWithForeignCurrency(conformedSales)
+    }
+
     // 4. Count orphans (no identity match)
     const orphanedSales = conformedSales.filter(s => s.client_rut && !s.organization_id).length
     const orphanedPurchases = conformedPurchases.filter(p => p.supplier_rut && !p.supplier_id).length
+
+    // 4b. TASK-990 — capture orphan EXPORT sales (DTE 110/111/112 with a tax id
+    // that did not match any organization) into the reviewed-disposition queue.
+    // Best-effort: a capture failure must never break the conformed sync.
+    const orphanExportSales = conformedSales.filter(
+      s => EXPORT_DTE_CODES.has(s.dte_type_code ?? '') && s.client_rut && !s.organization_id
+    )
+
+    if (orphanExportSales.length > 0) {
+      try {
+        await captureOrphanRfcExports(
+          orphanExportSales.map(s => ({
+            nuboxSaleId: s.nubox_sale_id,
+            dteTypeCode: s.dte_type_code,
+            rfcRaw: s.client_rut as string,
+            rfcNormalized: normalizeTaxId(s.client_rut),
+            clientTradeName: s.client_trade_name,
+            foreignTotalAmount: s.foreign_total_amount,
+            foreignCurrencyCode: s.foreign_currency_code,
+            functionalTotalAmountClp: s.functional_total_amount_clp
+          }))
+        )
+      } catch (captureError) {
+        captureWithDomain(captureError, 'finance', {
+          tags: { source: 'nubox_export_rfc_disposition_capture' },
+          extra: { orphanExportCount: orphanExportSales.length }
+        })
+      }
+    }
 
     // 5. Append conformed snapshots; downstream readers select latest snapshot per Nubox ID
     await writeNuboxConformedSales(conformedSales)

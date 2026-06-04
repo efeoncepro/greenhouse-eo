@@ -22,6 +22,13 @@ vi.mock('@/lib/webhooks/signing', () => ({
   resolveSecret: async () => 'test-secret'
 }))
 
+// TASK-1010 Slice 3 — deal events delegan al sub-handler hubspot-deals.
+const processHubSpotDealEventsMock = vi.hoisted(() => vi.fn(async () => {}))
+
+vi.mock('./hubspot-deals', () => ({
+  processHubSpotDealEvents: processHubSpotDealEventsMock
+}))
+
 const handlersByCode: Record<string, (...args: unknown[]) => Promise<void>> = {}
 
 vi.mock('@/lib/webhooks/inbound', () => ({
@@ -323,6 +330,78 @@ describe('hubspot-companies webhook handler (TASK-878 async path)', () => {
       await handler(buildInboxEvent(headers), rawBody, events)
 
       expect(publishOutboxEventMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('deal delegation (TASK-1010 Slice 3)', () => {
+    beforeEach(() => processHubSpotDealEventsMock.mockClear())
+
+    it('delega deal events (object 0-3) a processHubSpotDealEvents, NO los trata como company', async () => {
+      const handler = handlersByCode['hubspot-companies']
+
+      const events = [
+        { subscriptionType: 'object.propertyChange', objectTypeId: '0-3', objectId: 555, propertyName: 'dealstage' }
+      ]
+
+      const rawBody = JSON.stringify(events)
+      const ts = String(Date.now())
+      const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
+
+      const headers = {
+        'x-hubspot-signature-v3': sig,
+        'x-hubspot-request-timestamp': ts,
+        'x-forwarded-uri': TARGET_URI
+      }
+
+      await handler(buildInboxEvent(headers), rawBody, events)
+
+      expect(processHubSpotDealEventsMock).toHaveBeenCalledTimes(1)
+      expect(processHubSpotDealEventsMock).toHaveBeenCalledWith([events[0]])
+      // Un deal event NO debe emitir un outbox de company sync.
+      expect(publishOutboxEventMock).not.toHaveBeenCalled()
+    })
+
+    it('delega legacy deal.* events también', async () => {
+      const handler = handlersByCode['hubspot-companies']
+
+      const events = [{ subscriptionType: 'deal.creation', objectId: 777 }]
+      const rawBody = JSON.stringify(events)
+      const ts = String(Date.now())
+      const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
+
+      const headers = {
+        'x-hubspot-signature-v3': sig,
+        'x-hubspot-request-timestamp': ts,
+        'x-forwarded-uri': TARGET_URI
+      }
+
+      await handler(buildInboxEvent(headers), rawBody, events)
+
+      expect(processHubSpotDealEventsMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('un batch mixto (company + deal) procesa ambos canales', async () => {
+      const handler = handlersByCode['hubspot-companies']
+
+      const events = [
+        { subscriptionType: 'company.creation', objectId: 27778972424 },
+        { subscriptionType: 'object.propertyChange', objectTypeId: '0-3', objectId: 555, propertyName: 'dealstage' }
+      ]
+
+      const rawBody = JSON.stringify(events)
+      const ts = String(Date.now())
+      const sig = buildHubSpotSignature(rawBody, ts, 'test-secret')
+
+      const headers = {
+        'x-hubspot-signature-v3': sig,
+        'x-hubspot-request-timestamp': ts,
+        'x-forwarded-uri': TARGET_URI
+      }
+
+      await handler(buildInboxEvent(headers), rawBody, events)
+
+      expect(processHubSpotDealEventsMock).toHaveBeenCalledTimes(1)
+      expect(publishOutboxEventMock).toHaveBeenCalledTimes(1) // company sync
     })
   })
 })

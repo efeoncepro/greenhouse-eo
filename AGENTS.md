@@ -40,6 +40,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 - ADRs: decisiones arquitectonicas viven bajo `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` y el indice `docs/architecture/DECISIONS_INDEX.md`. Si una task cambia source of truth, schema, access, auth, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, debe identificar o proponer ADR antes de implementar.
 - Contexto y auditoria: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` gobierna como usar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder memoria historica.
 - Source of truth: si task/spec, arquitectura y runtime real discrepan, prevalecen arquitectura vigente + codigo/schema/runtime verificados. Corregir la spec antes de implementar si el drift cambia contrato o bloquea.
+- Full API parity: toda capacidad que pueda ejecutarse dentro de Greenhouse debe tener o planificar un contrato programatico equivalente. La UI no debe ser el unico camino para ejecutar una accion de negocio: debe consumir primitives server-side, commands/readers y contratos API gobernados por `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`. No exponer tablas ni replicar botones como endpoints ad hoc.
 - Calidad de solucion: no entregar parches fragiles si el problema pide causa raiz. Aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`; cualquier workaround debe ser temporal, reversible, documentado y con owner/retirada.
 - Copy visible: antes de escribir labels, CTAs, empty states, alerts, tooltips, aria-labels o mensajes, buscar/crear la entrada en la capa canonica. `src/lib/copy/*` guarda microcopy funcional y copy reutilizable por dominio; `src/config/greenhouse-nomenclature.ts` guarda solo nomenclatura de producto, navegacion y labels institucionales. No hardcodear copy reusable en JSX.
 - Proporcionalidad: discovery breve para cambios locales; protocolo completo para cambios cross-domain, auth, billing, finance, data, cloud, migraciones, observabilidad o UI visible.
@@ -67,6 +68,7 @@ Estos CLIs estan autenticados localmente. Cuando una task toca su dominio, **usa
 - **PostgreSQL CLI (`psql`)** via `pnpm pg:connect`: levanta proxy Cloud SQL + conexion auto, sin credenciales manuales.
 - **Timeout en macOS (`gtimeout`)**: este workspace corre en macOS, donde `timeout` GNU no existe por defecto. `coreutils` esta instalado via Homebrew y el comando canonico es `gtimeout <duracion> <comando>` (ej. `gtimeout 30s pnpm test`). No usar `timeout` crudo en recetas para agentes; si un script debe ser portable, detectar `gtimeout || timeout` o implementar timeout en Node.
 - **Greenhouse Visual Capture (`GVC`, `pnpm fe:capture`)**: herramienta canonica Playwright + agent auth para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal, con `index.html`, readiness/assertions, failure taxonomy, quality findings, microinteraction evidence y multi-viewport opt-in. Reemplaza el patron ad-hoc de `_cap.mjs`. Scenario DSL declarativo bajo `scripts/frontend/scenarios/`. Output `.captures/<ISO>_<scenario>/` (gitignored). Triple gate para production. Comandos: `pnpm fe:capture <scenario> --env=staging [--gif] [--headed]` o `pnpm fe:capture --route=/path --env=staging --hold=3000`. Comandos relacionados: `pnpm fe:capture:review <scenario|capture-dir>` genera dossier para UI review, `pnpm fe:capture:diff <prev> <curr>` compara before/after, `pnpm fe:capture:health` audita salud local reciente y `pnpm fe:capture:gc [--apply]` purga >30d. Para pantallas largas usar scenario con `scroll selector`, `scrollTo`, `mark fullPage` o `mark clipSelector`; preferir `data-capture="<seccion>"` sobre offsets fragiles. Para flows críticos usar `readiness`, `assertions`, `interaction`, `viewports` y `baseline` cuando aplique. Arquitectura: `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md`. Manual: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`.
+- **Hook obligatorio de diseno UI (skills + GVC en loop) — ANY UI work:** para CUALQUIER trabajo de UI (componente nuevo, cambio visual, layout, estados, microinteracciones, mockup, copy visible), ANTES de escribir JSX nuevo invocar las skills de product design que apliquen (`greenhouse-ux`, `modern-ui`, `state-design`, `forms-ux`, `greenhouse-ux-writing`) y DESPUES verificar con GVC en loop (`pnpm fe:capture` → leer el frame PNG → ajustar → re-capturar hasta verse enterprise). NUNCA pintar UI freehand ni declarar "listo" en UI sin una captura GVC mirada. Mockup↔runtime: paridad por copy-and-patch + `fe:capture:diff`. Enforcement humano de Julio (sesion TASK-997).
 - **Hook operativo de verificacion visual UI:** cuando una tarea o diagnostico toca UI visible, microinteractions, responsive, screenshots, secuencias de frames, design QA o "se ve bien/mal", la evidencia visual primaria debe salir de Greenhouse Visual Capture (`pnpm fe:capture`) o `pnpm fe:capture:review`. Si existe scenario, usarlo; si no, usar `--route` para evidencia rapida y crear scenario bajo `scripts/frontend/scenarios/` cuando el flujo vaya a repetirse, tenga interacciones o requiera scroll/captura de secciones. Solo usar Playwright ad-hoc como camino principal si hace falta consola/red/API payloads o una interaccion que el DSL aun no soporte; en ese caso guardar artifacts bajo `.captures/`, explicar por que no basto `GVC` y preferir convertir el caso en scenario despues. Si `fe:capture` falla por env faltante (por ejemplo `VERCEL_AUTOMATION_BYPASS_SECRET`), reportar el bloqueo exacto y probar `--env=local` cuando aplique, no reemplazar silenciosamente por screenshots sueltas.
 - **Hook operativo de browser diagnostics:** si el usuario pide abrir, revisar, diagnosticar, capturar o testear una ruta/URL del portal, invocar automaticamente `greenhouse-browser-diagnostics` y usar usuario agente dedicado + Playwright/Chromium. No pedir login al usuario ni navegar anonimo como primer intento. Para `dev-greenhouse.efeoncepro.com`, automatizar contra la URL `.vercel.app` canonica con bypass, salvo que el objetivo sea inspeccionar la SSO wall.
 
@@ -115,6 +117,13 @@ Si falta alguno de esos pasos, el cierre debe decir `code complete, rollout pend
   - si el fix correcto vive en una primitive compartida, schema, worker, env, secret, docs o arquitectura, actuar ahi en vez de parchear el caller visible
   - un workaround solo es aceptable como mitigacion temporal: reversible, documentado, con owner, condicion de retiro y task/issue asociada cuando aplique
   - fuente canonica: `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
+- **Principio full API parity**:
+  - si una accion, consulta, workflow, reporte, export, recovery, aprobacion o configuracion puede hacerse en Greenhouse, debe existir un camino programatico equivalente o una task/ADR explicita para crearlo
+  - la UI debe ser consumidor de primitives canonicas (`src/lib/**` commands/readers/projections) y no la unica implementacion de la logica
+  - nuevas capacidades deben declarar desde el diseno que contrato API/MCP/app lane las consumira o por que quedan temporalmente UI-only
+  - writes programaticos requieren command semantics explicita, authorization tenant-safe, audit/outbox cuando aplique, idempotencia si pueden reintentarse, errores sanitizados y observabilidad
+  - no crear endpoints como "click handlers remotos"; el contrato debe modelar el aggregate/recurso/command, no el componente visible
+  - fuente canonica: `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`, `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` y `docs/architecture/DECISIONS_INDEX.md` decision "Full API parity".
 - Si el trabajo toca permisos, navegacion, Home, menu, guards, surfaces por rol o diseño de nuevas capacidades:
   - revisar `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
   - revisar `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
@@ -895,6 +904,7 @@ Existen **3 integraciones Notion productivas/no-productivas** + **1 dedicada al 
 | **Greenhouse** | env `NOTION_TOKEN` (staging/dev) | Runtime no-productivo (`dev-greenhouse`, preview, local) | Efeonce + Sky (staging/dev) | **Staging/Dev** |
 | **Greenhouse PRD** | `notion-integration-token-greenhouse-prd` (2026-05-21) → env `NOTION_TOKEN` | Runtime Vercel prod + `ops-worker` (re-fetch status transitions TASK-912 + writeback `[GH]` properties TASK-916) | Efeonce + Sky (productivo) | Producción |
 | **(dedicada demo)** | `notion-integration-token-greenhouse-metrics-demo` (2026-05-19) → `NOTION_METRICS_DEMO_TOKEN_SECRET_REF` | `ops-worker` compute/writeback demo (TASK-913) | **SOLO** teamspace `Demo Greenhouse` (`36339c2f-…`) | Sandbox demo |
+| **Por cliente (scoped, TASK-998)** | `notion-integration-token-greenhouse-<slug>` → `space_notion_sources.notion_token_secret_ref` (ej. `notion-integration-token-greenhouse-berel`, 2026-06-03) | sync per-space (pendiente `notion-bigquery`) + checklist onboarding | **SOLO** el teamspace de ESE cliente (el token ES el scope) | Producción (clientes nuevos) |
 
 **⚠️ Reglas duras**:
 
@@ -907,6 +917,44 @@ Existen **3 integraciones Notion productivas/no-productivas** + **1 dedicada al 
 - **SIEMPRE** que emerja una integración Notion nueva (e.g. otro cliente, otro pipeline), agregarla a este registry con su secret + consumer + scope + entorno antes del primer uso, y enumerar a qué teamspaces se le concede acceso.
 
 **Verificación operador-side** (no es código — son settings de Notion): la lista de integraciones conectadas a un teamspace se ve en Notion → teamspace → Settings → Connections. Para auditar fuga a BQ: `bq query 'SELECT source_database_id, space_id, COUNT(*) FROM efeonce-group.notion_ops.raw_pages_snapshot GROUP BY 1,2'` — todo `source_database_id` debe pertenecer a Efeonce (`spc-c0cf6478-…`) o Sky (`spc-ae463d9f-…`); cualquier `36339c2f…` (demo) es fuga.
+
+### Notion teamspace linking — token POR teamspace + cómo enumerar DBs (TASK-998, desde 2026-06-03)
+
+Vincular el teamspace Notion de un **cliente nuevo** = **una integración interna scoped SOLO a ese teamspace**, cuyo token **es el scope**. La compartida `notion-token` queda solo para Efeonce/Sky legacy. Verificado live (Berel):
+
+- **REST NO enumera teamspaces**: `/v1/teams`=400; `parent` de un data_source es `database_id`, no teamspace; las DBs de un teamspace **no comparten prefijo de id** → heurístico de prefijo inválido.
+- **MCP claude.ai `notion-get-teams` SÍ enumera** pero es OAuth interactivo **NO runtime-available** (solo un agente lo usa para obtener IDs).
+- **Gate real = ACCESO**: el token compartido da 404 en DBs no compartidas con él. Ninguna vía lee un teamspace no compartido con su credencial.
+
+Flujo canónico (checklist `provision_notion_workspace`, NO el wizard): operador pega el token scoped → `discoverNotionDatabasesForToken` (`src/lib/client-onboarding/notion-token-connect.ts`) hace `POST /v1/search` (devuelve SOLO las DBs de ese cliente) → auto-clasifica Tareas/Proyectos/Sprints por título → operador confirma → token a Secret Manager (`notion-integration-token-greenhouse-<slug>`, `printf %s`) + `space_notion_sources.notion_token_secret_ref` (NUNCA el token crudo).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** enumerar teamspaces con `/v1/search` crudo + heurística de prefijo. Usar el token scoped por cliente + clasificación por título.
+- **NUNCA** cablear el MCP claude.ai a un backend (OAuth interactivo, absent en headless).
+- **NUNCA** agregar un teamspace de cliente nuevo a la integración compartida `notion-token` "para que el discover lo vea". Cada cliente = su integración scoped.
+- **NUNCA** persistir el token Notion crudo en PG/logs/eventos. Solo el `*_SECRET_REF`; a Secret Manager con `printf %s`.
+- **NUNCA** vincular el teamspace en el wizard de nacimiento (vive en el checklist de provisioning — separación de concerns).
+- **Teams**: el bot Graph (`/v1.0/teams` + `/teams/{id}/channels`) ya lista teams+canales sin permisos nuevos (verificado: "Berel - Efeonce" › "Squad Berel"). Chats 1:1 fuera de scope.
+
+Spec: `docs/tasks/to-do/TASK-998-notion-teams-teamspace-linking-discover-register.md`.
+
+### Notion data_sources endpoint canónico — extractor notion-bq-sync (TASK-1003, desde 2026-06-04)
+
+El extractor `notion-bq-sync` (repo hermano `efeoncepro/notion-bigquery`, Cloud Run `us-central1`) queryea Notion **SIEMPRE por `POST /v1/data_sources/{id}/query` + Notion-Version `2026-03-11`** (revisión live `00021-wkl`, flag `NOTION_DATA_SOURCES_ENDPOINT_ENABLED=true`). El endpoint legacy `/v1/databases/{id}/query` (deprecado por Notion 2025-09-03) queda muerto.
+
+- **Resolver runtime** `resolve_data_source_id(configured_id)`: `GET /v1/data_sources/{id}`→200 (ya es data_source) o fallback `GET /v1/databases/{id}`→`data_sources[0].id` (legacy). Multi-data-source (>1) → fail-fast. Hereda el token per-space (TASK-1000) vía `_notion_headers`. El `database_id` configurado se conserva como identidad (snapshot/binding); solo la URL usa el id resuelto.
+- **`in_trash` (no `archived`)** bajo 2026-03-11: `page.get("in_trash", page.get("archived", False))`. **404 NO transitorio** (4xx salvo 429 → fail-fast).
+- Efeonce/Sky/Berel migrados a data_source ids en `space_notion_sources` (PG SSOT + BQ mirror, Slice 4) → consistentes con clientes nuevos.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** reintroducir `/v1/databases/{id}/query` ni Notion-Version `2022-06-28` en el extractor; ni guardar parent database ids para meter un cliente por el endpoint viejo (parche rechazado, Solution Quality Contract).
+- **NUNCA** desplegar `notion-bq-sync` con `bash deploy.sh` a secas (usa `--env-vars-file`/`--set-secrets` REPLACE → borra las vars per-space + el secret `GREENHOUSE_POSTGRES_PASSWORD` que viven manuales en la revisión; `.env.yaml` es gitignored y no los contiene). Deploy canónico: `gcloud run deploy notion-bq-sync --source --function=notion_bq_sync --update-env-vars=... --update-secrets=...` (MERGE), re-aseverando `NOTION_PER_SPACE_TOKEN_ENABLED=true` + `GREENHOUSE_POSTGRES_{INSTANCE_CONNECTION_NAME,DB,USER}` + ambos secrets.
+- **NUNCA** flipear `NOTION_DATA_SOURCES_ENDPOINT_ENABLED` ni bumpear `NOTION_VERSION` sin correr `parity_check_task1003.py` (read-only, no escribe BQ) → PARIDAD TOTAL. Rollback <5 min: flag OFF (`gcloud run services update --update-env-vars`) o traffic a revisión previa (`00020-6vw`/`00019-fgp`).
+- **SIEMPRE** un cliente nuevo entra nativo (data_source ids del wizard + token scoped + `sync_enabled=TRUE`), cero casos especiales — el cutover NO se repite por cliente (proceso idempotente/escalable).
+
+**Spec**: `docs/architecture/GREENHOUSE_NOTION_BQ_SYNC_DATA_SOURCES_MIGRATION_V1.md` · task `docs/tasks/complete/TASK-1003-notion-bq-sync-data-sources-endpoint-migration.md` · funcional `docs/documentation/operations/notion-bigquery-sync.md` · manual `docs/manual-de-uso/operations/notion-bq-sync-operacion.md`.
 
 ### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
 

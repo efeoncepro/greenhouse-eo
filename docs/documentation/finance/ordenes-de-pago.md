@@ -1,9 +1,9 @@
 # Órdenes de Pago — Finanzas
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-01 por Julio Reyes
-> **Ultima actualizacion:** 2026-05-05 por Julio Reyes
+> **Ultima actualizacion:** 2026-06-02 por Codex — integracion corrida contractors
 > **Documentacion tecnica:** [docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md)
 
 ## Processor vs instrumento de salida
@@ -29,7 +29,7 @@ paga). Vive en `/finance/payment-orders`.
 
 Cada orden:
 
-- agrupa una o mas obligaciones (nomina, proveedores, impuestos),
+- agrupa una o mas obligaciones (nomina, contractors, proveedores, impuestos),
 - tiene una fecha programada y un metodo de pago,
 - pasa por maker-checker (quien la crea no la aprueba),
 - emite eventos auditados al outbox en cada cambio de estado,
@@ -73,7 +73,10 @@ cancela, la obligation queda libre para reasignarse.
 
 1. **Generar obligaciones**: al exportar una nomina, el sistema crea
    automaticamente las `payment_obligations` (neto colaborador, cotizaciones
-   empleador, retenciones).
+   empleador, retenciones). Para contractors, la obligacion nace cuando el
+   payable pasa a `ready_for_finance`: el bridge crea
+   `source_kind='contractor_payable'`, `obligation_kind='provider_payroll'` y
+   monto por el neto a pagar al contractor.
 2. **Seleccionar y crear orden**: en la pestaña Obligaciones, marcar las
    obligaciones a pagar y click en "Crear orden de pago". Configurar metodo
    de pago, fecha programada y maker-checker.
@@ -89,6 +92,33 @@ cancela, la obligation queda libre para reasignarse.
    Las obligations vinculadas pasan a `paid`.
 7. **Conciliar (TASK-722)**: el modulo Conciliacion cruza el pago contra el
    extracto bancario.
+
+## Integracion con pagos a contractors
+
+La pantalla `/finance/contractor-payments` no paga por si sola. Su corrida
+mensual prepara el lote para Tesoreria:
+
+- barre obligaciones `provider_payroll` con
+  `source_kind='contractor_payable'`,
+- agrupa por moneda,
+- crea ordenes de pago `pending_approval`,
+- marca el payable como `payment_order_created`.
+
+Desde ahi, Payment Orders conserva el ownership del pago:
+
+```text
+contractor payment run
+  -> payment_order pending_approval
+  -> approved
+  -> scheduled/submitted
+  -> paid
+  -> contractor-payable-paid-cascade
+  -> contractor remittance advice
+```
+
+El gasto contractor se reconoce por el bruto del payable. La orden paga el
+neto al contractor; la retencion SII queda como pasivo separado a remesar al
+SII.
 
 ## Reglas duras
 
@@ -113,3 +143,12 @@ Cada accion publica un evento en `greenhouse_sync.outbox_events`:
 > Detalle tecnico: helpers en [src/lib/finance/payment-orders/](../../../src/lib/finance/payment-orders/).
 > API en [src/app/api/admin/finance/payment-orders/](../../../src/app/api/admin/finance/payment-orders/).
 > Schema en [migrations/20260501143749876_task-750-payment-orders.sql](../../../migrations/20260501143749876_task-750-payment-orders.sql).
+
+## Delta 2026-06-02 — Órdenes de pago en MXN (TASK-990)
+
+Con la promoción de MXN a moneda finance-core, las órdenes de pago aceptan `MXN` (además de `CLP`/`USD`), detrás del flag `FINANCE_MXN_PAYMENT_ORDERS_ENABLED` (apagado por defecto). Reglas que se mantienen:
+
+- **Una orden, una sola moneda** (invariante reforzado): una orden de pago no mezcla monedas. Si una orden quedaría con monedas mixtas, se rechaza con `unsupported_corridor` antes de iniciar la transacción. La señal `finance.payment_order.mixed_currency_attempt` (steady = 0) lo detecta como defensa en profundidad.
+- Con el flag apagado, una orden MXN se rechaza (`unsupported_corridor`) — el comportamiento CLP/USD es idéntico al anterior.
+
+> Detalle técnico: [TASK-990](../../tasks/in-progress/TASK-990-mxn-multi-currency-finance-core.md) Slice 6. Berel es income/AR; las órdenes MXN son infraestructura forward-looking de payables.

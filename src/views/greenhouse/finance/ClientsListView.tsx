@@ -73,8 +73,6 @@ const cliColumns: ColumnDef<ClientProfile, any>[] = [
   })
 ]
 
-import CreateClientDrawer from '@views/greenhouse/finance/drawers/CreateClientDrawer'
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -96,6 +94,12 @@ interface ClientProfile {
 
 const ClientsListView = () => {
   const router = useRouter()
+
+  // TASK-1010 Slice 2 — el alta de cliente vive SIEMPRE en la puerta única (wizard
+  // `provisionClientFromWizard`). Se eliminó el fallback al viejo CreateClientDrawer
+  // que creaba clientes en paralelo (anti-patrón que violaba la regla de puerta única
+  // TASK-992). Completar el perfil financiero de un cliente EXISTENTE vive ahora en el
+  // FinanceFacetDrawer, montado en la ficha del cliente (ClientDetailView).
   const [loading, setLoading] = useState(true)
   const [clients, setClients] = useState<ClientProfile[]>([])
   const [total, setTotal] = useState(0)
@@ -103,7 +107,6 @@ const ClientsListView = () => {
   const [poFilter, setPoFilter] = useState('')
   const [hesFilter, setHesFilter] = useState('')
   const [error, setError] = useState('')
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [sorting, setSorting] = useState<SortingState>([{ id: 'legalName', desc: false }])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -244,9 +247,9 @@ const ClientsListView = () => {
             variant='contained'
             color='primary'
             startIcon={<i className='tabler-plus' />}
-            onClick={() => setDrawerOpen(true)}
+            onClick={() => router.push('/agency/clients/new')}
           >
-            Nuevo perfil
+            Nuevo cliente
           </Button>
         </Box>
       </Box>
@@ -368,8 +371,6 @@ const ClientsListView = () => {
         </div>
         <TablePaginationComponent table={cliTable as ReturnType<typeof useReactTable>} />
       </Card>
-
-      <CreateClientDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchClients() }} />
     </Box>
   )
 }

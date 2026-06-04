@@ -1,6 +1,11 @@
-export type FinanceCurrency = 'CLP' | 'USD'
+// TASK-990: MXN promoted from pricing-only to finance_core (ADR
+// GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1, accepted 2026-06-02). The prior
+// `CLP | USD` narrow type was a pre-ADR guard; the ADR's whole purpose is to
+// promote MXN. Write paths stay gated by FINANCE_CORE_MXN_ENABLED (default off)
+// until schema + readers classify MXN safely (expand-and-contract).
+export type FinanceCurrency = 'CLP' | 'USD' | 'MXN'
 
-export const VALID_CURRENCIES: FinanceCurrency[] = ['CLP', 'USD']
+export const VALID_CURRENCIES: FinanceCurrency[] = ['CLP', 'USD', 'MXN']
 
 export const QUOTATION_SOURCE_SYSTEMS = ['manual', 'hubspot', 'nubox'] as const
 export type QuotationSourceSystem = (typeof QUOTATION_SOURCE_SYSTEMS)[number]

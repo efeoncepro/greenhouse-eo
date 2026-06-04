@@ -231,6 +231,26 @@ Esto cierra el loop: el row de `notifications` (in-app) muestra checkmark, el fo
 
 Análogamente, `ops.alert.snooze` actualiza `notification_intents` con `status='superseded'` + un row paralelo en `notification_snoozes` (futuro) que el router consulta antes de dispatchar el siguiente evento del mismo `correlation_id`.
 
+### 6.1 Payment-status 1:1 announcements
+
+Discovery 2026-06-04 validated a concrete manual bridge for 1:1 payment-status announcements:
+
+- Payment-ready messages can be delivered by the Greenhouse TeamBot to a personal Teams chat with `recipient_kind='chat_1on1'` and `recipient_user_id=<aadObjectId>`.
+- For recurring/productized sends, the Hub must not persist one static channel row per person. The canonical shape is:
+  - `notification_intents.recipient_kind='member'`
+  - `notification_intents.recipient_member_id=<member_id>`
+  - `notification_deliveries.channel='teams_dm'`
+  - adapter target = the Hub Teams DM adapter / Bot Framework message id
+  - correlation/dedup based on the payment aggregate, period and recipient, not a random UUID
+- The Teams DM adapter reuses `resolveTeamsUserForMember(memberId)`, then `sendViaBotFramework()` with a phantom `TeamsChannelRecord` using `recipient_kind='dynamic_user'` and `recipient_routing_rule_json={ from: 'payload.recipientMemberId' }`.
+- Existing source events should be reused where possible:
+  - contractor / honorarios: `workforce.contractor_payable.paid`
+  - payment order settlement: `finance.payment_order.paid` / `finance.payment_order.settled`
+  - payroll employee payment: add a canonical per-member payment event if the existing order/obligation event does not carry enough recipient grain.
+- Message bodies must stay low-PII: status + link button only. Do not include amounts, bank details, transfer references or account identifiers in Teams.
+
+The manual CLI/runbook remains a temporary bridge and audit aid until TASK-690 to TASK-693 make the Hub canonical.
+
 ## 7. Sinergia con Reliability Control Plane
 
 El hub publica un nuevo módulo `'notifications.hub'` en `RELIABILITY_REGISTRY` con `incidentDomainTag='notifications.hub'`. Signals esperados:

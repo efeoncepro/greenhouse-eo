@@ -882,6 +882,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    // TASK-990 — Resolver/descartar disposición de factura de exportación Nubox
+    // (DTE 110/111/112) con RFC sin match automático. Grant runtime explícito
+    // (TASK-873 invariant: capability sin grant = 403 latente).
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.nubox_export.review_disposition',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
     addEntitlement(entries, {
       module: 'finance',
       capability: 'finance.payment_orders.recover',
@@ -1491,6 +1502,36 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN)) {
     addEntitlement(entries, { module: 'commercial', capability: 'commercial.party.promote_to_client', action: 'update', scope: 'tenant', source: 'role' })
     addEntitlement(entries, { module: 'commercial', capability: 'commercial.quote_to_cash.execute', action: 'approve', scope: 'tenant', source: 'role' })
+  }
+
+  // ─── TASK-992 — Client Lifecycle Orchestrator (GREENHOUSE_CLIENT_LIFECYCLE_V1 §8) ───
+  // Grants collapsed to real ROLE_CODES (anti-ghost-role TASK-935): the V1 spec
+  // mentions commercial_admin/operations which do not exist. open/resolve are
+  // admin-grade writes (EFEONCE_ADMIN + FINANCE_ADMIN); advance/read follow the
+  // commercial/finance route groups; override_blocker is EFEONCE_ADMIN only.
+  if (
+    hasRouteGroup(subject, 'commercial') ||
+    hasRouteGroup(subject, 'finance') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource =
+      hasRouteGroup(subject, 'commercial') || hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
+
+    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.read', action: 'read', scope: 'tenant', source })
+    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.advance', action: 'update', scope: 'tenant', source })
+    // TASK-1001 — inviting client-portal users is part of advancing the onboarding
+    // checklist (provision_client_users_access). Same tier as advance, NOT EFEONCE_ADMIN-only.
+    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.portal_user.invite', action: 'create', scope: 'tenant', source })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ADMIN)) {
+    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.open', action: 'create', scope: 'tenant', source: 'role' })
+    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.resolve', action: 'approve', scope: 'tenant', source: 'role' })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.override_blocker', action: 'override', scope: 'tenant', source: 'role' })
   }
 
   // ─── TASK-696 Wave 6 — Smart Home strategic blocks (CEO/role-aware) ───

@@ -4,6 +4,12 @@
 
 Greenhouse EO — portal operativo de Efeonce Group. Next.js 16 App Router + MUI 7.x + Vuexy starter-kit + TypeScript 5.9. Deploy en Vercel.
 
+### Operator Communication Style
+
+- Hablarle al operador en español neutro latinoamericano, natural para una persona venezolana viviendo en Chile.
+- Evitar modismos argentinos y voseo rioplatense (`che`, `boludo`, `vos`, `tenés`, `querés`, `laburo`, etc.).
+- Mantener un tono claro, cercano y profesional; se permite chilenismo operativo solo cuando sea contexto del producto/país, no como muletilla.
+
 ### Data Architecture
 
 - **PostgreSQL** (Cloud SQL `greenhouse-pg-dev`, Postgres 16, `us-east4`) — OLTP, workflows mutables, runtime-first
@@ -94,6 +100,7 @@ Espera mi confirmacion antes de empujar a develop o crear preview remoto.
 - El custom domain de staging (`dev-greenhouse.efeoncepro.com`) **SÍ tiene SSO** — no es excepción.
 - Para acceso programático (agentes, Playwright, curl): usar la URL `.vercel.app` + header `x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET`.
 - Hook operativo browser diagnostics: si el usuario pide abrir, revisar, diagnosticar, capturar o testear una ruta/URL del portal, usar automáticamente usuario agente dedicado + Playwright/Chromium. No pedir login ni navegar anónimo como primer intento. Enviar `x-vercel-protection-bypass` solo a origins Greenhouse/Vercel, no a terceros como Sentry.
+- **Hook obligatorio de diseño UI (skills + GVC en loop) — ANY UI work**: para CUALQUIER trabajo de UI (componente nuevo, cambio visual, layout, estados, microinteracciones, mockup, copy visible), ANTES de escribir JSX nuevo **invocar las skills de product design** que apliquen — `greenhouse-ux` (layout + componente Vuexy/MUI + tokens), `modern-ui` (jerarquía/tipografía/spacing/balance), `state-design` (loading/empty/error/degraded honestos), `forms-ux` (inputs/validación/combobox), `greenhouse-ux-writing` (microcopy es-CL → `src/lib/copy/*`) — y DESPUÉS **verificar con GVC en loop**: `pnpm fe:capture`, leer el frame PNG, ajustar, re-capturar hasta que se vea enterprise. NUNCA pintar UI freehand ni declarar "listo" en UI sin una captura GVC mirada. Para mockup↔runtime, paridad por copy-and-patch + `fe:capture:diff`. Enforcement humano de Julio (sesión TASK-997): el loop atrapó pills→filas enterprise, `Autocomplete` crudo→`CustomAutocomplete`, prefill verificado, copy "workspace"→"Teamspace".
 - Hook operativo de verificación visual UI: si el trabajo toca UI visible, screenshots, microinteractions, responsive, design QA, frame sequences o revisión visual, la evidencia primaria debe generarse con **Greenhouse Visual Capture** (`GVC`, `pnpm fe:capture`) / `pnpm fe:capture:review` y sus relacionados. Usar scenario existente cuando exista; usar `pnpm fe:capture --route=<path> --env=staging --hold=3000` para evidencia rápida; crear scenario en `scripts/frontend/scenarios/` si el flujo es repetible, tiene interacciones o requiere scroll/captura de secciones; usar `pnpm fe:capture:diff` para before/after y `pnpm fe:capture:health` para salud local del helper. Para pantallas largas, preferir `scroll selector`, `scrollTo`, `mark fullPage` y `mark clipSelector` antes de scripts ad-hoc. Para flows críticos, declarar `readiness`/`assertions`; para microinteractions, preferir `interaction` V2 con intención y frames relativos; para responsive, usar `viewports`; para mockup aprobado→runtime, usar `baseline`. Playwright ad-hoc solo como complemento cuando se necesiten console/network/API payloads o una interacción no soportada por el DSL; guardar artifacts bajo `.captures/` y documentar por qué no bastó `GVC`.
 - **NUNCA crear manualmente** `VERCEL_AUTOMATION_BYPASS_SECRET` en Vercel — la variable es auto-gestionada por el sistema. Si se crea manualmente, sombrea el valor real y rompe el bypass.
 - URLs de staging:
@@ -174,6 +181,20 @@ Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a mú
 - Antes de implementar, validar si el problema es sintoma local o causa compartida y preferir la primitive canonica del dominio.
 - Todo workaround debe quedar documentado como temporal, reversible, con owner, condicion de retiro y task/issue asociada cuando aplique.
 - Fuente canonica: `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
+
+### Full API Parity Principle
+
+**Regla base:** todo lo que se pueda hacer dentro de Greenhouse debe poder hacerse, o tener camino planificado para hacerse, a traves de un contrato programatico gobernado. La UI no es el source of truth de una capacidad: es un cliente de commands, readers, projections y API contracts server-side.
+
+**Implicaciones duras:**
+
+- **NUNCA** implementar una accion de negocio solo dentro de un componente UI si puede afectar estado, permisos, datos, aprobaciones, exports, recoveries, reportes o configuracion. Extraer primero la primitive canonica en `src/lib/**`.
+- **NUNCA** crear endpoints que sean simples "click handlers remotos" acoplados al componente visible. Modelar el aggregate/recurso/command y su contrato estable.
+- **SIEMPRE** que una feature nueva agregue una accion visible, declarar el camino programatico esperado: Product API interna, `api/platform/app/*`, `api/platform/ecosystem/*`, MCP downstream, CLI/runbook, o task follow-up si se difiere.
+- **SIEMPRE** que el write pueda reintentarse o venga de integracion/agente, aplicar command semantics explicita, authorization tenant-safe, audit/outbox cuando aplique, idempotencia, errores sanitizados y observabilidad.
+- **SIEMPRE** que la UI consuma una operacion, preferir reuse de readers/commands canonicos antes de crear logica paralela para la pantalla.
+
+**Fuente canonica:** `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` + `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` + decision "Full API parity" en `docs/architecture/DECISIONS_INDEX.md`.
 
 ### Session access derivation must honor role-assignment lifecycle (TASK-987 / ISSUE-083, desde 2026-06-01)
 
@@ -1088,6 +1109,7 @@ Existen **3 integraciones Notion productivas/no-productivas** + **1 dedicada al 
 | **Greenhouse** | env `NOTION_TOKEN` (staging/dev) | Runtime no-productivo (`dev-greenhouse`, preview, local) | Efeonce + Sky (staging/dev) | **Staging/Dev** |
 | **Greenhouse PRD** | `notion-integration-token-greenhouse-prd` (2026-05-21) → env `NOTION_TOKEN` | Runtime Vercel prod + `ops-worker` (re-fetch status transitions TASK-912 + writeback `[GH]` properties TASK-916) | Efeonce + Sky (productivo) | Producción |
 | **(dedicada demo)** | `notion-integration-token-greenhouse-metrics-demo` (2026-05-19) → `NOTION_METRICS_DEMO_TOKEN_SECRET_REF` | `ops-worker` compute/writeback demo (TASK-913) | **SOLO** teamspace `Demo Greenhouse` (`36339c2f-…`) | Sandbox demo |
+| **Por cliente (scoped, TASK-998)** | `notion-integration-token-greenhouse-<slug>` → `space_notion_sources.notion_token_secret_ref` (ej. `notion-integration-token-greenhouse-berel`, 2026-06-03) | sync per-space (pendiente en `notion-bigquery`) + checklist onboarding | **SOLO** el teamspace de ESE cliente (el token ES el scope) | Producción (clientes nuevos) |
 
 **⚠️ Reglas duras**:
 
@@ -1100,6 +1122,57 @@ Existen **3 integraciones Notion productivas/no-productivas** + **1 dedicada al 
 - **SIEMPRE** que emerja una integración Notion nueva (e.g. otro cliente, otro pipeline), agregarla a este registry con su secret + consumer + scope + entorno antes del primer uso, y enumerar a qué teamspaces se le concede acceso.
 
 **Verificación operador-side** (no es código — son settings de Notion): la lista de integraciones conectadas a un teamspace se ve en Notion → teamspace → Settings → Connections. Para auditar fuga a BQ: `bq query 'SELECT source_database_id, space_id, COUNT(*) FROM efeonce-group.notion_ops.raw_pages_snapshot GROUP BY 1,2'` — todo `source_database_id` debe pertenecer a Efeonce (`spc-c0cf6478-…`) o Sky (`spc-ae463d9f-…`); cualquier `36339c2f…` (demo) es fuga.
+
+### Notion teamspace linking — token POR teamspace + cómo enumerar DBs (TASK-998, desde 2026-06-03)
+
+Para vincular el teamspace Notion de un **cliente nuevo** (Berel, ANAM, …) a Greenhouse, el modelo canónico es **una integración interna scoped SOLO al teamspace de ese cliente**, cuyo token **es el scope**. La integración compartida `notion-token` (BigQuery Sync) queda **solo para Efeonce/Sky legacy** — los clientes nuevos NO se agregan a ella (aislamiento duro; mismo principio que el token dedicado del demo, TASK-913).
+
+**Hechos verificados live (2026-06-03, Grupo Berel) — qué NO funciona para enumerar teamspaces**:
+
+- **La API REST de Notion NO enumera teamspaces.** `GET /v1/teams` → `400 invalid_request_url` (no existe). `POST /v1/search` devuelve data_sources cuyo `parent` es `database_id`, no teamspace → el nombre del teamspace **no está en REST**. Las DBs de un teamspace **NO comparten prefijo de id** (Berel: Tareas/Proyectos/Sprints=`35c39c2f`, "Wiki de Berel"=`98239c2f`, "Content Hub"=`35f39c2f`) → cualquier heurístico de prefijo es **inválido**.
+- **El MCP claude.ai (`notion-get-teams`) SÍ enumera** teamspaces por nombre — pero usa el **OAuth personal interactivo** del operador (dueño del workspace, ve todo) y **NO es runtime-available** (absent en headless/cron, CLAUDE.md). Sirve para que un **agente** obtenga IDs durante el onboarding, NUNCA como dependencia del runtime.
+- **El Cloud Run `notion-bq-sync` v3.0.0 `/discover` devuelve config snapshot, no discovery en vivo.** No se puede usar para enumerar el teamspace de un cliente nuevo.
+
+**El gate real NO es discovery — es el ACCESO de la integración.** El token compartido `notion-token` da `404 object_not_found` en las DBs de Berel porque la integración no tiene acceso a ese teamspace. Ningún camino (REST, MCP, Cloud Run) puede leer un teamspace que no esté compartido con su credencial — por diseño de seguridad.
+
+**Modelo canónico — token-por-teamspace (el token ES el scope)**:
+
+1. El operador crea en Notion una **integración interna** (Settings → Developers → New connection) scoped al teamspace del cliente (capacidades: Leer/Actualizar/Insertar contenido) + copia el token `ntn_…`. Ej. live: conexión **"Greenhouse - Berel"** sobre el teamspace `Grupo Berel` (`35c39c2f-…`).
+2. En el **checklist de onboarding** (item `provision_notion_workspace`, NO el wizard de nacimiento — separación de concerns), el operador pega el token. `discoverNotionDatabasesForToken(token)` ([src/lib/client-onboarding/notion-token-connect.ts](src/lib/client-onboarding/notion-token-connect.ts)) hace `POST /v1/search` (filter data_source, Notion-Version `2026-03-11`) → como el token está acotado, devuelve **SOLO las DBs de ese cliente** (cero cross-tenant) → auto-clasifica Tareas/Proyectos/Sprints por título (tolerante a espacio final/acentos/mayúsculas vía `classifyNotionDatabaseTitle`) → sugiere los 3 ids; el operador confirma/ajusta.
+3. Al confirmar: el token se guarda en **GCP Secret Manager** (`notion-integration-token-greenhouse-<slug>`, ej. `notion-integration-token-greenhouse-berel`) con `printf %s` (sin newline) + se persiste el **`*_SECRET_REF`** en `greenhouse_core.space_notion_sources.notion_token_secret_ref` (columna TASK-998). **NUNCA el token crudo en PG/logs/Notion.** `notion_token_secret_ref` NULL = usar el `notion-token` compartido legacy (Efeonce/Sky).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** enumerar teamspaces Notion con `/v1/search` crudo + heurística de prefijo de id. La API no enumera teamspaces; las DBs de un teamspace no comparten prefijo. Usar el **token scoped por cliente** (el token = el scope) + clasificación por título.
+- **NUNCA** cablear el MCP claude.ai (`notion-get-teams`) a un backend (Cloud Run, Vercel, ops-worker). Es OAuth interactivo, absent en headless. Solo un agente lo usa para obtener IDs durante onboarding.
+- **NUNCA** agregar un teamspace de cliente nuevo a la integración compartida `notion-token` (BigQuery Sync) "para que el discover lo vea". Rompe el aislamiento duro. Cada cliente nuevo = su propia integración scoped + su propio token.
+- **NUNCA** persistir el token Notion crudo en `space_notion_sources`, PG, logs ni el payload de un evento. Solo el `*_SECRET_REF`. El token va a Secret Manager con `printf %s` (Secret Manager Hygiene).
+- **NUNCA** vincular el teamspace en el **wizard de nacimiento** del cliente. El vínculo vive en el **checklist de provisioning** (nacimiento ≠ provisioning de tooling — separación de concerns TASK-992/997).
+- **SIEMPRE** que un token Notion se pegue en texto plano (chat, form sin enmascarar), tratarlo como expuesto: guardarlo en Secret Manager + recomendar rotación. El campo del form debe ser `type=password`, el POST server-side directo, sin echo.
+- **SIEMPRE** que emerja una integración Notion nueva de cliente, agregarla al **Notion Integrations Registry** (arriba) con secret + consumer + scope + entorno antes del primer uso.
+
+**Teams channel linking (lado Teams del mismo checklist)**: el bot Graph (`greenhouse-teams-bot-client-credentials`) **YA puede** listar teams + canales con los permisos actuales — verificado live: `GET /v1.0/teams` (vio "Berel - Efeonce") + `GET /v1.0/teams/{id}/channels` (vio "Squad Berel"). Sin permisos Azure nuevos. (Los chats 1:1 `/v1.0/chats` requieren `Chat.ReadBasic.All`, no concedido — fuera de scope; los canales son el target del registry `teams_notification_channels`.) El reader self-serve reusa `src/lib/integrations/teams/bot-framework/token-cache.ts`.
+
+**Sync end-to-end por cliente nuevo — RESUELTO (TASK-1000 + TASK-1003, 2026-06-04)**: el Cloud Run `notion-bq-sync` ya **resuelve el token POR space** (`notion_token_secret_ref` → Secret Manager; TASK-1000) Y **queryea el endpoint canónico `/v1/data_sources/{id}/query` + Notion-Version `2026-03-11`** (TASK-1003, mata el deprecado `/v1/databases/{id}/query`). Un cliente nuevo registrado por el wizard (data_source ids + token scoped) con `sync_enabled=TRUE` drena nativo a diario. Verificado live con Grupo Berel (3/3 tables, token scoped). Ver §"Notion data_sources endpoint canónico (TASK-1003)" abajo.
+
+### Notion data_sources endpoint canónico — extractor notion-bq-sync (TASK-1003, desde 2026-06-04)
+
+El extractor `notion-bq-sync` (repo hermano `efeoncepro/notion-bigquery`, Cloud Run `us-central1`) queryea Notion **SIEMPRE por el endpoint canónico `POST /v1/data_sources/{id}/query` + Notion-Version `2026-03-11`** (revisión live `00021-wkl`, flag `NOTION_DATA_SOURCES_ENDPOINT_ENABLED=true`). El endpoint legacy `/v1/databases/{id}/query` (deprecado por Notion 2025-09-03) queda muerto.
+
+- **Resolver runtime canónico** `resolve_data_source_id(configured_id)` (`main.py`): acepta AMBOS tipos de id por construcción — `GET /v1/data_sources/{id}`→200 (ya es data_source: Berel/clientes nuevos del wizard) o fallback `GET /v1/databases/{id}`→`data_sources[0].id` (Efeonce/Sky con database ids legacy en el BQ mirror). Multi-data-source (>1) → fail-fast (nunca adivinar). Hereda el token per-space (TASK-1000) vía `_notion_headers`. Cache estable por mapping.
+- **`database_id` configurado se conserva como identidad** para snapshot/binding (`source_database_id`, `_resolve_space_context`); SOLO la URL de query usa el id resuelto. NO mezclar.
+- **`in_trash` (no `archived`)**: bajo 2026-03-11 el campo page-level de borrado es `in_trash`. El write usa `page.get("in_trash", page.get("archived", False))` (safe ambas versiones; la columna BQ sigue `archived`). NO volver a `page.get("archived", False)` solo.
+- **404 NO transitorio**: `_is_transient_sync_error` clasifica 4xx (salvo 429) como NO transitorio (mata el reintento 3x inútil). NO revertir a "cualquier RequestException → transient".
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** reintroducir `/v1/databases/{id}/query` ni Notion-Version `2022-06-28` en el extractor. El endpoint legacy está deprecado; toda query nueva usa data_sources + 2026-03-11.
+- **NUNCA** guardar parent database ids de un cliente nuevo para meterlo por el endpoint viejo (anti-patrón rechazado en TASK-1003; viola Solution Quality Contract). El resolver runtime maneja ambos id-types.
+- **NUNCA** desplegar `notion-bq-sync` con `bash deploy.sh` a secas: usa `--env-vars-file`/`--set-secrets` (REPLACE) y borraría las vars per-space + el secret `GREENHOUSE_POSTGRES_PASSWORD` que viven manuales en la revisión (no en `.env.yaml`, que es gitignored). Deploy canónico: `gcloud run deploy notion-bq-sync --source --function=notion_bq_sync --update-env-vars=... --update-secrets=...` (MERGE, preserva per-space+PG+secrets). Re-aseverar explícitamente `NOTION_PER_SPACE_TOKEN_ENABLED=true` + `GREENHOUSE_POSTGRES_{INSTANCE_CONNECTION_NAME,DB,USER}` + ambos secrets.
+- **NUNCA** flipear `NOTION_DATA_SOURCES_ENDPOINT_ENABLED` ni bumpear `NOTION_VERSION` sin correr el gate de paridad `parity_check_task1003.py` (read-only, no escribe BQ) sobre Efeonce/Sky → PARIDAD TOTAL. Rollback <5 min: flag OFF + `gcloud run services update --update-env-vars` o traffic a revisión previa.
+- **SIEMPRE** que emerja un cliente nuevo: el wizard guarda data_source ids + token scoped → con `sync_enabled=TRUE` sincroniza nativo, cero casos especiales (proceso idempotente/escalable, NO repetir el cutover por cliente).
+
+**Spec canónica**: `docs/tasks/complete/TASK-1003-notion-bq-sync-data-sources-endpoint-migration.md`. Skill `notion-platform` §0 (estado canónico). Gate: `parity_check_task1003.py` (repo hermano).
 
 ### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
 
@@ -5548,6 +5621,85 @@ El **atraso imputable** mide SOLO el slip atribuible a la agencia: días posteri
 **Reliability signals** (subsystem `delivery`): `delivery.attributable_lateness.shadow_paridad` (% buckets que el freeze cambia; ok ≤30%, warning >30% sanity) + `delivery.attributable_lateness.freeze_reschedule_overlap` (invariante anti-doble-descuento, steady=0). `delivery.reschedule.pending_reason_confirmation` se reusa de TASK-921.
 
 **Spec canónica**: `docs/architecture/metrics/ATTRIBUTABLE_LATENESS_V1.md` + ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1.md` §4-7, §16.9. Task: `docs/tasks/complete/TASK-922-attributable-lateness-helper-otd-bucket-shadow.md`. Migration: `20260524104127717`. Patrón fuente: TASK-908 (calculate-cycle-time interval pattern), TASK-913/916 (RpA V2 helper + snapshot + consumer), TASK-923 (classifyOtdBucket).
+
+### Canonical Organization Write SSOT invariants (TASK-991, desde 2026-06-02)
+
+TODA derivación de `organization_type` pasa por `deriveOrganizationType` (`src/lib/account-360/organization-type.ts`, SSOT) y TODA escritura de la fila `greenhouse_core.organizations` que toque `organization_type`/`lifecycle_stage` reconcilia ambos. Cierra el bug class fuente (Grupo Berel): las puertas se repartían las columnas de `organizations` sin SSOT — la puerta HubSpot (`createPartyFromHubSpotCompany`) escribía `lifecycle_stage`+`hubspot_company_id` pero NUNCA `organization_type`/`tax_id`/`country`/`legal_name`, dejando `active_client` con `organization_type='other'` (invisible en Finanzas) + `country='CL'` ciego (Berel es MX) + `public_id` NULL.
+
+- `organization_type` y `lifecycle_stage` son ortogonales pero deben reconciliarse: `active_client ⇒ client/both`, `provider_only ⇒ supplier`, dual ⇒ `both`, prospect/opportunity ⇒ `other`. `deriveOrganizationType({lifecycleStage, hasClientRole, hasSupplierRole, currentType})` es la ÚNICA fuente (reemplaza `promoteToClientCapableType` inline). NUNCA degrada un rol ya adquirido. NO incluye `efeonce_internal` (la operating entity usa el flag `is_operating_entity`, no `organization_type`).
+- **Los TRES writers de `organization_type`** lo derivan: (1) `upsertCanonicalOrganization` (`organization-identity.ts`, writer canónico de las puertas finance/supplier — siempre deriva, no gated), (2) `createPartyFromHubSpotCompany` (puerta HubSpot INSERT — gated), (3) `promoteParty` (`commands/promote-party.ts`, reconcilia el type en el MISMO UPDATE al promover a active_client/provider_only — gated). `promoteParty` es el ÚNICO writer de `lifecycle_stage` (sweeps/overrides funnelean por él).
+- `deriveOrganizationType` NO es columna GENERATED (necesita inputs de rol que no viven solo en el lifecycle). Es columna gobernada por los writers + 4 signals (drift) + un CHECK DB `organizations_type_lifecycle_consistent` **diferido a post-release** (ver abajo). Defense-in-depth en producción inmediata: writers (app, default ON) + signals; el CHECK es la capa DB que se agrega cuando el código nuevo está en TODOS los runtimes.
+- `upsertCanonicalOrganization` llena `public_id` + `origin` en cada INSERT. Modo `overrideIdentity` (remediación dirigida, ej. country CL→MX) sobreescribe identidad provista; default COALESCE preserva (no-regresión).
+- `country`/`tax_id` se derivan del origin, NUNCA default ciego. La puerta HubSpot propaga `crm.companies.country_code` (NULL honesto si falta), no el default de columna `'CL'`. `tax_id` queda operator-supplied (HubSpot no trae RFC confiable).
+- 4 reliability signals (subsystem `Commercial Health`, steady=0): `commercial.organization.type_lifecycle_drift` (error>0), `commercial.organization.incomplete_identity` (warning, acotado a client-grade — NO a prospects), `commercial.client.active_without_profile`, `commercial.client.active_without_space`.
+- **Kill-switch `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED` (default ON)**: gatea el comportamiento corrector de la puerta HubSpot (INSERT) + `promoteParty` (UPDATE). Default ON = la escritura correcta es el comportamiento por defecto en TODOS los runtimes sin setear env por runtime (evita el drift dual-env, que es la clase de bug que esta task combate). Solo `=false` lo apaga (emergencia). El helper finance/supplier NO está gated (siempre canónico).
+- **CHECK `organizations_type_lifecycle_consistent` — DIFERIDO a post-release (hazard de deploy-ordering)**: `active_client ⇒ organization_type IN (client,both)`. NO está aplicado en la DB (el Cloud SQL `greenhouse-pg-dev` es compartido por TODOS los runtimes; aplicarlo mientras producción corre el código viejo —que aún escribe `active_client+other`— rompería el HubSpot sync de prod con un CHECK violation). Sin el CHECK, los writes legacy del código viejo siguen permitidos → la ventana de deploy es segura (código nuevo escribe canónico, código viejo escribe legacy-pero-permitido; el signal `type_lifecycle_drift` lo cubre). Se aplica como **paso manual post-develop→main** (cuando el código nuevo esté en prod), como su propia migración `pnpm migrate:create`. SQL canónico: `ALTER TABLE greenhouse_core.organizations ADD CONSTRAINT organizations_type_lifecycle_consistent CHECK (lifecycle_stage IS DISTINCT FROM 'active_client' OR COALESCE(organization_type,'other') IN ('client','both')) NOT VALID;` luego `VALIDATE CONSTRAINT` (idempotente, guarded). Owner del DROP/ADD = `greenhouse_ops`.
+- Remediación de orgs a medias: SIEMPRE vía `scripts/commercial/remediate-half-baked-orgs.ts` (dry-run/apply/allowlist/actor/reason/expected-count abort), que pasa por `upsertCanonicalOrganization`. NUNCA SQL directo.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** escribir `greenhouse_core.organizations` (account-360 doors) fuera de `upsertCanonicalOrganization`. Toda puerta es caller.
+- **NUNCA** hand-setear `organization_type` inconsistente con el lifecycle. Usar `deriveOrganizationType`. Cualquier writer nuevo de `lifecycle_stage='active_client'` DEBE setear el type en el mismo statement (sino, cuando el CHECK post-release esté activo, lo rechaza).
+- **NUNCA** dejar `lifecycle_stage='active_client'` con `organization_type='other'`. Los writers lo reconcilian; el signal lo detecta; el CHECK (DB, post-release) lo bloquea.
+- **NUNCA** default ciego `'CL'` en escrituras de sync. Derivar del origin; NULL explícito si falta.
+- **NUNCA** aplicar el CHECK `organizations_type_lifecycle_consistent` contra el Cloud SQL compartido mientras producción corra el código viejo (pre develop→main). Es el hazard de deploy-ordering que rompería el HubSpot sync de prod. Aplicarlo SOLO post-release, cuando el código nuevo esté en todos los runtimes. Una vez activo el CHECK: **NUNCA** apagar el kill-switch (`=false`) sin dropear primero el CHECK (la puerta legacy volvería a producir `active_client+other` → rechazo).
+- **SIEMPRE** que emerja una puerta nueva de nacimiento de org, hacerla caller del helper SSOT + setear `origin`.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-991-canonical-client-birth-lifecycle.md` + audit `docs/audits/client-lifecycle/CLIENT_BIRTH_FRAGMENTATION_AUDIT_2026-06-02.md`. Migración aplicada: `20260602144943699` (origin, additivo seguro). CHECK `organizations_type_lifecycle_consistent` = paso manual post-release (no migración auto-aplicable, por el deploy-ordering). Orquestador lifecycle + wizard = TASK-992.
+
+### Client Lifecycle Orchestrator invariants (TASK-992, onboarding V1.0 desde 2026-06-03)
+
+`greenhouse_core.client_lifecycle_cases` es el agregado canónico del ciclo de vida del cliente (`onboarding | offboarding | reactivation`) — espejo comercial de TASK-760 (offboarding de colaboradores). V1.0 implementa SOLO `onboarding` (+ scaffolding `reactivation`); `offboarding` queda diferido. Vive detrás del flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` (default OFF — el código está live en `develop`, las tablas vacías no se consumen). Implementa `GREENHOUSE_CLIENT_LIFECYCLE_V1` §5-§13 verbatim. Módulo: `src/lib/client-lifecycle/` (barrel pure: `types.ts` + `state-machine.ts`; `store.ts` + `commands/**` + `api-helpers.ts` son server-only, importados directo — patrón TASK-822).
+
+**4 tablas** (`greenhouse_core`): `client_lifecycle_cases` (aggregate + state machine), `client_lifecycle_case_events` (append-only, anti-UPDATE/DELETE triggers), `client_lifecycle_checklist_templates` (declarativo, versionado, append-only), `client_lifecycle_checklist_items` (snapshot materializado al abrir). Migración `20260603004341038`. Seed `standard_onboarding_v1` (10 items §5.5 verbatim). Defensa-en-profundidad DB: CHECK status/kind enums + UNIQUE partial (un caso activo por `(organization_id, case_kind)`) + trigger `client_lifecycle_case_transition_check` (matriz §6.3 + gate "no completar con required+blocking pendientes salvo override vía `SET LOCAL app.client_lifecycle_blocker_override='true'`").
+
+**5 comandos canónicos** (`commands/**`, atómicos + idempotentes + outbox v1, dual-mode `client?: PoolClient`): `provisionClientLifecycle` (idempotente por `(org, kind)`), `advanceLifecycleChecklistItem`, `resolveLifecycleCase`, `addLifecycleBlocker`/`resolveLifecycleBlocker`. Cada mutación appendea `client_lifecycle_case_events` + emite el evento `client.lifecycle.*` v1 **dentro de la misma tx**. El cascade del `.completed` (onboarding) invoca `instantiateClientForParty` si no existe (swallow `OrganizationAlreadyHasClientError`).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** escribir `greenhouse_core.organizations` desde el lifecycle. El org row es exclusivo de `upsertCanonicalOrganization` (TASK-991), invocado por el wizard composer (Slice 2) ANTES de `provisionClientLifecycle(organizationId)`. El lifecycle recibe un `organizationId` ya existente.
+- **NUNCA** invocar `instantiateClientForParty` ni `archiveClientForParty` directo desde UI/route — siempre como cascade del case completion (o desde el wizard composer en su propia tx).
+- **NUNCA** UPDATE/DELETE sobre `client_lifecycle_case_events` (triggers append-only). Para correcciones, INSERT nueva fila.
+- **NUNCA** transicionar el case fuera de la matriz §6.3. La transición se valida en TS (`assertCaseTransition`) Y en el trigger DB (defensa-en-profundidad). `completed`/`cancelled` son terminales.
+- **NUNCA** completar un caso con ítems required+blocking pendientes sin pasar por `overrideBlockers` (capability `client.lifecycle.case.override_blocker`, EFEONCE_ADMIN only, `overrideReason >= 20`). El trigger DB lo bloquea salvo el session var de override.
+- **NUNCA** materializar checklist sin `template_code` activo. El comando lee `readActiveTemplateItems`; el signal `client.lifecycle.case_without_template` detecta drift. `template_code` es columna snapshot (no FK — templates usa PK compuesta).
+- **NUNCA** modificar un template existente; crear versión nueva (`standard_onboarding_v2`) + deprecar la vieja vía `effective_to`. Los casos snapshot el template al abrirse.
+- **NUNCA** loggear `reason`/`cancellation_reason`/`override_reason` raw — usar `redactSensitive` / `captureWithDomain(err, 'commercial', { tags: { source: 'client_lifecycle' } })`. NUNCA `Sentry.captureException` directo.
+- **NUNCA** error API crudo: las rutas usan `authorizeLifecycle(capability)` + `mapLifecycleError` (es-CL, `redactErrorForResponse` en el path 502).
+- **NUNCA** seedear una capability `client.lifecycle.case.*` sin grant en `runtime.ts` mismo PR. Grants colapsados a ROLE_CODES reales (anti-rol-fantasma TASK-935): open/resolve → EFEONCE_ADMIN + FINANCE_ADMIN; advance/read → route_groups `commercial`/`finance` + admins; override_blocker → EFEONCE_ADMIN only. La spec V1 §8 menciona `commercial_admin`/`operations` que NO existen.
+- **SIEMPRE** que un comando nuevo mute el case, emitir el evento `client.lifecycle.*` v1 + appendear el case_event en la misma tx. 5 reliability signals (subsystem Commercial Health, steady=0; override anomaly steady<3/30d): `onboarding_stalled`, `checklist_orphan_items`, `cascade_dead_letter`, `case_without_template`, `blocker_override_anomaly_rate`.
+
+**Capabilities**: `client.lifecycle.case.{open,advance,resolve,override_blocker,read}` (módulo `commercial`). API §9: `GET/POST /api/admin/clients/[organizationId]/lifecycle[/onboarding]`, `PATCH /api/admin/clients/lifecycle/cases/[caseId]/items/[itemCode]`, `POST .../resolve`, `GET .../cases`, `GET .../health`. Eventos: 8 `client.lifecycle.*` v1 (EVENT_CATALOG Delta 2026-06-03).
+
+**Slice 2 (puerta única / wizard) — desde 2026-06-03**: el composer canónico `provisionClientFromWizard` (`src/lib/client-lifecycle/commands/provision-client-from-wizard.ts`) es la ÚNICA puerta de alta de cliente: en UNA tx atómica hace `upsertCanonicalOrganization` (SSOT TASK-991, identidad + client role) → `instantiateClientForParty` (Cliente + `client_profiles` con moneda de facturación, **incl. MXN**) → `promoteParty('active_client')` (**único writer canónico de `lifecycle_stage` + history**; su instantiate interno es no-op porque el cliente ya existe → preserva el perfil MXN) → `provisionClientLifecycle` (abre el caso). Endpoint: `POST /api/admin/clients/lifecycle/provision`. La moneda se valida contra `CURRENCY_DOMAIN_SUPPORT.finance_core ∪ {UF,UTM}` (derivada del registry, NO hardcode); `billingDefaults.paymentCurrency` widened a `CLP|USD|MXN|UF|UTM`. Pickers + gate "ya existe" buscan el backbone canónico vía `GET /api/admin/clients/lifecycle/org-search`. UI runtime: `/agency/clients/new` (`ClientOnboardingView`, gated por flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + capability `client.lifecycle.case.open`), **cableada 1:1 del mockup APROBADO por copy-and-patch** (mismo JSX → paridad visual estructural; solo cambian data + commit).
+
+**⚠️ Reglas duras Slice 2**:
+- **NUNCA** parir un cliente fuera de `provisionClientFromWizard` (o del cascade de `resolveLifecycleCase`). El wizard es la puerta única; el drawer de Finanzas se redefine a "completar facet" (Slice 2c, pendiente), NO pare.
+- **NUNCA** escribir `lifecycle_stage` desde el composer salvo vía `promoteParty` (history + reconcile type). `upsertCanonicalOrganization` NO recibe `lifecycleStage` en este path.
+- **NUNCA** instanciar el cliente DESPUÉS de `promoteParty` (su instantiate usaría CLP default). Orden canónico: upsert → instantiate(moneda) → promote.
+- **NUNCA** hardcodear la moneda de facturación; validar contra el registry. `client_profiles.payment_currency` no tiene CHECK en PG (MXN ya aceptado).
+- **NUNCA** modificar/borrar los `*/mockup/*` ni implementar el runtime dentro de `/mockup/`. El runtime vive en `src/views/greenhouse/agency/clients/*` (fuera de `/mockup/`) e **iguala visualmente** el mockup. Cualquier estado/visual NUEVO (loading/degraded de pickers, código del SuccessScreen, entrada de nav) pasa por el loop product-design (`state-design`/`modern-ui`/`greenhouse-ux`) + GVC `fe:capture:diff` ANTES de pintarse — NO freehand.
+- **SIEMPRE** verificar paridad con `pnpm fe:capture:diff <mockup-capture> <runtime-capture>` antes de cerrar Slice 2.
+
+**Pendiente Slice 2c + 3**: redefinir `CreateClientDrawer` → "completar facet financiero"; triggers HubSpot deal/adopt → onboarding case `draft`; timeline lifecycle en Account 360 (TASK-611). Ítems para el loop GVC: estados loading/degraded de pickers (`state-design`), código legible del caso en SuccessScreen (`public_id` en `client_lifecycle_cases`?), entrada de nav discoverable (exponer flag al menú client).
+
+**Spec canónica**: `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md` + `docs/tasks/in-progress/TASK-992-client-lifecycle-orchestrator-single-front-door.md`. Patrón fuente: TASK-760 (offboarding de colaboradores). Migración: `20260603004341038`.
+
+### Client Portal User Invitation SSOT (TASK-1001, desde 2026-06-03)
+
+Toda creación de un usuario de portal cliente (`client_users` + `user_role_assignments` + email de invitación) pasa por el **helper canónico SSOT** `inviteClientPortalUser` (`src/lib/client-onboarding/invite-client-portal-user.ts`). Extraído de `/api/admin/invite` (que ahora lo consume con `onExisting:'error'`, preservando el 409). El onboarding lo consume con `onExisting:'ensure'` (idempotente: usuario existente → asegura rol additive, no duplica fila, no re-emaila). La invitación de personas del portal en el alta vive en el **ítem de checklist canónico existente `provision_client_users_access`** (NO se crea ítem paralelo) del timeline de onboarding (TASK-992), vía el `PortalUsersPanel` que siembra candidatos desde HubSpot (`listClientPortalPersonCandidates`) y sugiere rol por cargo (`suggestClientPortalRole`).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** crear `client_users` ni `user_role_assignments` por SQL inline para portal users. Pasar por `inviteClientPortalUser` (single source of truth, tx atómica, emite `role.assigned` v1 in-tx para los roles recién asignados).
+- **NUNCA** asignar a un portal user un rol fuera de los 3 client_* (`client_executive`/`client_manager`/`client_specialist`). El helper valida `isRoleCode`; el endpoint valida `isClientPortalRole`. NUNCA un rol interno (collaborator/efeonce_*).
+- **NUNCA** usar `updateUserRoles` para invitar (reemplaza el set completo → destructivo). La asignación es additive (`ON CONFLICT DO NOTHING` + RETURNING para detectar el alta real).
+- **NUNCA** invitar en el wizard de nacimiento. Vive en el checklist de provisioning (separación de concerns — mismo principio Notion/Teams TASK-998).
+- **NUNCA** gatear la invitación solo con `client.lifecycle.case.advance`. Capability dedicada **`client.lifecycle.portal_user.invite`** (least-privilege: invitar otorga ACCESO, distinto de avanzar bookkeeping). Listar candidatos usa `client.lifecycle.case.read`. Grant en `runtime.ts` al tier advance (commercial/finance route_group + admins) — `capability-grant-coverage.test.ts` lo enforce.
+- **NUNCA** resolver el `client_id` del body en el endpoint de invite. Se resuelve server-side desde la org (`resolveAccountScope`, anti-tamper). Sin Cliente → degrada honesto `client_not_ready`.
+- **SIEMPRE** sembrar candidatos desde los contactos HubSpot ya capturados; el operador confirma/ajusta rol. Idempotente (dedup por email).
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-1001-client-portal-people-provisioning-onboarding.md`. Helpers: `inviteClientPortalUser`, `suggestClientPortalRole`, `listClientPortalPersonCandidates` (`src/lib/client-onboarding/`). Sin migración (capability mirror de la familia TASK-992 catalog+runtime), sin reliability signal nuevo (ítem `required=FALSE`), sin evento nuevo (reuso `role.assigned`).
 
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 

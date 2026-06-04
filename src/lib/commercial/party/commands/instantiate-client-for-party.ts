@@ -28,12 +28,43 @@ interface QueryableClient {
   ) => Promise<QueryResultLike<T>>
 }
 
+/**
+ * TASK-997 Slice 2 — contacto de finanzas persistido con provenance (External
+ * Reference). `source='hubspot'` ⇒ `hubspotContactId` apunta a la persona real en
+ * `greenhouse_crm.contacts` (elegido del suggest); `source='manual'` ⇒ ingresado a
+ * mano (sin id). NUNCA un string suelto: la referencia mantiene la trazabilidad.
+ */
+export interface FinanceContactRecord {
+  name: string
+  email: string | null
+  role: string | null
+  hubspotContactId: string | null
+  source: 'hubspot' | 'manual'
+}
+
 export interface InstantiateClientForPartyInput {
   organizationId: string
   triggerEntity: LifecycleTriggerEntity
   billingDefaults?: {
-    paymentCurrency?: 'CLP' | 'USD' | 'UF' | 'UTM'
+    // finance_core currencies (CLP/USD/MXN — TASK-990) + CL indexation units (UF/UTM).
+    // The valid finance_core set is governed by CURRENCY_DOMAIN_SUPPORT.finance_core;
+    // callers resolving from user input must validate against it (see the wizard composer).
+    paymentCurrency?: 'CLP' | 'USD' | 'MXN' | 'UF' | 'UTM'
     paymentTermsDays?: number
+  }
+  /** TASK-997 Slice 2 — contactos de finanzas (suggest HubSpot o manual). */
+  financeContacts?: FinanceContactRecord[]
+  /** TASK-1006 — perfil financiero declarado en el alta. Todos opcionales; defaults legacy
+   *  preservados cuando no vienen. `billingCountry` ya viene auto-derivado del país de la org
+   *  desde la UI. `clients.country_code` NO va aquí: se deriva de organization.country. */
+  financeProfile?: {
+    billingAddress?: string | null
+    billingCountry?: string | null
+    requiresPo?: boolean
+    requiresHes?: boolean
+    currentPoNumber?: string | null
+    currentHesNumber?: string | null
+    specialConditions?: string | null
   }
   actor: PartyActor
 }
@@ -66,24 +97,32 @@ export const instantiateClientForParty = async (
       ? 'efeonce_internal'
       : 'client'
 
+    // TASK-1006 — país del cliente = país de la org (SSOT). null-safe; trim→null.
+    const clientCountryCode =
+      typeof organization.country === 'string' && organization.country.trim().length > 0
+        ? organization.country.trim()
+        : null
+
     const insertedClient = await txClient.query<{ client_id: string }>(
       `INSERT INTO greenhouse_core.clients (
          client_id,
          client_name,
          legal_name,
          hubspot_company_id,
+         country_code,
          tenant_type,
          status,
          active,
          created_at,
          updated_at
-       ) VALUES ($1, $2, $3, $4, $5, 'active', TRUE, NOW(), NOW())
+       ) VALUES ($1, $2, $3, $4, $5, $6, 'active', TRUE, NOW(), NOW())
        RETURNING client_id`,
       [
         clientId,
         organization.organization_name,
         organization.organization_name,
         organization.hubspot_company_id,
+        clientCountryCode,
         tenantType
       ]
     )
@@ -93,6 +132,18 @@ export const instantiateClientForParty = async (
     const clientProfileId = `cp-${randomUUID()}`
     const paymentCurrency = input.billingDefaults?.paymentCurrency ?? DEFAULT_CURRENCY
     const paymentTermsDays = input.billingDefaults?.paymentTermsDays ?? DEFAULT_PAYMENT_TERMS_DAYS
+
+    const financeContacts =
+      input.financeContacts && input.financeContacts.length > 0
+        ? JSON.stringify(input.financeContacts)
+        : null
+
+    // TASK-1006 — perfil financiero del alta. Defaults legacy preservados cuando no viene
+    // financeProfile (billing_* = null, requires_* = FALSE). El N° OC/HES se persiste solo
+    // si el toggle correspondiente está activo (ya normalizado en el route; defensa extra acá).
+    const fp = input.financeProfile
+    const requiresPo = fp?.requiresPo ?? false
+    const requiresHes = fp?.requiresHes ?? false
 
     await txClient.query(
       `INSERT INTO greenhouse_finance.client_profiles (
@@ -105,10 +156,16 @@ export const instantiateClientForParty = async (
          payment_terms_days,
          requires_po,
          requires_hes,
+         current_po_number,
+         current_hes_number,
+         billing_address,
+         billing_country,
+         special_conditions,
+         finance_contacts,
          created_by_user_id,
          created_at,
          updated_at
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, FALSE, FALSE, $8, NOW(), NOW())`,
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb, $16, NOW(), NOW())`,
       [
         clientProfileId,
         insertedClientId,
@@ -117,6 +174,14 @@ export const instantiateClientForParty = async (
         organization.hubspot_company_id,
         paymentCurrency,
         paymentTermsDays,
+        requiresPo,
+        requiresHes,
+        requiresPo ? (fp?.currentPoNumber ?? null) : null,
+        requiresHes ? (fp?.currentHesNumber ?? null) : null,
+        fp?.billingAddress ?? null,
+        fp?.billingCountry ?? null,
+        fp?.specialConditions ?? null,
+        financeContacts,
         input.actor.userId ?? 'system'
       ]
     )
@@ -146,4 +211,59 @@ export const instantiateClientForParty = async (
   }
 
   return withTransaction(run)
+}
+
+export interface FillMissingFinanceProfileInput {
+  clientId: string
+  /** País legal/HQ de la org (SSOT) para llenar clients.country_code si está vacío. */
+  countryCode?: string | null
+  financeProfile?: {
+    billingAddress?: string | null
+    billingCountry?: string | null
+    currentPoNumber?: string | null
+    currentHesNumber?: string | null
+    specialConditions?: string | null
+  }
+}
+
+/**
+ * TASK-1006 — path de cliente EXISTENTE (reuso). Completa SOLO los campos del perfil
+ * financiero que hoy están NULL/vacío (anti-data-loss: NUNCA pisa un valor existente
+ * no-vacío desde el wizard; el overwrite intencional es un command auditado aparte —
+ * Open Question resuelta V1). Idempotente: COALESCE(NULLIF(TRIM(col),''), incoming) por
+ * campo nullable. Los booleans requires_po/hes NO se tocan (no son "null/empty" — tienen
+ * default FALSE deliberado). clients.country_code se llena solo si está NULL.
+ */
+export const fillMissingFinanceProfileForExistingClient = async (
+  input: FillMissingFinanceProfileInput,
+  client: QueryableClient
+): Promise<void> => {
+  const fp = input.financeProfile
+
+  await client.query(
+    `UPDATE greenhouse_finance.client_profiles
+        SET billing_address    = COALESCE(NULLIF(TRIM(COALESCE(billing_address, '')), ''), $2),
+            billing_country    = COALESCE(NULLIF(TRIM(COALESCE(billing_country, '')), ''), $3),
+            current_po_number  = COALESCE(NULLIF(TRIM(COALESCE(current_po_number, '')), ''), $4),
+            current_hes_number = COALESCE(NULLIF(TRIM(COALESCE(current_hes_number, '')), ''), $5),
+            special_conditions = COALESCE(NULLIF(TRIM(COALESCE(special_conditions, '')), ''), $6),
+            updated_at = NOW()
+      WHERE client_id = $1`,
+    [
+      input.clientId,
+      fp?.billingAddress ?? null,
+      fp?.billingCountry ?? null,
+      fp?.currentPoNumber ?? null,
+      fp?.currentHesNumber ?? null,
+      fp?.specialConditions ?? null
+    ]
+  )
+
+  await client.query(
+    `UPDATE greenhouse_core.clients
+        SET country_code = COALESCE(NULLIF(TRIM(COALESCE(country_code, '')), ''), $2),
+            updated_at = NOW()
+      WHERE client_id = $1`,
+    [input.clientId, input.countryCode ?? null]
+  )
 }

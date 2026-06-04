@@ -10,8 +10,10 @@ import type {
   NuboxRawSnapshotRow,
   NuboxConformedSale,
   NuboxConformedPurchase,
-  NuboxConformedBankMovement
+  NuboxConformedBankMovement,
+  NuboxExportationDetail
 } from '@/lib/nubox/types'
+import { normalizeTaxId } from '@/lib/finance/multi-currency/tax-identity'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -128,14 +130,89 @@ type IdentityMaps = {
   expenseByNuboxId: Map<string, string> // nubox_purchase_id → expense_id
 }
 
+// TASK-990 — DTE export legal codes (SII): 110 factura exportación, 111 nota
+// débito exportación, 112 nota crédito exportación.
+const EXPORT_DTE_LEGAL_CODES = new Set(['110', '111', '112'])
+
+export const isNuboxExportInvoice = (sale: NuboxSale): boolean =>
+  EXPORT_DTE_LEGAL_CODES.has(sale.type?.legalCode ?? '')
+
+// Candidate keys the raw export node MIGHT use for the foreign amount / currency
+// (Nubox's typed shape has none today — extraction is defensive, Open Question
+// resolved per-payload in Discovery). Operator-reviewed evidence is merged at
+// the disposition step (Slice 4), not here.
+const FOREIGN_AMOUNT_KEYS = ['foreignAmount', 'montoExtranjero', 'totalMonedaExtranjera', 'montoMonedaExtranjera', 'totalForeign']
+const FOREIGN_CURRENCY_KEYS = ['foreignCurrency', 'foreignCurrencyCode', 'currencyCode', 'codigoMoneda', 'tipoMoneda', 'moneda', 'currency']
+
+const readNumber = (node: Record<string, unknown>, keys: string[]): number | null => {
+  for (const k of keys) {
+    const v = node[k]
+    const n = typeof v === 'number' ? v : typeof v === 'string' ? Number(v) : NaN
+
+    if (Number.isFinite(n) && n > 0) return n
+  }
+
+  return null
+}
+
+const readString = (node: Record<string, unknown>, keys: string[]): string | null => {
+  for (const k of keys) {
+    const v = node[k]
+
+    if (typeof v === 'string' && v.trim()) return v.trim().toUpperCase()
+  }
+
+  return null
+}
+
+/**
+ * Extract export foreign-currency detail from a Nubox sale. CLP-only / non-export
+ * invoices return `none` evidence with null amounts (no behavior change). The CLP
+ * legal value is always `sale.totalAmount` (the functional plane — never
+ * recomputed, ADR §8.4). When the raw payload carries a usable foreign amount +
+ * currency, evidence is `nubox_payload`; otherwise `none` (needs reviewed
+ * disposition, Slice 4).
+ */
+export const mapNuboxExportationDetail = (sale: NuboxSale): NuboxExportationDetail => {
+  const functionalClp = sale.totalAmount ?? null
+
+  if (!isNuboxExportInvoice(sale)) {
+    return {
+      foreignTotalAmount: null,
+      foreignCurrencyCode: null,
+      functionalTotalAmountClp: functionalClp,
+      evidenceSource: 'none',
+      confidence: 'none',
+      raw: null
+    }
+  }
+
+  const raw = sale.exportationDetail ?? null
+  const foreignAmount = raw ? readNumber(raw, FOREIGN_AMOUNT_KEYS) : null
+  const foreignCurrency = raw ? readString(raw, FOREIGN_CURRENCY_KEYS) : null
+  const hasUsable = foreignAmount !== null && foreignCurrency !== null
+
+  return {
+    foreignTotalAmount: hasUsable ? foreignAmount : null,
+    foreignCurrencyCode: hasUsable ? foreignCurrency : null,
+    functionalTotalAmountClp: functionalClp,
+    evidenceSource: hasUsable ? 'nubox_payload' : 'none',
+    confidence: hasUsable ? 'high' : 'none',
+    raw
+  }
+}
+
 export const mapSaleToConformed = (
   sale: NuboxSale,
   syncRunId: string,
   identityMaps: Pick<IdentityMaps, 'orgByRut' | 'incomeByNuboxId'>
 ): NuboxConformedSale => {
   const clientRut = sale.client?.identification?.value || null
-  const orgMatch = clientRut ? identityMaps.orgByRut.get(clientRut) : undefined
+  // TASK-990 — normalize the tax-id key (RUT or Mexican RFC) on lookup so case /
+  // whitespace variance never silently orphans an export sale (overlay arch #1).
+  const orgMatch = clientRut ? identityMaps.orgByRut.get(normalizeTaxId(clientRut)) : undefined
   const incomeId = identityMaps.incomeByNuboxId.get(String(sale.id)) || null
+  const exportationDetail = mapNuboxExportationDetail(sale)
 
   return {
     nubox_sale_id: String(sale.id),
@@ -164,6 +241,12 @@ export const mapSaleToConformed = (
     client_rut: clientRut,
     client_trade_name: sale.client?.tradeName || null,
     client_main_activity: sale.client?.mainActivity || null,
+    foreign_total_amount: exportationDetail.foreignTotalAmount,
+    foreign_currency_code: exportationDetail.foreignCurrencyCode,
+    functional_total_amount_clp: exportationDetail.functionalTotalAmountClp,
+    exportation_detail_json: exportationDetail.raw ? JSON.stringify(exportationDetail.raw) : null,
+    foreign_currency_evidence_source: exportationDetail.evidenceSource,
+    foreign_currency_confidence: exportationDetail.confidence,
     pdf_url: getLink(sale.links, 'pdf'),
     xml_url: getLink(sale.links, 'xml'),
     details_url: getLink(sale.links, 'details'),
@@ -183,8 +266,9 @@ export const mapPurchaseToConformed = (
   identityMaps: Pick<IdentityMaps, 'orgByRut' | 'supplierByRut' | 'expenseByNuboxId'>
 ): NuboxConformedPurchase => {
   const supplierRut = purchase.supplier?.identification?.value || null
-  const supplierId = supplierRut ? identityMaps.supplierByRut.get(supplierRut) || null : null
-  const orgEntry = supplierRut ? identityMaps.orgByRut.get(supplierRut) || null : null
+  const supplierKey = normalizeTaxId(supplierRut)
+  const supplierId = supplierKey ? identityMaps.supplierByRut.get(supplierKey) || null : null
+  const orgEntry = supplierKey ? identityMaps.orgByRut.get(supplierKey) || null : null
   const expenseId = identityMaps.expenseByNuboxId.get(String(purchase.id)) || null
 
   return {

@@ -37,14 +37,22 @@ export const getNotionFreshnessFromBigQuery = async (
   const bq = getBigQueryClient()
   const filter = buildSpaceFilter('space_id', spaceIds)
 
+  // TASK-1007: la freshness se deriva de `notion_ops.raw_pages_snapshot.synced_at`
+  // (evidencia real de "el sync escribió data para este space"), NO del mirror BQ legacy
+  // `greenhouse.space_notion_sources` que solo contiene Efeonce/Sky y greenhouse-eo ya no
+  // escribe para clientes nuevos (misma raíz que TASK-1004). Todos los spaces escriben en
+  // raw_pages_snapshot por construcción → cualquier cliente nuevo entra solo, cero código.
+  // Consistente con el readiness gate y getNotionSyncOperationalOverview, que ya tratan
+  // `notion_ops.*` synced_at como fuente canónica. El guard `sync_enabled` NO va aquí
+  // (no es columna en raw); lo enforce el UPDATE PG en reconcileNotionFreshnessToPostgres.
   const [rows] = await bq.query({
     query: `
       SELECT
         space_id,
-        MAX(last_synced_at) AS last_synced_at
-      FROM \`${projectId}.greenhouse.space_notion_sources\`
-      WHERE sync_enabled = TRUE
-        AND last_synced_at IS NOT NULL${filter}
+        MAX(synced_at) AS last_synced_at
+      FROM \`${projectId}.notion_ops.raw_pages_snapshot\`
+      WHERE synced_at IS NOT NULL
+        AND space_id IS NOT NULL${filter}
       GROUP BY space_id
     `
   })

@@ -319,6 +319,7 @@ Append-only JSONL en `.captures/audit.jsonl`. Cada run agrega: timestamp, route,
 - **NUNCA** invocar `tsx scripts/frontend/capture.ts` directo — usar `pnpm fe:capture` para que tsx resuelva paths correctamente.
 - **NUNCA** usar `scrollY` como unica forma de llegar a una sección estable si existe un selector posible.
 - **NUNCA** combinar `fullPage` y `clipSelector` en el mismo `mark`.
+- **NUNCA** usar `mark fullPage` para LEER el detalle de una sección cuando la pantalla tiene un sidebar `position: fixed` — el stitch de fullPage repite el elemento fijo a cada altura de scroll y el escalado vuelve el texto ilegible (TASK-1006, 2026-06-04). Para leer detalle/copy: `data-capture` en la sección + `scroll selector` + `mark clipSelector` (crisp, resolución real). `fullPage` es para "ver el largo total", no para auditar detalle.
 - **NUNCA** committear `.captures/` ni `.auth/` — ambos en `.gitignore`.
 - **NUNCA** loggear bypass secret a stdout / manifest / audit / stderr.
 - **NUNCA** recording sin `applySecretMask` activo (incluso si el scenario no toca password inputs — defense-in-depth).
@@ -416,3 +417,16 @@ Output producido:
 - Documentación funcional: `docs/documentation/plataforma/captura-visual.md`
 - Agent auth canónico: CLAUDE.md sección "Agent Auth"
 - Spec arquitectónica diseñada vía: `arch-architect` skill (`.claude/skills/arch-architect/SKILL.md`)
+
+## Delta 2026-06-04 — Artefacto `fullPage` con sidebar fijo (aprendizaje GVC, TASK-1006)
+
+Durante el loop GVC de TASK-1006 (verificar el resumen Confirmar del wizard de alta) un `mark fullPage` salió **ilegible**: el portal tiene el sidebar de navegación en `position: fixed`, y el stitch de `fullPage` lo **repinta a cada altura de scroll**, superponiéndolo sobre el contenido; además el escalado de una página alta achica el texto al punto de no poder leer copy ni valores.
+
+**Regla práctica canonizada:** `fullPage` sirve para **ver el largo/estructura total** de una pantalla, NO para **leer detalle** (copy, valores, jerarquía fina). Para auditar una sección puntual:
+
+```ts
+{ kind: 'scroll', selector: '[data-capture="mi-seccion"]', scrollBlock: 'center' },
+{ kind: 'mark', label: 'mi-seccion', clipSelector: '[data-capture="mi-seccion"]' }
+```
+
+Esto produce una captura crisp a resolución real, sin el artefacto del elemento fijo. Si la sección no tiene un selector estable, agregar un `data-capture` (envoltura `Box data-capture="…"` version-agnostic) — preferido sobre offsets o `fullPage` para leer detalle. Reflejado en la Hard rule correspondiente + en el manual de uso ("Problemas comunes").

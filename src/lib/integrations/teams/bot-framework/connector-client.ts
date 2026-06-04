@@ -356,6 +356,12 @@ interface CreateOneOnOneParams {
  * If they don't, the Connector returns 403 and we surface
  * `recipient_not_in_tenant` (the dispatcher decides whether to call
  * `installBotForUser` first via Graph).
+ *
+ * Microsoft Learn's current proactive-message guidance says that creating a
+ * one-on-one conversation with an Entra user passes the aadObjectId as the
+ * member `id`. Do not prefix it with `29:` here: that prefix is for Teams
+ * pairwise user IDs and mention entities, and the Connector returns
+ * "Failed to decrypt pairwise id" when it receives `29:<aadObjectId>`.
  */
 export const getOrCreateOneOnOneChat = async (
   params: CreateOneOnOneParams
@@ -367,7 +373,7 @@ export const getOrCreateOneOnOneChat = async (
 
     const body = {
       bot: { id: '', name: '' },
-      members: [{ id: `29:${params.recipientUserId}` }],
+      members: [{ id: params.recipientUserId }],
       tenantId: params.tenantId,
       channelData: { tenant: { id: params.tenantId } }
     }

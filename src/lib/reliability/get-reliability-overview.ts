@@ -41,6 +41,16 @@ import { getClientPortalResolverFailureRateSignal } from './queries/client-porta
 import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook-subscription-health'
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
+import { getNuboxExportOrphanRfcSignal } from './queries/nubox-export-orphan-rfc'
+import { getPaymentOrderMixedCurrencySignal } from './queries/payment-order-mixed-currency'
+import { getFxGainLossUnclassifiedSignal } from './queries/fx-gain-loss-unclassified'
+import {
+  getCashSignalUnsupportedCurrencySignal,
+  getFxSnapshotMissingSignal,
+  getMxnRateFreshnessSignal,
+  getNativeEquivalentDriftSignal,
+  getNuboxExportForeignAmountMissingSignal
+} from './queries/multi-currency-fx-signals'
 import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
 import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
 import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
@@ -165,6 +175,21 @@ import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conform
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
 import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
 import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
+// TASK-991 Slice 0 — 4 reliability signals de completitud del nacimiento de la organización.
+// Todas roll up bajo subsystem `commercial`. Steady=0.
+import { getCommercialClientActiveWithoutProfileSignal } from './queries/commercial-client-active-without-profile'
+import { getCommercialClientActiveWithoutSpaceSignal } from './queries/commercial-client-active-without-space'
+// TASK-992 — 5 reliability signals del Client Lifecycle Orchestrator (roll up `commercial`).
+import {
+  getClientLifecycleOnboardingStalledSignal,
+  getClientLifecycleChecklistOrphanItemsSignal,
+  getClientLifecycleCascadeDeadLetterSignal,
+  getClientLifecycleCaseWithoutTemplateSignal,
+  getClientLifecycleBlockerOverrideAnomalySignal
+} from './queries/client-lifecycle-signals'
+import { getCommercialOrganizationIncompleteIdentitySignal } from './queries/commercial-organization-incomplete-identity'
+import { getCommercialOrganizationIndustryNoncanonicalSignal } from './queries/commercial-organization-industry-noncanonical'
+import { getCommercialOrganizationTypeLifecycleDriftSignal } from './queries/commercial-organization-type-lifecycle-drift'
 import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
 // TASK-837 Slice 6 — 7 reliability signals for Sample Sprint outbound projection.
 import {
@@ -571,6 +596,22 @@ interface ReliabilityOverviewSources {
    */
   ledgerUnresolvedDriftItems?: ReliabilitySignal | null
 
+  /** TASK-990 Slice 4 — Nubox export RFC sin organización (disposición pendiente). */
+  nuboxExportOrphanRfc?: ReliabilitySignal | null
+
+  /** TASK-990 Slice 6 — payment order con currency distinta a sus obligations. */
+  paymentOrderMixedCurrency?: ReliabilitySignal | null
+
+  /** TASK-990 Slice 7 — pago no-CLP con resultado cambiario sin clasificar. */
+  fxGainLossUnclassified?: ReliabilitySignal | null
+
+  /** TASK-990 Slice 8 — multi-currency / FX rollout signals (5). */
+  mxnRateFreshness?: ReliabilitySignal | null
+  fxSnapshotMissing?: ReliabilitySignal | null
+  nuboxExportForeignAmountMissing?: ReliabilitySignal | null
+  multiCurrencyNativeEquivalentDrift?: ReliabilitySignal | null
+  cashSignalUnsupportedCurrency?: ReliabilitySignal | null
+
   /**
    * TASK-793 Slice 3 — Contractor payable → Finance bridge signals (lag +
    * dead-letter). Single signals; degradan honestamente a null si la query falla.
@@ -896,6 +937,14 @@ export const buildReliabilityOverview = (
     // TASK-774 Slice 4 — Account balances FX drift (closing_balance vs recompute).
     ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
     ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
+    ...(sources.nuboxExportOrphanRfc ? [sources.nuboxExportOrphanRfc] : []),
+    ...(sources.paymentOrderMixedCurrency ? [sources.paymentOrderMixedCurrency] : []),
+    ...(sources.fxGainLossUnclassified ? [sources.fxGainLossUnclassified] : []),
+    ...(sources.mxnRateFreshness ? [sources.mxnRateFreshness] : []),
+    ...(sources.fxSnapshotMissing ? [sources.fxSnapshotMissing] : []),
+    ...(sources.nuboxExportForeignAmountMissing ? [sources.nuboxExportForeignAmountMissing] : []),
+    ...(sources.multiCurrencyNativeEquivalentDrift ? [sources.multiCurrencyNativeEquivalentDrift] : []),
+    ...(sources.cashSignalUnsupportedCurrency ? [sources.cashSignalUnsupportedCurrency] : []),
     // TASK-793 Slice 3 — contractor payable → Finance bridge (lag + dead-letter).
     ...(sources.contractorPayableReadyWithoutObligation
       ? [sources.contractorPayableReadyWithoutObligation]
@@ -1288,6 +1337,46 @@ export const getReliabilityOverview = async (
       ? preloadedSources.ledgerUnresolvedDriftItems
       : await getLedgerUnresolvedDriftItemsSignal().catch(() => null)
 
+  const nuboxExportOrphanRfc =
+    preloadedSources.nuboxExportOrphanRfc !== undefined
+      ? preloadedSources.nuboxExportOrphanRfc
+      : await getNuboxExportOrphanRfcSignal().catch(() => null)
+
+  const paymentOrderMixedCurrency =
+    preloadedSources.paymentOrderMixedCurrency !== undefined
+      ? preloadedSources.paymentOrderMixedCurrency
+      : await getPaymentOrderMixedCurrencySignal().catch(() => null)
+
+  const fxGainLossUnclassified =
+    preloadedSources.fxGainLossUnclassified !== undefined
+      ? preloadedSources.fxGainLossUnclassified
+      : await getFxGainLossUnclassifiedSignal().catch(() => null)
+
+  const mxnRateFreshness =
+    preloadedSources.mxnRateFreshness !== undefined
+      ? preloadedSources.mxnRateFreshness
+      : await getMxnRateFreshnessSignal().catch(() => null)
+
+  const fxSnapshotMissing =
+    preloadedSources.fxSnapshotMissing !== undefined
+      ? preloadedSources.fxSnapshotMissing
+      : await getFxSnapshotMissingSignal().catch(() => null)
+
+  const nuboxExportForeignAmountMissing =
+    preloadedSources.nuboxExportForeignAmountMissing !== undefined
+      ? preloadedSources.nuboxExportForeignAmountMissing
+      : await getNuboxExportForeignAmountMissingSignal().catch(() => null)
+
+  const multiCurrencyNativeEquivalentDrift =
+    preloadedSources.multiCurrencyNativeEquivalentDrift !== undefined
+      ? preloadedSources.multiCurrencyNativeEquivalentDrift
+      : await getNativeEquivalentDriftSignal().catch(() => null)
+
+  const cashSignalUnsupportedCurrency =
+    preloadedSources.cashSignalUnsupportedCurrency !== undefined
+      ? preloadedSources.cashSignalUnsupportedCurrency
+      : await getCashSignalUnsupportedCurrencySignal().catch(() => null)
+
   // TASK-793 Slice 3 — Contractor payable → Finance bridge (lag + dead-letter).
   // Cada reader degrada honestamente a null si su query falla — un solo signal
   // roto NO envenena el overview entero.
@@ -1649,7 +1738,20 @@ export const getReliabilityOverview = async (
           getSampleSprintDealClosedButActiveSignal().catch(() => null),
           getSampleSprintDealAssociationsDriftSignal().catch(() => null),
           getSampleSprintOutcomeTerminalPservicesOpenSignal().catch(() => null),
-          getSampleSprintLegacyWithoutDealSignal().catch(() => null)
+          getSampleSprintLegacyWithoutDealSignal().catch(() => null),
+          // TASK-991 Slice 0 — Organization birth completeness signals (roll up bajo `commercial`).
+          getCommercialOrganizationTypeLifecycleDriftSignal().catch(() => null),
+          getCommercialOrganizationIncompleteIdentitySignal().catch(() => null),
+          getCommercialClientActiveWithoutProfileSignal().catch(() => null),
+          getCommercialClientActiveWithoutSpaceSignal().catch(() => null),
+          // TASK-997 Slice 1 — industria fuera del enum canónico HubSpot (data quality).
+          getCommercialOrganizationIndustryNoncanonicalSignal().catch(() => null),
+          // TASK-992 — Client Lifecycle Orchestrator signals (roll up bajo `commercial`).
+          getClientLifecycleOnboardingStalledSignal().catch(() => null),
+          getClientLifecycleChecklistOrphanItemsSignal().catch(() => null),
+          getClientLifecycleCascadeDeadLetterSignal().catch(() => null),
+          getClientLifecycleCaseWithoutTemplateSignal().catch(() => null),
+          getClientLifecycleBlockerOverrideAnomalySignal().catch(() => null)
         ])
           .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
@@ -1770,6 +1872,14 @@ export const getReliabilityOverview = async (
     cronStagingDrift,
     accountBalancesFxDrift,
     ledgerUnresolvedDriftItems,
+    nuboxExportOrphanRfc,
+    paymentOrderMixedCurrency,
+    fxGainLossUnclassified,
+    mxnRateFreshness,
+    fxSnapshotMissing,
+    nuboxExportForeignAmountMissing,
+    multiCurrencyNativeEquivalentDrift,
+    cashSignalUnsupportedCurrency,
     contractorPayableReadyWithoutObligation,
     contractorPayableExpenseUnmaterialized,
     contractorPayablePaymentSlaOverdue,

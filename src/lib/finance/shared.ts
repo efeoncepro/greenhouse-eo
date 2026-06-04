@@ -178,7 +178,9 @@ export const assertValidCurrency = (currency: string): FinanceCurrency => {
   const upper = currency.toUpperCase().trim()
 
   if (!VALID_CURRENCIES.includes(upper as FinanceCurrency)) {
-    throw new FinanceValidationError(`Invalid currency: ${currency}. Must be CLP or USD.`)
+    // Message derived from the canonical list so it never drifts when a currency
+    // is added to/removed from finance_core (e.g. MXN, TASK-990).
+    throw new FinanceValidationError(`Invalid currency: ${currency}. Must be one of ${VALID_CURRENCIES.join(', ')}.`)
   }
 
   return upper as FinanceCurrency

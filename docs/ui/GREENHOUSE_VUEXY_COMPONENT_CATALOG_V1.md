@@ -231,6 +231,64 @@ Enumera lo que hoy conviene consultar primero.
 - Referencia local:
   - `src/components/greenhouse/BrandLogo.tsx`
 
+### `greenhouse-date-picker`
+- Estado: `shared`
+- Familia: `form-input`
+- Uso:
+  - **cualquier** input de fecha del portal — es el datepicker canónico
+  - formato `dd/MM/yyyy`; modo mes/año con `showMonthYearPicker`
+- API:
+  - `<GreenhouseDatePicker label value onChange error helperText minDate maxDate disabled showMonthYearPicker dateFormat />`
+  - `value` / `onChange` en `Date | null` (cuidado tz al convertir `yyyy-mm-dd ↔ Date`: usar partes locales, no `new Date('yyyy-mm-dd')` que parsea UTC)
+- Estética:
+  - **encapsulada en el componente** — input `CustomTextField` (radio 8px + ícono `tabler-calendar-event` + readOnly) y popup `react-datepicker` retemado con tokens MUI (`--mui-palette-*`, `--mui-shape-borderRadius`, `--mui-customShadows-md`), light/dark automático
+  - reutilizar = mismo look sin overrides por pantalla (los consumidores NO pasan `sx`/`style`/`className`)
+- Consumidores hoy:
+  - wizard alta de cliente (Comercial: inicio/término + form de fase), `AdminOperationalCalendarView`, mockup onboarding
+- Referencia local:
+  - `src/components/greenhouse/GreenhouseDatePicker.tsx` (wrapper de `src/libs/styles/AppReactDatepicker.tsx`)
+- Regla dura:
+  - NUNCA usar `<input type="date">` ni `CustomTextField type='date'` — siempre este wrapper
+
+### `greenhouse-calendar`
+- Estado: `shared`
+- Familia: `form-input`
+- Uso:
+  - vista de calendario (wrapper de FullCalendar) — eventos `GreenhouseCalendarEvent`
+- Referencia local:
+  - `src/components/greenhouse/GreenhouseCalendar.tsx`
+
+### `greenhouse-drag-list`
+- Estado: `shared`
+- Familia: `form-input`
+- Uso:
+  - reordenar ítems por drag & drop (wrapper de `@formkit/drag-and-drop`)
+- Referencia local:
+  - `src/components/greenhouse/GreenhouseDragList.tsx`
+
+### `greenhouse-file-uploader`
+- Estado: `shared`
+- Familia: `form-input`
+- Uso:
+  - subida de archivos a assets privados canónicos (evidencia, documentos)
+- Referencia local:
+  - `src/components/greenhouse/GreenhouseFileUploader.tsx`
+
+### `brand-isotypes` (integraciones de terceros)
+- Estado: `shared`
+- Familia: `brand-integration`
+- Uso:
+  - etiquetar superficies de integración con el isotipo de la marca de terceros (Notion, Teams, futuros HubSpot/Slack)
+  - `NotionIsotype` (N negro en caja blanca) / `TeamsIsotype` (glyph púrpura `#5059C9`), prop `size`
+- Regla dura:
+  - rinden el **glyph Tabler de la marca** (`tabler-brand-notion`/`-teams`/`-*`) ya bundleado — NUNCA paths SVG hand-transcritos (rinden blob malformado + arrastran marcas retiradas de simple-icons). Decorativos (`aria-hidden`); el significado lo carga el label adyacente
+  - NO es la marca Efeonce/Greenhouse (esa vive en `efeonce-brand.ts` + DESIGN.md "Brand assets — Efeonce") y se usa distinto — estos marks de terceros NUNCA en documentos institucionales
+  - integración nueva → agregar `<XIsotype>` reusando `tabler-brand-<x>`; NUNCA hand-author SVG
+- Referencia local:
+  - `src/components/greenhouse/brand/BrandIsotypes.tsx`
+- Contrato visual:
+  - `DESIGN.md` → "Brand assets — Integraciones de terceros (Notion, Teams, …)"
+
 ## Overflow y secondary actions
 
 ### `option-menu`

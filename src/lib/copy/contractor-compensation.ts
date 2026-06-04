@@ -441,5 +441,48 @@ export const GH_CONTRACTOR_COMPENSATION = {
     saved: 'Guardado',
     cancel: 'Cancelar',
     saveError: 'No pudimos guardar los términos. Intenta de nuevo.'
+  },
+  supportDocuments: {
+    title: 'Soportes del caso',
+    subtitle: 'Boletas, evidencia y documentos adjuntos al engagement contractor.',
+    loading: 'Cargando soportes del caso…',
+    loadError: 'No pudimos cargar los soportes del caso. Intenta de nuevo.',
+    retryCta: 'Reintentar',
+    emptyTitle: 'Sin soportes adjuntos',
+    emptyDescription: 'Aún no hay boleta ni evidencia adjunta a este engagement.',
+    openViewerCta: 'Abrir visor',
+    closeViewerAria: 'Cerrar visor',
+    viewerLoading: 'Cargando documento…',
+    viewerLoadError: 'No pudimos cargar el documento.',
+    nonPreviewableDescription: 'Este tipo de archivo no se puede previsualizar en el visor.',
+    openFileCta: 'Abrir archivo',
+    openInTabCta: 'Abrir en pestaña',
+    previousPageAria: 'Página anterior',
+    nextPageAria: 'Página siguiente',
+    invoiceCountLabel: 'Boletas',
+    evidenceCountLabel: 'Evidencia',
+    engagementScope: 'Engagement completo',
+    currentSubmissionScope: 'Este envío',
+    otherSubmissionScope: 'Otro envío',
+    invoiceAttachedToEngagement:
+      'La boleta está adjunta al engagement completo. Revísala antes de decidir sobre este envío.',
+    requiredInvoiceMissing: 'Este engagement requiere boleta, pero no hay una boleta adjunta.',
+    role: {
+      invoice_pdf: 'Boleta PDF',
+      tax_xml: 'XML tributario',
+      tax_certificate: 'Certificado tributario',
+      work_evidence: 'Evidencia',
+      provider_statement: 'Statement proveedor',
+      payout_receipt: 'Comprobante de pago',
+      fx_receipt: 'Comprobante FX',
+      other_supporting_doc: 'Otro soporte'
+    },
+    source: {
+      contractor_upload: 'Subido por contractor',
+      hr_upload_on_behalf: 'Subido por HR',
+      finance_upload_on_behalf: 'Subido por Finanzas',
+      provider_import: 'Importado desde proveedor',
+      system_generated: 'Generado por Greenhouse'
+    }
   }
 } as const

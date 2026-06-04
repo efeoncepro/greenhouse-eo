@@ -361,6 +361,7 @@ Solo declaralos si **sabés** que poseés la capability vigente. El audit log re
 | Step `hover` / `click` falla con timeout | Verificá el selector — usa DevTools del browser (con `--headed`) para inspeccionar y ajustar el selector |
 | GIF muy grande / muy lento | Reducir el `--gif` workflow — el helper produce 12 fps 800px por default. Para casos pesados, abrir `flipbook.gif` y comprimirlo con `gifsicle` después |
 | Tests vitest fallan luego de agregar steps | Los tests usan `getByText`/`getByRole`; al agregar elementos nuevos podés introducir duplicados. Cambiar a `findByText`/`getAllByText` |
+| `mark fullPage` sale ilegible / con la barra lateral repetida | Artefacto conocido del stitch de `fullPage` cuando hay un sidebar `position: fixed` (la barra se pinta a cada altura de scroll) + el escalado achica el texto. **No uses `fullPage` para leer una sección puntual.** Agregá un `data-capture` a la sección y usá `{ kind: 'scroll', selector: '[data-capture="x"]' }` + `{ kind: 'mark', clipSelector: '[data-capture="x"]' }` → captura crisp a resolución real. `fullPage` queda para "ver el largo total", no para leer detalle. (TASK-1006, 2026-06-04.) |
 
 ## Referencias técnicas
 

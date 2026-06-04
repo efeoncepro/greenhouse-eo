@@ -8,6 +8,18 @@ Este documento acompaña el portal publico `/developers/api`. Resume las lanes
 runtime reales de `api/platform/*` sin reemplazar la arquitectura ni los docs
 funcionales internos.
 
+## Full API Parity
+
+Greenhouse adopta full API parity: toda capacidad que pueda ejecutarse dentro
+del portal debe poder ejecutarse, o tener camino planificado para ejecutarse,
+mediante un contrato programatico gobernado.
+
+Esto no significa publicar cada boton como endpoint. La paridad se diseña sobre
+aggregates, resources y commands; la UI, apps, agentes, MCP adapters y sister
+platforms consumen primitives server-side y contracts versionables.
+
+ADR canonico: `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
+
 ## Base URLs
 
 - Production: `https://greenhouse.efeoncepro.com`

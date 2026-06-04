@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -16,10 +16,13 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import ContractorSupportDocumentsPanel from '@/components/greenhouse/contractors/ContractorSupportDocumentsPanel'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_CONTRACTOR_COMPENSATION as C } from '@/lib/copy/contractor-compensation'
 import { formatCurrency } from '@/lib/format'
 import type { CurrencyCode } from '@/lib/format'
 import type { ContractorWorkbenchQueueRow } from '@/lib/contractor-engagements/projection-types'
+import type { ContractorSupportDocumentsBundle } from '@/lib/contractor-engagements/support-documents/types'
 import type { ContractorWorkSubmission } from '@/lib/contractor-engagements/work-submissions/types'
 
 export type ReviewDecision = 'approve' | 'dispute' | 'reject'
@@ -81,15 +84,58 @@ const AdminReviewDecisionDrawer = ({
   const [decision, setDecision] = useState<ReviewDecision>(initialDecision)
   const [loading, setLoading] = useState(false)
   const [submission, setSubmission] = useState<ContractorWorkSubmission | null>(null)
+  const [supportBundle, setSupportBundle] = useState<ContractorSupportDocumentsBundle | null>(null)
+  const [supportLoading, setSupportLoading] = useState(false)
+  const [supportError, setSupportError] = useState<string | null>(null)
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const submissionRequestIdRef = useRef(0)
+  const supportRequestIdRef = useRef(0)
 
   const copy = decisionCopy[decision]
   const requiresReason = decision !== 'approve'
   const reasonTooShort = requiresReason && reason.trim().length < MIN_REASON_LENGTH
 
+  const loadSupportDocuments = useCallback(async (engagementId: string, submissionId?: string | null) => {
+    const requestId = supportRequestIdRef.current + 1
+
+    supportRequestIdRef.current = requestId
+    setSupportLoading(true)
+    setSupportError(null)
+    setSupportBundle(null)
+
+    try {
+      const params = submissionId ? `?contractorWorkSubmissionId=${encodeURIComponent(submissionId)}` : ''
+
+      const response = await fetch(`/api/hr/contractors/${encodeURIComponent(engagementId)}/support-documents${params}`, {
+        cache: 'no-store'
+      })
+
+      if (!response.ok) throw new Error('load_failed')
+
+      const payload = (await response.json().catch(() => null)) as ContractorSupportDocumentsBundle | null
+
+      if (!payload?.contractorEngagementId) throw new Error('load_failed')
+
+      if (supportRequestIdRef.current === requestId) {
+        setSupportBundle(payload)
+      }
+    } catch {
+      if (supportRequestIdRef.current === requestId) {
+        setSupportError(C.supportDocuments.loadError)
+      }
+    } finally {
+      if (supportRequestIdRef.current === requestId) {
+        setSupportLoading(false)
+      }
+    }
+  }, [])
+
   const loadSubmission = useCallback(async (engagementId: string) => {
+    const requestId = submissionRequestIdRef.current + 1
+
+    submissionRequestIdRef.current = requestId
     setLoading(true)
     setError(null)
     setSubmission(null)
@@ -118,13 +164,22 @@ const AdminReviewDecisionDrawer = ({
         (b.submittedAt ?? b.createdAt).localeCompare(a.submittedAt ?? a.createdAt)
       )
 
-      setSubmission(candidates[0] ?? null)
+      const nextSubmission = candidates[0] ?? null
+
+      if (submissionRequestIdRef.current === requestId) {
+        setSubmission(nextSubmission)
+        void loadSupportDocuments(engagementId, nextSubmission?.contractorWorkSubmissionId ?? null)
+      }
     } catch {
-      setError('No pudimos cargar el envío de este caso. Intenta de nuevo.')
+      if (submissionRequestIdRef.current === requestId) {
+        setError('No pudimos cargar el envío de este caso. Intenta de nuevo.')
+      }
     } finally {
-      setLoading(false)
+      if (submissionRequestIdRef.current === requestId) {
+        setLoading(false)
+      }
     }
-  }, [])
+  }, [loadSupportDocuments])
 
   useEffect(() => {
     if (!open || !queueRow) return
@@ -132,7 +187,14 @@ const AdminReviewDecisionDrawer = ({
     setDecision(initialDecision)
     setReason('')
     setError(null)
+    setSupportError(null)
+    setSupportBundle(null)
     void loadSubmission(queueRow.contractorEngagementId)
+
+    return () => {
+      submissionRequestIdRef.current += 1
+      supportRequestIdRef.current += 1
+    }
   }, [open, queueRow, initialDecision, loadSubmission])
 
   const handleConfirm = async () => {
@@ -214,6 +276,17 @@ const AdminReviewDecisionDrawer = ({
                 value={submission ? formatSubmissionAmount(submission.grossAmount, submission.currency) : '—'}
               />
             </Stack>
+          ) : null}
+
+          {queueRow ? (
+            <ContractorSupportDocumentsPanel
+              bundle={supportBundle}
+              loading={supportLoading}
+              error={supportError}
+              onRetry={() =>
+                void loadSupportDocuments(queueRow.contractorEngagementId, submission?.contractorWorkSubmissionId ?? null)
+              }
+            />
           ) : null}
 
           {loading ? (

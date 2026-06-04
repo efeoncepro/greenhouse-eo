@@ -56,6 +56,41 @@ export type NuboxSaleType = {
   name: string
 }
 
+// TASK-990 — Export invoice (DTE 110/111/112) foreign-currency detail.
+// Nubox's typed sale shape does NOT carry a foreign-currency field today; the
+// raw payload MAY expose an export node under an unknown key, so the raw node is
+// permissive and the mapper extracts defensively. When the payload has no
+// usable foreign amount/currency, the detail is `none` and requires a reviewed
+// commercial disposition (Slice 4) before any income projection (Slice 5).
+export type NuboxRawExportationNode = Record<string, unknown>
+
+// `nubox_xml` = the authoritative SII DTE XML (`<Totales>` native + `<OtraMoneda>`
+// CLP), the legal source for foreign-currency export invoices. `nubox_payload`
+// = the (currently empty) list-payload export node. `reviewed_commercial` =
+// operator-supplied via reviewed disposition. `none` = no usable evidence yet.
+export type NuboxForeignCurrencyEvidenceSource =
+  | 'nubox_xml'
+  | 'nubox_payload'
+  | 'reviewed_commercial'
+  | 'none'
+
+export type NuboxForeignCurrencyConfidence = 'high' | 'medium' | 'low' | 'none'
+
+export type NuboxExportationDetail = {
+  /** Native foreign amount of the export invoice (e.g. 89960 MXN). Null when no
+   *  usable evidence yet. */
+  foreignTotalAmount: number | null
+  /** ISO 4217 code of the foreign amount (e.g. 'MXN'). Null when unknown. */
+  foreignCurrencyCode: string | null
+  /** CLP legal/documentary equivalent from the document (Nubox `totalAmount`).
+   *  This is the functional plane — Greenhouse never recomputes it (ADR §8.4). */
+  functionalTotalAmountClp: number | null
+  evidenceSource: NuboxForeignCurrencyEvidenceSource
+  confidence: NuboxForeignCurrencyConfidence
+  /** The raw export node if Nubox provided one, for audit. */
+  raw: NuboxRawExportationNode | null
+}
+
 export type NuboxSale = {
   id: number
   number: string // folio
@@ -78,6 +113,10 @@ export type NuboxSale = {
   emissionStatus: NuboxEmissionStatus
   saleType?: NuboxSaleType
   links?: NuboxLink[]
+  // TASK-990: raw export node if the payload carries one (shape unknown — the
+  // mapper inspects candidate keys). Operator-supplied reviewed evidence is
+  // merged in at the disposition step (Slice 4), not here.
+  exportationDetail?: NuboxRawExportationNode | null
 }
 
 export type NuboxSaleDetail = {
@@ -274,6 +313,15 @@ export type NuboxConformedSale = {
   client_rut: string | null
   client_trade_name: string | null
   client_main_activity: string | null
+
+  // TASK-990 — export (DTE 110) foreign-currency detail. CLP-only invoices leave
+  // these null; CLP legal value stays in total_amount as today.
+  foreign_total_amount: number | null
+  foreign_currency_code: string | null
+  functional_total_amount_clp: number | null
+  exportation_detail_json: string | null
+  foreign_currency_evidence_source: NuboxForeignCurrencyEvidenceSource
+  foreign_currency_confidence: NuboxForeignCurrencyConfidence
 
   // Links
   pdf_url: string | null

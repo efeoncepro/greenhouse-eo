@@ -14,6 +14,10 @@ export async function ensureHandlersRegistered() {
   // endpoint /api/webhooks/notion-status-transitions, secret separado, gated por
   // kill-switch flag NOTION_STATUS_TRANSITIONS_WEBHOOK_ENABLED default OFF).
   await import('./notion-status-transitions')
+  // TASK-1010 Slice 3 — HubSpot deals webhook (semi-automatic onboarding trigger,
+  // endpoint /api/webhooks/hubspot-deals, gated por flag
+  // CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED default OFF).
+  await import('./hubspot-deals')
 
   // Future handlers imported here
   registered = true

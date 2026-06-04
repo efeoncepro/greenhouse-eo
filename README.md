@@ -72,6 +72,8 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
 
 ## APIs activas
 
+Principio vigente: Greenhouse adopta **full API parity**. Toda capacidad que pueda hacerse dentro del portal debe tener o planificar un equivalente programatico gobernado; la UI consume primitives server-side y no debe ser el unico lugar donde viva una accion de negocio. La arquitectura canonica vive en `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`.
+
 ### Dashboard y proyecto
 
 - `/api/dashboard/kpis`

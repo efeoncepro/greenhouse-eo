@@ -1,0 +1,796 @@
+# TASK-990 — MXN Multi-Currency Finance Core
+
+## Delta 2026-06-03 — MXN validado LIVE con Grupo Berel (primer cliente MXN del programa)
+
+**Contexto programa (EPIC-CLIENT-360):** esta task (soporte MXN en finance core) es el **enabler raíz** del onboarding de **Grupo Berel** — cliente mexicano cuya incorporación motivó todo el programa (MXN + vía canónica para incorporar clientes). Encadena: TASK-990 (MXN) → TASK-991 (org write SSOT) → TASK-992/997 (puerta única / wizard) → TASK-998 (teamspace link) → TASK-1000/1003 (sync diario).
+
+- ✅ **MXN consumido end-to-end por el wizard:** el composer `provisionClientFromWizard` (TASK-992 Slice 2) valida la moneda de facturación contra `CURRENCY_DOMAIN_SUPPORT.finance_core ∪ {UF,UTM}` (derivado del registry, NO hardcode) y crea `client_profiles` con moneda **MXN**. Berel quedó con perfil MXN/30 días.
+- Estado para recall: revisar el lifecycle/rollout de esta task (flags MXN en los dominios finance) — Berel es el caso real que la ejercita. Si MXN quedó code-complete con rollout pendiente, Berel es el smoke vivo.
+- Evidencia del onboarding completo: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md`.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `in-progress`
+- Priority: `P0`
+- Impact: `Muy alto`
+- Effort: `Alto`
+- Type: `implementation`
+- Epic: `[optional EPIC-TBD]`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `finance` (owner) — touches `integrations` (Nubox sync), `treasury` (settlement/FX), `data` (BQ conformed), `reliability` (signals). Domain boundary per `docs/architecture/GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`: Finance owns income, expenses, payments, reconciliation, FX, P&L. Commercial (pricing MXN) is upstream evidence only, NOT modified by this task.
+- Blocked by: `none` — ADR `GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1` ACEPTADO 2026-06-02 (ver §0 Acceptance Record). Lista para Slice 0.
+- Branch: `task/TASK-990-mxn-multi-currency-finance-core`
+- Legacy ID: `none`
+- GitHub Issue: `[optional]`
+
+## Delta 2026-06-02 — identidad de Berel remediada por TASK-991
+
+TASK-991 (Slice 3) ya remedió **en vivo** la identidad de la org de Grupo Berel: `organization_type='client'`, `country='MX'`, `tax_id='PBE970101718'` (`tax_id_type='RFC'`), `legal_name='PINTURAS BEREL SA DE CV'`. Eso **destraba el RFC match** de esta task (Slice 4-5): la org ya tiene el RFC para anclar la factura Nubox `28800562`. El facet financiero MXN (income projection + perfil con moneda MXN) sigue siendo responsabilidad de esta task. El Space operativo y el wizard de onboarding son TASK-992.
+
+## Delta 2026-06-02 — PROGRESO Slices 1–5 (commiteados + pusheados a `develop`) — anti-pérdida-de-contexto
+
+> Bloque durable para que una compactación no pierda estado. Cada slice gateado en flags **default OFF** → cero cambio en producción. El flip de flags + el *apply* del backfill de Berel siguen pendientes de OK explícito del operador (acciones de rollout, no de código).
+
+**Commits (en `origin/develop`):**
+- `c82fca89` Slice 1 — Foundation: `FinanceCurrency += MXN` (`src/lib/finance/contracts.ts`), `finance_core` corridor, money primitives + FX snapshot evidence + canonical 3-plane snapshot (`src/lib/finance/multi-currency/{flags,money,fx-snapshot,canonical-money-snapshot,index}.ts`). 15 tests.
+- `97192169` Slice 2 — Schema (`migrations/20260602194741585_...sql`): tabla `greenhouse_finance.fx_snapshots` (append-only); 7 CHECK widenings a MXN; 12 columnas aditivas nullable (`income`/`expenses`: `native_amount, native_currency, amount_usd, native_to_functional_fx_snapshot_id, functional_to_reporting_fx_snapshot_id`; `*_payments`: `amount_usd, settlement_fx_snapshot_id`); VIEWs canónicas extendidas (USD al FINAL, sin reordenar — preservan TASK-768 economic_category JOIN); partial indexes `income.invoice_date`/`expenses.document_date`.
+- `7b047b73` Slice 3 — Conformed model: `NuboxExportationDetail` + 6 campos conformed + `isNuboxExportInvoice` (DTE 110/111/112). **OJO**: esta slice dejó un riesgo latente (mapper emitía 6 campos que la tabla BQ no tenía) — cerrado en 5a.
+- `e1a997aa` Slice 4 — Identity matching: helper RFC puro (`src/lib/finance/multi-currency/tax-identity.ts`: `normalizeTaxId`/`classifyTaxId`/`isValidRfc*`), resolver normalizado RUT/RFC en ambos lados, queue `greenhouse_finance.nubox_export_rfc_dispositions` + capability `finance.nubox_export.review_disposition` (catalog + registry migration `20260602201016706` + grant runtime.ts) + endpoints `/api/admin/finance/nubox-export-rfc-dispositions[/[id]/resolve]` + signal `finance.nubox_export.orphan_rfc` + dry-run.
+- `087a6019` Slice 5a — **XML foreign sourcing** (corrección crítica del operador): el monto MXN vive en el **XML SII** (`getNuboxSaleXml`), NO en `/sales` ni `/details`. `src/lib/nubox/dte-foreign-currency.ts` (`parseDteForeignCurrencyXml` + SII currency-name→ISO). Conformed sync `enrichExportSalesWithForeignCurrency` (gated `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`). **BQ ALTER ran live**: `greenhouse_conformed.nubox_sales` += 6 `foreign_*` columns + `ignoreUnknownValues:true` en los 3 inserts conformed (cierra el riesgo de Slice 3). `resolveNuboxIncomeTaxCode`: DTE 110/111/112 → `cl_vat_exempt` explícito. evidence enum += `nubox_xml`.
+- `f04cd6b9` Slice 5b — Income native plane: `persistFxSnapshot` (`src/lib/finance/multi-currency/fx-snapshot-store.ts`); income upsert (gated `FINANCE_CORE_MXN_ENABLED`) puebla aditivo `native_amount`/`native_currency`/`native_to_functional_fx_snapshot_id` (rate MXN→CLP `nubox_legal_document`/`rate_at_event`). Campos CLP fiscales (`currency`/`total_amount`/`total_amount_clp`) **bit-for-bit intactos**. Sign DTE 112 aplicado a native.
+- `fb611347` Slice 6 — Payment orders MXN: `PaymentOrderCurrency += MXN`; gate `unsupported_corridor` en `create-from-obligations.ts` (order MXN rechazada hasta `FINANCE_MXN_PAYMENT_ORDERS_ENABLED`); error code `unsupported_corridor` (errors.test 19 codes); signal `finance.payment_order.mixed_currency_attempt` (`src/lib/reliability/queries/payment-order-mixed-currency.ts`, drift, steady=0, smoke-verified PG). Berel es income/AR → infra forward-looking de payables.
+
+**Datos canónicos verificados live (Berel, sale `28800562`, DTE 110):**
+- XML SII: `<Totales><TpoMoneda>PESO MEX</TpoMoneda><MntTotal>89960</MntTotal></Totales>` + `<OtraMoneda><TpoMoneda>PESO CL</TpoMoneda><TpoCambio>51</TpoCambio><MntTotOtrMnda>4617647</MntTotOtrMnda></OtraMoneda>`.
+- native = **89.960 MXN**; functional = **4.617.647 CLP** (legal, nunca recomputado); implied rate = **51,33** CLP/MXN; IVA-exento (D.L. 825).
+- El `<RUTRecep>55555555-5</RUTRecep>` del XML es el placeholder SII de receptor extranjero — el RFC real (`PBE970101718`) viene del Nubox `client.identification.value` (lo que usa el match Slice 4). Org Berel: `org-32333527-02a8-487b-819e-6f76a761777d` (MX, active_client, tax_id=RFC).
+- Income row de Berel **aún NO existe** en PG (`greenhouse_finance.income`) — el backfill apply (gated) la crearía.
+
+**Contrato de planos (binding, ya implementado):** native → columnas `native_amount`/`native_currency` (MXN). functional → `total_amount_clp` existente (CLP legal Nubox, intacto). reporting USD → `amount_usd` (**pendiente Slice 8**, requiere rate CLP→USD externo). `currency`/`total_amount` quedan CLP funcional (aditivo seguro; el CHECK ya admite MXN para evolución futura).
+
+**Flags (todas OFF):** `FINANCE_CORE_MXN_ENABLED`, `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`, `FINANCE_MXN_PAYMENT_ORDERS_ENABLED`, `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, `FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED` (en `src/lib/finance/multi-currency/flags.ts`).
+
+**Dry-runs (read-only, repetibles):** `scripts/finance/task-990-nubox-export-rfc-dryrun.ts` (RFC match: Berel auto-match, 0 orphans) · `scripts/finance/task-990-berel-income-native-dryrun.ts` (income native plane: 89960 MXN / 4617647 CLP / 51.33).
+
+**Pendiente:** **rollout operativo** (acción del operador — ver "Delta Slice 9 — rollout sequence" abajo): el código está **code-complete** (Slices 1–9) pero NO **operationally complete** (flags OFF, cuenta Global66 MXN no onboardeada, income de Berel no proyectado, workers Cloud Run no redeployados con flags activos). Per la Runtime Rollout Completion Gate, la task queda `in-progress` (code complete, rollout pendiente). **Diferido con documentación** (sin consumer vivo → no especular, anti-drift): (a) columnas USD en las VIEWs `*_payments_normalized` + superficies reader USD (gated `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, sin dashboard consumidor aún); (b) capability `finance.fx.manual_override` + su endpoint admin de override de rate stale/missing (no existe write surface; sembrar la capability sin consumer = drift TASK-873). El override ya es posible hoy vía `exchangeRateOverride` en los ledgers. Gate de cierre: `pnpm test` + `pnpm build` + verificar deploy workers (ops-worker consume `src/lib/nubox`).
+
+## Delta 2026-06-02 — PROGRESO Slice 8 (reporting USD plane + 5 signals) — anti-pérdida-de-contexto
+
+> Commit `feat(finance): TASK-990 Slice 8 …`. Todo gateado/data-driven → cero cambio en producción (sin filas native MXN; flag OFF). Los 5 signals leen `ok` contra PG real hoy.
+
+**Reporting USD plane (completa el snapshot 3-planos que Slice 5b difirió):** el income write de Nubox (`src/lib/nubox/sync-nubox-to-postgres.ts`, dentro del bloque `foreignActive` ya gated `FINANCE_CORE_MXN_ENABLED`) ahora resuelve **CLP→USD** al `emission_date` (`resolveFxSnapshotEvidence`, `policy='rate_at_event'`, `domain='finance_core'`), persiste el snapshot reporting y puebla `income.amount_usd` (= `total_amount_clp × rate`, derivado del MISMO functional CLP persistido → `native_equivalent_drift=0`) + `functional_to_reporting_fx_snapshot_id`. **Degradación honesta:** si no hay rate CLP→USD al emission, ambos quedan NULL y los signals lo exponen. Cadena canónica ADR §8.4: **MXN (native) → CLP (legal Nubox) → USD (snapshot CLP→USD)**, NUNCA MXN→USD directo. `ON CONFLICT` COALESCE additivo.
+
+**5 reliability signals** en `src/lib/reliability/queries/multi-currency-fx-signals.ts` (wired en `get-reliability-overview.ts`, 15 tests, todos `ok` en smoke PG real):
+- `finance.fx.mxn_rate_freshness` (lag): edad del rate MXN/CLP; ok si no hay exposición MXN nativa; warning ≥7d, error ≥30d o sin rate con exposición. Date-safe (`(CURRENT_DATE - MAX(rate_date))::int`).
+- `finance.fx.snapshot_missing` (data_quality, error>0): filas con `native_currency` sin `native_to_functional_fx_snapshot_id`.
+- `finance.nubox_export.foreign_amount_missing` (data_quality): **gated por el flag** — flag OFF → `ok` ("sourcing disabled" — pre-rollout TODO export tiene `native_amount` NULL por diseño, no alarmar); flag ON → cuenta DTE `110/111/112` (`dte_type_code` es **TEXT**) con `native_amount` NULL.
+- `finance.multi_currency.native_equivalent_drift` (drift, error>0): JOIN a `fx_snapshots` — `ABS(total_amount_clp − native_amount × rate) > 1 CLP` (functional) + `ABS(amount_usd − total_amount_clp × rate) > 0.01 USD` (reporting), income + expenses.
+- `finance.cash_signal.unsupported_currency` (data_quality, error>0): `external_cash_signals.currency` fuera de `{CLP,USD,MXN}` (hoy 156 filas todas CLP → 0).
+
+**Gate:** `pnpm local:check` (lint+tsc) verde; suite reliability 410 verde (sin romper pins de registry/overview); 15 tests de signals + smoke PG real (5/5 `ok`). `db.d.ts` sin cambios (sin DDL nuevo en Slice 8).
+
+## Delta 2026-06-02 — PROGRESO Slice 9 (docs + rollout) — anti-pérdida-de-contexto
+
+> Commit `docs(finance): TASK-990 Slice 9 …`. **Code-complete (Slices 1–9)**; rollout operativo pendiente del operador (acciones de producción money-movement + flag flips, NO autónomas).
+
+**Docs actualizados (Slice 9):**
+- `docs/documentation/finance/monedas-y-tipos-de-cambio.md` → v1.2: sección funcional "MXN como moneda finance-core (TASK-990)" (3 planos, settlement nativo, resultado cambiario, señales, rollout) + fila de la matriz `finance_core` corregida a `CLP/USD/MXN†`.
+- `docs/architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md` → Delta 2026-06-02 (ADR aceptado, fx_snapshots, 3 planos, settlement nativo, 7 señales, readiness fail-closed).
+- `docs/documentation/finance/ordenes-de-pago.md` + `conciliacion-bancaria.md` → deltas MXN (one-order-one-currency; conciliación en plano nativo sin drift falso).
+- `docs/architecture/DECISIONS_INDEX.md` → ADR ya estaba `Accepted`; corregido el path de la task (`to-do` → `in-progress`).
+
+**Fix de robustez UI (currency source canónico, no parche):** el form de creación de instrumento de pago (`CreatePaymentInstrumentDrawer.tsx`) tenía hardcodeado `const CURRENCIES = ['CLP', 'USD']` → MXN no aparecía aunque el server ya lo aceptaba. **Solución escalable:** el dropdown ahora deriva de `CURRENCY_DOMAIN_SUPPORT.finance_core` (único source of truth; client-safe, import type-only). Cuando una moneda entra/sale de finance_core, el dropdown y `assertValidCurrency`→`VALID_CURRENCIES` quedan en sync automáticamente, sin drift. Además se corrigió el mensaje stale de `assertValidCurrency` ("Must be CLP or USD" → derivado de `VALID_CURRENCIES.join(', ')`). Esto habilita al operador crear la cuenta Global66 MXN **a mano** desde el admin (paso pre-rollout); crear una cuenta vacía es inerte (sin movimientos → sin FX) y no depende de los flags.
+
+**Gate de cierre de task (ejecutado):** `pnpm test` (full) **5898 passed / 0 failed** (exit 0) — los cambios money-movement de Slices 7–8 pasan cross-module. `pnpm build` (Turbopack producción): [resultado en commit]. **Worker Cloud Run deploy**: los workflows de los 4 workers se disparan por cambios en `services/<worker>/**`, NO por `src/lib/**`; como TODO está gated OFF, el código MXN está **dormant** en el bundle del worker y NO requiere redeploy inmediato. El redeploy de workers es **parte de la secuencia de rollout** (abajo), para que el bundle esbuild incluya el nuevo `src/lib/{nubox,finance}` cuando los flags se enciendan.
+
+### Slice 9 — Rollout sequence (acciones del OPERADOR, money-movement; NO autónomas)
+
+Orden canónico (cada paso reversible vía flags / rollback per-slice del Risk Matrix). **No ejecutar sin OK explícito; son escrituras de producción.**
+
+1. **Staging primero.** Setear en staging (Vercel env `Preview/develop` + ops-worker) los flags uno a uno, validar, luego producción. Redeploy requerido tras cada cambio de env var.
+2. **`FINANCE_CORE_MXN_ENABLED=true`** (master). Activa: native plane en el income write de Nubox, settlement nativo + resultado cambiario, reporting USD. Verificar señales en `/admin/operations` (las 7 MXN deben quedar `ok`).
+3. **Onboardear la cuenta Global66 MXN**: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/task-990-onboard-global66-mxn-account.ts --apply` (gated tras el master flag; idempotente; expected-mutation-count=1). Declarar su OTB si corresponde.
+4. **`NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED=true`** + correr el dry-run RFC (`scripts/finance/task-990-nubox-export-rfc-dryrun.ts`) → resolver dispositions pendientes si las hay.
+5. **Backfill Berel** (gated `FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED=true`): dry-run primero (`scripts/finance/task-990-berel-income-native-dryrun.ts`), revisar payload before/after + FX snapshot + match RFC, luego `--apply --allowlist-source-object-id 28800562 --actor <id> --reason "<...>"`. Abort si mutation count ≠ esperado.
+6. **`FINANCE_MXN_PAYMENT_ORDERS_ENABLED`** / **`FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`**: encender cuando se necesiten payables MXN / readers USD (este último sin consumer vivo aún — ver "Diferido").
+7. **Redeploy workers Cloud Run** (`ops-worker` consume `src/lib/nubox` + `src/lib/finance`): `gh workflow run ops-worker-deploy.yml --ref develop -f environment=staging -f expected_sha=$(git rev-parse origin/develop)` y verificar `GIT_SHA` de la revisión. Idem si el flujo MXN corre en otros workers.
+8. **Verificación post-rollout**: factura Berel proyectada con native+functional+USD; cobro MXN → `paid` + resultado cambiario en el lane FX; señales en steady `ok`; `pnpm pg:doctor`.
+
+**Rollback**: apagar los flags (revierte comportamiento sin tocar data); el backfill de Berel se compensa vía supersede/reprojection desde la evidencia del dry-run (Risk Matrix Slice 5). Las columnas aditivas y `fx_snapshots` (append-only) se dejan.
+
+## Delta 2026-06-02 — PROGRESO Slice 7 (treasury / settlement / FX result) — anti-pérdida-de-contexto
+
+> **Checkpoint money-movement aprobado por el operador** antes de implementar (2 forks): (1) native-plane closing **full** (no diferir a Slice 8); (2) cuenta Global66 MXN vía **script gateado idempotente** (sin `--apply` ahora). Todo gateado/data-driven → cero cambio en producción (ningún row tiene aún `native_currency`; el income de Berel no existe). Aún NO commiteado/pusheado al momento de escribir este bloque — ver commit `feat(finance): TASK-990 Slice 7 …`.
+
+**Hallazgo raíz (verificado contra PG real + código):** el settlement/legs ya es **estructuralmente** multi-currency (`settlement_legs.currency` SIN CHECK → MXN ya permitido; `settlement-orchestration.ts` arma receipt/funding/fx_conversion/fee currency-agnóstico con `amount_clp` vía COALESCE TASK-774; `santander-usd-usd` ya prueba el path no-CLP). El realized FX YA fluye `income_payments.fx_gain_loss_clp` → `account_balances.fx_gain_loss_realized_clp` → VIEW `fx_pnl_breakdown.realized_clp`. **Por eso NO se tocó la VIEW `fx_pnl_breakdown` (extend-not-parallel = alimentarla correcto, no duplicarla).** Los dos cruxes reales:
+
+- **Crux 1 — FX-result rate.** Berel se persiste CLP-funcional (`currency='CLP'`, `total_amount=total_amount_clp=4.617.647`, `exchange_rate_to_clp=1`, native `89.960 MXN` + rate 51,33 en el `fx_snapshot`). La fórmula legacy de `fx_gain_loss_clp` usaba `exchange_rate_to_clp` (=1) → basura para un pago MXN. **Fix:** la booked rate del FX result = `total_amount_clp / native_amount` (= rate del snapshot) cuando `native_currency = payment currency`. `fx_result = monto_mxn × (rate_at_settlement − 51,33)`.
+- **Crux 2 — cierre de la factura.** `amount_paid`/`payment_status` (trigger TASK-708/708b + fallback JS) comparaban `SUM(payments.amount en MXN=89.960)` vs `total_amount` (CLP=4.617.647) → la factura NUNCA cierra + drift falso. **Fix (IAS 21 monetary item):** el cierre se mide en el **plano nativo** (`SUM(pagos en native_currency) vs native_amount`). `amount_paid` queda intacto (= SUM pagos + factoring + withholding) → `income_settlement_reconciliation` (TASK-571) **reconcilia sin drift y sin cambiar la VIEW** (verificado live: `drift=0.00`).
+
+**Commits/archivos canónicos (Slice 7):**
+- **Migración** `migrations/20260602213606548_task-990-slice7-native-plane-settlement.sql` (aplicada + DO-block anti pre-up-marker verifica lógica native en ambas funciones): `CREATE OR REPLACE fn_recompute_income_amount_paid(TEXT)` + `fn_sync_expense_amount_paid()` native-aware. **Data-driven** (`native_currency IS NOT NULL`) — la función no lee env flags; el flag gatea la CREACIÓN del native upstream. Down restaura el shape TASK-708b.
+- **Helper puro canónico** `src/lib/finance/multi-currency/native-settlement.ts` (`resolveNativeSettlementContext`, `isSettlementCorridorSupported`, `deriveBookedFunctionalRate`, `computeRealizedFxClp`) — la matemática money-movement extraída y unit-testeada (17 tests). Ambos ledgers la consumen (DRY).
+- **Ledgers** `src/lib/finance/{payment-ledger,expense-payment-ledger}.ts`: para invoice/payable native → booked rate native + `fx_gain_loss_clp` correcto + persiste `settlement_fx_snapshot_id` (snapshot observado `rate_at_settlement`, vía `persistFxSnapshot`/`observedFxSnapshotEvidence`, **solo native** → USD legacy bit-for-bit) + **rechazo fail-closed `unsupported_corridor`** si el payment currency ≠ native_currency (V1: el AR foráneo se salda en su moneda nativa; el destino CLP/USD es routing de legs, no payment currency) + overflow guard en el plano de settlement + **re-lectura del status del trigger (SSOT)** en lugar del recompute legacy (solo en el branch native; legacy intacto). `reconcile{,Expense}PaymentTotals` native-aware (income delega a `fn_recompute_income_amount_paid`; expense computa native inline).
+- **Signal** `finance.fx_gain_loss.unclassified` (`src/lib/reliability/queries/fx-gain-loss-unclassified.ts`, kind=`data_quality`, error si >0, steady=0, wired en `get-reliability-overview.ts`): cuenta pagos no-CLP activos con `fx_gain_loss_clp IS NULL` (el delta FX existe pero no quedó clasificado en el lane → "buried in operating P&L"). 3 tests.
+- **Script onboarding gateado** `scripts/finance/task-990-onboard-global66-mxn-account.ts` (dry-run default; `--apply` gateado tras `FINANCE_CORE_MXN_ENABLED`; idempotente `ON CONFLICT DO NOTHING`; expected-mutation-count). **NO aplicado.** Crea `accounts` row `global66-mxn` (currency='MXN', fintech/global66, distinta de `global66-clp` que recibe CLP/paga USD). Hoy NO existe esa cuenta (solo `global66-clp` + `santander-usd-usd`).
+- **Deuda de tests Slice 1 cerrada:** 3 tests stale (`currency-domain.test.ts` ×2 + `fx-readiness.test.ts`) asertaban el contrato PRE-ADR "finance_core rechaza MXN"; actualizados al invariante ADR (MXN ∈ finance_core; el path unsupported usa COP).
+
+**Verificación live (rollback tx, real PG, cero pollution):** native MXN invoice — pago parcial 44.980 → `partial`; pago completo 89.960 → `paid` (aunque `amount_paid` 89.960 MXN ≪ `total_amount` 4.617.647 CLP); `income_settlement_reconciliation` → `drift=0.00, has_drift=false`. Gate: `pnpm local:check` (lint+tsc) verde; 86 tests focales verdes (incluye suite finance completa sin regresión).
+
+**Decisión binding (plano de settlement V1):** una factura/payable native se salda SOLO en su moneda nativa (pago en moneda no-native → `unsupported_corridor`). El "settled in CLP/USD" es el **destino** del cash (legs funding/fx_conversion de settlement-orchestration), no la moneda del pago. Cross-currency settlement de un AR foráneo (pagar una factura MXN con CLP) = slice futura. Limitación V1 documentada: para una factura native parcialmente pagada, el `amount_paid` numérico vive en el plano nativo (MXN) mientras `total_amount` es CLP; el `payment_status` es correcto; los readers Slice 8 exponen el plano nativo. `settlement_legs.fx_snapshot_id`/`amount_usd` (columnas Slice 2) se poblarán en Slice 8 (plano USD/reporting) — el `settlement_fx_snapshot_id` a nivel pago ya es la evidencia canónica del rate aplicado.
+
+## Delta 2026-06-02 — Slice 0: Discovery + Migration Map (commit pre-Slice 1)
+
+Discovery ejecutada (skill finanzas + 3 Explore subagents: ADR digest, primitivas canónicas finance, Nubox+Berel+RFC) + verificación de schema PG real vía connector. `fx_snapshots` NO existe; `total_amount_clp` (plano funcional) ya existe en `income`/`expenses`; el plano USD reporting NO existe en ninguna tabla.
+
+### Decisión #1 (binding) — el comentario `finance_core STAYS NARROW` es PRE-ADR y queda superseded
+
+`src/lib/finance/currency-domain.ts` tiene un comentario TASK-475: `finance_core: ['CLP','USD'] // STAYS NARROW — expanding breaks invariants downstream`. **El ADR aceptado 2026-06-02 lo supersede**: el Goal de TASK-990 es promover MXN de pricing-only a `finance_core`. `FinanceCurrency` pasa a `CLP | USD | MXN` (ADR §5.1). El blast radius (todo consumer de `FinanceCurrency`: `accounts`, `exchange_rates`, `postgres-store`, switches) es REAL y se gestiona con expand-and-contract + flags: Slice 1 expande el tipo detrás de flags (sin write path activo), Slice 2 expande schema, los readers clasifican MXN antes de cualquier constraint flip. Al implementar Slice 1: actualizar el comentario stale (no dejar el guard contradictorio). Un Explore subagent de Discovery leyó el comentario como "nunca expandir finance_core" — eso es interpretación del estado PRE-ADR; el ADR es autoritativo.
+
+### Migration map — verificado contra PG real
+
+**CHECK widening INSTANTÁNEO** (agregar `'MXN'` al `IN (...)` valida de inmediato, sin `NOT VALID`; rollback = re-narrow tras verificar 0 filas MXN):
+
+| Artefacto | Constraint actual | Target |
+|---|---|---|
+| `income` | `income_currency_check: currency IN ('CLP','USD')` | `+ 'MXN'` |
+| `expenses` | `expenses_currency_check` | `+ 'MXN'` |
+| `payment_obligations` | `payment_obligations_currency_check` | `+ 'MXN'` |
+| `payment_orders` | `payment_orders_currency_check` | `+ 'MXN'` |
+| `payment_order_lines` | `payment_order_lines_currency_check` | `+ 'MXN'` |
+| `beneficiary_payment_profiles` | `beneficiary_payment_profiles_currency_check` | `+ 'MXN'` |
+| `payment_order_processor_funding_policies` | `..._order_currency_check (NULL OR IN('CLP','USD'))` | `+ 'MXN'` |
+
+**Sin CHECK de currency** (ya aceptan MXN estructuralmente — el bloqueo es runtime/hardcode, NO DDL): `accounts.currency`, `external_cash_signals.currency`, `income_payments.currency` (nullable), `settlement_legs.currency`. El gate es el reader/hardcode (Slices 5/7); la cuenta Global66 MXN se inserta como fila `accounts` nueva (Slice 7).
+
+**Plano funcional CLP — YA EXISTE** (no recrear): `income.total_amount_clp NOT NULL` + `income.exchange_rate_to_clp`; idem `expenses`; `income_payments.amount_clp` + `expense_payments.amount_clp` (COALESCE chain TASK-766); `settlement_legs.amount_clp`. El cutover CHECK `*_clp_amount_required_after_cutover` (currency!='CLP' ⇒ amount_clp NOT NULL) ya fuerza el plano funcional para no-CLP → consistente con MXN.
+
+**Columnas NUEVAS additivas nullable** (no requieren `NOT VALID`; cualquier CHECK que las ate sí usa `NOT VALID + VALIDATE`):
+- `income` / `expenses`: `native_amount`, `native_currency`, `amount_usd` (reporting), `native_to_functional_fx_snapshot_id` FK, `functional_to_reporting_fx_snapshot_id` FK, `is_tax_exempt` (verificar si ya existe vía tax_code; DTE 110). Compat: filas CLP existentes dejan estas NULL; reader trata `native = COALESCE(native_currency, currency)`.
+- `income_payments` / `expense_payments`: `amount_usd`, `settlement_fx_snapshot_id`.
+- `settlement_legs`: `amount_usd`, `fx_snapshot_id`.
+
+**Tabla NUEVA** `greenhouse_finance.fx_snapshots` (ADR §7.1 default model): append-only, anti-UPDATE/anti-DELETE triggers, `superseded_by` self-FK, columnas `snapshot_id, from_currency, to_currency, rate, inverse_rate, rate_date, rate_date_resolved, source, source_run_id, composed_via, policy, locked_at, locked_by, manual_override_reason`. Legacy inline (`exchange_rate_to_clp`) se mantiene pero espeja el snapshot, nunca diverge.
+
+**VIEWs canónicas a EXTENDER** (no paralelizar):
+- `expense_payments_normalized` + `income_payments_normalized` (TASK-766): agregar `payment_amount_usd` con COALESCE análogo a `payment_amount_clp` + MXN como currency válida del filtro 3-axis supersede.
+- `income_settlement_reconciliation` (TASK-571): currency-aware para que factura MXN pagada en MXN/CLP/USD no dé `drift` falso (reconciliar en plano nativo).
+- `fx_pnl_breakdown` (TASK-699): delta MXN invoice-vs-settlement como fuente #1 realized-settlement, `economic_category='financial_cost'`.
+
+**Rollback global**: columnas additivas se dejan; comportamiento revierte por flags; CHECK widening re-narrow solo tras 0 filas MXN; `fx_snapshots` se deja (append-only).
+
+### Open Question técnica abierta (NO bloqueante para el plan, sí para Slice 3/5)
+
+El path de extracción del **código de moneda extranjera** en el payload Nubox (export DTE 110) NO está confirmado: `src/lib/nubox/types.ts` no tiene campo de moneda extranjera. Para Berel hay fallback de evidencia comercial confirmada (MXN, ADR §0). Slice 3 Discovery verifica contra el artefacto Nubox/SII real de `28800562`. **No bloquea Slices 1-2** (money primitives + schema), sí condiciona el mapper de Slice 3. Hardcodes CLP a remover (Slice 5/7): `sync-nubox-to-postgres.ts` income currency `'CLP'` + `exchange_rate_to_clp=1` + external cash signal `'CLP'`.
+
+## Summary
+
+Promover MXN desde soporte comercial/pricing-only a soporte finance-core end-to-end. Greenhouse debe preservar moneda nativa MXN, calcular y bloquear snapshots CLP/USD, proyectar facturas de exportacion Nubox, soportar cobros/pagos/ordenes en MXN y exponer reportería CLP/USD sin perder el detalle nativo.
+
+## Why This Task Exists
+
+Greenhouse hoy puede cotizar en MXN, pero finance core sigue limitado a `CLP | USD`. El caso real Grupo Berel confirma el gap: Nubox ingirio una factura de exportacion con equivalente CLP `4.617.647` y monto extranjero `89.960`, pero la venta quedo orphaned y, si se proyectara hoy, el sync la persistiria como CLP-only. Eso rompe AR, caja, conciliacion, P&L, FX gain/loss y trazabilidad contractual.
+
+No basta agregar `MXN` a un enum. Esta task debe cambiar el contrato financiero completo, con expand-and-contract, flags, snapshots FX, identity RFC, Nubox export detail, payment orders, settlement y reporting.
+
+## Goal
+
+- Greenhouse acepta `MXN` como `finance_core` currency para income, expenses, obligations, payment profiles, payment orders, cash signals, settlement y reporting cuando el flujo lo permite.
+- Cada evento financiero relevante preserva `native` currency, `functional` CLP, `reporting` USD y `settlement` currency cuando aplica.
+- La factura Nubox exportacion de Berel (`source_object_id=28800562`) se puede proyectar con MXN nativo, CLP legal/documental y USD reporting, sin guesswork ni SQL manual.
+- Cobros/pagos MXN quedan conciliables, con FX gain/loss separado de revenue/costo operacional.
+- Los readers/reportes exponen native detail + CLP + USD y no recalculan FX silenciosamente al leer.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     "Que necesito entender antes de planificar?"
+     El agente lee cada doc referenciado aqui. Si un doc no
+     existe en el repo, reporta antes de continuar.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md`
+- `docs/architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md`
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
+- `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`
+
+Reglas obligatorias:
+
+- No implementar si el ADR multi-currency sigue `Proposed` sin aprobacion humana explicita.
+- No declarar soporte MXN si solo funciona en cotizaciones.
+- No hardcodear `currency='CLP'` en Nubox, cash signals o finance write paths cuando el source trae moneda extranjera.
+- No inferir MXN solo por pais Mexico; pais es señal, no source of truth.
+- No recalcular FX de eventos emitidos/cerrados al leer.
+- No mezclar monedas dentro de una `payment_order`.
+- No clasificar FX gain/loss como revenue, payroll, contractor, vendor o overhead.
+- No mutar datos reales sin dry-run, allowlist, counts, sample rows y rollback/compensacion.
+- No paralelizar las VIEWs/helpers canonicos de finance: MXN se agrega EXTENDIENDO `expense_payments_normalized` / `income_payments_normalized` (TASK-766), `income_settlement_reconciliation` (TASK-571), `fx_pnl_breakdown` (TASK-699), `materializeAccountBalance` (TASK-774). Ver `## Canonical Pattern Alignment`.
+- No escribir `SUM(ep.amount * exchange_rate_to_clp)`, `SUM(ip.amount)`, `SUM(sl.amount)` ni variantes en readers nuevos: el lint rule `greenhouse/no-untokenized-fx-math` (modo `error`) bloquea el build. Toda agregacion CLP/USD pasa por la VIEW canonica o por su helper.
+- No usar `Sentry.captureException` directo en los code paths nuevos: usar `captureWithDomain(err, 'finance', { tags: { source: '<...>' } })`.
+- No retornar `NextResponse.json({ error: 'English prose' }, ...)`: todo error API que cruce al cliente usa `canonicalErrorResponse(code, ...)` con `code` es-CL (incluye `unsupported_corridor`, `fx_snapshot_missing`, `fx_rate_stale`, `nubox_export_orphan_rfc`).
+- No seedear una capability nueva (manual FX override, reviewed disposition) sin su grant en `src/lib/entitlements/runtime.ts` en el MISMO PR: el guard `capability-grant-coverage.test.ts` rompe el build (TASK-873/935). Ver `## Capabilities & Access`.
+- No aplicar IVA 19% a una factura de exportacion (DTE 110): es IVA-exenta por D.L. 825 Art 12. La fila `income` se proyecta con `is_tax_exempt=true`, `tax_rate=0`, `tax_amount=0`. Ver `## Currency Plane Sourcing Contract`.
+
+## Canonical Pattern Alignment (binding — extend, never parallel)
+
+> Esta seccion es vinculante. El ADR define el contrato conceptual; aqui se fija EXACTAMENTE que primitiva canonica existente extiende cada pieza. La task original no nombraba estos artefactos y un agente implementador que siga `CLAUDE.md` chocara con sus lint rules y reliability signals. **No crear primitivas nuevas donde ya existe la canonica.**
+
+| Necesidad de la task | Primitiva canonica existente (NO paralelizar) | Como se extiende para MXN |
+|---|---|---|
+| Resolver CLP de income/expense payments | VIEW `greenhouse_finance.expense_payments_normalized` + `income_payments_normalized` (TASK-766) + helpers `sumExpensePaymentsClpForPeriod` / `sumIncomePaymentsClpForPeriod` en `src/lib/finance/{expense,income}-payments-reader.ts` | La VIEW ya emite `payment_amount_clp` con COALESCE chain. MXN se agrega como currency valida del filtro 3-axis supersede + se EXTIENDE la VIEW para exponer tambien `payment_amount_usd` (plano reporting) sin recomputar inline. Cualquier reader nuevo lee de la VIEW, jamas `amount * rate`. |
+| Reconciliacion de `income.amount_paid` (cobros MXN) | VIEW `greenhouse_finance.income_settlement_reconciliation` (TASK-571, extendida TASK-929 superseded-exclusion) + helper `src/lib/finance/income-settlement.ts` | La ecuacion canonica `amount_paid == SUM(pagos activos) + factoring_fee + withholding` debe volverse currency-aware: una factura MXN pagada en MXN/CLP/USD no debe producir `drift` falso. EXTENDER la VIEW para reconciliar en el plano nativo de la factura. NO branchear en consumers. |
+| FX gain/loss de settlement MXN | VIEW `greenhouse_finance.fx_pnl_breakdown` (TASK-699) + helper `getBankFxPnlBreakdown` en `src/lib/finance/fx-pnl.ts` | El FX result de Slice 7 NO es un mecanismo nuevo: es la **fuente #1 (realized FX en settlement)** y **#3 (realized FX en transferencias internas)** de la VIEW canonica que ya existe. EXTENDER `fx_pnl_breakdown` con el delta MXN invoice-vs-settlement. El `economic_category` canonico del FX result es `financial_cost` (ya existe en `economic-category/types.ts`), NUNCA revenue/payroll/vendor. |
+| Balance diario de cuenta MXN | `materializeAccountBalance` en `src/lib/finance/account-balances.ts` (TASK-774) + signal `finance.account_balances.fx_drift` + rolling anchor TASK-871 + genesis floor TASK-938 | Una cuenta `currency='MXN'` fluye por el MISMO materializer (ya consume VIEWs canonicas + COALESCE `settlement_legs.amount_clp`). NO crear computo de balance nuevo. El signal `fx_drift` ya cubre drift de recompute; verificar que ignora correctamente el plano nativo MXN. |
+| Dimension analitica del gasto/ingreso | `economic_category` (TASK-768) + resolver `src/lib/finance/economic-category/resolver.ts` | El FX result usa `economic_category='financial_cost'`. NO leer `expense_type`/`income_type` (fiscal SII) para analitica: el lint rule `greenhouse/no-untokenized-expense-type-for-analytics` (modo `error`) lo bloquea. |
+| Proyeccion a BigQuery de hechos MXN | Outbox + reactive consumer (TASK-771/773), NO inline en route handlers | Toda proyeccion downstream (BQ conformed, AR marts) corre via outbox event versionado v1 + reactive consumer en ops-worker. El Nubox→PG→BQ de Slice 3/5 respeta el decoupling: el write a `income` emite outbox; la proyeccion BQ la consume el reactive worker. NO bloquear el request path con la proyeccion. |
+| Error API que cruza al cliente | `canonicalErrorResponse(code)` (`src/lib/api/canonical-error-response.ts`) | Extender el enum `CanonicalErrorCode` con `unsupported_corridor`, `fx_snapshot_missing`, `fx_rate_stale`, `nubox_export_orphan_rfc`, `mixed_currency_payment_order`. Prosa es-CL, `actionable` correcto (stale/missing → `actionable:false` salvo override path). |
+
+**Interaccion con el lint rule `greenhouse/no-untokenized-fx-math`** (modo `error`, override block en `eslint.config.mjs`): los readers canonicos (`expense-payments-reader.ts`, `income-payments-reader.ts`) ya estan exentos. Si Slice 8 crea un reader USD nuevo que necesita `amount * rate`, la unica via legitima es: (a) agregar la columna pre-resuelta a la VIEW canonica (preferido), o (b) agregar el archivo al override block con razon documentada. NUNCA desactivar el rule inline.
+
+## Currency Plane Sourcing Contract (binding decision — resuelve ambiguedad ADR §8.2)
+
+> El ADR dice "functional CLP" y "Nubox CLP legal equivalent" sin declarar si son el MISMO numero ni cual rate produce el plano USD. Esta ambiguedad genera `finance.multi_currency.native_equivalent_drift` falso si dos paths producen CLP/USD distintos. **Decision canonica, no interpretable:**
+
+Para una factura de exportacion Nubox (DTE 110), los 3 planos se sourcing asi:
+
+1. **`native`** = monto extranjero del documento, tal cual lo trae Nubox. Berel: `89.960 MXN`. Inmutable. Es el monto contractual y la base de revenue recognition (IFRS 15: transaction price en la moneda del contrato).
+
+2. **`functional` (CLP)** = el **equivalente CLP legal/documental que Nubox/SII ya calculo** (Berel: `4.617.647 CLP`). Greenhouse **NO recomputa** MXN→CLP con su propio rate; toma el CLP observado del documento legal como verdad del plano funcional. El rate implicito (`4.617.647 / 89.960 = 51,3300 CLP/MXN`) se persiste como **evidencia** en el `FxSnapshot` con `source='nubox_legal_document'` y `policy='rate_at_event'`. Esto preserva la conciliacion exacta contra el RCV/F29 del SII y evita drift contra el libro de ventas.
+
+3. **`reporting` (USD)** = se deriva **deterministicamente desde el plano funcional CLP** via snapshot bloqueado `CLP→USD` (`rate_at_event` a la fecha de emision), NO desde un MXN→USD independiente. Razon: los 3 planos deben reconciliar por un unico ancla (el CLP legal). Si USD se sacara de MXN→USD con un rate distinto, `native * mxn_usd_rate != functional_clp / clp_usd_rate` y el signal `native_equivalent_drift` dispararia falso. La cadena canonica es **`MXN (native) → CLP (legal Nubox) → USD (snapshot CLP→USD)`**.
+
+   - **DECISION ACEPTADA 2026-06-02 (operador):** esta cadena via CLP legal es canonica para V1. Justificacion IAS 21: el USD es moneda de *presentacion*, no de medicion; la conversion a moneda de presentacion se hace DESDE las cifras en moneda funcional (CLP), no desde la moneda original de cada transaccion por separado. El monto MXN nativo se preserva siempre como dimension, asi que un MXN→USD de mercado queda disponible como vista de analitica ad-hoc — nunca como el numero consolidado de reporting. Registrada en ADR §8.4.
+   - **Condicion de revisita:** si Finance decide que el plano USD debe reflejar el mercado MXN directo (MXN→USD banxico), es un cambio de governance que debe re-registrarse en el ADR §8.4 y relajar la tolerancia del contrato `native_equivalent_drift`.
+
+**`native_equivalent_drift` — definicion deterministica del recompute** (para que el signal no de falsos positivos): `functional_clp` debe igualar `native_amount * fx_snapshot[native→functional].rate` dentro de tolerancia de redondeo (±1 CLP, mismo umbral que `account_balances.fx_drift`), donde el snapshot es el `nubox_legal_document` rate implicito; y `reporting_usd` debe igualar `functional_clp * fx_snapshot[CLP→USD].rate` dentro de ±0,01 USD. Cualquier consumer que recompute por otra cadena viola el contrato.
+
+**Tratamiento fiscal (DTE 110, IVA-exento)**: la factura de exportacion es **IVA-exenta** por D.L. 825 Art 12 letra D/E. La fila `income` se proyecta con `is_tax_exempt=true`, `tax_rate=0`, `tax_amount=0`. NUNCA aplicar IVA 19% a un DTE 110. El plano funcional CLP es el valor exento documental. (No es asesoria tributaria de filing; el mapeo del campo de exportacion debe verificarse contra el artefacto Nubox/SII en Discovery — ver Open Questions.)
+
+**FX gain/loss en settlement** (cuando Berel paga): `fx_result = settlement_functional_clp - invoice_functional_clp`, donde `invoice_functional_clp` es el CLP legal Nubox (punto 2) y `settlement_functional_clp` se snapshotea con `policy='rate_at_settlement'` a la fecha del movimiento bancario. El resultado se clasifica `economic_category='financial_cost'` y se materializa via `fx_pnl_breakdown` (TASK-699), NUNCA dentro de revenue. Esto es FX realizado (skill finance Lens 5: diferencia entre rate documento y rate pago).
+
+## Capabilities & Access (binding — TASK-873/935 grant coverage)
+
+Esta task introduce 2 superficies de escritura nuevas que requieren capability dedicada (overlay arch #7) + grant en `runtime.ts` en el MISMO PR (sino el guard `capability-grant-coverage.test.ts` rompe el build y el endpoint da 403):
+
+| Capability | Module / action / scope | Roles (grant en `runtime.ts`) | Superficie |
+|---|---|---|---|
+| `finance.fx.manual_override` | `finance` / `update` / `tenant` | FINANCE_ADMIN + EFEONCE_ADMIN | Override de rate cuando readiness es `temporarily_unavailable` o `supported_but_stale`. Requiere `rate`, `reason >= 10 chars`, audit row + outbox. El valor crudo del override no se loggea fuera del audit. |
+| `finance.nubox_export.review_disposition` | `finance` / `approve` / `tenant` | FINANCE_ADMIN + EFEONCE_ADMIN | Resolver manualmente el match RFC↔organization cuando el resolver no encuentra match. Name similarity es evidencia candidata, NUNCA write authority. Disposition es append-only audit. |
+
+Ambas escriben outbox event v1 + audit append-only (anti-UPDATE/anti-DELETE trigger). El reviewed disposition NUNCA proyecta a `income` por nombre similar sin firma humana.
+
+## Normative Docs
+
+- `docs/documentation/finance/monedas-y-tipos-de-cambio.md`
+- `docs/documentation/finance/modulos-caja-cobros-pagos.md`
+- `docs/documentation/finance/conciliacion-bancaria.md`
+- `docs/documentation/finance/ordenes-de-pago.md`
+- `docs/documentation/finance/payment-orders-bank-settlement-resilience.md`
+- `docs/documentation/finance/pricing-comercial.md`
+- `docs/documentation/finance/cotizador.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- ADR approval: `docs/architecture/GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md`.
+- FX foundation runtime:
+  - `src/lib/finance/currency-domain.ts`
+  - `src/lib/finance/currency-registry.ts`
+  - `src/lib/finance/fx-readiness.ts`
+  - `src/lib/finance/fx/sync-orchestrator.ts`
+  - `src/app/api/cron/fx-sync-latam/route.ts`
+- Finance contracts/runtime:
+  - `src/lib/finance/contracts.ts`
+  - `src/lib/finance/postgres-store.ts`
+  - `src/lib/finance/shared.ts`
+- Nubox sync:
+  - `src/lib/nubox/types.ts`
+  - `src/lib/nubox/mappers.ts`
+  - `src/lib/nubox/sync-nubox-to-postgres.ts`
+- Payment obligations:
+  - `src/lib/finance/payment-obligations/create-obligation.ts`
+  - `src/lib/finance/payment-obligations/list-obligations.ts`
+  - `src/lib/finance/payment-obligations/row-mapper.ts`
+- Payment orders:
+  - `src/lib/finance/payment-orders/create-from-obligations.ts`
+  - `src/lib/finance/payment-orders/mark-paid-atomic.ts`
+  - `src/lib/finance/payment-orders/record-payment-from-order.ts`
+  - `src/lib/finance/payment-orders/source-instrument-policy.ts`
+  - `src/lib/finance/payment-orders/list-orders.ts`
+- Beneficiary payment profiles:
+  - `src/lib/finance/beneficiary-payment-profiles/create-profile.ts`
+  - `src/lib/finance/beneficiary-payment-profiles/approve-profile.ts`
+  - `src/lib/finance/beneficiary-payment-profiles/row-mapper.ts`
+  - `src/lib/finance/beneficiary-payment-profiles/resolve-self-service-context.ts`
+- Existing migrations to inspect before new migrations:
+  - `migrations/20260421011323497_task-466-expand-quotation-currency-constraint.sql`
+  - `migrations/20260501140545647_task-748-payment-obligations.sql`
+  - `migrations/20260501143749876_task-750-payment-orders.sql`
+  - `migrations/20260501151805031_task-749-beneficiary-payment-profiles.sql`
+  - `migrations/20260505172907393_payment-order-processor-funding-policy.sql`
+
+### Blocks / Impacts
+
+- Berel/Grupo Berel MXN AR and cash workflow.
+- Nubox export invoice projection correctness.
+- MXN payment order creation and settlement.
+- Finance dashboards and P&L that currently assume CLP-normalized-only facts.
+- Any future LATAM finance-core currency promotion.
+
+### Files owned
+
+- `docs/architecture/GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md`
+- `src/lib/finance/currency-domain.ts`
+- `src/lib/finance/contracts.ts`
+- `src/lib/finance/currency-registry.ts`
+- `src/lib/finance/fx-readiness.ts`
+- `src/lib/finance/fx/sync-orchestrator.ts`
+- `src/lib/nubox/types.ts`
+- `src/lib/nubox/mappers.ts`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
+- `src/lib/finance/payment-obligations/**`
+- `src/lib/finance/payment-orders/**`
+- `src/lib/finance/beneficiary-payment-profiles/**`
+- `src/lib/finance/**/reporting-or-reader-files-[verificar-en-plan]`
+- `migrations/*task-990*.sql`
+- `docs/documentation/finance/monedas-y-tipos-de-cambio.md`
+- `docs/documentation/finance/ordenes-de-pago.md`
+- `docs/documentation/finance/conciliacion-bancaria.md`
+
+## Current Repo State
+
+### Already exists
+
+- Pricing/commercial supports MXN output:
+  - `src/lib/finance/currency-domain.ts`
+  - `src/lib/finance/currency-registry.ts`
+  - `src/lib/finance/pricing/contracts.ts`
+  - `src/lib/commercial/product-catalog-prices.ts`
+  - quotation/product catalog migrations for `CLP, USD, CLF, COP, MXN, PEN`.
+- FX provider platform exists:
+  - `src/lib/finance/fx/sync-orchestrator.ts`
+  - providers including `banxico_sie`, `frankfurter`, `fawaz_ahmed`.
+  - `/api/cron/fx-sync-latam?window=evening` includes MXN.
+- Payment Orders architecture exists and keeps source/processor/settlement separation.
+- Nubox sync already ingests raw/conformed sales but does not model export foreign detail in finance projection.
+
+### Gap
+
+- `finance_core` rejects MXN by domain matrix and TypeScript contract.
+- Core DB constraints still reject MXN in obligations, payment orders, payment lines, payment profiles and funding policies.
+- Nubox exportation detail is not typed/mapped/projected.
+- Nubox sync hardcodes `income.currency='CLP'` and `exchange_rate_to_clp=1`.
+- External cash signals from Nubox bank movements are hardcoded as CLP.
+- Berel/RFC identity cannot project the invoice into `income`.
+- CLP/USD reporting planes are not guaranteed by locked snapshots for MXN native events.
+- Treasury does not yet classify MXN settlement deltas as explicit FX gain/loss.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     "Que construyo exactamente, slice por slice?"
+     El agente solo lee esta zona DESPUES de que el plan este
+     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 0 — ADR acceptance, inventory and migration map
+
+- Confirm human acceptance of `docs/architecture/GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1.md`.
+- Run `pnpm pg:doctor`.
+- Inspect actual PostgreSQL constraints for:
+  - `greenhouse_finance.income`
+  - `greenhouse_finance.expenses`
+  - `greenhouse_finance.payment_obligations`
+  - `greenhouse_finance.payment_orders`
+  - `greenhouse_finance.payment_order_lines`
+  - `greenhouse_finance.beneficiary_payment_profiles`
+  - `greenhouse_finance.payment_order_processor_funding_policies`
+  - `greenhouse_finance.accounts`
+  - `greenhouse_finance.income_payments`
+  - `greenhouse_finance.expense_payments`
+  - `greenhouse_finance.settlement_legs`
+  - `greenhouse_finance.external_cash_signals`
+- Inspect Nubox raw/conformed BigQuery fields for document `28800562`.
+- Inventory the canonical VIEWs/helpers that MXN must extend (ver `## Canonical Pattern Alignment`): `expense_payments_normalized`, `income_payments_normalized`, `income_settlement_reconciliation`, `fx_pnl_breakdown`. Document their current column contract + the `payment_amount_clp` COALESCE chain before altering.
+- Inventory the `economic_category` canonical values (`financial_cost` is the FX-result home) and the lint rules `no-untokenized-fx-math` + `no-untokenized-expense-type-for-analytics` (both `error`) — the migration map must state which readers are exempt and which must be added to the override block.
+- Produce and commit a table-by-table AND view-by-view migration map inside this task as a `Delta` before Slice 1 implementation. The map must state, per artifact: current columns/constraint, target, compatibility field, whether CHECK widening is instant (adding `'MXN'` to `IN (...)` validates immediately, no `NOT VALID` needed) vs new-column constraints that require `NOT VALID + VALIDATE` two-step (overlay arch #12), and rollback stance.
+
+### Slice 1 — Money primitives and FX snapshot contract
+
+- Expand `FinanceCurrency` to `CLP | USD | MXN`.
+- Expand `CURRENCY_DOMAIN_SUPPORT.finance_core` to include MXN.
+- Introduce canonical money/snapshot helpers under `src/lib/finance/` using existing local patterns.
+- Ensure resolver can produce snapshotable evidence for all six directions:
+  - `CLP->USD`
+  - `USD->CLP`
+  - `MXN->CLP`
+  - `CLP->MXN`
+  - `MXN->USD`
+  - `USD->MXN`
+- Add tests for direct, inverse and composition paths.
+- Keep production write paths blocked by flags.
+
+### Slice 2 — Schema expand, no behavior flip
+
+- Add/alter CHECK constraints to include MXN only after readers/helpers can classify MXN safely.
+- Add nullable native/functional/reporting/snapshot columns or snapshot link tables according to Slice 0 map.
+- Preserve existing CLP/USD rows bit-for-bit.
+- Add indexes required for currency/period/source queries.
+- Add migration DO blocks that fail if constraints are not in the expected pre-state.
+- Do not backfill Berel or any live row in this slice.
+
+### Slice 3 — Nubox export invoice conformed model
+
+- Extend `src/lib/nubox/types.ts` with `exportationDetail`.
+- Extend `src/lib/nubox/mappers.ts` to map foreign amount and currency evidence.
+- Add conformed shape fields for:
+  - `foreign_total_amount`
+  - `foreign_currency_code`
+  - `functional_total_amount_clp`
+  - `exportation_detail_json`
+  - `foreign_currency_evidence_source`
+  - `foreign_currency_confidence`
+- Add tests using a Berel-like fixture.
+- Do not project into `income` yet unless `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED=true`.
+
+### Slice 4 — Cross-country fiscal identity matching
+
+- Add or reuse an organization tax identity resolver that supports Mexican RFC. Extender la identidad 360 (`greenhouse_core.organizations` tax identities / RUT matching) — NUNCA crear identidad paralela (overlay arch #1).
+- Normalize RFC `PBE970101718` (validar el patron RFC persona moral: 3 letras + 6 digitos fecha + 3 homoclave).
+- Add reviewed disposition path when RFC cannot be matched automatically, gated por capability `finance.nubox_export.review_disposition` (ver `## Capabilities & Access`) + grant en `runtime.ts` en el mismo PR + audit append-only.
+- Ensure name similarity is candidate evidence only, never write authority.
+- Add signal `finance.nubox_export.orphan_rfc`.
+- Produce dry-run report for Berel.
+
+### Slice 5 — Income and AR projection with MXN native amount
+
+- Update Nubox-to-Postgres projection (`src/lib/nubox/sync-nubox-to-postgres.ts`) to preserve, segun el `## Currency Plane Sourcing Contract`:
+  - native MXN amount (monto extranjero del documento, inmutable).
+  - functional CLP = el equivalente CLP legal Nubox (NO recomputado por Greenhouse); persistir el rate implicito como `FxSnapshot{source='nubox_legal_document', policy='rate_at_event'}`.
+  - reporting USD derivado deterministicamente `CLP(legal) → USD` (snapshot `rate_at_event`), NO un MXN→USD independiente.
+  - FX snapshot ids o campos de evidencia equivalentes.
+- Remove CLP hardcode for export invoices. El hardcode concreto a remover vive en el upsert de income (no en el de cash signal). Verificar tambien que el income export NO aplique IVA (DTE 110 → `is_tax_exempt=true`, `tax_rate=0`, `tax_amount=0`).
+- Keep CLP-only behavior for non-export invoices whose source is CLP (bit-for-bit, sin cambio de semantica).
+- Toda lectura CLP/USD downstream pasa por las VIEWs canonicas extendidas (`income_payments_normalized` / `income_settlement_reconciliation`), NUNCA recompute inline (lint `no-untokenized-fx-math`).
+- Gate with `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED=false` and `FINANCE_CORE_MXN_ENABLED=false` defaults.
+- Backfill Berel in dry-run first; apply only through allowlist and explicit flag (`FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED`). Emitir outbox v1 para la proyeccion BQ (reactive consumer, TASK-771), NO proyectar inline.
+
+### Slice 6 — Payment obligations, profiles and payment orders MXN
+
+- Expand payment obligations to MXN.
+- Expand beneficiary payment profiles to MXN.
+- Expand payment orders and payment lines to MXN.
+- Keep one-order-one-currency invariant.
+- Update routing/source policy to handle `order_currency='MXN'` or explicitly return `unsupported_corridor` before creating an order.
+- Add tests for mixed-currency rejection.
+- Add signal `finance.payment_order.mixed_currency_attempt`.
+
+### Slice 7 — Treasury cash, settlement legs and FX result
+
+- Update income/expense payment recording to accept MXN settlement currency where the source supports it.
+- Update `settlement_legs` handling to model MXN funding, FX, fees and payouts. Reusar el COALESCE `settlement_legs.amount_clp` canonico (TASK-774); el balance de cuenta MXN fluye por `materializeAccountBalance` sin computo nuevo.
+- Ensure processors remain separate from source accounts per TASK-799.
+- Add explicit FX gain/loss classification for invoice-vs-settlement delta **extendiendo la VIEW canonica `fx_pnl_breakdown` (TASK-699, fuente #1 realized-settlement / #3 internal-transfer), NO un mecanismo nuevo**. Formula: `fx_result = settlement_functional_clp - invoice_functional_clp` (invoice CLP = legal Nubox; settlement CLP = snapshot `rate_at_settlement`). `economic_category='financial_cost'`.
+- Add signal `finance.fx_gain_loss.unclassified`.
+- Add tests for:
+  - MXN invoice paid in MXN.
+  - MXN invoice settled in CLP.
+  - MXN invoice settled in USD.
+  - no double debit when processor is counterparty/intermediary.
+
+### Slice 8 — Reporting and reliability readers
+
+- Add or update readers for native, CLP and USD planes, **extendiendo las VIEWs canonicas, no paralelizando**:
+  - AR/income → `income_payments_normalized` + `income_settlement_reconciliation` (extendidas con plano USD).
+  - cash position → `materializeAccountBalance` / `account_balances` (consolidado CLP/USD ya derivable; preservar account-native currency).
+  - payment obligations / payment orders → readers existentes en `src/lib/finance/payment-{obligations,orders}/`.
+  - client profitability / P&L [verificar exact reader in Plan Mode].
+- Si un reader USD nuevo requiere `amount * rate`: agregar la columna pre-resuelta a la VIEW canonica (preferido) o al override block de `eslint.config.mjs` con razon documentada. NUNCA `// eslint-disable` inline del rule `no-untokenized-fx-math`.
+- Preserve native currency dimension in detailed exports.
+- Add signals:
+  - `finance.fx.mxn_rate_freshness`
+  - `finance.fx.snapshot_missing`
+  - `finance.nubox_export.foreign_amount_missing`
+  - `finance.multi_currency.native_equivalent_drift`
+  - `finance.cash_signal.unsupported_currency`
+- Wire into reliability overview.
+
+### Slice 9 — Docs, rollout and production verification
+
+- Update finance functional docs:
+  - `docs/documentation/finance/monedas-y-tipos-de-cambio.md`
+  - `docs/documentation/finance/ordenes-de-pago.md`
+  - `docs/documentation/finance/conciliacion-bancaria.md`
+  - any Nubox/export invoice doc discovered in Plan Mode.
+- Update `docs/architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md` with a dated delta pointing to the accepted multi-currency ADR.
+- Update `docs/architecture/DECISIONS_INDEX.md` if ADR status changes to Accepted.
+- Execute staging and production rollout sequence exactly as below.
+
+## Out of Scope
+
+- Adding COP/PEN/CLF/BRL to `finance_core`.
+- Replacing Greenhouse with a legal GL.
+- Changing Chile statutory payroll currency away from CLP.
+- Adding new UI workbenches unless required for a reviewed disposition/admin queue found in Plan Mode.
+- Mutating unrelated Nubox invoices outside the allowlist.
+- Manual SQL data fixes outside a committed, reviewed, idempotent script.
+- Changing pricing product catalog semantics beyond consuming the existing MXN foundation.
+
+## Detailed Spec
+
+### Canonical event shape
+
+Every new or migrated write path must be able to reconstruct:
+
+```ts
+interface FinanceMonetaryEvent {
+  native: {
+    amount: string
+    currency: 'CLP' | 'USD' | 'MXN'
+  }
+  functional: {
+    amount: string
+    currency: 'CLP'
+  }
+  reporting: {
+    amount: string
+    currency: 'USD'
+  }
+  settlement?: {
+    amount: string
+    currency: 'CLP' | 'USD' | 'MXN'
+  }
+  fxSnapshots: Array<{
+    fromCurrency: 'CLP' | 'USD' | 'MXN'
+    toCurrency: 'CLP' | 'USD' | 'MXN'
+    rate: string
+    inverseRate: string
+    rateDate: string
+    rateDateResolved: string
+    source: string
+    policy: 'rate_at_event' | 'rate_at_send' | 'rate_at_period_close' | 'rate_at_settlement' | 'manual_override'
+    lockedAt: string
+  }>
+}
+```
+
+### Berel acceptance fixture
+
+The canonical test fixture must include:
+
+```json
+{
+  "sourceSystem": "nubox",
+  "sourceObjectId": "28800562",
+  "dteType": 110,
+  "clientName": "PINTURAS BEREL SA DE CV",
+  "clientTaxId": "PBE970101718",
+  "emissionDate": "2026-06-01T22:52:13Z",
+  "dueDate": "2026-07-01",
+  "functionalTotalAmountClp": 4617647,
+  "foreignTotalAmount": 89960,
+  "foreignCurrencyCode": "MXN"
+}
+```
+
+### Fail-closed behavior
+
+- If MXN rate is missing: block event creation unless Finance Admin supplies manual override.
+- If MXN rate is stale: block client-facing emission and payment creation unless override is recorded.
+- If RFC identity is unresolved: keep Nubox sale conformed/orphaned; do not project into `income`.
+- If order would mix currencies: reject before transaction starts.
+- If settlement currency is unsupported by source policy: reject with explicit `unsupported_corridor`.
+- If FX snapshot cannot be locked: no write.
+
+### Backfill contract
+
+Backfill scripts must support:
+
+```bash
+--dry-run
+--apply
+--allowlist-source-object-id 28800562
+--actor <user-id>
+--reason "<human-readable reason>"
+--max-rows <n>
+```
+
+Dry-run output must include:
+
+- candidate count.
+- rows skipped by reason.
+- before/after payload preview.
+- FX snapshot source/rate/date.
+- organization match evidence.
+- exact SQL mutation count expected.
+
+Apply must abort if actual mutation count differs from expected.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 0 MUST complete before any implementation.
+- Slice 1 MUST complete before Slice 2.
+- Slice 2 MUST complete before any production write path accepts MXN.
+- Slice 3 and Slice 4 can run after Slice 1, but Slice 5 requires both.
+- Slice 6 requires Slice 1 + Slice 2.
+- Slice 7 requires Slice 6.
+- Slice 8 requires Slices 5-7.
+- Slice 9 closes only after staging + production verification.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| CLP/USD legacy rows change semantics | finance/data | medium | Expand-and-contract, bit-for-bit CLP/USD tests, no column semantic rename without map | `finance.multi_currency.native_equivalent_drift` |
+| MXN invoice projected as CLP-only | Nubox/finance | high pre-task | Export detail mapper, hard rule against CLP hardcode, signal | `finance.nubox_export.foreign_amount_missing` |
+| Berel matched to wrong organization | identity/data | medium | RFC resolver + reviewed disposition; name match advisory only | `finance.nubox_export.orphan_rfc` |
+| Missing/stale MXN rate creates wrong amounts | FX/finance | medium | fail-closed readiness, manual override audit | `finance.fx.mxn_rate_freshness`, `finance.fx.snapshot_missing` |
+| Mixed-currency payment order | payment orders | medium | server-side reject + tests | `finance.payment_order.mixed_currency_attempt` |
+| FX loss buried in operating P&L | reporting/accounting | medium | explicit FX result lane + tests | `finance.fx_gain_loss.unclassified` |
+| Processor double-debits cash during MXN settlement | treasury | low-medium | TASK-799 source/intermediary policy, settlement tests | existing payment-order settlement signals + new MXN tests |
+| Backfill mutates too many rows | data | low | allowlist, dry-run, expected mutation count abort | script output + Sentry capture |
+| Production env flags not deployed/redeployed | rollout | medium | explicit Vercel env verification + redeploy sequence | rollout checklist |
+
+### Feature flags / cutover
+
+- `FINANCE_CORE_MXN_ENABLED=false` default.
+- `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED=false` default.
+- `FINANCE_MXN_PAYMENT_ORDERS_ENABLED=false` default.
+- `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED=false` default.
+- `FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED=false` default.
+
+Flags must be present in Production, staging and Preview develop before the code path is considered rollout-ready. Redeploy is required after env var changes.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 0 | Revert docs only. | <5 min | yes |
+| Slice 1 | Revert code if flags off; no data mutation. | <15 min | yes |
+| Slice 2 | If additive columns only, leave columns and disable flags; if constraint expansion causes issue, apply follow-up constraint narrowing after verifying no MXN rows. | 30-90 min | partial |
+| Slice 3 | Disable `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`; revert mapper. | <15 min | yes |
+| Slice 4 | Disable projection apply; reviewed dispositions remain audit evidence. | <30 min | partial |
+| Slice 5 | Disable `FINANCE_CORE_MXN_ENABLED` and projection flag; if Berel backfill applied, run compensating supersede/reprojection script from stored dry-run evidence. | 1-2h | partial |
+| Slice 6 | Disable `FINANCE_MXN_PAYMENT_ORDERS_ENABLED`; existing MXN orders remain readable but no new creates. | <15 min | partial |
+| Slice 7 | Disable mark-paid MXN path; do not delete settlement evidence; apply compensating reversal only with Finance approval. | 1-4h | partial |
+| Slice 8 | Disable `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`; fallback to legacy readers. | <15 min | yes |
+| Slice 9 | Rollout docs only; no runtime rollback. | N/A | yes |
+
+### Production verification sequence
+
+1. `pnpm pg:doctor` local and staging.
+2. Run all migrations in staging.
+3. Deploy staging with all flags `false`.
+4. Verify CLP/USD finance flows unchanged:
+   - existing Nubox non-export projection.
+   - existing payment order create/approve/mark-paid.
+   - existing account balance health.
+5. Enable `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED=true` in staging.
+6. Dry-run Berel projection for `28800562`; verify native MXN, CLP and USD values.
+7. Enable `FINANCE_CORE_MXN_ENABLED=true` in staging.
+8. Apply Berel allowlist backfill in staging.
+9. Verify `income` projection, AR reader, reporting reader and reliability signals.
+10. Enable `FINANCE_MXN_PAYMENT_ORDERS_ENABLED=true` in staging.
+11. Create MXN obligation/order/profile fixture and verify mixed-currency rejection.
+12. Exercise MXN settlement scenarios in staging.
+13. Enable `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED=true` in staging.
+14. Verify dashboards/readers and CLP/USD consolidated outputs.
+15. Repeat production deploy with flags `false`.
+16. Configure flags in Production but keep disabled until staging evidence is attached to Handoff.
+17. Enable production flags one by one using the same order.
+18. Apply Berel production backfill only with allowlist and explicit actor/reason.
+19. Monitor listed signals for 7 days.
+
+### Out-of-band coordination required
+
+- ✅ RESUELTO 2026-06-02 — Berel's contractual/invoice currency is **MXN** (operator-confirmed). `native_currency='MXN'` autoritativo para Berel; no country-inference. ADR §0.
+- ✅ RESUELTO 2026-06-02 — Banxico NO es obligatorio como primary; se requiere una fuente/API anclada. MXN ya sincroniza via la plataforma FX existente (`fx-sync-latam`, provider `banxico_sie` + fallbacks `frankfurter`/`fawaz_ahmed`, hub USD). Writes MXN en produccion permitidos con **degraded-source visible**; fail-closed readiness sigue bloqueando missing/stale. Hard-required Banxico queda como Follow-up. ADR §0.
+- ✅ RESUELTO 2026-06-02 — Settlement path: **Berel paga MXN a la cuenta Global66 CLABE denominada en MXN** de Efeonce. Efeonce tiene **varias cuentas Global66, una por moneda** (MXN, USD, EUR…); cada una es su **propia fila `accounts` con su `currency`**. ⚠️ NO confundir con la cuenta Global66 ya modelada en instrumentos de pago, que **recibe CLP y paga USD** (transit/intermediario para payroll internacional, `anchored-payments.ts`, ej. `global66-clp`) — esa convierte; la de Berel es nativa-MXN y solo recibe MXN sin conversión. Mismo provider, cuenta distinta, moneda distinta, rol distinto. AR inbound observada directo en MXN. Conversión MXN→CLP posterior = evento de tesorería/internal-transfer separado, NO el settlement. ADR §0 + §9.1. **Acción concreta:** onboardear la cuenta Global66 **MXN** en `greenhouse_finance.accounts` con `currency='MXN'` como fila propia, distinta de cualquier cuenta Global66 CLP/USD existente (Slice 7 / Treasury).
+- If production flags/env vars are added or changed, Vercel redeploy is required for affected targets.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     "Como compruebo que termine y que actualizo?"
+     El agente ejecuta estos checks al cerrar cada slice y
+     al cerrar la task completa.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [x] ADR `GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1` is accepted (2026-06-02, operator — ver ADR §0 Acceptance Record).
+- [ ] `FinanceCurrency` and `finance_core` domain support include MXN.
+- [ ] All known CLP/USD finance-core DB constraints are expanded or explicitly bounded.
+- [ ] Nubox export invoices map foreign amount and currency evidence.
+- [ ] Berel invoice `28800562` dry-run shows MXN `89,960`, CLP `4,617,647` and USD reporting equivalent from locked FX snapshot.
+- [ ] Berel projection cannot write without RFC organization match or reviewed disposition.
+- [ ] Income/AR preserves native MXN plus CLP/USD equivalents.
+- [ ] Payment obligations/profiles/orders support MXN or reject unsupported corridors before creating orders.
+- [ ] Mixed-currency payment orders are rejected server-side.
+- [ ] Settlement paths classify FX gain/loss explicitly.
+- [ ] Reporting/readers expose native detail, CLP consolidated and USD consolidated planes.
+- [ ] Required reliability signals are wired (subsystem rollup `Finance Data Quality`) and return steady-state after rollout.
+- [ ] Production rollout includes flags/env vars, redeploy, allowlist backfill and runtime verification.
+- [ ] MXN se agrega EXTENDIENDO las VIEWs canonicas (`expense_payments_normalized`, `income_payments_normalized`, `income_settlement_reconciliation`, `fx_pnl_breakdown`, `materializeAccountBalance`); no se crea ninguna VIEW/helper paralelo.
+- [ ] Ningun reader nuevo viola `greenhouse/no-untokenized-fx-math` (build verde sin `eslint-disable` inline).
+- [ ] Los 3 planos reconcilian por la cadena canonica `MXN(native) → CLP(legal Nubox) → USD(snapshot CLP→USD)`; `native_equivalent_drift` no da falsos positivos.
+- [ ] La factura de exportacion DTE 110 se proyecta IVA-exenta (`is_tax_exempt=true`, `tax_rate=0`, `tax_amount=0`).
+- [ ] FX gain/loss se materializa via `fx_pnl_breakdown` con `economic_category='financial_cost'`, fuera de revenue/operating P&L.
+- [ ] Las capabilities `finance.fx.manual_override` y `finance.nubox_export.review_disposition` estan seedeadas + granteadas en `runtime.ts` (guard `capability-grant-coverage.test.ts` verde) con audit append-only.
+- [ ] Errores API nuevos usan `canonicalErrorResponse` (es-CL) y los code paths usan `captureWithDomain(err, 'finance', ...)`.
+
+## Verification
+
+- `pnpm pg:doctor`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm test`
+- Targeted tests:
+  - `pnpm vitest run src/lib/finance src/lib/nubox src/lib/reliability`
+  - `pnpm vitest run src/lib/finance/payment-orders src/lib/finance/payment-obligations src/lib/finance/beneficiary-payment-profiles`
+- Migration verification:
+  - `pnpm pg:connect`
+  - inspect constraints before/after.
+- Runtime verification:
+  - `pnpm staging:request GET /api/finance/nubox/sync-status --pretty`
+  - Berel dry-run/apply script output.
+  - payment order MXN staging fixture.
+  - reliability overview signals.
+- If any UI/reporting surface changes visibly:
+  - `pnpm fe:capture --route=<route> --env=staging --hold=3000`
+
+## Closing Protocol
+
+- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [ ] `docs/architecture/DECISIONS_INDEX.md` refleja el status final del ADR
+- [ ] `docs/documentation/finance/monedas-y-tipos-de-cambio.md` refleja que finance_core soporta MXN solo si el rollout esta operativo
+- [ ] Staging and production flags/env vars were verified with CLI, not assumed
+- [ ] Production redeploy/restart was performed where env vars changed
+- [ ] Berel backfill evidence is attached in Handoff
+
+## Follow-ups
+
+- Promote `BANXICO_SIE_TOKEN` and MXN coverage to `auto_synced` if Finance requires official MXN source before broader rollout.
+- Future ADR/task for COP/PEN finance-core promotion if commercial demand repeats outside MXN.
+- UI task for Finance Admin reviewed-disposition queue if Plan Mode finds no existing surface can safely host RFC/orphan review.
+- Treasury task for MXN bank/processor onboarding if no current account/rail can settle MXN.
+
+## Open Questions
+
+- Does Nubox expose explicit foreign currency code in XML/PDF or another endpoint for export invoices, or must Greenhouse use reviewed commercial evidence? **(Sigue abierta — Berel ya está confirmada como MXN a nivel negocio (ADR §0); lo que queda es el path técnico de extracción del código de moneda en el payload Nubox, a verificar en Slice 0/3 Discovery. Para Berel hay fallback de evidencia comercial confirmada.)**
+- ✅ RESUELTO 2026-06-02 — Berel paga a una cuenta Global66 CLABE denominada en MXN; settlement nativo MXN sin conversión en el boundary. ADR §0 + §9.1.
+- ✅ RESUELTO 2026-06-02 — Banxico NO obligatorio; fallback aceptable con degraded-source visible sobre la plataforma FX existente. ADR §0.
+- Should `reporting` and `analytics` expose USD broadly now, or only in finance multi-currency readers behind `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED` first?
+- **Governance del plano USD — RESUELTO 2026-06-02 (operador):** se confirma la cadena canonica `MXN → CLP(legal Nubox) → USD` para V1 (IAS 21: USD es moneda de presentacion, se convierte desde la funcional CLP). Registrado en ADR §8.4 + `## Currency Plane Sourcing Contract` punto 3. El MXN→USD directo queda como analitica ad-hoc, no como numero consolidado. Reabrir solo si Finance pide reporting "market-pure".
+- **Verificacion fiscal DTE 110:** confirmar contra el artefacto Nubox/SII real (XML/PDF de `28800562`) que el income export se mapea IVA-exento (D.L. 825 Art 12) y que el equivalente CLP que trae Nubox es el valor documental legal (no un estimado). Escalar a contador si el campo de exportacion no es inequivoco.
+- **`account_balances.fx_drift` con cuenta MXN nativa:** confirmar en Slice 7 que el signal `finance.account_balances.fx_drift` (TASK-774) trata correctamente el plano nativo MXN y no dispara drift artificial sobre una cuenta cuyo `currency='MXN'`.

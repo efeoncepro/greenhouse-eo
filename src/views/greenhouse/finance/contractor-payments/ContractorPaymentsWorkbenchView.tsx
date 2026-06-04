@@ -63,6 +63,12 @@ interface ReadinessBlocker {
   message: string
 }
 
+interface WorkbenchReadiness {
+  ready?: boolean
+  blockers?: ReadinessBlocker[]
+  evaluatedAt?: string
+}
+
 export interface WorkbenchPayable {
   contractorPayableId: string
   publicId: string
@@ -76,7 +82,19 @@ export interface WorkbenchPayable {
   payrollVia: string
   dueDate: string | null
   status: WorkbenchStatus
-  readiness: { blockers?: ReadinessBlocker[] }
+  readiness: WorkbenchReadiness
+}
+
+interface ReadySubmission {
+  contractorWorkSubmissionId: string
+  publicId: string
+  contractorName: string
+  engagementPublicId: string
+  title: string | null
+  servicePeriodStart: string | null
+  servicePeriodEnd: string | null
+  grossAmount: number | null
+  currency: string | null
 }
 
 type GovernanceAction = 'ready' | 'cancel' | 'waive' | 'override'
@@ -101,8 +119,19 @@ const STATUS_FILTERS: { value: 'all' | WorkbenchStatus; label: string }[] = [
   { value: 'paid', label: C.status.paid }
 ]
 
+const LIVE_READINESS_STATUSES = new Set<WorkbenchStatus>(['pending_readiness', 'blocked'])
+
 const money = (n: number, currency: string) =>
   formatCurrency(n, currency as CurrencyCode, { currencySymbolSpacing: ' ' }, 'es-CL')
+
+const readySubmissionLabel = (submission: ReadySubmission): string => {
+  const period =
+    submission.servicePeriodStart && submission.servicePeriodEnd
+      ? `${submission.servicePeriodStart} → ${submission.servicePeriodEnd}`
+      : submission.servicePeriodStart ?? submission.servicePeriodEnd ?? 'Sin período'
+
+  return `${submission.publicId} · ${period}`
+}
 
 const statusLabel = (s: WorkbenchStatus) => C.status[s] ?? s
 
@@ -116,6 +145,12 @@ const ContractorPaymentsWorkbenchView = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | WorkbenchStatus>('all')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [governance, setGovernance] = useState<GovernanceAction | null>(null)
+  const [readinessLoadingId, setReadinessLoadingId] = useState<string | null>(null)
+  const [readinessErrorId, setReadinessErrorId] = useState<string | null>(null)
+
+  const patchPayable = useCallback((contractorPayableId: string, patch: Partial<WorkbenchPayable>) => {
+    setPayables(prev => prev.map(p => (p.contractorPayableId === contractorPayableId ? { ...p, ...patch } : p)))
+  }, [])
 
   const refetch = useCallback(async () => {
     setError(false)
@@ -154,6 +189,49 @@ const ContractorPaymentsWorkbenchView = () => {
     () => payables.find(p => p.contractorPayableId === selectedId) ?? null,
     [payables, selectedId]
   )
+
+  const selectedPayableId = selected?.contractorPayableId ?? null
+  const selectedStatus = selected?.status ?? null
+
+  useEffect(() => {
+    if (!selectedPayableId || !selectedStatus || !LIVE_READINESS_STATUSES.has(selectedStatus)) return
+
+    let alive = true
+    const id = selectedPayableId
+
+    const loadReadiness = async () => {
+      setReadinessLoadingId(id)
+      setReadinessErrorId(null)
+
+      try {
+        const res = await fetch(`/api/finance/contractor-payables/${encodeURIComponent(id)}/readiness`, {
+          cache: 'no-store'
+        })
+
+        const body = (await res.json().catch(() => null)) as { readiness?: WorkbenchReadiness } | null
+
+        if (!alive) return
+
+        if (!res.ok || !body?.readiness) {
+          setReadinessErrorId(id)
+
+          return
+        }
+
+        patchPayable(id, { readiness: body.readiness })
+      } catch {
+        if (alive) setReadinessErrorId(id)
+      } finally {
+        if (alive) setReadinessLoadingId(current => (current === id ? null : current))
+      }
+    }
+
+    void loadReadiness()
+
+    return () => {
+      alive = false
+    }
+  }, [patchPayable, selectedPayableId, selectedStatus])
 
   const kpis = useMemo(() => {
     const sum = (list: WorkbenchPayable[]) => list.reduce((acc, p) => acc + p.netPayable, 0)
@@ -350,7 +428,17 @@ const ContractorPaymentsWorkbenchView = () => {
                 transition={{ duration: 0.22, ease: [0.2, 0, 0, 1] }}
               >
                 {selected ? (
-                  <DetailPanel payable={selected} onGovernance={setGovernance} />
+                  <DetailPanel
+                    payable={selected}
+                    readinessLoading={
+                      readinessLoadingId === selected.contractorPayableId ||
+                      (LIVE_READINESS_STATUSES.has(selected.status) &&
+                        !selected.readiness.evaluatedAt &&
+                        readinessErrorId !== selected.contractorPayableId)
+                    }
+                    readinessError={readinessErrorId === selected.contractorPayableId}
+                    onGovernance={setGovernance}
+                  />
                 ) : (
                   <OperationalPanel title={C.detail.title} icon='tabler-receipt' iconColor='secondary'>
                     <Alert severity='info' role='status'>
@@ -369,6 +457,7 @@ const ContractorPaymentsWorkbenchView = () => {
           action={governance}
           payable={selected}
           onClose={() => setGovernance(null)}
+          onPayablePatch={patch => patchPayable(selected.contractorPayableId, patch)}
           onDone={() => {
             setGovernance(null)
             void refetch()
@@ -383,9 +472,13 @@ const ContractorPaymentsWorkbenchView = () => {
 
 const DetailPanel = ({
   payable,
+  readinessLoading,
+  readinessError,
   onGovernance
 }: {
   payable: WorkbenchPayable
+  readinessLoading: boolean
+  readinessError: boolean
   onGovernance: (action: GovernanceAction) => void
 }) => {
   const theme = useTheme()
@@ -440,7 +533,15 @@ const DetailPanel = ({
       </OperationalPanel>
 
       <OperationalPanel title={C.detail.readinessTitle} icon='tabler-shield-check' iconColor={hasBlockers ? 'error' : 'success'}>
-        {hasBlockers ? (
+        {readinessLoading ? (
+          <Alert severity='info' icon={<CircularProgress size={18} />}>
+            {C.detail.readinessChecking}
+          </Alert>
+        ) : readinessError ? (
+          <Alert severity='warning' icon={<i className='tabler-alert-triangle' />}>
+            {C.detail.readinessRefreshFailed}
+          </Alert>
+        ) : hasBlockers ? (
           <Stack spacing={2}>
             {blockers.map(b => (
               <Box
@@ -475,7 +576,12 @@ const DetailPanel = ({
           <>
             <Divider sx={{ my: 4 }} />
             <Stack direction='row' spacing={2} flexWrap='wrap'>
-              <Button variant='contained' startIcon={<i className='tabler-send' />} disabled={hasBlockers && !isProfile} onClick={() => onGovernance('ready')}>
+              <Button
+                variant='contained'
+                startIcon={<i className='tabler-send' />}
+                disabled={readinessLoading || readinessError || hasBlockers}
+                onClick={() => onGovernance('ready')}
+              >
                 {C.actions.sendToFinance}
               </Button>
               {isExceeds ? (
@@ -527,20 +633,24 @@ const GovernanceDialog = ({
   action,
   payable,
   onClose,
+  onPayablePatch,
   onDone
 }: {
   action: GovernanceAction | null
   payable: WorkbenchPayable
   onClose: () => void
+  onPayablePatch: (patch: Partial<WorkbenchPayable>) => void
   onDone: () => void
 }) => {
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [errBlockers, setErrBlockers] = useState<ReadinessBlocker[]>([])
 
   useEffect(() => {
     setReason('')
     setErr(null)
+    setErrBlockers([])
   }, [action])
 
   if (!action) return null
@@ -566,7 +676,29 @@ const GovernanceDialog = ({
       })
 
       if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: string } | null
+        const body = (await res.json().catch(() => null)) as {
+          error?: string
+          readiness?: WorkbenchReadiness
+          blockers?: ReadinessBlocker[]
+        } | null
+
+        const readiness =
+          body?.readiness ??
+          (body?.blockers
+            ? {
+                ready: false,
+                blockers: body.blockers,
+                evaluatedAt: new Date().toISOString()
+              }
+            : null)
+
+        if (readiness) {
+          onPayablePatch({
+            readiness,
+            ...(action === 'ready' && readiness.ready === false ? { status: 'blocked' as WorkbenchStatus } : {})
+          })
+          setErrBlockers(readiness.blockers ?? [])
+        }
 
         setErr(body?.error ?? 'No se pudo completar la acción. Intenta de nuevo.')
 
@@ -596,6 +728,15 @@ const GovernanceDialog = ({
             <CustomTextField label={C.governance.reasonLabel} value={reason} onChange={e => setReason(e.target.value)} multiline minRows={3} fullWidth helperText={C.governance.reasonHelper} />
           ) : null}
           {err ? <Alert severity='error'>{err}</Alert> : null}
+          {errBlockers.length > 0 ? (
+            <Stack spacing={1.5}>
+              {errBlockers.map(blocker => (
+                <Alert key={blocker.code} severity='warning' icon={<i className='tabler-shield-x' />}>
+                  {C.blocker[blocker.code as keyof typeof C.blocker] ?? blocker.message}
+                </Alert>
+              ))}
+            </Stack>
+          ) : null}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 6, pb: 5 }}>
@@ -652,10 +793,49 @@ const CreateDialog = ({
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [readySubmissions, setReadySubmissions] = useState<ReadySubmission[]>([])
+  const [loadingReadySubmissions, setLoadingReadySubmissions] = useState(false)
 
   const isOffCycle = mode === 'off_cycle'
   const grossNum = Number(gross.replace(/[^\d]/g, '')) || 0
   const ready = isOffCycle ? engagementId !== '' && grossNum > 0 && reason.trim().length >= 10 : submissionId.trim() !== ''
+
+  useEffect(() => {
+    setSubmissionId('')
+    setErr(null)
+
+    if (isOffCycle) return
+
+    let alive = true
+
+    const loadReadySubmissions = async () => {
+      setLoadingReadySubmissions(true)
+
+      try {
+        const res = await fetch('/api/finance/contractor-payables/ready-submissions?limit=100', { cache: 'no-store' })
+
+        if (!res.ok) {
+          if (alive) setErr('No pudimos cargar los envíos aprobados.')
+
+          return
+        }
+
+        const body = (await res.json().catch(() => null)) as { items?: ReadySubmission[] } | null
+
+        if (alive) setReadySubmissions(body?.items ?? [])
+      } catch {
+        if (alive) setErr('No pudimos cargar los envíos aprobados.')
+      } finally {
+        if (alive) setLoadingReadySubmissions(false)
+      }
+    }
+
+    void loadReadySubmissions()
+
+    return () => {
+      alive = false
+    }
+  }, [isOffCycle])
 
   const submit = async () => {
     setSubmitting(true)
@@ -707,7 +887,31 @@ const CreateDialog = ({
               <CustomTextField label={C.create.reasonLabel} value={reason} onChange={e => setReason(e.target.value)} multiline minRows={2} fullWidth helperText={C.create.reasonHelper} />
             </>
           ) : (
-            <CustomTextField label={C.create.selectSubmission} value={submissionId} onChange={e => setSubmissionId(e.target.value)} fullWidth placeholder='cws-…' />
+            <CustomTextField
+              select
+              label={C.create.selectSubmission}
+              value={submissionId}
+              onChange={e => setSubmissionId(e.target.value)}
+              fullWidth
+              disabled={loadingReadySubmissions || readySubmissions.length === 0}
+              helperText={loadingReadySubmissions ? C.create.loadingSubmissions : readySubmissions.length === 0 ? C.create.emptySubmissions : undefined}
+            >
+              {readySubmissions.map(submission => (
+                <MenuItem key={submission.contractorWorkSubmissionId} value={submission.contractorWorkSubmissionId}>
+                  <Stack spacing={0.25}>
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                      {submission.contractorName}
+                    </Typography>
+                    <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+                      {readySubmissionLabel(submission)}
+                    </Typography>
+                    <Typography variant='caption' sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
+                      {submission.grossAmount !== null ? money(submission.grossAmount, submission.currency ?? 'CLP') : 'Monto pendiente'} · {submission.engagementPublicId}
+                    </Typography>
+                  </Stack>
+                </MenuItem>
+              ))}
+            </CustomTextField>
           )}
 
           {err ? <Alert severity='error'>{err}</Alert> : null}

@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import type { PoolClient } from 'pg'
 
 import { withTransaction } from '@/lib/db'
+import { isFinanceMxnPaymentOrdersEnabled } from '@/lib/finance/multi-currency/flags'
 import { resolvePaymentRoute } from '@/lib/finance/payment-routing/resolve-route'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import type {
@@ -186,6 +187,16 @@ export async function createPaymentOrderFromObligations(
     }
 
     const currency = [...currencies][0] as PaymentOrderCurrency
+
+    // 4b. TASK-990 — corredor MXN gated. Hasta habilitar
+    // FINANCE_MXN_PAYMENT_ORDERS_ENABLED, una order MXN se rechaza explícito
+    // (`unsupported_corridor`) ANTES de crearse — nunca se crea silenciosa.
+    if (currency === 'MXN' && !isFinanceMxnPaymentOrdersEnabled()) {
+      throw new PaymentOrderValidationError(
+        'El corredor de pagos MXN aún no está habilitado. Contacta a Finanzas para activarlo.',
+        'unsupported_corridor'
+      )
+    }
 
     // 5. Computar total + validar partial amounts
     let totalAmount = 0

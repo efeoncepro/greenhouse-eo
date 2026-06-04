@@ -72,6 +72,16 @@ Este epic crea una linea canonica sin romper Payroll ni Finance: `ContractorEnga
 - `TASK-797` — Contractor Closure + Transition Controls.
 - `TASK-798` — Contractor Reliability + Ops Control Plane.
 
+## Extension Tasks
+
+- `TASK-974` — Finance Contractor Payments Workbench.
+- `TASK-977` — Contractor Payable Bank Settlement.
+- `TASK-978` — Contractor Payment Due-Date Rule + SLA Signal.
+- `TASK-979` — Monthly Contractor Payment Run.
+- `TASK-980` — Contractor Payment Run Report ("Nomina de Contractors" PDF + Excel).
+- `TASK-981` — Contractor Payment Email + Remittance Attachment.
+- `TASK-993` — Contractor Payment Run Ready Email for Finance subscribers.
+
 ## Existing Related Work
 
 - `TASK-749` — Beneficiary Payment Profiles + Routing Policies V1.
@@ -96,6 +106,7 @@ Este epic crea una linea canonica sin romper Payroll ni Finance: `ContractorEnga
 - [ ] Contractor self-service can submit invoices/evidence and track payment state.
 - [ ] Contractor closure does not trigger finiquito and checks open invoices, access, documents and provider termination refs.
 - [ ] Reliability signals expose missing tax owner, FX blockers, duplicate payables, unapproved invoices and provider reconciliation lag.
+- [ ] Finance subscribers receive an idempotent run-ready email with PDF+Excel attachments when contractor payment orders are prepared.
 
 ## Non-goals
 

@@ -1,8 +1,66 @@
 # Greenhouse Contractor Engagements + Payables Architecture V1
 
-**Version:** 1.11
+**Version:** 1.12
 **Created:** 2026-05-05
 **Status:** `ContractorEngagement` (TASK-790) + Contractor Invoice Assets (TASK-791) + Contractor Work Submissions (TASK-792) + ContractorPayable + Finance bridge (TASK-793) + Chile Honorarios Compliance (TASK-794) + International Contractor Boundary Fase A (TASK-795) + Self-Service Hub UI (TASK-796) + Employee→Contractor connected command (TASK-956) + Contractor↔Legacy Payroll Double-Rail Exclusion + Current Work Classification (TASK-957) + **Contractor Closure + Transition Controls (TASK-797)** implemented. Provider settlement split + EOR (TASK-795 Fase B / TASK-955) and ops control plane (TASK-798) remain proposals.
+
+## Delta 2026-06-02 — Contractor payable end-to-end operator path validated
+
+Se valido el flujo operador end-to-end en `dev-greenhouse` para Valentina
+Hoyos (`EO-CENG-0001` / payable `EO-CPAY-0001`) sin scripts de estado ni
+mutaciones hechas por agentes: el operador avanzo desde la UI por las
+superficies canonicas.
+
+Cadena canonica validada:
+
+```text
+contractor_work_submission approved
+  -> contractor_payable pending_readiness
+  -> readiness live OK + payment route resolved
+  -> ready_for_finance
+  -> payment_obligation provider_payroll
+  -> monthly contractor payment run
+  -> payment_order pending_approval
+  -> approved/scheduled/submitted/paid in Payment Orders
+  -> contractor_payable paid
+  -> remittance advice EO-RA + email
+```
+
+Contratos reforzados:
+
+- **Payment profile resolution**: el readiness puede resolver un perfil activo
+  via `resolvePaymentRoute` aunque el payable haya nacido sin
+  `payment_profile_id`. Si la ruta activa es `beneficiary_type='member'`, solo
+  se usa un `member` existente ligado al `contractor_engagement.profile_id`;
+  el dominio contractor **nunca crea members**, no crea
+  `compensation_versions` y no entra al roster Payroll. Sin ruta, el payable
+  falla cerrado (`payment_profile_unresolved`) o requiere waiver auditado.
+- **Finance handoff**: `ready_for_finance` no es pago al banco. Es el traspaso
+  gobernado que crea una `payment_obligation` con
+  `source_kind='contractor_payable'`, `obligation_kind='provider_payroll'` y
+  `amount=net_payable`.
+- **Monthly run**: la corrida mensual barre obligaciones contractor no
+  batcheadas hasta el corte, agrupa por moneda y crea ordenes
+  `pending_approval`. Es idempotente y atomica; prepara el lote, no aprueba ni
+  paga.
+- **Payment Orders ownership**: approval, schedule, submit, mark-paid,
+  settlement y conciliacion viven en Payment Orders / Tesoreria. El payable
+  queda `payment_order_created` hasta que una orden pagada confirme el banco.
+- **Paid cascade**: solo `finance.payment_order.paid` puede mover el payable
+  `payment_order_created -> paid`. La emision del comprobante individual
+  `EO-RA` y el email de remesa requieren `payable.status='paid'`.
+- **Accounting**: el gasto contractor es el bruto; el banco paga el neto; la
+  retencion SII queda como pasivo separado a remesar al SII (F29).
+- **Run report**: el reporte de nomina de contractors puede incluir pagos
+  comprometidos/listos/en orden/pagados, pero `netPaidTotal` solo suma
+  `paid`. Un payable "En orden de pago" no debe leerse como pagado.
+
+Documentacion asociada:
+
+- Manual operador: `docs/manual-de-uso/finance/pagos-a-contractors.md`.
+- Manual Tesoreria: `docs/manual-de-uso/finance/ordenes-de-pago.md`.
+- Documentacion funcional: `docs/documentation/finance/pagos-a-contractors.md`
+  y `docs/documentation/finance/ordenes-de-pago.md`.
 
 ## Delta 2026-06-01 — TASK-985 Onboarding auto-activation (no más draft huérfano)
 

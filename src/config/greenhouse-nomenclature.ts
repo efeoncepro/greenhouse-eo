@@ -54,6 +54,7 @@ export const GH_AGENCY_NAV = {
   spaces: { label: 'Spaces', subtitle: 'Lista de clientes activos' },
   capacity: { label: 'Capacidad', subtitle: 'Carga operativa global del equipo' },
   organizations: { label: 'Organizaciones', subtitle: 'Cuentas, relaciones y estructura' },
+  newClient: { label: 'Alta de cliente', subtitle: 'Puerta única de onboarding' },
   services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' },
   sampleSprints: { label: 'Sample Sprints', subtitle: 'Pilotos, trials y discovery comerciales' },
   staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding y economía por assignment' },

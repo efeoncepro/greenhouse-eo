@@ -24,6 +24,9 @@ export interface OrganizationLifecycleRow extends Record<string, unknown> {
   lifecycle_stage_by: string | null
   is_dual_role: boolean
   organization_type: string | null
+  // TASK-1006 — país legal/HQ de la org; SSOT del default para clients.country_code
+  // y client_profiles.billing_country.
+  country: string | null
 }
 
 // TASK-535: narrow reads for the lifecycle commands. Kept separate so the
@@ -45,7 +48,8 @@ export const selectOrganizationForLifecycleUpdate = async (
        lifecycle_stage_source,
        lifecycle_stage_by,
        is_dual_role,
-       organization_type
+       organization_type,
+       country
      FROM greenhouse_core.organizations
      WHERE organization_id = $1
      FOR UPDATE`,
@@ -70,7 +74,8 @@ export const findOrganizationByHubSpotCompany = async (
        lifecycle_stage_source,
        lifecycle_stage_by,
        is_dual_role,
-       organization_type
+       organization_type,
+       country
      FROM greenhouse_core.organizations
      WHERE hubspot_company_id = $1
      ORDER BY created_at ASC

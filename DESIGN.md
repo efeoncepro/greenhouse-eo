@@ -430,3 +430,23 @@ Font assets: `src/assets/fonts/Poppins-{ExtraBold,ExtraBoldItalic,Black,BlackIta
 ### Reusable PDF footer
 
 `src/lib/finance/pdf/efeonce-pdf-footer.tsx` (`EfeoncePdfFooter`) is the canonical institutional footer for **all** Efeonce PDFs: legal entity (legalName · RUT) + legal address (line 1), `efeoncepro.com` + optional generated/page (line 2). The footer carries **legal/contact identity only** — the marketing slogan goes in the brand zone, not here. New PDFs reuse this footer instead of rolling their own.
+
+## Brand assets — Integraciones de terceros (Notion, Teams, …)
+
+**Esto NO es la marca Efeonce/Greenhouse.** Son los **isotipos de marcas de terceros** que Greenhouse integra (Notion, Microsoft Teams, y a futuro HubSpot, etc.). Se usan **solo para etiquetar superficies de integración** — el panel de vínculo de teamspace/canal en el wizard de alta, conectores, settings de integración — donde el usuario necesita reconocer "esto es Notion / esto es Teams". Gobierno aparte del logo institucional (ese vive en la sección anterior + `src/config/efeonce-brand.ts`).
+
+**Componente canónico:** `src/components/greenhouse/brand/BrandIsotypes.tsx` → `NotionIsotype`, `TeamsIsotype` (prop `size`). NUNCA re-implementar el isotipo inline ni pegar un `<svg>` de marca suelto.
+
+**Cómo se renderizan (regla dura):** cada isotipo usa el **glyph Tabler de la marca** ya bundleado (`tabler-brand-notion`, `tabler-brand-teams`, `tabler-brand-*`) vía `<i className>`, coloreado a la marca:
+
+- **Notion** → glyph `tabler-brand-notion` negro dentro de una caja blanca redondeada (lockup canónico sobre superficies claras).
+- **Teams** → glyph `tabler-brand-teams` en púrpura oficial `#5059C9`, sin caja.
+
+NUNCA usar paths SVG hand-transcritos (de simple-icons u otra fuente): rinden como un blob malformado cuando les falta `fill-rule`/container, arrastran marcas que Microsoft/Notion pidieron retirar de esas librerías, y se desvían del sistema de iconos del portal (Tabler en todo). El bug fuente (TASK-998): el isotipo de Teams era un `<path>` simple-icons monocromo sin container → blob púrpura ilegible.
+
+**Reglas duras:**
+
+- Decorativos: `aria-hidden`. El significado lo carga el **label de texto adyacente** ("Notion del cliente", "Teams del cliente"), nunca el glyph solo.
+- Para una integración nueva (HubSpot, Slack, etc.): agregar un `<XIsotype>` a `BrandIsotypes.tsx` reusando su glyph Tabler `tabler-brand-<x>` si está en el bundle (verificar en `src/assets/iconify-icons/generated-icons.css`); si no está, agregarlo al bundle — NUNCA hand-author el SVG.
+- Estos marks de terceros **NUNCA** se usan como marca propia del portal ni en documentos institucionales (recibos, finiquitos, contratos) — esos llevan **solo** marca Efeonce.
+- Tamaño vía `size`; color a la marca vía `color`/container, no inventar variantes.

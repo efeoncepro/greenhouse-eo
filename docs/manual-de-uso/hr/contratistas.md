@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 1.0
 > **Creado:** 2026-05-30 por Claude (TASK-796 — contractor self-service hub)
-> **Ultima actualizacion:** 2026-05-30 por Claude (TASK-796 — contractor self-service hub)
+> **Ultima actualizacion:** 2026-06-02 — visor de soportes admin + handoff a Finanzas
 > **Modulo:** HR / Contratistas
 > **Ruta en portal:** `/my/contractor` (contratista) · `/hr/contractors` (HR / admin)
 > **Documentacion relacionada:** [Contratistas — Self-Service y Workbench HR](../../documentation/hr/contratistas-self-service.md), [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
@@ -63,11 +63,26 @@ Estas dos pantallas cierran el ciclo de un contratista, desde que entrega su tra
 ### HR — aprobar, observar o rechazar
 
 1. Selecciona la entrega en la cola y abre la **decision de revision**.
-2. Elige una opcion:
+2. Revisa el panel **Soportes del caso** antes de decidir. Ahi ves boletas, evidencia y documentos asociados al engagement o al envio actual.
+3. Si necesitas ver el archivo, usa **Abrir visor**. Para PDF e imagenes, el visor abre el documento dentro del drawer; para otros formatos, abre el archivo privado en una pestaña.
+4. Elige una opcion:
    - **Aprobar.** Deja la entrega lista para que Finanzas la procese.
    - **Observar.** Pide cambios. Debes escribir una razon visible para el contratista de al menos 10 caracteres.
    - **Rechazar.** Cierra la entrega. Tambien exige una razon visible de al menos 10 caracteres.
-3. Confirma. El contratista vera el resultado y, si observaste o rechazaste, la razon.
+5. Confirma. El contratista vera el resultado y, si observaste o rechazaste, la razon.
+
+### HR — que pasa despues de aprobar
+
+Cuando apruebas un envio, el caso puede quedar en la cola como **Aprobado** con responsable **Finance** y siguiente accion **Crear payable en Finanzas**.
+
+Eso significa:
+
+- HR ya hizo su parte sobre el envio.
+- El envio aprobado queda disponible para que Finanzas cree un payable desde `/finance/contractor-payments`.
+- Todavia **no** existe pago bancario.
+- Todavia **no** necesariamente existe un payable en `ready_for_finance`.
+
+Si ves un envio anterior como **Disputado** en el historial, pero luego hay una correccion aprobada para el mismo periodo/contexto, el headline del workbench sigue la correccion aprobada. La disputa anterior queda auditable, pero no debe bloquear el caso actual.
 
 ## Que significan los estados
 
@@ -147,7 +162,16 @@ Observar y rechazar exigen una razon visible para el contratista de al menos 10 
 
 ### Aprobe una entrega pero no se pago
 
-Aprobar no ejecuta el pago: deja lista la obligacion para Finanzas. El pago corre por los flujos de Finanzas, fuera de esta pantalla.
+Aprobar no ejecuta el pago. El siguiente paso es de Finanzas:
+
+1. Finanzas abre `/finance/contractor-payments`.
+2. Usa **Crear desde envio**.
+3. Selecciona el envio aprobado.
+4. Crea el payable.
+5. Revisa readiness y lo envia a Finanzas.
+6. Luego Finanzas prepara la corrida mensual / orden de pago.
+
+Si HR ya aprobo y la fila muestra **Aprobado · Finance · Crear payable en Finanzas**, esta correcto: no vuelvas a disputar ni rechazar solo porque aun no esta pagado.
 
 ## Dar de alta un contractor (onboarding, TASK-976)
 
@@ -206,6 +230,20 @@ Los botones de ciclo de vida muestran **solo las transiciones validas** del esta
 
 No paga ni prepara payables (eso es Finanzas, `/finance/contractor-payments`). No crea engagements ni convierte empleados (onboarding, futuro). No toca nomina ni finiquito.
 
+## Puente hacia Finanzas
+
+El workbench HR es dueño de la revision de trabajo y evidencia. Finanzas es dueño de crear y preparar el payable.
+
+| Estado o señal en HR | Qué significa | Qué hace HR | Qué hace Finanzas |
+|---|---|---|---|
+| En revision | Hay envio pendiente de decision | Revisar soportes y aprobar/observar/rechazar | Nada todavia |
+| Disputado | HR pidio correccion | Esperar respuesta del contractor | Nada todavia |
+| Aprobado | HR aprobo el envio vigente | No volver a revisar salvo error real | Crear payable desde envio |
+| Bloqueado | Hay payable bloqueado | Revisar si el blocker dice HR/Contractor | Resolver readiness si es de Finanzas |
+| Listo/Pagado | Ya avanzo el flujo financiero | Consultar, no operar pago | Manejar obligacion/orden/comprobante |
+
+Para operar el pago completo, usa el manual de Finanzas: [Pagos a Contractors](../finance/pagos-a-contractors.md).
+
 ## Referencias tecnicas
 
 - `src/lib/contractor-engagements/self-service-projection.ts`
@@ -216,3 +254,4 @@ No paga ni prepara payables (eso es Finanzas, `/finance/contractor-payments`). N
 - viewCodes `mi_ficha.mi_contratacion` (contratista) · `equipo.contratistas` (HR)
 - capabilities `personal_workspace.contractor.read_self` · `.submit_self` · `hr.contractor_work_submission.review` · `hr.contractor_engagement:update` · `hr.contractor_classification:approve`
 - [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
+- Manual financiero posterior: [Pagos a Contractors](../finance/pagos-a-contractors.md)

@@ -3,9 +3,34 @@
 > **Tipo de documento:** Spec de arquitectura
 > **Version:** 1.0
 > **Creado:** 2026-04-25
-> **Ultima actualizacion:** 2026-04-25
+> **Ultima actualizacion:** 2026-06-03
 > **Scope:** API platform interna, ecosystem-facing y futura external-facing de Greenhouse
-> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_MCP_ARCHITECTURE_V1.md`, `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`, `TASK-040`
+> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`, `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_MCP_ARCHITECTURE_V1.md`, `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`, `TASK-040`
+
+---
+
+## Delta 2026-06-03 — Full API parity como principio de producto/plataforma
+
+ADR canonico: `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
+
+Greenhouse adopta **full API parity** como principio rector:
+
+> Toda capacidad que pueda ejecutarse dentro de Greenhouse debe poder ejecutarse, o tener un camino planificado para ejecutarse, mediante un contrato programatico gobernado.
+
+La decision no significa exponer cada boton de la UI como endpoint. Significa que la UI, futuras apps, agentes, MCP adapters, sister platforms, CLIs y runbooks deben converger sobre primitives canonicas server-side y contratos API versionables.
+
+Reglas:
+
+- La UI no es source of truth de logica de negocio; debe consumir commands/readers/projections canonicos.
+- Una capacidad nueva debe declarar el camino programatico esperado: Product API interna, `api/platform/app/*`, `api/platform/ecosystem/*`, MCP downstream, CLI/runbook, o follow-up explicito si queda temporalmente UI-only.
+- Un write programatico debe tener command semantics explicita, authorization tenant-safe, audit/outbox cuando aplique, idempotencia si puede reintentarse, errores sanitizados y observabilidad.
+- Los contratos API modelan aggregates, resources y commands; no componentes, tabs, botones ni handlers visuales.
+- Las excepciones UI-only deben ser temporales, justificadas, reversibles y trazables a task/ADR si la capacidad tiene valor operativo.
+
+Consecuencia practica:
+
+- Las nuevas features no estan "cerradas" si solo existen como UI y su dominio requiere automatizacion, integracion, agente, recovery o app client.
+- Las rutas de producto existentes pueden seguir conviviendo, pero las capacidades estables y reutilizables deben migrar progresivamente hacia API Platform contracts y adapters downstream.
 
 ---
 
@@ -246,6 +271,16 @@ Cuando una dependencia falle o un backend no esté listo, la platform API debe i
 ### 5.7 Versioning is explicit
 
 La evolución del contrato debe ser gobernada; no implícita.
+
+### 5.8 Full API parity
+
+Toda capacidad que pueda ejecutarse dentro de Greenhouse debe tener o planificar un equivalente programatico. La paridad se evalua contra la capacidad de negocio, no contra la forma visual de la pantalla.
+
+Por lo tanto:
+
+- primero se diseña la primitive server-side y su command/read contract;
+- luego la UI, apps, integraciones, agentes y MCP adapters consumen ese contrato segun su lane;
+- cualquier excepcion UI-only queda documentada como deuda temporal, no como estado objetivo.
 
 ---
 
@@ -1253,10 +1288,32 @@ Desde 2026-04-25 Greenhouse debe operar con estas reglas:
 4. Nuevos resources de platform API deben montarse sobre adapters shared por aggregate, no sobre proxies de rutas legacy.
 5. `MCP` debe seguir siendo downstream de contratos API estables.
 6. `BigQuery` puede seguir existiendo como backend transicional o analítico, pero no debe filtrarse como shape contractual del consumer.
+7. Toda capacidad Greenhouse nueva debe evaluar full API parity: si es accionable en UI, debe tener primitive server-side reusable y camino API/app/MCP/CLI o follow-up explicito.
 
 ---
 
-## 25. Delta 2026-04-25 — Nace la arquitectura canónica de API platform
+## 25. Delta 2026-06-03 — Full API parity queda aceptado
+
+ADR canonico: `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
+
+La decision full API parity queda aceptada como principio transversal de producto/plataforma.
+
+Scope:
+
+- UI interna del portal
+- first-party app lane
+- ecosystem/server-to-server lane
+- MCP adapters
+- CLIs y runbooks operativos
+- sister platforms y futuras integraciones
+
+No cambia runtime por si sola. Cambia el criterio de diseño y cierre:
+
+- una capacidad visible debe declarar como se automatiza o integra;
+- un command debe vivir en primitive canonica antes de exponerse por UI/API;
+- el backlog API Platform existente (`TASK-650` a `TASK-661` y tasks hijas) es el carril natural para materializar paridad por dominio.
+
+## 26. Delta 2026-04-25 — Nace la arquitectura canónica de API platform
 
 Se crea `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` como source of truth para la plataforma de APIs de Greenhouse.
 
@@ -1268,7 +1325,7 @@ Decisiones explícitas:
 - `integrations/v1` sigue vivo como lane legacy/transicional
 - `MCP` queda reafirmado como adapter downstream de una API estable y no como punto de partida
 
-## 26. Delta 2026-04-25 — TASK-616 implementa el primer slice runtime
+## 27. Delta 2026-04-25 — TASK-616 implementa el primer slice runtime
 
 Ya existe una primera implementación runtime aditiva de la arquitectura:
 
@@ -1291,7 +1348,7 @@ Decisiones explícitas de este slice:
 - el auth/context nuevo reutiliza el modelo seguro de `sister_platform_consumers` + `sister_platform_bindings` + `sister_platform_request_logs` sin romper `/api/integrations/v1/*`
 - `integrations/v1` y `integrations/v1/sister-platforms/*` siguen intactos y verificados como lanes legacy/transicionales
 
-## 27. Platform Health V1 contract — preflight programático canónico (TASK-672)
+## 28. Platform Health V1 contract — preflight programático canónico (TASK-672)
 
 Primer endpoint API Platform pensado para ser consumido por agentes (MCP, Teams bot, CI, scripts, dashboards externos) **antes** de ejecutar acciones sensibles. Reemplaza el patrón anterior donde cada consumer tenía que inferir el estado leyendo 7 endpoints distintos y hacer su propio rollup.
 

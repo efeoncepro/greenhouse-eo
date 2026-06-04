@@ -45,10 +45,11 @@ export type PlatformCurrency = (typeof CURRENCIES_ALL)[number]
 // `isSupportedCurrencyForDomain` or `assertSupportedCurrencyForDomain`
 // instead of hardcoding lists.
 export const CURRENCY_DOMAIN_SUPPORT: Record<CurrencyDomain, readonly PlatformCurrency[]> = {
-  // finance_core stays at CLP | USD to match `FinanceCurrency` contract;
-  // expanding here without migrating income/expense/payroll tables would
-  // break invariants downstream.
-  finance_core: ['CLP', 'USD'],
+  // TASK-990: MXN promoted to finance_core (ADR multi-currency, accepted
+  // 2026-06-02). MXN write paths stay gated by FINANCE_CORE_MXN_ENABLED
+  // (default off) until schema + canonical readers classify MXN safely
+  // (expand-and-contract). Chile statutory payroll stays CLP regardless.
+  finance_core: ['CLP', 'USD', 'MXN'],
 
   // pricing_output is the multi-currency surface Efeonce sells in.
   pricing_output: ['USD', 'CLP', 'CLF', 'COP', 'MXN', 'PEN'],
@@ -102,7 +103,17 @@ export const FX_POLICIES = [
 
   // The surface does not apply FX — values are always consumed in their
   // native currency. Used when the surface is intentionally source-preserving.
-  'none'
+  'none',
+
+  // TASK-990 (ADR multi-currency §5.2): snapshot the rate at the moment cash
+  // settles (bank movement date). Used by treasury FX gain/loss on the
+  // invoice-vs-settlement delta. Not a domain default.
+  'rate_at_settlement',
+
+  // TASK-990: Finance Admin manually supplied the rate (readiness was
+  // temporarily_unavailable/stale). Recorded with actor + reason + audit. Not
+  // a domain default.
+  'manual_override'
 ] as const
 
 export type FxPolicy = (typeof FX_POLICIES)[number]
@@ -201,8 +212,8 @@ export const CLIENT_FACING_STALENESS_THRESHOLD_DAYS = 3
 export const toFinanceCurrency = (currency: string): FinanceCurrency => {
   const narrowed = assertSupportedCurrencyForDomain(currency, 'finance_core')
 
-  // finance_core support is statically ['CLP', 'USD'] — cast is safe because
-  // assertSupportedCurrencyForDomain threw otherwise.
+  // finance_core support is ['CLP', 'USD', 'MXN'] (TASK-990) — cast is safe
+  // because assertSupportedCurrencyForDomain threw otherwise.
   return narrowed as FinanceCurrency
 }
 
