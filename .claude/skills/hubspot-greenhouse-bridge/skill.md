@@ -11,8 +11,8 @@ Operate the Cloud Run service that bridges HubSpot CRM writes/webhooks ↔ `gree
 
 | System | Lives in | Canonical authority |
 |---|---|---|
-| **HubSpot portal app** (v2025.2): OAuth scopes (`app-hsmeta.json`), webhook subscriptions (`webhooks-hsmeta.json`) | **MONOREPO** `greenhouse-eo/services/hubspot_greenhouse_integration/hubspot-app/hubspot-bigquery/` (**ABSORBIDO** — TASK-574 movió el bridge Cloud Run; el app project se absorbió semanas después). `hs project upload --account=48713323` se corre desde ahí. El sibling quedó stale para el app config. | HubSpot Developer Platform (deploy vía `hs project upload`) |
-| **HubSpot → BigQuery CRM sync** (Cloud Function `hubspot-bq-sync`, `main.py`) + `create_hubspot_properties.py` | `cesargrowth11/hubspot-bigquery/main.py` + `deploy.sh` (sibling, **NO absorbido**) | GCP Cloud Function + BigQuery `hubspot_crm.*` |
+| **HubSpot portal app** (v2025.2): OAuth scopes, webhook URL config, private app tokens | `cesargrowth11/hubspot-bigquery/hsproject.json` + `src/app/` (sibling, **NOT moved** by TASK-574) | HubSpot Developer Platform |
+| **HubSpot → BigQuery CRM sync** (Cloud Function `hubspot-bq-sync`, `main.py`) | `cesargrowth11/hubspot-bigquery/main.py` + `deploy.sh` (sibling, **NOT moved**) | GCP Cloud Function + BigQuery `hubspot_crm.*` |
 | **HubSpot write bridge + webhooks** (Cloud Run `hubspot-greenhouse-integration`, 23 routes) | `greenhouse-eo/services/hubspot_greenhouse_integration/` | **this skill** owns this system |
 | **Greenhouse runtime** (Next.js on Vercel) | `greenhouse-eo/src/**` | `src/lib/integrations/hubspot-greenhouse-service.ts` is the canonical client |
 | **Secret Manager** (3 secrets) | GCP project `efeonce-group` | Runtime SA `greenhouse-portal@` reads at boot |
