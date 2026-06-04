@@ -127,12 +127,21 @@ Trigger semi-automático §11.1: deal closed-won → abre onboarding case `statu
   - **A confirmar en implementación**: (a) cómo el drawer recibe el cliente existente (props `clientProfileId` + identidad para el context read-only) y **carga** los valores actuales del `client_profiles`; (b) el endpoint/helper de persistencia del Save (reusar patrón `fillMissingFinanceProfileForExistingClient` TASK-1006, o un PUT a `client_profiles`); (c) el trigger nuevo (per-cliente, desde la lista/detalle de Finanzas) — el botón global "Crear cliente" debe ir SIEMPRE al wizard (quitar el fallback `setDrawerOpen(true)` legacy).
 - (Slices 2 y 3 ya implementados — ver bloques ✅ arriba. Este texto queda como referencia histórica del discovery.)
 
-### Operator-gated / live (lo que falta para cerrar TASK-1010 — NO autonomizable por un agente)
+### Estado de items (recalibrado 2026-06-04 tras verificación e2e)
 
-- **Slice 4 GVC SuccessScreen + degraded pickers**: SuccessScreen requiere un create real contra staging (cliente de prueba rollback-safe); degraded pickers requieren inyección de falla. (Necesita deploy a staging del código de las tasks núcleo + del Slice 2; aún no desplegado.)
-- **Suscripción webhook HubSpot deal** (Slice 3 rollout): crear la subscription `deal.creation` + `deal.propertyChange(dealstage)` en el portal HubSpot Developer apuntando a `/api/webhooks/hubspot-deals` (signature v3) + flip `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED=true`. El handler ya está shipped y verde; sin la subscription + el flag, no llegan eventos (cero side-effect).
-- **Azure Graph `Group.Read.All`** al App Registration del bot: grant tenant-wide read — requiere OK explícito del scope antes de aplicar por `az`.
-- **Invitación real e2e** (1001): enviar invitación a un **email de PRUEBA** (no cliente real); verificar email (Resend) + activación de cuenta con flag ON.
-- **Flag prod verificado**: `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` value=true en Production + nav discoverable.
+**✅ VERIFICADO / hecho:**
+- Slice 1 Teams channel materialización + **persistencia e2e verificada** (`writeTeamsChannelFromAnchor` → `teams_notification_channels`, team+channel, `ready`, space-scoped).
+- Slice 2 FinanceFacetDrawer (drawer→facet + botón global→wizard) + GVC del mockup aprobado.
+- Slice 3 webhook deal + **e2e verificado contra DB real** (HMAC→classify→delegate→processClosedWonDeal→case draft + control negativo + cleanup) + subscription deal LIVE (Build #26).
+- **Channel-level Teams** + **Graph perms**: ya resueltos por TASK-998 (scope stale del spec) — el panel elige equipo→canal; el bot lista con perms actuales (sin `Group.Read.All`).
+- **Invitación al portal**: e2e verificada + **bug latente ISSUE-084 detectado y fixeado** (INSERT sin `user_id` + `auth_mode` inválido; afectaba onboarding + `/api/admin/invite`). Fix del lifecycle invite→activación + guard de regresión.
 
-> **Estado**: Slices 1-3 code-complete + verde en `develop` (local-first, sin push). El cierre de TASK-1010 queda gated por los ítems live/operator-gated de arriba (Runtime Rollout Completion Gate). NO mover a `complete/` hasta que el operador ejecute el rollout externo + Slice 4 GVC live.
+**🔒 Operator-gated / release (lo que falta — al release conjunto):**
+- **Suscripción webhook deal en HubSpot**: ✅ ya hecha (Build #26). Falta el flip `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` en prod (al release).
+- **Round-trip de producción del webhook**: requiere release `develop→main` (código de clasificación a prod) — sin eso, prod descarta deal events como `unknown`.
+- **Invitación real con entrega a `creative@efeoncepro.com`**: post-push, el email se envía desde staging/prod (Resend) → el usuario activa con el link.
+- **Readiness Notion PRD**: conectar la integración Greenhouse PRD al teamspace del cliente (acción operador en Notion settings, per-cliente). El search degrada honesto a "crear nuevo" sin eso (comportamiento correcto).
+- **GVC SuccessScreen + degraded pickers**: requiere un create real contra staging (post-deploy) + inyección de falla para los pickers.
+- **Flip + verificación de flags en prod**: `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + deal trigger.
+
+> **Estado**: el grueso del dev-scope está verde + verificado e2e en `develop`. Lo que resta es del **release conjunto** (decisión operador: terminar 1010 + pasar todo junto a prod). NO mover a `complete/` hasta el round-trip de prod + GVC SuccessScreen + invitación real entregada.
