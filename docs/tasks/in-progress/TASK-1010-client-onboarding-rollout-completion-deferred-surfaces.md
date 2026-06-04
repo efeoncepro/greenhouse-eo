@@ -109,11 +109,12 @@ Trigger semi-automático §11.1: deal closed-won → abre onboarding case `statu
 - Verde: eslint 0, tsc 0, `hubspot-deals.test` 13/13, `hubspot-companies.test` 13/13.
 - **✅ E2E VERIFICADO contra DB real (2026-06-04, in-process)**: `processInboundWebhook('hubspot-companies', req-firmado-deal-0-3)` → `{status:200, processed:true}` → caso `draft` real creado (`clc-a381e90c…`, trigger=hubspot_deal, deal ANAM `36218728630`). Ejercitó el path completo: HMAC v3 (acepta válida / **rechaza inválida** → control negativo `processed:false`) → classify `0-3`='deal' → delegación → `processHubSpotDealEvents` (flag ON) → `processClosedWonDeal` → SQL real (`greenhouse_crm.deals` is_closed_won + resolución org) → `provisionClientLifecycle`. **Cleanup**: caso cancelado (rollback-safe, sin residuo activo). Secret sintético (valida el código; el match con secret real ya probado en prod por webhooks company/service, mismo `validateHubSpotSignature`). **PENDIENTE sólo el round-trip de PRODUCCIÓN** (HubSpot real → endpoint prod): requiere release `develop→main` del código de clasificación + flip del flag en prod.
 
-### 🔄 PENDIENTE (operator-gated + Slice 4 GVC live)
+### ✅ Slice 4 — GVC SuccessScreen + degraded pickers (2026-06-04, verificado enterprise)
 
-**Slice 4 — GVC SuccessScreen + degraded pickers** (GVC live). PENDIENTE.
-- SuccessScreen: requiere un create real contra staging (cliente de prueba rollback-safe).
-- Degraded pickers (loading/falla de HubSpot/Graph): requiere inyección de falla.
+- **SuccessScreen** (mockup `client-onboarding-wizard`, ruta `/agency/clients/new/mockup`, sin writes a DB): check verde, "Cliente creado", metadata `Cliente=Grupo Berel` + **código de caso `EO-CLC-0051` legible** (chip), 3 próximos pasos del checklist, jerarquía de CTAs correcta (1 primary "Ir a la ficha" + 1 tonal "Crear otro"), stepper 100%, footer Efeonce. Frame mirado ✓.
+- **Degraded picker** (runtime local, scenario `client-onboarding-wizard-runtime --env=local`, flag ON): el panel Notion con token inválido → `POST /api/admin/clients/lifecycle/notion/validate` lo rechaza → **error Alert honesto** (ícono + crimson + texto "El token fue rechazado por Notion (401). Verifica que lo copiaste completo.", outlined, no alarmante) + fallback manual disponible + nota "se guarda cifrado, nunca en texto plano". Color+ícono+texto → WCAG ok. Validate es **read-only (no crea cliente)** → captura determinista + safe. Frame mirado ✓.
+- Hook nuevo `data-capture="notion-connect-panel"` (espejo del de Teams) para clips limpios (commit `f180d4d1c`).
+- **Por qué local y no staging**: staging+prod comparten Cloud SQL → un create real por el wizard en staging crearía una org/cliente visible en prod. Local tiene el código + es seguro (sin writes compartidos). El degraded usa `/notion/validate` (read-only).
 
 **~~Slice 2~~ (cerrado arriba) — referencia histórica del discovery:**
 - Redefinir `src/views/greenhouse/finance/drawers/CreateClientDrawer.tsx` (hoy "crea cliente" desde Finanzas, POSTea `/api/finance/clients`) → superficie de **completar el facet financiero** de un cliente existente. El wizard es la ÚNICA puerta de nacimiento (`provisionClientFromWizard`) — el drawer NO debe parir clientes.
@@ -135,14 +136,13 @@ Trigger semi-automático §11.1: deal closed-won → abre onboarding case `statu
 - Slice 3 webhook deal + **e2e verificado contra DB real** (HMAC→classify→delegate→processClosedWonDeal→case draft + control negativo + cleanup) + subscription deal LIVE (Build #26).
 - **Channel-level Teams** + **Graph perms**: ya resueltos por TASK-998 (scope stale del spec) — el panel elige equipo→canal; el bot lista con perms actuales (sin `Group.Read.All`).
 - **Readiness Notion PRD** (scope stale): ya funciona — el onboarding usa **token scoped por cliente** (TASK-998), `NotionConnectPanel` → `/notion/validate` → `discoverNotionDatabasesForToken` valida + clasifica las DBs del cliente **al instante**. El item "conectar Greenhouse PRD + Graph Group.Read.All" era del modelo viejo (integración compartida), superseded por el token-por-teamspace. NO se hace de nuevo.
-- **Invitación al portal**: e2e verificada + **bug latente ISSUE-084 detectado y fixeado** (INSERT sin `user_id` + `auth_mode` inválido; afectaba onboarding + `/api/admin/invite`). Fix del lifecycle invite→activación + guard de regresión. **Invitación real a `creative@efeoncepro.com` ENVIADA vía staging** (HTTP 200, `userId:e9feae0e`, email con link de staging para activar contra el código fixeado).
+- **Invitación al portal**: e2e verificada + **bug latente ISSUE-084 detectado y fixeado** (INSERT sin `user_id` + `auth_mode` inválido; afectaba onboarding + `/api/admin/invite`). Fix del lifecycle invite→activación + guard de regresión. **Entrega real confirmada en Resend** (`last_event=delivered`) a `hhumberly@efeoncepro.com` Y `jreysgo@gmail.com` (vía staging). `creative@` rebotó (no es buzón real — no es bug). El usuario hizo clic en el link de `jreysgo@` y obtuvo "enlace inválido/expirado" → **causa raíz cross-env, NO bug del flujo**: el email arma la URL con `NEXT_PUBLIC_APP_URL || prod`, en staging apunta a prod, y el JWT firmado con el secret de staging no verifica con el secret de prod (DB compartida, la fila del token sí existe). **El flujo funciona en prod** (mismo secret, misma DB). Capturado en **TASK-1012** (URL cross-env + sync de estado de entrega Resend).
+- **Slice 4 GVC SuccessScreen + degraded pickers**: ✅ ambos frames capturados + mirados + verificados enterprise (ver bloque Slice 4 arriba).
 
-**🔒 Operator-gated / release (lo que falta — al release conjunto):**
-- **Suscripción webhook deal en HubSpot**: ✅ ya hecha (Build #26). Falta el flip `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` en prod (al release).
-- **Round-trip de producción del webhook**: requiere release `develop→main` (código de clasificación a prod) — sin eso, prod descarta deal events como `unknown`.
-- **Invitación real con entrega a `creative@efeoncepro.com`**: post-push, el email se envía desde staging/prod (Resend) → el usuario activa con el link.
-- **Readiness Notion PRD**: conectar la integración Greenhouse PRD al teamspace del cliente (acción operador en Notion settings, per-cliente). El search degrada honesto a "crear nuevo" sin eso (comportamiento correcto).
-- **GVC SuccessScreen + degraded pickers**: requiere un create real contra staging (post-deploy) + inyección de falla para los pickers.
-- **Flip + verificación de flags en prod**: `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + deal trigger.
+**🔒 Operator-gated / release (lo único que falta — al release conjunto):**
 
-> **Estado**: el grueso del dev-scope está verde + verificado e2e en `develop`. Lo que resta es del **release conjunto** (decisión operador: terminar 1010 + pasar todo junto a prod). NO mover a `complete/` hasta el round-trip de prod + GVC SuccessScreen + invitación real entregada.
+- **Round-trip de producción del webhook deal**: requiere release `develop→main` (código de clasificación a prod) + flip `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED`. Subscription ya LIVE (Build #26).
+- **Flip + verificación de flags en prod**: `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + deal trigger + round-trip e2e real (HubSpot deal → caso draft).
+- **Readiness Notion PRD per-cliente**: conectar el token scoped al teamspace del cliente (acción operador en Notion, per-cliente, en el checklist). El search degrada honesto a "crear nuevo" sin eso (correcto).
+
+> **Estado**: **dev-scope COMPLETO + verificado** (Slices 1-4 verdes, invitación e2e con entrega real, GVC ambos frames mirados, ISSUE-084 fixeado, TASK-1012 abierta para el follow-up cross-env). Lo único pendiente es el **rollout a prod** (flip de flags + round-trip e2e real), intencionalmente diferido al **release conjunto** (decisión operador: terminar 1010 + pasar todo junto). NO mover a `complete/` hasta completar ese rollout (Runtime Rollout Completion Gate).
