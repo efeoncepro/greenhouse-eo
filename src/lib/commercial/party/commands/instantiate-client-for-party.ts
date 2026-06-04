@@ -54,6 +54,18 @@ export interface InstantiateClientForPartyInput {
   }
   /** TASK-997 Slice 2 — contactos de finanzas (suggest HubSpot o manual). */
   financeContacts?: FinanceContactRecord[]
+  /** TASK-1006 — perfil financiero declarado en el alta. Todos opcionales; defaults legacy
+   *  preservados cuando no vienen. `billingCountry` ya viene auto-derivado del país de la org
+   *  desde la UI. `clients.country_code` NO va aquí: se deriva de organization.country. */
+  financeProfile?: {
+    billingAddress?: string | null
+    billingCountry?: string | null
+    requiresPo?: boolean
+    requiresHes?: boolean
+    currentPoNumber?: string | null
+    currentHesNumber?: string | null
+    specialConditions?: string | null
+  }
   actor: PartyActor
 }
 
@@ -85,24 +97,32 @@ export const instantiateClientForParty = async (
       ? 'efeonce_internal'
       : 'client'
 
+    // TASK-1006 — país del cliente = país de la org (SSOT). null-safe; trim→null.
+    const clientCountryCode =
+      typeof organization.country === 'string' && organization.country.trim().length > 0
+        ? organization.country.trim()
+        : null
+
     const insertedClient = await txClient.query<{ client_id: string }>(
       `INSERT INTO greenhouse_core.clients (
          client_id,
          client_name,
          legal_name,
          hubspot_company_id,
+         country_code,
          tenant_type,
          status,
          active,
          created_at,
          updated_at
-       ) VALUES ($1, $2, $3, $4, $5, 'active', TRUE, NOW(), NOW())
+       ) VALUES ($1, $2, $3, $4, $5, $6, 'active', TRUE, NOW(), NOW())
        RETURNING client_id`,
       [
         clientId,
         organization.organization_name,
         organization.organization_name,
         organization.hubspot_company_id,
+        clientCountryCode,
         tenantType
       ]
     )
@@ -118,6 +138,13 @@ export const instantiateClientForParty = async (
         ? JSON.stringify(input.financeContacts)
         : null
 
+    // TASK-1006 — perfil financiero del alta. Defaults legacy preservados cuando no viene
+    // financeProfile (billing_* = null, requires_* = FALSE). El N° OC/HES se persiste solo
+    // si el toggle correspondiente está activo (ya normalizado en el route; defensa extra acá).
+    const fp = input.financeProfile
+    const requiresPo = fp?.requiresPo ?? false
+    const requiresHes = fp?.requiresHes ?? false
+
     await txClient.query(
       `INSERT INTO greenhouse_finance.client_profiles (
          client_profile_id,
@@ -129,11 +156,16 @@ export const instantiateClientForParty = async (
          payment_terms_days,
          requires_po,
          requires_hes,
+         current_po_number,
+         current_hes_number,
+         billing_address,
+         billing_country,
+         special_conditions,
          finance_contacts,
          created_by_user_id,
          created_at,
          updated_at
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, FALSE, FALSE, $9::jsonb, $8, NOW(), NOW())`,
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb, $16, NOW(), NOW())`,
       [
         clientProfileId,
         insertedClientId,
@@ -142,8 +174,15 @@ export const instantiateClientForParty = async (
         organization.hubspot_company_id,
         paymentCurrency,
         paymentTermsDays,
-        input.actor.userId ?? 'system',
-        financeContacts
+        requiresPo,
+        requiresHes,
+        requiresPo ? (fp?.currentPoNumber ?? null) : null,
+        requiresHes ? (fp?.currentHesNumber ?? null) : null,
+        fp?.billingAddress ?? null,
+        fp?.billingCountry ?? null,
+        fp?.specialConditions ?? null,
+        financeContacts,
+        input.actor.userId ?? 'system'
       ]
     )
 

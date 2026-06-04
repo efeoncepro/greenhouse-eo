@@ -190,6 +190,18 @@ export const provisionClientFromWizard = async (
               ? { paymentTermsDays: input.finance.paymentTermsDays }
               : undefined,
           financeContacts: input.financeContacts,
+          // TASK-1006 — perfil financiero del paso Finanzas (billing + OC/HES + condiciones).
+          financeProfile: input.finance
+            ? {
+                billingAddress: input.finance.billingAddress,
+                billingCountry: input.finance.billingCountry,
+                requiresPo: input.finance.requiresPo,
+                requiresHes: input.finance.requiresHes,
+                currentPoNumber: input.finance.currentPoNumber,
+                currentHesNumber: input.finance.currentHesNumber,
+                specialConditions: input.finance.specialConditions
+              }
+            : undefined,
           actor: { userId: input.triggeredByUserId }
         },
         client
