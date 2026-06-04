@@ -2,7 +2,13 @@
 
 ## Status
 
-- Lifecycle: `complete`
+<!-- 2026-06-04: reabierta. Se cerró prematuramente; el webhook NO se probó e2e y
+     5+ ítems del scope siguen sin hacer (invitación e2e, readiness Notion PRD/Graph,
+     channel-level Teams, GVC SuccessScreen/degraded, flag prod). El webhook de deal
+     NO es funcional aún (código de clasificación en develop sin desplegar a prod +
+     flag OFF; target del webhook es producción). NO marcar complete hasta verificar
+     el flow real (Runtime Rollout Completion Gate). -->
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto` (cierra el rollout real del onboarding de clientes — invitación, readiness externo, superficies diferidas)
 - Effort: `Medio-Alto`
