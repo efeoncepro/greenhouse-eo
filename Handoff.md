@@ -1,3 +1,57 @@
+# Sesion 2026-06-04 (cont.) — Notification Hub context para TeamBot 1:1 payments
+
+Por pedido del operador se reviso el contexto de Notification Hub para encajar los envios 1:1 de Greenhouse como forma canonica futura, no como script manual permanente.
+
+- **Docs revisados:** `GREENHOUSE_NOTIFICATION_HUB_V1`, `TASK-690`/`691`/`692`/`693`, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1`, runtime actual `src/lib/notifications/*`, `teams-notify.ts`, `manual-teams-announcements`.
+- **Conclusion:** el modelo objetivo es `notification_intents.recipient_member_id` + `notification_deliveries.channel='teams_dm'`; el adapter TeamBot usa `recipient_kind='dynamic_user'` y resuelve `member_id -> aadObjectId` en runtime. No seedear una fila estatica por persona para envios recurrentes.
+- **Correccion documental aplicada:** `GREENHOUSE_TEAMS_BOT_INTERACTION_V1` bump v1.3. Crear DM por Bot Framework usa `members: [{ id: "<aadObjectId>" }]`; `29:` queda para mentions/pairwise ids, no para create-conversation.
+- **Payment-status alignment:** `GREENHOUSE_NOTIFICATION_HUB_V1` ahora tiene seccion `6.1 Payment-status 1:1 announcements`: eventos fuente preferidos `workforce.contractor_payable.paid`, `finance.payment_order.paid` / `.settled`, y evento per-member payroll si falta grano.
+- **TASK-690 Delta v0.3:** agrega discovery TeamBot 1:1 + low-PII rules + Maggie discovery-only al contrato de implementacion.
+- **Runbook actualizado:** `docs/operations/teams-bot-payroll-payment-1on1-announcements.md` ahora declara que el CLI es puente temporal hasta que el Hub sea canonico.
+
+---
+
+# Sesion 2026-06-04 (cont.) — TeamBot 1:1 discovery Maggie Borralles, sin envio
+
+Por pedido del operador se incorporo discovery de Maggie Borralles/Borrales para saber como enviarle por chat 1:1 con el TeamBot. **No se envio ningun mensaje** y **no se creo conversacion Bot Framework** durante esta discovery.
+
+- **Persona resuelta en Greenhouse/Graph:** Maggie Borralles (`mborralles@efeoncepro.com`; el pedido la escribio como Borrales).
+- **Greenhouse member id:** `0e6a896e-f1d2-481c-9c97-ee43ab1714d8`.
+- **AAD object id / recipient_user_id para 1:1:** `e0f8f69a-c1f5-40a1-a159-dced9087b318`.
+- **Estado Teams app personal:** instalada. Graph `GET /users/{aadObjectId}/teamwork/installedApps?$expand=teamsAppDefinition...` retorno `200`; entry `Greenhouse`, version `1.0.4`.
+- **Cache 1:1:** no existe row aun en `greenhouse_core.teams_bot_conversation_references` para `reference_key='user:e0f8f69a-c1f5-40a1-a159-dced9087b318'`.
+- **Envios previos Teams para Maggie:** no hay rows en `greenhouse_sync.source_sync_runs` (`source_system='teams_notification'`) con Maggie/AAD id.
+- **Como enviar en futuro, solo con autorizacion explicita:** construir `TeamsChannelRecord` transiente con `recipient_kind='chat_1on1'` y `recipient_user_id='e0f8f69a-c1f5-40a1-a159-dced9087b318'`. El primer envio real llamara `getOrCreateOneOnOneChat()` y cacheara la conversacion bajo `user:e0f8...`.
+- **Documentacion:** `docs/operations/teams-bot-payroll-payment-1on1-announcements.md` ahora tiene seccion `Additional 1:1 discovery candidates` con Maggie y shape exacto del `TeamsChannelRecord`.
+
+---
+
+# Sesion 2026-06-04 (cont.) — TeamBot 1:1 pagos nomina/honorarios enviados + fix Connector aadObjectId
+
+Por pedido del operador se notifico por Microsoft Teams 1:1 a Felipe Zurita, Daniela Ferreira, Valentina Hoyos, Melkin Hernandez y Andres Carlosama sobre pagos ya realizados/listos, con Adaptive Card + boton `Action.OpenUrl`.
+
+- **Enviados OK (5/5)** via Bot Framework Connector, `surface=chat_1on1`, correlacion operativa `manual-payment-announcement-2026-06-04`.
+- **Runs auditados en `greenhouse_sync.source_sync_runs`:**
+  - Daniela `teams-payment-9b73e8f4-9c74-4118-957e-e4a66b0025c8`, messageId `1780584804194`.
+  - Melkin `teams-payment-96bcad9e-eef6-4a80-9f27-7700eba02d98`, messageId `1780584806595`.
+  - Andres `teams-payment-a7e28b8e-17da-4c4e-94f3-82b27d651a1b`, messageId `1780584809954`.
+  - Valentina `teams-payment-ffc46b80-5b8f-48f5-85da-0542cf866237`, messageId `1780584813513`.
+  - Felipe `teams-payment-5e2eec9e-2e42-4af2-929b-0b012602abd2`, messageId `1780584815961`.
+- **Causa raiz descubierta antes del envio exitoso:** `getOrCreateOneOnOneChat()` usaba `members: [{ id: "29:<aadObjectId>" }]`; Teams Connector devuelve `403 BadArgument: Failed to decrypt pairwise id`. La forma correcta para crear 1:1 desde Entra object id es `members: [{ id: "<aadObjectId>" }]`. El prefijo `29:` queda para pairwise Teams IDs / mention entities, no para create-conversation con aadObjectId.
+- **Fix aplicado:** `src/lib/integrations/teams/bot-framework/connector-client.ts` + test focal `connector-client.test.ts` actualizado; `pnpm exec vitest run src/lib/integrations/teams/bot-framework/__tests__/connector-client.test.ts` verde (10/10).
+- **Documentacion/runbook:** `docs/operations/teams-bot-payroll-payment-1on1-announcements.md` actualizado con comando canonico, dry-run obligatorio, duplicate protection, gotcha `29:` vs aadObjectId y futuro carril Payment Orders/Notification Hub.
+- **Comando canonico:** `pnpm teams:payment-announcement --period <YYYY-MM-DD|YYYY-MM> --dry-run|--yes` (`package.json`). El script `scripts/send-payroll-payment-teams-announcements.ts` ahora:
+  - no envia por defecto;
+  - soporta `--dry-run`, `--yes`, `--triggered-by`, `--allow-duplicate`;
+  - usa copy con acentos;
+  - bloquea duplicados por `memberId` + `period` usando `source_sync_runs` (compat legacy con los 5 envios de 2026-06-04);
+  - sale con `process.exit()` para no dejar pool abierto.
+- **Verificacion anti-duplicado:** `pnpm teams:payment-announcement --period 2026-06-04 --yes --triggered-by codex` NO reenvio nada; salto 5/5 con `reason=duplicate_success` apuntando a los runIds ya enviados.
+- **Gates post-hardening:** `pnpm exec vitest run src/lib/integrations/teams/bot-framework/__tests__/connector-client.test.ts` verde (10/10) + `pnpm exec tsc --noEmit` verde.
+- **Cache verificado:** 5 rows `greenhouse_core.teams_bot_conversation_references` `reference_key='user:<aadObjectId>'`, `failure_count=0`.
+
+---
+
 # Sesion 2026-06-04 (cont.) — Onboarding de clientes: núcleo de TASK-992/997/1001 cerrado (opción A) + TASK-1010 (rollout) creada
 
 Revisión + cierre del onboarding de clientes (decisión operador: opción A — cerrar el núcleo + docs + GVC, splittear lo externo/rollout). Las tres movidas a `complete/`:

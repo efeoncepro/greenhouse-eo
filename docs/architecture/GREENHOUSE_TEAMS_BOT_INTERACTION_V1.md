@@ -1,11 +1,18 @@
 # GREENHOUSE_TEAMS_BOT_INTERACTION_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-04-26 por TASK-671 (Claude)
-> **Última actualización:** 2026-04-26 por TASK-671 (Claude) — bump a v1.2 con cutover ejecutado + dispatcher con region failover/cache/circuit breaker + sinergia con Notification Hub
+> **Última actualización:** 2026-06-04 por Codex — bump a v1.3 con smoke 1:1 create-conversation + alineación Notification Hub
 > **Estado:** vigente
 > **Specs relacionadas:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.2 (transport), `GREENHOUSE_NOTIFICATION_HUB_V1.md` (orquestador upstream — TASK-690)
+
+## Delta v1.3 (2026-06-04 — 1:1 create-conversation smoke + Notification Hub alignment)
+
+- **Corrección verificada para crear DM 1:1:** `POST {serviceUrl}/v3/conversations` debe recibir `members: [{ id: "<aadObjectId>" }]` cuando el destinatario viene desde Microsoft Entra / Graph user id. No prefijar con `29:` en ese request. El prefijo `29:` sigue siendo correcto para Teams pairwise ids / mention entities, pero en create-conversation con `29:<aadObjectId>` el Connector devolvió `403 BadArgument: Failed to decrypt pairwise id`.
+- **Discovery real 2026-06-04:** los envíos manuales de pagos de nómina/honorarios a 5 colaboradores validaron el path `chat_1on1` y poblaron `greenhouse_core.teams_bot_conversation_references` con `reference_key='user:<aadObjectId>'`.
+- **Maggie Borralles discovery-only:** `member_id='0e6a896e-f1d2-481c-9c97-ee43ab1714d8'`, `aadObjectId='e0f8f69a-c1f5-40a1-a159-dced9087b318'`, app personal `Greenhouse` instalada, sin conversation reference cache todavía. No se envió mensaje.
+- **Alineación con Notification Hub:** los envíos 1:1 recurrentes no deben escalar como filas estáticas por persona. El modelo objetivo es `notification_intents.recipient_member_id` + delivery `teams_dm`; el adapter usa `recipient_kind='dynamic_user'`, resuelve `member_id → aadObjectId` con `resolveTeamsUserForMember()`, y delega al dispatcher Bot Framework.
 
 ## Delta v1.2 (2026-04-26 — cutover real + robustness baked-in + sinergia)
 
@@ -45,7 +52,7 @@ Greenhouse Teams Bot envía via **Bot Framework Connector API**, no Microsoft Gr
 | Service URL | `https://smba.trafficmanager.net/teams` (primary), `/amer`, `/emea`, `/apac` (fallbacks regionales) |
 | Endpoint canal | `POST {serviceUrl}/v3/conversations` con body `{ isGroup: true, channelData: { channel, tenant, team? }, activity }` |
 | Endpoint chat existente | `POST {serviceUrl}/v3/conversations/{chatId}/activities` |
-| Endpoint crear DM | `POST {serviceUrl}/v3/conversations` con `members: [{ id: "29:<aadObjectId>" }]` |
+| Endpoint crear DM | `POST {serviceUrl}/v3/conversations` con `members: [{ id: "<aadObjectId>" }]` |
 
 Microsoft Graph **sí** se usa para 2 lookups ancilares (token aud
 `https://graph.microsoft.com/.default`):
@@ -244,10 +251,10 @@ Greenhouse runtime
     [returns JSON: { clientId, clientSecret, tenantId }]
   → acquireBotFrameworkToken({ clientId, clientSecret, tenantId })
     [POST login.microsoftonline.com/{tid}/oauth2/v2.0/token
-     scope=https://graph.microsoft.com/.default,
+     scope=https://api.botframework.com/.default,
      grant_type=client_credentials]
   → cached token (in-memory, expires_in - 60s)
-  → graph-client.ts call
+  → connector-client.ts call
 ```
 
 **Federated credentials** (TASK-671 follow-up): el secret blob actual usa client_secret. La spec de Cloud Security Posture pide migrar a federated credential (Vercel OIDC + Cloud Run WIF + GitHub Actions) para no tener client_secret rotable manualmente. La migración no requiere cambiar el code path — solo el blob almacenado en Secret Manager (un cliente de federated credential trade `assertion → token`).

@@ -144,6 +144,7 @@
     "seed:service-catalog": "tsx scripts/seed-service-catalog.ts",
     "staging:request": "node scripts/staging-request.mjs",
     "teams:announce": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/send-manual-teams-announcement.ts",
+    "teams:payment-announcement": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/send-payroll-payment-teams-announcements.ts",
     "mcp:greenhouse": "tsx scripts/run-greenhouse-mcp.ts",
     "email:dev": "email dev --dir src/emails --port 3001",
     "postinstall": "npm run build:icons",

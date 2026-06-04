@@ -165,7 +165,7 @@ describe('getOrCreateOneOnOneChat', () => {
 
     const body = JSON.parse((fetchImpl.mock.calls[0][1] as { body: string }).body)
 
-    expect(body.members[0].id).toBe('29:user-1')
+    expect(body.members[0].id).toBe('user-1')
     expect(body.tenantId).toBe('tenant-a')
     expect(body.channelData.tenant.id).toBe('tenant-a')
   })
