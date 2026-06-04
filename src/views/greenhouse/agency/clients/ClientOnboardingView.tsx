@@ -2412,7 +2412,16 @@ const ClientOnboardingView = () => {
           },
           finance: {
             paymentCurrency: state.currency || undefined,
-            paymentTermsDays: state.paymentTermsDays ? Number(state.paymentTermsDays) : undefined
+            paymentTermsDays: state.paymentTermsDays ? Number(state.paymentTermsDays) : undefined,
+            // TASK-1006 — perfil financiero del paso Finanzas (antes se descartaba en el submit).
+            // El server normaliza trim→null; el N° OC/HES solo si el toggle está activo.
+            billingAddress: state.billingAddress || undefined,
+            billingCountry: state.billingCountry || undefined,
+            requiresPo: state.requiresPo,
+            requiresHes: state.requiresHes,
+            currentPoNumber: state.requiresPo ? state.poNumber || undefined : undefined,
+            currentHesNumber: state.requiresHes ? state.hesNumber || undefined : undefined,
+            specialConditions: state.specialConditions || undefined
           },
           effectiveDate: state.startDate ? state.startDate.toISOString().slice(0, 10) : undefined,
           clientKind: state.engagementKind,

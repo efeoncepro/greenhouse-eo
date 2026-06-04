@@ -94,7 +94,16 @@ export async function POST(request: Request) {
       },
       finance: {
         paymentCurrency: typeof finance.paymentCurrency === 'string' ? (finance.paymentCurrency as never) : undefined,
-        paymentTermsDays: typeof finance.paymentTermsDays === 'number' ? finance.paymentTermsDays : undefined
+        paymentTermsDays: typeof finance.paymentTermsDays === 'number' ? finance.paymentTermsDays : undefined,
+        // TASK-1006 — perfil financiero (todos opcionales, trim→null). Si requiresPo/Hes=false,
+        // el número viene null (la UI ya oculta el campo); persistirlo null es correcto.
+        billingAddress: trimToNull(finance.billingAddress),
+        billingCountry: trimToNull(finance.billingCountry),
+        requiresPo: typeof finance.requiresPo === 'boolean' ? finance.requiresPo : undefined,
+        requiresHes: typeof finance.requiresHes === 'boolean' ? finance.requiresHes : undefined,
+        currentPoNumber: finance.requiresPo === true ? trimToNull(finance.currentPoNumber) : null,
+        currentHesNumber: finance.requiresHes === true ? trimToNull(finance.currentHesNumber) : null,
+        specialConditions: trimToNull(finance.specialConditions)
       },
       financeContacts,
       notionAnchors,
@@ -117,6 +126,15 @@ export async function POST(request: Request) {
   } catch (error) {
     return mapLifecycleError(error, 'provision_from_wizard')
   }
+}
+
+// TASK-1006 — string del body → trim → null si vacío. Acepta solo strings; cualquier
+// otro tipo (number/bool/object/undefined) → null. No inventa defaults.
+const trimToNull = (raw: unknown): string | null => {
+  if (typeof raw !== 'string') return null
+  const trimmed = raw.trim()
+
+  return trimmed.length > 0 ? trimmed : null
 }
 
 // TASK-997 Slice 2 — normaliza los contactos de finanzas del wizard a la forma

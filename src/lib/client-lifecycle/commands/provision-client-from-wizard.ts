@@ -60,6 +60,17 @@ export interface ProvisionClientFromWizardInput {
   finance?: {
     paymentCurrency?: BillingCurrency
     paymentTermsDays?: number
+    // TASK-1006 — perfil financiero declarado en el paso Finanzas. Todos opcionales con
+    // defaults legacy preservados. `billingCountry` ya auto-deriva del país de la org en
+    // la UI; se persiste tal cual. `clients.country_code` NO viene de aquí: se deriva de
+    // organization.country en instantiateClientForParty (ver Delta SSOT de la spec).
+    billingAddress?: string | null
+    billingCountry?: string | null
+    requiresPo?: boolean
+    requiresHes?: boolean
+    currentPoNumber?: string | null
+    currentHesNumber?: string | null
+    specialConditions?: string | null
   }
   /** TASK-997 Slice 2 — contactos de finanzas con provenance (suggest HubSpot o manual). */
   financeContacts?: FinanceContactRecord[]
