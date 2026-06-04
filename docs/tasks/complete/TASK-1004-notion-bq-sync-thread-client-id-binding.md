@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio` (data-completeness BQ; afecta downstream que filtra/joina por `client_id`)
 - Effort: `Bajo`
@@ -27,7 +27,7 @@ Es una **segunda fuente de verdad divergente**: `load_all_space_configs()` (qué
 
 ## Root Cause (evidencia)
 
-```
+```text
 notion_ops.tareas (2026-06-04):
   Sky      spc-ae463d9f   4118 filas  client_id NULL=0     SET=4118  ✅ (en mirror BQ)
   Efeonce  spc-c0cf6478   1374 filas  client_id NULL=0     SET=1374  ✅ (en mirror BQ)
@@ -60,21 +60,34 @@ firma con `client_id`, preferencia threaded>mirror, threading en el caller per-s
 
 - Repo `efeoncepro/notion-bigquery`, Cloud Run `notion-bq-sync` (`us-central1`, proyecto `efeonce-group`).
 - **NO** `bash deploy.sh` a secas (usa `--env-vars-file` → REPLACE → borraría las vars per-space + el secret PG que viven manuales en la revisión, no en `.env.yaml` gitignored). Deploy canónico **merge** (preserva env+secrets), igual que el cutover de TASK-1003:
+
   ```bash
   gcloud run deploy notion-bq-sync --source --function=notion_bq_sync \
     --region=us-central1 --project=efeonce-group \
-    --update-env-vars=... --update-secrets=...   # MERGE, no reemplaza
+    --service-account=183008134038-compute@developer.gserviceaccount.com \
+    --update-env-vars=NOTION_PER_SPACE_TOKEN_ENABLED=true,NOTION_DATA_SOURCES_ENDPOINT_ENABLED=true,GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev,GREENHOUSE_POSTGRES_DB=greenhouse_app,GREENHOUSE_POSTGRES_USER=greenhouse_app \
+    --update-secrets=NOTION_TOKEN=notion-token:latest,GREENHOUSE_POSTGRES_PASSWORD=greenhouse-pg-dev-app-password:latest
   ```
+
 - Aditivo + sin flag nuevo (el path per-space ya está ON). Reversible: traffic a la revisión previa (`00021-wkl`).
 
 ## Definition of Done
 
-- [x] Fix implementado en `main.py` (repo hermano) + commit en rama TASK-1004.
+- [x] Fix implementado en `main.py` (repo hermano) + commit en rama TASK-1004 (`87a4391`).
 - [x] Tests verde (12).
-- [ ] Deploy merge a Cloud Run `notion-bq-sync` (autorización del operador + comando mostrado).
-- [ ] Verificación post-deploy: próxima corrida → Berel `client_id` SET (NULL=0) + sin warning.
-- [ ] Rama pusheada a `origin`.
-- [ ] Lifecycle → `complete`, registros sincronizados, Handoff.
+- [x] Deploy merge a Cloud Run `notion-bq-sync` (autorizado por el operador, revisión `00022-vk8`, env+secrets preservados).
+- [x] Verificación post-deploy: corrida manual (10 ok, 0 errors) → **Berel `client_id` NULL=0** (tareas 80/80, proyectos 4/4) + **cero warnings de binding**. Efeonce/Sky no-regresión (NULL=0).
+- [x] Rama pusheada a `origin`.
+- [x] Lifecycle → `complete`, registros sincronizados, Handoff.
+
+## Cierre (2026-06-04, live)
+
+- Deploy: revisión `notion-bq-sync-00022-vk8` (100% tráfico). Merge preservó per-space + PG + ambos secrets + flags.
+- Sync manual (`gcloud scheduler jobs run notion-bq-daily-sync`): `10 ok, 0 skipped, 0 errors — 5851 rows`, servido por `00022-vk8`.
+- Berel `notion_ops`: `client_id` NULL 80→**0** (autocorregido por DELETE+INSERT, sin backfill). `sample_cid=cli-0863869c-…`.
+- Efeonce (1374) / Sky (4118): `client_id` NULL=0 (bit-for-bit, sin regresión).
+- Warnings de binding (`35c39c2f`): **0** en la corrida post-deploy.
+- Rollback disponible <5 min: `gcloud run services update-traffic notion-bq-sync --to-revisions=notion-bq-sync-00021-wkl=100 --region=us-central1 --project=efeonce-group`.
 
 ## Out of Scope
 

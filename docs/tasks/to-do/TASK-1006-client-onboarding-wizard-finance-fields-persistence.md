@@ -1,0 +1,349 @@
+# TASK-1006 — Client Onboarding Wizard Finance Fields Persistence
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P1`
+- Impact: `Alto`
+- Effort: `Medio`
+- Type: `implementation`
+- Epic: `EPIC-CLIENT-360`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `commercial|finance|ui|api|data`
+- Blocked by: `none`
+- Branch: `task/TASK-1006-client-onboarding-wizard-finance-fields-persistence`
+- Legacy ID: `none`
+- GitHub Issue: `optional`
+
+## Summary
+
+Corregir el drift del wizard de alta donde varios campos visibles del paso Finanzas se capturan en UI pero no llegan al API ni se persisten en `greenhouse_finance.client_profiles`: direccion de facturacion, pais de facturacion, requiere OC/HES, numero OC/HES vigente y condiciones especiales. La solucion debe reusar columnas y primitives existentes; no crear un modelo paralelo.
+
+## Why This Task Exists
+
+El wizard muestra campos financieros operativos que el operador cree estar guardando. Sin embargo, `ClientOnboardingView.handleSubmit` solo envia moneda, terminos de pago y contactos; `provisionClientFromWizard` solo pasa `billingDefaults` y `financeContacts` a `instantiateClientForParty`. El schema real ya tiene columnas para estos datos, por lo que el problema es un contrato incompleto UI -> route -> composer -> `client_profiles`, no una falta de DDL.
+
+## Goal
+
+- Enviar y validar todos los campos financieros visibles del wizard que tienen columna canonica.
+- Persistirlos en `greenhouse_finance.client_profiles` durante el commit atomico del alta.
+- Mantener idempotencia al completar clientes existentes sin borrar datos ya confiables por accidente.
+- Agregar tests anti-regresion para que ningun campo visible vuelva a quedar descartado silenciosamente.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     "Que necesito entender antes de planificar?"
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md`
+- `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md`
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
+
+Reglas obligatorias:
+
+- No crear columnas nuevas salvo que `pnpm pg:doctor`/schema real contradiga `src/types/db.d.ts`.
+- Reusar `greenhouse_finance.client_profiles` como source of truth del perfil financiero inicial.
+- No crear endpoints ad hoc para botones; el write sigue pasando por `provisionClientFromWizard`.
+- No crear Purchase Order/HES entities en esta task; solo persistir los numeros vigentes del perfil cuando el operador los declara en el alta.
+- Mantener idempotencia para orgs/clientes existentes: no sobreescribir valores existentes con vacio/null.
+- Copy visible sigue en `src/lib/copy/client-onboarding.ts`.
+
+## Normative Docs
+
+- `DESIGN.md`
+- `docs/tasks/in-progress/TASK-992-client-lifecycle-orchestrator-single-front-door.md`
+- `docs/tasks/to-do/TASK-997-wizard-canonical-external-reference-association.md`
+- `docs/tasks/to-do/TASK-1005-client-onboarding-wizard-ai-assistants.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- `src/views/greenhouse/agency/clients/ClientOnboardingView.tsx`
+- `src/app/api/admin/clients/lifecycle/provision/route.ts`
+- `src/lib/client-lifecycle/commands/provision-client-from-wizard.ts`
+- `src/lib/commercial/party/commands/instantiate-client-for-party.ts`
+- `src/lib/finance/postgres-store-slice2.ts`
+- `src/types/db.d.ts`
+- `greenhouse_finance.client_profiles` columns:
+  - `billing_address`
+  - `billing_country`
+  - `requires_po`
+  - `requires_hes`
+  - `current_po_number`
+  - `current_hes_number`
+  - `special_conditions`
+  - `finance_contacts`
+  - `payment_terms_days`
+  - `payment_currency`
+
+### Blocks / Impacts
+
+- Blocks `TASK-1005`, because AI Preflight should not recommend or reason over finance fields that the runtime discards.
+- Improves `confirm_billing_setup` readiness in the client lifecycle checklist.
+- Impacts Finance client profile readers and Account 360/timeline displays if they surface these fields.
+
+### Files owned
+
+- `src/views/greenhouse/agency/clients/ClientOnboardingView.tsx`
+- `src/app/api/admin/clients/lifecycle/provision/route.ts`
+- `src/lib/client-lifecycle/commands/provision-client-from-wizard.ts`
+- `src/lib/commercial/party/commands/instantiate-client-for-party.ts`
+- `src/lib/client-lifecycle/commands/provision-client-from-wizard.live.test.ts`
+- `src/lib/client-onboarding/form-helpers.ts`
+- `src/lib/copy/client-onboarding.ts`
+- `docs/architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md`
+- `docs/documentation/**`
+- `docs/manual-de-uso/**`
+
+## Current Repo State
+
+### Already exists
+
+- UI state includes:
+  - `billingAddress`
+  - `billingCountry`
+  - `requiresPo`
+  - `requiresHes`
+  - `poNumber`
+  - `hesNumber`
+  - `specialConditions`
+- UI renders the fields in `FinanzasStep`.
+- `src/types/db.d.ts` confirms `greenhouse_finance.client_profiles` has:
+  - `billing_address`
+  - `billing_country`
+  - `requires_po`
+  - `requires_hes`
+  - `current_po_number`
+  - `current_hes_number`
+  - `special_conditions`
+- `src/lib/finance/postgres-store-slice2.ts` already knows how to upsert/read these profile fields.
+- `instantiateClientForParty` already creates `client_profiles` atomically, but only fills currency, terms, PO/HES booleans as false, contacts and base identity.
+
+### Gap
+
+- `ClientOnboardingView.handleSubmit` does not include billing address/country, PO/HES requirements, PO/HES numbers or special conditions in the request body.
+- `provision/route.ts` does not parse these fields.
+- `ProvisionClientFromWizardInput.finance` does not model these fields.
+- `instantiateClientForParty` cannot receive/persist these fields.
+- Existing-client completion path catches `OrganizationAlreadyHasClientError` and reads the profile id/client id, but does not update missing finance fields on an existing profile.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     "Que construyo exactamente, slice por slice?"
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 1 — Contract and payload threading
+
+- Extender `WizardState` submit payload en `ClientOnboardingView.handleSubmit`.
+- Extender `provision/route.ts` con parser/normalizer para:
+  - `billingAddress`
+  - `billingCountry`
+  - `requiresPo`
+  - `requiresHes`
+  - `currentPoNumber`
+  - `currentHesNumber`
+  - `specialConditions`
+- Extender `ProvisionClientFromWizardInput.finance`.
+- Validar relaciones simples:
+  - si `requiresPo=false`, `currentPoNumber` puede persistir null aunque UI lo haya ocultado.
+  - si `requiresHes=false`, `currentHesNumber` puede persistir null aunque UI lo haya ocultado.
+  - trim strings, empty -> null.
+
+### Slice 2 — Persist in client profile creation
+
+- Extender `InstantiateClientForPartyInput.billingDefaults` o crear `financeProfileDefaults` en el helper, segun Discovery determine menor blast radius.
+- Persistir en el INSERT de `greenhouse_finance.client_profiles`:
+  - `billing_address`
+  - `billing_country`
+  - `requires_po`
+  - `requires_hes`
+  - `current_po_number`
+  - `current_hes_number`
+  - `special_conditions`
+- Preservar default existing behavior cuando no vienen campos.
+- Agregar tests unitarios/focales del helper.
+
+### Slice 3 — Existing client completion path
+
+- Cuando `instantiateClientForParty` lance `OrganizationAlreadyHasClientError`, actualizar el `client_profiles` existente con los campos faltantes/enviados desde el wizard.
+- Regla anti-data-loss: no reemplazar un valor existente no-vacio por null/vacio.
+- Si el operador envia un valor nuevo no-vacio distinto al existente, Discovery debe decidir si se actualiza directamente o si se requiere una action auditada separada. V1 recomendado: update solo cuando el campo actual esta null/vacio; warning o follow-up para overwrite.
+
+### Slice 4 — UI truthfulness and review summary
+
+- Confirmar que el paso Confirmar muestra los campos financieros persistibles relevantes o al menos no oculta datos que se guardaran.
+- Ajustar microcopy si hace falta para dejar claro que OC/HES en el alta son numeros vigentes del perfil, no creacion de entidades PO/HES.
+- Si algun campo visible sigue sin persistirse por decision de dominio, retirarlo de UI o marcarlo explicitamente como nota local no persistida (preferido: persistir los campos listados).
+
+### Slice 5 — Tests, docs and live smoke
+
+- Actualizar `provision-client-from-wizard.live.test.ts` para verificar que los campos llegan a `client_profiles`.
+- Agregar/regenerar types solo si hay drift real de DB.
+- Actualizar `GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md` con la lista de campos persistidos.
+- GVC del paso Finanzas/Confirmar si cambia UI visible.
+
+## Out of Scope
+
+- Crear purchase orders reales en `greenhouse_finance.purchase_orders`.
+- Crear HES reales en `greenhouse_finance.service_entry_sheets`.
+- Automatizar facturacion/Nubox a partir de OC/HES.
+- IA para extraer condiciones financieras; eso vive en `TASK-1005` despues de este fix.
+- Cambiar el checklist template `standard_onboarding_v1` salvo que Discovery pruebe que `confirm_billing_setup` necesita un delta documental.
+- Redisenar el wizard o mover el flujo de Finanzas a otro drawer.
+
+## Detailed Spec
+
+Campos UI -> DB esperados:
+
+| UI state | Request/API | DB column |
+|---|---|---|
+| `billingAddress` | `finance.billingAddress` | `client_profiles.billing_address` |
+| `billingCountry` | `finance.billingCountry` | `client_profiles.billing_country` |
+| `requiresPo` | `finance.requiresPo` | `client_profiles.requires_po` |
+| `poNumber` | `finance.currentPoNumber` | `client_profiles.current_po_number` |
+| `requiresHes` | `finance.requiresHes` | `client_profiles.requires_hes` |
+| `hesNumber` | `finance.currentHesNumber` | `client_profiles.current_hes_number` |
+| `specialConditions` | `finance.specialConditions` | `client_profiles.special_conditions` |
+| `paymentTermsDays` | existing | `client_profiles.payment_terms_days` |
+| `currency` | existing | `client_profiles.payment_currency` |
+| `contacts` | existing | `client_profiles.finance_contacts` |
+
+Recommended type shape:
+
+```ts
+finance?: {
+  paymentCurrency?: BillingCurrency
+  paymentTermsDays?: number
+  billingAddress?: string | null
+  billingCountry?: string | null
+  requiresPo?: boolean
+  requiresHes?: boolean
+  currentPoNumber?: string | null
+  currentHesNumber?: string | null
+  specialConditions?: string | null
+}
+```
+
+Existing profile update rule:
+
+```ts
+// Pseudocode
+if (existingProfile) {
+  update only fields where incoming non-empty AND current is null/empty
+  never null-out an existing profile field from wizard defaults
+}
+```
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 -> Slice 2 -> Slice 3 -> Slice 4 -> Slice 5.
+- Do not start `TASK-1005` until Slice 5 closes or the task is code complete with tests green.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Sobrescribir datos financieros existentes en cliente reusado | finance/data | medium | update only null/empty fields unless explicit overwrite command exists | tests + manual DB smoke |
+| Operador cree que se creo una OC/HES formal | finance/ui | medium | copy claro: numero vigente del perfil, no entidad PO/HES | GVC/manual review |
+| Campo visible sigue sin persistirse | ui/data | medium | live test y assertion exhaustiva UI payload -> DB | test focal |
+| Drift entre `db.d.ts` y PG real | data | low | `pnpm pg:doctor` / live test before close | pg doctor / migration check |
+| Romper alta existente por payload nuevo | commercial | low | fields optional + defaults preserve legacy behavior | live test rollback-wrapped |
+
+### Feature flags / cutover
+
+Sin flag nuevo recomendado: es correccion de persistencia para campos ya visibles, todos opcionales y con defaults legacy. Rollback por revert PR. Si Discovery detecta overwrite de datos existentes o comportamiento sensible, agregar flag `CLIENT_ONBOARDING_FINANCE_PROFILE_FIELDS_ENABLED=false` default y graduar.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1 | Revert UI/API payload threading | PR revert | si |
+| Slice 2 | Revert helper persistence; campos vuelven a no persistir | PR revert | si |
+| Slice 3 | Revert existing-profile update branch | PR revert | si |
+| Slice 4 | Revert copy/UI summary changes | PR revert | si |
+| Slice 5 | Docs/tests revert no afecta runtime | N/A | si |
+
+### Production verification sequence
+
+1. Local tests: payload parser + helper persistence.
+2. Live rollback-wrapped test contra PG real: crear cliente temporal con all finance fields y assert `client_profiles`.
+3. Live rollback-wrapped test con org existente/profile parcial: assert no overwrite de valores existentes con null.
+4. GVC local/staging del paso Finanzas y Confirmar si copy cambia.
+5. Staging flag/current deploy: alta controlada o rollback-wrapped API call.
+6. Verificar Account 360/Finance client profile reader muestra los campos si la surface ya los expone.
+
+### Out-of-band coordination required
+
+N/A — repo-only change. No requiere GCP/Vercel secrets, HubSpot config, Notion scopes ni Teams permissions.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] `handleSubmit` envia todos los campos financieros visibles persistibles.
+- [ ] `provision/route.ts` parsea/sanitiza esos campos sin aceptar tipos ambiguos.
+- [ ] `provisionClientFromWizard` modela y pasa los campos financieros al helper canonico.
+- [ ] `instantiateClientForParty` persiste los campos en `greenhouse_finance.client_profiles` para clientes nuevos.
+- [ ] El path de cliente existente completa campos faltantes sin borrar valores existentes.
+- [ ] Live test verifica al menos `billing_address`, `billing_country`, `requires_po`, `current_po_number`, `requires_hes`, `current_hes_number`, `special_conditions`.
+- [ ] La UI/copy no sugiere que se creen entidades PO/HES formales.
+
+## Verification
+
+- `pnpm task:lint --changed`
+- `pnpm lint`
+- `pnpm tsc --noEmit`
+- `pnpm vitest run src/lib/client-onboarding src/lib/client-lifecycle src/lib/commercial/party`
+- `pnpm pg:doctor`
+- `pnpm vitest run src/lib/client-lifecycle/commands/provision-client-from-wizard.live.test.ts`
+- `pnpm design:lint`
+- `pnpm fe:capture --route=/agency/clients/new --env=local --hold=3000` if visible copy/layout changes
+
+## Closing Protocol
+
+- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [ ] `docs/architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md` actualizado con campos financieros persistidos.
+- [ ] `TASK-1005` revisado/desbloqueado si este cierre deja el AI Preflight listo para esos campos.
+
+## Follow-ups
+
+- Si se requiere overwrite auditado de campos financieros existentes, crear task separada para command `updateClientFinanceProfileFromOnboarding`.
+- Si Finanzas necesita crear entidades formales de OC/HES desde el alta, crear task separada sobre Quote-to-Cash / Purchase Orders / Service Entry Sheets.
+
+## Open Questions
+
+- En cliente existente con valor distinto no-vacio, ¿el wizard debe bloquear, mostrar warning o abrir una accion auditada de overwrite? Recomendacion V1: no overwrite silencioso.

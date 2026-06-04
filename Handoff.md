@@ -1,3 +1,26 @@
+# Sesion 2026-06-04 (cont.) — TASK-1004 ✅ notion-bq-sync: client_id de Berel NULL → fix de binding (deploy live + verificado)
+
+Verificación post-cierre del sync (TASK-1000/1003): el daily corre OK, pero salía `WARNING: No space_id binding found` para Berel **y** sus 80 filas en `notion_ops` tenían `client_id` NULL (Efeonce/Sky 100% SET). **Causa raíz (no cosmético):** `sync_table` re-derivaba el binding `{space_id,client_id}` contra el **mirror BQ legacy** (`_resolve_space_context`, tabla `greenhouse.space_notion_sources`) que greenhouse-eo ya no escribe para clientes nuevos → Berel ausente. El loop per-space ya tenía el `client_id` del **SSOT PG** (`greenhouse_core.space_notion_sources` + JOIN `spaces`) pero solo threadeaba `space_id`.
+
+**Fix robusto (no parche, Solution Quality Contract):** threadear `client_id` a `sync_table`, preferir el SSOT, mirror BQ solo fallback del path legacy estático → cero backfill BQ por cliente, escala con el wizard. Repo hermano `efeoncepro/notion-bigquery`, commit `87a4391`, rama `task/TASK-1004-thread-client-id-binding` (pusheada). 12 tests verde (5 nuevos source-contract + 7 de TASK-1003).
+
+**Deploy live + verificado (autorizado por operador):** revisión `notion-bq-sync-00022-vk8` (merge `--update-env-vars`/`--update-secrets` preservó per-space + PG + secrets + flags). Sync manual: `10 ok, 0 errors, 5851 rows`. **Berel `client_id` NULL 80→0** (tareas 80/80, proyectos 4/4; autocorregido por DELETE+INSERT, sin backfill). **Efeonce 1374 / Sky 4118 NULL=0** (bit-for-bit). **0 warnings de binding.** Rollback <5 min: traffic a `00021-wkl`.
+
+**Pendiente NO bloqueante (heredado):** limpieza del secreto huérfano `notion-integration-token-greenhouse-berel` (Berel usa `-grupo-berel`); deprecación futura del mirror BQ legacy `greenhouse.space_notion_sources`.
+
+---
+
+# Sesion 2026-06-04 — Wizard AI + finance persistence follow-ups — 🆕 TASKS
+
+**Scope**: a partir del review profundo del wizard de alta de cliente (`/agency/clients/new`), se crearon dos follow-ups separados para no mezclar IA con un bug de contrato UI→persistencia.
+
+- **TASK-1006** — `docs/tasks/to-do/TASK-1006-client-onboarding-wizard-finance-fields-persistence.md`: corregir campos visibles del paso Finanzas que hoy no viajan al API ni se persisten (`billingAddress`, `billingCountry`, `requiresPo`, `poNumber`, `requiresHes`, `hesNumber`, `specialConditions`). El schema real ya tiene columnas en `greenhouse_finance.client_profiles`; la task debe reusar `provisionClientFromWizard` + `instantiateClientForParty` y evitar overwrite silencioso en clientes existentes.
+- **TASK-1005** — `docs/tasks/to-do/TASK-1005-client-onboarding-wizard-ai-assistants.md`: incorporar IA al wizard como capa advisory/editable (AI Preflight, sugerir fases, ranking de contactos, smart match, quality checks Notion/Teams). **Bloqueada por TASK-1006** para no razonar sobre campos que el runtime descarta. IA no escribe el alta, no recibe secretos/tokens y queda con `CLIENT_ONBOARDING_AI_ENABLED=false` default.
+
+**Indices sincronizados**: `docs/tasks/README.md` + `docs/tasks/TASK_ID_REGISTRY.md`; siguiente ID disponible `TASK-1007`.
+
+**Verificacion**: `pnpm task:lint --changed` verde. Nota: `pnpm task:lint --task TASK-1005` / `TASK-1006` falla por limitacion actual del linter focal con IDs de 4 digitos; las specs usan `--changed`.
+
 # Sesion 2026-06-03 (cont.) — Wizard gaps #5/#7 ✅ + TASK-1000 rollout (infra desplegada, BLOQUEADA) + 🆕 TASK-1003 + 📋 AUDIT
 
 **Audit canónico de la sesión**: `docs/audits/notion/NOTION_BQ_SYNC_PER_SPACE_TOKEN_ROLLOUT_AND_DEPRECATED_API_AUDIT_2026-06-03.md` — TODOS los hallazgos + estado runtime + comandos + pendientes para continuar.
