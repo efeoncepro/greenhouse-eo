@@ -80,11 +80,17 @@ Mantenerlos dentro de 992/997/1001 dejaba esas tasks bloqueadas indefinidamente 
 
 ### 🔄 PENDIENTE (lo que falta para cerrar TASK-1010)
 
-**Slice 2 — `CreateClientDrawer` → "completar facet financiero"** (UI + loop GVC). EN CURSO.
-- Redefinir `src/views/greenhouse/finance/drawers/CreateClientDrawer.tsx` (hoy "crea cliente" desde Finanzas) → superficie de **completar el facet financiero** de un cliente existente. El wizard es la ÚNICA puerta de nacimiento (`provisionClientFromWizard`) — el drawer NO debe parir clientes.
+**Slice 2 — `CreateClientDrawer` → "completar facet financiero"** (UI + loop GVC). NO INICIADO (solo discovery read-only hecho; cero código escrito).
+- Redefinir `src/views/greenhouse/finance/drawers/CreateClientDrawer.tsx` (hoy "crea cliente" desde Finanzas, POSTea `/api/finance/clients`) → superficie de **completar el facet financiero** de un cliente existente. El wizard es la ÚNICA puerta de nacimiento (`provisionClientFromWizard`) — el drawer NO debe parir clientes.
 - Mockup aprobado del target: `src/views/greenhouse/agency/clients/mockup/FinanceFacetDrawerMockup.tsx`.
-- Consumer del drawer: `src/views/greenhouse/finance/ClientsListView.tsx`.
-- Loop GVC (bar enterprise 2026) antes de declarar listo.
+- Consumer del drawer: `src/views/greenhouse/finance/ClientsListView.tsx` (botón "Crear cliente" línea ~254 hoy hace toggle wizard-vs-drawer; el drawer se monta línea ~379).
+
+  **Discovery hecho (no re-descubrir):**
+  - **Layout target** (mockup, 170 líneas): Drawer anchor=right, `width { xs:'100%', sm:460 }`. Header (título + subtítulo + close) → **client context read-only** (org name + taxId + chip `publicId`, fondo `alpha(secondary,0.04)`) → body `Stack spacing={4}`: `currency` (select `CURRENCY_OPTIONS`), `paymentTerms` (number + adorn "días"), 2 `Switch` (`requiresPo`/`requiresHes`), `billingAddress`, `specialConditions` (multiline) → nota info "Esto no crea un cliente" → footer Cancel + **Guardar perfil** (icon `tabler-device-floppy`).
+  - **Copy keys YA existen** en `src/lib/copy/client-onboarding.ts`: `T.financeDrawer.{title,subtitle,clientContextLabel,notACreateNote,saveCta,cancelCta}` (línea ~333) + `T.finanzas.{currencyLabel,currencyMxNote,paymentTermsLabel/Helper,requiresPoLabel,requiresHesLabel,billingAddressLabel/Helper,specialConditionsLabel/Helper}`. **No hay que escribir copy.**
+  - **Endpoint de UPDATE EXISTE**: `src/app/api/finance/clients/[id]/route.ts` (verificar si tiene PUT/PATCH para los campos financieros; si no, ese es el backend a agregar para el Save del facet). El drawer NUEVO **NO** debe POSTear `/api/finance/clients` (create).
+  - **A confirmar en implementación**: (a) cómo el drawer recibe el cliente existente (props `clientProfileId` + identidad para el context read-only) y **carga** los valores actuales del `client_profiles`; (b) el endpoint/helper de persistencia del Save (reusar patrón `fillMissingFinanceProfileForExistingClient` TASK-1006, o un PUT a `client_profiles`); (c) el trigger nuevo (per-cliente, desde la lista/detalle de Finanzas) — el botón global "Crear cliente" debe ir SIEMPRE al wizard (quitar el fallback `setDrawerOpen(true)` legacy).
+- Loop GVC (bar enterprise 2026) antes de declarar listo. Invocar `greenhouse-ux` + `greenhouse-dev` antes de escribir JSX.
 
 **Slice 3 — Webhook `hubspot-deals.ts`** (backend, spec §11.1). PENDIENTE.
 - Handler nuevo `src/lib/webhooks/handlers/hubspot-deals.ts`: deal stage `closedwon` → abre onboarding case en `status='draft'` (semi-automático: operador activa). Patrón: `hubspot-companies.ts`/`hubspot-services.ts` (HMAC v3, dedup, captureWithDomain).
