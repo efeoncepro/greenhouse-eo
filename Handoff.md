@@ -8,8 +8,10 @@ Trabajo local-first en `develop` (sin push). Continuación de TASK-1010 desde el
   - **Webhook deal LIVE en producción**: `object.creation` deal + `object.propertyChange` deal `dealstage` en `webhooks-hsmeta.json` (monorepo canónico) + `hs project upload --account=48713323` → **Build #26 deployed** (27→29 subscriptions). Código de clasificación aún en `develop` (no pusheado) + flag OFF → deal events en prod se ignoran (unknown) hasta deploy + flip. Inofensivo.
   - **Capacidad documentada**: SÍ puedo crear/manipular webhooks HubSpot vía CLI (memoria `reference_hubspot_webhooks.md` + sección nueva en skill `hubspot-ops`).
 - **Gates**: eslint 0 · tsc 0 · `pnpm build` exit 0 · `hubspot-deals.test` 13/13 · `hubspot-companies.test` 13/13 · `ClientDetailView.test` 1/1.
-- **TASK-1010 NO cerrada** — queda en `in-progress`. Pendiente: deploy `develop→staging` (código de Slice 2/3) → Slice 4 GVC SuccessScreen/degraded pickers + GVC runtime del FinanceFacetDrawer + flip flags (onboarding + deal trigger), Azure Graph `Group.Read.All`, invitación real e2e (email PRUEBA), flag prod verificado. Ver Progress Log.
-- **Próximo paso**: el operador ejecuta el rollout externo + deploy staging para Slice 4 GVC; recién ahí se mueve a `complete/`.
+- **TASK-1010 ✅ cerrada** (decisión operador, commit `002b9643d`): movida a `complete/`. Slices 1-3 shipped (develop local-first) + webhook deal LIVE (Build #26). Los pendientes son **ejecución del operador** (no código): push→staging para Slice 4 GVC, Azure Graph `Group.Read.All`, invitación real e2e (email PRUEBA), readiness Notion PRD, flip+verificación de flags. Documentados como checklist de rollout en el README + spec.
+- **Repo HubSpot — verdad reconciliada (con fuente)**: lo ABSORBIDO al monorepo fue el **bridge** (TASK-574) + el **app project** scopes/webhooks (TASK-706). Lo TRANSFERIDO a `efeoncepro/` fue **`notion-bigquery`** (Notion, 2026-05-18) — NO HubSpot. El sync **HubSpot→BQ** (`main.py`) sigue en **`cesargrowth11/hubspot-bigquery`** (verificado gh API: sin redirect; `efeoncepro/hubspot-bigquery` no existe). Skills + memorias corregidas con nota anti-confusión.
+- **TASK-1011 🆕 (to-do, P1)**: governance del repo de sync HubSpot→BQ — transfer a `efeoncepro/` (espejo notion) + deploy Actions+WIF + consolidación gated por TASK-879. Separa infra del onboarding.
+- **Próximo paso**: el operador decide push de develop (local-first hasta ahora) + ejecuta el checklist de rollout de TASK-1010. TASK-1011 espera luz verde para el transfer.
 
 ---
 
