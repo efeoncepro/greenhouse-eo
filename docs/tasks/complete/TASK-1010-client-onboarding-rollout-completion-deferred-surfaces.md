@@ -2,13 +2,17 @@
 
 ## Status
 
-<!-- 2026-06-04: reabierta. Se cerró prematuramente; el webhook NO se probó e2e y
-     5+ ítems del scope siguen sin hacer (invitación e2e, readiness Notion PRD/Graph,
-     channel-level Teams, GVC SuccessScreen/degraded, flag prod). El webhook de deal
-     NO es funcional aún (código de clasificación en develop sin desplegar a prod +
-     flag OFF; target del webhook es producción). NO marcar complete hasta verificar
-     el flow real (Runtime Rollout Completion Gate). -->
-- Lifecycle: `in-progress`
+<!-- 2026-06-04 CIERRE: rollout completo + verificado live. Release develop->main
+     `released` (run 26979667731, SHA 94130a850) + flags prod ON
+     (CLIENT_LIFECYCLE_ONBOARDING_ENABLED + HUBSPOT_DEAL_TRIGGER + NEXT_PUBLIC_…ONBOARDING)
+     + redeploy greenhouse-lqr6gwlq6. Wizard /agency/clients/new CONFIRMADO renderizando
+     en prod (captura operador). Slices 1-4 verdes; ISSUE-084 fixeado; invitación e2e
+     con entrega real `delivered`. El deal-trigger está code-complete + live (subscription
+     Build #26 + flag ON), pero sus casos `draft` no tienen UI para verse/activarse →
+     spun-out a TASK-1013 (scope nuevo de UI/nav, no incompletitud de esta task).
+     Follow-ups abiertos: TASK-1012 (invite cross-env URL + Resend status), TASK-1013
+     (onboarding cases inbox). Runtime Rollout Completion Gate satisfecho. -->
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto` (cierra el rollout real del onboarding de clientes — invitación, readiness externo, superficies diferidas)
 - Effort: `Medio-Alto`
