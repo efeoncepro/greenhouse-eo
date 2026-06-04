@@ -5707,6 +5707,21 @@ Toda creación de un usuario de portal cliente (`client_users` + `user_role_assi
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-1001-client-portal-people-provisioning-onboarding.md`. Helpers: `inviteClientPortalUser`, `suggestClientPortalRole`, `listClientPortalPersonCandidates` (`src/lib/client-onboarding/`). Sin migración (capability mirror de la familia TASK-992 catalog+runtime), sin reliability signal nuevo (ítem `required=FALSE`), sin evento nuevo (reuso `role.assigned`).
 
+### Notion onboarding preflight — "configurado ≠ fluyendo" (TASK-1009, desde 2026-06-04)
+
+La verificación de que un cliente nuevo **fluye de verdad al portal** (raw → client_id → readiness → template L1 → conformed → PG) pasa por el composer canónico `getNotionOnboardingReadiness(spaceId)` ([src/lib/integrations/notion-onboarding-preflight.ts](src/lib/integrations/notion-onboarding-preflight.ts)). Es **reuse-first**: compone los helpers de readiness/freshness que ya existen (`getNotionRawFreshnessGate`, `space_notion_sources.last_synced_at` de TASK-1007, `resolveSecretByRef`) y solo agrega los eslabones que ninguno cubría (#6 Estado mapeable a V1, #8 tareas en `greenhouse_delivery.tasks`, #4 client_id como verificación de TASK-1004). El evaluador puro `evaluateNotionOnboardingReadiness` es la SSOT de `readyToOnboard`. El gate es el ítem **bloqueante** `verify_notion_flowing` de `standard_onboarding_v1`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** duplicar la validación de onboarding que el wizard/checklist ya hacen (estructura via `resolveClientCompleteness`, token+DBs via `notion/validate`). El preflight SOLO cubre el tramo "fluyendo" — si necesitás un check nuevo, agregalo como eslabón del composer, no como validador paralelo.
+- **NUNCA** agregar aliases de status/título por cliente para "pasar" el check L1 (#6). El fix es alinear el template L1 del cliente en Notion (consistente con "Canonical task status vocabulary V1"). El check usa `normalizeTaskStatus` sobre los estados distintos del space — un alias custom enmascara el drift.
+- **NUNCA** marcar `verify_notion_flowing` verde estando rojo. La auto-completación vive SOLO en `POST .../cases/[caseId]/notion-preflight` (reusa capability `client.lifecycle.case.advance`), que corre el preflight server-side y avanza el ítem **solo si `readyToOnboard`**. El space se resuelve del caso server-side (anti-tamper).
+- **NUNCA** correr el preflight pesado (9 checks, BQ) por caso dentro del reliability dashboard. El signal `integrations.notion.onboarding_incomplete` es un COUNT PG O(1) sobre casos abiertos con el ítem pendiente >7d; el preflight pesado es on-demand (CLI/endpoint).
+- **NUNCA** colapsar advisory y crítico: token (#1) y freshness (#9) son advisory (no bloquean `readyToOnboard` — el raw landing ya prueba el token); el resto es crítico. Un crítico en `degraded` (fuente caída) ⇒ NO listo (conservador).
+- **SIEMPRE** que un eslabón nuevo del pipeline emerja (otra capa, otra tabla), agregalo como check del composer + su rama en el evaluador puro + test, no inline en consumers.
+
+**Spec canónica**: `docs/tasks/complete/TASK-1009-notion-onboarding-flow-preflight.md` + Delta en `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`. Migración aditiva `20260604224502258`. CLI `pnpm notion:onboarding-preflight <spaceId> [--json]`. Verificado live: Berel 9/9 verde.
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

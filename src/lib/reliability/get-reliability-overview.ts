@@ -172,6 +172,7 @@ import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-re
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
+import { getNotionOnboardingIncompleteSignal } from './queries/notion-onboarding-incomplete'
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
 import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
 import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
@@ -735,6 +736,9 @@ interface ReliabilityOverviewSources {
    */
   notionConformedDrainFreshness?: ReliabilitySignal | null
 
+  /** TASK-1009 — onboarding cases con verify_notion_flowing pendiente > 7d. */
+  notionOnboardingIncomplete?: ReliabilitySignal | null
+
   /**
    * TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
    *   - infrastructure.critical_tables.missing (drift, error si > 0)
@@ -995,6 +999,8 @@ export const buildReliabilityOverview = (
     ...(sources.nuboxSourceFreshness ? [sources.nuboxSourceFreshness] : []),
     // Notion conformed → PG drain freshness (FK incident escalation backstop).
     ...(sources.notionConformedDrainFreshness ? [sources.notionConformedDrainFreshness] : []),
+    // TASK-1009 — onboarding Notion sin fluir al portal.
+    ...(sources.notionOnboardingIncomplete ? [sources.notionOnboardingIncomplete] : []),
     // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
@@ -1595,6 +1601,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.notionConformedDrainFreshness
       : await getNotionConformedDrainFreshnessSignal().catch(() => null)
 
+  const notionOnboardingIncomplete =
+    preloadedSources.notionOnboardingIncomplete !== undefined
+      ? preloadedSources.notionOnboardingIncomplete
+      : await getNotionOnboardingIncompleteSignal().catch(() => null)
+
   // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG. Single
   // reader; degrada honestamente a `unknown` si la query falla.
   const criticalTablesMissing =
@@ -1903,6 +1914,7 @@ export const getReliabilityOverview = async (
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     notionConformedDrainFreshness,
+    notionOnboardingIncomplete,
     criticalTablesMissing,
     cloudRunSilentObservability,
     aiObserverUnhealthy,

@@ -87,6 +87,7 @@
     "freeze:delivery-performance-period": "tsx scripts/freeze-delivery-performance-period.ts",
     "reconcile:delivery-performance-history": "tsx scripts/reconcile-delivery-performance-history.ts",
     "audit:notion-delivery-parity": "tsx scripts/audit-notion-delivery-parity.ts",
+    "notion:onboarding-preflight": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/notion/onboarding-preflight.ts",
     "audit:person-360": "tsx scripts/audit-person-360-coverage.ts",
     "audit:finance:payment-ledgers": "tsx scripts/remediate-finance-payment-ledgers.ts",
     "worktrees:status": "bash scripts/worktree-sync.sh --status",

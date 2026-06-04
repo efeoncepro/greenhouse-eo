@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-04 por Claude
-> **Ultima actualizacion:** 2026-06-04 por Claude
+> **Ultima actualizacion:** 2026-06-04 por Claude (TASK-1009 — preflight Notion)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1](../../architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md) · [GREENHOUSE_CLIENT_LIFECYCLE_V1](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md)
 
 # Alta de Cliente — Puerta Unica de Onboarding
@@ -171,3 +171,15 @@ Es idempotente: re-invitar a alguien ya invitado no duplica nada. Solo se pueden
 - **Onboarding en curso** → en la ficha, el banner muestra cuantos items del checklist estan completos (por ejemplo "4 de 10 completados").
 
 > Detalle tecnico: la completitud se resuelve con `resolveClientCompleteness` + `GET .../completeness`. Estados honestos (state-design) en [GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1 §5](../../architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md).
+
+## Preflight Notion: "fluyendo de verdad al portal" (TASK-1009)
+
+Configurar Notion (token + bases) no es lo mismo que tener las tareas **visibles en el portal**. El checklist de onboarding incluye un item bloqueante **"Verificar que el cliente fluye al portal"** (`verify_notion_flowing`): el onboarding **no se puede dar por completado** hasta que ese item este en verde.
+
+El item corre un **preflight de 9 eslabones** sobre la cadena completa y reporta verde/rojo por cada uno:
+
+1. Token Notion resuelve · 2. Sync habilitado + bases configuradas · 3. Datos crudos en BigQuery · 4. `client_id` atribuido · 5. Gate de readiness (tareas + proyectos; los sprints son opcionales) · 6. Template L1 (los estados del cliente mapean al vocabulario canonico) · 7. Datos en la capa conformed · 8. **Tareas visibles en el portal** · 9. Sync reciente.
+
+El item **se auto-completa solo si el preflight da todo verde** — nadie puede marcarlo listo estando rojo. Si algo sale rojo, el detalle dice exactamente que eslabon arreglar (por ejemplo, un estado de Notion que no mapea → alinear el template en Notion, **no** crear excepciones por cliente).
+
+> Detalle tecnico: composer `getNotionOnboardingReadiness(spaceId)` (reusa los helpers de readiness/freshness existentes), endpoint `POST .../cases/[caseId]/notion-preflight`, CLI `pnpm notion:onboarding-preflight <spaceId>`, signal `integrations.notion.onboarding_incomplete`. Delta en [GREENHOUSE_CLIENT_LIFECYCLE_V1](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md).

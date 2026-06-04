@@ -740,6 +740,17 @@ Readers en `src/lib/reliability/queries/client-lifecycle-*.ts`. Wire-up en `getR
 ## 21. References
 
 - `GREENHOUSE_360_OBJECT_MODEL_V1.md` — canonical 360 anchor (organizations, clients)
+
+## Delta 2026-06-04 — TASK-1009: ítem bloqueante `verify_notion_flowing` + preflight de flujo
+
+Se agregó al checklist `standard_onboarding_v1` un 11º ítem **`verify_notion_flowing`** (required, `blocks_completion=TRUE`, `owner_role='operations'`, `requires_evidence=FALSE`) vía migración aditiva `20260604224502258` (`ON CONFLICT DO NOTHING` + guard anti-marker). Garantiza que ningún onboarding se complete hasta que las tareas del cliente **fluyan de verdad al portal** (no solo "Notion configurado").
+
+- **Composer canónico** (NO duplica validación): `getNotionOnboardingReadiness(spaceId)` en `src/lib/integrations/notion-onboarding-preflight.ts` compone helpers existentes (`getNotionRawFreshnessGate` #3/#5, `space_notion_sources.last_synced_at` de TASK-1007 #9, `resolveSecretByRef` #1) + agrega los eslabones que ninguno cubría: **Estado mapeable a vocabulario V1** (#6, `normalizeTaskStatus` sobre los estados distintos del space en `notion_ops.tareas`), **tareas en `greenhouse_delivery.tasks`** (#8) y verificación de **client_id** (#4, ya garantizado por TASK-1004). Evaluador puro `evaluateNotionOnboardingReadiness` + degradación honesta + `readyToOnboard` conservador.
+- **Auto-complete gated**: `POST /api/admin/clients/lifecycle/cases/[caseId]/notion-preflight` (capability reusada `client.lifecycle.case.advance`) corre el preflight server-side y avanza el ítem **solo si `readyToOnboard`** — el operador no puede marcarlo verde estando rojo. El space se resuelve del caso server-side (anti-tamper). Casos previos a la migración (sin el ítem) no se ven afectados.
+- **CLI** read-only `pnpm notion:onboarding-preflight <spaceId> [--json]`. **Signal** `integrations.notion.onboarding_incomplete` (kind `data_quality`, moduleKey `integrations.notion`, warning si >0, steady 0) — COUNT PG O(1) de onboardings abiertos con el ítem pendiente >7d; NO corre el preflight pesado por caso.
+- **Hard rule**: NUNCA agregar aliases de status/título por cliente para "pasar" el check L1 — el fix es alinear el template L1 en Notion (consistente con "Canonical task status vocabulary V1"). Verificado live: Berel 9/9 verde.
+
+Spec: `docs/tasks/complete/TASK-1009-notion-onboarding-flow-preflight.md`.
 - `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` — máquina de estados de identidad TASK-535
 - `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1.md` — engagement primitives TASK-801/802/803
 - `GREENHOUSE_WORKFORCE_ONBOARDING_ARCHITECTURE_V1.md` — patrón espejo TASK-760 (workforce side)

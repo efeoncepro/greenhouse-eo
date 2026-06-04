@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-04 por Claude
-> **Ultima actualizacion:** 2026-06-04 por Claude
+> **Ultima actualizacion:** 2026-06-04 por Claude (TASK-1009 — preflight Notion)
 > **Documentacion funcional:** [Alta de Cliente](../../documentation/agency/alta-de-cliente.md)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1](../../architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md)
 
@@ -101,6 +101,15 @@ En la ficha del cliente, abre el item **"Accesos del portal"** (`provision_clien
 - **"La busqueda de Notion/Teams viene vacia."** La integracion no esta conectada a ese teamspace/equipo (o faltan permisos). Conectala en Notion / pide los permisos de Teams, o crea el espacio nuevo desde el checklist.
 - **"Quedo un cliente a medias de un intento anterior."** Vuelve a abrir el wizard con el mismo origen: el wizard detecta la organizacion existente y te ofrece "Completar cliente" sin duplicar.
 - **"No veo la opcion de invitar personas."** Te falta el permiso `client.lifecycle.portal_user.invite`. Pidelo a tu administrador.
+
+## Verificar que el cliente fluye al portal (preflight Notion)
+
+Antes de dar por terminado el onboarding, el checklist tiene un item bloqueante **"Verificar que el cliente fluye al portal"**. No alcanza con haber configurado Notion: hay que confirmar que las tareas del cliente **se ven en el portal**.
+
+- **Como correrlo (operador tecnico):** `pnpm notion:onboarding-preflight <spaceId>` — lista los 9 eslabones con ✓/✗/⚠ y dice `readyToOnboard: SI/NO`. Agrega `--json` para integraciones.
+- **Que significa cada estado:** ✓ ok · ✗ falla (eslabon roto, hay que arreglarlo) · ⚠ advisory (no bloquea: token compartido o sync algo viejo).
+- **El item se completa solo cuando todo da verde.** Si esta rojo, el detalle dice que arreglar. Caso tipico: un estado de Notion que no mapea al vocabulario estandar → **alinear el template del cliente en Notion** (no pedir una excepcion por cliente).
+- **Que NO hacer:** marcar el item como completado a mano cuando el preflight esta rojo — el sistema lo impide; primero arregla el eslabon.
 
 ## Referencias tecnicas
 

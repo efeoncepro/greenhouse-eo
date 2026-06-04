@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto` (convierte el debugging arqueológico por cliente en "corré el check, arreglá lo rojo")
 - Effort: `Medio`
@@ -56,12 +56,12 @@ Dado un `space_id` de un cliente, un preflight que valida la cadena completa y r
 
 ## Definition of Done
 
-- [ ] Validador L1 + composer preflight + CLI, con tests.
-- [ ] Item `verify_notion_flowing` en el checklist, bloqueante.
-- [ ] Verificado contra Berel (debe dar verde end-to-end ahora) + contra un space mal-configurado (debe marcar el eslabón roto).
-- [ ] Capability grant coverage si se agrega endpoint admin.
-- [ ] `pnpm test` + tsc + lint verde.
-- [ ] Lifecycle → complete, doc funcional + manual de uso (runbook de onboarding Notion), Handoff.
+- [x] Validador L1 (check #6 dentro del composer) + composer preflight + CLI, con tests (10 focales).
+- [x] Item `verify_notion_flowing` en el checklist, bloqueante (migración aditiva `20260604224502258`, aplicada).
+- [x] Verificado contra Berel (`space-cli-0863869c-eaac-…` → **9/9 verde, readyToOnboard SÍ**) + space inexistente (todo rojo, NO listo).
+- [x] Capability grant coverage: endpoint reusa `client.lifecycle.case.advance` (existente, grant-cubierta) — sin capability nueva, sin drift.
+- [x] `pnpm test` (5993) + tsc (0) + lint (0) + build verde.
+- [x] Lifecycle → complete, doc funcional + manual de uso (`agency/alta-de-cliente.md` v1.1), arch Delta, CLAUDE.md, Handoff, changelog.
 
 ## Hard rules
 
@@ -76,3 +76,20 @@ Dado un `space_id` de un cliente, un preflight que valida la cadena completa y r
 - Auto-corregir el template en Notion (inherentemente operador-side; el preflight lo **gatea**, no lo arregla).
 - Crear la integración Notion / pegar token (sigue siendo paso de operador en `provision_notion_workspace`).
 - Onboarding de canales Teams / portal users (ya cubiertos por sus items: TASK-1001 + communication channels).
+
+## Progress Log
+
+### 2026-06-04 — Complete (local-first, develop, sin push)
+
+**Re-scope aprobado por operador (THIN):** el onboarding ya valida muy bien estructura (`resolveClientCompleteness`) + token/DBs (`notion/validate`) + raw↔conformed (`notion-parity-audit`). Para no duplicar, el composer **reusa** los 6 helpers existentes y agrega solo los 3 eslabones genuinamente faltantes (#4 client_id — verificación de TASK-1004, #6 Estado mapeable a V1, #8 tareas en PG portal) + el gate bloqueante. NO se construyó un validador L1 standalone pesado (el check L1 vive dentro del composer).
+
+**Entregado:**
+- `src/lib/integrations/notion-onboarding-preflight.ts` — composer `getNotionOnboardingReadiness(spaceId)` (9 checks, Promise.allSettled, degradación honesta advisory/crítico) + evaluador puro `evaluateNotionOnboardingReadiness` + readers schema-adaptive (BQ INFORMATION_SCHEMA). 10 tests focales.
+- `scripts/notion/onboarding-preflight.ts` + `pnpm notion:onboarding-preflight <spaceId> [--json]` (read-only, exit 1 si no listo).
+- `migrations/20260604224502258_…` — ítem `verify_notion_flowing` (required+blocking, owner operations, order 11) aditivo + guard anti-marker. **Aplicado** al Cloud SQL (tipos regenerados).
+- `src/app/api/admin/clients/lifecycle/cases/[caseId]/notion-preflight/route.ts` — endpoint gated (reusa `client.lifecycle.case.advance`), auto-completa solo si `readyToOnboard`, space resuelto server-side.
+- `src/lib/reliability/queries/notion-onboarding-incomplete.ts` — signal `integrations.notion.onboarding_incomplete` (PG O(1)) + wiring en `get-reliability-overview.ts`.
+
+**Verificación live (DoD):** Berel id real → 9/9 verde, readyToOnboard SÍ (prueba e2e de TASK-998/1004/1007/1008). Space inexistente → todo rojo. Gates: tsc 0 · lint 0 · 10 focales + suite 5993 + build verde · 0 `new Pool` · 0 error crudo · `data_quality` ya en expectedSignalKinds de integrations.notion (sin mismatch de registry).
+
+**Follow-up no bloqueante:** botón "Correr preflight" en el timeline del Account 360 (UI sobre el endpoint existente; loop GVC aparte). El endpoint + CLI + manual PATCH ya cubren la operación.
