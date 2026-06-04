@@ -94,6 +94,12 @@ Reglas obligatorias:
 - `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`
 - `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`
 
+## Design + Architecture Skills (invocar en Plan Mode)
+
+- **Product design (cualquier UI nueva, hook obligatorio CLAUDE.md)**: `greenhouse-ux` (layout + CustomAvatar + tokens), `state-design` (estados del avatar/logo + review queue), `info-architecture` (dónde vive el review queue, reachability), `greenhouse-ux-writing` (copy es-CL → `src/lib/copy/identity.ts`), `greenhouse-ui-review` (gate pre-commit). Verificar con GVC en loop (`pnpm fe:capture`), nunca freehand.
+- **Image safety / normalización**: `greenhouse-digital-brand-asset-designer` aplica a payment instruments (matriz 4-variantes + VTracer + manifest provenance + visual QA). Los logos de organización son OTRA clase de asset (no reusar la matriz 4-variantes), pero **sí reusar sus patrones de saneamiento SVG, normalización raster→vector y QA visual** cuando se valide un candidato.
+- **Arquitectura**: `arch-architect` (overlay greenhouse) — extensión canónica 360, state machine + CHECK + audit trio (TASK-700/765), VIEW + helper + reliability signal (TASK-571/766/774), defense-in-depth 7-layer (TASK-742), outbox + reactive consumer (TASK-771/773), capability granular (overlay regla #7). Scoring 4-pilar obligatorio.
+
 ## Dependencies & Impact
 
 ### Depends on
@@ -135,6 +141,12 @@ Reglas obligatorias:
 - `src/config/entitlements-catalog.ts`
 - `src/lib/entitlements/runtime.ts`
 - `src/lib/reliability/registry.ts`
+- `src/lib/reliability/queries/` (signals coverage/discovery/drift/operating-entity)
+- `src/lib/hubspot/company-identity.ts` (backfill `domain` => `organizations.website_url`)
+- `services/ops-worker/` (discovery fetch + download candidates fuera de Vercel)
+- `src/lib/sync/projections/` (reactive consumer de candidate_discovered si aplica)
+- `src/lib/copy/identity.ts` (copy es-CL del review queue)
+- `src/lib/navigation/route-reachability-manifest.ts` (declarar el review queue admin)
 - `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`
 - `docs/manual-de-uso/identity/organization-workspace-projection.md`
 - `docs/documentation/identity/sistema-identidad-roles-acceso.md`
@@ -180,10 +192,11 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Canonical contract and projection
+### Slice 1 — Canonical contract, domain SSOT and projection
 
-- Documentar el delta semantico de `organizations.logo_asset_id`: puntero final de logo de organizacion, reusable por UI y documentos; no source alternativo de legal identity.
-- Crear migracion additive para actualizar comment/metadata y refrescar `greenhouse_serving.organization_360` con `logo_asset_id` y una referencia consumible por readers.
+- Documentar el delta semantico de `organizations.logo_asset_id`: puntero final del **logo canonico de la organizacion** (significado unificado), reusable por UI y documentos. El uso depende del tipo de fila: operating entity (`is_operating_entity=TRUE`) => logo legal en documentos (TASK-862); organizacion cliente => avatar comercial en 360/Workspace. Un override documental separado seria una columna NUEVA futura (YAGNI hoy — ver Open Questions resueltas).
+- **Capturar SSOT de dominio (prerequisito de discovery, BLOQUEANTE de Slice 3 `website_metadata`/`hubspot_company`)**: la inspeccion 2026-06-03 confirmo que `greenhouse_core.organizations` NO tiene columna `website`/`domain`. Sin dominio no hay favicon/website/HubSpot-logo derivable. Agregar columna additive nullable `organizations.website_url` (o `domain`) + backfillearla desde la propiedad HubSpot `domain` dentro del sync de companies existente (`src/lib/hubspot/company-identity.ts` / `syncHubSpotCompanies`). Exponerla en `organization_360`. Confirmar primero el scope del token HubSpot para leer `domain` (coordinacion out-of-band).
+- Crear migracion additive para actualizar comment/metadata de `logo_asset_id` y refrescar `greenhouse_serving.organization_360` (`CREATE OR REPLACE VIEW`) con `logo_asset_id` + `website_url`/`domain`. NOTA: `organization_360` es un VIEW (migration `20260402094316652`), no un materializer; verificar si el owned-file `src/lib/sync/projections/organization-360.ts` aplica o si solo se toca el VIEW + reader `organization-store.ts`.
 - Extender `OrganizationDetailData`, `OrganizationWorkspaceHeader` y DTOs de readers con `logoAssetId` y `logoUrl` seguro cuando aplique.
 - Agregar tests de reader/projection para confirmar que una organizacion con logo lo expone y una sin logo conserva fallback.
 
@@ -191,22 +204,25 @@ Reglas obligatorias:
 
 - Agregar contexts/retention classes `organization_logo_draft`, `organization_logo` y `organization_logo_candidate` en `src/types/assets.ts` y storage helpers.
 - Extender upload privado o crear endpoint dedicado para subir logo de organizacion con validacion de MIME, tamano, dimensiones y owner `organizationId`.
-- Crear command atomico para adjuntar/reemplazar logo: actualiza `organizations.logo_asset_id`, marca asset como attached, escribe audit/outbox y preserva el logo anterior como asset historico no borrado.
-- Gatear mutaciones con capability granular, propuesta inicial: `organization.identity_logo` action `update|review` scope `tenant|all`, o extender `organization.identity_sensitive.update` solo si Discovery demuestra que no hace falta nueva capability.
+- Crear command atomico (tx unica) para adjuntar/reemplazar logo: actualiza `organizations.logo_asset_id`, marca asset como attached (`owner_aggregate_type='organization_logo'`), escribe audit/outbox y **preserva el logo anterior como asset historico no borrado** (supersede, nunca DELETE). Idempotente por `content_hash`.
+- Gatear mutaciones con la capability granular `organization.brand_asset` (`update|review`) — ver Access model. Aplicar el **operating-entity guard**: bloquear/elevar cuando `is_operating_entity=TRUE`.
 
 ### Slice 3 — Candidate discovery model
 
-- Crear tabla additive de candidatos, por ejemplo `greenhouse_core.organization_brand_asset_candidates`, con `organization_id`, `source`, `source_url`, `asset_id`, `confidence`, `status`, `metadata_json`, `discovered_at`, `reviewed_by`, `reviewed_at` y `rejection_reason`.
-- Implementar discovery idempotente desde datos disponibles: `hubspot_company_id`, dominio/website cuando exista, metadata web segura y fuentes de logo verificables.
-- Descargar candidatos a storage propio como `organization_logo_candidate`; no servir ni persistir hotlinks como logo final.
+- Crear tabla additive de candidatos `greenhouse_core.organization_brand_asset_candidates`, con `organization_id`, `source`, `source_url`, `asset_id`, `confidence`, `status`, `metadata_json`, `discovered_at`, `reviewed_by`, `reviewed_at` y `rejection_reason`. Append-friendly; el `status` sigue el state machine de candidatos (ver Detailed Spec) con CHECK enum cerrado.
+- **Orden de fuentes V1 segun dependencia de dominio (Slice 1 debe haber capturado `domain`/`website_url`)**: `hubspot_company` requiere leer la propiedad HubSpot `domain` (confirmar scope token); `website_metadata` (favicon/apple-touch/open-graph) requiere `organizations.website_url` poblado. Si Slice 1 NO logra capturar dominio, V1 degrada a `manual_upload` + `operator_url` unicamente y `website_metadata` queda diferido (no listar fuentes que no pueden correr).
+- **Ejecucion del discovery en ops-worker (Cloud Run), NO en route Vercel** (overlay arch-architect regla #3 + resiliencia): el fetch externo + descarga de imagenes es trabajo con rate-limit/timeout/retry/circuit-breaker; vive en `services/ops-worker/` disparado por outbox/scheduler, no inline en serverless. El "buscar de nuevo" manual de una org puede ser un route Vercel que ENCOLA (emite `organization.brand_asset.candidate_discovered` o un trigger) y el ops-worker hace el fetch+download. Aplicar rate limit + retries acotados + circuit breaker.
+- Descargar candidatos a storage propio como `organization_logo_candidate`; **nunca** servir ni persistir hotlinks como logo final. Validar MIME real + size + sanitizar SVG (reusar patrones de `greenhouse-digital-brand-asset-designer`).
 - Registrar provenance suficiente para saber de donde salio cada candidato y por que tuvo determinada confianza.
 
 ### Slice 4 — Review queue and UI consumption
 
-- Crear surface alcanzable para revision operativa: lista de organizaciones sin logo, candidatos disponibles, acciones `Aceptar`, `Rechazar`, `Subir`, `Buscar de nuevo`.
-- Conectar Organization Workspace/list/sidebar para renderizar logo canonicamente con fallback a inicial estable cuando no hay logo.
-- Evitar dos primary actions en headers; usar Vuexy/MUI primitives y copy canonico en `src/lib/copy/identity.ts` cuando haya labels reutilizables.
-- Ejecutar GVC sobre las rutas visibles tocadas y guardar evidencia en `.captures/`.
+- **IA: espejar el precedente canonico existente `/admin/data-quality/notion-titles`** (cola de hygiene con NULL names + CTA — ver CLAUDE.md "Admin queue de hygiene"). El review queue de logos vive como cola de data-quality bajo `/admin/...` (supplemental nav: `info-architecture`), p.ej. `/admin/data-quality/organization-logos`, NO inventar IA nueva. Reachable por nav o declarado en `src/lib/navigation/route-reachability-manifest.ts` (`pnpm route-reachability-gate --strict`). Adicionalmente, **accion contextual por-fila en `/agency/organizations`** (subir/revisar logo desde la lista — contextual nav). Las dos surfaces consumen el mismo command/reader; cero composicion ad-hoc.
+- Surface de revision: lista de organizaciones sin logo + candidatos disponibles, acciones `Aceptar`, `Rechazar`, `Subir`, `Buscar de nuevo`. Mostrar `confidence` + `provenance` (source + source_url) visibles para que el operador decida.
+- **Estados del review queue (state-design, 12-state matrix)**: `loading` (skeleton de tabla, no spinner page-level), `empty` (todas las orgs ya tienen logo => zero-state celebratorio con CTA secundario), `empty-filtered` (filtro sin resultados => limpiar filtros), `error` retriable, `degraded` (discovery caido => banner honesto "Algunos candidatos no disponibles", no $0/blanco). Acciones con UI optimista + rollback al fallar.
+- **Estados del avatar/logo en Workspace/list/sidebar (state-design)**: usar `CustomAvatar variant='rounded'` con **`object-fit: contain` + padding sobre fondo neutro** (NO `cover` — los wordmarks se croppearian). Default => `logoUrl`; sin logo => **inicial estable** derivada del `organizationName`; `<img>` con `onError` => fallback a inicial (NUNCA imagen rota); skeleton dimensionado al avatar final (sin CLS). Nunca renderizar un candidato/rechazado como logo final.
+- Evitar dos primary actions en headers (1 primary contained + N tonal); usar Vuexy/MUI primitives y copy canonico es-CL en `src/lib/copy/identity.ts` (validar con `greenhouse-ux-writing`).
+- Ejecutar GVC en loop sobre las rutas visibles tocadas (`pnpm fe:capture`), leer el frame, ajustar hasta enterprise, guardar evidencia en `.captures/`.
 
 ### Slice 5 — Backfill, signals and docs
 
@@ -264,9 +280,10 @@ Fuentes iniciales permitidas:
 
 ### Access model
 
-- Read: `organization.identity:read`.
-- Mutate/review: el plan debe decidir entre nueva capability granular `organization.identity_logo` (`update`, `review`) o `organization.identity_sensitive:update`.
-- Si se crea capability nueva: TS catalog + migration `capabilities_registry` + runtime grants + tests de coverage.
+- Read: `organization.identity:read` (logo es parte de identity basica; `logoUrl` se sirve por proxy propio con `canTenantAccessAsset`).
+- Mutate/review: **capability granular nueva `organization.brand_asset`** con actions `review|update` scope `tenant|all`. DECIDIDO (overlay arch-architect regla #7 — capability granular, no reusar coarse): NO reutilizar `organization.identity_sensitive.update` porque mezcla dimensiones ortogonales (editar campos sensibles de identidad vs revisar/aplicar logos). El naming `brand_asset` es consistente con los eventos `organization.brand_asset.*` y la tabla `organization_brand_asset_candidates`.
+- Capability nueva => TS catalog (`src/config/entitlements-catalog.ts`) + migration seed `capabilities_registry` + grants en `src/lib/entitlements/runtime.ts` en el MISMO PR + `capability-grant-coverage.test.ts` verde (invariant TASK-873/935; sin grant runtime el endpoint da 403 a todos). Grants canonicos: route_group `identity`/`admin` + `EFEONCE_ADMIN`; evaluar `efeonce_account` (lider de cuenta) para review de sus organizaciones si Discovery lo justifica.
+- **Operating-entity guard (Pilar 1, DECIDIDO)**: las mutaciones de `organization.brand_asset` que apunten a una fila con `is_operating_entity=TRUE` (logo legal de Efeonce usado en finiquitos/contratos, TASK-862/863) DEBEN bloquearse o exigir `EFEONCE_ADMIN` explicito. Aplicar un logo comercial a la operating entity cambiaria el logo de documentos legales. El command verifica el flag antes de tocar `logo_asset_id`.
 - `routeGroups` y `views` solo gobiernan navegacion; las mutaciones API deben usar `can()`.
 
 ### Events and audit
@@ -279,6 +296,13 @@ Eventos propuestos:
 - `organization.brand_asset.replaced` v1
 
 El plan puede colapsar eventos si el event catalog vigente recomienda granularidad menor, pero debe preservar auditabilidad de candidate -> decision -> final logo.
+
+## 4-Pillar Scoring (arch-architect contract)
+
+- **Safety**: capability granular nueva `organization.brand_asset` (no coarse); operating-entity guard protege el logo legal de Efeonce; `logoUrl` servido por proxy propio con `canTenantAccessAsset` (sin fuga cross-tenant); SVG saneado o rechazado; no hotlink; errores externos redactados (`redactErrorForResponse`, nunca crudo). Blast radius de un logo mal aplicado = 1 organizacion, mitigado por review-first.
+- **Robustness**: command de apply atomico (tx unica) con supersede del logo previo (nunca DELETE); idempotencia por `content_hash`; candidate state machine con CHECK enum cerrado; validacion MIME real + size + dimensiones en el boundary; discovery idempotente por `(organization_id, source, source_url)`.
+- **Resilience**: discovery en ops-worker con retries acotados + circuit breaker + dead-letter; reliability signals `coverage_gap` / `discovery_failures` / `projection_drift` / `operating_entity_mutation_blocked` (steady=0); degradacion honesta en UI (img rota => inicial; discovery caido => banner, no $0); rollback per-slice documentado; feature flags para discovery y review UI.
+- **Scalability**: 157 orgs hoy, ~125 con ancla HubSpot — volumen bajo; discovery batched + rate-limited absorbe 10x; assets en storage propio servido por proxy cacheable; `organization_360` es VIEW (sin materializacion extra). Si emerge superficie cliente-facing publica de alto trafico, variantes publicas/cacheadas son follow-up.
 
 ## Rollout Plan & Risk Matrix
 
@@ -299,7 +323,8 @@ El plan puede colapsar eventos si el event catalog vigente recomienda granularid
 | SVG malicioso o imagen no valida | security / assets | medium | MIME sniffing, sanitizacion o rechazo SVG, normalizacion y size limits | `identity.organization_brand_assets.validation_failures` |
 | Fuga de logo privado entre tenants | identity / assets | low | `canTenantAccessAsset` con owner organization + relationship/capability check | `identity.organization_brand_assets.access_denied_rate` |
 | Drift de `organization_360` vs `organizations.logo_asset_id` | data / serving | medium | tests de projection + signal de coverage/drift | `identity.organization_brand_assets.projection_drift` |
-| Backfill genera demasiadas descargas externas | integrations / ops | medium | rate limit, dry-run, allowlist, retries acotados, circuit breaker | `identity.organization_brand_assets.discovery_failures` |
+| Backfill genera demasiadas descargas externas | integrations / ops | medium | rate limit, dry-run, allowlist, retries acotados, circuit breaker, fetch en ops-worker no Vercel | `identity.organization_brand_assets.discovery_failures` |
+| Aplicar logo comercial a la operating entity y romper logo legal en documentos (finiquito/contrato) | identity / legal | medium | operating-entity guard: bloquear/elevar a `EFEONCE_ADMIN` cuando `is_operating_entity=TRUE`; el logo legal se gestiona aparte | `identity.organization_brand_assets.operating_entity_mutation_blocked` |
 
 ### Feature flags / cutover
 
@@ -379,12 +404,19 @@ El plan puede colapsar eventos si el event catalog vigente recomienda granularid
 
 ## Follow-ups
 
-- Evaluar un campo canonico `organization_domain` / `website_url` si TASK-997/TASK-992 no lo materializan.
+- Auto-apply de candidatos high-confidence, gated por precision medida (umbral a definir) — diferido de V1 (review-first).
+- Reconciliar el 3er logo legacy `greenhouse.clients.logo_url` (BQ, branding del portal cliente, `src/lib/admin/media-assets.ts`): decidir si el logo comercial de la organizacion lo reemplaza como SSOT o coexisten. NO se toca en V1 (evitar 3 SSOT en paralelo sin decision).
 - Evaluar proveedor externo de logo enrichment solo si discovery propio + HubSpot no cubren suficientes organizaciones.
 - Crear variantes publicas/cacheadas de logo si aparece una superficie client-facing publica que no pueda usar private asset proxy.
 
+## Resolved Decisions (arch-architect verdict 2026-06-04)
+
+- **Auto-apply vs review** => **V1 siempre review humana** para todos los candidatos. Blast radius de logo equivocado en cliente equivocado es medium; costo de review es 1 click. Auto-apply high-confidence se difiere a follow-up gated por precision medida (>= N candidatos aceptados sin rechazo posterior). Pinned en Slice ordering.
+- **Capability de mutacion** => **nueva granular `organization.brand_asset` (`review|update`)**, NO reusar `organization.identity_sensitive.update` (overlay regla #7; naming consistente con eventos/tabla `brand_asset`). Resuelto en Access model.
+- **Logo legal vs comercial comparten `logo_asset_id`** => **SI, comparten** la misma columna; el significado es unificado "logo canonico de la organizacion" y el uso depende del tipo de fila (operating entity => documentos; cliente => UI). Un override documental separado seria una columna NUEVA futura (YAGNI). Protegido por el operating-entity guard.
+
 ## Open Questions
 
-- ¿Auto-aplicar logos high-confidence o mantener review humana obligatoria para todos los candidatos en V1?
-- ¿La capability de mutacion debe ser nueva (`organization.identity_logo`) o reutilizar `organization.identity_sensitive.update`?
-- ¿El logo de legal entity para documentos debe compartir siempre `logo_asset_id` con el logo comercial, o requiere override documental futuro?
+- ¿Qué umbral exacto de precision medida habilita el follow-up de auto-apply high-confidence (y para qué fuentes)?
+- ¿La accion contextual por-fila en `/agency/organizations` debe permitir solo `Subir`/`Aceptar candidato`, o también disparar `Buscar de nuevo` (encolar discovery on-demand)?
+- ¿El logo comercial de una organizacion cliente debe convertirse en SSOT que reemplace el legacy `greenhouse.clients.logo_url` (branding del portal cliente), o ambos coexisten? (ver Follow-ups — reconciliacion del 3er logo legacy en BQ).
