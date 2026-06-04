@@ -29,9 +29,18 @@ export async function POST(request: Request) {
     await withPasswordChangeAuthorization(
       { userId: targetUserId, source: 'accept_invite' },
       async client => {
+        // Al setear password_hash, auth_mode DEBE transicionar fuera de 'invited'
+        // (invariant TASK-742: 'invited' ⇒ password_hash IS NULL). Si el usuario ya
+        // tenía SSO (microsoft_oid) → 'both'; si no → 'credentials'. Ambos exigen
+        // password_hash NOT NULL, que es justo lo que estamos seteando. Sin este
+        // flip, la fila quedaría 'invited' + password_hash NOT NULL → viola el CHECK.
         await client.query(
           `UPDATE greenhouse_core.client_users
-           SET password_hash = $1, password_hash_algorithm = 'bcrypt', status = 'active', updated_at = now()
+           SET password_hash = $1,
+               password_hash_algorithm = 'bcrypt',
+               status = 'active',
+               auth_mode = CASE WHEN microsoft_oid IS NOT NULL THEN 'both' ELSE 'credentials' END,
+               updated_at = now()
            WHERE user_id = $2`,
           [passwordHash, targetUserId]
         )

@@ -93,6 +93,29 @@ describe('inviteClientPortalUser', () => {
     expect(sendEmailMock).toHaveBeenCalledTimes(1)
   })
 
+  // TASK-1010 — regresión del bug latente: el INSERT NO seteaba user_id (NOT NULL sin
+  // default → falla) y usaba auth_mode='credentials' (CHECK TASK-742 exige password_hash
+  // NOT NULL → falla en un invitado sin password). El correcto: user_id generado +
+  // auth_mode='invited'. Los unit tests con DB mockeada no lo atrapaban; este guard sí.
+  it('REGRESIÓN: el INSERT de client_users genera user_id y usa auth_mode=invited (no credentials)', async () => {
+    const client = wireTx({ existing: false, roleInserted: true })
+
+    await inviteClientPortalUser({ ...baseInput, onExisting: 'ensure' })
+
+    const insertCall = (client.query.mock.calls as unknown[][]).find(c =>
+      String(c[0]).includes('INSERT INTO greenhouse_core.client_users'))
+
+    expect(insertCall).toBeTruthy()
+    const sql = String(insertCall![0])
+    const params = insertCall![1] as unknown[]
+
+    expect(sql).toContain('user_id')               // columna user_id presente (NOT NULL sin default)
+    expect(sql).toContain("'invited', 'invited'")  // status + auth_mode = invited
+    expect(sql).not.toContain("'credentials'")     // 'credentials' violaría el CHECK (password NULL al invitar)
+    expect(typeof params[0]).toBe('string')        // user_id generado (randomUUID)
+    expect((params[0] as string).length).toBeGreaterThan(10)
+  })
+
   it('onExisting=error: email existente lanza 409 sin crear ni emailear', async () => {
     wireTx({ existing: true })
 

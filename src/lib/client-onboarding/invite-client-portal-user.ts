@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { randomUUID } from 'node:crypto'
+
 import { ROLE_CODES, isRoleCode } from '@/config/role-codes'
 import { generateToken, storeToken } from '@/lib/auth-tokens'
 import { sendEmail } from '@/lib/email/delivery'
@@ -95,11 +97,19 @@ export const inviteClientPortalUser = async (
       userId = existing.rows[0].user_id
       created = false
     } else {
+      // user_id: NOT NULL sin default en client_users → generar (patrón canónico
+      // randomUUID, mismo que SCIM provisioning). auth_mode='invited': un invitado
+      // sin password todavía DEBE cumplir el invariant TASK-742
+      // (client_users_auth_mode_invariant: 'invited' ⇒ password_hash IS NULL).
+      // 'credentials' exigiría password_hash NOT NULL → violaría el CHECK aquí.
+      // La activación (accept-invite) flipea a 'credentials' al setear el password.
+      const newUserId = randomUUID()
+
       const inserted = await client.query<{ user_id: string }>(
-        `INSERT INTO greenhouse_core.client_users (email, full_name, client_id, status, auth_mode, created_at)
-         VALUES ($1, $2, $3, 'invited', 'credentials', now())
+        `INSERT INTO greenhouse_core.client_users (user_id, email, full_name, client_id, status, auth_mode, created_at)
+         VALUES ($1, $2, $3, $4, 'invited', 'invited', now())
          RETURNING user_id`,
-        [normalizedEmail, fullName, clientId]
+        [newUserId, normalizedEmail, fullName, clientId]
       )
 
       userId = inserted.rows[0].user_id
