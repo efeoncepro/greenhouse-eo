@@ -337,7 +337,9 @@ export const GH_CLIENT_ONBOARDING = {
     notACreateNote: 'Esto no crea un cliente. Solo completa su perfil financiero.',
     saveCta: 'Guardar perfil',
     cancelCta: 'Cancelar',
-    savedToast: 'Perfil financiero actualizado.'
+    savedToast: 'Perfil financiero actualizado.',
+    saveError: 'No pudimos guardar el perfil financiero. Reintenta en unos segundos.',
+    daysAdornment: 'días'
   },
 
   // --- Account 360 lifecycle timeline ----------------------------------------

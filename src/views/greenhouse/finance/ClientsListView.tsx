@@ -73,8 +73,6 @@ const cliColumns: ColumnDef<ClientProfile, any>[] = [
   })
 ]
 
-import CreateClientDrawer from '@views/greenhouse/finance/drawers/CreateClientDrawer'
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -97,12 +95,11 @@ interface ClientProfile {
 const ClientsListView = () => {
   const router = useRouter()
 
-  // TASK-992 Slice 2c — el alta de cliente vive en la puerta única (wizard). Cuando
-  // el flag está activo, "Nuevo cliente" navega al wizard en vez de abrir el viejo
-  // CreateClientDrawer (que creaba clientes en paralelo — anti-patrón). El drawer
-  // queda solo como fallback mientras el flag esté apagado.
-  const lifecycleWizardEnabled = process.env.NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED === 'true'
-
+  // TASK-1010 Slice 2 — el alta de cliente vive SIEMPRE en la puerta única (wizard
+  // `provisionClientFromWizard`). Se eliminó el fallback al viejo CreateClientDrawer
+  // que creaba clientes en paralelo (anti-patrón que violaba la regla de puerta única
+  // TASK-992). Completar el perfil financiero de un cliente EXISTENTE vive ahora en el
+  // FinanceFacetDrawer, montado en la ficha del cliente (ClientDetailView).
   const [loading, setLoading] = useState(true)
   const [clients, setClients] = useState<ClientProfile[]>([])
   const [total, setTotal] = useState(0)
@@ -110,7 +107,6 @@ const ClientsListView = () => {
   const [poFilter, setPoFilter] = useState('')
   const [hesFilter, setHesFilter] = useState('')
   const [error, setError] = useState('')
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [sorting, setSorting] = useState<SortingState>([{ id: 'legalName', desc: false }])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -251,9 +247,9 @@ const ClientsListView = () => {
             variant='contained'
             color='primary'
             startIcon={<i className='tabler-plus' />}
-            onClick={() => (lifecycleWizardEnabled ? router.push('/agency/clients/new') : setDrawerOpen(true))}
+            onClick={() => router.push('/agency/clients/new')}
           >
-            {lifecycleWizardEnabled ? 'Nuevo cliente' : 'Nuevo perfil'}
+            Nuevo cliente
           </Button>
         </Box>
       </Box>
@@ -375,8 +371,6 @@ const ClientsListView = () => {
         </div>
         <TablePaginationComponent table={cliTable as ReturnType<typeof useReactTable>} />
       </Card>
-
-      <CreateClientDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchClients() }} />
     </Box>
   )
 }

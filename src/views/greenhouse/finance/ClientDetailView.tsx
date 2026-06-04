@@ -36,6 +36,8 @@ import CustomTabList from '@core/components/mui/TabList'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { ROLE_CODES } from '@/config/role-codes'
 import AddMembershipDrawer from '@/views/greenhouse/organizations/drawers/AddMembershipDrawer'
+import FinanceFacetDrawer from '@/views/greenhouse/finance/drawers/FinanceFacetDrawer'
+import { GH_CLIENT_ONBOARDING as T_ONBOARDING } from '@/lib/copy/client-onboarding'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
@@ -173,12 +175,24 @@ const ClientDetailView = () => {
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
-  const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
+  const roleCodes = session?.user?.roleCodes ?? []
+  const isAdmin = roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
+
+  // Quién puede completar/editar el perfil financiero del cliente. Espeja el gate
+  // server-side del PUT /api/finance/clients/[id] (requireFinanceTenantContext):
+  // admin + roles de Finanzas. Si el usuario llegó a esta página de Finanzas pero
+  // no tiene rol de escritura, el PUT igual rechaza — esto solo evita mostrar un
+  // CTA que fallaría.
+  const canEditFinanceProfile =
+    isAdmin ||
+    roleCodes.includes(ROLE_CODES.FINANCE_ADMIN) ||
+    roleCodes.includes(ROLE_CODES.FINANCE_ANALYST)
 
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<ClientDetailData | null>(null)
   const [activeTab, setActiveTab] = useState('profile')
   const [addContactOpen, setAddContactOpen] = useState(false)
+  const [financeFacetOpen, setFinanceFacetOpen] = useState(false)
 
   const loadClientDetail = useCallback(async () => {
     if (!id) return
@@ -318,6 +332,17 @@ const ClientDetailView = () => {
               <CardHeader
                 title='Datos de facturación'
                 avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><i className='tabler-receipt' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} /></Avatar>}
+                action={canEditFinanceProfile ? (
+                  <Button
+                    variant='tonal'
+                    color='primary'
+                    size='small'
+                    startIcon={<i className='tabler-pencil' />}
+                    onClick={() => setFinanceFacetOpen(true)}
+                  >
+                    {T_ONBOARDING.financeDrawer.title}
+                  </Button>
+                ) : undefined}
               />
               <Divider />
               <CardContent>
@@ -568,6 +593,27 @@ const ClientDetailView = () => {
           }}
         />
       )}
+
+      <FinanceFacetDrawer
+        open={financeFacetOpen}
+        onClose={() => setFinanceFacetOpen(false)}
+        onSaved={() => { void loadClientDetail() }}
+        context={{
+          clientProfileId: fp.clientProfileId,
+          organizationName: fp.legalName || company.companyName || company.greenhouseClientName || fp.clientProfileId,
+          taxIdLabel: fp.taxIdType || 'Tax ID',
+          taxId: fp.taxId,
+          publicId: null
+        }}
+        initial={{
+          paymentCurrency: fp.paymentCurrency,
+          paymentTermsDays: fp.paymentTermsDays,
+          requiresPo: fp.requiresPo,
+          requiresHes: fp.requiresHes,
+          billingAddress: fp.billingAddress,
+          specialConditions: fp.specialConditions
+        }}
+      />
     </Box>
   )
 }
