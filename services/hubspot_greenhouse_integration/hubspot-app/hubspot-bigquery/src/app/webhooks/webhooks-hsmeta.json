@@ -166,6 +166,17 @@
           "objectType": "service",
           "propertyName": "hs_pipeline_stage",
           "active": true
+        },
+        {
+          "subscriptionType": "object.creation",
+          "objectType": "deal",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "deal",
+          "propertyName": "dealstage",
+          "active": true
         }
       ]
     }

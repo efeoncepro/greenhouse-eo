@@ -5,6 +5,7 @@ import { resolveSecret } from '@/lib/webhooks/signing'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { enqueueHubSpotServiceEventsAsync } from './hubspot-services'
+import { processHubSpotDealEvents } from './hubspot-deals'
 
 /**
  * HubSpot companies webhook handler — TASK-706 + TASK-878 (async cutover).
@@ -90,7 +91,7 @@ interface HubSpotEvent {
  * Pattern fuente: defense-in-depth + boring tech preference (no breaking change
  * a apps legacy aunque migren después).
  */
-type HubSpotEventCategory = 'company' | 'contact' | 'service' | 'unknown'
+type HubSpotEventCategory = 'company' | 'contact' | 'service' | 'deal' | 'unknown'
 
 const classifyHubSpotEvent = (event: HubSpotEvent): HubSpotEventCategory => {
   const subscriptionType = String(event.subscriptionType || '')
@@ -109,11 +110,18 @@ const classifyHubSpotEvent = (event: HubSpotEvent): HubSpotEventCategory => {
     return 'service'
   }
 
+  // TASK-1010 Slice 3 — deal events (object 0-3). Llegan al MISMO target URL
+  // (1 webhooks component por app). Delegan al sub-handler hubspot-deals.
+  if (subscriptionType.startsWith('deal.') || subscriptionType.startsWith('0-3.')) {
+    return 'deal'
+  }
+
   // Developer Platform 2025.2 format (subscriptionType genérico + objectTypeId/objectType separado)
   if (subscriptionType.startsWith('object.')) {
     if (objectTypeId === '0-2' || objectType === 'company') return 'company'
     if (objectTypeId === '0-1' || objectType === 'contact') return 'contact'
     if (objectTypeId === '0-162' || objectType === 'service' || objectType === 'p_services') return 'service'
+    if (objectTypeId === '0-3' || objectType === 'deal') return 'deal'
   }
 
   return 'unknown'
@@ -266,6 +274,29 @@ registerInboundHandler('hubspot-companies', async (inboxEvent, rawBody, parsedPa
         level: 'error',
         tags: { source: 'hubspot-companies-webhook', step: 'delegate-services-async' },
         extra: { serviceEventCount: serviceEvents.length }
+      })
+    }
+  }
+
+  // TASK-1010 Slice 3 — deal events (object 0-3) llegan al mismo target URL.
+  // Delegan al sub-handler hubspot-deals: si el deal está closed-won y el flag
+  // CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED está ON, abre un onboarding
+  // case en draft. A diferencia de services (bridge fetch externo → async via
+  // outbox), el deal handler lee SOLO Postgres (greenhouse_crm.deals + orgs),
+  // es idempotente y flag-gated, así que corre inline con guard (sin riesgo de
+  // timeout de 5s de HubSpot). processHubSpotDealEvents no-opea con el flag OFF.
+  const dealEvents = events.filter(e => classifyHubSpotEvent(e) === 'deal')
+
+  if (dealEvents.length > 0) {
+    try {
+      await processHubSpotDealEvents(dealEvents)
+    } catch (err) {
+      // No abortamos el company flow si el deal trigger falla. HubSpot reintenta
+      // el webhook completo; provisionClientLifecycle es idempotente.
+      captureWithDomain(err, 'integrations.hubspot', {
+        level: 'error',
+        tags: { source: 'hubspot-companies-webhook', step: 'delegate-deals' },
+        extra: { dealEventCount: dealEvents.length }
       })
     }
   }

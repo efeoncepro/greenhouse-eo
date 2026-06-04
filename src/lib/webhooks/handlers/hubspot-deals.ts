@@ -16,11 +16,18 @@ import { resolveSecret } from '@/lib/webhooks/signing'
  * Un misclick de sales NO dispara side-effects irreversibles (el caso draft no
  * provisiona nada — solo materializa el checklist pendiente de activación).
  *
- * Suscripción HubSpot Developer Portal (operator-gated, config aparte):
- *   - deal.creation
- *   - deal.propertyChange (dealstage)
- *   Target URL: https://greenhouse.efeoncepro.com/api/webhooks/hubspot-deals
- *   Signature method: v3.
+ * Entrega de eventos (IMPORTANTE — constraint HubSpot Developer Platform):
+ *   1 webhooks component por app → TODOS los events convergen al ÚNICO target
+ *   URL configurado (`.../api/webhooks/hubspot-companies`). Por eso el path
+ *   canónico de entrega de deal events es la DELEGACIÓN desde el handler
+ *   `hubspot-companies` (`classifyHubSpotEvent === 'deal'` → `processHubSpotDealEvents`),
+ *   NO este endpoint standalone. La suscripción vive en
+ *   `services/hubspot_greenhouse_integration/hubspot-app/.../webhooks-hsmeta.json`
+ *   (`object.creation` deal + `object.propertyChange` deal `dealstage`).
+ *
+ *   El endpoint standalone `hubspot-deals` queda registrado como entry point
+ *   alternativo para tests / configuraciones futuras — mismo patrón que el
+ *   endpoint standalone `hubspot-services`.
  *
  * Validación: HubSpot v3 signature (HMAC-SHA256 of method+uri+body+timestamp),
  * mismo patrón que hubspot-services / hubspot-companies.
