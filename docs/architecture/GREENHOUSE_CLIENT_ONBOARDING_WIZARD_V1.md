@@ -134,3 +134,34 @@ Bonus: el rol PG del runtime es **`greenhouse_app`** (miembro de `cloudsqlsuperu
 - **NUNCA** crear cliente fuera de `provisionClientFromWizard` (puerta única) ni escribir `lifecycle_stage` fuera de `promoteParty`.
 - **NUNCA** devolver el genérico "ciclo de vida" sin `detail` + `pgCode`.
 - **SIEMPRE** que el wizard cambie, correr el live test + GVC antes de cerrar.
+
+## Delta 2026-06-04 — TASK-1006: persistencia del perfil financiero + clients.country_code
+
+El paso Finanzas capturaba campos que se descartaban en el submit (contrato incompleto UI→route→composer→`client_profiles`). TASK-1006 los cablea end-to-end y llena los **3 campos de país** (ninguno queda vacío).
+
+**Campos del perfil financiero ahora persistidos en `greenhouse_finance.client_profiles`** (vía `instantiateClientForParty.financeProfile`):
+
+| Campo wizard | Columna |
+|---|---|
+| dirección de facturación | `billing_address` |
+| país de facturación (auto-deriva del país de la org) | `billing_country` |
+| requiere OC | `requires_po` (antes hardcode FALSE) |
+| N° OC vigente (solo si requiere OC) | `current_po_number` |
+| requiere HES | `requires_hes` (antes hardcode FALSE) |
+| N° HES vigente (solo si requiere HES) | `current_hes_number` |
+| condiciones especiales | `special_conditions` |
+
+**Los 3 campos de país** (decisión operador 2026-06-04, ninguno vacío): `organizations.country` (legal/HQ, SSOT del default) → `clients.country_code` (derivado de `organization.country` en el INSERT de `clients`; antes quedaba NULL) → `client_profiles.billing_country` (del wizard, default = país de la org, overridable). Para derivar el country se agregó `country` al SELECT de `selectOrganizationForLifecycleUpdate` (party-store).
+
+**Path cliente existente (reuso):** `fillMissingFinanceProfileForExistingClient` completa SOLO los campos null/vacío (anti-data-loss: NUNCA pisa un valor existente no-vacío; no toca booleans). El overwrite intencional de un valor existente queda para un command auditado separado.
+
+**Truthfulness:** el resumen Confirmar ahora muestra los 5 campos persistibles (antes ocultaba todo salvo moneda + términos). Copy "OC/HES vigente" deja claro que es el número del perfil, NO la creación de una entidad OC/HES formal.
+
+**Verificación:** live test rollback-wrapped contra PG real (assert de los 7 campos + `clients.country_code`) + build + 88 tests focales. Sin DDL (columnas ya existían). En develop.
+
+### Hard rules (TASK-1006)
+
+- **NUNCA** mostrar en el wizard un campo financiero que no se persista (honest-state). Si se agrega un campo visible, cablearlo UI→route→composer→`client_profiles` o retirarlo.
+- **NUNCA** pisar un valor financiero existente no-vacío desde el wizard en el path de cliente reusado (anti-data-loss). Solo llenar null/vacío.
+- **NUNCA** derivar `clients.country_code` ni `billing_country` de algo distinto al país de la org (SSOT) como default.
+- **NUNCA** cerrar un cambio del wizard sin verificar el alta completa end-to-end (live test + build + GVC) — un bug en el write atómico rompe TODA el alta.

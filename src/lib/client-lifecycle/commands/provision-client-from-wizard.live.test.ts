@@ -29,6 +29,9 @@ live('provisionClientFromWizard (live) — alta de cliente completa, bug-class r
 
     let result: Awaited<ReturnType<typeof provisionClientFromWizard>> | undefined
     let captured: unknown = null
+    // TASK-1006 — capturamos las filas persistidas DENTRO de la tx (antes del rollback).
+    let persistedProfile: Record<string, unknown> | undefined
+    let persistedClient: Record<string, unknown> | undefined
 
     try {
       await withTransaction(async client => {
@@ -43,7 +46,18 @@ live('provisionClientFromWizard (live) — alta de cliente completa, bug-class r
                 taxIdType: 'RFC',
                 country: 'MX'
               },
-              finance: { paymentCurrency: 'MXN', paymentTermsDays: 30 },
+              // TASK-1006 — perfil financiero completo: debe persistir en client_profiles.
+              finance: {
+                paymentCurrency: 'MXN',
+                paymentTermsDays: 30,
+                billingAddress: 'Av. Reforma 123, CDMX',
+                billingCountry: 'MX',
+                requiresPo: true,
+                currentPoNumber: 'OC-2026-001',
+                requiresHes: true,
+                currentHesNumber: 'HES-2026-001',
+                specialConditions: 'Factura a 30 días, sin retención.'
+              },
               // (1) vocabulario UI → debe mapear a client_space
               space: { spaceName: 'ZZ Live Regression', spaceType: 'client' },
               // (2) Notion IDs de 36 chars → deben caber (columnas TEXT) + SAVEPOINT
@@ -68,6 +82,25 @@ live('provisionClientFromWizard (live) — alta de cliente completa, bug-class r
           captured = err
         }
 
+        // TASK-1006 — leer lo persistido ANTES del rollback (el test no deja nada).
+        if (result?.clientId) {
+          const prof = await client.query<Record<string, unknown>>(
+            `SELECT billing_address, billing_country, requires_po, requires_hes,
+                    current_po_number, current_hes_number, special_conditions
+             FROM greenhouse_finance.client_profiles WHERE client_id = $1`,
+            [result.clientId]
+          )
+
+          persistedProfile = prof.rows[0]
+
+          const cli = await client.query<Record<string, unknown>>(
+            `SELECT country_code FROM greenhouse_core.clients WHERE client_id = $1`,
+            [result.clientId]
+          )
+
+          persistedClient = cli.rows[0]
+        }
+
         // SIEMPRE revierte — el test no debe persistir nada.
         throw new RollbackSentinel('rollback')
       })
@@ -83,6 +116,17 @@ live('provisionClientFromWizard (live) — alta de cliente completa, bug-class r
     expect(result?.spaceId).toBeTruthy()
     // El vínculo de Notion se persistió (IDs de 36 chars caben en TEXT).
     expect(result?.notionConnected).toBe(true)
+
+    // TASK-1006 — los campos del perfil financiero se persistieron en client_profiles.
+    expect(persistedProfile?.billing_address).toBe('Av. Reforma 123, CDMX')
+    expect(persistedProfile?.billing_country).toBe('MX')
+    expect(persistedProfile?.requires_po).toBe(true)
+    expect(persistedProfile?.requires_hes).toBe(true)
+    expect(persistedProfile?.current_po_number).toBe('OC-2026-001')
+    expect(persistedProfile?.current_hes_number).toBe('HES-2026-001')
+    expect(persistedProfile?.special_conditions).toBe('Factura a 30 días, sin retención.')
+    // TASK-1006 — clients.country_code derivado del país de la org (los 3 países llenos).
+    expect(persistedClient?.country_code).toBe('MX')
 
     // TASK-992 gap #5 — las fases declaradas auto-completan declare_engagement_phases.
     const items = result?.checklistItems ?? []
