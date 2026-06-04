@@ -182,6 +182,35 @@ Si un documento ya tiene suficiente contexto y otro solo necesita continuidad, e
   - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 - `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md` y `changelog.md` deben dejar solo el delta operativo corto y enlazar a esos documentos, no duplicar el runbook completo.
 
+## Chequeo mecanico de cierre documental
+
+El comando canonico para una primera pasada mecanica es:
+
+```bash
+pnpm docs:closure-check
+```
+
+El checker vive en `scripts/check-documentation-closure.mjs`, no modifica archivos
+y emite hallazgos advisory sobre posibles docs faltantes segun el diff:
+`changelog.md`, `Handoff.md`, `project_context.md`, arquitectura/ADR,
+docs funcionales, manuales, task lifecycle, skills Codex/Claude y puntos de
+entrada de agentes.
+
+Uso recomendado:
+
+- `pnpm docs:closure-check` para el dirty tree completo.
+- `pnpm docs:closure-check --staged` para revisar solo lo staged.
+- `pnpm docs:closure-check -- <path...>` para aislar el delta propio cuando hay
+  cambios paralelos de otro agente en el worktree.
+- `pnpm docs:closure-check --base origin/develop --strict` cuando se quiera
+  convertir warnings en exit code no-cero.
+- `pnpm docs:closure-check --json` para consumo por otros scripts o agentes.
+
+Este comando no reemplaza la skill `greenhouse-documentation-governor`: solo
+detecta senales probables. El agente sigue decidiendo si un documento es
+requerido, intencionalmente no requerido, o si el cierre debe quedar como
+`code complete, rollout pendiente` / `operativamente bloqueado`.
+
 ## Regla para skills locales de agentes
 
 - La convención canónica para skills de Codex en este repo es:

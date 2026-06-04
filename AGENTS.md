@@ -50,6 +50,7 @@ Este bloque es el resumen obligatorio antes de ejecutar cualquier cambio. Las se
 - Skills y subagentes: usar skills cuando el dominio matchee y subagentes solo para trabajo paralelo independiente con ownership claro. No delegar el bloqueo inmediato del hilo principal.
 - Seguridad runtime: no improvisar credenciales, pools, env vars, access paths, bypasses, raw errors ni acciones destructivas. Usar los CLIs autenticados con guardrails.
 - Verificacion y cierre: validar con build/lint/test/manual segun aplique, documentar lo no validado, sincronizar docs/task lifecycle y no declarar cerrado algo que siga incompleto. Si una feature depende de flags/env vars, redeploy, backfill, provisioning externo, cron, webhook, worker, secret, migration aplicada, data recovery o verificacion runtime, eso es parte del cierre: no basta con que el codigo exista en repo.
+- Cierre documental: al terminar una implementacion, incidente, rollout, cambio de arquitectura/workflow o skill local, invocar `greenhouse-documentation-governor` y usar `pnpm docs:closure-check` como primera pasada mecanica para auditar/sincronizar arquitectura/ADR, changelog, handoff, task lifecycle, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, docs funcionales, manuales, auditorias y cualquier doc relacionado. Paths canonicos: `.codex/skills/greenhouse-documentation-governor/SKILL.md` y `.claude/skills/greenhouse-documentation-governor/SKILL.md`.
 
 ## Reglas Operativas
 
@@ -324,6 +325,7 @@ El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capa
   - `AGENTS.md` y `CLAUDE.md` dejan la regla operativa corta
   - `project_context.md` registra skills nuevas que cambian el contrato multi-agente
   - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` guarda la convención canónica para crear skills de Codex y Claude
+  - `greenhouse-documentation-governor` es el gate invocable de cierre documental para decidir que actualizar y que no duplicar tras una implementacion
 - Regla operativa adicional para agentes:
   - cuando un agente redacte una task, un plan o una propuesta de arquitectura que toque acceso, debe explicitar si el cambio vive en `views`, en `entitlements`, o en ambos
   - la ausencia de esa distincion debe tratarse como señal de diseño incompleto

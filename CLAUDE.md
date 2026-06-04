@@ -232,6 +232,12 @@ Si falta algo, reportar el estado como `code complete, rollout pendiente` o `ope
 
 **Caso fuente 2026-06-01:** Workforce Activation/SCIM tenia codigo TASK-872/874/876, pero sin `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true`, `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true`, redeploy de Vercel y backfill de usuarios ya creados, Entra seguia creando solo `client_users` y no `members`. La pantalla prometia activacion laboral, pero Maggie Borralles no aparecia hasta completar rollout + recovery.
 
+### Documentation Closure Gate
+
+Despues de cualquier implementacion, incidente, rollout, cambio de arquitectura/workflow o skill local, invocar `greenhouse-documentation-governor` antes de declarar el trabajo completo y usar `pnpm docs:closure-check` como primera pasada mecanica. La skill decide y ejecuta la sincronizacion documental proporcional: arquitectura/ADR, `DECISIONS_INDEX`, changelog, `Handoff.md`, task lifecycle, `AGENTS.md`, `CLAUDE.md`, `project_context.md`, docs funcionales, manuales, auditorias y relacionados. Paths canonicos: `.codex/skills/greenhouse-documentation-governor/SKILL.md` y `.claude/skills/greenhouse-documentation-governor/SKILL.md`.
+
+Regla corta: si los docs, rollout, lifecycle y evidencia no quedaron sincronizados, el estado correcto es `code complete, rollout pendiente` u `operativamente bloqueado`, no `complete`.
+
 ### Task Closing Quality Gate — full test + production build local (desde 2026-05-13, TASK-827 follow-up)
 
 **ANTES de mover una task de `in-progress/` a `complete/`** y declarar "ship done", correr **ambos** comandos local como gate final canonical:

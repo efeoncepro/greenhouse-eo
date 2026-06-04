@@ -1,3 +1,14 @@
+# Sesion 2026-06-04 (cont.) — Skill Documentation Governor creada
+
+Por pedido del operador se creo la skill invocable `greenhouse-documentation-governor` para Codex y Claude. Objetivo: verificar despues de una implementacion si el cierre documental esta completo y decidir/actualizar arquitectura, ADR, changelog, handoff, task lifecycle, `AGENTS.md`, `CLAUDE.md` (incluye typo operativo `claude.mc`), `project_context.md`, docs funcionales, manuales, auditorias y relacionados sin duplicar fuentes canonicas.
+
+- **Paths:** `.codex/skills/greenhouse-documentation-governor/SKILL.md` + `.codex/skills/greenhouse-documentation-governor/agents/openai.yaml` + `.claude/skills/greenhouse-documentation-governor/SKILL.md`.
+- **Helper ejecutable agregado:** `scripts/check-documentation-closure.mjs` + script `pnpm docs:closure-check`. Lee el diff dirty/staged/base, acepta pathspecs y `--json`/`--strict`, y emite findings advisory sobre docs faltantes.
+- **Puntos de entrada sincronizados:** `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `changelog.md`, `Handoff.md`, `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`.
+- **Cierre:** docs-only / skill/tooling-only; sin cambios runtime. Verificacion: `pnpm docs:closure-check -- <scope propio>` = 0 warnings; `pnpm docs:context-check` ejecutado (0 errors, 2 warnings conocidos por tamano historico de `Handoff.md`); frontmatter/YAML validado con Ruby porque `quick_validate.py` no corrio por falta local de `PyYAML`.
+
+---
+
 # Sesion 2026-06-04 (cont.) — 🚀 RELEASE A PRODUCCIÓN (todo develop→main) + rollout TASK-1010
 
 **Release ejecutado y verificado (orquestador canónico).** Promoción acumulada de 161 commits develop→main.
