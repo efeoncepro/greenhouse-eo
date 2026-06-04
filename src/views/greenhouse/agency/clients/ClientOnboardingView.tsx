@@ -1518,6 +1518,18 @@ const ConfirmarStep = ({
         <Section title={T.confirmar.sectionFinanzas} stepIndex={3}>
           <SummaryRow label={T.finanzas.currencyLabel} value={state.currency || T.confirmar.notSet} />
           <SummaryRow label={T.finanzas.paymentTermsLabel} value={state.paymentTermsDays ? `${state.paymentTermsDays} días` : T.confirmar.notSet} />
+          {/* TASK-1006 — campos persistidos del perfil financiero (antes ocultos en Confirmar). */}
+          <SummaryRow label={T.finanzas.billingAddressLabel} value={state.billingAddress || T.confirmar.notSet} />
+          <SummaryRow label={T.finanzas.billingCountryLabel} value={countryByCode(state.billingCountry || null)?.label ?? T.confirmar.notSet} />
+          <SummaryRow label={T.confirmar.requiresPoSummaryLabel} value={state.requiresPo ? T.confirmar.yes : T.confirmar.no} />
+          {state.requiresPo ? (
+            <SummaryRow label={T.finanzas.poNumberLabel} value={state.poNumber || T.confirmar.notSet} />
+          ) : null}
+          <SummaryRow label={T.confirmar.requiresHesSummaryLabel} value={state.requiresHes ? T.confirmar.yes : T.confirmar.no} />
+          {state.requiresHes ? (
+            <SummaryRow label={T.finanzas.hesNumberLabel} value={state.hesNumber || T.confirmar.notSet} />
+          ) : null}
+          <SummaryRow label={T.finanzas.specialConditionsLabel} value={state.specialConditions || T.confirmar.notSet} />
         </Section>
         <Section title={T.confirmar.sectionSpace} stepIndex={4}>
           <SummaryRow label={T.space.spaceNameLabel} value={state.spaceName || T.confirmar.notSet} />

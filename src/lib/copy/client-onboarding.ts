@@ -298,7 +298,13 @@ export const GH_CLIENT_ONBOARDING = {
     willHappenChecklist: 'Vas a completar el checklist desde la ficha del cliente.',
     confirmReviewLabel: 'Revisé los datos de arriba y confirmo que están correctos.',
     confirmUnderstandLabel: 'Entiendo que esto crea el cliente y abre su onboarding.',
-    notSet: 'Sin definir'
+    notSet: 'Sin definir',
+    // TASK-1006 — resumen de finanzas en Confirmar. "vigente" deja claro que es el número
+    // del perfil, no la creación de una OC/HES formal.
+    yes: 'Sí',
+    no: 'No',
+    requiresPoSummaryLabel: 'OC requerida',
+    requiresHesSummaryLabel: 'HES requerida'
   },
 
   // --- Success screen --------------------------------------------------------
