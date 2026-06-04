@@ -1093,19 +1093,23 @@ const FinanzasStep = ({
         />
 
         <Stack spacing={1}>
-          <FormControlLabel
-            control={<Switch checked={state.requiresPo} onChange={() => update('requiresPo', !state.requiresPo)} />}
-            label={T.finanzas.requiresPoLabel}
-          />
-          {state.requiresPo ? (
-            <CustomTextField
-              fullWidth
-              label={T.finanzas.poNumberLabel}
-              value={state.poNumber}
-              onChange={e => update('poNumber', e.target.value)}
-              helperText={T.finanzas.poNumberHelper}
-              sx={{ mt: 1 }}
+          <Box data-capture='finance-requires-po'>
+            <FormControlLabel
+              control={<Switch checked={state.requiresPo} onChange={() => update('requiresPo', !state.requiresPo)} />}
+              label={T.finanzas.requiresPoLabel}
             />
+          </Box>
+          {state.requiresPo ? (
+            <Box data-capture='finance-po-number'>
+              <CustomTextField
+                fullWidth
+                label={T.finanzas.poNumberLabel}
+                value={state.poNumber}
+                onChange={e => update('poNumber', e.target.value)}
+                helperText={T.finanzas.poNumberHelper}
+                sx={{ mt: 1 }}
+              />
+            </Box>
           ) : null}
           <FormControlLabel
             control={<Switch checked={state.requiresHes} onChange={() => update('requiresHes', !state.requiresHes)} />}
@@ -1122,14 +1126,16 @@ const FinanzasStep = ({
           ) : null}
         </Stack>
 
-        <CustomTextField
-          fullWidth
-          label={T.finanzas.billingAddressLabel}
-          value={state.billingAddress}
-          onChange={e => update('billingAddress', e.target.value)}
-          helperText={T.finanzas.billingAddressHelper}
-          autoComplete='off'
-        />
+        <Box data-capture='finance-billing-address'>
+          <CustomTextField
+            fullWidth
+            label={T.finanzas.billingAddressLabel}
+            value={state.billingAddress}
+            onChange={e => update('billingAddress', e.target.value)}
+            helperText={T.finanzas.billingAddressHelper}
+            autoComplete='off'
+          />
+        </Box>
 
         {/* Finance contacts */}
         <Box>

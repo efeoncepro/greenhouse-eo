@@ -60,6 +60,15 @@ export const scenario: CaptureScenario = {
     { kind: 'sleep', ms: 500 },
     { kind: 'mark', label: 'step4-finanzas', note: 'Paso 4 Finanzas — MXN prefilled' },
 
+    // TASK-1006 — llenar el perfil financiero (dirección + OC) para verificar que esos
+    // campos llegan al resumen Confirmar (antes se descartaban y Confirmar los ocultaba).
+    { kind: 'fill', selector: '[data-capture="finance-billing-address"] input', value: 'Av. Reforma 123, Col. Juárez, CDMX' },
+    { kind: 'click', selector: '[data-capture="finance-requires-po"] input' },
+    { kind: 'sleep', ms: 300 },
+    { kind: 'fill', selector: '[data-capture="finance-po-number"] input', value: 'OC-2026-0042' },
+    { kind: 'sleep', ms: 200 },
+    { kind: 'mark', label: 'step4-finanzas-filled', note: 'Paso 4 Finanzas — perfil financiero lleno (dirección + OC vigente)' },
+
     // → Step 5 Espacio (CHANGED: mode-card contrast + removed numeric code)
     { kind: 'click', selector: '[data-capture="wizard-next"]' },
     { kind: 'sleep', ms: 600 },
@@ -86,6 +95,10 @@ export const scenario: CaptureScenario = {
     { kind: 'sleep', ms: 1100 },
     { kind: 'scroll', selector: '[data-capture="wizard-create"]', scrollBlock: 'center' },
     { kind: 'sleep', ms: 300 },
-    { kind: 'mark', label: 'completeness-incomplete', note: 'Confirmar — banner cliente incompleto (Berel) + CTA Completar cliente' }
+    { kind: 'mark', label: 'completeness-incomplete', note: 'Confirmar — banner cliente incompleto (Berel) + CTA Completar cliente' },
+
+    // TASK-1006 — captura fullPage del resumen Confirmar: el bloque Finanzas ahora muestra
+    // dirección, país (México auto-derivado), OC requerida: Sí + N° vigente, HES, condiciones.
+    { kind: 'mark', label: 'confirmar-finanzas-summary', fullPage: true, note: 'Confirmar fullPage — resumen Finanzas con los campos persistidos (TASK-1006)' }
   ]
 }
