@@ -1,5 +1,21 @@
 # TASK-998 — Notion/Teams Teamspace Linking via Discover + Register (canonical)
 
+## Cierre 2026-06-04 — COMPLETE (triage post TASK-1000/1003/1004/1007)
+
+Cerrada tras verificar que se cumplen sus propios criterios de cierre (ver "Lifecycle status" abajo: *"cuando TASK-1000 shippee + smoke Berel verde → cierran AMBAS juntas"*).
+
+- ✅ **Core shippeó + canónico:** modelo **token-por-teamspace** (`discoverNotionDatabasesForToken`, columna `notion_token_secret_ref`, secret-write helper, connect store, UI panel GVC-verificado, wiring submit→provision). Berel vinculado live.
+- ✅ **Bloqueador resuelto:** TASK-1000 (per-space token) + TASK-1003 (endpoint data_sources) **complete**; Berel **sincroniza end-to-end** (raw + conformed + portal, tareas visibles). Verificado live 2026-06-04.
+- 🔁 **Slices 0/1 SUPERSEDED:** enumerar teamspaces vía `/discover` + heurístico de prefijo de id quedó obsoleto por el modelo token-por-teamspace (el token ES la conexión → discovery scoped trivial, sin prefijo, sin paso A1). No se implementan.
+- 📋 **Forward-looking DIFERIDO (no bloquea):**
+  - **Slice 3 — Teams channel self-serve:** el item `provision_communication_channels` (TASK-992) es el home; el vínculo del canal de un cliente es paso de operador hasta construir el reader self-serve. Para Berel, registrar "Squad Berel" queda como paso operativo del checklist.
+  - **Slice 4 — Crear teamspace nuevo con template L1** (TASK-910): forward-looking; no requerido para clientes que traen su teamspace (Berel/ANAM).
+  - El **enforce del template L1** + el **preflight de "fluye de verdad"** viven ahora en **TASK-1009**.
+
+**Resultado:** vínculo de teamspace canónico, self-serve por token scoped, validado end-to-end con Berel. Lifecycle → `complete`.
+
+---
+
 ## Delta 2026-06-03 — Berel vinculado LIVE; sync diario bloqueado por endpoint Notion deprecado (TASK-1003)
 
 **Contexto programa (EPIC-CLIENT-360):** esta task es el paso "vincular el teamspace del cliente" dentro del onboarding de **Grupo Berel** (primer cliente MXN, ver TASK-990 MXN + TASK-991/992/997 puerta única de incorporación). El vínculo se validó live el 2026-06-03.
@@ -11,7 +27,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio-Alto`
