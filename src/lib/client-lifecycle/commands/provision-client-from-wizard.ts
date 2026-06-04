@@ -10,7 +10,7 @@ import { writeSpaceNotionSourcesFromIntent, type NotionConnectIntent } from '@/l
 import { toCanonicalSpaceType } from '@/lib/client-onboarding/form-helpers'
 import { allocateSpaceNumericCode } from '@/lib/services/allocate-space-numeric-code'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import { instantiateClientForParty } from '@/lib/commercial/party/commands/instantiate-client-for-party'
+import { fillMissingFinanceProfileForExistingClient, instantiateClientForParty } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 import { promoteParty } from '@/lib/commercial/party/commands/promote-party'
 import { OrganizationAlreadyHasClientError } from '@/lib/commercial/party/types'
 import { CURRENCY_DOMAIN_SUPPORT } from '@/lib/finance/currency-domain'
@@ -219,6 +219,28 @@ export const provisionClientFromWizard = async (
         )
 
         clientId = existing.rows[0]?.client_id ?? null
+
+        // TASK-1006 Slice 3 — cliente reusado: completar SOLO los campos del perfil
+        // financiero que están vacíos (anti-data-loss). No pisa valores existentes ni
+        // toca booleans. clients.country_code se llena solo si está NULL.
+        if (clientId && (input.finance || input.identity.country)) {
+          await fillMissingFinanceProfileForExistingClient(
+            {
+              clientId,
+              countryCode: input.identity.country?.trim() || null,
+              financeProfile: input.finance
+                ? {
+                    billingAddress: input.finance.billingAddress,
+                    billingCountry: input.finance.billingCountry,
+                    currentPoNumber: input.finance.currentPoNumber,
+                    currentHesNumber: input.finance.currentHesNumber,
+                    specialConditions: input.finance.specialConditions
+                  }
+                : undefined
+            },
+            client
+          )
+        }
       } else {
         throw error
       }

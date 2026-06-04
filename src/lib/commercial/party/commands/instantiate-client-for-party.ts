@@ -212,3 +212,58 @@ export const instantiateClientForParty = async (
 
   return withTransaction(run)
 }
+
+export interface FillMissingFinanceProfileInput {
+  clientId: string
+  /** País legal/HQ de la org (SSOT) para llenar clients.country_code si está vacío. */
+  countryCode?: string | null
+  financeProfile?: {
+    billingAddress?: string | null
+    billingCountry?: string | null
+    currentPoNumber?: string | null
+    currentHesNumber?: string | null
+    specialConditions?: string | null
+  }
+}
+
+/**
+ * TASK-1006 — path de cliente EXISTENTE (reuso). Completa SOLO los campos del perfil
+ * financiero que hoy están NULL/vacío (anti-data-loss: NUNCA pisa un valor existente
+ * no-vacío desde el wizard; el overwrite intencional es un command auditado aparte —
+ * Open Question resuelta V1). Idempotente: COALESCE(NULLIF(TRIM(col),''), incoming) por
+ * campo nullable. Los booleans requires_po/hes NO se tocan (no son "null/empty" — tienen
+ * default FALSE deliberado). clients.country_code se llena solo si está NULL.
+ */
+export const fillMissingFinanceProfileForExistingClient = async (
+  input: FillMissingFinanceProfileInput,
+  client: QueryableClient
+): Promise<void> => {
+  const fp = input.financeProfile
+
+  await client.query(
+    `UPDATE greenhouse_finance.client_profiles
+        SET billing_address    = COALESCE(NULLIF(TRIM(COALESCE(billing_address, '')), ''), $2),
+            billing_country    = COALESCE(NULLIF(TRIM(COALESCE(billing_country, '')), ''), $3),
+            current_po_number  = COALESCE(NULLIF(TRIM(COALESCE(current_po_number, '')), ''), $4),
+            current_hes_number = COALESCE(NULLIF(TRIM(COALESCE(current_hes_number, '')), ''), $5),
+            special_conditions = COALESCE(NULLIF(TRIM(COALESCE(special_conditions, '')), ''), $6),
+            updated_at = NOW()
+      WHERE client_id = $1`,
+    [
+      input.clientId,
+      fp?.billingAddress ?? null,
+      fp?.billingCountry ?? null,
+      fp?.currentPoNumber ?? null,
+      fp?.currentHesNumber ?? null,
+      fp?.specialConditions ?? null
+    ]
+  )
+
+  await client.query(
+    `UPDATE greenhouse_core.clients
+        SET country_code = COALESCE(NULLIF(TRIM(COALESCE(country_code, '')), ''), $2),
+            updated_at = NOW()
+      WHERE client_id = $1`,
+    [input.clientId, input.countryCode ?? null]
+  )
+}
