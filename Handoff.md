@@ -1,3 +1,15 @@
+# Sesion 2026-06-04 (cont.) — TASK-1010 Slices 2-3 (rollout onboarding cliente)
+
+Trabajo local-first en `develop` (sin push). Continuación de TASK-1010 desde el primer slice incompleto (Slice 1 ya estaba cerrado en sesión previa, commit `101cab770`).
+
+- **Slice 2 ✅ (commit `7646f20b9`)** — `CreateClientDrawer` → `FinanceFacetDrawer`. El drawer de Finanzas dejó de crear clientes en paralelo (anti-patrón puerta única); ahora completa el facet financiero de un cliente EXISTENTE vía el `PUT /api/finance/clients/[id]` que ya existía. Botón global "Nuevo cliente" SIEMPRE → wizard (`/agency/clients/new`); drawer montado en `ClientDetailView` (acción en CardHeader "Datos de facturación", gated finance roles). Moneda = `VALID_CURRENCIES` (CLP/USD/MXN, SSOT — NO la lista del mockup wizard que rompería el PUT). GVC verificado contra el route mockup aprobado (`/agency/clients/finance-facet/mockup`, staging) — runtime es copy-and-patch 1:1.
+- **Slice 3 ✅ (commit `2ce606826`)** — webhook `hubspot-deals.ts` (§11.1). Deal closed-won → onboarding case `draft` (operador activa). HMAC v3 + classifier dual-format + Postgres-first con skip honesto + idempotente. Flag `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` default OFF. Migración `20260604175019856` (seed webhook_endpoints, aplicada a dev). `provisionClientLifecycle.triggeredByUserId` widened a `string|null` (system actor; cols nullable FK a client_users). 13 tests.
+- **Gates**: eslint 0 · tsc 0 · `pnpm build` exit 0 · `hubspot-deals.test` 13/13 · `ClientDetailView.test` 1/1 · webhooks+client-lifecycle 116/116.
+- **TASK-1010 NO cerrada** — queda en `in-progress`. Pendiente operator-gated (Runtime Rollout Completion Gate): suscripción webhook deal en portal HubSpot + flip flag, Azure Graph `Group.Read.All`, invitación real e2e (email PRUEBA), Slice 4 GVC SuccessScreen/degraded pickers (requiere create real en staging), flag prod verificado. Ver Progress Log de la task.
+- **Próximo paso**: el operador ejecuta el rollout externo + deploy staging para Slice 4 GVC; recién ahí se mueve a `complete/`.
+
+---
+
 # Sesion 2026-06-04 (cont.) — Notification Hub context para TeamBot 1:1 payments
 
 Por pedido del operador se reviso el contexto de Notification Hub para encajar los envios 1:1 de Greenhouse como forma canonica futura, no como script manual permanente.

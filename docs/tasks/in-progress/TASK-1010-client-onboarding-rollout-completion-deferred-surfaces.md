@@ -78,9 +78,33 @@ Mantenerlos dentro de 992/997/1001 dejaba esas tasks bloqueadas indefinidamente 
 - Helper `writeTeamsChannelFromAnchor` (`src/lib/client-onboarding/teams-connect-store.ts`): UPSERT idempotente por `channel_code` determinístico (`client-teams-<spaceId>` sanitizado), `teams_bot`, bot creds del secret, SAVEPOINT anti-poison, degrada honesto sin `channelId` (`channel_pending`) o sin bot secret (`bot_secret_unavailable`). 3 tests.
 - Wireado inline en el composer junto al write de Notion.
 
-### 🔄 PENDIENTE (lo que falta para cerrar TASK-1010)
+### ✅ Slice 2 — `CreateClientDrawer` → FinanceFacetDrawer (commit `7646f20b9`, develop)
 
-**Slice 2 — `CreateClientDrawer` → "completar facet financiero"** (UI + loop GVC). NO INICIADO (solo discovery read-only hecho; cero código escrito).
+Redefinido: el drawer dejó de crear clientes en paralelo (anti-patrón puerta única) y pasa a **completar el facet financiero de un cliente EXISTENTE** vía `PUT /api/finance/clients/[id]` (el endpoint PUT ya existía).
+- `FinanceFacetDrawer.tsx` (nuevo): copy-and-patch 1:1 del mockup aprobado (`FinanceFacetDrawerMockup`). Props `{open,onClose,onSaved,context,initial}` — carga valores actuales + Save PUT + estados loading/saving/error. Moneda derivada de `VALID_CURRENCIES` (SSOT `finance/contracts.ts` = CLP/USD/MXN), **NO** de la lista del mockup del wizard (ARS/COP/PEN rompería el PUT con 400 — `assertValidCurrency`).
+- `ClientsListView.tsx`: botón global "Nuevo cliente" SIEMPRE → wizard (`/agency/clients/new`). Eliminado el fallback legacy `setDrawerOpen` + el viejo `CreateClientDrawer` (borrado). Removida la branch `lifecycleWizardEnabled`.
+- `ClientDetailView.tsx`: monta el `FinanceFacetDrawer` + acción "Completar perfil financiero" (`tabler-pencil`) en el CardHeader de "Datos de facturación", gated por `canEditFinanceProfile` (EFEONCE_ADMIN ∪ FINANCE_ADMIN ∪ FINANCE_ANALYST — espeja `requireFinanceTenantContext` del PUT). `onSaved` recarga la ficha.
+- Copy: `+ financeDrawer.saveError + financeDrawer.daysAdornment` (es-CL).
+- **GVC ✅**: capturado el route mockup aprobado (`/agency/clients/finance-facet/mockup`, staging) — frame enterprise 2026 mirado; el runtime es copy-and-patch 1:1 (deltas intencionales: lista de moneda CLP/USD/MXN, `currencyHelper` en vez del MX-suggestion note porque edita un cliente existente, Alert de error + spinner de guardado). `.captures/2026-06-04T17-47-16_inline-agency-clients-finance-facet-mockup`.
+- Verde: eslint 0, tsc 0, `ClientDetailView.test` 1/1.
+
+### ✅ Slice 3 — Webhook `hubspot-deals.ts` (commit `2ce606826`, develop)
+
+Trigger semi-automático §11.1: deal closed-won → abre onboarding case `status='draft'` (operador activa). **Code-complete; subscription HubSpot + flag = operator-gated.**
+- `handlers/hubspot-deals.ts` (nuevo): HMAC v3 (mismo patrón services/companies) + classifier dual-format (legacy `deal.*`/`0-3.*` + DP 2025.2 `object.*`+objectTypeId `0-3`). Resolución Postgres-first + **skip honesto** (no throw): re-lee el deal de `greenhouse_crm.deals` (`is_closed_won` + `hubspot_company_id`, NUNCA confía el payload) → org canónica vía `organizations.hubspot_company_id` → `provisionClientLifecycle(draft, idempotente)`. Skip si deal no synced / no closed-won / org inexistente. `captureWithDomain('integrations.hubspot')` por failure.
+- `flags.ts`: `+ isClientLifecycleHubspotDealTriggerEnabled` (`CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED`, **default OFF**). Flag OFF → valida firma + ACK pero NO abre casos.
+- `provision-client-lifecycle.ts`: `triggeredByUserId` widened a `string|null` (system-initiated — cols `triggered_by/actor_user_id` son nullable FK a `client_users`; el command ya special-caseaba `hubspot_deal`→draft). NO es rewrite del orquestador.
+- Migración `20260604175019856`: seed `webhook_endpoints` hubspot-deals (`provider_native`, `HUBSPOT_APP_CLIENT_SECRET`) + anti pre-up-marker guard. **Aplicada a dev** (row verificado).
+- `handlers/index.ts`: registrado en el barrel. Sin event nuevo (reusa `client.lifecycle.case.opened v1`).
+- Verde: eslint 0, tsc 0, `hubspot-deals.test` 13/13, suites webhooks+client-lifecycle 116/116.
+
+### 🔄 PENDIENTE (operator-gated + Slice 4 GVC live)
+
+**Slice 4 — GVC SuccessScreen + degraded pickers** (GVC live). PENDIENTE.
+- SuccessScreen: requiere un create real contra staging (cliente de prueba rollback-safe).
+- Degraded pickers (loading/falla de HubSpot/Graph): requiere inyección de falla.
+
+**~~Slice 2~~ (cerrado arriba) — referencia histórica del discovery:**
 - Redefinir `src/views/greenhouse/finance/drawers/CreateClientDrawer.tsx` (hoy "crea cliente" desde Finanzas, POSTea `/api/finance/clients`) → superficie de **completar el facet financiero** de un cliente existente. El wizard es la ÚNICA puerta de nacimiento (`provisionClientFromWizard`) — el drawer NO debe parir clientes.
 - Mockup aprobado del target: `src/views/greenhouse/agency/clients/mockup/FinanceFacetDrawerMockup.tsx`.
 - Consumer del drawer: `src/views/greenhouse/finance/ClientsListView.tsx` (botón "Crear cliente" línea ~254 hoy hace toggle wizard-vs-drawer; el drawer se monta línea ~379).
@@ -90,19 +114,14 @@ Mantenerlos dentro de 992/997/1001 dejaba esas tasks bloqueadas indefinidamente 
   - **Copy keys YA existen** en `src/lib/copy/client-onboarding.ts`: `T.financeDrawer.{title,subtitle,clientContextLabel,notACreateNote,saveCta,cancelCta}` (línea ~333) + `T.finanzas.{currencyLabel,currencyMxNote,paymentTermsLabel/Helper,requiresPoLabel,requiresHesLabel,billingAddressLabel/Helper,specialConditionsLabel/Helper}`. **No hay que escribir copy.**
   - **Endpoint de UPDATE EXISTE**: `src/app/api/finance/clients/[id]/route.ts` (verificar si tiene PUT/PATCH para los campos financieros; si no, ese es el backend a agregar para el Save del facet). El drawer NUEVO **NO** debe POSTear `/api/finance/clients` (create).
   - **A confirmar en implementación**: (a) cómo el drawer recibe el cliente existente (props `clientProfileId` + identidad para el context read-only) y **carga** los valores actuales del `client_profiles`; (b) el endpoint/helper de persistencia del Save (reusar patrón `fillMissingFinanceProfileForExistingClient` TASK-1006, o un PUT a `client_profiles`); (c) el trigger nuevo (per-cliente, desde la lista/detalle de Finanzas) — el botón global "Crear cliente" debe ir SIEMPRE al wizard (quitar el fallback `setDrawerOpen(true)` legacy).
-- Loop GVC (bar enterprise 2026) antes de declarar listo. Invocar `greenhouse-ux` + `greenhouse-dev` antes de escribir JSX.
+- (Slices 2 y 3 ya implementados — ver bloques ✅ arriba. Este texto queda como referencia histórica del discovery.)
 
-**Slice 3 — Webhook `hubspot-deals.ts`** (backend, spec §11.1). PENDIENTE.
-- Handler nuevo `src/lib/webhooks/handlers/hubspot-deals.ts`: deal stage `closedwon` → abre onboarding case en `status='draft'` (semi-automático: operador activa). Patrón: `hubspot-companies.ts`/`hubspot-services.ts` (HMAC v3, dedup, captureWithDomain).
-- §11.1 de `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`.
-- La **suscripción** del webhook en el portal HubSpot es operator-gated (config aparte).
+### Operator-gated / live (lo que falta para cerrar TASK-1010 — NO autonomizable por un agente)
 
-**Slice 4 — GVC SuccessScreen + degraded pickers** (GVC). PENDIENTE.
-- SuccessScreen: requiere un create real contra staging (cliente de prueba rollback-safe).
-- Degraded pickers (loading/falla de HubSpot/Graph): requiere inyección de falla.
-
-**Operator-gated (requieren acción del operador o confirmación CLI):**
-- **Azure Graph `Group.Read.All`** al App Registration del bot: **grant tenant-wide read** — requiere OK explícito del scope (o un permiso más acotado si existe) antes de aplicar por `az`.
-- **Suscripción webhook HubSpot deal**: config en el portal/API HubSpot.
-- **Invitación real e2e** (1001): enviar invitación a un **email de PRUEBA** (no cliente real — el producto no está listo para invitar clientes); verificar email (Resend) + activación de cuenta con flag ON.
+- **Slice 4 GVC SuccessScreen + degraded pickers**: SuccessScreen requiere un create real contra staging (cliente de prueba rollback-safe); degraded pickers requieren inyección de falla. (Necesita deploy a staging del código de las tasks núcleo + del Slice 2; aún no desplegado.)
+- **Suscripción webhook HubSpot deal** (Slice 3 rollout): crear la subscription `deal.creation` + `deal.propertyChange(dealstage)` en el portal HubSpot Developer apuntando a `/api/webhooks/hubspot-deals` (signature v3) + flip `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED=true`. El handler ya está shipped y verde; sin la subscription + el flag, no llegan eventos (cero side-effect).
+- **Azure Graph `Group.Read.All`** al App Registration del bot: grant tenant-wide read — requiere OK explícito del scope antes de aplicar por `az`.
+- **Invitación real e2e** (1001): enviar invitación a un **email de PRUEBA** (no cliente real); verificar email (Resend) + activación de cuenta con flag ON.
 - **Flag prod verificado**: `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` value=true en Production + nav discoverable.
+
+> **Estado**: Slices 1-3 code-complete + verde en `develop` (local-first, sin push). El cierre de TASK-1010 queda gated por los ítems live/operator-gated de arriba (Runtime Rollout Completion Gate). NO mover a `complete/` hasta que el operador ejecute el rollout externo + Slice 4 GVC live.

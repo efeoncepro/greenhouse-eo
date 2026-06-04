@@ -1,5 +1,16 @@
 # TASK-821 — Client Lifecycle HubSpot Semi-Automatic Trigger
 
+## Delta 2026-06-04 — Base handler ya shipped por TASK-1010 Slice 3
+
+El **handler base** del trigger semi-automático ya existe en `develop` (TASK-1010 Slice 3, commit `2ce606826`): `src/lib/webhooks/handlers/hubspot-deals.ts` (HMAC v3 + classifier dual-format + Postgres-first skip honesto + idempotente) abre el onboarding case en `status='draft'` cuando un deal llega a closed-won, gated por `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` (default OFF). Endpoint registrado (`webhook_endpoints` hubspot-deals, migración `20260604175019856`) + barrel + 13 tests.
+
+**Esta task queda reducida a las extensiones Bow-tie sobre ese handler base** (NO re-construir el handler):
+
+1. Capturar `dealtype`/`deal_type` desde el fetch del deal → persistir en `metadata_json.hubspot_deal_type` + hint del classifier. **Nota**: el handler base hoy resuelve `hubspot_company_id`/`is_closed_won` desde `greenhouse_crm.deals` (Postgres-first); para `dealtype` habrá que fetchear el deal del bridge HubSpot o agregar `deal_type` a la projection `greenhouse_crm.deals`.
+2. Evento `client.lifecycle.hubspot_trigger.deal_type_missing.v1` cuando falta `dealtype` (defer del case hasta que el operador lo complete).
+3. Reverse-projection de `Company.lifecyclestage` (subscription nueva + consumer).
+4. Reliability signal `client.lifecycle.hubspot_trigger.deal_type_missing`.
+
 ## Delta 2026-05-07 — Bow-tie alignment
 
 Extiende el handler para capturar `hubspot_deal_type` (input crítico del classifier Bow-tie §5.2) + escuchar `Company.lifecyclestage` change para drift detection bidireccional. Aligned con `GREENHOUSE_BOWTIE_OPERATIONAL_BRIDGE_V1.md` §10.3 reverse-projection.
