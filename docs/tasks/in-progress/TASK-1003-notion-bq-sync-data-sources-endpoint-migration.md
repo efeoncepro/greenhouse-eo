@@ -243,10 +243,61 @@ Todo detrás de `NOTION_DATA_SOURCES_ENDPOINT_ENABLED` (default OFF → **sync b
 
 `.env.yaml` está **gitignored** en el repo hermano (config local de deploy) y `deploy.sh` la pasa con `--env-vars-file` (que **reemplaza** todas las env vars). Las vars per-space de TASK-1000 (`NOTION_PER_SPACE_TOKEN_ENABLED`, `GREENHOUSE_POSTGRES_*` + secret `greenhouse-pg-dev-app-password`) se setearon **manual** sobre la revisión `00019-fgp`, NO vía `.env.yaml`. Un `deploy.sh` ciego las **borraría** → se cae el path per-space. **Slice 3 debe**: (a) capturar el env+secrets vivos de `00019-fgp`, (b) reconciliarlos (o usar `--update-env-vars`/`--set-secrets` en el paso manual post-deploy) de modo que el nuevo deploy preserve per-space + PG + agregue el flip del flag data_sources. El default OFF del flag vive en el código (`or "false"`), así que el código es seguro sin `.env.yaml`.
 
-### Próximo — Slice 3 (cutover, NEEDS operator go-ahead, payroll-crítico)
+### Slice 2 — PARIDAD FULL VERDE (evidencia 2026-06-03, read-only contra API real)
 
-1. Reconciliar env/secrets (gotcha arriba) + deploy de la rama TASK-1003.
-2. Correr `parity_check_task1003.py` (full) → debe dar PARIDAD TOTAL.
-3. Flip `NOTION_DATA_SOURCES_ENDPOINT_ENABLED=true` + smoke Efeonce/Sky.
-4. Re-habilitar Berel (`sync_enabled=TRUE`) + verificar `notion_ops` Berel + conformed downstream.
-5. Cerrar TASK-1000. Rollback < 5 min: flag OFF + redeploy o traffic a `00019-fgp`.
+`parity_check_task1003.py --sample 5` (full, sin escribir BQ) → **PARIDAD TOTAL** en los 7 tables. Endpoint viejo (`/databases`@2022-06-28) vs canónico (`/data_sources`@2026-03-11), conteos full:
+
+| Tenant/tabla | row count | page_id set | last_edited+borrado | firma props | raw_props muestra |
+| --- | --- | --- | --- | --- | --- |
+| efeonce/tareas | 1374 | ✅ idéntico | ✅ | ✅ | 0 diff |
+| efeonce/proyectos | 66 | ✅ | ✅ | ✅ | 0 diff |
+| efeonce/sprints | 19 | ✅ | ✅ | ✅ | 0 diff |
+| efeonce/revisiones | 86 | ✅ | ✅ | ✅ | 0 diff |
+| sky/tareas | 4118 | ✅ | ✅ | ✅ | 0 diff |
+| sky/proyectos | 88 | ✅ | ✅ | ✅ | 0 diff |
+| sky/sprints | 16 | ✅ | ✅ | ✅ | 0 diff |
+
+Exit 0 = **seguro flipear el flag**. (Re-correr este gate justo antes del flip en Slice 3 para foto fresca.)
+
+### Slice 3 — config viva de `00019-fgp` (SSOT del deploy reconciliado)
+
+Capturada read-only (`gcloud run services describe`). Lo que el deploy DEBE preservar (sino se cae el path per-space/PG):
+
+- **Env plain:** `BQ_DATASET`, `BQ_LOCATION`, `BQ_RAW_SNAPSHOT_TABLE`, `BQ_SPACE_NOTION_TABLE`, `NOTION_DB_{TAREAS,PROYECTOS,SPRINTS,REVISIONES}`, `NOTION_MAX_RETRIES`, `NOTION_BACKOFF_BASE_SECONDS`, `NOTION_BACKOFF_MAX_SECONDS`, `NOTION_PER_SPACE_TOKEN_ENABLED=true`, `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev`, `GREENHOUSE_POSTGRES_DB=greenhouse_app`, `GREENHOUSE_POSTGRES_USER=greenhouse_app`
+- **Secrets:** `NOTION_TOKEN→notion-token:latest`, `GREENHOUSE_POSTGRES_PASSWORD→greenhouse-pg-dev-app-password:latest`
+- **SA:** `183008134038-compute@developer.gserviceaccount.com` · maxScale 3 · sin mount cloudsql (Python Connector).
+
+### Slice 3 — comandos canónicos del cutover (NEEDS operator go-ahead, payroll-crítico)
+
+Mecanismo robusto: `gcloud run deploy --source --update-env-vars` (**merge**, preserva env+secrets; NUNCA `deploy.sh --env-vars-file` que reemplaza). Deploy con flag **OFF primero** (cero cambio) → smoke → flip ON → smoke → Berel.
+
+```bash
+cd /Users/jreye/Documents/notion-bigquery   # rama task/TASK-1003-notion-data-sources-endpoint
+
+# 1) Paridad fresca (debe dar PARIDAD TOTAL)
+export TOK_GLOBAL="$(gcloud secrets versions access latest --secret=notion-token --project=efeonce-group)"
+python3 parity_check_task1003.py            # exit 0
+
+# 2) Deploy nuevo código con flag OFF (merge preserva per-space+PG+secrets) → comportamiento idéntico a hoy
+gcloud run deploy notion-bq-sync --source . --region=us-central1 --project=efeonce-group \
+  --update-env-vars NOTION_DATA_SOURCES_ENDPOINT_ENABLED=false
+# smoke: GET health → 2 spaces (Efeonce+Sky); corrida manual → 0 errores
+
+# 3) Flip ON (sin rebuild) → smoke Efeonce/Sky por el endpoint nuevo
+gcloud run services update notion-bq-sync --region=us-central1 --project=efeonce-group \
+  --update-env-vars NOTION_DATA_SOURCES_ENDPOINT_ENABLED=true
+# smoke: corrida manual → row counts == paridad, 0 errores
+
+# 4) Re-habilitar Berel + verificar
+#   UPDATE greenhouse_core.space_notion_sources SET sync_enabled=TRUE
+#     WHERE space_id='space-cli-0863869c-eaac-4630-9bd0-af283c56f7fb';
+#   corrida → notion_ops con data de Berel + conformed downstream (ops-worker runNotionSyncOrchestration)
+
+# ROLLBACK <5min (cualquier punto):
+gcloud run services update notion-bq-sync --region=us-central1 --project=efeonce-group \
+  --update-env-vars NOTION_DATA_SOURCES_ENDPOINT_ENABLED=false
+#   o traffic a la revisión previa:
+# gcloud run services update-traffic notion-bq-sync --region=us-central1 --to-revisions=notion-bq-sync-00019-fgp=100
+```
+
+5. Cerrar TASK-1000 (re-habilitar Berel desbloqueado). Verificar conformed downstream para Berel (ojo propiedades custom → Out of Scope, template L1).

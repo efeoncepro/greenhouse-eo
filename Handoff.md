@@ -16,7 +16,9 @@ Migración `notion-bq-sync` al endpoint canónico `/v1/data_sources/{id}/query` 
 
 **Slice 1 ✅ (repo hermano, commit `f5d93f7`):** resolver `resolve_data_source_id` (try data_source→fallback databases[0], fail-fast multi-source, hereda token per-space) + endpoint/version flag-gated + `in_trash` fallback + 404 fail-fast. **Todo detrás de `NOTION_DATA_SOURCES_ENDPOINT_ENABLED` (OFF) → sync bit-for-bit con hoy.** Test de invariantes verde + existente sin regresión + `py_compile` OK.
 
-**Slice 2 ✅ (commit `42388c4`):** `parity_check_task1003.py` (stdlib, read-only, no escribe BQ) — gate row count + page_ids + campos clave + firma de props. Corrida full = en Slice 3 pre-cutover.
+**Slice 2 ✅ (commit `42388c4`) + PARIDAD FULL VERDE:** `parity_check_task1003.py` (stdlib, read-only, no escribe BQ). Corrida full 2026-06-03 → **PARIDAD TOTAL** los 7 tables (Efeonce tareas 1374/proyectos 66/sprints 19/revisiones 86; Sky tareas 4118/proyectos 88/sprints 16): row count + page_id set + last_edited+borrado + firma props + raw_props muestra, cero diff. Exit 0.
+
+**Config viva `00019-fgp` capturada (SSOT deploy):** env per-space (`NOTION_PER_SPACE_TOKEN_ENABLED=true` + `GREENHOUSE_POSTGRES_*`) + secrets (`notion-token`, `greenhouse-pg-dev-app-password`) + SA `183008134038-compute@`. Deploy robusto = `gcloud run deploy --source --update-env-vars` (merge, preserva todo). Comandos canónicos del cutover en la spec.
 
 **⚠️ Gotcha Slice 3:** `.env.yaml` es gitignored y `deploy.sh` usa `--env-vars-file` (reemplaza todo). Las vars per-space de TASK-1000 están manuales en `00019-fgp`, NO en `.env.yaml` → deploy ciego las borra. Slice 3 debe reconciliar env+secrets antes de desplegar (el default OFF del flag vive en código, así que el código es seguro).
 
