@@ -10,6 +10,7 @@ import { writeSpaceNotionSourcesFromIntent, type NotionConnectIntent } from '@/l
 import { toCanonicalSpaceType } from '@/lib/client-onboarding/form-helpers'
 import { allocateSpaceNumericCode } from '@/lib/services/allocate-space-numeric-code'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { writeTeamsChannelFromAnchor } from '@/lib/client-onboarding/teams-connect-store'
 import { fillMissingFinanceProfileForExistingClient, instantiateClientForParty } from '@/lib/commercial/party/commands/instantiate-client-for-party'
 import { promoteParty } from '@/lib/commercial/party/commands/promote-party'
 import { OrganizationAlreadyHasClientError } from '@/lib/commercial/party/types'
@@ -304,6 +305,23 @@ export const provisionClientFromWizard = async (
         const written = await writeSpaceNotionSourcesFromIntent(spaceId, input.notionConnectIntent, input.triggeredByUserId, client)
 
         notionConnected = written.ok
+      }
+
+      // TASK-1010 — materializa el canal de Teams anclado → teams_notification_channels
+      // (scopeado al Space). Best-effort + SAVEPOINT: si degrada (sin channel_id o bot secret
+      // ausente), NO rompe el alta — el ítem provision_communication_channels queda para
+      // completar el canal. Inline (no async) por consistencia con el write de Notion.
+      if (spaceId && input.teamsAnchor?.teamId) {
+        await writeTeamsChannelFromAnchor(
+          spaceId,
+          {
+            teamId: input.teamsAnchor.teamId,
+            teamName: input.teamsAnchor.teamName,
+            channelId: input.teamsAnchor.channelId,
+            channelName: input.teamsAnchor.channelName
+          },
+          client
+        )
       }
     }
 

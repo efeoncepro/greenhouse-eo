@@ -3484,6 +3484,7 @@ export interface GreenhouseCoreTeamsNotificationChannels {
    */
   recipient_user_id: string | null;
   secret_ref: string;
+  space_id: string | null;
   team_id: string | null;
   updated_at: Generated<Timestamp>;
 }
