@@ -134,7 +134,8 @@ Trigger semi-automático §11.1: deal closed-won → abre onboarding case `statu
 - Slice 2 FinanceFacetDrawer (drawer→facet + botón global→wizard) + GVC del mockup aprobado.
 - Slice 3 webhook deal + **e2e verificado contra DB real** (HMAC→classify→delegate→processClosedWonDeal→case draft + control negativo + cleanup) + subscription deal LIVE (Build #26).
 - **Channel-level Teams** + **Graph perms**: ya resueltos por TASK-998 (scope stale del spec) — el panel elige equipo→canal; el bot lista con perms actuales (sin `Group.Read.All`).
-- **Invitación al portal**: e2e verificada + **bug latente ISSUE-084 detectado y fixeado** (INSERT sin `user_id` + `auth_mode` inválido; afectaba onboarding + `/api/admin/invite`). Fix del lifecycle invite→activación + guard de regresión.
+- **Readiness Notion PRD** (scope stale): ya funciona — el onboarding usa **token scoped por cliente** (TASK-998), `NotionConnectPanel` → `/notion/validate` → `discoverNotionDatabasesForToken` valida + clasifica las DBs del cliente **al instante**. El item "conectar Greenhouse PRD + Graph Group.Read.All" era del modelo viejo (integración compartida), superseded por el token-por-teamspace. NO se hace de nuevo.
+- **Invitación al portal**: e2e verificada + **bug latente ISSUE-084 detectado y fixeado** (INSERT sin `user_id` + `auth_mode` inválido; afectaba onboarding + `/api/admin/invite`). Fix del lifecycle invite→activación + guard de regresión. **Invitación real a `creative@efeoncepro.com` ENVIADA vía staging** (HTTP 200, `userId:e9feae0e`, email con link de staging para activar contra el código fixeado).
 
 **🔒 Operator-gated / release (lo que falta — al release conjunto):**
 - **Suscripción webhook deal en HubSpot**: ✅ ya hecha (Build #26). Falta el flip `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` en prod (al release).
