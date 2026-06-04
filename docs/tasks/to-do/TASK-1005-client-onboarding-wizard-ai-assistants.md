@@ -1,5 +1,10 @@
 # TASK-1005 — Client Onboarding Wizard AI Assistants
 
+## Delta 2026-06-04 — desbloqueada (TASK-1006 complete)
+
+TASK-1006 cerró: los campos financieros del wizard (billing_address/country, requires_po/hes, current_po/hes_number, special_conditions) + clients.country_code **ahora persisten** en `client_profiles`. El AI Preflight ya puede razonar/sugerir sobre esos campos sin que el runtime los descarte. `Blocked by` resuelto.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -403,3 +403,22 @@ N/A — repo-only change. No requiere GCP/Vercel secrets, HubSpot config, Notion
 ## Open Questions
 
 - En cliente existente con valor distinto no-vacio, ¿el wizard debe bloquear, mostrar warning o abrir una accion auditada de overwrite? Recomendacion V1: no overwrite silencioso.
+
+## Cierre (2026-06-04, en develop sin branch por pedido del operador)
+
+5 slices entregados (commits en develop):
+- **Slice 1** (`6dad7c43d`) — contract + payload: handleSubmit envía los 7 campos; route parsea con `trimToNull`; `ProvisionClientFromWizardInput.finance` modela los 7.
+- **Slice 2** (`31ad6e4e4`) — persistir: `+country` al SELECT de `selectOrganizationForLifecycleUpdate`; `instantiateClientForParty.financeProfile`; INSERT `client_profiles` persiste los 7 (requires_po/hes ya no hardcode FALSE); INSERT `clients` setea `country_code = organization.country`; INSERT reescrito con params secuenciales.
+- **Slice 3** (`f27ce8c89`) — cliente existente: helper `fillMissingFinanceProfileForExistingClient` (anti-data-loss, solo null/vacío); wire en el catch.
+- **Slice 4** (`8c0ce0ae5`) — truthfulness: SummaryRows de los 5 campos en Confirmar; copy es-CL.
+- **Slice 5** (`a43c0b716`) — live test extendido (assert los 7 + country_code) + arch Delta.
+
+**Verificación (HARD RULE no-regresión cumplida):**
+- Live test rollback-wrapped contra PG real: **2 verde** — alta completa (org+client+profile+space+case) + los 7 campos persistidos + `clients.country_code='MX'` + path cliente existente. Nada queda en DB.
+- `pnpm test` full suite: **5963 passed, 0 failed**.
+- `pnpm local:check:ui`: lint + tsc + build verde (wizard 'use client' compila).
+- Sin DDL (columnas ya existían). Sin nuevos endpoints/capabilities/events/signals.
+
+**Open Question resuelta (V1):** cliente existente con valor distinto no-vacío → NO overwrite silencioso; solo llenar null/vacío. Overwrite intencional = command auditado separado (follow-up).
+
+**Pendiente menor (no bloqueante):** GVC del wizard end-to-end en localhost — el live test + build cubren el flujo; el GVC visual del resumen Confirmar queda recomendado al levantar `pnpm dev` (la copy es aditiva, bajo riesgo). **Desbloquea TASK-1005** (AI preflight ya puede razonar sobre campos que el runtime persiste).

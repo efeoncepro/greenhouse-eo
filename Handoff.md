@@ -1,3 +1,18 @@
+# Sesion 2026-06-04 (cont.) — TASK-1006 ✅ persistencia del perfil financiero del wizard de alta (en develop, 5 slices)
+
+Implementada end-to-end en `develop` (sin branch, por pedido del operador). El paso Finanzas del wizard capturaba campos que se descartaban al confirmar → ahora persisten en `client_profiles`, y los **3 campos de país** quedan llenos.
+
+- **Slice 1** (`6dad7c43d`) contract+payload · **Slice 2** (`31ad6e4e4`) persistir + `clients.country_code` · **Slice 3** (`f27ce8c89`) cliente existente anti-data-loss · **Slice 4** (`8c0ce0ae5`) truthfulness en Confirmar · **Slice 5** (`a43c0b716`) live test + arch Delta.
+- **Audit finding clave:** `selectOrganizationForLifecycleUpdate` NO seleccionaba `country` (mi spec lo asumía); se agregó `country` al SELECT + tipo (additive, promoteParty no lo consume).
+- **Open Question resuelta (V1):** cliente reusado con valor distinto no-vacío → NO overwrite silencioso; solo llenar null/vacío. Overwrite intencional = command auditado aparte.
+- **HARD RULE no-regresión cumplida:** live test rollback-wrapped contra PG real (2 verde — alta completa org+client+profile+space+case + 7 campos persistidos + `clients.country_code='MX'`), `pnpm test` full **5963 passed / 0 failed**, `pnpm local:check:ui` (lint+tsc+build) verde. Sin DDL, sin endpoints/capabilities/events/signals nuevos.
+- **Desbloquea TASK-1005** (AI preflight ya razona sobre campos que el runtime persiste).
+- **Pendiente menor:** GVC del wizard end-to-end en localhost (copy aditiva, bajo riesgo; live test + build cubren el flujo).
+
+**Orden EPIC-CLIENT-360 restante:** TASK-1009 (preflight onboarding) → TASK-1005 (AI assistants, ya desbloqueada) → TASK-999 (logos, off critical path).
+
+---
+
 # Sesion 2026-06-04 (cont.) — Sistematización onboarding clientes: TASK-998 ✅ cerrada (triage) + TASK-1008 ✅ (gate sprints opcional) + TASK-1009/1008 creadas
 
 Orden de avance acordado para EPIC-CLIENT-360 (998→1008→1006→1009→1005→999). Avanzado:
