@@ -1,3 +1,15 @@
+# Sesion 2026-06-04 (cont.) — Sistematización onboarding clientes: TASK-998 ✅ cerrada (triage) + TASK-1008 ✅ (gate sprints opcional) + TASK-1009/1008 creadas
+
+Orden de avance acordado para EPIC-CLIENT-360 (998→1008→1006→1009→1005→999). Avanzado:
+
+- **TASK-998 ✅ complete (triage):** linking token-por-teamspace ya shippeó + su bloqueador (TASK-1000) resuelto → Berel sincroniza end-to-end. Slices 0/1 (`/discover`+heurístico) **superseded** por el modelo token-scoped; forward-looking (Teams self-serve, crear teamspace L1) diferido. Cerrada cumpliendo sus propios criterios.
+- **TASK-1008 ✅ complete:** gate de readiness del conformed (`evaluateNotionRawFreshnessGate`) relajado — `tareas`+`proyectos` requeridos, **`sprints` opcional** (frescura solo si rowCount>0). Mata la trampa del cliente de contenido sin sprints (que vivió Berel: el gate exigía las 3 DBs → invisible hasta meter un sprint postizo). Fix-once: el próximo content client entra sin sprint. Efeonce/Sky bit-for-bit (test #1). 4 tests focales + blast-radius (20) verde. Slice 2 verificado (el mirror `isSpaceFreshEnough` no re-imponía sprints).
+- **TASK-1008 + TASK-1009 creadas** (sistematización del onboarding Notion): 1008 hecha; 1009 (preflight end-to-end + validador template L1 enganchado al checklist `standard_onboarding_v1`) queda en backlog.
+
+**Siguiente en el orden:** TASK-1006 (finance fields persistence, desbloquea 1005) → TASK-1009 (preflight) → TASK-1005 (AI assistants) → TASK-999 (logos, off critical path).
+
+---
+
 # Sesion 2026-06-04 (cont.) — TASK-1007 ✅ notion freshness: last_synced_at de Berel NULL → fuente canónica raw (no mirror BQ legacy)
 
 Segundo cabo de la deuda del mirror BQ legacy (mismo que TASK-1004, ahora lado escritura de freshness). `greenhouse_core.space_notion_sources.last_synced_at` quedaba **NULL para siempre** en clientes nuevos: `getNotionFreshnessFromBigQuery` leía el `last_synced_at` del mirror BQ `greenhouse.space_notion_sources` (solo Efeonce/Sky; greenhouse-eo ya no lo escribe). Berel ausente del mirror → nunca entraba al reconcile.
