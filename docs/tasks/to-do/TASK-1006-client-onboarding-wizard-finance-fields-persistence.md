@@ -38,11 +38,24 @@ Análisis con skills sobre el código real ANTES de implementar. El diagnóstico
 **Afinamientos a los slices (ver detalle en cada Slice abajo):**
 
 1. **Slice 1 — validación PO/HES (forms-ux):** cuando `requiresPo=true`, `poNumber` queda **opcional, NO bloqueante** (el operador puede no tener el N° aún al onboardear; el alta no debe frenarse). Persistir lo que haya; trim → null. Idem HES.
-2. **Slice 2 — `billing_country`:** persistir el `CountryCode` ya auto-derivado, no recomputar. **NO** confundir con los otros 2 campos de país (ver nota SSOT abajo).
+2. **Slice 2 — países (AMBOS):** persistir `client_profiles.billing_country` (del wizard, ya auto-derivado) **Y** `clients.country_code` ← `organization.country` (derivado en el mismo INSERT de `clients`, sin input nuevo). Los 3 campos de país quedan llenos (ver nota SSOT abajo).
 3. **Slice 4 — re-scope a "agregar al resumen Confirmar":** los 5 campos persistibles se muestran en Confirmar (no solo "no ocultar"). Copy es-CL claro para OC/HES = "número vigente del perfil", no entidad PO/HES.
 4. **Anti-regresión = el live test** (overlay arch #8): este es un write **síncrono** del wizard, no un path async → la red de seguridad canónica es el `provision-client-from-wizard.live.test.ts` (UI payload → `client_profiles`), NO un reliability signal (sería over-engineering). El spec ya lo tiene; afirmado.
 
-**⚠️ Nota SSOT — 3 campos de país NO son el mismo (arch):** existen tres y NO deben conflarse — `organizations.country` (país legal/HQ, hoy `MX` para Berel), `clients.country_code` (país del cliente, hoy **vacío** para Berel) y `client_profiles.billing_country` (país de facturación). **TASK-1006 owns SOLO `client_profiles.billing_country`.** Que `clients.country_code` esté vacío es un gap **separado** (territorio TASK-991 org-write SSOT), **fuera de scope** — NO mezclarlo en este fix.
+**⚠️ Los 3 campos de país DEBEN quedar llenos (arch — decisión del operador 2026-06-04):** existen tres campos distintos, NO redundantes, pero **ninguno debe quedar vacío** en un cliente bien onboardeado:
+
+- `organizations.country` — país legal/HQ de la organización. **SSOT del default.** Hoy `MX` (Berel). Ya se llena (wizard/TASK-991).
+- `clients.country_code` — país del cliente. Hoy **vacío** (Berel). Por defecto = país de la org.
+- `client_profiles.billing_country` — país de facturación. Hoy **vacío** (Berel). Por defecto = país de la org; **puede diferir** (facturar desde otra entidad/país).
+
+En el caso normal los 3 = el país de la organización; se modelan separados porque `billing_country` puede legítimamente diferir.
+
+**Decisión: TASK-1006 llena AMBOS campos vacíos en el mismo write atómico** (antes marcado `clients.country_code` fuera de scope — corregido). El helper `instantiateClientForParty` **ya tiene la fila `organization` en mano** (selección al inicio de la tx) con su `country` → derivar `clients.country_code = organization.country` en el INSERT de `clients` es trivial y coherente (sería incoherente arreglar `billing_country` y dejar el de al lado vacío). NO requiere campo nuevo en el wizard: `clients.country_code` deriva del país de la org (SSOT), NO del formulario. Solo `billing_country` viene del wizard (y ya auto-deriva del país de la org en la UI, overridable).
+
+- `clients.country_code` ← `organization.country` (derivado, sin input nuevo).
+- `client_profiles.billing_country` ← `finance.billingCountry` del wizard.
+
+**Sigue fuera de scope:** reconciliar valores ya existentes en clientes reusados con un override auditado (regla anti-data-loss del Slice 3 aplica: solo llenar si está vacío).
 
 ## Why This Task Exists
 
@@ -110,6 +123,8 @@ Reglas obligatorias:
   - `finance_contacts`
   - `payment_terms_days`
   - `payment_currency`
+- `greenhouse_core.clients` column (Delta 2026-06-04):
+  - `country_code` (derivado de `organization.country` en el INSERT de clients)
 
 ### Blocks / Impacts
 
@@ -203,8 +218,9 @@ Reglas obligatorias:
   - `current_po_number`
   - `current_hes_number`
   - `special_conditions`
+- **Llenar `clients.country_code` en el INSERT de `greenhouse_core.clients`** (Delta 2026-06-04): derivar de `organization.country` (la fila `organization` ya está en mano en la tx, `instantiate-client-for-party.ts:70`). NO requiere input nuevo del wizard. Hoy ese INSERT (`instantiate-client-for-party.ts:89-108`) NO setea `country_code` → queda NULL. Anti-data-loss: solo setear si el valor entrante (org country) es no-vacío.
 - Preservar default existing behavior cuando no vienen campos.
-- Agregar tests unitarios/focales del helper.
+- Agregar tests unitarios/focales del helper (incluir assert de `clients.country_code = organization.country`).
 
 ### Slice 3 — Existing client completion path
 
@@ -250,6 +266,7 @@ Campos UI -> DB esperados:
 | `paymentTermsDays` | existing | `client_profiles.payment_terms_days` |
 | `currency` | existing | `client_profiles.payment_currency` |
 | `contacts` | existing | `client_profiles.finance_contacts` |
+| _(derivado)_ `organization.country` | — (no wizard input) | `clients.country_code` |
 
 Recommended type shape:
 
@@ -331,8 +348,9 @@ N/A — repo-only change. No requiere GCP/Vercel secrets, HubSpot config, Notion
 - [ ] `provision/route.ts` parsea/sanitiza esos campos sin aceptar tipos ambiguos.
 - [ ] `provisionClientFromWizard` modela y pasa los campos financieros al helper canonico.
 - [ ] `instantiateClientForParty` persiste los campos en `greenhouse_finance.client_profiles` para clientes nuevos.
+- [ ] `instantiateClientForParty` setea `clients.country_code` derivado de `organization.country` (los 3 campos de país quedan llenos, ninguno NULL).
 - [ ] El path de cliente existente completa campos faltantes sin borrar valores existentes.
-- [ ] Live test verifica al menos `billing_address`, `billing_country`, `requires_po`, `current_po_number`, `requires_hes`, `current_hes_number`, `special_conditions`.
+- [ ] Live test verifica al menos `billing_address`, `billing_country`, `requires_po`, `current_po_number`, `requires_hes`, `current_hes_number`, `special_conditions` **y `clients.country_code`**.
 - [ ] La UI/copy no sugiere que se creen entidades PO/HES formales.
 
 ## Verification
