@@ -10,6 +10,7 @@ Promoción del mockup aprobado del Workforce Contracting Studio a runtime real. 
 - **GVC loop ✅** (`1e982c966`): scenario runtime captura las 3 superficies; el loop atrapó + corrigió badge "(Próximamente)" obsoleto + 2 violaciones axe color-contrast. Captura final **OK · 0 violaciones**. Paridad real `pass|fail|unknown`.
 - **Gate de cierre**: `pnpm test` + `pnpm build` full corriendo; mover a `complete/` + push tras verdes.
 - La migración del viewCode YA está aplicada al Cloud SQL compartido.
+- **IA encendida en staging (decisión operador 2026-06-05)**: `WORKFORCE_CONTRACTING_AI_ENABLED=true` en **Preview (develop) + Development** (Vercel) + redeploy staging. **Producción queda OFF** (gate de revisión legal de calidad de borrador). El secret `greenhouse-anthropic-api-key` **NO se rotó** — el operador decidió rotarlo al **cerrar todo el epic** (override explícito de la regla CLAUDE.md "rotar antes de habilitar el flag"; riesgo acotado: staging SSO-protegido). ⚠️ **Pendiente al cierre del epic: rotar la key.** Con el flag ON, el "Generar borrador IA" del Bilingual Review ya llama a Claude en staging.
 
 # Sesion 2026-06-05 (cont.) — TASK-1019 ✅ foundation implementada (5 slices, en `develop` sin push)
 
