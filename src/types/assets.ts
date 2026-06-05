@@ -17,6 +17,8 @@ export type GreenhouseAssetRetentionClass =
   | 'tooling_supporting_doc'
   | 'hr_certification'
   | 'hr_evidence'
+  // TASK-1023 — labor contracts / offer letters; long retention (5yr+ post-termination).
+  | 'workforce_contract'
   // TASK-791 — Contractor invoice / work evidence retention classes. Provider
   // invoice/payout statements reuse the existing `provider_supporting_doc`.
   | 'contractor_invoice'
@@ -52,6 +54,8 @@ export type GreenhouseAssetContext =
   | 'provider_invoice_draft'
   | 'provider_invoice'
   | 'provider_payout_statement'
+  // TASK-1023 — Workforce Contracting Studio signable document (offer letter / employment contract).
+  | 'workforce_contracting_document'
 
 export interface GreenhouseAssetRecord {
   assetId: string

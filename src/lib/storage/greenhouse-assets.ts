@@ -106,7 +106,9 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   contractor_work_evidence: 'contractor_work_evidence',
   provider_invoice_draft: 'provider_supporting_doc',
   provider_invoice: 'provider_supporting_doc',
-  provider_payout_statement: 'provider_supporting_doc'
+  provider_payout_statement: 'provider_supporting_doc',
+  // TASK-1023 — Workforce Contracting signable document (offer letter / employment contract).
+  workforce_contracting_document: 'workforce_contract'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -138,7 +140,9 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   contractor_work_evidence: 'contractor-work-evidence',
   provider_invoice_draft: 'provider-invoices',
   provider_invoice: 'provider-invoices',
-  provider_payout_statement: 'provider-payout-statements'
+  provider_payout_statement: 'provider-payout-statements',
+  // TASK-1023 — Workforce Contracting signable document bucket prefix.
+  workforce_contracting_document: 'workforce-contracting-documents'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -677,7 +681,7 @@ export const upsertSystemGeneratedAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -790,7 +794,7 @@ export const storeSystemGeneratedPrivateAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -910,6 +914,20 @@ const canAccessProviderSupportingAsset = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'finance') ||
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
+// TASK-1023 — Workforce Contracting signable document: the subject collaborator (own member),
+// HR, Finance, or admin. The /my collaborator surface resolves pre-hire offers by identity_profile.
+const canAccessWorkforceContractingDocumentAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord) => {
+  if (asset.ownerMemberId && tenant.memberId && asset.ownerMemberId === tenant.memberId) {
+    return true
+  }
+
+  return (
+    hasRouteGroup(tenant, 'hr') ||
+    hasRouteGroup(tenant, 'finance') ||
+    hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  )
+}
+
 export const canTenantAccessAsset = ({
   tenant,
   asset
@@ -955,6 +973,9 @@ export const canTenantAccessAsset = ({
     case 'provider_invoice':
     case 'provider_payout_statement':
       return canAccessProviderSupportingAsset(tenant)
+    // TASK-1023 — Workforce Contracting signable document.
+    case 'workforce_contracting_document':
+      return canAccessWorkforceContractingDocumentAsset(tenant, asset)
     default:
       return false
   }

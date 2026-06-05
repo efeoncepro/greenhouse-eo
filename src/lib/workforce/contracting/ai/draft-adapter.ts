@@ -113,6 +113,8 @@ export interface ContractingAiDeps {
     outputHash: string
     usageJson: Record<string, unknown>
     createdByUserId: string
+    // TASK-1023 — sanitised document-necessary facts (packet.facts) persisted on the draft.
+    capturedFacts: Record<string, unknown>
   }) => Promise<{ draftId: string }>
   persistFailure: (input: { aiRunId: string; errorSummary: string }) => Promise<void>
 }
@@ -121,10 +123,19 @@ const defaultDeps: ContractingAiDeps = {
   isEnabled: isWorkforceContractingAiEnabled,
   generate: generateStructuredAnthropic,
   recordRun: createContractingAiRun,
-  persistSuccess: async ({ aiRunId, caseId, structuredContent, parityStatus, outputHash, usageJson, createdByUserId }) =>
+  persistSuccess: async ({
+    aiRunId,
+    caseId,
+    structuredContent,
+    parityStatus,
+    outputHash,
+    usageJson,
+    createdByUserId,
+    capturedFacts
+  }) =>
     withGreenhousePostgresTransaction(async client => {
       const draft = await createWorkforceContractingDraft(
-        { caseId, structuredContent, createdByUserId, source: 'claude_ai' },
+        { caseId, structuredContent, createdByUserId, source: 'claude_ai', capturedFacts },
         client
       )
 
@@ -204,7 +215,9 @@ export const runContractingAiDraft = async (
       parityStatus: prepared.parityStatus,
       outputHash: hashStructuredContent(result.data),
       usageJson: { inputTokens: result.usage.inputTokens, outputTokens: result.usage.outputTokens },
-      createdByUserId: input.createdByUserId
+      createdByUserId: input.createdByUserId,
+      // Persist the sanitised document-necessary facts (allowlist) for the PDF render termscard.
+      capturedFacts: packet.facts
     })
 
     return {

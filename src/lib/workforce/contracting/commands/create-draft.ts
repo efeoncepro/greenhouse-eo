@@ -30,6 +30,12 @@ export interface CreateWorkforceContractingDraftInput {
   source?: WorkforceContractingDraftSource
   validationSnapshot?: WorkforceContractingValidationResult | null
   languageParitySnapshot?: Record<string, unknown> | null
+  /**
+   * TASK-1023 — structured captured facts (the sanitised ALLOWED_FACT_CODES allowlist that
+   * produced this draft). Persisted as `captured_facts_json` so the PDF render reads structured
+   * terms (offer termscard) instead of parsing prose. Nullable for manual drafts without facts.
+   */
+  capturedFacts?: Record<string, unknown> | null
   /** Optional AI run to link (set by the Claude adapter, Slice 3). */
   aiRunId?: string | null
 }
@@ -100,8 +106,9 @@ const createDraft = async (
     await client.query(
       `INSERT INTO greenhouse_hr.workforce_contracting_drafts (
          draft_id, case_id, draft_version, source, status, structured_content_json,
-         validation_snapshot_json, language_parity_snapshot_json, content_hash, created_by_user_id
-       ) VALUES ($1, $2, $3, $4, 'draft', $5::jsonb, $6::jsonb, $7::jsonb, $8, $9)`,
+         validation_snapshot_json, language_parity_snapshot_json, content_hash, created_by_user_id,
+         captured_facts_json
+       ) VALUES ($1, $2, $3, $4, 'draft', $5::jsonb, $6::jsonb, $7::jsonb, $8, $9, $10::jsonb)`,
       [
         draftId,
         input.caseId,
@@ -111,7 +118,8 @@ const createDraft = async (
         input.validationSnapshot ? JSON.stringify(input.validationSnapshot) : null,
         input.languageParitySnapshot ? JSON.stringify(input.languageParitySnapshot) : null,
         contentHash,
-        input.createdByUserId
+        input.createdByUserId,
+        input.capturedFacts ? JSON.stringify(input.capturedFacts) : null
       ]
     )
 

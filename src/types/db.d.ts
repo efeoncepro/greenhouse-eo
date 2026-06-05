@@ -6570,9 +6570,31 @@ export interface GreenhouseHrWorkforceContractingCases {
   operating_entity_organization_id: string;
   pay_regime_snapshot: string | null;
   payroll_via_snapshot: string | null;
+  /**
+   * TASK-1023 - rendered (unsigned) signable PDF private asset (greenhouse_core.assets). Auto-regen per status.
+   */
+  pdf_asset_id: string | null;
+  /**
+   * TASK-1023 - SHA-256 of the rendered PDF bytes (reproducibility/verification).
+   */
+  pdf_content_hash: string | null;
+  /**
+   * TASK-1023 - immutable facts snapshot (employer + worker + terms + structured content) captured at first render; reused for re-renders so an approved document never changes if identities change later (OQ1).
+   */
+  pdf_facts_snapshot: Json | null;
+  pdf_generated_at: Timestamp | null;
+  /**
+   * TASK-1023 - case status when the PDF was last rendered (drift detection vs asset metadata documentStatusAtRender).
+   */
+  pdf_status_at_render: string | null;
+  pdf_template_version: string | null;
   required_languages: Generated<string[]>;
   signable_format: Generated<string>;
   signature_provider: Generated<string>;
+  /**
+   * TASK-1023 (reserved, populated by TASK-1024) - signed PDF artifact returned by ZapSign.
+   */
+  signed_pdf_asset_id: string | null;
   source_offer_case_id: string | null;
   status: string;
   subject_identity_profile_id: string;
@@ -6586,6 +6608,10 @@ export interface GreenhouseHrWorkforceContractingCases {
 export interface GreenhouseHrWorkforceContractingDrafts {
   approved_at: Timestamp | null;
   approved_by_user_id: string | null;
+  /**
+   * TASK-1023 - structured document-necessary facts (gross_amount, role_title, etc.) the PDF render reads for the offer termscard instead of parsing prose (OQ2). Nullable for manual drafts.
+   */
+  captured_facts_json: Json | null;
   case_id: string;
   content_hash: string;
   created_at: Generated<Timestamp>;
