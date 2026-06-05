@@ -48,17 +48,16 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Onboarding wizard (TASK-976) — reached via the "Nuevo contractor" primary CTA in the contractors workbench header (TASK-982 Slice 1). Create-action, not a standalone nav item.'
   },
   {
-    // TASK-992 Slice 2b — single front door wizard to onboard a client. Gated by
-    // CLIENT_LIFECYCLE_ONBOARDING_ENABLED (OFF by default → route 404s). The
-    // discoverable entry (a flag-gated "Alta de cliente" nav item / orgs header
-    // CTA) is wired in the nav follow-up once the flag is exposed to the menu
-    // client; meanwhile the route is reachable by direct URL + the Account 360
-    // deep-link. Create-action, not a standalone menu item.
+    // TASK-992 Slice 2b / TASK-1013 — single front door wizard to onboard a client.
+    // Gated by CLIENT_LIFECYCLE_ONBOARDING_ENABLED (OFF by default → route 404s).
+    // The discoverable entry is the onboarding cockpit (/agency/clients/onboarding,
+    // the flag-gated "Alta de cliente" nav item); the wizard is reached from the
+    // cockpit's primary "Nuevo cliente" CTA. Create-action, not a standalone menu item.
     route: '/agency/clients/new',
-    parent: '/agency/organizations',
+    parent: '/agency/clients/onboarding',
     via: 'header-cta',
     reason:
-      'Client onboarding wizard (TASK-992 Slice 2b) — single canonical front door, flag-gated (CLIENT_LIFECYCLE_ONBOARDING_ENABLED). Reached from the organizations workbench; discoverable nav entry wired in the nav follow-up.'
+      'Client onboarding wizard (TASK-992 Slice 2b) — single canonical front door, flag-gated (CLIENT_LIFECYCLE_ONBOARDING_ENABLED). Reached from the onboarding cockpit (TASK-1013) via its primary "Nuevo cliente" CTA.'
   },
   {
     // TASK-983 triage: legacy redirect-only page → /agency?tab=capacidad.

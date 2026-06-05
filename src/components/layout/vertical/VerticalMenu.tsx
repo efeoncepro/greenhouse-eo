@@ -204,7 +204,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_AGENCY_NAV.delivery), href: '/agency/delivery' },
               { label: nl(GH_AGENCY_NAV.campaigns), href: '/agency/campaigns' },
               { label: nl(GH_AGENCY_NAV.organizations), href: '/agency/organizations' },
-              { label: nl(GH_AGENCY_NAV.newClient), href: '/agency/clients/new', icon: 'tabler-user-plus' },
+              { label: nl(GH_AGENCY_NAV.newClient), href: '/agency/clients/onboarding', icon: 'tabler-user-plus' },
               { label: nl(GH_AGENCY_NAV.services), href: '/agency/services' },
               { label: nl(GH_AGENCY_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
               { label: nl(GH_AGENCY_NAV.operations), href: '/agency/operations' }
@@ -213,10 +213,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/agency/campaigns') return canSeeView('gestion.campanas', true)
               if (item.href === '/agency/organizations') return canSeeView('gestion.organizaciones', true)
 
-              // TASK-992 — single front door. Visible only where the lifecycle flag is
-              // ON (client-readable NEXT_PUBLIC mirror of CLIENT_LIFECYCLE_ONBOARDING_ENABLED),
-              // so the item never appears in an env where the page would 404.
-              if (item.href === '/agency/clients/new') {
+              // TASK-992 / TASK-1013 — onboarding front door. The nav item now points to
+              // the onboarding cockpit (/agency/clients/onboarding), which lists in-flight
+              // cases (incl. deal-trigger drafts) and keeps the wizard (/agency/clients/new)
+              // as its primary CTA. Visible only where the lifecycle flag is ON (client-readable
+              // NEXT_PUBLIC mirror of CLIENT_LIFECYCLE_ONBOARDING_ENABLED), so the item never
+              // appears in an env where the page would 404.
+              if (item.href === '/agency/clients/onboarding') {
                 return (
                   process.env.NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED === 'true' &&
                   canSeeView('gestion.organizaciones', true)
