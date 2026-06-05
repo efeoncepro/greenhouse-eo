@@ -57,6 +57,7 @@ import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contracto
 import { getContractingAiDraftFailedSignal } from './queries/contracting-ai-draft-failed'
 import { getContractingApprovedWithoutPdfSignal } from './queries/contracting-approved-without-pdf'
 import { getContractingPdfStatusDriftSignal } from './queries/contracting-pdf-status-drift'
+import { getContractingSignatureDesyncSignal } from './queries/contracting-signature-desync'
 import {
   getSignatureFailedSignal,
   getSignaturePendingOverdueSignal,
@@ -643,6 +644,8 @@ interface ReliabilityOverviewSources {
   contractingApprovedWithoutPdf?: ReliabilitySignal | null
   /** TASK-1023 — stale PDF watermark vs current case status. */
   contractingPdfStatusDrift?: ReliabilitySignal | null
+  /** TASK-1024 — signature completed/failed but the contracting case never advanced. */
+  contractingSignatureDesync?: ReliabilitySignal | null
   /** TASK-490 — signature orchestration signals (moduleKey 'documents'). */
   signaturePendingOverdue?: ReliabilitySignal | null
   signatureFailed?: ReliabilitySignal | null
@@ -992,6 +995,8 @@ export const buildReliabilityOverview = (
     ...(sources.contractingAiDraftFailed ? [sources.contractingAiDraftFailed] : []),
     ...(sources.contractingValidationBlockedOverdue ? [sources.contractingValidationBlockedOverdue] : []),
     ...(sources.contractingApprovedWithoutPdf ? [sources.contractingApprovedWithoutPdf] : []),
+    ...(sources.contractingPdfStatusDrift ? [sources.contractingPdfStatusDrift] : []), // TASK-1023 (was resolved+packed but not surfaced)
+    ...(sources.contractingSignatureDesync ? [sources.contractingSignatureDesync] : []), // TASK-1024
     // TASK-490 — Signature orchestration signals (moduleKey 'documents').
     ...(sources.signaturePendingOverdue ? [sources.signaturePendingOverdue] : []),
     ...(sources.signatureFailed ? [sources.signatureFailed] : []),
@@ -1479,6 +1484,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.contractingPdfStatusDrift
       : await getContractingPdfStatusDriftSignal().catch(() => null)
 
+  const contractingSignatureDesync =
+    preloadedSources.contractingSignatureDesync !== undefined
+      ? preloadedSources.contractingSignatureDesync
+      : await getContractingSignatureDesyncSignal().catch(() => null)
+
   const contractorPayableUnbatchedOverdue =
     preloadedSources.contractorPayableUnbatchedOverdue !== undefined
       ? preloadedSources.contractorPayableUnbatchedOverdue
@@ -1964,6 +1974,7 @@ export const getReliabilityOverview = async (
     contractingValidationBlockedOverdue,
     contractingApprovedWithoutPdf,
     contractingPdfStatusDrift,
+    contractingSignatureDesync,
     signaturePendingOverdue,
     signatureFailed,
     signatureSignedArtifactMissing,
