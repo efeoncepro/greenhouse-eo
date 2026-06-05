@@ -52,6 +52,7 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
   let checklist: LifecycleChecklistItemVm[] = []
   let notionAnchors: { notionDatabaseId: string; title: string }[] = []
   let teamsAnchor: { teamId: string; teamName: string } | null = null
+  let caseId: string | null = null
 
   try {
     const [timeline, name, activeCase] = await Promise.all([
@@ -64,6 +65,7 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
     organizationName = name ?? 'Cliente'
 
     if (activeCase) {
+      caseId = activeCase.caseId
       const items = await getChecklistItems(activeCase.caseId)
 
       checklist = items.map(item => ({
@@ -103,6 +105,7 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
       data={data}
       degraded={degraded}
       startOnboardingHref='/agency/clients/new'
+      caseId={caseId}
       checklist={checklist}
       notionAnchors={notionAnchors}
       teamsAnchor={teamsAnchor}

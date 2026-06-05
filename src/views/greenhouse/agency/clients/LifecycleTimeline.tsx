@@ -21,6 +21,7 @@ import CustomChip from '@core/components/mui/Chip'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { HubSpotIsotype } from '@/components/greenhouse/brand/BrandIsotypes'
 import { OperationalPanel } from '@/components/greenhouse/primitives'
+import { NotionPreflightPanel } from '@/views/greenhouse/agency/clients/NotionPreflightPanel'
 import { PortalUsersPanel } from '@/views/greenhouse/agency/clients/PortalUsersPanel'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
 import type {
@@ -142,6 +143,8 @@ interface Props {
   degraded?: boolean
   /** When set, the empty-state CTA links here (the single front door). */
   startOnboardingHref?: string
+  /** TASK-1009 — caso activo; alimenta el panel del preflight Notion (verify_notion_flowing). */
+  caseId?: string | null
   /** TASK-997 — checklist del caso activo (read-only). */
   checklist?: LifecycleChecklistItemVm[]
   /** TASK-997 — bases Notion ancladas (surface en provision_notion_workspace). */
@@ -156,6 +159,7 @@ const LifecycleTimeline = ({
   data,
   degraded,
   startOnboardingHref,
+  caseId,
   checklist,
   notionAnchors,
   teamsAnchor
@@ -263,6 +267,7 @@ const LifecycleTimeline = ({
                 const isNotion = item.itemCode === 'provision_notion_workspace'
                 const isTeams = item.itemCode === 'provision_communication_channels'
                 const isPortalUsers = item.itemCode === 'provision_client_users_access'
+                const isVerifyNotion = item.itemCode === 'verify_notion_flowing'
 
                 return (
                   <Box key={item.itemCode}>
@@ -318,6 +323,7 @@ const LifecycleTimeline = ({
                     <CustomChip round='true' size='small' variant='tonal' color={st.color} icon={<i className={st.icon} />} label={st.label} />
                   </Stack>
                   {isPortalUsers ? <PortalUsersPanel organizationId={organizationId} /> : null}
+                  {isVerifyNotion && caseId ? <NotionPreflightPanel caseId={caseId} /> : null}
                   </Box>
                 )
               })}

@@ -7,7 +7,7 @@ Cierre del último cabo del onboarding de cliente: la diferencia entre **"config
 - **CLI** read-only `pnpm notion:onboarding-preflight <spaceId> [--json]` (exit 1 si no listo, para gatear). **Signal** `integrations.notion.onboarding_incomplete` (moduleKey integrations.notion, data_quality, warning si >0, steady 0) — PG COUNT O(1), NO corre el preflight pesado por caso (anti-escalable). Wireado en `get-reliability-overview`.
 - **Verificado live (DoD):** Berel (`space-cli-0863869c-eaac-…`) → **9/9 verde, readyToOnboard SÍ** (prueba e2e de TASK-998/1004/1007/1008 de paso). Space inexistente → todo rojo, NO listo. tsc 0 · lint 0 · 10 focales + **suite 5993** + **build** verde.
 - **Migración ya aplicada** al Cloud SQL compartido (regenera tipos; aditiva e idempotente). **Local-first, sin push** — pendiente: push a develop + (cuando el user lo decida) deploy.
-- **Follow-up no bloqueante**: botón "Correr preflight" en el timeline del Account 360 (UI que llame al endpoint) — el endpoint + CLI + manual PATCH ya cubren la operación; la UI es loop GVC aparte.
+- **Follow-up UI ✅ (2026-06-04, GVC-verificado)**: `NotionPreflightPanel` en el ítem `verify_notion_flowing` del timeline (`/agency/clients/[organizationId]/lifecycle`) — botón "Correr preflight" → endpoint server-side → resultado con estados honestos (idle/verificando/fluye/no-fluye/error), críticos en rojo + advisory en ámbar. Vista de resultado extraída a `NotionPreflightResultView` (reusada por panel real + mockup, sin duplicar JSX). Loop GVC sobre mockup de data ficticia (`/agency/clients/mockup/notion-preflight` — **no toca clientes reales, Berel intacto**): 3 frames mirados, enterprise. Copy tokenizado `GH_CLIENT_ONBOARDING.notionPreflight`. tsc/eslint/design:lint/build verdes.
 
 ---
 

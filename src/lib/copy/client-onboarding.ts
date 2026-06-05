@@ -416,6 +416,27 @@ export const GH_CLIENT_ONBOARDING = {
     statusInvitedChip: 'Invitación enviada',
     statusErrorChip: 'No se pudo invitar',
     secretNote: 'Cada persona recibe un email para crear su contraseña. Su acceso queda limitado al portal de este cliente.'
+  },
+  // TASK-1009 — panel del preflight de onboarding Notion (ítem verify_notion_flowing).
+  notionPreflight: {
+    title: 'Verificar flujo al portal',
+    subtitle: 'Confirma que las tareas del cliente llegan al portal antes de cerrar el onboarding.',
+    idleHint: 'Corre el preflight para revisar la cadena completa, de Notion al portal. El paso se marca como completado solo si todo está en verde.',
+    runCta: 'Correr preflight',
+    runningCta: 'Verificando…',
+    rerunCta: 'Volver a correr',
+    advisoryTag: 'opcional',
+    readyTitle: 'El cliente fluye al portal',
+    readyBody: 'Todos los pasos críticos están en verde.',
+    advancedNote: 'Marcamos este paso como completado.',
+    notReadyTitle: 'Todavía no fluye',
+    notReadyBody: 'Revisa los pasos en rojo y arregla el eslabón. Volvé a correr el preflight cuando lo resuelvas.',
+    noSpaceTitle: 'Falta vincular el teamspace',
+    noSpaceBody: 'Este caso no tiene un teamspace Notion vinculado. Vinculalo antes de correr el preflight.',
+    errorTitle: 'No pudimos correr el preflight',
+    errorBody: 'Tuvimos un problema al verificar. Probá de nuevo en unos segundos.',
+    retryCta: 'Reintentar',
+    resultHint: 'Cada eslabón muestra su estado real. Los pasos opcionales no bloquean el cierre.'
   }
 } as const
 
