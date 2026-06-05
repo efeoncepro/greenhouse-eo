@@ -129,7 +129,12 @@ Reglas obligatorias:
 - EPIC-001 defines document registry, signature orchestration, ZapSign adapter and template rendering.
 - Notification Hub architecture defines future intent/delivery model.
 - Person 360 can become the user-facing evidence hub.
-- Product Design mockup route exists at `/hr/workforce/contracts/mockup` with three approved modes: Centro operativo, Flujo guiado and Revisión bilingüe. It is mock data only and must not be treated as runtime implementation.
+- Product Design mockup **ya commiteado** (pase Codex 2026-06-05), mock data only, no debe tratarse como runtime:
+  - Ruta: `src/app/(dashboard)/hr/workforce/contracts/mockup/page.tsx`.
+  - Vista + data: `src/views/greenhouse/hr/workforce-contracting/mockup/{WorkforceContractingStudioMockupView.tsx,data.ts}`.
+  - Copy: `src/lib/copy/workforce-contracting.ts` (`GH_WORKFORCE_CONTRACTING`).
+  - Scenario GVC: `scripts/frontend/scenarios/workforce-contracting-studio-mockup.scenario.ts`.
+  - Tres modos aprobados (Centro operativo / Flujo guiado / Revisión bilingüe) + preview colaborador. Es la dirección visual de referencia para los readers product-shaped de Slice 4 (los campos `nextActionCode`, `riskLevel`, `languageParityStatus`, `missingFactsSummary`, `authoritativeLanguage` deben alimentar exactamente lo que el mockup pinta — copy-and-patch + paridad GVC al promoverlo, ver TASK-1018).
 
 ### Gap
 
@@ -190,6 +195,18 @@ Design/product constraints:
   - `workforce.contracting.ai_draft`;
   - `workforce.contracting.approve`;
   - `workforce.contracting.reveal_sensitive`.
+- **Capability → runtime grant (mismo PR, invariante TASK-873/935):** sembrar una capability en el catalog SIN grant en `src/lib/entitlements/runtime.ts` = 403 para todos + rompe el guard `capability-grant-coverage.test.ts`. No existe rol `legal` en `ROLE_CODES`; el sign-off legal colapsa a `EFEONCE_ADMIN` (patrón anti-rol-fantasma TASK-935). Matriz **propuesta** (confirmar composición de aprobadores con operador/Legal — ver Open Questions):
+
+  | Capability | Roles (grant runtime) | Notas |
+  | --- | --- | --- |
+  | `workforce.contracting.read` | route_group `hr` ∪ `HR_MANAGER` ∪ `HR_PAYROLL` ∪ `EFEONCE_ADMIN` ∪ `FINANCE_ADMIN` | lectura cola/casos |
+  | `workforce.contracting.manage` | route_group `hr` ∪ `HR_MANAGER` ∪ `EFEONCE_ADMIN` | crear/editar drafts |
+  | `workforce.contracting.ai_draft` | `HR_MANAGER` ∪ `EFEONCE_ADMIN` | disparar draft Claude |
+  | `workforce.contracting.approve` | `HR_MANAGER` ∪ `FINANCE_ADMIN` ∪ `EFEONCE_ADMIN` | aprobación par bilingüe (HR/Legal/Finance; Legal = `EFEONCE_ADMIN`) |
+  | `workforce.contracting.reveal_sensitive` | `EFEONCE_ADMIN` ∪ `HR_MANAGER` | PII para drafting |
+
+  Toda capability que se chequee vía `can()` en un endpoint DEBE estar en la matriz. Verificar que los roles citados existen en `src/config/role-codes.ts` antes de mergear (NO usar `DEVOPS_OPERATOR`, `HR_ADMIN` ni roles fantasma).
+- **Observabilidad:** no existe dominio Sentry `workforce`/`hr`/`documents` en `CaptureDomain` (`src/lib/observability/capture.ts`). Decidir en plan: (a) agregar `'workforce'` a `CaptureDomain` (additivo, recomendado por tamaño de EPIC-017) + subsystem rollup nuevo en el Reliability Control Plane, o (b) reusar `'payroll'`. Usar siempre `captureWithDomain(err, '<domain>', ...)`, nunca `Sentry.captureException` directo.
 - Add idempotent command skeletons:
   - `createWorkforceContractingCase`;
   - `createOfferDraft`;
@@ -210,7 +227,8 @@ Design/product constraints:
   - section codes align across languages;
   - amounts, dates, names, entities and conditions match;
   - authoritative language is present and explicit.
-- Enforce `legalReviewReference` for `international_internal` and foreigners working in Chile.
+- Enforce `legalReviewReference` for `international_internal` and foreigners working in Chile. Aplicar el invariante canónico TASK-894: `legalReviewReference` >= 10 chars, NUNCA loggear ni publicar el valor crudo en outbox/Sentry; el evento usa solo `hasLegalReviewReference`. Fail-closed si falta.
+- No usar `members.contract_type` como verdad única de estado laboral; resolver clasificación vigente vía el resolver canónico (TASK-957 `resolveCurrentWorkClassification`) o los snapshots del caso. La validación contrasta contra la tupla `(contract_type, pay_regime, payroll_via)`, no recalcula payroll.
 - Add unit tests covering missing facts, unsupported tuple and valid happy path.
 
 ### Slice 3 — Claude AI Drafting Adapter
@@ -224,6 +242,7 @@ Design/product constraints:
 - Persist AI run metadata: provider, model, prompt version/hash, input snapshot hash, output hash, usage/error.
 - Persist bilingual parity result in draft validation snapshots.
 - Never auto-approve, auto-PDF, auto-send email or auto-sign.
+- **Eval baseline (invariante arch-architect):** ningún cambio de prompt/agente sin baseline. Agregar un set de golden fixtures por jurisdiction pack (`CL_CHILE_DEPENDENT_V1`, `CL_FOREIGNER_WORKING_IN_CHILE_V1`, `INTERNATIONAL_INTERNAL_REMOTE_V1`) con input packet determinista + output esperado, ejercidos como regresión sin llamar al provider real (fixture/replay). Los validators deterministas + el schema parity actúan como gate del eval.
 - Add tests for schema validation, bilingual completeness/parity and no-secret/no-provider-token prompt contract.
 
 ### Slice 4 — Commands, Readers and API Routes
@@ -265,7 +284,7 @@ Design/product constraints:
 - Creating signature requests.
 - Generating final production PDF.
 - Building full admin UI or collaborator viewer.
-- Building visual mockup routes for `/hr/workforce/contracts`, `/my/offers` or `/my/contracts`.
+- Building NEW visual mockup routes, or wiring the existing committed mockup (`/hr/workforce/contracts/mockup`) to runtime data/commands. El mockup ya existe y queda intacto como referencia; promoverlo a runtime es follow-up post-foundation.
 - Sending emails.
 - Deferring English/Spanish generation to a later task.
 - Registering contracts in DT/REL or automating Mi DT.
@@ -274,6 +293,8 @@ Design/product constraints:
 - Creating legal counsel-approved final clause library.
 
 ## Detailed Spec
+
+> **Status vocabulary es source of truth ejecutable.** El arch doc §6 declara que TASK-1019 owns el primer schema ejecutable; cuando estos enums diverjan del lifecycle textual del arch doc §3.2, **este enum prevalece** y el arch doc se sincroniza al cierre. Mapeo del único punto de divergencia: arch doc `pdf_generated` ≅ este enum `ready_for_signature` (PDF rendereado, pendiente de envío a firma). El reliability signal `workforce.contracting.approved_without_pdf` discrimina `internal_approved`/`ready_for_pdf` vs `ready_for_signature`, así que la granularidad de este enum es la correcta.
 
 ### Suggested status vocabulary
 
@@ -455,6 +476,8 @@ Do not call Claude before deterministic input packet and validation shape exist.
 ## Open Questions
 
 - Which Anthropic secret naming convention is already approved in Greenhouse, if any?
+- **Composición de aprobadores:** ¿`workforce.contracting.approve` es una sola capability con checklist HR/Legal/Finance en metadata (lean V0, recomendado), o un modelo multi-firma con gates por rol (estilo segunda firma TASK-839)? El mockup pinta un checklist 3-way (HR/Legal/Finance). Sin rol `legal`, el sign-off legal recae en `EFEONCE_ADMIN` — confirmar con operador/Legal y, si se quiere un rol legal dedicado, decidir si se crea uno nuevo en `ROLE_CODES`.
+- **Dominio de observabilidad:** ¿agregar `'workforce'` a `CaptureDomain` + subsystem rollup propio en el Reliability Control Plane (recomendado por escala de EPIC-017), o reusar `'payroll'`/`'identity'`? Los signals del arch doc §10 son `workforce.contracting.*` y hoy no tienen subsystem.
 - What is the first legal entity/pilot cohort for production trial?
 - Should offer acceptance happen in Greenhouse self-service before ZapSign, or should the offer itself also be signed through ZapSign in V1?
 - Who are the required internal signers for Chile dependent contracts: legal representative only, HR, or dual signer?
