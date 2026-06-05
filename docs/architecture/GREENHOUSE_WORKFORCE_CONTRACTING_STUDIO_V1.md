@@ -637,4 +637,25 @@ Foundation entregada (5 slices, commits `19b5069c1`→`ff8429f25`). NO incluye P
 - **Reliability** (moduleKey `workforce`, Sentry domain `workforce`): 3 signals steady=0. EVENT_CATALOG v1: 6 eventos `workforce.contracting.*`.
 - **Verificación**: tsc 0, eslint 0, ~94 tests focales + 414 reliability + live smoke (tx rolled-back: triggers + state machine + append-only + FKs reales).
 - **Decisiones del operador (2026-06-05)**: secret `greenhouse-anthropic-api-key` creado (rotar post-impl); aprobación unilateral `EFEONCE_ADMIN`; firma legal del representante ya en repo; dominio `workforce`; formato firmable ZapSign PDF+DOCX (render propio, no template feature).
-- **Pendiente (rollout)**: push `develop` + deploy Vercel/workers + flip de flags (cuando aplique) son decisión del operador (instrucción "mantente en develop"). El secret Anthropic debe rotarse antes de habilitar el flag en cualquier ambiente.
+- **Pendiente (rollout)**: ✅ push `develop` + deploy Vercel/workers + verificación CI/worker-gate verdes + `ANTHROPIC_API_KEY_SECRET_REF` registrado en Vercel (Production/Preview/Development) ejecutados 2026-06-05. El secret Anthropic debe **rotarse** antes de habilitar el flag `WORKFORCE_CONTRACTING_AI_ENABLED` en cualquier ambiente (estuvo expuesto en chat).
+
+### Roadmap — tasks faltantes para dar vida completa al Studio (creadas 2026-06-05)
+
+Traduce el §12 "Implementation Order" a tasks concretas. **Dos tracks**: A (desbloqueado, consume la foundation actual) y B (bloqueado por EPIC-001).
+
+| Task | Qué | Bloqueo | Track |
+| --- | --- | --- | --- |
+| **TASK-1021** | Admin Viewer runtime (Command Center + Guided Builder + Bilingual Review Desk) — promueve el mockup aprobado consumiendo readers/commands; loop GVC + viewCode/nav/reachability | ninguno (foundation) | **A — listo para empezar** |
+| **TASK-1022** | Collaborator Viewer runtime (`/my/offers` + `/my/contracts`) — estado honesto bilingüe via `getOwnContractingSummary` | ninguno (foundation) | **A — listo para empezar** |
+| `TASK-489` | EPIC-001 document registry & versioning | — | B (prerequisito) |
+| `TASK-493` | EPIC-001 rendering / template catalog | — | B (prerequisito) |
+| `TASK-490` | EPIC-001 signature orchestration | — | B (prerequisito) |
+| `TASK-491` | EPIC-001 ZapSign adapter + webhooks | — | B (prerequisito) |
+| **TASK-1023** | PDF/signable render consumer (Efeonce bilingüe, private asset, hash/version/status) + activa `generate_document` | EPIC-001 489/493 | B |
+| **TASK-1024** | Signature consumer (ZapSign via EPIC-001) + 3 signals + ingest firmado | EPIC-001 490/491 + TASK-1023 | B |
+| **TASK-1025** | Notification/email (pre/post-firma, recordatorio, rechazo) + cron recordatorios | TASK-1023/1024 | B |
+| **TASK-1026** | Chile DT/REL external registration evidence + activation gate (`activation_blocked_by_contract`) | TASK-1024 + TASK-872/892 | B |
+
+Operacional (no es task): **rotar la key Anthropic** + staging shadow del flag IA antes de `WORKFORCE_CONTRACTING_AI_ENABLED=true`.
+
+**Camino crítico al end-to-end firmable**: EPIC-001 (489→493→490→491) → TASK-1023 → TASK-1024 → TASK-1025/1026. Los viewers (1021/1022) avanzan en paralelo desde ya, con acciones de PDF/firma en estado `locked` hasta que Track B aterrice.
