@@ -12,6 +12,7 @@
 - Blocked by: `none` (backend `listLifecycleCases` + `/api/admin/clients/lifecycle/cases` ya en prod desde TASK-992)
 - Derived from: `TASK-1010` (hallazgo 2026-06-04 durante verificación live post-release), `TASK-992` (orquestador lifecycle), `TASK-982` (reachability governance)
 - Creada: 2026-06-04
+- Mockup aprobado: 2026-06-05
 
 ## Summary
 
@@ -28,6 +29,23 @@ El **deal-trigger de onboarding** (TASK-1010 Slice 3, ya live en prod: deal HubS
 1. El operador VE los casos de onboarding en vuelo (especialmente `draft` pendientes de activación) en una superficie discoverable, sin tipear URLs.
 2. Desde ahí puede abrir el timeline del caso y **activarlo** (`draft → in_progress` vía el resolve/advance ya existente).
 3. La ruta del timeline queda enlazada desde Organizaciones/Account 360 cuando la org tiene un caso activo, y declarada en el reachability manifest.
+
+## Mockup aprobado — regla dura de implementación
+
+**Aprobado por el operador el 2026-06-05. No rediseñar.** La dirección visual y de interacción aprobada es el mockup **Inbox + Timeline Preview**:
+
+- Ruta mockup: `/agency/clients/onboarding/mockup`
+- View mockup: `src/views/greenhouse/agency/clients/mockup/onboarding-cases/OnboardingCasesInboxMockupView.tsx`
+- Scenario GVC: `scripts/frontend/scenarios/onboarding-cases-inbox-mockup.scenario.ts`
+- Evidencia GVC aprobada: `.captures/2026-06-05T00-33-42_onboarding-cases-inbox-mockup` (desktop + mobile, dossier `review-dossier.md`)
+
+Reglas duras para el agente que implemente TASK-1013:
+
+- **NO sustituir ni rediseñar el wizard** `/agency/clients/new`. El cockpit lo complementa: hace visibles los casos en vuelo y su CTA primario `Nuevo cliente` sigue entrando al wizard existente.
+- **NO inventar otra IA/layout/nav para esta task.** La ruta runtime debe cablear el patrón aprobado: header + aviso explícito de que no reemplaza el wizard + KPIs + inbox seleccionable + preview de timeline + rail de acción.
+- **NO convertir el inbox en una tabla apretada.** La dirección aprobada es lista/inbox compacta a la izquierda, preview de checklist/timeline al centro y acciones/fuente/SLA a la derecha en desktop; en mobile debe apilar sin perder CTAs.
+- **Sí cablear datos reales** reemplazando mock data con readers/API existentes: `listLifecycleCases`, enriquecimiento de organización, checklist del caso, links al timeline y acciones ya existentes.
+- **Sí conservar copy/aria en capa canónica** (`src/lib/copy/client-onboarding.ts` o el namespace correspondiente), estados honestos y GVC en loop antes de declarar listo.
 
 ## Current Repo State
 
@@ -48,8 +66,8 @@ El **deal-trigger de onboarding** (TASK-1010 Slice 3, ya live en prod: deal HubS
 ## Scope (slices)
 
 ### Slice 1 — Inbox de casos de onboarding (vista lista)
-- Vista nueva que consume `GET /api/admin/clients/lifecycle/cases` con filtros (status default destacando `draft` + `in_progress` + `blocked`; `overdue`). Columnas: organización, estado, origen (`triggerSource`: wizard/hubspot_deal/…), creado, próximos pasos pendientes, CTA "Abrir" → timeline.
-- **Decisión IA (resolver con `info-architecture`)**: recomendación = el ítem de nav "Alta de cliente" pasa a apuntar a un **cockpit de onboarding** (`/agency/clients/onboarding` o `/agency/onboarding`) que muestra el inbox de casos en vuelo + un CTA primary "Nuevo cliente" → `/agency/clients/new` (wizard). Así el wizard sigue siendo la puerta, pero los casos en vuelo (incluido el deal-trigger draft) son visibles. Confirmar placement con el operador antes de cablear.
+- Vista nueva que consume `GET /api/admin/clients/lifecycle/cases` con filtros (status default destacando `draft` + `in_progress` + `blocked`; `overdue`). Debe seguir el mockup aprobado: lista/inbox seleccionable, no tabla densa apretada; preview del checklist/timeline del caso seleccionado; rail de acciones con "Abrir timeline" y "Activar caso" cuando aplique.
+- **Decisión IA cerrada y aprobada**: el ítem de nav "Alta de cliente" pasa a apuntar al **cockpit de onboarding** `/agency/clients/onboarding`, que muestra el inbox de casos en vuelo + un CTA primary "Nuevo cliente" → `/agency/clients/new` (wizard). Así el wizard sigue siendo la puerta, pero los casos en vuelo (incluido el deal-trigger draft) son visibles.
 - Loop de diseño obligatorio (CLAUDE.md UI hook): `greenhouse-ux` + `state-design` (loading/empty/degraded honestos) + `greenhouse-ux-writing` (es-CL) + GVC en loop. Empty state honesto cuando no hay casos.
 
 ### Slice 2 — Discoverability cruzada (Organizaciones / Account 360)

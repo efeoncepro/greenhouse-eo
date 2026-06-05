@@ -32,6 +32,32 @@ const PRINT = (msg: string) => {
   console.log(msg)
 }
 
+const HELP_TEXT = `Greenhouse Visual Capture (GVC)
+
+Uso:
+  pnpm fe:capture <scenario-name> [--env=local|staging|dev-agent|production] [--gif] [--headed]
+  pnpm fe:capture --route=/path [--env=local|staging|dev-agent|production] [--hold=3000]
+
+Opciones:
+  --env=<env>       Target de captura. Default: staging
+  --route=<path>    Captura inline de una ruta sin scenario
+  --hold=<ms>       Espera inicial para capturas inline. Default: 1500
+  --gif             Genera flipbook.gif
+  --headed          Abre Chromium visible para debug
+  --device=<name>   Device Playwright para capturas inline
+  --upload=<bucket> Sube artifacts a GCS
+  --prod            Triple gate explícito para production
+  -h, --help        Muestra esta ayuda
+
+Ejemplos:
+  pnpm fe:capture onboarding-cases-inbox-mockup --env=local
+  pnpm fe:capture --route=/agency/clients/onboarding/mockup --env=local --hold=3000
+  pnpm fe:capture:review .captures/<capture-dir>
+
+Scenarios:
+  ls scripts/frontend/scenarios/
+`
+
 const buildOutputDir = (scenarioName: string): string => {
   const iso = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
   const dir = resolve(CAPTURES_DIR, `${iso}_${scenarioName}`)
@@ -259,9 +285,16 @@ const main = async (): Promise<void> => {
       headed: { type: 'boolean', default: false },
       prod: { type: 'boolean', default: false },
       device: { type: 'string' },
-      upload: { type: 'string' }
+      upload: { type: 'string' },
+      help: { type: 'boolean', short: 'h', default: false }
     }
   })
+
+  if (values.help === true) {
+    PRINT(HELP_TEXT)
+
+    return
+  }
 
   if (!isValidEnv(values.env as string)) {
     throw new Error(`--env inválido: "${values.env}". Valores: local | staging | dev-agent | production`)

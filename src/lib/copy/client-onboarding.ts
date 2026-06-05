@@ -417,6 +417,11 @@ export const GH_CLIENT_ONBOARDING = {
     statusErrorChip: 'No se pudo invitar',
     secretNote: 'Cada persona recibe un email para crear su contraseña. Su acceso queda limitado al portal de este cliente.'
   },
+  // TASK-1013 — mockup Product Design del inbox/cockpit de casos de onboarding.
+  onboardingCases: {
+    filtersAria: 'Filtros rápidos de onboarding',
+    openTimelineAria: 'Abrir timeline completo del caso'
+  },
   // TASK-1009 — panel del preflight de onboarding Notion (ítem verify_notion_flowing).
   notionPreflight: {
     title: 'Verificar flujo al portal',

@@ -1,3 +1,12 @@
+# Sesion 2026-06-05 — TASK-1013 mockup aprobado + contrato de implementación
+
+El operador aprobó el mockup Product Design para TASK-1013: **Inbox + Timeline Preview**. Queda como referencia vinculante; la implementación real NO debe rediseñar ni sustituir el wizard.
+
+- **Mockup aprobado:** `/agency/clients/onboarding/mockup`
+- **Archivos mockup:** `src/app/(dashboard)/agency/clients/onboarding/mockup/page.tsx` + `src/views/greenhouse/agency/clients/mockup/onboarding-cases/OnboardingCasesInboxMockupView.tsx`
+- **GVC:** scenario `onboarding-cases-inbox-mockup` + captura `.captures/2026-06-05T00-33-42_onboarding-cases-inbox-mockup` (desktop + mobile, dossier generado).
+- **Regla dura documentada en TASK-1013:** no moverse del diseño aprobado; lo que toca es cablear runtime real con `listLifecycleCases`/organización/checklist/timeline/acciones existentes. El CTA `Nuevo cliente` sigue apuntando al wizard `/agency/clients/new`; el cockpit solo hace visibles y activables los casos en vuelo.
+
 # Sesion 2026-06-04 (cont.) — TASK-1009 ✅ preflight de onboarding Notion (composer thin, reuse-first) + ítem bloqueante
 
 Cierre del último cabo del onboarding de cliente: la diferencia entre **"configurado"** y **"fluyendo de verdad al portal"**. El wizard/checklist ya validan estructura + token + DBs muy bien (confirmado en código: `resolveClientCompleteness`, `notion/validate`, `notion-parity-audit`); el agujero era que nadie componía la cadena completa ni bloqueaba el cierre hasta que las tareas estuvieran en PG. Decisión de alcance del operador: **THIN — componer lo existente + 3 gaps + gate, no duplicar**.
