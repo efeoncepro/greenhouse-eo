@@ -218,6 +218,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
+    viewCode: 'equipo.workforce_contracting',
+    section: 'equipo',
+    label: 'Contratos laborales',
+    description: 'Workbench HR de cartas oferta y contratos laborales bilingües: cola, riesgo, paridad ES+EN y validación.',
+    routePath: '/hr/workforce/contracts',
+    routeGroup: 'hr'
+  },
+  {
     viewCode: 'equipo.workforce_activation',
     section: 'equipo',
     label: 'Workforce Activation',
