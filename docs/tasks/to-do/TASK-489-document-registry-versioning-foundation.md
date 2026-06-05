@@ -18,6 +18,17 @@
 
 ---
 
+## Delta 2026-06-05 — Arch review (arch-architect): registry NO está en el camino crítico del pack firmable de contracting
+
+Revisión con `arch-architect` (overlay Greenhouse) disparada por el avance del Workforce Contracting Studio (TASK-1019/1021/1022 ya en runtime) + el descubrimiento de que la lane ZapSign ya existe (MSA). Conclusiones que **NO cambian el schema V2.1** pero sí re-rankean y aclaran el contrato de consumo:
+
+- **Contracting consume el registry como `kind='linked'`, NO native.** El caso de contratación (`greenhouse_hr.workforce_contracting_cases`) es el SSOT laboral y — igual que finiquito (TASK-863) y payroll receipt (TASK-868) — **será dueño de su propio `pdf_asset_id` + `content_hash` + auto-regen por estado**. El registry lo superficie como el **5º linked aggregate** (`greenhouse_hr.workforce_contracting_cases`) vía bridge dedicado `document_workforce_contracting_link` + consumer reactivo, **late binding** (mismo mecanismo que TASK-868). Agregar a `linked_aggregate_table` CHECK enum + `linkAggregateDocument` kind union cuando emerja TASK-1023's follow-up de superficie.
+- **TASK-489 NO bloquea renderizar ni firmar un contrato.** Contracting renderiza su PDF con los primitives `@react-pdf` Efeonce existentes y posee el asset en su agregado (patrón finiquito). El registry unificado `/documents` es **superficie downstream** — no está en el camino crítico de la firma. Construir las 9 tablas + 6 capabilities + linked-consumers **antes** de firmar sería sobre-construir el camino crítico.
+- **Re-rank**: TASK-489 sigue siendo la foundation canónica del registry unificado (finiquito + payroll receipt + contracting + MSA/SOW en un solo `/documents`), pero su valor entra con **TASK-492 (UI document manager)** + **TASK-494/495 (HR/Finance convergence)**, NO como prerequisito de Track B del Contracting Studio. Se construye **en paralelo / después** del pack firmable de contracting (`TASK-1023 → TASK-490 → TASK-491 → TASK-1024`).
+- **Sin cambio de schema V2.1**: el `kind='linked'` + `linked_aggregate_table` enum + bridge-per-aggregate + reactive-sync-consumer ya canonizados cubren contracting sin migración adicional al registry (idéntico a cómo absorbió TASK-868). Solo se agrega el 5º valor al enum + el bridge dedicado cuando el consumer de superficie emerja.
+
+---
+
 ## Delta 2026-05-11 V2.2 — TASK-868 spawned (payroll_receipt linked V1.5 via dedicated aggregate)
 
 Pregunta del usuario sobre recibos de nómina disparó 4-pillar analysis:

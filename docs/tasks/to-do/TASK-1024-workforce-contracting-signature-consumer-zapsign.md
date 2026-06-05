@@ -7,6 +7,14 @@
 - Epic: Workforce Contracting Studio (ADR `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` §7, §12.3)
 - Created: 2026-06-05
 
+## Delta 2026-06-05 — Arch review (arch-architect): TASK-490/491 es el primitivo genuino del camino crítico
+
+Revisión con `arch-architect`. La lane ZapSign **ya existe pero es one-off de MSA**: `src/lib/integrations/zapsign/client.ts` (`createZapSignDocument` base64, `getZapSignDocument`, `isZapSignConfigured`), columnas de firma inline en `greenhouse_commercial.master_agreements`, webhook MSA-específico `/api/webhooks/zapsign` (resuelve por `signature_document_token`), secrets `greenhouse-zapsign-api-token` + `greenhouse-zapsign-webhook-shared-secret` operativos.
+
+- El invariante STUDIO ("NUNCA firma paralela; consume EPIC-001") **prohíbe** reusar el cliente ZapSign crudo como 2ª lane estilo-MSA. Contracting DEBE consumir el `signature_requests` aggregate provider-neutral (TASK-490) + adapter (TASK-491) que **generalizan** la lane MSA.
+- **Esta task es el motivo por el que TASK-490/491 están en el camino crítico** (no TASK-489/493). Scope mínimo suficiente para firmar: `signature_requests` + `signature_request_signers` + `signature_request_events` (state machine + webhook inbox) + ZapSign adapter (el cliente ya existe → TASK-491 es envolverlo + dedup + reconciliation). La **migración de MSA** a la nueva orquestación + reconciliation polish puede ser follow-up (no bloquea el primer contrato firmado).
+- El PDF de entrada lo provee TASK-1023 (case-owned `pdf_asset_id`); el signed PDF + audit report se ingieren como private assets ligados al caso (no al registry genérico todavía).
+
 ## Why
 
 Tras aprobación + render del PDF firmable (TASK-1023), el documento se envía a firma electrónica. **ZapSign es solo el provider de firma del colaborador** (no source of truth laboral); Greenhouse archiva la evidencia firmada. La firma se orquesta vía EPIC-001 (NO un orquestador paralelo). La foundation reservó los eventos `ready_for_signature` + la capability `send_signature` (a seedear).

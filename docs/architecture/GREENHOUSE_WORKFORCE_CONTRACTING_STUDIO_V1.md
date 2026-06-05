@@ -651,14 +651,14 @@ Traduce el §12 "Implementation Order" a tasks concretas. **Dos tracks**: A (des
 | `TASK-493` | EPIC-001 rendering / template catalog | — | B (prerequisito) |
 | `TASK-490` | EPIC-001 signature orchestration | — | B (prerequisito) |
 | `TASK-491` | EPIC-001 ZapSign adapter + webhooks | — | B (prerequisito) |
-| **TASK-1023** | PDF/signable render consumer (Efeonce bilingüe, private asset, hash/version/status) + activa `generate_document` | EPIC-001 489/493 | B |
-| **TASK-1024** | Signature consumer (ZapSign via EPIC-001) + 3 signals + ingest firmado | EPIC-001 490/491 + TASK-1023 | B |
+| **TASK-1023** | PDF/signable render consumer (Efeonce bilingüe, **case-owned** `pdf_asset_id` + hash/version/status, auto-regen mirror TASK-863) + activa `generate_document` | **solo TASK-1019** (ver Delta arch review abajo) | **A — desbloqueado** |
+| **TASK-1024** | Signature consumer (ZapSign via EPIC-001) + 3 signals + ingest firmado | TASK-490/491 + TASK-1023 | B |
 | **TASK-1025** | Notification/email (pre/post-firma, recordatorio, rechazo) + cron recordatorios | TASK-1023/1024 | B |
 | **TASK-1026** | Chile DT/REL external registration evidence + activation gate (`activation_blocked_by_contract`) | TASK-1024 + TASK-872/892 | B |
 
 Operacional (no es task): **rotar la key Anthropic** + staging shadow del flag IA antes de `WORKFORCE_CONTRACTING_AI_ENABLED=true`.
 
-**Camino crítico al end-to-end firmable**: EPIC-001 (489→493→490→491) → TASK-1023 → TASK-1024 → TASK-1025/1026. Los viewers (1021/1022) avanzan en paralelo desde ya, con acciones de PDF/firma en estado `locked` hasta que Track B aterrice.
+> **⚠️ Camino crítico CORREGIDO — ver "Delta 2026-06-05 — Arch review" abajo.** El camino canónico al primer contrato firmable es **TASK-1023 (independiente) → TASK-490 → TASK-491 → TASK-1024 → TASK-1025/1026**. TASK-489 (registry) + TASK-493 (rendering catalog) **NO son prerequisito** — entran en paralelo/después como superficie unificada `/documents` (TASK-492/494/495).
 
 ## Delta 2026-06-05 — AI drafting prompt v3 (nacional + internacional, jurisdicción de la entidad matriz) + IA encendida en staging
 
@@ -669,3 +669,42 @@ Refina §5 (AI Architecture). El adapter Claude (`src/lib/workforce/contracting/
 - **Internacional**: para `INTERNATIONAL_INTERNAL_REMOTE_V1`, el prompt instruye modelo operational payer (NO employer-of-record), cláusula obligatoria de ley aplicable + foro (jurisdicción de la matriz) y prohíbe deducciones/estatutos laborales locales del país del trabajador.
 - **Validación live** (Claude real, DB mockeada, 2026-06-05): (a) Chile dependiente → `ok=true, parity=pass`, 7 cláusulas ES+EN, cita Código del Trabajo (Art. 7/10/12/22), Ley 21.561/21.220, flagea missing facts bloqueantes con justificación legal + placeholders `[POR DEFINIR]` (no inventa). (b) Internacional (Colombia, USD) → `ok=true, parity=pass`, 6 ES+EN, `governing_law_and_jurisdiction` = ley chilena exclusiva (excluye derecho laboral colombiano), **sin AFP/Isapre/Fonasa**, llama "Prestador" (no "Trabajador").
 - **Rollout**: `WORKFORCE_CONTRACTING_AI_ENABLED=true` en Vercel **Preview (develop) + Development** (staging); **Producción OFF** (gate de revisión legal de calidad de borrador). El secret `greenhouse-anthropic-api-key` **NO rotado** — decisión del operador de rotarlo al cierre del epic (override explícito de la regla "rotar antes de habilitar"; riesgo acotado: staging SSO-protegido). ⚠️ pendiente al cierre del epic: rotar la key.
+
+## Delta 2026-06-05 — Arch review (arch-architect): re-secuencia del pack firmable (489/493 fuera del camino crítico)
+
+Revisión arquitectónica con `arch-architect` (overlay Greenhouse) + `greenhouse-postgres`, disparada antes de empezar Track B. Investigación de la realidad vigente (lane ZapSign existente, primitives `@react-pdf`, patrón finiquito/payroll-receipt). **Corrige el §12 + el "camino crítico"** (preservados arriba como audit trail). Cero cambio al contrato de dominio del Studio.
+
+**Hallazgos:**
+
+1. **TASK-493 (rendering/template catalog) NO es bloqueante.** EPIC-001 lo difiere explícitamente ("hasta que emerja necesidad de templates centralizados"). El patrón `@react-pdf` canónico ya existe y está probado en 5-6 docs: `register-fonts.ts` (`ensurePdfFontsRegistered`), `EfeoncePdfFooter`, `EfeonceSloganPdf`, watermark-por-estado del finiquito, `storeSystemGeneratedPrivateAsset`. TASK-1023 los reutiliza directo.
+
+2. **TASK-489 (document registry) NO bloquea renderizar ni firmar.** El patrón canónico de **finiquito (TASK-863 V1.5.2)** y **payroll receipt (TASK-868)** es: el **agregado del dominio posee su `pdf_asset_id` + `content_hash` + auto-regen por estado**; el registry unificado lo superficie luego como `kind='linked'` (5º linked aggregate `workforce_contracting_cases` + bridge `document_workforce_contracting_link` + consumer reactivo, late binding). El §7 de este spec ya citaba el patrón TASK-863 para contracting → es consistente. El registry `/documents` es **superficie downstream**, no prerequisito de la firma.
+
+3. **El primitivo genuino del camino crítico es TASK-490 (signature orchestration).** La lane ZapSign **ya existe pero es one-off de MSA** (`src/lib/integrations/zapsign/client.ts` + columnas de firma inline en `master_agreements` + webhook MSA-específico + secrets operativos). El invariante "NUNCA firma paralela; consume EPIC-001" prohíbe reusar el cliente crudo como 2ª lane → contracting consume el `signature_requests` aggregate provider-neutral (TASK-490) + adapter (TASK-491) que **generalizan** la lane MSA. Scope mínimo suficiente: aggregate + signers + events + webhook inbox + adapter (el cliente ya existe). Migrar MSA + reconciliation polish = follow-up.
+
+**Camino crítico CANÓNICO al primer contrato firmable:**
+
+```
+TASK-1023 (PDF bilingüe, case-owned pdf_asset_id + auto-regen — mirror finiquito)   ← Track A, arrancable YA (solo TASK-1019)
+   └─ TASK-490 (signature_requests aggregate provider-neutral — generaliza lane MSA)
+        └─ TASK-491 (ZapSign adapter + webhook bus canónico — cliente ya existe)
+             └─ TASK-1024 (case → signature_request → ZapSign → webhook → avanza caso)
+                  └─ TASK-1025 (emails) + TASK-1026 (DT/REL + activation gate)
+
+   ── en PARALELO / después, superficie unificada (NO bloquea firma) ──
+TASK-489 (registry) + TASK-868 (payroll-receipt link) + TASK-492 (UI /documents) + TASK-494/495 (HR/Finance convergence)
+```
+
+**4-pillar del re-secuenciamiento:** *Safety* — sin parallel signature lane (consume TASK-490 canónico); caso = SSOT laboral, signature_request = SSOT firma, asset = SSOT binario. *Robustness* — auto-regen por estado + `pdf_status_drift` (patrón probado finiquito). *Resilience* — webhook inbox + dedup + reconciliation en TASK-491. *Scalability* — registry unificado se agrega como linked-consumer sin re-trabajo (idéntico a TASK-868).
+
+**Patrones canónicos que el re-secuenciamiento reutiliza:** TASK-863/868 (aggregate-owned pdf + auto-regen + linked surface), TASK-490/491 (signature orchestration generalizando MSA), TASK-721 (asset uploader). Specs ajustadas: TASK-489 (Delta off-critical-path), TASK-1023 (Delta deps → solo TASK-1019), TASK-1024 (Delta TASK-490/491 = primitivo genuino).
+
+## Delta 2026-06-05 — Estándar de documento firmable APROBADO (formato O1 + C2)
+
+El operador aprobó (loop GVC + `modern-ui`/`greenhouse-ux-writing`) los dos formatos del artefacto firmable. **Supera el hint "lado a lado" de §7**: la decisión canónica es **bilingüe secuencial** (instrumento es-CL prevalente completo → espejo en-US completo) para ambos, en un solo PDF firmado.
+
+- **Carta oferta — O1**: carta ejecutiva secuencial (masthead Efeonce → banner prevalencia → saludo + intro → termscard "Resumen de la oferta" → secciones → firma de aceptación → footer; luego espejo EN).
+- **Contrato — C2**: instrumento es-CL prevalente (comparecencia → cláusulas PRIMERO→… justificadas → bloque de firma 3 columnas) → espejo en-US completo.
+- **Sistema documental común**: Poppins (display) + Geist (body, `tabular-nums`), acento único `#2E7D32`, masthead logo Efeonce + eslogan subordinado, footer `EfeoncePdfFooter`, watermark/badge por `documentStatus` (desaparece al firmar), firma del representante pre-estampada (`@/lib/legal-signatures`) con simetría vertical.
+
+**Las reglas duras anti-degradación + el baseline visual vinculante (mockup `/hr/workforce/contracts/mockup/documents` + scenario GVC `contracting-document-format-mockup`) viven en `TASK-1023`** (Delta "Estándar de documento APROBADO"). El render real debe reproducir ese estándar (paridad `fe:capture:diff`); todo cambio futuro = mejora incremental, nunca degradación.
