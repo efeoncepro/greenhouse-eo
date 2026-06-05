@@ -9,6 +9,16 @@ Feedback del operador viendo el cockpit (TASK-1013) en staging → pase de calid
 - **Gates**: tsc 0 · eslint full 0 · `pnpm build` (verificando) · GVC mirado. Spec: `complete/TASK-1015-onboarding-cockpit-enterprise-polish.md`.
 - **Pendiente (respondido como follow-ups al operador)**: auto-verificación del estado real de ítems (Notion/Nubox, extiende preflight TASK-1009) + "todo caso con deal" + linkear el deal de Berel (modelo + backfill; el caso de Berel es `manual` sin deal y el cockpit lo muestra honesto).
 
+# Sesion 2026-06-05 (cont.) — TASK-1016 🆕 propuesta enterprise para listado de organizaciones
+
+Por feedback del operador sobre `/agency/organizations` ("parece Excel glorificado"), se uso Product Design + contrato Greenhouse/Vuexy para convertir la recomendacion en una task de prototipo, **sin tocar runtime productivo**.
+
+- **TASK creada:** `docs/tasks/to-do/TASK-1016-organization-list-enterprise-prototype.md`.
+- **Direccion recomendada:** pasar de tabla plana a **Organization Operations Workbench**: header compacto, summary strip accionable, filtros segmentados, lista rica con identidad/status/readiness, rail contextual de cuenta seleccionada y matrix/table como modo secundario.
+- **Scope:** construir `/agency/organizations/mockup` como ruta real del portal con mock data tipada + GVC desktop/mobile. No modifica `/agency/organizations`, `/api/organizations`, schema, flags ni capabilities.
+- **Indices sync:** `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`; siguiente ID disponible `TASK-1017`.
+- **Verificacion:** `pnpm task:lint --changed` verde; `pnpm task:lint --task TASK-1016` sigue fallando por limitacion conocida del linter focal con IDs de 4 digitos (`Expected TASK-###`).
+
 # Sesion 2026-06-05 (cont.) — TASK-1014 ✅ aviso in-app + email al nacer un onboarding draft por deal
 
 Promoví el Slice 4 diferido de TASK-1013 a **TASK-1014** y lo implementé (en `develop`, sin push intermedio). El cockpit hizo los casos *encontrables* (pull); esto agrega el *push*.
