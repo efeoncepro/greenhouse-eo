@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -18,10 +17,15 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
+import ViewTransitionLink from '@/components/greenhouse/motion/ViewTransitionLink'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { motion } from '@/libs/FramerMotion'
+import useReducedMotion from '@/hooks/useReducedMotion'
 import { getMicrocopy } from '@/lib/copy'
 import { GH_CLIENT_ONBOARDING } from '@/lib/copy/client-onboarding'
 import type {
@@ -71,6 +75,11 @@ const STATUS_FILTERS: Array<{ value: 'all' | OnboardingInboxStatus; label: strin
   { value: 'blocked', label: STATUS_COPY.blocked.label }
 ]
 
+// Una etapa cuenta como resuelta cuando está completada, omitida o no aplica —
+// en esos casos el aviso "Bloquea el cierre" es ruido y no se muestra.
+const isDoneStepStatus = (status: ClientLifecycleItemStatus): boolean =>
+  status === 'completed' || status === 'skipped' || status === 'not_applicable'
+
 const nextActionCopy = (status: OnboardingInboxStatus): string => {
   if (status === 'draft') return T.nextActionDraft
   if (status === 'blocked') return T.nextActionBlocked
@@ -78,15 +87,38 @@ const nextActionCopy = (status: OnboardingInboxStatus): string => {
   return T.nextActionInProgress
 }
 
+export interface OnboardingOperatorVm {
+  name: string
+  email: string | null
+  /** Resuelto server-side con resolveAvatarUrl (fuente única canónica). */
+  avatarUrl: string | null
+}
+
 const OnboardingCasesInboxView = ({
   data,
-  degraded
+  degraded,
+  operator
 }: {
   data: OnboardingInboxData
   degraded: boolean
+  operator: OnboardingOperatorVm
 }) => {
   const theme = useTheme()
+  const reducedMotion = useReducedMotion()
   const { cases, summary } = data
+
+  // Crossfade sutil al cambiar de caso (state-transition feedback). Respeta
+  // prefers-reduced-motion: sin motion, el contenido se intercambia directo.
+  const caseFade = reducedMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 4 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.16, ease: [0.2, 0, 0, 1] as const }
+      }
+
+  // #6 — el operador que abre el onboarding sale como responsable (nombre + foto).
+  const operatorName = operator.name.trim() || T.responsibleFallback
 
   const [selectedId, setSelectedId] = useState(cases[0]?.caseId ?? '')
   const [statusFilter, setStatusFilter] = useState<'all' | OnboardingInboxStatus>('all')
@@ -135,7 +167,7 @@ const OnboardingCasesInboxView = ({
       <Box>
         <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 1 }}>
           <Typography
-            component={Link}
+            component={ViewTransitionLink}
             href='/agency'
             variant='body2'
             sx={{ color: 'primary.main', fontWeight: 600, textDecoration: 'none' }}
@@ -158,14 +190,15 @@ const OnboardingCasesInboxView = ({
       </Box>
       <Stack direction='row' spacing={2} alignItems='center'>
         <Button
-          component={Link}
+          component={ViewTransitionLink}
           href='/agency/clients/new'
           variant='contained'
           startIcon={<i className='tabler-plus' />}
           sx={{
             minWidth: 164,
-            transition: 'transform 160ms ease, box-shadow 160ms ease',
-            '&:hover': { transform: 'translateY(-1px)', boxShadow: 4 }
+            transition: 'transform 160ms cubic-bezier(0.2, 0, 0, 1), box-shadow 160ms cubic-bezier(0.2, 0, 0, 1)',
+            '&:hover': { transform: 'translateY(-1px)', boxShadow: 4 },
+            '&:active': { transform: 'scale(0.98)' }
           }}
         >
           {T.newClientCta}
@@ -184,7 +217,28 @@ const OnboardingCasesInboxView = ({
         bgcolor: alpha(theme.palette.primary.main, 0.06)
       }}
     >
-      {T.wizardNotice}
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ sm: 'center' }} flexWrap='wrap'>
+        <Typography variant='body2' component='span'>
+          {T.wizardNotice}
+        </Typography>
+        <Typography
+          component={ViewTransitionLink}
+          href='/agency/clients/new'
+          variant='body2'
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.5,
+            color: 'primary.main',
+            fontWeight: 600,
+            textDecoration: 'none',
+            '&:hover': { textDecoration: 'underline' }
+          }}
+        >
+          {T.wizardNoticeCta}
+          <i className='tabler-arrow-right' style={{ fontSize: 16 }} aria-hidden='true' />
+        </Typography>
+      </Stack>
     </Alert>
   )
 
@@ -201,7 +255,7 @@ const OnboardingCasesInboxView = ({
             description={T.degradedDescription}
             minHeight={360}
             action={
-              <Button component={Link} href='/agency/clients/onboarding' variant='outlined'>
+              <Button component={ViewTransitionLink} href='/agency/clients/onboarding' variant='outlined'>
                 {T.retryCta}
               </Button>
             }
@@ -225,7 +279,7 @@ const OnboardingCasesInboxView = ({
             minHeight={360}
             action={
               <Button
-                component={Link}
+                component={ViewTransitionLink}
                 href='/agency/clients/new'
                 variant='contained'
                 startIcon={<i className='tabler-plus' />}
@@ -255,19 +309,19 @@ const OnboardingCasesInboxView = ({
             gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }
           }}
         >
-          <MetricTile icon='tabler-folder' label={T.kpiOpenLabel} value={String(summary.openCases)} tone='primary' />
-          <MetricTile icon='tabler-clock' label={T.kpiInProgressLabel} value={String(summary.inProgress)} tone='info' />
+          <MetricTile icon='tabler-folder' label={T.kpiOpenLabel} value={summary.openCases} tone='primary' />
+          <MetricTile icon='tabler-clock' label={T.kpiInProgressLabel} value={summary.inProgress} tone='info' />
           <MetricTile
             icon='tabler-alert-octagon'
             label={T.kpiOverdueLabel}
-            value={String(summary.overdue)}
+            value={summary.overdue}
             detail={T.kpiOverdueDetail}
             tone='error'
           />
           <MetricTile
             icon='tabler-lock'
             label={T.kpiBlockedLabel}
-            value={String(summary.blocked)}
+            value={summary.blocked}
             detail={T.kpiBlockedDetail}
             tone='warning'
             last
@@ -445,7 +499,12 @@ const OnboardingCasesInboxView = ({
         </Box>
 
         {/* Column 2 — selected case preview (real checklist) */}
-        <Box sx={{ p: { xs: 4, md: 5 }, borderRight: { lg: `1px solid ${theme.palette.divider}` } }}>
+        <Box
+          component={motion.div}
+          key={`detail-${selected.caseId}`}
+          {...caseFade}
+          sx={{ p: { xs: 4, md: 5 }, borderRight: { lg: `1px solid ${theme.palette.divider}` } }}
+        >
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             justifyContent='space-between'
@@ -460,7 +519,7 @@ const OnboardingCasesInboxView = ({
                 </Typography>
                 <IconButton
                   size='small'
-                  component={Link}
+                  component={ViewTransitionLink}
                   href={selected.timelineHref}
                   aria-label={T.openTimelineAria}
                 >
@@ -551,7 +610,7 @@ const OnboardingCasesInboxView = ({
                           <Typography variant='h6' sx={{ fontSize: '1rem' }}>
                             {step.label}
                           </Typography>
-                          {step.blocksCompletion ? (
+                          {step.blocksCompletion && !isDoneStepStatus(step.status) ? (
                             <Typography variant='caption' color='text.secondary'>
                               {T.stepBlocksCompletion}
                             </Typography>
@@ -574,7 +633,12 @@ const OnboardingCasesInboxView = ({
         </Box>
 
         {/* Column 3 — action rail (honest fields only) */}
-        <Box sx={{ p: 4, bgcolor: alpha(theme.palette.action.hover, 0.2) }}>
+        <Box
+          component={motion.div}
+          key={`rail-${selected.caseId}`}
+          {...caseFade}
+          sx={{ p: 4, bgcolor: alpha(theme.palette.action.hover, 0.2) }}
+        >
           <Stack spacing={4}>
             <ActionSection title={T.nextActionTitle} icon='tabler-flag'>
               <Typography variant='body2' color='text.secondary'>
@@ -582,7 +646,7 @@ const OnboardingCasesInboxView = ({
               </Typography>
               <Stack spacing={2} sx={{ mt: 3 }}>
                 <Button
-                  component={Link}
+                  component={ViewTransitionLink}
                   href={selected.timelineHref}
                   variant='contained'
                   endIcon={<i className='tabler-arrow-right' />}
@@ -595,7 +659,7 @@ const OnboardingCasesInboxView = ({
                 </Button>
                 {isDraft ? (
                   <Button
-                    component={Link}
+                    component={ViewTransitionLink}
                     href={selected.timelineHref}
                     variant='outlined'
                     startIcon={<i className='tabler-bolt' />}
@@ -611,12 +675,19 @@ const OnboardingCasesInboxView = ({
 
             <ActionSection title={T.responsibleTitle} icon='tabler-user-circle'>
               <Stack direction='row' spacing={2} alignItems='center'>
-                <Avatar sx={{ width: 34, height: 34 }}>
-                  <i className={selected.triggeredByUserId ? 'tabler-user' : 'tabler-robot'} />
+                <Avatar src={operator.avatarUrl ?? undefined} sx={{ width: 34, height: 34 }}>
+                  {operatorName.slice(0, 1).toUpperCase()}
                 </Avatar>
-                <Typography variant='body2' fontWeight={700}>
-                  {selected.triggeredByUserId ? T.responsibleOperator : T.responsibleSystem}
-                </Typography>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant='body2' fontWeight={700} noWrap>
+                    {operatorName}
+                  </Typography>
+                  {operator.email ? (
+                    <Typography variant='caption' color='text.secondary' noWrap>
+                      {operator.email}
+                    </Typography>
+                  ) : null}
+                </Box>
               </Stack>
             </ActionSection>
 
@@ -655,7 +726,7 @@ const OnboardingCasesInboxView = ({
 type MetricTileProps = {
   icon: string
   label: string
-  value: string
+  value: number
   detail?: string
   tone: 'primary' | 'info' | 'error' | 'success' | 'warning'
   last?: boolean
@@ -679,8 +750,8 @@ const MetricTile = ({ icon, label, value, detail, tone, last = false }: MetricTi
         <Typography variant='body2' color='text.secondary'>
           {label}
         </Typography>
-        <Typography variant='h4' sx={{ fontWeight: 800, color: `${tone}.main`, lineHeight: 1.1, mt: 0.5, fontVariantNumeric: 'tabular-nums' }}>
-          {value}
+        <Typography variant='h4' component='div' sx={{ fontWeight: 800, color: `${tone}.main`, lineHeight: 1.1, mt: 0.5, fontVariantNumeric: 'tabular-nums' }}>
+          <AnimatedCounter value={value} format='integer' />
         </Typography>
         {detail ? (
           <Typography variant='caption' color='text.secondary'>

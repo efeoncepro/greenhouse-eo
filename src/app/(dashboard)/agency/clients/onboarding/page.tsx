@@ -10,6 +10,7 @@ import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-enti
 import { can } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireServerSession } from '@/lib/auth/require-server-session'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export const metadata: Metadata = { title: 'Onboarding de clientes | Greenhouse' }
@@ -22,7 +23,7 @@ export const dynamic = 'force-dynamic'
 // failure (renders the degraded state, never a crash). The wizard at
 // /agency/clients/new stays the canonical front door — this cockpit complements it.
 const Page = async () => {
-  await requireServerSession()
+  const session = await requireServerSession()
 
   if (!isClientLifecycleOnboardingEnabled()) {
     notFound()
@@ -53,7 +54,15 @@ const Page = async () => {
     degraded = true
   }
 
-  return <OnboardingCasesInboxView data={data} degraded={degraded} />
+  // #6 — el operador que abre el cockpit sale como responsable (nombre + foto).
+  // Avatar resuelto con el helper canónico resolveAvatarUrl (fuente única).
+  const operator = {
+    name: session.user.name ?? 'Operador',
+    email: session.user.email ?? null,
+    avatarUrl: resolveAvatarUrl(session.user.avatarUrl ?? null, session.user.userId ?? null)
+  }
+
+  return <OnboardingCasesInboxView data={data} degraded={degraded} operator={operator} />
 }
 
 export default Page

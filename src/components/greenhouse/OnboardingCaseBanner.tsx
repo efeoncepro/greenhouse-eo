@@ -1,12 +1,13 @@
 'use client'
 
-import Link from 'next/link'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
+
+import ViewTransitionLink from '@/components/greenhouse/motion/ViewTransitionLink'
 
 import CustomChip from '@core/components/mui/Chip'
 
@@ -65,7 +66,7 @@ const OnboardingCaseBanner = ({
         <Typography variant='body2'>{meta.banner}</Typography>
       </Stack>
       <Button
-        component={Link}
+        component={ViewTransitionLink}
         href={`/agency/clients/${organizationId}/lifecycle`}
         size='small'
         variant='outlined'

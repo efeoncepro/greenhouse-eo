@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import Link from 'next/link'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -25,6 +24,8 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
+
+import ViewTransitionLink from '@/components/greenhouse/motion/ViewTransitionLink'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -109,7 +110,7 @@ const orgColumns: ColumnDef<OrganizationListItem, any>[] = [
 
       return (
         <>
-          <Typography component={Link} href={`/agency/organizations/${org.organizationId}`} variant='body2' fontWeight={600} sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+          <Typography component={ViewTransitionLink} href={`/agency/organizations/${org.organizationId}`} variant='body2' fontWeight={600} sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
             {org.organizationName}
           </Typography>
           {org.legalName && org.legalName !== org.organizationName && (
@@ -147,7 +148,7 @@ const orgColumns: ColumnDef<OrganizationListItem, any>[] = [
       const meta = ONBOARDING_META[onboardingStatus]
 
       return (
-        <Link
+        <ViewTransitionLink
           href={`/agency/clients/${row.original.organizationId}/lifecycle`}
           aria-label={ONB_T.orgLinkAria}
           style={{ textDecoration: 'none' }}
@@ -161,7 +162,7 @@ const orgColumns: ColumnDef<OrganizationListItem, any>[] = [
             label={meta.label}
             icon={<i className='tabler-external-link' style={{ fontSize: 14 }} />}
           />
-        </Link>
+        </ViewTransitionLink>
       )
     },
     meta: { align: 'center' }

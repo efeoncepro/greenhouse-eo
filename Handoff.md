@@ -1,3 +1,14 @@
+# Sesion 2026-06-05 (cont.) — TASK-1015 ✅ pase enterprise del cockpit de onboarding (UX-writing + motion + avatar)
+
+Feedback del operador viendo el cockpit (TASK-1013) en staging → pase de calidad enterprise (en `develop`).
+
+- **6 fixes + UX-writing + motion**: link amigable al wizard; **UX-writing es-CL tuteo** (eliminé voseo rioplatense + jerga cockpit/inbox/timeline); **etiquetas del checklist** reescritas de técnicas a claras (migración `20260605053954845`: plantilla + casos abiertos, `item_code` intactos); **Responsable = operador real** (nombre+email+foto) vía helper canónico `resolveAvatarUrl`; "Bloquea el cierre" solo en etapas pendientes; **transición moderna** al wizard (`ViewTransitionLink` crossfade + `loading.tsx` skeleton del shell); **microinteracciones** (KPIs `AnimatedCounter` + crossfade al cambiar de caso, reduced-motion-aware).
+- **Avatar canonizado en CLAUDE.md**: `resolveAvatarUrl` (`src/lib/person-360/resolve-avatar.ts`) = fuente única; es server-only → resolver en server y pasar el avatar resuelto al cliente. Nunca componer `/api/media/users/{id}/avatar` inline.
+- **GVC en loop**: cockpit (copy + counters + gate) + **escenario nuevo de View Transition** (`onboarding-cases-new-client-transition`, interaction V2, frames 0/140/380/1300ms → crossfade + skeleton del wizard) mirados, enterprise.
+- **Bug class corregido**: server component no puede pasar `sx={{ ...: theme => ... }}` (callback) a MUI client → 500 en el wizard; fix con tokens string (`borderColor: 'divider'`).
+- **Gates**: tsc 0 · eslint full 0 · `pnpm build` (verificando) · GVC mirado. Spec: `complete/TASK-1015-onboarding-cockpit-enterprise-polish.md`.
+- **Pendiente (respondido como follow-ups al operador)**: auto-verificación del estado real de ítems (Notion/Nubox, extiende preflight TASK-1009) + "todo caso con deal" + linkear el deal de Berel (modelo + backfill; el caso de Berel es `manual` sin deal y el cockpit lo muestra honesto).
+
 # Sesion 2026-06-05 (cont.) — TASK-1014 ✅ aviso in-app + email al nacer un onboarding draft por deal
 
 Promoví el Slice 4 diferido de TASK-1013 a **TASK-1014** y lo implementé (en `develop`, sin push intermedio). El cockpit hizo los casos *encontrables* (pull); esto agrega el *push*.

@@ -25,7 +25,7 @@ export const scenario: CaptureScenario = {
   assertions: [
     { kind: 'noLoginRedirect', reason: 'el cockpit vive bajo (dashboard) autenticado' },
     { kind: 'noErrorBoundary', reason: 'la evidencia no debe capturar un error boundary' },
-    { kind: 'visible', selector: 'text=Este cockpit no reemplaza el wizard', reason: 'el aviso de no-reemplazo del wizard siempre está presente' },
+    { kind: 'visible', selector: 'text=Esta vista no reemplaza el alta', reason: 'el aviso de no-reemplazo del alta siempre está presente' },
     { kind: 'visible', selector: 'text=Onboarding de clientes', reason: 'título del cockpit' }
   ],
   steps: [

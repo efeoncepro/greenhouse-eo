@@ -5755,6 +5755,17 @@ automaticamente al `pnpm install`):
 clone el repo y haga `pnpm install` recibe los hooks automaticamente. El CI
 gate sigue activo como tercera linea de defensa.
 
+### Avatares de usuario — helper canónico (fuente única, desde 2026-06-05)
+
+Toda resolución de la foto/avatar de un usuario pasa por el helper canónico **`resolveAvatarUrl(avatarUrl, userId)`** en [src/lib/person-360/resolve-avatar.ts](src/lib/person-360/resolve-avatar.ts). Es la **fuente única** para que NO haya fotos distintas por todos lados: los avatares se guardan como `gs://` en la DB y se sirven SIEMPRE por el proxy canónico `/api/media/users/{userId}/avatar`; el helper hace exactamente esa traducción (`gs://` + userId → proxy URL; cualquier otra URL → tal cual; null → null).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** componer `/api/media/users/${userId}/avatar` inline en un consumer (es justo la duplicación que el helper evita — había copias en `get-person-profile`, `my/organization/members`, `my/assignments`, `UserDropdown`, todas reemplazadas/a reemplazar por el canónico). Toda foto de usuario sale de `resolveAvatarUrl`.
+- **NUNCA** usar `session.user.avatarUrl` crudo en un `<Avatar src>` — puede ser un `gs://` no servible. Pasarlo siempre por `resolveAvatarUrl(avatarUrl, userId)` primero.
+- **`resolveAvatarUrl` es `import 'server-only'`** → en un componente cliente (`'use client'`) NO se puede importar. Patrón canónico: resolverlo en el **server component / route / reader** y pasar el `avatarUrl` ya resuelto como prop/campo del VM (el cliente solo renderiza `<Avatar src={vm.avatarUrl ?? undefined}>` con fallback a iniciales). Caso fuente: `OnboardingCasesInboxView` (TASK-1015) recibe `operator.avatarUrl` resuelto en su page server.
+- **SIEMPRE** que un reader/route/VM exponga un avatar de usuario, mapearlo con `resolveAvatarUrl(rawAvatarUrl, userId)` (mirror de los facets person-360 / account-360 / people / finance responsibles que ya lo consumen).
+
 ### Otras convenciones
 
 - Line endings: LF (ver `.gitattributes`)
