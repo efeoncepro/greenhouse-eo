@@ -1,3 +1,13 @@
+# Sesion 2026-06-05 (cont.) — TASK-1022 ✅ Collaborator Viewer runtime (Workforce Contracting)
+
+El colaborador ve sus ofertas y contratos en "Mi Ficha" (`/my/offers` + `/my/contracts`). **En `develop` sin branch.** Backend ya existía (TASK-1019 Slice 4: rutas `/api/my/*` + reader `getOwnContractingSummary` anti-IDOR) → TASK-1022 fue UI + nav + governance.
+
+- **Slice 0 — Governance + flag** (`423f5d4db`): viewCode `mi_ficha.mis_contratos` (migración aplicada+verificada, grant `collaborator`) + TS catalog; flag de sesión `hasWorkforceContractingDocument` (helper EXISTS + auth.ts JWT/session + next-auth types + get-tenant-context, mirror TASK-796) gatea los 2 ítems de nav en "Mi Ficha" (ambos bloques internos); copy es/en.
+- **Slice 1 — UI** (`3689a8497`): `MyContractingDocumentsView` compartida (por tipo) consumiendo el reader server-side; estado honesto agrupado (preparando/pendiente firma/firmado/cerrada) + badge bilingüe + nota read-only + acciones firma/descarga `locked` (EPIC-001). 12-state. 2 server pages gated por viewCode.
+- **GVC** (`eafe19b05`): scenario + capturas de `/my/contracts` y `/my/offers` → enterprise, empty states honestos, **0 violaciones axe**. Test pin `mi_ficha` 13→14.
+- **Gate de cierre**: `pnpm test` + `pnpm build` full corriendo; mover a `complete/` + push tras verdes. Migración viewCode ya aplicada al Cloud SQL compartido.
+- **Fuera de scope**: PDF/firma/descarga real = EPIC-001 (TASK-1023/1024). El epic queda: foundation + admin viewer (TASK-1021) + collaborator viewer (TASK-1022) ✅; falta Track B (firmable).
+
 # Sesion 2026-06-05 (cont.) — ADR My Performance self-service + TASK-1027 🆕
 
 Por pedido del operador se formalizo primero la arquitectura y luego la task para llevar a `/my/performance` la riqueza de `People > Person 360 > Actividad` sin convertir la vista colaborador en una copia admin.
