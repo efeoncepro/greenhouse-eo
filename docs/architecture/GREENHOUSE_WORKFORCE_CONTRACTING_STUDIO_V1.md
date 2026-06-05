@@ -113,6 +113,70 @@ Person / Candidate
 
 El modulo debe sentirse como un workbench operativo, no como un editor generico de documentos. El operador ve excepciones, datos faltantes, riesgo legal, diferencias oferta vs contrato y firmas pendientes.
 
+### 1.1 Product Experience Direction
+
+Workforce Contracting Studio debe ser un producto de **decision, revision y orquestacion**, no una pantalla para "generar texto con IA".
+
+La propuesta de producto aprobada combina tres ideas:
+
+1. **Guided Contract Builder**
+   - Flujo guiado para convertir datos canonicos de persona, cargo, compensacion, entidad legal, modalidad y jurisdiction pack en una carta oferta o contrato.
+   - El operador avanza por pasos: datos capturados, readiness legal, redaccion IA, revision bilingue, aprobacion, PDF/firma.
+   - Cada paso muestra bloqueos concretos y evita estados ambiguos como "listo" cuando faltan datos o validacion legal.
+
+2. **Bilingual Legal Review Desk**
+   - Pantalla de revision lado a lado para `es-CL` y `en-US`.
+   - Secciones alineadas por `sectionCode`, con badges de paridad y bloqueos si montos, fechas, nombres, entidades, beneficios, condiciones o riesgos no coinciden.
+   - Claude puede sugerir redaccion y notas, pero Greenhouse debe explicar que datos uso, que asumio, que falta y que requiere Legal.
+   - La aprobacion ocurre sobre el par bilingue completo; no existe aprobacion de un idioma por separado.
+
+3. **Contracting Command Center**
+   - Workbench administrativo para HR/Legal/Finance con cola de casos, filtros por riesgo, jurisdiccion, estado, tipo documental, firma pendiente y proxima accion.
+   - Esta vista prioriza excepciones y throughput: drafts por revisar, casos bloqueados por datos, listos para firma, firmas vencidas y contratos completados.
+
+La direccion recomendada para V1 es un hibrido: **Guided Contract Builder** como flujo principal, **Bilingual Legal Review Desk** como pantalla diferenciadora, y **Command Center** como entrada operativa para volumen.
+
+### 1.2 Product Surfaces
+
+Admin route:
+
+```text
+/hr/workforce/contracts
+```
+
+Expected surfaces:
+
+- **Queue / Command Center:** lista operativa de casos con KPIs, filtros segmentados y acciones por proxima decision.
+- **Case Detail:** datos capturados, readiness legal/payroll, timeline, eventos, fuentes y bloqueos.
+- **AI Draft Panel:** borrador Claude, source facts, missing facts, assumptions, risk flags y reviewer notes.
+- **Bilingual Review Desk:** revision `es-CL` / `en-US` lado a lado, paridad por seccion y diffs materiales.
+- **Approval Rail:** aprobacion HR/Legal/Finance, readiness para PDF/firma, void/supersede y resend reminders cuando las tareas futuras lo habiliten.
+
+Collaborator routes:
+
+```text
+/my/offers
+/my/contracts
+```
+
+Expected surfaces:
+
+- estado honesto del documento;
+- visor bilingue o selector/comparador `es-CL` / `en-US`;
+- CTA de firma cuando ZapSign este listo;
+- descarga de PDF firmado y evidencia cuando exista;
+- estados de falta de accion, pendiente de empresa, vencido o corregido;
+- cero edicion de texto legal.
+
+### 1.3 Product Principles
+
+- **No fake green:** el producto nunca debe mostrar "listo para firma" si falta un idioma, si falla paridad, si hay blockers de jurisdiction pack o si falta aprobacion humana.
+- **AI is visible but bounded:** Claude debe sentirse como copiloto de redaccion, no como autoridad legal.
+- **Bilingual first:** espanol e ingles nacen juntos desde el draft; el ingles no es traduccion manual tardia.
+- **Exception-led operations:** la cola debe ordenar por riesgo y proxima accion, no por fecha de creacion solamente.
+- **Evidence over decoration:** cada estado critico debe poder explicar de donde viene: dato fuente, validator, reviewer, PDF version, firma o webhook.
+- **Calm enterprise UI:** superficies densas pero legibles, sin landing page, sin cards decorativas anidadas y con lenguaje de trabajo.
+
 ## 2. Domain Boundary
 
 | Capability | Owner | Contract |

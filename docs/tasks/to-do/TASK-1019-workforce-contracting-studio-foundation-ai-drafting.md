@@ -129,6 +129,7 @@ Reglas obligatorias:
 - EPIC-001 defines document registry, signature orchestration, ZapSign adapter and template rendering.
 - Notification Hub architecture defines future intent/delivery model.
 - Person 360 can become the user-facing evidence hub.
+- Product Design mockup route exists at `/hr/workforce/contracts/mockup` with three approved modes: Centro operativo, Flujo guiado and Revisión bilingüe. It is mock data only and must not be treated as runtime implementation.
 
 ### Gap
 
@@ -137,6 +138,27 @@ Reglas obligatorias:
 - No deterministic jurisdiction pack validators exist for offer/contract readiness.
 - No bridge exists between accepted offer -> employment contract -> workforce activation readiness.
 - No canonical event vocabulary exists for pre-signature/post-signature/pending-signature emails.
+
+## Product Direction
+
+This task must shape the domain primitives for the approved product direction, even though it does not build the full UI.
+
+The target product is **Workforce Contracting Studio**: a decision, review and orchestration workbench for bilingual offer letters and employment contracts.
+
+Approved product model:
+
+- **Guided Contract Builder:** guided flow from canonical person/workforce facts to readiness, Claude draft, bilingual review, approval and future PDF/signature.
+- **Bilingual Legal Review Desk:** side-by-side `es-CL` / `en-US` review with section alignment, parity validation, material divergence blockers, source facts and reviewer notes.
+- **Contracting Command Center:** admin queue for HR/Legal/Finance with drafts, blockers, legal risk, signatures pending, exceptions and next action.
+- **Collaborator Viewer:** simple self-service experience for `/my/offers` and `/my/contracts`: read, compare languages, sign when ready, download signed artifacts and see honest status.
+
+Design/product constraints:
+
+- No fake-green status: ready states require both languages, parity pass, jurisdiction pack validation and required human approvals.
+- Claude is visible but bounded: the UI may show AI notes, source facts and assumptions, but the commands must never treat AI output as approval.
+- Every list/detail reader should expose next-action metadata so future UI can sort by operational urgency.
+- Every draft/detail reader should expose bilingual parity metadata so future UI can render the review desk without re-running business logic in JSX.
+- Future visible copy must use `src/lib/copy/workforce-contracting.ts` and Greenhouse nomenclature; do not hardcode reusable labels in UI.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -210,6 +232,13 @@ Reglas obligatorias:
   - list contracting cases for admin queue;
   - read case detail with drafts, validation snapshot and event timeline;
   - read own contract/offer summary for collaborator.
+- Include product-shaped fields in readers:
+  - `nextActionCode`;
+  - `riskLevel`;
+  - `missingFactsSummary`;
+  - `languageParityStatus`;
+  - `authoritativeLanguage`;
+  - `signatureReadinessStatus` as future no-op/derived status only.
 - Add internal product API routes for admin actions using command primitives.
 - Add a read-only self route or reader for future `/my/offers` and `/my/contracts`.
 - Map errors with sanitized domain errors.
@@ -236,6 +265,7 @@ Reglas obligatorias:
 - Creating signature requests.
 - Generating final production PDF.
 - Building full admin UI or collaborator viewer.
+- Building visual mockup routes for `/hr/workforce/contracts`, `/my/offers` or `/my/contracts`.
 - Sending emails.
 - Deferring English/Spanish generation to a later task.
 - Registering contracts in DT/REL or automating Mi DT.
@@ -386,6 +416,7 @@ Do not call Claude before deterministic input packet and validation shape exist.
 - [ ] Draft approval cannot proceed unless both languages exist and bilingual parity validation has no blocking divergence.
 - [ ] No code calls ZapSign, sends emails or generates production PDFs in this task.
 - [ ] API routes consume command/read primitives and enforce capabilities.
+- [ ] Readers expose product-shaped metadata for future Command Center, Guided Builder, Bilingual Legal Review Desk and collaborator viewer.
 - [ ] Outbox event vocabulary is documented and emitted only for foundation lifecycle events.
 - [ ] Documentation explains future connection to EPIC-001, Notification Hub and Workforce Activation.
 
@@ -413,6 +444,7 @@ Do not call Claude before deterministic input packet and validation shape exist.
 
 ## Follow-ups
 
+- Promote approved mockup direction from `/hr/workforce/contracts/mockup` into runtime after foundation readers/commands exist, keeping GVC parity against the mockup.
 - Workforce Contracting PDF + Template Rendering consumer, blocked by `TASK-489` + `TASK-493`.
 - Workforce Contracting ZapSign signature consumer, blocked by `TASK-490` + `TASK-491`.
 - Admin workbench `/hr/workforce/contracts` with GVC loop.
