@@ -1,3 +1,13 @@
+# Sesion 2026-06-05 (cont.) — Workforce Contracting Studio ADR + TASK-1019 🆕
+
+Por pedido del operador se ideó la arquitectura para dos módulos complementarios de Workforce: **carta oferta** previa contratación y **contrato de trabajo**, con drafting asistido por Claude, aprobación humana, viewers colaborador/admin, PDF institucional, emails pre/post/pendiente de firma y firma vía ZapSign. Ajuste posterior del operador: **carta oferta y contrato deben existir siempre en español e inglés**.
+
+- **ADR/arquitectura creada:** `docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` (`Accepted as target architecture`). Decisión: Claude redacta borradores estructurados advisory-only; Greenhouse valida determinísticamente; humanos aprueban; EPIC-001 renderiza/versiona/firma; ZapSign es provider, no source of truth. Bilingüismo obligatorio `es-CL` + `en-US`; para Chile, `es-CL` queda como versión legal prevalente salvo override de Legal; ningún PDF/firma avanza si falta un idioma o hay divergencia material.
+- **Primera task creada:** `docs/tasks/to-do/TASK-1019-workforce-contracting-studio-foundation-ai-drafting.md`. Alcance: aggregate `WorkforceContractingCase`, drafts bilingües versionados, ledger Claude, validators V0 por jurisdiction pack, parity validation español/inglés, commands/readers/API/event contracts. **Fuera de scope:** ZapSign real, PDF productivo, emails, UI completa y registro DT/REL.
+- **Índices/cross-links sync:** `docs/architecture/DECISIONS_INDEX.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/epics/to-do/EPIC-001-document-vault-signature-orchestration-platform.md`, `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`.
+- **Verificación:** docs-only; `pnpm task:lint --changed` verde; `git diff --check` verde. `pnpm docs:closure-check` pidió handoff, resuelto con esta entrada; repetir check antes de cerrar respuesta.
+- **Nota multi-agente:** antes de esta sesión ya había cambios ajenos en `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/to-do/TASK-1016-organization-list-enterprise-prototype.md` y `docs/tasks/to-do/TASK-1018-gvc-mockup-runtime-contract-gates.md`; no revertirlos ni atribuirlos a TASK-1019.
+
 # Sesion 2026-06-05 (cont.) — TASK-1017 ✅ auto-verificación de ítems del checklist contra el estado real (capa de evidencia)
 
 Follow-up del pendiente que dejó TASK-1015. El estado de cada ítem del checklist de onboarding era manual; varios ítems ya tienen estado real queryable → desfase "marcado ≠ realidad" (Berel: Notion provisionado + en BigQuery, pero el paso seguía "en curso"). Extendí el patrón **thin + reuse-first** de TASK-1009 a los 6 ítems auto-derivables (en `develop`, sin push). **Cero migración / capability / outbox / tabla.**
