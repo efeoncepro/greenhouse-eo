@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura + ADR distribuido
 > **Version:** 1.0
 > **Creado:** 2026-06-05
-> **Estado:** Accepted as target architecture, runtime pendiente
+> **Estado:** Accepted; **foundation implementada (TASK-1019, 2026-06-05)** en `develop` (sin push). PDF/firma/UI consumen EPIC-001 + tasks de viewer (pendientes).
 > **Owner:** HR / Legal / Payroll / Documents / Notifications / AI
 > **Validated as of:** 2026-06-05
 > **Related:** `EPIC-001`, `EPIC-017`, `TASK-1019`
@@ -624,3 +624,17 @@ Official/public sources consulted 2026-06-05:
 - Greenhouse opens a new legal entity outside Chile.
 - A non-Chile employee/employer-of-record flow becomes active.
 - AI drafting is allowed to move beyond advisory into stronger automation, which would require a separate ADR.
+
+## Delta 2026-06-05 — TASK-1019 foundation implementada (en `develop`, sin push)
+
+Foundation entregada (5 slices, commits `19b5069c1`→`ff8429f25`). NO incluye PDF/firma/emails/UI runtime (esos consumen EPIC-001 + tasks de viewer).
+
+- **Migración** `20260605132850083` (+ `…133159761` capabilities): 4 tablas en `greenhouse_hr` (`workforce_contracting_{cases,drafts,ai_runs,case_events}`) con state-machine transition-guard por `case_kind`, append-only audit triggers, CHECK bilingüe + `signable_format` + status-by-kind, FKs a `identity_profiles`/`members`/`organizations`/`client_users`/`work_relationship_onboarding_cases`. Aplicada al Cloud SQL `greenhouse-pg-dev` (compartido).
+- **Dominio** `src/lib/workforce/contracting/`: types puros + state machine (2 matrices, espejo del trigger DB) + store dual-mode + 5 commands atómicos (createCase, createOffer/EmploymentContractDraft, approveDraft, voidCase) con outbox v1 + audit in-tx. Barrel pure-only (store/commands server-only, TASK-827).
+- **Validators V0** (`jurisdiction-packs/`): 3 packs (`CL_CHILE_DEPENDENT_V1`, `CL_FOREIGNER_WORKING_IN_CHILE_V1`, `INTERNATIONAL_INTERNAL_REMOTE_V1`) fail-closed + paridad bilingüe + `legalReviewReference` (TASK-894).
+- **AI adapter** (`ai/`): cliente Claude canónico `src/lib/ai/anthropic.ts`, flag `WORKFORCE_CONTRACTING_AI_ENABLED=false` (default), schema `workforce_contracting_ai_draft.v1`, allowlist anti-leak, ai_run ledger, advisory-only (nunca auto-approve/PDF/email/sign), eval golden fixtures.
+- **Readers + projection + API**: readers product-shaped (Command Center / Bilingual Review Desk / collaborator), 6 rutas `/api/hr/workforce/contracting/**` + `/api/my/{contracts,offers}` (anti-IDOR). 6 capabilities `workforce.contracting.*` (approve = `EFEONCE_ADMIN` unilateral V0).
+- **Reliability** (moduleKey `workforce`, Sentry domain `workforce`): 3 signals steady=0. EVENT_CATALOG v1: 6 eventos `workforce.contracting.*`.
+- **Verificación**: tsc 0, eslint 0, ~94 tests focales + 414 reliability + live smoke (tx rolled-back: triggers + state machine + append-only + FKs reales).
+- **Decisiones del operador (2026-06-05)**: secret `greenhouse-anthropic-api-key` creado (rotar post-impl); aprobación unilateral `EFEONCE_ADMIN`; firma legal del representante ya en repo; dominio `workforce`; formato firmable ZapSign PDF+DOCX (render propio, no template feature).
+- **Pendiente (rollout)**: push `develop` + deploy Vercel/workers + flip de flags (cuando aplique) son decisión del operador (instrucción "mantente en develop"). El secret Anthropic debe rotarse antes de habilitar el flag en cualquier ambiente.

@@ -447,6 +447,24 @@ Los providers de IA conviven en `src/lib/ai/`. **NUNCA** crear un cliente/SDK pa
 - **Reliability signal canónico** `secrets.env_ref_format_drift` (kind=drift, severity=error si count>0, subsystem `cloud`, steady=0). Detecta env vars `*_SECRET_REF` cuyo valor falla `isCanonicalSecretRefShape` post-strip. Cuando alerta: re-set la env var ofensora con `printf %s "<clean-value>" | vercel env add <NAME> production --force` + redeploy.
 - **Bug class canonizada (2026-05-12)**: `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF` quedó persistida en Vercel production como `"greenhouse-github-app-private-key\n"` (bytes hex `... 6b 65 79 5c 6e 22`). El normalizer legacy NO stripaba quotes envolventes (solo `\n`/`\r` literales + `.trim()`) → resource name resultante con quotes embebidos → GCP NOT_FOUND silencioso → `resolveGithubAppInstallationToken` lanzaba "is not valid PEM" + `captureWithDomain` cada ~3min → preflight check `sentry_critical_issues` bloqueaba production release orchestrator. Fix V2: `stripEnvVarContamination` single-source-of-truth + `SECRET_REF_SHAPE` regex en boundary + signal `secrets.env_ref_format_drift` upstream + resolver `github-app-token` diferencia ref/content corruption.
 
+### Workforce Contracting Studio invariants (TASK-1019, foundation desde 2026-06-05)
+
+Dominio canónico de **cartas oferta + contratos laborales** (aggregate `greenhouse_hr.workforce_contracting_cases`, hermanos `offer_letter`/`employment_contract`), bajo **HR/Workforce — NO Payroll**. Módulo: `src/lib/workforce/contracting/` (barrel pure-only: types + state-machine + jurisdiction-packs; `store`/`commands`/`ai` son server-only, importados directo — TASK-827). Foundation: sin UI runtime, sin PDF/firma/email (esos consumen EPIC-001 + tasks de viewer). Spec: `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md`.
+
+**Bilingüe obligatorio**: toda carta oferta y contrato tiene `es-CL` + `en-US` (CHECK DB `required_languages` ⊇ {es-CL,en-US}). Para Chile, `es-CL` es la versión legal prevalente. La aprobación es sobre el **par bilingüe completo** (nunca un idioma suelto); requiere paridad estructural (mismos `sectionCode`) + sin divergencia material.
+
+**State machine + CHECK + audit trio** (patrón TASK-700/765): `status` único con CHECK condicional por `case_kind` (offer 11 estados / contract 19); transiciones enforced en TS (`assertCaseTransition`, 2 matrices) **y** en el trigger DB `workforce_contracting_case_transition_check` (espejo exacto — mover juntos). `workforce_contracting_case_events` append-only (triggers anti-UPDATE/DELETE). Commands dual-mode (`client?: PoolClient`), atómicos, outbox v1 + audit in-tx.
+
+**⚠️ Reglas duras**:
+- **NUNCA** escribir/mutar `payroll_entries`, `compensation_versions`, `final_settlements` ni recalcular payroll/compensation desde este dominio. Valida contra la tupla `(contract_type, pay_regime, payroll_via)`, no la recalcula. Gate de cierre: `pnpm vitest run src/lib/payroll` verde.
+- **NUNCA** usar `members.contract_type` como verdad única de estado laboral vigente; usar snapshots del caso o `resolveCurrentWorkClassification` (TASK-957).
+- **NUNCA** dejar que Claude apruebe, genere PDF, envíe email o firme. El adapter (`ai/`) es **advisory-only** detrás del flag `WORKFORCE_CONTRACTING_AI_ENABLED` (default OFF). El cliente Claude canónico vive en `src/lib/ai/anthropic.ts` (NO instanciar el SDK en el módulo de dominio). El input packet usa **allowlist** (`ALLOWED_FACT_CODES`): nunca secrets/tokens/bank/salary-history al prompt (arch §11).
+- **NUNCA** crear un vault/firma/document-manager paralelo. PDF/render/firma consumen **EPIC-001** (`TASK-489/490/491/493`); ZapSign acepta PDF **y** DOCX por upload directo (`base64_*`, NO el template feature que prohíbe imágenes/tablas). El formato firmable es la dimensión `cases.signable_format` (`pdf`|`docx`, default `pdf` Chile V1). La firma legal del representante va pre-estampada vía `@/lib/legal-signatures` (TASK-863).
+- **NUNCA** aprobar `international_internal` o extranjero-en-Chile sin `legalReviewReference` (>=10 chars, fail-closed en el validator; CHECK DB; invariante TASK-894). NUNCA loggear el valor crudo.
+- **NUNCA** sembrar una capability `workforce.contracting.*` sin grant en `runtime.ts` (mismo PR; guard `capability-grant-coverage.test`). Aprobación V0 = `EFEONCE_ADMIN` unilateral (no existe rol `legal`).
+- **NUNCA** `Sentry.captureException` directo — usar `captureWithDomain(err, 'workforce', ...)` (dominio + moduleKey `workforce` nuevos). 3 signals steady=0: `workforce.contracting.{ai_draft_failed, validation_blocked_overdue, approved_without_pdf}`.
+- **SIEMPRE** que un consumer downstream necesite "el detalle/estado de un caso", consumir los readers product-shaped (`readers.ts` + `projection.ts`), no recomputar en JSX.
+
 ### GitHub Actions workflows — pnpm + Node setup ordering
 
 **⚠️ Reglas duras (canonical workflow setup ordering, arch-architect verdict 2026-05-10)**:

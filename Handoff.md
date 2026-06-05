@@ -1,3 +1,15 @@
+# Sesion 2026-06-05 (cont.) — TASK-1019 ✅ foundation implementada (5 slices, en `develop` sin push)
+
+Workforce Contracting Studio foundation completa (cartas oferta + contratos laborales bilingües ES+EN, drafting Claude advisory, validators por jurisdiction pack). **En `develop`, sin push** (instrucción del operador "mantente en develop"). Sin UI runtime, sin PDF/firma/email (esos consumen EPIC-001 + tasks de viewer).
+
+- **Slices (commits)**: `19b5069c1` Slice 1 (dominio + migración 4 tablas `greenhouse_hr` + state machine + 6 capabilities + CaptureDomain workforce + commands), `495e7ca11` Slice 2 (3 jurisdiction packs fail-closed + paridad bilingüe + legalReviewReference), `7054abff8` Slice 3 (cliente `src/lib/ai/anthropic.ts` + flag OFF + structured output + eval fixtures), `42d8dbcb7` Slice 4 (readers product-shaped + projection + 6 rutas HR + 2 rutas `/my` anti-IDOR + **live smoke** tx rolled-back), `ff8429f25` Slice 5 (3 reliability signals moduleKey `workforce` + EVENT_CATALOG Delta 6 eventos v1). Docs: `50b10918e`.
+- **Migración aplicada** al Cloud SQL `greenhouse-pg-dev` (compartido) — tablas + triggers + 6 capabilities seedeadas verificadas por anti-pre-up DO blocks.
+- **Live smoke verde** (data real, rolled-back): create→draft→approve (walk multi-hop) + trigger DB rechaza transición inválida + append-only event guard + void→voided. Valida triggers + state machine + FKs + outbox in-tx.
+- **Gates**: tsc 0 · eslint 0 · ~94 tests focales + 414 reliability verdes · `pnpm test` (full) + `pnpm build` corriendo al cierre.
+- **Anthropic**: secret `greenhouse-anthropic-api-key` creado (probado HTTP 200). ⚠️ **Rotar la key** (se pegó en chat) ANTES de habilitar el flag en cualquier ambiente.
+- **Pendiente (rollout — decisión operador)**: push `develop` → deploy Vercel/workers; registrar `ANTHROPIC_API_KEY_SECRET_REF` en Vercel; promover el mockup `/hr/workforce/contracts/mockup` a runtime (task viewer); consumir EPIC-001 para PDF/ZapSign. Sin push, los workers Cloud Run + Vercel no se redespliegan (los cambios en `src/lib/reliability`/`observability`/`sync` son additivos).
+- **Doc funcional/manual**: NO creados — TASK-1019 no cambia comportamiento visible (sin UI, flag OFF). Se crearán con la task de viewer. La spec canónica es `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` (Delta 2026-06-05).
+
 # Sesion 2026-06-05 (cont.) — TASK-1019 🚧 implementación iniciada (foundation)
 
 Por pedido del operador se inició la implementación de TASK-1019 (Workforce Contracting Studio Foundation), **en `develop` sin branch** (instrucción explícita). Es P1 → se llega hasta el Plan (FASE 4) y se para en checkpoint humano antes de escribir runtime.
