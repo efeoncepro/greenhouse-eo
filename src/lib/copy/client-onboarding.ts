@@ -420,7 +420,71 @@ export const GH_CLIENT_ONBOARDING = {
   // TASK-1013 — mockup Product Design del inbox/cockpit de casos de onboarding.
   onboardingCases: {
     filtersAria: 'Filtros rápidos de onboarding',
-    openTimelineAria: 'Abrir timeline completo del caso'
+    openTimelineAria: 'Abrir timeline completo del caso',
+    // --- Cockpit runtime (TASK-1013) -----------------------------------------
+    breadcrumbAgency: 'Agencia',
+    breadcrumbClients: 'Clientes',
+    title: 'Onboarding de clientes',
+    subtitle: 'Encuentra los casos creados por deals, revisa los bloqueos y abre el timeline sin tipear URLs.',
+    wizardNotice: 'Este cockpit no reemplaza el wizard: lo hace encontrable. El alta nueva sigue viviendo en /agency/clients/new.',
+    newClientCta: 'Nuevo cliente',
+    // KPIs (solo datos reales: nada de SLA% fabricado).
+    kpiOpenLabel: 'Casos abiertos',
+    kpiInProgressLabel: 'En progreso',
+    kpiOverdueLabel: 'Vencidos',
+    kpiOverdueDetail: 'Pasaron su fecha objetivo',
+    kpiBlockedLabel: 'Bloqueados',
+    kpiBlockedDetail: 'Necesitan que resuelvas un bloqueo',
+    // Inbox + filtros.
+    searchPlaceholder: 'Buscar cliente, código o deal',
+    statusFilterLabel: 'Estado',
+    originFilterLabel: 'Origen',
+    filterAll: 'Todos',
+    inboxHeading: 'Inbox de casos',
+    statusDraft: 'Borrador',
+    stepSkipped: 'Omitido',
+    stepNotApplicable: 'No aplica',
+    stepBlocksCompletion: 'Bloquea el cierre',
+    visibleCountAria: 'Cantidad de casos visibles',
+    withinTarget: 'Dentro de la fecha objetivo',
+    noTargetDate: 'Sin fecha objetivo',
+    // Estados (state-design): vacío real vs filtrado vs degradado.
+    emptyZeroTitle: 'Aún no hay casos de onboarding',
+    emptyZeroDescription: 'Cuando un deal pase a cerrado-ganado o crees un cliente, su caso aparece acá para que lo actives.',
+    emptyFilteredTitle: 'Sin casos para estos filtros',
+    emptyFilteredDescription: 'Cambia el estado, el origen o la búsqueda para volver a ver casos de onboarding.',
+    clearFiltersCta: 'Limpiar filtros',
+    degradedTitle: 'No pudimos cargar los casos',
+    degradedDescription: 'Tuvimos un problema al leer el onboarding. Probá de nuevo en unos segundos.',
+    retryCta: 'Reintentar',
+    // Preview del caso seleccionado (timeline real del checklist).
+    createdOn: 'Creado el',
+    stepsReady: 'etapas listas',
+    progressAria: 'Avance del checklist del caso',
+    // Rail de acción.
+    nextActionTitle: 'Siguiente acción',
+    nextActionInProgress: 'Continuá el checklist en el timeline del caso.',
+    nextActionDraft: 'Activá el caso para iniciar su onboarding.',
+    nextActionBlocked: 'Resolvé el bloqueo antes de seguir.',
+    openTimelineCta: 'Abrir timeline',
+    activateCaseCta: 'Activar caso',
+    activationHint: 'La activación ocurre en el timeline del caso.',
+    responsibleTitle: 'Responsable',
+    responsibleSystem: 'Sistema (automático)',
+    responsibleOperator: 'Operador interno',
+    targetTitle: 'Fecha objetivo',
+    targetNone: 'Sin fecha objetivo definida.',
+    sourceTitle: 'Fuente',
+    sourceOriginLabel: 'Origen',
+    sourceDealLabel: 'Deal ID',
+    sourceNoDeal: 'Sin deal asociado',
+    // Origen (mapea trigger_source canónico).
+    originHubspotDeal: 'Deal HubSpot',
+    originManual: 'Manual',
+    originAdopt: 'Adopción',
+    originRenewal: 'Renovación',
+    originChurnSignal: 'Señal de baja',
+    originMigration: 'Migración'
   },
   // TASK-1009 — panel del preflight de onboarding Notion (ítem verify_notion_flowing).
   notionPreflight: {

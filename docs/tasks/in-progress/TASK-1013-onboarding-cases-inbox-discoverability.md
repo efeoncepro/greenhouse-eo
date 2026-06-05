@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto` (sin esto, el deal-trigger de onboarding crea casos draft que el operador NO puede encontrar → flujo inutilizable end-to-end)
 - Effort: `Medio`
