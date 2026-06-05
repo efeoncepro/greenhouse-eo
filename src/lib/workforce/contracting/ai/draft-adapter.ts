@@ -32,6 +32,8 @@ import {
   getWorkforceContractingDraftModel,
   isWorkforceContractingAiEnabled
 } from './config'
+import { getJurisdictionPack } from '../jurisdiction-packs/registry'
+
 import {
   buildContractingDraftingPrompt,
   buildContractingInputPacket,
@@ -176,8 +178,8 @@ export const runContractingAiDraft = async (
   try {
     const result = await d.generate<unknown>({
       model,
-      system: buildContractingSystemPrompt(),
-      prompt: buildContractingDraftingPrompt(packet),
+      system: buildContractingSystemPrompt(input.jurisdictionPackCode),
+      prompt: buildContractingDraftingPrompt(packet, getJurisdictionPack(input.jurisdictionPackCode)),
       toolName: WORKFORCE_CONTRACTING_AI_DRAFT_TOOL.name,
       toolDescription: WORKFORCE_CONTRACTING_AI_DRAFT_TOOL.description,
       inputSchema: WORKFORCE_CONTRACTING_AI_DRAFT_TOOL.inputSchema as unknown as Anthropic.Messages.Tool.InputSchema,

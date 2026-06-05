@@ -15,4 +15,6 @@ export const getWorkforceContractingDraftModel = (): string =>
   process.env.WORKFORCE_CONTRACTING_AI_MODEL?.trim() || 'claude-sonnet-4-6'
 
 export const WORKFORCE_CONTRACTING_AI_PROVIDER = 'anthropic'
-export const WORKFORCE_CONTRACTING_PROMPT_VERSION = 'workforce_contracting_ai_draft.v1'
+// v2 (2026-06-05): persona de abogado laboralista + especialista en compensaciones,
+// marco legal pack-aware y enumeración explícita de cláusulas obligatorias/prohibidas.
+export const WORKFORCE_CONTRACTING_PROMPT_VERSION = 'workforce_contracting_ai_draft.v2'
