@@ -10,4 +10,5 @@
  */
 export * from './types'
 export * from './state-machine'
+export * from './projection'
 export * from './jurisdiction-packs'
