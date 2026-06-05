@@ -178,12 +178,15 @@ export const runContractingAiDraft = async (
   try {
     const result = await d.generate<unknown>({
       model,
-      system: buildContractingSystemPrompt(input.jurisdictionPackCode),
+      system: buildContractingSystemPrompt(input.jurisdictionPackCode, packet.authoritativeLanguage),
       prompt: buildContractingDraftingPrompt(packet, getJurisdictionPack(input.jurisdictionPackCode)),
       toolName: WORKFORCE_CONTRACTING_AI_DRAFT_TOOL.name,
       toolDescription: WORKFORCE_CONTRACTING_AI_DRAFT_TOOL.description,
       inputSchema: WORKFORCE_CONTRACTING_AI_DRAFT_TOOL.inputSchema as unknown as Anthropic.Messages.Tool.InputSchema,
-      maxTokens: 8192
+      // A full bilingual contract (es-CL + en-US, multiple legal clauses) exceeds 8192
+      // output tokens — international contracts truncated at 8192, dropping trailing
+      // schema fields (prohibitedContentDetected). 16384 gives comfortable headroom.
+      maxTokens: 16384
     })
 
     const prepared = prepareDraftFromAiResponse(result.data)

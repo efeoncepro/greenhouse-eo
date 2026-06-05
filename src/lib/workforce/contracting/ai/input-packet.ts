@@ -110,18 +110,18 @@ export const buildContractingInputPacket = (input: BuildInputPacketInput): Build
 /** Legal framework line per jurisdiction pack (gives Claude the right doctrine to draft against). */
 const packFrameworkLine = (packCode: string): string => {
   if (packCode.startsWith('CL_CHILE_DEPENDENT')) {
-    return 'Marco legal: contrato individual de trabajo DEPENDIENTE regido por el Código del Trabajo chileno (indefinido o plazo fijo). Aplica la doctrina y dictámenes de la Dirección del Trabajo.'
+    return 'Marco de este caso: contrato individual de trabajo DEPENDIENTE regido por el Código del Trabajo chileno (indefinido o plazo fijo). Aplica la doctrina y dictámenes de la Dirección del Trabajo.'
   }
 
   if (packCode.startsWith('CL_FOREIGNER')) {
-    return 'Marco legal: trabajador/a EXTRANJERO/A prestando servicios físicamente en Chile. Aplica el Código del Trabajo chileno + normativa de extranjería (permiso de trabajo/residencia). Requiere revisión legal humana.'
+    return 'Marco de este caso: trabajador/a EXTRANJERO/A prestando servicios físicamente en Chile. Aplica el Código del Trabajo chileno + normativa de extranjería (permiso de trabajo/residencia). Requiere revisión legal humana.'
   }
 
   if (packCode.startsWith('INTERNATIONAL_INTERNAL')) {
-    return 'Marco legal: persona FUERA de Chile pagada internamente por Efeonce como operational payer (NO employer-of-record ni empleador local). NO apliques cotizaciones ni retenciones laborales chilenas. Requiere revisión legal humana.'
+    return 'Marco de este caso: persona FUERA de la jurisdicción de la entidad contratante, vinculada internamente (modelo operational payer; la entidad NO es employer-of-record ni empleador local). El acuerdo se rige por la ley de la entidad matriz e incluye SIEMPRE una cláusula de ley aplicable y foro de esa jurisdicción. NO apliques cotizaciones ni estatutos laborales locales del país del trabajador. Requiere revisión legal humana.'
   }
 
-  return 'Marco legal: usa el marco aplicable al jurisdiction pack indicado; ante duda, decláralo y exige revisión legal.'
+  return 'Marco de este caso: usa el marco aplicable al jurisdiction pack indicado, siempre bajo la jurisdicción de la entidad contratante; ante duda, decláralo y exige revisión legal.'
 }
 
 export interface DraftingPromptPackContext {
@@ -132,37 +132,44 @@ export interface DraftingPromptPackContext {
   requiredCompensationFacts: readonly string[]
 }
 
-export const buildContractingSystemPrompt = (packCode?: string): string =>
+export const buildContractingSystemPrompt = (packCode?: string, authoritativeLanguage: ContractLanguage = 'es-CL'): string =>
   [
-    'Eres un abogado laboralista senior y especialista en compensaciones de Efeonce, con expertise en:',
-    '- Derecho del trabajo chileno (Código del Trabajo, doctrina y dictámenes de la Dirección del Trabajo).',
-    '- Estructuras de compensación y nómina (regímenes laborales, remuneración fija y variable, asignaciones, beneficios).',
-    '- Redacción de contratos laborales y cartas oferta exigibles, con terminología jurídica precisa.',
-    '- Traducción legal bilingüe español (Chile) ↔ inglés (EE. UU.), fiel y estructuralmente alineada.',
+    'Eres un especialista senior en contratación de personas para Efeonce. Combinas tres expertises:',
+    '1) Derecho del trabajo de la jurisdicción de la ENTIDAD CONTRATANTE (hoy Efeonce es entidad chilena: Código del Trabajo, doctrina y dictámenes de la Dirección del Trabajo).',
+    '2) Acuerdos INTERNACIONALES de prestación de servicios para personas fuera de esa jurisdicción, gobernados por la ley de la entidad matriz (modelo operational payer).',
+    '3) Estructuras de compensación y nómina, y traducción legal bilingüe español (Chile) ↔ inglés (EE. UU.), fiel y estructuralmente alineada.',
+    '',
+    'PRINCIPIO DE JURISDICCIÓN: el contrato se rige SIEMPRE por la jurisdicción de la entidad contratante/matriz (la operating entity de Efeonce), NO por la del país de residencia del trabajador. Para personas internacionales, redactas un acuerdo bajo esa jurisdicción, con cláusula expresa de ley aplicable y foro, sin aplicar estatutos laborales locales del país del trabajador.',
     '',
     packCode ? packFrameworkLine(packCode) : '',
     '',
-    'Redactas borradores estructurados claros, completos y jurídicamente sólidos para revisión humana.',
+    'Redactas borradores estructurados, completos y jurídicamente sólidos para revisión humana.',
     'NO apruebas, NO firmas, NO decides legalidad ni emites opinión legal vinculante: eres asistente de redacción.',
     '',
     'Reglas duras:',
     '- Genera SIEMPRE ambas versiones: es-CL y en-US, alineadas 1:1 por sectionCode (misma estructura, mismo orden).',
-    '- es-CL es la versión legal PREVALENTE para Chile; en-US debe ser traducción fiel, no una reinterpretación distinta.',
+    `- El idioma legalmente PREVALENTE de este caso es ${authoritativeLanguage}; la otra versión es traducción fiel, no una reinterpretación distinta.`,
     '- Redacta cláusulas COMPLETAS y exigibles con la terminología correcta. Sé asertivo y preciso; evita lenguaje vago o condicional innecesario.',
+    '- En contratos internacionales: incluye SIEMPRE la cláusula de ley aplicable y foro (la de la entidad contratante) y NO apliques deducciones/estatutos laborales locales si el pack los prohíbe.',
     '- NUNCA inventes montos, fechas, identidades de personas/entidades ni hechos tributarios/payroll. Si falta un dato necesario, NO lo inventes: decláralo en missingFacts y deja un placeholder explícito (p. ej. «[POR DEFINIR]»).',
     '- No incluyas secretos, tokens ni datos no provistos en el input.',
-    '- Marca prohibitedContentDetected=true si detectas contenido prohibido por el pack.',
+    '- Incluye SIEMPRE el campo prohibitedContentDetected: true si detectas contenido prohibido por el pack, false en caso contrario (nunca lo omitas).',
     'Devuelve la salida exclusivamente vía la herramienta emit_workforce_contracting_draft.'
   ]
     .filter(line => line !== '')
     .join('\n')
 
 export const buildContractingDraftingPrompt = (packet: ContractingInputPacket, pack?: DraftingPromptPackContext): string => {
+  const entity = typeof packet.facts.operating_entity_legal_name === 'string' && packet.facts.operating_entity_legal_name.trim().length > 0
+    ? packet.facts.operating_entity_legal_name
+    : '[POR DEFINIR — entidad contratante]'
+
   const lines = [
     `Tipo de documento: ${packet.documentKind}`,
     `Jurisdiction pack: ${packet.jurisdictionPackCode}`,
-    `Idioma autoritativo: ${packet.authoritativeLanguage}`,
-    `Idiomas requeridos: ${packet.requiredLanguages.join(', ')}`,
+    `Entidad contratante (su jurisdicción rige el contrato): ${entity}`,
+    `Idioma legalmente prevalente: ${packet.authoritativeLanguage}`,
+    `Idiomas requeridos (ambos obligatorios): ${packet.requiredLanguages.join(', ')}`,
     `Tupla contractual: ${packet.contractTuple.contractType} / ${packet.contractTuple.payRegime} / ${packet.contractTuple.payrollVia}`,
     ''
   ]
