@@ -211,7 +211,9 @@ export const AGGREGATE_TYPES = {
 
   // TASK-1019 — Workforce Contracting Studio (GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1).
   // Aggregate identity = caseId ('wcc-{uuid}').
-  workforceContractingCase: 'workforce_contracting_case'
+  workforceContractingCase: 'workforce_contracting_case',
+  // TASK-490 — provider-neutral signature orchestration (EPIC-001). Identity = 'sig-{uuid}'.
+  signatureRequest: 'signature_request'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -986,7 +988,17 @@ export const EVENT_TYPES = {
   workforceContractingReadyForPdf: 'workforce.contracting.ready_for_pdf',
   workforceContractingReadyForSignature: 'workforce.contracting.ready_for_signature',
   // Future scheduler-emitted contract only (never emitted in TASK-1019).
-  workforceContractingSignaturePendingOverdue: 'workforce.contracting.signature_pending_overdue'
+  workforceContractingSignaturePendingOverdue: 'workforce.contracting.signature_pending_overdue',
+  // TASK-490 — provider-neutral signature orchestration (EPIC-001).
+  // aggregate_type = signature_request, aggregate_id = 'sig-{uuid}'. Consuming domains
+  // (contracting case, MSA) react to `completed` to link the signed asset.
+  signatureRequestCreated: 'signature.request.created',
+  signatureRequestSent: 'signature.request.sent',
+  signatureRequestPartiallySigned: 'signature.request.partially_signed',
+  signatureRequestCompleted: 'signature.request.completed',
+  signatureRequestCancelled: 'signature.request.cancelled',
+  signatureRequestFailed: 'signature.request.failed',
+  signatureRequestExpired: 'signature.request.expired'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
