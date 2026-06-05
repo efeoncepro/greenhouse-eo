@@ -37,7 +37,7 @@ export type FailureCategory =
 
 export interface CaptureFinding {
   severity: 'info' | 'warning' | 'error'
-  category: FailureCategory | 'readiness' | 'microinteraction' | 'baseline'
+  category: FailureCategory | 'readiness' | 'microinteraction' | 'baseline' | 'accessibility'
   code: string
   message: string
   frameLabel?: string

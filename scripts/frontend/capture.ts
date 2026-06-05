@@ -188,6 +188,16 @@ const runOneCapture = async ({
       exitCode = 1
       stepError = outcome.error
     }
+
+    const blockingFinding = outcome.qualityFindings.find(finding => finding.severity === 'error')
+
+    if (blockingFinding) {
+      exitCode = 1
+      stepError = {
+        message: `${blockingFinding.code}: ${blockingFinding.message}`,
+        stepIndex: -1
+      }
+    }
   } catch (err) {
     exitCode = 1
     stepError = {

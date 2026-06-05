@@ -76,11 +76,23 @@ export interface CaptureViewportVariant {
   device?: string
 }
 
+export interface CaptureAccessibilityQualityOptions {
+  /** Ejecuta axe-core sobre cada frame marcado. Default false. */
+  enabled?: boolean
+  /** Limita el audit a un contenedor estable para evitar ruido del shell global. */
+  includeSelector?: string
+  /** Tags axe/WCAG a evaluar. Default: WCAG 2.0/2.1/2.2 A y AA. */
+  tags?: string[]
+  /** Si es true/default, cualquier violation hace fallar la captura. */
+  failOnViolations?: boolean
+}
+
 export interface CaptureQualityOptions {
   allowEmpty?: boolean
   allowLoading?: boolean
   allowLogin?: boolean
   allowErrorBoundary?: boolean
+  accessibility?: CaptureAccessibilityQualityOptions
 }
 
 export interface CaptureScenarioStep {

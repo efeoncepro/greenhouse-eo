@@ -20,6 +20,12 @@ export const scenario: CaptureScenario = {
     postReadyDelayMs: 300,
     timeout: 12000
   },
+  quality: {
+    accessibility: {
+      enabled: true,
+      includeSelector: '[data-capture="organization-list-enterprise-mockup"]'
+    }
+  },
   assertions: [
     { kind: 'noLoginRedirect', reason: 'mockup vive bajo (dashboard) autenticado' },
     { kind: 'noErrorBoundary', reason: 'la evidencia no debe capturar un error boundary' },

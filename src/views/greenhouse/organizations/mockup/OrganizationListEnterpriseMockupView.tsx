@@ -21,7 +21,6 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
-import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
@@ -52,7 +51,8 @@ const organizationListMockupAria = {
   viewMode: 'Modo de visualizacion',
   workbenchView: 'Vista workbench',
   matrixView: 'Vista matriz',
-  matrixTable: 'Matriz comparativa de organizaciones'
+  matrixTable: 'Matriz comparativa de organizaciones',
+  matrixRegion: 'Tabla comparativa desplazable de organizaciones'
 }
 
 const filterOrder: OrganizationWorkbenchFilter[] = ['all', 'attention', 'onboarding', 'no_space', 'no_people', 'active']
@@ -338,54 +338,55 @@ const OrganizationListEnterpriseMockupView = () => {
 
         <Divider />
 
-        {filteredOrganizations.length === 0 ? (
-          <Box sx={{ p: 4 }}>
-            <EmptyState
-              icon='tabler-search-off'
-              title='Sin organizaciones para este filtro'
-              description='Ajusta la busqueda o vuelve a Todas para recuperar el panorama completo.'
-              action={<Button variant='tonal' onClick={() => { setQuery(''); setFilter('all') }}>Ver todas</Button>}
-            />
-          </Box>
-        ) : viewMode === 'workbench' ? (
-          <Box
-            id='organization-workbench-panel'
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1.12fr) minmax(340px, 0.88fr)' },
-              minHeight: { xs: 'auto', lg: 560 }
-            }}
-          >
-            <Stack
-              divider={<Divider flexItem />}
+        <Box id='organization-workbench-panel'>
+          {filteredOrganizations.length === 0 ? (
+            <Box sx={{ p: 4 }}>
+              <EmptyState
+                icon='tabler-search-off'
+                title='Sin organizaciones para este filtro'
+                description='Ajusta la busqueda o vuelve a Todas para recuperar el panorama completo.'
+                action={<Button variant='tonal' onClick={() => { setQuery(''); setFilter('all') }}>Ver todas</Button>}
+              />
+            </Box>
+          ) : viewMode === 'workbench' ? (
+            <Box
               sx={{
-                borderRight: { lg: `1px solid ${theme.palette.divider}` }
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1.12fr) minmax(340px, 0.88fr)' },
+                minHeight: { xs: 'auto', lg: 560 }
               }}
             >
-              {filteredOrganizations.map(item => (
-                <OrganizationRow
-                  key={item.organizationId}
-                  item={item}
-                  selected={item.organizationId === selectedOrganization.organizationId}
-                  onSelect={() => setSelectedId(item.organizationId)}
-                />
-              ))}
-            </Stack>
+              <Stack
+                divider={<Divider flexItem />}
+                sx={{
+                  borderRight: { lg: `1px solid ${theme.palette.divider}` }
+                }}
+              >
+                {filteredOrganizations.map(item => (
+                  <OrganizationRow
+                    key={item.organizationId}
+                    item={item}
+                    selected={item.organizationId === selectedOrganization.organizationId}
+                    onSelect={() => setSelectedId(item.organizationId)}
+                  />
+                ))}
+              </Stack>
 
-            <Box
-              component={motion.aside}
-              key={selectedOrganization.organizationId}
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
-              animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-              sx={{ p: { xs: 3, md: 4 }, bgcolor: alpha(theme.palette.action.hover, 0.28) }}
-            >
-              <OrganizationContextRail item={selectedOrganization} />
+              <Box
+                component={motion.aside}
+                key={selectedOrganization.organizationId}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
+                animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+                sx={{ p: { xs: 3, md: 4 }, bgcolor: alpha(theme.palette.action.hover, 0.28) }}
+              >
+                <OrganizationContextRail item={selectedOrganization} />
+              </Box>
             </Box>
-          </Box>
-        ) : (
-          <MatrixView organizations={filteredOrganizations} />
-        )}
+          ) : (
+            <MatrixView organizations={filteredOrganizations} />
+          )}
+        </Box>
       </Card>
     </Stack>
   )
@@ -539,10 +540,10 @@ function FilterSegment({
       ) : null}
       <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={2} sx={{ minWidth: 0 }}>
         <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-          <Typography variant='subtitle2' sx={{ fontSize: { xs: 13, md: undefined }, fontWeight: isActive ? 800 : 650, lineHeight: 1.2 }}>
+          <Typography variant='subtitle2' color='text.primary' sx={{ fontSize: { xs: 13, md: undefined }, fontWeight: isActive ? 800 : 650, lineHeight: 1.2 }}>
             {title}
           </Typography>
-          <Typography variant='caption' color='text.secondary' sx={{ display: { xs: 'none', sm: 'block' }, lineHeight: 1.25 }}>
+          <Typography variant='caption' color='text.primary' sx={{ display: { xs: 'none', sm: 'block' }, lineHeight: 1.25 }}>
             {filterHint(title)}
           </Typography>
         </Stack>
@@ -573,6 +574,42 @@ function filterHint(title: string) {
   return 'Operativas'
 }
 
+function OrgAvatar({
+  item,
+  size = 'default'
+}: {
+  item: OrganizationEnterpriseMock
+  size?: 'default' | 'rail' | 'matrix'
+}) {
+  const theme = useTheme()
+  const dimension = size === 'rail' ? 56 : size === 'matrix' ? 32 : 48
+  const mobileDimension = size === 'default' ? 40 : dimension
+
+  return (
+    <Box
+      component='span'
+      aria-hidden='true'
+      sx={{
+        width: { xs: mobileDimension, md: dimension },
+        height: { xs: mobileDimension, md: dimension },
+        borderRadius: size === 'matrix' ? 1.25 : 1.5,
+        display: 'grid',
+        placeItems: 'center',
+        flexShrink: 0,
+        border: `1px solid ${alpha(theme.palette[item.avatarTone].main, 0.24)}`,
+        bgcolor: alpha(theme.palette[item.avatarTone].main, 0.08),
+        color: 'text.primary',
+        fontSize: size === 'matrix' ? 12 : size === 'rail' ? 16 : 14,
+        fontWeight: 800,
+        lineHeight: 1,
+        letterSpacing: 0
+      }}
+    >
+      {item.initials}
+    </Box>
+  )
+}
+
 function OrganizationRow({
   item,
   selected,
@@ -595,14 +632,14 @@ function OrganizationRow({
         width: '100%',
         border: 0,
         textAlign: 'left',
-        bgcolor: selected ? alpha(theme.palette.action.hover, 0.6) : 'background.paper',
+        bgcolor: 'background.paper',
         color: 'text.primary',
         cursor: 'pointer',
         p: { xs: 3, md: 4 },
         transition: 'background-color 150ms ease, box-shadow 150ms ease',
         boxShadow: selected ? `inset 3px 0 0 ${theme.palette.primary.main}` : 'none',
         '&:hover': {
-          bgcolor: selected ? alpha(theme.palette.action.hover, 0.78) : alpha(theme.palette.primary.main, 0.03)
+          bgcolor: alpha(theme.palette.primary.main, selected ? 0.025 : 0.03)
         },
         '&:focus-visible': {
           outline: `2px solid ${theme.palette.primary.main}`,
@@ -613,12 +650,10 @@ function OrganizationRow({
       <Stack spacing={2.5}>
         <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={3}>
           <Stack direction='row' spacing={3} alignItems='center' sx={{ minWidth: 0, flex: 1 }}>
-            <CustomAvatar skin='light' color={item.avatarTone} variant='rounded' sx={{ width: { xs: 40, md: 48 }, height: { xs: 40, md: 48 }, fontWeight: 700 }}>
-              {item.initials}
-            </CustomAvatar>
+            <OrgAvatar item={item} />
             <Stack spacing={0.75} sx={{ minWidth: 0 }}>
               <Stack direction='row' alignItems='center' spacing={1.5} sx={{ minWidth: 0 }} useFlexGap flexWrap='wrap'>
-                <Typography variant='subtitle1' sx={{ fontSize: { xs: 15, md: undefined }, fontWeight: 700 }}>
+                <Typography variant='subtitle1' color='text.primary' sx={{ fontSize: { xs: 15, md: undefined }, fontWeight: 700 }}>
                   {item.name}
                 </Typography>
                 <StatusPill label={risk.label} tone={risk.tone} icon={risk.icon} />
@@ -685,8 +720,8 @@ function RowFact({ label, tone, icon }: { label: string; tone: SemanticTone; ico
         px: { xs: 1.5, md: 2 },
         border: `1px solid ${tone === 'secondary' ? theme.palette.divider : alpha(theme.palette[tone].main, 0.22)}`,
         borderRadius: 1,
-        bgcolor: tone === 'secondary' ? alpha(theme.palette.action.hover, 0.28) : alpha(theme.palette.background.paper, 0.82),
-        color: tone === 'secondary' ? 'text.secondary' : 'text.primary',
+        bgcolor: tone === 'secondary' ? alpha(theme.palette.action.hover, 0.18) : alpha(theme.palette[tone].main, 0.035),
+        color: 'text.primary',
         fontSize: { xs: 11, md: theme.typography.caption.fontSize },
         fontWeight: 650,
         lineHeight: 1.2,
@@ -717,13 +752,14 @@ function StatusPill({ label, tone, icon }: { label: ReactNode; tone: SemanticTon
         px: { xs: 1.5, md: 2 },
         borderRadius: 1,
         border: `1px solid ${isNeutral ? theme.palette.divider : alpha(theme.palette[tone].main, 0.28)}`,
-        bgcolor: isNeutral ? alpha(theme.palette.action.hover, 0.32) : alpha(theme.palette[tone].main, 0.04),
-        color: isNeutral ? 'text.secondary' : `${tone}.dark`,
+        bgcolor: isNeutral ? alpha(theme.palette.action.hover, 0.18) : alpha(theme.palette[tone].main, 0.035),
+        color: 'text.primary',
         fontSize: { xs: 11, md: theme.typography.caption.fontSize },
         fontWeight: 700,
         lineHeight: 1.2,
         whiteSpace: 'nowrap',
         '& i': {
+          color: isNeutral ? 'text.secondary' : `${tone}.dark`,
           fontSize: { xs: 14, md: 16 }
         }
       }}
@@ -742,9 +778,7 @@ function OrganizationContextRail({ item }: { item: OrganizationEnterpriseMock })
     <Stack spacing={4}>
       <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={3}>
         <Stack direction='row' spacing={3} alignItems='center' sx={{ minWidth: 0 }}>
-          <CustomAvatar skin='light' color={item.avatarTone} variant='rounded' sx={{ width: 56, height: 56, fontWeight: 800 }}>
-            {item.initials}
-          </CustomAvatar>
+          <OrgAvatar item={item} size='rail' />
           <Stack spacing={0.75} sx={{ minWidth: 0 }}>
             <Typography variant='h5' noWrap>
               {item.name}
@@ -768,7 +802,13 @@ function OrganizationContextRail({ item }: { item: OrganizationEnterpriseMock })
                 {progress}%
               </Typography>
             </Stack>
-            <LinearProgress variant='determinate' value={progress} color={item.risk === 'blocked' ? 'error' : item.risk === 'attention' ? 'warning' : 'success'} sx={{ height: 8, borderRadius: 1 }} />
+            <LinearProgress
+              variant='determinate'
+              value={progress}
+              color={item.risk === 'blocked' ? 'error' : item.risk === 'attention' ? 'warning' : 'success'}
+              aria-label={`Preparacion operacional de ${item.name}`}
+              sx={{ height: 8, borderRadius: 1 }}
+            />
           </Stack>
           <Stack spacing={2}>
             {item.readiness.map(entry => (
@@ -831,8 +871,16 @@ function OrganizationContextRail({ item }: { item: OrganizationEnterpriseMock })
         <Button
           component={ViewTransitionLink}
           href={item.onboarding ? `/agency/clients/${item.organizationId}/lifecycle` : '/agency/clients/onboarding'}
-          variant='tonal'
+          variant='outlined'
           startIcon={<i className='tabler-clipboard-list' />}
+          sx={{
+            color: 'text.primary',
+            borderColor: 'divider',
+            '&:hover': {
+              borderColor: 'text.secondary',
+              bgcolor: 'action.hover'
+            }
+          }}
         >
           Ver onboarding
         </Button>
@@ -883,7 +931,7 @@ function RailSection({
           <i className={icon} aria-hidden='true' />
         </Box>
         <Box sx={{ minWidth: 0 }}>
-          <Typography variant='subtitle1' sx={{ fontWeight: 700 }}>
+          <Typography variant='subtitle1' color='text.primary' sx={{ fontWeight: 700 }}>
             {title}
           </Typography>
           <Typography variant='caption' color='text.secondary'>
@@ -921,7 +969,18 @@ function RelationshipMetric({ label, value, icon }: { label: string; value: numb
 
 function MatrixView({ organizations }: { organizations: OrganizationEnterpriseMock[] }) {
   return (
-    <Box sx={{ overflowX: 'auto' }}>
+    <Box
+      role='region'
+      aria-label={organizationListMockupAria.matrixRegion}
+      tabIndex={0}
+      sx={{
+        overflowX: 'auto',
+        '&:focus-visible': {
+          outline: theme => `2px solid ${theme.palette.primary.main}`,
+          outlineOffset: -2
+        }
+      }}
+    >
       <Table size='small' aria-label={organizationListMockupAria.matrixTable}>
         <TableHead>
           <TableRow>
@@ -939,9 +998,7 @@ function MatrixView({ organizations }: { organizations: OrganizationEnterpriseMo
             <TableRow key={item.organizationId} hover>
               <TableCell>
                 <Stack direction='row' spacing={2} alignItems='center'>
-                  <CustomAvatar skin='light' color={item.avatarTone} variant='rounded' sx={{ width: 32, height: 32, fontSize: 12, fontWeight: 700 }}>
-                    {item.initials}
-                  </CustomAvatar>
+                  <OrgAvatar item={item} size='matrix' />
                   <Box>
                     <Typography variant='body2' sx={{ fontWeight: 700 }}>
                       {item.name}

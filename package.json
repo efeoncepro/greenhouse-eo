@@ -266,6 +266,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "9.39.4",
     "@google/design.md": "^0.1.1",
