@@ -1290,6 +1290,49 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-1019 — Workforce Contracting Studio (cartas oferta + contratos laborales
+    // bilingües). read=ver cola/casos/drafts; manage=crear/editar casos y drafts;
+    // ai_draft=disparar drafting Claude (advisory); approve=aprobar par bilingüe
+    // ES+EN completo; generate_document=gate de generar el artefacto firmable
+    // (PDF/DOCX, dormant hasta el render consumer); reveal_sensitive=PII de drafting.
+    // Grants en runtime.ts (decisión operador 2026-06-05): approve = EFEONCE_ADMIN
+    // unilateral V0 (no existe rol legal). Spec: GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.
+    key: 'workforce.contracting.read',
+    module: 'workforce',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.manage',
+    module: 'workforce',
+    actions: ['create', 'update', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.ai_draft',
+    module: 'workforce',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.approve',
+    module: 'workforce',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.generate_document',
+    module: 'workforce',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.reveal_sensitive',
+    module: 'workforce',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-891 Slice 3 — capability granular para reconciliar drift entre
     // runtime laboral del member y la relacion legal activa en Person 360.
     // Cierra la relacion legacy `employee` + abre nueva `contractor` en una

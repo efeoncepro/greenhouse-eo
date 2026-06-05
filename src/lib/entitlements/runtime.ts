@@ -414,6 +414,87 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1019 — Workforce Contracting Studio (cartas oferta + contratos bilingües).
+  // Matriz decidida por el operador 2026-06-05 (no existe rol `legal`; el sign-off
+  // legal colapsa a EFEONCE_ADMIN, patrón TASK-935). Spec:
+  // GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1 §8.
+  //   read              -> HR route_group ∪ HR_MANAGER ∪ HR_PAYROLL ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN
+  //   manage            -> HR route_group ∪ HR_MANAGER ∪ EFEONCE_ADMIN
+  //   ai_draft          -> HR_MANAGER ∪ EFEONCE_ADMIN
+  //   approve           -> EFEONCE_ADMIN (V0 aprobación unilateral del operador)
+  //   generate_document -> EFEONCE_ADMIN (dormant hasta el render consumer futuro)
+  //   reveal_sensitive  -> EFEONCE_ADMIN ∪ HR_MANAGER
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER) ||
+    hasRole(subject, ROLE_CODES.HR_PAYROLL)
+  ) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+    })
+  }
+
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    for (const action of ['create', 'update', 'manage'] as const) {
+      addEntitlement(entries, {
+        module: 'workforce',
+        capability: 'workforce.contracting.manage',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
+  if (hasRole(subject, ROLE_CODES.HR_MANAGER) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.ai_draft',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.approve',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.generate_document',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.HR_MANAGER)) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.reveal_sensitive',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-891 Slice 3 — Person 360 relationship drift reconciliation.
   // Capability granular para cerrar relacion legacy `employee` + abrir nueva
   // `contractor` en una sola tx atomic (helper `reconcileMemberContractDrift`).

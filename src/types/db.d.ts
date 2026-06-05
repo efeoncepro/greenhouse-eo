@@ -6527,6 +6527,79 @@ export interface GreenhouseHrWorkflowApprovalSnapshots {
   workflow_entity_id: string;
 }
 
+export interface GreenhouseHrWorkforceContractingAiRuns {
+  ai_run_id: string;
+  case_id: string;
+  created_at: Generated<Timestamp>;
+  draft_id: string | null;
+  error_summary: string | null;
+  input_snapshot_hash: string;
+  language_parity_status: string | null;
+  model: string;
+  output_hash: string | null;
+  prompt_hash: string | null;
+  prompt_version: string;
+  provider: string;
+  status: string;
+  updated_at: Generated<Timestamp>;
+  usage_json: Json | null;
+}
+
+export interface GreenhouseHrWorkforceContractingCaseEvents {
+  actor_user_id: string | null;
+  case_id: string;
+  event_id: string;
+  event_kind: string;
+  from_status: string | null;
+  occurred_at: Generated<Timestamp>;
+  payload_json: Generated<Json>;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrWorkforceContractingCases {
+  authoritative_language: Generated<string>;
+  case_id: string;
+  case_kind: string;
+  contract_type_snapshot: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  jurisdiction_pack_code: string;
+  legal_review_reference: string | null;
+  member_id: string | null;
+  metadata_json: Generated<Json>;
+  operating_entity_organization_id: string;
+  pay_regime_snapshot: string | null;
+  payroll_via_snapshot: string | null;
+  required_languages: Generated<string[]>;
+  signable_format: Generated<string>;
+  signature_provider: Generated<string>;
+  source_offer_case_id: string | null;
+  status: string;
+  subject_identity_profile_id: string;
+  target_start_date: Timestamp | null;
+  updated_at: Generated<Timestamp>;
+  void_reason: string | null;
+  voided_at: Timestamp | null;
+  work_relationship_onboarding_case_id: string | null;
+}
+
+export interface GreenhouseHrWorkforceContractingDrafts {
+  approved_at: Timestamp | null;
+  approved_by_user_id: string | null;
+  case_id: string;
+  content_hash: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  draft_id: string;
+  draft_version: number;
+  language_parity_snapshot_json: Json | null;
+  source: string;
+  status: Generated<string>;
+  structured_content_json: Json;
+  updated_at: Generated<Timestamp>;
+  validation_snapshot_json: Json | null;
+}
+
 export interface GreenhouseHrWorkRelationshipOffboardingCaseEvents {
   actor_user_id: string | null;
   created_at: Generated<Timestamp>;
@@ -9939,6 +10012,10 @@ export interface DB {
   "greenhouse_hr.work_relationship_onboarding_case_events": GreenhouseHrWorkRelationshipOnboardingCaseEvents;
   "greenhouse_hr.work_relationship_onboarding_cases": GreenhouseHrWorkRelationshipOnboardingCases;
   "greenhouse_hr.workflow_approval_snapshots": GreenhouseHrWorkflowApprovalSnapshots;
+  "greenhouse_hr.workforce_contracting_ai_runs": GreenhouseHrWorkforceContractingAiRuns;
+  "greenhouse_hr.workforce_contracting_case_events": GreenhouseHrWorkforceContractingCaseEvents;
+  "greenhouse_hr.workforce_contracting_cases": GreenhouseHrWorkforceContractingCases;
+  "greenhouse_hr.workforce_contracting_drafts": GreenhouseHrWorkforceContractingDrafts;
   "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
   "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;
   "greenhouse_notifications.email_subscriptions": GreenhouseNotificationsEmailSubscriptions;

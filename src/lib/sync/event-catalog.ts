@@ -207,7 +207,11 @@ export const AGGREGATE_TYPES = {
 
   // TASK-992 — Client Lifecycle Orchestrator (GREENHOUSE_CLIENT_LIFECYCLE_V1).
   // Aggregate identity = caseId ('clc-{uuid}').
-  clientLifecycleCase: 'client_lifecycle_case'
+  clientLifecycleCase: 'client_lifecycle_case',
+
+  // TASK-1019 — Workforce Contracting Studio (GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1).
+  // Aggregate identity = caseId ('wcc-{uuid}').
+  workforceContractingCase: 'workforce_contracting_case'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -971,7 +975,18 @@ export const EVENT_TYPES = {
   clientLifecycleBlockerResolved: 'client.lifecycle.blocker.resolved',
   clientLifecycleCaseCompleted: 'client.lifecycle.case.completed',
   clientLifecycleCaseCancelled: 'client.lifecycle.case.cancelled',
-  clientLifecycleBlockerOverridden: 'client.lifecycle.blocker.overridden'
+  clientLifecycleBlockerOverridden: 'client.lifecycle.blocker.overridden',
+
+  // TASK-1019 — Workforce Contracting Studio lifecycle (v1).
+  // aggregate_type = workforce_contracting_case, aggregate_id = caseId ('wcc-{uuid}').
+  // Advisory/foundation only: no consumer emits PDF/ZapSign/email in TASK-1019.
+  workforceContractingCaseOpened: 'workforce.contracting.case_opened',
+  workforceContractingAiDraftCreated: 'workforce.contracting.ai_draft_created',
+  workforceContractingDraftApproved: 'workforce.contracting.draft_approved',
+  workforceContractingReadyForPdf: 'workforce.contracting.ready_for_pdf',
+  workforceContractingReadyForSignature: 'workforce.contracting.ready_for_signature',
+  // Future scheduler-emitted contract only (never emitted in TASK-1019).
+  workforceContractingSignaturePendingOverdue: 'workforce.contracting.signature_pending_overdue'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
