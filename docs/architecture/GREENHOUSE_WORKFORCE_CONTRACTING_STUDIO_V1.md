@@ -708,3 +708,16 @@ El operador aprobó (loop GVC + `modern-ui`/`greenhouse-ux-writing`) los dos for
 - **Sistema documental común**: Poppins (display) + Geist (body, `tabular-nums`), acento único `#2E7D32`, masthead logo Efeonce + eslogan subordinado, footer `EfeoncePdfFooter`, watermark/badge por `documentStatus` (desaparece al firmar), firma del representante pre-estampada (`@/lib/legal-signatures`) con simetría vertical.
 
 **Las reglas duras anti-degradación + el baseline visual vinculante (mockup `/hr/workforce/contracts/mockup/documents` + scenario GVC `contracting-document-format-mockup`) viven en `TASK-1023`** (Delta "Estándar de documento APROBADO"). El render real debe reproducir ese estándar (paridad `fe:capture:diff`); todo cambio futuro = mejora incremental, nunca degradación.
+
+## Delta 2026-06-05 — TASK-1023 implementado (PDF/signable render) en `develop` — code complete, staging e2e pendiente
+
+Track B Slice 1: el render del artefacto firmable ya existe (consume el estándar aprobado O1/C2). 7 slices en `develop` (sin push):
+
+- **Migración** `20260605201812869` (aditiva, nullable): `workforce_contracting_cases` gana `pdf_asset_id`/`signed_pdf_asset_id`/`pdf_content_hash`/`pdf_template_version`/`pdf_status_at_render`/`pdf_generated_at`/`pdf_facts_snapshot`; `workforce_contracting_drafts` gana `captured_facts_json`. Asset context nuevo `workforce_contracting_document` + retention `workforce_contract`.
+- **Render** `src/lib/workforce/contracting/document/contracting-document-pdf.tsx`: `@react-pdf` que reproduce el mockup aprobado (O1 termscard + secuencial; C2 comparecencia + cláusulas + firma 3-col), sistema Efeonce (Poppins/Geist, acento `#2E7D32`, masthead, `EfeoncePdfFooter`, watermark por estado, banner prevalencia), **firma real pre-estampada** (`@/lib/legal-signatures`). Verificado visualmente contra el mockup.
+- **Snapshot inmutable** (OQ1) + `regenerateContractingPdfForStatus` atómico (mirror finiquito TASK-863 V1.5.2: render→asset privado→UPDATE→soft-fail). Worker + términos desde `captured_facts` (OQ2).
+- **Command** `generateContractingDocument` + `POST /api/hr/workforce/contracting/[caseId]/generate-document` (capability `workforce.contracting.generate_document` ya granted EFEONCE_ADMIN). Contrato `ready_for_pdf`→`ready_for_signature` + evento; oferta adjunta en `approved`. Descarga vía `/api/assets/private/[assetId]`.
+- **Signal** `workforce.contracting.pdf_status_drift` (bucket de watermark, steady=0, smoke PG real OK).
+- **UI**: "Generar PDF" desbloqueado en el Bilingual Review Desk (gate + loading/error + descarga).
+- **Verificación**: render visual ✓, signal smoke ✓, build ✓, tests focales (460) ✓.
+- **Pendiente**: e2e en staging (AI draft → aprobar → generar; flag-gated) + 3-skill audit del PDF real → luego mover a `complete`. Después: TASK-1024 (firma ZapSign) consume `ready_for_signature`.

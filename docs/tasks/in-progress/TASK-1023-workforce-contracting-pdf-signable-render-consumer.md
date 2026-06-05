@@ -87,3 +87,21 @@ El artefacto firmable es un archivo **renderizado por Greenhouse/EPIC-001** desd
 - **Paridad con el mockup aprobado** (O1 + C2): `fe:capture:diff` mockup↔runtime sin pérdida de ningún elemento del estándar (masthead, banner prevalencia, watermark-por-estado, footer, firma simétrica, termscard, Poppins/Geist, acento único).
 - Loop de verificación con caso real cerrado (3-skills sin bloqueantes).
 - Signal `pdf_status_drift` steady=0; `pnpm test`/`build` verdes.
+
+## Delta 2026-06-05 — Implementación (7 slices) — code complete en `develop`, staging e2e pendiente
+
+| Slice | Entregado | Commit |
+| --- | --- | --- |
+| 1 | Migración aditiva (cols PDF en cases + `captured_facts_json` en drafts) + asset context `workforce_contracting_document` + facts persistence en createDraft | `13674f1b3` |
+| 2 | Render `@react-pdf` (O1 + C2) reproduciendo el mockup aprobado — verificado visualmente; firma real pre-estampada | `5a1f26038` |
+| 3 | Snapshot inmutable (OQ1) + `regenerateContractingPdfForStatus` atómico (mirror finiquito) | `3e8e94c9b` |
+| 4 | Command `generateContractingDocument` + `POST .../generate-document` + capability guard | (Slice 4 commit) |
+| 5 | Signal `workforce.contracting.pdf_status_drift` (bucket watermark, smoke PG OK) | `45327b528` |
+| 6 | "Generar PDF" desbloqueado en el Bilingual Review Desk + descarga | `f1e517212` |
+| 7 | Verificación (render visual, signal smoke, build, 460 tests focales) + docs | (este Delta) |
+
+**Open Questions resueltas** (pre-execution): OQ1 snapshot inmutable, OQ2 `captured_facts_json` en draft, OQ3 oferta sin transición al renderizar, OQ4 reuso de snapshot en re-render, OQ5 asset context nuevo, OQ6 render sync.
+
+**Pendiente para `complete`** (Runtime Rollout Completion Gate): e2e en staging (AI draft → aprobar → generar; `WORKFORCE_CONTRACTING_AI_ENABLED` es staging-only) + 3-skill audit del PDF real emitido + `pnpm test` full. La task queda `in-progress` (code complete, staging verification pendiente).
+
+**Cross-impact**: TASK-1024 (firma ZapSign) ya puede consumir el evento `workforce.contracting.ready_for_signature` + el `pdf_asset_id` del caso. TASK-489 (registry) agregará el linked-surface (kind='linked') cuando aterrice.

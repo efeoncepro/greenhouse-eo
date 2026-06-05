@@ -1,3 +1,7 @@
+## TASK-1023 — Workforce Contracting PDF/signable render (2026-06-05, code complete en develop, staging e2e pendiente)
+
+Implementado el render del PDF firmable (carta oferta O1 + contrato C2) consumiendo el estándar visual aprobado por el operador. 7 slices en `develop` (sin push), commits `13674f1b3`→`f1e517212`. El caso es dueño de su `pdf_asset_id` (patrón finiquito TASK-863); render `@react-pdf` con marca Efeonce + firma real pre-estampada (`77357182-1.png`); command + API + capability + signal `pdf_status_drift` + UI desbloqueada (Bilingual Review Desk). **Verificado**: render visual vs mockup aprobado ✓, signal smoke PG ✓, build ✓, 460 tests focales ✓. **Pendiente para complete**: e2e staging (AI draft → aprobar → generar, flag `WORKFORCE_CONTRACTING_AI_ENABLED` staging-only) + 3-skill audit del PDF real emitido. **Siguiente en el pack firmable**: TASK-490/491 (signature orchestration + ZapSign adapter) → TASK-1024 (consume `ready_for_signature`). Arch review desacopló TASK-489/493 del camino crítico.
+
 # Sesion 2026-06-05 (cont.) — TASK-1022 ✅ Collaborator Viewer runtime (Workforce Contracting)
 
 El colaborador ve sus ofertas y contratos en "Mi Ficha" (`/my/offers` + `/my/contracts`). **En `develop` sin branch.** Backend ya existía (TASK-1019 Slice 4: rutas `/api/my/*` + reader `getOwnContractingSummary` anti-IDOR) → TASK-1022 fue UI + nav + governance.
