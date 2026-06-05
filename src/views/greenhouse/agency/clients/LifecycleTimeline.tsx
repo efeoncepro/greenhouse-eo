@@ -22,7 +22,13 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import { HubSpotIsotype } from '@/components/greenhouse/brand/BrandIsotypes'
 import { OperationalPanel } from '@/components/greenhouse/primitives'
 import { NotionPreflightPanel } from '@/views/greenhouse/agency/clients/NotionPreflightPanel'
+import {
+  EvidenceRow,
+  EvidenceVerifyButton,
+  useOnboardingEvidence
+} from '@/views/greenhouse/agency/clients/OnboardingEvidence'
 import { PortalUsersPanel } from '@/views/greenhouse/agency/clients/PortalUsersPanel'
+import { isAutoDerivableItem } from '@/lib/client-lifecycle/evidence/evidence-types'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
 import type {
   FacetKey,
@@ -165,6 +171,7 @@ const LifecycleTimeline = ({
   teamsAnchor
 }: Props) => {
   const theme = useTheme()
+  const evidence = useOnboardingEvidence(caseId)
 
   const Header = (
     <Stack spacing={1} sx={{ mb: 2 }}>
@@ -260,7 +267,29 @@ const LifecycleTimeline = ({
       {/* TASK-997 — checklist del caso + anchors capturados (read-only) */}
       {checklist && checklist.length > 0 ? (
         <Box sx={{ mb: 6 }}>
-          <OperationalPanel title={T.checklist.title} subheader={T.checklist.subtitle} icon='tabler-checklist' iconColor='primary'>
+          <OperationalPanel
+            title={T.checklist.title}
+            subheader={T.checklist.subtitle}
+            icon='tabler-checklist'
+            iconColor='primary'
+            action={caseId ? <EvidenceVerifyButton status={evidence.status} onRun={evidence.run} /> : undefined}
+          >
+            {evidence.status === 'error' ? (
+              <Alert
+                severity='warning'
+                variant='outlined'
+                sx={{ mb: 3, borderRadius: `${theme.shape.customBorderRadius.sm}px` }}
+                role='alert'
+                action={
+                  <Button color='inherit' size='small' onClick={evidence.run} startIcon={<i className='tabler-refresh' />}>
+                    {T.evidence.retryCta}
+                  </Button>
+                }
+              >
+                <AlertTitle sx={{ fontWeight: 600 }}>{T.evidence.errorTitle}</AlertTitle>
+                {T.evidence.errorBody}
+              </Alert>
+            ) : null}
             <Stack spacing={2}>
               {checklist.map((item, index) => {
                 const st = CHECKLIST_STATUS[item.status]
@@ -318,6 +347,14 @@ const LifecycleTimeline = ({
                           </Typography>
                           <CustomChip round='true' size='small' variant='tonal' color='primary' icon={<i className='tabler-brand-teams' />} label={teamsAnchor.teamName} />
                         </Stack>
+                      ) : null}
+
+                      {/* TASK-1017 — evidencia real auto-derivada (on-demand, honesta) */}
+                      {isAutoDerivableItem(item.itemCode) && evidence.evidenceByCode.has(item.itemCode) ? (
+                        <EvidenceRow
+                          evidence={evidence.evidenceByCode.get(item.itemCode)!}
+                          autoCompleted={evidence.autoCompleted.has(item.itemCode)}
+                        />
                       ) : null}
                     </Box>
                     <CustomChip round='true' size='small' variant='tonal' color={st.color} icon={<i className={st.icon} />} label={st.label} />

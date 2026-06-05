@@ -19,3 +19,12 @@ export const isClientLifecycleOnboardingEnabled = (): boolean =>
 // Server-only path (the handler runs server-side); no NEXT_PUBLIC mirror needed.
 export const isClientLifecycleHubspotDealTriggerEnabled = (): boolean =>
   process.env.CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED === 'true'
+
+// TASK-1017 Slice 3 — Auto-complete de ítems auto-derivables del checklist cuando
+// su evidencia real está `detected`. Default OFF: la exposición de la evidencia
+// (Slice 2, read-only honesto) va sin flag; el AUTO-COMPLETE (que muta el estado
+// del ítem) queda detrás de esta flag hasta validar la evidencia en casos reales.
+// Mirror del staged-rollout de TASK-1009/1010. Server-only (el endpoint corre
+// server-side); no necesita NEXT_PUBLIC mirror.
+export const isOnboardingItemEvidenceAutocompleteEnabled = (): boolean =>
+  process.env.ONBOARDING_ITEM_EVIDENCE_AUTOCOMPLETE_ENABLED === 'true'

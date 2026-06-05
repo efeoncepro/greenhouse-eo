@@ -515,6 +515,23 @@ export const GH_CLIENT_ONBOARDING = {
     errorBody: 'Tuvimos un problema al verificar. Probá de nuevo en unos segundos.',
     retryCta: 'Reintentar',
     resultHint: 'Cada eslabón muestra su estado real. Los pasos opcionales no bloquean el cierre.'
+  },
+  // --- TASK-1017 — Evidencia auto-derivable del checklist --------------------
+  // Capa read-time honesta: por cada paso auto-derivable muestra lo que el sistema
+  // ya sabe (detectado / sin detectar / no verificable), sin pisar lo manual.
+  evidence: {
+    runCta: 'Verificar evidencia',
+    runningCta: 'Verificando…',
+    rerunCta: 'Volver a verificar',
+    idleHint: 'Revisa el estado real de cada paso contra el sistema, sin marcarlo a mano.',
+    errorTitle: 'No pudimos verificar',
+    errorBody: 'Tuvimos un problema al leer el estado. Prueba de nuevo en unos segundos.',
+    retryCta: 'Reintentar',
+    statusDetected: 'Detectado',
+    statusPending: 'Sin detectar',
+    statusUnverifiable: 'No verificable',
+    autoCompletedTag: 'Marcado automáticamente',
+    resultHint: 'Cada paso muestra lo que ve el sistema. La verificación no pisa lo que marques a mano.'
   }
 } as const
 
