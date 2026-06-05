@@ -3158,6 +3158,62 @@ export interface GreenhouseCoreServiceSlaDefinitions {
   warning_threshold: Numeric | null;
 }
 
+export interface GreenhouseCoreSignatureRequestEvents {
+  actor: string;
+  event_id: string;
+  event_kind: string;
+  from_status: string | null;
+  occurred_at: Generated<Timestamp>;
+  payload_json: Generated<Json>;
+  signature_request_id: string;
+  to_status: string | null;
+}
+
+export interface GreenhouseCoreSignatureRequests {
+  audit_report_asset_id: string | null;
+  cancel_reason: string | null;
+  cancelled_at: Timestamp | null;
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string;
+  document_asset_id: string;
+  failure_reason: string | null;
+  idempotency_key: string | null;
+  last_synced_at: Timestamp | null;
+  provider: Generated<string>;
+  provider_document_token: string | null;
+  /**
+   * TASK-490 — raw provider state snapshot (reconciliation + out-of-order callback tolerance).
+   */
+  provider_payload: Generated<Json>;
+  sent_at: Timestamp | null;
+  signable_format: Generated<string>;
+  signature_request_id: string;
+  signed_document_asset_id: string | null;
+  /**
+   * TASK-490 — initiating domain (contracting_case | master_agreement). The consuming domain reacts to signature.request.completed to link the signed asset (polymorphic source_ref, no FK).
+   */
+  source_kind: string;
+  source_ref: string;
+  status: Generated<string>;
+  title: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreSignatureRequestSigners {
+  created_at: Generated<Timestamp>;
+  order_group: Generated<number>;
+  provider_signer_token: string | null;
+  signature_request_id: string;
+  signed_at: Timestamp | null;
+  signer_email: string | null;
+  signer_id: string;
+  signer_name: string;
+  signer_role: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreSisterPlatformAuthorizationCodes {
   code_challenge: string;
   code_challenge_method: Generated<string>;
@@ -9891,6 +9947,9 @@ export interface DB {
   "greenhouse_core.service_skill_requirements": GreenhouseCoreServiceSkillRequirements;
   "greenhouse_core.service_sla_definitions": GreenhouseCoreServiceSlaDefinitions;
   "greenhouse_core.services": GreenhouseCoreServices;
+  "greenhouse_core.signature_request_events": GreenhouseCoreSignatureRequestEvents;
+  "greenhouse_core.signature_request_signers": GreenhouseCoreSignatureRequestSigners;
+  "greenhouse_core.signature_requests": GreenhouseCoreSignatureRequests;
   "greenhouse_core.sister_platform_authorization_codes": GreenhouseCoreSisterPlatformAuthorizationCodes;
   "greenhouse_core.sister_platform_bindings": GreenhouseCoreSisterPlatformBindings;
   "greenhouse_core.sister_platform_consumers": GreenhouseCoreSisterPlatformConsumers;

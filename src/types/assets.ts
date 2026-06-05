@@ -56,6 +56,8 @@ export type GreenhouseAssetContext =
   | 'provider_payout_statement'
   // TASK-1023 — Workforce Contracting Studio signable document (offer letter / employment contract).
   | 'workforce_contracting_document'
+  // TASK-490 — signed PDF artifact returned by the signature provider (EPIC-001 signature platform).
+  | 'signature_signed_document'
 
 export interface GreenhouseAssetRecord {
   assetId: string

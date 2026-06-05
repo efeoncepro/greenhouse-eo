@@ -108,7 +108,9 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   provider_invoice: 'provider_supporting_doc',
   provider_payout_statement: 'provider_supporting_doc',
   // TASK-1023 — Workforce Contracting signable document (offer letter / employment contract).
-  workforce_contracting_document: 'workforce_contract'
+  workforce_contracting_document: 'workforce_contract',
+  // TASK-490 — signed PDF artifact from the signature provider (vault retention).
+  signature_signed_document: 'document_vault'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -142,7 +144,9 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   provider_invoice: 'provider-invoices',
   provider_payout_statement: 'provider-payout-statements',
   // TASK-1023 — Workforce Contracting signable document bucket prefix.
-  workforce_contracting_document: 'workforce-contracting-documents'
+  workforce_contracting_document: 'workforce-contracting-documents',
+  // TASK-490 — signed signature artifact bucket prefix.
+  signature_signed_document: 'signature-signed-documents'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -681,7 +685,7 @@ export const upsertSystemGeneratedAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -794,7 +798,7 @@ export const storeSystemGeneratedPrivateAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -928,6 +932,24 @@ const canAccessWorkforceContractingDocumentAsset = (tenant: TenantContext, asset
   )
 }
 
+// TASK-490 — signed signature artifact: the subject collaborator (own member), the client (own
+// client, e.g. MSA), HR, Finance, or admin. The consuming domain's /my surface resolves access.
+const canAccessSignatureSignedDocumentAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord) => {
+  if (asset.ownerMemberId && tenant.memberId && asset.ownerMemberId === tenant.memberId) {
+    return true
+  }
+
+  if (asset.ownerClientId && tenant.clientId && asset.ownerClientId === tenant.clientId) {
+    return true
+  }
+
+  return (
+    hasRouteGroup(tenant, 'hr') ||
+    hasRouteGroup(tenant, 'finance') ||
+    hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  )
+}
+
 export const canTenantAccessAsset = ({
   tenant,
   asset
@@ -976,6 +998,9 @@ export const canTenantAccessAsset = ({
     // TASK-1023 — Workforce Contracting signable document.
     case 'workforce_contracting_document':
       return canAccessWorkforceContractingDocumentAsset(tenant, asset)
+    // TASK-490 — signed signature artifact.
+    case 'signature_signed_document':
+      return canAccessSignatureSignedDocumentAsset(tenant, asset)
     default:
       return false
   }
