@@ -160,6 +160,7 @@
     ]
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
     "@assistant-ui/react": "^0.12.21",
     "@assistant-ui/react-markdown": "^0.12.7",
     "@emoji-mart/data": "1.2.1",
