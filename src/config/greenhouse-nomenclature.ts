@@ -114,6 +114,7 @@ export const GH_HR_NAV = {
   departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
   workforceActivation: { label: 'Workforce Activation', subtitle: 'Habilitación laboral y blockers' },
   contractors: { label: 'Contratistas', subtitle: 'Engagements, envíos y revisión' },
+  workforceContracts: { label: 'Contratos laborales', subtitle: 'Cartas oferta y contratos bilingües' },
   offboarding: { label: 'Offboarding', subtitle: 'Casos de salida laboral y contractual' },
   leave: { label: 'Permisos', subtitle: 'Solicitudes y saldos de permisos' },
   attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' },

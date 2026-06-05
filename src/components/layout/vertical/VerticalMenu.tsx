@@ -284,12 +284,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_HR_NAV.approvals), href: '/hr/approvals' },
               { label: nl(GH_HR_NAV.departments), href: '/hr/departments' },
               { label: nl(GH_HR_NAV.contractors), href: '/hr/contractors' },
+              { label: nl(GH_HR_NAV.workforceContracts), href: '/hr/workforce/contracts' },
               { label: nl(GH_HR_NAV.offboarding), href: '/hr/offboarding' }
             ].filter(item => {
               if (item.href === '/hr/team') return canSeeHrTeamWorkspace
               if (item.href === '/hr/approvals') return canSeeHrTeamWorkspace
               if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
               if (item.href === '/hr/contractors') return canSeeView('equipo.contratistas', true)
+              if (item.href === '/hr/workforce/contracts') return canSeeView('equipo.workforce_contracting', true)
               if (item.href === '/hr/offboarding') return canSeeView('equipo.offboarding', true)
 
               return true
