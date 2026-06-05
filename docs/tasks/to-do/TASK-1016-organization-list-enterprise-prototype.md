@@ -170,6 +170,57 @@ Direccion recomendada:
 - No hay rail contextual, modo cards/list-detail, filtros segmentados ni estados visuales enterprise.
 - No existe prototipo aprobado para guiar una futura implementacion runtime sin freehand.
 
+## Approved Mockup Contract — Hard Rules for Runtime Implementation
+
+> **Regla de oro:** el mockup aprobado ya resolvio la direccion visual. La implementacion runtime futura debe **cablear datos reales y acciones reales sobre este diseno**, no redisenar la superficie.
+
+Artefactos aprobados:
+
+- Ruta mockup aprobada: `/agency/organizations/mockup`
+- View aprobada: `src/views/greenhouse/organizations/mockup/OrganizationListEnterpriseMockupView.tsx`
+- Mock data de referencia: `src/views/greenhouse/organizations/mockup/organization-list-enterprise-mock-data.ts`
+- Scenario GVC canonico: `scripts/frontend/scenarios/organization-list-enterprise-mockup.scenario.ts`
+- Captura final aprobada: `.captures/2026-06-05T10-40-50_organization-list-enterprise-mockup`
+- Dossier final: `.captures/2026-06-05T10-40-50_organization-list-enterprise-mockup/review-dossier.md`
+- Commit de infraestructura GVC/axe: `829b1466a`
+
+### Runtime adoption hard rules
+
+- **NO redisenar.** No cambiar layout, jerarquia, densidad, composicion, cromatica, radios, ritmo, microcopy principal, patron list-detail, summary strip, filtros segmentados, rail contextual ni matrix mode salvo que el operador apruebe explicitamente una nueva captura GVC.
+- **NO volver a tabla plana como default.** La tabla/matriz queda como modo secundario; la experiencia default es Organization Operations Workbench list-detail.
+- **NO introducir un patron visual paralelo.** La implementacion debe ser copy-and-patch del mockup aprobado hacia `OrganizationListView` o su reemplazo runtime, reutilizando MUI/Vuexy/Greenhouse primitives existentes.
+- **NO inventar datos reales.** Si un campo del mockup no existe en `/api/organizations` o en readers canonicos, cablear estado honesto `unknown`/`not_available`, derivar desde source of truth existente, o abrir subtask/API contract. Nunca fabricar readiness, last activity, data quality, logos ni relationship counts.
+- **NO mover logica de negocio al JSX.** La UI runtime debe consumir DTO/readers/commands canonicos. Si se requiere enriquecer `/api/organizations`, hacerlo con contrato server-side, tenant-safe, paginado y testeado.
+- **NO hardcodear copy reusable nuevo.** Labels, aria-labels, empty states, CTAs y estados productivos deben vivir en `src/lib/copy/agency.ts` o capa canonica equivalente. Copy estrictamente local de mockup no se promueve sin tokenizar.
+- **NO tocar `TASK-999`.** Logos reales y brand asset enrichment siguen siendo responsabilidad de `TASK-999`; la adopcion runtime puede usar fallback de iniciales o `logoUrl` solo si ya existe un contrato canonico.
+- **NO degradar mobile.** Mobile debe mantener lectura operacional, filtros usables, row selection y matrix accesible. No aceptar scroll horizontal como unica experiencia default.
+- **NO saltarse accesibilidad.** El runtime debe preservar foco visible, labels, `aria-controls` validos, progressbar con nombre, regiones scrollables focusables y contraste WCAG AA automatizado.
+- **NO remover microinteracciones enterprise.** Mantener selection feedback, rail crossfade reduced-motion-aware, hover/focus states y layout estable. Se puede simplificar solo por performance medida y con captura before/after.
+- **NO cerrar la task de implementacion con "se ve parecido".** Debe existir GVC diff/evidencia runtime contra el mockup aprobado y revision visual humana de frames.
+
+### What the implementation agent should do
+
+- Cablear search, filtros, seleccion, summary strip, rows, rail contextual y matrix mode con datos reales disponibles.
+- Reutilizar la estructura visual del mockup como blueprint exacto.
+- Identificar campo por campo:
+  - dato ya disponible en `/api/organizations` o reader canonico;
+  - dato derivable server-side sin N+1;
+  - dato faltante que requiere follow-up/API contract;
+  - dato que debe quedar oculto o degradado honestamente.
+- Mantener la ruta mockup viva hasta que runtime tenga paridad visual verificada; no borrar el mockup antes del cierre runtime.
+- Ejecutar GVC en loop sobre mockup y runtime, comparar frames y ajustar solo para paridad/bugs.
+
+### Required runtime adoption gates
+
+- `pnpm lint`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm design:lint`
+- `pnpm fe:capture organization-list-enterprise-mockup --env=local`
+- Nuevo scenario runtime para `/agency/organizations` o `pnpm fe:capture --route=/agency/organizations --env=local --hold=3000`
+- `pnpm fe:capture:review <runtime-capture-dir>`
+- Axe/accessibility gate: el scenario runtime debe activar `quality.accessibility` o tener test Playwright con `@axe-core/playwright` sobre el contenedor de la surface.
+- Revision manual de frames desktop + mobile antes de commit final.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
      El agente que toma esta task ejecuta Discovery y produce
