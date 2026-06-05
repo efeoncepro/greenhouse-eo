@@ -1,3 +1,14 @@
+# Sesion 2026-06-05 (cont.) — ADR My Performance self-service + TASK-1027 🆕
+
+Por pedido del operador se formalizo primero la arquitectura y luego la task para llevar a `/my/performance` la riqueza de `People > Person 360 > Actividad` sin convertir la vista colaborador en una copia admin.
+
+- **ADR aceptado:** `docs/architecture/GREENHOUSE_MY_PERFORMANCE_SELF_SERVICE_ACTIVITY_V1.md`.
+- **Decision:** `/my/performance` es la surface self-service canonica de actividad/desempeno personal: ICO metrics + Nexa member-scoped insights, sujeto resuelto por sesion (`requireMyTenantContext()`), DTO redacted sin costo/compensacion, Nexa advisory-only y menciones access-aware antes de linkear a `/people`/`/agency`.
+- **Indice sync:** `docs/architecture/DECISIONS_INDEX.md`.
+- **Task creada:** `docs/tasks/to-do/TASK-1027-my-performance-rich-self-service-activity.md`; registro en `docs/tasks/TASK_ID_REGISTRY.md`; `docs/tasks/README.md` ahora declara siguiente ID `TASK-1028`.
+- **Skills usadas:** `product-design-architect-2026`, `greenhouse-product-ui-architect`, `software-architect-2026`, `greenhouse-ux-content-accessibility`, `greenhouse-task-planner`, `greenhouse-documentation-governor`.
+- **Verificacion docs:** `pnpm task:lint --changed` OK, `git diff --check` OK, `pnpm docs:closure-check` OK.
+
 # Sesion 2026-06-05 (cont.) — TASK-1021 ✅ Admin Viewer runtime completo (3 superficies, GVC verde)
 
 Promoción del mockup aprobado del Workforce Contracting Studio a runtime real. **En `develop`, sin branch** (instrucción del operador "mantente en develop"). **3 superficies admin entregadas + GVC-verificadas (0 violaciones axe)**. El Collaborator Viewer es TASK-1022.
