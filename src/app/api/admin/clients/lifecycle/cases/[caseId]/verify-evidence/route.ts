@@ -3,16 +3,12 @@ import { NextResponse } from 'next/server'
 import { authorizeLifecycle, mapLifecycleError } from '@/lib/client-lifecycle/api-helpers'
 import { advanceLifecycleChecklistItem } from '@/lib/client-lifecycle/commands/advance-checklist-item'
 import { resolveOnboardingEvidence } from '@/lib/client-lifecycle/evidence/composer'
-import { isAutoDerivableItem } from '@/lib/client-lifecycle/evidence/evidence-types'
+import { canAutoCompleteFromEvidence } from '@/lib/client-lifecycle/evidence/evidence-types'
 import { isOnboardingItemEvidenceAutocompleteEnabled } from '@/lib/client-lifecycle/flags'
 import { getChecklistItems } from '@/lib/client-lifecycle/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 export const dynamic = 'force-dynamic'
-
-// Estados desde los cuales el auto-complete PUEDE cerrar un ítem. Respeta el
-// override manual del operador: skipped/not_applicable/blocked/completed NO se tocan.
-const AUTO_COMPLETABLE_FROM = new Set(['pending', 'in_progress'])
 
 /**
  * TASK-1017 — POST /api/admin/clients/lifecycle/cases/[caseId]/verify-evidence
@@ -39,13 +35,21 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ca
       const byCode = new Map(items.map(item => [item.itemCode, item]))
 
       for (const ev of evidence.items) {
-        if (ev.status !== 'detected' || !isAutoDerivableItem(ev.itemCode)) continue
-
         const item = byCode.get(ev.itemCode)
 
+        // Decisión pura + safety-critical (anti-fake-green + respeta override manual).
         // `requiresEvidence` items (p.ej. provision_notion_workspace) necesitan un
         // asset humano: la evidencia del sistema NO lo reemplaza → quedan manuales.
-        if (!item || item.requiresEvidence || !AUTO_COMPLETABLE_FROM.has(item.status)) continue
+        if (
+          !item ||
+          !canAutoCompleteFromEvidence({
+            evidenceStatus: ev.status,
+            requiresEvidence: item.requiresEvidence,
+            itemStatus: item.status
+          })
+        ) {
+          continue
+        }
 
         try {
           await advanceLifecycleChecklistItem({

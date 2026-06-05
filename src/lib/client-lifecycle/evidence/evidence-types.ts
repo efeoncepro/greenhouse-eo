@@ -55,3 +55,25 @@ const AUTO_DERIVABLE_SET: ReadonlySet<string> = new Set(AUTO_DERIVABLE_ITEM_CODE
 
 export const isAutoDerivableItem = (itemCode: string): itemCode is AutoDerivableItemCode =>
   AUTO_DERIVABLE_SET.has(itemCode)
+
+// Estados del ítem desde los que el auto-complete PUEDE cerrarlo. Respeta el override
+// manual del operador: completed/skipped/not_applicable/blocked NUNCA se tocan.
+const AUTO_COMPLETABLE_FROM_STATUSES: ReadonlySet<string> = new Set(['pending', 'in_progress'])
+
+export interface AutoCompleteCandidate {
+  evidenceStatus: ItemEvidenceStatus
+  /** Si el ítem requiere un asset humano, la evidencia del sistema NO lo reemplaza. */
+  requiresEvidence: boolean
+  itemStatus: string
+}
+
+/**
+ * Decisión PURA + safety-critical del auto-complete (TASK-1017 Slice 3):
+ * cierra el ítem SOLO si su evidencia es `detected`, NO requiere asset humano, y
+ * está en un estado abierto. NUNCA con `pending`/`unverifiable` (anti-fake-green),
+ * NUNCA sobre un estado ya resuelto/bloqueado (respeta el override manual).
+ */
+export const canAutoCompleteFromEvidence = (candidate: AutoCompleteCandidate): boolean =>
+  candidate.evidenceStatus === 'detected' &&
+  !candidate.requiresEvidence &&
+  AUTO_COMPLETABLE_FROM_STATUSES.has(candidate.itemStatus)

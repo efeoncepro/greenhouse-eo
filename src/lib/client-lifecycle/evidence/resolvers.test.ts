@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { AUTO_DERIVABLE_ITEM_CODES, isAutoDerivableItem } from './evidence-types'
+import { AUTO_DERIVABLE_ITEM_CODES, canAutoCompleteFromEvidence, isAutoDerivableItem } from './evidence-types'
 import {
   classifyBilling,
   classifyHubspot,
@@ -21,6 +21,31 @@ describe('isAutoDerivableItem', () => {
     expect(isAutoDerivableItem('declare_engagement_kind')).toBe(false)
     expect(isAutoDerivableItem('verify_notion_flowing')).toBe(false)
     expect(isAutoDerivableItem('nope')).toBe(false)
+  })
+})
+
+describe('canAutoCompleteFromEvidence (safety-critical, anti-fake-green)', () => {
+  it('autocompletes a detected, non-evidence item from pending', () => {
+    expect(canAutoCompleteFromEvidence({ evidenceStatus: 'detected', requiresEvidence: false, itemStatus: 'pending' })).toBe(true)
+  })
+
+  it('autocompletes from in_progress too', () => {
+    expect(canAutoCompleteFromEvidence({ evidenceStatus: 'detected', requiresEvidence: false, itemStatus: 'in_progress' })).toBe(true)
+  })
+
+  it('NEVER autocompletes pending/unverifiable evidence', () => {
+    expect(canAutoCompleteFromEvidence({ evidenceStatus: 'pending', requiresEvidence: false, itemStatus: 'pending' })).toBe(false)
+    expect(canAutoCompleteFromEvidence({ evidenceStatus: 'unverifiable', requiresEvidence: false, itemStatus: 'pending' })).toBe(false)
+  })
+
+  it('NEVER autocompletes a requires-evidence item (system evidence ≠ human asset)', () => {
+    expect(canAutoCompleteFromEvidence({ evidenceStatus: 'detected', requiresEvidence: true, itemStatus: 'pending' })).toBe(false)
+  })
+
+  it('NEVER overrides a manual decision (completed/skipped/not_applicable/blocked)', () => {
+    for (const itemStatus of ['completed', 'skipped', 'not_applicable', 'blocked']) {
+      expect(canAutoCompleteFromEvidence({ evidenceStatus: 'detected', requiresEvidence: false, itemStatus })).toBe(false)
+    }
   })
 })
 
