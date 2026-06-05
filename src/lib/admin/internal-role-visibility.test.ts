@@ -164,10 +164,11 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(COMERCIAL_VIEW_CODES).toContain('comercial.sow')
   })
 
-  it('equipo has 14 views (incluye workforce activation, contratistas, offboarding, onboarding y nomina_proyectada)', () => {
-    expect(EQUIPO_VIEW_CODES).toHaveLength(14)
+  it('equipo has 15 views (incluye workforce activation, contratistas, contratos laborales, offboarding, onboarding y nomina_proyectada)', () => {
+    expect(EQUIPO_VIEW_CODES).toHaveLength(15)
     expect(EQUIPO_VIEW_CODES).toContain('equipo.workforce_activation')
     expect(EQUIPO_VIEW_CODES).toContain('equipo.contratistas')
+    expect(EQUIPO_VIEW_CODES).toContain('equipo.workforce_contracting')
   })
 
   // ─────────────────────────────────────────────────────────────────────────────
