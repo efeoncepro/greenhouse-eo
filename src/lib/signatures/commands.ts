@@ -185,8 +185,16 @@ export const sendSignatureRequest = async (
 
     assertSignatureOperatorTransition(request.status, 'sent')
 
-    const signersResult = await client.query<{ signer_role: string; signer_email: string | null }>(
-      `SELECT signer_role, signer_email FROM greenhouse_core.signature_request_signers WHERE signature_request_id = $1 ORDER BY order_group ASC`,
+    const signersResult = await client.query<{
+      signer_name: string
+      signer_role: SignatureRequestSignerInput['role']
+      signer_email: string | null
+      order_group: number | string
+    }>(
+      `SELECT signer_name, signer_role, signer_email, order_group
+       FROM greenhouse_core.signature_request_signers
+       WHERE signature_request_id = $1
+       ORDER BY order_group ASC, created_at ASC`,
       [input.signatureRequestId]
     )
 
@@ -195,7 +203,17 @@ export const sendSignatureRequest = async (
       title: request.title,
       signableFormat: request.signableFormat,
       documentAssetId: request.documentAssetId,
-      signers: signersResult.rows.map(r => ({ name: '', email: r.signer_email, role: r.signer_role as never }))
+      signers: signersResult.rows.map(r => ({
+        name: r.signer_name,
+        email: r.signer_email,
+        role: r.signer_role,
+        orderGroup: Number(r.order_group ?? 1)
+      })),
+      metadata: {
+        signature_request_id: request.signatureRequestId,
+        source_kind: request.sourceKind,
+        source_ref: request.sourceRef
+      }
     })
 
     // Persist provider signer tokens (match by email when available).

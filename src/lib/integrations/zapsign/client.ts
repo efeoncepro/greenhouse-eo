@@ -148,7 +148,9 @@ return true
 
 export const createZapSignDocument = async (input: {
   name: string
-  base64Pdf: string
+  /** Provide exactly one of base64Pdf / base64Docx (ZapSign accepts both for upload). */
+  base64Pdf?: string
+  base64Docx?: string
   signers: ZapSignSignerInput[]
   language?: 'es' | 'en'
   disableSignerEmails?: boolean
@@ -158,12 +160,17 @@ export const createZapSignDocument = async (input: {
   dateLimitToSign?: string
   observers?: string[]
   metadata?: Array<{ key: string; value: string }>
-}) =>
-  zapsignFetch<ZapSignDocument>('/api/v1/docs/', {
+}) => {
+  if (!input.base64Pdf && !input.base64Docx) {
+    throw new Error('createZapSignDocument requires base64Pdf or base64Docx')
+  }
+
+  return zapsignFetch<ZapSignDocument>('/api/v1/docs/', {
     method: 'POST',
     body: JSON.stringify({
       name: input.name,
-      base64_pdf: input.base64Pdf,
+      ...(input.base64Pdf ? { base64_pdf: input.base64Pdf } : {}),
+      ...(input.base64Docx ? { base64_docx: input.base64Docx } : {}),
       signers: input.signers.map(buildSignerPayload),
       ...(input.language ? { lang: input.language } : {}),
       ...(input.disableSignerEmails !== undefined
@@ -179,6 +186,7 @@ export const createZapSignDocument = async (input: {
       ...(input.metadata?.length ? { metadata: input.metadata } : {})
     })
   })
+}
 
 export const getZapSignDocument = async (documentToken: string) =>
   zapsignFetch<ZapSignDocument>(`/api/v1/docs/${encodeURIComponent(documentToken)}/`, {
