@@ -168,6 +168,8 @@ const enUS: NavigationCopy = {
     profile: { label: 'My Profile', subtitle: 'Identity and personal data' },
     payroll: { label: 'My Payroll', subtitle: 'Payslips and compensation' },
     contractor: { label: 'My Contractor Services', subtitle: 'Support, review and payments' },
+    offers: { label: 'My Offers', subtitle: 'Offer letters and their status' },
+    contracts: { label: 'My Contracts', subtitle: 'Employment contracts and signing' },
     paymentProfile: { label: 'My Payment Account', subtitle: 'Where you receive payments' },
     leave: { label: 'My Leave', subtitle: 'Balances and requests' },
     goals: { label: 'My Goals', subtitle: 'OKRs and cycle key results' },

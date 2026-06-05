@@ -32,6 +32,7 @@ import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { hasActiveContractorEngagementForProfile } from '@/lib/contractor-engagements/active-engagement-flag'
+import { hasWorkforceContractingDocumentForProfile } from '@/lib/workforce/contracting/active-document-flag'
 import { resolveSupervisorAccessSummaryFromMinimalContext } from '@/lib/reporting-hierarchy/access'
 import { getUserLocalePreferenceSnapshot } from '@/lib/i18n/locale-preferences'
 
@@ -837,6 +838,18 @@ const createAuthOptions = (): NextAuthOptions => {
         )
       }
 
+      // TASK-1022 — Resolve the contracting self-service flag once per session
+      // (drives the dynamic `/my/offers` + `/my/contracts` menu items). Same
+      // fail-safe contract: errors → false; never breaks auth.
+      const shouldResolveContractingFlag =
+        Boolean(user) || Boolean(account) || token.hasWorkforceContractingDocument === undefined
+
+      if (shouldResolveContractingFlag) {
+        token.hasWorkforceContractingDocument = await hasWorkforceContractingDocumentForProfile(
+          typeof token.identityProfileId === 'string' ? token.identityProfileId : null
+        )
+      }
+
       return token
       } catch (error) {
         // TASK-742 Capa 3 — JWT callback errors are the primary cause of opaque
@@ -922,6 +935,7 @@ const createAuthOptions = (): NextAuthOptions => {
         // TASK-727 — Supervisor scope summary
         session.user.supervisorAccess = token.supervisorAccess ?? null
         session.user.hasActiveContractorEngagement = token.hasActiveContractorEngagement ?? false
+        session.user.hasWorkforceContractingDocument = token.hasWorkforceContractingDocument ?? false
       }
 
       return session

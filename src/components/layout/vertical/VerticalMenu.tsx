@@ -92,6 +92,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const supervisorAccess = session?.user?.supervisorAccess ?? null
   // TASK-796 — dynamic /my/contractor visibility: only when the member has a live engagement.
   const hasActiveContractorEngagement = session?.user?.hasActiveContractorEngagement ?? false
+  const hasWorkforceContractingDocument = session?.user?.hasWorkforceContractingDocument ?? false
 
   const canSupervise =
     Boolean(session?.user?.memberId) && supervisorAccess?.canAccessSupervisorLeave === true
@@ -606,6 +607,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
+          { label: nl(GH_MY_NAV.offers), href: '/my/offers', icon: 'tabler-file-text' },
+          { label: nl(GH_MY_NAV.contracts), href: '/my/contracts', icon: 'tabler-file-certificate' },
           { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
           { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
@@ -619,6 +622,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
           // TASK-796 — dynamic: only show when the member has a live contractor engagement.
           if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
+          // TASK-1022 — dynamic: only show when the collaborator has a contracting document.
+          if (item.href === '/my/offers') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
+          if (item.href === '/my/contracts') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
           if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
           if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
@@ -732,6 +738,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
+          { label: nl(GH_MY_NAV.offers), href: '/my/offers', icon: 'tabler-file-text' },
+          { label: nl(GH_MY_NAV.contracts), href: '/my/contracts', icon: 'tabler-file-certificate' },
           { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
           { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
@@ -745,6 +753,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
           // TASK-796 — dynamic: only show when the member has a live contractor engagement.
           if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
+          // TASK-1022 — dynamic: only show when the collaborator has a contracting document.
+          if (item.href === '/my/offers') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
+          if (item.href === '/my/contracts') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
           if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
           if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)

@@ -2,7 +2,8 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
+- Branch: `develop` (operador: "mantente en develop", 2026-06-05)
 - Priority: `P1`
 - Epic: Workforce Contracting Studio (ADR `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` §8 "Collaborator Viewer", §12.4)
 - Created: 2026-06-05

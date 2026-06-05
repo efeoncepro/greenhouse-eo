@@ -604,6 +604,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'my'
   },
   {
+    viewCode: 'mi_ficha.mis_contratos',
+    section: 'mi_ficha',
+    label: 'Mis contratos y ofertas',
+    description: 'Vista del colaborador de sus cartas oferta y contratos laborales bilingües (estado honesto, sin edición legal).',
+    routePath: '/my/contracts',
+    routeGroup: 'my'
+  },
+  {
     viewCode: 'mi_ficha.mi_cuenta_pago',
     section: 'mi_ficha',
     label: 'Mi cuenta de pago',

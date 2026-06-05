@@ -130,6 +130,8 @@ export const GH_MY_NAV = {
   profile: { label: 'Mi Perfil', subtitle: 'Identidad y datos personales' },
   payroll: { label: 'Mi Nómina', subtitle: 'Liquidaciones y compensación' },
   contractor: { label: 'Mis Servicios Contractor', subtitle: 'Soporte, revisión y pagos' },
+  offers: { label: 'Mis Ofertas', subtitle: 'Cartas oferta y su estado' },
+  contracts: { label: 'Mis Contratos', subtitle: 'Contratos laborales y firma' },
   paymentProfile: { label: 'Mi Cuenta de Pago', subtitle: 'Donde recibes tus pagos' },
   leave: { label: 'Mis Permisos', subtitle: 'Saldos y solicitudes' },
   goals: { label: 'Mis Objetivos', subtitle: 'OKRs y key results del ciclo' },
