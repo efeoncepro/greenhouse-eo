@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio` (hoy el operador marca a mano ítems cuyo estado real ya es queryable → fricción + drift entre "marcado" y "realidad")
 - Effort: `Medio`
@@ -12,6 +12,22 @@
 - Blocked by: `none` (extiende el patrón de TASK-1009 ya en prod)
 - Derived from: feedback del operador sobre TASK-1013/1015 (2026-06-05): "Notion ya está provisionado y en BigQuery pero sale 'en curso'; Nubox tiene OC registrada pero el onboarding no lo verifica"
 - Creada: 2026-06-05
+- Completada: 2026-06-05 (code complete, local-first en `develop`)
+
+## Implementación (2026-06-05)
+
+Los 4 slices entregados, extendiendo el patrón thin + reuse-first de TASK-1009. **Cero migración / capability / outbox / tabla** (todo aditivo + flag-gated).
+
+- **Slice 1 — registry + resolvers** (`src/lib/client-lifecycle/evidence/`): `evidence-types.ts` (shared: `ItemEvidenceStatus`, `AUTO_DERIVABLE_ITEM_CODES`, `isAutoDerivableItem`, `canAutoCompleteFromEvidence`), `resolvers.ts` (server-only: 6 clasificadores **puros** + gatherers IO `settle`-wrapped, reusan `getClientLifecycleStage`/`getNotionOnboardingReadiness`/tablas canónicas), `composer.ts` (`resolveOnboardingEvidence(caseId)` batched, scope resuelto 1 vez). 26 tests focales.
+- **Slice 2 — endpoint + UI**: `POST .../cases/[caseId]/verify-evidence` (auth `client.lifecycle.case.advance`, scope server-side anti-tamper, `mapLifecycleError`). UI `OnboardingEvidence.tsx` (hook + `EvidenceVerifyButton` + `EvidenceRow`) wired en `LifecycleTimeline` — botón en el header del checklist + chip de evidencia **solo en pasos no resueltos** (GVC enterprise loop sobre Berel). Copy `GH_CLIENT_ONBOARDING.evidence`. Scenario GVC `client-lifecycle-evidence`.
+- **Slice 3 — auto-complete gated**: flag `ONBOARDING_ITEM_EVIDENCE_AUTOCOMPLETE_ENABLED` (default OFF). Decisión pura `canAutoCompleteFromEvidence` (anti-fake-green + respeta override manual + `requires_evidence` queda manual). Resiliente per-ítem (`captureWithDomain`).
+- **Slice 4 — signal**: `client.lifecycle.evidence_detected_not_marked` (commercial, drift, PG-only, steady=0), wired en `get-reliability-overview.ts`. SQL validado contra PG real.
+
+**Open Questions resueltas**: OQ1 → on-demand (no N+1 en el read del timeline). OQ2 → billing detected ⇔ `payment_currency` + (`!requires_po` o hay `current_po_number`). OQ3 → team detected ⇔ ≥1 `client_team_assignment` activo (FTE>0 no requerido).
+
+**Gates**: tsc 0 · eslint 0 · 26 tests focales + suite full 862 passed · build OK · smoke live (Berel: Notion/HubSpot/billing-MXN detected). Falla ajena pre-existente en develop (`notifications/preferences/route` pin 13≠14, de TASK-1014) — fuera de scope.
+
+**Pendiente operativo**: activar `ONBOARDING_ITEM_EVIDENCE_AUTOCOMPLETE_ENABLED` tras validar la evidencia contra la realidad por resolver (la exposición read ya va sin flag).
 
 ## Summary
 

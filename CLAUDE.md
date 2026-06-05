@@ -5722,6 +5722,23 @@ La verificación de que un cliente nuevo **fluye de verdad al portal** (raw → 
 
 **Spec canónica**: `docs/tasks/complete/TASK-1009-notion-onboarding-flow-preflight.md` + Delta en `GREENHOUSE_CLIENT_LIFECYCLE_V1.md`. Migración aditiva `20260604224502258`. CLI `pnpm notion:onboarding-preflight <spaceId> [--json]`. Verificado live: Berel 9/9 verde.
 
+### Onboarding checklist evidence layer — el estado se deriva de evidencia real, no se marca a ciegas (TASK-1017, desde 2026-06-05)
+
+El estado de un ítem **auto-derivable** del checklist `standard_onboarding_v1` se deriva del estado REAL del runtime, no se marca a ciegas. La capa vive en `src/lib/client-lifecycle/evidence/` y extiende el patrón thin + reuse-first de TASK-1009 (`verify_notion_flowing`) a los 6 ítems auto-derivables: `verify_hubspot_company_synced`, `assign_team_members`, `provision_notion_workspace`, `provision_communication_channels`, `provision_client_users_access`, `confirm_billing_setup`. Cada resolver **reusa** el reader/tabla canónica existente (HubSpot `getClientLifecycleStage`, Notion `getNotionOnboardingReadiness`, equipo/Teams/portal/facturación por su tabla) y clasifica en **`detected | pending | unverifiable`** vía un clasificador **puro** (testeable) + gatherer IO `settle`-wrapped. El composer `resolveOnboardingEvidence(caseId)` resuelve el scope (org→client→space) **una vez** y corre los 6 en paralelo. El endpoint `POST .../cases/[caseId]/verify-evidence` (auth `client.lifecycle.case.advance`) expone la evidencia y, detrás de flag, auto-completa. Cero migración / capability / outbox / tabla.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** clasificar evidencia como `pending` cuando la fuente falló. Error de IO → `unverifiable` (degradación honesta; la fuente está caída, ≠ "todavía no está hecho"). El gatherer va envuelto en `settle`; el clasificador es puro y nunca lanza.
+- **NUNCA** componer la evidencia de los ítems en el read del timeline/inbox (hot path de listas). Es **on-demand** (botón "Verificar evidencia" → un endpoint batched por caso). Componerla en el read = N+1 sobre BigQuery (el preflight Notion solo hace ~6 queries BQ). Mirror exacto de TASK-1009.
+- **NUNCA** auto-completar un ítem sin pasar por `canAutoCompleteFromEvidence` (decisión pura SSOT): cierra SOLO si evidencia `detected` + `requires_evidence=false` + estado `pending`/`in_progress`. **Anti-fake-green** (jamás con `pending`/`unverifiable`); **respeta el override manual** (jamás sobre `completed`/`skipped`/`not_applicable`/`blocked`).
+- **NUNCA** auto-completar un ítem `requires_evidence=true` (p.ej. `provision_notion_workspace`): la evidencia del sistema NO reemplaza el asset humano requerido → muestra la evidencia pero queda manual.
+- **NUNCA** auto-derivar los ítems **declarativos** (`confirm_legal_documents`, `declare_engagement_kind`, `declare_commercial_terms`, `declare_engagement_phases`): no tienen fuente automática, siguen manuales, sin evidencia inventada. `isAutoDerivableItem` es la lista cerrada canónica.
+- **NUNCA** activar el flag `ONBOARDING_ITEM_EVIDENCE_AUTOCOMPLETE_ENABLED=true` sin validar la evidencia contra la realidad en ≥1 caso real por resolver (production verification sequence). La exposición read va sin flag; el auto-complete (mutación) es lo gated.
+- **NUNCA** crear un sync nuevo para un ítem auto-derivable: se **componen** los readers/tablas canónicas existentes. Si emerge un ítem nuevo, agregar su resolver al registry reusando su reader canónico.
+- **SIEMPRE** que emerja un ítem auto-derivable nuevo, agregar (a) su `item_code` a `AUTO_DERIVABLE_ITEM_CODES`, (b) su resolver (clasificador puro + gatherer settle), (c) tests del clasificador, y (d) la rama PG-queryable al signal `client.lifecycle.evidence_detected_not_marked` si su evidencia vive en PG.
+
+**Spec canónica**: `docs/tasks/complete/TASK-1017-onboarding-checklist-item-evidence-auto-verification.md`. Helpers: `resolveOnboardingEvidence`, `canAutoCompleteFromEvidence`, `isAutoDerivableItem` (`src/lib/client-lifecycle/evidence/`). Signal: `client.lifecycle.evidence_detected_not_marked` (commercial, drift, PG-only, steady=0). Patrón fuente: TASK-1009 (composer thin + evaluador puro + degradación honesta + auto-complete solo-si-verde).
+
 ### Git hooks canonicos (Husky + lint-staged) — auto-prevention de errores CI
 
 Repo tiene 2 hooks instalados via Husky 9 (`pnpm prepare` los activa

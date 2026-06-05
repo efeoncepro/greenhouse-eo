@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-04 por Claude
-> **Ultima actualizacion:** 2026-06-04 por Claude (TASK-1009 — preflight Notion)
+> **Ultima actualizacion:** 2026-06-05 por Claude (TASK-1017 — verificar evidencia del checklist)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1](../../architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md) · [GREENHOUSE_CLIENT_LIFECYCLE_V1](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md)
 
 # Alta de Cliente — Puerta Unica de Onboarding
@@ -202,3 +202,21 @@ El item corre un **preflight de 9 eslabones** sobre la cadena completa y reporta
 El item **se auto-completa solo si el preflight da todo verde** — nadie puede marcarlo listo estando rojo. Si algo sale rojo, el detalle dice exactamente que eslabon arreglar (por ejemplo, un estado de Notion que no mapea → alinear el template en Notion, **no** crear excepciones por cliente).
 
 > Detalle tecnico: composer `getNotionOnboardingReadiness(spaceId)` (reusa los helpers de readiness/freshness existentes), endpoint `POST .../cases/[caseId]/notion-preflight`, CLI `pnpm notion:onboarding-preflight <spaceId>`, signal `integrations.notion.onboarding_incomplete`. Delta en [GREENHOUSE_CLIENT_LIFECYCLE_V1](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md).
+
+## Verificar evidencia del checklist (TASK-1017)
+
+Varios pasos del checklist tienen un estado real que el sistema **ya sabe** sin que el operador lo marque a mano: la empresa sincronizada desde HubSpot, el equipo asignado, Notion fluyendo, el canal de Teams, las personas del portal invitadas, la facturacion lista. Antes, el checklist mostraba lo que estaba guardado, no la realidad — un paso podia salir "pendiente" aunque la pieza ya estuviera lista (caso Berel: Notion provisionado y en BigQuery, pero el paso seguia "en curso").
+
+En la ficha del cliente, el panel del checklist tiene un boton **"Verificar evidencia"**. Al correrlo, cada paso **auto-derivable** muestra, junto a su estado, lo que ve el sistema:
+
+- **Detectado** (verde) — la pieza ya esta lista en el sistema.
+- **Sin detectar** (gris) — la fuente respondio y todavia no esta hecho.
+- **No verificable** (ambar) — no pudimos verificar (la fuente esta caida). Nunca se muestra un falso "pendiente".
+
+La evidencia solo aparece en los pasos **aun no resueltos** (donde aporta decision: "ya esta listo, marcalo" o "todavia no"); en un paso ya cerrado seria ruido. Los casos de **drift** ("ya esta listo pero nadie lo marco") destacan: ves "Detectado" junto a un estado que sigue pendiente.
+
+Los pasos **declarativos** (contrato firmado, tipo de servicio, terminos comerciales, fases) **no** tienen fuente automatica: siguen siendo manuales, sin evidencia inventada.
+
+**Auto-completado (opcional, detras de flag):** cuando el operador lo activa, un paso con evidencia **Detectado** que no requiere un documento adjunto humano se marca como completado solo. Nunca con evidencia "pendiente"/"no verificable" (anti-fake-green), nunca pisa lo que ya marcaste a mano, y los pasos que requieren un asset humano (como provisionar Notion) muestran la evidencia pero quedan manuales — la evidencia del sistema no reemplaza el documento.
+
+> Detalle tecnico: registry `item_code → resolver` (reuse-first: HubSpot via `getClientLifecycleStage`, Notion via `getNotionOnboardingReadiness`, equipo/Teams/portal/facturacion por tabla canonica), composer batched `resolveOnboardingEvidence(caseId)` (server-only, degradacion honesta `OutcomeOrError`), endpoint `POST .../cases/[caseId]/verify-evidence` (read + auto-complete gated por `ONBOARDING_ITEM_EVIDENCE_AUTOCOMPLETE_ENABLED`). Decision pura `canAutoCompleteFromEvidence`. Signal de drift `client.lifecycle.evidence_detected_not_marked`. Implementado por TASK-1017 (extiende el patron `verify_notion_flowing` de TASK-1009).

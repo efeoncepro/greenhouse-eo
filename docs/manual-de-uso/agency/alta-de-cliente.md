@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-04 por Claude
-> **Ultima actualizacion:** 2026-06-04 por Claude (TASK-1009 — preflight Notion)
+> **Ultima actualizacion:** 2026-06-05 por Claude (TASK-1017 — verificar evidencia del checklist)
 > **Documentacion funcional:** [Alta de Cliente](../../documentation/agency/alta-de-cliente.md)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1](../../architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md)
 
@@ -97,6 +97,8 @@ En la ficha del cliente, abre el item **"Accesos del portal"** (`provision_clien
 | Aviso "Notion quedo pendiente" (pantalla de exito) | El cliente se creo, pero Notion no se pudo vincular | Resuelvelo desde el item de Notion en el checklist |
 | Banner "Onboarding en curso — N de 10 completados" | El caso esta abierto con tareas pendientes | Sigue completando el checklist |
 | "Con acceso" (verde) en una persona | Ya tiene usuario de portal con rol | No hace falta re-invitar |
+| Chip "Detectado" (verde) bajo un paso pendiente | El sistema ve que la pieza ya esta lista | Podes marcar el paso (o se marca solo si el auto-completado esta activo) |
+| Chip "No verificable" (ambar) bajo un paso | No se pudo verificar ahora (fuente caida) | Volve a presionar "Verificar evidencia" en unos segundos |
 
 ## Que no hacer
 
@@ -123,6 +125,19 @@ Antes de dar por terminado el onboarding, el checklist tiene un item bloqueante 
 - **Que significa cada estado:** ✓ ok · ✗ falla (eslabon roto, hay que arreglarlo) · ⚠ advisory (no bloquea: token compartido o sync algo viejo).
 - **El item se completa solo cuando todo da verde.** Si esta rojo, el detalle dice que arreglar. Caso tipico: un estado de Notion que no mapea al vocabulario estandar → **alinear el template del cliente en Notion** (no pedir una excepcion por cliente).
 - **Que NO hacer:** marcar el item como completado a mano cuando el preflight esta rojo — el sistema lo impide; primero arregla el eslabon.
+
+## Verificar la evidencia del checklist (sin marcar a mano)
+
+En la ficha del cliente, el panel del checklist tiene un boton **"Verificar evidencia"**. Presionalo para que Greenhouse revise el estado real de cada paso contra el sistema:
+
+- **Detectado** (verde) — la pieza ya esta lista (empresa de HubSpot, equipo asignado, Notion fluyendo, canal de Teams, personas del portal, facturacion).
+- **Sin detectar** (gris) — todavia no esta hecho.
+- **No verificable** (ambar) — no se pudo verificar ahora (la fuente esta caida). No es un "pendiente" falso; vuelve a intentar.
+
+La evidencia aparece **solo en los pasos que aun no marcaste**. Si ves **"Detectado"** junto a un paso que sigue pendiente, es justo lo que buscas: la pieza ya esta lista, podes marcarla.
+
+- **Auto-completado:** si tu entorno tiene el auto-completado activo, los pasos detectados que no necesitan un documento adjunto se marcan solos. **Nunca** se marca algo sin detectar, **nunca** se pisa lo que ya marcaste a mano, y los pasos que piden un documento (como provisionar Notion) muestran la evidencia pero los completas vos.
+- **Que NO hacer:** suponer que "Sin detectar" es un error. Significa que la pieza todavia no esta — hacela y volve a verificar.
 
 ## Referencias tecnicas
 
