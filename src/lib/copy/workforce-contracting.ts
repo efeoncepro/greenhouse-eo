@@ -2,6 +2,9 @@ export const GH_WORKFORCE_CONTRACTING = {
   productName: 'Workforce Contracting',
   studioName: 'Workforce Contracting Studio',
   mockupTitle: 'Workforce Contracting',
+  runtimeTitle: 'Contratos laborales',
+  runtimeSubtitle:
+    'Prepara cartas oferta y contratos laborales bilingües con redacción asistida, validación determinista, aprobación humana y firma futura.',
   commandCenter: 'Centro operativo',
   guidedBuilder: 'Flujo guiado',
   bilingualReview: 'Revisión bilingüe',
@@ -25,8 +28,141 @@ export const GH_WORKFORCE_CONTRACTING = {
   parityOk: 'Paridad OK',
   parityWarning: 'Atención',
   parityBlocked: 'Bloqueante',
+  // Runtime — Command Center
+  filters: {
+    all: 'Todos',
+    offers: 'Cartas oferta',
+    contracts: 'Contratos',
+    chile: 'Chile',
+    international: 'Internacional',
+    risk: 'Riesgo'
+  },
+  columns: {
+    person: 'Persona',
+    document: 'Documento',
+    pack: 'Pack jurisdiccional',
+    status: 'Estado',
+    parity: 'Paridad',
+    risk: 'Riesgo',
+    nextAction: 'Próxima acción',
+    start: 'Inicio'
+  },
+  detail: {
+    title: 'Detalle del caso',
+    pack: 'Pack jurisdiccional',
+    authoritative: 'Idioma autoritativo',
+    signableFormat: 'Formato firmable',
+    drafts: 'Borradores',
+    timeline: 'Línea de tiempo',
+    validation: 'Validación',
+    noBlockers: 'Sin bloqueantes',
+    blockers: 'Bloqueantes',
+    selectHint: 'Elige un caso de la cola para ver su detalle.',
+    notAvailable: '—'
+  },
+  // Honest states (state-design)
+  states: {
+    loading: 'Cargando casos…',
+    loadingDetail: 'Cargando detalle…',
+    emptyTitle: 'Aún no hay casos',
+    emptyBody: 'Cuando se cree una carta oferta o un contrato laboral, aparecerá acá.',
+    emptyFilteredTitle: 'Sin resultados para este filtro',
+    emptyFilteredBody: 'Ajusta los filtros o vuelve a “Todos”.',
+    clearFilters: 'Ver todos',
+    errorTitle: 'No pudimos cargar el detalle',
+    errorBody: 'Reintenta en unos segundos.',
+    retry: 'Reintentar'
+  },
+  // Modes not yet built (locked / honest)
+  locked: {
+    badge: 'Próximamente',
+    builderTitle: 'Flujo guiado de creación',
+    builderBody:
+      'El asistente de creación + redacción bilingüe llega en una entrega siguiente (TASK-1021). Por ahora, los casos se gestionan desde el Centro operativo.',
+    reviewTitle: 'Revisión bilingüe',
+    reviewBody:
+      'La comparación ES+EN cláusula por cláusula del borrador llega en una entrega siguiente (TASK-1021). La validación y los bloqueantes ya se ven en el detalle del caso.'
+  },
+  actions: {
+    void: 'Anular',
+    openDraft: 'Ver borrador',
+    pendingEpic: 'Disponible al integrar firma (EPIC-001)'
+  },
+  kindLabels: {
+    offer_letter: 'Carta oferta',
+    employment_contract: 'Contrato laboral'
+  },
+  riskLabels: {
+    low: 'Bajo',
+    medium: 'Medio',
+    high: 'Alto'
+  },
+  parityLabels: {
+    ok: 'ES+EN OK',
+    warning: 'ES+EN revisar',
+    error: 'ES+EN bloquea',
+    unknown: 'ES+EN sin evaluar'
+  },
+  signatureLabels: {
+    not_applicable: 'No aplica',
+    not_ready: 'Sin preparar',
+    ready_for_pdf: 'Listo para PDF',
+    ready_for_signature: 'Listo para firma',
+    pending_signature: 'Firma pendiente',
+    signed: 'Firmado'
+  },
+  // Case statuses (offer 11 + contract 19) — es-CL
+  statusLabels: {
+    // offer
+    draft: 'Borrador',
+    ai_drafted: 'Borrador IA',
+    pending_internal_review: 'Pendiente de revisión',
+    approved: 'Aprobada',
+    sent: 'Enviada',
+    viewed: 'Vista',
+    accepted: 'Aceptada',
+    rejected: 'Rechazada',
+    expired: 'Vencida',
+    withdrawn: 'Retirada',
+    converted_to_contract: 'Convertida a contrato',
+    // contract
+    intake_pending: 'Intake pendiente',
+    validation_blocked: 'Bloqueado por validación',
+    pending_review: 'Pendiente de revisión',
+    legal_review: 'Revisión legal',
+    internal_approved: 'Aprobado interno',
+    ready_for_pdf: 'Listo para PDF',
+    ready_for_signature: 'Listo para firma',
+    sent_for_signature: 'Enviado a firma',
+    partially_signed: 'Parcialmente firmado',
+    fully_signed: 'Firmado',
+    registered_external: 'Registrado',
+    active: 'Vigente',
+    voided: 'Anulado',
+    superseded: 'Reemplazado',
+    signature_failed: 'Firma fallida',
+    needs_amendment: 'Requiere addenda'
+  },
+  nextActionLabels: {
+    create_draft: 'Crear borrador',
+    review_bilingual_draft: 'Revisar borrador bilingüe',
+    approve_offer: 'Aprobar oferta',
+    send_offer: 'Enviar oferta',
+    await_candidate: 'Esperar al candidato',
+    convert_to_contract: 'Convertir a contrato',
+    resolve_blockers: 'Resolver bloqueantes',
+    advance_review: 'Avanzar revisión',
+    approve_contract: 'Aprobar contrato',
+    generate_pdf: 'Generar PDF',
+    send_to_signature: 'Enviar a firma',
+    remind_signer: 'Recordar firma',
+    register_external: 'Registrar (DT/REL)',
+    mark_active: 'Marcar vigente',
+    retry_signature: 'Reintentar firma',
+    none: 'Sin acción'
+  },
   aria: {
-    prototypeMode: 'Modo del prototipo Workforce Contracting',
+    prototypeMode: 'Modo del Workforce Contracting',
     legalReadinessProgress: 'Progreso de validación legal',
     commandQueueTable: 'Tabla de casos de Workforce Contracting',
     bilingualReviewTable: 'Tabla de revisión bilingüe de contrato'
