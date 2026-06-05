@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Branch: `develop` (operador: "mantente en develop no cambies de rama", 2026-06-05)
 - Epic: Workforce Contracting Studio (ADR `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` §8 "Admin Viewer", §12.4)
@@ -12,9 +12,11 @@
 
 - **Slice 0 — Governance ✅** (commits `556347410` + `e5bf9f74f` + `735a2fa1b`): migración `20260605150932572` (viewCode `equipo.workforce_contracting` + 4 grants efeonce_admin/finance_admin/hr_manager/hr_payroll) **aplicada + verificada live**; nav item "Contratos laborales" bajo HR/Supervisión gated por `canSeeView`; copy `GH_HR_NAV` (es) + `navigation-copy` (en); registrado también en el TS `VIEW_REGISTRY` (view-access-catalog) para paridad. `/hr/workforce/contracts` top-level → alcanzable (sin reachability entry).
 - **Slice 1 — Command Center runtime ✅** (commit `75bd66066`): page (gate viewCode + reader) + `WorkforceContractingStudioView` consumiendo `listContractingCases` + detail rail vía GET `/api/hr/workforce/contracting/[caseId]`. Header + 5 KPIs computados + queue filtrable + detail rail (status, projection, blockers, drafts, timeline real). 12-state honesto (empty zero/filtered, loading skeleton, error+retry, degraded `—`). Builder/Review = locked "Próximamente". PDF/firma = locked (EPIC-001). tsc 0 · eslint 0 · 155 tests focales. **GVC empty-state PASS** (chrome enterprise, agent auth pasa el gate).
-- **Slice 2 — Guided Builder (create wizard + mutations createCase/createDraft, ai-draft flag-gated)** — PENDIENTE.
-- **Slice 3 — Bilingual Review Desk (structuredContent del draft + approveDraft + void)** — PENDIENTE (requiere extender un reader para el cuerpo ES/EN por sección).
-- GVC poblado (queue + detail rail con data) sigue naturalmente cuando existan casos (Slice 2 los crea).
+- **Slice 2 — Guided Builder ✅** (commit `32bf5231d`): botón "Nueva carta o contrato" (canManage) → modo builder con form de creación (toggle tipo + person picker vía `/api/organizations/people-search` + select de pack filtrado por tipo + `GreenhouseDatePicker` + `legalReviewReference` condicional al pack) → POST create → `router.refresh` + selección. Operating entity resuelto server-side. Acción "Generar borrador IA" honesta (flag OFF → 409 "IA deshabilitada").
+- **Slice 3 — Bilingual Review Desk ✅** (commit `32bf5231d`): nuevo reader `getLatestContractingDraftContent` + GET `/[caseId]/draft-content`. Modo review renderiza ES/EN lado a lado por `sectionCode` + paridad estructural + blockers; `approveDraft` (canApprove, bloqueado si blockers>0), `void` (canManage, prompt de motivo ≥5), generar borrador IA. Detail rail gana "Revisar borrador bilingüe" → modo review. 12-state honesto.
+- **GVC loop ✅** (commit `1e982c966`): scenario runtime captura las 3 superficies (Command Center + Guided Builder/create + Bilingual Review). El loop atrapó + corrigió: badge "(Próximamente)" obsoleto (Builder/Review ya funcionales) + 2 violaciones axe color-contrast (toggle low-opacity + subheader compartido `text.secondary`). **Captura final OK · 0 violaciones axe** en las 3 superficies.
+- Paridad real corregida: los valores de paridad bilingüe son `pass|fail|unknown` (no `ok|warning|error` del mockup).
+- **Pendiente (fuera de TASK-1021)**: el Collaborator Viewer (`/my/offers` + `/my/contracts`) es **TASK-1022**. PDF/firma/emails = EPIC-001 (TASK-1023..1026). El cuerpo ES/EN poblado del review aparece cuando exista un draft (IA flag ON o autoría — futuro).
 
 ## Why
 

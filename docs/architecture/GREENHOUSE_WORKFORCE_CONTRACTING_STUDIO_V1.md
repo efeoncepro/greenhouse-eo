@@ -645,7 +645,7 @@ Traduce el §12 "Implementation Order" a tasks concretas. **Dos tracks**: A (des
 
 | Task | Qué | Bloqueo | Track |
 | --- | --- | --- | --- |
-| **TASK-1021** | Admin Viewer runtime (Command Center + Guided Builder + Bilingual Review Desk) — promueve el mockup aprobado consumiendo readers/commands; loop GVC + viewCode/nav/reachability | ninguno (foundation) | **A — listo para empezar** |
+| **TASK-1021** ✅ | Admin Viewer runtime (Command Center + Guided Builder + Bilingual Review Desk) — promovido a runtime en `/hr/workforce/contracts` consumiendo readers/commands; viewCode `equipo.workforce_contracting` + nav; loop GVC verde (0 axe) en las 3 superficies. PDF/firma como acciones futuras (EPIC-001). En `develop` 2026-06-05. | ninguno (foundation) | **A — ✅ entregado** |
 | **TASK-1022** | Collaborator Viewer runtime (`/my/offers` + `/my/contracts`) — estado honesto bilingüe via `getOwnContractingSummary` | ninguno (foundation) | **A — listo para empezar** |
 | `TASK-489` | EPIC-001 document registry & versioning | — | B (prerequisito) |
 | `TASK-493` | EPIC-001 rendering / template catalog | — | B (prerequisito) |

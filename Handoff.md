@@ -1,12 +1,15 @@
-# Sesion 2026-06-05 (cont.) — TASK-1021 🚧 Admin Viewer runtime (Slices 0-1 ✅, en `develop` sin push)
+# Sesion 2026-06-05 (cont.) — TASK-1021 ✅ Admin Viewer runtime completo (3 superficies, GVC verde)
 
-Promoción del mockup aprobado del Workforce Contracting Studio a runtime real. **En `develop`, sin branch ni push** (instrucción del operador "mantente en develop"). **Slices 0-1 entregados + GVC-verificados; Slices 2-3 pendientes** → task queda `in-progress`.
+Promoción del mockup aprobado del Workforce Contracting Studio a runtime real. **En `develop`, sin branch** (instrucción del operador "mantente en develop"). **3 superficies admin entregadas + GVC-verificadas (0 violaciones axe)**. El Collaborator Viewer es TASK-1022.
 
 - **Rollout de TASK-1019 ejecutado antes**: push `develop` (`3ebaa3dc6..55a991b16`) + CI/worker-gate/Playwright/Vercel staging todos verdes + `ANTHROPIC_API_KEY_SECRET_REF` registrado en Vercel (Production/Preview/Development). Roadmap de tasks faltantes registrado (TASK-1021..1026, push `..32b8557c3`). ⚠️ rotar la key Anthropic antes de habilitar el flag IA.
 - **Slice 0 — Governance ✅** (`556347410` + `e5bf9f74f` + `735a2fa1b`): migración `20260605150932572` (viewCode `equipo.workforce_contracting` + 4 grants) **aplicada + verificada live**; nav item "Contratos laborales" (HR/Supervisión, `canSeeView`); copy es/en; TS `VIEW_REGISTRY` catalog. Ruta top-level → alcanzable.
 - **Slice 1 — Command Center runtime ✅** (`75bd66066`): `/hr/workforce/contracts` (page gated + `WorkforceContractingStudioView`) consumiendo `listContractingCases` + detail rail vía API existente. Header + 5 KPIs + queue filtrable + detail rail (status/projection/blockers/drafts/timeline real). 12-state honesto. Builder/Review + PDF/firma = locked. tsc 0 · eslint 0 · 155 tests focales. **GVC empty-state PASS** (chrome enterprise, agent auth OK).
-- **Pendiente (Slices 2-3, próxima sesión)**: Guided Builder (wizard create + mutations createCase/createDraft, ai-draft flag-gated) + Bilingual Review Desk (structuredContent ES/EN por sección + approveDraft + void; requiere extender un reader). GVC poblado (queue con data) sigue cuando Slice 2 cree casos.
-- **No pusheado** (local-first): los commits viven en `develop` local. Push = decisión del operador. La migración del viewCode YA está aplicada al Cloud SQL compartido (seed inerte hasta que el código se despliegue).
+- **Slice 2 — Guided Builder ✅** (`32bf5231d`): "Nueva carta o contrato" → modo builder con form de creación (tipo + person picker `/api/organizations/people-search` + pack filtrado + `GreenhouseDatePicker` + ref. legal condicional) → POST create → refresh + select. Operating entity server-side. Acción IA honesta (flag OFF → 409).
+- **Slice 3 — Bilingual Review Desk ✅** (`32bf5231d`): reader `getLatestContractingDraftContent` + GET `/[caseId]/draft-content`; modo review ES/EN lado a lado por `sectionCode` + paridad + approve (canApprove, bloqueado si blockers) + void (prompt) + generar IA. Detail rail → "Revisar borrador bilingüe".
+- **GVC loop ✅** (`1e982c966`): scenario runtime captura las 3 superficies; el loop atrapó + corrigió badge "(Próximamente)" obsoleto + 2 violaciones axe color-contrast. Captura final **OK · 0 violaciones**. Paridad real `pass|fail|unknown`.
+- **Gate de cierre**: `pnpm test` + `pnpm build` full corriendo; mover a `complete/` + push tras verdes.
+- La migración del viewCode YA está aplicada al Cloud SQL compartido.
 
 # Sesion 2026-06-05 (cont.) — TASK-1019 ✅ foundation implementada (5 slices, en `develop` sin push)
 
