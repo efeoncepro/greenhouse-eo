@@ -11,6 +11,7 @@ import {
   type WorkforceContractingCaseKind,
   type WorkforceContractingCaseStatus,
   type WorkforceContractingDraftStatus,
+  type WorkforceContractingStructuredContent,
   type WorkforceContractingValidationResult
 } from './types'
 
@@ -231,6 +232,56 @@ export const getContractingCaseDetail = async (caseId: string): Promise<Contract
       actorUserId: e.actor_user_id,
       occurredAt: e.occurred_at instanceof Date ? e.occurred_at.toISOString() : String(e.occurred_at)
     }))
+  }
+}
+
+export interface ContractingDraftContent {
+  draftId: string
+  draftVersion: number
+  status: WorkforceContractingDraftStatus
+  source: string
+  structuredContent: WorkforceContractingStructuredContent | null
+  validation: WorkforceContractingValidationResult | null
+}
+
+/**
+ * Latest draft body for the Bilingual Review Desk (TASK-1021 Slice 3). Returns the
+ * full structured bilingual content (es-CL + en-US sections) + the validation snapshot.
+ * Null when the case has no draft yet (honest empty state).
+ */
+export const getLatestContractingDraftContent = async (caseId: string): Promise<ContractingDraftContent | null> => {
+  const rows = await runGreenhousePostgresQuery<{
+    draft_id: string
+    draft_version: number
+    status: WorkforceContractingDraftStatus
+    source: string
+    structured_content_json: WorkforceContractingStructuredContent | Record<string, unknown> | null
+    validation_snapshot_json: WorkforceContractingValidationResult | null
+  }>(
+    `SELECT draft_id, draft_version, status, source, structured_content_json, validation_snapshot_json
+     FROM greenhouse_hr.workforce_contracting_drafts
+     WHERE case_id = $1
+     ORDER BY draft_version DESC
+     LIMIT 1`,
+    [caseId]
+  )
+
+  if (!rows[0]) return null
+
+  const raw = rows[0].structured_content_json
+
+  const structuredContent =
+    raw && typeof raw === 'object' && 'localizedDrafts' in raw
+      ? (raw as WorkforceContractingStructuredContent)
+      : null
+
+  return {
+    draftId: rows[0].draft_id,
+    draftVersion: Number(rows[0].draft_version),
+    status: rows[0].status,
+    source: rows[0].source,
+    structuredContent,
+    validation: rows[0].validation_snapshot_json
   }
 }
 

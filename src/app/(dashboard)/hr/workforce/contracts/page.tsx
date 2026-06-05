@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 import { ROLE_CODES } from '@/config/role-codes'
+import { getOperatingEntityIdentity } from '@/lib/account-360/organization-identity'
+import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
+import { can } from '@/lib/entitlements/runtime'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { listContractingCases } from '@/lib/workforce/contracting/readers'
@@ -28,9 +31,23 @@ const Page = async () => {
     redirect(tenant.portalHomePath)
   }
 
-  const { items } = await listContractingCases({ limit: 200 })
+  const subject = buildTenantEntitlementSubject(tenant)
+  const canManage = can(subject, 'workforce.contracting.manage', 'create', 'tenant')
+  const canApprove = can(subject, 'workforce.contracting.approve', 'approve', 'tenant')
 
-  return <WorkforceContractingStudioView items={items} />
+  const [{ items }, operatingEntity] = await Promise.all([
+    listContractingCases({ limit: 200 }),
+    getOperatingEntityIdentity()
+  ])
+
+  return (
+    <WorkforceContractingStudioView
+      items={items}
+      canManage={canManage}
+      canApprove={canApprove}
+      operatingEntityOrganizationId={operatingEntity?.organizationId ?? null}
+    />
+  )
 }
 
 export default Page

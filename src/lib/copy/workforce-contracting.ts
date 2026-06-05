@@ -73,6 +73,43 @@ export const GH_WORKFORCE_CONTRACTING = {
     errorBody: 'Reintenta en unos segundos.',
     retry: 'Reintentar'
   },
+  // Create (Guided Builder)
+  create: {
+    title: 'Nueva carta o contrato',
+    subtitle: 'Abre un caso bilingüe. La redacción y la firma llegan en pasos siguientes.',
+    kind: 'Tipo de documento',
+    subject: 'Persona',
+    subjectPlaceholder: 'Busca por nombre…',
+    subjectHint: 'Escribe al menos 2 letras para buscar.',
+    pack: 'Pack jurisdiccional',
+    startDate: 'Fecha de inicio',
+    legalRef: 'Referencia de revisión legal',
+    legalRefHint: 'Este pack exige revisión legal (mín. 10 caracteres).',
+    entityMissing: 'No se pudo resolver la entidad operadora. Contacta a Admin.',
+    submit: 'Abrir caso',
+    submitting: 'Abriendo…',
+    success: 'Caso abierto.',
+    error: 'No se pudo abrir el caso.',
+    selectSubject: 'Selecciona una persona.',
+    selectPack: 'Selecciona un pack jurisdiccional.'
+  },
+  // Bilingual Review Desk
+  review: {
+    selectFromQueue: 'Selecciona un caso en el Centro operativo para revisarlo.',
+    noDraftTitle: 'Sin borrador todavía',
+    noDraftBody: 'Genera el borrador bilingüe para revisar cláusula por cláusula.',
+    generateDraft: 'Generar borrador IA',
+    aiDisabled: 'La redacción IA está deshabilitada en este ambiente.',
+    sectionsHeader: 'Sección',
+    approve: 'Aprobar par bilingüe',
+    approving: 'Aprobando…',
+    approved: 'Borrador aprobado.',
+    approveError: 'No se pudo aprobar.',
+    voided: 'Caso anulado.',
+    voidError: 'No se pudo anular.',
+    voidConfirm: 'reason',
+    structuralParity: 'Paridad estructural'
+  },
   // Modes not yet built (locked / honest)
   locked: {
     badge: 'Próximamente',
@@ -98,9 +135,8 @@ export const GH_WORKFORCE_CONTRACTING = {
     high: 'Alto'
   },
   parityLabels: {
-    ok: 'ES+EN OK',
-    warning: 'ES+EN revisar',
-    error: 'ES+EN bloquea',
+    pass: 'ES+EN OK',
+    fail: 'ES+EN diverge',
     unknown: 'ES+EN sin evaluar'
   },
   signatureLabels: {

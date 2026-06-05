@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -29,12 +31,18 @@ import { OperationalPanel, type OperationalStatusTone } from '@/components/green
 import { GH_WORKFORCE_CONTRACTING as C } from '@/lib/copy/workforce-contracting'
 import type { ContractingCaseDetail, ContractingCaseListItem } from '@/lib/workforce/contracting/readers'
 
+import BilingualReviewDesk from './BilingualReviewDesk'
+import CreateContractingCaseForm from './CreateContractingCaseForm'
+
 type StudioMode = 'command' | 'builder' | 'review'
 type QueueFilter = 'all' | 'offers' | 'contracts' | 'chile' | 'international' | 'risk'
 type DetailState = 'idle' | 'loading' | 'ready' | 'error'
 
 interface Props {
   items: ContractingCaseListItem[]
+  canManage: boolean
+  canApprove: boolean
+  operatingEntityOrganizationId: string | null
 }
 
 // ── Tone + label mappers (projection → es-CL, honest) ──────────────────────────
@@ -51,9 +59,8 @@ const riskTone = (level: 'low' | 'medium' | 'high'): OperationalStatusTone =>
   level === 'high' ? 'error' : level === 'medium' ? 'warning' : 'success'
 
 const parityTone = (parity: string): OperationalStatusTone => {
-  if (parity === 'ok') return 'success'
-  if (parity === 'warning') return 'warning'
-  if (parity === 'error') return 'error'
+  if (parity === 'pass') return 'success'
+  if (parity === 'fail') return 'error'
 
   return 'secondary'
 }
@@ -122,8 +129,9 @@ const MODE_LABELS: Record<StudioMode, { label: string; icon: string; capture: st
   review: { label: C.bilingualReview, icon: 'tabler-columns-3', capture: 'mode-review' }
 }
 
-const WorkforceContractingStudioView = ({ items }: Props) => {
+const WorkforceContractingStudioView = ({ items, canManage, canApprove, operatingEntityOrganizationId }: Props) => {
   const theme = useTheme()
+  const router = useRouter()
   const [mode, setMode] = useState<StudioMode>('command')
   const [filter, setFilter] = useState<QueueFilter>('all')
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -197,9 +205,24 @@ const WorkforceContractingStudioView = ({ items }: Props) => {
     }
   }, [filtered, selectedId])
 
+  const handleCreated = useCallback(
+    (newCaseId: string) => {
+      setSelectedId(newCaseId)
+      setMode('command')
+      router.refresh()
+      void loadDetail(newCaseId)
+    },
+    [router, loadDetail]
+  )
+
+  const handleReview = useCallback((caseId: string) => {
+    setSelectedId(caseId)
+    setMode('review')
+  }, [])
+
   return (
     <Stack spacing={{ xs: 3, md: 5 }} data-capture='workforce-contracting-studio'>
-      <Header mode={mode} onModeChange={setMode} />
+      <Header mode={mode} onModeChange={setMode} canManage={canManage} />
 
       <MetricStrip kpis={kpis} />
 
@@ -211,6 +234,7 @@ const WorkforceContractingStudioView = ({ items }: Props) => {
           onFilter={setFilter}
           selectedId={selectedId}
           onSelect={handleSelect}
+          onReview={handleReview}
           detail={detail}
           detailState={detailState}
           onRetryDetail={() => selectedId && loadDetail(selectedId)}
@@ -218,14 +242,23 @@ const WorkforceContractingStudioView = ({ items }: Props) => {
         />
       ) : null}
 
-      {mode === 'builder' ? <LockedMode title={C.locked.builderTitle} body={C.locked.builderBody} icon='tabler-route' /> : null}
-      {mode === 'review' ? <LockedMode title={C.locked.reviewTitle} body={C.locked.reviewBody} icon='tabler-columns-3' /> : null}
+      {mode === 'builder' ? (
+        canManage ? (
+          <CreateContractingCaseForm operatingEntityOrganizationId={operatingEntityOrganizationId} onCreated={handleCreated} />
+        ) : (
+          <LockedMode title={C.locked.builderTitle} body={C.locked.builderBody} icon='tabler-route' />
+        )
+      ) : null}
+
+      {mode === 'review' ? (
+        <BilingualReviewDesk caseId={selectedId} canApprove={canApprove} canManage={canManage} onChanged={() => router.refresh()} />
+      ) : null}
     </Stack>
   )
 }
 
 // ── Header ─────────────────────────────────────────────────────────────────────
-const Header = ({ mode, onModeChange }: { mode: StudioMode; onModeChange: (m: StudioMode) => void }) => (
+const Header = ({ mode, onModeChange, canManage }: { mode: StudioMode; onModeChange: (m: StudioMode) => void; canManage: boolean }) => (
   <Card
     sx={theme => ({
       borderRadius: 2,
@@ -254,12 +287,14 @@ const Header = ({ mode, onModeChange }: { mode: StudioMode; onModeChange: (m: St
           </Stack>
 
           <Stack alignItems={{ xs: 'stretch', lg: 'flex-end' }} spacing={1}>
-            <Button variant='contained' disabled startIcon={<i className='tabler-file-plus' aria-hidden='true' />}>
+            <Button
+              variant='contained'
+              disabled={!canManage}
+              onClick={() => onModeChange('builder')}
+              startIcon={<i className='tabler-file-plus' aria-hidden='true' />}
+            >
               {C.createDocument}
             </Button>
-            <Typography variant='caption' color='text.secondary'>
-              {C.locked.badge} · {C.guidedBuilder}
-            </Typography>
           </Stack>
         </Stack>
 
@@ -340,6 +375,7 @@ const CommandCenter = ({
   onFilter,
   selectedId,
   onSelect,
+  onReview,
   detail,
   detailState,
   onRetryDetail,
@@ -351,6 +387,7 @@ const CommandCenter = ({
   onFilter: (f: QueueFilter) => void
   selectedId: string | null
   onSelect: (id: string) => void
+  onReview: (id: string) => void
   detail: ContractingCaseDetail | null
   detailState: DetailState
   onRetryDetail: () => void
@@ -480,7 +517,7 @@ const CommandCenter = ({
         </CardContent>
       </Card>
 
-      <CaseRail selectedId={selectedId} detail={detail} detailState={detailState} onRetry={onRetryDetail} theme={theme} />
+      <CaseRail selectedId={selectedId} detail={detail} detailState={detailState} onRetry={onRetryDetail} onReview={onReview} theme={theme} />
     </Box>
   )
 }
@@ -491,12 +528,14 @@ const CaseRail = ({
   detail,
   detailState,
   onRetry,
+  onReview,
   theme
 }: {
   selectedId: string | null
   detail: ContractingCaseDetail | null
   detailState: DetailState
   onRetry: () => void
+  onReview: (id: string) => void
   theme: Theme
 }) => (
   <Card data-capture='workforce-contracting-case-rail' sx={{ boxShadow: 'none', border: `1px solid ${theme.palette.divider}`, position: { lg: 'sticky' }, top: { lg: 16 } }}>
@@ -538,13 +577,13 @@ const CaseRail = ({
           </Button>
         </Stack>
       ) : (
-        <CaseRailContent detail={detail} theme={theme} />
+        <CaseRailContent detail={detail} theme={theme} onReview={onReview} />
       )}
     </CardContent>
   </Card>
 )
 
-const CaseRailContent = ({ detail, theme }: { detail: ContractingCaseDetail; theme: Theme }) => {
+const CaseRailContent = ({ detail, theme, onReview }: { detail: ContractingCaseDetail; theme: Theme; onReview: (id: string) => void }) => {
   const projection = detail.projection
   const blockers = detail.latestValidation?.blockers ?? []
 
@@ -656,9 +695,14 @@ const CaseRailContent = ({ detail, theme }: { detail: ContractingCaseDetail; the
         </>
       ) : null}
 
-      <Button fullWidth variant='outlined' disabled startIcon={<i className='tabler-file-type-pdf' aria-hidden='true' />}>
-        {C.generatePdf} · {C.locked.badge}
-      </Button>
+      <Stack spacing={1}>
+        <Button fullWidth variant='contained' onClick={() => onReview(detail.case.caseId)} startIcon={<i className='tabler-columns-3' aria-hidden='true' />}>
+          {C.reviewBilingualDraft}
+        </Button>
+        <Button fullWidth variant='outlined' disabled startIcon={<i className='tabler-file-type-pdf' aria-hidden='true' />}>
+          {C.generatePdf} · {C.locked.badge}
+        </Button>
+      </Stack>
     </Stack>
   )
 }
