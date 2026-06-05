@@ -130,8 +130,11 @@ const CreateContractingCaseForm = ({ operatingEntityOrganizationId, onCreated }:
   }, [subject, packCode, operatingEntityOrganizationId, caseKind, selectedPack, startDate, requiresLegalRef, legalRef, onCreated])
 
   return (
-    <OperationalPanel title={C.create.title} subheader={C.create.subtitle} icon='tabler-file-plus' iconColor='primary'>
+    <OperationalPanel title={C.create.title} icon='tabler-file-plus' iconColor='primary'>
       <Stack spacing={3} sx={{ maxWidth: 620 }}>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {C.create.subtitle}
+        </Typography>
         {!operatingEntityOrganizationId ? <Alert severity='error'>{C.create.entityMissing}</Alert> : null}
 
         <Box>

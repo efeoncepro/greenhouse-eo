@@ -319,11 +319,6 @@ const Header = ({ mode, onModeChange, canManage }: { mode: StudioMode; onModeCha
               <Stack direction='row' spacing={1} alignItems='center'>
                 <i className={MODE_LABELS[item].icon} aria-hidden='true' />
                 <span>{MODE_LABELS[item].label}</span>
-                {item !== 'command' ? (
-                  <Box component='span' sx={{ fontSize: '0.7rem', opacity: 0.7 }}>
-                    ({C.locked.badge})
-                  </Box>
-                ) : null}
               </Stack>
             </ToggleButton>
           ))}
