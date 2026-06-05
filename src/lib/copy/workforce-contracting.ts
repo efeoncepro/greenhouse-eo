@@ -230,5 +230,26 @@ export const GH_WORKFORCE_CONTRACTING = {
     legalReadinessProgress: 'Progreso de validación legal',
     commandQueueTable: 'Tabla de casos de Workforce Contracting',
     bilingualReviewTable: 'Tabla de revisión bilingüe de contrato'
+  },
+  // TASK-1023 — chrome del documento firmable (PDF bilingüe es-CL + en-US).
+  document: {
+    prevalentBannerEs: 'Versión en español · prevalente',
+    referenceBannerEn: 'English version · reference',
+    termsTitleEs: 'Resumen de la oferta',
+    termsTitleEn: 'Offer summary',
+    signatureEmployer: 'Por el empleador',
+    signatureWorker: 'El trabajador',
+    signatureWitness: 'Ministro de fe',
+    representativeRole: 'Representante legal',
+    preStamped: 'Firma electrónica pre-estampada',
+    signViaZapsignEs: 'Firma vía ZapSign',
+    signViaZapsignEn: 'Signature via ZapSign',
+    offerAcceptEs: 'Acepto la oferta · firma vía ZapSign',
+    offerAcceptEn: 'I accept the offer · signature via ZapSign',
+    watermarkProyecto: 'PROYECTO',
+    watermarkVoided: 'ANULADO',
+    watermarkRejected: 'RECHAZADO',
+    watermarkExpired: 'EXPIRADO',
+    watermarkSuperseded: 'REEMPLAZADO'
   }
 } as const
