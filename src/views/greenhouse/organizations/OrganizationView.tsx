@@ -22,6 +22,7 @@ import CustomIconButton from '@core/components/mui/IconButton'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import { ROLE_CODES } from '@/config/role-codes'
+import OnboardingCaseBanner from '@/components/greenhouse/OnboardingCaseBanner'
 import type { OrganizationDetailData } from './types'
 import OrganizationTabs from './OrganizationTabs'
 import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
@@ -62,9 +63,10 @@ interface OrgKpis {
 
 type Props = {
   organizationId: string
+  onboardingStatus?: 'draft' | 'in_progress' | 'blocked' | null
 }
 
-const OrganizationView = ({ organizationId }: Props) => {
+const OrganizationView = ({ organizationId, onboardingStatus = null }: Props) => {
   const { data: session } = useSession()
   const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
 
@@ -185,6 +187,7 @@ const OrganizationView = ({ organizationId }: Props) => {
   return (
     <>
       <Stack spacing={6}>
+        <OnboardingCaseBanner organizationId={organizationId} status={onboardingStatus} />
         {/* ── Identity Header ── */}
         <Card variant='outlined'>
           <CardContent sx={{ py: 3 }}>

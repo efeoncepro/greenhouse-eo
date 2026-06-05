@@ -62,6 +62,8 @@ export type OrganizationWorkspaceShellProps = {
   adminActions?: ReactNode
   /** Optional drawer slot rendered after shell content (modals/drawers). */
   drawerSlot?: ReactNode
+  /** Optional banner rendered above the header (e.g. onboarding in-flight, TASK-1013). */
+  headerBanner?: ReactNode
 }
 
 const STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'secondary'> = {
@@ -118,7 +120,8 @@ const OrganizationWorkspaceShell = ({
   onFacetChange,
   children,
   adminActions,
-  drawerSlot
+  drawerSlot,
+  headerBanner
 }: OrganizationWorkspaceShellProps) => {
   const copy = GH_ORGANIZATION_WORKSPACE.shell
 
@@ -159,6 +162,7 @@ const OrganizationWorkspaceShell = ({
   return (
     <>
       <Stack spacing={6}>
+        {headerBanner}
         {/* ── Header ── */}
         <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
           <CardContent>

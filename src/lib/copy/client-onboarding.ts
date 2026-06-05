@@ -484,7 +484,14 @@ export const GH_CLIENT_ONBOARDING = {
     originAdopt: 'Adopción',
     originRenewal: 'Renovación',
     originChurnSignal: 'Señal de baja',
-    originMigration: 'Migración'
+    originMigration: 'Migración',
+    // Indicador cruzado en Organizaciones / Account 360 (TASK-1013 Slice 2).
+    orgColumnHeader: 'Onboarding',
+    orgLinkAria: 'Abrir el onboarding de esta organización',
+    orgBannerInProgress: 'Onboarding en curso',
+    orgBannerDraft: 'Onboarding pendiente de iniciar',
+    orgBannerBlocked: 'Onboarding bloqueado',
+    orgOpenTimelineCta: 'Abrir timeline'
   },
   // TASK-1009 — panel del preflight de onboarding Notion (ítem verify_notion_flowing).
   notionPreflight: {

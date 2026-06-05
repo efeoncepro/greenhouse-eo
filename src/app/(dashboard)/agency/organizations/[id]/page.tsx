@@ -6,8 +6,37 @@ import { isWorkspaceShellEnabledForSubject } from '@/lib/workspace-rollout'
 import { resolveOrganizationWorkspaceProjection } from '@/lib/organization-workspace/projection'
 import { buildOrganizationWorkspaceSubject } from '@/lib/organization-workspace/build-projection-subject'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { isClientLifecycleOnboardingEnabled } from '@/lib/client-lifecycle/flags'
+import { getActiveCaseForOrganization } from '@/lib/client-lifecycle/store'
 
 export const dynamic = 'force-dynamic'
+
+type OnboardingStatus = 'draft' | 'in_progress' | 'blocked'
+
+// TASK-1013 Slice 2 — resolve the in-flight onboarding case status for the org so
+// the detail (Account 360) can surface a discoverability banner + timeline link.
+// Flag-gated, honest degradation: a read failure just omits the banner (the page
+// renders normally).
+const resolveOnboardingStatus = async (organizationId: string): Promise<OnboardingStatus | null> => {
+  if (!isClientLifecycleOnboardingEnabled()) return null
+
+  try {
+    const activeCase = await getActiveCaseForOrganization(organizationId, 'onboarding')
+
+    if (activeCase && (activeCase.status === 'draft' || activeCase.status === 'in_progress' || activeCase.status === 'blocked')) {
+      return activeCase.status
+    }
+
+    return null
+  } catch (error) {
+    captureWithDomain(error, 'commercial', {
+      tags: { source: 'agency_organization_detail_page', stage: 'onboarding_status' },
+      extra: { organizationId }
+    })
+
+    return null
+  }
+}
 
 /**
  * TASK-612 Slice 5 — Agency organization detail page.
@@ -48,8 +77,10 @@ const OrganizationDetailPage = async ({ params }: { params: Promise<{ id: string
     return false
   })
 
+  const onboardingStatus = await resolveOnboardingStatus(id)
+
   if (!shellEnabled) {
-    return <OrganizationView organizationId={id} />
+    return <OrganizationView organizationId={id} onboardingStatus={onboardingStatus} />
   }
 
   const projection = await resolveOrganizationWorkspaceProjection({
@@ -58,7 +89,9 @@ const OrganizationDetailPage = async ({ params }: { params: Promise<{ id: string
     entrypointContext: 'agency'
   })
 
-  return <AgencyOrganizationWorkspaceClient organizationId={id} projection={projection} />
+  return (
+    <AgencyOrganizationWorkspaceClient organizationId={id} projection={projection} onboardingStatus={onboardingStatus} />
+  )
 }
 
 export default OrganizationDetailPage

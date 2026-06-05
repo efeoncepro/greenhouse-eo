@@ -30,9 +30,14 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
+import { getMicrocopy } from '@/lib/copy'
+import { GH_CLIENT_ONBOARDING } from '@/lib/copy/client-onboarding'
+
 import tableStyles from '@core/styles/table.module.css'
 
 // ── Types ──────────────────────────────────────────────────────────────
+
+type OnboardingStatus = 'draft' | 'in_progress' | 'blocked'
 
 interface OrganizationListItem {
   organizationId: string
@@ -49,6 +54,8 @@ interface OrganizationListItem {
   uniquePersonCount: number
   createdAt: string
   updatedAt: string
+  // TASK-1013 Slice 2 — in-flight onboarding case status (flag-gated, may be absent).
+  onboardingStatus?: OnboardingStatus | null
 }
 
 interface ListResponse {
@@ -79,6 +86,15 @@ const COUNTRY_FLAGS: Record<string, string> = {
 }
 
 const countryFlag = (code: string | null) => code ? COUNTRY_FLAGS[code.toUpperCase()] ?? '🌐' : ''
+
+const ONB_M = getMicrocopy()
+const ONB_T = GH_CLIENT_ONBOARDING.onboardingCases
+
+const ONBOARDING_META: Record<OnboardingStatus, { label: string; color: 'warning' | 'info' | 'error' }> = {
+  draft: { label: ONB_T.statusDraft, color: 'warning' },
+  in_progress: { label: ONB_M.states.inProgress, color: 'info' },
+  blocked: { label: ONB_M.states.blocked, color: 'error' }
+}
 
 // ── Columns ──
 
@@ -118,6 +134,36 @@ const orgColumns: ColumnDef<OrganizationListItem, any>[] = [
   columnHelper.accessor('status', {
     header: 'Estado',
     cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={STATUS_COLOR[getValue()] ?? 'secondary'} label={STATUS_LABEL[getValue()] ?? getValue()} />,
+    meta: { align: 'center' }
+  }),
+  columnHelper.display({
+    id: 'onboarding',
+    header: 'Onboarding',
+    cell: ({ row }) => {
+      const onboardingStatus = row.original.onboardingStatus
+
+      if (!onboardingStatus) return <Typography variant='body2' color='text.secondary'>—</Typography>
+
+      const meta = ONBOARDING_META[onboardingStatus]
+
+      return (
+        <Link
+          href={`/agency/clients/${row.original.organizationId}/lifecycle`}
+          aria-label={ONB_T.orgLinkAria}
+          style={{ textDecoration: 'none' }}
+        >
+          <CustomChip
+            round='true'
+            size='small'
+            variant='tonal'
+            clickable
+            color={meta.color}
+            label={meta.label}
+            icon={<i className='tabler-external-link' style={{ fontSize: 14 }} />}
+          />
+        </Link>
+      )
+    },
     meta: { align: 'center' }
   }),
   columnHelper.accessor('spaceCount', {

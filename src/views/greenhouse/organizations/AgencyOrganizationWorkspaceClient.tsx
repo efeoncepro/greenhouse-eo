@@ -19,6 +19,7 @@ import OrganizationWorkspaceShell, {
   OrganizationWorkspaceAdminAction
 } from '@/components/greenhouse/organization-workspace/OrganizationWorkspaceShell'
 import FacetContentRouter from '@/components/greenhouse/organization-workspace/FacetContentRouter'
+import OnboardingCaseBanner from '@/components/greenhouse/OnboardingCaseBanner'
 import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
 
 import type {
@@ -52,6 +53,7 @@ interface OrgKpis {
 type Props = {
   organizationId: string
   projection: OrganizationWorkspaceProjection
+  onboardingStatus?: 'draft' | 'in_progress' | 'blocked' | null
 }
 
 const FACET_QUERY_PARAM = 'facet'
@@ -59,7 +61,7 @@ const FACET_QUERY_PARAM = 'facet'
 const isOrganizationFacet = (value: string): value is OrganizationFacet =>
   (ORGANIZATION_FACETS as readonly string[]).includes(value)
 
-const AgencyOrganizationWorkspaceClient = ({ organizationId, projection }: Props) => {
+const AgencyOrganizationWorkspaceClient = ({ organizationId, projection, onboardingStatus = null }: Props) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: session } = useSession()
@@ -213,6 +215,7 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection }: Props
       activeFacet={activeFacet}
       onFacetChange={handleFacetChange}
       adminActions={adminActions}
+      headerBanner={<OnboardingCaseBanner organizationId={organizationId} status={onboardingStatus} />}
       drawerSlot={
         <EditOrganizationDrawer
           open={editDrawerOpen}
