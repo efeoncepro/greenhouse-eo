@@ -140,6 +140,9 @@ const OWNER_LABEL: Record<string, string> = {
   finance: T.checklist.ownerFinance
 }
 
+// Estados "resueltos": en ellos la evidencia auto-derivada NO se muestra (sería ruido).
+const DONE_STATUSES: ReadonlySet<string> = new Set(['completed', 'skipped', 'not_applicable'])
+
 interface Props {
   organizationName: string
   /** TASK-1001 — org del caso; alimenta el panel interactivo de personas del portal. */
@@ -266,7 +269,7 @@ const LifecycleTimeline = ({
 
       {/* TASK-997 — checklist del caso + anchors capturados (read-only) */}
       {checklist && checklist.length > 0 ? (
-        <Box sx={{ mb: 6 }}>
+        <Box sx={{ mb: 6 }} data-capture='onboarding-checklist'>
           <OperationalPanel
             title={T.checklist.title}
             subheader={T.checklist.subtitle}
@@ -349,8 +352,13 @@ const LifecycleTimeline = ({
                         </Stack>
                       ) : null}
 
-                      {/* TASK-1017 — evidencia real auto-derivada (on-demand, honesta) */}
-                      {isAutoDerivableItem(item.itemCode) && evidence.evidenceByCode.has(item.itemCode) ? (
+                      {/* TASK-1017 — evidencia real auto-derivada (on-demand, honesta).
+                          Solo en pasos NO resueltos: ahí la evidencia aporta decisión
+                          ("ya está listo, podés marcarlo" / "todavía no"). En un paso ya
+                          cerrado el chip sería ruido redundante (modern-ui: restraint). */}
+                      {isAutoDerivableItem(item.itemCode) &&
+                      !DONE_STATUSES.has(item.status) &&
+                      evidence.evidenceByCode.has(item.itemCode) ? (
                         <EvidenceRow
                           evidence={evidence.evidenceByCode.get(item.itemCode)!}
                           autoCompleted={evidence.autoCompleted.has(item.itemCode)}
