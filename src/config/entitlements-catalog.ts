@@ -24,7 +24,12 @@ export const ENTITLEMENT_MODULES = [
   // transitions, notion status-transition ingestion). Las capabilities ya estaban
   // seedeadas en capabilities_registry por TASK-908/912 pero faltaba el módulo en
   // el catalog TS → parity drift. NO son can()-checked (auth de CLI/cron/worker).
-  'delivery'
+  'delivery',
+  // TASK-490 — namespace del platform de firma + document vault (EPIC-001 signable pack).
+  // Dedicated identity (captureWithDomain 'documents' + reliability moduleKey + este módulo).
+  // Distinto de `workforce` (contracting cases producen el documento) y `hr` (procesos HR):
+  // `documents` es la orquestación de firma reusable (contracting_case, master_agreement, …).
+  'documents'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -1431,6 +1436,18 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'nexa.insights.read',
     module: 'delivery',
     actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-490 — Signature orchestration (EPIC-001 signable pack). Gate de las superficies
+  // operador-facing de firma (enviar a firmar / cancelar / reconciliar). El render del
+  // documento (TASK-1023) y el adapter ZapSign (TASK-491) viven detrás de este gate.
+  // Grant matriz (runtime.ts): hr route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN (mismo set
+  // que workforce.member.complete_intake — contracting cases son dominio HR/Workforce).
+  // NUNCA seed sin grant en runtime.ts mismo PR (invariant TASK-873 + TASK-935).
+  {
+    key: 'documents.signature_request',
+    module: 'documents',
+    actions: ['read', 'create', 'update', 'manage'] as const,
     defaultScope: 'tenant'
   }
 ] as const

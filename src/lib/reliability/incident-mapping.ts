@@ -113,6 +113,15 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'contracting draft',
     'offer letter',
     'employment contract'
+  ],
+  // TASK-490 — Signature orchestration + document vault (EPIC-001 signable pack).
+  documents: [
+    'signature_request',
+    'signature request',
+    'zapsign',
+    'signature orchestration',
+    'document vault',
+    'signable'
   ]
 }
 
@@ -133,6 +142,10 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   // TASK-1019 — workforce contracting: prioridad media. Si un incident toca
   // contracting y cloud, workforce gana (es el dueño del flujo HR/legal).
   workforce: 18,
+  // TASK-490 — documents/signature: prioridad media (dueño del flujo de firma).
+  // Por encima de cloud para que un incident `signature_request`/`zapsign` ruteee
+  // al subsystem Documents y no al fallback cloud genérico.
+  documents: 17,
   home: 15,
   // TASK-773 — sync infraestructure: prioridad media-baja. Si un incident
   // matchea ambos `outbox` y `finance`, finance gana (el outbox es el medium,

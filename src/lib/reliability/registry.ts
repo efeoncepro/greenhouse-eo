@@ -488,6 +488,33 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['dead_letter', 'lag', 'drift', 'incident'],
     incidentDomainTag: 'workforce'
+  },
+  {
+    // TASK-490 — Signature orchestration foundation (EPIC-001 signable pack).
+    // Aggregate signature_requests + signers + append-only events, hexagonal provider
+    // port (ZapSign adapter = TASK-491). Render del documento = TASK-1023. 3 signals:
+    // pending_overdue (lag), failed (incident-like drift), signed_artifact_missing (data_quality).
+    moduleKey: 'documents',
+    label: 'Documents & Signatures',
+    description:
+      'Signature orchestration platform (TASK-490): firma de cartas oferta + contratos + master agreements vía provider externo (ZapSign, TASK-491). Aggregate signature_requests con state machine monotónica, append-only events y document vault privado. Render del documento = TASK-1023.',
+    domain: 'hr',
+    routes: [{ path: '/hr/workforce/contracts', label: 'Signature surfaces (futuro)' }],
+    apis: [{ path: '/api/documents/signature-requests', label: 'Signature requests (futuro)' }],
+    dependencies: [
+      'greenhouse_core.signature_requests',
+      'greenhouse_core.signature_request_signers',
+      'greenhouse_core.signature_request_events',
+      'greenhouse_core.assets (signed document vault)',
+      'ZapSign (provider, TASK-491)'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/signatures/**',
+      'src/lib/reliability/queries/signature-*.ts'
+    ],
+    expectedSignalKinds: ['lag', 'drift', 'data_quality', 'incident'],
+    incidentDomainTag: 'documents'
   }
 ]
 

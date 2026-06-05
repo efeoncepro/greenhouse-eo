@@ -973,3 +973,23 @@ Spec: `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md` §10 + `docs/tasks/i
 - **Reliability** (moduleKey `workforce`): `workforce.contracting.ai_draft_failed` (dead_letter), `validation_blocked_overdue` (lag), `approved_without_pdf` (drift). Steady=0.
 
 Spec: `docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` + `docs/tasks/in-progress/TASK-1019-workforce-contracting-studio-foundation-ai-drafting.md`.
+
+## Delta 2026-06-05 — TASK-490: `signature.request.*` (Signature orchestration foundation, EPIC-001)
+
+7 eventos versionados v1, aggregate type `signature_request`, aggregate_id = `signatureRequestId` (`sig-{uuid}`). Plataforma de firma provider-neutral (hexagonal port; adapter ZapSign = TASK-491). Foundation: el aggregate + state machine + commands existen; ningún provider real se invoca todavía (`notImplementedSignatureAdapter` lanza 503 hasta TASK-491).
+
+| Event | Cuándo | Payload v1 (además de `schemaVersion:1, signatureRequestId, sourceKind, sourceRef, status`) | Consumers |
+|---|---|---|---|
+| `signature.request.created` | `createSignatureRequest` (draft) | — | audit, UI (futuro) |
+| `signature.request.sent` | `sendSignatureRequest` (→ provider) | `{}` (status=sent) | Notification Hub (futuro) |
+| `signature.request.partially_signed` | `applyProviderSignatureUpdate` (un firmante de varios) | `{signedDocumentAssetId}` | UI progreso (futuro) |
+| `signature.request.completed` | `applyProviderSignatureUpdate` (todos firman) | `{signedDocumentAssetId}` | **REACTIVO futuro** — Workforce Activation, vault del documento firmado |
+| `signature.request.cancelled` | `cancelSignatureRequest` | `{}` (status=cancelled) | audit |
+| `signature.request.failed` | `applyProviderSignatureUpdate` (provider rechaza) | `{}` (status=failed) | reliability `documents.signature_request.failed` |
+| `signature.request.expired` | `applyProviderSignatureUpdate` (TTL provider) | `{}` (status=expired) | audit |
+
+- **Emisor**: comandos en `src/lib/signatures/commands.ts` vía `publishSignatureEvent` (dual-mode, dentro de la misma tx que la mutación + el `signature_request_events` append-only). El estado provider-driven es **monotónico + tolerante a callbacks fuera de orden** (`applyProviderStatus` nunca regresa; terminal es inmutable) → el evento de status solo se emite en un cambio real de estado (idempotente ante reentrega del webhook TASK-491).
+- **Hexagonal port**: `SignatureProviderAdapter` (DI). El adapter real ZapSign + el webhook inbound = TASK-491. El render del documento = TASK-1023. El bridge `ready_for_signature` (workforce_contracting → signature_request) = TASK-491.
+- **Reliability** (moduleKey `documents`): `documents.signature_request.pending_overdue` (lag), `.failed` (drift), `.signed_artifact_missing` (data_quality). Steady=0.
+
+Spec: `docs/tasks/in-progress/TASK-490-signature-orchestration-foundation.md`.

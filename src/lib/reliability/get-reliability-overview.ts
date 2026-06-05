@@ -57,6 +57,11 @@ import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contracto
 import { getContractingAiDraftFailedSignal } from './queries/contracting-ai-draft-failed'
 import { getContractingApprovedWithoutPdfSignal } from './queries/contracting-approved-without-pdf'
 import { getContractingPdfStatusDriftSignal } from './queries/contracting-pdf-status-drift'
+import {
+  getSignatureFailedSignal,
+  getSignaturePendingOverdueSignal,
+  getSignatureSignedArtifactMissingSignal
+} from './queries/signature-orchestration-signals'
 import { getContractingValidationBlockedOverdueSignal } from './queries/contracting-validation-blocked-overdue'
 import { getContractorPayableUnbatchedOverdueSignal } from './queries/contractor-payable-unbatched-overdue'
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
@@ -638,6 +643,10 @@ interface ReliabilityOverviewSources {
   contractingApprovedWithoutPdf?: ReliabilitySignal | null
   /** TASK-1023 — stale PDF watermark vs current case status. */
   contractingPdfStatusDrift?: ReliabilitySignal | null
+  /** TASK-490 — signature orchestration signals (moduleKey 'documents'). */
+  signaturePendingOverdue?: ReliabilitySignal | null
+  signatureFailed?: ReliabilitySignal | null
+  signatureSignedArtifactMissing?: ReliabilitySignal | null
   /** TASK-979 — un-batched overdue contractor obligations (monthly run coverage gap). */
   contractorPayableUnbatchedOverdue?: ReliabilitySignal | null
 
@@ -983,6 +992,10 @@ export const buildReliabilityOverview = (
     ...(sources.contractingAiDraftFailed ? [sources.contractingAiDraftFailed] : []),
     ...(sources.contractingValidationBlockedOverdue ? [sources.contractingValidationBlockedOverdue] : []),
     ...(sources.contractingApprovedWithoutPdf ? [sources.contractingApprovedWithoutPdf] : []),
+    // TASK-490 — Signature orchestration signals (moduleKey 'documents').
+    ...(sources.signaturePendingOverdue ? [sources.signaturePendingOverdue] : []),
+    ...(sources.signatureFailed ? [sources.signatureFailed] : []),
+    ...(sources.signatureSignedArtifactMissing ? [sources.signatureSignedArtifactMissing] : []),
     ...(sources.contractorPayableUnbatchedOverdue ? [sources.contractorPayableUnbatchedOverdue] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
@@ -1471,6 +1484,22 @@ export const getReliabilityOverview = async (
       ? preloadedSources.contractorPayableUnbatchedOverdue
       : await getContractorPayableUnbatchedOverdueSignal().catch(() => null)
 
+  // TASK-490 — Signature orchestration reliability signals (moduleKey 'documents').
+  const signaturePendingOverdue =
+    preloadedSources.signaturePendingOverdue !== undefined
+      ? preloadedSources.signaturePendingOverdue
+      : await getSignaturePendingOverdueSignal().catch(() => null)
+
+  const signatureFailed =
+    preloadedSources.signatureFailed !== undefined
+      ? preloadedSources.signatureFailed
+      : await getSignatureFailedSignal().catch(() => null)
+
+  const signatureSignedArtifactMissing =
+    preloadedSources.signatureSignedArtifactMissing !== undefined
+      ? preloadedSources.signatureSignedArtifactMissing
+      : await getSignatureSignedArtifactMissingSignal().catch(() => null)
+
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
       ? preloadedSources.expenseDistribution
@@ -1935,6 +1964,9 @@ export const getReliabilityOverview = async (
     contractingValidationBlockedOverdue,
     contractingApprovedWithoutPdf,
     contractingPdfStatusDrift,
+    signaturePendingOverdue,
+    signatureFailed,
+    signatureSignedArtifactMissing,
     contractorPayableUnbatchedOverdue,
     contractorPayableBridgeDeadLetter,
     contractorRemittanceEmailDeadLetter,

@@ -389,6 +389,27 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-490 — Signature orchestration (EPIC-001 signable pack). Gate de las superficies
+  // operador-facing de firma (enviar / cancelar / reconciliar). Matriz canonical: hr
+  // route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN (contracting cases son dominio HR/Workforce;
+  // mismo set que workforce.member.complete_intake). El render (TASK-1023) y el adapter
+  // ZapSign (TASK-491) viven detrás de este gate. Invariant TASK-873 + TASK-935.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'documents',
+      capability: 'documents.signature_request',
+      action: 'manage',
+      scope: 'tenant',
+      source
+    })
+  }
+
   // TASK-890 Slice 4 — Workforce offboarding external provider close.
   // Capability granular para cerrar offboarding cases en lane `external_payroll`
   // (Deel/EOR/proveedor externo). Operador firma decision (Greenhouse no emite
