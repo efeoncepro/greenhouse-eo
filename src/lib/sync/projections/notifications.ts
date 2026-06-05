@@ -13,6 +13,8 @@ import type { ProjectionDefinition } from '../projection-registry'
 import { buildNotificationRecipientKey, NotificationService } from '@/lib/notifications/notification-service'
 import { ensureNotificationSchema } from '@/lib/notifications/schema'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { getActiveCaseForOrganization } from '@/lib/client-lifecycle/store'
+import { getOrganizationDisplayName } from '@/lib/client-onboarding/org-search'
 
 const PAYROLL_OPS_RECIPIENTS = [
   { memberId: 'julio-reyes', contactEmail: 'jreyes@efeoncepro.com', fullName: 'Julio Reyes' },
@@ -22,6 +24,16 @@ const PAYROLL_OPS_RECIPIENTS = [
 const getAdminRecipients = async () => getRoleCodeNotificationRecipients([ROLE_CODES.EFEONCE_ADMIN])
 
 const getFinanceRecipients = async () => getRoleCodeNotificationRecipients([ROLE_CODES.FINANCE_ADMIN, ROLE_CODES.EFEONCE_ADMIN])
+
+// TASK-1014 — operadores que activan un onboarding nacido de un deal: admin +
+// comercial/ops (líder de cuenta + operaciones) + finanzas (facet financiero).
+const getOnboardingDraftRecipients = async () =>
+  getRoleCodeNotificationRecipients([
+    ROLE_CODES.EFEONCE_ADMIN,
+    ROLE_CODES.EFEONCE_ACCOUNT,
+    ROLE_CODES.EFEONCE_OPERATIONS,
+    ROLE_CODES.FINANCE_ADMIN
+  ])
 
 const getApprovalSnapshotFromPayload = (payload: Record<string, unknown>) => {
   const approvalSnapshot = payload.approvalSnapshot
@@ -117,7 +129,8 @@ export const notificationProjection: ProjectionDefinition = {
     'leave_request.cancelled',
     'leave_request.payroll_impact_detected',
     'access.view_override_changed',
-    'accounting.margin_alert.triggered'
+    'accounting.margin_alert.triggered',
+    'client.lifecycle.case.opened'
   ],
 
   extractScope: (payload) => {
@@ -299,6 +312,66 @@ export const notificationProjection: ProjectionDefinition = {
       })
 
       return `notified ${eligibleUsers.length} payroll ops users about payroll_period.calculated`
+    }
+
+    if (eventType === 'client.lifecycle.case.opened') {
+      const organizationId = typeof payload.organizationId === 'string' ? payload.organizationId : null
+      const eventId = typeof payload._eventId === 'string' ? payload._eventId : null
+
+      if (!organizationId) return null
+
+      // TASK-1014 — re-read the case (TASK-771: never trust the payload). Only push a
+      // notification for deal-trigger drafts waiting activation: manual/wizard cases
+      // already have the operator in the flow, and an already-activated case (status
+      // moved to in_progress before this consumer ran) needs no nudge.
+      const activeCase = await getActiveCaseForOrganization(organizationId, 'onboarding')
+
+      if (!activeCase || activeCase.triggerSource !== 'hubspot_deal' || activeCase.status !== 'draft') {
+        return `skipped onboarding notification (not a deal-trigger draft) for org ${organizationId}`
+      }
+
+      const recipients = await getOnboardingDraftRecipients()
+
+      const eligibleUsers = (
+        await Promise.all(
+          recipients.map(async recipient => ({
+            ...recipient,
+            recipientKey: buildNotificationRecipientKey(recipient),
+            alreadySent: await wasNotificationAlreadySent({
+              recipientKey: buildNotificationRecipientKey(recipient) ?? 'unknown-recipient',
+              category: 'client_onboarding_draft',
+              eventId
+            })
+          }))
+        )
+      ).filter(recipient => recipient.recipientKey && !recipient.alreadySent)
+
+      if (eligibleUsers.length === 0) {
+        return `client.lifecycle.case.opened already notified for event ${eventId ?? 'without-event-id'}`
+      }
+
+      const organizationName = (await getOrganizationDisplayName(organizationId)) ?? 'un cliente'
+
+      await NotificationService.dispatch({
+        category: 'client_onboarding_draft',
+        title: `Onboarding por activar: ${organizationName}`,
+        body: 'Un deal cerrado-ganado abrió un onboarding en borrador. Activalo para empezar el alta del cliente.',
+        actionUrl: `/agency/clients/${organizationId}/lifecycle`,
+        metadata: {
+          ...payload,
+          eventId,
+          notificationScope: 'client_onboarding_draft'
+        },
+        recipients: eligibleUsers.map(recipient => ({
+          identityProfileId: recipient.identityProfileId,
+          memberId: recipient.memberId,
+          userId: recipient.userId,
+          email: recipient.email,
+          fullName: recipient.fullName
+        }))
+      })
+
+      return `notified ${eligibleUsers.length} operators about onboarding draft for org ${organizationId}`
     }
 
     if (eventType === 'leave_request.created') {

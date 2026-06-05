@@ -1,3 +1,13 @@
+# Sesion 2026-06-05 (cont.) — TASK-1014 ✅ aviso in-app + email al nacer un onboarding draft por deal
+
+Promoví el Slice 4 diferido de TASK-1013 a **TASK-1014** y lo implementé (en `develop`, sin push intermedio). El cockpit hizo los casos *encontrables* (pull); esto agrega el *push*.
+
+- **100% reuso del sistema canónico de notificaciones** (sin migración, sin endpoint, sin flag): categoría nueva `client_onboarding_draft` (in_app + email, priority high) + handler reactivo en `notificationProjection` que consume `client.lifecycle.case.opened` (ya emitido por `provisionClientLifecycle` solo en creación real).
+- **Filtro honesto**: re-lee el caso (TASK-771, nunca confía el payload) y notifica **solo si `triggerSource=hubspot_deal && status=draft`** (manual/wizard ya tienen al operador en el flujo; uno ya activado no necesita aviso). Idempotente (dedup por `eventId` + at-most-once del reactive consumer). Link → `/agency/clients/{orgId}/lifecycle`.
+- **Destinatarios (decisión del operador):** `efeonce_admin + efeonce_account + efeonce_operations + finance_admin`.
+- **Gates:** tsc 0 · eslint 0 · tests focales (pin del registry de categorías extendido a 14 + 2 tests nuevos del handler: deal-draft→notifica, manual/no-draft→skip). Spec: `complete/TASK-1014-onboarding-draft-notification.md`.
+- **Runtime**: la cadena (deal closed-won → outbox → publisher → reactive consumer → dispatch) ya tiene sus piezas vivas en prod (`CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` ON + Cloud Scheduler). Se confirma con el primer deal real.
+
 # Sesion 2026-06-05 (cont.) — TASK-1013 ✅ cockpit + discoverability implementado (GVC verificado, local-first)
 
 Implementado el contrato de TASK-1013 sobre el mockup aprobado, **quedándome en `develop`** (sin branch, por pedido del operador), **sin push**. Backend TASK-992 reusado: **0 migraciones, 0 flags/capabilities/events/signals nuevos**.

@@ -308,6 +308,7 @@ export type NotificationCategoryCopyCode =
   | 'payroll_ops'
   | 'finance_alert'
   | 'system_event'
+  | 'client_onboarding_draft'
 
 export type NotificationCategoryCopy = Record<
   NotificationCategoryCopyCode,

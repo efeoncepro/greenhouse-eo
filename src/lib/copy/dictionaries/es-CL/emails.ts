@@ -389,6 +389,10 @@ export const emails: EmailsCopy = {
     system_event: {
       label: 'Eventos del sistema',
       description: 'Nuevo usuario, sync fallido, cambio de configuración'
+    },
+    client_onboarding_draft: {
+      label: 'Onboarding por activar',
+      description: 'Un deal cerrado-ganado abrió un onboarding en borrador que espera tu activación'
     }
   },
   subjects: {

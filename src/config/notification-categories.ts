@@ -68,6 +68,10 @@ const LEGACY_NOTIFICATION_CATEGORY_COPY: Record<
   system_event: {
     label: 'Eventos del sistema',
     description: 'Nuevo usuario, sync fallido, cambio de configuración'
+  },
+  client_onboarding_draft: {
+    label: 'Onboarding por activar',
+    description: 'Un deal cerrado-ganado abrió un onboarding en borrador que espera tu activación'
   }
 }
 
@@ -197,6 +201,16 @@ export const NOTIFICATION_CATEGORIES: Record<NotificationCategoryCopyCode, Notif
     audience: 'admin',
     defaultChannels: ['in_app'],
     priority: 'low'
+  }),
+
+  // TASK-1014 — un deal closed-won abrió un caso de onboarding en borrador que
+  // espera activación. In-app + email para que el operador no lo deje colgado.
+  client_onboarding_draft: withCategoryCopy({
+    code: 'client_onboarding_draft',
+    icon: 'tabler-rocket',
+    audience: 'internal',
+    defaultChannels: ['in_app', 'email'],
+    priority: 'high'
   })
 } as const
 
