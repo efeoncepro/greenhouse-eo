@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto` (sin esto, el deal-trigger de onboarding crea casos draft que el operador NO puede encontrar → flujo inutilizable end-to-end)
 - Effort: `Medio`
@@ -89,12 +89,33 @@ Reglas duras para el agente que implemente TASK-1013:
 
 ## Acceptance Criteria
 
-- [ ] Existe una superficie discoverable (en nav) que lista los casos de onboarding en vuelo, con los `draft` destacados.
-- [ ] Un caso draft creado por el deal-trigger aparece en esa lista sin tipear URLs.
-- [ ] Desde la lista, "Abrir" lleva al timeline del caso; desde ahí se puede activar (`draft → in_progress`).
-- [ ] Organizaciones/Account 360 muestran indicador + link cuando la org tiene caso activo.
-- [ ] `/agency/clients/[organizationId]/lifecycle` (y la ruta del inbox) declaradas en el reachability manifest; `pnpm route-reachability-gate` verde.
-- [ ] Estados honestos (loading/empty/degraded) verificados con GVC; copy es-CL validado con `greenhouse-ux-writing`.
+- [x] Existe una superficie discoverable (en nav) que lista los casos de onboarding en vuelo, con los `draft` destacados. → cockpit `/agency/clients/onboarding` (nav item "Alta de cliente" re-apuntado).
+- [x] Un caso draft creado por el deal-trigger aparece en esa lista sin tipear URLs. → `getOnboardingCasesInbox()` lista status NOT IN (completed, cancelled), newest-first.
+- [x] Desde la lista, "Abrir" lleva al timeline del caso; desde ahí se puede activar (`draft → in_progress`). → "Abrir timeline" + "Activar caso" (draft) → `/agency/clients/[organizationId]/lifecycle`.
+- [x] Organizaciones/Account 360 muestran indicador + link cuando la org tiene caso activo. → columna "Onboarding" en la lista (chip+link) + `OnboardingCaseBanner` en Account 360 (legacy + V2 shell). GVC: Grupo Berel `in_progress`.
+- [x] `/agency/clients/[organizationId]/lifecycle` (y la ruta del inbox) declaradas/alcanzables en el reachability manifest; `pnpm route-reachability-gate` verde. → cockpit alcanzable por nav href; timeline por regla (c) dinámica; `/agency/clients/new` re-parenteado al cockpit. Gate `--strict`: 0 orphans.
+- [x] Estados honestos (loading/empty/degraded) verificados con GVC; copy es-CL validado con `greenhouse-ux-writing`. → degraded / empty-zero / empty-filtered; copy en `GH_CLIENT_ONBOARDING.onboardingCases`; GVC desktop+mobile mirados.
+
+## Implementation (2026-06-05, local-first en `develop` — sin push)
+
+3 slices, sin migración / sin schema / sin flags-capabilities-events-signals nuevos (backend TASK-992 reusado). GVC en loop verificado en vivo contra datos reales (Grupo Berel).
+
+- **Slice 1 — Cockpit runtime** (`feat(commercial): TASK-1013 Slice 1`):
+  - Reader server-only `src/lib/client-lifecycle/inbox-reader.ts` (`getOnboardingCasesInbox()`): cases in-flight `onboarding` JOIN organizations (nombre) + checklist batched (`case_id = ANY`, sin N+1) + overdue (`CURRENT_DATE - date` = integer days) + fechas formateadas server-side (anti hydration-drift). VM **honesto**: shortCode = caseId[:8] (no fabrica `ONB-####`), owner = Sistema/Operador (deal-trigger escribe `triggeredByUserId=null`), sin SLA% inventado.
+  - Page server `/agency/clients/onboarding/page.tsx`: `requireServerSession` + flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` (notFound) + capability `client.lifecycle.case.read` (notFound) + try/catch degraded.
+  - View `OnboardingCasesInboxView.tsx`: copy-and-patch del mockup aprobado (layout 3-col, aviso "no reemplaza el wizard", CTA "Nuevo cliente" → `/agency/clients/new`), estados honestos, links por `organizationId`.
+  - Copy es-CL en `GH_CLIENT_ONBOARDING.onboardingCases`. KPI fabricado "Cumplimiento SLA %" → reemplazado por "Bloqueados" (dato real).
+- **Slice 2 — Discoverability cruzada** (`feat(commercial): TASK-1013 Slice 2`):
+  - Batched reader `getActiveOnboardingStatusByOrg(ids)` (1 query/página) + enrich `/api/organizations` (flag-gated, non-blocking).
+  - Columna "Onboarding" (chip+link) en `OrganizationListView`.
+  - Componente reusable `OnboardingCaseBanner` en Account 360: legacy `OrganizationView` + V2 `OrganizationWorkspaceShell` (slot opcional `headerBanner`). Status resuelto server-side en la detail page (flag-gated, honest).
+- **Slice 3 — Nav + reachability** (`feat(agency): TASK-1013 Slice 3`):
+  - Nav item "Alta de cliente" re-apuntado `/agency/clients/new` → `/agency/clients/onboarding` (mantiene gate flag + viewCode `gestion.organizaciones`).
+  - Manifest: `/agency/clients/new` re-parenteado al cockpit. `route-reachability-gate --strict` verde (0 orphans).
+
+**Gates:** tsc 0 · eslint 0 · `route-reachability-gate --strict` 0 orphans · GVC (cockpit desktop+mobile, org list, Account 360 Berel) mirados, enterprise.
+
+**Nota Slice 4 (opcional V1.1, no implementado):** notificación al aparecer un caso draft por trigger → diferida (el inbox visible ya cubre el caso operativo). Queda como follow-up.
 
 ## Rollout Plan & Risk Matrix
 

@@ -1,3 +1,17 @@
+# Sesion 2026-06-05 (cont.) — TASK-1013 ✅ cockpit + discoverability implementado (GVC verificado, local-first)
+
+Implementado el contrato de TASK-1013 sobre el mockup aprobado, **quedándome en `develop`** (sin branch, por pedido del operador), **sin push**. Backend TASK-992 reusado: **0 migraciones, 0 flags/capabilities/events/signals nuevos**.
+
+- **Slice 1 — Cockpit `/agency/clients/onboarding`** (commit `440971a98` + scenario `2f6e9ce25`): page server (session + flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + capability `client.lifecycle.case.read` + degraded honesto) → `OnboardingCasesInboxView` (copy-and-patch del mockup, layout 3-col, aviso "no reemplaza el wizard", CTA "Nuevo cliente" → `/agency/clients/new`). Reader server-only `getOnboardingCasesInbox()` ([src/lib/client-lifecycle/inbox-reader.ts](src/lib/client-lifecycle/inbox-reader.ts)): cases in-flight JOIN organizations + checklist batched (`case_id = ANY`, sin N+1) + overdue (`CURRENT_DATE - date`) + fechas server-side. **Honesto**: shortCode = caseId[:8] (no fabrica `ONB-####`), owner Sistema/Operador, sin SLA% inventado; KPI "Cumplimiento SLA%" del mockup → "Bloqueados" (real).
+- **Slice 2 — Discoverability cruzada** (commit `cf75784b3`): batched `getActiveOnboardingStatusByOrg(ids)` + enrich `/api/organizations` (flag-gated, non-blocking) → columna "Onboarding" en la lista; componente reusable `OnboardingCaseBanner` en Account 360 (legacy `OrganizationView` + V2 `OrganizationWorkspaceShell` vía slot opcional `headerBanner`); status resuelto server-side en la detail page.
+- **Slice 3 — Nav + reachability** (commit `98f589cdb`): item "Alta de cliente" re-apuntado `/agency/clients/new` → `/agency/clients/onboarding` (gate flag + viewCode intactos); manifest `/agency/clients/new` re-parenteado al cockpit; `route-reachability-gate --strict` **0 orphans** (cierra la ruta huérfana TASK-982).
+
+**GVC en loop (verificado en vivo, datos reales — Grupo Berel `in_progress`):** cockpit desktop+mobile, lista de Organizaciones (columna ONBOARDING), Account 360 (banner) — todos mirados, enterprise + honestos, sin correcciones necesarias (el copy-and-patch mantuvo paridad con el mockup).
+
+**Gates:** tsc 0 · eslint full 0 · `route-reachability-gate --strict` 0 orphans · `pnpm build` exit 0. **Pendiente**: full-suite (`pnpm test`) + cierre lifecycle. **Follow-up diferido**: Slice 4 (notificación al aparecer un caso draft por trigger) — el inbox visible ya cubre el caso operativo.
+
+> ⚠️ Operativo: para GVC reinicié el dev server local (:3000) con `CLIENT_LIFECYCLE_ONBOARDING_ENABLED=true` + `NEXT_PUBLIC_…=true`. Lo detuve para correr el build; para ver la página local, levantá `pnpm dev` con esos flags (la página 404 sin ellos).
+
 # Sesion 2026-06-05 — TASK-1013 mockup aprobado + contrato de implementación
 
 El operador aprobó el mockup Product Design para TASK-1013: **Inbox + Timeline Preview**. Queda como referencia vinculante; la implementación real NO debe rediseñar ni sustituir el wizard.

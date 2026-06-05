@@ -55,6 +55,19 @@ Para crear un cliente nuevo en Greenhouse de principio a fin: su identidad, su p
 
 En la ficha del cliente (Account 360) veras el timeline del caso con su checklist. Cada item es una tarea pendiente. Abrelo, completalo y marca el avance. El banner te dice cuantos items van completos. El caso no se cierra mientras queden items obligatorios pendientes.
 
+### Como encontrar y activar un caso de onboarding en vuelo
+
+Cuando un deal de HubSpot pasa a cerrado-ganado, Greenhouse abre un caso de onboarding en **borrador** automaticamente. Para verlo no necesitas tipear ninguna URL:
+
+1. Anda a **Agencia → Operaciones → "Alta de cliente"** (el cockpit de onboarding).
+2. Vas a ver el inbox de los casos en vuelo. Los **borradores** (los que nacieron de un deal y esperan activacion) estan destacados. Podes filtrar por estado u origen, o buscar por cliente / codigo / deal.
+3. Selecciona el caso: al centro ves su checklist real y a la derecha la siguiente accion.
+4. Presiona **"Abrir timeline"** para ir a la ficha del caso. Si esta en borrador, **"Activar caso"** te lleva al mismo lugar, donde lo activas (`borrador → en curso`) y empezas a completar el checklist.
+
+Tambien podes llegar al onboarding de una organizacion desde donde ya estabas: la **lista de Organizaciones** muestra una columna "Onboarding" y la **ficha del cliente** muestra un banner "Onboarding en curso · Abrir timeline" cuando hay un caso activo.
+
+> El cockpit **no reemplaza el wizard**: para dar de alta un cliente nuevo segui usando "Nuevo cliente" (que va al wizard). El cockpit solo hace visibles y activables los casos que ya estan en vuelo.
+
 ### Como vincular el teamspace de Notion
 
 En el item de Notion del checklist (o en el paso 5 al crear): elige "Vincular existente", busca el teamspace y pega el token con alcance acotado **solo a ese teamspace**. Greenhouse lo guarda de forma segura y registra el teamspace para el sync. Si la integracion aun no esta conectada al teamspace, la busqueda vendra vacia: conectala en Notion o crea el teamspace nuevo desde el checklist.

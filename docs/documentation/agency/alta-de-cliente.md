@@ -133,6 +133,25 @@ El timeline del caso se ve en la ficha del cliente (Account 360): muestra el ori
 
 > Detalle tecnico: aggregate `client_lifecycle_case` + checklist `standard_onboarding_v1` + comando `provisionClientLifecycle`. Maquina de estados y eventos `client.lifecycle.*` v1 en [GREENHOUSE_CLIENT_LIFECYCLE_V1 §5-§10](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md). Implementado por TASK-992.
 
+## Encontrar y activar casos en vuelo (cockpit de onboarding)
+
+No todos los casos nacen del wizard. Cuando un deal de HubSpot pasa a cerrado-ganado, Greenhouse abre automaticamente un caso de onboarding en **borrador** (el operador lo activa; un misclick de ventas no dispara nada irreversible). Esos casos no nacen con una URL a mano — por eso existe el **cockpit de onboarding**.
+
+El cockpit vive en **Agencia → Operaciones → "Alta de cliente"** (`/agency/clients/onboarding`). Es el inbox de los casos en vuelo:
+
+- **KPIs reales**: casos abiertos, en progreso, vencidos (pasaron su fecha objetivo) y bloqueados.
+- **Inbox seleccionable** a la izquierda (filtrable por estado y origen, buscable por cliente / codigo / deal), con los **borradores destacados**.
+- **Preview del checklist real** del caso seleccionado al centro (las 10 etapas con su estado actual).
+- **Rail de accion** a la derecha: "Abrir timeline" (y "Activar caso" cuando esta en borrador), el responsable, la fecha objetivo y la fuente (origen + Deal ID).
+
+El cockpit **no reemplaza el wizard**: lo hace encontrable. Su CTA principal "Nuevo cliente" sigue yendo al wizard (`/agency/clients/new`); el cockpit solo hace **visibles y activables** los casos que ya estan en vuelo. La activacion ocurre en el timeline del caso (`draft → in_progress`).
+
+Ademas, la lista de **Organizaciones** muestra una columna "Onboarding" y la **ficha del cliente (Account 360)** muestra un banner "Onboarding en curso · Abrir timeline" cuando la organizacion tiene un caso activo — para llegar al timeline desde donde ya estabas mirando la cuenta.
+
+Todo lo que muestra el cockpit es **honesto**: si un dato no existe (no hay fecha objetivo, no hay deal asociado, el caso lo abrio el sistema), se muestra "—" / "Sin deal asociado" / "Sistema", nunca un valor inventado.
+
+> Detalle tecnico: reader `getOnboardingCasesInbox()` ([inbox-reader.ts](../../../src/lib/client-lifecycle/inbox-reader.ts), cases + organizacion + checklist batched sin N+1), page `/agency/clients/onboarding`, vista `OnboardingCasesInboxView`. Indicador cruzado: `getActiveOnboardingStatusByOrg` + `OnboardingCaseBanner`. Gated por `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + capability `client.lifecycle.case.read`. Implementado por TASK-1013 (sobre el backend de TASK-992; el deal-trigger es TASK-1010).
+
 ## Anclaje de referencias externas (Notion, Teams, contactos, industria)
 
 El wizard sigue una regla canonica: **cuando un dato tiene una fuente de verdad externa, no se escribe a mano ni se crea a ciegas — se sugiere desde la fuente y se asocia a la entidad canonica con su trazabilidad.**

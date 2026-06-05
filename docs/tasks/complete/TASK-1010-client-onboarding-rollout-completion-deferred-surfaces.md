@@ -1,5 +1,9 @@
 # TASK-1010 — Client Onboarding: rollout completion + superficies diferidas (split de TASK-992/997/1001)
 
+## Delta 2026-06-05
+
+- El gap del **deal-trigger** (casos `draft` creados por deal closed-won sin UI para verse/activarse) quedó **cerrado por TASK-1013** (cockpit de onboarding `/agency/clients/onboarding` + discoverability cruzada en Organizaciones/Account 360 + reachability). Code complete en `develop`, GVC verificado (Grupo Berel). Un caso draft del trigger ahora aparece en el inbox sin tipear URLs.
+
 ## Status
 
 <!-- 2026-06-04 CIERRE: rollout completo + verificado live. Release develop->main
