@@ -69,6 +69,8 @@ const parityTone = (parity: string): OperationalStatusTone => {
 const statusLabel = (status: string) =>
   (C.statusLabels as Record<string, string>)[status] ?? status
 
+const packLabel = (code: string) => C.packLabels[code] ?? code
+
 const parityLabel = (parity: string) =>
   (C.parityLabels as Record<string, string>)[parity] ?? C.parityLabels.unknown
 
@@ -279,7 +281,7 @@ const Header = ({ mode, onModeChange, canManage }: { mode: StudioMode; onModeCha
             </Stack>
             <Box>
               <Typography variant='h4' sx={{ lineHeight: 1.1 }}>
-                {C.runtimeTitle}
+                {C.studioName}
               </Typography>
               <Typography color='text.secondary' sx={{ mt: 1, maxWidth: 720 }}>
                 {C.runtimeSubtitle}
@@ -437,19 +439,15 @@ const CommandCenter = ({
               />
             </Box>
           ) : (
-            <Box sx={{ overflowX: 'auto' }} tabIndex={0} aria-label={C.aria.commandQueueTable}>
-              <Table sx={{ minWidth: 960 }}>
+            <Box tabIndex={0} aria-label={C.aria.commandQueueTable}>
+              <Table>
                 <caption className='sr-only'>{C.aria.commandQueueTable}</caption>
                 <TableHead>
                   <TableRow>
                     <TableCell scope='col'>{C.columns.person}</TableCell>
                     <TableCell scope='col'>{C.columns.document}</TableCell>
-                    <TableCell scope='col'>{C.columns.pack}</TableCell>
                     <TableCell scope='col'>{C.columns.status}</TableCell>
-                    <TableCell scope='col'>{C.columns.parity}</TableCell>
-                    <TableCell scope='col'>{C.columns.risk}</TableCell>
-                    <TableCell scope='col'>{C.columns.nextAction}</TableCell>
-                    <TableCell scope='col'>{C.columns.start}</TableCell>
+                    <TableCell scope='col' align='right'>{C.columns.risk}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -490,19 +488,18 @@ const CommandCenter = ({
                             </Box>
                           </Stack>
                         </TableCell>
-                        <TableCell>{(C.kindLabels as Record<string, string>)[item.caseKind]}</TableCell>
-                        <TableCell>{item.jurisdictionPackCode}</TableCell>
+                        <TableCell>
+                          <Stack spacing={0.25}>
+                            <Typography variant='body2'>{(C.kindLabels as Record<string, string>)[item.caseKind]}</Typography>
+                            <Typography variant='caption' color='text.secondary'>{packLabel(item.jurisdictionPackCode)}</Typography>
+                          </Stack>
+                        </TableCell>
                         <TableCell>
                           <StatusPill label={statusLabel(item.status)} tone={statusTone(item.status)} />
                         </TableCell>
-                        <TableCell>
-                          <StatusPill label={parityLabel(item.projection.languageParityStatus)} tone={parityTone(item.projection.languageParityStatus)} icon='tabler-language' />
-                        </TableCell>
-                        <TableCell>
+                        <TableCell align='right'>
                           <StatusPill label={(C.riskLabels as Record<string, string>)[item.projection.riskLevel]} tone={riskTone(item.projection.riskLevel)} />
                         </TableCell>
-                        <TableCell>{nextActionLabel(item.projection.nextActionCode)}</TableCell>
-                        <TableCell>{formatStart(item.targetStartDate)}</TableCell>
                       </TableRow>
                     )
                   })}
@@ -589,7 +586,7 @@ const CaseRailContent = ({ detail, theme, onReview }: { detail: ContractingCaseD
         <Box sx={{ minWidth: 0 }}>
           <Typography variant='h5'>{detail.subjectName ?? C.detail.notAvailable}</Typography>
           <Typography variant='body2' color='text.secondary'>
-            {(C.kindLabels as Record<string, string>)[detail.case.caseKind]} · {detail.case.jurisdictionPackCode}
+            {(C.kindLabels as Record<string, string>)[detail.case.caseKind]} · {packLabel(detail.case.jurisdictionPackCode)}
           </Typography>
         </Box>
         <StatusPill label={statusLabel(detail.case.status)} tone={statusTone(detail.case.status)} />

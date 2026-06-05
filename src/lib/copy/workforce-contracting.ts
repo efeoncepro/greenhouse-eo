@@ -144,6 +144,12 @@ export const GH_WORKFORCE_CONTRACTING = {
     offer_letter: 'Carta oferta',
     employment_contract: 'Contrato laboral'
   },
+  // Etiquetas humanas de los packs jurisdiccionales (NUNCA el código crudo en UI).
+  packLabels: {
+    CL_CHILE_DEPENDENT_V1: 'Chile · Dependiente',
+    CL_FOREIGNER_WORKING_IN_CHILE_V1: 'Chile · Extranjero',
+    INTERNATIONAL_INTERNAL_REMOTE_V1: 'Internacional · Remoto interno'
+  } as Record<string, string>,
   riskLabels: {
     low: 'Bajo',
     medium: 'Medio',
