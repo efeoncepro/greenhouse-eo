@@ -1513,6 +1513,40 @@ HubSpot Developer Platform 2025.2 cambió el shape del payload de webhooks. **Am
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-836-hubspot-services-lifecycle-stage-sync-hardening.md`. Runbook config HubSpot: `docs/operations/runbooks/hubspot-service-pipeline-config.md`.
 
+### Signature platform invariants — provider-neutral + ZapSign (TASK-490 + TASK-491, desde 2026-06-05)
+
+La firma electrónica de Greenhouse (cartas oferta, contratos laborales, MSA, futuros documentos) es **provider-neutral** (EPIC-001, identidad `documents`). El aggregate `greenhouse_core.signature_requests` (+ `signature_request_signers` + `signature_request_events` append-only, trio state-machine+CHECK+audit TASK-765) modela la solicitud; el provider concreto vive detrás del **port hexagonal** `SignatureProviderAdapter` (`src/lib/signatures/provider-port.ts`). ZapSign es el primer (y único V1) adapter: `zapSignSignatureAdapter` (`src/lib/integrations/zapsign/signature-adapter.ts`).
+
+**Pipeline canónico**:
+
+```text
+createSignatureRequest (draft) → sendSignatureRequest (adapter.createDocument → ZapSign)
+  → ZapSign callback → /api/webhooks/zapsign (genérica [endpointKey] + processInboundWebhook + inbox dedupe)
+    → handler 'zapsign' DISPATCH CASCADE:
+       1. getSignatureRequestByProviderToken → applyZapSignStateToSignatureRequest (aggregate)
+       2. getMasterAgreementBySignatureDocumentToken → syncMasterAgreementSignature (MSA legacy fallback)
+       3. else → ignore
+  → reconcile (safety-net): reconcileZapSignSignatureRequest(id) — endpoint admin + CLI
+```
+
+**State machine provider-driven (TASK-490)**: `applyProviderStatus` es **monotónico + tolerante a callbacks fuera de orden** (nunca regresa; terminal inmutable). El status event (`signature.request.{partially_signed,completed,failed,...}` v1) se emite SOLO en un cambio real de estado → reentrega del webhook idempotente.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** llamar la API de ZapSign (`createZapSignDocument`/`getZapSignDocument`) directo desde un dominio o route para el flujo del aggregate. Pasar por `zapSignSignatureAdapter` (port). El lane MSA legacy (`/api/finance/master-agreements/[id]/signature-requests`) es el único caller directo restante y coexiste — NO migrarlo aquí.
+- **NUNCA** recrear una ruta webhook one-off para ZapSign (la dedicada `/api/webhooks/zapsign/route.ts` fue borrada en TASK-491). Todo callback entra por el bus canónico (`endpoint_key='zapsign'`, handler `src/lib/webhooks/handlers/zapsign.ts`). Mismo principio para un provider de firma nuevo: handler en el bus, NO ruta dedicada.
+- **NUNCA** romper el **dispatch cascade** del handler: el aggregate `signature_requests` tiene prioridad; el lane MSA es el fallback (coexistencia, invariante TASK-490). Modificar el handler sin preservar el fallback MSA rompe la firma de MSA en producción (lane vivo). Los tests `src/lib/webhooks/handlers/zapsign.test.ts` cubren ambos paths.
+- **NUNCA** marcar un `signature_request` como `completed` sin `signed_document_asset_id` (CHECK DB). El recovery DEBE bajar el PDF firmado al vault ANTES de aplicar `completed`. Por eso el webhook Y el reconcile comparten `applyZapSignStateToSignatureRequest` (`src/lib/integrations/zapsign/apply-state.ts`) — single source of truth del recovery. NO usar el `reconcileSignatureRequest` genérico de TASK-490 para ZapSign (no baja el archivo → violaría el CHECK).
+- **NUNCA** persistir el PDF firmado del aggregate fuera del context `signature_signed_document` (vault privado, acceso own member/own client/HR/Finance/admin). El lane MSA usa `master_agreement` (no mezclar).
+- **NUNCA** leer el documento a firmar con `downloadPrivateAsset` en el adapter (infla `download_count` + emite `asset.downloaded` por cada envío). Usar `downloadGreenhouseStorageObject` (read sin side-effects).
+- **NUNCA** confiar el status del payload del webhook para el aggregate. El handler **re-consulta** el estado autoritativo vía `adapter.getDocumentState` (la API es la fuente de verdad; el payload puede ser parcial). El lane MSA sí usa el payload (comportamiento legacy preservado verbatim).
+- **NUNCA** invocar `Sentry.captureException` directo en estos paths. Usar `captureWithDomain(err, 'documents', { tags: { source: 'zapsign_webhook' | 'admin_signature_request_reconcile' } })`.
+- **NUNCA** reconfigurar el webhook de ZapSign ni cambiar el secret `ZAPSIGN_WEBHOOK_SHARED_SECRET` al tocar este flujo. El `auth_mode='bearer'` + el fallback aditivo `x-zapsign-webhook-secret` en `verifyAuth` preservan el auth exacto del route viejo. La URL no cambia.
+- **SIEMPRE** que emerja un provider de firma nuevo (DocuSign, etc.), implementar el port `SignatureProviderAdapter` + un handler en el bus + un `apply-state` análogo. Cero lógica de provider en el aggregate.
+- **SIEMPRE** que el aggregate gane un producer real (TASK-1024 bridge contracting → `createSignatureRequest`/`sendSignatureRequest`), correr el smoke real ZapSign end-to-end + confirmar los signals `documents.signature_request.{pending_overdue,failed,signed_artifact_missing}` en steady=0.
+
+**Spec canónica**: `docs/tasks/complete/TASK-490-signature-orchestration-foundation.md` + `docs/tasks/complete/TASK-491-zapsign-adapter-webhook-convergence.md`. EVENT_CATALOG: Deltas 2026-06-05 (`signature.request.*`). Migraciones: `20260605210419134` (aggregate) + `20260605215340232` (webhook endpoint).
+
 ### Sample Sprint outbound projection invariants (TASK-837)
 
 Cuando alguien declara un **Sample Sprint** (`engagement_kind IN ('pilot','trial','poc','discovery')`) vía wizard `/agency/sample-sprints`, Greenhouse:

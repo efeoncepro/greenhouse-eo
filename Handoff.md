@@ -1,3 +1,15 @@
+## TASK-491 ✅ — ZapSign Adapter + Webhook Convergence (2026-06-05, complete en develop)
+
+El segundo eslabón del pack firmable después de TASK-490: ZapSign queda como adapter del port provider-neutral + el webhook converge al bus canónico + reconcile. **En `develop` sin branch.** 3 slices:
+
+- **Slice 1** (`a234eeeec`): `zapSignSignatureAdapter` implementa `SignatureProviderAdapter` (TASK-490). `createDocument` (asset → base64 read sin side-effects → `createZapSignDocument`) + `getDocumentState` (`status-map.ts` puro). Extendí el client con `base64Docx`. **Fix latente TASK-490**: `sendSignatureRequest` perdía el `signer_name` (`name:''`) → corregido (el adapter lo necesita). 13 tests status-map.
+- **Slice 2** (`f834559c0`): migración `20260605215340232` seedea `webhook_endpoints` (`zapsign`, `bearer`). Handler `handlers/zapsign.ts` con **dispatch cascade** (aggregate `signature_requests` prioridad → fallback MSA legacy verbatim → ignore) + **borrada** la ruta one-off `/api/webhooks/zapsign` (shadow-eaba el bus) + `verifyAuth` extendido con fallback aditivo `x-zapsign-webhook-secret`. 6 tests cascade.
+- **Slice 3** (`27cab0090`): `apply-state.ts` (`applyZapSignStateToSignatureRequest`, compartido webhook+reconcile → recovery byte-idéntico, descarga el signed PDF al vault `signature_signed_document` antes de aplicar `completed` por el CHECK) + endpoint admin `POST /api/admin/documents/signature-requests/[id]/reconcile` (`requireAdminTenantContext` + `can documents.signature_request:manage`) + CLI `scripts/signatures/reconcile.ts` (`--id` | `--sweep`).
+- **Gates verdes**: tsc 0 · lint 0 · `pnpm test` full + `pnpm build` (ver abajo) · 21 tests focales (status-map + cascade + state-machine).
+- **Secretos/runtime**: `ZAPSIGN_API_TOKEN` + `ZAPSIGN_WEBHOOK_SHARED_SECRET` + `ZAPSIGN_API_BASE_URL` YA configurados en GCP Secret Manager + Vercel (los 3 envs). **Cero secretos/eventos/capabilities nuevos** (reusa los de TASK-490). ZapSign **no se reconfigura** (misma URL `/api/webhooks/zapsign`, mismo secret).
+- **Riesgo gestionado**: borrar la ruta one-off podía romper el lane MSA (vivo en prod). Mitigado: el handler replica la lógica MSA verbatim (fallback del cascade) + auth byte-idéntico (Bearer **o** `x-zapsign-webhook-secret`) + tests del fallback MSA.
+- **Pendiente smoke real**: el aggregate nuevo no tiene producer hasta TASK-1024 (bridge contracting → `createSignatureRequest`); el lane MSA sigue ejercitando el handler en prod. **Siguiente**: TASK-1024 (firma end-to-end del contrato laboral).
+
 ## TASK-490 ✅ — Signature Orchestration Foundation (2026-06-05, complete en develop)
 
 Capa provider-neutral de firma (EPIC-001), siguiente eslabón del pack firmable después de TASK-1023. **En `develop` sin branch.** 3 slices + verificación full:

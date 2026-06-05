@@ -15,6 +15,15 @@ Revisión con `arch-architect`. La lane ZapSign **ya existe pero es one-off de M
 - **Esta task es el motivo por el que TASK-490/491 están en el camino crítico** (no TASK-489/493). Scope mínimo suficiente para firmar: `signature_requests` + `signature_request_signers` + `signature_request_events` (state machine + webhook inbox) + ZapSign adapter (el cliente ya existe → TASK-491 es envolverlo + dedup + reconciliation). La **migración de MSA** a la nueva orquestación + reconciliation polish puede ser follow-up (no bloquea el primer contrato firmado).
 - El PDF de entrada lo provee TASK-1023 (case-owned `pdf_asset_id`); el signed PDF + audit report se ingieren como private assets ligados al caso (no al registry genérico todavía).
 
+## Delta 2026-06-05 — TASK-490 + TASK-491 ✅ complete (dependencia lista)
+
+La foundation de firma (TASK-490) y el adapter+webhook ZapSign (TASK-491) están **complete en `develop`**. Lo que TASK-1024 ya puede consumir directamente (cero plumbing de provider):
+
+- **Crear + enviar a firma**: `createSignatureRequest({ sourceKind:'contracting_case', sourceRef: caseId, documentAssetId, signers, ... })` → `sendSignatureRequest({ signatureRequestId }, zapSignSignatureAdapter)` (`src/lib/signatures/commands.ts` + `src/lib/integrations/zapsign/signature-adapter.ts`). El adapter resuelve el PDF del asset (de TASK-1023) → base64 → ZapSign.
+- **Callback**: ya converge al bus (`/api/webhooks/zapsign` handler `zapsign`); el **dispatch cascade** detecta el `signature_request` por `provider_document_token` automáticamente (sin tocar el handler), baja el signed PDF al vault `signature_signed_document`, y emite `signature.request.completed` v1.
+- **Lo que falta en TASK-1024** (el bridge, NO el provider): (1) el productor — transición del caso a `ready_for_signature` → `createSignatureRequest` + `sendSignatureRequest` (capability `workforce.contracting.send_signature` a seedear); (2) el consumer reactivo de `signature.request.completed` que liga el `signed_document_asset_id` al `case.signed_pdf_asset_id` + avanza el state machine del caso; (3) capability + UI del CTA "Enviar a firma" en el Bilingual Review Desk; (4) smoke real ZapSign end-to-end (el primer producer real del aggregate).
+- El signed PDF se liga al **caso** (no al registry genérico TASK-489 todavía — late-binding).
+
 ## Why
 
 Tras aprobación + render del PDF firmable (TASK-1023), el documento se envía a firma electrónica. **ZapSign es solo el provider de firma del colaborador** (no source of truth laboral); Greenhouse archiva la evidencia firmada. La firma se orquesta vía EPIC-001 (NO un orquestador paralelo). La foundation reservó los eventos `ready_for_signature` + la capability `send_signature` (a seedear).
