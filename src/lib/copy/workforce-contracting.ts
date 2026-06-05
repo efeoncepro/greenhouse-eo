@@ -197,6 +197,34 @@ export const GH_WORKFORCE_CONTRACTING = {
     retry_signature: 'Reintentar firma',
     none: 'Sin acción'
   },
+  // Collaborator viewer (/my/offers + /my/contracts) — honest, read-only, bilingual
+  collaborator: {
+    offersTitle: 'Mis ofertas',
+    offersSubtitle: 'Tus cartas oferta y su estado. Acá ves el avance; el texto legal vive en el documento.',
+    contractsTitle: 'Mis contratos',
+    contractsSubtitle: 'Tus contratos laborales y su estado de firma.',
+    bilingual: 'Español e inglés',
+    readOnlyNote: 'Esto es solo lectura. El texto legal no se edita desde aquí.',
+    nextStep: 'Próximo paso',
+    openSignature: 'Abrir firma',
+    downloadSigned: 'Descargar PDF firmado',
+    comingSoon: 'Disponible pronto',
+    emptyOffersTitle: 'No tienes ofertas',
+    emptyOffersBody: 'Cuando se te envíe una carta oferta, aparecerá acá.',
+    emptyContractsTitle: 'No tienes contratos',
+    emptyContractsBody: 'Cuando se prepare tu contrato laboral, aparecerá acá.',
+    errorTitle: 'No pudimos cargar tus documentos',
+    errorBody: 'Reintenta en unos segundos.',
+    retry: 'Reintentar',
+    // coarse status groups (collaborator-facing — agrupa los estados internos)
+    statusPreparing: 'En preparación',
+    statusPendingSignature: 'Pendiente de firma',
+    statusReadyToSign: 'Lista para firmar',
+    statusDone: 'Completado',
+    statusActive: 'Vigente',
+    statusClosed: 'Cerrada',
+    signed: 'Firmado'
+  },
   aria: {
     prototypeMode: 'Modo del Workforce Contracting',
     legalReadinessProgress: 'Progreso de validación legal',
