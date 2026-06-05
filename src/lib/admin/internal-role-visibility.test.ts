@@ -146,11 +146,12 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(ALL_INTERNAL_VIEW_CODES.length).toBeGreaterThanOrEqual(60)
   })
 
-  it('mi_ficha has 13 views including payment profile, onboarding and contractor self-service', () => {
-    expect(MI_FICHA_VIEW_CODES).toHaveLength(13)
+  it('mi_ficha has 14 views including payment profile, onboarding, contractor self-service and contracting docs', () => {
+    expect(MI_FICHA_VIEW_CODES).toHaveLength(14)
     expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mi_cuenta_pago')
     expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.onboarding')
     expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mi_contratacion')
+    expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mis_contratos')
   })
 
   it('finanzas has 15 views (incluye contractor_payables, TASK-974)', () => {
