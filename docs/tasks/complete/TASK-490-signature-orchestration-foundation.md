@@ -2,16 +2,16 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-001`
-- Status real: `Diseno`
+- Status real: `Code complete (foundation) — adapter ZapSign + webhook = TASK-491`
 - Rank: `TBD`
-- Domain: `platform`
-- Blocked by: `TASK-489`
+- Domain: `documents`
+- Blocked by: `none` (era TASK-489 — desacoplado por OQ-A)
 - Branch: `task/TASK-490-signature-orchestration-foundation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -108,9 +108,9 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] existe un agregado reusable para firma electrónica independiente del provider
-- [ ] el trail de eventos soporta conciliación y callbacks fuera de orden
-- [ ] el artifact firmado se integra con el registry documental canónico
+- [x] existe un agregado reusable para firma electrónica independiente del provider (`signature_requests` + hexagonal `SignatureProviderAdapter` port)
+- [x] el trail de eventos soporta conciliación y callbacks fuera de orden (`signature_request_events` append-only + `applyProviderStatus` monotónico + `reconcileSignatureRequest`)
+- [x] el artifact firmado se integra con el registry documental canónico (private asset context `signature_signed_document` + `signed_document_asset_id` FK; el bridge consumer del dominio liga la versión — late-binding TASK-489)
 
 ## Verification
 
@@ -146,3 +146,41 @@ El spec original es un esqueleto. Discovery (reutilizando la investigación ZapS
 - Idempotency: `signature_requests.idempotency_key UNIQUE`; reconcile re-lee el provider (out-of-order callbacks safe).
 
 ### `Blocked by`: `none` (era TASK-489 — desacoplado por OQ-A).
+
+## Delta 2026-06-05 — Implementación (foundation code complete)
+
+Implementado en `develop` (sin branch, autorizado). 3 slices + verificación. El adapter ZapSign real + el webhook inbound + el bridge `ready_for_signature` (workforce_contracting → signature_request) son **TASK-491** (este foundation ships el port + un `notImplementedSignatureAdapter` que lanza 503 hasta entonces).
+
+### Slice 1 — Schema + asset context + types + state machine (commit `c23a2a942`)
+
+- Migración `20260605210419134_task-490-signature-orchestration.sql` (+3 tablas → 430 total): `signature_requests` (PK `signature_request_id`, enum `provider`/`status`, `source_kind`/`source_ref` polimórfico, `document_asset_id`/`signed_document_asset_id`/`audit_report_asset_id` FK, `provider_payload` JSONB, `idempotency_key` UNIQUE, CHECK `status<>'completed' OR signed_document_asset_id IS NOT NULL`) + `signature_request_signers` (enum `role`/`status`) + `signature_request_events` (append-only, triggers anti-UPDATE/DELETE). Indexes: provider_token (partial), source, pending.
+- Asset context canónico `signature_signed_document` (retention `document_vault`, prefix `signature-signed-documents`) + `canAccessSignatureSignedDocumentAsset` (own member / own client / HR / Finance / admin).
+- `src/lib/signatures/types.ts` + `state-machine.ts` (`OPERATOR_TRANSITIONS` strict + `applyProviderStatus` monotónico/out-of-order tolerant) + `state-machine.test.ts` (8 tests).
+
+### Slice 2 — Runtime + provider port + commands (commit `49cb29c06`)
+
+- `provider-port.ts`: `SignatureProviderAdapter` interface (DI) + `notImplementedSignatureAdapter` (503 hasta TASK-491).
+- `store.ts`: `getSignatureRequestById`/`ByProviderToken`/`ByIdempotencyKey` + `listSignersForRequest` (dual-mode `client?`, `forUpdate`).
+- `commands.ts`: `createSignatureRequest` (idempotente), `sendSignatureRequest` (adapter DI), `cancelSignatureRequest`, `applyProviderSignatureUpdate` (webhook/reconcile core — monotónico, idempotente, emite el status event solo en cambio real), `reconcileSignatureRequest` (re-lee provider). Todos atómicos dual-mode en `withGreenhousePostgresTransaction`, append-only event + outbox in-tx.
+- `event-catalog.ts`: `AGGREGATE_TYPES.signatureRequest` + 7 `signature.request.*` EVENT_TYPES.
+
+### Slice 3 — Identidad `documents` (commit `d08b2f52d`)
+
+- `captureWithDomain` domain `documents`.
+- Entitlements module `documents` + capability `documents.signature_request` (read/create/update/manage) + runtime grant (hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN; invariant TASK-873/935 — grant-coverage test verde).
+- Reliability module `documents` + 3 signals (`pending_overdue`/lag, `failed`/drift, `signed_artifact_missing`/data_quality) wired en `get-reliability-overview`; incident-mapping hints + priority.
+- EVENT_CATALOG Delta: 7 `signature.request.*` v1.
+
+### Verificación
+
+- `pnpm exec tsc --noEmit`: **0 errores**.
+- `pnpm lint`: **0**.
+- `pnpm test` (full) + `pnpm build`: ver Handoff (gate de cierre canónico, TASK-490 toca registries compartidos).
+- Focal: `state-machine.test.ts` (8) + `capability-grant-coverage.test.ts` + `registry-store.test.ts` (21 total) verdes.
+
+### Pendiente (TASK-491 / follow-up)
+
+- Adapter ZapSign real (`base64_pdf`/`base64_docx`) + webhook inbound (firma callbacks → `applyProviderSignatureUpdate`).
+- Bridge `ready_for_signature` (workforce_contracting case → `createSignatureRequest` + `sendSignatureRequest`).
+- Routes operador-facing (`/api/documents/signature-requests/**`) gated por `documents.signature_request` + mapeo a `canonicalErrorResponse` (los `SignatureValidationError.code` ya son es-CL + statusCode).
+- Capabilities registry DB seed (mirror TASK-872 pattern) cuando aterrice la primera route can()-checked.
