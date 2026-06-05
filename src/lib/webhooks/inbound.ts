@@ -167,8 +167,15 @@ const verifyAuth = async (
     const authHeader = request.headers.get('authorization') || ''
     const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : authHeader.trim()
 
-    // Also check custom header for backward compat
-    const customHeader = request.headers.get('x-hr-core-webhook-secret')?.trim() || ''
+    // Also check custom headers for backward compat:
+    //  - `x-hr-core-webhook-secret`: Greenhouse-internal webhook callers.
+    //  - `x-zapsign-webhook-secret`: legacy ZapSign one-off route convention (TASK-491
+    //    convergence). Additive — no other provider sends it, so zero impact on others.
+    const customHeader =
+      request.headers.get('x-hr-core-webhook-secret')?.trim() ||
+      request.headers.get('x-zapsign-webhook-secret')?.trim() ||
+      ''
+
     const token = bearerToken || customHeader
 
     return token === secret
