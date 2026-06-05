@@ -24,6 +24,7 @@ export type ReliabilityModuleKey =
   | 'identity' // TASK-784 — Person legal profile + auth + SCIM
   | 'commercial' // TASK-813 — engagement instance sync (HubSpot p_services). TASK-807 formaliza subsystem rollup.
   | 'platform' // TASK-848 — production release control plane (release_manifests, GH workflow blockers, WIF subjects, deploy duration p95)
+  | 'workforce' // TASK-1019 — Workforce Contracting Studio (offer letters + employment contracts, AI drafting)
 
 export type ReliabilityModuleDomain =
   | 'platform'

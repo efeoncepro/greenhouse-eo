@@ -453,6 +453,41 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['drift', 'lag'],
     incidentDomainTag: 'cloud'
+  },
+  {
+    // TASK-1019 — Workforce Contracting Studio (offer letters + employment contracts,
+    // bilingual es-CL + en-US, Claude drafting advisory-only, jurisdiction-pack
+    // validators). PDF/ZapSign/emails consume EPIC-001 in future tasks.
+    moduleKey: 'workforce',
+    label: 'Workforce Contracting',
+    description:
+      'Workforce Contracting Studio (TASK-1019): cartas oferta + contratos laborales bilingües, drafting asistido por Claude (advisory), validators determinísticos por jurisdiction pack y eventos preparados para PDF/firma EPIC-001. AI flag OFF por default.',
+    domain: 'hr',
+    routes: [
+      { path: '/hr/workforce/contracts', label: 'Workforce Contracting (futuro)' }
+    ],
+    apis: [
+      { path: '/api/hr/workforce/contracting', label: 'Contracting cases' }
+    ],
+    dependencies: [
+      'greenhouse_hr.workforce_contracting_cases',
+      'greenhouse_hr.workforce_contracting_drafts',
+      'greenhouse_hr.workforce_contracting_ai_runs',
+      'greenhouse_core.identity_profiles (subject)',
+      'greenhouse_core.organizations (operating entity)',
+      'Anthropic Claude (greenhouse-anthropic-api-key, flag WORKFORCE_CONTRACTING_AI_ENABLED)',
+      'EPIC-001 document registry / rendering / ZapSign (future consumer)'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/workforce/contracting/**',
+      'src/lib/ai/anthropic.ts',
+      'src/lib/reliability/queries/contracting-*.ts',
+      'src/app/api/hr/workforce/contracting/**',
+      'docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md'
+    ],
+    expectedSignalKinds: ['dead_letter', 'lag', 'drift', 'incident'],
+    incidentDomainTag: 'workforce'
   }
 ]
 

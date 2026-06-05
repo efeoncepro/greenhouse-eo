@@ -54,6 +54,9 @@ import {
 import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
 import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
 import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
+import { getContractingAiDraftFailedSignal } from './queries/contracting-ai-draft-failed'
+import { getContractingApprovedWithoutPdfSignal } from './queries/contracting-approved-without-pdf'
+import { getContractingValidationBlockedOverdueSignal } from './queries/contracting-validation-blocked-overdue'
 import { getContractorPayableUnbatchedOverdueSignal } from './queries/contractor-payable-unbatched-overdue'
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
 import { getContractorRemittanceEmailDeadLetterSignal } from './queries/contractor-remittance-email-dead-letter'
@@ -629,6 +632,9 @@ interface ReliabilityOverviewSources {
   /** TASK-977 — committed payables without a materialized expense (settlement precondition). */
   contractorPayableExpenseUnmaterialized?: ReliabilitySignal | null
   contractorPayablePaymentSlaOverdue?: ReliabilitySignal | null
+  contractingAiDraftFailed?: ReliabilitySignal | null
+  contractingValidationBlockedOverdue?: ReliabilitySignal | null
+  contractingApprovedWithoutPdf?: ReliabilitySignal | null
   /** TASK-979 — un-batched overdue contractor obligations (monthly run coverage gap). */
   contractorPayableUnbatchedOverdue?: ReliabilitySignal | null
 
@@ -970,6 +976,10 @@ export const buildReliabilityOverview = (
       ? [sources.contractorPayableExpenseUnmaterialized]
       : []),
     ...(sources.contractorPayablePaymentSlaOverdue ? [sources.contractorPayablePaymentSlaOverdue] : []),
+    // TASK-1019 — Workforce Contracting signals (moduleKey 'workforce').
+    ...(sources.contractingAiDraftFailed ? [sources.contractingAiDraftFailed] : []),
+    ...(sources.contractingValidationBlockedOverdue ? [sources.contractingValidationBlockedOverdue] : []),
+    ...(sources.contractingApprovedWithoutPdf ? [sources.contractingApprovedWithoutPdf] : []),
     ...(sources.contractorPayableUnbatchedOverdue ? [sources.contractorPayableUnbatchedOverdue] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
@@ -1431,6 +1441,22 @@ export const getReliabilityOverview = async (
     preloadedSources.contractorPayablePaymentSlaOverdue !== undefined
       ? preloadedSources.contractorPayablePaymentSlaOverdue
       : await getContractorPayablePaymentSlaOverdueSignal().catch(() => null)
+
+  // TASK-1019 — Workforce Contracting reliability signals (moduleKey 'workforce').
+  const contractingAiDraftFailed =
+    preloadedSources.contractingAiDraftFailed !== undefined
+      ? preloadedSources.contractingAiDraftFailed
+      : await getContractingAiDraftFailedSignal().catch(() => null)
+
+  const contractingValidationBlockedOverdue =
+    preloadedSources.contractingValidationBlockedOverdue !== undefined
+      ? preloadedSources.contractingValidationBlockedOverdue
+      : await getContractingValidationBlockedOverdueSignal().catch(() => null)
+
+  const contractingApprovedWithoutPdf =
+    preloadedSources.contractingApprovedWithoutPdf !== undefined
+      ? preloadedSources.contractingApprovedWithoutPdf
+      : await getContractingApprovedWithoutPdfSignal().catch(() => null)
 
   const contractorPayableUnbatchedOverdue =
     preloadedSources.contractorPayableUnbatchedOverdue !== undefined
@@ -1897,6 +1923,9 @@ export const getReliabilityOverview = async (
     contractorPayableReadyWithoutObligation,
     contractorPayableExpenseUnmaterialized,
     contractorPayablePaymentSlaOverdue,
+    contractingAiDraftFailed,
+    contractingValidationBlockedOverdue,
+    contractingApprovedWithoutPdf,
     contractorPayableUnbatchedOverdue,
     contractorPayableBridgeDeadLetter,
     contractorRemittanceEmailDeadLetter,

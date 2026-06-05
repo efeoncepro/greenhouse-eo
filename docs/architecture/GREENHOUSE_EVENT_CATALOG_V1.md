@@ -950,3 +950,26 @@ Spec: `docs/tasks/in-progress/TASK-934-unanchored-paid-expense-anchoring-review-
 - **Reliability**: `client.lifecycle.cascade_dead_letter` lee `outbox_events WHERE event_type LIKE 'client.lifecycle.%' AND status='dead_letter'`.
 
 Spec: `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md` §10 + `docs/tasks/in-progress/TASK-992-client-lifecycle-orchestrator-single-front-door.md`.
+
+## Delta 2026-06-05 — TASK-1019: `workforce.contracting.*` (Workforce Contracting Studio foundation)
+
+6 eventos versionados v1, aggregate type `workforce_contracting_case`, aggregate_id = `caseId` (`wcc-{uuid}`). Foundation advisory-only: ningún consumer genera PDF/firma/email en TASK-1019.
+
+| Event | Cuándo | Payload v1 (además de `schemaVersion:1, caseId`) | Consumers |
+|---|---|---|---|
+| `workforce.contracting.case_opened` | `createWorkforceContractingCase` | `{caseKind, subjectIdentityProfileId, operatingEntityOrganizationId, jurisdictionPackCode, status}` | audit, UI notification (futuro) |
+| `workforce.contracting.ai_draft_created` | `createWorkforceContractingDraft` con `source='claude_ai'` (adapter Slice 3) | `{draftId, draftVersion, aiRunId, caseStatus}` | **REACTIVO futuro** — render/PDF consumer (EPIC-001) |
+| `workforce.contracting.draft_approved` | `approveWorkforceContractingDraft` | `{draftId, draftVersion, caseKind, caseStatus, approvedByUserId}` | **REACTIVO futuro** — render/PDF (EPIC-001) |
+| `workforce.contracting.ready_for_pdf` | transición → `ready_for_pdf` (comando futuro) | `{...}` | render consumer (EPIC-001 `TASK-489`/`TASK-493`) |
+| `workforce.contracting.ready_for_signature` | transición → `ready_for_signature` (comando futuro) | `{...}` | signature consumer (EPIC-001 `TASK-490`/`TASK-491`, ZapSign) |
+| `workforce.contracting.signature_pending_overdue` | **scheduler futuro** (no emitido en TASK-1019) | `{...}` | Notification Hub (recordatorio de firma pendiente) |
+
+- **Emisor**: comandos en `src/lib/workforce/contracting/commands/**` vía `publishContractingEvent` (dual-mode, dentro de la misma tx que la mutación + el `workforce_contracting_case_events` append-only). En TASK-1019 se emiten `case_opened` (createCase), `ai_draft_created` (draft AI) y `draft_approved` (approve); los demás quedan declarados como contrato para tasks futuras.
+- **Contratos de integración futura** (no implementados en TASK-1019):
+  - **EPIC-001 render/template** (`TASK-489` registry + `TASK-493` rendering): consume `ai_draft_created`/`draft_approved`/`ready_for_pdf` para generar el PDF/DOCX institucional desde `structured_content_json` aprobado (formato declarado en `cases.signable_format`). NO crea vault paralelo.
+  - **EPIC-001 signature/ZapSign** (`TASK-490` orchestration + `TASK-491` adapter): consume `ready_for_signature`; ZapSign firma el artefacto vía `base64_pdf`/`base64_docx` (no el template feature). Webhooks de firma vuelven por el inbox canónico.
+  - **Notification Hub**: consume `ready_for_signature` (pre-firma) + un evento post-firma futuro + `signature_pending_overdue` (recordatorio). Copy es-CL canónico, sin overclaiming legal.
+  - **Workforce Activation**: cuando el contrato llega a `active`/`registered_external`, desbloquea la readiness documental laboral (TASK-874/876).
+- **Reliability** (moduleKey `workforce`): `workforce.contracting.ai_draft_failed` (dead_letter), `validation_blocked_overdue` (lag), `approved_without_pdf` (drift). Steady=0.
+
+Spec: `docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` + `docs/tasks/in-progress/TASK-1019-workforce-contracting-studio-foundation-ai-drafting.md`.
