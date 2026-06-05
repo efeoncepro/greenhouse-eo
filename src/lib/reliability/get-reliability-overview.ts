@@ -56,6 +56,7 @@ import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contr
 import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
 import { getContractingAiDraftFailedSignal } from './queries/contracting-ai-draft-failed'
 import { getContractingApprovedWithoutPdfSignal } from './queries/contracting-approved-without-pdf'
+import { getContractingPdfStatusDriftSignal } from './queries/contracting-pdf-status-drift'
 import { getContractingValidationBlockedOverdueSignal } from './queries/contracting-validation-blocked-overdue'
 import { getContractorPayableUnbatchedOverdueSignal } from './queries/contractor-payable-unbatched-overdue'
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
@@ -635,6 +636,8 @@ interface ReliabilityOverviewSources {
   contractingAiDraftFailed?: ReliabilitySignal | null
   contractingValidationBlockedOverdue?: ReliabilitySignal | null
   contractingApprovedWithoutPdf?: ReliabilitySignal | null
+  /** TASK-1023 — stale PDF watermark vs current case status. */
+  contractingPdfStatusDrift?: ReliabilitySignal | null
   /** TASK-979 — un-batched overdue contractor obligations (monthly run coverage gap). */
   contractorPayableUnbatchedOverdue?: ReliabilitySignal | null
 
@@ -1458,6 +1461,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.contractingApprovedWithoutPdf
       : await getContractingApprovedWithoutPdfSignal().catch(() => null)
 
+  const contractingPdfStatusDrift =
+    preloadedSources.contractingPdfStatusDrift !== undefined
+      ? preloadedSources.contractingPdfStatusDrift
+      : await getContractingPdfStatusDriftSignal().catch(() => null)
+
   const contractorPayableUnbatchedOverdue =
     preloadedSources.contractorPayableUnbatchedOverdue !== undefined
       ? preloadedSources.contractorPayableUnbatchedOverdue
@@ -1926,6 +1934,7 @@ export const getReliabilityOverview = async (
     contractingAiDraftFailed,
     contractingValidationBlockedOverdue,
     contractingApprovedWithoutPdf,
+    contractingPdfStatusDrift,
     contractorPayableUnbatchedOverdue,
     contractorPayableBridgeDeadLetter,
     contractorRemittanceEmailDeadLetter,
