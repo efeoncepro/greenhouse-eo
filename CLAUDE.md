@@ -1547,6 +1547,15 @@ createSignatureRequest (draft) → sendSignatureRequest (adapter.createDocument 
 
 **Spec canónica**: `docs/tasks/complete/TASK-490-signature-orchestration-foundation.md` + `docs/tasks/complete/TASK-491-zapsign-adapter-webhook-convergence.md`. EVENT_CATALOG: Deltas 2026-06-05 (`signature.request.*`). Migraciones: `20260605210419134` (aggregate) + `20260605215340232` (webhook endpoint).
 
+**Bridge contracting → firma (primer producer real del aggregate, TASK-1024, desde 2026-06-05)**: el Workforce Contracting Studio es el primer dominio que produce + consume `signature_requests`. Producer `sendContractingCaseToSignature` (`src/lib/workforce/contracting/signature/`); consumer reactivo `contracting_signature_bridge` (`src/lib/sync/projections/`).
+
+- **NUNCA** firmar un contrato/oferta con el representante legal como firmante ZapSign. El **único firmante electrónico es el TRABAJADOR**; la firma del representante de la entidad va **pre-estampada** en el PDF (TASK-863/1023, `@/lib/legal-signatures`). La e-firma del trabajador es válida para contratos (≠ finiquito, que exige ratificación notarial). El `resolveContractingWorkerSigner` resuelve worker name+email fail-closed (sin email → no se puede enviar).
+- **NUNCA** disparar el envío a firma automáticamente al llegar a `ready_for_signature`. Es una **acción de operador explícita** (CTA, capability `workforce.contracting.send_signature`) — el operador revisa el PDF antes de comprometer la e-firma. El evento `ready_for_signature` es audit/notificación, no trigger de envío.
+- **NUNCA** llamar la API de ZapSign dentro de una tx PG. El producer es 3-fases: (1 tx) crear el `signature_request` draft idempotente (`caseId:pdfAssetId`); (2 sin tx) `sendSignatureRequest` a ZapSign; (3 tx) avanzar el caso `ready_for_signature → sent_for_signature`. El caso avanza SOLO si ZapSign aceptó (retry idempotente).
+- **NUNCA** marcar el caso `fully_signed` sin ligar `signed_pdf_asset_id`. El consumer reactivo re-lee el `signature_request` (que el webhook TASK-491 ya pobló con `signedDocumentAssetId`), liga el asset y avanza el caso. Idempotente + cubre el crash window (transiciona por `sent_for_signature` si el producer murió). El CHECK del aggregate ya garantiza `completed ⇒ signed_document_asset_id`.
+- **NUNCA** duplicar los signals del aggregate per-dominio: el contracting reusa `documents.signature_request.{pending_overdue,failed,signed_artifact_missing}` (TASK-490). El único signal contracting-específico es `workforce.contracting.signature_desync` (el caso quedó atrás de su request → consumer falló; steady=0).
+- **SIEMPRE** que un dominio nuevo necesite firma (quote, MSA migrado, addenda), reusar el mismo patrón: producer command (validación + createSignatureRequest + sendSignatureRequest fuera de tx + transición) + consumer reactivo filtrado por `sourceKind`. Cero acoplamiento a ZapSign.
+
 ### Sample Sprint outbound projection invariants (TASK-837)
 
 Cuando alguien declara un **Sample Sprint** (`engagement_kind IN ('pilot','trial','poc','discovery')`) vía wizard `/agency/sample-sprints`, Greenhouse:

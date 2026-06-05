@@ -38,3 +38,12 @@ Los emails del Studio son **event-driven**: Contracting emite eventos de dominio
 
 - Las 4 familias disparan por evento, idempotentes, copy es-CL revisada (greenhouse-ux-writing), adjunto bilingüe.
 - Recordatorios via cron canónico; verificación con caso real (preview endpoint + render Chromium).
+
+## Delta 2026-06-05 — TASK-1024 ✅ complete: eventos del bridge de firma disponibles
+
+El bridge contrato↔firma (TASK-1024) está complete en `develop`. Esta task ya puede consumir los 3 eventos v1 estables (aggregate `workforce_contracting_case`):
+- `workforce.contracting.sent_for_signature` — `{caseId, signatureRequestId}` (caso enviado a firma).
+- `workforce.contracting.signature_completed` — `{caseId, signatureRequestId, signatureStatus, signedPdfAssetId}` (caso `fully_signed`; el PDF firmado ya está ligado al caso en `signed_pdf_asset_id`).
+- `workforce.contracting.signature_failed` — `{caseId, signatureRequestId, signatureStatus}` (firma falló/expiró).
+
+Registrar un reactive consumer (patrón `registerProjection`) filtrando por estos eventos. NO re-derivar el estado de firma: leer el caso (`signed_pdf_asset_id`, `status`) o el `signature_request`.

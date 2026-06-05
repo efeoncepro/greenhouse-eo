@@ -993,3 +993,19 @@ Spec: `docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` + `docs/
 - **Reliability** (moduleKey `documents`): `documents.signature_request.pending_overdue` (lag), `.failed` (drift), `.signed_artifact_missing` (data_quality). Steady=0.
 
 Spec: `docs/tasks/in-progress/TASK-490-signature-orchestration-foundation.md`.
+
+## Delta 2026-06-05 — TASK-1024: `workforce.contracting.{sent_for_signature, signature_completed, signature_failed}` (signature bridge)
+
+3 eventos v1 nuevos, aggregate type `workforce_contracting_case`. Cierran el bridge contrato↔firma (consume EPIC-001 TASK-490/491).
+
+| Event | Cuándo | Payload v1 (además de `schemaVersion:1, caseId`) | Consumers |
+|---|---|---|---|
+| `workforce.contracting.sent_for_signature` | producer `sendContractingCaseToSignature` (CTA operador) | `{signatureRequestId}` | TASK-1025 (notificación de envío) |
+| `workforce.contracting.signature_completed` | consumer reactivo (signature.request.completed → case fully_signed) | `{signatureRequestId, signatureStatus, signedPdfAssetId}` | **REACTIVO futuro** — TASK-1025 (archivar + notificar), TASK-1026 (registro DT/REL) |
+| `workforce.contracting.signature_failed` | consumer reactivo (signature.request.failed/expired) | `{signatureRequestId, signatureStatus, signedPdfAssetId}` | TASK-1025 (alerta / reenvío) |
+
+- **Emisor producer**: `src/lib/workforce/contracting/signature/send-to-signature.ts` vía `publishContractingEvent` (dentro de la tx que avanza el caso a `sent_for_signature`). El worker es el único firmante electrónico (firma del representante pre-estampada, TASK-863/1023).
+- **Emisor consumer**: projection reactiva `contracting_signature_bridge` (`src/lib/sync/projections/contracting-signature-bridge.ts`) que consume `signature.request.{completed,partially_signed,failed,expired}` filtrado a `sourceKind='contracting_case'`, re-lee PG, avanza el caso + liga `signed_pdf_asset_id`. `expired` mapea a `signature_failed` (estado del caso = `expired`, distinto). `partially_signed` es audit-only (single-signer no dispara).
+- **Reliability** (moduleKey `workforce`): `workforce.contracting.signature_desync` (drift, steady=0) — el caso quedó atrás de su signature_request (consumer falló). Los failure modes del aggregate ya los cubre TASK-490 `documents.signature_request.*`.
+
+Spec: `docs/tasks/in-progress/TASK-1024-workforce-contracting-signature-consumer-zapsign.md`.

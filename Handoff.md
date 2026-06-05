@@ -1,3 +1,15 @@
+## TASK-1024 ✅ — Workforce Contracting signature bridge (2026-06-05, complete en develop)
+
+El **bridge contrato↔firma** que cierra la firma electrónica end-to-end consumiendo EPIC-001 (TASK-490/491). **En `develop` sin branch.** 3 slices:
+
+- **Slice 1 — Producer** (`e50702ff4`): command `sendContractingCaseToSignature` (3-fases: crea `signature_request` draft idempotente en tx → `sendSignatureRequest` a ZapSign sin tx → avanza el caso a `sent_for_signature` en tx; el caso avanza solo si ZapSign aceptó). El **trabajador es el único firmante electrónico** (firma del representante pre-estampada TASK-863/1023); `resolveContractingWorkerSigner` fail-closed sin email. Migración `20260605222647887` (capability `send_signature` + columna `signature_request_id`) + endpoint + catalog/runtime grant (EFEONCE_ADMIN V0) + 3 eventos v1.
+- **Slice 2 — Consumer** (`02823a91f`): projection reactiva `contracting_signature_bridge` (`signature.request.*` filtrado `sourceKind=contracting_case` → re-lee PG → avanza el caso + liga `signed_pdf_asset_id` + emite eventos; idempotente + cubre crash window). Signal `workforce.contracting.signature_desync` (drift, steady=0). Reusa los signals del aggregate (TASK-490). También surfaceé `contractingPdfStatusDrift` (gap latente TASK-1023: resolved+packed pero no spreadeado).
+- **Slice 3 — UI** (`648559516`): CTA "Enviar a firma" en el Bilingual Review Desk (gated capability + `caseStatus=ready_for_signature`) + badge de estado (pendiente/firmado/falló) + "Descargar firmado". Reader `getLatestContractingDraftContent` JOIN del caso. Copy es-CL tokenizado (`greenhouse-ux-writing`).
+- **Gates verdes**: tsc 0 · lint 0 · `pnpm test` full **6095 passed (0 fail)** · `pnpm build` ✓. Migración aplicada al Cloud SQL compartido.
+- **Decisiones (OQ)**: worker-only signer · CTA explícito (no auto) · ZapSign fuera de tx (TASK-771) · reuse signals + 1 desync nuevo · ZapSign manda el email al worker (no persistir sign_url).
+- **Cero secretos nuevos** (ZapSign ya en los 3 envs vía TASK-491). **Pendiente**: smoke real ZapSign end-to-end (requiere caso real en `ready_for_signature` + flag staging — mismo e2e pendiente de TASK-1023: AI draft → aprobar → generar → **enviar a firma** → firmar). El backend está completo + testeado; el live cierra el round-trip + la GVC del CTA vivo.
+- **Pack firmable**: con TASK-490/491/1023/1024 el contrato se firma end-to-end (crear → IA draft → aprobar → PDF → enviar a firma → ZapSign → firmado ligado al caso). Siguiente: TASK-1025 (emails post-firma) + TASK-1026 (registro DT/REL).
+
 ## TASK-491 ✅ — ZapSign Adapter + Webhook Convergence (2026-06-05, complete en develop)
 
 El segundo eslabón del pack firmable después de TASK-490: ZapSign queda como adapter del port provider-neutral + el webhook converge al bus canónico + reconcile. **En `develop` sin branch.** 3 slices:

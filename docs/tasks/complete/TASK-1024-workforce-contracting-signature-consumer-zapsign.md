@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Epic: Workforce Contracting Studio (ADR `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` §7, §12.3)
 - Created: 2026-06-05
@@ -49,5 +49,40 @@ Tras aprobación + render del PDF firmable (TASK-1023), el documento se envía a
 
 ## Acceptance
 
-- Caso con PDF aprobado → enviado a ZapSign via EPIC-001 → webhook converge estado → PDF firmado + audit ingeridos como private assets.
-- 3 signals operativos; `pnpm test`/`build` verdes; verificación con caso real coordinada.
+- [x] Caso con PDF aprobado → enviado a ZapSign via EPIC-001 (producer command + CTA) → webhook converge estado (consumer reactivo) → PDF firmado ligado al caso (`signed_pdf_asset_id`).
+- [x] `pnpm test`/`build` verdes (ver Handoff). Signal de desync operativo.
+- [ ] Verificación con caso real ZapSign end-to-end (staging, coordinada con el e2e pendiente de TASK-1023: AI draft → aprobar → generar → **enviar a firma** → firmar → caso `fully_signed`).
+
+## Delta 2026-06-05 — Implementación (bridge contrato↔firma, code complete)
+
+Implementado en `develop` (sin branch, autorizado). 3 slices. Consume EPIC-001 (TASK-490/491) — cero plumbing de provider.
+
+### Open Questions resueltas (pre-execution)
+
+El spec no tenía `## Open Questions`; Discovery (2 Explore agents) + `greenhouse-backend` las resolvieron:
+
+- **OQ-1 ¿Quién firma vía ZapSign?** → **SOLO el trabajador**. La firma del representante legal va pre-estampada en el PDF (TASK-863/1023). E-firma del trabajador válida para contratos (≠ finiquito). `signers=[{role:'worker'}]`.
+- **OQ-2 ¿Producer automático o CTA?** → **CTA explícito** (`workforce.contracting.send_signature`). El operador revisa el PDF antes de la e-firma.
+- **OQ-3 ¿ZapSign API en tx?** → **NO** (TASK-771). 3-fases: crear request draft (tx) → sendSignatureRequest (sin tx) → avanzar caso (tx). El caso avanza solo si ZapSign aceptó.
+- **OQ-4 ¿Link case→request?** → columna `signature_request_id` (additiva FK) en el caso.
+- **OQ-5 ¿Signals?** → REUSAR `documents.signature_request.{pending_overdue,failed,signed_artifact_missing}` (TASK-490) + 1 nuevo `workforce.contracting.signature_desync` (el único failure mode nuevo del bridge).
+- **OQ-6 ¿Link de firma al worker?** → ZapSign le manda email automático. Portal muestra estado + descarga firmado. NO persistir sign_url (invariante spec).
+- **OQ-7 ¿Worker sin email?** → fail-closed (es-CL).
+
+### Slice 1 — Producer (commit `e50702ff4`)
+
+Migración `20260605222647887` (capability `send_signature` registry + columna `signature_request_id`). Command `sendContractingCaseToSignature` (3-fases idempotente) + `resolveContractingWorkerSigner` (fail-closed) + endpoint `POST /api/hr/workforce/contracting/[caseId]/send-to-signature` + catalog/runtime grant (EFEONCE_ADMIN V0) + 3 eventos v1 + case type/mapper PDF fields.
+
+### Slice 2 — Reactive consumer (commit `02823a91f`)
+
+Projection `contracting_signature_bridge` (`signature.request.*` filtrado `sourceKind=contracting_case` → re-lee PG → avanza caso + liga signed PDF + emite eventos; idempotente + cubre crash window). Pure `signature-status-map`. Signal `workforce.contracting.signature_desync` (drift, steady=0). También surfaceé `contractingPdfStatusDrift` (TASK-1023 estaba resolved+packed pero no spreadeado — gap latente).
+
+### Slice 3 — UI (commit `648559516`)
+
+CTA "Enviar a firma" en el Bilingual Review Desk (gated capability + `caseStatus=ready_for_signature`) + badge de estado de firma (pendiente/firmado/falló, color+texto) + "Descargar firmado". Reader `getLatestContractingDraftContent` JOIN del caso (caseStatus/pdfAssetId/signedPdfAssetId). Copy es-CL tokenizado.
+
+### Notas runtime / pendiente
+
+- **Cero secretos nuevos** (ZapSign ya en los 3 envs vía TASK-491).
+- **Pendiente**: smoke real ZapSign end-to-end (requiere un caso real en `ready_for_signature` + flag `WORKFORCE_CONTRACTING_AI_ENABLED` staging; mismo e2e pendiente que TASK-1023). El backend está completo + testeado; el live verifica el round-trip ZapSign.
+- **GVC del CTA**: la captura del botón vivo requiere un caso real en `ready_for_signature` (parte del e2e staging); el desk base ya fue GVC-verificado en TASK-1021 y el CTA reusa sus patrones (Button + OperationalStatusBadge + toast).
