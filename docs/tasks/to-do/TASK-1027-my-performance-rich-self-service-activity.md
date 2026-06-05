@@ -24,11 +24,11 @@
 
 ## Summary
 
-Enriquecer `/my/performance` para que el colaborador vea sus métricas ICO y Nexa insights con una experiencia comparable a `People > Person 360 > Actividad`, pero self-scoped, redacted y escrita como coaching operativo personal. La UI debe consumir un DTO explícito de `/api/my/performance`, sin abrir endpoints admin ni aceptar `memberId` desde el cliente.
+Enriquecer `/my/performance` para que el colaborador vea sus métricas ICO y Nexa Insights con una experiencia comparable a `People > Person 360 > Actividad`, pero self-scoped, redacted y escrita como coaching operativo personal. La UI debe consumir un DTO explícito de `/api/my/performance`, sin abrir endpoints admin ni aceptar `memberId` desde el cliente.
 
 ## Why This Task Exists
 
-Person 360 Activity ya muestra una lectura rica de la actividad de una persona: Nexa insights, KPIs ICO, tendencias OTD/FTR, radar, CSC distribution y estados honestos. La vista colaborador `/my/performance` existe y está gateada por `mi_ficha.mi_desempeno`, pero quedó como una versión pobre y con riesgo de drift. El colaborador debe poder ver sus propias señales con la misma calidad, sin heredar navegación, lenguaje ni datos admin.
+Person 360 Activity ya muestra una lectura rica de la actividad de una persona: Nexa Insights, KPIs ICO, tendencias OTD/FTR, radar, CSC distribution y estados honestos. La vista colaborador `/my/performance` existe y está gateada por `mi_ficha.mi_desempeno`, pero quedó como una versión pobre y con riesgo de drift. El colaborador debe poder ver sus propias señales con la misma calidad, sin heredar navegación, lenguaje ni datos admin.
 
 ## Goal
 
@@ -122,12 +122,12 @@ Reglas obligatorias:
 - `/my/performance` page guard usa `mi_ficha.mi_desempeno` con fallback route group `my`.
 - `/api/my/performance` usa `requireMyTenantContext()` y resuelve `memberId` desde la sesión.
 - `PersonActivityTab` ya implementa la experiencia rica de Actividad para operadores.
-- `readMemberAiLlmSummary(memberId, year, month)` ya expone Nexa insights filtrados por `member_id + period`.
+- `readMemberAiLlmSummary(memberId, year, month)` ya expone Nexa Insights filtrados por `member_id + period`.
 - `NexaInsightsBlock` ya soporta timeline, root cause, lifecycle sparkline y honest degradation.
 
 ### Gap
 
-- `/my/performance` no muestra Nexa insights ni la composición rica de Actividad.
+- `/my/performance` no muestra Nexa Insights ni la composición rica de Actividad.
 - El endpoint self-service devuelve objetos internos (`intelligence`, `intelligenceTrend`) que pueden incluir campos no apropiados para el DTO colaborador.
 - `NexaMentionText` asume links a `/people` y `/agency/spaces`, lo cual no es seguro para `/my` sin access-aware rendering.
 - La UI actual no distingue suficientemente período en curso, muestra pequeña, no cierres, stale/degraded y empty-positive.
@@ -169,7 +169,7 @@ Reglas obligatorias:
 
 ### Slice 4 — MyPerformanceView enterprise runtime
 
-- Rehacer `MyPerformanceView` como dashboard self-service: header/period selector, Nexa insights, KPIs, trends, summary chips, radar, CSC/pipeline chart y empty states.
+- Rehacer `MyPerformanceView` como dashboard self-service: header/period selector, Nexa Insights, KPIs, trends, summary chips, radar, CSC/pipeline chart y empty states.
 - Aplicar copy de coaching operativo, no evaluación formal.
 - Cubrir responsive mobile/laptop/desktop.
 - Usar copy reusable en `src/lib/copy/*` cuando corresponda.
@@ -186,7 +186,7 @@ Reglas obligatorias:
 - Crear una nueva ruta `/my/activity`.
 - Abrir `/api/ico-engine/context` a colaboradores.
 - Modificar definiciones de métricas ICO.
-- Generar señales Nexa o llamar LLM inline desde la UI.
+- Generar Nexa Insights o llamar LLM inline desde la UI.
 - Crear o modificar evaluaciones HR formales.
 - Crear goals, reviews, feedback, payroll adjustments o task reassignment desde esta vista.
 - Exponer datos de compensación, costo por hora, bill rate, loaded cost o salary en el DTO de desempeño.
@@ -254,9 +254,18 @@ Usar tono es-CL/tuteo operativo:
 
 - "Mi desempeno"
 - "Actividad del periodo"
-- "Senales Nexa"
+- "Nexa Insights"
 - "Este periodo aun esta en curso"
 - "Todavia no hay cierres para calcular calidad"
+
+UX writing rules for the implementation:
+
+- Header subtitle must name the job of the screen in one idea: metrics + Nexa Insights for the selected period.
+- KPI helper text must be specific to the metric state; avoid generic encouragement like "vas bien" without an operational next step.
+- Partial-period copy must say values can change when new closures arrive; never imply final scoring while the period is open.
+- `Nexa Insights` advisory copy must say it is an operational personal reading, not an HR process or formal action source.
+- `Stuck Assets` should remain in English when used as the canonical indicator; Spanish helper text can explain what to prioritize.
+- Score rails and chart tooltips must include the unit/context (`/100 score`, closures, percent) so color is never the only meaning.
 
 Evitar:
 
@@ -264,6 +273,96 @@ Evitar:
 - "calificacion"
 - "bajo rendimiento"
 - "aprobado/reprobado"
+
+### Product Design visual direction
+
+Direccion preferida: `Tablero de foco personal`.
+
+Referencia visual seleccionada por el operador:
+
+- `docs/mockups/TASK-1027/my-performance-tablero-foco-personal-reference.png`
+
+La vista debe sentirse como un dashboard self-service de coaching operativo, no como una inspeccion admin ni una evaluacion HR. Debe conservar la densidad enterprise de Greenhouse/Vuexy, pero ordenar la lectura para que el colaborador entienda primero "donde estoy, que significa, y que puedo mirar ahora".
+
+#### First fold
+
+Orden obligatorio de lectura:
+
+1. Header compacto:
+   - Titulo: "Mi desempeno".
+   - Selector mes/ano.
+   - Chip de estado del periodo: `En curso`, `Cerrado`, `Sin datos`, `Datos parciales` o `Datos degradados`.
+   - Accion secundaria icon-only para refrescar; no usar primary CTA porque V1 es read-only.
+2. Resumen de foco:
+   - Tres senales accionables, en una banda o grid superior:
+     - "On-Time Delivery" (`OTD%`).
+     - "First Time Right" (`FTR%`).
+     - "Throughput" / "Cycle Time" / "Pipeline Velocity" segun dato disponible.
+   - Cada senal debe mostrar valor, estado y microcopy breve de coaching.
+   - Null debe renderizar como `Sin cierres`, `Sin medicion` o copy equivalente; nunca como `0`.
+3. Nexa Insights:
+   - Ubicacion: inmediatamente despues del resumen de foco y antes de charts profundos.
+   - Titulo: "Nexa Insights".
+   - Subcopy orientativo: "Lectura operativa para ayudarte a priorizar el periodo."
+   - Debe usar menciones seguras: chips no navegables por defecto en `/my`.
+   - Puede tener segmented control `Resumen` / `Historial` si hay timeline.
+4. Metricas ICO:
+   - Grid de KPIs para `RpA`, `OTD%`, `FTR%`, `Throughput`, `Cycle Time` y `Stuck Assets`.
+   - Usar zonas/tonos semaforicos solo cuando el valor existe y la zona corresponde al valor mostrado.
+5. Tendencia:
+   - Dos cards principales: `OTD%` y `FTR%`.
+   - Reusar la doctrina de mes cerrado de `PersonActivityTab`: el headline no debe mezclar selected period parcial con tendencia mensual cerrada.
+6. Actividad del periodo:
+   - Chips: tareas totales, completadas, activas y carry-over.
+   - Alert honesta para periodo en curso, cierres pendientes o fuente degradada.
+7. Charts profundos:
+   - Radar: "Salud operativa".
+   - Secundario: distribucion CSC o velocidad pipeline segun disponibilidad.
+   - El radar debe cerrar con un rail compacto de scores normalizados, no con labels sueltos debajo del grafico. En desktop debe evitar truncar `Throughput`, `Execution` y `Discipline`; en mobile puede usar un rail horizontal desplazable para no crear una lista vertical pesada.
+
+#### Desktop composition
+
+```text
+[Mi desempeno + selector periodo + status]
+[Resumen de foco: 3 senales accionables]
+[Nexa Insights]
+[KPIs ICO]
+[OTD trend] [FTR trend]
+[Actividad del periodo]
+[Radar salud operativa] [Distribucion CSC / Velocidad]
+```
+
+#### Mobile composition
+
+```text
+Header
+Periodo/status
+Resumen de foco
+Nexa Insights
+KPIs en 2 columnas
+Tendencias
+Actividad
+Charts
+```
+
+#### Visual rules
+
+- Base surface Greenhouse neutral; no hero marketing, no gradientes decorativos, no cards dentro de cards.
+- Cards con border sutil y radio <= 8px, alineadas con `DESIGN.md`.
+- Iconos Tabler/lucide-equivalent dentro de botones y avatars, no SVG custom si existe icono.
+- Charts con altura estable y label accesible cercano; informacion importante nunca solo por color.
+- Microcopy breve; evitar parrafos largos dentro de KPI cards.
+- Los nombres de indicadores y nombres canonicos de producto/surface deben mantenerse en ingles canonico (`Nexa Insights`, `On-Time Delivery`, `First Time Right`, `Throughput`, `OTD%`, `FTR%`); el coaching, helper text y estados pueden ir en es-CL.
+- Period controls deben seguir alcanzables en mobile.
+- El bloque Nexa debe verse advisory y operacional, no "AI spectacle".
+
+#### Microinteractions and motion rules
+
+- Usar transiciones suaves y sobrias: entrada escalonada de cards, hover lift leve, cambios de estado con `AnimatePresence` o equivalente y feedback visible al refrescar.
+- Toda animacion debe respetar reduced-motion; el contenido no puede depender de movimiento para entenderse.
+- El segmented control `Resumen` / `Historial` de Nexa debe transicionar sin salto de layout y conservar foco/keyboard affordances.
+- El refresh debe ser icon-only, con tooltip, rotacion/progress breve y estado `aria-live` al completar.
+- Los charts y score rails deben tener dimensiones estables; hover/transiciones no deben mover el layout ni truncar nombres canonicos.
 
 ### Data states
 
@@ -326,7 +425,7 @@ Sin flag por defecto — additive improvement to an existing self-service route.
 
 ## Acceptance Criteria
 
-- `/my/performance` renders a rich self-service activity dashboard with Nexa insights, KPIs, trends and charts when data exists.
+- `/my/performance` renders a rich self-service activity dashboard with Nexa Insights, KPIs, trends and charts when data exists.
 - `/api/my/performance` never accepts or honors a target member identifier from the client.
 - DTO tests prove restricted cost/compensation fields are absent.
 - Nexa mention rendering in `/my/performance` is safe for collaborator access.

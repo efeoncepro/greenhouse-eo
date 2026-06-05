@@ -19,6 +19,20 @@ Por pedido del operador se formalizo primero la arquitectura y luego la task par
 - **Skills usadas:** `product-design-architect-2026`, `greenhouse-product-ui-architect`, `software-architect-2026`, `greenhouse-ux-content-accessibility`, `greenhouse-task-planner`, `greenhouse-documentation-governor`.
 - **Verificacion docs:** `pnpm task:lint --changed` OK, `git diff --check` OK, `pnpm docs:closure-check` OK.
 
+# Sesion 2026-06-05 (cont.) — TASK-1027 mockup enterprise + GVC microinteractions
+
+Se documento la direccion Product Design aprobada para `/my/performance` y se creo un prototipo runtime de referencia, sin promover aun la vista productiva.
+
+- **Referencia aprobada guardada:** `docs/mockups/TASK-1027/my-performance-tablero-foco-personal-reference.png`.
+- **Task actualizada:** `docs/tasks/to-do/TASK-1027-my-performance-rich-self-service-activity.md` ahora fija la direccion "Tablero de foco personal", nombres canonicos de indicadores/product surface en ingles (`Nexa Insights`, `On-Time Delivery`, `First Time Right`, `Throughput`, `OTD%`, `FTR%`, `Stuck Assets`, etc.), composicion responsive, reglas de UX writing y reglas de microinteraccion/reduced-motion.
+- **Mockup runtime:** `/my/performance/mockup` con `src/views/greenhouse/my/performance/mockup/MyPerformanceMockupView.tsx`, data tipada, copy en `src/lib/copy/my-performance.ts`, Recharts radar, Apex donut CSC y reuso de `MetricTrendCard` para OTD/FTR.
+- **Microinteracciones:** entrada escalonada, hover lift sutil, refresh icon-only con progress + `aria-live`, transicion `Resumen`/`Historial` Nexa con `AnimatePresence`, y rail compacto bajo radar para evitar labels sueltos/no enterprise.
+- **UX writing pass:** subtitulo de una idea, advisory sin lenguaje evaluativo (`procesos HR` en vez de evaluaciones), partial state honesto, helper text especifico por metrica, `Stuck Assets` canonico y score units visibles (`/100 score`).
+- **GVC:** scenario `scripts/frontend/scenarios/my-performance-self-service-mockup.scenario.ts`; ultima captura verde `.captures/2026-06-05T18-33-52_my-performance-self-service-mockup` (desktop + mobile, 16 frames, incluye refresh y transicion Nexa). Frame de charts revisado: desktop sin truncamientos y mobile con score rail horizontal compacto.
+- **Verificacion:** `pnpm exec eslint ...MyPerformanceMockupView.tsx`, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm task:lint --changed`, `pnpm fe:capture my-performance-self-service-mockup --env=local` OK.
+- **No cerrar TASK-1027 aun:** sigue `to-do` hasta implementar DTO real anti-IDOR, safe mentions, runtime `/my/performance`, tests API/UI y GVC sobre colaborador real. No se agrego changelog/manual porque es mockup/prototipo, no feature productiva.
+- **Cuidado multi-agente:** el worktree tambien muestra cambios staged/untracked de `TASK-489` (`docs/tasks/in-progress/TASK-489...` + migracion `20260605182316120...`); no son de este prototipo y no deben mezclarse en un commit de TASK-1027.
+
 # Sesion 2026-06-05 (cont.) — TASK-1021 ✅ Admin Viewer runtime completo (3 superficies, GVC verde)
 
 Promoción del mockup aprobado del Workforce Contracting Studio a runtime real. **En `develop`, sin branch** (instrucción del operador "mantente en develop"). **3 superficies admin entregadas + GVC-verificadas (0 violaciones axe)**. El Collaborator Viewer es TASK-1022.
