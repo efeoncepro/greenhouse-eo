@@ -242,6 +242,11 @@ export interface ContractingDraftContent {
   source: string
   structuredContent: WorkforceContractingStructuredContent | null
   validation: WorkforceContractingValidationResult | null
+  // TASK-1024 — case-level signature state for the send-to-signature CTA + status display.
+  caseStatus: string
+  pdfAssetId: string | null
+  signedPdfAssetId: string | null
+  signatureRequestId: string | null
 }
 
 /**
@@ -257,11 +262,18 @@ export const getLatestContractingDraftContent = async (caseId: string): Promise<
     source: string
     structured_content_json: WorkforceContractingStructuredContent | Record<string, unknown> | null
     validation_snapshot_json: WorkforceContractingValidationResult | null
+    case_status: string
+    pdf_asset_id: string | null
+    signed_pdf_asset_id: string | null
+    signature_request_id: string | null
   }>(
-    `SELECT draft_id, draft_version, status, source, structured_content_json, validation_snapshot_json
-     FROM greenhouse_hr.workforce_contracting_drafts
-     WHERE case_id = $1
-     ORDER BY draft_version DESC
+    `SELECT d.draft_id, d.draft_version, d.status, d.source,
+            d.structured_content_json, d.validation_snapshot_json,
+            c.status AS case_status, c.pdf_asset_id, c.signed_pdf_asset_id, c.signature_request_id
+     FROM greenhouse_hr.workforce_contracting_drafts d
+     JOIN greenhouse_hr.workforce_contracting_cases c ON c.case_id = d.case_id
+     WHERE d.case_id = $1
+     ORDER BY d.draft_version DESC
      LIMIT 1`,
     [caseId]
   )
@@ -281,7 +293,11 @@ export const getLatestContractingDraftContent = async (caseId: string): Promise<
     status: rows[0].status,
     source: rows[0].source,
     structuredContent,
-    validation: rows[0].validation_snapshot_json
+    validation: rows[0].validation_snapshot_json,
+    caseStatus: rows[0].case_status,
+    pdfAssetId: rows[0].pdf_asset_id,
+    signedPdfAssetId: rows[0].signed_pdf_asset_id,
+    signatureRequestId: rows[0].signature_request_id
   }
 }
 

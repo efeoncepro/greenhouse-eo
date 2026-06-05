@@ -28,6 +28,7 @@ interface Props {
   caseId: string | null
   canApprove: boolean
   canManage: boolean
+  canSendSignature: boolean
   onChanged: () => void
 }
 
@@ -40,7 +41,7 @@ type SectionRow = {
   parity: 'ok' | 'missing'
 }
 
-const BilingualReviewDesk = ({ caseId, canApprove, canManage, onChanged }: Props) => {
+const BilingualReviewDesk = ({ caseId, canApprove, canManage, canSendSignature, onChanged }: Props) => {
   const theme = useTheme()
   const [content, setContent] = useState<ContractingDraftContent | null>(null)
   const [loading, setLoading] = useState(false)
@@ -96,6 +97,27 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, onChanged }: Props
   const blockers = content?.validation?.blockers ?? []
   const parityStatus = content?.validation?.languageParity?.status ?? 'unknown'
 
+  // TASK-1024 — signature state derived from the case status.
+  const caseStatus = content?.caseStatus ?? null
+  const signedPdfAssetId = content?.signedPdfAssetId ?? null
+  const canSend = canSendSignature && caseStatus === 'ready_for_signature' && Boolean(content?.pdfAssetId)
+
+  const signatureStatus = useMemo<{ label: string; status: 'pending' | 'success' | 'error' } | null>(() => {
+    if (caseStatus === 'sent_for_signature' || caseStatus === 'partially_signed') {
+      return { label: C.review.signatureStatusSent, status: 'pending' }
+    }
+
+    if (caseStatus === 'fully_signed' || caseStatus === 'registered_external' || caseStatus === 'active') {
+      return { label: C.review.signatureStatusSigned, status: 'success' }
+    }
+
+    if (caseStatus === 'signature_failed' || caseStatus === 'expired') {
+      return { label: C.review.signatureStatusFailed, status: 'error' }
+    }
+
+    return null
+  }, [caseStatus])
+
   const handleApprove = useCallback(async () => {
     if (!content) return
     setBusy(true)
@@ -143,6 +165,31 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, onChanged }: Props
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : C.review.generatePdfError)
+    } finally {
+      setBusy(false)
+    }
+  }, [caseId, onChanged, load])
+
+  const handleSendToSignature = useCallback(async () => {
+    if (!caseId) return
+    setBusy(true)
+
+    try {
+      const res = await fetch(`/api/hr/workforce/contracting/${encodeURIComponent(caseId)}/send-to-signature`, {
+        method: 'POST'
+      })
+
+      if (!res.ok) {
+        const payload = (await res.json().catch(() => ({}))) as { error?: string }
+
+        throw new Error(payload.error || C.review.sendToSignatureError)
+      }
+
+      toast.success(C.review.sentToSignature)
+      onChanged()
+      void load(caseId)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : C.review.sendToSignatureError)
     } finally {
       setBusy(false)
     }
@@ -357,32 +404,72 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, onChanged }: Props
 
       <Card sx={{ position: 'sticky', bottom: 16, zIndex: 2, boxShadow: theme.shadows[8], border: `1px solid ${theme.palette.divider}` }}>
         <CardContent sx={{ py: 2 }}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='flex-end' spacing={1.5}>
-            {canManage ? (
-              <Button variant='outlined' color='error' disabled={busy} onClick={handleVoid} startIcon={<i className='tabler-ban' aria-hidden='true' />}>
-                {C.actions.void}
-              </Button>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            justifyContent={signatureStatus ? 'space-between' : 'flex-end'}
+            alignItems={{ xs: 'stretch', sm: 'center' }}
+            spacing={1.5}
+          >
+            {signatureStatus ? (
+              <OperationalStatusBadge
+                label={signatureStatus.label}
+                tone={signatureStatus.status === 'success' ? 'success' : signatureStatus.status === 'error' ? 'error' : 'info'}
+                icon={
+                  signatureStatus.status === 'success'
+                    ? 'tabler-circle-check'
+                    : signatureStatus.status === 'error'
+                      ? 'tabler-alert-triangle'
+                      : 'tabler-clock'
+                }
+              />
             ) : null}
-            {canManage ? (
-              <Button
-                variant='outlined'
-                disabled={busy || content?.status !== 'approved_for_pdf'}
-                onClick={handleGeneratePdf}
-                startIcon={busy ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-file-type-pdf' aria-hidden='true' />}
-              >
-                {busy ? C.review.generating : C.generatePdf}
-              </Button>
-            ) : null}
-            {canApprove ? (
-              <Button
-                variant='contained'
-                disabled={busy || blockers.length > 0}
-                onClick={handleApprove}
-                startIcon={busy ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-circle-check' aria-hidden='true' />}
-              >
-                {busy ? C.review.approving : C.review.approve}
-              </Button>
-            ) : null}
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+              {canManage ? (
+                <Button variant='outlined' color='error' disabled={busy} onClick={handleVoid} startIcon={<i className='tabler-ban' aria-hidden='true' />}>
+                  {C.actions.void}
+                </Button>
+              ) : null}
+              {signedPdfAssetId ? (
+                <Button
+                  variant='outlined'
+                  onClick={() => window.open(`/api/assets/private/${encodeURIComponent(signedPdfAssetId)}`, '_blank', 'noopener')}
+                  startIcon={<i className='tabler-download' aria-hidden='true' />}
+                >
+                  {C.review.downloadSigned}
+                </Button>
+              ) : null}
+              {canManage ? (
+                <Button
+                  variant='outlined'
+                  disabled={busy || content?.status !== 'approved_for_pdf'}
+                  onClick={handleGeneratePdf}
+                  startIcon={busy ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-file-type-pdf' aria-hidden='true' />}
+                >
+                  {busy ? C.review.generating : C.generatePdf}
+                </Button>
+              ) : null}
+              {canApprove ? (
+                <Button
+                  variant='contained'
+                  disabled={busy || blockers.length > 0}
+                  onClick={handleApprove}
+                  startIcon={busy ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-circle-check' aria-hidden='true' />}
+                >
+                  {busy ? C.review.approving : C.review.approve}
+                </Button>
+              ) : null}
+              {canSend ? (
+                <Button
+                  variant='contained'
+                  disabled={busy}
+                  onClick={handleSendToSignature}
+                  title={C.review.sendToSignatureHint}
+                  startIcon={busy ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-signature' aria-hidden='true' />}
+                >
+                  {busy ? C.review.sending : C.review.sendToSignature}
+                </Button>
+              ) : null}
+            </Stack>
           </Stack>
         </CardContent>
       </Card>

@@ -111,7 +111,19 @@ export const GH_WORKFORCE_CONTRACTING = {
     structuralParity: 'Paridad estructural',
     generating: 'Generando PDF…',
     generatePdfDone: 'PDF generado.',
-    generatePdfError: 'No se pudo generar el PDF.'
+    generatePdfError: 'No se pudo generar el PDF.',
+    // TASK-1024 — send to electronic signature (ZapSign). The worker is the only e-signer; the
+    // employer representative's signature is already pre-stamped in the rendered PDF.
+    sendToSignature: 'Enviar a firma',
+    sending: 'Enviando a firma…',
+    sentToSignature: 'Enviado a firma. El colaborador recibirá un correo para firmar.',
+    sendToSignatureError: 'No se pudo enviar a firma.',
+    sendToSignatureHint:
+      'Se envía al colaborador para firma electrónica. La firma del representante de Efeonce ya está incorporada en el documento.',
+    signatureStatusSent: 'Pendiente de firma del colaborador',
+    signatureStatusSigned: 'Firmado por el colaborador',
+    signatureStatusFailed: 'La firma falló o expiró. Reenvía cuando el documento esté listo.',
+    downloadSigned: 'Descargar firmado'
   },
   // Modes not yet built (locked / honest)
   locked: {

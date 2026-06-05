@@ -34,6 +34,7 @@ const Page = async () => {
   const subject = buildTenantEntitlementSubject(tenant)
   const canManage = can(subject, 'workforce.contracting.manage', 'create', 'tenant')
   const canApprove = can(subject, 'workforce.contracting.approve', 'approve', 'tenant')
+  const canSendSignature = can(subject, 'workforce.contracting.send_signature', 'create', 'tenant')
 
   const [{ items }, operatingEntity] = await Promise.all([
     listContractingCases({ limit: 200 }),
@@ -45,6 +46,7 @@ const Page = async () => {
       items={items}
       canManage={canManage}
       canApprove={canApprove}
+      canSendSignature={canSendSignature}
       operatingEntityOrganizationId={operatingEntity?.organizationId ?? null}
     />
   )

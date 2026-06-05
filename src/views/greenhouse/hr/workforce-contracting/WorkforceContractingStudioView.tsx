@@ -42,6 +42,7 @@ interface Props {
   items: ContractingCaseListItem[]
   canManage: boolean
   canApprove: boolean
+  canSendSignature: boolean
   operatingEntityOrganizationId: string | null
 }
 
@@ -129,7 +130,7 @@ const MODE_LABELS: Record<StudioMode, { label: string; icon: string; capture: st
   review: { label: C.bilingualReview, icon: 'tabler-columns-3', capture: 'mode-review' }
 }
 
-const WorkforceContractingStudioView = ({ items, canManage, canApprove, operatingEntityOrganizationId }: Props) => {
+const WorkforceContractingStudioView = ({ items, canManage, canApprove, canSendSignature, operatingEntityOrganizationId }: Props) => {
   const theme = useTheme()
   const router = useRouter()
   const [mode, setMode] = useState<StudioMode>('command')
@@ -251,7 +252,7 @@ const WorkforceContractingStudioView = ({ items, canManage, canApprove, operatin
       ) : null}
 
       {mode === 'review' ? (
-        <BilingualReviewDesk caseId={selectedId} canApprove={canApprove} canManage={canManage} onChanged={() => router.refresh()} />
+        <BilingualReviewDesk caseId={selectedId} canApprove={canApprove} canManage={canManage} canSendSignature={canSendSignature} onChanged={() => router.refresh()} />
       ) : null}
     </Stack>
   )
