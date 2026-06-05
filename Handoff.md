@@ -1,3 +1,16 @@
+# Sesion 2026-06-05 (cont.) — TASK-1019 🚧 implementación iniciada (foundation)
+
+Por pedido del operador se inició la implementación de TASK-1019 (Workforce Contracting Studio Foundation), **en `develop` sin branch** (instrucción explícita). Es P1 → se llega hasta el Plan (FASE 4) y se para en checkpoint humano antes de escribir runtime.
+
+- **Lifecycle:** `to-do` → `in-progress`, archivo movido a `docs/tasks/in-progress/`, README sync. `develop` estaba limpio (HEAD == origin/develop, sin branch/PR conflictivo). Mockups de Codex ya commiteados (`f50ea61c6`).
+- **Open Questions bloqueantes resueltas pre-execution (con rationale en la task):**
+  - *Secret Anthropic:* no existía; creado `greenhouse-anthropic-api-key` en GCP Secret Manager (project `efeonce-group`, v1, probado HTTP 200 contra `claude-haiku-4-5-20251001`). Ref `ANTHROPIC_API_KEY_SECRET_REF`. ⚠️ key pegada en chat → rotar post-implementación (decisión operador).
+  - *Aprobación:* V0 unilateral del operador → `workforce.contracting.approve = EFEONCE_ADMIN` (no existe rol `legal`, colapso TASK-935). Firma legal del representante ya en repo (`src/assets/signatures/77357182-1.png`, helper `@/lib/legal-signatures`).
+  - *Observabilidad:* agregar `'workforce'` a `CaptureDomain` + subsystem rollup propio (signals `workforce.contracting.*`).
+  - *Formato firmable (ZapSign):* investigado — ZapSign acepta **PDF y DOCX** (premisa "solo DOCX" invertida). Estrategia canónica: Greenhouse/EPIC-001 renderiza el artefacto desde structured content y sube por `base64_*` (NO el template feature de ZapSign, que prohíbe imágenes/tablas y choca con el layout bilingüe + firma legal PNG). Foundation reserva dimensión `signable_format` (`docx`/`pdf`, default `pdf` Chile V1) + capability `workforce.contracting.generate_document` (gate de la acción, formato = parámetro).
+- **Anthropic canonizado:** providers de IA conviven en `src/lib/ai/` (Gemini texto + OpenAI imágenes); cliente Claude canónico **debe vivir en `src/lib/ai/anthropic.ts`** (no paralelo). Documentado en CLAUDE.md (nueva subsección "AI providers — texto/LLM") + AGENTS.md.
+- **Próximo paso:** FASE 1 Discovery (subagentes Explore) → Audit → Connections → Plan → STOP checkpoint humano (P1) antes de migración/código.
+
 # Sesion 2026-06-05 (cont.) — Workforce Contracting Studio ADR + TASK-1019 🆕
 
 Por pedido del operador se ideó la arquitectura para dos módulos complementarios de Workforce: **carta oferta** previa contratación y **contrato de trabajo**, con drafting asistido por Claude, aprobación humana, viewers colaborador/admin, PDF institucional, emails pre/post/pendiente de firma y firma vía ZapSign. Ajuste posterior del operador: **carta oferta y contrato deben existir siempre en español e inglés**.

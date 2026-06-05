@@ -459,7 +459,9 @@ No provider URL should be shown as source of truth.
 
 ## 7. PDF and Signature Architecture
 
-The PDF is a Greenhouse/Efeonce artifact, then ZapSign signs it.
+The signable artifact is a Greenhouse/Efeonce-rendered file, then ZapSign signs it.
+
+**Signable format (investigated 2026-06-05):** ZapSign accepts **both PDF and DOCX** on document creation via upload (`base64_pdf`/`url_pdf`, `base64_docx`/`url_docx`, plus `markdown_text`), 10MB max — PDF is NOT blocked. ZapSign also exposes a separate DOCX **template** feature (`POST /api/v1/templates/create`, `{{field}}` placeholders) whose official guidance is to **avoid images and tables**. Because our contracts use a side-by-side bilingual table layout and an embedded legal-representative signature image (`@/lib/legal-signatures`, TASK-863), Greenhouse does **not** use ZapSign's template feature. Canonical strategy: **Greenhouse/EPIC-001 renders the final signable file (DOCX or PDF) from approved structured content and uploads it via `base64_*` direct upload**; ZapSign is only the collaborator-signature provider. The render target is a dimension (`signable_format ∈ {docx, pdf}`) declared by the jurisdiction pack, not hardcoded. Chile V1 recommended default: `pdf` (reuses the proven `@react-pdf/renderer` + Efeonce footer/slogan + legal-signature PNG pipeline); `docx` stays available per pack. TASK-1019 only reserves this dimension + the `workforce.contracting.generate_document` capability; it renders nothing.
 
 Rules:
 

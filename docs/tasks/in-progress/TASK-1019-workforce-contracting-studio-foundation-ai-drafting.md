@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -194,19 +194,22 @@ Design/product constraints:
   - `workforce.contracting.manage`;
   - `workforce.contracting.ai_draft`;
   - `workforce.contracting.approve`;
+  - `workforce.contracting.generate_document`;
   - `workforce.contracting.reveal_sensitive`.
-- **Capability → runtime grant (mismo PR, invariante TASK-873/935):** sembrar una capability en el catalog SIN grant en `src/lib/entitlements/runtime.ts` = 403 para todos + rompe el guard `capability-grant-coverage.test.ts`. No existe rol `legal` en `ROLE_CODES`; el sign-off legal colapsa a `EFEONCE_ADMIN` (patrón anti-rol-fantasma TASK-935). Matriz **propuesta** (confirmar composición de aprobadores con operador/Legal — ver Open Questions):
+- **Capability → runtime grant (mismo PR, invariante TASK-873/935):** sembrar una capability en el catalog SIN grant en `src/lib/entitlements/runtime.ts` = 403 para todos + rompe el guard `capability-grant-coverage.test.ts`. Matriz **decidida (operador 2026-06-05)** — aprobación unilateral del operador en V0:
 
   | Capability | Roles (grant runtime) | Notas |
   | --- | --- | --- |
   | `workforce.contracting.read` | route_group `hr` ∪ `HR_MANAGER` ∪ `HR_PAYROLL` ∪ `EFEONCE_ADMIN` ∪ `FINANCE_ADMIN` | lectura cola/casos |
   | `workforce.contracting.manage` | route_group `hr` ∪ `HR_MANAGER` ∪ `EFEONCE_ADMIN` | crear/editar drafts |
   | `workforce.contracting.ai_draft` | `HR_MANAGER` ∪ `EFEONCE_ADMIN` | disparar draft Claude |
-  | `workforce.contracting.approve` | `HR_MANAGER` ∪ `FINANCE_ADMIN` ∪ `EFEONCE_ADMIN` | aprobación par bilingüe (HR/Legal/Finance; Legal = `EFEONCE_ADMIN`) |
+  | `workforce.contracting.approve` | **`EFEONCE_ADMIN`** (V0 — aprobación unilateral del operador) | aprobación del par bilingüe completo. NO multi-firma en V0; HR/Finance gates = follow-up si el volumen lo pide. |
+  | `workforce.contracting.generate_document` | `EFEONCE_ADMIN` | **gate de la acción** de generar el artefacto firmable (DOCX/PDF). Reservada en la foundation, ejercida por el render/signature consumer futuro (TASK-493). El formato (`docx`/`pdf`) es un parámetro, NO una capability aparte — se gatea la acción, no el formato. |
   | `workforce.contracting.reveal_sensitive` | `EFEONCE_ADMIN` ∪ `HR_MANAGER` | PII para drafting |
 
   Toda capability que se chequee vía `can()` en un endpoint DEBE estar en la matriz. Verificar que los roles citados existen en `src/config/role-codes.ts` antes de mergear (NO usar `DEVOPS_OPERATOR`, `HR_ADMIN` ni roles fantasma).
-- **Observabilidad:** no existe dominio Sentry `workforce`/`hr`/`documents` en `CaptureDomain` (`src/lib/observability/capture.ts`). Decidir en plan: (a) agregar `'workforce'` a `CaptureDomain` (additivo, recomendado por tamaño de EPIC-017) + subsystem rollup nuevo en el Reliability Control Plane, o (b) reusar `'payroll'`. Usar siempre `captureWithDomain(err, '<domain>', ...)`, nunca `Sentry.captureException` directo.
+- **Firma legal del representante:** el contrato/PDF (follow-up, no esta task) lleva la firma legal del operador, **ya presente en el repo** (`src/assets/signatures/77357182-1.png`, Efeonce Group SpA RUT 77.357.182-1), resuelta por el helper canónico `@/lib/legal-signatures` (TASK-863). No re-implementar resolución de firma.
+- **Observabilidad (decisión operador 2026-06-05):** agregar `'workforce'` a `CaptureDomain` (`src/lib/observability/capture.ts`, additivo) + subsystem rollup nuevo en el Reliability Control Plane para los signals `workforce.contracting.*`. Usar siempre `captureWithDomain(err, 'workforce', ...)`, nunca `Sentry.captureException` directo.
 - Add idempotent command skeletons:
   - `createWorkforceContractingCase`;
   - `createOfferDraft`;
@@ -221,6 +224,7 @@ Design/product constraints:
   - `CL_FOREIGNER_WORKING_IN_CHILE_V1`;
   - `INTERNATIONAL_INTERNAL_REMOTE_V1`.
 - Validators return structured blockers/warnings and source refs.
+- Cada jurisdiction pack declara `signableFormat: 'docx' | 'pdf'` y `signatureProvider: 'zapsign'` (ver Detailed Spec → "Signable render format + ZapSign"). Los validators NO renderizan, pero exponen los requisitos de formato firmable para que el render/signature consumer futuro no quede boxed-in.
 - Include minimum Chile contract clause checks from the architecture doc.
 - Add bilingual readiness checks:
   - both `es-CL` and `en-US` exist;
@@ -233,9 +237,11 @@ Design/product constraints:
 
 ### Slice 3 — Claude AI Drafting Adapter
 
+- **Cliente Anthropic canónico, NO paralelo:** el wrapper de Claude vive en `src/lib/ai/anthropic.ts`, junto a `src/lib/ai/google-genai.ts` (Gemini/Vertex) y `src/lib/ai/openai-image.ts` (OpenAI) — los tres providers conviven en `src/lib/ai/`. El módulo `src/lib/workforce/contracting/` **consume** ese cliente, no instancia su propio SDK. Patrón: `import 'server-only'`, secret server-only vía `resolveSecretByRef`, mirror de la forma de `openai-image.ts`/`google-genai.ts`.
 - Add provider wrapper for Claude drafting under a feature flag:
   - `WORKFORCE_CONTRACTING_AI_ENABLED=false` default.
-  - Secret resolution via `ANTHROPIC_API_KEY_SECRET_REF` or existing project-approved secret pattern discovered during plan.
+  - Secret **ya creado** `greenhouse-anthropic-api-key` (GCP Secret Manager, project `efeonce-group`), ref `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key` (registrar en Vercel en este slice). Resolución server-only vía `resolveSecretByRef`.
+  - Modelo: agregar id(s) Anthropic al shape `provider/model@version` (`anthropic/claude-*@default`) en `src/config/nexa-models.ts` (o config drafting dedicada si no debe aparecer en el picker Nexa de usuario). Para drafting legal preferir un modelo de mayor capacidad (p.ej. Opus/Sonnet 4.x) sobre Haiku.
 - Build deterministic input packet from allowed facts only.
 - Use structured output schema `workforce_contracting_ai_draft.v1`.
 - Require Claude output to include both `localizedDrafts['es-CL']` and `localizedDrafts['en-US']` plus `languageParity` metadata.
@@ -369,6 +375,40 @@ type WorkforceContractingValidationResult = {
 }
 ```
 
+### Signable render format + ZapSign (investigado 2026-06-05)
+
+**Hallazgo (corrige la premisa "ZapSign solo firma DOCX"):** ZapSign acepta **PDF *y* DOCX** (no solo DOCX) al crear documento vía upload, más `markdown_text`. Parámetros verbatim:
+
+- PDF: `url_pdf` o `base64_pdf`.
+- DOCX: `url_docx` o `base64_docx`.
+- Texto: `markdown_text`.
+- Límite: 10MB por archivo.
+
+Existe además el **DOCX template feature** (distinto del upload directo): subir un `.docx` con placeholders `{{campo}}` vía `POST /api/v1/templates/create` (`docx_url` o `base64_docx`) y luego generar el documento firmable con los datos llenados. **Caveat oficial de ZapSign para templates: "Avoid images and tables in the DOCX document, as they may interfere with proper functionality."**
+
+**Implicancia arquitectónica (por qué NO usamos el template feature de ZapSign):** nuestro contrato bilingüe usa (a) layout ES/EN lado a lado (tablas) y (b) la **firma legal del representante como imagen** (`src/assets/signatures/77357182-1.png`, TASK-863). Ambos chocan con el caveat "avoid images and tables". Por eso la estrategia canónica es:
+
+> **Greenhouse / EPIC-001 renderiza el artefacto firmable final** (DOCX o PDF) desde el structured content aprobado, y lo sube a ZapSign vía `base64_docx` / `base64_pdf` (upload directo, NO el template feature). Greenhouse mantiene control total de layout bilingüe + firma legal pre-estampada; ZapSign es solo provider de firma del colaborador.
+
+**Firma del documento (modelo V0):** la firma legal del representante (operador) va **pre-estampada** por el renderer (imagen PNG embebida, helper `@/lib/legal-signatures`); el colaborador firma electrónicamente vía ZapSign como signer. No hay rol `legal` separado (TASK-935): el operador es el firmante legal de la empresa.
+
+**Qué reserva la foundation (esta task) — sin renderizar ni llamar ZapSign:**
+
+- **Dimensión de formato firmable** en el contrato de caso/draft: campo `signable_format` enum `'docx' | 'pdf'` (declarado por el jurisdiction pack, no hardcodeado). Esto evita que el render/signature consumer futuro quede boxed-in a PDF.
+- **`signatureProvider`** reservado (`'zapsign'`) a nivel pack para que el adapter EPIC-001 (TASK-491) lo resuelva.
+- **Capability `workforce.contracting.generate_document`** (gate de la acción de generar; el formato es parámetro). Sembrada + grant `EFEONCE_ADMIN`, **dormant** hasta el render consumer.
+- Validators format-aware: exponen como warning/blocker si para el `signable_format` declarado faltan inputs de render (p.ej. firma legal ausente, secciones sin `sectionCode`), sin renderizar.
+
+**Decisión de formato para Chile V1 (a confirmar en el render consumer, NO en esta task):** `docx` es editable y ZapSign-friendly, pero hoy el render institucional Efeonce (TASK-863, finiquitos) es **PDF vía `@react-pdf/renderer`** y ya resuelve firma legal + branding + tablas. Recomendación: **default `pdf`** para Chile V1 (reusa el pipeline `@react-pdf/renderer` + footer/eslogan Efeonce + firma legal PNG ya probados), y dejar `docx` disponible vía la dimensión `signable_format` para jurisdicciones/casos que lo requieran. Si se elige `docx`, el render consumer necesita una lib DOCX nueva (p.ej. `docx` npm) — no existe en el repo hoy.
+
+**Out of scope reafirmado:** TASK-1019 NO genera DOCX ni PDF, NO sube nada a ZapSign, NO crea signature requests. Solo reserva la dimensión de formato, la capability y el contrato para que el consumer futuro (TASK-489/490/491/493) lo ejerza.
+
+**Fuentes ZapSign (validadas 2026-06-05):**
+
+- Create document via upload (formatos `base64_pdf`/`url_pdf`/`base64_docx`/`url_docx`/`markdown_text`, 10MB): `https://docs.zapsign.com.br/english/documentos/criar-documento`
+- Add document base64 DOCX (SDK): `https://docs.zapsign.com.br/facilitadores/sdks/sdk-em-go/requisicoes-para-documentos/adicionar-documento-base64-docx`
+- Create template (DOCX) — placeholders `{{campo}}`, `POST /api/v1/templates/create`, caveat "avoid images and tables": `https://docs.zapsign.com.br/english/templates/create-template-docx`
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -475,9 +515,9 @@ Do not call Claude before deterministic input packet and validation shape exist.
 
 ## Open Questions
 
-- Which Anthropic secret naming convention is already approved in Greenhouse, if any?
-- **Composición de aprobadores:** ¿`workforce.contracting.approve` es una sola capability con checklist HR/Legal/Finance en metadata (lean V0, recomendado), o un modelo multi-firma con gates por rol (estilo segunda firma TASK-839)? El mockup pinta un checklist 3-way (HR/Legal/Finance). Sin rol `legal`, el sign-off legal recae en `EFEONCE_ADMIN` — confirmar con operador/Legal y, si se quiere un rol legal dedicado, decidir si se crea uno nuevo en `ROLE_CODES`.
-- **Dominio de observabilidad:** ¿agregar `'workforce'` a `CaptureDomain` + subsystem rollup propio en el Reliability Control Plane (recomendado por escala de EPIC-017), o reusar `'payroll'`/`'identity'`? Los signals del arch doc §10 son `workforce.contracting.*` y hoy no tienen subsystem.
+- ~~Anthropic secret naming~~ → **Resuelto 2026-06-05:** secret `greenhouse-anthropic-api-key` **creado** en GCP Secret Manager (project `efeonce-group`, version 1, probado HTTP 200 contra `claude-haiku-4-5-20251001`). Consumir server-only vía `resolveSecretByRef` con `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key` (registrar en Vercel al llegar a Slice 3). ⚠️ La key se pegó en chat → **rotar** y subir nueva version (`gcloud secrets versions add`).
+- ~~Composición de aprobadores~~ → **Resuelto 2026-06-05:** V0 aprobación unilateral del operador (`workforce.contracting.approve` = `EFEONCE_ADMIN`). Firma legal del representante ya en repo (`src/assets/signatures/77357182-1.png`). Multi-firma HR/Finance = follow-up.
+- ~~Dominio de observabilidad~~ → **Resuelto 2026-06-05:** agregar `'workforce'` a `CaptureDomain` + subsystem rollup propio.
 - What is the first legal entity/pilot cohort for production trial?
 - Should offer acceptance happen in Greenhouse self-service before ZapSign, or should the offer itself also be signed through ZapSign in V1?
 - Who are the required internal signers for Chile dependent contracts: legal representative only, HR, or dual signer?
