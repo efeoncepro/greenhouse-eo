@@ -72,6 +72,7 @@ describe('zapsign webhook dispatch cascade', () => {
   it('routes to the signature_requests aggregate (priority) and applies authoritative state', async () => {
     getSignatureRequestByProviderToken.mockResolvedValue({
       signatureRequestId: 'sig-1',
+      providerDocumentToken: 'tok-1',
       signedDocumentAssetId: null,
       sourceKind: 'contracting_case',
       sourceRef: 'wcc-1'
@@ -97,6 +98,7 @@ describe('zapsign webhook dispatch cascade', () => {
   it('downloads + stores the signed PDF in the vault when completed', async () => {
     getSignatureRequestByProviderToken.mockResolvedValue({
       signatureRequestId: 'sig-2',
+      providerDocumentToken: 'tok-2',
       signedDocumentAssetId: null,
       sourceKind: 'master_agreement',
       sourceRef: 'msa-9'

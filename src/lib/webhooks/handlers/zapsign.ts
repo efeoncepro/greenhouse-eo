@@ -4,11 +4,9 @@ import {
   getMasterAgreementBySignatureDocumentToken,
   syncMasterAgreementSignature
 } from '@/lib/commercial/master-agreements-store'
-import { zapSignSignatureAdapter } from '@/lib/integrations/zapsign/signature-adapter'
+import { applyZapSignStateToSignatureRequest } from '@/lib/integrations/zapsign/apply-state'
 import { captureWithDomain } from '@/lib/observability/capture'
-import { applyProviderSignatureUpdate } from '@/lib/signatures/commands'
 import { getSignatureRequestByProviderToken } from '@/lib/signatures/store'
-import type { SignatureRequest } from '@/lib/signatures/types'
 import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-assets'
 
 import { registerInboundHandler } from '../inbound'
@@ -48,46 +46,6 @@ const resolveLatestSignedAt = (payload: Record<string, unknown>): string | null 
     .sort()
 
   return signerDates.at(-1) ?? null
-}
-
-/**
- * Aggregate path (TASK-490). Re-fetch authoritative ZapSign state, persist the signed PDF into the
- * private vault (`signature_signed_document`) when present, and apply the status monotonically.
- */
-const applyToSignatureRequest = async (request: SignatureRequest, documentToken: string): Promise<void> => {
-  const state = await zapSignSignatureAdapter.getDocumentState(documentToken)
-
-  let signedDocumentAssetId = request.signedDocumentAssetId
-
-  if (state.signedFileUrl && !signedDocumentAssetId) {
-    const { bytes, mimeType } = await downloadSignedFile(state.signedFileUrl)
-
-    const stored = await storeSystemGeneratedPrivateAsset({
-      ownerAggregateType: 'signature_signed_document',
-      ownerAggregateId: request.signatureRequestId,
-      fileName: `${request.signatureRequestId}-signed.pdf`,
-      mimeType,
-      bytes,
-      actorUserId: 'system:zapsign',
-      metadata: {
-        source: 'zapsign_webhook',
-        documentToken,
-        sourceKind: request.sourceKind,
-        sourceRef: request.sourceRef
-      }
-    })
-
-    signedDocumentAssetId = stored.assetId
-  }
-
-  await applyProviderSignatureUpdate({
-    signatureRequestId: request.signatureRequestId,
-    providerStatus: state.status,
-    signers: state.signers,
-    signedDocumentAssetId,
-    providerPayload: state.rawPayload,
-    actor: 'system:zapsign'
-  })
 }
 
 /**
@@ -143,7 +101,7 @@ registerInboundHandler('zapsign', async (_inboxEvent, _rawBody, parsedPayload) =
     const signatureRequest = await getSignatureRequestByProviderToken(documentToken)
 
     if (signatureRequest) {
-      await applyToSignatureRequest(signatureRequest, documentToken)
+      await applyZapSignStateToSignatureRequest(signatureRequest)
 
       return
     }
