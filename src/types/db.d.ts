@@ -6648,6 +6648,10 @@ export interface GreenhouseHrWorkforceContractingCases {
   signable_format: Generated<string>;
   signature_provider: Generated<string>;
   /**
+   * TASK-1024 — the current EPIC-001 signature_request for this case (latest send). NULL until sent to signature.
+   */
+  signature_request_id: string | null;
+  /**
    * TASK-1023 (reserved, populated by TASK-1024) - signed PDF artifact returned by ZapSign.
    */
   signed_pdf_asset_id: string | null;

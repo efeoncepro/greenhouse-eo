@@ -987,6 +987,12 @@ export const EVENT_TYPES = {
   workforceContractingDraftApproved: 'workforce.contracting.draft_approved',
   workforceContractingReadyForPdf: 'workforce.contracting.ready_for_pdf',
   workforceContractingReadyForSignature: 'workforce.contracting.ready_for_signature',
+  // TASK-1024 — signature bridge. `sent_for_signature` (producer, operator CTA);
+  // `signature_completed`/`signature_failed` (reactive consumer of signature.request.*).
+  // TASK-1025 (emails) + TASK-1026 (registro DT) consumen estos.
+  workforceContractingSentForSignature: 'workforce.contracting.sent_for_signature',
+  workforceContractingSignatureCompleted: 'workforce.contracting.signature_completed',
+  workforceContractingSignatureFailed: 'workforce.contracting.signature_failed',
   // Future scheduler-emitted contract only (never emitted in TASK-1019).
   workforceContractingSignaturePendingOverdue: 'workforce.contracting.signature_pending_overdue',
   // TASK-490 — provider-neutral signature orchestration (EPIC-001).

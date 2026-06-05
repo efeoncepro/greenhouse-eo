@@ -62,6 +62,9 @@ type CaseRow = {
   pay_regime_snapshot: string | null
   payroll_via_snapshot: string | null
   legal_review_reference: string | null
+  pdf_asset_id: string | null
+  signed_pdf_asset_id: string | null
+  signature_request_id: string | null
   created_by_user_id: string | null
   voided_at: unknown
   void_reason: string | null
@@ -76,7 +79,8 @@ export const CASE_COLUMNS = `
   operating_entity_organization_id, jurisdiction_pack_code, required_languages,
   authoritative_language, signable_format, signature_provider, status,
   target_start_date, contract_type_snapshot, pay_regime_snapshot, payroll_via_snapshot,
-  legal_review_reference, created_by_user_id, voided_at, void_reason, metadata_json,
+  legal_review_reference, pdf_asset_id, signed_pdf_asset_id, signature_request_id,
+  created_by_user_id, voided_at, void_reason, metadata_json,
   created_at, updated_at
 `
 
@@ -99,6 +103,9 @@ export const mapCaseRow = (row: CaseRow): WorkforceContractingCase => ({
   payRegimeSnapshot: row.pay_regime_snapshot,
   payrollViaSnapshot: row.payroll_via_snapshot,
   legalReviewReference: row.legal_review_reference,
+  pdfAssetId: row.pdf_asset_id,
+  signedPdfAssetId: row.signed_pdf_asset_id,
+  signatureRequestId: row.signature_request_id,
   createdByUserId: row.created_by_user_id,
   voidedAt: toIso(row.voided_at),
   voidReason: row.void_reason,

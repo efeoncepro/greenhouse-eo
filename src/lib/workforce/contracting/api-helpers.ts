@@ -19,6 +19,7 @@ export type ContractingCapability =
   | 'workforce.contracting.approve'
   | 'workforce.contracting.generate_document'
   | 'workforce.contracting.reveal_sensitive'
+  | 'workforce.contracting.send_signature'
 
 export interface ContractingAuthResult {
   tenant: Awaited<ReturnType<typeof requireTenantContext>>['tenant']

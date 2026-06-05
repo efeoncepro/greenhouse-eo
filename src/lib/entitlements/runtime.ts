@@ -504,6 +504,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+    // TASK-1024 — enviar a firma electrónica. V0 = EFEONCE_ADMIN (mirror approve/generate_document;
+    // delegación a HR_MANAGER queda V1.1). Invariant TASK-873/935 (grant en el mismo PR que el seed).
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.send_signature',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.HR_MANAGER)) {

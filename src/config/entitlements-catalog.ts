@@ -1338,6 +1338,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-1024 — enviar un contrato/oferta aprobado a firma electrónica (ZapSign vía EPIC-001).
+    // Grant V0 = EFEONCE_ADMIN (mirror approve/generate_document). NUNCA seed sin grant en
+    // runtime.ts mismo PR (invariant TASK-873 + TASK-935).
+    key: 'workforce.contracting.send_signature',
+    module: 'workforce',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-891 Slice 3 — capability granular para reconciliar drift entre
     // runtime laboral del member y la relacion legal activa en Person 360.
     // Cierra la relacion legacy `employee` + abre nueva `contractor` en una

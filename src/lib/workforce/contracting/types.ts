@@ -100,6 +100,10 @@ export interface WorkforceContractingCase {
   payRegimeSnapshot: string | null
   payrollViaSnapshot: string | null
   legalReviewReference: string | null
+  // TASK-1023 — case-owned signable PDF (private asset); TASK-1024 — signed PDF + current request.
+  pdfAssetId: string | null
+  signedPdfAssetId: string | null
+  signatureRequestId: string | null
   createdByUserId: string | null
   voidedAt: string | null
   voidReason: string | null
