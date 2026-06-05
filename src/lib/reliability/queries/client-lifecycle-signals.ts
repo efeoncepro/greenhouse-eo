@@ -217,3 +217,72 @@ export const getClientLifecycleBlockerOverrideAnomalySignal = async (): Promise<
     return errorSignal(id, source, 'drift', 'Tasa de overrides de bloqueo', error)
   }
 }
+
+// 6. evidence_detected_not_marked (TASK-1017) — pasos auto-derivables aún `pending`
+//    en casos abiertos > 7 días cuya evidencia PG-queryable YA está presente: el drift
+//    "ya está listo pero nadie lo marcó". Solo evidencia PG (HubSpot/equipo/Teams/
+//    portal/facturación); Notion es BQ-dependiente y ya lo cubre el signal de TASK-1009
+//    (integrations.notion.onboarding_incomplete). Steady=0.
+export const getClientLifecycleEvidenceDetectedNotMarkedSignal = async (): Promise<ReliabilitySignal> => {
+  const id = 'client.lifecycle.evidence_detected_not_marked'
+  const source = 'getClientLifecycleEvidenceDetectedNotMarkedSignal'
+
+  try {
+    const count = await readCount(
+      `WITH candidates AS (
+         SELECT i.item_id, i.item_code, c.organization_id,
+                COALESCE(c.client_id, sp.client_id) AS client_id
+         FROM greenhouse_core.client_lifecycle_checklist_items i
+         JOIN greenhouse_core.client_lifecycle_cases c ON c.case_id = i.case_id
+         LEFT JOIN LATERAL (
+           SELECT s.client_id
+           FROM greenhouse_core.spaces s
+           WHERE s.organization_id = c.organization_id AND s.active = TRUE AND s.client_id IS NOT NULL
+           ORDER BY s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST
+           LIMIT 1
+         ) sp ON TRUE
+         WHERE c.case_kind = 'onboarding'
+           AND c.status IN ('in_progress', 'blocked')
+           AND i.status = 'pending'
+           AND c.created_at < NOW() - INTERVAL '7 days'
+       )
+       SELECT COUNT(*)::int AS n
+       FROM candidates cand
+       WHERE (cand.item_code = 'verify_hubspot_company_synced' AND EXISTS (
+                SELECT 1 FROM greenhouse_core.clients cl
+                WHERE cl.client_id = cand.client_id AND cl.hubspot_company_id IS NOT NULL))
+          OR (cand.item_code = 'assign_team_members' AND EXISTS (
+                SELECT 1 FROM greenhouse_core.client_team_assignments a
+                WHERE a.client_id = cand.client_id AND a.active = TRUE
+                  AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)))
+          OR (cand.item_code = 'provision_client_users_access' AND EXISTS (
+                SELECT 1 FROM greenhouse_core.client_users u
+                WHERE u.client_id = cand.client_id AND u.active = TRUE
+                  AND u.status IN ('active', 'invited')))
+          OR (cand.item_code = 'confirm_billing_setup' AND EXISTS (
+                SELECT 1 FROM greenhouse_finance.client_profiles p
+                WHERE (p.client_id = cand.client_id OR p.organization_id = cand.organization_id)
+                  AND p.payment_currency IS NOT NULL))
+          OR (cand.item_code = 'provision_communication_channels' AND EXISTS (
+                SELECT 1 FROM greenhouse_core.teams_notification_channels t
+                JOIN greenhouse_core.spaces s ON s.space_id = t.space_id
+                WHERE s.organization_id = cand.organization_id
+                  AND t.provisioning_status = 'ready' AND t.channel_id IS NOT NULL))`
+    )
+
+    return buildSignal(
+      id,
+      source,
+      'drift',
+      'Evidencia detectada sin marcar',
+      count === 0 ? 'ok' : 'warning',
+      count === 0
+        ? 'Sin pasos con evidencia detectada pendientes de marcar.'
+        : `${count} paso(s) con evidencia ya lista pero todavía sin marcar hace +7 días.`,
+      count,
+      'checklist_items pending (caso onboarding abierto >7d) cuya evidencia PG-queryable existe'
+    )
+  } catch (error) {
+    return errorSignal(id, source, 'drift', 'Evidencia detectada sin marcar', error)
+  }
+}

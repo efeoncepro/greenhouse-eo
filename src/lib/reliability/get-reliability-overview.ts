@@ -186,7 +186,8 @@ import {
   getClientLifecycleChecklistOrphanItemsSignal,
   getClientLifecycleCascadeDeadLetterSignal,
   getClientLifecycleCaseWithoutTemplateSignal,
-  getClientLifecycleBlockerOverrideAnomalySignal
+  getClientLifecycleBlockerOverrideAnomalySignal,
+  getClientLifecycleEvidenceDetectedNotMarkedSignal
 } from './queries/client-lifecycle-signals'
 import { getCommercialOrganizationIncompleteIdentitySignal } from './queries/commercial-organization-incomplete-identity'
 import { getCommercialOrganizationIndustryNoncanonicalSignal } from './queries/commercial-organization-industry-noncanonical'
@@ -1762,7 +1763,9 @@ export const getReliabilityOverview = async (
           getClientLifecycleChecklistOrphanItemsSignal().catch(() => null),
           getClientLifecycleCascadeDeadLetterSignal().catch(() => null),
           getClientLifecycleCaseWithoutTemplateSignal().catch(() => null),
-          getClientLifecycleBlockerOverrideAnomalySignal().catch(() => null)
+          getClientLifecycleBlockerOverrideAnomalySignal().catch(() => null),
+          // TASK-1017 — evidencia auto-derivable detectada pero el paso sigue sin marcar.
+          getClientLifecycleEvidenceDetectedNotMarkedSignal().catch(() => null)
         ])
           .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
