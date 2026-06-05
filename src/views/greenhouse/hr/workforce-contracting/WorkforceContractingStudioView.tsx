@@ -694,9 +694,8 @@ const CaseRailContent = ({ detail, theme, onReview }: { detail: ContractingCaseD
         <Button fullWidth variant='contained' onClick={() => onReview(detail.case.caseId)} startIcon={<i className='tabler-columns-3' aria-hidden='true' />}>
           {C.reviewBilingualDraft}
         </Button>
-        <Button fullWidth variant='outlined' disabled startIcon={<i className='tabler-file-type-pdf' aria-hidden='true' />}>
-          {C.generatePdf} · {C.locked.badge}
-        </Button>
+        {/* TASK-1023 — "Generar PDF" lives in the Bilingual Review Desk (opened by the action above),
+            where the draft is reviewed, approved and rendered in one flow. */}
       </Stack>
     </Stack>
   )

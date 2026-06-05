@@ -119,6 +119,35 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, onChanged }: Props
     }
   }, [content, onChanged, caseId, load])
 
+  const handleGeneratePdf = useCallback(async () => {
+    if (!caseId) return
+    setBusy(true)
+
+    try {
+      const res = await fetch(`/api/hr/workforce/contracting/${encodeURIComponent(caseId)}/generate-document`, { method: 'POST' })
+
+      if (!res.ok) {
+        const payload = (await res.json().catch(() => ({}))) as { error?: string }
+
+        throw new Error(payload.error || C.review.generatePdfError)
+      }
+
+      const data = (await res.json()) as { pdfAssetId?: string }
+
+      toast.success(C.review.generatePdfDone)
+      onChanged()
+      void load(caseId)
+
+      if (data.pdfAssetId) {
+        window.open(`/api/assets/private/${encodeURIComponent(data.pdfAssetId)}`, '_blank', 'noopener')
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : C.review.generatePdfError)
+    } finally {
+      setBusy(false)
+    }
+  }, [caseId, onChanged, load])
+
   const handleVoid = useCallback(async () => {
     if (!caseId) return
     const reason = window.prompt(C.actions.void + ' — motivo (mín. 5 caracteres):')?.trim()
@@ -334,9 +363,16 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, onChanged }: Props
                 {C.actions.void}
               </Button>
             ) : null}
-            <Button variant='outlined' disabled startIcon={<i className='tabler-file-type-pdf' aria-hidden='true' />}>
-              {C.generatePdf} · {C.locked.badge}
-            </Button>
+            {canManage ? (
+              <Button
+                variant='outlined'
+                disabled={busy || content?.status !== 'approved_for_pdf'}
+                onClick={handleGeneratePdf}
+                startIcon={busy ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-file-type-pdf' aria-hidden='true' />}
+              >
+                {busy ? C.review.generating : C.generatePdf}
+              </Button>
+            ) : null}
             {canApprove ? (
               <Button
                 variant='contained'

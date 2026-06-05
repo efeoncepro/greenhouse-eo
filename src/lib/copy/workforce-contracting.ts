@@ -108,7 +108,10 @@ export const GH_WORKFORCE_CONTRACTING = {
     voided: 'Caso anulado.',
     voidError: 'No se pudo anular.',
     voidConfirm: 'reason',
-    structuralParity: 'Paridad estructural'
+    structuralParity: 'Paridad estructural',
+    generating: 'Generando PDF…',
+    generatePdfDone: 'PDF generado.',
+    generatePdfError: 'No se pudo generar el PDF.'
   },
   // Modes not yet built (locked / honest)
   locked: {
