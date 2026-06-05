@@ -181,7 +181,7 @@ const OnboardingCasesInboxView = ({
             {T.breadcrumbClients}
           </Typography>
         </Stack>
-        <Typography variant='h4' sx={{ fontWeight: 800, letterSpacing: 0 }}>
+        <Typography variant='h3' sx={{ fontWeight: 800, letterSpacing: 0 }}>
           {T.title}
         </Typography>
         <Typography variant='body1' color='text.secondary' sx={{ mt: 1, maxWidth: 720 }}>
