@@ -8,6 +8,14 @@
 - Epic: Workforce Contracting Studio (ADR `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` §8 "Admin Viewer", §12.4)
 - Created: 2026-06-05
 
+## Progress (2026-06-05, en `develop` sin push)
+
+- **Slice 0 — Governance ✅** (commits `556347410` + `e5bf9f74f` + `735a2fa1b`): migración `20260605150932572` (viewCode `equipo.workforce_contracting` + 4 grants efeonce_admin/finance_admin/hr_manager/hr_payroll) **aplicada + verificada live**; nav item "Contratos laborales" bajo HR/Supervisión gated por `canSeeView`; copy `GH_HR_NAV` (es) + `navigation-copy` (en); registrado también en el TS `VIEW_REGISTRY` (view-access-catalog) para paridad. `/hr/workforce/contracts` top-level → alcanzable (sin reachability entry).
+- **Slice 1 — Command Center runtime ✅** (commit `75bd66066`): page (gate viewCode + reader) + `WorkforceContractingStudioView` consumiendo `listContractingCases` + detail rail vía GET `/api/hr/workforce/contracting/[caseId]`. Header + 5 KPIs computados + queue filtrable + detail rail (status, projection, blockers, drafts, timeline real). 12-state honesto (empty zero/filtered, loading skeleton, error+retry, degraded `—`). Builder/Review = locked "Próximamente". PDF/firma = locked (EPIC-001). tsc 0 · eslint 0 · 155 tests focales. **GVC empty-state PASS** (chrome enterprise, agent auth pasa el gate).
+- **Slice 2 — Guided Builder (create wizard + mutations createCase/createDraft, ai-draft flag-gated)** — PENDIENTE.
+- **Slice 3 — Bilingual Review Desk (structuredContent del draft + approveDraft + void)** — PENDIENTE (requiere extender un reader para el cuerpo ES/EN por sección).
+- GVC poblado (queue + detail rail con data) sigue naturalmente cuando existan casos (Slice 2 los crea).
+
 ## Why
 
 La foundation (TASK-1019) entregó dominio + readers product-shaped (`listContractingCases`, `getContractingCaseDetail`) + commands (`createCase`, `createOffer/EmploymentContractDraft`, `approveDraft`, `voidCase`) + capabilities + el **mockup aprobado** (`/hr/workforce/contracts/mockup`), pero **no hay UI runtime**. Esta task promueve el mockup a runtime real consumiendo los readers, vía **copy-and-patch** + loop GVC (paridad `fe:capture:diff` contra el mockup). **No depende de EPIC-001** — las acciones de PDF/firma se renderizan como estados `locked` ("Próximamente") hasta que aterricen TASK-1023/1024.
