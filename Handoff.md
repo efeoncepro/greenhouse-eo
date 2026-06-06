@@ -1,3 +1,20 @@
+# Sesion 2026-06-06 — Greenhouse command microinteraction primitives
+
+Por pedido del operador de continuar primitives de microinteracciones aparte de loaders, se empezó con commands puntuales: accion async + feedback post-accion.
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseAsyncActionButton.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato:** estados `idle`, `loading`, `success`, `error`; labels por estado; `aria-live`, `aria-busy` en loading, `data-state`, reduced-motion, proteccion contra doble submit por default y polish enterprise (sombra/focus/pressed/spinner estable).
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseCommandFeedback.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato:** tonos `success`, `error`, `warning`, `info`, `retrying`; `role=status` o `role=alert` para error; CTA opcional; timestamp/reference id; compact mode.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseStateTransition.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato:** tonos `success`, `warning`, `error`, `info`, `neutral`; variants funcionales `surface` e `inline`; `fromLabel -> toLabel`; title/description/timestamp/reference id; `role=status` o `role=alert` para error; live region y reduced-motion.
+- **Uso esperado:** commands puntuales como guardar, enviar, aprobar, generar, validar o reintentar; transiciones visibles de row/card/panel como pendiente→aprobado, esperando callback→sincronizado o progreso→bloqueado. No reemplaza procesos largos multi-step, timelines de auditoria completos ni confirmaciones destructivas/legales/financieras.
+- **Lab interno:** `/admin/design-system/microinteractions`, enlazado desde `/admin/design-system`, gateado por `administracion.design_system`.
+- **Scenario GVC:** `design-system-microinteractions`.
+- **GVC final:** `.captures/2026-06-06T23-35-31_design-system-microinteractions` desktop + mobile, `qualityFindings=[]`, revisado visualmente.
+- **Gates verdes:** eslint focal, vitest focal de primitives (18/18), `gtimeout 150s pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm design:lint`, `pnpm docs:closure-check` (warning advisory esperado por UI visible + GVC/docs cubiertos), `git diff --check`.
+- **Pendiente:** commit+push por pedido del operador. Hay cambios ajenos activos de TASK-1043; no mezclarlos.
+
 # Sesion 2026-06-06 — Sistema de tipografía CERRADO end-to-end (TASK-1038 + 4 follow-ups, pusheado)
 
 Arco completo del sistema de tipografía sobre el SoT de TASK-1036. **Todo shipped + pusheado a develop**; TASK-1038 y sus 4 follow-ups **cerrados** (`complete`). Estado final:

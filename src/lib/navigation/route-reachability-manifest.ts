@@ -125,6 +125,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Loading Lab (TASK-1037) — child surface del Design System, alcanzable desde la referencia interna de tokens AXIS sin mezclar loaders en la pagina canonica de color.'
   },
   {
+    route: '/admin/design-system/microinteractions',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Microinteractions Lab — child surface del Design System para primitives de feedback de comandos async, alcanzable desde la card "Ver microinteracciones" en DesignSystemView.'
+  },
+  {
     route: '/admin/design-system/typography',
     parent: '/admin/design-system',
     via: 'inline-link',

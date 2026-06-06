@@ -39,6 +39,7 @@ const contrast = (a: string, b: string) => {
 const RAMP_STEPS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const
 const OPACITY_STEPS = [8, 16, 24, 32, 38] as const
 const LOADING_LAB_ROUTE = '/admin/design-system/loaders'
+const MICROINTERACTIONS_LAB_ROUTE = '/admin/design-system/microinteractions'
 const TYPOGRAPHY_ROUTE = '/admin/design-system/typography'
 
 const BRAND: { key: AxisColorFamily; label: string }[] = [
@@ -232,6 +233,41 @@ const DesignSystemView = () => (
           endIcon={<i className='tabler-arrow-right' />}
         >
           Ver loaders
+        </Button>
+      </CardContent>
+    </Card>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Laboratorios
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Microinteracciones de acciones
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Subseccion interna para revisar feedback de comandos async, retry, exito/error y proteccion contra doble submit.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={MICROINTERACTIONS_LAB_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-click' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver microinteracciones
         </Button>
       </CardContent>
     </Card>

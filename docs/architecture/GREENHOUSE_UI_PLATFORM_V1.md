@@ -1,7 +1,9 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.18
+> **Version:** 1.20
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-06 — v1.20: Greenhouse agrega `GreenhouseStateTransition` como primitive de microinteraccion para cambios de estado visibles en rows, cards y panels (`from -> to`, tonos semanticos, live region, reduced-motion). Lab interno: `/admin/design-system/microinteractions`.
+> **Updated:** 2026-06-06 — v1.19: Greenhouse agrega `GreenhouseAsyncActionButton` y `GreenhouseCommandFeedback` como primitives de microinteraccion para commands puntuales: progreso del command + resultado persistente post-accion. Lab interno: `/admin/design-system/microinteractions`.
 > **Updated:** 2026-06-06 — v1.18b: cada variant oficial de `GreenhouseLoadingSurface` queda expuesta tambien como componente nombrado reusable (`GreenhouseDocumentPipelineLoader`, `GreenhouseExternalHandoffLoader`, etc.) para migrar consumers sin depender de strings de variant.
 > **Updated:** 2026-06-06 — v1.18: `GreenhouseLoadingSurface` agrega variants enterprise orientadas a workflows operativos: `documentPipeline`, `externalHandoff`, `secureAction`, `uploadVerification` y `reconciliationMatching`, y refina `aiThinking` con checkpoints internos. Implementacion: `TASK-1037`.
 > **Updated:** 2026-06-06 — v1.17: Greenhouse agrega `GreenhouseLoadingSurface` como primitive canonica inicial para loading states modernos y abre el **Loading Lab** interno como child route de design system en `/admin/design-system/loaders`. Variants V1: `pageSkeleton`, `panelSkeleton`, `tableSkeleton`, `inlineAction`, `brandSplash`, `aiThinking`, `progressRail`. Implementacion: `TASK-1037`.
@@ -28,6 +30,33 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-06e — Greenhouse Command Microinteractions
+
+Greenhouse adopta `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback` y `GreenhouseStateTransition` como primitives iniciales de microinteracciones para commands puntuales y cambios de estado visibles. Cubren la clase repetida de botones con `isSaving`, `isSubmitting`, `submitting`, `CircularProgress` inline, labels locales, toasts efimeros, feedback post-accion inconsistente y rows/cards que cambian de estado sin señal clara.
+
+Docs canonicos:
+
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseAsyncActionButton.tsx`
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseCommandFeedback.tsx`
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseStateTransition.tsx`
+- Visual lab interno: `/admin/design-system/microinteractions`
+- Scenario GVC: `design-system-microinteractions`
+
+Contrato:
+
+- Estados oficiales: `idle`, `loading`, `success`, `error`.
+- Props principales: `children`, `loadingLabel`, `successLabel`, `errorLabel`, `state`, `startIcon`, `disableWhileLoading`, `reserveWidth`, `statusLabel`.
+- La primitive owns `aria-live='polite'`, `aria-busy` en loading, `data-state`, proteccion contra doble submit por default y reduced-motion para la microinteraccion visual.
+- Usar para commands puntuales: guardar, enviar, aprobar, generar, validar, refrescar, reintentar.
+- `GreenhouseCommandFeedback` cubre el resultado persistente post-accion con tonos `success`, `error`, `warning`, `info`, `retrying`, `role='status'` o `role='alert'` para errores, CTA opcional, timestamp y reference id.
+- Usar `CommandFeedback` cuando el usuario necesita saber que ocurrio, que referencia quedo registrada, o que hacer si falla/reintenta. No reemplaza un toast global; lo complementa cuando el resultado debe permanecer visible en el contexto.
+- `GreenhouseStateTransition` cubre cambios visibles de estado con tonos `success`, `warning`, `error`, `info`, `neutral`; variants funcionales `surface` e `inline`; `fromLabel`, `toLabel`, title, description, timestamp/reference id, `role='status'` o `role='alert'` para errores, `aria-live` y reduced-motion.
+- Usar `StateTransition` cuando un row, card, inspector o panel cambia de estado y el usuario necesita ver de donde venia, donde quedo y con que referencia/timing. No reemplaza timelines de auditoria completos ni historiales permanentes.
+- No usar para procesos largos multi-step: usar `GreenhouseLoadingSurface`/loader nombrado, sidecar, drawer o progress rail segun contexto.
+- No usar para confirmaciones destructivas/legales/financieras que requieren decision explicita: usar `Dialog`/maker-checker y luego el boton async dentro de la accion confirmada.
+- Product consumers deben reemplazar patrones locales `startIcon={submitting ? <CircularProgress /> : ...}` por esta primitive cuando el boton modela un command puntual.
+- Nuevas variants visuales o semanticas deben iterarse en esta primitive y en el lab antes de crear `FooSubmitButton` locales.
 
 ## Delta 2026-06-06d — Greenhouse Loading Surface
 
