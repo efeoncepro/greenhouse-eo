@@ -76,26 +76,37 @@ Reglas:
 - No hay adapter de escala de roles para PDF ni email.
 - Componentes PDF/email hardcodean `fontSize`.
 
+## Decisiones pre/durante ejecución (2026-06-06)
+
+- **Derivación SoT sin copiar px del web** (Open Question resuelta): el SoT aporta el **set de roles + `fontWeight` + familia (display/text)**; el adapter posee su **rampa de tamaños** (`pt` PDF). NO se copian los px del web — la jerarquía de un doc legal denso (title/body ≈ 2.5x) no es proporcional a la del web (1.43x); un factor lineal regresaría los docs. El test pinea la derivación (peso + family-intent desde el SoT). Es exactamente la política canonizada "el SoT define los roles; cada adapter elige el tamaño apropiado a su medio".
+- **Email DESCOPEADO por el operador**: Geist no renderiza confiable en clientes de mail (solo Apple Mail; Gmail/Outlook/Yahoo caen al fallback). El operador decidió **dejar los emails como están** ("se ven bien, me da miedo tocarlos"). Además la familia de email ya estaba centralizada (`src/emails/constants.ts` `EMAIL_FONTS` + `EmailLayout`), así que el gap de gobernanza ahí ya era marginal. No se creó `getEmailTypography()` ni se tocó ningún email.
+- **Rol `titleLg`**: los docs financieros sobrios (comprobante, reporte) usan título en **Geist Bold** (familia text), NO el flourish Poppins de `pageTitle`/`display`. Se agregó el rol `titleLg` (text + bold, derivado de `fontWeights.bold`) para gobernarlos sin forzar cambio de familia.
+
 ## Scope
 
-### Slice 1 — PDF typography adapter
+### Slice 1 — PDF typography adapter — ✅ DONE
 
-- `getPdfTypography()` → `{ display, pageTitle, sectionTitle, body, caption, numeric, … }` con `{ fontSize (pt), fontFamily (familia registrada), fontWeight, … }` derivados del SoT (mapeo rem→pt para densidad de doc).
-- Tests (deriva del SoT, no hardcodea).
+- `getPdfTypography()` → roles `{ display, pageTitle, titleLg, sectionTitle, subtitle, label, body, bodyStrong, caption, micro, overline, numericId, numericAmount, kpiValue }` con `{ fontFamily (familia registrada), fontSize (pt), letterSpacing? }`. Peso + familia derivan del SoT; tamaño pt del medio. `pdfFamilyName(intent, weight)` mapea a la familia registrada — consume Geist SemiBold/ExtraBold de TASK-1040 (absorbe su Slice 2).
+- 11 tests pinean la derivación del SoT. Archivo: `src/lib/finance/pdf/pdf-typography.ts`.
 
-### Slice 2 — Migrar componentes PDF
+### Slice 2 — Migrar comprobante contractor (proof consumer) — ✅ DONE
 
-- Finiquito, recibo de nómina, comprobante contractor, reportes → consumir `getPdfTypography()`. Cierra TASK-1040 Slice 2 (familias 600/800).
-- GVC/visual review de cada PDF (loop con caso real, mirror TASK-863).
+- `generate-contractor-remittance-pdf.tsx` (TASK-960) consume `getPdfTypography()` (cero `'Geist Bold'` literal). Render real before/after verificado vía Read PDF: layout idéntico, sin reflow, neto levemente más prominente (kpiValue=ExtraBold por canon SoT). `REMITTANCE_TEMPLATE_VERSION` 2→3.
 
-### Slice 3 — Email typography adapter + migración
+### Slice 3 (REMANENTE) — Migrar PDFs densos/legales/alto-tráfico — ⏳ requiere loop GVC real-case
 
-- `getEmailTypography()` → objetos de estilo inline por rol (`px` + fallback). Migrar emails transaccionales. Preview endpoint para QA.
+- `generate-contractor-run-pdf.tsx` (reporte denso, tabla 8pt afinada para columnas A4 → riesgo de reflow), `document-pdf.tsx` (finiquito legal, 29 tamaños fraccionales = densidad fine-tuned), `generate-payroll-pdf.tsx` (recibo nómina, hoy Helvetica → Geist = cambio visible en cada payslip), reportes finance/payroll.
+- Cada uno requiere **render con caso real + revisión skills payroll/finance + verificar no-reflow / no-regresión legal** (mirror TASK-863). Mismo posture de riesgo que llevó a dejar los emails intactos. NO migrar sin el loop.
+
+### Slice 4 (DESCOPEADO) — ~~Email typography adapter~~
+
+- Cancelado por decisión del operador (ver Decisiones). Emails quedan como están.
 
 ## Out of Scope
 
 - Cambiar `register-fonts.ts` (ya tiene las familias).
 - Web/charts (ya gobernados).
+- Email (descopeado por el operador — emails intactos).
 
 ## Rollout Plan & Risk Matrix
 
@@ -108,24 +119,26 @@ Sin flag — additive (el adapter convive con los componentes no migrados). Roll
 
 ## Acceptance Criteria
 
-- [ ] `getPdfTypography()` + `getEmailTypography()` con tests (derivan del SoT).
-- [ ] Componentes PDF clave migrados + GVC con caso real sin regresión.
-- [ ] Emails transaccionales clave migrados + preview QA.
-- [ ] `pnpm test` + `pnpm tsc --noEmit` + `pnpm build` verdes.
+- [x] `getPdfTypography()` con tests (deriva del SoT). _(email descopeado por operador)_
+- [x] ≥1 componente PDF migrado + verificación de render real sin regresión (comprobante contractor).
+- [ ] PDFs densos/legales/alto-tráfico migrados + loop GVC real-case _(remanente — Slice 3)_.
+- [x] `pnpm tsc --noEmit` verde para los archivos tocados; tests focales verdes.
 
 ## Verification
 
-- `pnpm test src/lib/finance/pdf src/lib/email`
-- Render real de PDFs (finiquito, recibo, comprobante) + preview de emails
-- `pnpm vitest run src/lib/payroll` (no-regresión EPIC-013/finiquito)
+- ✅ `pnpm vitest run src/lib/finance/pdf/pdf-typography.test.ts` (11) + remittance PDF test (5).
+- ✅ Render real del comprobante (before/after, Read PDF) — sin reflow, layout idéntico.
+- Pendiente (Slice 3): render real de finiquito/recibo/reportes + `pnpm vitest run src/lib/payroll` (no-regresión EPIC-013/finiquito) antes de migrarlos.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado + archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` + registry sincronizados
-- [ ] cerrar TASK-1040 (su Slice 2 queda absorbido aquí)
-- [ ] `Handoff.md` / `changelog.md`
+- Task queda **in-progress**: foundation (adapter) + proof consumer entregados; migración de PDFs densos/legales remanente (Slice 3) requiere loop real-case.
+- [x] `docs/tasks/README.md` + registry sincronizados (in-progress).
+- [ ] cerrar TASK-1040 (su Slice 2 — familias 600/800 — ya tiene consumidor canónico vía `pdfFamilyName`; el cierre formal de TASK-1040 puede hacerse ahora).
+- [x] `Handoff.md` / `changelog.md`.
 
 ## Follow-ups
 
+- **Slice 3**: migrar finiquito + recibo nómina + reporte de corrida + reportes finance al adapter, con loop GVC real-case (render + skills payroll/finance + no-reflow). Promovible a task derivada si el operador prefiere trackearlo aparte.
 - Si emergen más medios (export Excel, certificados), reusar el patrón SSOT + adapter.
+- Email: si en el futuro se quiere gobernar la escala de email desde el SoT, hacerlo con Poppins (display) + body system-safe (Geist NO en email) — decisión ya tomada, solo falta ejecutar si se reabre.

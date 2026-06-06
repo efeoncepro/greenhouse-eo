@@ -30082,3 +30082,24 @@ Resuelto el "draft huérfano" (caso Valentina `EO-CENG-0001`): el onboarding (Ca
 - Wizard refleja estado real (activo/retenido), no "Borrador" fijo.
 - 3 commits Slice 1/2/3. Gates: tsc/lint 0 · contractor+payroll+offboarding 728 verde · `pnpm build` (en curso al cierre).
 - **No pusheado**: el operador está testeando en staging (`dev-greenhouse`); para que el fix llegue allí hay que push a `develop` (auto-deploy). Pendiente: (1) push, (2) confirmar fecha real de Valentina (01-05 vs 01-06) + monto, (3) re-onboardear Valentina en staging → el heal la activa.
+
+---
+
+## 2026-06-06 — TASK-1043 Typography PDF adapter (in-progress, develop)
+
+Trabajo directo en `develop` por instrucción del operador (sin branch). P3, domain ui. Realiza la política canonizada "PDF/email = un SSOT semántico + adapter por medio" — **solo el medio PDF**; el email quedó descopeado por el operador.
+
+**Entregado (S1 + S2)**:
+- `src/lib/finance/pdf/pdf-typography.ts` — `getPdfTypography()` adapter: roles semánticos (display/pageTitle/titleLg/sectionTitle/subtitle/label/body/bodyStrong/caption/micro/overline/numericId/numericAmount/kpiValue) en `pt`. El **peso + la familia** (display=Poppins / text=Geist) **derivan del SoT** (`typographyScale`/`fontWeights`/`fontFamilies`); el **tamaño pt es propio del medio** (doc legal denso, NO se copia del web). `pdfFamilyName(intent, weight)` mapea a la familia registrada en `register-fonts.ts` — consume **Geist SemiBold/ExtraBold de TASK-1040** (absorbe su Slice 2). 11 tests pinean la derivación.
+- `generate-contractor-remittance-pdf.tsx` (comprobante de remesa TASK-960) migrado a consumir el adapter (cero `'Geist Bold'` literal). **Render real before/after verificado vía Read PDF**: layout idéntico, sin reflow, una página, neto verde levemente más prominente (kpiValue=ExtraBold por canon SoT KPI=800). `REMITTANCE_TEMPLATE_VERSION` 2→3.
+
+**Decisiones del operador (mid-task)**:
+- **Email descopeado**: Geist no renderiza confiable en clientes de mail (solo Apple Mail; Gmail/Outlook/Yahoo caen al fallback). El operador decidió dejar los emails como están ("se ven bien, me da miedo tocarlos"). Además la familia de email ya estaba centralizada (`EMAIL_FONTS` + `EmailLayout`). NO se creó `getEmailTypography()` ni se tocó ningún email.
+- Open Question resuelta: el adapter deriva del SoT el **set de roles + peso + familia**, NO los px (la jerarquía de un doc legal denso no es proporcional al web → un factor lineal regresaría los docs).
+
+**Remanente (Slice 3, NO migrado — requiere loop GVC real-case mirror TASK-863)**:
+- `generate-contractor-run-pdf.tsx` (tabla densa 8pt afinada a columnas A4 → riesgo reflow), `document-pdf.tsx` (finiquito legal, 29 tamaños fraccionales), `generate-payroll-pdf.tsx` (recibo nómina, hoy Helvetica → cambio visible en cada payslip), reportes finance/payroll. Mismo posture de riesgo que dejó los emails intactos: NO migrar sin render con caso real + skills payroll/finance + verificación no-reflow.
+
+**Validación**: `pnpm exec tsc --noEmit` exit 0 · `pnpm exec vitest run src/lib/finance/pdf src/lib/contractor-engagements/remittance` 68/68 · eslint OK archivos tocados · render real comprobante before/after sin regresión.
+
+**Estado**: task **in-progress** — foundation (adapter) + proof consumer entregados; migración de PDFs densos/legales remanente. **TASK-1040 Slice 2** ya tiene consumidor canónico de sus familias 600/800 vía `pdfFamilyName` (su cierre formal puede hacerse ahora). Pendiente decisión del operador: ¿continúo Slice 3 (loop real-case) o se trackea aparte?
