@@ -9,6 +9,8 @@ import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Typography from '@mui/material/Typography'
 
+import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
+
 // Live-theme preview: real MUI components colored by the AXIS-wired palette.
 // Verifies contrastText + Alert/Chip/Button rendering against the live theme (TASK-1034).
 
@@ -28,9 +30,10 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 
 const ThemePreviewMockupView = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 1100, mx: 'auto' }}>
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+      <AxisWordmark variant='full' height={40} />
       <Typography variant='h4' sx={{ fontWeight: 700 }}>
-        Theme vivo — semánticos AXIS (mockup)
+        Theme vivo — semánticos (mockup)
       </Typography>
       <Typography variant='body2' color='text.secondary'>
         Componentes MUI reales coloreados por el palette (no swatches). Verifica contrastText, alerts y chips

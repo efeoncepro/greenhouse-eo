@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography'
 
 import { axisRamp, axisOpacity, axisNeutral, axisMain } from '@core/theme/axis-tokens'
 import type { AxisColorFamily } from '@core/theme/axis-tokens'
+import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 
 // --- WCAG contrast helpers (mockup-local; the audit lives here, not in the theme) ---
 const channel = (c: number) => {
@@ -146,9 +147,10 @@ const NeutralPanel = ({ mode }: { mode: 'light' | 'dark' }) => {
 
 const AxisPaletteMockupView = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 1100, mx: 'auto' }}>
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+      <AxisWordmark variant='full' height={44} />
       <Typography variant='h4' sx={{ fontWeight: 700 }}>
-        Paleta AXIS completa en Greenhouse (mockup)
+        Paleta completa de colores (mockup)
       </Typography>
       <Typography variant='body2' color='text.secondary'>
         Render fiel de todos los tokens de color de AXIS (ramps 100→900 + opacity 8/16/24/32/38 + neutrales light/dark),
