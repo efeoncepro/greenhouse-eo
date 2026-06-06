@@ -5,8 +5,12 @@
 > **Autor:** Claude (sesión TASK-1034 adopción paleta AXIS — el audit emergió al robustecer DESIGN.md)
 > **Alcance:** sistema de tipografía completo — `DESIGN.md` (contrato agente) ↔ `src/components/theme/mergedTheme.ts` (runtime) ↔ `src/@core/theme/**` (Vuexy core, read-only) ↔ `GREENHOUSE_DESIGN_TOKENS_V1.md`
 > **Disparador:** pregunta del operador — "¿la deuda es solo en labels o en TODO lo de tipografía?"
-> **Estado:** **deuda confirmada y caracterizada. NO resuelta en este audit** (fuera del scope de TASK-1034 = color). Requiere task dedicada.
+> **Estado:** **RESUELTO** — TASK-1036 (fundación SoT + drift-guard + bridge, no-op) + **TASK-1038** (rediseño de escala = la remediación §6 aplicada: page-title 16→20 arregla la inversión, ladder 11→8, subtitle2/tab/dialog gobernados). Ver `docs/tasks/in-progress/TASK-1038-typography-scale-redesign.md`.
+>
+> **Hallazgos adicionales del completeness pass (incorporados a TASK-1038):** `subtitle2` no eran 3 consumidores sino **~267** (y es 13/**400** = body-sm, NO label-sm 13/600 — error de modelo corregido); PDF registra Geist solo 400/500/700 → **faltan 600/800** que la escala usa (caen a Helvetica); tipografía de **charts** sin mapear (~47 archivos); **text measure** (~65ch) ausente; ~1.351 `fontSize` inline (mayoría íconos). Decisiones transversales canonizadas (i18n/fluid/display/PDF-email/truncation/charts/measure) + follow-up rol peso 500.
 > **Regla operativa:** seguimos robusteciendo DESIGN.md en paralelo; ESTA deuda debe resolverse en su propia task (no parchear dentro de TASK-1034).
+>
+> **Corrección post-implementación (importante — el audit sobre-dimensionó L2 y L3):** al verificar TASK-1036 contra el runtime real, el coretheme Vuexy (`src/@core/theme/typography.ts`) **SÍ** define los `fontSize` de h5/h6/button/subtitle1 y `mergedTheme` los hereda por `deepmerge` — el runtime YA coincidía con el contrato. NO había "drift activo" (§2/§4); la deuda real era de **gobernanza** (valor fuera del SoT de Greenhouse, sin guard). Y los "magic numbers" de control-text de §5 son casi todos tamaños de **ícono** (Button icon 14/16/20, Chip avatar/icon 13/15) o estructurales (input legend 0.867em), **no texto**; el control-texto ya estaba tokenizado (Button small/medium = body2/button, Chip = body2) y el único magic number de texto real era `<Button size="large">` 17px. **La remediación robusta de §6 se aplicó completa** (SoT `typographyScale` + `TYPOGRAPHY_VARIANT_BRIDGE` + `controlText` + drift-guard `typography-drift.test.ts`), con S0/S1/S2 **no-op visual** (único delta: overline lh 1.16667→1.167, button lh 1.467→1.5, sub-pixel línea única; Button-large 17px sin cambio).
 
 ---
 

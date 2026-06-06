@@ -47,17 +47,17 @@ typography:
     lineHeight: 1.25
   page-title:
     fontFamily: Poppins
-    fontSize: 1rem
+    fontSize: 1.25rem
     fontWeight: 600
     lineHeight: 1.4
   section-title:
     fontFamily: Geist
-    fontSize: 1.125rem
+    fontSize: 1rem
     fontWeight: 600
     lineHeight: 1.5
   label-md:
     fontFamily: Geist
-    fontSize: 0.9375rem
+    fontSize: 0.875rem
     fontWeight: 600
     lineHeight: 1.5
   body-lg:
@@ -282,22 +282,44 @@ Use the scale semantically:
 
 - `page-title` for product page titles
 - `section-title` for section headers inside cards and drawers
+- `label-lg` / `label-md` / `label-sm` for control / bold-label text (16 / 15 / 13px). `label-md` is the canonical control label (the `button` variant); `label-lg` and `label-sm` are the larger / smaller steps of the same label scale
 - `body-lg` for primary readable copy
 - `body-md` for dense product UI copy, table cells, and helpers
 - `body-sm` for metadata and timestamps
 - `overline` for compact uppercase labels above values
 
-> **Pending typography reconciliation (tracked: TASK-1036, audit
-> `docs/audits/design-tokens/TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md`):**
-> the control-text/label scale is not yet fully modeled here. Only `label-md`
-> ships as a contract token today; `label-lg` / `label-sm` were intentionally
-> NOT added with invented values because they have no runtime backing yet
-> (control text sizing lives as per-component sizes — `<Button size>`, Chip —
-> in the read-only `@core` overrides, not a shared token). The full
-> `label-lg/md/sm` scale + a typography source-of-truth + a contract↔runtime
-> drift-guard will be (re-)introduced **corrected, with real backing** by
-> TASK-1036. Until then, for control text use the MUI idiom (`<Button>`,
-> `<Chip>`) — do not hardcode `fontSize` inline.
+### Source of truth + contract↔runtime bridge (TASK-1036)
+
+Typography has one Source of Truth in code: `typographyScale` in
+`src/components/theme/typography-tokens.ts` (primitives → composed tokens, the
+mirror of the AXIS color SoT). The runtime theme (`mergedTheme.ts`) and this
+contract both derive from it; `src/components/theme/typography-drift.test.ts`
+fails CI if runtime, contract, or the SoT diverge.
+
+This contract uses semantic names; the runtime keeps standard MUI variant names.
+The mapping is **code, not a manual table** — `TYPOGRAPHY_VARIANT_BRIDGE`
+(verified in CI):
+
+| Contract token | MUI variant |
+|---|---|
+| `headline-display/lg/md`, `page-title` | `h1` / `h2` / `h3` / `h4` |
+| `section-title` | `h5` |
+| `label-md` | `button` |
+| `body-lg/md/sm` | `body1` / `body2` / `caption` |
+| `overline` | `overline` |
+| `numeric-id` / `numeric-amount` / `kpi-value` | `monoId` / `monoAmount` / `kpiValue` |
+
+Notes:
+
+- `label-lg` (16px) and `label-sm` (13px) are SoT tokens of the label scale with
+  no dedicated MUI variant — apply them through the matching control (`<Button>`,
+  `<Chip>`), never with `fontSize` inline.
+- Control text is owned by the SoT too: the only control-text size not already a
+  typography token is `<Button size="large">` (17px = `controlText.lg`,
+  intentionally one step above `label-lg`). `subtitle1` is the live `subheader`
+  token; `h6` reuses the `label-md` value (inline bold label).
+- The icon glyph sizes inside controls (Button/Chip icons, input legend) are not
+  typography — they live in the read-only Vuexy `@core` overrides.
 
 ## Layout
 

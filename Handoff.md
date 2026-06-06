@@ -1,3 +1,43 @@
+# Sesion 2026-06-06 — TASK-1038 typography scale redesign IMPLEMENTADO (TO-BE aprobado, local-first, sin push)
+
+Continuacion de TASK-1036. El operador aprobo el TO-BE tras ver el impacto en `/admin/design-system/typography/mockup` (documento canonico: primitivas → escala → aplicaciones → bridge → propuesta → 10 transversales → gobernanza, vivo desde el SoT). Implementado directo (sin flag), **local-first, sin push**.
+
+- **Cambio VISUAL real:** la escala era acumulada — inversion (page-title 16 < section-title 18), goteo de 1px (7 tamanos en 6px), sobre-granularidad. Flip en `typographyScale`: **page-title 16→20** (arregla inversion), **section-title 18→16**, subheader/subtitle1 15→14, **label-md/button 15→14**, controlText.md 15→14, controlText.lg 17→16. Ladder 11→**8**. 0 nuevos, 0 renombrados.
+- **subtitle2** (13/400, ~267 consumidores) → `body-sm` en `SECONDARY_VARIANT_TOKENS` + override mergedTheme. **Tab** 18px → controlText.md 14. **Dialog title** h6 → section-title 16/600.
+- **Parity 3 capas:** SoT + mergedTheme + DESIGN.md (page-title 1.25rem / section-title 1rem / label-md 0.875rem) + V1 §3.2 + Delta v1.7. **drift-guard 37 verde**, design:lint 0/0/1, `pnpm local:check` verde, ningun test depende de valores viejos.
+- **GVC** `/admin/design-system` light: page-title domina, section-titles subordinadas — inversion arreglada, sin breakage. (Tipografia mode-independent: dark no cambia tamanos.)
+- **No perder contexto:** pointer en `CLAUDE.md` ("Typography System") con SoT/runtime/guard/contrato/mockup/escala/reglas/politicas/follow-ups. **Politicas transversales canonizadas:** i18n Latin-first + RTL-ready (logical props), tipo fijo en producto / clamp solo marketing, no display tier sin consumidor, PDF/email = un SSOT + adapters, truncation, charts del SoT, body ~65ch.
+- **Arquitectura:** DESIGN.md refleja runtime (Opcion A) + drift-guard enforce `runtime ≡ SoT ≡ DESIGN.md` → el TO-BE NO podia ir a DESIGN.md antes del flip; van juntos. El mockup es el "museo" visual; las reglas viven en DESIGN.md/V1/CLAUDE.md.
+- **Follow-ups:** rol semantico para peso 500; adapter PDF (Geist 600/800 faltan → Helvetica en PDF); adapter charts del SoT; lint rule `no-fontSize-inline` icon-vs-text; cleanup cap 5 del mockup.
+- **Pendiente:** **push** (todo local; tree con TASK-1036 + TASK-1037 sin commitear — coordinar untangle). Spec: `docs/tasks/in-progress/TASK-1038-typography-scale-redesign.md`.
+
+# Sesion 2026-06-06 — TASK-1037 Greenhouse Loading Primitive System (Slice 1)
+
+Por pedido del operador de construir loaders modernos sin limitarse a microinteracciones pobres existentes, se creo `TASK-1037` y se implemento la primera base de plataforma.
+
+- **Task:** `docs/tasks/in-progress/TASK-1037-greenhouse-loading-primitive-system.md` (P1, UI platform/design-system/accessibility).
+- **Primitive:** `GreenhouseLoadingSurface` en `src/components/greenhouse/primitives/GreenhouseLoadingSurface.tsx`, exportada desde el barrel.
+- **Variants V1:** `pageSkeleton`, `panelSkeleton`, `tableSkeleton`, `inlineAction`, `brandSplash`, `aiThinking`, `progressRail`.
+- **Loading Lab:** `/admin/design-system/loaders` aloja el laboratorio interno como child surface del Design System; `/admin/design-system` queda como canon AXIS con link hacia loaders. Sigue gateado por `administracion.design_system`; clientes no lo ven.
+- **Regla de plataforma:** reutilizar stack Greenhouse no significa heredar loaders mediocres. Para route/panel/table/IA/brand loading, extender la primitive antes de crear otro loader local; `CircularProgress` queda tolerado solo para casos puntuales inline mientras se migra.
+- **GVC final:** `.captures/2026-06-06T18-12-28_design-system` desktop + mobile y `.captures/2026-06-06T18-13-15_design-system-loaders` desktop + mobile, `qualityFindings=[]`.
+- **Gates verdes:** `pnpm vitest run src/components/greenhouse/primitives/__tests__/GreenhouseLoadingSurface.test.tsx` (9/9), eslint focal, `pnpm route-reachability-gate --strict`, `pnpm design:lint`, `pnpm task:lint --task TASK-1037`, `pnpm docs:closure-check`, `git diff --check`.
+- **Verificacion no concluida:** `gtimeout 120s pnpm exec tsc --noEmit --pretty false` agoto timeout sin imprimir errores en esta pasada post-separacion; la pasada previa de Slice 1 habia estado verde.
+- **Pendiente:** Slice 2 pilotos (`/auth/landing/loading.tsx` brandSplash, un route skeleton, un estado IA/Nexa) + posible refinamiento visual tras feedback operador. No mover a complete todavia.
+
+# Sesion 2026-06-06 — TASK-1036 typography SoT + drift-guard (S0+S1, local-first, sin push)
+
+Spin-off de TASK-1034. Resuelve la deuda tipografica del audit `TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md` con el mismo patron que TASK-1034 uso para color (SoT + drift-guard). Trabajado **local-first, sin push** (espera confirmacion del operador). Task movida a `in-progress/`.
+
+**Reencuadre verificado contra el runtime real (importante — el audit que yo mismo escribi sobre-dimensiono L2):** el coretheme Vuexy `src/@core/theme/typography.ts` **SI** define los `fontSize` de `h5` (1.125rem), `h6`/`subtitle1`/`button` (0.9375rem) y `mergedTheme` los hereda por `deepmerge`. O sea el runtime YA coincidia con el contrato — NO habia "drift activo". La deuda real es de **gobernanza**: esos valores vivian en `@core` (read-only) fuera del SoT de Greenhouse y nada los pineaba (rompible en silencio en un upgrade de Vuexy). Por eso S0/S1 son **no-op visual** (ownership + guard), no fix de valores.
+
+- **S0 — SoT + rewire no-op + drift-guard.** Extendido `src/components/theme/typography-tokens.ts` (mismo archivo que `lineHeights`) con primitivos (`fontFamilies`/`fontWeights`/`fontSizes`/`letterSpacings`/`fontFeatures`) + `typographyScale` (SoT compuesto, keyed por nombre semantico del contrato) + `TYPOGRAPHY_VARIANT_BRIDGE` (contrato↔variante MUI, 1:1, como CODIGO no tabla manual). `mergedTheme` spread-ea el SoT para las variantes que ya seteaba explicito (h1-h4, body1/2, caption, overline, mono*, kpi). Nuevo `typography-drift.test.ts` (espejo de `axis-semantic-drift.test.ts`): pins del SoT + runtime≡SoT (construye el theme real via `createTheme(mergedTheme(...))`, mockeando `next/font/google`) + DESIGN.md front-matter≡SoT (parsea el YAML). Unico delta de valor en todo S0: `overline.lineHeight` 1.16667→1.167 (sub-pixel, alinea al contrato).
+- **S1 — ownership explicito + bridge completo.** `mergedTheme` ahora setea `h5`={...sectionTitle}, `h6`={...labelMd}, `subtitle1`={...subheader}, `button`={...labelMd, textTransform:none} desde el SoT — corta la dependencia silenciosa de `@core`. Agregado token runtime-only `subheader` (para subtitle1, 0.9375/400, sin equivalente en el contrato) + `SECONDARY_VARIANT_TOKENS` (h6 reusa label-md, fuera del bridge 1:1). Drift-guard extendido al bridge completo (14 tokens) + secundarios → **34 tests verdes**. Unico delta de valor en S1: `button.lineHeight` 1.467→1.5 (linea unica, sin efecto visible).
+- **Decisiones de diseño (AskUserQuestion del operador):** (1) reencuadre L2 confirmado (S0/S1 no-op de gobernanza); (2) L1 vocabulario = **bridge verificado en CI**, NO rename de variantes (blast-radius); (3) S2 = hacer SoT+override, GVC sweep, decidir flag tras mirar.
+- **Verificacion:** `pnpm vitest run src/components/theme/typography-drift.test.ts` = 34/34; `pnpm local:check` (lint full + tsc) verde; `pnpm design:lint` 0/0/1 (DESIGN.md sin tocar aun); sin tests del repo dependientes de valores de `theme.typography`.
+- **Archivos:** `src/components/theme/{typography-tokens.ts, mergedTheme.ts, typography-drift.test.ts}` + lifecycle (`docs/tasks/{in-progress}/TASK-1036-*.md`, README). **Nada commiteado/pusheado** — pendiente confirmacion del operador.
+- **PENDIENTE (checkpoint):** S2 (ramp control-text — Button large 17px / Chip 13/15px / input via mergedTheme; UNICO slice visible) requiere review visual GVC del operador + decision de flag + decision Button-large 17px vs label-lg 16px. Luego S3 (formalizar bridge L1) + S4 (re-incorporar `label-lg`/`label-sm` corregidos a DESIGN.md con respaldo real + sync V1 §3.2/§15.1).
+
 # Sesion 2026-06-06 — TASK-1034 canoniza la paleta AXIS como superficie interna `/admin/design-system`
 
 Por pedido del operador ("mas que mockup quiero canonizarlo" + "esto no tienen que verlo los clientes"), el mockup de paleta completa se promovio a una superficie real gobernada **INTERNA**. Commit `9437dbe7c` en `develop`.

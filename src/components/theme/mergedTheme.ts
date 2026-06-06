@@ -27,8 +27,8 @@ import { resolveNeutralFragments } from '@core/theme/axis-neutrals'
 // build-time rollout flag (NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED, default OFF).
 import { resolveSecondaryPalette } from '@core/theme/axis-secondary'
 
-// Greenhouse typography tokens (v1.3+) — line-height namespace canónico
-import { lineHeights } from './typography-tokens'
+// Greenhouse typography tokens — line-height namespace (v1.3+) + scale SoT (TASK-1036)
+import { controlText, lineHeights, typographyScale } from './typography-tokens'
 
 const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['direction']) => {
   // AXIS neutral fragments (Slice 3) — flag-gated; OFF = legacy navy bit-for-bit.
@@ -109,89 +109,74 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       }
     },
     typography: {
-      // Typography foundation — TASK-566 / EPIC-004 (Delta 2026-05-01 tarde: pivot a Geist + namespace v1.3)
+      // Typography foundation — TASK-566 / EPIC-004 (pivot a Geist + namespace v1.3),
+      // reconciliada a un Source of Truth único en TASK-1036.
       // Geist Sans = product UI base (body, forms, tables, controls, KPIs, IDs, amounts).
       // Poppins = display only, restricted to h1-h4.
       // monoId / monoAmount stay as semantic variants but use Geist + tabular-nums
       // (NO monospace family, NO Geist Mono).
-      // line-heights consumen `lineHeights` tokens — cero magic numbers.
-      // Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3 (v1.3).
+      // Cada variant spreadea su token de `typographyScale` (SoT) — cero magic numbers
+      // de fontSize/fontWeight/familia/line-height inline. El bridge contrato↔variante
+      // (`TYPOGRAPHY_VARIANT_BRIDGE`) y los valores los pinea `typography-drift.test.ts`.
+      // Source of truth: src/components/theme/typography-tokens.ts + DESIGN.md §Typography.
       fontFamily:
         "var(--font-geist), 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-      h1: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
-        fontWeight: 800,
-        fontSize: '2rem',
-        lineHeight: lineHeights.heading
-      },
-      h2: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
-        fontWeight: 700,
-        fontSize: '1.5rem',
-        lineHeight: lineHeights.heading
-      },
-      h3: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
-        fontWeight: 600,
-        fontSize: '1.25rem',
-        lineHeight: lineHeights.heading
-      },
-      h4: {
-        fontFamily: "var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif",
-        fontWeight: 600,
-        fontSize: '1rem',
-        lineHeight: lineHeights.pageTitle
-      },
-      h5: {
-        fontWeight: 600,
-        lineHeight: lineHeights.body
-      },
-      h6: {
-        fontWeight: 600,
-        lineHeight: lineHeights.body
-      },
-      subtitle1: {
-        lineHeight: lineHeights.body
-      },
-      body1: {
-        fontSize: '1rem',
-        lineHeight: lineHeights.body
-      },
-      body2: {
-        fontSize: '0.875rem',
-        lineHeight: lineHeights.body
-      },
-      caption: {
-        fontSize: '0.8125rem',
-        lineHeight: lineHeights.metadata
-      },
+      h1: { ...typographyScale.headlineDisplay },
+      h2: { ...typographyScale.headlineLg },
+      h3: { ...typographyScale.headlineMd },
+      h4: { ...typographyScale.pageTitle },
+      // h5 / h6 / subtitle1 / button — ownership explícito desde el SoT (TASK-1036 S1).
+      // Antes heredaban su fontSize del coretheme Vuevy read-only (= mismo valor);
+      // ahora el SoT es la fuente. Único delta sub-pixel: button.lineHeight 1.467→1.5
+      // (línea única, sin efecto visible). h6 reusa el valor de label-md (label inline-bold).
+      h5: { ...typographyScale.sectionTitle },
+      h6: { ...typographyScale.labelMd },
+      subtitle1: { ...typographyScale.subheader },
+      // subtitle2 — TASK-1038: variante MUI heavily-used (~267) traída al SoT vía body-sm.
+      subtitle2: { ...typographyScale.bodySm },
+      body1: { ...typographyScale.bodyLg },
+      body2: { ...typographyScale.bodyMd },
+      caption: { ...typographyScale.bodySm },
       button: {
-        fontWeight: 600,
+        ...typographyScale.labelMd,
         textTransform: 'none'
       },
       overline: {
-        fontWeight: 600,
-        letterSpacing: '1px',
-        fontSize: '0.75rem'
+        ...typographyScale.overline,
+        // textTransform lo aporta el coretheme (uppercase); el SoT cubre family/size/weight/lh/tracking.
+        textTransform: 'uppercase'
       },
-      monoId: {
-        fontWeight: 600,
-        fontSize: '0.875rem',
-        lineHeight: lineHeights.numericDense,
-        letterSpacing: '0.01em',
-        fontVariantNumeric: 'tabular-nums'
+      monoId: { ...typographyScale.numericId },
+      monoAmount: { ...typographyScale.numericAmount },
+      kpiValue: { ...typographyScale.kpiValue }
+    },
+    components: {
+      // Control-text ownership desde el SoT (TASK-1036 S2 + TASK-1038). deepmerge
+      // preserva lineHeight/borderRadius del coretheme; solo ownemos el fontSize.
+      MuiButton: {
+        styleOverrides: {
+          // Button size=large: 17→16 (TASK-1038, saca el 17 bespoke).
+          sizeLarge: {
+            fontSize: controlText.lg
+          }
+        }
       },
-      monoAmount: {
-        fontWeight: 700,
-        fontSize: '0.8125rem',
-        lineHeight: lineHeights.numericDense,
-        fontVariantNumeric: 'tabular-nums'
+      // Tab label — TASK-1038: 18px hardcoded (coretheme) → control-text 14, gobernado.
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            fontSize: controlText.md
+          }
+        }
       },
-      kpiValue: {
-        fontWeight: 800,
-        fontSize: '1.75rem',
-        lineHeight: lineHeights.display,
-        fontVariantNumeric: 'tabular-nums'
+      // Dialog title — TASK-1038: usa h6 (=label-md 14, chico) → section-title 16/600.
+      MuiDialogTitle: {
+        styleOverrides: {
+          root: {
+            fontSize: typographyScale.sectionTitle.fontSize,
+            fontWeight: typographyScale.sectionTitle.fontWeight
+          }
+        }
       }
     }
   }

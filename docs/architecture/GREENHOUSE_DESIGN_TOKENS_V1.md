@@ -92,14 +92,14 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 | h1 | **Poppins** | 2 | 32 (override) | 800 | `heading` (1.25) | — | Marketing hero only |
 | h2 | **Poppins** | 1.5 | 24 (override) | 700 | `heading` (1.25) | — | Marketing section header |
 | h3 | **Poppins** | 1.25 | 20 (override) | 600 | `heading` (1.25) | — | Page identity (rare) |
-| h4 | **Poppins** | 1 | 16 (override) | 600 | `pageTitle` (1.4) | — | **Page title in product UI** |
-| h5 | Geist | 1.125 | 18 | 600 | `body` (1.5) | — | **Section title inside card/accordion** |
-| h6 | Geist | 0.9375 | 15 | 600 | `body` (1.5) | — | Inline bold label (prefer subtitle1) |
-| subtitle1 | Geist | 0.9375 | 15 | 400 | `body` (1.5) | — | **Card subheader, list item primary** |
-| subtitle2 | Geist | 0.8125 | 13 | 400 | 1.538 (coretheme inherit) | — | Card subheader secondary |
+| h4 | **Poppins** | 1.25 | 20 | 600 | `pageTitle` (1.4) | — | **Page title in product UI** (TASK-1038: 16→20, fixes inversion) |
+| h5 | Geist | 1 | 16 | 600 | `body` (1.5) | — | **Section title inside card/accordion** (TASK-1038: 18→16) |
+| h6 | Geist | 0.875 | 14 | 600 | `body` (1.5) | — | Inline bold label (= `label-md`; prefer subtitle1) |
+| subtitle1 | Geist | 0.875 | 14 | 400 | `body` (1.5) | — | **Card subheader, list item primary** (= `subheader`, TASK-1038: 15→14) |
+| subtitle2 | Geist | 0.8125 | 13 | 400 | `metadata` (1.45) | 0.4px | Secondary subtitle — owned via `body-sm` (TASK-1038, ~267 consumers) |
 | body1 | Geist | 1 | 16 (override) | 400 | `body` (1.5) | — | **Primary body text** |
 | body2 | Geist | 0.875 | 14 (override) | 400 | `body` (1.5) | — | **Dense text, table cells, chip labels, helpers** |
-| button | Geist | 0.9375 | 15 | 600 | 1.467 (coretheme inherit) | — | Theme override — do not touch |
+| button | Geist | 0.875 | 14 | 600 | `body` (1.5) | — | = `label-md`, owned from SoT (TASK-1038: 15→14) |
 | caption | Geist | 0.8125 | 13 | 400 | `metadata` (1.45) | 0.4px | **Metadata, validity, timestamps, "sugerido"** |
 | overline | Geist | 0.75 | 12 | 600 | 1.167 (coretheme inherit) | 1px | **Section labels over content (SUBTOTAL, TOTAL, STATUS)** — uppercase tight intentional |
 | monoId | Geist + `tabular-nums` | 0.875 | 14 | 600 | `numericDense` (1.54) | 0.01em | IDs alfanuméricos canónicos (`EO-XXX-XXXX`, SKU, account number) |
@@ -577,10 +577,14 @@ Inventoried by TASK-488 subagent 2026-04-19. Top 15 files to copy/adapt (never f
 | 1.3 | 2026-05-01 (tarde) | Claude + TASK-566 / EPIC-004 (line-height namespace + calibración Geist) | **Cambio arquitectónico**: introducción del namespace canónico de line-height tokens (§3.6), accesible vía `theme.lineHeights.<token>`. Implementación: `src/components/theme/typography-tokens.ts` (tokens canónicos `display` 1.05, `heading` 1.25, `pageTitle` 1.4, `metadata` 1.45, `body` 1.5, `numericDense` 1.54), type augmentation en `types.ts`, theme expone `lineHeights` para uso runtime. **Toda variant del theme que necesite line-height referencia un token**, cero magic numbers en `mergedTheme.ts`. Calibración Geist absorbida por los tokens: `h5/h6/subtitle1` ahora consumen `body` (= 1.5, antes coretheme 1.467/1.556 leía cramped); `caption` consume `metadata` (= 1.45, antes 1.4); `h1/h2/h3` colapsan a `heading` (= 1.25, antes 1.2/1.25/1.3 graduación cosmética sin valor). Body1/body2 siguen en 1.5 (piso WCAG 1.4.12). `button`, `overline`, `subtitle2` heredan del coretheme sin override (intencional). Razón del trigger: Geist tiene x-height ligeramente más bajo que Inter/DM Sans, lo cual hace que ratios `<1.5` se sientan cramped al root 13.125px de Vuexy. Convergente con Linear / Stripe Dashboard / Vercel app que corren subtitle/h6 a 1.5 sobre Geist. **Solución robusta + escalable**: futuras calibraciones de line-height tocan 1 archivo, no N variants. |
 | 1.4 | 2026-05-02 | Claude + TASK-764 audit reconciliation | Audit transversal cerró drift items críticos vs runtime real (`mergedTheme.ts`). §8.1 actualizado: `secondary.main = #023C70` (efeonce-azure), `info.main = #0375DB` (Core Blue) reflejan runtime real, no Vuexy default. `primary.main` declarado como runtime-driven con catálogo Efeonce de 7 paletas (default `efeonce-core` Core Blue). Nueva §8.1.bis documenta `customColors` namespace (14 tokens, 7 con adopción confirmada, 7 orphan candidates → TASK-770 cleanup). Nueva §4.4 con 6 component padding contracts cuantitativos (button 12px, card 24px, input 40px, status-chip 8px). §3.4 actualizado: TASK-567 cerró sweep en UI productiva; DM Sans residual en global-error/emails/@core/PDFs documentado como excepciones legítimas (NO drift). Nueva §15.1 mapping bilateral DESIGN.md ↔ V1 (snake-case ↔ camelCase). §16 cross-ref simétrica con DESIGN.md y THEME_TOKEN_CONTRACT_V1. **Decisión runtime-as-source-of-truth heredada de THEME_TOKEN_CONTRACT_V1 §1.4** (TASK-368, 2026-04-11) — no requirió ADR nuevo. |
 | 1.5 | 2026-05-04 | Claude + TASK-764 close (CI gate + warnings + skills + diff + Opción A) | DESIGN.md pasa de contrato decorativo a contrato vivo y auto-protegido. CI gate `.github/workflows/design-contract.yml` strict (errors + warnings block). 17 warnings cerrados vía 12 contratos de componente reales (`app-shell`, `app-shell-dark`, `button-primary-{hover,tonal,disabled}`, `button-secondary-{hover,active}`, `card-default-{border,dark,dark-secondary}`, `status-chip-{success,warning,error,info}`) — anti-bandaid, NO namespace `palette.*`. `info: "#0375DB"` agregado a DESIGN.md YAML (cierra drift item #14). Skills UI (`greenhouse-ux`, `greenhouse-ui-review`, `modern-ui` overlay) cargan DESIGN.md como mandatory context. `pnpm design:diff` operativo via `scripts/design-diff.mjs` (extrae `git show <ref>:DESIGN.md` a temp, sin `DESIGN.prev.md` drift). Decisión arquitectónica documentada: **Opción A** — DESIGN.md refleja runtime, NO lo genera. Inversión Opción B (theme MUI consume DESIGN.md tokens) queda fuera de scope mientras `@google/design.md` siga en alpha 0.1.x. |
+| 1.6 | 2026-06-06 | Claude + TASK-1036 (typography SoT + drift-guard) | Tipografía gana un **Source of Truth en código** espejo de la paleta AXIS (color): `typographyScale` (primitivos `fontFamilies`/`fontWeights`/`fontSizes`/`letterSpacings`/`fontFeatures` → tokens compuestos) + `TYPOGRAPHY_VARIANT_BRIDGE` (contrato↔variante MUI 1:1, como código) + `controlText` ramp, todo en `src/components/theme/typography-tokens.ts`. `mergedTheme.ts` deriva cada variante del SoT (cero `fontSize`/`fontWeight`/familia hardcodeados); `src/components/theme/typography-drift.test.ts` (36 tests, espejo de `axis-semantic-drift.test.ts`) falla CI si runtime / contrato / SoT divergen. **Reencuadre del audit `TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md` verificado contra el runtime real**: L2 no era drift activo (el coretheme Vuexy define los `fontSize` de h5/h6/button/subtitle1 y mergedTheme los heredaba por deepmerge = mismo valor); la deuda era de gobernanza (valor fuera del SoT, sin guard) — S0/S1 la cierran sin cambio visual (único delta: overline lh 1.16667→1.167, button lh 1.467→1.5, sub-pixel línea única). L3: el control-texto ya estaba casi todo tokenizado (Button small/medium = body2/button, Chip = body2); el único magic number real era `<Button size="large">` 17px → ahora `controlText.lg` (S2, no-op). §15.1 reescrita: el mapping es código (bridge), `label-md ↔ button` (no `h6`), + notas `subheader`↔`subtitle1` / `h6` reusa label-md / control-lg vs label-lg. §3.2 ya reflejaba los valores correctos. `label-lg`/`label-sm` re-incorporados a DESIGN.md (prosa, patrón orphanedTokens) con respaldo SoT real. |
+| 1.7 | 2026-06-06 | Claude + TASK-1038 (typography scale redesign) | **Rediseño de la escala** (cambio visual aprobado por el operador tras ver el impacto en `/admin/design-system/typography/mockup`). La escala era acumulada, no diseñada: **inversión de jerarquía** (page-title 16 < section-title 18), **goteo de 1px** (7 tamaños en 6px) y **sobre-granularidad** (15/16/17 vivos a la vez). Flip en el SoT (`typographyScale`), 4 tokens cambian valor + 2 de `controlText`, **0 nuevos, 0 renombrados**: `page-title` (h4) 16→**20** (arregla la inversión), `section-title` (h5) 18→**16**, `subheader`/`subtitle1` 15→**14**, `label-md`/`button` 15→**14**; `controlText.md` 15→14, `controlText.lg` (Button large) 17→**16** (saca el 17 bespoke). Ladder: 11→**8** tamaños distintos (12·13·14·16·20·24·28·32). **Hallazgos del completeness pass incorporados**: (a) `subtitle2` (13/400, ~267 consumidores) traída al SoT vía `body-sm` en `SECONDARY_VARIANT_TOKENS` (NO label-sm 13/600); (b) **Tab label** 18px hardcoded → `controlText.md` 14 (override `MuiTab` en mergedTheme); (c) **Dialog title** h6 → `section-title` 16/600 (override `MuiDialogTitle`); (d) PDF: Geist `.ttf` registra solo 400/500/700, **faltan 600/800** que la escala usa (fix pendiente en el adapter PDF). §3.2 actualizada. drift-guard 37 tests verde, design:lint 0/0/1, GVC `/admin/design-system` confirma la jerarquía sana (page-title domina, sin breakage). **Decisiones transversales canonizadas** (con product-design + arch skills): i18n Latin-first + RTL-ready vía logical properties (CJK diferido); tipo **fijo en producto**, `clamp()` solo marketing; **no display tier** sin consumidor; **PDF/email = un SSOT + adapters por medio** (espeja precedente color); truncation (ellipsis 1-línea/clamp 2-líneas/wrap); charts derivan del SoT; body measure ~65ch. **Follow-ups**: rol semántico para peso 500 (énfasis medio); adapters PDF/charts desde el SoT; lint rule `no-fontSize-inline` icon-vs-text. Referencia visual viva: `/admin/design-system/typography/mockup`. |
 
 ### 15.1 Naming map — DESIGN.md ↔ V1 / runtime
 
-DESIGN.md (raíz, formato `@google/design.md`) usa nombres semánticos snake-case. V1 + runtime usan API JS camelCase (MUI variant names + custom variants). Mapping bilateral canónico:
+DESIGN.md (raíz, formato `@google/design.md`) usa nombres semánticos snake-case. V1 + runtime usan API JS camelCase (MUI variant names + custom variants).
+
+**Desde TASK-1036 este mapping es CÓDIGO, no una tabla manual:** `TYPOGRAPHY_VARIANT_BRIDGE` en `src/components/theme/typography-tokens.ts` es la fuente única (1:1 token canónico ↔ variante MUI), verificada en CI por `src/components/theme/typography-drift.test.ts` (falla el build si runtime / contrato / SoT divergen). La tabla de abajo es un espejo legible de ese bridge:
 
 | DESIGN.md (semantic) | V1 / runtime (API) | Notas |
 |---|---|---|
@@ -589,7 +593,7 @@ DESIGN.md (raíz, formato `@google/design.md`) usa nombres semánticos snake-cas
 | `headline-md` | `h3` | Poppins display, 1.25rem |
 | `page-title` | `h4` | Poppins display, 1rem |
 | `section-title` | `h5` | Geist, 1.125rem |
-| `label-md` | `h6` | Geist, 0.9375rem |
+| `label-md` | `button` | Geist, 0.9375rem — control/bold label (el variant `button`) |
 | `body-lg` | `body1` | Geist, 1rem |
 | `body-md` | `body2` | Geist, 0.875rem |
 | `body-sm` | `caption` | Geist, 0.8125rem, metadata line-height |
@@ -598,7 +602,13 @@ DESIGN.md (raíz, formato `@google/design.md`) usa nombres semánticos snake-cas
 | `numeric-amount` | `monoAmount` | Geist + tabular-nums, 0.8125rem, 700 |
 | `kpi-value` | `kpiValue` | Geist + tabular-nums, 1.75rem, 800 |
 
-Cuando un agente lee DESIGN.md y necesita el variant runtime, consulta esta tabla. Cuando el inverso: V1 → DESIGN.md, mismo mapping.
+Variantes runtime sin token de contrato dedicado (ownership SoT, fuera del bridge 1:1):
+
+- `subtitle1` ← `subheader` (SoT runtime-only, Geist 0.9375rem/400 — card subheader / list item primary; sin equivalente en el contrato).
+- `h6` reusa el valor de `label-md` (label inline-bold; preferir `subtitle1`/`section-title` en código nuevo).
+- `<Button size="large">` ← `controlText.lg` (17px, un paso por encima de `label-lg` 16px). `label-lg`/`label-sm` son tokens del SoT de la escala de label sin variante dedicada (aplicar vía el control, nunca `fontSize` inline).
+
+Cuando un agente lee DESIGN.md y necesita el variant runtime, consulta el bridge (código) o esta tabla. Cuando el inverso: V1 → DESIGN.md, mismo mapping.
 
 ## 16. Related docs
 
