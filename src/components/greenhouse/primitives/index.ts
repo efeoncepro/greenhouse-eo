@@ -81,7 +81,22 @@ export type {
 export { default as ShellFloatingActionDock } from './ShellFloatingActionDock'
 export type { ShellFloatingActionDockProps } from './ShellFloatingActionDock'
 export { default as GreenhouseLoadingSurface } from './GreenhouseLoadingSurface'
+export {
+  GreenhouseCheckpointRailLoader,
+  GreenhouseDocumentPipelineLoader,
+  GreenhouseExternalHandoffLoader,
+  GreenhouseInlineActionLoader,
+  GreenhouseNexaReasoningLoader,
+  GreenhousePageSkeletonLoader,
+  GreenhousePanelSkeletonLoader,
+  GreenhouseReconciliationMatchingLoader,
+  GreenhouseSecureActionLoader,
+  GreenhouseTableSkeletonLoader,
+  GreenhouseUploadVerificationLoader,
+  GreenhouseWorkspaceBootLoader
+} from './GreenhouseLoadingSurface'
 export type {
+  GreenhouseNamedLoadingSurfaceProps,
   GreenhouseLoadingStep,
   GreenhouseLoadingSurfaceKind,
   GreenhouseLoadingSurfaceProps,

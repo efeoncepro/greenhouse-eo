@@ -1,7 +1,9 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.17
+> **Version:** 1.18
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-06 — v1.18b: cada variant oficial de `GreenhouseLoadingSurface` queda expuesta tambien como componente nombrado reusable (`GreenhouseDocumentPipelineLoader`, `GreenhouseExternalHandoffLoader`, etc.) para migrar consumers sin depender de strings de variant.
+> **Updated:** 2026-06-06 — v1.18: `GreenhouseLoadingSurface` agrega variants enterprise orientadas a workflows operativos: `documentPipeline`, `externalHandoff`, `secureAction`, `uploadVerification` y `reconciliationMatching`, y refina `aiThinking` con checkpoints internos. Implementacion: `TASK-1037`.
 > **Updated:** 2026-06-06 — v1.17: Greenhouse agrega `GreenhouseLoadingSurface` como primitive canonica inicial para loading states modernos y abre el **Loading Lab** interno como child route de design system en `/admin/design-system/loaders`. Variants V1: `pageSkeleton`, `panelSkeleton`, `tableSkeleton`, `inlineAction`, `brandSplash`, `aiThinking`, `progressRail`. Implementacion: `TASK-1037`.
 > **Updated:** 2026-06-06 — v1.16: Greenhouse adopta **Dashboard Floating Action Dock** como primitive shell para acciones persistentes ancladas al viewport (`NexaFloatingButton`, `ScrollToTop` y futuros items). Publica safe-area CSS vars para footers/sticky bars y separa este contrato de `GreenhouseFloatingSurface` (`TASK-1033`), que cubre superficies contextuales ancladas.
 > **Updated:** 2026-06-06 — v1.15: Greenhouse adopta Floating UI como engine canonico de posicionamiento para superficies contextuales ancladas, expuesto via primitive futura **Greenhouse Floating Surface**. ADR: `GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md`; implementacion futura: `TASK-1033`.
@@ -39,8 +41,23 @@ Docs canonicos:
 
 Contrato:
 
-- Variants oficiales V1: `pageSkeleton`, `panelSkeleton`, `tableSkeleton`, `inlineAction`, `brandSplash`, `aiThinking`, `progressRail`.
-- Cada variant representa un job funcional, no una skin: route-level skeleton, panel/sidebar, table/list loading, accion inline, transicion branded, IA reasoning y proceso por checkpoints.
+- Variants oficiales V1/V1.1: `pageSkeleton`, `panelSkeleton`, `tableSkeleton`, `inlineAction`, `brandSplash`, `aiThinking`, `progressRail`, `documentPipeline`, `externalHandoff`, `secureAction`, `uploadVerification`, `reconciliationMatching`.
+- Cada variant representa un job funcional, no una skin: route-level skeleton, panel/sidebar, table/list loading, accion inline, transicion branded, IA reasoning, proceso por checkpoints, generacion de documentos, handoff a proveedor, accion sensible, verificacion de evidencia y conciliacion/matching.
+- Componentes nombrados oficiales:
+  - `GreenhousePageSkeletonLoader`
+  - `GreenhousePanelSkeletonLoader`
+  - `GreenhouseTableSkeletonLoader`
+  - `GreenhouseInlineActionLoader`
+  - `GreenhouseWorkspaceBootLoader`
+  - `GreenhouseNexaReasoningLoader`
+  - `GreenhouseCheckpointRailLoader`
+  - `GreenhouseDocumentPipelineLoader`
+  - `GreenhouseExternalHandoffLoader`
+  - `GreenhouseSecureActionLoader`
+  - `GreenhouseUploadVerificationLoader`
+  - `GreenhouseReconciliationMatchingLoader`
+- Product consumers should prefer the named component when the job is known. Use `<GreenhouseLoadingSurface variant='...' />` for abstract registries, labs, or factories.
+- Variant iteration happens inside the named component + base variant pair first. If a consumer needs a materially different behavior, propose a new official variant or kind mapping before creating a local loader.
 - La primitive owns `role='status'`, `aria-busy='true'`, `aria-live='polite'`, reduced-motion handling, `data-capture` hooks y estructura visual responsive.
 - Reutilizar el stack Greenhouse no significa limitarse a los loaders existentes: Framer Motion/CSS/MUI/AXIS son el chasis, pero las implementations visuales deben subir el nivel antes de migrar consumers.
 - Product views deben preferir esta primitive antes de introducir nuevos loaders locales. `CircularProgress` queda aceptable para casos puntuales inline mientras se migra, pero no debe convertirse en la solucion default de route/panel/IA.

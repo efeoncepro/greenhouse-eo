@@ -21,6 +21,11 @@ export type GreenhouseLoadingSurfaceVariant =
   | 'brandSplash'
   | 'aiThinking'
   | 'progressRail'
+  | 'documentPipeline'
+  | 'externalHandoff'
+  | 'secureAction'
+  | 'uploadVerification'
+  | 'reconciliationMatching'
 
 export type GreenhouseLoadingSurfaceKind =
   | 'adminWorkbench'
@@ -30,6 +35,11 @@ export type GreenhouseLoadingSurfaceKind =
   | 'workspaceBoot'
   | 'nexaReasoning'
   | 'runbookExecution'
+  | 'documentGeneration'
+  | 'providerHandoff'
+  | 'auditAction'
+  | 'assetVerification'
+  | 'financeReconciliation'
   | (string & {})
 
 export type GreenhouseLoadingStep = {
@@ -50,6 +60,8 @@ export type GreenhouseLoadingSurfaceProps = {
   dataCapture?: string
 }
 
+export type GreenhouseNamedLoadingSurfaceProps = Omit<GreenhouseLoadingSurfaceProps, 'variant'>
+
 const DEFAULT_TITLE: Record<GreenhouseLoadingSurfaceVariant, string> = {
   pageSkeleton: 'Cargando vista',
   panelSkeleton: 'Cargando panel',
@@ -57,7 +69,12 @@ const DEFAULT_TITLE: Record<GreenhouseLoadingSurfaceVariant, string> = {
   inlineAction: 'Procesando',
   brandSplash: 'Preparando workspace',
   aiThinking: 'Nexa esta pensando',
-  progressRail: 'Ejecutando pasos'
+  progressRail: 'Ejecutando pasos',
+  documentPipeline: 'Preparando documento',
+  externalHandoff: 'Coordinando proveedor',
+  secureAction: 'Validando accion segura',
+  uploadVerification: 'Verificando archivo',
+  reconciliationMatching: 'Comparando movimientos'
 }
 
 const DEFAULT_DESCRIPTION: Record<GreenhouseLoadingSurfaceVariant, string> = {
@@ -67,7 +84,12 @@ const DEFAULT_DESCRIPTION: Record<GreenhouseLoadingSurfaceVariant, string> = {
   inlineAction: 'La accion sigue en curso.',
   brandSplash: 'Estamos conectando tu sesion con el portal.',
   aiThinking: 'Analizando senales, evidencia y contexto disponible.',
-  progressRail: 'Avanzando por checkpoints verificables.'
+  progressRail: 'Avanzando por checkpoints verificables.',
+  documentPipeline: 'Renderizando, validando y preparando el artefacto final.',
+  externalHandoff: 'Preparando payload, enviando la solicitud y esperando confirmacion externa.',
+  secureAction: 'Confirmando permisos, audit trail e idempotencia antes de continuar.',
+  uploadVerification: 'Subiendo, inspeccionando y asociando evidencia al caso correcto.',
+  reconciliationMatching: 'Evaluando candidatos, confianza y trazabilidad antes de conciliar.'
 }
 
 const MotionShell = ({ reduced, children }: { reduced: boolean; children: ReactNode }) => {
@@ -433,6 +455,45 @@ const AiThinking = ({ title, description }: { title: string; description: string
             </Typography>
           </Stack>
         </Stack>
+        <Stack spacing={1.25}>
+          {['Lectura de hechos', 'Borrador bilingue', 'Chequeo de paridad'].map((label, index) => (
+            <Box
+              key={label}
+              sx={theme => ({
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr',
+                gap: 1.25,
+                alignItems: 'center',
+                p: 1.25,
+                borderRadius: 1.5,
+                backgroundColor: alpha(theme.palette.background.paper, 0.74),
+                border: `1px solid ${alpha(theme.palette.info.main, index === 1 ? 0.28 : 0.12)}`
+              })}
+            >
+              <Box
+                aria-hidden='true'
+                component='i'
+                className={index === 0 ? 'tabler-circle-check' : index === 1 ? 'tabler-sparkles' : 'tabler-language'}
+                sx={theme => ({
+                  color: index === 0 ? theme.palette.success.main : theme.palette.info.main,
+                  fontSize: 18,
+                  animation: index === 1 ? 'gh-ai-token 1500ms ease-in-out infinite' : 'none',
+                  '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+                  '@keyframes gh-ai-token': {
+                    '0%, 100%': { transform: 'scale(0.94)', opacity: 0.72 },
+                    '50%': { transform: 'scale(1)', opacity: 1 }
+                  }
+                })}
+              />
+              <Stack spacing={0.5}>
+                <Typography variant='caption' sx={{ fontWeight: 800 }}>
+                  {label}
+                </Typography>
+                <Rail width={index === 0 ? '88%' : index === 1 ? '72%' : '52%'} height={4} delay={index * 140} />
+              </Stack>
+            </Box>
+          ))}
+        </Stack>
         <Box
           aria-hidden='true'
           sx={{
@@ -462,6 +523,400 @@ const AiThinking = ({ title, description }: { title: string; description: string
             />
           ))}
         </Box>
+      </Stack>
+    </CardContent>
+  </Card>
+)
+
+const DocumentPipeline = ({ title, description, steps }: { title: string; description: string; steps?: GreenhouseLoadingStep[] }) => {
+  const resolvedSteps =
+    steps?.length
+      ? steps
+      : [
+          { label: 'Componer estructura', status: 'done' as const },
+          { label: 'Renderizar PDF', status: 'active' as const },
+          { label: 'Adjuntar artefacto', status: 'pending' as const }
+        ]
+
+  return (
+    <Card
+      elevation={0}
+      sx={theme => ({
+        overflow: 'hidden',
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
+        backgroundColor: alpha(theme.palette.background.paper, 0.96)
+      })}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Stack spacing={2.5}>
+          <Stack direction='row' spacing={1.5} alignItems='center'>
+            <Box
+              aria-hidden='true'
+              component='i'
+              className='tabler-file-type-pdf'
+              sx={theme => ({
+                display: 'grid',
+                placeItems: 'center',
+                width: 42,
+                height: 42,
+                borderRadius: 2,
+                color: theme.palette.primary.main,
+                backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                fontSize: 22
+              })}
+            />
+            <Stack spacing={0.25}>
+              <Typography variant='h6' sx={{ fontWeight: 800 }}>
+                {title}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {description}
+              </Typography>
+            </Stack>
+          </Stack>
+          <Box
+            aria-hidden='true'
+            sx={theme => ({
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: 132,
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
+              background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)}, ${theme.palette.background.paper})`
+            })}
+          >
+            <Box sx={{ position: 'absolute', inset: 16, display: 'grid', gridTemplateColumns: '0.58fr 1fr', gap: 2 }}>
+              <Stack spacing={1.25}>
+                <Rail width='76%' height={10} />
+                <Rail width='52%' height={10} delay={80} />
+                <Rail width='88%' height={42} delay={160} />
+              </Stack>
+              <Stack spacing={1.15}>
+                <Rail width='92%' height={8} delay={120} />
+                <Rail width='84%' height={8} delay={180} />
+                <Rail width='70%' height={8} delay={240} />
+                <Rail width='96%' height={8} delay={300} />
+                <Rail width='62%' height={8} delay={360} />
+              </Stack>
+            </Box>
+            <Box
+              sx={theme => ({
+                position: 'absolute',
+                insetBlock: 0,
+                inlineSize: '36%',
+                transform: 'translateX(-80%) skewX(-10deg)',
+                background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.primary.main, 0.12)}, transparent)`,
+                animation: 'gh-doc-scan 2100ms ease-in-out infinite',
+                '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0.35 },
+                '@keyframes gh-doc-scan': {
+                  '0%': { transform: 'translateX(-80%) skewX(-10deg)' },
+                  '55%': { transform: 'translateX(260%) skewX(-10deg)' },
+                  '100%': { transform: 'translateX(260%) skewX(-10deg)' }
+                }
+              })}
+            />
+          </Box>
+          <ProgressRail steps={resolvedSteps} />
+        </Stack>
+      </CardContent>
+    </Card>
+  )
+}
+
+const ExternalHandoff = ({ title, description, steps }: { title: string; description: string; steps?: GreenhouseLoadingStep[] }) => {
+  const resolvedSteps =
+    steps?.length
+      ? steps
+      : [
+          { label: 'Preparar payload', status: 'done' as const },
+          { label: 'Enviar a proveedor', status: 'active' as const },
+          { label: 'Esperar confirmacion', status: 'pending' as const }
+        ]
+
+  return (
+    <Card
+      elevation={0}
+      sx={theme => ({
+        overflow: 'hidden',
+        border: `1px solid ${alpha(theme.palette.info.main, 0.24)}`,
+        background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)}, ${alpha(theme.palette.background.paper, 0.98)})`
+      })}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Stack spacing={2.5}>
+          <Stack direction='row' spacing={1.5} alignItems='center'>
+            <Box component='i' className='tabler-route' aria-hidden='true' sx={{ color: 'info.main', fontSize: 22 }} />
+            <Stack spacing={0.25}>
+              <Typography variant='h6' sx={{ fontWeight: 800 }}>
+                {title}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {description}
+              </Typography>
+            </Stack>
+          </Stack>
+          <Box
+            aria-hidden='true'
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr auto 1fr auto 1fr',
+              alignItems: 'center',
+              gap: 1.25
+            }}
+          >
+            {['Greenhouse', 'Provider', 'Callback'].map((label, index) => (
+              <Box
+                key={label}
+                sx={theme => ({
+                  minHeight: 74,
+                  borderRadius: 2,
+                  border: `1px solid ${alpha(index === 1 ? theme.palette.info.main : theme.palette.primary.main, 0.2)}`,
+                  backgroundColor: alpha(index === 1 ? theme.palette.info.main : theme.palette.primary.main, 0.07),
+                  display: 'grid',
+                  placeItems: 'center',
+                  px: 1
+                })}
+              >
+                <Stack spacing={1} alignItems='center'>
+                  <Box
+                    component='i'
+                    className={index === 0 ? 'tabler-home-2' : index === 1 ? 'tabler-cloud-upload' : 'tabler-webhook'}
+                    sx={{ fontSize: 20, color: index === 1 ? 'info.main' : 'primary.main' }}
+                  />
+                  <Typography variant='caption' sx={{ fontWeight: 800 }}>
+                    {label}
+                  </Typography>
+                </Stack>
+              </Box>
+            )).flatMap((node, index, array) =>
+              index < array.length - 1
+                ? [
+                    node,
+                    <Rail key={`handoff-rail-${index}`} width={34} height={4} delay={index * 160} />
+                  ]
+                : [node]
+            )}
+          </Box>
+          <ProgressRail steps={resolvedSteps} />
+        </Stack>
+      </CardContent>
+    </Card>
+  )
+}
+
+const SecureAction = ({ title, description, steps }: { title: string; description: string; steps?: GreenhouseLoadingStep[] }) => {
+  const resolvedSteps =
+    steps?.length
+      ? steps
+      : [
+          { label: 'Verificar permisos', status: 'done' as const },
+          { label: 'Registrar audit trail', status: 'active' as const },
+          { label: 'Confirmar idempotencia', status: 'pending' as const }
+        ]
+
+  return (
+    <Card
+      elevation={0}
+      sx={theme => ({
+        border: `1px solid ${alpha(theme.palette.warning.main, 0.28)}`,
+        backgroundColor: alpha(theme.palette.warning.main, 0.055)
+      })}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Stack spacing={2.5}>
+          <Stack direction='row' spacing={1.5} alignItems='center'>
+            <Box
+              component='i'
+              className='tabler-shield-lock'
+              aria-hidden='true'
+              sx={theme => ({
+                width: 42,
+                height: 42,
+                borderRadius: 2,
+                display: 'grid',
+                placeItems: 'center',
+                color: theme.palette.warning.dark,
+                backgroundColor: alpha(theme.palette.warning.main, 0.14),
+                fontSize: 22
+              })}
+            />
+            <Stack spacing={0.25}>
+              <Typography variant='h6' sx={{ fontWeight: 800 }}>
+                {title}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {description}
+              </Typography>
+            </Stack>
+          </Stack>
+          <Box
+            aria-hidden='true'
+            sx={theme => ({
+              p: 2,
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.warning.main, 0.22)}`,
+              backgroundColor: alpha(theme.palette.background.paper, 0.72)
+            })}
+          >
+            <Stack spacing={1.35}>
+              <Stack direction='row' spacing={1} alignItems='center'>
+                <Box component='i' className='tabler-key' sx={{ fontSize: 18, color: 'warning.dark' }} />
+                <Rail width='72%' height={8} />
+              </Stack>
+              <Stack direction='row' spacing={1} alignItems='center'>
+                <Box component='i' className='tabler-file-text' sx={{ fontSize: 18, color: 'warning.dark' }} />
+                <Rail width='88%' height={8} delay={120} />
+              </Stack>
+              <Stack direction='row' spacing={1} alignItems='center'>
+                <Box component='i' className='tabler-fingerprint' sx={{ fontSize: 18, color: 'warning.dark' }} />
+                <Rail width='58%' height={8} delay={240} />
+              </Stack>
+            </Stack>
+          </Box>
+          <ProgressRail steps={resolvedSteps} />
+        </Stack>
+      </CardContent>
+    </Card>
+  )
+}
+
+const UploadVerification = ({ title, description, steps }: { title: string; description: string; steps?: GreenhouseLoadingStep[] }) => {
+  const resolvedSteps =
+    steps?.length
+      ? steps
+      : [
+          { label: 'Subir archivo', status: 'done' as const },
+          { label: 'Validar policy', status: 'active' as const },
+          { label: 'Asociar evidencia', status: 'pending' as const }
+        ]
+
+  return (
+    <Card elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
+      <CardContent sx={{ p: 3 }}>
+        <Stack spacing={2.5}>
+          <Stack direction='row' spacing={1.5} alignItems='center'>
+            <Box component='i' className='tabler-cloud-check' aria-hidden='true' sx={{ color: 'success.main', fontSize: 22 }} />
+            <Stack spacing={0.25}>
+              <Typography variant='h6' sx={{ fontWeight: 800 }}>
+                {title}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {description}
+              </Typography>
+            </Stack>
+          </Stack>
+          <Box
+            aria-hidden='true'
+            sx={theme => ({
+              display: 'grid',
+              gridTemplateColumns: '72px 1fr',
+              gap: 2,
+              alignItems: 'center',
+              p: 2,
+              borderRadius: 2,
+              border: `1px dashed ${alpha(theme.palette.success.main, 0.32)}`,
+              backgroundColor: alpha(theme.palette.success.main, 0.055)
+            })}
+          >
+            <Box
+              sx={theme => ({
+                width: 72,
+                height: 72,
+                borderRadius: 2,
+                display: 'grid',
+                placeItems: 'center',
+                backgroundColor: alpha(theme.palette.success.main, 0.12),
+                color: theme.palette.success.main
+              })}
+            >
+              <Box component='i' className='tabler-file-upload' sx={{ fontSize: 22 }} />
+            </Box>
+            <Stack spacing={1.1}>
+              <Rail width='78%' height={10} />
+              <Rail width='92%' height={10} delay={120} />
+              <Rail width='48%' height={10} delay={220} />
+            </Stack>
+          </Box>
+          <ProgressRail steps={resolvedSteps} />
+        </Stack>
+      </CardContent>
+    </Card>
+  )
+}
+
+const ReconciliationMatching = ({ title, description }: { title: string; description: string }) => (
+  <Card
+    elevation={0}
+    sx={theme => ({
+      overflow: 'hidden',
+      border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`,
+      backgroundColor: alpha(theme.palette.background.paper, 0.96)
+    })}
+  >
+    <CardContent sx={{ p: 3 }}>
+      <Stack spacing={2.5}>
+        <Stack direction='row' spacing={1.5} alignItems='center'>
+          <Box component='i' className='tabler-arrows-exchange' aria-hidden='true' sx={{ color: 'success.main', fontSize: 22 }} />
+          <Stack spacing={0.25}>
+            <Typography variant='h6' sx={{ fontWeight: 800 }}>
+              {title}
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {description}
+            </Typography>
+          </Stack>
+        </Stack>
+        <Box sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: { xs: '1fr', sm: '1fr auto 1fr' }, alignItems: 'center' }}>
+          {['Movimiento banco', 'Documento canonico'].map((label, index) => (
+            <Card key={label} elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
+              <CardContent sx={{ p: 2 }}>
+                <Stack spacing={1.25}>
+                  <Typography variant='caption' sx={{ fontWeight: 800 }}>
+                    {label}
+                  </Typography>
+                  <Rail width='82%' height={12} delay={index * 120} />
+                  <Rail width='58%' height={12} delay={index * 180} />
+                  <Rail width='72%' height={22} delay={index * 240} />
+                </Stack>
+              </CardContent>
+            </Card>
+          )).flatMap((node, index) =>
+            index === 0
+              ? [
+                  node,
+                  <Box
+                    key='match-indicator'
+                    aria-hidden='true'
+                    sx={theme => ({
+                      width: { xs: '100%', sm: 42 },
+                      height: { xs: 22, sm: 42 },
+                      borderRadius: 999,
+                      display: 'grid',
+                      placeItems: 'center',
+                      color: theme.palette.success.main,
+                      backgroundColor: alpha(theme.palette.success.main, 0.1),
+                      border: `1px solid ${alpha(theme.palette.success.main, 0.22)}`,
+                      animation: 'gh-match-pulse 1400ms ease-in-out infinite',
+                      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+                      '@keyframes gh-match-pulse': {
+                        '0%, 100%': { transform: 'scale(0.96)', opacity: 0.78 },
+                        '50%': { transform: 'scale(1)', opacity: 1 }
+                      }
+                    })}
+                  >
+                    <Box component='i' className='tabler-link' sx={{ fontSize: 18 }} />
+                  </Box>
+                ]
+              : [node]
+          )}
+        </Box>
+        <Stack spacing={1}>
+          <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 800 }}>
+            Confianza y trazabilidad
+          </Typography>
+          <Rail width='100%' height={8} />
+          <Rail width='66%' height={8} delay={180} />
+        </Stack>
       </Stack>
     </CardContent>
   </Card>
@@ -553,6 +1008,16 @@ const renderVariant = ({
       return <AiThinking title={title ?? DEFAULT_TITLE.aiThinking} description={description ?? DEFAULT_DESCRIPTION.aiThinking} />
     case 'progressRail':
       return <ProgressRail steps={steps ?? (typeof progress === 'number' ? [{ label: `Avance ${Math.round(progress)}%`, status: 'active' }] : undefined)} />
+    case 'documentPipeline':
+      return <DocumentPipeline title={title ?? DEFAULT_TITLE.documentPipeline} description={description ?? DEFAULT_DESCRIPTION.documentPipeline} steps={steps} />
+    case 'externalHandoff':
+      return <ExternalHandoff title={title ?? DEFAULT_TITLE.externalHandoff} description={description ?? DEFAULT_DESCRIPTION.externalHandoff} steps={steps} />
+    case 'secureAction':
+      return <SecureAction title={title ?? DEFAULT_TITLE.secureAction} description={description ?? DEFAULT_DESCRIPTION.secureAction} steps={steps} />
+    case 'uploadVerification':
+      return <UploadVerification title={title ?? DEFAULT_TITLE.uploadVerification} description={description ?? DEFAULT_DESCRIPTION.uploadVerification} steps={steps} />
+    case 'reconciliationMatching':
+      return <ReconciliationMatching title={title ?? DEFAULT_TITLE.reconciliationMatching} description={description ?? DEFAULT_DESCRIPTION.reconciliationMatching} />
     default:
       return null
   }
@@ -592,5 +1057,91 @@ const GreenhouseLoadingSurface = ({
     </StatusRoot>
   )
 }
+
+const createGreenhouseLoadingSurfaceComponent = (
+  variant: GreenhouseLoadingSurfaceVariant,
+  defaultKind: GreenhouseLoadingSurfaceKind,
+  displayName: string
+) => {
+  const Component = ({ kind, ...props }: GreenhouseNamedLoadingSurfaceProps) => (
+    <GreenhouseLoadingSurface {...props} variant={variant} kind={kind ?? defaultKind} />
+  )
+
+  Component.displayName = displayName
+
+  return Component
+}
+
+export const GreenhousePageSkeletonLoader = createGreenhouseLoadingSurfaceComponent(
+  'pageSkeleton',
+  'adminWorkbench',
+  'GreenhousePageSkeletonLoader'
+)
+
+export const GreenhousePanelSkeletonLoader = createGreenhouseLoadingSurfaceComponent(
+  'panelSkeleton',
+  'sidecarPanel',
+  'GreenhousePanelSkeletonLoader'
+)
+
+export const GreenhouseTableSkeletonLoader = createGreenhouseLoadingSurfaceComponent(
+  'tableSkeleton',
+  'financeTable',
+  'GreenhouseTableSkeletonLoader'
+)
+
+export const GreenhouseInlineActionLoader = createGreenhouseLoadingSurfaceComponent(
+  'inlineAction',
+  'inlineSave',
+  'GreenhouseInlineActionLoader'
+)
+
+export const GreenhouseWorkspaceBootLoader = createGreenhouseLoadingSurfaceComponent(
+  'brandSplash',
+  'workspaceBoot',
+  'GreenhouseWorkspaceBootLoader'
+)
+
+export const GreenhouseNexaReasoningLoader = createGreenhouseLoadingSurfaceComponent(
+  'aiThinking',
+  'nexaReasoning',
+  'GreenhouseNexaReasoningLoader'
+)
+
+export const GreenhouseCheckpointRailLoader = createGreenhouseLoadingSurfaceComponent(
+  'progressRail',
+  'runbookExecution',
+  'GreenhouseCheckpointRailLoader'
+)
+
+export const GreenhouseDocumentPipelineLoader = createGreenhouseLoadingSurfaceComponent(
+  'documentPipeline',
+  'documentGeneration',
+  'GreenhouseDocumentPipelineLoader'
+)
+
+export const GreenhouseExternalHandoffLoader = createGreenhouseLoadingSurfaceComponent(
+  'externalHandoff',
+  'providerHandoff',
+  'GreenhouseExternalHandoffLoader'
+)
+
+export const GreenhouseSecureActionLoader = createGreenhouseLoadingSurfaceComponent(
+  'secureAction',
+  'auditAction',
+  'GreenhouseSecureActionLoader'
+)
+
+export const GreenhouseUploadVerificationLoader = createGreenhouseLoadingSurfaceComponent(
+  'uploadVerification',
+  'assetVerification',
+  'GreenhouseUploadVerificationLoader'
+)
+
+export const GreenhouseReconciliationMatchingLoader = createGreenhouseLoadingSurfaceComponent(
+  'reconciliationMatching',
+  'financeReconciliation',
+  'GreenhouseReconciliationMatchingLoader'
+)
 
 export default GreenhouseLoadingSurface

@@ -12,7 +12,7 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Slice 1 code complete; visual feedback / Slice 2 pilots pending`
+- Status real: `Slice 1 + enterprise variant expansion code complete; Slice 2 pilots pending`
 - Rank: `TBD`
 - Domain: `ui|platform|design-system|accessibility`
 - Blocked by: `none`
@@ -32,7 +32,7 @@ Current loading UI is fragmented: many routes and views use local spinners, skel
 
 - Create a reusable loading primitive using the Primitive + Variants + Kinds method.
 - Add an internal Loading Lab under `/admin/design-system/loaders` for visual direction, GVC evidence and operator review.
-- Establish variants for page, panel, table, inline action, brand transition, AI thinking and staged progress loading.
+- Establish variants for page, panel, table, inline action, brand transition, AI thinking, staged progress loading, document pipelines, external handoffs, secure actions, upload verification and reconciliation matching.
 - Preserve AXIS/MUI theme usage, reduced-motion support, accessibility semantics and copy governance.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -117,6 +117,11 @@ Reglas obligatorias:
   - `brandSplash`
   - `aiThinking`
   - `progressRail`
+  - `documentPipeline`
+  - `externalHandoff`
+  - `secureAction`
+  - `uploadVerification`
+  - `reconciliationMatching`
 - Add Loading Lab route under `/admin/design-system/loaders`.
 - Add focused primitive tests.
 - Capture GVC evidence for `/admin/design-system/loaders`.
@@ -158,6 +163,11 @@ Reglas obligatorias:
 - `financeTable`
 - `sidecarPanel`
 - `inlineSave`
+- `documentGeneration`
+- `providerHandoff`
+- `auditAction`
+- `assetVerification`
+- `financeReconciliation`
 
 ## Rollout Plan & Risk Matrix
 
@@ -221,6 +231,37 @@ No feature flag for Slice 1. It is additive and internal-only. Runtime consumer 
 - Split GVC scenarios: `design-system` for AXIS palette, `design-system-loaders` for loading-state variants.
 - Evidence: `.captures/2026-06-06T18-12-28_design-system` and `.captures/2026-06-06T18-13-15_design-system-loaders` (`qualityFindings=[]`).
 - Verification: eslint focal, route reachability, primitive tests, design lint, task lint, docs closure and diff check passed. Full TypeScript re-run timed out after 120s without printing errors in this post-separation pass.
+
+### 2026-06-06 — Enterprise variant expansion
+
+- Expanded `GreenhouseLoadingSurface` beyond generic route loaders into enterprise workflow states:
+  - `documentPipeline` for PDF/render/attachment flows.
+  - `externalHandoff` for provider calls and callback waits.
+  - `secureAction` for permission/audit/idempotency checks.
+  - `uploadVerification` for evidence uploads and policy checks.
+  - `reconciliationMatching` for finance matching and traceability states.
+- Refined `aiThinking` with internal reasoning checkpoints so it reads as an advisory/product state instead of a decorative spinner.
+- Updated the Loading Lab catalog to show operational jobs from Workforce Contracting, Finance, signatures, integrations, evidence handling and reconciliation before any consumer migration.
+- Evidence: `.captures/2026-06-06T23-03-37_design-system-loaders` desktop + mobile (`qualityFindings=[]`), visually reviewed after correcting lab card alignment and adding named component metadata.
+- Verification: eslint focal, primitive tests 26/26, TypeScript, route reachability, design lint and task lint passed in this expansion pass.
+
+### 2026-06-06 — Named reusable primitive components
+
+- Promoted each official variant into a named reusable component exported from `@/components/greenhouse/primitives`:
+  - `GreenhousePageSkeletonLoader` -> `pageSkeleton`
+  - `GreenhousePanelSkeletonLoader` -> `panelSkeleton`
+  - `GreenhouseTableSkeletonLoader` -> `tableSkeleton`
+  - `GreenhouseInlineActionLoader` -> `inlineAction`
+  - `GreenhouseWorkspaceBootLoader` -> `brandSplash`
+  - `GreenhouseNexaReasoningLoader` -> `aiThinking`
+  - `GreenhouseCheckpointRailLoader` -> `progressRail`
+  - `GreenhouseDocumentPipelineLoader` -> `documentPipeline`
+  - `GreenhouseExternalHandoffLoader` -> `externalHandoff`
+  - `GreenhouseSecureActionLoader` -> `secureAction`
+  - `GreenhouseUploadVerificationLoader` -> `uploadVerification`
+  - `GreenhouseReconciliationMatchingLoader` -> `reconciliationMatching`
+- The Loading Lab now renders these named components directly and displays their component names, keeping `GreenhouseLoadingSurface` as the lower-level variant primitive for abstract factories.
+- Iteration model: evolve visual/internal behavior inside the named component/variant pair first, then migrate consumers. Do not create consumer-local loader components for these jobs.
 
 ## Closing Protocol
 
