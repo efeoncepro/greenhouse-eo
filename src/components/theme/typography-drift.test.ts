@@ -207,3 +207,119 @@ describe('TYPOGRAPHY_VARIANT_BRIDGE shape', () => {
     }
   })
 })
+
+// ── TASK-1042: close the gap — the front-matter guard above only covers the
+// DESIGN.md YAML block. Prose (DESIGN.md §Typography) and the V1 §15.1 table
+// carried numeric sizes that NO test validated, so they drifted silently
+// (TASK-1038 left "15px"/"17px" in prose and the whole V1 table pre-redesign).
+// These two blocks validate both against the SoT.
+
+const remToPx = (rem: string): number => Math.round(parseFloat(rem) * 16 * 1000) / 1000
+
+// Sizes the SoT *actually uses* — derived from live tokens (typographyScale +
+// controlText), NOT the raw `fontSizes` primitives (which still carry orphaned
+// 15/18). A prose/V1 size outside this set is stale by definition.
+const VALID_TYPOGRAPHY_PX = (() => {
+  const set = new Set<number>()
+
+  for (const token of Object.values(typographyScale) as Array<Record<string, unknown>>) {
+    if (typeof token.fontSize === 'string') set.add(remToPx(token.fontSize))
+
+    if (typeof token.letterSpacing === 'string' && token.letterSpacing.endsWith('px')) {
+      set.add(parseFloat(token.letterSpacing))
+    }
+  }
+
+  for (const v of Object.values(controlText)) set.add(remToPx(v as string))
+
+  return set
+})()
+
+const CONTRACT_TO_SCALE_V1: Record<string, keyof typeof typographyScale> = {
+  'headline-display': 'headlineDisplay',
+  'headline-lg': 'headlineLg',
+  'headline-md': 'headlineMd',
+  'page-title': 'pageTitle',
+  'section-title': 'sectionTitle',
+  'label-md': 'labelMd',
+  'body-lg': 'bodyLg',
+  'body-md': 'bodyMd',
+  'body-sm': 'bodySm',
+  overline: 'overline',
+  'numeric-id': 'numericId',
+  'numeric-amount': 'numericAmount',
+  'kpi-value': 'kpiValue'
+}
+
+describe('V1 §15.1 table ≡ SoT (TASK-1042)', () => {
+  const v1 = readFileSync(join(process.cwd(), 'docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md'), 'utf8')
+
+  // Bound the §15.1 region (table + runtime-variant bullets).
+  const sectionStart = v1.indexOf('### 15.1')
+  const afterStart = v1.slice(sectionStart + 1)
+  const sectionEnd = afterStart.search(/\n##? /)
+  const section = sectionEnd === -1 ? afterStart : afterStart.slice(0, sectionEnd)
+
+  // Table rows: | `token` | `variant` | ...Nrem... |
+  const rows = section.split('\n').filter(l => /^\|\s*`[a-z-]+`\s*\|/.test(l))
+
+  it('contains a row for every contract token', () => {
+    const tokens = rows.map(r => r.match(/^\|\s*`([a-z-]+)`/)?.[1]).filter(Boolean)
+
+    for (const k of Object.keys(CONTRACT_TO_SCALE_V1)) {
+      expect(tokens, `V1 §15.1 missing row for ${k}`).toContain(k)
+    }
+  })
+
+  for (const row of rows) {
+    const tokenKey = row.match(/^\|\s*`([a-z-]+)`/)?.[1]
+
+    if (!tokenKey || !CONTRACT_TO_SCALE_V1[tokenKey]) continue
+    const remMatch = row.match(/(\d+(?:\.\d+)?)rem/)
+
+    if (!remMatch) continue // rows like overline "identico" carry no rem
+
+    it(`§15.1 ${tokenKey} rem ≡ SoT`, () => {
+      const scaleToken = typographyScale[CONTRACT_TO_SCALE_V1[tokenKey]] as Record<string, unknown>
+
+      expect(remToPx(`${remMatch[1]}rem`)).toBe(remToPx(String(scaleToken.fontSize)))
+    })
+  }
+
+  // Belt-and-suspenders: every rem in the §15.1 region (incl. the runtime-variant
+  // bullets like subtitle1/subheader) must be a live SoT size.
+  it('every rem in §15.1 is a live SoT size', () => {
+    for (const m of section.matchAll(/(\d+(?:\.\d+)?)rem\b/g)) {
+      const px = remToPx(`${m[1]}rem`)
+
+      expect(VALID_TYPOGRAPHY_PX.has(px), `V1 §15.1 "${m[0]}" (${px}px) is not a current SoT size — stale?`).toBe(true)
+    }
+  })
+})
+
+describe('DESIGN.md §Typography prose sizes ∈ SoT (TASK-1042)', () => {
+  const design = readFileSync(join(process.cwd(), 'DESIGN.md'), 'utf8')
+
+  // Section between "## Typography" and the next "## " heading (prose only —
+  // the front-matter is guarded by the block above).
+  const start = design.indexOf('\n## Typography\n')
+  const rest = design.slice(start + 1)
+  const end = rest.indexOf('\n## ', 3)
+  const section = end === -1 ? rest : rest.slice(0, end)
+
+  // Every explicit px / rem size literal in the prose must be a live SoT size.
+  // (`pt` PDF points, `ch` measure, and unit-less weights/counts are ignored.)
+  const matches = [...section.matchAll(/(\d+(?:\.\d+)?)(px|rem)\b/g)]
+
+  it('finds prose size mentions to validate', () => {
+    expect(matches.length).toBeGreaterThan(0)
+  })
+
+  for (const m of matches) {
+    const px = m[2] === 'rem' ? remToPx(`${m[1]}rem`) : parseFloat(m[1])
+
+    it(`prose "${m[0]}" is a live SoT size`, () => {
+      expect(VALID_TYPOGRAPHY_PX.has(px), `DESIGN.md §Typography "${m[0]}" (${px}px) is not a current SoT size — stale?`).toBe(true)
+    })
+  }
+})

@@ -282,7 +282,7 @@ Use the scale semantically:
 
 - `page-title` for product page titles
 - `section-title` for section headers inside cards and drawers
-- `label-lg` / `label-md` / `label-sm` for control / bold-label text (16 / 14 / 13px). `label-md` is the canonical control label (the `button` variant); `label-lg` and `label-sm` are the larger / smaller steps of the same label scale
+- `label-lg` / `label-md` / `label-sm` for control / bold-label text (16px / 14px / 13px). `label-md` is the canonical control label (the `button` variant); `label-lg` and `label-sm` are the larger / smaller steps of the same label scale
 - `body-lg` for primary readable copy
 - `body-md` for dense product UI copy, table cells, and helpers
 - `body-sm` for metadata and timestamps
@@ -315,8 +315,8 @@ Notes:
   no dedicated MUI variant — apply them through the matching control (`<Button>`,
   `<Chip>`), never with `fontSize` inline.
 - Control text is owned by the SoT too (`controlText` ramp): Button `sm`/`md` =
-  14 (`= body-md`/`label-md`), Button `lg` = 16 (`= label-lg`), Tab = 14
-  (`controlText.md`), Dialog title = 16 (`= section-title`). `subtitle1` is the
+  14px (`= body-md`/`label-md`), Button `lg` = 16px (`= label-lg`), Tab = 14px
+  (`controlText.md`), Dialog title = 16px (`= section-title`). `subtitle1` is the
   live `subheader` token; `h6` reuses the `label-md` value (inline bold label);
   `subtitle2` is governed via `body-sm` (`SECONDARY_VARIANT_TOKENS`).
 - The icon glyph sizes inside controls (Button/Chip icons, input legend) are not
@@ -373,8 +373,10 @@ PDF/email type adapters derive the role scale from the SoT — never re-hardcode
 - **NEVER** edit `src/@core/theme/*` (Vuexy core) — override in `mergedTheme.ts`.
 - **NEVER** a token without a consumer; **NEVER** a fixed-type `clamp()` in product
   (fluid type is marketing-only).
-- **ALWAYS** move the 3 layers together (SoT ≡ `mergedTheme` ≡ DESIGN.md front-matter)
-  or `typography-drift.test.ts` (37 tests) fails CI.
+- **ALWAYS** move the 3 layers together (SoT ≡ `mergedTheme` ≡ DESIGN.md) or
+  `typography-drift.test.ts` fails CI — it guards runtime ≡ SoT ≡ DESIGN.md
+  **front-matter + prose** ≡ **V1 §15.1** (TASK-1042: every `Npx`/`Nrem` literal
+  in the §Typography prose and the V1 table must be a live SoT size).
 - Living reference (internal): `/admin/design-system/typography/mockup` — the
   "museum"; the rules an agent applies live here in DESIGN.md, not in the mockup.
 
