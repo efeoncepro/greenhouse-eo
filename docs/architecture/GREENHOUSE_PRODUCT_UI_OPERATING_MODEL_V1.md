@@ -61,7 +61,21 @@ Use the pattern that fits the task:
 - Command center for subsystem monitoring and exception-first workflows.
 - List-detail for entity browsing and comparison.
 - Wizard for low-frequency, high-risk creation.
-- AI drawer for contextual assistance that does not replace core operations.
+- Adaptive sidecar for contextual assistance, inspection, review, preview, and low-risk contextual editing where the main work context must remain visible.
+- AI drawer only as mobile/tablet temporary behavior or legacy escape hatch; desktop assistant surfaces should prefer adaptive sidecar when density allows.
+- Modal Dialog for destructive, irreversible, legal, financial, or maker-checker decisions.
+
+### Adaptive sidecar runtime primitive
+
+When the selected pattern is adaptive sidecar, the canonical implementation is `AdaptiveSidecarLayout` + `ContextualSidecar` + `adaptive-sidecar-controller` from `@/components/greenhouse/primitives`.
+
+Rules:
+
+- Do not implement a new desktop Drawer/card-overlay to imitate the pattern.
+- Desktop sidecar lanes must be in-flow, full-height within the work canvas, and structurally separated from main content.
+- Use the idempotent controller reducer for local state machines that can open, close, replace, or become dirty.
+- Use `ContextualSidecar` with `chrome='adaptive'` for desktop lanes; reserve contained chrome for explicitly framed local surfaces.
+- Use GVC desktop + mobile evidence before declaring a consumer enterprise-ready.
 
 ## Enterprise Quality Bar
 

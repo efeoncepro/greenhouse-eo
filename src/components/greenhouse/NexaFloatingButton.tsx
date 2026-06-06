@@ -143,6 +143,7 @@ const NexaFloatingButton = () => {
     <>
       {/* FAB trigger */}
       <Fab
+        data-nexa-floating-trigger='true'
         color='primary'
         size='medium'
         aria-label={TASK407_ARIA_ABRIR_NEXA_AI}

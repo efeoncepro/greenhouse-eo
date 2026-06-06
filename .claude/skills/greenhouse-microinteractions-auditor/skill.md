@@ -103,6 +103,7 @@ These are non-negotiable import and usage rules:
 | Alerts | MUI `Alert` for inline messages; `role="alert"` for urgent blocking |
 | Staggered lists | `AnimatePresence` + `motion.div`, gated by `useReducedMotion` (see `NexaInsightsBlock.tsx` pattern) |
 | GSAP usage | Advanced timelines, SVG/path/text choreography, or measured ScrollTrigger experiences only; not normal hover/focus/press/counters/loading/list mutation |
+| Adaptive Sidecar | Use `AdaptiveSidecarLayout`, `ContextualSidecar`, and `reduceAdaptiveSidecarState()` from `@/components/greenhouse/primitives`; never rebuild desktop sidecar motion as a custom Drawer/card overlay |
 
 ## Implementation heuristics
 
@@ -160,6 +161,7 @@ Use this unless the surface has a stronger local pattern:
 | Urgent blocking issue | MUI `Alert` or `role="alert"` |
 | Dynamic result count / async status | persistent `role="status"` / `aria-live="polite"` |
 | Staggered list entrance | `AnimatePresence` + `motion.div` gated by `useReducedMotion` |
+| Contextual panel open/replace/close | Adaptive Sidecar primitive + dirty replacement guard + reduced-motion-aware content transition |
 
 ## Output contract
 
@@ -193,6 +195,7 @@ Return:
 - Leaving success/error feedback without screen-reader consideration
 - Premature field validation while the user is still typing
 - Animating error states or destructive confirmations
+- Building a drawer-like desktop sidecar instead of the Adaptive Sidecar primitive when the main work context must remain visible
 
 ## Complements
 

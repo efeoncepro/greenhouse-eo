@@ -48,6 +48,30 @@ export type {
   OperationalSignalListProps,
   OperationalSignalTone
 } from './OperationalSignalList'
+export { default as AdaptiveSidecarLayout } from './AdaptiveSidecarLayout'
+export type { AdaptiveSidecarLayoutProps } from './AdaptiveSidecarLayout'
+export { default as ContextualSidecar } from './ContextualSidecar'
+export type { ContextualSidecarChrome, ContextualSidecarProps, ContextualSidecarState } from './ContextualSidecar'
+export {
+  buildSidecarSearchParams,
+  canReplaceAdaptiveSidecar,
+  createAdaptiveSidecarEvent,
+  removeSidecarSearchParams,
+  reduceAdaptiveSidecarState,
+  resolveAdaptiveSidecarMode
+} from './adaptive-sidecar-controller'
+export type {
+  AdaptiveSidecarControllerAction,
+  AdaptiveSidecarControllerLastAction,
+  AdaptiveSidecarControllerState,
+  AdaptiveSidecarKind,
+  AdaptiveSidecarPreferredMode,
+  AdaptiveSidecarResolvedMode,
+  AdaptiveSidecarSearchParamsInput,
+  AdaptiveSidecarSide,
+  AdaptiveSidecarTelemetryEvent,
+  AdaptiveSidecarTelemetryEventName
+} from './adaptive-sidecar-controller'
 
 // Reusable KPI trend card — interactive month-over-month area chart (Recharts):
 // hover tooltip + crosshair, zone-tone semaphore, edge-to-edge line with inset

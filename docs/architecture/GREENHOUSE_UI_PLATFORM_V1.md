@@ -1,7 +1,9 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.11
+> **Version:** 1.13
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-06 — v1.13: TASK-1028 promoted Adaptive Sidecar from architecture to reusable runtime primitive. Canonical exports live in `src/components/greenhouse/primitives/`: `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` (`resolveAdaptiveSidecarMode`, URL helpers, telemetry helper, idempotent `reduceAdaptiveSidecarState`). Future contextual assistance/inspection/review/preview/low-risk edit surfaces must reuse this primitive before creating custom drawers/modals.
+> **Updated:** 2026-06-05 — v1.12: Greenhouse adopta `Adaptive Sidecar` como capacidad UI platform canonica, no Nexa-only, para asistencia, inspeccion, review, preview y edicion contextual que debe preservar el contexto de trabajo. ADR: `GREENHOUSE_ADAPTIVE_SIDECAR_DECISION_V1.md`; arquitectura: `GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md`; implementacion: `TASK-1028`. Desktop preferente = in-flow push/reflow; mobile/tablet = Drawer temporal; Dialog modal sigue obligatorio para acciones destructivas/irreversibles/legales/financieras. Ver Delta 2026-06-05 abajo.
 > **Updated:** 2026-06-02 — v1.11: `MetricTrendCard` primitive nueva (`src/components/greenhouse/primitives/`). KPI card con área interactiva month-over-month en **Recharts**: tooltip on-hover + crosshair, semáforo por `tone` (success/warning/error), línea **edge-to-edge** con dots/labels inset y alineados (técnica edge-anchor), draw-in + hover-lift reduced-motion aware, tabla sr-only a11y. Data-agnostic (recibe `series`/`value`/`tone`) → reutilizable para cualquier métrica de tendencia. Primer consumer: Person 360 → Activity (OTD%/FTR%). Ver Delta 2026-06-02 abajo.
 > **Updated:** 2026-06-01 — v1.10: TASK-982 Navigation Reachability Governance. Contrato canónico: toda ruta `(dashboard)` debe ser alcanzable (link interno / child route declarada / dinámica). Gate `route-reachability-gate.mjs` (espejo navegacional de TASK-827) + manifest SSOT `src/lib/navigation/route-reachability-manifest.ts`. Patrón header primary-action ("Nuevo X" en workbench, 1 primary + N tonal). Doctrina IA de dominio multi-superficie (hub-por-audiencia + tabs + drawers + ⌘K). Ver Delta 2026-06-01 abajo.
 > **Updated:** 2026-05-08 — v1.9: TASK-612 entrega Organization Workspace Shell (chrome) + FacetContentRouter + 9 facet content components, gated por flag `organization_workspace_shell_agency` (extensión de `home_rollout_flags` per V1.1). Patron canónico shell-vs-content (§4.5 spec V1) materializado: shell owns chrome, domain owns facet content via render-prop + lazy registry. Ver Delta 2026-05-08 abajo.
@@ -20,6 +22,31 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-05 — Adaptive Sidecar UI Platform
+
+Greenhouse adopta **Adaptive Sidecar** como capacidad UI platform canonica para superficies contextuales que deben convivir con el flujo principal: Nexa/assistant, inspectores, review panels, previews y formularios contextuales de bajo riesgo. Nexa es un consumidor posible, no el owner del patron.
+
+Docs canonicos:
+
+- ADR: `docs/architecture/GREENHOUSE_ADAPTIVE_SIDECAR_DECISION_V1.md`
+- Arquitectura: `docs/architecture/GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md`
+- Implementacion: `docs/tasks/in-progress/TASK-1028-adaptive-sidecar-ui-platform.md`
+
+Contratos:
+
+- Primitive canonica: `AdaptiveSidecarLayout` + `ContextualSidecar` + `adaptive-sidecar-controller`, exportados desde `@/components/greenhouse/primitives`.
+- Desktop preferente: sidecar in-flow que reserva espacio y hace reflow del main content.
+- Mobile/tablet: Drawer temporal con focus trap.
+- Sidecar in-flow no es modal: no usar `role='dialog'` ni `aria-modal='true'`.
+- Idempotencia: usar `reduceAdaptiveSidecarState()` para open/close/dirty/replace cuando el consumer tenga estado local; dirty close/replacement se bloquean salvo `force`.
+- Layout enterprise: lanes desktop deben ocupar el alto util del canvas de trabajo, no el alto de una card aislada; usar `minHeight` y medir ancho real del contenedor.
+- Dialog modal sigue siendo obligatorio para confirmaciones destructivas, irreversibles, legales, financieras o maker-checker.
+- La sidecar no implementa business logic; consume primitives/readers/commands/API canonicos y preserva Full API parity.
+- La primitive debe validar multiples variants: assistant, inspector, form, preview y review, con al menos un camino no-Nexa.
+- V1 no requiere libreria nueva de motion: usar CSS/MUI transitions, `@/libs/FramerMotion`, View Transition helpers existentes y GSAP solo para excepciones avanzadas.
+- Toda adopcion debe declarar URL mode (`ephemeral`/`addressable`), Back behavior, collision model, dirty guard, scroll containment, AI redaction si aplica e instrumentation hooks.
+- Toda adopcion runtime requiere GVC desktop closed/open + mobile temporary mode.
 
 ## Delta 2026-06-02 — `MetricTrendCard` primitive (KPI trend chart reutilizable)
 

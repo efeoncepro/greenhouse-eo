@@ -82,6 +82,15 @@ Normalize it into:
 - Any motion recommendation must include reduced-motion behavior: `useReducedMotion` for custom motion and static `icon` fallback for animated empty states.
 - Prefer the existing wrappers and primitives before proposing any new motion layer or third-party animation library.
 
+## Adaptive Sidecar decision rules
+
+- For contextual assistance, inspection, review, preview, and low-risk contextual editing where the main work context must remain visible, recommend the Adaptive Sidecar primitive first.
+- Canonical implementation: `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` from `@/components/greenhouse/primitives`.
+- Desktop sidecar is an in-flow, full-height lane with non-modal semantics; it is not a custom Drawer, floating card, or Dialog.
+- Mobile/tablet fallback may use the primitive's temporary Drawer mode.
+- If the surface can be dirty or replace its target, require `reduceAdaptiveSidecarState()` or an equivalent adapter around it.
+- Require GVC desktop and mobile evidence for any production consumer.
+
 ## Output contract
 
 When responding, include:

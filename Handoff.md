@@ -1,3 +1,32 @@
+# Sesion 2026-06-05 (cont.) — Adaptive Sidecar UI Platform ADR + TASK-1028 🆕
+
+Por pedido del operador se investigo y formalizo la tendencia de **sidecars adaptativos**: asistentes, inspectores y review panels que entran en el flujo y hacen que la UI se acomode, en vez de cubrir la pantalla como overlay.
+
+- **ADR aceptado:** `docs/architecture/GREENHOUSE_ADAPTIVE_SIDECAR_DECISION_V1.md`.
+- **Arquitectura creada:** `docs/architecture/GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md`.
+- **Decision:** Greenhouse adopta Adaptive Sidecar como capacidad UI platform multiuso, no Nexa-only, para asistencia contextual, inspeccion, review, preview y edicion contextual de bajo riesgo. Desktop preferente = in-flow push/reflow; mobile/tablet = Drawer temporal; Dialog modal sigue obligatorio para destructivo/irreversible/legal/financiero/maker-checker.
+- **Motion/library decision:** V1 no necesita libreria nueva. Usar CSS/MUI transitions + `@/libs/FramerMotion` + View Transition helpers existentes; `@formkit/auto-animate` solo para listas simples internas; GSAP solo para excepciones avanzadas segun su ADR.
+- **Platform concerns agregados:** URL mode (`ephemeral`/`addressable`), Back behavior, collision model (1 primary sidecar), scroll containment, dirty-state guard, pin/resize diferidos, AI redaction DTO e instrumentation hooks opcionales.
+- **Investigacion externa usada:** Google Gemini side panel, HubSpot Breeze, MUI persistent Drawer, Equinor Side Sheet, MDN/WAI dialog/aria-modal semantics.
+- **Evidencia local:** Nexa desktop hoy usa overlay fixed (`NexaFloatingButton`); Workforce Contracting y HR Offboarding ya muestran rails/paneles contextuales parciales que la primitive puede normalizar.
+- **Task creada:** `docs/tasks/to-do/TASK-1028-adaptive-sidecar-ui-platform.md`; registry/README sincronizados; `docs/architecture/DECISIONS_INDEX.md` actualizado; `GREENHOUSE_UI_PLATFORM_V1.md` y `GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1.md` sincronizados.
+- **Runtime no tocado:** queda pendiente implementar primitives `AdaptiveSidecarLayout`/`ContextualSidecar`, mockup/GVC con variants assistant/inspector/form/preview/review, piloto Nexa opcional bajo rollout guard y validacion operacional no-Nexa.
+
+# Sesion 2026-06-06 — TASK-1028 Adaptive Sidecar UI Platform in-progress
+
+El operador pidio ejecutar TASK-1028 y mantenerse en `develop` (override explicito: no branch). Ownership verificado: no PR abierto ni branch `TASK-1028`/`adaptive-sidecar`. Se movio la task a `docs/tasks/in-progress/TASK-1028-adaptive-sidecar-ui-platform.md`, `Lifecycle=in-progress`, y se sincronizaron README/registry/links. Worktree contiene cambios ajenos de Workforce Contracting (`TASK-1029/1030`, scenarios y BilingualReviewDesk/copy); no tocarlos ni mezclarlos con TASK-1028.
+
+Avance runtime:
+
+- **Primitives implementadas:** `AdaptiveSidecarLayout`, `ContextualSidecar` y `adaptive-sidecar-controller` en `src/components/greenhouse/primitives/`, exportadas por el barrel. El layout soporta `push|inline|overlay|temporary`, mide ancho real del contenedor con `ResizeObserver`, respeta reduced motion y cae a Drawer/overlay cuando el main no conserva ancho minimo.
+- **Primitive reusable/idempotente:** el barrel ahora expone `reduceAdaptiveSidecarState()` junto con mode resolver, URL helpers y telemetry helper. El reducer vuelve idempotente abrir el mismo target, bloquea close/replacement dirty salvo `force` y deja `lastAction` para que consumers disparen confirmacion sin pisar contexto.
+- **Mockup no-Nexa:** `/platform/adaptive-sidecar/mockup` con variants assistant/inspector/form/preview/review y data operacional tipada. Esto valida que la capacidad es UI platform, no Nexa-only.
+- **GVC final verde:** desktop `.captures/2026-06-06T01-30-31_adaptive-sidecar-platform-mockup` (push, form, inline, keyboard) y mobile `.captures/2026-06-06T01-30-00_adaptive-sidecar-platform-mobile-mockup` (drawer open/close/reopen).
+- **Gates verdes:** `pnpm vitest run src/components/greenhouse/primitives/__tests__/adaptive-sidecar-controller.test.ts src/components/greenhouse/primitives/__tests__/ContextualSidecar.test.tsx src/components/greenhouse/primitives/__tests__/AdaptiveSidecarLayout.test.tsx` (18 tests), `pnpm exec tsc --noEmit --pretty false`, `pnpm lint`, `pnpm task:lint --changed`.
+- **Product Design/GVC findings corregidos:** push ya no depende solo del viewport global; en dashboard con sidebar se mide el ancho disponible real. Tambien se saco el selector de variant del `CardHeader` para que mobile no comprima el titulo. Tras feedback del operador, se corrigio la lectura drawer-like: `ContextualSidecar` usa chrome `adaptive`, el layout in-flow separa por divider estructural y el mockup desktop muestra una superficie recompuesta. Segundo feedback: la primitive acepta `minHeight` y el mockup la usa como shell-level canvas wrapper. Tercer feedback: se elevo la microinteraccion con content transitions, hover/pressed states, save feedback inline y reduced-motion handling. Cuarto feedback enterprise: se agrego contenedor in-flow con borde/radius/sombra sobria, header sticky con surface blur, close affordance refinado, filas redondeadas y seleccion de alta señal; el mockup oculta el FAB legacy de Nexa via `data-nexa-floating-trigger` para evitar colision visual.
+- **Docs/skills sincronizados:** `GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md`, `GREENHOUSE_UI_PLATFORM_V1.md`, `GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1.md`, `GREENHOUSE_UI_ORCHESTRATION_V1.md`, `AGENTS.md`, `CLAUDE.md` y skills locales de UI/Product Design/Microinteractions/Enterprise Review declaran el patron como primitive canonica.
+- **Pendiente honesto:** piloto Nexa runtime no se habilito aun. `NexaFloatingButton` sigue montado fuera de `LayoutWrapper`, asi que reacomodar toda la UI global requiere un shell host/collision model con mayor blast radius. No declarar TASK-1028 complete hasta resolver o documentar formalmente ese slice.
+
 ## TASK-1024 ✅ — Workforce Contracting signature bridge (2026-06-05, complete en develop)
 
 El **bridge contrato↔firma** que cierra la firma electrónica end-to-end consumiendo EPIC-001 (TASK-490/491). **En `develop` sin branch.** 3 slices:

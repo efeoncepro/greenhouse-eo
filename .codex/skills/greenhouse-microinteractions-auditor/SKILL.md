@@ -83,6 +83,7 @@ Review the surface in this order:
 - Import Lottie from `@/libs/Lottie`, not directly from `lottie-react`.
 - Use `useReducedMotion` for any custom motion.
 - Use GSAP only for advanced timelines, SVG/path/text choreography, or measured ScrollTrigger experiences; keep normal microinteractions on Framer Motion, CSS/MUI transitions, or auto-animate.
+- Adaptive Sidecar motion uses the platform primitive: shell reflow via `AdaptiveSidecarLayout`, content transitions via `ContextualSidecar`, and state transitions via `reduceAdaptiveSidecarState()`. Do not recreate sidecar open/close choreography with a custom Drawer or direct animation imports.
 - Reuse `AnimatedCounter` for KPI value transitions.
 - Reuse `EmptyState` with `animatedIcon` only for first-use or no-results moments where calm motion helps orientation.
 - Keep error states and destructive confirmations visually stable.
@@ -162,3 +163,4 @@ Use this quick mapping unless the surface has a stronger local pattern:
 - successful save / mutation -> toast + stable inline state if relevant
 - urgent blocking issue -> `Alert` or dialog, not toast-only
 - dynamic result count / async status -> persistent live region or `role="status"`
+- adaptive contextual panel open/close/replace -> `AdaptiveSidecarLayout` + `ContextualSidecar` + reduced-motion-aware content transition; dirty replacement must be blocked by controller state

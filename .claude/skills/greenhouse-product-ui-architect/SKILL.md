@@ -1,6 +1,6 @@
 ---
 name: greenhouse-product-ui-architect
-description: Greenhouse-specific product UI architecture overlay. Use when applying modern UI/product design decisions to the Greenhouse repo, Vuexy/MUI, DESIGN.md, canonical copy, primitives, views, access surfaces, and Playwright verification.
+description: Greenhouse-specific product UI architecture overlay for Vuexy/MUI, DESIGN.md, canonical copy, primitives, views, access surfaces, and GVC verification.
 ---
 
 # Greenhouse Product UI Architect
@@ -16,23 +16,12 @@ Use this after a global design skill selects the product pattern. This overlay t
 - `docs/architecture/GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1.md`
 - `docs/operations/GREENHOUSE_UI_DELIVERY_LOOP_V1.md`
 
-## Greenhouse Mapping
-
-For every visible UI change, decide:
-
-- **Surface**: route, view, drawer, modal, mockup, primitive.
-- **Primitive reuse**: `OperationalPanel`, `DataTableShell`, `EmptyState`, `FieldsProgressChip`, `CustomChip`, Vuexy/MUI wrappers.
-- **Copy**: `src/lib/copy/*` for reusable microcopy; inline only for one-off local text.
-- **Access**: whether the change touches `routeGroups`, `views`, `entitlements`, or none.
-- **Responsive**: desktop/laptop/mobile screenshots required for meaningful UI.
-- **Verification**: `pnpm design:lint`, relevant tests, Playwright screenshot loop.
-
-## Greenhouse UI Pattern Preferences
+## Pattern Preferences
 
 - Operational lists with decisions: prefer queue + inspector.
 - Low-frequency risky creation: prefer drawer or stepper with clear consequences.
 - Runtime dashboards: prefer command center with exceptions before totals.
-- AI helpers: prefer Adaptive Sidecar on desktop and temporary Drawer only on mobile/tablet; never make AI the only path for core operations.
+- AI helpers: prefer Adaptive Sidecar on desktop and temporary Drawer only on mobile/tablet.
 - Contextual assistance, inspection, review, preview, and low-risk contextual editing: use `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` from `@/components/greenhouse/primitives` before creating any custom drawer/modal.
 - Tables: use when comparison and scanning matter; pair with inspector for actions that require context.
 
@@ -41,9 +30,8 @@ For every visible UI change, decide:
 - Do not introduce a parallel design system.
 - Do not bypass `DESIGN.md`.
 - Do not reintroduce generic landing-page composition inside operational tools.
-- Do not duplicate primary actions across table rows and inspector unless the duplication has a clear accessibility/efficiency reason.
-- Do not ship screenshots-free UI changes when the request is about visual quality.
 - Do not implement a desktop Adaptive Sidecar as a boxed drawer/card overlay. It must be an in-flow, full-height work-canvas lane with non-modal semantics.
+- Do not ship screenshots-free UI changes when the request is about visual quality.
 
 ## Output Contract
 
