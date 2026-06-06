@@ -72,7 +72,7 @@ Rules:
 
 - Do not create separate `FooDrawer`, `FooInspector`, `FooAssistant` components when one primitive plus variants can cover the family.
 - Do not add variants that only change color, radius, shadow or icon.
-- Define at most 3-5 official variants per primitive unless an ADR justifies more.
+- Define at most 3-5 official variants per primitive unless an ADR/runtime primitive justifies more. Adaptive Sidecar is the accepted exception with 6 functional variants: `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, `runbook`.
 - Validate each official variant with GVC before calling the primitive enterprise-ready.
 - Preserve Full API parity: variants may change UI workflow, not business source of truth.
 

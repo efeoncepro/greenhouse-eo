@@ -64,6 +64,9 @@ describe('adaptive-sidecar-controller', () => {
     expect(resolveAdaptiveSidecarVariant('form')).toBe('composer')
     expect(resolveAdaptiveSidecarVariant('composer')).toBe('composer')
     expect(resolveAdaptiveSidecarVariant('assistant')).toBe('assistant')
+    expect(resolveAdaptiveSidecarVariant('evidence')).toBe('evidence')
+    expect(resolveAdaptiveSidecarVariant('reconciler')).toBe('reconciler')
+    expect(resolveAdaptiveSidecarVariant('runbook')).toBe('runbook')
     expect(resolveAdaptiveSidecarVariant('review', 'assistant')).toBe('assistant')
   })
 

@@ -1,11 +1,11 @@
 # Sesion 2026-06-06 — Adaptive Sidecar variants oficiales implementadas
 
-Se termino el modelado runtime de las 3 variants oficiales de Adaptive Sidecar bajo la metodologia Primitive + Variants + Kinds:
+Se termino el modelado runtime de las variants oficiales de Adaptive Sidecar bajo la metodologia Primitive + Variants + Kinds. La base inicial fue `inspector`, `composer`, `assistant`; el contrato vigente se extendio a `reconciler`, `evidence` y `runbook`:
 
 - `adaptive-sidecar-controller.ts` ahora exporta `AdaptiveSidecarVariant` y `resolveAdaptiveSidecarVariant()`.
-- Mapeo canonico: `inspector/review/preview -> inspector`, `composer/form -> composer`, `assistant -> assistant`; `variant` explicita puede overridear.
+- Mapeo canonico: `inspector/review/preview -> inspector`, `composer/form -> composer`, `assistant -> assistant`, `reconciler -> reconciler`, `evidence -> evidence`, `runbook -> runbook`; `variant` explicita puede overridear.
 - `ContextualSidecar` usa el resolver canonico y expone `data-sidecar-variant` estable para GVC/testing.
-- Mockup `/platform/adaptive-sidecar/mockup` ahora muestra solo variants oficiales `inspector`, `composer`, `assistant`; `composer` tiene dirty-state guard, footer de guardado/descarte y wrappers Vuexy (`CustomTextField`, `CustomChip`).
+- Mockup `/platform/adaptive-sidecar/mockup` ahora muestra las variants oficiales; `composer` tiene dirty-state guard, footer de guardado/descarte y wrappers Vuexy (`CustomTextField`, `CustomChip`), y las variants `reconciler/evidence/runbook` usan bloques reutilizables de señal, métricas, comparación, procedencia y pasos operacionales.
 - Scenario GVC desktop actualizado a `switch-to-composer` y a captura full viewport para panels fixed/viewport.
 - Evidencia GVC local: desktop `.captures/2026-06-06T10-24-01_adaptive-sidecar-platform-mockup`; mobile `.captures/2026-06-06T10-24-51_adaptive-sidecar-platform-mobile-mockup`.
 - Gates verdes: focal vitest 22/22, `pnpm exec tsc --noEmit --pretty false`, `pnpm task:lint --changed`, `git diff --check`.
@@ -17,7 +17,7 @@ Por feedback del operador durante TASK-1028, se canonizo la metodología **Primi
 - **ADR aceptado:** `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`.
 - **Decision:** UI platform reusable se desarrolla como primitive estable + variants funcionales oficiales + kinds semanticos por consumidor. Variants no son skins; cambian comportamiento, densidad, estados, footer/actions y microinteracciones. Kinds no deben controlar layout directo: se resuelven a una variant.
 - **Shape canonico:** `<Primitive variant='inspector' kind='contractReview' />`.
-- **Aplicacion TASK-1028:** Adaptive Sidecar tendrá 3 variants oficiales: `inspector`, `composer`, `assistant`; kinds como `form`, `review`, `preview` son aliases/casos semanticos que deben mapear a una variant oficial.
+- **Aplicacion TASK-1028:** Adaptive Sidecar tiene 6 variants oficiales: `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, `runbook`; kinds como `form`, `review`, `preview`, reconciliacion, procedencia/evidencia y ejecucion guiada son aliases/casos semanticos que deben mapear a una variant oficial.
 - **Docs/reglas sincronizadas:** `DECISIONS_INDEX`, `GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1`, `GREENHOUSE_UI_PLATFORM_V1`, `AGENTS.md`, `CLAUDE.md`, `project_context.md` y skills UI/Product Design.
 
 # Sesion 2026-06-05 (cont.) — Adaptive Sidecar UI Platform ADR + TASK-1028 🆕
@@ -29769,6 +29769,34 @@ Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. N
 ---
 
 ## 2026-05-31 — EPIC-017 / TASK-959 cierre + TASK-961 creada
+## 2026-06-06 — Adaptive Sidecar variants 6-pack + enterprise polish
+
+Contexto: el operador pidió elevar las nuevas variantes del Adaptive Sidecar porque se sentían planas y poco enterprise. Se aplicó loop con Product Design / microinteractions / UX content-accessibility / modern-ui Greenhouse, y se retiró la línea de color estructural del borde del sidecar por feedback del operador.
+
+Trabajo realizado:
+- Adaptive Sidecar ahora canoniza 6 variants oficiales: `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, `runbook`.
+- Nuevo bloque reusable `src/components/greenhouse/primitives/ContextualSidecarBlocks.tsx`: signal, metric strip, comparison rows, progress, timeline y runbook steps con roles/focus/reduced-motion/tonal states.
+- Mockup `/platform/adaptive-sidecar/mockup` actualizado para mostrar Reconciler/Evidence/Runbook con señal ejecutiva, microcopy operacional, footer contextual y acciones más específicas.
+- Docs/skills sincronizadas: arquitectura Adaptive Sidecar, Primitive+Variants ADR, UI Platform, Product UI Operating Model, TASK-1028, skills Codex/Claude/agents.
+- Se guardaron referencias visuales generadas en `docs/assets/product-design/adaptive-sidecar-variants/`.
+
+Validación:
+- `pnpm vitest run src/components/greenhouse/primitives/__tests__/adaptive-sidecar-controller.test.ts src/components/greenhouse/primitives/__tests__/ContextualSidecar.test.tsx src/components/greenhouse/primitives/__tests__/AdaptiveSidecarLayout.test.tsx` OK (23 tests).
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `git diff --check` OK.
+- GVC desktop OK: `.captures/2026-06-06T11-04-52_adaptive-sidecar-platform-mockup`.
+- GVC mobile OK: `.captures/2026-06-06T11-05-41_adaptive-sidecar-platform-mobile-mockup`.
+- `pnpm docs:closure-check` ejecutado: warnings por changelog/handoff/project_context y por cambios unrelated en worktree; changelog/handoff/project_context quedaron actualizados para este slice.
+
+Nota de sesión/local auth:
+- GVC renderiza la ruta correctamente. La page `src/app/(dashboard)/platform/adaptive-sidecar/mockup/page.tsx` no tiene guard propio.
+- Si Chrome del operador cae en `/401`, parece sesión/permisos local/stale del navegador o overlay anterior de Next, no ruptura del sidecar. Request sin cookies a la ruta redirige a `/login`, esperado para `(dashboard)`.
+
+Pendiente:
+- No commitear cambios unrelated del worktree (Coming Soon, brand/copy/not authorized, etc.) salvo instrucción explícita.
+
+---
+
 
 Contexto: el operador corrigio el enfoque tras la captura de Deel: la captura corresponde a People / Worker Profile, no a Payroll. Decision operativa: Person 360 ya es un hub parcial y debe evolucionar como hub workforce; Payroll queda como vista/rail especializada para calculos, periodos, recibos y salidas estatutarias.
 

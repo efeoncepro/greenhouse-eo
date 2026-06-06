@@ -1,8 +1,9 @@
 # Greenhouse Adaptive Sidecar UI Platform V1
 
-> **Version:** 1.4
+> **Version:** 1.5
 > **Created:** 2026-06-05
-> **Updated:** 2026-06-06 — v1.4: Adaptive Sidecar adopts `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`: official variants are `inspector`, `composer`, and `assistant`; domain/legacy kinds resolve into those variants.
+> **Updated:** 2026-06-06 — v1.5: Adaptive Sidecar extends official variants to `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, and `runbook`; reusable content blocks live in `ContextualSidecarBlocks` for comparison, provenance, metrics, signals, progress, and runbook steps.
+> **Updated:** 2026-06-06 — v1.4: Adaptive Sidecar adopts `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`; domain/legacy kinds resolve into official variants before behavior/chrome is chosen.
 > **Updated:** 2026-06-06 — v1.3: viewport-height sidecars can publish shell reservations through `AdaptiveSidecarShellProvider`; the Greenhouse vertical navbar consumes that reservation and reflows without global CSS patches or `!important`.
 > **Updated:** 2026-06-06 — v1.2: optional bounded resize and viewport-height shell lanes are accepted in V1 for desktop in-flow sidecars. `AdaptiveSidecarLayout` exposes `resizable`, `sidecarMinWidth`, `sidecarMaxWidth`, `onSidecarWidthChange`, `sidecarExtent`, `viewportOffsetTop`, and an accessible `role="separator"` splitter.
 > **Updated:** 2026-06-06 — Runtime primitive promoted: `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` are the canonical reusable implementation under `src/components/greenhouse/primitives/`.
@@ -100,6 +101,9 @@ Canonical imports:
 import {
   AdaptiveSidecarLayout,
   ContextualSidecar,
+  ContextualSidecarComparisonRows,
+  ContextualSidecarMetricStrip,
+  ContextualSidecarSignal,
   buildSidecarSearchParams,
   removeSidecarSearchParams,
   reduceAdaptiveSidecarState,
@@ -111,6 +115,7 @@ Canonical files:
 
 - `src/components/greenhouse/primitives/AdaptiveSidecarLayout.tsx`
 - `src/components/greenhouse/primitives/ContextualSidecar.tsx`
+- `src/components/greenhouse/primitives/ContextualSidecarBlocks.tsx`
 - `src/components/greenhouse/primitives/adaptive-sidecar-controller.ts`
 - `src/components/greenhouse/primitives/adaptive-sidecar-shell-context.tsx`
 - `src/components/layout/vertical/Navbar.tsx`
@@ -137,6 +142,23 @@ Motion contract:
 - `sidecarExtent='viewport'` is the shell-level presentation: panel and splitter run top-to-bottom through the viewport, while the route content still reserves layout space so the main surface is not covered.
 - If a viewport sidecar needs to occupy the global app-bar area, the implementation must use `viewportShellReflow='greenhouse-vertical-navbar'` inside `AdaptiveSidecarShellProvider`. The sidecar publishes a bounded reservation; the navbar consumes it through its `overrideStyles` contract and preserves global actions/avatar. Do not patch the navbar with route-local global CSS or `!important`.
 - Viewport sidecars must not remove the global footer. Surfaces that use full-height lanes must budget header/content padding/footer height in their own canvas so `scrollHeight === clientHeight` when the workbench is intended to be non-scrolling.
+
+Variant contract:
+
+- `inspector`: read/diagnose/decide beside the workbench.
+- `composer`: low-risk contextual editing with dirty-state guard.
+- `assistant`: advisory-only explanation and suggestions with evidence context.
+- `reconciler`: source comparison, drift resolution, exception path and audit trail.
+- `evidence`: provenance, source freshness, confidence and acceptance traceability.
+- `runbook`: checkpointed operational execution with rollback/pause affordance.
+
+Reusable content blocks:
+
+- `ContextualSidecarSignal` for the dominant operational signal.
+- `ContextualSidecarMetricStrip` for compact KPI/state summaries.
+- `ContextualSidecarComparisonRows` for reconciler source comparison.
+- `ContextualSidecarProgress` and `ContextualSidecarTimeline` for evidence confidence/provenance.
+- `ContextualSidecarRunbookSteps` for gated operational steps.
 
 Verification evidence for the V1 primitive:
 
@@ -196,6 +218,9 @@ Variant contract follows `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`:
 | `inspector` | User must read, diagnose and decide while preserving queue/context | Read-heavy hierarchy, evidence/status/timeline, one contextual primary action |
 | `composer` | User creates or edits contextual data | Dirty-state guard, validation feedback, save/discard/cancel action model |
 | `assistant` | User needs advisory explanation, summary or next-best-action | Context disclosure, evidence/sources, advisory-only suggested actions |
+| `reconciler` | User compares two or more sources and resolves drift | Source comparison rows, exception path, explicit apply action, audit trail |
+| `evidence` | User validates provenance, confidence and source freshness | Source cards, confidence/progress, provenance timeline, accept/copy actions |
+| `runbook` | User advances a guided operational procedure | Checkpoint steps, active gate, rollback/pause affordance, execution guardrails |
 
 `kind` remains semantic and may be domain-specific (`contractReview`, `paymentInspector`) or legacy/narrow (`form`, `review`, `preview`). Kinds must map into an official variant before chrome, footer behavior or motion is decided.
 
@@ -209,7 +234,7 @@ type ContextualSidecarProps = {
   status?: React.ReactNode
   icon?: React.ReactNode
   kind: AdaptiveSidecarKind
-  variant?: 'inspector' | 'composer' | 'assistant'
+  variant?: 'inspector' | 'composer' | 'assistant' | 'reconciler' | 'evidence' | 'runbook'
   onClose: () => void
   actions?: React.ReactNode
   children: React.ReactNode

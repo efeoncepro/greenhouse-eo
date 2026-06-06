@@ -50,7 +50,7 @@ Use the real product stack:
 - Vuexy/MUI theme from the repo
 - `@core/components/mui/*` wrappers such as `CustomTextField`, `CustomChip`, `CustomAvatar`, `CustomTabList`, `CustomIconButton`
 - Existing Greenhouse primitives such as `EmptyState`, `CardHeaderWithBadge`, `EntitySummaryDock`, `ContextChipStrip`, and other `src/components/greenhouse/*` primitives
-- For contextual sidecars, use `AdaptiveSidecarLayout` + `ContextualSidecar` and its official variants (`inspector`, `composer`, `assistant`) instead of custom drawers/cards.
+- For contextual sidecars, use `AdaptiveSidecarLayout` + `ContextualSidecar` and its official variants (`inspector`, `composer`, `assistant`, `reconciler`, `evidence`, `runbook`) instead of custom drawers/cards.
 - `src/lib/format/*` for visible numbers, dates, currency, percentages, and relative time
 - `src/lib/copy/*` / domain copy modules for shared copy, states, aria labels, empty states, and labels when lint requires tokenization
 

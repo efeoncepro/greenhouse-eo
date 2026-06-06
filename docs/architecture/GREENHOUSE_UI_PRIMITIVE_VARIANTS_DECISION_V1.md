@@ -38,7 +38,7 @@ When agents design or implement a reusable UI surface:
 1. Identify the **job to be done**, not the visual container.
 2. Check whether an existing primitive already covers the interaction.
 3. If the pattern recurs or is platform-level, create or extend a primitive.
-4. Define at most 3-5 official variants, each with a distinct functional contract.
+4. Define a small set of official variants, each with a distinct functional contract. Prefer 3-5; allow 6 only when an ADR/runtime primitive proves the jobs are materially different.
 5. Map domain-specific kinds into those variants.
 6. Document the state model, action model, responsive model, accessibility model and verification evidence per variant.
 7. Validate with GVC for each official variant before declaring the primitive enterprise-ready.
@@ -61,18 +61,21 @@ Kinds are semantic:
 
 ## Adaptive Sidecar Application
 
-Adaptive Sidecar V1 establishes three official variants:
+Adaptive Sidecar V1 establishes six official variants. The first three cover the original contextual jobs; the next three are accepted because Greenhouse needs enterprise-grade operational sidecars for reconciliation, provenance/evidence, and guided runbook execution without creating parallel drawers.
 
 | Variant | Primary job | Typical kinds | Action model |
 | --- | --- | --- | --- |
 | `inspector` | Read, diagnose and decide without losing the queue/context | `inspector`, `review`, `preview`, domain entity detail kinds | One primary contextual action plus secondary inspect/escalate actions |
 | `composer` | Create or edit contextual data without abandoning the workbench | `composer`, `form`, edit/create kinds | Dirty-state guard, save/discard/cancel, validation feedback |
 | `assistant` | Explain, summarize and suggest using current context | `assistant`, `nexa`, AI copilots | Advisory-only suggestions with evidence/context chips; never the only execution path |
+| `reconciler` | Compare sources, expose drift and resolve differences with audit trail | offer-vs-contract, bank/accounting, identity/data drift kinds | One correction/apply action plus exception/escalation path; no silent auto-merge |
+| `evidence` | Inspect provenance, confidence and source freshness before accepting evidence | uploads, onboarding evidence, finance reconciliation evidence, audit packets | Accept/copy/link evidence with traceability and honest incomplete-source states |
+| `runbook` | Guide an operator through reversible, checkpointed execution | release/preflight, recovery, operational remediation kinds | Step gating, rollback/pause affordance, checkpoint status and execution guardrails |
 
 `ContextualSidecar` may expose both:
 
 ```tsx
-variant='inspector' | 'composer' | 'assistant'
+variant='inspector' | 'composer' | 'assistant' | 'reconciler' | 'evidence' | 'runbook'
 kind={domainSpecificKind}
 ```
 

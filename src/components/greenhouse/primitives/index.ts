@@ -57,6 +57,22 @@ export type {
   ContextualSidecarState,
   ContextualSidecarVariant
 } from './ContextualSidecar'
+export {
+  ContextualSidecarComparisonRows,
+  ContextualSidecarMetricStrip,
+  ContextualSidecarProgress,
+  ContextualSidecarRunbookSteps,
+  ContextualSidecarSection,
+  ContextualSidecarSignal,
+  ContextualSidecarTimeline
+} from './ContextualSidecarBlocks'
+export type {
+  ContextualSidecarComparisonRow,
+  ContextualSidecarMetric,
+  ContextualSidecarRunbookStep,
+  ContextualSidecarSignalProps,
+  ContextualSidecarTimelineItem
+} from './ContextualSidecarBlocks'
 export { AdaptiveSidecarShellProvider, useAdaptiveSidecarShell } from './adaptive-sidecar-shell-context'
 export type {
   AdaptiveSidecarShellReflowTarget,

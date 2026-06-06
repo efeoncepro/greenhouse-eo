@@ -50,6 +50,32 @@ describe('ContextualSidecar', () => {
     expect(getByRole('complementary', { name: 'AI' })).toHaveAttribute('data-sidecar-variant', 'assistant')
   })
 
+  it('exposes the extended official variants', () => {
+    const { getByRole, rerender } = renderWithTheme(
+      <ContextualSidecar title='Reconciler' kind='reconciler'>
+        <p>Contenido</p>
+      </ContextualSidecar>
+    )
+
+    expect(getByRole('complementary', { name: 'Reconciler' })).toHaveAttribute('data-sidecar-variant', 'reconciler')
+
+    rerender(
+      <ContextualSidecar title='Evidence' kind='evidence'>
+        <p>Contenido</p>
+      </ContextualSidecar>
+    )
+
+    expect(getByRole('complementary', { name: 'Evidence' })).toHaveAttribute('data-sidecar-variant', 'evidence')
+
+    rerender(
+      <ContextualSidecar title='Runbook' kind='runbook'>
+        <p>Contenido</p>
+      </ContextualSidecar>
+    )
+
+    expect(getByRole('complementary', { name: 'Runbook' })).toHaveAttribute('data-sidecar-variant', 'runbook')
+  })
+
   it('exposes busy and error states', () => {
     const { getByRole, rerender } = renderWithTheme(
       <ContextualSidecar title='Panel' state='loading'>

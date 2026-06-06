@@ -24,12 +24,12 @@ export const scenario: CaptureScenario = {
     { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' },
     { kind: 'visible', selector: 'text=Mesa operacional', reason: 'la superficie debe declarar la tarea operacional' },
     { kind: 'visible', selector: 'text=Superficie no-Nexa', reason: 'la validación debe demostrar uso no-Nexa' },
-    { kind: 'visible', selector: 'text=Inspector · GH-1842', reason: 'el sidecar debe estar visible en primer fold' },
+    { kind: 'visible', selector: 'text=Reconciler · GH-1842', reason: 'el sidecar recomendado debe estar visible en primer fold' },
     { kind: 'visible', selector: 'img[alt="Greenhouse Workspace"]', reason: 'el reflow del shell no debe ocultar el avatar global' },
     {
       kind: 'visible',
-      selector: '[data-sidecar-shell-reflow="greenhouse-vertical-navbar"]',
-      reason: 'el sidecar viewport debe declarar reflow del app bar de plataforma'
+      selector: '[data-capture="adaptive-sidecar-layout"][data-sidecar-open="true"]',
+      reason: 'el layout adaptativo debe estar abierto y visible en el primer fold'
     },
     {
       kind: 'visible',
@@ -40,8 +40,58 @@ export const scenario: CaptureScenario = {
   steps: [
     {
       kind: 'mark',
-      label: 'desktop-push',
-      note: 'Workbench y sidecar conviven en layout push sin superposición'
+      label: 'desktop-reconciler-push',
+      note: 'Workbench y sidecar reconciler conviven en layout push sin superposición'
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'switch-to-evidence',
+        intent: 'Verifica cambio hacia evidence con provenance y fuentes.',
+        action: { kind: 'click', selector: 'button[aria-label="Evidence"]' },
+        frames: [
+          {
+            label: 'evidence-start',
+            atMs: 120,
+            note: 'Inicio del cambio a evidence'
+          },
+          {
+            label: 'evidence-settled',
+            atMs: 520,
+            note: 'Evidence estable con fuentes y procedencia'
+          }
+        ],
+        keyboardEquivalent: {
+          action: { kind: 'focus', selector: 'button[aria-label="Evidence"]' },
+          expected: 'El selector evidence tiene foco visible y nombre accesible.'
+        },
+        reducedMotion: 'skip'
+      }
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'switch-to-runbook',
+        intent: 'Verifica cambio hacia runbook con pasos operacionales.',
+        action: { kind: 'click', selector: 'button[aria-label="Runbook"]' },
+        frames: [
+          {
+            label: 'runbook-start',
+            atMs: 120,
+            note: 'Inicio del cambio a runbook'
+          },
+          {
+            label: 'runbook-settled',
+            atMs: 520,
+            note: 'Runbook estable con pasos y checkpoint activo'
+          }
+        ],
+        keyboardEquivalent: {
+          action: { kind: 'focus', selector: 'button[aria-label="Runbook"]' },
+          expected: 'El selector runbook tiene foco visible y nombre accesible.'
+        },
+        reducedMotion: 'skip'
+      }
     },
     {
       kind: 'interaction',

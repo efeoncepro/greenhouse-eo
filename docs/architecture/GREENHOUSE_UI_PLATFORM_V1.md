@@ -64,7 +64,7 @@ Contratos:
 - Dialog modal sigue siendo obligatorio para confirmaciones destructivas, irreversibles, legales, financieras o maker-checker.
 - La sidecar no implementa business logic; consume primitives/readers/commands/API canonicos y preserva Full API parity.
 - La primitive debe validar multiples variants: assistant, inspector, form, preview y review, con al menos un camino no-Nexa.
-- Bajo la metodologia Primitive + Variants + Kinds, Adaptive Sidecar tiene 3 variants oficiales: `inspector`, `composer` y `assistant`. Kinds como `form`, `review` y `preview` son casos semanticos que deben mapear a una variant oficial antes de comportamiento/chrome.
+- Bajo la metodologia Primitive + Variants + Kinds, Adaptive Sidecar tiene 6 variants oficiales: `inspector`, `composer`, `assistant`, `reconciler`, `evidence` y `runbook`. Kinds como `form`, `review`, `preview`, reconciliacion, procedencia/evidencia o ejecucion guiada son casos semanticos que deben mapear a una variant oficial antes de comportamiento/chrome.
 - V1 no requiere libreria nueva de motion: usar CSS/MUI transitions, `@/libs/FramerMotion`, View Transition helpers existentes y GSAP solo para excepciones avanzadas.
 - Toda adopcion debe declarar URL mode (`ephemeral`/`addressable`), Back behavior, collision model, dirty guard, scroll containment, AI redaction si aplica e instrumentation hooks.
 - Toda adopcion runtime requiere GVC desktop closed/open + mobile temporary mode.

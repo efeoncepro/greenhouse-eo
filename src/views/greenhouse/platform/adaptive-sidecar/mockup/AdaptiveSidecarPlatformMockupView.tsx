@@ -19,10 +19,24 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { AdaptiveSidecarLayout, ContextualSidecar, resolveAdaptiveSidecarVariant } from '@/components/greenhouse/primitives'
+import {
+  AdaptiveSidecarLayout,
+  ContextualSidecar,
+  ContextualSidecarComparisonRows,
+  ContextualSidecarMetricStrip,
+  ContextualSidecarProgress,
+  ContextualSidecarRunbookSteps,
+  ContextualSidecarSection,
+  ContextualSidecarSignal,
+  ContextualSidecarTimeline,
+  resolveAdaptiveSidecarVariant
+} from '@/components/greenhouse/primitives'
 import type {
   AdaptiveSidecarKind,
   AdaptiveSidecarPreferredMode,
+  ContextualSidecarMetric,
+  ContextualSidecarRunbookStep,
+  ContextualSidecarTimelineItem,
   ContextualSidecarVariant
 } from '@/components/greenhouse/primitives'
 import useReducedMotion from '@/hooks/useReducedMotion'
@@ -81,7 +95,10 @@ const KIND_LABELS: Record<AdaptiveSidecarKind, string> = {
   form: 'Formulario',
   review: 'Revisión',
   assistant: 'Asistente',
-  preview: 'Preview'
+  preview: 'Preview',
+  evidence: 'Evidence',
+  reconciler: 'Reconciler',
+  runbook: 'Runbook'
 }
 
 const KIND_CONTROL_LABELS: Record<AdaptiveSidecarKind, string> = {
@@ -90,13 +107,19 @@ const KIND_CONTROL_LABELS: Record<AdaptiveSidecarKind, string> = {
   form: 'Form.',
   review: 'Review',
   assistant: 'AI',
-  preview: 'Preview'
+  preview: 'Preview',
+  evidence: 'Evid.',
+  reconciler: 'Recon.',
+  runbook: 'Run.'
 }
 
 const OFFICIAL_VARIANTS: Array<{ kind: AdaptiveSidecarKind; variant: ContextualSidecarVariant }> = [
   { kind: 'inspector', variant: 'inspector' },
   { kind: 'composer', variant: 'composer' },
-  { kind: 'assistant', variant: 'assistant' }
+  { kind: 'assistant', variant: 'assistant' },
+  { kind: 'reconciler', variant: 'reconciler' },
+  { kind: 'evidence', variant: 'evidence' },
+  { kind: 'runbook', variant: 'runbook' }
 ]
 
 const MODE_LABELS: Record<AdaptiveSidecarPreferredMode, string> = {
@@ -119,11 +142,124 @@ const STATUS_META: Record<MockCaseStatus, { label: string; color: 'error' | 'war
   ready: { label: GREENHOUSE_COPY.states.completed, color: 'success', icon: 'tabler-circle-check' }
 }
 
+const VARIANT_PRESENTATION: Record<
+  ContextualSidecarVariant,
+  { icon: string; color: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info'; subtitle: string }
+> = {
+  inspector: {
+    icon: 'tabler-eye-check',
+    color: 'primary',
+    subtitle: 'Inspección contextual con decisión rápida'
+  },
+  composer: {
+    icon: 'tabler-edit',
+    color: 'warning',
+    subtitle: 'Edición contextual protegida por dirty-state'
+  },
+  assistant: {
+    icon: 'tabler-sparkles',
+    color: 'info',
+    subtitle: 'Asistencia advisory-only con trazabilidad'
+  },
+  evidence: {
+    icon: 'tabler-shield-check',
+    color: 'success',
+    subtitle: 'Provenance, fuentes y confianza verificable'
+  },
+  reconciler: {
+    icon: 'tabler-git-compare',
+    color: 'error',
+    subtitle: 'Comparación y resolución de diferencias'
+  },
+  runbook: {
+    icon: 'tabler-list-check',
+    color: 'primary',
+    subtitle: 'Ejecución operacional guiada y auditable'
+  }
+}
+
 const sidecarItemMotion = (index: number, prefersReducedMotion: boolean) => ({
   initial: prefersReducedMotion ? false : { opacity: 0, y: 8 },
   animate: prefersReducedMotion ? undefined : { opacity: 1, y: 0 },
-  transition: prefersReducedMotion ? undefined : { duration: 0.18, delay: index * 0.045, ease: 'easeOut' as const }
+  transition: prefersReducedMotion ? undefined : { duration: 0.18, delay: index * 0.045, ease: [0.2, 0, 0, 1] as const }
 })
+
+const RECONCILER_METRICS: ContextualSidecarMetric[] = [
+  { label: 'Diferencias', value: 3, helper: 'Oferta vs contrato', color: 'error', icon: 'tabler-delta' },
+  { label: 'Bloqueante', value: 1, helper: 'Requiere decisión', color: 'warning', icon: 'tabler-lock-exclamation' },
+  { label: 'Confianza', value: '62%', helper: 'Match documental', color: 'primary', icon: 'tabler-chart-dots-3' }
+]
+
+const EVIDENCE_TIMELINE_ITEMS: ContextualSidecarTimelineItem[] = [
+  {
+    id: 'notion',
+    title: 'Notion Employee DB sincronizado',
+    meta: '08:55',
+    description: 'Evento ID: 3f4c9b12...',
+    icon: 'tabler-database',
+    color: 'success'
+  },
+  {
+    id: 'hubspot',
+    title: 'Datos del contacto en HubSpot',
+    meta: '08:42',
+    description: 'Actor: hubspot.integration',
+    icon: 'tabler-plug-connected',
+    color: 'warning'
+  },
+  {
+    id: 'workspace',
+    title: 'Perfil verificado en Google Workspace',
+    meta: '08:30',
+    description: 'Actor: system.integration',
+    icon: 'tabler-check',
+    color: 'success'
+  }
+]
+
+const RUNBOOK_METRICS: ContextualSidecarMetric[] = [
+  { label: 'Estado', value: 'Activo', helper: 'Operación pausada', color: 'primary', icon: 'tabler-player-pause' },
+  { label: 'Tiempo', value: '03:24', helper: 'transcurrido', color: 'info', icon: 'tabler-clock' },
+  { label: 'Riesgo', value: 'Medio', helper: 'rollback disponible', color: 'warning', icon: 'tabler-shield-half' }
+]
+
+const RUNBOOK_STEPS: ContextualSidecarRunbookStep[] = [
+  {
+    id: 'preflight',
+    index: 1,
+    title: 'Preflight',
+    description: 'Validaciones previas obligatorias',
+    status: 'Completado',
+    color: 'success',
+    meta: '8 / 8 checks pasaron · duración 02:01'
+  },
+  {
+    id: 'approval',
+    index: 2,
+    title: 'Aprobación del operador',
+    description: 'Confirmar para continuar',
+    status: 'En espera',
+    color: 'primary',
+    active: true,
+    meta: 'Requiere aprobación con rol Owner'
+  },
+  {
+    id: 'workers',
+    index: 3,
+    title: 'Despliegue de workers',
+    description: 'Actualizar servicios en Cloud Run',
+    status: 'Pendiente',
+    disabled: true
+  },
+  {
+    id: 'health',
+    index: 4,
+    title: 'Post-release health',
+    description: 'Validaciones finales y confirmación',
+    status: 'Pendiente',
+    disabled: true
+  }
+]
 
 const SidecarBody = ({
   selectedCase,
@@ -201,6 +337,174 @@ const SidecarBody = ({
           defaultValue='Validar evidencia y confirmar próximo hito con el owner.'
           onChange={() => setDirty(true)}
         />
+      </Stack>
+    )
+  }
+
+  if (variant === 'reconciler') {
+    return (
+      <Stack spacing={4}>
+        <ContextualSidecarSignal
+          icon='tabler-alert-hexagon'
+          color='error'
+          title='Diferencia bloqueante detectada'
+          description='El monto del contrato no coincide con la oferta aprobada. Resolverlo evita enviar un documento con obligación de pago incorrecta.'
+          meta='-$100.000'
+          secondaryMeta='impacto mensual'
+        />
+        <ContextualSidecarMetricStrip items={RECONCILER_METRICS} />
+        <ContextualSidecarSection title='Comparación normalizada' subtitle='Cada fila conserva fuente, estado y foco de resolución'>
+          <ContextualSidecarComparisonRows
+            sourceALabel='Oferta'
+            sourceBLabel='Contrato'
+            rows={[
+              {
+                id: 'role',
+                field: 'Cargo',
+                sourceA: 'Analista Financiero',
+                sourceB: 'Analista Financiero',
+                status: 'Match',
+                tone: 'success'
+              },
+              {
+                id: 'fee',
+                field: 'Monto mensual',
+                sourceA: '$1.350.000 CLP',
+                sourceB: '$1.250.000 CLP',
+                status: 'Bloqueante',
+                tone: 'error',
+                selected: true
+              },
+              {
+                id: 'payment-days',
+                field: 'Días de pago',
+                sourceA: '30',
+                sourceB: '15',
+                status: 'Diferencia',
+                tone: 'warning'
+              },
+              {
+                id: 'bank',
+                field: 'Cuenta bancaria',
+                sourceA: '—',
+                sourceB: 'Banco de Chile · 8921',
+                status: 'Faltante',
+                tone: 'info'
+              }
+            ]}
+          />
+        </ContextualSidecarSection>
+        <ContextualSidecarSection title='Decisión sugerida'>
+          <Alert severity='warning'>
+            Actualiza el contrato al monto aprobado de la oferta y conserva la diferencia como evento auditable.
+          </Alert>
+        </ContextualSidecarSection>
+        <ContextualSidecarSection title='Impacto y auditoría'>
+          <Stack spacing={2}>
+            {[
+              ['Registros que se actualizarán', '1 contrato'],
+              ['Implicancias', 'Finanzas, Nómina'],
+              ['Log de auditoría', 'Se generará 1 entrada']
+            ].map(([label, value]) => (
+              <Stack key={label} direction='row' justifyContent='space-between' gap={3}>
+                <Typography variant='caption' color='text.secondary'>
+                  {label}
+                </Typography>
+                <Typography variant='caption' fontWeight={700} textAlign='right'>
+                  {value}
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </ContextualSidecarSection>
+      </Stack>
+    )
+  }
+
+  if (variant === 'evidence') {
+    return (
+      <Stack spacing={4}>
+        <ContextualSidecarSignal
+          icon='tabler-shield-check'
+          color='success'
+          title='Evidencia suficiente para aceptar'
+          description='Las fuentes críticas están sincronizadas y el rastro de procedencia conserva actor, hora y evento de origen.'
+          meta='84%'
+          secondaryMeta='confianza'
+        />
+        <ContextualSidecarProgress label='Confianza general' value={84} helper='5 fuentes verificadas · 1 fuente requiere revisión manual' />
+        <ContextualSidecarSection title='Fuentes verificadas' subtitle='Ordenadas por frescura, confiabilidad y trazabilidad'>
+          <Stack spacing={2}>
+            {[
+              ['Notion · Employee DB', 'Sincronizado hoy 08:55', 'Alta', 'success'],
+              ['HubSpot · Contacto', 'Sincronizado hoy 08:42', 'Media', 'warning'],
+              ['Google Workspace', 'Verificado hoy 08:30', 'Alta', 'success'],
+              ['Comprobante de identidad', 'Subido por María Torres', 'Media', 'warning']
+            ].map(([title, meta, label, color]) => (
+              <Box
+                key={title}
+                sx={theme => ({
+                  border: `1px solid ${alpha(theme.palette.divider, 0.72)}`,
+                  borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+                  p: 3,
+                  bgcolor: 'background.paper',
+                  boxShadow: `0 8px 22px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.2 : 0.035)}`,
+                  transition: theme.transitions.create(['border-color', 'box-shadow', 'transform'], {
+                    duration: theme.transitions.duration.shorter,
+                    easing: 'cubic-bezier(0.2, 0, 0, 1)'
+                  }),
+                  '&:hover': {
+                    borderColor: alpha(theme.palette[color as 'success' | 'warning'].main, 0.38),
+                    boxShadow: `0 12px 30px ${alpha(theme.palette[color as 'success' | 'warning'].main, theme.palette.mode === 'dark' ? 0.14 : 0.075)}`,
+                    transform: 'translateY(-1px)'
+                  },
+                  '@media (prefers-reduced-motion: reduce)': {
+                    transition: 'none',
+                    '&:hover': {
+                      transform: 'none'
+                    }
+                  }
+                })}
+              >
+                <Stack direction='row' spacing={3} alignItems='center'>
+                  <CustomAvatar skin='light' color={color as 'success' | 'warning'} variant='rounded'>
+                    <i className={title.startsWith('Notion') ? 'tabler-brand-notion' : 'tabler-file-check'} aria-hidden='true' />
+                  </CustomAvatar>
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography variant='body2' fontWeight={700}>
+                      {title}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {meta}
+                    </Typography>
+                  </Box>
+                  <CustomChip round='true' size='small' variant='tonal' color={color as 'success' | 'warning'} label={label} />
+                </Stack>
+              </Box>
+            ))}
+          </Stack>
+        </ContextualSidecarSection>
+        <ContextualSidecarSection title='Línea de procedencia'>
+          <ContextualSidecarTimeline items={EVIDENCE_TIMELINE_ITEMS} />
+        </ContextualSidecarSection>
+      </Stack>
+    )
+  }
+
+  if (variant === 'runbook') {
+    return (
+      <Stack spacing={4}>
+        <ContextualSidecarSignal
+          icon='tabler-player-play'
+          color='primary'
+          title='Punto de control listo para avanzar'
+          description='El preflight terminó sin errores. La siguiente acción requiere aprobación del Owner y mantiene rollback disponible.'
+          meta='2/4'
+          secondaryMeta='paso activo'
+        />
+        <ContextualSidecarMetricStrip items={RUNBOOK_METRICS} />
+        <ContextualSidecarRunbookSteps steps={RUNBOOK_STEPS} />
+        <Alert severity='warning'>Rollback disponible: volver a la versión estable anterior si falla salud post-release.</Alert>
       </Stack>
     )
   }
@@ -295,7 +599,7 @@ const SidecarBody = ({
 
 const AdaptiveSidecarPlatformMockupView = () => {
   const [open, setOpen] = useState(true)
-  const [kind, setKind] = useState<AdaptiveSidecarKind>('inspector')
+  const [kind, setKind] = useState<AdaptiveSidecarKind>('reconciler')
   const [mode, setMode] = useState<AdaptiveSidecarPreferredMode>('push')
   const [selectedCaseId, setSelectedCaseId] = useState(CASES[0].id)
   const [dirty, setDirty] = useState(false)
@@ -310,8 +614,8 @@ const AdaptiveSidecarPlatformMockupView = () => {
     [selectedCaseId]
   )
 
-  const status = STATUS_META[selectedCase.status]
   const selectedVariant = resolveAdaptiveSidecarVariant(kind)
+  const variantPresentation = VARIANT_PRESENTATION[selectedVariant]
 
   useEffect(() => {
     if (selectedVariant !== 'assistant') {
@@ -393,7 +697,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
             initial={prefersReducedMotion ? false : { opacity: 0, x: 8, scale: 0.98 }}
             animate={prefersReducedMotion ? undefined : { opacity: 1, x: 0, scale: 1 }}
             exit={prefersReducedMotion ? undefined : { opacity: 0, x: 8, scale: 0.98 }}
-            transition={prefersReducedMotion ? undefined : { duration: 0.18, ease: 'easeOut' }}
+            transition={prefersReducedMotion ? undefined : { duration: 0.18, ease: [0.2, 0, 0, 1] }}
           >
             <CustomChip
               color='success'
@@ -413,7 +717,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
             initial={prefersReducedMotion ? false : { opacity: 0, y: 4 }}
             animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
             exit={prefersReducedMotion ? undefined : { opacity: 0, y: 4 }}
-            transition={prefersReducedMotion ? undefined : { duration: 0.16, ease: 'easeOut' }}
+            transition={prefersReducedMotion ? undefined : { duration: 0.16, ease: [0.2, 0, 0, 1] }}
             sx={{ minWidth: 0 }}
           >
             <i className='tabler-edit-circle' aria-hidden='true' />
@@ -438,6 +742,30 @@ const AdaptiveSidecarPlatformMockupView = () => {
             </Typography>
           </Stack>
         ) : null}
+        {selectedVariant === 'reconciler' && !saveFeedback ? (
+          <Stack key='reconciler-context' direction='row' spacing={2} alignItems='center' sx={{ minWidth: 0 }}>
+            <i className='tabler-git-compare' aria-hidden='true' />
+            <Typography variant='body2' color='text.secondary'>
+              Corrige monto y registra auditoría
+            </Typography>
+          </Stack>
+        ) : null}
+        {selectedVariant === 'evidence' && !saveFeedback ? (
+          <Stack key='evidence-context' direction='row' spacing={2} alignItems='center' sx={{ minWidth: 0 }}>
+            <i className='tabler-shield-check' aria-hidden='true' />
+            <Typography variant='body2' color='text.secondary'>
+              Acepta evidencia con rastro completo
+            </Typography>
+          </Stack>
+        ) : null}
+        {selectedVariant === 'runbook' && !saveFeedback ? (
+          <Stack key='runbook-context' direction='row' spacing={2} alignItems='center' sx={{ minWidth: 0 }}>
+            <i className='tabler-player-pause' aria-hidden='true' />
+            <Typography variant='body2' color='text.secondary'>
+              Avanza solo desde checkpoint seguro
+            </Typography>
+          </Stack>
+        ) : null}
       </AnimatePresence>
       <Stack direction='row' spacing={2} justifyContent='flex-end'>
         {selectedVariant === 'composer' && dirty ? (
@@ -448,6 +776,21 @@ const AdaptiveSidecarPlatformMockupView = () => {
         {selectedVariant === 'assistant' ? (
           <Button size='small' variant='tonal' startIcon={<i className='tabler-notes' aria-hidden='true' />}>
             Crear tarea
+          </Button>
+        ) : null}
+        {selectedVariant === 'reconciler' ? (
+          <Button size='small' variant='tonal' startIcon={<i className='tabler-flag' aria-hidden='true' />}>
+            Crear excepción
+          </Button>
+        ) : null}
+        {selectedVariant === 'evidence' ? (
+          <Button size='small' variant='tonal' startIcon={<i className='tabler-copy' aria-hidden='true' />}>
+            Copiar
+          </Button>
+        ) : null}
+        {selectedVariant === 'runbook' ? (
+          <Button size='small' variant='tonal' startIcon={<i className='tabler-terminal-2' aria-hidden='true' />}>
+            Rollback
           </Button>
         ) : null}
         <Button
@@ -465,7 +808,13 @@ const AdaptiveSidecarPlatformMockupView = () => {
                   ? 'tabler-check'
                   : selectedVariant === 'assistant'
                     ? 'tabler-copy-check'
-                    : 'tabler-device-floppy'
+                    : selectedVariant === 'composer'
+                      ? 'tabler-device-floppy'
+                      : selectedVariant === 'evidence'
+                        ? 'tabler-shield-check'
+                        : selectedVariant === 'reconciler'
+                          ? 'tabler-git-merge'
+                          : 'tabler-arrow-right'
               }
               aria-hidden='true'
             />
@@ -475,7 +824,13 @@ const AdaptiveSidecarPlatformMockupView = () => {
             ? 'Resolver'
             : selectedVariant === 'assistant'
               ? 'Usar resumen'
-              : GREENHOUSE_COPY.actions.save}
+              : selectedVariant === 'composer'
+                ? GREENHOUSE_COPY.actions.save
+                : selectedVariant === 'evidence'
+                  ? 'Aceptar evidencia'
+                  : selectedVariant === 'reconciler'
+                    ? 'Aplicar corrección'
+                    : 'Autorizar paso'}
         </Button>
       </Stack>
     </Stack>
@@ -500,9 +855,9 @@ const AdaptiveSidecarPlatformMockupView = () => {
         onDirtyCloseAttempt={() => setDirtyWarning(true)}
         restoreFocusRef={launchButtonRef}
         dataCapture='adaptive-sidecar-layout'
-        sidecarWidth={440}
+        sidecarWidth={500}
         sidecarMinWidth={380}
-        sidecarMaxWidth={560}
+        sidecarMaxWidth={640}
         sidecarExtent='viewport'
         viewportOffsetTop={0}
         viewportShellReflow='greenhouse-vertical-navbar'
@@ -515,10 +870,10 @@ const AdaptiveSidecarPlatformMockupView = () => {
             kind={kind}
             variant={selectedVariant}
             title={`${KIND_LABELS[kind]} · ${selectedCase.id}`}
-            subtitle={selectedCase.title}
+            subtitle={variantPresentation.subtitle}
             eyebrow={selectedCase.client}
-            icon={status.icon}
-            iconColor={status.color}
+            icon={variantPresentation.icon}
+            iconColor={variantPresentation.color}
             state={selectedVariant === 'assistant' && assistantBusy ? 'loading' : 'idle'}
             onClose={() => {
               if (dirty) {

@@ -1,6 +1,15 @@
-export type AdaptiveSidecarKind = 'assistant' | 'inspector' | 'composer' | 'form' | 'preview' | 'review'
+export type AdaptiveSidecarKind =
+  | 'assistant'
+  | 'inspector'
+  | 'composer'
+  | 'form'
+  | 'preview'
+  | 'review'
+  | 'evidence'
+  | 'reconciler'
+  | 'runbook'
 
-export type AdaptiveSidecarVariant = 'inspector' | 'composer' | 'assistant'
+export type AdaptiveSidecarVariant = 'inspector' | 'composer' | 'assistant' | 'evidence' | 'reconciler' | 'runbook'
 
 export type AdaptiveSidecarPreferredMode = 'push' | 'inline' | 'overlay' | 'temporary'
 
@@ -144,6 +153,10 @@ export const resolveAdaptiveSidecarVariant = (
 
   if (kind === 'assistant') {
     return 'assistant'
+  }
+
+  if (kind === 'evidence' || kind === 'reconciler' || kind === 'runbook') {
+    return kind
   }
 
   if (kind === 'composer' || kind === 'form') {

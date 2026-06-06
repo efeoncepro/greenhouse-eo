@@ -59,7 +59,10 @@ const VARIANT_META: Record<
 > = {
   inspector: { accent: 'primary', bodyTint: 'neutral' },
   composer: { accent: 'warning', bodyTint: 'warm' },
-  assistant: { accent: 'info', bodyTint: 'cool' }
+  assistant: { accent: 'info', bodyTint: 'cool' },
+  evidence: { accent: 'success', bodyTint: 'neutral' },
+  reconciler: { accent: 'error', bodyTint: 'warm' },
+  runbook: { accent: 'primary', bodyTint: 'cool' }
 }
 
 const ContextualSidecar = ({
@@ -101,6 +104,7 @@ const ContextualSidecar = ({
       data-sidecar-variant={resolvedVariant}
       data-capture={dataCapture}
       sx={theme => ({
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         minHeight: 0,
@@ -112,9 +116,13 @@ const ContextualSidecar = ({
               : theme.palette.background.paper
             : 'background.paper',
         border: chrome === 'contained' ? `1px solid ${theme.palette.divider}` : 0,
+        borderInlineStart: chrome === 'adaptive' ? `1px solid ${alpha(theme.palette.divider, 0.86)}` : undefined,
         borderRadius: chrome === 'contained' ? { xs: 0, md: `${theme.shape.customBorderRadius.lg}px` } : 0,
         overflow: 'hidden',
-        boxShadow: chrome === 'contained' ? { xs: 0, md: theme.shadows[2] } : 'none'
+        boxShadow:
+          chrome === 'contained'
+            ? { xs: 0, md: theme.shadows[2] }
+            : `-18px 0 48px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.22 : 0.055)}`
       })}
     >
       <Box
@@ -122,9 +130,10 @@ const ContextualSidecar = ({
           position: 'sticky',
           top: 0,
           zIndex: 1,
-          bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.94),
-          backdropFilter: 'saturate(180%) blur(10px)',
-          borderBlockEnd: `1px solid ${alpha(theme.palette[variantMeta.accent].main, resolvedVariant === 'inspector' ? 0.16 : 0.26)}`
+          bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.97),
+          backdropFilter: 'saturate(180%) blur(14px)',
+          borderBlockEnd: `1px solid ${alpha(theme.palette.divider, 0.82)}`,
+          boxShadow: `0 10px 28px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.18 : 0.04)}`
         })}
       >
         {isBusy ? <LinearProgress aria-hidden='true' /> : null}
@@ -135,7 +144,7 @@ const ContextualSidecar = ({
               color={resolvedIconColor}
               variant='rounded'
               sx={theme => ({
-                boxShadow: `0 0 0 1px ${alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.06 : 0.62)}`
+                boxShadow: `0 0 0 1px ${alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.06 : 0.72)}, 0 8px 22px ${alpha(theme.palette[resolvedIconColor].main, theme.palette.mode === 'dark' ? 0.18 : 0.12)}`
               })}
             >
               <i className={icon} aria-hidden='true' />
@@ -192,10 +201,16 @@ const ContextualSidecar = ({
           bgcolor:
             chrome === 'adaptive'
               ? resolvedVariant === 'composer'
-                ? alpha(theme.palette.warning.main, theme.palette.mode === 'dark' ? 0.08 : 0.025)
+                ? alpha(theme.palette.warning.main, theme.palette.mode === 'dark' ? 0.065 : 0.014)
                 : resolvedVariant === 'assistant'
-                  ? alpha(theme.palette.info.main, theme.palette.mode === 'dark' ? 0.09 : 0.026)
-                  : alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.98)
+                  ? alpha(theme.palette.info.main, theme.palette.mode === 'dark' ? 0.065 : 0.014)
+                  : resolvedVariant === 'evidence'
+                    ? alpha(theme.palette.success.main, theme.palette.mode === 'dark' ? 0.06 : 0.012)
+                    : resolvedVariant === 'reconciler'
+                      ? alpha(theme.palette.error.main, theme.palette.mode === 'dark' ? 0.058 : 0.012)
+                      : resolvedVariant === 'runbook'
+                        ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.058 : 0.012)
+                        : alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.98)
               : 'transparent'
         })}
       >
@@ -211,7 +226,7 @@ const ContextualSidecar = ({
                 ? undefined
                 : {
                     duration: 0.22,
-                    ease: 'easeOut'
+                    ease: [0.2, 0, 0, 1]
                   }
             }
           >
@@ -227,7 +242,13 @@ const ContextualSidecar = ({
               p: 4,
               bgcolor:
                 resolvedVariant === 'composer'
-                  ? alpha(theme.palette.warning.main, theme.palette.mode === 'dark' ? 0.09 : 0.032)
+                  ? alpha(theme.palette.warning.main, theme.palette.mode === 'dark' ? 0.07 : 0.018)
+                  : resolvedVariant === 'evidence'
+                    ? alpha(theme.palette.success.main, theme.palette.mode === 'dark' ? 0.064 : 0.014)
+                    : resolvedVariant === 'reconciler'
+                      ? alpha(theme.palette.error.main, theme.palette.mode === 'dark' ? 0.062 : 0.014)
+                      : resolvedVariant === 'runbook'
+                        ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.064 : 0.014)
                   : alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.92 : 0.98),
               backdropFilter: 'saturate(180%) blur(8px)'
             })}

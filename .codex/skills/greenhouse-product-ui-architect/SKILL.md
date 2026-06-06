@@ -50,7 +50,7 @@ Canonical shape:
 - Runtime dashboards: prefer command center with exceptions before totals.
 - AI helpers: prefer Adaptive Sidecar on desktop and temporary Drawer only on mobile/tablet; never make AI the only path for core operations.
 - Contextual assistance, inspection, review, preview, and low-risk contextual editing: use `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` from `@/components/greenhouse/primitives` before creating any custom drawer/modal.
-- Adaptive Sidecar official variants are `inspector`, `composer`, and `assistant`; domain kinds such as `form`, `review`, or `preview` must map to one of those variants.
+- Adaptive Sidecar official variants are `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, and `runbook`; domain kinds such as `form`, `review`, `preview`, reconciliation, provenance/evidence, or guided operations must map to one of those variants.
 - Tables: use when comparison and scanning matter; pair with inspector for actions that require context.
 
 ## Hard Rules

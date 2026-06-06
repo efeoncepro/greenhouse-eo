@@ -20,7 +20,7 @@ export const scenario: CaptureScenario = {
   assertions: [
     { kind: 'noLoginRedirect', reason: 'mockup vive bajo dashboard autenticado' },
     { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' },
-    { kind: 'visible', selector: 'text=Inspector · GH-1842', reason: 'el drawer móvil debe abrir con contexto' }
+    { kind: 'visible', selector: 'text=Reconciler · GH-1842', reason: 'el drawer móvil debe abrir con contexto' }
   ],
   steps: [
     {

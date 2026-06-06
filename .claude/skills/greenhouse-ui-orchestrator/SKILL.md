@@ -21,7 +21,7 @@ Use this skill when the task is to decide which Vuexy or MUI pattern Greenhouse 
 
 - For contextual assistance, inspection, review, preview, and low-risk contextual editing where the main work context must remain visible, recommend the Adaptive Sidecar primitive first.
 - Canonical implementation: `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` from `@/components/greenhouse/primitives`.
-- Apply the Primitive + Variants + Kinds method: official variants are `inspector`, `composer`, and `assistant`; domain kinds must resolve to one of them before behavior/chrome is chosen.
+- Apply the Primitive + Variants + Kinds method: official Adaptive Sidecar variants are `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, and `runbook`; domain kinds must resolve to one of them before behavior/chrome is chosen.
 - Desktop sidecar is an in-flow, full-height lane with non-modal semantics; it is not a custom Drawer, floating card, or Dialog.
 - Mobile/tablet fallback may use the primitive's temporary Drawer mode.
 - If the surface can be dirty or replace its target, require `reduceAdaptiveSidecarState()` or an equivalent adapter around it.
