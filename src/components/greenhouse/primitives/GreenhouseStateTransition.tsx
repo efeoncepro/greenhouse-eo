@@ -225,14 +225,6 @@ const GreenhouseStateTransition = ({
           backgroundColor: alpha(main, tone === 'neutral' ? 0.025 : 0.052),
           boxShadow: active ? `0 0 0 3px ${alpha(main, tone === 'neutral' ? 0.05 : 0.085)}` : undefined,
           animation: active && !reduced ? `gh-state-transition-surface 620ms ${MOTION_EASING} both` : 'none',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            insetBlock: 0,
-            insetInlineStart: 0,
-            width: 3,
-            backgroundColor: meta.color ? theme.palette[meta.color].main : theme.palette.text.secondary
-          },
           '@keyframes gh-state-transition-surface': {
             '0%': { transform: 'translateY(2px)', opacity: 0.84 },
             '100%': { transform: 'translateY(0)', opacity: 1 }

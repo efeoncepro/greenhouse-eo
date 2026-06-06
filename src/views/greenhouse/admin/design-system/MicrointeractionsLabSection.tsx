@@ -7,10 +7,17 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
-import { GreenhouseAsyncActionButton, GreenhouseCommandFeedback, GreenhouseStateTransition } from '@/components/greenhouse/primitives'
+import {
+  GreenhouseAsyncActionButton,
+  GreenhouseCommandFeedback,
+  GreenhouseInlineValidation,
+  GreenhouseStateTransition
+} from '@/components/greenhouse/primitives'
 import type {
   GreenhouseAsyncActionState,
   GreenhouseCommandFeedbackTone,
+  GreenhouseInlineValidationState,
+  GreenhouseInlineValidationVariant,
   GreenhouseStateTransitionTone,
   GreenhouseStateTransitionVariant
 } from '@/components/greenhouse/primitives'
@@ -49,6 +56,17 @@ type StateTransitionExample = {
   referenceId?: string
   variant?: GreenhouseStateTransitionVariant
   active?: boolean
+}
+
+type InlineValidationExample = {
+  state: GreenhouseInlineValidationState
+  variant: GreenhouseInlineValidationVariant
+  title: string
+  message: string
+  detail?: string
+  meta?: string
+  actionLabel?: string
+  icon?: string
 }
 
 const ACTION_EXAMPLES: AsyncActionExample[] = [
@@ -200,6 +218,76 @@ const STATE_TRANSITION_EXAMPLES: StateTransitionExample[] = [
   }
 ]
 
+const INLINE_VALIDATION_EXAMPLES: InlineValidationExample[] = [
+  {
+    state: 'checking',
+    variant: 'field',
+    title: 'Field check',
+    message: 'Validando RUT contra fuente canonica',
+    detail: 'Evita guardar un perfil legal con identificador incompleto.',
+    meta: 'campo person.legal_id'
+  },
+  {
+    state: 'valid',
+    variant: 'field',
+    title: 'Positive field',
+    message: 'Cuenta bancaria verificada',
+    detail: 'La combinacion banco + cuenta ya paso el check operacional.',
+    meta: 'hace 12s'
+  },
+  {
+    state: 'warning',
+    variant: 'section',
+    title: 'Section warning',
+    message: 'Falta evidencia por asociar',
+    detail: 'El formulario puede guardarse, pero no deberia cerrarse sin respaldo.',
+    actionLabel: 'Ver evidencia',
+    icon: 'tabler-files'
+  },
+  {
+    state: 'blocked',
+    variant: 'section',
+    title: 'Blocking issue',
+    message: 'No se puede continuar',
+    detail: 'El contrato requiere revision legal antes de generar el documento final.',
+    actionLabel: 'Abrir revision',
+    icon: 'tabler-scale'
+  },
+  {
+    state: 'checking',
+    variant: 'asyncCheck',
+    title: 'Async policy check',
+    message: 'Consultando policy de payroll',
+    detail: 'El check corre sin bloquear la lectura del formulario.',
+    meta: 'intento 1 de 2'
+  },
+  {
+    state: 'error',
+    variant: 'asyncCheck',
+    title: 'Recoverable async error',
+    message: 'No se pudo validar el proveedor',
+    detail: 'Puedes reintentar sin perder los campos ingresados.',
+    actionLabel: 'Reintentar',
+    icon: 'tabler-refresh'
+  },
+  {
+    state: 'valid',
+    variant: 'summary',
+    title: 'Form summary',
+    message: 'Formulario listo para enviar',
+    detail: 'Los checks requeridos pasaron y no quedan bloqueos abiertos.',
+    meta: '8 de 8 checks'
+  },
+  {
+    state: 'idle',
+    variant: 'summary',
+    title: 'Idle summary',
+    message: 'Validacion pendiente',
+    detail: 'El resumen aparece sobrio mientras el usuario completa datos.',
+    meta: 'sin checks ejecutados'
+  }
+]
+
 const AsyncActionCard = ({ example }: { example: AsyncActionExample }) => (
   <Card
     variant='outlined'
@@ -264,6 +352,31 @@ const StateTransitionCard = ({ example }: { example: StateTransitionExample }) =
     referenceId={example.referenceId}
     dataCapture={`state-transition-${example.tone}`}
   />
+)
+
+const InlineValidationCard = ({ example }: { example: InlineValidationExample }) => (
+  <Card variant='outlined'>
+    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Stack spacing={0.5}>
+        <Typography variant='h6' sx={{ fontWeight: 800 }}>
+          {example.title}
+        </Typography>
+        <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>
+          state={example.state} · variant={example.variant}
+        </Typography>
+      </Stack>
+      <GreenhouseInlineValidation
+        state={example.state}
+        variant={example.variant}
+        message={example.message}
+        detail={example.detail}
+        meta={example.meta}
+        actionLabel={example.actionLabel}
+        actionIcon={example.icon ? <i className={example.icon} /> : undefined}
+        dataCapture={`inline-validation-${example.variant}-${example.state}`}
+      />
+    </CardContent>
+  </Card>
 )
 
 const MicrointeractionsLabSection = () => (
@@ -337,6 +450,29 @@ const MicrointeractionsLabSection = () => (
       >
         {STATE_TRANSITION_EXAMPLES.map(example => (
           <StateTransitionCard key={`${example.title}-${example.tone}`} example={example} />
+        ))}
+      </Box>
+      <Stack spacing={1}>
+        <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+          Inline validation
+        </Typography>
+        <Typography variant='h5' sx={{ fontWeight: 800 }}>
+          Validacion y recuperacion local
+        </Typography>
+        <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
+          Feedback cercano a campos, secciones y summaries cuando una regla local o async cambia de estado. La primitive comunica
+          checking, valid, warning, error y blocked sin depender solo del color ni de mensajes globales.
+        </Typography>
+      </Stack>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }
+        }}
+      >
+        {INLINE_VALIDATION_EXAMPLES.map(example => (
+          <InlineValidationCard key={`${example.title}-${example.state}-${example.variant}`} example={example} />
         ))}
       </Box>
     </CardContent>

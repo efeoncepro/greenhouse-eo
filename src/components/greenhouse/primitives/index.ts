@@ -22,6 +22,12 @@ export type {
   GreenhouseStateTransitionTone,
   GreenhouseStateTransitionVariant
 } from './GreenhouseStateTransition'
+export { default as GreenhouseInlineValidation } from './GreenhouseInlineValidation'
+export type {
+  GreenhouseInlineValidationProps,
+  GreenhouseInlineValidationState,
+  GreenhouseInlineValidationVariant
+} from './GreenhouseInlineValidation'
 export { default as MarginHealthChip } from './MarginHealthChip'
 export type {
   MarginClassification,

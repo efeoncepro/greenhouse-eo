@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.20
+> **Version:** 1.21
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-06 — v1.21: Greenhouse canoniza el set V1 de primitives de microinteraccion (`GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`, `GreenhouseStateTransition`, `GreenhouseInlineValidation`) con states/variants oficiales e iteracion obligatoria en el lab antes de crear componentes paralelos.
 > **Updated:** 2026-06-06 — v1.20: Greenhouse agrega `GreenhouseStateTransition` como primitive de microinteraccion para cambios de estado visibles en rows, cards y panels (`from -> to`, tonos semanticos, live region, reduced-motion). Lab interno: `/admin/design-system/microinteractions`.
 > **Updated:** 2026-06-06 — v1.19: Greenhouse agrega `GreenhouseAsyncActionButton` y `GreenhouseCommandFeedback` como primitives de microinteraccion para commands puntuales: progreso del command + resultado persistente post-accion. Lab interno: `/admin/design-system/microinteractions`.
 > **Updated:** 2026-06-06 — v1.18b: cada variant oficial de `GreenhouseLoadingSurface` queda expuesta tambien como componente nombrado reusable (`GreenhouseDocumentPipelineLoader`, `GreenhouseExternalHandoffLoader`, etc.) para migrar consumers sin depender de strings de variant.
@@ -31,19 +32,29 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
-## Delta 2026-06-06e — Greenhouse Command Microinteractions
+## Delta 2026-06-06e — Greenhouse Microinteraction Primitives V1
 
-Greenhouse adopta `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback` y `GreenhouseStateTransition` como primitives iniciales de microinteracciones para commands puntuales y cambios de estado visibles. Cubren la clase repetida de botones con `isSaving`, `isSubmitting`, `submitting`, `CircularProgress` inline, labels locales, toasts efimeros, feedback post-accion inconsistente y rows/cards que cambian de estado sin señal clara.
+Greenhouse adopta `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`, `GreenhouseStateTransition` y `GreenhouseInlineValidation` como primitives V1 de microinteracciones para commands puntuales, resultados post-accion, cambios de estado visibles y validacion local/async. Cubren la clase repetida de botones con `isSaving`, `isSubmitting`, `submitting`, `CircularProgress` inline, labels locales, toasts efimeros, feedback post-accion inconsistente, rows/cards que cambian de estado sin señal clara y formularios que no explican si una regla fue validada, advertida, fallida o bloqueada.
 
 Docs canonicos:
 
 - Runtime primitive: `src/components/greenhouse/primitives/GreenhouseAsyncActionButton.tsx`
 - Runtime primitive: `src/components/greenhouse/primitives/GreenhouseCommandFeedback.tsx`
 - Runtime primitive: `src/components/greenhouse/primitives/GreenhouseStateTransition.tsx`
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseInlineValidation.tsx`
 - Visual lab interno: `/admin/design-system/microinteractions`
 - Scenario GVC: `design-system-microinteractions`
 
-Contrato:
+Canon V1:
+
+| Primitive | Job funcional | States / tones | Variants oficiales | No reemplaza |
+| --- | --- | --- | --- | --- |
+| `GreenhouseAsyncActionButton` | Command puntual localizado | `idle`, `loading`, `success`, `error` | MUI button variants (`contained`, `tonal`, `outlined`) conservando el contrato de estado | Confirmaciones destructivas, procesos largos |
+| `GreenhouseCommandFeedback` | Resultado persistente post-accion | `success`, `error`, `warning`, `info`, `retrying` | `compact` como density secundaria | Alerts bloqueantes, toast global unico |
+| `GreenhouseStateTransition` | Cambio visible de estado en row/card/panel | `success`, `warning`, `error`, `info`, `neutral` | `surface`, `inline` | Timeline/audit history completo |
+| `GreenhouseInlineValidation` | Validacion local/async cerca del campo o seccion | `idle`, `checking`, `valid`, `warning`, `error`, `blocked` | `field`, `section`, `summary`, `asyncCheck` | Summary legal completo, bloqueos maker-checker |
+
+Contrato especifico:
 
 - Estados oficiales: `idle`, `loading`, `success`, `error`.
 - Props principales: `children`, `loadingLabel`, `successLabel`, `errorLabel`, `state`, `startIcon`, `disableWhileLoading`, `reserveWidth`, `statusLabel`.
@@ -53,10 +64,12 @@ Contrato:
 - Usar `CommandFeedback` cuando el usuario necesita saber que ocurrio, que referencia quedo registrada, o que hacer si falla/reintenta. No reemplaza un toast global; lo complementa cuando el resultado debe permanecer visible en el contexto.
 - `GreenhouseStateTransition` cubre cambios visibles de estado con tonos `success`, `warning`, `error`, `info`, `neutral`; variants funcionales `surface` e `inline`; `fromLabel`, `toLabel`, title, description, timestamp/reference id, `role='status'` o `role='alert'` para errores, `aria-live` y reduced-motion.
 - Usar `StateTransition` cuando un row, card, inspector o panel cambia de estado y el usuario necesita ver de donde venia, donde quedo y con que referencia/timing. No reemplaza timelines de auditoria completos ni historiales permanentes.
+- `GreenhouseInlineValidation` cubre feedback cerca del campo/seccion/resumen con estados `idle`, `checking`, `valid`, `warning`, `error`, `blocked`; variants funcionales `field`, `section`, `summary`, `asyncCheck`; `role='status'` o `role='alert'` para error/blocked, `aria-live`, progress bar para asyncCheck y reduced-motion.
+- Usar `InlineValidation` cuando una regla local o async cambia el estado de un campo, seccion o formulario y el usuario necesita saber si puede continuar, corregir, reintentar o esperar. No usar como reemplazo de validacion server-side, maker-checker ni evidencia/auditoria completa.
 - No usar para procesos largos multi-step: usar `GreenhouseLoadingSurface`/loader nombrado, sidecar, drawer o progress rail segun contexto.
 - No usar para confirmaciones destructivas/legales/financieras que requieren decision explicita: usar `Dialog`/maker-checker y luego el boton async dentro de la accion confirmada.
 - Product consumers deben reemplazar patrones locales `startIcon={submitting ? <CircularProgress /> : ...}` por esta primitive cuando el boton modela un command puntual.
-- Nuevas variants visuales o semanticas deben iterarse en esta primitive y en el lab antes de crear `FooSubmitButton` locales.
+- Nuevas variants visuales, states o kinds semanticos deben iterarse dentro de estas primitives y en el Microinteractions Lab antes de crear `FooSubmitButton`, `FooValidation`, `FooStatusPulse`, `FooFeedbackCard` o componentes locales equivalentes. Una variant nueva debe cambiar comportamiento, densidad, state model, action placement o microinteraction contract; nunca solo color/radius/icono.
 
 ## Delta 2026-06-06d — Greenhouse Loading Surface
 
