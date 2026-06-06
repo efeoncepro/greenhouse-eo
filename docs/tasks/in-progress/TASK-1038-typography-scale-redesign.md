@@ -31,13 +31,19 @@ El operador aprobó el TO-BE tras ver el impacto en `/admin/design-system/typogr
 - **GVC** `/admin/design-system` (light): page-title domina como título, section-titles subordinadas — inversión arreglada, sin breakage.
 - **Canonización**: pointer en `CLAUDE.md` (sección "Typography System") + políticas transversales (i18n/fluid/display/PDF-email/truncation/charts/measure).
 
-### Follow-ups (NO incluidos en este flip)
+### Follow-ups
 
-- Rol semántico para el peso **500** (énfasis medio: nav/tabla/labels sutiles) — calibración aparte con su propio GVC.
-- Adapter **PDF** que registre Geist **600/800** (hoy `register-fonts.ts` solo tiene 400/500/700 → section-titles/labels/KPI caen a Helvetica en PDF).
-- Adapter de **charts** (~47 archivos) derivando del SoT.
-- Lint rule **`no-fontSize-inline` icon-vs-text** (~1.351 inline hoy, mayoría íconos legítimos).
-- Cleanup del mockup: la sección "Propuesta TO-BE" (cap 5) quedó histórica (el TO-BE ya es el runtime).
+**✓ Cerrados en este flip (2026-06-06):**
+
+- **Lint rule** `greenhouse/no-fontsize-inline-typography` (warn) — scopeada a `<Typography>` (resuelve icon-vs-text sin heurística fuzzy: Typography = siempre texto; íconos nunca son Typography → cero falsos positivos). 168 captures legacy = el inventario a migrar. Off en theme/pdf/mockup. Tests + registrada en `index.mjs` v1.11.0 + config. Commit `b7875842d`.
+- **Rule-test coverage en CI** — los `.test.mjs` de `eslint-plugins/greenhouse/` no estaban en NINGÚN runner (el `include` de vitest solo escanea src/scripts/services); el de `no-cross-domain` estaba **roto** (usaba `import type` sin parser TS) sin que nadie lo viera. Fix: `pnpm test:lint-rules` (`node --test` con glob → auto-descubre rules nuevos) + step en `ci.yml` + parser TS en el RuleTester roto. 13/13 verde. Commit `f33265e95`.
+- **Cleanup mockup cap 5** — relabel "Propuesta TO-BE / no aplicado" (warning) → "Rediseño TASK-1038 — aplicado" (success); el AS-IS↔TO-BE se conserva como **registro** del rediseño.
+
+**Abiertos (ejecutables — orden + spec):**
+
+- **FU1 — rol semántico peso 500** (énfasis medio: nav/tabla/labels sutiles). El peso **500 ya está cargado** (Geist + Poppins). Falta darle un **rol** en el SoT. Plan: agregar token(s) en `typographyScale` (p.ej. `labelMdMedium` / `navItem` 14/500) + consumir en los overrides de componente que hoy usan 600 donde corresponda 500 (Tab, nav items, table-header secundario). **⚠️ Cambio visual cross-surface → requiere GVC + aprobación del operador ANTES del flip** (mismo protocolo que la escala: mostrar impacto, aprobar). NO flipear unilateral.
+- **FU2 — adapter PDF Geist 600/800.** Corrección del claim previo: `register-fonts.ts` registra **por nombre de familia** (`Geist`=400 / `Geist Medium`=500 / `Geist Bold`=700), **no por peso** — un componente PDF que quiera 600/800 hoy aproxima con Bold/Medium (NO "cae a Helvetica"; eso es solo para familias sin registrar). Es **refinamiento de paridad**, no bug. El **web no tiene gap** (next/font carga 400-800). Cerrarlo = (a) obtener `Geist-SemiBold.ttf`(600)+`Geist-ExtraBold.ttf`(800) del mismo origen Google Fonts/gwfh que las actuales, (b) `tryRegister('Geist SemiBold'…)`/`tryRegister('Geist ExtraBold'…)`, (c) migrar los componentes PDF que ameriten esos pesos. **Nota Google Fonts (op. 2026-06-06):** react-pdf SÍ acepta `Font.register({ src: 'https://…' })` (URL remota), pero el patrón existente usa **.ttf locales a propósito** (render PDF offline-safe en Cloud Run); URL remota = dependencia de red en cada render (riesgo de resiliencia). Robusto = local.
+- **FU3 — adapter de charts desde el SoT** (~47 archivos ECharts/Apex/Recharts). Hoy cada chart define tamaños de texto inline. Plan: un helper `getChartTypographyFromTheme(theme)` que derive `fontFamily`/`fontSize` de axis/legend/tooltip/label desde el SoT, y migrar los wrappers de chart a consumirlo. **Sweep de ~47 archivos** — task derivada propia.
 
 ## Summary
 

@@ -413,7 +413,7 @@ const TOC = [
   { id: 'cap2', label: '2 · Roles semánticos (escala)' },
   { id: 'cap3', label: '3 · Aplicaciones' },
   { id: 'cap4', label: '4 · Bridge contrato ↔ runtime' },
-  { id: 'cap5', label: '5 · Propuesta TO-BE' },
+  { id: 'cap5', label: '5 · Rediseño de escala (aplicado)' },
   { id: 'cap6', label: '6 · Transversales' },
   { id: 'cap7', label: '7 · Gobernanza' }
 ]
@@ -437,8 +437,8 @@ const TypographyReferenceMockupView = () => {
           → aplicación) + propuesta de rediseño + transversales + gobernanza.
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 1.5 }}>
-          <Chip size='small' variant='tonal' color='success' label='AS-IS gobernado (TASK-1036)' />
-          <Chip size='small' variant='tonal' color='primary' label='Propuesta TO-BE (TASK-1038, no aplicada)' />
+          <Chip size='small' variant='tonal' color='success' label='SoT gobernado (TASK-1036)' />
+          <Chip size='small' variant='tonal' color='success' label='Escala TASK-1038 — aplicada (runtime)' />
         </Box>
       </Box>
 
@@ -849,13 +849,15 @@ const TypographyReferenceMockupView = () => {
         </Box>
       </Section>
 
-      {/* ── 5 · Propuesta TO-BE ──────────────────────────────────────────── */}
-      <Card id='cap5' sx={{ mb: 3, scrollMarginTop: 24, borderColor: 'warning.main', borderWidth: 1, borderStyle: 'solid' }}>
+      {/* ── 5 · Rediseño de escala (TASK-1038 — aplicado) ───────────────────── */}
+      <Card id='cap5' sx={{ mb: 3, scrollMarginTop: 24, borderColor: 'success.main', borderWidth: 1, borderStyle: 'solid' }}>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Typography variant='h5'>5 · Propuesta de rediseño (TO-BE) — no aplicado</Typography>
+          <Typography variant='h5'>5 · Rediseño de escala (TASK-1038 — aplicado)</Typography>
           <Typography variant='body2' color='text.secondary'>
-            La escala actual no fue diseñada como escala: se acumuló de los defaults de Vuexy + nombres de la spec. Tres
-            problemas estructurales. Los valores TO-BE viven como propuesta en este mockup; el runtime sigue AS-IS.
+            La escala AS-IS no fue diseñada como escala: se acumuló de los defaults de Vuexy + nombres de la spec, con tres
+            problemas estructurales. El TO-BE de abajo fue aprobado y <strong>ya es el runtime</strong> (2026-06-06): el SoT,
+            <code>mergedTheme</code>, DESIGN.md y el drift-guard se movieron juntos. Se conserva el AS-IS↔TO-BE como registro
+            del rediseño y su argumento.
           </Typography>
           <Box component='ul' sx={{ m: 0, pl: 3, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
             <Typography component='li' variant='body2'>
