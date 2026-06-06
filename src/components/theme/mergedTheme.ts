@@ -23,6 +23,9 @@ import { axisSemanticPalette } from '@core/theme/axis-semantic'
 // AXIS neutrals (TASK-1034 Slice 3) — surface/text/customColors behind a
 // build-time rollout flag (NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED, default OFF).
 import { resolveNeutralFragments } from '@core/theme/axis-neutrals'
+// AXIS secondary brand role (TASK-1034) — azure→AXIS deep-green behind a
+// build-time rollout flag (NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED, default OFF).
+import { resolveSecondaryPalette } from '@core/theme/axis-secondary'
 
 // Greenhouse typography tokens (v1.3+) — line-height namespace canónico
 import { lineHeights } from './typography-tokens'
@@ -30,6 +33,8 @@ import { lineHeights } from './typography-tokens'
 const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['direction']) => {
   // AXIS neutral fragments (Slice 3) — flag-gated; OFF = legacy navy bit-for-bit.
   const neutrals = resolveNeutralFragments()
+  // AXIS secondary role — flag-gated; OFF = legacy azure, ON = AXIS deep-green.
+  const secondary = resolveSecondaryPalette()
 
   const userTheme: ThemeOptions = {
     // Expose line-height tokens al theme — accesible vía `theme.lineHeights.<token>`
@@ -43,15 +48,8 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
         palette: {
           // primary is set by the provider via settings.primaryColor (source: primaryColorConfig.ts)
           // — no need to duplicate it here. See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §4.1
-          // secondary = structural Efeonce azure. DECISION (TASK-1034): NOT flipped to
-          // AXIS lime — GVC showed pervasive lime secondary competes with the blue
-          // primary (rainbow risk) in an enterprise tone. AXIS lime stays a RESERVED
-          // accent via theme.axis.ramp.secondary for specific moments.
-          secondary: {
-            main: '#023C70',
-            light: '#035A9E',
-            dark: '#022A4E'
-          },
+          // secondary brand role — flag-gated (legacy azure OFF / AXIS deep-green ON)
+          secondary,
           // Feedback semantics from AXIS (TASK-1034 Slice 2). contrastText AA-validated.
           info: axisSemanticPalette.info,
           success: axisSemanticPalette.success,
@@ -81,12 +79,8 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       dark: {
         palette: {
           // primary is set by the provider via settings.primaryColor (same source as light)
-          // secondary = structural azure (see light scheme — AXIS lime not adopted, reserved accent)
-          secondary: {
-            main: '#023C70',
-            light: '#035A9E',
-            dark: '#022A4E'
-          },
+          // secondary brand role — flag-gated (legacy azure OFF / AXIS deep-green ON)
+          secondary,
           // Feedback semantics from AXIS (mains are mode-agnostic; same mapping as light).
           info: axisSemanticPalette.info,
           success: axisSemanticPalette.success,

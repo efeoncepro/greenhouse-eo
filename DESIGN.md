@@ -8,9 +8,9 @@ colors:
   primary-light: "#3691E3"
   primary-dark: "#024C8F"
   primary-tonal: "#D7E9F9"
-  secondary: "#023C70"
-  secondary-light: "#035A9E"
-  secondary-dark: "#022A4E"
+  secondary: "#138760"
+  secondary-light: "#6EC207"
+  secondary-dark: "#0C7250"
   info: "#00BAD1"
   neutral: "#F8F7FA"
   surface: "#FFFFFF"
@@ -148,7 +148,7 @@ components:
     rounded: "{rounded.md}"
     padding: 12px
   button-secondary-hover:
-    backgroundColor: "{colors.secondary-light}"
+    backgroundColor: "{colors.secondary-dark}"
     textColor: "{colors.on-primary}"
   button-secondary-active:
     backgroundColor: "{colors.secondary-dark}"
@@ -211,6 +211,12 @@ components:
     typography: "{typography.body-md}"
     rounded: "{rounded.md}"
     padding: 8px
+  chip-accent-secondary:
+    backgroundColor: "{colors.secondary-light}"
+    textColor: "{colors.text-primary}"
+    typography: "{typography.body-md}"
+    rounded: "{rounded.md}"
+    padding: 8px
 ---
 
 # Greenhouse Design Contract
@@ -239,14 +245,23 @@ The overall impression should be crisp and trustworthy rather than flashy. Blue 
 
 The colors above are the **semantic + key tokens** an agent needs day to day. The complete AXIS palette (Efeonce's Design System) is the source of truth and lives in code, not in this front-matter — the design-contract lint gate forbids unreferenced tokens here, so the full ramps stay where they're consumed:
 
-- **Source of truth:** `src/@core/theme/axis-tokens.ts` (1:1 mirror of AXIS Figma `yyMksCoijfMaIoYplXKZaR`).
+- **Source of truth (code):** `src/@core/theme/axis-tokens.ts` (1:1 mirror of AXIS Figma).
+- **Source of truth (design, live via Figma MCP):** the AXIS Figma file is the upstream SoT. An agent with the Figma MCP can pull the live ramps/semantics for context before a design decision:
+  - **fileKey:** `yyMksCoijfMaIoYplXKZaR` · **Theme Color node:** `11205:5341` (light + dark swatches, all ramps 100→900 + opacity + elevation).
+  - **Tools:** `get_variable_defs(nodeId, fileKey)` → every token's resolved hex (e.g. `Color Efeonce/Secundary/secundary-700 = #138760`); `get_screenshot(nodeId, fileKey)` → the swatch sheet. URL: `figma.com/design/yyMksCoijfMaIoYplXKZaR/...?node-id=11205-5341`.
+  - When AXIS Figma and this contract disagree, AXIS is the north — pull it, then reconcile the runtime + this file (parity 3-capas).
 - **Runtime access:** `theme.axis.*`.
   - `theme.axis.ramp.<family>[<step>]` — full `100→900` ramps for `primary`, `secondary`, `info`, `success`, `warning`, `error`, and the neutral `gray` family. Reach for a specific step only for the rare case the semantic layer can't cover (a chart series, a contrast-safe text tint).
   - `theme.axis.opacity.<family>[8|16|24|32|38]` — canonical soft-fill / hover / selected alphas (alert & chip tints, hover overlays).
   - `theme.axis.neutral.{light,dark}` — per-mode surface/text/divider neutrals (the values mapped into `background`/`paper`/`text` below).
 - **Default rule:** components consume the **semantic** layer (`theme.palette.*`, `theme.customColors.*`) — the AXIS primitives mint those semantics; only drop to `theme.axis.ramp.*` when no semantic token fits.
+- **Which step to use (agents: do NOT pick a ramp step by eye):** the semantic `main`/`light`/`dark` already encode the right step per role — use them, not raw ramp steps. The mapping + a11y rule:
+  - `main` = the **functional fill/text step** chosen for AA, NOT always the nominal `500`. E.g. `error.main` = error-**800** (`#CC3D41`, the `500` `#FF4C51` fails white text); `secondary.main` = secondary-**700** (`#138760`, the lime `500` `#6EC207` is illegible as text ~1.8:1). When you need a solid fill or text in a brand/semantic color, use `main`.
+  - `light` = the **bright/tint accent end** (e.g. `secondary.light` = lime `500` `#6EC207`) — use ONLY as a tint behind dark/ink text or as a soft fill, never with white text (it fails AA). `theme.axis.opacity.<family>[8|16]` is the canonical soft-fill alpha.
+  - `dark` = **hover/active** (darken), e.g. `secondary.dark` = secondary-`800`.
+  - Raw `theme.axis.ramp.<family>[<step>]` is for the rare case the semantic layer can't cover (a chart series needing N distinct steps, a specific contrast-safe tint) — and you must verify contrast yourself.
 - **Neutrals are AXIS** (light bg `#F8F7FA` / paper `#FFFFFF` / ink `#2F2B3D`; dark bg `#25293C` / paper `#2F3349` / ink `#E1DEF5`), default-on at runtime; the env kill-switch `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED=false` reverts to legacy navy only in emergency.
-- **`secondary` = structural azure `#023C70` (DECIDED — AXIS lime NOT adopted as `secondary`).** AXIS labels its lime ramp `secondary`, but Greenhouse keeps `secondary` as the structural Efeonce azure. A flag-gated GVC trial of the lime flip (TASK-1034) showed pervasive lime `secondary` competes with the blue `primary` (the "rainbow" the Colors section warns against) and reads candy in an enterprise tone. **Resolution:** `secondary` stays azure; the **AXIS lime is a RESERVED accent** available via `theme.axis.ramp.secondary` for specific positive/brand moments only — never as a global `color="secondary"`. This is a deliberate divergence from AXIS's naming, documented for upstream reconciliation.
+- **`secondary` = AXIS green (ADOPTED, TASK-1034).** AXIS defines `secondary` as the green/lime ramp; the legacy Efeonce azure `#023C70` was NOT an AXIS color and is retired. `secondary.main` = secondary-**700** `#138760` (deep green — the functional, AA-legible step: white text 4.9:1, and legible as tonal/outlined text where `main` drives the color). `secondary.light` = secondary-**500** `#6EC207` (the bright lime — tint/accent only, dark/ink text). `secondary.dark` = secondary-**800** `#0C7250` (hover/active). Default-on at runtime; kill-switch `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED=false` reverts to legacy azure only in emergency. **Why deep green, not the nominal lime `500`:** `color="secondary"` is ~241 tonal/outlined usages (0 contained) where `main` is the text/border — bright lime as text is illegible (~1.8:1) and reads candy; the deep green is sophisticated + AA. Same principle as `error.main` = error-800.
 - **`primary-light` / `primary-dark`** remain runtime-computed (`lighten`/`darken` of the tenant primary), not AXIS ramp steps, because `primary` is tenant-driven.
 
 ## Typography

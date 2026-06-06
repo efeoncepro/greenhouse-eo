@@ -348,7 +348,7 @@ Three layers compose the effective palette (see `GREENHOUSE_THEME_TOKEN_CONTRACT
 | Token | Hex | Brand meaning | Usage |
 |---|---|---|---|
 | `primary.main` | runtime-driven, default `#0375DB` (Core Blue) | Brand identity | CTAs, active state, filled chips, links |
-| `secondary.main` | `#023C70` (Efeonce azure / deep navy) | Structural | Navigation depth, emphasis blocks, structural CTAs |
+| `secondary.main` | `#138760` (AXIS secondary-700, deep green) | Brand secondary | Secondary actions (tonal/outlined buttons + chips). `light` = lime `#6EC207` (tint/accent, ink text only); `dark` = `#0C7250` (hover/active). Legacy azure `#023C70` retired (TASK-1034 — not an AXIS color). main=700 not 500: lime is illegible as tonal/outlined text (~1.8:1), deep green is AA. Kill-switch `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED=false`. |
 | `success.main` | `#28C76F` (AXIS green) | Healthy / optimal | KPI óptimo, margin healthy, task complete |
 | `warning.main` | `#FFB703` (AXIS amber) | Attention | Margin warning, expiring soon, approaching limit |
 | `error.main` | `#CC3D41` (AXIS error-800) | Critical / blocked | Validation fail, margin critical, quote expired |
