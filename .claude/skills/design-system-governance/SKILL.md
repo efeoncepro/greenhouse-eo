@@ -135,6 +135,23 @@ Run periodically (or on PR). Looks for:
 - Color tokens marked deprecated in V1 still in use
 - DESIGN.md ↔ V1 ↔ runtime divergence
 
+### 11. Typography — SoT + drift-guard + escala (TASK-1036 / TASK-1038)
+
+La tipografía tiene su propio SoT en código (espejo del patrón AXIS de color) — **cuando agregues/cambies un valor de tipografía, mové las 3 capas juntas o el drift-guard rompe el CI**:
+
+| Capa | Archivo |
+|---|---|
+| **SoT (valores)** | `src/components/theme/typography-tokens.ts` — primitivos (`fontFamilies`/`fontWeights`/`fontSizes`/`letterSpacings`/`fontFeatures`) → `typographyScale` (tokens por rol) → `TYPOGRAPHY_VARIANT_BRIDGE` (contrato↔variante MUI, **1:1 como código**) + `SECONDARY_VARIANT_TOKENS` (h6→labelMd, subtitle2→bodySm) + `controlText` ramp |
+| **Runtime** | `mergedTheme.ts` deriva cada variante del SoT (overrides Button-large/Tab/DialogTitle en `components`). NUNCA hardcodear `fontSize`/`fontWeight`/familia |
+| **Contrato agente** | `DESIGN.md` §Typography (compacto) + `GREENHOUSE_DESIGN_TOKENS_V1.md` §3 (extendido) |
+| **Enforcement** | `typography-drift.test.ts` (37 tests) falla CI si `runtime ≡ SoT ≡ DESIGN.md` divergen |
+
+- **Escala vigente (TASK-1038, px):** display Poppins 32/24/20; page-title **20** (h4, arregló la inversión: page-title ≥ section-title); section-title **16** (h5); subheader/subtitle1 14; label-md/button **14**; body-lg 16 / body-md 14 / body-sm·caption 13; overline 12; numeric-id 14 / numeric-amount 13 / kpi 28. Control: Button sm/md 14, **lg 16**; Tab 14; Dialog title 16. Ladder 8 tamaños.
+- **Para AGREGAR un rol de tipografía:** 1) `typographyScale` (SoT) + bridge si tiene variante MUI; 2) consumir en `mergedTheme`; 3) DESIGN.md (front-matter solo si un componente lo referencia — sino prosa, por `orphanedTokens`); 4) V1 §3.2 + Delta; 5) extender `typography-drift.test.ts`; 6) `design:lint` 0/0/1.
+- **Referencia visual viva (INTERNA):** `/admin/design-system/typography/mockup` (museo, NO donde se leen las reglas — esas viven en DESIGN.md/V1/CLAUDE.md).
+- **Políticas transversales canonizadas:** i18n Latin-first + RTL-ready vía logical properties (CJK diferido); tipo fijo en producto / `clamp()` solo marketing; no display tier sin consumidor; **PDF/email = un SSOT + adapter por medio**; truncation (ellipsis 1-línea / clamp 2-líneas / wrap); charts derivan del SoT; body ~65ch.
+- **Follow-ups abiertos:** rol semántico para peso **500** (énfasis medio); adapter PDF (Geist 600/800 faltan en `register-fonts.ts`); adapter charts; lint rule `no-fontSize-inline` icon-vs-text. Spec: `docs/tasks/in-progress/TASK-1038-typography-scale-redesign.md`.
+
 ## Hard rules (anti-regression)
 
 - **NEVER** ship a new color / size / radius / duration inline — propose a token.
