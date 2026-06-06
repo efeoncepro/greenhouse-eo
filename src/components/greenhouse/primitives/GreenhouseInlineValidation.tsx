@@ -72,8 +72,6 @@ const GreenhouseInlineValidation = ({
 
   const icon = (
     <Box
-      component='i'
-      className={stateMeta.icon}
       aria-hidden='true'
       sx={theme => {
         const main = getColor(theme, stateMeta)
@@ -81,22 +79,36 @@ const GreenhouseInlineValidation = ({
         return {
           display: 'grid',
           placeItems: 'center',
-          width: isField ? 22 : 32,
-          height: isField ? 22 : 32,
-          borderRadius: isField ? 999 : theme.shape.customBorderRadius.md,
+          width: isField ? 26 : 32,
+          height: isField ? 26 : 32,
+          borderRadius: `${isField ? theme.shape.customBorderRadius.sm : theme.shape.customBorderRadius.md}px`,
           flexShrink: 0,
           color: main,
-          backgroundColor: isField ? 'transparent' : alpha(main, state === 'idle' ? 0.07 : 0.12),
-          fontSize: isField ? 17 : 19,
-          animation: isChecking && !reduced ? `gh-inline-validation-spin 900ms ${MOTION_EASING} infinite` : undefined
+          border: isField ? `1px solid ${alpha(main, state === 'idle' ? 0.14 : 0.3)}` : undefined,
+          backgroundColor: alpha(main, isField ? (state === 'idle' ? 0.018 : 0.06) : state === 'idle' ? 0.07 : 0.12),
+          overflow: 'hidden'
         }
       }}
-    />
+    >
+      <Box
+        component='i'
+        className={stateMeta.icon}
+        sx={{
+          display: 'block',
+          fontSize: isField ? 16 : 19,
+          lineHeight: 1,
+          animation: isChecking && !reduced ? `gh-inline-validation-spin 900ms ${MOTION_EASING} infinite` : undefined,
+          '&::before': {
+            display: 'block'
+          }
+        }}
+      />
+    </Box>
   )
 
   const text = (
     <Stack spacing={isField ? 0.25 : 0.5} sx={{ minWidth: 0, flex: 1 }}>
-      <Typography variant={isSummary ? 'h6' : 'body2'} sx={{ fontWeight: isField ? 700 : 800 }}>
+      <Typography variant={isSummary ? 'h6' : 'body2'} sx={{ fontWeight: isField ? 700 : 800, lineHeight: 1.35 }}>
         {message}
       </Typography>
       {detail ? (
@@ -181,12 +193,11 @@ const GreenhouseInlineValidation = ({
             alignItems: 'flex-start',
             gap: 1.25,
             color: state === 'idle' ? 'text.secondary' : undefined,
-            px: 2,
+            px: 1.5,
             py: 1.25,
-            border: `1px solid ${state === 'idle' ? alpha(theme.palette.text.primary, 0.08) : alpha(main, 0.18)}`,
-            borderRadius: theme.shape.customBorderRadius.lg,
-            backgroundColor: state === 'idle' ? 'transparent' : alpha(main, 0.032),
-            boxShadow: state !== 'idle' ? `0 0 0 3px ${alpha(main, 0.04)}` : undefined,
+            border: `1px solid ${state === 'idle' ? alpha(theme.palette.text.primary, 0.08) : alpha(main, 0.14)}`,
+            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+            backgroundColor: state === 'idle' ? 'transparent' : alpha(main, 0.018),
             animation: state !== 'idle' && !reduced ? `gh-inline-validation-enter 220ms ${MOTION_EASING} both` : undefined,
             '@keyframes gh-inline-validation-enter': {
               '0%': { transform: 'translateY(-1px)', opacity: 0.78 },
