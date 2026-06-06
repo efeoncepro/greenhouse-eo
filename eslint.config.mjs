@@ -275,7 +275,11 @@ export default [
       // Modo warn inicial: existe deuda histórica en views/emails. El gate
       // deja visible cualquier uso nuevo de Intl/toLocale* directo sin romper
       // el baseline mientras los slices de migración bajan el inventario.
-      'greenhouse/no-raw-locale-formatting': 'warn'
+      'greenhouse/no-raw-locale-formatting': 'warn',
+      // TASK-1038 — <Typography> debe usar un variant del SoT, nunca fontSize
+      // inline. Modo warn (76 archivos legacy); promover a 'error' tras el
+      // sweep. Scopeado a Typography → cero falsos positivos de íconos.
+      'greenhouse/no-fontsize-inline-typography': 'warn'
     }
   },
 
@@ -329,7 +333,20 @@ export default [
     ],
     rules: {
       'greenhouse/no-hardcoded-fontfamily': 'off',
-      'greenhouse/no-untokenized-copy': 'off'
+      'greenhouse/no-untokenized-copy': 'off',
+      'greenhouse/no-fontsize-inline-typography': 'off'
+    }
+  },
+
+  // TASK-1038 — los mockups del design-system son referencias visuales que
+  // renderizan tamaños inline a propósito (la galería del SoT). Off ahí.
+  {
+    files: ['**/mockup/**/*.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-fontsize-inline-typography': 'off'
     }
   },
 

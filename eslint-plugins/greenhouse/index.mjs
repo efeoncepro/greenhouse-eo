@@ -32,11 +32,12 @@ import noInlinePayrollScopeGate from './rules/no-inline-payroll-scope-gate.mjs'
 import noExtractEpochFromDateSubtraction from './rules/no-extract-epoch-from-date-subtraction.mjs'
 import noInlineFtrCalculation from './rules/no-inline-ftr-calculation.mjs'
 import noBqStructStringTimestamp from './rules/no-bq-struct-string-timestamp.mjs'
+import noFontsizeInlineTypography from './rules/no-fontsize-inline-typography.mjs'
 
 const plugin = {
   meta: {
     name: 'eslint-plugin-greenhouse',
-    version: '1.10.0'
+    version: '1.11.0'
   },
   rules: {
     'no-raw-table-without-shell': noRawTableWithoutShell,
@@ -53,7 +54,8 @@ const plugin = {
     'no-inline-payroll-scope-gate': noInlinePayrollScopeGate,
     'no-extract-epoch-from-date-subtraction': noExtractEpochFromDateSubtraction,
     'no-inline-ftr-calculation': noInlineFtrCalculation,
-    'no-bq-struct-string-timestamp': noBqStructStringTimestamp
+    'no-bq-struct-string-timestamp': noBqStructStringTimestamp,
+    'no-fontsize-inline-typography': noFontsizeInlineTypography
   }
 }
 
