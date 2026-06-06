@@ -12,6 +12,7 @@ import type { MicrocopyDictionary } from '../../types'
 
 import { actions } from './actions'
 import { aria } from './aria'
+import { comingSoon } from './comingSoon'
 import { empty } from './empty'
 import { emails } from './emails'
 import { errors } from './errors'
@@ -33,6 +34,7 @@ export const esCL: MicrocopyDictionary = {
   errors,
   notFound,
   notAuthorized,
+  comingSoon,
   feedback,
   time,
   emails

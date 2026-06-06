@@ -1,3 +1,15 @@
+# Sesion 2026-06-06 — TASK-1032 Coming Soon / Launch page (in-progress, fine-tuning visual)
+
+Página **Coming Soon** branded (hermana de 404/401) con countdown + captura de email de lanzamiento gobernada. **Commit local hecho, sin push.** Spec completa + contexto para continuar: `docs/tasks/in-progress/TASK-1032-coming-soon-launch-page.md`.
+
+- **Estado:** code complete + **backend verificado e2e en vivo** (created → idempotent → invalid_email 422 → no-email 422). UI enterprise iterada en loop GVC. **Quedamos en fine-tuning del espaciado vertical** (el operador ajustando "compacto pero que respire").
+- **Decisiones locked:** form funcional con backend gobernado · audiencia ambas (pública anónima + gate interno) · countdown auto-redirect con `COMING_SOON_LAUNCH_AT` (placeholder hoy) · solo guardar + toast · **autenticado = "Notifícame" un-clic** + enlace "¿Prefieres otro correo?" (progressive disclosure) · anónimo = campo requerido · ilustración Figma **placeholder** (asset propietario Efeonce pendiente) · **Efeonce logo bottom-centered en las 3 misc pages** (`MiscPageEfeonceFooter`) · copy creativo bilingüe es-CL/en-US con metáfora invernadero + `🌱`.
+- **Backend:** migración `greenhouse_core.launch_notifications` **aplicada** al Cloud SQL dev + tipos regenerados; endpoint `/api/coming-soon/notify` (rate-limit IP hasheada + upsert idempotente + outbox sin PII); reusa `sync.outbox.dead_letter` (sin signal nuevo, documentado).
+- **404/401 también:** copy reescrito creativo+funcional bilingüe + montan el footer Efeonce.
+- **⚠️ Aprendizaje canonizado:** **MUI `sx` ignora los shorthands de margen lógico `mbe`/`mbs`** (no-ops) — usar `mb`/`mt`; `mbe-*` solo como clase Tailwind. Era la causa raíz del "se ve apretado". (Memoria + a documentar en CLAUDE.md/AGENTS.md por el documentation-governor.)
+- **Pendiente:** continuar fine-tuning visual (valores `mb` actuales: eyebrow 3 / headline 2 / subtítulo 4 / countdown 4) · fecha real env · ilustración definitiva Efeonce · capturar estados (éxito/revelado/anónimo/dark) · cierre documental (`greenhouse-documentation-governor`) · push + rollout gate cuando el operador apruebe.
+- **Nota sesión:** el visor de imágenes del tool llegó a tope de la sesión (rechaza frames); para volver al loop GVC visual conviene **sesión nueva**. Todo el trabajo persiste local.
+
 # Sesion 2026-06-06 — Adaptive Sidecar variants oficiales implementadas
 
 Se termino el modelado runtime de las variants oficiales de Adaptive Sidecar bajo la metodologia Primitive + Variants + Kinds. La base inicial fue `inspector`, `composer`, `assistant`; el contrato vigente se extendio a `reconciler`, `evidence` y `runbook`:

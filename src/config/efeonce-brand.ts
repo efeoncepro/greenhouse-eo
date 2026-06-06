@@ -11,6 +11,15 @@
  * FALLBACK / seed (used when no operating-entity row is resolvable, e.g. a PDF
  * rendered without DB context) and the brand-level facts that don't live in the
  * org table (URL, slogan).
+ *
+ * BRAND ILLUSTRATIONS — PROPRIETARY (not stock). The portal character
+ * illustrations under `public/images/illustrations/characters/greenhouse-*.png`
+ * (greenhouse-404, greenhouse-401, coming-soon, …) are ORIGINAL work by
+ * Efeonce's in-house creative team (Efeonce owns Greenhouse). They are NOT
+ * Vuexy/stock assets. Never describe them in code/docs as "stock" or "Vuexy
+ * character". When a reference design ships a stock illustration, the product
+ * uses Efeonce's own character (same 3D style as greenhouse-404/401). Canonical
+ * note for both Claude + Codex: see DESIGN.md → "Ilustraciones / personajes".
  */
 
 /** Public URL of Efeonce. Already used in payroll PDF footer + transactional emails. */

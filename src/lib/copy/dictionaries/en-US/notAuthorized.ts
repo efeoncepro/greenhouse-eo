@@ -10,7 +10,7 @@
 import type { NotAuthorizedCopy } from '../../types'
 
 export const notAuthorized: NotAuthorizedCopy = {
-  title: "You're not authorized",
-  description: "You don't have permission to access this page. If you think this is a mistake, contact your administrator.",
+  title: "You'll need a key for this",
+  description: "This area is out of reach for now. If you think that's a mistake, reach out to your administrator.",
   cta: 'Back to home'
 }

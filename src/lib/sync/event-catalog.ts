@@ -494,6 +494,12 @@ export const EVENT_TYPES = {
   emailDeliverabilityAlert: 'email_delivery.deliverability_alert',
   emailGdprDeletionCompleted: 'email_delivery.gdpr_deletion_completed',
 
+  // Coming Soon launch waitlist (route /coming-soon). Emitted on a NEW email
+  // capture (idempotent re-subscribe does NOT re-emit). Audit + hook for the
+  // future "we launched" notify flow. No dedicated reactive consumer yet; the
+  // generic outbox publisher (sync.outbox.*) carries it.
+  launchNotificationSubscribed: 'launch.notification.subscribed',
+
   // Quotes & Credit Notes (legacy finance namespace, TASK-344 cutover aliased via commercial.*)
   quoteCreated: 'finance.quote.created',
   quoteSynced: 'finance.quote.synced',

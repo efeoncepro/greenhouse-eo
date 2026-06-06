@@ -431,6 +431,16 @@ Font assets: `src/assets/fonts/Poppins-{ExtraBold,ExtraBoldItalic,Black,BlackIta
 
 `src/lib/finance/pdf/efeonce-pdf-footer.tsx` (`EfeoncePdfFooter`) is the canonical institutional footer for **all** Efeonce PDFs: legal entity (legalName · RUT) + legal address (line 1), `efeoncepro.com` + optional generated/page (line 2). The footer carries **legal/contact identity only** — the marketing slogan goes in the brand zone, not here. New PDFs reuse this footer instead of rolling their own.
 
+### Ilustraciones / personajes — PROPIETARIAS de Efeonce (no stock)
+
+Las ilustraciones de personaje del portal (`public/images/illustrations/characters/greenhouse-*.png` — p. ej. `greenhouse-404.png`, `greenhouse-401.png`, y futuras como coming-soon) **NO son assets de stock ni del starter Vuexy**: son **obra propia del equipo creativo de Efeonce**, dueños de Greenhouse. Tratarlas como **brand assets propietarios**:
+
+- **NUNCA** describirlas, documentarlas ni comentarlas en código como "stock", "Vuexy character", "ilustración genérica" o equivalente. Son originales de Efeonce.
+- Cuando un diseño de referencia (Figma DS Vuexy, etc.) traiga una ilustración stock, la versión que va al producto es la **propia de Efeonce** con el mismo estilo de personaje 3D (coherencia con `greenhouse-404`/`greenhouse-401`), no la stock importada — salvo instrucción explícita del operador.
+- El estilo canónico del personaje (3D, hoodie azul Efeonce, expresivo) es la línea visual de marca; assets nuevos deben mantener esa consistencia.
+
+Regla cross-agente (Claude + Codex): cualquier ilustración de personaje bajo `characters/greenhouse-*` se asume **autoría Efeonce**, no atribuir a terceros ni a librerías de stock.
+
 ## Brand assets — Integraciones de terceros (Notion, Teams, …)
 
 **Esto NO es la marca Efeonce/Greenhouse.** Son los **isotipos de marcas de terceros** que Greenhouse integra (Notion, Microsoft Teams, y a futuro HubSpot, etc.). Se usan **solo para etiquetar superficies de integración** — el panel de vínculo de teamspace/canal en el wizard de alta, conectores, settings de integración — donde el usuario necesita reconocer "esto es Notion / esto es Teams". Gobierno aparte del logo institucional (ese vive en la sección anterior + `src/config/efeonce-brand.ts`).

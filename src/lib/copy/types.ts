@@ -68,6 +68,7 @@ export interface MicrocopyDictionary {
   errors: ErrorsCopy
   notFound: NotFoundCopy
   notAuthorized: NotAuthorizedCopy
+  comingSoon: ComingSoonCopy
   feedback: FeedbackCopy
   time: TimeCopy
   emails: EmailsCopy
@@ -290,6 +291,45 @@ export interface NotAuthorizedCopy {
   title: string
   description: string
   cta: string
+}
+
+/**
+ * Copy de la página "Coming Soon" (full-page launch placeholder + countdown +
+ * captura de email). Tono cálido pero sobrio (greenhouse-ux-writing): primera
+ * persona plural, sentence case, sin emoji (consistente con el resto de misc
+ * pages del portal). Sirve como ruta pública /coming-soon y como gate de
+ * feature interna. El formulario captura interés ("avísame cuando esté listo")
+ * — los toasts cubren los tres estados de envío (éxito / ya registrado / error)
+ * más la validación de email. Las unidades del countdown se separan para
+ * permitir pluralización por locale.
+ */
+export interface ComingSoonCopy {
+  /** Eyebrow / kicker sobre el título (overline). */
+  eyebrow: string
+  title: string
+  description: string
+  /** Label del input (a11y — sr-only; el campo se pre-llena con el correo de Greenhouse para autenticados). */
+  emailLabel: string
+  emailPlaceholder: string
+  notifyCta: string
+  notifyCtaLoading: string
+  /** Enlace de bajo énfasis (autenticado) que revela el campo para usar otro correo. */
+  useAnotherEmail: string
+  /** Validación inline: formato de email inválido. */
+  invalidEmail: string
+  /** Toast: registro exitoso. */
+  successToast: string
+  /** Toast: el email ya estaba registrado (idempotente, no es error). */
+  alreadySubscribedToast: string
+  /** Toast: fallo al registrar (reintentable). */
+  errorToast: string
+  /** Etiquetas de unidades del countdown. */
+  countdownDays: string
+  countdownHours: string
+  countdownMinutes: string
+  countdownSeconds: string
+  /** Mensaje breve mientras redirige al llegar a cero. */
+  launching: string
 }
 
 /**

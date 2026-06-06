@@ -16,6 +16,9 @@ import classnames from 'classnames'
 import type { SystemMode } from '@core/types'
 import type { NotAuthorizedCopy } from '@/lib/copy/types'
 
+// Component Imports
+import MiscPageEfeonceFooter from '@/components/greenhouse/brand/MiscPageEfeonceFooter'
+
 // Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
 
@@ -108,6 +111,8 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
           className={classnames({ 'scale-x-[-1]': theme.direction === 'rtl' })}
         />
       )}
+
+      <MiscPageEfeonceFooter mode={mode} />
     </main>
   )
 }

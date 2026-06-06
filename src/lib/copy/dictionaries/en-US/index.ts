@@ -3,6 +3,7 @@ import type { MicrocopyDictionary } from '../../types'
 import { emails as esCLEmails } from '../es-CL/emails'
 import { actions } from './actions'
 import { aria } from './aria'
+import { comingSoon } from './comingSoon'
 import { empty } from './empty'
 import { errors } from './errors'
 import { feedback } from './feedback'
@@ -23,6 +24,7 @@ export const enUS: MicrocopyDictionary = {
   errors,
   notFound,
   notAuthorized,
+  comingSoon,
   feedback,
   time,
   // Email localization is intentionally deferred to the email rollout child task.

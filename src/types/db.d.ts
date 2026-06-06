@@ -2320,6 +2320,19 @@ export interface GreenhouseCoreIdentityProfileSourceLinks {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreLaunchNotifications {
+  created_at: Generated<Timestamp>;
+  email: string;
+  locale: Generated<string>;
+  notification_id: Generated<string>;
+  notified_at: Timestamp | null;
+  request_ip_hash: string | null;
+  source: Generated<string>;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  user_id: string | null;
+}
+
 export interface GreenhouseCoreMemberCertifications {
   /**
    * FK to assets — PDF/image evidence uploaded via private assets
@@ -9911,6 +9924,7 @@ export interface DB {
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
+  "greenhouse_core.launch_notifications": GreenhouseCoreLaunchNotifications;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
   "greenhouse_core.member_contract_type_audit_log": GreenhouseCoreMemberContractTypeAuditLog;
   "greenhouse_core.member_endorsements": GreenhouseCoreMemberEndorsements;

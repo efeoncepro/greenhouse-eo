@@ -9,8 +9,8 @@
 import type { NotFoundCopy } from '../../types'
 
 export const notFound: NotFoundCopy = {
-  title: 'Page not found',
-  description: "We couldn't find the page you're looking for. The link may be broken or the page may have moved.",
+  title: 'This page wandered off',
+  description: "We couldn't find what you're looking for. The link may be broken or the page may have moved.",
   cta: 'Back to home',
   secondaryCta: 'Go back'
 }
