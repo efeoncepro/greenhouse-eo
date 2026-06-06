@@ -1,7 +1,8 @@
 ---
 version: alpha
 name: Greenhouse EO Portal
-description: Greenhouse design contract for coding agents. Derived from the live MUI theme and the canonical typography/token docs.
+designSystem: AXIS
+description: Greenhouse design contract for coding agents. Derived from the live MUI theme and the canonical typography/token docs. El Design System de Efeonce se llama AXIS (multi-marca Efeonce/Kortex/Verk); fuente de verdad en Figma "Design System | Vuexy → AXIS" (fileKey yyMksCoijfMaIoYplXKZaR, read-only). Cuando este contrato y AXIS difieran, AXIS es el norte y el runtime converge hacia él.
 colors:
   primary: "#0375DB"
   primary-light: "#3691E3"
