@@ -55,22 +55,11 @@ typography:
     fontSize: 1.125rem
     fontWeight: 600
     lineHeight: 1.5
-  label-lg:
-    fontFamily: Geist
-    fontSize: 1rem
-    fontWeight: 600
-    lineHeight: 1.5
   label-md:
     fontFamily: Geist
     fontSize: 0.9375rem
     fontWeight: 600
     lineHeight: 1.5
-  label-sm:
-    fontFamily: Geist
-    fontSize: 0.8125rem
-    fontWeight: 600
-    lineHeight: 1.45
-    letterSpacing: 0.2px
   body-lg:
     fontFamily: Geist
     fontSize: 1rem
@@ -281,6 +270,18 @@ Use the scale semantically:
 - `body-md` for dense product UI copy, table cells, and helpers
 - `body-sm` for metadata and timestamps
 - `overline` for compact uppercase labels above values
+
+> **Pending typography reconciliation (tracked: TASK-1036, audit
+> `docs/audits/design-tokens/TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md`):**
+> the control-text/label scale is not yet fully modeled here. Only `label-md`
+> ships as a contract token today; `label-lg` / `label-sm` were intentionally
+> NOT added with invented values because they have no runtime backing yet
+> (control text sizing lives as per-component sizes — `<Button size>`, Chip —
+> in the read-only `@core` overrides, not a shared token). The full
+> `label-lg/md/sm` scale + a typography source-of-truth + a contract↔runtime
+> drift-guard will be (re-)introduced **corrected, with real backing** by
+> TASK-1036. Until then, for control text use the MUI idiom (`<Button>`,
+> `<Chip>`) — do not hardcode `fontSize` inline.
 
 ## Layout
 
