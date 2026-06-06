@@ -288,9 +288,17 @@ export interface NotFoundCopy {
  * §6: error permanente = qué pasó + cómo salir).
  */
 export interface NotAuthorizedCopy {
+  eyebrow: string
   title: string
   description: string
+  messages: Array<{
+    title: string
+    status: string
+    detail: string
+    recovery: string
+  }>
   cta: string
+  secondaryCta: string
 }
 
 /**

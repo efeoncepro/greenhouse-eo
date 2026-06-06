@@ -11,7 +11,42 @@
 import type { NotAuthorizedCopy } from '../../types'
 
 export const notAuthorized: NotAuthorizedCopy = {
+  eyebrow: 'Acceso restringido',
   title: 'Necesitas una llave para esto',
-  description: 'Esta sección está fuera de tu alcance por ahora. Si crees que es un error, habla con tu administrador.',
-  cta: 'Volver al inicio'
+  description:
+    'Tu sesión está activa, pero esta vista requiere permisos adicionales. Si esperabas entrar, solicita acceso al administrador.',
+  messages: [
+    {
+      title: 'Necesitas una llave para esto',
+      status: 'Sesión activa. Permiso pendiente.',
+      detail: 'Esta vista requiere permisos adicionales.',
+      recovery: 'Si esperabas entrar, solicita acceso al administrador.'
+    },
+    {
+      title: 'Esta puerta pide permisos',
+      status: 'Estás dentro de Greenhouse.',
+      detail: 'Esta sección está reservada para otro rol o alcance.',
+      recovery: 'Vuelve al inicio o pide acceso.'
+    },
+    {
+      title: 'Tu pase no cubre esta vista',
+      status: 'La ruta existe.',
+      detail: 'Tu perfil todavía no tiene autorización para abrirla.',
+      recovery: 'Si corresponde, el administrador puede habilitarla.'
+    },
+    {
+      title: 'Aquí falta una autorización',
+      status: 'Greenhouse protegió esta pantalla.',
+      detail: 'La información requiere un permiso específico.',
+      recovery: 'Puedes volver atrás o solicitar el permiso correcto.'
+    },
+    {
+      title: 'Zona con acceso controlado',
+      status: 'Esta vista necesita una llave adicional.',
+      detail: 'El acceso depende de tu rol y alcance.',
+      recovery: 'Si venías por trabajo, pide que revisen tu rol.'
+    }
+  ],
+  cta: 'Volver al inicio',
+  secondaryCta: 'Volver atrás'
 }

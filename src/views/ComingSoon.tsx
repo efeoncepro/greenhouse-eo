@@ -269,7 +269,7 @@ const ComingSoon = ({
           sx={{
             fontWeight: 600,
             lineHeight: 1.2,
-            letterSpacing: '-0.01em',
+            letterSpacing: 0,
             textWrap: 'balance',
             fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
             mb: 2
@@ -280,7 +280,7 @@ const ComingSoon = ({
         <Typography
           variant='body1'
           color='text.secondary'
-          sx={{ maxInlineSize: 600, lineHeight: 1.7, textWrap: 'balance', mb: 4 }}
+          sx={{ maxInlineSize: 600, lineHeight: 1.7, textWrap: 'balance', mb: 3 }}
         >
           {copy.description}
         </Typography>
@@ -292,8 +292,8 @@ const ComingSoon = ({
           sx={{
             display: 'grid',
             gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(4, auto)' },
-            gap: { xs: 3, sm: 3 },
-            mb: 4,
+            gap: { xs: 3, sm: 2.5 },
+            mb: 3,
             justifyContent: 'center',
             maxInlineSize: { xs: 320, sm: 'none' },
             marginInline: 'auto'
@@ -303,9 +303,9 @@ const ComingSoon = ({
             <Box
               key={unit.label}
               sx={{
-                minInlineSize: { xs: 76, sm: 108 },
-                px: { xs: 3, sm: 5 },
-                py: { xs: 4, sm: 5 },
+                minInlineSize: { xs: 76, sm: 104 },
+                px: { xs: 3, sm: 4 },
+                py: { xs: 4, sm: 4 },
                 borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`,
                 border: theme => `1px solid ${theme.palette.divider}`,
                 backgroundColor: 'background.paper',
@@ -441,7 +441,7 @@ const ComingSoon = ({
               ) : (
                 // Authenticated default: one-click notify (uses the session
                 // Greenhouse email) + low-emphasis escape hatch for a different one.
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                   <Button
                     type='submit'
                     variant='contained'
@@ -457,7 +457,16 @@ const ComingSoon = ({
                     color='secondary'
                     size='small'
                     onClick={() => setUseAltEmail(true)}
-                    sx={{ textDecoration: 'underline', textUnderlineOffset: 3 }}
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 500,
+                      textDecoration: 'none',
+                      '&:hover, &:focus-visible': {
+                        color: 'secondary.main',
+                        textDecoration: 'underline',
+                        textUnderlineOffset: 3
+                      }
+                    }}
                   >
                     {copy.useAnotherEmail}
                   </Button>
@@ -473,7 +482,7 @@ const ComingSoon = ({
             alt=''
             aria-hidden='true'
             src='/images/illustrations/characters/greenhouse-coming-soon.png'
-            className='object-contain bs-[300px] md:bs-[380px] lg:bs-[440px] mbs-2 md:mbs-4'
+            className='object-contain bs-[300px] md:bs-[360px] lg:bs-[420px] mbs-0 md:mbs-2'
           />
         </CharacterFade>
       </ContentStack>

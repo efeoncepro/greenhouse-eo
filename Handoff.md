@@ -1,3 +1,13 @@
+# Sesion 2026-06-06 — TASK-1032 misc pages polish local (`/coming-soon` + `/401`)
+
+Se continuo el fine-tuning visual local de las misc pages iniciadas por Claude/Codex, usando skills de product design + GVC loop.
+
+- `/coming-soon`: se compacto el ritmo desktop sin cambiar el contrato funcional: H1 sin letter spacing negativo, menor aire subtitulo→countdown→CTA, cards countdown un poco mas densas, link "¿Prefieres otro correo?" de menor enfasis y personaje mas integrado. Evidencia GVC: `.captures/2026-06-06T11-49-56_coming-soon`.
+- `/401`: pase enterprise manteniendo el **401** como protagonista. Se agrego eyebrow canonico (`Acceso restringido` / `Restricted access`), 5 variantes de microcopy creativo+funcional (`messages`) y seleccion aleatoria **una vez al entrar** (sin carrusel), accion secundaria `Volver atras`/`Go back`, iconos Tabler en acciones, boton secundario outline sobrio y personaje responsive sin colision con wordmark Efeonce. Ultima iteracion UX writing: el parrafo de permisos se dividio en microcopy escaneable `status` → `detail` → `recovery` para lectura rapida sin bajar el protagonismo del codigo; la linea de recuperacion usa jerarquia secundaria legible, no `text.disabled`. Nuevo scenario GVC: `scripts/frontend/scenarios/not-authorized.scenario.ts`; evidencia final: `.captures/2026-06-06T12-28-24_not-authorized` desktop + iPhone 13.
+- Gates verdes: `pnpm exec eslint src/views/NotAuthorized.tsx src/lib/copy/types.ts src/lib/copy/dictionaries/es-CL/notAuthorized.ts src/lib/copy/dictionaries/en-US/notAuthorized.ts scripts/frontend/scenarios/not-authorized.scenario.ts`; `pnpm exec tsc --noEmit --pretty false`; `git diff --check`.
+- Docs sync: `changelog.md` + `docs/tasks/in-progress/TASK-1032-coming-soon-launch-page.md`. `pnpm docs:closure-check` habia pedido changelog/handoff/UI evidence; re-correr antes del cierre final si se siguen tocando files.
+- Pendiente: aprobacion visual final del operador, estados no capturados aun de `/coming-soon` (success, campo revelado, anonimo, dark), fecha real `COMING_SOON_LAUNCH_AT`, asset definitivo Efeonce, push/rollout gate.
+
 # Sesion 2026-06-06 — Floating UI / Greenhouse Floating Surface ADR + TASK-1033
 
 Por feedback del operador sobre usar mas `@floating-ui/react`, se formalizo la decision de plataforma:
