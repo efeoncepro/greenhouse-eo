@@ -70,9 +70,25 @@ AXIS (Figma, SoT)
   overrides core. DESIGN.md error→#CC3D41 + status-chip-error→on-primary; tokens doc §8.1 actualizado. Verificado
   por sonda de color real: btn/alert/chip error contained = 4.87:1 AA. Desviación a11y deliberada (decision #3),
   documentada para reconciliar con AXIS. gate ✅ tsc ✅ GVC ✅.
-- [ ] **Slice 3 — Neutrales AXIS (ALTO blast-radius).** Adoptar bg/paper/text/divider de AXIS light+dark
-  (cambia el tono de toda la app). **En el MISMO commit:** actualizar `text-*`, `surface*`, `background*`
-  en DESIGN.md + tokens doc. GVC sweep de superficies clave; evaluar flag de rollout.
+- [x] **Slice 3 — Neutrales AXIS (ALTO blast-radius) (CÓDIGO DONE 2026-06-06, ship dormant).**
+  Adopta bg/paper/text/customColors de AXIS light+dark vía `src/@core/theme/axis-neutrals.ts`
+  (dos fragmentos: `legacyNeutrals` bit-for-bit + `axisNeutrals` desde `axisNeutral` SoT).
+  `mergedTheme.ts` consume `resolveNeutralFragments()`. Brand customColors
+  (midnight/deepAzure/royalBlue/coreBlue/neonLime/sunsetOrange/crimson/lightAlloy) + `inputBorder`
+  INTACTOS (Slice 4). `divider` lo deja el core (ya === AXIS `#2f2b3d1f` vía channels).
+  Superficies Vuexy dark alineadas a AXIS (chatBg `#202534`, greyLightBg `#353A52`, trackBg `#3A3F57`,
+  tableHeader/tooltip `#2f3349`) para no chocar de hue contra el nuevo bg púrpura-navy.
+  - **Flag de rollout (decisión operador):** `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED` (build-time, **default OFF**).
+    Desviación deliberada del `home_rollout_flags` (DB): el theme MUI se construye sincrónico en cada
+    render (SSR+cliente) sin DB alcanzable y es global → flag build-time es el mecanismo correcto
+    (clase `themeConfig.mode`/`primaryColor`). Flip por env var en Vercel + redeploy.
+  - **Verificado:** tsc/lint/design:lint verdes (DESIGN.md sin tocar = consistente con runtime live OFF).
+    GVC light+dark (flag ON) en /home, /people, /finance/expenses, /admin/operations: dark navy→púrpura-navy
+    AXIS coherente, cero regresión. Sonda de color computado dark AA con margen: heading 9.14:1,
+    form-label 7.98:1, body 6.11:1, table-cell 5.47:1.
+  - **PENDIENTE al flip (NO en este commit):** actualizar DESIGN.md `neutral`/`surface*`/`background-dark`/
+    `text-*` + `GREENHOUSE_DESIGN_TOKENS_V1.md` §8.1 a los neutrales AXIS, en el MISMO commit que flipea
+    el flag a ON (mantiene contract==runtime; text con alpha → sólido representativo para el contrastCheck).
 - [ ] **Slice 4 — Migración consumers + docs + drift guard.** Migrar usos de `customColors` legacy a
   tokens AXIS; sincronizar DESIGN.md + `GREENHOUSE_DESIGN_TOKENS_V1.md`; agregar guard de drift
   (snapshot test o ritual de regeneración documentado).

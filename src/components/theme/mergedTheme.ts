@@ -20,11 +20,17 @@ import coreTheme from '@core/theme'
 // AXIS design tokens (TASK-1034) — full palette SoT + semantic feedback mapping
 import { axisTokens } from '@core/theme/axis-tokens'
 import { axisSemanticPalette } from '@core/theme/axis-semantic'
+// AXIS neutrals (TASK-1034 Slice 3) — surface/text/customColors behind a
+// build-time rollout flag (NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED, default OFF).
+import { resolveNeutralFragments } from '@core/theme/axis-neutrals'
 
 // Greenhouse typography tokens (v1.3+) — line-height namespace canónico
 import { lineHeights } from './typography-tokens'
 
 const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['direction']) => {
+  // AXIS neutral fragments (Slice 3) — flag-gated; OFF = legacy navy bit-for-bit.
+  const neutrals = resolveNeutralFragments()
+
   const userTheme: ThemeOptions = {
     // Expose line-height tokens al theme — accesible vía `theme.lineHeights.<token>`
     // desde useTheme() / styled() / sx={}. Source of truth: typography-tokens.ts.
@@ -49,23 +55,15 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
           success: axisSemanticPalette.success,
           warning: axisSemanticPalette.warning,
           error: axisSemanticPalette.error,
-          background: {
-            default: '#F8F9FA',
-            paper: '#FFFFFF'
-          },
-          text: {
-            primary: '#1A1A2E',
-            secondary: '#667085',
-            disabled: '#848484'
-          },
+          // Neutrals (bg/paper/text) — AXIS Slice 3, flag-gated (legacy navy when OFF)
+          background: neutrals.light.background,
+          text: neutrals.light.text,
           customColors: {
-            bodyBg: '#F8F9FA',
-            chatBg: '#F3F5F7',
-            greyLightBg: '#FAFBFC',
+            // surface + text mirrors from the resolved neutral fragment
+            ...neutrals.light.customColors,
+            // channel-based (AXIS ink), mode-specific — same in both fragments
             inputBorder: 'rgb(var(--mui-mainColorChannels-light) / 0.22)',
-            tableHeaderBg: '#FFFFFF',
-            tooltipText: '#FFFFFF',
-            trackBg: '#ECF1F5',
+            // Greenhouse brand customColors — INTACT (Slice 4 territory)
             midnight: '#022A4E',
             deepAzure: '#023C70',
             royalBlue: '#024C8F',
@@ -73,10 +71,7 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
             neonLime: '#6EC207',
             sunsetOrange: '#FF6500',
             crimson: '#BB1954',
-            lightAlloy: '#DBDBDB',
-            bodyText: '#1A1A2E',
-            secondaryText: '#667085',
-            claimGray: '#848484'
+            lightAlloy: '#DBDBDB'
           }
         }
       },
@@ -93,23 +88,15 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
           success: axisSemanticPalette.success,
           warning: axisSemanticPalette.warning,
           error: axisSemanticPalette.error,
-          background: {
-            default: '#101827',
-            paper: '#162033'
-          },
-          text: {
-            primary: '#F5F7FA',
-            secondary: '#B0B9C8',
-            disabled: '#7A8394'
-          },
+          // Neutrals (bg/paper/text) — AXIS Slice 3, flag-gated (legacy navy when OFF)
+          background: neutrals.dark.background,
+          text: neutrals.dark.text,
           customColors: {
-            bodyBg: '#101827',
-            chatBg: '#152033',
-            greyLightBg: '#202C42',
+            // surface + text mirrors from the resolved neutral fragment
+            ...neutrals.dark.customColors,
+            // channel-based (AXIS ink), mode-specific — same in both fragments
             inputBorder: 'rgb(var(--mui-mainColorChannels-dark) / 0.22)',
-            tableHeaderBg: '#162033',
-            tooltipText: '#0F172A',
-            trackBg: '#25314A',
+            // Greenhouse brand customColors — INTACT (Slice 4 territory)
             midnight: '#022A4E',
             deepAzure: '#023C70',
             royalBlue: '#024C8F',
@@ -117,10 +104,7 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
             neonLime: '#6EC207',
             sunsetOrange: '#FF6500',
             crimson: '#BB1954',
-            lightAlloy: '#DBDBDB',
-            bodyText: '#F5F7FA',
-            secondaryText: '#B0B9C8',
-            claimGray: '#7A8394'
+            lightAlloy: '#DBDBDB'
           }
         }
       }
