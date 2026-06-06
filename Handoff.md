@@ -1,3 +1,18 @@
+# Sesion 2026-06-06 — TASK-1034 canoniza la paleta AXIS como superficie interna `/admin/design-system`
+
+Por pedido del operador ("mas que mockup quiero canonizarlo" + "esto no tienen que verlo los clientes"), el mockup de paleta completa se promovio a una superficie real gobernada **INTERNA**. Commit `9437dbe7c` en `develop`.
+
+- **Link local:** `http://localhost:3000/admin/design-system` (el `/admin/axis-palette/mockup` ya no existe — movido).
+- **Ruta + vista:** `git mv` de `admin/axis-palette/mockup/page.tsx` → `admin/design-system/page.tsx` y `AxisPaletteMockupView` → `DesignSystemView` (fuera de `/mockup`). Heading "Paleta AXIS — referencia completa" + referencia Figma SoT (`yyMksCoijfMaIoYplXKZaR` / `11205:5341`) + nota "interna, no para clientes". Renderiza los ramps live desde `axis-tokens.ts`.
+- **Guard:** `getTenantContext` → `/login` sin sesion → `/401` si `tenantType==='client'` → `hasAuthorizedViewCode('administracion.design_system', fallback routeGroups.includes('internal'))` else `/401`.
+- **Gobernanza View Registry (TASK-827):** viewCode `administracion.design_system` (routeGroup `internal`) en `VIEW_REGISTRY` + migracion `20260606164637875_task-1034-seed-design-system-view.sql` **aplicada** (`view_registry` + `role_view_assignments` a **9 roles internos**, NO `client_*`).
+- **Nav (TASK-982):** item bajo Administracion gateado por `canSeeView('administracion.design_system', false)` + keys en `GH_INTERNAL_NAV` / `greenhouse-navigation-copy`.
+- **GVC:** `/admin/design-system` = 200, render correcto.
+- **Dos bloqueos resueltos:** (1) `git mv` stageo el blob VIEJO (rename preserva contenido) → re-`git add` de los 3 movidos para que staged == working tree (sino lint `no-runtime-mockup-import`); (2) pre-push tsc fallaba por `.next/dev/types/{routes.d.ts,validator.ts}` corruptos (dual-write del dev server al regenerar el manifest tras mover la ruta) → `rm` de los 2 scratch (Turbopack los regenera; tsconfig globs toleran ausentes) → tsc exit 0. NO es codigo mio; CI compila `.next` limpio.
+- **Docs sync:** `CLAUDE.md`, `AGENTS.md`, este `Handoff.md`, TASK-1034 spec, memoria `project_axis_palette_adoption.md`.
+- **Verificacion:** pre-commit lint ✓, pre-push lint+tsc ✓, `pnpm design:lint` 0/0/1, `db.d.ts` sin cambios.
+- **Pendiente separado:** TASK-1036 (deuda tipografica), ya en `to-do/`.
+
 # Sesion 2026-06-06 — Greenhouse Operating Loop V1
 
 Por recomendacion del proceso operativo, se canonizo el nombre **Greenhouse Operating Loop** para el ciclo `intake -> taxonomy -> plan -> execution -> verification -> closure -> handoff`, y se agrego una primera capa de enforcement para epics y mini-tasks, separada de `task:lint`.

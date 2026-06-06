@@ -141,3 +141,15 @@ AXIS (Figma, SoT)
 - AXIS bindea `action-hover` al mismo `#e1def50f` en ambos modos; en light es casi invisible —
   probable gap de autoría de AXIS, espejado verbatim + flag para reconciliar upstream.
 - El nombre canónico del DS (AXIS) quedó registrado en DESIGN.md (commit `8dee9e5f`) + memoria.
+
+## Delta 2026-06-06 — canonización de la referencia viva (mockup → `/admin/design-system`)
+
+El mockup de Slice 0 se promovió a una **superficie real gobernada INTERNA** (commit `9437dbe7c`). Decisión operador: "más que mockup quiero canonizarlo" + "esto no tienen que verlo los clientes".
+
+- **Rutas movidas (fuera de `/mockup`):** `admin/axis-palette/mockup/page.tsx` → `admin/design-system/page.tsx`; `AxisPaletteMockupView` → `src/views/greenhouse/admin/design-system/DesignSystemView.tsx`; scenario GVC → `scripts/frontend/scenarios/design-system.scenario.ts`. (Reemplaza las rutas listadas en "Archivos (Slice 0)".)
+- **Guard de acceso:** `getTenantContext` → `/login` sin sesión → `/401` si `tenantType==='client'` → `hasAuthorizedViewCode('administracion.design_system', fallback routeGroups.includes('internal'))` else `/401`.
+- **Gobernanza View Registry (TASK-827):** viewCode `administracion.design_system` (routeGroup `internal`, `/admin/design-system`, icon `tabler-palette`) en `VIEW_REGISTRY` (`src/lib/admin/view-access-catalog.ts`) + migración `20260606164637875_task-1034-seed-design-system-view.sql` **aplicada** sembrando `view_registry` + `role_view_assignments` a **9 roles internos** (efeonce_admin, finance_admin, finance_analyst, hr_payroll, hr_manager, efeonce_operations, efeonce_account, people_viewer, ai_tooling_admin — **NUNCA `client_*`**).
+- **Nav (TASK-982):** item bajo Administración gateado por `canSeeView('administracion.design_system', false)` en `VerticalMenu.tsx` + keys `adminDesignSystem` en `greenhouse-nomenclature.ts` / `greenhouse-navigation-copy.ts`.
+- **Vista:** heading "Paleta AXIS — referencia completa" + referencia Figma SoT (fileKey `yyMksCoijfMaIoYplXKZaR`, nodo `11205:5341`, tools MCP `get_variable_defs`/`get_screenshot`) + nota interna; renderiza los ramps live desde `axis-tokens.ts`; lleva `AxisWordmark` (logo solo-DS).
+- **Verificación:** GVC `/admin/design-system` = 200 render correcto; pre-commit lint ✓; pre-push lint+tsc ✓; `pnpm design:lint` 0/0/1; `db.d.ts` sin cambios (solo rows). Docs sync: CLAUDE.md, AGENTS.md, Handoff.md, esta spec, memoria `project_axis_palette_adoption.md`.
+- **Gotchas registrados:** (1) `git mv` stagea el blob viejo (rename preserva contenido) → re-`git add` de los movidos para que staged == working tree; (2) pre-push tsc falló por `.next/dev/types/{routes.d.ts,validator.ts}` corruptos (dual-write del dev server al regenerar el manifest tras mover la ruta) → `rm` de los scratch (Turbopack regenera; globs toleran ausentes). No es código del repo; CI compila `.next` limpio.
