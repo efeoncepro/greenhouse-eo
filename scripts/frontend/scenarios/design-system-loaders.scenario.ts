@@ -1,10 +1,10 @@
-// Mockup verification — full AXIS palette rendered in-portal from axis-tokens.ts.
+// Internal Loading Lab verification — GreenhouseLoadingSurface variants.
 
 import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
-  name: 'design-system',
-  route: '/admin/design-system',
+  name: 'design-system-loaders',
+  route: '/admin/design-system/loaders',
   viewport: { width: 1280, height: 900 },
   viewports: [
     { name: 'desktop', width: 1280, height: 900 },
@@ -13,21 +13,24 @@ export const scenario: CaptureScenario = {
   initialHoldMs: 1500,
   finalHoldMs: 400,
   readiness: {
-    absentSelectors: ['.MuiSkeleton-root', '[data-testid="login-card"]'],
+    absentSelectors: ['[data-testid="login-card"]'],
     waitForFonts: true,
     postReadyDelayMs: 400,
     timeout: 12000
   },
   assertions: [
-    { kind: 'noLoginRedirect', reason: 'mockup vive bajo dashboard autenticado' },
+    { kind: 'noLoginRedirect', reason: 'laboratorio interno bajo dashboard autenticado' },
     { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' }
   ],
+  quality: {
+    allowLoading: true
+  },
   steps: [
     {
       kind: 'mark',
-      label: 'axis-palette-full',
+      label: 'loading-lab',
       fullPage: true,
-      note: 'Paleta AXIS completa; el Loading Lab vive en /admin/design-system/loaders'
+      note: 'Laboratorio interno dedicado para variants de GreenhouseLoadingSurface'
     }
   ]
 }

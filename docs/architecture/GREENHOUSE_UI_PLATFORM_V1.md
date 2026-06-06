@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.16
+> **Version:** 1.17
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-06 — v1.17: Greenhouse agrega `GreenhouseLoadingSurface` como primitive canonica inicial para loading states modernos y abre el **Loading Lab** interno como child route de design system en `/admin/design-system/loaders`. Variants V1: `pageSkeleton`, `panelSkeleton`, `tableSkeleton`, `inlineAction`, `brandSplash`, `aiThinking`, `progressRail`. Implementacion: `TASK-1037`.
 > **Updated:** 2026-06-06 — v1.16: Greenhouse adopta **Dashboard Floating Action Dock** como primitive shell para acciones persistentes ancladas al viewport (`NexaFloatingButton`, `ScrollToTop` y futuros items). Publica safe-area CSS vars para footers/sticky bars y separa este contrato de `GreenhouseFloatingSurface` (`TASK-1033`), que cubre superficies contextuales ancladas.
 > **Updated:** 2026-06-06 — v1.15: Greenhouse adopta Floating UI como engine canonico de posicionamiento para superficies contextuales ancladas, expuesto via primitive futura **Greenhouse Floating Surface**. ADR: `GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md`; implementacion futura: `TASK-1033`.
 > **Updated:** 2026-06-06 — v1.14: Greenhouse canoniza la metodologia **Primitive + Variants + Kinds** para UI reusable. Una primitive estable owns layout/a11y/responsive/motion/shell; `variant` representa un modo funcional oficial; `kind` representa el caso semantico de consumidor y debe mapear a una variant. ADR: `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`.
@@ -25,6 +26,26 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-06d — Greenhouse Loading Surface
+
+Greenhouse adopta `GreenhouseLoadingSurface` como primitive inicial para loading states modernos, evitando que cada ruta o view vuelva a resolver el problema con `CircularProgress`, `Skeleton` o copy local sin criterio de plataforma.
+
+Docs canonicos:
+
+- Implementacion/task: `docs/tasks/in-progress/TASK-1037-greenhouse-loading-primitive-system.md`
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseLoadingSurface.tsx`
+- Visual lab interno: `/admin/design-system/loaders` (`Loading Lab`, client-visible blocked by `administracion.design_system`)
+
+Contrato:
+
+- Variants oficiales V1: `pageSkeleton`, `panelSkeleton`, `tableSkeleton`, `inlineAction`, `brandSplash`, `aiThinking`, `progressRail`.
+- Cada variant representa un job funcional, no una skin: route-level skeleton, panel/sidebar, table/list loading, accion inline, transicion branded, IA reasoning y proceso por checkpoints.
+- La primitive owns `role='status'`, `aria-busy='true'`, `aria-live='polite'`, reduced-motion handling, `data-capture` hooks y estructura visual responsive.
+- Reutilizar el stack Greenhouse no significa limitarse a los loaders existentes: Framer Motion/CSS/MUI/AXIS son el chasis, pero las implementations visuales deben subir el nivel antes de migrar consumers.
+- Product views deben preferir esta primitive antes de introducir nuevos loaders locales. `CircularProgress` queda aceptable para casos puntuales inline mientras se migra, pero no debe convertirse en la solucion default de route/panel/IA.
+- `Lottie` o `GSAP` solo deben entrar en una variant o consumer si el Loading Lab demuestra que aportan valor claro y conservan reduced-motion.
+- GVC requerido para variants nuevas o cambios visuales materiales; el scenario `design-system-loaders` captura desktop + mobile.
 
 ## Delta 2026-06-06c — Dashboard Floating Action Dock
 

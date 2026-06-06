@@ -116,6 +116,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Preferencias personales de notificaciones. Link en UserDropdown pendiente (TASK-983 follow-up); alcanzable por URL directa mientras tanto.'
+  },
+  {
+    route: '/admin/design-system/loaders',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Loading Lab (TASK-1037) — child surface del Design System, alcanzable desde la referencia interna de tokens AXIS sin mezclar loaders en la pagina canonica de color.'
   }
 ]
 

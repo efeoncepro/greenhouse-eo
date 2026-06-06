@@ -80,6 +80,13 @@ export type {
 } from './adaptive-sidecar-shell-context'
 export { default as ShellFloatingActionDock } from './ShellFloatingActionDock'
 export type { ShellFloatingActionDockProps } from './ShellFloatingActionDock'
+export { default as GreenhouseLoadingSurface } from './GreenhouseLoadingSurface'
+export type {
+  GreenhouseLoadingStep,
+  GreenhouseLoadingSurfaceKind,
+  GreenhouseLoadingSurfaceProps,
+  GreenhouseLoadingSurfaceVariant
+} from './GreenhouseLoadingSurface'
 export {
   buildSidecarSearchParams,
   canReplaceAdaptiveSidecar,

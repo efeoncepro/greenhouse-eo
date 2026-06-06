@@ -1,8 +1,12 @@
 'use client'
 
+import Link from 'next/link'
+
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { axisRamp, axisOpacity, axisNeutral, axisMain } from '@core/theme/axis-tokens'
@@ -34,6 +38,7 @@ const contrast = (a: string, b: string) => {
 
 const RAMP_STEPS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const
 const OPACITY_STEPS = [8, 16, 24, 32, 38] as const
+const LOADING_LAB_ROUTE = '/admin/design-system/loaders'
 
 const BRAND: { key: AxisColorFamily; label: string }[] = [
   { key: 'primary', label: 'Primary (Efeonce)' },
@@ -159,6 +164,41 @@ const DesignSystemView = () => (
         (<code>yyMksCoijfMaIoYplXKZaR</code>, nodo <code>11205:5341</code>). Superficie interna — no visible para clientes.
       </Typography>
     </Box>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Laboratorios
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Loaders y estados de carga
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Subseccion interna para revisar microinteracciones de carga sin mezclar el canon de color AXIS.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={LOADING_LAB_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-loader-2' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver loaders
+        </Button>
+      </CardContent>
+    </Card>
 
     <Card variant='outlined'>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
