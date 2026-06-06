@@ -1319,7 +1319,7 @@ export const SIGNAL_KIND_LABELS: Record<ReliabilitySignalKind, string> = {
  * try/catch and returns a degraded signal (kind=unknown) instead of throwing
  * — so a failure in one DB query never poisons the whole overview.
  *
- * Lives behind `Promise.all` to avoid sequential N+1 latency on /admin/operations.
+ * Lives behind `Promise.all` to avoid sequential N+1 latency on /admin/ops-health.
  */
 export const buildPaymentOrderSettlementSignals = async (
   readers: {
@@ -1365,7 +1365,7 @@ export const buildFinanceClpDriftSignals = async (
  *
  * Compone los 3 readers (drift full-month-entry + drift source-date +
  * delta-anomaly placeholder) en `Promise.all` para evitar latencia secuencial
- * en `/admin/operations`. Cada reader degrada honestamente (severity=unknown)
+ * en `/admin/ops-health`. Cada reader degrada honestamente (severity=unknown)
  * si su query falla — un solo signal roto NUNCA envenena el overview entero.
  *
  * Subsystem rollup: `finance_data_quality` (moduleKey='finance') alineado

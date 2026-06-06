@@ -11,7 +11,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
  * **V1.0 status: HONEST DEGRADATION (unknown severity)**.
  *
  * The signal exists in the canonical registry so operators see it on the
- * `/admin/operations` surface and understand it is a planned monitor.
+ * `/admin/ops-health` surface and understand it is a planned monitor.
  * However, the actual delta detection requires shadow compare data — a
  * mechanism where `projectPayrollForPeriod` runs BOTH paths (flag OFF +
  * flag ON) in parallel and emits the delta as a structured Sentry event

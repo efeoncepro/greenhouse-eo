@@ -17,7 +17,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
  *
  * **Snapshot estático embebido**: el reader contiene el set canónico de
  * Cloud Scheduler jobs definidos en `services/ops-worker/deploy.sh`. Razón:
- * llamar gcloud API en cada hit de /admin/operations es caro y agrega
+ * llamar gcloud API en cada hit de /admin/ops-health es caro y agrega
  * failure surface. Cuando se agrega/quita un job a `deploy.sh`, también se
  * actualiza el set en este reader (1 archivo coordinado, simétrico con
  * la fuente de verdad de schedule).

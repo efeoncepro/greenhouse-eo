@@ -47,7 +47,7 @@ const buildActions = (props: HomeDayActionsProps): DayAction[] => {
       label: `Revisar ${downModules.length} ${downModules.length === 1 ? 'incidente' : 'incidentes'}`,
       icon: 'tabler-alert-triangle',
       color: 'error',
-      href: '/admin/operations',
+      href: '/admin/ops-health',
       primary: true
     })
   }

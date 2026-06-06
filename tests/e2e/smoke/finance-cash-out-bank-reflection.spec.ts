@@ -5,7 +5,7 @@
  *   1. /finance/cash-out renderiza sin crash
  *   2. /finance/bank renderiza sin crash + muestra Santander Corp con
  *      `freshness.lastMaterializedAt` reciente (< 30 min)
- *   3. /admin/operations renderiza con los reliability signals nuevos
+ *   3. /admin/ops-health renderiza con los reliability signals nuevos
  *      visibles (sync.outbox.unpublished_lag, sync.outbox.dead_letter)
  *
  * Bug class que cierra: el incidente Figma 2026-05-03 (pago no rebajaba TC)
@@ -46,8 +46,8 @@ test.describe('finance / cash-out → bank reflection (TASK-773)', () => {
     await expect(santanderCorp).toBeVisible({ timeout: 10000 })
   })
 
-  test('/admin/operations renderiza sin crash (reliability dashboard)', async ({ page }) => {
-    const response = await gotoAuthenticated(page, '/admin/operations')
+  test('/admin/ops-health renderiza sin crash (reliability dashboard)', async ({ page }) => {
+    const response = await gotoAuthenticated(page, '/admin/ops-health')
 
     // Admin route puede 403 si el agent no es admin. Aceptamos 200 OK o 403/redirect.
     if (response?.status() && response.status() < 400) {

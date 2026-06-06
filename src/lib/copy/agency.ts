@@ -139,7 +139,7 @@ export const GH_AGENCY = {
       listSubtitle: 'Activos e históricos del piloto',
       filterEmptySubheader: 'Ejemplo para filtros sin resultados.',
       healthTitle: 'Commercial Health',
-      healthSubtitle: 'Subsystem mock para /admin/operations.'
+      healthSubtitle: 'Subsystem mock para /admin/ops-health.'
     },
     runtime: {
       title: 'Sample Sprints comerciales',
@@ -248,7 +248,7 @@ export const GH_AGENCY = {
       },
       commercial_health_unavailable: {
         title: 'Señales comerciales en revisión',
-        description: 'Las señales operativas no están disponibles ahora. Verifica /admin/operations o reintenta en unos minutos.'
+        description: 'Las señales operativas no están disponibles ahora. Verifica /admin/ops-health o reintenta en unos minutos.'
       },
       capacity_unresolvable: {
         title: 'Capacidad no evaluable',

@@ -1185,7 +1185,7 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'all'
   },
   // TASK-849 — Production Release Watchdog: read-only access para query del
-  // CLI desde admin endpoints futuros (admin dashboard /admin/operations
+  // CLI desde admin endpoints futuros (Admin Center /admin/ops-health
   // ya consume los signals automaticamente via reliability registry).
   // Granular least-privilege: NO reusar `platform.release.execute` (semantica
   // distinta: leer estado vs disparar release).

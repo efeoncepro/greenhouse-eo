@@ -11,7 +11,7 @@ import { getTenantContext } from '@/lib/tenant/get-tenant-context'
  *
  * Server page que renderiza el form auditado de reconciliacion Person 360
  * para EFEONCE_ADMIN. Operador llega via deep link desde el reliability
- * signal `identity.relationship.member_contract_drift` en /admin/operations.
+ * signal `identity.relationship.member_contract_drift` en /admin/ops-health.
  *
  * Query params:
  *   - `memberId` (opcional, pre-fill del form si presente)

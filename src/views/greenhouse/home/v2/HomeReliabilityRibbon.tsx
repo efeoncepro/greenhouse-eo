@@ -82,7 +82,7 @@ export const HomeReliabilityRibbon = ({ data }: HomeReliabilityRibbonProps) => {
                 transition: 'background-color 120ms cubic-bezier(0.2, 0, 0, 1)',
                 '&:hover': { bgcolor: 'action.hover' }
               }}
-              onClick={() => router.push('/admin/operations')}
+              onClick={() => router.push('/admin/ops-health')}
             >
               <Box
                 sx={{

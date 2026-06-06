@@ -217,7 +217,7 @@ export const GH_NEXA = {
     `Observación de ${metric}, severidad ${severity.toLowerCase()}. Haz clic para ver causa raíz.`,
   list_card_scope_template: (space: string, metric: string) => `${space} · ${metric}`,
 
-  // Degraded banner (honest, accionable, escalation a /admin/operations)
+  // Degraded banner (honest, accionable, escalation a /admin/ops-health)
   list_degraded_title: 'No pudimos cargar las observaciones',
   list_degraded_body:
     'El pipeline de Nexa está respondiendo lento o tuvo un fallo transitorio. Intenta de nuevo en unos minutos.',

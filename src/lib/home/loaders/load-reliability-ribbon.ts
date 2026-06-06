@@ -18,7 +18,7 @@ const STATUS_PRIORITY: Record<ReliabilityModuleStatus, number> = {
  * Trades the full `getReliabilityOverview()` (which aggregates billing +
  * Notion ops + synthetic snapshots + smoke lane and takes 3-4s) for a
  * direct-from-registry list with cheap recent-incident counts. Total
- * latency budget: <1s. Full detail is one click away on `/admin/operations`.
+ * latency budget: <1s. Full detail is one click away on `/admin/ops-health`.
  */
 
 interface RecentIncidentRow {

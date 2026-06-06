@@ -295,7 +295,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'Outbox publisher (PG → BQ raw) + reactive consumer + projection refreshes. Backbone async de Greenhouse: si está caído, nada async progresa.',
     domain: 'sync',
     routes: [
-      { path: '/admin/operations', label: 'Ops Health' }
+      { path: '/admin/ops-health', label: 'Ops Health' }
     ],
     apis: [
       { path: '/api/admin/reliability/overview', label: 'Reliability overview' }
@@ -425,7 +425,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'Production release control plane (TASK-848): preflight, manifest persistido, deploy coordinado, deteccion de blockers GH Actions y rollback first-class. Visibilidad temprana de stale approvals + pending sin jobs.',
     domain: 'release',
     routes: [
-      { path: '/admin/operations', label: 'Ops Health' }
+      { path: '/admin/ops-health', label: 'Ops Health' }
     ],
     apis: [
       { path: '/api/admin/releases', label: 'Release manifests (V1.1)' }

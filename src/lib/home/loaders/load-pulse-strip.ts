@@ -232,7 +232,7 @@ const cardForReliability = (rollup: { healthyCount: number; total: number } | nu
       trend: 'flat',
       status: 'unknown',
       sparkline: [],
-      drillHref: '/admin/operations',
+      drillHref: '/admin/ops-health',
       description: null,
       computedAt: new Date().toISOString(),
       source: 'realtime'
@@ -253,7 +253,7 @@ const cardForReliability = (rollup: { healthyCount: number; total: number } | nu
     trend: 'flat',
     status: healthy === rollup.total ? 'optimal' : healthy >= rollup.total - 1 ? 'attention' : 'critical',
     sparkline: Array.from({ length: 7 }, () => pct),
-    drillHref: '/admin/operations',
+    drillHref: '/admin/ops-health',
     description: `${healthy} de ${rollup.total} módulos OK`,
     computedAt: new Date().toISOString(),
     source: 'realtime'

@@ -13,7 +13,7 @@ import type { ReliabilitySignal, ReliabilitySeverity } from '@/types/reliability
  *
  * This is the escalation backstop the FK incident (JAVASCRIPT-NEXTJS-6C) lacked:
  * if the drain starts failing or stops completing, `greenhouse_delivery.*` goes
- * stale silently. This signal surfaces that on /admin/operations instead of
+ * stale silently. This signal surfaces that on /admin/ops-health instead of
  * waiting for a downstream consumer to notice.
  */
 export const NOTION_CONFORMED_DRAIN_FRESHNESS_SIGNAL_ID = 'sync.notion_conformed_drain.freshness'

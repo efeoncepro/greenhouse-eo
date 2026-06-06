@@ -25,7 +25,7 @@ const OUTCOME_ELIGIBLE_NON_REGULAR_SERVICE_PREDICATE = `
  * tenant_type='client').
  *
  * Cuando ausente: comportamiento global preservado 100% — el reliability
- * dashboard `/admin/operations` y todos los consumers actuales siguen igual.
+ * dashboard `/admin/ops-health` y todos los consumers actuales siguen igual.
  *
  * Si el subject es Efeonce admin sin spaceId asignado, el predicate queda
  * vacío y la query devuelve los counts globales — exactamente lo que un

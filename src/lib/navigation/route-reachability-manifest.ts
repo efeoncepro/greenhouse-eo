@@ -76,6 +76,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Legacy LEGACY_INTERNAL_DASHBOARD_PATH (resolve-portal-home-path); the page only `redirect("/admin")`. Canonical surface is the Admin Center.'
   },
   {
+    route: '/admin/operations',
+    parent: '/admin/ops-health',
+    via: 'redirect-alias',
+    reason:
+      'Legacy reliability URL kept for older links, docs and bookmarks; the page only `redirect("/admin/ops-health")`. Canonical incident-facing surface is Ops Health.'
+  },
+  {
     // TASK-983 triage: quote share dashboard — genuine sub-surface of the quotes flow.
     route: '/finance/quotes/share-dashboard',
     parent: '/finance/quotes',
