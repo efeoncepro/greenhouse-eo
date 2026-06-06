@@ -2,17 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `refactor`
 - Epic: `none`
-- Status real: `Diseño`
+- Status real: `Slice 1 done (helper + 6 tests); Slice 2 (sweep ~47 archivos) pendiente`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
-- Branch: `task/TASK-1041-typography-charts-adapter`
+- Branch: `develop` (local-first)
 - Legacy ID: `TASK-1038 FU3`
 
 ## Summary
