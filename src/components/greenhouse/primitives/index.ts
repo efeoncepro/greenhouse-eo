@@ -78,6 +78,8 @@ export type {
   AdaptiveSidecarShellReflowTarget,
   AdaptiveSidecarShellReservation
 } from './adaptive-sidecar-shell-context'
+export { default as ShellFloatingActionDock } from './ShellFloatingActionDock'
+export type { ShellFloatingActionDockProps } from './ShellFloatingActionDock'
 export {
   buildSidecarSearchParams,
   canReplaceAdaptiveSidecar,

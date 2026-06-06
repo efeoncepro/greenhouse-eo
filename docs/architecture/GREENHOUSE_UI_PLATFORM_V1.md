@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.15
+> **Version:** 1.16
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-06 — v1.16: Greenhouse adopta **Dashboard Floating Action Dock** como primitive shell para acciones persistentes ancladas al viewport (`NexaFloatingButton`, `ScrollToTop` y futuros items). Publica safe-area CSS vars para footers/sticky bars y separa este contrato de `GreenhouseFloatingSurface` (`TASK-1033`), que cubre superficies contextuales ancladas.
 > **Updated:** 2026-06-06 — v1.15: Greenhouse adopta Floating UI como engine canonico de posicionamiento para superficies contextuales ancladas, expuesto via primitive futura **Greenhouse Floating Surface**. ADR: `GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md`; implementacion futura: `TASK-1033`.
 > **Updated:** 2026-06-06 — v1.14: Greenhouse canoniza la metodologia **Primitive + Variants + Kinds** para UI reusable. Una primitive estable owns layout/a11y/responsive/motion/shell; `variant` representa un modo funcional oficial; `kind` representa el caso semantico de consumidor y debe mapear a una variant. ADR: `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`.
 > **Updated:** 2026-06-06 — v1.13: TASK-1028 promoted Adaptive Sidecar from architecture to reusable runtime primitive. Canonical exports live in `src/components/greenhouse/primitives/`: `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` (`resolveAdaptiveSidecarMode`, URL helpers, telemetry helper, idempotent `reduceAdaptiveSidecarState`). Future contextual assistance/inspection/review/preview/low-risk edit surfaces must reuse this primitive before creating custom drawers/modals.
@@ -24,6 +25,32 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-06c — Dashboard Floating Action Dock
+
+Greenhouse adopta **Dashboard Floating Action Dock** como primitive shell para acciones flotantes persistentes ancladas al viewport. El dock gobierna la columna bottom-right del dashboard y evita que cada accion global defina `position: fixed`, `bottom`, `right` y `z-index` por separado.
+
+Docs canonicos:
+
+- Implementacion/task: `docs/tasks/in-progress/TASK-1035-dashboard-floating-action-dock-shell-collision-model.md`
+- Runtime primitive: `src/components/greenhouse/primitives/ShellFloatingActionDock.tsx`
+
+Contrato:
+
+- El dashboard layout debe montar acciones persistentes del viewport dentro de `ShellFloatingActionDock`.
+- V1 consumers: `NexaFloatingButton` y `ScrollToTop`.
+- El dock publica variables CSS canonicas:
+  - `--gh-floating-actions-inline-offset`
+  - `--gh-floating-actions-bottom`
+  - `--gh-floating-actions-gap`
+  - `--gh-floating-actions-trigger-size`
+  - `--gh-floating-actions-stack-size`
+  - `--gh-floating-actions-safe-inline-size`
+  - `--gh-floating-actions-safe-block-size`
+- Sticky footers/action bars que puedan quedar tapados por acciones globales deben reservar espacio con `--gh-floating-actions-safe-inline-size` o `--gh-floating-actions-safe-block-size`, no con hardcodes locales.
+- Este dock cubre acciones persistentes del viewport. No reemplaza `GreenhouseFloatingSurface` (`TASK-1033`) para popovers/tooltips/menus anclados, ni `AdaptiveSidecar` para carriles contextuales full-height, ni `Dialog` para decisiones destructivas/legales/financieras.
+- Mobile debe respetar `env(safe-area-inset-bottom)` y mantener el fallback drawer de los consumers que lo requieran.
+- Toda accion persistente nueva debe declarar si pertenece al dock; no puede agregar otro fixed bottom-right global sin revisar el collision model.
 
 ## Delta 2026-06-06b — Greenhouse Floating Surface
 

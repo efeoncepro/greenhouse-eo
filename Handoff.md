@@ -1,3 +1,18 @@
+# Sesion 2026-06-06 — TASK-1035 Dashboard Floating Action Dock complete
+
+Por feedback del operador sobre solapamientos globales entre botones flotantes y contenido/footer, se creó y completó `TASK-1035` en la misma sesión.
+
+- **Task:** `docs/tasks/complete/TASK-1035-dashboard-floating-action-dock-shell-collision-model.md`.
+- **Runtime:** nueva primitive `ShellFloatingActionDock` exportada desde `@/components/greenhouse/primitives`.
+- **Consumers migrados:** `src/app/(dashboard)/layout.tsx` monta `ScrollToTop` + `NexaFloatingButton` dentro del dock; ambos mantienen fallback legacy cuando no se usan docked.
+- **Safe-area contract:** el dock publica `--gh-floating-actions-*`; `BilingualReviewDesk` reemplazó el workaround local `pr: 10` por `--gh-floating-actions-safe-inline-size`.
+- **Boundary:** dock = acciones persistentes del viewport; `TASK-1033` = Floating Surface anclada con `@floating-ui/react`; `AdaptiveSidecar` sigue siendo owner de lanes full-height.
+- **Docs sync:** `GREENHOUSE_UI_PLATFORM_V1.md` v1.16, `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, `changelog.md`, `project_context.md`.
+- **Evidencia GVC principal:** `.captures/2026-06-06T14-27-50_dashboard-floating-action-dock` desktop+mobile (`initial-dock`, `bottom-with-scroll-top`, `nexa-open-from-dock`) — visualmente verde.
+- **Evidencia adicional:** `workforce-contracting-studio-runtime` se intentó y generó frames en `.captures/2026-06-06T14-28-51_workforce-contracting-studio-runtime`, pero falló por axe preexistente (`color-contrast`, `image-alt`) en command center, no por el dock.
+- **Browser MCP:** `http://localhost:3000/agency` abrió sin errores de consola; solo warning dev-only de preload font.
+- **Gates verdes:** eslint focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm task:lint --changed`.
+
 # Sesion 2026-06-06 — TASK-1034 adopción paleta AXIS (Slices 0–2b DONE, Slice 3 pendiente)
 
 Greenhouse adopta **toda** la paleta de AXIS (Design System de Efeonce, Figma `yyMksCoijfMaIoYplXKZaR`). Pipeline canónico: AXIS (SoT) → `src/@core/theme/axis-tokens.ts` (primitivos espejo 1:1) → `src/@core/theme/axis-semantic.ts` (ramp→rol MUI) → `colorSchemes.light/dark.palette` en `mergedTheme.ts`; primitivos completos en runtime via `theme.axis.{ramp,opacity,neutral}` (augmentation `src/components/theme/types.ts`). Spec: `docs/tasks/in-progress/TASK-1034-axis-full-palette-adoption.md`. Memoria: `project_axis_palette_adoption.md`.

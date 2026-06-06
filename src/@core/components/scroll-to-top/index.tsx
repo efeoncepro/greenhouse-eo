@@ -10,19 +10,27 @@ import useScrollTrigger from '@mui/material/useScrollTrigger'
 
 interface ScrollToTopProps {
   className?: string
+  docked?: boolean
   children: ReactNode
 }
 
-const ScrollToTopStyled = styled('div')(({ theme }) => ({
-  zIndex: 'var(--mui-zIndex-fab)',
-  position: 'fixed',
-  insetInlineEnd: theme.spacing(10),
-  insetBlockEnd: theme.spacing(14)
-}))
+const ScrollToTopStyled = styled('div', {
+  shouldForwardProp: prop => prop !== 'docked'
+})<{ docked?: boolean }>(({ theme, docked }) => docked
+  ? ({
+      position: 'static',
+      zIndex: 'inherit'
+    })
+  : ({
+      zIndex: 'var(--mui-zIndex-fab)',
+      position: 'fixed',
+      insetInlineEnd: theme.spacing(10),
+      insetBlockEnd: theme.spacing(14)
+    }))
 
 const ScrollToTop = (props: ScrollToTopProps) => {
   // Props
-  const { children, className } = props
+  const { children, className, docked = false } = props
 
   // Hooks
   // init trigger
@@ -41,7 +49,7 @@ const ScrollToTop = (props: ScrollToTopProps) => {
 
   return (
     <Zoom in={trigger}>
-      <ScrollToTopStyled className={className} onClick={handleClick} role='presentation'>
+      <ScrollToTopStyled className={className} docked={docked} onClick={handleClick} role='presentation'>
         {children}
       </ScrollToTopStyled>
     </Zoom>

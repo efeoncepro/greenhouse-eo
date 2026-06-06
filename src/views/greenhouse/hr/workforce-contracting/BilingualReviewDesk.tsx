@@ -699,9 +699,8 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, canSendSignature, 
       ) : null}
 
       <Card sx={{ position: 'sticky', bottom: 16, zIndex: 2, boxShadow: theme.shadows[8], border: `1px solid ${theme.palette.divider}` }}>
-        {/* pr reserva el "FAB safe-area": el botón Nexa (fixed bottom-right 24+48px) + scroll-to-top
-            no deben taparse con "Aprobar par bilingüe". 80px libra la columna de FABs en desktop. */}
-        <CardContent sx={{ py: 2, pr: { sm: 10 } }}>
+        {/* Reserva la safe-area del dock global de acciones flotantes. */}
+        <CardContent sx={{ py: 2, pr: { sm: 'var(--gh-floating-actions-safe-inline-size)' } }}>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             justifyContent={signatureStatus ? 'space-between' : 'flex-end'}
