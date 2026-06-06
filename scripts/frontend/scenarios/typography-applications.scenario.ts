@@ -22,6 +22,12 @@ export const scenario: CaptureScenario = {
   steps: [
     {
       kind: 'mark',
+      label: 'peso-500',
+      clipSelector: '[data-capture="peso-500"]',
+      note: 'Cap 5b · Propuesta peso 500 (TASK-1039) — comparación live 400/500/600 + mapping, pendiente aprobación'
+    },
+    {
+      kind: 'mark',
       label: 'transversales',
       clipSelector: '[data-capture="transversales"]',
       note: 'Cap 6 · Transversales — decisiones resueltas (a11y, color, truncation, i18n, fluid, display, PDF/email, íconos)'

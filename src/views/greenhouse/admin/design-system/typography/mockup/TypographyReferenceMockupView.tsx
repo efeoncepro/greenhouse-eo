@@ -414,6 +414,7 @@ const TOC = [
   { id: 'cap3', label: '3 · Aplicaciones' },
   { id: 'cap4', label: '4 · Bridge contrato ↔ runtime' },
   { id: 'cap5', label: '5 · Rediseño de escala (aplicado)' },
+  { id: 'cap5b', label: '5b · Peso 500 (propuesta)' },
   { id: 'cap6', label: '6 · Transversales' },
   { id: 'cap7', label: '7 · Gobernanza' }
 ]
@@ -969,6 +970,97 @@ const TypographyReferenceMockupView = () => {
           </Box>
         </Box>
       </Section>
+
+      {/* ── 5b · Propuesta peso 500 (TASK-1039) — pendiente aprobación ──────── */}
+      <Card
+        id='cap5b'
+        data-capture='peso-500'
+        sx={{ mb: 3, scrollMarginTop: 24, borderColor: 'warning.main', borderWidth: 1, borderStyle: 'solid' }}
+      >
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box>
+            <Typography variant='h5'>5b · Rol del peso 500 — énfasis medio (TASK-1039)</Typography>
+            <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
+              Greenhouse salta de <strong>400 (body)</strong> a <strong>600 (labels/títulos)</strong>. El peso{' '}
+              <strong>500 ya está cargado</strong> (Geist + Poppins) pero está <em>«reserved»</em> — sin rol. La rampa
+              convergente (Linear, Stripe, GitHub) usa 400/500/600: el <strong>500 es el «in-between»</strong> para
+              jerarquía sutil (nav-items, encabezados de tabla, metadata enfatizada) que con 400 «se pierde» y con 600
+              «compite con los títulos». <strong>Comparalo abajo y decidís.</strong>
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              alignItems: 'flex-start',
+              p: 1.5,
+              borderRadius: 1,
+              backgroundColor: 'warning.lightOpacity',
+              border: '1px solid',
+              borderColor: 'warning.main'
+            }}
+          >
+            <Chip size='small' variant='tonal' color='warning' label='Pendiente' />
+            <Typography variant='body2' sx={{ mt: 0.25 }}>
+              Es un cambio <strong>cross-surface</strong> (se ve en nav + tablas + tabs de casi todo el portal). No se
+              aplica sin tu visto bueno — esta sección es la propuesta para que apruebes la dirección.
+            </Typography>
+          </Box>
+
+          {/* Comparación live 400 vs 500 vs 600 sobre ejemplos reales */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, pb: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+              {(['400 — body (hoy)', '500 — énfasis medio (propuesto)', '600 — label (hoy)'] as const).map(h => (
+                <Typography key={h} variant='overline' color='text.secondary'>{h}</Typography>
+              ))}
+            </Box>
+            {([
+              ['Ítem de nav', 'Finanzas'],
+              ['Encabezado de tabla', 'Colaborador'],
+              ['Tab', 'Resumen'],
+              ['Metadata enfatizada', 'Actualizado hace 2h']
+            ] as const).map(([role, text]) => (
+              <Box key={role} sx={{ py: 1.25, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 0.5 }}>{role}</Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, alignItems: 'baseline' }}>
+                  {([400, 500, 600] as const).map(w => (
+                    <Typography
+                      key={w}
+                      sx={{
+                        fontFamily: fontFamilies.text,
+                        fontSize: 14,
+                        fontWeight: w,
+                        color: w === 500 ? 'warning.main' : 'text.primary'
+                      }}
+                    >
+                      {text}
+                    </Typography>
+                  ))}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+
+          <Box>
+            <Typography variant='overline' color='text.secondary'>Mapping propuesto (consumidores del 500)</Typography>
+            <Box component='ul' sx={{ m: 0, mt: 0.5, pl: 3, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+              <Typography component='li' variant='body2'>
+                <strong>Ítems de nav</strong> (VerticalMenu) — hoy ~400, suben a 500 para legibilidad sin gritar.
+              </Typography>
+              <Typography component='li' variant='body2'>
+                <strong>Encabezados de tabla</strong> (DataTableShell) — énfasis sutil vs el body de las celdas.
+              </Typography>
+              <Typography component='li' variant='body2'>
+                <strong>Tab labels</strong> (CustomTabList) — entre body y label, hoy compiten o se pierden.
+              </Typography>
+              <Typography component='li' variant='body2' color='text.secondary'>
+                <em>NO toca</em> títulos/botones (600) ni display (800). El 500 es additive — un tier nuevo con consumidores reales (regla modern-ui: no token sin consumidor).
+              </Typography>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
 
       {/* ── 6 · Transversales ────────────────────────────────────────────── */}
       <Section
