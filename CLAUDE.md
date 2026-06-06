@@ -85,6 +85,24 @@ Ese reporte local usa GitHub Actions Runs/Jobs API via `gh` para estimar hotspot
 
 Si el cambio toca UI visible, levantar `pnpm dev` y entregar la URL `localhost` exacta antes de pedir push. No usar Vercel Preview como loop de exploracion si localhost puede validar el cambio.
 
+### Greenhouse Operating Loop
+
+**Spec canonica:** `docs/operations/GREENHOUSE_OPERATING_LOOP_V1.md`.
+
+Todo trabajo formal debe respetar el ciclo `intake -> taxonomy -> plan -> execution -> verification -> closure -> handoff`.
+
+Comandos canonicos:
+
+```bash
+pnpm task:lint          # TASK-###
+pnpm epic:lint          # EPIC-###
+pnpm mini:lint          # MINI-###
+pnpm ops:lint --changed # agregador para cambios en tasks/epics/mini-tasks
+pnpm docs:closure-check # cierre documental advisory
+```
+
+V1 valida estructura, lifecycle/carpeta, registry, next ID y checkboxes. No reemplaza verification real, GVC, flags/env vars, rollout, migraciones ni juicio humano de checkpoint.
+
 Prompt operativo recomendado:
 
 ```text

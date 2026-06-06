@@ -1,3 +1,14 @@
+# Sesion 2026-06-06 — Greenhouse Operating Loop V1
+
+Por recomendacion del proceso operativo, se canonizo el nombre **Greenhouse Operating Loop** para el ciclo `intake -> taxonomy -> plan -> execution -> verification -> closure -> handoff`, y se agrego una primera capa de enforcement para epics y mini-tasks, separada de `task:lint`.
+
+- **Fuente canonica:** `docs/operations/GREENHOUSE_OPERATING_LOOP_V1.md`.
+- **Scripts nuevos:** `pnpm epic:lint`, `pnpm mini:lint`, `pnpm ops:lint`, `pnpm ops:lint:test`.
+- **Runtime tooling:** `scripts/ci/ops-artifact-lint.mjs` valida lifecycle/carpeta, secciones obligatorias, status fields, checkboxes, registry y next ID para `EPIC-###` y `MINI-###`.
+- **Orquestador:** `scripts/ci/ops-lint.mjs` corre `task:lint` + `epic:lint` + `mini:lint` con flags compartidos como `--changed`, `--active` y `--strict`.
+- **Scope V1:** cubre estructura/paridad documental; no reemplaza cierre semantico, verification real ni `docs:closure-check`.
+- **Tests:** `scripts/ci/__tests__/ops-artifact-lint.test.mjs`.
+
 # Sesion 2026-06-06 — TASK-1033 Floating Surface Primitive tomada
 
 Por pedido del operador, se empezo a ejecutar `TASK-1033` en el checkout actual y **sin worktree**.

@@ -425,16 +425,16 @@ Sin flag por defecto — additive improvement to an existing self-service route.
 
 ## Acceptance Criteria
 
-- `/my/performance` renders a rich self-service activity dashboard with Nexa Insights, KPIs, trends and charts when data exists.
-- `/api/my/performance` never accepts or honors a target member identifier from the client.
-- DTO tests prove restricted cost/compensation fields are absent.
-- Nexa mention rendering in `/my/performance` is safe for collaborator access.
-- Current-period and no-closure states are visibly distinct from closed-period healthy states.
-- Person 360 Activity continues to pass focal tests after any shared extraction.
-- GVC evidence for collaborator desktop and mobile is reviewed and attached under `.captures/`.
-- `pnpm design:lint`, relevant tsc/lint/tests and build status are documented at closure.
+- [ ] `/my/performance` renders a rich self-service activity dashboard with Nexa Insights, KPIs, trends and charts when data exists.
+- [ ] `/api/my/performance` never accepts or honors a target member identifier from the client.
+- [ ] DTO tests prove restricted cost/compensation fields are absent.
+- [ ] Nexa mention rendering in `/my/performance` is safe for collaborator access.
+- [ ] Current-period and no-closure states are visibly distinct from closed-period healthy states.
+- [ ] Person 360 Activity continues to pass focal tests after any shared extraction.
+- [ ] GVC evidence for collaborator desktop and mobile is reviewed and attached under `.captures/`.
+- [ ] `pnpm design:lint`, relevant tsc/lint/tests and build status are documented at closure.
 
-## Verification Checklist
+## Verification
 
 - [ ] `pnpm exec tsc --noEmit`
 - [ ] `pnpm exec eslint ...` or repo canonical lint command
@@ -446,9 +446,9 @@ Sin flag por defecto — additive improvement to an existing self-service route.
 - [ ] `pnpm fe:capture --route=/my/performance --env=staging` or scenario equivalent with collaborator agent auth
 - [ ] `pnpm build`
 
-## Closure Notes
+## Closing Protocol
 
-- Move this file to `docs/tasks/complete/` when complete.
-- Update `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md`.
-- Update `docs/architecture/GREENHOUSE_MY_PERFORMANCE_SELF_SERVICE_ACTIVITY_V1.md` only if the accepted contract changes materially; otherwise append implementation links.
-- Run `pnpm docs:closure-check`.
+- [ ] Move this file to `docs/tasks/complete/` when complete.
+- [ ] Update `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md`.
+- [ ] Update `docs/architecture/GREENHOUSE_MY_PERFORMANCE_SELF_SERVICE_ACTIVITY_V1.md` only if the accepted contract changes materially; otherwise append implementation links.
+- [ ] Run `pnpm docs:closure-check`.

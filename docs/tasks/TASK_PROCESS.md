@@ -141,6 +141,28 @@ CI corre `.github/workflows/task-contract.yml` en modo `--changed` warn-first. N
 linter para reescribir backlog legacy ni para auto-mover archivos; reporta drift y el agente
 lo corrige siguiendo este proceso.
 
+## Greenhouse Operating Loop
+
+El proceso de tasks forma parte del **Greenhouse Operating Loop**, el ciclo operativo canonico `intake -> taxonomy -> plan -> execution -> verification -> closure -> handoff`.
+
+Fuente canonica:
+
+- `docs/operations/GREENHOUSE_OPERATING_LOOP_V1.md`
+
+Ademas de `task:lint`, el repo tiene gates separados para la taxonomia operativa completa:
+
+- `pnpm epic:lint` — revisa epics (`EPIC-###`) contra lifecycle/carpeta, secciones obligatorias, registry, next ID y exit criteria.
+- `pnpm mini:lint` — revisa mini-tasks (`MINI-###`) contra lifecycle/carpeta, secciones obligatorias, registry, next ID y acceptance criteria.
+- `pnpm ops:lint` — orquesta `task:lint`, `epic:lint` y `mini:lint` con los mismos flags (`--changed`, `--active`, `--strict`).
+
+Regla V1:
+
+- `task:lint` sigue siendo el gate especifico de tasks.
+- `epic:lint` y `mini:lint` cubren estructura y paridad documental; no ejecutan cierre semantico profundo aun.
+- `ops:lint --changed` es la primera pasada recomendada cuando una sesion toca `docs/tasks/`, `docs/epics/` o `docs/mini-tasks/`.
+- Epics previos a `EPIC-018` y mini-tasks previas a `MINI-005` quedan tratados como deuda historica en barridos globales/active; si se modifican o se revisan con `--item`, deben normalizarse.
+- Los checks de cierre end-to-end siguen viviendo en `docs:closure-check`, el protocolo de la task/epic/mini y la verificacion tecnica correspondiente.
+
 ---
 
 ## Derivacion de Checkpoint y Mode

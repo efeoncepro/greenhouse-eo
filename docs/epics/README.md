@@ -14,6 +14,10 @@ Panel operativo de epics del repo.
   - [EPIC_ID_REGISTRY.md](EPIC_ID_REGISTRY.md)
 - Modelo operativo canónico:
   - [`../operations/EPIC_OPERATING_MODEL_V1.md`](../operations/EPIC_OPERATING_MODEL_V1.md)
+- Linter operativo:
+  - `pnpm epic:lint`
+  - `pnpm ops:lint --changed` cuando el cambio toca epics junto con tasks o mini-tasks
+- Estos comandos forman parte del Greenhouse Operating Loop: `docs/operations/GREENHOUSE_OPERATING_LOOP_V1.md`.
 
 ## Bootstrap actual
 
