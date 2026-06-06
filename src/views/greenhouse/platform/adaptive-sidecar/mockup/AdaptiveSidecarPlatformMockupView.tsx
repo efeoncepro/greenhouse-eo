@@ -212,7 +212,7 @@ const SidecarBody = ({
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: `${theme.shape.customBorderRadius.lg}px`,
           p: 4,
-          bgcolor: 'grey.50'
+          bgcolor: 'background.paper'
         })}
       >
         <Stack spacing={3}>
@@ -241,6 +241,7 @@ const SidecarBody = ({
         </Typography>
         <Typography variant='body1'>{selectedCase.signal}</Typography>
       </Stack>
+      <Divider />
       <Box>
         <Stack direction='row' justifyContent='space-between' sx={{ mb: 2 }}>
           <Typography variant='body2' color='text.secondary'>
@@ -257,6 +258,7 @@ const SidecarBody = ({
           aria-label={`Salud del caso ${selectedCase.score}%`}
         />
       </Box>
+      <Divider />
       <Stack spacing={2}>
         <Typography variant='body2' color='text.secondary'>
           Próximo hito
@@ -324,12 +326,9 @@ const AdaptiveSidecarPlatformMockupView = () => {
     <Box
       data-capture='adaptive-sidecar-platform'
       sx={theme => ({
-        p: { xs: 4, md: 6 },
+        p: { xs: 4, md: 4 },
         minWidth: 0,
-        background:
-          theme.palette.mode === 'dark'
-            ? alpha(theme.palette.background.default, 0.96)
-            : `linear-gradient(180deg, ${alpha(theme.palette.primary.light, 0.08)} 0%, ${theme.palette.background.default} 28%)`
+        background: theme.palette.mode === 'dark' ? theme.palette.background.default : '#f7f7f8'
       })}
     >
       <GlobalStyles styles={{ '[data-nexa-floating-trigger="true"]': { display: 'none !important' } }} />
@@ -343,7 +342,12 @@ const AdaptiveSidecarPlatformMockupView = () => {
         restoreFocusRef={launchButtonRef}
         dataCapture='adaptive-sidecar-layout'
         sidecarWidth={440}
-        minHeight='calc(100dvh - 160px)'
+        sidecarMinWidth={380}
+        sidecarMaxWidth={560}
+        sidecarExtent='viewport'
+        viewportOffsetTop={0}
+        viewportShellReflow='greenhouse-vertical-navbar'
+        minHeight='calc(100dvh - 264px)'
         mainMinWidth={620}
         temporaryPlacement='bottom'
         source='platform-mockup'
@@ -366,7 +370,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
               setOpen(false)
             }}
             footer={
-              <Stack direction='row' spacing={2} justifyContent='flex-end'>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent='space-between'>
                 <AnimatePresence mode='popLayout' initial={false}>
                   {saveFeedback ? (
                     <Chip
@@ -383,22 +387,43 @@ const AdaptiveSidecarPlatformMockupView = () => {
                     />
                   ) : null}
                   {dirty ? (
-                    <Button key='discard' size='small' onClick={() => setDirty(false)}>
+                    <Stack
+                      key='dirty-context'
+                      direction='row'
+                      spacing={2}
+                      alignItems='center'
+                      component={motion.div}
+                      initial={prefersReducedMotion ? false : { opacity: 0, y: 4 }}
+                      animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+                      exit={prefersReducedMotion ? undefined : { opacity: 0, y: 4 }}
+                      transition={prefersReducedMotion ? undefined : { duration: 0.16, ease: 'easeOut' }}
+                      sx={{ minWidth: 0 }}
+                    >
+                      <i className='tabler-edit-circle' aria-hidden='true' />
+                      <Typography variant='body2' color='text.secondary'>
+                        Cambios sin guardar
+                      </Typography>
+                    </Stack>
+                  ) : null}
+                </AnimatePresence>
+                <Stack direction='row' spacing={2} justifyContent='flex-end'>
+                  {dirty ? (
+                    <Button size='small' onClick={() => setDirty(false)}>
                       Descartar
                     </Button>
                   ) : null}
-                </AnimatePresence>
-                <Button
-                  size='small'
-                  variant='contained'
-                  onClick={() => {
-                    setDirty(false)
-                    setDirtyWarning(false)
-                    setSaveFeedback(true)
-                  }}
-                >
-                  {GREENHOUSE_COPY.actions.save}
-                </Button>
+                  <Button
+                    size='small'
+                    variant='contained'
+                    onClick={() => {
+                      setDirty(false)
+                      setDirtyWarning(false)
+                      setSaveFeedback(true)
+                    }}
+                  >
+                    {GREENHOUSE_COPY.actions.save}
+                  </Button>
+                </Stack>
               </Stack>
             }
             motionKey={`${selectedCase.id}-${kind}`}
@@ -414,7 +439,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
           </ContextualSidecar>
         }
       >
-        <Stack spacing={5} data-capture='adaptive-sidecar-main-workbench' sx={{ minHeight: '100%' }}>
+        <Stack spacing={4} data-capture='adaptive-sidecar-main-workbench' sx={{ minHeight: '100%' }}>
           <Stack
             data-capture='adaptive-sidecar-header'
             direction={{ xs: 'column', xl: 'row' }}
@@ -468,17 +493,17 @@ const AdaptiveSidecarPlatformMockupView = () => {
               border: `1px solid ${alpha(theme.palette.divider, 0.82)}`,
               borderRadius: `${theme.shape.customBorderRadius.lg}px`,
               overflow: 'hidden',
-              boxShadow: `0 14px 44px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.28 : 0.06)}`
+              boxShadow: `0 10px 30px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.24 : 0.045)}`
             })}
           >
             <Box
               sx={theme => ({
-                p: 5,
+                p: 4,
                 borderBlockEnd: `1px solid ${alpha(theme.palette.divider, 0.72)}`,
                 background:
                   theme.palette.mode === 'dark'
                     ? alpha(theme.palette.background.paper, 0.94)
-                    : `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.98)} 0%, ${alpha(theme.palette.primary.light, 0.1)} 100%)`
+                    : `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.grey[50], 0.78)} 100%)`
               })}
             >
                 <Stack
@@ -516,7 +541,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
                   </Box>
                 </Stack>
               </Box>
-              <Stack spacing={2.5} sx={{ px: { xs: 3, md: 5 }, py: 3.5 }}>
+              <Stack spacing={2} sx={{ px: { xs: 3, md: 4 }, py: 3 }}>
                 {CASES.map(item => {
                   const itemStatus = STATUS_META[item.status]
                   const selected = item.id === selectedCase.id
@@ -538,9 +563,9 @@ const AdaptiveSidecarPlatformMockupView = () => {
                         borderInlineStart: `3px solid ${selected ? theme.palette.primary.main : 'transparent'}`,
                         borderRadius: `${theme.shape.customBorderRadius.lg}px`,
                         p: 3,
-                        bgcolor: selected ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.13 : 0.045) : 'background.paper',
+                        bgcolor: selected ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.1 : 0.026) : 'background.paper',
                         boxShadow: selected
-                          ? `0 10px 28px ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.22 : 0.1)}`
+                          ? `0 8px 20px ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.18 : 0.075)}`
                           : `0 1px 0 ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.2 : 0.03)}`,
                         cursor: 'default',
                         transition: theme.transitions.create(['background-color', 'box-shadow', 'border-color', 'transform'], {
@@ -604,7 +629,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
                   sx={theme => ({
                     border: `1px solid ${alpha(theme.palette.divider, 0.78)}`,
                     borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-                    p: 4,
+                    p: 3,
                     bgcolor: 'background.paper',
                     boxShadow: `0 8px 26px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.22 : 0.05)}`
                   })}

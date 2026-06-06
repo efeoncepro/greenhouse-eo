@@ -48,6 +48,7 @@ export type MicrocopyNamespace =
   | 'months' // Meses abreviados (Ene/Feb/.../Dic) y completos (Enero/.../Diciembre)
   | 'aria' // aria-labels comunes para a11y
   | 'errors' // Mensajes de error genéricos shared
+  | 'notFound' // Copy de la página 404 (full-page not-found)
   | 'feedback' // Toasts, snackbars, confirmaciones genéricas
   | 'time' // Formatos de tiempo relativo: hace X minutos, ayer, etc.
   | 'emails' // Copy institucional compartido por templates y notification delivery
@@ -64,6 +65,7 @@ export interface MicrocopyDictionary {
   months: MonthsCopy
   aria: AriaCopy
   errors: ErrorsCopy
+  notFound: NotFoundCopy
   feedback: FeedbackCopy
   time: TimeCopy
   emails: EmailsCopy
@@ -261,6 +263,18 @@ export interface ErrorsCopy {
   invalidFormat: string
   tryAgain: string
   contactSupport: string
+}
+
+/**
+ * Copy de la página 404 (full-page not-found). El glifo "404" es un código
+ * HTTP, no copy traducible — vive en el componente. Estructura calmada
+ * (skill greenhouse-ux-writing §6: error permanente = qué pasó + cómo salir).
+ */
+export interface NotFoundCopy {
+  title: string
+  description: string
+  cta: string
+  secondaryCta: string
 }
 
 /**

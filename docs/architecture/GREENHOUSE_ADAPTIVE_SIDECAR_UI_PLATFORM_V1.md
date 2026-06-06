@@ -1,7 +1,9 @@
 # Greenhouse Adaptive Sidecar UI Platform V1
 
-> **Version:** 1.1
+> **Version:** 1.3
 > **Created:** 2026-06-05
+> **Updated:** 2026-06-06 — v1.3: viewport-height sidecars can publish shell reservations through `AdaptiveSidecarShellProvider`; the Greenhouse vertical navbar consumes that reservation and reflows without global CSS patches or `!important`.
+> **Updated:** 2026-06-06 — v1.2: optional bounded resize and viewport-height shell lanes are accepted in V1 for desktop in-flow sidecars. `AdaptiveSidecarLayout` exposes `resizable`, `sidecarMinWidth`, `sidecarMaxWidth`, `onSidecarWidthChange`, `sidecarExtent`, `viewportOffsetTop`, and an accessible `role="separator"` splitter.
 > **Updated:** 2026-06-06 — Runtime primitive promoted: `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` are the canonical reusable implementation under `src/components/greenhouse/primitives/`.
 > **Status:** Accepted target architecture
 > **Decision:** `docs/architecture/GREENHOUSE_ADAPTIVE_SIDECAR_DECISION_V1.md`
@@ -27,6 +29,11 @@ Current enterprise products are converging on contextual assistance inside the w
 - **MUI Drawer** separates temporary drawers from persistent drawers. Persistent drawers coexist with app content and are appropriate when the panel is part of the working layout. Source: <https://mui.com/material-ui/react-drawer/>.
 - **Equinor Side Sheet** distinguishes push-side sheets and persistent flows, showing that "side panel that pushes content" is already a mature design-system primitive in enterprise design systems. Source: <https://eds.equinor.com/docs/components/surfaces/side_sheet/>.
 - **MDN/WAI accessibility guidance** makes the semantic boundary important: a modal dialog requires inert background behavior and correct dialog semantics; non-modal side panels should not pretend to be modal. Sources: <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/dialog_role> and <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-modal>.
+- **Microsoft Fluent 2 Drawer** explicitly distinguishes inline drawers that sit side-by-side with main content from overlay drawers that cover it; inline is preferred when users benefit from interacting with both regions at once. Source: <https://fluent2.microsoft.design/components/web/react/core/drawer/usage>.
+- **Material side sheet guidance** distinguishes standard side sheets that coexist with the main UI from modal side sheets that block the page with a scrim; coplanar side sheets can reflow/squash sibling content on sufficiently wide layouts. Source: <https://super12138.github.io/material-components-android/components/SideSheet.html>.
+- **OpenUI Copilot** and `assistant-ui` both treat assistant sidebars as side-by-side layouts that keep the main application visible; `assistant-ui` demonstrates a resizable panel group for assistant surfaces. Sources: <https://www.openui.com/docs/chat/copilot> and <https://www.assistant-ui.com/docs/ui/assistant-sidebar>.
+- **Shopify Polaris Contextual Save Bar** reinforces the dirty-state pattern: save/discard actions should stay contextual and explain what changed. Source: <https://polaris-react.shopify.com/components/internal-only/contextual-save-bar>.
+- **Atlassian Design System** cautions against Drawer in its newer navigation context, reinforcing that Greenhouse should not treat the pattern as a generic navigation drawer. Source: <https://atlassian.design/components/drawer/>.
 
 ### 2.2 Product interpretation for Greenhouse
 
@@ -104,6 +111,8 @@ Canonical files:
 - `src/components/greenhouse/primitives/AdaptiveSidecarLayout.tsx`
 - `src/components/greenhouse/primitives/ContextualSidecar.tsx`
 - `src/components/greenhouse/primitives/adaptive-sidecar-controller.ts`
+- `src/components/greenhouse/primitives/adaptive-sidecar-shell-context.tsx`
+- `src/components/layout/vertical/Navbar.tsx`
 - `src/components/greenhouse/primitives/__tests__/AdaptiveSidecarLayout.test.tsx`
 - `src/components/greenhouse/primitives/__tests__/ContextualSidecar.test.tsx`
 - `src/components/greenhouse/primitives/__tests__/adaptive-sidecar-controller.test.ts`
@@ -123,12 +132,18 @@ Motion contract:
 - Sidecar content changes use `@/libs/FramerMotion` and `useReducedMotion`; consumers must not import `framer-motion` directly.
 - GSAP is not the default sidecar motion stack; it remains reserved for exceptional choreography covered by its own ADR.
 - Desktop `push`/`inline` sidecars are full-height lanes inside the work canvas, separated by structure, not boxed drawers with shadow/radius chrome.
+- Desktop resizable sidecars must expose a visible splitter with `role="separator"`, `aria-orientation="vertical"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and keyboard adjustment.
+- `sidecarExtent='viewport'` is the shell-level presentation: panel and splitter run top-to-bottom through the viewport, while the route content still reserves layout space so the main surface is not covered.
+- If a viewport sidecar needs to occupy the global app-bar area, the implementation must use `viewportShellReflow='greenhouse-vertical-navbar'` inside `AdaptiveSidecarShellProvider`. The sidecar publishes a bounded reservation; the navbar consumes it through its `overrideStyles` contract and preserves global actions/avatar. Do not patch the navbar with route-local global CSS or `!important`.
+- Viewport sidecars must not remove the global footer. Surfaces that use full-height lanes must budget header/content padding/footer height in their own canvas so `scrollHeight === clientHeight` when the workbench is intended to be non-scrolling.
 
 Verification evidence for the V1 primitive:
 
-- Desktop GVC: `.captures/2026-06-06T01-16-53_adaptive-sidecar-platform-mockup`
-- Mobile GVC: `.captures/2026-06-06T01-16-54_adaptive-sidecar-platform-mobile-mockup`
-- Tests: 18 focused primitive/controller tests.
+- Desktop GVC: `.captures/2026-06-06T02-50-18_adaptive-sidecar-platform-mockup` (14 frames: variant switch, close, reopen, inline, keyboard).
+- Mobile GVC: `.captures/2026-06-06T02-40-56_adaptive-sidecar-platform-mobile-mockup` (drawer open, close, re-open).
+- Navbar safety check: `/home` keeps the default navbar width/position when no sidecar reservation is active; sidecar open adapts the app bar and close restores it.
+- Scroll/footer check: sidecar mockup keeps the footer visible and measures `scrollHeight=900/clientHeight=900` open and closed at 1440x900.
+- Tests: focused primitive/controller tests plus TypeScript.
 
 ### 6.1 `AdaptiveSidecarLayout`
 
@@ -295,11 +310,12 @@ Dirty confirmation should be specific: keep editing, discard changes, or save wh
 
 ### 6.9 Pinning, resizing, and persistence
 
-V1 does not ship user-resizable or pinned sidecars by default.
+V1 ships **optional bounded resize** for desktop in-flow sidecars and does not ship pinned persistent sidecars by default.
 
 Rationale:
 
-- Resize increases layout states and GVC matrix cost.
+- Resize is useful for assistant/review/preview use cases where text, evidence, or generated output density varies by task.
+- Resize must stay bounded; unrestricted width creates inaccessible or unusable main content.
 - Pinning introduces persistence, collision, and stale context concerns.
 - Enterprise density needs stable, predictable dimensions before personalization.
 
@@ -307,9 +323,20 @@ Allowed in V1:
 
 - fixed width presets by `kind` and breakpoint;
 - optional `density` prop;
+- optional `resizable` prop with `sidecarMinWidth`, `sidecarMaxWidth`, `onSidecarWidthChange`, visual splitter, keyboard controls and GVC evidence;
+- optional `sidecarExtent='viewport'` for shell-level lanes that should visually occupy top-to-bottom viewport height;
 - route-local remembered open state only when the surface owner proves it is safe.
 
-Future V1.1/V2 may add resize/pin after GVC covers min/max dimensions, keyboard controls, persistence reset, and dirty-state behavior.
+Not allowed in V1:
+
+- persisted user pinning across routes;
+- unbounded resize;
+- resize on mobile temporary Drawer;
+- resize that bypasses `mainMinWidth` fallback;
+- resize handles without keyboard control and accessible value semantics.
+- viewport-height sidecars that cover main content instead of reserving space.
+
+Future V2 may add pinning/persistence after the shell host and collision model prove stale-context handling.
 
 ## 7. Responsive Model
 
@@ -382,7 +409,7 @@ Microinteractions:
 
 - Open: content shifts/reserves space with low-jank transition.
 - Close: reverse transition with focus restore.
-- Pin/resize, if implemented later, must preserve stable layout and GVC coverage.
+- Resize must preserve stable layout, `mainMinWidth` fallback, keyboard control and GVC coverage; pinning remains deferred.
 
 Hard rules:
 
@@ -453,7 +480,7 @@ Before a Greenhouse surface adopts Adaptive Sidecar, answer:
 7. What is the collision rule if another primary sidecar is already open?
 8. Which data/API primitives does it consume?
 9. What context is redacted for AI/assistant usage?
-10. What GVC frames prove desktop open/closed and mobile temporary behavior?
+10. What GVC frames prove desktop open/closed, optional resize affordance, and mobile temporary behavior?
 11. Does this need telemetry hooks?
 12. Why is this not a Dialog, Wizard, route, or inline rail?
 
@@ -513,7 +540,7 @@ Preferred scenario metadata:
 ## 16. Open Questions for TASK-1028 Plan Mode
 
 - Should Nexa desktop rollout use an existing Greenhouse rollout flag mechanism or a UI-only env flag?
-- Should the primitive support user-resizable width in V1, or defer to V1.1?
+- Should a future shell host support persisted pinned sidecars, or should sidecars remain route-local?
 - Should temporary mobile mode be right Drawer or bottom sheet for assistant usage?
 - Which workbench should be the first non-Nexa adoption after the pilot?
 - Should `OrganizationWorkspaceShell.drawerSlot` become a compatibility adapter or remain separate until V2?

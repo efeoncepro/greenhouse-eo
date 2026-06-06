@@ -89,7 +89,7 @@ const ContextualSidecar = ({
           chrome === 'adaptive'
             ? theme.palette.mode === 'dark'
               ? alpha(theme.palette.background.paper, 0.96)
-              : alpha(theme.palette.background.paper, 0.98)
+              : theme.palette.background.paper
             : 'background.paper',
         border: chrome === 'contained' ? `1px solid ${theme.palette.divider}` : 0,
         borderRadius: chrome === 'contained' ? { xs: 0, md: `${theme.shape.customBorderRadius.lg}px` } : 0,
@@ -102,7 +102,7 @@ const ContextualSidecar = ({
           position: 'sticky',
           top: 0,
           zIndex: 1,
-          bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.86),
+          bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.94),
           backdropFilter: 'saturate(180%) blur(10px)',
           borderBlockEnd: `1px solid ${alpha(theme.palette.divider, 0.72)}`
         })}
@@ -162,7 +162,16 @@ const ContextualSidecar = ({
           <Alert severity='error'>{errorMessage}</Alert>
         </Box>
       ) : null}
-      <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', px: 4, py: 4 }}>
+      <Box
+        sx={theme => ({
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          px: 4,
+          py: 4,
+          bgcolor: chrome === 'adaptive' ? alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.98) : 'transparent'
+        })}
+      >
         <AnimatePresence mode='wait' initial={false}>
           <Box
             key={motionKey ?? `${kind}-${state}`}
@@ -189,7 +198,7 @@ const ContextualSidecar = ({
           <Box
             sx={theme => ({
               p: 4,
-              bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.92 : 0.96),
+              bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.92 : 0.98),
               backdropFilter: 'saturate(180%) blur(8px)'
             })}
           >

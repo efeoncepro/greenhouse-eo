@@ -24,7 +24,18 @@ export const scenario: CaptureScenario = {
     { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' },
     { kind: 'visible', selector: 'text=Mesa operacional', reason: 'la superficie debe declarar la tarea operacional' },
     { kind: 'visible', selector: 'text=Superficie no-Nexa', reason: 'la validación debe demostrar uso no-Nexa' },
-    { kind: 'visible', selector: 'text=Inspector · GH-1842', reason: 'el sidecar debe estar visible en primer fold' }
+    { kind: 'visible', selector: 'text=Inspector · GH-1842', reason: 'el sidecar debe estar visible en primer fold' },
+    { kind: 'visible', selector: 'img[alt="Greenhouse Workspace"]', reason: 'el reflow del shell no debe ocultar el avatar global' },
+    {
+      kind: 'visible',
+      selector: '[data-sidecar-shell-reflow="greenhouse-vertical-navbar"]',
+      reason: 'el sidecar viewport debe declarar reflow del app bar de plataforma'
+    },
+    {
+      kind: 'visible',
+      selector: '[data-sidecar-motion="enterprise"]',
+      reason: 'la primitiva debe exponer la coreografía enterprise salvo reduced motion'
+    }
   ],
   steps: [
     {
@@ -55,6 +66,60 @@ export const scenario: CaptureScenario = {
         keyboardEquivalent: {
           action: { kind: 'focus', selector: 'button[aria-label="Formulario"]' },
           expected: 'El selector de tipo de panel tiene foco visible y nombre accesible.'
+        },
+        reducedMotion: 'skip'
+      }
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'close-panel',
+        intent: 'Verifica salida suave del panel y recuperación del canvas sin overlay residual.',
+        action: { kind: 'click', selector: 'button[aria-label="Cerrar panel"]' },
+        frames: [
+          {
+            label: 'close-start',
+            atMs: 80,
+            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
+            note: 'Inicio del cierre con salida del rail contextual'
+          },
+          {
+            label: 'close-settled',
+            atMs: 420,
+            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
+            note: 'Workspace estable después del cierre'
+          }
+        ],
+        keyboardEquivalent: {
+          action: { kind: 'focus', selector: 'button:has-text("Abrir panel")' },
+          expected: 'El foco retorna a la acción que reabre el panel.'
+        },
+        reducedMotion: 'skip'
+      }
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'reopen-panel',
+        intent: 'Verifica entrada suave del rail y reflow del app bar sin tapar avatar ni acciones.',
+        action: { kind: 'click', selector: 'button:has-text("Abrir panel")' },
+        frames: [
+          {
+            label: 'open-start',
+            atMs: 100,
+            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
+            note: 'Inicio de apertura con reserva de shell'
+          },
+          {
+            label: 'open-settled',
+            atMs: 520,
+            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
+            note: 'Rail estable con navbar adaptado'
+          }
+        ],
+        keyboardEquivalent: {
+          action: { kind: 'focus', selector: 'button[aria-label="Cerrar panel"]' },
+          expected: 'El panel reabierto expone una acción de cierre accesible.'
         },
         reducedMotion: 'skip'
       }

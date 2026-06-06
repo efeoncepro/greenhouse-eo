@@ -52,6 +52,11 @@ export { default as AdaptiveSidecarLayout } from './AdaptiveSidecarLayout'
 export type { AdaptiveSidecarLayoutProps } from './AdaptiveSidecarLayout'
 export { default as ContextualSidecar } from './ContextualSidecar'
 export type { ContextualSidecarChrome, ContextualSidecarProps, ContextualSidecarState } from './ContextualSidecar'
+export { AdaptiveSidecarShellProvider, useAdaptiveSidecarShell } from './adaptive-sidecar-shell-context'
+export type {
+  AdaptiveSidecarShellReflowTarget,
+  AdaptiveSidecarShellReservation
+} from './adaptive-sidecar-shell-context'
 export {
   buildSidecarSearchParams,
   canReplaceAdaptiveSidecar,

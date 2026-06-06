@@ -18,6 +18,7 @@ import { errors } from './errors'
 import { feedback } from './feedback'
 import { loading } from './loading'
 import { months } from './months'
+import { notFound } from './notFound'
 import { states } from './states'
 import { time } from './time'
 
@@ -29,6 +30,7 @@ export const esCL: MicrocopyDictionary = {
   months,
   aria,
   errors,
+  notFound,
   feedback,
   time,
   emails

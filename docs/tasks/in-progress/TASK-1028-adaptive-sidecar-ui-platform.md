@@ -145,9 +145,13 @@ Reglas obligatorias:
 - Product Design/GVC finding corregido por feedback operador: el sidecar no debe ocupar solo el alto de una card/seccion. `AdaptiveSidecarLayout` ahora acepta `minHeight` y el mockup lo usa como shell-level canvas wrapper, de modo que la lane adaptativa toma el espacio vertical util de arriba a abajo.
 - Product Design/GVC finding corregido por feedback operador: se elevo el nivel de microinteraccion con transiciones `AnimatePresence`/`motionKey`, hover/pressed states, save feedback inline y reduced-motion handling sin agregar libreria nueva.
 - Product Design/GVC enterprise polish 2026: el primitive ahora tiene contenedor in-flow con borde/radius/sombra sutil, sidecar header sticky con surface blur, close affordance refinado, workbench con filas redondeadas y seleccion de alta señal. El mockup oculta el FAB legacy de Nexa mediante `data-nexa-floating-trigger` para evidenciar el patron nuevo sin colision visual.
+- Deep research 2026 aplicado: Fluent inline drawer, Material standard/coplanar side sheet, OpenUI/assistant-ui sidebar assistant y Polaris contextual save bar reforzaron el contrato de sidecar copresente, resizable y con dirty actions contextuales.
+- Resize enterprise V1.2: `AdaptiveSidecarLayout` ahora soporta `resizable`, `sidecarMinWidth`, `sidecarMaxWidth`, `onSidecarWidthChange` y splitter accesible `role="separator"` con `aria-valuemin/max/now` + ArrowLeft/ArrowRight. El mockup final no muestra splitter por defecto para evitar ruido visual; la capability queda cubierta por tests.
+- Shell reflow enterprise V1.3: `AdaptiveSidecarShellProvider` se monta en el dashboard y permite que sidecars `sidecarExtent="viewport"` publiquen una reserva de carril. El `Navbar` vertical consume esa reserva mediante `overrideStyles` de Vuexy, con especificidad equivalente a `headerFloating/headerContentCompact`, sin `!important` ni CSS global route-local. Resultado: el panel puede ocupar top-to-bottom completo y el app bar se acorta preservando acciones/avatar.
+- Microinteraction enterprise V1.4: entrada/salida del panel usa `AnimatePresence` con spring breve, salida desacoplada y reduced-motion; el shell conserva la reserva durante la salida para evitar saltos de layout. El footer global permanece visible; el mockup presupuesta su altura en el canvas para evitar scroll vertical adicional.
 - Reusable platform hardening: barrel exporta primitives, types y controller; tests focales cubren idempotencia de open, dirty close/replace block, forced close/replace y dirty-state writes repetidos.
-- Evidencia final corregida: `.captures/2026-06-06T01-30-31_adaptive-sidecar-platform-mockup` y `.captures/2026-06-06T01-30-00_adaptive-sidecar-platform-mobile-mockup`.
-- Gates focales actualizados: `pnpm vitest run src/components/greenhouse/primitives/__tests__/adaptive-sidecar-controller.test.ts src/components/greenhouse/primitives/__tests__/ContextualSidecar.test.tsx src/components/greenhouse/primitives/__tests__/AdaptiveSidecarLayout.test.tsx` (18 tests) y `pnpm exec tsc --noEmit --pretty false`.
+- Evidencia final corregida: `.captures/2026-06-06T02-50-18_adaptive-sidecar-platform-mockup` y `.captures/2026-06-06T02-40-56_adaptive-sidecar-platform-mobile-mockup`. Check adicional `/home`: navbar default conserva ancho 1132px, avatar en x=1362 y sin reserva activa. En mockup sidecar: abierto navbar 692px/avatar visible/panel x=1000-1440; cerrado navbar vuelve a 1132px/avatar x=1362. Scroll global medido `900/900` abierto y cerrado con footer visible.
+- Gates focales actualizados: `pnpm vitest run src/components/greenhouse/primitives/__tests__/adaptive-sidecar-controller.test.ts src/components/greenhouse/primitives/__tests__/ContextualSidecar.test.tsx src/components/greenhouse/primitives/__tests__/AdaptiveSidecarLayout.test.tsx` (20 tests) y `pnpm exec tsc --noEmit --pretty false`.
 - Residual risk documentado: el FAB global de Nexa puede competir con contenido cuando el drawer mobile se cierra; esto confirma que el collision model debe aplicarse al piloto Nexa/shell antes de habilitar runtime global.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -224,7 +228,7 @@ Reglas obligatorias:
 - Reescribir `OrganizationWorkspaceShell`.
 - Introducir un nuevo design system o libreria de side panel.
 - Introducir una libreria nueva de animacion para V1 (`react-spring`, `anime.js`, otra drawer lib, etc.) salvo ADR/task separada.
-- Agregar sidecars resizables/pinneables en V1 sin ADR separada.
+- Agregar sidecars pinneables/persistentes en V1 sin ADR separada.
 - Cambiar Dialogs de confirmacion destructiva/legal/financiera.
 - Cambiar access model, entitlements o view registry salvo que el piloto cree una ruta runtime nueva no mockup.
 

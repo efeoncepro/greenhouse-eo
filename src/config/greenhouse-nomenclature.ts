@@ -44,6 +44,10 @@ export const GH_INTERNAL_NAV = {
   adminTeamOps: { label: 'Equipo y operaciones', subtitle: 'Talento, líneas de negocio e instrumentos' }
 } as const
 
+export const GH_PLATFORM_UI = {
+  adaptiveSidecarResizeHandleAria: 'Ajustar ancho del panel contextual'
+} as const
+
 export const GH_PEOPLE_NAV = {
   people: { label: 'Personas', subtitle: 'Vista operativa del equipo Efeonce' }
 } as const
