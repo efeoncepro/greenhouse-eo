@@ -442,6 +442,22 @@ Las ilustraciones de personaje del portal (`public/images/illustrations/characte
 
 Regla cross-agente (Claude + Codex): cualquier ilustración de personaje bajo `characters/greenhouse-*` se asume **autoría Efeonce**, no atribuir a terceros ni a librerías de stock.
 
+## Brand assets — AXIS (design system only)
+
+**AXIS es el logo del Design System de Efeonce — NO es marca de producto.** Identidad del sistema de diseño (tokens, paleta, componentes), distinta del logo **Greenhouse** (app/portal) y del logo **Efeonce** (institucional/PDFs).
+
+**Regla dura — scope cerrado:** el logo AXIS se usa **ÚNICAMENTE** en superficies del propio design system — referencias de paleta/tokens, documentación del DS, theme previews internos. **NUNCA** en UI de producto, dashboards, navegación, login, emails, PDFs, comprobantes, finiquitos, portal cliente, ni ningún contexto de cara al usuario u operador. Si dudás, NO uses AXIS: usá **Greenhouse** (app) o **Efeonce** (institucional).
+
+**Componente canónico:** `src/components/greenhouse/brand/AxisWordmark.tsx` (`variant`: `full` | `isotype` | `negative`). NUNCA pegar el `<svg>` inline ni referenciar el archivo a mano.
+
+**Assets (vector):** `public/branding/axis-*.svg`
+
+- `full` → `axis-full-color.svg` — lockup color (navy + naranja), sobre fondo claro. Default.
+- `isotype` → `axis-isotipo-full-color.svg` — solo el isotipo, para espacios reducidos.
+- `negative` → `axis-color-negative.svg` — blanco + naranja, sobre fondo oscuro.
+
+Cross-agente (Claude + Codex): AXIS = marca del design system, scope cerrado. Cualquier uso fuera de surfaces del DS es un error de marca.
+
 ## Brand assets — Integraciones de terceros (Notion, Teams, …)
 
 **Esto NO es la marca Efeonce/Greenhouse.** Son los **isotipos de marcas de terceros** que Greenhouse integra (Notion, Microsoft Teams, y a futuro HubSpot, etc.). Se usan **solo para etiquetar superficies de integración** — el panel de vínculo de teamspace/canal en el wizard de alta, conectores, settings de integración — donde el usuario necesita reconocer "esto es Notion / esto es Teams". Gobierno aparte del logo institucional (ese vive en la sección anterior + `src/config/efeonce-brand.ts`).
