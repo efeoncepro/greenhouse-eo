@@ -29,6 +29,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:staging": "node scripts/playwright-staging.mjs",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:setup": "node scripts/playwright-auth-setup.mjs",
     "test:inventory": "tsx scripts/test-inventory.ts",

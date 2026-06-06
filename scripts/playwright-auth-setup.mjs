@@ -33,7 +33,16 @@
 import { writeFile, mkdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
-const BASE_URL = process.env.AGENT_AUTH_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+import { loadLocalEnvFiles } from './lib/local-env.mjs'
+
+await loadLocalEnvFiles()
+
+const BASE_URL =
+  process.env.AGENT_AUTH_BASE_URL ||
+  process.env.PLAYWRIGHT_BASE_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  'http://localhost:3000'
+
 const MODE = process.env.AGENT_AUTH_MODE || 'api'
 const EMAIL = process.env.AGENT_AUTH_EMAIL
 const STORAGE_PATH = resolve(process.env.AGENT_AUTH_STORAGE_PATH || '.auth/storageState.json')
