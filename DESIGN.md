@@ -55,11 +55,22 @@ typography:
     fontSize: 1.125rem
     fontWeight: 600
     lineHeight: 1.5
+  label-lg:
+    fontFamily: Geist
+    fontSize: 1rem
+    fontWeight: 600
+    lineHeight: 1.5
   label-md:
     fontFamily: Geist
     fontSize: 0.9375rem
     fontWeight: 600
     lineHeight: 1.5
+  label-sm:
+    fontFamily: Geist
+    fontSize: 0.8125rem
+    fontWeight: 600
+    lineHeight: 1.45
+    letterSpacing: 0.2px
   body-lg:
     fontFamily: Geist
     fontSize: 1rem
@@ -102,6 +113,7 @@ typography:
     lineHeight: 1.05
     fontFeature: '"tnum" 1'
 rounded:
+  none: 0px
   xs: 2px
   sm: 4px
   md: 6px
