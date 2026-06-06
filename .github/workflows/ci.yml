@@ -96,6 +96,15 @@ jobs:
       - name: Lint
         run: pnpm exec eslint . --cache --cache-location .eslintcache
 
+      - name: Lint-rule tests (TASK-1038)
+        # Los custom rules de eslint-plugins/greenhouse/ tienen tests RuleTester
+        # (.test.mjs) que el `include` de vitest NO cubre (vitest solo escanea
+        # src/scripts/services). Antes no corrían en NINGÚN runner — un test podía
+        # romperse silenciosamente (caso real: no-cross-domain usaba `import type`
+        # sin parser TS y fallaba sin que nadie lo viera). `node --test` con glob
+        # los auto-descubre, así que rules nuevos quedan protegidos sin tocar config.
+        run: pnpm test:lint-rules
+
       - name: Typecheck
         run: pnpm exec tsc --noEmit
 
