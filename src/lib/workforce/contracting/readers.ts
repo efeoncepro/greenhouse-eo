@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { getJurisdictionPack } from './jurisdiction-packs/registry'
@@ -18,9 +19,24 @@ import {
 // Row shape returned by the case queries (case columns + joined extras).
 type CaseRowWithExtras = Record<string, unknown> & {
   subject_name: string | null
+  subject_user_id: string | null
+  subject_avatar_url: string | null
+  subject_member_avatar_url: string | null
   latest_validation: WorkforceContractingValidationResult | null
   latest_draft_version: number | null
 }
+
+// Resolve the subject's avatar (gs:// on client_users → proxy via user_id; member avatar is
+// already a proxy URL). Canonical helper resolveAvatarUrl (TASK-1015 doctrine).
+const SUBJECT_AVATAR_JOIN = `
+  LEFT JOIN greenhouse_core.client_users cu ON cu.identity_profile_id = c.subject_identity_profile_id
+  LEFT JOIN greenhouse_core.members mb ON mb.identity_profile_id = c.subject_identity_profile_id`
+
+const SUBJECT_AVATAR_SELECT =
+  'cu.user_id AS subject_user_id, cu.avatar_url AS subject_avatar_url, mb.avatar_url AS subject_member_avatar_url'
+
+const resolveSubjectAvatar = (row: CaseRowWithExtras): string | null =>
+  resolveAvatarUrl(row.subject_avatar_url, row.subject_user_id) ?? row.subject_member_avatar_url ?? null
 
 const projectCase = (
   contractingCase: WorkforceContractingCase,
@@ -55,6 +71,7 @@ export interface ContractingCaseListItem {
   status: WorkforceContractingCaseStatus
   subjectIdentityProfileId: string
   subjectName: string | null
+  subjectAvatarUrl: string | null
   jurisdictionPackCode: string
   authoritativeLanguage: 'es-CL' | 'en-US'
   signableFormat: 'pdf' | 'docx'
@@ -101,10 +118,12 @@ export const listContractingCases = async (
   const rows = await runGreenhousePostgresQuery<CaseRowWithExtras>(
     `SELECT ${CASE_COLUMNS.split(',').map(col => `c.${col.trim()}`).join(', ')},
             ip.full_name AS subject_name,
+            ${SUBJECT_AVATAR_SELECT},
             ld.validation_snapshot_json AS latest_validation,
             ld.draft_version AS latest_draft_version
      FROM greenhouse_hr.workforce_contracting_cases c
      LEFT JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = c.subject_identity_profile_id
+     ${SUBJECT_AVATAR_JOIN}
      ${LATEST_DRAFT_LATERAL}
      ${where}
      ORDER BY c.updated_at DESC
@@ -126,6 +145,7 @@ export const listContractingCases = async (
       status: contractingCase.status,
       subjectIdentityProfileId: contractingCase.subjectIdentityProfileId,
       subjectName: row.subject_name,
+      subjectAvatarUrl: resolveSubjectAvatar(row),
       jurisdictionPackCode: contractingCase.jurisdictionPackCode,
       authoritativeLanguage: contractingCase.authoritativeLanguage,
       signableFormat: contractingCase.signableFormat,
@@ -153,6 +173,7 @@ export interface ContractingDraftSummary {
 export interface ContractingCaseDetail {
   case: WorkforceContractingCase
   subjectName: string | null
+  subjectAvatarUrl: string | null
   projection: ContractingCaseProjection
   latestValidation: WorkforceContractingValidationResult | null
   drafts: ContractingDraftSummary[]
@@ -164,10 +185,12 @@ export const getContractingCaseDetail = async (caseId: string): Promise<Contract
   const rows = await runGreenhousePostgresQuery<CaseRowWithExtras>(
     `SELECT ${CASE_COLUMNS.split(',').map(col => `c.${col.trim()}`).join(', ')},
             ip.full_name AS subject_name,
+            ${SUBJECT_AVATAR_SELECT},
             ld.validation_snapshot_json AS latest_validation,
             ld.draft_version AS latest_draft_version
      FROM greenhouse_hr.workforce_contracting_cases c
      LEFT JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = c.subject_identity_profile_id
+     ${SUBJECT_AVATAR_JOIN}
      ${LATEST_DRAFT_LATERAL}
      WHERE c.case_id = $1`,
     [caseId]
@@ -211,6 +234,7 @@ export const getContractingCaseDetail = async (caseId: string): Promise<Contract
   return {
     case: contractingCase,
     subjectName: rows[0].subject_name,
+    subjectAvatarUrl: resolveSubjectAvatar(rows[0]),
     projection: projectCase(contractingCase, latestValidation),
     latestValidation,
     drafts: draftRows.map(d => ({

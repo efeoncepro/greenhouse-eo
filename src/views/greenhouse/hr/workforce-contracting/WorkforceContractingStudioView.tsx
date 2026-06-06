@@ -477,7 +477,12 @@ const CommandCenter = ({
                       >
                         <TableCell>
                           <Stack direction='row' spacing={1.5} alignItems='center'>
-                            <CustomAvatar skin='filled' color='primary' size={34}>
+                            <CustomAvatar
+                              src={item.subjectAvatarUrl ?? undefined}
+                              skin={item.subjectAvatarUrl ? undefined : 'filled'}
+                              color='primary'
+                              size={34}
+                            >
                               {initialsOf(item.subjectName)}
                             </CustomAvatar>
                             <Box sx={{ minWidth: 0 }}>
@@ -583,12 +588,22 @@ const CaseRailContent = ({ detail, theme, onReview }: { detail: ContractingCaseD
   return (
     <Stack spacing={3}>
       <Stack direction='row' justifyContent='space-between' spacing={2}>
-        <Box sx={{ minWidth: 0 }}>
-          <Typography variant='h5'>{detail.subjectName ?? C.detail.notAvailable}</Typography>
-          <Typography variant='body2' color='text.secondary'>
-            {(C.kindLabels as Record<string, string>)[detail.case.caseKind]} · {packLabel(detail.case.jurisdictionPackCode)}
-          </Typography>
-        </Box>
+        <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0 }}>
+          <CustomAvatar
+            src={detail.subjectAvatarUrl ?? undefined}
+            skin={detail.subjectAvatarUrl ? undefined : 'filled'}
+            color='primary'
+            size={42}
+          >
+            {initialsOf(detail.subjectName)}
+          </CustomAvatar>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant='h5' noWrap>{detail.subjectName ?? C.detail.notAvailable}</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {(C.kindLabels as Record<string, string>)[detail.case.caseKind]} · {packLabel(detail.case.jurisdictionPackCode)}
+            </Typography>
+          </Box>
+        </Stack>
         <StatusPill label={statusLabel(detail.case.status)} tone={statusTone(detail.case.status)} />
       </Stack>
 
