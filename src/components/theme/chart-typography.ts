@@ -7,12 +7,17 @@
 // valores del theme runtime (que ya refleja el SoT) para que la tipografía de
 // los charts se mueva junto con la escala canónica.
 //
-// Library-agnostic: devuelve px-number + color resuelto. Cada wrapper de chart
-// mapea a su shape (ECharts `textStyle`, Apex `style.fontSize` string, Recharts
-// `<Text fontSize fill>`). Política transversal canonizada en DESIGN.md §Typography
-// + V1 §3 ("charts derivan del SoT").
+// Gobernanza canónica de tipografía de chart (TASK-1041), por capa:
+// - **Apex + Recharts (SVG, todos los charts actuales):** gobernados por CSS en
+//   sus wrappers (`AppReactApexCharts`, `AppRecharts`) que leen `theme.typography`
+//   con `!important`. NO necesitan este helper — el CSS ya los cubre 100%.
+// - **ECharts (canvas, dashboards nuevos de alto impacto — política CLAUDE.md):**
+//   el CSS NO llega al canvas. Estos charts DEBEN consumir este helper en
+//   `option.textStyle` / `axisLabel` / etc. para heredar el SoT.
 //
-// NUNCA hardcodear fontSize de texto de chart inline — usar este helper.
+// Library-agnostic: px-number + color resuelto. Single-source JS del SoT para
+// charts. Política transversal en DESIGN.md §Typography + V1 §3 ("charts derivan
+// del SoT"). NUNCA hardcodear fontSize de texto de chart inline.
 
 import type { Theme } from '@mui/material/styles'
 

@@ -2,18 +2,34 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `refactor`
 - Epic: `none`
-- Status real: `Slice 1 done (helper + 6 tests); Slice 2 (sweep ~47 archivos) pendiente`
+- Status real: `Complete — gobernanza central vía wrappers (supera el sweep de 47 archivos)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
 - Branch: `develop` (local-first)
 - Legacy ID: `TASK-1038 FU3`
+
+## Resolution — gobernanza central vía wrappers (2026-06-06)
+
+El sweep de "~47 archivos" resultó **innecesario** — una solución más robusta y escalable. Hallazgos al aterrizar:
+
+- **Solo hay 2 librerías de chart**: ApexCharts (33 charts) + Recharts (10). **ECharts NO se usa** (los "13 ECharts" eran falsos positivos: "Recharts" contiene "echart").
+- **100% de cobertura por wrapper**: los 33 Apex usan `AppReactApexCharts`, los 10 Recharts usan `AppRecharts` (incl. `MetricTrendCard`). **0 bypass.**
+- Ambos wrappers son `styled()` que ya gobernaban la **familia** del texto SVG con CSS `!important` desde el theme — pero **les faltaba el tamaño** (cada chart lo ponía inline).
+
+**Solución:** agregar `fontSize: theme.typography.caption.fontSize !important` a la regla CSS existente de cada wrapper (ejes/leyenda/tooltip/datalabels; NO títulos). Resultado: **los 43 charts del portal consumen familia + tamaño del SoT desde un solo lugar (el theme)**. Cambiar el SoT → los 2 wrappers → los 43 charts se actualizan solos. **Nunca más chart por chart.** 2 archivos tocados, no 47.
+
+- **Fuente única:** el SoT (`theme.typography`, alimentado por `typography-tokens.ts`).
+- **Gobernanza primaria (SVG/DOM charts):** los wrappers CSS — `AppReactApexCharts` + `AppRecharts`.
+- **Single-source JS (canvas / futuras libs):** el helper `getChartTypographyFromTheme(theme)` (`src/components/theme/chart-typography.ts`, 6 tests) — para charts que configuren tipografía vía JS options (p.ej. si entra ECharts canvas-rendered, donde el CSS no llega).
+
+Verificado: tsc 0, 6 tests verde, GVC `/agency` sin breakage.
 
 ## Summary
 
