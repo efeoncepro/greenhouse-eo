@@ -278,11 +278,20 @@ The split is intentional:
 
 Numeric alignment uses Geist with tabular numerals semantics. Do not introduce monospace for IDs, amounts, or tables. The semantic equivalents are `numeric-id`, `numeric-amount`, and `kpi-value`.
 
+> **Units (this contract is agent-facing — you emit code; humans use Figma/AXIS).**
+> Emit the **token / MUI variant by name** (`<Typography variant="…">`), **never a
+> raw font-size**. The concrete value lives in the front-matter above and is in
+> **`rem`** — the runtime unit (font-size in `rem` scales with the user's font-size
+> preference + zoom; WCAG 1.4.4 — `px` font-size would break that). When a size is
+> shown in this prose it is `rem` for that reason. Other properties: `line-height`
+> unit-less, `letter-spacing` `em`, borders/hairlines/focus-ring `px` (must NOT scale
+> with the font).
+
 Use the scale semantically:
 
 - `page-title` for product page titles
 - `section-title` for section headers inside cards and drawers
-- `label-lg` / `label-md` / `label-sm` for control / bold-label text (16px / 14px / 13px). `label-md` is the canonical control label (the `button` variant); `label-lg` and `label-sm` are the larger / smaller steps of the same label scale
+- `label-lg` / `label-md` / `label-sm` for control / bold-label text (`1rem` / `0.875rem` / `0.8125rem`). `label-md` is the canonical control label (the `button` variant); `label-lg` and `label-sm` are the larger / smaller steps of the same label scale
 - `body-lg` for primary readable copy
 - `body-md` for dense product UI copy, table cells, and helpers
 - `body-sm` for metadata and timestamps
@@ -311,12 +320,12 @@ The mapping is **code, not a manual table** — `TYPOGRAPHY_VARIANT_BRIDGE`
 
 Notes:
 
-- `label-lg` (16px) and `label-sm` (13px) are SoT tokens of the label scale with
+- `label-lg` (`1rem`) and `label-sm` (`0.8125rem`) are SoT tokens of the label scale with
   no dedicated MUI variant — apply them through the matching control (`<Button>`,
   `<Chip>`), never with `fontSize` inline.
 - Control text is owned by the SoT too (`controlText` ramp): Button `sm`/`md` =
-  14px (`= body-md`/`label-md`), Button `lg` = 16px (`= label-lg`), Tab = 14px
-  (`controlText.md`), Dialog title = 16px (`= section-title`). `subtitle1` is the
+  `body-md`/`label-md`, Button `lg` = `label-lg`, Tab = `label-md`
+  (`controlText.md`), Dialog title = `section-title`. `subtitle1` is the
   live `subheader` token; `h6` reuses the `label-md` value (inline bold label);
   `subtitle2` is governed via `body-sm` (`SECONDARY_VARIANT_TOKENS`).
 - The icon glyph sizes inside controls (Button/Chip icons, input legend) are not
@@ -332,7 +341,7 @@ inline size); the bridge wires it to a MUI variant if it needs one.
 
 **Weight roles (Greenhouse uses 4):** `400` body · `600` labels/titles/buttons ·
 `700` reserved strong emphasis · `800` display/KPI. **`500` is loaded but has no
-semantic role** — evaluated and **declined** (TASK-1039): at 14px 400→500 is
+semantic role** — evaluated and **declined** (TASK-1039): at body size 400→500 is
 imperceptible and `500` already renders via Vuexy/MUI defaults (Tab/stepper/
 inputs); naming it would add a 4th ambiguous tier. Do not introduce a `500` role.
 
