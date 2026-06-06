@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useCallback, useEffect, useId, useMemo, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 
 // Next Imports
 import { useRouter } from 'next/navigation'
@@ -78,6 +78,7 @@ const CharacterImg = styled('img')({
 })
 
 const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+const EMAIL_INPUT_ID = 'coming-soon-email'
 
 const pad2 = (n: number) => n.toString().padStart(2, '0')
 
@@ -132,7 +133,7 @@ const ComingSoon = ({
   const darkImg = '/images/pages/misc-mask-dark.png'
   const lightImg = '/images/pages/misc-mask-light.png'
   const isAuthenticated = Boolean(viewerEmail)
-  const inputId = useId()
+  const inputId = EMAIL_INPUT_ID
 
   // Hooks
   const router = useRouter()
