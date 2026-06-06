@@ -10,7 +10,7 @@ colors:
   secondary: "#023C70"
   secondary-light: "#035A9E"
   secondary-dark: "#022A4E"
-  info: "#0375DB"
+  info: "#00BAD1"
   neutral: "#F8F9FA"
   surface: "#FFFFFF"
   surface-alt: "#FAFBFC"
@@ -24,9 +24,9 @@ colors:
   on-primary: "#FFFFFF"
   on-surface: "#1A1A2E"
   on-surface-dark: "#F5F7FA"
-  success: "#6EC207"
-  warning: "#FF6500"
-  error: "#BB1954"
+  success: "#28C76F"
+  warning: "#FFB703"
+  error: "#CC3D41"
   border-subtle: "#DBDBDB"
 typography:
   headline-display:
@@ -202,7 +202,7 @@ components:
     padding: 8px
   status-chip-info:
     backgroundColor: "{colors.info}"
-    textColor: "{colors.on-primary}"
+    textColor: "{colors.text-primary}"
     typography: "{typography.body-md}"
     rounded: "{rounded.md}"
     padding: 8px

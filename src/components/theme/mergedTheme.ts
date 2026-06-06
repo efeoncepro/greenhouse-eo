@@ -17,6 +17,10 @@ import type { SystemMode } from '@core/types'
 // Core Theme Imports
 import coreTheme from '@core/theme'
 
+// AXIS design tokens (TASK-1034) — full palette SoT + semantic feedback mapping
+import { axisTokens } from '@core/theme/axis-tokens'
+import { axisSemanticPalette } from '@core/theme/axis-semantic'
+
 // Greenhouse typography tokens (v1.3+) — line-height namespace canónico
 import { lineHeights } from './typography-tokens'
 
@@ -25,30 +29,26 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
     // Expose line-height tokens al theme — accesible vía `theme.lineHeights.<token>`
     // desde useTheme() / styled() / sx={}. Source of truth: typography-tokens.ts.
     lineHeights,
+    // AXIS primitive tokens (full ramps + opacity + neutrals) accesibles vía `theme.axis`.
+    // Source of truth en código: src/@core/theme/axis-tokens.ts (espejo de AXIS Figma).
+    axis: axisTokens,
     colorSchemes: {
       light: {
         palette: {
           // primary is set by the provider via settings.primaryColor (source: primaryColorConfig.ts)
           // — no need to duplicate it here. See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §4.1
+          // secondary stays navy for now; AXIS lime-secondary ramp lives in theme.axis
+          // (brand-role flip pending decision — TASK-1034).
           secondary: {
             main: '#023C70',
             light: '#035A9E',
             dark: '#022A4E'
           },
-          info: {
-            main: '#0375DB',
-            light: '#3691E3',
-            dark: '#024C8F'
-          },
-          success: {
-            main: '#6EC207'
-          },
-          warning: {
-            main: '#FF6500'
-          },
-          error: {
-            main: '#BB1954'
-          },
+          // Feedback semantics from AXIS (TASK-1034 Slice 2). contrastText AA-validated.
+          info: axisSemanticPalette.info,
+          success: axisSemanticPalette.success,
+          warning: axisSemanticPalette.warning,
+          error: axisSemanticPalette.error,
           background: {
             default: '#F8F9FA',
             paper: '#FFFFFF'
@@ -88,20 +88,11 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
             light: '#035A9E',
             dark: '#022A4E'
           },
-          info: {
-            main: '#3691E3',
-            light: '#5AA5E8',
-            dark: '#0375DB'
-          },
-          success: {
-            main: '#6EC207'
-          },
-          warning: {
-            main: '#FF6500'
-          },
-          error: {
-            main: '#BB1954'
-          },
+          // Feedback semantics from AXIS (mains are mode-agnostic; same mapping as light).
+          info: axisSemanticPalette.info,
+          success: axisSemanticPalette.success,
+          warning: axisSemanticPalette.warning,
+          error: axisSemanticPalette.error,
           background: {
             default: '#101827',
             paper: '#162033'

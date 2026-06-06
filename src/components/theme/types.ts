@@ -16,6 +16,7 @@ import type {
   CustomInputVerticalProps,
   CustomInputImgProps
 } from '@core/components/custom-inputs/types'
+import type { AxisTokens } from '@core/theme/axis-tokens'
 
 declare module '@mui/material/styles' {
    
@@ -87,6 +88,13 @@ declare module '@mui/material/styles' {
       body: number
       numericDense: number
     }
+    /**
+     * AXIS primitive design tokens (full ramps + opacity + neutrals).
+     * Source of truth in code: `src/@core/theme/axis-tokens.ts` (mirrors AXIS Figma).
+     * Consume the semantic layer (`theme.palette.*`) in components; reach into
+     * `theme.axis.ramp.*` only for a specific ramp step.
+     */
+    axis: AxisTokens
   }
   interface ThemeOptions {
     shape?: {
@@ -150,6 +158,7 @@ declare module '@mui/material/styles' {
       body: number
       numericDense: number
     }>
+    axis?: AxisTokens
   }
 
   // Custom Typography Variants

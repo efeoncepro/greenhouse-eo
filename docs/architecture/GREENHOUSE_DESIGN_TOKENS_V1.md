@@ -349,10 +349,12 @@ Three layers compose the effective palette (see `GREENHOUSE_THEME_TOKEN_CONTRACT
 |---|---|---|---|
 | `primary.main` | runtime-driven, default `#0375DB` (Core Blue) | Brand identity | CTAs, active state, filled chips, links |
 | `secondary.main` | `#023C70` (Efeonce azure / deep navy) | Structural | Navigation depth, emphasis blocks, structural CTAs |
-| `success.main` | `#6EC207` (neon lime) | Healthy / optimal | KPI óptimo, margin healthy, task complete |
-| `warning.main` | `#FF6500` (sunset orange) | Attention | Margin warning, expiring soon, approaching limit |
-| `error.main` | `#BB1954` (crimson magenta) | Critical / blocked | Validation fail, margin critical, quote expired |
-| `info.main` | `#0375DB` (Core Blue) | Informational | Neutral info, template applied, non-critical state |
+| `success.main` | `#28C76F` (AXIS green) | Healthy / optimal | KPI óptimo, margin healthy, task complete |
+| `warning.main` | `#FFB703` (AXIS amber) | Attention | Margin warning, expiring soon, approaching limit |
+| `error.main` | `#CC3D41` (AXIS error-800) | Critical / blocked | Validation fail, margin critical, quote expired |
+| `info.main` | `#00BAD1` (AXIS cyan) | Informational | Neutral info, template applied, non-critical state |
+
+> **AXIS adoption (TASK-1034 Slice 2):** los `*.main` de feedback derivan de AXIS (Design System de Efeonce) vía `src/@core/theme/axis-semantic.ts`; los ramps completos 100→900 + opacity viven en `src/@core/theme/axis-tokens.ts` y se exponen en runtime como `theme.axis.*`. `contrastText` es AA: success/warning/info usan ink oscuro `#2f2b3d` (verificado: 5.8–7.8:1; los fills brillantes fallan con blanco). **`error.main` (Slice 2b):** AXIS error-500 `#FF4C51` no admite texto AA como fill sólido (blanco 3.28:1), así que `error.main = #CC3D41` (AXIS error-800, blanco 4.87:1 ✅) y el vibrante `#FF4C51` queda como `error.light` para bordes/íconos/tints — desviación a11y deliberada a reconciliar con AXIS. `primary`/`secondary` no cambian; los neutrales AXIS son Slice 3.
 
 **`primary.main` runtime selection**: the active primary is whatever `settings.primaryColor` resolves to. Default for un-configured tenants is the first entry of `primaryColorConfig.ts`: `efeonce-core` (`#0375DB`). Per-tenant brands (Globe clients, etc.) can override via the customizer or persisted settings.
 
@@ -380,12 +382,12 @@ Each color ships with opacities: `lighterOpacity` (8%), `lightOpacity` (16%), `m
 |---|---|---|
 | `customColors.midnight` | `#022A4E` | Deep navy backgrounds, structural emphasis (52 uses) |
 | `customColors.lightAlloy` | `#DBDBDB` | Subtle borders, dividers (41 uses) |
-| `customColors.coreBlue` | `#0375DB` | Brand accents (mirror of `info.main`) |
+| `customColors.coreBlue` | `#0375DB` | Brand accent (= primary default) |
 | `customColors.deepAzure` | `#023C70` | Mirror of `secondary.main` for contexts where brand naming reads better |
 | `customColors.royalBlue` | `#024C8F` | Mid-stop in the blue ramp |
-| `customColors.neonLime` | `#6EC207` | Mirror of `success.main` for chart/brand contexts |
-| `customColors.sunsetOrange` | `#FF6500` | Mirror of `warning.main` |
-| `customColors.crimson` | `#BB1954` | Mirror of `error.main` |
+| `customColors.neonLime` | `#6EC207` | Legacy brand lime — **ya NO es mirror de `success.main`** (AXIS success = `#28C76F`). Es el lime de marca (= AXIS secondary). Migrar consumers en Slice 4 (TASK-1034). |
+| `customColors.sunsetOrange` | `#FF6500` | Legacy brand orange — **ya NO es mirror de `warning.main`** (AXIS warning = `#FFB703`). Migrar en Slice 4. |
+| `customColors.crimson` | `#BB1954` | Legacy brand crimson — **ya NO es mirror de `error.main`** (AXIS error = `#FF4C51`). Migrar en Slice 4. |
 | `customColors.bodyText` | tied to `text.primary` | Body text in non-MUI primitives |
 | `customColors.secondaryText` | tied to `text.secondary` | Helpers in non-MUI primitives |
 | `customColors.claimGray` | `#848484` | Disabled / muted text in non-MUI primitives |
