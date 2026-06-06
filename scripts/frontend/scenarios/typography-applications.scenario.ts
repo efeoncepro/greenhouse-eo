@@ -24,7 +24,7 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'peso-500',
       clipSelector: '[data-capture="peso-500"]',
-      note: 'Cap 5b · Propuesta peso 500 (TASK-1039) — comparación live 400/500/600 + mapping, pendiente aprobación'
+      note: 'Cap 5b · Peso 500 (TASK-1039) — evaluado y descartado: comparación live 400/500/600 conservada como récord del análisis'
     },
     {
       kind: 'mark',

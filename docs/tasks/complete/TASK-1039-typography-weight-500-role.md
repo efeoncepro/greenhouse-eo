@@ -2,18 +2,27 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Propuesta — pendiente aprobación visual`
+- Status real: `Cerrada — evaluada y descartada (won't-do)`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `aprobación visual del operador`
+- Blocked by: `none`
 - Branch: `develop` (local-first)
 - Legacy ID: `TASK-1038 FU1`
+
+## Resolution — won't-do (2026-06-06)
+
+Evaluado con comparación visual live (sección 5b del mockup de tipografía, GVC capturado) y **descartado**. Dos razones, fundamentadas tras verificar el estado real:
+
+1. **Diferencia imperceptible:** a 14px, 400→500 es casi invisible; el salto que el ojo lee es 400↔600. Agregar un tier que no se percibe viola la regla `modern-ui` (restraint — no token que no se ve).
+2. **El 500 ya rinde:** Vuexy/MUI ya usan `fontWeightMedium` (500) en label de Tab, stepper y custom-inputs. No era "peso reservado sin usar" — el SoT simplemente no lo nombra. Formalizarlo sería un fix de gobernanza (SoT == realidad) con el costo de un 4º tier que mete la ambigüedad "¿esto va 400/500/600?". Beneficio marginal < costo de claridad.
+
+El análisis se conserva como **récord de decisión** en la sección 5b del mockup (`/admin/design-system/typography/mockup`). El peso 500 queda donde Vuexy ya lo pone; no se introduce token nuevo. La energía se redirige al follow-up de mayor valor (TASK-1041 charts adapter).
 
 ## Summary
 

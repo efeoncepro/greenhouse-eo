@@ -414,7 +414,7 @@ const TOC = [
   { id: 'cap3', label: '3 · Aplicaciones' },
   { id: 'cap4', label: '4 · Bridge contrato ↔ runtime' },
   { id: 'cap5', label: '5 · Rediseño de escala (aplicado)' },
-  { id: 'cap5b', label: '5b · Peso 500 (propuesta)' },
+  { id: 'cap5b', label: '5b · Peso 500 (descartado)' },
   { id: 'cap6', label: '6 · Transversales' },
   { id: 'cap7', label: '7 · Gobernanza' }
 ]
@@ -975,17 +975,16 @@ const TypographyReferenceMockupView = () => {
       <Card
         id='cap5b'
         data-capture='peso-500'
-        sx={{ mb: 3, scrollMarginTop: 24, borderColor: 'warning.main', borderWidth: 1, borderStyle: 'solid' }}
+        sx={{ mb: 3, scrollMarginTop: 24, borderColor: 'divider', borderWidth: 1, borderStyle: 'solid' }}
       >
         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Box>
-            <Typography variant='h5'>5b · Rol del peso 500 — énfasis medio (TASK-1039)</Typography>
+            <Typography variant='h5'>5b · Peso 500 — evaluado y descartado (TASK-1039)</Typography>
             <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
-              Greenhouse salta de <strong>400 (body)</strong> a <strong>600 (labels/títulos)</strong>. El peso{' '}
-              <strong>500 ya está cargado</strong> (Geist + Poppins) pero está <em>«reserved»</em> — sin rol. La rampa
-              convergente (Linear, Stripe, GitHub) usa 400/500/600: el <strong>500 es el «in-between»</strong> para
-              jerarquía sutil (nav-items, encabezados de tabla, metadata enfatizada) que con 400 «se pierde» y con 600
-              «compite con los títulos». <strong>Comparalo abajo y decidís.</strong>
+              Greenhouse salta de <strong>400 (body)</strong> a <strong>600 (labels/títulos)</strong>. Se evaluó dar rol
+              al <strong>500</strong> como énfasis medio (la rampa 400/500/600 de Linear/Stripe/GitHub). La comparación
+              live de abajo es la evidencia. <strong>Decisión: no se aplica</strong> — se conserva como récord del
+              análisis.
             </Typography>
           </Box>
 
@@ -996,22 +995,24 @@ const TypographyReferenceMockupView = () => {
               alignItems: 'flex-start',
               p: 1.5,
               borderRadius: 1,
-              backgroundColor: 'warning.lightOpacity',
+              backgroundColor: 'action.hover',
               border: '1px solid',
-              borderColor: 'warning.main'
+              borderColor: 'divider'
             }}
           >
-            <Chip size='small' variant='tonal' color='warning' label='Pendiente' />
+            <Chip size='small' variant='tonal' color='secondary' label='Decisión: no aplica' />
             <Typography variant='body2' sx={{ mt: 0.25 }}>
-              Es un cambio <strong>cross-surface</strong> (se ve en nav + tablas + tabs de casi todo el portal). No se
-              aplica sin tu visto bueno — esta sección es la propuesta para que apruebes la dirección.
+              Dos razones: <strong>(1)</strong> a 14px la diferencia 400→500 es casi imperceptible (el salto que el ojo
+              lee es 400↔600); <strong>(2)</strong> el 500 <strong>ya rinde</strong> en la app vía Vuexy/MUI (label de
+              Tab, stepper, custom-inputs) — nombrarlo en el SoT sería formalizar lo que ya pasa, con el costo de un 4º
+              tier que mete la ambigüedad «¿esto va 400, 500 o 600?». Beneficio marginal &lt; costo de claridad.
             </Typography>
           </Box>
 
           {/* Comparación live 400 vs 500 vs 600 sobre ejemplos reales */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, pb: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
-              {(['400 — body (hoy)', '500 — énfasis medio (propuesto)', '600 — label (hoy)'] as const).map(h => (
+              {(['400 — body (hoy)', '500 — énfasis medio (descartado)', '600 — label (hoy)'] as const).map(h => (
                 <Typography key={h} variant='overline' color='text.secondary'>{h}</Typography>
               ))}
             </Box>
@@ -1043,7 +1044,7 @@ const TypographyReferenceMockupView = () => {
           </Box>
 
           <Box>
-            <Typography variant='overline' color='text.secondary'>Mapping propuesto (consumidores del 500)</Typography>
+            <Typography variant='overline' color='text.secondary'>Mapping que se evaluó (descartado — récord)</Typography>
             <Box component='ul' sx={{ m: 0, mt: 0.5, pl: 3, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
               <Typography component='li' variant='body2'>
                 <strong>Ítems de nav</strong> (VerticalMenu) — hoy ~400, suben a 500 para legibilidad sin gritar.
