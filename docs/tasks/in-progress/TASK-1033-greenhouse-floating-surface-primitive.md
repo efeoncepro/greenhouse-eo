@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -16,7 +16,7 @@
 - Rank: `TBD`
 - Domain: `ui|platform|accessibility`
 - Blocked by: `none`
-- Branch: `task/TASK-1033-greenhouse-floating-surface-primitive`
+- Branch: `develop` (operator-directed no-worktree/current-checkout execution)
 - Legacy ID: ``
 - GitHub Issue: ``
 
@@ -234,6 +234,15 @@ Sin flag para la primitive foundation. Pilot migrations are additive and local; 
 5. Inspect GVC frames for collision, focus and polish.
 6. `pnpm docs:closure-check`.
 
+## Acceptance Criteria
+
+- [ ] `GreenhouseFloatingSurface` existe, se exporta desde `@/components/greenhouse/primitives` y centraliza defaults de Floating UI.
+- [ ] Variants oficiales (`richTooltip`, `actionMenu`, `evidencePeek`, `inlineEditor`, `validationBubble`, `commandPreview`) tienen resolver `kind -> variant` y contrato accesible documentado/testeado.
+- [ ] `TotalsLadder` y `CostProvenancePopover` consumen la primitive sin cambiar su API publica ni degradar visual/focus behavior.
+- [ ] Tests focales cubren resolver, open/close, Escape/outside dismiss, aria/data hooks y focus return cuando aplique.
+- [ ] Scenario GVC repetible captura desktop/mobile y al menos un estado open de surface anclada.
+- [ ] Docs UI platform y lifecycle de task quedan sincronizados al cierre.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSURE
      ═══════════════════════════════════════════════════════════ -->
@@ -242,7 +251,14 @@ Sin flag para la primitive foundation. Pilot migrations are additive and local; 
 
 To be completed during implementation.
 
+## Closing Protocol
+
+- [ ] Ejecutar verification completo y registrar evidencia.
+- [ ] Marcar acceptance criteria completados o documentar pendiente bloqueante.
+- [ ] Mover task a `docs/tasks/complete/` solo cuando runtime, GVC y docs esten cerrados.
+- [ ] Sincronizar `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `Handoff.md`, `changelog.md` y docs de arquitectura afectadas.
+- [ ] Ejecutar `pnpm docs:closure-check`.
+
 ## Closure Notes
 
 To be completed when moved to `complete`.
-

@@ -10,7 +10,7 @@ Para la plantilla copiable, ver [`TASK_TEMPLATE.md`](TASK_TEMPLATE.md).
 
 ## Convenciones de ID y nombre
 
-- ID canonico para tasks nuevas: `TASK-###`
+- ID canonico para tasks nuevas: `TASK-###` como forma simbolica; el correlativo acepta 3 o mas digitos (`TASK-001`, `TASK-999`, `TASK-1000`, etc.)
 - El `###` es un identificador estable, no el orden mutable del backlog
 - El orden actual de ejecucion debe vivir en `Rank` y en el panel operativo, no en renumeraciones
 - Nombre de archivo recomendado:

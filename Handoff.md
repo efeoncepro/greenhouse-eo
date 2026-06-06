@@ -1,3 +1,29 @@
+# Sesion 2026-06-06 — TASK-1033 Floating Surface Primitive tomada
+
+Por pedido del operador, se empezo a ejecutar `TASK-1033` en el checkout actual y **sin worktree**.
+
+- **Hook Codex:** ejecutado `pnpm codex:task-hook TASK-1033 --prompt-only`; prompt activo confirma la regla anti-worktree.
+- **Lifecycle:** `docs/tasks/to-do/TASK-1033-greenhouse-floating-surface-primitive.md` movida a `docs/tasks/in-progress/TASK-1033-greenhouse-floating-surface-primitive.md`; indices sincronizados.
+- **Plan:** `docs/tasks/plans/TASK-1033-plan.md`.
+- **Checkpoint:** por `P1` + `Effort Medio`, el proceso exige aprobacion humana antes de escribir codigo de producto.
+- **Workspace:** branch actual `develop`, sin branch/worktree aislado por instruccion explicita del operador. No pushear automaticamente.
+- **Discovery:** gap confirmado: solo `TotalsLadder` y `CostProvenancePopover` usan Floating UI ad-hoc en producto; Vuexy menu queda infraestructura fuera de scope.
+- **Tooling fix aplicado durante checkpoint:** `pnpm task:lint --task TASK-1033` ya acepta IDs de 4+ digitos. Se actualizaron regex de `task-lint`/parser/registry/next-id y tests focales; `TASK-1033` ademas fue normalizada con `Acceptance Criteria` y `Closing Protocol`.
+
+# Sesion 2026-06-06 — Hook pre-ejecucion TASK-* para Codex solamente
+
+Por pedido del operador, se formalizo que el prompt robusto de ejecucion se active para **Codex** antes de implementar tasks formales `TASK-*`, sin aplicarlo a todo trabajo pequeño o conversacional ni imponerlo a Cursor/Claude.
+
+- **Mecanico:** nuevo comando `pnpm codex:task-hook TASK-###` (`scripts/codex-task-hook.mjs`) resuelve la task activa, bloquea tasks completas/bloqueadas y emite el prompt canonico sustituido. Para la excepcion `mantente en develop`, usar `pnpm codex:task-hook TASK-### --develop`.
+- **Skill Codex-only:** `.codex/skills/greenhouse-task-execution-hook/SKILL.md` apunta al comando para que sesiones futuras lo carguen como capacidad especifica de Codex.
+- **Canonico:** `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` ahora declara el hook operativo: cualquier pedido a Codex con `TASK-###`, `[TASK-###]` o ruta `docs/tasks/**/TASK-###-*.md` obliga a ejecutar el comando antes de escribir codigo.
+- **Versionamiento:** `CODEX_EXECUTION_PROMPT_V1.md` ahora declara politica de mantenimiento: ajustes compatibles (skills, docs, wording, checks aditivos, comando hook compatible) se quedan en V1; cambios estructurales de trigger, orden/obligatoriedad de fases, formato Audit/Plan/cierre, branch/checkpoint/ownership, skill routing/subagentes o source-of-truth requieren crear `CODEX_EXECUTION_PROMPT_V2.md`.
+- **Scope:** aplica solo a Codex y solo a tasks formales `TASK-*`; no obliga automaticamente a Cursor, Claude u otros agentes; no aplica a preguntas generales, brainstorming, mini-tasks o issues salvo pedido explicito.
+- **Branch override:** si el operador dice `mantente en develop`, eso overridea la branch convention de Codex; Codex debe documentar la excepcion en Audit/Plan/Handoff y no pushear a develop como cierre automatico sin confirmacion humana.
+- **Worktree policy:** tras feedback del operador, Codex NO debe crear worktrees/folders clon por defecto para ejecutar tasks. Solo con pedido/aprobacion explicita en la sesion; si se crea por excepcion, debe limpiarse al cerrar. Se elimino el worktree temporal `../greenhouse-eo-task-1033` y la branch `task/TASK-1033-greenhouse-floating-surface-primitive` creados por error en esta prueba.
+- **Docs sync:** `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `changelog.md`.
+- **Verificacion:** `pnpm codex:task-hook TASK-1033 --develop --prompt-only`, `pnpm docs:closure-check`, `pnpm docs:context-check`, `git diff --check`.
+
 # Sesion 2026-06-06 — TASK-1035 Dashboard Floating Action Dock complete
 
 Por feedback del operador sobre solapamientos globales entre botones flotantes y contenido/footer, se creó y completó `TASK-1035` en la misma sesión.

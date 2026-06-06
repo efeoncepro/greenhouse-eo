@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from 'node:child_process'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
 const args = process.argv.slice(2)
@@ -269,6 +270,17 @@ function analyze(changes) {
   const localSkillChanged = anyChanged(files, ['.codex/skills/', '.claude/skills/'])
   const codexSkillChanged = anyChanged(files, ['.codex/skills/'])
   const claudeSkillChanged = anyChanged(files, ['.claude/skills/'])
+  const codexSkillFiles = files.filter(filePath => filePath.startsWith('.codex/skills/') && filePath.endsWith('/SKILL.md'))
+
+  const changedCodexSkillsAreCodexOnly =
+    codexSkillFiles.length > 0 &&
+    codexSkillFiles.every(filePath => {
+      if (!existsSync(filePath)) return false
+
+      const source = readFileSync(filePath, 'utf8')
+
+      return /\bCodex-only\b|solo de Codex|Codex solamente/i.test(source)
+    })
 
   const taskLifecycleChanged = files.some(filePath =>
     /^docs\/(tasks|mini-tasks|epics)\/(to-do|in-progress|complete)\//.test(filePath),
@@ -344,7 +356,7 @@ function analyze(changes) {
   }
 
   if (localSkillChanged) {
-    if (codexSkillChanged && !claudeSkillChanged) {
+    if (codexSkillChanged && !claudeSkillChanged && !changedCodexSkillsAreCodexOnly) {
       addFinding(findings, 'warn', 'missing_claude_skill_pair', 'Codex skill changed without a Claude skill counterpart in this diff.', [
         '.claude/skills/',
       ])

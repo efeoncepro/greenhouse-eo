@@ -16,6 +16,7 @@
     "design:lint": "design.md lint DESIGN.md",
     "design:diff": "node scripts/design-diff.mjs",
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md",
+    "codex:task-hook": "node scripts/codex-task-hook.mjs",
     "task:lint": "node scripts/ci/task-lint.mjs",
     "task:lint:test": "node scripts/ci/__tests__/task-lint.test.mjs",
     "docs:closure-check": "node scripts/check-documentation-closure.mjs",
