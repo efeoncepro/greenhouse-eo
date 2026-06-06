@@ -42,6 +42,7 @@ import {
   typographyScale
 } from '@/components/theme/typography-tokens'
 import type { TypographyToken, TypographyTokenName } from '@/components/theme/typography-tokens'
+import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Canonical typography document (TASK-1036 / TASK-1038). INTERNAL ONLY.
@@ -428,6 +429,7 @@ const TypographyReferenceMockupView = () => {
     <Box sx={{ maxWidth: 1040, mx: 'auto', p: { xs: 3, md: 5 } }}>
       {/* ── 0 · Portada ──────────────────────────────────────────────────── */}
       <Box id='cap0' sx={{ mb: 3, scrollMarginTop: 24 }}>
+        <AxisWordmark variant='auto' height={36} sx={{ mb: 1.5 }} />
         <Typography variant='h4' sx={{ mb: 1 }}>
           Tipografía — documento canónico de tokens y primitivas
         </Typography>

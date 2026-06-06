@@ -39,6 +39,7 @@ const contrast = (a: string, b: string) => {
 const RAMP_STEPS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const
 const OPACITY_STEPS = [8, 16, 24, 32, 38] as const
 const LOADING_LAB_ROUTE = '/admin/design-system/loaders'
+const TYPOGRAPHY_ROUTE = '/admin/design-system/typography'
 
 const BRAND: { key: AxisColorFamily; label: string }[] = [
   { key: 'primary', label: 'Primary (Efeonce)' },
@@ -153,7 +154,7 @@ const NeutralPanel = ({ mode }: { mode: 'light' | 'dark' }) => {
 const DesignSystemView = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 1100, mx: 'auto' }}>
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-      <AxisWordmark variant='full' height={44} />
+      <AxisWordmark variant='auto' height={44} />
       <Typography variant='h4' sx={{ fontWeight: 700 }}>
         Paleta AXIS — referencia completa
       </Typography>
@@ -164,6 +165,41 @@ const DesignSystemView = () => (
         (<code>yyMksCoijfMaIoYplXKZaR</code>, nodo <code>11205:5341</code>). Superficie interna — no visible para clientes.
       </Typography>
     </Box>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Tipografía
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Referencia canónica de tipografía
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Familias, escala de roles, aplicaciones, bridge contrato↔runtime, unidades y gobernanza — renderizado vivo desde el SoT.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={TYPOGRAPHY_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-typography' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver tipografía
+        </Button>
+      </CardContent>
+    </Card>
 
     <Card variant='outlined'>
       <CardContent

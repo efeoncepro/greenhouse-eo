@@ -350,6 +350,22 @@ export default [
     }
   },
 
+  // TASK-1044 — las vistas de referencia INTERNAS del design-system (galería
+  // AXIS, loaders lab, referencia canónica de tipografía) documentan el sistema:
+  // renderizan tamaños/familias crudos y labels ILUSTRATIVOS (ej. botones
+  // "Guardar"/"Confirmar" como muestra de control-text), no copy de producto.
+  // Off copy + fontSize-inline ahí.
+  {
+    files: ['src/views/greenhouse/admin/design-system/**/*.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-untokenized-copy': 'off',
+      'greenhouse/no-fontsize-inline-typography': 'off'
+    }
+  },
+
   // TASK-766 Slice 3 — la lint rule no-untokenized-fx-math se desactiva
   // SOLO en los helpers/readers canónicos donde el patrón aparece como
   // referencia en docstrings y assertion strings de tests (NO en SQL real).

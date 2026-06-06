@@ -14,15 +14,19 @@ import type { BoxProps } from '@mui/material/Box'
  *   - `full`     → axis-full-color.svg       (lockup, navy + orange — on light)
  *   - `isotype`  → axis-isotipo-full-color.svg (mark only)
  *   - `negative` → axis-color-negative.svg   (white + orange — on dark surfaces)
+ *   - `auto`     → mode-aware: `full` on light, `negative` on dark (CSS toggle).
+ *
+ * Default is `auto` so any design-system surface gets the contrast-correct logo
+ * in both themes without wiring the mode itself.
  */
 
-export type AxisWordmarkVariant = 'full' | 'isotype' | 'negative'
+export type AxisWordmarkVariant = 'full' | 'isotype' | 'negative' | 'auto'
 
-const AXIS_SRC: Record<AxisWordmarkVariant, string> = {
+const AXIS_SRC = {
   full: '/branding/axis-full-color.svg',
   isotype: '/branding/axis-isotipo-full-color.svg',
   negative: '/branding/axis-color-negative.svg'
-}
+} as const
 
 export type AxisWordmarkProps = {
   variant?: AxisWordmarkVariant
@@ -30,14 +34,40 @@ export type AxisWordmarkProps = {
   height?: number
 } & Omit<BoxProps<'img'>, 'component' | 'src' | 'height'>
 
-const AxisWordmark = ({ variant = 'full', height = 28, alt = 'AXIS', sx, ...rest }: AxisWordmarkProps) => (
-  <Box
-    component='img'
-    src={AXIS_SRC[variant]}
-    alt={alt}
-    sx={{ height, width: 'auto', display: 'block', ...sx }}
-    {...rest}
-  />
-)
+const AxisWordmark = ({ variant = 'auto', height = 28, alt = 'AXIS', sx, ...rest }: AxisWordmarkProps) => {
+  // Mode-aware: render both the positive + negative lockups and CSS-toggle by
+  // theme (works with the CSS-variables theme — no mode hook, SSR-safe).
+  if (variant === 'auto') {
+    return (
+      <>
+        <Box
+          component='img'
+          src={AXIS_SRC.full}
+          alt={alt}
+          sx={[{ height, width: 'auto', display: 'block' }, theme => theme.applyStyles('dark', { display: 'none' }), ...(Array.isArray(sx) ? sx : [sx])]}
+          {...rest}
+        />
+        <Box
+          component='img'
+          src={AXIS_SRC.negative}
+          alt={alt}
+          aria-hidden
+          sx={[{ height, width: 'auto', display: 'none' }, theme => theme.applyStyles('dark', { display: 'block' }), ...(Array.isArray(sx) ? sx : [sx])]}
+          {...rest}
+        />
+      </>
+    )
+  }
+
+  return (
+    <Box
+      component='img'
+      src={AXIS_SRC[variant]}
+      alt={alt}
+      sx={[{ height, width: 'auto', display: 'block' }, ...(Array.isArray(sx) ? sx : [sx])]}
+      {...rest}
+    />
+  )
+}
 
 export default AxisWordmark

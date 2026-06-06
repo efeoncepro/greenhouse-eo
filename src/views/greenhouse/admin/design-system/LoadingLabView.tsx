@@ -7,6 +7,8 @@ import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
+
 import LoadingLabSection from './LoadingLabSection'
 
 const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
@@ -25,6 +27,7 @@ const LoadingLabView = () => (
       >
         Design System
       </Button>
+      <AxisWordmark variant='auto' height={32} sx={{ mb: 0.5 }} />
       <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
         Loading Lab
       </Typography>
