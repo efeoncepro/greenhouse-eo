@@ -25,7 +25,7 @@ export default async function AgencySpaceDetailPage({
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const { id } = await params

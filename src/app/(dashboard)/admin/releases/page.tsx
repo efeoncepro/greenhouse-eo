@@ -30,7 +30,7 @@ const Page = async () => {
   // (ver TASK-854 spec). En V1.2 emergerá `platform.release.read_results`
   // granular si el dashboard expone superficies adicionales.
   if (!can(subject, 'platform.release.execute', 'execute', 'all')) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect('/401')
   }
 
   // Initial page fetch + last status signal en paralelo.

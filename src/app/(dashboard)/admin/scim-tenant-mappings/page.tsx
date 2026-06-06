@@ -15,7 +15,7 @@ export default async function Page() {
   if (!tenant) redirect('/login')
 
   if (!tenant.routeGroups.includes('admin')) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const db = await getDb()

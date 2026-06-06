@@ -15,7 +15,7 @@ const PeopleLayout = async ({ children }: { children: ReactNode }) => {
   const accessContext = await resolvePeopleAccessContext(tenant)
 
   if (!accessContext) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <>{children}</>

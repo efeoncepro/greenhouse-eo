@@ -49,6 +49,7 @@ export type MicrocopyNamespace =
   | 'aria' // aria-labels comunes para a11y
   | 'errors' // Mensajes de error genéricos shared
   | 'notFound' // Copy de la página 404 (full-page not-found)
+  | 'notAuthorized' // Copy de la página 401 (full-page not-authorized)
   | 'feedback' // Toasts, snackbars, confirmaciones genéricas
   | 'time' // Formatos de tiempo relativo: hace X minutos, ayer, etc.
   | 'emails' // Copy institucional compartido por templates y notification delivery
@@ -66,6 +67,7 @@ export interface MicrocopyDictionary {
   aria: AriaCopy
   errors: ErrorsCopy
   notFound: NotFoundCopy
+  notAuthorized: NotAuthorizedCopy
   feedback: FeedbackCopy
   time: TimeCopy
   emails: EmailsCopy
@@ -275,6 +277,19 @@ export interface NotFoundCopy {
   description: string
   cta: string
   secondaryCta: string
+}
+
+/**
+ * Copy de la página 401 (full-page not-authorized). El glifo "401" es un
+ * código HTTP, no copy traducible — vive en el componente. Surface genérico
+ * para usuario AUTENTICADO sin permiso a una superficie (distinto del rechazo
+ * SSO especializado de /auth/access-denied). Tono calmado (greenhouse-ux-writing
+ * §6: error permanente = qué pasó + cómo salir).
+ */
+export interface NotAuthorizedCopy {
+  title: string
+  description: string
+  cta: string
 }
 
 /**

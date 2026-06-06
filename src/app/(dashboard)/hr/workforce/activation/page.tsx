@@ -30,7 +30,7 @@ const Page = async ({
   const subject = buildTenantEntitlementSubject(tenant)
 
   if (!can(subject, 'workforce.member.activation_readiness.read', 'read', 'tenant')) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect('/401')
   }
 
   const [initialPage, pendingSignal, directMember] = await Promise.all([

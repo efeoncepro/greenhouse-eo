@@ -19,7 +19,7 @@ export default async function ClientCampaignsLayout({ children }: { children: Re
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

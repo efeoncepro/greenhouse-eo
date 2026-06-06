@@ -15,7 +15,7 @@ export default async function Page() {
   }
 
   if (!tenant.routeGroups.includes('client')) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   // TASK-827 Slice 4 — Page guard canonical resolver-based (replace legacy

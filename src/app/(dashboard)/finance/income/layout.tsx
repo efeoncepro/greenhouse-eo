@@ -20,7 +20,7 @@ export default async function FinanceIncomeLayout({ children }: { children: Reac
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

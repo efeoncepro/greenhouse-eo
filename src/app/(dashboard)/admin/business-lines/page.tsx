@@ -19,7 +19,7 @@ export default async function Page() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const businessLines = await loadBusinessLineMetadata()

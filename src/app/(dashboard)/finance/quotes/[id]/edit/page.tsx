@@ -74,7 +74,7 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
   }
 
   if (!canAccessFinanceQuotes(tenant)) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const detailRow = await getFinanceQuoteDetailFromCanonical({ tenant, quoteId: id })

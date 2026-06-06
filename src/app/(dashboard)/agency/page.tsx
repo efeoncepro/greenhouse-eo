@@ -50,7 +50,7 @@ export default async function AgencyPage() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const [kpisResult, spaces, statusMix, weeklyActivity] = await Promise.all([

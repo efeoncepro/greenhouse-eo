@@ -18,7 +18,7 @@ const Page = async () => {
   const tenant = await getTenantContext()
 
   if (!tenant) redirect('/login')
-  if (!canAdministerPricingCatalog(tenant)) redirect(tenant.portalHomePath)
+  if (!canAdministerPricingCatalog(tenant)) redirect('/401')
 
   return <GovernanceInlineView />
 }

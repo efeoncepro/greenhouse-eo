@@ -22,7 +22,7 @@ export default async function HrLayout({ children }: { children: ReactNode }) {
   const leaveAccessContext = hasAccess ? null : await resolveHrLeaveAccessContext(tenant)
 
   if (!hasAccess && !leaveAccessContext) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

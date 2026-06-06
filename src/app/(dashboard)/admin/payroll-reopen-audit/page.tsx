@@ -24,7 +24,7 @@ export default async function Page() {
   const hasAdminRouteGroup = tenant.routeGroups.includes('admin')
 
   if (!isAdmin || !hasAdminRouteGroup) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <PayrollReopenAuditView />

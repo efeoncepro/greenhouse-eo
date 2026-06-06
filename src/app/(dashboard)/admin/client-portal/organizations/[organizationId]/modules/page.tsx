@@ -68,7 +68,7 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
   const subject = buildTenantEntitlementSubject(tenant)
 
   if (!can(subject, 'client_portal.module.read_assignment', 'read', 'tenant')) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect('/401')
   }
 
   const { organizationId } = await params

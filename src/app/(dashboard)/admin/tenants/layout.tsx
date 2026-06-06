@@ -19,7 +19,7 @@ export default async function AdminTenantsLayout({ children }: { children: React
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

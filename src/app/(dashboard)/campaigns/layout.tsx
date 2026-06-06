@@ -20,7 +20,7 @@ export default async function CampaignsLayout({ children }: { children: ReactNod
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

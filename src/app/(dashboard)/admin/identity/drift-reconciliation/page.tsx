@@ -35,7 +35,7 @@ const Page = async ({ searchParams }: PageProps) => {
 
   // Capability granular: EFEONCE_ADMIN solo V1.0 (drift Person 360 es cross-domain).
   if (!can(subject, 'person.legal_entity_relationships.reconcile_drift', 'update', 'tenant')) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect('/401')
   }
 
   const params = await searchParams

@@ -18,7 +18,7 @@ const AiToolsPage = async () => {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <AiToolingDashboard />

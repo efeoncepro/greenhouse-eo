@@ -24,7 +24,7 @@ const Page = async () => {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <MyLeaveView />

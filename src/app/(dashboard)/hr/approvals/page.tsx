@@ -15,7 +15,7 @@ const HrApprovalsPage = async () => {
   const accessContext = hasAccess ? null : await resolveHrLeaveAccessContext(tenant)
 
   if (!hasAccess && !accessContext) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <SupervisorWorkspaceView initialTab='approvals' />

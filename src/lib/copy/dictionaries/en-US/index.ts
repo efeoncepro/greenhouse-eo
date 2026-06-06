@@ -8,6 +8,7 @@ import { errors } from './errors'
 import { feedback } from './feedback'
 import { loading } from './loading'
 import { months } from './months'
+import { notAuthorized } from './notAuthorized'
 import { notFound } from './notFound'
 import { states } from './states'
 import { time } from './time'
@@ -21,6 +22,7 @@ export const enUS: MicrocopyDictionary = {
   aria,
   errors,
   notFound,
+  notAuthorized,
   feedback,
   time,
   // Email localization is intentionally deferred to the email rollout child task.

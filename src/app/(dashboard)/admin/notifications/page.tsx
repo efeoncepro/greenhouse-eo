@@ -28,7 +28,7 @@ export default async function AdminNotificationsPage() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const data = await getAdminNotificationsOverview()

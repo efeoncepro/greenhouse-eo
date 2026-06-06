@@ -17,7 +17,7 @@ const Page = async () => {
   const subject = buildTenantEntitlementSubject(tenant)
 
   if (!can(subject, 'commercial.engagement.recover_outbound', 'read', 'tenant')) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect('/401')
   }
 
   return <SampleSprintDeadLetterView />

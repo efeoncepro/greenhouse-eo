@@ -31,7 +31,7 @@ const QuoteBuilderNewPage = async () => {
   }
 
   if (!canAccessFinanceQuotes(tenant)) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const [templateRows, orgResult] = await Promise.all([
