@@ -6,13 +6,24 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Implementado local (aprobado por operador 2026-06-06); pendiente push + verificación staging`
+- Status real: `Complete — escala shipped + pusheada; los 4 follow-ups cerrados (TASK-1039/1040/1041/1042)`
+
+## Resolution (2026-06-06)
+
+Core (rediseño de escala) shipped + pusheado a develop. Los 4 follow-ups se spun out a tasks propias y **todos cerraron**:
+
+- **TASK-1039** (peso 500) — evaluado y **descartado** (won't-do): imperceptible a 14px + ya rinde vía Vuexy; récord en el mockup.
+- **TASK-1040** (PDF Geist 600/800) — familias `SemiBold`/`ExtraBold` registradas (corrigió el claim "cae a Helvetica" → es family-name-based, aproxima con Bold/Medium). Migrar componentes PDF queda como slice opcional.
+- **TASK-1041** (charts) — los 43 charts consumen tipografía del **SoT desde un solo lugar** vía los wrappers `AppReactApexCharts`+`AppRecharts` (no el sweep de 47). Helper `getChartTypographyFromTheme` para ECharts canvas.
+- **TASK-1042** (drift-guard) — el guard se extendió a la **prosa de DESIGN.md + tabla V1 §15.1** (antes solo front-matter); todo `Npx`/`Nrem` debe ser un tamaño vigente del SoT.
+
+Consolidación final: lint rule `no-fontsize-inline-typography` + rule-tests en CI; DESIGN.md/V1/skills sincronizados (fix de drift en §15.1 que estaba entera pre-rediseño); prosa de DESIGN.md `px→rem` (es agent-facing); `letter-spacing` del SoT `px→em` (escala con la fuente). Sistema de unidades coherente: font-size rem · line-height unitless · letter-spacing em · borders px.
 - Rank: `TBD`
 - Domain: `ui|platform|design-system`
 - Blocked by: `TASK-1036` (la fundación SoT + drift-guard + bridge)

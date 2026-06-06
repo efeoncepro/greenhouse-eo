@@ -5,7 +5,7 @@
 > **Autor:** Claude (sesión TASK-1034 adopción paleta AXIS — el audit emergió al robustecer DESIGN.md)
 > **Alcance:** sistema de tipografía completo — `DESIGN.md` (contrato agente) ↔ `src/components/theme/mergedTheme.ts` (runtime) ↔ `src/@core/theme/**` (Vuexy core, read-only) ↔ `GREENHOUSE_DESIGN_TOKENS_V1.md`
 > **Disparador:** pregunta del operador — "¿la deuda es solo en labels o en TODO lo de tipografía?"
-> **Estado:** **RESUELTO** — TASK-1036 (fundación SoT + drift-guard + bridge, no-op) + **TASK-1038** (rediseño de escala = la remediación §6 aplicada: page-title 16→20 arregla la inversión, ladder 11→8, subtitle2/tab/dialog gobernados). Ver `docs/tasks/in-progress/TASK-1038-typography-scale-redesign.md`.
+> **Estado:** **RESUELTO** — TASK-1036 (fundación SoT + drift-guard + bridge, no-op) + **TASK-1038** (rediseño de escala = la remediación §6 aplicada: page-title 16→20 arregla la inversión, ladder 11→8, subtitle2/tab/dialog gobernados). Ver `docs/tasks/complete/TASK-1038-typography-scale-redesign.md`.
 >
 > **Hallazgos adicionales del completeness pass (incorporados a TASK-1038):** `subtitle2` no eran 3 consumidores sino **~267** (y es 13/**400** = body-sm, NO label-sm 13/600 — error de modelo corregido); PDF registra Geist solo 400/500/700 → **faltan 600/800** que la escala usa (caen a Helvetica); tipografía de **charts** sin mapear (~47 archivos); **text measure** (~65ch) ausente; ~1.351 `fontSize` inline (mayoría íconos). Decisiones transversales canonizadas (i18n/fluid/display/PDF-email/truncation/charts/measure) + follow-up rol peso 500.
 > **Regla operativa:** seguimos robusteciendo DESIGN.md en paralelo; ESTA deuda debe resolverse en su propia task (no parchear dentro de TASK-1034).

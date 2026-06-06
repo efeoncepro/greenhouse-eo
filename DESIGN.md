@@ -75,13 +75,13 @@ typography:
     fontSize: 0.8125rem
     fontWeight: 400
     lineHeight: 1.45
-    letterSpacing: 0.4px
+    letterSpacing: 0.03em
   overline:
     fontFamily: Geist
     fontSize: 0.75rem
     fontWeight: 600
     lineHeight: 1.167
-    letterSpacing: 1px
+    letterSpacing: 0.08em
   numeric-id:
     fontFamily: Geist
     fontSize: 0.875rem

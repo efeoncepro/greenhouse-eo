@@ -1,15 +1,14 @@
-# Sesion 2026-06-06 — TASK-1038 typography scale redesign IMPLEMENTADO (TO-BE aprobado, local-first, sin push)
+# Sesion 2026-06-06 — Sistema de tipografía CERRADO end-to-end (TASK-1038 + 4 follow-ups, pusheado)
 
-Continuacion de TASK-1036. El operador aprobo el TO-BE tras ver el impacto en `/admin/design-system/typography/mockup` (documento canonico: primitivas → escala → aplicaciones → bridge → propuesta → 10 transversales → gobernanza, vivo desde el SoT). Implementado directo (sin flag), **local-first, sin push**.
+Arco completo del sistema de tipografía sobre el SoT de TASK-1036. **Todo shipped + pusheado a develop**; TASK-1038 y sus 4 follow-ups **cerrados** (`complete`). Estado final:
 
-- **Cambio VISUAL real:** la escala era acumulada — inversion (page-title 16 < section-title 18), goteo de 1px (7 tamanos en 6px), sobre-granularidad. Flip en `typographyScale`: **page-title 16→20** (arregla inversion), **section-title 18→16**, subheader/subtitle1 15→14, **label-md/button 15→14**, controlText.md 15→14, controlText.lg 17→16. Ladder 11→**8**. 0 nuevos, 0 renombrados.
-- **subtitle2** (13/400, ~267 consumidores) → `body-sm` en `SECONDARY_VARIANT_TOKENS` + override mergedTheme. **Tab** 18px → controlText.md 14. **Dialog title** h6 → section-title 16/600.
-- **Parity 3 capas:** SoT + mergedTheme + DESIGN.md (page-title 1.25rem / section-title 1rem / label-md 0.875rem) + V1 §3.2 + Delta v1.7. **drift-guard 37 verde**, design:lint 0/0/1, `pnpm local:check` verde, ningun test depende de valores viejos.
-- **GVC** `/admin/design-system` light: page-title domina, section-titles subordinadas — inversion arreglada, sin breakage. (Tipografia mode-independent: dark no cambia tamanos.)
-- **No perder contexto:** pointer en `CLAUDE.md` ("Typography System") con SoT/runtime/guard/contrato/mockup/escala/reglas/politicas/follow-ups. **Politicas transversales canonizadas:** i18n Latin-first + RTL-ready (logical props), tipo fijo en producto / clamp solo marketing, no display tier sin consumidor, PDF/email = un SSOT + adapters, truncation, charts del SoT, body ~65ch.
-- **Arquitectura:** DESIGN.md refleja runtime (Opcion A) + drift-guard enforce `runtime ≡ SoT ≡ DESIGN.md` → el TO-BE NO podia ir a DESIGN.md antes del flip; van juntos. El mockup es el "museo" visual; las reglas viven en DESIGN.md/V1/CLAUDE.md.
-- **Follow-ups:** rol semantico para peso 500; adapter PDF (Geist 600/800 faltan → Helvetica en PDF); adapter charts del SoT; lint rule `no-fontSize-inline` icon-vs-text; cleanup cap 5 del mockup.
-- **Pendiente:** **push** (todo local; tree con TASK-1036 + TASK-1037 sin commitear — coordinar untangle). Spec: `docs/tasks/in-progress/TASK-1038-typography-scale-redesign.md`.
+- **TASK-1038 (escala) ✅** — flip en `typographyScale`: **page-title 16→20** (arregla la inversión page-title < section-title), **section-title 18→16**, subheader/subtitle1 15→14, **label-md/button 15→14**, controlText.md 15→14 / lg 17→16. Ladder 11→**8** (12·13·14·16·20·24·28·32), 0 nuevos/renombrados. subtitle2 (~267 consumidores)→`body-sm`; Tab 18→14; Dialog title h6→section-title 16.
+- **TASK-1039 (peso 500) ✅ won't-do** — evaluado con comparación live (mockup 5b + GVC) y descartado: imperceptible a 14px + ya rinde vía Vuexy. Récord de decisión en el mockup.
+- **TASK-1040 (PDF Geist 600/800) 🔨** — familias `SemiBold`(600)+`ExtraBold`(800) registradas (`.ttf` locales gstatic v5). Corrigió el claim "cae a Helvetica" (es family-name-based → aproxima con Bold/Medium). **Pendiente (slice opcional):** migrar componentes PDF a usar las familias.
+- **TASK-1041 (charts) ✅** — los **43 charts** (Apex 33 + Recharts 10; ECharts no se usa) consumen familia+tamaño del **SoT desde un solo lugar** vía los wrappers `AppReactApexCharts`+`AppRecharts` (CSS `!important` leyendo `theme.typography`, 100% cobertura, 0 bypass). 2 archivos, no el sweep de 47. Helper `getChartTypographyFromTheme` para ECharts canvas.
+- **TASK-1042 (drift-guard) ✅** — el guard se extendió a la **prosa de DESIGN.md + tabla V1 §15.1** (antes solo front-matter, que dejó driftear "15px/17px" en prosa + la tabla V1 entera pre-rediseño). Todo `Npx`/`Nrem` en prosa+V1 debe ser un tamaño vigente del SoT (set de tokens activos, no primitivos huérfanos). Verificado contra drift inyectado.
+- **Consolidación + unidades** — lint rule `no-fontsize-inline-typography` + rule-tests en CI (`pnpm test:lint-rules`, cerró un test roto que nunca corría). DESIGN.md/V1/skills sincronizados (fix §15.1). **DESIGN.md es agent-facing** → prosa `px→rem`; **`letter-spacing` del SoT `px→em`** (escala con la fuente). Sistema de unidades coherente: **font-size rem · line-height unitless · letter-spacing em · borders/1px px**.
+- **Gates:** drift-guard 57 verde, design:lint 0/0, tsc 0, ops:lint verde. Specs: `docs/tasks/complete/TASK-1038..1042-*.md`.
 
 # Sesion 2026-06-06 — TASK-1037 Greenhouse Loading Primitive System (Slice 1)
 

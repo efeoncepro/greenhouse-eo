@@ -79,8 +79,12 @@ export const fontSizes = {
 
 /** Letter-spacing primitives used by the scale. */
 export const letterSpacings = {
-  caps: '1px', // overline (uppercase tight)
-  metadata: '0.4px', // body-sm (timestamps, "sugerido")
+  // TASK-1042 follow-up: letter-spacing en `em` (relativo al font-size del token),
+  // no `px` — escala con la preferencia de fuente del usuario, igual que el
+  // font-size en rem. Valores ≈ los px previos: caps 1px@12px≈0.08em, metadata
+  // 0.4px@13px≈0.03em (diferencia sub-pixel, ahora escala bien).
+  caps: '0.08em', // overline (uppercase tight)
+  metadata: '0.03em', // body-sm (timestamps, "sugerido")
   numeric: '0.01em' // numeric-id column breathing
 } as const
 
