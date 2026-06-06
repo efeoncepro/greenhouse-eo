@@ -86,9 +86,27 @@ AXIS (Figma, SoT)
     GVC light+dark (flag ON) en /home, /people, /finance/expenses, /admin/operations: dark navy→púrpura-navy
     AXIS coherente, cero regresión. Sonda de color computado dark AA con margen: heading 9.14:1,
     form-label 7.98:1, body 6.11:1, table-cell 5.47:1.
-  - **PENDIENTE al flip (NO en este commit):** actualizar DESIGN.md `neutral`/`surface*`/`background-dark`/
-    `text-*` + `GREENHOUSE_DESIGN_TOKENS_V1.md` §8.1 a los neutrales AXIS, en el MISMO commit que flipea
-    el flag a ON (mantiene contract==runtime; text con alpha → sólido representativo para el contrastCheck).
+  - **FLIP A DEFAULT-ON (2026-06-06, decisión operador):** `isAxisNeutralsEnabled()` ahora default ON
+    (`env !== 'false'`); `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED=false` queda como kill-switch de emergencia.
+    Razón: un flag es rollout temporal, no hogar permanente; dejar AXIS dormido mientras el contrato dice
+    AXIS = divergencia permanente. Verificado: dark default = AXIS `#25293C` sin env (sonda).
+  - **DESIGN.md alineado a AXIS (mismo flip):** neutrales → AXIS (neutral `#F8F7FA`, surface-dark `#2F3349`,
+    background-dark `#25293C`, text-primary `#2F2B3D`, text-primary-dark `#E1DEF5`, etc., sólidos
+    representativos del alpha para el contrastCheck). `button-primary-tonal` re-modelado AA-correcto
+    (`primary-tonal #D7E9F9` + `primary-dark` = ~7:1; el ink AXIS expuso que el viejo `#3691e3`+ink daba
+    4.12). `primary-light` CONSERVADO (re-alojado en `nav-active-indicator`, NO borrado). Nueva sección
+    prosa "AXIS palette — full reference" documenta ramps 100-900 + opacity + gray vía `theme.axis.*`
+    (no van al front-matter: la regla `orphanedTokens` rechaza tokens sin componente). V1 §8.1 nota
+    sincronizada. `design:lint` 0/0/1.
+  - **PENDIENTE (decisión de marca, NO adoptado):** `secondary` sigue navy `#023C70`; AXIS define
+    secondary = lime `#6EC207` (flip de rol gated). `primary-light`/`primary-dark` siguen runtime-computed
+    (primary es tenant-driven), no ramp AXIS.
+
+- [x] **Slice 5 — DROPEADO (2026-06-06, decisión operador).** Las sombras/elevación YA están AXIS-alineadas
+  por construcción: el core Vuexy genera `theme.shadows` + `theme.customShadows` channel-based sobre el
+  shadow channel AXIS (`mainColorChannels.darkShadow`); `mergedTheme.ts` no las override. No es color de
+  paleta. El cleanup de 36 `boxShadow` hardcodeados es token-discipline ortogonal → TASK aparte si se desea.
+  La adopción de la PALETA AXIS queda completa con Slices 0-4 + flip.
 - [x] **Slice 4 — Migración consumers + drift guard (DONE 2026-06-06).** Audit reveló que el "~41
   archivos" estaba inflado: el token `customColors.{neonLime,sunsetOrange,crimson}` tenía **cero
   consumers reales** (solo type decl + test mock); el drift real eran ~hex legacy hardcodeados en

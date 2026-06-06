@@ -17,9 +17,17 @@
  * class as themeConfig.mode / primaryColorConfig that already drive the theme —
  * not a home/shell feature flag. Flip via Vercel env var + redeploy.
  *
- * Flag: NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED
- *   unset / anything but 'true'  → legacy Greenhouse neutrals (bit-for-bit today)
- *   'true'                       → AXIS neutrals (per axisNeutral SoT)
+ * Flag: NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED — KILL-SWITCH (default ON since TASK-1034
+ * Slice 3 flip). AXIS neutrals are the canonical runtime; DESIGN.md (the agent
+ * contract) reflects them. The env var only exists to revert in an emergency:
+ *   unset / anything but 'false'  → AXIS neutrals (canonical, default)
+ *   'false'                       → legacy Greenhouse navy neutrals (emergency revert)
+ *
+ * Rationale: a feature flag is a temporary rollout mechanism, not a permanent
+ * home. Leaving AXIS dormant behind a default-OFF flag while the contract says
+ * AXIS creates a permanent contract↔runtime divergence that every future agent
+ * must reason about. Flipping the default to ON converges runtime == contract ==
+ * SoT == AXIS (single source of truth); the env stays as an instant revert.
  *
  * NOTE: `divider` and `text` already resolve to AXIS via the Vuexy core theme
  * channels (mainColorChannels.light='47 43 61'=#2F2B3D, dark='225 222 245'=
@@ -50,9 +58,9 @@ export type NeutralFragment = {
   customColors: NeutralCustomColors
 }
 
-/** Build-time rollout flag. Default OFF → legacy neutrals. */
+/** Build-time kill-switch. Default ON → AXIS neutrals; env='false' reverts to legacy. */
 export const isAxisNeutralsEnabled = (): boolean =>
-  process.env.NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED === 'true'
+  process.env.NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED !== 'false'
 
 /**
  * Legacy fragments — EXACT current mergedTheme values. Flag OFF must be

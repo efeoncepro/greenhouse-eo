@@ -7,23 +7,24 @@ colors:
   primary: "#0375DB"
   primary-light: "#3691E3"
   primary-dark: "#024C8F"
+  primary-tonal: "#D7E9F9"
   secondary: "#023C70"
   secondary-light: "#035A9E"
   secondary-dark: "#022A4E"
   info: "#00BAD1"
-  neutral: "#F8F9FA"
+  neutral: "#F8F7FA"
   surface: "#FFFFFF"
-  surface-alt: "#FAFBFC"
-  surface-dark: "#162033"
-  background-dark: "#101827"
-  text-primary: "#1A1A2E"
-  text-secondary: "#667085"
-  text-disabled: "#848484"
-  text-primary-dark: "#F5F7FA"
-  text-secondary-dark: "#B0B9C8"
+  surface-alt: "#FAFAFA"
+  surface-dark: "#2F3349"
+  background-dark: "#25293C"
+  text-primary: "#2F2B3D"
+  text-secondary: "#6B6876"
+  text-disabled: "#A7A5AE"
+  text-primary-dark: "#E1DEF5"
+  text-secondary-dark: "#ACABC1"
   on-primary: "#FFFFFF"
-  on-surface: "#1A1A2E"
-  on-surface-dark: "#F5F7FA"
+  on-surface: "#2F2B3D"
+  on-surface-dark: "#E1DEF5"
   success: "#28C76F"
   warning: "#FFB703"
   error: "#CC3D41"
@@ -131,8 +132,11 @@ components:
     backgroundColor: "{colors.primary-dark}"
     textColor: "{colors.on-primary}"
   button-primary-tonal:
+    backgroundColor: "{colors.primary-tonal}"
+    textColor: "{colors.primary-dark}"
+  nav-active-indicator:
     backgroundColor: "{colors.primary-light}"
-    textColor: "{colors.text-primary}"
+    height: 2px
   button-primary-disabled:
     textColor: "{colors.text-disabled}"
     typography: "{typography.label-md}"
@@ -229,6 +233,19 @@ The product is built on bright neutral surfaces, deep blue structural tones, and
 - In dark mode, prefer the dedicated dark surfaces and text tokens instead of inverting colors ad hoc.
 
 The overall impression should be crisp and trustworthy rather than flashy. Blue is the product's default energy source; orange, lime, and crimson are controlled signals, not a rainbow palette.
+
+### AXIS palette — full reference
+
+The colors above are the **semantic + key tokens** an agent needs day to day. The complete AXIS palette (Efeonce's Design System) is the source of truth and lives in code, not in this front-matter — the design-contract lint gate forbids unreferenced tokens here, so the full ramps stay where they're consumed:
+
+- **Source of truth:** `src/@core/theme/axis-tokens.ts` (1:1 mirror of AXIS Figma `yyMksCoijfMaIoYplXKZaR`).
+- **Runtime access:** `theme.axis.*`.
+  - `theme.axis.ramp.<family>[<step>]` — full `100→900` ramps for `primary`, `secondary`, `info`, `success`, `warning`, `error`, and the neutral `gray` family. Reach for a specific step only for the rare case the semantic layer can't cover (a chart series, a contrast-safe text tint).
+  - `theme.axis.opacity.<family>[8|16|24|32|38]` — canonical soft-fill / hover / selected alphas (alert & chip tints, hover overlays).
+  - `theme.axis.neutral.{light,dark}` — per-mode surface/text/divider neutrals (the values mapped into `background`/`paper`/`text` below).
+- **Default rule:** components consume the **semantic** layer (`theme.palette.*`, `theme.customColors.*`) — the AXIS primitives mint those semantics; only drop to `theme.axis.ramp.*` when no semantic token fits.
+- **Neutrals are AXIS** (light bg `#F8F7FA` / paper `#FFFFFF` / ink `#2F2B3D`; dark bg `#25293C` / paper `#2F3349` / ink `#E1DEF5`), default-on at runtime; the env kill-switch `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED=false` reverts to legacy navy only in emergency.
+- **Pending AXIS reconciliation (NOT yet adopted):** `secondary` stays the structural navy `#023C70` — AXIS defines `secondary` as the lime ramp (`#6EC207`), a brand-role flip held for an explicit decision (the lime ramp is already available via `theme.axis.ramp.secondary`). `primary-light` / `primary-dark` remain runtime-computed (`lighten`/`darken` of the tenant primary), not AXIS ramp steps, because `primary` is tenant-driven.
 
 ## Typography
 
