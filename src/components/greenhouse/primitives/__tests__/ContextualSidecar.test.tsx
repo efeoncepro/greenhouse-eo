@@ -20,7 +20,34 @@ describe('ContextualSidecar', () => {
     const sidecar = getByRole('complementary', { name: 'Detalle operacional' })
 
     expect(sidecar).toHaveAttribute('data-sidecar-kind', 'inspector')
+    expect(sidecar).toHaveAttribute('data-sidecar-variant', 'inspector')
     expect(sidecar).toHaveTextContent('Caso OF-1028')
+  })
+
+  it('maps semantic kinds to official functional variants', () => {
+    const { getByRole, rerender } = renderWithTheme(
+      <ContextualSidecar title='Formulario' kind='form'>
+        <p>Contenido</p>
+      </ContextualSidecar>
+    )
+
+    expect(getByRole('complementary', { name: 'Formulario' })).toHaveAttribute('data-sidecar-variant', 'composer')
+
+    rerender(
+      <ContextualSidecar title='Review' kind='review'>
+        <p>Contenido</p>
+      </ContextualSidecar>
+    )
+
+    expect(getByRole('complementary', { name: 'Review' })).toHaveAttribute('data-sidecar-variant', 'inspector')
+
+    rerender(
+      <ContextualSidecar title='AI' kind='review' variant='assistant'>
+        <p>Contenido</p>
+      </ContextualSidecar>
+    )
+
+    expect(getByRole('complementary', { name: 'AI' })).toHaveAttribute('data-sidecar-variant', 'assistant')
   })
 
   it('exposes busy and error states', () => {

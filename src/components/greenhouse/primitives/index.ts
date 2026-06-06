@@ -51,7 +51,12 @@ export type {
 export { default as AdaptiveSidecarLayout } from './AdaptiveSidecarLayout'
 export type { AdaptiveSidecarLayoutProps } from './AdaptiveSidecarLayout'
 export { default as ContextualSidecar } from './ContextualSidecar'
-export type { ContextualSidecarChrome, ContextualSidecarProps, ContextualSidecarState } from './ContextualSidecar'
+export type {
+  ContextualSidecarChrome,
+  ContextualSidecarProps,
+  ContextualSidecarState,
+  ContextualSidecarVariant
+} from './ContextualSidecar'
 export { AdaptiveSidecarShellProvider, useAdaptiveSidecarShell } from './adaptive-sidecar-shell-context'
 export type {
   AdaptiveSidecarShellReflowTarget,
@@ -63,6 +68,7 @@ export {
   createAdaptiveSidecarEvent,
   removeSidecarSearchParams,
   reduceAdaptiveSidecarState,
+  resolveAdaptiveSidecarVariant,
   resolveAdaptiveSidecarMode
 } from './adaptive-sidecar-controller'
 export type {
@@ -75,7 +81,8 @@ export type {
   AdaptiveSidecarSearchParamsInput,
   AdaptiveSidecarSide,
   AdaptiveSidecarTelemetryEvent,
-  AdaptiveSidecarTelemetryEventName
+  AdaptiveSidecarTelemetryEventName,
+  AdaptiveSidecarVariant
 } from './adaptive-sidecar-controller'
 
 // Reusable KPI trend card — interactive month-over-month area chart (Recharts):

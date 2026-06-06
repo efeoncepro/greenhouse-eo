@@ -5,24 +5,25 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import GlobalStyles from '@mui/material/GlobalStyles'
 import LinearProgress from '@mui/material/LinearProgress'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import CustomAvatar from '@core/components/mui/Avatar'
+import CustomChip from '@core/components/mui/Chip'
+import CustomTextField from '@core/components/mui/TextField'
 
-import { AdaptiveSidecarLayout, ContextualSidecar } from '@/components/greenhouse/primitives'
+import { AdaptiveSidecarLayout, ContextualSidecar, resolveAdaptiveSidecarVariant } from '@/components/greenhouse/primitives'
 import type {
   AdaptiveSidecarKind,
-  AdaptiveSidecarPreferredMode
+  AdaptiveSidecarPreferredMode,
+  ContextualSidecarVariant
 } from '@/components/greenhouse/primitives'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { AnimatePresence, motion } from '@/libs/FramerMotion'
@@ -76,6 +77,7 @@ const CASES: MockCase[] = [
 
 const KIND_LABELS: Record<AdaptiveSidecarKind, string> = {
   inspector: 'Inspector',
+  composer: 'Composer',
   form: 'Formulario',
   review: 'Revisión',
   assistant: 'Asistente',
@@ -84,11 +86,18 @@ const KIND_LABELS: Record<AdaptiveSidecarKind, string> = {
 
 const KIND_CONTROL_LABELS: Record<AdaptiveSidecarKind, string> = {
   inspector: 'Insp.',
+  composer: 'Comp.',
   form: 'Form.',
   review: 'Review',
   assistant: 'AI',
   preview: 'Preview'
 }
+
+const OFFICIAL_VARIANTS: Array<{ kind: AdaptiveSidecarKind; variant: ContextualSidecarVariant }> = [
+  { kind: 'inspector', variant: 'inspector' },
+  { kind: 'composer', variant: 'composer' },
+  { kind: 'assistant', variant: 'assistant' }
+]
 
 const MODE_LABELS: Record<AdaptiveSidecarPreferredMode, string> = {
   push: 'Push',
@@ -119,17 +128,19 @@ const sidecarItemMotion = (index: number, prefersReducedMotion: boolean) => ({
 const SidecarBody = ({
   selectedCase,
   kind,
+  variant,
   dirty,
   setDirty,
   prefersReducedMotion
 }: {
   selectedCase: MockCase
   kind: AdaptiveSidecarKind
+  variant: ContextualSidecarVariant
   dirty: boolean
   setDirty: (dirty: boolean) => void
   prefersReducedMotion: boolean
 }) => {
-  if (kind === 'assistant') {
+  if (variant === 'assistant') {
     return (
       <Stack spacing={4}>
         <Alert severity='info'>
@@ -153,23 +164,36 @@ const SidecarBody = ({
     )
   }
 
-  if (kind === 'form') {
+  if (variant === 'composer') {
     return (
       <Stack spacing={4}>
         {dirty ? <Alert severity='warning'>Hay cambios locales pendientes de guardar.</Alert> : null}
-        <TextField label='Owner operativo' value={selectedCase.owner} size='small' onChange={() => setDirty(true)} />
-        <TextField
+        <Stack spacing={1}>
+          <Typography variant='body2' color='text.secondary'>
+            Edición contextual
+          </Typography>
+          <Typography variant='body1'>
+            Ajusta la decisión sin salir de la cola. El cierre queda protegido por dirty-state.
+          </Typography>
+        </Stack>
+        <CustomTextField
+          label='Owner operativo'
+          defaultValue={selectedCase.owner}
+          size='small'
+          onChange={() => setDirty(true)}
+        />
+        <CustomTextField
           select
           label='Estado de resolución'
-          value={selectedCase.status}
+          defaultValue={selectedCase.status}
           size='small'
           onChange={() => setDirty(true)}
         >
           <MenuItem value='risk'>Riesgo</MenuItem>
           <MenuItem value='review'>En revisión</MenuItem>
           <MenuItem value='ready'>Listo</MenuItem>
-        </TextField>
-        <TextField
+        </CustomTextField>
+        <CustomTextField
           label='Nota interna'
           multiline
           minRows={4}
@@ -263,7 +287,7 @@ const SidecarBody = ({
         <Typography variant='body2' color='text.secondary'>
           Próximo hito
         </Typography>
-        <Chip label={selectedCase.due} size='small' icon={<i className='tabler-calendar-event' aria-hidden='true' />} />
+        <CustomChip label={selectedCase.due} size='small' icon={<i className='tabler-calendar-event' aria-hidden='true' />} />
       </Stack>
     </Stack>
   )
@@ -277,6 +301,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
   const [dirty, setDirty] = useState(false)
   const [dirtyWarning, setDirtyWarning] = useState(false)
   const [saveFeedback, setSaveFeedback] = useState(false)
+  const [assistantBusy, setAssistantBusy] = useState(false)
   const launchButtonRef = useRef<HTMLButtonElement | null>(null)
   const prefersReducedMotion = useReducedMotion()
 
@@ -286,6 +311,21 @@ const AdaptiveSidecarPlatformMockupView = () => {
   )
 
   const status = STATUS_META[selectedCase.status]
+  const selectedVariant = resolveAdaptiveSidecarVariant(kind)
+
+  useEffect(() => {
+    if (selectedVariant !== 'assistant') {
+      setAssistantBusy(false)
+
+      return undefined
+    }
+
+    setAssistantBusy(true)
+
+    const timeout = window.setTimeout(() => setAssistantBusy(false), 620)
+
+    return () => window.clearTimeout(timeout)
+  }, [selectedCase.id, selectedVariant])
 
   useEffect(() => {
     if (!saveFeedback) {
@@ -298,6 +338,14 @@ const AdaptiveSidecarPlatformMockupView = () => {
   }, [saveFeedback])
 
   const handleOpenCase = (caseId: string, nextKind: AdaptiveSidecarKind = kind) => {
+    const replacingDirtyComposer = dirty && selectedVariant === 'composer' && caseId !== selectedCaseId
+
+    if (replacingDirtyComposer) {
+      setDirtyWarning(true)
+
+      return
+    }
+
     setSelectedCaseId(caseId)
     setKind(nextKind)
     setOpen(true)
@@ -307,6 +355,14 @@ const AdaptiveSidecarPlatformMockupView = () => {
 
   const handleKindChange = (_event: unknown, nextKind: AdaptiveSidecarKind | null) => {
     if (!nextKind) {
+      return
+    }
+
+    const nextVariant = resolveAdaptiveSidecarVariant(nextKind)
+
+    if (dirty && selectedVariant === 'composer' && nextVariant !== selectedVariant) {
+      setDirtyWarning(true)
+
       return
     }
 
@@ -321,6 +377,109 @@ const AdaptiveSidecarPlatformMockupView = () => {
       setMode(nextMode)
     }
   }
+
+  const sidecarFooter = (
+    <Stack
+      direction={{ xs: 'column', sm: 'row' }}
+      spacing={2}
+      alignItems={{ xs: 'stretch', sm: 'center' }}
+      justifyContent='space-between'
+    >
+      <AnimatePresence mode='popLayout' initial={false}>
+        {saveFeedback ? (
+          <Box
+            key='saved'
+            component={motion.div}
+            initial={prefersReducedMotion ? false : { opacity: 0, x: 8, scale: 0.98 }}
+            animate={prefersReducedMotion ? undefined : { opacity: 1, x: 0, scale: 1 }}
+            exit={prefersReducedMotion ? undefined : { opacity: 0, x: 8, scale: 0.98 }}
+            transition={prefersReducedMotion ? undefined : { duration: 0.18, ease: 'easeOut' }}
+          >
+            <CustomChip
+              color='success'
+              size='small'
+              label={GREENHOUSE_COPY.feedback.saved}
+              icon={<i className='tabler-check' aria-hidden='true' />}
+            />
+          </Box>
+        ) : null}
+        {selectedVariant === 'composer' && dirty ? (
+          <Stack
+            key='dirty-context'
+            direction='row'
+            spacing={2}
+            alignItems='center'
+            component={motion.div}
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 4 }}
+            animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+            exit={prefersReducedMotion ? undefined : { opacity: 0, y: 4 }}
+            transition={prefersReducedMotion ? undefined : { duration: 0.16, ease: 'easeOut' }}
+            sx={{ minWidth: 0 }}
+          >
+            <i className='tabler-edit-circle' aria-hidden='true' />
+            <Typography variant='body2' color='text.secondary'>
+              Cambios sin guardar
+            </Typography>
+          </Stack>
+        ) : null}
+        {selectedVariant === 'inspector' && !saveFeedback ? (
+          <Stack key='inspector-context' direction='row' spacing={2} alignItems='center' sx={{ minWidth: 0 }}>
+            <i className='tabler-eye-check' aria-hidden='true' />
+            <Typography variant='body2' color='text.secondary'>
+              Decisión rápida con contexto visible
+            </Typography>
+          </Stack>
+        ) : null}
+        {selectedVariant === 'assistant' && !saveFeedback ? (
+          <Stack key='assistant-context' direction='row' spacing={2} alignItems='center' sx={{ minWidth: 0 }}>
+            <i className='tabler-sparkles' aria-hidden='true' />
+            <Typography variant='body2' color='text.secondary'>
+              Sugerencias advisory-only
+            </Typography>
+          </Stack>
+        ) : null}
+      </AnimatePresence>
+      <Stack direction='row' spacing={2} justifyContent='flex-end'>
+        {selectedVariant === 'composer' && dirty ? (
+          <Button size='small' onClick={() => setDirty(false)}>
+            Descartar
+          </Button>
+        ) : null}
+        {selectedVariant === 'assistant' ? (
+          <Button size='small' variant='tonal' startIcon={<i className='tabler-notes' aria-hidden='true' />}>
+            Crear tarea
+          </Button>
+        ) : null}
+        <Button
+          size='small'
+          variant='contained'
+          onClick={() => {
+            setDirty(false)
+            setDirtyWarning(false)
+            setSaveFeedback(true)
+          }}
+          startIcon={
+            <i
+              className={
+                selectedVariant === 'inspector'
+                  ? 'tabler-check'
+                  : selectedVariant === 'assistant'
+                    ? 'tabler-copy-check'
+                    : 'tabler-device-floppy'
+              }
+              aria-hidden='true'
+            />
+          }
+        >
+          {selectedVariant === 'inspector'
+            ? 'Resolver'
+            : selectedVariant === 'assistant'
+              ? 'Usar resumen'
+              : GREENHOUSE_COPY.actions.save}
+        </Button>
+      </Stack>
+    </Stack>
+  )
 
   return (
     <Box
@@ -354,12 +513,13 @@ const AdaptiveSidecarPlatformMockupView = () => {
         sidecar={
           <ContextualSidecar
             kind={kind}
+            variant={selectedVariant}
             title={`${KIND_LABELS[kind]} · ${selectedCase.id}`}
             subtitle={selectedCase.title}
             eyebrow={selectedCase.client}
             icon={status.icon}
             iconColor={status.color}
-            state={kind === 'assistant' ? 'loading' : 'idle'}
+            state={selectedVariant === 'assistant' && assistantBusy ? 'loading' : 'idle'}
             onClose={() => {
               if (dirty) {
                 setDirtyWarning(true)
@@ -369,69 +529,14 @@ const AdaptiveSidecarPlatformMockupView = () => {
 
               setOpen(false)
             }}
-            footer={
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent='space-between'>
-                <AnimatePresence mode='popLayout' initial={false}>
-                  {saveFeedback ? (
-                    <Chip
-                      key='saved'
-                      color='success'
-                      size='small'
-                      label={GREENHOUSE_COPY.feedback.saved}
-                      icon={<i className='tabler-check' aria-hidden='true' />}
-                      component={motion.div}
-                      initial={prefersReducedMotion ? false : { opacity: 0, x: 8, scale: 0.98 }}
-                      animate={prefersReducedMotion ? undefined : { opacity: 1, x: 0, scale: 1 }}
-                      exit={prefersReducedMotion ? undefined : { opacity: 0, x: 8, scale: 0.98 }}
-                      transition={prefersReducedMotion ? undefined : { duration: 0.18, ease: 'easeOut' }}
-                    />
-                  ) : null}
-                  {dirty ? (
-                    <Stack
-                      key='dirty-context'
-                      direction='row'
-                      spacing={2}
-                      alignItems='center'
-                      component={motion.div}
-                      initial={prefersReducedMotion ? false : { opacity: 0, y: 4 }}
-                      animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-                      exit={prefersReducedMotion ? undefined : { opacity: 0, y: 4 }}
-                      transition={prefersReducedMotion ? undefined : { duration: 0.16, ease: 'easeOut' }}
-                      sx={{ minWidth: 0 }}
-                    >
-                      <i className='tabler-edit-circle' aria-hidden='true' />
-                      <Typography variant='body2' color='text.secondary'>
-                        Cambios sin guardar
-                      </Typography>
-                    </Stack>
-                  ) : null}
-                </AnimatePresence>
-                <Stack direction='row' spacing={2} justifyContent='flex-end'>
-                  {dirty ? (
-                    <Button size='small' onClick={() => setDirty(false)}>
-                      Descartar
-                    </Button>
-                  ) : null}
-                  <Button
-                    size='small'
-                    variant='contained'
-                    onClick={() => {
-                      setDirty(false)
-                      setDirtyWarning(false)
-                      setSaveFeedback(true)
-                    }}
-                  >
-                    {GREENHOUSE_COPY.actions.save}
-                  </Button>
-                </Stack>
-              </Stack>
-            }
+            footer={sidecarFooter}
             motionKey={`${selectedCase.id}-${kind}`}
             dataCapture='adaptive-sidecar-contextual-panel'
           >
             <SidecarBody
               selectedCase={selectedCase}
               kind={kind}
+              variant={selectedVariant}
               dirty={dirty}
               setDirty={setDirty}
               prefersReducedMotion={prefersReducedMotion}
@@ -482,7 +587,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
 
           {dirtyWarning ? (
             <Alert severity='warning' data-capture='adaptive-sidecar-dirty-warning'>
-              Guarda o descarta los cambios del formulario antes de cerrar el panel.
+              Guarda o descarta los cambios del composer antes de cerrar el panel.
             </Alert>
           ) : null}
 
@@ -532,7 +637,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
                       aria-label={MOCKUP_ARIA.kindSelector}
                       sx={{ minWidth: 'max-content' }}
                     >
-                      {(Object.keys(KIND_LABELS) as AdaptiveSidecarKind[]).map(item => (
+                      {OFFICIAL_VARIANTS.map(({ kind: item }) => (
                         <ToggleButton key={item} value={item} aria-label={KIND_LABELS[item]}>
                           {KIND_CONTROL_LABELS[item]}
                         </ToggleButton>
@@ -584,8 +689,8 @@ const AdaptiveSidecarPlatformMockupView = () => {
                         <Box sx={{ minWidth: 0 }}>
                           <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' sx={{ mb: 1 }}>
                             <Typography variant='subtitle1'>{item.id}</Typography>
-                            <Chip size='small' color={itemStatus.color} label={itemStatus.label} />
-                            <Chip size='small' variant='outlined' label={item.owner} />
+                            <CustomChip size='small' color={itemStatus.color} label={itemStatus.label} />
+                            <CustomChip size='small' variant='outlined' label={item.owner} />
                           </Stack>
                           <Typography variant='body1' sx={{ mb: 1 }}>
                             {item.title}
@@ -596,7 +701,11 @@ const AdaptiveSidecarPlatformMockupView = () => {
                         </Box>
                       </Stack>
                       <Stack direction='row' spacing={2} alignItems='center' justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
-                        <Chip size='small' label={item.due} icon={<i className='tabler-clock-hour-4' aria-hidden='true' />} />
+                        <CustomChip
+                          size='small'
+                          label={item.due}
+                          icon={<i className='tabler-clock-hour-4' aria-hidden='true' />}
+                        />
                         <Button
                           size='small'
                           variant={selected ? 'contained' : 'tonal'}

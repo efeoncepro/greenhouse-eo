@@ -19,10 +19,12 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 import { AnimatePresence, motion } from '@/libs/FramerMotion'
 import { getMicrocopy } from '@/lib/copy'
 
-import type { AdaptiveSidecarKind } from './adaptive-sidecar-controller'
+import type { AdaptiveSidecarKind, AdaptiveSidecarVariant } from './adaptive-sidecar-controller'
+import { resolveAdaptiveSidecarVariant } from './adaptive-sidecar-controller'
 
 export type ContextualSidecarState = 'idle' | 'loading' | 'saving' | 'error'
 export type ContextualSidecarChrome = 'adaptive' | 'contained'
+export type ContextualSidecarVariant = AdaptiveSidecarVariant
 
 export interface ContextualSidecarProps {
   title: ReactNode
@@ -31,6 +33,7 @@ export interface ContextualSidecarProps {
   icon?: string
   iconColor?: ThemeColor
   kind?: AdaptiveSidecarKind
+  variant?: ContextualSidecarVariant
   state?: ContextualSidecarState
   errorMessage?: ReactNode
   actions?: ReactNode
@@ -47,13 +50,26 @@ export interface ContextualSidecarProps {
 
 const GREENHOUSE_COPY = getMicrocopy()
 
+const VARIANT_META: Record<
+  ContextualSidecarVariant,
+  {
+    accent: ThemeColor
+    bodyTint: 'neutral' | 'warm' | 'cool'
+  }
+> = {
+  inspector: { accent: 'primary', bodyTint: 'neutral' },
+  composer: { accent: 'warning', bodyTint: 'warm' },
+  assistant: { accent: 'info', bodyTint: 'cool' }
+}
+
 const ContextualSidecar = ({
   title,
   subtitle,
   eyebrow,
   icon,
-  iconColor = 'primary',
+  iconColor,
   kind = 'inspector',
+  variant,
   state = 'idle',
   errorMessage,
   actions,
@@ -71,6 +87,9 @@ const ContextualSidecar = ({
   const headingId = labelledBy ?? id ?? `contextual-sidecar-${generatedId}`
   const isBusy = state === 'loading' || state === 'saving'
   const prefersReducedMotion = useReducedMotion()
+  const resolvedVariant = resolveAdaptiveSidecarVariant(kind, variant)
+  const variantMeta = VARIANT_META[resolvedVariant]
+  const resolvedIconColor = iconColor ?? variantMeta.accent
 
   return (
     <Box
@@ -79,6 +98,7 @@ const ContextualSidecar = ({
       aria-labelledby={headingId}
       aria-busy={isBusy ? 'true' : undefined}
       data-sidecar-kind={kind}
+      data-sidecar-variant={resolvedVariant}
       data-capture={dataCapture}
       sx={theme => ({
         display: 'flex',
@@ -104,7 +124,7 @@ const ContextualSidecar = ({
           zIndex: 1,
           bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.94),
           backdropFilter: 'saturate(180%) blur(10px)',
-          borderBlockEnd: `1px solid ${alpha(theme.palette.divider, 0.72)}`
+          borderBlockEnd: `1px solid ${alpha(theme.palette[variantMeta.accent].main, resolvedVariant === 'inspector' ? 0.16 : 0.26)}`
         })}
       >
         {isBusy ? <LinearProgress aria-hidden='true' /> : null}
@@ -112,7 +132,7 @@ const ContextualSidecar = ({
           {icon ? (
             <CustomAvatar
               skin='light'
-              color={iconColor}
+              color={resolvedIconColor}
               variant='rounded'
               sx={theme => ({
                 boxShadow: `0 0 0 1px ${alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.06 : 0.62)}`
@@ -169,7 +189,14 @@ const ContextualSidecar = ({
           overflowY: 'auto',
           px: 4,
           py: 4,
-          bgcolor: chrome === 'adaptive' ? alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.98) : 'transparent'
+          bgcolor:
+            chrome === 'adaptive'
+              ? resolvedVariant === 'composer'
+                ? alpha(theme.palette.warning.main, theme.palette.mode === 'dark' ? 0.08 : 0.025)
+                : resolvedVariant === 'assistant'
+                  ? alpha(theme.palette.info.main, theme.palette.mode === 'dark' ? 0.09 : 0.026)
+                  : alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.9 : 0.98)
+              : 'transparent'
         })}
       >
         <AnimatePresence mode='wait' initial={false}>
@@ -198,7 +225,10 @@ const ContextualSidecar = ({
           <Box
             sx={theme => ({
               p: 4,
-              bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.92 : 0.98),
+              bgcolor:
+                resolvedVariant === 'composer'
+                  ? alpha(theme.palette.warning.main, theme.palette.mode === 'dark' ? 0.09 : 0.032)
+                  : alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.92 : 0.98),
               backdropFilter: 'saturate(180%) blur(8px)'
             })}
           >

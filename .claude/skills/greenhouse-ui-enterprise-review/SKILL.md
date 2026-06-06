@@ -37,6 +37,8 @@ Score 1-5:
 - UI is generic template composition rather than task-native.
 - Copy is vague or reusable copy is hardcoded in JSX.
 - New component bypasses established Greenhouse primitives without rationale.
+- Reusable UI creates parallel components instead of applying Primitive + Variants + Kinds (`GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`).
+- A `variant` only changes color/radius/shadow/icon instead of behavior, density, state model, action placement, or microinteraction contract.
 - A desktop contextual sidecar is implemented as a custom drawer/card overlay instead of `AdaptiveSidecarLayout` + `ContextualSidecar`.
 - A dirty/replacing sidecar has no idempotent close/replacement guard.
 

@@ -1,4 +1,6 @@
-export type AdaptiveSidecarKind = 'assistant' | 'inspector' | 'form' | 'preview' | 'review'
+export type AdaptiveSidecarKind = 'assistant' | 'inspector' | 'composer' | 'form' | 'preview' | 'review'
+
+export type AdaptiveSidecarVariant = 'inspector' | 'composer' | 'assistant'
 
 export type AdaptiveSidecarPreferredMode = 'push' | 'inline' | 'overlay' | 'temporary'
 
@@ -130,6 +132,25 @@ export const canReplaceAdaptiveSidecar = ({
   }
 
   return !dirty
+}
+
+export const resolveAdaptiveSidecarVariant = (
+  kind: AdaptiveSidecarKind = 'inspector',
+  explicitVariant?: AdaptiveSidecarVariant
+): AdaptiveSidecarVariant => {
+  if (explicitVariant) {
+    return explicitVariant
+  }
+
+  if (kind === 'assistant') {
+    return 'assistant'
+  }
+
+  if (kind === 'composer' || kind === 'form') {
+    return 'composer'
+  }
+
+  return 'inspector'
 }
 
 export const buildSidecarSearchParams = (

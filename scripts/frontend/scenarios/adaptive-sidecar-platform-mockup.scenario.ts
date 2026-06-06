@@ -46,25 +46,23 @@ export const scenario: CaptureScenario = {
     {
       kind: 'interaction',
       interaction: {
-        name: 'switch-to-form',
-        intent: 'Verifica cambio de variante hacia formulario y mantenimiento de contexto.',
-        action: { kind: 'click', selector: 'button[aria-label="Formulario"]' },
+        name: 'switch-to-composer',
+        intent: 'Verifica cambio de variante hacia composer y mantenimiento de contexto.',
+        action: { kind: 'click', selector: 'button[aria-label="Composer"]' },
         frames: [
           {
             label: 'variant-start',
             atMs: 120,
-            clipSelector: '[data-capture="adaptive-sidecar-layout"]',
             note: 'Inicio del cambio de variante'
           },
           {
             label: 'variant-settled',
             atMs: 520,
-            clipSelector: '[data-capture="adaptive-sidecar-layout"]',
-            note: 'Formulario contextual estable'
+            note: 'Composer contextual estable'
           }
         ],
         keyboardEquivalent: {
-          action: { kind: 'focus', selector: 'button[aria-label="Formulario"]' },
+          action: { kind: 'focus', selector: 'button[aria-label="Composer"]' },
           expected: 'El selector de tipo de panel tiene foco visible y nombre accesible.'
         },
         reducedMotion: 'skip'
@@ -80,13 +78,11 @@ export const scenario: CaptureScenario = {
           {
             label: 'close-start',
             atMs: 80,
-            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
             note: 'Inicio del cierre con salida del rail contextual'
           },
           {
             label: 'close-settled',
             atMs: 420,
-            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
             note: 'Workspace estable después del cierre'
           }
         ],
@@ -107,13 +103,11 @@ export const scenario: CaptureScenario = {
           {
             label: 'open-start',
             atMs: 100,
-            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
             note: 'Inicio de apertura con reserva de shell'
           },
           {
             label: 'open-settled',
             atMs: 520,
-            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
             note: 'Rail estable con navbar adaptado'
           }
         ],
@@ -134,13 +128,11 @@ export const scenario: CaptureScenario = {
           {
             label: 'inline-start',
             atMs: 120,
-            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
             note: 'Transición a modo inline'
           },
           {
             label: 'inline-settled',
             atMs: 520,
-            clipSelector: '[data-capture="adaptive-sidecar-platform"]',
             note: 'Sidecar in-flow estabilizado y contenido principal preservado'
           }
         ],

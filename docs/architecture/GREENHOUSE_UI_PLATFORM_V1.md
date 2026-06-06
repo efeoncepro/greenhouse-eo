@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.13
+> **Version:** 1.14
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-06 — v1.14: Greenhouse canoniza la metodologia **Primitive + Variants + Kinds** para UI reusable. Una primitive estable owns layout/a11y/responsive/motion/shell; `variant` representa un modo funcional oficial; `kind` representa el caso semantico de consumidor y debe mapear a una variant. ADR: `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`.
 > **Updated:** 2026-06-06 — v1.13: TASK-1028 promoted Adaptive Sidecar from architecture to reusable runtime primitive. Canonical exports live in `src/components/greenhouse/primitives/`: `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` (`resolveAdaptiveSidecarMode`, URL helpers, telemetry helper, idempotent `reduceAdaptiveSidecarState`). Future contextual assistance/inspection/review/preview/low-risk edit surfaces must reuse this primitive before creating custom drawers/modals.
 > **Updated:** 2026-06-05 — v1.12: Greenhouse adopta `Adaptive Sidecar` como capacidad UI platform canonica, no Nexa-only, para asistencia, inspeccion, review, preview y edicion contextual que debe preservar el contexto de trabajo. ADR: `GREENHOUSE_ADAPTIVE_SIDECAR_DECISION_V1.md`; arquitectura: `GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md`; implementacion: `TASK-1028`. Desktop preferente = in-flow push/reflow; mobile/tablet = Drawer temporal; Dialog modal sigue obligatorio para acciones destructivas/irreversibles/legales/financieras. Ver Delta 2026-06-05 abajo.
 > **Updated:** 2026-06-02 — v1.11: `MetricTrendCard` primitive nueva (`src/components/greenhouse/primitives/`). KPI card con área interactiva month-over-month en **Recharts**: tooltip on-hover + crosshair, semáforo por `tone` (success/warning/error), línea **edge-to-edge** con dots/labels inset y alineados (técnica edge-anchor), draw-in + hover-lift reduced-motion aware, tabla sr-only a11y. Data-agnostic (recibe `series`/`value`/`tone`) → reutilizable para cualquier métrica de tendencia. Primer consumer: Person 360 → Activity (OTD%/FTR%). Ver Delta 2026-06-02 abajo.
@@ -22,6 +23,25 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-06 — Primitive + Variants + Kinds methodology
+
+Greenhouse adopta **Primitive + Variants + Kinds** como metodologia canonica para desarrollar UI reusable de producto.
+
+Docs canonicos:
+
+- ADR: `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`
+- Product UI operating model: `docs/architecture/GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1.md`
+
+Contrato:
+
+- **Primitive**: contrato estable de implementacion. Owns layout, accesibilidad, responsive fallback, motion, shell integration, state plumbing y hooks GVC.
+- **Variant**: modo funcional oficial. Cambia comportamiento, densidad, estado, footer/actions y microinteracciones. No es skin visual.
+- **Kind**: caso semantico del consumidor. Puede ser dominio/workflow/alias legacy, pero debe resolver a una variant oficial antes de decidir layout o behavior.
+- Canonical shape: `<Primitive variant='inspector' kind='contractReview' />`.
+- Nuevas primitives o ampliaciones de primitives deben declarar sus variants oficiales, mapear kinds relevantes y validar cada variant con GVC cuando la UI sea visible.
+- No crear familias paralelas (`FooDrawer`, `FooInspector`, `FooAssistant`) si una primitive + variants cubre el problema.
+- No introducir variants que solo cambian color/radius/icono.
 
 ## Delta 2026-06-05 — Adaptive Sidecar UI Platform
 
@@ -44,6 +64,7 @@ Contratos:
 - Dialog modal sigue siendo obligatorio para confirmaciones destructivas, irreversibles, legales, financieras o maker-checker.
 - La sidecar no implementa business logic; consume primitives/readers/commands/API canonicos y preserva Full API parity.
 - La primitive debe validar multiples variants: assistant, inspector, form, preview y review, con al menos un camino no-Nexa.
+- Bajo la metodologia Primitive + Variants + Kinds, Adaptive Sidecar tiene 3 variants oficiales: `inspector`, `composer` y `assistant`. Kinds como `form`, `review` y `preview` son casos semanticos que deben mapear a una variant oficial antes de comportamiento/chrome.
 - V1 no requiere libreria nueva de motion: usar CSS/MUI transitions, `@/libs/FramerMotion`, View Transition helpers existentes y GSAP solo para excepciones avanzadas.
 - Toda adopcion debe declarar URL mode (`ephemeral`/`addressable`), Back behavior, collision model, dirty guard, scroll containment, AI redaction si aplica e instrumentation hooks.
 - Toda adopcion runtime requiere GVC desktop closed/open + mobile temporary mode.

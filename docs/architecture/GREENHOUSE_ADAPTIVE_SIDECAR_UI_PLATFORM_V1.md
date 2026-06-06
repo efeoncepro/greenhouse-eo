@@ -1,7 +1,8 @@
 # Greenhouse Adaptive Sidecar UI Platform V1
 
-> **Version:** 1.3
+> **Version:** 1.4
 > **Created:** 2026-06-05
+> **Updated:** 2026-06-06 — v1.4: Adaptive Sidecar adopts `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`: official variants are `inspector`, `composer`, and `assistant`; domain/legacy kinds resolve into those variants.
 > **Updated:** 2026-06-06 — v1.3: viewport-height sidecars can publish shell reservations through `AdaptiveSidecarShellProvider`; the Greenhouse vertical navbar consumes that reservation and reflows without global CSS patches or `!important`.
 > **Updated:** 2026-06-06 — v1.2: optional bounded resize and viewport-height shell lanes are accepted in V1 for desktop in-flow sidecars. `AdaptiveSidecarLayout` exposes `resizable`, `sidecarMinWidth`, `sidecarMaxWidth`, `onSidecarWidthChange`, `sidecarExtent`, `viewportOffsetTop`, and an accessible `role="separator"` splitter.
 > **Updated:** 2026-06-06 — Runtime primitive promoted: `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` are the canonical reusable implementation under `src/components/greenhouse/primitives/`.
@@ -188,6 +189,16 @@ Responsibilities:
 
 Home: `src/components/greenhouse/primitives/ContextualSidecar.tsx`
 
+Variant contract follows `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`:
+
+| Official variant | Use when | Required behavior |
+| --- | --- | --- |
+| `inspector` | User must read, diagnose and decide while preserving queue/context | Read-heavy hierarchy, evidence/status/timeline, one contextual primary action |
+| `composer` | User creates or edits contextual data | Dirty-state guard, validation feedback, save/discard/cancel action model |
+| `assistant` | User needs advisory explanation, summary or next-best-action | Context disclosure, evidence/sources, advisory-only suggested actions |
+
+`kind` remains semantic and may be domain-specific (`contractReview`, `paymentInspector`) or legacy/narrow (`form`, `review`, `preview`). Kinds must map into an official variant before chrome, footer behavior or motion is decided.
+
 Draft API:
 
 ```tsx
@@ -198,6 +209,7 @@ type ContextualSidecarProps = {
   status?: React.ReactNode
   icon?: React.ReactNode
   kind: AdaptiveSidecarKind
+  variant?: 'inspector' | 'composer' | 'assistant'
   onClose: () => void
   actions?: React.ReactNode
   children: React.ReactNode

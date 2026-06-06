@@ -6,6 +6,7 @@ import {
   createAdaptiveSidecarEvent,
   removeSidecarSearchParams,
   reduceAdaptiveSidecarState,
+  resolveAdaptiveSidecarVariant,
   resolveAdaptiveSidecarMode
 } from '../adaptive-sidecar-controller'
 
@@ -54,6 +55,16 @@ describe('adaptive-sidecar-controller', () => {
   it('blocks replacing a dirty sidecar with a different kind', () => {
     expect(canReplaceAdaptiveSidecar({ currentKind: 'form', nextKind: 'review', dirty: true })).toBe(false)
     expect(canReplaceAdaptiveSidecar({ currentKind: 'form', nextKind: 'form', dirty: true })).toBe(true)
+  })
+
+  it('maps domain kinds into official sidecar variants', () => {
+    expect(resolveAdaptiveSidecarVariant('inspector')).toBe('inspector')
+    expect(resolveAdaptiveSidecarVariant('review')).toBe('inspector')
+    expect(resolveAdaptiveSidecarVariant('preview')).toBe('inspector')
+    expect(resolveAdaptiveSidecarVariant('form')).toBe('composer')
+    expect(resolveAdaptiveSidecarVariant('composer')).toBe('composer')
+    expect(resolveAdaptiveSidecarVariant('assistant')).toBe('assistant')
+    expect(resolveAdaptiveSidecarVariant('review', 'assistant')).toBe('assistant')
   })
 
   it('builds and removes stable URL search params for URL-addressable sidecars', () => {

@@ -33,7 +33,7 @@ Greenhouse ya tiene buenos patrones locales de rail/drawer, pero no tiene una pr
 ## Goal
 
 - Crear primitives reutilizables `AdaptiveSidecarLayout` y `ContextualSidecar` en `src/components/greenhouse/primitives/`.
-- Validar las variants `assistant`, `inspector`, `form`, `preview` y `review` en una ruta mockup/demo de plataforma.
+- Validar las variants oficiales `inspector`, `composer` y `assistant` en una ruta mockup/demo de plataforma, con kinds/aliases (`form`, `preview`, `review`) resueltos por contrato hacia una variant oficial.
 - Migrar o validar el piloto Nexa desktop desde overlay fijo hacia sidecar adaptativo, con rollout guard y mobile Drawer preservado.
 - Validar al menos un consumidor operacional no-Nexa con GVC.
 - Formalizar reglas de uso para que futuras superficies no confundan sidecar, Drawer y Dialog.
@@ -135,7 +135,7 @@ Reglas obligatorias:
 - `AdaptiveSidecarLayout` implementado como primitive client-side con modos `push|inline|overlay|temporary`, medicion real de ancho disponible via `ResizeObserver`, fallback por `mainMinWidth`, `data-capture`, `prefers-reduced-motion`, Drawer temporal y dirty-close guard.
 - `ContextualSidecar` implementado como region `complementary`, no modal en desktop, con header/body/footer, estados `idle|loading|saving|error`, scroll containment, close control con microcopy canonico y `aria-busy`.
 - Controller puro implementado en `adaptive-sidecar-controller.ts`: mode resolution, URL params (`sidecar`, `sidecarId`, `sidecarMode`), collision/replacement guard, telemetry event shape y reducer idempotente `reduceAdaptiveSidecarState()` para open/close/replace/dirty.
-- Mockup real no-Nexa creado en `/platform/adaptive-sidecar/mockup`, con variants `assistant`, `inspector`, `form`, `preview`, `review`, modo desktop push/overlay y mobile bottom drawer.
+- Mockup real no-Nexa creado en `/platform/adaptive-sidecar/mockup`, con variants oficiales `inspector`, `composer`, `assistant`, modo desktop push/overlay y mobile bottom drawer. Kinds semánticos/legacy (`form`, `preview`, `review`) resuelven por controller hacia una variant oficial.
 - Scenarios GVC creados:
   - `adaptive-sidecar-platform-mockup` desktop: push, switch a form, inline y keyboard frames.
   - `adaptive-sidecar-platform-mobile-mockup` mobile: drawer open, close, re-open.
@@ -149,6 +149,9 @@ Reglas obligatorias:
 - Resize enterprise V1.2: `AdaptiveSidecarLayout` ahora soporta `resizable`, `sidecarMinWidth`, `sidecarMaxWidth`, `onSidecarWidthChange` y splitter accesible `role="separator"` con `aria-valuemin/max/now` + ArrowLeft/ArrowRight. El mockup final no muestra splitter por defecto para evitar ruido visual; la capability queda cubierta por tests.
 - Shell reflow enterprise V1.3: `AdaptiveSidecarShellProvider` se monta en el dashboard y permite que sidecars `sidecarExtent="viewport"` publiquen una reserva de carril. El `Navbar` vertical consume esa reserva mediante `overrideStyles` de Vuexy, con especificidad equivalente a `headerFloating/headerContentCompact`, sin `!important` ni CSS global route-local. Resultado: el panel puede ocupar top-to-bottom completo y el app bar se acorta preservando acciones/avatar.
 - Microinteraction enterprise V1.4: entrada/salida del panel usa `AnimatePresence` con spring breve, salida desacoplada y reduced-motion; el shell conserva la reserva durante la salida para evitar saltos de layout. El footer global permanece visible; el mockup presupuesta su altura en el canvas para evitar scroll vertical adicional.
+- Product methodology canonizada: TASK-1028 generaliza la metodología **Primitive + Variants + Kinds** en `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`. Adaptive Sidecar tendrá 3 variants oficiales (`inspector`, `composer`, `assistant`) y kinds semánticos/aliases (`form`, `review`, `preview`, etc.) que deben resolver a una variant oficial.
+- Variants oficiales implementadas en runtime: `AdaptiveSidecarVariant` + `resolveAdaptiveSidecarVariant()` viven en `adaptive-sidecar-controller.ts`; `ContextualSidecar` consume el resolver y publica `data-sidecar-variant`. Mockup actualizado a variants oficiales (`inspector`, `composer`, `assistant`) con `composer` como edición contextual y dirty-state guard.
+- Nueva evidencia GVC local: desktop `.captures/2026-06-06T10-24-01_adaptive-sidecar-platform-mockup`; mobile `.captures/2026-06-06T10-24-51_adaptive-sidecar-platform-mobile-mockup`.
 - Reusable platform hardening: barrel exporta primitives, types y controller; tests focales cubren idempotencia de open, dirty close/replace block, forced close/replace y dirty-state writes repetidos.
 - Evidencia final corregida: `.captures/2026-06-06T02-50-18_adaptive-sidecar-platform-mockup` y `.captures/2026-06-06T02-40-56_adaptive-sidecar-platform-mobile-mockup`. Check adicional `/home`: navbar default conserva ancho 1132px, avatar en x=1362 y sin reserva activa. En mockup sidecar: abierto navbar 692px/avatar visible/panel x=1000-1440; cerrado navbar vuelve a 1132px/avatar x=1362. Scroll global medido `900/900` abierto y cerrado con footer visible.
 - Gates focales actualizados: `pnpm vitest run src/components/greenhouse/primitives/__tests__/adaptive-sidecar-controller.test.ts src/components/greenhouse/primitives/__tests__/ContextualSidecar.test.tsx src/components/greenhouse/primitives/__tests__/AdaptiveSidecarLayout.test.tsx` (20 tests) y `pnpm exec tsc --noEmit --pretty false`.
@@ -189,7 +192,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Mockup/demo route + GVC scenario
 
-- Crear una ruta mockup real del portal para validar las variants `assistant`, `inspector`, `form`, `preview` y `review` sin tocar runtime productivo.
+- Crear una ruta mockup real del portal para validar las variants oficiales `inspector`, `composer` y `assistant` sin tocar runtime productivo; `form`, `preview` y `review` quedan como kinds/aliases semánticos que resuelven hacia una variant oficial.
 - Usar mock data tipada y primitives Greenhouse; no HTML/CSS separado.
 - Agregar scenario GVC desktop + mobile que capture closed/open states, scroll containment, dirty-state guard visual y al menos un estado degradado/loading.
 - Verificar que la UI no se comprime ni oculta contenido clave.

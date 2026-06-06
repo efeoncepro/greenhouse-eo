@@ -1,7 +1,7 @@
 # Greenhouse Product UI Operating Model V1
 
 Status: accepted
-Last updated: 2026-05-11
+Last updated: 2026-06-06
 Owner: Platform / Product Design Agents
 
 ## Purpose
@@ -48,10 +48,33 @@ This operating model establishes the AI Product Design Studio stack for Greenhou
 7. Define responsive model.
 8. Define microinteraction model.
 9. Map to Greenhouse primitives.
-10. Implement or mock up.
-11. Capture screenshots.
-12. Run enterprise review.
-13. Verify and commit.
+10. If the primitive is reusable, define official variants and domain kinds.
+11. Implement or mock up.
+12. Capture screenshots.
+13. Run enterprise review.
+14. Verify and commit.
+
+## Primitive + Variants + Kinds Method
+
+Reusable UI work must use the **Primitive + Variants + Kinds** method from `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`.
+
+- **Primitive**: owns layout, accessibility, responsive behavior, motion, shell integration, state plumbing and verification hooks.
+- **Variant**: official functional mode. It changes behavior, density, state model, action placement and microinteraction contract. It is not a skin.
+- **Kind**: semantic consumer use case. It may be domain-specific, workflow-specific or a legacy alias, but it must resolve to an official variant before layout/styling behavior is chosen.
+
+Canonical shape:
+
+```tsx
+<Primitive variant='inspector' kind='contractReview' />
+```
+
+Rules:
+
+- Do not create separate `FooDrawer`, `FooInspector`, `FooAssistant` components when one primitive plus variants can cover the family.
+- Do not add variants that only change color, radius, shadow or icon.
+- Define at most 3-5 official variants per primitive unless an ADR justifies more.
+- Validate each official variant with GVC before calling the primitive enterprise-ready.
+- Preserve Full API parity: variants may change UI workflow, not business source of truth.
 
 ## Pattern Decisions
 
@@ -68,6 +91,12 @@ Use the pattern that fits the task:
 ### Adaptive sidecar runtime primitive
 
 When the selected pattern is adaptive sidecar, the canonical implementation is `AdaptiveSidecarLayout` + `ContextualSidecar` + `adaptive-sidecar-controller` from `@/components/greenhouse/primitives`.
+
+Official variants:
+
+- `inspector`: read, diagnose and decide without losing the queue/context.
+- `composer`: create or edit contextual data with dirty-state guard.
+- `assistant`: explain, summarize and suggest using current context; advisory-only and never the only execution path.
 
 Rules:
 
