@@ -1,12 +1,14 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CircularProgress from '@mui/material/CircularProgress'
+import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -15,13 +17,21 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles'
 import { toast } from 'sonner'
 
 import CustomAvatar from '@core/components/mui/Avatar'
+import CustomChip from '@core/components/mui/Chip'
 
+import { motion, AnimatePresence } from '@/libs/FramerMotion'
+import useReducedMotion from '@/hooks/useReducedMotion'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { OperationalStatusBadge } from '@/components/greenhouse/primitives'
-import { GH_WORKFORCE_CONTRACTING as C } from '@/lib/copy/workforce-contracting'
+import {
+  GH_WORKFORCE_CONTRACTING as C,
+  contractingSectionLabel,
+  contractingSourceLabel
+} from '@/lib/copy/workforce-contracting'
 import type { ContractingDraftContent } from '@/lib/workforce/contracting/readers'
 
 interface Props {
@@ -41,11 +51,128 @@ type SectionRow = {
   parity: 'ok' | 'missing'
 }
 
+// Marca cualquier placeholder pendiente: [POR DEFINIR …] / [TO BE DEFINED …] (con o sin detalle).
+const PLACEHOLDER_RE = /\[(?:POR DEFINIR|TO BE DEFINED)[^\]]*\]/g
+
+const countPlaceholders = (text: string | null): number =>
+  text ? text.match(PLACEHOLDER_RE)?.length ?? 0 : 0
+
+// Resalta los placeholders dentro de un fragmento (señal visual "falta completar este campo").
+const highlightPlaceholders = (text: string, theme: Theme): ReactNode[] => {
+  const out: ReactNode[] = []
+  const re = new RegExp(PLACEHOLDER_RE)
+  let last = 0
+  let key = 0
+  let match: RegExpExecArray | null
+
+  while ((match = re.exec(text)) !== null) {
+    if (match.index > last) out.push(text.slice(last, match.index))
+    out.push(
+      <Box
+        component='span'
+        key={`ph-${key++}`}
+        sx={{
+          mx: 0.25,
+          px: 0.75,
+          py: 0.1,
+          borderRadius: 0.75,
+          bgcolor: alpha(theme.palette.warning.main, 0.16),
+          color: 'warning.dark',
+          fontWeight: 600,
+          fontSize: '0.78rem',
+          fontVariantNumeric: 'tabular-nums'
+        }}
+      >
+        {match[0]}
+      </Box>
+    )
+    last = match.index + match[0].length
+  }
+
+  if (last < text.length) out.push(text.slice(last))
+
+  return out
+}
+
+// Renderiza el cuerpo de una cláusula con jerarquía: separa sub-cláusulas "N.N" con número colgante
+// y resalta los placeholders por definir. Sin esto, el texto legal se ve como un bloque plano.
+const ClauseBody = ({ text, theme }: { text: string | null; theme: Theme }) => {
+  if (!text || !text.trim()) {
+    return (
+      <Typography variant='body2' color='text.disabled'>
+        {C.detail.notAvailable}
+      </Typography>
+    )
+  }
+
+  const chunks = text
+    .split(/(?=\b\d+\.\d+\s)/)
+    .map(s => s.trim())
+    .filter(Boolean)
+
+  const blocks = chunks.length > 1 ? chunks : [text.trim()]
+
+  return (
+    <Stack spacing={1.25}>
+      {blocks.map((block, bi) => {
+        const marked = block.match(/^(\d+\.\d+)\s+([\s\S]*)$/)
+
+        if (marked) {
+          return (
+            <Box key={bi} sx={{ display: 'flex', gap: 1.25 }}>
+              <Typography
+                component='span'
+                sx={{
+                  flexShrink: 0,
+                  minWidth: 30,
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  lineHeight: 1.7,
+                  color: 'text.primary',
+                  fontVariantNumeric: 'tabular-nums'
+                }}
+              >
+                {marked[1]}
+              </Typography>
+              <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.7 }}>
+                {highlightPlaceholders(marked[2], theme)}
+              </Typography>
+            </Box>
+          )
+        }
+
+        return (
+          <Typography key={bi} variant='body2' color='text.secondary' sx={{ lineHeight: 1.7 }}>
+            {highlightPlaceholders(block, theme)}
+          </Typography>
+        )
+      })}
+    </Stack>
+  )
+}
+
 const BilingualReviewDesk = ({ caseId, canApprove, canManage, canSendSignature, onChanged }: Props) => {
   const theme = useTheme()
   const [content, setContent] = useState<ContractingDraftContent | null>(null)
   const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState(false)
+  const reducedMotion = useReducedMotion()
+  const [thinkingStep, setThinkingStep] = useState(0)
+
+  // Cicla los pasos de "la IA está pensando" mientras Claude redacta (~1-2 min).
+  useEffect(() => {
+    if (!busy) {
+      setThinkingStep(0)
+
+      return
+    }
+
+    const id = setInterval(() => {
+      setThinkingStep(s => (s + 1) % C.review.aiThinkingSteps.length)
+    }, 2200)
+
+    return () => clearInterval(id)
+  }, [busy])
 
   const load = useCallback(async (id: string) => {
     setLoading(true)
@@ -283,6 +410,78 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, canSendSignature, 
   }
 
   if (!content) {
+    // "La IA está pensando": Claude tarda ~1-2 min redactando ES+EN. Sin esta señal,
+    // el botón quedaba muerto y el usuario creía que no pasaba nada (caso Luis).
+    if (busy) {
+      return (
+        <Card
+          data-capture='workforce-contracting-ai-thinking'
+          sx={{ boxShadow: 'none', border: `1px solid ${theme.palette.divider}` }}
+        >
+          <CardContent sx={{ py: { xs: 5, md: 7 } }}>
+            <Stack spacing={3} alignItems='center' role='status' aria-live='polite' sx={{ maxWidth: 460, mx: 'auto', textAlign: 'center' }}>
+              <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                {!reducedMotion && (
+                  <motion.span
+                    aria-hidden='true'
+                    initial={{ scale: 0.85, opacity: 0.5 }}
+                    animate={{ scale: [0.85, 1.25, 0.85], opacity: [0.5, 0, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: '50%',
+                      background: alpha(theme.palette.primary.main, 0.25)
+                    }}
+                  />
+                )}
+                <CustomAvatar skin='light' color='primary' size={56} sx={{ position: 'relative' }}>
+                  <motion.i
+                    className='tabler-sparkles'
+                    aria-hidden='true'
+                    style={{ fontSize: 26, display: 'inline-flex' }}
+                    animate={reducedMotion ? undefined : { rotate: [0, 8, -8, 0] }}
+                    transition={reducedMotion ? undefined : { duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                </CustomAvatar>
+              </Box>
+
+              <Stack spacing={1} alignItems='center'>
+                <Typography variant='h6'>{C.review.aiThinkingTitle}</Typography>
+                <Box sx={{ minHeight: 24 }}>
+                  {reducedMotion ? (
+                    <Typography variant='body2' color='text.secondary'>
+                      {C.review.aiThinkingSteps[thinkingStep]}
+                    </Typography>
+                  ) : (
+                    <AnimatePresence mode='wait'>
+                      <motion.div
+                        key={thinkingStep}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.35 }}
+                      >
+                        <Typography variant='body2' color='text.secondary'>
+                          {C.review.aiThinkingSteps[thinkingStep]}
+                        </Typography>
+                      </motion.div>
+                    </AnimatePresence>
+                  )}
+                </Box>
+              </Stack>
+
+              <LinearProgress sx={{ width: '100%', borderRadius: 1, height: 6 }} />
+
+              <Typography variant='caption' color='text.secondary'>
+                {C.review.aiThinkingHint}
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+      )
+    }
+
     return (
       <Card sx={{ boxShadow: 'none', border: `1px solid ${theme.palette.divider}` }}>
         <CardContent>
@@ -292,8 +491,19 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, canSendSignature, 
             description={C.review.noDraftBody}
             action={
               canManage ? (
-                <Button variant='contained' onClick={handleGenerate} disabled={busy} startIcon={<i className='tabler-sparkles' aria-hidden='true' />}>
-                  {C.review.generateDraft}
+                <Button
+                  variant='contained'
+                  onClick={handleGenerate}
+                  disabled={busy}
+                  startIcon={
+                    busy ? (
+                      <CircularProgress size={16} color='inherit' />
+                    ) : (
+                      <i className='tabler-sparkles' aria-hidden='true' />
+                    )
+                  }
+                >
+                  {busy ? C.review.generatingDraft : C.review.generateDraft}
                 </Button>
               ) : undefined
             }
@@ -311,7 +521,7 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, canSendSignature, 
             <Stack spacing={0.5}>
               <Typography variant='h5'>{C.bilingualReview}</Typography>
               <Typography variant='body2' color='text.secondary'>
-                v{content.draftVersion} · {content.source}
+                Versión {content.draftVersion} · {contractingSourceLabel(content.source)}
               </Typography>
             </Stack>
             <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
@@ -336,42 +546,128 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, canSendSignature, 
             <Table sx={{ minWidth: 900 }}>
               <caption className='sr-only'>{C.aria.bilingualReviewTable}</caption>
               <TableHead>
-                <TableRow>
-                  <TableCell scope='col' sx={{ width: 90 }}>
-                    {C.review.sectionsHeader}
+                <TableRow sx={{ bgcolor: alpha(theme.palette.text.primary, 0.02) }}>
+                  <TableCell scope='col' sx={{ width: 220 }}>
+                    <Typography
+                      variant='caption'
+                      sx={{ textTransform: 'uppercase', letterSpacing: '.5px', fontWeight: 700, color: 'text.secondary' }}
+                    >
+                      {C.review.sectionsHeader}
+                    </Typography>
                   </TableCell>
-                  <TableCell scope='col'>{C.authoritativeSpanish} (es-CL)</TableCell>
-                  <TableCell scope='col'>English (en-US)</TableCell>
+                  <TableCell scope='col' sx={{ width: '40%' }}>
+                    <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                      <Typography variant='subtitle2'>{C.review.langEs}</Typography>
+                      <CustomChip round='true' size='small' variant='tonal' color='primary' label={C.review.langEsTag} />
+                    </Stack>
+                    <Typography variant='caption' color='text.secondary'>
+                      {C.review.langEsHint}
+                    </Typography>
+                  </TableCell>
+                  <TableCell scope='col' sx={{ width: '40%' }}>
+                    <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                      <Typography variant='subtitle2'>{C.review.langEn}</Typography>
+                      <CustomChip round='true' size='small' variant='tonal' color='secondary' label={C.review.langEnTag} />
+                    </Stack>
+                    <Typography variant='caption' color='text.secondary'>
+                      {C.review.langEnHint}
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map(row => (
-                  <TableRow
-                    key={row.code}
-                    sx={{
-                      bgcolor: row.parity === 'missing' ? alpha(theme.palette.error.main, 0.055) : undefined,
-                      boxShadow: row.parity === 'missing' ? `inset 3px 0 0 ${theme.palette.error.main}` : undefined
-                    }}
-                  >
-                    <TableCell sx={{ verticalAlign: 'top' }}>
-                      <Typography variant='subtitle2' color={row.parity === 'missing' ? 'error.main' : 'text.primary'}>
-                        {row.code}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ verticalAlign: 'top' }}>
-                      <Typography variant='subtitle2'>{row.esHeading ?? C.detail.notAvailable}</Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {row.esBody ?? C.detail.notAvailable}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ verticalAlign: 'top' }}>
-                      <Typography variant='subtitle2'>{row.enHeading ?? C.detail.notAvailable}</Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {row.enBody ?? C.detail.notAvailable}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {rows.map((row, idx) => {
+                  const pendingFields = countPlaceholders(row.esBody) || countPlaceholders(row.enBody)
+
+                  return (
+                    <TableRow
+                      key={row.code}
+                      sx={{
+                        bgcolor:
+                          row.parity === 'missing'
+                            ? alpha(theme.palette.error.main, 0.055)
+                            : idx % 2 === 1
+                              ? alpha(theme.palette.text.primary, 0.015)
+                              : undefined,
+                        boxShadow: row.parity === 'missing' ? `inset 3px 0 0 ${theme.palette.error.main}` : undefined
+                      }}
+                    >
+                      <TableCell sx={{ verticalAlign: 'top', py: 2.5 }}>
+                        <Stack spacing={1}>
+                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                            <CustomAvatar
+                              skin='light'
+                              color={row.parity === 'missing' ? 'error' : 'primary'}
+                              size={26}
+                              sx={{ fontSize: '0.74rem', fontWeight: 700, mt: '1px', flexShrink: 0 }}
+                            >
+                              {idx + 1}
+                            </CustomAvatar>
+                            <Typography
+                              variant='subtitle2'
+                              color={row.parity === 'missing' ? 'error.main' : 'text.primary'}
+                              sx={{ lineHeight: 1.4 }}
+                            >
+                              {contractingSectionLabel(row.code)}
+                            </Typography>
+                          </Box>
+                          {pendingFields > 0 && (
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant='tonal'
+                              color='warning'
+                              label={`${pendingFields} ${C.review.pendingFieldsChip}`}
+                              sx={{ alignSelf: 'flex-start' }}
+                            />
+                          )}
+                          {row.parity === 'missing' && (
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant='tonal'
+                              color='error'
+                              label={C.review.missingLanguageChip}
+                              sx={{ alignSelf: 'flex-start' }}
+                            />
+                          )}
+                        </Stack>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'top', py: 2.5 }}>
+                        <Typography
+                          variant='caption'
+                          sx={{
+                            display: 'block',
+                            mb: 1.25,
+                            textTransform: 'uppercase',
+                            letterSpacing: '.4px',
+                            fontWeight: 700,
+                            color: row.esHeading ? 'text.primary' : 'text.disabled'
+                          }}
+                        >
+                          {row.esHeading ?? C.detail.notAvailable}
+                        </Typography>
+                        <ClauseBody text={row.esBody} theme={theme} />
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'top', py: 2.5 }}>
+                        <Typography
+                          variant='caption'
+                          sx={{
+                            display: 'block',
+                            mb: 1.25,
+                            textTransform: 'uppercase',
+                            letterSpacing: '.4px',
+                            fontWeight: 700,
+                            color: row.enHeading ? 'text.primary' : 'text.disabled'
+                          }}
+                        >
+                          {row.enHeading ?? C.detail.notAvailable}
+                        </Typography>
+                        <ClauseBody text={row.enBody} theme={theme} />
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </Box>
@@ -403,7 +699,9 @@ const BilingualReviewDesk = ({ caseId, canApprove, canManage, canSendSignature, 
       ) : null}
 
       <Card sx={{ position: 'sticky', bottom: 16, zIndex: 2, boxShadow: theme.shadows[8], border: `1px solid ${theme.palette.divider}` }}>
-        <CardContent sx={{ py: 2 }}>
+        {/* pr reserva el "FAB safe-area": el botón Nexa (fixed bottom-right 24+48px) + scroll-to-top
+            no deben taparse con "Aprobar par bilingüe". 80px libra la columna de FABs en desktop. */}
+        <CardContent sx={{ py: 2, pr: { sm: 10 } }}>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             justifyContent={signatureStatus ? 'space-between' : 'flex-end'}

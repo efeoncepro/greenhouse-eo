@@ -99,8 +99,27 @@ export const GH_WORKFORCE_CONTRACTING = {
     noDraftTitle: 'Sin borrador todavía',
     noDraftBody: 'Genera el borrador bilingüe para revisar cláusula por cláusula.',
     generateDraft: 'Generar borrador IA',
+    generatingDraft: 'Generando borrador…',
     aiDisabled: 'La redacción IA está deshabilitada en este ambiente.',
-    sectionsHeader: 'Sección',
+    // Estado "la IA está pensando" — Claude tarda ~1-2 min redactando ES+EN.
+    aiThinkingTitle: 'Redactando con IA…',
+    aiThinkingHint:
+      'Claude redacta el español legal y su traducción al inglés; Greenhouse valida la paridad. Puede tomar hasta un par de minutos.',
+    aiThinkingSteps: [
+      'Reuniendo los datos del caso…',
+      'Redactando en español (versión legal)…',
+      'Traduciendo al inglés (referencia)…',
+      'Validando la paridad bilingüe…'
+    ],
+    sectionsHeader: 'Cláusula',
+    langEs: 'Español',
+    langEsTag: 'Versión legal',
+    langEsHint: 'Esta versión prevalece legalmente',
+    langEn: 'Inglés',
+    langEnTag: 'Referencia',
+    langEnHint: 'Traducción de apoyo, no vinculante',
+    pendingFieldsChip: 'por definir',
+    missingLanguageChip: 'Falta un idioma',
     approve: 'Aprobar par bilingüe',
     approving: 'Aprobando…',
     approved: 'Borrador aprobado.',
@@ -149,6 +168,40 @@ export const GH_WORKFORCE_CONTRACTING = {
     CL_CHILE_DEPENDENT_V1: 'Chile · Dependiente',
     CL_FOREIGNER_WORKING_IN_CHILE_V1: 'Chile · Extranjero',
     INTERNATIONAL_INTERNAL_REMOTE_V1: 'Internacional · Remoto interno'
+  } as Record<string, string>,
+  // Etiquetas humanas es-CL de las cláusulas/secciones (NUNCA el código snake_case crudo en UI).
+  // Cubre el vocabulario canónico de los packs (registry.ts) + alias que la IA puede emitir.
+  sectionLabels: {
+    place_and_date: 'Lugar y fecha',
+    parties_identification: 'Identificación de las partes',
+    services_nature_and_location: 'Naturaleza y lugar de los servicios',
+    remuneration: 'Remuneración',
+    compensation: 'Remuneración',
+    working_hours: 'Jornada laboral',
+    contract_term: 'Vigencia del contrato',
+    additional_pacts_and_benefits: 'Pactos y beneficios adicionales',
+    benefits: 'Beneficios',
+    remote_work_setup: 'Modalidad de trabajo remoto',
+    governing_law_and_jurisdiction: 'Ley aplicable y jurisdicción',
+    visa_work_authorization: 'Visa y autorización de trabajo',
+    work_authorization: 'Autorización de trabajo',
+    residence_permit: 'Permiso de residencia',
+    travel_clause_if_applicable: 'Cláusula de viajes (si aplica)',
+    confidentiality: 'Confidencialidad',
+    intellectual_property: 'Propiedad intelectual',
+    data_protection: 'Protección de datos',
+    termination: 'Término del contrato',
+    probation: 'Período de prueba',
+    non_compete: 'No competencia',
+    pay_method: 'Forma de pago',
+    pay_period: 'Periodicidad de pago',
+    signatures: 'Firmas',
+    signature: 'Firmas'
+  } as Record<string, string>,
+  // Etiquetas humanas es-CL del origen del borrador (NUNCA el token crudo 'claude_ai').
+  sourceLabels: {
+    claude_ai: 'Redactado con IA',
+    manual: 'Redacción manual'
   } as Record<string, string>,
   riskLabels: {
     low: 'Bajo',
@@ -274,3 +327,25 @@ export const GH_WORKFORCE_CONTRACTING = {
     watermarkSuperseded: 'REEMPLAZADO'
   }
 } as const
+
+/**
+ * Etiqueta humana es-CL de una cláusula/sección del documento.
+ * Resuelve el vocabulario canónico (sectionLabels) y, para cualquier código
+ * emitido por la IA fuera del catálogo, humaniza el snake_case (NUNCA muestra el código crudo).
+ */
+export const contractingSectionLabel = (code: string): string => {
+  const known = GH_WORKFORCE_CONTRACTING.sectionLabels[code]
+
+  if (known) return known
+
+  const humanized = code
+    .replace(/_/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ')
+
+  return humanized.charAt(0).toUpperCase() + humanized.slice(1)
+}
+
+/** Etiqueta humana es-CL del origen del borrador (claude_ai → "Redactado con IA"). */
+export const contractingSourceLabel = (source: string): string =>
+  GH_WORKFORCE_CONTRACTING.sourceLabels[source] ?? source
