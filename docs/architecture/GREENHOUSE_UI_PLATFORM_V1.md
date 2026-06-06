@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.14
+> **Version:** 1.15
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-06 — v1.15: Greenhouse adopta Floating UI como engine canonico de posicionamiento para superficies contextuales ancladas, expuesto via primitive futura **Greenhouse Floating Surface**. ADR: `GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md`; implementacion futura: `TASK-1033`.
 > **Updated:** 2026-06-06 — v1.14: Greenhouse canoniza la metodologia **Primitive + Variants + Kinds** para UI reusable. Una primitive estable owns layout/a11y/responsive/motion/shell; `variant` representa un modo funcional oficial; `kind` representa el caso semantico de consumidor y debe mapear a una variant. ADR: `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`.
 > **Updated:** 2026-06-06 — v1.13: TASK-1028 promoted Adaptive Sidecar from architecture to reusable runtime primitive. Canonical exports live in `src/components/greenhouse/primitives/`: `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` (`resolveAdaptiveSidecarMode`, URL helpers, telemetry helper, idempotent `reduceAdaptiveSidecarState`). Future contextual assistance/inspection/review/preview/low-risk edit surfaces must reuse this primitive before creating custom drawers/modals.
 > **Updated:** 2026-06-05 — v1.12: Greenhouse adopta `Adaptive Sidecar` como capacidad UI platform canonica, no Nexa-only, para asistencia, inspeccion, review, preview y edicion contextual que debe preservar el contexto de trabajo. ADR: `GREENHOUSE_ADAPTIVE_SIDECAR_DECISION_V1.md`; arquitectura: `GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md`; implementacion: `TASK-1028`. Desktop preferente = in-flow push/reflow; mobile/tablet = Drawer temporal; Dialog modal sigue obligatorio para acciones destructivas/irreversibles/legales/financieras. Ver Delta 2026-06-05 abajo.
@@ -23,6 +24,25 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-06b — Greenhouse Floating Surface
+
+Greenhouse adopta **Floating UI** como engine canonico para superficies contextuales ancladas: popovers, menus, rich tooltips, evidence peeks, inline editors, validation bubbles y command previews.
+
+Docs canonicos:
+
+- ADR: `docs/architecture/GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md`
+- Implementacion futura: `docs/tasks/to-do/TASK-1033-greenhouse-floating-surface-primitive.md`
+
+Contrato:
+
+- Floating UI es engine interno de posicionamiento; product views deben consumir primitives Greenhouse, no importar `@floating-ui/react` ad-hoc.
+- Primitive futura: `GreenhouseFloatingSurface`, exportada desde `@/components/greenhouse/primitives`.
+- V1 variants oficiales: `richTooltip`, `actionMenu`, `evidencePeek`, `inlineEditor`, `validationBubble`, `commandPreview`.
+- Kinds semanticos como `costProvenance`, `rowActions`, `fieldValidation`, `commandResultPreview` deben resolver a una variant antes de decidir role, foco, dismissal y density.
+- Defaults canonicos: `autoUpdate`, `offset(8)`, `flip({ fallbackAxisSideDirection: 'end' })`, `shift({ padding: 16 })`, `FloatingPortal`, `FloatingFocusManager modal={false}`, `useDismiss`, `useRole`, `useInteractions`.
+- Floating Surface cubre UI anclada, transiente y contextual. Para carriles full-height usar `AdaptiveSidecar`; para destructivo/legal/financiero/maker-checker usar `Dialog`; para workflows largos usar sidecar/drawer/stepper segun dominio.
+- Toda adopcion visible debe verificar keyboard, Escape/outside dismissal, focus return, collision near viewport edge y scroll containment con tests + GVC.
 
 ## Delta 2026-06-06 — Primitive + Variants + Kinds methodology
 

@@ -1,3 +1,13 @@
+# Sesion 2026-06-06 — Floating UI / Greenhouse Floating Surface ADR + TASK-1033
+
+Por feedback del operador sobre usar mas `@floating-ui/react`, se formalizo la decision de plataforma:
+
+- **ADR aceptado:** `docs/architecture/GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md`.
+- **Task creada:** `docs/tasks/to-do/TASK-1033-greenhouse-floating-surface-primitive.md`.
+- **Decision:** Floating UI queda como engine canonico para superficies contextuales ancladas (rich tooltip, action menu, evidence peek, inline editor, validation bubble, command preview), pero expuesto via primitive Greenhouse, no imports ad-hoc en views.
+- **Boundary:** no reemplaza `AdaptiveSidecar` para carriles full-height ni `Dialog` para decisiones destructivas/legales/financieras.
+- **Docs sync:** `DECISIONS_INDEX`, `GREENHOUSE_UI_PLATFORM_V1`, `project_context`, `docs/tasks/README.md` y `TASK_ID_REGISTRY`.
+
 # Sesion 2026-06-06 — TASK-1032 Coming Soon / Launch page (in-progress, fine-tuning visual)
 
 Página **Coming Soon** branded (hermana de 404/401) con countdown + captura de email de lanzamiento gobernada. **Commit local hecho, sin push.** Spec completa + contexto para continuar: `docs/tasks/in-progress/TASK-1032-coming-soon-launch-page.md`.
