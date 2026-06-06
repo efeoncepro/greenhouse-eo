@@ -145,17 +145,18 @@ const NeutralPanel = ({ mode }: { mode: 'light' | 'dark' }) => {
   )
 }
 
-const AxisPaletteMockupView = () => (
+const DesignSystemView = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 1100, mx: 'auto' }}>
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       <AxisWordmark variant='full' height={44} />
       <Typography variant='h4' sx={{ fontWeight: 700 }}>
-        Paleta completa de colores (mockup)
+        Paleta AXIS — referencia completa
       </Typography>
       <Typography variant='body2' color='text.secondary'>
-        Render fiel de todos los tokens de color de AXIS (ramps 100→900 + opacity 8/16/24/32/38 + neutrales light/dark),
-        consumidos desde <code>@core/theme/axis-tokens.ts</code>. En cada paso del ramp: <strong>✓ texto</strong> = contraste ≥4.5:1
-        sobre blanco (apto para texto chico); si no, muestra el ratio real. Esto es el preview antes de cablear el theme vivo.
+        Referencia viva de todos los tokens de color de AXIS (ramps 100→900 + opacity 8/16/24/32/38 + neutrales light/dark),
+        consumidos desde el SoT <code>@core/theme/axis-tokens.ts</code>. En cada paso del ramp: <strong>✓ texto</strong> = contraste ≥4.5:1
+        sobre blanco (apto para texto chico); si no, muestra el ratio real. Fuente de verdad upstream: AXIS en Figma
+        (<code>yyMksCoijfMaIoYplXKZaR</code>, nodo <code>11205:5341</code>). Superficie interna — no visible para clientes.
       </Typography>
     </Box>
 
@@ -204,4 +205,4 @@ const AxisPaletteMockupView = () => (
   </Box>
 )
 
-export default AxisPaletteMockupView
+export default DesignSystemView

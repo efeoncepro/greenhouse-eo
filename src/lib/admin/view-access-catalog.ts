@@ -580,6 +580,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.design_system',
+    section: 'administracion',
+    label: 'Design System',
+    description: 'Referencia viva de la paleta AXIS (ramps, semánticos, neutrales). Interno — clientes no acceden.',
+    routePath: '/admin/design-system',
+    routeGroup: 'internal'
+  },
+  {
     viewCode: 'mi_ficha.mi_perfil',
     section: 'mi_ficha',
     label: 'Mi Perfil',

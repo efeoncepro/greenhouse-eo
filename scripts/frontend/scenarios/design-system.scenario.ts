@@ -3,8 +3,8 @@
 import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
-  name: 'axis-palette-mockup',
-  route: '/admin/axis-palette/mockup',
+  name: 'design-system',
+  route: '/admin/design-system',
   viewport: { width: 1280, height: 900 },
   initialHoldMs: 1500,
   finalHoldMs: 400,
