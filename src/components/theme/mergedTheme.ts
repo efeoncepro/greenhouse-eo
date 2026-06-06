@@ -43,8 +43,10 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
         palette: {
           // primary is set by the provider via settings.primaryColor (source: primaryColorConfig.ts)
           // — no need to duplicate it here. See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §4.1
-          // secondary stays navy for now; AXIS lime-secondary ramp lives in theme.axis
-          // (brand-role flip pending decision — TASK-1034).
+          // secondary = structural Efeonce azure. DECISION (TASK-1034): NOT flipped to
+          // AXIS lime — GVC showed pervasive lime secondary competes with the blue
+          // primary (rainbow risk) in an enterprise tone. AXIS lime stays a RESERVED
+          // accent via theme.axis.ramp.secondary for specific moments.
           secondary: {
             main: '#023C70',
             light: '#035A9E',
@@ -79,6 +81,7 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       dark: {
         palette: {
           // primary is set by the provider via settings.primaryColor (same source as light)
+          // secondary = structural azure (see light scheme — AXIS lime not adopted, reserved accent)
           secondary: {
             main: '#023C70',
             light: '#035A9E',
