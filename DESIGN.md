@@ -282,7 +282,7 @@ Use the scale semantically:
 
 - `page-title` for product page titles
 - `section-title` for section headers inside cards and drawers
-- `label-lg` / `label-md` / `label-sm` for control / bold-label text (16 / 15 / 13px). `label-md` is the canonical control label (the `button` variant); `label-lg` and `label-sm` are the larger / smaller steps of the same label scale
+- `label-lg` / `label-md` / `label-sm` for control / bold-label text (16 / 14 / 13px). `label-md` is the canonical control label (the `button` variant); `label-lg` and `label-sm` are the larger / smaller steps of the same label scale
 - `body-lg` for primary readable copy
 - `body-md` for dense product UI copy, table cells, and helpers
 - `body-sm` for metadata and timestamps
@@ -314,12 +314,69 @@ Notes:
 - `label-lg` (16px) and `label-sm` (13px) are SoT tokens of the label scale with
   no dedicated MUI variant — apply them through the matching control (`<Button>`,
   `<Chip>`), never with `fontSize` inline.
-- Control text is owned by the SoT too: the only control-text size not already a
-  typography token is `<Button size="large">` (17px = `controlText.lg`,
-  intentionally one step above `label-lg`). `subtitle1` is the live `subheader`
-  token; `h6` reuses the `label-md` value (inline bold label).
+- Control text is owned by the SoT too (`controlText` ramp): Button `sm`/`md` =
+  14 (`= body-md`/`label-md`), Button `lg` = 16 (`= label-lg`), Tab = 14
+  (`controlText.md`), Dialog title = 16 (`= section-title`). `subtitle1` is the
+  live `subheader` token; `h6` reuses the `label-md` value (inline bold label);
+  `subtitle2` is governed via `body-sm` (`SECONDARY_VARIANT_TOKENS`).
 - The icon glyph sizes inside controls (Button/Chip icons, input legend) are not
   typography — they live in the read-only Vuexy `@core` overrides.
+
+### Token names (SoT) + weight roles
+
+The SoT (`typographyScale`) token names are camelCase mirrors of the contract:
+`headlineDisplay` · `headlineLg` · `headlineMd` · `pageTitle` · `sectionTitle` ·
+`subheader` · `labelLg` · `labelMd` · `labelSm` · `bodyLg` · `bodyMd` · `bodySm` ·
+`overline` · `numericId` · `numericAmount` · `kpiValue`. Add a role here (never an
+inline size); the bridge wires it to a MUI variant if it needs one.
+
+**Weight roles (Greenhouse uses 4):** `400` body · `600` labels/titles/buttons ·
+`700` reserved strong emphasis · `800` display/KPI. **`500` is loaded but has no
+semantic role** — evaluated and **declined** (TASK-1039): at 14px 400→500 is
+imperceptible and `500` already renders via Vuexy/MUI defaults (Tab/stepper/
+inputs); naming it would add a 4th ambiguous tier. Do not introduce a `500` role.
+
+### Charts derive from the SoT (TASK-1041)
+
+All charts consume typography from **one place** — the SoT (`theme.typography`) —
+via their canonical wrappers. **Never** set `fontSize`/`fontFamily` on chart text
+inline:
+
+- **Apex (33) + Recharts (10)** (SVG, all current charts): the wrappers
+  `AppReactApexCharts` + `AppRecharts` (`src/libs/styles/`) govern font family +
+  size with CSS `!important` reading `theme.typography.{fontFamily,caption}`. 100%
+  coverage, 0 bypass. Change the SoT → all 43 charts update; no per-chart edits.
+- **ECharts** (canvas, the policy for new high-impact dashboards): CSS can't reach
+  the canvas — those charts MUST consume `getChartTypographyFromTheme(theme)`
+  (`src/components/theme/chart-typography.ts`) in `option.textStyle`/`axisLabel`.
+
+### PDF + email = one semantic SSOT + adapter per medium
+
+The semantic roles (display / page-title / section-title / body / caption / …) are
+the single source; **each medium has an adapter** (mirrors the `axisSemanticHex`
+color precedent). Web → MUI variants (done). Charts → wrappers/helper (done).
+PDF/email have **no CSS cascade** (react-pdf `StyleSheet`, email inline styles), so
+governance is an **opt-in adapter**, not enforced CSS, and concrete sizes differ
+per medium (PDF in `pt` for dense legal docs, email in `px` with web-safe
+fallbacks). Today: PDF font **families** are centralized (`register-fonts.ts`,
+incl. `Geist SemiBold`/`ExtraBold` from TASK-1040) but the **type scale is not yet
+adapter-governed** (sizes are still per-component); email is not governed. Future
+PDF/email type adapters derive the role scale from the SoT — never re-hardcode.
+
+### Hard rules
+
+- **NEVER** `fontSize` inline on `<Typography>` — use a variant/token. Enforced by
+  `greenhouse/no-fontsize-inline-typography` (warn; scoped to `<Typography>` so it
+  never flags icon `fontSize`). Run `pnpm test:lint-rules` covers the rule tests.
+- **NEVER** monospace for numbers/IDs/amounts — Geist + `tabular-nums` (`numeric-id`
+  / `numeric-amount` / `kpi-value`).
+- **NEVER** edit `src/@core/theme/*` (Vuexy core) — override in `mergedTheme.ts`.
+- **NEVER** a token without a consumer; **NEVER** a fixed-type `clamp()` in product
+  (fluid type is marketing-only).
+- **ALWAYS** move the 3 layers together (SoT ≡ `mergedTheme` ≡ DESIGN.md front-matter)
+  or `typography-drift.test.ts` (37 tests) fails CI.
+- Living reference (internal): `/admin/design-system/typography/mockup` — the
+  "museum"; the rules an agent applies live here in DESIGN.md, not in the mockup.
 
 ## Layout
 
