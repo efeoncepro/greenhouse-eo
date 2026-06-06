@@ -274,8 +274,13 @@ export interface ErrorsCopy {
  * (skill greenhouse-ux-writing §6: error permanente = qué pasó + cómo salir).
  */
 export interface NotFoundCopy {
+  eyebrow: string
   title: string
   description: string
+  messages: Array<{
+    title: string
+    description: string
+  }>
   cta: string
   secondaryCta: string
 }
@@ -316,6 +321,15 @@ export interface ComingSoonCopy {
   eyebrow: string
   title: string
   description: string
+  /**
+   * Variantes creativas seleccionadas una vez al entrar. Mantienen la misma
+   * arquitectura funcional: mensaje principal + contexto + recuperacion.
+   */
+  messages: Array<{
+    title: string
+    status: string
+    recovery: string
+  }>
   /** Label del input (a11y — sr-only; el campo se pre-llena con el correo de Greenhouse para autenticados). */
   emailLabel: string
   emailPlaceholder: string

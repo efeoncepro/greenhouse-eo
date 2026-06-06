@@ -49,6 +49,7 @@ Canonical shape:
 - Low-frequency risky creation: prefer drawer or stepper with clear consequences.
 - Runtime dashboards: prefer command center with exceptions before totals.
 - AI helpers: prefer Adaptive Sidecar on desktop and temporary Drawer only on mobile/tablet; never make AI the only path for core operations.
+- Error and misc surfaces (404, 401, access denied, coming soon, maintenance, unavailable route) should be treated as product surfaces with brand voice and recovery architecture. Use concise creative microcopy variants selected once on entry when appropriate, but keep cause, action, and accessibility stable.
 - Contextual assistance, inspection, review, preview, and low-risk contextual editing: use `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` from `@/components/greenhouse/primitives` before creating any custom drawer/modal.
 - Adaptive Sidecar official variants are `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, and `runbook`; domain kinds such as `form`, `review`, `preview`, reconciliation, provenance/evidence, or guided operations must map to one of those variants.
 - Tables: use when comparison and scanning matter; pair with inspector for actions that require context.
@@ -60,6 +61,7 @@ Canonical shape:
 - Do not reintroduce generic landing-page composition inside operational tools.
 - Do not duplicate primary actions across table rows and inspector unless the duplication has a clear accessibility/efficiency reason.
 - Do not ship screenshots-free UI changes when the request is about visual quality.
+- Do not leave high-friction error surfaces with only generic template copy when the product voice can safely improve recovery and brand perception.
 - Do not implement a desktop Adaptive Sidecar as a boxed drawer/card overlay. It must be an in-flow, full-height work-canvas lane with non-modal semantics.
 - Do not create `FooDrawer`, `FooInspector`, and `FooAssistant` as separate components when one primitive plus functional variants covers the family.
 - Do not add a variant that only changes color, radius, shadow, or icon.

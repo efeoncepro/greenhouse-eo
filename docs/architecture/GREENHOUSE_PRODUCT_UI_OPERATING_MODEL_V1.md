@@ -85,6 +85,7 @@ Use the pattern that fits the task:
 - List-detail for entity browsing and comparison.
 - Wizard for low-frequency, high-risk creation.
 - Adaptive sidecar for contextual assistance, inspection, review, preview, and low-risk contextual editing where the main work context must remain visible.
+- Error and misc states (404, 401, access denied, coming soon, maintenance, unavailable route) as compact brand-and-recovery surfaces: creative enough to feel owned by Greenhouse, structured enough to preserve cause, next action, accessibility and stable CTAs.
 - AI drawer only as mobile/tablet temporary behavior or legacy escape hatch; desktop assistant surfaces should prefer adaptive sidecar when density allows.
 - Modal Dialog for destructive, irreversible, legal, financial, or maker-checker decisions.
 
@@ -116,6 +117,7 @@ A UI is not Greenhouse-enterprise-ready if:
 - partial data looks complete;
 - mobile is just a compressed desktop;
 - important state is conveyed only by color;
+- high-friction error surfaces use generic template copy, or creative variants obscure cause/recovery, rotate while reading, or hardcode reusable JSX copy;
 - screenshots were not reviewed for a visual-quality request.
 
 ## Product UI ADR

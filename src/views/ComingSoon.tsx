@@ -141,10 +141,20 @@ const ComingSoon = ({
   const miscBackground = useImageVariant(mode, lightImg, darkImg)
   const launchMs = useMemo(() => new Date(launchAtIso).getTime(), [launchAtIso])
 
+  const messages = useMemo(
+    () =>
+      copy.messages.length > 0
+        ? copy.messages
+        : [{ title: copy.title, status: copy.description, recovery: '' }],
+    [copy.description, copy.messages, copy.title]
+  )
+
   // Countdown — mount-gated to avoid SSR/CSR hydration mismatch.
   const [mounted, setMounted] = useState(false)
   const [remaining, setRemaining] = useState<Remaining>(() => computeRemaining(launchMs))
   const [launched, setLaunched] = useState(false)
+  const [activeMessageIndex, setActiveMessageIndex] = useState(0)
+  const activeMessage = messages[activeMessageIndex % messages.length]
 
   useEffect(() => {
     if (isPlaceholderLaunch && process.env.NODE_ENV !== 'production') {
@@ -168,6 +178,15 @@ const ComingSoon = ({
 
     return () => window.clearInterval(id)
   }, [launchMs, redirectPath, router, isPlaceholderLaunch])
+
+  useEffect(() => {
+    if (messages.length < 2) return
+
+    const randomValues = new Uint32Array(1)
+
+    window.crypto.getRandomValues(randomValues)
+    setActiveMessageIndex((randomValues[0] ?? 0) % messages.length)
+  }, [messages.length])
 
   // Form. Authenticated users get a one-click "Notify me" (subscribes their
   // Greenhouse email — nothing to type, nothing redundant shown). The email
@@ -259,31 +278,73 @@ const ComingSoon = ({
           variant='tonal'
           color='primary'
           round='true'
-          sx={{ mb: 3, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}
+          sx={{
+            mb: { xs: 2.5, md: 2.25 },
+            height: { xs: 28, sm: 32 },
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            fontWeight: 600,
+            px: 0.5,
+            '& .MuiChip-label': { fontSize: { xs: '0.6875rem', sm: '0.75rem' } }
+          }}
         />
 
         {/* Hero headline (Poppins via h-variant) */}
-        <Typography
-          variant='h2'
-          component='h1'
+        <Box
+          key={activeMessageIndex}
           sx={{
-            fontWeight: 600,
-            lineHeight: 1.2,
-            letterSpacing: 0,
-            textWrap: 'balance',
-            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-            mb: 2
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            minBlockSize: { sm: 162, md: 134 },
+            animation: theme => `${fadeRise} 320ms ${theme.transitions.easing.easeOut} both`,
+            '@media (prefers-reduced-motion: reduce)': {
+              animation: 'none'
+            }
           }}
         >
-          {copy.title}
-        </Typography>
-        <Typography
-          variant='body1'
-          color='text.secondary'
-          sx={{ maxInlineSize: 600, lineHeight: 1.7, textWrap: 'balance', mb: 3 }}
-        >
-          {copy.description}
-        </Typography>
+          <Typography
+            variant='h2'
+            component='h1'
+            sx={{
+              fontWeight: 600,
+              lineHeight: 1.16,
+              letterSpacing: 0,
+              textWrap: 'balance',
+              fontSize: { xs: '1.5rem', sm: '2.5rem', md: '3rem' },
+              mb: { xs: 1.5, md: 1.75 }
+            }}
+          >
+            {activeMessage.title}
+          </Typography>
+          <Typography
+            variant='body1'
+            color='text.secondary'
+            sx={{
+              maxInlineSize: 620,
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              lineHeight: { xs: 1.45, sm: 1.65 },
+              textWrap: 'balance',
+              mb: 0.75
+            }}
+          >
+            {activeMessage.status}
+          </Typography>
+          {activeMessage.recovery && (
+            <Typography
+              variant='body1'
+              color='text.secondary'
+              sx={{
+                maxInlineSize: 620,
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                lineHeight: { xs: 1.45, sm: 1.65 },
+                textWrap: 'balance'
+              }}
+            >
+              {activeMessage.recovery}
+            </Typography>
+          )}
+        </Box>
 
         {/* Countdown */}
         <Box
@@ -292,10 +353,10 @@ const ComingSoon = ({
           sx={{
             display: 'grid',
             gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(4, auto)' },
-            gap: { xs: 3, sm: 2.5 },
-            mb: 3,
+            gap: { xs: 1.5, sm: 2 },
+            mb: { xs: 2.25, sm: 2.75 },
             justifyContent: 'center',
-            maxInlineSize: { xs: 320, sm: 'none' },
+            maxInlineSize: { xs: 260, sm: 'none' },
             marginInline: 'auto'
           }}
         >
@@ -303,16 +364,16 @@ const ComingSoon = ({
             <Box
               key={unit.label}
               sx={{
-                minInlineSize: { xs: 76, sm: 104 },
-                px: { xs: 3, sm: 4 },
-                py: { xs: 4, sm: 4 },
+                minInlineSize: { xs: 62, sm: 96 },
+                px: { xs: 2, sm: 3.5 },
+                py: { xs: 2.25, sm: 3.25 },
                 borderRadius: theme => `${theme.shape.customBorderRadius.xl}px`,
                 border: theme => `1px solid ${theme.palette.divider}`,
                 backgroundColor: 'background.paper',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 2
+                gap: 1.75
               }}
             >
               <Typography
@@ -322,13 +383,17 @@ const ComingSoon = ({
                   fontVariantNumeric: 'tabular-nums',
                   fontWeight: 500,
                   lineHeight: 1,
-                  fontSize: { xs: '2rem', sm: '2.75rem' },
+                  fontSize: { xs: '1.5rem', sm: '2.5rem' },
                   color: 'text.primary'
                 }}
               >
                 {mounted ? pad2(unit.value) : '--'}
               </Typography>
-              <Typography variant='overline' color='text.secondary' sx={{ lineHeight: 1.2 }}>
+              <Typography
+                variant='overline'
+                color='text.secondary'
+                sx={{ lineHeight: 1.2, fontSize: { xs: '0.625rem', sm: '0.75rem' } }}
+              >
                 {unit.label}
               </Typography>
             </Box>
@@ -447,7 +512,12 @@ const ComingSoon = ({
                     variant='contained'
                     size='large'
                     disabled={submitState === 'submitting'}
-                    sx={{ borderRadius: 9999, paddingInline: 8, paddingBlock: 2.5 }}
+                    sx={{
+                      borderRadius: 9999,
+                      paddingInline: { xs: 6, sm: 8 },
+                      paddingBlock: { xs: 2, sm: 2.5 },
+                      fontSize: { xs: '0.9375rem', sm: '1rem' }
+                    }}
                   >
                     {submitState === 'submitting' ? copy.notifyCtaLoading : copy.notifyCta}
                   </Button>
@@ -460,6 +530,7 @@ const ComingSoon = ({
                     sx={{
                       color: 'text.secondary',
                       fontWeight: 500,
+                      fontSize: { xs: '0.875rem', sm: '0.9375rem' },
                       textDecoration: 'none',
                       '&:hover, &:focus-visible': {
                         color: 'secondary.main',

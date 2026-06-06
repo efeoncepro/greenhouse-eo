@@ -119,7 +119,7 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
             flexDirection: 'column',
             alignItems: 'center',
             inlineSize: { xs: '90vw', sm: '100%' },
-            mb: { xs: 5, md: 4 }
+            mb: { xs: 4.25, md: 3.25 }
           }}
         >
           <CustomChip
@@ -129,11 +129,12 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
             color='primary'
             round='true'
             sx={{
-              mb: { xs: 2.5, md: 2.5 },
+              mb: { xs: 1.75, md: 1.5 },
               textTransform: 'uppercase',
-              letterSpacing: '0.08em',
+              letterSpacing: '0.06em',
               fontWeight: 600,
-              '& .MuiChip-label': { fontSize: { xs: '0.75rem', sm: '0.8125rem' } }
+              px: 0.5,
+              '& .MuiChip-label': { fontSize: { xs: '0.6875rem', sm: '0.75rem' } }
             }}
           />
           <Typography
@@ -143,11 +144,11 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
             sx={{
               fontFamily: theme => theme.typography.h1.fontFamily,
               fontWeight: 800,
-              lineHeight: 0.88,
+              lineHeight: 0.9,
               letterSpacing: 0,
-              fontSize: { xs: '4.5rem', sm: '7rem', md: '8rem' },
-              mb: { xs: 2.5, md: 2 },
-              textShadow: theme => `0 12px 30px ${alpha(theme.palette.text.primary, 0.08)}`
+              fontSize: { xs: '4rem', sm: '6rem', md: '6.75rem' },
+              mb: { xs: 2, md: 1.5 },
+              textShadow: theme => `0 10px 24px ${alpha(theme.palette.text.primary, 0.06)}`
             }}
           >
             401
@@ -173,8 +174,8 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
                 lineHeight: 1.2,
                 letterSpacing: 0,
                 textWrap: 'balance',
-                fontSize: { xs: '1.375rem', sm: '1.5rem' },
-                mb: { xs: 1.5, md: 2 }
+                fontSize: { xs: '1.25rem', sm: '1.375rem' },
+                mb: { xs: 1.25, md: 1.5 }
               }}
             >
               {activeMessage.title}
@@ -189,14 +190,14 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
             >
               {activeMessage.status ? (
                 <Typography
-                  color='text.primary'
-                  sx={{
-                    fontWeight: 600,
-                    lineHeight: 1.45,
-                    textWrap: 'balance',
-                    fontSize: { xs: '0.9375rem', sm: '1rem' }
-                  }}
-                >
+                color='text.primary'
+                sx={{
+                  fontWeight: 600,
+                  lineHeight: 1.45,
+                  textWrap: 'balance',
+                  fontSize: { xs: '0.875rem', sm: '0.9375rem' }
+                }}
+              >
                   {activeMessage.status}
                 </Typography>
               ) : null}
@@ -205,7 +206,7 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
                 sx={{
                   lineHeight: { xs: 1.5, md: 1.55 },
                   textWrap: 'balance',
-                  fontSize: { xs: '0.9375rem', sm: '1rem' }
+                  fontSize: { xs: '0.875rem', sm: '0.9375rem' }
                 }}
               >
                 {activeMessage.detail}
@@ -216,7 +217,7 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
                   sx={{
                     lineHeight: 1.5,
                     textWrap: 'balance',
-                    fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                    fontSize: { xs: '0.8125rem', sm: '0.8125rem' },
                     opacity: 0.82
                   }}
                 >
@@ -246,10 +247,10 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
             startIcon={<i className='tabler-home' />}
             sx={{
               inlineSize: { xs: '100%', sm: 'auto' },
-              maxInlineSize: { xs: 292, sm: 'none' },
-              px: { xs: 5, sm: 6 },
-              py: { xs: 1.5, sm: 2 },
-              fontSize: { xs: '0.9375rem', sm: '1rem' }
+              maxInlineSize: { xs: 276, sm: 'none' },
+              px: { xs: 4.5, sm: 5.5 },
+              py: { xs: 1.25, sm: 1.5 },
+              fontSize: { xs: '0.875rem', sm: '0.9375rem' }
             }}
           >
             {copy.cta}
@@ -263,10 +264,10 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
             onClick={() => router.back()}
             sx={{
               inlineSize: { xs: '100%', sm: 'auto' },
-              maxInlineSize: { xs: 292, sm: 'none' },
-              px: { xs: 5, sm: 6 },
-              py: { xs: 1.5, sm: 2 },
-              fontSize: { xs: '0.9375rem', sm: '1rem' },
+              maxInlineSize: { xs: 276, sm: 'none' },
+              px: { xs: 4.5, sm: 5.5 },
+              py: { xs: 1.25, sm: 1.5 },
+              fontSize: { xs: '0.875rem', sm: '0.9375rem' },
               backgroundColor: theme => alpha(theme.palette.background.paper, 0.72),
               borderColor: theme => alpha(theme.palette.secondary.main, 0.24),
               '&:hover': {
@@ -284,7 +285,7 @@ const NotAuthorized = ({ mode, copy }: { mode: SystemMode; copy: NotAuthorizedCo
             alt=''
             aria-hidden='true'
             src='/images/illustrations/characters/greenhouse-401.png'
-            className='bs-[200px] md:bs-[360px] lg:bs-[392px] mbs-6 md:mbs-9 lg:mbs-10'
+            className='bs-[200px] md:bs-[348px] lg:bs-[384px] mbs-5 md:mbs-8 lg:mbs-8'
           />
         </CharacterFade>
       </ContentStack>

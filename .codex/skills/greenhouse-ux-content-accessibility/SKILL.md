@@ -86,6 +86,15 @@ Use `GREENHOUSE_UI_ORCHESTRATION_V1.md` only if pattern selection is still unres
 - If data is partial, say it.
 - If the system depends on sync, imports, or overrides, do not imply real-time truth.
 
+## Error surface microcopy rules
+
+- Treat unavoidable error surfaces such as 404, 401, access denied, maintenance, empty launch states, and unavailable routes as brand-and-recovery moments, not throwaway generic errors.
+- Use creative microcopy when it improves recall or reduces friction, but never at the expense of task clarity: every variant must still communicate what happened, likely cause, and the next safe action.
+- Prefer a small set of curated variants (for example, 5) selected once on page entry. Do not rotate copy while the user is reading unless the interaction explicitly asks for rotation.
+- Keep the functional recovery path stable across variants: primary CTA, secondary CTA, aria labels, and error semantics should not change randomly.
+- Keep reusable variants in `src/lib/copy/*`; do not hardcode reusable 404/401/empty/error strings in JSX.
+- For scan-heavy error copy, split content into short signals such as status, reason, and recovery instead of forcing a paragraph when the user needs quick orientation.
+
 ## Animation copy rules
 
 - Animated empty states keep the same copy discipline as static ones: title, description, and CTA must stand on their own without mentioning the animation.

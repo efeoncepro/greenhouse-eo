@@ -599,6 +599,18 @@ const subject = t.emails.subjects.payrollExport('Marzo 2026', 4)
   → Cerca del dominio (helper o componente) pero PASA por skill greenhouse-ux-writing para validar tono.
 ```
 
+### Error surfaces y variantes creativas
+
+Las surfaces 404, 401, access denied, coming soon, maintenance y rutas no disponibles deben tratarse como microcopy funcional de producto, no como texto decorativo. La regla canonica es brand + recuperacion: el mensaje puede tener personalidad, pero siempre debe dejar claro que paso y que camino tomar.
+
+Contrato:
+- guardar variantes reutilizables en `src/lib/copy/dictionaries/<locale>/...` y tiparlas en `src/lib/copy/types.ts`
+- usar 3 a 5 variantes curadas cuando la surface lo amerite; seleccionarlas una vez al entrar a la pantalla
+- no rotar mensajes mientras el usuario lee ni cambiar CTAs por variante
+- mantener estable la arquitectura de recuperacion: primary CTA, secondary CTA cuando aplique, aria-labels y semantica
+- dividir mensajes largos en status, detalle y recuperacion cuando mejore escaneabilidad
+- validar con GVC si cambia layout, jerarquia, personaje, microcopy visible o responsive
+
 ### Casos por tipo
 
 **1. Product nomenclature** — `greenhouse-nomenclature.ts`

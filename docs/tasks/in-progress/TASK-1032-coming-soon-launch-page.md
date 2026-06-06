@@ -13,7 +13,7 @@ Página **"Coming Soon / Algo nuevo está creciendo"** branded, hermana de 404/4
 
 - **Code complete + funcional**: backend verificado **end-to-end en vivo** (created → idempotent already_subscribed → invalid_email 422 → no-email 422).
 - **UI enterprise** iterada en loop GVC (desktop + mobile) con skills `modern-ui`/`greenhouse-ux`/`state-design`/`forms-ux`/`greenhouse-ux-writing`.
-- **Fine-tuning visual local avanzado:** `/coming-soon` quedó más compacto en desktop; `/401` recibió pase enterprise manteniendo el código como protagonista, con eyebrow de acceso restringido, 5 variantes de microcopy creativo+funcional seleccionadas una vez al entrar, microcopy estructurado para escaneo (`status` → `detail` → `recovery`), acción secundaria `Volver atrás`, botones con iconos y scenario GVC propio (`not-authorized`).
+- **Fine-tuning visual local avanzado:** `/coming-soon` quedó más compacto en desktop, ahora usa 5 variantes de microcopy creativo+funcional seleccionadas una vez al entrar y estructura escaneable (`title` → `status` → `recovery`); el countdown se bajó de peso visual y mobile se densificó **sin achicar Nexa**. `/404` y `/401` recibieron pase enterprise manteniendo el código como protagonista, con eyebrow de estado, acciones con iconos, secundario outline, personaje responsive controlado y scenario GVC propio (`not-found` / `not-authorized`). La última pasada bajó peso visual de chip/código/título/botones, corrigió el centrado óptico del chip frente al número y devolvió presencia a Nexa sin volver al hero pesado. `/404` y `/401` usan 5 variantes de microcopy creativo+funcional seleccionadas una vez al entrar; `/401` además usa estructura escaneable (`status` → `detail` → `recovery`).
 - `tsc` 0 errores, `eslint` limpio en archivos propios. Ruta responde 200 en dev.
 
 ## Decisiones del operador (LOCKED)
@@ -39,11 +39,12 @@ Página **"Coming Soon / Algo nuevo está creciendo"** branded, hermana de 404/4
 - `src/lib/copy/dictionaries/{es-CL,en-US}/comingSoon.ts` — copy bilingüe
 - `migrations/20260606101244591_launch-notifications-coming-soon.sql` — tabla `greenhouse_core.launch_notifications` (**aplicada** al Cloud SQL dev + tipos regenerados)
 - `scripts/frontend/scenarios/coming-soon.scenario.ts` — GVC desktop + mobile
+- `scripts/frontend/scenarios/not-found.scenario.ts` — GVC desktop + mobile para `/404`
 - `scripts/frontend/scenarios/not-authorized.scenario.ts` — GVC desktop + mobile para `/401`
 - `public/images/illustrations/characters/greenhouse-coming-soon.png` — ilustración (placeholder de Figma)
 
 **Modificados:**
-- `src/lib/copy/types.ts` (+ `ComingSoonCopy` + en `MicrocopyDictionary`)
+- `src/lib/copy/types.ts` (+ `ComingSoonCopy.messages` + en `MicrocopyDictionary`)
 - `src/lib/copy/dictionaries/{es-CL,en-US}/index.ts` (registran comingSoon)
 - `src/lib/copy/dictionaries/{es-CL,en-US}/{notFound,notAuthorized}.ts` (copy creativo; `/401` agrega eyebrow + acción secundaria)
 - `src/views/{NotFound,NotAuthorized}.tsx` (montan `MiscPageEfeonceFooter`; `/401` refinado como estado de permisos enterprise)
@@ -61,7 +62,7 @@ Página **"Coming Soon / Algo nuevo está creciendo"** branded, hermana de 404/4
 
 ## Pendientes (para la nueva sesión)
 
-1. **VISUAL FINE-TUNING restante:** `/coming-soon` y `/401` tienen GVC local verde, pero falta aprobación visual final del operador. Última evidencia: `.captures/2026-06-06T11-49-56_coming-soon` y `.captures/2026-06-06T12-28-24_not-authorized`.
+1. **VISUAL FINE-TUNING restante:** `/coming-soon`, `/404` y `/401` tienen GVC local verde, pero falta aprobación visual final del operador. Última evidencia: `.captures/2026-06-06T13-09-32_coming-soon`, `.captures/2026-06-06T12-54-45_not-found` y `.captures/2026-06-06T12-46-28_not-authorized`.
 2. **Fecha real**: setear `COMING_SOON_LAUNCH_AT` (ISO+tz, ej. `2026-08-01T09:00:00-04:00`) en los envs cuando el operador la defina. Hoy placeholder (aviso solo en consola dev).
 3. **Ilustración definitiva**: reemplazar `public/images/illustrations/characters/greenhouse-coming-soon.png` con el asset propietario de Efeonce cuando el equipo creativo lo entregue.
 4. **Estados sin captura aún** (cerrar loop): éxito post-Notifícame (check verde + "Listo… 🌱"), campo revelado ("¿Prefieres otro correo?"), variante anónima, dark mode (logo Efeonce negativo).

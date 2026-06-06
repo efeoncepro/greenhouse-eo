@@ -17,6 +17,33 @@ export const comingSoon: ComingSoonCopy = {
   title: 'Algo nuevo está creciendo',
   description:
     'Estamos cultivando la próxima evolución de tu ecosistema. Déjanos tu correo y te avisaremos apenas florezca. 🌱',
+  messages: [
+    {
+      title: 'Algo nuevo está creciendo',
+      status: 'Estamos cultivando la próxima evolución de tu ecosistema.',
+      recovery: 'Déjanos tu correo y te avisaremos apenas florezca.'
+    },
+    {
+      title: 'La próxima señal ya viene',
+      status: 'Estamos afinando una nueva forma de ver y mover tu operación.',
+      recovery: 'Súmate a la lista y te avisaremos cuando esté disponible.'
+    },
+    {
+      title: 'Estamos preparando el invernadero',
+      status: 'La próxima capacidad de Greenhouse está tomando forma.',
+      recovery: 'Déjanos tu correo y te avisaremos cuando abramos la puerta.'
+    },
+    {
+      title: 'Una mejora viene en camino',
+      status: 'Estamos cerrando los últimos detalles antes de activarla.',
+      recovery: 'Regístrate y te avisaremos apenas esté lista para entrar.'
+    },
+    {
+      title: 'Falta poco para abrir',
+      status: 'Esta sección se está preparando para llegar con buen contexto.',
+      recovery: 'Pide el aviso y vuelve cuando esté disponible.'
+    }
+  ],
   emailLabel: 'Correo electrónico',
   emailPlaceholder: 'ej. nombre@empresa.com',
   notifyCta: 'Notifícame',

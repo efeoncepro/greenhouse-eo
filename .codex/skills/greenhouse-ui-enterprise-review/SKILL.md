@@ -33,6 +33,7 @@ Score 1-5:
 - repo consistency
 - implementation maintainability
 - adaptive sidecar fit when the UI is contextual assistance, inspection, review, preview, or low-risk editing
+- error-surface recovery and brand voice for 404/401/access-denied/unavailable routes
 
 ## Blockers
 
@@ -43,6 +44,7 @@ Score 1-5:
 - Important state is color-only.
 - UI is generic template composition rather than task-native.
 - Copy is vague or reusable copy is hardcoded in JSX.
+- High-friction error surfaces use generic template copy only, or creative variants obscure cause/recovery, rotate while reading, or hardcode reusable copy in JSX.
 - New component bypasses established Greenhouse primitives without rationale.
 - Reusable UI creates parallel components instead of applying Primitive + Variants + Kinds (`GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`).
 - A `variant` only changes color/radius/shadow/icon instead of behavior, density, state model, action placement, or microinteraction contract.
