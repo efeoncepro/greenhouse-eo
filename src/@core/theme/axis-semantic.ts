@@ -43,6 +43,27 @@ type SemanticRole = {
  *   - secondary (AXIS lime ramp) is a brand-role flip pending explicit decision
  *     (tracked in TASK-1034); its full ramp is still available via theme.axis.
  */
+/**
+ * Canonical semantic HEX SoT (TASK-1034 Slice 4) for NON-MUI consumers that
+ * cannot read `theme.palette` — chart configs, PDF tokens (`@react-pdf`), the
+ * `greenhouse-nomenclature` status maps, AI art-direction prompts. These MUST
+ * import from here instead of hardcoding `#6ec207`/`#ff6500`/`#bb1954` (the
+ * legacy pre-AXIS hexes that drifted from the adopted semantics in Slice 2).
+ *
+ * Derived from `axisSemanticPalette` below (same source as the MUI theme), so a
+ * drift-guard test can assert: theme.palette.<role>.main === axisSemanticHex.<role>
+ * === every non-theme consumer. One SoT, zero hardcoded semantic hexes.
+ *
+ * NOTE error = #cc3d41 (AXIS error-800, the AA-capable solid-fill main from
+ * Slice 2b), NOT the vibrant #ff4c51 (which is error.light, accents only).
+ */
+export const axisSemanticHex = {
+  success: axisRamp.success[500],
+  warning: axisRamp.warning[500],
+  error: axisRamp.error[800],
+  info: axisRamp.info[500]
+} as const satisfies Record<'success' | 'warning' | 'error' | 'info', string>
+
 export const axisSemanticPalette = {
   success: {
     main: axisRamp.success[500],

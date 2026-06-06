@@ -1,3 +1,10 @@
+// AXIS semantic SoT (TASK-1034 Slice 4). Semantic status maps below derive their
+// hue/text/tint from here — NEVER hardcode the legacy #6ec207/#ff6500/#bb1954.
+// Domain/categorical palettes (cscPhase, service, categories) keep deliberate
+// brand hues and are intentionally NOT migrated.
+import { axisSemanticHex } from '@core/theme/axis-semantic'
+import { axisOpacity } from '@core/theme/axis-tokens'
+
 export const GH_CLIENT_NAV = {
   dashboard: { label: 'Pulse', subtitle: 'Vista general de tu operacion' },
   projects: { label: 'Proyectos', subtitle: 'Proyectos activos' },
@@ -190,22 +197,24 @@ export const GH_COLORS = {
     }
   },
 
+  // Semantic status (traffic-light). AXIS SoT — TASK-1034 Slice 4.
   semaphore: {
-    green: { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' },
-    yellow: { source: '#ff6500', bg: '#fff2ea', text: '#ff6500' },
-    red: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' }
+    green: { source: axisSemanticHex.success, bg: axisOpacity.success[8], text: axisSemanticHex.success },
+    yellow: { source: axisSemanticHex.warning, bg: axisOpacity.warning[8], text: axisSemanticHex.warning },
+    red: { source: axisSemanticHex.error, bg: axisOpacity.error[8], text: axisSemanticHex.error }
   },
 
   /**
    * @deprecated Use theme.palette.{success,warning,error,info} instead.
    * Kept temporarily for backwards compat — will be removed when all consumers migrate.
    * See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §3.2
+   * Values derive from the AXIS SoT (TASK-1034 Slice 4) so they no longer drift.
    */
   semantic: {
-    success: { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' },
-    warning: { source: '#ff6500', bg: '#fff2ea', text: '#ff6500' },
-    danger: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' },
-    info: { source: '#0375db', bg: '#eaf3fc', text: '#0375db' }
+    success: { source: axisSemanticHex.success, bg: axisOpacity.success[8], text: axisSemanticHex.success },
+    warning: { source: axisSemanticHex.warning, bg: axisOpacity.warning[8], text: axisSemanticHex.warning },
+    danger: { source: axisSemanticHex.error, bg: axisOpacity.error[8], text: axisSemanticHex.error },
+    info: { source: axisSemanticHex.info, bg: axisOpacity.info[8], text: axisSemanticHex.info }
   },
 
   brand: {
@@ -242,9 +251,10 @@ export const GH_COLORS = {
   chart: {
     primary: '#0375db',
     secondary: '#024c8f',
-    success: '#6ec207',
-    warning: '#ff6500',
-    error: '#bb1954',
+    // Semantic series — AXIS SoT (TASK-1034 Slice 4).
+    success: axisSemanticHex.success,
+    warning: axisSemanticHex.warning,
+    error: axisSemanticHex.error,
     info: '#023c70',
     neutral: '#dbdbdb'
   },

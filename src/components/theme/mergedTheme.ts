@@ -63,14 +63,15 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
             ...neutrals.light.customColors,
             // channel-based (AXIS ink), mode-specific — same in both fragments
             inputBorder: 'rgb(var(--mui-mainColorChannels-light) / 0.22)',
-            // Greenhouse brand customColors — INTACT (Slice 4 territory)
+            // Greenhouse brand customColors (navy family + alloy).
+            // neonLime/sunsetOrange/crimson removed in Slice 4 (TASK-1034): dead
+            // pseudo-semantic tokens that drifted from the AXIS semantics; zero
+            // runtime consumers (audited). Semantic hexes now flow from the AXIS
+            // SoT (axisSemanticHex). efeonce-crimson primary option is unaffected.
             midnight: '#022A4E',
             deepAzure: '#023C70',
             royalBlue: '#024C8F',
             coreBlue: '#0375DB',
-            neonLime: '#6EC207',
-            sunsetOrange: '#FF6500',
-            crimson: '#BB1954',
             lightAlloy: '#DBDBDB'
           }
         }
@@ -96,14 +97,15 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
             ...neutrals.dark.customColors,
             // channel-based (AXIS ink), mode-specific — same in both fragments
             inputBorder: 'rgb(var(--mui-mainColorChannels-dark) / 0.22)',
-            // Greenhouse brand customColors — INTACT (Slice 4 territory)
+            // Greenhouse brand customColors (navy family + alloy).
+            // neonLime/sunsetOrange/crimson removed in Slice 4 (TASK-1034): dead
+            // pseudo-semantic tokens that drifted from the AXIS semantics; zero
+            // runtime consumers (audited). Semantic hexes now flow from the AXIS
+            // SoT (axisSemanticHex). efeonce-crimson primary option is unaffected.
             midnight: '#022A4E',
             deepAzure: '#023C70',
             royalBlue: '#024C8F',
             coreBlue: '#0375DB',
-            neonLime: '#6EC207',
-            sunsetOrange: '#FF6500',
-            crimson: '#BB1954',
             lightAlloy: '#DBDBDB'
           }
         }

@@ -385,9 +385,9 @@ Each color ships with opacities: `lighterOpacity` (8%), `lightOpacity` (16%), `m
 | `customColors.coreBlue` | `#0375DB` | Brand accent (= primary default) |
 | `customColors.deepAzure` | `#023C70` | Mirror of `secondary.main` for contexts where brand naming reads better |
 | `customColors.royalBlue` | `#024C8F` | Mid-stop in the blue ramp |
-| `customColors.neonLime` | `#6EC207` | Legacy brand lime — **ya NO es mirror de `success.main`** (AXIS success = `#28C76F`). Es el lime de marca (= AXIS secondary). Migrar consumers en Slice 4 (TASK-1034). |
-| `customColors.sunsetOrange` | `#FF6500` | Legacy brand orange — **ya NO es mirror de `warning.main`** (AXIS warning = `#FFB703`). Migrar en Slice 4. |
-| `customColors.crimson` | `#BB1954` | Legacy brand crimson — **ya NO es mirror de `error.main`** (AXIS error = `#FF4C51`). Migrar en Slice 4. |
+| ~~`customColors.neonLime`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Token pseudo-semántico legacy sin consumers reales (auditado). Para verde semántico usar `theme.palette.success` o el SoT `axisSemanticHex.success` (`#28C76F`); el lime de marca vive en `theme.axis.ramp.secondary[500]`. |
+| ~~`customColors.sunsetOrange`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Sin consumers. Para ámbar semántico usar `theme.palette.warning` / `axisSemanticHex.warning` (`#FFB703`). |
+| ~~`customColors.crimson`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Sin consumers; divergía de `error.main` (AXIS error = `#CC3D41`, no `#FF4C51`). Para error usar `theme.palette.error` / `axisSemanticHex.error`. La opción de color primario `efeonce-crimson` (`primaryColorConfig.ts`) NO se ve afectada. |
 | `customColors.bodyText` | tied to `text.primary` | Body text in non-MUI primitives |
 | `customColors.secondaryText` | tied to `text.secondary` | Helpers in non-MUI primitives |
 | `customColors.claimGray` | `#848484` | Disabled / muted text in non-MUI primitives |

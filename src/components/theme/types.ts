@@ -203,9 +203,6 @@ declare module '@mui/material/styles' {
       deepAzure?: string
       royalBlue?: string
       coreBlue?: string
-      neonLime?: string
-      sunsetOrange?: string
-      crimson?: string
       lightAlloy?: string
       bodyText?: string
       secondaryText?: string
@@ -225,9 +222,6 @@ declare module '@mui/material/styles' {
       deepAzure?: string
       royalBlue?: string
       coreBlue?: string
-      neonLime?: string
-      sunsetOrange?: string
-      crimson?: string
       lightAlloy?: string
       bodyText?: string
       secondaryText?: string

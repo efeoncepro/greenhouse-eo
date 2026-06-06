@@ -89,9 +89,26 @@ AXIS (Figma, SoT)
   - **PENDIENTE al flip (NO en este commit):** actualizar DESIGN.md `neutral`/`surface*`/`background-dark`/
     `text-*` + `GREENHOUSE_DESIGN_TOKENS_V1.md` §8.1 a los neutrales AXIS, en el MISMO commit que flipea
     el flag a ON (mantiene contract==runtime; text con alpha → sólido representativo para el contrastCheck).
-- [ ] **Slice 4 — Migración consumers + docs + drift guard.** Migrar usos de `customColors` legacy a
-  tokens AXIS; sincronizar DESIGN.md + `GREENHOUSE_DESIGN_TOKENS_V1.md`; agregar guard de drift
-  (snapshot test o ritual de regeneración documentado).
+- [x] **Slice 4 — Migración consumers + drift guard (DONE 2026-06-06).** Audit reveló que el "~41
+  archivos" estaba inflado: el token `customColors.{neonLime,sunsetOrange,crimson}` tenía **cero
+  consumers reales** (solo type decl + test mock); el drift real eran ~hex legacy hardcodeados en
+  config/PDF/charts.
+  - **SoT semántico:** `axisSemanticHex` en `axis-semantic.ts` (success `#28c76f`, warning `#ffb703`,
+    error `#cc3d41` [error-800 AA, no el #ff4c51], info `#00bad1`), derivado de `axisSemanticPalette`
+    (mismo origen que el theme) → un solo SoT para consumers non-MUI.
+  - **Token muerto REMOVIDO** (veredicto skills `design-system-governance` + `arch-architect`: cero
+    consumers ⇒ grace-period nulo; footgun de misuse; two-way door reversible). Quitado de
+    `mergedTheme.ts` (light+dark) + `types.ts` + `test/render.tsx`. `efeonce-crimson` primary NO tocado.
+  - **Consumers semánticos migrados al SoT:** `lib/finance/pdf/tokens.ts` (success/warning),
+    `config/greenhouse-nomenclature.ts` (`semaphore`/`semantic`/`chart` semantic roles; bg→`axisOpacity[8]`),
+    `lib/ai/image-generator.ts` (prompt). Categóricos de dominio (cscPhase/service/categories/subBrand)
+    **NO migrados** (paleta de categorías deliberada, decisión operador).
+  - **Drift guard:** `axis-semantic-drift.test.ts` (7 tests) asserta theme ≡ nomenclature ≡ PDF ≡
+    `axisSemanticHex` + que ningún hex legacy sobreviva. Falla CI ante cualquier drift futuro.
+  - **V1 §8.1** sincronizado (tokens marcados REMOVIDO + apuntan al SoT; corregido stale error #FF4C51→#CC3D41).
+    DESIGN.md sin cambios (los semánticos ya eran AXIS desde Slice 2; Slice 4 solo alinea consumers).
+  - Verificado: tsc/lint/design:lint(0/0/1) verdes · 154 tests consumers + 7 drift · GVC OTD% trend card
+    = verde AXIS `#28c76f` coherente (antes lime legacy).
 - [ ] **Slice 5 — Shadows/elevación (diferido del scope de color).** Tokens de sombra AXIS sm/md/lg light+dark.
 
 ## Archivos (Slice 0)
