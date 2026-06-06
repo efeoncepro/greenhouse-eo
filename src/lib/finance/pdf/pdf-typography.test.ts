@@ -34,7 +34,7 @@ describe('getPdfTypography — derivación del SoT', () => {
 
   it('expone todos los roles canónicos con tamaño pt positivo', () => {
     const roles: PdfTypographyRole[] = [
-      'display', 'pageTitle', 'sectionTitle', 'subtitle', 'label', 'body',
+      'display', 'pageTitle', 'titleLg', 'sectionTitle', 'subtitle', 'label', 'body',
       'bodyStrong', 'caption', 'micro', 'overline', 'numericId', 'numericAmount', 'kpiValue'
     ]
 
@@ -66,6 +66,11 @@ describe('getPdfTypography — derivación del SoT', () => {
   it('kpi-value usa Geist ExtraBold (text + 800) y numeric-amount Geist Bold (text + 700)', () => {
     expect(pdf.kpiValue.fontFamily).toBe('Geist ExtraBold')
     expect(pdf.numericAmount.fontFamily).toBe('Geist Bold')
+  })
+
+  it('title-lg es un título SOBRIO en familia text (Geist Bold), NO Poppins', () => {
+    expect(pdf.titleLg.fontFamily).toBe('Geist Bold')
+    expect(pdf.titleLg.fontFamily).not.toContain('Poppins')
   })
 
   it('body/caption/subtitle usan Geist regular (text + 400)', () => {

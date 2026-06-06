@@ -50,6 +50,7 @@ export interface PdfTextStyle {
 export type PdfTypographyRole =
   | 'display'
   | 'pageTitle'
+  | 'titleLg'
   | 'sectionTitle'
   | 'subtitle'
   | 'label'
@@ -85,6 +86,10 @@ interface PdfRoleSpec {
 const PDF_ROLE_SPECS: Record<PdfTypographyRole, PdfRoleSpec> = {
   display: { token: 'headlineDisplay', sizePt: 20 },
   pageTitle: { token: 'pageTitle', sizePt: 16 },
+  // Título de documento SOBRIO en familia text (Geist Bold) — los docs
+  // financieros (comprobante, reporte) usan título Geist, NO el flourish
+  // Poppins de `pageTitle`/`display`. text + bold derivan de primitivas SoT.
+  titleLg: { familyIntent: 'text', fontWeight: fontWeights.bold, sizePt: 16 },
   sectionTitle: { token: 'sectionTitle', sizePt: 12 },
   subtitle: { token: 'subheader', sizePt: 10 },
   label: { token: 'labelMd', sizePt: 9 },
