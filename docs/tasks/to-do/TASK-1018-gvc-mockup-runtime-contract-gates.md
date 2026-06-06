@@ -180,13 +180,19 @@ Reglas obligatorias:
   - `baseline.maxDiffRatio`;
   - `baseline.maxChangedPixels`;
   - `baseline.requiredRegions`.
-- Emitir findings en manifest/report:
+- Emitir findings en manifest/report (registrar los codes nuevos como SSOT en `scripts/frontend/lib/failure-taxonomy.ts`, no inline por callsite):
   - `baseline_missing`;
   - `frame_label_missing`;
   - `visual_diff_exceeded`;
   - `required_region_missing`;
-  - `mask_selector_missing`.
+  - `mask_selector_missing`;
+  - `baseline_stale` (el baseline durable no existe / fue purgado / no se pudo resolver desde `surfaceId`).
 - Mantener salida humana: PNG diff/overlay o artifact JSON suficiente para review.
+- **Baseline durable (SSOT del mockup aprobado).** `approvedMockupCaptureDir` apunta a `.captures/` que es **gitignored, timestamped y purgado por `fe:capture:gc` >30d** → no sirve como contrato compartido cross-maquina/cross-agente. Agregar un paso de promocion que materialice el baseline aprobado en un home durable keyed por `surfaceId` (frames PNG livianos, masked, commiteables), p.ej. `scripts/frontend/baselines/<surfaceId>/`:
+  - comando/flag `fe:capture:diff --promote` (o sub-comando equivalente) que copia las frames aprobadas al home durable;
+  - el scenario referencia el baseline por `baseline.surfaceId` (durable) y `approvedMockupCaptureDir` queda solo como fuente de promocion / fallback efimero;
+  - el diff resuelve primero el baseline durable y degrada a `baseline_stale` (warning, exitCode != error) si no existe, en vez de romper duro.
+- **Determinismo de captura (anti-flaky).** Baseline y runtime DEBEN capturarse bajo condiciones identicas y deterministas, sino el pixel-diff es flaky cross-maquina: animaciones/transiciones desactivadas, caret oculto, `deviceScaleFactor` fijo, fuentes ya cargadas (`document.fonts.ready`) y `prefers-reduced-motion: reduce`. Esta normalizacion es prerequisito de cualquier `maxDiffRatio`/`maxChangedPixels`; documentarla como contrato del diff, no como detalle de implementacion.
 
 ### Slice 2 — Layout Integrity Gate
 
@@ -199,7 +205,7 @@ Reglas obligatorias:
   - regiones scrollables sin foco o sin label;
   - fixed/floating elements tapando contenido capturado;
   - cards anidadas cuando el DOM/MUI classes permitan detectarlo con baja flakiness.
-- Permitir `allowHorizontalScrollSelectors`, `ignoreSelectors`, `minTargetSize`.
+- Permitir `allowHorizontalScrollSelectors`, `ignoreSelectors`, `minTargetSize` (default **24 CSS px** — piso WCAG 2.2 AA 2.5.8; preferir 44 cuando el scenario lo declare).
 - Registrar findings con selector, bounding box y frame label.
 
 ### Slice 3 — Console, Hydration and Network Strict Mode
@@ -375,6 +381,7 @@ export const scenario: CaptureScenario = {
 - Los checks heurísticos deben preferir warning sobre error salvo que el scenario declare fail-hard.
 - Selectores dinamicos deben poder enmascararse.
 - El diff visual debe preferir `clipSelector`/`data-capture` antes que full-page.
+- El diff visual SOLO es valido bajo condiciones deterministas (ver Slice 1 / "Determinismo de captura"): animaciones off, caret oculto, `deviceScaleFactor` fijo, fonts settled, reduced-motion. Un `maxDiffRatio` sobre captura no-normalizada se considera invalido, no estricto.
 
 ## Rollout Plan & Risk Matrix
 
@@ -460,6 +467,10 @@ N/A — repo-only tooling. Si se decide instalar Lighthouse/LHCI o publicar arti
 - [ ] Enterprise rubric aparece en dossier/report como advisory structured summary.
 - [ ] Docs GVC quedan sincronizadas con las primitives nuevas.
 - [ ] Scenarios regression prueban al menos baseline diff, layout, runtime strict, keyboard/focus y report rendering.
+- [ ] El baseline aprobado tiene un home durable keyed por `surfaceId` (no depende de un dir efimero `.captures/` ni del retention de `fe:capture:gc`); el diff resuelve el baseline durable y degrada honesto a `baseline_stale` si falta.
+- [ ] El diff visual se ejecuta bajo condiciones deterministas (animaciones off, caret oculto, `deviceScaleFactor` fijo, fonts settled, reduced-motion).
+- [ ] `manifest.json` preserva `schemaVersion: 1` via campos aditivos; cualquier bump queda documentado y `fe:capture:health` tolera manifests de versiones mixtas (capturas viejas + nuevas).
+- [ ] Los finding codes nuevos viven en `scripts/frontend/lib/failure-taxonomy.ts` como SSOT.
 
 ## Verification
 
@@ -483,6 +494,16 @@ N/A — repo-only tooling. Si se decide instalar Lighthouse/LHCI o publicar arti
 - [ ] `docs/documentation/plataforma/captura-visual.md` actualizado
 - [ ] `Handoff.md` actualizado con pilotos, comandos y limites
 - [ ] `greenhouse-documentation-governor` ejecutado antes de cierre completo
+
+## Open Questions
+
+Decisiones deliberadamente NO tomadas al disenar la task; el agente que la ejecute las resuelve en plan.md (Zone 2) antes de implementar Slice 1:
+
+- **Motor de diff:** `pixelmatch` (control fino, masks por region, dep liviana) vs el `toHaveScreenshot` nativo de Playwright (snapshots gestionados, menos control de masks por region). Decision en discovery; preferir lo que ya este en `node_modules` y minimice deps nuevas.
+- **Formato del baseline durable:** PNG commiteados por `surfaceId` (simple, diffeable en git, pero pesa el repo) vs manifest + hashes con storage fuera de git. V1 inclina a PNG livianos masked + `clipSelector` para acotar tamano; confirmar contra el costo de repo.
+- **Granularidad del `surfaceId`:** por ruta, por seccion `data-capture`, o por viewport. Afecta cuantos baselines durables se mantienen y la tasa de churn.
+- **Hydration warning detection (Slice 3):** que tan confiable es interceptar el warning de hydration de React/Next sin acoplarse a strings internos del framework; si no es estable, degradar a warning en vez de fail-hard.
+- **Promocion de baseline:** quien/cuando aprueba (operador via flag explicito vs paso del UI delivery loop). V1: promocion manual explicita; gobernanza posterior es follow-up.
 
 ## Follow-ups
 
