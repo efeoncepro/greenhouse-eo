@@ -23,6 +23,7 @@ import { notAuthorized } from './notAuthorized'
 import { notFound } from './notFound'
 import { states } from './states'
 import { time } from './time'
+import { underMaintenance } from './underMaintenance'
 
 export const esCL: MicrocopyDictionary = {
   actions,
@@ -35,6 +36,7 @@ export const esCL: MicrocopyDictionary = {
   notFound,
   notAuthorized,
   comingSoon,
+  underMaintenance,
   feedback,
   time,
   emails

@@ -13,6 +13,7 @@ import { notAuthorized } from './notAuthorized'
 import { notFound } from './notFound'
 import { states } from './states'
 import { time } from './time'
+import { underMaintenance } from './underMaintenance'
 
 export const enUS: MicrocopyDictionary = {
   actions,
@@ -25,6 +26,7 @@ export const enUS: MicrocopyDictionary = {
   notFound,
   notAuthorized,
   comingSoon,
+  underMaintenance,
   feedback,
   time,
   // Email localization is intentionally deferred to the email rollout child task.

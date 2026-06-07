@@ -50,6 +50,8 @@ export type MicrocopyNamespace =
   | 'errors' // Mensajes de error genéricos shared
   | 'notFound' // Copy de la página 404 (full-page not-found)
   | 'notAuthorized' // Copy de la página 401 (full-page not-authorized)
+  | 'comingSoon' // Copy de la página "Coming Soon" (full-page launch placeholder)
+  | 'underMaintenance' // Copy de la página "En mantenimiento" (full-page maintenance)
   | 'feedback' // Toasts, snackbars, confirmaciones genéricas
   | 'time' // Formatos de tiempo relativo: hace X minutos, ayer, etc.
   | 'emails' // Copy institucional compartido por templates y notification delivery
@@ -69,6 +71,7 @@ export interface MicrocopyDictionary {
   notFound: NotFoundCopy
   notAuthorized: NotAuthorizedCopy
   comingSoon: ComingSoonCopy
+  underMaintenance: UnderMaintenanceCopy
   feedback: FeedbackCopy
   time: TimeCopy
   emails: EmailsCopy
@@ -352,6 +355,29 @@ export interface ComingSoonCopy {
   countdownSeconds: string
   /** Mensaje breve mientras redirige al llegar a cero. */
   launching: string
+}
+
+/**
+ * Copy de la página "En mantenimiento" (full-page maintenance). Surface calmada
+ * para cuando el portal (o una sección) está temporalmente fuera por una
+ * mantención planificada — distinta del 404 (recurso inexistente) y del 401
+ * (sin permiso). Tono cálido y tranquilizador (greenhouse-ux-writing): explica
+ * la causa + ofrece recuperación (reintentar / volver al inicio) + reasegura.
+ * Tuteo es-CL, sentence case, sin emoji (consistente con el resto de misc pages).
+ * Mismo shape que `NotFoundCopy`: varias variantes creativas + 2 CTAs.
+ */
+export interface UnderMaintenanceCopy {
+  eyebrow: string
+  title: string
+  description: string
+  messages: Array<{
+    title: string
+    description: string
+  }>
+  /** CTA primaria (volver al inicio). */
+  cta: string
+  /** CTA secundaria (reintentar — recarga para verificar si ya volvió). */
+  secondaryCta: string
 }
 
 /**
