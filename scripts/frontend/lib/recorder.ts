@@ -27,8 +27,10 @@ import {
   type CaptureScenario,
   type ScenarioRunContext
 } from './scenario'
-import type { AssertionResult, CaptureFinding, FrameRecord, InteractionSegment, ReadinessResult } from './manifest'
+import type { AssertionResult, CaptureFinding, FrameMaskRect, FrameRecord, InteractionSegment, ReadinessResult } from './manifest'
 import { analyzeFrameQuality } from './quality'
+import { resolveMaskRects } from './capture-masks'
+import { FINDING_CODES } from './failure-taxonomy'
 
 export interface RecorderOutcome {
   frames: FrameRecord[]
@@ -97,6 +99,28 @@ export const runScenario = async ({
 
     qualityFindings.push(...frameQualityFindings)
 
+    let maskRects: FrameMaskRect[] | undefined
+
+    if (scenario.baseline?.maskSelectors?.length) {
+      const resolution = await resolveMaskRects(page, scenario.baseline.maskSelectors, {
+        clipSelector: options?.clipSelector,
+        fullPage: options?.fullPage
+      })
+
+      if (resolution.rects.length) maskRects = resolution.rects
+
+      for (const missing of resolution.missingSelectors) {
+        qualityFindings.push({
+          severity: 'warning',
+          category: 'baseline',
+          code: FINDING_CODES.mask_selector_missing,
+          message: `Mask selector "${missing}" no matcheó nodos en el frame "${label}"; el diff no enmascarará esa región.`,
+          frameLabel: label,
+          selector: missing
+        })
+      }
+    }
+
     frames.push({
       index,
       label,
@@ -104,7 +128,8 @@ export const runScenario = async ({
       tMs,
       note,
       interactionName: options?.interactionName,
-      qualityFindings: frameQualityFindings.length ? frameQualityFindings : undefined
+      qualityFindings: frameQualityFindings.length ? frameQualityFindings : undefined,
+      maskRects
     })
 
     log(`  ✓ mark[${index}] "${label}" (+${tMs}ms)`)
@@ -197,6 +222,25 @@ export const runScenario = async ({
         interactions,
         error: { message, stepIndex: index }
       }
+    }
+  }
+
+  // Baseline contract: required regions must render (live-page check).
+  for (const region of scenario.baseline?.requiredRegions ?? []) {
+    const visible = await page
+      .locator(region)
+      .first()
+      .isVisible({ timeout: 1000 })
+      .catch(() => false)
+
+    if (!visible) {
+      qualityFindings.push({
+        severity: 'error',
+        category: 'baseline',
+        code: FINDING_CODES.required_region_missing,
+        message: `Región requerida "${region}" no está visible al cierre de la captura (baseline ${scenario.baseline?.surfaceId ?? '—'}).`,
+        selector: region
+      })
     }
   }
 

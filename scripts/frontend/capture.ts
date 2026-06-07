@@ -13,11 +13,13 @@ import { parseArgs } from 'node:util'
 
 import { appendAudit, resolveActor } from './lib/audit'
 import { ensureStorageStateFresh, refreshStorageState } from './lib/auth'
+import { runBaselineDiffContract } from './lib/baseline-contract'
 import { assertNotRedirectedToLogin, launchCaptureSession } from './lib/browser'
+import { applyCaptureDeterminism } from './lib/capture-masks'
 import { isValidEnv, resolveEnvConfig, type CaptureEnv, type EnvConfig } from './lib/env'
 import { classifyCaptureFailure } from './lib/failure-taxonomy'
 import { composeGif } from './lib/gif'
-import { writeManifest, type CaptureManifest } from './lib/manifest'
+import { writeManifest, type BaselineFrameDiff, type CaptureManifest } from './lib/manifest'
 import { runScenario } from './lib/recorder'
 import { writeCaptureReport } from './lib/report'
 import { applySecretMask, assertSafeOutputPath, enforceProductionGate } from './lib/safety'
@@ -151,6 +153,7 @@ const runOneCapture = async ({
 
   let exitCode: 0 | 1 = 0
   let stepError: { message: string; stepIndex: number } | undefined
+  let baselineDiffs: BaselineFrameDiff[] | undefined
   let outcome = {
     frames: [],
     startedAt: Date.now(),
@@ -177,6 +180,13 @@ const runOneCapture = async ({
 
     await applySecretMask(session.page, scenario.extraMaskSelectors ?? [])
 
+    // Baseline contract: el diff pixel-perfect SOLO es válido bajo condiciones
+    // deterministas. Se aplica sólo cuando el scenario declara un baseline para
+    // no alterar la evidencia de motion de scenarios de microinteracción.
+    if (scenario.baseline?.surfaceId) {
+      await applyCaptureDeterminism(session.page)
+    }
+
     outcome = await runScenario({
       page: session.page,
       scenario,
@@ -187,6 +197,24 @@ const runOneCapture = async ({
     if (outcome.error) {
       exitCode = 1
       stepError = outcome.error
+    }
+
+    if (scenario.baseline?.surfaceId) {
+      const contract = runBaselineDiffContract({
+        baseline: scenario.baseline,
+        outputDir,
+        frames: outcome.frames,
+        viewportName
+      })
+
+      outcome.qualityFindings.push(...contract.findings)
+      baselineDiffs = contract.baselineDiffs.length ? contract.baselineDiffs : undefined
+
+      for (const diff of contract.baselineDiffs) {
+        const badge = diff.status === 'match' ? '🟢' : diff.status === 'exceeded' || diff.status === 'dimension_mismatch' ? '🔴' : '🟡'
+
+        PRINT(`  ${badge} baseline ${diff.frameLabel}: ${diff.status}${diff.diffRatio !== undefined ? ` (${(diff.diffRatio * 100).toFixed(2)}%)` : ''}`)
+      }
     }
 
     const blockingFinding = outcome.qualityFindings.find(finding => finding.severity === 'error')
@@ -263,6 +291,7 @@ const runOneCapture = async ({
     interactions: outcome.interactions,
     failureCategory,
     baseline: scenario.baseline,
+    baselineDiffs,
     exitCode,
     error: stepError
   }

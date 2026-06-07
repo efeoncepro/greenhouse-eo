@@ -15,7 +15,7 @@
 
 import type { Page } from 'playwright'
 
-import type { AssertionResult, CaptureFinding, InteractionSegment, ReadinessResult } from './manifest'
+import type { AssertionResult, CaptureBaselineMeta, CaptureFinding, InteractionSegment, ReadinessResult } from './manifest'
 
 export interface CaptureReadiness {
   /** Selector estable que representa que la pantalla ya está lista para evidencia visual. */
@@ -182,12 +182,8 @@ export interface CaptureScenario {
   /** Quality guard de frames. Opt-out explícito por scenario. */
   quality?: CaptureQualityOptions
 
-  /** Metadata para flujo mockup aprobado -> runtime. */
-  baseline?: {
-    surfaceId?: string
-    baselineName?: string
-    approvedMockupCaptureDir?: string
-  }
+  /** Metadata + contrato de visual diff para flujo mockup aprobado -> runtime. */
+  baseline?: CaptureBaselineMeta
 
   /** Steps en orden */
   steps: CaptureScenarioStep[]
@@ -327,6 +323,26 @@ export const validateScenario = (s: CaptureScenario): void => {
       }
 
       names.add(viewport.name)
+    }
+  }
+
+  const baseline = s.baseline
+
+  if (baseline) {
+    if (baseline.maxDiffRatio !== undefined && (baseline.maxDiffRatio < 0 || baseline.maxDiffRatio > 1)) {
+      throw new Error(`baseline.maxDiffRatio debe estar en [0,1]: ${baseline.maxDiffRatio}`)
+    }
+
+    if (baseline.maxChangedPixels !== undefined && (!Number.isFinite(baseline.maxChangedPixels) || baseline.maxChangedPixels < 0)) {
+      throw new Error(`baseline.maxChangedPixels debe ser un entero >= 0: ${baseline.maxChangedPixels}`)
+    }
+
+    if ((baseline.requiredFrameLabels?.length || baseline.maskSelectors?.length || baseline.requiredRegions?.length) && !baseline.surfaceId) {
+      throw new Error('baseline con requiredFrameLabels/maskSelectors/requiredRegions requiere baseline.surfaceId (home durable)')
+    }
+
+    if (baseline.surfaceId && !/^[a-z0-9][a-z0-9._-]*$/i.test(baseline.surfaceId)) {
+      throw new Error(`baseline.surfaceId inválido (alfanumérico + . _ -): "${baseline.surfaceId}"`)
     }
   }
 }

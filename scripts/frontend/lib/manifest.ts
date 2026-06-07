@@ -14,6 +14,14 @@ import { join } from 'node:path'
 
 import type { CaptureEnv } from './env'
 
+/** Rectángulo en píxeles del frame ya escalado por deviceScaleFactor. */
+export interface FrameMaskRect {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 export interface FrameRecord {
   index: number
   label: string
@@ -24,6 +32,12 @@ export interface FrameRecord {
   viewportName?: string
   interactionName?: string
   qualityFindings?: CaptureFinding[]
+  /**
+   * Regiones a enmascarar en el visual diff (datos dinámicos). Resueltas en
+   * capture-time desde `scenario.baseline.maskSelectors` y persistidas en
+   * coordenadas de imagen para que el diff offline las pueda aplicar.
+   */
+  maskRects?: FrameMaskRect[]
 }
 
 export type FailureCategory =
@@ -35,9 +49,21 @@ export type FailureCategory =
   | 'assertion_failed'
   | 'helper_error'
 
+export type FindingCategory =
+  | FailureCategory
+  | 'readiness'
+  | 'microinteraction'
+  | 'baseline'
+  | 'accessibility'
+  | 'layout'
+  | 'runtime'
+  | 'keyboard'
+  | 'performance'
+  | 'enterprise'
+
 export interface CaptureFinding {
   severity: 'info' | 'warning' | 'error'
-  category: FailureCategory | 'readiness' | 'microinteraction' | 'baseline' | 'accessibility'
+  category: FindingCategory
   code: string
   message: string
   frameLabel?: string
@@ -75,6 +101,43 @@ export interface InteractionSegment {
   findings?: CaptureFinding[]
 }
 
+/** Metadata declarativa del contrato baseline mockup → runtime (Slice 1). */
+export interface CaptureBaselineMeta {
+  surfaceId?: string
+  baselineName?: string
+  approvedMockupCaptureDir?: string
+  requiredFrameLabels?: string[]
+  maskSelectors?: string[]
+  maxDiffRatio?: number
+  maxChangedPixels?: number
+  requiredRegions?: string[]
+}
+
+export type BaselineDiffStatus =
+  | 'match'
+  | 'exceeded'
+  | 'baseline_missing'
+  | 'baseline_stale'
+  | 'dimension_mismatch'
+  | 'frame_missing'
+  | 'error'
+
+/** Resultado del diff de un frame runtime contra su baseline durable. */
+export interface BaselineFrameDiff {
+  frameLabel: string
+  viewportName?: string
+  surfaceId?: string
+  status: BaselineDiffStatus
+  baselinePath?: string
+  changedPixels?: number
+  totalPixels?: number
+  diffRatio?: number
+  maxDiffRatio?: number
+  maxChangedPixels?: number
+  diffArtifact?: string
+  detail?: string
+}
+
 export interface CaptureVariantSummary {
   name: string
   viewport: { width: number; height: number }
@@ -109,11 +172,8 @@ export interface CaptureManifest {
   failureCategory?: FailureCategory
   reportHtml?: string
   variants?: CaptureVariantSummary[]
-  baseline?: {
-    surfaceId?: string
-    baselineName?: string
-    approvedMockupCaptureDir?: string
-  }
+  baseline?: CaptureBaselineMeta
+  baselineDiffs?: BaselineFrameDiff[]
   exitCode: 0 | 1
   error?: {
     message: string

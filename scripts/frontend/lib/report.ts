@@ -55,6 +55,27 @@ export const buildCaptureReportHtml = (manifest: CaptureManifest): string => {
     ? interactions.map(i => `<tr><td><code>${escapeHtml(i.name)}</code></td><td>${escapeHtml(i.actionKind)}</td><td>${i.endMs - i.startMs}ms</td><td>${escapeHtml(i.intent)}</td><td>${i.frameLabels.map(escapeHtml).join(', ')}</td></tr>`).join('\n')
     : '<tr><td colspan="5" class="muted">Sin interactions V2 declaradas.</td></tr>'
 
+  const baselineDiffs = manifest.baselineDiffs ?? []
+
+  const baselinePill = (status: string): string => {
+    if (status === 'match') return 'ok'
+    if (status === 'exceeded' || status === 'dimension_mismatch' || status === 'frame_missing') return 'error'
+
+    return 'warning'
+  }
+
+  const baselineRows = baselineDiffs.length
+    ? baselineDiffs
+        .map(d => {
+          const ratio = d.diffRatio !== undefined ? `${(d.diffRatio * 100).toFixed(2)}%` : '—'
+          const budget = d.maxDiffRatio !== undefined ? `${(d.maxDiffRatio * 100).toFixed(2)}%` : d.maxChangedPixels !== undefined ? `${d.maxChangedPixels}px` : '—'
+          const artifact = d.diffArtifact ? `<a href="${escapeHtml(d.diffArtifact)}">diff PNG</a>` : d.detail ? escapeHtml(d.detail) : '—'
+
+          return `<tr><td><span class="pill ${baselinePill(d.status)}">${escapeHtml(d.status)}</span></td><td><code>${escapeHtml(d.frameLabel)}</code>${d.viewportName ? ` · ${escapeHtml(d.viewportName)}` : ''}</td><td>${ratio}</td><td>${budget}</td><td>${artifact}</td></tr>`
+        })
+        .join('\n')
+    : `<tr><td colspan="5" class="muted">Sin contrato baseline (declarar <code>baseline.surfaceId</code> + <code>fe:capture:diff --promote</code>).</td></tr>`
+
   return `<!doctype html>
 <html lang="es">
 <head>
@@ -109,6 +130,9 @@ export const buildCaptureReportHtml = (manifest: CaptureManifest): string => {
 
   <h2>Findings</h2>
   <table><thead><tr><th>Severity</th><th>Category</th><th>Code</th><th>Message</th></tr></thead><tbody>${findingRows}</tbody></table>
+
+  <h2>Baseline diff</h2>
+  <table><thead><tr><th>Status</th><th>Frame</th><th>Diff</th><th>Budget</th><th>Artifact</th></tr></thead><tbody>${baselineRows}</tbody></table>
 
   <h2>Microinteractions</h2>
   <table><thead><tr><th>Name</th><th>Action</th><th>Segment</th><th>Intent</th><th>Frames</th></tr></thead><tbody>${interactionRows}</tbody></table>
