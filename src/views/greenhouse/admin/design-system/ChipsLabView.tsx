@@ -10,6 +10,9 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { SxProps, Theme } from '@mui/material/styles'
 
+import { axisNeutral, axisRamp } from '@core/theme/axis-tokens'
+import { axisSemanticHex, axisSemanticPalette } from '@core/theme/axis-semantic'
+
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { GreenhouseChip, type GreenhouseChipVariant } from '@/components/greenhouse/primitives'
 
@@ -35,15 +38,24 @@ const tones: { label: string; value: PreviewTone }[] = [
   { label: 'Success', value: 'success' }
 ]
 
-const figmaTone = {
-  default: '#2F2B3D',
-  primary: '#28C76F',
-  secondary: '#168CFA',
-  error: '#FF4C51',
-  warning: '#FFB703',
-  info: '#00BAD1',
-  success: '#28C76F'
+const axisPreviewTone = {
+  default: axisNeutral.light.snackbar,
+  primary: axisSemanticHex.success,
+  secondary: axisRamp.primary[500],
+  error: axisSemanticHex.error,
+  warning: axisSemanticHex.warning,
+  info: axisSemanticHex.info,
+  success: axisSemanticHex.success
 } as const satisfies Record<PreviewTone, string>
+
+const axisPreviewContrastText = {
+  primary: axisSemanticPalette.success.contrastText,
+  secondary: axisNeutral.light.bgWhite,
+  error: axisSemanticPalette.error.contrastText,
+  warning: axisSemanticPalette.warning.contrastText,
+  info: axisSemanticPalette.info.contrastText,
+  success: axisSemanticPalette.success.contrastText
+} as const satisfies Record<Exclude<PreviewTone, 'default'>, string>
 
 const hexToRgb = (hex: string) => {
   const value = hex.replace('#', '')
@@ -61,13 +73,14 @@ const alphaHex = (hex: string, opacity: number) => {
   return `rgb(${r} ${g} ${b} / ${opacity})`
 }
 
-const getFigmaChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode: PreviewMode): SxProps<Theme> => {
-  const main = figmaTone[tone]
+const getAxisChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode: PreviewMode): SxProps<Theme> => {
+  const neutral = axisNeutral[mode]
+  const main = axisPreviewTone[tone]
   const isDefault = tone === 'default'
-  const solidText = tone === 'warning' || tone === 'info' || tone === 'success' ? '#2F2B3D' : '#FFFFFF'
-  const defaultFill = mode === 'dark' ? '#3A3F57' : '#EEEDF0'
-  const defaultLabel = mode === 'dark' ? '#34384F' : '#EEEDF0'
-  const defaultText = mode === 'dark' ? '#E1DEF5' : '#2F2B3D'
+  const solidText = isDefault ? neutral.textPrimary : axisPreviewContrastText[tone]
+  const defaultFill = alphaHex(neutral.textPrimary, mode === 'dark' ? 0.12 : 0.08)
+  const defaultLabel = alphaHex(neutral.textPrimary, mode === 'dark' ? 0.1 : 0.08)
+  const defaultText = neutral.textPrimary
 
   const fill =
     variant === 'solid'
@@ -78,9 +91,7 @@ const getFigmaChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode:
         ? isDefault
           ? defaultLabel
           : alphaHex(main, mode === 'dark' ? 0.16 : 0.18)
-        : mode === 'dark'
-          ? '#FFFFFF'
-          : '#FFFFFF'
+        : neutral.paper
 
   const color =
     variant === 'solid'
@@ -91,7 +102,7 @@ const getFigmaChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode:
         ? defaultText
         : main
 
-  const border = variant === 'outlined' ? (isDefault ? (mode === 'dark' ? '#E1DEF51F' : '#2F2B3D1F') : main) : fill
+  const border = variant === 'outlined' ? (isDefault ? neutral.divider : main) : fill
 
   return {
     backgroundColor: fill,
@@ -100,14 +111,12 @@ const getFigmaChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode:
     boxShadow: 'none',
 
     '& .MuiChip-avatar': {
-      backgroundColor: alphaHex('#FFFFFF', variant === 'solid' ? 0.78 : 0.72),
-      color: isDefault ? defaultText : main,
-      fontSize: 10,
-      fontWeight: 800
+      backgroundColor: alphaHex(axisNeutral.light.bgWhite, variant === 'solid' ? 0.78 : 0.72),
+      color: isDefault ? defaultText : main
     },
 
     '& .MuiChip-deleteIcon': {
-      color: variant === 'solid' ? alphaHex('#FFFFFF', 0.82) : alphaHex(main, 0.62)
+      color: variant === 'solid' ? alphaHex(axisNeutral.light.bgWhite, 0.82) : alphaHex(main, 0.62)
     },
 
     '&.MuiChip-clickable:hover, &:has(.MuiChip-deleteIcon):hover': {
@@ -119,31 +128,7 @@ const getFigmaChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode:
 }
 
 const getTextColor = (mode: PreviewMode, opacity: 0.9 | 0.7 = 0.9) =>
-  mode === 'dark' ? alphaHex('#E1DEF5', opacity) : alphaHex('#2F2B3D', opacity)
-
-const labType = {
-  componentTitle: {
-    fontSize: 38,
-    fontWeight: 600,
-    lineHeight: '52px'
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 600,
-    lineHeight: '24px'
-  },
-  columnLabel: {
-    fontSize: 14,
-    fontWeight: 600,
-    lineHeight: '20px',
-    textAlign: 'center'
-  },
-  rowLabel: {
-    fontSize: 15,
-    fontWeight: 500,
-    lineHeight: '20px'
-  }
-} as const
+  alphaHex(axisNeutral[mode].textPrimary, opacity)
 
 const BoardHeader = ({ mode }: { mode: PreviewMode }) => (
   <Box
@@ -154,7 +139,7 @@ const BoardHeader = ({ mode }: { mode: PreviewMode }) => (
       gridTemplateColumns: { xs: '1fr', sm: 'minmax(0, 1fr) auto' },
       gap: 3,
       alignItems: 'start',
-      backgroundColor: mode === 'dark' ? '#E1DEF50F' : '#2F2B3D0F'
+      backgroundColor: alphaHex(axisNeutral[mode].textPrimary, 0.06)
     }}
   >
     <Stack spacing={1}>
@@ -162,13 +147,14 @@ const BoardHeader = ({ mode }: { mode: PreviewMode }) => (
         <Typography
           variant='h4'
           sx={{
-            color: getTextColor(mode),
-            ...labType.componentTitle
+            color: getTextColor(mode)
           }}
         >
           Chip
         </Typography>
-        <Box
+        <Typography
+          variant='button'
+          component='span'
           sx={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -176,18 +162,15 @@ const BoardHeader = ({ mode }: { mode: PreviewMode }) => (
             px: 1.25,
             py: 0.5,
             borderRadius: 999,
-            backgroundColor: alphaHex('#28C76F', mode === 'dark' ? 0.22 : 0.16),
-            color: '#28C76F',
-            fontSize: 14,
-            fontWeight: 600,
-            lineHeight: 1
+            backgroundColor: alphaHex(axisSemanticHex.success, mode === 'dark' ? 0.22 : 0.16),
+            color: axisSemanticHex.success
           }}
         >
-          <i className='tabler-circle-check' />
+          <i aria-hidden='true' className='tabler-circle-check' />
           Auto Layout
-        </Box>
+        </Typography>
       </Stack>
-      <Typography sx={{ color: getTextColor(mode, 0.7), fontSize: 18, lineHeight: '24px', maxWidth: 340 }}>
+      <Typography variant='body1' sx={{ color: getTextColor(mode, 0.7), maxWidth: 340 }}>
         Chips are compact elements that represent an input, attribute, or action.
       </Typography>
     </Stack>
@@ -228,7 +211,7 @@ const PreviewChip = ({
     closable={closable}
     closeLabel='Quitar chip'
     onDelete={closable ? () => undefined : undefined}
-    sx={getFigmaChipSx(variant, tone, mode)}
+    sx={getAxisChipSx(variant, tone, mode)}
   />
 )
 
@@ -244,7 +227,7 @@ const HeaderRow = ({ mode }: { mode: PreviewMode }) => (
   >
     <Box />
     {variants.map(variant => (
-      <Typography key={variant.value} sx={{ color: getTextColor(mode, 0.7), ...labType.columnLabel }}>
+      <Typography key={variant.value} variant='button' sx={{ color: getTextColor(mode, 0.7), textAlign: 'center' }}>
         {variant.label}
       </Typography>
     ))}
@@ -275,7 +258,7 @@ const MatrixRow = ({
       alignItems: 'center'
     }}
   >
-    <Typography sx={{ color: getTextColor(mode, 0.7), ...labType.rowLabel }}>
+    <Typography variant='body2' sx={{ color: getTextColor(mode, 0.7) }}>
       {label}
     </Typography>
     {variants.map(variant => (
@@ -296,13 +279,13 @@ const MatrixSection = ({
   title: string
 }) => (
   <Stack spacing={1.75}>
-    <Typography sx={{ color: getTextColor(mode), ...labType.sectionTitle }}>
+    <Typography variant='h5' sx={{ color: getTextColor(mode) }}>
       {title}
     </Typography>
     <Box
       sx={{
         border: '1px dashed',
-        borderColor: mode === 'dark' ? '#E1DEF51F' : '#2F2B3D1F',
+        borderColor: axisNeutral[mode].divider,
         borderRadius: 2,
         px: 3,
         py: 3,
@@ -321,10 +304,10 @@ const ChipBoard = ({ mode }: { mode: PreviewMode }) => (
     data-capture={`chips-lab-${mode}`}
     sx={{
       minInlineSize: 0,
-      backgroundColor: mode === 'dark' ? '#25293C' : '#F8F7FA',
+      backgroundColor: axisNeutral[mode].bodyBg,
       border: '1px solid',
-      borderColor: mode === 'dark' ? '#E1DEF51F' : '#2F2B3D14',
-      boxShadow: mode === 'dark' ? 'none' : '0 18px 52px rgb(47 43 61 / 0.08)'
+      borderColor: axisNeutral[mode].divider,
+      boxShadow: mode === 'dark' ? 'none' : `0 18px 52px ${alphaHex(axisNeutral.light.snackbar, 0.08)}`
     }}
   >
     <BoardHeader mode={mode} />

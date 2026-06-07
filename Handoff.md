@@ -1,3 +1,15 @@
+# Sesion 2026-06-07 — Chips Lab tokenizado + typography hardening
+
+Se revisó `/admin/design-system/chips` por sospecha del operador de colores/tipografía hardcodeados.
+
+- **Hallazgo:** la sospecha era correcta. `ChipsLabView` tenía HEX directos para tones, fondos, bordes y textos, además de `labType` con `fontSize/fontWeight/lineHeight` inline. `GreenhouseChip` no tenía HEX, pero sí literals tipográficos para el label (`fontWeight`, `fontSize`, `lineHeight`) y tamaños de icon/avatar mezclados en el `sx`.
+- **Fix:** el lab ahora deriva color desde `axisNeutral`, `axisRamp`, `axisSemanticHex` y `axisSemanticPalette`; headings/labels/helper usan variants MUI (`h4`, `h5`, `body1/body2`, `button`) sin overrides tipográficos. `GreenhouseChip` consume `typographyScale.labelMd/labelSm` para el texto y concentra block/avatar/delete/icon sizes en `GREENHOUSE_CHIP_SIZE_TOKENS`.
+- **No-regresión:** no se cambiaron variants, tones, kinds, props ni consumers productivos. Los colores runtime de la primitive siguen en `theme.palette`/CSS vars; el lab solo documenta la matriz AXIS.
+- **GVC:** `.captures/2026-06-07T13-29-26_design-system-chips` desktop + mobile revisados.
+- **Gates verdes:** eslint focal, `GreenhouseChip` + typography/color drift tests, `tsc --noEmit`, `pnpm design:lint`, `pnpm lint`, `git diff --check` focal. `docs:closure-check` acotado deja cubierto changelog/handoff; UI docs/manual/client changelog no aplican por surface interna.
+
+---
+
 # Sesion 2026-06-07 — UI Platform doc restructure (`ui-platform/`) + skill tipografía
 
 Por pedido del operador se reestructuró el monolito `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` (~3.000 líneas, mayormente changelog `## Delta`).

@@ -7,6 +7,8 @@ import Chip from '@mui/material/Chip'
 import type { ChipProps } from '@mui/material/Chip'
 import type { SxProps, Theme } from '@mui/material/styles'
 
+import { typographyScale } from '@/components/theme/typography-tokens'
+
 export type GreenhouseChipVariant = 'solid' | 'label' | 'outlined'
 export type GreenhouseChipTone = 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
 export type GreenhouseChipSize = 'medium' | 'small'
@@ -36,6 +38,32 @@ const isSemanticTone = (tone: GreenhouseChipTone): tone is Exclude<GreenhouseChi
 const toneMain = (tone: Exclude<GreenhouseChipTone, 'default'>) => `var(--mui-palette-${tone}-main)`
 const toneContrast = (tone: Exclude<GreenhouseChipTone, 'default'>) => `var(--mui-palette-${tone}-contrastText)`
 const toneSoft = (tone: Exclude<GreenhouseChipTone, 'default'>) => `var(--mui-palette-${tone}-lightOpacity)`
+
+const GREENHOUSE_CHIP_SIZE_TOKENS = {
+  medium: {
+    blockSize: 32,
+    avatarSize: '20px',
+    deleteSize: '18px',
+    iconSize: '15px',
+    labelTypography: typographyScale.labelMd
+  },
+  small: {
+    blockSize: 24,
+    avatarSize: '16px',
+    deleteSize: '16px',
+    iconSize: '13px',
+    labelTypography: typographyScale.labelSm
+  }
+} as const satisfies Record<
+  GreenhouseChipSize,
+  {
+    blockSize: number
+    avatarSize: string
+    deleteSize: string
+    iconSize: string
+    labelTypography: typeof typographyScale.labelMd | typeof typographyScale.labelSm
+  }
+>
 
 const getChipSurface = (variant: GreenhouseChipVariant, tone: GreenhouseChipTone) => {
   if (tone === 'default') {
@@ -108,21 +136,21 @@ const getChipSx = (
   const surface = getChipSurface(variant, tone)
   const hoverSurface = getHoverSurface(variant, tone)
   const isSmall = size === 'small'
+  const sizeTokens = GREENHOUSE_CHIP_SIZE_TOKENS[size]
+  const { labelTypography } = sizeTokens
 
   return theme => ({
-    ...theme.typography.button,
-    '--gh-chip-avatar-size': isSmall ? '16px' : '20px',
-    '--gh-chip-delete-size': isSmall ? '16px' : '18px',
-    blockSize: isSmall ? 24 : 32,
+    ...labelTypography,
+    '--gh-chip-avatar-size': sizeTokens.avatarSize,
+    '--gh-chip-delete-size': sizeTokens.deleteSize,
+    '--gh-chip-icon-size': sizeTokens.iconSize,
+    blockSize: sizeTokens.blockSize,
     minInlineSize: 0,
     borderRadius: 1,
     border: '1px solid',
     borderColor: surface.borderColor,
     backgroundColor: surface.backgroundColor,
     color: surface.color,
-    fontWeight: 600,
-    fontSize: isSmall ? theme.typography.caption.fontSize : theme.typography.button.fontSize,
-    lineHeight: 1,
     transform: 'translateY(0)',
     transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'color', 'transform'], {
       duration: theme.transitions.duration.shortest
@@ -134,7 +162,7 @@ const getChipSx = (
       display: 'inline-flex',
       minInlineSize: 0,
       alignItems: 'center',
-      lineHeight: 1,
+      lineHeight: labelTypography.lineHeight,
       whiteSpace: 'nowrap'
     },
 
@@ -144,7 +172,7 @@ const getChipSx = (
       marginInlineStart: isSmall ? theme.spacing(1) : theme.spacing(1.5),
       marginInlineEnd: isSmall ? theme.spacing(-1.5) : theme.spacing(-2),
       color: 'currentColor',
-      fontSize: isSmall ? 13 : 15
+      fontSize: 'var(--gh-chip-icon-size)'
     },
 
     '& .MuiChip-deleteIcon': {
