@@ -1304,6 +1304,7 @@ ADR: `docs/architecture/GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md` (Accepted 20
 ### Regla canónica de consumo
 
 - Los **views de producto NO importan `@floating-ui/react` directamente**. Consumen `GreenhouseFloatingSurface`. La excepción son las primitives mismas y la infraestructura legacy de menús Vuexy (`FloatingTree`).
+- **Enforced mecánicamente**: lint rule `greenhouse/no-direct-floating-ui-in-views` (modo `error` desde commit-1, cero violaciones hoy). Activa sobre `src/views|app|components`; exime por path `src/components/greenhouse/primitives/**` (la familia de primitives, incl. `GreenhouseFieldProvenancePeek`) e infra Vuexy (`src/@menu|@core|@layout`). Cubre import estático + `import()` dinámico + `require()`.
 - Floating Surface es para **UI contextual anclada y transitoria**. NO reemplaza `AdaptiveSidecar` (lanes full-height) ni MUI `Dialog` (decisiones destructivas/legales/financieras/maker-checker).
 - Sin lógica de negocio dentro de la primitive.
 
@@ -1316,7 +1317,7 @@ Ambos dejaron de importar `@floating-ui/react`; paridad visual + focus preservad
 
 ### Verificación
 
-- 19 tests focales (`floating-surface-controller.test.ts` + `GreenhouseFloatingSurface.test.tsx`).
+- 19 tests focales (`floating-surface-controller.test.ts` + `GreenhouseFloatingSurface.test.tsx`) + RuleTester de la lint rule (`no-direct-floating-ui-in-views.test.mjs`).
 - Lab interno `/admin/design-system/floating-surfaces` (`FloatingSurfaceLabView`) + scenario GVC `floating-surface-primitives` (desktop + mobile, open/close, keyboard, collision near-edge).
 
 `GreenhouseFieldProvenancePeek` sigue usando Floating UI ad-hoc (es primitive/infra, no view de producto) — candidato a adoptar la primitive en un follow-up.

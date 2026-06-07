@@ -10,7 +10,8 @@ Se implementó y cerró TASK-1033 en `develop` (sin worktree, por instrucción d
 - **Sin migración / backend / capability / outbox / reliability signals nuevos.** No toca permisos, rutas de producto, ni Adaptive Sidecar.
 - **Gates verdes:** 19 tests focales, `tsc --noEmit` limpio, `pnpm lint` 0 errores (warnings pre-existentes ajenos), GVC desktop+mobile. `pnpm test` (full) + `pnpm build` corridos como gate de cierre (toca barrel compartido + `eslint.config.mjs`).
 - **Commits:** `9f127a12a` (Slice 1+2 foundation+variants), `abb605c71` (Slice 3 pilotos), `fafc37e4e` (Slice 4 lab+scenario+docs), `2f438e826` (GVC scenario robusto).
-- **Follow-ups (no bloqueantes):** `GreenhouseFieldProvenancePeek` sigue usando Floating UI ad-hoc (primitive/infra) — candidato a adoptar la primitive. La skill local `greenhouse-dev` tiene una línea desactualizada ("@floating-ui NOT to use") que el ADR (Accepted 2026-06-06) supersede.
+- **Enforcement (post-cierre, a pedido del operador):** lint rule `greenhouse/no-direct-floating-ui-in-views` (modo `error`) promueve la regla de convención a gate mecánico — views/app/components NO importan `@floating-ui/*` directo; exentos por path primitives + infra Vuexy menu; cubre static/`import()`/`require()`. Cero violaciones hoy (`pnpm lint` 0 errores), RuleTester verde. Commit `f7439bae1`. Docs sincronizadas: `GREENHOUSE_UI_PLATFORM_V1` (regla + verificación), CLAUDE.md (Patron canonico Floating Surface), changelog, task closure.
+- **Follow-ups (no bloqueantes):** `GreenhouseFieldProvenancePeek` sigue usando Floating UI ad-hoc (primitive/infra, exenta por path del lint gate) — candidato a adoptar la primitive. La skill local `greenhouse-dev` tiene una línea desactualizada ("@floating-ui NOT to use") que el ADR (Accepted 2026-06-06) supersede.
 
 ---
 
