@@ -30,7 +30,7 @@ Read only what the task needs, in this order:
 - `<repo>/AGENTS.md`
 - `<repo>/project_context.md`
 - `<repo>/Handoff.md`
-- `<repo>/docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+- `<repo>/docs/architecture/ui-platform/README.md`
 - `<repo>/docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
 - `<repo>/docs/ui/GREENHOUSE_ACCESSIBILITY_GUIDELINES_V1.md`
 - `<repo>/docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md` when the surface is client-facing

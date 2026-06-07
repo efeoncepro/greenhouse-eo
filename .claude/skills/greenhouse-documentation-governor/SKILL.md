@@ -132,6 +132,7 @@ Use this matrix to choose the smallest complete update set.
 - Never update docs based only on stale audit/handoff memory; re-check code,
   runtime, or architecture when the conclusion matters.
 - Never overwrite unrelated user/agent edits while synchronizing docs.
+- Never let an architecture doc grow into an append-only monolith (a large file that is mostly `## Delta YYYY-MM-DD` sections). Separate **estado vigente** (docs temáticos) from **cronología** (`HISTORIAL.md` append-only): a vigente change edits the topic doc; the dated entry goes to `HISTORIAL.md`; a shared contract goes to its ADR + `DECISIONS_INDEX.md`. Precedent + regla: `docs/architecture/ui-platform/` (start at `README.md`) + ADR `GREENHOUSE_UI_PLATFORM_RESTRUCTURE_DECISION_V1.md`. The docs lint flags regressions (`architecture_doc_monolith`, `ui_platform_stub_regrowth`). `GREENHOUSE_UI_PLATFORM_V1.md` is a **router stub** — never re-add content to it; the UI platform reference lives under `docs/architecture/ui-platform/`.
 
 ## Executable Helper
 

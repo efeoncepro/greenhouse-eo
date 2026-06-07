@@ -12,7 +12,7 @@ Use this skill when the task is to decide which Vuexy or MUI pattern Greenhouse 
 - `AGENTS.md`
 - `project_context.md`
 - `Handoff.md`
-- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+- `docs/architecture/ui-platform/README.md`
 - `docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`
 - `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
 - `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`

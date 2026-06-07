@@ -21,7 +21,7 @@ This overlay pins Greenhouse-specific decisions so agents don't drift from the e
 
 - **Agent-facing design contract**: `DESIGN.md` (repo root, `@google/design.md` format) — READ FIRST. Lists every component variant available in code (`button-primary-hover`, `status-chip-success`, `card-default-dark`, etc.). The TASK-764 contract gate enforces 0 errors / 0 warnings on every PR.
 - **Design tokens (extended)**: `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` — extended canonical spec (palette, customColors namespace, line-height tokens, decision matrix per variant)
-- **UI platform**: `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+- **UI platform**: `docs/architecture/ui-platform/README.md`
 - **Runtime authority**: `src/components/theme/mergedTheme.ts` — when DESIGN.md, V1, and runtime disagree on a hex value, **runtime wins** and the docs update
 - **Theme code**: `src/@core/theme/` (read-only, NEVER modify)
 - **Component wrappers**: `src/@core/components/mui/` (use these, never raw MUI)

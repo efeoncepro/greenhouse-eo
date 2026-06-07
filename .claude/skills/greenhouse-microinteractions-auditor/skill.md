@@ -28,7 +28,7 @@ Read only what the task needs, in this order:
 1. `AGENTS.md` — operational rules
 2. `project_context.md` — current context
 3. `Handoff.md` — recent changes
-4. `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` — UI stack and available libraries
+4. `docs/architecture/ui-platform/README.md` — UI stack and available libraries
 5. `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md` — UX baseline
 6. `docs/ui/GREENHOUSE_ACCESSIBILITY_GUIDELINES_V1.md` — accessibility rules
 7. `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md` — when the surface is client-facing

@@ -1,3 +1,17 @@
+# Sesion 2026-06-07 — UI Platform doc restructure (`ui-platform/`) + skill tipografía
+
+Por pedido del operador se reestructuró el monolito `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` (~3.000 líneas, mayormente changelog `## Delta`).
+
+- **Qué se hizo:** split determinístico (script, conservación de líneas verificada — 61 secciones, 0 sin rutear) en `docs/architecture/ui-platform/`: `README` (índice + mapa "dónde vive X" + modelo de fuentes de verdad) + docs temáticos vigentes (`STACK`/`PRIMITIVES`/`STATE`/`FORMS`/`TABLES`/`MOTION`/`I18N`/`PATTERNS`/`GOVERNANCE`) + `HISTORIAL.md` (todas las `## Delta` + version-log v1.0→v1.29). El path viejo → **router stub** (preserva referencias).
+- **Colisión multi-agente resuelta:** la sesión de botones había dejado las deltas 06-07d/06-07e **sin commitear** en el working tree del V1 doc (su commit `7a9f746ea` las dejó fuera a propósito). El split las **absorbió a `HISTORIAL.md`** → cero pérdida; no se tocó el código de botones (ya committeado).
+- **Naming:** `ui-platform/` neutro. **AXIS reservado para el lenguaje visual** (color/tokens/tipografía/motion), no para la plataforma de ingeniería UI.
+- **Gobernanza:** ADR `GREENHOUSE_UI_PLATFORM_RESTRUCTURE_DECISION_V1.md` + `DECISIONS_INDEX.md`. Regla **anti-monolito** incorporada a la skill `greenhouse-documentation-governor` (Claude + Codex) y al **docs lint** (`scripts/check-documentation-closure.mjs`: findings `architecture_doc_monolith` + `ui_platform_stub_regrowth`, validado sin falso positivo sobre el stub).
+- **Punteros actualizados:** `CLAUDE.md`, `AGENTS.md`, 12 skills UI repo (Codex + Claude) + 2 globales repunteadas a `ui-platform/`. (3 skills Codex — `greenhouse-agent`/`portal-ui-implementer`/`vuexy-ui-expert` — están gitignored: editadas en disco, no committeables.)
+- **Skill tipografía (turno previo):** `typography-design` (global craft + overlay Greenhouse) + mirror Codex `greenhouse-typography-accessibility` enriquecida; puntero en CLAUDE.md.
+- **Pendiente / riesgo:** si la sesión de botones intentaba commitear esas deltas al V1 doc, ahora deben ir a `ui-platform/HISTORIAL.md` (el V1 es stub). Markdownlint warnings cosméticas en docs (no gated por `local:check`).
+
+---
+
 # Sesion 2026-06-07 — Greenhouse Button primitive + Buttons Lab AXIS
 
 Por pedido del operador se reencuadro la referencia Figma `Buttons` (`yyMksCoijfMaIoYplXKZaR`, node `324:32923`) como **tokenizacion + primitive canonical**, no como pagina estetica.

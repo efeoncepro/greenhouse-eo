@@ -33,7 +33,7 @@ Doc completa: `docs/manual-de-uso/plataforma/captura-visual-playwright.md`.
 
 - `DESIGN.md` (repo root) exists and `pnpm design:lint` reports 0 errors / 0 warnings. The TASK-764 contract gate enforces this on every PR; if local lint fails, fix before review.
 - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` exists and is current.
-- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` is accessible.
+- `docs/architecture/ui-platform/README.md` is accessible.
 - Target component file is ready to review (no WIP scaffolding).
 
 ## Mandatory context (load BEFORE running checklist)

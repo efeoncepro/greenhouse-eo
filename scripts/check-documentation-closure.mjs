@@ -325,6 +325,51 @@ function analyze(changes) {
     )
   }
 
+  // Anti-monolith doc structure (ADR GREENHOUSE_UI_PLATFORM_RESTRUCTURE_DECISION_V1):
+  // architecture docs deben separar estado vigente (docs temáticos) de la cronología
+  // (HISTORIAL append-only). No volver a un único archivo que mezcle ambos.
+  const architectureMdFiles = files.filter(
+    filePath =>
+      filePath.startsWith('docs/architecture/') &&
+      filePath.endsWith('.md') &&
+      !filePath.startsWith('docs/architecture/ui-platform/') &&
+      !/HISTORIAL\.md$/.test(filePath),
+  )
+
+  for (const filePath of architectureMdFiles) {
+    if (!existsSync(filePath)) continue
+
+    const source = readFileSync(filePath, 'utf8')
+    const lineCount = source.split('\n').length
+    const deltaCount = (source.match(/^## Delta /gm) || []).length
+
+    // El router stub del UI platform debe quedar como stub: contenido vigente → ui-platform/<topic>.md, cronología → ui-platform/HISTORIAL.md.
+    if (
+      filePath === 'docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md' &&
+      (deltaCount > 0 || lineCount > 120)
+    ) {
+      addFinding(
+        findings,
+        'warn',
+        'ui_platform_stub_regrowth',
+        'GREENHOUSE_UI_PLATFORM_V1.md es un router stub. El contenido vigente va a docs/architecture/ui-platform/<topic>.md y la cronología a ui-platform/HISTORIAL.md — no agregar contenido acá.',
+        ['docs/architecture/ui-platform/README.md', 'docs/architecture/ui-platform/HISTORIAL.md'],
+      )
+      continue
+    }
+
+    // Smell genérico de monolito append-only: muchos "## Delta" + archivo enorme.
+    if (deltaCount >= 8 && lineCount > 1200) {
+      addFinding(
+        findings,
+        'warn',
+        'architecture_doc_monolith',
+        `${filePath} parece un changelog append-only (${deltaCount} secciones "## Delta", ${lineCount} líneas). Considerá dividir en docs temáticos vigentes + un HISTORIAL (precedente: docs/architecture/ui-platform/ + ADR GREENHOUSE_UI_PLATFORM_RESTRUCTURE_DECISION_V1.md).`,
+        ['docs/architecture/GREENHOUSE_UI_PLATFORM_RESTRUCTURE_DECISION_V1.md'],
+      )
+    }
+  }
+
   if ((accessChanged || releaseCloudChanged || localSkillChanged || packageWorkflowChanged) && !docsChanged.projectContext) {
     addFinding(
       findings,

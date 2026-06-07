@@ -18,7 +18,7 @@ Read only what the task needs, in this order:
 - `<repo>/AGENTS.md`
 - `<repo>/project_context.md`
 - `<repo>/Handoff.md`
-- `<repo>/docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+- `<repo>/docs/architecture/ui-platform/README.md`
 - `<repo>/docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`
 - `<repo>/docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
 - `<repo>/docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
