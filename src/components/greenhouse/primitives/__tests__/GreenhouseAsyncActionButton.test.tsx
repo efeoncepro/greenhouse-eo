@@ -33,11 +33,40 @@ describe('GreenhouseAsyncActionButton', () => {
 
     expect(button).toHaveAttribute('data-state', state)
     expect(button).toHaveAttribute('aria-live', 'polite')
+    expect(button).toHaveAttribute('data-kind', 'primaryAction')
+    expect(button).toHaveAttribute('data-variant', 'solid')
 
     if (state === 'loading') {
       expect(button).toHaveAttribute('aria-busy', 'true')
       expect(button).toBeDisabled()
     }
+  })
+
+  it('maps legacy MUI button props to the GreenhouseButton contract', () => {
+    const { getByRole } = renderWithTheme(
+      <GreenhouseAsyncActionButton state='idle' variant='tonal' color='secondary' kind='secondaryAction'>
+        {submitLabel}
+      </GreenhouseAsyncActionButton>
+    )
+
+    const button = getByRole('button', { name: submitLabel })
+
+    expect(button).toHaveAttribute('data-variant', 'label')
+    expect(button).toHaveAttribute('data-tone', 'secondary')
+    expect(button).toHaveAttribute('data-kind', 'secondaryAction')
+  })
+
+  it('allows the canonical button variant and tone to override legacy props', () => {
+    const { getByRole } = renderWithTheme(
+      <GreenhouseAsyncActionButton state='error' variant='contained' color='primary' greenhouseVariant='outlined' tone='warning'>
+        {submitLabel}
+      </GreenhouseAsyncActionButton>
+    )
+
+    const button = getByRole('button', { name: submitLabel })
+
+    expect(button).toHaveAttribute('data-variant', 'outlined')
+    expect(button).toHaveAttribute('data-tone', 'warning')
   })
 
   it('does not disable loading state when disableWhileLoading is false', () => {

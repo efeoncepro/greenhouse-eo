@@ -146,6 +146,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde la card "Ver chips" en DesignSystemView.'
   },
   {
+    route: '/admin/design-system/buttons',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Buttons Lab — child surface del Design System para la primitive GreenhouseButton basada en AXIS Figma, alcanzable desde la card "Ver buttons" en DesignSystemView.'
+  },
+  {
     route: '/admin/design-system/charts',
     parent: '/admin/design-system',
     via: 'inline-link',

@@ -41,6 +41,7 @@ const OPACITY_STEPS = [8, 16, 24, 32, 38] as const
 const LOADING_LAB_ROUTE = '/admin/design-system/loaders'
 const MICROINTERACTIONS_LAB_ROUTE = '/admin/design-system/microinteractions'
 const TYPOGRAPHY_ROUTE = '/admin/design-system/typography'
+const BUTTONS_LAB_ROUTE = '/admin/design-system/buttons'
 const CHIPS_LAB_ROUTE = '/admin/design-system/chips'
 const CHARTS_LAB_ROUTE = '/admin/design-system/charts'
 const UTILITIES_LAB_ROUTE = '/admin/design-system/utilities'
@@ -203,6 +204,41 @@ const DesignSystemView = () => (
           endIcon={<i className='tabler-arrow-right' />}
         >
           Ver tipografía
+        </Button>
+      </CardContent>
+    </Card>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Componentes
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Buttons canónicos
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Primitive reusable basada en AXIS Figma para comandos, jerarquía de emphasis, icon placement, sizes y estados.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={BUTTONS_LAB_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-square-rounded-letter-b' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver buttons
         </Button>
       </CardContent>
     </Card>

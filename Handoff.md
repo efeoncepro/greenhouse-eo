@@ -1,3 +1,22 @@
+# Sesion 2026-06-07 — Greenhouse Button primitive + Buttons Lab AXIS
+
+Por pedido del operador se reencuadro la referencia Figma `Buttons` (`yyMksCoijfMaIoYplXKZaR`, node `324:32923`) como **tokenizacion + primitive canonical**, no como pagina estetica.
+
+- **Discovery:** el repo ya tenia `MuiButton` overrides Vuexy/MUI (`contained/tonal/outlined/text`, active scale, ButtonBase/ripple config, large size corregido por `mergedTheme` via `controlText.lg`) y `GreenhouseAsyncActionButton` para estados async. Brecha cerrada: contrato Greenhouse reusable para button emphasis/kinds/icon placement/sizes/states + lab GVC.
+- **Primitive:** `GreenhouseButton` (`src/components/greenhouse/primitives/GreenhouseButton.tsx`) + controller `greenhouse-button-controller.ts`.
+- **Contrato V1:** variants `solid/label/outlined/text` (mapeadas a `contained/tonal/outlined/text`), tones `primary/secondary/error/warning/info/success`, sizes `large/medium/small`, kinds `primaryAction/secondaryAction/destructiveAction/inlineAction/navigation/filter/custom`, resolver `kind→variant/tone`, icon placement, `data-variant/tone/kind/capture`, focus ring y reduced-motion fallback.
+- **Compatibilidad/sinergia:** `GreenhouseAsyncActionButton` ahora compone `GreenhouseButton`: conserva su API legacy `variant/color`, traduce internamente a `solid/label/outlined/text` + `tone`, y mantiene su responsabilidad async (`idle/loading/success/error`, double-submit guard, spinner, success/error state). Raw MUI `Button` queda permitido en legacy/Vuexy internals; migrar por slices.
+- **No-regresion de botones existentes:** no hay diff en `src/@core/theme/overrides/button.ts`, `src/components/theme/mergedTheme.ts`, `src/components/theme/types.ts` ni `src/components/theme/typography-tokens.ts`; ningun consumer productivo fue migrado a `GreenhouseButton` en este slice. La nueva primitive solo se usa en el lab y se exporta para adopcion futura por slices.
+- **Tipografia:** la primitive no hardcodea `fontSize`, `fontWeight` ni `fontFamily` del texto; hereda el contrato vigente de MUI/Vuexy (`theme.typography.button` + sizing existente). Los size tokens del controller exponen `controlText.lg/md/sm` como metadata canonical; el unico `fontSize` en `GreenhouseButton` es para iconos. `ButtonsLabView` tambien queda sin `fontSize/fontWeight/fontFamily/lineHeight` inline: headings/labels/spec notes usan variants MUI canonicas.
+- **A11y corregido:** al componer AsyncAction se movio el status live region fuera del `<button>`; antes el texto oculto podia duplicar el accessible name (`EnviarEnviar`) en pruebas.
+- **Lab interno:** `/admin/design-system/buttons`, gateado por `administracion.design_system`, enlazado desde `/admin/design-system`, declarado en route reachability. El header usa `AxisWordmark`; no quedan referencias externas de marca en la surface nueva.
+- **Scenario GVC:** `design-system-buttons`.
+- **Evidencia GVC:** Buttons Lab `.captures/2026-06-07T13-11-51_design-system-buttons` desktop + mobile tras retirar tipografia inline del lab; Microinteractions Lab `.captures/2026-06-07T13-04-17_design-system-microinteractions` desktop + mobile tras componer `GreenhouseAsyncActionButton`.
+- **Gates verdes:** vitest focal `GreenhouseButton` + `GreenhouseAsyncActionButton` (12 tests), no-regression suite `GreenhouseAsyncActionButton` + button/typography/color drift (76 tests), eslint focal, `pnpm lint` completo, `tsc --noEmit`, `route-reachability-gate --strict`, `design:lint`, `docs:closure-check` (warning advisory esperado por UI interna + GVC/docs cubiertos), `pnpm build`, GVC local.
+- **Docs sincronizadas:** `GREENHOUSE_BUTTON_PRIMITIVE_V1.md`, `project_context.md`, `changelog.md`, este handoff. `GREENHOUSE_UI_PLATFORM_V1.md` queda fuera de este commit porque hay una reestructura documental paralela no incluida.
+
+---
+
 # Sesion 2026-06-07 — Greenhouse Motion Primitive (base GSAP gobernada, TASK-1045)
 
 Se construyó la **primitiva base de motion sobre GSAP** (la "primigenia" para reusar acá y en otras apps) y se pusheó a `develop` (`fd23184ca..bf76137af`).

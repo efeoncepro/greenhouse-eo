@@ -11,6 +11,25 @@ export type {
   GreenhouseAsyncActionButtonProps,
   GreenhouseAsyncActionState
 } from './GreenhouseAsyncActionButton'
+export { default as GreenhouseButton } from './GreenhouseButton'
+export type { GreenhouseButtonProps } from './GreenhouseButton'
+export {
+  GREENHOUSE_BUTTON_KIND_DEFAULT_TONE,
+  GREENHOUSE_BUTTON_KIND_DEFAULT_VARIANT,
+  GREENHOUSE_BUTTON_SIZE_TOKENS,
+  GREENHOUSE_BUTTON_SIZES,
+  GREENHOUSE_BUTTON_TONES,
+  GREENHOUSE_BUTTON_VARIANT_CONFIG,
+  GREENHOUSE_BUTTON_VARIANTS,
+  resolveGreenhouseButtonTone,
+  resolveGreenhouseButtonVariant
+} from './greenhouse-button-controller'
+export type {
+  GreenhouseButtonKind,
+  GreenhouseButtonSize,
+  GreenhouseButtonTone,
+  GreenhouseButtonVariant
+} from './greenhouse-button-controller'
 export { default as GreenhouseChip } from './GreenhouseChip'
 export type {
   GreenhouseChipKind,
