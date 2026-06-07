@@ -2,20 +2,18 @@ import { redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
 
-import DesignSystemCatalogView from '@views/greenhouse/admin/design-system/DesignSystemCatalogView'
-import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import AxisColorLabView from '@views/greenhouse/admin/design-system/AxisColorLabView'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
+import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Design System Catalog — AXIS | Greenhouse'
+  title: 'Color AXIS — Design System | Greenhouse'
 }
 
-// Canonical internal design-system catalog. INTERNAL ONLY — clients must never
-// see this. Gated by the `administracion.design_system` viewCode (granted to
-// internal roles only) with an internal route-group fallback; a defensive
-// tenantType check redirects any client tenant.
+// Canonical internal AXIS color reference. Mirrors `/admin/design-system`
+// guard: this is an internal-only lab under the Design System catalog.
 export default async function Page() {
   const tenant = await getTenantContext()
 
@@ -37,5 +35,5 @@ export default async function Page() {
     redirect('/401')
   }
 
-  return <DesignSystemCatalogView />
+  return <AxisColorLabView />
 }

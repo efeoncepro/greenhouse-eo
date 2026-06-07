@@ -18,6 +18,8 @@ Esta carpeta describe la **plataforma de ingeniería UI**. El **lenguaje visual 
 |---|---|
 | **Contrato agente (visual)** | `DESIGN.md` (raíz, lint-gated TASK-764) |
 | **Tokens visuales (extendido)** | [GREENHOUSE_DESIGN_TOKENS_V1.md](../GREENHOUSE_DESIGN_TOKENS_V1.md) · [GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md](../GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md) |
+| **Catálogo vivo del Design System** | `/admin/design-system` (interno) — home navegable de tokens, primitives, patrones y labs |
+| **Color AXIS** | `/admin/design-system/colors` (interno) · ramps/opacidades/neutrales desde `src/@core/theme/axis-tokens.ts` |
 | **Geometry foundations** | `/admin/design-system/geometry` (interno) · spacing `theme.spacing(N)` · radius `theme.shape.customBorderRadius.*` |
 | **Tipografía** | skill `typography-design` + `src/components/theme/typography-tokens.ts` (SoT) |
 | **Runtime (autoridad final)** | `src/components/theme/mergedTheme.ts` + `src/components/greenhouse/primitives/**` |
@@ -55,3 +57,14 @@ Regla: cuando un doc temático difiera del runtime, **gana el runtime** y el doc
 2. La **entrada cronológica** (qué cambió, cuándo, qué TASK) va a [HISTORIAL.md](./HISTORIAL.md) (append-only).
 3. Si el cambio toca un contrato compartido, va a su ADR dedicada + `DECISIONS_INDEX.md`.
 4. Nunca volver a un único archivo monolito de N-mil líneas que mezcla vigente + historial.
+
+## Design System catalog
+
+`/admin/design-system` es el front door canónico para encontrar cualquier parte viva del Design System interno. Cuando nace o cambia una incorporación del Design System:
+
+1. Agregar o actualizar su entrada en `DesignSystemCatalogView` con ruta real, familia, tipo, status, SoT/owner y tags buscables.
+2. Declarar la ruta en `src/lib/navigation/route-reachability-manifest.ts` si es child route bajo `/admin/design-system`.
+3. Crear o actualizar el scenario GVC cuando la página sea visual/repetible.
+4. Enlazar el contrato en el doc temático de `ui-platform/*` o en la arquitectura/ADR de tokens correspondiente.
+
+La paleta AXIS ya no ocupa la home: vive en `/admin/design-system/colors`.

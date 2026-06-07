@@ -99,7 +99,7 @@ Reglas obligatorias:
 - `src/@core/theme/index.ts`
 - `src/components/theme/types.ts` si el shape extendido requiere declaracion tipada
 - `src/views/greenhouse/admin/design-system/GeometryLabView.tsx`
-- `src/views/greenhouse/admin/design-system/DesignSystemView.tsx`
+- `src/views/greenhouse/admin/design-system/DesignSystemCatalogView.tsx`
 - `src/views/greenhouse/admin/design-system/design-system-lab-tokens.ts`
 - `src/lib/navigation/route-reachability-manifest.ts` si hace falta declarar child route
 - `scripts/frontend/scenarios/design-system-geometry.scenario.ts`
@@ -183,7 +183,7 @@ Reglas obligatorias:
 
 ### Slice 4 — Navigation + reachability + GVC
 
-- Agregar entrada desde `/admin/design-system` hacia el spacing/geometry lab.
+- Agregar entrada desde el catálogo canónico `/admin/design-system` hacia el spacing/geometry lab.
 - Declarar child route en `route-reachability-manifest.ts` solo si el link real no basta.
 - Crear scenario GVC `design-system-spacing` o `design-system-geometry` con desktop + mobile.
 - Capturar con `pnpm fe:capture <scenario> --env=local`, revisar frames PNG y ajustar hasta que no haya overflow/truncamiento.

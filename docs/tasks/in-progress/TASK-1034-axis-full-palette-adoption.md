@@ -152,4 +152,10 @@ El mockup de Slice 0 se promovió a una **superficie real gobernada INTERNA** (c
 - **Nav (TASK-982):** item bajo Administración gateado por `canSeeView('administracion.design_system', false)` en `VerticalMenu.tsx` + keys `adminDesignSystem` en `greenhouse-nomenclature.ts` / `greenhouse-navigation-copy.ts`.
 - **Vista:** heading "Paleta AXIS — referencia completa" + referencia Figma SoT (fileKey `yyMksCoijfMaIoYplXKZaR`, nodo `11205:5341`, tools MCP `get_variable_defs`/`get_screenshot`) + nota interna; renderiza los ramps live desde `axis-tokens.ts`; lleva `AxisWordmark` (logo solo-DS).
 - **Verificación:** GVC `/admin/design-system` = 200 render correcto; pre-commit lint ✓; pre-push lint+tsc ✓; `pnpm design:lint` 0/0/1; `db.d.ts` sin cambios (solo rows). Docs sync: CLAUDE.md, AGENTS.md, Handoff.md, esta spec, memoria `project_axis_palette_adoption.md`.
+
+## Delta 2026-06-07 — paleta pasa a child route del catálogo DS
+
+- `/admin/design-system` ahora es el catálogo canónico del Design System interno.
+- La referencia viva de color AXIS de esta task se conserva como `/admin/design-system/colors` (`AxisColorLabView`) con el mismo viewCode `administracion.design_system`.
+- Toda extensión futura de color debe actualizar `/admin/design-system/colors` y mantener la entrada correspondiente enlazada desde el catálogo `/admin/design-system`.
 - **Gotchas registrados:** (1) `git mv` stagea el blob viejo (rename preserva contenido) → re-`git add` de los movidos para que staged == working tree; (2) pre-push tsc falló por `.next/dev/types/{routes.d.ts,validator.ts}` corruptos (dual-write del dev server al regenerar el manifest tras mover la ruta) → `rm` de los scratch (Turbopack regenera; globs toleran ausentes). No es código del repo; CI compila `.next` limpio.

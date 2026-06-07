@@ -118,6 +118,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Preferencias personales de notificaciones. Link en UserDropdown pendiente (TASK-983 follow-up); alcanzable por URL directa mientras tanto.'
   },
   {
+    route: '/admin/design-system/colors',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Color AXIS Lab — child surface del Design System para ramps, opacidades, contraste y neutrales; alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
     route: '/admin/design-system/loaders',
     parent: '/admin/design-system',
     via: 'inline-link',
@@ -129,70 +136,70 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Microinteractions Lab — child surface del Design System para primitives de feedback de comandos async, alcanzable desde la card "Ver microinteracciones" en DesignSystemView.'
+      'Microinteractions Lab — child surface del Design System para primitives de feedback de comandos async, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/typography',
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Referencia canonica de tipografia (TASK-1044) — child surface del Design System, alcanzable desde la card "Ver tipografia" en DesignSystemView (href={TYPOGRAPHY_ROUTE}, const no detectado por el gate estatico).'
+      'Referencia canonica de tipografia (TASK-1044) — child surface del Design System, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/chips',
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde la card "Ver chips" en DesignSystemView.'
+      'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/buttons',
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Buttons Lab — child surface del Design System para la primitive GreenhouseButton basada en AXIS Figma, alcanzable desde la card "Ver buttons" en DesignSystemView.'
+      'Buttons Lab — child surface del Design System para la primitive GreenhouseButton basada en AXIS Figma, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/charts',
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Charts Lab — child surface del Design System para primitives de visualizacion de datos, alcanzable desde la card "Ver charts" en DesignSystemView.'
+      'Charts Lab — child surface del Design System para primitives de visualizacion de datos, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/utilities',
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Utilities Lab — child surface del Design System para primitives utilitarias como Activity Timeline, alcanzable desde la card "Ver utilities" en DesignSystemView.'
+      'Utilities Lab — child surface del Design System para primitives utilitarias como Activity Timeline, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/floating-surfaces',
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Floating Surfaces Lab (TASK-1033) — child surface del Design System para la primitive GreenhouseFloatingSurface y sus 6 variants, alcanzable desde la card "Ver floating surfaces" en DesignSystemView.'
+      'Floating Surfaces Lab (TASK-1033) — child surface del Design System para la primitive GreenhouseFloatingSurface y sus 6 variants, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/motion',
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Motion Lab (TASK-1045) — child surface del Design System para la primitiva de motion sobre GSAP (<Motion> + useGreenhouseGSAP) y sus 4 variants, alcanzable desde la card "Ver motion" en DesignSystemView.'
+      'Motion Lab (TASK-1045) — child surface del Design System para la primitiva de motion sobre GSAP (<Motion> + useGreenhouseGSAP) y sus 4 variants, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/elevation',
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Elevation & Shadows Lab (TASK-1049) — child surface del Design System para los roles semánticos de elevación (theme.greenhouseElevation), alcanzable desde la card "Ver elevation" en DesignSystemView.'
+      'Elevation & Shadows Lab (TASK-1049) — child surface del Design System para los roles semánticos de elevación (theme.greenhouseElevation), alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/geometry',
     parent: '/admin/design-system',
     via: 'inline-link',
     reason:
-      'Geometry Lab (TASK-1050) — child surface del Design System para spacing/radius AXIS y la extension Greenhouse xxl/display, alcanzable desde la card "Ver geometry" en DesignSystemView.'
+      'Geometry Lab (TASK-1050) — child surface del Design System para spacing/radius AXIS y la extension Greenhouse xxl/display, alcanzable desde el catalogo canonico /admin/design-system.'
   }
 ]
 

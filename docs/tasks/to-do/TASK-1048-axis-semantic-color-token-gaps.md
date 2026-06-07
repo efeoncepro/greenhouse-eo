@@ -38,7 +38,7 @@ Drift detectado de paso (ya corregido): la skill `design-system-governance` afir
 - Token de surface para el tag blue `#eaf3fc`.
 - Los ~8 consumidores de `#2E7D32` + los 9 warnings residuales mapeados a tokens (web por theme; PDF/Excel por el patrón SSOT + adapter por medio).
 - `greenhouse/no-hardcoded-hex-color` promovida a `error` con baseline 0.
-- **Los tokens nuevos quedan documentados en la página viva de colores del design-system** (`/admin/design-system` referencia AXIS + `/admin/design-system/semantic-colors`) + DESIGN.md/V1, para no perderlos del mapa.
+- **Los tokens nuevos quedan documentados en la página viva de colores del design-system** (`/admin/design-system/colors` referencia AXIS + `/admin/design-system/semantic-colors`) + DESIGN.md/V1, para no perderlos del mapa.
 
 ## Architecture Alignment
 
@@ -79,7 +79,7 @@ Reglas obligatorias:
 - `DESIGN.md` + `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`
 - `eslint.config.mjs` (promover rule a error)
 - `src/config/greenhouse-nomenclature.ts` (token `GH_COLORS.surface.tagBlue` / chart pos-neg, si aplica)
-- `src/views/greenhouse/admin/design-system/DesignSystemView.tsx` + `src/views/greenhouse/admin/semantic-colors/mockup/SemanticColorsMockupView.tsx` (documentar tokens en el mapa de colores)
+- `src/views/greenhouse/admin/design-system/AxisColorLabView.tsx` + `src/views/greenhouse/admin/semantic-colors/mockup/SemanticColorsMockupView.tsx` (documentar tokens en el mapa de colores)
 - `.claude/skills/design-system-governance/SKILL.md` (sección 4, cuando el token exista)
 - los consumidores listados arriba
 
@@ -127,7 +127,7 @@ Reglas obligatorias:
 
 ### Slice 6 — Documentar los tokens en el mapa de colores (no perderlos)
 
-- Renderizar/documentar los tokens nuevos (success-ink AA, chart positive/negative, surface tag-blue) en la **página viva de colores del design-system**: `/admin/design-system` (referencia AXIS, `DesignSystemView`) + `/admin/design-system/semantic-colors` (`SemanticColorsMockupView` — que además hoy hardcodea `#2E7D32`, así lo consume Y lo documenta).
+- Renderizar/documentar los tokens nuevos (success-ink AA, chart positive/negative, surface tag-blue) en la **página viva de colores del design-system**: `/admin/design-system/colors` (referencia AXIS, `AxisColorLabView`) + `/admin/design-system/semantic-colors` (`SemanticColorsMockupView` — que además hoy hardcodea `#2E7D32`, así lo consume Y lo documenta). Agregar/actualizar la entrada correspondiente en el catálogo canónico `/admin/design-system`.
 - Reflejar en `DESIGN.md` (sección color) + `GREENHOUSE_DESIGN_TOKENS_V1.md` el token AA-safe + su uso (texto verde sobre blanco) y el racional del gap.
 - Actualizar la skill `design-system-governance` sección 4: pasar `successContrast` de "gap pendiente" a token real con su valor + contraste.
 
@@ -183,7 +183,7 @@ Contrastes medidos sobre blanco (`#ffffff`): success-500 `#28c76f` 2.21:1 · suc
 - [ ] Los ~8 consumidores de `#2E7D32` + los 9 warnings residuales mapeados a tokens (web + PDF/Excel adapter).
 - [ ] `greenhouse/no-hardcoded-hex-color` en `error` con baseline 0.
 - [ ] Contraste verificado y evidencia GVC de superficies afectadas.
-- [ ] Tokens nuevos documentados en `/admin/design-system` + `/admin/design-system/semantic-colors` + DESIGN.md/V1 (no perderlos del mapa) + skill `design-system-governance` §4 actualizada.
+- [ ] Tokens nuevos documentados en `/admin/design-system/colors` + `/admin/design-system/semantic-colors` + DESIGN.md/V1 (no perderlos del mapa), entrada enlazada desde `/admin/design-system` y skill `design-system-governance` §4 actualizada.
 
 ## Verification
 

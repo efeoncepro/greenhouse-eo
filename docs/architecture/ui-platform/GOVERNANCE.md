@@ -78,6 +78,17 @@ No abrir nuevas pantallas visibles relevantes sin decidir al menos una de estas 
 - `tiene view_code propio`
 - `queda explícitamente fuera del modelo porque es una ruta base transversal`
 
+### Regla Design System
+
+Las rutas internas bajo `/admin/design-system/**` reutilizan `administracion.design_system` salvo que exista una razón de acceso nueva y explícita.
+
+Cuando se agregue un token, primitive, patrón o lab nuevo:
+- debe aparecer en el catálogo canónico `/admin/design-system`
+- debe tener link real hacia su ruta interna
+- debe quedar declarado en `route-reachability-manifest.ts`
+- debe contar con GVC si la surface es visual/repetible
+- debe enlazar su contrato en `ui-platform/*`, `DESIGN.md`, la arquitectura de tokens o un ADR según corresponda
+
 ### Excepción documentada actual
 
 `/home` queda explícitamente fuera del modelo de `view_code`.
@@ -93,4 +104,3 @@ Razón de plataforma:
 Eso significa:
 - no debe aparecer en `/admin/views` como vista gobernable por ahora
 - no debe bloquearse con `hasAuthorizedViewCode()` mientras siga siendo la entrada transversal segura de la sesión interna
-

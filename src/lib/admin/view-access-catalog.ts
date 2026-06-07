@@ -583,7 +583,7 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'administracion.design_system',
     section: 'administracion',
     label: 'Design System',
-    description: 'Referencia viva de la paleta AXIS (ramps, semánticos, neutrales). Interno — clientes no acceden.',
+    description: 'Catálogo interno de AXIS: tokens, primitives, patrones y labs del Design System. Clientes no acceden.',
     routePath: '/admin/design-system',
     routeGroup: 'internal'
   },
