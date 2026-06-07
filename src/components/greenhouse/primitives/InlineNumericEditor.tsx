@@ -239,10 +239,17 @@ const InlineNumericEditor = ({
           sx={{ zIndex: theme => theme.zIndex.modal }}
         >
           <Paper
-            elevation={6}
+            elevation={0}
             role='dialog'
             aria-label={`Ajustar ${label}`}
-            sx={{ p: 2, width: 240 }}
+            sx={theme => ({
+              p: 2,
+              width: 240,
+              // Semantic elevation (TASK-1051): anchored transient editor → `floating`.
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+              border: `1px solid ${theme.greenhouseElevation.floating.borderColor}`,
+              boxShadow: theme.greenhouseElevation.floating.boxShadow
+            })}
           >
             <Stack spacing={1.25}>
               <Typography variant='caption' color='text.secondary'>

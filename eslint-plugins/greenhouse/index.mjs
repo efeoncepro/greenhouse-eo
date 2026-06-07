@@ -36,11 +36,12 @@ import noFontsizeInlineTypography from './rules/no-fontsize-inline-typography.mj
 import noDirectFloatingUiInViews from './rules/no-direct-floating-ui-in-views.mjs'
 import noDirectGsapInViews from './rules/no-direct-gsap-in-views.mjs'
 import noHardcodedHexColor from './rules/no-hardcoded-hex-color.mjs'
+import noDirectMuiElevationInPrimitives from './rules/no-direct-mui-elevation-in-primitives.mjs'
 
 const plugin = {
   meta: {
     name: 'eslint-plugin-greenhouse',
-    version: '1.13.0'
+    version: '1.14.0'
   },
   rules: {
     'no-raw-table-without-shell': noRawTableWithoutShell,
@@ -61,7 +62,8 @@ const plugin = {
     'no-fontsize-inline-typography': noFontsizeInlineTypography,
     'no-direct-floating-ui-in-views': noDirectFloatingUiInViews,
     'no-direct-gsap-in-views': noDirectGsapInViews,
-    'no-hardcoded-hex-color': noHardcodedHexColor
+    'no-hardcoded-hex-color': noHardcodedHexColor,
+    'no-direct-mui-elevation-in-primitives': noDirectMuiElevationInPrimitives
   }
 }
 

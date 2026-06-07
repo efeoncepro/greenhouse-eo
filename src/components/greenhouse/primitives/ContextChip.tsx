@@ -611,9 +611,10 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 mt: 1,
                 width: props.popoverWidth ?? 320,
                 maxWidth: 'calc(100vw - 32px)',
+                // Semantic elevation (TASK-1051): anchored contextual popover → `floating`.
                 borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                border: `1px solid ${theme.palette.divider}`,
-                boxShadow: theme.shadows[6]
+                border: `1px solid ${theme.greenhouseElevation.floating.borderColor}`,
+                boxShadow: theme.greenhouseElevation.floating.boxShadow
               })
             }
           }}
@@ -641,9 +642,10 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
               sx={theme => ({
                 width: props.popoverWidth ?? 360,
                 maxWidth: 'calc(100vw - 32px)',
+                // Semantic elevation (TASK-1051): anchored contextual popover → `floating`.
                 borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                border: `1px solid ${theme.palette.divider}`,
-                boxShadow: theme.shadows[6],
+                border: `1px solid ${theme.greenhouseElevation.floating.borderColor}`,
+                boxShadow: theme.greenhouseElevation.floating.boxShadow,
                 overflow: 'hidden'
               })}
               role='dialog'

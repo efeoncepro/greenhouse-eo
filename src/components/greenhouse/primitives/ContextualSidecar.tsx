@@ -121,8 +121,11 @@ const ContextualSidecar = ({
         overflow: 'hidden',
         boxShadow:
           chrome === 'contained'
-            ? { xs: 0, md: theme.shadows[2] }
-            : `-18px 0 48px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.22 : 0.055)}`
+            ? // Semantic elevation (TASK-1051): contained resting panel → `raised`.
+              { xs: 0, md: theme.greenhouseElevation.raised.boxShadow }
+            : // `adaptive` lane keeps a bespoke directional shadow (not a symmetric
+              // role): the in-flow lane casts toward the canvas it overlays.
+              `-18px 0 48px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.22 : 0.055)}`
       })}
     >
       <Box

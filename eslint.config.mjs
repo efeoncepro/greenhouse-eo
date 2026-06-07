@@ -320,6 +320,11 @@ export default [
       // eran los huérfanos src/libs/GSAP*.tsx, jubilados; el módulo motion es
       // exento por path en la rule).
       'greenhouse/no-direct-gsap-in-views': 'error',
+      // TASK-1049/1051 — primitives Greenhouse NO usan sombra directa MUI
+      // (elevation={n} / theme.shadows[n]); consumir theme.greenhouseElevation.<role>.
+      // Mode `error` desde commit-1 (TASK-1051 migró los 4 callsites previos;
+      // cero violaciones en src/components/greenhouse/primitives/** hoy).
+      'greenhouse/no-direct-mui-elevation-in-primitives': 'error',
       // TASK-827 Slice 7 — modo warn durante migración V1.0. Promote a `error`
       // vive en TASK derivada V1.1 client-portal-legacy-branching-sweep
       // (trigger: zero drift ≥30 días post TASK-829 cierre).

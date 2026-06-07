@@ -333,7 +333,8 @@ const MetricTrendCard = ({
         }),
         '&:hover': {
           transform: 'translateY(-2px)',
-          boxShadow: theme.shadows[4],
+          // Semantic elevation (TASK-1051): hover lift on an interactive card → `raised`.
+          boxShadow: theme.greenhouseElevation.raised.boxShadow,
           borderColor: alpha(lineColor, 0.5)
         },
         '@media (prefers-reduced-motion: reduce)': {
