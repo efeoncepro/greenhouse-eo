@@ -137,6 +137,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Referencia canonica de tipografia (TASK-1044) — child surface del Design System, alcanzable desde la card "Ver tipografia" en DesignSystemView (href={TYPOGRAPHY_ROUTE}, const no detectado por el gate estatico).'
+  },
+  {
+    route: '/admin/design-system/charts',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Charts Lab — child surface del Design System para primitives de visualizacion de datos, alcanzable desde la card "Ver charts" en DesignSystemView.'
   }
 ]
 

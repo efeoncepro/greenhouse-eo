@@ -8,9 +8,28 @@ Se implementó el diseño AXIS "Under Maintenance" (Figma 504-12356) en la famil
 - **Evidencia:** tsc 0 + lint clean; gate ON **7/7** curl tests (503 gateado, `/maintenance` 200 sin loop, allowlist 200, asset 200, bypass correcto setea cookie, bypass incorrecto 503, cookie persiste); `pnpm build` **BUILD_EXIT=0** con `ƒ Proxy (Middleware)`; GVC desktop+mobile enterprise (`.captures/2026-06-07T00-02-22_inline-maintenance`, `…T00-05-18…` mobile). Skills: greenhouse-ux, modern-ui, greenhouse-ux-writing, arch-architect.
 - **Commit:** `16bb15dac feat(ui): AXIS Under Maintenance misc page + maintenance gate` (solo mis 10 archivos; el trabajo de primitives/charts quedó sin tocar).
 - **Riesgo conocido:** con mantenimiento global ON, "Volver al inicio" recarga `/maintenance` (todo gateado); la acción útil es "Reintentar". Se dejó así por consistencia con la familia.
+- **Extensibilidad documentada:** el `middleware.ts` es de propósito general (capa edge-global, singleton del framework). Doc canónica `docs/documentation/plataforma/middleware-edge.md` lista usos futuros (geo/locale, rate limit, A/B, security headers globales, redirects masivos, bloqueo bot/IP) + reglas (1 función por responsabilidad encadenada, default-OFF + fail-open, cero DB/IO por request, NUNCA un 2º middleware).
 - **Estado: code complete, rollout pendiente.** El gate NO se encendió en ningún ambiente. **Próximo paso (owner: operador):** para activar una mantención → setear `MAINTENANCE_MODE=true` (+ `MAINTENANCE_BYPASS_SECRET=$(openssl rand -hex 32)`) en el target + redeploy; para cerrar → `MAINTENANCE_MODE=false` + redeploy. Runbook: `docs/manual-de-uso/plataforma/modo-mantenimiento.md`.
 
 ---
+
+# Sesion 2026-06-07 — Greenhouse chart primitives + Charts Lab
+
+Por pedido del operador se abrió una nueva página de charts bajo el Design System interno y se implementaron tres diseños AXIS Figma como primitives reutilizables, no como composiciones route-locales: `Earning Reports` semanal (`yyMksCoijfMaIoYplXKZaR`, node `6717:211725`), `Earning Reports` anual (node `6717:214469`) y `Vehicles overview` (node `6717:215195`).
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseMetricBreakdownChartCard.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato V1:** `variant='weeklyBarSummary'`, kinds `earningReports/financialSnapshot/operationalSnapshot/custom`, KPI hero + delta + descripcion, bar chart semanal Recharts, metric meters MUI con `role='meter'`, tooltip accesible, responsive mobile, `data-capture`, `aria-label` conciso + `aria-describedby` compacto.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseChartCard.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato V1:** `variant='monthlyBar'`, kinds `earningReports/operationalMetric/financialMetric/custom`, tabs semánticos con `id/label/icon/data/tone/highlightedIndex`, bar chart mensual Recharts, tooltip accesible, responsive mobile, `data-capture`, `aria-label` conciso + `aria-describedby` compacto.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseStackedDistributionChartCard.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato V1:** `variant='stackedStatus'`, kinds `vehiclesOverview/workflowDistribution/capacityDistribution/custom`, segmentos ordenados con `id/label/value/detail/icon/tone`, stacked horizontal bar Recharts, rows operativas MUI, tooltip, responsive mobile y `aria-describedby` compacto.
+- **Fix importante de a11y/layout:** se reemplazó la tabla sr-only inicial por una descripción oculta 1x1. Medición Playwright confirmó `tablesCount=0` y descripción `1x1`; esto elimina la caja absoluta grande que podía explicar el espacio raro observado en mobile.
+- **Lab interno:** `/admin/design-system/charts`, gateado igual que `/admin/design-system` por `administracion.design_system` y defensa `tenantType !== client`.
+- **Reachability:** link "Ver charts" agregado en `DesignSystemView` + child route declarada en `src/lib/navigation/route-reachability-manifest.ts`.
+- **Scenario GVC:** `scripts/frontend/scenarios/design-system-charts.scenario.ts`.
+- **URL local actual:** `http://localhost:3001/admin/design-system/charts` (hay dev server vivo en 3001; 3000 no estaba escuchando).
+- **Evidencia GVC final:** `.captures/2026-06-07T00-48-13_design-system-charts` desktop + mobile, revisado visualmente; el nuevo card semanal no muestra espacio phantom y mobile apila los metric meters sin colisiones.
+- **Gates verdes:** vitest de las tres primitives, eslint focal, `gtimeout 120s pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm design:lint`, `pnpm docs:closure-check` (solo info CLIENT_CHANGELOG; no aplica por surface interna) y `git diff --check`.
 
 # Sesion 2026-06-06 — Greenhouse microinteraction primitives V1
 

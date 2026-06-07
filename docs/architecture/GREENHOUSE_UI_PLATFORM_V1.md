@@ -1,7 +1,10 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.22
+> **Version:** 1.25
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-07 — v1.25: Greenhouse agrega `GreenhouseMetricBreakdownChartCard` como tercera primitive canonical de charts para snapshots con KPI hero + serie semanal + metric meters (`variant='weeklyBarSummary'`, primer kind `earningReports`) basada en Recharts + meters MUI.
+> **Updated:** 2026-06-07 — v1.24: Greenhouse agrega `GreenhouseStackedDistributionChartCard` como segunda primitive canonical de charts para distribuciones apiladas operativas (`variant='stackedStatus'`, primer kind `vehiclesOverview`) basada en Recharts + rows MUI.
+> **Updated:** 2026-06-07 — v1.23: Greenhouse agrega `GreenhouseChartCard` como primitive reusable inicial para chart cards enterprise basadas en Recharts, con tabs de metrica, tooltip accesible, `aria-describedby` compacto, responsive mobile y Charts Lab interno en `/admin/design-system/charts`.
 > **Updated:** 2026-06-06 — v1.22: Greenhouse expande microinteracciones V1.1 con `GreenhouseFieldProvenancePeek`, `GreenhouseStepperProgressMicro`, `GreenhouseEvidenceAttachmentDropzone` y `GreenhouseInlineDecisionPrompt` para procedencia de datos, progreso operativo compacto, evidencia/upload verificado y decisiones inline de riesgo controlado.
 > **Updated:** 2026-06-06 — v1.21: Greenhouse canoniza el set V1 de primitives de microinteraccion (`GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`, `GreenhouseStateTransition`, `GreenhouseInlineValidation`) con states/variants oficiales e iteracion obligatoria en el lab antes de crear componentes paralelos.
 > **Updated:** 2026-06-06 — v1.20: Greenhouse agrega `GreenhouseStateTransition` como primitive de microinteraccion para cambios de estado visibles en rows, cards y panels (`from -> to`, tonos semanticos, live region, reduced-motion). Lab interno: `/admin/design-system/microinteractions`.
@@ -32,6 +35,34 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-07 — Greenhouse Chart Card Primitives
+
+Greenhouse adopta tres primitives iniciales para chart cards enterprise de la familia Design System / AXIS:
+
+- `GreenhouseChartCard`: primer kind `earningReports`, primera variant oficial `monthlyBar`, adaptada desde AXIS Figma (`Design System | Vuexy → AXIS`, node `6717:214469`) al stack Greenhouse.
+- `GreenhouseStackedDistributionChartCard`: primer kind `vehiclesOverview`, primera variant oficial `stackedStatus`, adaptada desde AXIS Figma (`Design System | Vuexy → AXIS`, node `6717:215195`) al stack Greenhouse.
+- `GreenhouseMetricBreakdownChartCard`: primer kind `earningReports`, primera variant oficial `weeklyBarSummary`, adaptada desde AXIS Figma (`Design System | Vuexy → AXIS`, node `6717:211725`) al stack Greenhouse para KPI hero + delta + serie semanal + metric meters.
+
+Docs canonicos:
+
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseChartCard.tsx`
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseStackedDistributionChartCard.tsx`
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseMetricBreakdownChartCard.tsx`
+- Visual lab interno: `/admin/design-system/charts`
+- Scenario GVC: `design-system-charts`
+
+Contrato:
+
+- Library choice V1: Recharts. Se eligio para esta primitive porque tabs semanticos, labels, tooltip, hover state, responsive behavior y fallback accesible permanecen bajo React/MUI. ApexCharts sigue vigente para dashboards existentes y charts donde su wrapper ya sea suficiente.
+- Props principales: `title`, `subtitle`, `tabs`, `variant`, `kind`, `activeTabId/defaultActiveTabId`, `onActiveTabChange`, `onAddMetric`, `maxValue`, `yAxisTicks`, `valueFormatter`, `chartAriaLabel`, `dataCapture`.
+- `tabs` modela cada metrica con `id`, `label`, `icon`, `data`, `tone` y `highlightedIndex`. La primitive solo renderiza visualizacion; readers, commands, autorizacion, audit/outbox y API parity viven en adapters de dominio.
+- `GreenhouseStackedDistributionChartCard` modela distribuciones apiladas con `segments[]` (`id`, `label`, `value`, `detail`, `icon`, `tone`) y usa Recharts para la barra apilada + MUI para rows operativas. El dominio calcula los porcentajes/tiempos; la primitive gobierna layout, tooltip, responsive y a11y.
+- `GreenhouseMetricBreakdownChartCard` modela snapshots compactos con `heroValue`, `deltaLabel`, descripcion, `series[]` semanal y `metrics[]` (`id`, `label`, `value`, `icon`, `tone`, `progress`). Recharts gobierna la serie; MUI gobierna los meters. El dominio calcula valores/progreso; la primitive conserva shell, responsive, tooltip y a11y.
+- A11y: el plot expone `role='img'`, nombre conciso via `aria-label` y resumen de datos via `aria-describedby`. No usa tabla sr-only grande: el fallback visualmente oculto es una caja 1x1 para evitar layout phantom en mobile.
+- Responsive: tabs pueden scrollear horizontalmente si la cantidad de metricas supera el ancho; el chart debe escalar en mobile sin quedar cortado.
+- Extension futura: nuevas variants deben cambiar comportamiento de visualizacion, densidad, interaccion o contrato de datos; no se aceptan variants que solo cambien color, sombra o radio. Nuevos kinds deben mapear un uso semantico de dominio hacia una variant oficial antes de que el consumer pinte layout propio.
+- Toda variant chart nueva debe aparecer primero en `/admin/design-system/charts` con `data-capture`, GVC desktop+mobile y test focal antes de migrar consumers productivos.
 
 ## Delta 2026-06-06e — Greenhouse Microinteraction Primitives V1/V1.1
 

@@ -41,6 +41,7 @@ const OPACITY_STEPS = [8, 16, 24, 32, 38] as const
 const LOADING_LAB_ROUTE = '/admin/design-system/loaders'
 const MICROINTERACTIONS_LAB_ROUTE = '/admin/design-system/microinteractions'
 const TYPOGRAPHY_ROUTE = '/admin/design-system/typography'
+const CHARTS_LAB_ROUTE = '/admin/design-system/charts'
 
 const BRAND: { key: AxisColorFamily; label: string }[] = [
   { key: 'primary', label: 'Primary (Efeonce)' },
@@ -198,6 +199,41 @@ const DesignSystemView = () => (
           endIcon={<i className='tabler-arrow-right' />}
         >
           Ver tipografía
+        </Button>
+      </CardContent>
+    </Card>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Laboratorios
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Charts y visualizacion de datos
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Primitive reusable para charts enterprise basada en AXIS Figma, Recharts, tipografia SoT y fallback accesible.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={CHARTS_LAB_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-chart-bar' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver charts
         </Button>
       </CardContent>
     </Card>
