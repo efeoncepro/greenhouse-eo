@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Code-complete + pushed (develop) — pendiente: full pnpm test + verificación staging`
+- Status real: `Code-complete + pushed (develop). Hardening residual (render-tests + full suite + staging) → TASK-1047`
 - Rank: `TBD`
 
 ## Closing summary (2026-06-07)

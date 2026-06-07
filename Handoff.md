@@ -8,8 +8,8 @@ Se construyó la **primitiva base de motion sobre GSAP** (la "primigenia" para r
 - **Museo + GVC:** `/admin/design-system/motion` (gate interno, enlazado + reachability), GVC enterprise verde (4 frames mirados).
 - **Docs:** ADR `GREENHOUSE_MOTION_PRIMITIVE_V1.md` + DESIGN.md §Motion + V1 §9 reconciliado al SoT + DECISIONS_INDEX + CLAUDE.md/AGENTS.md.
 - **Colisión multi-agente resuelta:** Codex committeó su Chips Lab (`11951d7c0`) en paralelo; sus hunks en `DesignSystemView`/manifest se aislaron de los míos (chips preservado intacto) y completé su entrada de reachability dangling (`0c92b7451`).
-- **Gates:** `local:check` + `pnpm build` + `design:lint 0/0` + drift-guard 57 + reachability 0 orphans + 37 tests focales. **Pendiente de cierre formal:** full `pnpm test` (~12 min) + verificación staging.
-- **Próxima primitiva:** TASK-1046 `<AnimatedMetric>` (converge `AnimatedCounter`/31 consumidores swapeando el motor a `useGreenhouseGSAP` con API idéntica → cero churn).
+- **Gates:** `local:check` + `pnpm build` + `design:lint 0/0` + drift-guard 57 + reachability 0 orphans + 37 tests focales. TASK-1045 movida a `complete/` (code-complete + pushed).
+- **Follow-ups creados:** **TASK-1047** (hardening residual: render-test harness de `<Motion>`/variants + full `pnpm test` + verificación staging) y **TASK-1046** (`<AnimatedMetric>`: converge `AnimatedCounter`/31 consumidores swapeando el motor a `useGreenhouseGSAP` con API idéntica → cero churn). Ambas para sesión fresca.
 
 ---
 
