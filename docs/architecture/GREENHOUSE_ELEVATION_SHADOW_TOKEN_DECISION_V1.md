@@ -59,6 +59,20 @@ The exact exported names may be refined during TASK-1049, but the module must ex
 - border/surface guidance where relevant, not only `boxShadow`;
 - enough metadata for tests and documentation.
 
+The SoT module is the values authority, but the tokens must reach consumers **through the theme**, not via a direct module import in primitives. This mirrors the canonical typography precedent (`typography-tokens.ts` is the SoT, `mergedTheme.ts` derives, consumers read `theme.*`). Reason: `prefers-color-scheme` and the `darkSemi` second theme are resolved at the theme layer; a directly-imported object would sit outside the theme switch. The exact surfacing mechanism (a `theme.greenhouseElevation.*` namespace, or an intentional mapping onto `customShadows`) is decided in TASK-1049 Plan Mode, but a primitive must never `import` the elevation module to read a raw value.
+
+### Visual direction (starting point, calibrate in GVC)
+
+This ADR does not lock exact CSS values, but it pins the **convergent 2026 elevation recipe** as the starting direction so calibration is not done blind. Serious product systems (GitHub Primer, shadcn/ui, Linear, Vercel Geist) converge on **two soft layers + a 1px hairline ring**, not a single heavy drop:
+
+```css
+/* floating — starting direction, refine in GVC */
+box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06);
+/* + 1px hairline border/ring carrying the separation */
+```
+
+Hard anti-dated ceiling for the whole system: **no role's shadow may exceed `0 8px 24px rgba(0,0,0,0.1)`** (the "dated drop shadow" threshold). `floating` sits clearly below it; `modal` may approach it but must not return to the heavy single-drop `theme.shadows[6/8]` look the operator flagged. Exact alpha/offset values are GVC-calibrated in light + dark.
+
 `GreenhouseFloatingSurface` must become the first consumer:
 
 - `Paper elevation={0}`;
@@ -87,6 +101,8 @@ If a future task adds or changes a role, it must update the runtime SoT and thes
 - Cards inside operational workbenches remain flat/outlined by default.
 - Elevation must not be used as decoration when hierarchy is already clear via spacing, border, density or contrast.
 - Floating, overlay and modal roles must remain visually distinct but restrained.
+- **`forced-colors` (Windows High Contrast):** the browser strips `box-shadow` entirely, so a surface that separates only via shadow becomes visually fused with its background. Every floating/overlay/modal token must carry its separation through the **border** (a real `1px` border-color, not a shadow ring) so the surface stays legible when shadows are removed. The shadow is the enhancement; the border is the floor.
+- **`raised` is not an escape hatch to re-elevate cards.** The Flat 3.0 / `elevation > 0` prohibition on internal cards stands. `raised` is for transient hover/selection lift and rare resting surfaces that genuinely need separation — never a blanket card resting state in dashboards/workbenches.
 
 ## Alternatives Considered
 
@@ -125,13 +141,14 @@ Risks:
 
 - Overcorrecting to shadows that are too flat can hurt separation in dense tables/workbenches.
 - Dark mode can make shadows ineffective if border/surface treatment is not paired with the token.
+- `forced-colors` mode removes shadows entirely; without a real border the surface disappears into its background.
 - If the role table grows too quickly, agents may again choose by taste.
 
 Mitigations:
 
 - Keep V1 roles small.
-- Include border/surface guidance in each token.
-- Use GVC desktop + mobile evidence for Floating Surface.
+- Include border/surface guidance in each token; the border (not the shadow) must carry separation under `forced-colors`.
+- Use GVC desktop + mobile evidence for Floating Surface, in both light and `darkSemi`.
 - Treat broad migration as follow-up, not first task scope.
 
 ## Reversibility

@@ -95,6 +95,7 @@ Reglas obligatorias:
 
 - `src/components/theme/elevation-tokens.ts` (nuevo SoT esperado)
 - `src/components/theme/__tests__/elevation-tokens.test.ts` o ubicacion equivalente
+- `src/components/theme/elevation-drift.test.ts` o equivalente (drift-guard 3-capas, espejo de `typography-drift.test.ts`)
 - `src/components/greenhouse/primitives/GreenhouseFloatingSurface.tsx`
 - `src/components/greenhouse/primitives/floating-surface-controller.ts`
 - `src/components/greenhouse/primitives/__tests__/GreenhouseFloatingSurface.test.tsx`
@@ -164,20 +165,26 @@ Reglas obligatorias:
   - `floating`
   - `overlay`
   - `modal`
-  - `overflow`
-- Cada token debe declarar al menos:
+  - `overflow` (reservado — ver regla abajo)
+- **El SoT fluye por el theme, NO por import directo en primitives** (precedente canonico de tipografia: `typography-tokens.ts` es SoT, `mergedTheme.ts` deriva, los consumers leen `theme.*`). Decidir en Plan Mode el mecanismo de surfacing — `theme.greenhouseElevation.*` namespace o mapeo intencional sobre `customShadows` — pero un primitive NUNCA debe `import`ar `elevation-tokens.ts` para leer un valor crudo. Razon dura: `prefers-color-scheme` y el segundo theme `darkSemi` se resuelven en la capa de theme; un objeto importado directo queda fuera del switch de tema.
+- **`overflow` nace reservado: union + metadata + docs, pero SIN valor runtime emitido** hasta que un consumidor real (sticky/table edge) lo use. Regla canonica "NUNCA un token sin consumidor" (mismo criterio que "no display tier sin consumidor" de tipografia). Esto reduce el risk de role table inflada.
+- Cada token (de los roles con consumidor) debe declarar al menos:
   - `boxShadow`
-  - `borderColor` o politica de border cuando aplique
+  - `borderColor` o politica de border cuando aplique — **obligatorio para floating/overlay/modal**: el border (no la sombra) carga la separacion bajo `forced-colors`
   - `surfaceColor` o politica de background cuando aplique
   - intended usage metadata para docs/tests
-- Los valores deben ser light/dark aware.
-- Los valores pueden derivar de canales MUI/Vuexy (`theme.palette`, `alpha`, CSS vars de shadow channel), pero el consumidor debe ver el rol semantico, no el indice MUI.
+- Los valores deben ser light/dark aware (light + `darkSemi`).
+- Los valores pueden derivar de canales MUI/Vuexy (`theme.palette`, `alpha`, CSS vars de shadow channel), pero el consumidor debe ver el rol semantico, no el indice MUI. NO introducir OKLCH/`color-mix`/P3 (overlay modern-ui Greenhouse: sRGB + opacities).
+- **Direccion visual de partida** (calibrar en GVC, Slice 3): receta convergente 2026 (GitHub Primer, shadcn/ui, Linear, Vercel Geist) = doble capa suave + hairline ring 1px, NO un drop pesado de una sola capa. Ningun rol puede superar `0 8px 24px rgba(0,0,0,0.1)` (umbral "dated").
 - Agregar tests focales que verifiquen:
-  - todos los roles existen;
+  - todos los roles existen en la union;
   - `none.boxShadow === 'none'` o equivalente;
   - `floating` no referencia `theme.shadows[6]` como contrato directo;
-  - dark mode tiene valores definidos;
-  - metadata de uso no esta vacia.
+  - `floating`/`overlay`/`modal` declaran `borderColor` no vacio (separacion forced-colors);
+  - dark mode (`darkSemi`) tiene valores definidos;
+  - metadata de uso no esta vacia;
+  - `overflow` esta declarado en la union/metadata pero no emite valor runtime hasta tener consumidor.
+- **Agregar drift-guard de paridad 3-capas** (espejo de `typography-drift.test.ts`): un test que falle CI si divergen `runtime (theme) ≡ SoT ≡ DESIGN.md §Elevation ≡ V1 §6`. Los tests focales NO sustituyen este guard — la paridad 3-capas es no-negociable (`design-system-governance` regla #1). Puede cerrarse junto con Slice 4 (cuando DESIGN.md/V1 tengan la tabla), pero el guard se escribe en este slice.
 
 ### Slice 2 — Floating Surface cutover
 
@@ -203,22 +210,27 @@ Reglas obligatorias:
   - mobile;
   - near-edge/collision scenario;
   - keyboard open/close si el scenario ya lo cubre.
+  - dark mode (`darkSemi`) si el scenario lo cubre;
+  - `forced-colors`/high-contrast: verificar (al menos manualmente, emulando en DevTools) que con `box-shadow` removido el surface sigue separado por el border.
 - Revisar frames PNG manualmente y ajustar hasta que:
-  - la sombra se vea sobria/moderna;
-  - el borde no se vea pesado;
+  - la sombra se vea sobria/moderna (doble capa suave + ring 1px, no drop pesado);
+  - el borde no se vea pesado pero SI sostenga la separacion sin sombra;
   - dark mode no pierda separacion;
+  - `forced-colors` no funde el surface con el fondo;
   - tooltips/action menus no parezcan dialogs.
 
 ### Slice 4 — Documentation sync
 
 - `DESIGN.md`:
   - reemplazar criterio generico por regla compacta con roles semanticos;
-  - dejar claro que cards internas siguen flat/outlined;
-  - declarar que popovers/dialogs/docks usan roles, no numeros.
+  - dejar claro que cards internas siguen flat/outlined y que `raised` NO es escape hatch para re-elevar cards;
+  - declarar que popovers/dialogs/docks usan roles, no numeros;
+  - declarar la regla `forced-colors`: el border carga la separacion, la sombra es enhancement.
 - `GREENHOUSE_DESIGN_TOKENS_V1.md` §6:
   - mover tabla principal a roles semanticos;
   - conservar `theme.shadows`/`customShadows` como legacy/compat explanation;
   - declarar primer consumidor `GreenhouseFloatingSurface`.
+- **Drift-guard:** confirmar que el test de paridad 3-capas (Slice 1) queda verde con la tabla final de DESIGN.md/V1 — runtime ≡ SoT ≡ DESIGN.md §Elevation ≡ V1 §6. Si DESIGN.md entra al contrato lint (TASK-764), validar con `pnpm design:lint` 0/0.
 - `ui-platform/PRIMITIVES.md`:
   - actualizar Floating Surface para indicar elevation token.
 - `ui-platform/HISTORIAL.md`:
@@ -280,19 +292,20 @@ El shape exacto puede cambiar si el plan lo justifica, pero NO puede perder:
 
 - union tipada de niveles;
 - metadata o docs vinculables;
-- resolucion light/dark;
-- consumo desde Floating Surface sin indices MUI directos.
+- resolucion light/dark (`darkSemi`);
+- consumo desde Floating Surface **a traves del theme**, sin indices MUI directos y sin `import` del modulo SoT en el primitive;
+- `borderColor` real (no shadow ring) en floating/overlay/modal para que la separacion sobreviva `forced-colors`.
 
 ### Role semantics
 
 | Role | Debe verse como | Uso permitido | Prohibido |
 |---|---|---|---|
 | `none` | plano, separado por border/spacing | internal cards, table shells, panels | popovers/menus |
-| `raised` | lift suave local | hover/selection, tile interactivo | resting state masivo en dashboards |
+| `raised` | lift suave local | hover/selection, tile interactivo | resting state masivo en dashboards (NO es escape hatch para re-elevar cards) |
 | `floating` | surface anclada, transitoria, clara pero sobria | `GreenhouseFloatingSurface` default | dialogs/destructive decisions |
 | `overlay` | capa superior no modal | command preview, floating dock | drawers full-height |
 | `modal` | stack blocking claro | Dialog/temporary Drawer | anchored popovers |
-| `overflow` | affordance de scroll/sticky edge | table edge shadows | container depth |
+| `overflow` | affordance de scroll/sticky edge — **reservado en V1, sin valor runtime hasta tener consumidor** | table edge shadows (futuro) | container depth |
 
 ### Floating Surface acceptance detail
 
@@ -306,10 +319,12 @@ La diff esperada en `GreenhouseFloatingSurface` debe cumplir:
 
 ### Visual standard
 
-El resultado debe parecer enterprise 2026:
+El resultado debe parecer enterprise 2026. Direccion de partida (resuelta por modern-ui, calibrar exactos en GVC):
 
-- sombra mas difusa/sutil, sin glow pesado;
-- borde fino para separacion en light/dark;
+- **Receta convergente 2026** (GitHub Primer, shadcn/ui, Linear, Vercel Geist): doble capa suave + hairline ring 1px. Punto de partida `floating` = `box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06)` + 1px border/ring que carga la separacion.
+- **Techo duro anti-dated:** ningun rol supera `0 8px 24px rgba(0,0,0,0.1)`. `floating` queda claramente debajo; `modal` puede acercarse pero sin volver al drop pesado de `theme.shadows[6/8]`.
+- sombra mas difusa/sutil, sin glow pesado ni capa unica pesada;
+- borde fino para separacion en light/dark — y unico mecanismo bajo `forced-colors`;
 - surface limpia y legible;
 - sin efecto "card flotando brillante";
 - sin capas de sombras acumuladas cuando el popover vive sobre cards.
@@ -329,6 +344,7 @@ Slice 2 no puede correr antes de Slice 1. Slice 4 no puede cerrar antes de que S
 | La nueva sombra queda demasiado plana y pierde separacion en tablas densas | UI / accessibility | medium | GVC near-edge + dark/light; combinar border/surface con shadow | revision visual GVC |
 | La nueva sombra queda demasiado fuerte y compite con Dialog/Dock | UI / platform | medium | roles `floating` vs `overlay` vs `modal` pequenos y testeados | revision visual GVC |
 | Dark mode pierde jerarquia porque la sombra no se percibe | UI / dark mode | medium | token incluye border/surface guidance, no solo shadow | GVC dark mode si disponible |
+| `forced-colors`/high-contrast funde el surface (browser elimina box-shadow) | UI / accessibility | medium | border real (no shadow ring) carga la separacion en floating/overlay/modal | emulacion forced-colors DevTools + test borderColor no vacio |
 | Agentes siguen usando `theme.shadows[n]` en primitives nuevas | UI governance | medium | docs + follow-up lint candidate | rg audit / lint future |
 | Scope creep a migracion global de sombras | delivery | high | Slice 5 solo clasifica; migraciones nuevas requieren task | task scope review |
 | Drift docs/runtime | design system | low | docs + tests + `design:lint` + closure-check | `pnpm design:lint`, docs closure |
@@ -373,10 +389,14 @@ Slice 2 no puede correr antes de Slice 1. Slice 4 no puede cerrar antes de que S
 ## Acceptance Criteria
 
 - [ ] ADR `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1` aceptada o ajustada por el operador antes de runtime.
-- [ ] Existe SoT runtime de elevation tokens con roles `none`, `raised`, `floating`, `overlay`, `modal`, `overflow`.
-- [ ] Tests focales cubren existencia, light/dark y uso metadata de tokens.
+- [ ] Existe SoT runtime de elevation tokens con roles `none`, `raised`, `floating`, `overlay`, `modal`, `overflow` (este ultimo reservado, sin valor runtime hasta tener consumidor).
+- [ ] El token fluye por el theme; ningun primitive `import`a `elevation-tokens.ts` para leer un valor crudo.
+- [ ] `floating`/`overlay`/`modal` declaran `borderColor` real; la separacion sobrevive `forced-colors` (border, no sombra).
+- [ ] Tests focales cubren existencia, light/`darkSemi`, borderColor en overlays, `overflow` reservado y uso metadata de tokens.
+- [ ] Drift-guard de paridad 3-capas (runtime ≡ SoT ≡ DESIGN.md ≡ V1) verde en CI.
 - [ ] `GreenhouseFloatingSurface` ya no usa `Paper elevation={6}` ni `theme.shadows[n]` directo.
 - [ ] Floating Surface consume `floating` semantic elevation por defecto.
+- [ ] Ninguna sombra del sistema supera `0 8px 24px rgba(0,0,0,0.1)` (techo anti-dated).
 - [ ] Lab `/admin/design-system/floating-surfaces` refleja el contrato o specimen vivo.
 - [ ] GVC desktop + mobile revisado manualmente; resultado aceptado visualmente.
 - [ ] `DESIGN.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md`, `ui-platform/PRIMITIVES.md`, `ui-platform/HISTORIAL.md` sincronizados.
@@ -391,6 +411,7 @@ Slice 2 no puede correr antes de Slice 1. Slice 4 no puede cerrar antes de que S
 - `pnpm lint`
 - `pnpm tsc --noEmit`
 - test focal nuevo de elevation tokens
+- drift-guard de paridad 3-capas (runtime ≡ SoT ≡ DESIGN.md ≡ V1) — espejo de `typography-drift.test.ts`
 - test focal existente/actualizado de `GreenhouseFloatingSurface`
 - `pnpm fe:capture floating-surface-primitives --env=local`
 - `pnpm docs:closure-check`
@@ -414,7 +435,8 @@ Slice 2 no puede correr antes de Slice 1. Slice 4 no puede cerrar antes de que S
 
 ## Open Questions
 
-- ¿El token `floating` V1 debe derivar internamente de `customShadows.md/lg` o usar una composicion propia con `alpha(theme.palette.common.black, ...)`? Resolver en Plan Mode con GVC.
-- ¿Dark mode requiere token separado por surface/border mas que por shadow? Resolver en visual calibration.
-- ¿`overflow` entra en V1 runtime o se declara reservado hasta que una sticky/table edge lo consuma? Recomendacion: definir metadata y valor minimo si el costo es bajo; si complica, mantener reservado con test/documentacion.
+- ~~¿`floating` debe ser sombra de una capa o composicion doble sutil?~~ **RESUELTO (modern-ui):** doble capa suave + hairline ring 1px (receta convergente 2026). Sigue calibrable en GVC, pero arranca de esa direccion, no a ciegas. Ver Detailed Spec → Visual standard.
+- ¿El token `floating` V1 debe derivar internamente de `customShadows.md/lg` o usar una composicion propia con `alpha(theme.palette.common.black, ...)`? Resolver en Plan Mode con GVC. Restriccion dura: sRGB + opacities (NO OKLCH/`color-mix`/P3, overlay modern-ui Greenhouse). Preferir alpha sobre canal de shadow AXIS-aware si existe, para alinear con TASK-1034.
+- ¿Dark mode requiere token separado por surface/border mas que por shadow? Resolver en visual calibration. Nota: bajo `forced-colors` el border ya es obligatorio independientemente del modo.
+- ~~¿`overflow` entra en V1 runtime?~~ **RESUELTO:** reservado en V1 — declarado en union/metadata/docs, SIN valor runtime emitido hasta que un sticky/table edge real lo consuma (regla "no token sin consumidor"). Ver Slice 1.
 
