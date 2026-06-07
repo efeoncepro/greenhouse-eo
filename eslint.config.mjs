@@ -304,6 +304,11 @@ export default [
       'greenhouse/no-inline-facet-visibility-check': 'error',
       'greenhouse/cloud-run-services-must-init-sentry': 'error',
       'greenhouse/no-cross-domain-import-from-client-portal': 'error',
+      // TASK-1033 — views/app/components NO importan @floating-ui/* directo;
+      // consumir GreenhouseFloatingSurface. Mode `error` desde commit-1 (cero
+      // violaciones en superficies de producto: pilotos migrados; el resto son
+      // primitives o infra Vuexy menu, exentos por path en la rule).
+      'greenhouse/no-direct-floating-ui-in-views': 'error',
       // TASK-827 Slice 7 — modo warn durante migración V1.0. Promote a `error`
       // vive en TASK derivada V1.1 client-portal-legacy-branching-sweep
       // (trigger: zero drift ≥30 días post TASK-829 cierre).

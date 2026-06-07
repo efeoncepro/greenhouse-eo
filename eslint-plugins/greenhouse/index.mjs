@@ -33,6 +33,7 @@ import noExtractEpochFromDateSubtraction from './rules/no-extract-epoch-from-dat
 import noInlineFtrCalculation from './rules/no-inline-ftr-calculation.mjs'
 import noBqStructStringTimestamp from './rules/no-bq-struct-string-timestamp.mjs'
 import noFontsizeInlineTypography from './rules/no-fontsize-inline-typography.mjs'
+import noDirectFloatingUiInViews from './rules/no-direct-floating-ui-in-views.mjs'
 
 const plugin = {
   meta: {
@@ -55,7 +56,8 @@ const plugin = {
     'no-extract-epoch-from-date-subtraction': noExtractEpochFromDateSubtraction,
     'no-inline-ftr-calculation': noInlineFtrCalculation,
     'no-bq-struct-string-timestamp': noBqStructStringTimestamp,
-    'no-fontsize-inline-typography': noFontsizeInlineTypography
+    'no-fontsize-inline-typography': noFontsizeInlineTypography,
+    'no-direct-floating-ui-in-views': noDirectFloatingUiInViews
   }
 }
 
