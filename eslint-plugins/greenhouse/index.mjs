@@ -34,11 +34,12 @@ import noInlineFtrCalculation from './rules/no-inline-ftr-calculation.mjs'
 import noBqStructStringTimestamp from './rules/no-bq-struct-string-timestamp.mjs'
 import noFontsizeInlineTypography from './rules/no-fontsize-inline-typography.mjs'
 import noDirectFloatingUiInViews from './rules/no-direct-floating-ui-in-views.mjs'
+import noDirectGsapInViews from './rules/no-direct-gsap-in-views.mjs'
 
 const plugin = {
   meta: {
     name: 'eslint-plugin-greenhouse',
-    version: '1.11.0'
+    version: '1.12.0'
   },
   rules: {
     'no-raw-table-without-shell': noRawTableWithoutShell,
@@ -57,7 +58,8 @@ const plugin = {
     'no-inline-ftr-calculation': noInlineFtrCalculation,
     'no-bq-struct-string-timestamp': noBqStructStringTimestamp,
     'no-fontsize-inline-typography': noFontsizeInlineTypography,
-    'no-direct-floating-ui-in-views': noDirectFloatingUiInViews
+    'no-direct-floating-ui-in-views': noDirectFloatingUiInViews,
+    'no-direct-gsap-in-views': noDirectGsapInViews
   }
 }
 

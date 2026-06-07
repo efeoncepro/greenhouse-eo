@@ -309,6 +309,12 @@ export default [
       // violaciones en superficies de producto: pilotos migrados; el resto son
       // primitives o infra Vuexy menu, exentos por path en la rule).
       'greenhouse/no-direct-floating-ui-in-views': 'error',
+      // TASK-1045 — views/app/components NO importan gsap/@gsap directo; consumir
+      // <Motion> o useGreenhouseGSAP desde @/components/greenhouse/motion. Mode
+      // `error` desde commit-1 (cero violaciones: los únicos importadores previos
+      // eran los huérfanos src/libs/GSAP*.tsx, jubilados; el módulo motion es
+      // exento por path en la rule).
+      'greenhouse/no-direct-gsap-in-views': 'error',
       // TASK-827 Slice 7 — modo warn durante migración V1.0. Promote a `error`
       // vive en TASK derivada V1.1 client-portal-legacy-branching-sweep
       // (trigger: zero drift ≥30 días post TASK-829 cierre).
