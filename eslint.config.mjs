@@ -366,6 +366,21 @@ export default [
     }
   },
 
+  // TASK-1033 — el test focal de la primitive GreenhouseFloatingSurface renderiza
+  // anchors/content con labels ILUSTRATIVOS ("Ver evidencia", "Editar", aria-label
+  // de fixture) como triggers de prueba del open/close/role; son fixtures de test,
+  // NUNCA copy de producto que se despliega. Off copy ahí (mismo criterio que las
+  // design-system reference views).
+  {
+    files: ['src/components/greenhouse/primitives/__tests__/GreenhouseFloatingSurface.test.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-untokenized-copy': 'off'
+    }
+  },
+
   // TASK-766 Slice 3 — la lint rule no-untokenized-fx-math se desactiva
   // SOLO en los helpers/readers canónicos donde el patrón aparece como
   // referencia en docstrings y assertion strings de tests (NO en SQL real).

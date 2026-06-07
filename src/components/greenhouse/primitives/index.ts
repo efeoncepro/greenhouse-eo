@@ -71,6 +71,32 @@ export type {
 export { default as InlineNumericEditor } from './InlineNumericEditor'
 export type { InlineNumericEditorProps, InlineNumericEditorCurrency } from './InlineNumericEditor'
 
+// TASK-1033 — Greenhouse Floating Surface primitive (anchored contextual UI over
+// @floating-ui/react). Product views consume this instead of importing the
+// positioning engine directly. ADR: GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md
+export { default as GreenhouseFloatingSurface } from './GreenhouseFloatingSurface'
+export type {
+  GreenhouseFloatingSurfaceAnchorProps,
+  GreenhouseFloatingSurfaceContentProps,
+  GreenhouseFloatingSurfaceProps
+} from './GreenhouseFloatingSurface'
+export {
+  DEFAULT_FLOATING_SURFACE_VARIANT,
+  FLOATING_SURFACE_VARIANTS,
+  FLOATING_SURFACE_VARIANT_CONFIG,
+  getFloatingSurfaceVariantConfig,
+  resolveFloatingSurfaceVariant
+} from './floating-surface-controller'
+export type {
+  GreenhouseFloatingSurfaceDensity,
+  GreenhouseFloatingSurfaceInteraction,
+  GreenhouseFloatingSurfaceKind,
+  GreenhouseFloatingSurfaceMotion,
+  GreenhouseFloatingSurfaceRole,
+  GreenhouseFloatingSurfaceVariant,
+  GreenhouseFloatingSurfaceVariantConfig
+} from './floating-surface-controller'
+
 // TASK-498 — Sprint 3 primitives extraction (Quote Builder generalization)
 export { default as EntitySummaryDock } from './EntitySummaryDock'
 export type {
