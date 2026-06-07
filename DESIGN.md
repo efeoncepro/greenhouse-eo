@@ -402,13 +402,18 @@ Dense operational surfaces such as payroll, finance tables, and drawers should s
 
 ## Elevation & Depth
 
-Depth is restrained. Most surfaces should feel flat-to-soft rather than glossy.
+Depth is restrained and **semantic**. New Greenhouse primitives read an elevation **role**, never a numeric index (`Paper elevation={6}` / `theme.shadows[n]` are legacy MUI infra). Roles are served by the theme: `theme.greenhouseElevation.<role>` (SoT `src/components/theme/elevation-tokens.ts`, ADR `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1`).
 
-- default cards are subtle and stable
-- floating docks, dialogs, and popovers can step up in elevation
-- avoid layering many shadowed containers inside each other
+The recipe is the convergent 2026 one: two soft shadow layers + a 1px hairline border — never a heavy single drop. No role exceeds `0 8px 24px rgba(0,0,0,0.1)`.
 
-If a layout already communicates hierarchy with spacing and contrast, do not add shadow just to make it feel "designed".
+- `none` — flat / outlined surfaces (internal cards, table shells, panels). Default for dense operational UI.
+- `raised` — soft local lift for hover/selection. NOT a blanket card resting state.
+- `floating` — anchored, transient surfaces (`GreenhouseFloatingSurface`, popovers, menus, rich tooltips, evidence peeks, inline editors, validation bubbles). NOT dialogs.
+- `overlay` — higher transient layer, not modal (command previews, floating docks).
+- `modal` — blocking surfaces (Dialog, temporary Drawer, destructive/legal/financial confirmations).
+- `overflow` — reserved (no runtime value yet): scroll/sticky-edge affordance.
+
+If a layout already communicates hierarchy with spacing and contrast, do not add shadow just to make it feel "designed". Cards inside workbenches stay flat/outlined. On `floating`/`overlay`/`modal` the **border carries the separation under `forced-colors`** (the browser strips `box-shadow`); the shadow is the enhancement. Avoid layering many shadowed containers inside each other.
 
 ## Shapes
 

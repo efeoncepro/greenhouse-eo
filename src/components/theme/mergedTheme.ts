@@ -29,6 +29,10 @@ import { resolveSecondaryPalette } from '@core/theme/axis-secondary'
 
 // Greenhouse typography tokens — line-height namespace (v1.3+) + scale SoT (TASK-1036)
 import { controlText, lineHeights, typographyScale } from './typography-tokens'
+// Greenhouse elevation tokens — semantic shadow/elevation SoT (TASK-1049).
+// Mode-aware factory over the canonical shadow channel; consumed via
+// `theme.greenhouseElevation.<level>`. Drift-guarded by elevation-drift.test.ts.
+import { elevationTokens } from './elevation-tokens'
 
 const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['direction']) => {
   // AXIS neutral fragments (Slice 3) — flag-gated; OFF = legacy navy bit-for-bit.
@@ -43,6 +47,12 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
     // AXIS primitive tokens (full ramps + opacity + neutrals) accesibles vía `theme.axis`.
     // Source of truth en código: src/@core/theme/axis-tokens.ts (espejo de AXIS Figma).
     axis: axisTokens,
+    // Greenhouse semantic elevation roles (TASK-1049) accesibles vía
+    // `theme.greenhouseElevation.<level>`. Factory mode-aware (canal shadow AXIS).
+    // Source of truth: src/components/theme/elevation-tokens.ts. Primer consumidor:
+    // GreenhouseFloatingSurface (rol `floating`). NO usar `Paper elevation={n}` ni
+    // `theme.shadows[n]` en primitives Greenhouse nuevas.
+    greenhouseElevation: elevationTokens(mode),
     colorSchemes: {
       light: {
         palette: {

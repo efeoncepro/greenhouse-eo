@@ -17,6 +17,7 @@ import type {
   CustomInputImgProps
 } from '@core/components/custom-inputs/types'
 import type { AxisTokens } from '@core/theme/axis-tokens'
+import type { GreenhouseElevationLevel, GreenhouseElevationToken } from './elevation-tokens'
 
 declare module '@mui/material/styles' {
    
@@ -95,6 +96,13 @@ declare module '@mui/material/styles' {
      * `theme.axis.ramp.*` only for a specific ramp step.
      */
     axis: AxisTokens
+    /**
+     * Greenhouse semantic elevation roles (TASK-1049). Source of truth:
+     * `src/components/theme/elevation-tokens.ts`. Read a ROLE
+     * (`theme.greenhouseElevation.floating`) — never `Paper elevation={n}` nor
+     * `theme.shadows[n]` for new Greenhouse primitives.
+     */
+    greenhouseElevation: Record<GreenhouseElevationLevel, GreenhouseElevationToken>
   }
   interface ThemeOptions {
     shape?: {
@@ -159,6 +167,7 @@ declare module '@mui/material/styles' {
       numericDense: number
     }>
     axis?: AxisTokens
+    greenhouseElevation?: Partial<Record<GreenhouseElevationLevel, GreenhouseElevationToken>>
   }
 
   // Custom Typography Variants

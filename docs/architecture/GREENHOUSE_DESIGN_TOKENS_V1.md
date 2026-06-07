@@ -293,7 +293,24 @@ shape: {
 
 ## 6. Elevation / shadow
 
-MUI 24-step shadow scale in `src/@core/theme/shadows.ts`. Per-color custom shadows in `customShadows.ts`.
+**Semantic roles are the contract (TASK-1049).** Greenhouse primitives read an elevation **role** from the theme — `theme.greenhouseElevation.<role>` — never a numeric MUI index. SoT: `src/components/theme/elevation-tokens.ts` (mode-aware factory over the canonical channel `var(--mui-mainColorChannels-${mode}Shadow)`). ADR: `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1`. Drift-guard: `src/components/theme/elevation-drift.test.ts` (runtime ≡ SoT ≡ DESIGN.md ≡ this table). First consumer: `GreenhouseFloatingSurface` (role `floating`).
+
+The recipe is the convergent 2026 one (GitHub Primer / shadcn/ui / Linear / Vercel Geist): **two soft layers + a 1px hairline border**, never a heavy single drop. Anti-dated ceiling: no role exceeds `0 8px 24px rgba(0,0,0,0.1)`. Raw shadow values live in the SoT, not here — agents pick a role, not a number.
+
+| Role | Intent | Border (forced-colors) | Primary consumers |
+|---|---|---|---|
+| `none` | Flat / outlined surface, no depth | n/a (consumer's own border) | internal cards, table shells, panels, dense dashboards |
+| `raised` | Soft local lift (hover/selection) | optional | interactive cards, selectable tiles — NOT a blanket card resting state |
+| `floating` | Anchored, transient contextual surface | **required** | `GreenhouseFloatingSurface`, popovers, menus, rich tooltips, evidence peeks, inline editors, validation bubbles |
+| `overlay` | Higher transient layer, not modal | **required** | command previews, floating docks, top-of-stack affordances |
+| `modal` | Blocking surface, clear stack separation | **required** | MUI Dialog, temporary Drawer, destructive/legal/financial confirmations |
+| `overflow` | **Reserved (no runtime value yet)** — scroll/sticky-edge affordance | — | sticky table edges, scroll shadows (future consumer) |
+
+**Rules**: cards inside operational workbenches stay flat (`none`) + 1px border. `floating`/`overlay`/`modal` carry their separation through a **real border** (not a shadow ring) so the surface survives `forced-colors` mode, where the browser strips `box-shadow`. `raised` is not an escape hatch to re-elevate cards. Don't add shadow when spacing/border/contrast already communicate hierarchy.
+
+### 6.1 Legacy / compat (MUI + Vuexy infrastructure — NOT the contract for new primitives)
+
+MUI 24-step shadow scale in `src/@core/theme/shadows.ts`. Per-color custom shadows in `customShadows.ts`. These remain available for Vuexy components and legacy code, but are **not** the agent-facing contract for new Greenhouse primitives (use the semantic roles above).
 
 | Token | Usage |
 |---|---|
