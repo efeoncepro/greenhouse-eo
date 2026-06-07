@@ -76,6 +76,26 @@ export const buildCaptureReportHtml = (manifest: CaptureManifest): string => {
         .join('\n')
     : `<tr><td colspan="5" class="muted">Sin contrato baseline (declarar <code>baseline.surfaceId</code> + <code>fe:capture:diff --promote</code>).</td></tr>`
 
+  const rt = manifest.runtimeSummary
+  const runtimePill = (count: number): string => (count > 0 ? 'error' : 'ok')
+
+  const runtimeSection = rt
+    ? `<div class="meta">
+        <div class="panel"><strong>console.error</strong><br><span class="pill ${runtimePill(rt.consoleErrorCount)}">${rt.consoleErrorCount}</span></div>
+        <div class="panel"><strong>pageerror</strong><br><span class="pill ${runtimePill(rt.pageErrorCount)}">${rt.pageErrorCount}</span></div>
+        <div class="panel"><strong>hydration</strong><br><span class="pill ${rt.hydrationWarningCount > 0 ? 'warning' : 'ok'}">${rt.hydrationWarningCount}</span></div>
+        <div class="panel"><strong>http 4xx/5xx</strong><br><span class="pill ${runtimePill(rt.httpFailureCount)}">${rt.httpFailureCount}</span></div>
+      </div>
+      ${rt.consoleErrorSamples.length || rt.pageErrorSamples.length || rt.hydrationWarningSamples.length || rt.httpFailureSamples.length
+        ? `<ul>${[
+            ...rt.consoleErrorSamples.map(m => `<li class="error">console.error: ${escapeHtml(m)}</li>`),
+            ...rt.pageErrorSamples.map(m => `<li class="error">pageerror: ${escapeHtml(m)}</li>`),
+            ...rt.hydrationWarningSamples.map(m => `<li class="warning">hydration: ${escapeHtml(m)}</li>`),
+            ...rt.httpFailureSamples.map(f => `<li class="error">HTTP ${f.status} ${escapeHtml(f.resourceType)}: ${escapeHtml(f.url)}</li>`)
+          ].join('')}</ul>`
+        : '<p class="muted">Sin errores de consola/red detectados.</p>'}`
+    : '<p class="muted">Collectors runtime no registrados.</p>'
+
   return `<!doctype html>
 <html lang="es">
 <head>
@@ -133,6 +153,9 @@ export const buildCaptureReportHtml = (manifest: CaptureManifest): string => {
 
   <h2>Baseline diff</h2>
   <table><thead><tr><th>Status</th><th>Frame</th><th>Diff</th><th>Budget</th><th>Artifact</th></tr></thead><tbody>${baselineRows}</tbody></table>
+
+  <h2>Runtime (console · page · hydration · network)</h2>
+  ${runtimeSection}
 
   <h2>Microinteractions</h2>
   <table><thead><tr><th>Name</th><th>Action</th><th>Segment</th><th>Intent</th><th>Frames</th></tr></thead><tbody>${interactionRows}</tbody></table>

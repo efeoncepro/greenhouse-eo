@@ -138,6 +138,19 @@ export interface BaselineFrameDiff {
   detail?: string
 }
 
+/** Resumen de los collectors runtime (console/page/hydration/network). Slice 3. */
+export interface RuntimeSummary {
+  consoleErrorCount: number
+  pageErrorCount: number
+  hydrationWarningCount: number
+  httpFailureCount: number
+  /** Muestras saneadas y truncadas (cap por categoría). */
+  consoleErrorSamples: string[]
+  pageErrorSamples: string[]
+  hydrationWarningSamples: string[]
+  httpFailureSamples: Array<{ url: string; status: number; resourceType: string }>
+}
+
 export interface CaptureVariantSummary {
   name: string
   viewport: { width: number; height: number }
@@ -174,6 +187,7 @@ export interface CaptureManifest {
   variants?: CaptureVariantSummary[]
   baseline?: CaptureBaselineMeta
   baselineDiffs?: BaselineFrameDiff[]
+  runtimeSummary?: RuntimeSummary
   exitCode: 0 | 1
   error?: {
     message: string

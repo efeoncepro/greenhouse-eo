@@ -43,7 +43,12 @@ export const FINDING_CODES = {
   layout_text_clipped: 'layout_text_clipped',
   layout_scroll_region_unlabeled: 'layout_scroll_region_unlabeled',
   layout_nested_cards: 'layout_nested_cards',
-  layout_probe_failed: 'layout_probe_failed'
+  layout_probe_failed: 'layout_probe_failed',
+  // --- Slice 3: console / hydration / network strict ---
+  runtime_console_error: 'runtime_console_error',
+  runtime_page_error: 'runtime_page_error',
+  runtime_hydration_warning: 'runtime_hydration_warning',
+  runtime_http_error: 'runtime_http_error'
 } as const
 
 export type FindingCode = (typeof FINDING_CODES)[keyof typeof FINDING_CODES]

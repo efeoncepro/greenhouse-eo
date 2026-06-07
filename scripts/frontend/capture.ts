@@ -19,9 +19,10 @@ import { applyCaptureDeterminism } from './lib/capture-masks'
 import { isValidEnv, resolveEnvConfig, type CaptureEnv, type EnvConfig } from './lib/env'
 import { classifyCaptureFailure } from './lib/failure-taxonomy'
 import { composeGif } from './lib/gif'
-import { writeManifest, type BaselineFrameDiff, type CaptureManifest } from './lib/manifest'
+import { writeManifest, type BaselineFrameDiff, type CaptureManifest, type RuntimeSummary } from './lib/manifest'
 import { runScenario } from './lib/recorder'
 import { writeCaptureReport } from './lib/report'
+import { attachRuntimeCollectors, deriveRuntimeFindings } from './lib/runtime-collector'
 import { applySecretMask, assertSafeOutputPath, enforceProductionGate } from './lib/safety'
 import type { CaptureScenario, CaptureViewportVariant } from './lib/scenario'
 import { uploadCaptureToGcs } from './lib/upload'
@@ -151,9 +152,12 @@ const runOneCapture = async ({
     recordVideoDir: videoDir
   })
 
+  const runtimeCollector = attachRuntimeCollectors(session.page)
+
   let exitCode: 0 | 1 = 0
   let stepError: { message: string; stepIndex: number } | undefined
   let baselineDiffs: BaselineFrameDiff[] | undefined
+  let runtimeSummary: RuntimeSummary | undefined
   let outcome = {
     frames: [],
     startedAt: Date.now(),
@@ -217,6 +221,9 @@ const runOneCapture = async ({
       }
     }
 
+    runtimeSummary = runtimeCollector.summarize()
+    outcome.qualityFindings.push(...deriveRuntimeFindings(runtimeCollector.raw(), scenario.quality?.runtime))
+
     const blockingFinding = outcome.qualityFindings.find(finding => finding.severity === 'error')
 
     if (blockingFinding) {
@@ -234,6 +241,9 @@ const runOneCapture = async ({
     }
     PRINT(`✗ captura abortada: ${stepError.message}`)
   }
+
+  runtimeSummary ??= runtimeCollector.summarize()
+  runtimeCollector.dispose()
 
   const webmTmpPath = await session.finalizeRecording()
   let webmPath: string | null = null
@@ -292,6 +302,7 @@ const runOneCapture = async ({
     failureCategory,
     baseline: scenario.baseline,
     baselineDiffs,
+    runtimeSummary,
     exitCode,
     error: stepError
   }

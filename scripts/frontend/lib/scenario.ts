@@ -102,6 +102,21 @@ export interface CaptureLayoutQualityOptions {
   failOnViolations?: boolean
 }
 
+export interface CaptureRuntimeQualityOptions {
+  /** console.error → finding error (default) o warning si false. */
+  failOnConsoleError?: boolean
+  /** pageerror (excepción no capturada) → finding error. */
+  failOnPageError?: boolean
+  /** Warning de hydration React/Next (best-effort por pattern) → finding error. */
+  failOnHydrationWarning?: boolean
+  /** Responses 4xx/5xx de document/xhr/fetch → finding error. */
+  failOnHttpStatus?: boolean
+  /** Regex (string) de URLs a ignorar en el gate de red. */
+  ignoreUrlPatterns?: string[]
+  /** Regex (string) de mensajes de consola a ignorar. */
+  ignoreConsolePatterns?: string[]
+}
+
 export interface CaptureQualityOptions {
   allowEmpty?: boolean
   allowLoading?: boolean
@@ -109,6 +124,7 @@ export interface CaptureQualityOptions {
   allowErrorBoundary?: boolean
   accessibility?: CaptureAccessibilityQualityOptions
   layout?: CaptureLayoutQualityOptions
+  runtime?: CaptureRuntimeQualityOptions
 }
 
 export interface CaptureScenarioStep {
