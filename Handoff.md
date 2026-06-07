@@ -1,3 +1,18 @@
+# Sesion 2026-06-07 — Greenhouse Motion Primitive (base GSAP gobernada, TASK-1045)
+
+Se construyó la **primitiva base de motion sobre GSAP** (la "primigenia" para reusar acá y en otras apps) y se pusheó a `develop` (`fd23184ca..bf76137af`).
+
+- **3 anillos:** núcleo portable `src/components/greenhouse/motion/core/` (cero deps Greenhouse) con tokens SoT (drift-guarded), `ensureMotionRegistered` (CustomEase = paridad CSS), `prefers-reduced-motion` y el hook `useGreenhouseGSAP` (SSR/StrictMode-safe, cleanup auto, reduced-motion horneado vía `gsap.matchMedia`); binding `theme/motion-tokens.ts`; primitive `<Motion variant kind>` (4 variants `entrance/stagger/scrollReveal/timeline` + resolver `kind→variant`).
+- **Boundary:** lint rule `greenhouse/no-direct-gsap-in-views` (error) — solo el módulo motion importa gsap; jubilados los huérfanos `src/libs/GSAP*.tsx`.
+- **No-regresión:** GSAP NO reemplaza CSS Tier 1 ni framer-motion; las microinteracciones existentes (`useReducedMotion` ×21 + CSS blanket) quedan intactas (verificado: AnimatedCounter/EmptyState tests verdes).
+- **Museo + GVC:** `/admin/design-system/motion` (gate interno, enlazado + reachability), GVC enterprise verde (4 frames mirados).
+- **Docs:** ADR `GREENHOUSE_MOTION_PRIMITIVE_V1.md` + DESIGN.md §Motion + V1 §9 reconciliado al SoT + DECISIONS_INDEX + CLAUDE.md/AGENTS.md.
+- **Colisión multi-agente resuelta:** Codex committeó su Chips Lab (`11951d7c0`) en paralelo; sus hunks en `DesignSystemView`/manifest se aislaron de los míos (chips preservado intacto) y completé su entrada de reachability dangling (`0c92b7451`).
+- **Gates:** `local:check` + `pnpm build` + `design:lint 0/0` + drift-guard 57 + reachability 0 orphans + 37 tests focales. **Pendiente de cierre formal:** full `pnpm test` (~12 min) + verificación staging.
+- **Próxima primitiva:** TASK-1046 `<AnimatedMetric>` (converge `AnimatedCounter`/31 consumidores swapeando el motor a `useGreenhouseGSAP` con API idéntica → cero churn).
+
+---
+
 # Sesion 2026-06-07 — Skill Codex `greenhouse-typography-accessibility`
 
 Se creo una skill local **solo para Codex** en `.codex/skills/greenhouse-typography-accessibility/` para gobernar decisiones de tipografia Greenhouse: pesos, variantes MUI, contraste, espaciado accesible, jerarquia visual, frontera Poppins/Geist, chips/botones/labels/tablas/KPIs y adapters PDF/email.
