@@ -45,6 +45,7 @@ const CHIPS_LAB_ROUTE = '/admin/design-system/chips'
 const CHARTS_LAB_ROUTE = '/admin/design-system/charts'
 const UTILITIES_LAB_ROUTE = '/admin/design-system/utilities'
 const FLOATING_SURFACES_LAB_ROUTE = '/admin/design-system/floating-surfaces'
+const MOTION_LAB_ROUTE = '/admin/design-system/motion'
 
 const BRAND: { key: AxisColorFamily; label: string }[] = [
   { key: 'primary', label: 'Primary (Efeonce)' },
@@ -413,6 +414,42 @@ const DesignSystemView = () => (
           endIcon={<i className='tabler-arrow-right' />}
         >
           Ver floating surfaces
+        </Button>
+      </CardContent>
+    </Card>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Laboratorios
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Motion (primitiva GSAP)
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Primitive canonica sobre GSAP para el tier cinematico / orquestado / scroll: variants entrance, stagger,
+            scrollReveal y timeline con tokens de motion, prefers-reduced-motion y cleanup gobernados.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={MOTION_LAB_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-wand' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver motion
         </Button>
       </CardContent>
     </Card>
