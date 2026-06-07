@@ -245,6 +245,12 @@ const runOneCapture = async ({
   runtimeSummary ??= runtimeCollector.summarize()
   runtimeCollector.dispose()
 
+  // Trace on failure (retain-on-failure): guarda trace.zip sólo si la captura falló.
+  const traceSavePath = exitCode === 1 ? resolve(outputDir, 'trace.zip') : null
+  const traceSaved = await session.stopTracing(traceSavePath)
+
+  if (traceSaved) PRINT(`✓ trace.zip guardado (debug: pnpm exec playwright show-trace ${outputDir.replace(REPO_ROOT, '<repo>')}/trace.zip)`)
+
   const webmTmpPath = await session.finalizeRecording()
   let webmPath: string | null = null
 
@@ -292,7 +298,8 @@ const runOneCapture = async ({
     outputs: {
       recordingWebm: webmPath ? webmPath.replace(`${outputDir}/`, '') : null,
       framesDir: 'frames/',
-      flipbookGif: gifPath ? gifPath.replace(`${outputDir}/`, '') : null
+      flipbookGif: gifPath ? gifPath.replace(`${outputDir}/`, '') : null,
+      trace: traceSaved ? 'trace.zip' : null
     },
     frames: outcome.frames,
     readiness: outcome.readiness,

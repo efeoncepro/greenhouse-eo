@@ -135,6 +135,7 @@ export const buildCaptureReportHtml = (manifest: CaptureManifest): string => {
       <div class="panel"><strong>Viewport</strong><br>${manifest.viewport.width}x${manifest.viewport.height}${manifest.viewportName ? ` · ${escapeHtml(manifest.viewportName)}` : ''}</div>
       <div class="panel"><strong>Exit</strong><br><span class="pill ${manifest.exitCode === 0 ? 'ok' : 'error'}">${manifest.exitCode}</span>${manifest.failureCategory ? ` · ${escapeHtml(manifest.failureCategory)}` : ''}</div>
       <div class="panel"><strong>Duration</strong><br>${manifest.durationMs}ms</div>
+      ${manifest.outputs.trace ? `<div class="panel"><strong>Trace</strong><br><a href="${escapeHtml(manifest.outputs.trace)}">trace.zip</a><br><small class="muted">playwright show-trace</small></div>` : ''}
     </div>
   </header>
 

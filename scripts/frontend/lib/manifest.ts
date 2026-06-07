@@ -175,6 +175,8 @@ export interface CaptureManifest {
     recordingWebm: string | null
     framesDir: string
     flipbookGif: string | null
+    /** trace.zip de Playwright cuando la captura falló (retain-on-failure). */
+    trace?: string | null
   }
   frames: FrameRecord[]
   viewportName?: string
