@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -507,20 +507,20 @@ N/A — repo-only tooling. Si se decide instalar Lighthouse/LHCI o publicar arti
 
 ## Acceptance Criteria
 
-- [ ] GVC puede comparar una captura runtime contra un mockup aprobado usando `baseline.approvedMockupCaptureDir`.
-- [ ] El diff visual soporta frame labels, viewports, masks y thresholds configurables.
-- [ ] `quality.layout` detecta al menos overflow/overlap/target-size/scroll-region cases con findings accionables.
-- [ ] `quality.runtime` captura console/page/hydration/network failures sanitizados y configurables.
-- [ ] GVC guarda Playwright `trace.zip` on failure y lo referencia en manifest/report.
-- [ ] Keyboard/focus/reduced-motion gates existen como opt-in y tienen al menos un scenario regression.
-- [ ] Performance/resource budgets existen como opt-in warning-first.
-- [ ] Enterprise rubric aparece en dossier/report como advisory structured summary.
-- [ ] Docs GVC quedan sincronizadas con las primitives nuevas.
-- [ ] Scenarios regression prueban al menos baseline diff, layout, runtime strict, keyboard/focus y report rendering.
-- [ ] El baseline aprobado tiene un home durable keyed por `surfaceId` (no depende de un dir efimero `.captures/` ni del retention de `fe:capture:gc`); el diff resuelve el baseline durable y degrada honesto a `baseline_stale` si falta.
-- [ ] El diff visual se ejecuta bajo condiciones deterministas (animaciones off, caret oculto, `deviceScaleFactor` fijo, fonts settled, reduced-motion).
-- [ ] `manifest.json` preserva `schemaVersion: 1` via campos aditivos; cualquier bump queda documentado y `fe:capture:health` tolera manifests de versiones mixtas (capturas viejas + nuevas).
-- [ ] Los finding codes nuevos viven en `scripts/frontend/lib/failure-taxonomy.ts` como SSOT.
+- [x] GVC puede comparar una captura runtime contra un mockup aprobado usando `baseline.approvedMockupCaptureDir`.
+- [x] El diff visual soporta frame labels, viewports, masks y thresholds configurables.
+- [x] `quality.layout` detecta al menos overflow/overlap/target-size/scroll-region cases con findings accionables.
+- [x] `quality.runtime` captura console/page/hydration/network failures sanitizados y configurables.
+- [x] GVC guarda Playwright `trace.zip` on failure y lo referencia en manifest/report.
+- [x] Keyboard/focus/reduced-motion gates existen como opt-in y tienen al menos un scenario regression.
+- [x] Performance/resource budgets existen como opt-in warning-first.
+- [x] Enterprise rubric aparece en dossier/report como advisory structured summary.
+- [x] Docs GVC quedan sincronizadas con las primitives nuevas.
+- [x] Scenarios regression prueban al menos baseline diff, layout, runtime strict, keyboard/focus y report rendering.
+- [x] El baseline aprobado tiene un home durable keyed por `surfaceId` (no depende de un dir efimero `.captures/` ni del retention de `fe:capture:gc`); el diff resuelve el baseline durable y degrada honesto a `baseline_stale` si falta.
+- [x] El diff visual se ejecuta bajo condiciones deterministas (animaciones off, caret oculto, `deviceScaleFactor` fijo, fonts settled, reduced-motion).
+- [x] `manifest.json` preserva `schemaVersion: 1` via campos aditivos; cualquier bump queda documentado y `fe:capture:health` tolera manifests de versiones mixtas (capturas viejas + nuevas).
+- [x] Los finding codes nuevos viven en `scripts/frontend/lib/failure-taxonomy.ts` como SSOT.
 
 ## Verification
 
@@ -534,16 +534,16 @@ N/A — repo-only tooling. Si se decide instalar Lighthouse/LHCI o publicar arti
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con carpeta (`to-do/`, `in-progress/`, `complete/`)
-- [ ] `docs/tasks/README.md` actualizado
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` actualizado
-- [ ] `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` actualizado con delta V1.5 o version que corresponda
-- [ ] `scripts/frontend/README.md` actualizado
-- [ ] `scripts/frontend/scenarios/_README.md` actualizado
-- [ ] `docs/manual-de-uso/plataforma/captura-visual-playwright.md` actualizado
-- [ ] `docs/documentation/plataforma/captura-visual.md` actualizado
-- [ ] `Handoff.md` actualizado con pilotos, comandos y limites
-- [ ] `greenhouse-documentation-governor` ejecutado antes de cierre completo
+- [x] `Lifecycle` sincronizado con carpeta (`to-do/`, `in-progress/`, `complete/`)
+- [x] `docs/tasks/README.md` actualizado
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` actualizado
+- [x] `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` actualizado con delta V1.5 o version que corresponda
+- [x] `scripts/frontend/README.md` actualizado
+- [x] `scripts/frontend/scenarios/_README.md` actualizado
+- [x] `docs/manual-de-uso/plataforma/captura-visual-playwright.md` actualizado
+- [x] `docs/documentation/plataforma/captura-visual.md` actualizado
+- [x] `Handoff.md` actualizado con pilotos, comandos y limites
+- [x] `greenhouse-documentation-governor` ejecutado antes de cierre completo
 
 ## Open Questions
 
