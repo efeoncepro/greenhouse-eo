@@ -428,15 +428,18 @@ When adding a new brand moment, check this namespace first; only add a new token
 
 ### 9.1 Duration scale (matches Material 3 emphasized + Linear/Stripe convergent)
 
+Codified SoT: `src/components/greenhouse/motion/core/tokens.ts` (re-exported by `src/components/theme/motion-tokens.ts`). Seconds (GSAP) + CSS strings are **derived** from ms — never declared in parallel. Drift-guard: `motion/core/tokens.test.ts`.
+
 | Token | ms | Usage |
 |---|---|---|
-| instant | 0 | Reduced motion fallback |
-| micro | 75 | Tap acknowledgment |
+| instant | 75 | Tap acknowledgment; reduced-motion snap fallback |
 | short | 150 | Hover, focus, small state shift |
 | standard | 200 | Menu open, small move, snackbar |
-| longer | 300 | Modal open/close, drawer |
-| page | 400 | Page entrance, cross-surface nav |
-| hero | 600 | Hero entrance, cross-document |
+| medium | 300 | Modal open/close, drawer |
+| long | 400 | Page entrance, cross-surface nav |
+| extended | 600 | Hero entrance, cross-document |
+
+> **Reconciliación (TASK-1045):** estos valores antes se listaban con nombres prosa nunca codificados (`micro/longer/page/hero` + `instant=0`). El SoT codificado + drift-guarded es ahora la fuente única; los nombres convergen a él. El antiguo `instant=0` (reduced fallback) es ahora el `reducedDuration` (snap ~75 ms) que aplica el motion primitive.
 
 ### 9.2 Easing
 
@@ -459,12 +462,26 @@ if (prefersReduced) {
 
 Animations exempted (must stay): loaders, focus rings, state-conveying transitions (chip value change flash).
 
+Two reduced-motion layers coexist (both honored): (1) the **CSS blanket** in `src/app/globals.css` + framer-motion's `useReducedMotion` for the existing microinteractions; (2) the **GSAP primitive** bakes the contract into `useGreenhouseGSAP` via `gsap.matchMedia` — non-bypassable (see §9.5).
+
 ### 9.4 Prohibitions
 
 - No parallax.
 - No autoplay video.
 - No infinite loops (except shimmer on skeleton).
 - No rapid flashing (>3 Hz) — WCAG 2.3.1.
+
+### 9.5 Motion primitive (GSAP — TASK-1045)
+
+The cinematic / orchestrated / scroll tier runs on **GSAP** behind a canonical primitive. Product surfaces consume `<Motion>` (declarative) or `useGreenhouseGSAP` (imperative escape hatch) — **never** `import 'gsap'` directly (lint rule `greenhouse/no-direct-gsap-in-views`, mode `error`, exempts only `src/components/greenhouse/motion/**`). GSAP does NOT replace CSS Tier 1 (hover/tap/toggle) nor framer-motion (existing microinteractions) — it's an additive third layer.
+
+- **Variants (V1):** `entrance` · `stagger` · `scrollReveal` · `timeline`.
+- **Kinds → variant:** `heroIntro→timeline`, `listMount→stagger`, `sectionReveal→scrollReveal`, `kpiCountUp→timeline`, `panelEnter→entrance`, `cardReveal→scrollReveal`.
+- **Reduced-motion:** baked into `useGreenhouseGSAP` (`gsap.matchMedia`); each variant degrades (cross-fade snap / opacity-only / visible no-op / collapsed timeline). Honest degradation: `gsap.from()` keeps content visible if JS never runs.
+- **SoT:** `src/components/greenhouse/motion/core/tokens.ts`; portable core (zero Greenhouse deps) reusable across apps.
+- **Internal museum:** `/admin/design-system/motion`.
+
+Spec: `docs/architecture/GREENHOUSE_MOTION_PRIMITIVE_V1.md`.
 
 ## 10. Interaction cost
 

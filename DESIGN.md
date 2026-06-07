@@ -461,6 +461,17 @@ Data-heavy UI:
 - KPIs and totals should feel deliberate but not oversized
 - tables should optimize scanability first
 
+## Motion
+
+Duration tokens (ms, fixed scale): `instant 75 · short 150 · standard 200 · medium 300 · long 400 · extended 600`. Easing: `emphasized cubic-bezier(0.2,0,0,1)` (default) · `standard (0.4,0,0.2,1)` · `emphasizedAccelerate (0.3,0,0.8,0.15)` (exits) · `linear`. SoT in code: `src/components/greenhouse/motion/core/tokens.ts` (seconds + CSS strings derived — never parallel). Never `ease-in-out` as default.
+
+- The cinematic / orchestrated / scroll tier runs on **GSAP** behind the canonical primitive. Consume `<Motion>` (declarative) or `useGreenhouseGSAP` (imperative escape hatch) from `@/components/greenhouse/motion`.
+- **NEVER** `import 'gsap' / '@gsap/react'` in views/app/components — lint rule `greenhouse/no-direct-gsap-in-views` (error) blocks it; only `src/components/greenhouse/motion/**` may.
+- GSAP does NOT replace CSS Tier 1 (hover/tap/toggle/focus) nor framer-motion (existing microinteractions). It's an additive third layer.
+- Variants: `entrance · stagger · scrollReveal · timeline`; kinds resolve to a variant (`listMount→stagger`, `sectionReveal→scrollReveal`, `heroIntro→timeline`…).
+- `prefers-reduced-motion` is baked into `useGreenhouseGSAP` (non-bypassable). Compositor-only props (`transform`/`opacity`/`filter`/`clip-path`); never `width/height/top/left/margin/padding`.
+- Internal museum: `/admin/design-system/motion`. Spec: `docs/architecture/GREENHOUSE_MOTION_PRIMITIVE_V1.md` · tokens detail: `GREENHOUSE_DESIGN_TOKENS_V1.md` §9.
+
 ## Maintenance Protocol
 
 `DESIGN.md` is a living contract. It should evolve whenever the product's visual system evolves, but it must stay tightly synchronized with the real runtime.
