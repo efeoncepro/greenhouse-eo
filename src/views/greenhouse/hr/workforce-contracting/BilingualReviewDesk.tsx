@@ -120,13 +120,12 @@ const ClauseBody = ({ text, theme }: { text: string | null; theme: Theme }) => {
         if (marked) {
           return (
             <Box key={bi} sx={{ display: 'flex', gap: 1.25 }}>
-              <Typography
+              <Typography variant='caption'
                 component='span'
                 sx={{
                   flexShrink: 0,
                   minWidth: 30,
                   fontWeight: 700,
-                  fontSize: '0.8rem',
                   lineHeight: 1.7,
                   color: 'text.primary',
                   fontVariantNumeric: 'tabular-nums'

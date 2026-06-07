@@ -373,17 +373,17 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
                         {data.cloud.bigquery.blockedQueries.slice(0, 10).map((entry, idx) => (
                           <TableRow key={idx}>
                             <TableCell>
-                              <Typography variant='body2' sx={{ fontSize: '0.75rem', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <Typography variant='caption' sx={{ maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {entry.query}
                               </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography variant='body2' sx={{ fontSize: '0.75rem' }}>
+                              <Typography variant='caption'>
                                 {formatGreenhouseNumber(Number(entry.limit), 'en-US')} B
                               </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography variant='body2' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
+                              <Typography variant='caption' color='text.secondary'>
                                 {formatGreenhouseDateTime(entry.timestamp)}
                               </Typography>
                             </TableCell>
@@ -595,7 +595,7 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
                 {allCredentialRows.map(item => (
                   <TableRow key={`${item.sourceKind}-${item.secretRef}`}>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontSize: '0.8125rem' }}>
+                      <Typography variant='caption'>
                         {item.secretRef}
                       </Typography>
                     </TableCell>

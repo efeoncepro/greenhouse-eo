@@ -331,7 +331,7 @@ const ProductCatalogView = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                        <Typography variant='caption'>
                           {p.sku ?? '—'}
                         </Typography>
                       </TableCell>

@@ -156,7 +156,7 @@ const EmailDeliveryDetailDrawer = ({ open, delivery, onClose, onRetry }: Props) 
                 borderLeft: theme => `4px solid ${theme.palette.error.main}`
               }}
             >
-              <Typography variant='body2' sx={{ fontSize: '0.8rem', wordBreak: 'break-all' }}>
+              <Typography variant='caption' sx={{ wordBreak: 'break-all' }}>
                 {delivery.errorMessage}
               </Typography>
             </Card>

@@ -457,7 +457,7 @@ const CashOutListView = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                        <Typography variant='caption'>
                           {item.reference || '\u2014'}
                         </Typography>
                       </TableCell>

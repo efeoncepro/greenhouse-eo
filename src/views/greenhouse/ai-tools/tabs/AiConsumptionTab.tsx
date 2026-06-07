@@ -206,7 +206,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
       columnHelper.accessor('balanceAfter', {
         header: 'Balance',
         cell: ({ getValue }) => (
-          <Typography sx={{ fontSize: '0.8rem' }}>
+          <Typography variant='caption'>
             {getValue()}
           </Typography>
         )
@@ -236,7 +236,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
         id: 'cost',
         header: 'Costo',
         cell: ({ row }) => (
-          <Typography sx={{ fontSize: '0.8rem' }}>
+          <Typography variant='caption'>
             {formatCost(row.original.totalCost, row.original.costCurrency)}
           </Typography>
         )

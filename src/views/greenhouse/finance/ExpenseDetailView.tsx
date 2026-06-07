@@ -302,7 +302,7 @@ const ExpenseDetailView = () => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant='caption' color='text.secondary'>N° Documento</Typography>
-              <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+              <Typography variant='caption'>
                 {data.documentNumber || '—'}
               </Typography>
             </Grid>

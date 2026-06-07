@@ -374,7 +374,7 @@ const RequestChangeDialog = ({ open, onClose, onSubmit }: Props) => {
         <Stack direction='row' alignItems='center' spacing={1.5}>
           <i className='tabler-id' style={{ fontSize: 20, color: 'var(--mui-palette-text-secondary)' }} aria-hidden />
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600, fontSize: '0.7rem' }}>
+            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>
               Documento {context.legalDocumentVerificationStatus === 'verified' ? 'verificado' : 'pendiente de verificación'}
             </Typography>
             <Typography variant='monoId' sx={{ display: 'block' }}>

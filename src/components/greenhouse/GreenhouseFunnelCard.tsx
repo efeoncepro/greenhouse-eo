@@ -284,7 +284,7 @@ const GreenhouseFunnelCard = ({
                 }}
               >
                 {rates.slice(1).map((rate, i) => (
-                  <Typography key={i} variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>
+                  <Typography key={i} variant='caption' color='text.secondary'>
                     → {rate ?? 0}%
                   </Typography>
                 ))}

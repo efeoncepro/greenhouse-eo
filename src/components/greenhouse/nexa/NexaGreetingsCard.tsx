@@ -280,7 +280,6 @@ export const NexaGreetingsCard = ({
                 color: 'common.white',
                 opacity: 0.75,
                 textAlign: 'center',
-                fontSize: '0.5rem',
                 lineHeight: 1.25,
                 letterSpacing: '0.04em'
               }}

@@ -91,11 +91,10 @@ const Breadcrumb = ({ items }: BreadcrumbProps) => {
           return (
             <Box component='li' key={`${item.label}-${index}`} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {isLast || !item.href ? (
-                <Typography
+                <Typography variant='overline'
                   component='span'
                   aria-current={isLast ? 'page' : undefined}
                   sx={{
-                    fontSize: '0.75rem',
                     fontWeight: isLast ? 700 : 500,
                     letterSpacing: 0.4,
                     textTransform: 'uppercase',

@@ -607,7 +607,7 @@ const OnboardingCasesInboxView = ({
                     <Box sx={{ pb: isLast ? 0 : 4 }}>
                       <Stack direction='row' justifyContent='space-between' gap={3} alignItems='flex-start'>
                         <Box>
-                          <Typography variant='h6' sx={{ fontSize: '1rem' }}>
+                          <Typography variant='h6'>
                             {step.label}
                           </Typography>
                           {step.blocksCompletion && !isDoneStepStatus(step.status) ? (

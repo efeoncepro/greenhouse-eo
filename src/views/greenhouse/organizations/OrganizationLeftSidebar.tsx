@@ -119,7 +119,7 @@ const OrganizationLeftSidebar = ({ detail, isAdmin, syncing, onEditOrganization,
           <>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Box component='img' src='/images/integrations/hubspot.svg' alt='HubSpot' sx={{ width: 16, height: 16, objectFit: 'contain' }} />
-              <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+              <Typography variant='caption'>
                 HubSpot: {detail.hubspotCompanyId}
               </Typography>
             </Box>

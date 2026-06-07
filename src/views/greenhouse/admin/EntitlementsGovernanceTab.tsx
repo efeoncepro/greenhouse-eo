@@ -204,7 +204,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                 {data.capabilities.map(item => (
                   <TableRow key={item.capability}>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                      <Typography variant='caption'>
                         {item.capability}
                       </Typography>
                     </TableCell>
@@ -278,7 +278,7 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                   {capabilityRows.map(row => (
                     <TableRow key={row.key}>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                        <Typography variant='caption'>
                           {row.capability}
                         </Typography>
                       </TableCell>
@@ -340,12 +340,12 @@ const EntitlementsGovernanceTab = ({ data }: Props) => {
                   <TableRow key={`${binding.viewCode}:${binding.capability}:${binding.scope}`}>
                     <TableCell>{binding.viewLabel}</TableCell>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                      <Typography variant='caption'>
                         {binding.routePath}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                      <Typography variant='caption'>
                         {binding.capability}
                       </Typography>
                     </TableCell>

@@ -92,10 +92,10 @@ export const HomeClosingCountdown = ({ data }: HomeClosingCountdownProps) => {
                   color={tone}
                   sx={{ '& .MuiCircularProgress-circle': { strokeLinecap: 'round' } }}
                 />
-                <Typography
+                <Typography variant='caption'
                   className='absolute font-medium'
                   color='text.primary'
-                  sx={{ fontVariantNumeric: 'tabular-nums', fontSize: 13 }}
+                  sx={{ fontVariantNumeric: 'tabular-nums'}}
                 >
                   {`${Math.round(value)}%`}
                 </Typography>

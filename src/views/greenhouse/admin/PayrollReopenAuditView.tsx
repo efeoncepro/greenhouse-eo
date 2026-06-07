@@ -260,7 +260,7 @@ const PayrollReopenAuditView = () => {
                         <Typography variant='body2'>{formatDateTime(row.reopenedAt)}</Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                        <Typography variant='caption'>
                           {formatMonthLabel(row)}
                         </Typography>
                       </TableCell>

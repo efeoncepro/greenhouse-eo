@@ -614,7 +614,7 @@ return theme.palette.secondary.main
                   </CustomAvatar>
                   <Box>
                     <Typography variant='subtitle2'>{editWallet.toolName}</Typography>
-                    <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
+                    <Typography variant='caption' color='text.secondary'>
                       {editWallet.walletId}
                     </Typography>
                   </Box>

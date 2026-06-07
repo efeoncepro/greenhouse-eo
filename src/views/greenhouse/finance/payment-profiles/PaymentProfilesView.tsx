@@ -509,7 +509,6 @@ const PaymentProfilesView = () => {
                             <Typography
                               variant='caption'
                               color='text.secondary'
-                              sx={{ fontSize: '0.7rem' }}
                             >
                               {profile.beneficiaryId}
                             </Typography>

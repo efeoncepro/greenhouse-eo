@@ -1261,7 +1261,7 @@ const FinanceDashboardView = () => {
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <Typography variant='caption' color='text.secondary'>Detalle</Typography>
-                <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                <Typography variant='caption'>
                   {nuboxSync.lastProjection?.notes || nuboxSync.lastSync.notes || '—'}
                 </Typography>
               </Grid>
@@ -1316,7 +1316,7 @@ const movementColumns: any[] = [
     cell: ({ getValue, row }) => (
       <Box>
         <Typography variant='body2' fontWeight={500}>{getValue()}</Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>{row.original.id}</Typography>
+        <Typography variant='caption' color='text.secondary'>{row.original.id}</Typography>
       </Box>
     ),
     meta: { minWidth: 300 }

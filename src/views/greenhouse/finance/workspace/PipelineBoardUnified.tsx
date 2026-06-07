@@ -527,7 +527,7 @@ const PipelineBoardUnified = ({
                           <Typography
                             variant='caption'
                             color='text.secondary'
-                            sx={{ fontVariantNumeric: 'tabular-nums', fontSize: '0.7rem' }}
+                            sx={{ fontVariantNumeric: 'tabular-nums' }}
                           >
                             {row.stage}
                           </Typography>

@@ -41,11 +41,11 @@ Evidencia runtime verificada en Cloud SQL durante discovery read-only:
 
 La causa raiz es que el contrato `approval_delegate` es demasiado amplio para permisos. Hoy transfiere autoridad de aprobacion de `leave.supervisor_review` sin estar scopeado por dominio/workflow, sin elegibilidad especifica, sin actor/reason auditable en el payload/evento suficiente, y sin senal que detecte snapshots delegados invalidos.
 
-## Goal
-
 - Para permisos (`leave.supervisor_review`), la aprobacion por supervisor debe resolver a la supervisora formal vigente desde `greenhouse_core.reporting_lines`, salvo override HR/admin explicito o futura delegacion de permisos domain-scoped que tenga contrato, elegibilidad, auditoria y UI aprobadas.
+- Corregir la CLASE de bug, no solo el caso de permisos: el `approval_delegate` generico hoy se consume por TRES workflows que usan `resolutionStrategy: 'effective_supervisor'` en `src/lib/approval-authority/config.ts` (`leave`, `expense_report`, `performance_evaluation`) via el mismo `getEffectiveSupervisor`. El fix debe ser un contrato per-stage (no un caso especial de leave) que decida explicitamente cada workflow.
+- Cerrar el SEGUNDO consumidor del delegate generico: `src/lib/reporting-hierarchy/access.ts` (`listDelegatedSupervisorIds` -> `getSupervisorScopeForTenant`) hoy le da a la delegada (Valentina) `hasDelegatedAuthority=true`, `canAccessSupervisorLeave=true` y visibilidad del subarbol completo del supervisor. Arreglar solo la autoridad sin decidir la visibilidad deja exposicion indebida (mismo principio que TASK-987/ISSUE-083: autoridad invalida no confiere acceso, ni superficie ni scope).
 - Remediar el dato vivo que da autoridad a Valentina sobre permisos de Andres/Melkin/Daniela mediante un comando auditado, idempotente y verificable, no con SQL manual opaco.
-- Reparar snapshots pendientes ya congelados con una autoridad efectiva invalida, incluyendo `leave-14abe9e8-df63-40a8-853a-e83aa92cfaea`, preservando audit trail de antes/despues.
+- Reparar snapshots pendientes ya congelados con una autoridad efectiva invalida, incluyendo `leave-14abe9e8-df63-40a8-853a-e83aa92cfaea`, preservando audit trail de antes/despues, recomputando con el resolver canonico post-fix (SSOT) y nunca reimplementando la logica de autoridad en el comando.
 - Endurecer el resolver, policy, store y tests para que un `approval_delegate` generico no vuelva a transferir autoridad de permisos accidentalmente.
 - Agregar observabilidad para detectar cualquier snapshot de permiso delegado que viole la politica canonica.
 - Si se toca UX visible, hacerlo con skills de product design y loop GVC obligatorio; no cerrar UI sin captura mirada y evidencia en `.captures/`.
@@ -82,6 +82,10 @@ Reglas obligatorias:
 - Si esta task cambia el contrato arquitectonico de delegaciones o autoridad de aprobacion, registrar delta arquitectonico o ADR segun `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` antes de cerrar.
 - No borrar filas historicas de `greenhouse_core.operational_responsibilities`; revocar con lifecycle/audit.
 - No hacer raw SQL de remediacion en production como camino final. SQL read-only se permite para diagnostico y verificacion.
+- El fix debe vivir en la capa de configuracion per-stage (`ApprovalStageDefinition`), no como un `if (workflow === 'leave')` hardcodeado en el resolver. Patron canonico: flag declarativo por stage (ej. `honorGenericApprovalDelegate: false` default) que el resolver consume. Esto fuerza una decision explicita por cada stage `effective_supervisor` y evita drift inverso cuando se agregue un workflow nuevo.
+- Defense-in-depth: la autoridad de aprobacion (resolver -> snapshot -> policy) y el scope de supervisor/visibilidad (`access.ts`) son DOS planos. Ambos consumen hoy el mismo `approval_delegate` generico. La task debe decidir explicitamente cada plano; no asumir que arreglar uno arregla el otro.
+- Alinear con la regla de lifecycle de acceso (TASK-987 / ISSUE-083): una autoridad/delegacion invalida o revocada NO debe conferir ni aprobacion, ni vista, ni scope, ni item de menu. El fix de autoridad y el de visibilidad se mueven juntos para el caso invalido.
+- El recovery command es consumidor del resolver canonico, no una segunda implementacion de la politica. Recomputar snapshots SIEMPRE via el resolver post-fix para que runtime y remediacion no puedan divergir.
 
 ## Normative Docs
 
@@ -160,7 +164,9 @@ Reglas obligatorias:
 ### Gap
 
 - No existe contrato domain-scoped para diferenciar una delegacion operacional generica de una delegacion valida para aprobar permisos.
-- `getEffectiveSupervisor` aplica `approval_delegate` de forma transversal, y el approval resolver lo consume para `leave.supervisor_review`.
+- `getEffectiveSupervisor` (`readers.ts`) aplica `approval_delegate` de forma transversal sin parametro de politica (solo acepta `opts.effectiveAt`), y el approval resolver lo consume para los TRES stages `effective_supervisor` (`leave`, `expense_report`, `performance_evaluation`) — el drift no es exclusivo de permisos.
+- `src/lib/reporting-hierarchy/access.ts` (`listDelegatedSupervisorIds` + `getSupervisorScopeForTenant`) es un SEGUNDO consumidor independiente del mismo `approval_delegate` generico: confiere `hasDelegatedAuthority`, `canAccessSupervisorPeople/Leave` y `visibleMemberIds` del subarbol del supervisor. Ningun cambio en el resolver lo toca; requiere decision propia.
+- `ApprovalStageDefinition` (`config.ts`) no tiene un campo de politica de delegacion; hoy `resolutionStrategy: 'effective_supervisor'` honra el delegate generico de forma implicita para todos los stages que la usan.
 - No hay check de elegibilidad/politica que impida que un peer o reporte directo quede como aprobador de permisos de otras personas sin aprobacion HR explicita.
 - No hay comando auditado para reparar snapshots pendientes cuyo effective approver ya no corresponde a la politica.
 - No hay senal steady=0 que detecte `workflow_approval_snapshots` de permisos con `authority_source='delegation'` cuando la politica activa no permite delegacion generica.
@@ -185,6 +191,8 @@ Reglas obligatorias:
 ### Slice 1 - Decision contract and architecture delta
 
 - Confirmar y documentar la politica canonica V1: `leave.supervisor_review` NO honra `greenhouse_core.operational_responsibilities.responsibility_type='approval_delegate'` generico como fuente de autoridad efectiva.
+- Decidir explicitamente los OTROS dos stages `effective_supervisor` que consumen el mismo delegate generico (`expense_report.supervisor_review`, `performance_evaluation.supervisor_review`). Recomendacion por default: tambien `honorGenericApprovalDelegate: false`, porque ninguno tiene contrato de delegacion domain-scoped validado; un delegate generico tampoco deberia transferir su autoridad. Si por alguna razon historica uno de ellos debe conservar el comportamiento legacy, documentar el por que con doc vigente.
+- Decidir el SEGUNDO plano (visibilidad/scope): si un `approval_delegate` generico debe seguir confiriendo supervisor workspace scope (`getSupervisorScopeForTenant`) cuando ya NO confiere autoridad de aprobacion. Recomendacion V1: para la delegacion invalida del caso (revocada en Slice 3) no confiere nada; para el contrato generico a futuro, separar "scope de cobertura operacional" de "autoridad de aprobacion" requiere decision explicita o queda fuera de V1.
 - Definir explicitamente si la capacidad futura "delegar aprobacion de permisos" queda fuera de V1 o si requiere nuevo contrato domain-scoped, por ejemplo `responsibility_type='leave_approval_delegate'` o metadata equivalente con workflow/stage/scope, eligibility, actor, reason y expiracion obligatoria.
 - Actualizar la arquitectura relevante o crear ADR/delta indexado en `docs/architecture/DECISIONS_INDEX.md` si el contrato cambia source of truth, auth semantics o eventos.
 - Declarar la frontera entre:
@@ -196,14 +204,16 @@ Reglas obligatorias:
 
 ### Slice 2 - Resolver and policy hardening
 
-- Introducir una decision de politica por workflow/stage en la capa de approval authority. El resultado esperado para `workflow='leave'` y `stage='supervisor_review'` es:
+- Introducir un campo de politica per-stage en `ApprovalStageDefinition` (`src/lib/approval-authority/config.ts`), por ejemplo `honorGenericApprovalDelegate?: boolean` con default tratado como `false`. El resolver lo consume y lo pasa a `getEffectiveSupervisor`. Esto reemplaza el honrado implicito de hoy y fuerza decision explicita por stage. El resultado esperado para `workflow='leave'` y `stage='supervisor_review'` es:
   - `formalApproverMemberId = current reporting_lines supervisor`;
   - `effectiveApproverMemberId = formalApproverMemberId`;
-  - `authoritySource = 'formal_supervisor'` o equivalente canonical;
+  - `authoritySource = 'reporting_hierarchy'` (o `'formal_supervisor'` si se canoniza un nuevo valor; NO `'delegation'`);
   - ninguna responsabilidad generica `approval_delegate` puede cambiar ese effective approver.
-- Evitar un cambio global ciego en `getEffectiveSupervisor` si otros dominios dependen legitima o historicamente de delegacion. Preferir una API explicita tipo `getEffectiveSupervisor(memberId, { delegationPolicy: 'ignore' | 'generic' | 'domain_scoped', workflowContext })` o mover la decision al resolver de approval authority.
-- Endurecer `src/lib/hr-core/leave-review-policy.ts` para que la comparacion de actor autorizado dependa del snapshot ya normalizado y no reintroduzca fallback inseguro hacia delegaciones genericas.
-- Revisar `src/lib/reporting-hierarchy/access.ts` y `VerticalMenu.tsx` para asegurar que Daniela conserva entrada a su workspace de supervisora sin otorgar acceso de aprobacion a Valentina.
+- Extender `getEffectiveSupervisor(memberId, opts)` con una opcion explicita `delegationPolicy: 'ignore' | 'generic'` (additivo a `opts.effectiveAt`). El resolver pasa `'ignore'` cuando el stage tiene `honorGenericApprovalDelegate=false`. NO hacer un cambio global ciego dentro de `getEffectiveSupervisor` que afecte a todos los callers sin que cada uno declare su politica.
+- Aplicar la decision de Slice 1 a los tres stages `effective_supervisor` (`leave`, `expense_report`, `performance_evaluation`) seteando el flag explicito en cada uno. Default `false` salvo decision documentada distinta.
+- Endurecer `src/lib/hr-core/leave-review-policy.ts` para que la comparacion de actor autorizado dependa del snapshot ya normalizado y no reintroduzca fallback inseguro hacia delegaciones genericas. Revisar el fallback `getEffectiveLeaveApproverMemberId` (`?? request.supervisorMemberId`) para confirmar que sigue siendo seguro una vez el snapshot ya no congela delegados invalidos.
+- Decidir y aplicar el plano de visibilidad (`access.ts` `listDelegatedSupervisorIds` / `getSupervisorScopeForTenant`) segun Slice 1: si el delegate generico deja de conferir scope, ajustar el reader; si se conserva como cobertura operacional, documentar la separacion. En cualquier caso, una delegacion invalida (la del caso vivo) no debe seguir confiriendo scope tras el recovery.
+- Revisar `src/lib/reporting-hierarchy/access.ts` y `VerticalMenu.tsx` para asegurar que Daniela conserva entrada a su workspace de supervisora (por `hasDirectReports`) sin otorgar acceso de aprobacion ni visibilidad indebida a Valentina.
 - Garantizar que HR/admin broad sigue funcionando solo por capability/role autorizado, no por responsabilidades operacionales.
 
 ### Slice 3 - Audited recovery command for live drift
@@ -222,6 +232,7 @@ Reglas obligatorias:
   - identificar responsabilidades `approval_delegate` activas que no son validas para permisos bajo la nueva politica;
   - revocar la responsabilidad invalida via primitive existente o nueva primitive auditada, nunca borrarla;
   - recomputar snapshots solo para solicitudes de permisos en estados pendientes de supervisor;
+  - recomputar SIEMPRE invocando el resolver canonico post-fix (`resolveApprovalAuthorityForStage`), nunca reimplementando la logica de autoridad dentro del comando (SSOT: runtime y recovery no pueden divergir);
   - cambiar `effective_approver_member_id` de delegado invalido a supervisor formal vigente;
   - preservar `formal_approver_member_id`;
   - registrar before/after y razon de remediacion;
@@ -257,6 +268,7 @@ Reglas obligatorias:
   - `authority_source='delegation'`; o
   - `effective_approver_member_id != formal_approver_member_id`
   - salvo que exista una politica domain-scoped aceptada que permita esa divergencia.
+- Cubrir tambien los otros stages `effective_supervisor` cuya decision de Slice 1 sea `honorGenericApprovalDelegate=false` (`expense_report.supervisor_review`, `performance_evaluation.supervisor_review`). Preferir una sola senal parametrizada por workflow/stage (lee la politica per-stage de `config.ts`) antes que tres senales paralelas; el conteo divergente solo es violacion si el stage no honra delegate generico. Si se decide acotar a leave en V1, declararlo explicito y dejar follow-up para las otras.
 - Agregar senal complementaria si corresponde:
   - `hr.leave.approval_delegate_without_domain_policy`
   - detecta responsabilidades `approval_delegate` activas cuyo scope podria impactar permisos, aunque los snapshots ya esten sanos.

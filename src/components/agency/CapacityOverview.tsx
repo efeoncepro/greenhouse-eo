@@ -184,7 +184,7 @@ const CapacityOverview = ({ capacity }: Props) => {
         }}
       >
         <Box sx={{ px: 2.5, py: 1.25, bgcolor: theme.palette.background.default }}>
-          <Typography sx={{ fontSize: '0.7rem', fontWeight: 500, color: theme.palette.text.secondary, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <Typography variant='overline' sx={{ fontWeight: 500, color: theme.palette.text.secondary, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Distribución por persona
           </Typography>
         </Box>

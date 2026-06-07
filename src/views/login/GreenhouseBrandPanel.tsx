@@ -112,9 +112,9 @@ const GreenhouseBrandPanel = () => {
         />
 
         {/* Subtitle with inline Efeonce logo */}
-        <Typography
+        <Typography variant='body2'
           component='p'
-          sx={{ fontSize: 15, color: 'rgba(255,255,255, 0.5)', mb: 6, lineHeight: 1.7 }}
+          sx={{ color: 'rgba(255,255,255, 0.5)', mb: 6, lineHeight: 1.7 }}
         >
           {'La plataforma de '}
           <Box
@@ -155,11 +155,10 @@ const GreenhouseBrandPanel = () => {
       />
 
       {/* Footer */}
-      <Typography
+      <Typography variant='caption'
         sx={{
           position: 'absolute',
           bottom: { md: 28, lg: 36 },
-          fontSize: 11,
           color: 'rgba(255,255,255, 0.35)'
         }}
       >

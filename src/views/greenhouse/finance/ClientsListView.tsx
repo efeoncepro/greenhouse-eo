@@ -45,13 +45,13 @@ const cliColumns: ColumnDef<ClientProfile, any>[] = [
     cell: ({ row }) => (
       <Box>
         <Typography variant='body2' fontWeight={600}>{row.original.legalName || row.original.clientProfileId}</Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>{row.original.hubspotCompanyId}</Typography>
+        <Typography variant='caption' color='text.secondary'>{row.original.hubspotCompanyId}</Typography>
       </Box>
     )
   }),
   cliColumnHelper.accessor('taxId', {
     header: 'RUT',
-    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{getValue() || '—'}</Typography>
+    cell: ({ getValue }) => <Typography variant='caption'>{getValue() || '—'}</Typography>
   }),
   cliColumnHelper.accessor('paymentTermsDays', {
     header: 'Plazo',

@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Avanzada`
 - Rank: `TBD`
 - Domain: `ui|platform|design-system`
 - Blocked by: `none`

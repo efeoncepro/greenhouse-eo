@@ -316,7 +316,6 @@ const ProfileDetailDrawer = ({ profileId, onClose, onActionComplete }: ProfileDe
             <Typography
               variant='caption'
               color='text.secondary'
-              sx={{ fontSize: '0.7rem' }}
             >
               {profile.profileId}
             </Typography>

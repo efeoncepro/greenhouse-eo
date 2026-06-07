@@ -295,7 +295,6 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
             <Typography
               variant='caption'
               sx={{
-                fontSize: '0.7rem',
                 color: 'text.secondary'
               }}
             >
@@ -317,7 +316,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Typography
                 variant='caption'
                 color='text.secondary'
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.7rem' }}
+                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}
               >
                 Provider
               </Typography>
@@ -336,7 +335,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Typography
                 variant='caption'
                 color='text.secondary'
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.7rem' }}
+                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}
               >
                 Metodo
               </Typography>
@@ -347,7 +346,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Typography
                 variant='caption'
                 color='text.secondary'
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.7rem' }}
+                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}
               >
                 Titular
               </Typography>
@@ -358,7 +357,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Typography
                 variant='caption'
                 color='text.secondary'
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.7rem' }}
+                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}
               >
                 Pais
               </Typography>
@@ -369,7 +368,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Typography
                 variant='caption'
                 color='text.secondary'
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.7rem' }}
+                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}
               >
                 Banco / plataforma
               </Typography>
@@ -380,7 +379,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Typography
                 variant='caption'
                 color='text.secondary'
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.7rem' }}
+                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}
               >
                 Maker → Checker
               </Typography>
@@ -409,7 +408,7 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
               <Typography
                 variant='caption'
                 color='text.secondary'
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.7rem' }}
+                sx={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}
               >
                 Cuenta destino
               </Typography>
@@ -517,7 +516,6 @@ const PaymentProfileCard = ({ profile, onActionComplete }: PaymentProfileCardPro
             sx={{
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
-              fontSize: '0.7rem',
               fontWeight: 600
             }}
           >

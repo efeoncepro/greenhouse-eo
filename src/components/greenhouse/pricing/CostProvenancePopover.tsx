@@ -150,7 +150,7 @@ const CostProvenancePopover = ({
               >
                 {GH_PRICING.costProvenance.sourceRefLabel}
               </Typography>
-              <Typography variant='body2' sx={{ fontSize: '0.8rem', wordBreak: 'break-all' }}>
+              <Typography variant='caption' sx={{ wordBreak: 'break-all' }}>
                 {sourceRef}
               </Typography>
             </Box>

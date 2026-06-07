@@ -107,7 +107,7 @@ const AtRiskRow = ({ item, index, active, onActivate }: AtRiskRowProps) => {
           <Stack direction='row' spacing={1.5} alignItems='center'>
             {item.metric ? (
               <Stack alignItems='flex-end' spacing={0}>
-                <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10 }}>
+                <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', letterSpacing: 0.5}}>
                   {item.metric.label}
                 </Typography>
                 <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }} color='text.primary'>

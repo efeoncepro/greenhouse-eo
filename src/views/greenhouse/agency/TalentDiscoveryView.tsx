@@ -515,7 +515,7 @@ function TalentCard({ person }: { person: TalentDiscoveryItem }) {
                     justifyContent: 'center'
                   }}
                 >
-                  <Typography variant='caption' fontWeight={700} sx={{ fontSize: '0.65rem' }}>
+                  <Typography variant='caption' fontWeight={700}>
                     {person.discoveryScore}
                   </Typography>
                 </Box>

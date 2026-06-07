@@ -690,13 +690,13 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                   {detail.notionProjectId && (
                     <Grid size={{ xs: 12 }}>
                       <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>Notion Project ID</Typography>
-                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.notionProjectId}</Typography>
+                      <Typography variant='caption'>{detail.notionProjectId}</Typography>
                     </Grid>
                   )}
                   {detail.createdBy && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>Creado por</Typography>
-                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.createdBy}</Typography>
+                      <Typography variant='caption'>{detail.createdBy}</Typography>
                     </Grid>
                   )}
                 </Grid>
@@ -978,7 +978,7 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                 <Grid container spacing={4}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>HubSpot Service ID</Typography>
-                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.hubspotServiceId ?? '—'}</Typography>
+                    <Typography variant='caption'>{detail.hubspotServiceId ?? '—'}</Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sync Status</Typography>
@@ -991,13 +991,13 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                   {detail.hubspotCompanyId && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>HubSpot Company ID</Typography>
-                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.hubspotCompanyId}</Typography>
+                      <Typography variant='caption'>{detail.hubspotCompanyId}</Typography>
                     </Grid>
                   )}
                   {detail.hubspotDealId && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>HubSpot Deal ID</Typography>
-                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{detail.hubspotDealId}</Typography>
+                      <Typography variant='caption'>{detail.hubspotDealId}</Typography>
                     </Grid>
                   )}
                 </Grid>

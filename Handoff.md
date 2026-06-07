@@ -1,3 +1,14 @@
+# Sesion 2026-06-07 — Typography consumer sweep (TASK-1036 cleanup)
+
+Se resolvió el baseline de warnings `greenhouse/no-fontsize-inline-typography`: `pnpm lint` pasó de 162 warnings en 93 archivos a 0 errores / 0 warnings. El cambio migró `<Typography>` legacy con `fontSize` literal hacia variants del SoT (`caption`, `body1/body2`, `overline`, `inherit`, etc.) y corrigió un warning real de hooks en `CostAllocationsView` moviendo `clientColumnHelper` a scope estable + dependencia explícita de `handleToggleExpand`.
+
+- **No se cambió** `typographyScale`, `mergedTheme`, `DESIGN.md` ni la lint rule; el fix refuerza el contrato existente en vez de agregar tokens ad hoc o silenciar el gate.
+- **Task metadata:** `TASK-1036` sigue en `in-progress`; se corrigió el drift documental `Lifecycle: to-do` → `in-progress` y `Status real` → `Avanzada`. No se movió a `complete` porque esto fue un cleanup slice, no cierre administrativo de todo el programa.
+- **Verificación:** `pnpm lint`, `gtimeout 180s pnpm exec tsc --noEmit --pretty false`, `pnpm vitest run src/components/theme/typography-drift.test.ts`, `pnpm design:lint`, `pnpm docs:closure-check`, `git diff --check`.
+- **Nota operativa:** VS Code del operador crasheó durante el sweep por el volumen de archivos; el diff final quedó en disco y validado por terminal.
+
+---
+
 # Sesion 2026-06-07 — TASK-1033 Greenhouse Floating Surface primitive (complete)
 
 Se implementó y cerró TASK-1033 en `develop` (sin worktree, por instrucción del operador). Es la capa de plataforma que el Delta UI 2026-04-20b anticipaba: el contrato Floating UI dejó de vivir duplicado en cada consumer.

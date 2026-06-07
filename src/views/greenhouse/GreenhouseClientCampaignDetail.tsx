@@ -139,7 +139,7 @@ const GreenhouseClientCampaignDetail = ({ campaignId }: { campaignId: string }) 
               </Box>
             }
             subheader={
-              <Typography variant='body2' sx={{ fontSize: '0.8rem', mt: 0.5 }} color='text.disabled'>
+              <Typography variant='caption' sx={{ mt: 0.5 }} color='text.disabled'>
                 {c.eoId}
               </Typography>
             }

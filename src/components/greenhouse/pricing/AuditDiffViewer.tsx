@@ -397,8 +397,8 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
                       {key}
                     </Typography>
                     <Typography
-                      variant='body2'
-                      sx={{ fontSize: '0.8rem', wordBreak: 'break-all' }}
+                      variant='caption'
+                      sx={{ wordBreak: 'break-all' }}
                     >
                       {formatValue(previous)}
                     </Typography>
@@ -422,8 +422,8 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
                       {key}
                     </Typography>
                     <Typography
-                      variant='body2'
-                      sx={{ fontSize: '0.8rem', wordBreak: 'break-all' }}
+                      variant='caption'
+                      sx={{ wordBreak: 'break-all' }}
                     >
                       {formatValue(next)}
                     </Typography>

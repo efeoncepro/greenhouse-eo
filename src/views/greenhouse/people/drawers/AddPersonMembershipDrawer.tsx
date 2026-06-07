@@ -222,7 +222,7 @@ const AddPersonMembershipDrawer = ({ open, memberId, memberName, onClose, onSucc
             <i className='tabler-building-check' style={{ fontSize: 18, color: 'var(--mui-palette-success-main)' }} />
             <Box>
               <Typography variant='body2' fontWeight={600}>{selectedOrg.organizationName}</Typography>
-              <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>
+              <Typography variant='caption' color='text.secondary'>
                 {selectedOrg.publicId}
               </Typography>
             </Box>

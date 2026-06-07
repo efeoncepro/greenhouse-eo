@@ -283,7 +283,7 @@ const CampaignListView = () => {
                     <i className='tabler-folders' style={{ fontSize: 14 }} />
                     {c.projectCount} proyecto{c.projectCount !== 1 ? 's' : ''}
                   </Typography>
-                  <Typography variant='caption' sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>
+                  <Typography variant='caption' sx={{ color: 'text.disabled' }}>
                     {c.eoId}
                   </Typography>
                 </Box>

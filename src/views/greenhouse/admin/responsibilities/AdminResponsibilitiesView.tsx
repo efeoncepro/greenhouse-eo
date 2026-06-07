@@ -462,7 +462,6 @@ const AdminResponsibilitiesView = () => {
                             <Typography
                               variant='caption'
                               color='text.secondary'
-                              sx={{ fontSize: '0.75rem' }}
                             >
                               {row.scopeName ?? row.scopeId}
                             </Typography>

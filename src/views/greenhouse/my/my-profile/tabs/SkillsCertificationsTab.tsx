@@ -615,7 +615,6 @@ function SkillsSection({
                                 bgcolor: 'action.selected',
                                 borderRadius: 0.5,
                                 px: 0.5,
-                                fontSize: '0.65rem',
                                 fontWeight: 600,
                                 textTransform: 'uppercase'
                               }}
@@ -873,7 +872,6 @@ function ToolsSection({
                                 bgcolor: 'action.selected',
                                 borderRadius: 0.5,
                                 px: 0.5,
-                                fontSize: '0.65rem',
                                 fontWeight: 600,
                                 textTransform: 'uppercase'
                               }}
@@ -1139,7 +1137,6 @@ function LanguagesSection({
                           bgcolor: 'action.selected',
                           borderRadius: 0.5,
                           px: 0.5,
-                          fontSize: '0.65rem',
                           fontWeight: 600,
                           textTransform: 'uppercase'
                         }}

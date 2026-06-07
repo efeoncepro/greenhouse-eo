@@ -278,7 +278,7 @@ const EntryVersionHistoryDrawer = ({ open, onClose, entryId, memberName }: Props
                           </Typography>
                         )}
                         {version.reopenAuditId && (
-                          <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>
+                          <Typography variant='caption' color='text.secondary'>
                             Audit: {version.reopenAuditId}
                           </Typography>
                         )}

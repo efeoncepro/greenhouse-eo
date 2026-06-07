@@ -81,8 +81,8 @@ const LoginValueCard = ({ data }: LoginValueCardProps) => {
         {iconPaths[icon]}
       </Box>
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography sx={{ fontSize: 13, fontWeight: 500, color: '#fff', lineHeight: 1.4 }}>{title}</Typography>
-        <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255, 0.4)', lineHeight: 1.4, mt: 0.25 }}>
+        <Typography variant='caption' sx={{ fontWeight: 500, color: '#fff', lineHeight: 1.4 }}>{title}</Typography>
+        <Typography variant='caption' sx={{ color: 'rgba(255,255,255, 0.4)', lineHeight: 1.4, mt: 0.25 }}>
           {subtitle}
         </Typography>
       </Box>

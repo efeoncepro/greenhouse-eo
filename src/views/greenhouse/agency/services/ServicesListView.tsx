@@ -120,7 +120,7 @@ const svcColumns: ColumnDef<ServiceListItem, any>[] = [
         >
           {row.original.name}
         </Typography>
-        <Typography variant='caption' sx={{ fontSize: '0.75rem' }} color='text.secondary'>{row.original.publicId ?? row.original.serviceId}</Typography>
+        <Typography variant='caption' color='text.secondary'>{row.original.publicId ?? row.original.serviceId}</Typography>
       </Box>
     )
   }),

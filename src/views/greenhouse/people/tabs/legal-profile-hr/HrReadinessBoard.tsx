@@ -43,7 +43,6 @@ const HrReadinessBoard = ({ finalSettlement, payroll }: HrReadinessBoardProps) =
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
               color: 'text.secondary',
-              fontSize: 11
             }}
           >
             {title}
@@ -65,7 +64,7 @@ const HrReadinessBoard = ({ finalSettlement, payroll }: HrReadinessBoardProps) =
               style={{ fontSize: 14 }}
               aria-hidden='true'
             />
-            <Typography variant='body2' sx={{ fontWeight: 600, fontSize: 13 }}>
+            <Typography variant='caption' sx={{ fontWeight: 600}}>
               {r.ready
                 ? HR_LEGAL_COPY.readiness.statusReady
                 : r.blockers.length > 0

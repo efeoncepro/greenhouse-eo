@@ -40,7 +40,7 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
 
 const NavLabel = ({ label, subtitle, show }: { label: string; subtitle: string; show: boolean }) => (
   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
-    <Typography component='span' sx={{ color: 'inherit', fontSize: 'inherit', fontWeight: 500, lineHeight: 1.2 }}>
+    <Typography variant='inherit' component='span' sx={{ color: 'inherit', fontWeight: 500, lineHeight: 1.2 }}>
       {label}
     </Typography>
     {show ? (
