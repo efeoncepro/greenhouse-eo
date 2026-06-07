@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -156,6 +156,56 @@ Reglas obligatorias:
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Plan (Discovery 2026-06-07, local-first en `develop` por instrucción del operador — sin branch)
+
+### Open Questions resueltas (opción más robusta/segura/escalable, no bandaid)
+
+1. **Motor de diff → `pixelmatch` + `pngjs` como `devDependencies` explícitas.**
+   Rationale: `toHaveScreenshot` nativo exige correr dentro del runner `@playwright/test`
+   con baselines gestionados por el runner (carpetas `__screenshots__`, naming propio, masks
+   solo por locator a capture-time). GVC hace diff **offline file-to-file** (PNG mockup durable
+   vs PNG runtime ya en disco) con masks **rectangulares por región** — arquitectura incompatible
+   con el runner. `pixelmatch` es puro JS, zero-dep, ~5KB, da control de threshold + anti-aliasing
+   + diff PNG; las masks las aplico zeroing regiones del buffer antes del diff. `pngjs@5.0.0` ya es
+   resoluble (transitivo) → lo pineo explícito para quitar la fragilidad de depender de un hoist.
+   Rechazo `sharp` (binario nativo pesado, overkill para diff RGBA).
+
+2. **Formato baseline durable → PNG committeados bajo `scripts/frontend/baselines/<surfaceId>/<viewport>__<frameLabel>.png`**,
+   masked + clipped (livianos vía `clipSelector`). Diffeables en git, contrato compartido
+   cross-máquina/cross-agente. `.captures/` (gitignored, purgado >30d) NO sirve como SSOT.
+
+3. **Granularidad `surfaceId` → por superficie**; `viewport` + `frameLabel` son sub-keys del
+   filename. La sección se acota con `clipSelector` por frame. Minimiza dirs durables + churn.
+
+4. **Hydration detection (Slice 3) → pattern-match sobre `console.error`** (`hydrat`,
+   `did not match`, `Text content does not match`, `Hydration failed`). Default `warning`;
+   `error` sólo si el scenario declara `failOnHydrationWarning: true`. Best-effort honesto
+   (no se acopla a hooks internos del framework).
+
+5. **Promoción de baseline → manual explícita** vía `fe:capture:diff --promote <capture-dir>`.
+   Gobernanza (quién/cuándo aprueba, UI delivery loop) = follow-up.
+
+### Decisiones de diseño transversales
+
+- **Finding codes nuevos = SSOT en `scripts/frontend/lib/failure-taxonomy.ts`** (no inline por callsite).
+- **`manifest.schemaVersion` se mantiene en `1`**; todos los campos nuevos son additive. `health.ts`
+  lee de `audit.jsonl` (no de manifests) → tolerante a versiones mixtas por construcción.
+- **Cada gate nuevo es opt-in por scenario + warning-first**; `error` sólo si el scenario lo declara.
+- **Determinismo de captura** (anim off, caret oculto, `deviceScaleFactor` fijo, fonts settled,
+  reduced-motion) es **prerequisito del diff** — se aplica en el setup del browser/page, no como detalle.
+
+### Slices
+
+- Slice 0 — deps (`pixelmatch` + `pngjs` devDeps) + esta sección plan.
+- Slice 1 — Baseline Visual Contract (diff engine pixelmatch + masks + determinism + home durable + `--promote` + codes).
+- Slice 2 — Layout Integrity Gate (`quality.layout`).
+- Slice 3 — Console/Hydration/Network strict (`quality.runtime`).
+- Slice 4 — Playwright trace retain-on-failure.
+- Slice 5 — Keyboard/Focus/Reduced-motion (`quality.keyboard`).
+- Slice 6 — Performance budgets opt-in (`quality.performance`, warning-first).
+- Slice 7 — Data honesty + enterprise rubric (`quality.enterpriseRubric`).
+- Slice 8 — Docs + regression scenarios + adoption path.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
