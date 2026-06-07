@@ -207,3 +207,14 @@ export type {
   GreenhouseMetricBreakdownPoint,
   GreenhouseMetricBreakdownTone
 } from './GreenhouseMetricBreakdownChartCard'
+export { default as GreenhouseActivityTimeline } from './GreenhouseActivityTimeline'
+export type {
+  GreenhouseActivityTimelineAttachment,
+  GreenhouseActivityTimelineAvatar,
+  GreenhouseActivityTimelineItem,
+  GreenhouseActivityTimelineKind,
+  GreenhouseActivityTimelinePerson,
+  GreenhouseActivityTimelineProps,
+  GreenhouseActivityTimelineTone,
+  GreenhouseActivityTimelineVariant
+} from './GreenhouseActivityTimeline'

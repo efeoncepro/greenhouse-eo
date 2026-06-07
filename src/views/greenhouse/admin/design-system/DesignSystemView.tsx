@@ -42,6 +42,7 @@ const LOADING_LAB_ROUTE = '/admin/design-system/loaders'
 const MICROINTERACTIONS_LAB_ROUTE = '/admin/design-system/microinteractions'
 const TYPOGRAPHY_ROUTE = '/admin/design-system/typography'
 const CHARTS_LAB_ROUTE = '/admin/design-system/charts'
+const UTILITIES_LAB_ROUTE = '/admin/design-system/utilities'
 
 const BRAND: { key: AxisColorFamily; label: string }[] = [
   { key: 'primary', label: 'Primary (Efeonce)' },
@@ -199,6 +200,41 @@ const DesignSystemView = () => (
           endIcon={<i className='tabler-arrow-right' />}
         >
           Ver tipografía
+        </Button>
+      </CardContent>
+    </Card>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Laboratorios
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Utilities y timelines de actividad
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Primitive reusable para activity timeline basada en AXIS Figma, motion reducido y semántica de lista ordenada.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={UTILITIES_LAB_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-list-details' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver utilities
         </Button>
       </CardContent>
     </Card>

@@ -1,3 +1,19 @@
+# Sesion 2026-06-07 — Greenhouse Utilities Lab + Activity Timeline primitive
+
+Por pedido del operador se abrió una nueva página de utilities bajo el Design System interno y se implementó el diseño AXIS Figma `Activity Timeline` (`yyMksCoijfMaIoYplXKZaR`, node `6678:105154`) como primitive reusable, no como composición route-local.
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseActivityTimeline.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato V1:** variants `card/embedded/compact`, kinds `activityTimeline/auditTrail/handoffTimeline/documentTimeline/custom`, lista ordenada accesible, dots semánticos, timestamps, attachment pill, person row, `TeamAvatarGroup` para clusters de equipo, `data-capture` y responsive mobile.
+- **Motion:** usa `Framer Motion` vía `@/libs/FramerMotion` + `useReducedMotion`. Se eligió sobre GSAP porque el diseño requiere mount transitions y crecimiento sutil de conectores, no una timeline medida/scroll/path compleja.
+- **Lab interno:** `/admin/design-system/utilities`, gateado igual que `/admin/design-system` por `administracion.design_system` y defensa `tenantType !== client`.
+- **Reachability:** link "Ver utilities" agregado en `DesignSystemView` + child route declarada en `src/lib/navigation/route-reachability-manifest.ts`.
+- **Scenario GVC:** `scripts/frontend/scenarios/design-system-utilities.scenario.ts`.
+- **URL local actual:** `http://localhost:3001/admin/design-system/utilities` (GVC local necesitó `AGENT_AUTH_BASE_URL=http://localhost:3001`; 3000 no estaba escuchando).
+- **Evidencia GVC final:** `.captures/2026-06-07T01-08-26_design-system-utilities` desktop + mobile, revisado visualmente; se corrigió el rail vertical tras la primera captura y luego se elevó el acabado con eventos Greenhouse reales, contract card curada y `TeamAvatarGroup`.
+- **Gates verdes:** vitest focal de la primitive, eslint focal, `gtimeout 150s pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm design:lint`, `pnpm docs:closure-check` (warnings esperados: UI interna con GVC, no aplica manual/client changelog) y `git diff --check`.
+
+---
+
 # Sesion 2026-06-06 — Página "En mantenimiento" + Modo Mantenimiento (gate)
 
 Se implementó el diseño AXIS "Under Maintenance" (Figma 504-12356) en la familia canónica de misc-pages + un gate de mantenimiento env-driven (primer `middleware.ts` del repo).

@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.25
+> **Version:** 1.26
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-07 — v1.26: Greenhouse agrega `GreenhouseActivityTimeline` como primera primitive de utilities para timelines de actividad/auditoria ligera/handoffs/documentos, adaptada desde AXIS Figma `Activity Timeline` (`yyMksCoijfMaIoYplXKZaR`, node `6678:105154`) con Framer Motion reduced-motion-safe y Utilities Lab interno en `/admin/design-system/utilities`.
 > **Updated:** 2026-06-07 — v1.25: Greenhouse agrega `GreenhouseMetricBreakdownChartCard` como tercera primitive canonical de charts para snapshots con KPI hero + serie semanal + metric meters (`variant='weeklyBarSummary'`, primer kind `earningReports`) basada en Recharts + meters MUI.
 > **Updated:** 2026-06-07 — v1.24: Greenhouse agrega `GreenhouseStackedDistributionChartCard` como segunda primitive canonical de charts para distribuciones apiladas operativas (`variant='stackedStatus'`, primer kind `vehiclesOverview`) basada en Recharts + rows MUI.
 > **Updated:** 2026-06-07 — v1.23: Greenhouse agrega `GreenhouseChartCard` como primitive reusable inicial para chart cards enterprise basadas en Recharts, con tabs de metrica, tooltip accesible, `aria-describedby` compacto, responsive mobile y Charts Lab interno en `/admin/design-system/charts`.
@@ -35,6 +36,28 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-07b — Greenhouse Utilities / Activity Timeline Primitive
+
+Greenhouse adopta `GreenhouseActivityTimeline` como primera primitive de utilities basada en AXIS Figma (`Design System | Vuexy → AXIS`, node `6678:105154`) para timelines de actividad, auditoria ligera, handoffs y documentos.
+
+Docs canonicos:
+
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseActivityTimeline.tsx`
+- Visual lab interno: `/admin/design-system/utilities`
+- Scenario GVC: `design-system-utilities`
+
+Contrato:
+
+- Variants oficiales V1: `card`, `embedded`, `compact`.
+- Kinds semanticos V1: `activityTimeline`, `auditTrail`, `handoffTimeline`, `documentTimeline`, `custom`.
+- Props principales: `title`, `subtitle`, `items`, `variant`, `kind`, `icon`, `actionLabel`, `onAction`, `ariaLabel`, `dataCapture`.
+- `items` modela entradas ordenadas con `id`, `title`, `timestamp`, `description`, `tone` y bloques opcionales `attachment`, `person`, `avatars`.
+- La primitive owns lista ordenada accesible, timeline rail, dots semanticos, timestamps, attachment pill, person row, avatar group, responsive stacking, `data-variant`, `data-kind`, `data-capture` y reduced-motion.
+- Los clusters de equipo reutilizan `TeamAvatarGroup` (`src/components/greenhouse/TeamAvatarGroup.tsx`) para conservar tooltip, fallback de iniciales y microinteraccion `pull-up`; no crear otro avatar group dentro de consumers del timeline.
+- Library choice V1: Framer Motion via `@/libs/FramerMotion` + `useReducedMotion`. Se eligio sobre GSAP porque este diseño necesita mount transitions y crecimiento sutil de conectores; GSAP queda para timelines complejas, SVG/path/text, ScrollTrigger o motion medido.
+- Boundary: no reemplaza auditoria legal completa, event sourcing UI, sidecars de evidencia, maker-checker ni readers/commands de dominio. Los dominios calculan/filtran eventos, permisos, evidencia y URLs; la primitive gobierna shell visual, a11y, responsive y motion.
+- Toda nueva variant utility debe aparecer primero en `/admin/design-system/utilities` con `data-capture`, GVC desktop+mobile y test focal antes de migrar consumers productivos.
 
 ## Delta 2026-06-07 — Greenhouse Chart Card Primitives
 

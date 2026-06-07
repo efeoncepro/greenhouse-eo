@@ -144,6 +144,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Charts Lab — child surface del Design System para primitives de visualizacion de datos, alcanzable desde la card "Ver charts" en DesignSystemView.'
+  },
+  {
+    route: '/admin/design-system/utilities',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Utilities Lab — child surface del Design System para primitives utilitarias como Activity Timeline, alcanzable desde la card "Ver utilities" en DesignSystemView.'
   }
 ]
 
