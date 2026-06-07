@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: ``
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `ui|platform|accessibility`
 - Blocked by: `none`
@@ -236,12 +236,12 @@ Sin flag para la primitive foundation. Pilot migrations are additive and local; 
 
 ## Acceptance Criteria
 
-- [ ] `GreenhouseFloatingSurface` existe, se exporta desde `@/components/greenhouse/primitives` y centraliza defaults de Floating UI.
-- [ ] Variants oficiales (`richTooltip`, `actionMenu`, `evidencePeek`, `inlineEditor`, `validationBubble`, `commandPreview`) tienen resolver `kind -> variant` y contrato accesible documentado/testeado.
-- [ ] `TotalsLadder` y `CostProvenancePopover` consumen la primitive sin cambiar su API publica ni degradar visual/focus behavior.
-- [ ] Tests focales cubren resolver, open/close, Escape/outside dismiss, aria/data hooks y focus return cuando aplique.
-- [ ] Scenario GVC repetible captura desktop/mobile y al menos un estado open de surface anclada.
-- [ ] Docs UI platform y lifecycle de task quedan sincronizados al cierre.
+- [x] `GreenhouseFloatingSurface` existe, se exporta desde `@/components/greenhouse/primitives` y centraliza defaults de Floating UI.
+- [x] Variants oficiales (`richTooltip`, `actionMenu`, `evidencePeek`, `inlineEditor`, `validationBubble`, `commandPreview`) tienen resolver `kind -> variant` y contrato accesible documentado/testeado.
+- [x] `TotalsLadder` y `CostProvenancePopover` consumen la primitive sin cambiar su API publica ni degradar visual/focus behavior.
+- [x] Tests focales cubren resolver, open/close, Escape/outside dismiss, aria/data hooks y focus return cuando aplique.
+- [x] Scenario GVC repetible captura desktop/mobile y al menos un estado open de surface anclada.
+- [x] Docs UI platform y lifecycle de task quedan sincronizados al cierre.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSURE
@@ -249,16 +249,25 @@ Sin flag para la primitive foundation. Pilot migrations are additive and local; 
 
 ## Verification
 
-To be completed during implementation.
+Evidencia recogida 2026-06-07:
+
+- **Tests focales** — 19 pasan (`floating-surface-controller.test.ts` resolver/contrato + `GreenhouseFloatingSurface.test.tsx` open/close/Escape/outside/focus/controlled/role/inline-editor-dirty).
+- **tsc** — `pnpm exec tsc --noEmit --pretty false` limpio (0 errores).
+- **lint** — `pnpm lint` 0 errores (162 warnings pre-existentes `no-fontsize-inline-typography` ajenos; 1 en `CostProvenancePopover` preservado verbatim por paridad visual).
+- **GVC** — `pnpm fe:capture floating-surface-primitives --env=local` OK: 2 variants (desktop 1280×900 + mobile iPhone 13), 8 frames. Estados capturados y revisados visualmente: galería de variants, `evidencePeek` (role dialog) abierto, `richTooltip` abierto por foco de teclado, `commandPreview` (right-start) reubicado por flip/shift cerca del borde derecho. Evidencia: `.captures/2026-06-07T01-43-23_floating-surface-primitives`.
+- **Migración de pilotos** — `CostProvenancePopover` y `TotalsLadder` ya NO importan `@floating-ui/react`; API pública intacta; paridad visual/focus preservada.
 
 ## Closing Protocol
 
-- [ ] Ejecutar verification completo y registrar evidencia.
-- [ ] Marcar acceptance criteria completados o documentar pendiente bloqueante.
-- [ ] Mover task a `docs/tasks/complete/` solo cuando runtime, GVC y docs esten cerrados.
-- [ ] Sincronizar `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `Handoff.md`, `changelog.md` y docs de arquitectura afectadas.
-- [ ] Ejecutar `pnpm docs:closure-check`.
+- [x] Ejecutar verification completo y registrar evidencia.
+- [x] Marcar acceptance criteria completados o documentar pendiente bloqueante.
+- [x] Mover task a `docs/tasks/complete/` solo cuando runtime, GVC y docs esten cerrados.
+- [x] Sincronizar `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `Handoff.md`, `changelog.md` y docs de arquitectura afectadas.
+- [x] Ejecutar `pnpm docs:closure-check`.
 
 ## Closure Notes
 
-To be completed when moved to `complete`.
+- **Shipped**: `GreenhouseFloatingSurface` + `floating-surface-controller` (`@/components/greenhouse/primitives`), 6 variants oficiales con contrato a11y por variant y resolver idempotente `kind→variant`. 2 pilotos migrados. Lab interno `/admin/design-system/floating-surfaces` + scenario GVC.
+- **Sin migración / backend / capability nuevos**: el lab reusa el viewCode `administracion.design_system`. No toca permisos, rutas de producto, outbox, ni reliability signals.
+- **Regla canónica nueva** (documentada en `GREENHOUSE_UI_PLATFORM_V1` Delta 2026-06-06): los views de producto NO importan `@floating-ui/react`; consumen la primitive. Excepción: primitives + infra Vuexy menu.
+- **Follow-up (no bloqueante)**: `GreenhouseFieldProvenancePeek` sigue usando Floating UI ad-hoc (es primitive/infra, no view de producto) — candidato a adoptar la primitive. La skill local `greenhouse-dev` tiene una línea desactualizada ("@floating-ui NOT to use — MUI Popper covers this") que el ADR `GREENHOUSE_FLOATING_SURFACE_DECISION_V1` (Accepted 2026-06-06) supersede; reconciliar la skill cuando se toque.

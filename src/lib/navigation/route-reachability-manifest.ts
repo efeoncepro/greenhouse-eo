@@ -151,6 +151,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Utilities Lab — child surface del Design System para primitives utilitarias como Activity Timeline, alcanzable desde la card "Ver utilities" en DesignSystemView.'
+  },
+  {
+    route: '/admin/design-system/floating-surfaces',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Floating Surfaces Lab (TASK-1033) — child surface del Design System para la primitive GreenhouseFloatingSurface y sus 6 variants, alcanzable desde la card "Ver floating surfaces" en DesignSystemView.'
   }
 ]
 

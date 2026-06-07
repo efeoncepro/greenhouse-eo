@@ -1,3 +1,19 @@
+# Sesion 2026-06-07 — TASK-1033 Greenhouse Floating Surface primitive (complete)
+
+Se implementó y cerró TASK-1033 en `develop` (sin worktree, por instrucción del operador). Es la capa de plataforma que el Delta UI 2026-04-20b anticipaba: el contrato Floating UI dejó de vivir duplicado en cada consumer.
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseFloatingSurface.tsx` + controller puro `floating-surface-controller.ts`, exportados desde `@/components/greenhouse/primitives`. Centraliza el contrato canónico (`autoUpdate` + `offset` + `flip({ fallbackAxisSideDirection: 'end' })` + `shift({ padding: 16 })` + `FloatingPortal` + `FloatingFocusManager modal={false}` + `useDismiss` + `useRole`), open controlled/uncontrolled, render-props `anchor`/`content`, hooks GVC y reduced-motion.
+- **6 variants oficiales** con contrato a11y por variant (frozen `FLOATING_SURFACE_VARIANT_CONFIG`): `richTooltip`/`validationBubble`/`commandPreview` (hover+focus, role tooltip, sin focus trap), `actionMenu` (role menu), `evidencePeek`/`inlineEditor` (role dialog, focus managed; `inlineEditor` NO descarta en outside-press por dirty-state). Resolver idempotente `resolveFloatingSurfaceVariant({ variant?, kind? })`.
+- **Pilotos migrados:** `CostProvenancePopover` → `evidencePeek`/`costProvenance` y `TotalsLadder` (addons) → `evidencePeek`/`totalsAddons`. Ambos dejaron de importar `@floating-ui/react`; API pública intacta; paridad visual/focus preservada.
+- **Regla canónica nueva:** product views NO importan `@floating-ui/react`; consumen la primitive. Excepción: primitives + infra Vuexy menu. Documentada en `GREENHOUSE_UI_PLATFORM_V1` Delta 2026-06-06.
+- **Lab interno + GVC:** `/admin/design-system/floating-surfaces` (`FloatingSurfaceLabView`, reusa viewCode `administracion.design_system`, sin viewCode/migración nuevos) + nav card en `DesignSystemView`. Scenario `floating-surface-primitives` verde: 2 variants (desktop 1280×900 + mobile iPhone 13), 8 frames. Evidencia revisada visualmente: `evidencePeek` dialog, `richTooltip` keyboard path, `commandPreview` flip/shift collision cerca del borde. `.captures/2026-06-07T01-43-23_floating-surface-primitives`.
+- **Sin migración / backend / capability / outbox / reliability signals nuevos.** No toca permisos, rutas de producto, ni Adaptive Sidecar.
+- **Gates verdes:** 19 tests focales, `tsc --noEmit` limpio, `pnpm lint` 0 errores (warnings pre-existentes ajenos), GVC desktop+mobile. `pnpm test` (full) + `pnpm build` corridos como gate de cierre (toca barrel compartido + `eslint.config.mjs`).
+- **Commits:** `9f127a12a` (Slice 1+2 foundation+variants), `abb605c71` (Slice 3 pilotos), `fafc37e4e` (Slice 4 lab+scenario+docs), `2f438e826` (GVC scenario robusto).
+- **Follow-ups (no bloqueantes):** `GreenhouseFieldProvenancePeek` sigue usando Floating UI ad-hoc (primitive/infra) — candidato a adoptar la primitive. La skill local `greenhouse-dev` tiene una línea desactualizada ("@floating-ui NOT to use") que el ADR (Accepted 2026-06-06) supersede.
+
+---
+
 # Sesion 2026-06-07 — Vercel staging failure por doble entrypoint global Next.js
 
 Se investigó el error reportado por el operador tras el push de utilities. Resultado: **no fue deploy a producción**; los deploys afectados eran `Environment: staging`, branch `develop`, proyecto `efeonce-7670142f/greenhouse-eo`.
