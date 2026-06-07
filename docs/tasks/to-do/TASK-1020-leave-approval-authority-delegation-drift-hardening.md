@@ -568,6 +568,10 @@ La remediacion y el cambio de autoridad deben existir como primitive/command reu
 ## Acceptance Criteria
 
 - [ ] La arquitectura o ADR declara explicitamente que `approval_delegate` generico no confiere autoridad para `leave.supervisor_review`.
+- [ ] El fix vive como flag per-stage (`honorGenericApprovalDelegate`, default `false`) en `ApprovalStageDefinition`, no como `if (workflow === 'leave')` hardcodeado en el resolver.
+- [ ] Los tres stages `effective_supervisor` (`leave`, `expense_report`, `performance_evaluation`) tienen decision explicita aplicada (default `false`), o la excepcion legacy queda documentada con su razon.
+- [ ] El plano de visibilidad (`access.ts` / `getSupervisorScopeForTenant`) tiene decision aplicada: la delegacion invalida del caso no confiere scope tras el recovery, y la regla general queda documentada.
+- [ ] El recovery recomputa snapshots invocando el resolver canonico post-fix, sin reimplementar la logica de autoridad (SSOT verificado en test).
 - [ ] El resolver de approval authority para permisos devuelve `effectiveApproverMemberId='daniela-ferreira'` para solicitudes de Andres/Melkin cuando Daniela es la supervisora formal, aunque exista un `approval_delegate` generico.
 - [ ] `src/lib/hr-core/leave-review-policy.ts` niega aprobacion a Valentina para solicitudes de Andres/Melkin si solo cuenta con delegacion generica.
 - [ ] Daniela puede aprobar/rechazar permisos de sus reportes directos desde server-side policy sin otorgarle HR/admin broad.
@@ -621,3 +625,5 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 
 - La decision V1 esperada es bloquear delegacion generica para permisos. Si HR confirma una necesidad real de delegar aprobaciones de permisos, se debe crear ADR/follow-up separado antes de soportarlo.
 - Confirmar si la responsabilidad activa `resp-2de74ab9-7e3c-4a7c-b9b3-7984c2567f58` debe revocarse globalmente o solo neutralizarse para permisos. La recomendacion de esta task es revocarla por falta de actor/reason y por conferir autoridad indebida.
+- Confirmar la decision para `expense_report.supervisor_review` y `performance_evaluation.supervisor_review`: la recomendacion por default es `honorGenericApprovalDelegate=false` (consistente con leave), porque ninguno tiene contrato domain-scoped validado. Si HR/Finance requieren conservar delegacion generica en alguno, documentar la excepcion con doc vigente antes de implementar.
+- Confirmar si el `approval_delegate` generico debe seguir confiriendo supervisor workspace scope/visibilidad (`getSupervisorScopeForTenant`) como "cobertura operacional" cuando ya no confiere autoridad de aprobacion, o si scope y autoridad se desacoplan en V1. Para la delegacion invalida del caso vivo no hay ambiguedad: tras el recovery no debe conferir ninguno.
