@@ -1,5 +1,9 @@
 # TASK-1016 — Organization List Enterprise Prototype
 
+## Delta 2026-06-07 — GVC contract gates disponibles (TASK-1018 complete)
+
+El runtime de `/agency/organizations` ya puede cerrarse con el **contrato mockup→runtime de GVC V1.5** (TASK-1018). Cuando se implemente el runtime: capturar el mockup aprobado, promover el baseline durable (`pnpm fe:capture:diff --promote` → `scripts/frontend/baselines/agency.organizations.list/`), y declarar en el scenario runtime `baseline.surfaceId` + `maxDiffRatio` + `maskSelectors` + los gates `quality.{layout,runtime,keyboard,performance,enterpriseRubric}`. Ver `GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` Delta V1.5 + `scripts/frontend/scenarios/_README.md`. El follow-up "aplicar el contrato a este runtime" queda listado en TASK-1018 Follow-ups.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

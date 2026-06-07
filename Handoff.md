@@ -1,3 +1,28 @@
+# Sesion 2026-06-07 — TASK-1018 GVC mockup→runtime contract gates (V1.5)
+
+Se endureció Greenhouse Visual Capture para convertir el paso mockup aprobado → runtime en contrato verificable. Local-first en `develop` (sin branch ni push, por instrucción del operador). 8 slices + verificación live + skills.
+
+- **Slice 0** — `pixelmatch` + `pngjs` como devDeps + ambient `.d.ts` (sin `@types`).
+- **Slice 1** — Baseline visual contract: motor de diff offline (`visual-diff.ts`, pixelmatch + masks por región + dimension guard + warning-first default ratio), home durable committeable `scripts/frontend/baselines/<surfaceId>/<viewport>__<label>.png` + mask sidecar, promoción `pnpm fe:capture:diff --promote`, determinismo (anim off / caret oculto / reduced-motion / fonts settled) auto-aplicado cuando hay `baseline.surfaceId`, `requiredFrameLabels`/`requiredRegions`/`maskSelectors`/`maxDiffRatio`/`maxChangedPixels`. Degrada honesto a `baseline_stale`.
+- **Slice 2** — `quality.layout` (overflow / target <24px / texto cortado / scroll sin label / cards anidadas).
+- **Slice 3** — `quality.runtime` (console.error / pageerror / hydration best-effort / 4xx-5xx, sanitizado + opt-in).
+- **Slice 4** — Playwright trace retain-on-failure (`trace.zip` solo en `exitCode=1`).
+- **Slice 5** — `quality.keyboard` (foco + focus ring + estado + reduced-motion check).
+- **Slice 6** — `quality.performance` (DOM/requests/transfer/FCP, warning-first).
+- **Slice 7** — `quality.enterpriseRubric` (data honesty) + **resumen ejecutivo** (`Apto`/`Revisar`/`Requiere iteración`) en `index.html` + `review-dossier.md`.
+- **Slice 8** — Docs (arch helper Delta V1.5, README, scenarios/_README, manual, documentation) + scenarios regresión `gvc-contract-gates` + `gvc-keyboard-focus` + workflow de adopción.
+- **Codes SSOT**: `scripts/frontend/lib/failure-taxonomy.ts` (`FINDING_CODES`, 33 codes). `manifest.schemaVersion` se mantiene en `1` (campos aditivos). `health.ts` lee de `audit.jsonl` → tolerante a manifests mixtos.
+
+**Verificación live (`--env=local`, dev server local + storageState.local-agent):** `gvc-contract-gates` `baseline_stale` → `pnpm fe:capture:diff --promote` → re-run **`match` (0 px)** end-to-end; hydration warning detectado live; layout/perf/rubric verdes; `gvc-keyboard-focus` probe + frame OK; `fe:capture:review` (resumen ejecutivo + baseline diff + rubric) y `fe:capture:health` verdes. **Aprendizaje canonizado:** esbuild keepNames envuelve arrow-consts dentro de `page.evaluate` con `__name()` ausente en el browser → fix con function declarations + shim `globalThis.__name` vía `context.addInitScript`.
+
+**Skills actualizadas** (Claude + Codex): `greenhouse-product-ui-architect`, `greenhouse-ui-orchestrator`, `greenhouse-mockup-builder`, `greenhouse-ui-review`, `greenhouse-ui-enterprise-review`, `modern-ui`, `greenhouse-ux` (global), + mirrors Codex (`greenhouse-portal-ui-implementer`, `greenhouse-vuexy-ui-expert`) — bloque "GVC V1.5 contract gates".
+
+**Gates:** `tsc --noEmit` 0 · `pnpm lint` 0 errores (9 warnings hex pre-existentes en views ajenas) · 49 tests focales `scripts/frontend` · `docs:closure-check` 0 warnings. No se corrió `pnpm test` full / `pnpm build` (cambio tooling-only bajo `scripts/frontend`, no entra al bundle Next ni a los workers).
+
+**Límites/decisiones:** baselines durables son sensibles al entorno (font hinting cross-OS) — GVC es local-first, no CI obligatorio (Out of Scope). El baseline del regression scenario NO se commitea (PNG pesado + env-sensitive); el scenario ejercita el path `baseline_stale` + promote→match queda verificado live. Open Question del motor de diff resuelta a pixelmatch (vs `toHaveScreenshot`, que exige el runner `@playwright/test`).
+
+---
+
 # Sesion 2026-06-07 — Elevation / shadow token governance propuesta
 
 Se formalizo el discovery pedido por el operador sobre la sombra de `GreenhouseFloatingSurface` (la primitive hoy usa `Paper elevation={6}` y se percibe vieja/pesada). No se toco runtime.
