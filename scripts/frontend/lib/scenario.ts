@@ -87,12 +87,28 @@ export interface CaptureAccessibilityQualityOptions {
   failOnViolations?: boolean
 }
 
+export interface CaptureLayoutQualityOptions {
+  /** Corre el layout integrity gate sobre cada frame marcado. Default false. */
+  enabled?: boolean
+  /** Acota el scan a un contenedor estable (default: body). */
+  includeSelector?: string
+  /** Selectores a ignorar por completo (overlays legítimos, devtools, etc.). */
+  ignoreSelectors?: string[]
+  /** Selectores donde el scroll horizontal es esperado (carruseles, tablas anchas). */
+  allowHorizontalScrollSelectors?: string[]
+  /** Tamaño mínimo de target interactivo en CSS px. Default 24 (WCAG 2.2 AA 2.5.8). */
+  minTargetSize?: number
+  /** Si true, los hallazgos de layout son `error`. Default false (warning-first). */
+  failOnViolations?: boolean
+}
+
 export interface CaptureQualityOptions {
   allowEmpty?: boolean
   allowLoading?: boolean
   allowLogin?: boolean
   allowErrorBoundary?: boolean
   accessibility?: CaptureAccessibilityQualityOptions
+  layout?: CaptureLayoutQualityOptions
 }
 
 export interface CaptureScenarioStep {

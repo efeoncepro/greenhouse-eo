@@ -4,8 +4,9 @@ import { basename, dirname, extname, join } from 'node:path'
 import AxeBuilder from '@axe-core/playwright'
 import type { Page } from 'playwright'
 
+import { analyzeLayoutIntegrity } from './layout-integrity'
 import type { CaptureFinding } from './manifest'
-import type { CaptureAccessibilityQualityOptions } from './scenario'
+import type { CaptureAccessibilityQualityOptions, CaptureLayoutQualityOptions } from './scenario'
 
 export interface FrameQualityOptions {
   frameLabel: string
@@ -16,6 +17,7 @@ export interface FrameQualityOptions {
   allowErrorBoundary?: boolean
   fullPage?: boolean
   accessibility?: CaptureAccessibilityQualityOptions
+  layout?: CaptureLayoutQualityOptions
 }
 
 const DEFAULT_AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa']
@@ -218,6 +220,10 @@ export const analyzeFrameQuality = async (page: Page, options: FrameQualityOptio
 
   if (options.accessibility?.enabled) {
     findings.push(...await analyzeAccessibility(page, frameLabel, options.framePath, options.accessibility))
+  }
+
+  if (options.layout?.enabled) {
+    findings.push(...await analyzeLayoutIntegrity(page, frameLabel, options.layout))
   }
 
   return findings

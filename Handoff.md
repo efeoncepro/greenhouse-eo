@@ -1,3 +1,15 @@
+# Sesion 2026-06-07 — Elevation / shadow token governance propuesta
+
+Se formalizo el discovery pedido por el operador sobre la sombra de `GreenhouseFloatingSurface` (la primitive hoy usa `Paper elevation={6}` y se percibe vieja/pesada). No se toco runtime.
+
+- **Audit creado:** `docs/audits/design-tokens/ELEVATION_SHADOW_TOKEN_AUDIT_2026-06-07.md`. Hallazgo central: existen `theme.shadows` y `theme.customShadows`, pero no un SoT semantico Greenhouse de elevacion; la documentacion actual habla de indices MUI (`boxShadow: 6`) y no de roles.
+- **ADR propuesta:** `docs/architecture/GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1.md` (`Status: Proposed`) + entrada en `DECISIONS_INDEX.md` bajo "Decisiones propuestas / en discusion". Propone roles `none`, `raised`, `floating`, `overlay`, `modal`, `overflow`; `theme.shadows[n]`/`Paper elevation={n}` quedan como infra legacy/compat para primitives nuevas.
+- **Task creada:** `docs/tasks/to-do/TASK-1049-greenhouse-elevation-shadow-token-system.md` + registry/README sincronizados (`siguiente ID disponible: TASK-1050`). La task bloquea runtime hasta aceptacion explicita de la ADR y exige token SoT, primer consumidor `GreenhouseFloatingSurface`, tests, GVC desktop/mobile, docs DESIGN.md/V1/UI Platform y audit de usos directos sin migracion global automatica.
+- **Gates verdes:** `pnpm ops:lint --changed`, `pnpm task:lint --task TASK-1049`. `pnpm docs:closure-check` se corrio y pidio changelog/handoff; ambos quedan actualizados en esta nota.
+- **Pendiente:** aprobacion/revision del operador sobre la ADR. Si se aprueba, tomar TASK-1049 via task hook antes de implementar.
+
+---
+
 # Sesion 2026-06-07 — Utilities Lab + Activity Timeline token hardening
 
 Se revisó `/admin/design-system/utilities` y `GreenhouseActivityTimeline` con la misma metodología aplicada a buttons/chips/charts: discovery focal, scanner de literals, owner compartido primero, GVC desktop+mobile y cierre documental.

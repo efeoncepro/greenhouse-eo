@@ -94,7 +94,8 @@ export const runScenario = async ({
       allowLogin: scenario.quality?.allowLogin,
       allowErrorBoundary: scenario.quality?.allowErrorBoundary,
       fullPage: options?.fullPage,
-      accessibility: scenario.quality?.accessibility
+      accessibility: scenario.quality?.accessibility,
+      layout: scenario.quality?.layout
     })
 
     qualityFindings.push(...frameQualityFindings)

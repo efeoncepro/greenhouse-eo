@@ -35,7 +35,15 @@ export const FINDING_CODES = {
   visual_diff_dimension_mismatch: 'visual_diff_dimension_mismatch',
   visual_diff_failed: 'visual_diff_failed',
   required_region_missing: 'required_region_missing',
-  mask_selector_missing: 'mask_selector_missing'
+  mask_selector_missing: 'mask_selector_missing',
+  // --- Slice 2: layout integrity ---
+  layout_horizontal_overflow: 'layout_horizontal_overflow',
+  layout_element_overflow: 'layout_element_overflow',
+  layout_target_too_small: 'layout_target_too_small',
+  layout_text_clipped: 'layout_text_clipped',
+  layout_scroll_region_unlabeled: 'layout_scroll_region_unlabeled',
+  layout_nested_cards: 'layout_nested_cards',
+  layout_probe_failed: 'layout_probe_failed'
 } as const
 
 export type FindingCode = (typeof FINDING_CODES)[keyof typeof FINDING_CODES]
