@@ -139,6 +139,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Referencia canonica de tipografia (TASK-1044) — child surface del Design System, alcanzable desde la card "Ver tipografia" en DesignSystemView (href={TYPOGRAPHY_ROUTE}, const no detectado por el gate estatico).'
   },
   {
+    route: '/admin/design-system/chips',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde la card "Ver chips" en DesignSystemView.'
+  },
+  {
     route: '/admin/design-system/charts',
     parent: '/admin/design-system',
     via: 'inline-link',
