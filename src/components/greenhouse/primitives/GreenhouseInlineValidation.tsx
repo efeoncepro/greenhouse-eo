@@ -3,17 +3,17 @@
 import type { ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import type { ButtonProps } from '@mui/material/Button'
 import { alpha } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
 
 import useReducedMotion from '@/hooks/useReducedMotion'
+
+import GreenhouseButton, { type GreenhouseButtonProps } from './GreenhouseButton'
 
 export type GreenhouseInlineValidationState = 'idle' | 'checking' | 'valid' | 'warning' | 'error' | 'blocked'
 export type GreenhouseInlineValidationVariant = 'field' | 'section' | 'summary' | 'asyncCheck'
@@ -25,7 +25,7 @@ export type GreenhouseInlineValidationProps = {
   detail?: ReactNode
   meta?: ReactNode
   actionLabel?: ReactNode
-  onAction?: ButtonProps['onClick']
+  onAction?: GreenhouseButtonProps['onClick']
   actionIcon?: ReactNode
   dataCapture?: string
   ariaLabel?: string
@@ -48,6 +48,12 @@ const STATE_META: Record<GreenhouseInlineValidationState, ValidationMeta> = {
 }
 
 const MOTION_EASING = 'cubic-bezier(0.2, 0, 0, 1)'
+
+const ICON_SIZE = {
+  action: 18,
+  field: 16,
+  default: 19
+} as const
 
 const getColor = (theme: Theme, meta: ValidationMeta) => (meta.color ? theme.palette[meta.color].main : theme.palette.text.secondary)
 
@@ -95,7 +101,7 @@ const GreenhouseInlineValidation = ({
         className={stateMeta.icon}
         sx={{
           display: 'block',
-          fontSize: isField ? 16 : 19,
+          fontSize: isField ? ICON_SIZE.field : ICON_SIZE.default,
           lineHeight: 1,
           animation: isChecking && !reduced ? `gh-inline-validation-spin 900ms ${MOTION_EASING} infinite` : undefined,
           '&::before': {
@@ -108,7 +114,7 @@ const GreenhouseInlineValidation = ({
 
   const text = (
     <Stack spacing={isField ? 0.25 : 0.5} sx={{ minWidth: 0, flex: 1 }}>
-      <Typography variant={isSummary ? 'h6' : 'body2'} sx={{ fontWeight: isField ? 700 : 800, lineHeight: 1.35 }}>
+      <Typography variant={isField ? 'body2' : 'h6'}>
         {message}
       </Typography>
       {detail ? (
@@ -117,7 +123,7 @@ const GreenhouseInlineValidation = ({
         </Typography>
       ) : null}
       {meta ? (
-        <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+        <Typography variant='monoId' color='text.secondary'>
           {meta}
         </Typography>
       ) : null}
@@ -126,21 +132,22 @@ const GreenhouseInlineValidation = ({
 
   const action = actionLabel ? (
     <Box sx={{ flexShrink: 0 }}>
-      <Button
+      <GreenhouseButton
         type='button'
         size='small'
-        variant='tonal'
-        color={stateMeta.color ?? 'primary'}
-        startIcon={actionIcon}
+        variant='label'
+        tone={stateMeta.color ?? 'primary'}
+        kind='secondaryAction'
+        leadingIcon={actionIcon}
         onClick={onAction}
         sx={{
           '& .MuiButton-startIcon > i': {
-            fontSize: 18
+            fontSize: ICON_SIZE.action
           }
         }}
       >
         {actionLabel}
-      </Button>
+      </GreenhouseButton>
     </Box>
   ) : null
 

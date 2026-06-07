@@ -3,11 +3,11 @@
 import Link from 'next/link'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
+import { GreenhouseButton } from '@/components/greenhouse/primitives'
 
 import MicrointeractionsLabSection from './MicrointeractionsLabSection'
 
@@ -16,22 +16,23 @@ const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 const MicrointeractionsLabView = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 1100, mx: 'auto' }}>
     <Stack spacing={1.5}>
-      <Button
+      <GreenhouseButton
         component={Link}
         href={DESIGN_SYSTEM_ROUTE}
         variant='text'
-        color='secondary'
+        tone='secondary'
+        kind='navigation'
         size='small'
-        startIcon={<i className='tabler-arrow-left' />}
+        leadingIcon={<i className='tabler-arrow-left' />}
         sx={{ alignSelf: 'flex-start', px: 0 }}
       >
         Design System
-      </Button>
+      </GreenhouseButton>
       <AxisWordmark variant='auto' height={32} sx={{ mb: 0.5 }} />
-      <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+      <Typography variant='overline' color='primary'>
         Microinteractions Lab
       </Typography>
-      <Typography variant='h4' sx={{ fontWeight: 800 }}>
+      <Typography variant='h4'>
         Feedback moderno para acciones
       </Typography>
       <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 780 }}>

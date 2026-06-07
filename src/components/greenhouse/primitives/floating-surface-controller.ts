@@ -46,6 +46,24 @@ export type GreenhouseFloatingSurfaceDensity = 'compact' | 'comfortable'
 
 export type GreenhouseFloatingSurfaceMotion = 'fade' | 'none'
 
+export const FLOATING_SURFACE_CHROME_TOKENS = Object.freeze({
+  /** Viewport collision padding and max-width inset share the same gutter. */
+  viewportMargin: 16,
+  /** MUI spacing units. The surface component resolves these through theme spacing. */
+  densityPadding: {
+    compact: 1.5,
+    comfortable: 2
+  }
+} as const satisfies {
+  viewportMargin: number
+  densityPadding: Record<GreenhouseFloatingSurfaceDensity, number>
+})
+
+export const FLOATING_SURFACE_MOTION_TOKENS = Object.freeze({
+  fadeDuration: 'short',
+  fadeEase: 'emphasized'
+} as const)
+
 export interface GreenhouseFloatingSurfaceVariantConfig {
   /** ARIA role for `useRole`. Non-modal surfaces never claim `aria-modal`. */
   role: GreenhouseFloatingSurfaceRole

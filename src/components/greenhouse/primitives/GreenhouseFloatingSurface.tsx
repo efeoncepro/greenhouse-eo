@@ -22,7 +22,11 @@ import {
 import Paper from '@mui/material/Paper'
 import type { SxProps, Theme } from '@mui/material/styles'
 
+import { motionCss } from '@/components/theme/motion-tokens'
+
 import {
+  FLOATING_SURFACE_CHROME_TOKENS,
+  FLOATING_SURFACE_MOTION_TOKENS,
   getFloatingSurfaceVariantConfig,
   resolveFloatingSurfaceVariant,
   type GreenhouseFloatingSurfaceKind,
@@ -108,7 +112,7 @@ export interface GreenhouseFloatingSurfaceProps {
   surfaceSx?: SxProps<Theme>
 }
 
-const FADE_TRANSITION = 'opacity 150ms cubic-bezier(0.2, 0, 0, 1)'
+const FADE_TRANSITION = `opacity ${motionCss.duration[FLOATING_SURFACE_MOTION_TOKENS.fadeDuration]} ${motionCss.ease[FLOATING_SURFACE_MOTION_TOKENS.fadeEase]}`
 
 const GreenhouseFloatingSurface = ({
   variant: variantProp,
@@ -150,7 +154,7 @@ const GreenhouseFloatingSurface = ({
     middleware: [
       offset(config.offset),
       flip({ fallbackAxisSideDirection: 'end' }),
-      shift({ padding: 16 })
+      shift({ padding: FLOATING_SURFACE_CHROME_TOKENS.viewportMargin })
     ]
   })
 
@@ -196,10 +200,10 @@ const GreenhouseFloatingSurface = ({
       sx={[
         theme => ({
           width: resolvedWidth,
-          maxWidth: 'calc(100vw - 32px)',
+          maxWidth: `calc(100vw - ${FLOATING_SURFACE_CHROME_TOKENS.viewportMargin * 2}px)`,
           borderRadius: `${theme.shape.customBorderRadius.md}px`,
           border: `1px solid ${theme.palette.divider}`,
-          p: config.density === 'comfortable' ? 2 : 1.5,
+          p: FLOATING_SURFACE_CHROME_TOKENS.densityPadding[config.density],
           zIndex: theme.zIndex.modal + 1,
           opacity: isPositioned ? 1 : 0,
           transition: reduceMotion ? 'none' : FADE_TRANSITION,

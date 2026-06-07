@@ -3,15 +3,16 @@
 import type { ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
-import type { ButtonProps } from '@mui/material/Button'
 import type { Theme } from '@mui/material/styles'
 
 import useReducedMotion from '@/hooks/useReducedMotion'
+
+import GreenhouseButton, { type GreenhouseButtonProps } from './GreenhouseButton'
+import GreenhouseChip, { type GreenhouseChipTone } from './GreenhouseChip'
 
 export type GreenhouseInlineDecisionTone = 'info' | 'warning' | 'error' | 'success' | 'neutral'
 export type GreenhouseInlineDecisionState = 'idle' | 'reviewing' | 'submitting' | 'confirmed' | 'blocked'
@@ -27,9 +28,9 @@ export type GreenhouseInlineDecisionPromptProps = {
   primaryLabel: ReactNode
   secondaryLabel?: ReactNode
   tertiaryLabel?: ReactNode
-  onPrimary?: ButtonProps['onClick']
-  onSecondary?: ButtonProps['onClick']
-  onTertiary?: ButtonProps['onClick']
+  onPrimary?: GreenhouseButtonProps['onClick']
+  onSecondary?: GreenhouseButtonProps['onClick']
+  onTertiary?: GreenhouseButtonProps['onClick']
   primaryIcon?: ReactNode
   secondaryIcon?: ReactNode
   tertiaryIcon?: ReactNode
@@ -56,11 +57,19 @@ const STATE_LABEL: Record<GreenhouseInlineDecisionState, string> = {
 
 const MOTION_EASING = 'cubic-bezier(0.2, 0, 0, 1)'
 
+const ICON_SIZE = {
+  bullet: 14,
+  prompt: 20,
+  spinner: 14
+} as const
+
 const getMain = (theme: Theme, tone: GreenhouseInlineDecisionTone) => {
   const color = TONE_META[tone].color
 
   return color ? theme.palette[color].main : theme.palette.text.secondary
 }
+
+const toChipTone = (tone: GreenhouseInlineDecisionTone): GreenhouseChipTone => (tone === 'neutral' ? 'default' : tone)
 
 const GreenhouseInlineDecisionPrompt = ({
   tone = 'info',
@@ -135,16 +144,14 @@ const GreenhouseInlineDecisionPrompt = ({
                 }
               }}
             >
-              <Box component='i' className={toneMeta.icon} sx={{ fontSize: 20 }} />
+              <Box component='i' className={toneMeta.icon} sx={{ fontSize: ICON_SIZE.prompt }} />
             </Box>
             <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
               <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-                <Typography variant='body2' sx={{ fontWeight: 800 }}>
+                <Typography variant='h6'>
                   {title}
                 </Typography>
-                <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 800 }}>
-                  {STATE_LABEL[state]}
-                </Typography>
+                <GreenhouseChip label={STATE_LABEL[state]} size='small' variant='label' tone={toChipTone(tone)} kind='status' />
               </Stack>
               {description ? (
                 <Typography variant='caption' color='text.secondary'>
@@ -152,7 +159,7 @@ const GreenhouseInlineDecisionPrompt = ({
                 </Typography>
               ) : null}
               {meta ? (
-                <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                <Typography variant='monoId' color='text.secondary'>
                   {meta}
                 </Typography>
               ) : null}
@@ -161,26 +168,45 @@ const GreenhouseInlineDecisionPrompt = ({
 
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
             {tertiaryLabel ? (
-              <Button type='button' size='small' variant='text' color='secondary' startIcon={tertiaryIcon} onClick={onTertiary} disabled={isSubmitting}>
+              <GreenhouseButton
+                type='button'
+                size='small'
+                variant='text'
+                tone='secondary'
+                kind='inlineAction'
+                leadingIcon={tertiaryIcon}
+                onClick={onTertiary}
+                disabled={isSubmitting}
+              >
                 {tertiaryLabel}
-              </Button>
+              </GreenhouseButton>
             ) : null}
             {secondaryLabel ? (
-              <Button type='button' size='small' variant='tonal' color='secondary' startIcon={secondaryIcon} onClick={onSecondary} disabled={isSubmitting}>
+              <GreenhouseButton
+                type='button'
+                size='small'
+                variant='label'
+                tone='secondary'
+                kind='secondaryAction'
+                leadingIcon={secondaryIcon}
+                onClick={onSecondary}
+                disabled={isSubmitting}
+              >
                 {secondaryLabel}
-              </Button>
+              </GreenhouseButton>
             ) : null}
-            <Button
+            <GreenhouseButton
               type='button'
               size='small'
-              variant='contained'
-              color={tone === 'error' ? 'error' : 'primary'}
-              startIcon={isSubmitting ? <CircularProgress size={14} color='inherit' /> : primaryIcon}
+              variant='solid'
+              tone={tone === 'error' ? 'error' : 'primary'}
+              kind={tone === 'error' ? 'destructiveAction' : 'primaryAction'}
+              leadingIcon={isSubmitting ? <CircularProgress size={ICON_SIZE.spinner} color='inherit' /> : primaryIcon}
               onClick={onPrimary}
               disabled={isSubmitting || state === 'blocked'}
             >
               {primaryLabel}
-            </Button>
+            </GreenhouseButton>
           </Stack>
         </Stack>
 
@@ -209,7 +235,7 @@ const GreenhouseInlineDecisionPrompt = ({
                   backgroundColor: alpha(theme.palette.background.paper, 0.72)
                 })}
               >
-                <Box component='i' className='tabler-point-filled' aria-hidden='true' sx={{ mt: 0.5, color: 'text.secondary', fontSize: 14 }} />
+                <Box component='i' className='tabler-point-filled' aria-hidden='true' sx={{ mt: 0.5, color: 'text.secondary', fontSize: ICON_SIZE.bullet }} />
                 <Typography variant='caption' color='text.secondary'>
                   {item}
                 </Typography>

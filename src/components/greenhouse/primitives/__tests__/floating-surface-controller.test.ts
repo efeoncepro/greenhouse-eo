@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DEFAULT_FLOATING_SURFACE_VARIANT,
+  FLOATING_SURFACE_CHROME_TOKENS,
+  FLOATING_SURFACE_MOTION_TOKENS,
   FLOATING_SURFACE_VARIANTS,
   FLOATING_SURFACE_VARIANT_CONFIG,
   getFloatingSurfaceVariantConfig,
@@ -85,6 +87,18 @@ describe('floating-surface-controller', () => {
       for (const variant of FLOATING_SURFACE_VARIANTS) {
         expect(FLOATING_SURFACE_VARIANT_CONFIG[variant].dismissOnEscape).toBe(true)
       }
+    })
+
+    it('keeps shared chrome and motion tokens centralized', () => {
+      expect(FLOATING_SURFACE_CHROME_TOKENS.viewportMargin).toBe(16)
+      expect(FLOATING_SURFACE_CHROME_TOKENS.densityPadding).toEqual({
+        compact: 1.5,
+        comfortable: 2
+      })
+      expect(FLOATING_SURFACE_MOTION_TOKENS).toEqual({
+        fadeDuration: 'short',
+        fadeEase: 'emphasized'
+      })
     })
   })
 

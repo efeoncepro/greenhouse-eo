@@ -3,15 +3,15 @@
 import type { ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import type { ButtonProps } from '@mui/material/Button'
 import { alpha } from '@mui/material/styles'
 
 import useReducedMotion from '@/hooks/useReducedMotion'
+
+import GreenhouseButton, { type GreenhouseButtonProps } from './GreenhouseButton'
 
 export type GreenhouseCommandFeedbackTone = 'success' | 'error' | 'warning' | 'info' | 'retrying'
 
@@ -20,7 +20,7 @@ export type GreenhouseCommandFeedbackProps = {
   title: ReactNode
   description?: ReactNode
   actionLabel?: ReactNode
-  onAction?: ButtonProps['onClick']
+  onAction?: GreenhouseButtonProps['onClick']
   actionIcon?: ReactNode
   timestamp?: ReactNode
   referenceId?: ReactNode
@@ -35,6 +35,12 @@ const TONE_META: Record<GreenhouseCommandFeedbackTone, { icon: string; color: 's
   info: { icon: 'tabler-info-circle', color: 'info' },
   retrying: { icon: 'tabler-refresh', color: 'primary' }
 }
+
+const ICON_SIZE = {
+  action: 18,
+  compact: 18,
+  default: 20
+} as const
 
 const GreenhouseCommandFeedback = ({
   tone,
@@ -87,7 +93,7 @@ const GreenhouseCommandFeedback = ({
                 flexShrink: 0,
                 color: palette.main,
                 backgroundColor: alpha(palette.main, 0.12),
-                fontSize: compact ? 18 : 20,
+                fontSize: compact ? ICON_SIZE.compact : ICON_SIZE.default,
                 animation: tone === 'retrying' && !reduced ? 'gh-command-feedback-spin 1500ms linear infinite' : 'none',
                 '@keyframes gh-command-feedback-spin': {
                   from: { transform: 'rotate(0deg)' },
@@ -98,7 +104,7 @@ const GreenhouseCommandFeedback = ({
           />
           <Stack spacing={compact ? 1 : 1.25} sx={{ minWidth: 0, flex: 1 }}>
             <Stack spacing={0.35}>
-              <Typography variant={compact ? 'body2' : 'h6'} sx={{ fontWeight: 800 }}>
+              <Typography variant='h6'>
                 {title}
               </Typography>
               {description ? (
@@ -110,12 +116,12 @@ const GreenhouseCommandFeedback = ({
             {timestamp || referenceId ? (
               <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
                 {timestamp ? (
-                  <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>
+                  <Typography variant='caption' color='text.secondary'>
                     {timestamp}
                   </Typography>
                 ) : null}
                 {referenceId ? (
-                  <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                  <Typography variant='monoId' color='text.secondary'>
                     {referenceId}
                   </Typography>
                 ) : null}
@@ -123,21 +129,22 @@ const GreenhouseCommandFeedback = ({
             ) : null}
             {actionLabel ? (
               <Box>
-                <Button
+                <GreenhouseButton
                   type='button'
-                  variant='tonal'
-                  color={meta.color}
+                  variant='label'
+                  tone={meta.color}
+                  kind='secondaryAction'
                   size='small'
-                  startIcon={actionIcon}
+                  leadingIcon={actionIcon}
                   onClick={onAction}
                   sx={{
                     '& .MuiButton-startIcon > i': {
-                      fontSize: 18
+                      fontSize: ICON_SIZE.action
                     }
                   }}
                 >
                   {actionLabel}
-                </Button>
+                </GreenhouseButton>
               </Box>
             ) : null}
           </Stack>

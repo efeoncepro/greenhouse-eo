@@ -1,3 +1,19 @@
+# Sesion 2026-06-07 — Microinteraction primitives sin Button/Chip/type hardcodes
+
+Se revisó el set de primitives documentado en `/admin/design-system/microinteractions` por deuda de buttons, chips, tipografía y colores hardcodeados.
+
+- **Floating Surface follow-up cerrado:** a pedido del operador se revisó si la página de microinteractions tocaba Floating UI. La página no importaba Floating UI directo, pero `GreenhouseFieldProvenancePeek` sí usaba `@floating-ui/react` ad-hoc. Se migró a `GreenhouseFloatingSurface variant='evidencePeek' kind='fieldProvenance'` manteniendo API pública, trigger, contenido, focus return y `data-capture`.
+- **Floating Surface token audit:** `GreenhouseFloatingSurface`/`floating-surface-controller` no hardcodean colores ni tipografía. Se centralizaron los valores compartidos de chrome/motion (`viewportMargin`, padding por density, `fadeDuration='short'`, `fadeEase='emphasized'`) en el controller y la transición del surface se deriva de `motionCss`, no de un cubic-bezier literal.
+- **Floating Surface Lab tokenizado:** `FloatingSurfaceLabView` dejó de usar MUI `Button`/`Chip` crudos, font/type literals, rgba/HEX y números visuales dispersos. El lab consume `GreenhouseButton`, `GreenhouseChip`, `GreenhouseFloatingSurface`, `typographyScale`, `motionCss` y el namespace `DESIGN_SYSTEM_LAB_TOKENS` para layout/opacidades/focus/icon specimen. GVC local OK: `.captures/2026-06-07T14-16-29_inline-admin-design-system-floating-surfaces/frames/01-snapshot.png`.
+- **Hallazgo:** la deuda era real en el owner compartido: `GreenhouseCommandFeedback`, `GreenhouseInlineValidation`, `GreenhouseEvidenceAttachmentDropzone` y `GreenhouseInlineDecisionPrompt` usaban MUI `Button` crudo; `GreenhouseStateTransition`, `GreenhouseFieldProvenancePeek`, evidence/decision/status labels dibujaban chips/pills con `Box + Typography`; varias primitives usaban `fontWeight`/`fontVariantNumeric` inline para headings, labels y metadata.
+- **Fix:** las acciones ahora usan `GreenhouseButton`; los status/source/freshness/transition pills usan `GreenhouseChip`; IDs/references/progress metadata usan `Typography variant='monoId'`; títulos/labels usan variants (`h6`, `caption`, `button`) sin pesos inline. Los tamaños que quedan como `fontSize` son solo iconos/spinners y se concentraron como `ICON_SIZE` local, no tipografía de texto.
+- **Colores:** búsqueda focal sin HEX/rgba hardcodeados en microinteraction primitives/lab. Los únicos `rgb(...)` relevantes que quedan están en `GreenhouseChip` y usan CSS vars del theme (`var(--mui-...)`), por lo que siguen tokenizados.
+- **Lab:** `MicrointeractionsLabView` usa `GreenhouseButton` para volver al Design System; `MicrointeractionsLabSection` retiró overrides tipográficos inline en headings/labels de documentación.
+- **GVC:** desktop full-page `.captures/2026-06-07T13-54-35_design-system-microinteractions/01-desktop/frames/01-microinteractions-lab.png` revisado. El scenario multi-viewport se colgó en mobile/ffmpeg; se mató solo el proceso GVC y se tomó fallback mobile inline OK: `.captures/2026-06-07T13-58-41_inline-admin-design-system-microinteractions/frames/01-snapshot.png`.
+- **Gates verdes:** búsqueda focal sin raw `Button`/`Chip`, sin `fontWeight/fontFamily/fontVariantNumeric` inline y sin HEX/rgba en el scope; eslint focal; vitest focal de microinteraction/button/chip + typography/color drift (112 tests); `tsc --noEmit`; `design:lint`; `docs:closure-check` acotado (warning esperado por UI interna con GVC cubierto); `git diff --check`; `pnpm lint` exit 0. Nota: el lint completo mostró 29 warnings de la regla nueva `greenhouse/no-hardcoded-hex-color` en archivos fuera de este slice; esos cambios de eslint/config están en el worktree ajeno y no se tocaron.
+
+---
+
 # Sesion 2026-06-07 — Typography canonical page controls hardening
 
 Se revisó `/admin/design-system/typography` por sospecha del operador de colores/tipografía hardcodeados y luego se corrigieron los ejemplos de botones.
@@ -119,7 +135,7 @@ Se implementó y cerró TASK-1033 en `develop` (sin worktree, por instrucción d
 - **Gates verdes:** 19 tests focales, `tsc --noEmit` limpio, `pnpm lint` 0 errores (warnings pre-existentes ajenos), GVC desktop+mobile. `pnpm test` (full) + `pnpm build` corridos como gate de cierre (toca barrel compartido + `eslint.config.mjs`).
 - **Commits:** `9f127a12a` (Slice 1+2 foundation+variants), `abb605c71` (Slice 3 pilotos), `fafc37e4e` (Slice 4 lab+scenario+docs), `2f438e826` (GVC scenario robusto).
 - **Enforcement (post-cierre, a pedido del operador):** lint rule `greenhouse/no-direct-floating-ui-in-views` (modo `error`) promueve la regla de convención a gate mecánico — views/app/components NO importan `@floating-ui/*` directo; exentos por path primitives + infra Vuexy menu; cubre static/`import()`/`require()`. Cero violaciones hoy (`pnpm lint` 0 errores), RuleTester verde. Commit `f7439bae1`. Docs sincronizadas: `GREENHOUSE_UI_PLATFORM_V1` (regla + verificación), CLAUDE.md (Patron canonico Floating Surface), changelog, task closure.
-- **Follow-ups (no bloqueantes):** `GreenhouseFieldProvenancePeek` sigue usando Floating UI ad-hoc (primitive/infra, exenta por path del lint gate) — candidato a adoptar la primitive. La skill local `greenhouse-dev` tiene una línea desactualizada ("@floating-ui NOT to use") que el ADR (Accepted 2026-06-06) supersede.
+- **Follow-ups (no bloqueantes):** la skill local `greenhouse-dev` tiene una línea desactualizada ("@floating-ui NOT to use") que el ADR (Accepted 2026-06-06) supersede.
 
 ---
 

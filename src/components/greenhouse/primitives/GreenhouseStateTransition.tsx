@@ -11,6 +11,8 @@ import { alpha } from '@mui/material/styles'
 
 import useReducedMotion from '@/hooks/useReducedMotion'
 
+import GreenhouseChip, { type GreenhouseChipTone } from './GreenhouseChip'
+
 export type GreenhouseStateTransitionTone = 'success' | 'warning' | 'error' | 'info' | 'neutral'
 export type GreenhouseStateTransitionVariant = 'surface' | 'inline'
 
@@ -37,6 +39,14 @@ const TONE_META: Record<GreenhouseStateTransitionTone, { icon: string; color: 's
 }
 
 const MOTION_EASING = 'cubic-bezier(0.2, 0, 0, 1)'
+
+const ICON_SIZE = {
+  arrow: 18,
+  inline: 17,
+  default: 20
+} as const
+
+const toChipTone = (tone: GreenhouseStateTransitionTone): GreenhouseChipTone => (tone === 'neutral' ? 'default' : tone)
 
 const GreenhouseStateTransition = ({
   tone,
@@ -76,13 +86,13 @@ const GreenhouseStateTransition = ({
               flexShrink: 0,
               color: main,
               backgroundColor: alpha(main, tone === 'neutral' ? 0.08 : 0.12),
-              fontSize: isInline ? 17 : 20,
+              fontSize: isInline ? ICON_SIZE.inline : ICON_SIZE.default,
               animation: active && !reduced ? `gh-state-transition-icon 240ms ${MOTION_EASING} both` : 'none'
             }
           }}
         />
         <Stack spacing={0.35} sx={{ minWidth: 0, flex: 1 }}>
-          <Typography variant={isInline ? 'body2' : 'h6'} sx={{ fontWeight: 800 }}>
+          <Typography variant='h6'>
             {title}
           </Typography>
           {description ? (
@@ -94,66 +104,38 @@ const GreenhouseStateTransition = ({
       </Stack>
 
       <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-        <Box
-          component='span'
-          sx={theme => ({
-            maxWidth: '100%',
-            px: 2,
-            py: 0.75,
-            borderRadius: 999,
-            color: 'text.secondary',
-            backgroundColor: alpha(theme.palette.text.primary, 0.055),
-            fontSize: theme.typography.caption.fontSize,
-            fontWeight: 800,
-            lineHeight: 1.35
-          })}
-        >
-          {fromLabel}
-        </Box>
+        <GreenhouseChip label={fromLabel} size='small' variant='label' tone='default' kind='attribute' />
         <Box
           aria-hidden='true'
           component='i'
           className='tabler-arrow-right'
           sx={theme => ({
             color: meta.color ? theme.palette[meta.color].main : theme.palette.text.secondary,
-            fontSize: 18,
+            fontSize: ICON_SIZE.arrow,
             flexShrink: 0
           })}
         />
-        <Box
-          component='span'
-          sx={theme => {
-            const main = meta.color ? theme.palette[meta.color].main : theme.palette.text.primary
-
-            return {
-              maxWidth: '100%',
-              position: 'relative',
-              px: 2,
-              py: 0.75,
-              borderRadius: 999,
-              color: tone === 'warning' || tone === 'success' || tone === 'info' ? theme.palette.text.primary : main,
-              backgroundColor: alpha(main, tone === 'neutral' ? 0.075 : 0.13),
-              boxShadow: active ? `0 0 0 3px ${alpha(main, tone === 'neutral' ? 0.07 : 0.1)}` : undefined,
-              fontSize: theme.typography.caption.fontSize,
-              fontWeight: 900,
-              lineHeight: 1.35,
-              animation: active && !reduced ? `gh-state-transition-highlight 720ms ${MOTION_EASING} both` : 'none'
-            }
+        <GreenhouseChip
+          label={toLabel}
+          size='small'
+          variant='label'
+          tone={toChipTone(tone)}
+          kind='status'
+          sx={{
+            animation: active && !reduced ? `gh-state-transition-highlight 720ms ${MOTION_EASING} both` : 'none'
           }}
-        >
-          {toLabel}
-        </Box>
+        />
       </Stack>
 
       {timestamp || referenceId ? (
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           {timestamp ? (
-            <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>
+            <Typography variant='caption' color='text.secondary'>
               {timestamp}
             </Typography>
           ) : null}
           {referenceId ? (
-            <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+            <Typography variant='monoId' color='text.secondary'>
               {referenceId}
             </Typography>
           ) : null}

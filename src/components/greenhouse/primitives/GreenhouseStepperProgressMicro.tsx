@@ -41,6 +41,10 @@ const STATE_META: Record<GreenhouseStepperProgressState, { icon: string; tone: '
 
 const MOTION_EASING = 'cubic-bezier(0.2, 0, 0, 1)'
 
+const ICON_SIZE = {
+  step: 16
+} as const
+
 const getMain = (theme: Theme, state: GreenhouseStepperProgressState) => {
   const tone = STATE_META[state].tone
 
@@ -82,7 +86,7 @@ const StepIcon = ({ state }: { state: GreenhouseStepperProgressState }) => {
         className={meta.icon}
         sx={{
           display: 'block',
-          fontSize: 16,
+          fontSize: ICON_SIZE.step,
           lineHeight: 1,
           animation: state === 'active' && !reduced ? `gh-stepper-spin 900ms ${MOTION_EASING} infinite` : undefined,
           '&::before': { display: 'block' }
@@ -130,7 +134,7 @@ const GreenhouseStepperProgressMicro = ({
       {title || description ? (
         <Stack spacing={0.25}>
           {title ? (
-            <Typography variant='body2' sx={{ fontWeight: 800 }}>
+            <Typography variant='h6'>
               {title}
             </Typography>
           ) : null}
@@ -207,7 +211,7 @@ const GreenhouseStepperProgressMicro = ({
               <Stack direction='row' spacing={1.25} alignItems='flex-start'>
                 <StepIcon state={step.state} />
                 <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-                  <Typography variant='body2' sx={{ fontWeight: isCurrent ? 800 : 700 }}>
+                  <Typography variant={isCurrent ? 'h6' : 'body2'}>
                     {step.label}
                   </Typography>
                   {!isCompact && step.description ? (
@@ -216,7 +220,7 @@ const GreenhouseStepperProgressMicro = ({
                     </Typography>
                   ) : null}
                   {step.meta ? (
-                    <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                    <Typography variant='monoId' color='text.secondary'>
                       {step.meta}
                     </Typography>
                   ) : null}

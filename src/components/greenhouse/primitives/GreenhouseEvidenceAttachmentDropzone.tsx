@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -14,6 +13,9 @@ import { useDropzone } from 'react-dropzone'
 
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { getMicrocopy } from '@/lib/copy'
+
+import GreenhouseButton from './GreenhouseButton'
+import GreenhouseChip from './GreenhouseChip'
 
 export type GreenhouseEvidenceAttachmentState = 'idle' | 'dragging' | 'uploading' | 'scanning' | 'verified' | 'rejected' | 'disabled'
 export type GreenhouseEvidenceAttachmentVariant = 'compact' | 'panel'
@@ -51,6 +53,11 @@ const STATE_META: Record<GreenhouseEvidenceAttachmentState, { icon: string; tone
 }
 
 const MOTION_EASING = 'cubic-bezier(0.2, 0, 0, 1)'
+
+const ICON_SIZE = {
+  file: 18,
+  state: 22
+} as const
 
 const getMain = (theme: Theme, state: GreenhouseEvidenceAttachmentState) => {
   const tone = STATE_META[state].tone
@@ -172,7 +179,7 @@ const GreenhouseEvidenceAttachmentDropzone = ({
                 className={stateMeta.icon}
                 sx={{
                   display: 'block',
-                  fontSize: 22,
+                  fontSize: ICON_SIZE.state,
                   lineHeight: 1,
                   animation: isBusy && !reduced ? 'gh-evidence-pulse 1200ms cubic-bezier(0.2, 0, 0, 1) infinite' : undefined,
                   '&::before': { display: 'block' }
@@ -181,12 +188,10 @@ const GreenhouseEvidenceAttachmentDropzone = ({
             </Box>
             <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
               <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-                <Typography variant='body2' sx={{ fontWeight: 800 }}>
+                <Typography variant='h6'>
                   {title}
                 </Typography>
-                <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 800 }}>
-                  {stateLabel}
-                </Typography>
+                <GreenhouseChip label={stateLabel} size='small' variant='label' tone={stateMeta.tone ?? 'default'} kind='status' />
               </Stack>
               {description ? (
                 <Typography variant='caption' color='text.secondary'>
@@ -194,7 +199,7 @@ const GreenhouseEvidenceAttachmentDropzone = ({
                 </Typography>
               ) : null}
               {acceptedLabel ? (
-                <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>
+                <Typography variant='caption' color='text.secondary'>
                   {acceptedLabel}
                 </Typography>
               ) : null}
@@ -202,13 +207,13 @@ const GreenhouseEvidenceAttachmentDropzone = ({
           </Stack>
 
           <Stack direction='row' spacing={1} alignItems='center' sx={{ flexShrink: 0 }}>
-            <Button type='button' size='small' variant='tonal' onClick={handleBrowse} disabled={isDisabled || isBusy}>
+            <GreenhouseButton type='button' size='small' variant='label' tone='primary' kind='secondaryAction' onClick={handleBrowse} disabled={isDisabled || isBusy}>
               {hasFile ? replaceLabel : browseLabel}
-            </Button>
+            </GreenhouseButton>
             {hasFile && onRemove ? (
-              <Button type='button' size='small' variant='text' color='secondary' onClick={onRemove} disabled={isDisabled || isBusy}>
+              <GreenhouseButton type='button' size='small' variant='text' tone='secondary' kind='inlineAction' onClick={onRemove} disabled={isDisabled || isBusy}>
                 {removeLabel}
-              </Button>
+              </GreenhouseButton>
             ) : null}
           </Stack>
         </Stack>
@@ -223,9 +228,9 @@ const GreenhouseEvidenceAttachmentDropzone = ({
             })}
           >
             <Stack direction='row' spacing={1.25} alignItems='center'>
-              <Box component='i' className='tabler-file-description' aria-hidden='true' sx={{ color: 'text.secondary', fontSize: 18 }} />
+              <Box component='i' className='tabler-file-description' aria-hidden='true' sx={{ color: 'text.secondary', fontSize: ICON_SIZE.file }} />
               <Stack spacing={0.125} sx={{ minWidth: 0 }}>
-                <Typography variant='body2' sx={{ fontWeight: 800 }} noWrap>
+                <Typography variant='h6' noWrap>
                   {fileName}
                 </Typography>
                 {fileMeta ? (

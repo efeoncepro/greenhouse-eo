@@ -525,13 +525,13 @@ const AsyncActionCard = ({ example }: { example: AsyncActionExample }) => (
   >
     <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.25 }}>
       <Stack spacing={0.75}>
-        <Typography variant='h6' sx={{ fontWeight: 800 }}>
+        <Typography variant='h6'>
           {example.title}
         </Typography>
         <Typography variant='body2' color='text.secondary'>
           {example.description}
         </Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>
+        <Typography variant='caption' color='text.secondary'>
           state={example.state}
         </Typography>
       </Stack>
@@ -586,10 +586,10 @@ const InlineValidationCard = ({ example }: { example: InlineValidationExample })
   <Card variant='outlined'>
     <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Stack spacing={0.5}>
-        <Typography variant='h6' sx={{ fontWeight: 800 }}>
+        <Typography variant='h6'>
           {example.title}
         </Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>
+        <Typography variant='caption' color='text.secondary'>
           state={example.state} · variant={example.variant}
         </Typography>
       </Stack>
@@ -611,13 +611,13 @@ const ProvenanceCard = ({ example }: { example: ProvenanceExample }) => (
   <Card variant='outlined'>
     <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Stack spacing={0.5}>
-        <Typography variant='h6' sx={{ fontWeight: 800 }}>
+        <Typography variant='h6'>
           {example.title}
         </Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>
+        <Typography variant='caption' color='text.secondary'>
           source={example.source}
         </Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>
+        <Typography variant='caption' color='text.secondary'>
           confidence={example.confidence} · freshness={example.freshness}
         </Typography>
       </Stack>
@@ -634,10 +634,10 @@ const ProvenanceCard = ({ example }: { example: ProvenanceExample }) => (
         })}
       >
         <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-          <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 800 }}>
+          <Typography variant='caption' color='text.secondary'>
             {example.fieldLabel}
           </Typography>
-          <Typography variant='body2' sx={{ fontWeight: 800 }} noWrap>
+          <Typography variant='h6' noWrap>
             {example.valueLabel ?? example.sourceLabel}
           </Typography>
         </Stack>
@@ -707,10 +707,10 @@ const MicrointeractionsLabSection = () => (
   <Card variant='outlined' data-capture='microinteractions-lab'>
     <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Stack spacing={1}>
-        <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+        <Typography variant='overline' color='primary'>
           Microinteractions Lab
         </Typography>
-        <Typography variant='h5' sx={{ fontWeight: 800 }}>
+        <Typography variant='h5'>
           Acciones async reutilizables
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
@@ -731,10 +731,10 @@ const MicrointeractionsLabSection = () => (
         ))}
       </Box>
       <Stack spacing={1}>
-        <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+        <Typography variant='overline' color='primary'>
           Command feedback
         </Typography>
-        <Typography variant='h5' sx={{ fontWeight: 800 }}>
+        <Typography variant='h5'>
           Resultado persistente post-accion
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
@@ -754,10 +754,10 @@ const MicrointeractionsLabSection = () => (
         ))}
       </Box>
       <Stack spacing={1}>
-        <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+        <Typography variant='overline' color='primary'>
           State transitions
         </Typography>
-        <Typography variant='h5' sx={{ fontWeight: 800 }}>
+        <Typography variant='h5'>
           Cambios de estado visibles
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
@@ -777,10 +777,10 @@ const MicrointeractionsLabSection = () => (
         ))}
       </Box>
       <Stack spacing={1}>
-        <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+        <Typography variant='overline' color='primary'>
           Inline validation
         </Typography>
-        <Typography variant='h5' sx={{ fontWeight: 800 }}>
+        <Typography variant='h5'>
           Validacion y recuperacion local
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
@@ -800,10 +800,10 @@ const MicrointeractionsLabSection = () => (
         ))}
       </Box>
       <Stack spacing={1}>
-        <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+        <Typography variant='overline' color='primary'>
           Field provenance
         </Typography>
-        <Typography variant='h5' sx={{ fontWeight: 800 }}>
+        <Typography variant='h5'>
           Procedencia y confianza del dato
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
@@ -823,10 +823,10 @@ const MicrointeractionsLabSection = () => (
         ))}
       </Box>
       <Stack spacing={1}>
-        <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+        <Typography variant='overline' color='primary'>
           Stepper progress micro
         </Typography>
-        <Typography variant='h5' sx={{ fontWeight: 800 }}>
+        <Typography variant='h5'>
           Progreso operativo compacto
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
@@ -846,10 +846,10 @@ const MicrointeractionsLabSection = () => (
         ))}
       </Box>
       <Stack spacing={1}>
-        <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+        <Typography variant='overline' color='primary'>
           Evidence attachment
         </Typography>
-        <Typography variant='h5' sx={{ fontWeight: 800 }}>
+        <Typography variant='h5'>
           Carga y verificacion de evidencia
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
@@ -869,10 +869,10 @@ const MicrointeractionsLabSection = () => (
         ))}
       </Box>
       <Stack spacing={1}>
-        <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+        <Typography variant='overline' color='primary'>
           Inline decision prompt
         </Typography>
-        <Typography variant='h5' sx={{ fontWeight: 800 }}>
+        <Typography variant='h5'>
           Decisiones sin romper contexto
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>

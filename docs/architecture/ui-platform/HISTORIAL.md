@@ -6,6 +6,25 @@
 
 ---
 
+## Delta 2026-06-07g — Floating Surface Lab tokenizado
+
+`/admin/design-system/floating-surfaces` deja de usar literals visuales route-locales para documentar la primitive y se conecta al vocabulario vivo del Design System.
+
+- El lab compone `GreenhouseButton`, `GreenhouseChip` y `GreenhouseFloatingSurface`; ya no usa MUI `Button`/`Chip` crudos para los ejemplos de variants.
+- La tipografía de labels/menu/input/specimens deriva de `typographyScale`; motion deriva de `motionCss`.
+- Layout, opacidades, focus ring, sombra e icon specimen viven en `DESIGN_SYSTEM_LAB_TOKENS` (`src/views/greenhouse/admin/design-system/design-system-lab-tokens.ts`) para evitar números visuales dispersos en views del museo.
+- La primitive mantiene sus tokens propios en `floating-surface-controller` (`FLOATING_SURFACE_CHROME_TOKENS`, `FLOATING_SURFACE_MOTION_TOKENS`); el namespace del lab no sustituye el contrato de la primitive.
+
+
+## Delta 2026-06-07f — FieldProvenance usa Floating Surface canonica
+
+`GreenhouseFieldProvenancePeek` deja de mantener un popover ad-hoc sobre `@floating-ui/react` y compone `GreenhouseFloatingSurface variant='evidencePeek' kind='fieldProvenance'`.
+
+- La API pública de `GreenhouseFieldProvenancePeek` se mantiene intacta (`source`, `confidence`, `freshness`, `variant`, `triggerLabel`, `dataCapture`).
+- El trigger conserva su affordance visual y metadata (`data-source`, `data-variant`, `data-capture`), mientras positioning/focus/dismissal/portal/role pasan a la primitive canónica.
+- Cierra el follow-up anotado en el Delta 2026-06-06b.
+
+
 ## Delta 2026-06-07e — Greenhouse Button + AsyncAction composition
 
 `GreenhouseAsyncActionButton` compone `GreenhouseButton` como base canonical. La frontera queda:
