@@ -311,6 +311,8 @@
     "lint-staged": "^16.4.0",
     "msw": "^2.13.4",
     "node-pg-migrate": "^8.0.4",
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^5.0.0",
     "postcss": "8.5.6",
     "postcss-styled-syntax": "0.7.1",
     "prettier": "3.6.2",
