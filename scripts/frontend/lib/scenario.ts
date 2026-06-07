@@ -117,6 +117,32 @@ export interface CaptureRuntimeQualityOptions {
   ignoreConsolePatterns?: string[]
 }
 
+export interface CaptureKeyboardProbe {
+  /** kebab-case; nombra el frame keyboard-<name>. */
+  name: string
+  /** Selector a enfocar antes de la secuencia (click/focus). */
+  startSelector?: string
+  /** Secuencia de teclas: 'Tab' | 'Enter' | 'Space' | 'Escape' | 'ArrowDown'… */
+  keys: string[]
+  /** Tras la secuencia, `document.activeElement` debe matchear este selector. */
+  expectedFocusSelector?: string
+  /** Exige focus ring visible en el elemento enfocado. Default true. */
+  requireVisibleFocusRing?: boolean
+  /** Selector que DEBE quedar visible tras la secuencia (e.g. menú abierto). */
+  expectedVisibleSelector?: string
+  /** Selector que DEBE quedar oculto tras la secuencia (e.g. Escape cierra). */
+  expectedHiddenSelector?: string
+}
+
+export interface CaptureKeyboardQualityOptions {
+  enabled?: boolean
+  /** Si true, los hallazgos de teclado son `error`. Default false (warning-first). */
+  failOnViolations?: boolean
+  /** Re-corre cada probe bajo prefers-reduced-motion y verifica que el feedback no se pierda. */
+  reducedMotionCheck?: boolean
+  probes: CaptureKeyboardProbe[]
+}
+
 export interface CaptureQualityOptions {
   allowEmpty?: boolean
   allowLoading?: boolean
@@ -125,6 +151,7 @@ export interface CaptureQualityOptions {
   accessibility?: CaptureAccessibilityQualityOptions
   layout?: CaptureLayoutQualityOptions
   runtime?: CaptureRuntimeQualityOptions
+  keyboard?: CaptureKeyboardQualityOptions
 }
 
 export interface CaptureScenarioStep {
@@ -375,6 +402,28 @@ export const validateScenario = (s: CaptureScenario): void => {
 
     if (baseline.surfaceId && !/^[a-z0-9][a-z0-9._-]*$/i.test(baseline.surfaceId)) {
       throw new Error(`baseline.surfaceId inválido (alfanumérico + . _ -): "${baseline.surfaceId}"`)
+    }
+  }
+
+  const keyboard = s.quality?.keyboard
+
+  if (keyboard?.enabled) {
+    if (!keyboard.probes?.length) {
+      throw new Error('quality.keyboard.enabled requiere al menos un probe')
+    }
+
+    const probeNames = new Set<string>()
+
+    for (const [index, probe] of keyboard.probes.entries()) {
+      if (!probe.name || !/^[a-z0-9-]+$/.test(probe.name)) {
+        throw new Error(`quality.keyboard.probes[${index}].name inválido (kebab-case requerido)`)
+      }
+
+      if (probeNames.has(probe.name)) throw new Error(`quality.keyboard probe "${probe.name}" duplicado`)
+
+      if (!probe.keys?.length) throw new Error(`quality.keyboard probe "${probe.name}" requiere keys`)
+
+      probeNames.add(probe.name)
     }
   }
 }

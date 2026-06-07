@@ -31,6 +31,7 @@ import type { AssertionResult, CaptureFinding, FrameMaskRect, FrameRecord, Inter
 import { analyzeFrameQuality } from './quality'
 import { resolveMaskRects } from './capture-masks'
 import { FINDING_CODES } from './failure-taxonomy'
+import { runKeyboardGate } from './keyboard-gate'
 
 export interface RecorderOutcome {
   frames: FrameRecord[]
@@ -243,6 +244,16 @@ export const runScenario = async ({
         selector: region
       })
     }
+  }
+
+  // Keyboard / focus / reduced-motion gate (opt-in, runs after the timeline).
+  if (scenario.quality?.keyboard?.enabled && scenario.quality.keyboard.probes.length) {
+    await runKeyboardGate({
+      page,
+      options: scenario.quality.keyboard,
+      mark: (label, note) => onMark(label, note),
+      addFinding: finding => qualityFindings.push(finding)
+    })
   }
 
   // Final hold for last state capture in the .webm

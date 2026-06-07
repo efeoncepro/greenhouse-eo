@@ -143,4 +143,31 @@ describe('frontend capture scenario DSL', () => {
       baseline: { surfaceId: 'bad surface/id!' }
     })).toThrow('baseline.surfaceId inválido')
   })
+
+  it('accepts a keyboard quality gate with probes', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      quality: {
+        keyboard: {
+          enabled: true,
+          reducedMotionCheck: true,
+          probes: [{ name: 'open-menu', keys: ['Tab', 'Enter'], expectedVisibleSelector: '[role="menu"]' }]
+        }
+      }
+    })).not.toThrow()
+  })
+
+  it('rejects an enabled keyboard gate without probes', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      quality: { keyboard: { enabled: true, probes: [] } }
+    })).toThrow('al menos un probe')
+  })
+
+  it('rejects a keyboard probe without keys', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      quality: { keyboard: { enabled: true, probes: [{ name: 'bad', keys: [] }] } }
+    })).toThrow('requiere keys')
+  })
 })

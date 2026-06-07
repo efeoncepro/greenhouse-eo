@@ -48,7 +48,13 @@ export const FINDING_CODES = {
   runtime_console_error: 'runtime_console_error',
   runtime_page_error: 'runtime_page_error',
   runtime_hydration_warning: 'runtime_hydration_warning',
-  runtime_http_error: 'runtime_http_error'
+  runtime_http_error: 'runtime_http_error',
+  // --- Slice 5: keyboard / focus / reduced motion ---
+  keyboard_focus_mismatch: 'keyboard_focus_mismatch',
+  keyboard_focus_ring_missing: 'keyboard_focus_ring_missing',
+  keyboard_expected_state_missing: 'keyboard_expected_state_missing',
+  keyboard_reduced_motion_feedback_lost: 'keyboard_reduced_motion_feedback_lost',
+  keyboard_probe_failed: 'keyboard_probe_failed'
 } as const
 
 export type FindingCode = (typeof FINDING_CODES)[keyof typeof FINDING_CODES]
