@@ -1,8 +1,8 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-06 por Claude (Opus 4.8)
-> **Ultima actualizacion:** 2026-06-06 por Claude (Opus 4.8)
-> **Documentacion tecnica:** `src/config/maintenance.ts`, `middleware.ts`, `src/views/UnderMaintenance.tsx`, `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+> **Ultima actualizacion:** 2026-06-07 por Codex
+> **Documentacion tecnica:** `src/config/maintenance.ts`, `src/proxy.ts`, `src/views/UnderMaintenance.tsx`, `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
 
 # Pagina "En mantenimiento" + Modo Mantenimiento
 
@@ -67,4 +67,4 @@ de las personas sigue viendo la pagina de mantenimiento.
 
 > Detalle tecnico: la pagina vive en `(blank-layout-pages)/maintenance`; el
 > interruptor y la lista de rutas permitidas viven en `src/config/maintenance.ts`,
-> aplicados por `middleware.ts` (el primer middleware del repo).
+> aplicados por el Proxy global canonico `src/proxy.ts`.

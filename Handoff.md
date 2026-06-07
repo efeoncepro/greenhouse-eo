@@ -1,3 +1,13 @@
+# Sesion 2026-06-07 — Vercel staging failure por doble entrypoint global Next.js
+
+Se investigó el error reportado por el operador tras el push de utilities. Resultado: **no fue deploy a producción**; los deploys afectados eran `Environment: staging`, branch `develop`, proyecto `efeonce-7670142f/greenhouse-eo`.
+
+- **Deploys afectados:** `greenhouse-ik5scaqoj` (commit `acf9d8b`), `greenhouse-py9zagblp` (commit `fcaba25`) y `greenhouse-gvgupyep5` (commit `841df05`) fallaron despues de compilar con `Error: ENOENT: no such file or directory, open '/vercel/path0/.next/server/middleware.js.nft.json'`.
+- **Causa raíz:** el repo ya tenía `src/proxy.ts` (security headers/CSP/HSTS) como singleton global de Next.js. El commit de mantenimiento agregó un segundo entrypoint global `middleware.ts` en raíz. Next 16 muestra `ƒ Proxy (Middleware)` y compila, pero Vercel CLI 54.9.0 genera/lee manifests mixtos y busca el artefacto legacy `middleware.js.nft.json`, que Next 16.1.1 no emite en este build.
+- **Fix aplicado:** se consolidó el maintenance gate dentro de `src/proxy.ts`, se eliminó `middleware.ts`, se mantuvieron los security headers como post-procesamiento de cualquier response, y se amplió `src/proxy.test.ts` para cubrir 503, allowlist y bypass.
+- **Guardrail agregado:** `pnpm next-global-entrypoint-gate` corre en `prebuild` y bloquea cualquier `middleware.*` o múltiples `proxy.*`; el único entrypoint permitido es `src/proxy.ts`.
+- **Contrato operativo:** NO crear `middleware.ts`; toda lógica request-global debe agregarse a `src/proxy.ts`, con config SSOT, default-OFF/fail-open y sin DB/IO por request. Docs actualizadas: `docs/documentation/plataforma/middleware-edge.md`, `pagina-mantenimiento.md`, manual de modo mantenimiento, `project_context.md`, `changelog.md`.
+
 # Sesion 2026-06-07 — Greenhouse Utilities Lab + Activity Timeline primitive
 
 Por pedido del operador se abrió una nueva página de utilities bajo el Design System interno y se implementó el diseño AXIS Figma `Activity Timeline` (`yyMksCoijfMaIoYplXKZaR`, node `6678:105154`) como primitive reusable, no como composición route-local.

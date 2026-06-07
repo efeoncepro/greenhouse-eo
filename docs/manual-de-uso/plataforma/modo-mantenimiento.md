@@ -75,6 +75,6 @@ navegando con un bypass para verificar.
 ## Referencias tecnicas
 
 - Configuracion (SSOT): `src/config/maintenance.ts`
-- Aplicacion: `middleware.ts` (primer middleware del repo; default OFF, fail-open)
+- Aplicacion: `src/proxy.ts` (Proxy global canonico; default OFF, fail-open)
 - Pagina: `src/views/UnderMaintenance.tsx` + `src/app/(blank-layout-pages)/maintenance/page.tsx`
 - Doc funcional: `docs/documentation/plataforma/pagina-mantenimiento.md`

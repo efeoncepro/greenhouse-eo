@@ -10,8 +10,8 @@
  *    pure pass-through (zero behavior change on merge). An optional operator
  *    bypass (`MAINTENANCE_BYPASS_SECRET`) lets ops keep browsing to verify /
  *    disable while everyone else sees maintenance.
- *  - Robustness: pure env + path string checks (Edge-safe, no IO). The
- *    middleware fails OPEN — a bug in the gate must never take the portal down.
+ *  - Robustness: pure env + path string checks (Proxy-safe, no IO). The
+ *    proxy fails OPEN — a bug in the gate must never take the portal down.
  *  - Resilience: stateless; toggling is `MAINTENANCE_MODE=true` + redeploy on
  *    the target (Vercel reads env at deploy time). Honest HTTP 503 + Retry-After
  *    so monitors/bots treat it as a temporary outage, not a permanent error.
@@ -57,7 +57,7 @@ export function getMaintenanceBypassSecret(): string {
  * itself (avoid a rewrite loop), framework internals, auth + agent-session +
  * health (so ops/monitors keep working), and brand/illustration assets the
  * maintenance page needs. Static files (with a dot) are already excluded by the
- * middleware matcher; these cover the dot-less routes.
+ * proxy matcher; these cover the dot-less routes.
  */
 const ALWAYS_ALLOWED_PREFIXES = [
   MAINTENANCE_PATH, // /maintenance
