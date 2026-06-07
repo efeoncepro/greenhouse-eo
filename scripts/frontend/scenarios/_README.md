@@ -112,6 +112,39 @@ baseline: {
 
 Capturá mockup y runtime, luego compará con `pnpm fe:capture:diff <mockup-run> <runtime-run>`.
 
+### Contract gates V1.5 (TASK-1018)
+
+El `baseline` ahora es un contrato verificable + hay gates `quality.*` opt-in (warning-first):
+
+```ts
+baseline: {
+  surfaceId: 'agency.organizations.list',   // home durable: scripts/frontend/baselines/<surfaceId>/
+  requiredFrameLabels: ['first-fold'],      // deben existir en la captura runtime
+  maskSelectors: ['[data-relative-time]'],  // datos dinámicos enmascarados en el diff
+  maxDiffRatio: 0.05,                        // explícito ⇒ visual_diff_exceeded = error
+  requiredRegions: ['[data-capture="list"]'] // deben renderizar (live check)
+},
+quality: {
+  layout: { enabled: true },                                    // overflow/target/clip/scroll/nested-cards
+  runtime: { failOnConsoleError: true, failOnHydrationWarning: true }, // console/page/hydration/4xx-5xx
+  keyboard: { enabled: true, reducedMotionCheck: true,
+    probes: [{ name: 'open', keys: ['Tab','Enter'], expectedVisibleSelector: '[role="menu"]' }] },
+  performance: { enabled: true, severity: 'warning', maxDomNodes: 6000 },
+  enterpriseRubric: { enabled: true }
+}
+```
+
+Workflow mockup→runtime canónico:
+
+1. Capturá el mockup aprobado: `pnpm fe:capture <scenario> --env=local`.
+2. Promové el baseline durable: `pnpm fe:capture:diff --promote .captures/<run>` → commiteá `scripts/frontend/baselines/<surfaceId>/`.
+3. El scenario runtime declara el mismo `baseline.surfaceId` + thresholds; `fe:capture` corre el diff solo.
+4. Sin baseline durable, el diff degrada honesto a `baseline_stale` (warning).
+
+El diff corre bajo captura **determinista** (animaciones off, caret oculto, reduced-motion, fonts settled) que GVC aplica automáticamente cuando el scenario declara `baseline.surfaceId`. Enmascará datos dinámicos con `maskSelectors` para que el diff no sea flaky.
+
+Regresión: `gvc-contract-gates` (baseline + layout + runtime + perf + rubric) y `gvc-keyboard-focus`.
+
 ### Capturas largas y secciones scrolleadas
 
 Para evitar offsets fragiles en pantallas con scroll, preferir `scroll` por selector y luego capturar el panel con `clipSelector`:
