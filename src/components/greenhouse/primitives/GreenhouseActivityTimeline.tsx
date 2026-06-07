@@ -16,6 +16,9 @@ import type { Theme } from '@mui/material/styles'
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import TeamAvatarGroup from '@/components/greenhouse/TeamAvatarGroup'
+import { typographyScale } from '@/components/theme/typography-tokens'
+
+import { GREENHOUSE_ACTIVITY_TIMELINE_TOKENS } from './greenhouse-activity-timeline-controller'
 
 export type GreenhouseActivityTimelineTone = 'success' | 'info' | 'warning' | 'error' | 'primary' | 'secondary' | 'neutral'
 export type GreenhouseActivityTimelineVariant = 'card' | 'embedded' | 'compact'
@@ -84,13 +87,14 @@ const getToneMain = (theme: Theme, tone: GreenhouseActivityTimelineTone) => {
 
 const TimelineDot = ({ tone = 'success', isLast }: { tone?: GreenhouseActivityTimelineTone; isLast: boolean }) => {
   const reduced = useReducedMotion()
+  const tokens = GREENHOUSE_ACTIVITY_TIMELINE_TOKENS
 
   return (
     <Box
       aria-hidden='true'
       sx={{
         position: 'relative',
-        width: 18,
+        width: tokens.dot.railInlineSize,
         display: 'flex',
         justifyContent: 'center',
         flexShrink: 0
@@ -100,16 +104,16 @@ const TimelineDot = ({ tone = 'success', isLast }: { tone?: GreenhouseActivityTi
         component={motion.div}
         initial={reduced ? false : { scaleY: 0, opacity: 0.4 }}
         animate={reduced ? undefined : { scaleY: 1, opacity: 1 }}
-        transition={{ duration: 0.34, ease: [0.2, 0, 0, 1] }}
+        transition={{ duration: tokens.motion.connectorDuration, ease: tokens.motion.easing }}
         sx={theme => ({
           display: isLast ? 'none' : 'block',
           position: 'absolute',
-          top: 22,
-          bottom: -22,
-          left: 8.5,
+          top: tokens.dot.connectorTop,
+          bottom: tokens.dot.connectorBlockOffset,
+          left: tokens.dot.connectorInlineOffset,
           width: 0,
           transformOrigin: 'top',
-          borderLeft: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`
+          borderLeft: `1px solid ${alpha(theme.palette.text.primary, tokens.opacity.connector)}`
         })}
       />
       <Box
@@ -119,21 +123,24 @@ const TimelineDot = ({ tone = 'success', isLast }: { tone?: GreenhouseActivityTi
           return {
             position: 'relative',
             mt: 0.5,
-            width: 18,
-            height: 18,
+            width: tokens.dot.size,
+            height: tokens.dot.size,
             borderRadius: '50%',
             display: 'grid',
             placeItems: 'center',
             color: main,
-            backgroundColor: alpha(main, tone === 'neutral' ? 0.11 : 0.18),
-            boxShadow: `0 0 0 3px ${theme.palette.background.paper}`
+            backgroundColor: alpha(
+              main,
+              tone === 'neutral' ? tokens.opacity.neutralDotSurface : tokens.opacity.semanticDotSurface
+            ),
+            boxShadow: `0 0 0 ${tokens.dot.surfaceRing}px ${theme.palette.background.paper}`
           }
         }}
       >
         <Box
           sx={theme => ({
-            width: 10,
-            height: 10,
+            width: tokens.dot.innerSize,
+            height: tokens.dot.innerSize,
             borderRadius: '50%',
             backgroundColor: getToneMain(theme, tone)
           })}
@@ -149,35 +156,41 @@ const AttachmentPill = ({ attachment }: { attachment: GreenhouseActivityTimeline
     sx={theme => ({
       display: 'inline-flex',
       alignItems: 'center',
-      gap: 1,
+      gap: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.spacing.attachmentGap,
       maxWidth: '100%',
-      px: 1,
-      py: 0.65,
+      px: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.spacing.attachmentPaddingX,
+      py: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.spacing.attachmentPaddingY,
       borderRadius: `${theme.shape.customBorderRadius.md}px`,
       color: theme.palette.text.secondary,
-      border: `1px solid ${alpha(theme.palette.text.primary, 0.08)}`,
-      backgroundColor: alpha(theme.palette.background.paper, 0.86),
-      boxShadow: theme.palette.mode === 'dark' ? 'none' : '0 8px 18px rgba(47, 43, 61, 0.05)'
+      border: `1px solid ${alpha(theme.palette.text.primary, GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.opacity.border)}`,
+      backgroundColor: alpha(theme.palette.background.paper, GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.opacity.attachmentSurface),
+      boxShadow:
+        theme.palette.mode === 'dark'
+          ? 'none'
+          : `0 ${GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.shadow.attachmentOffsetY}px ${GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.shadow.attachmentBlur}px ${alpha(
+              theme.palette.text.primary,
+              GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.opacity.attachmentShadow
+            )}`
     })}
   >
     <Box
       aria-hidden='true'
       sx={theme => ({
-        width: 18,
-        height: 22,
+        width: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.icon.attachmentInlineSize,
+        height: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.icon.attachmentBlockSize,
         borderRadius: 0.5,
         display: 'grid',
         placeItems: 'center',
         flexShrink: 0,
         color: theme.palette.error.contrastText,
         backgroundColor: theme.palette.error.dark,
-        fontSize: 12,
-        '& > i': { fontSize: 14 }
+        ...typographyScale.labelSm,
+        '& > i': { fontSize: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.icon.attachmentGlyph }
       })}
     >
       {attachment.icon ?? <i className='tabler-file-type-pdf' />}
     </Box>
-    <Typography variant='body2' noWrap sx={{ minWidth: 0, fontWeight: 700 }}>
+    <Typography variant='button' noWrap sx={{ minWidth: 0 }}>
       {attachment.label}
     </Typography>
   </Box>
@@ -191,18 +204,25 @@ const PersonRow = ({ person }: { person: GreenhouseActivityTimelinePerson }) => 
     sx={theme => ({
       width: 'fit-content',
       maxWidth: '100%',
-      px: 1,
-      py: 0.75,
+      px: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.spacing.personPaddingX,
+      py: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.spacing.personPaddingY,
       borderRadius: `${theme.shape.customBorderRadius.md}px`,
-      border: `1px solid ${alpha(theme.palette.text.primary, 0.06)}`,
-      backgroundColor: alpha(theme.palette.text.primary, 0.025)
+      border: `1px solid ${alpha(theme.palette.text.primary, GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.opacity.personBorder)}`,
+      backgroundColor: alpha(theme.palette.text.primary, GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.opacity.personSurface)
     })}
   >
-    <Avatar src={person.avatarSrc} sx={{ width: 34, height: 34, fontSize: 12, fontWeight: 800 }}>
+    <Avatar
+      src={person.avatarSrc}
+      sx={{
+        width: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.avatar.person,
+        height: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.avatar.person,
+        ...typographyScale.labelSm
+      }}
+    >
       {person.initials}
     </Avatar>
     <Stack spacing={0} sx={{ minWidth: 0 }}>
-      <Typography variant='body2' noWrap sx={{ fontWeight: 700 }}>
+      <Typography variant='button' noWrap>
         {person.name}
       </Typography>
       {person.description ? (
@@ -222,10 +242,10 @@ const AvatarCluster = ({ avatars, overflowLabel }: { avatars: GreenhouseActivity
         avatarUrl: avatar.src ?? null
       }))}
       max={4}
-      size={34}
+      size={GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.avatar.cluster}
     />
     {overflowLabel ? (
-      <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 700 }}>
+      <Typography variant='button' color='text.secondary'>
         {overflowLabel}
       </Typography>
     ) : null}
@@ -247,6 +267,7 @@ const GreenhouseActivityTimeline = ({
   const reduced = useReducedMotion()
   const isEmbedded = variant === 'embedded'
   const isCompact = variant === 'compact'
+  const tokens = GREENHOUSE_ACTIVITY_TIMELINE_TOKENS
 
   const content = (
     <Stack
@@ -270,21 +291,21 @@ const GreenhouseActivityTimeline = ({
               aria-hidden='true'
               sx={theme => ({
                 mt: 0.25,
-                width: 22,
-                height: 22,
+                width: tokens.icon.header,
+                height: tokens.icon.header,
                 display: 'grid',
                 placeItems: 'center',
-                color: alpha(theme.palette.text.primary, 0.78),
-                fontSize: 22,
+                color: alpha(theme.palette.text.primary, tokens.opacity.headerIcon),
+                fontSize: tokens.icon.header,
                 flexShrink: 0,
-                '& > i': { fontSize: 22 }
+                '& > i': { fontSize: tokens.icon.header }
               })}
             >
               {icon ?? <i className='tabler-list-details' />}
             </Box>
             <Stack spacing={0.25} sx={{ minWidth: 0 }}>
               {title ? (
-                <Typography variant='h6' sx={{ fontWeight: 800 }}>
+                <Typography variant='h6'>
                   {title}
                 </Typography>
               ) : null}
@@ -302,7 +323,7 @@ const GreenhouseActivityTimeline = ({
               </IconButton>
             </Tooltip>
           ) : (
-            <Box aria-hidden='true' sx={{ width: 34 }} />
+            <Box aria-hidden='true' sx={{ width: tokens.icon.actionSpacer }} />
           )}
         </Stack>
       ) : null}
@@ -315,12 +336,16 @@ const GreenhouseActivityTimeline = ({
             <Box
               key={item.id}
               component={motion.li}
-              initial={reduced ? false : { opacity: 0, y: 8 }}
+              initial={reduced ? false : { opacity: 0, y: tokens.motion.itemOffsetY }}
               animate={reduced ? undefined : { opacity: 1, y: 0 }}
-              transition={{ duration: 0.26, delay: index * 0.045, ease: [0.2, 0, 0, 1] }}
+              transition={{
+                duration: tokens.motion.itemDuration,
+                delay: index * tokens.motion.itemDelayStep,
+                ease: tokens.motion.easing
+              }}
               sx={{
                 display: 'grid',
-                gridTemplateColumns: '18px minmax(0, 1fr)',
+                gridTemplateColumns: `${tokens.dot.railInlineSize}px minmax(0, 1fr)`,
                 columnGap: 2,
                 pb: isLast ? 0 : isCompact ? 2 : 2.5
               }}
@@ -334,22 +359,18 @@ const GreenhouseActivityTimeline = ({
                   spacing={{ xs: 0.35, sm: 2 }}
                   sx={{ minWidth: 0 }}
                 >
-                  <Typography variant='body1' sx={{ fontWeight: 500, minWidth: 0 }}>
+                  <Typography variant='h6' sx={{ minWidth: 0 }}>
                     {item.title}
                   </Typography>
                   {item.timestamp ? (
-                    <Typography
-                      variant='caption'
-                      color='text.disabled'
-                      sx={{ flexShrink: 0, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
-                    >
+                    <Typography variant='monoId' color='text.disabled' sx={{ flexShrink: 0 }}>
                       {item.timestamp}
                     </Typography>
                   ) : null}
                 </Stack>
 
                 {item.description ? (
-                  <Typography variant='body1' color='text.secondary' sx={{ fontWeight: 400 }}>
+                  <Typography variant='body1' color='text.secondary'>
                     {item.description}
                   </Typography>
                 ) : null}
@@ -378,14 +399,20 @@ const GreenhouseActivityTimeline = ({
       variant='outlined'
       sx={theme => ({
         width: '100%',
-        maxWidth: variant === 'compact' ? 460 : 554,
+        maxWidth: variant === 'compact' ? tokens.card.compactMaxInlineSize : tokens.card.maxInlineSize,
         borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-        borderColor: alpha(theme.palette.text.primary, 0.08),
+        borderColor: alpha(theme.palette.text.primary, tokens.opacity.border),
         background:
           theme.palette.mode === 'dark'
             ? theme.palette.background.paper
-            : `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.background.paper, 0.96)} 100%)`,
-        boxShadow: theme.palette.mode === 'dark' ? 'none' : '0 22px 54px rgba(47, 43, 61, 0.1)',
+            : `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.background.paper, tokens.opacity.cardGradientStop)} 100%)`,
+        boxShadow:
+          theme.palette.mode === 'dark'
+            ? 'none'
+            : `0 ${tokens.shadow.cardOffsetY}px ${tokens.shadow.cardBlur}px ${alpha(
+                theme.palette.text.primary,
+                tokens.opacity.cardShadow
+              )}`,
         overflow: 'hidden'
       })}
     >

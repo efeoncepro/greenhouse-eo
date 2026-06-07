@@ -1,3 +1,15 @@
+# Sesion 2026-06-07 — Utilities Lab + Activity Timeline token hardening
+
+Se revisó `/admin/design-system/utilities` y `GreenhouseActivityTimeline` con la misma metodología aplicada a buttons/chips/charts: discovery focal, scanner de literals, owner compartido primero, GVC desktop+mobile y cierre documental.
+
+- **Hallazgo:** la deuda era real. `UtilitiesLabView` usaba MUI `Button`/`Chip` crudos, pesos `800`, `fontSize` route-local y sombra `rgba`; `GreenhouseActivityTimeline` dispersaba sizing/opacidades/motion, usaba sombras `rgba`, `fontWeight: 500` para títulos de item y overrides `700/800` en labels/avatars/títulos.
+- **Fix:** se agregó `greenhouse-activity-timeline-controller.ts` con `GREENHOUSE_ACTIVITY_TIMELINE_TOKENS` para card widths, rail/dot geometry, icon/avatar sizing, opacidades, sombras, motion timing y spacing. La primitive consume ese controller, usa variants canónicas (`h6`, `button`, `monoId`) y resuelve color/sombra desde `theme.palette` + `alpha`.
+- **Lab:** `UtilitiesLabView` ahora compone `GreenhouseButton` y `GreenhouseChip`; layout/chrome usan `DESIGN_SYSTEM_LAB_TOKENS` + `GREENHOUSE_ACTIVITY_TIMELINE_TOKENS`; `AxisWordmark` se mantiene como marca interna del design system.
+- **Visual:** GVC `design-system-utilities` desktop+mobile OK en `.captures/2026-06-07T14-43-31_design-system-utilities`; frames revisados visualmente sin overflow/truncamiento.
+- **Gates verdes:** scanner focal sin raw `Button`/`Chip`, HEX/RGB/RGBA ni font literals sospechosos; eslint focal; Vitest focal de `GreenhouseActivityTimeline` + controller + typography/color drift (60 tests); `tsc --noEmit`.
+
+---
+
 # Sesion 2026-06-07 — Charts Lab + primitives token hardening
 
 Se revisó `/admin/design-system/charts` y las chart primitives por hardcodes de color, tipografía y chrome.

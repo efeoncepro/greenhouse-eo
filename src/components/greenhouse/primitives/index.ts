@@ -262,6 +262,7 @@ export type {
   GreenhouseMetricBreakdownTone
 } from './GreenhouseMetricBreakdownChartCard'
 export { default as GreenhouseActivityTimeline } from './GreenhouseActivityTimeline'
+export { GREENHOUSE_ACTIVITY_TIMELINE_TOKENS } from './greenhouse-activity-timeline-controller'
 export type {
   GreenhouseActivityTimelineAttachment,
   GreenhouseActivityTimelineAvatar,

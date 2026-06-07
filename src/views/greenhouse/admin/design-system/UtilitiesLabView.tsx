@@ -4,10 +4,8 @@ import Link from 'next/link'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -16,8 +14,14 @@ import { alpha } from '@mui/material/styles'
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import {
   GreenhouseActivityTimeline,
+  GreenhouseButton,
+  GreenhouseChip,
+  GREENHOUSE_ACTIVITY_TIMELINE_TOKENS,
   type GreenhouseActivityTimelineItem
 } from '@/components/greenhouse/primitives'
+import { typographyScale } from '@/components/theme/typography-tokens'
+
+import { DESIGN_SYSTEM_LAB_TOKENS } from './design-system-lab-tokens'
 
 const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 
@@ -100,9 +104,8 @@ const InlineCode = ({ children }: { children: string }) => (
       py: 0.15,
       borderRadius: 0.75,
       color: theme.palette.text.primary,
-      backgroundColor: alpha(theme.palette.text.primary, 0.055),
-      fontSize: '0.78em',
-      fontWeight: 700,
+      backgroundColor: alpha(theme.palette.text.primary, DESIGN_SYSTEM_LAB_TOKENS.opacity.codeBackground),
+      ...typographyScale.labelSm,
       whiteSpace: 'nowrap'
     })}
   >
@@ -115,21 +118,21 @@ const ContractSignal = ({ icon, title, description }: { icon: string; title: str
     <Box
       aria-hidden='true'
       sx={theme => ({
-        width: 32,
-        height: 32,
+        width: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.icon.contractSignalContainer,
+        height: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.icon.contractSignalContainer,
         borderRadius: `${theme.shape.customBorderRadius.md}px`,
         display: 'grid',
         placeItems: 'center',
         flexShrink: 0,
         color: theme.palette.primary.main,
-        backgroundColor: alpha(theme.palette.primary.main, 0.08),
-        '& > i': { fontSize: 18 }
+        backgroundColor: alpha(theme.palette.primary.main, DESIGN_SYSTEM_LAB_TOKENS.opacity.softAccentSurface),
+        '& > i': { fontSize: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.icon.contractSignal }
       })}
     >
       <i className={icon} />
     </Box>
     <Stack spacing={0.25}>
-      <Typography variant='body2' sx={{ fontWeight: 800 }}>
+      <Typography variant='h6'>
         {title}
       </Typography>
       <Typography variant='caption' color='text.secondary'>
@@ -140,27 +143,36 @@ const ContractSignal = ({ icon, title, description }: { icon: string; title: str
 )
 
 const UtilitiesLabView = () => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 1100, mx: 'auto' }}>
-    <Stack spacing={1.5}>
-      <Button
+  <Box
+    sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: DESIGN_SYSTEM_LAB_TOKENS.layout.sectionGap,
+      maxWidth: DESIGN_SYSTEM_LAB_TOKENS.layout.pageMaxInlineSize,
+      mx: 'auto'
+    }}
+  >
+    <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.layout.headerGap}>
+      <GreenhouseButton
         component={Link}
         href={DESIGN_SYSTEM_ROUTE}
         variant='text'
-        color='secondary'
+        tone='secondary'
         size='small'
-        startIcon={<i className='tabler-arrow-left' />}
+        kind='navigation'
+        leadingIconClassName='tabler-arrow-left'
         sx={{ alignSelf: 'flex-start', px: 0 }}
       >
         Design System
-      </Button>
-      <AxisWordmark variant='auto' height={32} sx={{ mb: 0.5 }} />
-      <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+      </GreenhouseButton>
+      <AxisWordmark variant='auto' height={DESIGN_SYSTEM_LAB_TOKENS.layout.logoBlockSize} sx={{ mb: 0.5 }} />
+      <Typography variant='overline' color='primary'>
         Utilities Lab
       </Typography>
-      <Typography variant='h4' sx={{ fontWeight: 800 }}>
+      <Typography variant='h4'>
         Utilidades enterprise para Greenhouse
       </Typography>
-      <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
+      <Typography variant='body2' color='text.secondary' sx={{ maxWidth: DESIGN_SYSTEM_LAB_TOKENS.layout.introMaxInlineSize }}>
         Laboratorio interno para primitives utilitarias del Design System. Esta primera pieza adapta
         <InlineCode>Activity Timeline</InlineCode> de AXIS a un patrón reusable para secuencias operativas, evidencia
         ligera y handoffs.
@@ -171,8 +183,11 @@ const UtilitiesLabView = () => (
       data-capture='utilities-lab-activity-timeline'
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 554px) minmax(320px, 1fr)' },
-        gap: 4,
+        gridTemplateColumns: {
+          xs: '1fr',
+          lg: `minmax(0, ${GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.card.maxInlineSize}px) minmax(${DESIGN_SYSTEM_LAB_TOKENS.layout.narrowAsideMinInlineSize}px, 1fr)`
+        },
+        gap: DESIGN_SYSTEM_LAB_TOKENS.layout.gridGap,
         alignItems: 'start'
       }}
     >
@@ -187,18 +202,24 @@ const UtilitiesLabView = () => (
       <Card
         variant='outlined'
         sx={theme => ({
-          borderColor: alpha(theme.palette.text.primary, 0.08),
-          boxShadow: theme.palette.mode === 'dark' ? 'none' : '0 18px 42px rgba(47, 43, 61, 0.06)'
+          borderColor: alpha(theme.palette.text.primary, DESIGN_SYSTEM_LAB_TOKENS.opacity.subtleBorder),
+          boxShadow:
+            theme.palette.mode === 'dark'
+              ? 'none'
+              : `0 ${DESIGN_SYSTEM_LAB_TOKENS.shadow.cardOffsetY}px ${DESIGN_SYSTEM_LAB_TOKENS.shadow.cardBlur}px ${alpha(
+                  theme.palette.text.primary,
+                  DESIGN_SYSTEM_LAB_TOKENS.opacity.elevatedShadow
+                )}`
         })}
       >
         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
           <Stack spacing={1}>
             <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
-              <Chip size='small' color='primary' variant='tonal' label='Primitive' />
-              <Chip size='small' color='success' variant='tonal' label='Reduced motion' />
-              <Chip size='small' color='info' variant='tonal' label='Ordered list a11y' />
+              <GreenhouseChip size='small' tone='primary' variant='label' kind='attribute' label='Primitive' />
+              <GreenhouseChip size='small' tone='success' variant='label' kind='attribute' label='Reduced motion' />
+              <GreenhouseChip size='small' tone='info' variant='label' kind='attribute' label='Ordered list a11y' />
             </Stack>
-            <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            <Typography variant='h6'>
               Contrato reusable, no screenshot
             </Typography>
             <Typography variant='body2' color='text.secondary'>
@@ -229,9 +250,18 @@ const UtilitiesLabView = () => (
     </Box>
 
     <Card variant='outlined' data-capture='utilities-lab-variants'>
-      <CardContent sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1fr) 320px' }, gap: 4 }}>
+      <CardContent
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: `minmax(0, 1fr) ${DESIGN_SYSTEM_LAB_TOKENS.layout.asideMinInlineSize}px`
+          },
+          gap: DESIGN_SYSTEM_LAB_TOKENS.layout.gridGap
+        }}
+      >
         <Stack spacing={2.5}>
-          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+          <Typography variant='h6'>
             Variants y kinds semánticos
           </Typography>
           <Typography variant='body2' color='text.secondary'>
@@ -249,7 +279,7 @@ const UtilitiesLabView = () => (
         </Stack>
 
         <Stack spacing={2}>
-          <Typography variant='body2' sx={{ fontWeight: 800 }}>
+          <Typography variant='h6'>
             Fit esperado
           </Typography>
           {[
@@ -259,11 +289,20 @@ const UtilitiesLabView = () => (
             ['documentTimeline', 'Generacion, revision, firma y archivo de documentos.']
           ].map(([kind, description]) => (
             <Stack key={kind} direction='row' spacing={1.25} alignItems='flex-start'>
-              <Avatar sx={{ width: 28, height: 28, bgcolor: 'primary.lighter', color: 'primary.dark', fontSize: 13 }}>
+              <Avatar
+                sx={{
+                  width: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.icon.fitAvatar,
+                  height: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.icon.fitAvatar,
+                  bgcolor: 'primary.lighter',
+                  color: 'primary.dark',
+                  ...typographyScale.labelSm,
+                  '& > i': { fontSize: GREENHOUSE_ACTIVITY_TIMELINE_TOKENS.icon.fitAvatarGlyph }
+                }}
+              >
                 <i className='tabler-timeline-event' />
               </Avatar>
               <Stack spacing={0.25}>
-                <Typography variant='body2' sx={{ fontWeight: 800 }}>
+                <Typography variant='h6'>
                   {kind}
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>

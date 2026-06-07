@@ -6,6 +6,17 @@
 
 ---
 
+## Delta 2026-06-07i — Utilities Lab y Activity Timeline token hardening
+
+`/admin/design-system/utilities` y `GreenhouseActivityTimeline` se alinean al contrato tokenizado del Design System, manteniendo `ActivityTimeline` como primitive reusable y no como composición visual route-local.
+
+- Nuevo controller `greenhouse-activity-timeline-controller.ts` con `GREENHOUSE_ACTIVITY_TIMELINE_TOKENS` para card widths, rail/dot geometry, icon/avatar sizing, opacidades, sombras, motion timing y spacing del shell.
+- `GreenhouseActivityTimeline` consume ese controller para chrome/motion; timestamps pasan a `monoId`, labels/personas/adjuntos usan variants canónicas (`h6`/`button`) y los colores/sombras se resuelven desde `theme.palette` + `alpha`.
+- Se retira el peso `500` del título de item y los overrides inline `700/800` de labels/títulos/avatars; la primitive queda dentro del ladder vigente `400/600/700/800` sin roles ad-hoc.
+- `UtilitiesLabView` compone `GreenhouseButton`, `GreenhouseChip`, `DESIGN_SYSTEM_LAB_TOKENS` y `GREENHOUSE_ACTIVITY_TIMELINE_TOKENS`; ya no usa MUI `Button`/`Chip` crudos ni `rgba`/type literals route-locales para documentar la primitive.
+- Se agrega test focal para el controller y evidencia GVC desktop+mobile en `.captures/2026-06-07T14-43-31_design-system-utilities`.
+
+
 ## Delta 2026-06-07h — Charts Lab y chart primitives token hardening
 
 `/admin/design-system/charts` y las chart card primitives se conectan al contrato tokenizado del Design System en vez de mantener literals visuales route-locales o por-card.
