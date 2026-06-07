@@ -12,8 +12,18 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Implementación — Slice 0`
+- Status real: `Code-complete + pushed (develop) — pendiente: full pnpm test + verificación staging`
 - Rank: `TBD`
+
+## Closing summary (2026-06-07)
+
+5 slices entregados y **pusheados a `origin/develop`** (`fd23184ca..0c92b7451`): Slice 0 núcleo+tokens (`1cef92579`), Slice 1 `<Motion>`+variants (`0aa2efe1a`), Slice 2 lint boundary + huérfanos jubilados (`64ca9e223`), Slice 3 página+GVC+wiring (`febcf408e`/`fc42a4568`/`0f5810622`), Slice 4 ADR+DESIGN.md/V1+governance (`692e4466b`).
+
+Gates verdes pre-push: `local:check` (lint+tsc), `pnpm build` (ruta construida), `design:lint` 0/0, typography drift-guard 57, reachability 0 orphans, motion 22 + rule-tests 15 + reduced-motion existentes (AnimatedCounter/EmptyState).
+
+- **Colisión multi-agente resuelta**: Codex committeó su chips lab (`11951d7c0`); sus hunks se aislaron de los míos (chips intacto) y completé la entrada de reachability de chips dangling (`0c92b7451`).
+- **No-regresión**: microinteracciones existentes (framer-motion `useReducedMotion` ×21 + CSS blanket) intactas — GSAP es capa aditiva.
+- **Pendiente cierre formal**: full `pnpm test` (~12 min) + verificación en staging tras deploy de develop. `Handoff.md`/`changelog.md` los co-edita Codex — no tocados.
 - Domain: `ui|platform|design-system|motion`
 - Blocked by: `none`
 - Branch: `develop (local-first, sin push hasta autorización del operador)`
