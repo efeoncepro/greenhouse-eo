@@ -179,6 +179,20 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Motion Lab (TASK-1045) — child surface del Design System para la primitiva de motion sobre GSAP (<Motion> + useGreenhouseGSAP) y sus 4 variants, alcanzable desde la card "Ver motion" en DesignSystemView.'
+  },
+  {
+    route: '/admin/design-system/elevation',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Elevation & Shadows Lab (TASK-1049) — child surface del Design System para los roles semánticos de elevación (theme.greenhouseElevation), alcanzable desde la card "Ver elevation" en DesignSystemView.'
+  },
+  {
+    route: '/admin/design-system/geometry',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Geometry Lab (TASK-1050) — child surface del Design System para spacing/radius AXIS y la extension Greenhouse xxl/display, alcanzable desde la card "Ver geometry" en DesignSystemView.'
   }
 ]
 

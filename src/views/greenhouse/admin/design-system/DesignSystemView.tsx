@@ -47,6 +47,8 @@ const CHARTS_LAB_ROUTE = '/admin/design-system/charts'
 const UTILITIES_LAB_ROUTE = '/admin/design-system/utilities'
 const FLOATING_SURFACES_LAB_ROUTE = '/admin/design-system/floating-surfaces'
 const MOTION_LAB_ROUTE = '/admin/design-system/motion'
+const ELEVATION_LAB_ROUTE = '/admin/design-system/elevation'
+const GEOMETRY_LAB_ROUTE = '/admin/design-system/geometry'
 
 const BRAND: { key: AxisColorFamily; label: string }[] = [
   { key: 'primary', label: 'Primary (Efeonce)' },
@@ -204,6 +206,42 @@ const DesignSystemView = () => (
           endIcon={<i className='tabler-arrow-right' />}
         >
           Ver tipografía
+        </Button>
+      </CardContent>
+    </Card>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Foundations
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Geometry foundations
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Escalas vivas de spacing y radius: AXIS Gap/Padding, Border Radius, round, y extension Greenhouse
+            xxl/display para superficies grandes.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={GEOMETRY_LAB_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-dimensions' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver geometry
         </Button>
       </CardContent>
     </Card>
@@ -486,6 +524,43 @@ const DesignSystemView = () => (
           endIcon={<i className='tabler-arrow-right' />}
         >
           Ver motion
+        </Button>
+      </CardContent>
+    </Card>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Laboratorios
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Elevation & Shadows
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Roles semánticos de elevación (none, raised, floating, overlay, modal, overflow reservado) servidos por el
+            theme. Las primitives leen un rol, no un índice MUI; borde requerido en floating/overlay/modal para
+            forced-colors.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={ELEVATION_LAB_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-stack-2' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver elevation
         </Button>
       </CardContent>
     </Card>
