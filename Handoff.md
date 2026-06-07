@@ -1,3 +1,16 @@
+# Sesion 2026-06-07 — TASK-1052 chart-card primitives a elevation roles + lint cubre customShadows (complete, develop)
+
+Tier 1 del follow-up de TASK-1051: cierra la **capa primitive** del contrato de elevación. Local-first en `develop`.
+
+- **Migración (7 callsites, 4 archivos):** tooltips de chart (`role='status'`, `customShadows-sm`) en `GreenhouseChartCard`/`GreenhouseMetricBreakdownChartCard`/`GreenhouseStackedDistributionChartCard`/`MetricTrendCard` → `theme.greenhouseElevation.floating.boxShadow`; contenedores `<Card>` (`customShadows-md`) de los 3 chart cards → `theme.greenhouseElevation.raised.boxShadow`. Rol por semántica (tooltip anclado=floating, card resting=raised), no por matchear el shade.
+- **Lint rule extendida:** `greenhouse/no-direct-mui-elevation-in-primitives` ahora también flaggea `customShadows` en primitives (`theme.customShadows.*` member + string `var(--mui-customShadows-*)` incl. template quasi). Fuera de primitives = compat (no flaggea). RuleTester +4 casos (8 invalid total).
+- **Resultado:** 0 `customShadows`/`theme.shadows[`/`elevation={n≥1}` en `src/components/greenhouse/primitives/**`. La capa primitive queda 100% en roles.
+- **Gates:** 0 violaciones en `src/` · rule-tests 17/17 · primitives 168/168 · tsc 0 · GVC charts lab (chart cards `raised` suaves OK).
+- **Decisión documentada:** chart card container → `raised` (preserva intención elevada + tokeniza/moderniza); flatten a `none` sería rediseño aparte (fuera de scope).
+- **Follow-up abierto:** Tier 2 (views/app `theme.shadows[n]`/`customShadows`) oportunista o warn-rule scopeada a views; Tier 3 (mockups + Vuexy `card-statistics`) no tocar hasta promoción a runtime.
+
+---
+
 # Sesion 2026-06-07 — TASK-1051 elevation token primitive migration + lint rule (complete, develop)
 
 Cierra el follow-up de TASK-1049. Local-first en `develop` (sin branch). 4 primitives migradas a `theme.greenhouseElevation.<role>` + lint rule guardrail.

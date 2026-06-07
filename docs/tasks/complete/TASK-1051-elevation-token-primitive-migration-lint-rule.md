@@ -250,7 +250,8 @@ Slice 1 (migrar) → Slice 2 (GVC) → Slice 3 (lint rule a `error`, solo tras S
 
 ## Follow-ups
 
-- Barrido opcional de `theme.shadows[n]` en views de producto / cards Vuexy (fuera de primitives) si emerge necesidad.
+- **✅ Tier 1 CERRADO por TASK-1052 (2026-06-07)**: los chart-card primitives (`customShadows-sm/md`) migrados a `floating`/`raised` + lint rule extendida a `customShadows` en primitives. La capa primitive queda 100% en roles.
+- Barrido opcional de `theme.shadows[n]`/`customShadows` en **views de producto / cards Vuexy** (fuera de primitives) — **Tier 2, oportunista** (al tocar) o warn-rule scopeada a views; **Tier 3** (mockups + Vuexy `card-statistics`) no tocar hasta promoción a runtime.
 - Captura GVC dark mode explícita del lab de elevación (heredado de TASK-1049, pendiente menor).
 
 ## Open Questions
