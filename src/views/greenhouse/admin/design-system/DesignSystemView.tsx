@@ -43,6 +43,7 @@ const MICROINTERACTIONS_LAB_ROUTE = '/admin/design-system/microinteractions'
 const TYPOGRAPHY_ROUTE = '/admin/design-system/typography'
 const CHARTS_LAB_ROUTE = '/admin/design-system/charts'
 const UTILITIES_LAB_ROUTE = '/admin/design-system/utilities'
+const FLOATING_SURFACES_LAB_ROUTE = '/admin/design-system/floating-surfaces'
 
 const BRAND: { key: AxisColorFamily; label: string }[] = [
   { key: 'primary', label: 'Primary (Efeonce)' },
@@ -340,6 +341,42 @@ const DesignSystemView = () => (
           endIcon={<i className='tabler-arrow-right' />}
         >
           Ver microinteracciones
+        </Button>
+      </CardContent>
+    </Card>
+
+    <Card variant='outlined'>
+      <CardContent
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 3
+        }}
+      >
+        <Stack spacing={0.75}>
+          <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+            Laboratorios
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 800 }}>
+            Floating surfaces ancladas
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
+            Primitive canonica sobre Floating UI para popovers, action menus, evidence peeks, inline editors y
+            validation bubbles, con positioning, foco y dismissal gobernados.
+          </Typography>
+        </Stack>
+        <Button
+          component={Link}
+          href={FLOATING_SURFACES_LAB_ROUTE}
+          variant='tonal'
+          color='primary'
+          size='small'
+          startIcon={<i className='tabler-layout-navbar-expand' />}
+          endIcon={<i className='tabler-arrow-right' />}
+        >
+          Ver floating surfaces
         </Button>
       </CardContent>
     </Card>

@@ -1278,6 +1278,49 @@ await startViewTransition(() => {
 - `src/components/greenhouse/motion/ViewTransitionLink.tsx` — Link drop-in.
 - `src/app/globals.css` — keyframes `greenhouse-view-transition-fade-{in,out}` + reduced-motion guard.
 
+## Delta 2026-06-06 — Greenhouse Floating Surface primitive (TASK-1033)
+
+La capa de plataforma que el Delta 2026-04-20b anticipaba (Floating UI como engine, wrapper Greenhouse pendiente) ya existe. El contrato Floating UI dejó de vivir duplicado en cada consumer: ahora hay una primitive canónica.
+
+ADR: `docs/architecture/GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md` (Accepted 2026-06-06).
+
+### Qué se shippeó
+
+- **`GreenhouseFloatingSurface`** (`@/components/greenhouse/primitives`) — primitive client-side sobre `@floating-ui/react`. Centraliza el contrato canónico (`autoUpdate` + `offset` + `flip({ fallbackAxisSideDirection: 'end' })` + `shift({ padding: 16 })` + `FloatingPortal` + `FloatingFocusManager modal={false}` + `useDismiss` + `useRole`). Open controlled/uncontrolled, render-props `anchor`/`content`, hooks GVC (`data-gh-floating-surface`, `data-gh-floating-anchor`, `data-state`, `data-capture`), reduced-motion.
+- **`floating-surface-controller.ts`** — fuente única (pura, testeable) de los unions `variant`/`kind`, el contrato congelado por variant (`FLOATING_SURFACE_VARIANT_CONFIG`) y el resolver idempotente `resolveFloatingSurfaceVariant({ variant?, kind? })`.
+- **6 variants oficiales V1** con contrato de a11y por variant:
+
+  | variant | role | interaction | focus managed | outside dismiss | placement |
+  |---|---|---|---|---|---|
+  | `richTooltip` | tooltip | hover + focus | no | sí | top |
+  | `actionMenu` | menu | click | sí (+ return) | sí | bottom-start |
+  | `evidencePeek` | dialog | click | sí (+ return) | sí | bottom-start |
+  | `inlineEditor` | dialog | click | sí (+ return) | **no** (dirty seguro) | bottom-start |
+  | `validationBubble` | tooltip | hover + focus | no | sí | bottom-start |
+  | `commandPreview` | tooltip | hover + focus | no | sí | right-start |
+
+- **Shape canónica**: `<GreenhouseFloatingSurface variant='evidencePeek' kind='costProvenance' />` (metodología Primitive + Variants + Kinds).
+
+### Regla canónica de consumo
+
+- Los **views de producto NO importan `@floating-ui/react` directamente**. Consumen `GreenhouseFloatingSurface`. La excepción son las primitives mismas y la infraestructura legacy de menús Vuexy (`FloatingTree`).
+- Floating Surface es para **UI contextual anclada y transitoria**. NO reemplaza `AdaptiveSidecar` (lanes full-height) ni MUI `Dialog` (decisiones destructivas/legales/financieras/maker-checker).
+- Sin lógica de negocio dentro de la primitive.
+
+### Consumers migrados (pilotos)
+
+- `CostProvenancePopover` → `evidencePeek` / `costProvenance` (API pública intacta).
+- `TotalsLadder` (segmento de addons) → `evidencePeek` / `totalsAddons` (prop `addonsSegment` intacta).
+
+Ambos dejaron de importar `@floating-ui/react`; paridad visual + focus preservada.
+
+### Verificación
+
+- 19 tests focales (`floating-surface-controller.test.ts` + `GreenhouseFloatingSurface.test.tsx`).
+- Lab interno `/admin/design-system/floating-surfaces` (`FloatingSurfaceLabView`) + scenario GVC `floating-surface-primitives` (desktop + mobile, open/close, keyboard, collision near-edge).
+
+`GreenhouseFieldProvenancePeek` sigue usando Floating UI ad-hoc (es primitive/infra, no view de producto) — candidato a adoptar la primitive en un follow-up.
+
 ## Delta 2026-04-20b — Floating UI como stack oficial de popovers (TASK-509 / TASK-510)
 
 ### Decisión de plataforma
