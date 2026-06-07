@@ -1,3 +1,15 @@
+# Sesion 2026-06-07 — Typography canonical page controls hardening
+
+Se revisó `/admin/design-system/typography` por sospecha del operador de colores/tipografía hardcodeados y luego se corrigieron los ejemplos de botones.
+
+- **Resultado audit:** la vista canónica no tenía HEX hardcodeados; los colores usan theme/palette. Sí tenía atajos tipográficos route-locales y ejemplos de controles con MUI `Button`/`Chip` crudos, lo que era incoherente con el contrato nuevo de primitives.
+- **Fix:** `CanonicalTypographyView` ahora usa `GreenhouseButton` para los ejemplos small/medium/large de controles y `GreenhouseChip` para chips de estado/spec. El ejemplo de KPI usa `variant='kpiValue'`; el ID usa `variant='monoId'`; títulos repetidos de cards/spec usan variants (`h6`) en vez de `fontWeight`; los specimens de familia/peso derivan de `typographyScale`; se corrigió `Poppris` → `Poppins`.
+- **Clasificación mockup:** `/admin/design-system/typography/mockup` sigue teniendo `fontSize` inline porque es un registro histórico AS-IS↔TO-BE y conserva ejemplos intencionales de deuda/decisión; la referencia vigente es la canónica.
+- **GVC:** `.captures/2026-06-07T13-41-12_typography-canonical` (`escala`, `aplicaciones`, `gobernanza`) revisado; los botones muestran tipografía aplicada desde `GreenhouseButton`/`controlText`.
+- **Gates verdes:** eslint focal, `tsc --noEmit`, `GreenhouseButton` + `GreenhouseChip` + typography drift tests, `design:lint`, búsqueda estricta sin HEX/literals crudos ni `<Button>/<Chip>` en la canónica.
+
+---
+
 # Sesion 2026-06-07 — Chips Lab tokenizado + typography hardening
 
 Se revisó `/admin/design-system/chips` por sospecha del operador de colores/tipografía hardcodeados.

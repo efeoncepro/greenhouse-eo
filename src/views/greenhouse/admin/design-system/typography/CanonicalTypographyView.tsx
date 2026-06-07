@@ -13,16 +13,15 @@
 import Link from 'next/link'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { SxProps, Theme } from '@mui/material/styles'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
+import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
 import {
   controlText,
   fontFamilies,
@@ -77,7 +76,7 @@ const variantOf = (key: ScaleKey): string | null => {
 
 // When-to-use note per token (the semantic intent).
 const USAGE: Record<ScaleKey, string> = {
-  headlineDisplay: 'Momento display máximo — marketing / splash. Poppris. Raro en producto.',
+  headlineDisplay: 'Momento display máximo — marketing / splash. Poppins. Raro en producto.',
   headlineLg: 'Display grande (h2).',
   headlineMd: 'Display medio (h3).',
   pageTitle: 'Título de página de producto (h4). Domina la jerarquía visual.',
@@ -158,7 +157,7 @@ const Section = ({
 )
 
 const SpecChip = ({ label }: { label: string }) => (
-  <Chip size='small' variant='tonal' color='secondary' label={label} sx={{ fontFamily: fontFamilies.text }} />
+  <GreenhouseChip size='small' variant='label' tone='secondary' kind='attribute' label={label} />
 )
 
 // One token: live specimen + full spec.
@@ -210,7 +209,7 @@ const TokenSpecimen = ({ tokenKey }: { tokenKey: ScaleKey }) => {
               <Typography variant='caption' color='text.secondary'>
                 {k}
               </Typography>
-              <Typography variant='caption' sx={{ fontWeight: fontWeights.semibold, fontVariantNumeric: 'tabular-nums' }}>
+              <Typography variant='monoId'>
                 {v}
               </Typography>
             </Box>
@@ -273,17 +272,17 @@ const CanonicalTypographyView = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
           {TOC.map(item => (
-            <Button
+            <GreenhouseButton
               key={item.id}
               size='small'
-              variant='tonal'
-              color='secondary'
+              variant='label'
+              tone='secondary'
+              kind='navigation'
               component={Link}
               href={`#${item.id}`}
-              sx={{ textTransform: 'none' }}
             >
               {item.label}
-            </Button>
+            </GreenhouseButton>
           ))}
         </CardContent>
       </Card>
@@ -296,12 +295,24 @@ const CanonicalTypographyView = () => {
         hint='Exactamente dos familias activas, variable fonts. Poppins solo para display (headline-* + page-title); Geist para todo lo demás. Numéricos en Geist con tabular-nums — nunca monospace.'
       >
         {[
-          { name: 'Poppins', role: 'Display', stack: fontFamilies.display, note: 'headline-display / lg / md + page-title. Solo display.' },
-          { name: 'Geist', role: 'Texto', stack: fontFamilies.text, note: 'Body, controles, tablas, labels, IDs, KPIs. Todo lo no-display.' }
+          {
+            name: 'Poppins',
+            role: 'Display',
+            stack: fontFamilies.display,
+            token: 'headlineLg',
+            note: 'headline-display / lg / md + page-title. Solo display.'
+          },
+          {
+            name: 'Geist',
+            role: 'Texto',
+            stack: fontFamilies.text,
+            token: 'sectionTitle',
+            note: 'Body, controles, tablas, labels, IDs, KPIs. Todo lo no-display.'
+          }
         ].map(fam => (
           <Box key={fam.name} sx={{ py: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
             <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5, flexWrap: 'wrap' }}>
-              <Box component='span' sx={{ fontFamily: fam.stack, fontSize: 24, fontWeight: 600 }}>
+              <Box component='span' sx={{ ...tokenSx(fam.token as ScaleKey), display: 'block' }}>
                 {fam.name}
               </Box>
               <SpecChip label={fam.role} />
@@ -312,7 +323,16 @@ const CanonicalTypographyView = () => {
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mt: 1 }}>
               {FAMILY_WEIGHTS.map(w => (
                 <Box key={w.weight} sx={{ textAlign: 'center' }}>
-                  <Box component='span' sx={{ fontFamily: fam.stack, fontSize: 28, fontWeight: w.weight, display: 'block' }}>
+                  <Box
+                    component='span'
+                    sx={{
+                      fontFamily: fam.stack,
+                      fontSize: typographyScale.headlineLg.fontSize,
+                      fontWeight: w.weight,
+                      lineHeight: typographyScale.headlineLg.lineHeight,
+                      display: 'block'
+                    }}
+                  >
                     Ag
                   </Box>
                   <Typography variant='caption' color='text.secondary'>
@@ -377,7 +397,7 @@ const CanonicalTypographyView = () => {
               <Typography variant='overline' color='text.secondary'>
                 OTD Global
               </Typography>
-              <Typography variant='h3' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+              <Typography variant='kpiValue' sx={{ display: 'block', mt: 0.25 }}>
                 85,8%
               </Typography>
               <Typography variant='body2' color='text.secondary'>
@@ -388,7 +408,7 @@ const CanonicalTypographyView = () => {
               <Typography variant='overline' color='text.secondary'>
                 ID de ciclo
               </Typography>
-              <Typography variant='body1' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: fontWeights.semibold }}>
+              <Typography variant='monoId' sx={{ display: 'block', mt: 0.25 }}>
                 EO-2026-0042
               </Typography>
               <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
@@ -404,18 +424,23 @@ const CanonicalTypographyView = () => {
             Controles (label-md / control-text)
           </Typography>
           <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
-            <Button variant='contained' size='small'>
+            <GreenhouseButton variant='solid' tone='primary' size='small' kind='primaryAction'>
               Guardar
-            </Button>
-            <Button variant='contained' size='medium'>
+            </GreenhouseButton>
+            <GreenhouseButton variant='solid' tone='primary' size='medium' kind='primaryAction'>
               Confirmar
-            </Button>
-            <Button variant='contained' size='large'>
+            </GreenhouseButton>
+            <GreenhouseButton variant='solid' tone='primary' size='large' kind='primaryAction'>
               Continuar
-            </Button>
-            <Chip label='Activo' color='success' variant='tonal' />
-            <Chip label='Pendiente' color='warning' variant='tonal' />
+            </GreenhouseButton>
+            <GreenhouseChip label='Activo' tone='success' variant='label' kind='status' />
+            <GreenhouseChip label='Pendiente' tone='warning' variant='label' kind='status' />
           </Stack>
+          <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
+            <code>GreenhouseButton</code> consume el label de <code>theme.typography.button</code> y su tamaño de texto
+            desde <code>controlText</code> por size; <code>GreenhouseChip</code> consume{' '}
+            <code>typographyScale.labelMd/labelSm</code>.
+          </Typography>
         </Box>
       </Section>
 
@@ -438,10 +463,10 @@ const CanonicalTypographyView = () => {
           </Typography>
           {(Object.keys(typographyScale) as ScaleKey[]).map(key => (
             <Box key={key} sx={{ display: 'contents' }}>
-              <Typography variant='body2' sx={{ fontFamily: fontFamilies.text }}>
+              <Typography variant='body2'>
                 {CONTRACT_NAME[key] ?? '—'}
               </Typography>
-              <Typography variant='body2' sx={{ fontFamily: fontFamilies.text, fontWeight: fontWeights.semibold }}>
+              <Typography variant='h6'>
                 {key}
               </Typography>
               <Typography variant='body2' color='text.secondary'>
@@ -518,7 +543,7 @@ const CanonicalTypographyView = () => {
             }
           ].map(card => (
             <Box key={card.t} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant='subtitle2' sx={{ fontWeight: fontWeights.semibold }}>
+              <Typography variant='h6'>
                 {card.t}
               </Typography>
               <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
