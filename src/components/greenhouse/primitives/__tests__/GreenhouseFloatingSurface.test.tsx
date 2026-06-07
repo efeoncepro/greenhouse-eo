@@ -63,6 +63,18 @@ describe('GreenhouseFloatingSurface', () => {
     expect(screen.getByText('Contenido de la evidencia')).toBeInTheDocument()
   })
 
+  it('uses semantic floating elevation, not the MUI elevation={6} index (TASK-1049)', async () => {
+    renderSurface()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ver evidencia' }))
+
+    const surface = await screen.findByRole('dialog')
+
+    // Chrome depth comes from theme.greenhouseElevation.floating, not theme.shadows[6].
+    expect(surface.className).not.toMatch(/MuiPaper-elevation6\b/)
+    expect(surface.className).toMatch(/MuiPaper-elevation0\b/)
+  })
+
   it('closes on Escape', async () => {
     renderSurface()
 

@@ -255,7 +255,11 @@ const GreenhouseFloatingSurface = ({
       <Paper
         {...getFloatingProps()}
         aria-label={ariaLabel}
-        elevation={6}
+        // Semantic elevation (TASK-1049): chrome depth comes from the `floating`
+        // role token (theme.greenhouseElevation), NOT the generic MUI
+        // `theme.shadows[6]`. Paper renders no MUI shadow of its own (elevation 0);
+        // the 1px border carries separation under forced-colors (box-shadow stripped).
+        elevation={0}
         data-gh-floating-surface={variant}
         data-gh-floating-surface-kind={kind ?? ''}
         data-gh-floating-placement={resolvedPlacement}
@@ -267,7 +271,8 @@ const GreenhouseFloatingSurface = ({
           theme => ({
             width: '100%',
             borderRadius: `${theme.shape.customBorderRadius.md}px`,
-            border: `1px solid ${theme.palette.divider}`,
+            border: `1px solid ${theme.greenhouseElevation.floating.borderColor}`,
+            boxShadow: theme.greenhouseElevation.floating.boxShadow,
             p: FLOATING_SURFACE_CHROME_TOKENS.densityPadding[config.density],
             zIndex: theme.zIndex.modal + 1,
             transformOrigin,
