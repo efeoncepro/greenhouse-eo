@@ -19,7 +19,8 @@ import { applyCaptureDeterminism } from './lib/capture-masks'
 import { isValidEnv, resolveEnvConfig, type CaptureEnv, type EnvConfig } from './lib/env'
 import { classifyCaptureFailure } from './lib/failure-taxonomy'
 import { composeGif } from './lib/gif'
-import { writeManifest, type BaselineFrameDiff, type CaptureManifest, type PerformanceSummary, type RuntimeSummary } from './lib/manifest'
+import { computeRubricVerdict } from './lib/enterprise-rubric'
+import { writeManifest, type BaselineFrameDiff, type CaptureManifest, type EnterpriseRubricSummary, type PerformanceSummary, type RuntimeSummary } from './lib/manifest'
 import { collectPerformanceSnapshot, derivePerformanceFindings } from './lib/perf-budget'
 import { runScenario } from './lib/recorder'
 import { writeCaptureReport } from './lib/report'
@@ -290,6 +291,14 @@ const runOneCapture = async ({
 
   const failureCategory = classifyCaptureFailure(stepError?.message)
 
+  let enterpriseRubric: EnterpriseRubricSummary | undefined
+
+  if (scenario.quality?.enterpriseRubric?.enabled) {
+    const rubricFindings = outcome.qualityFindings.filter(finding => finding.category === 'enterprise')
+
+    enterpriseRubric = { verdict: computeRubricVerdict(rubricFindings), findingCount: rubricFindings.length }
+  }
+
   const reportManifest: CaptureManifest = {
     schemaVersion: 1,
     scenarioName: scenario.name,
@@ -316,6 +325,7 @@ const runOneCapture = async ({
     baselineDiffs,
     runtimeSummary,
     performanceSummary,
+    enterpriseRubric,
     exitCode,
     error: stepError
   }

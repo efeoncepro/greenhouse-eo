@@ -151,6 +151,14 @@ export interface RuntimeSummary {
   httpFailureSamples: Array<{ url: string; status: number; resourceType: string }>
 }
 
+export type EnterpriseRubricVerdict = 'pass' | 'warning' | 'blocked'
+
+/** Resumen estructurado del enterprise rubric (Slice 7). Advisory, no juicio absoluto. */
+export interface EnterpriseRubricSummary {
+  verdict: EnterpriseRubricVerdict
+  findingCount: number
+}
+
 /** Snapshot liviano de performance/recursos (Slice 6). */
 export interface PerformanceSummary {
   domNodes: number
@@ -201,6 +209,7 @@ export interface CaptureManifest {
   baselineDiffs?: BaselineFrameDiff[]
   runtimeSummary?: RuntimeSummary
   performanceSummary?: PerformanceSummary
+  enterpriseRubric?: EnterpriseRubricSummary
   exitCode: 0 | 1
   error?: {
     message: string

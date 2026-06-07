@@ -109,6 +109,25 @@ export const buildCaptureReportHtml = (manifest: CaptureManifest): string => {
       </div>`
     : '<p class="muted">Sin snapshot de performance.</p>'
 
+  // Executive summary: ¿apto para implementar o requiere iteración?
+  const errorCount = findings.filter(f => f.severity === 'error').length
+  const warningCount = findings.filter(f => f.severity === 'warning').length
+
+  const verdictLabel = manifest.exitCode === 1 || errorCount > 0
+    ? 'Requiere iteración'
+    : warningCount > 0
+      ? 'Revisar antes de implementar'
+      : 'Apto para implementar'
+
+  const verdictClass = manifest.exitCode === 1 || errorCount > 0 ? 'error' : warningCount > 0 ? 'warning' : 'ok'
+  const rubric = manifest.enterpriseRubric
+
+  const rubricChip = rubric
+    ? ` · rubric enterprise: <span class="pill ${rubric.verdict === 'pass' ? 'ok' : rubric.verdict === 'warning' ? 'warning' : 'error'}">${rubric.verdict}</span>`
+    : ''
+
+  const summarySection = `<div class="panel"><strong>Veredicto:</strong> <span class="pill ${verdictClass}">${verdictLabel}</span> · ${errorCount} error · ${warningCount} warning${rubricChip}</div>`
+
   return `<!doctype html>
 <html lang="es">
 <head>
@@ -151,6 +170,9 @@ export const buildCaptureReportHtml = (manifest: CaptureManifest): string => {
       ${manifest.outputs.trace ? `<div class="panel"><strong>Trace</strong><br><a href="${escapeHtml(manifest.outputs.trace)}">trace.zip</a><br><small class="muted">playwright show-trace</small></div>` : ''}
     </div>
   </header>
+
+  <h2>Resumen ejecutivo</h2>
+  ${summarySection}
 
   <h2>Readiness</h2>
   <div class="panel">

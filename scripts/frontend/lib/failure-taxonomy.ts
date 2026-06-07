@@ -60,7 +60,14 @@ export const FINDING_CODES = {
   perf_requests_exceeded: 'perf_requests_exceeded',
   perf_transfer_exceeded: 'perf_transfer_exceeded',
   perf_fcp_exceeded: 'perf_fcp_exceeded',
-  perf_probe_failed: 'perf_probe_failed'
+  perf_probe_failed: 'perf_probe_failed',
+  // --- Slice 7: data honesty + enterprise rubric ---
+  enterprise_placeholder_text: 'enterprise_placeholder_text',
+  enterprise_empty_tokens: 'enterprise_empty_tokens',
+  enterprise_multiple_primary_actions: 'enterprise_multiple_primary_actions',
+  enterprise_color_saturation: 'enterprise_color_saturation',
+  enterprise_data_capture_missing: 'enterprise_data_capture_missing',
+  enterprise_probe_failed: 'enterprise_probe_failed'
 } as const
 
 export type FindingCode = (typeof FINDING_CODES)[keyof typeof FINDING_CODES]

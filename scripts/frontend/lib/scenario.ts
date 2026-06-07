@@ -153,6 +153,22 @@ export interface CapturePerformanceQualityOptions {
   maxFcpMs?: number
 }
 
+export interface CaptureEnterpriseRubricOptions {
+  enabled?: boolean
+  /** Acota el scan a un contenedor estable (default: body). */
+  includeSelector?: string
+  /** Si true, los hallazgos de rubric son `error` (blocked). Default false (warning). */
+  failOnViolations?: boolean
+  /** Términos placeholder a detectar. Default: lorem/tbd/mock/fake/todo/placeholder. */
+  placeholderTerms?: string[]
+  /** Máximo de botones primarios (contained) por header. Default 1. */
+  maxPrimaryButtonsPerHeader?: number
+  /** Ratio máximo de celdas vacías (—/0) sobre el total. Default 0.5. */
+  maxEmptyTokensRatio?: number
+  /** Regiones `data-capture` que deben existir en la superficie. */
+  expectedDataCaptureRegions?: string[]
+}
+
 export interface CaptureQualityOptions {
   allowEmpty?: boolean
   allowLoading?: boolean
@@ -163,6 +179,7 @@ export interface CaptureQualityOptions {
   runtime?: CaptureRuntimeQualityOptions
   keyboard?: CaptureKeyboardQualityOptions
   performance?: CapturePerformanceQualityOptions
+  enterpriseRubric?: CaptureEnterpriseRubricOptions
 }
 
 export interface CaptureScenarioStep {

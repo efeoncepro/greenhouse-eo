@@ -30,6 +30,7 @@ import {
 import type { AssertionResult, CaptureFinding, FrameMaskRect, FrameRecord, InteractionSegment, ReadinessResult } from './manifest'
 import { analyzeFrameQuality } from './quality'
 import { resolveMaskRects } from './capture-masks'
+import { analyzeEnterpriseRubric } from './enterprise-rubric'
 import { FINDING_CODES } from './failure-taxonomy'
 import { runKeyboardGate } from './keyboard-gate'
 
@@ -254,6 +255,13 @@ export const runScenario = async ({
       mark: (label, note) => onMark(label, note),
       addFinding: finding => qualityFindings.push(finding)
     })
+  }
+
+  // Enterprise rubric (opt-in, advisory) — corre una vez sobre el estado final.
+  if (scenario.quality?.enterpriseRubric?.enabled) {
+    const rubricFindings = await analyzeEnterpriseRubric(page, scenario.quality.enterpriseRubric)
+
+    qualityFindings.push(...rubricFindings)
   }
 
   // Final hold for last state capture in the .webm

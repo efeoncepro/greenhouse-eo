@@ -49,6 +49,9 @@ interface ManifestLike {
   qualityFindings?: Array<{ severity: string; category: string; code: string; message: string; frameLabel?: string }>
   interactions?: Array<{ name: string; intent: string; actionKind: string; frameLabels: string[] }>
   reportHtml?: string
+  exitCode?: number
+  enterpriseRubric?: { verdict: string; findingCount: number }
+  baselineDiffs?: Array<{ frameLabel: string; status: string; diffRatio?: number; viewportName?: string }>
 }
 
 const buildDossier = (captureDir: string, manifest: ManifestLike): string => {
@@ -74,10 +77,36 @@ const buildDossier = (captureDir: string, manifest: ManifestLike): string => {
         .join('\n')
     : '- Sin interactions V2 declaradas.'
 
+  const errorCount = manifest.qualityFindings?.filter(f => f.severity === 'error').length ?? 0
+  const warningCount = manifest.qualityFindings?.filter(f => f.severity === 'warning').length ?? 0
+
+  const verdict = manifest.exitCode === 1 || errorCount > 0
+    ? '🔴 Requiere iteración'
+    : warningCount > 0
+      ? '🟡 Revisar antes de implementar'
+      : '🟢 Apto para implementar'
+
+  const baselineDiffs = manifest.baselineDiffs?.length
+    ? manifest.baselineDiffs
+        .map(d => `- \`${d.frameLabel}\`${d.viewportName ? ` (${d.viewportName})` : ''}: **${d.status}**${d.diffRatio !== undefined ? ` — ${(d.diffRatio * 100).toFixed(2)}%` : ''}`)
+        .join('\n')
+    : '- Sin contrato baseline activo.'
+
   return `# UI Review Dossier — ${manifest.scenarioName}
 
 > Generado por \`pnpm fe:capture:review\` el ${new Date().toISOString()}
 > **Skill a invocar**: \`greenhouse-ui-review\` (cargá el contexto de DESIGN.md + V1 antes)
+
+## Resumen ejecutivo (GVC)
+
+- **Veredicto automático**: ${verdict}
+- **Findings**: ${errorCount} error · ${warningCount} warning
+- **Rubric enterprise**: ${manifest.enterpriseRubric ? `${manifest.enterpriseRubric.verdict} (${manifest.enterpriseRubric.findingCount} hallazgos)` : 'no evaluado'}
+- **Exit code**: ${manifest.exitCode ?? 0}
+
+## Baseline diff (mockup → runtime)
+
+${baselineDiffs}
 
 ## Contexto
 
