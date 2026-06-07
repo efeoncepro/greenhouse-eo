@@ -6,6 +6,18 @@
 
 ---
 
+## Delta 2026-06-07k — Elevation / shadow token system semántico (TASK-1049)
+
+Greenhouse gana un SoT semántico de elevación. Las primitives dejan de leer índices MUI (`Paper elevation={6}` → `theme.shadows[6]`) o `customShadows` a ojo, y leen un **rol** servido por el theme.
+
+- **SoT** `src/components/theme/elevation-tokens.ts` — factory mode-aware (`elevationTokens(mode)`) sobre el canal canónico `var(--mui-mainColorChannels-${mode}Shadow)` (AXIS-aware, NO reusa `customShadows.md/lg`, NO OKLCH). 6 roles: `none` · `raised` · `floating` · `overlay` · `modal` · `overflow` (reservado, sin valor runtime hasta tener consumidor).
+- **Runtime** `theme.greenhouseElevation.<role>` (inyectado en `mergedTheme.ts`, augmentado en `types.ts`). Cada token: `boxShadow` + `borderColor` (obligatorio en floating/overlay/modal) + `surfaceColor` + `intendedUse`.
+- **Receta 2026**: dos capas suaves + borde hairline 1px (GitHub Primer / shadcn / Linear / Vercel Geist). Techo anti-dated: ningún rol supera `0 8px 24px rgba(0,0,0,0.1)`. Dark usa alpha más alto; el **borde** carga la separación bajo `forced-colors` (el navegador elimina `box-shadow`).
+- **Primer consumidor**: `GreenhouseFloatingSurface` deja `elevation={6}` → `elevation={0}` + `theme.greenhouseElevation.floating` (boxShadow + border). 6 variants comparten `floating` (sin campo `elevationRole` en el controller — restraint; se agrega solo si un variant lo necesita).
+- **Drift-guard** `src/components/theme/elevation-drift.test.ts` — paridad `runtime ≡ SoT ≡ DESIGN.md §Elevation ≡ V1 §6` (role-set) + value parity runtime≡SoT + techo + border. `DESIGN.md §Elevation` y `V1 §6` reescritos a roles (la tabla numérica queda como §6.1 legacy/compat).
+- **Lab vivo** `/admin/design-system/elevation` (interno, gate `administracion.design_system`, alcanzable por nav TASK-982) — specimens vivos desde el theme, light/dark, nota forced-colors.
+- ADR: [GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1.md](../GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1.md). Verificado GVC local (lab + floating-surface-primitives). drift 27/27 · floating-surface 24/24 · design:lint 0/0.
+
 ## Delta 2026-06-07j — Floating Surface anchored motion hardening
 
 `GreenhouseFloatingSurface` moderniza su entrada visual sin convertir los popovers/menus/tooltips en motion cinematica.
@@ -2409,3 +2421,6 @@ Registro de versiones que vivía en el front-matter de `GREENHOUSE_UI_PLATFORM_V
 > **Updated:** 2026-04-20 — v1.3: Floating UI (`@floating-ui/react` 0.27) introducido como stack oficial de positioning para popovers (TASK-509). Primer consumer: `TotalsLadder`. TASK-510 backlog migra el resto. Ver Delta 2026-04-20b abajo.
 > **Updated:** 2026-04-20 — v1.2: `TotalsLadder` primitive extiende su API con `addonsSegment?: { count, amount, onClick, ariaExpanded } | null` (TASK-507) para renderizar un segmento interactivo inline dentro de la ladder de ajustes. Pattern: acciones contextuales viven con sus datos, no como chips flotantes separados. Ver Delta 2026-04-20 abajo.
 > **Updated:** 2026-04-19 — v1.1: registry de primitives `src/components/greenhouse/primitives/` gana 3 componentes nuevos extraídos de `QuoteSummaryDock` (TASK-505). Ver Delta 2026-04-19 abajo.
+## Delta 2026-06-07 — TASK-1050 Geometry foundations
+
+Se agrego la referencia viva interna `/admin/design-system/geometry` para spacing/radius base. La pagina renderiza AXIS `Gap/Padding 1..16 + 25` desde `theme.spacing(N)`, AXIS `Border-Radius xs..xl` desde `theme.shape.customBorderRadius`, `Border-Round` como `9999px`/`50%`, y la extension Greenhouse `xxl=12` / `display=16` para superficies grandes. `xxl/display` viven en el theme y tipos MUI; no son valores AXIS upstream ni deben aplicarse a tablas, inputs, menus o cards densas. Scenario GVC: `design-system-geometry`.

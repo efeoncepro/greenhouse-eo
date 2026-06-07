@@ -31,7 +31,9 @@ const theme = (settings: Settings, mode: SystemMode, direction: Theme['direction
         sm: 4,
         md: 6,
         lg: 8,
-        xl: 10
+        xl: 10,
+        xxl: 12,
+        display: 16
       }
     },
     shadows: shadows(mode),

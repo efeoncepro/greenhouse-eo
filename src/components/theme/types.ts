@@ -31,6 +31,8 @@ declare module '@mui/material/styles' {
         md: number
         lg: number
         xl: number
+        xxl: number
+        display: number
       }
     }
     customShadows: {
@@ -113,6 +115,8 @@ declare module '@mui/material/styles' {
         md?: number
         lg?: number
         xl?: number
+        xxl?: number
+        display?: number
       }
     }
     customShadows?: {

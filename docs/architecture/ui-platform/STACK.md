@@ -61,6 +61,17 @@
 
 ## Vuexy Component System
 
+## Geometry Foundations
+
+La plataforma UI consume geometry desde el theme, no desde literals route-locales ni desde valores Figma pegados:
+
+- Spacing AXIS `Gap/Padding-N` → `theme.spacing(N)` / `Stack spacing={N}` / `sx={{ p: N }}`.
+- Radius AXIS `xs..xl` → `theme.shape.customBorderRadius.{xs,sm,md,lg,xl}`.
+- Radius Greenhouse `xxl=12` y `display=16` → superficies grandes con uso intencional, no cards operacionales densas.
+- `Border-Round` → `9999px` para pills/capsules o `50%` para circulos.
+
+Referencia viva interna: `/admin/design-system/geometry`. Contrato extenso: `GREENHOUSE_DESIGN_TOKENS_V1.md` §4-§5.
+
 ### Wrappers (@core/components/mui/)
 
 Vuexy envuelve componentes MUI con estilizado consistente:
@@ -162,9 +173,9 @@ import type { OperationsOverview } from '@/lib/operations/get-operations-overvie
 - No usar `elevation > 0` en cards internas (usar `variant='outlined'`)
 - No mezclar español e inglés en la misma surface
 - No hardcodear colores — siempre `theme.palette.*`
+- No hardcodear spacing/radius — spacing usa `theme.spacing(N)`; radius usa `theme.shape.customBorderRadius.*`
 - No crear stat displays custom cuando un card-statistics component sirve
 - No usar Redux para estado local — `useState` o `react-hook-form`
 - No instalar librerías nuevas sin verificar si ya están disponibles en este inventario
 - No importar `lottie-react` o `framer-motion` directo — usar los wrappers en `src/libs/`
 - No crear animaciones que ignoren `prefers-reduced-motion` — usar `useReducedMotion` hook
-

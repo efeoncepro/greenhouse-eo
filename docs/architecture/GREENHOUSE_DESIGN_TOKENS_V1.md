@@ -197,6 +197,8 @@ spacing: (factor) => `${0.25 * factor}rem`
 
 With base root 16px: `spacing(n) = 4n px`.
 
+**AXIS parity (TASK-1050)**: Figma `Design System | Vuexy → AXIS`, fileKey `yyMksCoijfMaIoYplXKZaR`, node `11112:12286` (`Gap & Padding`) is a token sheet, not a product UI. `Gap-N` / `Padding-N` maps directly to `theme.spacing(N)`, `Stack spacing={N}`, `sx={{ p: N }}` or `sx={{ gap: N }}`. Do not copy the px literals from Figma into JSX.
+
 ### 4.1 Scale
 
 | Token | px | rem | Canonical usage |
@@ -213,6 +215,10 @@ With base root 16px: `spacing(n) = 4n px`.
 | `spacing(8)` | 32 | 2 | Page section breathing room |
 | `spacing(10)` | 40 | 2.5 | Page top/bottom padding |
 | `spacing(12)` | 48 | 3 | Landing hero padding |
+| `spacing(16)` | 64 | 4 | Available AXIS step for large layout gaps |
+| `spacing(25)` | 100 | 6.25 | Available AXIS display step; rare, intentional only |
+
+AXIS exposes `1..16 + 25`. The table above highlights the operational subset plus the two largest AXIS stops; non-preferred steps are available, but should be intentional in product UI.
 
 ### 4.2 Surface-level conventions
 
@@ -250,9 +256,11 @@ Defined in `src/@core/theme/index.ts`:
 ```ts
 shape: {
   borderRadius: 6,
-  customBorderRadius: { xs: 2, sm: 4, md: 6, lg: 8, xl: 10 }
+  customBorderRadius: { xs: 2, sm: 4, md: 6, lg: 8, xl: 10, xxl: 12, display: 16 }
 }
 ```
+
+**AXIS parity (TASK-1050)**: Figma fileKey `yyMksCoijfMaIoYplXKZaR`, node `11112:12362` (`Border Radius`) defines `xs=2`, `sm=4`, `md=6`, `lg=8`, `xl=10`, and `border-round=500`. Runtime maps `xs..xl` 1:1 to `theme.shape.customBorderRadius.*`; `border-round` maps to `9999px` for pills/capsules or `50%` for true circles. Greenhouse additionally defines `xxl=12` and `display=16` as governed runtime extensions for large surfaces, not AXIS upstream tokens.
 
 ### 5.1 Scale
 
@@ -263,6 +271,8 @@ shape: {
 | `theme.shape.customBorderRadius.md` | 6 | **Default — cards, tooltips** |
 | `theme.shape.customBorderRadius.lg` | 8 | Large cards, dialogs, **floating docks** |
 | `theme.shape.customBorderRadius.xl` | 10 | Hero cards (rare) |
+| `theme.shape.customBorderRadius.xxl` | 12 | Large support/editorial/internal documentation surfaces |
+| `theme.shape.customBorderRadius.display` | 16 | Display-scale support surfaces; never dense operational UI |
 | `9999px` | full pill | ContextChip display, avatar circles |
 
 ### 5.2 Usage matrix
@@ -276,6 +286,8 @@ shape: {
 | Popover / Menu | `md (6px)` | Match cards |
 | Autocomplete paper | `md (6px)` | Theme default |
 | Floating dock (sticky-bottom) | `lg (8px)` | Visually distinct from page content |
+| Support / documentation surface | `xxl (12px)` | More generous surface radius without becoming playful |
+| Display-scale internal surface | `display (16px)` | Large explanatory panel; not for tables, menus, inputs or dense cards |
 | Chip size='small' | `sm (4px)` | Tight |
 | Chip size='medium' | `md (6px)` | Default |
 | ContextChip (display-only pill) | `999px` (pill) | Display convention for filter/context bar |
@@ -289,7 +301,10 @@ shape: {
 
 - **NEVER** `sx={{ borderRadius: 2 }}` → this is `12px` (MUI multiplier). Use `sx={{ borderRadius: theme => theme.shape.customBorderRadius.lg }}` → 8px explicitly.
 - **NEVER** hardcode `borderRadius: '12px'` inline.
+- **NEVER** apply `xxl` / `display` as a blanket modernization pass. They require a large-surface rationale and visual review.
 - When in doubt, use `md (6px)`.
+
+Living reference (internal): `/admin/design-system/geometry` renders the spacing and radius scales from the active theme, including `xxl`/`display`, with GVC scenario `design-system-geometry`.
 
 ## 6. Elevation / shadow
 

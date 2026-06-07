@@ -18,6 +18,7 @@ Esta carpeta describe la **plataforma de ingeniería UI**. El **lenguaje visual 
 |---|---|
 | **Contrato agente (visual)** | `DESIGN.md` (raíz, lint-gated TASK-764) |
 | **Tokens visuales (extendido)** | [GREENHOUSE_DESIGN_TOKENS_V1.md](../GREENHOUSE_DESIGN_TOKENS_V1.md) · [GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md](../GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md) |
+| **Geometry foundations** | `/admin/design-system/geometry` (interno) · spacing `theme.spacing(N)` · radius `theme.shape.customBorderRadius.*` |
 | **Tipografía** | skill `typography-design` + `src/components/theme/typography-tokens.ts` (SoT) |
 | **Runtime (autoridad final)** | `src/components/theme/mergedTheme.ts` + `src/components/greenhouse/primitives/**` |
 | **Gobernanza de tokens (lifecycle)** | skill `design-system-governance` |
@@ -29,6 +30,7 @@ Regla: cuando un doc temático difiera del runtime, **gana el runtime** y el doc
 | Necesito… | Doc |
 |---|---|
 | Stack, librerías disponibles, sistema de componentes Vuexy, convenciones, anti-patrones | [STACK.md](./STACK.md) |
+| Spacing/radius runtime contract y lab vivo | [GREENHOUSE_DESIGN_TOKENS_V1.md](../GREENHOUSE_DESIGN_TOKENS_V1.md) §4-§5 · `/admin/design-system/geometry` |
 | Metodología Primitive+Variants+Kinds + catálogo de primitives (Sidecar, Floating Surface, Buttons, Chips, Chart cards, Loading, Microinteraction, Timeline, Summary docks…) | [PRIMITIVES.md](./PRIMITIVES.md) |
 | Estado de servidor (React Query) y de cliente | [STATE.md](./STATE.md) |
 | Formularios, calendario, fechas, rich text, drag&drop, file upload | [FORMS.md](./FORMS.md) |

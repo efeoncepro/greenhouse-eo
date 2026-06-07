@@ -108,6 +108,8 @@ rounded:
   md: 6px
   lg: 8px
   xl: 10px
+  xxl: 12px
+  display: 16px
   full: 9999px
 spacing:
   xs: 4px
@@ -393,6 +395,7 @@ PDF/email type adapters derive the role scale from the SoT — never re-hardcode
 
 Greenhouse favors predictable spacing and strong rhythm over visual tricks.
 
+- AXIS `Gap/Padding-N` maps to `theme.spacing(N)` (`4N px` visually). The AXIS sheet exposes `1..16 + 25`; product UI prefers the established rhythm (`1`, `1.5`, `2`, `3`, `4`, `5`, `6`, `8`, `10`, `12`) unless a concrete spec requires another available step.
 - `24px` is the default card padding and a common container rhythm
 - `16px` is the standard inner spacing step
 - `8px` is the compact inline gap
@@ -419,9 +422,12 @@ If a layout already communicates hierarchy with spacing and contrast, do not add
 
 Rounded corners are moderate and systematic.
 
+- AXIS `Border-Radius-{xs,sm,md,lg,xl}` maps to `theme.shape.customBorderRadius.{xs,sm,md,lg,xl}`.
 - `md` is the default for cards, fields, and common interactive surfaces
 - `lg` is reserved for floating or high-emphasis containers such as docks and dialogs
-- `full` is for pill treatments only
+- `xl` is for larger panels and previews when `lg` is too tight
+- `xxl` (`12px`) and `display` (`16px`) are Greenhouse extensions for large support/editorial/internal documentation surfaces. They are available in `theme.shape.customBorderRadius`, but they are not the default for dense operational cards, tables, menus, inputs, or chips.
+- `full` is for pill treatments only; use `9999px` for pills/capsules and `50%` for true circles, not the Figma `500px` literal.
 
 Do not introduce arbitrary radii or make the system softer than the token scale suggests. Greenhouse should feel modern and precise, not playful.
 

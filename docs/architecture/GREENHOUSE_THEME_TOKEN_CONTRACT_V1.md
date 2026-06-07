@@ -1,13 +1,27 @@
 # Greenhouse Theme Token Contract
 
 > **Tipo de documento:** Spec de arquitectura (contrato de decisiones)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-11 por Claude (TASK-368)
-> **Ultima actualizacion:** 2026-04-11
-> **Task origen:** TASK-368 — Theme Token Audit & Decision Contract
+> **Ultima actualizacion:** 2026-06-07
+> **Task origen:** TASK-368 — Theme Token Audit & Decision Contract; TASK-1050 — AXIS spacing/radius scale + design system lab
 > **Task padre:** TASK-264 — Greenhouse Theme Canonicalization (umbrella)
 
 ---
+
+## 0. Runtime geometry contract (TASK-1050)
+
+Este documento nacio como contrato de color/theme, pero la capa theme tambien gobierna geometry runtime. El contrato vigente para spacing/radius vive en `DESIGN.md` y `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`; este addendum deja el bridge de theme para evitar que agentes busquen valores en Figma y los peguen en JSX.
+
+| Concepto | Runtime SoT | Uso correcto |
+|---|---|---|
+| AXIS `Gap/Padding-N` | `src/@core/theme/spacing.ts` | `theme.spacing(N)`, `Stack spacing={N}`, `sx={{ p: N }}`, `sx={{ gap: N }}` |
+| AXIS `Border-Radius-xs..xl` | `src/@core/theme/index.ts` → `theme.shape.customBorderRadius.{xs,sm,md,lg,xl}` | `sx={theme => ({ borderRadius: \`${theme.shape.customBorderRadius.md}px\` })}` |
+| Greenhouse `Radius-xxl` | `theme.shape.customBorderRadius.xxl` | Large support/editorial/internal documentation surfaces |
+| Greenhouse `Radius-display` | `theme.shape.customBorderRadius.display` | Display-scale support surfaces; not dense operational UI |
+| AXIS `Border-Round` | no numeric theme token | `9999px` for pills/capsules or `50%` for true circles |
+
+Values: `xs=2`, `sm=4`, `md=6`, `lg=8`, `xl=10`, `xxl=12`, `display=16`. `xxl` and `display` are Greenhouse extensions, not AXIS upstream variables. Living internal reference: `/admin/design-system/geometry`.
 
 ## 1. Estado actual del sistema de color
 

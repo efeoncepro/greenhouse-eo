@@ -1,3 +1,17 @@
+# Sesion 2026-06-07 — TASK-1050 Geometry Lab iniciado
+
+Se inicio `TASK-1050` en `develop` sin cambiar de rama porque el worktree ya tenia cambios paralelos de `TASK-1049` (elevation). No se revirtio ni se edito ownership ajeno.
+
+- **Runtime:** `theme.shape.customBorderRadius` ahora incluye `xxl: 12` y `display: 16`; tipos MUI extendidos en `src/components/theme/types.ts`.
+- **Lab interno:** nueva ruta `/admin/design-system/geometry`, gateada igual que el Design System (`administracion.design_system`, clientes redirigen a `/401`). View: `GeometryLabView`.
+- **Contenido:** spacing AXIS `Gap/Padding 1..16 + 25` renderizado desde `theme.spacing(n)`; radius AXIS `xs..xl`, round (`9999px` / `50%`) y extension Greenhouse `xxl/display`; ejemplo vivo de `display` en superficie grande.
+- **Navegacion:** card "Geometry foundations" agregada en `DesignSystemView`; child route declarada en `route-reachability-manifest.ts`.
+- **GVC:** scenario nuevo `design-system-geometry`; captura local desktop+mobile OK en `.captures/2026-06-07T16-52-49_design-system-geometry`.
+- **Gates:** eslint focal OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm route-reachability-gate --strict` OK; `pnpm task:lint --task TASK-1050` OK; `pnpm ops:lint --changed` sin errores y con warnings preexistentes de registry parity de `TASK-1049`.
+- **Pendiente para cerrar TASK-1050:** sincronizar docs de contrato (`DESIGN.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md`, `ui-platform/*`) y cierre documental/changelog si se completa la task.
+
+---
+
 # Sesion 2026-06-07 — TASK-1049 elevation/shadow token system (in-progress, develop)
 
 Implementación del SoT semántico de elevación/sombra Greenhouse. Local-first en `develop` (sin branch, por instrucción del operador). ADR `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1` **Accepted 2026-06-07**.
