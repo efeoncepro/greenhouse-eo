@@ -17,8 +17,25 @@ Por pedido del operador de continuar primitives de microinteracciones aparte de 
 - **Scenario GVC:** `design-system-microinteractions`.
 - **GVC final:** `.captures/2026-06-06T23-46-53_design-system-microinteractions` desktop + mobile, `qualityFindings=[]`, revisado visualmente.
 - **Gates verdes:** eslint focal, vitest focal de primitives (18/18), `gtimeout 150s pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm design:lint`, `pnpm docs:closure-check` (warning advisory esperado por UI visible + GVC/docs cubiertos), `git diff --check`.
-- **Commit previo:** `8de60dd21 feat: add greenhouse microinteraction primitives` pusheado a `origin/develop` con AsyncActionButton, CommandFeedback y StateTransition.
-- **Pendiente:** correr GVC final + cierre para `GreenhouseInlineValidation`, luego commit+push por pedido del operador.
+- **Commits previos:** `8de60dd21 feat: add greenhouse microinteraction primitives`, `635bf0dfd feat: add inline validation microinteraction primitive` y `383a83528 fix: refine inline validation affordance` pusheados a `origin/develop`.
+- **Estado:** V1 base cerrada; V1.1 enterprise extension en progreso local.
+
+## Extension V1.1 — primitives enterprise en progreso local
+
+Por pedido del operador se agregaron cuatro primitives adicionales de microinteraccion con foco enterprise: procedencia de datos, progreso compacto, evidencia/upload y decision inline.
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseFieldProvenancePeek.tsx`.
+- **Contrato:** `source` (`integration/manual/calculated/override/seeded/fallback/system`), `confidence` (`verified/high/medium/low/unknown`), `freshness` (`live/recent/stale/partial/unknown`), variants `icon/chip/inline`, Floating UI no-modal, focus return, reference id/notas y data-capture.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseStepperProgressMicro.tsx`.
+- **Contrato:** steps con estados `pending/active/complete/warning/error/blocked`, variants `horizontal/vertical/compact`, live region, `aria-current='step'`, reduced-motion.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseEvidenceAttachmentDropzone.tsx`.
+- **Contrato:** estados `idle/dragging/uploading/scanning/verified/rejected/disabled`, variants `panel/compact`, progress, file summary, browse/replace/remove; no implementa endpoints ni negocio de vault/scan.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseInlineDecisionPrompt.tsx`.
+- **Contrato:** tones `info/warning/error/success/neutral`, states `idle/reviewing/submitting/confirmed/blocked`, variants `choice/confirmation/impact`, actions primaria/secundaria/terciaria y lista de impacto.
+- **Lab interno:** `/admin/design-system/microinteractions` actualizado con ejemplos de procedencia HubSpot/override/calculo, pipeline documental, payroll readiness, handoff externo, evidencia y prompts inline.
+- **Docs:** `GREENHOUSE_UI_PLATFORM_V1.md` v1.22, `project_context.md` y `changelog.md` sincronizados.
+- **GVC final:** `.captures/2026-06-07T00-16-32_design-system-microinteractions` desktop + mobile revisado. Ajustes aplicados tras GVC: procedencia como field row real, steppers/evidence/decisions con composicion de mayor ancho y decision prompts a ancho completo.
+- **Gates parciales verdes:** eslint focal, tsc focal/global, nuevas tests focales (18/18) y microinteraction suite (47/47). El operador pidio canonizar, documentar y hacer commit+push; cerrar con commit selectivo excluyendo cambios ajenos de maintenance.
 
 # Sesion 2026-06-06 — Sistema de tipografía CERRADO end-to-end (TASK-1038 + 4 follow-ups, pusheado)
 
