@@ -279,7 +279,12 @@ export default [
       // TASK-1038 — <Typography> debe usar un variant del SoT, nunca fontSize
       // inline. Modo warn (76 archivos legacy); promover a 'error' tras el
       // sweep. Scopeado a Typography → cero falsos positivos de íconos.
-      'greenhouse/no-fontsize-inline-typography': 'warn'
+      'greenhouse/no-fontsize-inline-typography': 'warn',
+      // Figma Implementation Contract — color HEX hardcodeado prohibido en UI
+      // de producto; mapear a theme.palette.*/theme.axis.*/var(--mui-palette-*).
+      // Modo warn inicial (deuda legacy); promover a 'error' tras el sweep,
+      // igual que el rollout de tipografía. Labs/theme/emails/pdf/mockup exentos.
+      'greenhouse/no-hardcoded-hex-color': 'warn'
     }
   },
 
@@ -345,7 +350,9 @@ export default [
     rules: {
       'greenhouse/no-hardcoded-fontfamily': 'off',
       'greenhouse/no-untokenized-copy': 'off',
-      'greenhouse/no-fontsize-inline-typography': 'off'
+      'greenhouse/no-fontsize-inline-typography': 'off',
+      // theme/tokens AXIS, emails y PDFs son las fuentes legítimas de HEX crudo.
+      'greenhouse/no-hardcoded-hex-color': 'off'
     }
   },
 
@@ -357,7 +364,9 @@ export default [
       greenhouse: greenhousePlugin
     },
     rules: {
-      'greenhouse/no-fontsize-inline-typography': 'off'
+      'greenhouse/no-fontsize-inline-typography': 'off',
+      // los mockups documentan AS-IS↔TO-BE con valores crudos a propósito.
+      'greenhouse/no-hardcoded-hex-color': 'off'
     }
   },
 
@@ -373,7 +382,10 @@ export default [
     },
     rules: {
       'greenhouse/no-untokenized-copy': 'off',
-      'greenhouse/no-fontsize-inline-typography': 'off'
+      'greenhouse/no-fontsize-inline-typography': 'off',
+      // los labs internos renderizan ramps/specimens AXIS con HEX crudo como
+      // documentación del sistema (la galería de color). Off ahí.
+      'greenhouse/no-hardcoded-hex-color': 'off'
     }
   },
 
