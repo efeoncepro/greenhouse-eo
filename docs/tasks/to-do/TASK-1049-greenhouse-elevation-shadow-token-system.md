@@ -37,6 +37,7 @@ Esta task convierte el hallazgo en un contrato operativo: token runtime, docs, t
 - Definir un SoT runtime de elevacion Greenhouse con roles semanticos pequenos y estables.
 - Migrar `GreenhouseFloatingSurface` desde `Paper elevation={6}` a `Paper elevation={0}` + token semantico.
 - Documentar el contrato en `DESIGN.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md` y UI Platform.
+- Crear una **pagina viva de design system** (`/admin/design-system/elevation`) que documente los tokens de shadow/elevacion (specimen vivo por rol, light/dark, nota forced-colors), espejo de las paginas de typography y motion.
 - Verificar con tests + GVC desktop/mobile que Floating Surface se ve enterprise y mantiene a11y/behavior.
 - Dejar claro que `theme.shadows[n]` y `customShadows` son infraestructura/compat, no la API semantica para primitives nuevas.
 
@@ -100,6 +101,10 @@ Reglas obligatorias:
 - `src/components/greenhouse/primitives/floating-surface-controller.ts`
 - `src/components/greenhouse/primitives/__tests__/GreenhouseFloatingSurface.test.tsx`
 - `src/views/greenhouse/admin/design-system/floating-surfaces/**` si el lab necesita specimen/legend
+- `src/app/(dashboard)/admin/design-system/elevation/**` (nueva pagina viva de tokens de elevacion)
+- `src/views/greenhouse/admin/design-system/elevation/**` (view de la pagina)
+- migracion seed de `VIEW_REGISTRY` si la pagina requiere viewCode nuevo (gobernanza TASK-827)
+- entrada de nav / indice design system para route-reachability (TASK-982)
 - `DESIGN.md`
 - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`
 - `docs/architecture/GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1.md`
@@ -201,14 +206,22 @@ Reglas obligatorias:
   - GVC data hooks.
 - Actualizar tests existentes para cubrir el nuevo contrato.
 
-### Slice 3 — Lab + GVC visual calibration
+### Slice 3 — Design system page + lab + GVC visual calibration
 
-- Actualizar `/admin/design-system/floating-surfaces` para mostrar que el surface usa elevation semantica.
-- Si no existe una seccion de elevation, agregar un specimen minimo dentro del lab actual. No crear una pagina nueva si el alcance se puede mantener compacto.
+- **Crear pagina viva dedicada `/admin/design-system/elevation`** (entregable requerido, NO follow-up), espejo de las paginas de typography (`/admin/design-system/typography/mockup`) y motion (`/admin/design-system/motion`):
+  - render vivo de cada rol (`none`, `raised`, `floating`, `overlay`, `modal`; `overflow` mostrado como reservado) leyendo el SoT desde el theme — NUNCA valores route-locales hardcodeados;
+  - cada specimen muestra: nombre del rol, boxShadow resuelto, border, uso permitido y prohibido (mismo contenido que la tabla Role semantics);
+  - light + `darkSemi` lado a lado;
+  - nota visible de la regla `forced-colors` (border carga la separacion);
+  - **INTERNA**: gate `administracion.design_system` (route_group `internal`, NUNCA `client_*`) + redirect defensivo si `tenantType==='client'`, igual que la pagina AXIS/typography;
+  - **alcanzable por nav** (route-reachability TASK-982) — agregar entrada de nav o link desde el indice del design system; NO ruta huerfana;
+  - si la pagina necesita un viewCode nuevo en `VIEW_REGISTRY`, acompañar con migracion seed en el mismo PR (gobernanza TASK-827). Por defecto reusa `administracion.design_system` — verificar en Plan Mode.
+- Actualizar `/admin/design-system/floating-surfaces` para mostrar que el surface usa elevation semantica (consumidor real, complementa la pagina de tokens).
 - Ejecutar GVC:
   - desktop;
   - mobile;
-  - near-edge/collision scenario;
+  - pagina `/admin/design-system/elevation` (specimen de todos los roles, light + dark);
+  - near-edge/collision scenario (floating-surfaces);
   - keyboard open/close si el scenario ya lo cubre.
   - dark mode (`darkSemi`) si el scenario lo cubre;
   - `forced-colors`/high-contrast: verificar (al menos manualmente, emulando en DevTools) que con `box-shadow` removido el surface sigue separado por el border.
@@ -360,7 +373,7 @@ Slice 2 no puede correr antes de Slice 1. Slice 4 no puede cerrar antes de que S
 |---|---|---|---|
 | Slice 1 | revertir modulo de tokens y tests | <5 min | si |
 | Slice 2 | revertir diff de `GreenhouseFloatingSurface` a `elevation={6}` | <5 min | si |
-| Slice 3 | revertir lab/specimen updates | <5 min | si |
+| Slice 3 | revertir pagina `/admin/design-system/elevation` + lab/specimen updates (+ migracion seed si la hubo) | <10 min | si |
 | Slice 4 | revertir docs o marcar ADR superseded/proposed nuevamente | <10 min | si |
 | Slice 5 | N/A, solo clasificacion | N/A | si |
 
@@ -397,6 +410,8 @@ Slice 2 no puede correr antes de Slice 1. Slice 4 no puede cerrar antes de que S
 - [ ] `GreenhouseFloatingSurface` ya no usa `Paper elevation={6}` ni `theme.shadows[n]` directo.
 - [ ] Floating Surface consume `floating` semantic elevation por defecto.
 - [ ] Ninguna sombra del sistema supera `0 8px 24px rgba(0,0,0,0.1)` (techo anti-dated).
+- [ ] Existe pagina viva `/admin/design-system/elevation` que documenta todos los roles de shadow/elevacion (specimen vivo desde el theme, light/dark, nota forced-colors), INTERNA (gate `administracion.design_system`, nunca client) y alcanzable por nav (TASK-982).
+- [ ] Si la pagina requiere viewCode nuevo, la migracion seed `VIEW_REGISTRY` esta en el mismo PR (TASK-827).
 - [ ] Lab `/admin/design-system/floating-surfaces` refleja el contrato o specimen vivo.
 - [ ] GVC desktop + mobile revisado manualmente; resultado aceptado visualmente.
 - [ ] `DESIGN.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md`, `ui-platform/PRIMITIVES.md`, `ui-platform/HISTORIAL.md` sincronizados.
@@ -430,8 +445,8 @@ Slice 2 no puede correr antes de Slice 1. Slice 4 no puede cerrar antes de que S
 ## Follow-ups
 
 - Posible lint rule `greenhouse/no-direct-mui-elevation-in-primitives` si el audit Slice 5 encuentra uso directo repetido.
-- Posible pagina dedicada `/admin/design-system/elevation` si el sistema crece mas alla del specimen de Floating Surface.
 - Posible migracion de Dialog/Drawer/Dock a tokens `modal`/`overlay` cuando exista evidencia.
+- (La pagina viva `/admin/design-system/elevation` paso a scope en Slice 3 — ya no es follow-up.)
 
 ## Open Questions
 

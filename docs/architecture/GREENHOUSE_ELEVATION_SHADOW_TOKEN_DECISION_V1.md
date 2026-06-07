@@ -89,7 +89,7 @@ When this decision is accepted and implemented, the following docs must move tog
 - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` §6: semantic role table and migration guidance.
 - `docs/architecture/ui-platform/PRIMITIVES.md`: Floating Surface consumes semantic elevation.
 - `docs/architecture/ui-platform/HISTORIAL.md`: append-only delta.
-- `/admin/design-system/floating-surfaces` or equivalent lab surface: show the live token usage after implementation.
+- **A dedicated live design-system page `/admin/design-system/elevation`** must be created — mirror of the typography (`/admin/design-system/typography/mockup`) and motion (`/admin/design-system/motion`) pages — rendering every elevation role live from the theme (light + `darkSemi`, forced-colors note). It is INTERNAL (gated `administracion.design_system`, never `client_*`) and must be reachable by nav (route-reachability, TASK-982). The `/admin/design-system/floating-surfaces` lab is updated as the real consumer, complementing — not replacing — the token page.
 
 If a future task adds or changes a role, it must update the runtime SoT and these docs in the same PR.
 
