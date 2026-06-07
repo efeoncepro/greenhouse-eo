@@ -50,6 +50,13 @@ La causa raiz es que el contrato `approval_delegate` es demasiado amplio para pe
 - Agregar observabilidad para detectar cualquier snapshot de permiso delegado que viole la politica canonica.
 - Si se toca UX visible, hacerlo con skills de product design y loop GVC obligatorio; no cerrar UI sin captura mirada y evidencia en `.captures/`.
 
+## Goal
+
+- Definir y aplicar una politica per-stage que impida que `approval_delegate` generico transfiera autoridad de aprobacion de permisos accidentalmente.
+- Remediar responsabilidades/snapshots vivos con comandos auditados, idempotentes y verificables, preservando trazabilidad de antes/despues.
+- Endurecer resolver, access scope, tests y observabilidad para prevenir recurrencia en `leave`, `expense_report` y `performance_evaluation`.
+- Mantener UX y copy honestos si se toca UI visible, con estados de autoridad claros y verificacion GVC.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
@@ -283,8 +290,10 @@ Reglas obligatorias:
 
 - Tests unitarios del resolver:
   - reporte formal sin delegacion: effective=formal;
-  - reporte formal con `approval_delegate` generico activo: para `leave.supervisor_review`, effective=formal;
-  - otro workflow que siga soportando delegacion generica, si existe y se confirma en arquitectura, conserva comportamiento;
+  - reporte formal con `approval_delegate` generico activo: para `leave.supervisor_review`, effective=formal y `authoritySource != 'delegation'`;
+  - mismo escenario para `expense_report.supervisor_review` y `performance_evaluation.supervisor_review` segun la decision de Slice 1 (con default `honorGenericApprovalDelegate=false`, effective=formal en los tres);
+  - si la decision conserva delegacion generica para algun stage (`honorGenericApprovalDelegate=true`), un test pin-ea explicitamente ese comportamiento legacy;
+  - `getEffectiveSupervisor(memberId, { delegationPolicy: 'generic' })` sigue devolviendo el delegado (no romper el contrato del reader para callers que lo pidan explicito);
   - ausencia de supervisor formal falla con error/estado honesto existente.
 - Tests de `leave-review-policy`:
   - Daniela puede aprobar solicitud de Andres cuando snapshot effective=formal;
@@ -303,16 +312,18 @@ Reglas obligatorias:
 
 ### Slice 7 - UX truthfulness only if touched
 
-- Si la solucion toca UI visible, antes de escribir JSX nuevo invocar skills de product design aplicables y documentar el criterio:
-  - `greenhouse-product-ui-architect` o skill Product Design equivalente;
-  - `greenhouse-ux-content-accessibility`;
-  - `greenhouse-vuexy-ui-expert` si se modifica shell/Vuexy/MUI;
+- Si la solucion toca UI visible, antes de escribir JSX nuevo invocar las skills de product design que apliquen y documentar el criterio (usar los nombres reales del repo):
+  - `greenhouse-ux` (layout + seleccion de componente Vuexy/MUI + tokens) y `greenhouse-product-ui-architect`;
+  - `state-design` — es el nucleo de este slice: el problema no es "falta un boton" sino comunicar honestamente el ESTADO de autoridad (readonly/locked/empty con causa), distinguiendo "pendiente de otra persona" de "no tienes autoridad" sin estado ambiguo;
+  - `greenhouse-ux-writing` para microcopy es-CL (tuteo) accionable;
+  - `modern-ui` para jerarquia/tipografia/spacing si se ajusta layout;
   - `greenhouse-microinteractions-auditor` si se agregan estados o feedback.
-- Cualquier UI debe evitar el diagnostico falso "no tienes boton" y explicar estados de autoridad de forma accionable:
-  - "Pendiente de Daniela Ferreira";
-  - "Delegacion operacional no valida para permisos";
-  - "Solicita a HR revisar la linea de reporte o la politica de aprobacion", si aplica.
-- Si se toca UI, extraer copy reutilizable a `src/lib/copy/` o nomenclatura canonica segun AGENTS.
+- Aplicar el patron canonico de estados (state-design): la pantalla NUNCA debe colapsar a un vacio/disabled ambiguo. Estados honestos esperados:
+  - actor es el aprobador efectivo -> accion habilitada;
+  - actor ve la solicitud pero el aprobador es otro -> readonly + "Pendiente de Daniela Ferreira" (no boton muerto);
+  - actor sin autoridad y sin relacion -> no se muestra como accionable (server-side deny, sin oraculo de existencia);
+  - delegacion invalida detectada -> mensaje accionable "Solicita a HR revisar la linea de reporte o la politica de aprobacion".
+- Si se toca UI, extraer copy reutilizable a `src/lib/copy/` o nomenclatura canonica segun AGENTS (validado con `greenhouse-ux-writing`).
 - Verificar con GVC en loop:
   - captura antes/despues si existe baseline;
   - `pnpm fe:capture --route=/hr/approvals --env=staging`;
@@ -349,25 +360,33 @@ Reglas obligatorias:
 
 ### Policy V1 propuesta
 
-Para permisos:
+La politica vive per-stage en `ApprovalStageDefinition`, no como un caso especial de leave. Campo nuevo (default `false`):
 
 ```ts
-type LeaveSupervisorApprovalPolicy = {
-  workflow: 'leave'
-  stage: 'supervisor_review'
-  formalApproverSource: 'reporting_lines.current_supervisor'
-  effectiveApproverSource: 'formal_supervisor'
-  honorGenericApprovalDelegate: false
-  allowedOverrides: ['hr_admin_capability', 'hr_manager_capability']
+interface ApprovalStageDefinition {
+  // ...campos actuales
+  resolutionStrategy: 'effective_supervisor' | 'role_fallback'
+  honorGenericApprovalDelegate?: boolean // default tratado como false
 }
 ```
 
-Invariante:
+Aplicado a los stages `effective_supervisor` (decision Slice 1; default recomendado `false` en los tres):
 
 ```ts
-if (workflow === 'leave' && stage === 'supervisor_review') {
-  effectiveApproverMemberId = formalApproverMemberId
-}
+leave.supervisor_review:                 { honorGenericApprovalDelegate: false }
+expense_report.supervisor_review:        { honorGenericApprovalDelegate: false }
+performance_evaluation.supervisor_review:{ honorGenericApprovalDelegate: false }
+```
+
+Invariante en el resolver (generico, no hardcodeado a leave):
+
+```ts
+const honorDelegate = stage.honorGenericApprovalDelegate === true
+const effectiveSupervisor = await getEffectiveSupervisor(subjectMemberId, {
+  delegationPolicy: honorDelegate ? 'generic' : 'ignore'
+})
+// con delegationPolicy='ignore', effectiveApproverMemberId === formalApproverMemberId
+// y authoritySource !== 'delegation'
 ```
 
 Un `approval_delegate` generico puede seguir existiendo para otras responsabilidades operacionales si un doc vigente lo justifica, pero no puede cambiar autoridad de permisos. Si el producto necesita delegaciones de permisos mas adelante, deben nacer con un contrato separado:
@@ -455,6 +474,15 @@ La remediacion y el cambio de autoridad deben existir como primitive/command reu
 - command dry-run/apply;
 - event/audit output;
 - tests.
+
+### Architecture 4-Pillar Assessment
+
+| Pilar | Como lo cubre esta task |
+|---|---|
+| Safety | Autoridad de aprobacion deja de derivar de una responsabilidad operacional generica; queda gateada por reporting_lines + override por capability HR/admin. El recovery apply requiere actor con capability administrativa + allowlist en production. Se cierra el segundo plano (visibilidad) para que una delegacion invalida no exponga el equipo del supervisor. Server-side deny; no se confia en `session.user.supervisorAccess` client-side. |
+| Robustness | Fix en capa de config per-stage (declarativo) evita drift inverso al agregar workflows. Recovery transaccional, idempotente, solo sobre estados pendientes, no toca terminales. Recompute via resolver canonico (SSOT) evita divergencia runtime/recovery. Falla del apply deja datos sin cambiar. |
+| Resilience | Senal steady=0 (`hr.leave.invalid_delegated_approval_snapshots`, parametrizada por stage) detecta recurrencia. Flag break-glass server-side opcional con owner + fecha de retiro. Runbook con dry-run/apply/verify. Rollback per-slice declarado. |
+| Scalability | El contrato per-stage escala a cualquier workflow nuevo `effective_supervisor` sin codigo nuevo (solo declara su flag). La senal parametrizada cubre N workflows con una sola query. El recovery filtra por supervisor/responsibility/leaveRequest, no full-table. |
 
 ## Rollout Plan & Risk Matrix
 
