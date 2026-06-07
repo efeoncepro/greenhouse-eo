@@ -139,7 +139,8 @@ const TrendTooltip = ({ active, payload, title, format, accent }: TrendTooltipPr
         bgcolor: 'background.paper',
         border: t => `1px solid ${t.palette.divider}`,
         borderRadius: t => `${t.shape.customBorderRadius.sm}px`,
-        boxShadow: 'var(--mui-customShadows-sm)'
+        // Semantic elevation (TASK-1052): anchored chart tooltip → `floating`.
+        boxShadow: t => t.greenhouseElevation.floating.boxShadow
       }}
     >
       <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 0.5 }}>

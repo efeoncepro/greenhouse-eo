@@ -89,7 +89,8 @@ const DistributionTooltip = ({
         bgcolor: 'background.paper',
         border: theme => `1px solid ${theme.palette.divider}`,
         borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
-        boxShadow: 'var(--mui-customShadows-sm)'
+        // Semantic elevation (TASK-1052): anchored chart tooltip → `floating`.
+        boxShadow: theme => theme.greenhouseElevation.floating.boxShadow
       }}
     >
       <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
@@ -205,7 +206,8 @@ const GreenhouseStackedDistributionChartCard = ({
         maxWidth: GREENHOUSE_CHART_CHROME_TOKENS.card.compactMaxInlineSize,
         borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
         border: theme => `1px solid ${alpha(theme.palette.divider, GREENHOUSE_CHART_CHROME_TOKENS.opacity.border)}`,
-        boxShadow: 'var(--mui-customShadows-md)',
+        // Semantic elevation (TASK-1052): resting chart card container → `raised`.
+        boxShadow: theme => theme.greenhouseElevation.raised.boxShadow,
         overflow: 'hidden'
       }}
     >

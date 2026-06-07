@@ -13,17 +13,17 @@
 //
 // Governed surface (rule active): src/components/greenhouse/primitives/**.
 //
-// Detects two patterns:
+// Detects (TASK-1051 + TASK-1052):
 //   1. `elevation={<n>}` with n >= 1 (JSX attribute). `elevation={0}` is allowed
 //      (the canonical "no MUI shadow, depth from the token" form).
 //   2. `theme.shadows[...]` / `t.shadows[...]` member access (the numeric scale).
+//   3. `theme.customShadows.*` member access (the Vuexy custom-shadow layer).
+//   4. `var(--mui-customShadows-*)` strings (the Vuexy custom-shadow CSS vars).
 //
-// NOT flagged (out of TASK-1051 scope — kept off `error` to avoid breaking
-// legitimate Vuexy-compat callsites):
-//   - `var(--mui-customShadows-*)` strings and `theme.customShadows.*` (the Vuexy
-//     compat layer; chart cards still use it — a future sweep migrates those).
+// NOT flagged (legitimate):
 //   - bespoke directional `boxShadow` strings (e.g. the ContextualSidecar
 //     `adaptive` lane shadow) — a symmetric role can't express a directional cast.
+//   - any of the above OUTSIDE primitives (views/app/Vuexy keep them as compat).
 //
 // Allowed (rule inactive): test/spec files + this rule's own tests.
 //
@@ -69,6 +69,10 @@ const ELEVATION_MESSAGE = `\`elevation={n}\` (n>=1) in a Greenhouse primitive us
 
 const SHADOWS_MESSAGE = `\`theme.shadows[...]\` in a Greenhouse primitive uses the generic MUI numeric shadow scale. ${HELPER_HINT}`
 
+const CUSTOM_SHADOWS_MESSAGE = `\`customShadows\` (\`theme.customShadows.*\` / \`var(--mui-customShadows-*)\`) in a Greenhouse primitive uses the Vuexy compat shadow layer. ${HELPER_HINT}`
+
+const CUSTOM_SHADOWS_VAR_REGEX = /var\(\s*--mui-customShadows-/
+
 export default {
   meta: {
     type: 'problem',
@@ -99,16 +103,39 @@ export default {
       },
 
       // 2. `theme.shadows` / `t.shadows` member access (the numeric scale)
+      // 3. `theme.customShadows` / `t.customShadows` member access (Vuexy layer)
       MemberExpression(node) {
         if (
-          !node.computed &&
-          node.property &&
-          node.property.type === 'Identifier' &&
-          node.property.name === 'shadows' &&
-          node.object &&
-          node.object.type === 'Identifier'
+          node.computed ||
+          !node.property ||
+          node.property.type !== 'Identifier' ||
+          !node.object ||
+          node.object.type !== 'Identifier'
         ) {
+          return
+        }
+
+        if (node.property.name === 'shadows') {
           context.report({ node, message: SHADOWS_MESSAGE })
+        } else if (node.property.name === 'customShadows') {
+          context.report({ node, message: CUSTOM_SHADOWS_MESSAGE })
+        }
+      },
+
+      // 4. `var(--mui-customShadows-*)` string literals
+      Literal(node) {
+        if (typeof node.value === 'string' && CUSTOM_SHADOWS_VAR_REGEX.test(node.value)) {
+          context.report({ node, message: CUSTOM_SHADOWS_MESSAGE })
+        }
+      },
+
+      // 4b. same inside template literals (e.g. `... var(--mui-customShadows-md) ...`)
+      TemplateLiteral(node) {
+        for (const quasi of node.quasis) {
+          if (quasi.value && typeof quasi.value.raw === 'string' && CUSTOM_SHADOWS_VAR_REGEX.test(quasi.value.raw)) {
+            context.report({ node: quasi, message: CUSTOM_SHADOWS_MESSAGE })
+            break
+          }
         }
       }
     }

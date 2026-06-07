@@ -46,6 +46,11 @@ ruleTester.run('greenhouse/no-direct-mui-elevation-in-primitives', rule, {
       name: 'view surface is not governed by this rule'
     },
     {
+      code: "const sx = { boxShadow: 'var(--mui-customShadows-sm)' }",
+      filename: '/repo/src/views/greenhouse/finance/SomeView.tsx',
+      name: 'customShadows in a view is compat (not governed)'
+    },
+    {
       code: 'const x = <Paper elevation={6} />',
       filename: '/repo/src/@core/components/customizer/index.tsx',
       name: 'Vuexy @core is legacy/allowed'
@@ -81,6 +86,24 @@ ruleTester.run('greenhouse/no-direct-mui-elevation-in-primitives', rule, {
       filename: PRIMITIVE,
       errors: 1,
       name: 't.shadows[2] in a primitive is flagged'
+    },
+    {
+      code: "const sx = { boxShadow: 'var(--mui-customShadows-sm)' }",
+      filename: PRIMITIVE,
+      errors: 1,
+      name: 'var(--mui-customShadows-sm) string in a primitive is flagged (TASK-1052)'
+    },
+    {
+      code: 'const sx = (theme) => ({ boxShadow: theme.customShadows.md })',
+      filename: PRIMITIVE,
+      errors: 1,
+      name: 'theme.customShadows.md member in a primitive is flagged (TASK-1052)'
+    },
+    {
+      code: 'const sx = (t) => ({ boxShadow: `0 0 0 var(--mui-customShadows-lg)` })',
+      filename: PRIMITIVE,
+      errors: 1,
+      name: 'customShadows var inside template literal quasi is flagged (TASK-1052)'
     }
   ]
 })
