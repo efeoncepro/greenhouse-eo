@@ -18,8 +18,14 @@ Implementación del SoT semántico de elevación/sombra Greenhouse. Local-first 
 
 - **Open Questions resueltas pre-ejecución:** (Q#2) derivación = composición propia en `elevation-tokens.ts` sobre el canal canónico `var(--mui-mainColorChannels-${mode}Shadow)` (mismo que `shadows.ts`/`customShadows.ts`, AXIS-aware, light/dark), NO reuse de `customShadows.md/lg` (quedan compat Vuexy). (Q#3) cada rol es factory mode-aware (alpha light≠dark) + `borderColor` obligatorio en floating/overlay/modal (carga separación bajo `forced-colors` + compensa sombra débil en dark). (Drift) runtime real = `light`/`dark` (NO `darkSemi` — la skill overlay estaba desactualizada; runtime gana).
 - **Decisión de restraint:** NO se agrega campo `elevationRole` al `floating-surface-controller` — los 6 variants son visualmente idénticos y comparten `floating`. Abstracción por-variant es follow-up documentado solo si un variant lo necesita (mismo criterio que `overflow` reservado).
-- **Slice 0 (este commit):** lifecycle `in-progress`, ADR `Accepted`, `DECISIONS_INDEX` + README sync. Sin migración (viewCode `administracion.design_system` reusado, TASK-1034). Sin capability/event/signal nuevos.
-- **Pendiente:** Slice 1 (SoT + theme injection + drift-guard), Slice 2 (FloatingSurface cutover), Slice 3 (página `/admin/design-system/elevation` + GVC), Slice 4 (docs), Slice 5 (audit).
+- **Slice 0:** ADR `Accepted`, lifecycle `in-progress`, `DECISIONS_INDEX` + README. Sin migración (viewCode `administracion.design_system` reusado, TASK-1034). Sin capability/event/signal nuevos.
+- **Slice 1:** SoT `src/components/theme/elevation-tokens.ts` (factory mode-aware, 6 roles) + inyección `mergedTheme.ts` (`theme.greenhouseElevation`) + augmentation `types.ts` + `render.tsx` test theme. Tests: focal (11) + drift-guard (16, paridad 3-capas). DESIGN.md §Elevation + V1 §6 → roles (numérica = §6.1 legacy).
+- **Slice 2:** `GreenhouseFloatingSurface` `elevation={6}`→`{0}` + `theme.greenhouseElevation.floating` (boxShadow + border). Test anti-regresión no-`elevation6`. 6 variants comparten `floating` (sin campo controller — restraint).
+- **Slice 3:** página viva `/admin/design-system/elevation` (gate `administracion.design_system`, AxisWordmark, 100% tokenizada — fix de hardcodes flagged por Julio: borderRadius hack, `<Code>` tokenizado, h4) + card DesignSystemView + route-reachability. GVC local verde (lab + floating-surface-primitives: sombra `floating` enterprise doble-capa+hairline).
+- **Slice 4:** docs — PRIMITIVES.md, HISTORIAL.md (Delta 2026-06-07k), CLAUDE.md invariante, changelog.
+- **Slice 5:** audit `rg` — FloatingSurface migrado ✓; `@core/customizer` legacy read-only (allowed); **follow-up** (fuera de scope): `InlineNumericEditor` (elevation={6}), `ContextChip`/`MetricTrendCard`/`ContextualSidecar` (`theme.shadows[n]`) → migrar a roles + evaluar lint rule `greenhouse/no-direct-mui-elevation-in-primitives`.
+- **Gate de cierre:** `pnpm test` + `pnpm build` (en curso). Push a develop al cerrar.
+- **Pendiente menor:** captura GVC dark mode explícita (contrato dark cubierto por border obligatorio + tests).
 
 ---
 

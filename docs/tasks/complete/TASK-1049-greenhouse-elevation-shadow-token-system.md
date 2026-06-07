@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -25,6 +25,19 @@
 ## Summary
 
 Crear el sistema semantico Greenhouse de elevacion/sombra para que primitives y overlays no dependan de indices MUI (`elevation={6}` / `theme.shadows[n]`) ni de sombras Vuexy escogidas a ojo. El primer consumidor obligatorio es `GreenhouseFloatingSurface`, que debe dejar de usar `Paper elevation={6}` y consumir un token semantico `floating` con evidencia GVC before/after.
+
+## Delta 2026-06-07 — Implementación completa (slices 0-5)
+
+SHIPPED en `develop` (local-first, sin branch por instrucción del operador). ADR **Accepted**.
+
+- **Slice 0** — ADR Proposed→Accepted, lifecycle in-progress, DECISIONS_INDEX + README. Open Questions resueltas: derivación propia sobre canal `var(--mui-mainColorChannels-${mode}Shadow)` (NO `customShadows.md/lg`); factory mode-aware + border obligatorio forced-colors; runtime real `light`/`dark` (no existe `darkSemi`).
+- **Slice 1** — SoT `src/components/theme/elevation-tokens.ts` (6 roles, factory mode-aware) + `theme.greenhouseElevation` en `mergedTheme.ts` + augmentation `types.ts` + `render.tsx` (test theme). Tests focal (11) + drift-guard (16, paridad 3-capas). DESIGN.md §Elevation + V1 §6 → roles; numérica = §6.1 legacy.
+- **Slice 2** — `GreenhouseFloatingSurface` `elevation={6}`→`{0}` + `theme.greenhouseElevation.floating`. Test anti-regresión. 6 variants comparten `floating` (sin campo `elevationRole` en controller — restraint; follow-up si un variant lo necesita).
+- **Slice 3** — página viva `/admin/design-system/elevation` (gate `administracion.design_system`, AxisWordmark, 100% tokenizada) + card DesignSystemView + route-reachability. GVC local verde.
+- **Slice 4** — docs: PRIMITIVES.md, HISTORIAL.md (Delta 2026-06-07k), CLAUDE.md invariante, changelog.
+- **Slice 5** — audit `rg`: FloatingSurface migrado ✓; `@core/components/customizer` es Vuexy read-only (legacy allowed). **Follow-up (fuera de scope, no migrado en esta task)**: `InlineNumericEditor.tsx` (`elevation={6}`), `ContextChip.tsx` (`theme.shadows[6]`), `MetricTrendCard.tsx` (`theme.shadows[4]`), `ContextualSidecar.tsx` (`theme.shadows[2]`) → migrar a roles semánticos + evaluar lint rule `greenhouse/no-direct-mui-elevation-in-primitives` (modo error solo después de migrarlos).
+- **Gate de cierre**: `pnpm test` (6407 passed, 0 failed) + `pnpm build`. drift 27/27 · floating-surface 24/24 · design:lint 0/0 · route-gate 0 orphans · tsc/eslint 0.
+- **Pendiente menor**: evidencia GVC dark mode explícita (contrato dark cubierto por border obligatorio + tests + factory mode-aware).
 
 ## Why This Task Exists
 
