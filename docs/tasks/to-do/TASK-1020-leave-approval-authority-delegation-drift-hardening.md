@@ -197,10 +197,21 @@ Reglas obligatorias:
 
 ### Slice 1 - Decision contract and architecture delta
 
+#### Decisiones V1 canonicas (resueltas con skills arch-architect + product design, 2026-06-07)
+
+Las cuatro convergen en un solo movimiento canonico: **el `approval_delegate` generico, en V1, NO confiere ni autoridad ni scope para las superficies de aprobacion**; la cobertura real (autoridad y/o visibilidad) renace como contrato domain-scoped explicito en un ADR follow-up. El caso vivo se cierra revocando globalmente.
+
+- **D1 — Delegacion de permisos: bloqueada en V1.** `leave.supervisor_review` NO honra el `approval_delegate` generico como fuente de autoridad efectiva. La delegacion real de aprobacion de permisos (ej. cobertura por vacaciones) es un contrato SEPARADO domain-scoped (workflow/stage/scope + expiracion + actor/reason + elegibilidad + audit + UI honesta + signal), follow-up con ADR propio. Interin: override HR/admin existente. Rationale: aprobar un permiso es acto sensible (saldos/payroll/registro laboral); la primitiva generica no tiene expiry/actor/reason/elegibilidad. Pilar Safety+Robustness.
+- **D2 — Clase, no instancia: los tres stages `effective_supervisor` con `honorGenericApprovalDelegate=false`** (`leave`, `expense_report`, `performance_evaluation`). Ninguno tiene contrato domain-scoped; aprobar reembolsos = autoridad financiera y aprobar evaluaciones = autoridad HR, ambas al menos tan sensibles como un permiso. Leave-only seria parchar el sintoma (viola Solution Quality Contract). **Gate de seguridad:** el flip de expense/perf se condiciona a que la senal parametrizada (Slice 5) muestre 0 snapshots delegados activos legitimos en esos workflows; si aparece alguno, investigar caso por caso antes del flip. Pilar Robustness+Scalability.
+- **D3 — Scope/visibilidad: NO half-decouple en V1.** El delegate generico deja de conferir autoridad Y scope para las superficies endurecidas (`access.ts` `getSupervisorScopeForTenant` no cuenta `approval_delegate` generico hacia `canAccessSupervisorLeave`/`visibleMemberIds` de la superficie de aprobacion). Conferir visibilidad-sin-autoridad sobre un artefacto no validado sigue siendo over-exposure (principio TASK-987/ISSUE-083: el predicado de validez se mueve junto para TODO lo derivado) y produce el estado deshonesto que la task evita (ver pila read-only no accionable = ruido + privacidad). Daniela conserva su workspace por `hasDirectReports`, no por delegacion → no se rompe nada. El desacople deliberado "ver pero no aprobar" (coverage viewer con copy claro) se difiere al mismo contrato domain-scoped de D1, opt-in por dimension (`confersApprovalAuthority` / `confersVisibilityScope`). Pilar Safety + UX honesta.
+- **D4 — Caso vivo `resp-2de74ab9-...`: revocar globalmente** (lifecycle/audit append-only, nunca DELETE), no neutralizar solo-permisos. Sin actor/reason, reasignada multiples veces sobre el mismo scope = drift, no politica. Neutralizar solo leave la dejaria confiriendo expense/perf + visibilidad del equipo de Daniela sin base validada (misma clase de over-exposure). Revocar globalmente resuelve D3 para el caso vivo automaticamente (Valentina pierde autoridad y scope). **Confirmado por el operador (CEO) el 2026-06-07** — no requiere signoff adicional de HR/Finance.
+
+#### Tareas de Slice 1
+
 - Confirmar y documentar la politica canonica V1: `leave.supervisor_review` NO honra `greenhouse_core.operational_responsibilities.responsibility_type='approval_delegate'` generico como fuente de autoridad efectiva.
-- Decidir explicitamente los OTROS dos stages `effective_supervisor` que consumen el mismo delegate generico (`expense_report.supervisor_review`, `performance_evaluation.supervisor_review`). Recomendacion por default: tambien `honorGenericApprovalDelegate: false`, porque ninguno tiene contrato de delegacion domain-scoped validado; un delegate generico tampoco deberia transferir su autoridad. Si por alguna razon historica uno de ellos debe conservar el comportamiento legacy, documentar el por que con doc vigente.
-- Decidir el SEGUNDO plano (visibilidad/scope): si un `approval_delegate` generico debe seguir confiriendo supervisor workspace scope (`getSupervisorScopeForTenant`) cuando ya NO confiere autoridad de aprobacion. Recomendacion V1: para la delegacion invalida del caso (revocada en Slice 3) no confiere nada; para el contrato generico a futuro, separar "scope de cobertura operacional" de "autoridad de aprobacion" requiere decision explicita o queda fuera de V1.
-- Definir explicitamente si la capacidad futura "delegar aprobacion de permisos" queda fuera de V1 o si requiere nuevo contrato domain-scoped, por ejemplo `responsibility_type='leave_approval_delegate'` o metadata equivalente con workflow/stage/scope, eligibility, actor, reason y expiracion obligatoria.
+- Aplicar D2: setear `honorGenericApprovalDelegate: false` en los tres stages `effective_supervisor` (`leave`, `expense_report`, `performance_evaluation`), respetando el gate de la senal para el flip de expense/perf.
+- Aplicar D3: documentar y aplicar que el `approval_delegate` generico no confiere supervisor workspace scope (`getSupervisorScopeForTenant`) para las superficies endurecidas; el desacople "ver sin aprobar" se difiere al contrato domain-scoped (D1 follow-up).
+- Documentar el follow-up de D1: la capacidad futura "delegar aprobacion de permisos" queda FUERA de V1; cuando HR confirme la necesidad, nace como contrato domain-scoped (ej. `responsibility_type='leave_approval_delegate'` o metadata con workflow/stage/scope, eligibility, actor, reason y expiracion obligatoria) en ADR propio.
 - Actualizar la arquitectura relevante o crear ADR/delta indexado en `docs/architecture/DECISIONS_INDEX.md` si el contrato cambia source of truth, auth semantics o eventos.
 - Declarar la frontera entre:
   - supervisor formal: deriva de `greenhouse_core.reporting_lines`;
@@ -553,8 +564,7 @@ La remediacion y el cambio de autoridad deben existir como primitive/command reu
 
 ### Out-of-band coordination required
 
-- Coordinar con HR/operador antes de aplicar recovery en production, porque cambia quien puede actuar sobre solicitudes pendientes.
-- Confirmar con el owner de HR si se desea matar completamente la delegacion generica activa o solo dejarla sin efecto para permisos. La evidencia actual apunta a revocar la delegacion invalida.
+- El operador (CEO) ya confirmo las decisiones D1-D4 el 2026-06-07; el revoke global y los flips estan aprobados. No se requiere coordinacion adicional con HR/Finance antes del apply.
 - No requiere Azure/GCP secret/HubSpot/Teams cambios externos salvo deploy/runtime normal.
 - Si hay comunicacion a Daniela/Valentina, debe decir que se corrigio autoridad de aprobacion de permisos; no pedir que Valentina apruebe como workaround.
 
@@ -624,7 +634,8 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 
 ## Open Questions
 
-- La decision V1 esperada es bloquear delegacion generica para permisos. Si HR confirma una necesidad real de delegar aprobaciones de permisos, se debe crear ADR/follow-up separado antes de soportarlo.
-- Confirmar si la responsabilidad activa `resp-2de74ab9-7e3c-4a7c-b9b3-7984c2567f58` debe revocarse globalmente o solo neutralizarse para permisos. La recomendacion de esta task es revocarla por falta de actor/reason y por conferir autoridad indebida.
-- Confirmar la decision para `expense_report.supervisor_review` y `performance_evaluation.supervisor_review`: la recomendacion por default es `honorGenericApprovalDelegate=false` (consistente con leave), porque ninguno tiene contrato domain-scoped validado. Si HR/Finance requieren conservar delegacion generica en alguno, documentar la excepcion con doc vigente antes de implementar.
-- Confirmar si el `approval_delegate` generico debe seguir confiriendo supervisor workspace scope/visibilidad (`getSupervisorScopeForTenant`) como "cobertura operacional" cuando ya no confiere autoridad de aprobacion, o si scope y autoridad se desacoplan en V1. Para la delegacion invalida del caso vivo no hay ambiguedad: tras el recovery no debe conferir ninguno.
+Las decisiones de diseno (D1-D4) quedaron resueltas en Slice 1 con skills arch-architect + product design, y **confirmadas por el operador (CEO) el 2026-06-07**. No hay signoffs de HR/Finance pendientes — el operador es la autoridad de aprobacion para esta task. No quedan preguntas abiertas de arquitectura ni de gobernanza. Se conservan solo como notas de ejecucion (no bloqueantes):
+
+- **[Confirmado — D4]** Revoke global de `resp-2de74ab9-7e3c-4a7c-b9b3-7984c2567f58` aprobado por el operador. No se preserva el artefacto generico; si emergiera una cobertura legitima futura, se re-otorga via el contrato correcto (D1 follow-up).
+- **[Confirmado — D2]** Flip de `expense_report` y `performance_evaluation` a `honorGenericApprovalDelegate=false` aprobado. La senal parametrizada (Slice 5) se sigue revisando antes del flip como **chequeo de datos de ingenieria** (no como signoff): si surge un snapshot delegado activo inesperado, registrarlo en el Handoff e investigar antes de flipear; no es un bloqueo de gobernanza.
+- **[Confirmado — D1/D3]** No hay necesidad actual de delegar aprobacion de permisos ni "cobertura viewer"; queda FUERA de V1. Si el operador la solicita a futuro, nace como contrato domain-scoped (autoridad y visibilidad opt-in por dimension, con expiry/actor/reason/elegibilidad) en ADR propio. El override HR/admin cubre cualquier interin.
