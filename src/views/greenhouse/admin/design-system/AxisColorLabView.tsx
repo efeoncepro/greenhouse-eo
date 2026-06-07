@@ -4,8 +4,8 @@ import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 
-import { axisRamp, axisOpacity, axisNeutral, axisMain } from '@core/theme/axis-tokens'
 import type { AxisColorFamily } from '@core/theme/axis-tokens'
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 
@@ -47,53 +47,72 @@ const FEEDBACK: { key: AxisColorFamily; label: string }[] = [
   { key: 'info', label: 'Info' }
 ]
 
-const RampSwatch = ({ family }: { family: AxisColorFamily }) => (
-  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 0.75 }}>
-    {RAMP_STEPS.map(step => {
-      const hex = axisRamp[family][step]
-      const ratioWhite = contrast(hex, '#ffffff')
-      const textSafe = ratioWhite >= 4.5
+const RampSwatch = ({ family }: { family: AxisColorFamily }) => {
+  const theme = useTheme()
 
-      return (
-        <Box key={step} sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-          {/* pure color block — NO text on the color (guarantees legibility on every swatch) */}
-          <Box style={{ background: hex }} sx={{ height: 52, borderRadius: 1 }} />
-          {/* all metadata on the card surface — token text colors, ≥4.97:1 by construction */}
-          <Box sx={{ px: 0.25 }}>
-            <Typography color='text.primary' sx={{ fontSize: 11, fontWeight: 700, lineHeight: 1.3 }}>
-              {step}
-            </Typography>
-            <Typography
-              color='text.secondary'
-              sx={{
-                fontSize: 10,
-                fontWeight: 600,
-                fontVariantNumeric: 'tabular-nums',
-                display: 'block',
-                lineHeight: 1.4
-              }}
-            >
-              {hex}
-            </Typography>
-            <Typography color='text.secondary' sx={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.2 }}>
-              {textSafe ? '✓ AA texto' : `${ratioWhite.toFixed(1)}:1`}
-            </Typography>
+  return (
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', md: 'repeat(9, minmax(0, 1fr))' },
+        gap: 1
+      }}
+    >
+      {RAMP_STEPS.map(step => {
+        const hex = theme.axis.ramp[family][step]
+        const ratioWhite = contrast(hex, theme.axis.neutral.light.bgWhite)
+        const textSafe = ratioWhite >= 4.5
+
+        return (
+          <Box key={step} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {/* Specimen: the background is the AXIS token being documented. */}
+            <Box
+              aria-label={`${family}-${step} ${hex}`}
+              sx={theme => ({
+                bgcolor: hex,
+                minBlockSize: theme.spacing(13),
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                border: `1px solid ${theme.palette.divider}`
+              })}
+            />
+            <Box sx={{ px: 0.5 }}>
+              <Typography variant='monoId' color='text.primary'>
+                {step}
+              </Typography>
+              <Typography variant='monoAmount' color='text.secondary' sx={{ display: 'block' }}>
+                {hex}
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
+                {textSafe ? 'AA texto' : `${ratioWhite.toFixed(1)}:1`}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      )
-    })}
-  </Box>
-)
+        )
+      })}
+    </Box>
+  )
+}
 
 const FamilyCard = ({ family, label }: { family: AxisColorFamily; label: string }) => {
-  const main = family === 'gray' ? axisRamp.gray[500] : axisMain[family as keyof typeof axisMain]
+  const theme = useTheme()
+  const main = family === 'gray' ? theme.axis.ramp.gray[500] : theme.axis.main[family as keyof typeof theme.axis.main]
+  const opacitySurfaces = [theme.axis.neutral.light.bgWhite, theme.axis.neutral.dark.paper] as const
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        <Box style={{ background: main }} sx={{ width: 28, height: 28, borderRadius: 1.5 }} />
-        <Typography sx={{ fontWeight: 700 }}>{label}</Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+        <Box
+          aria-hidden
+          sx={theme => ({
+            bgcolor: main,
+            inlineSize: theme.spacing(7),
+            blockSize: theme.spacing(7),
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+            border: `1px solid ${theme.palette.divider}`
+          })}
+        />
+        <Typography variant='h6'>{label}</Typography>
+        <Typography variant='monoId' color='text.secondary'>
           main {main}
         </Typography>
       </Box>
@@ -101,23 +120,34 @@ const FamilyCard = ({ family, label }: { family: AxisColorFamily; label: string 
       {/* opacity soft-fills over light + dark surfaces (graduated 8 → 38%) */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mt: 0.5 }}>
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
-          {(['#ffffff', axisNeutral.dark.paper] as const).map(surface => (
+          {opacitySurfaces.map(surface => (
             <Box
               key={surface}
-              style={{ background: surface }}
-              sx={{ p: 1, borderRadius: 1, display: 'flex', gap: 0.5 }}
+              sx={theme => ({
+                bgcolor: surface,
+                p: 1,
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                border: `1px solid ${theme.palette.divider}`,
+                display: 'flex',
+                gap: 0.5
+              })}
             >
               {OPACITY_STEPS.map(op => (
                 <Box
                   key={op}
-                  style={{ background: axisOpacity[family][op] }}
-                  sx={{ flex: 1, height: 24, borderRadius: 0.75 }}
+                  aria-label={`${family} opacity ${op}`}
+                  sx={theme => ({
+                    bgcolor: theme.axis.opacity[family][op],
+                    flex: 1,
+                    minBlockSize: theme.spacing(6),
+                    borderRadius: `${theme.shape.customBorderRadius.sm}px`
+                  })}
                 />
               ))}
             </Box>
           ))}
         </Box>
-        <Typography color='text.secondary' sx={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.2 }}>
+        <Typography variant='caption' color='text.secondary'>
           Opacidad 8 · 16 · 24 · 32 · 38 — sobre claro y oscuro
         </Typography>
       </Box>
@@ -126,27 +156,43 @@ const FamilyCard = ({ family, label }: { family: AxisColorFamily; label: string 
 }
 
 const NeutralPanel = ({ mode }: { mode: 'light' | 'dark' }) => {
-  const n = axisNeutral[mode]
+  const theme = useTheme()
+  const n = theme.axis.neutral[mode]
 
   return (
     <Box
-      style={{ background: n.bodyBg }}
-      sx={{ p: 2.5, borderRadius: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}
+      sx={theme => ({
+        bgcolor: n.bodyBg,
+        p: 2.5,
+        borderRadius: `${theme.shape.customBorderRadius.xxl}px`,
+        border: `1px solid ${n.divider}`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1.5
+      })}
     >
-      <Typography variant='overline' sx={{ fontWeight: 700 }} style={{ color: n.textPrimary }}>
+      <Typography variant='overline' sx={{ color: n.textPrimary }}>
         {mode}
       </Typography>
       <Box
-        style={{ background: n.paper, borderColor: n.divider }}
-        sx={{ p: 2, borderRadius: 1.5, border: '1px solid', display: 'flex', flexDirection: 'column', gap: 0.5 }}
+        sx={theme => ({
+          bgcolor: n.paper,
+          borderColor: n.divider,
+          p: 2,
+          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+          border: '1px solid',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 0.5
+        })}
       >
-        <Typography sx={{ fontWeight: 600 }} style={{ color: n.textPrimary }}>
+        <Typography variant='body2' sx={{ color: n.textPrimary }}>
           text.primary · {n.textPrimary}
         </Typography>
-        <Typography sx={{ fontSize: 13 }} style={{ color: n.textSecondary }}>
+        <Typography variant='caption' sx={{ color: n.textSecondary }}>
           text.secondary · {n.textSecondary}
         </Typography>
-        <Typography sx={{ fontSize: 13 }} style={{ color: n.textDisabled }}>
+        <Typography variant='caption' sx={{ color: n.textDisabled }}>
           text.disabled · {n.textDisabled}
         </Typography>
       </Box>
@@ -156,12 +202,7 @@ const NeutralPanel = ({ mode }: { mode: 'light' | 'dark' }) => {
           ['paper', n.paper],
           ['divider', n.divider]
         ].map(([k, v]) => (
-          <Typography
-            key={k}
-            variant='caption'
-            sx={{ fontVariantNumeric: 'tabular-nums' }}
-            style={{ color: n.textSecondary }}
-          >
+          <Typography key={k} variant='monoAmount' sx={{ color: n.textSecondary }}>
             {k}: {v}
           </Typography>
         ))}
@@ -171,10 +212,18 @@ const NeutralPanel = ({ mode }: { mode: 'light' | 'dark' }) => {
 }
 
 const AxisColorLabView = () => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 1100, mx: 'auto' }}>
+  <Box
+    sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 4,
+      maxInlineSize: theme => theme.spacing(275),
+      mx: 'auto'
+    }}
+  >
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       <AxisWordmark variant='auto' height={44} />
-      <Typography variant='h4' sx={{ fontWeight: 700 }}>
+      <Typography variant='h4'>
         Paleta AXIS — referencia completa
       </Typography>
       <Typography variant='body2' color='text.secondary'>
@@ -188,7 +237,7 @@ const AxisColorLabView = () => (
 
     <Card variant='outlined'>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <Typography variant='h6' sx={{ fontWeight: 700 }}>
+        <Typography variant='h5'>
           Marca
         </Typography>
         {BRAND.map(f => (
@@ -199,7 +248,7 @@ const AxisColorLabView = () => (
 
     <Card variant='outlined'>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <Typography variant='h6' sx={{ fontWeight: 700 }}>
+        <Typography variant='h5'>
           Feedback (semánticos)
         </Typography>
         {FEEDBACK.map(f => (
@@ -210,7 +259,7 @@ const AxisColorLabView = () => (
 
     <Card variant='outlined'>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <Typography variant='h6' sx={{ fontWeight: 700 }}>
+        <Typography variant='h5'>
           Neutral (gray)
         </Typography>
         <FamilyCard family='gray' label='Gray' />
@@ -219,7 +268,7 @@ const AxisColorLabView = () => (
 
     <Card variant='outlined'>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <Typography variant='h6' sx={{ fontWeight: 700 }}>
+        <Typography variant='h5'>
           Neutrales y superficies (light / dark)
         </Typography>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
