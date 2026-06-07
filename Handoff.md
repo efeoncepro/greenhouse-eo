@@ -1,3 +1,17 @@
+# Sesion 2026-06-07 — Floating Surface anchored motion hardening
+
+Se modernizo el motion de `GreenhouseFloatingSurface` antes de tocar sombras/elevacion. Se reviso especificamente la duda del operador sobre la primitive `Motion`: existe y se mantiene canonica, pero su ADR la acota a motion cinematica/orquestada/scroll; Floating Surface es una microinteraccion frecuente y por eso se resolvio con CSS Tier 1 + tokens `motionCss`.
+
+- **Decision:** no usar `<Motion>`/`useGreenhouseGSAP` para popovers, menus, tooltips, evidence peeks, inline editors ni validation bubbles. Usar motion CSS tokenizado dentro de la primitive.
+- **Runtime:** `GreenhouseFloatingSurfaceMotion` pasa de `fade` a `anchored`; cada variant oficial queda en `motion: 'anchored'`.
+- **Comportamiento:** el vector de entrada/salida deriva del placement resuelto de Floating UI (`top/right/bottom/left`), empieza unos px desde el borde del anchor, entra con `motionCss.duration.standard` + `motionCss.ease.emphasized`, sale con `motionCss.duration.short` + `motionCss.ease.emphasizedAccelerate`, y usa un snap suave de escala para dar sensacion enterprise actual sin rebote jugueton.
+- **Arquitectura:** el wrapper conserva `refs.setFloating` + `floatingStyles`; la animacion vive en el `Paper` interno para no pisar el transform de posicionamiento de Floating UI. Al cerrar, el surface queda montado brevemente en estado `exiting` hasta completar `exitDuration`; `prefers-reduced-motion` desactiva transform/animation y desmonta sin espera.
+- **Lab:** `/admin/design-system/floating-surfaces` muestra `motion: anchored` en cada specimen.
+- **Gates verdes:** vitest focal (`floating-surface-controller` + `GreenhouseFloatingSurface`, 23 tests), eslint focal, `tsc --noEmit`, GVC local desktop+mobile en `.captures/2026-06-07T15-54-46_floating-surface-primitives`. Frames revisados: rich tooltip desktop, command preview desktop y mobile sin collision visible. La captura mobile conserva un hydration warning generico de app en manifest; no bloquea este cambio y no hay console/page/http failures.
+- **Pendiente separado:** sombra/elevacion sigue deferida a `TASK-1049` y su ADR propuesta; este cambio deja `Paper elevation={6}` intacto por alcance.
+
+---
+
 # Sesion 2026-06-07 — TASK-1018 GVC mockup→runtime contract gates (V1.5)
 
 Se endureció Greenhouse Visual Capture para convertir el paso mockup aprobado → runtime en contrato verificable. Local-first en `develop` (sin branch ni push, por instrucción del operador). 8 slices + verificación live + skills.

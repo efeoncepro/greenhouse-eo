@@ -6,6 +6,18 @@
 
 ---
 
+## Delta 2026-06-07j — Floating Surface anchored motion hardening
+
+`GreenhouseFloatingSurface` moderniza su entrada visual sin convertir los popovers/menus/tooltips en motion cinematica.
+
+- La primitive deja el contrato `motion: fade` y adopta `motion: anchored`: la animacion deriva del placement resuelto de Floating UI (`top/right/bottom/left`) para entrar desde el borde del anchor, con travel corto y snap suave de escala; al cerrar, sale de vuelta hacia el anchor con fade/scale mas rapido.
+- La animacion usa CSS Tier 1 + tokens canonicos (`motionCss.duration.standard`, `motionCss.ease.emphasized`); no usa `<Motion>` ni `useGreenhouseGSAP` porque esos contratos se reservan para entrance/stagger/scrollReveal/timeline.
+- El transform animado vive en el `Paper` interno; el wrapper mantiene `refs.setFloating` + `floatingStyles` para no pelear con el transform de posicionamiento de Floating UI. En salida, el wrapper queda montado hasta terminar el token `exitDuration`.
+- `prefers-reduced-motion` elimina animacion/transform y deja el estado final estable.
+- El lab `/admin/design-system/floating-surfaces` expone el chip `motion: anchored` por variant.
+- Verificado con tests focales de controller/component y GVC desktop+mobile en `.captures/2026-06-07T15-54-46_floating-surface-primitives`.
+
+
 ## Delta 2026-06-07i — Utilities Lab y Activity Timeline token hardening
 
 `/admin/design-system/utilities` y `GreenhouseActivityTimeline` se alinean al contrato tokenizado del Design System, manteniendo `ActivityTimeline` como primitive reusable y no como composición visual route-local.

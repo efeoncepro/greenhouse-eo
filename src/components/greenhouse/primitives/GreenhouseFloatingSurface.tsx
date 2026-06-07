@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useId, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react'
 
 import {
   FloatingFocusManager,
@@ -19,14 +19,18 @@ import {
   useRole,
   type Placement
 } from '@floating-ui/react'
+import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import type { SxProps, Theme } from '@mui/material/styles'
 
-import { motionCss } from '@/components/theme/motion-tokens'
+import { MOTION_DURATION_MS, motionCss } from '@/components/theme/motion-tokens'
+import useReducedMotion from '@/hooks/useReducedMotion'
 
 import {
   FLOATING_SURFACE_CHROME_TOKENS,
   FLOATING_SURFACE_MOTION_TOKENS,
+  getFloatingSurfaceMotionVector,
+  getFloatingSurfaceTransformOrigin,
   getFloatingSurfaceVariantConfig,
   resolveFloatingSurfaceVariant,
   type GreenhouseFloatingSurfaceKind,
@@ -112,7 +116,8 @@ export interface GreenhouseFloatingSurfaceProps {
   surfaceSx?: SxProps<Theme>
 }
 
-const FADE_TRANSITION = `opacity ${motionCss.duration[FLOATING_SURFACE_MOTION_TOKENS.fadeDuration]} ${motionCss.ease[FLOATING_SURFACE_MOTION_TOKENS.fadeEase]}`
+const ENTER_ANIMATION = `gh-floating-surface-enter ${motionCss.duration[FLOATING_SURFACE_MOTION_TOKENS.enterDuration]} ${motionCss.ease[FLOATING_SURFACE_MOTION_TOKENS.enterEase]} both`
+const EXIT_ANIMATION = `gh-floating-surface-exit ${motionCss.duration[FLOATING_SURFACE_MOTION_TOKENS.exitDuration]} ${motionCss.ease[FLOATING_SURFACE_MOTION_TOKENS.exitEase]} both`
 
 const GreenhouseFloatingSurface = ({
   variant: variantProp,
@@ -137,6 +142,12 @@ const GreenhouseFloatingSurface = ({
   const open = isControlled ? (openProp as boolean) : internalOpen
 
   const surfaceId = useId()
+  const prefersReducedMotion = useReducedMotion()
+  const reduceMotion = config.motion === 'none' || prefersReducedMotion
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [isSurfaceMounted, setIsSurfaceMounted] = useState(open)
+  const isExiting = isSurfaceMounted && !open && !reduceMotion
+  const floatingOpen = open || isExiting
 
   const setOpen = useCallback(
     (next: boolean) => {
@@ -146,8 +157,47 @@ const GreenhouseFloatingSurface = ({
     [isControlled, onOpenChange]
   )
 
-  const { refs, floatingStyles, context, isPositioned } = useFloating({
-    open,
+  useEffect(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+
+    if (open) {
+      setIsSurfaceMounted(true)
+
+      return
+    }
+
+    if (!isSurfaceMounted) return
+
+    if (reduceMotion) {
+      setIsSurfaceMounted(false)
+
+      return
+    }
+
+    closeTimerRef.current = setTimeout(() => {
+      setIsSurfaceMounted(false)
+      closeTimerRef.current = null
+    }, MOTION_DURATION_MS[FLOATING_SURFACE_MOTION_TOKENS.exitDuration])
+
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current)
+        closeTimerRef.current = null
+      }
+    }
+  }, [isSurfaceMounted, open, reduceMotion])
+
+  const {
+    refs,
+    floatingStyles,
+    context,
+    isPositioned,
+    placement: resolvedPlacement
+  } = useFloating({
+    open: floatingOpen,
     onOpenChange: setOpen,
     placement: placementProp ?? config.placement,
     whileElementsMounted: autoUpdate,
@@ -185,44 +235,101 @@ const GreenhouseFloatingSurface = ({
   }
 
   const resolvedWidth = width ?? config.defaultWidth
-  const reduceMotion = config.motion === 'none'
+  const motionVector = getFloatingSurfaceMotionVector(resolvedPlacement)
+  const transformOrigin = getFloatingSurfaceTransformOrigin(resolvedPlacement)
 
   const surface = (
-    <Paper
+    <Box
       ref={refs.setFloating}
-      elevation={6}
-      style={floatingStyles}
-      {...getFloatingProps()}
-      aria-label={ariaLabel}
-      data-gh-floating-surface={variant}
-      data-gh-floating-surface-kind={kind ?? ''}
-      data-capture={dataCapture}
-      sx={[
-        theme => ({
-          width: resolvedWidth,
-          maxWidth: `calc(100vw - ${FLOATING_SURFACE_CHROME_TOKENS.viewportMargin * 2}px)`,
-          borderRadius: `${theme.shape.customBorderRadius.md}px`,
-          border: `1px solid ${theme.palette.divider}`,
-          p: FLOATING_SURFACE_CHROME_TOKENS.densityPadding[config.density],
-          zIndex: theme.zIndex.modal + 1,
-          opacity: isPositioned ? 1 : 0,
-          transition: reduceMotion ? 'none' : FADE_TRANSITION,
-          '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
-        }),
-        ...(Array.isArray(surfaceSx) ? surfaceSx : surfaceSx ? [surfaceSx] : [])
-      ]}
+      style={{
+        ...floatingStyles,
+        width: resolvedWidth,
+        maxWidth: `calc(100vw - ${FLOATING_SURFACE_CHROME_TOKENS.viewportMargin * 2}px)`
+      }}
+      sx={theme => ({
+        zIndex: theme.zIndex.modal + 1,
+        opacity: isPositioned ? 1 : 0,
+        pointerEvents: isPositioned && open ? undefined : 'none'
+      })}
     >
-      {content({ close, variant })}
-    </Paper>
+      <Paper
+        {...getFloatingProps()}
+        aria-label={ariaLabel}
+        elevation={6}
+        data-gh-floating-surface={variant}
+        data-gh-floating-surface-kind={kind ?? ''}
+        data-gh-floating-placement={resolvedPlacement}
+        data-gh-floating-motion={config.motion}
+        data-gh-floating-motion-state={isExiting ? 'exiting' : 'entering'}
+        data-capture={dataCapture}
+        role={config.role}
+        sx={[
+          theme => ({
+            width: '100%',
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+            border: `1px solid ${theme.palette.divider}`,
+            p: FLOATING_SURFACE_CHROME_TOKENS.densityPadding[config.density],
+            zIndex: theme.zIndex.modal + 1,
+            transformOrigin,
+            animation: reduceMotion || !isPositioned ? 'none' : isExiting ? EXIT_ANIMATION : ENTER_ANIMATION,
+            willChange: reduceMotion ? 'auto' : 'opacity, transform',
+            '--gh-floating-motion-x': `${motionVector.x}px`,
+            '--gh-floating-motion-y': `${motionVector.y}px`,
+            '--gh-floating-motion-start-scale': FLOATING_SURFACE_MOTION_TOKENS.startScale,
+            '--gh-floating-motion-settle-scale': FLOATING_SURFACE_MOTION_TOKENS.settleScale,
+            '--gh-floating-motion-snap-back-scale': FLOATING_SURFACE_MOTION_TOKENS.snapBackScale,
+            '--gh-floating-motion-exit-scale': FLOATING_SURFACE_MOTION_TOKENS.exitScale,
+            '@keyframes gh-floating-surface-enter': {
+              '0%': {
+                opacity: 0,
+                transform:
+                  'translate3d(var(--gh-floating-motion-x), var(--gh-floating-motion-y), 0) scale(var(--gh-floating-motion-start-scale))'
+              },
+              '64%': {
+                opacity: 1,
+                transform: 'translate3d(0, 0, 0) scale(var(--gh-floating-motion-settle-scale))'
+              },
+              '82%': {
+                opacity: 1,
+                transform: 'translate3d(0, 0, 0) scale(var(--gh-floating-motion-snap-back-scale))'
+              },
+              '100%': {
+                opacity: 1,
+                transform: 'translate3d(0, 0, 0) scale(1)'
+              }
+            },
+            '@keyframes gh-floating-surface-exit': {
+              '0%': {
+                opacity: 1,
+                transform: 'translate3d(0, 0, 0) scale(1)'
+              },
+              '100%': {
+                opacity: 0,
+                transform:
+                  'translate3d(var(--gh-floating-motion-x), var(--gh-floating-motion-y), 0) scale(var(--gh-floating-motion-exit-scale))'
+              }
+            },
+            '@media (prefers-reduced-motion: reduce)': {
+              animation: 'none',
+              transform: 'none',
+              willChange: 'auto'
+            }
+          }),
+          ...(Array.isArray(surfaceSx) ? surfaceSx : surfaceSx ? [surfaceSx] : [])
+        ]}
+      >
+        {content({ close, variant })}
+      </Paper>
+    </Box>
   )
 
   return (
     <>
       {anchor(anchorProps)}
 
-      {open ? (
+      {isSurfaceMounted ? (
         <FloatingPortal id={`gh-floating-surface-${surfaceId}`}>
-          {config.focusManaged ? (
+          {config.focusManaged && open ? (
             <FloatingFocusManager context={context} modal={false} returnFocus={config.returnFocus}>
               {surface}
             </FloatingFocusManager>

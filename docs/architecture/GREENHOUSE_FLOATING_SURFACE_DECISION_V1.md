@@ -73,6 +73,14 @@ Accessibility contract:
 - Keyboard open/close/focus return must be tested.
 - Reduced-motion and high-contrast behavior must be considered.
 
+Motion contract:
+
+- Floating Surface uses CSS Tier 1 motion backed by canonical motion tokens (`motionCss`), not the GSAP-backed `<Motion>` primitive.
+- Rationale: anchored popovers, action menus and tooltips are frequent microinteractions; the accepted Motion Primitive contract is reserved for cinematic, orchestrated, scroll and timeline motion.
+- Entrance and exit motion are anchored to the resolved Floating UI placement: the surface starts a few pixels from the anchor edge, eases into place with a soft scale snap/settle, and exits back toward the anchor with a faster fade/scale that stays below a playful bounce.
+- `prefers-reduced-motion` removes transform and animation while preserving the final visible state.
+- The animated transform lives on the inner chrome node, not the Floating UI positioning node, because Floating UI owns positioning transforms. Exit keeps the positioning wrapper mounted briefly, then unmounts after the tokenized exit duration.
+
 Copy contract:
 
 - Labels, aria labels, empty/error text, and action text come from `src/lib/copy/*` when reusable.
@@ -139,4 +147,3 @@ Reopen this decision if:
 - MUI/Base UI provides a superior governed primitive that reduces custom ownership.
 - Product teams start using floating surfaces for deep workflows better served by `AdaptiveSidecar`.
 - Accessibility regressions appear repeatedly in anchored surfaces.
-

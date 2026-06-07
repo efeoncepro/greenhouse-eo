@@ -15,6 +15,7 @@ Reglas duras canónicas (resumen — el detalle vive en las specs de arriba + CL
 - Los **views de producto NO importan `gsap`/`@gsap/react` ni `@floating-ui/react` directo** — lint rules `greenhouse/no-direct-gsap-in-views` + `greenhouse/no-direct-floating-ui-in-views` (modo `error`).
 - `prefers-reduced-motion` horneado/no-bypassable; degradación honesta (el contenido queda visible si el JS falla).
 - GSAP **no reemplaza** CSS Tier 1 ni framer-motion — es una tercera capa aditiva.
+- Floating Surface, menus, popovers, rich tooltips, validation bubbles y command previews son microinteracciones frecuentes: deben usar CSS Tier 1/tokenizado dentro de su primitive, no `<Motion>`/GSAP.
 - Tokens SoT (`instant 75 · short 150 · standard 200 · medium 300 · long 400 · extended 600` ms + eases) en `motion/core/tokens.ts`.
 
 ---
@@ -131,4 +132,3 @@ Para agregar assets nuevos:
 |-------|-----------|------------|
 | Finance Dashboard | `AnimatedCounter` | 3 (DSO, DPO, Ratio nómina/ingresos) |
 | Finance Period Closure | `EmptyState` + `animatedIcon` | 2 (períodos vacíos, snapshots vacíos) |
-

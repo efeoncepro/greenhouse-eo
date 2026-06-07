@@ -44,7 +44,7 @@ export type GreenhouseFloatingSurfaceRole = 'tooltip' | 'menu' | 'dialog'
 
 export type GreenhouseFloatingSurfaceDensity = 'compact' | 'comfortable'
 
-export type GreenhouseFloatingSurfaceMotion = 'fade' | 'none'
+export type GreenhouseFloatingSurfaceMotion = 'anchored' | 'none'
 
 export const FLOATING_SURFACE_CHROME_TOKENS = Object.freeze({
   /** Viewport collision padding and max-width inset share the same gutter. */
@@ -60,9 +60,50 @@ export const FLOATING_SURFACE_CHROME_TOKENS = Object.freeze({
 })
 
 export const FLOATING_SURFACE_MOTION_TOKENS = Object.freeze({
-  fadeDuration: 'short',
-  fadeEase: 'emphasized'
+  enterDuration: 'standard',
+  enterEase: 'emphasized',
+  exitDuration: 'short',
+  exitEase: 'emphasizedAccelerate',
+  enterTravel: 6,
+  startScale: 0.974,
+  settleScale: 1.007,
+  snapBackScale: 0.999,
+  exitScale: 0.986
 } as const)
+
+export type FloatingSurfaceMotionVector = {
+  x: number
+  y: number
+}
+
+const getPlacementSide = (placement: Placement): 'top' | 'right' | 'bottom' | 'left' =>
+  placement.split('-')[0] as 'top' | 'right' | 'bottom' | 'left'
+
+export const getFloatingSurfaceMotionVector = (placement: Placement): FloatingSurfaceMotionVector => {
+  const travel = FLOATING_SURFACE_MOTION_TOKENS.enterTravel
+
+  switch (getPlacementSide(placement)) {
+    case 'top':
+      return { x: 0, y: travel }
+    case 'right':
+      return { x: -travel, y: 0 }
+    case 'left':
+      return { x: travel, y: 0 }
+    case 'bottom':
+    default:
+      return { x: 0, y: -travel }
+  }
+}
+
+export const getFloatingSurfaceTransformOrigin = (placement: Placement): string => {
+  const [side, alignment] = placement.split('-') as [ReturnType<typeof getPlacementSide>, 'start' | 'end' | undefined]
+
+  if (side === 'top') return alignment === 'end' ? 'bottom right' : 'bottom left'
+  if (side === 'bottom') return alignment === 'end' ? 'top right' : 'top left'
+  if (side === 'left') return alignment === 'end' ? 'right bottom' : 'right top'
+
+  return alignment === 'end' ? 'left bottom' : 'left top'
+}
 
 export interface GreenhouseFloatingSurfaceVariantConfig {
   /** ARIA role for `useRole`. Non-modal surfaces never claim `aria-modal`. */
@@ -116,7 +157,7 @@ export const FLOATING_SURFACE_VARIANT_CONFIG: Readonly<
     offset: 8,
     placement: 'top',
     density: 'compact',
-    motion: 'fade',
+    motion: 'anchored',
     defaultWidth: 280
   },
   actionMenu: {
@@ -129,7 +170,7 @@ export const FLOATING_SURFACE_VARIANT_CONFIG: Readonly<
     offset: 8,
     placement: 'bottom-start',
     density: 'compact',
-    motion: 'fade',
+    motion: 'anchored',
     defaultWidth: 240
   },
   evidencePeek: {
@@ -142,7 +183,7 @@ export const FLOATING_SURFACE_VARIANT_CONFIG: Readonly<
     offset: 8,
     placement: 'bottom-start',
     density: 'comfortable',
-    motion: 'fade',
+    motion: 'anchored',
     defaultWidth: 360
   },
   inlineEditor: {
@@ -156,7 +197,7 @@ export const FLOATING_SURFACE_VARIANT_CONFIG: Readonly<
     offset: 8,
     placement: 'bottom-start',
     density: 'comfortable',
-    motion: 'fade',
+    motion: 'anchored',
     defaultWidth: 320
   },
   validationBubble: {
@@ -169,7 +210,7 @@ export const FLOATING_SURFACE_VARIANT_CONFIG: Readonly<
     offset: 6,
     placement: 'bottom-start',
     density: 'compact',
-    motion: 'fade',
+    motion: 'anchored',
     defaultWidth: 280
   },
   commandPreview: {
@@ -182,7 +223,7 @@ export const FLOATING_SURFACE_VARIANT_CONFIG: Readonly<
     offset: 8,
     placement: 'right-start',
     density: 'comfortable',
-    motion: 'fade',
+    motion: 'anchored',
     defaultWidth: 320
   }
 })

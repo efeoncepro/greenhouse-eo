@@ -1,9 +1,9 @@
 # Sistema de Animaciones y Microinteracciones del Portal
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-04-26 por Claude (TASK-642)
-> **Última actualización:** 2026-05-17 — GSAP adoptado como carril especializado de motion avanzado.
+> **Última actualización:** 2026-06-07 — boundary actualizado: microinteracciones frecuentes usan CSS/tokens; Motion Primitive/GSAP se reserva para motion cinemática u orquestada.
 > **Documentación técnica:** [GREENHOUSE_MOTION_SYSTEM_V1.md](../../architecture/GREENHOUSE_MOTION_SYSTEM_V1.md)
 
 ---
@@ -58,6 +58,8 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 **Tecnología**: tokens canónicos (`hoverScale`, `pressDepress`, `focusGlow`) aplicados globalmente vía MUI theme. CSS transitions livianas.
 
 **Dónde lo verás**: en TODA la superficie del portal una vez ejecutada TASK-643. Es el primer slice del programa porque define los tokens que usan las demás dimensiones.
+
+**Floating surfaces**: popovers, action menus, rich tooltips, evidence peeks, inline editors, validation bubbles y command previews son parte de esta capa. Su entrada y salida deben sentirse ancladas al elemento que las abre: desplazamiento corto desde/hacia el borde del anchor, easing suave, snap de escala apenas perceptible y sin rebote exagerado. En runtime esto vive en `GreenhouseFloatingSurface` como `motion: anchored` y respeta `prefers-reduced-motion`.
 
 ---
 
@@ -140,6 +142,7 @@ Greenhouse es plataforma operativa enterprise, no portfolio creativo.
 | **Click en row de lista → detalle** | Cross-page navigation (morph del nombre/status) |
 | **Hover sobre botón/card/link** | Microinteraction (scale, glow, underline) |
 | **Click en botón** | Press depress + ripple |
+| **Popover/menu/tooltip anclado** | Floating Surface `motion: anchored` (CSS tokenizado) |
 | **Tab/Shift-Tab navegación con teclado** | Focus glow visible |
 | **Carga de cualquier vista** | Page entrance (fade + slide-up) |
 | **Datos llegan después de skeleton** | Skeleton crossfade (200ms suave) |
@@ -184,6 +187,7 @@ El sistema está versionado:
 
 - **V1 (vigente)**: las 8 dimensiones descritas arriba. Foundation completa.
 - **V1.1 (vigente desde 2026-05-17)**: GSAP queda disponible para motion avanzado: timelines complejos, SVG/path/text y experiencias con ScrollTrigger. No reemplaza Framer Motion para microinteracciones normales.
+- **V1.2 (vigente desde 2026-06-07)**: Floating Surface adopta `motion: anchored` con CSS Tier 1/tokenizado. Esto confirma el límite: la Motion Primitive/GSAP no se usa para popovers/menus/tooltips frecuentes.
 - **V2 (futuro)**: si aparecen varios usos productivos de GSAP, se crearán primitives Greenhouse dedicadas para no repetir timelines por pantalla.
 - **Decisiones cerradas**: Stack canónico base = View Transitions API + Framer Motion + auto-animate + CSS/MUI transitions. GSAP es carril especializado; react-spring, Anime.js y react-transition-group siguen fuera.
 

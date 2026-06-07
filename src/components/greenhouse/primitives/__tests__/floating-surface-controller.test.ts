@@ -6,6 +6,8 @@ import {
   FLOATING_SURFACE_MOTION_TOKENS,
   FLOATING_SURFACE_VARIANTS,
   FLOATING_SURFACE_VARIANT_CONFIG,
+  getFloatingSurfaceMotionVector,
+  getFloatingSurfaceTransformOrigin,
   getFloatingSurfaceVariantConfig,
   resolveFloatingSurfaceVariant,
   type GreenhouseFloatingSurfaceVariant
@@ -96,15 +98,44 @@ describe('floating-surface-controller', () => {
         comfortable: 2
       })
       expect(FLOATING_SURFACE_MOTION_TOKENS).toEqual({
-        fadeDuration: 'short',
-        fadeEase: 'emphasized'
+        enterDuration: 'standard',
+        enterEase: 'emphasized',
+        exitDuration: 'short',
+        exitEase: 'emphasizedAccelerate',
+        enterTravel: 6,
+        startScale: 0.974,
+        settleScale: 1.007,
+        snapBackScale: 0.999,
+        exitScale: 0.986
       })
+    })
+
+    it('uses anchored motion for every visible variant', () => {
+      for (const variant of FLOATING_SURFACE_VARIANTS) {
+        expect(FLOATING_SURFACE_VARIANT_CONFIG[variant].motion).toBe('anchored')
+      }
     })
   })
 
   describe('getFloatingSurfaceVariantConfig', () => {
     it('returns the frozen config for a variant', () => {
       expect(getFloatingSurfaceVariantConfig('evidencePeek')).toBe(FLOATING_SURFACE_VARIANT_CONFIG.evidencePeek)
+    })
+  })
+
+  describe('floating surface motion helpers', () => {
+    it('moves surfaces from the anchor side by placement', () => {
+      expect(getFloatingSurfaceMotionVector('bottom-start')).toEqual({ x: 0, y: -6 })
+      expect(getFloatingSurfaceMotionVector('top')).toEqual({ x: 0, y: 6 })
+      expect(getFloatingSurfaceMotionVector('right-start')).toEqual({ x: -6, y: 0 })
+      expect(getFloatingSurfaceMotionVector('left-end')).toEqual({ x: 6, y: 0 })
+    })
+
+    it('sets transform origin to the edge closest to the anchor', () => {
+      expect(getFloatingSurfaceTransformOrigin('bottom-start')).toBe('top left')
+      expect(getFloatingSurfaceTransformOrigin('bottom-end')).toBe('top right')
+      expect(getFloatingSurfaceTransformOrigin('top-start')).toBe('bottom left')
+      expect(getFloatingSurfaceTransformOrigin('right-end')).toBe('left bottom')
     })
   })
 })

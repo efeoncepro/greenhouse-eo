@@ -22,7 +22,7 @@ Cada primitive tiene su contrato canónico en una ADR/spec dedicada o en su delt
 | Familia | Primitive(s) | Contrato canónico |
 |---|---|---|
 | **Adaptive Sidecar** (asistencia/inspección/review/preview/edición contextual que preserva contexto) | `AdaptiveSidecarLayout`, `ContextualSidecar`, `adaptive-sidecar-controller` | [GREENHOUSE_ADAPTIVE_SIDECAR_DECISION_V1.md](../GREENHOUSE_ADAPTIVE_SIDECAR_DECISION_V1.md) + [GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md](../GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md) |
-| **Floating Surface** (popovers, action menus, rich tooltips, evidence peeks, inline editors, validation bubbles, command previews) | `GreenhouseFloatingSurface`, `floating-surface-controller` | [GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md](../GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md) + HISTORIAL Delta 2026-06-06b |
+| **Floating Surface** (popovers, action menus, rich tooltips, evidence peeks, inline editors, validation bubbles, command previews) | `GreenhouseFloatingSurface`, `floating-surface-controller` | [GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md](../GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md) + HISTORIAL Deltas 2026-06-06b / 2026-06-07j |
 | **Floating Action Dock** (acciones persistentes ancladas al viewport) | `NexaFloatingButton`, `ScrollToTop` + safe-area CSS vars | HISTORIAL Delta 2026-06-06c |
 | **Motion** (cinemático/orquestado/scroll) | `<Motion>`, `useGreenhouseGSAP` | [GREENHOUSE_MOTION_PRIMITIVE_V1.md](../GREENHOUSE_MOTION_PRIMITIVE_V1.md) → ver [MOTION.md](./MOTION.md) |
 | **Microinteraction** | `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`, `GreenhouseStateTransition`, `GreenhouseInlineValidation`, `GreenhouseFieldProvenancePeek`, `GreenhouseStepperProgressMicro`, `GreenhouseEvidenceAttachmentDropzone`, `GreenhouseInlineDecisionPrompt` | HISTORIAL Deltas 2026-06-06 / 06e |
@@ -33,7 +33,7 @@ Cada primitive tiene su contrato canónico en una ADR/spec dedicada o en su delt
 | **Utilities** | `GreenhouseActivityTimeline` | HISTORIAL Delta 2026-06-07b |
 | **Summary / Quote builder** | `EntitySummaryDock`, `CardHeaderWithBadge`, `FormSectionAccordion`, `ContextChipStrip`, `TotalsLadder` | HISTORIAL Deltas 2026-05-05 / 2026-04-19 / 2026-04-20 |
 
-> **Nota de límites:** Adaptive Sidecar ≠ Floating Surface ≠ Dialog. Sidecar = lane in-flow full-height que preserva el contexto; Floating Surface = UI contextual anclada y transitoria; `Dialog` modal sigue obligatorio para decisiones destructivas/irreversibles/legales/financieras. Floating Action Dock cubre acciones persistentes ancladas al viewport, distinto de Floating Surface.
+> **Nota de límites:** Adaptive Sidecar ≠ Floating Surface ≠ Dialog. Sidecar = lane in-flow full-height que preserva el contexto; Floating Surface = UI contextual anclada y transitoria; `Dialog` modal sigue obligatorio para decisiones destructivas/irreversibles/legales/financieras. Floating Action Dock cubre acciones persistentes ancladas al viewport, distinto de Floating Surface. Floating Surface usa `motion: anchored` con CSS Tier 1 + tokens; no usa la Motion Primitive GSAP porque no es motion cinemática/orquestada.
 
 ## Tipografía, tokens y color de las primitives
 

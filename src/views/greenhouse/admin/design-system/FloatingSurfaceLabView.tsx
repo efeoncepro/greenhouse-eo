@@ -292,6 +292,7 @@ const VariantDemoCard = ({ demo }: { demo: VariantDemo }) => {
         <Stack direction='row' spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.hairline} useFlexGap flexWrap='wrap'>
           <GreenhouseChip size='small' variant='label' tone='primary' label={`role: ${config.role}`} kind='attribute' />
           <GreenhouseChip size='small' variant='label' tone='info' label={config.interaction} kind='attribute' />
+          <GreenhouseChip size='small' variant='label' tone='secondary' label={`motion: ${config.motion}`} kind='attribute' />
           {config.focusManaged ? (
             <GreenhouseChip size='small' variant='label' tone='success' label='focus managed' kind='status' />
           ) : null}

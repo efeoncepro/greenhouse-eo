@@ -55,6 +55,9 @@ describe('GreenhouseFloatingSurface', () => {
 
     expect(surface).toHaveAttribute('data-gh-floating-surface', 'evidencePeek')
     expect(surface).toHaveAttribute('data-gh-floating-surface-kind', 'costProvenance')
+    expect(surface).toHaveAttribute('data-gh-floating-placement', 'bottom-start')
+    expect(surface).toHaveAttribute('data-gh-floating-motion', 'anchored')
+    expect(surface).toHaveAttribute('data-gh-floating-motion-state', 'entering')
     expect(surface).toHaveAttribute('data-capture', 'evidence-peek')
     expect(surface).toHaveAttribute('aria-label', 'Detalle de evidencia')
     expect(screen.getByText('Contenido de la evidencia')).toBeInTheDocument()
@@ -67,6 +70,8 @@ describe('GreenhouseFloatingSurface', () => {
     await screen.findByRole('dialog')
 
     fireEvent.keyDown(document.body, { key: 'Escape' })
+
+    expect(screen.getByRole('dialog')).toHaveAttribute('data-gh-floating-motion-state', 'exiting')
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
