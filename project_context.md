@@ -60,6 +60,16 @@
 - **Software Architect 2026 skill:** Codex ahora tiene la skill local invocable `software-architect-2026` en `.codex/skills/software-architect-2026/`. Se adapto desde el paquete Claude entregado por el usuario y conserva referencias, checklists, templates y overlay Efeonce. Uso esperado: decisiones de arquitectura, ADRs, C4, stack picks, auditorias, migraciones, threat models, cost estimates y handoff a TASK docs. En Greenhouse, `AGENTS.md`, `project_context.md`, `Handoff.md` y la task vigente prevalecen si alguna referencia del overlay queda stale.
 - **GSAP adoption vigente:** Greenhouse adopta `gsap` + `@gsap/react` como carril especializado de motion avanzado, no como reemplazo del stack base. ADR canonical: `docs/architecture/GREENHOUSE_GSAP_ADOPTION_DECISION_V1.md`. Imports canonicos: `src/libs/GSAP.tsx` (`gsap`, `useGSAP`) y `src/libs/GSAPScrollTrigger.tsx` (`ScrollTrigger`). Framer Motion/CSS/auto-animate siguen siendo default para microinteracciones comunes; GSAP queda para timelines complejos, SVG/path/text y ScrollTrigger medido con reduced-motion y performance guardrails.
 
+## Delta 2026-06-06 Maintenance gate + primer middleware del repo
+
+- Se agregó el **primer `middleware.ts`** del repo (raíz) para el **gate de mantenimiento** env-driven. SSOT en `src/config/maintenance.ts`. Contrato durable para agentes:
+  - **Default OFF**: sin `MAINTENANCE_MODE=true` el middleware es pass-through total (cero cambio de comportamiento). Activar = env + redeploy (Vercel lee env al desplegar, no en caliente).
+  - **Fail-open**: cualquier excepción del gate degrada a `NextResponse.next()`. El único modo de falla aceptable es "el mantenimiento no se activó", NUNCA "el sitio se cae".
+  - **Allowlist** que nunca se gatea: `/maintenance`, `/_next`, `/api/auth` (+agent-session), `/api/health`, `/branding`, `/images`, `/animations` + estáticos con extensión (excluidos por el matcher).
+  - **Bypass de operador**: `MAINTENANCE_BYPASS_SECRET` vía `?gh_bypass=<secret>` → cookie httpOnly (compare constant-time, Edge-safe). Respuesta a visitantes: **503 + Retry-After + no-store**.
+  - **Reglas duras**: NO crear un 2º archivo middleware (extender el existente si emerge otra necesidad de request-gating); NO meter lecturas a PG/IO por request en el middleware (Edge, debe ser O(1)); NO duplicar la lógica del gate fuera de `src/config/maintenance.ts`. La página `/maintenance` es de la familia canónica de error/recovery surfaces (ver bullet "Error surfaces como brand/recovery moments" arriba) con 5 variantes seleccionadas una vez al entrar.
+- Docs: `docs/documentation/plataforma/pagina-mantenimiento.md` (funcional) + `docs/manual-de-uso/plataforma/modo-mantenimiento.md` (operador). **Rollout pendiente**: no se encendió en ningún ambiente.
+
 ## Delta 2026-05-24 SDD adoptado como práctica explícita (ADR aceptado)
 
 - Greenhouse adopta **Spec-Driven Development** como práctica nombrada. Contrato operativo nuevo para agentes: todo invariante vive en un nivel de la **escalera de promoción L0 prosa → L1 revisado → L2 ejecutable**, y se promueve a L2 (check ejecutable + gate CI) solo si cumple el criterio explícito (drift recurrente / costo alto-irreversible / recurso cross-agente / verificación barata). NO promover por reflejo; NO mecanizar toda la prosa; NO code-gen.

@@ -1,3 +1,17 @@
+# Sesion 2026-06-06 — Página "En mantenimiento" + Modo Mantenimiento (gate)
+
+Se implementó el diseño AXIS "Under Maintenance" (Figma 504-12356) en la familia canónica de misc-pages + un gate de mantenimiento env-driven (primer `middleware.ts` del repo).
+
+- **Pagina:** `src/views/UnderMaintenance.tsx` + `src/app/(blank-layout-pages)/maintenance/page.tsx` (server→view con `mode`+`copy`). Espejo de NotFound: misc-mask, floats reduced-motion-safe, `MiscPageEfeonceFooter`, tokens de tema. CTAs **Volver al inicio** + **Reintentar** (reload = recovery).
+- **Copy:** namespace `underMaintenance` (es-CL/en-US) con **5 variantes rotativas** (crypto-random al refrescar, patrón 404/401). Ilustración Efeonce propietaria adoptada del AXIS DS → `public/images/illustrations/characters/greenhouse-maintenance.png`.
+- **Gate:** `middleware.ts` + `src/config/maintenance.ts` (SSOT). Default **OFF** (zero behavior change al mergear); **fail-open**; allowlist (`/maintenance`, `_next`, `/api/auth`, `/api/health`, assets); bypass operador `?gh_bypass=<secret>`→cookie httpOnly; **503 + Retry-After + no-store**.
+- **Evidencia:** tsc 0 + lint clean; gate ON **7/7** curl tests (503 gateado, `/maintenance` 200 sin loop, allowlist 200, asset 200, bypass correcto setea cookie, bypass incorrecto 503, cookie persiste); `pnpm build` **BUILD_EXIT=0** con `ƒ Proxy (Middleware)`; GVC desktop+mobile enterprise (`.captures/2026-06-07T00-02-22_inline-maintenance`, `…T00-05-18…` mobile). Skills: greenhouse-ux, modern-ui, greenhouse-ux-writing, arch-architect.
+- **Commit:** `16bb15dac feat(ui): AXIS Under Maintenance misc page + maintenance gate` (solo mis 10 archivos; el trabajo de primitives/charts quedó sin tocar).
+- **Riesgo conocido:** con mantenimiento global ON, "Volver al inicio" recarga `/maintenance` (todo gateado); la acción útil es "Reintentar". Se dejó así por consistencia con la familia.
+- **Estado: code complete, rollout pendiente.** El gate NO se encendió en ningún ambiente. **Próximo paso (owner: operador):** para activar una mantención → setear `MAINTENANCE_MODE=true` (+ `MAINTENANCE_BYPASS_SECRET=$(openssl rand -hex 32)`) en el target + redeploy; para cerrar → `MAINTENANCE_MODE=false` + redeploy. Runbook: `docs/manual-de-uso/plataforma/modo-mantenimiento.md`.
+
+---
+
 # Sesion 2026-06-06 — Greenhouse microinteraction primitives V1
 
 Por pedido del operador de continuar primitives de microinteracciones aparte de loaders, se canonizo el set V1 de microinteracciones: accion async, feedback post-accion, transiciones de estado y validacion inline.
