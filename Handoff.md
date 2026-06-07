@@ -1,3 +1,28 @@
+# Sesion 2026-06-07 — TASK-1051 elevation token primitive migration + lint rule (complete, develop)
+
+Cierra el follow-up de TASK-1049. Local-first en `develop` (sin branch). 4 primitives migradas a `theme.greenhouseElevation.<role>` + lint rule guardrail.
+
+- **Migración (rol por semántica, no por matchear el número):** `InlineNumericEditor` (Popper editor) `elevation={6}`→`floating`; `ContextChip` (×2 popovers `role=dialog`) `theme.shadows[6]`→`floating`; `MetricTrendCard` (hover lift) `theme.shadows[4]`→`raised`; `ContextualSidecar` (contained desktop) `theme.shadows[2]`→`raised`. La sombra **direccional** del lane `adaptive` (`-18px 0 48px`) queda **bespoke** (no es `theme.shadows[n]`, un rol simétrico no la expresa) — decisión documentada.
+- **Lint rule** `greenhouse/no-direct-mui-elevation-in-primitives` (modo `error`, scope `src/components/greenhouse/primitives/**`): flag `elevation={n≥1}` + `theme.shadows[n]`. NO flaggea `customShadows` ni sombras direccionales bespoke (compat Vuexy + lane shadows legítimos). RuleTester 4 valid + 4 invalid. Plugin v1.13.0→1.14.0.
+- **Gates:** 0 violaciones en `src/` · rule-tests 17/17 · primitives 168/168 · drift 27/27 · tsc/eslint 0. GVC: adaptive-sidecar mockup (`raised` contenido OK) + Person 360 (ContextChip `floating`, mismo token aprobado en TASK-1049).
+- **Follow-up abierto (no en scope):** barrido opcional de `customShadows`/`theme.shadows[n]` en views de producto + chart cards (Vuexy compat).
+
+---
+
+# Sesion 2026-06-07 — Design System catalog canonizado
+
+Se aprobo el mockup del catalogo del Design System y se canonizo como home real.
+
+- **Ruta canonica:** `/admin/design-system` ahora renderiza `DesignSystemCatalogView` (catalogo interno de tokens, primitives, patrones y labs). La ruta mockup `/admin/design-system/mockup/catalog` fue retirada.
+- **Color AXIS:** la antigua home de paleta se movio a `/admin/design-system/colors` como `AxisColorLabView`, con el mismo gate `administracion.design_system`. La pagina de color queda enfocada solo en color AXIS; se retiraron las cards heredadas de navegacion a otras paginas del Design System.
+- **Catalogo:** entradas actuales enlazan a rutas reales; `Color AXIS` apunta a `/admin/design-system/colors`; el item del catalogo queda marcado como canonical; se retiro la fila falsa de docs sin ruta de producto.
+- **Jerarquia visual:** la tabla del catalogo separa `Contrato` y `SoT` con gutter + borde sutil en desktop, corrigiendo la falta de separacion marcada por el operador.
+- **Governance para agentes/Claude:** `CLAUDE.md`, `AGENTS.md` y `ui-platform` declaran que toda nueva incorporacion del Design System debe agregarse al catalogo, enlazar su ruta/lab, declararse en reachability y conectar docs/GVC.
+- **Verificacion local:** `pnpm exec eslint ...` focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm docs:closure-check` y GVC `design-system-catalog` local desktop/wide/mobile OK. Color validado con `pnpm fe:capture --route=/admin/design-system/colors --env=local`.
+- **Nota de staging:** no mezclar en este commit los cambios de lifecycle `TASK-1051` ya presentes en el worktree.
+
+---
+
 # Sesion 2026-06-07 — TASK-1050 Geometry Lab iniciado
 
 Se inicio `TASK-1050` en `develop` sin cambiar de rama porque el worktree ya tenia cambios paralelos de `TASK-1049` (elevation). No se revirtio ni se edito ownership ajeno.

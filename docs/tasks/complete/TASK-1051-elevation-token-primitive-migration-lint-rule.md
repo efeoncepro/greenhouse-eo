@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Complete (2026-06-07)`
 - Rank: `TBD`
 - Domain: `ui|platform|design-system|accessibility`
 - Blocked by: `none (TASK-1049 SHIPPED — SoT theme.greenhouseElevation existe)`
-- Branch: `task/TASK-1051-elevation-token-primitive-migration-lint-rule`
+- Branch: `develop (operador: mantenerse en develop, sin branch)`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
