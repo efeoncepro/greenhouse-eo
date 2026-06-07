@@ -143,6 +143,16 @@ export interface CaptureKeyboardQualityOptions {
   probes: CaptureKeyboardProbe[]
 }
 
+export interface CapturePerformanceQualityOptions {
+  enabled?: boolean
+  /** Severidad de los hallazgos de budget. Default 'warning' (warning-first). */
+  severity?: 'warning' | 'error'
+  maxDomNodes?: number
+  maxRequests?: number
+  maxTransferBytes?: number
+  maxFcpMs?: number
+}
+
 export interface CaptureQualityOptions {
   allowEmpty?: boolean
   allowLoading?: boolean
@@ -152,6 +162,7 @@ export interface CaptureQualityOptions {
   layout?: CaptureLayoutQualityOptions
   runtime?: CaptureRuntimeQualityOptions
   keyboard?: CaptureKeyboardQualityOptions
+  performance?: CapturePerformanceQualityOptions
 }
 
 export interface CaptureScenarioStep {

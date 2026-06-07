@@ -54,7 +54,13 @@ export const FINDING_CODES = {
   keyboard_focus_ring_missing: 'keyboard_focus_ring_missing',
   keyboard_expected_state_missing: 'keyboard_expected_state_missing',
   keyboard_reduced_motion_feedback_lost: 'keyboard_reduced_motion_feedback_lost',
-  keyboard_probe_failed: 'keyboard_probe_failed'
+  keyboard_probe_failed: 'keyboard_probe_failed',
+  // --- Slice 6: performance / resource budgets ---
+  perf_dom_nodes_exceeded: 'perf_dom_nodes_exceeded',
+  perf_requests_exceeded: 'perf_requests_exceeded',
+  perf_transfer_exceeded: 'perf_transfer_exceeded',
+  perf_fcp_exceeded: 'perf_fcp_exceeded',
+  perf_probe_failed: 'perf_probe_failed'
 } as const
 
 export type FindingCode = (typeof FINDING_CODES)[keyof typeof FINDING_CODES]

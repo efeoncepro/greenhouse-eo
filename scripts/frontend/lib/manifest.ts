@@ -151,6 +151,16 @@ export interface RuntimeSummary {
   httpFailureSamples: Array<{ url: string; status: number; resourceType: string }>
 }
 
+/** Snapshot liviano de performance/recursos (Slice 6). */
+export interface PerformanceSummary {
+  domNodes: number
+  requestCount: number
+  transferBytes: number
+  fcpMs?: number
+  domContentLoadedMs?: number
+  jsHeapBytes?: number
+}
+
 export interface CaptureVariantSummary {
   name: string
   viewport: { width: number; height: number }
@@ -190,6 +200,7 @@ export interface CaptureManifest {
   baseline?: CaptureBaselineMeta
   baselineDiffs?: BaselineFrameDiff[]
   runtimeSummary?: RuntimeSummary
+  performanceSummary?: PerformanceSummary
   exitCode: 0 | 1
   error?: {
     message: string

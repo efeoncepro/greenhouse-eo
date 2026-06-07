@@ -96,6 +96,19 @@ export const buildCaptureReportHtml = (manifest: CaptureManifest): string => {
         : '<p class="muted">Sin errores de consola/red detectados.</p>'}`
     : '<p class="muted">Collectors runtime no registrados.</p>'
 
+  const perf = manifest.performanceSummary
+
+  const perfSection = perf
+    ? `<div class="meta">
+        <div class="panel"><strong>DOM nodes</strong><br>${perf.domNodes}</div>
+        <div class="panel"><strong>Requests</strong><br>${perf.requestCount}</div>
+        <div class="panel"><strong>Transfer</strong><br>${(perf.transferBytes / 1024).toFixed(0)} KB</div>
+        <div class="panel"><strong>FCP</strong><br>${perf.fcpMs !== undefined ? `${perf.fcpMs}ms` : '—'}</div>
+        <div class="panel"><strong>DCL</strong><br>${perf.domContentLoadedMs !== undefined ? `${perf.domContentLoadedMs}ms` : '—'}</div>
+        ${perf.jsHeapBytes !== undefined ? `<div class="panel"><strong>JS heap</strong><br>${(perf.jsHeapBytes / 1048576).toFixed(1)} MB</div>` : ''}
+      </div>`
+    : '<p class="muted">Sin snapshot de performance.</p>'
+
   return `<!doctype html>
 <html lang="es">
 <head>
@@ -157,6 +170,9 @@ export const buildCaptureReportHtml = (manifest: CaptureManifest): string => {
 
   <h2>Runtime (console · page · hydration · network)</h2>
   ${runtimeSection}
+
+  <h2>Performance (resource budgets)</h2>
+  ${perfSection}
 
   <h2>Microinteractions</h2>
   <table><thead><tr><th>Name</th><th>Action</th><th>Segment</th><th>Intent</th><th>Frames</th></tr></thead><tbody>${interactionRows}</tbody></table>

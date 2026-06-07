@@ -19,7 +19,8 @@ import { applyCaptureDeterminism } from './lib/capture-masks'
 import { isValidEnv, resolveEnvConfig, type CaptureEnv, type EnvConfig } from './lib/env'
 import { classifyCaptureFailure } from './lib/failure-taxonomy'
 import { composeGif } from './lib/gif'
-import { writeManifest, type BaselineFrameDiff, type CaptureManifest, type RuntimeSummary } from './lib/manifest'
+import { writeManifest, type BaselineFrameDiff, type CaptureManifest, type PerformanceSummary, type RuntimeSummary } from './lib/manifest'
+import { collectPerformanceSnapshot, derivePerformanceFindings } from './lib/perf-budget'
 import { runScenario } from './lib/recorder'
 import { writeCaptureReport } from './lib/report'
 import { attachRuntimeCollectors, deriveRuntimeFindings } from './lib/runtime-collector'
@@ -158,6 +159,7 @@ const runOneCapture = async ({
   let stepError: { message: string; stepIndex: number } | undefined
   let baselineDiffs: BaselineFrameDiff[] | undefined
   let runtimeSummary: RuntimeSummary | undefined
+  let performanceSummary: PerformanceSummary | undefined
   let outcome = {
     frames: [],
     startedAt: Date.now(),
@@ -223,6 +225,9 @@ const runOneCapture = async ({
 
     runtimeSummary = runtimeCollector.summarize()
     outcome.qualityFindings.push(...deriveRuntimeFindings(runtimeCollector.raw(), scenario.quality?.runtime))
+
+    performanceSummary = await collectPerformanceSnapshot(session.page)
+    outcome.qualityFindings.push(...derivePerformanceFindings(performanceSummary, scenario.quality?.performance))
 
     const blockingFinding = outcome.qualityFindings.find(finding => finding.severity === 'error')
 
@@ -310,6 +315,7 @@ const runOneCapture = async ({
     baseline: scenario.baseline,
     baselineDiffs,
     runtimeSummary,
+    performanceSummary,
     exitCode,
     error: stepError
   }
