@@ -71,6 +71,16 @@ export const launchCaptureSession = async (opts: LaunchOptions): Promise<Launche
     }
   })
 
+  // esbuild keepNames shim: los bodies de page.evaluate compilados por tsx pueden
+  // referenciar el helper `__name`, que no existe en el contexto del browser.
+  // Lo definimos como passthrough antes de cualquier navegación (defense-in-depth
+  // para todos los gates que usan page.evaluate).
+  await context.addInitScript(() => {
+    const g = globalThis as unknown as { __name?: (fn: unknown) => unknown }
+
+    if (!g.__name) g.__name = fn => fn
+  })
+
   let tracingActive = false
 
   try {

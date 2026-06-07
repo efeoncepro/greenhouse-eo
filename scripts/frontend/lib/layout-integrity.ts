@@ -50,14 +50,17 @@ export const analyzeLayoutIntegrity = async (
           .flatMap(sel => Array.from(document.querySelectorAll(sel)))
           .filter((el): el is Element => Boolean(el))
 
-        const isIgnored = (el: Element): boolean => {
+        // NOTE: declaradas como function declarations (no `const fn = () =>`)
+        // a propósito: esbuild keepNames envuelve arrow-consts con `__name(...)`
+        // que NO existe en el contexto del browser de page.evaluate.
+        function isIgnored(el: Element): boolean {
           if (el.closest('[aria-hidden="true"]')) return true
           for (const ig of ignore) if (ig === el || ig.contains(el)) return true
 
           return false
         }
 
-        const describe = (el: Element): string => {
+        function describe(el: Element): string {
           const tag = el.tagName.toLowerCase()
           const id = el.id ? `#${el.id}` : ''
           const cls = typeof el.className === 'string' && el.className.trim() ? `.${el.className.trim().split(/\s+/)[0]}` : ''
@@ -66,7 +69,7 @@ export const analyzeLayoutIntegrity = async (
           return dataCapture ? `${tag}[data-capture="${dataCapture}"]` : `${tag}${id}${cls}`
         }
 
-        const isVisible = (el: Element): boolean => {
+        function isVisible(el: Element): boolean {
           const style = getComputedStyle(el)
 
           if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) return false
@@ -76,7 +79,9 @@ export const analyzeLayoutIntegrity = async (
           return r.width > 0 && r.height > 0
         }
 
-        const cap = (code: string): boolean => issues.filter(i => i.code === code).length >= maxPerCode
+        function cap(code: string): boolean {
+          return issues.filter(i => i.code === code).length >= maxPerCode
+        }
 
         const vw = window.innerWidth
 
