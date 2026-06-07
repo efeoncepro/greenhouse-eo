@@ -7,6 +7,10 @@ import type { CaptureScenario } from '../lib/scenario'
 export const scenario: CaptureScenario = {
   name: 'floating-surface-primitives',
   route: '/admin/design-system/floating-surfaces',
+  // Escape/focus are UI-only interactions over an internal lab with no backend
+  // writes — safe to capture.
+  mutating: true,
+  safeForCapture: true,
   viewport: { width: 1280, height: 900 },
   viewports: [
     { name: 'desktop', width: 1280, height: 900 },
@@ -36,8 +40,9 @@ export const scenario: CaptureScenario = {
       fullPage: true,
       note: 'Galería de las 6 variants oficiales con sus contratos role/interaction/focus'
     },
+    // evidencePeek — click, role dialog. Open + capture the managed surface.
     { kind: 'click', selector: '#fs-anchor-evidencePeek' },
-    { kind: 'sleep', ms: 400 },
+    { kind: 'sleep', ms: 450 },
     {
       kind: 'mark',
       label: 'evidence-peek-open',
@@ -45,17 +50,8 @@ export const scenario: CaptureScenario = {
       note: 'evidencePeek (role dialog) abierto: chips de trazabilidad + open-deeper'
     },
     { kind: 'press', key: 'Escape' },
-    { kind: 'sleep', ms: 250 },
-    { kind: 'click', selector: '#fs-anchor-actionMenu' },
-    { kind: 'sleep', ms: 400 },
-    {
-      kind: 'mark',
-      label: 'action-menu-open',
-      clipSelector: '[data-gh-floating-surface="actionMenu"]',
-      note: 'actionMenu (role menu) abierto con foco gestionado'
-    },
-    { kind: 'press', key: 'Escape' },
-    { kind: 'sleep', ms: 250 },
+    { kind: 'sleep', ms: 500 },
+    // richTooltip — read-only, opens on keyboard focus (no focus trap).
     {
       kind: 'interaction',
       interaction: {
@@ -64,7 +60,7 @@ export const scenario: CaptureScenario = {
         action: { kind: 'focus', selector: '#fs-anchor-richTooltip' },
         frames: [
           {
-            atMs: 350,
+            atMs: 400,
             label: 'open',
             clipSelector: '[data-gh-floating-surface="richTooltip"]',
             note: 'richTooltip abierto por foco (keyboard reachable)'
@@ -72,6 +68,9 @@ export const scenario: CaptureScenario = {
         ]
       }
     },
+    { kind: 'press', key: 'Escape' },
+    { kind: 'sleep', ms: 400 },
+    // commandPreview — right-start near the right edge: flip/shift collision.
     {
       kind: 'interaction',
       interaction: {
@@ -80,7 +79,7 @@ export const scenario: CaptureScenario = {
         action: { kind: 'focus', selector: '#fs-anchor-commandPreview' },
         frames: [
           {
-            atMs: 350,
+            atMs: 400,
             label: 'collision',
             fullPage: true,
             note: 'commandPreview reubicado por flip/shift sin salirse del viewport'
