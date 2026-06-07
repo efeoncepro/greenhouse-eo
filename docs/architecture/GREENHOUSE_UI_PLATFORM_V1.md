@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.26
+> **Version:** 1.27
 > **Created:** 2026-03-30
+> **Updated:** 2026-06-07 — v1.27: Greenhouse agrega `GreenhouseChip` como primitive canonical de chips basada en AXIS Figma `Chip` (`yyMksCoijfMaIoYplXKZaR`, node `369:92030`) con variants `solid/label/outlined`, tones semanticos, sizes `medium/small`, avatar y close affordance. Lab interno: `/admin/design-system/chips`.
 > **Updated:** 2026-06-07 — v1.26: Greenhouse agrega `GreenhouseActivityTimeline` como primera primitive de utilities para timelines de actividad/auditoria ligera/handoffs/documentos, adaptada desde AXIS Figma `Activity Timeline` (`yyMksCoijfMaIoYplXKZaR`, node `6678:105154`) con Framer Motion reduced-motion-safe y Utilities Lab interno en `/admin/design-system/utilities`.
 > **Updated:** 2026-06-07 — v1.25: Greenhouse agrega `GreenhouseMetricBreakdownChartCard` como tercera primitive canonical de charts para snapshots con KPI hero + serie semanal + metric meters (`variant='weeklyBarSummary'`, primer kind `earningReports`) basada en Recharts + meters MUI.
 > **Updated:** 2026-06-07 — v1.24: Greenhouse agrega `GreenhouseStackedDistributionChartCard` como segunda primitive canonical de charts para distribuciones apiladas operativas (`variant='stackedStatus'`, primer kind `vehiclesOverview`) basada en Recharts + rows MUI.
@@ -36,6 +37,28 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-06-07c — Greenhouse Chip Primitive
+
+Greenhouse adopta `GreenhouseChip` como primitive canonical para chips compactos basada en AXIS Figma (`Design System | Vuexy → AXIS`, node `369:92030`). El objetivo es cortar la proliferacion de chips route-locales cuando el caso es reusable: estados, atributos, filtros, entradas removibles, identidad compacta y metadatos operativos.
+
+Docs canonicos:
+
+- Runtime primitive: `src/components/greenhouse/primitives/GreenhouseChip.tsx`
+- Visual lab interno: `/admin/design-system/chips`
+- Scenario GVC: `design-system-chips`
+- Avatar de referencia DS: `public/images/greenhouse/design-system/axis-avatar-greenhouse.png`, exportado desde AXIS Figma `Avatar/Greenhouse` (node `369:72301`). Es solo asset de documentacion visual; los avatares productivos siguen resolviendose con `resolveAvatarUrl()`.
+
+Contrato:
+
+- Variants oficiales V1: `solid`, `label`, `outlined`. `label` conserva el nombre AXIS/Figma y se traduce internamente al affordance tonal de Vuexy/MUI.
+- Tones oficiales V1: `default`, `primary`, `secondary`, `error`, `warning`, `info`, `success`.
+- Sizes oficiales V1: `medium` (32px) y `small` (24px), alineados al nodo Figma.
+- Kinds semanticos V1: `status`, `attribute`, `input`, `action`, `identity`, `filter`, `metric`, `custom`.
+- Props principales: `label`, `variant`, `tone`, `size`, `kind`, `avatarSrc/avatarInitials/avatarNode`, `iconClassName`, `closable`, `onDelete`, `closeLabel`, `dataCapture`.
+- La primitive owns altura, border radius AXIS, avatar/delete icon sizing, focus ring, hover/pressed state, delete-icon affordance, reduced-motion fallback, `data-variant`, `data-tone`, `data-kind`, `data-capture` y estados disabled/clickable.
+- Product consumers deben preferir `GreenhouseChip` cuando el chip tenga semantica reusable o de plataforma. `@core/components/mui/Chip` y `@mui/material/Chip` siguen permitidos para adapters legacy o componentes Vuexy internos mientras se migra por slice.
+- Nuevas variants no pueden ser skins de color/radio; deben cambiar contrato funcional, densidad, interaccion o state model. Nuevos kinds deben mapear un uso semantico hacia una variant existente antes de crear componentes locales como `FooStatusChip`.
 
 ## Delta 2026-06-07b — Greenhouse Utilities / Activity Timeline Primitive
 

@@ -11,6 +11,14 @@ export type {
   GreenhouseAsyncActionButtonProps,
   GreenhouseAsyncActionState
 } from './GreenhouseAsyncActionButton'
+export { default as GreenhouseChip } from './GreenhouseChip'
+export type {
+  GreenhouseChipKind,
+  GreenhouseChipProps,
+  GreenhouseChipSize,
+  GreenhouseChipTone,
+  GreenhouseChipVariant
+} from './GreenhouseChip'
 export { default as GreenhouseCommandFeedback } from './GreenhouseCommandFeedback'
 export type {
   GreenhouseCommandFeedbackProps,

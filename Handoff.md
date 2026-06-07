@@ -1,3 +1,28 @@
+# Sesion 2026-06-07 — Skill Codex `greenhouse-typography-accessibility`
+
+Se creo una skill local **solo para Codex** en `.codex/skills/greenhouse-typography-accessibility/` para gobernar decisiones de tipografia Greenhouse: pesos, variantes MUI, contraste, espaciado accesible, jerarquia visual, frontera Poppins/Geist, chips/botones/labels/tablas/KPIs y adapters PDF/email.
+
+- **No se creo copia Claude:** el operador corrigio el scope porque las skills de Product Design de Claude no son equivalentes. La carpeta `.claude/skills/greenhouse-typography-accessibility/` se retiro.
+- **Investigacion externa incorporada:** W3C WCAG 2.2, WCAG Text Spacing 1.4.12, USWDS Typography, Material 3 / Material Web Typography, Carbon Typography e IBM Type Scale. La referencia cargable vive en `.codex/skills/greenhouse-typography-accessibility/references/typography-research-and-runtime-map.md`.
+- **Mapa runtime incluido:** `typographyScale`, `TYPOGRAPHY_VARIANT_BRIDGE`, `SECONDARY_VARIANT_TOKENS`, `controlText`, pesos 400/600/700/800, decision de no crear rol 500, familias PDF registradas y boundary `Poppins display / Geist product UI`.
+- **Decision de skill:** no reemplaza `design-system-governance`; compone con ella cuando se cambia token/SoT. Tampoco reemplaza `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility` ni `greenhouse-ui-enterprise-review`; se activa para diagnostico tipografico especializado ("todo muy bold", pesos, contrastes, variants, Poppins/Geist).
+- **Smoke test practico:** se aplico contra la pagina de Chips del commit local `codex/chips-lab-axis` sin cambiar de rama ni tocar trabajo paralelo. Resultado: la skill detecto correctamente pesos de filas/headers y el uso de `500`; tambien revelo un falso positivo potencial para labs Figma por raw `fontSize` route-local. Se ajusto la skill con una excepcion gobernada para `/admin/design-system/**`: valores specimen permitidos solo si no salen a primitives/tokens/product views y se validan con GVC.
+- **Estado worktree paralelo:** existen archivos untracked de motion de otro trabajo (`src/components/greenhouse/motion/*`); no pertenecen a esta skill y no se tocaron.
+
+---
+
+# Sesion 2026-06-07 — Greenhouse Chip primitive + Chips Lab AXIS restaurado en `develop`
+
+Se restauró en el working tree actual la página `/admin/design-system/chips`, que había quedado solo en la rama local aislada `codex/chips-lab-axis` y por eso devolvía 404 en `develop`.
+
+- **Primitive:** `GreenhouseChip` en `src/components/greenhouse/primitives/`, con variants `solid/label/outlined`, tones semánticos, sizes `medium/small`, kinds, avatar opcional, close affordance y microinteracciones reduced-motion-safe.
+- **Lab interno:** `src/app/(dashboard)/admin/design-system/chips/page.tsx` + `ChipsLabView`, protegido por el mismo gate de `/admin/design-system`.
+- **Figma parity:** lab light/dark basado en AXIS Figma `Chip` (`yyMksCoijfMaIoYplXKZaR`, node `369:92030`), con `AxisWordmark` y avatar de referencia `Avatar/Greenhouse` (`node 369:72301`) en `public/images/greenhouse/design-system/axis-avatar-greenhouse.png`.
+- **No se tocó Claude/motion:** `DesignSystemView` y `route-reachability-manifest` recibieron solo hunks de chips; los hunks de Motion Lab siguen fuera del commit de chips.
+- **Verificación:** eslint focal, test focal `GreenhouseChip` y `pnpm route-reachability-gate --strict` verdes (183 rutas, 0 orphans).
+
+---
+
 # Sesion 2026-06-07 — Typography consumer sweep (TASK-1036 cleanup)
 
 Se resolvió el baseline de warnings `greenhouse/no-fontsize-inline-typography`: `pnpm lint` pasó de 162 warnings en 93 archivos a 0 errores / 0 warnings. El cambio migró `<Typography>` legacy con `fontSize` literal hacia variants del SoT (`caption`, `body1/body2`, `overline`, `inherit`, etc.) y corrigió un warning real de hooks en `CostAllocationsView` moviendo `clientColumnHelper` a scope estable + dependencia explícita de `handleToggleExpand`.

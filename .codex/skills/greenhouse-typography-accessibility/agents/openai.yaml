@@ -1,0 +1,6 @@
+interface:
+  display_name: "Greenhouse Typography Accessibility"
+  short_description: "Audit type hierarchy, weights, and contrast"
+  default_prompt: "Use $greenhouse-typography-accessibility to audit this UI typography and recommend Greenhouse-safe variants, weights, and accessibility fixes."
+policy:
+  allow_implicit_invocation: true
