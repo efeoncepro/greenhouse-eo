@@ -16,6 +16,8 @@ import { visuallyHidden } from '@mui/utils'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { Bar, BarChart, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from '@/libs/Recharts'
 
+import { GREENHOUSE_CHART_CHROME_TOKENS } from './greenhouse-chart-controller'
+
 export type GreenhouseStackedDistributionTone = 'neutral' | 'success' | 'info' | 'ink' | 'primary' | 'secondary'
 
 export type GreenhouseStackedDistributionSegment = {
@@ -83,7 +85,7 @@ const DistributionTooltip = ({
       sx={{
         px: 3,
         py: 2,
-        minWidth: 180,
+        minWidth: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.minInlineSize.distribution,
         bgcolor: 'background.paper',
         border: theme => `1px solid ${theme.palette.divider}`,
         borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
@@ -102,12 +104,20 @@ const DistributionTooltip = ({
             return (
               <Stack key={String(item.dataKey)} direction='row' alignItems='center' justifyContent='space-between' spacing={2}>
                 <Stack direction='row' alignItems='center' spacing={1.25} sx={{ minWidth: 0 }}>
-                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.color, flexShrink: 0 }} />
+                  <Box
+                    sx={{
+                      width: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.markerSize,
+                      height: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.markerSize,
+                      borderRadius: '50%',
+                      bgcolor: item.color,
+                      flexShrink: 0
+                    }}
+                  />
                   <Typography variant='caption' color='text.primary' noWrap>
                     {segment?.label ?? item.dataKey}
                   </Typography>
                 </Stack>
-                <Typography variant='caption' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                <Typography variant='monoAmount'>
                   {formatRenderableValue(item.value, valueFormatter)}
                 </Typography>
               </Stack>
@@ -155,7 +165,7 @@ const GreenhouseStackedDistributionChartCard = ({
         return { fill: theme.palette.info.main, text: theme.palette.common.white, icon: theme.palette.info.dark }
       case 'ink':
         return {
-          fill: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#2F2B3D',
+          fill: theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.text.primary,
           text: theme.palette.common.white,
           icon: theme.palette.text.secondary
         }
@@ -192,9 +202,9 @@ const GreenhouseStackedDistributionChartCard = ({
       data-chart-kind={kind}
       sx={{
         width: '100%',
-        maxWidth: 554,
+        maxWidth: GREENHOUSE_CHART_CHROME_TOKENS.card.compactMaxInlineSize,
         borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-        border: theme => `1px solid ${alpha(theme.palette.divider, 0.72)}`,
+        border: theme => `1px solid ${alpha(theme.palette.divider, GREENHOUSE_CHART_CHROME_TOKENS.opacity.border)}`,
         boxShadow: 'var(--mui-customShadows-md)',
         overflow: 'hidden'
       }}
@@ -223,11 +233,18 @@ const GreenhouseStackedDistributionChartCard = ({
                 <Typography
                   variant={isCompact ? 'body2' : 'body1'}
                   color='text.secondary'
-                  sx={{ lineHeight: 1.35, minHeight: { xs: 38, sm: 'auto' } }}
+                  sx={{ minHeight: { xs: GREENHOUSE_CHART_CHROME_TOKENS.icon.container, sm: 'auto' } }}
                 >
                   {segment.label}
                 </Typography>
-                <Box sx={{ width: 1, maxWidth: 10, height: 10, borderInlineStart: theme => `1px solid ${theme.palette.divider}` }} />
+                <Box
+                  sx={{
+                    width: 1,
+                    maxWidth: GREENHOUSE_CHART_CHROME_TOKENS.chart.segmentTickSize,
+                    height: GREENHOUSE_CHART_CHROME_TOKENS.chart.segmentTickSize,
+                    borderInlineStart: theme => `1px solid ${theme.palette.divider}`
+                  }}
+                />
               </Stack>
             ))}
           </Box>
@@ -235,7 +252,7 @@ const GreenhouseStackedDistributionChartCard = ({
           <Box sx={{ position: 'relative', mb: 6 }}>
             <AppRecharts>
               <Box role='img' aria-label={resolvedChartAriaLabel} aria-describedby={chartDescriptionId}>
-                <ResponsiveContainer width='100%' height={46}>
+                <ResponsiveContainer width='100%' height={GREENHOUSE_CHART_CHROME_TOKENS.chart.stackedHeight}>
                   <BarChart
                     data={chartData}
                     layout='vertical'
@@ -262,9 +279,19 @@ const GreenhouseStackedDistributionChartCard = ({
                         fill={segment.colors.fill}
                         radius={
                           index === 0
-                            ? [6, 0, 0, 6]
+                            ? [
+                                GREENHOUSE_CHART_CHROME_TOKENS.chart.barRadius,
+                                0,
+                                0,
+                                GREENHOUSE_CHART_CHROME_TOKENS.chart.barRadius
+                              ]
                             : index === coloredSegments.length - 1
-                              ? [0, 6, 6, 0]
+                              ? [
+                                  0,
+                                  GREENHOUSE_CHART_CHROME_TOKENS.chart.barRadius,
+                                  GREENHOUSE_CHART_CHROME_TOKENS.chart.barRadius,
+                                  0
+                                ]
                               : [0, 0, 0, 0]
                         }
                         isAnimationActive
@@ -294,17 +321,17 @@ const GreenhouseStackedDistributionChartCard = ({
                     minWidth: 0,
                     display: 'flex',
                     alignItems: 'center',
-                    px: isCompact ? 1 : 4
+                    justifyContent: isCompact ? 'center' : 'flex-start',
+                    px: isCompact
+                      ? GREENHOUSE_CHART_CHROME_TOKENS.spacing.segmentValuePadding.compact
+                      : GREENHOUSE_CHART_CHROME_TOKENS.spacing.segmentValuePadding.comfortable
                   }}
                 >
                   <Typography
-                    variant='caption'
-                    noWrap
+                    variant='monoAmount'
                     sx={{
                       color: segment.colors.text,
-                      fontSize: isCompact ? 11 : undefined,
-                      fontWeight: 800,
-                      fontVariantNumeric: 'tabular-nums'
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     {valueFormatter(segment.value)}
@@ -331,10 +358,11 @@ const GreenhouseStackedDistributionChartCard = ({
                   }}
                 >
                   <Stack direction='row' alignItems='center' spacing={2} sx={{ minWidth: 0 }}>
-                    <i
+                    <Box
+                      component='i'
                       className={segment.icon}
                       aria-hidden='true'
-                      style={{ fontSize: 24, color: segment.colors.icon, flexShrink: 0 }}
+                      sx={{ fontSize: GREENHOUSE_CHART_CHROME_TOKENS.icon.segment, color: segment.colors.icon, flexShrink: 0 }}
                     />
                     <Typography variant='body1' color='text.primary' noWrap>
                       {segment.label}
@@ -342,18 +370,17 @@ const GreenhouseStackedDistributionChartCard = ({
                   </Stack>
                   {segment.detail ? (
                     <Typography
-                      variant='body2'
-                      sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: 'text.primary' }}
+                      variant='monoId'
+                      sx={{ color: 'text.primary' }}
                     >
                       {segment.detail}
                     </Typography>
                   ) : null}
                   <Typography
-                    variant='body1'
+                    variant='monoAmount'
                     color='text.secondary'
                     sx={{
                       gridColumn: { xs: segment.detail ? '2 / 3' : 'auto', sm: 'auto' },
-                      fontVariantNumeric: 'tabular-nums',
                       textAlign: 'end'
                     }}
                   >

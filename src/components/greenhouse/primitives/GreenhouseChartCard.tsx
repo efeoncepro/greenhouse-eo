@@ -12,6 +12,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { alpha, useTheme } from '@mui/material/styles'
 import { visuallyHidden } from '@mui/utils'
 
+import { getChartTypographyFromTheme } from '@/components/theme/chart-typography'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import {
   Bar,
@@ -24,6 +25,8 @@ import {
   XAxis,
   YAxis
 } from '@/libs/Recharts'
+
+import { GREENHOUSE_CHART_CHROME_TOKENS } from './greenhouse-chart-controller'
 
 export type GreenhouseChartTone = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'
 
@@ -111,7 +114,7 @@ const GreenhouseChartTooltip = ({
       sx={{
         px: 3,
         py: 2,
-        minWidth: 108,
+        minWidth: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.minInlineSize.compact,
         bgcolor: 'background.paper',
         border: theme => `1px solid ${theme.palette.divider}`,
         borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
@@ -122,8 +125,16 @@ const GreenhouseChartTooltip = ({
         {label}
       </Typography>
       <Stack direction='row' alignItems='center' spacing={1.5}>
-        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: color, flexShrink: 0 }} />
-        <Typography variant='body2' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+        <Box
+          sx={{
+            width: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.markerSize,
+            height: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.markerSize,
+            borderRadius: '50%',
+            bgcolor: color,
+            flexShrink: 0
+          }}
+        />
+        <Typography variant='monoId'>
           {valueFormatter(value)}
         </Typography>
       </Stack>
@@ -150,6 +161,7 @@ const GreenhouseChartCard = ({
 }: GreenhouseChartCardProps) => {
   const theme = useTheme()
   const isCompact = useMediaQuery(theme.breakpoints.down('sm'))
+  const chartTypography = getChartTypographyFromTheme(theme)
   const chartDescriptionId = useId().replace(/:/g, '')
   const selectableTabs = useMemo(() => tabs.filter(tab => !tab.disabled && tab.data?.length), [tabs])
   const initialTabId = defaultActiveTabId ?? selectableTabs[0]?.id ?? tabs[0]?.id
@@ -160,8 +172,16 @@ const GreenhouseChartCard = ({
   const tone = activeTab?.tone ?? 'success'
   const mainColor = theme.palette[tone].main
   const activeColor = theme.palette[tone].dark || mainColor
-  const softColor = alpha(mainColor, theme.palette.mode === 'dark' ? 0.24 : 0.16)
+
+  const softColor = alpha(
+    mainColor,
+    theme.palette.mode === 'dark'
+      ? GREENHOUSE_CHART_CHROME_TOKENS.opacity.monthlyInactiveBar.dark
+      : GREENHOUSE_CHART_CHROME_TOKENS.opacity.monthlyInactiveBar.light
+  )
+
   const highlightedIndex = activeTab?.highlightedIndex ?? data.findIndex(item => item.value === Math.max(...data.map(d => d.value)))
+
   const resolvedMaxValue = resolveMaxValue(data, maxValue)
 
   const chartSummary = `${activeTab?.label ?? 'Metrica'}: ${data
@@ -193,9 +213,9 @@ const GreenhouseChartCard = ({
       data-chart-kind={kind}
       sx={{
         width: '100%',
-        maxWidth: 746,
+        maxWidth: GREENHOUSE_CHART_CHROME_TOKENS.card.wideMaxInlineSize,
         borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-        border: theme => `1px solid ${alpha(theme.palette.divider, 0.72)}`,
+        border: theme => `1px solid ${alpha(theme.palette.divider, GREENHOUSE_CHART_CHROME_TOKENS.opacity.border)}`,
         boxShadow: 'var(--mui-customShadows-md)',
         overflow: 'hidden'
       }}
@@ -266,7 +286,7 @@ const GreenhouseChartCard = ({
                     border: theme =>
                       selected
                         ? `1px solid ${theme.palette.primary.main}`
-                        : `1px dashed ${alpha(theme.palette.text.primary, 0.14)}`,
+                        : `1px dashed ${alpha(theme.palette.text.primary, GREENHOUSE_CHART_CHROME_TOKENS.opacity.dashedBorder)}`,
                     bgcolor: 'transparent',
                     color: selected ? 'text.primary' : 'text.secondary',
                     cursor: tab.disabled ? 'not-allowed' : 'pointer',
@@ -276,8 +296,11 @@ const GreenhouseChartCard = ({
                       duration: theme.transitions.duration.shortest
                     }),
                     '&:hover': {
-                      borderColor: theme => (selected ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.34)),
-                      bgcolor: theme => alpha(theme.palette.primary.main, 0.035)
+                      borderColor: theme =>
+                        selected
+                          ? theme.palette.primary.main
+                          : alpha(theme.palette.primary.main, GREENHOUSE_CHART_CHROME_TOKENS.opacity.hoverBorder),
+                      bgcolor: theme => alpha(theme.palette.primary.main, GREENHOUSE_CHART_CHROME_TOKENS.opacity.hoverSurface)
                     },
                     '&:focus-visible': {
                       outline: theme => `2px solid ${theme.palette.primary.main}`,
@@ -292,23 +315,25 @@ const GreenhouseChartCard = ({
                 >
                   <Box
                     sx={{
-                      width: 38,
-                      height: 38,
+                      width: GREENHOUSE_CHART_CHROME_TOKENS.icon.container,
+                      height: GREENHOUSE_CHART_CHROME_TOKENS.icon.container,
                       display: 'grid',
                       placeItems: 'center',
                       borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-                      bgcolor: selected ? alpha(mainColor, 0.16) : 'action.selected',
+                      bgcolor: selected
+                        ? alpha(mainColor, GREENHOUSE_CHART_CHROME_TOKENS.opacity.monthlyInactiveBar.light)
+                        : 'action.selected',
                       color: selected ? activeColor : 'text.secondary'
                     }}
                   >
-                    <i className={tab.icon} style={{ fontSize: 22 }} aria-hidden='true' />
+                    <Box component='i' className={tab.icon} sx={{ fontSize: GREENHOUSE_CHART_CHROME_TOKENS.icon.tab }} aria-hidden='true' />
                   </Box>
                   {isAdd ? (
                     <Box component='span' sx={visuallyHidden}>
                       {tab.label}
                     </Box>
                   ) : (
-                    <Typography component='span' variant='body2' sx={{ fontWeight: 700 }}>
+                    <Typography component='span' variant='button'>
                       {tab.label}
                     </Typography>
                   )}
@@ -324,19 +349,26 @@ const GreenhouseChartCard = ({
               <>
                 <AppRecharts>
                   <Box role='img' aria-label={resolvedChartAriaLabel} aria-describedby={chartDescriptionId}>
-                    <ResponsiveContainer width='100%' height={isCompact ? 232 : 248}>
+                    <ResponsiveContainer
+                      width='100%'
+                      height={
+                        isCompact
+                          ? GREENHOUSE_CHART_CHROME_TOKENS.chart.monthlyHeight.compact
+                          : GREENHOUSE_CHART_CHROME_TOKENS.chart.monthlyHeight.comfortable
+                      }
+                    >
                       <BarChart data={data} margin={{ top: 24, right: 4, bottom: 4, left: 0 }} barCategoryGap='18%'>
                         <CartesianGrid vertical={false} strokeDasharray='0' stroke='transparent' />
                         <XAxis
                           dataKey='label'
-                          axisLine={{ stroke: alpha(theme.palette.text.primary, 0.12) }}
+                          axisLine={{ stroke: alpha(theme.palette.text.primary, GREENHOUSE_CHART_CHROME_TOKENS.opacity.axisLine) }}
                           tickLine={false}
                           tick={{ fill: 'var(--mui-palette-text-disabled)' }}
                           dy={12}
                           interval={0}
                         />
                         <YAxis
-                          width={44}
+                          width={GREENHOUSE_CHART_CHROME_TOKENS.chart.axisWidth}
                           axisLine={false}
                           tickLine={false}
                           ticks={yAxisTicks}
@@ -345,7 +377,7 @@ const GreenhouseChartCard = ({
                           tick={{ fill: 'var(--mui-palette-text-disabled)' }}
                         />
                         <RechartsTooltip
-                          cursor={{ fill: alpha(theme.palette.text.primary, 0.04) }}
+                          cursor={{ fill: alpha(theme.palette.text.primary, GREENHOUSE_CHART_CHROME_TOKENS.opacity.cursor) }}
                           wrapperStyle={{ outline: 'none', zIndex: 10 }}
                           content={
                             <GreenhouseChartTooltip
@@ -354,7 +386,21 @@ const GreenhouseChartCard = ({
                             />
                           }
                         />
-                        <Bar dataKey='value' radius={[6, 6, 0, 0]} barSize={isCompact ? 20 : 28} isAnimationActive>
+                        <Bar
+                          dataKey='value'
+                          radius={[
+                            GREENHOUSE_CHART_CHROME_TOKENS.chart.barRadius,
+                            GREENHOUSE_CHART_CHROME_TOKENS.chart.barRadius,
+                            0,
+                            0
+                          ]}
+                          barSize={
+                            isCompact
+                              ? GREENHOUSE_CHART_CHROME_TOKENS.chart.monthlyBarSize.compact
+                              : GREENHOUSE_CHART_CHROME_TOKENS.chart.monthlyBarSize.comfortable
+                          }
+                          isAnimationActive
+                        >
                           {data.map((entry, index) => (
                             <Cell
                               key={`${entry.label}-${entry.value}`}
@@ -367,9 +413,9 @@ const GreenhouseChartCard = ({
                             formatter={value => formatRenderableValue(value, valueFormatter)}
                             fill='var(--mui-palette-text-primary)'
                             style={{
-                              fontSize: 14,
-                              fontWeight: 700,
-                              fontFamily: theme.typography.fontFamily
+                              fontFamily: chartTypography.dataLabel.fontFamily,
+                              fontSize: chartTypography.dataLabel.fontSize,
+                              fontWeight: chartTypography.title.fontWeight
                             }}
                           />
                         </Bar>

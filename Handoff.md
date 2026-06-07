@@ -1,3 +1,14 @@
+# Sesion 2026-06-07 — Charts Lab + primitives token hardening
+
+Se revisó `/admin/design-system/charts` y las chart primitives por hardcodes de color, tipografía y chrome.
+
+- **Hallazgo:** `ChartsLabView` usaba MUI `Button` crudo, `fontWeight: 800` y layout literals; `GreenhouseChartCard` hardcodeaba `LabelList` (`fontSize/fontWeight/fontFamily`) y labels de tabs; `GreenhouseMetricBreakdownChartCard` dibujaba el delta como chip manual y overrideaba `kpiValue`; `GreenhouseStackedDistributionChartCard` tenía HEX `#2F2B3D` y typography numeric inline; `AppRecharts` todavía tenía rems fijos.
+- **Fix:** se agregó `greenhouse-chart-controller.ts` con `GREENHOUSE_CHART_CHROME_TOKENS` (card widths, icon sizes, chart geometry, opacities); el lab consume `GreenhouseButton`, `DESIGN_SYSTEM_LAB_TOKENS` y los chart tokens; las primitives usan `GreenhouseChip`, `monoId`/`monoAmount`/`kpiValue`, theme palette y `getChartTypographyFromTheme()` para Recharts labels.
+- **Visual:** GVC `design-system-charts` desktop+mobile OK en `.captures/2026-06-07T14-31-20_design-system-charts`; se corrigió el truncamiento mobile de `14.6%` en el stacked bar.
+- **Gates verdes:** eslint focal, vitest focal de charts + chart/typography/color drift (68 tests), `tsc --noEmit`, GVC desktop/mobile, `git diff --check` focal.
+
+---
+
 # Sesion 2026-06-07 — Microinteraction primitives sin Button/Chip/type hardcodes
 
 Se revisó el set de primitives documentado en `/admin/design-system/microinteractions` por deuda de buttons, chips, tipografía y colores hardcodeados.

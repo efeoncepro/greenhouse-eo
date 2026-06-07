@@ -17,7 +17,9 @@ export const DESIGN_SYSTEM_LAB_TOKENS = Object.freeze({
     logoBlockSize: 32,
     sectionGap: 4,
     headerGap: 1.5,
-    gridGap: 4
+    gridGap: 4,
+    asideMinInlineSize: 280,
+    narrowAsideMinInlineSize: 260
   },
   spacing: {
     hairline: 0.5,

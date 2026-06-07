@@ -15,6 +15,9 @@ import { visuallyHidden } from '@mui/utils'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from '@/libs/Recharts'
 
+import GreenhouseChip, { type GreenhouseChipTone } from './GreenhouseChip'
+import { GREENHOUSE_CHART_CHROME_TOKENS } from './greenhouse-chart-controller'
+
 export type GreenhouseMetricBreakdownTone = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'
 
 export type GreenhouseMetricBreakdownDeltaTone = 'success' | 'warning' | 'error' | 'neutral'
@@ -70,6 +73,9 @@ const defaultValueFormatter = (value: number): string => String(value)
 
 const clampProgress = (value: number): number => Math.min(Math.max(value, 0), 100)
 
+const toDeltaChipTone = (tone: GreenhouseMetricBreakdownDeltaTone): GreenhouseChipTone =>
+  tone === 'neutral' ? 'default' : tone
+
 const resolveMaxValue = (series: GreenhouseMetricBreakdownPoint[], explicitMax?: number): number => {
   if (explicitMax && explicitMax > 0) return explicitMax
 
@@ -101,7 +107,7 @@ const GreenhouseMetricBreakdownTooltip = ({
       sx={{
         px: 3,
         py: 2,
-        minWidth: 108,
+        minWidth: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.minInlineSize.compact,
         bgcolor: 'background.paper',
         border: theme => `1px solid ${theme.palette.divider}`,
         borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
@@ -112,8 +118,16 @@ const GreenhouseMetricBreakdownTooltip = ({
         {label}
       </Typography>
       <Stack direction='row' alignItems='center' spacing={1.5}>
-        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: color, flexShrink: 0 }} />
-        <Typography variant='body2' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+        <Box
+          sx={{
+            width: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.markerSize,
+            height: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.markerSize,
+            borderRadius: '50%',
+            bgcolor: color,
+            flexShrink: 0
+          }}
+        />
+        <Typography variant='monoId'>
           {valueFormatter(value)}
         </Typography>
       </Stack>
@@ -151,16 +165,14 @@ const GreenhouseMetricBreakdownChartCard = ({
 
   const toneColor = (tone: GreenhouseMetricBreakdownTone = 'success') => theme.palette[tone].main
 
-  const deltaColor =
-    deltaTone === 'neutral' ? theme.palette.text.secondary : theme.palette[deltaTone].main
-
-  const deltaBg =
-    deltaTone === 'neutral'
-      ? alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.18 : 0.08)
-      : alpha(theme.palette[deltaTone].main, theme.palette.mode === 'dark' ? 0.2 : 0.14)
-
   const chartColor = theme.palette.success.main
-  const chartSoftColor = alpha(chartColor, theme.palette.mode === 'dark' ? 0.26 : 0.18)
+
+  const chartSoftColor = alpha(
+    chartColor,
+    theme.palette.mode === 'dark'
+      ? GREENHOUSE_CHART_CHROME_TOKENS.opacity.weeklyInactiveBar.dark
+      : GREENHOUSE_CHART_CHROME_TOKENS.opacity.weeklyInactiveBar.light
+  )
 
   const chartSummary = `${title}${subtitle ? `, ${subtitle}` : ''}: ${series
     .map(item => `${item.label} ${valueFormatter(item.value)}`)
@@ -180,9 +192,9 @@ const GreenhouseMetricBreakdownChartCard = ({
       data-chart-kind={kind}
       sx={{
         width: '100%',
-        maxWidth: 554,
+        maxWidth: GREENHOUSE_CHART_CHROME_TOKENS.card.compactMaxInlineSize,
         borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-        border: theme => `1px solid ${alpha(theme.palette.divider, 0.72)}`,
+        border: theme => `1px solid ${alpha(theme.palette.divider, GREENHOUSE_CHART_CHROME_TOKENS.opacity.border)}`,
         boxShadow: 'var(--mui-customShadows-md)',
         overflow: 'hidden'
       }}
@@ -220,31 +232,13 @@ const GreenhouseMetricBreakdownChartCard = ({
                   component='p'
                   variant='kpiValue'
                   sx={{
-                    color: 'text.primary',
-                    fontSize: { xs: '2rem', sm: '2.375rem' },
-                    lineHeight: 1.16,
-                    fontVariantNumeric: 'tabular-nums'
+                    color: 'text.primary'
                   }}
                 >
                   {heroValue}
                 </Typography>
                 {deltaLabel ? (
-                  <Box
-                    component='span'
-                    sx={{
-                      px: 2,
-                      py: 0.75,
-                      borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
-                      bgcolor: deltaBg,
-                      color: deltaColor,
-                      fontSize: theme => theme.typography.caption.fontSize,
-                      lineHeight: 1.2,
-                      fontWeight: 800,
-                      fontVariantNumeric: 'tabular-nums'
-                    }}
-                  >
-                    {deltaLabel}
-                  </Box>
+                  <GreenhouseChip size='small' variant='label' tone={toDeltaChipTone(deltaTone)} kind='metric' label={deltaLabel} />
                 ) : null}
               </Stack>
               {descriptionLines.length ? (
@@ -262,7 +256,14 @@ const GreenhouseMetricBreakdownChartCard = ({
               <>
                 <AppRecharts>
                   <Box role='img' aria-label={resolvedChartAriaLabel} aria-describedby={chartDescriptionId}>
-                    <ResponsiveContainer width='100%' height={isCompact ? 170 : 156}>
+                    <ResponsiveContainer
+                      width='100%'
+                      height={
+                        isCompact
+                          ? GREENHOUSE_CHART_CHROME_TOKENS.chart.weeklyHeight.compact
+                          : GREENHOUSE_CHART_CHROME_TOKENS.chart.weeklyHeight.comfortable
+                      }
+                    >
                       <BarChart data={chartData} margin={{ top: 4, right: 0, bottom: 0, left: 0 }} barCategoryGap='30%'>
                         <XAxis
                           dataKey='label'
@@ -274,7 +275,7 @@ const GreenhouseMetricBreakdownChartCard = ({
                         />
                         <YAxis hide domain={[0, resolvedMaxValue]} />
                         <RechartsTooltip
-                          cursor={{ fill: alpha(theme.palette.text.primary, 0.04) }}
+                          cursor={{ fill: alpha(theme.palette.text.primary, GREENHOUSE_CHART_CHROME_TOKENS.opacity.cursor) }}
                           wrapperStyle={{ outline: 'none', zIndex: 10 }}
                           content={
                             <GreenhouseMetricBreakdownTooltip
@@ -283,7 +284,21 @@ const GreenhouseMetricBreakdownChartCard = ({
                             />
                           }
                         />
-                        <Bar dataKey='value' radius={[6, 6, 0, 0]} barSize={isCompact ? 18 : 22} isAnimationActive>
+                        <Bar
+                          dataKey='value'
+                          radius={[
+                            GREENHOUSE_CHART_CHROME_TOKENS.chart.barRadius,
+                            GREENHOUSE_CHART_CHROME_TOKENS.chart.barRadius,
+                            0,
+                            0
+                          ]}
+                          barSize={
+                            isCompact
+                              ? GREENHOUSE_CHART_CHROME_TOKENS.chart.weeklyBarSize.compact
+                              : GREENHOUSE_CHART_CHROME_TOKENS.chart.weeklyBarSize.comfortable
+                          }
+                          isAnimationActive
+                        >
                           {chartData.map((entry, index) => (
                             <Cell
                               key={`${entry.label}-${entry.value}`}
@@ -314,9 +329,15 @@ const GreenhouseMetricBreakdownChartCard = ({
               gridTemplateColumns: { xs: '1fr', sm: `repeat(${Math.max(metrics.length, 1)}, minmax(0, 1fr))` },
               gap: { xs: 3, sm: 4 },
               p: { xs: 4, sm: 5 },
-              border: theme => `1px solid ${alpha(theme.palette.divider, 0.72)}`,
+              border: theme => `1px solid ${alpha(theme.palette.divider, GREENHOUSE_CHART_CHROME_TOKENS.opacity.border)}`,
               borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-              bgcolor: theme => alpha(theme.palette.background.default, theme.palette.mode === 'dark' ? 0.24 : 0.58)
+              bgcolor: theme =>
+                alpha(
+                  theme.palette.background.default,
+                  theme.palette.mode === 'dark'
+                    ? GREENHOUSE_CHART_CHROME_TOKENS.opacity.neutralSurface.dark
+                    : GREENHOUSE_CHART_CHROME_TOKENS.opacity.neutralSurface.light
+                )
             }}
           >
             {metrics.map(metric => {
@@ -328,26 +349,35 @@ const GreenhouseMetricBreakdownChartCard = ({
                   <Stack direction='row' spacing={2.25} alignItems='center' sx={{ minWidth: 0 }}>
                     <Box
                       sx={{
-                        width: 38,
-                        height: 38,
+                        width: GREENHOUSE_CHART_CHROME_TOKENS.icon.container,
+                        height: GREENHOUSE_CHART_CHROME_TOKENS.icon.container,
                         display: 'grid',
                         placeItems: 'center',
                         flexShrink: 0,
                         borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-                        bgcolor: alpha(metricColor, theme.palette.mode === 'dark' ? 0.22 : 0.14),
+                        bgcolor: alpha(
+                          metricColor,
+                          theme.palette.mode === 'dark'
+                            ? GREENHOUSE_CHART_CHROME_TOKENS.opacity.semanticSurface.dark
+                            : GREENHOUSE_CHART_CHROME_TOKENS.opacity.semanticSurface.light
+                        ),
                         color: metricColor
                       }}
                     >
-                      <i className={metric.icon} style={{ fontSize: 22 }} aria-hidden='true' />
+                      <Box
+                        component='i'
+                        className={metric.icon}
+                        sx={{ fontSize: GREENHOUSE_CHART_CHROME_TOKENS.icon.metric }}
+                        aria-hidden='true'
+                      />
                     </Box>
                     <Stack spacing={0.25} sx={{ minWidth: 0 }}>
                       <Typography variant='body2' color='text.secondary' noWrap>
                         {metric.label}
                       </Typography>
                       <Typography
-                        variant='h6'
+                        variant='monoAmount'
                         color='text.primary'
-                        sx={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}
                       >
                         {metric.value}
                       </Typography>
@@ -361,9 +391,14 @@ const GreenhouseMetricBreakdownChartCard = ({
                     aria-valuenow={progress}
                     sx={{
                       width: 1,
-                      height: 8,
+                      height: GREENHOUSE_CHART_CHROME_TOKENS.tooltip.markerSize,
                       borderRadius: 999,
-                      bgcolor: alpha(metricColor, theme.palette.mode === 'dark' ? 0.18 : 0.12),
+                      bgcolor: alpha(
+                        metricColor,
+                        theme.palette.mode === 'dark'
+                          ? GREENHOUSE_CHART_CHROME_TOKENS.opacity.meterTrack.dark
+                          : GREENHOUSE_CHART_CHROME_TOKENS.opacity.meterTrack.light
+                      ),
                       overflow: 'hidden'
                     }}
                   >

@@ -234,6 +234,7 @@ export type {
 export { default as MetricTrendCard } from './MetricTrendCard'
 export type { MetricTrendCardProps, MetricTrendPoint, MetricTrendTone } from './MetricTrendCard'
 export { default as GreenhouseChartCard } from './GreenhouseChartCard'
+export { GREENHOUSE_CHART_CHROME_TOKENS } from './greenhouse-chart-controller'
 export type {
   GreenhouseChartCardKind,
   GreenhouseChartCardProps,

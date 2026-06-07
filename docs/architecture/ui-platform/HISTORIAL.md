@@ -6,6 +6,17 @@
 
 ---
 
+## Delta 2026-06-07h — Charts Lab y chart primitives token hardening
+
+`/admin/design-system/charts` y las chart card primitives se conectan al contrato tokenizado del Design System en vez de mantener literals visuales route-locales o por-card.
+
+- Nuevo controller `greenhouse-chart-controller.ts` con `GREENHOUSE_CHART_CHROME_TOKENS` para card widths, tooltip markers, icon sizes, chart heights/bar sizes/radius y opacidades semánticas.
+- `GreenhouseChartCard`, `GreenhouseMetricBreakdownChartCard` y `GreenhouseStackedDistributionChartCard` consumen ese controller para chrome/sizing; valores numéricos usan variants `monoId`/`monoAmount`/`kpiValue`; el delta semanal usa `GreenhouseChip`.
+- `GreenhouseChartCard` deriva los `LabelList` de Recharts desde `getChartTypographyFromTheme()`; `AppRecharts` deja de declarar rems fijos y usa `theme.typography.caption.fontSize`.
+- Se retiró el HEX hardcodeado del tone `ink` en `GreenhouseStackedDistributionChartCard` y se resolvió desde `theme.palette.text.primary` / `theme.palette.grey`.
+- `ChartsLabView` usa `GreenhouseButton`, `DESIGN_SYSTEM_LAB_TOKENS` y `GREENHOUSE_CHART_CHROME_TOKENS`.
+
+
 ## Delta 2026-06-07g — Floating Surface Lab tokenizado
 
 `/admin/design-system/floating-surfaces` deja de usar literals visuales route-locales para documentar la primitive y se conecta al vocabulario vivo del Design System.

@@ -49,11 +49,11 @@ const AppRecharts = styled('div')(({ theme }) => ({
     fill: 'var(--mui-palette-secondary-main)'
   },
   '& .recharts-tooltip-item': {
-    fontSize: '0.875rem',
+    fontSize: theme.typography.caption.fontSize,
     color: 'var(--mui-palette-text-primary) !important'
   },
   '& .recharts-text': {
-    fontSize: '0.8125rem',
+    fontSize: theme.typography.caption.fontSize,
     fill: 'var(--mui-palette-text-disabled)'
   },
   '& .recharts-pie .recharts-sector, & .recharts-layer': {

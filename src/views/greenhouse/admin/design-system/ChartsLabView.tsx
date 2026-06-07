@@ -3,12 +3,15 @@
 import Link from 'next/link'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
+import { typographyScale } from '@/components/theme/typography-tokens'
 import {
+  GREENHOUSE_CHART_CHROME_TOKENS,
+  GreenhouseButton,
   GreenhouseChartCard,
   GreenhouseMetricBreakdownChartCard,
   GreenhouseStackedDistributionChartCard,
@@ -18,7 +21,24 @@ import {
   type GreenhouseStackedDistributionSegment
 } from '@/components/greenhouse/primitives'
 
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
+import { DESIGN_SYSTEM_LAB_TOKENS } from './design-system-lab-tokens'
+
+const InlineCode = ({ children }: { children: string }) => (
+  <Box
+    component='span'
+    sx={theme => ({
+      px: DESIGN_SYSTEM_LAB_TOKENS.spacing.tight,
+      py: DESIGN_SYSTEM_LAB_TOKENS.spacing.hairline,
+      borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+      color: theme.palette.text.primary,
+      backgroundColor: alpha(theme.palette.text.primary, DESIGN_SYSTEM_LAB_TOKENS.opacity.codeBackground),
+      ...typographyScale.labelSm,
+      whiteSpace: 'nowrap'
+    })}
+  >
+    {children}
+  </Box>
+)
 
 const weeklyEarningsSeries: GreenhouseMetricBreakdownPoint[] = [
   { label: 'Mo', value: 51 },
@@ -176,27 +196,40 @@ const vehicleSegments: GreenhouseStackedDistributionSegment[] = [
 ]
 
 const ChartsLabView = () => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 1100, mx: 'auto' }}>
-    <Stack spacing={1.5}>
-      <Button
+  <Box
+    sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: DESIGN_SYSTEM_LAB_TOKENS.layout.sectionGap,
+      maxWidth: DESIGN_SYSTEM_LAB_TOKENS.layout.pageMaxInlineSize,
+      mx: 'auto'
+    }}
+  >
+    <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.layout.headerGap}>
+      <GreenhouseButton
         component={Link}
-        href={DESIGN_SYSTEM_ROUTE}
+        href={DESIGN_SYSTEM_LAB_TOKENS.routes.root}
         variant='text'
-        color='secondary'
+        tone='secondary'
+        kind='navigation'
         size='small'
-        startIcon={<i className='tabler-arrow-left' />}
+        leadingIcon={<i className='tabler-arrow-left' />}
         sx={{ alignSelf: 'flex-start', px: 0 }}
       >
         Design System
-      </Button>
-      <AxisWordmark variant='auto' height={32} sx={{ mb: 0.5 }} />
-      <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
+      </GreenhouseButton>
+      <AxisWordmark
+        variant='auto'
+        height={DESIGN_SYSTEM_LAB_TOKENS.layout.logoBlockSize}
+        sx={{ mb: DESIGN_SYSTEM_LAB_TOKENS.spacing.hairline }}
+      />
+      <Typography variant='overline' color='primary'>
         Charts Lab
       </Typography>
-      <Typography variant='h4' sx={{ fontWeight: 800 }}>
+      <Typography variant='h4'>
         Charts enterprise para Greenhouse
       </Typography>
-      <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
+      <Typography variant='body2' color='text.secondary' sx={{ maxWidth: DESIGN_SYSTEM_LAB_TOKENS.layout.introMaxInlineSize }}>
         Laboratorio interno para primitives de visualizacion de datos. Estas piezas adaptan componentes AXIS Figma a
         Recharts, tokens Greenhouse, tooltips accesibles y fallback compacto para lectores de pantalla.
       </Typography>
@@ -206,8 +239,11 @@ const ChartsLabView = () => (
       data-capture='charts-lab-weekly-earnings'
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 554px) minmax(280px, 1fr)' },
-        gap: 4,
+        gridTemplateColumns: {
+          xs: '1fr',
+          lg: `minmax(0, ${GREENHOUSE_CHART_CHROME_TOKENS.card.compactMaxInlineSize}px) minmax(${DESIGN_SYSTEM_LAB_TOKENS.layout.asideMinInlineSize}px, 1fr)`
+        },
+        gap: DESIGN_SYSTEM_LAB_TOKENS.layout.gridGap,
         alignItems: 'start'
       }}
     >
@@ -227,23 +263,23 @@ const ChartsLabView = () => (
         dataCapture='greenhouse-metric-breakdown-earning-reports'
       />
 
-      <Stack spacing={3} sx={{ py: { xs: 0, lg: 2 } }}>
-        <Stack spacing={0.75}>
+      <Stack spacing={3} sx={{ py: { xs: 0, lg: DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup } }}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Primitive + variant</Typography>
           <Typography variant='body2' color='text.secondary'>
-            <code>GreenhouseMetricBreakdownChartCard</code> owns the KPI headline, delta chip, weekly Recharts bar,
-            metric meters and compact accessible summary. <code>variant=&apos;weeklyBarSummary&apos;</code> covers
+            <InlineCode>GreenhouseMetricBreakdownChartCard</InlineCode> owns the KPI headline, delta chip, weekly Recharts bar,
+            metric meters and compact accessible summary. <InlineCode>variant=weeklyBarSummary</InlineCode> covers
             financial or operational snapshots that mix one hero number with a short series.
           </Typography>
         </Stack>
-        <Stack spacing={0.75}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Library choice</Typography>
           <Typography variant='body2' color='text.secondary'>
             Recharts stays the right engine because the weekly bars need real data, hover semantics and responsive control; MUI
             owns the metric breakdown and progress meters.
           </Typography>
         </Stack>
-        <Stack spacing={0.75}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Data contract</Typography>
           <Typography variant='body2' color='text.secondary'>
             Consumers pass a hero value, delta, seven-point series and ordered metrics with icon, tone and progress. Domain
@@ -257,8 +293,11 @@ const ChartsLabView = () => (
       data-capture='charts-lab-vehicles-overview'
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 554px) minmax(280px, 1fr)' },
-        gap: 4,
+        gridTemplateColumns: {
+          xs: '1fr',
+          lg: `minmax(0, ${GREENHOUSE_CHART_CHROME_TOKENS.card.compactMaxInlineSize}px) minmax(${DESIGN_SYSTEM_LAB_TOKENS.layout.asideMinInlineSize}px, 1fr)`
+        },
+        gap: DESIGN_SYSTEM_LAB_TOKENS.layout.gridGap,
         alignItems: 'start'
       }}
     >
@@ -270,23 +309,23 @@ const ChartsLabView = () => (
         dataCapture='greenhouse-stacked-distribution-vehicles-overview'
       />
 
-      <Stack spacing={3} sx={{ py: { xs: 0, lg: 2 } }}>
-        <Stack spacing={0.75}>
+      <Stack spacing={3} sx={{ py: { xs: 0, lg: DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup } }}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Primitive + variant</Typography>
           <Typography variant='body2' color='text.secondary'>
-            <code>GreenhouseStackedDistributionChartCard</code> owns the stacked distribution, row details, tooltip,
-            responsive behavior and accessible summary. <code>variant=&apos;stackedStatus&apos;</code> covers operational
+            <InlineCode>GreenhouseStackedDistributionChartCard</InlineCode> owns the stacked distribution, row details, tooltip,
+            responsive behavior and accessible summary. <InlineCode>variant=stackedStatus</InlineCode> covers operational
             state mixes like vehicles, workloads or capacity lanes.
           </Typography>
         </Stack>
-        <Stack spacing={0.75}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Library choice</Typography>
           <Typography variant='body2' color='text.secondary'>
             Recharts is the right fit because the card is still a chart: the stacked bar consumes real series data and can expose a
             tooltip, while MUI owns the operational detail rows.
           </Typography>
         </Stack>
-        <Stack spacing={0.75}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Data contract</Typography>
           <Typography variant='body2' color='text.secondary'>
             Consumers pass ordered segments with label, percentage, optional detail, icon and tone. Domain readers calculate the
@@ -300,8 +339,11 @@ const ChartsLabView = () => (
       data-capture='charts-lab-earning-reports'
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 746px) minmax(260px, 1fr)' },
-        gap: 4,
+        gridTemplateColumns: {
+          xs: '1fr',
+          lg: `minmax(0, ${GREENHOUSE_CHART_CHROME_TOKENS.card.wideMaxInlineSize}px) minmax(${DESIGN_SYSTEM_LAB_TOKENS.layout.narrowAsideMinInlineSize}px, 1fr)`
+        },
+        gap: DESIGN_SYSTEM_LAB_TOKENS.layout.gridGap,
         alignItems: 'start'
       }}
     >
@@ -316,22 +358,22 @@ const ChartsLabView = () => (
         dataCapture='greenhouse-chart-card-earning-reports'
       />
 
-      <Stack spacing={3} sx={{ py: { xs: 0, lg: 2 } }}>
-        <Stack spacing={0.75}>
+      <Stack spacing={3} sx={{ py: { xs: 0, lg: DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup } }}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Primitive + variant</Typography>
           <Typography variant='body2' color='text.secondary'>
-            <code>GreenhouseChartCard</code> owns layout, tabs, Recharts wiring, tooltip, responsive overflow and chart
-            accessibility. <code>variant=&apos;monthlyBar&apos;</code> covers the AXIS earning-report composition.
+            <InlineCode>GreenhouseChartCard</InlineCode> owns layout, tabs, Recharts wiring, tooltip, responsive overflow and chart
+            accessibility. <InlineCode>variant=monthlyBar</InlineCode> covers the AXIS earning-report composition.
           </Typography>
         </Stack>
-        <Stack spacing={0.75}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Library choice</Typography>
           <Typography variant='body2' color='text.secondary'>
             Recharts fits this card because labels, hover state and fallback content stay inside React. Apex remains available for
             existing dashboards, but this primitive needs stronger control over semantic tabs and chart accessibility.
           </Typography>
         </Stack>
-        <Stack spacing={0.75}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Data contract</Typography>
           <Typography variant='body2' color='text.secondary'>
             Consumers pass tabs with metric series, icon, tone and optional highlighted bar. Domain logic, readers and API parity

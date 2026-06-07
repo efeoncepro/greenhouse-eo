@@ -2,6 +2,8 @@
 
 ## 2026-06-07
 
+- **Charts Lab y chart primitives sin color/tipografía literals dispersos.** Se revisó `/admin/design-system/charts` y las primitives `GreenhouseMetricBreakdownChartCard`, `GreenhouseStackedDistributionChartCard` y `GreenhouseChartCard`. El lab ahora usa `GreenhouseButton`, `DESIGN_SYSTEM_LAB_TOKENS` y `GREENHOUSE_CHART_CHROME_TOKENS`; las primitives centralizan chrome/sizing/opacidades en `greenhouse-chart-controller`, usan `GreenhouseChip` para el delta, variants numéricas (`monoId`/`monoAmount`/`kpiValue`) para valores y `getChartTypographyFromTheme()` para labels de Recharts. Se eliminó el HEX hardcodeado de `ink` y `AppRecharts` dejó de declarar rems fijos. Evidencia GVC: `.captures/2026-06-07T14-31-20_design-system-charts` desktop+mobile.
+
 - **`GreenhouseFieldProvenancePeek` adopta `GreenhouseFloatingSurface`.** Se revisó `/admin/design-system/microinteractions` por uso de Floating UI: la página no importaba `@floating-ui/react`, pero la primitive de procedencia seguía con un popover ad-hoc. Ahora `GreenhouseFieldProvenancePeek` compone `GreenhouseFloatingSurface variant='evidencePeek' kind='fieldProvenance'`, preservando su API pública, trigger, contenido, focus return y hooks GVC. El follow-up de TASK-1033 queda cerrado.
 
 - **Floating Surface sin color/tipo/motion literals dispersos.** Se auditó la primitive canónica `GreenhouseFloatingSurface` y su `floating-surface-controller`: no tenían colores ni tipografía hardcodeados; se centralizaron los valores compartidos de chrome/motion (`viewportMargin`, padding por density y tokens de fade) en el controller, y la transición del surface ahora deriva de `motionCss` (`short` + `emphasized`) en vez de repetir el cubic-bezier literal.
