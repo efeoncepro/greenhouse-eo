@@ -68,20 +68,17 @@ Validate local with `pnpm design:lint` before commit.
 
 Extending the scale requires a documented why + V1 spec update + lint extension. NEVER ship off-scale values inline.
 
-### 4. Color palette — current
+### 4. Color palette — current (AXIS SoT)
 
-Vuexy + Greenhouse custom palette. `palette.customColors` namespace:
+**Semánticos de feedback** = `theme.palette.{success,warning,error,info}` — fluyen del **AXIS SoT** (`axisSemanticPalette` / `axisSemanticHex`, derivados de `axisRamp` en `src/@core/theme/axis-tokens.ts`). NO viven en `customColors`. Marca primaria = `theme.palette.primary` (settings.primaryColor).
 
-- `customColors.success` (#6ec207 lime)
-- `customColors.successContrast` (#2E7D32 — for text on white where lime fails 4.5:1)
-- `customColors.warning` (#ff6500)
-- `customColors.error` (#bb1954)
-- `customColors.info` (#00BAD1)
-- `customColors.brand` (#7367F0 primary)
+> **TASK-1034 Slice 4:** los `customColors` pseudo-semánticos ad-hoc (`neonLime`/`sunsetOrange`/`crimson`) fueron **eliminados** por drift. NO re-introducir colores semánticos en `customColors`; las semánticas salen de la capa AXIS.
 
-`palette.primary` / `secondary` / `success` / `warning` / `error` / `info` from MUI defaults + Vuexy adjustments.
+`palette.customColors` namespace (lo que **sí** existe hoy, runtime `mergedTheme.ts`): familia navy de marca + neutrales — `midnight` (#022A4E), `deepAzure` (#023C70), `royalBlue` (#024C8F), `coreBlue` (#0375DB), `lightAlloy` (#DBDBDB), `inputBorder`, + mirrors surface/text de los neutrals AXIS. (App-level brand color nomenclature aparte: `GH_COLORS` en `src/config/greenhouse-nomenclature.ts`.)
 
-NEVER inline hex in JSX. Always `theme.palette.<token>` or `palette.customColors.<token>`.
+**⚠️ Gap conocido — verde "success" AA-safe para texto sobre blanco (NO existe token todavía):** el ramp AXIS success topa en `success-900 = #1e9553` (**3.83:1** sobre blanco → falla 4.5:1 texto normal); `success-500 #28c76f` = 2.21:1. NO hay token AA-usable para texto verde sobre blanco. Por eso `#2E7D32` (5.13:1 ✅) está **hardcodeado en ~8 lugares** (PDFs/Excel `NET_ACCENT`, UI de montos). Mismo patrón que el gap ya documentado de error en `axis-semantic.ts` ("the error ramp needs an additional dark step"). El fix canónico es un **step oscuro nuevo reconciliado con AXIS upstream** (un `success-1000` AA), NO mapear a un shade existente del ramp (todos fallan). Pendiente: **TASK-1048**. Hasta entonces NO afirmar que existe un token `successContrast`.
+
+NEVER inline hex in JSX. Always `theme.palette.<token>` or `palette.customColors.<token>`. Semánticos → `theme.palette.{success,warning,error,info,primary}` (AXIS SoT).
 
 ### 5. Adding a new token — the 6-step protocol
 
