@@ -103,7 +103,7 @@ Reglas obligatorias:
 
 | Familia | AXIS actual (`axisRamp`) | Propuesta D | Veredicto |
 |---|---|---|---|
-| **Primary / CTA** | `primary` 500 `#0375db` (ramp saturado `#79c0ff…#002a50`) | `action` 500 **`#024C8F`** (más oscuro; ramp tint `#E1EAF2…#011B33`) | **CAMBIA** anchor + ramp (blast radius alto: todo botón/link) |
+| **Primary / CTA** | `primary` 500 `#0375db` (ramp saturado `#79c0ff…#002a50`) | `action` 500 **`#024C8F`** (más oscuro; ramp tint `#E1EAF2…#011B33`) | **CAMBIA** anchor + ramp (blast radius alto: todo botón/link). ⚠️ **lever real = `primaryColorConfig`/`settings.primaryColor`, NO `axisRamp.primary` — ver Design Review gap #1** |
 | **Navy identidad** | (≈ `primary` 800 `#003b70`) | `navy` 500 `#023C70` (ramp propio) | **CAMBIA / rol nuevo** |
 | **Secondary (verde)** | `secondary` 500 `#6ec207` **pero ramp se va a TEAL** en dark (`#1d9d72…#03593d`) | `greenVivid` 500 `#6EC207` (ramp se mantiene verde `#5CA306…#284603`) | **CAMBIA** ramp (corrige el hue-shift a teal) |
 | **Green canon (olivo)** | — (no existe) | `greenCanon` 500 `#3E7A12` | **NUEVO** |
@@ -224,6 +224,27 @@ Son hue-distintos y en contextos distintos (marca = identidad/sparkles; success 
 5. **Gate de contraste CI** (light + darkSemi): cada `ink` ≥4.5 sobre blanco y su tint; cada `onFill` ≥4.5 (o ≥3 large) sobre `fill`; cada `dark-fg` ≥4.5 sobre charcoal. Reemplaza el parche `#2E7D32` → cierra el gap success-ink de TASK-1048.
 6. **Página viva** `/admin/design-system/colors` (existente, TASK-1034): NO restructurar — los valores se actualizan solos (vienen de `theme.axis.*`). Agregar una **sección de ejemplos de implementación** con tokens canónicos (tonal/dot/sólido/KPI/form). Scenario GVC desktop/mobile. (Solo crear sub-página si la sección no cabe.)
 7. **Migración de consumidores:** los ~8 sitios de `#2E7D32` + cualquier hex semántico residual → tokens. Promover `greenhouse/no-hardcoded-hex-color` a `error` con baseline 0 (coordinar con TASK-1048).
+
+## Design Review — gaps a considerar (skills product-design, 2026-06-07)
+
+Auditoría con `design-system-governance` + `a11y-architect` + `modern-ui`. Verificados contra código donde aplica. **NINGUNO cambia la dirección visual D — son condiciones para que la paleta se APLIQUE bien.**
+
+**🔴 Críticos — afectan Fase A (corregir antes de codear):**
+
+1. **El primary NO sale de `axisRamp.primary` — sale de `settings.primaryColor` / `primaryColorConfig.ts`.** `mergedTheme.ts:59` lo confirma: *"primary is set by the provider via settings.primaryColor"*. Cambiar el ramp AXIS **NO mueve el botón primario**. Para llevar el primary a `#024C8F` hay que cambiar el **default de `primaryColorConfig`** (o la definición `efeonce-core`), NO `axisRamp.primary`. ⚠️ Corrige el lever de la fila "Primary" del DELTA.
+2. **Regenerar los tokens de opacidad / state-layers (`axisOpacity`, `src/@core/theme/axis-tokens.ts:131`).** Existen ramps `{8,16,24,32,38}%` por familia (`#0375db14`…) que alimentan hover/selected/focus/`::selection`. Si cambia un anchor, **hay que regenerar su `axisOpacity` en el mismo PR** o los estados hover/selected quedan con el color viejo.
+3. **Dark mode necesita derivación propia, no solo `dark-fg`.** En dark el `tint` no es el tint claro (es `rgba(255,255,255,0.04)` + borde `dark-fg`) y `main/light/dark` por rol se derivan distinto. Especificar la derivación dark de los 6 sub-valores (el mockup ya muestra el target en su DarkShowcase).
+
+**🟡 Importantes — checklist de Discovery:**
+
+4. **Crowding de hues:** 3 azules (`navy #023C70` · `action #024C8F` · `info #1F6FD4`) + 3 verdes (canon/vivid/success). Auditar distinción para que un chip `info` no se lea como acción primaria. Si no se distinguen, nudge menor de un hue (NO rediseño).
+5. **El patrón `dot` debe respetar "color nunca solo":** un dot success(verde)/error(rojo) sin texto/ícono adyacente es indistinguible en deuteranopia. El dot siempre va con label o ícono.
+6. **Falta la paleta categórica / de series de charts** (serie 1..N), distinta de los semánticos. Coordinar con `dataviz-design`. (Puede quedar fuera de scope, pero hay que declararlo.)
+7. **Reconciliación `GH_COLORS`:** `semaphore` + `service` + capability palettes legacy coexisten con el spine; decidir si se reconcilian o quedan como dominio aparte.
+
+**🟢 Menor:**
+
+8. **Focus ring explícito:** con el primary más oscuro, el ring (action blue) debe dar ≥3:1 contra ambos lados (WCAG 2.4.11/2.4.13); declararlo en el contrast gate específicamente para foco.
 
 ## Rollout Plan & Risk Matrix
 
