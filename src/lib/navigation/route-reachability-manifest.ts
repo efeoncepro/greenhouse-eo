@@ -139,13 +139,6 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Referencia canonica de tipografia (TASK-1044) — child surface del Design System, alcanzable desde la card "Ver tipografia" en DesignSystemView (href={TYPOGRAPHY_ROUTE}, const no detectado por el gate estatico).'
   },
   {
-    route: '/admin/design-system/chips',
-    parent: '/admin/design-system',
-    via: 'inline-link',
-    reason:
-      'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde la card "Ver chips" en DesignSystemView.'
-  },
-  {
     route: '/admin/design-system/charts',
     parent: '/admin/design-system',
     via: 'inline-link',
@@ -165,6 +158,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Floating Surfaces Lab (TASK-1033) — child surface del Design System para la primitive GreenhouseFloatingSurface y sus 6 variants, alcanzable desde la card "Ver floating surfaces" en DesignSystemView.'
+  },
+  {
+    route: '/admin/design-system/motion',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Motion Lab (TASK-1045) — child surface del Design System para la primitiva de motion sobre GSAP (<Motion> + useGreenhouseGSAP) y sus 4 variants, alcanzable desde la card "Ver motion" en DesignSystemView.'
   }
 ]
 
