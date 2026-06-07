@@ -1,6 +1,6 @@
 # GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1
 
-> **Status:** Proposed  
+> **Status:** Accepted (2026-06-07)  
 > **Date:** 2026-06-07  
 > **Owner:** UI Platform / Design System  
 > **Scope:** Elevation, shadow, floating/overlay/modal depth, Greenhouse primitives, design-token documentation  
@@ -8,7 +8,8 @@
 > **Confidence:** medium-high  
 > **Validated as of:** 2026-06-07 against repo runtime and external design-system references  
 > **Audit input:** `docs/audits/design-tokens/ELEVATION_SHADOW_TOKEN_AUDIT_2026-06-07.md`  
-> **Implementation task:** `docs/tasks/to-do/TASK-1049-greenhouse-elevation-shadow-token-system.md`
+> **Implementation task:** `docs/tasks/in-progress/TASK-1049-greenhouse-elevation-shadow-token-system.md`  
+> **Accepted by:** operador (Julio), sesión de implementación 2026-06-07. Open Questions resueltas pre-ejecución: derivación = composición propia sobre canal `var(--mui-mainColorChannels-${mode}Shadow)` (NO reuse de `customShadows.md/lg`); dark = factory mode-aware con border obligatorio; runtime real es `light`/`dark` (no existe `darkSemi`).
 
 ## Context
 

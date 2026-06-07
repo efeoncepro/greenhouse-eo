@@ -1,3 +1,14 @@
+# Sesion 2026-06-07 — TASK-1049 elevation/shadow token system (in-progress, develop)
+
+Implementación del SoT semántico de elevación/sombra Greenhouse. Local-first en `develop` (sin branch, por instrucción del operador). ADR `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1` **Accepted 2026-06-07**.
+
+- **Open Questions resueltas pre-ejecución:** (Q#2) derivación = composición propia en `elevation-tokens.ts` sobre el canal canónico `var(--mui-mainColorChannels-${mode}Shadow)` (mismo que `shadows.ts`/`customShadows.ts`, AXIS-aware, light/dark), NO reuse de `customShadows.md/lg` (quedan compat Vuexy). (Q#3) cada rol es factory mode-aware (alpha light≠dark) + `borderColor` obligatorio en floating/overlay/modal (carga separación bajo `forced-colors` + compensa sombra débil en dark). (Drift) runtime real = `light`/`dark` (NO `darkSemi` — la skill overlay estaba desactualizada; runtime gana).
+- **Decisión de restraint:** NO se agrega campo `elevationRole` al `floating-surface-controller` — los 6 variants son visualmente idénticos y comparten `floating`. Abstracción por-variant es follow-up documentado solo si un variant lo necesita (mismo criterio que `overflow` reservado).
+- **Slice 0 (este commit):** lifecycle `in-progress`, ADR `Accepted`, `DECISIONS_INDEX` + README sync. Sin migración (viewCode `administracion.design_system` reusado, TASK-1034). Sin capability/event/signal nuevos.
+- **Pendiente:** Slice 1 (SoT + theme injection + drift-guard), Slice 2 (FloatingSurface cutover), Slice 3 (página `/admin/design-system/elevation` + GVC), Slice 4 (docs), Slice 5 (audit).
+
+---
+
 # Sesion 2026-06-07 — Floating Surface anchored motion hardening
 
 Se modernizo el motion de `GreenhouseFloatingSurface` antes de tocar sombras/elevacion. Se reviso especificamente la duda del operador sobre la primitive `Motion`: existe y se mantiene canonica, pero su ADR la acota a motion cinematica/orquestada/scroll; Floating Surface es una microinteraccion frecuente y por eso se resolvio con CSS Tier 1 + tokens `motionCss`.

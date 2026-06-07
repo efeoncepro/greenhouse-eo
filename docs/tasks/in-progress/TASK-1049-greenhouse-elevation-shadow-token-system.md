@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `ui|platform|design-system|accessibility`
-- Blocked by: `ADR acceptance: docs/architecture/GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1.md`
-- Branch: `task/TASK-1049-greenhouse-elevation-shadow-token-system`
+- Blocked by: `none (ADR aceptada 2026-06-07)`
+- Branch: `develop (operador: mantenerse en develop, sin branch)`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
