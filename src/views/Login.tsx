@@ -358,12 +358,12 @@ const LoginV2 = ({
                   sx={{
                     py: 1.8,
                     bgcolor: GH_COLORS.brand.midnightNavy,
-                    color: '#fff',
+                    color: 'common.white',
                     borderRadius: '8px',
                     textTransform: 'none',
                     fontSize: 14,
                     fontWeight: 500,
-                    '&:hover': { bgcolor: '#03345e' },
+                    '&:hover': { bgcolor: GH_COLORS.brand.midnightNavyHover },
                     '&.Mui-disabled': { bgcolor: 'action.disabledBackground', color: 'text.disabled' }
                   }}
                 >

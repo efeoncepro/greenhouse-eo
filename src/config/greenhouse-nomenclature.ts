@@ -220,6 +220,7 @@ export const GH_COLORS = {
 
   brand: {
     midnightNavy: '#022a4e',
+    midnightNavyHover: '#03345e',
     greenhouseGreen: '#1B7A4E',
     leaf: '#4CAF6E',
     coreBlue: '#0375db',

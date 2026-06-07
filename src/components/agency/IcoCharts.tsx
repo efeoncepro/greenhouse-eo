@@ -36,12 +36,14 @@ type Props = {
   rpaTrend?: RpaTrendBySpace[]
 }
 
+// Paleta semántica canónica (= theme.palette.*.main). ApexCharts renderiza SVG,
+// así que las CSS vars de MUI resuelven aquí — cero hardcode, cero cambio visual.
 const CSC_COLORS: Record<CscPhase, string> = {
-  briefing: '#7367F0',
-  produccion: '#00BAD1',
-  revision_interna: '#ff6500',
-  cambios_cliente: '#bb1954',
-  entrega: '#6ec207'
+  briefing: 'var(--mui-palette-primary-main)',
+  produccion: 'var(--mui-palette-info-main)',
+  revision_interna: 'var(--mui-palette-warning-main)',
+  cambios_cliente: 'var(--mui-palette-error-main)',
+  entrega: 'var(--mui-palette-success-main)'
 }
 
 const TREND_LINE_COLORS = ['#023c70', '#024c8f', '#633f93', '#0375db', '#ff6500']

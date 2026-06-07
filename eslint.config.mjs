@@ -389,6 +389,18 @@ export default [
     }
   },
 
+  // Tests pueden referenciar HEX en asserts de estilo (toHaveStyle('color: #...')).
+  // No son superficie de producto — off ahí.
+  {
+    files: ['**/*.test.ts', '**/*.test.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-hardcoded-hex-color': 'off'
+    }
+  },
+
   // TASK-1033 — el test focal de la primitive GreenhouseFloatingSurface renderiza
   // anchors/content con labels ILUSTRATIVOS ("Ver evidencia", "Editar", aria-label
   // de fixture) como triggers de prueba del open/close/role; son fixtures de test,

@@ -88,7 +88,7 @@ const PulseGlobalCharts = ({ spaces, statusMix, weeklyActivity }: Props) => {
       tickAmount: 8
     },
     yaxis: { labels: { style: { colors: theme.palette.text.secondary } } },
-    markers: { size: 4, colors: [GH_COLORS.chart.primary], strokeColors: '#fff', strokeWidth: 2 }
+    markers: { size: 4, colors: [GH_COLORS.chart.primary], strokeColors: theme.palette.common.white, strokeWidth: 2 }
   }
 
   return (

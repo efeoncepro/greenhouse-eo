@@ -422,7 +422,7 @@ const EmailTemplatePreviewView = () => {
                   minHeight: 600,
                   border: `1px solid ${theme.palette.divider}`,
                   borderRadius: 8,
-                  backgroundColor: '#ffffff'
+                  backgroundColor: theme.palette.common.white
                 }}
                 sandbox='allow-same-origin'
               />

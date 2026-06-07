@@ -281,7 +281,7 @@ const PayrollReceiptCard = ({ entry, period, employerInfo, adjustmentsBreakdown 
         <Box
           sx={{
             bgcolor: presentation.hero.variant === 'degraded' ? 'text.disabled' : GH_COLORS.role.account.source,
-            color: '#fff',
+            color: 'common.white',
             borderRadius: 1,
             display: 'flex',
             justifyContent: 'space-between',

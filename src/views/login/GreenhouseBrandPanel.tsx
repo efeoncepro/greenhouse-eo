@@ -89,7 +89,7 @@ const GreenhouseBrandPanel = () => {
           sx={{
             fontSize: { md: 32, lg: 38 },
             fontWeight: 600,
-            color: '#fff',
+            color: 'common.white',
             lineHeight: 1.2,
             mb: 2.5,
             whiteSpace: 'pre-line',
