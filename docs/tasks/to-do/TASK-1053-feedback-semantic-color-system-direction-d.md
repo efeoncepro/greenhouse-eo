@@ -248,6 +248,22 @@ Auditoría con `design-system-governance` + `a11y-architect` + `modern-ui`. Veri
 
 ## Rollout Plan & Risk Matrix
 
+### Recommended execution path (decisión operador 2026-06-07: "lo más robusto y escalable")
+
+**Recomendación canónica: por fases — Paso 0 (foundation) → Fase A (re-value) → Fase B (patrones). NO todo junto.** Razones (robusto + escalable, Solution Quality Contract):
+
+- **Cada paso se verifica y revierte solo.** Si aparece una regresión visual, sabés si fue el cambio de valores (A) o el de comportamiento de componentes (B). Un PR gigante A+B mezcla las dos cosas → diagnóstico imposible.
+- **A es mecánico** (propaga por tokens a todos los consumidores) → bajo riesgo, rápido, blast radius gobernado en un solo lugar (el SoT + primaryColorConfig + axisOpacity).
+- **B es escalable por diseño:** el tonal-by-default se hace en UN lugar (el override de `<Chip>`/`<Alert>` del theme) y vuelve tonales TODOS los chips de la app de una — no se toca chip por chip.
+- **El estado intermedio (post-A, pre-B) NO está roto:** es coherente y usable (colores nuevos + chips sólidos con color nuevo). Solo no es el tratamiento tonal final. Ningún usuario queda con UI rota.
+- **Foundation primero (Paso 0):** resolver los 3 gaps críticos + las decisiones (lever del primary = `primaryColorConfig`; reconciliación AXIS; 3-verdes). Sin esto, A se codea sobre el lever equivocado.
+
+**Sub-recomendaciones de las decisiones gated:**
+
+- **Reconciliación AXIS (gap F):** opción **(A) actualizar AXIS Figma upstream** — mantiene AXIS como única fuente de verdad, runtime ≡ Figma, sin divergencia. Es lo más escalable a largo plazo (la opción B override genera drift permanente).
+- **3 verdes (gap G):** mantener el decoplado marca/feedback (es el patrón escalable: la marca evoluciona sin tocar el feedback) — pero aplicar el check de distinción del gap #4.
+- **Resultado:** A+B completas = idéntico al mockup aprobado. La única variación posible es un nudge mínimo de un hue si el gap #4 detecta dos demasiado parecidos.
+
 ### Slice ordering hard rule
 
 **Insight de scope (operador 2026-06-07):** el codebase ya está token-anclado (la lint `no-hardcoded-hex-color` bajó el hardcode a 9 warnings residuales). Por eso el grueso del overhaul es **mecánico**: cambiar los VALORES detrás de los nombres de token existentes en el SoT → se propaga solo a todos los consumidores vía `theme.*`. La task se parte en **A (re-value, mecánico)** + **B (patrones, toca componentes/overrides)** para que A pueda shippear rápido y B quede separable.
