@@ -564,6 +564,7 @@ const ChartPaletteCard = () => (
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
           <ChartSwatch color={GH_COLORS.chart.directional.positive} label='Positivo' />
+          <ChartSwatch color={GH_COLORS.chart.directional.caution} label='Precaución' />
           <ChartSwatch color={GH_COLORS.chart.directional.negative} label='Negativo' />
           <ChartSwatch color={GH_COLORS.chart.directional.neutral} label='Neutral' />
         </Box>

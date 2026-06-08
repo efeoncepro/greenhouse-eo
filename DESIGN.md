@@ -387,9 +387,11 @@ palettes, so a chart series is never confused with a UI status. Two sub-palettes
   `.categoricalDark` (dark): `indigo #5145E0 · verde #1FBA85 · naranja #FB7A00 · magenta #D633C9 · cian #3CC9F0 ·
   lima #9BE036`. For arbitrary series (spaces, clients, expense categories, members, **CSC phases via subset**).
   Re-analyzed: CVD-min ΔE 12.9 (colorblind-distinguishable), clash ΔE 23 vs the 4 semantics, vibrant (chroma 73).
-- **Directional** (Finance & deltas) — `GH_COLORS.chart.directional.{positive #3DBA5D, negative #FF4D49, neutral
-  #94A3B8}` (+ `directionalDark`): cashflow in/out, P&L +/−, KPI variation, waterfall. The chart green/red is
-  brighter than the UI semantic ink and lives in `axis-chart`, not `theme.palette`.
+- **Directional** (Finance & deltas + health gradients) — `GH_COLORS.chart.directional.{positive #3DBA5D, caution
+  #F0A526, negative #FF4D49, neutral #94A3B8}` (+ `directionalDark`): cashflow in/out, P&L +/−, KPI variation,
+  waterfall, **runway/budget health** (optimal→positive · attention→caution · critical→negative). `caution` is a
+  chart-tuned gold distinct from the UI alert amber (`#FFB703`). The chart green/red is brighter than the UI
+  semantic ink and lives in `axis-chart`, not `theme.palette`.
 
 Rules:
 

@@ -46,9 +46,15 @@ export const axisChartCategoricalDark = [
   '#9be036' // 6 · lima
 ] as const
 
-/** Directional palette (light) — Finance/deltas. NEVER color-only: +/- sign or ▲/▼ icon. */
+/**
+ * Directional palette (light) — Finance/deltas + health gradients. NEVER color-only:
+ * +/- sign or ▲/▼ icon. `caution` is the mid health tier (runway "attention", budget
+ * warning) — a chart-tuned gold, distinct from the UI alert amber (#FFB703, ΔE 13) so
+ * a chart health signal is not the same token as a UI alert. `neutral` = subtotal/baseline.
+ */
 export const axisChartDirectional = {
   positive: '#3dba5d',
+  caution: '#f0a526',
   negative: '#ff4d49',
   neutral: '#94a3b8'
 } as const
@@ -56,6 +62,7 @@ export const axisChartDirectional = {
 /** Directional palette (dark) — lifted for charcoal visibility. */
 export const axisChartDirectionalDark = {
   positive: '#4ed17a',
+  caution: '#f7b84a',
   negative: '#ff6e6b',
   neutral: '#aeb7c4'
 } as const

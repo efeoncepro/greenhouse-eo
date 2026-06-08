@@ -422,7 +422,7 @@ Each color ships with opacities: `lighterOpacity` (8%), `lightOpacity` (16%), `m
 `src/@core/theme/axis-chart.ts` es el **SoT de charts** — auto-contenido ("rica en sí misma"), NO derivado de marca/semánticos (una serie nunca se confunde con un status de UI). Dos sub-paletas cubren todos los tipos de chart (una categórica + una direccional — sin paletas por tipo):
 
 - **Categórica "Deep-bright"** (aprobada operador 2026-06-08) — `GH_COLORS.chart.categorical` (light) / `.categoricalDark` (dark): `indigo #5145E0 · verde #1FBA85 · naranja #FB7A00 · magenta #D633C9 · cian #3CC9F0 · lima #9BE036`. Series arbitrarias (spaces, clientes, categorías de gasto, miembros, **fases CSC vía subset**). Re-analizada: CVD-min ΔE 12.9 (distinguible daltónicos), clash ΔE 23 vs los 4 semánticos, vibrante (chroma 73). Dark levanta solo el indigo (`#7B72F0`) para verse en charcoal preservando el spread.
-- **Direccional** (Finanzas/deltas) — `GH_COLORS.chart.directional.{positive #3DBA5D, negative #FF4D49, neutral #94A3B8}` (+ `directionalDark`): cashflow in/out, P&L +/−, variación KPI, waterfall. Verde/rojo chart-tuned (más brillante que el ink semántico), vive en `axis-chart`, no en `theme.palette`.
+- **Direccional** (Finanzas/deltas + gradientes de salud) — `GH_COLORS.chart.directional.{positive #3DBA5D, caution #F0A526, negative #FF4D49, neutral #94A3B8}` (+ `directionalDark`): cashflow in/out, P&L +/−, variación KPI, waterfall, **salud runway/budget** (óptimo→positive · atención→caution · crítico→negative). `caution` = gold chart-tuned, distinto del amber de alerta de UI (`#FFB703`). Verde/rojo chart-tuned (más brillante que el ink semántico), vive en `axis-chart`, no en `theme.palette`.
 
 **Reglas duras CVD (Coblis pre-check, Machado 2009 + CIE76 ΔE):**
 

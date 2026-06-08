@@ -5,7 +5,6 @@ import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 
 import type { ApexOptions } from 'apexcharts'
-import { useTheme } from '@mui/material/styles'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -26,6 +25,7 @@ import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
@@ -42,6 +42,15 @@ const STATUS_TONE: Record<NonNullable<HomeRunwayData['status']>, { color: ThemeC
   attention: { color: 'warning', label: 'Atención', icon: 'tabler-alert-circle' },
   critical: { color: 'error', label: 'Crítico', icon: 'tabler-alert-triangle' },
   unknown: { color: 'secondary', label: '—', icon: 'tabler-circle-dotted' }
+}
+
+// TASK-1053: el FILL del chart sale del chart SoT direccional (gradiente de salud),
+// NO del palette semántico de UI. El avatar/pill conservan su tono semántico (eso es UI).
+const STATUS_CHART_HEX: Record<NonNullable<HomeRunwayData['status']>, string> = {
+  optimal: GH_COLORS.chart.directional.positive,
+  attention: GH_COLORS.chart.directional.caution,
+  critical: GH_COLORS.chart.directional.negative,
+  unknown: GH_COLORS.chart.directional.neutral
 }
 
 const formatCash = (amount: number | null, currency: HomeRunwayData['cashCurrency']): string => {
@@ -78,10 +87,10 @@ const isCritical = (status: HomeRunwayData['status']): boolean => status === 'cr
  * lacks `home.runway`. Payload never reaches the wire.
  */
 export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
-  const theme = useTheme()
   const router = useRouter()
   const reduced = useReducedMotion()
   const tone = STATUS_TONE[data.status]
+  const chartHex = STATUS_CHART_HEX[data.status]
   const critical = isCritical(data.status)
 
   const series = useMemo<ApexOptions['series']>(() => {
@@ -115,7 +124,7 @@ export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
         stops: [0, 100],
         colorStops: [
           [
-            { offset: 0, opacity: 0.45, color: theme.palette[tone.color].main },
+            { offset: 0, opacity: 0.45, color: chartHex },
             { offset: 100, opacity: 0.08, color: 'var(--mui-palette-background-paper)' }
           ]
         ]
@@ -126,12 +135,12 @@ export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
         enabled: true,
         shadeTo: 'light',
         shadeIntensity: 1,
-        color: theme.palette[tone.color].main
+        color: chartHex
       }
     },
     xaxis: { labels: { show: false }, axisTicks: { show: false }, axisBorder: { show: false } },
     yaxis: { show: false }
-  }), [theme.palette, tone.color, reduced])
+  }), [chartHex, reduced])
 
   const handleDrill = () => {
     if (!data.drillHref) return
