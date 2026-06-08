@@ -82,7 +82,14 @@ Extending the scale requires a documented why + V1 spec update + lint extension.
 - El legacy `#2E7D32` (5.13:1) quedó **convergido** a `success.ink` en sus ~8 sitios (web + PDFs/Excel). NO reintroducir `#2E7D32` ni afirmar `successContrast` (ese nombre nunca existió).
 - `warning.main` (`#ffb703` amber) **NUNCA** como texto — usar el `tonalText`/`ink` del rol (`#8a5a00`). Verificado por `axis-semantic-contrast.test.ts` + `greenhouse-semantic-drift.test.ts`. Surface tag-blue tokenizado en `GH_COLORS.surface.tagBlue`.
 
-NEVER inline hex in JSX. Always `theme.palette.<token>` or `palette.customColors.<token>`. Semánticos → `theme.palette.{success,warning,error,info,primary}` (AXIS SoT).
+**Sub-valores semánticos curados (TASK-1053 Fase B) — `theme.greenhouseSemantic`:** factory mode-aware (espejo de `theme.greenhouseElevation`/`elevationTokens(mode)`) que sirve, por rol `{info,success,warning,error}`, los valores curados AA: `ink` (texto AA sobre blanco+tint), `tint` (superficie tonal), `border` (hairline), `darkFg` (AA sobre charcoal `#25293c`), + los derivados de consumo `tonalSurface`/`tonalText`/`tonalBorder` (mode-aware). SoT runtime-agnóstico: `axisSemanticSubValues` en `@/lib/design-tokens/semantic-sub-values` (literales puros) → `@core/theme/axis-semantic` lo re-exporta para UI → `greenhouseSemanticTokens(mode)` en `src/components/theme/greenhouse-semantic-tokens.ts` arma el factory → `mergedTheme.ts` lo monta. Drift-guard: `greenhouse-semantic-drift.test.ts` + `axis-semantic-contrast.test.ts`.
+
+- **Tonal-by-default (chips de feedback):** `GreenhouseChip variant='label'` con tono `{info,success,warning,error}` consume `theme.greenhouseSemantic[tone].{tonalSurface,tonalText,tonalBorder}` — NUNCA `warning.main` como texto (falla AA). Es el patrón canónico de "estado tonal".
+- **2 primitives nuevos (Fase B2):** `GreenhouseKpiDelta` (delta KPI inline, signo+flecha siempre, color desde `greenhouseSemantic.{success,error}.tonalText`) y `GreenhouseStatusDot` (dot+label, `label`|`ariaLabel` obligatorio). Contrato en `docs/architecture/ui-platform/PRIMITIVES.md`; export en `src/components/greenhouse/primitives/index.ts`.
+
+**Color de series de charts = Chart SoT, NUNCA semánticos de feedback (TASK-1053 charts "Deep-bright" + TASK-1054):** las series salen de `GH_COLORS.chart.{categorical,categoricalDark,directional,directionalDark}` (derivados de `axis-chart.ts`). Reglas: categórica necesita leyenda (color-nunca-solo); directional (ingreso/egreso, salud) necesita signo/ícono; single-series → accent neutral / directional con significado / por-significado en strips densos. **NUNCA** `theme.palette.{success,warning,error,info}.main` como color de serie (eso es feedback de UI, no dato). Los 43 charts heredan tipografía vía wrappers `AppReactApexCharts`/`AppRecharts`; el color de serie es responsabilidad del consumer leyendo `GH_COLORS.chart.*`.
+
+NEVER inline hex in JSX. Always `theme.palette.<token>` or `palette.customColors.<token>`. Semánticos de feedback → `theme.palette.{success,warning,error,info,primary}` (fill) o `theme.greenhouseSemantic[role].*` (texto/tonal AA, mode-aware). Series de chart → `GH_COLORS.chart.*`.
 
 ### 5. Adding a new token — the 6-step protocol
 
@@ -164,6 +171,8 @@ La tipografía tiene su propio SoT en código (espejo del patrón AXIS de color)
 - **NEVER** bypass DESIGN.md + V1 update (the 3-layer parity is the contract).
 - **NEVER** introduce a `Custom*` wrapper that breaks Vuexy theme — extend, don't fight.
 - **NEVER** use `fontFamily: 'monospace'` for numbers — `fontVariantNumeric: 'tabular-nums'`.
+- **NEVER** color a chart series from `theme.palette.{success,warning,error,info}.main` — series come from `GH_COLORS.chart.*` (Chart SoT "Deep-bright"); feedback semantics are UI state, not data.
+- **NEVER** use `warning.main` (amber) as text — use `theme.greenhouseSemantic.warning.tonalText`/`.ink`. Tonal feedback (chips/states) → `theme.greenhouseSemantic[role].{tonalSurface,tonalText,tonalBorder}` (mode-aware AA).
 - **NEVER** ship a token without verifying contrast in light + darkSemi.
 - **NEVER** ship multi-brand support without explicit task + V1.5 spec update.
 - **SIEMPRE** run `pnpm design:lint` before commit.
