@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
@@ -19,7 +18,7 @@ import TableRow from '@mui/material/TableRow'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
-import { alpha, useTheme } from '@mui/material/styles'
+import { useTheme } from '@mui/material/styles'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -27,6 +26,8 @@ import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import ViewTransitionLink from '@/components/greenhouse/motion/ViewTransitionLink'
+import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
+import { MOTION_DURATION_S, MOTION_EASE, motionCss } from '@/components/theme/motion-tokens'
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { getMicrocopy } from '@/lib/copy'
@@ -56,6 +57,7 @@ const organizationListMockupAria = {
 }
 
 const filterOrder: OrganizationWorkbenchFilter[] = ['all', 'attention', 'onboarding', 'no_space', 'no_people', 'active']
+const framerEaseEmphasized: [number, number, number, number] = [...MOTION_EASE.emphasized.cubicBezier]
 
 const lifecycleLabel: Record<OrganizationEnterpriseMock['lifecycle'], string> = {
   active_client: 'Cliente activo',
@@ -164,11 +166,11 @@ const OrganizationListEnterpriseMockupView = () => {
     <Stack spacing={{ xs: 3, md: 6 }} data-capture='organization-list-enterprise-mockup'>
       <Card
         sx={{
-          borderRadius: 2,
+          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
           border: `1px solid ${theme.palette.divider}`,
           borderTop: `3px solid ${theme.palette.primary.main}`,
-          boxShadow: 'none',
-          bgcolor: alpha(theme.palette.background.paper, 0.98)
+          boxShadow: theme.greenhouseElevation.none.boxShadow,
+          bgcolor: 'background.paper'
         }}
       >
         <CardContent sx={{ p: { xs: 2.5, sm: 4, md: 5 } }}>
@@ -185,32 +187,22 @@ const OrganizationListEnterpriseMockupView = () => {
                     sx={{
                       width: 42,
                       height: 42,
-                      borderRadius: 2,
+                      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
                       display: { xs: 'none', sm: 'grid' },
                       placeItems: 'center',
                       color: 'primary.main',
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
+                      bgcolor: 'primary.lighterOpacity',
                       flexShrink: 0
                     }}
                   >
                     <i className='tabler-building-community' aria-hidden='true' />
                   </Box>
                   <Box sx={{ minWidth: 0 }}>
-                    <Typography
-                      variant='overline'
-                      color='primary.main'
-                      sx={{
-                        display: { xs: 'none', sm: 'block' },
-                        fontSize: { sm: 12, md: '0.75rem' },
-                        lineHeight: 1.35
-                      }}
-                    >
+                    <Typography variant='overline' color='primary.main' sx={{ display: { xs: 'none', sm: 'block' } }}>
                       Organization Operations Workbench
                     </Typography>
-                    <Typography variant='h4' sx={{ fontSize: { xs: 24, md: undefined }, lineHeight: 1.1 }}>
-                      Organizaciones
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620, fontSize: { xs: 13, md: undefined }, lineHeight: { xs: 1.3, md: undefined } }}>
+                    <Typography variant='h4'>Organizaciones</Typography>
+                    <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
                       <Box component='span' sx={{ display: { xs: 'none', sm: 'inline' } }}>
                         Prioriza cuentas con riesgo, relaciones faltantes y onboarding pendiente.
                       </Box>
@@ -229,25 +221,21 @@ const OrganizationListEnterpriseMockupView = () => {
                   aria-label={organizationListMockupAria.search}
                   size='small'
                   InputProps={{
-                    startAdornment: <i className='tabler-search' aria-hidden='true' style={{ marginRight: 8 }} />
+                    startAdornment: <Box component='i' className='tabler-search' aria-hidden='true' sx={{ mr: 2 }} />
                   }}
                   sx={{
                     flex: { xs: 1, sm: 'initial' },
                     minWidth: { xs: 0, sm: 280 },
                     '& .MuiInputBase-root': {
                       minHeight: { xs: 36, md: undefined }
-                    },
-                    '& .MuiInputBase-input': {
-                      fontSize: { xs: 13, md: undefined }
                     }
                   }}
                 />
-                <Button
+                <GreenhouseButton
                   component={Link}
                   href='/agency/clients/onboarding'
-                  variant='contained'
-                  startIcon={<i className='tabler-user-plus' />}
-                  sx={{ minHeight: { xs: 36, md: 40 }, px: { xs: 3, md: undefined }, fontSize: { xs: 13, md: undefined }, whiteSpace: 'nowrap' }}
+                  kind='primaryAction'
+                  leadingIconClassName='tabler-user-plus'
                 >
                   <Box component='span' sx={{ display: { xs: 'none', sm: 'inline' } }}>
                     Alta de cliente
@@ -255,7 +243,7 @@ const OrganizationListEnterpriseMockupView = () => {
                   <Box component='span' sx={{ display: { xs: 'inline', sm: 'none' } }}>
                     Alta
                   </Box>
-                </Button>
+                </GreenhouseButton>
               </Stack>
             </Stack>
 
@@ -264,7 +252,7 @@ const OrganizationListEnterpriseMockupView = () => {
                 display: 'grid',
                 gridTemplateColumns: { xs: 'repeat(4, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' },
                 border: `1px solid ${theme.palette.divider}`,
-                borderRadius: 2,
+                borderRadius: `${theme.shape.customBorderRadius.lg}px`,
                 overflow: 'hidden'
               }}
               role='list'
@@ -279,7 +267,14 @@ const OrganizationListEnterpriseMockupView = () => {
         </CardContent>
       </Card>
 
-      <Card sx={{ borderRadius: 2, boxShadow: 'none', border: `1px solid ${theme.palette.divider}`, overflow: 'hidden' }}>
+      <Card
+        sx={{
+          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+          boxShadow: theme.greenhouseElevation.none.boxShadow,
+          border: `1px solid ${theme.palette.divider}`,
+          overflow: 'hidden'
+        }}
+      >
         <Stack
           direction={{ xs: 'column', lg: 'row' }}
           alignItems={{ xs: 'stretch', lg: 'center' }}
@@ -295,7 +290,7 @@ const OrganizationListEnterpriseMockupView = () => {
               gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' },
               flex: 1,
               border: `1px solid ${theme.palette.divider}`,
-              borderRadius: 2,
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
               overflow: 'hidden'
             }}
           >
@@ -345,7 +340,7 @@ const OrganizationListEnterpriseMockupView = () => {
                 icon='tabler-search-off'
                 title='Sin organizaciones para este filtro'
                 description='Ajusta la busqueda o vuelve a Todas para recuperar el panorama completo.'
-                action={<Button variant='tonal' onClick={() => { setQuery(''); setFilter('all') }}>Ver todas</Button>}
+                action={<GreenhouseButton variant='label' onClick={() => { setQuery(''); setFilter('all') }}>Ver todas</GreenhouseButton>}
               />
             </Box>
           ) : viewMode === 'workbench' ? (
@@ -377,8 +372,8 @@ const OrganizationListEnterpriseMockupView = () => {
                 key={selectedOrganization.organizationId}
                 initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
                 animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-                transition={{ duration: 0.18, ease: 'easeOut' }}
-                sx={{ p: { xs: 3, md: 4 }, bgcolor: alpha(theme.palette.action.hover, 0.28) }}
+                transition={{ duration: MOTION_DURATION_S.standard, ease: framerEaseEmphasized }}
+                sx={{ p: { xs: 3, md: 4 }, bgcolor: 'action.hover' }}
               >
                 <OrganizationContextRail item={selectedOrganization} />
               </Box>
@@ -424,7 +419,7 @@ function SignalCell({
       }}
     >
       <Stack spacing={0.5} sx={{ minWidth: 0, alignItems: { xs: 'center', md: 'flex-start' }, textAlign: { xs: 'center', md: 'left' } }}>
-        <Typography variant='body2' color='text.secondary' sx={{ fontSize: { xs: 10.5, md: undefined }, lineHeight: 1.15 }}>
+        <Typography variant='caption' color='text.secondary'>
           <Box component='span' sx={{ display: { xs: 'none', md: 'inline' } }}>
             {label}
           </Box>
@@ -432,8 +427,8 @@ function SignalCell({
             {mobileLabel ?? label}
           </Box>
         </Typography>
-        <Typography variant='h4' sx={{ fontVariantNumeric: 'tabular-nums', fontSize: { xs: 18, md: undefined }, lineHeight: 1.1 }}>
-          <AnimatedCounter value={value} />
+        <Typography variant='h5'>
+          <AnimatedCounter value={value} duration={MOTION_DURATION_S.long} />
         </Typography>
         <Typography variant='caption' color='text.secondary' sx={{ display: { xs: 'none', md: 'block' } }}>
           {helper}
@@ -443,15 +438,15 @@ function SignalCell({
         sx={{
           width: { xs: 26, md: 42 },
           height: { xs: 26, md: 42 },
-          borderRadius: { xs: 1.5, md: 2 },
+          borderRadius: {
+            xs: `${theme.shape.customBorderRadius.md}px`,
+            md: `${theme.shape.customBorderRadius.lg}px`
+          },
           display: { xs: 'none', sm: 'grid' },
           placeItems: 'center',
           color: theme => (tone === 'primary' || tone === 'info' ? theme.palette.text.secondary : theme.palette[tone].dark),
-          bgcolor: theme => alpha(theme.palette[tone].main, tone === 'primary' || tone === 'info' ? 0.045 : 0.06),
-          flexShrink: 0,
-          '& i': {
-            fontSize: { xs: 16, md: 24 }
-          }
+          bgcolor: `${tone}.lighterOpacity`,
+          flexShrink: 0
         }}
       >
         <i className={icon} aria-hidden='true' />
@@ -491,7 +486,7 @@ function FilterSegment({
       aria-controls={ariaControls}
       aria-label={`${title}: ${value} organizaciones`}
       onClick={onSelect}
-      whileTap={prefersReducedMotion ? undefined : { scale: 0.985, transition: { duration: 0.08 } }}
+      whileTap={prefersReducedMotion ? undefined : { scale: 0.985, transition: { duration: MOTION_DURATION_S.instant } }}
       sx={{
         appearance: 'none',
         border: 0,
@@ -503,7 +498,7 @@ function FilterSegment({
           xs: index % 2 === 0 ? 0 : `1px solid ${theme.palette.divider}`,
           md: index % 3 === 0 ? 0 : `1px solid ${theme.palette.divider}`
         },
-        bgcolor: isActive ? alpha(theme.palette[tone].main, tone === 'warning' ? 0.055 : 0.045) : 'background.paper',
+        bgcolor: isActive ? `${tone}.lighterOpacity` : 'background.paper',
         color: 'text.primary',
         cursor: 'pointer',
         minHeight: { xs: 44, md: 64 },
@@ -511,10 +506,10 @@ function FilterSegment({
         py: { xs: 1.75, md: 2.5 },
         position: 'relative',
         textAlign: 'left',
-        transition: 'background-color 140ms ease, box-shadow 140ms ease',
+        transition: `background-color ${motionCss.duration.short} ${motionCss.ease.standard}, box-shadow ${motionCss.duration.short} ${motionCss.ease.standard}`,
         '&:hover': {
-          bgcolor: isActive ? alpha(theme.palette[tone].main, 0.075) : alpha(theme.palette.action.hover, 0.72),
-          boxShadow: `inset 0 0 0 1px ${alpha(theme.palette[tone].main, 0.12)}`
+          bgcolor: isActive ? `${tone}.lightOpacity` : 'action.hover',
+          boxShadow: `inset 0 0 0 1px ${theme.palette[tone].lightOpacity}`
         },
         '&:focus-visible': {
           outline: `2px solid ${theme.palette[tone].main}`,
@@ -526,38 +521,34 @@ function FilterSegment({
         <Box
           component={motion.span}
           layoutId={activeBarLayoutId}
-          transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: MOTION_DURATION_S.standard, ease: framerEaseEmphasized }}
           sx={{
             position: 'absolute',
             insetInlineStart: 0,
             insetBlock: 0,
             width: 3,
             bgcolor: `${tone}.main`,
-            borderTopRightRadius: 2,
-            borderBottomRightRadius: 2
+            borderTopRightRadius: `${theme.shape.customBorderRadius.lg}px`,
+            borderBottomRightRadius: `${theme.shape.customBorderRadius.lg}px`
           }}
         />
       ) : null}
       <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={2} sx={{ minWidth: 0 }}>
         <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-          <Typography variant='subtitle2' color='text.primary' sx={{ fontSize: { xs: 13, md: undefined }, fontWeight: isActive ? 800 : 650, lineHeight: 1.2 }}>
+          <Typography variant='h6' color='text.primary'>
             {title}
           </Typography>
-          <Typography variant='caption' color='text.primary' sx={{ display: { xs: 'none', sm: 'block' }, lineHeight: 1.25 }}>
+          <Typography variant='caption' color='text.primary' sx={{ display: { xs: 'none', sm: 'block' } }}>
             {filterHint(title)}
           </Typography>
         </Stack>
         <Typography
           variant='h5'
           sx={{
-            color: isActive ? `${tone}.dark` : 'text.primary',
-            fontVariantNumeric: 'tabular-nums',
-            fontSize: { xs: 16, md: '1.2rem' },
-            fontWeight: 800,
-            lineHeight: 1
+            color: isActive ? `${tone}.dark` : 'text.primary'
           }}
         >
-          <AnimatedCounter value={value} format='integer' duration={0.45} />
+          <AnimatedCounter value={value} format='integer' duration={MOTION_DURATION_S.long} />
         </Typography>
       </Stack>
     </Box>
@@ -592,20 +583,21 @@ function OrgAvatar({
       sx={{
         width: { xs: mobileDimension, md: dimension },
         height: { xs: mobileDimension, md: dimension },
-        borderRadius: size === 'matrix' ? 1.25 : 1.5,
+        borderRadius:
+          size === 'matrix'
+            ? `${theme.shape.customBorderRadius.sm}px`
+            : `${theme.shape.customBorderRadius.md}px`,
         display: 'grid',
         placeItems: 'center',
         flexShrink: 0,
-        border: `1px solid ${alpha(theme.palette[item.avatarTone].main, 0.24)}`,
-        bgcolor: alpha(theme.palette[item.avatarTone].main, 0.08),
+        border: `1px solid ${theme.palette[item.avatarTone].mainOpacity}`,
+        bgcolor: `${item.avatarTone}.lighterOpacity`,
         color: 'text.primary',
-        fontSize: size === 'matrix' ? 12 : size === 'rail' ? 16 : 14,
-        fontWeight: 800,
-        lineHeight: 1,
-        letterSpacing: 0
       }}
     >
-      {item.initials}
+      <Typography component='span' variant={size === 'matrix' ? 'caption' : 'button'} color='inherit'>
+        {item.initials}
+      </Typography>
     </Box>
   )
 }
@@ -636,10 +628,10 @@ function OrganizationRow({
         color: 'text.primary',
         cursor: 'pointer',
         p: { xs: 3, md: 4 },
-        transition: 'background-color 150ms ease, box-shadow 150ms ease',
-        boxShadow: selected ? `inset 3px 0 0 ${theme.palette.primary.main}` : 'none',
+        transition: `background-color ${motionCss.duration.short} ${motionCss.ease.standard}, box-shadow ${motionCss.duration.short} ${motionCss.ease.standard}`,
+        boxShadow: selected ? `inset 3px 0 0 ${theme.palette.primary.main}` : theme.greenhouseElevation.none.boxShadow,
         '&:hover': {
-          bgcolor: alpha(theme.palette.primary.main, selected ? 0.025 : 0.03)
+          bgcolor: selected ? 'action.selected' : 'action.hover'
         },
         '&:focus-visible': {
           outline: `2px solid ${theme.palette.primary.main}`,
@@ -653,12 +645,10 @@ function OrganizationRow({
             <OrgAvatar item={item} />
             <Stack spacing={0.75} sx={{ minWidth: 0 }}>
               <Stack direction='row' alignItems='center' spacing={1.5} sx={{ minWidth: 0 }} useFlexGap flexWrap='wrap'>
-                <Typography variant='subtitle1' color='text.primary' sx={{ fontSize: { xs: 15, md: undefined }, fontWeight: 700 }}>
-                  {item.name}
-                </Typography>
+                <Typography variant='h6' color='text.primary'>{item.name}</Typography>
                 <StatusPill label={risk.label} tone={risk.tone} icon={risk.icon} />
               </Stack>
-              <Typography variant='caption' color='text.secondary' sx={{ fontSize: { xs: 11, md: undefined } }}>
+              <Typography variant='caption' color='text.secondary'>
                 {item.publicId} · {item.countryCode ?? 'Sin pais'} · {item.industry ?? 'Sin industria'}
               </Typography>
               {item.legalName ? (
@@ -673,7 +663,7 @@ function OrganizationRow({
             <Typography variant='caption' color='text.secondary'>
               Ultima senal
             </Typography>
-            <Typography variant='body2' sx={{ fontWeight: 600, textAlign: 'right' }}>
+            <Typography variant='h6' sx={{ textAlign: 'right' }}>
               {item.lastActivityLabel}
             </Typography>
           </Stack>
@@ -706,67 +696,31 @@ function OrganizationRow({
   )
 }
 
-function RowFact({ label, tone, icon }: { label: string; tone: SemanticTone; icon?: string }) {
-  const theme = useTheme()
+const toGreenhouseChipTone = (tone: SemanticTone) => (tone === 'primary' || tone === 'error' ? tone : 'default')
 
+function RowFact({ label, tone, icon }: { label: string; tone: SemanticTone; icon?: string }) {
   return (
-    <Box
-      component='span'
-      sx={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: { xs: 0.75, md: 1 },
-        minHeight: { xs: 22, md: 26 },
-        px: { xs: 1.5, md: 2 },
-        border: `1px solid ${tone === 'secondary' ? theme.palette.divider : alpha(theme.palette[tone].main, 0.22)}`,
-        borderRadius: 1,
-        bgcolor: tone === 'secondary' ? alpha(theme.palette.action.hover, 0.18) : alpha(theme.palette[tone].main, 0.035),
-        color: 'text.primary',
-        fontSize: { xs: 11, md: theme.typography.caption.fontSize },
-        fontWeight: 650,
-        lineHeight: 1.2,
-        '& i': {
-          color: tone === 'secondary' ? 'text.secondary' : `${tone}.dark`,
-          fontSize: { xs: 14, md: 16 }
-        }
-      }}
-    >
-      {icon ? <i className={icon} aria-hidden='true' /> : null}
-      {label}
-    </Box>
+    <GreenhouseChip
+      kind='attribute'
+      label={label}
+      iconClassName={icon}
+      size='small'
+      tone={toGreenhouseChipTone(tone)}
+      variant='outlined'
+    />
   )
 }
 
 function StatusPill({ label, tone, icon }: { label: ReactNode; tone: SemanticTone; icon?: string }) {
-  const theme = useTheme()
-  const isNeutral = tone === 'secondary'
-
   return (
-    <Box
-      component='span'
-      sx={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: { xs: 0.75, md: 1 },
-        minHeight: { xs: 22, md: 24 },
-        px: { xs: 1.5, md: 2 },
-        borderRadius: 1,
-        border: `1px solid ${isNeutral ? theme.palette.divider : alpha(theme.palette[tone].main, 0.28)}`,
-        bgcolor: isNeutral ? alpha(theme.palette.action.hover, 0.18) : alpha(theme.palette[tone].main, 0.035),
-        color: 'text.primary',
-        fontSize: { xs: 11, md: theme.typography.caption.fontSize },
-        fontWeight: 700,
-        lineHeight: 1.2,
-        whiteSpace: 'nowrap',
-        '& i': {
-          color: isNeutral ? 'text.secondary' : `${tone}.dark`,
-          fontSize: { xs: 14, md: 16 }
-        }
-      }}
-    >
-      {icon ? <i className={icon} aria-hidden='true' /> : null}
-      {label}
-    </Box>
+    <GreenhouseChip
+      kind='status'
+      label={label}
+      iconClassName={icon}
+      size='small'
+      tone={toGreenhouseChipTone(tone)}
+      variant='outlined'
+    />
   )
 }
 
@@ -795,10 +749,10 @@ function OrganizationContextRail({ item }: { item: OrganizationEnterpriseMock })
         <Stack spacing={3}>
           <Stack spacing={1}>
             <Stack direction='row' justifyContent='space-between' alignItems='center'>
-              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+              <Typography variant='h6'>
                 Preparacion
               </Typography>
-              <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+              <Typography variant='monoId' color='text.secondary'>
                 {progress}%
               </Typography>
             </Stack>
@@ -807,7 +761,7 @@ function OrganizationContextRail({ item }: { item: OrganizationEnterpriseMock })
               value={progress}
               color={item.risk === 'blocked' ? 'error' : item.risk === 'attention' ? 'warning' : 'success'}
               aria-label={`Preparacion operacional de ${item.name}`}
-              sx={{ height: 8, borderRadius: 1 }}
+              sx={theme => ({ height: 8, borderRadius: `${theme.shape.customBorderRadius.sm}px` })}
             />
           </Stack>
           <Stack spacing={2}>
@@ -847,7 +801,7 @@ function OrganizationContextRail({ item }: { item: OrganizationEnterpriseMock })
                 }}
               />
               <Stack spacing={0.25}>
-                <Typography variant='body2' sx={{ fontWeight: 700 }}>
+                <Typography variant='h6'>
                   {event.label}
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>
@@ -860,19 +814,20 @@ function OrganizationContextRail({ item }: { item: OrganizationEnterpriseMock })
       </RailSection>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-        <Button
+        <GreenhouseButton
           component={ViewTransitionLink}
           href={`/agency/organizations/${item.organizationId}`}
-          variant='contained'
-          startIcon={<i className='tabler-layout-dashboard' />}
+          kind='primaryAction'
+          leadingIconClassName='tabler-layout-dashboard'
         >
           Abrir Workspace
-        </Button>
-        <Button
+        </GreenhouseButton>
+        <GreenhouseButton
           component={ViewTransitionLink}
           href={item.onboarding ? `/agency/clients/${item.organizationId}/lifecycle` : '/agency/clients/onboarding'}
           variant='outlined'
-          startIcon={<i className='tabler-clipboard-list' />}
+          tone='secondary'
+          leadingIconClassName='tabler-clipboard-list'
           sx={{
             color: 'text.primary',
             borderColor: 'divider',
@@ -883,7 +838,7 @@ function OrganizationContextRail({ item }: { item: OrganizationEnterpriseMock })
           }}
         >
           Ver onboarding
-        </Button>
+        </GreenhouseButton>
       </Stack>
     </Stack>
   )
@@ -920,20 +875,18 @@ function RailSection({
           sx={{
             width: 36,
             height: 36,
-            borderRadius: 2,
+            borderRadius: `${theme.shape.customBorderRadius.lg}px`,
             display: 'grid',
             placeItems: 'center',
             color: `${tone}.main`,
-            bgcolor: alpha(theme.palette[tone].main, 0.1),
+            bgcolor: `${tone}.lighterOpacity`,
             flexShrink: 0
           }}
         >
           <i className={icon} aria-hidden='true' />
         </Box>
         <Box sx={{ minWidth: 0 }}>
-          <Typography variant='subtitle1' color='text.primary' sx={{ fontWeight: 700 }}>
-            {title}
-          </Typography>
+          <Typography variant='h6' color='text.primary'>{title}</Typography>
           <Typography variant='caption' color='text.secondary'>
             {subheader}
           </Typography>
@@ -960,8 +913,8 @@ function RelationshipMetric({ label, value, icon }: { label: string; value: numb
           {label}
         </Typography>
       </Stack>
-      <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-        <AnimatedCounter value={value} />
+      <Typography variant='h5'>
+        <AnimatedCounter value={value} duration={MOTION_DURATION_S.long} />
       </Typography>
     </Stack>
   )
@@ -1000,9 +953,7 @@ function MatrixView({ organizations }: { organizations: OrganizationEnterpriseMo
                 <Stack direction='row' spacing={2} alignItems='center'>
                   <OrgAvatar item={item} size='matrix' />
                   <Box>
-                    <Typography variant='body2' sx={{ fontWeight: 700 }}>
-                      {item.name}
-                    </Typography>
+                    <Typography variant='h6'>{item.name}</Typography>
                     <Typography variant='caption' color='text.secondary'>
                       {item.publicId}
                     </Typography>
@@ -1019,8 +970,8 @@ function MatrixView({ organizations }: { organizations: OrganizationEnterpriseMo
                   <Typography variant='body2' color='text.secondary'>Sin caso</Typography>
                 )}
               </TableCell>
-              <TableCell align='right'>{item.spaceCount}</TableCell>
-              <TableCell align='right'>{item.peopleCount}</TableCell>
+              <TableCell align='right'><Typography variant='monoId'>{item.spaceCount}</Typography></TableCell>
+              <TableCell align='right'><Typography variant='monoId'>{item.peopleCount}</Typography></TableCell>
               <TableCell>{sourceLabel(item.source)}</TableCell>
               <TableCell>{item.lastActivityLabel}</TableCell>
             </TableRow>

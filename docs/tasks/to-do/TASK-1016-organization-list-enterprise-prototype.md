@@ -1,5 +1,9 @@
 # TASK-1016 — Organization List Enterprise Prototype
 
+## Delta 2026-06-08 — Mockup token hardening
+
+El mockup aprobado de `/agency/organizations/mockup` mantiene su direccion visual, pero fue endurecido contra el Design System para no depender de valores hardcodeados route-locales. `OrganizationListEnterpriseMockupView` ahora usa `GreenhouseButton`, `GreenhouseChip`, variants tipograficas canonicas, `theme.shape.customBorderRadius`, `theme.greenhouseElevation.none`, tokens de palette/opacity y `motionCss`/`MOTION_DURATION_S`/`MOTION_EASE`. La captura vigente de hardening es `.captures/2026-06-08T09-04-14_organization-list-enterprise-mockup` (desktop+mobile OK, `qualityFindings=[]`).
+
 ## Delta 2026-06-07 — GVC contract gates disponibles (TASK-1018 complete)
 
 El runtime de `/agency/organizations` ya puede cerrarse con el **contrato mockup→runtime de GVC V1.5** (TASK-1018). Cuando se implemente el runtime: capturar el mockup aprobado, promover el baseline durable (`pnpm fe:capture:diff --promote` → `scripts/frontend/baselines/agency.organizations.list/`), y declarar en el scenario runtime `baseline.surfaceId` + `maxDiffRatio` + `maskSelectors` + los gates `quality.{layout,runtime,keyboard,performance,enterpriseRubric}`. Ver `GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` Delta V1.5 + `scripts/frontend/scenarios/_README.md`. El follow-up "aplicar el contrato a este runtime" queda listado en TASK-1018 Follow-ups.
@@ -185,6 +189,7 @@ Artefactos aprobados:
 - Mock data de referencia: `src/views/greenhouse/organizations/mockup/organization-list-enterprise-mock-data.ts`
 - Scenario GVC canonico: `scripts/frontend/scenarios/organization-list-enterprise-mockup.scenario.ts`
 - Captura final aprobada: `.captures/2026-06-05T10-40-50_organization-list-enterprise-mockup`
+- Captura vigente token-hardening: `.captures/2026-06-08T09-04-14_organization-list-enterprise-mockup`
 - Dossier final: `.captures/2026-06-05T10-40-50_organization-list-enterprise-mockup/review-dossier.md`
 - Commit de infraestructura GVC/axe: `829b1466a`
 

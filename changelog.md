@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-06-08
+
+- **TASK-1016 — mockup de organizaciones tokenizado.** La ruta aprobada `/agency/organizations/mockup` mantiene la direccion visual del Organization Operations Workbench, pero deja de depender de valores route-locales para color, tipografia, radio, elevacion y motion. Los CTAs usan `GreenhouseButton`, los pills usan `GreenhouseChip`, la tipografia usa variants canonicas, los radios/elevacion salen de `theme.shape.customBorderRadius` + `theme.greenhouseElevation`, y motion/opacity salen de `motionCss`/`MOTION_DURATION_S`/palette tokens. Verificado con eslint focal, `tsc --noEmit` y GVC local desktop+mobile: `.captures/2026-06-08T09-04-14_organization-list-enterprise-mockup`.
+
 ## 2026-06-07
 
 - **ISSUE-085 — Fix local dev compile loop por ApexCharts/Turbopack.** Se corrigió la causa raíz del `Compiling...` infinito en `localhost:3000/home`: `AppReactApexCharts` tenía una frontera `next/dynamic` interna hacia `react-apexcharts` y 23 consumers volvían a envolver el wrapper con `dynamic(() => import('@/libs/styles/AppReactApexCharts'))`, generando manifests/chunks huérfanos en Turbopack dev (`react-apexcharts_min_*.js` 404) y Fast Refresh en rebuild permanente. Ahora `AppReactApexCharts` es el único owner del `ssr:false`; los consumers lo importan directo; se eliminó el indirection legacy `src/libs/ApexCharts.tsx`. Nueva lint rule `greenhouse/no-dynamic-app-react-apexcharts` (error) bloquea reintroducir el doble dynamic o importar el legacy. Documentado como issue resuelto con runbook corto para futuros casos `Compiling...`/Turbopack. Verificado con Playwright local: `/home` y `/admin/design-system/colors` cargan, consola 0 errores, chunk `react-apexcharts` 200 OK; `pnpm test:lint-rules`, `tsc`, `pnpm lint` (0 errores, 9 warnings HEX preexistentes) y `pnpm build` OK.

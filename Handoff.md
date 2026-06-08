@@ -1,3 +1,16 @@
+# Sesion 2026-06-08 — TASK-1016 mockup de organizaciones tokenizado (develop local)
+
+Se reviso `/agency/organizations/mockup` por hardcodes visuales tras levantar server local y ver el mockup en Browser/GVC.
+
+- **Cambio acotado:** `src/views/greenhouse/organizations/mockup/OrganizationListEnterpriseMockupView.tsx` mantiene la direccion visual aprobada y reemplaza los valores route-locales por tokens/primitives canonicos.
+- **Primitives:** CTAs y empty-state action usan `GreenhouseButton`; pills/metadata/status usan `GreenhouseChip`.
+- **Tokens:** color/opacity via `theme.palette.*`, `*.lighterOpacity`/`*.lightOpacity`/`*.mainOpacity` y `action.hover/selected`; tipografia via variants MUI/Greenhouse; radios via `theme.shape.customBorderRadius`; elevacion flat via `theme.greenhouseElevation.none`; motion via `motionCss`, `MOTION_DURATION_S` y `MOTION_EASE`.
+- **Scanner focal:** sin hits para `alpha(`, HEX/RGBA, MUI `Button`, `<Button`, typography inline (`fontSize/fontWeight/lineHeight/letterSpacing/fontVariantNumeric`), `borderRadius: <number>`, `boxShadow: 'none'`, motion literals tipo `duration: 0.x`/`stiffness`/`damping`.
+- **Gates:** `pnpm exec eslint src/views/greenhouse/organizations/mockup/OrganizationListEnterpriseMockupView.tsx` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm fe:capture organization-list-enterprise-mockup --env=local` OK desktop+mobile, `qualityFindings=[]`, evidencia `.captures/2026-06-08T09-04-14_organization-list-enterprise-mockup`.
+- **No tocado:** cambios locales paralelos de `TASK-1053` (`DESIGN.md`, color lab, brand-color proposal, lifecycle move) siguen fuera de este cierre.
+
+---
+
 # Sesion 2026-06-07 — ISSUE-085 fix local dev compile loop por ApexCharts dynamic nested (resolved, develop local)
 
 Incidente local diagnosticado: `localhost:3000/home` quedaba con el indicador **Compiling...** y el `next-server (v16.1.1)` entraba en loop de CPU (~480-525%), dejando requests nuevas sin bytes.
