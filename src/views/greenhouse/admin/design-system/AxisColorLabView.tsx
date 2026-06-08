@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
 import type { AxisColorFamily } from '@core/theme/axis-tokens'
+import { axisSemanticPalette, axisSemanticSubValues } from '@core/theme/axis-semantic'
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
@@ -573,6 +574,65 @@ const ChartPaletteCard = () => (
   </Card>
 )
 
+// Swatch with a hairline border so pale tints / white onFill stay visible.
+const TonalSwatch = ({ color, label }: { color: string; label: string }) => (
+  <Box sx={{ textAlign: 'center', minInlineSize: 84 }}>
+    <Box
+      sx={{ height: 48, borderRadius: 1, bgcolor: color, mb: 0.75, border: '1px solid', borderColor: 'divider' }}
+    />
+    <Typography variant='caption' sx={{ display: 'block', fontWeight: 600 }}>
+      {label}
+    </Typography>
+    <Typography variant='caption' color='text.secondary' sx={{ fontSize: 10 }}>
+      {color.toUpperCase()}
+    </Typography>
+  </Box>
+)
+
+const SEMANTIC_TONAL_ROLES = [
+  { key: 'info', label: 'Info' },
+  { key: 'success', label: 'Success' },
+  { key: 'warning', label: 'Warning' },
+  { key: 'error', label: 'Error' }
+] as const
+
+const SemanticTonalCard = () => (
+  <Card variant='outlined' data-capture='colors-tonal-card'>
+    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Typography variant='h5'>Feedback tonal — sub-valores (TASK-1053 Fase B)</Typography>
+        <Typography variant='body2' color='text.secondary'>
+          El default de un chip/alert de estado es <strong>tonal</strong> (superficie suave + ink AA), no un sólido
+          saturado. SoT: <code>axisSemanticSubValues</code> + factory <code>theme.greenhouseSemantic</code>. El{' '}
+          <strong>ink</strong> es el texto AA (≥5.3:1 sobre su tint) — <strong>NO</strong> <code>main</code> (el amber del
+          warning como texto es ilegible). <strong>dark-fg</strong> es el texto AA sobre charcoal. Ver el tonal{' '}
+          <em>aplicado</em> en el lab de Chips.
+        </Typography>
+      </Box>
+
+      {SEMANTIC_TONAL_ROLES.map(role => {
+        const sub = axisSemanticSubValues[role.key]
+        const palette = axisSemanticPalette[role.key]
+
+        return (
+          <Box key={role.key}>
+            <Typography variant='subtitle2' sx={{ mb: 1 }}>
+              {role.label}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+              <TonalSwatch color={palette.main} label='Fill (main)' />
+              <TonalSwatch color={sub.tint} label='Tint (superficie)' />
+              <TonalSwatch color={sub.ink} label='Ink (texto AA)' />
+              <TonalSwatch color={sub.border} label='Border' />
+              <TonalSwatch color={sub.darkFg} label='Dark-fg' />
+            </Box>
+          </Box>
+        )
+      })}
+    </CardContent>
+  </Card>
+)
+
 const AxisColorLabView = () => (
   <Box
     sx={{
@@ -618,6 +678,8 @@ const AxisColorLabView = () => (
         ))}
       </CardContent>
     </Card>
+
+    <SemanticTonalCard />
 
     <Card variant='outlined'>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
