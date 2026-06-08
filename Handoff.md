@@ -10,6 +10,18 @@ Se corrigio el flujo manual de TeamBot tras un envío público duplicado al chat
 
 ---
 
+# Sesion 2026-06-08 — TASK-1048 token gaps + incidente ICO batch (worker @core boundary)
+
+Cerrados los gaps de token de color (los 7 warnings residuales de `no-hardcoded-hex-color`) + promovida la rule a `error` (baseline 0). El verde de montos `#2E7D32` convergió a `success.ink #11703f` (token AA de Fase B) en web (`theme.greenhouseSemantic.success.tonalText`) + PDF/Excel (`axisSemanticSubValues.success.ink`). Tokens nuevos: `GH_COLORS.surface.tagBlue`, splash → `brand.greenhouseGreen`, `#666`→`text.secondary`.
+
+**Incidente ICO batch (resuelto):** el cambio de charts de TASK-1053 hizo que `metric-registry` (dominio worker-bundled) importara `@core/theme/axis-chart` → `ERR_MODULE_NOT_FOUND` (los Docker builds de los workers excluyen `src/@core`) → ico-batch deploy failed. **Fix robusto (no parche):** (1) layering — `CSC_CHART_COLORS` (UI) movido a `src/components/greenhouse/charts/csc-chart-colors.ts`; (2) DATA de tokens runtime-agnóstica relocada a `src/lib/design-tokens/semantic-sub-values.ts` (re-exportada por `@core/theme/axis-semantic`) para que PDF/Excel worker-bundled no toquen `@core`; (3) guard esbuild `--alias:@core` en los 3 workers Node (silent-crash → loud-build-fail). Regla canonizada en CLAUDE.md/AGENTS.md "Worker @core boundary".
+
+- **Verificado:** ico-batch + ops-worker + commercial-cost deploy **SUCCESS** (real Docker). eslint . 0 errores · tsc 0 · 18 lint-rule tests · 41 theme tests · GVC success-ink swatch (`/admin/design-system/colors`).
+- **Commits:** worker alias `8385e59a9` · ico layering `28750f7c1` · Slice2+3 `5f7aca7f2` · Slice4+5 `7f9df0e37`.
+- **No tocado:** parcela paralela de Codex (teams skill, mockups, QueryClientProvider, date.ts) sigue sin commitear.
+
+---
+
 # Sesion 2026-06-08 — TASK-1053 color overhaul "Restraint v1" (Fase A + charts)
 
 Recuperación de la sesión perdida (crash de VS Code) + ejecución de la tokenización de la paleta **Restraint v1** (aprobada por el operador). Local-first en `develop`, sin push.

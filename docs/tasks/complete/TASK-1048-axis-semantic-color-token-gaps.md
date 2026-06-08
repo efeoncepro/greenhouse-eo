@@ -2,13 +2,28 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Complete`
+
+## Delta de cierre 2026-06-08
+
+El gap del verde success AA-safe **ya lo había resuelto TASK-1053 Fase B** (`axisSemanticSubValues.success.ink = #11703f`, 6.15:1) — no hizo falta un `success-1000` nuevo en el ramp. Implementación final (diverge del plan original, mejor — reusa Fase B):
+
+- **Slice 1 (token):** ✅ resuelto por Fase B. `success.ink` es el token AA canónico.
+- **Slice 2 (web):** ✅ 3 consumidores `#2E7D32` → `theme.greenhouseSemantic.success.tonalText` (mode-aware).
+- **Slice 3 (PDF/Excel):** ✅ 5 generators → `axisSemanticSubValues.success.ink` desde el **SoT runtime-agnóstico nuevo** `src/lib/design-tokens/semantic-sub-values.ts` (re-exportado por `@core/theme/axis-semantic`) — porque los PDF worker-bundled NO pueden tocar `@core`.
+- **Slice 4 (one-offs):** ✅ `GH_COLORS.surface.tagBlue` (`#eaf3fc`), splash → `GH_COLORS.brand.greenhouseGreen`, `#666` → `text.secondary`. Chart pos/neg ya existían como `GH_COLORS.chart.directional` (TASK-1053 charts).
+- **Slice 5:** ✅ `greenhouse/no-hardcoded-hex-color` → `error`, baseline 0 (eslint . 0 errores).
+- **Slice 6 (docs):** ✅ DESIGN.md §Color + V1 §8.1.quater (success.ink, Fase B), skill `design-system-governance` §4 (gap → resuelto), colors page swatch, changelog/Handoff, regla "Worker @core boundary" en CLAUDE.md/AGENTS.md.
+
+**Incidente resuelto en el camino (ICO batch):** el cambio de charts de TASK-1053 hizo que `metric-registry` (dominio worker-bundled) importara `@core/theme/axis-chart` → `ERR_MODULE_NOT_FOUND` (workers excluyen `src/@core`) → ico-batch deploy failed. Fix: layering (`CSC_CHART_COLORS` → `src/components/greenhouse/charts/`) + design-token SoT relocado a `src/lib/design-tokens` + guard esbuild `--alias:@core` en los 3 workers. ico-batch + ops-worker deploy SUCCESS verificados.
+
+**Gates:** eslint . 0 errores · tsc 0 · 18 lint-rule tests · 41 theme tests · ico-batch/ops-worker/commercial-cost deploy SUCCESS · GVC success-ink swatch.
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
