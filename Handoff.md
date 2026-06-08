@@ -1,3 +1,26 @@
+# Sesion 2026-06-08 — TASK-1053 color overhaul "Restraint v1" (Fase A + charts)
+
+Recuperación de la sesión perdida (crash de VS Code) + ejecución de la tokenización de la paleta **Restraint v1** (aprobada por el operador). Local-first en `develop`, sin push.
+
+**Shipped (6 commits en `develop`):**
+
+- `1415f8cb3` Slice 0 — ADR `GREENHOUSE_SEMANTIC_COLOR_SYSTEM_DECISION_V1` (Accepted) + DECISIONS_INDEX + task in-progress con callout "Scope vs secuencia".
+- `c62a70aea` A1a — semánticos AA (info/success/error texto-blanco + warning ink) + `contrast.ts` + contrast gate.
+- `e6ff4a0ec` A1b — secondary a verde coherente (ink `#4B8405`).
+- `d02fcc441` fix framing orange.
+- `b301161a8` charts — paleta categórica `axis-chart.ts` + cashflow + orange serie #3; migrados IcoCharts + cashflow consumers.
+- `990fee915` (tipografía surfaceHeroTitle, parcela previa de Codex/operador, cerrada aparte).
+
+**Capas canónicas, NO override:** todo en `axis-tokens`/`axis-semantic`/`axis-secondary`/`axis-chart` (SoT); `mergedTheme` y consumidores (GH_COLORS, PdfColors) derivan. Verificado: cero cambios de color en mergedTheme/colorSchemes.
+
+**Evidencia:** design:lint 0/0 · tsc · theme tests 18/18 (drift + contrast) · build exit 0 · GVC chips light+dark, colors ramp, charts lab (`.captures/2026-06-08T10-36-34_tmp-a1a-chips`, `...10-45-50_inline-admin-design-system-colors`, `...11-13-40_inline-admin-design-system-charts`). Coblis pre-check: lime/orange marginal deuteranopía (ΔE 10.1) + cashflow verde/rojo inseguro (ΔE 8.8) → reglas color-nunca-solo + signo/ícono horneadas.
+
+**Pendiente (scope aprobado, slices siguientes):** Fase B sub-valores (ink/tint/border/dark-fg) + tonal-by-default/dot/KPI-inline + dark-fg derivation. GVC en vivo del trend chart ICO (recolor verificado mecánicamente; conviene eyeball en `/agency` tab ICO). Reconciliación AXIS Figma upstream (code-first). Discrepancia detectada: el ramp `axisRamp.primary` dark-steps (700-900) NO está alineado con el accent ramp Restraint (navy=accent-800 `#023C70` + step 50) — follow-up si el operador quiere el ramp completo.
+
+**No tocar — parcela paralela de Codex** (en el working tree, NO commitear): `QueryClientProvider.tsx` (devtools opt-in), `lib/format/date.ts` (normalizeIntlWhitespace), `agency/organizations/mockup/page.tsx` + `people/daniela-workforce/page.tsx` + sus `ClientMockupPage.tsx`. Codex las commitea.
+
+---
+
 # Sesion 2026-06-08 — Surface Hero Title token para títulos primarios
 
 Se promovio el tamaño/peso que el operador aprobo visualmente en `/people/mockup/daniela-workforce` y `/agency/organizations/mockup` a token canonico de surface, sin cambiar `h1-h4` globales.
