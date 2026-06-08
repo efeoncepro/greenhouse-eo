@@ -248,6 +248,12 @@ export const GH_COLORS = {
     bgSurface: '#F8F9FA'
   },
 
+  // Superficies con nombre (tints suaves de tag/badge). TASK-1048: tokeniza el
+  // tag-blue que estaba hardcodeado como fallback en SpaceCard/SpaceHealthTable.
+  surface: {
+    tagBlue: '#eaf3fc' // pale info wash (fondo de tag cuando no hay color de servicio)
+  },
+
   service: {
     globe: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' },
     efeonce_digital: { source: '#023c70', bg: '#eaeff3', text: '#023c70' },

@@ -273,7 +273,7 @@ return
         <Box>
           <Link
             href='/admin/commercial/product-catalog'
-            style={{ textDecoration: 'none', fontSize: 14, color: '#666' }}
+            style={{ textDecoration: 'none', fontSize: 14, color: 'var(--mui-palette-text-secondary)' }}
           >
             ← Catálogo
           </Link>

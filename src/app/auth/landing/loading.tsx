@@ -3,6 +3,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+
 export default function AuthLandingLoading() {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
@@ -13,7 +15,7 @@ export default function AuthLandingLoading() {
               width: 32,
               height: 32,
               borderRadius: '6px',
-              bgcolor: '#2d6a4f',
+              bgcolor: GH_COLORS.brand.greenhouseGreen,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

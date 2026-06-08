@@ -282,9 +282,10 @@ export default [
       'greenhouse/no-fontsize-inline-typography': 'warn',
       // Figma Implementation Contract — color HEX hardcodeado prohibido en UI
       // de producto; mapear a theme.palette.*/theme.axis.*/var(--mui-palette-*).
-      // Modo warn inicial (deuda legacy); promover a 'error' tras el sweep,
-      // igual que el rollout de tipografía. Labs/theme/emails/pdf/mockup exentos.
-      'greenhouse/no-hardcoded-hex-color': 'warn'
+      // TASK-1048: promovida a 'error' con baseline 0 (sweep + tokens success-ink/
+      // surface tag-blue cerraron los 7 warnings residuales). Labs/theme/emails/
+      // pdf/mockup/tests exentos vía overrides abajo.
+      'greenhouse/no-hardcoded-hex-color': 'error'
     }
   },
 
