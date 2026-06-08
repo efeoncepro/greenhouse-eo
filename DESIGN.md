@@ -379,18 +379,25 @@ inline:
 
 ### Chart colors derive from the SoT (TASK-1053)
 
-Multi-series charts consume the **canonical categorical palette** — `GH_COLORS.chart.categorical`
-(light) / `.categoricalDark` (dark), which derives from the AXIS SoT `src/@core/theme/axis-chart.ts`.
-Series order is brand-anchored: `azul #0375DB · lima #6EC207 · naranja #FF6500 (Reach sub-brand) ·
-violeta #7C3AED · cian #06B6D4 · magenta #EC4899`. Single-series → the accent (`primary`); **never the navy**.
+**`axis-chart.ts` is the chart SoT** — self-contained ("rica en sí misma"), NOT derived from brand/semantic
+palettes, so a chart series is never confused with a UI status. Two sub-palettes cover every chart type
+(one categorical + one directional — no per-chart-type palettes):
 
-- **Color is NEVER the only encoding** (WCAG 1.4.1): charts MUST carry a legend / labels. `lime` and
-  `orange` are marginal under deuteranopia (Coblis ΔE 10.1) and adjacent in series order — distinguishing
-  them by color alone fails.
-- **Cashflow** uses `GH_COLORS.chart.cashflow.{positive #3DBA5D, negative #FF4D49}` and MUST always pair
-  with a **+/- sign or ▲/▼ icon** — the red/green pair is deuteranopia-unsafe (ΔE 8.8), color-only forbidden.
-- **NEVER** hardcode chart series hexes inline. Local `*_COLORS` arrays in chart components are a smell —
-  use `GH_COLORS.chart.categorical`. Domain palettes (`cscPhase`, `service`) keep their deliberate brand hues.
+- **Categorical** "Deep-bright" (operator-approved 2026-06-08) — `GH_COLORS.chart.categorical` (light) /
+  `.categoricalDark` (dark): `indigo #5145E0 · verde #1FBA85 · naranja #FB7A00 · magenta #D633C9 · cian #3CC9F0 ·
+  lima #9BE036`. For arbitrary series (spaces, clients, expense categories, members, **CSC phases via subset**).
+  Re-analyzed: CVD-min ΔE 12.9 (colorblind-distinguishable), clash ΔE 23 vs the 4 semantics, vibrant (chroma 73).
+- **Directional** (Finance & deltas) — `GH_COLORS.chart.directional.{positive #3DBA5D, negative #FF4D49, neutral
+  #94A3B8}` (+ `directionalDark`): cashflow in/out, P&L +/−, KPI variation, waterfall. The chart green/red is
+  brighter than the UI semantic ink and lives in `axis-chart`, not `theme.palette`.
+
+Rules:
+
+- **Color is NEVER the only encoding** (WCAG 1.4.1): categorical charts MUST carry a legend / labels.
+- **Directional** MUST always pair with a **+/- sign or ▲/▼ icon** — red/green is deuteranopia-unsafe color-alone.
+- Single-series → the accent. **NEVER** pull a categorical series from `theme.palette.{success,warning,error,info}`
+  (the success ink is too dark for "good", warning is the alert amber) — use `GH_COLORS.chart.*`.
+- **NEVER** hardcode chart series hexes inline. Domain palettes (`cscPhase`) derive from `categorical` (subset).
 
 ### PDF + email = one semantic SSOT + adapter per medium
 

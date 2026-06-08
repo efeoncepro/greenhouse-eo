@@ -8,6 +8,7 @@ import { useTheme } from '@mui/material/styles'
 
 import type { AxisColorFamily } from '@core/theme/axis-tokens'
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
 // --- WCAG contrast helpers (lab-local; the audit lives here, not in the theme) ---
 const channel = (c: number) => {
@@ -509,6 +510,68 @@ const NeutralPanel = ({ mode }: { mode: 'light' | 'dark' }) => {
   )
 }
 
+const ChartSwatch = ({ color, label }: { color: string; label: string }) => (
+  <Box sx={{ textAlign: 'center', minInlineSize: 84 }}>
+    <Box sx={{ height: 48, borderRadius: 1, bgcolor: color, mb: 0.75 }} />
+    <Typography variant='caption' sx={{ display: 'block', fontWeight: 600 }}>
+      {label}
+    </Typography>
+    <Typography variant='caption' color='text.secondary' sx={{ fontSize: 10 }}>
+      {color.toUpperCase()}
+    </Typography>
+  </Box>
+)
+
+const CHART_CATEGORICAL_LABELS = ['Serie 1', 'Serie 2', 'Serie 3', 'Serie 4', 'Serie 5', 'Serie 6']
+
+const ChartPaletteCard = () => (
+  <Card variant='outlined'>
+    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Typography variant='h5'>Charts — paleta «Deep-bright» (TASK-1053)</Typography>
+        <Typography variant='body2' color='text.secondary'>
+          SoT propio de charts (<code>@core/theme/axis-chart.ts</code>), independiente de marca y semánticos. Toda serie
+          sale de acá vía <code>GH_COLORS.chart.*</code>. Colorblind-safe (CVD-min ΔE 12.9) y sin chocar con
+          info/success/warning/error (ΔE ≥23). <strong>Color nunca solo</strong>: legend/labels obligatorios.
+        </Typography>
+      </Box>
+
+      <Box>
+        <Typography variant='subtitle2' sx={{ mb: 1 }}>
+          Categórica (series arbitrarias · CSC fases · multi-serie) — light
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+          {GH_COLORS.chart.categorical.map((c, i) => (
+            <ChartSwatch key={c} color={c} label={CHART_CATEGORICAL_LABELS[i]} />
+          ))}
+        </Box>
+      </Box>
+
+      <Box>
+        <Typography variant='subtitle2' sx={{ mb: 1 }}>
+          Categórica — dark (charcoal)
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+          {GH_COLORS.chart.categoricalDark.map((c, i) => (
+            <ChartSwatch key={c} color={c} label={CHART_CATEGORICAL_LABELS[i]} />
+          ))}
+        </Box>
+      </Box>
+
+      <Box>
+        <Typography variant='subtitle2' sx={{ mb: 1 }}>
+          Direccional (Finanzas / deltas) — siempre con signo +/− o ícono ▲/▼
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+          <ChartSwatch color={GH_COLORS.chart.directional.positive} label='Positivo' />
+          <ChartSwatch color={GH_COLORS.chart.directional.negative} label='Negativo' />
+          <ChartSwatch color={GH_COLORS.chart.directional.neutral} label='Neutral' />
+        </Box>
+      </Box>
+    </CardContent>
+  </Card>
+)
+
 const AxisColorLabView = () => (
   <Box
     sx={{
@@ -577,6 +640,8 @@ const AxisColorLabView = () => (
     </Card>
 
     <ProposedBrandAccentCard />
+
+    <ChartPaletteCard />
 
     <AxisTokenReference />
   </Box>

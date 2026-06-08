@@ -18,12 +18,9 @@ type Props = {
   weeklyActivity: AgencyChartWeeklyPoint[]
 }
 
-const STATUS_COLORS = [
-  GH_COLORS.chart.primary,
-  GH_COLORS.semaphore.yellow.source,
-  GH_COLORS.semaphore.red.source,
-  GH_COLORS.semaphore.green.source
-]
+// Distribución de estados (TASK-1053): paleta categórica canónica, no semáforo de UI.
+// El label de cada slice lleva el significado (color-nunca-solo).
+const STATUS_COLORS = GH_COLORS.chart.categorical
 
 const PulseGlobalCharts = ({ spaces, statusMix, weeklyActivity }: Props) => {
   const theme = useTheme()

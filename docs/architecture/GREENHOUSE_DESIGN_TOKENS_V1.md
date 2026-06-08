@@ -417,15 +417,19 @@ Three layers compose the effective palette (see `GREENHOUSE_THEME_TOKEN_CONTRACT
 
 Each color ships with opacities: `lighterOpacity` (8%), `lightOpacity` (16%), `mainOpacity` (24%), `darkOpacity` (32%), `darkerOpacity` (38%).
 
-### 8.1.ter Chart categorical palette (TASK-1053)
+### 8.1.ter Chart palette (TASK-1053 "Deep-bright")
 
-Las series de charts multi-serie consumen la **paleta categórica canónica** desde el SoT `src/@core/theme/axis-chart.ts`, expuesta como `GH_COLORS.chart.categorical` (light) / `.categoricalDark` (dark) + `GH_COLORS.chart.cashflow.{positive,negative}`. Orden anclado a marca: `azul #0375DB · lima #6EC207 · naranja #FF6500 (Reach sub-brand) · violeta #7C3AED · cian #06B6D4 · magenta #EC4899`. Series 1-2 derivan de `axisRamp` (primary/secondary[500]); 3-6 curadas. Dark levantada: `#3B8EE8 #7FD42A #FF8A3D #9B6BF0 #22C9E4 #F25BAC`. Cashflow `#3DBA5D`/`#FF4D49`.
+`src/@core/theme/axis-chart.ts` es el **SoT de charts** — auto-contenido ("rica en sí misma"), NO derivado de marca/semánticos (una serie nunca se confunde con un status de UI). Dos sub-paletas cubren todos los tipos de chart (una categórica + una direccional — sin paletas por tipo):
+
+- **Categórica "Deep-bright"** (aprobada operador 2026-06-08) — `GH_COLORS.chart.categorical` (light) / `.categoricalDark` (dark): `indigo #5145E0 · verde #1FBA85 · naranja #FB7A00 · magenta #D633C9 · cian #3CC9F0 · lima #9BE036`. Series arbitrarias (spaces, clientes, categorías de gasto, miembros, **fases CSC vía subset**). Re-analizada: CVD-min ΔE 12.9 (distinguible daltónicos), clash ΔE 23 vs los 4 semánticos, vibrante (chroma 73). Dark levanta solo el indigo (`#7B72F0`) para verse en charcoal preservando el spread.
+- **Direccional** (Finanzas/deltas) — `GH_COLORS.chart.directional.{positive #3DBA5D, negative #FF4D49, neutral #94A3B8}` (+ `directionalDark`): cashflow in/out, P&L +/−, variación KPI, waterfall. Verde/rojo chart-tuned (más brillante que el ink semántico), vive en `axis-chart`, no en `theme.palette`.
 
 **Reglas duras CVD (Coblis pre-check, Machado 2009 + CIE76 ΔE):**
 
-- **Color nunca solo** (WCAG 1.4.1): legend/labels obligatorios. `lime` vs `orange` marginal en deuteranopía (ΔE 10.1) y adyacentes en el orden → no distinguir solo por color.
-- **Cashflow** (verde/rojo) deuteranopía-inseguro (ΔE 8.8) → siempre signo `+/-` o ícono `▲/▼`, jamás solo color.
-- **NUNCA** hexes de serie inline ni arrays `*_COLORS` locales en componentes de chart → usar `GH_COLORS.chart.categorical`. Paletas de dominio (`cscPhase`, `service`) conservan sus hues de marca deliberados. Drift-guard: `axis-semantic-drift.test.ts` (bloque chart categorical).
+- **Color nunca solo** (WCAG 1.4.1): categórica con legend/labels obligatorios.
+- **Direccional** siempre con signo `+/-` o ícono `▲/▼` (verde/rojo inseguro daltónico solo-color).
+- Single-series → el acento. **NUNCA** una serie categórica desde `theme.palette.{success,warning,error,info}` (el ink success es muy oscuro para "bueno", el warning es el amber de alerta) → usar `GH_COLORS.chart.*`.
+- **NUNCA** hexes de serie inline ni arrays `*_COLORS` locales → `GH_COLORS.chart.categorical`. Paletas de dominio (`cscPhase`) derivan de `categorical` (subset). Drift-guard: `axis-semantic-drift.test.ts` (bloque chart palette).
 
 ### 8.1.bis customColors namespace (Greenhouse semantic layer)
 

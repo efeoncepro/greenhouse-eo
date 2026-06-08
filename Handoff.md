@@ -8,14 +8,16 @@ Recuperación de la sesión perdida (crash de VS Code) + ejecución de la tokeni
 - `c62a70aea` A1a — semánticos AA (info/success/error texto-blanco + warning ink) + `contrast.ts` + contrast gate.
 - `e6ff4a0ec` A1b — secondary a verde coherente (ink `#4B8405`).
 - `d02fcc441` fix framing orange.
-- `b301161a8` charts — paleta categórica `axis-chart.ts` + cashflow + orange serie #3; migrados IcoCharts + cashflow consumers.
+- `b301161a8` charts (v1, supersedido) — paleta categórica inicial + cashflow + orange serie #3.
+- `34d71776a` **primary ramp fix** — pasa el accent ramp aprobado a `axisRamp.primary` (navy=accent-800 `#023C70`; main `#0375DB` igual) + `efeonce-core.light` alineado. **Cierra la discrepancia que estaba como follow-up.**
+- **(commit en curso)** **Charts SoT "Deep-bright"** — `axis-chart.ts` rediseñado self-contained (NO marca/semánticos): categórica `#5145E0 #1FBA85 #FB7A00 #D633C9 #3CC9F0 #9BE036` (elegida por el operador entre 4 candidatas re-analizadas CVD+clash+chroma) + dark + directional (pos/neg/neutral). Migrados TODOS los consumers (CSC `CSC_COLORS`+`CSC_CHART_COLORS` legacy, Pulse, KPI sparklines Home vía `chartHexColor` nuevo en `StatsWithAreaChart`, cashflow→directional). Surfaceado en `/colors`. Resuelve las 2 quejas del operador (dos azules + amber-alerta en CSC; verde-dark + amber en KPIs).
 - `990fee915` (tipografía surfaceHeroTitle, parcela previa de Codex/operador, cerrada aparte).
 
 **Capas canónicas, NO override:** todo en `axis-tokens`/`axis-semantic`/`axis-secondary`/`axis-chart` (SoT); `mergedTheme` y consumidores (GH_COLORS, PdfColors) derivan. Verificado: cero cambios de color en mergedTheme/colorSchemes.
 
 **Evidencia:** design:lint 0/0 · tsc · theme tests 18/18 (drift + contrast) · build exit 0 · GVC chips light+dark, colors ramp, charts lab (`.captures/2026-06-08T10-36-34_tmp-a1a-chips`, `...10-45-50_inline-admin-design-system-colors`, `...11-13-40_inline-admin-design-system-charts`). Coblis pre-check: lime/orange marginal deuteranopía (ΔE 10.1) + cashflow verde/rojo inseguro (ΔE 8.8) → reglas color-nunca-solo + signo/ícono horneadas.
 
-**Pendiente (scope aprobado, slices siguientes):** Fase B sub-valores (ink/tint/border/dark-fg) + tonal-by-default/dot/KPI-inline + dark-fg derivation. GVC en vivo del trend chart ICO (recolor verificado mecánicamente; conviene eyeball en `/agency` tab ICO). Reconciliación AXIS Figma upstream (code-first). Discrepancia detectada: el ramp `axisRamp.primary` dark-steps (700-900) NO está alineado con el accent ramp Restraint (navy=accent-800 `#023C70` + step 50) — follow-up si el operador quiere el ramp completo.
+**Pendiente (scope aprobado, slices siguientes):** Fase B sub-valores (ink/tint/border/dark-fg) + tonal-by-default/dot/KPI-inline + dark-fg derivation. Reconciliación AXIS Figma upstream (code-first) — ahora incluye el accent ramp + la paleta de charts Deep-bright. (Resuelto: la discrepancia del primary ramp — ya pasado en `34d71776a`. Charts: SoT Deep-bright + todos los consumers migrados + GVC verde home/ICO.)
 
 **No tocar — parcela paralela de Codex** (en el working tree, NO commitear): `QueryClientProvider.tsx` (devtools opt-in), `lib/format/date.ts` (normalizeIntlWhitespace), `agency/organizations/mockup/page.tsx` + `people/daniela-workforce/page.tsx` + sus `ClientMockupPage.tsx`. Codex las commitea.
 

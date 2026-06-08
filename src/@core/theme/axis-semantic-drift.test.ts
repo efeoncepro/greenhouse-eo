@@ -15,8 +15,13 @@ import { describe, expect, it } from 'vitest'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { PdfColors } from '@/lib/finance/pdf/tokens'
 
-import { axisChartCashflow, axisChartCategorical, axisChartCategoricalDark } from './axis-chart'
-import { axisMain, axisRamp } from './axis-tokens'
+import {
+  axisChartCategorical,
+  axisChartCategoricalDark,
+  axisChartDirectional,
+  axisChartDirectionalDark
+} from './axis-chart'
+import { axisMain } from './axis-tokens'
 
 import { axisSemanticHex, axisSemanticPalette } from './axis-semantic'
 
@@ -87,26 +92,27 @@ describe('PDF semantic tokens derive from the SoT', () => {
   })
 })
 
-describe('chart categorical palette derives from axis-chart SoT (TASK-1053)', () => {
-  it('GH_COLORS.chart.categorical === axisChartCategorical (light) + Dark + cashflow', () => {
+describe('chart palette derives from axis-chart SoT (TASK-1053 "Deep-bright")', () => {
+  it('GH_COLORS.chart.{categorical,categoricalDark,directional,directionalDark} === axis-chart SoT', () => {
     expect(GH_COLORS.chart.categorical).toEqual([...axisChartCategorical])
     expect(GH_COLORS.chart.categoricalDark).toEqual([...axisChartCategoricalDark])
-    expect(GH_COLORS.chart.cashflow).toEqual({ ...axisChartCashflow })
+    expect(GH_COLORS.chart.directional).toEqual({ ...axisChartDirectional })
+    expect(GH_COLORS.chart.directionalDark).toEqual({ ...axisChartDirectionalDark })
+  })
+
+  it('categorical pins the approved Deep-bright values (6 self-contained, NOT brand-anchored)', () => {
+    expect(axisChartCategorical).toEqual(['#5145e0', '#1fba85', '#fb7a00', '#d633c9', '#3cc9f0', '#9be036'])
+    // self-contained: la serie 1 NO es el primary de marca (resuelve el clash azul/info)
+    expect(axisChartCategorical[0]).not.toBe(axisMain.primary)
   })
 
   it('named brand series derive from the AXIS SoT (no stale dirección-D literals)', () => {
     expect(GH_COLORS.chart.primary).toBe(axisMain.primary)
     expect(GH_COLORS.chart.secondary).toBe(axisMain.secondary)
     expect(GH_COLORS.chart.info).toBe(axisMain.info)
-    // el stale #024c8f (dirección D) y el navy literal #023c70 ya no deben sobrevivir
     const named = [GH_COLORS.chart.primary, GH_COLORS.chart.secondary, GH_COLORS.chart.info].map(v => v.toLowerCase())
 
     expect(named).not.toContain('#024c8f')
     expect(named).not.toContain('#023c70')
-  })
-
-  it('categorical palette is brand-anchored: series 1-2 derive from the brand ramp', () => {
-    expect(axisChartCategorical[0]).toBe(axisMain.primary) // azul de marca
-    expect(axisChartCategorical[1]).toBe(axisRamp.secondary[500]) // lima de marca
   })
 })

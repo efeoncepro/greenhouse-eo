@@ -38,12 +38,14 @@ type Props = {
 
 // Paleta semántica canónica (= theme.palette.*.main). ApexCharts renderiza SVG,
 // así que las CSS vars de MUI resuelven aquí — cero hardcode, cero cambio visual.
+// CSC fases (TASK-1053): subset de la paleta categórica canónica (NO semánticos de UI —
+// el ink success es muy oscuro y el amber es alerta). Deriva de axis-chart vía GH_COLORS.
 const CSC_COLORS: Record<CscPhase, string> = {
-  briefing: 'var(--mui-palette-primary-main)',
-  produccion: 'var(--mui-palette-info-main)',
-  revision_interna: 'var(--mui-palette-warning-main)',
-  cambios_cliente: 'var(--mui-palette-error-main)',
-  entrega: 'var(--mui-palette-success-main)'
+  briefing: GH_COLORS.chart.categorical[0],
+  produccion: GH_COLORS.chart.categorical[1],
+  revision_interna: GH_COLORS.chart.categorical[2],
+  cambios_cliente: GH_COLORS.chart.categorical[3],
+  entrega: GH_COLORS.chart.categorical[4]
 }
 
 // Paleta categórica canónica (TASK-1053) — vibrante anclada a marca, deriva de axis-chart.

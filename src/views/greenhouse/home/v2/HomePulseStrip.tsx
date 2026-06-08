@@ -14,6 +14,8 @@ import StatsWithAreaChart from '@/components/card-statistics/StatsWithAreaChart'
 import type { StatsWithAreaChartProps } from '@/components/card-statistics/StatsWithAreaChart'
 import type { ThemeColor } from '@core/types'
 
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
@@ -51,6 +53,16 @@ const TONE_BY_KPI: Record<string, { color: ThemeColor; icon: string }> = {
 }
 
 const FALLBACK = { color: 'primary' as ThemeColor, icon: 'tabler-chart-line' }
+
+// TASK-1053: el sparkline sale del chart SoT (axis-chart), NO del palette semántico de UI
+// (el success ink es muy oscuro; el warning es el amber de alerta). El avatar conserva su
+// tono semántico (eso es UI, no chart). Tonos sin entrada → fallback al acento (single-series).
+const SPARK_HEX_BY_TONE: Partial<Record<ThemeColor, string>> = {
+  success: GH_COLORS.chart.directional.positive,
+  error: GH_COLORS.chart.directional.negative,
+  warning: GH_COLORS.chart.directional.neutral,
+  info: GH_COLORS.chart.categorical[4]
+}
 
 const formatStats = (card: PulseKpiCard): string => {
   if (card.value == null) return '—'
@@ -163,6 +175,7 @@ const PulseCardSlot = ({ card, index }: PulseCardSlotProps) => {
             title={card.label}
             subtitle={card.description ?? undefined}
             chartColor={tone.color}
+            chartHexColor={SPARK_HEX_BY_TONE[tone.color]}
             chartSeries={series}
             avatarIcon={tone.icon}
             avatarColor={tone.color}

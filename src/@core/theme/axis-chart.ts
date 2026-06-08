@@ -1,53 +1,61 @@
 /**
- * AXIS chart palette — TASK-1053 (categorical + cashflow). Canonical SoT for
- * multi-series chart colors, separate from the feedback semantics (those are
- * status, these are categorical brand series).
+ * AXIS chart palette — TASK-1053. Canonical SoT for ALL chart series color.
+ * Self-contained ("rica en sí misma"): NOT derived from brand/semantic palettes,
+ * so a chart series is never confused with a UI status signal.
  *
- * Series 1-2 derive from the brand ramp (primary blue + secondary lime); series
- * 3-6 are curated vibrant extensions. Orange (series 3) is the Efeonce **Reach
- * sub-brand** color, formalized here as its chart consumer (no separate UI role —
- * not warning, not CTA). `GH_COLORS.chart.categorical` derives from this layer.
+ * Two purpose-built sub-palettes (analysis: one categorical + one directional
+ * cover every chart type — no per-chart-type palettes):
+ *   • categorical — arbitrary series (spaces, clients, expense categories, members,
+ *     CSC phases via subset). NO order/meaning. Legend/labels ALWAYS (color-never-alone).
+ *   • directional — Finance & deltas (cashflow in/out, P&L +/-, KPI variation,
+ *     waterfall). positive/negative/neutral. ALWAYS pair with +/- sign or ▲/▼ icon.
  *
- * --- Colorblind safety (Coblis pre-check, Machado 2009 sim + CIE76 ΔE) ---
- * ⚠️ lime (series 2 #6ec207) and orange (series 3 #ff6500) are MARGINAL under
- *   deuteranopia (ΔE 10.1) and are adjacent in the approved brand order. Charts
- *   consuming this palette MUST carry a legend/labels — color is NEVER the only
- *   encoding (WCAG 1.4.1). Avoid distinguishing lime vs orange by color alone.
- * ⚠️ cashflow positive/negative (green/red) is deuteranopia-UNSAFE (ΔE 8.8 — the
- *   classic red/green trap). ALWAYS pair with a +/- sign or ▲/▼ icon, NEVER color
- *   alone. Other CVD types (protanopia/tritanopia) and all categorical pairs in
- *   protanopia/tritanopia clear ΔE ≥ 15.
+ * --- Palette "Deep-bright" (operator-approved 2026-06-08) ---
+ * Re-analyzed vibrant 6: CVD-min ΔE 12.9 (deuteranopia/protanopia/tritanopia all ≥10
+ * → distinguishable for colorblind), clash-min ΔE 23 vs the 4 semantics
+ * (info/success/warning/error → never confused with a status), chroma ≈73 (vibrant).
+ * Dark variant lifts only the dark indigo (#5145e0→#7b72f0) to stay visible on
+ * charcoal (≥3:1) while preserving the lightness spread that keeps it CVD-safe (13.2).
  *
- * Dark series are raised/brightened (NOT an inversion) so each stays distinct on
- * the charcoal surface (bodyBg #25293C / paper #2F3349).
+ * --- Directional CVD ---
+ * positive/negative (green/red) is deuteranopia-UNSAFE color-alone (the classic trap)
+ * → ALWAYS a +/- sign or ▲/▼ icon. neutral = subtotal/baseline (waterfall, zero line).
  *
- * Keep this file pure (no server-only, no Greenhouse deps beyond axisRamp).
+ * Rules: every chart series sources from here. NEVER hex inline; NEVER pull a
+ * categorical series from theme.palette.{success,warning,error,info}. Domain palettes
+ * (cscPhase) derive from `categorical` (subset). Keep this file pure (no deps).
  */
 
-import { axisRamp } from './axis-tokens'
-
-/** Categorical series palette (light mode) — brand-anchored vibrant, ≤6 series. */
+/** Categorical series palette (light) — Deep-bright, ≤6 series, legend mandatory. */
 export const axisChartCategorical = [
-  axisRamp.primary[500], // 1 · azul #0375db (= el acento de marca)
-  axisRamp.secondary[500], // 2 · lima #6ec207 (verde de marca, pop)
-  '#ff6500', // 3 · naranja — Reach sub-brand
-  '#7c3aed', // 4 · violeta
-  '#06b6d4', // 5 · cian
-  '#ec4899' // 6 · magenta
+  '#5145e0', // 1 · indigo
+  '#1fba85', // 2 · verde
+  '#fb7a00', // 3 · naranja
+  '#d633c9', // 4 · magenta
+  '#3cc9f0', // 5 · cian
+  '#9be036' // 6 · lima
 ] as const
 
-/** Categorical series palette (dark mode) — raised so each series stays distinct on charcoal. */
+/** Categorical series palette (dark) — only the dark indigo lifted; rest visible on charcoal. */
 export const axisChartCategoricalDark = [
-  '#3b8ee8', // 1 · azul
-  '#7fd42a', // 2 · lima
-  '#ff8a3d', // 3 · naranja
-  '#9b6bf0', // 4 · violeta
-  '#22c9e4', // 5 · cian
-  '#f25bac' // 6 · magenta
+  '#7b72f0', // 1 · indigo (lifted)
+  '#1fba85', // 2 · verde
+  '#fb7a00', // 3 · naranja
+  '#d633c9', // 4 · magenta
+  '#3cc9f0', // 5 · cian
+  '#9be036' // 6 · lima
 ] as const
 
-/** Cashflow directional pair. NEVER color-only — pair with +/- sign or ▲/▼ icon. */
-export const axisChartCashflow = {
+/** Directional palette (light) — Finance/deltas. NEVER color-only: +/- sign or ▲/▼ icon. */
+export const axisChartDirectional = {
   positive: '#3dba5d',
-  negative: '#ff4d49'
+  negative: '#ff4d49',
+  neutral: '#94a3b8'
+} as const
+
+/** Directional palette (dark) — lifted for charcoal visibility. */
+export const axisChartDirectionalDark = {
+  positive: '#4ed17a',
+  negative: '#ff6e6b',
+  neutral: '#aeb7c4'
 } as const

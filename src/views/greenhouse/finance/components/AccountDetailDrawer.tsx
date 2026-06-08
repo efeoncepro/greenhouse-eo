@@ -588,13 +588,13 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
                         <Bar
                           dataKey='inflows'
                           name={profile?.chart.inflowLabel ?? 'Ingresos'}
-                          fill={profile?.chart.inflowColor ?? GH_COLORS.chart.cashflow.positive}
+                          fill={profile?.chart.inflowColor ?? GH_COLORS.chart.directional.positive}
                           radius={[4, 4, 0, 0]}
                         />
                         <Bar
                           dataKey='outflows'
                           name={profile?.chart.outflowLabel ?? 'Salidas'}
-                          fill={profile?.chart.outflowColor ?? GH_COLORS.chart.cashflow.negative}
+                          fill={profile?.chart.outflowColor ?? GH_COLORS.chart.directional.negative}
                           radius={[4, 4, 0, 0]}
                         />
                       </BarChart>

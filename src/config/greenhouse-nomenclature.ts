@@ -2,7 +2,12 @@
 // hue/text/tint from here — NEVER hardcode the legacy #6ec207/#ff6500/#bb1954.
 // Domain/categorical palettes (cscPhase, service, categories) keep deliberate
 // brand hues and are intentionally NOT migrated.
-import { axisChartCashflow, axisChartCategorical, axisChartCategoricalDark } from '@core/theme/axis-chart'
+import {
+  axisChartCategorical,
+  axisChartCategoricalDark,
+  axisChartDirectional,
+  axisChartDirectionalDark
+} from '@core/theme/axis-chart'
 import { axisSemanticHex } from '@core/theme/axis-semantic'
 import { axisMain, axisOpacity } from '@core/theme/axis-tokens'
 
@@ -260,12 +265,13 @@ export const GH_COLORS = {
     error: axisSemanticHex.error,
     info: axisMain.info, // azure (era navy #023c70 literal, sin consumers)
     neutral: '#dbdbdb',
-    // Categorical multi-series palette (TASK-1053) — vibrante anclada a marca, deriva de axis-chart.
-    // ⚠️ color NUNCA solo: usar siempre legend/labels (lime/orange marginales en deuteranopía).
+    // Categorical multi-series palette (TASK-1053 "Deep-bright") — self-contained, deriva de axis-chart.
+    // ⚠️ color NUNCA solo: usar siempre legend/labels.
     categorical: [...axisChartCategorical],
     categoricalDark: [...axisChartCategoricalDark],
-    // Cashflow direccional — NUNCA solo color: signo +/- o ícono ▲/▼ obligatorio.
-    cashflow: { ...axisChartCashflow }
+    // Direccional (Finanzas/deltas) — NUNCA solo color: signo +/- o ícono ▲/▼ obligatorio.
+    directional: { ...axisChartDirectional },
+    directionalDark: { ...axisChartDirectionalDark }
   },
 
   cscPhase: {

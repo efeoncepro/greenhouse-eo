@@ -24,7 +24,7 @@
  * The drawer renders a profile; it does not interpret an instrument.
  */
 
-import { axisChartCashflow } from '@core/theme/axis-chart'
+import { axisChartDirectional } from '@core/theme/axis-chart'
 
 import type { TreasuryBankAccountOverview } from '@/lib/finance/account-balances'
 import type { ProcessorComponentizationStatus, TreasuryProcessorDigest } from '@/lib/finance/processor-digest'
@@ -126,9 +126,9 @@ export interface InstrumentDetailProfile {
   temporalDefaults?: TemporalDefaults
 }
 
-// Cashflow direccional canónico (TASK-1053) — la UI debe acompañar con signo/ícono (no color-solo).
-const SUCCESS_HEX = axisChartCashflow.positive
-const ERROR_HEX = axisChartCashflow.negative
+// Direccional canónico (TASK-1053) — la UI debe acompañar con signo/ícono (no color-solo).
+const SUCCESS_HEX = axisChartDirectional.positive
+const ERROR_HEX = axisChartDirectional.negative
 const PRIMARY_HEX = 'var(--mui-palette-primary-main)'
 const WARNING_HEX = 'var(--mui-palette-warning-main)'
 
