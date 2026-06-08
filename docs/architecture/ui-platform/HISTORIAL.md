@@ -6,6 +6,14 @@
 
 ---
 
+## Delta 2026-06-08 — Feedback tonal sub-valores + atoms (TASK-1053 Fase B)
+
+Tonal-by-default para feedback (aprobado en Restraint v1). Tres capas nuevas:
+
+- **Sub-valores semánticos** (`axisSemanticSubValues` en `@core/theme/axis-semantic.ts`): `ink`/`tint`/`border`/`darkFg` por rol (info/success/warning/error), 16 hexes curados AA-verificados. Factory mode-aware `theme.greenhouseSemantic.<role>` (`src/components/theme/greenhouse-semantic-tokens.ts`, espejo de `greenhouseElevation`) compone el triple tonal por modo (light: tint/ink/border · dark: darkFg + `color-mix`). Gates: `greenhouse-semantic-drift.test.ts` + `axis-semantic-contrast.test.ts`. Surfaceado en `/admin/design-system/colors` (card SemanticTonalCard) + DESIGN.md §Color + V1 §8.1.quater.
+- **GreenhouseChip** `label` (tonal) variant consume el triple para tonos feedback → arregla bug AA real (`warning.main` amber como texto era ilegible; ahora ink `#8a5a00` 5.41:1). Rollout **primitive-scoped** (decisión operador): los `<Chip>`/`<Alert>` MUI crudos NO cambian.
+- **Feedback atoms (Slice B2)**: `GreenhouseKpiDelta` (delta KPI inline — signo + flecha + color AA, variants text/tonal, `invert`, `neutralThreshold`; migra HomeRunwayStrategic) + `GreenhouseStatusDot` (dot de estado + label/ariaLabel obligatorio, `pulse`/`halo`; migra HomeReliabilityRibbon). Color nunca solo (WCAG 1.4.1). Showcase en el lab de chips. GVC light+dark.
+
 ## Delta 2026-06-08 — Surface Hero Title token
 
 - La escala tipográfica suma `surfaceHeroTitle` / `surface-hero-title`: Poppins 600, `2.125rem` desktop/tablet, `1.75rem` mobile, `lineHeight=surfaceHero(1.15)`.

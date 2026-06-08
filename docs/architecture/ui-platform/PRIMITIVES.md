@@ -29,7 +29,8 @@ Cada primitive tiene su contrato canónico en una ADR/spec dedicada o en su delt
 | **Microinteraction** | `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`, `GreenhouseStateTransition`, `GreenhouseInlineValidation`, `GreenhouseFieldProvenancePeek`, `GreenhouseStepperProgressMicro`, `GreenhouseEvidenceAttachmentDropzone`, `GreenhouseInlineDecisionPrompt` | HISTORIAL Deltas 2026-06-06 / 06e |
 | **Loading Surface** | `GreenhouseLoadingSurface` + variants nombradas (`GreenhouseDocumentPipelineLoader`, `GreenhouseExternalHandoffLoader`, …) | HISTORIAL Delta 2026-06-06d (TASK-1037) |
 | **Chart cards** | `GreenhouseChartCard`, `GreenhouseStackedDistributionChartCard`, `GreenhouseMetricBreakdownChartCard`, `MetricTrendCard`; Apex runtime via `AppReactApexCharts` | HISTORIAL Deltas 2026-06-07 / 2026-06-02 / 2026-06-07l → ver también `dataviz-design` |
-| **Chips** | `GreenhouseChip` (AXIS) | HISTORIAL Delta 2026-06-07c |
+| **Chips** | `GreenhouseChip` (AXIS; `label` variant tonal AA vía `theme.greenhouseSemantic`) | HISTORIAL Deltas 2026-06-07c / 2026-06-08 (TASK-1053 Fase B) |
+| **Feedback atoms** | `GreenhouseKpiDelta` (delta KPI inline: signo + flecha + color AA, variants text/tonal, `invert`), `GreenhouseStatusDot` (dot de estado + label/ariaLabel obligatorio, `pulse`/`halo`) — color nunca solo; consumen `theme.greenhouseSemantic` | HISTORIAL Delta 2026-06-08 (TASK-1053 Fase B Slice B2) |
 | **Buttons** | `GreenhouseButton` (AXIS) + `GreenhouseAsyncActionButton` (compone Button) | HISTORIAL Deltas 2026-06-07d / 06-07e |
 | **Utilities** | `GreenhouseActivityTimeline` | HISTORIAL Delta 2026-06-07b |
 | **Summary / Quote builder** | `EntitySummaryDock`, `CardHeaderWithBadge`, `FormSectionAccordion`, `ContextChipStrip`, `TotalsLadder` | HISTORIAL Deltas 2026-05-05 / 2026-04-19 / 2026-04-20 |

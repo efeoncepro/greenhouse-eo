@@ -4,7 +4,7 @@ Se corrigio el flujo manual de TeamBot tras un envío público duplicado al chat
 
 - **Smoke real:** en 1:1 de Julio Reyes, card-only con `msteams.entities[].mentioned.id = <Entra Object ID>` renderizó mención real; card-only con `29:<aadObjectId>` renderizó texto plano.
 - **CLI:** `pnpm teams:announce` ahora acepta `--mention "Texto visible|entraObjectIdOrUpn|Nombre de perfil"` repetible, permite CTA opcional y rechaza `29:<aadObjectId>` en Adaptive Cards.
-- **Docs/skills:** actualizado `docs/operations/manual-teams-announcements.md`, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.4, `changelog.md`, `project_context.md` y skills `teams-bot-platform` Codex/Claude.
+- **Docs/skills:** actualizado `docs/operations/manual-teams-announcements.md`, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.4, `changelog.md`, `project_context.md`, skills `teams-bot-platform` Codex/Claude y nueva skill invocable `greenhouse-teams-message-operator` en `.codex/skills/` + `.claude/skills/`.
 - **Gates:** manual announcement tests 7/7; eslint focal; `tsc --noEmit`; dry-run CLI con mención de Maria Fernanda; `docs:closure-check` focal.
 - **Pendiente:** si se reenvía una bienvenida pública, primero hacer dry-run y, si hay duda de membresía en el chat destino, validar membership/usar 1:1. No enviar otra prueba a `EO Team`.
 
@@ -31,7 +31,9 @@ Recuperación de la sesión perdida (crash de VS Code) + ejecución de la tokeni
 
 **Fase B Slice B1 ✓ (`2c3dc4132`):** sub-valores curados (ink/tint/border/darkFg, 16 hexes AA) en `axisSemanticSubValues` + factory `theme.greenhouseSemantic` (mode-aware, espejo de `greenhouseElevation`) + consumidor **primitive-scoped** (decisión operador vía AskUserQuestion): `GreenhouseChip` `label` variant tonal AA — arregla `warning.main` amber-como-texto (ahora ink `#8a5a00` 5.41:1 sobre tint). dark-fg ya consumido (tonalText en dark). Lab `/admin/design-system/chips` hecho fiel. Sub-valores como tokens en `/admin/design-system/colors`. Gates: `greenhouse-semantic-drift.test.ts` + `axis-semantic-contrast.test.ts` (147 theme tests). GVC light+dark ✓ (`.captures/2026-06-08T14-07-02_tmp-chips-tonal`).
 
-**Pendiente (scope aprobado):** Fase B Slice B2 = dot variant + KPI delta inline (consumen directional/ink). TASK-1054 (migración de ~11 charts al Chart SoT, ya documentada). Reconciliación AXIS Figma upstream (code-first) — incluye accent ramp + charts Deep-bright + los sub-valores tonales. Diferido a tasks separadas: success-ink `#2E7D32` (TASK-1048), paleta emails, lint→error baseline. **Decisión rollout:** tonal es **primitive-scoped**, NO flip global de Chip/Alert MUI crudos.
+**Fase B Slice B2 ✓ (`e2daf6a8e`):** dos primitives de feedback inline — `GreenhouseKpiDelta` (delta KPI: signo+flecha+color AA, variants text/tonal, `invert`/`neutralThreshold`; migra HomeRunwayStrategic) + `GreenhouseStatusDot` (dot+label/ariaLabel obligatorio, `pulse`/`halo`; migra HomeReliabilityRibbon). Color nunca solo (WCAG 1.4.1). Showcase "Feedback atoms" en el lab de chips. Registradas en PRIMITIVES.md + HISTORIAL. 151 tests · GVC light+dark ✓. **→ Fase B COMPLETA.**
+
+**Pendiente (scope aprobado, tasks separadas):** TASK-1054 (migración de ~11 charts al Chart SoT, ya documentada). Reconciliación AXIS Figma upstream (code-first) — incluye accent ramp + charts Deep-bright + sub-valores tonales + atoms. Diferido a tasks separadas: success-ink `#2E7D32` (TASK-1048), paleta emails, lint→error baseline. **Decisión rollout:** tonal es **primitive-scoped**, NO flip global de Chip/Alert MUI crudos. Adopción de KpiDelta/StatusDot en las ~15 superficies restantes = gradual (no bloqueante).
 
 **No tocar — parcela paralela de Codex** (en el working tree, NO commitear): `QueryClientProvider.tsx` (devtools opt-in), `lib/format/date.ts` (normalizeIntlWhitespace), `agency/organizations/mockup/page.tsx` + `people/daniela-workforce/page.tsx` + sus `ClientMockupPage.tsx`. Codex las commitea.
 
