@@ -1,3 +1,15 @@
+# Sesion 2026-06-08 — TASK-1055 Harness Coverage Matrix creada
+
+Se creo `TASK-1055` como task formal para mejorar el harness del repo sin inflar CI a ciegas.
+
+- **Task:** `docs/tasks/to-do/TASK-1055-harness-coverage-matrix-tiered-quality-gates.md`.
+- **Scope:** matriz canonica `riesgo -> evidencia -> gate` por Tier 0/1/2, `pnpm harness:lint` inicial, bridge a observabilidad de tests y politica gradual para promover warnings maduros a errores.
+- **Registro:** `docs/tasks/TASK_ID_REGISTRY.md` actualizado y `docs/tasks/README.md` movio el siguiente ID disponible a `TASK-1056`.
+- **No ejecutado:** no se implemento la matriz ni el lint; queda para ejecucion futura via task hook.
+- **Gates:** `pnpm ops:lint --changed` y `pnpm task:lint --task TASK-1055` verdes.
+
+---
+
 # Sesion 2026-06-08 — TeamBot mentions corregidas + CLI extendido
 
 Se corrigio el flujo manual de TeamBot tras un envío público duplicado al chat `EO Team`: no volver a usar `activity.text` + Adaptive Card para menciones en grupos, porque Teams muestra `activity.text` como burbuja separada arriba del card.
