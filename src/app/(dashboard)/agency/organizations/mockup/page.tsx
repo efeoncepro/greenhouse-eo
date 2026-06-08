@@ -1,7 +1,7 @@
-import OrganizationListEnterpriseMockupView from '@/views/greenhouse/organizations/mockup/OrganizationListEnterpriseMockupView'
+import OrganizationListEnterpriseMockupClientPage from './ClientMockupPage'
 
 export const dynamic = 'force-dynamic'
 
-const OrganizationListEnterpriseMockupPage = () => <OrganizationListEnterpriseMockupView />
+const OrganizationListEnterpriseMockupPage = () => <OrganizationListEnterpriseMockupClientPage />
 
 export default OrganizationListEnterpriseMockupPage

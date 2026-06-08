@@ -10,6 +10,7 @@ import {
 } from './types'
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+const normalizeIntlWhitespace = (value: string): string => value.replace(/[\u00a0\u202f]/g, ' ')
 
 const dateOnlyToUtcNoon = (value: string): Date | null => {
   const [year, month, day] = value.split('-').map(Number)
@@ -50,7 +51,7 @@ export const formatDate = (
   const resolvedTimeZone = dateOnly ? 'UTC' : (timeZone ?? undefined)
   const hasStyleShortcut = intlOptions.dateStyle != null || intlOptions.timeStyle != null
 
-  return new Intl.DateTimeFormat(resolvedLocale, {
+  return normalizeIntlWhitespace(new Intl.DateTimeFormat(resolvedLocale, {
     ...(hasStyleShortcut
       ? {}
       : {
@@ -60,7 +61,7 @@ export const formatDate = (
         }),
     ...(resolvedTimeZone ? { timeZone: resolvedTimeZone } : {}),
     ...intlOptions
-  }).format(date)
+  }).format(date))
 }
 
 export const formatDateTime = (
@@ -81,7 +82,7 @@ export const formatDateTime = (
   const resolvedLocale = resolveFormatLocale(typeof optionsOrLocale === 'string' ? optionsOrLocale : (locale ?? optionLocale))
   const hasStyleShortcut = intlOptions.dateStyle != null || intlOptions.timeStyle != null
 
-  return new Intl.DateTimeFormat(resolvedLocale, {
+  return normalizeIntlWhitespace(new Intl.DateTimeFormat(resolvedLocale, {
     ...(hasStyleShortcut
       ? {}
       : {
@@ -93,7 +94,7 @@ export const formatDateTime = (
         }),
     timeZone: OPERATIONAL_TIME_ZONE,
     ...intlOptions
-  }).format(date)
+  }).format(date))
 }
 
 export const formatTime = (
@@ -113,12 +114,12 @@ export const formatTime = (
 
   const resolvedLocale = resolveFormatLocale(typeof optionsOrLocale === 'string' ? optionsOrLocale : (locale ?? optionLocale))
 
-  return new Intl.DateTimeFormat(resolvedLocale, {
+  return normalizeIntlWhitespace(new Intl.DateTimeFormat(resolvedLocale, {
     hour: '2-digit',
     minute: '2-digit',
     timeZone: OPERATIONAL_TIME_ZONE,
     ...intlOptions
-  }).format(date)
+  }).format(date))
 }
 
 export const formatISODateKey = (value: FormatValue, timeZone = OPERATIONAL_TIME_ZONE): string => {
