@@ -1,3 +1,15 @@
+# Sesion 2026-06-08 — TeamBot mentions corregidas + CLI extendido
+
+Se corrigio el flujo manual de TeamBot tras un envío público duplicado al chat `EO Team`: no volver a usar `activity.text` + Adaptive Card para menciones en grupos, porque Teams muestra `activity.text` como burbuja separada arriba del card.
+
+- **Smoke real:** en 1:1 de Julio Reyes, card-only con `msteams.entities[].mentioned.id = <Entra Object ID>` renderizó mención real; card-only con `29:<aadObjectId>` renderizó texto plano.
+- **CLI:** `pnpm teams:announce` ahora acepta `--mention "Texto visible|entraObjectIdOrUpn|Nombre de perfil"` repetible, permite CTA opcional y rechaza `29:<aadObjectId>` en Adaptive Cards.
+- **Docs/skills:** actualizado `docs/operations/manual-teams-announcements.md`, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.4, `changelog.md`, `project_context.md` y skills `teams-bot-platform` Codex/Claude.
+- **Gates:** manual announcement tests 7/7; eslint focal; `tsc --noEmit`; dry-run CLI con mención de Maria Fernanda; `docs:closure-check` focal.
+- **Pendiente:** si se reenvía una bienvenida pública, primero hacer dry-run y, si hay duda de membresía en el chat destino, validar membership/usar 1:1. No enviar otra prueba a `EO Team`.
+
+---
+
 # Sesion 2026-06-08 — TASK-1053 color overhaul "Restraint v1" (Fase A + charts)
 
 Recuperación de la sesión perdida (crash de VS Code) + ejecución de la tokenización de la paleta **Restraint v1** (aprobada por el operador). Local-first en `develop`, sin push.
@@ -17,7 +29,9 @@ Recuperación de la sesión perdida (crash de VS Code) + ejecución de la tokeni
 
 **Evidencia:** design:lint 0/0 · tsc · theme tests 18/18 (drift + contrast) · build exit 0 · GVC chips light+dark, colors ramp, charts lab (`.captures/2026-06-08T10-36-34_tmp-a1a-chips`, `...10-45-50_inline-admin-design-system-colors`, `...11-13-40_inline-admin-design-system-charts`). Coblis pre-check: lime/orange marginal deuteranopía (ΔE 10.1) + cashflow verde/rojo inseguro (ΔE 8.8) → reglas color-nunca-solo + signo/ícono horneadas.
 
-**Pendiente (scope aprobado, slices siguientes):** Fase B sub-valores (ink/tint/border/dark-fg) + tonal-by-default/dot/KPI-inline + dark-fg derivation. Reconciliación AXIS Figma upstream (code-first) — ahora incluye el accent ramp + la paleta de charts Deep-bright. (Resuelto: la discrepancia del primary ramp — ya pasado en `34d71776a`. Charts: SoT Deep-bright + todos los consumers migrados + GVC verde home/ICO.)
+**Fase B Slice B1 ✓ (`2c3dc4132`):** sub-valores curados (ink/tint/border/darkFg, 16 hexes AA) en `axisSemanticSubValues` + factory `theme.greenhouseSemantic` (mode-aware, espejo de `greenhouseElevation`) + consumidor **primitive-scoped** (decisión operador vía AskUserQuestion): `GreenhouseChip` `label` variant tonal AA — arregla `warning.main` amber-como-texto (ahora ink `#8a5a00` 5.41:1 sobre tint). dark-fg ya consumido (tonalText en dark). Lab `/admin/design-system/chips` hecho fiel. Gates: `greenhouse-semantic-drift.test.ts` + `axis-semantic-contrast.test.ts` (147 theme tests). GVC light+dark ✓ (`.captures/2026-06-08T14-07-02_tmp-chips-tonal`).
+
+**Pendiente (scope aprobado):** Fase B Slice B2 = dot variant + KPI delta inline (consumen directional/ink). TASK-1054 (migración de ~11 charts al Chart SoT, ya documentada). Reconciliación AXIS Figma upstream (code-first) — incluye accent ramp + charts Deep-bright + los sub-valores tonales. Diferido a tasks separadas: success-ink `#2E7D32` (TASK-1048), paleta emails, lint→error baseline. **Decisión rollout:** tonal es **primitive-scoped**, NO flip global de Chip/Alert MUI crudos.
 
 **No tocar — parcela paralela de Codex** (en el working tree, NO commitear): `QueryClientProvider.tsx` (devtools opt-in), `lib/format/date.ts` (normalizeIntlWhitespace), `agency/organizations/mockup/page.tsx` + `people/daniela-workforce/page.tsx` + sus `ClientMockupPage.tsx`. Codex las commitea.
 
