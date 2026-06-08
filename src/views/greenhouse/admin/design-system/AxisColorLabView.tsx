@@ -47,6 +47,45 @@ const FEEDBACK: { key: AxisColorFamily; label: string }[] = [
   { key: 'info', label: 'Info' }
 ]
 
+const TOKEN_FAMILIES: { key: AxisColorFamily; label: string }[] = [
+  ...BRAND,
+  ...FEEDBACK,
+  { key: 'gray', label: 'Gray' }
+]
+
+const MAIN_TOKEN_FAMILIES = ['primary', 'secondary', 'info', 'success', 'warning', 'error'] as const
+
+const NEUTRAL_TOKENS = [
+  'bodyBg',
+  'paper',
+  'bgWhite',
+  'textPrimary',
+  'textSecondary',
+  'textDisabled',
+  'divider',
+  'actionHover',
+  'snackbar'
+] as const
+
+const PROPOSED_BRAND_ACCENT_RAMP = {
+  100: '#FFE0CC',
+  200: '#FFC199',
+  300: '#FFA266',
+  400: '#FF8333',
+  500: '#FF6500',
+  600: '#E65B00',
+  700: '#BF4C00',
+  800: '#993D00',
+  900: '#662900'
+} as const
+
+type AxisColorTokenReference = {
+  name: string
+  value: string
+}
+
+const formatRatio = (ratio: number) => `${ratio.toFixed(2)}:1`
+
 const RampSwatch = ({ family }: { family: AxisColorFamily }) => {
   const theme = useTheme()
 
@@ -90,6 +129,265 @@ const RampSwatch = ({ family }: { family: AxisColorFamily }) => {
         )
       })}
     </Box>
+  )
+}
+
+const ProposedBrandAccentCard = () => {
+  const theme = useTheme()
+  const anchor = PROPOSED_BRAND_ACCENT_RAMP[500]
+  const anchorOnWhite = contrast(anchor, theme.axis.neutral.light.bgWhite)
+  const anchorWithInk = contrast(anchor, theme.axis.neutral.light.textPrimary)
+  const anchorOnDark = contrast(anchor, theme.axis.neutral.dark.bodyBg)
+  const whiteTextSafeSteps = RAMP_STEPS.filter(step => contrast(PROPOSED_BRAND_ACCENT_RAMP[step], theme.axis.neutral.light.bgWhite) >= 4.5)
+  const darkInkFillSteps = RAMP_STEPS.filter(step => contrast(PROPOSED_BRAND_ACCENT_RAMP[step], theme.axis.neutral.light.textPrimary) >= 4.5)
+  const darkSurfaceTextSteps = RAMP_STEPS.filter(step => contrast(PROPOSED_BRAND_ACCENT_RAMP[step], theme.axis.neutral.dark.bodyBg) >= 4.5)
+
+  return (
+    <Card variant='outlined'>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Typography variant='h5'>Brand accent / tertiary orange</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Propuesta visual para probar el naranja real de marca. Aún no es token runtime, no reemplaza warning y no
+            debe usarse como CTA por defecto.
+          </Typography>
+        </Box>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+          <Box
+            aria-hidden
+            sx={theme => ({
+              bgcolor: anchor,
+              inlineSize: theme.spacing(7),
+              blockSize: theme.spacing(7),
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+              border: `1px solid ${theme.palette.divider}`
+            })}
+          />
+          <Typography variant='h6'>Tertiary orange draft</Typography>
+          <Typography variant='monoId' color='text.secondary'>
+            anchor 500 {anchor}
+          </Typography>
+        </Box>
+
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' }, gap: 1 }}>
+          <Box
+            sx={theme => ({
+              p: 2,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`
+            })}
+          >
+            <Typography variant='overline' color='text.secondary'>
+              Anchor 500
+            </Typography>
+            <Typography variant='body2' color='text.primary'>
+              Seguro como acento de marca con tinta oscura: {formatRatio(anchorWithInk)}. No usar con texto blanco:
+              {` ${formatRatio(anchorOnWhite)}`}.
+            </Typography>
+          </Box>
+          <Box
+            sx={theme => ({
+              p: 2,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`
+            })}
+          >
+            <Typography variant='overline' color='text.secondary'>
+              Texto sobre claro
+            </Typography>
+            <Typography variant='body2' color='text.primary'>
+              Para texto naranja sobre blanco, usar pasos {whiteTextSafeSteps.join(', ')}. Los pasos 100–600 son acento,
+              no texto.
+            </Typography>
+          </Box>
+          <Box
+            sx={theme => ({
+              p: 2,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`
+            })}
+          >
+            <Typography variant='overline' color='text.secondary'>
+              Superficie oscura
+            </Typography>
+            <Typography variant='body2' color='text.primary'>
+              Sobre dark bg, pasos {darkSurfaceTextSteps.join(', ')} pasan AA. Anchor 500: {formatRatio(anchorOnDark)}.
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box
+          sx={theme => ({
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: 1,
+            p: 2,
+            borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+            bgcolor: theme.palette.warning.lightOpacity,
+            border: `1px solid ${theme.palette.warning.mainOpacity}`
+          })}
+        >
+          <Typography variant='body2' color='text.primary'>
+            Fill con texto oscuro: pasos {darkInkFillSteps.join(', ')}.
+          </Typography>
+          <Typography variant='body2' color='text.primary'>
+            Fill con texto blanco: usar solo pasos {whiteTextSafeSteps.join(', ')}.
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', md: 'repeat(9, minmax(0, 1fr))' },
+            gap: 1
+          }}
+        >
+          {RAMP_STEPS.map(step => {
+            const hex = PROPOSED_BRAND_ACCENT_RAMP[step]
+            const ratioWhite = contrast(hex, theme.axis.neutral.light.bgWhite)
+            const textSafe = ratioWhite >= 4.5
+
+            return (
+              <Box key={step} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box
+                  aria-label={`tertiary-orange-${step} ${hex}`}
+                  sx={theme => ({
+                    bgcolor: hex,
+                    minBlockSize: theme.spacing(13),
+                    borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                    border: `1px solid ${theme.palette.divider}`
+                  })}
+                />
+                <Box sx={{ px: 0.5 }}>
+                  <Typography variant='monoId' color='text.primary'>
+                    {step}
+                  </Typography>
+                  <Typography variant='monoAmount' color='text.secondary' sx={{ display: 'block' }}>
+                    {hex}
+                  </Typography>
+                  <Typography variant='caption' color='text.secondary'>
+                    {textSafe ? 'AA texto' : `${ratioWhite.toFixed(1)}:1`}
+                  </Typography>
+                </Box>
+              </Box>
+            )
+          })}
+        </Box>
+      </CardContent>
+    </Card>
+  )
+}
+
+const TokenReferenceRow = ({ name, value }: AxisColorTokenReference) => (
+  <Box
+    sx={theme => ({
+      display: 'grid',
+      gridTemplateColumns: { xs: '1fr', sm: `${theme.spacing(8)} minmax(0, 1fr) minmax(108px, auto)` },
+      alignItems: 'center',
+      gap: 1.5,
+      p: 1,
+      border: `1px solid ${theme.palette.divider}`,
+      borderRadius: `${theme.shape.customBorderRadius.md}px`
+    })}
+  >
+    <Box
+      aria-hidden
+      sx={theme => ({
+        bgcolor: value,
+        inlineSize: theme.spacing(8),
+        blockSize: theme.spacing(6),
+        borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+        border: `1px solid ${theme.palette.divider}`
+      })}
+    />
+    <Typography variant='monoId' color='text.primary' sx={{ overflowWrap: 'anywhere' }}>
+      {name}
+    </Typography>
+    <Typography variant='monoAmount' color='text.secondary'>
+      {value}
+    </Typography>
+  </Box>
+)
+
+const TokenReferenceGroup = ({ title, description, tokens }: { title: string; description: string; tokens: AxisColorTokenReference[] }) => (
+  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+    <Box>
+      <Typography variant='h6'>{title}</Typography>
+      <Typography variant='body2' color='text.secondary'>
+        {description}
+      </Typography>
+    </Box>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }, gap: 1 }}>
+      {tokens.map(token => (
+        <TokenReferenceRow key={token.name} {...token} />
+      ))}
+    </Box>
+  </Box>
+)
+
+const AxisTokenReference = () => {
+  const theme = useTheme()
+
+  const mainTokens = MAIN_TOKEN_FAMILIES.map(family => ({
+    name: `theme.axis.main.${family}`,
+    value: theme.axis.main[family]
+  }))
+
+  const rampTokens = TOKEN_FAMILIES.flatMap(family =>
+    RAMP_STEPS.map(step => ({
+      name: `theme.axis.ramp.${family.key}[${step}]`,
+      value: theme.axis.ramp[family.key][step]
+    }))
+  )
+
+  const opacityTokens = TOKEN_FAMILIES.flatMap(family =>
+    OPACITY_STEPS.map(step => ({
+      name: `theme.axis.opacity.${family.key}[${step}]`,
+      value: theme.axis.opacity[family.key][step]
+    }))
+  )
+
+  const neutralTokens = (['light', 'dark'] as const).flatMap(mode =>
+    NEUTRAL_TOKENS.map(token => ({
+      name: `theme.axis.neutral.${mode}.${token}`,
+      value: theme.axis.neutral[mode][token]
+    }))
+  )
+
+  return (
+    <Card variant='outlined'>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Typography variant='h5'>Nombres de tokens</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Inventario runtime para copiar la referencia correcta sin transcribir HEX desde Figma. Cada fila muestra el
+            path canónico y el color que resuelve hoy el theme.
+          </Typography>
+        </Box>
+
+        <TokenReferenceGroup
+          title='Main aliases'
+          description='Aliases de uso rápido para el color principal de cada familia semántica.'
+          tokens={mainTokens}
+        />
+        <TokenReferenceGroup
+          title='Ramp tokens'
+          description='Escala AXIS 100→900 por familia. Usa pasos concretos solo cuando el contrato lo pida.'
+          tokens={rampTokens}
+        />
+        <TokenReferenceGroup
+          title='Opacity tokens'
+          description='Soft fills por familia sobre superficies claras y oscuras.'
+          tokens={opacityTokens}
+        />
+        <TokenReferenceGroup
+          title='Neutral tokens'
+          description='Fondos, texto y separadores por modo.'
+          tokens={neutralTokens}
+        />
+      </CardContent>
+    </Card>
   )
 }
 
@@ -277,6 +575,10 @@ const AxisColorLabView = () => (
         </Box>
       </CardContent>
     </Card>
+
+    <ProposedBrandAccentCard />
+
+    <AxisTokenReference />
   </Box>
 )
 

@@ -8,12 +8,14 @@
 // (es una propuesta de color cruda, todavía no mapeada a axis-tokens).
 //
 // Reglas de gobierno demostradas:
-//   1. El 500 de cada color de TRABAJO cae en [4.5–7] sobre blanco → un token
-//      sirve como texto-sobre-blanco Y blanco-sobre-fill.
+//   1. Semánticas decopladas de marca (principio AXIS): fill vívido (fondo, con
+//      blanco u oscuro encima) + ink oscuro SEPARADO para texto sobre blanco/tint.
+//      Texto ≥4.5:1, bordes/íconos/UI ≥3:1. No se fuerza un solo token a hacer todo.
 //   2. Warning = lógica de señal de tránsito: amber brillante como FILL con texto
 //      OSCURO; ink ocre solo para texto sobre blanco. Nunca texto blanco en amber.
-//   3. Pops de marca (vivid green, orange) = solo fill decorativo + ink-pair AA.
-//   4. Dual-mode: cada color de trabajo tiene un dark-fg verificado sobre charcoal.
+//   3. Estado nunca por color solo: siempre ícono + texto (WCAG 1.4.1).
+//   4. Pops de marca (vivid green, orange) = solo fill decorativo + ink-pair AA.
+//   5. Dual-mode: cada rol tiene un dark-fg verificado sobre charcoal.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import Link from 'next/link'
@@ -92,24 +94,24 @@ const RAMPS: Record<string, { label: string; usage: string; ramp: Ramp }> = {
     ramp: { 50: '#FFF7F2', 100: '#FFEDE0', 200: '#FFD7BD', 300: '#FFBB8F', 400: '#FF934D', 500: '#FF6500', 600: '#D65500', 700: '#AD4500', 800: '#853500', 900: '#5C2400' }
   },
   info: {
-    label: 'Info',
-    usage: 'Azul petróleo informativo. Acompaña al primary sin competir como CTA.',
-    ramp: { 50: '#F4F8F9', 100: '#E5EDF2', 200: '#C6D9E2', 300: '#9FBECE', 400: '#6697B1', 500: '#256B8F', 600: '#1F5A78', 700: '#194961', 800: '#13384A', 900: '#0D2733' }
+    label: 'Info — azure',
+    usage: 'Azul informativo limpio. Fill 500 (blanco AA), ink 700 para texto, tint 100 para banners.',
+    ramp: { 50: '#EEF4FD', 100: '#E8F1FD', 200: '#C2DBF7', 300: '#94BEEE', 400: '#4E90DE', 500: '#1F6FD4', 600: '#1A5EB8', 700: '#155CAD', 800: '#114A8C', 900: '#0C376A' }
   },
   success: {
-    label: 'Success',
-    usage: 'Verde éxito profundo. Separado del green de marca. AA desde 500.',
-    ramp: { 50: '#F4F8F6', 100: '#E4EFEA', 200: '#C5DCD1', 300: '#9CC4B1', 400: '#62A282', 500: '#1F7A4D', 600: '#1A6641', 700: '#155334', 800: '#103F28', 900: '#0B2C1C' }
+    label: 'Success — emerald',
+    usage: 'Verde éxito vívido y limpio. Separado del green de marca. Fill 500 (blanco AA), ink para texto.',
+    ramp: { 50: '#EDF7F1', 100: '#E7F6EE', 200: '#BCE6CF', 300: '#8FD3AE', 400: '#46A877', 500: '#157F47', 600: '#127140', 700: '#0F5E35', 800: '#0B4928', 900: '#073219' }
   },
   warning: {
     label: 'Warning — amber (señal de tránsito)',
-    usage: 'Amber brillante 300/400 como FILL con texto OSCURO. Texto sobre blanco → ink 700+ (#8F6200). Nunca texto blanco.',
-    ramp: { 50: '#FFFBF0', 100: '#FFF3D1', 200: '#FFE49E', 300: '#FFD25C', 400: '#FFB703', 500: '#E0A006', 600: '#B5810A', 700: '#8F6200', 800: '#6B4900', 900: '#472F00' }
+    usage: 'Amber brillante como FILL con texto OSCURO. Texto sobre blanco → ink (#8A5A00). Nunca texto blanco.',
+    ramp: { 50: '#FFFBF0', 100: '#FFF4D6', 200: '#F5D98A', 300: '#FFD25C', 400: '#FFB703', 500: '#E0A006', 600: '#B5810A', 700: '#8A5A00', 800: '#6B4900', 900: '#472F00' }
   },
   error: {
-    label: 'Error',
-    usage: 'Rojo institucional. Más adulto que coral. AA desde 500.',
-    ramp: { 50: '#FBF4F4', 100: '#F6E5E5', 200: '#ECC6C8', 300: '#DE9EA1', 400: '#CB656A', 500: '#B4232A', 600: '#971D23', 700: '#7A181D', 800: '#5E1216', 900: '#410D0F' }
+    label: 'Error — vermilion',
+    usage: 'Rojo vívido y legible (no ladrillo). Fill 500 (blanco AA), ink para texto, tint para banners.',
+    ramp: { 50: '#FDEDEE', 100: '#FDECEC', 200: '#F5C2C4', 300: '#ED9094', 400: '#E25A61', 500: '#DC2E39', 600: '#C01D27', 700: '#9E1820', 800: '#7B1219', 900: '#560C11' }
   },
   neutral: {
     label: 'Neutral — slate',
@@ -118,13 +120,16 @@ const RAMPS: Record<string, { label: string; usage: string; ramp: Ramp }> = {
   }
 }
 
-type Semantic = { role: string; fill: string; onFill: string; ink: string; dark: string; icon: string }
+type Semantic = { role: string; fill: string; onFill: string; ink: string; tint: string; border: string; dark: string; icon: string }
 
+// Semánticas vívidas + AA en ambas bandas. Fill/dot/icono = 500 limpio;
+// ink = step oscuro separado para texto-sobre-blanco/tint; tint = bg claro.
+// Decoplado de marca (principio AXIS). Amber = traffic-sign (texto oscuro).
 const SEMANTICS: Semantic[] = [
-  { role: 'Info', fill: '#256B8F', onFill: '#FFFFFF', ink: '#194961', dark: '#6FB0D6', icon: 'tabler-info-circle' },
-  { role: 'Success', fill: '#1F7A4D', onFill: '#FFFFFF', ink: '#155334', dark: '#5FC08C', icon: 'tabler-circle-check' },
-  { role: 'Warning', fill: '#FFB703', onFill: '#2A1A00', ink: '#8F6200', dark: '#E0A93E', icon: 'tabler-alert-triangle' },
-  { role: 'Error', fill: '#B4232A', onFill: '#FFFFFF', ink: '#7A181D', dark: '#E8888D', icon: 'tabler-circle-x' }
+  { role: 'Info', fill: '#1F6FD4', onFill: '#FFFFFF', ink: '#155CAD', tint: '#E8F1FD', border: '#C2DBF7', dark: '#6FB0F0', icon: 'tabler-info-circle' },
+  { role: 'Success', fill: '#157F47', onFill: '#FFFFFF', ink: '#11703F', tint: '#E7F6EE', border: '#BCE6CF', dark: '#5FC891', icon: 'tabler-circle-check' },
+  { role: 'Warning', fill: '#FFB703', onFill: '#2A1A00', ink: '#8A5A00', tint: '#FFF4D6', border: '#F5D98A', dark: '#E8B84B', icon: 'tabler-alert-triangle' },
+  { role: 'Error', fill: '#DC2E39', onFill: '#FFFFFF', ink: '#C01D27', tint: '#FDECEC', border: '#F5C2C4', dark: '#F08A8F', icon: 'tabler-circle-x' }
 ]
 
 const SPINE = { base: '#023C70', action: '#024C8F', support: '#E8F1F8', actionDark: '#6BA6E8' }
@@ -163,7 +168,7 @@ const StepSwatch = ({ step, hex }: { step: string; hex: string }) => {
       <Typography color='text.secondary' sx={{ fontSize: 9.5, fontVariantNumeric: 'tabular-nums', display: 'block', lineHeight: 1.3 }}>
         {hex}
       </Typography>
-      <Typography sx={{ fontSize: 9, fontWeight: 700, color: textSafe ? '#155334' : largeSafe ? '#8F6200' : 'text.disabled' }}>
+      <Typography sx={{ fontSize: 9, fontWeight: 700, color: textSafe ? '#11703F' : largeSafe ? '#8A5A00' : 'text.disabled' }}>
         {textSafe ? '✓ texto' : largeSafe ? `${cw.toFixed(1)} grande` : `${cw.toFixed(1)} fill`}
       </Typography>
     </Box>
@@ -236,7 +241,7 @@ const ButtonsDemo = () => (
         <Button variant='outlined' sx={{ color: GREEN_CANON, borderColor: GREEN_CANON, '&:hover': { borderColor: GREEN_CANON, bgcolor: '#F5F8F3' } }} startIcon={<i className='tabler-sparkles' />}>
           Marca
         </Button>
-        <Button variant='contained' sx={{ bgcolor: '#B4232A', '&:hover': { bgcolor: '#971D23' } }} startIcon={<i className='tabler-trash' />}>
+        <Button variant='contained' sx={{ bgcolor: '#DC2E39', '&:hover': { bgcolor: '#C01D27' } }} startIcon={<i className='tabler-trash' />}>
           Destructivo
         </Button>
         <Button variant='contained' disabled startIcon={<i className='tabler-lock' />}>
@@ -247,42 +252,83 @@ const ButtonsDemo = () => (
   </Card>
 )
 
+const StatusDot = ({ color }: { color: string }) => (
+  <Box component='span' sx={{ inlineSize: 8, blockSize: 8, borderRadius: '999px', bgcolor: color, flexShrink: 0 }} />
+)
+
 const ChipsDemo = () => (
   <Card variant='outlined'>
-    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Typography variant='subtitle2'>Chips de estado + marca</Typography>
-      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-        {SEMANTICS.map(s => (
-          <Chip
-            key={s.role}
-            size='small'
-            icon={<i className={s.icon} style={{ color: s.onFill === '#FFFFFF' ? '#FFFFFF' : s.onFill }} />}
-            label={s.role}
-            sx={{ bgcolor: s.fill, color: s.onFill, fontWeight: 700, '& .MuiChip-icon': { color: s.onFill } }}
-          />
-        ))}
-        <Chip size='small' label='Marca' icon={<i className='tabler-leaf' style={{ color: SPINE.base }} />} sx={{ bgcolor: GREEN_VIVID, color: SPINE.base, fontWeight: 700, '& .MuiChip-icon': { color: SPINE.base } }} />
-        <Chip size='small' label='En proceso' sx={{ bgcolor: SPINE.support, color: SPINE.action, fontWeight: 700 }} />
-      </Box>
-      <Typography variant='caption' color='text.secondary'>
-        Outlined (tint + ink + borde): el patrón de bajo ruido para tablas y listas densas.
-      </Typography>
-      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-        {SEMANTICS.map(s => {
-          const fam = s.role.toLowerCase() as keyof typeof RAMPS
-          const r = RAMPS[fam].ramp
+    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Typography variant='subtitle2'>Estado — tratamiento canónico</Typography>
 
-          return (
-            <Chip
+      {/* 1. Tonal — el default enterprise (tint + ink, borde hairline) */}
+      <Box>
+        <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 0.75 }}>
+          Tonal (default) — tint suave + ink. Bajo ruido, escaneable.
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          {SEMANTICS.map(s => (
+            <Box
               key={s.role}
-              size='small'
-              variant='outlined'
-              icon={<i className={s.icon} style={{ color: s.ink }} />}
-              label={s.role}
-              sx={{ bgcolor: r['100'], color: s.ink, borderColor: r['300'], fontWeight: 700, '& .MuiChip-icon': { color: s.ink } }}
-            />
-          )
-        })}
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.75,
+                bgcolor: s.tint,
+                color: s.ink,
+                border: `1px solid ${s.border}`,
+                borderRadius: '999px',
+                px: 1.25,
+                py: 0.4
+              }}
+            >
+              <i className={s.icon} style={{ color: s.ink, fontSize: 14 }} />
+              <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: s.ink, lineHeight: 1.4 }}>{s.role}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      {/* 2. Dot — para tablas / listas densas (patrón Linear) */}
+      <Box>
+        <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 0.75 }}>
+          Dot — para tablas y listas densas. El más sobrio.
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          {SEMANTICS.map(s => (
+            <Box key={s.role} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
+              <StatusDot color={s.fill} />
+              <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: '#3A4049' }}>{s.role}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      {/* 3. Sólido — excepción de alta urgencia (no es el default) */}
+      <Box>
+        <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 0.75 }}>
+          Sólido — solo alta urgencia (banner crítico, count que debe gritar). NO como estado inline default.
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Chip size='small' label='Error · 3' sx={{ bgcolor: '#DC2E39', color: '#FFFFFF', fontWeight: 700 }} />
+          <Chip size='small' label='Warning · 6' sx={{ bgcolor: '#FFB703', color: '#2A1A00', fontWeight: 700 }} />
+        </Box>
+      </Box>
+
+      {/* Marca */}
+      <Box>
+        <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 0.75 }}>
+          Marca — pop de identidad (no es estado).
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, bgcolor: '#EEF8E1', color: GREEN_CANON, border: '1px solid #D9EFBF', borderRadius: '999px', px: 1.25, py: 0.4 }}>
+            <i className='tabler-leaf' style={{ color: GREEN_CANON, fontSize: 14 }} />
+            <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: GREEN_CANON }}>Marca</Typography>
+          </Box>
+          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, bgcolor: SPINE.support, color: SPINE.action, borderRadius: '999px', px: 1.25, py: 0.4 }}>
+            <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: SPINE.action }}>En proceso</Typography>
+          </Box>
+        </Box>
       </Box>
     </CardContent>
   </Card>
@@ -292,54 +338,59 @@ const AlertsDemo = () => (
   <Card variant='outlined'>
     <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       <Typography variant='subtitle2'>Alertas / banners</Typography>
-      {SEMANTICS.map(s => {
-        const fam = s.role.toLowerCase() as keyof typeof RAMPS
-        const r = RAMPS[fam].ramp
-
-        return (
-          <Box key={s.role} sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start', bgcolor: r['50'], border: `1px solid ${r['300']}`, borderRadius: '8px', p: 1.5 }}>
-            <i className={s.icon} style={{ color: s.ink, fontSize: 18, marginTop: 2 }} />
-            <Box>
-              <Typography sx={{ fontWeight: 700, color: s.ink, fontSize: 13.5 }}>{s.role}</Typography>
-              <Typography sx={{ color: '#3A4049', fontSize: 12.5 }}>
-                Mensaje de {s.role.toLowerCase()} con texto ink {s.ink} sobre tint {r['50']} — AA.
-              </Typography>
-            </Box>
+      {SEMANTICS.map(s => (
+        <Box key={s.role} sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start', bgcolor: s.tint, border: `1px solid ${s.border}`, borderRadius: '8px', p: 1.5 }}>
+          <i className={s.icon} style={{ color: s.ink, fontSize: 18, marginTop: 2 }} />
+          <Box>
+            <Typography sx={{ fontWeight: 700, color: s.ink, fontSize: 13.5 }}>{s.role}</Typography>
+            <Typography sx={{ color: '#3A4049', fontSize: 12.5 }}>
+              Mensaje de {s.role.toLowerCase()} con texto ink {s.ink} sobre tint {s.tint} — AA.
+            </Typography>
           </Box>
-        )
-      })}
+        </Box>
+      ))}
     </CardContent>
   </Card>
 )
 
 const KpiDemo = () => {
   const kpis = [
-    { label: 'Margen', value: '42.8%', delta: '+3.1', icon: 'tabler-trending-up', sem: SEMANTICS[1] },
-    { label: 'Riesgo cuentas', value: '6', delta: 'atención', icon: 'tabler-alert-triangle', sem: SEMANTICS[2] },
-    { label: 'Bloqueos', value: '2', delta: 'crítico', icon: 'tabler-circle-x', sem: SEMANTICS[3] }
+    { label: 'Margen', value: '42.8%', delta: '3.1%', kind: 'trend' as const, glyph: 'tabler-arrow-up-right', icon: 'tabler-trending-up', sem: SEMANTICS[1] },
+    { label: 'Riesgo cuentas', value: '6', delta: 'Atención', kind: 'status' as const, glyph: '', icon: 'tabler-alert-triangle', sem: SEMANTICS[2] },
+    { label: 'Bloqueos', value: '2', delta: 'Crítico', kind: 'status' as const, glyph: '', icon: 'tabler-circle-x', sem: SEMANTICS[3] }
   ]
 
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2 }}>
       {kpis.map(k => {
-        const fam = k.sem.role.toLowerCase() as keyof typeof RAMPS
-        const r = RAMPS[fam].ramp
+        const s = k.sem
 
         return (
           <Card key={k.label} variant='outlined'>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box sx={{ bgcolor: r['100'], borderRadius: '8px', p: 0.75, display: 'flex' }}>
-                  <i className={k.icon} style={{ color: k.sem.ink, fontSize: 18 }} />
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                <Box sx={{ bgcolor: s.tint, borderRadius: '8px', p: 0.6, display: 'flex' }}>
+                  <i className={k.icon} style={{ color: s.ink, fontSize: 16 }} />
                 </Box>
-                <Chip size='small' label={k.delta} sx={{ bgcolor: fam === 'warning' ? k.sem.fill : r['100'], color: fam === 'warning' ? k.sem.onFill : k.sem.ink, fontWeight: 700, height: 20 }} />
+                <Typography variant='caption' color='text.secondary'>
+                  {k.label}
+                </Typography>
               </Box>
-              <Typography variant='kpiValue' sx={{ color: '#1B1E22' }}>
+              <Typography variant='kpiValue' sx={{ color: '#1B1E22', lineHeight: 1.1 }}>
                 {k.value}
               </Typography>
-              <Typography variant='caption' color='text.secondary'>
-                {k.label}
-              </Typography>
+              {/* delta inline — sin pill: glyph/dot + texto en ink */}
+              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, mt: 0.25 }}>
+                {k.kind === 'trend' ? (
+                  <i className={k.glyph} style={{ color: s.ink, fontSize: 14 }} />
+                ) : (
+                  <Box component='span' sx={{ inlineSize: 6, blockSize: 6, borderRadius: '999px', bgcolor: s.fill }} />
+                )}
+                <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: s.ink, lineHeight: 1.4 }}>{k.delta}</Typography>
+                {k.kind === 'trend' ? (
+                  <Typography sx={{ fontSize: 11.5, color: 'text.secondary', ml: 0.25 }}>vs. mes ant.</Typography>
+                ) : null}
+              </Box>
             </CardContent>
           </Card>
         )
@@ -348,24 +399,116 @@ const KpiDemo = () => {
   )
 }
 
+type FieldState = 'default' | 'focus' | 'success' | 'error' | 'disabled'
+
+const NEUTRAL_BORDER = '#BDC1C7'
+const NEUTRAL_TEXT = '#1B1E22'
+const NEUTRAL_DIM = '#5B6472'
+const INFO = SEMANTICS[0]
+const SUCCESS = SEMANTICS[1]
+const WARNING = SEMANTICS[2]
+const ERROR = SEMANTICS[3]
+
+const FieldBox = ({
+  label,
+  value,
+  state,
+  helper,
+  trailingIcon,
+  placeholder
+}: {
+  label: string
+  value?: string
+  state: FieldState
+  helper?: { text: string; tone: 'muted' | 'success' | 'error' | 'info' }
+  trailingIcon?: string
+  placeholder?: string
+}) => {
+  const borderColor =
+    state === 'focus' ? SPINE.action : state === 'success' ? SUCCESS.fill : state === 'error' ? ERROR.fill : NEUTRAL_BORDER
+
+  const helperColor =
+    helper?.tone === 'success' ? SUCCESS.ink : helper?.tone === 'error' ? ERROR.ink : helper?.tone === 'info' ? INFO.ink : NEUTRAL_DIM
+
+  const trailingColor = state === 'success' ? SUCCESS.fill : state === 'error' ? ERROR.fill : NEUTRAL_DIM
+
+  return (
+    <Box sx={{ opacity: state === 'disabled' ? 0.55 : 1 }}>
+      <Typography sx={{ fontSize: 12, fontWeight: 600, mb: 0.5, color: NEUTRAL_TEXT }}>{label}</Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          border: `1px solid ${borderColor}`,
+          ...(state === 'focus' ? { outline: `3px solid ${SPINE.support}`, outlineOffset: 0 } : {}),
+          bgcolor: state === 'disabled' ? '#F4F5F6' : '#FFFFFF',
+          borderRadius: '8px',
+          px: 1.5,
+          py: 1
+        }}
+      >
+        <Typography sx={{ flex: 1, fontSize: 13, color: value ? NEUTRAL_TEXT : '#9399A2' }}>
+          {value ?? placeholder}
+          {state === 'focus' ? <Box component='span' sx={{ borderInlineStart: `2px solid ${SPINE.action}`, ml: 0.25, opacity: 0.9 }} /> : null}
+        </Typography>
+        {trailingIcon ? <i className={trailingIcon} style={{ color: trailingColor, fontSize: 16 }} /> : null}
+      </Box>
+      {helper ? (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+          {helper.tone === 'success' ? <i className='tabler-circle-check' style={{ color: helperColor, fontSize: 13 }} /> : null}
+          {helper.tone === 'error' ? <i className='tabler-alert-circle' style={{ color: helperColor, fontSize: 13 }} /> : null}
+          {helper.tone === 'info' ? <i className='tabler-info-circle' style={{ color: helperColor, fontSize: 13 }} /> : null}
+          <Typography sx={{ fontSize: 11.5, color: helperColor, fontWeight: helper.tone === 'muted' ? 400 : 600 }}>{helper.text}</Typography>
+        </Box>
+      ) : null}
+    </Box>
+  )
+}
+
 const FormDemo = () => (
   <Card variant='outlined'>
-    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Typography variant='subtitle2'>Formulario — default · foco · error</Typography>
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2 }}>
-        <Box>
-          <Typography sx={{ fontSize: 12, fontWeight: 600, mb: 0.5 }}>Default</Typography>
-          <Box sx={{ border: '1px solid #BDC1C7', borderRadius: '8px', px: 1.5, py: 1, color: '#3A4049', fontSize: 13 }}>Texto…</Box>
+    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Box>
+        <Typography variant='subtitle2'>Formulario — el sistema en su hábitat</Typography>
+        <Typography variant='caption' color='text.secondary'>
+          El foco usa el azul de acción; éxito · error · info usan su semántica con ícono + texto (nunca color solo).
+        </Typography>
+      </Box>
+
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 2 }}>
+        <FieldBox label='Nombre' value='María Fernanda Rivas' state='default' helper={{ text: 'Nombre legal completo.', tone: 'muted' }} />
+        <FieldBox label='Cargo' value='Cuenta · Performance' state='focus' trailingIcon='tabler-chevron-down' helper={{ text: 'Editando…', tone: 'muted' }} />
+        <FieldBox label='Correo corporativo' value='m.rivas@efeonce.org' state='success' trailingIcon='tabler-circle-check' helper={{ text: 'Disponible y verificado.', tone: 'success' }} />
+        <FieldBox label='RUT' value='12.345.678-0' state='error' trailingIcon='tabler-alert-circle' helper={{ text: 'Dígito verificador inválido.', tone: 'error' }} />
+      </Box>
+
+      {/* hint informativo — strip tint info */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: INFO.tint, border: `1px solid ${INFO.border}`, borderRadius: '8px', px: 1.5, py: 1 }}>
+        <i className='tabler-info-circle' style={{ color: INFO.ink, fontSize: 16 }} />
+        <Typography sx={{ fontSize: 12.5, color: INFO.ink }}>Los campos marcados se sincronizan con Identidad al guardar.</Typography>
+      </Box>
+
+      {/* checkbox action + warning inline */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 1.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ inlineSize: 18, blockSize: 18, borderRadius: '5px', bgcolor: SPINE.action, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <i className='tabler-check' style={{ color: '#FFFFFF', fontSize: 13 }} />
+          </Box>
+          <Typography sx={{ fontSize: 13, color: NEUTRAL_TEXT }}>Enviar invitación al portal</Typography>
         </Box>
-        <Box>
-          <Typography sx={{ fontSize: 12, fontWeight: 600, mb: 0.5 }}>Foco (ring action)</Typography>
-          <Box sx={{ border: `1px solid ${SPINE.action}`, outline: `2px solid ${SPINE.action}`, outlineOffset: 1, borderRadius: '8px', px: 1.5, py: 1, color: '#1B1E22', fontSize: 13 }}>Editando…</Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <i className='tabler-alert-triangle' style={{ color: WARNING.ink, fontSize: 14 }} />
+          <Typography sx={{ fontSize: 11.5, color: WARNING.ink, fontWeight: 600 }}>Sin RUT válido no se puede emitir contrato.</Typography>
         </Box>
-        <Box>
-          <Typography sx={{ fontSize: 12, fontWeight: 600, mb: 0.5 }}>Error</Typography>
-          <Box sx={{ border: '1px solid #B4232A', borderRadius: '8px', px: 1.5, py: 1, color: '#7A181D', fontSize: 13 }}>Valor inválido</Box>
-          <Typography sx={{ fontSize: 11, color: '#7A181D', mt: 0.5 }}>Revisá este campo.</Typography>
-        </Box>
+      </Box>
+
+      {/* acciones */}
+      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+        <Button variant='text' sx={{ color: NEUTRAL_DIM }}>Cancelar</Button>
+        <Button variant='contained' sx={{ bgcolor: SPINE.action, '&:hover': { bgcolor: SPINE.base } }} startIcon={<i className='tabler-device-floppy' />}>
+          Guardar colaborador
+        </Button>
       </Box>
     </CardContent>
   </Card>
@@ -404,8 +547,9 @@ const DarkShowcase = () => (
 
 const A11yRules = () => {
   const rules = [
-    { icon: 'tabler-arrows-horizontal', t: 'Banda dual [4.5–7]', d: 'El 500 de cada color de trabajo cae en [4.5–7] sobre blanco → un solo token sirve como texto-sobre-blanco Y blanco-sobre-fill.' },
-    { icon: 'tabler-traffic-lights', t: 'Warning = señal de tránsito', d: 'Amber brillante (#FFB703) como FILL con texto OSCURO (9.65:1). Ink ocre (#8F6200) solo para texto sobre blanco. Nunca texto blanco en amber.' },
+    { icon: 'tabler-contrast', t: 'Texto e íconos AA siempre', d: 'Todo color que lleva texto cumple ≥4.5:1; bordes/íconos/UI ≥3:1. Las semánticas separan un fill vívido (fondo, con blanco u oscuro encima) de un ink oscuro para texto sobre blanco o tint.' },
+    { icon: 'tabler-traffic-lights', t: 'Warning = señal de tránsito', d: 'Amber brillante (#FFB703) como FILL con texto OSCURO (9.65:1). Ink ocre (#8A5A00) solo para texto sobre blanco. Nunca texto blanco en amber.' },
+    { icon: 'tabler-eye', t: 'Color nunca solo', d: 'Cada estado lleva ícono + texto además del color (no se distingue por color únicamente). Cumple WCAG 1.4.1 para daltonismo.' },
     { icon: 'tabler-droplet', t: 'Pops de marca = fill + ink-pair', d: 'Vivid green y orange son solo fill decorativo. Para texto/icono usan su ink AA (green-ink #3E7A12, orange-ink #9A3D00).' },
     { icon: 'tabler-moon', t: 'Dual-mode', d: 'Cada color de trabajo tiene un dark-fg (step claro) que da ≥4.5 sobre el charcoal. El borde sostiene la separación bajo forced-colors.' }
   ]
@@ -460,8 +604,9 @@ const BrandColorSystemMockupView = () => {
             </Typography>
             <Typography variant='h4'>Sistema de color Greenhouse</Typography>
             <Typography variant='body1' color='text.secondary'>
-              Dirección D: brand spine (navy identidad + azul acción) + verde de marca disciplinado + pops con ink-pairs +
-              dual-mode. Cada color de trabajo es AA en light y dark; el warning sigue la lógica de señal de tránsito.
+              Dirección D: brand spine (navy identidad + azul acción) + verde de marca disciplinado + pops con ink-pairs.
+              Las semánticas de feedback son vívidas y decopladas de la marca (fill + ink separados, principio AXIS), AA en
+              light y dark; el warning sigue la lógica de señal de tránsito.
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               <Chip sx={{ bgcolor: SPINE.base, color: '#FFFFFF' }} label='Navy #023C70' />
@@ -480,7 +625,7 @@ const BrandColorSystemMockupView = () => {
 
       {/* Accesibilidad primero */}
       <Box>
-        <SectionHeading eyebrow='Principios' title='Accesibilidad como base' description='Las cuatro reglas que gobiernan toda la paleta. No son un check final: definen los valores.' />
+        <SectionHeading eyebrow='Principios' title='Accesibilidad como base' description='Los principios que gobiernan toda la paleta. No son un check final: definen los valores.' />
         <A11yRules />
       </Box>
 

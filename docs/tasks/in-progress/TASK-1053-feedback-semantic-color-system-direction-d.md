@@ -2,16 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno aprobado (propuesta visual), pendiente GO de tokenizacion`
+- Status real: `Paleta Restraint v1 APROBADA visualmente (operador 2026-06-08); pendiente GO de tokenización (Slice 0 → Fase A) — valores en §"Paleta APROBADA"`
 - Rank: `TBD`
 - Domain: `ui | platform | design-system | accessibility`
-- Blocked by: `none` (coordina con TASK-1034 AXIS adoption + subsume el success-ink de TASK-1048)
+- Blocked by: `none`
+- Coordination: coordina con TASK-1034 AXIS adoption. **TASK-1048: se foldean los one-offs sueltos (chart pos/neg + tag-blue surface); el success-ink `#2E7D32` queda diferido en 1048/task separada (decisión operador 2026-06-08).**
 - Branch: `task/TASK-1053-feedback-semantic-color-system-direction-d`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -23,6 +24,76 @@
 El re-pick semántico es el corazón técnico: familias **vívidas y decopladas de la marca** (principio AXIS), con **fill e ink separados** (no un solo token forzado a hacer texto-sobre-blanco Y blanco-sobre-fill — esa regla "banda dual" es la que enlodaba los hues). Cada rol expone 6 valores gobernados (`fill` · `onFill` · `ink` · `tint` · `border` · `dark-fg`) + ramp 50→900, todos AA en light y dark. Incluye los **patrones de aplicación canónicos** (estado tonal por default, dot para listas densas, sólido solo para alta urgencia, KPI con delta inline sin pill, formularios con foco = azul de acción y estados con ícono+texto). Termina **tokenizando** por el flujo canónico `axis-tokens → axis-semantic → mergedTheme → DESIGN.md → V1 → drift-guard` + gate de contraste en CI.
 
 La propuesta ya está construida y revisada visualmente como mockup interno (no tokenizado): `/admin/design-system/mockup/brand-color-system` (hoja completa) y la sección "Contrapropuesta D" en `/admin/design-system/mockup/brand-color-proposal`. **Esta task es el registro durable de TODOS los valores y reglas** para tokenizar sin perder nada si se compacta el contexto.
+
+## Decisiones del operador — locked 2026-06-08
+
+Estas resoluciones ajustan el scope y reemplazan/actualizan las Open Questions y las Decisiones clave F/G de más abajo. Son la fuente autoritativa.
+
+1. **Primary / CTA — ✅ RESUELTO (Restraint v1, 2026-06-08): el primary NO se oscurece y NO se desacopla.** La mini-exploración convergió en que el problema no era "dónde se usa el primary" sino que `#024c8f` era demasiado oscuro. Fix: el primary se queda en **`#0375DB` vibrante** y ESE es el color de acción (CTA · links · foco · activo · chart single-series) — no hace falta un token `action` separado. Los **charts dejan de usar el primary**: tienen su propia paleta categórica vibrante. → **El stash debe DROPEAR sus cambios de oscurecido del primary** (reorder de `primaryColorConfig` a royal + re-value de `axisRamp.primary` a `#024c8f` + su `axisOpacity.primary`); se conservan sus cambios de semánticos + secondary. Valores en §"Paleta APROBADA".
+2. **F — reconciliación AXIS: (A) actualizar Figma upstream.** El operador sincroniza el AXIS Figma maestro **después** del código (code-first temporal, divergencia gobernada y documentada en el header del SoT). Destino durable: runtime ≡ Figma.
+3. **G — 3 verdes: CONFIRMADO.** Conviven a propósito (canon olivo / vivid lima / success emerald); se vieron bien en la propuesta. Aplicar igual el check de distinción del gap #4.
+4. **Emails — DIFERIDOS a task separada.** No se tocan en esta task; el email tiene paleta propia aislada del SoT (`src/emails/constants.ts`). **Fuera de scope aquí.**
+5. **Verde finanzas `#2E7D32` (success-ink) — DIFERIDO.** No se retira en esta task; queda en TASK-1048 / task separada (igual tratamiento que los emails). → Esta task **ya NO cierra** el success-ink de 1048, **NO** migra los 8 sitios de `#2E7D32`, y **NO** promueve `greenhouse/no-hardcoded-hex-color` a `error` baseline 0 (eso va con la task del verde finanzas). > ⚠️ Interpretación de "igual que el verde finanzas" — confirmar que se difiere como los emails.
+6. **One-offs sueltos de TASK-1048 — SE FOLDEAN ACÁ.** Los colores categóricos sueltos (chart positivo/negativo `#3DBA5D`/`#FF4D49` + tag-blue surface `#eaf3fc`) entran en esta task.
+
+**Refinamientos de seguridad/escalabilidad (evaluación 2026-06-08, aplicados al plan):**
+
+- **El color pasa a ser capa con guard mecánico (como typography/elevation).** Hoy el color NO está enforced (no hay `semantic-color-drift.test.ts` ni contrast gate; `design:lint` no valida hexes de color → un re-value puede quedar "verde" rompiendo paridad de 3 capas en silencio). El PR que cambia los valores **trae en el mismo PR** DESIGN.md §Color + V1 §Color + el drift-guard nuevo + el contrast gate. Cutover auto-verificable.
+- **Fase A se parte en dos PRs** para reversibilidad fina: **A1a = semánticos de feedback** (info/success/error/warning + sus AA — win claro, en este PR va el guard+gate) y **A1b = brand spine** (secondary ramp + green-canon + orange; el anchor del primary queda fuera de A1b hasta resolver el token de acción).
+- **Consumidores que NO derivan del SoT** (no auto-actualizan): email (diferido), PDF accent + `#2E7D32` (diferido), refs primary en GH_COLORS. Manejarlos donde corresponda; los que quedan en scope se migran al SoT (no parche).
+
+## ✅ Paleta APROBADA — Restraint v1 (operador 2026-06-08)
+
+El operador aprobó la propuesta **Restraint v1** completa (charts vibrantes + dark retocado). **Esta sección es la fuente autoritativa de valores para la tokenización** y supersede los valores "dirección D" del cuerpo de esta spec (DELTA / §A-C) donde difieran. Detalle vivo + razonamiento: `docs/operations/proposals/TASK-1053-color-palette-iteration.md`. Render aprobado: `/admin/design-system/mockup/brand-color-comparison`.
+
+**Brand spine:**
+
+- **Accent / primary** (CTA · links · foco · activo · chart single-series): `#0375DB` — vibrante, AA blanco 4.6:1. Ramp 50→900: `#EAF3FC #CFE4FA #A6CDF5 #6FACF0 #2E8BE8 #0375DB #0362BA #024C8F #023C70 #00284D`. **NO se oscurece** (se descartó el `#024C8F` de D). Dark-fg: `#6FACF0`.
+- **Navy** (shell/header institucional): `#023C70` = **accent-800** (mismo azul, step oscuro — NO un hue aparte).
+- **Green de marca (UNO):** pop `#6EC207` + ink crisp `#4B8405`. **El olivo `#3E7A12` se elimina.**
+- **Orange:** `#FF6500` = **sub-brand (Reach)**, fuera del UI diario (no warning, no CTA).
+
+**Semánticas de feedback (intactas vs D — ya AA + modernas), 6 sub-valores:**
+
+| Rol | fill | onFill | ink | tint | border | dark-fg |
+|---|---|---|---|---|---|---|
+| Info | #1F6FD4 | #FFFFFF | #155CAD | #E8F1FD | #C2DBF7 | #6FB0F0 |
+| Success | #157F47 | #FFFFFF | #11703F | #E7F6EE | #BCE6CF | #5FC891 |
+| Warning | #FFB703 | #2A1A00 | #8A5A00 | #FFF4D6 | #F5D98A | #E8B84B |
+| Error | #DC2E39 | #FFFFFF | #C01D27 | #FDECEC | #F5C2C4 | #F08A8F |
+
+**Neutrales:** Greenhouse gray (invariante, `#97939e` family). NO slate.
+
+**Charts — paleta categórica VIBRANTE (anclada a marca):**
+
+- Light: `#0375DB #6EC207 #FF6500 #7C3AED #06B6D4 #EC4899`
+- Dark (levantada): `#3B8EE8 #7FD42A #FF8A3D #9B6BF0 #22C9E4 #F25BAC`
+- Cashflow pos/neg: `#3DBA5D` / `#FF4D49`. Single-series → el acento. **Nunca el navy.**
+
+**Dark mode = derivación propia (no invertir):** acento → `#6FACF0`; semánticas → su dark-fg; charts → paleta dark levantada; jerarquía de superficie bodyBg `#25293C` + paper `#2F3349`.
+
+**Checks abiertos (verificar en tokenización, no bloquean):** (1) crowding acento `#0375DB` sólido vs info `#1F6FD4` tonal — el tratamiento difiere (acción sólida, info tonal), confirmar; (2) Coblis del chart palette + regla color-nunca-solo (red/lima no adyacentes + ícono/label).
+
+## ⚠️ Scope vs secuencia — NO CONFUNDIR (clarificación operador 2026-06-08)
+
+> **Regla dura para cualquier agente (incluido yo mismo en otra sesión): el operador aprobó la propuesta Restraint v1 COMPLETA** (*"me quedé con tu propuesta completa, me encantó"*). **Secuenciar en slices (Fase A → Fase B) es cómo se implementa, NO qué se decidió.** Poner algo en una slice posterior **no** lo hace "diferido" ni "fuera de scope". Confundir estos dos ejes ya causó un error (sesión 2026-06-08): se reportaron charts/dark/sub-valores como "diferidos" cuando son scope aprobado.
+
+**TODO esto es SCOPE de TASK-1053 (aprobado en Restraint v1) — se hace en esta task, distribuido en slices por reversibilidad:**
+
+- Semánticos AA (info/success/warning/error) con sus **6 sub-valores** (`fill`/`onFill`/`ink`/`tint`/`border`/`dark-fg`). [A1a hace `fill`/`onFill`; B1 agrega `ink`/`tint`/`border`/`dark-fg` — ambos son scope]
+- **Secondary** corregido (sin hue-shift a teal) + **orange** como sub-brand. [A1b]
+- **Charts: paleta categórica VIBRANTE** (`#0375DB #6EC207 #FF6500 #7C3AED #06B6D4 #EC4899` + cashflow pos/neg + dark levantada). [scope, slice de charts]
+- **Dark mode con derivación propia** (acento `#6FACF0`, semánticas a su dark-fg, charts dark, bodyBg `#25293C`/paper `#2F3349`). [tejido a través de A1a + B1 + charts]
+- **Patrones de aplicación** (tonal-by-default, dot, KPI delta inline, form states). [B2]
+- **Primary se queda `#0375DB`** — esto es una **decisión activa** (no "diferido"): se descarta el `#024C8F` oscuro de la dirección D.
+
+**SOLO esto está REALMENTE fuera de scope de TASK-1053 (diferido por decisiones #4/#5 del operador) — ver "Out of Scope":**
+
+1. **Success-ink `#2E7D32`** + su migración → TASK-1048 / task separada.
+2. **Emails** (paleta propia aislada del SoT, `src/emails/constants.ts`) → task separada.
+3. **Promover `greenhouse/no-hardcoded-hex-color` a `error` baseline 0** → con la task del verde finanzas.
+
+Si vas a decir "esto no se hace en TASK-1053", verificá que sea exactamente uno de esos 3. Cualquier otra cosa de Restraint v1 **se hace**.
 
 ## Why This Task Exists
 
@@ -40,7 +111,7 @@ Sin esta task, los valores + reglas viven solo en archivos de mockup volátiles 
 - Tokens semánticos canónicos para `info`/`success`/`warning`/`error` con **6 valores gobernados por rol** (`fill`/`onFill`/`ink`/`tint`/`border`/`dark-fg`), todos AA verificados en `light` + `darkSemi`.
 - Ramps 50→900 por rol, reconciliados con AXIS upstream (los steps oscuros que hoy no existen).
 - Patrones de aplicación canónicos documentados en DESIGN.md/V1 (tonal default, dot, sólido-excepción, KPI delta inline, estados de formulario, foco = azul de acción, color-nunca-solo).
-- Reemplazar el parche `#2E7D32` hardcodeado (cierra el gap success-ink de TASK-1048).
+- ~~Reemplazar el parche `#2E7D32` hardcodeado~~ **DIFERIDO (decisión operador 2026-06-08):** el success-ink `#2E7D32` y su migración quedan en TASK-1048/task separada (como los emails). Esta task NO lo retira ni promueve el lint a `error`.
 - Paridad de 3 capas + drift-guard + gate de contraste en CI.
 - Actualizar la página viva existente `/admin/design-system/colors` **sin cambiar su estructura** (valores se actualizan solos vía `theme.axis.*`) + agregar una sección de **ejemplos de implementación** con tokens canónicos (no hex).
 - Decisión consciente registrada y confirmada: **3 verdes** (brand-work + brand-pop + success-feedback).
@@ -74,7 +145,7 @@ Reglas obligatorias:
 ## Dependencies & Impact
 
 - **Depende de:** AXIS SoT (`axis-tokens.ts`/`axis-semantic.ts`) existente. Coordinación con TASK-1034 (AXIS full palette adoption en progreso) — esta task **cambia los valores semánticos de AXIS** (ver "Decisión clave: reconciliación con AXIS upstream").
-- **Impacta a:** TASK-1048 (subsume el token success-ink AA-safe + lo reemplaza por el ramp success nuevo; los one-offs de chart pos/neg + tag-blue surface pueden quedar en TASK-1048 o foldearse aquí). TODA superficie que use `theme.palette.{info,success,warning,error}` (cambio de hue runtime → blast radius amplio pero gobernado por theme, sin tocar consumidores uno a uno).
+- **Impacta a:** TASK-1048 (decisión operador 2026-06-08: **se foldean acá** los one-offs de chart pos/neg + tag-blue surface; el **success-ink `#2E7D32` queda diferido** en 1048/task separada — esta task ya NO lo subsume). TODA superficie que use `theme.palette.{info,success,warning,error}` (cambio de hue runtime → blast radius amplio pero gobernado por theme, sin tocar consumidores uno a uno). **El CTA pasa a un token `action` desacoplado del primary (decisión 1).**
 - **Archivos owned (cuando se implemente):** `src/@core/theme/axis-tokens.ts` (ramps semánticos), `src/@core/theme/axis-semantic.ts` (roles), `src/components/theme/mergedTheme.ts` (palette derive + namespace `theme.greenhouseSemantic` si se necesita exponer ink/tint/border/dark-fg), `DESIGN.md`, `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`, drift-guard test nuevo, página viva `/admin/design-system/colors` (extender, no restructurar).
 
 ## Current Repo State
@@ -103,7 +174,7 @@ Reglas obligatorias:
 
 | Familia | AXIS actual (`axisRamp`) | Propuesta D | Veredicto |
 |---|---|---|---|
-| **Primary / CTA** | `primary` 500 `#0375db` (ramp saturado `#79c0ff…#002a50`) | `action` 500 **`#024C8F`** (más oscuro; ramp tint `#E1EAF2…#011B33`) | **CAMBIA** anchor + ramp (blast radius alto: todo botón/link). ⚠️ **lever real = `primaryColorConfig`/`settings.primaryColor`, NO `axisRamp.primary` — ver Design Review gap #1** |
+| **Primary / CTA** | `primary` 500 `#0375db` | (D proponía `#024C8F`) | **✅ RESUELTO (Restraint v1, 2026-06-08): el primary se queda en `#0375db` vibrante — NO se oscurece.** Ese es el color de acción (no se desacopla). Los charts usan paleta categórica propia, no el primary. Ver §"Paleta APROBADA". |
 | **Navy identidad** | (≈ `primary` 800 `#003b70`) | `navy` 500 `#023C70` (ramp propio) | **CAMBIA / rol nuevo** |
 | **Secondary (verde)** | `secondary` 500 `#6ec207` **pero ramp se va a TEAL** en dark (`#1d9d72…#03593d`) | `greenVivid` 500 `#6EC207` (ramp se mantiene verde `#5CA306…#284603`) | **CAMBIA** ramp (corrige el hue-shift a teal) |
 | **Green canon (olivo)** | — (no existe) | `greenCanon` 500 `#3E7A12` | **NUEVO** |
@@ -196,7 +267,9 @@ Estas reglas son tan canónicas como los hex — definen cómo se ve "moderno en
 - En dark, las alertas usan bg sutil (`rgba(255,255,255,0.04)`) + borde `dark-fg` (no el `tint` claro de light).
 - `border`/`dark-fg` sostienen la separación bajo `forced-colors` (el navegador elimina box-shadow y backgrounds).
 
-### F. Decisión clave 1 — reconciliación con AXIS upstream (REQUIERE confirmación del operador)
+### F. Decisión clave 1 — reconciliación con AXIS upstream — ✅ RESUELTO (operador 2026-06-08): (A) Figma upstream, después
+
+> **RESUELTO:** se elige **(A) reconciliar AXIS Figma upstream**. El código va **code-first** (dirección D ya en `axis-tokens.ts`) y el operador sincroniza el AXIS Figma maestro **después**; divergencia temporal gobernada y documentada en el header del SoT. Destino durable: runtime ≡ Figma.
 
 La propuesta **cambia los valores semánticos respecto del AXIS runtime actual** (`success #28c76f` → `#157F47`; `error #ff4c51` → `#DC2E39`; `info #00bad1` → `#1F6FD4`; `warning #ffb703` se mantiene). AXIS (Figma `yyMksCoijfMaIoYplXKZaR`) es el SoT. Dos caminos canónicos (elegir antes de tokenizar):
 
@@ -205,7 +278,9 @@ La propuesta **cambia los valores semánticos respecto del AXIS runtime actual**
 
 **Recomendación:** (A). Registrar la decisión en el ADR + DECISIONS_INDEX.
 
-### G. Decisión clave 2 — 3 verdes (REQUIERE confirmación del operador)
+### G. Decisión clave 2 — verdes — ✅ RESUELTO (Restraint v1, 2026-06-08): 2 verdes (olivo eliminado)
+
+> **RESUELTO:** Restraint **elimina el olivo `#3E7A12`**. Quedan **2 verdes** hue-distintos y de rol distinto: **green de marca** (lime `#6EC207` pop + ink crisp `#4B8405`) y **success emerald `#157F47`** (feedback). El brand-lime también es serie de chart. Aplicar el check de distinción verde-marca vs success al implementar.
 
 Coexisten tres verdes, **a propósito** (principio AXIS decopla marca de feedback):
 
@@ -268,14 +343,15 @@ Auditoría con `design-system-governance` + `a11y-architect` + `modern-ui`. Veri
 
 **Insight de scope (operador 2026-06-07):** el codebase ya está token-anclado (la lint `no-hardcoded-hex-color` bajó el hardcode a 9 warnings residuales). Por eso el grueso del overhaul es **mecánico**: cambiar los VALORES detrás de los nombres de token existentes en el SoT → se propaga solo a todos los consumidores vía `theme.*`. La task se parte en **A (re-value, mecánico)** + **B (patrones, toca componentes/overrides)** para que A pueda shippear rápido y B quede separable.
 
-**Slice 0 — decisiones (gate, sin esto no se codea):** confirmar anchor del primary (`#0375db → #024C8F`) + F (reconciliación AXIS A vs B) + G (3 verdes). Neutrales YA resueltos (invariantes). ADR + DECISIONS_INDEX.
+**Slice 0 — decisiones (gate):** mayormente resueltas (operador 2026-06-08, ver "Decisiones del operador"). Neutrales invariantes ✓ · F = (A) Figma upstream después ✓ · G = 3 verdes confirmados ✓ · emails + success-ink diferidos ✓ · one-offs 1048 foldeados ✓. **Queda 1 gate abierto: el token de acción `action` para CTA** (decisión 1) — requiere mini-exploración visual (mockup + GVC) antes de codear el brand spine (A1b). Falta: ADR `GREENHOUSE_SEMANTIC_COLOR_SYSTEM_DECISION_V1` + DECISIONS_INDEX con estas decisiones.
 
-**FASE A — re-value (mecánico, propaga vía tokens; el grueso):**
+**FASE A — re-value (mecánico, propaga vía tokens; el grueso). Partida en dos PRs para reversibilidad fina (refinamiento 2026-06-08):**
 
-1. **Slice A1 — SoT:** nuevos VALORES en `axis-tokens.ts` (ramps `primary`/`secondary`/`info`/`success`/`warning`/`error` + `green-canon` nuevo + orange formalizado) + `axis-semantic.ts` (roles). **Nombres de token sin cambios** (solo valores) + nombres nuevos aditivos (green-canon). `gray`/neutrales INTACTOS. Tests de valores.
-2. **Slice A2 — runtime + contrato:** `mergedTheme.ts` deriva `theme.palette.*` de los valores nuevos (cero consumidores tocados — heredan el hue solo) + DESIGN.md §Color + V1 §Color (3-capas) + drift-guard. `pnpm design:lint` 0/0 · `pnpm test` · `pnpm build`.
-3. **Slice A3 — verificación visual (red de seguridad, NO migración):** GVC de superficies clave (dashboard, formulario, nav, tablas, login) en light + darkSemi + gate de contraste CI. Un cambio de hue puede romper contraste en algún punto — esto lo caza.
-4. **Slice A4 — 9 warnings + lint error:** mapear los hex residuales (`#2E7D32` success-ink, etc.) a token; promover `no-hardcoded-hex-color` a `error` baseline 0. **Cierra el success-ink de TASK-1048.**
+1. **Slice A1a — semánticos de feedback (PR 1, win claro + red puesta):** nuevos VALORES de `info`/`success`/`error` (+ `warning` invariante) en `axis-tokens.ts` + roles en `axis-semantic.ts` (los 4 ya AA con texto blanco; warning = texto oscuro). **En el MISMO PR, el guard mecánico:** `mergedTheme.ts` deriva `theme.palette.{info,success,warning,error}` + DESIGN.md §Color + V1 §Color (3-capas) + **`semantic-color-drift.test.ts` nuevo** + **contrast gate CI** (light + darkSemi). El stash actual es la semilla de este slice (re-value semántico + opacity + drift-test ya hecho) — falta DESIGN.md/V1 + el drift-guard + el contrast gate para que sea shippable. `pnpm design:lint` 0/0 · `pnpm test` · `pnpm build`. **Cero consumidores tocados** (heredan el hue vía theme).
+2. **Slice A1b — brand spine (PR 2):** `secondary` ramp (corrige hue-shift a teal) + `green-canon` nuevo (aditivo) + `orange` formalizado en AXIS, con su DESIGN.md/V1/drift. **El anchor del primary queda FUERA de A1b** hasta resolver el token de acción (decisión 1 — gate abierto). **Verificar antes de mergear (gaps R5):** que `theme.palette.secondary` realmente derive de `axisRamp.secondary` (hoy `secondary` no está en `axisSemanticPalette`); y el comportamiento `lighten/darken` del Provider.
+3. **Slice A2 — token de acción `action` (PR 3, gated por decisión 1):** introducir `action` desacoplado del primary + apuntar los CTA/foco a `action` (esto toca componentes/overrides — más cercano a Fase B que a re-value puro). Solo después de la mini-exploración visual.
+4. **Slice A3 — verificación visual (red de seguridad, NO migración):** GVC de superficies clave (dashboard, formulario, nav, tablas, login) en light + darkSemi por cada PR. El contrast gate de A1a ya corre en CI.
+5. ~~Slice A4 — lint a error + success-ink~~ **DIFERIDO** (decisión operador 2026-06-08): el retiro de `#2E7D32` y la promoción de `no-hardcoded-hex-color` a `error` baseline 0 quedan en TASK-1048/task separada. **Fase A NO promueve el lint a error.**
 
 **FASE B — patrones de aplicación (separable; toca componentes/overrides):**
 
@@ -327,11 +403,15 @@ Auditoría con `design-system-governance` + `a11y-architect` + `modern-ui`. Veri
 ## Out of Scope
 
 - **Neutrales / gray** — INVARIANTE (decisión operador 2026-06-07): quedan exactamente como hoy (`axisRamp.gray` + customColors neutrales). El slate del mockup NO se adopta. La task no toca ningún token neutral.
-- Las **opciones** alternativas de `primaryColorConfig` (`efeonce-azure/royal/lime/sunset/crimson`) como selector de usuario — se conservan; lo que cambia es el **default/anchor** del primary a action `#024C8F`.
+- **Emails** — DIFERIDOS (decisión operador 2026-06-08): paleta propia aislada del SoT (`src/emails/constants.ts`); task separada futura. No se tocan aquí.
+- **Verde finanzas `#2E7D32` (success-ink) + lint a `error` baseline 0** — DIFERIDOS (decisión operador 2026-06-08): quedan en TASK-1048/task separada. Esta task no retira el parche ni migra sus ~8 sitios.
+- **Oscurecer el anchor del primary** (`#0375db → #024c8f`) — EN PAUSA (decisión operador 2026-06-08): pendiente resolver el token de acción `action` para los CTA (decisión 1). El reorder de `primaryColorConfig` del stash queda en pausa hasta esa resolución.
+- Las **opciones** alternativas de `primaryColorConfig` (`efeonce-core/royal/azure/lime/sunset/crimson`) como selector de usuario — se conservan.
 - Multi-brand por tenant (V1.5, no aquí).
 - Tipografía / spacing / elevation (otras capas, otras tasks).
-- Charts cashflow positive/negative (`#3DBA5D`/`#FF4D49`) + tag-blue surface (`#eaf3fc`) — quedan en TASK-1048 salvo decisión de foldearlos en Slice 0.
-- Cambiar el patrón de foco (sigue siendo azul de acción).
+- Cambiar el patrón de foco (foco = token de acción).
+
+**En scope (foldeado por decisión operador 2026-06-08):** charts cashflow positive/negative (`#3DBA5D`/`#FF4D49`) + tag-blue surface (`#eaf3fc`) — los one-offs categóricos sueltos de TASK-1048 **entran en esta task** (tokenizar como paleta categórica, no como semánticos de feedback).
 
 ## Acceptance Criteria
 
@@ -341,7 +421,9 @@ Auditoría con `design-system-governance` + `a11y-architect` + `modern-ui`. Veri
 - [ ] Warning mantiene texto oscuro sobre amber (nunca blanco).
 - [ ] Los 7 patrones de aplicación (tonal/dot/sólido-excepción/KPI inline/form states/foco-acción/color-nunca-solo) documentados en DESIGN.md §Color + V1 §Color.
 - [ ] Paridad 3-capas verificada por drift-guard; `pnpm design:lint` 0/0.
-- [ ] `#2E7D32` reemplazado por token; `greenhouse/no-hardcoded-hex-color` en `error` con baseline 0 (cierra success-ink de TASK-1048).
+- [ ] ~~`#2E7D32` reemplazado + lint a `error` baseline 0~~ **DIFERIDO** a TASK-1048/task separada (decisión operador 2026-06-08).
+- [ ] Existe `semantic-color-drift.test.ts` (runtime ≡ SoT ≡ DESIGN.md §Color) + contrast gate en CI (light + darkSemi) — el color queda con guard mecánico como typography/elevation.
+- [ ] Los one-offs categóricos de TASK-1048 (chart pos/neg + tag-blue surface) tokenizados como paleta categórica.
 - [ ] `/admin/design-system/colors` (existente): estructura SIN cambios, valores actualizados (vía tokens), + sección de ejemplos de implementación con tokens canónicos (no hex). GVC desktop/mobile.
 - [ ] `pnpm test` + `pnpm build` verdes.
 
@@ -369,9 +451,10 @@ Auditoría con `design-system-governance` + `a11y-architect` + `modern-ui`. Veri
 
 ## Open Questions
 
-- **Anchor del primary:** ¿se confirma oscurecer el primary `#0375db → #024C8F` (cambia todo botón/link/acento)? Es la decisión de mayor blast radius de la task.
+- **🔴 ABIERTA — Token de acción para CTA:** ¿los CTA usan un token `action` dedicado (desacoplado de `theme.palette.primary`) en vez de cambiar el primary de marca? (decisión 1, operador 2026-06-08). Define si el primary de marca se queda en `#0375db` o cambia, y cómo se modela `action` (¿palette custom + override de `<Button>` para CTA? ¿foco = `action`?). **Es el único gate que falta** — requiere mini-exploración visual (mockup + GVC) antes de codear el spine. La columna "Primary" del DELTA queda en pausa hasta esto.
+- ~~Anchor del primary~~ **EN PAUSA (2026-06-08):** subsumida en la pregunta del token de acción de arriba.
 - ~~Neutrales~~ **RESUELTO (2026-06-07):** invariantes — quedan exactamente como hoy (`axisRamp.gray`), el slate NO se adopta.
-- **F — reconciliación AXIS:** ¿(A) actualizar AXIS Figma upstream, o (B) override Greenhouse gobernado? (recomendado A).
-- **G — 3 verdes:** ¿se confirma la coexistencia brand-work + brand-pop + success-feedback?
-- ¿`#2E7D32` success-ink se mapea al `success.ink #11703F` (5.6:1) o se conserva un valor dedicado para montos en finance?
-- ¿Foldear los one-offs de TASK-1048 (chart pos/neg + tag-blue) en esta task o mantenerlos separados?
+- ~~F — reconciliación AXIS~~ **RESUELTO (2026-06-08):** (A) actualizar AXIS Figma upstream; el operador lo sincroniza después (code-first temporal).
+- ~~G — 3 verdes~~ **RESUELTO (2026-06-08):** confirmados — conviven a propósito.
+- ~~`#2E7D32` success-ink~~ **RESUELTO (2026-06-08):** DIFERIDO a TASK-1048/task separada.
+- ~~Foldear one-offs de TASK-1048~~ **RESUELTO (2026-06-08):** sí, los one-offs categóricos sueltos (chart pos/neg + tag-blue) se foldean acá.
