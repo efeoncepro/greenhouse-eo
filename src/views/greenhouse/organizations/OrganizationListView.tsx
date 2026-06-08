@@ -136,8 +136,13 @@ const statusLabel: Record<string, string> = {
 
 const sourceLabel = (item: OrganizationListItem) => (item.hubspotCompanyId ? 'HubSpot' : 'Portal')
 
-const accessibleOutlinedChipTone = (tone: SemanticTone): SemanticTone =>
-  tone === 'primary' || tone === 'secondary' || tone === 'error' ? tone : 'secondary'
+// Feedback tones (success/warning/error/info) tienen triple tonal curado AA en
+// `theme.greenhouseSemantic` → se renderizan como chip tonal `label` (señal real:
+// verde/ámbar/rojo). Las tones no-feedback (primary/secondary/default) NO tienen token
+// tonal curado → `outlined` (texto sobre paper) mantiene contraste AA. Sin esto, un chip
+// `secondary` tonal pinta verde sobre tint verde y falla 4.5:1 (axe color-contrast).
+const chipVariantForTone = (tone: SemanticTone): 'label' | 'outlined' =>
+  tone === 'success' || tone === 'warning' || tone === 'error' || tone === 'info' ? 'label' : 'outlined'
 
 const getInitials = (name: string) => {
   const parts = name.trim().split(/\s+/).filter(Boolean)
@@ -222,7 +227,7 @@ const OrganizationListView = () => {
   const [data, setData] = useState<ListResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
-  const [pageSize, setPageSize] = useState(25)
+  const [pageSize, setPageSize] = useState(10)
   const [search, setSearch] = useState('')
   const [searchDebounced, setSearchDebounced] = useState('')
   const [filter, setFilter] = useState<OrganizationWorkbenchFilter>('attention')
@@ -478,7 +483,6 @@ const OrganizationListView = () => {
                 display: 'grid',
                 gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: 'minmax(0, 1.12fr) minmax(340px, 0.88fr)' },
                 maxWidth: '100%',
-                minHeight: { xs: 'auto', lg: 560 },
                 minWidth: 0,
                 overflow: 'hidden'
               }}
@@ -756,7 +760,7 @@ function OrganizationRow({ item, selected, onSelect }: { item: OrganizationListI
         bgcolor: 'background.paper',
         color: 'text.primary',
         cursor: 'pointer',
-        p: { xs: 3, md: 4 },
+        p: { xs: 2.5, md: 3 },
         transition: `background-color ${motionCss.duration.short} ${motionCss.ease.standard}, box-shadow ${motionCss.duration.short} ${motionCss.ease.standard}`,
         boxShadow: selected ? `inset 3px 0 0 ${theme.palette.primary.main}` : theme.greenhouseElevation.none.boxShadow,
         '&:hover': {
@@ -768,11 +772,11 @@ function OrganizationRow({ item, selected, onSelect }: { item: OrganizationListI
         }
       }}
     >
-      <Stack spacing={2.5}>
+      <Stack spacing={1.5}>
         <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={{ xs: 2, md: 3 }}>
-          <Stack direction='row' spacing={3} alignItems='center' sx={{ minWidth: 0, maxWidth: '100%', flex: 1 }}>
+          <Stack direction='row' spacing={2.5} alignItems='center' sx={{ minWidth: 0, maxWidth: '100%', flex: 1 }}>
             <OrgAvatar item={item} />
-            <Stack spacing={0.75} sx={{ minWidth: 0 }}>
+            <Stack spacing={0.25} sx={{ minWidth: 0 }}>
               <Stack
                 direction={{ xs: 'column', sm: 'row' }}
                 alignItems={{ xs: 'flex-start', sm: 'center' }}
@@ -789,11 +793,6 @@ function OrganizationRow({ item, selected, onSelect }: { item: OrganizationListI
               <Typography variant='caption' color='text.secondary'>
                 {item.publicId} · {item.country ?? 'Sin pais'} · {item.industry ?? 'Sin industria'}
               </Typography>
-              {item.legalName && item.legalName !== item.organizationName ? (
-                <Typography variant='caption' color='text.secondary'>
-                  {item.legalName}
-                </Typography>
-              ) : null}
             </Stack>
           </Stack>
 
@@ -842,14 +841,18 @@ function OrganizationRow({ item, selected, onSelect }: { item: OrganizationListI
 }
 
 function RowFact({ label, tone, icon }: { label: string; tone: SemanticTone; icon?: string }) {
+  // Tonal (variant='label') feedback chip: consume `theme.greenhouseSemantic[tone]`
+  // (tint + AA ink + soft border) → mantiene el tono semántico REAL con contraste AA.
+  // El `outlined` colapsaba warning/success→gris (bordes finos fallan 3:1) y aplanaba la
+  // señal: positivo (verde), gap/atención (ámbar) y bloqueo (rojo) deben verse distintos.
   return (
     <GreenhouseChip
       kind='attribute'
       label={label}
       iconClassName={icon}
       size='small'
-      tone={accessibleOutlinedChipTone(tone)}
-      variant='outlined'
+      tone={tone}
+      variant={chipVariantForTone(tone)}
       sx={{
         width: { xs: '100%', sm: 'auto' },
         maxWidth: '100%',
@@ -865,14 +868,17 @@ function RowFact({ label, tone, icon }: { label: string; tone: SemanticTone; ico
 }
 
 function StatusPill({ label, tone, icon }: { label: ReactNode; tone: SemanticTone; icon?: string }) {
+  // Tonal feedback chip (AA via `theme.greenhouseSemantic[tone]`): el badge de riesgo,
+  // los chips del rail de readiness y la columna Estado del matrix muestran su tono
+  // semántico REAL — verde (positivo) / ámbar (atención) / rojo (bloqueo) distinguibles.
   return (
     <GreenhouseChip
       kind='status'
       label={label}
       iconClassName={icon}
       size='small'
-      tone={accessibleOutlinedChipTone(tone)}
-      variant='outlined'
+      tone={tone}
+      variant={chipVariantForTone(tone)}
     />
   )
 }
