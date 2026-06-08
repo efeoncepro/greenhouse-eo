@@ -11,7 +11,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -19,6 +18,7 @@ import { AgencyMetricStatusChip, getAgencyMetricFooterLabel } from '@/components
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
@@ -125,7 +125,6 @@ const DELIVERY_METRICS: Array<{ id: string; label: string }> = [
 type Props = { memberId: string }
 
 const PersonIntelligenceTab = ({ memberId }: Props) => {
-  const theme = useTheme()
   const [data, setData] = useState<IntelligenceResponse | null>(null)
   const [icoTrustMetrics, setIcoTrustMetrics] = useState<TrustMetricValue[] | null>(null)
   const [loading, setLoading] = useState(true)
@@ -256,9 +255,9 @@ const PersonIntelligenceTab = ({ memberId }: Props) => {
                     <YAxis domain={[0, 100]} tickFormatter={v => `${v}`} />
                     <Tooltip formatter={(v) => `${v}`} />
                     <Legend />
-                    <Line type='monotone' dataKey='calidad' stroke={theme.palette.success.main} strokeWidth={2} name='Calidad' dot={{ r: 4 }} />
-                    <Line type='monotone' dataKey='dedicacion' stroke={theme.palette.warning.main} strokeWidth={2} name='Dedicación' dot={{ r: 4 }} />
-                    <Line type='monotone' dataKey='utilizacion' stroke={theme.palette.info.main} strokeWidth={2} name='Utilización' strokeDasharray='5 5' dot={{ r: 3 }} />
+                    <Line type='monotone' dataKey='calidad' stroke={GH_COLORS.chart.categorical[0]} strokeWidth={2} name='Calidad' dot={{ r: 4 }} />
+                    <Line type='monotone' dataKey='dedicacion' stroke={GH_COLORS.chart.categorical[1]} strokeWidth={2} name='Dedicación' dot={{ r: 4 }} />
+                    <Line type='monotone' dataKey='utilizacion' stroke={GH_COLORS.chart.categorical[2]} strokeWidth={2} name='Utilización' strokeDasharray='5 5' dot={{ r: 3 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </AppRecharts>

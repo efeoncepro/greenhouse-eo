@@ -21,7 +21,6 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
@@ -35,6 +34,7 @@ import CustomChip from '@core/components/mui/Chip'
 import { HorizontalWithSubtitle, StatsWithAreaChart } from '@/components/card-statistics'
 import type { MemberPayrollHistory as MemberHistory } from '@/types/payroll'
 import { getInitials } from '@/utils/getInitials'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { formatCurrency, formatPeriodIdLabel, formatAttendanceRatio, formatFactor, regimeLabel, regimeColor } from './helpers'
 
 
@@ -43,7 +43,6 @@ type Props = {
 }
 
 const MemberPayrollHistory = ({ memberId }: Props) => {
-  const theme = useTheme()
   const [data, setData] = useState<MemberHistory | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -140,7 +139,7 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
         formatter: v => formatCurrency(v, currency)
       }
     },
-    colors: [theme.palette.success.main],
+    colors: [GH_COLORS.chart.primary],
     tooltip: {
       y: { formatter: v => formatCurrency(v, currency) }
     }

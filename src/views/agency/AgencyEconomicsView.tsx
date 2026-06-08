@@ -11,7 +11,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 import {
   createColumnHelper,
@@ -32,6 +31,7 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 import tableStyles from '@core/styles/table.module.css'
 import { getMicrocopy } from '@/lib/copy'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
 const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
@@ -106,7 +106,6 @@ const clientColumns: ColumnDef<ClientEcon, any>[] = [
 // ── Component ──
 
 const AgencyEconomicsView = () => {
-  const theme = useTheme()
   const [year, setYear] = useState(() => new Date().getFullYear())
   const [month, setMonth] = useState(() => new Date().getMonth() + 1)
   const [pnl, setPnl] = useState<PnlData | null>(null)
@@ -289,7 +288,7 @@ const AgencyEconomicsView = () => {
                     <YAxis tickFormatter={v => `$${(v / 1_000_000).toFixed(0)}M`} />
                     <Tooltip formatter={(v) => fmtClp(Number(v))} />
                     <Legend />
-                    <Line type='monotone' dataKey='total' stroke={theme.palette.error.main} name='Gastos totales' strokeWidth={2} />
+                    <Line type='monotone' dataKey='total' stroke={GH_COLORS.chart.primary} name='Gastos totales' strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </AppRecharts>

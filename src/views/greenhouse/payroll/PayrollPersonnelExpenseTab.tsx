@@ -21,7 +21,6 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { useTheme, type Theme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 import { TabContext, TabPanel } from '@mui/lab'
@@ -37,6 +36,7 @@ import type { PayrollCurrency } from '@/types/payroll'
 import type { PersonnelExpenseReport, PersonnelExpenseCurrencyMeta } from '@/lib/payroll/personnel-expense'
 import { formatCurrency, formatPeriodLabel } from './helpers'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -56,7 +56,6 @@ const formatMonthRange = (meta: PersonnelExpenseCurrencyMeta): string => {
 }
 
 const PayrollPersonnelExpenseTab = () => {
-  const theme = useTheme()
   const now = new Date()
   const [yearFrom, setYearFrom] = useState(now.getFullYear())
   const [monthFrom, setMonthFrom] = useState(1)
@@ -159,14 +158,13 @@ const PayrollPersonnelExpenseTab = () => {
     )
   }
 
-  return <ExpenseContent data={data} theme={theme} chartCurrencyTab={chartCurrencyTab} setChartCurrencyTab={setChartCurrencyTab} yearFrom={yearFrom} setYearFrom={setYearFrom} monthFrom={monthFrom} setMonthFrom={setMonthFrom} yearTo={yearTo} setYearTo={setYearTo} monthTo={monthTo} setMonthTo={setMonthTo} />
+  return <ExpenseContent data={data} chartCurrencyTab={chartCurrencyTab} setChartCurrencyTab={setChartCurrencyTab} yearFrom={yearFrom} setYearFrom={setYearFrom} monthFrom={monthFrom} setMonthFrom={setMonthFrom} yearTo={yearTo} setYearTo={setYearTo} monthTo={monthTo} setMonthTo={setMonthTo} />
 }
 
 // ─── Content component (only renders when data exists) ──────────
 
 type ExpenseContentProps = {
   data: PersonnelExpenseReport
-  theme: Theme
   chartCurrencyTab: string
   setChartCurrencyTab: (v: string) => void
   yearFrom: number
@@ -179,7 +177,7 @@ type ExpenseContentProps = {
   setMonthTo: (v: number) => void
 }
 
-const ExpenseContent = ({ data, theme, chartCurrencyTab, setChartCurrencyTab, yearFrom, setYearFrom, monthFrom, setMonthFrom, yearTo, setYearTo, monthTo, setMonthTo }: ExpenseContentProps) => {
+const ExpenseContent = ({ data, chartCurrencyTab, setChartCurrencyTab, yearFrom, setYearFrom, monthFrom, setMonthFrom, yearTo, setYearTo, monthTo, setMonthTo }: ExpenseContentProps) => {
   const { totals, periods, byRegime } = data
   const chileRegime = byRegime.find(r => r.regime === 'chile')
   const intlRegime = byRegime.find(r => r.regime === 'international')
@@ -248,12 +246,12 @@ const ExpenseContent = ({ data, theme, chartCurrencyTab, setChartCurrencyTab, ye
         formatter: v => formatCurrency(v, chartCurrencyTab as PayrollCurrency)
       }
     },
-    colors: [theme.palette.warning.main, theme.palette.success.main],
+    colors: [GH_COLORS.chart.categorical[0], GH_COLORS.chart.categorical[1]],
     legend: { position: 'top' },
     tooltip: {
       y: { formatter: v => formatCurrency(v, chartCurrencyTab as PayrollCurrency) }
     }
-  }), [chartCategories, chartCurrencyTab, theme])
+  }), [chartCategories, chartCurrencyTab])
 
   // Donut: only for single-currency, using headcount (not amounts)
   const donutLabels: string[] = []
@@ -275,7 +273,7 @@ const ExpenseContent = ({ data, theme, chartCurrencyTab, setChartCurrencyTab, ye
   const donutOptions: ApexOptions = {
     chart: { parentHeightOffset: 0 },
     labels: donutLabels,
-    colors: [theme.palette.success.main, theme.palette.info.main],
+    colors: [GH_COLORS.chart.categorical[0], GH_COLORS.chart.categorical[1]],
     legend: { position: 'bottom' },
     dataLabels: { enabled: true, formatter: (_, opts) => `${donutSeries[opts.seriesIndex]}` },
     tooltip: {

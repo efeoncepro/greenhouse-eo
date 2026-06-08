@@ -21,7 +21,6 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
@@ -32,6 +31,7 @@ import CustomChip from '@core/components/mui/Chip'
 
 import type { PayrollEntry } from '@/types/payroll'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { formatCurrency, formatPeriodIdLabel } from '@views/greenhouse/payroll/helpers'
 
 const TASK407_ARIA_IR_AL_MODULO_DE_NOMINA = "Ir al módulo de nómina"
@@ -44,7 +44,6 @@ type Props = {
 }
 
 const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
-  const theme = useTheme()
   const [entries, setEntries] = useState<PayrollEntry[] | null>(initialEntries ?? null)
   const [loading, setLoading] = useState(!initialEntries)
   const [error, setError] = useState<string | null>(null)
@@ -149,7 +148,7 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
         formatter: v => formatCurrency(v, currency)
       }
     },
-    colors: [theme.palette.success.main],
+    colors: [GH_COLORS.chart.primary],
     tooltip: { y: { formatter: v => formatCurrency(v, currency) } }
   }
 
