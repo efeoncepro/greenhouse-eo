@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import type { SxProps, Theme } from '@mui/material/styles'
 
 import { axisNeutral, axisRamp } from '@core/theme/axis-tokens'
-import { axisSemanticHex, axisSemanticPalette } from '@core/theme/axis-semantic'
+import { axisSemanticHex, axisSemanticPalette, axisSemanticSubValues } from '@core/theme/axis-semantic'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { GreenhouseChip, type GreenhouseChipVariant } from '@/components/greenhouse/primitives'
@@ -73,6 +73,15 @@ const alphaHex = (hex: string, opacity: number) => {
   return `rgb(${r} ${g} ${b} / ${opacity})`
 }
 
+// TASK-1053 Fase B: feedback roles that carry curated tonal sub-values. For the
+// `label` (tonal) variant these read the SoT triple (tint/ink/border per mode) so
+// the lab is a FAITHFUL render of GreenhouseChip — NOT `main`-as-text (the AA bug:
+// warning amber on an amber wash). primary/secondary keep the legacy opacity wash.
+const FEEDBACK_PREVIEW_TONES = ['error', 'warning', 'info', 'success'] as const
+
+const isFeedbackPreviewTone = (tone: PreviewTone): tone is (typeof FEEDBACK_PREVIEW_TONES)[number] =>
+  (FEEDBACK_PREVIEW_TONES as readonly string[]).includes(tone)
+
 const getAxisChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode: PreviewMode): SxProps<Theme> => {
   const neutral = axisNeutral[mode]
   const main = axisPreviewTone[tone]
@@ -82,6 +91,14 @@ const getAxisChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode: 
   const defaultLabel = alphaHex(neutral.textPrimary, mode === 'dark' ? 0.1 : 0.08)
   const defaultText = neutral.textPrimary
 
+  // Tonal (label) feedback: curated SoT triple, resolved per mode (mirror of the
+  // greenhouseSemanticTokens factory — the lab renders both modes under one theme).
+  const tonalFeedback = variant === 'label' && isFeedbackPreviewTone(tone)
+  const sub = tonalFeedback ? axisSemanticSubValues[tone] : null
+  const tonalSurface = sub ? (mode === 'dark' ? `color-mix(in oklch, ${sub.darkFg} 16%, ${neutral.paper})` : sub.tint) : null
+  const tonalText = sub ? (mode === 'dark' ? sub.darkFg : sub.ink) : null
+  const tonalBorder = sub ? (mode === 'dark' ? `color-mix(in oklch, ${sub.darkFg} 36%, transparent)` : sub.border) : null
+
   const fill =
     variant === 'solid'
       ? isDefault
@@ -90,7 +107,7 @@ const getAxisChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode: 
       : variant === 'label'
         ? isDefault
           ? defaultLabel
-          : alphaHex(main, mode === 'dark' ? 0.16 : 0.18)
+          : tonalSurface ?? alphaHex(main, mode === 'dark' ? 0.16 : 0.18)
         : neutral.paper
 
   const color =
@@ -100,9 +117,10 @@ const getAxisChipSx = (variant: GreenhouseChipVariant, tone: PreviewTone, mode: 
         : solidText
       : isDefault
         ? defaultText
-        : main
+        : tonalText ?? main
 
-  const border = variant === 'outlined' ? (isDefault ? neutral.divider : main) : fill
+  const border =
+    variant === 'outlined' ? (isDefault ? neutral.divider : main) : tonalBorder ?? fill
 
   return {
     backgroundColor: fill,

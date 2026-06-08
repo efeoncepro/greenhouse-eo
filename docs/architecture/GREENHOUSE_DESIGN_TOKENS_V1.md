@@ -431,6 +431,33 @@ Each color ships with opacities: `lighterOpacity` (8%), `lightOpacity` (16%), `m
 - Single-series → el acento. **NUNCA** una serie categórica desde `theme.palette.{success,warning,error,info}` (el ink success es muy oscuro para "bueno", el warning es el amber de alerta) → usar `GH_COLORS.chart.*`.
 - **NUNCA** hexes de serie inline ni arrays `*_COLORS` locales → `GH_COLORS.chart.categorical`. Paletas de dominio (`cscPhase`) derivan de `categorical` (subset). Drift-guard: `axis-semantic-drift.test.ts` (bloque chart palette).
 
+### 8.1.quater Tonal-by-default feedback sub-values (TASK-1053 Fase B)
+
+El default de un chip/alert de estado es **tonal** (superficie suave + ink AA), no un sólido saturado (el sólido lee "admin template 2016" — reparo Restraint v1). El rol MUI solo carga `main`/`contrastText`; el tratamiento tonal necesita tres valores curados más por rol de feedback, expuestos como **factory mode-aware** `theme.greenhouseSemantic.<role>` (espejo de `theme.greenhouseElevation`).
+
+SoT de valores: `src/@core/theme/axis-semantic.ts` → `axisSemanticSubValues` (curados, viven en la capa semántica como `contrastText`, NO un ramp primitivo paralelo). Composición mode-resuelta: `src/components/theme/greenhouse-semantic-tokens.ts`. Sub-valores aprobados (AA-verificados — `axis-semantic-contrast.test.ts`):
+
+| Rol | ink (texto AA) | tint (superficie) | border | darkFg (texto dark) |
+|---|---|---|---|---|
+| `info` | `#155CAD` | `#E8F1FD` | `#C2DBF7` | `#6FB0F0` |
+| `success` | `#11703F` | `#E7F6EE` | `#BCE6CF` | `#5FC891` |
+| `warning` | `#8A5A00` | `#FFF4D6` | `#F5D98A` | `#E8B84B` |
+| `error` | `#C01D27` | `#FDECEC` | `#F5C2C4` | `#F08A8F` |
+
+Contraste verificado: `ink` ≥5.9:1 sobre blanco, ≥5.3:1 sobre su propio `tint`; `darkFg` ≥5.98:1 sobre charcoal `#25293C`. El `border` ~1.4:1 es hairline suave a propósito (WCAG 1.4.11 no lo exige a 3:1 — el estado lo comunican tint+ink).
+
+Token expuesto por rol: `{ fill, onFill, ink, tint, border, darkFg, tonalSurface, tonalText, tonalBorder }`. El **triple tonal** mode-resuelto (lo que consume el `label` variant):
+
+- **light** → `tonalSurface=tint · tonalText=ink · tonalBorder=border`
+- **dark** → `tonalText=darkFg`, `tonalSurface=color-mix(in oklch, darkFg 16%, paper)`, `tonalBorder=color-mix(in oklch, darkFg 36%, transparent)`
+
+**Reglas duras:**
+
+- **NUNCA** usar `palette.<role>.main` como color de TEXTO tonal — es el fill. (Bug que arregla esta Fase: `warning.main` `#FFB703` amber como texto es ilegible; `warning.tonalText`=ink `#8A5A00` pasa AA.)
+- Primer consumidor: `GreenhouseChip` `label` (tonal) variant para tonos feedback. `primary`/`secondary` mantienen el wash de opacidad legacy (son marca, no feedback; sin sub-valores curados).
+- Drift-guard: `greenhouse-semantic-drift.test.ts` (pin de los 16 hexes + composición del factory). Contrast gate: `axis-semantic-contrast.test.ts`. Mover juntos SoT + DESIGN.md §Color + esta tabla en el mismo PR (paridad 3 capas, igual que color/tipografía).
+- Lab fiel: `/admin/design-system/chips` renderiza el tonal real (su `getAxisChipSx` consume `axisSemanticSubValues` por modo).
+
 ### 8.1.bis customColors namespace (Greenhouse semantic layer)
 
 `mergedTheme.ts` extends `palette` with a `customColors` namespace (14 tokens) that names brand moments not covered by MUI semantic colors. These are **canonical for Greenhouse** but not part of MUI standard palette.

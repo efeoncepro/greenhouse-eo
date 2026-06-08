@@ -18,6 +18,7 @@ import type {
 } from '@core/components/custom-inputs/types'
 import type { AxisTokens } from '@core/theme/axis-tokens'
 import type { GreenhouseElevationLevel, GreenhouseElevationToken } from './elevation-tokens'
+import type { GreenhouseSemanticRole, GreenhouseSemanticToken } from './greenhouse-semantic-tokens'
 
 declare module '@mui/material/styles' {
    
@@ -106,6 +107,14 @@ declare module '@mui/material/styles' {
      * `theme.shadows[n]` for new Greenhouse primitives.
      */
     greenhouseElevation: Record<GreenhouseElevationLevel, GreenhouseElevationToken>
+    /**
+     * Greenhouse semantic feedback roles (TASK-1053 Fase B). Source of truth:
+     * `src/components/theme/greenhouse-semantic-tokens.ts`. Read a ROLE
+     * (`theme.greenhouseSemantic.warning.tonalText`) for the tonal-by-default
+     * treatment — never `palette.<role>.main` as a tonal TEXT color (that is the
+     * fill, not the ink; e.g. warning.main amber fails as text).
+     */
+    greenhouseSemantic: Record<GreenhouseSemanticRole, GreenhouseSemanticToken>
   }
   interface ThemeOptions {
     shape?: {
@@ -174,6 +183,7 @@ declare module '@mui/material/styles' {
     }>
     axis?: AxisTokens
     greenhouseElevation?: Partial<Record<GreenhouseElevationLevel, GreenhouseElevationToken>>
+    greenhouseSemantic?: Partial<Record<GreenhouseSemanticRole, GreenhouseSemanticToken>>
   }
 
   // Custom Typography Variants

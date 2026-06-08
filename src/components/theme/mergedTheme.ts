@@ -35,6 +35,10 @@ import { controlText, lineHeights, typographyScale } from './typography-tokens'
 // Mode-aware factory over the canonical shadow channel; consumed via
 // `theme.greenhouseElevation.<level>`. Drift-guarded by elevation-drift.test.ts.
 import { elevationTokens } from './elevation-tokens'
+// Greenhouse semantic feedback tokens — tonal-by-default SoT (TASK-1053 Fase B).
+// Mode-aware factory; consumed via `theme.greenhouseSemantic.<role>`. Drift-guarded
+// by greenhouse-semantic-drift.test.ts.
+import { greenhouseSemanticTokens } from './greenhouse-semantic-tokens'
 
 const { mobileFontSize: surfaceHeroTitleMobileFontSize, ...surfaceHeroTitleToken } = typographyScale.surfaceHeroTitle
 
@@ -57,6 +61,12 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
     // GreenhouseFloatingSurface (rol `floating`). NO usar `Paper elevation={n}` ni
     // `theme.shadows[n]` en primitives Greenhouse nuevas.
     greenhouseElevation: elevationTokens(mode),
+    // Greenhouse semantic feedback roles (TASK-1053 Fase B) accesibles vía
+    // `theme.greenhouseSemantic.<role>`. Factory mode-aware (espejo de elevation).
+    // SoT: greenhouse-semantic-tokens.ts + sub-valores curados en axis-semantic.ts.
+    // Consumidor: GreenhouseChip `label` variant (tonal AA). NO usar
+    // `palette.<role>.main` como color de TEXTO tonal (es el fill, no el ink).
+    greenhouseSemantic: greenhouseSemanticTokens(mode),
     colorSchemes: {
       light: {
         palette: {

@@ -62,6 +62,35 @@ export const axisSemanticHex = {
   info: axisRamp.info[500]
 } as const satisfies Record<'success' | 'warning' | 'error' | 'info', string>
 
+/**
+ * Curated semantic SUB-VALUES (TASK-1053 Fase B) — the extra per-role values the
+ * fill/onFill pair (main/contrastText above) cannot express, needed for the
+ * tonal-by-default treatment + dark-mode accents:
+ *   - ink     : AA text color on white AND on the role's own `tint` (≥5.3:1).
+ *               NOT `main` — e.g. warning.main #ffb703 (amber) as text FAILS;
+ *               ink #8a5a00 passes. This is the canonical "semantic text" color.
+ *   - tint    : tonal surface background (light mode). Soft, ~AA-quiet wash.
+ *   - border  : tonal hairline (light mode). Soft separation; the state is carried
+ *               by tint+ink, so this is decorative reinforcement (not a 3:1 target).
+ *   - darkFg  : AA accent/text on the dark charcoal surface (≥5.98:1 vs #25293c).
+ *
+ * All values verified WCAG 2.2 AA (axis-semantic-contrast.test.ts). Curated (not
+ * exact ramp steps) — they live in the SEMANTIC layer like `contrastText`, never
+ * a parallel primitive ramp. The mode-resolved tonal triple is composed by the
+ * factory in `src/components/theme/greenhouse-semantic-tokens.ts`.
+ */
+export const axisSemanticSubValues = {
+  success: { ink: '#11703f', tint: '#e7f6ee', border: '#bce6cf', darkFg: '#5fc891' },
+  warning: { ink: '#8a5a00', tint: '#fff4d6', border: '#f5d98a', darkFg: '#e8b84b' },
+  error: { ink: '#c01d27', tint: '#fdecec', border: '#f5c2c4', darkFg: '#f08a8f' },
+  info: { ink: '#155cad', tint: '#e8f1fd', border: '#c2dbf7', darkFg: '#6fb0f0' }
+} as const satisfies Record<'success' | 'warning' | 'error' | 'info', {
+  ink: string
+  tint: string
+  border: string
+  darkFg: string
+}>
+
 export const axisSemanticPalette = {
   success: {
     main: axisRamp.success[500],
