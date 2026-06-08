@@ -9,30 +9,57 @@ import {
 } from '@/config/manual-teams-announcements'
 import { sendViaBotFramework } from '@/lib/integrations/teams/bot-framework/sender'
 import { writeTeamsSendRunOutcome, writeTeamsSendRunStart } from '@/lib/integrations/teams/send-run-log'
-import type { TeamsAdaptiveCard, TeamsChannelRecord, TeamsSendOutcome } from '@/lib/integrations/teams/types'
+import type {
+  TeamsAdaptiveCard,
+  TeamsAdaptiveCardMentionEntity,
+  TeamsChannelRecord,
+  TeamsSendOutcome
+} from '@/lib/integrations/teams/types'
 
 const MAX_TITLE_LENGTH = 120
 const MAX_PARAGRAPH_LENGTH = 900
 const MAX_PARAGRAPHS = 6
 const MAX_CTA_LABEL_LENGTH = 40
+const MAX_MENTIONS = 5
+const MAX_MENTION_TEXT_LENGTH = 80
+const MAX_MENTION_ID_LENGTH = 200
 
 export interface ManualTeamsAnnouncementInput {
   destinationKey: string
   title: string
   paragraphs: string[]
-  ctaUrl: string
+  ctaUrl?: string
   ctaLabel?: string
+  mentions?: ManualTeamsAnnouncementMention[]
   triggeredBy: string
   correlationId?: string
   sourceObjectId?: string
+}
+
+export interface ManualTeamsAnnouncementMention {
+  /**
+   * Exact visible text to replace with `<at>text</at>` in the Adaptive Card.
+   * Example: `Maria Fernanda`.
+   */
+  text: string
+  /**
+   * Microsoft Entra Object ID or UPN. For Adaptive Card mentions do NOT pass
+   * `29:<aadObjectId>`; that rendered as plain text in live Teams smoke.
+   */
+  id: string
+  /**
+   * Profile name Teams should attach to the mention. Defaults to `text`.
+   */
+  name?: string
 }
 
 export interface ManualTeamsAnnouncementPreview {
   destination: ManualTeamsAnnouncementDestination
   title: string
   paragraphs: string[]
-  ctaUrl: string
-  ctaLabel: string
+  ctaUrl: string | null
+  ctaLabel: string | null
+  mentions: Required<ManualTeamsAnnouncementMention>[]
   fingerprint: string
   channel: TeamsChannelRecord
   card: TeamsAdaptiveCard
@@ -53,18 +80,94 @@ const isHttpsUrl = (value: string) => {
   }
 }
 
+const normalizeMentions = (mentions: ManualTeamsAnnouncementMention[] | undefined) =>
+  (mentions || []).map(mention => ({
+    text: mention.text.trim(),
+    id: mention.id.trim(),
+    name: (mention.name || mention.text).trim()
+  }))
+
+const validateMentions = (
+  mentions: Required<ManualTeamsAnnouncementMention>[],
+  searchableText: string
+) => {
+  if (mentions.length > MAX_MENTIONS) {
+    throw new Error(`Announcement supports up to ${MAX_MENTIONS} mentions`)
+  }
+
+  const seenTexts = new Set<string>()
+
+  for (const mention of mentions) {
+    if (!mention.text) {
+      throw new Error('Mention text is required')
+    }
+
+    if (mention.text.length > MAX_MENTION_TEXT_LENGTH) {
+      throw new Error(`Mention text exceeds ${MAX_MENTION_TEXT_LENGTH} characters`)
+    }
+
+    if (!mention.id) {
+      throw new Error(`Mention '${mention.text}' is missing an Entra object ID or UPN`)
+    }
+
+    if (mention.id.length > MAX_MENTION_ID_LENGTH) {
+      throw new Error(`Mention id for '${mention.text}' exceeds ${MAX_MENTION_ID_LENGTH} characters`)
+    }
+
+    if (mention.id.startsWith('29:')) {
+      throw new Error(
+        `Mention id for '${mention.text}' must be an Entra object ID or UPN, not '29:<aadObjectId>'`
+      )
+    }
+
+    if (seenTexts.has(mention.text)) {
+      throw new Error(`Duplicate mention text '${mention.text}'`)
+    }
+
+    seenTexts.add(mention.text)
+
+    if (!searchableText.includes(mention.text)) {
+      throw new Error(`Mention text '${mention.text}' was not found in the title or body`)
+    }
+  }
+}
+
+const applyMentionsToText = (
+  text: string,
+  mentions: Required<ManualTeamsAnnouncementMention>[]
+) =>
+  mentions.reduce((current, mention) => {
+    const atTag = `<at>${mention.text}</at>`
+
+    return current.split(mention.text).join(atTag)
+  }, text)
+
+const buildMentionEntities = (
+  mentions: Required<ManualTeamsAnnouncementMention>[]
+): TeamsAdaptiveCardMentionEntity[] =>
+  mentions.map(mention => ({
+    type: 'mention',
+    text: `<at>${mention.text}</at>`,
+    mentioned: {
+      id: mention.id,
+      name: mention.name
+    }
+  }))
+
 const buildFingerprint = ({
   destinationKey,
   title,
   paragraphs,
   ctaUrl,
-  ctaLabel
+  ctaLabel,
+  mentions
 }: {
   destinationKey: string
   title: string
   paragraphs: string[]
-  ctaUrl: string
-  ctaLabel: string
+  ctaUrl: string | null
+  ctaLabel: string | null
+  mentions: Required<ManualTeamsAnnouncementMention>[]
 }) =>
   createHash('sha256')
     .update(
@@ -73,7 +176,8 @@ const buildFingerprint = ({
         title,
         paragraphs,
         ctaUrl,
-        ctaLabel
+        ctaLabel,
+        mentions
       })
     )
     .digest('hex')
@@ -103,42 +207,60 @@ const buildCard = ({
   title,
   paragraphs,
   ctaUrl,
-  ctaLabel
+  ctaLabel,
+  mentions
 }: {
   title: string
   paragraphs: string[]
-  ctaUrl: string
-  ctaLabel: string
-}): TeamsAdaptiveCard => ({
-  type: 'AdaptiveCard',
-  version: '1.5',
-  body: [
-    {
-      type: 'TextBlock',
-      text: title,
-      weight: 'Bolder',
-      size: 'Large',
-      wrap: true
-    },
-    ...paragraphs.map((paragraph, index) => {
-      const spacing: 'Medium' | 'Small' = index === 0 ? 'Medium' : 'Small'
+  ctaUrl: string | null
+  ctaLabel: string | null
+  mentions: Required<ManualTeamsAnnouncementMention>[]
+}): TeamsAdaptiveCard => {
+  const mentionEntities = buildMentionEntities(mentions)
 
-      return {
-        type: 'TextBlock' as const,
-        text: paragraph,
-        wrap: true,
-        spacing
+  const card: TeamsAdaptiveCard = {
+    $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+    type: 'AdaptiveCard',
+    version: mentions.length > 0 ? '1.0' : '1.5',
+    body: [
+      {
+        type: 'TextBlock',
+        text: applyMentionsToText(title, mentions),
+        weight: 'Bolder',
+        size: 'Large',
+        wrap: true
+      },
+      ...paragraphs.map((paragraph, index) => {
+        const spacing: 'Medium' | 'Small' = index === 0 ? 'Medium' : 'Small'
+
+        return {
+          type: 'TextBlock' as const,
+          text: applyMentionsToText(paragraph, mentions),
+          wrap: true,
+          spacing
+        }
+      })
+    ]
+  }
+
+  if (ctaUrl && ctaLabel) {
+    card.actions = [
+      {
+        type: 'Action.OpenUrl',
+        title: ctaLabel,
+        url: ctaUrl
       }
-    })
-  ],
-  actions: [
-    {
-      type: 'Action.OpenUrl',
-      title: ctaLabel,
-      url: ctaUrl
+    ]
+  }
+
+  if (mentionEntities.length > 0) {
+    card.msteams = {
+      entities: mentionEntities
     }
-  ]
-})
+  }
+
+  return card
+}
 
 export const listManualTeamsAnnouncementDestinations = () =>
   Object.values(MANUAL_TEAMS_ANNOUNCEMENT_DESTINATIONS)
@@ -154,8 +276,9 @@ export const previewManualTeamsAnnouncement = (
 
   const title = input.title.trim()
   const paragraphs = normalizeParagraphs(input.paragraphs)
-  const ctaUrl = input.ctaUrl.trim()
-  const ctaLabel = (input.ctaLabel || destination.defaultCtaLabel).trim()
+  const ctaUrl = input.ctaUrl?.trim() || null
+  const ctaLabel = ctaUrl ? (input.ctaLabel || destination.defaultCtaLabel).trim() : null
+  const mentions = normalizeMentions(input.mentions)
 
   if (!title) {
     throw new Error('Announcement title is required')
@@ -179,24 +302,31 @@ export const previewManualTeamsAnnouncement = (
     }
   }
 
-  if (!ctaLabel) {
+  if (ctaUrl && !ctaLabel) {
     throw new Error('CTA label is required')
   }
 
-  if (ctaLabel.length > MAX_CTA_LABEL_LENGTH) {
+  if (ctaLabel && ctaLabel.length > MAX_CTA_LABEL_LENGTH) {
     throw new Error(`CTA label exceeds ${MAX_CTA_LABEL_LENGTH} characters`)
   }
 
-  if (!isHttpsUrl(ctaUrl)) {
+  if (input.ctaLabel && !ctaUrl) {
+    throw new Error('CTA URL is required when CTA label is provided')
+  }
+
+  if (ctaUrl && !isHttpsUrl(ctaUrl)) {
     throw new Error('CTA URL must be a valid https URL')
   }
+
+  validateMentions(mentions, `${title}\n${paragraphs.join('\n')}`)
 
   const fingerprint = buildFingerprint({
     destinationKey: destination.key,
     title,
     paragraphs,
     ctaUrl,
-    ctaLabel
+    ctaLabel,
+    mentions
   })
 
   const channel = buildChannelRecord(destination)
@@ -205,7 +335,8 @@ export const previewManualTeamsAnnouncement = (
     title,
     paragraphs,
     ctaUrl,
-    ctaLabel
+    ctaLabel,
+    mentions
   })
 
   return {
@@ -214,6 +345,7 @@ export const previewManualTeamsAnnouncement = (
     paragraphs,
     ctaUrl,
     ctaLabel,
+    mentions,
     fingerprint,
     channel,
     card
