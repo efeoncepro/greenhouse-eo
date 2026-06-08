@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Paleta Restraint v1 APROBADA visualmente (operador 2026-06-08); pendiente GO de tokenización (Slice 0 → Fase A) — valores en §"Paleta APROBADA"`
+- Status real: `Complete (2026-06-08) — Fase A + charts Deep-bright + Fase B (sub-valores + tonal chips + atoms KpiDelta/StatusDot + catálogo) shipped. Diferidos a tasks separadas: emails (paleta propia) + reconciliación AXIS Figma upstream (operador, code-first). El success-ink #2E7D32 + lint→error los cerró TASK-1048. Charts restantes → TASK-1054 (complete).`
 - Rank: `TBD`
 - Domain: `ui | platform | design-system | accessibility`
 - Blocked by: `none`

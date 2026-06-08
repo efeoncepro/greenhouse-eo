@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseño — inventario cerrado (audit 2026-06-08), regla de mapeo definida`
+- Status real: `Complete (2026-06-08)`
 - Rank: `TBD`
 - Domain: `ui | design-system | finance | hr | delivery | agency`
 - Blocked by: `none` (depende del SoT ya shipped en TASK-1053)
@@ -165,10 +165,10 @@ Skills que gobiernan: `design-system-governance`, `dataviz-design` (colorblind/o
 
 ## Acceptance Criteria
 
-- [ ] Cero `theme.palette.{success,warning,error,info}.main` como color de serie en los 11 archivos owned (verificado por grep).
-- [ ] Toda serie sale de `GH_COLORS.chart.*` (categorical/directional). Cero hex de serie inline ni `*_COLORS` locales nuevos.
-- [ ] Regla single-series aplicada (accent / directional según significado) y registrada por chart.
-- [ ] Cashflow/directional charts llevan signo o ícono (no color-solo).
-- [ ] GVC light + dark de superficies clave (cash-position, delivery analytics, person intelligence, un payroll chart).
-- [ ] Gates: `pnpm design:lint` 0/0 · `pnpm exec tsc --noEmit` · `pnpm test` (drift) · `pnpm build`.
-- [ ] Doc closure: changelog + Handoff + (si aplica) DESIGN.md/V1. Lifecycle → complete + README/REGISTRY sync.
+- [x] Cero `theme.palette.{success,warning,error,info}.main` como color de serie en los 11 archivos owned (verificado por grep).
+- [x] Toda serie sale de `GH_COLORS.chart.*` (categorical/directional). Cero hex de serie inline ni `*_COLORS` locales nuevos.
+- [x] Regla single-series aplicada (accent / directional según significado) y registrada por chart.
+- [x] Cashflow/directional charts llevan signo o ícono (no color-solo).
+- [x] GVC light + dark de superficies clave (cash-position, delivery analytics, person intelligence, un payroll chart).
+- [x] Gates: `pnpm design:lint` 0/0 · `pnpm exec tsc --noEmit` · `pnpm test` (drift) · `pnpm build`.
+- [x] Doc closure: changelog + Handoff + (si aplica) DESIGN.md/V1. Lifecycle → complete + README/REGISTRY sync.
