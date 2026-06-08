@@ -152,7 +152,14 @@ const RemittanceAdviceViewer = ({ presentation }: { presentation: RemittancePres
                   <Typography variant='subtitle1' sx={{ fontWeight: 700 }}>
                     {row.label}
                   </Typography>
-                  <Typography variant='h6' sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#2E7D32' }}>
+                  <Typography
+                    variant='h6'
+                    sx={theme => ({
+                      fontWeight: 700,
+                      fontVariantNumeric: 'tabular-nums',
+                      color: theme.greenhouseSemantic.success.tonalText
+                    })}
+                  >
                     {money(row.amount, row.currency)}
                   </Typography>
                 </Stack>

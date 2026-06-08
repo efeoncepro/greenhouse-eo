@@ -10,6 +10,8 @@ import EfeonceSloganPdf from '@/lib/finance/pdf/efeonce-slogan-pdf'
 import { ensurePdfFontsRegistered } from '@/lib/finance/pdf/register-fonts'
 import { resolveLegalRepresentativeSignaturePath } from '@/lib/legal-signatures'
 
+import { axisSemanticSubValues } from '@/lib/design-tokens/semantic-sub-values'
+
 import type {
   ContractingDocumentLanguage,
   ContractingPdfSnapshot,
@@ -19,7 +21,8 @@ import type {
 const C = GH_WORKFORCE_CONTRACTING.document
 
 // Approved standard tokens (TASK-1023 — Efeonce institutional document system).
-const ACCENT = '#2E7D32' // single contrast-safe green accent
+// Success ink (AA on white): canonical token SoT (TASK-1048 → Fase B success.ink).
+const ACCENT = axisSemanticSubValues.success.ink // single contrast-safe green accent
 const INK = '#1A1A2E'
 const MUTED = '#6B7280'
 const FAINT = '#9AA0AC'

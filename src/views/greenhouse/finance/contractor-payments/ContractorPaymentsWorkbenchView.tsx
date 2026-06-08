@@ -515,7 +515,10 @@ const DetailPanel = ({
             <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
               {C.detail.net}
             </Typography>
-            <Typography variant='h5' sx={{ fontWeight: 700, color: '#2E7D32', fontVariantNumeric: 'tabular-nums' }}>
+            <Typography
+              variant='h5'
+              sx={theme => ({ fontWeight: 700, color: theme.greenhouseSemantic.success.tonalText, fontVariantNumeric: 'tabular-nums' })}
+            >
               {money(payable.netPayable, payable.currency)}
             </Typography>
           </Box>

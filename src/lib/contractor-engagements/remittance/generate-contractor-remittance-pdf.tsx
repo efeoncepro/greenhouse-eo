@@ -26,6 +26,8 @@ import { formatCurrency, type CurrencyCode } from '@/lib/format'
 import { ensurePdfFontsRegistered } from '@/lib/finance/pdf/register-fonts'
 import { getPdfTypography } from '@/lib/finance/pdf/pdf-typography'
 
+import { axisSemanticSubValues } from '@/lib/design-tokens/semantic-sub-values'
+
 import type { RemittancePresentation } from './types'
 
 // TASK-1043 — tipografía derivada del SoT (familia + peso). Tamaños en pt
@@ -73,7 +75,8 @@ const TEXT_PRIMARY = '#1a1a1a'
 const TEXT_MUTED = '#5c5c5c'
 const TEXT_FAINT = '#999999'
 const BORDER_LIGHT = '#e0e0e0'
-const NET_ACCENT = '#2E7D32'
+// Success ink (AA on white): canonical token SoT (TASK-1048 → Fase B success.ink).
+const NET_ACCENT = axisSemanticSubValues.success.ink
 const NEUTRAL_BG = '#f7f7f7'
 const CHIP_BG = '#eeeeee'
 

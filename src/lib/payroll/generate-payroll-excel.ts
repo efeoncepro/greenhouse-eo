@@ -2,6 +2,8 @@ import 'server-only'
 
 import ExcelJS from 'exceljs'
 
+import { axisSemanticSubValues } from '@/lib/design-tokens/semantic-sub-values'
+
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
 import { formatCurrency as formatLocaleCurrency } from '@/lib/format'
 
@@ -41,10 +43,13 @@ const formatKpiSourceLabel = (source: PayrollEntry['kpiDataSource']) => {
   return 'Notion Ops'
 }
 
+// Success ink (AA on white) en ARGB — SoT canónico (TASK-1048 → Fase B success.ink).
+const NET_ARGB = `FF${axisSemanticSubValues.success.ink.slice(1).toUpperCase()}`
+
 const applyHeaderStyle = (row: ExcelJS.Row) => {
   row.eachCell(cell => {
     cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 10 }
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E7D32' } }
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: NET_ARGB } }
     cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
     cell.border = {
       bottom: { style: 'thin', color: { argb: 'FF000000' } }
