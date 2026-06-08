@@ -1,8 +1,14 @@
 # TASK-1016 — Organization List Enterprise Prototype
 
+## Delta 2026-06-08 — Runtime adoption complete
+
+El mockup aprobado fue implementado en `/agency/organizations` productivo sin redisenar la superficie. `OrganizationListView` ahora consume `/api/organizations` y adopta el Organization Operations Workbench: summary strip, busqueda, filtros segmentados, list-detail default, rail contextual, matrix mode secundario, estados loading/empty/filtered y degradacion honesta para logos/readiness/timeline cuando el DTO no trae mas datos.
+
+Evidencia final runtime: `.captures/2026-06-08T22-27-12_organization-list-runtime-workbench` (desktop+mobile, 6 frames, `qualityFindings=[]`, dossier generado). Verificacion focal: eslint, `tsc --noEmit`, `design:lint`, `route-reachability-gate --strict` y GVC runtime verdes.
+
 ## Delta 2026-06-08 — Mockup token hardening
 
-El mockup aprobado de `/agency/organizations/mockup` mantiene su direccion visual, pero fue endurecido contra el Design System para no depender de valores hardcodeados route-locales. `OrganizationListEnterpriseMockupView` ahora usa `GreenhouseButton`, `GreenhouseChip`, variants tipograficas canonicas, `theme.shape.customBorderRadius`, `theme.greenhouseElevation.none`, tokens de palette/opacity y `motionCss`/`MOTION_DURATION_S`/`MOTION_EASE`. La captura vigente de hardening es `.captures/2026-06-08T09-04-14_organization-list-enterprise-mockup` (desktop+mobile OK, `qualityFindings=[]`).
+El mockup aprobado de `/agency/organizations/mockup` mantiene su direccion visual, pero fue endurecido contra el Design System para no depender de valores hardcodeados route-locales. `OrganizationListEnterpriseMockupView` ahora usa `GreenhouseButton`, `GreenhouseChip`, variants tipograficas canonicas, `theme.shape.customBorderRadius`, `theme.greenhouseElevation.none`, tokens de palette/opacity y `motionCss`/`MOTION_DURATION_S`/`MOTION_EASE`. La captura vigente final es `.captures/2026-06-08T22-05-24_organization-list-enterprise-mockup` (desktop+mobile OK, `qualityFindings=[]`, dossier generado).
 
 ## Delta 2026-06-07 — GVC contract gates disponibles (TASK-1018 complete)
 
@@ -16,25 +22,35 @@ El runtime de `/agency/organizations` ya puede cerrarse con el **contrato mockup
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Completada`
 - Rank: `TBD`
 - Domain: `agency|ui`
 - Blocked by: `none`
-- Branch: `task/TASK-1016-organization-list-enterprise-prototype`
+- Branch: `develop` (excepcion explicita del operador: mantente en develop)
 - Legacy ID: `optional`
 - GitHub Issue: `optional`
 
+## Runtime Adoption Reopen 2026-06-08
+
+El operador aclaro que "la idea era implementarlo". TASK-1016 queda cerrada con adopcion runtime del mockup aprobado en `/agency/organizations`; el cierre administrativo previo queda superseded por esta implementacion real.
+
+- Entregado previamente: `/agency/organizations/mockup` renderiza el Organization Operations Workbench con list-detail default, signal strip, filtros segmentados, busqueda, seleccion de fila, rail contextual, matrix mode secundario y datos mock tipados.
+- Entregado ahora: `OrganizationListView` productivo adopta el blueprint visual del mockup y consume `/api/organizations`.
+- Reutilizado: `GreenhouseButton`, `GreenhouseChip`, `AnimatedCounter`, `EmptyState`, `ViewTransitionLink`, `CustomTextField`, variants tipograficas canonicas, `theme.shape.customBorderRadius`, `theme.greenhouseElevation.none` y tokens `motionCss` / `MOTION_DURATION_S` / `MOTION_EASE`.
+- Degradacion honesta runtime: logos reales siguen fuera de scope de TASK-999 y se muestran iniciales; readiness/timeline se derivan solo de counts/onboarding/source/updatedAt disponibles; no se fabrican owners ni KPIs sin source of truth.
+- Sin cambios planeados a schema/capabilities. La API `/api/organizations` se conserva salvo que una verificacion demuestre necesidad real de enrich server-side.
+
 ## Summary
 
-Prototipar una version enterprise moderna del listado `/agency/organizations`, reemplazando la lectura tipo planilla por una superficie operacional de cuentas: list-detail, identidad visual rica, health/readiness por organizacion, filtros segmentados y rail contextual.
+Prototipar e implementar una version enterprise moderna del listado `/agency/organizations`, reemplazando la lectura tipo planilla por una superficie operacional de cuentas: list-detail, identidad visual rica, health/readiness por organizacion, filtros segmentados y rail contextual.
 
-La task no implementa el runtime productivo. Produce un mockup real dentro del portal, GVC-verificado, para que el operador apruebe direccion visual antes de tocar `OrganizationListView`.
+La task produjo primero un mockup real dentro del portal, GVC-verificado, y luego adopto ese blueprint en `OrganizationListView` productivo consumiendo `/api/organizations`.
 
 ## Why This Task Exists
 
@@ -47,7 +63,7 @@ El problema no es que use tabla; el problema es que la tabla es el producto comp
 - Proponer y prototipar un layout enterprise para `/agency/organizations`.
 - Mantener densidad operacional, pero con jerarquia visual clara y lectura dominante en el first fold.
 - Usar el stack real Greenhouse/Vuexy/MUI, copy canonica y mock data tipada.
-- Dejar un prototipo aprobado que pueda convertirse luego en runtime con copy-and-patch y GVC diff.
+- Dejar el prototipo aprobado y su adopcion runtime verificada con GVC desktop/mobile.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -76,7 +92,7 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - Construir el prototipo como ruta real del portal bajo `/mockup/`, no HTML externo.
-- No tocar el runtime productivo de `/agency/organizations` en esta task.
+- Runtime adoption aprobada por aclaracion del operador el 2026-06-08: `/agency/organizations` productivo debe seguir el mockup aprobado sin redisenarlo.
 - No inventar datos operativos como si fueran reales; usar mock data rotulada y typed fixtures.
 - No crear un sistema visual paralelo: respetar `DESIGN.md`, Vuexy/MUI wrappers y primitives Greenhouse.
 - La propuesta debe preservar accesibilidad, keyboard focus, estados empty/loading/partial/degraded y reduced motion.
@@ -158,7 +174,9 @@ Direccion recomendada:
 - `src/views/greenhouse/organizations/mockup/organization-list-enterprise-mock-data.ts`
 - `scripts/frontend/scenarios/organization-list-enterprise-mockup.scenario.ts`
 - `src/lib/copy/agency.ts` `[solo si el prototipo promueve copy reutilizable]`
-- `docs/tasks/to-do/TASK-1016-organization-list-enterprise-prototype.md`
+- `src/views/greenhouse/organizations/OrganizationListView.tsx`
+- `scripts/frontend/scenarios/organization-list-runtime-workbench.scenario.ts`
+- `docs/tasks/complete/TASK-1016-organization-list-enterprise-prototype.md`
 
 ## Current Repo State
 
@@ -288,7 +306,6 @@ Artefactos aprobados:
 
 ## Out of Scope
 
-- Implementar el rediseño en `/agency/organizations` productivo.
 - Cambiar `/api/organizations` productivo, schema, capabilities o permisos.
 - Resolver logos reales de organizaciones; eso vive en `TASK-999`.
 - Agregar endpoints, migrations o flags.
@@ -370,7 +387,7 @@ type OrganizationEnterpriseMock = {
 
 ### Feature flags / cutover
 
-Sin flags. Es una ruta mockup aditiva sin impacto productivo.
+Sin flags. La adopcion runtime no cambia schema, capabilities ni endpoints; es un cambio de presentacion sobre `/api/organizations`.
 
 ### Rollback plan per slice
 
@@ -383,7 +400,7 @@ Sin flags. Es una ruta mockup aditiva sin impacto productivo.
 
 ### Production verification sequence
 
-N/A — prototipo local/staging mockup only, sin rollout productivo.
+Runtime local verificado con usuario agente y GVC. No se hizo redeploy ni rollout remoto en esta task.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -394,13 +411,14 @@ N/A — prototipo local/staging mockup only, sin rollout productivo.
 
 ## Acceptance Criteria
 
-- [ ] Existe `/agency/organizations/mockup` como ruta real del portal con mock data tipada.
-- [ ] El prototipo usa list-detail como experiencia default y conserva matrix/table como modo secundario.
-- [ ] Search, filtros segmentados, seleccion y cambio de modo funcionan sobre mock data.
-- [ ] Estados loading, empty, filtered empty y partial/degraded estan representados.
-- [ ] Desktop y mobile quedan verificados con GVC y frames revisados.
-- [ ] El handoff explica como adoptar el diseño en `OrganizationListView` sin reinterpretarlo.
-- [ ] No se tocan APIs, schema, flags ni runtime productivo del listado.
+- [x] Existe `/agency/organizations/mockup` como ruta real del portal con mock data tipada.
+- [x] El prototipo usa list-detail como experiencia default y conserva matrix/table como modo secundario.
+- [x] Search, filtros segmentados, seleccion y cambio de modo funcionan sobre mock data.
+- [x] Estados loading, empty, filtered empty y partial/degraded estan representados.
+- [x] Desktop y mobile quedan verificados con GVC y frames revisados.
+- [x] El handoff explica como adoptar el diseño en `OrganizationListView` sin reinterpretarlo.
+- [x] `/agency/organizations` productivo adopta el Organization Operations Workbench consumiendo `/api/organizations`.
+- [x] No se tocan APIs, schema, flags ni capabilities.
 
 ## Verification
 
@@ -411,18 +429,19 @@ N/A — prototipo local/staging mockup only, sin rollout productivo.
 - `pnpm route-reachability-gate --strict`
 - `pnpm fe:capture organization-list-enterprise-mockup --env=local`
 - `pnpm fe:capture:review organization-list-enterprise-mockup`
+- `pnpm fe:capture organization-list-runtime-workbench --env=local`
+- `pnpm fe:capture:review .captures/2026-06-08T22-27-12_organization-list-runtime-workbench`
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado con decision visual, GVC path y limites del prototipo
-- [ ] `changelog.md` quedo actualizado solo si la task termina cambiando una convencion visible o reusable
-- [ ] se ejecuto `greenhouse-documentation-governor` si el prototipo promueve un patron reusable o modifica docs/UI platform
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado con decision visual, GVC path y limites del prototipo
+- [x] `changelog.md` quedo actualizado solo si la task termina cambiando una convencion visible o reusable
+- [x] se ejecuto `greenhouse-documentation-governor` si el prototipo promueve un patron reusable o modifica docs/UI platform
 
 ## Follow-ups
 
-- Runtime implementation task para convertir el mockup aprobado en `/agency/organizations`.
 - Evaluar si el rail contextual debe reutilizar parte de `OrganizationWorkspaceShell` o permanecer como preview local.
 - Integrar logos reales cuando `TASK-999` cierre o exponga `logoUrl` canonico.

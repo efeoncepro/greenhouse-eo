@@ -220,7 +220,7 @@ const OrganizationListEnterpriseMockupView = () => {
                   id='organization-list-enterprise-search'
                   value={query}
                   onChange={event => setQuery(event.target.value)}
-                  placeholder='Buscar cuenta, ID o industria'
+                  placeholder='Buscar cuenta'
                   aria-label={organizationListMockupAria.search}
                   size='small'
                   InputProps={{
@@ -710,6 +710,15 @@ function RowFact({ label, tone, icon }: { label: string; tone: SemanticTone; ico
       size='small'
       tone={toGreenhouseChipTone(tone)}
       variant='outlined'
+      sx={{
+        flex: { xs: '1 1 calc(50% - 5px)', sm: '0 0 auto' },
+        minWidth: 0,
+        '& .MuiChip-label': {
+          minWidth: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }
+      }}
     />
   )
 }
