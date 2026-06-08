@@ -37,17 +37,18 @@ export const axisRamp = {
     800: '#003b70',
     900: '#002a50'
   },
-  // Brand · Efeonce Secondary (lime → green)
+  // Brand · Efeonce Secondary — TASK-1053 A1b Restraint v1: verde coherente (corrige el
+  // hue-shift a teal en 600-900). pop #6ec207 (500) · ink #4b8405 (700, AA blanco 4.56:1).
   secondary: {
-    100: '#c6ff7e',
-    200: '#b7ff5d',
-    300: '#9ffa2e',
-    400: '#7fdb0d',
+    100: '#eef8e1',
+    200: '#d9efbf',
+    300: '#bfe492',
+    400: '#9ad451',
     500: '#6ec207',
-    600: '#1d9d72',
-    700: '#138760',
-    800: '#0c7250',
-    900: '#03593d'
+    600: '#5ca306',
+    700: '#4b8405',
+    800: '#396504',
+    900: '#284603'
   },
   // Feedback · Info — TASK-1053 Restraint v1: azure (cyan → azul; AA texto-sobre-blanco desde 500, 4.9:1)
   info: {

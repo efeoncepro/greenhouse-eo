@@ -60,9 +60,9 @@ const legacySecondary = {
  * secondary-800 (hover/active). contrastText white (deep green carries white AA).
  */
 const axisSecondary = {
-  main: axisRamp.secondary[700], // #138760 — deep green, white 4.9:1 AA
-  light: axisRamp.secondary[500], // #6ec207 — lime accent / tint base
-  dark: axisRamp.secondary[800], // #0c7250 — deeper green hover/active
+  main: axisRamp.secondary[700], // TASK-1053 A1b: #4b8405 — crisp green ink, white 4.56:1 AA (era teal #138760)
+  light: axisRamp.secondary[500], // #6ec207 — lime accent / tint base (sin cambio)
+  dark: axisRamp.secondary[800], // TASK-1053 A1b: #396504 — deeper green hover/active (era #0c7250)
   contrastText: '#FFFFFF'
 } as const satisfies SecondaryRole
 

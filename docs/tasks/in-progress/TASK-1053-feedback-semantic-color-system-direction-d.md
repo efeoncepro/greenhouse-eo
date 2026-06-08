@@ -95,6 +95,15 @@ El operador aprobó la propuesta **Restraint v1** completa (charts vibrantes + d
 
 Si vas a decir "esto no se hace en TASK-1053", verificá que sea exactamente uno de esos 3. Cualquier otra cosa de Restraint v1 **se hace**.
 
+## Delta de ejecución 2026-06-08 (A1a + A1b shipped en `develop` local)
+
+- **Slice 0 (foundation) ✅** — ADR `GREENHOUSE_SEMANTIC_COLOR_SYSTEM_DECISION_V1` (Accepted) + DECISIONS_INDEX + este callout. Commit `1415f8cb3`.
+- **Fase A1a (semánticos) ✅** — commit `c62a70aea`. Re-value info `#1F6FD4` / success `#157F47` / error `#DC2E39` (texto blanco) + warning `#FFB703` (ink) en `axis-tokens` + `axis-semantic`. Guard nuevo: `contrast.ts` (helper WCAG) + `axis-semantic-contrast.test.ts`. Paridad: DESIGN.md §Color (front-matter + prosa + status-chip success/info → blanco) + V1 §8. Gates: design:lint 0/0 · tsc · theme tests · build ✓ · GVC light+dark ✓.
+- **Fase A1b (brand spine — secondary) ✅** — `axisRamp.secondary` re-valuado a verde coherente (corrige hue-shift a teal en 600-900): pop `#6EC207` (500) · ink `#4B8405` (700, AA blanco 4.56:1) · dark `#396504` (800). Contrast guard extendido a `secondary.main`. Paridad DESIGN.md + V1. GVC ✓ (ramp = una sola familia verde).
+- **Orange — DIFERIDO (no en A1b):** `#FF6500` es **sub-brand (Reach), fuera del UI diario**. NO tiene consumidor AXIS ni vive en `efeonce-brand.ts` hoy; el `#ff6500` de `colorSchemes.ts` es el **warning legacy Vuexy** (overrideado a amber por mergedTheme), no el sub-brand. Agregar `axisRamp.orange` ahora = token sin consumidor (anti-patrón design-governance + `design:lint` rechaza tokens no referenciados). Se formaliza **cuando exista una superficie Reach real que lo consuma**, y vivirá en el SSOT de marca (`efeonce-brand.ts`), no en `axisRamp`.
+- **Green-canon olivo `#3E7A12` — NO se agrega:** Restraint v1 eliminó el olivo (decisión G refinada a 2 verdes). El cuerpo histórico "dirección D" más abajo lo mantiene como referencia del "antes"; NO es scope.
+- **Pendiente:** Fase B (sub-valores ink/tint/border/dark-fg + tonal-by-default + KPI inline) + paleta de charts vibrante + dark-fg derivation. Todo scope aprobado.
+
 ## Why This Task Exists
 
 El sistema de feedback actual (AXIS semantic runtime: `success #28c76f`, `warning #ffb703`, `error #ff4c51`, `info #00bad1`) es vívido pero **no resuelve texto-sobre-blanco AA** (gap documentado en `axis-semantic.ts`: "the error ramp needs an additional dark step"; mismo gap para success → `#2E7D32` hardcodeado en ~8 sitios, TASK-1048). Una primera propuesta (iterada con el operador) intentó arreglarlo con la regla **"banda dual [4.5–7] → un solo token sirve de texto y de fill"**, pero forzar un único 500 a cumplir ambas bandas **oscurece y dessatura** los hues → quedaron "lodo" (info teal polvoriento, success verde bosque, error ladrillo). El operador lo detectó: *"no los veo como una UI moderna nivel enterprise"* y *"el problema es más de la propuesta misma de colores"*.

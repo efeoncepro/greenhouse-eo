@@ -13,6 +13,7 @@
  */
 import { describe, expect, it } from 'vitest'
 
+import { resolveSecondaryPalette } from './axis-secondary'
 import { axisSemanticPalette } from './axis-semantic'
 import { AA_NORMAL_TEXT, contrastRatio } from './contrast'
 
@@ -34,6 +35,21 @@ describe('AXIS semantic contrast gate (WCAG 2.2 AA — TASK-1053 A1a)', () => {
 
     expect(contrastText.toLowerCase()).not.toBe('#ffffff')
     expect(contrastRatio(main, '#ffffff')).toBeLessThan(AA_NORMAL_TEXT)
+  })
+})
+
+describe('AXIS secondary brand contrast gate (TASK-1053 A1b)', () => {
+  // secondary.main drives tonal/outlined TEXT (~241 usages, 0 contained) → it is the
+  // text/border color and must clear AA on white. The crisp green main (#4b8405) is
+  // barely AA (4.56:1); this guard breaks CI if a future ramp tweak drops it below.
+  it('secondary.main is AA (>=4.5:1) with its contrastText (white)', () => {
+    const { main, contrastText } = resolveSecondaryPalette()
+    const ratio = contrastRatio(main, contrastText)
+
+    expect(
+      ratio,
+      `secondary: contrast(main ${main}, contrastText ${contrastText}) = ${ratio.toFixed(2)}:1 < ${AA_NORMAL_TEXT}`
+    ).toBeGreaterThanOrEqual(AA_NORMAL_TEXT)
   })
 })
 
