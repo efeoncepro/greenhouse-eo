@@ -377,6 +377,21 @@ inline:
   the canvas — those charts MUST consume `getChartTypographyFromTheme(theme)`
   (`src/components/theme/chart-typography.ts`) in `option.textStyle`/`axisLabel`.
 
+### Chart colors derive from the SoT (TASK-1053)
+
+Multi-series charts consume the **canonical categorical palette** — `GH_COLORS.chart.categorical`
+(light) / `.categoricalDark` (dark), which derives from the AXIS SoT `src/@core/theme/axis-chart.ts`.
+Series order is brand-anchored: `azul #0375DB · lima #6EC207 · naranja #FF6500 (Reach sub-brand) ·
+violeta #7C3AED · cian #06B6D4 · magenta #EC4899`. Single-series → the accent (`primary`); **never the navy**.
+
+- **Color is NEVER the only encoding** (WCAG 1.4.1): charts MUST carry a legend / labels. `lime` and
+  `orange` are marginal under deuteranopia (Coblis ΔE 10.1) and adjacent in series order — distinguishing
+  them by color alone fails.
+- **Cashflow** uses `GH_COLORS.chart.cashflow.{positive #3DBA5D, negative #FF4D49}` and MUST always pair
+  with a **+/- sign or ▲/▼ icon** — the red/green pair is deuteranopia-unsafe (ΔE 8.8), color-only forbidden.
+- **NEVER** hardcode chart series hexes inline. Local `*_COLORS` arrays in chart components are a smell —
+  use `GH_COLORS.chart.categorical`. Domain palettes (`cscPhase`, `service`) keep their deliberate brand hues.
+
 ### PDF + email = one semantic SSOT + adapter per medium
 
 The semantic roles (display / page-title / section-title / body / caption / …) are

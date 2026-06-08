@@ -417,6 +417,16 @@ Three layers compose the effective palette (see `GREENHOUSE_THEME_TOKEN_CONTRACT
 
 Each color ships with opacities: `lighterOpacity` (8%), `lightOpacity` (16%), `mainOpacity` (24%), `darkOpacity` (32%), `darkerOpacity` (38%).
 
+### 8.1.ter Chart categorical palette (TASK-1053)
+
+Las series de charts multi-serie consumen la **paleta categórica canónica** desde el SoT `src/@core/theme/axis-chart.ts`, expuesta como `GH_COLORS.chart.categorical` (light) / `.categoricalDark` (dark) + `GH_COLORS.chart.cashflow.{positive,negative}`. Orden anclado a marca: `azul #0375DB · lima #6EC207 · naranja #FF6500 (Reach sub-brand) · violeta #7C3AED · cian #06B6D4 · magenta #EC4899`. Series 1-2 derivan de `axisRamp` (primary/secondary[500]); 3-6 curadas. Dark levantada: `#3B8EE8 #7FD42A #FF8A3D #9B6BF0 #22C9E4 #F25BAC`. Cashflow `#3DBA5D`/`#FF4D49`.
+
+**Reglas duras CVD (Coblis pre-check, Machado 2009 + CIE76 ΔE):**
+
+- **Color nunca solo** (WCAG 1.4.1): legend/labels obligatorios. `lime` vs `orange` marginal en deuteranopía (ΔE 10.1) y adyacentes en el orden → no distinguir solo por color.
+- **Cashflow** (verde/rojo) deuteranopía-inseguro (ΔE 8.8) → siempre signo `+/-` o ícono `▲/▼`, jamás solo color.
+- **NUNCA** hexes de serie inline ni arrays `*_COLORS` locales en componentes de chart → usar `GH_COLORS.chart.categorical`. Paletas de dominio (`cscPhase`, `service`) conservan sus hues de marca deliberados. Drift-guard: `axis-semantic-drift.test.ts` (bloque chart categorical).
+
 ### 8.1.bis customColors namespace (Greenhouse semantic layer)
 
 `mergedTheme.ts` extends `palette` with a `customColors` namespace (14 tokens) that names brand moments not covered by MUI semantic colors. These are **canonical for Greenhouse** but not part of MUI standard palette.

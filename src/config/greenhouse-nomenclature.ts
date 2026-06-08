@@ -2,8 +2,9 @@
 // hue/text/tint from here — NEVER hardcode the legacy #6ec207/#ff6500/#bb1954.
 // Domain/categorical palettes (cscPhase, service, categories) keep deliberate
 // brand hues and are intentionally NOT migrated.
+import { axisChartCashflow, axisChartCategorical, axisChartCategoricalDark } from '@core/theme/axis-chart'
 import { axisSemanticHex } from '@core/theme/axis-semantic'
-import { axisOpacity } from '@core/theme/axis-tokens'
+import { axisMain, axisOpacity } from '@core/theme/axis-tokens'
 
 export const GH_CLIENT_NAV = {
   dashboard: { label: 'Pulse', subtitle: 'Vista general de tu operacion' },
@@ -251,14 +252,20 @@ export const GH_COLORS = {
   },
 
   chart: {
-    primary: '#0375db',
-    secondary: '#024c8f',
-    // Semantic series — AXIS SoT (TASK-1034 Slice 4).
+    // Brand/semantic named series — derive del AXIS SoT (TASK-1034 + TASK-1053).
+    primary: axisMain.primary, // #0375db (era literal hardcodeado)
+    secondary: axisMain.secondary, // verde de marca (era el stale #024c8f de dirección D, sin consumers)
     success: axisSemanticHex.success,
     warning: axisSemanticHex.warning,
     error: axisSemanticHex.error,
-    info: '#023c70',
-    neutral: '#dbdbdb'
+    info: axisMain.info, // azure (era navy #023c70 literal, sin consumers)
+    neutral: '#dbdbdb',
+    // Categorical multi-series palette (TASK-1053) — vibrante anclada a marca, deriva de axis-chart.
+    // ⚠️ color NUNCA solo: usar siempre legend/labels (lime/orange marginales en deuteranopía).
+    categorical: [...axisChartCategorical],
+    categoricalDark: [...axisChartCategoricalDark],
+    // Cashflow direccional — NUNCA solo color: signo +/- o ícono ▲/▼ obligatorio.
+    cashflow: { ...axisChartCashflow }
   },
 
   cscPhase: {

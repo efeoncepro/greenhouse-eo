@@ -15,6 +15,9 @@ import { describe, expect, it } from 'vitest'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { PdfColors } from '@/lib/finance/pdf/tokens'
 
+import { axisChartCashflow, axisChartCategorical, axisChartCategoricalDark } from './axis-chart'
+import { axisMain, axisRamp } from './axis-tokens'
+
 import { axisSemanticHex, axisSemanticPalette } from './axis-semantic'
 
 const LEGACY_HEXES = ['#6ec207', '#ff6500', '#bb1954']
@@ -81,5 +84,29 @@ describe('PDF semantic tokens derive from the SoT', () => {
   it('PdfColors success/warning === AXIS', () => {
     expect(PdfColors.success).toBe(axisSemanticHex.success)
     expect(PdfColors.warning).toBe(axisSemanticHex.warning)
+  })
+})
+
+describe('chart categorical palette derives from axis-chart SoT (TASK-1053)', () => {
+  it('GH_COLORS.chart.categorical === axisChartCategorical (light) + Dark + cashflow', () => {
+    expect(GH_COLORS.chart.categorical).toEqual([...axisChartCategorical])
+    expect(GH_COLORS.chart.categoricalDark).toEqual([...axisChartCategoricalDark])
+    expect(GH_COLORS.chart.cashflow).toEqual({ ...axisChartCashflow })
+  })
+
+  it('named brand series derive from the AXIS SoT (no stale dirección-D literals)', () => {
+    expect(GH_COLORS.chart.primary).toBe(axisMain.primary)
+    expect(GH_COLORS.chart.secondary).toBe(axisMain.secondary)
+    expect(GH_COLORS.chart.info).toBe(axisMain.info)
+    // el stale #024c8f (dirección D) y el navy literal #023c70 ya no deben sobrevivir
+    const named = [GH_COLORS.chart.primary, GH_COLORS.chart.secondary, GH_COLORS.chart.info].map(v => v.toLowerCase())
+
+    expect(named).not.toContain('#024c8f')
+    expect(named).not.toContain('#023c70')
+  })
+
+  it('categorical palette is brand-anchored: series 1-2 derive from the brand ramp', () => {
+    expect(axisChartCategorical[0]).toBe(axisMain.primary) // azul de marca
+    expect(axisChartCategorical[1]).toBe(axisRamp.secondary[500]) // lima de marca
   })
 })

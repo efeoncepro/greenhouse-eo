@@ -46,7 +46,9 @@ const CSC_COLORS: Record<CscPhase, string> = {
   entrega: 'var(--mui-palette-success-main)'
 }
 
-const TREND_LINE_COLORS = ['#023c70', '#024c8f', '#633f93', '#0375db', '#ff6500']
+// Paleta categórica canónica (TASK-1053) — vibrante anclada a marca, deriva de axis-chart.
+// El chart lleva legend → color nunca solo (lime/orange marginales en deuteranopía).
+const TREND_LINE_COLORS = GH_COLORS.chart.categorical
 
 const MONTH_SHORT = GREENHOUSE_COPY.months.short
 
