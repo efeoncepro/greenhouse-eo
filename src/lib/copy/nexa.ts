@@ -23,6 +23,7 @@ export const GH_NEXA = {
   insights_root_cause_expand: 'Ver causa raíz',
   insights_root_cause_collapse: 'Ocultar causa raíz',
   insights_last_analysis: (label: string) => `Último análisis: ${label}`,
+  insights_total_analyzed: (count: number) => `${count} ${count === 1 ? 'señal analizada' : 'señales analizadas'}`,
 
   // View mode toggle (Recientes vs Historial)
   insights_view_mode_aria: 'Modo de visualización',
@@ -31,8 +32,7 @@ export const GH_NEXA = {
   insights_timeline_title: 'Historial de señales',
   insights_timeline_subtitle: (n: number) => `${n} ${n === 1 ? 'señal registrada' : 'señales registradas'}`,
   insights_timeline_empty_title: 'Aún no hay señales analizadas',
-  insights_timeline_empty_description:
-    'Cuando Nexa procese nuevas señales, aparecerán aquí ordenadas por fecha.',
+  insights_timeline_empty_description: 'Cuando Nexa procese nuevas señales, aparecerán aquí ordenadas por fecha.',
   insights_timeline_day_today: 'Hoy',
   insights_timeline_day_yesterday: 'Ayer',
   insights_timeline_time_at: (label: string) => `a las ${label}`,
@@ -75,7 +75,8 @@ export const GH_NEXA = {
 
   // Empty state
   empty_title: 'Aún no hay señales analizadas',
-  empty_description: 'Nexa analiza automáticamente las señales del ICO Engine después de cada sincronización. Las señales aparecerán aquí cuando estén listas.',
+  empty_description:
+    'Nexa analiza automáticamente las señales del ICO Engine después de cada sincronización. Las señales aparecerán aquí cuando estén listas.',
 
   // ─── TASK-945 — Signal lifecycle (sparkline + resolved badge) ────────────
   severity_label: {
@@ -93,13 +94,11 @@ export const GH_NEXA = {
   lifecycle_sparkline_series_label: 'Severidad',
   lifecycle_sparkline_aria_label: (count: number, lastSeverity: string) =>
     `Evolución de severidad: ${count} ${count === 1 ? 'observación' : 'observaciones'}. Última: ${lastSeverity}.`,
-  lifecycle_observations_count: (n: number) =>
-    `${n} ${n === 1 ? 'observación' : 'observaciones'} este período`,
+  lifecycle_observations_count: (n: number) => `${n} ${n === 1 ? 'observación' : 'observaciones'} este período`,
 
   // ─── TASK-946 — Honest degradation states (4 canonical UI states) ────────
   state_empty_pending_title: 'Aún sin observaciones para este período',
-  state_empty_pending_description:
-    'El análisis diario corre en la madrugada. Vuelve en unas horas.',
+  state_empty_pending_description: 'El análisis diario corre en la madrugada. Vuelve en unas horas.',
   state_empty_positive_title: 'Sin anomalías detectadas',
   state_empty_positive_description:
     'Nexa analizó las señales del período y no encontró desviaciones. Salud operativa OK.',
@@ -143,8 +142,7 @@ export const GH_NEXA = {
 
   // Banner: superseded (TASK-946 state mapping)
   detail_banner_superseded_title: 'Estás viendo una versión histórica de esta observación',
-  detail_banner_superseded_body:
-    'Nexa ya analizó esta señal de nuevo. La narrativa actual puede haber cambiado.',
+  detail_banner_superseded_body: 'Nexa ya analizó esta señal de nuevo. La narrativa actual puede haber cambiado.',
   detail_banner_superseded_cta: 'Ver versión actual',
 
   // Banner: degraded (honest)
@@ -207,8 +205,7 @@ export const GH_NEXA = {
 
   // Empty-positive (señal de SALUD operativa, no de error — TASK-946 framework)
   list_empty_positive_title: 'Sin anomalías este período',
-  list_empty_positive_body:
-    'Nexa analizó las señales del mes y no encontró desviaciones. Salud operativa OK.',
+  list_empty_positive_body: 'Nexa analizó las señales del mes y no encontró desviaciones. Salud operativa OK.',
   list_empty_positive_cta: 'Volver a Home',
 
   // Card item
@@ -224,5 +221,11 @@ export const GH_NEXA = {
   list_degraded_cta: 'Ver estado del pipeline',
 
   // Home V2 bento footer CTA (TASK-950 Slice 4) → list page canonical
+  home_bento_empty_subheader: 'Aún sin señales analizadas',
+  home_bento_empty_body: 'Nexa procesa señales nuevas cada hora. Vuelve más tarde para ver observaciones accionables.',
+  home_bento_menu_view_all: 'Ver todos los insights',
+  home_bento_menu_configure: 'Configurar análisis',
+  home_bento_last_analysis: (count: number, label: string) =>
+    `${count} ${count === 1 ? 'señal analizada' : 'señales analizadas'} · último análisis: ${label}`,
   home_bento_view_all_cta: 'Ver todos los insights del mes'
 } as const

@@ -6,6 +6,7 @@ description: Review and improve Greenhouse UI work through UX writing, accessibi
 # Greenhouse UX Content Accessibility
 
 Use this skill when the problem is not "which card from Vuexy should I use" but:
+
 - why the interface feels flat
 - why the copy feels generic
 - why the flow is hard to scan
@@ -13,11 +14,13 @@ Use this skill when the problem is not "which card from Vuexy should I use" but:
 - why the screen is not accessible enough
 
 This skill complements:
+
 - `greenhouse-ui-orchestrator`
 - `greenhouse-vuexy-ui-expert`
 - `greenhouse-portal-ui-implementer`
 
 It should be used for:
+
 - UX writing
 - content hierarchy
 - empty, loading, warning, partial, error, and success states
@@ -28,6 +31,7 @@ It should be used for:
 ## First reads
 
 Read only what the task needs, in this order:
+
 - `<repo>/AGENTS.md`
 - `<repo>/project_context.md`
 - `<repo>/Handoff.md`
@@ -41,6 +45,7 @@ Use `GREENHOUSE_UI_ORCHESTRATION_V1.md` only if pattern selection is still unres
 ## What this skill optimizes
 
 ### UX writing
+
 - task-based titles
 - precise CTA labels
 - honest helper text
@@ -48,6 +53,7 @@ Use `GREENHOUSE_UI_ORCHESTRATION_V1.md` only if pattern selection is still unres
 - error messages that explain cause and recovery
 
 ### Accessibility
+
 - headings and information structure
 - explicit labels and instructions
 - color-independent state communication
@@ -55,6 +61,7 @@ Use `GREENHOUSE_UI_ORCHESTRATION_V1.md` only if pattern selection is still unres
 - chart and table readability
 
 ### Interaction quality
+
 - first-fold clarity
 - stronger hierarchy
 - better progressive disclosure
@@ -111,17 +118,20 @@ Use `GREENHOUSE_UI_ORCHESTRATION_V1.md` only if pattern selection is still unres
 - Dense admin tables still need understandable column names and row actions.
 - Charts need textual framing when the visual alone is not enough.
 - Hover-only affordances are not sufficient.
+- When copy creates or changes visible states (`empty`, `error`, `degraded`, `success`, `loading`), ensure the wrapper can receive a semantic `data-capture` marker so GVC scenarios do not depend on translated text.
 
 ## Output contract
 
 For review tasks, return findings first, ordered by severity, with file references when possible.
 
 For rewrite tasks, return:
+
 - improved copy
 - reason for the change
 - accessibility or usability issue addressed
 
 For implementation tasks, also:
+
 - update the UI code
 - keep copy consistent with Greenhouse naming
 - leave validation notes

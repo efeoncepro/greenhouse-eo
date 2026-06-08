@@ -63,22 +63,28 @@ Score 1-5:
 # Enterprise UI Review — [surface]
 
 ## Verdict
+
 PASS | CONDITIONAL PASS | BLOCK
 
 ## Scores
+
 | Dimension | Score | Notes |
-| --- | ---: | --- |
+| --------- | ----: | ----- |
 
 ## Blockers
+
 1. ...
 
 ## Enterprise Bar
+
 1. ...
 
 ## Polish
+
 1. ...
 
 ## Required Next Iteration
+
 ...
 ```
 
@@ -92,6 +98,15 @@ Al implementar cualquier diseño (especialmente desde Figma), **Figma es intenci
 **Si hay que crear una primitive nueva (dropdown/list/input/etc.):** protocolo Primitive+Variants+Kinds COMPLETO — vive en `primitives/` + export en barrel + resolver `kind→variant`; a11y/responsive/reduced-motion horneados; **cero hardcode** (solo tokens); **Lab interno** `/admin/design-system/<nombre>` (gate `administracion.design_system`, alcanzable por nav + route-reachability); **GVC** desktop+mobile mirada; nodo AXIS Figma referenciado; contrato en `ui-platform/PRIMITIVES.md` (+ ADR si platform-level). Patrón fuente: `GreenhouseButton`/`GreenhouseChip`/`GreenhouseActivityTimeline`/chart cards.
 
 **Reportar la decisión** (reuse / extend / new-primitive + por qué) ANTES de codear. Un one-off no-reusable puede vivir junto al consumer pero **igual tokenizado** (no va al registry).
+
+## GVC data-capture markers (TASK-1056)
+
+When reviewing visible UI, flag missing or unstable GVC markers if the section, state, panel, design-system specimen, or repeatable flow step will need capture evidence:
+
+- prefer stable `[data-capture="..."]` selectors in scenarios over text, positional, or nth-child selectors;
+- names must be semantic kebab-case (`home-nexa-insights-bento`, `notion-picker-degraded`), never PII, translated copy, or position labels;
+- do not require markers on every small button/div unless GVC must interact with or clip that control.
+
 ## GVC V1.5 — contract gates mockup→runtime (TASK-1018)
 
 GVC (`pnpm fe:capture`) ya no es solo evidencia: es **contrato verificable** del paso mockup aprobado → runtime. Todos los gates son **opt-in por scenario + warning-first** (`error` solo si el scenario lo declara). Codes SSOT: `scripts/frontend/lib/failure-taxonomy.ts`.

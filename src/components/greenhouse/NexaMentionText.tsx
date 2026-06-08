@@ -2,10 +2,10 @@
 
 import { type ReactNode, Fragment, useMemo } from 'react'
 
-import Chip from '@mui/material/Chip'
 import Typography, { type TypographyProps } from '@mui/material/Typography'
 
 import Link from '@components/Link'
+import { GreenhouseChip } from '@/components/greenhouse/primitives'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -66,31 +66,20 @@ const parseMentions = (text: string): ReactNode[] => {
     const href = config.href(mention.id)
 
     parts.push(
-      <Chip
+      <GreenhouseChip
         key={`mention-${match.index}`}
         size='small'
         variant='outlined'
-        icon={<i className={config.icon} style={{ fontSize: 14 }} aria-hidden='true' />}
+        kind='identity'
+        tone='default'
+        iconClassName={config.icon}
         label={mention.name}
-        {...(href
-          ? { component: Link, href, clickable: true }
-          : {}
-        )}
+        {...(href ? { component: Link, href, clickable: true } : {})}
         sx={{
-          height: 22,
-          fontSize: '0.75rem',
-          fontWeight: 500,
-          mx: 0.25,
+          mx: 0.5,
           verticalAlign: 'text-bottom',
-          '& .MuiChip-label': { px: 0.75 },
-          '& .MuiChip-icon': { ml: 0.5, mr: -0.25 },
           ...(href && {
-            cursor: 'pointer',
-            '&:hover': {
-              borderColor: 'primary.main',
-              color: 'primary.main',
-              '& .MuiChip-icon': { color: 'primary.main' }
-            }
+            cursor: 'pointer'
           })
         }}
       />

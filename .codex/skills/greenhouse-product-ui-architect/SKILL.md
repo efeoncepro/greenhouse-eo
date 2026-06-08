@@ -84,6 +84,16 @@ Al implementar cualquier diseño (especialmente desde Figma), **Figma es intenci
 **Si hay que crear una primitive nueva (dropdown/list/input/etc.):** protocolo Primitive+Variants+Kinds COMPLETO — vive en `primitives/` + export en barrel + resolver `kind→variant`; a11y/responsive/reduced-motion horneados; **cero hardcode** (solo tokens); **Lab interno** `/admin/design-system/<nombre>` (gate `administracion.design_system`, alcanzable por nav + route-reachability); **GVC** desktop+mobile mirada; nodo AXIS Figma referenciado; contrato en `ui-platform/PRIMITIVES.md` (+ ADR si platform-level). Patrón fuente: `GreenhouseButton`/`GreenhouseChip`/`GreenhouseActivityTimeline`/chart cards.
 
 **Reportar la decisión** (reuse / extend / new-primitive + por qué) ANTES de codear. Un one-off no-reusable puede vivir junto al consumer pero **igual tokenizado** (no va al registry).
+
+## GVC data-capture markers (TASK-1056)
+
+When building or materially changing visible UI, add stable `data-capture` markers to wrappers that GVC may need to scroll to, clip, assert, or interact with later:
+
+- mark section/page blocks, panels, repeated review cards, design-system specimens, important states (`loading`, `empty`, `degraded`, `error`, `success`) and repeatable flow steps;
+- use kebab-case semantic names (`home-nexa-insights-bento`, `notion-picker-degraded`), never copy-dependent text, positions like `card-2`, or PII;
+- do not marker-spam every small button/div; controls only need markers when a scenario interacts with or clips them;
+- scenarios should prefer `[data-capture="..."]` for `readiness.selector`, `scroll.selector`, `clipSelector`, `requiredRegions`, and interaction targets before text/nth-child selectors.
+
 ## GVC V1.5 — contract gates mockup→runtime (TASK-1018)
 
 GVC (`pnpm fe:capture`) ya no es solo evidencia: es **contrato verificable** del paso mockup aprobado → runtime. Todos los gates son **opt-in por scenario + warning-first** (`error` solo si el scenario lo declara). Codes SSOT: `scripts/frontend/lib/failure-taxonomy.ts`.

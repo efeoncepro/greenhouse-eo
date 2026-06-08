@@ -1,3 +1,27 @@
+# Sesion 2026-06-08 — TASK-1056 creada + skills Codex GVC markers
+
+Se formalizo como task la regla operativa de usar `data-capture` estable para que GVC capture secciones/states/flows sin depender de texto, offsets o selectores posicionales.
+
+- **Task:** `docs/tasks/to-do/TASK-1056-gvc-data-capture-marker-skill-contract.md`.
+- **Indices:** `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` avanzan el siguiente ID a `TASK-1057`.
+- **Skills Codex actualizadas:** `greenhouse-product-ui-architect`, `greenhouse-portal-ui-implementer`, `greenhouse-vuexy-ui-expert`, `greenhouse-ui-orchestrator`, `greenhouse-mockup-builder`, `greenhouse-ui-enterprise-review` y `greenhouse-ux-content-accessibility`.
+- **Memoria viva:** `project_context.md` ahora registra la convención: marker semántico kebab-case en wrapper capturable, sin PII/copy traducible, y sin marker-spam en cada nodo pequeño.
+- **Pendiente intencional en TASK-1056:** sincronizar skills Claude equivalentes, reforzar docs GVC/UI delivery y evaluar guardrail warning-first. No se ejecutó esa implementación completa en esta sesión.
+
+---
+
+# Sesion 2026-06-08 — Home Nexa Insights tokenizado y verificado
+
+Se reviso la seccion `Nexa Insights` del Home por uso de primitives/tokens, aplicando las skills `greenhouse-typography-accessibility`, `greenhouse-ux-content-accessibility`, `greenhouse-product-ui-architect`, `greenhouse-portal-ui-implementer` y cierre con `greenhouse-documentation-governor`.
+
+- **Cambio:** `HomeAiInsightsBento` reemplaza `Button`/`Chip` MUI crudos por `GreenhouseButton`/`GreenhouseChip`, usa copy `GH_NEXA`, traduce tipos de señal (`root_cause` → `Causa raíz`), elimina `fontWeight: 500`, tracking manual y `theme.shadows[2]`, y consume motion/elevation tokens.
+- **Shared:** `NexaMentionText` ahora renderiza menciones con `GreenhouseChip` para evitar chips inline route-locales.
+- **GVC:** nuevo scenario `home-nexa-insights-bento` captura desktop+mobile con marker `[data-capture="home-nexa-insights-bento"]`; evidencia final `.captures/2026-06-08T21-04-40_home-nexa-insights-bento`, `qualityFindings=[]`, assertions OK.
+- **Gates:** eslint focal OK, `vitest run src/views/greenhouse/home/v2/HomeAiInsightsBento.test.ts` OK, `tsc --noEmit` OK, `docs:closure-check` focal revisado.
+- **No tocado:** cambios paralelos existentes de `TASK-1054`/charts en otros archivos del worktree.
+
+---
+
 # Sesion 2026-06-08 — TASK-1055 Harness Coverage Matrix creada
 
 Se creo `TASK-1055` como task formal para mejorar el harness del repo sin inflar CI a ciegas.
