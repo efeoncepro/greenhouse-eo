@@ -17,18 +17,18 @@
 // Gate: NO renderiza si < 2 observations. Honest degradation natural (1 obs
 // no es una trayectoria). Consumer UI invoca solo cuando hay data suficiente.
 
-import dynamic from 'next/dynamic'
 
 import Box from '@mui/material/Box'
 import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import useReducedMotion from '@/hooks/useReducedMotion'
 import type { NexaSignalObservation } from '@/lib/ico-engine/ai/llm-types'
 import { GH_NEXA } from '@/lib/copy/nexa'
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 export type NexaSeveritySparklineProps = {
   observations: NexaSignalObservation[]

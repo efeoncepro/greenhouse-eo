@@ -1,16 +1,18 @@
 'use client'
 
+import dynamic from 'next/dynamic'
+
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 import type { BoxProps } from '@mui/material/Box'
 
 import type { Props } from 'react-apexcharts'
 
-import ReactApexcharts from '@/libs/ApexCharts'
-
 type ApexChartWrapperProps = Props & {
   boxProps?: BoxProps
 }
+
+const ReactApexcharts = dynamic<Props>(() => import('react-apexcharts'), { ssr: false })
 
 const ApexChartWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   '& .apexcharts-canvas': {

@@ -2,7 +2,6 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -39,6 +38,8 @@ import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import type { ApexOptions } from 'apexcharts'
 import classnames from 'classnames'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
@@ -50,7 +51,6 @@ import { GH_COST_ATTRIBUTION } from '@/lib/copy/finance'
 import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 // ---------------------------------------------------------------------------
 // Types

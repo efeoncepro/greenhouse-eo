@@ -6,6 +6,17 @@
 
 ---
 
+## Delta 2026-06-07l — ApexCharts wrapper sin doble dynamic (ISSUE-085)
+
+`AppReactApexCharts` queda canonizado como el único wrapper dueño del `next/dynamic(..., { ssr:false })` hacia `react-apexcharts`.
+
+- Se eliminó el indirection legacy `src/libs/ApexCharts.tsx`.
+- Los consumers que envolvían `AppReactApexCharts` con `dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr:false })` ahora importan el wrapper directo.
+- Causa raíz: con doble dynamic, Turbopack dev generaba `react-loadable-manifest.json` apuntando a chunks `react-apexcharts_min_*.js` que no existían en `.next/dev/static/chunks`, produciendo 404, Fast Refresh en rebuild permanente y `Compiling...` infinito en local.
+- Guardrail: nueva lint rule `greenhouse/no-dynamic-app-react-apexcharts` (`error`) bloquea reintroducir el dynamic nested y el import legacy `@/libs/ApexCharts`.
+- Aprendizaje operativo: para `Compiling...` local con CPU alto, diagnosticar chunks/manifests con browser real antes de limpiar cache; `pnpm clean` es confirmación, no causa raíz.
+- Verificación: Playwright local `/home` + `/admin/design-system/colors` sin cuelgue, consola 0 errores, chunk `react-apexcharts` 200 OK; `pnpm test:lint-rules`, `tsc`, `pnpm lint` y `pnpm build`.
+
 ## Delta 2026-06-07k — Elevation / shadow token system semántico (TASK-1049)
 
 Greenhouse gana un SoT semántico de elevación. Las primitives dejan de leer índices MUI (`Paper elevation={6}` → `theme.shadows[6]`) o `customShadows` a ojo, y leen un **rol** servido por el theme.

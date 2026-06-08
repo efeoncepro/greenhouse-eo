@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
@@ -26,6 +25,8 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import { DataTableShell } from '@/components/greenhouse/data-table'
 
 
@@ -36,7 +37,6 @@ import type { MemberPayrollHistory as MemberHistory } from '@/types/payroll'
 import { getInitials } from '@/utils/getInitials'
 import { formatCurrency, formatPeriodIdLabel, formatAttendanceRatio, formatFactor, regimeLabel, regimeColor } from './helpers'
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 type Props = {
   memberId: string

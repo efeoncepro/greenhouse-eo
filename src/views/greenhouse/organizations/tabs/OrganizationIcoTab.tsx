@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -11,6 +10,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
 import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
+
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 
 import CustomTextField from '@core/components/mui/TextField'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
@@ -31,7 +32,6 @@ const TASK407_ARIA_EVOLUCION_MENSUAL_DEL_RPA = "Evolución mensual del RpA"
 
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Constants ─────────────────────────────────────────────────────────
 

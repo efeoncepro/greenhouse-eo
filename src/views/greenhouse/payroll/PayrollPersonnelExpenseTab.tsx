@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
@@ -27,6 +26,8 @@ import { useTheme, type Theme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 import { TabContext, TabPanel } from '@mui/lab'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
@@ -38,7 +39,6 @@ import { formatCurrency, formatPeriodLabel } from './helpers'
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 const SHORT_MONTH_NAMES = GREENHOUSE_COPY.months.short
 

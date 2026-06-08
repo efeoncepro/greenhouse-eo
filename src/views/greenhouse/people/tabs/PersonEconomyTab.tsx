@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Accordion from '@mui/material/Accordion'
@@ -30,6 +29,8 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import { getMicrocopy } from '@/lib/copy'
 
 import type { PersonDetail } from '@/types/people'
@@ -43,7 +44,6 @@ const TASK407_ARIA_IR_AL_MODULO_DE_NOMINA = "Ir al modulo de nomina"
 
 const GREENHOUSE_COPY = getMicrocopy()
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ---------------------------------------------------------------------------
 // Props

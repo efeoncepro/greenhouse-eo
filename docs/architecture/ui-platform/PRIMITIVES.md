@@ -28,13 +28,28 @@ Cada primitive tiene su contrato canónico en una ADR/spec dedicada o en su delt
 | **Motion** (cinemático/orquestado/scroll) | `<Motion>`, `useGreenhouseGSAP` | [GREENHOUSE_MOTION_PRIMITIVE_V1.md](../GREENHOUSE_MOTION_PRIMITIVE_V1.md) → ver [MOTION.md](./MOTION.md) |
 | **Microinteraction** | `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`, `GreenhouseStateTransition`, `GreenhouseInlineValidation`, `GreenhouseFieldProvenancePeek`, `GreenhouseStepperProgressMicro`, `GreenhouseEvidenceAttachmentDropzone`, `GreenhouseInlineDecisionPrompt` | HISTORIAL Deltas 2026-06-06 / 06e |
 | **Loading Surface** | `GreenhouseLoadingSurface` + variants nombradas (`GreenhouseDocumentPipelineLoader`, `GreenhouseExternalHandoffLoader`, …) | HISTORIAL Delta 2026-06-06d (TASK-1037) |
-| **Chart cards** | `GreenhouseChartCard`, `GreenhouseStackedDistributionChartCard`, `GreenhouseMetricBreakdownChartCard`, `MetricTrendCard` | HISTORIAL Deltas 2026-06-07 / 2026-06-02 → ver también `dataviz-design` |
+| **Chart cards** | `GreenhouseChartCard`, `GreenhouseStackedDistributionChartCard`, `GreenhouseMetricBreakdownChartCard`, `MetricTrendCard`; Apex runtime via `AppReactApexCharts` | HISTORIAL Deltas 2026-06-07 / 2026-06-02 / 2026-06-07l → ver también `dataviz-design` |
 | **Chips** | `GreenhouseChip` (AXIS) | HISTORIAL Delta 2026-06-07c |
 | **Buttons** | `GreenhouseButton` (AXIS) + `GreenhouseAsyncActionButton` (compone Button) | HISTORIAL Deltas 2026-06-07d / 06-07e |
 | **Utilities** | `GreenhouseActivityTimeline` | HISTORIAL Delta 2026-06-07b |
 | **Summary / Quote builder** | `EntitySummaryDock`, `CardHeaderWithBadge`, `FormSectionAccordion`, `ContextChipStrip`, `TotalsLadder` | HISTORIAL Deltas 2026-05-05 / 2026-04-19 / 2026-04-20 |
 
 > **Nota de límites:** Adaptive Sidecar ≠ Floating Surface ≠ Dialog. Sidecar = lane in-flow full-height que preserva el contexto; Floating Surface = UI contextual anclada y transitoria; `Dialog` modal sigue obligatorio para decisiones destructivas/irreversibles/legales/financieras. Floating Action Dock cubre acciones persistentes ancladas al viewport, distinto de Floating Surface. Floating Surface usa `motion: anchored` con CSS Tier 1 + tokens; no usa la Motion Primitive GSAP porque no es motion cinemática/orquestada.
+
+## ApexCharts Runtime Wrapper
+
+`AppReactApexCharts` (`src/libs/styles/AppReactApexCharts.tsx`) es el wrapper canónico para charts Apex legacy/productivos. El wrapper owns la única frontera `next/dynamic(..., { ssr:false })` hacia `react-apexcharts`; los consumers lo importan directo.
+
+Reglas:
+
+- NO envolver `AppReactApexCharts` con otro `dynamic(() => import('@/libs/styles/AppReactApexCharts'))`.
+- NO importar `@/libs/ApexCharts`; ese indirection legacy fue retirado.
+- Si un chart necesita SSR-off, se resuelve en el wrapper común, no en cada consumer.
+- Guardrail: `greenhouse/no-dynamic-app-react-apexcharts` (`error`).
+
+Motivo: el doble dynamic produjo manifests/chunks huérfanos en Turbopack dev (`react-apexcharts_min_*.js` 404), dejando Fast Refresh en rebuild permanente y el portal local en `Compiling...` (ISSUE-085).
+
+Diagnóstico rápido para casos similares: si local queda en `Compiling...`, revisar CPU/proceso, comparar `curl -I` vs browser real y usar Playwright console/network filtrando `_next/static/chunks`, HMR y 404. Si aparece un chunk huérfano, comparar `.next/dev/**/react-loadable-manifest.json` con `.next/dev/static/chunks` y buscar fronteras `dynamic()`/imports nested en wrappers compartidos. `pnpm clean` solo confirma; el fix vive en el owner canónico del wrapper.
 
 ## Tipografía, tokens y color de las primitives
 

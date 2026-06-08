@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
@@ -35,6 +34,8 @@ import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
 import type { ApexOptions } from 'apexcharts'
+
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 
 import { getMicrocopy } from '@/lib/copy'
 
@@ -71,7 +72,6 @@ import { leaveStatusConfig, getLeaveTypeConfig, formatDate, formatDateRange, for
 
 const GREENHOUSE_COPY = getMicrocopy()
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 const initialBackfillForm = {
   startDate: '',

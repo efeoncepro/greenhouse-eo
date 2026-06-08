@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Box from '@mui/material/Box'
@@ -26,6 +25,8 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import CustomChip from '@core/components/mui/Chip'
 
 
@@ -36,7 +37,6 @@ import { formatCurrency, formatPeriodIdLabel } from '@views/greenhouse/payroll/h
 const TASK407_ARIA_IR_AL_MODULO_DE_NOMINA = "Ir al módulo de nómina"
 
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 type Props = {
   entries?: PayrollEntry[]

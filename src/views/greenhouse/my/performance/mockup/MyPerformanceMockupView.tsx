@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react'
 import { useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -20,6 +19,8 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
+
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
@@ -60,7 +61,6 @@ import {
   type MyPerformanceTone
 } from './data'
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 type NexaMode = 'summary' | 'history'
 

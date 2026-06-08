@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
@@ -42,6 +41,8 @@ import Chip from '@mui/material/Chip'
 
 import classnames from 'classnames'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
 import TablePaginationComponent from '@components/TablePaginationComponent'
@@ -64,7 +65,6 @@ import { getMicrocopy } from '@/lib/copy'
 import { formatCurrency as formatGreenhouseCurrency, formatDateTime as formatGreenhouseDateTime, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 // ---------------------------------------------------------------------------
 // Types

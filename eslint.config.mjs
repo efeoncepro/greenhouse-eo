@@ -314,6 +314,10 @@ export default [
       // violaciones en superficies de producto: pilotos migrados; el resto son
       // primitives o infra Vuexy menu, exentos por path en la rule).
       'greenhouse/no-direct-floating-ui-in-views': 'error',
+      // ApexCharts: el wrapper canonical AppReactApexCharts es el único dueño de
+      // next/dynamic({ ssr:false }). Consumers lo importan directo para evitar
+      // manifests/chunks huérfanos en Turbopack.
+      'greenhouse/no-dynamic-app-react-apexcharts': 'error',
       // TASK-1045 — views/app/components NO importan gsap/@gsap directo; consumir
       // <Motion> o useGreenhouseGSAP desde @/components/greenhouse/motion. Mode
       // `error` desde commit-1 (cero violaciones: los únicos importadores previos

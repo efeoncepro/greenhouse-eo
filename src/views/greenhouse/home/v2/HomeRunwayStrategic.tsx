@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react'
 
-import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 
 import type { ApexOptions } from 'apexcharts'
@@ -20,6 +19,8 @@ import Typography from '@mui/material/Typography'
 
 import classnames from 'classnames'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
@@ -31,7 +32,6 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 import type { HomeRunwayData } from '@/lib/home/contract'
 import { formatCurrency as formatGreenhouseCurrency, formatTime as formatGreenhouseTime } from '@/lib/format'
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 interface HomeRunwayStrategicProps {
   data: HomeRunwayData

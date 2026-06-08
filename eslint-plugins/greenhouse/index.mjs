@@ -16,6 +16,7 @@
 //   - no-inline-payroll-scope-gate                  (TASK-890) — consumers MUST NOT recompose the offboarding × payroll scope gate inline; use canonical resolver
 //   - no-extract-epoch-from-date-subtraction        (TASK-893 hotfix #3) — bloquea EXTRACT(EPOCH FROM (X - Y)) cuando X o Y es DATE (rompe runtime PG)
 //   - no-inline-ftr-calculation                     (TASK-909) — prohibe recomputar el veredicto FTR inline; usar helper canonical calculateFtr
+//   - no-dynamic-app-react-apexcharts               — ApexCharts wrapper owns the only ssr:false dynamic boundary
 
 import noRawTableWithoutShell from './rules/no-raw-table-without-shell.mjs'
 import noHardcodedFontfamily from './rules/no-hardcoded-fontfamily.mjs'
@@ -37,11 +38,12 @@ import noDirectFloatingUiInViews from './rules/no-direct-floating-ui-in-views.mj
 import noDirectGsapInViews from './rules/no-direct-gsap-in-views.mjs'
 import noHardcodedHexColor from './rules/no-hardcoded-hex-color.mjs'
 import noDirectMuiElevationInPrimitives from './rules/no-direct-mui-elevation-in-primitives.mjs'
+import noDynamicAppReactApexCharts from './rules/no-dynamic-app-react-apexcharts.mjs'
 
 const plugin = {
   meta: {
     name: 'eslint-plugin-greenhouse',
-    version: '1.14.0'
+    version: '1.15.0'
   },
   rules: {
     'no-raw-table-without-shell': noRawTableWithoutShell,
@@ -63,7 +65,8 @@ const plugin = {
     'no-direct-floating-ui-in-views': noDirectFloatingUiInViews,
     'no-direct-gsap-in-views': noDirectGsapInViews,
     'no-hardcoded-hex-color': noHardcodedHexColor,
-    'no-direct-mui-elevation-in-primitives': noDirectMuiElevationInPrimitives
+    'no-direct-mui-elevation-in-primitives': noDirectMuiElevationInPrimitives,
+    'no-dynamic-app-react-apexcharts': noDynamicAppReactApexCharts
   }
 }
 

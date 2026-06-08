@@ -1,3 +1,18 @@
+# Sesion 2026-06-07 — ISSUE-085 fix local dev compile loop por ApexCharts dynamic nested (resolved, develop local)
+
+Incidente local diagnosticado: `localhost:3000/home` quedaba con el indicador **Compiling...** y el `next-server (v16.1.1)` entraba en loop de CPU (~480-525%), dejando requests nuevas sin bytes.
+
+- **Causa raíz:** doble frontera `next/dynamic` alrededor de ApexCharts. `AppReactApexCharts` importaba un wrapper legacy `@/libs/ApexCharts` que a su vez hacía `dynamic(() => import('react-apexcharts'), { ssr:false })`, mientras 23 consumers además hacían `dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr:false })`. En Turbopack dev eso dejó `react-loadable-manifest.json` apuntando a chunks huérfanos (`node_modules_react-apexcharts_dist_react-apexcharts_min_*.js` 404) y Fast Refresh se quedaba en rebuild.
+- **Fix robusto:** `src/libs/styles/AppReactApexCharts.tsx` queda como **único owner** del `dynamic<Props>(() => import('react-apexcharts'), { ssr:false })`; se retiró `src/libs/ApexCharts.tsx`; todos los consumers importan `AppReactApexCharts` directo.
+- **Guardrail:** nueva lint rule `greenhouse/no-dynamic-app-react-apexcharts` (error) bloquea volver a envolver el wrapper con `next/dynamic` y bloquea imports del legacy `@/libs/ApexCharts`. Rule-tests agregados y verdes.
+- **Issue resuelto:** `docs/issues/resolved/ISSUE-085-local-dev-turbopack-apexcharts-chunk-loop.md` documenta síntoma, causa raíz, verificación y runbook corto. Aprendizaje canonizado: si local queda en `Compiling...`, diagnosticar chunks/manifests con Playwright/browser real antes de limpiar cache; `pnpm clean` confirma, no arregla la causa.
+- **Evidencia runtime local:** tras `pnpm clean` + `pnpm dev`, Playwright abrió `/home` (17.4s cold: compile 7.7s, render 9.6s) y `/admin/design-system/colors` (4.6s cold) sin colgarse. Consola: 0 errores; el chunk `react-apexcharts_min_5c90e618.js` respondió `200 OK` (antes era 404); Fast Refresh terminó (`done in 362ms/459ms`).
+- **Gates:** `pnpm test:lint-rules` OK (18 suites); eslint focal OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK con 9 warnings HEX preexistentes fuera de este fix; `pnpm build` OK.
+- **Task hook:** `TASK-1053` tenía `Blocked by: \`none\` (coordina...)` y el hook lo leía como blocker. Se dejó parseable (`Blocked by: \`none\``) y la nota pasó a `Coordination`; `pnpm codex:task-hook TASK-1053 --prompt-only` ahora corre.
+- **Pendiente no tocado:** cambios locales previos de `TASK-1053` (`DESIGN.md`, `AxisColorLabView`, `BrandColorSystemMockupView`, nueva ruta mockup proposal) siguen en worktree y no se reinterpretaron como parte de este incidente.
+
+---
+
 # Sesion 2026-06-07 — TASK-1052 chart-card primitives a elevation roles + lint cubre customShadows (complete, develop)
 
 Tier 1 del follow-up de TASK-1051: cierra la **capa primitive** del contrato de elevación. Local-first en `develop`.

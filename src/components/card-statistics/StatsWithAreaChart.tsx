@@ -1,7 +1,6 @@
 'use client'
 
 // Next Imports
-import dynamic from 'next/dynamic'
 
 // MUI Imports
 import Card from '@mui/material/Card'
@@ -16,6 +15,8 @@ import type { ApexOptions } from 'apexcharts'
 // Type Imports
 import Chip from '@mui/material/Chip'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import type { ThemeColor } from '@core/types'
 import type { CustomAvatarProps } from '@core/components/mui/Avatar'
 
@@ -24,7 +25,6 @@ import type { CustomAvatarProps } from '@core/components/mui/Avatar'
 import CustomAvatar from '@core/components/mui/Avatar'
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 export type StatsWithAreaChartProps = {
   stats: string

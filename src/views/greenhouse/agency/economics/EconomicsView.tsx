@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import dynamic from 'next/dynamic'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -32,6 +31,8 @@ import { alpha, useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import PeriodNavigator from '@/components/greenhouse/PeriodNavigator'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import HorizontalWithSubtitle from '@/components/card-statistics/HorizontalWithSubtitle'
@@ -40,7 +41,6 @@ import type { AgencyEconomicsResponse, AgencyEconomicsSpaceRow } from '@/types/a
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 import CustomChip from '@core/components/mui/Chip'
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 const formatMoney = (value: number) => formatGreenhouseCurrency(value, 'CLP', { maximumFractionDigits: 0 })
 
