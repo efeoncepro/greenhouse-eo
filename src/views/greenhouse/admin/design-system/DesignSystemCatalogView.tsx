@@ -138,6 +138,18 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-badge'
   },
   {
+    id: 'feedback-atoms',
+    title: 'Feedback atoms',
+    description: 'KPI delta inline (signo+flecha+color AA) y status dot (dot+label). Color nunca solo; consumen theme.greenhouseSemantic.',
+    route: '/admin/design-system/chips',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'GreenhouseKpiDelta · GreenhouseStatusDot',
+    tags: ['kpi', 'delta', 'status', 'dot'],
+    icon: 'tabler-activity-heartbeat'
+  },
+  {
     id: 'floating-surfaces',
     title: 'Floating surfaces',
     description: 'Usa esto para popovers, menus, peeks de evidencia e inline editors anclados.',
