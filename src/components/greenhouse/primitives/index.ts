@@ -38,6 +38,19 @@ export type {
   GreenhouseChipTone,
   GreenhouseChipVariant
 } from './GreenhouseChip'
+export { default as GreenhouseKpiDelta } from './GreenhouseKpiDelta'
+export type {
+  GreenhouseKpiDeltaDirection,
+  GreenhouseKpiDeltaProps,
+  GreenhouseKpiDeltaSize,
+  GreenhouseKpiDeltaVariant
+} from './GreenhouseKpiDelta'
+export { default as GreenhouseStatusDot } from './GreenhouseStatusDot'
+export type {
+  GreenhouseStatusDotProps,
+  GreenhouseStatusDotSize,
+  GreenhouseStatusDotTone
+} from './GreenhouseStatusDot'
 export { default as GreenhouseCommandFeedback } from './GreenhouseCommandFeedback'
 export type {
   GreenhouseCommandFeedbackProps,

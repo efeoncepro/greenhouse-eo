@@ -11,7 +11,6 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
-import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -25,6 +24,7 @@ import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+import { GreenhouseKpiDelta } from '@/components/greenhouse/primitives'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
@@ -209,14 +209,7 @@ export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
                   </Typography>
                 </Tooltip>
                 {data.deltaPct != null && Math.abs(data.deltaPct) >= 0.5 ? (
-                  <Chip
-                    size='small'
-                    variant='outlined'
-                    color={data.deltaPct > 0 ? 'success' : 'error'}
-                    icon={<i className={data.deltaPct > 0 ? 'tabler-arrow-up-right' : 'tabler-arrow-down-right'} />}
-                    label={`${data.deltaPct > 0 ? '+' : ''}${data.deltaPct.toFixed(1)}%`}
-                    sx={{ fontVariantNumeric: 'tabular-nums' }}
-                  />
+                  <GreenhouseKpiDelta value={data.deltaPct} variant='tonal' />
                 ) : null}
                 <Box
                   sx={{

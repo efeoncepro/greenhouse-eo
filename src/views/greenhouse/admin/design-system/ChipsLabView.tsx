@@ -6,6 +6,8 @@ import Link from 'next/link'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { SxProps, Theme } from '@mui/material/styles'
@@ -14,7 +16,12 @@ import { axisNeutral, axisRamp } from '@core/theme/axis-tokens'
 import { axisSemanticHex, axisSemanticPalette, axisSemanticSubValues } from '@core/theme/axis-semantic'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
-import { GreenhouseChip, type GreenhouseChipVariant } from '@/components/greenhouse/primitives'
+import {
+  GreenhouseChip,
+  GreenhouseKpiDelta,
+  GreenhouseStatusDot,
+  type GreenhouseChipVariant
+} from '@/components/greenhouse/primitives'
 
 const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 const FIGMA_AVATAR_SRC = '/images/greenhouse/design-system/axis-avatar-greenhouse.png'
@@ -353,6 +360,56 @@ const ChipBoard = ({ mode }: { mode: PreviewMode }) => (
   </Box>
 )
 
+// Feedback atoms (TASK-1053 Fase B Slice B2). Renders in the ACTIVE theme mode
+// (toggle the theme to see dark) — these primitives read theme.greenhouseSemantic
+// / CSS vars, so they are mode-correct without a faked dual column.
+const ShowcaseRow = ({ label, children }: { label: string; children: ReactNode }) => (
+  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '160px 1fr' }, gap: 2, alignItems: 'center' }}>
+    <Typography variant='caption' color='text.secondary'>
+      {label}
+    </Typography>
+    <Stack direction='row' spacing={3} alignItems='center' flexWrap='wrap' useFlexGap>
+      {children}
+    </Stack>
+  </Box>
+)
+
+const FeedbackAtomsCard = () => (
+  <Card variant='outlined' data-capture='feedback-atoms'>
+    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Typography variant='h5'>Feedback atoms — KPI delta · Status dot (TASK-1053 Fase B)</Typography>
+        <Typography variant='body2' color='text.secondary'>
+          <code>GreenhouseKpiDelta</code> y <code>GreenhouseStatusDot</code>. <strong>Color nunca solo</strong>: el delta
+          siempre lleva signo + flecha; el dot siempre lleva label o <code>ariaLabel</code>. Color AA desde{' '}
+          <code>theme.greenhouseSemantic</code>. Se renderiza en el tema activo — cambiá el tema para ver dark.
+        </Typography>
+      </Box>
+
+      <ShowcaseRow label='KPI delta · text'>
+        <GreenhouseKpiDelta value={12.4} />
+        <GreenhouseKpiDelta value={-5} />
+        <GreenhouseKpiDelta value={0.3} neutralThreshold={0.5} />
+        <GreenhouseKpiDelta value={8} invert ariaLabel='sube 8 por ciento (peor)' />
+      </ShowcaseRow>
+
+      <ShowcaseRow label='KPI delta · tonal'>
+        <GreenhouseKpiDelta value={12.4} variant='tonal' />
+        <GreenhouseKpiDelta value={-5} variant='tonal' />
+        <GreenhouseKpiDelta value={3.2} variant='tonal' size='md' />
+      </ShowcaseRow>
+
+      <ShowcaseRow label='Status dot'>
+        <GreenhouseStatusDot tone='success' label='Activo' halo pulse />
+        <GreenhouseStatusDot tone='warning' label='Degradado' />
+        <GreenhouseStatusDot tone='error' label='Bloqueado' />
+        <GreenhouseStatusDot tone='info' label='En curso' />
+        <GreenhouseStatusDot tone='neutral' label='Sin empezar' />
+      </ShowcaseRow>
+    </CardContent>
+  </Card>
+)
+
 const ChipsLabView = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, maxWidth: 1360, mx: 'auto' }}>
     <Button
@@ -379,6 +436,8 @@ const ChipsLabView = () => (
       <ChipBoard mode='light' />
       <ChipBoard mode='dark' />
     </Box>
+
+    <FeedbackAtomsCard />
   </Box>
 )
 
