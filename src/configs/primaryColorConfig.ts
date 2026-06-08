@@ -11,7 +11,7 @@ export type PrimaryColorConfig = {
 const primaryColorConfig: PrimaryColorConfig[] = [
   {
     name: 'efeonce-core',
-    light: '#3691E3',
+    light: '#2E8BE8',
     main: '#0375DB',
     dark: '#024C8F'
   },

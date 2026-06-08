@@ -26,16 +26,18 @@ export type AxisOpacityScale = Record<AxisOpacityStep, string>
 /** Full 100→900 ramps, mode-agnostic (constant across light/dark in AXIS). */
 export const axisRamp = {
   // Brand · Efeonce Primary
+  // Brand · Efeonce Primary (acento) — TASK-1053 Restraint v1: ramp del acento aprobado.
+  // 500 #0375db (= el acento, sin cambio); navy = accent-800 #023c70 (misma familia, NO hue aparte).
   primary: {
-    100: '#79c0ff',
-    200: '#51adff',
-    300: '#289aff',
-    400: '#0085fd',
+    100: '#cfe4fa',
+    200: '#a6cdf5',
+    300: '#6facf0',
+    400: '#2e8be8',
     500: '#0375db',
-    600: '#0066c2',
-    700: '#00539d',
-    800: '#003b70',
-    900: '#002a50'
+    600: '#0362ba',
+    700: '#024c8f',
+    800: '#023c70',
+    900: '#00284d'
   },
   // Brand · Efeonce Secondary — TASK-1053 A1b Restraint v1: verde coherente (corrige el
   // hue-shift a teal en 600-900). pop #6ec207 (500) · ink #4b8405 (700, AA blanco 4.56:1).
