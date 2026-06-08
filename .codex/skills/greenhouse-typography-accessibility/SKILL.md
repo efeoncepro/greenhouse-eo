@@ -34,7 +34,7 @@ Read only what the task needs — but never set type blind:
 ## Greenhouse type contract (FIXED — do not re-decide)
 
 Exactly **two active families**:
-- **Poppins** — controlled display ONLY: `headlineDisplay`/`headlineLg`/`headlineMd`/`pageTitle` (= `h1`–`h4`). The ONLY way to get Poppins is `<Typography variant='h1'..'h4'>`.
+- **Poppins** — controlled display ONLY: `headlineDisplay`/`headlineLg`/`headlineMd`/`pageTitle` (= `h1`–`h4`) plus `surfaceHeroTitle` for primary full-page/workbench titles. The ONLY way to get Poppins is `<Typography variant='h1'..'h4'>` or `<Typography variant='surfaceHeroTitle'>`.
 - **Geist** — everything else: body, tables, forms, metadata, chips, buttons, IDs, KPI values, numeric runs, chart text, PDF/email body.
 
 **Weight ladder (FIXED): 400 / 600 / 700 / 800.**
@@ -55,6 +55,7 @@ Exactly **two active families**:
 | h2 | headline-lg | Poppins | 24 | 700 | 1.25 | marketing section |
 | h3 | headline-md | Poppins | 20 | 600 | 1.25 | page identity (rare) |
 | h4 | page-title | Poppins | 20 | 600 | 1.4 | product page title |
+| surfaceHeroTitle | surface-hero-title | Poppins | 34 / 28 mobile | 600 | 1.15 | primary full-page/workbench title only |
 | h5 | section-title | Geist | 16 | 600 | 1.5 | section/card/drawer title |
 | subtitle1 | subheader | Geist | 14 | 400 | 1.5 | card subheader / list primary |
 | h6 | (= label-md) | Geist | 14 | 600 | 1.5 | inline bold label (prefer subtitle1) |
@@ -74,7 +75,7 @@ Control ramp: Button sm/md 14, **lg 16** · Tab 14 · Dialog title 16. **Invaria
 
 ## The 8 typographic decisions (make in order)
 
-1. **Families & pairing** — Greenhouse is fixed: Poppins display (h1–h4) + Geist text. Never a third family, never Poppins outside h1–h4, never >2 families on a surface. (Craft: one-family-first; pair display+neutral-text or superfamilies; match x-height.)
+1. **Families & pairing** — Greenhouse is fixed: Poppins display (h1–h4 + `surfaceHeroTitle`) + Geist text. Never a third family, never Poppins outside those variants, never >2 families on a surface. (Craft: one-family-first; pair display+neutral-text or superfamilies; match x-height.)
 2. **Weight** — cheapest hierarchy lever, semantic not decorative. Stay in {400,600,700,800}; never <400 for content; bold sparingly. If everything is ≥600, nothing is emphasized.
 3. **Size & scale** — use the fixed scale; body ≥16px (`body1`)/14px dense (`body2`); sizes in `rem`; inputs ≥16px (iOS zoom). Fluid `clamp()` only for marketing — and only `rem+vw` with `max ≤ 2.5×min` (pure `vw` fails WCAG 1.4.4). Product UI = fixed scale + container queries.
 4. **Line-height (leading)** — body 1.5; headings 1.1–1.3 (big type, less leading); long measures 1.6–1.7; small/numeric a touch more (1.45–1.54). Unitless only. Must survive user line-height 1.5 (WCAG 1.4.12).
@@ -119,7 +120,8 @@ Latin-first (es-CL / en-US / pt) + **RTL-ready via CSS logical properties**; CJK
 ## Hard rules (NUNCA)
 
 - Never inline `fontSize`/`fontFamily` on text — use a variant/token (lints: `no-fontsize-inline-typography` warn on `<Typography>`, `no-hardcoded-fontfamily` error bans Inter/DM Sans/Geist Mono/`monospace`/raw Poppins-Geist literals).
-- Never Poppins for body/forms/tables/chips/buttons/helper/metadata/dense UI (display h1–h4 only).
+- Never Poppins for body/forms/tables/chips/buttons/helper/metadata/dense UI (display h1–h4 + `surfaceHeroTitle` only).
+- Never use `surfaceHeroTitle` as a general big heading. It is only for primary full-page/workbench surface titles or primary identity headers; maximum one per surface; never cards, tables, lists, drawers, modals, dashboards, repeated rows, or marketing heroes. Dense/product-detail page titles remain `h4` / `page-title`.
 - Never monospace for IDs/money/tables — Geist + tabular numerals.
 - Never `fontWeight: 800` for repeated labels, column headers, or whole sections.
 - Never introduce a weight-500 role (won't-do); never DM Sans/Inter/a third family/a display tier without a real consumer.

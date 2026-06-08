@@ -42,7 +42,8 @@
 
 /**
  * Font family stacks. Exactly two active families (DESIGN.md / V1 §3.1):
- * Poppins for display (`headline-*`, `page-title`), Geist for everything else.
+ * Poppins for display (`headline-*`, `page-title`, `surface-hero-title`),
+ * Geist for everything else.
  * `monospace` is prohibited — numeric variants use Geist + `tabular-nums`.
  */
 export const fontFamilies = {
@@ -65,6 +66,7 @@ export const fontWeights = {
  * Keyed by t-shirt step; the composed `typographyScale` references these.
  */
 export const fontSizes = {
+  surfaceHero: '2.125rem', // 34 — surface-hero-title (primary full-page/workbench title only)
   '5xl': '2rem', // 32 — headline-display
   '4xl': '1.75rem', // 28 — kpi-value
   '3xl': '1.5rem', // 24 — headline-lg
@@ -105,6 +107,13 @@ export const lineHeights = {
    * de marketing. Aplica a `h1`, `h2`, `h3`.
    */
   heading: 1.25,
+
+  /**
+   * Surface hero title (`surfaceHeroTitle`). Compacta el titulo primario de
+   * una surface full-page/workbench sin convertirlo en hero marketing. Uso
+   * estrecho: page/workbench headers aprobados e identity headers principales.
+   */
+  surfaceHero: 1.15,
 
   /**
    * Page title en product UI (`h4`). Levemente más relajado que `heading`
@@ -160,6 +169,7 @@ export type LineHeightToken = keyof typeof lineHeights
 export interface TypographyToken {
   fontFamily: string
   fontSize: string
+  mobileFontSize?: string
   fontWeight: number
   lineHeight: number
   letterSpacing?: string
@@ -191,6 +201,13 @@ export const typographyScale = {
     fontSize: fontSizes['2xl'], // 20 — TASK-1038: 16→20, arregla la inversión (page-title ≥ section-title)
     fontWeight: fontWeights.semibold,
     lineHeight: lineHeights.pageTitle
+  },
+  surfaceHeroTitle: {
+    fontFamily: fontFamilies.display,
+    fontSize: fontSizes.surfaceHero,
+    mobileFontSize: fontSizes['4xl'],
+    fontWeight: fontWeights.semibold,
+    lineHeight: lineHeights.surfaceHero
   },
 
   // Section title (Geist) — bridged to h5
@@ -308,6 +325,7 @@ export const TYPOGRAPHY_VARIANT_BRIDGE = {
   headlineLg: 'h2',
   headlineMd: 'h3',
   pageTitle: 'h4',
+  surfaceHeroTitle: 'surfaceHeroTitle',
   sectionTitle: 'h5',
   subheader: 'subtitle1',
   labelMd: 'button',

@@ -50,6 +50,12 @@ typography:
     fontSize: 1.25rem
     fontWeight: 600
     lineHeight: 1.4
+  surface-hero-title:
+    fontFamily: Poppins
+    fontSize: 2.125rem
+    mobileFontSize: 1.75rem
+    fontWeight: 600
+    lineHeight: 1.15
   section-title:
     fontFamily: Geist
     fontSize: 1rem
@@ -253,9 +259,11 @@ The colors above are the **semantic + key tokens** an agent needs day to day. Th
   - **Tools:** `get_variable_defs(nodeId, fileKey)` → every token's resolved hex (e.g. `Color Efeonce/Secundary/secundary-700 = #138760`); `get_screenshot(nodeId, fileKey)` → the swatch sheet. URL: `figma.com/design/yyMksCoijfMaIoYplXKZaR/...?node-id=11205-5341`.
   - When AXIS Figma and this contract disagree, AXIS is the north — pull it, then reconcile the runtime + this file (parity 3-capas).
 - **Runtime access:** `theme.axis.*`.
+  - **Living inventory for agents:** `/admin/design-system/colors` lists every runtime token name with its current resolved color. Check it when choosing a color token; do not invent names or paste HEX from screenshots/Figma.
+  - `theme.axis.main.<family>` — quick alias for the current main color of `primary`, `secondary`, `info`, `success`, `warning`, and `error`.
   - `theme.axis.ramp.<family>[<step>]` — full `100→900` ramps for `primary`, `secondary`, `info`, `success`, `warning`, `error`, and the neutral `gray` family. Reach for a specific step only for the rare case the semantic layer can't cover (a chart series, a contrast-safe text tint).
   - `theme.axis.opacity.<family>[8|16|24|32|38]` — canonical soft-fill / hover / selected alphas (alert & chip tints, hover overlays).
-  - `theme.axis.neutral.{light,dark}` — per-mode surface/text/divider neutrals (the values mapped into `background`/`paper`/`text` below).
+  - `theme.axis.neutral.{light,dark}.{bodyBg|paper|bgWhite|textPrimary|textSecondary|textDisabled|divider|actionHover|snackbar}` — per-mode surface/text/divider neutrals (the values mapped into `background`/`paper`/`text` below).
 - **Default rule:** components consume the **semantic** layer (`theme.palette.*`, `theme.customColors.*`) — the AXIS primitives mint those semantics; only drop to `theme.axis.ramp.*` when no semantic token fits.
 - **Which step to use (agents: do NOT pick a ramp step by eye):** the semantic `main`/`light`/`dark` already encode the right step per role — use them, not raw ramp steps. The mapping + a11y rule:
   - `main` = the **functional fill/text step** chosen for AA, NOT always the nominal `500`. E.g. `error.main` = error-**800** (`#CC3D41`, the `500` `#FF4C51` fails white text); `secondary.main` = secondary-**700** (`#138760`, the lime `500` `#6EC207` is illegible as text ~1.8:1). When you need a solid fill or text in a brand/semantic color, use `main`.
@@ -275,7 +283,7 @@ Greenhouse uses exactly two active font families:
 
 The split is intentional:
 
-- `headline-display`, `headline-lg`, `headline-md`, and `page-title` are the only places where Poppins should appear
+- `headline-display`, `headline-lg`, `headline-md`, `page-title`, and `surface-hero-title` are the only places where Poppins should appear
 - all body copy, tables, forms, metadata, chips, buttons, IDs, and KPI values use Geist
 
 Numeric alignment uses Geist with tabular numerals semantics. Do not introduce monospace for IDs, amounts, or tables. The semantic equivalents are `numeric-id`, `numeric-amount`, and `kpi-value`.
@@ -292,6 +300,13 @@ Numeric alignment uses Geist with tabular numerals semantics. Do not introduce m
 Use the scale semantically:
 
 - `page-title` for product page titles
+- `surface-hero-title` for the primary title of a full-page surface or workbench
+  that needs a stronger first-read anchor (for example `Organizaciones`) and for
+  primary identity headers (for example a Person 360 name). It is intentionally
+  large: `2.125rem` from tablet/desktop and `1.75rem` on mobile. Use it **once
+  per surface only**, never in cards, tables, lists, dashboards, inspectors,
+  modals, marketing heroes, repeated rows, or as a generic "make it bigger"
+  heading. Dense/product-detail page titles remain `page-title`.
 - `section-title` for section headers inside cards and drawers
 - `label-lg` / `label-md` / `label-sm` for control / bold-label text (`1rem` / `0.875rem` / `0.8125rem`). `label-md` is the canonical control label (the `button` variant); `label-lg` and `label-sm` are the larger / smaller steps of the same label scale
 - `body-lg` for primary readable copy
@@ -314,6 +329,7 @@ The mapping is **code, not a manual table** — `TYPOGRAPHY_VARIANT_BRIDGE`
 | Contract token | MUI variant |
 |---|---|
 | `headline-display/lg/md`, `page-title` | `h1` / `h2` / `h3` / `h4` |
+| `surface-hero-title` | `surfaceHeroTitle` |
 | `section-title` | `h5` |
 | `label-md` | `button` |
 | `body-lg/md/sm` | `body1` / `body2` / `caption` |
@@ -337,7 +353,7 @@ Notes:
 
 The SoT (`typographyScale`) token names are camelCase mirrors of the contract:
 `headlineDisplay` · `headlineLg` · `headlineMd` · `pageTitle` · `sectionTitle` ·
-`subheader` · `labelLg` · `labelMd` · `labelSm` · `bodyLg` · `bodyMd` · `bodySm` ·
+`surfaceHeroTitle` · `subheader` · `labelLg` · `labelMd` · `labelSm` · `bodyLg` · `bodyMd` · `bodySm` ·
 `overline` · `numericId` · `numericAmount` · `kpiValue`. Add a role here (never an
 inline size); the bridge wires it to a MUI variant if it needs one.
 

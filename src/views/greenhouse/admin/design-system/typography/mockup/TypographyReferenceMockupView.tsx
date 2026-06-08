@@ -74,6 +74,7 @@ const CONTRACT_NAME: Record<TypographyTokenName, string> = {
   headlineLg: 'headline-lg',
   headlineMd: 'headline-md',
   pageTitle: 'page-title',
+  surfaceHeroTitle: 'surface-hero-title',
   sectionTitle: 'section-title',
   subheader: 'subheader',
   labelLg: 'label-lg',

@@ -13,7 +13,7 @@ This file **overrides** the global `typography-design` skill inside the `greenho
 
 ## Why this overlay exists
 
-Greenhouse is not greenfield. Typography is already a governed 3-surface system with a CI drift-guard. The global skill teaches *the craft* (weights, contrast, measure, OpenType, i18n); this overlay pins *the answers already decided here* so an agent never re-litigates the scale, picks a banned weight, or hardcodes a size. Two families are fixed: **Poppins** (display, h1–h4 only) + **Geist** (everything else). Numbers use **Geist + `tabular-nums`** — never a monospace family.
+Greenhouse is not greenfield. Typography is already a governed 3-surface system with a CI drift-guard. The global skill teaches *the craft* (weights, contrast, measure, OpenType, i18n); this overlay pins *the answers already decided here* so an agent never re-litigates the scale, picks a banned weight, or hardcodes a size. Two families are fixed: **Poppins** (display, h1–h4 + `surfaceHeroTitle` only) + **Geist** (everything else). Numbers use **Geist + `tabular-nums`** — never a monospace family.
 
 ## Canonical sources of truth (READ in this order)
 
@@ -37,11 +37,11 @@ CLAUDE.md "Typography System (TASK-1036/1038)" is the short pointer to all of th
 
 | Role | Family | CSS var | Loaded web weights | When |
 |---|---|---|---|---|
-| **Display** | **Poppins** | `var(--font-poppins)` | 600, 700, 800 (web); +900 + italics exist for slogan/PDF | **h1–h4 ONLY** (auto-applied by variant) |
+| **Display** | **Poppins** | `var(--font-poppins)` | 600, 700, 800 (web); +900 + italics exist for slogan/PDF | **h1–h4 + surfaceHeroTitle ONLY** (auto-applied by variant) |
 | **Product UI / text** | **Geist Sans** | `var(--font-geist)` | 400, 500, 600, 700, 800 | everything else |
 | **Numbers / IDs / amounts** | Geist + `tabular-nums` | `var(--font-geist)` | (same Geist) | numeric columns, totals, IDs, KPIs |
 
-To get Poppins on a surface: use `variant='h1'|'h2'|'h3'|'h4'`. **There is no other way and no other place** Poppins is allowed in product UI. h5/h6/subtitle/body/caption/button/overline/mono*/kpiValue all render Geist.
+To get Poppins on a surface: use `variant='h1'|'h2'|'h3'|'h4'` or `variant='surfaceHeroTitle'`. **There is no other way and no other place** Poppins is allowed in product UI. h5/h6/subtitle/body/caption/button/overline/mono*/kpiValue all render Geist.
 
 ### Font files that ACTUALLY exist (`src/assets/fonts/`)
 - **Geist:** Regular(400) · Medium(500) · SemiBold(600) · Bold(700) · ExtraBold(800).
@@ -69,6 +69,7 @@ Product scale uses **400 / 600 / 700 / 800**. **Weight 500 is reserved, not used
 | h2 | headline-lg | Poppins | 1.5 | 24 | 700 | 1.25 | marketing section |
 | h3 | headline-md | Poppins | 1.25 | 20 | 600 | 1.25 | page identity (rare) |
 | h4 | page-title | Poppins | 1.25 | 20 | 600 | 1.4 | **product page title** |
+| surfaceHeroTitle | surface-hero-title | Poppins | 2.125 / 1.75 mobile | 34 / 28 mobile | 600 | 1.15 | primary full-page/workbench title only |
 | h5 | section-title | Geist | 1 | 16 | 600 | 1.5 | **section header in card** |
 | subtitle1 | subheader | Geist | 0.875 | 14 | 400 | 1.5 | card subheader / list primary |
 | h6 | (= label-md) | Geist | 0.875 | 14 | 600 | 1.5 | inline bold label (prefer subtitle1) |
@@ -89,7 +90,8 @@ Labels with no MUI variant: `label-lg` (16/600 = controlText.lg) and `label-sm` 
 ## Hard rules (NUNCA) — these override the global skill's generic advice
 
 - **NUNCA `fontSize` inline** on text — use a variant/token. Lint `greenhouse/no-fontsize-inline-typography` (warn, scoped to `<Typography>`/`<CustomTypography>`) catches it. If a size is missing, add it to `typographyScale`, don't inline.
-- **NUNCA hardcode `fontFamily`** — Poppins auto-applies via h1–h4; Geist is the default (redundant override). Lint `greenhouse/no-hardcoded-fontfamily` (error) bans Inter, DM Sans, Geist Mono, `monospace`, and raw Poppins/Geist literals.
+- **NUNCA hardcode `fontFamily`** — Poppins auto-applies via h1–h4 + `surfaceHeroTitle`; Geist is the default (redundant override). Lint `greenhouse/no-hardcoded-fontfamily` (error) bans Inter, DM Sans, Geist Mono, `monospace`, and raw Poppins/Geist literals.
+- **NUNCA use `surfaceHeroTitle` as a general big heading** — it is only for primary full-page/workbench surface titles or primary identity headers; maximum one per surface; never cards, tables, lists, drawers, modals, dashboards, repeated rows, or marketing heroes. Dense/product-detail page titles remain `h4` / `page-title`.
 - **NUNCA monospace / Geist Mono / Menlo / Consolas / Courier** for numbers — use `variant='monoId'|'monoAmount'|'kpiValue'` (Geist + `tabular-nums`). Numeric density comes from line-height (1.54) + letter-spacing, not a mono face.
 - **NUNCA edit `src/@core/theme/*`** (Vuexy core, read-only). Override only in `mergedTheme.ts`.
 - **NUNCA add a token without a consumer** (orphan = drift). And **NUNCA add/change a value in one surface only** — move SoT + mergedTheme + DESIGN.md (front-matter + prose) + V1 (§3.2/§15.1) + drift-guard **together in the same PR**, or `typography-drift.test.ts` fails CI.
@@ -126,7 +128,7 @@ Latin-first (es-CL / en-US / pt) + **RTL-ready via CSS logical properties**; CJK
 
 ## Audit pass (Greenhouse lens)
 1. Every text element a `<Typography variant>` / token — zero inline `fontSize`/`fontFamily`? (lint green)
-2. Poppins only via h1–h4; everything else Geist?
+2. Poppins only via h1–h4 + surfaceHeroTitle; everything else Geist?
 3. Numbers via monoId/monoAmount/kpiValue (tabular-nums), no monospace?
 4. No weight-500 role; weights in {400,600,700,800}?
 5. Page-title (20) ≥ section-title (16) — no inversion?

@@ -53,6 +53,7 @@ const OWNED_FIELDS = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'let
 describe('typographyScale SoT pins (TASK-1036)', () => {
   it('pins the canonical display + body + numeric values', () => {
     expect(typographyScale.headlineDisplay).toMatchObject({ fontSize: '2rem', fontWeight: 800 })
+    expect(typographyScale.surfaceHeroTitle).toMatchObject({ fontSize: '2.125rem', mobileFontSize: '1.75rem', fontWeight: 600, lineHeight: 1.15 })
     // TASK-1038 redesign: page-title 16→20, section-title 18→16, label-md 15→14.
     expect(typographyScale.pageTitle).toMatchObject({ fontSize: '1.25rem', fontWeight: 600 })
     expect(typographyScale.sectionTitle).toMatchObject({ fontSize: '1rem', fontWeight: 600 })
@@ -65,7 +66,7 @@ describe('typographyScale SoT pins (TASK-1036)', () => {
 
   it('uses only the two active families (Poppins display / Geist text)', () => {
     for (const [name, token] of Object.entries(typographyScale)) {
-      const isDisplay = ['headlineDisplay', 'headlineLg', 'headlineMd', 'pageTitle'].includes(name)
+      const isDisplay = ['headlineDisplay', 'headlineLg', 'headlineMd', 'pageTitle', 'surfaceHeroTitle'].includes(name)
 
       if (isDisplay) {
         expect(token.fontFamily, `${name} must be Poppins`).toContain('Poppins')
@@ -120,6 +121,12 @@ describe('runtime ≡ SoT — resolved theme variants mirror their bridged token
 
     expect(overrides?.sizeLarge?.fontSize).toBe(controlText.lg)
   })
+
+  it('surfaceHeroTitle has the canonical compact mobile step', () => {
+    const runtime = theme.typography.surfaceHeroTitle as Record<string, Record<string, unknown>>
+
+    expect(runtime['@media (max-width:599.95px)']?.fontSize).toBe(typographyScale.surfaceHeroTitle.mobileFontSize)
+  })
 })
 
 describe('controlText ramp pins (TASK-1038 redesign)', () => {
@@ -139,6 +146,7 @@ describe('DESIGN.md contract ≡ SoT', () => {
     'headline-lg': 'headlineLg',
     'headline-md': 'headlineMd',
     'page-title': 'pageTitle',
+    'surface-hero-title': 'surfaceHeroTitle',
     'section-title': 'sectionTitle',
     'label-md': 'labelMd',
     'body-lg': 'bodyLg',
@@ -224,6 +232,7 @@ const VALID_TYPOGRAPHY_PX = (() => {
 
   for (const token of Object.values(typographyScale) as Array<Record<string, unknown>>) {
     if (typeof token.fontSize === 'string') set.add(remToPx(token.fontSize))
+    if (typeof token.mobileFontSize === 'string') set.add(remToPx(token.mobileFontSize))
 
     if (typeof token.letterSpacing === 'string' && token.letterSpacing.endsWith('px')) {
       set.add(parseFloat(token.letterSpacing))
@@ -240,6 +249,7 @@ const CONTRACT_TO_SCALE_V1: Record<string, keyof typeof typographyScale> = {
   'headline-lg': 'headlineLg',
   'headline-md': 'headlineMd',
   'page-title': 'pageTitle',
+  'surface-hero-title': 'surfaceHeroTitle',
   'section-title': 'sectionTitle',
   'label-md': 'labelMd',
   'body-lg': 'bodyLg',

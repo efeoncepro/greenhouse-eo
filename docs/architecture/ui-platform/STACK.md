@@ -19,7 +19,7 @@
 | Charts (dashboard) | Recharts | 3.6 | Full-width charts, multi-series, tooltips |
 | Data Tables | TanStack React Table | 8.21 | Sorting, filtering, pagination, row selection |
 | Icons | Iconify (Tabler set) | 2.0 | `tabler-*` icon names via Iconify |
-| Font | DM Sans | — | `var(--font-dm-sans)`, monospace para IDs |
+| Font | Geist + Poppins | — | `var(--font-geist)` para producto base; Poppins solo `h1-h4` + `surfaceHeroTitle`; numéricos con Geist + `tabular-nums` |
 
 
 ## Librerías Disponibles — Inventario Completo

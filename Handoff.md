@@ -1,3 +1,20 @@
+# Sesion 2026-06-08 — Surface Hero Title token para títulos primarios
+
+Se promovio el tamaño/peso que el operador aprobo visualmente en `/people/mockup/daniela-workforce` y `/agency/organizations/mockup` a token canonico de surface, sin cambiar `h1-h4` globales.
+
+- **Token nuevo:** `surfaceHeroTitle` / `surface-hero-title` en `typographyScale`, bridged a `Typography variant='surfaceHeroTitle'`.
+- **Valores:** Poppins 600; `2.125rem` desktop/tablet; `1.75rem` mobile; `lineHeight=surfaceHero(1.15)`.
+- **Regla de uso:** solo título primario de surface full-page/workbench o header de identidad principal, maximo uno por surface. No usar en cards, tablas, listas, drawers, modals, dashboards, rows repetidas, headings genericos ni marketing heroes; page titles densos/de detalle siguen en `h4/page-title`.
+- **Runtime/docs:** theme + tipos MUI + drift tests + `DESIGN.md` + `GREENHOUSE_DESIGN_TOKENS_V1.md` + canonical typography view + UI Platform historial/stack + skill Codex de tipografia.
+- **Primer consumer:** `src/views/greenhouse/people/mockup/daniela-workforce/DanielaWorkforceProfileMockupView.tsx` reemplaza `h3` con `fontSize`/`lineHeight` inline por `variant='surfaceHeroTitle'`.
+- **Segundo consumer:** `src/views/greenhouse/organizations/mockup/OrganizationListEnterpriseMockupView.tsx` aplica `variant='surfaceHeroTitle'` al titulo principal `Organizaciones`; rail contextual vuelve a `h5` y lista/matriz siguen en `h6` por la regla anti-rows repetidas.
+- **Diagnostico local Next/Turbopack post-cambio:** el operador reporto rotura similar a ISSUE-085. Se reprodujeron errores transitorios `module factory is not available` mezclando los mockups de organizaciones/personas en el grafo SSR durante HMR y un chunk async viejo de `@tanstack/query-devtools`; no habia manifest/chunk huerfano persistente tras restart, pero el patron podia generar 500 temporales durante GVC.
+- **Fix runtime local:** las rutas mockup `/agency/organizations/mockup` y `/people/mockup/daniela-workforce` ahora cargan sus views pesadas con wrappers client-only (`ClientMockupPage.tsx`, `next/dynamic({ ssr:false })`), evitando que Turbopack intente instanciarlas en el grafo SSR de otras paginas durante HMR. `ReactQueryDevtools` queda opt-in local con `NEXT_PUBLIC_GREENHOUSE_REACT_QUERY_DEVTOOLS=1` para que el chunk de tooling no interfiera con GVC por defecto.
+- **Gates:** `typography-drift.test.ts` 63/63, eslint focal OK, `design:lint` 0/0, `tsc --noEmit` OK. Post-fix: eslint focal de wrappers/provider OK, `tsc --noEmit` OK, `pnpm fe:capture organization-list-enterprise-mockup --env=local` OK desktop+mobile (`.captures/2026-06-08T10-06-32_organization-list-enterprise-mockup`, runtime 0 console/page/http/hydration), `pnpm fe:capture person-daniela-workforce-profile --env=local` OK desktop+laptop+mobile (`.captures/2026-06-08T10-07-02_person-daniela-workforce-profile`, runtime 0 console/page/http/hydration). Referencia previa: `.captures/2026-06-08T09-32-37_typography-canonical`.
+- **No tocado:** cambios paralelos de `TASK-1053` siguen fuera de este cierre.
+
+---
+
 # Sesion 2026-06-08 — TASK-1016 mockup de organizaciones tokenizado (develop local)
 
 Se reviso `/agency/organizations/mockup` por hardcodes visuales tras levantar server local y ver el mockup en Browser/GVC.

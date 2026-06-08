@@ -86,6 +86,7 @@ declare module '@mui/material/styles' {
     lineHeights: {
       display: number
       heading: number
+      surfaceHero: number
       pageTitle: number
       metadata: number
       body: number
@@ -165,6 +166,7 @@ declare module '@mui/material/styles' {
     lineHeights?: Partial<{
       display: number
       heading: number
+      surfaceHero: number
       pageTitle: number
       metadata: number
       body: number
@@ -176,11 +178,13 @@ declare module '@mui/material/styles' {
 
   // Custom Typography Variants
   interface TypographyVariants {
+    surfaceHeroTitle: React.CSSProperties
     monoId: React.CSSProperties
     monoAmount: React.CSSProperties
     kpiValue: React.CSSProperties
   }
   interface TypographyVariantsOptions {
+    surfaceHeroTitle?: React.CSSProperties
     monoId?: React.CSSProperties
     monoAmount?: React.CSSProperties
     kpiValue?: React.CSSProperties
@@ -273,6 +277,7 @@ declare module '@mui/material/styles' {
 
 declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
+    surfaceHeroTitle: true
     monoId: true
     monoAmount: true
     kpiValue: true

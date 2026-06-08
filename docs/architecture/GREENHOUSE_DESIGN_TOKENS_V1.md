@@ -60,13 +60,13 @@ Violations visible in code review or agent output are a **hard block**, not a ni
 
 ## 3. Typography
 
-> **Política canónica vigente** (TASK-566 / EPIC-004, 2026-05-01 — pivot a Geist tarde del mismo día): el sistema tipográfico de Greenhouse opera con **dos familias activas y solo dos**: `Poppins` para display controlado (`h1-h4`) y `Geist Sans` para todo el producto base (body, forms, tablas, controles, chips, labels, KPIs, IDs y montos). `DM Sans` e `Inter` quedaron retiradas como baseline. `fontFamily: 'monospace'` está prohibido globalmente — los montos y los IDs usan Geist con `font-variant-numeric: tabular-nums`. Los variants `monoId` y `monoAmount` siguen siendo la API semántica para IDs y montos, pero NO licencian una tercera familia monospace (en particular **Geist Mono NO se introduce**).
+> **Política canónica vigente** (TASK-566 / EPIC-004, 2026-05-01 — pivot a Geist tarde del mismo día): el sistema tipográfico de Greenhouse opera con **dos familias activas y solo dos**: `Poppins` para display controlado (`h1-h4` + `surfaceHeroTitle`) y `Geist Sans` para todo el producto base (body, forms, tablas, controles, chips, labels, KPIs, IDs y montos). `DM Sans` e `Inter` quedaron retiradas como baseline. `fontFamily: 'monospace'` está prohibido globalmente — los montos y los IDs usan Geist con `font-variant-numeric: tabular-nums`. Los variants `monoId` y `monoAmount` siguen siendo la API semántica para IDs y montos, pero NO licencian una tercera familia monospace (en particular **Geist Mono NO se introduce**).
 
 ### 3.1 Font families
 
 | Role | Family | CSS Variable | Pesos cargados | When to use |
 |---|---|---|---|---|
-| Display | **Poppins** | `var(--font-poppins)` | 600, 700, 800 | EXCLUSIVO para `h1-h4` y momentos display realmente intencionales. Prohibido en `h5`, `h6`, `body*`, `button`, `overline`, `kpiValue`, `mono*`, chips, tablas, inputs |
+| Display | **Poppins** | `var(--font-poppins)` | 600, 700, 800 | EXCLUSIVO para `h1-h4`, `surfaceHeroTitle` y momentos display realmente intencionales. Prohibido en `h5`, `h6`, `body*`, `button`, `overline`, `kpiValue`, `mono*`, chips, tablas, inputs |
 | Product UI base | **Geist Sans** | `var(--font-geist)` | 400, 500, 600, 700, 800 | TODO el resto del producto: body, forms, controles, tablas, chips, labels, KPIs, IDs, montos. Es el `typography.fontFamily` default del theme — no debe hardcodearse inline |
 | Numbers / IDs | **Geist** + `font-variant-numeric: tabular-nums` | `var(--font-geist)` | mismos pesos que Geist | Toda columna numérica, total, KPI, ID y monto. **PROHIBIDO `font-family: monospace`** y **PROHIBIDO Geist Mono** |
 
@@ -93,6 +93,7 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 | h2 | **Poppins** | 1.5 | 24 (override) | 700 | `heading` (1.25) | — | Marketing section header |
 | h3 | **Poppins** | 1.25 | 20 (override) | 600 | `heading` (1.25) | — | Page identity (rare) |
 | h4 | **Poppins** | 1.25 | 20 | 600 | `pageTitle` (1.4) | — | **Page title in product UI** (TASK-1038: 16→20, fixes inversion) |
+| surfaceHeroTitle | **Poppins** | 2.125 (mobile 1.75) | 34 (mobile 28) | 600 | `surfaceHero` (1.15) | — | **Primary full-page/workbench surface title only** — one per surface, never cards/tables/lists |
 | h5 | Geist | 1 | 16 | 600 | `body` (1.5) | — | **Section title inside card/accordion** (TASK-1038: 18→16) |
 | h6 | Geist | 0.875 | 14 | 600 | `body` (1.5) | — | Inline bold label (= `label-md`; prefer subtitle1) |
 | subtitle1 | Geist | 0.875 | 14 | 400 | `body` (1.5) | — | **Card subheader, list item primary** (= `subheader`, TASK-1038: 15→14) |
@@ -114,7 +115,9 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 
 | I need to show… | Use variant | Example |
 |---|---|---|
-| Main page heading | `h4` | "Nueva cotización" in quote builder |
+| Dense/product-detail page heading | `h4` | "Nueva cotización" in quote builder |
+| Primary full-page/workbench surface title | `surfaceHeroTitle` | "Organizaciones" in Organization Operations Workbench |
+| Primary identity/person header | `surfaceHeroTitle` | "Daniela Alejandra Ferreira Toro" in Person 360 |
 | Section heading inside a card | `h5` | "Ítems de la cotización" |
 | Card subheader (explainer) | `subtitle1` with `color='text.secondary'` | "Agrega ítems vendibles desde el catálogo" |
 | Primary paragraph text | `body1` | Quote description body |
@@ -131,7 +134,12 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 ### 3.4 Prohibitions
 
 - **NEVER** uses `fontFamily: 'monospace'` (literal o vía stacks tipo `'Menlo, Consolas, monospace'`). Para alinear cifras usar `fontVariantNumeric: 'tabular-nums'` sobre Geist.
-- **NEVER** declare `fontFamily` inline en componentes nuevos. Geist es default implícito; Poppins se aplica solo por las variants `h1-h4` ya tipadas en el theme.
+- **NEVER** declare `fontFamily` inline en componentes nuevos. Geist es default implícito; Poppins se aplica solo por las variants `h1-h4` + `surfaceHeroTitle` ya tipadas en el theme.
+- **NEVER** use `surfaceHeroTitle` as a general big heading. It is only for the
+  primary title of a full-page surface/workbench or the primary name of an
+  identity header, maximum one per surface, and never for cards, tables, lists,
+  dashboards, drawers, modals, repeated rows or marketing heroes. Dense/product
+  detail page titles remain `h4` / `page-title`.
 - **NEVER** introduce Geist Mono ni ninguna familia mono separada — los variants `monoId` y `monoAmount` resuelven el caso sobre Geist Sans + tabular-nums.
 - **NEVER** mantener referencias activas a `var(--font-inter)` o `'Inter'` literal en código nuevo. TASK-567 cerró el sweep en UI productiva (2026-05-02): 0 referencias a Inter en `src/views/**`, `src/components/**`, `src/app/**`. La regla ESLint `greenhouse/no-hardcoded-fontfamily` (modo `error`) bloquea regresiones desde CI.
 - **NEVER** mantener referencias activas a `var(--font-dm-sans)` o a `'DM Sans'` en código nuevo. TASK-567 cerró el sweep. Quedan **excepciones legítimas documentadas** (NO drift):
@@ -150,7 +158,7 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 | Concern | File |
 |---|---|
 | Font loading + CSS variables + fallback stack | `src/app/layout.tsx` |
-| Theme override (Geist base, Poppins h1-h4, mono variants Geist+tabular-nums) | `src/components/theme/mergedTheme.ts` |
+| Theme override (Geist base, Poppins h1-h4 + surfaceHeroTitle, mono variants Geist+tabular-nums) | `src/components/theme/mergedTheme.ts` |
 | Variant type declarations (`monoId`, `monoAmount`, `kpiValue`) + `theme.lineHeights` augmentation | `src/components/theme/types.ts` |
 | Line-height token namespace (canonical scale) | `src/components/theme/typography-tokens.ts` |
 | Coretheme fallback chain (NOT to be edited per regla dura) | `src/@core/theme/typography.ts` |
@@ -163,6 +171,7 @@ Los `line-height` ratios viven en un namespace tokenizado canónico, **no como m
 |---|---|---|
 | `display` | 1.05 | Display moments donde la compresión es señal intencional. Aplica a `kpiValue`. Usar también para totales hero, dashboard stats grandes, dock totals |
 | `heading` | 1.25 | Display headings (Poppins). Tight feel. Aplica a `h1`, `h2`, `h3` (marketing/identity) |
+| `surfaceHero` | 1.15 | Primary full-page/workbench surface title. Compacto e intencional; NO usar como heading genérico |
 | `pageTitle` | 1.4 | Page title en product UI. Aplica a `h4`. Más relajado que `heading` porque convive con body inmediatamente debajo |
 | `metadata` | 1.45 | Captions, timestamps, validity, helper text. Aplica a `caption`. Levemente más tight que `body` para compensar el font-size más chico (13px vs 15-16px de body) |
 | `body` | 1.5 | Product UI baseline. Aplica a `body1`, `body2`, `h5`, `h6`, `subtitle1`. **Piso WCAG 1.4.12** (text-spacing override): no bajar de 1.5 en variants de párrafo. Convergente con Linear / Stripe Dashboard / Vercel app sobre Geist |
@@ -630,6 +639,7 @@ Inventoried by TASK-488 subagent 2026-04-19. Top 15 files to copy/adapt (never f
 | 1.7 | 2026-06-06 | Claude + TASK-1038 (typography scale redesign) | **Rediseño de la escala** (cambio visual aprobado por el operador tras ver el impacto en `/admin/design-system/typography/mockup`). La escala era acumulada, no diseñada: **inversión de jerarquía** (page-title 16 < section-title 18), **goteo de 1px** (7 tamaños en 6px) y **sobre-granularidad** (15/16/17 vivos a la vez). Flip en el SoT (`typographyScale`), 4 tokens cambian valor + 2 de `controlText`, **0 nuevos, 0 renombrados**: `page-title` (h4) 16→**20** (arregla la inversión), `section-title` (h5) 18→**16**, `subheader`/`subtitle1` 15→**14**, `label-md`/`button` 15→**14**; `controlText.md` 15→14, `controlText.lg` (Button large) 17→**16** (saca el 17 bespoke). Ladder: 11→**8** tamaños distintos (12·13·14·16·20·24·28·32). **Hallazgos del completeness pass incorporados**: (a) `subtitle2` (13/400, ~267 consumidores) traída al SoT vía `body-sm` en `SECONDARY_VARIANT_TOKENS` (NO label-sm 13/600); (b) **Tab label** 18px hardcoded → `controlText.md` 14 (override `MuiTab` en mergedTheme); (c) **Dialog title** h6 → `section-title` 16/600 (override `MuiDialogTitle`); (d) PDF: Geist `.ttf` registra solo 400/500/700, **faltan 600/800** que la escala usa (fix pendiente en el adapter PDF). §3.2 actualizada. drift-guard 37 tests verde, design:lint 0/0/1, GVC `/admin/design-system` confirma la jerarquía sana (page-title domina, sin breakage). **Decisiones transversales canonizadas** (con product-design + arch skills): i18n Latin-first + RTL-ready vía logical properties (CJK diferido); tipo **fijo en producto**, `clamp()` solo marketing; **no display tier** sin consumidor; **PDF/email = un SSOT + adapters por medio** (espeja precedente color); truncation (ellipsis 1-línea/clamp 2-líneas/wrap); charts derivan del SoT; body measure ~65ch. **Follow-ups**: rol semántico para peso 500 (énfasis medio); adapters PDF/charts desde el SoT; lint rule `no-fontSize-inline` icon-vs-text. Referencia visual viva: `/admin/design-system/typography/mockup`. |
 
 | 1.8 | 2026-06-06 | Claude + TASK-1039/1040/1041 (typography follow-ups + consolidación) | **Cierre de los follow-ups de TASK-1038 + consolidación documental.** (a) **Charts derivan del SoT desde un solo lugar (TASK-1041, ✓):** los 43 charts del portal (Apex 33 + Recharts 10; **ECharts no se usa** — eran falsos positivos, "Recharts" contiene "echart") consumen familia+tamaño del SoT vía los wrappers `AppReactApexCharts`+`AppRecharts` (CSS `!important` leyendo `theme.typography.{fontFamily,caption}`, 100% cobertura, 0 bypass). Cambiar el SoT → los 43 se actualizan solos (2 archivos, no el sweep de 47). Helper `getChartTypographyFromTheme` (`src/components/theme/chart-typography.ts`, 6 tests) = single-source JS para ECharts canvas (donde el CSS no llega). (b) **Peso 500 evaluado y descartado (TASK-1039, won't-do):** imperceptible a 14px + ya rinde vía Vuexy/MUI → un 4º tier mete ambigüedad; récord en el mockup. (c) **PDF Geist 600/800 (TASK-1040):** familias `Geist SemiBold`/`ExtraBold` registradas (`.ttf` locales, gstatic v5) — falta migrar componentes PDF a usarlas. (d) **Fix de drift en §15.1:** la tabla estaba **entera pre-TASK-1038** (page-title 16, section-title 18, label-md 15, control-lg 17) — actualizada a la escala vigente (20/16/14/16). (e) **PDF/email = SSOT semántico + adapter por medio (sin cascada CSS → opt-in):** documentado en DESIGN.md §Typography + hard rules. drift-guard 37 verde, design:lint 0/0/1. |
+| 1.9 | 2026-06-08 | Codex + operador | Agrega `surfaceHeroTitle` / `surface-hero-title` para títulos primarios de surfaces full-page/workbench y headers de identidad principales: Poppins 34px desktop/tablet, 28px mobile, weight 600, line-height `surfaceHero` 1.15. Regla de uso restrictiva: máximo uno por surface; prohibido en cards, tablas, listas, dashboards, drawers, modals, filas repetidas y marketing heroes. Consumers iniciales: nombre de Daniela en `/people/mockup/daniela-workforce` y título `Organizaciones` en `/agency/organizations/mockup`. Drift-guard ampliado y GVC actualizado en `person-daniela-workforce-profile`, `typography-canonical` y `organization-list-enterprise-mockup`. |
 
 ### 15.1 Naming map — DESIGN.md ↔ V1 / runtime
 
@@ -643,6 +653,7 @@ DESIGN.md (raíz, formato `@google/design.md`) usa nombres semánticos snake-cas
 | `headline-lg` | `h2` | Poppins display, 1.5rem |
 | `headline-md` | `h3` | Poppins display, 1.25rem |
 | `page-title` | `h4` | Poppins display, 1.25rem (TASK-1038: 16→20, arregla la inversión) |
+| `surface-hero-title` | `surfaceHeroTitle` | Poppins display, 2.125rem desktop/tablet + 1.75rem mobile, 600 — primary full-page/workbench title only |
 | `section-title` | `h5` | Geist, 1rem (TASK-1038: 18→16) |
 | `label-md` | `button` | Geist, 0.875rem (TASK-1038: 15→14) — control/bold label (el variant `button`) |
 | `body-lg` | `body1` | Geist, 1rem |

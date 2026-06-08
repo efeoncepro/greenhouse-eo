@@ -201,7 +201,9 @@ const OrganizationListEnterpriseMockupView = () => {
                     <Typography variant='overline' color='primary.main' sx={{ display: { xs: 'none', sm: 'block' } }}>
                       Organization Operations Workbench
                     </Typography>
-                    <Typography variant='h4'>Organizaciones</Typography>
+                    <Typography variant='surfaceHeroTitle' sx={{ overflowWrap: 'anywhere' }}>
+                      Organizaciones
+                    </Typography>
                     <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 620 }}>
                       <Box component='span' sx={{ display: { xs: 'none', sm: 'inline' } }}>
                         Prioriza cuentas con riesgo, relaciones faltantes y onboarding pendiente.
@@ -215,6 +217,7 @@ const OrganizationListEnterpriseMockupView = () => {
               </Stack>
               <Stack direction='row' spacing={2} alignItems='center'>
                 <CustomTextField
+                  id='organization-list-enterprise-search'
                   value={query}
                   onChange={event => setQuery(event.target.value)}
                   placeholder='Buscar cuenta, ID o industria'

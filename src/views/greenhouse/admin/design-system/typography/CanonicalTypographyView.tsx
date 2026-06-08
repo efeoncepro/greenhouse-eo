@@ -50,6 +50,7 @@ const CONTRACT_NAME: Partial<Record<ScaleKey, string>> = {
   headlineLg: 'headline-lg',
   headlineMd: 'headline-md',
   pageTitle: 'page-title',
+  surfaceHeroTitle: 'surface-hero-title',
   sectionTitle: 'section-title',
   subheader: 'subheader',
   labelLg: 'label-lg',
@@ -80,6 +81,7 @@ const USAGE: Record<ScaleKey, string> = {
   headlineLg: 'Display grande (h2).',
   headlineMd: 'Display medio (h3).',
   pageTitle: 'Título de página de producto (h4). Domina la jerarquía visual.',
+  surfaceHeroTitle: 'Título primario de surface. Uno por surface; no usar en cards/listas/tablas.',
   sectionTitle: 'Encabezado de sección dentro de cards y drawers (h5). Dialog title.',
   subheader: 'Subtítulo / primary de list item (subtitle1).',
   labelLg: 'Label grande / Button size=large.',
@@ -97,7 +99,7 @@ const USAGE: Record<ScaleKey, string> = {
 // Tiers for grouping the scale.
 const TIERS: { label: string; tokens: ScaleKey[] }[] = [
   { label: 'Display (Poppins)', tokens: ['headlineDisplay', 'headlineLg', 'headlineMd'] },
-  { label: 'Títulos', tokens: ['pageTitle', 'sectionTitle', 'subheader'] },
+  { label: 'Títulos', tokens: ['pageTitle', 'surfaceHeroTitle', 'sectionTitle', 'subheader'] },
   { label: 'Labels', tokens: ['labelLg', 'labelMd', 'labelSm'] },
   { label: 'Body', tokens: ['bodyLg', 'bodyMd', 'bodySm'] },
   { label: 'Overline', tokens: ['overline'] },
@@ -105,6 +107,7 @@ const TIERS: { label: string; tokens: ScaleKey[] }[] = [
 ]
 
 const SAMPLE_TEXT: Partial<Record<ScaleKey, string>> = {
+  surfaceHeroTitle: 'Organizaciones',
   numericId: 'EO-2026-0042',
   numericAmount: '$ 1.284.500',
   kpiValue: '85,8%'
@@ -117,7 +120,7 @@ const tokenSx = (key: ScaleKey): SxProps<Theme> => {
 
   return {
     fontFamily: t.fontFamily,
-    fontSize: t.fontSize,
+    fontSize: t.mobileFontSize ? { xs: t.mobileFontSize, sm: t.fontSize } : t.fontSize,
     fontWeight: t.fontWeight,
     lineHeight: t.lineHeight,
     ...(t.letterSpacing ? { letterSpacing: t.letterSpacing } : {}),
@@ -200,6 +203,7 @@ const TokenSpecimen = ({ tokenKey }: { tokenKey: ScaleKey }) => {
           {[
             ['Familia', familyLabel(String(t.fontFamily))],
             ['Tamaño', `${rem} · ${remToPx(rem)}px`],
+            ...(t.mobileFontSize ? [['Mobile', `${String(t.mobileFontSize)} · ${remToPx(String(t.mobileFontSize))}px`] as const] : []),
             ['Peso', weightLabel(Number(t.fontWeight))],
             ['Interlineado', String(t.lineHeight)],
             ...(t.letterSpacing ? [['Tracking', String(t.letterSpacing)] as const] : []),
@@ -292,7 +296,7 @@ const CanonicalTypographyView = () => {
         num='1'
         title='Familias'
         dataCapture='familias'
-        hint='Exactamente dos familias activas, variable fonts. Poppins solo para display (headline-* + page-title); Geist para todo lo demás. Numéricos en Geist con tabular-nums — nunca monospace.'
+        hint='Exactamente dos familias activas, variable fonts. Poppins solo para display (headline-* + page-title + surface-hero-title); Geist para todo lo demás. Numéricos en Geist con tabular-nums — nunca monospace.'
       >
         {[
           {
@@ -367,6 +371,32 @@ const CanonicalTypographyView = () => {
             ))}
           </Box>
         ))}
+        <Divider sx={{ my: 1.5 }} />
+        <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1, bgcolor: 'background.default' }}>
+          <Typography variant='overline' color='text.secondary'>
+            Regla de uso · surface-hero-title
+          </Typography>
+          <Typography variant='surfaceHeroTitle' sx={{ display: 'block', mt: 0.5, overflowWrap: 'anywhere' }}>
+            Organizaciones
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 1, maxWidth: 780 }}>
+            Token para el título primario de una surface full-page o workbench. Mantiene Poppins con presencia
+            editorial sin promover todos los <code>page-title</code> globales; escala desde{' '}
+            <code>{typographyScale.surfaceHeroTitle.mobileFontSize}</code> en mobile a{' '}
+            <code>{typographyScale.surfaceHeroTitle.fontSize}</code> en desktop.
+          </Typography>
+          <Box component='ul' sx={{ m: 0, mt: 1.5, pl: 3, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+            <Typography component='li' variant='body2'>
+              Usar como máximo una vez por surface, en headers principales de páginas operativas o perfiles 360.
+            </Typography>
+            <Typography component='li' variant='body2'>
+              No usar en cards, listas, tablas, drawers, modales, KPI tiles ni headers secundarios.
+            </Typography>
+            <Typography component='li' variant='body2'>
+              Cuando la surface sea densa o tabular, preferir <code>pageTitle</code> o <code>sectionTitle</code>.
+            </Typography>
+          </Box>
+        </Box>
       </Section>
 
       {/* 3 · Aplicaciones */}

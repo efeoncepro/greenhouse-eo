@@ -6,6 +6,8 @@
  * Export this file and import it in the `@components/theme/index.tsx` file to use the merged theme.
  */
 
+import type { CSSProperties } from 'react'
+
 // MUI Imports
 import { deepmerge } from '@mui/utils'
 import type { Theme, ThemeOptions } from '@mui/material/styles'
@@ -33,6 +35,8 @@ import { controlText, lineHeights, typographyScale } from './typography-tokens'
 // Mode-aware factory over the canonical shadow channel; consumed via
 // `theme.greenhouseElevation.<level>`. Drift-guarded by elevation-drift.test.ts.
 import { elevationTokens } from './elevation-tokens'
+
+const { mobileFontSize: surfaceHeroTitleMobileFontSize, ...surfaceHeroTitleToken } = typographyScale.surfaceHeroTitle
 
 const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['direction']) => {
   // AXIS neutral fragments (Slice 3) — flag-gated; OFF = legacy navy bit-for-bit.
@@ -122,7 +126,7 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       // Typography foundation — TASK-566 / EPIC-004 (pivot a Geist + namespace v1.3),
       // reconciliada a un Source of Truth único en TASK-1036.
       // Geist Sans = product UI base (body, forms, tables, controls, KPIs, IDs, amounts).
-      // Poppins = display only, restricted to h1-h4.
+      // Poppins = display only, restricted to h1-h4 + surfaceHeroTitle.
       // monoId / monoAmount stay as semantic variants but use Geist + tabular-nums
       // (NO monospace family, NO Geist Mono).
       // Cada variant spreadea su token de `typographyScale` (SoT) — cero magic numbers
@@ -135,6 +139,12 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       h2: { ...typographyScale.headlineLg },
       h3: { ...typographyScale.headlineMd },
       h4: { ...typographyScale.pageTitle },
+      surfaceHeroTitle: {
+        ...surfaceHeroTitleToken,
+        '@media (max-width:599.95px)': {
+          fontSize: surfaceHeroTitleMobileFontSize
+        }
+      } as unknown as CSSProperties,
       // h5 / h6 / subtitle1 / button — ownership explícito desde el SoT (TASK-1036 S1).
       // Antes heredaban su fontSize del coretheme Vuevy read-only (= mismo valor);
       // ahora el SoT es la fuente. Único delta sub-pixel: button.lineHeight 1.467→1.5

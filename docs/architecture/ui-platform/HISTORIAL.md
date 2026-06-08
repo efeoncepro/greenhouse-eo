@@ -6,6 +6,13 @@
 
 ---
 
+## Delta 2026-06-08 — Surface Hero Title token
+
+- La escala tipográfica suma `surfaceHeroTitle` / `surface-hero-title`: Poppins 600, `2.125rem` desktop/tablet, `1.75rem` mobile, `lineHeight=surfaceHero(1.15)`.
+- Uso permitido: título primario de surface full-page/workbench o header de identidad principal. Máximo uno por surface.
+- Uso prohibido: cards, tablas, listas, drawers, modals, dashboards, rows repetidas, headings genéricos o marketing heroes. No reemplaza `h1-h4`; evita usar `fontSize` inline para recrear el look.
+- Consumers iniciales: `/people/mockup/daniela-workforce` en el nombre de Daniela y `/agency/organizations/mockup` en el título `Organizaciones`. GVC local: `.captures/2026-06-08T09-32-36_person-daniela-workforce-profile`; referencia canónica: `.captures/2026-06-08T09-32-37_typography-canonical`.
+
 ## Delta 2026-06-07l — ApexCharts wrapper sin doble dynamic (ISSUE-085)
 
 `AppReactApexCharts` queda canonizado como el único wrapper dueño del `next/dynamic(..., { ssr:false })` hacia `react-apexcharts`.
