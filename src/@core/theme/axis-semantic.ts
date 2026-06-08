@@ -12,15 +12,12 @@
  * colorSchemes; only neutrals (Slice 3) differ per mode.
  *
  * --- Accessibility decisions (validated against WCAG 2.2 AA, contrast vs main) ---
- * success #28c76f, warning #ffb703, info #00bad1 are BRIGHT → white text fails
- *   (2.2:1 / 1.7:1 / 2.3:1). Dark ink passes (6.3 / 8.0 / 7.3) → contrastText = INK.
- * error: AXIS error-500 #ff4c51 is NOT AA-usable as a solid-fill main (white text
- *   3.28:1, dark ink 4.17:1 — neither reaches 4.5). So error.main maps to AXIS
- *   error-800 #cc3d41 (white text 4.87:1 ✅) for solid fills; the vibrant #ff4c51
- *   stays as error.light for accents/borders/icons (4.87:1 as UI element on white).
- *   This is a deliberate a11y deviation from the main=ramp[500] rule (TASK-1034
- *   Slice 2b, decision #3) — reconcile with AXIS upstream (the error ramp needs an
- *   AA-capable solid-fill main, or a dedicated solid token).
+ * TASK-1053 (dirección D): los fills 500 son oscuros y AA con texto BLANCO →
+ *   success #157f47 (5.05:1), info #1f6fd4 (4.9:1), error #dc2e39 (4.6:1).
+ *   contrastText = WHITE para esos tres; main = ramp[500] uniforme (se eliminó la
+ *   desviación a error-800 de Slice 2b — el ramp dirección D ya es AA-capable en 500).
+ * warning #ffb703 es amber brillante (señal de tránsito) → texto OSCURO (INK), nunca
+ *   blanco (blanco sobre amber falla; INK pasa ~8:1). contrastText = INK solo aquí.
  */
 
 import { axisRamp } from './axis-tokens'
@@ -54,13 +51,14 @@ type SemanticRole = {
  * drift-guard test can assert: theme.palette.<role>.main === axisSemanticHex.<role>
  * === every non-theme consumer. One SoT, zero hardcoded semantic hexes.
  *
- * NOTE error = #cc3d41 (AXIS error-800, the AA-capable solid-fill main from
- * Slice 2b), NOT the vibrant #ff4c51 (which is error.light, accents only).
+ * TASK-1053 (dirección D): los fills 500 ahora son AA con texto blanco
+ * (success #157f47 5.05:1, info #1f6fd4 4.9:1, error #dc2e39 4.6:1) → main = ramp[500]
+ * uniforme (sin la desviación a error-800). warning sigue traffic-sign (texto OSCURO).
  */
 export const axisSemanticHex = {
   success: axisRamp.success[500],
   warning: axisRamp.warning[500],
-  error: axisRamp.error[800],
+  error: axisRamp.error[500],
   info: axisRamp.info[500]
 } as const satisfies Record<'success' | 'warning' | 'error' | 'info', string>
 
@@ -69,25 +67,24 @@ export const axisSemanticPalette = {
     main: axisRamp.success[500],
     light: axisRamp.success[400],
     dark: axisRamp.success[600],
-    contrastText: INK
+    contrastText: WHITE // dirección D: emerald oscuro → texto blanco AA (5.05:1)
   },
   warning: {
     main: axisRamp.warning[500],
     light: axisRamp.warning[400],
     dark: axisRamp.warning[600],
-    contrastText: INK
+    contrastText: INK // amber traffic-sign → texto OSCURO (nunca blanco)
   },
   error: {
-    // a11y deviation: main = error-800 (AA white text 4.87:1); light = vibrant error-500.
-    main: axisRamp.error[800],
-    light: axisRamp.error[500],
-    dark: axisRamp.error[900],
+    main: axisRamp.error[500], // dirección D: vermilion AA (blanco 4.6:1) — sin desviación a 800
+    light: axisRamp.error[400],
+    dark: axisRamp.error[600],
     contrastText: WHITE
   },
   info: {
     main: axisRamp.info[500],
     light: axisRamp.info[400],
     dark: axisRamp.info[600],
-    contrastText: INK
+    contrastText: WHITE // dirección D: azure → texto blanco AA (4.9:1)
   }
 } as const satisfies Record<'success' | 'warning' | 'error' | 'info', SemanticRole>

@@ -49,29 +49,29 @@ export const axisRamp = {
     800: '#0c7250',
     900: '#03593d'
   },
-  // Feedback · GreenHouse Info (cyan)
+  // Feedback · Info — TASK-1053 Restraint v1: azure (cyan → azul; AA texto-sobre-blanco desde 500, 4.9:1)
   info: {
-    100: '#ccf1f6',
-    200: '#99e3ed',
-    300: '#66d6e3',
-    400: '#33c8da',
-    500: '#00bad1',
-    600: '#00a7bc',
-    700: '#009eb2',
-    800: '#0095a7',
-    900: '#008c9d'
+    100: '#e8f1fd',
+    200: '#c2dbf7',
+    300: '#94beee',
+    400: '#4e90de',
+    500: '#1f6fd4',
+    600: '#1a5eb8',
+    700: '#155cad',
+    800: '#114a8c',
+    900: '#0c376a'
   },
-  // Feedback · GreenHouse Success (green)
+  // Feedback · Success — TASK-1053 Restraint v1: emerald (AA texto-sobre-blanco desde 500; blanco-sobre-fill 5.05:1)
   success: {
-    100: '#d4f4e2',
-    200: '#a9e9c5',
-    300: '#7edda9',
-    400: '#53d28c',
-    500: '#28c76f',
-    600: '#24b364',
-    700: '#22a95e',
-    800: '#209f59',
-    900: '#1e9553'
+    100: '#e7f6ee',
+    200: '#bce6cf',
+    300: '#8fd3ae',
+    400: '#46a877',
+    500: '#157f47',
+    600: '#127140',
+    700: '#0f5e35',
+    800: '#0b4928',
+    900: '#073219'
   },
   // Feedback · GreenHouse Warning (amber)
   warning: {
@@ -85,17 +85,17 @@ export const axisRamp = {
     800: '#bd8700',
     900: '#9a6e00'
   },
-  // Feedback · GreenHouse Error (coral)
+  // Feedback · Error — TASK-1053 Restraint v1: vermilion (no ladrillo; blanco-sobre-fill 4.6:1 AA en 500)
   error: {
-    100: '#ffdbdc',
-    200: '#ffb7b9',
-    300: '#ff9497',
-    400: '#ff7074',
-    500: '#ff4c51',
-    600: '#e64449',
-    700: '#d94145',
-    800: '#cc3d41',
-    900: '#bf393d'
+    100: '#fdecec',
+    200: '#f5c2c4',
+    300: '#ed9094',
+    400: '#e25a61',
+    500: '#dc2e39',
+    600: '#c01d27',
+    700: '#9e1820',
+    800: '#7b1219',
+    900: '#560c11'
   },
   // Neutral · GreenHouse Gray
   gray: {
@@ -131,10 +131,10 @@ export const axisMain = {
 export const axisOpacity = {
   primary: { 8: '#0375db14', 16: '#0375db29', 24: '#0375db3d', 32: '#0375db52', 38: '#0375db61' },
   secondary: { 8: '#6ec20714', 16: '#6ec20729', 24: '#6ec2073d', 32: '#6ec20752', 38: '#6ec20761' },
-  info: { 8: '#00bad114', 16: '#00bad129', 24: '#00bad13d', 32: '#00bad152', 38: '#00bad161' },
-  success: { 8: '#28c76f14', 16: '#28c76f29', 24: '#28c76f3d', 32: '#28c76f52', 38: '#28c76f61' },
+  info: { 8: '#1f6fd414', 16: '#1f6fd429', 24: '#1f6fd43d', 32: '#1f6fd452', 38: '#1f6fd461' },
+  success: { 8: '#157f4714', 16: '#157f4729', 24: '#157f473d', 32: '#157f4752', 38: '#157f4761' },
   warning: { 8: '#ffb70314', 16: '#ffb70329', 24: '#ffb7033d', 32: '#ffb70352', 38: '#ffb70361' },
-  error: { 8: '#ff4c5114', 16: '#ff4c5129', 24: '#ff4c513d', 32: '#ff4c5152', 38: '#ff4c5161' },
+  error: { 8: '#dc2e3914', 16: '#dc2e3929', 24: '#dc2e393d', 32: '#dc2e3952', 38: '#dc2e3961' },
   gray: { 8: '#2e263d14', 16: '#2e263d29', 24: '#2e263d3d', 32: '#2e263d52', 38: '#2e263d61' }
 } as const satisfies Record<string, AxisOpacityScale>
 

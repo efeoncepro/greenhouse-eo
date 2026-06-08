@@ -20,12 +20,12 @@ import { axisSemanticHex, axisSemanticPalette } from './axis-semantic'
 const LEGACY_HEXES = ['#6ec207', '#ff6500', '#bb1954']
 
 describe('AXIS semantic SoT (axisSemanticHex)', () => {
-  it('pins the canonical AXIS hexes (error = error-800 AA, not the vibrant #ff4c51)', () => {
+  it('pins the canonical AXIS hexes (dirección D, TASK-1053: error = error-500 AA vermilion)', () => {
     expect(axisSemanticHex).toEqual({
-      success: '#28c76f',
+      success: '#157f47',
       warning: '#ffb703',
-      error: '#cc3d41',
-      info: '#00bad1'
+      error: '#dc2e39',
+      info: '#1f6fd4'
     })
   })
 

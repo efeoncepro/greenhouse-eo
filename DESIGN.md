@@ -11,7 +11,7 @@ colors:
   secondary: "#138760"
   secondary-light: "#6EC207"
   secondary-dark: "#0C7250"
-  info: "#00BAD1"
+  info: "#1F6FD4"
   neutral: "#F8F7FA"
   surface: "#FFFFFF"
   surface-alt: "#FAFAFA"
@@ -25,9 +25,9 @@ colors:
   on-primary: "#FFFFFF"
   on-surface: "#2F2B3D"
   on-surface-dark: "#E1DEF5"
-  success: "#28C76F"
+  success: "#157F47"
   warning: "#FFB703"
-  error: "#CC3D41"
+  error: "#DC2E39"
   border-subtle: "#DBDBDB"
 typography:
   headline-display:
@@ -197,7 +197,7 @@ components:
     padding: 8px
   status-chip-success:
     backgroundColor: "{colors.success}"
-    textColor: "{colors.text-primary}"
+    textColor: "{colors.on-primary}"
     typography: "{typography.body-md}"
     rounded: "{rounded.md}"
     padding: 8px
@@ -215,7 +215,7 @@ components:
     padding: 8px
   status-chip-info:
     backgroundColor: "{colors.info}"
-    textColor: "{colors.text-primary}"
+    textColor: "{colors.on-primary}"
     typography: "{typography.body-md}"
     rounded: "{rounded.md}"
     padding: 8px
@@ -266,12 +266,12 @@ The colors above are the **semantic + key tokens** an agent needs day to day. Th
   - `theme.axis.neutral.{light,dark}.{bodyBg|paper|bgWhite|textPrimary|textSecondary|textDisabled|divider|actionHover|snackbar}` — per-mode surface/text/divider neutrals (the values mapped into `background`/`paper`/`text` below).
 - **Default rule:** components consume the **semantic** layer (`theme.palette.*`, `theme.customColors.*`) — the AXIS primitives mint those semantics; only drop to `theme.axis.ramp.*` when no semantic token fits.
 - **Which step to use (agents: do NOT pick a ramp step by eye):** the semantic `main`/`light`/`dark` already encode the right step per role — use them, not raw ramp steps. The mapping + a11y rule:
-  - `main` = the **functional fill/text step** chosen for AA, NOT always the nominal `500`. E.g. `error.main` = error-**800** (`#CC3D41`, the `500` `#FF4C51` fails white text); `secondary.main` = secondary-**700** (`#138760`, the lime `500` `#6EC207` is illegible as text ~1.8:1). When you need a solid fill or text in a brand/semantic color, use `main`.
+  - `main` = the **functional fill/text step** chosen for AA. For feedback semantics (TASK-1053 Restraint v1) `main` = the nominal `500`, now AA with white text by design: `error.main` = error-`500` `#DC2E39` (white 4.6:1), `success.main` = success-`500` `#157F47` (white 5.05:1), `info.main` = info-`500` `#1F6FD4` (white 4.9:1); `warning.main` = warning-`500` `#FFB703` uses **dark ink** (white-on-amber fails AA). The legacy error-800 deviation was removed. `secondary.main` = secondary-**700** (`#138760`, the lime `500` `#6EC207` is illegible as text ~1.8:1). When you need a solid fill or text in a brand/semantic color, use `main`.
   - `light` = the **bright/tint accent end** (e.g. `secondary.light` = lime `500` `#6EC207`) — use ONLY as a tint behind dark/ink text or as a soft fill, never with white text (it fails AA). `theme.axis.opacity.<family>[8|16]` is the canonical soft-fill alpha.
   - `dark` = **hover/active** (darken), e.g. `secondary.dark` = secondary-`800`.
   - Raw `theme.axis.ramp.<family>[<step>]` is for the rare case the semantic layer can't cover (a chart series needing N distinct steps, a specific contrast-safe tint) — and you must verify contrast yourself.
 - **Neutrals are AXIS** (light bg `#F8F7FA` / paper `#FFFFFF` / ink `#2F2B3D`; dark bg `#25293C` / paper `#2F3349` / ink `#E1DEF5`), default-on at runtime; the env kill-switch `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED=false` reverts to legacy navy only in emergency.
-- **`secondary` = AXIS green (ADOPTED, TASK-1034).** AXIS defines `secondary` as the green/lime ramp; the legacy Efeonce azure `#023C70` was NOT an AXIS color and is retired. `secondary.main` = secondary-**700** `#138760` (deep green — the functional, AA-legible step: white text 4.9:1, and legible as tonal/outlined text where `main` drives the color). `secondary.light` = secondary-**500** `#6EC207` (the bright lime — tint/accent only, dark/ink text). `secondary.dark` = secondary-**800** `#0C7250` (hover/active). Default-on at runtime; kill-switch `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED=false` reverts to legacy azure only in emergency. **Why deep green, not the nominal lime `500`:** `color="secondary"` is ~241 tonal/outlined usages (0 contained) where `main` is the text/border — bright lime as text is illegible (~1.8:1) and reads candy; the deep green is sophisticated + AA. Same principle as `error.main` = error-800.
+- **`secondary` = AXIS green (ADOPTED, TASK-1034).** AXIS defines `secondary` as the green/lime ramp; the legacy Efeonce azure `#023C70` was NOT an AXIS color and is retired. `secondary.main` = secondary-**700** `#138760` (deep green — the functional, AA-legible step: white text 4.9:1, and legible as tonal/outlined text where `main` drives the color). `secondary.light` = secondary-**500** `#6EC207` (the bright lime — tint/accent only, dark/ink text). `secondary.dark` = secondary-**800** `#0C7250` (hover/active). Default-on at runtime; kill-switch `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED=false` reverts to legacy azure only in emergency. **Why deep green, not the nominal lime `500`:** `color="secondary"` is ~241 tonal/outlined usages (0 contained) where `main` is the text/border — bright lime as text is illegible (~1.8:1) and reads candy; the deep green is sophisticated + AA. Same principle as picking the AA-legible step over the bright nominal `500` (TASK-1053 corrected the feedback semantics to AA-capable `500`s, so only `secondary` keeps a non-500 main).
 - **`primary-light` / `primary-dark`** remain runtime-computed (`lighten`/`darken` of the tenant primary), not AXIS ramp steps, because `primary` is tenant-driven.
 
 ## Typography
