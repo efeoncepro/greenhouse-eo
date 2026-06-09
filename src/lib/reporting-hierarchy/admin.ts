@@ -5,11 +5,7 @@ import { sql } from 'kysely'
 import { getDb, withTransaction } from '@/lib/db'
 import { listDirectReports } from '@/lib/reporting-hierarchy/readers'
 import { upsertReportingLine, upsertReportingLineInTransaction } from '@/lib/reporting-hierarchy/store'
-import {
-  createResponsibilityInTransaction,
-  revokeResponsibility,
-  revokeResponsibilityInTransaction
-} from '@/lib/operational-responsibility/store'
+import { revokeResponsibility } from '@/lib/operational-responsibility/store'
 import { HrCoreValidationError, normalizeNullableString, normalizeString } from '@/lib/hr-core/shared'
 
 import type {
@@ -138,8 +134,6 @@ const sanitizeEffectiveFrom = (value: unknown) => {
 
   return normalized || new Date().toISOString()
 }
-
-const sanitizeEffectiveTo = (value: unknown) => normalizeNullableString(value)
 
 export const formatTimestampLike = (value: string | Date | null | undefined) => {
   if (!value) {
@@ -603,49 +597,31 @@ type AssignApprovalDelegationDependencies = {
   ) => Promise<HrHierarchyDelegationRecord[]>
 }
 
+/**
+ * TASK-1020 D1 — guardrail fail-closed.
+ *
+ * La delegación GENÉRICA de aprobaciones (`approval_delegate`) NO está soportada
+ * en V1: ya no confiere ni autoridad de aprobación (resolver per-stage ignora el
+ * delegate genérico) ni scope de supervisor (`getSupervisorScopeForTenant`). Crear
+ * una nueva sería un primitivo inerte y engañoso ("delegar aprobaciones" que no
+ * delega nada) — exactamente el drift que cerró TASK-1020.
+ *
+ * Las aprobaciones de permisos/gastos/evaluaciones resuelven al supervisor FORMAL
+ * (`reporting_lines`) o al override HR/admin. La delegación real renace como
+ * contrato domain-scoped (ADR follow-up). `revokeApprovalDelegationById` y
+ * `listApprovalDelegations` siguen disponibles para limpiar/auditar las existentes.
+ */
+export const GENERIC_APPROVAL_DELEGATION_UNSUPPORTED_MESSAGE =
+  'La delegación genérica de aprobaciones no está disponible. Las aprobaciones resuelven al supervisor formal o al override de HR/Administración; la delegación por dominio es una capacidad futura.'
+
 export const assignApprovalDelegationWithDependencies = async (
   input: AssignApprovalDelegationInput,
   dependencies: AssignApprovalDelegationDependencies
-) => {
-  const supervisorMemberId = assertRequired(input.supervisorMemberId, 'supervisorMemberId')
-  const delegateMemberId = assertRequired(input.delegateMemberId, 'delegateMemberId')
-  const effectiveFrom = sanitizeEffectiveFrom(input.effectiveFrom)
-  const effectiveTo = sanitizeEffectiveTo(input.effectiveTo)
+): Promise<HrHierarchyDelegationRecord | null> => {
+  void input
+  void dependencies
 
-  if (supervisorMemberId === delegateMemberId) {
-    throw new HrCoreValidationError('A supervisor cannot delegate approvals to the same member.')
-  }
-
-  const activeDelegations = await dependencies.loadApprovalDelegations({
-    supervisorMemberId,
-    includeInactive: false
-  })
-
-  await withTransaction(async client => {
-    for (const existing of activeDelegations) {
-      await revokeResponsibilityInTransaction(existing.responsibilityId, client)
-    }
-
-    await createResponsibilityInTransaction(
-      {
-        memberId: delegateMemberId,
-        scopeType: 'member',
-        scopeId: supervisorMemberId,
-        responsibilityType: 'approval_delegate',
-        isPrimary: true,
-        effectiveFrom,
-        effectiveTo
-      },
-      client
-    )
-  })
-
-  const [delegation] = await dependencies.loadApprovalDelegations({
-    supervisorMemberId,
-    includeInactive: true
-  })
-
-  return delegation ?? null
+  throw new HrCoreValidationError(GENERIC_APPROVAL_DELEGATION_UNSUPPORTED_MESSAGE, 422)
 }
 
 export const revokeApprovalDelegationById = async (responsibilityId: string) => {
