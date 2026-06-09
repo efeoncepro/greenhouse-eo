@@ -95,6 +95,12 @@ Reglas obligatorias:
 - no existe export client-safe de roster/coverage/alerts
 - no hay runbook operativo ni telemetry específica de esta capability
 
+## Approved Mockup Dependency
+
+El contrato visual/producto aprobado vive en `docs/mockups/TASK-357/README.md`.
+
+Esta task debe cerrar la operabilidad de lo que el mockup promete: freshness visible, lineage, health checks, export client-safe de roster/coverage/alerts y degradaciones honestas. Si runtime se aparta del mockup por una limitación operativa, debe documentarse con evidencia GVC y una decisión/follow-up explícito.
+
 ## Scope
 
 ### Slice 1 — Freshness & health
@@ -122,6 +128,7 @@ Reglas obligatorias:
 - [ ] `Assigned Team` expone freshness y health operativa comprensible
 - [ ] Existe export cliente-safe consistente con access policy
 - [ ] La capability queda documentada y operable para staging/production
+- [ ] Runbook y cierre de rollout referencian el mockup aprobado y la evidencia GVC runtime
 
 ## Verification
 

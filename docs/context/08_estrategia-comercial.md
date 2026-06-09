@@ -101,7 +101,7 @@ El diferenciador real no es ningún servicio individual — es escalar dentro de
 
 Lo que el corpus comercial declara que Greenhouse necesita tener operativo (= tu backlog con justificación comercial directa):
 
-- **Cobertura de tests** (hoy 3.3%): priorizar tests en `finance`, `payroll` e `identity` **antes** de exponer el portal a clientes. Riesgo reputacional directo.
+- **Cobertura de tests**: priorizar tests en `finance`, `payroll` e `identity` **antes** de exponer el portal a clientes. Riesgo reputacional directo. (El % exacto vive en el reporte de cobertura del repo/CI — no se hardcodea aquí.)
 - **Entorno demo:** tenant demo con datos simulados realistas para el proceso de venta.
 - **Dominio + SSL** del portal configurado (`greenhouse.efeoncepro.com`).
 
@@ -109,4 +109,4 @@ Lo que el corpus comercial declara que Greenhouse necesita tener operativo (= tu
 
 ---
 
-*Fuente: Estrategia Comercial Efeonce Q2–Q3 2026 v1.3. Documentos relacionados: Sistema Comercial Pipeline Core, Anatomía Core Pipeline v1.1, Arquitectura Bow-tie v1.1, BDR Prospecting Playbook 2026.*
+*Fuente: Estrategia Comercial Efeonce Q2–Q3 2026 v1.3. Documentos relacionados: Sistema Comercial Pipeline Core, Anatomía Core Pipeline v1.1, Arquitectura Bow-tie v1.1, BDR Prospecting Playbook 2026. Última verificación de drift contra runtime: 2026-06-09 (TASK-1064).*

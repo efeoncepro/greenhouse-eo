@@ -39,12 +39,14 @@ El doc ASaaS original asumía que Greenhouse era un MVP temprano por construir. 
 
 ## Hoja de ruta recalibrada (exponer y adoptar, no construir)
 
+> Las fases describen **orden y foco**, no calendario duro. La fase vigente y cualquier fecha se verifican contra `project_context.md` (no fijar quarters aquí, que envejecen).
+
 | Fase | Original | **Recalibrada (vigente)** |
 |---|---|---|
-| **Fase 1 · Q2 2026** | "Transparencia — completar el MVP" | **Exposición al cliente.** El MVP ya está. Foco: dominio + **tenant demo con datos simulados realistas**, onboarding Sky y ANAM, integrar demo en el pitch BDR, test coverage en finance/payroll/identity. |
-| **Fase 2 · Q3 2026** | Operación como producto | **Sin cambios — es el gap real.** Self-service: aprobar piezas, solicitar variantes, briefs desde el portal, webhooks real-time. |
-| **Fase 3 · Q4 2026** | "Construir AI agents + inteligencia" | **Exponer, no construir.** La inteligencia financiera (revenue/margen por cliente) y los AI tools ya existen internos. Falta la **vista cliente** filtrada + recomendaciones en dashboard + "Tu año con Efeonce" automático. |
-| **Fase 4 · 2027** | Plataforma como producto | **Sin cambios.** Tier pricing, API abierta, white-label, marketplace de AI agents. |
+| **Fase 1 · Exposición al cliente** | "Transparencia — completar el MVP" | El MVP ya está. Foco: dominio + **tenant demo con datos simulados realistas**, onboarding de clientes (Sky, ANAM), integrar demo en el pitch BDR, test coverage en finance/payroll/identity. |
+| **Fase 2 · Operación como producto** | Operación como producto | **Es el gap real.** Self-service: aprobar piezas, solicitar variantes, briefs desde el portal, webhooks real-time. |
+| **Fase 3 · Exponer inteligencia** | "Construir AI agents + inteligencia" | **Exponer, no construir.** La inteligencia financiera (revenue/margen por cliente) y los AI tools ya existen internos. Falta la **vista cliente** filtrada + recomendaciones en dashboard + "Tu año con Efeonce" automático. |
+| **Fase 4 · Plataforma como producto** | Plataforma como producto | Tier pricing, API abierta, white-label, marketplace de AI agents. |
 
 ---
 
@@ -91,4 +93,4 @@ La recalibración cambia tres cosas, y todas tocan al producto:
 
 ---
 
-*Fuentes: ASaaS Strategy (mar-2026) + Addendum de Recalibración (vigente). El addendum prevalece sobre el roadmap original donde difieren. Nombres/dominios normalizados según `00` (Greenhouse, greenhouse.efeoncepro.com).*
+*Fuentes: ASaaS Strategy (mar-2026) + Addendum de Recalibración (vigente). El addendum prevalece sobre el roadmap original donde difieren. Nombres/dominios normalizados según `00` (Greenhouse, greenhouse.efeoncepro.com). Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — fases sin fecha dura; estado/roadmap vivo en `project_context.md`.*

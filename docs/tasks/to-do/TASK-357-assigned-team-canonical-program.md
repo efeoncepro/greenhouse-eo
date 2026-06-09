@@ -112,6 +112,30 @@ Reglas obligatorias:
 - la UI shared enterprise todavía no está separada entre primitives, cards y composites
 - no existe rollout coordinado hacia dashboard, home, account views y alerting
 
+## Approved Mockup Contract
+
+El mockup enterprise de `Equipo asignado` quedó aprobado el 2026-06-09 y queda fijado como referencia visual/producto para `TASK-357` a `TASK-366`.
+
+Assets versionados:
+
+- `docs/mockups/TASK-357/assigned-team-command-portfolio-approved.png`
+- `docs/mockups/TASK-357/assigned-team-dossier-approved.png`
+- `docs/mockups/TASK-357/assigned-team-intelligence-band-approved.png`
+- `docs/mockups/TASK-357/README.md`
+
+Evidencia GVC de aprobación:
+
+- `.captures/2026-06-09T11-16-25_assigned-team-command-portfolio-mockup`
+- Scenario: `scripts/frontend/scenarios/assigned-team-command-portfolio-mockup.scenario.ts`
+- Resultado: desktop + mobile `OK`, enterprise rubric `pass`
+
+Contrato operativo:
+
+- este mockup NO es UI decorativa; cada bloque visible debe mapear a semantic layer, policy, backend/API o primitive compartida antes de llegar a runtime
+- si falta una capability en el modelo de datos/backend para dar vida a la interfaz aprobada, debe agregarse al scope de la task hija correspondiente antes de shippear UI runtime
+- si ya existe una capability backend/data que no aparece en el mockup, debe pasar por el mismo loop de Product Design + GVC antes de sumarse a la UI
+- la bajada a runtime debe seguir mockup -> data/model/policy -> shared UI -> runtime -> GVC parity
+
 ## Scope
 
 ### Slice 1 — Program sequencing
@@ -143,7 +167,8 @@ Secuencia recomendada:
 
 ## Acceptance Criteria
 
-- [ ] Existe un bloque canónico `TASK-357` a `TASK-366` registrado en backlog
+- [x] Existe un bloque canónico `TASK-357` a `TASK-366` registrado en backlog
+- [x] Existe un mockup aprobado y versionado para guiar la implementación enterprise
 - [ ] Cada task tiene ownership, dependencies y scope sin superposición ambigua
 - [ ] La secuencia de rollout queda explícita para agentes futuros
 
@@ -151,6 +176,7 @@ Secuencia recomendada:
 
 - revisión manual de consistencia contra la arquitectura
 - revisión manual del registro de IDs y del índice de tasks
+- GVC aprobado: `pnpm fe:capture assigned-team-command-portfolio-mockup --env=local`
 
 ## Closing Protocol
 

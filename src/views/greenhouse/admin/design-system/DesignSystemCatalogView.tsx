@@ -150,6 +150,18 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-activity-heartbeat'
   },
   {
+    id: 'talent-profile',
+    title: 'Talent profile',
+    description: 'Dossier enterprise, badge Verificado por Efeonce y kind Talento verificado para perfiles verificables.',
+    route: '/admin/design-system/talent-profile',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'GreenhouseTalentProfileDossier · GreenhouseVerificationBadge',
+    tags: ['talent', 'profile', 'verification', 'dossier'],
+    icon: 'tabler-id-badge-2'
+  },
+  {
     id: 'floating-surfaces',
     title: 'Floating surfaces',
     description: 'Usa esto para popovers, menus, peeks de evidencia e inline editors anclados.',

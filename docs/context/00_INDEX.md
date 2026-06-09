@@ -78,18 +78,21 @@ Antes de construir, el agente debería poder responder *sí* a al menos una y *n
 
 El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí:
 
-1. **Self-service del cliente** — aprobar, solicitar y mandar briefs *desde el portal* (hoy vive fuera). Es el gap #1.
-2. **Reactividad cross-module** — el sistema de eventos (outbox) para que los módulos se hablen sin cron.
+> Esta lista es **dirección**, no estado de runtime. Verificar el estado real contra `project_context.md` + el backlog (`docs/tasks/`); varios items ya cerraron.
+
+1. **Self-service del cliente** — aprobar, solicitar y mandar briefs *desde el portal* (buena parte aún vive fuera). Gap #1, avanza con onboarding/lifecycle del cliente.
+2. **Reactividad cross-module** — el sistema de eventos (outbox publisher + consumers reactivos) **ya está materializado** (ver CLAUDE.md / TASK-773); quedan superficies puntuales por reactivar.
 3. **ICO Engine ↔ Person 360** — integración profunda de métricas por persona.
-4. **Test coverage** — ~3.3% en módulos críticos. Deuda técnica que limita velocidad de iteración.
-5. **Exponer inteligencia al cliente** — inteligencia financiera y AI Tools hoy son internas; el roadmap las abre (Q4 2026).
+4. **Test coverage** en módulos críticos — deuda técnica que limita iteración. El % exacto vive en el reporte de cobertura del repo (CI), no se hardcodea aquí.
+5. **Exponer inteligencia al cliente** — inteligencia financiera y AI Tools hoy son internas; el roadmap las abre (ver roadmap vivo en `14` + `project_context.md`).
 
 ---
 
 ## Convenciones críticas (no negociables)
 
+- **Altitud del pack (regla anti-drift).** Este pack fija **dirección estratégica** (negocio, marca, GTM, voz), no **valores de runtime**. Conteos, %, schemas, rutas, gaps abiertos/cerrados, strings de métrica, rótulos de UI y fechas de roadmap **NO se hardcodean aquí** — se referencian al SoT técnico (`CLAUDE.md`, `DESIGN.md`, specs de `docs/architecture/`, el glosario vivo, `project_context.md`). Si un valor de runtime aparece hardcodeado, es drift: reemplazar por puntero. Regla de CLAUDE.md: cuando el pack y el contrato técnico difieran, **prevalece el contrato técnico verificado**.
 - **El producto se llama `Greenhouse`. Nunca "Greenhouse EO".** "EO" es solo la abreviatura del repo en GitHub; no es nombre de producto ni va en UI, docs de cliente ni copy.
-- **RpA = Rounds per Asset** (rondas de revisión por entregable; menor es mejor). El dashboard hoy lo rotula "Reviews per Asset" — **alinear el string a "Rounds per Asset"**. Ver `06`.
+- **RpA = Rounds per Asset** (rondas de revisión por entregable; menor es mejor). El string canónico es "Rounds per Asset". El naming vivo de métricas vive en `06` + el glosario de runtime — no fijar aquí estados de rótulo del dashboard (driftean).
 - **Casos reales y citables:** Sky Airlines, Bresler, Pinturas Berel, SSilva. **GEA Grupo NO es caso** (fue prospecto cotizado que nunca cerró; cualquier métrica tipo "+340% leads" asociada a GEA es falsa y no se usa).
 - **Treatment "tú"** en todo el copy de cliente (el "usted" solo en legales/contratos). Ver `05`.
 - **Dominios canónicos:** Greenhouse → `greenhouse.efeoncepro.com`. Agencia → `efeoncepro.com`. (El corpus antiguo decía `efeonce.com`; queda obsoleto.) Igual léelo desde env var (`NEXT_PUBLIC_APP_URL`), no lo hardcodees.
@@ -117,4 +120,11 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 
 ---
 
-*Propiedad intelectual de Efeonce Group SpA. Uso interno. Última destilación: junio 2026, a partir del corpus estratégico v5.3 / GTM 2026 / Product Ecosystem v1.0.*
+## Frescura y gobierno del pack
+
+- **Cadencia.** El pack se re-destila periódicamente vía `greenhouse-documentation-governor`. Cada cierre de trabajo que cambie negocio/marca/GTM verifica si toca refrescar el pack.
+- **Verificar antes de confiar.** Ante cualquier valor de runtime (conteos, %, schemas, gaps, métricas, rótulos, fechas), confirmar contra el SoT técnico antes de actuar — el pack puede ir por detrás del runtime. Los docs con `Última verificación` vigente fueron revisados contra el runtime en esa fecha; los que no, llevan la destilación del corpus y deben verificarse.
+- **SoT canónico:** `CLAUDE.md`, `DESIGN.md`, `docs/architecture/`, `06_glosario-metricas.md` (métricas), `project_context.md` (estado/roadmap).
+- **Reconciliación con la skill `efeonce-agency`:** este pack (`docs/context/*`) es la **fuente** del contexto de negocio; la skill `efeonce-agency` lo **referencia/operacionaliza** para agentes. No duplicar la misma verdad en ambos: si difieren, prevalece el pack.
+
+*Propiedad intelectual de Efeonce Group SpA. Uso interno. Última destilación: junio 2026, a partir del corpus estratégico v5.3 / GTM 2026 / Product Ecosystem v1.0. Última verificación de drift contra runtime: 2026-06-09 (TASK-1064, docs 00/04/05/08/14).*

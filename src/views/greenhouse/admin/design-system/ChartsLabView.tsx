@@ -13,9 +13,11 @@ import {
   GREENHOUSE_CHART_CHROME_TOKENS,
   GreenhouseButton,
   GreenhouseChartCard,
+  GreenhouseHealthSignalChart,
   GreenhouseMetricBreakdownChartCard,
   GreenhouseStackedDistributionChartCard,
   type GreenhouseChartTab,
+  type GreenhouseHealthSignalSegment,
   type GreenhouseMetricBreakdownMetric,
   type GreenhouseMetricBreakdownPoint,
   type GreenhouseStackedDistributionSegment
@@ -75,6 +77,12 @@ const weeklyEarningsMetrics: GreenhouseMetricBreakdownMetric[] = [
     tone: 'error',
     progress: 22
   }
+]
+
+const teamHealthSegments: GreenhouseHealthSignalSegment[] = [
+  { id: 'stable', label: 'Estable', value: 82, tone: 'success' },
+  { id: 'watch', label: 'En observación', value: 13, tone: 'warning' },
+  { id: 'critical', label: 'Intervención', value: 5, tone: 'error' }
 ]
 
 const monthlyEarnings = [
@@ -234,6 +242,70 @@ const ChartsLabView = () => (
         Recharts, tokens Greenhouse, tooltips accesibles y fallback compacto para lectores de pantalla.
       </Typography>
     </Stack>
+
+    <Box
+      data-capture='charts-lab-health-signal'
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          lg: `minmax(0, ${GREENHOUSE_CHART_CHROME_TOKENS.card.compactMaxInlineSize}px) minmax(${DESIGN_SYSTEM_LAB_TOKENS.layout.asideMinInlineSize}px, 1fr)`
+        },
+        gap: DESIGN_SYSTEM_LAB_TOKENS.layout.gridGap,
+        alignItems: 'center'
+      }}
+    >
+      <Box
+        sx={theme => ({
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+          bgcolor: 'background.paper',
+          boxShadow: theme.greenhouseElevation.none.boxShadow,
+          p: DESIGN_SYSTEM_LAB_TOKENS.spacing.sectionInset
+        })}
+      >
+        <Stack spacing={3} alignItems='center'>
+          <GreenhouseHealthSignalChart
+            segments={teamHealthSegments}
+            score={82}
+            kind='teamHealth'
+            dataCapture='greenhouse-health-signal-chart'
+            ariaLabel='Salud del equipo: 82 de 100, 13 por ciento en observación, 5 por ciento crítico'
+          />
+          <Stack spacing={0.75} alignItems='center' textAlign='center'>
+            <Typography variant='h5'>Cobertura saludable</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Señal compacta para salud, cobertura y continuidad operativa.
+            </Typography>
+          </Stack>
+        </Stack>
+      </Box>
+
+      <Stack spacing={3} sx={{ py: { xs: 0, lg: DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup } }}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+          <Typography variant='h6'>Primitive + variant</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            <InlineCode>GreenhouseHealthSignalChart</InlineCode> owns the filled health signal, segmented donut geometry,
+            chart-color mapping and accessible summary. <InlineCode>variant=segmentedDonut</InlineCode> is the canonical
+            base for team health, talent health and capacity health kinds.
+          </Typography>
+        </Stack>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+          <Typography variant='h6'>Mini reglas de uso</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Usarlo solo para señales de salud/cobertura/continuidad con score o distribución real. No usarlo como icono
+            decorativo, indicador romántico ni reemplazo de charts de composición amplios.
+          </Typography>
+        </Stack>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+          <Typography variant='h6'>Mini reglas de cambio</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Cualquier nuevo kind debe entrar primero aquí con data-capture, GVC desktop/mobile y segmentos con label accesible.
+            Los colores salen del Chart SoT; no se agregan HEX ni tonos locales.
+          </Typography>
+        </Stack>
+      </Stack>
+    </Box>
 
     <Box
       data-capture='charts-lab-weekly-earnings'

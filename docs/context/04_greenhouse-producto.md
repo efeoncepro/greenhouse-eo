@@ -25,9 +25,9 @@ Es **multi-tenant**: cada organización cliente tiene su workspace aislado (mét
 | Deploy | Vercel |
 | Tests | Vitest + React Testing Library |
 
-**En números:** 40+ páginas · 150–162 rutas API · 100+ componentes UI · ~1.800 archivos TypeScript · 8 módulos · 3 providers de auth · 4 cron jobs · 6 schemas PostgreSQL (`core`, `finance`, `hr`, `payroll`, `sync`, `serving`).
+**Escala:** decenas de páginas, cientos de rutas API y componentes, múltiples módulos, 3 providers de auth y varios schemas PostgreSQL. Los conteos exactos y la **lista canónica de schemas** viven en `CLAUDE.md` (§Data Architecture) y el repo — SoT, no se hardcodean aquí porque driftean.
 
-**Cron jobs (4):** ICO Engine · Nubox sync · Outbox (event publishing a BigQuery) · Sync general. Corren ~03:00–03:30.
+**Jobs programados:** ICO Engine, Nubox sync, outbox/event publishing, syncs de fuentes — orquestados vía Cloud Scheduler + `ops-worker` (y Vercel cron donde aplica). El inventario y la clasificación canónica viven en `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md` (no hardcodear el conteo aquí).
 
 ---
 
@@ -89,20 +89,24 @@ Greenhouse incorpora **Nexa** como capa de inteligencia del producto:
 
 ## Roadmap ASaaS de Greenhouse
 
+> Las fechas/quarters del roadmap viven en el roadmap vivo (`14_modelo-negocio-asaas.md` + `project_context.md`); aquí solo el orden de fases (no hardcodear calendario, que envejece).
+
 | Fase | Estado |
 |---|---|
 | **Herramienta interna** | ✅ Completada (operación interna completa). |
-| **Plataforma de cliente** | Q2 2026 — exponer el portal a clientes. **Primer login activo** (= KPI GTM 0%→100%). |
-| **Inteligencia** | Q4 2026 — exponer inteligencia financiera + AI Tools (Nexa) al cliente. |
-| **Producto standalone** | 2027 — tier pricing + API abierta + white-label. |
+| **Plataforma de cliente** | En curso — exponer el portal a clientes. **Primer login activo** (= KPI GTM 0%→100%). |
+| **Inteligencia** | Siguiente — exponer inteligencia financiera + AI Tools (Nexa) al cliente. |
+| **Producto standalone** | Futuro — tier pricing + API abierta + white-label. |
 
 ---
 
 ## Gaps declarados (= dónde aportar)
 
-1. **Self-service del cliente** — aprobar, solicitar y mandar briefs desde el portal. **Gap principal.** Hoy esa interacción vive fuera de Greenhouse.
-2. **Test coverage 3.3%** en módulos críticos. Deuda técnica que frena iteración.
-3. **Reactividad cross-module** — expandir el sistema de eventos (outbox) para que los módulos reaccionen entre sí sin depender de cron.
+> Estado de gaps: verificar siempre contra `project_context.md` + el backlog de tasks (`docs/tasks/`) — esta lista es dirección, no estado de runtime (varios ya cerraron).
+
+1. **Self-service del cliente** — aprobar, solicitar y mandar briefs desde el portal. **Gap principal.** Hoy buena parte de esa interacción vive fuera de Greenhouse (avanza con onboarding/lifecycle del cliente).
+2. **Test coverage** en módulos críticos — deuda técnica que frena iteración. El % exacto vive en el reporte de cobertura del repo (CI), no se hardcodea aquí.
+3. **Reactividad cross-module** — el sistema de eventos (outbox publisher + consumers reactivos) **ya está materializado** (Cloud Scheduler + `ops-worker`; ver CLAUDE.md / TASK-773). Quedan superficies puntuales por reactivar.
 4. **ICO Engine ↔ Person 360** — integración profunda de métricas por persona.
 5. **Sinergias cross-module y corrección de cálculos financieros** — backlog activo.
 
@@ -119,4 +123,4 @@ Greenhouse incorpora **Nexa** como capa de inteligencia del producto:
 
 ---
 
-*Fuente: Greenhouse — Capacidades del Producto + Análisis Técnico + Product Ecosystem v1.0. Recordatorio: el producto se llama **Greenhouse**, nunca "Greenhouse EO".*
+*Fuente: Greenhouse — Capacidades del Producto + Análisis Técnico + Product Ecosystem v1.0. Recordatorio: el producto se llama **Greenhouse**, nunca "Greenhouse EO". Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — valores de runtime referenciados al SoT, no hardcodeados.*

@@ -95,6 +95,12 @@ Reglas obligatorias:
 - no existe premium card compacta `Equipo asignado`
 - no hay navegación consistente desde snippets hacia módulo/drawer
 
+## Approved Mockup Dependency
+
+El contrato visual/producto aprobado vive en `docs/mockups/TASK-357/README.md`.
+
+Esta task debe reutilizar el semantic layer, policy y primitives/cards derivados del mockup aprobado. Cualquier snippet nuevo en dashboard/home/organization debe conservar la intención del mockup: lectura rápida de cobertura, salud, continuidad y señales, con entry point consistente a `/equipo` o al dossier. Si una surface necesita un dato no contemplado por el mockup, debe pasar por el loop mockup + GVC antes de incorporarlo.
+
 ## Scope
 
 ### Slice 1 — Dashboard consumers
@@ -122,6 +128,7 @@ Reglas obligatorias:
 - [ ] Dashboard y al menos dos surfaces adicionales consumen `Assigned Team` shared
 - [ ] Los snippets reutilizan semantic layer, access policy y UI shared sin duplicación
 - [ ] La navegación hacia módulo completo y drawer es consistente en todas las surfaces
+- [ ] Cada consumer nuevo tiene GVC o evidencia visual comparada contra el lenguaje aprobado
 
 ## Verification
 

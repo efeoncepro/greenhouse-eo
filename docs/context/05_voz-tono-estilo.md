@@ -88,8 +88,28 @@ Cómo aterriza la voz en el portal (úsalos como calibración):
 
 ## Marca visual (para UI)
 
-Colores de marca: navy `#022A4E` · azure `#023C70` · teal `#2EC4B6`. Tipografía: **Bricolage Grotesque** (títulos) · **DM Sans** (cuerpo). El tema custom de Greenhouse sobre MUI v5/Vuexy debe respetar estos tokens; no introducir paletas/fuentes nuevas sin pasar por brand guideline.
+Design System: **AXIS** (multi-marca Efeonce/Kortex/Verk), sobre MUI v5/Vuexy. Color: acento primario **azul `#0375DB`** (`primary`; dark `#024C8F`) + secundario **verde `#6EC207`**; el eslogan Efeonce va en **gris `#848484`**. Tipografía: **Poppins** (display/títulos) · **Geist** (cuerpo y numéricos con `tabular-nums`, nunca monospace); pesos 400/600/700/800. Estos son los tokens canónicos: resolverlos siempre desde `theme.axis.*` / `theme.palette.*` y el contrato `DESIGN.md` (nada inline; no introducir paletas/fuentes nuevas sin pasar por el Design System AXIS).
 
 ---
 
-*Fuente: Brand Voice, Tone & Personality v1.0 + Editorial Style Guide v1.0 + Brand Guideline v1.1.*
+## Ejecución en runtime (UX writing)
+
+Este doc fija **la voz y el registro** (estratégico, prosa-doctrina). Se **ejecuta** como strings tokenizados y enforceados en el runtime — esa capa táctica es la skill `greenhouse-ux-writing` + el sistema de copy. Misma relación que marca visual → AXIS/`DESIGN.md`: 05 es la fuente de voz, UX writing su capa de ejecución; ninguno reemplaza al otro.
+
+- **Nomenclatura de producto + navegación** → `src/config/greenhouse-nomenclature.ts`.
+- **Microcopy funcional compartido** (CTAs, estados, loading, empty, aria, errores, feedback) → `src/lib/copy/dictionaries/es-CL/*` (`import { getMicrocopy } from '@/lib/copy'`).
+- **Copy de dominio reusable** → `src/lib/copy/<dominio>.ts`.
+- **Enforcement mecánico** → lint `greenhouse/no-untokenized-copy` (bloquea literales no tokenizados) + reglas es-CL de la skill (tuteo, "Guardar"≠"Salvar", verbo+objeto, error = qué+por qué+cómo arreglar, nunca un número sin contexto).
+
+**Crosswalk contexto → tono operacional** (un solo eje, dos resoluciones — el contexto de marca de este doc se expande en el tone map de la skill, no compite con él):
+
+| Contexto (este doc) | Tono operacional (skill `greenhouse-ux-writing`) |
+|---|---|
+| UI operativa interna | loading · estados neutrales |
+| UI de cara al cliente | success · error · empty · data-alert (el dato primero, la interpretación después) |
+| Emails / notificaciones | billing/legal (formal) · toast · info |
+| Landing / marketing | onboarding · copy de alto impacto |
+
+---
+
+*Fuente: Brand Voice, Tone & Personality v1.0 + Editorial Style Guide v1.0 + Brand Guideline v1.1. Marca visual canónica: Design System **AXIS** + `DESIGN.md` (cuando el Brand Guideline difiera de los tokens vigentes, prevalece AXIS/runtime). Ejecución de copy: skill `greenhouse-ux-writing` + `src/lib/copy/*` + `src/config/greenhouse-nomenclature.ts`. Última verificación de drift contra runtime: 2026-06-09 (TASK-1064).*

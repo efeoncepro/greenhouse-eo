@@ -29,6 +29,9 @@ Cada primitive tiene su contrato canónico en una ADR/spec dedicada o en su delt
 | **Microinteraction** | `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`, `GreenhouseStateTransition`, `GreenhouseInlineValidation`, `GreenhouseFieldProvenancePeek`, `GreenhouseStepperProgressMicro`, `GreenhouseEvidenceAttachmentDropzone`, `GreenhouseInlineDecisionPrompt` | HISTORIAL Deltas 2026-06-06 / 06e |
 | **Loading Surface** | `GreenhouseLoadingSurface` + variants nombradas (`GreenhouseDocumentPipelineLoader`, `GreenhouseExternalHandoffLoader`, …) | HISTORIAL Delta 2026-06-06d (TASK-1037) |
 | **Chart cards** | `GreenhouseChartCard`, `GreenhouseStackedDistributionChartCard`, `GreenhouseMetricBreakdownChartCard`, `MetricTrendCard`; Apex runtime via `AppReactApexCharts` | HISTORIAL Deltas 2026-06-07 / 2026-06-02 / 2026-06-07l → ver también `dataviz-design` |
+| **Health signal charts** | `GreenhouseHealthSignalChart` (`variant='segmentedDonut'`, kinds `teamHealth`/`talentHealth`/`capacityHealth`) | HISTORIAL Delta 2026-06-09b · lab `/admin/design-system/charts` |
+| **Talent profile dossier** | `GreenhouseTalentProfileDossier` (`variant='enterpriseCard'`, kinds `assignedTeamTalent`/`candidateTalent`/`deliveryTalent`) | HISTORIAL Delta 2026-06-09b · lab `/admin/design-system/talent-profile` |
+| **Verification badges** | `GreenhouseVerificationBadge` (kinds `efeonce` / `talentVerified`) | HISTORIAL Delta 2026-06-09b · lab `/admin/design-system/talent-profile` |
 | **Chips** | `GreenhouseChip` (AXIS; `label` variant tonal AA vía `theme.greenhouseSemantic`) | HISTORIAL Deltas 2026-06-07c / 2026-06-08 (TASK-1053 Fase B) |
 | **Feedback atoms** | `GreenhouseKpiDelta` (delta KPI inline: signo + flecha + color AA, variants text/tonal, `invert`), `GreenhouseStatusDot` (dot de estado + label/ariaLabel obligatorio, `pulse`/`halo`) — color nunca solo; consumen `theme.greenhouseSemantic` | HISTORIAL Delta 2026-06-08 (TASK-1053 Fase B Slice B2) |
 | **Buttons** | `GreenhouseButton` (AXIS) + `GreenhouseAsyncActionButton` (compone Button) | HISTORIAL Deltas 2026-06-07d / 06-07e |
@@ -59,3 +62,9 @@ Las primitives consumen el SoT, nunca valores inline:
 - **Tipografía** → variantes/tokens del SoT (`typography-design` skill + [GREENHOUSE_DESIGN_TOKENS_V1.md](../GREENHOUSE_DESIGN_TOKENS_V1.md) §3). Nunca `fontSize`/`fontFamily` inline.
 - **Color / tokens** → `theme.palette.*` / `theme.axis.*` + `DESIGN.md`. Ver `design-system-governance`.
 - **Motion** → [MOTION.md](./MOTION.md).
+
+## Mini reglas — Health signal, dossier y verificación
+
+- `GreenhouseHealthSignalChart` se usa solo para salud/cobertura/continuidad con score o segmentos reales. No es un icono decorativo, de sentimiento o "favorito". Cualquier kind nuevo debe aparecer primero en `/admin/design-system/charts`, con `data-capture`, GVC desktop/mobile y labels accesibles por segmento.
+- `GreenhouseTalentProfileDossier` se usa cuando una superficie necesita revisar o decidir sobre cobertura de una persona. No poblarlo con señales sin source-of-truth, freshness y política de visibilidad. Nuevos bloques/métricas deben entrar como prop explícito y degradar honestamente.
+- `GreenhouseVerificationBadge` solo representa verificación real o una política aprobada de verificación. Nuevos labels, marcas o lockups deben entrar como kind oficial con copy bilingüe, `aria-label`, revisión de marca y GVC en `/admin/design-system/talent-profile`.
