@@ -167,6 +167,7 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       body1: { ...typographyScale.bodyLg },
       body2: { ...typographyScale.bodyMd },
       caption: { ...typographyScale.bodySm },
+      disclosureText: { ...typographyScale.disclosureText },
       button: {
         ...typographyScale.labelMd,
         textTransform: 'none'

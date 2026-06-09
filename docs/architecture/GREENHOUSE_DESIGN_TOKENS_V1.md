@@ -704,6 +704,7 @@ DESIGN.md (raíz, formato `@google/design.md`) usa nombres semánticos snake-cas
 | `body-lg` | `body1` | Geist, 1rem |
 | `body-md` | `body2` | Geist, 0.875rem |
 | `body-sm` | `caption` | Geist, 0.8125rem, metadata line-height |
+| `disclosure-text` | `disclosureText` | Geist, 0.75rem/400, compact sentence disclosures |
 | `overline` | `overline` | identico |
 | `numeric-id` | `monoId` | Geist + tabular-nums, 0.875rem, 600 |
 | `numeric-amount` | `monoAmount` | Geist + tabular-nums, 0.8125rem, 700 |

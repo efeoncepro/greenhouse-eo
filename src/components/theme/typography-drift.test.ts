@@ -60,6 +60,7 @@ describe('typographyScale SoT pins (TASK-1036)', () => {
     expect(typographyScale.labelMd).toMatchObject({ fontSize: '0.875rem', fontWeight: 600 })
     expect(typographyScale.bodyLg).toMatchObject({ fontSize: '1rem', fontWeight: 400 })
     expect(typographyScale.bodyMd).toMatchObject({ fontSize: '0.875rem', fontWeight: 400 })
+    expect(typographyScale.disclosureText).toMatchObject({ fontSize: '0.75rem', fontWeight: 400, lineHeight: 1.45 })
     expect(typographyScale.numericId).toMatchObject({ fontSize: '0.875rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' })
     expect(typographyScale.kpiValue).toMatchObject({ fontSize: '1.75rem', fontWeight: 800, fontVariantNumeric: 'tabular-nums' })
   })
@@ -152,6 +153,7 @@ describe('DESIGN.md contract ≡ SoT', () => {
     'body-lg': 'bodyLg',
     'body-md': 'bodyMd',
     'body-sm': 'bodySm',
+    'disclosure-text': 'disclosureText',
     overline: 'overline',
     'numeric-id': 'numericId',
     'numeric-amount': 'numericAmount',
@@ -255,6 +257,7 @@ const CONTRACT_TO_SCALE_V1: Record<string, keyof typeof typographyScale> = {
   'body-lg': 'bodyLg',
   'body-md': 'bodyMd',
   'body-sm': 'bodySm',
+  'disclosure-text': 'disclosureText',
   overline: 'overline',
   'numeric-id': 'numericId',
   'numeric-amount': 'numericAmount',

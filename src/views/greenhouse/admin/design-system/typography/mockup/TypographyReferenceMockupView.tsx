@@ -83,6 +83,7 @@ const CONTRACT_NAME: Record<TypographyTokenName, string> = {
   bodyLg: 'body-lg',
   bodyMd: 'body-md',
   bodySm: 'body-sm',
+  disclosureText: 'disclosure-text',
   overline: 'overline',
   numericId: 'numeric-id',
   numericAmount: 'numeric-amount',

@@ -59,6 +59,7 @@ const CONTRACT_NAME: Partial<Record<ScaleKey, string>> = {
   bodyLg: 'body-lg',
   bodyMd: 'body-md',
   bodySm: 'body-sm',
+  disclosureText: 'disclosure-text',
   overline: 'overline',
   numericId: 'numeric-id',
   numericAmount: 'numeric-amount',
@@ -90,6 +91,7 @@ const USAGE: Record<ScaleKey, string> = {
   bodyLg: 'Copy legible primario (body1).',
   bodyMd: 'Copy denso de producto, celdas de tabla, helpers (body2).',
   bodySm: 'Metadata, timestamps, caption (caption). subtitle2.',
+  disclosureText: 'Avisos compactos de IA, legales, seguridad o confianza. Oración, no uppercase.',
   overline: 'Label compacto en mayúsculas sobre valores.',
   numericId: 'IDs / códigos — Geist + tabular-nums.',
   numericAmount: 'Montos — Geist + tabular-nums.',
@@ -101,13 +103,14 @@ const TIERS: { label: string; tokens: ScaleKey[] }[] = [
   { label: 'Display (Poppins)', tokens: ['headlineDisplay', 'headlineLg', 'headlineMd'] },
   { label: 'Títulos', tokens: ['pageTitle', 'surfaceHeroTitle', 'sectionTitle', 'subheader'] },
   { label: 'Labels', tokens: ['labelLg', 'labelMd', 'labelSm'] },
-  { label: 'Body', tokens: ['bodyLg', 'bodyMd', 'bodySm'] },
+  { label: 'Body', tokens: ['bodyLg', 'bodyMd', 'bodySm', 'disclosureText'] },
   { label: 'Overline', tokens: ['overline'] },
   { label: 'Numéricos (tabular-nums)', tokens: ['numericId', 'numericAmount', 'kpiValue'] }
 ]
 
 const SAMPLE_TEXT: Partial<Record<ScaleKey, string>> = {
   surfaceHeroTitle: 'Organizaciones',
+  disclosureText: 'Nexa usa IA generativa. Verifica la información importante.',
   numericId: 'EO-2026-0042',
   numericAmount: '$ 1.284.500',
   kpiValue: '85,8%'

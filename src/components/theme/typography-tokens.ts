@@ -269,6 +269,13 @@ export const typographyScale = {
     lineHeight: lineHeights.metadata,
     letterSpacing: letterSpacings.metadata
   },
+  disclosureText: {
+    fontFamily: fontFamilies.text,
+    fontSize: fontSizes['2xs'],
+    fontWeight: fontWeights.regular,
+    lineHeight: lineHeights.metadata,
+    letterSpacing: letterSpacings.metadata
+  },
 
   // Overline (Geist, uppercase tight). line-height 1.167 = contract value,
   // aligns the previously coretheme-inherited 1.16667 (sub-pixel, no-op).
@@ -332,6 +339,7 @@ export const TYPOGRAPHY_VARIANT_BRIDGE = {
   bodyLg: 'body1',
   bodyMd: 'body2',
   bodySm: 'caption',
+  disclosureText: 'disclosureText',
   overline: 'overline',
   numericId: 'monoId',
   numericAmount: 'monoAmount',

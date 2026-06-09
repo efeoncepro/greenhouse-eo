@@ -43,11 +43,18 @@ export const scenario: CaptureScenario = {
   assertions: [
     { kind: 'noLoginRedirect', reason: 'runtime vive bajo (dashboard) autenticado' },
     { kind: 'noErrorBoundary', reason: 'la evidencia no debe capturar un error boundary' },
-    { kind: 'visible', selector: '[data-capture="organization-list-runtime-workbench"]', reason: 'el workbench runtime debe renderizar' },
-    { kind: 'visible', selector: 'text=Readiness operacional', reason: 'el rail contextual debe renderizar evidencia operacional' }
+    { kind: 'visible', selector: '[data-capture="organization-list-runtime-workbench"]', reason: 'el workbench runtime debe renderizar' }
   ],
   steps: [
     { kind: 'mark', label: 'first-fold', note: 'Runtime workbench list-detail using /api/organizations' },
+    { kind: 'scroll', selector: '[data-capture="organization-context-rail-readiness"]', scrollBlock: 'center' },
+    {
+      kind: 'mark',
+      label: 'readiness-rail',
+      clipSelector: '[data-capture="organization-context-rail-readiness"]',
+      note: 'Contextual rail readiness evidence'
+    },
+    { kind: 'scroll', scrollTo: 'top' },
     { kind: 'click', selector: 'button[aria-label="Vista matriz"]' },
     { kind: 'sleep', ms: 300 },
     { kind: 'mark', label: 'matrix-mode', note: 'Secondary runtime matrix mode' },

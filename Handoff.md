@@ -1,3 +1,43 @@
+# Sesion 2026-06-08 — TASK-999 foundation implementada en develop (in-progress)
+
+Se aplico el hook Codex `pnpm codex:task-hook TASK-999 --develop` por instruccion explicita del operador de mantenerse en `develop`; no se cambio de rama ni se creo worktree.
+
+- **Estado:** `TASK-999` sigue en `docs/tasks/in-progress/`; foundation/manual attach implementado, pero discovery worker, review queue y reliability signals siguen pendientes. No mover a `complete` aun.
+- **Runtime dev:** `pnpm pg:connect:migrate --status` aplico la migracion `20260608230303037_task-999-organization-brand-assets-foundation.sql` en Cloud SQL dev y regenero `src/types/db.d.ts`. Verificado: `organizations.website_url`, `organization_brand_asset_candidates`, `organization_360.logo_asset_id/website_url/is_operating_entity`, capability `organization.brand_asset`.
+- **Implementacion:** private asset contexts `organization_logo_draft|candidate|logo`, command `attachOrganizationLogoAsset()`, route `POST /api/organizations/[id]/brand-assets/logo`, DTO/readers y avatars de `/agency/organizations` + detail/workspace consumen `logoUrl` con fallback.
+- **Guardrail confirmado por operador y codificado:** TASK-999 aplica solo a organizaciones no-operating-entity. No cambiar logos de Efeonce, Greenhouse institucional, operating entities ni entidades relacionadas a Efeonce; el command bloquea `is_operating_entity=TRUE` antes de tocar assets.
+- **ADR:** `docs/architecture/GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md` aceptado e indexado.
+- **Verificacion local:** eslint focal OK, vitest focal OK (`organization-brand-assets`, entitlements runtime, capability coverage), `gtimeout 180s pnpm exec tsc --noEmit --pretty false` OK. Pendiente: `ops:lint --changed`, `task:lint`, docs closure, GVC local/staging.
+- **Worktree cuidado:** existen cambios paralelos no cerrados en tipografia/Home y `OrganizationListView`; no revertir ni mezclar sin revisar diff.
+
+---
+
+# Sesion 2026-06-08 — TASK-1016 runtime de organizaciones implementado en develop
+
+Se aplico el hook Codex `pnpm codex:task-hook TASK-1016 --develop` por instruccion explicita del operador de mantenerse en `develop`; no se cambio de rama ni se creo worktree. El cierre administrativo previo se corrigio porque el operador aclaro que la intencion era implementar el workbench en runtime productivo.
+
+- **Estado:** `TASK-1016` queda en `docs/tasks/complete/TASK-1016-organization-list-enterprise-prototype.md`; README/registry sincronizados a `complete`.
+- **Implementacion runtime:** `src/views/greenhouse/organizations/OrganizationListView.tsx` adopta el Organization Operations Workbench sobre `/api/organizations`.
+- **Datos:** se cablean search, filtros, seleccion, summary strip, rows, rail contextual y matrix mode con datos reales disponibles; readiness/timeline se degradan honestamente desde counts/onboarding/source/updatedAt; logos reales siguen fuera de scope de TASK-999.
+- **Polish final:** se acorto el placeholder visible del search en mobile (`Buscar cuenta`), los chips de facts de fila pasan a dos columnas mobile, el grid usa `minmax(0, 1fr)` para no desbordar, y el CTA secundario del rail usa tokens neutros accesibles.
+- **Evidencia runtime:** `.captures/2026-06-08T22-27-12_organization-list-runtime-workbench` (desktop+mobile, 6 frames, `qualityFindings=[]`, dossier generado). Mockup tokenizado vigente: `.captures/2026-06-08T22-05-24_organization-list-enterprise-mockup`.
+- **Verificacion:** eslint focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm route-reachability-gate --strict`, `pnpm fe:capture organization-list-runtime-workbench --env=local`, `pnpm fe:capture:review .captures/2026-06-08T22-27-12_organization-list-runtime-workbench`.
+- **No tocar:** cambios paralelos existentes en tipografia/Home siguen fuera de TASK-1016.
+
+---
+
+# Sesion 2026-06-08 — disclosureText token + Nexa greeting ajustado
+
+Se corrigio el aumento visual del disclaimer del greeting de Nexa sin volver a hardcodear `fontSize`.
+
+- **Causa:** el sweep tipografico habia retirado `fontSize: '0.5rem'` del disclaimer; al quedar `variant='caption'`, el texto heredo el `bodySm` canonico de 13px.
+- **Fix:** nuevo token/variant `disclosureText` / `disclosure-text` para avisos compactos de IA, legales, seguridad o confianza escritos como oracion: Geist 400, `0.75rem` (12px), `lineHeight=metadata(1.45)`, tracking metadata. `NexaGreetingsCard` ahora usa `Typography variant='disclosureText'`.
+- **Contrato sincronizado:** `typographyScale`, `mergedTheme`, tipos MUI, `typography-drift.test`, `DESIGN.md`, `ui-platform/STACK.md`, `ui-platform/HISTORIAL.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md` (solo espejo §15.1 del bridge), `CanonicalTypographyView`, mockup de tipografia, `project_context.md` y `changelog.md`.
+- **Verificacion:** `pnpm vitest run src/components/theme/typography-drift.test.ts` (66/66), `pnpm design:lint` (0/0), eslint focal OK, `pnpm exec tsc --noEmit --pretty false` OK. GVC local: Home limpio `.captures/2026-06-08T21-47-31_inline-home` (0 console/page/hydration/http failures) y typography canonical `.captures/2026-06-08T21-46-38_typography-canonical` (0 findings). Medicion DOM final: `font-size=12px`, `line-height=17.4px`, `letter-spacing=0.36px`.
+- **Nota:** la primera captura Home `.captures/2026-06-08T21-46-37_inline-home` registro un 500 transitorio de documento en dev/HMR; se repitio en caliente y quedo limpio.
+
+---
+
 # Sesion 2026-06-08 — TASK-1056 creada + skills Codex GVC markers
 
 Se formalizo como task la regla operativa de usar `data-capture` estable para que GVC capture secciones/states/flows sin depender de texto, offsets o selectores posicionales.

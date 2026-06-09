@@ -275,13 +275,12 @@ export const NexaGreetingsCard = ({
               }}
             />
             <Typography
-              variant='caption'
+              variant='disclosureText'
               sx={{
                 color: 'common.white',
                 opacity: 0.75,
                 textAlign: 'center',
-                lineHeight: 1.25,
-                letterSpacing: '0.04em'
+                display: 'block'
               }}
             >
               {disclaimer}

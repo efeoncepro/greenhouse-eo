@@ -22,6 +22,31 @@
 | Font | Geist + Poppins | — | `var(--font-geist)` para producto base; Poppins solo `h1-h4` + `surfaceHeroTitle`; numéricos con Geist + `tabular-nums` |
 
 
+## Typography Runtime Contract
+
+La plataforma UI consume tipografía por variantes semánticas del theme, nunca por
+`fontSize` inline en `<Typography>`.
+
+- SoT de valores y bridge runtime: `src/components/theme/typography-tokens.ts`.
+- Contrato agent-facing compacto: `DESIGN.md` §Typography.
+- Vista viva interna: `/admin/design-system/typography`.
+- Guard de paridad: `src/components/theme/typography-drift.test.ts`.
+
+`disclosureText` / `disclosure-text` es el token vigente para avisos compactos
+de IA, legales, seguridad o confianza escritos como oración. Usar:
+
+```tsx
+<Typography variant='disclosureText'>
+  Nexa usa IA generativa. Verifica la información importante.
+</Typography>
+```
+
+No usar `caption` con `fontSize` local para achicar disclosure copy, no usar
+`overline` para oraciones, y no revivir microtexto de 8px. `caption` queda para
+metadata/timestamps comunes; `overline` queda para labels uppercase sobre
+valores.
+
+
 ## Librerías Disponibles — Inventario Completo
 
 ### Activamente usadas

@@ -6,6 +6,19 @@
 
 ---
 
+## Delta 2026-06-08 — Disclosure text typography token
+
+La escala tipográfica suma `disclosureText` / `disclosure-text` como variante
+semántica para avisos compactos de IA, legales, seguridad o confianza escritos
+como oración. Cierra el caso del disclaimer de Nexa en Home sin volver a un
+`fontSize` inline ni al microtexto de 8px.
+
+- SoT/runtime: `typographyScale.disclosureText` → `theme.typography.disclosureText`.
+- Uso permitido: disclosures compactos tipo "Nexa usa IA generativa. Verifica la información importante."
+- Uso prohibido: metadata común (`caption`), labels uppercase (`overline`) o
+  cualquier reducción local de `fontSize`.
+- Evidencia: GVC Home `.captures/2026-06-08T21-47-31_inline-home` y typography canonical `.captures/2026-06-08T21-46-38_typography-canonical`.
+
 ## Delta 2026-06-08 — Feedback tonal sub-valores + atoms (TASK-1053 Fase B)
 
 Tonal-by-default para feedback (aprobado en Restraint v1). Tres capas nuevas:

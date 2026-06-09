@@ -82,6 +82,12 @@ typography:
     fontWeight: 400
     lineHeight: 1.45
     letterSpacing: 0.03em
+  disclosure-text:
+    fontFamily: Geist
+    fontSize: 0.75rem
+    fontWeight: 400
+    lineHeight: 1.45
+    letterSpacing: 0.03em
   overline:
     fontFamily: Geist
     fontSize: 0.75rem
@@ -317,6 +323,8 @@ Use the scale semantically:
 - `body-lg` for primary readable copy
 - `body-md` for dense product UI copy, table cells, and helpers
 - `body-sm` for metadata and timestamps
+- `disclosure-text` for compact AI, legal, security, or trust disclosures that must
+  read as a sentence, not as an uppercase label
 - `overline` for compact uppercase labels above values
 
 ### Source of truth + contract↔runtime bridge (TASK-1036)
@@ -338,6 +346,7 @@ The mapping is **code, not a manual table** — `TYPOGRAPHY_VARIANT_BRIDGE`
 | `section-title` | `h5` |
 | `label-md` | `button` |
 | `body-lg/md/sm` | `body1` / `body2` / `caption` |
+| `disclosure-text` | `disclosureText` |
 | `overline` | `overline` |
 | `numeric-id` / `numeric-amount` / `kpi-value` | `monoId` / `monoAmount` / `kpiValue` |
 
@@ -359,7 +368,7 @@ Notes:
 The SoT (`typographyScale`) token names are camelCase mirrors of the contract:
 `headlineDisplay` · `headlineLg` · `headlineMd` · `pageTitle` · `sectionTitle` ·
 `surfaceHeroTitle` · `subheader` · `labelLg` · `labelMd` · `labelSm` · `bodyLg` · `bodyMd` · `bodySm` ·
-`overline` · `numericId` · `numericAmount` · `kpiValue`. Add a role here (never an
+`disclosureText` · `overline` · `numericId` · `numericAmount` · `kpiValue`. Add a role here (never an
 inline size); the bridge wires it to a MUI variant if it needs one.
 
 **Weight roles (Greenhouse uses 4):** `400` body · `600` labels/titles/buttons ·

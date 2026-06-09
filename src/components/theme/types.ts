@@ -189,12 +189,14 @@ declare module '@mui/material/styles' {
   // Custom Typography Variants
   interface TypographyVariants {
     surfaceHeroTitle: React.CSSProperties
+    disclosureText: React.CSSProperties
     monoId: React.CSSProperties
     monoAmount: React.CSSProperties
     kpiValue: React.CSSProperties
   }
   interface TypographyVariantsOptions {
     surfaceHeroTitle?: React.CSSProperties
+    disclosureText?: React.CSSProperties
     monoId?: React.CSSProperties
     monoAmount?: React.CSSProperties
     kpiValue?: React.CSSProperties
@@ -288,6 +290,7 @@ declare module '@mui/material/styles' {
 declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     surfaceHeroTitle: true
+    disclosureText: true
     monoId: true
     monoAmount: true
     kpiValue: true

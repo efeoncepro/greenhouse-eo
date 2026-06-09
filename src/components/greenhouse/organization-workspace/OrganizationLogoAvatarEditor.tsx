@@ -254,6 +254,19 @@ const OrganizationLogoAvatarEditor = ({
               borderRadius: `${theme.shape.customBorderRadius.md}px`,
               bgcolor: 'transparent',
               cursor: 'pointer',
+              '& [data-logo-edit-indicator="true"]': {
+                opacity: 0,
+                transition: theme.transitions.create(['border-color', 'box-shadow', 'color', 'opacity', 'transform'], {
+                  duration: theme.transitions.duration.shortest
+                })
+              },
+              '&:hover [data-logo-edit-indicator="true"], &:focus-visible [data-logo-edit-indicator="true"]': {
+                opacity: 1,
+                color: 'primary.main',
+                borderColor: 'primary.light',
+                boxShadow: theme.greenhouseElevation.raised.boxShadow,
+                transform: 'translateY(-1px)'
+              },
               '&:focus-visible': {
                 outline: `2px solid ${theme.palette.primary.main}`,
                 outlineOffset: 3
@@ -263,22 +276,23 @@ const OrganizationLogoAvatarEditor = ({
             {avatar}
             <Box
               aria-hidden
-              sx={{
+              data-logo-edit-indicator='true'
+              sx={theme => ({
                 position: 'absolute',
-                insetInlineEnd: -6,
-                insetBlockEnd: -6,
+                insetInlineEnd: -5,
+                insetBlockEnd: -5,
                 display: 'grid',
                 placeItems: 'center',
-                inlineSize: 26,
-                blockSize: 26,
-                borderRadius: '50%',
-                bgcolor: 'primary.main',
-                color: 'primary.contrastText',
-                border: theme => `2px solid ${theme.palette.background.paper}`,
-                boxShadow: theme => theme.greenhouseElevation.floating.boxShadow
-              }}
+                inlineSize: 24,
+                blockSize: 24,
+                borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                bgcolor: 'background.paper',
+                color: 'text.secondary',
+                border: `1px solid ${theme.palette.divider}`,
+                boxShadow: theme.greenhouseElevation.none.boxShadow
+              })}
             >
-              <i className='tabler-photo-up' />
+              <i className='tabler-pencil' />
             </Box>
           </Box>
         )
