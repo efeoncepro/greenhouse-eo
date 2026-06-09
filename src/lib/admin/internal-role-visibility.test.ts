@@ -146,11 +146,12 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(ALL_INTERNAL_VIEW_CODES.length).toBeGreaterThanOrEqual(60)
   })
 
-  it('mi_ficha has 13 views including payment profile, onboarding and contractor self-service', () => {
-    expect(MI_FICHA_VIEW_CODES).toHaveLength(13)
+  it('mi_ficha has 14 views including payment profile, onboarding, contractor self-service and contracting docs', () => {
+    expect(MI_FICHA_VIEW_CODES).toHaveLength(14)
     expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mi_cuenta_pago')
     expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.onboarding')
     expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mi_contratacion')
+    expect(MI_FICHA_VIEW_CODES).toContain('mi_ficha.mis_contratos')
   })
 
   it('finanzas has 15 views (incluye contractor_payables, TASK-974)', () => {
@@ -164,10 +165,11 @@ describe('TASK-727: Internal role × view matrix', () => {
     expect(COMERCIAL_VIEW_CODES).toContain('comercial.sow')
   })
 
-  it('equipo has 14 views (incluye workforce activation, contratistas, offboarding, onboarding y nomina_proyectada)', () => {
-    expect(EQUIPO_VIEW_CODES).toHaveLength(14)
+  it('equipo has 15 views (incluye workforce activation, contratistas, contratos laborales, offboarding, onboarding y nomina_proyectada)', () => {
+    expect(EQUIPO_VIEW_CODES).toHaveLength(15)
     expect(EQUIPO_VIEW_CODES).toContain('equipo.workforce_activation')
     expect(EQUIPO_VIEW_CODES).toContain('equipo.contratistas')
+    expect(EQUIPO_VIEW_CODES).toContain('equipo.workforce_contracting')
   })
 
   // ─────────────────────────────────────────────────────────────────────────────

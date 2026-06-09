@@ -21,7 +21,14 @@ import CustomChip from '@core/components/mui/Chip'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { HubSpotIsotype } from '@/components/greenhouse/brand/BrandIsotypes'
 import { OperationalPanel } from '@/components/greenhouse/primitives'
+import { NotionPreflightPanel } from '@/views/greenhouse/agency/clients/NotionPreflightPanel'
+import {
+  EvidenceRow,
+  EvidenceVerifyButton,
+  useOnboardingEvidence
+} from '@/views/greenhouse/agency/clients/OnboardingEvidence'
 import { PortalUsersPanel } from '@/views/greenhouse/agency/clients/PortalUsersPanel'
+import { isAutoDerivableItem } from '@/lib/client-lifecycle/evidence/evidence-types'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
 import type {
   FacetKey,
@@ -133,6 +140,9 @@ const OWNER_LABEL: Record<string, string> = {
   finance: T.checklist.ownerFinance
 }
 
+// Estados "resueltos": en ellos la evidencia auto-derivada NO se muestra (sería ruido).
+const DONE_STATUSES: ReadonlySet<string> = new Set(['completed', 'skipped', 'not_applicable'])
+
 interface Props {
   organizationName: string
   /** TASK-1001 — org del caso; alimenta el panel interactivo de personas del portal. */
@@ -142,6 +152,8 @@ interface Props {
   degraded?: boolean
   /** When set, the empty-state CTA links here (the single front door). */
   startOnboardingHref?: string
+  /** TASK-1009 — caso activo; alimenta el panel del preflight Notion (verify_notion_flowing). */
+  caseId?: string | null
   /** TASK-997 — checklist del caso activo (read-only). */
   checklist?: LifecycleChecklistItemVm[]
   /** TASK-997 — bases Notion ancladas (surface en provision_notion_workspace). */
@@ -156,11 +168,13 @@ const LifecycleTimeline = ({
   data,
   degraded,
   startOnboardingHref,
+  caseId,
   checklist,
   notionAnchors,
   teamsAnchor
 }: Props) => {
   const theme = useTheme()
+  const evidence = useOnboardingEvidence(caseId)
 
   const Header = (
     <Stack spacing={1} sx={{ mb: 2 }}>
@@ -255,14 +269,37 @@ const LifecycleTimeline = ({
 
       {/* TASK-997 — checklist del caso + anchors capturados (read-only) */}
       {checklist && checklist.length > 0 ? (
-        <Box sx={{ mb: 6 }}>
-          <OperationalPanel title={T.checklist.title} subheader={T.checklist.subtitle} icon='tabler-checklist' iconColor='primary'>
+        <Box sx={{ mb: 6 }} data-capture='onboarding-checklist'>
+          <OperationalPanel
+            title={T.checklist.title}
+            subheader={T.checklist.subtitle}
+            icon='tabler-checklist'
+            iconColor='primary'
+            action={caseId ? <EvidenceVerifyButton status={evidence.status} onRun={evidence.run} /> : undefined}
+          >
+            {evidence.status === 'error' ? (
+              <Alert
+                severity='warning'
+                variant='outlined'
+                sx={{ mb: 3, borderRadius: `${theme.shape.customBorderRadius.sm}px` }}
+                role='alert'
+                action={
+                  <Button color='inherit' size='small' onClick={evidence.run} startIcon={<i className='tabler-refresh' />}>
+                    {T.evidence.retryCta}
+                  </Button>
+                }
+              >
+                <AlertTitle sx={{ fontWeight: 600 }}>{T.evidence.errorTitle}</AlertTitle>
+                {T.evidence.errorBody}
+              </Alert>
+            ) : null}
             <Stack spacing={2}>
               {checklist.map((item, index) => {
                 const st = CHECKLIST_STATUS[item.status]
                 const isNotion = item.itemCode === 'provision_notion_workspace'
                 const isTeams = item.itemCode === 'provision_communication_channels'
                 const isPortalUsers = item.itemCode === 'provision_client_users_access'
+                const isVerifyNotion = item.itemCode === 'verify_notion_flowing'
 
                 return (
                   <Box key={item.itemCode}>
@@ -314,10 +351,24 @@ const LifecycleTimeline = ({
                           <CustomChip round='true' size='small' variant='tonal' color='primary' icon={<i className='tabler-brand-teams' />} label={teamsAnchor.teamName} />
                         </Stack>
                       ) : null}
+
+                      {/* TASK-1017 — evidencia real auto-derivada (on-demand, honesta).
+                          Solo en pasos NO resueltos: ahí la evidencia aporta decisión
+                          ("ya está listo, podés marcarlo" / "todavía no"). En un paso ya
+                          cerrado el chip sería ruido redundante (modern-ui: restraint). */}
+                      {isAutoDerivableItem(item.itemCode) &&
+                      !DONE_STATUSES.has(item.status) &&
+                      evidence.evidenceByCode.has(item.itemCode) ? (
+                        <EvidenceRow
+                          evidence={evidence.evidenceByCode.get(item.itemCode)!}
+                          autoCompleted={evidence.autoCompleted.has(item.itemCode)}
+                        />
+                      ) : null}
                     </Box>
                     <CustomChip round='true' size='small' variant='tonal' color={st.color} icon={<i className={st.icon} />} label={st.label} />
                   </Stack>
                   {isPortalUsers ? <PortalUsersPanel organizationId={organizationId} /> : null}
+                  {isVerifyNotion && caseId ? <NotionPreflightPanel caseId={caseId} /> : null}
                   </Box>
                 )
               })}

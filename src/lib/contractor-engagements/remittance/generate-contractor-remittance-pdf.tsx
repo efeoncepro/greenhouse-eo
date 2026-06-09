@@ -24,8 +24,15 @@ import { Document, Image, Page, StyleSheet, Text, View, renderToStream } from '@
 
 import { formatCurrency, type CurrencyCode } from '@/lib/format'
 import { ensurePdfFontsRegistered } from '@/lib/finance/pdf/register-fonts'
+import { getPdfTypography } from '@/lib/finance/pdf/pdf-typography'
+
+import { axisSemanticSubValues } from '@/lib/design-tokens/semantic-sub-values'
 
 import type { RemittancePresentation } from './types'
+
+// TASK-1043 — tipografía derivada del SoT (familia + peso). Tamaños en pt
+// propios del medio; las familias salen del adapter (cero 'Geist Bold' literal).
+const t = getPdfTypography()
 
 const LOGO_PATH = path.join(process.cwd(), 'public/branding/logo-full.png')
 let cachedLogoDataUri: string | null | undefined
@@ -58,14 +65,18 @@ const getLogoDataUri = (): string | null => {
  * v2 (2026-05-31): body font migrated Helvetica → Geist (canonical body, DESIGN.md)
  * via ensurePdfFontsRegistered() — aligns the contractor remittance with the canonical
  * font so it matches the contractor payment report (TASK-980). Slogan stays Poppins.
+ * v3 (2026-06-06, TASK-1043): tipografía gobernada por el adapter `getPdfTypography()`
+ * (familia + peso derivan del SoT; tamaños pt propios del medio). El neto pasa a
+ * `kpiValue` (Geist ExtraBold 14, canon SoT KPI=800); labels normalizados ±0.5pt.
  */
-export const REMITTANCE_TEMPLATE_VERSION = '2'
+export const REMITTANCE_TEMPLATE_VERSION = '3'
 
 const TEXT_PRIMARY = '#1a1a1a'
 const TEXT_MUTED = '#5c5c5c'
 const TEXT_FAINT = '#999999'
 const BORDER_LIGHT = '#e0e0e0'
-const NET_ACCENT = '#2E7D32'
+// Success ink (AA on white): canonical token SoT (TASK-1048 → Fase B success.ink).
+const NET_ACCENT = axisSemanticSubValues.success.ink
 const NEUTRAL_BG = '#f7f7f7'
 const CHIP_BG = '#eeeeee'
 
@@ -74,8 +85,7 @@ const money = (amount: number, currency: string, locale: RemittancePresentation[
 
 const s = StyleSheet.create({
   page: {
-    fontFamily: 'Geist',
-    fontSize: 9,
+    ...t.body,
     paddingTop: 48,
     paddingBottom: 64,
     paddingHorizontal: 56,
@@ -90,36 +100,36 @@ const s = StyleSheet.create({
   },
   issuerBlock: { flexDirection: 'column', maxWidth: 280 },
   logo: { width: 110, height: 26, objectFit: 'contain', marginBottom: 10 },
-  issuerName: { fontFamily: 'Geist Bold', fontSize: 10, marginBottom: 2 },
-  issuerLine: { fontSize: 8, color: TEXT_MUTED, marginBottom: 1 },
+  issuerName: { ...t.bodyStrong, marginBottom: 2 },
+  issuerLine: { ...t.caption, color: TEXT_MUTED, marginBottom: 1 },
 
   headerRight: { flexDirection: 'column', alignItems: 'flex-end', maxWidth: 240 },
-  title: { fontFamily: 'Geist Bold', fontSize: 16, color: TEXT_PRIMARY, marginBottom: 6 },
+  title: { ...t.titleLg, color: TEXT_PRIMARY, marginBottom: 6 },
   chip: {
+    ...t.micro,
     backgroundColor: CHIP_BG,
     color: TEXT_MUTED,
-    fontSize: 7.5,
     paddingVertical: 2,
     paddingHorizontal: 7,
     borderRadius: 8,
     marginBottom: 6
   },
-  number: { fontSize: 10, marginBottom: 2 },
-  paymentDate: { fontSize: 8, color: TEXT_MUTED },
+  number: { ...t.subtitle, marginBottom: 2 },
+  paymentDate: { ...t.caption, color: TEXT_MUTED },
 
   divider: { borderBottomWidth: 1, borderBottomColor: BORDER_LIGHT, marginVertical: 16 },
 
   partiesRow: { flexDirection: 'row', justifyContent: 'space-between' },
   partyCol: { flexDirection: 'column', width: '48%' },
   sectionLabel: {
-    fontSize: 7,
+    ...t.micro,
     color: TEXT_FAINT,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 5
   },
-  partyName: { fontFamily: 'Geist Bold', fontSize: 9.5, marginBottom: 2 },
-  partyLine: { fontSize: 8, color: TEXT_MUTED, marginBottom: 1 },
+  partyName: { ...t.bodyStrong, marginBottom: 2 },
+  partyLine: { ...t.caption, color: TEXT_MUTED, marginBottom: 1 },
 
   breakdownRow: {
     flexDirection: 'row',
@@ -127,14 +137,14 @@ const s = StyleSheet.create({
     alignItems: 'flex-end',
     marginBottom: 7
   },
-  breakdownLabel: { fontSize: 9, color: TEXT_MUTED },
-  breakdownAmount: { fontSize: 9, color: TEXT_PRIMARY },
-  breakdownAmountMuted: { fontSize: 9, color: TEXT_MUTED },
+  breakdownLabel: { ...t.body, color: TEXT_MUTED },
+  breakdownAmount: { ...t.body, color: TEXT_PRIMARY },
+  breakdownAmountMuted: { ...t.body, color: TEXT_MUTED },
   netDivider: { borderBottomWidth: 1, borderBottomColor: BORDER_LIGHT, marginVertical: 6 },
   netRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 2 },
-  netLabel: { fontFamily: 'Geist Bold', fontSize: 11 },
-  netAmount: { fontFamily: 'Geist Bold', fontSize: 14, color: NET_ACCENT },
-  fxCaption: { fontSize: 7.5, color: TEXT_MUTED, marginTop: 5 },
+  netLabel: { ...t.numericAmount },
+  netAmount: { ...t.kpiValue, color: NET_ACCENT },
+  fxCaption: { ...t.micro, color: TEXT_MUTED, marginTop: 5 },
 
   paymentRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 2 },
 
@@ -146,9 +156,9 @@ const s = StyleSheet.create({
     borderColor: BORDER_LIGHT,
     borderRadius: 4
   },
-  disclaimerText: { fontSize: 8, color: TEXT_MUTED, lineHeight: 1.4 },
+  disclaimerText: { ...t.caption, color: TEXT_MUTED, lineHeight: 1.4 },
 
-  footerNote: { fontSize: 7.5, color: TEXT_FAINT, marginTop: 16 }
+  footerNote: { ...t.micro, color: TEXT_FAINT, marginTop: 16 }
 })
 
 const RemittanceDocument = ({ presentation }: { presentation: RemittancePresentation }) => {

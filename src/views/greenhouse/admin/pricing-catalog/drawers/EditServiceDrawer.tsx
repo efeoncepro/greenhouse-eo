@@ -742,7 +742,6 @@ const EditServiceDrawer = ({ open, moduleId, onClose, onSuccess }: EditServiceDr
             <Typography
               variant='caption'
               color='text.secondary'
-              sx={{ fontSize: '0.75rem' }}
             >
               {service.serviceSku} · {service.moduleCode}
             </Typography>

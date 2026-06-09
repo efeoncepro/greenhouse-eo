@@ -64,6 +64,8 @@ export type CaptureDomain =
   | 'payroll'
   | 'sync' // TASK-773 — outbox publisher, reactive consumer, projection refreshes
   | 'client_portal' // TASK-822 — Client Portal BFF / Anti-Corruption Layer (EPIC-015 child 1/8)
+  | 'workforce' // TASK-1019 — Workforce Contracting Studio (offer letters + employment contracts, AI drafting)
+  | 'documents' // TASK-490 — Signature orchestration + document vault (EPIC-001 signable pack)
 
 export interface CaptureOptions {
   /** Free-form structured context. Ends up in Sentry's `Additional Data`. */

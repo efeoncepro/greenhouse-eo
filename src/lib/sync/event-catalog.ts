@@ -207,7 +207,13 @@ export const AGGREGATE_TYPES = {
 
   // TASK-992 — Client Lifecycle Orchestrator (GREENHOUSE_CLIENT_LIFECYCLE_V1).
   // Aggregate identity = caseId ('clc-{uuid}').
-  clientLifecycleCase: 'client_lifecycle_case'
+  clientLifecycleCase: 'client_lifecycle_case',
+
+  // TASK-1019 — Workforce Contracting Studio (GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1).
+  // Aggregate identity = caseId ('wcc-{uuid}').
+  workforceContractingCase: 'workforce_contracting_case',
+  // TASK-490 — provider-neutral signature orchestration (EPIC-001). Identity = 'sig-{uuid}'.
+  signatureRequest: 'signature_request'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -218,6 +224,8 @@ export const EVENT_TYPES = {
   // Account 360
   organizationCreated: 'organization.created',
   organizationUpdated: 'organization.updated',
+  organizationBrandAssetCandidateCreated: 'organization.brand_asset.candidate_created',
+  organizationBrandAssetUpdated: 'organization.brand_asset.updated',
 
   // Commercial Party Lifecycle (TASK-535)
   commercialPartyCreated: 'commercial.party.created',
@@ -413,6 +421,10 @@ export const EVENT_TYPES = {
   leaveRequestRejected: 'leave_request.rejected',
   leaveRequestCancelled: 'leave_request.cancelled',
   leaveRequestPayrollImpactDetected: 'leave_request.payroll_impact_detected',
+  // TASK-1020 — audit-only: recovery de autoridad de aprobación de un permiso
+  // cuyo snapshot quedó congelado con un delegado genérico inválido. Payload v1
+  // con before/after + actor/reason. NO es reactivo (no dispara projection).
+  leaveApprovalAuthorityRecovered: 'leave_request.approval_authority_recovered',
   leaveBalanceAdjusted: 'leave_balance.adjusted',
   leaveBalanceAdjustmentReversed: 'leave_balance.adjustment_reversed',
 
@@ -487,6 +499,12 @@ export const EVENT_TYPES = {
   emailDeliveryDead: 'email_delivery.dead_letter',
   emailDeliverabilityAlert: 'email_delivery.deliverability_alert',
   emailGdprDeletionCompleted: 'email_delivery.gdpr_deletion_completed',
+
+  // Coming Soon launch waitlist (route /coming-soon). Emitted on a NEW email
+  // capture (idempotent re-subscribe does NOT re-emit). Audit + hook for the
+  // future "we launched" notify flow. No dedicated reactive consumer yet; the
+  // generic outbox publisher (sync.outbox.*) carries it.
+  launchNotificationSubscribed: 'launch.notification.subscribed',
 
   // Quotes & Credit Notes (legacy finance namespace, TASK-344 cutover aliased via commercial.*)
   quoteCreated: 'finance.quote.created',
@@ -971,7 +989,34 @@ export const EVENT_TYPES = {
   clientLifecycleBlockerResolved: 'client.lifecycle.blocker.resolved',
   clientLifecycleCaseCompleted: 'client.lifecycle.case.completed',
   clientLifecycleCaseCancelled: 'client.lifecycle.case.cancelled',
-  clientLifecycleBlockerOverridden: 'client.lifecycle.blocker.overridden'
+  clientLifecycleBlockerOverridden: 'client.lifecycle.blocker.overridden',
+
+  // TASK-1019 — Workforce Contracting Studio lifecycle (v1).
+  // aggregate_type = workforce_contracting_case, aggregate_id = caseId ('wcc-{uuid}').
+  // Advisory/foundation only: no consumer emits PDF/ZapSign/email in TASK-1019.
+  workforceContractingCaseOpened: 'workforce.contracting.case_opened',
+  workforceContractingAiDraftCreated: 'workforce.contracting.ai_draft_created',
+  workforceContractingDraftApproved: 'workforce.contracting.draft_approved',
+  workforceContractingReadyForPdf: 'workforce.contracting.ready_for_pdf',
+  workforceContractingReadyForSignature: 'workforce.contracting.ready_for_signature',
+  // TASK-1024 — signature bridge. `sent_for_signature` (producer, operator CTA);
+  // `signature_completed`/`signature_failed` (reactive consumer of signature.request.*).
+  // TASK-1025 (emails) + TASK-1026 (registro DT) consumen estos.
+  workforceContractingSentForSignature: 'workforce.contracting.sent_for_signature',
+  workforceContractingSignatureCompleted: 'workforce.contracting.signature_completed',
+  workforceContractingSignatureFailed: 'workforce.contracting.signature_failed',
+  // Future scheduler-emitted contract only (never emitted in TASK-1019).
+  workforceContractingSignaturePendingOverdue: 'workforce.contracting.signature_pending_overdue',
+  // TASK-490 — provider-neutral signature orchestration (EPIC-001).
+  // aggregate_type = signature_request, aggregate_id = 'sig-{uuid}'. Consuming domains
+  // (contracting case, MSA) react to `completed` to link the signed asset.
+  signatureRequestCreated: 'signature.request.created',
+  signatureRequestSent: 'signature.request.sent',
+  signatureRequestPartiallySigned: 'signature.request.partially_signed',
+  signatureRequestCompleted: 'signature.request.completed',
+  signatureRequestCancelled: 'signature.request.cancelled',
+  signatureRequestFailed: 'signature.request.failed',
+  signatureRequestExpired: 'signature.request.expired'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

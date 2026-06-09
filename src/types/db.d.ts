@@ -2320,6 +2320,19 @@ export interface GreenhouseCoreIdentityProfileSourceLinks {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreLaunchNotifications {
+  created_at: Generated<Timestamp>;
+  email: string;
+  locale: Generated<string>;
+  notification_id: Generated<string>;
+  notified_at: Timestamp | null;
+  request_ip_hash: string | null;
+  source: Generated<string>;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  user_id: string | null;
+}
+
 export interface GreenhouseCoreMemberCertifications {
   /**
    * FK to assets — PDF/image evidence uploaded via private assets
@@ -2643,6 +2656,23 @@ export interface GreenhouseCoreOperationalResponsibilities {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreOrganizationBrandAssetCandidates {
+  asset_id: string | null;
+  candidate_id: string;
+  confidence: Numeric | null;
+  created_at: Generated<Timestamp>;
+  discovered_at: Generated<Timestamp>;
+  metadata_json: Generated<Json>;
+  organization_id: string;
+  rejection_reason: string | null;
+  reviewed_at: Timestamp | null;
+  reviewed_by_user_id: string | null;
+  source: string;
+  source_url: string | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreOrganizationLifecycleHistory {
   commercial_party_id: string;
   from_stage: string | null;
@@ -2686,7 +2716,7 @@ export interface GreenhouseCoreOrganizations {
    */
   lifecycle_stage_source: Generated<string>;
   /**
-   * TASK-862 — Logo del empleador (legal entity) renderizado en el header de documentos legales (finiquito, contrato, anexo). Resuelto desde greenhouse_core.assets via /api/assets/private/<id>. Fallback a logo Greenhouse hardcoded cuando null.
+   * TASK-999 — canonical organization logo asset pointer. For non-operating organizations this is the commercial/brand logo used by Organization 360 UI. For operating entities it remains the legal/institutional document logo and is NOT mutated by the TASK-999 enrichment flow.
    */
   logo_asset_id: string | null;
   notes: string | null;
@@ -2702,6 +2732,10 @@ export interface GreenhouseCoreOrganizations {
   tax_id: string | null;
   tax_id_type: string | null;
   updated_at: Generated<Timestamp>;
+  /**
+   * TASK-999 — canonical organization website URL used as input for brand-asset discovery/enrichment. Nullable; no hotlinking contract.
+   */
+  website_url: string | null;
 }
 
 export interface GreenhouseCorePermissionSets {
@@ -3156,6 +3190,62 @@ export interface GreenhouseCoreServiceSlaDefinitions {
   updated_at: Generated<Timestamp>;
   updated_by: string | null;
   warning_threshold: Numeric | null;
+}
+
+export interface GreenhouseCoreSignatureRequestEvents {
+  actor: string;
+  event_id: string;
+  event_kind: string;
+  from_status: string | null;
+  occurred_at: Generated<Timestamp>;
+  payload_json: Generated<Json>;
+  signature_request_id: string;
+  to_status: string | null;
+}
+
+export interface GreenhouseCoreSignatureRequests {
+  audit_report_asset_id: string | null;
+  cancel_reason: string | null;
+  cancelled_at: Timestamp | null;
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string;
+  document_asset_id: string;
+  failure_reason: string | null;
+  idempotency_key: string | null;
+  last_synced_at: Timestamp | null;
+  provider: Generated<string>;
+  provider_document_token: string | null;
+  /**
+   * TASK-490 — raw provider state snapshot (reconciliation + out-of-order callback tolerance).
+   */
+  provider_payload: Generated<Json>;
+  sent_at: Timestamp | null;
+  signable_format: Generated<string>;
+  signature_request_id: string;
+  signed_document_asset_id: string | null;
+  /**
+   * TASK-490 — initiating domain (contracting_case | master_agreement). The consuming domain reacts to signature.request.completed to link the signed asset (polymorphic source_ref, no FK).
+   */
+  source_kind: string;
+  source_ref: string;
+  status: Generated<string>;
+  title: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreSignatureRequestSigners {
+  created_at: Generated<Timestamp>;
+  order_group: Generated<number>;
+  provider_signer_token: string | null;
+  signature_request_id: string;
+  signed_at: Timestamp | null;
+  signer_email: string | null;
+  signer_id: string;
+  signer_name: string;
+  signer_role: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseCoreSisterPlatformAuthorizationCodes {
@@ -6527,6 +6617,109 @@ export interface GreenhouseHrWorkflowApprovalSnapshots {
   workflow_entity_id: string;
 }
 
+export interface GreenhouseHrWorkforceContractingAiRuns {
+  ai_run_id: string;
+  case_id: string;
+  created_at: Generated<Timestamp>;
+  draft_id: string | null;
+  error_summary: string | null;
+  input_snapshot_hash: string;
+  language_parity_status: string | null;
+  model: string;
+  output_hash: string | null;
+  prompt_hash: string | null;
+  prompt_version: string;
+  provider: string;
+  status: string;
+  updated_at: Generated<Timestamp>;
+  usage_json: Json | null;
+}
+
+export interface GreenhouseHrWorkforceContractingCaseEvents {
+  actor_user_id: string | null;
+  case_id: string;
+  event_id: string;
+  event_kind: string;
+  from_status: string | null;
+  occurred_at: Generated<Timestamp>;
+  payload_json: Generated<Json>;
+  to_status: string | null;
+}
+
+export interface GreenhouseHrWorkforceContractingCases {
+  authoritative_language: Generated<string>;
+  case_id: string;
+  case_kind: string;
+  contract_type_snapshot: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  jurisdiction_pack_code: string;
+  legal_review_reference: string | null;
+  member_id: string | null;
+  metadata_json: Generated<Json>;
+  operating_entity_organization_id: string;
+  pay_regime_snapshot: string | null;
+  payroll_via_snapshot: string | null;
+  /**
+   * TASK-1023 - rendered (unsigned) signable PDF private asset (greenhouse_core.assets). Auto-regen per status.
+   */
+  pdf_asset_id: string | null;
+  /**
+   * TASK-1023 - SHA-256 of the rendered PDF bytes (reproducibility/verification).
+   */
+  pdf_content_hash: string | null;
+  /**
+   * TASK-1023 - immutable facts snapshot (employer + worker + terms + structured content) captured at first render; reused for re-renders so an approved document never changes if identities change later (OQ1).
+   */
+  pdf_facts_snapshot: Json | null;
+  pdf_generated_at: Timestamp | null;
+  /**
+   * TASK-1023 - case status when the PDF was last rendered (drift detection vs asset metadata documentStatusAtRender).
+   */
+  pdf_status_at_render: string | null;
+  pdf_template_version: string | null;
+  required_languages: Generated<string[]>;
+  signable_format: Generated<string>;
+  signature_provider: Generated<string>;
+  /**
+   * TASK-1024 — the current EPIC-001 signature_request for this case (latest send). NULL until sent to signature.
+   */
+  signature_request_id: string | null;
+  /**
+   * TASK-1023 (reserved, populated by TASK-1024) - signed PDF artifact returned by ZapSign.
+   */
+  signed_pdf_asset_id: string | null;
+  source_offer_case_id: string | null;
+  status: string;
+  subject_identity_profile_id: string;
+  target_start_date: Timestamp | null;
+  updated_at: Generated<Timestamp>;
+  void_reason: string | null;
+  voided_at: Timestamp | null;
+  work_relationship_onboarding_case_id: string | null;
+}
+
+export interface GreenhouseHrWorkforceContractingDrafts {
+  approved_at: Timestamp | null;
+  approved_by_user_id: string | null;
+  /**
+   * TASK-1023 - structured document-necessary facts (gross_amount, role_title, etc.) the PDF render reads for the offer termscard instead of parsing prose (OQ2). Nullable for manual drafts.
+   */
+  captured_facts_json: Json | null;
+  case_id: string;
+  content_hash: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  draft_id: string;
+  draft_version: number;
+  language_parity_snapshot_json: Json | null;
+  source: string;
+  status: Generated<string>;
+  structured_content_json: Json;
+  updated_at: Generated<Timestamp>;
+  validation_snapshot_json: Json | null;
+}
+
 export interface GreenhouseHrWorkRelationshipOffboardingCaseEvents {
   actor_user_id: string | null;
   created_at: Generated<Timestamp>;
@@ -8192,7 +8385,9 @@ export interface GreenhouseServingOrganization360 {
   created_at: Timestamp | null;
   hubspot_company_id: string | null;
   industry: string | null;
+  is_operating_entity: boolean | null;
   legal_name: string | null;
+  logo_asset_id: string | null;
   membership_count: Int8 | null;
   notes: string | null;
   organization_id: string | null;
@@ -8207,6 +8402,7 @@ export interface GreenhouseServingOrganization360 {
   tax_id_type: string | null;
   unique_person_count: Int8 | null;
   updated_at: Timestamp | null;
+  website_url: string | null;
 }
 
 export interface GreenhouseServingOrganizationOperationalMetrics {
@@ -9752,6 +9948,7 @@ export interface DB {
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
+  "greenhouse_core.launch_notifications": GreenhouseCoreLaunchNotifications;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
   "greenhouse_core.member_contract_type_audit_log": GreenhouseCoreMemberContractTypeAuditLog;
   "greenhouse_core.member_endorsements": GreenhouseCoreMemberEndorsements;
@@ -9765,6 +9962,7 @@ export interface DB {
   "greenhouse_core.notion_workspace_source_bindings": GreenhouseCoreNotionWorkspaceSourceBindings;
   "greenhouse_core.notion_workspaces": GreenhouseCoreNotionWorkspaces;
   "greenhouse_core.operational_responsibilities": GreenhouseCoreOperationalResponsibilities;
+  "greenhouse_core.organization_brand_asset_candidates": GreenhouseCoreOrganizationBrandAssetCandidates;
   "greenhouse_core.organization_lifecycle_history": GreenhouseCoreOrganizationLifecycleHistory;
   "greenhouse_core.organizations": GreenhouseCoreOrganizations;
   "greenhouse_core.permission_sets": GreenhouseCorePermissionSets;
@@ -9792,6 +9990,9 @@ export interface DB {
   "greenhouse_core.service_skill_requirements": GreenhouseCoreServiceSkillRequirements;
   "greenhouse_core.service_sla_definitions": GreenhouseCoreServiceSlaDefinitions;
   "greenhouse_core.services": GreenhouseCoreServices;
+  "greenhouse_core.signature_request_events": GreenhouseCoreSignatureRequestEvents;
+  "greenhouse_core.signature_request_signers": GreenhouseCoreSignatureRequestSigners;
+  "greenhouse_core.signature_requests": GreenhouseCoreSignatureRequests;
   "greenhouse_core.sister_platform_authorization_codes": GreenhouseCoreSisterPlatformAuthorizationCodes;
   "greenhouse_core.sister_platform_bindings": GreenhouseCoreSisterPlatformBindings;
   "greenhouse_core.sister_platform_consumers": GreenhouseCoreSisterPlatformConsumers;
@@ -9939,6 +10140,10 @@ export interface DB {
   "greenhouse_hr.work_relationship_onboarding_case_events": GreenhouseHrWorkRelationshipOnboardingCaseEvents;
   "greenhouse_hr.work_relationship_onboarding_cases": GreenhouseHrWorkRelationshipOnboardingCases;
   "greenhouse_hr.workflow_approval_snapshots": GreenhouseHrWorkflowApprovalSnapshots;
+  "greenhouse_hr.workforce_contracting_ai_runs": GreenhouseHrWorkforceContractingAiRuns;
+  "greenhouse_hr.workforce_contracting_case_events": GreenhouseHrWorkforceContractingCaseEvents;
+  "greenhouse_hr.workforce_contracting_cases": GreenhouseHrWorkforceContractingCases;
+  "greenhouse_hr.workforce_contracting_drafts": GreenhouseHrWorkforceContractingDrafts;
   "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
   "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;
   "greenhouse_notifications.email_subscriptions": GreenhouseNotificationsEmailSubscriptions;

@@ -13,13 +13,18 @@ import { parseArgs } from 'node:util'
 
 import { appendAudit, resolveActor } from './lib/audit'
 import { ensureStorageStateFresh, refreshStorageState } from './lib/auth'
+import { runBaselineDiffContract } from './lib/baseline-contract'
 import { assertNotRedirectedToLogin, launchCaptureSession } from './lib/browser'
+import { applyCaptureDeterminism } from './lib/capture-masks'
 import { isValidEnv, resolveEnvConfig, type CaptureEnv, type EnvConfig } from './lib/env'
 import { classifyCaptureFailure } from './lib/failure-taxonomy'
 import { composeGif } from './lib/gif'
-import { writeManifest, type CaptureManifest } from './lib/manifest'
+import { computeRubricVerdict } from './lib/enterprise-rubric'
+import { writeManifest, type BaselineFrameDiff, type CaptureManifest, type EnterpriseRubricSummary, type PerformanceSummary, type RuntimeSummary } from './lib/manifest'
+import { collectPerformanceSnapshot, derivePerformanceFindings } from './lib/perf-budget'
 import { runScenario } from './lib/recorder'
 import { writeCaptureReport } from './lib/report'
+import { attachRuntimeCollectors, deriveRuntimeFindings } from './lib/runtime-collector'
 import { applySecretMask, assertSafeOutputPath, enforceProductionGate } from './lib/safety'
 import type { CaptureScenario, CaptureViewportVariant } from './lib/scenario'
 import { uploadCaptureToGcs } from './lib/upload'
@@ -31,6 +36,32 @@ const CAPTURES_DIR = resolve(REPO_ROOT, '.captures')
 const PRINT = (msg: string) => {
   console.log(msg)
 }
+
+const HELP_TEXT = `Greenhouse Visual Capture (GVC)
+
+Uso:
+  pnpm fe:capture <scenario-name> [--env=local|staging|dev-agent|production] [--gif] [--headed]
+  pnpm fe:capture --route=/path [--env=local|staging|dev-agent|production] [--hold=3000]
+
+Opciones:
+  --env=<env>       Target de captura. Default: staging
+  --route=<path>    Captura inline de una ruta sin scenario
+  --hold=<ms>       Espera inicial para capturas inline. Default: 1500
+  --gif             Genera flipbook.gif
+  --headed          Abre Chromium visible para debug
+  --device=<name>   Device Playwright para capturas inline
+  --upload=<bucket> Sube artifacts a GCS
+  --prod            Triple gate explícito para production
+  -h, --help        Muestra esta ayuda
+
+Ejemplos:
+  pnpm fe:capture onboarding-cases-inbox-mockup --env=local
+  pnpm fe:capture --route=/agency/clients/onboarding/mockup --env=local --hold=3000
+  pnpm fe:capture:review .captures/<capture-dir>
+
+Scenarios:
+  ls scripts/frontend/scenarios/
+`
 
 const buildOutputDir = (scenarioName: string): string => {
   const iso = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
@@ -123,8 +154,13 @@ const runOneCapture = async ({
     recordVideoDir: videoDir
   })
 
+  const runtimeCollector = attachRuntimeCollectors(session.page)
+
   let exitCode: 0 | 1 = 0
   let stepError: { message: string; stepIndex: number } | undefined
+  let baselineDiffs: BaselineFrameDiff[] | undefined
+  let runtimeSummary: RuntimeSummary | undefined
+  let performanceSummary: PerformanceSummary | undefined
   let outcome = {
     frames: [],
     startedAt: Date.now(),
@@ -151,6 +187,13 @@ const runOneCapture = async ({
 
     await applySecretMask(session.page, scenario.extraMaskSelectors ?? [])
 
+    // Baseline contract: el diff pixel-perfect SOLO es válido bajo condiciones
+    // deterministas. Se aplica sólo cuando el scenario declara un baseline para
+    // no alterar la evidencia de motion de scenarios de microinteracción.
+    if (scenario.baseline?.surfaceId) {
+      await applyCaptureDeterminism(session.page)
+    }
+
     outcome = await runScenario({
       page: session.page,
       scenario,
@@ -162,6 +205,40 @@ const runOneCapture = async ({
       exitCode = 1
       stepError = outcome.error
     }
+
+    if (scenario.baseline?.surfaceId) {
+      const contract = runBaselineDiffContract({
+        baseline: scenario.baseline,
+        outputDir,
+        frames: outcome.frames,
+        viewportName
+      })
+
+      outcome.qualityFindings.push(...contract.findings)
+      baselineDiffs = contract.baselineDiffs.length ? contract.baselineDiffs : undefined
+
+      for (const diff of contract.baselineDiffs) {
+        const badge = diff.status === 'match' ? '🟢' : diff.status === 'exceeded' || diff.status === 'dimension_mismatch' ? '🔴' : '🟡'
+
+        PRINT(`  ${badge} baseline ${diff.frameLabel}: ${diff.status}${diff.diffRatio !== undefined ? ` (${(diff.diffRatio * 100).toFixed(2)}%)` : ''}`)
+      }
+    }
+
+    runtimeSummary = runtimeCollector.summarize()
+    outcome.qualityFindings.push(...deriveRuntimeFindings(runtimeCollector.raw(), scenario.quality?.runtime))
+
+    performanceSummary = await collectPerformanceSnapshot(session.page)
+    outcome.qualityFindings.push(...derivePerformanceFindings(performanceSummary, scenario.quality?.performance))
+
+    const blockingFinding = outcome.qualityFindings.find(finding => finding.severity === 'error')
+
+    if (blockingFinding) {
+      exitCode = 1
+      stepError = {
+        message: `${blockingFinding.code}: ${blockingFinding.message}`,
+        stepIndex: -1
+      }
+    }
   } catch (err) {
     exitCode = 1
     stepError = {
@@ -170,6 +247,15 @@ const runOneCapture = async ({
     }
     PRINT(`✗ captura abortada: ${stepError.message}`)
   }
+
+  runtimeSummary ??= runtimeCollector.summarize()
+  runtimeCollector.dispose()
+
+  // Trace on failure (retain-on-failure): guarda trace.zip sólo si la captura falló.
+  const traceSavePath = exitCode === 1 ? resolve(outputDir, 'trace.zip') : null
+  const traceSaved = await session.stopTracing(traceSavePath)
+
+  if (traceSaved) PRINT(`✓ trace.zip guardado (debug: pnpm exec playwright show-trace ${outputDir.replace(REPO_ROOT, '<repo>')}/trace.zip)`)
 
   const webmTmpPath = await session.finalizeRecording()
   let webmPath: string | null = null
@@ -205,6 +291,14 @@ const runOneCapture = async ({
 
   const failureCategory = classifyCaptureFailure(stepError?.message)
 
+  let enterpriseRubric: EnterpriseRubricSummary | undefined
+
+  if (scenario.quality?.enterpriseRubric?.enabled) {
+    const rubricFindings = outcome.qualityFindings.filter(finding => finding.category === 'enterprise')
+
+    enterpriseRubric = { verdict: computeRubricVerdict(rubricFindings), findingCount: rubricFindings.length }
+  }
+
   const reportManifest: CaptureManifest = {
     schemaVersion: 1,
     scenarioName: scenario.name,
@@ -218,7 +312,8 @@ const runOneCapture = async ({
     outputs: {
       recordingWebm: webmPath ? webmPath.replace(`${outputDir}/`, '') : null,
       framesDir: 'frames/',
-      flipbookGif: gifPath ? gifPath.replace(`${outputDir}/`, '') : null
+      flipbookGif: gifPath ? gifPath.replace(`${outputDir}/`, '') : null,
+      trace: traceSaved ? 'trace.zip' : null
     },
     frames: outcome.frames,
     readiness: outcome.readiness,
@@ -227,6 +322,10 @@ const runOneCapture = async ({
     interactions: outcome.interactions,
     failureCategory,
     baseline: scenario.baseline,
+    baselineDiffs,
+    runtimeSummary,
+    performanceSummary,
+    enterpriseRubric,
     exitCode,
     error: stepError
   }
@@ -259,9 +358,16 @@ const main = async (): Promise<void> => {
       headed: { type: 'boolean', default: false },
       prod: { type: 'boolean', default: false },
       device: { type: 'string' },
-      upload: { type: 'string' }
+      upload: { type: 'string' },
+      help: { type: 'boolean', short: 'h', default: false }
     }
   })
+
+  if (values.help === true) {
+    PRINT(HELP_TEXT)
+
+    return
+  }
 
   if (!isValidEnv(values.env as string)) {
     throw new Error(`--env inválido: "${values.env}". Valores: local | staging | dev-agent | production`)

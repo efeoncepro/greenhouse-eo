@@ -45,6 +45,7 @@ declare module 'next-auth' {
     supervisorAccess?: SupervisorAccessSummary | null
     // Contractor self-service flag (TASK-796): drives dynamic /my/contractor menu visibility.
     hasActiveContractorEngagement?: boolean
+    hasWorkforceContractingDocument?: boolean
   }
 
   interface Session {
@@ -90,6 +91,7 @@ declare module 'next-auth' {
       supervisorAccess?: SupervisorAccessSummary | null
     // Contractor self-service flag (TASK-796): drives dynamic /my/contractor menu visibility.
     hasActiveContractorEngagement?: boolean
+    hasWorkforceContractingDocument?: boolean
     } & DefaultSession['user']
   }
 }
@@ -139,5 +141,6 @@ declare module 'next-auth/jwt' {
     supervisorAccess?: SupervisorAccessSummary | null
     // Contractor self-service flag (TASK-796): drives dynamic /my/contractor menu visibility.
     hasActiveContractorEngagement?: boolean
+    hasWorkforceContractingDocument?: boolean
   }
 }

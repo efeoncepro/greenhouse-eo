@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 
-import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -14,6 +13,8 @@ import classnames from 'classnames'
 
 import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
+
+import { GreenhouseStatusDot } from '@/components/greenhouse/primitives'
 
 import type { HomeReliabilityRibbonData, ReliabilityModuleStatus } from '@/lib/home/contract'
 
@@ -82,38 +83,13 @@ export const HomeReliabilityRibbon = ({ data }: HomeReliabilityRibbonProps) => {
                 transition: 'background-color 120ms cubic-bezier(0.2, 0, 0, 1)',
                 '&:hover': { bgcolor: 'action.hover' }
               }}
-              onClick={() => router.push('/admin/operations')}
+              onClick={() => router.push('/admin/ops-health')}
             >
-              <Box
-                sx={{
-                  position: 'relative',
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  bgcolor: theme => theme.palette[tone.color].main,
-                  boxShadow: theme => `0 0 0 3px color-mix(in oklch, ${theme.palette[tone.color].main} 22%, transparent)`,
-                  flexShrink: 0,
-                  '&::after':
-                    module.status === 'healthy'
-                      ? {
-                          content: '""',
-                          position: 'absolute',
-                          inset: -4,
-                          borderRadius: '50%',
-                          bgcolor: theme => theme.palette[tone.color].main,
-                          opacity: 0.35,
-                          animation: 'gh-status-heartbeat 2.4s cubic-bezier(0.2, 0, 0, 1) infinite'
-                        }
-                      : undefined,
-                  '@media (prefers-reduced-motion: reduce)': {
-                    '&::after': { animation: 'none' }
-                  },
-                  '@keyframes gh-status-heartbeat': {
-                    '0%': { transform: 'scale(1)', opacity: 0.35 },
-                    '60%': { transform: 'scale(1.55)', opacity: 0 },
-                    '100%': { transform: 'scale(1.55)', opacity: 0 }
-                  }
-                }}
+              <GreenhouseStatusDot
+                tone={tone.color}
+                halo
+                pulse={module.status === 'healthy'}
+                ariaLabel={`${module.label}: ${tone.label}`}
               />
               <i className={classnames(icon, 'text-[16px]')} style={{ opacity: 0.65 }} />
               <Typography variant='body2' sx={{ fontWeight: 500, flex: 1, minWidth: 0 }} noWrap color='text.primary'>

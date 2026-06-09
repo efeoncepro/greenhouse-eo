@@ -293,7 +293,7 @@ Preflight deterministico minimo:
 | Slice 4 | Ocultar boton sugerir fases via flag | <5 min | si |
 | Slice 5 | Volver ordering deterministic de contactos | <5 min | si |
 | Slice 6 | Desactivar quality checks IA; conservar deterministico | <5 min | si |
-| Slice 7 | Docs revert no afecta runtime | N/A | si |
+| Slice 7 | Docs revert no afecta runtime | Sin ventana runtime; revert documental | si |
 
 ### Production verification sequence
 

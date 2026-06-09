@@ -11,13 +11,13 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
@@ -75,7 +75,6 @@ const healthLabel = (h: string | null): string => {
 }
 
 const MyPerformanceView = () => {
-  const theme = useTheme()
   const [data, setData] = useState<PerfData | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -151,8 +150,8 @@ const MyPerformanceView = () => {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type='monotone' dataKey='rpa' stroke={theme.palette.primary.main} name='RPA' strokeWidth={2} />
-                    <Line type='monotone' dataKey='otd' stroke={theme.palette.success.main} name='OTD%' strokeWidth={2} />
+                    <Line type='monotone' dataKey='rpa' stroke={GH_COLORS.chart.categorical[0]} name='RPA' strokeWidth={2} />
+                    <Line type='monotone' dataKey='otd' stroke={GH_COLORS.chart.categorical[1]} name='OTD%' strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </AppRecharts>

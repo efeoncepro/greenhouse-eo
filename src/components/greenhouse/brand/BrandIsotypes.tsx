@@ -27,7 +27,7 @@ export const NotionIsotype = ({ size = 28 }: IsotypeProps) => (
       width: size,
       height: size,
       borderRadius: `${Math.round(size * 0.22)}px`,
-      bgcolor: '#fff',
+      bgcolor: 'common.white',
       border: theme => `1px solid ${theme.palette.divider}`,
       display: 'inline-flex',
       alignItems: 'center',
@@ -35,7 +35,7 @@ export const NotionIsotype = ({ size = 28 }: IsotypeProps) => (
       flexShrink: 0
     }}
   >
-    <i className='tabler-brand-notion' style={{ fontSize: Math.round(size * 0.62), color: '#000', lineHeight: 1 }} />
+    <i className='tabler-brand-notion' style={{ fontSize: Math.round(size * 0.62), color: 'var(--mui-palette-common-black)', lineHeight: 1 }} />
   </Box>
 )
 

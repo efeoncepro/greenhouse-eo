@@ -18,6 +18,10 @@ export async function ensureHandlersRegistered() {
   // endpoint /api/webhooks/hubspot-deals, gated por flag
   // CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED default OFF).
   await import('./hubspot-deals')
+  // TASK-491 — ZapSign signature webhook (endpoint /api/webhooks/zapsign, auth_mode='bearer').
+  // Dispatch cascade: signature_requests aggregate (TASK-490) priority, MSA legacy fallback.
+  // Replaces the removed one-off route src/app/api/webhooks/zapsign/route.ts.
+  await import('./zapsign')
 
   // Future handlers imported here
   registered = true

@@ -966,7 +966,7 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
           <Typography variant='subtitle1' sx={{ fontWeight: 600, lineHeight: 1.3 }}>
             {HR_LEGAL_COPY.card.title}
           </Typography>
-          <Typography variant='caption' color='text.secondary' sx={{ fontSize: 13 }}>
+          <Typography variant='caption' color='text.secondary'>
             {HR_LEGAL_COPY.card.subtitle}
           </Typography>
         </Box>
@@ -1009,12 +1009,11 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               color: 'text.secondary',
-              fontSize: 11
             }}
           >
             {HR_LEGAL_COPY.sections.documents}
           </Typography>
-          <Typography variant='caption' color='text.secondary' sx={{ fontSize: 12 }}>
+          <Typography variant='caption' color='text.secondary'>
             {documents.length === 0
               ? HR_LEGAL_COPY.counts.documentsZero
               : HR_LEGAL_COPY.counts.documents(
@@ -1047,12 +1046,11 @@ const PersonLegalProfileSection = ({ memberId, collaboratorName }: PersonLegalPr
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               color: 'text.secondary',
-              fontSize: 11
             }}
           >
             {HR_LEGAL_COPY.sections.addresses}
           </Typography>
-          <Typography variant='caption' color='text.secondary' sx={{ fontSize: 12 }}>
+          <Typography variant='caption' color='text.secondary'>
             {addresses.length === 0
               ? HR_LEGAL_COPY.counts.addressesZero
               : HR_LEGAL_COPY.counts.addresses(

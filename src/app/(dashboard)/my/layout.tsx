@@ -30,7 +30,7 @@ export default async function MyLayout({ children }: { children: ReactNode }) {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

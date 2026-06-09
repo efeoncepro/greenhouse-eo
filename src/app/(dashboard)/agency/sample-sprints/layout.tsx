@@ -31,7 +31,7 @@ export default async function AgencySampleSprintsLayout({ children }: { children
   )
 
   if (!hasViewAccess || !hasReadCapability) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

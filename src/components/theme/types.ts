@@ -16,6 +16,9 @@ import type {
   CustomInputVerticalProps,
   CustomInputImgProps
 } from '@core/components/custom-inputs/types'
+import type { AxisTokens } from '@core/theme/axis-tokens'
+import type { GreenhouseElevationLevel, GreenhouseElevationToken } from './elevation-tokens'
+import type { GreenhouseSemanticRole, GreenhouseSemanticToken } from './greenhouse-semantic-tokens'
 
 declare module '@mui/material/styles' {
    
@@ -29,6 +32,8 @@ declare module '@mui/material/styles' {
         md: number
         lg: number
         xl: number
+        xxl: number
+        display: number
       }
     }
     customShadows: {
@@ -82,11 +87,34 @@ declare module '@mui/material/styles' {
     lineHeights: {
       display: number
       heading: number
+      surfaceHero: number
       pageTitle: number
       metadata: number
       body: number
       numericDense: number
     }
+    /**
+     * AXIS primitive design tokens (full ramps + opacity + neutrals).
+     * Source of truth in code: `src/@core/theme/axis-tokens.ts` (mirrors AXIS Figma).
+     * Consume the semantic layer (`theme.palette.*`) in components; reach into
+     * `theme.axis.ramp.*` only for a specific ramp step.
+     */
+    axis: AxisTokens
+    /**
+     * Greenhouse semantic elevation roles (TASK-1049). Source of truth:
+     * `src/components/theme/elevation-tokens.ts`. Read a ROLE
+     * (`theme.greenhouseElevation.floating`) — never `Paper elevation={n}` nor
+     * `theme.shadows[n]` for new Greenhouse primitives.
+     */
+    greenhouseElevation: Record<GreenhouseElevationLevel, GreenhouseElevationToken>
+    /**
+     * Greenhouse semantic feedback roles (TASK-1053 Fase B). Source of truth:
+     * `src/components/theme/greenhouse-semantic-tokens.ts`. Read a ROLE
+     * (`theme.greenhouseSemantic.warning.tonalText`) for the tonal-by-default
+     * treatment — never `palette.<role>.main` as a tonal TEXT color (that is the
+     * fill, not the ink; e.g. warning.main amber fails as text).
+     */
+    greenhouseSemantic: Record<GreenhouseSemanticRole, GreenhouseSemanticToken>
   }
   interface ThemeOptions {
     shape?: {
@@ -97,6 +125,8 @@ declare module '@mui/material/styles' {
         md?: number
         lg?: number
         xl?: number
+        xxl?: number
+        display?: number
       }
     }
     customShadows?: {
@@ -145,20 +175,28 @@ declare module '@mui/material/styles' {
     lineHeights?: Partial<{
       display: number
       heading: number
+      surfaceHero: number
       pageTitle: number
       metadata: number
       body: number
       numericDense: number
     }>
+    axis?: AxisTokens
+    greenhouseElevation?: Partial<Record<GreenhouseElevationLevel, GreenhouseElevationToken>>
+    greenhouseSemantic?: Partial<Record<GreenhouseSemanticRole, GreenhouseSemanticToken>>
   }
 
   // Custom Typography Variants
   interface TypographyVariants {
+    surfaceHeroTitle: React.CSSProperties
+    disclosureText: React.CSSProperties
     monoId: React.CSSProperties
     monoAmount: React.CSSProperties
     kpiValue: React.CSSProperties
   }
   interface TypographyVariantsOptions {
+    surfaceHeroTitle?: React.CSSProperties
+    disclosureText?: React.CSSProperties
     monoId?: React.CSSProperties
     monoAmount?: React.CSSProperties
     kpiValue?: React.CSSProperties
@@ -194,9 +232,6 @@ declare module '@mui/material/styles' {
       deepAzure?: string
       royalBlue?: string
       coreBlue?: string
-      neonLime?: string
-      sunsetOrange?: string
-      crimson?: string
       lightAlloy?: string
       bodyText?: string
       secondaryText?: string
@@ -216,9 +251,6 @@ declare module '@mui/material/styles' {
       deepAzure?: string
       royalBlue?: string
       coreBlue?: string
-      neonLime?: string
-      sunsetOrange?: string
-      crimson?: string
       lightAlloy?: string
       bodyText?: string
       secondaryText?: string
@@ -257,6 +289,8 @@ declare module '@mui/material/styles' {
 
 declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
+    surfaceHeroTitle: true
+    disclosureText: true
     monoId: true
     monoAmount: true
     kpiValue: true

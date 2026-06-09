@@ -18,38 +18,58 @@ describe('approval authority resolver', () => {
     vi.clearAllMocks()
   })
 
-  it('returns delegated supervisor authority when delegation is active', async () => {
-    mockGetEffectiveSupervisor.mockResolvedValue({
-      memberId: 'member-subject',
-      memberName: 'Ana',
-      supervisorMemberId: 'member-supervisor',
-      supervisorName: 'Carlos Supervisor',
-      effectiveSupervisorMemberId: 'member-delegate',
-      effectiveSupervisorName: 'Daniela Delegate',
-      delegated: true,
-      delegation: {
-        responsibilityId: 'resp-1',
-        delegateMemberId: 'member-delegate',
-        delegateMemberName: 'Daniela Delegate',
-        scopeType: 'member',
-        scopeId: 'member-supervisor',
-        effectiveFrom: '2026-04-01T00:00:00.000Z',
-        effectiveTo: null
-      }
-    })
+  const formalSupervisorRecord = {
+    memberId: 'member-subject',
+    memberName: 'Ana',
+    supervisorMemberId: 'member-supervisor',
+    supervisorName: 'Carlos Supervisor',
+    effectiveSupervisorMemberId: 'member-supervisor',
+    effectiveSupervisorName: 'Carlos Supervisor',
+    delegated: false,
+    delegation: null
+  }
+
+  // TASK-1020 — para leave.supervisor_review (honorGenericApprovalDelegate=false)
+  // el resolver pide delegationPolicy='ignore' y el efectivo == formal.
+  it('resolves leave.supervisor_review to the FORMAL supervisor (ignores generic delegate)', async () => {
+    mockGetEffectiveSupervisor.mockResolvedValue(formalSupervisorRecord)
 
     const resolution = await resolveInitialApprovalAuthority({
       workflowDomain: 'leave',
       subjectMemberId: 'member-subject'
     })
 
+    expect(mockGetEffectiveSupervisor).toHaveBeenCalledWith('member-subject', {
+      delegationPolicy: 'ignore'
+    })
     expect(resolution.stageCode).toBe('supervisor_review')
-    expect(resolution.authoritySource).toBe('delegation')
+    expect(resolution.authoritySource).toBe('reporting_hierarchy')
+    expect(resolution.authoritySource).not.toBe('delegation')
     expect(resolution.formalApproverMemberId).toBe('member-supervisor')
-    expect(resolution.effectiveApproverMemberId).toBe('member-delegate')
-    expect(resolution.delegateResponsibilityId).toBe('resp-1')
-    expect(resolution.delegated).toBe(true)
+    expect(resolution.effectiveApproverMemberId).toBe('member-supervisor')
+    expect(resolution.delegateResponsibilityId).toBeNull()
+    expect(resolution.delegated).toBe(false)
   })
+
+  // TASK-1020 D2 — los tres stages effective_supervisor (leave/expense_report/
+  // performance_evaluation) no honran el delegate genérico → 'ignore'.
+  it.each(['leave', 'expense_report', 'performance_evaluation'] as const)(
+    'passes delegationPolicy=ignore for %s.supervisor_review',
+    async workflowDomain => {
+      mockGetEffectiveSupervisor.mockResolvedValue(formalSupervisorRecord)
+
+      const resolution = await resolveInitialApprovalAuthority({
+        workflowDomain,
+        subjectMemberId: 'member-subject'
+      })
+
+      expect(mockGetEffectiveSupervisor).toHaveBeenCalledWith('member-subject', {
+        delegationPolicy: 'ignore'
+      })
+      expect(resolution.authoritySource).not.toBe('delegation')
+      expect(resolution.effectiveApproverMemberId).toBe('member-supervisor')
+    }
+  )
 
   it('falls back to hr review when the subject has no supervisor', async () => {
     mockGetEffectiveSupervisor.mockResolvedValue({

@@ -27,8 +27,12 @@ import {
   type CaptureScenario,
   type ScenarioRunContext
 } from './scenario'
-import type { AssertionResult, CaptureFinding, FrameRecord, InteractionSegment, ReadinessResult } from './manifest'
+import type { AssertionResult, CaptureFinding, FrameMaskRect, FrameRecord, InteractionSegment, ReadinessResult } from './manifest'
 import { analyzeFrameQuality } from './quality'
+import { resolveMaskRects } from './capture-masks'
+import { analyzeEnterpriseRubric } from './enterprise-rubric'
+import { FINDING_CODES } from './failure-taxonomy'
+import { runKeyboardGate } from './keyboard-gate'
 
 export interface RecorderOutcome {
   frames: FrameRecord[]
@@ -91,10 +95,34 @@ export const runScenario = async ({
       allowLoading: scenario.quality?.allowLoading,
       allowLogin: scenario.quality?.allowLogin,
       allowErrorBoundary: scenario.quality?.allowErrorBoundary,
-      fullPage: options?.fullPage
+      fullPage: options?.fullPage,
+      accessibility: scenario.quality?.accessibility,
+      layout: scenario.quality?.layout
     })
 
     qualityFindings.push(...frameQualityFindings)
+
+    let maskRects: FrameMaskRect[] | undefined
+
+    if (scenario.baseline?.maskSelectors?.length) {
+      const resolution = await resolveMaskRects(page, scenario.baseline.maskSelectors, {
+        clipSelector: options?.clipSelector,
+        fullPage: options?.fullPage
+      })
+
+      if (resolution.rects.length) maskRects = resolution.rects
+
+      for (const missing of resolution.missingSelectors) {
+        qualityFindings.push({
+          severity: 'warning',
+          category: 'baseline',
+          code: FINDING_CODES.mask_selector_missing,
+          message: `Mask selector "${missing}" no matcheó nodos en el frame "${label}"; el diff no enmascarará esa región.`,
+          frameLabel: label,
+          selector: missing
+        })
+      }
+    }
 
     frames.push({
       index,
@@ -103,7 +131,8 @@ export const runScenario = async ({
       tMs,
       note,
       interactionName: options?.interactionName,
-      qualityFindings: frameQualityFindings.length ? frameQualityFindings : undefined
+      qualityFindings: frameQualityFindings.length ? frameQualityFindings : undefined,
+      maskRects
     })
 
     log(`  ✓ mark[${index}] "${label}" (+${tMs}ms)`)
@@ -197,6 +226,42 @@ export const runScenario = async ({
         error: { message, stepIndex: index }
       }
     }
+  }
+
+  // Baseline contract: required regions must render (live-page check).
+  for (const region of scenario.baseline?.requiredRegions ?? []) {
+    const visible = await page
+      .locator(region)
+      .first()
+      .isVisible({ timeout: 1000 })
+      .catch(() => false)
+
+    if (!visible) {
+      qualityFindings.push({
+        severity: 'error',
+        category: 'baseline',
+        code: FINDING_CODES.required_region_missing,
+        message: `Región requerida "${region}" no está visible al cierre de la captura (baseline ${scenario.baseline?.surfaceId ?? '—'}).`,
+        selector: region
+      })
+    }
+  }
+
+  // Keyboard / focus / reduced-motion gate (opt-in, runs after the timeline).
+  if (scenario.quality?.keyboard?.enabled && scenario.quality.keyboard.probes.length) {
+    await runKeyboardGate({
+      page,
+      options: scenario.quality.keyboard,
+      mark: (label, note) => onMark(label, note),
+      addFinding: finding => qualityFindings.push(finding)
+    })
+  }
+
+  // Enterprise rubric (opt-in, advisory) — corre una vez sobre el estado final.
+  if (scenario.quality?.enterpriseRubric?.enabled) {
+    const rubricFindings = await analyzeEnterpriseRubric(page, scenario.quality.enterpriseRubric)
+
+    qualityFindings.push(...rubricFindings)
   }
 
   // Final hold for last state capture in the .webm

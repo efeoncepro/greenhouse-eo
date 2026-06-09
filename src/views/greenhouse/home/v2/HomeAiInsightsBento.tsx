@@ -2,22 +2,21 @@
 
 import { useRouter } from 'next/navigation'
 
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
-import Chip from '@mui/material/Chip'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-
-import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
+import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
+import { MOTION_DURATION_S, MOTION_EASE, motionCss } from '@/components/theme/motion-tokens'
 import { GH_NEXA } from '@/lib/copy/nexa'
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
@@ -25,8 +24,8 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 import type { HomeAiInsightCard, HomeAiInsightsBentoData } from '@/lib/home/contract'
 import { formatDateTime as formatGreenhouseDateTime } from '@/lib/format'
 
-const TASK407_ARIA_NEXA_INSIGHTS = "Nexa Insights"
-
+const TASK407_ARIA_NEXA_INSIGHTS = GH_NEXA.brand_full
+const FRAMER_EASE_EMPHASIZED: [number, number, number, number] = [...MOTION_EASE.emphasized.cubicBezier]
 
 interface HomeAiInsightsBentoProps {
   data: HomeAiInsightsBentoData
@@ -42,17 +41,19 @@ const DOMAIN_META: Record<HomeAiInsightCard['domain'], { label: string; icon: st
   integrations: { label: 'Integraciones', icon: 'tabler-plug', color: 'secondary' }
 }
 
-const SEVERITY_TONE: Record<NonNullable<HomeAiInsightCard['severity']>, ThemeColor> = {
+const SEVERITY_TONE: Record<NonNullable<HomeAiInsightCard['severity']>, 'error' | 'warning' | 'info'> = {
   critical: 'error',
   warning: 'warning',
   info: 'info'
 }
 
 const SEVERITY_LABEL: Record<NonNullable<HomeAiInsightCard['severity']>, string> = {
-  critical: 'Crítico',
-  warning: 'Atención',
-  info: 'Info'
+  critical: GH_NEXA.severity_label.critical,
+  warning: GH_NEXA.severity_label.warning,
+  info: GH_NEXA.severity_label.info
 }
+
+const formatSignalType = (signalType: string) => GH_NEXA.signal_type[signalType] ?? signalType.replaceAll('_', ' ')
 
 const InsightCard = ({ card, index }: { card: HomeAiInsightCard; index: number }) => {
   const router = useRouter()
@@ -63,72 +64,102 @@ const InsightCard = ({ card, index }: { card: HomeAiInsightCard; index: number }
     <motion.div
       initial={reduced ? false : { opacity: 0, y: 8 }}
       animate={reduced ? undefined : { opacity: 1, y: 0 }}
-      transition={reduced ? undefined : { duration: 0.2, delay: 0.05 * index, ease: [0.2, 0, 0, 1] }}
+      transition={
+        reduced
+          ? undefined
+          : {
+              duration: MOTION_DURATION_S.standard,
+              delay: MOTION_DURATION_S.instant * index,
+              ease: FRAMER_EASE_EMPHASIZED
+            }
+      }
       style={{ height: '100%' }}
     >
       <Card
         variant='outlined'
         sx={{
           height: '100%',
-          cursor: card.drillHref ? 'pointer' : 'default',
           display: 'flex',
           flexDirection: 'column',
-          transition: 'box-shadow 120ms cubic-bezier(0.2, 0, 0, 1), transform 120ms cubic-bezier(0.2, 0, 0, 1)',
+          transition: `box-shadow ${motionCss.duration.short} ${motionCss.ease.emphasized}, transform ${motionCss.duration.short} ${motionCss.ease.emphasized}`,
           '&:hover': {
             transform: card.drillHref ? 'translateY(-2px)' : undefined,
-            boxShadow: theme => theme.shadows[2]
+            boxShadow: theme => theme.greenhouseElevation.raised.boxShadow
+          },
+          '@media (prefers-reduced-motion: reduce)': {
+            transition: 'none',
+            '&:hover': {
+              transform: 'none'
+            }
           }
         }}
-        onClick={() => card.drillHref && router.push(card.drillHref)}
       >
         <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           <Stack direction='row' alignItems='center' spacing={1.5}>
             <CustomAvatar variant='rounded' skin='light' color={meta.color} size={32}>
-              <i className={classnames(meta.icon, 'text-[18px]')} />
+              <Box component='i' className={meta.icon} sx={{ fontSize: theme => theme.spacing(4.5) }} />
             </CustomAvatar>
-            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5, flex: 1 }}>
-              {meta.label} · {card.signalType}
+            <Typography variant='overline' color='text.secondary' sx={{ flex: 1 }}>
+              {meta.label} · {formatSignalType(card.signalType)}
             </Typography>
             {card.severity ? (
-              <Chip
+              <GreenhouseChip
                 size='small'
-                variant='tonal'
-                color={SEVERITY_TONE[card.severity]}
+                variant='label'
+                kind='status'
+                tone={SEVERITY_TONE[card.severity]}
                 label={SEVERITY_LABEL[card.severity]}
-                sx={{ height: 22, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}
               />
             ) : null}
           </Stack>
           <NexaMentionText
             text={card.headline}
             variant='body1'
-            sx={{ fontWeight: 500, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+            sx={{
+              color: 'text.primary',
+              display: '-webkit-box',
+              WebkitLineClamp: 4,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden'
+            }}
           />
           {card.recommendedAction ? (
             <Stack direction='row' spacing={1} alignItems='flex-start' sx={{ mt: 'auto' }}>
-              <i className='tabler-bulb text-[18px] text-warning shrink-0' style={{ marginTop: 2 }} />
+              <Box
+                aria-hidden='true'
+                component='i'
+                className='tabler-bulb'
+                sx={{ color: 'warning.main', flexShrink: 0, fontSize: theme => theme.spacing(4.5), mt: 0.25 }}
+              />
               <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-                <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>
-                  Acción sugerida
+                <Typography variant='overline' color='text.secondary'>
+                  {GH_NEXA.insights_action_label}
                 </Typography>
                 <NexaMentionText
                   text={card.recommendedAction}
                   variant='body2'
-                  sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', color: 'text.secondary' }}
+                  sx={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: { xs: 3, sm: 2 },
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    color: 'text.secondary'
+                  }}
                 />
               </Stack>
             </Stack>
           ) : null}
           {card.drillHref ? (
-            <Button
+            <GreenhouseButton
               size='small'
               variant='text'
-              color='primary'
-              endIcon={<i className='tabler-arrow-right text-base' />}
+              kind='navigation'
+              trailingIconClassName='tabler-arrow-right'
+              onClick={() => router.push(card.drillHref!)}
               sx={{ alignSelf: 'flex-start', mt: 1 }}
             >
-              Ver causa raíz
-            </Button>
+              {GH_NEXA.insights_root_cause_expand}
+            </GreenhouseButton>
           ) : null}
         </CardContent>
       </Card>
@@ -141,17 +172,23 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
 
   if (!data || data.cards.length === 0) {
     return (
-      <Card component='section' aria-label={TASK407_ARIA_NEXA_INSIGHTS}>
+      <Card component='section' aria-label={TASK407_ARIA_NEXA_INSIGHTS} data-capture='home-nexa-insights-bento'>
         <CardHeader
-          avatar={<i className='tabler-sparkles text-xl text-primary' />}
-          title='Nexa Insights'
-          subheader='Sin señales analizadas todavía'
+          avatar={
+            <Box
+              component='i'
+              className='tabler-sparkles'
+              sx={{ color: 'primary.main', fontSize: theme => theme.spacing(5) }}
+            />
+          }
+          title={GH_NEXA.brand_full}
+          subheader={GH_NEXA.home_bento_empty_subheader}
           titleTypographyProps={{ variant: 'h5' }}
           sx={{ '& .MuiCardHeader-avatar': { mr: 3 } }}
         />
         <CardContent>
           <Typography role='status' aria-live='polite' variant='body2' color='text.secondary'>
-            Nexa procesa señales nuevas cada hora. Vuelve más tarde para ver insights.
+            {GH_NEXA.home_bento_empty_body}
           </Typography>
         </CardContent>
       </Card>
@@ -159,43 +196,53 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
   }
 
   return (
-    <Card component='section' aria-label={TASK407_ARIA_NEXA_INSIGHTS}>
+    <Card component='section' aria-label={TASK407_ARIA_NEXA_INSIGHTS} data-capture='home-nexa-insights-bento'>
       <CardHeader
-        avatar={<i className='tabler-sparkles text-xl text-primary' />}
-        title='Nexa Insights'
+        avatar={
+          <Box
+            component='i'
+            className='tabler-sparkles'
+            sx={{ color: 'primary.main', fontSize: theme => theme.spacing(5) }}
+          />
+        }
+        title={GH_NEXA.brand_full}
         subheader={
           data.lastAnalysisAt
-            ? `${data.totalAnalyzed} señales · último análisis ${formatGreenhouseDateTime(new Date(data.lastAnalysisAt), {
-  dateStyle: 'short',
-  timeStyle: 'short'
-}, 'es-CL')}`
-            : `${data.totalAnalyzed} señales analizadas`
+            ? GH_NEXA.home_bento_last_analysis(
+                data.totalAnalyzed,
+                formatGreenhouseDateTime(
+                  new Date(data.lastAnalysisAt),
+                  {
+                    dateStyle: 'short',
+                    timeStyle: 'short'
+                  },
+                  'es-CL'
+                )
+              )
+            : GH_NEXA.insights_total_analyzed(data.totalAnalyzed)
         }
         titleTypographyProps={{ variant: 'h5' }}
-        action={<OptionMenu options={['Ver todos los insights', 'Configurar análisis']} />}
+        action={<OptionMenu options={[GH_NEXA.home_bento_menu_view_all, GH_NEXA.home_bento_menu_configure]} />}
         sx={{ '& .MuiCardHeader-avatar': { mr: 3 } }}
       />
       <CardContent>
         <Grid container spacing={3}>
           {data.cards.map((card, index) => (
-            <Grid
-              key={card.insightId}
-              size={{ xs: 12, md: data.cards.length === 1 ? 12 : 6 }}
-            >
+            <Grid key={card.insightId} size={{ xs: 12, md: data.cards.length === 1 ? 12 : 6 }}>
               <InsightCard card={card} index={index} />
             </Grid>
           ))}
         </Grid>
         <Stack direction='row' justifyContent='flex-end' sx={{ mt: 3 }}>
-          <Button
+          <GreenhouseButton
             size='small'
             variant='text'
-            color='primary'
-            endIcon={<i className='tabler-arrow-right text-base' />}
+            kind='navigation'
+            trailingIconClassName='tabler-arrow-right'
             onClick={() => router.push('/nexa/insights')}
           >
             {GH_NEXA.home_bento_view_all_cta}
-          </Button>
+          </GreenhouseButton>
         </Stack>
       </CardContent>
     </Card>

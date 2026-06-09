@@ -39,7 +39,7 @@ const EventsTab = () => {
             'finance.payment_order_artifact.downloaded'
           ].map(name => (
             <li key={name}>
-              <Typography variant='body2' component='code' sx={{ fontSize: '0.8125rem' }}>
+              <Typography variant='caption' component='code'>
                 {name}
               </Typography>
             </li>

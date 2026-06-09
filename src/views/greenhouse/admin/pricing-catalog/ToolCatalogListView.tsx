@@ -125,7 +125,7 @@ const buildColumns = (
   columnHelper.accessor('toolSku', {
     header: 'SKU',
     cell: ({ getValue }) => (
-      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+      <Typography variant='caption'>
         {getValue() || '—'}
       </Typography>
     )

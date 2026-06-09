@@ -525,7 +525,7 @@ const GovernanceInlineView = () => {
                     {(data?.commercialModelMultipliers ?? []).map(row => (
                       <TableRow key={row.modelCode}>
                         <TableCell>
-                          <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                          <Typography variant='caption'>
                             {row.modelCode}
                           </Typography>
                         </TableCell>
@@ -594,7 +594,7 @@ const GovernanceInlineView = () => {
                     {(data?.countryPricingFactors ?? []).map(row => (
                       <TableRow key={row.factorCode}>
                         <TableCell>
-                          <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                          <Typography variant='caption'>
                             {row.factorCode}
                           </Typography>
                         </TableCell>

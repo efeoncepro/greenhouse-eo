@@ -7,12 +7,13 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 ## Status
 
 - Estado: `accepted`
-- Version: `1.3`
+- Version: `1.5`
 - Fecha V1.0: `2026-05-12 mañana` — Slice 0-3 (CLI + scenario + recorder + docs)
 - Fecha V1.1: `2026-05-12 tarde` — Delta OQ-1..OQ-6 (upload, device, diff, capability, reliability, ui-review scaffolding)
 - Fecha V1.2: `2026-05-29` — Hook operativo para verificación visual UI obligatoria vía `pnpm fe:capture` y comandos relacionados
 - Fecha V1.3: `2026-05-30` — Greenhouse Visual Capture named tool + scroll/captura full-page resiliente para pantallas largas
 - Fecha V1.4: `2026-05-30` — evidence hardening: readiness/assertions, quality findings, report HTML, multi-viewport, microinteraction V2 y baseline mockup→runtime
+- Fecha V1.5: `2026-06-07` — mockup→runtime contract gates (TASK-1018): baseline visual diff (pixelmatch + masks + home durable), layout integrity, console/hydration/network strict, trace on failure, keyboard/focus/reduced-motion, performance budgets, enterprise rubric + resumen ejecutivo
 - Owner: `Claude / Greenhouse frontend tooling`
 - Relacionado con:
   - `scripts/frontend/` (implementación canónica)
@@ -430,3 +431,54 @@ Durante el loop GVC de TASK-1006 (verificar el resumen Confirmar del wizard de a
 ```
 
 Esto produce una captura crisp a resolución real, sin el artefacto del elemento fijo. Si la sección no tiene un selector estable, agregar un `data-capture` (envoltura `Box data-capture="…"` version-agnostic) — preferido sobre offsets o `fullPage` para leer detalle. Reflejado en la Hard rule correspondiente + en el manual de uso ("Problemas comunes").
+
+## Delta 2026-06-07 — Mockup→runtime contract gates V1.5 (TASK-1018)
+
+GVC deja de ser solo evidencia y se vuelve **contrato operacional de implementación UI**. Todos los gates son **aditivos + opt-in por scenario + warning-first** (severidad `error` solo cuando el scenario la declara). `manifest.schemaVersion` se mantiene en `1` (campos aditivos). Los finding codes nuevos viven como SSOT en `scripts/frontend/lib/failure-taxonomy.ts` (`FINDING_CODES`).
+
+### 1. Baseline visual contract (Slice 1)
+
+- **Motor de diff**: `pixelmatch` + `pngjs` (devDependencies). Offline file-to-file con masks rectangulares por región. `includeAA=false` → menos flaky por antialiasing.
+- **Home durable** (SSOT del mockup aprobado): `scripts/frontend/baselines/<surfaceId>/<viewport>__<frameLabel>.png` + sidecar `.mask.json`. Committeable, keyed por `surfaceId` → contrato cross-máquina/cross-agente (vs `.captures/` que es gitignored + purgado >30d).
+- **Promoción manual explícita**: `pnpm fe:capture:diff --promote <capture-dir>`.
+- **`scenario.baseline`** extendido: `surfaceId`, `requiredFrameLabels`, `maskSelectors`, `maxDiffRatio`, `maxChangedPixels`, `requiredRegions`.
+- **Determinismo** (prerequisito del diff): cuando el scenario declara `baseline.surfaceId`, GVC aplica animaciones off + caret oculto + `prefers-reduced-motion: reduce` + fonts settled + `deviceScaleFactor` fijo. Un `maxDiffRatio` sobre captura no-normalizada se considera inválido.
+- Codes: `baseline_missing`, `baseline_stale` (degradación honesta cuando el home durable falta), `frame_label_missing`, `visual_diff_exceeded`, `visual_diff_dimension_mismatch`, `visual_diff_failed`, `required_region_missing`, `mask_selector_missing`.
+- `maskRects` se resuelven en capture-time desde `maskSelectors` y se persisten por frame; el diff aplica la unión baseline+runtime.
+
+### 2. Layout integrity (`quality.layout`, Slice 2)
+
+Scan en un solo `page.evaluate` por frame: overflow horizontal de página/elemento, target interactivo < `minTargetSize` (default 24px, piso WCAG 2.2 AA 2.5.8), texto cortado, regiones scrollables sin label, cards MUI anidadas. Opciones `includeSelector`/`ignoreSelectors`/`allowHorizontalScrollSelectors`/`failOnViolations`.
+
+### 3. Console / hydration / network strict (`quality.runtime`, Slice 3)
+
+Collectors sobre toda la vida de la página: `console.error`, `pageerror`, hydration (best-effort por pattern → `warning` salvo `failOnHydrationWarning`), responses 4xx/5xx de document/xhr/fetch. Mensajes saneados (bearer/jwt/cookie/email/hex) + truncados. `runtimeSummary` siempre en el manifest; findings solo opt-in con `ignoreUrlPatterns`/`ignoreConsolePatterns`.
+
+### 4. Trace on failure (Slice 4)
+
+`context.tracing` retain-on-failure: `trace.zip` se guarda solo cuando `exitCode=1`; en éxito se descarta. `outputs.trace` en manifest + link en el report. Abrir con `pnpm exec playwright show-trace <dir>/trace.zip`.
+
+### 5. Keyboard / focus / reduced-motion (`quality.keyboard`, Slice 5)
+
+Probes declarativas (Tab/Enter/Space/Escape/Arrows) sobre la página viva: `expectedFocusSelector`, focus ring visible (outline/box-shadow), estado esperado (`expectedVisibleSelector`/`expectedHiddenSelector`) y re-corrida bajo reduced-motion que marca `keyboard_reduced_motion_feedback_lost` si el feedback depende de animación. Frames before/after por probe.
+
+### 6. Performance budgets (`quality.performance`, Slice 6)
+
+Snapshot liviano via Resource/Paint Timing + DOM count (sin Lighthouse): `domNodes`, `requestCount`, `transferBytes`, FCP, DCL, JS heap. Budgets por scenario; warning-first (`severity: 'error'` opt-in). `performanceSummary` en manifest + panel en el report.
+
+### 7. Data honesty + enterprise rubric (`quality.enterpriseRubric`, Slice 7)
+
+Heurísticas advisory: placeholders (lorem/tbd/mock/fake/todo), ratio de tokens vacíos (—/0/N/A → fake-green), >1 botón primario por header, saturación de chips semánticos, `data-capture` declarado faltante. Verdict `pass|warning|blocked` + **resumen ejecutivo** (`Apto para implementar` / `Revisar` / `Requiere iteración`) en `index.html` y `review-dossier.md`. Es apoyo al review humano, no juicio estético absoluto.
+
+### Esbuild keepNames + page.evaluate (aprendizaje live)
+
+tsx/esbuild `keepNames` envuelve arrow-consts nombradas dentro de `page.evaluate` con un helper `__name()` que NO existe en el contexto del browser → `ReferenceError`. Mitigación canónica: (a) usar function declarations dentro de `page.evaluate`, (b) shim passthrough `globalThis.__name` vía `context.addInitScript` en `browser.ts` (defense-in-depth para cualquier evaluate futuro).
+
+### Scenarios de regresión
+
+- `gvc-contract-gates` — baseline + layout + runtime + performance + enterpriseRubric + accessibility.
+- `gvc-keyboard-focus` — keyboard/focus gate.
+
+### Verificación live (2026-06-07, `--env=local`)
+
+`stale → promote → match (0px)` end-to-end; hydration warning detectado; layout/perf/rubric/keyboard funcionando; `fe:capture:review` (resumen ejecutivo + baseline diff + rubric) y `fe:capture:health` (tolerante a manifests mixtos) verdes.

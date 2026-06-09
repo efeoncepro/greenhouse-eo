@@ -4,6 +4,18 @@
 > **Last updated:** 2026-04-23
 > **Audience:** Platform engineers, DevOps, on-call operators
 
+## Delta 2026-06-06 — Secret Manager IAM binding helper para deploys Cloud Run
+
+Un fallo de GitHub Actions en `Commercial Cost Worker Deploy` expuso una carrera real en los deploy scripts: varios workers pueden mutar bindings IAM de los mismos secrets de Secret Manager en paralelo, y `gcloud secrets add-iam-policy-binding` puede devolver `409 concurrent policy changes` aunque la intención sea idempotente.
+
+Contrato vigente:
+
+- Los deploy scripts que otorgan `roles/secretmanager.secretAccessor` al runtime service account deben usar `services/_shared/gcloud-secret-iam.sh`.
+- El helper verifica si el binding ya existe antes de mutar IAM.
+- Los `409`/`ABORTED` por escritura concurrente se reintentan con backoff acotado y jitter; errores permanentes siguen fallando loud.
+- No se imprimen valores de secretos, no se amplían roles y no se introducen service account keys.
+- `services/ops-worker/deploy.sh`, `services/commercial-cost-worker/deploy.sh` y `services/hubspot_greenhouse_integration/deploy.sh` consumen el helper compartido. Nuevos deploy scripts Cloud Run deben reutilizarlo en vez de reimplementar `add-iam-policy-binding` inline.
+
 ## Delta 2026-04-23 — Auditoria live rebaselinea el inventario cloud real
 
 Se ejecuto una auditoria read-only directamente sobre GCP (`gcloud`, `bq`) y PostgreSQL live. La documentacion de infraestructura debe asumir desde ahora este baseline, no los supuestos previos de marzo.

@@ -87,7 +87,11 @@ const createFloatingAdapter = (modelRef: React.MutableRefObject<NexaModelId>): C
   }
 })
 
-const NexaFloatingButton = () => {
+interface NexaFloatingButtonProps {
+  docked?: boolean
+}
+
+const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   const pathname = usePathname()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -143,18 +147,25 @@ const NexaFloatingButton = () => {
     <>
       {/* FAB trigger */}
       <Fab
+        data-nexa-floating-trigger='true'
         color='primary'
         size='medium'
         aria-label={TASK407_ARIA_ABRIR_NEXA_AI}
         aria-expanded={open}
         onClick={() => setOpen(prev => !prev)}
-        sx={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          zIndex: theme.zIndex.speedDial,
-          boxShadow: open ? 'none' : 6
-        }}
+        sx={docked
+          ? {
+              position: 'static',
+              zIndex: 'inherit',
+              boxShadow: open ? 'none' : 6
+            }
+          : {
+              position: 'fixed',
+              bottom: 24,
+              right: 24,
+              zIndex: theme.zIndex.speedDial,
+              boxShadow: open ? 'none' : 6
+            }}
       >
         <i className={open ? 'tabler-x' : 'tabler-sparkles'} style={{ fontSize: '1.25rem' }} />
       </Fab>
@@ -174,8 +185,10 @@ const NexaFloatingButton = () => {
           <Box
             sx={{
               position: 'fixed',
-              bottom: 88,
-              right: 24,
+              bottom: docked
+                ? 'calc(var(--gh-floating-actions-safe-block-size) + var(--gh-floating-actions-gap))'
+                : 88,
+              right: docked ? 'var(--gh-floating-actions-inline-offset)' : 24,
               width: 400,
               height: 550,
               zIndex: theme.zIndex.speedDial - 1,

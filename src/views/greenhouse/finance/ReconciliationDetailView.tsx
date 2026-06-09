@@ -909,7 +909,7 @@ const ReconciliationDetailView = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                        <Typography variant='caption'>
                           {row.reference || '—'}
                         </Typography>
                       </TableCell>
@@ -967,7 +967,7 @@ const ReconciliationDetailView = () => {
                       <TableCell>
                         {row.matchedId ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                            <Typography variant='caption'>
                               {row.matchedId}
                             </Typography>
                             {/* TASK-722 — distinguir match canónico (settlement_leg, TASK-708) vs legacy (solo payment_id) */}

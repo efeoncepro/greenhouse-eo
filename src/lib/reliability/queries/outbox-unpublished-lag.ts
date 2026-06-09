@@ -20,7 +20,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
  *
  * Este signal vuelve invisible imposible: cualquier instancia (staging, prod,
  * o futuro environment nuevo) donde el publisher se rompa emite señal automática
- * en `/admin/operations`.
+ * en `/admin/ops-health`.
  *
  * **Threshold**: 10 minutos. Cloud Scheduler corre cada 2 min → 10 min cubre 5
  * ciclos antes de alarmar. Sub-threshold transient lag no dispara false positives.

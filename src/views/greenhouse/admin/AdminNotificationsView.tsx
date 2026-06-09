@@ -280,12 +280,12 @@ const AdminNotificationsView = ({ data }: Props) => {
                   {data.recentDispatch.map(row => (
                     <TableRow key={row.logId}>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.75rem' }}>
+                        <Typography variant='caption'>
                           {row.userId.length > 20 ? `${row.userId.slice(0, 20)}...` : row.userId}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                        <Typography variant='caption'>
                           {row.category}
                         </Typography>
                       </TableCell>

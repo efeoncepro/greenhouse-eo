@@ -49,6 +49,10 @@ export type CanonicalErrorCode =
   | 'forbidden'
   | 'member_identity_not_linked'
   | 'client_tenant_required'
+  // Generic input / throttle / server codes (Coming Soon notify + reusable).
+  | 'invalid_email'
+  | 'rate_limited'
+  | 'internal_error'
   // Reserved for future canonical codes — extender aquí cuando emerjan
   // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -89,6 +93,21 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 403,
     message: 'Este recurso solo está disponible para usuarios de cliente.',
     actionable: false
+  },
+  invalid_email: {
+    status: 422,
+    message: 'Ingresa un correo válido (ej. nombre@empresa.com).',
+    actionable: true
+  },
+  rate_limited: {
+    status: 429,
+    message: 'Demasiados intentos. Espera un momento e inténtalo de nuevo.',
+    actionable: true
+  },
+  internal_error: {
+    status: 500,
+    message: 'Algo salió mal de nuestro lado. Inténtalo de nuevo en unos minutos.',
+    actionable: true
   }
 }
 

@@ -1,7 +1,6 @@
 'use client'
 
 // Next Imports
-import dynamic from 'next/dynamic'
 
 // MUI Imports
 import Card from '@mui/material/Card'
@@ -16,6 +15,8 @@ import type { ApexOptions } from 'apexcharts'
 // Type Imports
 import Chip from '@mui/material/Chip'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import type { ThemeColor } from '@core/types'
 import type { CustomAvatarProps } from '@core/components/mui/Avatar'
 
@@ -24,12 +25,13 @@ import type { CustomAvatarProps } from '@core/components/mui/Avatar'
 import CustomAvatar from '@core/components/mui/Avatar'
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 export type StatsWithAreaChartProps = {
   stats: string
   title: string
   chartColor?: ThemeColor
+  /** TASK-1053: override explícito con un hex del chart SoT (axis-chart). Gana sobre chartColor. */
+  chartHexColor?: string
   chartSeries: ApexOptions['series']
   avatarIcon: string
   avatarSize?: number
@@ -43,9 +45,13 @@ export type StatsWithAreaChartProps = {
 const trendColorMap = { positive: 'success', negative: 'error', neutral: 'default' } as const
 
 const StatsWithAreaChart = (props: StatsWithAreaChartProps) => {
-  const { stats, title, avatarIcon, chartSeries, avatarSize, chartColor = 'primary', avatarColor, avatarSkin, trend, trendNumber, subtitle } = props
+  const { stats, title, avatarIcon, chartSeries, avatarSize, chartColor = 'primary', chartHexColor, avatarColor, avatarSkin, trend, trendNumber, subtitle } = props
 
   const theme = useTheme()
+
+  // TASK-1053: las series de chart salen del chart SoT (axis-chart) vía chartHexColor;
+  // fallback al ThemeColor para consumers legacy que aún no migran.
+  const seriesColor = chartHexColor ?? theme.palette[chartColor].main
 
   const options: ApexOptions = {
     chart: {
@@ -77,7 +83,7 @@ const StatsWithAreaChart = (props: StatsWithAreaChartProps) => {
             {
               offset: 0,
               opacity: 0.4,
-              color: theme.palette[chartColor].main
+              color: seriesColor
             },
             {
               offset: 100,
@@ -93,7 +99,7 @@ const StatsWithAreaChart = (props: StatsWithAreaChartProps) => {
         enabled: true,
         shadeTo: 'light',
         shadeIntensity: 1,
-        color: theme.palette[chartColor].main
+        color: seriesColor
       }
     },
     xaxis: {

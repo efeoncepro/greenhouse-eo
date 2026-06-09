@@ -185,7 +185,7 @@ const buildCeoNarratives = async (ctx: HomeLoaderContext): Promise<AiBriefingNar
       title: 'Plataforma',
       body: platformBody,
       signalCount: null,
-      drillHref: '/admin/operations'
+      drillHref: '/admin/ops-health'
     }
   ]
 }

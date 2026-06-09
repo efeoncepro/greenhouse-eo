@@ -1,8 +1,12 @@
-import { statSync } from 'node:fs'
+import { statSync, writeFileSync } from 'node:fs'
+import { basename, dirname, extname, join } from 'node:path'
 
+import AxeBuilder from '@axe-core/playwright'
 import type { Page } from 'playwright'
 
+import { analyzeLayoutIntegrity } from './layout-integrity'
 import type { CaptureFinding } from './manifest'
+import type { CaptureAccessibilityQualityOptions, CaptureLayoutQualityOptions } from './scenario'
 
 export interface FrameQualityOptions {
   frameLabel: string
@@ -12,7 +16,11 @@ export interface FrameQualityOptions {
   allowLogin?: boolean
   allowErrorBoundary?: boolean
   fullPage?: boolean
+  accessibility?: CaptureAccessibilityQualityOptions
+  layout?: CaptureLayoutQualityOptions
 }
+
+const DEFAULT_AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa']
 
 const DEFAULT_LOGIN_SELECTORS = [
   '[data-testid="login-card"]',
@@ -40,6 +48,77 @@ const isVisible = async (page: Page, selector: string): Promise<boolean> => {
   } catch {
     return false
   }
+}
+
+const writeAxeArtifact = (
+  framePath: string,
+  payload: unknown
+): { artifactName: string; artifactPath: string } => {
+  const extension = extname(framePath)
+  const baseName = basename(framePath, extension)
+  const artifactName = `${baseName}.axe.json`
+  const artifactPath = join(dirname(framePath), artifactName)
+
+  writeFileSync(artifactPath, JSON.stringify(payload, null, 2) + '\n', 'utf8')
+
+  return { artifactName, artifactPath }
+}
+
+const analyzeAccessibility = async (
+  page: Page,
+  frameLabel: string,
+  framePath: string,
+  accessibility: CaptureAccessibilityQualityOptions
+): Promise<CaptureFinding[]> => {
+  const findings: CaptureFinding[] = []
+  const tags = accessibility.tags?.length ? accessibility.tags : DEFAULT_AXE_TAGS
+  let builder = new AxeBuilder({ page }).withTags(tags)
+
+  if (accessibility.includeSelector) {
+    builder = builder.include(accessibility.includeSelector)
+  }
+
+  try {
+    const results = await builder.analyze()
+    const violations = results.violations
+
+    if (!violations.length) return findings
+
+    const { artifactName } = writeAxeArtifact(framePath, {
+      frameLabel,
+      url: page.url(),
+      includeSelector: accessibility.includeSelector ?? null,
+      tags,
+      violations,
+      incomplete: results.incomplete,
+      inapplicable: results.inapplicable.length,
+      passes: results.passes.length
+    })
+
+    const violationSummary = violations
+      .map(violation => `${violation.id} (${violation.nodes.length})`)
+      .join(', ')
+
+    findings.push({
+      severity: accessibility.failOnViolations === false ? 'warning' : 'error',
+      category: 'accessibility',
+      code: 'axe_violations',
+      message: `Frame "${frameLabel}" tiene ${violations.length} violation(s) axe: ${violationSummary}. Detalle: frames/${artifactName}`,
+      frameLabel,
+      selector: accessibility.includeSelector
+    })
+  } catch (err) {
+    findings.push({
+      severity: accessibility.failOnViolations === false ? 'warning' : 'error',
+      category: 'accessibility',
+      code: 'axe_run_failed',
+      message: err instanceof Error ? err.message : String(err),
+      frameLabel,
+      selector: accessibility.includeSelector
+    })
+  }
+
+  return findings
 }
 
 export const analyzeFrameQuality = async (page: Page, options: FrameQualityOptions): Promise<CaptureFinding[]> => {
@@ -137,6 +216,14 @@ export const analyzeFrameQuality = async (page: Page, options: FrameQualityOptio
       })
       break
     }
+  }
+
+  if (options.accessibility?.enabled) {
+    findings.push(...await analyzeAccessibility(page, frameLabel, options.framePath, options.accessibility))
+  }
+
+  if (options.layout?.enabled) {
+    findings.push(...await analyzeLayoutIntegrity(page, frameLabel, options.layout))
   }
 
   return findings

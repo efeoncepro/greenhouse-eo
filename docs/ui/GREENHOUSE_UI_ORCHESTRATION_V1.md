@@ -72,6 +72,7 @@ Sin este sistema pasa lo siguiente:
 
 4. Promover cuando repite
 - si un patron va a repetirse entre tenants, modulos o superficies, debe ir a `src/components/greenhouse/*`
+- para asistencia contextual, inspeccion, review, preview o edicion contextual de bajo riesgo, usar primero el patron Adaptive Sidecar canonico (`AdaptiveSidecarLayout`, `ContextualSidecar`, `adaptive-sidecar-controller`) antes de crear drawers/modals locales
 
 5. Hacer visible la procedencia
 - si una senal viene de `seeded`, `override`, `fallback` o fuente parcial, la UI debe poder expresarlo
@@ -97,6 +98,7 @@ Toda solicitud debe normalizarse a este modelo, aunque el texto original venga r
 - `settings`
 - `table_surface`
 - `detail_shell`
+- `adaptive_sidecar_consumer`
 
 ### Page intent
 - `executive_summary`
@@ -135,6 +137,8 @@ Toda solicitud debe normalizarse a este modelo, aunque el texto original venga r
 - `shared_product_ui`
 - `module_local`
 - `route_local`
+
+Si la solicitud normalizada cae en `shared_product_ui` y requiere una superficie contextual adyacente, el default es Adaptive Sidecar. Solo elegir Drawer desktop, modal o floating companion si el brief explica por que el contexto principal no debe seguir visible.
 
 ## Flujo de orquestacion
 

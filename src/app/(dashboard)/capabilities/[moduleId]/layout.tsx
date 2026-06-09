@@ -14,7 +14,7 @@ export default async function Layout({ children, params }: ChildrenType & { para
   }
 
   if (tenant.tenantType !== 'client' || !tenant.routeGroups.includes('client')) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const hasAccess = hasAuthorizedViewCode({
@@ -24,7 +24,7 @@ export default async function Layout({ children, params }: ChildrenType & { para
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const { moduleId } = await params

@@ -7,7 +7,7 @@
 //
 //   - state='ready'          → Grid de NexaInsightListItemCard.
 //   - state='empty-positive' → EmptyState success (estado de SALUD, no error).
-//   - state='degraded'       → Alert error con escalation a /admin/operations.
+//   - state='degraded'       → Alert error con escalation a /admin/ops-health.
 //
 // UX spec source: greenhouse-ux + state-design + greenhouse-ux-writing skills
 // audit pre-write (2026-05-29). Cero literals JSX — toda copy vive en
@@ -44,7 +44,7 @@ export interface NexaInsightListViewProps {
   homeHref: string
 }
 
-const OPERATIONS_HREF = '/admin/operations'
+const OPERATIONS_HREF = '/admin/ops-health'
 
 const BackLink = ({ homeHref }: { homeHref: string }) => (
   <Box>

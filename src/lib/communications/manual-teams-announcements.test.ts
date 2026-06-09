@@ -37,6 +37,74 @@ describe('manual-teams-announcements', () => {
     expect(preview.fingerprint).toHaveLength(24)
   })
 
+  it('builds a real Adaptive Card mention with Entra object id', () => {
+    const preview = previewManualTeamsAnnouncement({
+      destinationKey: 'eo-team',
+      title: 'Bienvenida al equipo',
+      paragraphs: ['Hoy le damos la bienvenida a Maria Fernanda.'],
+      mentions: [
+        {
+          text: 'Maria Fernanda',
+          id: '6a6bcc6d-95a6-4a6b-be3f-536ea2b79e9c',
+          name: 'Maria Fernanda Gonzalez'
+        }
+      ]
+    })
+
+    expect(preview.ctaUrl).toBeNull()
+    expect(preview.ctaLabel).toBeNull()
+    expect(preview.card.version).toBe('1.0')
+    expect(preview.card.actions).toBeUndefined()
+    expect(preview.card.body[1]).toEqual(
+      expect.objectContaining({
+        text: 'Hoy le damos la bienvenida a <at>Maria Fernanda</at>.'
+      })
+    )
+    expect(preview.card.msteams?.entities).toEqual([
+      {
+        type: 'mention',
+        text: '<at>Maria Fernanda</at>',
+        mentioned: {
+          id: '6a6bcc6d-95a6-4a6b-be3f-536ea2b79e9c',
+          name: 'Maria Fernanda Gonzalez'
+        }
+      }
+    ])
+  })
+
+  it('rejects 29-prefixed aad ids for Adaptive Card mentions', () => {
+    expect(() =>
+      previewManualTeamsAnnouncement({
+        destinationKey: 'eo-team',
+        title: 'Bienvenida',
+        paragraphs: ['Hola Julio Reyes'],
+        mentions: [
+          {
+            text: 'Julio Reyes',
+            id: '29:71acd85d-15a6-4eb6-953d-125370032e93',
+            name: 'Julio Reyes Rangel'
+          }
+        ]
+      })
+    ).toThrow(/not '29:<aadObjectId>'/)
+  })
+
+  it('rejects mentions that do not appear in the card text', () => {
+    expect(() =>
+      previewManualTeamsAnnouncement({
+        destinationKey: 'eo-team',
+        title: 'Bienvenida',
+        paragraphs: ['Hola equipo'],
+        mentions: [
+          {
+            text: 'Maria Fernanda',
+            id: '6a6bcc6d-95a6-4a6b-be3f-536ea2b79e9c'
+          }
+        ]
+      })
+    ).toThrow(/was not found/)
+  })
+
   it('maps channel-kind destinations (EO - Admin) to team_id + channel_id correctly', () => {
     const preview = previewManualTeamsAnnouncement({
       destinationKey: 'production-release-alerts',

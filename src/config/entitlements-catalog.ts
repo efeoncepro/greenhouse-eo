@@ -24,7 +24,12 @@ export const ENTITLEMENT_MODULES = [
   // transitions, notion status-transition ingestion). Las capabilities ya estaban
   // seedeadas en capabilities_registry por TASK-908/912 pero faltaba el módulo en
   // el catalog TS → parity drift. NO son can()-checked (auth de CLI/cron/worker).
-  'delivery'
+  'delivery',
+  // TASK-490 — namespace del platform de firma + document vault (EPIC-001 signable pack).
+  // Dedicated identity (captureWithDomain 'documents' + reliability moduleKey + este módulo).
+  // Distinto de `workforce` (contracting cases producen el documento) y `hr` (procesos HR):
+  // `documents` es la orquestación de firma reusable (contracting_case, master_agreement, …).
+  'documents'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -41,6 +46,7 @@ export const ENTITLEMENT_ACTIONS = [
   'configure',
   'launch',
   'sync',
+  'review',
   // TASK-848 — verbs explícitos del control plane production (NO conflated con manage).
   // Mismo patrón que TASK-742/768/784 que extendieron actions per-dominio en lugar
   // de reusar manage/launch.
@@ -1051,6 +1057,14 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-999 — commercial brand/logo asset review for non-operating organizations.
+    // Does not authorize mutating Efeonce/operating-entity legal logos.
+    key: 'organization.brand_asset',
+    module: 'organization',
+    actions: ['review', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'organization.spaces',
     module: 'organization',
     actions: ['read'] as const,
@@ -1180,7 +1194,7 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'all'
   },
   // TASK-849 — Production Release Watchdog: read-only access para query del
-  // CLI desde admin endpoints futuros (admin dashboard /admin/operations
+  // CLI desde admin endpoints futuros (Admin Center /admin/ops-health
   // ya consume los signals automaticamente via reliability registry).
   // Granular least-privilege: NO reusar `platform.release.execute` (semantica
   // distinta: leer estado vs disparar release).
@@ -1290,6 +1304,58 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-1019 — Workforce Contracting Studio (cartas oferta + contratos laborales
+    // bilingües). read=ver cola/casos/drafts; manage=crear/editar casos y drafts;
+    // ai_draft=disparar drafting Claude (advisory); approve=aprobar par bilingüe
+    // ES+EN completo; generate_document=gate de generar el artefacto firmable
+    // (PDF/DOCX, dormant hasta el render consumer); reveal_sensitive=PII de drafting.
+    // Grants en runtime.ts (decisión operador 2026-06-05): approve = EFEONCE_ADMIN
+    // unilateral V0 (no existe rol legal). Spec: GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.
+    key: 'workforce.contracting.read',
+    module: 'workforce',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.manage',
+    module: 'workforce',
+    actions: ['create', 'update', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.ai_draft',
+    module: 'workforce',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.approve',
+    module: 'workforce',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.generate_document',
+    module: 'workforce',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'workforce.contracting.reveal_sensitive',
+    module: 'workforce',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-1024 — enviar un contrato/oferta aprobado a firma electrónica (ZapSign vía EPIC-001).
+    // Grant V0 = EFEONCE_ADMIN (mirror approve/generate_document). NUNCA seed sin grant en
+    // runtime.ts mismo PR (invariant TASK-873 + TASK-935).
+    key: 'workforce.contracting.send_signature',
+    module: 'workforce',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-891 Slice 3 — capability granular para reconciliar drift entre
     // runtime laboral del member y la relacion legal activa en Person 360.
     // Cierra la relacion legacy `employee` + abre nueva `contractor` en una
@@ -1388,6 +1454,18 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'nexa.insights.read',
     module: 'delivery',
     actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-490 — Signature orchestration (EPIC-001 signable pack). Gate de las superficies
+  // operador-facing de firma (enviar a firmar / cancelar / reconciliar). El render del
+  // documento (TASK-1023) y el adapter ZapSign (TASK-491) viven detrás de este gate.
+  // Grant matriz (runtime.ts): hr route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN (mismo set
+  // que workforce.member.complete_intake — contracting cases son dominio HR/Workforce).
+  // NUNCA seed sin grant en runtime.ts mismo PR (invariant TASK-873 + TASK-935).
+  {
+    key: 'documents.signature_request',
+    module: 'documents',
+    actions: ['read', 'create', 'update', 'manage'] as const,
     defaultScope: 'tenant'
   }
 ] as const

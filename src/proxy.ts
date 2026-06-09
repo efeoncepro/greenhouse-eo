@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+import {
+  MAINTENANCE_BYPASS_COOKIE,
+  MAINTENANCE_BYPASS_MAX_AGE_SECONDS,
+  MAINTENANCE_BYPASS_QUERY,
+  MAINTENANCE_PATH,
+  MAINTENANCE_RETRY_AFTER_SECONDS,
+  getMaintenanceBypassSecret,
+  isMaintenanceAllowedPath,
+  isMaintenanceModeEnabled,
+  maintenanceBypassMatches
+} from '@/config/maintenance'
+
 const SECURITY_HEADERS = {
   'X-Frame-Options': 'DENY',
   'X-Content-Type-Options': 'nosniff',
@@ -30,15 +42,7 @@ function buildContentSecurityPolicyReportOnly() {
   ].join('; ')
 }
 
-export function proxy(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
-  const isApiRequest = pathname.startsWith('/api')
-  const isPageOptionsRequest = request.method === 'OPTIONS' && !isApiRequest
-
-  const response = isPageOptionsRequest
-    ? new NextResponse(null, { status: 204 })
-    : NextResponse.next()
-
+function applyCrossCuttingHeaders(response: NextResponse): NextResponse {
   for (const [headerName, headerValue] of Object.entries(SECURITY_HEADERS)) {
     response.headers.set(headerName, headerValue)
   }
@@ -50,6 +54,63 @@ export function proxy(request: NextRequest) {
   }
 
   return response
+}
+
+function resolveMaintenanceResponse(request: NextRequest): NextResponse | null {
+  try {
+    if (!isMaintenanceModeEnabled()) return null
+
+    const { pathname, searchParams } = request.nextUrl
+
+    if (isMaintenanceAllowedPath(pathname)) return null
+
+    const secret = getMaintenanceBypassSecret()
+
+    if (secret) {
+      if (maintenanceBypassMatches(searchParams.get(MAINTENANCE_BYPASS_QUERY), secret)) {
+        const granted = NextResponse.next()
+
+        granted.cookies.set(MAINTENANCE_BYPASS_COOKIE, secret, {
+          httpOnly: true,
+          sameSite: 'lax',
+          path: '/',
+          maxAge: MAINTENANCE_BYPASS_MAX_AGE_SECONDS
+        })
+
+        return granted
+      }
+
+      if (maintenanceBypassMatches(request.cookies.get(MAINTENANCE_BYPASS_COOKIE)?.value, secret)) {
+        return null
+      }
+    }
+
+    const rewriteUrl = request.nextUrl.clone()
+
+    rewriteUrl.pathname = MAINTENANCE_PATH
+    rewriteUrl.search = ''
+
+    const response = NextResponse.rewrite(rewriteUrl, { status: 503 })
+
+    response.headers.set('Retry-After', String(MAINTENANCE_RETRY_AFTER_SECONDS))
+    response.headers.set('Cache-Control', 'no-store')
+
+    return response
+  } catch {
+    return null
+  }
+}
+
+export function proxy(request: NextRequest): NextResponse {
+  const pathname = request.nextUrl.pathname
+  const isApiRequest = pathname.startsWith('/api')
+  const isPageOptionsRequest = request.method === 'OPTIONS' && !isApiRequest
+
+  const response = isPageOptionsRequest
+    ? new NextResponse(null, { status: 204 })
+    : resolveMaintenanceResponse(request) ?? NextResponse.next()
+
+  return applyCrossCuttingHeaders(response)
 }
 
 export const config = {

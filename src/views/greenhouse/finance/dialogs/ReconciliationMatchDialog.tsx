@@ -334,7 +334,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, initialCandidateId = n
                 <Typography variant='caption' color='text.secondary'>Descripcion</Typography>
                 <Typography variant='body2' fontWeight={600}>{row.description}</Typography>
                 {row.reference && (
-                  <Typography variant='caption' sx={{ fontSize: '0.75rem' }}>
+                  <Typography variant='caption'>
                     Ref: {row.reference}
                   </Typography>
                 )}
@@ -497,7 +497,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, initialCandidateId = n
                                   <CustomChip round='true' size='small' color='primary' label='Monto exacto' />
                                 )}
                                 {candidate.reference && (
-                                  <Typography variant='caption' sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
+                                  <Typography variant='caption' sx={{ color: 'text.secondary' }}>
                                     {candidate.reference}
                                   </Typography>
                                 )}

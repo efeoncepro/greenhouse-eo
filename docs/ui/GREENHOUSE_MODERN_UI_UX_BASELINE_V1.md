@@ -84,6 +84,19 @@ Regla:
 - el warning debe explicar impacto
 - el error debe decir que paso y que hacer ahora
 
+### 4.1 Error surfaces como momentos de marca y recuperacion
+
+Las pantallas 404, 401, access denied, coming soon, maintenance y rutas no disponibles no son descartables: son momentos de friccion donde Greenhouse debe conservar confianza, personalidad y una salida clara.
+
+Reglas:
+- capitalizar el error con microcopy creativo solo si mantiene claridad operacional
+- cada variante debe conservar tres señales escaneables: que paso, causa probable o contexto, y que hacer ahora
+- preferir 3 a 5 variantes curadas seleccionadas una vez al entrar a la pantalla
+- no rotar mensajes mientras el usuario lee; la creatividad no debe competir con la recuperacion
+- mantener CTAs, aria-labels, semantica y recovery path estables aunque cambie el mensaje
+- guardar copy reusable en `src/lib/copy/*`, tipada por locale, no hardcodeada en JSX
+- validar con GVC desktop/mobile cuando cambie layout, jerarquia, imagen o microcopy visible
+
 ### 5. Microcopy operacional, no marketing vacio
 
 La copy UX de Greenhouse debe ser:
@@ -176,6 +189,8 @@ Debe priorizar:
 - decir que paso
 - decir que puede hacer el usuario
 - evitar culpar al usuario sin evidencia
+- si la surface es de alto trafico o alta friccion, usar microcopy con voz de producto sin sacrificar causa ni recuperacion
+- separar status, razon y siguiente accion cuando el parrafo necesite ser escaneable
 
 ### Estado parcial
 - explicitar que parte esta disponible y que parte no

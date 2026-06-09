@@ -131,7 +131,7 @@ const TenantSettingsPanel = ({ data }: Props) => {
                   <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
                     {label}
                   </Typography>
-                  <Typography color='text.primary' sx={{ mt: 0.5, fontSize: '0.8rem' }}>{value}</Typography>
+                  <Typography variant='caption' color='text.primary' sx={{ mt: 0.5 }}>{value}</Typography>
                 </Box>
               ))}
               <Box sx={{ display: 'grid', gap: 2 }}>

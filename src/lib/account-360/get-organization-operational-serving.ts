@@ -1,8 +1,10 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-
-// ── Types ──
+import {
+  readOrganizationIcoMetricsFromBigQuery,
+  type OrganizationIcoSourceMetricsRow
+} from './organization-ico-metrics-source'
 
 interface OpsMetricsRow extends Record<string, unknown> {
   organization_id: string
@@ -12,10 +14,12 @@ interface OpsMetricsRow extends Record<string, unknown> {
   tasks_active: string | number
   tasks_total: string | number
   rpa_avg: string | number | null
+  rpa_median: string | number | null
   otd_pct: string | number | null
   ftr_pct: string | number | null
   cycle_time_avg_days: string | number | null
   throughput_count: string | number | null
+  pipeline_velocity: string | number | null
   stuck_asset_count: string | number | null
   source: string
   materialized_at: string | null
@@ -24,7 +28,7 @@ interface OpsMetricsRow extends Record<string, unknown> {
 export interface OrganizationOperationalServing {
   organizationId: string
   hasData: boolean
-  source: 'postgres' | 'none'
+  source: 'postgres' | 'bigquery' | 'none'
   current: {
     periodYear: number
     periodMonth: number
@@ -32,16 +36,16 @@ export interface OrganizationOperationalServing {
     tasksActive: number
     tasksTotal: number
     rpaAvg: number | null
+    rpaMedian: number | null
     otdPct: number | null
     ftrPct: number | null
     cycleTimeAvgDays: number | null
     throughputCount: number | null
+    pipelineVelocity: number | null
     stuckAssetCount: number
   } | null
   materializedAt: string | null
 }
-
-// ── Helpers ──
 
 const toNum = (v: unknown): number => {
   if (typeof v === 'number') return v
@@ -52,16 +56,40 @@ const toNum = (v: unknown): number => {
     return Number.isFinite(n) ? n : 0
   }
 
+  if (typeof v === 'object' && v !== null && 'value' in v) {
+    return toNum((v as { value?: unknown }).value)
+  }
+
   return 0
 }
 
 const toNullNum = (v: unknown): number | null => {
-  if (v === null || v === undefined) return null
+  if (v === null || v === undefined || v === '') return null
+  const n = toNum(v)
 
-  return toNum(v) || null
+  return Number.isFinite(n) ? n : null
 }
 
-// ── Schema readiness ──
+const toIsoString = (value: unknown): string | null => {
+  if (!value) return null
+  if (typeof value === 'string') return value
+  if (value instanceof Date) return value.toISOString()
+
+  if (typeof value === 'object' && value !== null && 'value' in value) {
+    return toIsoString((value as { value?: unknown }).value)
+  }
+
+  return null
+}
+
+const resolvePeriod = (options?: { periodYear?: number; periodMonth?: number }) => {
+  const now = new Date()
+
+  return {
+    year: options?.periodYear ?? now.getFullYear(),
+    month: options?.periodMonth ?? (now.getMonth() + 1)
+  }
+}
 
 let ensurePromise: Promise<void> | null = null
 
@@ -101,224 +129,126 @@ export const ensureOrganizationOperationalSchema = async (): Promise<void> => {
   return ensurePromise
 }
 
-// ── Main function ──
+const mapOperationalRow = (
+  organizationId: string,
+  row: OpsMetricsRow,
+  source: 'postgres' | 'bigquery'
+): OrganizationOperationalServing => ({
+  organizationId,
+  hasData: true,
+  source,
+  current: {
+    periodYear: Number(row.period_year),
+    periodMonth: Number(row.period_month),
+    tasksCompleted: toNum(row.tasks_completed),
+    tasksActive: toNum(row.tasks_active),
+    tasksTotal: toNum(row.tasks_total),
+    rpaAvg: toNullNum(row.rpa_avg),
+    rpaMedian: toNullNum(row.rpa_median),
+    otdPct: toNullNum(row.otd_pct),
+    ftrPct: toNullNum(row.ftr_pct),
+    cycleTimeAvgDays: toNullNum(row.cycle_time_avg_days),
+    throughputCount: toNullNum(row.throughput_count),
+    pipelineVelocity: toNullNum(row.pipeline_velocity),
+    stuckAssetCount: toNum(row.stuck_asset_count)
+  },
+  materializedAt: toIsoString(row.materialized_at)
+})
 
-export const getOrganizationOperationalServing = async (organizationId: string): Promise<OrganizationOperationalServing> => {
-  // Schema check is non-blocking — on-read fallback works without materialized tables
+const mapBigQueryRow = (
+  organizationId: string,
+  row: OrganizationIcoSourceMetricsRow
+): OrganizationOperationalServing => mapOperationalRow(organizationId, {
+  organization_id: String(row.organization_id),
+  period_year: Number(row.period_year),
+  period_month: Number(row.period_month),
+  tasks_completed: row.completed_tasks as string | number,
+  tasks_active: row.active_tasks as string | number,
+  tasks_total: row.total_tasks as string | number,
+  rpa_avg: row.rpa_avg as string | number | null,
+  rpa_median: row.rpa_median as string | number | null,
+  otd_pct: row.otd_pct as string | number | null,
+  ftr_pct: row.ftr_pct as string | number | null,
+  cycle_time_avg_days: row.cycle_time_avg_days as string | number | null,
+  throughput_count: row.throughput_count as string | number | null,
+  pipeline_velocity: row.pipeline_velocity as string | number | null,
+  stuck_asset_count: row.stuck_asset_count as string | number | null,
+  source: 'bigquery',
+  materialized_at: toIsoString(row.materialized_at)
+}, 'bigquery')
+
+export const getOrganizationOperationalServing = async (
+  organizationId: string,
+  options?: { periodYear?: number; periodMonth?: number }
+): Promise<OrganizationOperationalServing> => {
   await ensureOrganizationOperationalSchema().catch(() => {})
 
-  // Try Postgres-first: organization_operational_metrics
+  const { year, month } = resolvePeriod(options)
+
   const rows = await runGreenhousePostgresQuery<OpsMetricsRow>(
-    `SELECT * FROM greenhouse_serving.organization_operational_metrics
-     WHERE organization_id = $1
-     ORDER BY period_year DESC, period_month DESC
-     LIMIT 1`,
-    [organizationId]
-  )
-
-  if (rows.length > 0) {
-    const r = rows[0]
-
-    return {
-      organizationId,
-      hasData: true,
-      source: 'postgres',
-      current: {
-        periodYear: Number(r.period_year),
-        periodMonth: Number(r.period_month),
-        tasksCompleted: toNum(r.tasks_completed),
-        tasksActive: toNum(r.tasks_active),
-        tasksTotal: toNum(r.tasks_total),
-        rpaAvg: toNullNum(r.rpa_avg),
-        otdPct: toNullNum(r.otd_pct),
-        ftrPct: toNullNum(r.ftr_pct),
-        cycleTimeAvgDays: toNullNum(r.cycle_time_avg_days),
-        throughputCount: toNullNum(r.throughput_count),
-        stuckAssetCount: toNum(r.stuck_asset_count)
-      },
-      materializedAt: r.materialized_at || null
-    }
-  }
-
-  // Fallback: try ico_organization_metrics logically (the primary cache)
-  const icoRows = await runGreenhousePostgresQuery<OpsMetricsRow>(
     `SELECT
-      organization_id, period_year, period_month,
-      COALESCE(completed_tasks, 0) AS tasks_completed,
-      COALESCE(active_tasks, 0) AS tasks_active,
-      COALESCE(total_tasks, 0) AS tasks_total,
-      rpa_avg, otd_pct, ftr_pct,
-      cycle_time_avg_days, throughput_count,
-      COALESCE(stuck_asset_count, 0) AS stuck_asset_count,
-      'ico_organization_metrics' AS source,
-      materialized_at::text AS materialized_at
-     FROM greenhouse_serving.ico_organization_metrics
+       organization_id,
+       period_year,
+       period_month,
+       tasks_completed,
+       tasks_active,
+       tasks_total,
+       rpa_avg,
+       NULL::numeric AS rpa_median,
+       otd_pct,
+       ftr_pct,
+       cycle_time_avg_days,
+       throughput_count,
+       NULL::numeric AS pipeline_velocity,
+       stuck_asset_count,
+       source,
+       materialized_at::text AS materialized_at
+     FROM greenhouse_serving.organization_operational_metrics
      WHERE organization_id = $1
+       AND (period_year < $2 OR (period_year = $2 AND period_month <= $3))
      ORDER BY period_year DESC, period_month DESC
      LIMIT 1`,
-    [organizationId]
+    [organizationId, year, month]
   ).catch(() => [] as OpsMetricsRow[])
 
-  if (icoRows.length > 0) {
-    const r = icoRows[0]
+  if (rows.length > 0) return mapOperationalRow(organizationId, rows[0], 'postgres')
 
-    return {
-      organizationId,
-      hasData: true,
-      source: 'postgres',
-      current: {
-        periodYear: Number(r.period_year),
-        periodMonth: Number(r.period_month),
-        tasksCompleted: toNum(r.tasks_completed),
-        tasksActive: toNum(r.tasks_active),
-        tasksTotal: toNum(r.tasks_total),
-        rpaAvg: toNullNum(r.rpa_avg),
-        otdPct: toNullNum(r.otd_pct),
-        ftrPct: toNullNum(r.ftr_pct),
-        cycleTimeAvgDays: toNullNum(r.cycle_time_avg_days),
-        throughputCount: toNullNum(r.throughput_count),
-        stuckAssetCount: toNum(r.stuck_asset_count)
-      },
-      materializedAt: r.materialized_at || null
-    }
-  }
+  const icoRows = await runGreenhousePostgresQuery<OpsMetricsRow>(
+    `SELECT
+       organization_id,
+       period_year,
+       period_month,
+       COALESCE(completed_tasks, 0) AS tasks_completed,
+       COALESCE(active_tasks, 0) AS tasks_active,
+       COALESCE(total_tasks, 0) AS tasks_total,
+       rpa_avg,
+       rpa_median,
+       otd_pct,
+       ftr_pct,
+       cycle_time_avg_days,
+       throughput_count,
+       pipeline_velocity,
+       COALESCE(stuck_asset_count, 0) AS stuck_asset_count,
+       'ico_organization_metrics' AS source,
+       materialized_at::text AS materialized_at
+     FROM greenhouse_serving.ico_organization_metrics
+     WHERE organization_id = $1
+       AND (period_year < $2 OR (period_year = $2 AND period_month <= $3))
+     ORDER BY period_year DESC, period_month DESC
+     LIMIT 1`,
+    [organizationId, year, month]
+  ).catch(() => [] as OpsMetricsRow[])
 
-  // Fallback 3: compute on-read from ICO space snapshots (always fresh)
-  // This aggregates metric_snapshots_monthly across org's spaces.
-  // Scales well for 1-20 spaces; for 50+ spaces, use materialized tables above.
-  try {
-    interface SpaceSnapshotRow extends Record<string, unknown> {
-      period_year: number
-      period_month: number
-      total_rpa: string | number | null
-      rpa_count: string | number
-      total_otd: string | number | null
-      otd_count: string | number
-      total_ftr: string | number | null
-      ftr_count: string | number
-      avg_cycle_time: string | number | null
-      sum_throughput: string | number
-      sum_stuck: string | number
-      sum_total_tasks: string | number
-      sum_completed: string | number
-      sum_active: string | number
-    }
+  if (icoRows.length > 0) return mapOperationalRow(organizationId, icoRows[0], 'postgres')
 
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = now.getMonth() + 1
+  const bigQueryRow = await readOrganizationIcoMetricsFromBigQuery({
+    organizationId,
+    periodYear: year,
+    periodMonth: month,
+    mode: 'latest_at_or_before'
+  }).catch(() => null)
 
-    const spaceRows = await runGreenhousePostgresQuery<SpaceSnapshotRow>(
-      `SELECT
-        $2::int AS period_year,
-        $3::int AS period_month,
-        SUM(CASE WHEN ms.rpa_avg IS NOT NULL THEN ms.rpa_avg END) AS total_rpa,
-        COUNT(CASE WHEN ms.rpa_avg IS NOT NULL THEN 1 END) AS rpa_count,
-        SUM(CASE WHEN ms.otd_pct IS NOT NULL THEN ms.otd_pct END) AS total_otd,
-        COUNT(CASE WHEN ms.otd_pct IS NOT NULL THEN 1 END) AS otd_count,
-        SUM(CASE WHEN ms.ftr_pct IS NOT NULL THEN ms.ftr_pct END) AS total_ftr,
-        COUNT(CASE WHEN ms.ftr_pct IS NOT NULL THEN 1 END) AS ftr_count,
-        AVG(ms.cycle_time_avg_days) AS avg_cycle_time,
-        COALESCE(SUM(ms.throughput_count), 0) AS sum_throughput,
-        COALESCE(SUM(ms.stuck_asset_count), 0) AS sum_stuck,
-        COALESCE(SUM(ms.total_tasks), 0) AS sum_total_tasks,
-        COALESCE(SUM(ms.completed_tasks), 0) AS sum_completed,
-        COALESCE(SUM(ms.active_tasks), 0) AS sum_active
-      FROM greenhouse_core.spaces s
-      LEFT JOIN greenhouse_serving.ico_member_metrics ms
-        ON ms.member_id = s.space_id
-        AND ms.period_year = $2 AND ms.period_month = $3
-      WHERE s.organization_id = $1 AND s.active = TRUE
-      GROUP BY 1, 2`,
-      [organizationId, year, month]
-    ).catch(() => [] as SpaceSnapshotRow[])
-
-    // If no space-level ICO data, try aggregating person_operational_360 for org members
-    if (spaceRows.length === 0 || toNum(spaceRows[0]?.sum_total_tasks) === 0) {
-      interface PersonAggRow extends Record<string, unknown> {
-        avg_rpa: string | number | null
-        avg_otd: string | number | null
-        avg_ftr: string | number | null
-        avg_cycle_time: string | number | null
-        sum_throughput: string | number
-        sum_stuck: string | number
-        sum_total: string | number
-        sum_completed: string | number
-        sum_active: string | number
-      }
-
-      const personRows = await runGreenhousePostgresQuery<PersonAggRow>(
-        `SELECT
-          AVG(po.rpa_avg) AS avg_rpa,
-          AVG(po.otd_pct) AS avg_otd,
-          AVG(po.ftr_pct) AS avg_ftr,
-          AVG(po.cycle_time_avg_days) AS avg_cycle_time,
-          COALESCE(SUM(po.throughput_count), 0) AS sum_throughput,
-          COALESCE(SUM(po.stuck_asset_count), 0) AS sum_stuck,
-          COALESCE(SUM(po.total_tasks), 0) AS sum_total,
-          COALESCE(SUM(po.completed_tasks), 0) AS sum_completed,
-          COALESCE(SUM(po.active_tasks), 0) AS sum_active
-        FROM greenhouse_serving.person_operational_360 po
-        JOIN greenhouse_core.client_team_assignments a ON a.member_id = po.member_id AND a.active = TRUE
-        JOIN greenhouse_core.spaces s ON s.client_id = a.client_id AND s.organization_id = $1
-        WHERE po.period_year = $2 AND po.period_month = $3`,
-        [organizationId, year, month]
-      ).catch(() => [] as PersonAggRow[])
-
-      if (personRows.length > 0 && toNum(personRows[0]?.sum_total) > 0) {
-        const p = personRows[0]
-
-        return {
-          organizationId,
-          hasData: true,
-          source: 'postgres' as const,
-          current: {
-            periodYear: year,
-            periodMonth: month,
-            tasksCompleted: toNum(p.sum_completed),
-            tasksActive: toNum(p.sum_active),
-            tasksTotal: toNum(p.sum_total),
-            rpaAvg: toNullNum(p.avg_rpa),
-            otdPct: toNullNum(p.avg_otd),
-            ftrPct: toNullNum(p.avg_ftr),
-            cycleTimeAvgDays: toNullNum(p.avg_cycle_time),
-            throughputCount: toNullNum(p.sum_throughput),
-            stuckAssetCount: toNum(p.sum_stuck)
-          },
-          materializedAt: new Date().toISOString()
-        }
-      }
-    }
-
-    if (spaceRows.length > 0 && toNum(spaceRows[0]?.sum_total_tasks) > 0) {
-      const s = spaceRows[0]
-      const rpaCount = toNum(s.rpa_count)
-      const otdCount = toNum(s.otd_count)
-      const ftrCount = toNum(s.ftr_count)
-
-      return {
-        organizationId,
-        hasData: true,
-        source: 'postgres' as const,
-        current: {
-          periodYear: year,
-          periodMonth: month,
-          tasksCompleted: toNum(s.sum_completed),
-          tasksActive: toNum(s.sum_active),
-          tasksTotal: toNum(s.sum_total_tasks),
-          rpaAvg: rpaCount > 0 ? Math.round((toNum(s.total_rpa) / rpaCount) * 100) / 100 : null,
-          otdPct: otdCount > 0 ? Math.round((toNum(s.total_otd) / otdCount) * 10) / 10 : null,
-          ftrPct: ftrCount > 0 ? Math.round((toNum(s.total_ftr) / ftrCount) * 10) / 10 : null,
-          cycleTimeAvgDays: toNullNum(s.avg_cycle_time),
-          throughputCount: toNullNum(s.sum_throughput),
-          stuckAssetCount: toNum(s.sum_stuck)
-        },
-        materializedAt: new Date().toISOString()
-      }
-    }
-  } catch {
-    // On-read compute failed — non-blocking
-  }
+  if (bigQueryRow) return mapBigQueryRow(organizationId, bigQueryRow)
 
   return { organizationId, hasData: false, source: 'none', current: null, materializedAt: null }
 }

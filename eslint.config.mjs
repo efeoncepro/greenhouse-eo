@@ -275,7 +275,17 @@ export default [
       // Modo warn inicial: existe deuda histórica en views/emails. El gate
       // deja visible cualquier uso nuevo de Intl/toLocale* directo sin romper
       // el baseline mientras los slices de migración bajan el inventario.
-      'greenhouse/no-raw-locale-formatting': 'warn'
+      'greenhouse/no-raw-locale-formatting': 'warn',
+      // TASK-1038 — <Typography> debe usar un variant del SoT, nunca fontSize
+      // inline. Modo warn (76 archivos legacy); promover a 'error' tras el
+      // sweep. Scopeado a Typography → cero falsos positivos de íconos.
+      'greenhouse/no-fontsize-inline-typography': 'warn',
+      // Figma Implementation Contract — color HEX hardcodeado prohibido en UI
+      // de producto; mapear a theme.palette.*/theme.axis.*/var(--mui-palette-*).
+      // TASK-1048: promovida a 'error' con baseline 0 (sweep + tokens success-ink/
+      // surface tag-blue cerraron los 7 warnings residuales). Labs/theme/emails/
+      // pdf/mockup/tests exentos vía overrides abajo.
+      'greenhouse/no-hardcoded-hex-color': 'error'
     }
   },
 
@@ -300,6 +310,26 @@ export default [
       'greenhouse/no-inline-facet-visibility-check': 'error',
       'greenhouse/cloud-run-services-must-init-sentry': 'error',
       'greenhouse/no-cross-domain-import-from-client-portal': 'error',
+      // TASK-1033 — views/app/components NO importan @floating-ui/* directo;
+      // consumir GreenhouseFloatingSurface. Mode `error` desde commit-1 (cero
+      // violaciones en superficies de producto: pilotos migrados; el resto son
+      // primitives o infra Vuexy menu, exentos por path en la rule).
+      'greenhouse/no-direct-floating-ui-in-views': 'error',
+      // ApexCharts: el wrapper canonical AppReactApexCharts es el único dueño de
+      // next/dynamic({ ssr:false }). Consumers lo importan directo para evitar
+      // manifests/chunks huérfanos en Turbopack.
+      'greenhouse/no-dynamic-app-react-apexcharts': 'error',
+      // TASK-1045 — views/app/components NO importan gsap/@gsap directo; consumir
+      // <Motion> o useGreenhouseGSAP desde @/components/greenhouse/motion. Mode
+      // `error` desde commit-1 (cero violaciones: los únicos importadores previos
+      // eran los huérfanos src/libs/GSAP*.tsx, jubilados; el módulo motion es
+      // exento por path en la rule).
+      'greenhouse/no-direct-gsap-in-views': 'error',
+      // TASK-1049/1051 — primitives Greenhouse NO usan sombra directa MUI
+      // (elevation={n} / theme.shadows[n]); consumir theme.greenhouseElevation.<role>.
+      // Mode `error` desde commit-1 (TASK-1051 migró los 4 callsites previos;
+      // cero violaciones en src/components/greenhouse/primitives/** hoy).
+      'greenhouse/no-direct-mui-elevation-in-primitives': 'error',
       // TASK-827 Slice 7 — modo warn durante migración V1.0. Promote a `error`
       // vive en TASK derivada V1.1 client-portal-legacy-branching-sweep
       // (trigger: zero drift ≥30 días post TASK-829 cierre).
@@ -329,6 +359,69 @@ export default [
     ],
     rules: {
       'greenhouse/no-hardcoded-fontfamily': 'off',
+      'greenhouse/no-untokenized-copy': 'off',
+      'greenhouse/no-fontsize-inline-typography': 'off',
+      // theme/tokens AXIS, emails y PDFs son las fuentes legítimas de HEX crudo.
+      'greenhouse/no-hardcoded-hex-color': 'off'
+    }
+  },
+
+  // TASK-1038 — los mockups del design-system son referencias visuales que
+  // renderizan tamaños inline a propósito (la galería del SoT). Off ahí.
+  {
+    files: ['**/mockup/**/*.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-fontsize-inline-typography': 'off',
+      // los mockups documentan AS-IS↔TO-BE con valores crudos a propósito.
+      'greenhouse/no-hardcoded-hex-color': 'off'
+    }
+  },
+
+  // TASK-1044 — las vistas de referencia INTERNAS del design-system (galería
+  // AXIS, loaders lab, referencia canónica de tipografía) documentan el sistema:
+  // renderizan tamaños/familias crudos y labels ILUSTRATIVOS (ej. botones
+  // "Guardar"/"Confirmar" como muestra de control-text), no copy de producto.
+  // Off copy + fontSize-inline ahí.
+  {
+    files: ['src/views/greenhouse/admin/design-system/**/*.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-untokenized-copy': 'off',
+      'greenhouse/no-fontsize-inline-typography': 'off',
+      // los labs internos renderizan ramps/specimens AXIS con HEX crudo como
+      // documentación del sistema (la galería de color). Off ahí.
+      'greenhouse/no-hardcoded-hex-color': 'off'
+    }
+  },
+
+  // Tests pueden referenciar HEX en asserts de estilo (toHaveStyle('color: #...')).
+  // No son superficie de producto — off ahí.
+  {
+    files: ['**/*.test.ts', '**/*.test.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
+      'greenhouse/no-hardcoded-hex-color': 'off'
+    }
+  },
+
+  // TASK-1033 — el test focal de la primitive GreenhouseFloatingSurface renderiza
+  // anchors/content con labels ILUSTRATIVOS ("Ver evidencia", "Editar", aria-label
+  // de fixture) como triggers de prueba del open/close/role; son fixtures de test,
+  // NUNCA copy de producto que se despliega. Off copy ahí (mismo criterio que las
+  // design-system reference views).
+  {
+    files: ['src/components/greenhouse/primitives/__tests__/GreenhouseFloatingSurface.test.tsx'],
+    plugins: {
+      greenhouse: greenhousePlugin
+    },
+    rules: {
       'greenhouse/no-untokenized-copy': 'off'
     }
   },

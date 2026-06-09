@@ -47,6 +47,9 @@ PROJECT_ID="efeonce-group"
 REGION="us-east4"
 SERVICE_NAME="ops-worker"
 SERVICE_ACCOUNT="greenhouse-portal@${PROJECT_ID}.iam.gserviceaccount.com"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "${SCRIPT_DIR}/../_shared/gcloud-secret-iam.sh"
 
 # Cloud Run settings — enterprise tier (TASK-379 Slice 3)
 # Rationale:
@@ -129,56 +132,6 @@ require_non_empty "NUBOX_X_API_KEY_SECRET_REF" "${NUBOX_X_API_KEY_SECRET_REF}"
 require_non_empty "GREENHOUSE_PORTAL_BASE_URL" "${GREENHOUSE_PORTAL_BASE_URL}"
 require_non_empty "AZURE_AD_CLIENT_ID" "${AZURE_AD_CLIENT_ID}"
 require_non_empty "AZURE_AD_CLIENT_SECRET_REF" "${AZURE_AD_CLIENT_SECRET_REF}"
-
-# ─── Secret access helpers ───────────────────────────────────────────────────
-
-extract_secret_name() {
-  local ref="$1"
-  local normalized="${ref%%:latest}"
-
-  if [[ "${normalized}" == projects/*/secrets/*/versions/* ]]; then
-    normalized="${normalized#projects/}"
-    normalized="${normalized#*/secrets/}"
-    normalized="${normalized%%/versions/*}"
-  fi
-
-  printf '%s' "${normalized}"
-}
-
-normalize_secret_ref_for_cloud_run() {
-  local ref="$1"
-  local normalized="${ref}"
-
-  if [[ "${normalized}" == projects/*/secrets/*/versions/* ]]; then
-    printf '%s' "${normalized}"
-    return 0
-  fi
-
-  if [[ "${normalized}" == *:* ]]; then
-    printf '%s' "${normalized}"
-    return 0
-  fi
-
-  printf '%s:latest' "${normalized}"
-}
-
-ensure_secret_accessor_binding() {
-  local ref="$1"
-
-  if [ -z "${ref}" ]; then
-    return 0
-  fi
-
-  local secret_name
-  secret_name="$(extract_secret_name "${ref}")"
-
-  echo "=== Ensuring ${SERVICE_ACCOUNT} can access secret ${secret_name} ==="
-  gcloud secrets add-iam-policy-binding "${secret_name}" \
-    --project="${PROJECT_ID}" \
-    --member="serviceAccount:${SERVICE_ACCOUNT}" \
-    --role="roles/secretmanager.secretAccessor" \
-    --quiet >/dev/null
-}
 
 # ─── Build & Deploy to Cloud Run ─────────────────────────────────────────────
 

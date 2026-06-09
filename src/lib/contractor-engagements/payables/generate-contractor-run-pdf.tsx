@@ -26,6 +26,8 @@ import { EfeoncePdfFooter } from '@/lib/finance/pdf/efeonce-pdf-footer'
 import { EfeonceSloganPdf } from '@/lib/finance/pdf/efeonce-slogan-pdf'
 import { ensurePdfFontsRegistered } from '@/lib/finance/pdf/register-fonts'
 
+import { axisSemanticSubValues } from '@/lib/design-tokens/semantic-sub-values'
+
 import type {
   ContractorRunReport,
   ContractorRunReportRegimeGroupSummary,
@@ -57,7 +59,8 @@ const TEXT_PRIMARY = '#1a1a1a'
 const TEXT_MUTED = '#5c5c5c'
 const TEXT_FAINT = '#9aa4b2'
 const BORDER_LIGHT = '#e0e0e0'
-const NET_ACCENT = '#2E7D32'
+// Success ink (AA on white): canonical token SoT (TASK-1048 → Fase B success.ink).
+const NET_ACCENT = axisSemanticSubValues.success.ink
 
 const STATUS_LABELS: Record<ContractorRunReportRow['status'], string> = {
   pending_readiness: 'Por preparar',

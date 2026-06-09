@@ -15,8 +15,11 @@ export type GreenhouseAssetRetentionClass =
   | 'expense_report'
   | 'provider_supporting_doc'
   | 'tooling_supporting_doc'
+  | 'organization_brand_asset'
   | 'hr_certification'
   | 'hr_evidence'
+  // TASK-1023 — labor contracts / offer letters; long retention (5yr+ post-termination).
+  | 'workforce_contract'
   // TASK-791 — Contractor invoice / work evidence retention classes. Provider
   // invoice/payout statements reuse the existing `provider_supporting_doc`.
   | 'contractor_invoice'
@@ -52,6 +55,15 @@ export type GreenhouseAssetContext =
   | 'provider_invoice_draft'
   | 'provider_invoice'
   | 'provider_payout_statement'
+  // TASK-999 — Organization commercial logo enrichment. Draft/candidate/final
+  // assets live in private storage; accepted assets are served via proxy.
+  | 'organization_logo_draft'
+  | 'organization_logo'
+  | 'organization_logo_candidate'
+  // TASK-1023 — Workforce Contracting Studio signable document (offer letter / employment contract).
+  | 'workforce_contracting_document'
+  // TASK-490 — signed PDF artifact returned by the signature provider (EPIC-001 signature platform).
+  | 'signature_signed_document'
 
 export interface GreenhouseAssetRecord {
   assetId: string
@@ -103,6 +115,7 @@ export type DraftUploadContext = Extract<
   | 'contractor_invoice_draft'
   | 'contractor_work_evidence_draft'
   | 'provider_invoice_draft'
+  | 'organization_logo_draft'
 >
 
 export interface UploadPrivateAssetInput {

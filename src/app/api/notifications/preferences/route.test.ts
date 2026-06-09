@@ -34,12 +34,12 @@ describe('/api/notifications/preferences', () => {
     mockUpsertPreference.mockResolvedValue(undefined)
   })
 
-  it('returns preferences for the 13 runtime categories with dictionary-backed copy', async () => {
+  it('returns preferences for the 14 runtime categories with dictionary-backed copy', async () => {
     const response = await GET()
     const body = await response.json()
 
     expect(response.status).toBe(200)
-    expect(body.preferences).toHaveLength(13)
+    expect(body.preferences).toHaveLength(14)
     expect(body.preferences[0]).toMatchObject({
       category: 'delivery_update',
       label: 'Delivery updates',

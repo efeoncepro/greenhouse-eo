@@ -7,12 +7,18 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import type { RenderOptions } from '@testing-library/react'
 
+// Greenhouse semantic elevation roles (TASK-1049) — real SoT factory (pure, only
+// a type import, no next/font), so primitives reading
+// `theme.greenhouseElevation.<role>` test against the canonical values.
+import { elevationTokens } from '@/components/theme/elevation-tokens'
+
 // Mirrors the Greenhouse shape tokens (GREENHOUSE_DESIGN_TOKENS_V1.md §5.1) so
 // primitives that consume `theme.shape.customBorderRadius.*` can be unit-tested
 // without pulling the full Vuexy theme graph. TASK-946 — extends with
 // `palette.customColors` mirror (canonical V1 palette light) so primitives
 // reading `theme.palette.customColors.lightAlloy` / `midnight` etc. testean
-// sin pull del Vuexy theme completo.
+// sin pull del Vuexy theme completo. TASK-1049 — extends with
+// `greenhouseElevation` (real SoT) for elevation-token consumers.
 const theme = createTheme({
   shape: {
     customBorderRadius: {
@@ -23,6 +29,7 @@ const theme = createTheme({
       xl: 10
     }
   },
+  greenhouseElevation: elevationTokens('light'),
   palette: {
     customColors: {
       bodyBg: '#F8F9FA',
@@ -36,9 +43,6 @@ const theme = createTheme({
       deepAzure: '#023C70',
       royalBlue: '#024C8F',
       coreBlue: '#0375DB',
-      neonLime: '#6EC207',
-      sunsetOrange: '#FF6500',
-      crimson: '#BB1954',
       lightAlloy: '#DBDBDB',
       bodyText: '#1A1A2E',
       secondaryText: '#667085',

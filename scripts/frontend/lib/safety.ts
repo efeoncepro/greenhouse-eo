@@ -25,6 +25,14 @@ const DEFAULT_SECRET_MASK_SELECTORS = [
   '[data-capture-mask="true"]'
 ]
 
+const DEFAULT_CAPTURE_CHROME_HIDE_SELECTORS = [
+  // Next devtools lives in a shadow portal and can cover mobile evidence in local GVC.
+  // Runtime app chrome still goes through the regular quality pass before a capture is accepted.
+  'nextjs-portal',
+  '.tsqd-open-btn-container',
+  '.tsqd-open-btn'
+]
+
 export const applySecretMask = async (page: Page, extraSelectors: string[] = []): Promise<void> => {
   const all = [...DEFAULT_SECRET_MASK_SELECTORS, ...extraSelectors]
 
@@ -34,6 +42,10 @@ export const applySecretMask = async (page: Page, extraSelectors: string[] = [])
         filter: blur(8px) !important;
         color: transparent !important;
         text-shadow: 0 0 8px rgba(0, 0, 0, 0.55) !important;
+      }
+
+      ${DEFAULT_CAPTURE_CHROME_HIDE_SELECTORS.join(', ')} {
+        display: none !important;
       }
     `
   })

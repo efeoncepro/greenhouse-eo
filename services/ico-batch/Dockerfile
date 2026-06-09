@@ -45,6 +45,7 @@ RUN echo "" > /app/server-only-shim.js && \
       --alias:next/server=./next-server-shim.js \
       --alias:next/headers=./server-only-shim.js \
       --alias:@=./src \
+      --alias:@core=./src/@core \
       --resolve-extensions=.ts,.tsx,.js,.json \
       --packages=external \
       --tsconfig=tsconfig.json

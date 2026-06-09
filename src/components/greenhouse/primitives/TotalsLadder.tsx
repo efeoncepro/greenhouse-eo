@@ -1,28 +1,14 @@
 'use client'
 
-import { Fragment, useState, type ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
-import Paper from '@mui/material/Paper'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import {
-  FloatingFocusManager,
-  FloatingPortal,
-  autoUpdate,
-  flip,
-  offset,
-  shift,
-  useClick,
-  useDismiss,
-  useFloating,
-  useInteractions,
-  useRole
-} from '@floating-ui/react'
-
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+import GreenhouseFloatingSurface from './GreenhouseFloatingSurface'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
@@ -223,11 +209,11 @@ const TotalsLadder = ({
 }
 
 /**
- * Inline button + popover para el segmento de addons. Encapsula Floating UI:
- * autoUpdate detecta cambios del anchor (scroll, resize, re-render) y mantiene
- * la posición correcta; flip + shift evitan que el popover se salga del
- * viewport; useDismiss gestiona escape + outside-click; FloatingFocusManager
- * maneja focus trap ligero + return focus.
+ * Inline button + popover para el segmento de addons. El positioning, focus
+ * management, dismissal y a11y vienen de la primitive canónica
+ * `GreenhouseFloatingSurface` (variant `evidencePeek`, kind `totalsAddons`,
+ * TASK-1033). El botón inline y su copy se mantienen idénticos; la API pública
+ * `addonsSegment` no cambia.
  */
 const AddonsSegmentButton = ({
   count,
@@ -239,30 +225,18 @@ const AddonsSegmentButton = ({
   amount: number
   content: ReactNode
   currency: TotalsLadderCurrency
-}) => {
-  const [open, setOpen] = useState(false)
-
-  const { refs, floatingStyles, context, isPositioned } = useFloating<HTMLButtonElement>({
-    open,
-    onOpenChange: setOpen,
-    placement: 'top-start',
-    whileElementsMounted: autoUpdate,
-    middleware: [offset(8), flip({ fallbackAxisSideDirection: 'end' }), shift({ padding: 16 })]
-  })
-
-  const click = useClick(context)
-  const dismiss = useDismiss(context, { outsidePress: true, escapeKey: true })
-  const role = useRole(context, { role: 'dialog' })
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role])
-
-  return (
-    <>
+}) => (
+  <GreenhouseFloatingSurface
+    variant='evidencePeek'
+    kind='totalsAddons'
+    placement='top-start'
+    width={380}
+    dataCapture='totals-addons-peek'
+    anchor={anchorProps => (
       <Box
         component='button'
         type='button'
-        ref={refs.setReference}
-        {...getReferenceProps()}
+        {...anchorProps}
         aria-label={`${count} addon${count === 1 ? '' : 's'} aplicado${count === 1 ? '' : 's'}${amount > 0 ? ` por ${formatMoney(amount, currency)}` : ''}. Abrir detalle.`}
         sx={theme => ({
           appearance: 'none',
@@ -273,17 +247,22 @@ const AddonsSegmentButton = ({
           display: 'inline-flex',
           alignItems: 'center',
           gap: 0.5,
-          color: open ? theme.palette.primary.main : theme.palette.text.secondary,
+          color: theme.palette.text.secondary,
           fontVariantNumeric: 'tabular-nums',
           fontSize: theme.typography.caption.fontSize,
           fontFamily: theme.typography.fontFamily,
-          textDecoration: open ? 'underline' : 'none',
+          textDecoration: 'none',
           textUnderlineOffset: '2px',
           transition: theme.transitions.create(['color', 'text-decoration-color'], {
             duration: 150,
             easing: 'cubic-bezier(0.2, 0, 0, 1)'
           }),
           '&:hover': {
+            color: theme.palette.primary.main,
+            textDecoration: 'underline',
+            textUnderlineOffset: '2px'
+          },
+          '&[data-state="open"]': {
             color: theme.palette.primary.main,
             textDecoration: 'underline',
             textUnderlineOffset: '2px'
@@ -303,34 +282,9 @@ const AddonsSegmentButton = ({
           {amount > 0 ? ` ${formatMoney(amount, currency)}` : ''}
         </span>
       </Box>
-
-      {open ? (
-        <FloatingPortal>
-          <FloatingFocusManager context={context} modal={false} returnFocus>
-            <Paper
-              ref={refs.setFloating}
-              elevation={6}
-              style={floatingStyles}
-              {...getFloatingProps()}
-              sx={theme => ({
-                width: 380,
-                maxWidth: 'calc(100vw - 32px)',
-                borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                border: `1px solid ${theme.palette.divider}`,
-                p: 2,
-                zIndex: theme.zIndex.modal + 1,
-                opacity: isPositioned ? 1 : 0,
-                transition: 'opacity 150ms cubic-bezier(0.2, 0, 0, 1)',
-                '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
-              })}
-            >
-              {content}
-            </Paper>
-          </FloatingFocusManager>
-        </FloatingPortal>
-      ) : null}
-    </>
-  )
-}
+    )}
+    content={() => content}
+  />
+)
 
 export default TotalsLadder

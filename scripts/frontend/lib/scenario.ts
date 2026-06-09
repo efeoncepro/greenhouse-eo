@@ -15,7 +15,7 @@
 
 import type { Page } from 'playwright'
 
-import type { AssertionResult, CaptureFinding, InteractionSegment, ReadinessResult } from './manifest'
+import type { AssertionResult, CaptureBaselineMeta, CaptureFinding, InteractionSegment, ReadinessResult } from './manifest'
 
 export interface CaptureReadiness {
   /** Selector estable que representa que la pantalla ya está lista para evidencia visual. */
@@ -76,11 +76,110 @@ export interface CaptureViewportVariant {
   device?: string
 }
 
+export interface CaptureAccessibilityQualityOptions {
+  /** Ejecuta axe-core sobre cada frame marcado. Default false. */
+  enabled?: boolean
+  /** Limita el audit a un contenedor estable para evitar ruido del shell global. */
+  includeSelector?: string
+  /** Tags axe/WCAG a evaluar. Default: WCAG 2.0/2.1/2.2 A y AA. */
+  tags?: string[]
+  /** Si es true/default, cualquier violation hace fallar la captura. */
+  failOnViolations?: boolean
+}
+
+export interface CaptureLayoutQualityOptions {
+  /** Corre el layout integrity gate sobre cada frame marcado. Default false. */
+  enabled?: boolean
+  /** Acota el scan a un contenedor estable (default: body). */
+  includeSelector?: string
+  /** Selectores a ignorar por completo (overlays legítimos, devtools, etc.). */
+  ignoreSelectors?: string[]
+  /** Selectores donde el scroll horizontal es esperado (carruseles, tablas anchas). */
+  allowHorizontalScrollSelectors?: string[]
+  /** Tamaño mínimo de target interactivo en CSS px. Default 24 (WCAG 2.2 AA 2.5.8). */
+  minTargetSize?: number
+  /** Si true, los hallazgos de layout son `error`. Default false (warning-first). */
+  failOnViolations?: boolean
+}
+
+export interface CaptureRuntimeQualityOptions {
+  /** console.error → finding error (default) o warning si false. */
+  failOnConsoleError?: boolean
+  /** pageerror (excepción no capturada) → finding error. */
+  failOnPageError?: boolean
+  /** Warning de hydration React/Next (best-effort por pattern) → finding error. */
+  failOnHydrationWarning?: boolean
+  /** Responses 4xx/5xx de document/xhr/fetch → finding error. */
+  failOnHttpStatus?: boolean
+  /** Regex (string) de URLs a ignorar en el gate de red. */
+  ignoreUrlPatterns?: string[]
+  /** Regex (string) de mensajes de consola a ignorar. */
+  ignoreConsolePatterns?: string[]
+}
+
+export interface CaptureKeyboardProbe {
+  /** kebab-case; nombra el frame keyboard-<name>. */
+  name: string
+  /** Selector a enfocar antes de la secuencia (click/focus). */
+  startSelector?: string
+  /** Secuencia de teclas: 'Tab' | 'Enter' | 'Space' | 'Escape' | 'ArrowDown'… */
+  keys: string[]
+  /** Tras la secuencia, `document.activeElement` debe matchear este selector. */
+  expectedFocusSelector?: string
+  /** Exige focus ring visible en el elemento enfocado. Default true. */
+  requireVisibleFocusRing?: boolean
+  /** Selector que DEBE quedar visible tras la secuencia (e.g. menú abierto). */
+  expectedVisibleSelector?: string
+  /** Selector que DEBE quedar oculto tras la secuencia (e.g. Escape cierra). */
+  expectedHiddenSelector?: string
+}
+
+export interface CaptureKeyboardQualityOptions {
+  enabled?: boolean
+  /** Si true, los hallazgos de teclado son `error`. Default false (warning-first). */
+  failOnViolations?: boolean
+  /** Re-corre cada probe bajo prefers-reduced-motion y verifica que el feedback no se pierda. */
+  reducedMotionCheck?: boolean
+  probes: CaptureKeyboardProbe[]
+}
+
+export interface CapturePerformanceQualityOptions {
+  enabled?: boolean
+  /** Severidad de los hallazgos de budget. Default 'warning' (warning-first). */
+  severity?: 'warning' | 'error'
+  maxDomNodes?: number
+  maxRequests?: number
+  maxTransferBytes?: number
+  maxFcpMs?: number
+}
+
+export interface CaptureEnterpriseRubricOptions {
+  enabled?: boolean
+  /** Acota el scan a un contenedor estable (default: body). */
+  includeSelector?: string
+  /** Si true, los hallazgos de rubric son `error` (blocked). Default false (warning). */
+  failOnViolations?: boolean
+  /** Términos placeholder a detectar. Default: lorem/tbd/mock/fake/todo/placeholder. */
+  placeholderTerms?: string[]
+  /** Máximo de botones primarios (contained) por header. Default 1. */
+  maxPrimaryButtonsPerHeader?: number
+  /** Ratio máximo de celdas vacías (—/0) sobre el total. Default 0.5. */
+  maxEmptyTokensRatio?: number
+  /** Regiones `data-capture` que deben existir en la superficie. */
+  expectedDataCaptureRegions?: string[]
+}
+
 export interface CaptureQualityOptions {
   allowEmpty?: boolean
   allowLoading?: boolean
   allowLogin?: boolean
   allowErrorBoundary?: boolean
+  accessibility?: CaptureAccessibilityQualityOptions
+  layout?: CaptureLayoutQualityOptions
+  runtime?: CaptureRuntimeQualityOptions
+  keyboard?: CaptureKeyboardQualityOptions
+  performance?: CapturePerformanceQualityOptions
+  enterpriseRubric?: CaptureEnterpriseRubricOptions
 }
 
 export interface CaptureScenarioStep {
@@ -170,12 +269,8 @@ export interface CaptureScenario {
   /** Quality guard de frames. Opt-out explícito por scenario. */
   quality?: CaptureQualityOptions
 
-  /** Metadata para flujo mockup aprobado -> runtime. */
-  baseline?: {
-    surfaceId?: string
-    baselineName?: string
-    approvedMockupCaptureDir?: string
-  }
+  /** Metadata + contrato de visual diff para flujo mockup aprobado -> runtime. */
+  baseline?: CaptureBaselineMeta
 
   /** Steps en orden */
   steps: CaptureScenarioStep[]
@@ -315,6 +410,48 @@ export const validateScenario = (s: CaptureScenario): void => {
       }
 
       names.add(viewport.name)
+    }
+  }
+
+  const baseline = s.baseline
+
+  if (baseline) {
+    if (baseline.maxDiffRatio !== undefined && (baseline.maxDiffRatio < 0 || baseline.maxDiffRatio > 1)) {
+      throw new Error(`baseline.maxDiffRatio debe estar en [0,1]: ${baseline.maxDiffRatio}`)
+    }
+
+    if (baseline.maxChangedPixels !== undefined && (!Number.isFinite(baseline.maxChangedPixels) || baseline.maxChangedPixels < 0)) {
+      throw new Error(`baseline.maxChangedPixels debe ser un entero >= 0: ${baseline.maxChangedPixels}`)
+    }
+
+    if ((baseline.requiredFrameLabels?.length || baseline.maskSelectors?.length || baseline.requiredRegions?.length) && !baseline.surfaceId) {
+      throw new Error('baseline con requiredFrameLabels/maskSelectors/requiredRegions requiere baseline.surfaceId (home durable)')
+    }
+
+    if (baseline.surfaceId && !/^[a-z0-9][a-z0-9._-]*$/i.test(baseline.surfaceId)) {
+      throw new Error(`baseline.surfaceId inválido (alfanumérico + . _ -): "${baseline.surfaceId}"`)
+    }
+  }
+
+  const keyboard = s.quality?.keyboard
+
+  if (keyboard?.enabled) {
+    if (!keyboard.probes?.length) {
+      throw new Error('quality.keyboard.enabled requiere al menos un probe')
+    }
+
+    const probeNames = new Set<string>()
+
+    for (const [index, probe] of keyboard.probes.entries()) {
+      if (!probe.name || !/^[a-z0-9-]+$/.test(probe.name)) {
+        throw new Error(`quality.keyboard.probes[${index}].name inválido (kebab-case requerido)`)
+      }
+
+      if (probeNames.has(probe.name)) throw new Error(`quality.keyboard probe "${probe.name}" duplicado`)
+
+      if (!probe.keys?.length) throw new Error(`quality.keyboard probe "${probe.name}" requiere keys`)
+
+      probeNames.add(probe.name)
     }
   }
 }

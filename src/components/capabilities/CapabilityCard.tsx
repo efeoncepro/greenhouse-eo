@@ -682,7 +682,7 @@ const PipelineCard = ({ card, cardData }: TypedCapabilityCardProps<'pipeline'>) 
                     <Typography variant='h6' sx={{ color: phase.color, lineHeight: 1.2 }}>
                       {phase.count}
                     </Typography>
-                    <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.65rem' }}>
+                    <Typography variant='caption' color='text.secondary'>
                       {phase.label}
                     </Typography>
                   </Stack>

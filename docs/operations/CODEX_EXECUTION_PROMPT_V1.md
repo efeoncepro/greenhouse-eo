@@ -9,8 +9,24 @@ Este documento **no reemplaza** `AGENTS.md`, `project_context.md`, `Handoff.md`,
 ## Cuándo usarlo
 
 - Cuando Codex va a implementar una `TASK-###`
+- Cuando el pedido del operador menciona explicitamente `TASK-###`, `[TASK-###]` o una ruta `docs/tasks/**/TASK-###-*.md`
 - Cuando el trabajo toca varios dominios o tiene blast radius medio/alto
 - Cuando se quiere un prompt único y robusto, en vez de instrucciones dispersas
+
+## Hook operativo TASK-*
+
+Este documento actua como **hook pre-ejecucion** para Codex sobre tasks formales:
+
+- Si el pedido del operador contiene `TASK-###`, `[TASK-###]` o apunta a un archivo `docs/tasks/**/TASK-###-*.md`, Codex debe ejecutar `pnpm codex:task-hook TASK-###` antes de escribir codigo y aplicar el prompt que imprime.
+- Si el operador dice `mantente en develop`, Codex debe usar `pnpm codex:task-hook TASK-### --develop`.
+- Es un hook **solo de Codex**. No define obligaciones automaticas para Claude, Cursor u otros agentes; esos agentes siguen sus propios entrypoints y solo deben conocer esta regla para coordinar convivencia.
+- El hook aplica solo a `TASK-*` formales. No se activa por preguntas generales, brainstorming, reviews, mini-tasks, issues o cambios locales sin `TASK-###`, salvo que el operador lo pida.
+- El hook no reemplaza el contexto vivo: primero se deben leer `AGENTS.md`, `project_context.md`, `Handoff.md`, `docs/tasks/TASK_PROCESS.md` y la task real.
+- El prompt se aplica con proporcionalidad, pero las fases de Discovery, Audit, Plan, verificacion y cierre no se omiten en tasks de implementacion.
+- Si el operador agrega una instruccion explicita como `mantente en develop`, esa instruccion overridea la branch convention del prompt. El agente debe documentar la excepcion en Audit/Plan/Handoff y no cambiar de rama.
+- Codex no debe crear `git worktree`/carpetas clon aisladas por defecto para ejecutar una task. Solo puede hacerlo si el operador lo pide o aprueba explicitamente en esa sesion. Si el checkout actual esta sucio o hay trabajo paralelo, reporta el estado y continua con cambios acotados en el checkout actual o pide confirmacion; no abras otro folder por iniciativa propia.
+
+Esto no es un Git hook ni un listener del runtime de Codex: el disparo sigue siendo responsabilidad del agente al detectar `TASK-###`. La parte mecanica es el comando `pnpm codex:task-hook`, que resuelve la task activa, bloquea tasks completas/bloqueadas y emite el prompt canonico ya sustituido.
 
 ## Cuándo NO usarlo literal
 
@@ -18,6 +34,50 @@ Este documento **no reemplaza** `AGENTS.md`, `project_context.md`, `Handoff.md`,
 - Sesiones de brainstorming, diseño o revisión sin intención inmediata de implementar
 
 En esos casos, usar este prompt de forma proporcional y breve.
+
+## Mantenimiento y versionamiento
+
+`CODEX_EXECUTION_PROMPT_V1.md` usa versionamiento por contrato operativo, no por
+cada ajuste de redacción.
+
+### Mantener en V1
+
+Actualizar este mismo documento, sin crear una versión nueva, cuando el cambio sea
+compatible con el flujo actual:
+
+- Agregar o retirar skills recomendadas en la matriz de `SKILLS`.
+- Agregar ejemplos de lectura obligatoria o docs especializados.
+- Ajustar wording, claridad, comandos o checks sin cambiar el orden base de fases.
+- Agregar validaciones aditivas que refuercen Discovery, Audit, Plan,
+  Implementación, Verificación o Cierre.
+- Actualizar el hook mecánico `pnpm codex:task-hook` siempre que siga emitiendo el
+  prompt canónico y mantenga el mismo trigger `TASK-*` para Codex.
+
+### Crear V2
+
+Crear `docs/operations/CODEX_EXECUTION_PROMPT_V2.md` y actualizar los entrypoints
+cuando cambie el contrato de ejecución de forma estructural:
+
+- Cambia el trigger del hook o deja de ser solo `TASK-*` para Codex.
+- Cambia el orden o la obligatoriedad de fases.
+- Cambia el formato requerido de Audit, Connections Map, Plan o cierre.
+- Cambia la política de branch/checkpoint/ownership/worktrees.
+- Cambia el modelo de skill routing o subagentes de manera no compatible.
+- Cambia qué documentos del repo prevalecen como source of truth.
+
+### Mantenimiento obligatorio
+
+Todo cambio a este prompt debe:
+
+- Actualizar `.codex/skills/greenhouse-task-execution-hook/SKILL.md` si cambia el
+  comando, trigger o comportamiento esperado del hook.
+- Actualizar `AGENTS.md`, `project_context.md`, `Handoff.md` y `changelog.md`
+  cuando el cambio afecte un contrato vigente para Codex.
+- Actualizar `CLAUDE.md` solo como awareness de convivencia cuando corresponda;
+  no convertir este hook en obligación de Claude/Cursor.
+- Correr `pnpm codex:task-hook TASK-### --prompt-only` contra una task activa como
+  smoke del prompt sustituido.
+- Correr `pnpm docs:closure-check`, `pnpm docs:context-check` y `git diff --check`.
 
 ## Prompt canónico
 
@@ -70,8 +130,20 @@ Si la task está en `to-do/`:
   - mueve la task a `in-progress/`
   - cambia `Lifecycle` a `in-progress`
   - sincroniza `docs/tasks/README.md`
-  - crea branch `task/TASK-###-short-slug`
+  - crea branch `task/TASK-###-short-slug`, salvo instrucción explícita del operador de mantenerse en otra rama
   - deja nota en `Handoff.md`
+
+Si el operador pide `mantente en develop` o una excepcion de rama equivalente:
+- no cambies de rama
+- verifica ownership y worktree con mas cuidado
+- registra la excepcion en Audit/Plan/Handoff
+- no hagas push a `develop` como cierre automatico sin confirmacion humana
+
+Regla anti-basura de filesystem:
+- no crees `git worktree` ni carpetas clon aisladas por iniciativa propia
+- solo usa worktree si el operador lo pide o aprueba explicitamente en esta sesion
+- si el checkout actual esta sucio, lista los cambios relevantes y trabaja alrededor de ellos sin revertirlos, o pide confirmacion si bloquean la task
+- si por excepcion aprobada creas un worktree, debes retirarlo y borrar su branch temporal antes de cerrar, salvo que el operador pida conservarlo
 
 No trabajes en paralelo sobre una task que ya tiene ownership activo no resuelto.
 

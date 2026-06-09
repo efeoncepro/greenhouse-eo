@@ -416,6 +416,122 @@ export const GH_CLIENT_ONBOARDING = {
     statusInvitedChip: 'Invitación enviada',
     statusErrorChip: 'No se pudo invitar',
     secretNote: 'Cada persona recibe un email para crear su contraseña. Su acceso queda limitado al portal de este cliente.'
+  },
+  // TASK-1013 — mockup Product Design del inbox/cockpit de casos de onboarding.
+  onboardingCases: {
+    filtersAria: 'Filtros rápidos de onboarding',
+    openTimelineAria: 'Abrir el detalle completo del caso',
+    // --- Cockpit runtime (TASK-1013 · UX-writing enterprise TASK-1015) --------
+    // Tono: es-CL tuteo (NO voseo), claro y profesional. Sin jerga interna.
+    breadcrumbAgency: 'Agencia',
+    breadcrumbClients: 'Clientes',
+    title: 'Onboarding de clientes',
+    subtitle: 'Revisa los onboardings en curso, atiende los bloqueos y entra al detalle de cada caso.',
+    wizardNotice: 'Esta vista no reemplaza el alta de cliente: hace visibles los onboardings en curso. Para registrar un cliente nuevo, usa el asistente de alta.',
+    wizardNoticeCta: 'Ir al asistente de alta',
+    newClientCta: 'Nuevo cliente',
+    // KPIs (solo datos reales: nada de SLA% fabricado).
+    kpiOpenLabel: 'Casos abiertos',
+    kpiInProgressLabel: 'En progreso',
+    kpiOverdueLabel: 'Vencidos',
+    kpiOverdueDetail: 'Pasaron su fecha objetivo',
+    kpiBlockedLabel: 'Bloqueados',
+    kpiBlockedDetail: 'Requieren resolver un bloqueo',
+    // Bandeja + filtros.
+    searchPlaceholder: 'Buscar por cliente, código o deal',
+    statusFilterLabel: 'Estado',
+    originFilterLabel: 'Origen',
+    filterAll: 'Todos',
+    inboxHeading: 'Casos en curso',
+    statusDraft: 'Borrador',
+    stepSkipped: 'Omitido',
+    stepNotApplicable: 'No aplica',
+    stepBlocksCompletion: 'Bloquea el cierre',
+    visibleCountAria: 'Cantidad de casos visibles',
+    withinTarget: 'En fecha',
+    noTargetDate: 'Sin fecha objetivo',
+    // Estados (state-design): vacío real vs filtrado vs degradado.
+    emptyZeroTitle: 'Aún no hay onboardings en curso',
+    emptyZeroDescription: 'Cuando un deal pase a cerrado-ganado o registres un cliente nuevo, su onboarding aparece aquí para que lo actives.',
+    emptyFilteredTitle: 'Sin resultados para estos filtros',
+    emptyFilteredDescription: 'Ajusta el estado, el origen o la búsqueda para ver más onboardings.',
+    clearFiltersCta: 'Limpiar filtros',
+    degradedTitle: 'No pudimos cargar los casos',
+    degradedDescription: 'Tuvimos un problema al cargar los onboardings. Intenta de nuevo en unos segundos.',
+    retryCta: 'Reintentar',
+    // Detalle del caso seleccionado (checklist real).
+    createdOn: 'Creado el',
+    stepsReady: 'etapas listas',
+    progressAria: 'Avance del checklist del caso',
+    // Panel de acción.
+    nextActionTitle: 'Siguiente acción',
+    nextActionInProgress: 'Continúa el checklist en el detalle del caso.',
+    nextActionDraft: 'Activa el caso para iniciar el onboarding.',
+    nextActionBlocked: 'Resuelve el bloqueo antes de continuar.',
+    openTimelineCta: 'Abrir el detalle',
+    activateCaseCta: 'Activar el caso',
+    activationHint: 'La activación ocurre en el detalle del caso.',
+    responsibleTitle: 'Responsable',
+    responsibleFallback: 'Operador interno',
+    targetTitle: 'Fecha objetivo',
+    targetNone: 'Sin fecha objetivo definida.',
+    sourceTitle: 'Origen del caso',
+    sourceOriginLabel: 'Creado desde',
+    sourceDealLabel: 'Deal',
+    sourceNoDeal: 'Sin deal asociado',
+    // Origen (mapea trigger_source canónico).
+    originHubspotDeal: 'Deal de HubSpot',
+    originManual: 'Alta manual',
+    originAdopt: 'Adopción',
+    originRenewal: 'Renovación',
+    originChurnSignal: 'Señal de baja',
+    originMigration: 'Migración',
+    // Indicador cruzado en Organizaciones / Account 360 (TASK-1013 Slice 2).
+    orgColumnHeader: 'Onboarding',
+    orgLinkAria: 'Abrir el onboarding de esta organización',
+    orgBannerInProgress: 'Onboarding en curso',
+    orgBannerDraft: 'Onboarding pendiente de iniciar',
+    orgBannerBlocked: 'Onboarding bloqueado',
+    orgOpenTimelineCta: 'Abrir el detalle',
+    wizardLoadingAria: 'Cargando el asistente de alta de cliente'
+  },
+  // TASK-1009 — panel del preflight de onboarding Notion (ítem verify_notion_flowing).
+  notionPreflight: {
+    title: 'Verificar flujo al portal',
+    subtitle: 'Confirma que las tareas del cliente llegan al portal antes de cerrar el onboarding.',
+    idleHint: 'Corre el preflight para revisar la cadena completa, de Notion al portal. El paso se marca como completado solo si todo está en verde.',
+    runCta: 'Correr preflight',
+    runningCta: 'Verificando…',
+    rerunCta: 'Volver a correr',
+    advisoryTag: 'opcional',
+    readyTitle: 'El cliente fluye al portal',
+    readyBody: 'Todos los pasos críticos están en verde.',
+    advancedNote: 'Marcamos este paso como completado.',
+    notReadyTitle: 'Todavía no fluye',
+    notReadyBody: 'Revisa los pasos en rojo y arregla el eslabón. Volvé a correr el preflight cuando lo resuelvas.',
+    noSpaceTitle: 'Falta vincular el teamspace',
+    noSpaceBody: 'Este caso no tiene un teamspace Notion vinculado. Vinculalo antes de correr el preflight.',
+    errorTitle: 'No pudimos correr el preflight',
+    errorBody: 'Tuvimos un problema al verificar. Probá de nuevo en unos segundos.',
+    retryCta: 'Reintentar',
+    resultHint: 'Cada eslabón muestra su estado real. Los pasos opcionales no bloquean el cierre.'
+  },
+  // --- TASK-1017 — Evidencia auto-derivable del checklist --------------------
+  // Capa read-time honesta: por cada paso auto-derivable muestra lo que el sistema
+  // ya sabe (detectado / sin detectar / no verificable), sin pisar lo manual.
+  evidence: {
+    runCta: 'Verificar evidencia',
+    runningCta: 'Verificando…',
+    rerunCta: 'Volver a verificar',
+    idleHint: 'Revisa el estado real de cada paso contra el sistema, sin marcarlo a mano.',
+    errorTitle: 'No pudimos verificar',
+    errorBody: 'Tuvimos un problema al leer el estado. Prueba de nuevo en unos segundos.',
+    retryCta: 'Reintentar',
+    statusDetected: 'Detectado',
+    statusPending: 'Sin detectar',
+    statusUnverifiable: 'No verificable',
+    autoCompletedTag: 'Marcado automáticamente',
+    resultHint: 'Cada paso muestra lo que ve el sistema. La verificación no pisa lo que marques a mano.'
   }
 } as const
 

@@ -123,7 +123,7 @@ const UserMessage = () => (
             <Typography
               variant='body2'
               component='div'
-              sx={{ lineHeight: 1.7, fontSize: '0.9375rem', color: 'text.primary' }}
+              sx={{ lineHeight: 1.7, color: 'text.primary' }}
             >
               <MessagePrimitive.Content components={{ Text: TextPart }} />
             </Typography>

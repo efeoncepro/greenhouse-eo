@@ -139,7 +139,7 @@ export const GH_AGENCY = {
       listSubtitle: 'Activos e históricos del piloto',
       filterEmptySubheader: 'Ejemplo para filtros sin resultados.',
       healthTitle: 'Commercial Health',
-      healthSubtitle: 'Subsystem mock para /admin/operations.'
+      healthSubtitle: 'Subsystem mock para /admin/ops-health.'
     },
     runtime: {
       title: 'Sample Sprints comerciales',
@@ -248,7 +248,7 @@ export const GH_AGENCY = {
       },
       commercial_health_unavailable: {
         title: 'Señales comerciales en revisión',
-        description: 'Las señales operativas no están disponibles ahora. Verifica /admin/operations o reintenta en unos minutos.'
+        description: 'Las señales operativas no están disponibles ahora. Verifica /admin/ops-health o reintenta en unos minutos.'
       },
       capacity_unresolvable: {
         title: 'Capacidad no evaluable',
@@ -369,7 +369,52 @@ export const GH_ORGANIZATION_WORKSPACE = {
     actions: {
       syncHubspot: 'Sincronizar con HubSpot',
       syncing: 'Sincronizando…',
-      edit: 'Editar organización'
+      edit: 'Editar organización',
+      changeLogo: 'Cambiar logo',
+      uploadingLogo: 'Subiendo logo…',
+      applyingLogo: 'Aplicando logo…',
+      searchingLogo: 'Buscando logo…',
+      logoUpdated: 'Logo actualizado.',
+      logoUpdateFailed: 'No se pudo actualizar el logo.',
+      logoUploadRequired: 'Sube una imagen antes de aplicar el logo.',
+      logoUrlRequired: 'Pega una URL de imagen para buscar el logo.',
+      logoEditorDescription:
+        'Sube una imagen o pega una URL pública. El logo se guarda como asset privado y queda asociado a esta organización.',
+      logoEditorFileHint: 'PNG, JPG o WebP. No se hotlinkea: Greenhouse guarda el logo como asset privado.',
+      logoEditorProtectedHint: 'Los logos institucionales o legales no se modifican desde este flujo.',
+      logoUploaderTitle: 'Subir logo',
+      logoUploaderHelper: 'Arrastra una imagen o súbela desde tu equipo.',
+      logoUploaderEmptyTitle: 'Arrastra una imagen o súbela',
+      logoUploaderEmptyDescription: 'Formatos soportados: PNG, JPG, WebP. Tamaño máximo: 5 MB.',
+      logoUploaderBrowse: 'Subir desde equipo',
+      logoUploaderReplace: 'Reemplazar logo',
+      logoUploaderRemove: 'Quitar imagen',
+      applyLogo: 'Guardar logo',
+      clientOrganization: 'Organización cliente',
+      currentLogo: 'Actual',
+      newLogoPreview: 'Nuevo logo',
+      noNewLogoPreview: 'Vista previa',
+      logoUrlLabel: 'Sitio web o URL de imagen',
+      logoUrlPlaceholder: 'https://latam.com',
+      logoUrlHelper: 'Buscamos el logo en la web o usamos una imagen directa, y lo guardamos como asset privado.',
+      logoLegalProtectionNotice:
+        'Los logos institucionales o legales están protegidos y se gestionan en el entorno corporativo. Este logo es exclusivo para esta organización.',
+      protected: 'Protegido',
+      logoAiLabel: 'Indicación adicional (opcional)',
+      logoAiPlaceholder: 'Ej: usa la versión a color, fondo blanco',
+      logoAiGenerate: 'Generar con IA',
+      logoAiGenerating: 'Generando logo con IA…',
+      logoAiHelper:
+        'La IA reconstruye el logo real de la empresa a partir de su conocimiento de la marca. Es una aproximación: revísala antes de guardar. Para el logo exacto, usa subir archivo o la URL del sitio.',
+      logoAiRequired: 'Escribe una indicación o deja el campo vacío para usar solo el nombre.',
+      logoAiFailed: 'No pudimos generar el logo. Intenta de nuevo o ajusta la indicación.',
+      logoAiEstimate: 'Puede tardar hasta ~1 minuto.',
+      logoMethodAria: 'Cómo cambiar el logo',
+      logoMethodUpload: 'Subir',
+      logoMethodAi: 'Generar con IA',
+      logoMethodUrl: 'Desde URL',
+      logoCurrentEmpty: 'Sin logo',
+      logoReadyToSave: 'Listo para guardar'
     },
     kpis: {
       revenue: {
@@ -442,5 +487,141 @@ export const GH_ORGANIZATION_WORKSPACE = {
       }
     },
     loading: 'Cargando sección…'
+  },
+  enterprise: {
+    actions: {
+      filters: 'Filtros',
+      viewFull: 'Vista completa'
+    },
+    facetDescriptions: {
+      identity: 'Ficha legal, marca, HubSpot y mapeos canónicos para que el resto de facets no repita ownership.',
+      spaces: 'Spaces operativos, clientes puente y mapeos de trabajo asociados a esta organización.',
+      team: 'Roster, dedicación, roles y capacidad visible para entender si delivery y finance tienen base operativa.',
+      economics: 'Márgenes, contribución, mix de costos y sensibilidad operacional sin duplicar el ledger de Finanzas.',
+      delivery: 'Calidad, throughput, pipeline y proyectos activos. Esta vista es el default recomendado para Agency.',
+      finance: 'Resumen financiero para Agency con puente a la vista rica de Finance Clients cuando se requiere operación.',
+      crm: 'Contactos, deals, pipeline y sincronización HubSpot como contexto, no como único source of truth.',
+      services: 'Catálogo de servicios, cobertura activa y consumo por engagement.',
+      staffAug: 'Placements, contratos externos y baseline de capacidad aumentada con estado honesto de implementación.'
+    },
+    states: {
+      loading: 'Cargando',
+      ready: 'Listo',
+      partial: 'Parcial',
+      planned: 'Planificado',
+      available: 'Disponible',
+      noData: 'Sin datos'
+    },
+    provenance: {
+      mastheadPrefix: 'Fuente',
+      sourceSystemLabel: 'Sistema fuente',
+      lastSyncLabel: 'Última sincronización',
+      coverageLabel: 'Cobertura 360',
+      cacheLabel: 'Cache 360',
+      readStateLabel: 'Estado lectura',
+      fallbackFresh: 'fresh',
+      noTimestamp: 'Sin timestamp',
+      joiner: ' + ',
+      sources: {
+        greenhouse: 'Greenhouse',
+        hubspot: 'HubSpot',
+        account360: 'Account 360',
+        finance360: 'Finance 360',
+        delivery360: 'Delivery 360',
+        services360: 'Services 360',
+        staffAug360: 'Staff Aug 360'
+      }
+    },
+    sections: {
+      operationalTrend: {
+        title: 'Tendencia operacional',
+        subtitle: 'Revenue vs margen como proxy ejecutivo mientras delivery trend se materializa'
+      },
+      cscDistribution: {
+        title: 'Distribución CSC',
+        subtitle: 'Derivada de servicios o equipo disponible',
+        coverage: 'cobertura'
+      },
+      delivery360: {
+        title: 'Delivery 360',
+        subtitle: 'Métricas canónicas de proyectos, tareas, sprints e ICO para no depender solo del detalle Notion'
+      },
+      activeProjects: {
+        title: 'Proyectos / Sprints activos',
+        subtitle: 'Priorizados por riesgo de entrega y dependencia financiera',
+        ariaLabel: 'Proyectos activos de la organización',
+        columns: {
+          id: 'ID',
+          name: 'Nombre',
+          space: 'Space',
+          phase: 'Fase',
+          otd: 'OTD%',
+          rpa: 'RpA',
+          progress: 'Progreso',
+          dueDate: 'Due date',
+          sponsor: 'Sponsor'
+        }
+      },
+      relatedFacetBridge: {
+        title: 'Puentes hacia otras facets',
+        subtitle: 'La vista enterprise mantiene contexto cruzado sin salir de la organización'
+      },
+      financeAgency: {
+        title: 'Finanzas para Agency',
+        subtitle: 'Lectura compacta con salida directa hacia Finance Clients para operación avanzada'
+      },
+      financeClients: {
+        title: 'Finance Clients',
+        subtitle: 'Snapshot materializado desde el dominio financiero'
+      },
+      financePayments: {
+        title: 'Estado de pagos',
+        subtitle: 'Lectura rápida de exposición pendiente'
+      },
+      contextReadiness: {
+        title: 'Readiness de contexto',
+        subtitle: 'Evidencia materializada por facet de Account 360'
+      },
+      evidenceMap: {
+        title: 'Mapa de evidencia',
+        subtitle: 'Qué sistemas soportan la lectura actual'
+      },
+      consumerContract: {
+        title: 'Contrato consumidor',
+        subtitle: 'Cómo Agency usa esta facet sin duplicar el source of truth'
+      },
+      sidecarHealth: 'Salud ejecutiva',
+      sidecarReadiness: 'Readiness',
+      sidecarRecentSignals: 'Señales recientes',
+      sidecarNextActions: 'Próximas acciones',
+      sidecarProvenance: 'Procedencia de datos',
+      sidecarLineageAction: 'Ver linaje',
+      sidecarHistoryAction: 'Historial'
+    },
+    metrics: {
+      projects: 'Proyectos',
+      active: 'activos',
+      tasks: 'Tareas',
+      taskActive: 'activas',
+      sprints: 'Sprints',
+      deliveryRuntime: 'delivery runtime',
+      stuckAssets: 'Stuck assets'
+    },
+    empty: {
+      operationalTrend: 'Aún no hay tendencia mensual suficiente para graficar delivery.',
+      cscDistribution: 'Sin distribución suficiente para CSC. Se mostrará cuando existan servicios o equipo clasificado.',
+      activeProjects: 'Sin proyectos activos disponibles desde Notion/Delivery para esta organización.',
+      financeSnapshots: 'Sin snapshots financieros materializados todavía.',
+      spaces: 'Sin Spaces asociados desde Organization 360.',
+      team: 'Sin personas vinculadas desde Account 360.',
+      economics: 'Sin snapshots económicos materializados.',
+      crm: 'Sin datos CRM materializados.',
+      services: 'Sin servicios activos materializados.',
+      staffAug: 'Sin placements activos materializados.'
+    },
+    aria: {
+      cscDistribution: 'Distribución CSC por capability de entrega',
+      loadingOrganizationData: 'Cargando datos de organización'
+    }
   }
 } as const

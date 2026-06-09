@@ -20,6 +20,9 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import { GH_ORGANIZATION_WORKSPACE } from '@/lib/copy/agency'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+import { hubspotIndustryLabel } from '@/config/hubspot-industries'
+
+import OrganizationLogoAvatarEditor from './OrganizationLogoAvatarEditor'
 
 import type {
   FacetContentProps,
@@ -60,8 +63,13 @@ export type OrganizationWorkspaceShellProps = {
   children: (facet: OrganizationFacet, ctx: FacetContentProps) => ReactNode
   /** Optional admin actions rendered in header (HubSpot sync, Edit, etc.). */
   adminActions?: ReactNode
+  /** Allows direct logo editing from the header avatar for non-operating orgs. */
+  canEditLogo?: boolean
+  onLogoUpdated?: () => void | Promise<void>
   /** Optional drawer slot rendered after shell content (modals/drawers). */
   drawerSlot?: ReactNode
+  /** Optional banner rendered above the header (e.g. onboarding in-flight, TASK-1013). */
+  headerBanner?: ReactNode
 }
 
 const STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'secondary'> = {
@@ -118,13 +126,25 @@ const OrganizationWorkspaceShell = ({
   onFacetChange,
   children,
   adminActions,
-  drawerSlot
+  canEditLogo,
+  onLogoUpdated,
+  drawerSlot,
+  headerBanner
 }: OrganizationWorkspaceShellProps) => {
   const copy = GH_ORGANIZATION_WORKSPACE.shell
 
   const statusColor = STATUS_COLOR[organization.status] ?? 'secondary'
   const statusLabel = resolveStatusLabel(organization.status)
   const flag = organization.country ? (COUNTRY_FLAGS[organization.country] ?? '') : ''
+  const industryLabel = hubspotIndustryLabel(organization.industry)
+
+  const fallbackInitials =
+    organization.organizationName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0]?.toUpperCase())
+      .join('') || 'OR'
 
   const fieldRedactionsForActiveFacet = useMemo(() => {
     if (!activeFacet) return []
@@ -159,14 +179,22 @@ const OrganizationWorkspaceShell = ({
   return (
     <>
       <Stack spacing={6}>
+        {headerBanner}
         {/* ── Header ── */}
         <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
           <CardContent>
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ md: 'center' }} justifyContent='space-between'>
               <Stack direction='row' spacing={3} alignItems='center'>
-                <CustomAvatar variant='rounded' skin='light' color='primary' size={56}>
-                  <i className='tabler-building' style={{ fontSize: '1.75rem' }} />
-                </CustomAvatar>
+                <OrganizationLogoAvatarEditor
+                  organizationId={organization.organizationId}
+                  organizationName={organization.organizationName}
+                  logoUrl={organization.logoUrl}
+                  fallbackInitials={fallbackInitials}
+                  editable={Boolean(canEditLogo)}
+                  isOperatingEntity={organization.isOperatingEntity}
+                  size={56}
+                  onUpdated={onLogoUpdated}
+                />
                 <Box>
                   <Typography variant='caption' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: 'text.secondary' }}>
                     {copy.breadcrumb}
@@ -183,9 +211,9 @@ const OrganizationWorkspaceShell = ({
                         {flag} {organization.country}
                       </Typography>
                     )}
-                    {organization.industry && (
+                    {industryLabel && (
                       <Typography variant='body2' color='text.secondary'>
-                        {organization.industry}
+                        {industryLabel}
                       </Typography>
                     )}
                     {organization.publicId && (

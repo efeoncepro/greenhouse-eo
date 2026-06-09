@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, screen, within } from '@testing-library/react'
+import { cleanup, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -190,17 +190,6 @@ describe('HrHierarchyView', () => {
         })
       }
 
-      if (url === '/api/hr/core/hierarchy/delegations' && init?.method === 'POST') {
-        return Response.json(
-          {
-            delegation: {
-              responsibilityId: 'resp-2'
-            }
-          },
-          { status: 201 }
-        )
-      }
-
       if (url === '/api/hr/core/hierarchy/delegations' && init?.method === 'DELETE') {
         return Response.json({ responsibilityId: 'resp-1', revoked: true })
       }
@@ -286,19 +275,18 @@ describe('HrHierarchyView', () => {
     expect(screen.getByRole('textbox', { name: 'Razón' })).toHaveAttribute('aria-invalid', 'true')
   }, 30000)
 
-  it('opens the temporary delegation dialog from the audit panel', async () => {
+  it('shows the delegations panel as read-only without a create affordance', async () => {
     const { default: HrHierarchyView } = await import('./HrHierarchyView')
 
     renderWithTheme(<HrHierarchyView />)
 
     await screen.findAllByText('Ana Perez')
     const delegationPanel = await screen.findByRole('region', { name: 'Delegaciones temporales' })
-    const delegationButton = within(delegationPanel).getByRole('button', { name: 'Nueva delegación' })
 
-    fireEvent.click(delegationButton)
-
-    expect(screen.getByRole('heading', { name: 'Nueva delegación temporal' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Delegado' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Crear delegación' })).toBeInTheDocument()
+    expect(
+      within(delegationPanel).getByText('La delegación de aprobaciones no está disponible')
+    ).toBeInTheDocument()
+    expect(within(delegationPanel).queryByRole('button', { name: 'Nueva delegación' })).toBeNull()
+    expect(within(delegationPanel).queryByRole('button', { name: 'Crear delegación' })).toBeNull()
   }, 30000)
 })

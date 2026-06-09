@@ -6,6 +6,96 @@ export { default as FieldsProgressChip } from './FieldsProgressChip'
 export type { FieldsProgressChipProps } from './FieldsProgressChip'
 export { default as SaveStateIndicator } from './SaveStateIndicator'
 export type { SaveStateIndicatorProps, SaveStateKind } from './SaveStateIndicator'
+export { default as GreenhouseAsyncActionButton } from './GreenhouseAsyncActionButton'
+export type {
+  GreenhouseAsyncActionButtonProps,
+  GreenhouseAsyncActionState
+} from './GreenhouseAsyncActionButton'
+export { default as GreenhouseButton } from './GreenhouseButton'
+export type { GreenhouseButtonProps } from './GreenhouseButton'
+export {
+  GREENHOUSE_BUTTON_KIND_DEFAULT_TONE,
+  GREENHOUSE_BUTTON_KIND_DEFAULT_VARIANT,
+  GREENHOUSE_BUTTON_SIZE_TOKENS,
+  GREENHOUSE_BUTTON_SIZES,
+  GREENHOUSE_BUTTON_TONES,
+  GREENHOUSE_BUTTON_VARIANT_CONFIG,
+  GREENHOUSE_BUTTON_VARIANTS,
+  resolveGreenhouseButtonTone,
+  resolveGreenhouseButtonVariant
+} from './greenhouse-button-controller'
+export type {
+  GreenhouseButtonKind,
+  GreenhouseButtonSize,
+  GreenhouseButtonTone,
+  GreenhouseButtonVariant
+} from './greenhouse-button-controller'
+export { default as GreenhouseChip } from './GreenhouseChip'
+export type {
+  GreenhouseChipKind,
+  GreenhouseChipProps,
+  GreenhouseChipSize,
+  GreenhouseChipTone,
+  GreenhouseChipVariant
+} from './GreenhouseChip'
+export { default as GreenhouseKpiDelta } from './GreenhouseKpiDelta'
+export type {
+  GreenhouseKpiDeltaDirection,
+  GreenhouseKpiDeltaProps,
+  GreenhouseKpiDeltaSize,
+  GreenhouseKpiDeltaVariant
+} from './GreenhouseKpiDelta'
+export { default as GreenhouseStatusDot } from './GreenhouseStatusDot'
+export type {
+  GreenhouseStatusDotProps,
+  GreenhouseStatusDotSize,
+  GreenhouseStatusDotTone
+} from './GreenhouseStatusDot'
+export { default as GreenhouseCommandFeedback } from './GreenhouseCommandFeedback'
+export type {
+  GreenhouseCommandFeedbackProps,
+  GreenhouseCommandFeedbackTone
+} from './GreenhouseCommandFeedback'
+export { default as GreenhouseStateTransition } from './GreenhouseStateTransition'
+export type {
+  GreenhouseStateTransitionProps,
+  GreenhouseStateTransitionTone,
+  GreenhouseStateTransitionVariant
+} from './GreenhouseStateTransition'
+export { default as GreenhouseInlineValidation } from './GreenhouseInlineValidation'
+export type {
+  GreenhouseInlineValidationProps,
+  GreenhouseInlineValidationState,
+  GreenhouseInlineValidationVariant
+} from './GreenhouseInlineValidation'
+export { default as GreenhouseFieldProvenancePeek } from './GreenhouseFieldProvenancePeek'
+export type {
+  GreenhouseFieldProvenanceConfidence,
+  GreenhouseFieldProvenanceFreshness,
+  GreenhouseFieldProvenancePeekProps,
+  GreenhouseFieldProvenanceSource,
+  GreenhouseFieldProvenanceVariant
+} from './GreenhouseFieldProvenancePeek'
+export { default as GreenhouseStepperProgressMicro } from './GreenhouseStepperProgressMicro'
+export type {
+  GreenhouseStepperProgressMicroProps,
+  GreenhouseStepperProgressState,
+  GreenhouseStepperProgressStep,
+  GreenhouseStepperProgressVariant
+} from './GreenhouseStepperProgressMicro'
+export { default as GreenhouseEvidenceAttachmentDropzone } from './GreenhouseEvidenceAttachmentDropzone'
+export type {
+  GreenhouseEvidenceAttachmentDropzoneProps,
+  GreenhouseEvidenceAttachmentState,
+  GreenhouseEvidenceAttachmentVariant
+} from './GreenhouseEvidenceAttachmentDropzone'
+export { default as GreenhouseInlineDecisionPrompt } from './GreenhouseInlineDecisionPrompt'
+export type {
+  GreenhouseInlineDecisionPromptProps,
+  GreenhouseInlineDecisionState,
+  GreenhouseInlineDecisionTone,
+  GreenhouseInlineDecisionVariant
+} from './GreenhouseInlineDecisionPrompt'
 export { default as MarginHealthChip } from './MarginHealthChip'
 export type {
   MarginClassification,
@@ -20,6 +110,32 @@ export type {
 } from './TotalsLadder'
 export { default as InlineNumericEditor } from './InlineNumericEditor'
 export type { InlineNumericEditorProps, InlineNumericEditorCurrency } from './InlineNumericEditor'
+
+// TASK-1033 — Greenhouse Floating Surface primitive (anchored contextual UI over
+// @floating-ui/react). Product views consume this instead of importing the
+// positioning engine directly. ADR: GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md
+export { default as GreenhouseFloatingSurface } from './GreenhouseFloatingSurface'
+export type {
+  GreenhouseFloatingSurfaceAnchorProps,
+  GreenhouseFloatingSurfaceContentProps,
+  GreenhouseFloatingSurfaceProps
+} from './GreenhouseFloatingSurface'
+export {
+  DEFAULT_FLOATING_SURFACE_VARIANT,
+  FLOATING_SURFACE_VARIANTS,
+  FLOATING_SURFACE_VARIANT_CONFIG,
+  getFloatingSurfaceVariantConfig,
+  resolveFloatingSurfaceVariant
+} from './floating-surface-controller'
+export type {
+  GreenhouseFloatingSurfaceDensity,
+  GreenhouseFloatingSurfaceInteraction,
+  GreenhouseFloatingSurfaceKind,
+  GreenhouseFloatingSurfaceMotion,
+  GreenhouseFloatingSurfaceRole,
+  GreenhouseFloatingSurfaceVariant,
+  GreenhouseFloatingSurfaceVariantConfig
+} from './floating-surface-controller'
 
 // TASK-498 — Sprint 3 primitives extraction (Quote Builder generalization)
 export { default as EntitySummaryDock } from './EntitySummaryDock'
@@ -48,9 +164,125 @@ export type {
   OperationalSignalListProps,
   OperationalSignalTone
 } from './OperationalSignalList'
+export { default as AdaptiveSidecarLayout } from './AdaptiveSidecarLayout'
+export type { AdaptiveSidecarLayoutProps } from './AdaptiveSidecarLayout'
+export { default as ContextualSidecar } from './ContextualSidecar'
+export type {
+  ContextualSidecarChrome,
+  ContextualSidecarProps,
+  ContextualSidecarState,
+  ContextualSidecarVariant
+} from './ContextualSidecar'
+export {
+  ContextualSidecarComparisonRows,
+  ContextualSidecarMetricStrip,
+  ContextualSidecarProgress,
+  ContextualSidecarRunbookSteps,
+  ContextualSidecarSection,
+  ContextualSidecarSignal,
+  ContextualSidecarTimeline
+} from './ContextualSidecarBlocks'
+export type {
+  ContextualSidecarComparisonRow,
+  ContextualSidecarMetric,
+  ContextualSidecarRunbookStep,
+  ContextualSidecarSignalProps,
+  ContextualSidecarTimelineItem
+} from './ContextualSidecarBlocks'
+export { AdaptiveSidecarShellProvider, useAdaptiveSidecarShell } from './adaptive-sidecar-shell-context'
+export type {
+  AdaptiveSidecarShellReflowTarget,
+  AdaptiveSidecarShellReservation
+} from './adaptive-sidecar-shell-context'
+export { default as ShellFloatingActionDock } from './ShellFloatingActionDock'
+export type { ShellFloatingActionDockProps } from './ShellFloatingActionDock'
+export { default as GreenhouseLoadingSurface } from './GreenhouseLoadingSurface'
+export {
+  GreenhouseCheckpointRailLoader,
+  GreenhouseDocumentPipelineLoader,
+  GreenhouseExternalHandoffLoader,
+  GreenhouseInlineActionLoader,
+  GreenhouseNexaReasoningLoader,
+  GreenhousePageSkeletonLoader,
+  GreenhousePanelSkeletonLoader,
+  GreenhouseReconciliationMatchingLoader,
+  GreenhouseSecureActionLoader,
+  GreenhouseTableSkeletonLoader,
+  GreenhouseUploadVerificationLoader,
+  GreenhouseWorkspaceBootLoader
+} from './GreenhouseLoadingSurface'
+export type {
+  GreenhouseNamedLoadingSurfaceProps,
+  GreenhouseLoadingStep,
+  GreenhouseLoadingSurfaceKind,
+  GreenhouseLoadingSurfaceProps,
+  GreenhouseLoadingSurfaceVariant
+} from './GreenhouseLoadingSurface'
+export {
+  buildSidecarSearchParams,
+  canReplaceAdaptiveSidecar,
+  createAdaptiveSidecarEvent,
+  removeSidecarSearchParams,
+  reduceAdaptiveSidecarState,
+  resolveAdaptiveSidecarVariant,
+  resolveAdaptiveSidecarMode
+} from './adaptive-sidecar-controller'
+export type {
+  AdaptiveSidecarControllerAction,
+  AdaptiveSidecarControllerLastAction,
+  AdaptiveSidecarControllerState,
+  AdaptiveSidecarKind,
+  AdaptiveSidecarPreferredMode,
+  AdaptiveSidecarResolvedMode,
+  AdaptiveSidecarSearchParamsInput,
+  AdaptiveSidecarSide,
+  AdaptiveSidecarTelemetryEvent,
+  AdaptiveSidecarTelemetryEventName,
+  AdaptiveSidecarVariant
+} from './adaptive-sidecar-controller'
 
 // Reusable KPI trend card — interactive month-over-month area chart (Recharts):
 // hover tooltip + crosshair, zone-tone semaphore, edge-to-edge line with inset
 // aligned dots/labels, draw-in + hover-lift microinteractions, a11y table.
 export { default as MetricTrendCard } from './MetricTrendCard'
 export type { MetricTrendCardProps, MetricTrendPoint, MetricTrendTone } from './MetricTrendCard'
+export { default as GreenhouseChartCard } from './GreenhouseChartCard'
+export { GREENHOUSE_CHART_CHROME_TOKENS } from './greenhouse-chart-controller'
+export type {
+  GreenhouseChartCardKind,
+  GreenhouseChartCardProps,
+  GreenhouseChartCardVariant,
+  GreenhouseChartDatum,
+  GreenhouseChartTab,
+  GreenhouseChartTone
+} from './GreenhouseChartCard'
+export { default as GreenhouseStackedDistributionChartCard } from './GreenhouseStackedDistributionChartCard'
+export type {
+  GreenhouseStackedDistributionChartCardProps,
+  GreenhouseStackedDistributionKind,
+  GreenhouseStackedDistributionSegment,
+  GreenhouseStackedDistributionTone,
+  GreenhouseStackedDistributionVariant
+} from './GreenhouseStackedDistributionChartCard'
+export { default as GreenhouseMetricBreakdownChartCard } from './GreenhouseMetricBreakdownChartCard'
+export type {
+  GreenhouseMetricBreakdownChartCardKind,
+  GreenhouseMetricBreakdownChartCardProps,
+  GreenhouseMetricBreakdownChartCardVariant,
+  GreenhouseMetricBreakdownDeltaTone,
+  GreenhouseMetricBreakdownMetric,
+  GreenhouseMetricBreakdownPoint,
+  GreenhouseMetricBreakdownTone
+} from './GreenhouseMetricBreakdownChartCard'
+export { default as GreenhouseActivityTimeline } from './GreenhouseActivityTimeline'
+export { GREENHOUSE_ACTIVITY_TIMELINE_TOKENS } from './greenhouse-activity-timeline-controller'
+export type {
+  GreenhouseActivityTimelineAttachment,
+  GreenhouseActivityTimelineAvatar,
+  GreenhouseActivityTimelineItem,
+  GreenhouseActivityTimelineKind,
+  GreenhouseActivityTimelinePerson,
+  GreenhouseActivityTimelineProps,
+  GreenhouseActivityTimelineTone,
+  GreenhouseActivityTimelineVariant
+} from './GreenhouseActivityTimeline'

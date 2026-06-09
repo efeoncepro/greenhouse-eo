@@ -45,7 +45,7 @@ export const GH_PERSON_RELATIONSHIP_DRIFT_RECONCILE = {
     externalCloseDateHelper:
       'ISO YYYY-MM-DD. Útil para casos donde el cierre legal ocurrió en una fecha pasada. Si se omite, se usa hoy.',
     cancelButton: 'Cancelar',
-    cancelHref: '/admin/operations',
+    cancelHref: '/admin/ops-health',
     confirmButton: 'Confirmar reconciliación',
     confirmSaving: 'Reconciliando…'
   },

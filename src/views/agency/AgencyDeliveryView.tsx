@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -22,6 +21,8 @@ import {
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import {
@@ -38,7 +39,6 @@ import tableStyles from '@core/styles/table.module.css'
 import { getMicrocopy } from '@/lib/copy'
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Types ──
 

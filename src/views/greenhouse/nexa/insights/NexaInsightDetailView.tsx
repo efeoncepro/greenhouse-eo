@@ -339,7 +339,7 @@ const NexaInsightDetailView = ({ result, drillId, homeHref }: NexaInsightDetailV
               variant='text'
               color='inherit'
               component={Link}
-              href='/admin/operations'
+              href='/admin/ops-health'
             >
               {GH_NEXA.detail_banner_degraded_cta}
             </Button>
@@ -417,7 +417,7 @@ const NexaInsightDetailView = ({ result, drillId, homeHref }: NexaInsightDetailV
               variant='text'
               color='inherit'
               component={Link}
-              href='/admin/operations'
+              href='/admin/ops-health'
             >
               {GH_NEXA.detail_banner_degraded_cta}
             </Button>

@@ -27,7 +27,7 @@ export default async function AdminServiceSlasPage() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const services = await getServiceList({

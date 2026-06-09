@@ -42,13 +42,12 @@ const LegalProfileSection = ({ title, hint, children }: LegalProfileSectionProps
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             color: 'text.secondary',
-            fontSize: 11
           }}
         >
           {title}
         </Typography>
         {hint ? (
-          <Typography variant='caption' color='text.secondary' sx={{ fontSize: 12 }}>
+          <Typography variant='caption' color='text.secondary'>
             {hint}
           </Typography>
         ) : null}

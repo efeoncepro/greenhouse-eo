@@ -1,0 +1,470 @@
+# TASK-1049 — Greenhouse elevation / shadow token system
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `complete`
+- Priority: `P2`
+- Impact: `Alto`
+- Effort: `Medio`
+- Type: `implementation`
+- Epic: `none`
+- Status real: `Implementacion`
+- Rank: `TBD`
+- Domain: `ui|platform|design-system|accessibility`
+- Blocked by: `none (ADR aceptada 2026-06-07)`
+- Branch: `develop (operador: mantenerse en develop, sin branch)`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+Crear el sistema semantico Greenhouse de elevacion/sombra para que primitives y overlays no dependan de indices MUI (`elevation={6}` / `theme.shadows[n]`) ni de sombras Vuexy escogidas a ojo. El primer consumidor obligatorio es `GreenhouseFloatingSurface`, que debe dejar de usar `Paper elevation={6}` y consumir un token semantico `floating` con evidencia GVC before/after.
+
+## Delta 2026-06-07 — Implementación completa (slices 0-5)
+
+SHIPPED en `develop` (local-first, sin branch por instrucción del operador). ADR **Accepted**.
+
+- **Slice 0** — ADR Proposed→Accepted, lifecycle in-progress, DECISIONS_INDEX + README. Open Questions resueltas: derivación propia sobre canal `var(--mui-mainColorChannels-${mode}Shadow)` (NO `customShadows.md/lg`); factory mode-aware + border obligatorio forced-colors; runtime real `light`/`dark` (no existe `darkSemi`).
+- **Slice 1** — SoT `src/components/theme/elevation-tokens.ts` (6 roles, factory mode-aware) + `theme.greenhouseElevation` en `mergedTheme.ts` + augmentation `types.ts` + `render.tsx` (test theme). Tests focal (11) + drift-guard (16, paridad 3-capas). DESIGN.md §Elevation + V1 §6 → roles; numérica = §6.1 legacy.
+- **Slice 2** — `GreenhouseFloatingSurface` `elevation={6}`→`{0}` + `theme.greenhouseElevation.floating`. Test anti-regresión. 6 variants comparten `floating` (sin campo `elevationRole` en controller — restraint; follow-up si un variant lo necesita).
+- **Slice 3** — página viva `/admin/design-system/elevation` (gate `administracion.design_system`, AxisWordmark, 100% tokenizada) + card DesignSystemView + route-reachability. GVC local verde.
+- **Slice 4** — docs: PRIMITIVES.md, HISTORIAL.md (Delta 2026-06-07k), CLAUDE.md invariante, changelog.
+- **Slice 5** — audit `rg`: FloatingSurface migrado ✓; `@core/components/customizer` es Vuexy read-only (legacy allowed). **Follow-up (fuera de scope, no migrado en esta task)**: `InlineNumericEditor.tsx` (`elevation={6}`), `ContextChip.tsx` (`theme.shadows[6]`), `MetricTrendCard.tsx` (`theme.shadows[4]`), `ContextualSidecar.tsx` (`theme.shadows[2]`) → migrar a roles semánticos + evaluar lint rule `greenhouse/no-direct-mui-elevation-in-primitives` (modo error solo después de migrarlos). **✅ CERRADO por TASK-1051 (2026-06-07)**: los 4 migrados (`floating`/`raised`) + lint rule activa en modo `error`.
+- **Gate de cierre**: `pnpm test` (6407 passed, 0 failed) + `pnpm build`. drift 27/27 · floating-surface 24/24 · design:lint 0/0 · route-gate 0 orphans · tsc/eslint 0.
+- **Pendiente menor**: evidencia GVC dark mode explícita (contrato dark cubierto por border obligatorio + tests + factory mode-aware).
+
+## Why This Task Exists
+
+El operador detecto que la sombra actual de la primitive Floating Surface se siente anticuada. El discovery confirmo que el problema no es solo estetico: Greenhouse tiene runtime shadows (`theme.shadows`, `theme.customShadows`) pero no tiene una fuente semantica de elevacion propia. La documentacion actual habla de indices (`boxShadow: 6`) y no de intencion (`floating`, `overlay`, `modal`), lo que deja demasiada libertad interpretativa a agentes y futuros implementadores.
+
+Esta task convierte el hallazgo en un contrato operativo: token runtime, docs, tests y primer cutover visual controlado. No rediseña todas las sombras del portal.
+
+## Goal
+
+- Definir un SoT runtime de elevacion Greenhouse con roles semanticos pequenos y estables.
+- Migrar `GreenhouseFloatingSurface` desde `Paper elevation={6}` a `Paper elevation={0}` + token semantico.
+- Documentar el contrato en `DESIGN.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md` y UI Platform.
+- Crear una **pagina viva de design system** (`/admin/design-system/elevation`) que documente los tokens de shadow/elevacion (specimen vivo por rol, light/dark, nota forced-colors), espejo de las paginas de typography y motion.
+- Verificar con tests + GVC desktop/mobile que Floating Surface se ve enterprise y mantiene a11y/behavior.
+- Dejar claro que `theme.shadows[n]` y `customShadows` son infraestructura/compat, no la API semantica para primitives nuevas.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     "Que necesito entender antes de planificar?"
+     El agente lee cada doc referenciado aqui. Si un doc no
+     existe en el repo, reporta antes de continuar.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1.md`
+- `docs/audits/design-tokens/ELEVATION_SHADOW_TOKEN_AUDIT_2026-06-07.md`
+- `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`
+- `docs/architecture/GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md`
+- `docs/architecture/GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`
+- `docs/architecture/ui-platform/PRIMITIVES.md`
+- `docs/architecture/ui-platform/STACK.md`
+- `DESIGN.md`
+
+Reglas obligatorias:
+
+- Esta task NO puede empezar runtime hasta que el operador acepte o ajuste la ADR `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1`.
+- No modificar `src/@core/theme/shadows.ts` ni `src/@core/theme/customShadows.ts` salvo que el plan aprobado demuestre que es estrictamente necesario. Por defecto son infraestructura heredada.
+- No introducir `boxShadow` literal en `GreenhouseFloatingSurface` ni en views de producto.
+- No usar `Paper elevation={n}` en primitives Greenhouse nuevas o modificadas; usar token semantico.
+- Si el cambio toca UI visible, usar skills UI aplicables y GVC en loop antes de declarar cierre.
+
+## Normative Docs
+
+- `docs/audits/design-tokens/ELEVATION_SHADOW_TOKEN_AUDIT_2026-06-07.md`
+- `docs/architecture/DECISIONS_INDEX.md` — cuando la ADR pase de `Proposed` a `Accepted`, sincronizar el estado.
+- `docs/tasks/TASK_PROCESS.md`
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- Aceptacion explicita del operador sobre la ADR propuesta.
+- Runtime existente de TASK-1033: `GreenhouseFloatingSurface` + lab `/admin/design-system/floating-surfaces` + scenario GVC `floating-surface-primitives`.
+- Contexto de TASK-1034: AXIS palette adoption tiene neutrales/shadows pendientes; esta task debe coordinarse con ese backlog, no duplicarlo.
+
+### Blocks / Impacts
+
+- Polishing visual de `GreenhouseFloatingSurface`.
+- Futuras primitives overlay/floating/modal (`commandPreview`, docks, inline editors, validation bubbles).
+- Documentacion de tokens de sombra en `DESIGN.md` y `GREENHOUSE_DESIGN_TOKENS_V1.md`.
+- Potencial follow-up de lint/gate para no usar `elevation={n}` en primitives Greenhouse.
+
+### Files owned
+
+- `src/components/theme/elevation-tokens.ts` (nuevo SoT esperado)
+- `src/components/theme/__tests__/elevation-tokens.test.ts` o ubicacion equivalente
+- `src/components/theme/elevation-drift.test.ts` o equivalente (drift-guard 3-capas, espejo de `typography-drift.test.ts`)
+- `src/components/greenhouse/primitives/GreenhouseFloatingSurface.tsx`
+- `src/components/greenhouse/primitives/floating-surface-controller.ts`
+- `src/components/greenhouse/primitives/__tests__/GreenhouseFloatingSurface.test.tsx`
+- `src/views/greenhouse/admin/design-system/floating-surfaces/**` si el lab necesita specimen/legend
+- `src/app/(dashboard)/admin/design-system/elevation/**` (nueva pagina viva de tokens de elevacion)
+- `src/views/greenhouse/admin/design-system/elevation/**` (view de la pagina)
+- migracion seed de `VIEW_REGISTRY` si la pagina requiere viewCode nuevo (gobernanza TASK-827)
+- entrada de nav / indice design system para route-reachability (TASK-982)
+- `DESIGN.md`
+- `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`
+- `docs/architecture/GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1.md`
+- `docs/architecture/DECISIONS_INDEX.md`
+- `docs/architecture/ui-platform/PRIMITIVES.md`
+- `docs/architecture/ui-platform/HISTORIAL.md`
+- `docs/tasks/to-do/TASK-1049-greenhouse-elevation-shadow-token-system.md`
+- `Handoff.md` y `changelog.md` al cierre si la implementacion se ejecuta
+
+## Current Repo State
+
+### Already exists
+
+- `src/@core/theme/shadows.ts`: escala MUI 0..24.
+- `src/@core/theme/customShadows.ts`: sombras Vuexy `xs/sm/md/lg/xl` + coloreadas.
+- `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` §6: tabla numerica de sombras.
+- `DESIGN.md` §Elevation & Depth: criterio general "flat-to-soft".
+- `docs/architecture/ui-platform/STACK.md`: prohibicion de `elevation > 0` en cards internas.
+- `GreenhouseFloatingSurface` runtime con six variants oficiales y GVC hooks.
+- Lab interno `/admin/design-system/floating-surfaces` y scenario GVC `floating-surface-primitives`.
+
+### Gap
+
+- No existe `GreenhouseElevationLevel` ni token semantico de elevacion.
+- `GreenhouseFloatingSurface` usa `Paper elevation={6}`.
+- `theme.shadows[n]` esta documentado como token, aunque es infraestructura numerica.
+- `customShadows` esta mencionado pero no gobernado como rol semantico.
+- No hay drift guard ni specimen vivo especifico para elevation tokens.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     "Que construyo exactamente, slice por slice?"
+     El agente solo lee esta zona DESPUES de que el plan este
+     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 0 — ADR acceptance + runtime recalibration
+
+- Presentar la ADR propuesta al operador y registrar la decision: accepted as-is, accepted with edits, or rejected.
+- Si se acepta con cambios, actualizar `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1.md` antes de tocar runtime.
+- Actualizar `docs/architecture/DECISIONS_INDEX.md` si el estado pasa a `Accepted`.
+- Revalidar el runtime exacto antes de implementar:
+  - `GreenhouseFloatingSurface.tsx`
+  - `floating-surface-controller.ts`
+  - `src/@core/theme/shadows.ts`
+  - `src/@core/theme/customShadows.ts`
+  - lab/scenario `floating-surface-primitives`
+
+### Slice 1 — Runtime SoT de elevation tokens
+
+- Crear `src/components/theme/elevation-tokens.ts` o path equivalente aprobado.
+- Definir union estable:
+  - `none`
+  - `raised`
+  - `floating`
+  - `overlay`
+  - `modal`
+  - `overflow` (reservado — ver regla abajo)
+- **El SoT fluye por el theme, NO por import directo en primitives** (precedente canonico de tipografia: `typography-tokens.ts` es SoT, `mergedTheme.ts` deriva, los consumers leen `theme.*`). Decidir en Plan Mode el mecanismo de surfacing — `theme.greenhouseElevation.*` namespace o mapeo intencional sobre `customShadows` — pero un primitive NUNCA debe `import`ar `elevation-tokens.ts` para leer un valor crudo. Razon dura: `prefers-color-scheme` y el segundo theme `darkSemi` se resuelven en la capa de theme; un objeto importado directo queda fuera del switch de tema.
+- **`overflow` nace reservado: union + metadata + docs, pero SIN valor runtime emitido** hasta que un consumidor real (sticky/table edge) lo use. Regla canonica "NUNCA un token sin consumidor" (mismo criterio que "no display tier sin consumidor" de tipografia). Esto reduce el risk de role table inflada.
+- Cada token (de los roles con consumidor) debe declarar al menos:
+  - `boxShadow`
+  - `borderColor` o politica de border cuando aplique — **obligatorio para floating/overlay/modal**: el border (no la sombra) carga la separacion bajo `forced-colors`
+  - `surfaceColor` o politica de background cuando aplique
+  - intended usage metadata para docs/tests
+- Los valores deben ser light/dark aware (light + `darkSemi`).
+- Los valores pueden derivar de canales MUI/Vuexy (`theme.palette`, `alpha`, CSS vars de shadow channel), pero el consumidor debe ver el rol semantico, no el indice MUI. NO introducir OKLCH/`color-mix`/P3 (overlay modern-ui Greenhouse: sRGB + opacities).
+- **Direccion visual de partida** (calibrar en GVC, Slice 3): receta convergente 2026 (GitHub Primer, shadcn/ui, Linear, Vercel Geist) = doble capa suave + hairline ring 1px, NO un drop pesado de una sola capa. Ningun rol puede superar `0 8px 24px rgba(0,0,0,0.1)` (umbral "dated").
+- Agregar tests focales que verifiquen:
+  - todos los roles existen en la union;
+  - `none.boxShadow === 'none'` o equivalente;
+  - `floating` no referencia `theme.shadows[6]` como contrato directo;
+  - `floating`/`overlay`/`modal` declaran `borderColor` no vacio (separacion forced-colors);
+  - dark mode (`darkSemi`) tiene valores definidos;
+  - metadata de uso no esta vacia;
+  - `overflow` esta declarado en la union/metadata pero no emite valor runtime hasta tener consumidor.
+- **Agregar drift-guard de paridad 3-capas** (espejo de `typography-drift.test.ts`): un test que falle CI si divergen `runtime (theme) ≡ SoT ≡ DESIGN.md §Elevation ≡ V1 §6`. Los tests focales NO sustituyen este guard — la paridad 3-capas es no-negociable (`design-system-governance` regla #1). Puede cerrarse junto con Slice 4 (cuando DESIGN.md/V1 tengan la tabla), pero el guard se escribe en este slice.
+
+### Slice 2 — Floating Surface cutover
+
+- Cambiar `GreenhouseFloatingSurface` a `Paper elevation={0}`.
+- Aplicar `boxShadow`, `borderColor` y `backgroundColor` desde el token semantico.
+- El default de la primitive debe usar `floating`.
+- Si alguna variant requiere `overlay` u otro rol, debe quedar declarado en `floating-surface-controller.ts` con test.
+- Mantener intactos:
+  - API publica;
+  - roles/a11y por variant;
+  - open controlled/uncontrolled;
+  - focus manager;
+  - dismiss behavior;
+  - GVC data hooks.
+- Actualizar tests existentes para cubrir el nuevo contrato.
+
+### Slice 3 — Design system page + lab + GVC visual calibration
+
+- **Crear pagina viva dedicada `/admin/design-system/elevation`** (entregable requerido, NO follow-up), espejo de las paginas de typography (`/admin/design-system/typography/mockup`) y motion (`/admin/design-system/motion`):
+  - render vivo de cada rol (`none`, `raised`, `floating`, `overlay`, `modal`; `overflow` mostrado como reservado) leyendo el SoT desde el theme — NUNCA valores route-locales hardcodeados;
+  - cada specimen muestra: nombre del rol, boxShadow resuelto, border, uso permitido y prohibido (mismo contenido que la tabla Role semantics);
+  - light + `darkSemi` lado a lado;
+  - nota visible de la regla `forced-colors` (border carga la separacion);
+  - **INTERNA**: gate `administracion.design_system` (route_group `internal`, NUNCA `client_*`) + redirect defensivo si `tenantType==='client'`, igual que la pagina AXIS/typography;
+  - **alcanzable por nav** (route-reachability TASK-982) — agregar entrada de nav o link desde el indice del design system; NO ruta huerfana;
+  - si la pagina necesita un viewCode nuevo en `VIEW_REGISTRY`, acompañar con migracion seed en el mismo PR (gobernanza TASK-827). Por defecto reusa `administracion.design_system` — verificar en Plan Mode.
+- Actualizar `/admin/design-system/floating-surfaces` para mostrar que el surface usa elevation semantica (consumidor real, complementa la pagina de tokens).
+- Ejecutar GVC:
+  - desktop;
+  - mobile;
+  - pagina `/admin/design-system/elevation` (specimen de todos los roles, light + dark);
+  - near-edge/collision scenario (floating-surfaces);
+  - keyboard open/close si el scenario ya lo cubre.
+  - dark mode (`darkSemi`) si el scenario lo cubre;
+  - `forced-colors`/high-contrast: verificar (al menos manualmente, emulando en DevTools) que con `box-shadow` removido el surface sigue separado por el border.
+- Revisar frames PNG manualmente y ajustar hasta que:
+  - la sombra se vea sobria/moderna (doble capa suave + ring 1px, no drop pesado);
+  - el borde no se vea pesado pero SI sostenga la separacion sin sombra;
+  - dark mode no pierda separacion;
+  - `forced-colors` no funde el surface con el fondo;
+  - tooltips/action menus no parezcan dialogs.
+
+### Slice 4 — Documentation sync
+
+- `DESIGN.md`:
+  - reemplazar criterio generico por regla compacta con roles semanticos;
+  - dejar claro que cards internas siguen flat/outlined y que `raised` NO es escape hatch para re-elevar cards;
+  - declarar que popovers/dialogs/docks usan roles, no numeros;
+  - declarar la regla `forced-colors`: el border carga la separacion, la sombra es enhancement.
+- `GREENHOUSE_DESIGN_TOKENS_V1.md` §6:
+  - mover tabla principal a roles semanticos;
+  - conservar `theme.shadows`/`customShadows` como legacy/compat explanation;
+  - declarar primer consumidor `GreenhouseFloatingSurface`.
+- **Drift-guard:** confirmar que el test de paridad 3-capas (Slice 1) queda verde con la tabla final de DESIGN.md/V1 — runtime ≡ SoT ≡ DESIGN.md §Elevation ≡ V1 §6. Si DESIGN.md entra al contrato lint (TASK-764), validar con `pnpm design:lint` 0/0.
+- `ui-platform/PRIMITIVES.md`:
+  - actualizar Floating Surface para indicar elevation token.
+- `ui-platform/HISTORIAL.md`:
+  - agregar delta append-only de la adopcion.
+- `DECISIONS_INDEX.md`:
+  - reflejar estado final de la ADR.
+
+### Slice 5 — Follow-up audit / guardrail decision
+
+- Hacer `rg` de usos directos de:
+  - `elevation={`
+  - `theme.shadows[`
+  - `boxShadow:`
+  - `customShadows`
+- No migrar todo automaticamente.
+- Clasificar hallazgos:
+  - allowed legacy / MUI infra;
+  - should migrate to semantic elevation;
+  - unrelated one-off;
+  - candidate lint rule.
+- Si el uso directo en primitives Greenhouse persiste, crear follow-up o extender lint rule con scope `src/components/greenhouse/primitives/**`.
+
+## Out of Scope
+
+- Redisenar todas las sombras del portal.
+- Reescribir `src/@core/theme/shadows.ts` o `src/@core/theme/customShadows.ts` como parte obligatoria.
+- Migrar todos los `boxShadow` existentes en views/product surfaces.
+- Cambiar z-index, collision, focus, portal, placement o behavior de Floating UI.
+- Crear variants visuales nuevas de Floating Surface solo por sombra.
+- Cambiar la paleta AXIS o neutrales fuera de lo necesario para elevation tokens.
+- Cambiar Dialog/Drawer global sin evidencia y scope aprobado.
+- Hacer deploy/rollout productivo automatico sin aprobacion humana.
+
+## Detailed Spec
+
+### Token contract
+
+El token debe ser semantico y legible por agentes. Ejemplo de shape aceptable:
+
+```ts
+export type GreenhouseElevationLevel =
+  | 'none'
+  | 'raised'
+  | 'floating'
+  | 'overlay'
+  | 'modal'
+  | 'overflow'
+
+export type GreenhouseElevationToken = {
+  level: GreenhouseElevationLevel
+  boxShadow: string
+  borderColor?: string
+  surfaceColor?: string
+  intendedUse: string
+}
+```
+
+El shape exacto puede cambiar si el plan lo justifica, pero NO puede perder:
+
+- union tipada de niveles;
+- metadata o docs vinculables;
+- resolucion light/dark (`darkSemi`);
+- consumo desde Floating Surface **a traves del theme**, sin indices MUI directos y sin `import` del modulo SoT en el primitive;
+- `borderColor` real (no shadow ring) en floating/overlay/modal para que la separacion sobreviva `forced-colors`.
+
+### Role semantics
+
+| Role | Debe verse como | Uso permitido | Prohibido |
+|---|---|---|---|
+| `none` | plano, separado por border/spacing | internal cards, table shells, panels | popovers/menus |
+| `raised` | lift suave local | hover/selection, tile interactivo | resting state masivo en dashboards (NO es escape hatch para re-elevar cards) |
+| `floating` | surface anclada, transitoria, clara pero sobria | `GreenhouseFloatingSurface` default | dialogs/destructive decisions |
+| `overlay` | capa superior no modal | command preview, floating dock | drawers full-height |
+| `modal` | stack blocking claro | Dialog/temporary Drawer | anchored popovers |
+| `overflow` | affordance de scroll/sticky edge — **reservado en V1, sin valor runtime hasta tener consumidor** | table edge shadows (futuro) | container depth |
+
+### Floating Surface acceptance detail
+
+La diff esperada en `GreenhouseFloatingSurface` debe cumplir:
+
+- `elevation={6}` desaparece.
+- `elevation={0}` queda explicito o se omite si el wrapper no genera sombra MUI.
+- `boxShadow` se resuelve desde el token.
+- `border` conserva contraste sobrio.
+- `surfaceSx` sigue pudiendo extender, pero no debe ser necesario para el chrome base.
+
+### Visual standard
+
+El resultado debe parecer enterprise 2026. Direccion de partida (resuelta por modern-ui, calibrar exactos en GVC):
+
+- **Receta convergente 2026** (GitHub Primer, shadcn/ui, Linear, Vercel Geist): doble capa suave + hairline ring 1px. Punto de partida `floating` = `box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06)` + 1px border/ring que carga la separacion.
+- **Techo duro anti-dated:** ningun rol supera `0 8px 24px rgba(0,0,0,0.1)`. `floating` queda claramente debajo; `modal` puede acercarse pero sin volver al drop pesado de `theme.shadows[6/8]`.
+- sombra mas difusa/sutil, sin glow pesado ni capa unica pesada;
+- borde fino para separacion en light/dark — y unico mecanismo bajo `forced-colors`;
+- surface limpia y legible;
+- sin efecto "card flotando brillante";
+- sin capas de sombras acumuladas cuando el popover vive sobre cards.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+Slice 0 (ADR accepted) -> Slice 1 (SoT tokens) -> Slice 2 (Floating Surface cutover) -> Slice 3 (GVC calibration) -> Slice 4 (docs) -> Slice 5 (follow-up classification).
+
+Slice 2 no puede correr antes de Slice 1. Slice 4 no puede cerrar antes de que Slice 2/3 definan el resultado real. Slice 5 no puede convertirse en repo-wide migration sin nueva aprobacion.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| La nueva sombra queda demasiado plana y pierde separacion en tablas densas | UI / accessibility | medium | GVC near-edge + dark/light; combinar border/surface con shadow | revision visual GVC |
+| La nueva sombra queda demasiado fuerte y compite con Dialog/Dock | UI / platform | medium | roles `floating` vs `overlay` vs `modal` pequenos y testeados | revision visual GVC |
+| Dark mode pierde jerarquia porque la sombra no se percibe | UI / dark mode | medium | token incluye border/surface guidance, no solo shadow | GVC dark mode si disponible |
+| `forced-colors`/high-contrast funde el surface (browser elimina box-shadow) | UI / accessibility | medium | border real (no shadow ring) carga la separacion en floating/overlay/modal | emulacion forced-colors DevTools + test borderColor no vacio |
+| Agentes siguen usando `theme.shadows[n]` en primitives nuevas | UI governance | medium | docs + follow-up lint candidate | rg audit / lint future |
+| Scope creep a migracion global de sombras | delivery | high | Slice 5 solo clasifica; migraciones nuevas requieren task | task scope review |
+| Drift docs/runtime | design system | low | docs + tests + `design:lint` + closure-check | `pnpm design:lint`, docs closure |
+
+### Feature flags / cutover
+
+- Sin feature flag por defecto — cambio visual acotado a primitive compartida con GVC y revert PR.
+- Si durante Plan Mode se detecta que `GreenhouseFloatingSurface` ya esta muy desplegada en superficies criticas, el agente puede proponer flag local o variant opt-in, pero debe justificarlo antes de implementar.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1 | revertir modulo de tokens y tests | <5 min | si |
+| Slice 2 | revertir diff de `GreenhouseFloatingSurface` a `elevation={6}` | <5 min | si |
+| Slice 3 | revertir pagina `/admin/design-system/elevation` + lab/specimen updates (+ migracion seed si la hubo) | <10 min | si |
+| Slice 4 | revertir docs o marcar ADR superseded/proposed nuevamente | <10 min | si |
+| Slice 5 | N/A, solo clasificacion | N/A | si |
+
+### Production verification sequence
+
+1. Local: tests focales de elevation + Floating Surface.
+2. Local: `pnpm design:lint`.
+3. Local: `pnpm lint` o scope lint equivalente.
+4. Local: `pnpm tsc --noEmit`.
+5. Local GVC: `pnpm fe:capture floating-surface-primitives --env=local`.
+6. Leer frames PNG y dossier; ajustar y recapturar hasta resultado enterprise.
+7. Si se mergea a staging, repetir GVC staging cuando el target este disponible.
+
+### Out-of-band coordination required
+
+- Aprobacion visual del operador para el before/after de Floating Surface.
+- No requiere GCP/Azure/Vercel secrets ni integraciones externas.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     "Como compruebo que termine y que actualizo?"
+     El agente ejecuta estos checks al cerrar cada slice y
+     al cerrar la task completa.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] ADR `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1` aceptada o ajustada por el operador antes de runtime.
+- [ ] Existe SoT runtime de elevation tokens con roles `none`, `raised`, `floating`, `overlay`, `modal`, `overflow` (este ultimo reservado, sin valor runtime hasta tener consumidor).
+- [ ] El token fluye por el theme; ningun primitive `import`a `elevation-tokens.ts` para leer un valor crudo.
+- [ ] `floating`/`overlay`/`modal` declaran `borderColor` real; la separacion sobrevive `forced-colors` (border, no sombra).
+- [ ] Tests focales cubren existencia, light/`darkSemi`, borderColor en overlays, `overflow` reservado y uso metadata de tokens.
+- [ ] Drift-guard de paridad 3-capas (runtime ≡ SoT ≡ DESIGN.md ≡ V1) verde en CI.
+- [ ] `GreenhouseFloatingSurface` ya no usa `Paper elevation={6}` ni `theme.shadows[n]` directo.
+- [ ] Floating Surface consume `floating` semantic elevation por defecto.
+- [ ] Ninguna sombra del sistema supera `0 8px 24px rgba(0,0,0,0.1)` (techo anti-dated).
+- [ ] Existe pagina viva `/admin/design-system/elevation` que documenta todos los roles de shadow/elevacion (specimen vivo desde el theme, light/dark, nota forced-colors), INTERNA (gate `administracion.design_system`, nunca client) y alcanzable por nav (TASK-982).
+- [ ] Si la pagina requiere viewCode nuevo, la migracion seed `VIEW_REGISTRY` esta en el mismo PR (TASK-827).
+- [ ] Lab `/admin/design-system/floating-surfaces` refleja el contrato o specimen vivo.
+- [ ] GVC desktop + mobile revisado manualmente; resultado aceptado visualmente.
+- [ ] `DESIGN.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md`, `ui-platform/PRIMITIVES.md`, `ui-platform/HISTORIAL.md` sincronizados.
+- [ ] `DECISIONS_INDEX.md` refleja estado final de la ADR.
+- [ ] Audit de usos directos de sombra queda clasificado sin migracion global implicita.
+
+## Verification
+
+- `pnpm ops:lint --changed`
+- `pnpm task:lint --task TASK-1049`
+- `pnpm design:lint`
+- `pnpm lint`
+- `pnpm tsc --noEmit`
+- test focal nuevo de elevation tokens
+- drift-guard de paridad 3-capas (runtime ≡ SoT ≡ DESIGN.md ≡ V1) — espejo de `typography-drift.test.ts`
+- test focal existente/actualizado de `GreenhouseFloatingSurface`
+- `pnpm fe:capture floating-surface-primitives --env=local`
+- `pnpm docs:closure-check`
+
+## Closing Protocol
+
+- [ ] `Lifecycle` sincronizado con estado real.
+- [ ] Archivo movido a carpeta correcta si pasa a `in-progress` o `complete`.
+- [ ] `docs/tasks/README.md` sincronizado.
+- [ ] `docs/tasks/TASK_ID_REGISTRY.md` sincronizado.
+- [ ] `docs/architecture/DECISIONS_INDEX.md` sincronizado con estado final de ADR.
+- [ ] `Handoff.md` actualizado con evidencia GVC y cualquier deuda residual.
+- [ ] `changelog.md` actualizado si hubo runtime visual change.
+- [ ] Si queda follow-up lint/migration, crear task o dejar enlace explicito.
+
+## Follow-ups
+
+- Posible lint rule `greenhouse/no-direct-mui-elevation-in-primitives` si el audit Slice 5 encuentra uso directo repetido.
+- Posible migracion de Dialog/Drawer/Dock a tokens `modal`/`overlay` cuando exista evidencia.
+- (La pagina viva `/admin/design-system/elevation` paso a scope en Slice 3 — ya no es follow-up.)
+
+## Open Questions
+
+- ~~¿`floating` debe ser sombra de una capa o composicion doble sutil?~~ **RESUELTO (modern-ui):** doble capa suave + hairline ring 1px (receta convergente 2026). Sigue calibrable en GVC, pero arranca de esa direccion, no a ciegas. Ver Detailed Spec → Visual standard.
+- ¿El token `floating` V1 debe derivar internamente de `customShadows.md/lg` o usar una composicion propia con `alpha(theme.palette.common.black, ...)`? Resolver en Plan Mode con GVC. Restriccion dura: sRGB + opacities (NO OKLCH/`color-mix`/P3, overlay modern-ui Greenhouse). Preferir alpha sobre canal de shadow AXIS-aware si existe, para alinear con TASK-1034.
+- ¿Dark mode requiere token separado por surface/border mas que por shadow? Resolver en visual calibration. Nota: bajo `forced-colors` el border ya es obligatorio independientemente del modo.
+- ~~¿`overflow` entra en V1 runtime?~~ **RESUELTO:** reservado en V1 — declarado en union/metadata/docs, SIN valor runtime emitido hasta que un sticky/table edge real lo consuma (regla "no token sin consumidor"). Ver Slice 1.
+

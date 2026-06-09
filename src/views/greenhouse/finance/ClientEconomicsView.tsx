@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import { toast } from 'sonner'
 
@@ -35,6 +34,8 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -48,7 +49,6 @@ const TASK407_ARIA_GRAFICO_DE_EVOLUCION_MARGEN_BRUTO_PROMEDIO_Y_MARGEN_NETO_P = 
 
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 // ---------------------------------------------------------------------------
 // Types

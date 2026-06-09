@@ -23,7 +23,7 @@ const PaymentOrdersPage = async () => {
   const hasAccess = hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <PaymentOrdersView />

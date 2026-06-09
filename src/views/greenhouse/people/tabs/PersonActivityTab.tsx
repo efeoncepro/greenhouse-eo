@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -16,6 +15,8 @@ import Stack from '@mui/material/Stack'
 import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import NexaInsightsBlock from '@/components/greenhouse/NexaInsightsBlock'
@@ -25,7 +26,8 @@ import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import { MetricTrendCard, type MetricTrendPoint } from '@/components/greenhouse/primitives'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
-import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase, getMetricById, getThresholdZone } from '@/lib/ico-engine/metric-registry'
+import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, type CscPhase, getMetricById, getThresholdZone } from '@/lib/ico-engine/metric-registry'
+import { CSC_CHART_COLORS } from '@/components/greenhouse/charts/csc-chart-colors'
 import type { MemberNexaInsightsPayload } from '@/lib/ico-engine/ai/llm-types'
 import type { IcoMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
 import type { PersonIntelligenceSnapshot } from '@/lib/person-intelligence/types'
@@ -35,7 +37,6 @@ const TASK407_ARIA_RADAR_DE_SALUD_OPERATIVA_PERSONAL = "Radar de salud operativa
 
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Constants ─────────────────────────────────────────────────────────
 

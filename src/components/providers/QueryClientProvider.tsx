@@ -5,6 +5,9 @@ import { useState, type ReactNode } from 'react'
 import { QueryClient, QueryClientProvider as TanstackQueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
+const enableReactQueryDevtools =
+  process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_GREENHOUSE_REACT_QUERY_DEVTOOLS === '1'
+
 /**
  * TASK-513 — Canonical react-query provider for the Greenhouse portal.
  *
@@ -24,8 +27,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
  *   sin re-instanciarse, y se crea por arbol React (necesario para Next
  *   App Router server boundaries — un QueryClient por arbol cliente).
  *
- * - Devtools cargan solo cuando `NODE_ENV !== 'production'`. En produccion
- *   el componente queda como no-op.
+ * - Devtools son opt-in local (`NEXT_PUBLIC_GREENHOUSE_REACT_QUERY_DEVTOOLS=1`).
+ *   Evita que el chunk de tooling global interfiera con Turbopack/GVC cuando
+ *   estamos auditando surfaces de producto.
  */
 const QueryClientProvider = ({ children }: { children: ReactNode }) => {
   const [client] = useState(
@@ -50,7 +54,7 @@ const QueryClientProvider = ({ children }: { children: ReactNode }) => {
   return (
     <TanstackQueryClientProvider client={client}>
       {children}
-      {process.env.NODE_ENV !== 'production' ? (
+      {enableReactQueryDevtools ? (
         <ReactQueryDevtools initialIsOpen={false} buttonPosition='bottom-left' />
       ) : null}
     </TanstackQueryClientProvider>

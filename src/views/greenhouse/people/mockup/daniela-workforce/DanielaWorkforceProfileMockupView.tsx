@@ -194,15 +194,7 @@ const HeaderPanel = ({
                   Back to people
                 </Button>
                 <Box sx={{ minWidth: 0 }}>
-                  <Typography
-                    variant='h3'
-                    sx={{
-                      mb: 1,
-                      fontSize: { xs: '1.75rem', sm: '2.125rem', lg: undefined },
-                      lineHeight: 1.15,
-                      overflowWrap: 'anywhere'
-                    }}
-                  >
+                  <Typography variant='surfaceHeroTitle' sx={{ mb: 1, overflowWrap: 'anywhere' }}>
                     {danielaProfile.name}
                   </Typography>
                   <Typography

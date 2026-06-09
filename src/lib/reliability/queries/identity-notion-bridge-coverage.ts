@@ -93,7 +93,7 @@ export const getIdentityNotionBridgeCoverageSignal = async (): Promise<Reliabili
 
     const summary =
       total === 0
-        ? `Sin tareas Notion en últimos ${RECENT_WINDOW_DAYS} días. El sync Notion puede estar caído upstream — revisa /admin/operations.`
+        ? `Sin tareas Notion en últimos ${RECENT_WINDOW_DAYS} días. El sync Notion puede estar caído upstream — revisa /admin/ops-health.`
         : severity === 'ok'
           ? `Bridge Notion↔member operativo (${coveragePct}% cobertura, ${resolved}/${total} tareas resueltas).`
           : severity === 'warning'

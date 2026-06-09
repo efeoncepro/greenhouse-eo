@@ -79,7 +79,7 @@ const LegalProfileHero = ({ completed, total, variant }: LegalProfileHeroProps) 
           <Typography
             variant='caption'
             color='text.secondary'
-            sx={{ display: 'block', maxWidth: '56ch', lineHeight: 1.5, fontSize: 13 }}
+            sx={{ display: 'block', maxWidth: '56ch', lineHeight: 1.5}}
           >
             {isComplete
               ? LEGAL_PROFILE_COPY.hero.leadComplete
@@ -104,7 +104,6 @@ const LegalProfileHero = ({ completed, total, variant }: LegalProfileHeroProps) 
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
               color: 'text.secondary',
-              fontSize: 11
             }}
           >
             {LEGAL_PROFILE_COPY.hero.progressLabel}

@@ -27,7 +27,7 @@ export default async function Page() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect('/401')
   }
 
   const initial = await listSignals({ status: 'unresolved', limit: 50 })

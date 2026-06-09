@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
@@ -28,13 +27,14 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
 import type { ApexOptions } from 'apexcharts'
+
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 
 import { getMicrocopy } from '@/lib/copy'
 
@@ -67,11 +67,11 @@ import type {
   LeaveDayPeriod
 } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { leaveStatusConfig, getLeaveTypeConfig, formatDate, formatDateRange, formatTimestamp } from './helpers'
 
 const GREENHOUSE_COPY = getMicrocopy()
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 const initialBackfillForm = {
   startDate: '',
@@ -287,7 +287,6 @@ const MemberAvatar = ({
 )
 
 const HrLeaveView = () => {
-  const theme = useTheme()
   const [tab, setTab] = useState('requests')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -1106,7 +1105,7 @@ const HrLeaveView = () => {
                       }
                     }
                   },
-                  colors: [theme.palette[conf.color]?.main ?? theme.palette.primary.main]
+                  colors: [GH_COLORS.chart.primary]
                 }
 
                 return (

@@ -1,3 +1,16 @@
+// AXIS semantic SoT (TASK-1034 Slice 4). Semantic status maps below derive their
+// hue/text/tint from here — NEVER hardcode the legacy #6ec207/#ff6500/#bb1954.
+// Domain/categorical palettes (cscPhase, service, categories) keep deliberate
+// brand hues and are intentionally NOT migrated.
+import {
+  axisChartCategorical,
+  axisChartCategoricalDark,
+  axisChartDirectional,
+  axisChartDirectionalDark
+} from '@core/theme/axis-chart'
+import { axisSemanticHex } from '@core/theme/axis-semantic'
+import { axisMain, axisOpacity } from '@core/theme/axis-tokens'
+
 export const GH_CLIENT_NAV = {
   dashboard: { label: 'Pulse', subtitle: 'Vista general de tu operacion' },
   projects: { label: 'Proyectos', subtitle: 'Proyectos activos' },
@@ -30,6 +43,8 @@ export const GH_INTERNAL_NAV = {
   adminNotifications: { label: 'Notificaciones', subtitle: 'Sistema de notificaciones in-app y email' },
   adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, proyecciones y freshness del serving' },
   adminUntitledNotionPages: { label: 'Páginas sin título Notion', subtitle: 'Tareas, proyectos y sprints sin título — fix directo en Notion' },
+  adminOrganizationLogos: { label: 'Logos de organizaciones', subtitle: 'Candidatos y cobertura de marca para organizaciones no legales' },
+  adminDesignSystem: { label: 'Design System', subtitle: 'Catálogo interno de AXIS y primitives' },
   adminBusinessLines: { label: 'Business Lines', subtitle: 'Metadata canonica de las lineas de negocio' },
   adminServiceSlas: { label: 'SLA de servicios', subtitle: 'Gobernanza contractual por servicio y cumplimiento' },
   adminIntegrationGovernance: { label: 'Integration Governance', subtitle: 'Registro, taxonomia, readiness y ownership de integraciones nativas' },
@@ -42,6 +57,10 @@ export const GH_INTERNAL_NAV = {
   adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' },
   adminIdentityAccess: { label: 'Identidad y acceso', subtitle: 'Usuarios, roles, vistas y cuentas' },
   adminTeamOps: { label: 'Equipo y operaciones', subtitle: 'Talento, líneas de negocio e instrumentos' }
+} as const
+
+export const GH_PLATFORM_UI = {
+  adaptiveSidecarResizeHandleAria: 'Ajustar ancho del panel contextual'
 } as const
 
 export const GH_PEOPLE_NAV = {
@@ -114,6 +133,7 @@ export const GH_HR_NAV = {
   departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
   workforceActivation: { label: 'Workforce Activation', subtitle: 'Habilitación laboral y blockers' },
   contractors: { label: 'Contratistas', subtitle: 'Engagements, envíos y revisión' },
+  workforceContracts: { label: 'Contratos laborales', subtitle: 'Cartas oferta y contratos bilingües' },
   offboarding: { label: 'Offboarding', subtitle: 'Casos de salida laboral y contractual' },
   leave: { label: 'Permisos', subtitle: 'Solicitudes y saldos de permisos' },
   attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' },
@@ -129,6 +149,8 @@ export const GH_MY_NAV = {
   profile: { label: 'Mi Perfil', subtitle: 'Identidad y datos personales' },
   payroll: { label: 'Mi Nómina', subtitle: 'Liquidaciones y compensación' },
   contractor: { label: 'Mis Servicios Contractor', subtitle: 'Soporte, revisión y pagos' },
+  offers: { label: 'Mis Ofertas', subtitle: 'Cartas oferta y su estado' },
+  contracts: { label: 'Mis Contratos', subtitle: 'Contratos laborales y firma' },
   paymentProfile: { label: 'Mi Cuenta de Pago', subtitle: 'Donde recibes tus pagos' },
   leave: { label: 'Mis Permisos', subtitle: 'Saldos y solicitudes' },
   goals: { label: 'Mis Objetivos', subtitle: 'OKRs y key results del ciclo' },
@@ -183,26 +205,29 @@ export const GH_COLORS = {
     }
   },
 
+  // Semantic status (traffic-light). AXIS SoT — TASK-1034 Slice 4.
   semaphore: {
-    green: { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' },
-    yellow: { source: '#ff6500', bg: '#fff2ea', text: '#ff6500' },
-    red: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' }
+    green: { source: axisSemanticHex.success, bg: axisOpacity.success[8], text: axisSemanticHex.success },
+    yellow: { source: axisSemanticHex.warning, bg: axisOpacity.warning[8], text: axisSemanticHex.warning },
+    red: { source: axisSemanticHex.error, bg: axisOpacity.error[8], text: axisSemanticHex.error }
   },
 
   /**
    * @deprecated Use theme.palette.{success,warning,error,info} instead.
    * Kept temporarily for backwards compat — will be removed when all consumers migrate.
    * See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §3.2
+   * Values derive from the AXIS SoT (TASK-1034 Slice 4) so they no longer drift.
    */
   semantic: {
-    success: { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' },
-    warning: { source: '#ff6500', bg: '#fff2ea', text: '#ff6500' },
-    danger: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' },
-    info: { source: '#0375db', bg: '#eaf3fc', text: '#0375db' }
+    success: { source: axisSemanticHex.success, bg: axisOpacity.success[8], text: axisSemanticHex.success },
+    warning: { source: axisSemanticHex.warning, bg: axisOpacity.warning[8], text: axisSemanticHex.warning },
+    danger: { source: axisSemanticHex.error, bg: axisOpacity.error[8], text: axisSemanticHex.error },
+    info: { source: axisSemanticHex.info, bg: axisOpacity.info[8], text: axisSemanticHex.info }
   },
 
   brand: {
     midnightNavy: '#022a4e',
+    midnightNavyHover: '#03345e',
     greenhouseGreen: '#1B7A4E',
     leaf: '#4CAF6E',
     coreBlue: '#0375db',
@@ -224,6 +249,12 @@ export const GH_COLORS = {
     bgSurface: '#F8F9FA'
   },
 
+  // Superficies con nombre (tints suaves de tag/badge). TASK-1048: tokeniza el
+  // tag-blue que estaba hardcodeado como fallback en SpaceCard/SpaceHealthTable.
+  surface: {
+    tagBlue: '#eaf3fc' // pale info wash (fondo de tag cuando no hay color de servicio)
+  },
+
   service: {
     globe: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' },
     efeonce_digital: { source: '#023c70', bg: '#eaeff3', text: '#023c70' },
@@ -233,13 +264,21 @@ export const GH_COLORS = {
   },
 
   chart: {
-    primary: '#0375db',
-    secondary: '#024c8f',
-    success: '#6ec207',
-    warning: '#ff6500',
-    error: '#bb1954',
-    info: '#023c70',
-    neutral: '#dbdbdb'
+    // Brand/semantic named series — derive del AXIS SoT (TASK-1034 + TASK-1053).
+    primary: axisMain.primary, // #0375db (era literal hardcodeado)
+    secondary: axisMain.secondary, // verde de marca (era el stale #024c8f de dirección D, sin consumers)
+    success: axisSemanticHex.success,
+    warning: axisSemanticHex.warning,
+    error: axisSemanticHex.error,
+    info: axisMain.info, // azure (era navy #023c70 literal, sin consumers)
+    neutral: '#dbdbdb',
+    // Categorical multi-series palette (TASK-1053 "Deep-bright") — self-contained, deriva de axis-chart.
+    // ⚠️ color NUNCA solo: usar siempre legend/labels.
+    categorical: [...axisChartCategorical],
+    categoricalDark: [...axisChartCategoricalDark],
+    // Direccional (Finanzas/deltas) — NUNCA solo color: signo +/- o ícono ▲/▼ obligatorio.
+    directional: { ...axisChartDirectional },
+    directionalDark: { ...axisChartDirectionalDark }
   },
 
   cscPhase: {

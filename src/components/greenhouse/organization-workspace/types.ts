@@ -29,6 +29,10 @@ export type OrganizationWorkspaceHeader = {
   status: 'active' | 'inactive' | 'prospect' | 'churned' | string
   active: boolean
   hubspotCompanyId: string | null
+  logoAssetId?: string | null
+  logoUrl?: string | null
+  websiteUrl?: string | null
+  isOperatingEntity?: boolean
   spaceCount: number
   membershipCount: number
 }

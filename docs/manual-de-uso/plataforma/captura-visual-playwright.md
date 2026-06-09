@@ -370,3 +370,28 @@ Solo declaralos si **sabés** que poseés la capability vigente. El audit log re
 - **Auth canónico**: [scripts/playwright-auth-setup.mjs](../../../scripts/playwright-auth-setup.mjs)
 - **Convención storage state**: `.auth/storageState.<env>.json` (gitignored)
 - **CLAUDE.md** sección "Agent Auth": permisos + variables canónicas
+
+## Contract gates mockup→runtime (V1.5 · TASK-1018)
+
+Cuando implementás un runtime desde un mockup aprobado, GVC puede verificar la paridad y la calidad enterprise con gates **opt-in por scenario** (todos warning por defecto; `error` solo si lo declarás).
+
+### Baseline visual diff
+
+1. Capturá el mockup aprobado: `pnpm fe:capture <scenario> --env=local`.
+2. Promové el baseline durable: `pnpm fe:capture:diff --promote .captures/<run>`. Esto materializa `scripts/frontend/baselines/<surfaceId>/` (committeable, contrato compartido).
+3. El scenario runtime declara el mismo `baseline.surfaceId` + `maxDiffRatio` (y `maskSelectors` para datos dinámicos). `fe:capture` corre el diff solo y reporta `match` / `exceeded` (con PNG diff) / `baseline_stale` si falta el baseline.
+
+### Gates de calidad (`quality.*`)
+
+- `layout`: overflow horizontal, targets < 24px, texto cortado, scroll sin label, cards anidadas.
+- `runtime`: `console.error`, excepciones, warnings de hydration (best-effort), responses 4xx/5xx.
+- `keyboard`: ruta de teclado (Tab/Enter/Escape), foco esperado, focus ring visible, feedback bajo reduced-motion.
+- `performance`: budgets de DOM nodes / requests / transfer / FCP.
+- `enterpriseRubric`: placeholders, exceso de —/0, múltiples botones primarios, saturación cromática.
+
+### Debug
+
+- Cada captura fallida guarda `trace.zip`: `pnpm exec playwright show-trace .captures/<run>/trace.zip`.
+- `index.html` y `review-dossier.md` muestran un **resumen ejecutivo**: `Apto para implementar` / `Revisar` / `Requiere iteración`.
+
+Detalle técnico: [docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md) Delta V1.5.

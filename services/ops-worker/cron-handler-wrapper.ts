@@ -67,7 +67,7 @@ export interface WrapCronHandlerOptions<TResult> {
 
   /**
    * Domain canónico para captureWithDomain. Determina el subsystem rollup
-   * en /admin/operations cuando el handler emita errores a Sentry.
+   * en /admin/ops-health cuando el handler emita errores a Sentry.
    */
   domain: CaptureDomain
 

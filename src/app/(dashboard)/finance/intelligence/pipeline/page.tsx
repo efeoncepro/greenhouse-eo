@@ -43,7 +43,7 @@ const CommercialPipelinePage = async () => {
   })
 
   if (!hasCommercialAccess && !hasLegacyFinanceAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return (

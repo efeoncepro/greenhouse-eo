@@ -19,7 +19,7 @@ export default async function ProjectsLayout({ children }: { children: ReactNode
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

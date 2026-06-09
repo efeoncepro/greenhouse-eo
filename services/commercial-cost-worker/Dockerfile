@@ -45,6 +45,7 @@ RUN echo "" > /app/server-only-shim.js && \
       --alias:next-auth/next=./next-auth-shim.js \
       --alias:bcryptjs=./bcryptjs-shim.js \
       --alias:@=./src \
+      --alias:@core=./src/@core \
       --resolve-extensions=.ts,.tsx,.js,.json \
       --packages=external \
       --tsconfig=tsconfig.json

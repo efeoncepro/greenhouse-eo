@@ -295,7 +295,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'Outbox publisher (PG → BQ raw) + reactive consumer + projection refreshes. Backbone async de Greenhouse: si está caído, nada async progresa.',
     domain: 'sync',
     routes: [
-      { path: '/admin/operations', label: 'Ops Health' }
+      { path: '/admin/ops-health', label: 'Ops Health' }
     ],
     apis: [
       { path: '/api/admin/reliability/overview', label: 'Reliability overview' }
@@ -327,20 +327,25 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     domain: 'identity',
     routes: [
       { path: '/admin/users', label: 'Usuarios admin' },
-      { path: '/my/profile', label: 'Mi perfil' }
+      { path: '/my/profile', label: 'Mi perfil' },
+      { path: '/admin/data-quality/organization-logos', label: 'Cola de logos de organizaciones' }
     ],
     apis: [
       { path: '/api/my/legal-profile', label: 'Self-service legal profile' },
       { path: '/api/auth/health', label: 'Auth readiness' },
       { path: '/api/auth/sister-platforms/authorize', label: 'Sister-platform OAuth authorize' },
       { path: '/api/integrations/v1/sister-platforms/oauth/token', label: 'Sister-platform OAuth token exchange' },
-      { path: '/api/hr/workforce/role-title-drift', label: 'Role title drift queue' }
+      { path: '/api/hr/workforce/role-title-drift', label: 'Role title drift queue' },
+      { path: '/api/admin/data-quality/organization-logos', label: 'Organization logo review overview' },
+      { path: '/api/admin/data-quality/organization-logos/candidates', label: 'Organization logo candidates' },
+      { path: '/api/organizations/[id]/brand-assets/logo', label: 'Organization logo apply command' }
     ],
     dependencies: [
       'greenhouse_core.identity_profiles',
       'greenhouse_core.person_identity_documents',
       'greenhouse_core.person_addresses',
       'greenhouse_core.client_users',
+      'greenhouse_core.organization_brand_asset_candidates',
       'greenhouse_core.member_role_title_audit_log',
       'greenhouse_sync.member_role_title_drift_proposals',
       'GCP Secret Manager (greenhouse-pii-normalization-pepper)',
@@ -361,6 +366,9 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/api/hr/people/**/legal-profile/**',
       'src/app/api/hr/workforce/**',
       'src/app/api/admin/team/members/**/role-title/**',
+      'src/app/api/admin/data-quality/organization-logos/**',
+      'src/app/api/organizations/**/brand-assets/**',
+      'src/lib/account-360/organization-brand-assets*',
       'src/lib/contractor-engagements/**',
       'src/app/api/hr/contractors/**'
     ],
@@ -425,7 +433,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'Production release control plane (TASK-848): preflight, manifest persistido, deploy coordinado, deteccion de blockers GH Actions y rollback first-class. Visibilidad temprana de stale approvals + pending sin jobs.',
     domain: 'release',
     routes: [
-      { path: '/admin/operations', label: 'Ops Health' }
+      { path: '/admin/ops-health', label: 'Ops Health' }
     ],
     apis: [
       { path: '/api/admin/releases', label: 'Release manifests (V1.1)' }
@@ -453,6 +461,68 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['drift', 'lag'],
     incidentDomainTag: 'cloud'
+  },
+  {
+    // TASK-1019 — Workforce Contracting Studio (offer letters + employment contracts,
+    // bilingual es-CL + en-US, Claude drafting advisory-only, jurisdiction-pack
+    // validators). PDF/ZapSign/emails consume EPIC-001 in future tasks.
+    moduleKey: 'workforce',
+    label: 'Workforce Contracting',
+    description:
+      'Workforce Contracting Studio (TASK-1019): cartas oferta + contratos laborales bilingües, drafting asistido por Claude (advisory), validators determinísticos por jurisdiction pack y eventos preparados para PDF/firma EPIC-001. AI flag OFF por default.',
+    domain: 'hr',
+    routes: [
+      { path: '/hr/workforce/contracts', label: 'Workforce Contracting (futuro)' }
+    ],
+    apis: [
+      { path: '/api/hr/workforce/contracting', label: 'Contracting cases' }
+    ],
+    dependencies: [
+      'greenhouse_hr.workforce_contracting_cases',
+      'greenhouse_hr.workforce_contracting_drafts',
+      'greenhouse_hr.workforce_contracting_ai_runs',
+      'greenhouse_core.identity_profiles (subject)',
+      'greenhouse_core.organizations (operating entity)',
+      'Anthropic Claude (greenhouse-anthropic-api-key, flag WORKFORCE_CONTRACTING_AI_ENABLED)',
+      'EPIC-001 document registry / rendering / ZapSign (future consumer)'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/workforce/contracting/**',
+      'src/lib/ai/anthropic.ts',
+      'src/lib/reliability/queries/contracting-*.ts',
+      'src/app/api/hr/workforce/contracting/**',
+      'docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md'
+    ],
+    expectedSignalKinds: ['dead_letter', 'lag', 'drift', 'incident'],
+    incidentDomainTag: 'workforce'
+  },
+  {
+    // TASK-490 — Signature orchestration foundation (EPIC-001 signable pack).
+    // Aggregate signature_requests + signers + append-only events, hexagonal provider
+    // port (ZapSign adapter = TASK-491). Render del documento = TASK-1023. 3 signals:
+    // pending_overdue (lag), failed (incident-like drift), signed_artifact_missing (data_quality).
+    moduleKey: 'documents',
+    label: 'Documents & Signatures',
+    description:
+      'Signature orchestration platform (TASK-490): firma de cartas oferta + contratos + master agreements vía provider externo (ZapSign, TASK-491). Aggregate signature_requests con state machine monotónica, append-only events y document vault privado. Render del documento = TASK-1023.',
+    domain: 'hr',
+    routes: [{ path: '/hr/workforce/contracts', label: 'Signature surfaces (futuro)' }],
+    apis: [{ path: '/api/documents/signature-requests', label: 'Signature requests (futuro)' }],
+    dependencies: [
+      'greenhouse_core.signature_requests',
+      'greenhouse_core.signature_request_signers',
+      'greenhouse_core.signature_request_events',
+      'greenhouse_core.assets (signed document vault)',
+      'ZapSign (provider, TASK-491)'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/signatures/**',
+      'src/lib/reliability/queries/signature-*.ts'
+    ],
+    expectedSignalKinds: ['lag', 'drift', 'data_quality', 'incident'],
+    incidentDomainTag: 'documents'
   }
 ]
 

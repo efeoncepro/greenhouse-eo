@@ -153,7 +153,7 @@ const ProfitabilityTab = ({
               return (
                 <TableRow key={`${row.quotationId}-${row.periodYear}-${row.periodMonth}`} hover>
                   <TableCell>
-                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                    <Typography variant='caption'>
                       {row.quotationId}
                     </Typography>
                   </TableCell>
@@ -248,7 +248,7 @@ const RenewalsTab = ({
                 {renewals.map(item => (
                   <TableRow key={item.quotationId} hover>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                      <Typography variant='caption'>
                         {item.quotationId}
                       </Typography>
                     </TableCell>
@@ -308,7 +308,7 @@ const RenewalsTab = ({
                 {expired.map(item => (
                   <TableRow key={item.quotationId} hover>
                     <TableCell>
-                      <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                      <Typography variant='caption'>
                         {item.quotationId}
                       </Typography>
                     </TableCell>

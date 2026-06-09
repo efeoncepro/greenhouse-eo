@@ -465,7 +465,7 @@ const CompensationDrawer = ({
             {previewReady && (
               <Box data-testid='reverse-preview' sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
                 <Box sx={{ px: 2, py: 1.25, bgcolor: 'action.hover' }}>
-                  <Typography variant='overline' color='text.secondary' fontSize={10}>Haberes</Typography>
+                  <Typography variant='overline' color='text.secondary'>Haberes</Typography>
                   <Stack spacing={0.15} sx={{ mt: 0.25 }}>
                     <Row label='Sueldo base' amount={r.baseSalary} bold />
                     {r.forward.chileGratificacionLegalAmount != null && r.forward.chileGratificacionLegalAmount > 0 && (
@@ -477,7 +477,7 @@ const CompensationDrawer = ({
                   </Stack>
                 </Box>
                 <Box sx={{ px: 2, py: 1.25, bgcolor: 'var(--mui-palette-error-lighterOpacity)', borderTop: '1px solid', borderColor: 'divider' }}>
-                  <Typography variant='overline' color='text.secondary' fontSize={10}>Descuentos legales</Typography>
+                  <Typography variant='overline' color='text.secondary'>Descuentos legales</Typography>
                   <Stack spacing={0.15} sx={{ mt: 0.25 }}>
                     <Row label='AFP' amount={r.forward.chileAfpAmount} negative />
                     <Row label='Salud (7%)' amount={r.forward.chileHealthAmount} negative />
@@ -515,7 +515,7 @@ const CompensationDrawer = ({
             {/* ── Haberes no imponibles (Chile) ── */}
             {isChileEmployee && (
               <Box sx={sectionSx}>
-                <Typography variant='overline' color='text.secondary' fontSize={10}>Haberes no imponibles</Typography>
+                <Typography variant='overline' color='text.secondary'>Haberes no imponibles</Typography>
                 <Grid container spacing={2} sx={{ mt: 0.5 }}>
                   <Grid size={{ xs: 6 }}>
                     <CustomTextField fullWidth size='small' label='Colación' type='number' value={colacionAmount || ''} onChange={e => setColacionAmount(Number(e.target.value))} slotProps={{ input: { startAdornment: clpAdornment } }} />
@@ -529,7 +529,7 @@ const CompensationDrawer = ({
 
             {/* ── Bonos y haberes ── */}
             <Box sx={sectionSx}>
-              <Typography variant='overline' color='text.secondary' fontSize={10}>Bonos y haberes</Typography>
+              <Typography variant='overline' color='text.secondary'>Bonos y haberes</Typography>
               <Stack spacing={2} sx={{ mt: 1 }}>
                 {(isHonorarios || isDeel) && (
                   <Alert severity='info' variant='outlined' sx={{ py: 0.5 }}>
@@ -639,7 +639,7 @@ const CompensationDrawer = ({
 
             {/* ── Vigencia ── */}
             <Box sx={sectionSx}>
-              <Typography variant='overline' color='text.secondary' fontSize={10}>Vigencia</Typography>
+              <Typography variant='overline' color='text.secondary'>Vigencia</Typography>
               <Stack spacing={2} sx={{ mt: 1 }}>
                 <CustomTextField
                   fullWidth size='small' label='Vigente desde' type='date'
@@ -686,7 +686,7 @@ const Row = ({ label, amount, bold, negative, primary, muted }: {
   muted?: boolean
 }) => (
   <Stack direction='row' justifyContent='space-between' alignItems='baseline'>
-    <Typography variant='body2' color={muted ? 'text.disabled' : 'text.secondary'} fontWeight={bold ? 600 : 400} fontSize={13}>
+    <Typography variant='caption' color={muted ? 'text.disabled' : 'text.secondary'} fontWeight={bold ? 600 : 400}>
       {label}
     </Typography>
     <Typography variant='monoAmount' fontWeight={bold ? 700 : 500} color={primary ? 'primary.main' : negative ? 'error.main' : muted ? 'text.disabled' : 'text.primary'}>

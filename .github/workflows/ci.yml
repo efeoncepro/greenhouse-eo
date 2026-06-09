@@ -96,6 +96,15 @@ jobs:
       - name: Lint
         run: pnpm exec eslint . --cache --cache-location .eslintcache
 
+      - name: Lint-rule tests (TASK-1038)
+        # Los custom rules de eslint-plugins/greenhouse/ tienen tests RuleTester
+        # (.test.mjs) que el `include` de vitest NO cubre (vitest solo escanea
+        # src/scripts/services). Antes no corrían en NINGÚN runner — un test podía
+        # romperse silenciosamente (caso real: no-cross-domain usaba `import type`
+        # sin parser TS y fallaba sin que nadie lo viera). `node --test` con glob
+        # los auto-descubre, así que rules nuevos quedan protegidos sin tocar config.
+        run: pnpm test:lint-rules
+
       - name: Typecheck
         run: pnpm exec tsc --noEmit
 
@@ -126,6 +135,14 @@ jobs:
       - name: Migration marker gate self-tests
         # Verifica que el parser del gate sigue funcionando (7 cases).
         run: pnpm migration-marker-gate:test
+
+      - name: Worker runtime-deps gate (ISSUE-090)
+        # Bloquea el silent-startup-crash de los workers Cloud Run Node: un módulo
+        # worker-bundled de src/lib/** que importa un paquete npm clasificado como
+        # devDependency. El runtime stage hace `pnpm install --prod` (solo deps) →
+        # el paquete externalizado no existe → ERR_MODULE_NOT_FOUND al arrancar →
+        # no escucha en 8080 → deploy failed. Convierte ese crash en CI-fail.
+        run: pnpm worker:runtime-deps-gate
 
       - name: Test inventory
         run: pnpm test:inventory

@@ -38,12 +38,24 @@ export type TeamsAdaptiveCardElement =
   | TeamsAdaptiveCardFactSet
   | TeamsAdaptiveCardContainer
 
+export type TeamsAdaptiveCardMentionEntity = {
+  type: 'mention'
+  text: string
+  mentioned: {
+    id: string
+    name: string
+  }
+}
+
 export interface TeamsAdaptiveCard {
   $schema?: string
   type: 'AdaptiveCard'
-  version: '1.5'
+  version: '1.0' | '1.5'
   body: TeamsAdaptiveCardElement[]
   actions?: TeamsAdaptiveCardActionOpenUrl[]
+  msteams?: {
+    entities?: TeamsAdaptiveCardMentionEntity[]
+  }
 }
 
 export type TeamsChannelKind = 'azure_logic_app' | 'teams_bot' | 'graph_rsc'

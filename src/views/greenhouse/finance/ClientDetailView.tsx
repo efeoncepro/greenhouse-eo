@@ -272,7 +272,7 @@ const ClientDetailView = () => {
               {company.companyDomain && (
                 <Typography variant='caption' color='text.secondary'>{company.companyDomain}</Typography>
               )}
-              <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
+              <Typography variant='caption' color='text.secondary'>
                 ID: {fp.clientProfileId}
               </Typography>
             </Box>
@@ -353,7 +353,7 @@ const ClientDetailView = () => {
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>RUT</Typography>
-                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{fp.taxId || '—'}</Typography>
+                    <Typography variant='caption'>{fp.taxId || '—'}</Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>Dirección de facturación</Typography>
@@ -373,11 +373,11 @@ const ClientDetailView = () => {
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>N° OC vigente</Typography>
-                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{fp.currentPoNumber || '—'}</Typography>
+                    <Typography variant='caption'>{fp.currentPoNumber || '—'}</Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>N° HES vigente</Typography>
-                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{fp.currentHesNumber || '—'}</Typography>
+                    <Typography variant='caption'>{fp.currentHesNumber || '—'}</Typography>
                   </Grid>
                 </Grid>
               </CardContent>
@@ -500,7 +500,7 @@ const ClientDetailView = () => {
                         return (
                           <TableRow key={inv.incomeId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/income/${inv.incomeId}`)}>
                             <TableCell>
-                              <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                              <Typography variant='caption'>
                                 {inv.invoiceNumber || inv.incomeId}
                               </Typography>
                             </TableCell>

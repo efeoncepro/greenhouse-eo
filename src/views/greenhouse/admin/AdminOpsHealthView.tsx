@@ -595,7 +595,7 @@ const AdminOpsHealthView = ({
                           gap={2}
                         >
                           <Stack spacing={0.25}>
-                            <Typography variant='body2' sx={{ fontSize: '0.8125rem' }}>
+                            <Typography variant='caption'>
                               {run.spaceId}
                             </Typography>
                             <Typography variant='caption' color='text.secondary'>

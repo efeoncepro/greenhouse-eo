@@ -4,6 +4,8 @@ import ExcelJS from 'exceljs'
 
 import { formatCurrency as formatLocaleCurrency } from '@/lib/format'
 
+import { axisSemanticSubValues } from '@/lib/design-tokens/semantic-sub-values'
+
 import type {
   ContractorRunReport,
   ContractorRunReportCurrencySubtotal,
@@ -18,6 +20,10 @@ import type {
  * Excluidos. Montos verbatim del reporte; subtotales mutuamente excluyentes
  * (retención SII solo honorarios → F29; neto pagado solo `paid` → banco).
  */
+
+// Success ink (AA on white) en formato ARGB de ExcelJS — SoT canónico (TASK-1048 →
+// Fase B success.ink). Adapter por medio: el hex del SoT → 'FF' + hex sin '#'.
+const NET_ARGB = `FF${axisSemanticSubValues.success.ink.slice(1).toUpperCase()}`
 
 const STATUS_LABELS: Record<ContractorRunReportRow['status'], string> = {
   pending_readiness: 'Por preparar',
@@ -40,7 +46,7 @@ const formatCurrency = (value: number, currency: string): string =>
 const applyHeaderStyle = (row: ExcelJS.Row) => {
   row.eachCell(cell => {
     cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 10 }
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E7D32' } }
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: NET_ARGB } }
     cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
     cell.border = { bottom: { style: 'thin', color: { argb: 'FF000000' } } }
   })
@@ -138,7 +144,7 @@ const buildResumenSheet = (workbook: ExcelJS.Workbook, report: ContractorRunRepo
   if (report.grandTotalsByCurrency.some(c => c.netPaidTotal > 0)) {
     const paidRow = sheet.addRow(['Neto pagado al banco (status pagado)'])
 
-    paidRow.font = { bold: true, size: 11, color: { argb: 'FF2E7D32' } }
+    paidRow.font = { bold: true, size: 11, color: { argb: NET_ARGB } }
     sheet.mergeCells(`A${paidRow.number}:E${paidRow.number}`)
     const header = sheet.addRow(['Moneda', 'Neto pagado'])
 

@@ -1,7 +1,7 @@
-import DanielaWorkforceProfileMockupView from '@/views/greenhouse/people/mockup/daniela-workforce/DanielaWorkforceProfileMockupView'
+import DanielaWorkforceProfileMockupClientPage from './ClientMockupPage'
 
 export const dynamic = 'force-dynamic'
 
-const DanielaWorkforceProfileMockupPage = () => <DanielaWorkforceProfileMockupView />
+const DanielaWorkforceProfileMockupPage = () => <DanielaWorkforceProfileMockupClientPage />
 
 export default DanielaWorkforceProfileMockupPage

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -11,6 +10,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
 import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
+
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 
 import CustomTextField from '@core/components/mui/TextField'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
@@ -21,7 +22,8 @@ import type { RpaTrendBySpace } from '@/components/agency/IcoCharts'
 import SpaceIcoScorecard from '@/components/agency/SpaceIcoScorecard'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { SpaceMetricSnapshot, MetricValue } from '@/lib/ico-engine/read-metrics'
-import { CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import { CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import { CSC_CHART_COLORS } from '@/components/greenhouse/charts/csc-chart-colors'
 
 import type { OrganizationDetailData } from '../types'
 import { getMicrocopy } from '@/lib/copy'
@@ -31,7 +33,6 @@ const TASK407_ARIA_EVOLUCION_MENSUAL_DEL_RPA = "Evolución mensual del RpA"
 
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Constants ─────────────────────────────────────────────────────────
 

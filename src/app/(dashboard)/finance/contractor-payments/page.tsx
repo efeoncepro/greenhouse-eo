@@ -26,7 +26,7 @@ const ContractorPaymentsPage = async () => {
     hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <ContractorPaymentsWorkbenchView />

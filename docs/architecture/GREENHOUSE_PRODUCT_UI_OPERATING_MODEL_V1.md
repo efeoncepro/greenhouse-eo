@@ -1,7 +1,7 @@
 # Greenhouse Product UI Operating Model V1
 
 Status: accepted
-Last updated: 2026-05-11
+Last updated: 2026-06-06
 Owner: Platform / Product Design Agents
 
 ## Purpose
@@ -48,10 +48,33 @@ This operating model establishes the AI Product Design Studio stack for Greenhou
 7. Define responsive model.
 8. Define microinteraction model.
 9. Map to Greenhouse primitives.
-10. Implement or mock up.
-11. Capture screenshots.
-12. Run enterprise review.
-13. Verify and commit.
+10. If the primitive is reusable, define official variants and domain kinds.
+11. Implement or mock up.
+12. Capture screenshots.
+13. Run enterprise review.
+14. Verify and commit.
+
+## Primitive + Variants + Kinds Method
+
+Reusable UI work must use the **Primitive + Variants + Kinds** method from `GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`.
+
+- **Primitive**: owns layout, accessibility, responsive behavior, motion, shell integration, state plumbing and verification hooks.
+- **Variant**: official functional mode. It changes behavior, density, state model, action placement and microinteraction contract. It is not a skin.
+- **Kind**: semantic consumer use case. It may be domain-specific, workflow-specific or a legacy alias, but it must resolve to an official variant before layout/styling behavior is chosen.
+
+Canonical shape:
+
+```tsx
+<Primitive variant='inspector' kind='contractReview' />
+```
+
+Rules:
+
+- Do not create separate `FooDrawer`, `FooInspector`, `FooAssistant` components when one primitive plus variants can cover the family.
+- Do not add variants that only change color, radius, shadow or icon.
+- Define at most 3-5 official variants per primitive unless an ADR/runtime primitive justifies more. Adaptive Sidecar is the accepted exception with 6 functional variants: `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, `runbook`.
+- Validate each official variant with GVC before calling the primitive enterprise-ready.
+- Preserve Full API parity: variants may change UI workflow, not business source of truth.
 
 ## Pattern Decisions
 
@@ -61,7 +84,28 @@ Use the pattern that fits the task:
 - Command center for subsystem monitoring and exception-first workflows.
 - List-detail for entity browsing and comparison.
 - Wizard for low-frequency, high-risk creation.
-- AI drawer for contextual assistance that does not replace core operations.
+- Adaptive sidecar for contextual assistance, inspection, review, preview, and low-risk contextual editing where the main work context must remain visible.
+- Error and misc states (404, 401, access denied, coming soon, maintenance, unavailable route) as compact brand-and-recovery surfaces: creative enough to feel owned by Greenhouse, structured enough to preserve cause, next action, accessibility and stable CTAs.
+- AI drawer only as mobile/tablet temporary behavior or legacy escape hatch; desktop assistant surfaces should prefer adaptive sidecar when density allows.
+- Modal Dialog for destructive, irreversible, legal, financial, or maker-checker decisions.
+
+### Adaptive sidecar runtime primitive
+
+When the selected pattern is adaptive sidecar, the canonical implementation is `AdaptiveSidecarLayout` + `ContextualSidecar` + `adaptive-sidecar-controller` from `@/components/greenhouse/primitives`.
+
+Official variants:
+
+- `inspector`: read, diagnose and decide without losing the queue/context.
+- `composer`: create or edit contextual data with dirty-state guard.
+- `assistant`: explain, summarize and suggest using current context; advisory-only and never the only execution path.
+
+Rules:
+
+- Do not implement a new desktop Drawer/card-overlay to imitate the pattern.
+- Desktop sidecar lanes must be in-flow, full-height within the work canvas, and structurally separated from main content.
+- Use the idempotent controller reducer for local state machines that can open, close, replace, or become dirty.
+- Use `ContextualSidecar` with `chrome='adaptive'` for desktop lanes; reserve contained chrome for explicitly framed local surfaces.
+- Use GVC desktop + mobile evidence before declaring a consumer enterprise-ready.
 
 ## Enterprise Quality Bar
 
@@ -73,6 +117,7 @@ A UI is not Greenhouse-enterprise-ready if:
 - partial data looks complete;
 - mobile is just a compressed desktop;
 - important state is conveyed only by color;
+- high-friction error surfaces use generic template copy, or creative variants obscure cause/recovery, rotate while reading, or hardcode reusable JSX copy;
 - screenshots were not reviewed for a visual-quality request.
 
 ## Product UI ADR

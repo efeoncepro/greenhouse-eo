@@ -24,6 +24,9 @@ import { useSettings } from '@core/hooks/useSettings'
 // Style Imports
 import navigationCustomStyles from '@core/styles/vertical/navigationCustomStyles'
 
+// Brand tokens
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+
 type Props = {
   mode: Mode
 }
@@ -95,7 +98,7 @@ const Navigation = (props: Props) => {
     <VerticalNav
       customStyles={navigationCustomStyles(verticalNavOptions, theme)}
       collapsedWidth={71}
-      backgroundColor='#022A4E'
+      backgroundColor={GH_COLORS.brand.midnightNavy}
        
       // The following condition adds the data-dark attribute to the VerticalNav component
       // when semiDark is enabled and the mode or systemMode is light

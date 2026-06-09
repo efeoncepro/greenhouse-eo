@@ -27,12 +27,31 @@ For every visible UI change, decide:
 - **Responsive**: desktop/laptop/mobile screenshots required for meaningful UI.
 - **Verification**: `pnpm design:lint`, relevant tests, Playwright screenshot loop.
 
+## Primitive + Variants + Kinds Method
+
+Use `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md` for reusable UI.
+
+- **Primitive** owns layout, a11y, responsive behavior, motion, shell integration, state plumbing, and GVC hooks.
+- **Variant** is an official functional mode. It changes behavior, density, state model, action placement, and microinteraction contract. It is not a skin.
+- **Kind** is the semantic consumer use case. It may be domain-specific or a legacy alias, but it must resolve to an official variant before layout/chrome behavior is chosen.
+
+When a pattern recurs, recommend extending a primitive with variants instead of creating parallel drawers/cards/inspectors/assistants.
+
+Canonical shape:
+
+```tsx
+<Primitive variant='inspector' kind='contractReview' />
+```
+
 ## Greenhouse UI Pattern Preferences
 
 - Operational lists with decisions: prefer queue + inspector.
 - Low-frequency risky creation: prefer drawer or stepper with clear consequences.
 - Runtime dashboards: prefer command center with exceptions before totals.
-- AI helpers: prefer contextual drawer; never make AI the only path for core operations.
+- AI helpers: prefer Adaptive Sidecar on desktop and temporary Drawer only on mobile/tablet; never make AI the only path for core operations.
+- Error and misc surfaces (404, 401, access denied, coming soon, maintenance, unavailable route) should be treated as product surfaces with brand voice and recovery architecture. Use concise creative microcopy variants selected once on entry when appropriate, but keep cause, action, and accessibility stable.
+- Contextual assistance, inspection, review, preview, and low-risk contextual editing: use `AdaptiveSidecarLayout`, `ContextualSidecar`, and `adaptive-sidecar-controller` from `@/components/greenhouse/primitives` before creating any custom drawer/modal.
+- Adaptive Sidecar official variants are `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, and `runbook`; domain kinds such as `form`, `review`, `preview`, reconciliation, provenance/evidence, or guided operations must map to one of those variants.
 - Tables: use when comparison and scanning matter; pair with inspector for actions that require context.
 
 ## Hard Rules
@@ -42,6 +61,10 @@ For every visible UI change, decide:
 - Do not reintroduce generic landing-page composition inside operational tools.
 - Do not duplicate primary actions across table rows and inspector unless the duplication has a clear accessibility/efficiency reason.
 - Do not ship screenshots-free UI changes when the request is about visual quality.
+- Do not leave high-friction error surfaces with only generic template copy when the product voice can safely improve recovery and brand perception.
+- Do not implement a desktop Adaptive Sidecar as a boxed drawer/card overlay. It must be an in-flow, full-height work-canvas lane with non-modal semantics.
+- Do not create `FooDrawer`, `FooInspector`, and `FooAssistant` as separate components when one primitive plus functional variants covers the family.
+- Do not add a variant that only changes color, radius, shadow, or icon.
 
 ## Output Contract
 
@@ -50,3 +73,32 @@ For every visible UI change, decide:
 - copy/access decisions
 - screenshot plan
 - verification plan
+
+## Figma Implementation Contract (gate)
+
+Al implementar cualquier diseño (especialmente desde Figma), **Figma es intención, no valores literales**. Antes de escribir JSX, correr 2 gates (contrato canónico completo en CLAUDE.md / AGENTS.md → "Figma Implementation Contract"):
+
+1. **Token mapping (siempre):** color → `theme.palette.*` / `theme.axis.*` / `var(--mui-palette-*)`; tipografía → variant/SoT (skill `typography-design`); spacing/radius → spacing scale `4n` / `theme.shape.customBorderRadius.*`; motion → `motion/core/tokens.ts`. **NUNCA** transcribir HEX/px/fontFamily/ms crudos. Del MCP Figma usar `get_variable_defs` + `get_code_connect_map` → **mapear, no pegar**. Lint: `greenhouse/no-hardcoded-hex-color` + `no-hardcoded-fontfamily` + `no-fontsize-inline-typography`.
+2. **Primitive lookup en capas (ANTES de construir):** (a) ¿existe **primitive Greenhouse**? grep `src/components/greenhouse/primitives/index.ts` (~79 exports) + `docs/architecture/ui-platform/PRIMITIVES.md` → **usar o expandir** (variant/kind, no fork paralelo); (b) ¿hay **wrapper Vuexy `Custom*`** o componente MUI base (Select/Autocomplete/List/TextField/Menu…)? → la primitive nueva **envuelve esa base** (hereda a11y/teclado/estados), NUNCA reinventar input/select/list/dropdown desde cero; (c) solo si no hay nada → desde cero.
+
+**Si hay que crear una primitive nueva (dropdown/list/input/etc.):** protocolo Primitive+Variants+Kinds COMPLETO — vive en `primitives/` + export en barrel + resolver `kind→variant`; a11y/responsive/reduced-motion horneados; **cero hardcode** (solo tokens); **Lab interno** `/admin/design-system/<nombre>` (gate `administracion.design_system`, alcanzable por nav + route-reachability); **GVC** desktop+mobile mirada; nodo AXIS Figma referenciado; contrato en `ui-platform/PRIMITIVES.md` (+ ADR si platform-level). Patrón fuente: `GreenhouseButton`/`GreenhouseChip`/`GreenhouseActivityTimeline`/chart cards.
+
+**Reportar la decisión** (reuse / extend / new-primitive + por qué) ANTES de codear. Un one-off no-reusable puede vivir junto al consumer pero **igual tokenizado** (no va al registry).
+
+## GVC data-capture markers (TASK-1056)
+
+When building or materially changing visible UI, add stable `data-capture` markers to wrappers that GVC may need to scroll to, clip, assert, or interact with later:
+
+- mark section/page blocks, panels, repeated review cards, design-system specimens, important states (`loading`, `empty`, `degraded`, `error`, `success`) and repeatable flow steps;
+- use kebab-case semantic names (`home-nexa-insights-bento`, `notion-picker-degraded`), never copy-dependent text, positions like `card-2`, or PII;
+- do not marker-spam every small button/div; controls only need markers when a scenario interacts with or clips them;
+- scenarios should prefer `[data-capture="..."]` for `readiness.selector`, `scroll.selector`, `clipSelector`, `requiredRegions`, and interaction targets before text/nth-child selectors.
+
+## GVC V1.5 — contract gates mockup→runtime (TASK-1018)
+
+GVC (`pnpm fe:capture`) ya no es solo evidencia: es **contrato verificable** del paso mockup aprobado → runtime. Todos los gates son **opt-in por scenario + warning-first** (`error` solo si el scenario lo declara). Codes SSOT: `scripts/frontend/lib/failure-taxonomy.ts`.
+
+- **Baseline visual diff**: el scenario declara `baseline.surfaceId` + `maxDiffRatio` (+ `maskSelectors` para datos dinámicos + `requiredFrameLabels`/`requiredRegions`). Promové el mockup aprobado con `pnpm fe:capture:diff --promote <capture-dir>` → home durable committeable `scripts/frontend/baselines/<surfaceId>/`. El runtime con el mismo `surfaceId` corre el diff solo: `match` / `exceeded` (con PNG diff) / `baseline_stale` (degrada honesto si falta). GVC aplica determinismo (animaciones off, caret oculto, reduced-motion, fonts settled) automáticamente cuando hay `baseline.surfaceId`.
+- **`quality.layout`** (overflow / target <24px / texto cortado / scroll sin label / cards anidadas), **`quality.runtime`** (console.error / pageerror / hydration / 4xx-5xx), **`quality.keyboard`** (foco + focus ring + estado + reduced-motion), **`quality.performance`** (DOM nodes / requests / transfer / FCP), **`quality.enterpriseRubric`** (placeholders / exceso de —·0 / >1 botón primario / saturación cromática).
+- `trace.zip` automático en captura fallida (`pnpm exec playwright show-trace <dir>/trace.zip`). `index.html` + `review-dossier.md` traen **resumen ejecutivo** (`Apto` / `Revisar` / `Requiere iteración`) + verdict del rubric.
+- Regresión: `gvc-contract-gates` + `gvc-keyboard-focus`. Detalle: `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` Delta V1.5.

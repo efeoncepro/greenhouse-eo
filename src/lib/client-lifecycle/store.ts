@@ -307,6 +307,36 @@ export const listLifecycleCases = async (
   return { items, nextCursor, hasMore }
 }
 
+// TASK-1013 Slice 2 — batched in-flight onboarding status per organization. One
+// query for many orgs (no N+1) so the organizations list + Account 360 can surface
+// a "Onboarding en curso / Borrador" indicator. Returns the latest in-flight case
+// status per org (draft / in_progress / blocked); orgs without an active onboarding
+// case are simply absent from the map.
+export const getActiveOnboardingStatusByOrg = async (
+  organizationIds: string[]
+): Promise<Map<string, 'draft' | 'in_progress' | 'blocked'>> => {
+  if (organizationIds.length === 0) return new Map()
+
+  const rows = await runGreenhousePostgresQuery<{
+    organization_id: string
+    status: 'draft' | 'in_progress' | 'blocked'
+  }>(
+    `SELECT DISTINCT ON (organization_id) organization_id, status
+     FROM greenhouse_core.client_lifecycle_cases
+     WHERE organization_id = ANY($1)
+       AND case_kind = 'onboarding'
+       AND status NOT IN ('completed', 'cancelled')
+     ORDER BY organization_id, created_at DESC`,
+    [organizationIds]
+  )
+
+  const map = new Map<string, 'draft' | 'in_progress' | 'blocked'>()
+
+  for (const row of rows) map.set(row.organization_id, row.status)
+
+  return map
+}
+
 export const listCasesForOrganization = async (
   organizationId: string
 ): Promise<ClientLifecycleCase[]> => {

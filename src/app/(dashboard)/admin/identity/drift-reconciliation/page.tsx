@@ -11,7 +11,7 @@ import { getTenantContext } from '@/lib/tenant/get-tenant-context'
  *
  * Server page que renderiza el form auditado de reconciliacion Person 360
  * para EFEONCE_ADMIN. Operador llega via deep link desde el reliability
- * signal `identity.relationship.member_contract_drift` en /admin/operations.
+ * signal `identity.relationship.member_contract_drift` en /admin/ops-health.
  *
  * Query params:
  *   - `memberId` (opcional, pre-fill del form si presente)
@@ -35,7 +35,7 @@ const Page = async ({ searchParams }: PageProps) => {
 
   // Capability granular: EFEONCE_ADMIN solo V1.0 (drift Person 360 es cross-domain).
   if (!can(subject, 'person.legal_entity_relationships.reconcile_drift', 'update', 'tenant')) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect('/401')
   }
 
   const params = await searchParams

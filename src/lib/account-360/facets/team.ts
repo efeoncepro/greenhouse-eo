@@ -44,9 +44,13 @@ export const fetchTeamFacet = async (
   const limit = ctx.limit ?? 20
   const offset = ctx.offset ?? 0
 
-  // Build temporal filter clause + params
+  // Build temporal filter clause + params.
+  // NULL start_date = unbounded start = active as-of any date (canonical "as-of membership"
+  // semantics, mirror of getOrganizationMemberships). HubSpot-sourced contacts/memberships
+  // legitimately carry NULL start_date — a `start_date <= asOf` predicate would silently drop
+  // every one of them (the empirically-confirmed cause of empty Team tabs).
   const temporalClause = ctx.asOf
-    ? 'AND pm.start_date <= $2 AND (pm.end_date IS NULL OR pm.end_date >= $2)'
+    ? 'AND (pm.start_date IS NULL OR pm.start_date <= $2) AND (pm.end_date IS NULL OR pm.end_date >= $2)'
     : ''
 
   const baseParams: (string | number)[] = [scope.organizationId]

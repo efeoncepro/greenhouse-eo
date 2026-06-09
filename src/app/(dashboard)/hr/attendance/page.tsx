@@ -19,7 +19,7 @@ const AttendancePage = async () => {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <HrAttendanceView />

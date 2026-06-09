@@ -31,6 +31,13 @@ export interface LaunchedSession {
   browser: Browser
   context: BrowserContext
   page: Page
+  /**
+   * Detiene el Playwright trace. Si `savePath` se provee (captura fallida),
+   * persiste `trace.zip`; si es null (captura OK), descarta — retain-on-failure.
+   * Debe llamarse ANTES de finalizeRecording (que cierra el context).
+   * Devuelve true si se guardó el trace.
+   */
+  stopTracing: (savePath: string | null) => Promise<boolean>
   /** Llamado al final — devuelve la ruta absoluta del .webm o null si no se grabó */
   finalizeRecording: () => Promise<string | null>
 }
@@ -64,7 +71,41 @@ export const launchCaptureSession = async (opts: LaunchOptions): Promise<Launche
     }
   })
 
+  // esbuild keepNames shim: los bodies de page.evaluate compilados por tsx pueden
+  // referenciar el helper `__name`, que no existe en el contexto del browser.
+  // Lo definimos como passthrough antes de cualquier navegación (defense-in-depth
+  // para todos los gates que usan page.evaluate).
+  await context.addInitScript(() => {
+    const g = globalThis as unknown as { __name?: (fn: unknown) => unknown }
+
+    if (!g.__name) g.__name = fn => fn
+  })
+
+  let tracingActive = false
+
+  try {
+    await context.tracing.start({ screenshots: true, snapshots: true, sources: true })
+    tracingActive = true
+  } catch {
+    // Tracing es defense-in-depth; si el runtime no lo soporta, seguimos sin él.
+    tracingActive = false
+  }
+
   const page = await context.newPage()
+
+  const stopTracing = async (savePath: string | null): Promise<boolean> => {
+    if (!tracingActive) return false
+
+    tracingActive = false
+
+    try {
+      await context.tracing.stop(savePath ? { path: savePath } : undefined)
+
+      return Boolean(savePath)
+    } catch {
+      return false
+    }
+  }
 
   const finalizeRecording = async (): Promise<string | null> => {
     const video = page.video()
@@ -82,7 +123,7 @@ export const launchCaptureSession = async (opts: LaunchOptions): Promise<Launche
     return video.path()
   }
 
-  return { browser, context, page, finalizeRecording }
+  return { browser, context, page, stopTracing, finalizeRecording }
 }
 
 /**

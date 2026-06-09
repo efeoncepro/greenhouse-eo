@@ -61,6 +61,7 @@ RUN echo "" > /app/server-only-shim.js && \
       --alias:bcryptjs=./bcryptjs-shim.js \
       --alias:@vercel/oidc=./vercel-oidc-shim.js \
       --alias:@=./src \
+      --alias:@core=./src/@core \
       --resolve-extensions=.ts,.tsx,.js,.json \
       --packages=external \
       --tsconfig=tsconfig.json

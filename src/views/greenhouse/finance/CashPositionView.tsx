@@ -35,6 +35,7 @@ import {
   ReferenceLine
 } from '@/libs/Recharts'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
@@ -304,12 +305,12 @@ const CashPositionView = () => {
                     <Tooltip formatter={(v) => formatCLP(Number(v))} />
                     <Legend />
                     <ReferenceLine y={0} stroke={theme.palette.divider} />
-                    <Bar dataKey='cashIn' fill={theme.palette.success.main} name='Ingresos' radius={[4, 4, 0, 0]} />
-                    <Bar dataKey='cashOut' fill={theme.palette.error.main} name='Egresos' radius={[4, 4, 0, 0]} />
+                    <Bar dataKey='cashIn' fill={GH_COLORS.chart.directional.positive} name='Ingresos' radius={[4, 4, 0, 0]} />
+                    <Bar dataKey='cashOut' fill={GH_COLORS.chart.directional.negative} name='Egresos' radius={[4, 4, 0, 0]} />
                     <Line
                       type='monotone'
                       dataKey='netFlow'
-                      stroke={theme.palette.info.main}
+                      stroke={GH_COLORS.chart.directional.neutral}
                       name='Flujo neto'
                       strokeWidth={2}
                       dot={{ r: 3 }}

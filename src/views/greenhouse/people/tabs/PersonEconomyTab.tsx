@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Accordion from '@mui/material/Accordion'
@@ -26,9 +25,10 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
+
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 
 import { getMicrocopy } from '@/lib/copy'
 
@@ -36,6 +36,7 @@ import type { PersonDetail } from '@/types/people'
 import type { PayrollEntry } from '@/types/payroll'
 import { formatCurrency, regimeLabel, formatPeriodIdLabel } from '@views/greenhouse/payroll/helpers'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import PersonFinanceTab from './PersonFinanceTab'
 
 const TASK407_ARIA_IR_AL_MODULO_DE_NOMINA = "Ir al modulo de nomina"
@@ -43,7 +44,6 @@ const TASK407_ARIA_IR_AL_MODULO_DE_NOMINA = "Ir al modulo de nomina"
 
 const GREENHOUSE_COPY = getMicrocopy()
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ---------------------------------------------------------------------------
 // Props
@@ -70,7 +70,6 @@ const DetailRow = ({ label, value }: { label: string; value: string }) => (
 // ---------------------------------------------------------------------------
 
 const PersonEconomyTab = ({ detail, onEditCompensation }: Props) => {
-  const theme = useTheme()
   const compensation = detail.currentCompensation ?? null
   const memberId = detail.member.memberId
 
@@ -147,7 +146,7 @@ const PersonEconomyTab = ({ detail, onEditCompensation }: Props) => {
         formatter: v => formatCurrency(v, payrollCurrency)
       }
     },
-    colors: [theme.palette.success.main],
+    colors: [GH_COLORS.chart.primary],
     tooltip: { y: { formatter: v => formatCurrency(v, payrollCurrency) } }
   }
 

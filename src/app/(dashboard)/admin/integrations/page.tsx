@@ -40,7 +40,7 @@ export default async function Page() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   let integrations: IntegrationWithHealth[] = []

@@ -43,6 +43,8 @@ El suite es **smoke**, no integracion: verifica que los pages renderizan sin 5xx
 | `PLAYWRIGHT_SKIP_AUTH_SETUP` | Si es `true`, salta el global setup y requiere `.auth/storageState.json` pre-existente. | No |
 | `AGENT_AUTH_STORAGE_PATH` | Path custom para `storageState.json`. Default: `.auth/storageState.json`. | No |
 
+`playwright.config.ts` y `scripts/playwright-auth-setup.mjs` cargan `.env.local` y luego `.env` automaticamente, sin sobrescribir variables ya exportadas por la shell o por CI. En local no es necesario hacer `source .env.local` para que el suite encuentre `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL` o `VERCEL_AUTOMATION_BYPASS_SECRET`.
+
 ## Correr local
 
 ```bash
@@ -80,18 +82,18 @@ PLAYWRIGHT_SKIP_AUTH_SETUP=true pnpm test:e2e
 
 ## Correr contra Staging
 
-Staging tiene Vercel SSO Protection. Para que Playwright pueda hacer requests, necesita el bypass header:
+Staging tiene Vercel SSO Protection. El comando canonico resuelve el bypass de forma segura desde env, `.env.local` o Vercel API usando el mismo helper de `staging-request.mjs`:
 
 ```bash
-PLAYWRIGHT_BASE_URL="https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app" \
-VERCEL_AUTOMATION_BYPASS_SECRET="<secret>" \
-AGENT_AUTH_SECRET="<secret>" \
-pnpm test:e2e
+pnpm test:e2e:staging
+
+# O un spec puntual:
+pnpm test:e2e:staging -- tests/e2e/smoke/finance-cash-out-bank-reflection.spec.ts --project=chromium --workers=1
 ```
 
-`playwright.config.ts` inyecta el header `x-vercel-protection-bypass` automaticamente cuando `VERCEL_AUTOMATION_BYPASS_SECRET` esta seteado.
+`scripts/playwright-staging.mjs` setea `PLAYWRIGHT_BASE_URL`, `AGENT_AUTH_BASE_URL`, `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL` y `VERCEL_AUTOMATION_BYPASS_SECRET` solo para el proceso hijo de Playwright. No imprime valores sensibles. Si necesitas apuntar a otro deployment staging, usa `STAGING_URL=<url> pnpm test:e2e:staging`; `PLAYWRIGHT_BASE_URL=<url>` tambien funciona como override.
 
-**Nota:** usar la URL `.vercel.app`, no el custom domain `dev-greenhouse.efeoncepro.com` — este ultimo tambien tiene SSO activa pero el bypass header solo aplica al dominio de deployment.
+**Nota:** por defecto usa la URL `.vercel.app`, no el custom domain `dev-greenhouse.efeoncepro.com` — este ultimo tambien tiene SSO activa pero el bypass header solo aplica al dominio de deployment.
 
 ## Correr en CI
 
@@ -107,7 +109,7 @@ Requiere los siguientes **GitHub Secrets** (repo-level):
 | `PLAYWRIGHT_BASE_URL` | URL `.vercel.app` de staging (o custom staging URL). |
 | `AGENT_AUTH_SECRET` | Shared secret del agent auth endpoint. |
 | `AGENT_AUTH_EMAIL` | Opcional, default `agent@greenhouse.efeonce.org`. |
-| `VERCEL_AUTOMATION_BYPASS_SECRET` | Bypass de Vercel (auto-gestionado por Vercel — copiar de env vars). |
+| `VERCEL_AUTOMATION_BYPASS_SECRET` | Bypass de Vercel auto-gestionado por Vercel. |
 
 Si falta `PLAYWRIGHT_BASE_URL` o `AGENT_AUTH_SECRET`, el workflow falla en el guard inicial con un error claro.
 
@@ -169,9 +171,9 @@ tests/
 
 | Sintoma | Causa probable | Fix |
 | --- | --- | --- |
-| `AGENT_AUTH_SECRET is required for Playwright auth setup` | Falta env var local. | Exportar secret o ponerlo en `.env.local`. |
+| `AGENT_AUTH_SECRET is required for Playwright auth setup` | Falta env var local o secret de CI. | Ponerlo en `.env.local` para local o GitHub Secrets para CI. |
 | Tests caen a `/login` | Cookie expirada o secret invalido. | Borrar `.auth/storageState.json` y correr `pnpm test:e2e:setup`. |
-| 401/403 contra staging | Falta bypass secret o esta desalineado. | Verificar `VERCEL_AUTOMATION_BYPASS_SECRET` en Vercel Settings -> Environment Variables. No crearlo manualmente. |
+| 401/403 contra staging | Falta bypass secret o esta desalineado. | Correr `pnpm test:e2e:staging`; si sigue fallando con HTML/SSO, borrar `VERCEL_AUTOMATION_BYPASS_SECRET` de `.env.local` para que se re-resuelva desde Vercel API. No crearlo manualmente en Vercel. |
 | `browserType.launch: Executable doesn't exist` | Chromium no instalado. | `pnpm exec playwright install chromium`. |
 | Test timeouts en CI pero verdes local | Network lento en runners; storageState viejo. | CI ya regenera storageState en cada run via global-setup. Subir timeout en `playwright.config.ts` si se confirma. |
 

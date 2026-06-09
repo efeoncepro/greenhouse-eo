@@ -104,7 +104,7 @@ const EventRow = ({ event }: { event: HomeCalendarEvent }) => {
         <Typography variant='caption' sx={{ fontWeight: 600, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }} color={`${meta.color}.main`}>
           {day.day}
         </Typography>
-        <Typography variant='caption' sx={{ fontSize: 9, lineHeight: 1, mt: 0.25, textTransform: 'uppercase', letterSpacing: 0.5 }} color='text.secondary'>
+        <Typography variant='caption' sx={{ lineHeight: 1, mt: 0.25, textTransform: 'uppercase', letterSpacing: 0.5 }} color='text.secondary'>
           {day.month}
         </Typography>
       </Box>

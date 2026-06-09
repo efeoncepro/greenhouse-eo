@@ -288,11 +288,27 @@ export const listMembersWithoutSupervisor = async (
   return rows.map(mapReportingLine)
 }
 
+/**
+ * TASK-1020 — política de delegación que el caller declara explícitamente.
+ *
+ * - `'generic'` (default): aplica la responsabilidad operacional GENÉRICA
+ *   `approval_delegate` activa como supervisor efectivo (comportamiento legacy
+ *   del reader; preservado para callers que lo pidan explícito).
+ * - `'ignore'`: ignora el `approval_delegate` genérico y devuelve el supervisor
+ *   FORMAL (`reporting_lines`) como efectivo. El approval resolver pasa `'ignore'`
+ *   para los stages con `honorGenericApprovalDelegate=false`.
+ *
+ * NO se cambia el default a `'ignore'` de forma global ciega: cada caller declara
+ * su política. El plano de visibilidad (`access.ts`) es una decisión SEPARADA.
+ */
+export type EffectiveSupervisorDelegationPolicy = 'generic' | 'ignore'
+
 export const getEffectiveSupervisor = async (
   memberId: string,
-  opts?: { effectiveAt?: string }
+  opts?: { effectiveAt?: string; delegationPolicy?: EffectiveSupervisorDelegationPolicy }
 ): Promise<EffectiveSupervisorRecord | null> => {
   const effectiveAt = opts?.effectiveAt ?? new Date().toISOString()
+  const delegationPolicy: EffectiveSupervisorDelegationPolicy = opts?.delegationPolicy ?? 'generic'
   const currentLine = await getCurrentReportingLine(memberId, { effectiveAt })
 
   if (!currentLine) {
@@ -307,6 +323,21 @@ export const getEffectiveSupervisor = async (
       supervisorName: null,
       effectiveSupervisorMemberId: null,
       effectiveSupervisorName: null,
+      delegated: false,
+      delegation: null
+    }
+  }
+
+  // TASK-1020 — política 'ignore': el supervisor efectivo ES el formal; no se
+  // consulta ni se aplica ninguna delegación genérica.
+  if (delegationPolicy === 'ignore') {
+    return {
+      memberId: currentLine.memberId,
+      memberName: currentLine.memberName,
+      supervisorMemberId: currentLine.supervisorMemberId,
+      supervisorName: currentLine.supervisorName,
+      effectiveSupervisorMemberId: currentLine.supervisorMemberId,
+      effectiveSupervisorName: currentLine.supervisorName,
       delegated: false,
       delegation: null
     }

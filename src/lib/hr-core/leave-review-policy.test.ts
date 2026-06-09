@@ -99,3 +99,69 @@ describe('leave review policy', () => {
     })).toBe(false)
   })
 })
+
+// TASK-1020 — escenario regression Daniela/Valentina/Andrés (fixtures conceptuales,
+// sin IDs vivos en runtime). Post-fix el snapshot resuelve effective == supervisor
+// formal (Daniela); un delegado genérico (Valentina) NO puede aprobar.
+describe('leave review policy — TASK-1020 delegation drift', () => {
+  const andresRequest: HrLeaveRequest = {
+    ...baseRequest,
+    requestId: 'leave-andres',
+    memberId: 'andres-carlosama',
+    memberName: 'Andrés Carlosama',
+    supervisorMemberId: 'daniela-ferreira',
+    supervisorName: 'Daniela Ferreira',
+    approvalSnapshot: {
+      ...baseRequest.approvalSnapshot!,
+      workflowEntityId: 'leave-andres',
+      subjectMemberId: 'andres-carlosama',
+      authoritySource: 'reporting_hierarchy',
+      formalApproverMemberId: 'daniela-ferreira',
+      formalApproverName: 'Daniela Ferreira',
+      effectiveApproverMemberId: 'daniela-ferreira',
+      effectiveApproverName: 'Daniela Ferreira',
+      delegateMemberId: null,
+      delegateResponsibilityId: null,
+      delegated: false
+    }
+  }
+
+  it('Daniela (formal supervisor) can approve/reject Andrés request', () => {
+    const capabilities = getLeaveReviewCapabilities({
+      request: andresRequest,
+      actor: { currentMemberId: 'daniela-ferreira', hasHrAdminAccess: false }
+    })
+
+    expect(capabilities.canApprove).toBe(true)
+    expect(capabilities.canReject).toBe(true)
+    expect(capabilities.effectiveApproverMemberId).toBe('daniela-ferreira')
+  })
+
+  it('Valentina (generic delegate, not effective approver) cannot approve Andrés request', () => {
+    expect(canPerformLeaveReviewAction({
+      request: andresRequest,
+      actor: { currentMemberId: 'valentina-hoyos', hasHrAdminAccess: false },
+      action: 'approve'
+    })).toBe(false)
+
+    expect(getAllowedLeaveReviewActions({
+      request: andresRequest,
+      actor: { currentMemberId: 'valentina-hoyos', hasHrAdminAccess: false }
+    })).toEqual([])
+  })
+
+  it('HR admin override still applies regardless of delegation', () => {
+    expect(getAllowedLeaveReviewActions({
+      request: andresRequest,
+      actor: { currentMemberId: null, hasHrAdminAccess: true }
+    })).toEqual(['cancel', 'reject', 'approve'])
+  })
+
+  it('an unrelated collaborator cannot approve', () => {
+    expect(canPerformLeaveReviewAction({
+      request: andresRequest,
+      actor: { currentMemberId: 'someone-else', hasHrAdminAccess: false },
+      action: 'approve'
+    })).toBe(false)
+  })
+})

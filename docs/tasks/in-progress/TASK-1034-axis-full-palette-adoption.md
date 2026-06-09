@@ -1,0 +1,161 @@
+# TASK-1034 — Adopción completa de la paleta AXIS en el runtime Greenhouse
+
+> **Lifecycle:** in-progress
+> **Creado:** 2026-06-06 por Claude (sesión con Julio)
+> **Prioridad:** P1
+> **Domain:** ui | platform | design-system | accessibility
+
+## Objetivo
+
+Greenhouse debe tener **todos** los colores de AXIS (el Design System de Efeonce), no solo
+los `main` semánticos. AXIS = fuente de verdad (Figma `yyMksCoijfMaIoYplXKZaR`, nodos
+`11205:5342` light + `11205:6238` dark). El runtime actual ([mergedTheme.ts](../../../src/components/theme/mergedTheme.ts))
+solo tiene `main` + algunos `light/dark` + `customColors`; le falta el ramp completo y los
+neutrales divergen.
+
+## Decisiones del operador (2026-06-06)
+
+1. **Sincronización:** pipeline desde Figma (re-sincronizable, generado). NO transcripción manual.
+2. **Alcance marca:** solo Efeonce/GreenHouse. Kortex/Verk fuera del runtime de Greenhouse.
+3. **Huecos a11y:** arreglar en código por ahora (capa semántica, override documentado), reconciliar con AXIS después.
+
+## Drift detectado AXIS vs runtime actual
+
+| Token | AXIS | Runtime actual |
+|---|---|---|
+| success | `#28c76f` (verde) | `#6EC207` (lime) |
+| warning | `#ffb703` (ámbar) | `#FF6500` (naranja) |
+| error | `#ff4c51` (coral) | `#BB1954` (crimson) |
+| info | `#00bad1` (cyan) | `#0375DB` (= primary) |
+| secondary | `#6ec207` (lime ramp) | `#023C70` (navy) |
+| text-primary (light) | `#2f2b3de5` | `#1A1A2E` |
+| bg / paper (dark) | `#25293c` / `#2f3349` | `#101827` / `#162033` |
+| primary | `#0375db` ✅ | `#0375db` ✅ (igual) |
+
+## Huecos de contraste de AXIS tal cual (WCAG 2.2 AA, texto ≥4.5:1)
+
+- `success` e `info`: ni el paso `-900` alcanza 4.5:1 sobre blanco (máx 3.83 y 4.01) → texto chico verde/cyan sobre blanco reprueba. OK para íconos/large (3.0).
+- `error` contained con texto blanco = 3.28:1 (borderline texto normal).
+- En dark mode los `-500` brillantes dan 5–9:1 → sin problema.
+
+## Arquitectura (3 capas)
+
+```
+AXIS (Figma, SoT)
+  → Capa 1 primitivos  src/@core/theme/axis-tokens.ts   (espejo 1:1, generado)
+  → Capa 2 semántica   axis-semantic.ts                 (ramp → rol por modo + overrides a11y)
+  → Capa 3 MUI theme   colorSchemes.light/dark.palette  (palette.<family>[100..900], opacity, customColors)
+```
+
+## Slices
+
+- [x] **Slice 0 — Foundation (DONE 2026-06-06).** Extracción AXIS completa (light+dark) →
+  `src/@core/theme/axis-tokens.ts` (ramps 100-900 + opacity 8/16/24/32/38 + neutrales por modo +
+  `axisMain`). Mockup de paleta completa `/admin/axis-palette/mockup` con anotación WCAG por paso.
+  tsc/lint/design:lint verdes. GVC capturado y revisado.
+- [x] **Slice 1 — Capa semántica (DONE 2026-06-06).** `axis-semantic.ts`: mapea ramp→rol
+  (main=500 / light=400 / dark=600 / contrastText AA) para success/warning/error/info. contrastText:
+  success/warning/info = ink `#2f2b3d` (fills brillantes fallan con blanco); error = white (gap, ver 2b).
+  `theme.axis` expone los primitivos completos (augmentation en `types.ts`).
+- [x] **Slice 2 — Wire semánticos en el theme (DONE 2026-06-06).** `colorSchemes.light/dark.palette`
+  consume `axisSemanticPalette` para info/success/warning/error (mains AXIS mode-agnostic). `theme.axis`
+  agregado. `primary`/`secondary`/neutrales/`customColors` intactos. DESIGN.md front-matter
+  (success/warning/error/info) + chips error/info → text-primary (pasan contrastCheck) +
+  `GREENHOUSE_DESIGN_TOKENS_V1.md` §8.1 actualizados en el mismo cambio. `design:lint` 0/0/1 ✅, tsc ✅, lint ✅.
+  Verificado con sonda de color computado (success/warning/info AA en filled alerts + contained buttons).
+  Preview vivo: `/admin/theme-preview/mockup`.
+- [x] **Slice 2b — Fix AA del error fill (DONE 2026-06-06).** En vez de override de componente (riesgo de
+  clobber con overrides Vuexy vía deepmerge), se mapeó `error.main = AXIS error-800 #CC3D41` (blanco 4.87:1 ✅),
+  `error.light = #FF4C51` (vibrante para bordes/íconos/tints), `error.dark = #BF393D` (hover 5.43:1). Sin tocar
+  overrides core. DESIGN.md error→#CC3D41 + status-chip-error→on-primary; tokens doc §8.1 actualizado. Verificado
+  por sonda de color real: btn/alert/chip error contained = 4.87:1 AA. Desviación a11y deliberada (decision #3),
+  documentada para reconciliar con AXIS. gate ✅ tsc ✅ GVC ✅.
+- [x] **Slice 3 — Neutrales AXIS (ALTO blast-radius) (CÓDIGO DONE 2026-06-06, ship dormant).**
+  Adopta bg/paper/text/customColors de AXIS light+dark vía `src/@core/theme/axis-neutrals.ts`
+  (dos fragmentos: `legacyNeutrals` bit-for-bit + `axisNeutrals` desde `axisNeutral` SoT).
+  `mergedTheme.ts` consume `resolveNeutralFragments()`. Brand customColors
+  (midnight/deepAzure/royalBlue/coreBlue/neonLime/sunsetOrange/crimson/lightAlloy) + `inputBorder`
+  INTACTOS (Slice 4). `divider` lo deja el core (ya === AXIS `#2f2b3d1f` vía channels).
+  Superficies Vuexy dark alineadas a AXIS (chatBg `#202534`, greyLightBg `#353A52`, trackBg `#3A3F57`,
+  tableHeader/tooltip `#2f3349`) para no chocar de hue contra el nuevo bg púrpura-navy.
+  - **Flag de rollout (decisión operador):** `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED` (build-time, **default OFF**).
+    Desviación deliberada del `home_rollout_flags` (DB): el theme MUI se construye sincrónico en cada
+    render (SSR+cliente) sin DB alcanzable y es global → flag build-time es el mecanismo correcto
+    (clase `themeConfig.mode`/`primaryColor`). Flip por env var en Vercel + redeploy.
+  - **Verificado:** tsc/lint/design:lint verdes (DESIGN.md sin tocar = consistente con runtime live OFF).
+    GVC light+dark (flag ON) en /home, /people, /finance/expenses, /admin/operations: dark navy→púrpura-navy
+    AXIS coherente, cero regresión. Sonda de color computado dark AA con margen: heading 9.14:1,
+    form-label 7.98:1, body 6.11:1, table-cell 5.47:1.
+  - **FLIP A DEFAULT-ON (2026-06-06, decisión operador):** `isAxisNeutralsEnabled()` ahora default ON
+    (`env !== 'false'`); `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED=false` queda como kill-switch de emergencia.
+    Razón: un flag es rollout temporal, no hogar permanente; dejar AXIS dormido mientras el contrato dice
+    AXIS = divergencia permanente. Verificado: dark default = AXIS `#25293C` sin env (sonda).
+  - **DESIGN.md alineado a AXIS (mismo flip):** neutrales → AXIS (neutral `#F8F7FA`, surface-dark `#2F3349`,
+    background-dark `#25293C`, text-primary `#2F2B3D`, text-primary-dark `#E1DEF5`, etc., sólidos
+    representativos del alpha para el contrastCheck). `button-primary-tonal` re-modelado AA-correcto
+    (`primary-tonal #D7E9F9` + `primary-dark` = ~7:1; el ink AXIS expuso que el viejo `#3691e3`+ink daba
+    4.12). `primary-light` CONSERVADO (re-alojado en `nav-active-indicator`, NO borrado). Nueva sección
+    prosa "AXIS palette — full reference" documenta ramps 100-900 + opacity + gray vía `theme.axis.*`
+    (no van al front-matter: la regla `orphanedTokens` rechaza tokens sin componente). V1 §8.1 nota
+    sincronizada. `design:lint` 0/0/1.
+  - **PENDIENTE (decisión de marca, NO adoptado):** `secondary` sigue navy `#023C70`; AXIS define
+    secondary = lime `#6EC207` (flip de rol gated). `primary-light`/`primary-dark` siguen runtime-computed
+    (primary es tenant-driven), no ramp AXIS.
+
+- [x] **Slice 5 — DROPEADO (2026-06-06, decisión operador).** Las sombras/elevación YA están AXIS-alineadas
+  por construcción: el core Vuexy genera `theme.shadows` + `theme.customShadows` channel-based sobre el
+  shadow channel AXIS (`mainColorChannels.darkShadow`); `mergedTheme.ts` no las override. No es color de
+  paleta. El cleanup de 36 `boxShadow` hardcodeados es token-discipline ortogonal → TASK aparte si se desea.
+  La adopción de la PALETA AXIS queda completa con Slices 0-4 + flip.
+- [x] **Slice 4 — Migración consumers + drift guard (DONE 2026-06-06).** Audit reveló que el "~41
+  archivos" estaba inflado: el token `customColors.{neonLime,sunsetOrange,crimson}` tenía **cero
+  consumers reales** (solo type decl + test mock); el drift real eran ~hex legacy hardcodeados en
+  config/PDF/charts.
+  - **SoT semántico:** `axisSemanticHex` en `axis-semantic.ts` (success `#28c76f`, warning `#ffb703`,
+    error `#cc3d41` [error-800 AA, no el #ff4c51], info `#00bad1`), derivado de `axisSemanticPalette`
+    (mismo origen que el theme) → un solo SoT para consumers non-MUI.
+  - **Token muerto REMOVIDO** (veredicto skills `design-system-governance` + `arch-architect`: cero
+    consumers ⇒ grace-period nulo; footgun de misuse; two-way door reversible). Quitado de
+    `mergedTheme.ts` (light+dark) + `types.ts` + `test/render.tsx`. `efeonce-crimson` primary NO tocado.
+  - **Consumers semánticos migrados al SoT:** `lib/finance/pdf/tokens.ts` (success/warning),
+    `config/greenhouse-nomenclature.ts` (`semaphore`/`semantic`/`chart` semantic roles; bg→`axisOpacity[8]`),
+    `lib/ai/image-generator.ts` (prompt). Categóricos de dominio (cscPhase/service/categories/subBrand)
+    **NO migrados** (paleta de categorías deliberada, decisión operador).
+  - **Drift guard:** `axis-semantic-drift.test.ts` (7 tests) asserta theme ≡ nomenclature ≡ PDF ≡
+    `axisSemanticHex` + que ningún hex legacy sobreviva. Falla CI ante cualquier drift futuro.
+  - **V1 §8.1** sincronizado (tokens marcados REMOVIDO + apuntan al SoT; corregido stale error #FF4C51→#CC3D41).
+    DESIGN.md sin cambios (los semánticos ya eran AXIS desde Slice 2; Slice 4 solo alinea consumers).
+  - Verificado: tsc/lint/design:lint(0/0/1) verdes · 154 tests consumers + 7 drift · GVC OTD% trend card
+    = verde AXIS `#28c76f` coherente (antes lime legacy).
+- [ ] **Slice 5 — Shadows/elevación (diferido del scope de color).** Tokens de sombra AXIS sm/md/lg light+dark.
+
+## Archivos (Slice 0)
+
+- `src/@core/theme/axis-tokens.ts` — primitivos AXIS (SoT en código)
+- `src/app/(dashboard)/admin/axis-palette/mockup/page.tsx`
+- `src/views/greenhouse/admin/axis-palette/mockup/AxisPaletteMockupView.tsx`
+- `scripts/frontend/scenarios/axis-palette-mockup.scenario.ts`
+
+## Notas
+
+- AXIS bindea `action-hover` al mismo `#e1def50f` en ambos modos; en light es casi invisible —
+  probable gap de autoría de AXIS, espejado verbatim + flag para reconciliar upstream.
+- El nombre canónico del DS (AXIS) quedó registrado en DESIGN.md (commit `8dee9e5f`) + memoria.
+
+## Delta 2026-06-06 — canonización de la referencia viva (mockup → `/admin/design-system`)
+
+El mockup de Slice 0 se promovió a una **superficie real gobernada INTERNA** (commit `9437dbe7c`). Decisión operador: "más que mockup quiero canonizarlo" + "esto no tienen que verlo los clientes".
+
+- **Rutas movidas (fuera de `/mockup`):** `admin/axis-palette/mockup/page.tsx` → `admin/design-system/page.tsx`; `AxisPaletteMockupView` → `src/views/greenhouse/admin/design-system/DesignSystemView.tsx`; scenario GVC → `scripts/frontend/scenarios/design-system.scenario.ts`. (Reemplaza las rutas listadas en "Archivos (Slice 0)".)
+- **Guard de acceso:** `getTenantContext` → `/login` sin sesión → `/401` si `tenantType==='client'` → `hasAuthorizedViewCode('administracion.design_system', fallback routeGroups.includes('internal'))` else `/401`.
+- **Gobernanza View Registry (TASK-827):** viewCode `administracion.design_system` (routeGroup `internal`, `/admin/design-system`, icon `tabler-palette`) en `VIEW_REGISTRY` (`src/lib/admin/view-access-catalog.ts`) + migración `20260606164637875_task-1034-seed-design-system-view.sql` **aplicada** sembrando `view_registry` + `role_view_assignments` a **9 roles internos** (efeonce_admin, finance_admin, finance_analyst, hr_payroll, hr_manager, efeonce_operations, efeonce_account, people_viewer, ai_tooling_admin — **NUNCA `client_*`**).
+- **Nav (TASK-982):** item bajo Administración gateado por `canSeeView('administracion.design_system', false)` en `VerticalMenu.tsx` + keys `adminDesignSystem` en `greenhouse-nomenclature.ts` / `greenhouse-navigation-copy.ts`.
+- **Vista:** heading "Paleta AXIS — referencia completa" + referencia Figma SoT (fileKey `yyMksCoijfMaIoYplXKZaR`, nodo `11205:5341`, tools MCP `get_variable_defs`/`get_screenshot`) + nota interna; renderiza los ramps live desde `axis-tokens.ts`; lleva `AxisWordmark` (logo solo-DS).
+- **Verificación:** GVC `/admin/design-system` = 200 render correcto; pre-commit lint ✓; pre-push lint+tsc ✓; `pnpm design:lint` 0/0/1; `db.d.ts` sin cambios (solo rows). Docs sync: CLAUDE.md, AGENTS.md, Handoff.md, esta spec, memoria `project_axis_palette_adoption.md`.
+
+## Delta 2026-06-07 — paleta pasa a child route del catálogo DS
+
+- `/admin/design-system` ahora es el catálogo canónico del Design System interno.
+- La referencia viva de color AXIS de esta task se conserva como `/admin/design-system/colors` (`AxisColorLabView`) con el mismo viewCode `administracion.design_system`.
+- Toda extensión futura de color debe actualizar `/admin/design-system/colors` y mantener la entrada correspondiente enlazada desde el catálogo `/admin/design-system`.
+- **Gotchas registrados:** (1) `git mv` stagea el blob viejo (rename preserva contenido) → re-`git add` de los movidos para que staged == working tree; (2) pre-push tsc falló por `.next/dev/types/{routes.d.ts,validator.ts}` corruptos (dual-write del dev server al regenerar el manifest tras mover la ruta) → `rm` de los scratch (Turbopack regenera; globs toleran ausentes). No es código del repo; CI compila `.next` limpio.

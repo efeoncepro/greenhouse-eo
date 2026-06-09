@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
@@ -42,6 +41,8 @@ import Chip from '@mui/material/Chip'
 
 import classnames from 'classnames'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
 import TablePaginationComponent from '@components/TablePaginationComponent'
@@ -64,7 +65,6 @@ import { getMicrocopy } from '@/lib/copy'
 import { formatCurrency as formatGreenhouseCurrency, formatDateTime as formatGreenhouseDateTime, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1261,7 +1261,7 @@ const FinanceDashboardView = () => {
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <Typography variant='caption' color='text.secondary'>Detalle</Typography>
-                <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                <Typography variant='caption'>
                   {nuboxSync.lastProjection?.notes || nuboxSync.lastSync.notes || '—'}
                 </Typography>
               </Grid>
@@ -1316,7 +1316,7 @@ const movementColumns: any[] = [
     cell: ({ getValue, row }) => (
       <Box>
         <Typography variant='body2' fontWeight={500}>{getValue()}</Typography>
-        <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>{row.original.id}</Typography>
+        <Typography variant='caption' color='text.secondary'>{row.original.id}</Typography>
       </Box>
     ),
     meta: { minWidth: 300 }

@@ -190,7 +190,7 @@ const expColumns: ColumnDef<Expense, any>[] = [
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.25 }}>
           {row.original.documentNumber && (
-            <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
+            <Typography variant='caption' color='text.secondary'>
               Doc: {row.original.documentNumber}
             </Typography>
           )}

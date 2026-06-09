@@ -17,10 +17,6 @@ type DirectReportCountRow = {
   direct_reports_count: number | string
 }
 
-type DelegatedSupervisorRow = {
-  supervisor_member_id: string
-}
-
 const isInternalTenant = (tenant: TenantContext) => tenant.tenantType === 'efeonce_internal'
 
 export const resolveTenantHierarchyMemberId = async (tenant: TenantContext): Promise<string | null> => {
@@ -78,27 +74,22 @@ const getDirectReportCount = async (memberId: string) => {
   return Number(rows[0]?.direct_reports_count ?? 0)
 }
 
-const listDelegatedSupervisorIds = async (memberId: string) => {
-  const rows = await query<DelegatedSupervisorRow>(
-    `
-      SELECT DISTINCT
-        r.scope_id AS supervisor_member_id
-      FROM greenhouse_core.operational_responsibilities AS r
-      WHERE r.member_id = $1
-        AND r.responsibility_type = 'approval_delegate'
-        AND r.scope_type = 'member'
-        AND r.active = TRUE
-        AND r.effective_from <= CURRENT_TIMESTAMP
-        AND (r.effective_to IS NULL OR r.effective_to > CURRENT_TIMESTAMP)
-    `,
-    [memberId]
-  )
-
-  return rows
-    .map(row => row.supervisor_member_id)
-    .filter(Boolean)
-}
-
+/**
+ * TASK-1020 D3 — el supervisor scope (visibilidad + acceso a superficies de
+ * supervisor) deriva EXCLUSIVAMENTE de la línea formal `reporting_lines`
+ * (`hasDirectReports` + subárbol propio).
+ *
+ * El `approval_delegate` genérico de `operational_responsibilities` YA NO confiere
+ * scope: conferir visibilidad-sin-autoridad sobre un artefacto no validado es
+ * over-exposure (principio TASK-987/ISSUE-083 — el predicado de validez se mueve
+ * junto para TODO lo derivado). La cobertura legítima "ver sin aprobar" renace
+ * como contrato domain-scoped opt-in por dimensión (D1 follow-up), NO via el
+ * delegate genérico.
+ *
+ * `delegatedSupervisorIds` queda `[]` y `hasDelegatedAuthority` queda `false`
+ * mientras V1 no tenga un tipo de delegación domain-scoped. El shape del record
+ * se preserva para los consumers (supervisor-workspace, JWT summary).
+ */
 export const getSupervisorScopeForTenant = async (tenant: TenantContext): Promise<SupervisorScopeRecord> => {
   const memberId = await resolveTenantHierarchyMemberId(tenant)
 
@@ -115,19 +106,10 @@ export const getSupervisorScopeForTenant = async (tenant: TenantContext): Promis
     }
   }
 
-  const [directReportCount, delegatedSupervisorIds, ownSubtree] = await Promise.all([
+  const [directReportCount, ownSubtree] = await Promise.all([
     getDirectReportCount(memberId),
-    listDelegatedSupervisorIds(memberId),
     listReportingSubtree(memberId).catch(() => [])
   ])
-
-  const delegatedSubtrees = delegatedSupervisorIds.length > 0
-    ? await Promise.all(
-        delegatedSupervisorIds.map(async supervisorMemberId =>
-          listReportingSubtree(supervisorMemberId).catch(() => [])
-        )
-      )
-    : []
 
   const visibleMemberIds = new Set<string>([memberId])
 
@@ -135,26 +117,18 @@ export const getSupervisorScopeForTenant = async (tenant: TenantContext): Promis
     visibleMemberIds.add(node.memberId)
   }
 
-  for (const subtree of delegatedSubtrees) {
-    for (const node of subtree) {
-      if (node.depth > 0) {
-        visibleMemberIds.add(node.memberId)
-      }
-    }
-  }
-
   const hasDirectReports = directReportCount > 0
-  const hasDelegatedAuthority = delegatedSupervisorIds.length > 0
 
   return {
     memberId,
     directReportCount,
-    delegatedSupervisorIds,
+    // D3: el delegate genérico no confiere scope en V1.
+    delegatedSupervisorIds: [],
     visibleMemberIds: [...visibleMemberIds],
     hasDirectReports,
-    hasDelegatedAuthority,
-    canAccessSupervisorPeople: hasDirectReports || hasDelegatedAuthority,
-    canAccessSupervisorLeave: hasDirectReports || hasDelegatedAuthority
+    hasDelegatedAuthority: false,
+    canAccessSupervisorPeople: hasDirectReports,
+    canAccessSupervisorLeave: hasDirectReports
   }
 }
 

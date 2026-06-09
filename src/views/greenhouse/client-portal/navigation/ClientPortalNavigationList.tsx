@@ -81,7 +81,6 @@ const ClientPortalNavigationList = ({ items }: ClientPortalNavigationListProps) 
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
                 fontWeight: 600,
-                fontSize: '0.7rem'
               }}
             >
               {GROUP_LABELS[group]}
@@ -126,7 +125,6 @@ const ClientPortalNavigationList = ({ items }: ClientPortalNavigationListProps) 
                           borderRadius: 0.75,
                           backgroundColor: theme => theme.palette.warning.main,
                           color: 'common.white',
-                          fontSize: '0.625rem',
                           fontWeight: 600,
                           textTransform: 'uppercase'
                         }}

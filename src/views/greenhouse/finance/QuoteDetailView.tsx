@@ -1026,13 +1026,13 @@ const QuoteDetailView = () => {
                 {quote.dteFolio && (
                   <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <Typography variant='caption' color='text.secondary'>Folio DTE</Typography>
-                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{quote.dteFolio}</Typography>
+                    <Typography variant='caption'>{quote.dteFolio}</Typography>
                   </Grid>
                 )}
                 {quote.hubspotDealId && (
                   <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <Typography variant='caption' color='text.secondary'>Deal HubSpot</Typography>
-                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{quote.hubspotDealId}</Typography>
+                    <Typography variant='caption'>{quote.hubspotDealId}</Typography>
                   </Grid>
                 )}
                 {quote.notes && (
@@ -1089,7 +1089,7 @@ const QuoteDetailView = () => {
                               <Box>
                                 <Typography variant='body2' sx={{ fontWeight: 500 }}>{li.product.name}</Typography>
                                 {li.product.sku && (
-                                  <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>
+                                  <Typography variant='caption' color='text.secondary'>
                                     {li.product.sku}
                                   </Typography>
                                 )}

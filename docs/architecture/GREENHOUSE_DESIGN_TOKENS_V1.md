@@ -60,13 +60,13 @@ Violations visible in code review or agent output are a **hard block**, not a ni
 
 ## 3. Typography
 
-> **Política canónica vigente** (TASK-566 / EPIC-004, 2026-05-01 — pivot a Geist tarde del mismo día): el sistema tipográfico de Greenhouse opera con **dos familias activas y solo dos**: `Poppins` para display controlado (`h1-h4`) y `Geist Sans` para todo el producto base (body, forms, tablas, controles, chips, labels, KPIs, IDs y montos). `DM Sans` e `Inter` quedaron retiradas como baseline. `fontFamily: 'monospace'` está prohibido globalmente — los montos y los IDs usan Geist con `font-variant-numeric: tabular-nums`. Los variants `monoId` y `monoAmount` siguen siendo la API semántica para IDs y montos, pero NO licencian una tercera familia monospace (en particular **Geist Mono NO se introduce**).
+> **Política canónica vigente** (TASK-566 / EPIC-004, 2026-05-01 — pivot a Geist tarde del mismo día): el sistema tipográfico de Greenhouse opera con **dos familias activas y solo dos**: `Poppins` para display controlado (`h1-h4` + `surfaceHeroTitle`) y `Geist Sans` para todo el producto base (body, forms, tablas, controles, chips, labels, KPIs, IDs y montos). `DM Sans` e `Inter` quedaron retiradas como baseline. `fontFamily: 'monospace'` está prohibido globalmente — los montos y los IDs usan Geist con `font-variant-numeric: tabular-nums`. Los variants `monoId` y `monoAmount` siguen siendo la API semántica para IDs y montos, pero NO licencian una tercera familia monospace (en particular **Geist Mono NO se introduce**).
 
 ### 3.1 Font families
 
 | Role | Family | CSS Variable | Pesos cargados | When to use |
 |---|---|---|---|---|
-| Display | **Poppins** | `var(--font-poppins)` | 600, 700, 800 | EXCLUSIVO para `h1-h4` y momentos display realmente intencionales. Prohibido en `h5`, `h6`, `body*`, `button`, `overline`, `kpiValue`, `mono*`, chips, tablas, inputs |
+| Display | **Poppins** | `var(--font-poppins)` | 600, 700, 800 | EXCLUSIVO para `h1-h4`, `surfaceHeroTitle` y momentos display realmente intencionales. Prohibido en `h5`, `h6`, `body*`, `button`, `overline`, `kpiValue`, `mono*`, chips, tablas, inputs |
 | Product UI base | **Geist Sans** | `var(--font-geist)` | 400, 500, 600, 700, 800 | TODO el resto del producto: body, forms, controles, tablas, chips, labels, KPIs, IDs, montos. Es el `typography.fontFamily` default del theme — no debe hardcodearse inline |
 | Numbers / IDs | **Geist** + `font-variant-numeric: tabular-nums` | `var(--font-geist)` | mismos pesos que Geist | Toda columna numérica, total, KPI, ID y monto. **PROHIBIDO `font-family: monospace`** y **PROHIBIDO Geist Mono** |
 
@@ -92,14 +92,15 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 | h1 | **Poppins** | 2 | 32 (override) | 800 | `heading` (1.25) | — | Marketing hero only |
 | h2 | **Poppins** | 1.5 | 24 (override) | 700 | `heading` (1.25) | — | Marketing section header |
 | h3 | **Poppins** | 1.25 | 20 (override) | 600 | `heading` (1.25) | — | Page identity (rare) |
-| h4 | **Poppins** | 1 | 16 (override) | 600 | `pageTitle` (1.4) | — | **Page title in product UI** |
-| h5 | Geist | 1.125 | 18 | 600 | `body` (1.5) | — | **Section title inside card/accordion** |
-| h6 | Geist | 0.9375 | 15 | 600 | `body` (1.5) | — | Inline bold label (prefer subtitle1) |
-| subtitle1 | Geist | 0.9375 | 15 | 400 | `body` (1.5) | — | **Card subheader, list item primary** |
-| subtitle2 | Geist | 0.8125 | 13 | 400 | 1.538 (coretheme inherit) | — | Card subheader secondary |
+| h4 | **Poppins** | 1.25 | 20 | 600 | `pageTitle` (1.4) | — | **Page title in product UI** (TASK-1038: 16→20, fixes inversion) |
+| surfaceHeroTitle | **Poppins** | 2.125 (mobile 1.75) | 34 (mobile 28) | 600 | `surfaceHero` (1.15) | — | **Primary full-page/workbench surface title only** — one per surface, never cards/tables/lists |
+| h5 | Geist | 1 | 16 | 600 | `body` (1.5) | — | **Section title inside card/accordion** (TASK-1038: 18→16) |
+| h6 | Geist | 0.875 | 14 | 600 | `body` (1.5) | — | Inline bold label (= `label-md`; prefer subtitle1) |
+| subtitle1 | Geist | 0.875 | 14 | 400 | `body` (1.5) | — | **Card subheader, list item primary** (= `subheader`, TASK-1038: 15→14) |
+| subtitle2 | Geist | 0.8125 | 13 | 400 | `metadata` (1.45) | 0.4px | Secondary subtitle — owned via `body-sm` (TASK-1038, ~267 consumers) |
 | body1 | Geist | 1 | 16 (override) | 400 | `body` (1.5) | — | **Primary body text** |
 | body2 | Geist | 0.875 | 14 (override) | 400 | `body` (1.5) | — | **Dense text, table cells, chip labels, helpers** |
-| button | Geist | 0.9375 | 15 | 600 | 1.467 (coretheme inherit) | — | Theme override — do not touch |
+| button | Geist | 0.875 | 14 | 600 | `body` (1.5) | — | = `label-md`, owned from SoT (TASK-1038: 15→14) |
 | caption | Geist | 0.8125 | 13 | 400 | `metadata` (1.45) | 0.4px | **Metadata, validity, timestamps, "sugerido"** |
 | overline | Geist | 0.75 | 12 | 600 | 1.167 (coretheme inherit) | 1px | **Section labels over content (SUBTOTAL, TOTAL, STATUS)** — uppercase tight intentional |
 | monoId | Geist + `tabular-nums` | 0.875 | 14 | 600 | `numericDense` (1.54) | 0.01em | IDs alfanuméricos canónicos (`EO-XXX-XXXX`, SKU, account number) |
@@ -114,7 +115,9 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 
 | I need to show… | Use variant | Example |
 |---|---|---|
-| Main page heading | `h4` | "Nueva cotización" in quote builder |
+| Dense/product-detail page heading | `h4` | "Nueva cotización" in quote builder |
+| Primary full-page/workbench surface title | `surfaceHeroTitle` | "Organizaciones" in Organization Operations Workbench |
+| Primary identity/person header | `surfaceHeroTitle` | "Daniela Alejandra Ferreira Toro" in Person 360 |
 | Section heading inside a card | `h5` | "Ítems de la cotización" |
 | Card subheader (explainer) | `subtitle1` with `color='text.secondary'` | "Agrega ítems vendibles desde el catálogo" |
 | Primary paragraph text | `body1` | Quote description body |
@@ -131,7 +134,12 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 ### 3.4 Prohibitions
 
 - **NEVER** uses `fontFamily: 'monospace'` (literal o vía stacks tipo `'Menlo, Consolas, monospace'`). Para alinear cifras usar `fontVariantNumeric: 'tabular-nums'` sobre Geist.
-- **NEVER** declare `fontFamily` inline en componentes nuevos. Geist es default implícito; Poppins se aplica solo por las variants `h1-h4` ya tipadas en el theme.
+- **NEVER** declare `fontFamily` inline en componentes nuevos. Geist es default implícito; Poppins se aplica solo por las variants `h1-h4` + `surfaceHeroTitle` ya tipadas en el theme.
+- **NEVER** use `surfaceHeroTitle` as a general big heading. It is only for the
+  primary title of a full-page surface/workbench or the primary name of an
+  identity header, maximum one per surface, and never for cards, tables, lists,
+  dashboards, drawers, modals, repeated rows or marketing heroes. Dense/product
+  detail page titles remain `h4` / `page-title`.
 - **NEVER** introduce Geist Mono ni ninguna familia mono separada — los variants `monoId` y `monoAmount` resuelven el caso sobre Geist Sans + tabular-nums.
 - **NEVER** mantener referencias activas a `var(--font-inter)` o `'Inter'` literal en código nuevo. TASK-567 cerró el sweep en UI productiva (2026-05-02): 0 referencias a Inter en `src/views/**`, `src/components/**`, `src/app/**`. La regla ESLint `greenhouse/no-hardcoded-fontfamily` (modo `error`) bloquea regresiones desde CI.
 - **NEVER** mantener referencias activas a `var(--font-dm-sans)` o a `'DM Sans'` en código nuevo. TASK-567 cerró el sweep. Quedan **excepciones legítimas documentadas** (NO drift):
@@ -150,7 +158,7 @@ Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other
 | Concern | File |
 |---|---|
 | Font loading + CSS variables + fallback stack | `src/app/layout.tsx` |
-| Theme override (Geist base, Poppins h1-h4, mono variants Geist+tabular-nums) | `src/components/theme/mergedTheme.ts` |
+| Theme override (Geist base, Poppins h1-h4 + surfaceHeroTitle, mono variants Geist+tabular-nums) | `src/components/theme/mergedTheme.ts` |
 | Variant type declarations (`monoId`, `monoAmount`, `kpiValue`) + `theme.lineHeights` augmentation | `src/components/theme/types.ts` |
 | Line-height token namespace (canonical scale) | `src/components/theme/typography-tokens.ts` |
 | Coretheme fallback chain (NOT to be edited per regla dura) | `src/@core/theme/typography.ts` |
@@ -163,6 +171,7 @@ Los `line-height` ratios viven en un namespace tokenizado canónico, **no como m
 |---|---|---|
 | `display` | 1.05 | Display moments donde la compresión es señal intencional. Aplica a `kpiValue`. Usar también para totales hero, dashboard stats grandes, dock totals |
 | `heading` | 1.25 | Display headings (Poppins). Tight feel. Aplica a `h1`, `h2`, `h3` (marketing/identity) |
+| `surfaceHero` | 1.15 | Primary full-page/workbench surface title. Compacto e intencional; NO usar como heading genérico |
 | `pageTitle` | 1.4 | Page title en product UI. Aplica a `h4`. Más relajado que `heading` porque convive con body inmediatamente debajo |
 | `metadata` | 1.45 | Captions, timestamps, validity, helper text. Aplica a `caption`. Levemente más tight que `body` para compensar el font-size más chico (13px vs 15-16px de body) |
 | `body` | 1.5 | Product UI baseline. Aplica a `body1`, `body2`, `h5`, `h6`, `subtitle1`. **Piso WCAG 1.4.12** (text-spacing override): no bajar de 1.5 en variants de párrafo. Convergente con Linear / Stripe Dashboard / Vercel app sobre Geist |
@@ -197,6 +206,8 @@ spacing: (factor) => `${0.25 * factor}rem`
 
 With base root 16px: `spacing(n) = 4n px`.
 
+**AXIS parity (TASK-1050)**: Figma `Design System | Vuexy → AXIS`, fileKey `yyMksCoijfMaIoYplXKZaR`, node `11112:12286` (`Gap & Padding`) is a token sheet, not a product UI. `Gap-N` / `Padding-N` maps directly to `theme.spacing(N)`, `Stack spacing={N}`, `sx={{ p: N }}` or `sx={{ gap: N }}`. Do not copy the px literals from Figma into JSX.
+
 ### 4.1 Scale
 
 | Token | px | rem | Canonical usage |
@@ -213,6 +224,10 @@ With base root 16px: `spacing(n) = 4n px`.
 | `spacing(8)` | 32 | 2 | Page section breathing room |
 | `spacing(10)` | 40 | 2.5 | Page top/bottom padding |
 | `spacing(12)` | 48 | 3 | Landing hero padding |
+| `spacing(16)` | 64 | 4 | Available AXIS step for large layout gaps |
+| `spacing(25)` | 100 | 6.25 | Available AXIS display step; rare, intentional only |
+
+AXIS exposes `1..16 + 25`. The table above highlights the operational subset plus the two largest AXIS stops; non-preferred steps are available, but should be intentional in product UI.
 
 ### 4.2 Surface-level conventions
 
@@ -250,9 +265,11 @@ Defined in `src/@core/theme/index.ts`:
 ```ts
 shape: {
   borderRadius: 6,
-  customBorderRadius: { xs: 2, sm: 4, md: 6, lg: 8, xl: 10 }
+  customBorderRadius: { xs: 2, sm: 4, md: 6, lg: 8, xl: 10, xxl: 12, display: 16 }
 }
 ```
+
+**AXIS parity (TASK-1050)**: Figma fileKey `yyMksCoijfMaIoYplXKZaR`, node `11112:12362` (`Border Radius`) defines `xs=2`, `sm=4`, `md=6`, `lg=8`, `xl=10`, and `border-round=500`. Runtime maps `xs..xl` 1:1 to `theme.shape.customBorderRadius.*`; `border-round` maps to `9999px` for pills/capsules or `50%` for true circles. Greenhouse additionally defines `xxl=12` and `display=16` as governed runtime extensions for large surfaces, not AXIS upstream tokens.
 
 ### 5.1 Scale
 
@@ -263,6 +280,8 @@ shape: {
 | `theme.shape.customBorderRadius.md` | 6 | **Default — cards, tooltips** |
 | `theme.shape.customBorderRadius.lg` | 8 | Large cards, dialogs, **floating docks** |
 | `theme.shape.customBorderRadius.xl` | 10 | Hero cards (rare) |
+| `theme.shape.customBorderRadius.xxl` | 12 | Large support/editorial/internal documentation surfaces |
+| `theme.shape.customBorderRadius.display` | 16 | Display-scale support surfaces; never dense operational UI |
 | `9999px` | full pill | ContextChip display, avatar circles |
 
 ### 5.2 Usage matrix
@@ -276,6 +295,8 @@ shape: {
 | Popover / Menu | `md (6px)` | Match cards |
 | Autocomplete paper | `md (6px)` | Theme default |
 | Floating dock (sticky-bottom) | `lg (8px)` | Visually distinct from page content |
+| Support / documentation surface | `xxl (12px)` | More generous surface radius without becoming playful |
+| Display-scale internal surface | `display (16px)` | Large explanatory panel; not for tables, menus, inputs or dense cards |
 | Chip size='small' | `sm (4px)` | Tight |
 | Chip size='medium' | `md (6px)` | Default |
 | ContextChip (display-only pill) | `999px` (pill) | Display convention for filter/context bar |
@@ -289,11 +310,31 @@ shape: {
 
 - **NEVER** `sx={{ borderRadius: 2 }}` → this is `12px` (MUI multiplier). Use `sx={{ borderRadius: theme => theme.shape.customBorderRadius.lg }}` → 8px explicitly.
 - **NEVER** hardcode `borderRadius: '12px'` inline.
+- **NEVER** apply `xxl` / `display` as a blanket modernization pass. They require a large-surface rationale and visual review.
 - When in doubt, use `md (6px)`.
+
+Living reference (internal): `/admin/design-system/geometry` renders the spacing and radius scales from the active theme, including `xxl`/`display`, with GVC scenario `design-system-geometry`.
 
 ## 6. Elevation / shadow
 
-MUI 24-step shadow scale in `src/@core/theme/shadows.ts`. Per-color custom shadows in `customShadows.ts`.
+**Semantic roles are the contract (TASK-1049).** Greenhouse primitives read an elevation **role** from the theme — `theme.greenhouseElevation.<role>` — never a numeric MUI index. SoT: `src/components/theme/elevation-tokens.ts` (mode-aware factory over the canonical channel `var(--mui-mainColorChannels-${mode}Shadow)`). ADR: `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1`. Drift-guard: `src/components/theme/elevation-drift.test.ts` (runtime ≡ SoT ≡ DESIGN.md ≡ this table). First consumer: `GreenhouseFloatingSurface` (role `floating`).
+
+The recipe is the convergent 2026 one (GitHub Primer / shadcn/ui / Linear / Vercel Geist): **two soft layers + a 1px hairline border**, never a heavy single drop. Anti-dated ceiling: no role exceeds `0 8px 24px rgba(0,0,0,0.1)`. Raw shadow values live in the SoT, not here — agents pick a role, not a number.
+
+| Role | Intent | Border (forced-colors) | Primary consumers |
+|---|---|---|---|
+| `none` | Flat / outlined surface, no depth | n/a (consumer's own border) | internal cards, table shells, panels, dense dashboards |
+| `raised` | Soft local lift (hover/selection) | optional | interactive cards, selectable tiles — NOT a blanket card resting state |
+| `floating` | Anchored, transient contextual surface | **required** | `GreenhouseFloatingSurface`, popovers, menus, rich tooltips, evidence peeks, inline editors, validation bubbles |
+| `overlay` | Higher transient layer, not modal | **required** | command previews, floating docks, top-of-stack affordances |
+| `modal` | Blocking surface, clear stack separation | **required** | MUI Dialog, temporary Drawer, destructive/legal/financial confirmations |
+| `overflow` | **Reserved (no runtime value yet)** — scroll/sticky-edge affordance | — | sticky table edges, scroll shadows (future consumer) |
+
+**Rules**: cards inside operational workbenches stay flat (`none`) + 1px border. `floating`/`overlay`/`modal` carry their separation through a **real border** (not a shadow ring) so the surface survives `forced-colors` mode, where the browser strips `box-shadow`. `raised` is not an escape hatch to re-elevate cards. Don't add shadow when spacing/border/contrast already communicate hierarchy.
+
+### 6.1 Legacy / compat (MUI + Vuexy infrastructure — NOT the contract for new primitives)
+
+MUI 24-step shadow scale in `src/@core/theme/shadows.ts`. Per-color custom shadows in `customShadows.ts`. These remain available for Vuexy components and legacy code, but are **not** the agent-facing contract for new Greenhouse primitives (use the semantic roles above).
 
 | Token | Usage |
 |---|---|
@@ -348,11 +389,17 @@ Three layers compose the effective palette (see `GREENHOUSE_THEME_TOKEN_CONTRACT
 | Token | Hex | Brand meaning | Usage |
 |---|---|---|---|
 | `primary.main` | runtime-driven, default `#0375DB` (Core Blue) | Brand identity | CTAs, active state, filled chips, links |
-| `secondary.main` | `#023C70` (Efeonce azure / deep navy) | Structural | Navigation depth, emphasis blocks, structural CTAs |
-| `success.main` | `#6EC207` (neon lime) | Healthy / optimal | KPI óptimo, margin healthy, task complete |
-| `warning.main` | `#FF6500` (sunset orange) | Attention | Margin warning, expiring soon, approaching limit |
-| `error.main` | `#BB1954` (crimson magenta) | Critical / blocked | Validation fail, margin critical, quote expired |
-| `info.main` | `#0375DB` (Core Blue) | Informational | Neutral info, template applied, non-critical state |
+| `secondary.main` | `#4B8405` (AXIS secondary-700, crisp green, TASK-1053) | Brand secondary | Secondary actions (tonal/outlined buttons + chips). `light` = lime `#6EC207` (tint/accent, ink text only); `dark` = `#396504` (hover/active). Legacy azure `#023C70` retired (TASK-1034 — not an AXIS color); el teal `#138760` corregido a verde coherente en TASK-1053 A1b. main=700 not 500: lime is illegible as tonal/outlined text (~1.8:1), crisp green is AA (white 4.56:1). Kill-switch `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED=false`. |
+| `success.main` | `#157F47` (AXIS emerald-500, TASK-1053) | Healthy / optimal | KPI óptimo, margin healthy, task complete |
+| `warning.main` | `#FFB703` (AXIS amber) | Attention | Margin warning, expiring soon, approaching limit |
+| `error.main` | `#DC2E39` (AXIS vermilion-500, TASK-1053) | Critical / blocked | Validation fail, margin critical, quote expired |
+| `info.main` | `#1F6FD4` (AXIS azure-500, TASK-1053) | Informational | Neutral info, template applied, non-critical state |
+
+> **AXIS adoption (TASK-1034 Slice 2):** los `*.main` de feedback derivan de AXIS (Design System de Efeonce) vía `src/@core/theme/axis-semantic.ts`; los ramps completos 100→900 + opacity viven en `src/@core/theme/axis-tokens.ts` y se exponen en runtime como `theme.axis.*`.
+>
+> **Delta TASK-1053 Fase A1a (Restraint v1, 2026-06-08) — SUPERSEDE la parte semántica del párrafo siguiente:** los fills `500` de feedback se re-valuaron a familias AA-con-texto-blanco, eliminando la desviación a `error-800`. Vigente: `success.main = #157F47` (emerald, blanco 5.05:1), `info.main = #1F6FD4` (azure, blanco 4.9:1), `error.main = #DC2E39` (vermilion, blanco 4.6:1) → `contrastText = WHITE` para los tres. `warning.main = #FFB703` (amber, señal de tránsito) conserva `contrastText = ink #2f2b3d` (blanco-sobre-amber falla). Gate mecánico: `axis-semantic-drift.test.ts` (pins de valor) + `axis-semantic-contrast.test.ts` (AA del par main/contrastText, helper `contrast.ts`) + el contrast probe de `design:lint`. `primary`/`secondary`/`gray` NO cambian en A1a (secondary spine = A1b; sub-valores ink/tint/border/dark-fg = B1). Reconciliación AXIS Figma upstream pendiente (code-first, ADR `GREENHOUSE_SEMANTIC_COLOR_SYSTEM_DECISION_V1`).
+>
+> **[Histórico Slice 2/2b, superado por el Delta de arriba]** `contrastText` era AA con ink oscuro `#2f2b3d` (success/warning/info, 5.8–7.8:1); `error.main = #CC3D41` (AXIS error-800, blanco 4.87:1) con el vibrante `#FF4C51` como `error.light`. **Neutrales AXIS (Slice 3, default ON desde el flip):** `background`/`paper`/`text`/`divider` adoptan los neutrales AXIS por modo vía `src/@core/theme/axis-neutrals.ts` — light bg `#F8F7FA`/paper `#FFFFFF`/text ink `#2F2B3D`(α); dark bg `#25293C`/paper `#2F3349`/text `#E1DEF5`(α). El kill-switch `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED=false` revierte al navy legacy en emergencia. DESIGN.md (contrato) refleja los neutrales AXIS. **Tonal (Slice 3 flip):** `button-primary-tonal` modela el fill tonal canónico (`primary-tonal #D7E9F9` ≈ primary @16% + texto `primary-dark` = ~7:1 AA), más robusto que el tonal MUI default (texto primary.main = 3.78:1). `primary-light` documentado en `nav-active-indicator`.
 
 **`primary.main` runtime selection**: the active primary is whatever `settings.primaryColor` resolves to. Default for un-configured tenants is the first entry of `primaryColorConfig.ts`: `efeonce-core` (`#0375DB`). Per-tenant brands (Globe clients, etc.) can override via the customizer or persisted settings.
 
@@ -370,6 +417,47 @@ Three layers compose the effective palette (see `GREENHOUSE_THEME_TOKEN_CONTRACT
 
 Each color ships with opacities: `lighterOpacity` (8%), `lightOpacity` (16%), `mainOpacity` (24%), `darkOpacity` (32%), `darkerOpacity` (38%).
 
+### 8.1.ter Chart palette (TASK-1053 "Deep-bright")
+
+`src/@core/theme/axis-chart.ts` es el **SoT de charts** — auto-contenido ("rica en sí misma"), NO derivado de marca/semánticos (una serie nunca se confunde con un status de UI). Dos sub-paletas cubren todos los tipos de chart (una categórica + una direccional — sin paletas por tipo):
+
+- **Categórica "Deep-bright"** (aprobada operador 2026-06-08) — `GH_COLORS.chart.categorical` (light) / `.categoricalDark` (dark): `indigo #5145E0 · verde #1FBA85 · naranja #FB7A00 · magenta #D633C9 · cian #3CC9F0 · lima #9BE036`. Series arbitrarias (spaces, clientes, categorías de gasto, miembros, **fases CSC vía subset**). Re-analizada: CVD-min ΔE 12.9 (distinguible daltónicos), clash ΔE 23 vs los 4 semánticos, vibrante (chroma 73). Dark levanta solo el indigo (`#7B72F0`) para verse en charcoal preservando el spread.
+- **Direccional** (Finanzas/deltas + gradientes de salud) — `GH_COLORS.chart.directional.{positive #3DBA5D, caution #F0A526, negative #FF4D49, neutral #94A3B8}` (+ `directionalDark`): cashflow in/out, P&L +/−, variación KPI, waterfall, **salud runway/budget** (óptimo→positive · atención→caution · crítico→negative). `caution` = gold chart-tuned, distinto del amber de alerta de UI (`#FFB703`). Verde/rojo chart-tuned (más brillante que el ink semántico), vive en `axis-chart`, no en `theme.palette`.
+
+**Reglas duras CVD (Coblis pre-check, Machado 2009 + CIE76 ΔE):**
+
+- **Color nunca solo** (WCAG 1.4.1): categórica con legend/labels obligatorios.
+- **Direccional** siempre con signo `+/-` o ícono `▲/▼` (verde/rojo inseguro daltónico solo-color).
+- Single-series → el acento. **NUNCA** una serie categórica desde `theme.palette.{success,warning,error,info}` (el ink success es muy oscuro para "bueno", el warning es el amber de alerta) → usar `GH_COLORS.chart.*`.
+- **NUNCA** hexes de serie inline ni arrays `*_COLORS` locales → `GH_COLORS.chart.categorical`. Paletas de dominio (`cscPhase`) derivan de `categorical` (subset). Drift-guard: `axis-semantic-drift.test.ts` (bloque chart palette).
+
+### 8.1.quater Tonal-by-default feedback sub-values (TASK-1053 Fase B)
+
+El default de un chip/alert de estado es **tonal** (superficie suave + ink AA), no un sólido saturado (el sólido lee "admin template 2016" — reparo Restraint v1). El rol MUI solo carga `main`/`contrastText`; el tratamiento tonal necesita tres valores curados más por rol de feedback, expuestos como **factory mode-aware** `theme.greenhouseSemantic.<role>` (espejo de `theme.greenhouseElevation`).
+
+SoT de valores: `src/@core/theme/axis-semantic.ts` → `axisSemanticSubValues` (curados, viven en la capa semántica como `contrastText`, NO un ramp primitivo paralelo). Composición mode-resuelta: `src/components/theme/greenhouse-semantic-tokens.ts`. Sub-valores aprobados (AA-verificados — `axis-semantic-contrast.test.ts`):
+
+| Rol | ink (texto AA) | tint (superficie) | border | darkFg (texto dark) |
+|---|---|---|---|---|
+| `info` | `#155CAD` | `#E8F1FD` | `#C2DBF7` | `#6FB0F0` |
+| `success` | `#11703F` | `#E7F6EE` | `#BCE6CF` | `#5FC891` |
+| `warning` | `#8A5A00` | `#FFF4D6` | `#F5D98A` | `#E8B84B` |
+| `error` | `#C01D27` | `#FDECEC` | `#F5C2C4` | `#F08A8F` |
+
+Contraste verificado: `ink` ≥5.9:1 sobre blanco, ≥5.3:1 sobre su propio `tint`; `darkFg` ≥5.98:1 sobre charcoal `#25293C`. El `border` ~1.4:1 es hairline suave a propósito (WCAG 1.4.11 no lo exige a 3:1 — el estado lo comunican tint+ink).
+
+Token expuesto por rol: `{ fill, onFill, ink, tint, border, darkFg, tonalSurface, tonalText, tonalBorder }`. El **triple tonal** mode-resuelto (lo que consume el `label` variant):
+
+- **light** → `tonalSurface=tint · tonalText=ink · tonalBorder=border`
+- **dark** → `tonalText=darkFg`, `tonalSurface=color-mix(in oklch, darkFg 16%, paper)`, `tonalBorder=color-mix(in oklch, darkFg 36%, transparent)`
+
+**Reglas duras:**
+
+- **NUNCA** usar `palette.<role>.main` como color de TEXTO tonal — es el fill. (Bug que arregla esta Fase: `warning.main` `#FFB703` amber como texto es ilegible; `warning.tonalText`=ink `#8A5A00` pasa AA.)
+- Primer consumidor: `GreenhouseChip` `label` (tonal) variant para tonos feedback. `primary`/`secondary` mantienen el wash de opacidad legacy (son marca, no feedback; sin sub-valores curados).
+- Drift-guard: `greenhouse-semantic-drift.test.ts` (pin de los 16 hexes + composición del factory). Contrast gate: `axis-semantic-contrast.test.ts`. Mover juntos SoT + DESIGN.md §Color + esta tabla en el mismo PR (paridad 3 capas, igual que color/tipografía).
+- Lab fiel: `/admin/design-system/chips` renderiza el tonal real (su `getAxisChipSx` consume `axisSemanticSubValues` por modo).
+
 ### 8.1.bis customColors namespace (Greenhouse semantic layer)
 
 `mergedTheme.ts` extends `palette` with a `customColors` namespace (14 tokens) that names brand moments not covered by MUI semantic colors. These are **canonical for Greenhouse** but not part of MUI standard palette.
@@ -380,12 +468,12 @@ Each color ships with opacities: `lighterOpacity` (8%), `lightOpacity` (16%), `m
 |---|---|---|
 | `customColors.midnight` | `#022A4E` | Deep navy backgrounds, structural emphasis (52 uses) |
 | `customColors.lightAlloy` | `#DBDBDB` | Subtle borders, dividers (41 uses) |
-| `customColors.coreBlue` | `#0375DB` | Brand accents (mirror of `info.main`) |
+| `customColors.coreBlue` | `#0375DB` | Brand accent (= primary default) |
 | `customColors.deepAzure` | `#023C70` | Mirror of `secondary.main` for contexts where brand naming reads better |
 | `customColors.royalBlue` | `#024C8F` | Mid-stop in the blue ramp |
-| `customColors.neonLime` | `#6EC207` | Mirror of `success.main` for chart/brand contexts |
-| `customColors.sunsetOrange` | `#FF6500` | Mirror of `warning.main` |
-| `customColors.crimson` | `#BB1954` | Mirror of `error.main` |
+| ~~`customColors.neonLime`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Token pseudo-semántico legacy sin consumers reales (auditado). Para verde semántico usar `theme.palette.success` o el SoT `axisSemanticHex.success` (`#157F47`, TASK-1053); el lime de marca vive en `theme.axis.ramp.secondary[500]`. |
+| ~~`customColors.sunsetOrange`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Sin consumers. Para ámbar semántico usar `theme.palette.warning` / `axisSemanticHex.warning` (`#FFB703`). |
+| ~~`customColors.crimson`~~ | — | **REMOVIDO (Slice 4, TASK-1034).** Sin consumers; divergía de `error.main` (AXIS error vigente = `#DC2E39` vermilion-500, TASK-1053). Para error usar `theme.palette.error` / `axisSemanticHex.error`. La opción de color primario `efeonce-crimson` (`primaryColorConfig.ts`) NO se ve afectada. |
 | `customColors.bodyText` | tied to `text.primary` | Body text in non-MUI primitives |
 | `customColors.secondaryText` | tied to `text.secondary` | Helpers in non-MUI primitives |
 | `customColors.claimGray` | `#848484` | Disabled / muted text in non-MUI primitives |
@@ -426,15 +514,18 @@ When adding a new brand moment, check this namespace first; only add a new token
 
 ### 9.1 Duration scale (matches Material 3 emphasized + Linear/Stripe convergent)
 
+Codified SoT: `src/components/greenhouse/motion/core/tokens.ts` (re-exported by `src/components/theme/motion-tokens.ts`). Seconds (GSAP) + CSS strings are **derived** from ms — never declared in parallel. Drift-guard: `motion/core/tokens.test.ts`.
+
 | Token | ms | Usage |
 |---|---|---|
-| instant | 0 | Reduced motion fallback |
-| micro | 75 | Tap acknowledgment |
+| instant | 75 | Tap acknowledgment; reduced-motion snap fallback |
 | short | 150 | Hover, focus, small state shift |
 | standard | 200 | Menu open, small move, snackbar |
-| longer | 300 | Modal open/close, drawer |
-| page | 400 | Page entrance, cross-surface nav |
-| hero | 600 | Hero entrance, cross-document |
+| medium | 300 | Modal open/close, drawer |
+| long | 400 | Page entrance, cross-surface nav |
+| extended | 600 | Hero entrance, cross-document |
+
+> **Reconciliación (TASK-1045):** estos valores antes se listaban con nombres prosa nunca codificados (`micro/longer/page/hero` + `instant=0`). El SoT codificado + drift-guarded es ahora la fuente única; los nombres convergen a él. El antiguo `instant=0` (reduced fallback) es ahora el `reducedDuration` (snap ~75 ms) que aplica el motion primitive.
 
 ### 9.2 Easing
 
@@ -457,12 +548,26 @@ if (prefersReduced) {
 
 Animations exempted (must stay): loaders, focus rings, state-conveying transitions (chip value change flash).
 
+Two reduced-motion layers coexist (both honored): (1) the **CSS blanket** in `src/app/globals.css` + framer-motion's `useReducedMotion` for the existing microinteractions; (2) the **GSAP primitive** bakes the contract into `useGreenhouseGSAP` via `gsap.matchMedia` — non-bypassable (see §9.5).
+
 ### 9.4 Prohibitions
 
 - No parallax.
 - No autoplay video.
 - No infinite loops (except shimmer on skeleton).
 - No rapid flashing (>3 Hz) — WCAG 2.3.1.
+
+### 9.5 Motion primitive (GSAP — TASK-1045)
+
+The cinematic / orchestrated / scroll tier runs on **GSAP** behind a canonical primitive. Product surfaces consume `<Motion>` (declarative) or `useGreenhouseGSAP` (imperative escape hatch) — **never** `import 'gsap'` directly (lint rule `greenhouse/no-direct-gsap-in-views`, mode `error`, exempts only `src/components/greenhouse/motion/**`). GSAP does NOT replace CSS Tier 1 (hover/tap/toggle) nor framer-motion (existing microinteractions) — it's an additive third layer.
+
+- **Variants (V1):** `entrance` · `stagger` · `scrollReveal` · `timeline`.
+- **Kinds → variant:** `heroIntro→timeline`, `listMount→stagger`, `sectionReveal→scrollReveal`, `kpiCountUp→timeline`, `panelEnter→entrance`, `cardReveal→scrollReveal`.
+- **Reduced-motion:** baked into `useGreenhouseGSAP` (`gsap.matchMedia`); each variant degrades (cross-fade snap / opacity-only / visible no-op / collapsed timeline). Honest degradation: `gsap.from()` keeps content visible if JS never runs.
+- **SoT:** `src/components/greenhouse/motion/core/tokens.ts`; portable core (zero Greenhouse deps) reusable across apps.
+- **Internal museum:** `/admin/design-system/motion`.
+
+Spec: `docs/architecture/GREENHOUSE_MOTION_PRIMITIVE_V1.md`.
 
 ## 10. Interaction cost
 
@@ -575,28 +680,44 @@ Inventoried by TASK-488 subagent 2026-04-19. Top 15 files to copy/adapt (never f
 | 1.3 | 2026-05-01 (tarde) | Claude + TASK-566 / EPIC-004 (line-height namespace + calibración Geist) | **Cambio arquitectónico**: introducción del namespace canónico de line-height tokens (§3.6), accesible vía `theme.lineHeights.<token>`. Implementación: `src/components/theme/typography-tokens.ts` (tokens canónicos `display` 1.05, `heading` 1.25, `pageTitle` 1.4, `metadata` 1.45, `body` 1.5, `numericDense` 1.54), type augmentation en `types.ts`, theme expone `lineHeights` para uso runtime. **Toda variant del theme que necesite line-height referencia un token**, cero magic numbers en `mergedTheme.ts`. Calibración Geist absorbida por los tokens: `h5/h6/subtitle1` ahora consumen `body` (= 1.5, antes coretheme 1.467/1.556 leía cramped); `caption` consume `metadata` (= 1.45, antes 1.4); `h1/h2/h3` colapsan a `heading` (= 1.25, antes 1.2/1.25/1.3 graduación cosmética sin valor). Body1/body2 siguen en 1.5 (piso WCAG 1.4.12). `button`, `overline`, `subtitle2` heredan del coretheme sin override (intencional). Razón del trigger: Geist tiene x-height ligeramente más bajo que Inter/DM Sans, lo cual hace que ratios `<1.5` se sientan cramped al root 13.125px de Vuexy. Convergente con Linear / Stripe Dashboard / Vercel app que corren subtitle/h6 a 1.5 sobre Geist. **Solución robusta + escalable**: futuras calibraciones de line-height tocan 1 archivo, no N variants. |
 | 1.4 | 2026-05-02 | Claude + TASK-764 audit reconciliation | Audit transversal cerró drift items críticos vs runtime real (`mergedTheme.ts`). §8.1 actualizado: `secondary.main = #023C70` (efeonce-azure), `info.main = #0375DB` (Core Blue) reflejan runtime real, no Vuexy default. `primary.main` declarado como runtime-driven con catálogo Efeonce de 7 paletas (default `efeonce-core` Core Blue). Nueva §8.1.bis documenta `customColors` namespace (14 tokens, 7 con adopción confirmada, 7 orphan candidates → TASK-770 cleanup). Nueva §4.4 con 6 component padding contracts cuantitativos (button 12px, card 24px, input 40px, status-chip 8px). §3.4 actualizado: TASK-567 cerró sweep en UI productiva; DM Sans residual en global-error/emails/@core/PDFs documentado como excepciones legítimas (NO drift). Nueva §15.1 mapping bilateral DESIGN.md ↔ V1 (snake-case ↔ camelCase). §16 cross-ref simétrica con DESIGN.md y THEME_TOKEN_CONTRACT_V1. **Decisión runtime-as-source-of-truth heredada de THEME_TOKEN_CONTRACT_V1 §1.4** (TASK-368, 2026-04-11) — no requirió ADR nuevo. |
 | 1.5 | 2026-05-04 | Claude + TASK-764 close (CI gate + warnings + skills + diff + Opción A) | DESIGN.md pasa de contrato decorativo a contrato vivo y auto-protegido. CI gate `.github/workflows/design-contract.yml` strict (errors + warnings block). 17 warnings cerrados vía 12 contratos de componente reales (`app-shell`, `app-shell-dark`, `button-primary-{hover,tonal,disabled}`, `button-secondary-{hover,active}`, `card-default-{border,dark,dark-secondary}`, `status-chip-{success,warning,error,info}`) — anti-bandaid, NO namespace `palette.*`. `info: "#0375DB"` agregado a DESIGN.md YAML (cierra drift item #14). Skills UI (`greenhouse-ux`, `greenhouse-ui-review`, `modern-ui` overlay) cargan DESIGN.md como mandatory context. `pnpm design:diff` operativo via `scripts/design-diff.mjs` (extrae `git show <ref>:DESIGN.md` a temp, sin `DESIGN.prev.md` drift). Decisión arquitectónica documentada: **Opción A** — DESIGN.md refleja runtime, NO lo genera. Inversión Opción B (theme MUI consume DESIGN.md tokens) queda fuera de scope mientras `@google/design.md` siga en alpha 0.1.x. |
+| 1.6 | 2026-06-06 | Claude + TASK-1036 (typography SoT + drift-guard) | Tipografía gana un **Source of Truth en código** espejo de la paleta AXIS (color): `typographyScale` (primitivos `fontFamilies`/`fontWeights`/`fontSizes`/`letterSpacings`/`fontFeatures` → tokens compuestos) + `TYPOGRAPHY_VARIANT_BRIDGE` (contrato↔variante MUI 1:1, como código) + `controlText` ramp, todo en `src/components/theme/typography-tokens.ts`. `mergedTheme.ts` deriva cada variante del SoT (cero `fontSize`/`fontWeight`/familia hardcodeados); `src/components/theme/typography-drift.test.ts` (36 tests, espejo de `axis-semantic-drift.test.ts`) falla CI si runtime / contrato / SoT divergen. **Reencuadre del audit `TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md` verificado contra el runtime real**: L2 no era drift activo (el coretheme Vuexy define los `fontSize` de h5/h6/button/subtitle1 y mergedTheme los heredaba por deepmerge = mismo valor); la deuda era de gobernanza (valor fuera del SoT, sin guard) — S0/S1 la cierran sin cambio visual (único delta: overline lh 1.16667→1.167, button lh 1.467→1.5, sub-pixel línea única). L3: el control-texto ya estaba casi todo tokenizado (Button small/medium = body2/button, Chip = body2); el único magic number real era `<Button size="large">` 17px → ahora `controlText.lg` (S2, no-op). §15.1 reescrita: el mapping es código (bridge), `label-md ↔ button` (no `h6`), + notas `subheader`↔`subtitle1` / `h6` reusa label-md / control-lg vs label-lg. §3.2 ya reflejaba los valores correctos. `label-lg`/`label-sm` re-incorporados a DESIGN.md (prosa, patrón orphanedTokens) con respaldo SoT real. |
+| 1.7 | 2026-06-06 | Claude + TASK-1038 (typography scale redesign) | **Rediseño de la escala** (cambio visual aprobado por el operador tras ver el impacto en `/admin/design-system/typography/mockup`). La escala era acumulada, no diseñada: **inversión de jerarquía** (page-title 16 < section-title 18), **goteo de 1px** (7 tamaños en 6px) y **sobre-granularidad** (15/16/17 vivos a la vez). Flip en el SoT (`typographyScale`), 4 tokens cambian valor + 2 de `controlText`, **0 nuevos, 0 renombrados**: `page-title` (h4) 16→**20** (arregla la inversión), `section-title` (h5) 18→**16**, `subheader`/`subtitle1` 15→**14**, `label-md`/`button` 15→**14**; `controlText.md` 15→14, `controlText.lg` (Button large) 17→**16** (saca el 17 bespoke). Ladder: 11→**8** tamaños distintos (12·13·14·16·20·24·28·32). **Hallazgos del completeness pass incorporados**: (a) `subtitle2` (13/400, ~267 consumidores) traída al SoT vía `body-sm` en `SECONDARY_VARIANT_TOKENS` (NO label-sm 13/600); (b) **Tab label** 18px hardcoded → `controlText.md` 14 (override `MuiTab` en mergedTheme); (c) **Dialog title** h6 → `section-title` 16/600 (override `MuiDialogTitle`); (d) PDF: Geist `.ttf` registra solo 400/500/700, **faltan 600/800** que la escala usa (fix pendiente en el adapter PDF). §3.2 actualizada. drift-guard 37 tests verde, design:lint 0/0/1, GVC `/admin/design-system` confirma la jerarquía sana (page-title domina, sin breakage). **Decisiones transversales canonizadas** (con product-design + arch skills): i18n Latin-first + RTL-ready vía logical properties (CJK diferido); tipo **fijo en producto**, `clamp()` solo marketing; **no display tier** sin consumidor; **PDF/email = un SSOT + adapters por medio** (espeja precedente color); truncation (ellipsis 1-línea/clamp 2-líneas/wrap); charts derivan del SoT; body measure ~65ch. **Follow-ups**: rol semántico para peso 500 (énfasis medio); adapters PDF/charts desde el SoT; lint rule `no-fontSize-inline` icon-vs-text. Referencia visual viva: `/admin/design-system/typography/mockup`. |
+
+| 1.8 | 2026-06-06 | Claude + TASK-1039/1040/1041 (typography follow-ups + consolidación) | **Cierre de los follow-ups de TASK-1038 + consolidación documental.** (a) **Charts derivan del SoT desde un solo lugar (TASK-1041, ✓):** los 43 charts del portal (Apex 33 + Recharts 10; **ECharts no se usa** — eran falsos positivos, "Recharts" contiene "echart") consumen familia+tamaño del SoT vía los wrappers `AppReactApexCharts`+`AppRecharts` (CSS `!important` leyendo `theme.typography.{fontFamily,caption}`, 100% cobertura, 0 bypass). Cambiar el SoT → los 43 se actualizan solos (2 archivos, no el sweep de 47). Helper `getChartTypographyFromTheme` (`src/components/theme/chart-typography.ts`, 6 tests) = single-source JS para ECharts canvas (donde el CSS no llega). (b) **Peso 500 evaluado y descartado (TASK-1039, won't-do):** imperceptible a 14px + ya rinde vía Vuexy/MUI → un 4º tier mete ambigüedad; récord en el mockup. (c) **PDF Geist 600/800 (TASK-1040):** familias `Geist SemiBold`/`ExtraBold` registradas (`.ttf` locales, gstatic v5) — falta migrar componentes PDF a usarlas. (d) **Fix de drift en §15.1:** la tabla estaba **entera pre-TASK-1038** (page-title 16, section-title 18, label-md 15, control-lg 17) — actualizada a la escala vigente (20/16/14/16). (e) **PDF/email = SSOT semántico + adapter por medio (sin cascada CSS → opt-in):** documentado en DESIGN.md §Typography + hard rules. drift-guard 37 verde, design:lint 0/0/1. |
+| 1.9 | 2026-06-08 | Codex + operador | Agrega `surfaceHeroTitle` / `surface-hero-title` para títulos primarios de surfaces full-page/workbench y headers de identidad principales: Poppins 34px desktop/tablet, 28px mobile, weight 600, line-height `surfaceHero` 1.15. Regla de uso restrictiva: máximo uno por surface; prohibido en cards, tablas, listas, dashboards, drawers, modals, filas repetidas y marketing heroes. Consumers iniciales: nombre de Daniela en `/people/mockup/daniela-workforce` y título `Organizaciones` en `/agency/organizations/mockup`. Drift-guard ampliado y GVC actualizado en `person-daniela-workforce-profile`, `typography-canonical` y `organization-list-enterprise-mockup`. |
 
 ### 15.1 Naming map — DESIGN.md ↔ V1 / runtime
 
-DESIGN.md (raíz, formato `@google/design.md`) usa nombres semánticos snake-case. V1 + runtime usan API JS camelCase (MUI variant names + custom variants). Mapping bilateral canónico:
+DESIGN.md (raíz, formato `@google/design.md`) usa nombres semánticos snake-case. V1 + runtime usan API JS camelCase (MUI variant names + custom variants).
+
+**Desde TASK-1036 este mapping es CÓDIGO, no una tabla manual:** `TYPOGRAPHY_VARIANT_BRIDGE` en `src/components/theme/typography-tokens.ts` es la fuente única (1:1 token canónico ↔ variante MUI), verificada en CI por `src/components/theme/typography-drift.test.ts` (falla el build si runtime / contrato / SoT divergen). La tabla de abajo es un espejo legible de ese bridge:
 
 | DESIGN.md (semantic) | V1 / runtime (API) | Notas |
 |---|---|---|
 | `headline-display` | `h1` | Poppins display, 2rem |
 | `headline-lg` | `h2` | Poppins display, 1.5rem |
 | `headline-md` | `h3` | Poppins display, 1.25rem |
-| `page-title` | `h4` | Poppins display, 1rem |
-| `section-title` | `h5` | Geist, 1.125rem |
-| `label-md` | `h6` | Geist, 0.9375rem |
+| `page-title` | `h4` | Poppins display, 1.25rem (TASK-1038: 16→20, arregla la inversión) |
+| `surface-hero-title` | `surfaceHeroTitle` | Poppins display, 2.125rem desktop/tablet + 1.75rem mobile, 600 — primary full-page/workbench title only |
+| `section-title` | `h5` | Geist, 1rem (TASK-1038: 18→16) |
+| `label-md` | `button` | Geist, 0.875rem (TASK-1038: 15→14) — control/bold label (el variant `button`) |
 | `body-lg` | `body1` | Geist, 1rem |
 | `body-md` | `body2` | Geist, 0.875rem |
 | `body-sm` | `caption` | Geist, 0.8125rem, metadata line-height |
+| `disclosure-text` | `disclosureText` | Geist, 0.75rem/400, compact sentence disclosures |
 | `overline` | `overline` | identico |
 | `numeric-id` | `monoId` | Geist + tabular-nums, 0.875rem, 600 |
 | `numeric-amount` | `monoAmount` | Geist + tabular-nums, 0.8125rem, 700 |
 | `kpi-value` | `kpiValue` | Geist + tabular-nums, 1.75rem, 800 |
 
-Cuando un agente lee DESIGN.md y necesita el variant runtime, consulta esta tabla. Cuando el inverso: V1 → DESIGN.md, mismo mapping.
+Variantes runtime sin token de contrato dedicado (ownership SoT, fuera del bridge 1:1):
+
+- `subtitle1` ← `subheader` (SoT runtime-only, Geist 0.875rem/400 — TASK-1038: 15→14 — card subheader / list item primary; sin equivalente en el contrato).
+- `subtitle2` ← `body-sm` (gobernado vía `SECONDARY_VARIANT_TOKENS`, ~267 consumidores, 13/400 — TASK-1038).
+- `h6` reusa el valor de `label-md` (label inline-bold 14; preferir `subtitle1`/`section-title` en código nuevo).
+- `<Button size="large">` ← `controlText.lg` (TASK-1038: 17→**16** = `label-lg`, ya no un paso por encima). Tab = `controlText.md` (14). Dialog title = `section-title` (16). `label-lg`/`label-sm` son tokens del SoT de la escala de label sin variante dedicada (aplicar vía el control, nunca `fontSize` inline).
+
+Cuando un agente lee DESIGN.md y necesita el variant runtime, consulta el bridge (código) o esta tabla. Cuando el inverso: V1 → DESIGN.md, mismo mapping.
 
 ## 16. Related docs
 

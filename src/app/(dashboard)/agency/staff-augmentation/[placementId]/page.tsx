@@ -27,7 +27,7 @@ const StaffAugmentationPlacementPage = async ({ params }: Props) => {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const { placementId } = await params

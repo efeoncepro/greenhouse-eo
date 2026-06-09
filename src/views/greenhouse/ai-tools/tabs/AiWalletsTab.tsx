@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -23,6 +22,8 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import { getMicrocopy } from '@/lib/copy'
 
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -34,7 +35,6 @@ import { walletStatusConfig, balanceHealthConfig, walletScopeLabel, reloadReason
 
 const GREENHOUSE_COPY = getMicrocopy()
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 type Props = {
   wallets: AiCreditWallet[]
@@ -614,7 +614,7 @@ return theme.palette.secondary.main
                   </CustomAvatar>
                   <Box>
                     <Typography variant='subtitle2'>{editWallet.toolName}</Typography>
-                    <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
+                    <Typography variant='caption' color='text.secondary'>
                       {editWallet.walletId}
                     </Typography>
                   </Box>

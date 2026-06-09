@@ -4,8 +4,8 @@ const STATUS_HEADING_RE = /^##\s+Status\s*$/i
 const H2_RE = /^##\s+(.+?)\s*$/
 const H3_RE = /^###\s+(.+?)\s*$/
 const STATUS_FIELD_RE = /^-\s+([^:]+):\s*(.*)$/
-const TASK_ID_RE = /TASK-\d{3}(?:\.\d+)?/
-const CANONICAL_TASK_FILE_RE = /^TASK-\d{3}-/
+const TASK_ID_RE = /TASK-\d{3,}(?:\.\d+)?/
+const CANONICAL_TASK_FILE_RE = /^TASK-\d{3,}-/
 
 const stripInlineCode = value => value.trim().replace(/^`(.+)`$/, '$1').trim()
 
@@ -170,7 +170,7 @@ export const parseTaskMarkdown = ({ filePath, repoRoot, source }) => {
   const relativePath = repoRoot ? relative(repoRoot, filePath) : filePath
   const filename = basename(filePath)
   const id = filename.match(TASK_ID_RE)?.[0] ?? null
-  const idNumber = id ? Number(id.match(/^TASK-(\d{3})/)?.[1] ?? 0) : null
+  const idNumber = id ? Number(id.match(/^TASK-(\d{3,})/)?.[1] ?? 0) : null
   const status = extractStatusBlock(lines)
   const headings = extractHeadings(normalizedSource, lineStarts)
   const sections = extractSections(normalizedSource, headings)
@@ -217,7 +217,7 @@ export const parseTaskIdRegistry = source => {
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index]
-    const idMatch = line.match(/^\|\s*`(TASK-\d{3}(?:\.\d+)?)`\s*\|\s*`?([^`|]+)`?\s*\|.*\|\s*`([^`]+)`\s*\|/)
+    const idMatch = line.match(/^\|\s*`(TASK-\d{3,}(?:\.\d+)?)`\s*\|\s*`?([^`|]+)`?\s*\|.*\|\s*`([^`]+)`\s*\|/)
 
     if (!idMatch) continue
 
@@ -234,7 +234,7 @@ export const parseTaskIdRegistry = source => {
 
 export const parseReadmeNextId = source => {
   const normalizedSource = source.replace(/\r\n/g, '\n')
-  const match = normalizedSource.match(/siguiente ID disponible:\s*`(TASK-(\d{3}))`/i)
+  const match = normalizedSource.match(/siguiente ID disponible:\s*`(TASK-(\d{3,}))`/i)
 
   if (!match) return null
 
@@ -249,7 +249,7 @@ export const deriveNextTaskId = registryRows => {
   let max = 0
 
   for (const id of registryRows.keys()) {
-    const match = id.match(/^TASK-(\d{3})$/)
+    const match = id.match(/^TASK-(\d{3,})$/)
 
     if (!match) continue
     max = Math.max(max, Number(match[1]))

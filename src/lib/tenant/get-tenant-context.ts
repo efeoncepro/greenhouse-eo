@@ -47,6 +47,7 @@ export interface TenantContext {
 
   // Contractor self-service flag (TASK-796): drives dynamic /my/contractor menu visibility.
   hasActiveContractorEngagement?: boolean
+  hasWorkforceContractingDocument?: boolean
 }
 
 export const getTenantContext = async (): Promise<TenantContext | null> => {
@@ -99,6 +100,7 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
 
     // Supervisor scope (TASK-727): pasamos el summary tal como viene del JWT.
     supervisorAccess: session.user.supervisorAccess ?? null,
-    hasActiveContractorEngagement: session.user.hasActiveContractorEngagement ?? false
+    hasActiveContractorEngagement: session.user.hasActiveContractorEngagement ?? false,
+    hasWorkforceContractingDocument: session.user.hasWorkforceContractingDocument ?? false
   }
 }

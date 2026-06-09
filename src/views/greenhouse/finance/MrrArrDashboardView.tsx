@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
@@ -26,6 +25,8 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -41,7 +42,6 @@ import type {
 } from '@/lib/commercial-intelligence/contracts'
 import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 interface PeriodResponse {
   period: { year: number; month: number }

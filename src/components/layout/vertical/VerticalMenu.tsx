@@ -40,7 +40,7 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
 
 const NavLabel = ({ label, subtitle, show }: { label: string; subtitle: string; show: boolean }) => (
   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
-    <Typography component='span' sx={{ color: 'inherit', fontSize: 'inherit', fontWeight: 500, lineHeight: 1.2 }}>
+    <Typography variant='inherit' component='span' sx={{ color: 'inherit', fontWeight: 500, lineHeight: 1.2 }}>
       {label}
     </Typography>
     {show ? (
@@ -92,6 +92,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const supervisorAccess = session?.user?.supervisorAccess ?? null
   // TASK-796 — dynamic /my/contractor visibility: only when the member has a live engagement.
   const hasActiveContractorEngagement = session?.user?.hasActiveContractorEngagement ?? false
+  const hasWorkforceContractingDocument = session?.user?.hasWorkforceContractingDocument ?? false
 
   const canSupervise =
     Boolean(session?.user?.memberId) && supervisorAccess?.canAccessSupervisorLeave === true
@@ -204,7 +205,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_AGENCY_NAV.delivery), href: '/agency/delivery' },
               { label: nl(GH_AGENCY_NAV.campaigns), href: '/agency/campaigns' },
               { label: nl(GH_AGENCY_NAV.organizations), href: '/agency/organizations' },
-              { label: nl(GH_AGENCY_NAV.newClient), href: '/agency/clients/new', icon: 'tabler-user-plus' },
+              { label: nl(GH_AGENCY_NAV.newClient), href: '/agency/clients/onboarding', icon: 'tabler-user-plus' },
               { label: nl(GH_AGENCY_NAV.services), href: '/agency/services' },
               { label: nl(GH_AGENCY_NAV.sampleSprints), href: '/agency/sample-sprints', icon: 'tabler-rocket' },
               { label: nl(GH_AGENCY_NAV.operations), href: '/agency/operations' }
@@ -213,10 +214,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/agency/campaigns') return canSeeView('gestion.campanas', true)
               if (item.href === '/agency/organizations') return canSeeView('gestion.organizaciones', true)
 
-              // TASK-992 — single front door. Visible only where the lifecycle flag is
-              // ON (client-readable NEXT_PUBLIC mirror of CLIENT_LIFECYCLE_ONBOARDING_ENABLED),
-              // so the item never appears in an env where the page would 404.
-              if (item.href === '/agency/clients/new') {
+              // TASK-992 / TASK-1013 — onboarding front door. The nav item now points to
+              // the onboarding cockpit (/agency/clients/onboarding), which lists in-flight
+              // cases (incl. deal-trigger drafts) and keeps the wizard (/agency/clients/new)
+              // as its primary CTA. Visible only where the lifecycle flag is ON (client-readable
+              // NEXT_PUBLIC mirror of CLIENT_LIFECYCLE_ONBOARDING_ENABLED), so the item never
+              // appears in an env where the page would 404.
+              if (item.href === '/agency/clients/onboarding') {
                 return (
                   process.env.NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED === 'true' &&
                   canSeeView('gestion.organizaciones', true)
@@ -281,12 +285,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_HR_NAV.approvals), href: '/hr/approvals' },
               { label: nl(GH_HR_NAV.departments), href: '/hr/departments' },
               { label: nl(GH_HR_NAV.contractors), href: '/hr/contractors' },
+              { label: nl(GH_HR_NAV.workforceContracts), href: '/hr/workforce/contracts' },
               { label: nl(GH_HR_NAV.offboarding), href: '/hr/offboarding' }
             ].filter(item => {
               if (item.href === '/hr/team') return canSeeHrTeamWorkspace
               if (item.href === '/hr/approvals') return canSeeHrTeamWorkspace
               if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
               if (item.href === '/hr/contractors') return canSeeView('equipo.contratistas', true)
+              if (item.href === '/hr/workforce/contracts') return canSeeView('equipo.workforce_contracting', true)
               if (item.href === '/hr/offboarding') return canSeeView('equipo.offboarding', true)
 
               return true
@@ -571,7 +577,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminAiTools), href: '/admin/ai-tools' },
               { label: nl(GH_INTERNAL_NAV.adminCloudIntegrations), href: '/admin/cloud-integrations' },
               { label: nl(GH_INTERNAL_NAV.adminOpsHealth), href: '/admin/ops-health' },
-              { label: nl(GH_INTERNAL_NAV.adminUntitledNotionPages), href: '/admin/data-quality/notion-titles' }
+              { label: nl(GH_INTERNAL_NAV.adminUntitledNotionPages), href: '/admin/data-quality/notion-titles' },
+              { label: nl(GH_INTERNAL_NAV.adminOrganizationLogos), href: '/admin/data-quality/organization-logos' },
+              { label: nl(GH_INTERNAL_NAV.adminDesignSystem), href: '/admin/design-system' }
             ].filter(item => {
               if (item.href === '/admin/operational-calendar') return canSeeView('administracion.calendario_operativo', true)
               if (item.href === '/admin/email-delivery') return canSeeView('administracion.email_delivery', true)
@@ -581,6 +589,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/admin/cloud-integrations') return canSeeView('administracion.cloud_integrations', true)
               if (item.href === '/admin/ops-health') return canSeeView('administracion.ops_health', true)
               if (item.href === '/admin/data-quality/notion-titles') return canSeeView('administracion.cloud_integrations', true)
+              if (item.href === '/admin/data-quality/organization-logos') return canSeeView('administracion.cloud_integrations', true)
+              if (item.href === '/admin/design-system') return canSeeView('administracion.design_system', false)
 
               return true
             })
@@ -601,6 +611,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
+          { label: nl(GH_MY_NAV.offers), href: '/my/offers', icon: 'tabler-file-text' },
+          { label: nl(GH_MY_NAV.contracts), href: '/my/contracts', icon: 'tabler-file-certificate' },
           { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
           { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
@@ -614,6 +626,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
           // TASK-796 — dynamic: only show when the member has a live contractor engagement.
           if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
+          // TASK-1022 — dynamic: only show when the collaborator has a contracting document.
+          if (item.href === '/my/offers') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
+          if (item.href === '/my/contracts') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
           if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
           if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
@@ -727,6 +742,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_MY_NAV.contractor), href: '/my/contractor', icon: 'tabler-briefcase' },
+          { label: nl(GH_MY_NAV.offers), href: '/my/offers', icon: 'tabler-file-text' },
+          { label: nl(GH_MY_NAV.contracts), href: '/my/contracts', icon: 'tabler-file-certificate' },
           { label: nl(GH_MY_NAV.paymentProfile), href: '/my/payment-profile', icon: 'tabler-credit-card' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
           { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
@@ -740,6 +757,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
           // TASK-796 — dynamic: only show when the member has a live contractor engagement.
           if (item.href === '/my/contractor') return hasActiveContractorEngagement && canSeeView('mi_ficha.mi_contratacion', true)
+          // TASK-1022 — dynamic: only show when the collaborator has a contracting document.
+          if (item.href === '/my/offers') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
+          if (item.href === '/my/contracts') return hasWorkforceContractingDocument && canSeeView('mi_ficha.mis_contratos', true)
           if (item.href === '/my/payment-profile') return canSeeView('mi_ficha.mi_cuenta_pago', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
           if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)

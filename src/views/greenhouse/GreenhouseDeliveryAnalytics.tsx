@@ -12,7 +12,6 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 import {
   createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable
@@ -27,6 +26,7 @@ import tableStyles from '@core/styles/table.module.css'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
 const GREENHOUSE_COPY = getMicrocopy()
 // ── Types ──
@@ -96,7 +96,6 @@ const projMetricColumns: ColumnDef<ProjectMetric, any>[] = [
 ]
 
 const GreenhouseDeliveryAnalytics = () => {
-  const theme = useTheme()
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [projSorting, setProjSorting] = useState<SortingState>([{ id: 'rpaAvg', desc: false }])
   const [loading, setLoading] = useState(true)
@@ -196,8 +195,8 @@ const GreenhouseDeliveryAnalytics = () => {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Line type='monotone' dataKey='rpa' stroke={theme.palette.primary.main} name='RPA' strokeWidth={2} />
-                      <Line type='monotone' dataKey='otd' stroke={theme.palette.success.main} name='OTD%' strokeWidth={2} />
+                      <Line type='monotone' dataKey='rpa' stroke={GH_COLORS.chart.categorical[0]} name='RPA' strokeWidth={2} />
+                      <Line type='monotone' dataKey='otd' stroke={GH_COLORS.chart.categorical[1]} name='OTD%' strokeWidth={2} />
                     </LineChart>
                   </ResponsiveContainer>
                 </AppRecharts>
@@ -220,8 +219,8 @@ const GreenhouseDeliveryAnalytics = () => {
                       <YAxis yAxisId='right' orientation='right' />
                       <Tooltip />
                       <Legend />
-                      <Bar yAxisId='left' dataKey='throughput' fill={theme.palette.info.main} name='Completados' />
-                      <Line yAxisId='right' type='monotone' dataKey='cycleTime' stroke={theme.palette.warning.main} name='Cycle Time (días)' strokeWidth={2} />
+                      <Bar yAxisId='left' dataKey='throughput' fill={GH_COLORS.chart.categorical[2]} name='Completados' />
+                      <Line yAxisId='right' type='monotone' dataKey='cycleTime' stroke={GH_COLORS.chart.categorical[3]} name='Cycle Time (días)' strokeWidth={2} />
                     </BarChart>
                   </ResponsiveContainer>
                 </AppRecharts>

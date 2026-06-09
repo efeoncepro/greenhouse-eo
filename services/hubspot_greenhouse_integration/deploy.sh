@@ -36,6 +36,9 @@ PROJECT_ID="efeonce-group"
 REGION="us-central1"
 SERVICE_NAME="hubspot-greenhouse-integration"
 SERVICE_ACCOUNT="greenhouse-portal@${PROJECT_ID}.iam.gserviceaccount.com"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "${SCRIPT_DIR}/../_shared/gcloud-secret-iam.sh"
 
 # Cloud Run sizing — matches the sibling deploy defaults:
 #   min=0 keeps cost low (service is proxy to HubSpot, cold-start tolerated).
@@ -74,55 +77,6 @@ HUBSPOT_BUSINESS_LINE_PROP="${HUBSPOT_BUSINESS_LINE_PROP:-linea_de_servicio}"
 HUBSPOT_SERVICE_MODULE_PROP="${HUBSPOT_SERVICE_MODULE_PROP:-servicios_especificos}"
 HUBSPOT_TIMEOUT_SECONDS="${HUBSPOT_TIMEOUT_SECONDS:-30}"
 HUBSPOT_WEBHOOK_MAX_AGE_MS="${HUBSPOT_WEBHOOK_MAX_AGE_MS:-300000}"
-
-extract_secret_name() {
-  local ref="$1"
-  local normalized="${ref%%:latest}"
-
-  if [[ "${normalized}" == projects/*/secrets/*/versions/* ]]; then
-    normalized="${normalized#projects/}"
-    normalized="${normalized#*/secrets/}"
-    normalized="${normalized%%/versions/*}"
-  fi
-
-  printf '%s' "${normalized}"
-}
-
-normalize_secret_ref_for_cloud_run() {
-  local ref="$1"
-  local normalized="${ref}"
-
-  if [[ "${normalized}" == projects/*/secrets/*/versions/* ]]; then
-    printf '%s' "${normalized}"
-    return 0
-  fi
-
-  if [[ "${normalized}" == *:* ]]; then
-    printf '%s' "${normalized}"
-    return 0
-  fi
-
-  printf '%s:latest' "${normalized}"
-}
-
-ensure_secret_accessor_binding() {
-  local ref="$1"
-
-  if [ -z "${ref}" ]; then
-    return 0
-  fi
-
-  local secret_name
-  secret_name="$(extract_secret_name "${ref}")"
-
-  # Idempotent: gcloud returns success even if the binding already exists.
-  echo "=== Ensuring ${SERVICE_ACCOUNT} can access secret ${secret_name} ==="
-  gcloud secrets add-iam-policy-binding "${secret_name}" \
-    --project="${PROJECT_ID}" \
-    --member="serviceAccount:${SERVICE_ACCOUNT}" \
-    --role="roles/secretmanager.secretAccessor" \
-    --quiet >/dev/null
-}
 
 echo "=== Building ${SERVICE_NAME} image via Cloud Build ==="
 

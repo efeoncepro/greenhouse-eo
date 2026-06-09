@@ -2,15 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import classnames from 'classnames'
-
 import CustomAvatar from '@core/components/mui/Avatar'
 import type { ThemeColor } from '@core/types'
+
+import { GreenhouseButton } from '@/components/greenhouse/primitives'
 
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
@@ -47,7 +46,7 @@ const buildActions = (props: HomeDayActionsProps): DayAction[] => {
       label: `Revisar ${downModules.length} ${downModules.length === 1 ? 'incidente' : 'incidentes'}`,
       icon: 'tabler-alert-triangle',
       color: 'error',
-      href: '/admin/operations',
+      href: '/admin/ops-health',
       primary: true
     })
   }
@@ -106,8 +105,10 @@ export const HomeDayActions = (props: HomeDayActionsProps) => {
       animate={reduced ? undefined : { opacity: 1, y: 0 }}
       transition={reduced ? undefined : { duration: 0.22, delay: 0.1, ease: [0.2, 0, 0, 1] }}
     >
-      <Box
+      <Card
+        variant='outlined'
         component='section'
+        data-capture='home-day-actions'
         aria-label={TASK407_ARIA_ACCIONES_RECOMENDADAS_PARA_HOY}
         sx={{
           display: 'flex',
@@ -115,39 +116,33 @@ export const HomeDayActions = (props: HomeDayActionsProps) => {
           gap: 2,
           flexWrap: 'wrap',
           px: 3,
-          py: 2,
-          borderRadius: theme => theme.shape.customBorderRadius?.md ?? 6,
-          border: theme => `1px solid ${theme.palette.divider}`,
-          bgcolor: theme => `color-mix(in oklch, ${theme.palette.primary.main} 4%, ${theme.palette.background.paper})`
+          py: 2
         }}
       >
         <CustomAvatar skin='light' variant='rounded' color='primary' size={32}>
           <i className='tabler-bolt text-[18px]' />
         </CustomAvatar>
         <Stack flex={1} minWidth={0} sx={{ minWidth: 200 }}>
-          <Typography variant='body1' sx={{ fontWeight: 500 }}>
-            Próximos pasos
-          </Typography>
+          <Typography variant='h5'>Próximos pasos</Typography>
           <Typography variant='caption' color='text.secondary'>
             {actions.length} {actions.length === 1 ? 'acción sugerida' : 'acciones sugeridas'} para tu operación
           </Typography>
         </Stack>
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           {actions.map(action => (
-            <Button
+            <GreenhouseButton
               key={action.id}
               size='small'
-              variant={action.primary ? 'contained' : 'tonal'}
-              color={action.color}
-              startIcon={<i className={classnames(action.icon, 'text-[16px]')} />}
+              variant={action.primary ? 'solid' : 'label'}
+              tone={action.color}
+              leadingIconClassName={action.icon}
               onClick={() => router.push(action.href)}
-              sx={{ textTransform: 'none' }}
             >
               {action.label}
-            </Button>
+            </GreenhouseButton>
           ))}
         </Stack>
-      </Box>
+      </Card>
     </motion.div>
   )
 }

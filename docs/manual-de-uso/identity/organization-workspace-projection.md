@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 1.0
 > **Creado:** 2026-05-08 por Claude (TASK-611)
-> **Ultima actualizacion:** 2026-05-08 por Claude
+> **Ultima actualizacion:** 2026-06-08 por Codex
 > **Modulo:** Identidad y acceso
 > **Rutas en portal:** `/admin/operations` (signals), `/admin/users/[id]/access` (overrides), `/admin/governance/access` (defaults por rol)
 > **Documentacion relacionada:** [Sistema de Identidad, Roles y Acceso — sección Facets de Organization Workspace](../../documentation/identity/sistema-identidad-roles-acceso.md), [GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md](../../architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md)
@@ -46,11 +46,12 @@ Cuando un usuario entra al detalle de una organizacion, el sistema lo clasifica 
 
 **Regla critica de cross-tenant isolation**: un usuario `tenant_type='client'` NUNCA puede ver una organizacion que no sea la propia, aunque tenga capability `organization.<facet>:read`. La relacion es el outer gate; las capabilities filtran dentro de la relacion ya autorizada.
 
-## Las 11 capabilities `organization.*`
+## Las capabilities `organization.*`
 
 | Capability | Acciones | Que controla |
 |---|---|---|
-| `organization.identity` | `read` | Datos basicos: nombre, dominio, status comercial, logo |
+| `organization.identity` | `read` | Datos basicos: nombre, dominio, website, status comercial, logo final |
+| `organization.brand_asset` | `review`, `update` | Revisar/aplicar logos comerciales de organizaciones no-operating-entity |
 | `organization.identity_sensitive` | `read`, `update` | PII + identidad legal: RUT, direccion legal, beneficiarios |
 | `organization.spaces` | `read` | Spaces operativos (Notion) asociados |
 | `organization.team` | `read` | Roster + assignments del cliente |
@@ -64,12 +65,26 @@ Cuando un usuario entra al detalle de una organizacion, el sistema lo clasifica 
 
 **Quien las recibe automaticamente** (sin override):
 
-- `efeonce_admin` → 11 capabilities a scope `all` (incluyendo `*_sensitive`).
+- `efeonce_admin` → capabilities de Organization Workspace a scope `all` (incluyendo `*_sensitive` y `organization.brand_asset`).
+- `route_group=admin` → `organization.brand_asset` a scope `tenant` para review/update de logos comerciales.
 - `route_group=internal` (sin admin) → 7 facets non-sensitive a scope `tenant`: identity, spaces, team, delivery, crm, services, staff_aug. **No tienen** economics, finance, ni *_sensitive.
 - `route_group=finance` (sin admin) → suma economics + finance a scope `tenant`. **No tienen** finance_sensitive.
 - `tenant_type=client` → 4 facets (identity, team, delivery, services) a scope `own`. Solo en su propia org.
 
 Las capabilities sensibles (`*_sensitive`) **nunca se otorgan automaticamente** a roles no-admin. Requieren override explicito desde Admin Center.
+
+## Organization Brand Assets
+
+El logo visible de una organizacion comercial vive como asset privado Greenhouse:
+
+1. El puntero final es `greenhouse_core.organizations.logo_asset_id`.
+2. `organization_360` expone `logoAssetId`, `logoUrl`, `websiteUrl` e `isOperatingEntity`.
+3. Las superficies `/agency/organizations` y `/agency/organizations/[id]` renderizan `logoUrl` cuando existe y conservan fallback estable a inicial/icono cuando no existe o la imagen falla.
+4. El endpoint de mutacion es `POST /api/organizations/[id]/brand-assets/logo`; exige `organization.brand_asset:update`.
+
+Regla critica: este flujo **no cambia logos de Efeonce ni de operating entities**. Si `organizations.is_operating_entity=TRUE`, el command bloquea antes de tocar assets. Los logos legales/institucionales de Efeonce se gestionan por su contrato separado.
+
+Foundation implementada en TASK-999: manual attach/API + serving seguro. Siguen pendientes la cola visual de revision, discovery worker y reliability signals antes de declarar el flujo operativo completo.
 
 ## Operacion 1 — Revisar reliability signals
 

@@ -48,17 +48,16 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Onboarding wizard (TASK-976) — reached via the "Nuevo contractor" primary CTA in the contractors workbench header (TASK-982 Slice 1). Create-action, not a standalone nav item.'
   },
   {
-    // TASK-992 Slice 2b — single front door wizard to onboard a client. Gated by
-    // CLIENT_LIFECYCLE_ONBOARDING_ENABLED (OFF by default → route 404s). The
-    // discoverable entry (a flag-gated "Alta de cliente" nav item / orgs header
-    // CTA) is wired in the nav follow-up once the flag is exposed to the menu
-    // client; meanwhile the route is reachable by direct URL + the Account 360
-    // deep-link. Create-action, not a standalone menu item.
+    // TASK-992 Slice 2b / TASK-1013 — single front door wizard to onboard a client.
+    // Gated by CLIENT_LIFECYCLE_ONBOARDING_ENABLED (OFF by default → route 404s).
+    // The discoverable entry is the onboarding cockpit (/agency/clients/onboarding,
+    // the flag-gated "Alta de cliente" nav item); the wizard is reached from the
+    // cockpit's primary "Nuevo cliente" CTA. Create-action, not a standalone menu item.
     route: '/agency/clients/new',
-    parent: '/agency/organizations',
+    parent: '/agency/clients/onboarding',
     via: 'header-cta',
     reason:
-      'Client onboarding wizard (TASK-992 Slice 2b) — single canonical front door, flag-gated (CLIENT_LIFECYCLE_ONBOARDING_ENABLED). Reached from the organizations workbench; discoverable nav entry wired in the nav follow-up.'
+      'Client onboarding wizard (TASK-992 Slice 2b) — single canonical front door, flag-gated (CLIENT_LIFECYCLE_ONBOARDING_ENABLED). Reached from the onboarding cockpit (TASK-1013) via its primary "Nuevo cliente" CTA.'
   },
   {
     // TASK-983 triage: legacy redirect-only page → /agency?tab=capacidad.
@@ -75,6 +74,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'redirect-alias',
     reason:
       'Legacy LEGACY_INTERNAL_DASHBOARD_PATH (resolve-portal-home-path); the page only `redirect("/admin")`. Canonical surface is the Admin Center.'
+  },
+  {
+    route: '/admin/operations',
+    parent: '/admin/ops-health',
+    via: 'redirect-alias',
+    reason:
+      'Legacy reliability URL kept for older links, docs and bookmarks; the page only `redirect("/admin/ops-health")`. Canonical incident-facing surface is Ops Health.'
   },
   {
     // TASK-983 triage: quote share dashboard — genuine sub-surface of the quotes flow.
@@ -110,6 +116,90 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Preferencias personales de notificaciones. Link en UserDropdown pendiente (TASK-983 follow-up); alcanzable por URL directa mientras tanto.'
+  },
+  {
+    route: '/admin/design-system/colors',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Color AXIS Lab — child surface del Design System para ramps, opacidades, contraste y neutrales; alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/loaders',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Loading Lab (TASK-1037) — child surface del Design System, alcanzable desde la referencia interna de tokens AXIS sin mezclar loaders en la pagina canonica de color.'
+  },
+  {
+    route: '/admin/design-system/microinteractions',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Microinteractions Lab — child surface del Design System para primitives de feedback de comandos async, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/typography',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Referencia canonica de tipografia (TASK-1044) — child surface del Design System, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/chips',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/buttons',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Buttons Lab — child surface del Design System para la primitive GreenhouseButton basada en AXIS Figma, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/charts',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Charts Lab — child surface del Design System para primitives de visualizacion de datos, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/utilities',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Utilities Lab — child surface del Design System para primitives utilitarias como Activity Timeline, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/floating-surfaces',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Floating Surfaces Lab (TASK-1033) — child surface del Design System para la primitive GreenhouseFloatingSurface y sus 6 variants, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/motion',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Motion Lab (TASK-1045) — child surface del Design System para la primitiva de motion sobre GSAP (<Motion> + useGreenhouseGSAP) y sus 4 variants, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/elevation',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Elevation & Shadows Lab (TASK-1049) — child surface del Design System para los roles semánticos de elevación (theme.greenhouseElevation), alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/geometry',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Geometry Lab (TASK-1050) — child surface del Design System para spacing/radius AXIS y la extension Greenhouse xxl/display, alcanzable desde el catalogo canonico /admin/design-system.'
   }
 ]
 

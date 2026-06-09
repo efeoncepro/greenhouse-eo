@@ -497,7 +497,7 @@ const AdminIntegrationGovernanceView = ({
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant='body2' sx={{ fontSize: '0.8125rem' }}>
+                    <Typography variant='caption'>
                       {entry.syncCadence ?? '\u2014'}
                     </Typography>
                   </TableCell>
@@ -898,7 +898,7 @@ const AdminIntegrationGovernanceView = ({
                           {notionRecentRuns.slice(0, 6).map(run => (
                             <TableRow key={run.dataQualityRunId} hover>
                               <TableCell>
-                                <Typography variant='body2' sx={{ fontSize: '0.8125rem' }}>
+                                <Typography variant='caption'>
                                   {run.spaceId}
                                 </Typography>
                               </TableCell>

@@ -49,7 +49,7 @@ const Page = async () => {
   const subject = buildTenantEntitlementSubject(tenant)
 
   if (!can(subject, 'client_portal.catalog.manage', 'read', 'all')) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect('/401')
   }
 
   const rows = await query<ModuleCatalogRow>(`

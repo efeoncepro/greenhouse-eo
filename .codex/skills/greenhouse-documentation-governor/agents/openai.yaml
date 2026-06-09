@@ -1,0 +1,7 @@
+interface:
+  display_name: "Greenhouse Documentation Governor"
+  short_description: "Closure gate for docs, ADRs, handoff, changelog, and task lifecycle."
+  default_prompt: "Use $greenhouse-documentation-governor to verify whether this Greenhouse implementation was documented correctly and update the required architecture, ADR, changelog, handoff, task, AGENTS.md, CLAUDE.md, and related docs."
+
+policy:
+  allow_implicit_invocation: true

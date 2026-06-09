@@ -19,7 +19,7 @@ export default async function AgencyServicesLayout({ children }: { children: Rea
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

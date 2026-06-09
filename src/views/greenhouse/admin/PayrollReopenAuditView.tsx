@@ -191,7 +191,7 @@ const PayrollReopenAuditView = () => {
                   borderRadius: 6,
                   border: 'none',
                   background: 'var(--mui-palette-primary-main)',
-                  color: '#fff',
+                  color: 'var(--mui-palette-common-white)',
                   cursor: loading ? 'not-allowed' : 'pointer',
                   fontWeight: 500
                 }}
@@ -260,7 +260,7 @@ const PayrollReopenAuditView = () => {
                         <Typography variant='body2'>{formatDateTime(row.reopenedAt)}</Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                        <Typography variant='caption'>
                           {formatMonthLabel(row)}
                         </Typography>
                       </TableCell>

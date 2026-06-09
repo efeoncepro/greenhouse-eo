@@ -8,6 +8,7 @@ import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 import { getOrganizationOperationalServing } from './get-organization-operational-serving'
 import type { OrganizationClientFinance, OrganizationFinanceSummary } from '@/views/greenhouse/organizations/types'
 
@@ -42,6 +43,10 @@ export interface OrganizationListItem {
   industry: string | null
   country: string | null
   hubspotCompanyId: string | null
+  logoAssetId: string | null
+  logoUrl: string | null
+  websiteUrl: string | null
+  isOperatingEntity: boolean
   status: string
   active: boolean
   spaceCount: number
@@ -120,6 +125,9 @@ interface OrgListRow extends Record<string, unknown> {
   industry: string | null
   country: string | null
   hubspot_company_id: string | null
+  logo_asset_id: string | null
+  website_url: string | null
+  is_operating_entity: boolean | null
   status: string
   active: boolean
   space_count: string
@@ -200,6 +208,10 @@ const normalizeListItem = (r: OrgListRow): OrganizationListItem => ({
   industry: r.industry,
   country: r.country,
   hubspotCompanyId: r.hubspot_company_id,
+  logoAssetId: r.logo_asset_id,
+  logoUrl: r.logo_asset_id ? `${buildPrivateAssetDownloadUrl(r.logo_asset_id)}?inline=1` : null,
+  websiteUrl: r.website_url,
+  isOperatingEntity: r.is_operating_entity === true,
   status: r.status,
   active: r.active,
   spaceCount: toNum(r.space_count),
@@ -306,7 +318,7 @@ export const getOrganizationList = async (params: {
   const rows = await runGreenhousePostgresQuery<OrgListRow>(`
     SELECT
       organization_id, public_id, organization_name, legal_name,
-      organization_type, industry, country, hubspot_company_id, status, active,
+      organization_type, industry, country, hubspot_company_id, logo_asset_id, website_url, is_operating_entity, status, active,
       space_count::text, membership_count::text, unique_person_count::text,
       created_at, updated_at
     FROM greenhouse_serving.organization_360 o
@@ -328,7 +340,7 @@ export const getOrganizationDetail = async (id: string): Promise<OrganizationDet
     SELECT
       organization_id, public_id, organization_name, legal_name,
       organization_type, tax_id, tax_id_type, industry, country, hubspot_company_id,
-      status, active, notes,
+      logo_asset_id, website_url, is_operating_entity, status, active, notes,
       space_count::text, membership_count::text, unique_person_count::text,
       spaces, people,
       created_at, updated_at

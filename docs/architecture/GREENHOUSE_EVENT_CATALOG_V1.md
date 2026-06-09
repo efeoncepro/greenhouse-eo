@@ -2,6 +2,14 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-06-07 — TASK-1020: Leave Approval Authority Recovery (1 event v1, audit-only)
+
+Aggregate type: `leave_request`. Audit-only (NO reactivo — no dispara projection).
+
+| Evento | Trigger | Notas |
+| --- | --- | --- |
+| `leave_request.approval_authority_recovered` | `runLeaveApprovalAuthorityRecovery()` (apply), 1 por snapshot reparado | Payload `schemaVersion:1` con `{ leaveRequestId, subjectMemberId, stageCode:'supervisor_review', before:{authoritySource, formal/effective approver, delegateResponsibilityId}, after:{...}, revokedResponsibilityIds[], actorUserId, reason }`. Registra el before/after de la corrección de autoridad cuando un snapshot quedó congelado con un `approval_delegate` genérico inválido. La revocación de la responsabilidad emite además `responsibility.revoked` (existente). |
+
 ## Delta 2026-05-31 — TASK-979: Monthly Contractor Payment Run (1 event v1)
 
 Aggregate type: `contractor_payable`. Extiende los 5 eventos de TASK-793 con la transición que faltaba al lifecycle del payable.
@@ -950,3 +958,62 @@ Spec: `docs/tasks/in-progress/TASK-934-unanchored-paid-expense-anchoring-review-
 - **Reliability**: `client.lifecycle.cascade_dead_letter` lee `outbox_events WHERE event_type LIKE 'client.lifecycle.%' AND status='dead_letter'`.
 
 Spec: `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md` §10 + `docs/tasks/in-progress/TASK-992-client-lifecycle-orchestrator-single-front-door.md`.
+
+## Delta 2026-06-05 — TASK-1019: `workforce.contracting.*` (Workforce Contracting Studio foundation)
+
+6 eventos versionados v1, aggregate type `workforce_contracting_case`, aggregate_id = `caseId` (`wcc-{uuid}`). Foundation advisory-only: ningún consumer genera PDF/firma/email en TASK-1019.
+
+| Event | Cuándo | Payload v1 (además de `schemaVersion:1, caseId`) | Consumers |
+|---|---|---|---|
+| `workforce.contracting.case_opened` | `createWorkforceContractingCase` | `{caseKind, subjectIdentityProfileId, operatingEntityOrganizationId, jurisdictionPackCode, status}` | audit, UI notification (futuro) |
+| `workforce.contracting.ai_draft_created` | `createWorkforceContractingDraft` con `source='claude_ai'` (adapter Slice 3) | `{draftId, draftVersion, aiRunId, caseStatus}` | **REACTIVO futuro** — render/PDF consumer (EPIC-001) |
+| `workforce.contracting.draft_approved` | `approveWorkforceContractingDraft` | `{draftId, draftVersion, caseKind, caseStatus, approvedByUserId}` | **REACTIVO futuro** — render/PDF (EPIC-001) |
+| `workforce.contracting.ready_for_pdf` | transición → `ready_for_pdf` (comando futuro) | `{...}` | render consumer (EPIC-001 `TASK-489`/`TASK-493`) |
+| `workforce.contracting.ready_for_signature` | transición → `ready_for_signature` (comando futuro) | `{...}` | signature consumer (EPIC-001 `TASK-490`/`TASK-491`, ZapSign) |
+| `workforce.contracting.signature_pending_overdue` | **scheduler futuro** (no emitido en TASK-1019) | `{...}` | Notification Hub (recordatorio de firma pendiente) |
+
+- **Emisor**: comandos en `src/lib/workforce/contracting/commands/**` vía `publishContractingEvent` (dual-mode, dentro de la misma tx que la mutación + el `workforce_contracting_case_events` append-only). En TASK-1019 se emiten `case_opened` (createCase), `ai_draft_created` (draft AI) y `draft_approved` (approve); los demás quedan declarados como contrato para tasks futuras.
+- **Contratos de integración futura** (no implementados en TASK-1019):
+  - **EPIC-001 render/template** (`TASK-489` registry + `TASK-493` rendering): consume `ai_draft_created`/`draft_approved`/`ready_for_pdf` para generar el PDF/DOCX institucional desde `structured_content_json` aprobado (formato declarado en `cases.signable_format`). NO crea vault paralelo.
+  - **EPIC-001 signature/ZapSign** (`TASK-490` orchestration + `TASK-491` adapter): consume `ready_for_signature`; ZapSign firma el artefacto vía `base64_pdf`/`base64_docx` (no el template feature). Webhooks de firma vuelven por el inbox canónico.
+  - **Notification Hub**: consume `ready_for_signature` (pre-firma) + un evento post-firma futuro + `signature_pending_overdue` (recordatorio). Copy es-CL canónico, sin overclaiming legal.
+  - **Workforce Activation**: cuando el contrato llega a `active`/`registered_external`, desbloquea la readiness documental laboral (TASK-874/876).
+- **Reliability** (moduleKey `workforce`): `workforce.contracting.ai_draft_failed` (dead_letter), `validation_blocked_overdue` (lag), `approved_without_pdf` (drift). Steady=0.
+
+Spec: `docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` + `docs/tasks/in-progress/TASK-1019-workforce-contracting-studio-foundation-ai-drafting.md`.
+
+## Delta 2026-06-05 — TASK-490: `signature.request.*` (Signature orchestration foundation, EPIC-001)
+
+7 eventos versionados v1, aggregate type `signature_request`, aggregate_id = `signatureRequestId` (`sig-{uuid}`). Plataforma de firma provider-neutral (hexagonal port; adapter ZapSign = TASK-491). Foundation: el aggregate + state machine + commands existen; ningún provider real se invoca todavía (`notImplementedSignatureAdapter` lanza 503 hasta TASK-491).
+
+| Event | Cuándo | Payload v1 (además de `schemaVersion:1, signatureRequestId, sourceKind, sourceRef, status`) | Consumers |
+|---|---|---|---|
+| `signature.request.created` | `createSignatureRequest` (draft) | — | audit, UI (futuro) |
+| `signature.request.sent` | `sendSignatureRequest` (→ provider) | `{}` (status=sent) | Notification Hub (futuro) |
+| `signature.request.partially_signed` | `applyProviderSignatureUpdate` (un firmante de varios) | `{signedDocumentAssetId}` | UI progreso (futuro) |
+| `signature.request.completed` | `applyProviderSignatureUpdate` (todos firman) | `{signedDocumentAssetId}` | **REACTIVO futuro** — Workforce Activation, vault del documento firmado |
+| `signature.request.cancelled` | `cancelSignatureRequest` | `{}` (status=cancelled) | audit |
+| `signature.request.failed` | `applyProviderSignatureUpdate` (provider rechaza) | `{}` (status=failed) | reliability `documents.signature_request.failed` |
+| `signature.request.expired` | `applyProviderSignatureUpdate` (TTL provider) | `{}` (status=expired) | audit |
+
+- **Emisor**: comandos en `src/lib/signatures/commands.ts` vía `publishSignatureEvent` (dual-mode, dentro de la misma tx que la mutación + el `signature_request_events` append-only). El estado provider-driven es **monotónico + tolerante a callbacks fuera de orden** (`applyProviderStatus` nunca regresa; terminal es inmutable) → el evento de status solo se emite en un cambio real de estado (idempotente ante reentrega del webhook TASK-491).
+- **Hexagonal port**: `SignatureProviderAdapter` (DI). El adapter real ZapSign + el webhook inbound = TASK-491. El render del documento = TASK-1023. El bridge `ready_for_signature` (workforce_contracting → signature_request) = TASK-491.
+- **Reliability** (moduleKey `documents`): `documents.signature_request.pending_overdue` (lag), `.failed` (drift), `.signed_artifact_missing` (data_quality). Steady=0.
+
+Spec: `docs/tasks/in-progress/TASK-490-signature-orchestration-foundation.md`.
+
+## Delta 2026-06-05 — TASK-1024: `workforce.contracting.{sent_for_signature, signature_completed, signature_failed}` (signature bridge)
+
+3 eventos v1 nuevos, aggregate type `workforce_contracting_case`. Cierran el bridge contrato↔firma (consume EPIC-001 TASK-490/491).
+
+| Event | Cuándo | Payload v1 (además de `schemaVersion:1, caseId`) | Consumers |
+|---|---|---|---|
+| `workforce.contracting.sent_for_signature` | producer `sendContractingCaseToSignature` (CTA operador) | `{signatureRequestId}` | TASK-1025 (notificación de envío) |
+| `workforce.contracting.signature_completed` | consumer reactivo (signature.request.completed → case fully_signed) | `{signatureRequestId, signatureStatus, signedPdfAssetId}` | **REACTIVO futuro** — TASK-1025 (archivar + notificar), TASK-1026 (registro DT/REL) |
+| `workforce.contracting.signature_failed` | consumer reactivo (signature.request.failed/expired) | `{signatureRequestId, signatureStatus, signedPdfAssetId}` | TASK-1025 (alerta / reenvío) |
+
+- **Emisor producer**: `src/lib/workforce/contracting/signature/send-to-signature.ts` vía `publishContractingEvent` (dentro de la tx que avanza el caso a `sent_for_signature`). El worker es el único firmante electrónico (firma del representante pre-estampada, TASK-863/1023).
+- **Emisor consumer**: projection reactiva `contracting_signature_bridge` (`src/lib/sync/projections/contracting-signature-bridge.ts`) que consume `signature.request.{completed,partially_signed,failed,expired}` filtrado a `sourceKind='contracting_case'`, re-lee PG, avanza el caso + liga `signed_pdf_asset_id`. `expired` mapea a `signature_failed` (estado del caso = `expired`, distinto). `partially_signed` es audit-only (single-signer no dispara).
+- **Reliability** (moduleKey `workforce`): `workforce.contracting.signature_desync` (drift, steady=0) — el caso quedó atrás de su signature_request (consumer falló). Los failure modes del aggregate ya los cubre TASK-490 `documents.signature_request.*`.
+
+Spec: `docs/tasks/in-progress/TASK-1024-workforce-contracting-signature-consumer-zapsign.md`.

@@ -77,8 +77,8 @@ const parseArgs = argv => {
     throw new Error(`Invalid --format "${options.format}". Expected human or json.`)
   }
 
-  if (options.task && !/^TASK-\d{3}(?:\.\d+)?$/.test(options.task)) {
-    throw new Error(`Invalid --task "${options.task}". Expected TASK-###.`)
+  if (options.task && !/^TASK-\d{3,}(?:\.\d+)?$/.test(options.task)) {
+    throw new Error(`Invalid --task "${options.task}". Expected TASK-### with 3+ digits.`)
   }
 
   if (options.changed && options.active) {

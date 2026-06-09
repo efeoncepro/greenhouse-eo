@@ -125,7 +125,7 @@ const buildPeriodLabel = (year: number, month: number): string =>
  *
  * Honest degradation:
  *  - PG fail → state `degraded` + `captureWithDomain('delivery')`.
- *  - El page upstream consume el state y muestra Alert + link a /admin/operations.
+ *  - El page upstream consume el state y muestra Alert + link a /admin/ops-health.
  */
 export const listNexaInsightsForPeriod = async (
   subject: NexaInsightDrillSubject,

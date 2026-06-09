@@ -217,3 +217,17 @@ Evidence hardening:
 5. Reporte HTML `index.html` por captura.
 6. Multi-viewport declarativo por scenario.
 7. Metadata baseline/mockup→runtime para comparar con `fe:capture:diff`.
+
+## Contrato mockup→runtime (V1.5)
+
+Desde TASK-1018, GVC verifica que un runtime no traicione su mockup aprobado, con gates opt-in por scenario (warning-first):
+
+8. **Baseline visual diff**: compara cada frame runtime contra el mockup aprobado (home durable `scripts/frontend/baselines/<surfaceId>/`), con masks para datos dinámicos y thresholds configurables. Degrada honesto a `baseline_stale` si el baseline falta.
+9. **Layout integrity**: overflow, targets chicos, texto cortado, scroll sin label, cards anidadas.
+10. **Console/hydration/network strict**: errores de consola, excepciones, hydration y 4xx/5xx (sanitizados).
+11. **Trace on failure**: `trace.zip` de Playwright cuando la captura falla.
+12. **Keyboard/focus/reduced-motion**: rutas de teclado, focus ring y feedback sin animación.
+13. **Performance budgets**: DOM nodes, requests, transfer, FCP.
+14. **Enterprise rubric + resumen ejecutivo**: data honesty + veredicto "Apto / Revisar / Requiere iteración".
+
+> Detalle técnico: `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` Delta V1.5; flujo de adopción en `scripts/frontend/scenarios/_README.md`.

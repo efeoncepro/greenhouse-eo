@@ -103,12 +103,19 @@ Use the least-privilege agent persona that matches the route or workflow under r
 
 Full Agent Auth spec: [GREENHOUSE_IDENTITY_ACCESS_V2.md § Agent Auth](./GREENHOUSE_IDENTITY_ACCESS_V2.md)
 
-## 5. Canonical Tool: `staging-request.mjs`
+## 5. Canonical Tools
 
-**Source:** `scripts/staging-request.mjs`
-**pnpm alias:** `pnpm staging:request`
+Shared helper sources:
 
-The script encapsulates the full pipeline: bypass resolution → agent auth → request → output.
+- `scripts/lib/vercel-staging-access.mjs` resolves staging URL, Vercel protection bypass and agent auth inputs.
+- `scripts/lib/local-env.mjs` loads `.env.local`/`.env` without overriding already-exported environment variables.
+
+Consumers:
+
+- `scripts/staging-request.mjs` (`pnpm staging:request`) for authenticated API requests.
+- `scripts/playwright-staging.mjs` (`pnpm test:e2e:staging`) for authenticated Playwright smoke runs.
+
+Both tools use the same resolution order for staging access. Do not reimplement bypass lookup in one-off scripts.
 
 ### 5.1 Usage
 
@@ -127,6 +134,12 @@ pnpm staging:request /api/agency/operations --pretty
 
 # Pipe-friendly (JSON to stdout, logs to stderr)
 node scripts/staging-request.mjs /api/agency/operations | jq '.subsystems'
+
+# Playwright smoke against staging
+pnpm test:e2e:staging
+
+# Focused Playwright spec against staging
+pnpm test:e2e:staging -- tests/e2e/smoke/finance-cash-out-bank-reflection.spec.ts --project=chromium --workers=1
 ```
 
 ### 5.2 Flow
@@ -141,14 +154,21 @@ node scripts/staging-request.mjs /api/agency/operations | jq '.subsystems'
    └─ POST /api/auth/agent-session with bypass header
    └─ returns { cookieName, cookieValue }
 
-3. makeRequest(bypassSecret, cookie)
+3. Consumer action
+   staging-request:
    └─ GET|POST target path with bypass + cookie
    └─ returns JSON body
+   playwright-staging:
+   └─ sets PLAYWRIGHT_BASE_URL/AGENT_AUTH_BASE_URL + auth env for the child process
+   └─ runs pnpm exec playwright test
 
 4. Output
+   staging-request:
    ├─ --pretty → JSON.stringify(body, null, 2)
    ├─ --grep <pattern> → recursive key search
    └─ default → raw JSON to stdout
+   playwright-staging:
+   └─ Playwright reporter output; no secret values are printed
 ```
 
 ### 5.3 Environment variables
@@ -159,6 +179,7 @@ node scripts/staging-request.mjs /api/agency/operations | jq '.subsystems'
 | `AGENT_AUTH_SECRET`               | Yes               | `.env.local`               | Shared secret for agent-session endpoint                       |
 | `AGENT_AUTH_EMAIL`                | No                | `.env.local`               | Override agent email (default: `agent@greenhouse.efeonce.org`) |
 | `STAGING_URL`                     | No                | `.env.local`               | Override staging base URL                                      |
+| `PLAYWRIGHT_BASE_URL`             | No                | env/CI                     | Playwright target URL override (`pnpm test:e2e:staging` only)  |
 
 ## 6. URLs
 

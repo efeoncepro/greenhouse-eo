@@ -141,7 +141,7 @@ const PurchaseOrdersListView = () => {
       header: 'OC #',
       cell: ({ row }) => (
         <Box>
-          <Typography variant='body2' fontWeight={600} sx={{ fontSize: '0.8rem' }}>
+          <Typography variant='caption' fontWeight={600}>
             {row.original.poNumber}
           </Typography>
           {row.original.description && (

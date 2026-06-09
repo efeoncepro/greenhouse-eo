@@ -52,6 +52,7 @@ El repo ya cruzó el umbral en que MSA/SOW, contratos laborales, anexos, órdene
 - `TASK-495` — Convergencia Finance/Legal document chain para MSA, SOW y work orders.
 - `TASK-868` — Payroll Receipt Documents aggregate dedicado (mirror TASK-863 V1.5.2) + registry link como `kind='linked'` `document_type='payroll_receipt'`.
 - `TASK-964` — Alineacion con EPIC-017 Person Workforce Documents Rail: People/Person 360 consume documentos y firma como evidencia del journey laboral, sin crear document vault paralelo.
+- `TASK-1019` — Workforce Contracting Studio Foundation + AI Drafting: cartas oferta y contratos laborales nacen como aggregates HR/Legal con Claude advisory; PDF/firma/ZapSign deben consumir `TASK-489`/`TASK-490`/`TASK-491`/`TASK-493`, no crear vault ni provider calls paralelos.
 
 ## Implementation Order (canonical sequencing)
 
@@ -235,3 +236,13 @@ Regla de frontera:
 - EPIC-001 sigue siendo owner de registry, versions, assets, document manager, signature orchestration, templates y lifecycle documental.
 - EPIC-017 puede mostrar una rail documental en People/Person 360, pero no crea un storage/signature manager paralelo.
 - `TASK-964` coordina la alineacion: `TASK-489`/`TASK-492`/`TASK-494` desbloquean evidencia documental read-only; `TASK-490`/`TASK-491` solo bloquean nuevos workflows de firma iniciados desde Greenhouse, no la visualizacion de documentos ya registrados.
+
+## Delta 2026-06-05 — Workforce Contracting Studio consumer
+
+El ADR `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1` agrega un segundo consumer workforce directo para EPIC-001: cartas oferta y contratos laborales generados desde Greenhouse.
+
+Regla de frontera:
+
+- `TASK-1019` puede crear el aggregate HR/Legal, drafts versionados, Claude advisory y validadores deterministas.
+- El PDF institucional final, versioning documental, signature requests, ZapSign adapter, signed artifact ingestion y audit trail externo siguen siendo ownership de EPIC-001.
+- Ninguna task de Workforce Contracting debe llamar ZapSign directo ni guardar URLs provider como source of truth; debe esperar/consumir `TASK-489`, `TASK-490`, `TASK-491` y `TASK-493`.

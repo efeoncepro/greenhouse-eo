@@ -57,9 +57,15 @@ const registerFontsOnce = async (): Promise<void> => {
 
   registrationPromise = (async () => {
     // Geist — canonical body font (DESIGN.md). Source: Google Fonts.
+    // Registrado POR NOMBRE DE FAMILIA (no por fontWeight): un componente PDF
+    // referencia 'Geist Bold' etc. La escala del SoT (TASK-1036/1038) usa
+    // 400/500/600/700/800 — TASK-1040 sumó SemiBold(600)+ExtraBold(800) para
+    // paridad de peso PDF↔web (section-titles 600, KPI hero / display 800).
     tryRegister('Geist', resolve(FONT_DIR, 'Geist-Regular.ttf'))
     tryRegister('Geist Medium', resolve(FONT_DIR, 'Geist-Medium.ttf'))
+    tryRegister('Geist SemiBold', resolve(FONT_DIR, 'Geist-SemiBold.ttf'))
     tryRegister('Geist Bold', resolve(FONT_DIR, 'Geist-Bold.ttf'))
+    tryRegister('Geist ExtraBold', resolve(FONT_DIR, 'Geist-ExtraBold.ttf'))
 
     // Poppins — canonical display font (DESIGN.md).
     tryRegister('Poppins Medium', resolve(FONT_DIR, 'Poppins-Medium.ttf'))

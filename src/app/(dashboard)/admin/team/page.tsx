@@ -18,7 +18,7 @@ const AdminTeamPage = async () => {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <PeopleList />

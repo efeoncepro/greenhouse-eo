@@ -1,16 +1,18 @@
 'use client'
 
+import dynamic from 'next/dynamic'
+
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 import type { BoxProps } from '@mui/material/Box'
 
 import type { Props } from 'react-apexcharts'
 
-import ReactApexcharts from '@/libs/ApexCharts'
-
 type ApexChartWrapperProps = Props & {
   boxProps?: BoxProps
 }
+
+const ReactApexcharts = dynamic<Props>(() => import('react-apexcharts'), { ssr: false })
 
 const ApexChartWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   '& .apexcharts-canvas': {
@@ -84,9 +86,15 @@ const ApexChartWrapper = styled(Box)<BoxProps>(({ theme }) => ({
     '& .apexcharts-yaxis .apexcharts-yaxis-texts-g .apexcharts-yaxis-label': {
       textAnchor: theme.direction === 'rtl' ? 'start' : undefined
     },
+    // TASK-1041 — gobierna familia + TAMAÑO del texto de chart desde el SoT
+    // (caption 13 = body-sm), una sola vez para los 33 charts Apex. NO matchea
+    // títulos (`.apexcharts-title-text`, clase aparte) — solo ejes/leyenda/
+    // tooltip/datalabels, que comparten el tamaño pequeño del SoT. La familia ya
+    // se gobernaba aquí; el tamaño faltaba (cada chart lo ponía inline).
     '& .apexcharts-text, & .apexcharts-tooltip-text, & .apexcharts-datalabel-label, & .apexcharts-datalabel, & .apexcharts-xaxistooltip-text, & .apexcharts-yaxistooltip-text, & .apexcharts-legend-text':
       {
-        fontFamily: `${theme.typography.fontFamily} !important`
+        fontFamily: `${theme.typography.fontFamily} !important`,
+        fontSize: `${theme.typography.caption.fontSize} !important`
       },
     '& .apexcharts-pie-label': {
       filter: 'none'

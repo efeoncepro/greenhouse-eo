@@ -65,6 +65,10 @@ export interface OrganizationDetailData {
   industry: string | null
   country: string | null
   hubspotCompanyId: string | null
+  logoAssetId: string | null
+  logoUrl: string | null
+  websiteUrl: string | null
+  isOperatingEntity: boolean
   status: string
   active: boolean
   notes: string | null

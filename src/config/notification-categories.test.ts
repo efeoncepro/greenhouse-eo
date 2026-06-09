@@ -16,7 +16,8 @@ const EXPECTED_CATEGORY_CODES = [
   'capacity_warning',
   'payroll_ops',
   'finance_alert',
-  'system_event'
+  'system_event',
+  'client_onboarding_draft'
 ] as const satisfies readonly NotificationCategoryCopyCode[]
 
 const EXPECTED_RUNTIME_CONTRACT = {
@@ -97,6 +98,12 @@ const EXPECTED_RUNTIME_CONTRACT = {
     audience: 'admin',
     defaultChannels: ['in_app'],
     priority: 'low'
+  },
+  client_onboarding_draft: {
+    icon: 'tabler-rocket',
+    audience: 'internal',
+    defaultChannels: ['in_app', 'email'],
+    priority: 'high'
   }
 } as const
 

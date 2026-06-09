@@ -35,163 +35,13 @@
  *   STAGING_URL                      — override staging base URL
  */
 
-import { readFile, writeFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
-import { execSync } from 'node:child_process'
-import { homedir } from 'node:os'
+import { resolveStagingAccess } from './lib/vercel-staging-access.mjs'
 
 // ───── Config ─────
-
-const PROJECT_ROOT = resolve(import.meta.dirname, '..')
-const ENV_LOCAL_PATH = resolve(PROJECT_ROOT, '.env.local')
-
-const VERCEL_PROJECT_ID = 'prj_d9v6gihlDq4k1EXazPvzWhSU0qbl'
-const VERCEL_TEAM_ID = 'efeonce-7670142f'
-
-const DEFAULT_STAGING_URL = 'https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app'
-
-const DEFAULT_AGENT_EMAIL = 'agent@greenhouse.efeonce.org'
 
 // ───── Helpers ─────
 
 const log = (...args) => console.error(...args) // logs go to stderr, data to stdout
-
-function parseEnvFile(content) {
-  const vars = {}
-
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim()
-
-    if (!trimmed || trimmed.startsWith('#')) continue
-
-    const eqIdx = trimmed.indexOf('=')
-
-    if (eqIdx === -1) continue
-    vars[trimmed.slice(0, eqIdx)] = trimmed.slice(eqIdx + 1)
-  }
-
-  return vars
-}
-
-async function readEnvLocal() {
-  try {
-    return parseEnvFile(await readFile(ENV_LOCAL_PATH, 'utf-8'))
-  } catch {
-    return {}
-  }
-}
-
-// ───── Bypass secret resolution ─────
-
-async function getVercelCliToken() {
-  // macOS: ~/Library/Application Support/com.vercel.cli/auth.json
-  // Linux: ~/.local/share/com.vercel.cli/auth.json
-  const paths = [
-    resolve(homedir(), 'Library/Application Support/com.vercel.cli/auth.json'),
-    resolve(homedir(), '.local/share/com.vercel.cli/auth.json')
-  ]
-
-  for (const p of paths) {
-    try {
-      const data = JSON.parse(await readFile(p, 'utf-8'))
-
-      if (data.token) return data.token
-    } catch {
-      // try next
-    }
-  }
-
-  // Fallback: try `vercel whoami` to confirm CLI is authenticated
-  try {
-    execSync('vercel whoami', { stdio: 'pipe' })
-
-    // CLI is authenticated but we couldn't find token file — shouldn't happen
-    log('⚠ Vercel CLI is authenticated but token file not found at expected paths')
-  } catch {
-    // not authenticated
-  }
-
-  return null
-}
-
-async function fetchBypassSecretFromApi(token) {
-  const url = `https://api.vercel.com/v9/projects/${VERCEL_PROJECT_ID}?teamId=${VERCEL_TEAM_ID}`
-
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-
-  if (!res.ok) {
-    throw new Error(`Vercel API returned ${res.status}: ${await res.text()}`)
-  }
-
-  const project = await res.json()
-  const entries = Object.entries(project.protectionBypass || {})
-
-  const automationEntry = entries.find(([, v]) => typeof v === 'object' && v.scope === 'automation-bypass')
-
-  if (!automationEntry) {
-    throw new Error(
-      'No automation-bypass entry in project protectionBypass. ' +
-        'Enable "Protection Bypass for Automation" in Vercel Project Settings > Deployment Protection.'
-    )
-  }
-
-  return automationEntry[0] // the key IS the secret
-}
-
-async function resolveBypassSecret(envLocal) {
-  // 1. From environment
-  if (process.env.VERCEL_AUTOMATION_BYPASS_SECRET) {
-    log('  bypass: from env')
-
-    return process.env.VERCEL_AUTOMATION_BYPASS_SECRET
-  }
-
-  // 2. From .env.local
-  if (envLocal.VERCEL_AUTOMATION_BYPASS_SECRET) {
-    log('  bypass: from .env.local')
-
-    return envLocal.VERCEL_AUTOMATION_BYPASS_SECRET
-  }
-
-  // 3. Fetch from Vercel API using CLI token
-  log('  bypass: not in env — fetching from Vercel API...')
-  const token = await getVercelCliToken()
-
-  if (!token) {
-    throw new Error(
-      'Cannot resolve VERCEL_AUTOMATION_BYPASS_SECRET.\n' +
-        'Options:\n' +
-        '  1. Add VERCEL_AUTOMATION_BYPASS_SECRET to .env.local\n' +
-        '  2. Authenticate Vercel CLI: vercel login\n' +
-        '  3. Set it in environment: export VERCEL_AUTOMATION_BYPASS_SECRET=...'
-    )
-  }
-
-  const secret = await fetchBypassSecretFromApi(token)
-
-  log('  bypass: fetched from Vercel API ✓')
-
-  // Persist to .env.local for future runs
-  try {
-    let content = await readFile(ENV_LOCAL_PATH, 'utf-8')
-
-    if (!content.includes('VERCEL_AUTOMATION_BYPASS_SECRET')) {
-      const block =
-        '\n# Vercel Deployment Protection bypass (auto-fetched, system-managed)\n' +
-        `VERCEL_AUTOMATION_BYPASS_SECRET=${secret}\n`
-
-      content += block
-      await writeFile(ENV_LOCAL_PATH, content)
-      log('  bypass: saved to .env.local for future runs')
-    }
-  } catch {
-    log('  bypass: could not persist to .env.local (non-blocking)')
-  }
-
-  return secret
-}
 
 // ───── Agent auth ─────
 
@@ -330,18 +180,7 @@ async function main() {
 
   // Resolve secrets
   log('─── staging-request ───')
-  const envLocal = await readEnvLocal()
-  const stagingUrl = process.env.STAGING_URL || DEFAULT_STAGING_URL
-  const bypassSecret = await resolveBypassSecret(envLocal)
-
-  const agentSecret = process.env.AGENT_AUTH_SECRET || envLocal.AGENT_AUTH_SECRET
-
-  if (!agentSecret) {
-    log('ERROR: AGENT_AUTH_SECRET not found in environment or .env.local')
-    process.exit(1)
-  }
-
-  const email = process.env.AGENT_AUTH_EMAIL || envLocal.AGENT_AUTH_EMAIL || DEFAULT_AGENT_EMAIL
+  const { stagingUrl, bypassSecret, agentSecret, email } = await resolveStagingAccess({ log })
 
   // Authenticate
   const authData = await agentAuth({

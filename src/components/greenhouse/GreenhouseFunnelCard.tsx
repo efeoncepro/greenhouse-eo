@@ -148,7 +148,7 @@ const CustomFunnelLabel = (props: {
       y={y + height / 2}
       textAnchor='middle'
       dominantBaseline='central'
-      fill='#fff'
+      fill='var(--mui-palette-common-white)'
       fontSize={height < 30 ? 11 : 13}
       fontWeight={600}
       style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
@@ -284,7 +284,7 @@ const GreenhouseFunnelCard = ({
                 }}
               >
                 {rates.slice(1).map((rate, i) => (
-                  <Typography key={i} variant='caption' color='text.secondary' sx={{ fontSize: '0.7rem' }}>
+                  <Typography key={i} variant='caption' color='text.secondary'>
                     → {rate ?? 0}%
                   </Typography>
                 ))}

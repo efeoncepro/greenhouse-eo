@@ -30,7 +30,7 @@ const StaffAugmentationPage = async ({ searchParams }: Props) => {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined

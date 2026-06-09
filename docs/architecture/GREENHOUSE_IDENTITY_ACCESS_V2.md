@@ -1,5 +1,72 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-06-07 — Approval authority: el `approval_delegate` genérico NO confiere autoridad ni scope de aprobación (TASK-1020)
+
+**Contexto / bug class.** El 2026-06-05 una responsabilidad operacional genérica
+`operational_responsibilities.responsibility_type='approval_delegate'` (Valentina Hoyos delegada,
+`scope_id=daniela-ferreira`) hizo que el snapshot de aprobación del permiso de Andrés Carlosama
+congelara a Valentina como `effective_approver_member_id`, aunque la supervisora formal vigente en
+`reporting_lines` es Daniela. Daniela quedaba bloqueada para aprobar; Valentina obtenía autoridad
+que no debía tener. La causa raíz **no es UX** ("falta un botón") — es **drift de autorización**: el
+`approval_delegate` genérico es demasiado amplio para ser fuente de autoridad de aprobación.
+
+**Dos planos consumen el mismo delegate genérico** (defense-in-depth: hay que decidir ambos):
+1. **Autoridad** — `resolver.ts` → `getEffectiveSupervisor` (`readers.ts`) → snapshot → `leave-review-policy.ts`.
+   Lo consumen los TRES stages `effective_supervisor` (`leave`, `expense_report`, `performance_evaluation`).
+2. **Visibilidad/scope** — `access.ts` (`getSupervisorScopeForTenant`) le da a la delegada
+   `hasDelegatedAuthority=true`, `canAccessSupervisorLeave=true` y el subárbol completo del supervisor.
+
+**Decisiones canónicas V1 (D1-D4, confirmadas por el operador/CEO el 2026-06-07).**
+
+- **D1 — Delegación de permisos bloqueada en V1.** `leave.supervisor_review` NO honra el `approval_delegate`
+  genérico como fuente de autoridad efectiva. La delegación real de aprobación de permisos (cobertura por
+  vacaciones, etc.) es un contrato SEPARADO **domain-scoped** (workflow/stage/scope, expiración obligatoria,
+  actor/reason, elegibilidad, audit, UI honesta, signal) — follow-up con ADR propio. Interín: el
+  override HR/admin existente.
+- **D2 — Clase, no instancia.** Los tres stages `effective_supervisor` reciben el flag declarativo
+  `honorGenericApprovalDelegate=false` (`leave`, `expense_report`, `performance_evaluation`). Aprobar reembolsos
+  = autoridad financiera; aprobar evaluaciones = autoridad HR. Leave-only sería parchar el síntoma. El flip de
+  expense/perf pasó el **gate de datos**: 0 snapshots delegados activos en esos workflows (verificado en PG vivo).
+- **D3 — Scope/visibilidad: no half-decouple.** El delegate genérico deja de conferir autoridad **Y** scope para
+  las superficies endurecidas: `getSupervisorScopeForTenant` ya no cuenta `approval_delegate` genérico hacia
+  `canAccessSupervisorLeave`/`visibleMemberIds`. Conferir visibilidad-sin-autoridad sobre un artefacto no validado
+  es over-exposure (principio TASK-987/ISSUE-083: el predicado de validez se mueve junto para TODO lo derivado).
+  Daniela conserva su workspace por `hasDirectReports`, no por delegación. El desacople deliberado
+  "ver pero no aprobar" (coverage viewer) se difiere al contrato domain-scoped de D1, opt-in por dimensión
+  (`confersApprovalAuthority` / `confersVisibilityScope`).
+- **D4 — Caso vivo `resp-2de74ab9-7e3c-4a7c-b9b3-7984c2567f58`: revocar globalmente** (lifecycle/audit
+  append-only, nunca DELETE), no neutralizar solo-permisos. Sin actor/reason, reasignada múltiples veces sobre
+  el mismo scope = drift, no política.
+
+**Contrato canónico resultante.**
+
+- **Supervisor formal** deriva de `greenhouse_core.reporting_lines` (SSOT).
+- **Autoridad de aprobación** deriva de policy server-side (`resolveApprovalAuthorityForStage` +
+  `leave-review-policy.ts`), NO de visibilidad UI ni de responsabilidades operacionales genéricas.
+- **Supervisor workspace scope** deriva de `hasDirectReports` (+ futuras delegaciones domain-scoped),
+  no del `approval_delegate` genérico.
+- **HR/admin override** sigue gateado por capability/role broad explícito (`isHrAdminTenant`), nunca por
+  responsabilidades operacionales.
+
+**Mecánica.** El fix vive en la capa declarativa per-stage `ApprovalStageDefinition.honorGenericApprovalDelegate`
+(default tratado como `false`), que el resolver pasa a `getEffectiveSupervisor(memberId, { delegationPolicy })`
+(`'ignore'` para stages que no honran; `'generic'` default preserva el contrato del reader para callers explícitos).
+Con `'ignore'`, `effectiveApproverMemberId === formalApproverMemberId` y `authoritySource='reporting_hierarchy'`
+(NO `'delegation'`). El recovery command (TASK-1020 Slice 3) recomputa snapshots **pendientes** invocando el
+resolver canónico post-fix (SSOT) — nunca reimplementa la lógica de autoridad — y revoca globalmente el delegate
+inválido (D4). Reliability signal `hr.leave.invalid_delegated_approval_snapshots` (moduleKey `identity`,
+kind `drift`, steady=0) detecta recurrencia, parametrizado por los stages que no honran delegate.
+
+**Hard rules** (ver CLAUDE.md "Approval Authority Delegation invariants" para la versión completa):
+- NUNCA un `approval_delegate` genérico cambia el `effective_approver_member_id` de un stage con
+  `honorGenericApprovalDelegate=false`.
+- NUNCA resolver el incidente dando HR/admin broad a la supervisora formal ni tocando `route_groups`/`views`.
+- NUNCA el delegate genérico confiere `canAccessSupervisorLeave`/`visibleMemberIds`.
+- NUNCA remediar con SQL manual: usar el recovery command auditado (dry-run/apply/idempotente/outbox).
+- SIEMPRE el recovery recomputa vía resolver canónico (runtime y remediación no pueden divergir).
+
+Spec: `docs/tasks/in-progress/TASK-1020-leave-approval-authority-delegation-drift-hardening.md`.
+
 ## Delta 2026-04-26 — First-party app sessions para API Platform `app`
 
 - Greenhouse distingue explícitamente entre:

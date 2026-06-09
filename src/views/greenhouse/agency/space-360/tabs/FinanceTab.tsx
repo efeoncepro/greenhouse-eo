@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 
-import dynamic from 'next/dynamic'
 
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -14,12 +13,13 @@ import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import type { Space360Detail } from '@/lib/agency/space-360'
 import { EmptyState } from '@/components/greenhouse'
 
 import { formatMoney, formatPct } from '../shared'
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 type Props = {
   detail: Space360Detail

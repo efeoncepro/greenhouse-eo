@@ -88,14 +88,12 @@ export const CSC_PHASE_LABELS: Record<CscPhase, string> = {
   entrega: 'Entrega'
 }
 
-/** Chart colors per CSC phase — used by ICO donut/trend visualizations */
-export const CSC_CHART_COLORS: Record<CscPhase, string> = {
-  briefing: '#7367F0',
-  produccion: '#00BAD1',
-  revision_interna: '#ff6500',
-  cambios_cliente: '#bb1954',
-  entrega: '#6ec207'
-}
+// CSC chart colors (UI concern) viven en la capa UI, NO acá: este módulo es código
+// de dominio bundleado por el worker ico-batch, cuyo build excluye `src/@core`
+// (capa de tema AXIS/Vuexy). Importar `@core/theme/*` en código de dominio
+// worker-bundled rompe el bundle (TASK-1048 — incidente ICO batch 2026-06-08).
+// Ver `src/components/greenhouse/charts/csc-chart-colors.ts`. metric-registry
+// mantiene la definición de fase + labels (dominio puro, sin `@core`).
 
 // ─── Task Status → CSC Phase Mapping ────────────────────────────────────────
 // task_status values come from Notion (Spanish) but the column name is English.

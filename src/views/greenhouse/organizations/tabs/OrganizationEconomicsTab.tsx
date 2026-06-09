@@ -18,7 +18,6 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -29,6 +28,7 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 
 import type { OrganizationDetailData } from '../types'
 import { getMicrocopy } from '@/lib/copy'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const TASK407_EMPTY_NO_HAY_DATOS_ECONOMICOS_PARA_ESTE_PERIODO = "No hay datos económicos para este período"
@@ -142,7 +142,6 @@ type Props = {
 
 const OrganizationEconomicsTab = ({ detail }: Props) => {
   const now = new Date()
-  const theme = useTheme()
 
   // Default to previous month (last closed month) — current month often has no data yet
   const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
@@ -433,21 +432,21 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
                         <Line
                           type='monotone'
                           dataKey='ingreso'
-                          stroke={theme.palette.primary.main}
+                          stroke={GH_COLORS.chart.categorical[0]}
                           name='Ingreso'
                           strokeWidth={2}
                         />
                         <Line
                           type='monotone'
                           dataKey='costo'
-                          stroke={theme.palette.warning.main}
+                          stroke={GH_COLORS.chart.categorical[1]}
                           name='Costo laboral'
                           strokeWidth={2}
                         />
                         <Line
                           type='monotone'
                           dataKey='margen'
-                          stroke={theme.palette.success.main}
+                          stroke={GH_COLORS.chart.categorical[2]}
                           name='Margen'
                           strokeWidth={2}
                           strokeDasharray='5 5'

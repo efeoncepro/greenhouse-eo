@@ -144,7 +144,7 @@ const supColumns: ColumnDef<Supplier, any>[] = [
     header: 'Contacto',
     cell: ({ row }) => row.original.primaryContactName ? (
       <Box>
-        <Typography variant='body2' fontSize='0.8rem'>
+        <Typography variant='caption'>
           {row.original.contactSummary?.name || row.original.primaryContactName}
         </Typography>
         {(row.original.contactSummary?.email || row.original.primaryContactEmail) && (
@@ -171,7 +171,7 @@ const supColumns: ColumnDef<Supplier, any>[] = [
       </Box>
     ) : row.original.contactSummary ? (
       <Box>
-        <Typography variant='body2' fontSize='0.8rem'>{row.original.contactSummary.name || 'Sin nombre'}</Typography>
+        <Typography variant='caption'>{row.original.contactSummary.name || 'Sin nombre'}</Typography>
         {row.original.contactSummary.email && (
           <Typography variant='caption' color='text.secondary'>{row.original.contactSummary.email}</Typography>
         )}

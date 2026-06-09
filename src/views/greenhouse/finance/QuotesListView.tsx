@@ -252,9 +252,8 @@ const QuotesListView = () => {
                         {/* TASK-525: shared identity element. Same `view-transition-name` lives on the
                             quote detail header so the row's quote number morphs into the detail header. */}
                         <Typography
-                          variant='body2'
+                          variant='caption'
                           sx={{
-                            fontSize: '0.8rem',
                             viewTransitionName: `quote-identity-${q.quoteId}`
                           }}
                         >

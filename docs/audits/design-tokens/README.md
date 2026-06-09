@@ -10,6 +10,8 @@ Auditorías del sistema de tokens visuales de Greenhouse EO. Cubren la consisten
 ## Auditorías disponibles
 
 - [DESIGN_TOKENS_AUDIT_2026-05-02.md](DESIGN_TOKENS_AUDIT_2026-05-02.md) — primer audit transversal post TASK-567 (typography sweep). Inventaría 14 drift items entre DESIGN.md, V1 spec y runtime; propone resolución por rangos de severidad.
+- [TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md](TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md) — deuda técnica de tipografía (emergió en TASK-1034 al robustecer DESIGN.md). Responde "¿solo labels o todo?": **sistémica**, 3 capas — L1 divergencia de vocabulario contrato↔runtime (~todos los tokens), L2 drift/stubs (h5/section-title, button/label-md sin fontSize; label-lg/sm inexistentes), L3 magic numbers de control-text en @core (read-only). Sano: lineHeights + headlines. Remediación = task dedicada con SoT de tipografía (espejo de axis-tokens para color). NO resuelta aún.
+- [ELEVATION_SHADOW_TOKEN_AUDIT_2026-06-07.md](ELEVATION_SHADOW_TOKEN_AUDIT_2026-06-07.md) — deuda de elevación/sombra detectada al revisar `GreenhouseFloatingSurface`: runtime tiene `theme.shadows`/`customShadows`, pero falta un SoT semántico Greenhouse (`floating`, `overlay`, `modal`, etc.). Recomienda ADR + TASK-1049 antes de tocar la sombra de la primitive.
 
 ## Cuándo refrescar
 

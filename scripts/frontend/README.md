@@ -26,6 +26,8 @@ Output: `.captures/<ISO>_<scenario>/` (gitignored).
 
 Desde V1.4, cada run también genera `index.html` y manifest enriquecido con readiness, assertions ligeros, findings de calidad de frame, failure taxonomy y segmentos de microinteractions cuando el scenario los declara.
 
+Desde V1.5 (TASK-1018), GVC es **contrato de implementación mockup→runtime** con gates opt-in por scenario (warning-first): baseline visual diff, layout integrity, console/hydration/network strict, trace on failure, keyboard/focus/reduced-motion, performance budgets y enterprise rubric + resumen ejecutivo. Ver "Contract gates V1.5" abajo.
+
 Ver doc completa: [docs/manual-de-uso/plataforma/captura-visual-playwright.md](../../docs/manual-de-uso/plataforma/captura-visual-playwright.md).
 Arquitectura: [docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](../../docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md).
 
@@ -73,14 +75,57 @@ scripts/frontend/
 │   ├── recorder.ts            # ciclo webm + frames marker-based + manifest
 │   ├── manifest.ts            # CaptureManifest writer
 │   ├── quality.ts             # frame quality findings
-│   ├── report.ts              # index.html por captura
+│   ├── report.ts              # index.html + resumen ejecutivo
+│   ├── failure-taxonomy.ts    # FINDING_CODES SSOT + classifyCaptureFailure
+│   ├── visual-diff.ts         # pixelmatch + masks (Slice 1)
+│   ├── baseline-contract.ts   # home durable + promoción + diff (Slice 1)
+│   ├── capture-masks.ts       # maskRects + determinismo (Slice 1)
+│   ├── layout-integrity.ts    # quality.layout (Slice 2)
+│   ├── runtime-collector.ts   # quality.runtime (Slice 3)
+│   ├── keyboard-gate.ts       # quality.keyboard (Slice 5)
+│   ├── perf-budget.ts         # quality.performance (Slice 6)
+│   ├── enterprise-rubric.ts   # quality.enterpriseRubric (Slice 7)
 │   ├── gif.ts                 # ffmpeg compose (opcional)
 │   ├── audit.ts               # JSONL append
-│   └── safety.ts              # prod gate triple + secret mask
+│   └── safety.ts              # prod gate triple + secret mask + determinism
+├── baselines/                 # home durable de mockups aprobados (committeado)
 └── scenarios/
     ├── _README.md             # cómo escribir un scenario
-    └── offboarding-queue-microinteractions.scenario.ts
+    ├── gvc-contract-gates.scenario.ts   # regresión gates V1.5
+    └── gvc-keyboard-focus.scenario.ts   # regresión keyboard gate
 ```
+
+## Contract gates V1.5 (TASK-1018)
+
+Todos opt-in por scenario, aditivos, warning-first (severidad `error` solo si el scenario la declara). Codes en `lib/failure-taxonomy.ts` (`FINDING_CODES`).
+
+### Baseline visual diff (mockup → runtime)
+
+```ts
+baseline: {
+  surfaceId: 'agency.organizations.list',      // home durable keyed por surfaceId
+  requiredFrameLabels: ['first-fold'],
+  maskSelectors: ['[data-relative-time]'],     // datos dinámicos enmascarados
+  maxDiffRatio: 0.05                           // explícito ⇒ exceeded = error
+}
+```
+
+Flujo: capturá el mockup aprobado → `pnpm fe:capture:diff --promote <capture-dir>` (materializa `scripts/frontend/baselines/<surfaceId>/`) → commiteá → el runtime con el mismo `surfaceId` corre el diff automáticamente. Sin baseline durable degrada honesto a `baseline_stale` (warning). El diff corre bajo captura determinista (animaciones off, caret oculto, reduced-motion, fonts settled) que GVC aplica solo cuando hay `baseline.surfaceId`.
+
+### Otros gates (`quality.*`)
+
+```ts
+quality: {
+  layout: { enabled: true, minTargetSize: 24 },                 // overflow/overlap/target/clip
+  runtime: { failOnConsoleError: true, failOnHydrationWarning: true }, // console/page/hydration/4xx-5xx
+  keyboard: { enabled: true, reducedMotionCheck: true,          // foco + ring + estado + reduced-motion
+    probes: [{ name: 'open-menu', keys: ['Tab','Enter'], expectedVisibleSelector: '[role="menu"]' }] },
+  performance: { enabled: true, severity: 'warning', maxDomNodes: 6000 }, // DOM/requests/transfer/FCP
+  enterpriseRubric: { enabled: true }                           // placeholders/empty-tokens/primary/saturation
+}
+```
+
+`trace.zip` se guarda automáticamente en cada captura fallida (`exitCode=1`) — abrir con `pnpm exec playwright show-trace <dir>/trace.zip`. El `index.html` y el `review-dossier.md` muestran un **resumen ejecutivo** (`Apto para implementar` / `Revisar` / `Requiere iteración`) + verdict del rubric.
 
 ## Crear un scenario nuevo
 

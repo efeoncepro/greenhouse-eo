@@ -631,7 +631,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                   Space
                 </Typography>
                 <Typography variant='body2' fontWeight={600}>{status.space.spaceName}</Typography>
-                <Typography variant='caption' sx={{ fontSize: '0.75rem' }} color='text.disabled'>
+                <Typography variant='caption' color='text.disabled'>
                   {status.space.spaceId}
                 </Typography>
               </Stack>
@@ -666,7 +666,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                 <Typography variant='body2' color='text.secondary'>
                   {formatDatetime(mapping.createdAt)}
                 </Typography>
-                <Typography variant='caption' sx={{ fontSize: '0.75rem' }} color='text.disabled'>
+                <Typography variant='caption' color='text.disabled'>
                   {mapping.sourceId}
                 </Typography>
               </Stack>
@@ -701,7 +701,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                             </Stack>
                           </TableCell>
                           <TableCell>
-                            <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                            <Typography variant='caption'>
                               {dbId || '—'}
                             </Typography>
                           </TableCell>
@@ -933,7 +933,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                             {latestDataQualityChecks.map(check => (
                               <TableRow key={check.dataQualityCheckId} hover>
                                 <TableCell>
-                                  <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                                  <Typography variant='caption'>
                                     {check.checkKey}
                                   </Typography>
                                 </TableCell>
@@ -1370,7 +1370,7 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                          <Typography variant='caption'>
                             {db ? formatShortDbId(db.databaseId) : '—'}
                           </Typography>
                         </TableCell>

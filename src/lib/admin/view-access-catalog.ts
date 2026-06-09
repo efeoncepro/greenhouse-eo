@@ -218,6 +218,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
+    viewCode: 'equipo.workforce_contracting',
+    section: 'equipo',
+    label: 'Contratos laborales',
+    description: 'Workbench HR de cartas oferta y contratos laborales bilingües: cola, riesgo, paridad ES+EN y validación.',
+    routePath: '/hr/workforce/contracts',
+    routeGroup: 'hr'
+  },
+  {
     viewCode: 'equipo.workforce_activation',
     section: 'equipo',
     label: 'Workforce Activation',
@@ -572,6 +580,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.design_system',
+    section: 'administracion',
+    label: 'Design System',
+    description: 'Catálogo interno de AXIS: tokens, primitives, patrones y labs del Design System. Clientes no acceden.',
+    routePath: '/admin/design-system',
+    routeGroup: 'internal'
+  },
+  {
     viewCode: 'mi_ficha.mi_perfil',
     section: 'mi_ficha',
     label: 'Mi Perfil',
@@ -593,6 +609,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Mis Servicios Contractor',
     description: 'Soporte, revisión y estado de pago de tus servicios contractor.',
     routePath: '/my/contractor',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mis_contratos',
+    section: 'mi_ficha',
+    label: 'Mis contratos y ofertas',
+    description: 'Vista del colaborador de sus cartas oferta y contratos laborales bilingües (estado honesto, sin edición legal).',
+    routePath: '/my/contracts',
     routeGroup: 'my'
   },
   {

@@ -182,6 +182,7 @@ Hard rule:
 | `TASK-971` | `5` | `to-do` | M06 Workforce Reporting Foundation Mockup Approval: aprobar `/people/mockup/workforce-reporting` antes de runtime `TASK-966`, con reporting persona-centrico, redaction y no double count. |
 | `TASK-972` | `4` | `to-do` | M07 Unified Worker Change Workflow Mockup Approval: aprobar `/people/mockup/worker-change-workflow` como shell futuro antes de runtime `TASK-965`, sin habilitar writes. |
 | `TASK-973` | `5` | `to-do` | M08 Agent-Safe Workforce Context Mockup Approval: aprobar `/people/mockup/workforce-agent-context` antes de reframing/runtime `TASK-652`, con redaction, lineage y denied action states. |
+| `TASK-1019` | `4` | `to-do` | Workforce Contracting Studio Foundation + AI Drafting: foundation de cartas oferta/contratos laborales con Claude advisory, validators y events; PDF/firma/ZapSign consumen EPIC-001, no vault paralelo. |
 
 Las tasks se agregaran de forma iterativa cuando cumplan este protocolo:
 
@@ -206,6 +207,7 @@ Esta cola es deliberadamente conceptual. No reserva IDs.
 | Person 360 workforce journey facet | 3 | Mostrar relacion, assignment, compensation, readiness y rails en un lugar. | Creada como `TASK-961`; ejecutar solo como read-only/aditiva y con redaction/access explicitos. |
 | People list workforce overview | 3 | Mostrar workforce status, worker type, rail y gaps directamente en la lista de People. | Creada como `TASK-963`; ejecutar despues de `TASK-961`/`TASK-962`. |
 | Person documents/signature rail | 3/4 | Mostrar contratos, addenda, receipts, final settlements y firma como evidencia del journey laboral. | Creada como `TASK-964`; debe consumir EPIC-001, no duplicarlo. |
+| Workforce offer/contract generation | 4 | Orquestar cartas oferta y contratos laborales desde datos canonicos, IA advisory, validacion determinista y futura firma. | Creada como `TASK-1019`; PDF/firma/ZapSign quedan bloqueados por EPIC-001 foundations. |
 | Workforce rail drift signals | 1/2 | Detectar doble rail, rail sin evidencia, relationship sin payment readiness y compensation drift. | Definir steady state esperado por signal. |
 | Relationship-first activation command | 4 | Crear/activar worker desde person + relationship + assignment + compensation. | Parity projection y approval del write-path ADR/delta. |
 | Unified worker create/edit workflow | 4 | Orquestar identity, relationship, assignment, compensation, documents/compliance y payment rail desde People. | Creada como `TASK-965`; bloqueada por read models y checkpoint de write path. |

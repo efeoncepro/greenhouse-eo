@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildOtdBucketSql, classifyOtdBucket } from './classify-otd-bucket'
+import { buildOtdBucketPostgresSql, buildOtdBucketSql, classifyOtdBucket } from './classify-otd-bucket'
 import { OTD_BUCKET_FORMULA_VERSION } from './otd-bucket-types'
 
 // Mes vigente de referencia para los tests (todo en mayo 2026 para pasar el gate
@@ -250,6 +250,31 @@ describe('buildOtdBucketSql — mirror BQ (paridad TS↔SQL)', () => {
 
   it('applyMonthGate=true (default) mantiene la cláusula esMesActual (M1)', () => {
     expect(sql).toContain('EXTRACT(MONTH FROM due_date)')
+  })
+})
+
+describe('buildOtdBucketPostgresSql — mirror PG (paridad TS↔SQL)', () => {
+  const sql = buildOtdBucketPostgresSql()
+
+  it('encodea los buckets canónicos en sintaxis PostgreSQL', () => {
+    expect(sql).toContain("'on_time'")
+    expect(sql).toContain("'late_drop'")
+    expect(sql).toContain("'overdue'")
+    expect(sql).toContain("'carry_over'")
+    expect(sql).toContain("'not_applicable'")
+    expect(sql).toContain('(completed_at)::date - (due_date)::date')
+    expect(sql).toContain('CURRENT_DATE - (due_date)::date')
+  })
+
+  it('applyMonthGate=false omite el gate de mes para agregaciones por proyecto', () => {
+    const projectSql = buildOtdBucketPostgresSql(
+      { taskStatus: 't.task_status', dueDate: 't.due_date', completedAt: 't.completed_at' },
+      '0',
+      false
+    )
+
+    expect(projectSql).not.toContain('EXTRACT(MONTH FROM')
+    expect(projectSql).toContain('t.task_status IN')
   })
 })
 

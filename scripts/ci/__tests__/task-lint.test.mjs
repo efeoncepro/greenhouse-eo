@@ -4,7 +4,12 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { lintTasks } from '../task-lint.mjs'
-import { parseTaskMarkdown } from '../task-lint/parser.mjs'
+import {
+  deriveNextTaskId,
+  parseReadmeNextId,
+  parseTaskIdRegistry,
+  parseTaskMarkdown
+} from '../task-lint/parser.mjs'
 
 const write = (path, source) => writeFileSync(path, source, 'utf8')
 
@@ -154,6 +159,70 @@ const cases = [
       assert.match(parsed.status.fields['Blocked by'], /reason continues/)
       assert.match(parsed.status.fields['Blocked by'], /third line/)
       assert.equal(parsed.status.fields.Branch, 'task/task-999-fixture')
+    }
+  },
+  {
+    name: 'parses four-digit task ids as canonical template tasks',
+    run: () => {
+      const source = taskFixture({ id: 'TASK-1000' })
+
+      const parsed = parseTaskMarkdown({
+        filePath: 'docs/tasks/to-do/TASK-1000-fixture.md',
+        repoRoot: '',
+        source
+      })
+
+      assert.equal(parsed.id, 'TASK-1000')
+      assert.equal(parsed.idNumber, 1000)
+      assert.equal(parsed.kind, 'template')
+    }
+  },
+  {
+    name: 'keeps registry and next-id parsing valid after the task counter reaches four digits',
+    run: () => {
+      const registryRows = parseTaskIdRegistry(
+        [
+          '# Registry',
+          '',
+          '| Task ID | Lifecycle | Brief | File |',
+          '| --- | --- | --- | --- |',
+          '| `TASK-999` | `complete` | Fixture. | `docs/tasks/complete/TASK-999-fixture.md` |',
+          '| `TASK-1000` | `to-do` | Fixture. | `docs/tasks/to-do/TASK-1000-fixture.md` |'
+        ].join('\n')
+      )
+
+      const readmeNextId = parseReadmeNextId('# Task Index\n\n- siguiente ID disponible: `TASK-1001`\n')
+
+      assert.equal(registryRows.has('TASK-1000'), true)
+      assert.equal(deriveNextTaskId(registryRows), 'TASK-1001')
+      assert.equal(readmeNextId.id, 'TASK-1001')
+      assert.equal(readmeNextId.numeric, 1001)
+    }
+  },
+  {
+    name: 'task filter scans four-digit task ids',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'TASK_ID_REGISTRY.md'),
+        [
+          '# Registry',
+          '',
+          '| Task ID | Lifecycle | Brief | File |',
+          '| --- | --- | --- | --- |',
+          '| `TASK-1000` | `to-do` | Fixture. | `docs/tasks/to-do/TASK-1000-fixture.md` |'
+        ].join('\n')
+      )
+      write(join(root, 'docs', 'tasks', 'README.md'), '# Task Index\n\n- siguiente ID disponible: `TASK-1001`\n')
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-1000-fixture.md'), taskFixture({ id: 'TASK-1000' }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-1000' } })
+
+      assert.equal(result.summary.tasksScanned, 1)
+      assert.equal(result.summary.templateTasks, 1)
+      assert.equal(result.errors.length, 0)
+      rmSync(root, { recursive: true, force: true })
     }
   },
   {

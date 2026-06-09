@@ -2,7 +2,6 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -39,6 +38,8 @@ import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import type { ApexOptions } from 'apexcharts'
 import classnames from 'classnames'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
@@ -50,7 +51,6 @@ import { GH_COST_ATTRIBUTION } from '@/lib/copy/finance'
 import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
 const GREENHOUSE_COPY = getMicrocopy()
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
 // ---------------------------------------------------------------------------
 // Types
@@ -136,6 +136,8 @@ interface Allocation {
   createdAt: string | null
 }
 
+const clientColumnHelper = createColumnHelper<ClientRow>()
+
 // ---------------------------------------------------------------------------
 // Constants & helpers
 // ---------------------------------------------------------------------------
@@ -214,7 +216,7 @@ const ClientDrillDown = ({
             {data.members.map(m => (
               <TableRow key={m.memberId}>
                 <TableCell>
-                  <Typography variant='body2' sx={{ fontSize: '0.75rem' }}>
+                  <Typography variant='caption'>
                     {m.memberId}
                   </Typography>
                 </TableCell>
@@ -514,9 +516,6 @@ const CostAllocationsView = () => {
   // Tab 1 — Client TanStack table
   // ---------------------------------------------------------------------------
 
-  const clientColumnHelper = createColumnHelper<ClientRow>()
-
-   
   const clientColumns: ColumnDef<ClientRow, any>[] = useMemo(() => [
     clientColumnHelper.accessor('clientName', {
       header: 'Cliente',
@@ -560,8 +559,7 @@ const CostAllocationsView = () => {
       enableSorting: false,
       meta: { align: 'center' }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [expandedClientId])
+  ], [expandedClientId, handleToggleExpand])
 
   const clientTable = useReactTable({
     data: clientRows,
@@ -581,7 +579,7 @@ const CostAllocationsView = () => {
    
   const allocColumns: ColumnDef<Allocation, any>[] = [
     allocColumnHelper.accessor('clientName', { header: 'Cliente', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
-    allocColumnHelper.accessor('expenseId', { header: 'Expense ID', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontSize: '0.75rem' }}>{getValue().slice(0, 12)}...</Typography> }),
+    allocColumnHelper.accessor('expenseId', { header: 'Expense ID', cell: ({ getValue }) => <Typography variant='caption'>{getValue().slice(0, 12)}...</Typography> }),
     allocColumnHelper.accessor('allocationMethod', { header: 'Metodo', cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color='info' label={METHOD_LABELS[getValue()] || getValue()} />, meta: { align: 'center' } }),
     allocColumnHelper.accessor('allocationPercent', { header: '%', cell: ({ getValue }) => `${(getValue() * 100).toFixed(1)}%`, meta: { align: 'right' } }),
     allocColumnHelper.accessor('allocatedAmountClp', { header: 'Monto CLP', cell: ({ getValue }) => formatClpShort(getValue()), meta: { align: 'right' } }),

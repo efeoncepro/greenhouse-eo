@@ -1,0 +1,7 @@
+interface:
+  display_name: "Greenhouse Teams Message Operator"
+  short_description: "TeamBot announcements, mentions, dry-runs, and audit"
+  default_prompt: "Use $greenhouse-teams-message-operator to draft, preview, mention, send, or audit a Greenhouse TeamBot message safely through pnpm teams:announce."
+
+policy:
+  allow_implicit_invocation: true

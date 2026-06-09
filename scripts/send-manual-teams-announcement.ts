@@ -6,16 +6,36 @@ import { loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 loadGreenhouseToolEnv()
 
 const usage = `Usage:
-  pnpm teams:announce --destination eo-team --title "..." --body-file ./message.md --cta-url https://... [--cta-label "Abrir informe"] [--triggered-by codex] [--dry-run] [--yes]
+  pnpm teams:announce --destination eo-team --title "..." --body-file ./message.md [--cta-url https://...] [--cta-label "Abrir informe"] [--mention "Texto visible|entraObjectIdOrUpn|Nombre de perfil"] [--triggered-by codex] [--dry-run] [--yes]
 
 Rules:
   - Use --body-file with paragraphs separated by blank lines.
+  - Use repeatable --mention values to create real Adaptive Card mentions.
+  - Mention ids must be Microsoft Entra Object IDs or UPNs, not 29:<aadObjectId>.
   - Use --dry-run to preview without sending.
   - Non-dry sends require --yes as an explicit confirmation gate.
 `
 
 const parseArgs = (argv: string[]) => {
-  const args = new Map<string, string | boolean>()
+  const args = new Map<string, string | boolean | string[]>()
+
+  const pushArg = (key: string, value: string | boolean) => {
+    const existing = args.get(key)
+
+    if (existing === undefined) {
+      args.set(key, value)
+
+      return
+    }
+
+    if (Array.isArray(existing)) {
+      existing.push(String(value))
+
+      return
+    }
+
+    args.set(key, [String(existing), String(value)])
+  }
 
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index]
@@ -28,15 +48,36 @@ const parseArgs = (argv: string[]) => {
     const next = argv[index + 1]
 
     if (!next || next.startsWith('--')) {
-      args.set(key, true)
+      pushArg(key, true)
       continue
     }
 
-    args.set(key, next)
+    pushArg(key, next)
     index += 1
   }
 
   return args
+}
+
+const getStringArg = (args: Map<string, string | boolean | string[]>, key: string) => {
+  const value = args.get(key)
+
+  return typeof value === 'string' ? value : ''
+}
+
+const getOptionalStringArg = (args: Map<string, string | boolean | string[]>, key: string) => {
+  const value = args.get(key)
+
+  return typeof value === 'string' ? value : undefined
+}
+
+const getStringListArg = (args: Map<string, string | boolean | string[]>, key: string) => {
+  const value = args.get(key)
+
+  if (Array.isArray(value)) return value
+  if (typeof value === 'string') return [value]
+
+  return []
 }
 
 const readBodyParagraphs = (bodyFile: string) =>
@@ -44,6 +85,22 @@ const readBodyParagraphs = (bodyFile: string) =>
     .split(/\n\s*\n/)
     .map(block => block.replace(/\s*\n\s*/g, ' ').trim())
     .filter(Boolean)
+
+const parseMentionArg = (value: string) => {
+  const [text, id, name] = value.split('|').map(part => part.trim())
+
+  if (!text || !id) {
+    throw new Error(
+      `Invalid --mention value '${value}'. Expected "Texto visible|entraObjectIdOrUpn|Nombre de perfil".`
+    )
+  }
+
+  return {
+    text,
+    id,
+    name: name || text
+  }
+}
 
 const main = async () => {
   const args = parseArgs(process.argv.slice(2))
@@ -54,20 +111,21 @@ const main = async () => {
     return
   }
 
-  const destinationKey = typeof args.get('destination') === 'string' ? String(args.get('destination')) : ''
-  const title = typeof args.get('title') === 'string' ? String(args.get('title')) : ''
-  const bodyFile = typeof args.get('body-file') === 'string' ? String(args.get('body-file')) : ''
-  const ctaUrl = typeof args.get('cta-url') === 'string' ? String(args.get('cta-url')) : ''
-  const ctaLabel = typeof args.get('cta-label') === 'string' ? String(args.get('cta-label')) : undefined
+  const destinationKey = getStringArg(args, 'destination')
+  const title = getStringArg(args, 'title')
+  const bodyFile = getStringArg(args, 'body-file')
+  const ctaUrl = getOptionalStringArg(args, 'cta-url')
+  const ctaLabel = getOptionalStringArg(args, 'cta-label')
+  const mentions = getStringListArg(args, 'mention').map(parseMentionArg)
 
-  const triggeredBy = typeof args.get('triggered-by') === 'string'
-    ? String(args.get('triggered-by'))
+  const triggeredBy = getOptionalStringArg(args, 'triggered-by')
+    ? String(getOptionalStringArg(args, 'triggered-by'))
     : 'manual_cli'
 
   const dryRun = args.get('dry-run') === true
   const confirmed = args.get('yes') === true
 
-  if (!destinationKey || !title || !bodyFile || !ctaUrl) {
+  if (!destinationKey || !title || !bodyFile) {
     throw new Error(`Missing required arguments.\n\n${usage}`)
   }
 
@@ -80,7 +138,8 @@ const main = async () => {
     title,
     paragraphs: readBodyParagraphs(bodyFile),
     ctaUrl,
-    ctaLabel
+    ctaLabel,
+    mentions
   })
 
   console.log(
@@ -92,6 +151,7 @@ const main = async () => {
         paragraphs: preview.paragraphs,
         ctaLabel: preview.ctaLabel,
         ctaUrl: preview.ctaUrl,
+        mentions: preview.mentions,
         fingerprint: preview.fingerprint
       },
       null,
@@ -111,8 +171,9 @@ const main = async () => {
     destinationKey,
     title,
     paragraphs: preview.paragraphs,
-    ctaUrl,
-    ctaLabel: preview.ctaLabel,
+    ctaUrl: preview.ctaUrl || undefined,
+    ctaLabel: preview.ctaLabel || undefined,
+    mentions: preview.mentions,
     triggeredBy
   })
 

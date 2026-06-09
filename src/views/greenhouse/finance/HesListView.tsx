@@ -101,7 +101,7 @@ const hesColumnHelper = createColumnHelper<Hes>()
 const hesColumns: ColumnDef<Hes, any>[] = [
   hesColumnHelper.accessor('hesNumber', {
     header: 'HES #',
-    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600} sx={{ fontSize: '0.8rem' }}>{getValue()}</Typography>
+    cell: ({ getValue }) => <Typography variant='caption' fontWeight={600}>{getValue()}</Typography>
   }),
   hesColumnHelper.accessor('serviceDescription', {
     header: 'Servicio',

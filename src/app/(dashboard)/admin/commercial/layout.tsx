@@ -24,7 +24,7 @@ export default async function AdminCommercialLayout({ children }: { children: Re
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return children

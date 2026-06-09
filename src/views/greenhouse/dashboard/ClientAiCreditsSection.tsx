@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -18,6 +17,8 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomAvatar from '@core/components/mui/Avatar'
 
@@ -27,7 +28,6 @@ import { formatInteger } from '@/lib/format'
 import type { AiCreditWallet, ClientCreditSummary } from '@/types/ai-tools'
 import { balanceHealthConfig, walletStatusConfig, formatDate } from '@views/greenhouse/ai-tools/helpers'
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 const ClientAiCreditsSection = () => {
   const theme = useTheme()

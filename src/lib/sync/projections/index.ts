@@ -27,6 +27,7 @@ import { operationalPlProjection } from './operational-pl'
 import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
 import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
+import { contractingSignatureBridgeProjection } from './contracting-signature-bridge'
 import { contractorPayableFinanceObligationProjection } from './contractor-payable-finance-obligation'
 import { contractorPayableExpenseMaterializeProjection } from './contractor-payable-expense-materialize'
 import { contractorPayablePaidCascadeProjection } from './contractor-payable-paid-cascade'
@@ -114,6 +115,7 @@ registerProjection(contractorPayableFinanceObligationProjection)
 registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(contractorPayablePaidCascadeProjection) // TASK-981 Slice 1 — finance.payment_order.paid → mark linked contractor payables paid + emit workforce.contractor_payable.paid
   registerProjection(contractorPayablePaidEmailProjection) // TASK-981 Slice 2 — workforce.contractor_payable.paid → email TASK-960 remittance PDF to the contractor
+  registerProjection(contractingSignatureBridgeProjection) // TASK-1024 — signature.request.* → advance contracting case + link signed PDF
 
   registerProjection(recordExpensePaymentFromOrderProjection)
   registerProjection(payrollReliquidationDeltaProjection)

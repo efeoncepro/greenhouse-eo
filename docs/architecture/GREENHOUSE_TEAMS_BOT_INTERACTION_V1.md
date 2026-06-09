@@ -1,15 +1,22 @@
 # GREENHOUSE_TEAMS_BOT_INTERACTION_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-04-26 por TASK-671 (Claude)
-> **Última actualización:** 2026-06-04 por Codex — bump a v1.3 con smoke 1:1 create-conversation + alineación Notification Hub
+> **Última actualización:** 2026-06-08 por Codex — bump a v1.4 con smoke de menciones reales en Adaptive Cards
 > **Estado:** vigente
 > **Specs relacionadas:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.2 (transport), `GREENHOUSE_NOTIFICATION_HUB_V1.md` (orquestador upstream — TASK-690)
 
+## Delta v1.4 (2026-06-08 — menciones reales en Adaptive Cards)
+
+- **Corrección verificada para menciones en Adaptive Cards:** para cards enviadas por Bot Framework, `msteams.entities[].mentioned.id` debe usar Microsoft Entra Object ID puro o UPN. En smoke real contra el 1:1 de Julio Reyes, `mentioned.id='71acd85d-15a6-4eb6-953d-125370032e93'` renderizó como mención real; `mentioned.id='29:<aadObjectId>'` renderizó como texto plano.
+- **Evitar burbuja duplicada:** si el mensaje incluye Adaptive Card, no agregar `activity.text` solo para activar la mención. Teams muestra ese `activity.text` como burbuja separada arriba del card. El patrón correcto para anuncios manuales card-only es attachments-only + `card.msteams.entities`.
+- **CLI canónico actualizado:** `pnpm teams:announce` soporta `--mention "Texto visible|entraObjectIdOrUpn|Nombre de perfil"`, CTA opcional y validación que rechaza `29:<aadObjectId>` para menciones de Adaptive Card. Runbook: `docs/operations/manual-teams-announcements.md`.
+- **Boundary:** crear un DM 1:1 sigue usando `members: [{ id: "<aadObjectId>" }]` sin `29:`. Activity-body mentions fuera de Adaptive Cards pueden requerir Teams user/MRI IDs; no extrapolar el patrón `29:<aadObjectId>` a cards.
+
 ## Delta v1.3 (2026-06-04 — 1:1 create-conversation smoke + Notification Hub alignment)
 
-- **Corrección verificada para crear DM 1:1:** `POST {serviceUrl}/v3/conversations` debe recibir `members: [{ id: "<aadObjectId>" }]` cuando el destinatario viene desde Microsoft Entra / Graph user id. No prefijar con `29:` en ese request. El prefijo `29:` sigue siendo correcto para Teams pairwise ids / mention entities, pero en create-conversation con `29:<aadObjectId>` el Connector devolvió `403 BadArgument: Failed to decrypt pairwise id`.
+- **Corrección verificada para crear DM 1:1:** `POST {serviceUrl}/v3/conversations` debe recibir `members: [{ id: "<aadObjectId>" }]` cuando el destinatario viene desde Microsoft Entra / Graph user id. No prefijar con `29:` en ese request. En create-conversation con `29:<aadObjectId>` el Connector devolvió `403 BadArgument: Failed to decrypt pairwise id`.
 - **Discovery real 2026-06-04:** los envíos manuales de pagos de nómina/honorarios a 5 colaboradores validaron el path `chat_1on1` y poblaron `greenhouse_core.teams_bot_conversation_references` con `reference_key='user:<aadObjectId>'`.
 - **Maggie Borralles discovery-only:** `member_id='0e6a896e-f1d2-481c-9c97-ee43ab1714d8'`, `aadObjectId='e0f8f69a-c1f5-40a1-a159-dced9087b318'`, app personal `Greenhouse` instalada, sin conversation reference cache todavía. No se envió mensaje.
 - **Alineación con Notification Hub:** los envíos 1:1 recurrentes no deben escalar como filas estáticas por persona. El modelo objetivo es `notification_intents.recipient_member_id` + delivery `teams_dm`; el adapter usa `recipient_kind='dynamic_user'`, resuelve `member_id → aadObjectId` con `resolveTeamsUserForMember()`, y delega al dispatcher Bot Framework.

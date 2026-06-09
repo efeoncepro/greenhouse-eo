@@ -237,7 +237,7 @@ export const GH_CLIENT_TALENT = {
 // - Badge en PeopleListTable (Slice 2)
 // - Botón "Completar ficha" en PersonView + drawer compartido (Slice 3)
 // - Admin queue /admin/workforce/activation (Slice 4 — Workforce Activation workspace V1)
-// - Link CTA en /admin/operations dashboard (Slice 5)
+// - Link CTA en /admin/ops-health dashboard (Slice 5)
 // Operador objetivo: HR (HR_PAYROLL, HR_MANAGER), FINANCE_ADMIN, EFEONCE_ADMIN.
 // Tono: es-CL, tuteo, sentence case. Mirror de GH_RELEASE_ADMIN shape.
 // V1.0: validación pre-flight queda como TASK-874. El operador confirma

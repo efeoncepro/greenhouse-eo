@@ -246,7 +246,7 @@ export const NotionConnectPanel = ({ onChange }: NotionConnectPanelProps) => {
                     <Stack direction='row' spacing={2} alignItems='center' sx={{ minWidth: 160 }}>
                       <i
                         className={selected ? 'tabler-circle-check-filled' : row.icon}
-                        style={{ fontSize: 20, color: selected ? '#2E7D32' : theme.palette.text.secondary }}
+                        style={{ fontSize: 20, color: selected ? theme.greenhouseSemantic.success.tonalText : theme.palette.text.secondary }}
                         aria-hidden
                       />
                       <Typography variant='body2' sx={{ fontWeight: 600 }}>

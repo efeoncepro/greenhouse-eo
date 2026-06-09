@@ -1,3 +1,1086 @@
+# Sesion 2026-06-09 — Context pack + Organization Workspace commits/push + TASK-1060 superseded
+
+Codex reviso el worktree completo para commit/push seguro, leyo los dos nuevos context docs y empujo `develop` hasta `4dd267c16`.
+
+- **Skill Codex `efeonce-agency`:** agregada en `.codex/skills/efeonce-agency/SKILL.md` como router del context pack `docs/context/` para decisiones de producto, copy, métricas, GTM, marca, ASaaS/switching cost y buyer personas. El operador indicó que la contraparte Claude ya existe; no se modificó `.claude/skills/`.
+- **Corrección 2026-06-09 (Claude):** la contraparte Claude **del repo** NO existía — la skill declara que enruta a Claude y Codex pero solo había copia `.codex` committeada (commit `5d544161e`) + una copia global `~/.claude` (fuera del repo). Se creó el mirror canónico `.claude/skills/efeonce-agency/SKILL.md` (idéntico, fuente única = la versión committeada) para cerrar el contrato dual. La copia global `~/.claude/skills/efeonce-agency/` se **mantiene a propósito**: el operador la usa cross-proyecto (no es repo-específica). Las tres quedan idénticas. Nota: los punteros del cuerpo son rutas `docs/context/*` de greenhouse-eo — al invocarla en otros repos la doctrina/router aplica pero esos links no resuelven; si emerge fricción real, evaluar una variante path-agnóstica.
+- **Vercel env runtime verificado/corregido (2026-06-09):** `OPENAI_API_KEY_SECRET_REF` existe en Vercel `Production` (main/prod), `Development`, `Preview (develop)` y ahora tambien en custom env `staging` (agregado por Codex via `vercel env add ... staging`, valor ref `greenhouse-openai-api-key`). GCP Secret Manager confirma `greenhouse-openai-api-key` con version habilitada. Pendiente: redeploy/restart de targets que deban leer la env nueva; Vercel no aplica env vars nuevas a deployments ya construidos.
+- **Context docs nuevos:** `docs/context/13_icp-buyer-personas-jtbd.md` y `docs/context/14_modelo-negocio-asaas.md` leidos y commiteados en `585c7152a`; `00_INDEX.md` ahora los referencia y se limpiaron referencias a un `12` inexistente.
+- **Paquete Organization Workspace/brand/logo:** commit `4dd267c16` incluye polish del pop-up de logo, señales/labels/provenance, OTD/industry helpers y docs operativas. Verificado antes del push con lint, TypeScript, tests focales, build, route gate, design lint y GVC (`organization-logo-avatar-editor` local final `.captures/2026-06-09T07-58-13_organization-logo-avatar-editor`).
+- **Post-push task taxonomy:** aparecieron cambios nuevos de lifecycle: `TASK-1060` queda `complete`/deprecada y supersedida por `TASK-1063`; `TASK-1062` permanece como follow-up MCP/reliability sobre el contrato compact-signals heredado por TASK-1063. README/registry/referencias cruzadas sincronizadas en esta continuidad.
+
+---
+
+# Sesion 2026-06-09 — Org 360 facet wiring fix + AI logo generation (Claude, code complete en develop, sin push)
+
+Operador frenó a Codex y pidió a Claude continuar el cableado de los tabs de la vista de detalle de organización + sumar generación de logo con IA. Todo en `develop`, checkout compartido, **sin commit/push**. Se invocaron las skills `arch-architect` (diseño 4-pilar) y `greenhouse-ai-image-generator` (dirección de arte) por pedido explícito.
+
+- **WORK 1 — Org 360 facet readers (fix tabs vacíos + contrato anti silent-catch).** Síntoma: "legacy tenía datos, la nueva no". Causa raíz: `.catch(() => [])` en los readers canónicos del 360 ocultaba drift de schema/scope (= "sin datos"). Fixes en `src/lib/account-360/facets/{team,delivery,economics}.ts` + `organization-ico-metrics-source.ts` + nuevo `facet-observability.ts` (`observeAndRethrow`/`observeAndDegrade`) + guard live `account-complete-360.live.test.ts`. team NULL-safe `start_date`; delivery `project_record_id` + `task-status-canonical` + fallback ICO a BQ `ico_engine.metrics_by_organization` (keyed por `spaces.client_id`); economics `closure_status='closed'`. **Verificado live (Sky):** 9 facets, 0 errores, team=21, delivery tasks=4208 + ICO, economics presente; org sin data degrada honesto. tsc 0 · lint 0 · diseño intacto. Contrato pinneado en CLAUDE.md "Account 360 facet readers — anti silent-catch contract". Delta en TASK-1059.
+- **WORK 2 — Generación de logo con IA (gpt-image-2) en el pop-up de logo (TASK-999).** Command server-only `organization-logo-generation.ts` + ruta `POST /api/organizations/[id]/brand-assets/logo/generate`: gate `organization.brand_asset` + guardrail `is_operating_entity` fail-fast; gpt-image-2 fondo opaco; persiste `organization_logo_draft`; reusa `attachOrganizationLogoAsset`. Prompt **recrea el logo real** (override explícito del default de la skill; aproximación). gpt-image-2 es raster (no SVG). UI "Generar con IA" en `OrganizationLogoAvatarEditor` + copy es-CL en `agency.ts`. **Verificado live:** logo de Sky reconocible, persistido, assetId. Delta en ADR `GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md` + TASK-999.
+- **⚠️ Rollout pendiente (Runtime Rollout Completion Gate):** `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key` agregado a `.env.local` local (dev reiniciado, pid 64549). **Vercel staging/prod: SIN confirmar** — verificar con `vercel env ls` antes de declarar el flujo IA operativo en deployado. Sin esa env var el endpoint devuelve 502 "not configured".
+- **Próximo paso pedido por el operador:** **rediseñar la UI del pop-up de logo** (subir / IA / URL) a nivel enterprise invocando skills de product design + loop GVC. NO empezado aún. La doc de este Handoff no congela el layout actual del pop-up porque va a cambiar.
+- **Riesgo/coordinación:** checkout compartido; el diff incluye también cambios previos de Codex (TASK-1059/1060: `get-organization-operational-serving.ts`, `organization-projects.ts`, runtime view) que NO deben revertirse. No se hizo push.
+
+---
+
+# Sesion 2026-06-09 — TASK-1061 Organization Workspace Enterprise Tokenization + Visual Baseline (in-progress en develop)
+
+Operador pidio avanzar con TASK-1061 mientras TASK-1060 quedaba bajo re-plan. Se mantuvo `develop` por coordinacion multi-agente; no cambiar de rama ni crear worktree.
+
+- **Implementado:** controller visual domain-local `organization-enterprise-workspace-controller`, copy reusable bajo `GH_ORGANIZATION_WORKSPACE.enterprise`, CSC/trend chart colors desde Chart SoT, GVC baseline durable `agency.organizations.enterprise-detail`, fallback de website desde Organization Detail/Identity/CRM 360, Agency default facet `delivery`, y strip delivery en paridad con mockup (`OTD%`, `FTR%`, `Throughput`, `RpA`) con deltas reales vs `previousIcoMetrics`.
+- **Data contract agregado:** `AccountDeliveryFacet.previousIcoMetrics` opcional; `fetchDeliveryFacet()` resuelve período ICO anterior desde el mismo source canonical para no hardcodear variaciones del mockup.
+- **Evidencia GVC:** mockup baseline promovido desde `.captures/2026-06-09T06-34-57_organization-workspace-enterprise-detail-mockup`; runtime quick fold validado en `.captures/2026-06-09T06-51-49_inline-agency-organizations-org-b9977f96-f7ef-4afb-bb26-7355d78c981f` (website visible, delivery default, métricas y deltas visibles).
+- **Verificacion:** eslint focal OK, `pnpm exec tsc --noEmit --pretty false` OK, `pnpm ops:lint --changed` OK. Full runtime scenario con baseline estable matcheo desktop/laptop/mobile en `delivery-first-fold`, `finance-facet`, `identity-facet`, `keyboard-facet-rail`; wide queda sin baseline durable por diseño.
+- **Nota de alcance:** TASK-1061 ya no es solo tokenizacion porque la paridad visual aprobada requeria recuperar website/default delivery/deltas reales. Estado actualizado: TASK-1060 fue deprecada/supersedida; TASK-1063 hereda compact sidecar/API projection + paridad mockup→runtime.
+
+---
+
+# Sesion 2026-06-09 — TASK-1060 Organization Workspace Compact Signals Projection (in-progress en develop)
+
+Operador pidio ejecutar TASK-1060 end-to-end con discovery fuerte antes de implementar. Codex aplico `pnpm codex:task-hook TASK-1060 --develop`; por coordinacion multi-agente se mantiene en `develop`, sin cambiar de rama ni crear worktree. Worktree tenia cambios documentales previos de TASK-1061 sin commit; no revertirlos ni mezclarlos semanticamente.
+
+- **Estado:** `TASK-1060` movida a `docs/tasks/in-progress/`; README/registry sincronizados.
+- **Objetivo:** crear `OrganizationWorkspaceCompactSignals` server-side para el sidecar enterprise de Organization Workspace, reutilizando `resolveOrganizationWorkspaceProjection`, Account 360, Organization 360, projects, finance summary, lifecycle y `withSourceTimeout`.
+- **Guardrail:** TASK-1060 es read-model/API/data-contract; TASK-1061 sigue siendo tokenizacion visual/baseline GVC y no debe mezclarse salvo consumo UI minimo.
+
+---
+
+# Sesion 2026-06-08/09 — TASK-1059 Organization Workspace Enterprise Detail Runtime (en curso sobre develop)
+
+Operador pidio avanzar end-to-end con TASK-1059 y luego corrigio explicitamente: **no cambiar de rama** porque Claude tambien trabaja en este checkout. Codex volvio a `develop`; no crear branch/worktree ni hacer push automatico. El checkout esta `ahead 1` por commit local ajeno `d150c2191` de TASK-1020; no empujar ni reescribir ese commit desde TASK-1059.
+
+- **Estado:** `TASK-1059` movida a `docs/tasks/in-progress/`; README/registry sincronizados.
+- **Objetivo activo:** promover el mockup aprobado `/agency/organizations/mockup/enterprise-detail` al runtime `/agency/organizations/[organizationId]`, usando projection/capabilities canónicas de Organization Workspace y GVC runtime desktop/laptop/mobile.
+- **Estado actual:** code complete local sobre `develop`; no commit/push/deploy por checkout compartido. Runtime Agency detail corta directo a `OrganizationEnterpriseWorkspaceRuntime` y conserva projection/capabilities como gate.
+- **Implementado:** `src/views/greenhouse/organizations/OrganizationEnterpriseWorkspaceRuntime.tsx` consume detail + Account 360 + projects + finance summary; Delivery/Finance/Identity son canvases reales; facets restantes degradan honesto; CSC chart responsive sin clipping; scenario GVC runtime versionado.
+- **Evidencia:** `.captures/2026-06-09T02-15-20_organization-workspace-enterprise-detail-runtime` (desktop/laptop/mobile, 24 frames, `qualityFindings=[]`). Validado: eslint focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm ops:lint --changed` (solo warnings ajenos TASK-1020).
+- **Follow-up abierto:** `docs/tasks/to-do/TASK-1063-organization-detail-mockup-runtime-parity-completion.md` para compact signals/next actions/readiness projection del sidecar, API parity programatica y gaps de paridad mockup→runtime.
+- **Guardrail:** cualquier gap backend/facet debe degradar honesto en UI y abrir task follow-up, no inventar datos completos en JSX.
+
+---
+
+# Sesion 2026-06-07/08 — TASK-1020 Leave Approval Authority Delegation Drift Hardening (code complete en develop + caso vivo remediado)
+
+Por instruccion del operador se trabajo todo en `develop` (sin cambiar de rama, sin push). Task movida `to-do → in-progress → complete` (8 slices). Open Questions D1-D4 confirmadas por el operador/CEO el 2026-06-07.
+
+- **Problema (drift de autorizacion, no UX):** un `operational_responsibilities.approval_delegate` generico (Valentina delegada, `scope_id=daniela`) congelo a Valentina como `effective_approver_member_id` del permiso de Andres → Daniela (supervisora formal) no podia aprobar; Valentina tenia autoridad indebida. Mismo delegate generico afectaba 3 stages `effective_supervisor` (leave/expense/perf) + el plano de visibilidad (`access.ts`).
+- **Solucion canonica (D1-D4):** flag declarativo per-stage `honorGenericApprovalDelegate` (default `false`); resolver pasa `delegationPolicy:'ignore'` → `effective=formal`, `authoritySource='reporting_hierarchy'`. `getSupervisorScopeForTenant` (D3) ya no cuenta el delegate generico hacia scope/visibilidad (Daniela conserva workspace por `hasDirectReports`). Guardrail fail-closed (422) en `assignApprovalDelegation` + panel de delegaciones UI **solo lectura** con Alert honesto (state-design + GVC). Recovery auditado `pnpm hr:leave-approval-authority:recover` (dry-run/apply allowlisted, recompute SIEMPRE via `resolveApprovalAuthorityForStage` SSOT, revoke global D4 append-only, outbox `leave_request.approval_authority_recovered` v1, idempotente, solo snapshots pending). Signal `hr.leave.invalid_delegated_approval_snapshots` (moduleKey identity, drift, steady=0, parametrizado por config).
+- **Remediacion LIVE aplicada en Cloud SQL dev (operador autorizo D4 revoke global):** comando `--apply` con filtros allowlisted `daniela-ferreira` / `resp-2de74ab9-...` / `leave-14abe9e8-...`. Verificacion read-only post-apply: snapshot `leave-14abe9e8` → `effective=daniela-ferreira`, `authority_source='reporting_hierarchy'`, `delegate_responsibility_id=null`; responsabilidad `resp-2de74ab9` → `active=false`, `effective_to` poblado; outbox `leave_request.approval_authority_recovered` + `responsibility.revoked` publicados; signal → `severity=ok, count=0`; dry-run repetido = no-op (idempotente). **Fecha/hora apply:** 2026-06-09 01:43 UTC. **Actor:** recovery command (system marker, autorizado por operador via la spec). **Resultado:** Daniela ya puede aprobar el permiso de Andres; Valentina ya no.
+- **Gates:** `pnpm lint` 0 · `npx tsc --noEmit` 0 · `pnpm build` ✓ · tests focales 43 verdes. La suite completa tiene **19 fallos PRE-EXISTENTES** ajenos a TASK-1020 (primitives/theme `theme.greenhouseSemantic` de TASK-1053 + organization-workspace/account-360) — confirmado: 0 de mis commits tocan esos archivos y `GreenhouseStateTransition.test.tsx` falla igual en el commit base `c806c5121`.
+- **GVC:** scenario `scripts/frontend/scenarios/hr-hierarchy-delegations.scenario.ts`; frame mirado en `.captures/2026-06-09T01-28-46_hr-hierarchy-delegations/` (panel honesto: Alert "no disponible" + lista solo-lectura/revocar, sin CTA de crear).
+- **PENDIENTE bloqueante de rollout (Runtime Rollout Completion Gate):** el **codigo preventivo** (config flag, access.ts D3, guardrail 422, signal en dashboard) esta en `develop` **sin desplegar** (no push por instruccion del operador). Hasta el deploy, el runtime de staging/prod sigue con el resolver/guardrail viejos — el caso vivo YA esta resuelto (revoke desactivo la responsabilidad, asi que incluso el codigo viejo resuelve al formal), pero crear una NUEVA delegacion generica via UI desplegada (vieja) aun conferiria autoridad hasta que se despliegue el guardrail. **Proximo paso:** push `develop` + deploy; luego correr el dry-run en produccion (debe dar 0/0) y confirmar la signal en `/admin/operations`.
+- **Docs:** Delta en `GREENHOUSE_IDENTITY_ACCESS_V2.md` + `DECISIONS_INDEX.md` + `GREENHOUSE_EVENT_CATALOG_V1.md`; seccion nueva en CLAUDE.md "Approval Authority Delegation invariants"; runbook `docs/operations/runbooks/leave-approval-authority-recovery.md`.
+- **Follow-up (fuera de V1):** la delegacion REAL de aprobacion de permisos (cobertura por vacaciones) renace como contrato domain-scoped separado con ADR propio (opt-in por dimension `confersApprovalAuthority`/`confersVisibilityScope`, expiry/actor/reason/elegibilidad). El interin es el override HR/admin.
+
+---
+
+# Sesion 2026-06-08 — TASK-999 foundation implementada en develop (in-progress)
+
+Se aplico el hook Codex `pnpm codex:task-hook TASK-999 --develop` por instruccion explicita del operador de mantenerse en `develop`; no se cambio de rama ni se creo worktree.
+
+- **Estado:** `TASK-999` sigue en `docs/tasks/in-progress/`; foundation/manual attach implementado, pero discovery worker, review queue y reliability signals siguen pendientes. No mover a `complete` aun.
+- **Runtime dev:** `pnpm pg:connect:migrate --status` aplico la migracion `20260608230303037_task-999-organization-brand-assets-foundation.sql` en Cloud SQL dev y regenero `src/types/db.d.ts`. Verificado: `organizations.website_url`, `organization_brand_asset_candidates`, `organization_360.logo_asset_id/website_url/is_operating_entity`, capability `organization.brand_asset`.
+- **Implementacion:** private asset contexts `organization_logo_draft|candidate|logo`, command `attachOrganizationLogoAsset()`, route `POST /api/organizations/[id]/brand-assets/logo`, DTO/readers y avatars de `/agency/organizations` + detail/workspace consumen `logoUrl` con fallback.
+- **Guardrail confirmado por operador y codificado:** TASK-999 aplica solo a organizaciones no-operating-entity. No cambiar logos de Efeonce, Greenhouse institucional, operating entities ni entidades relacionadas a Efeonce; el command bloquea `is_operating_entity=TRUE` antes de tocar assets.
+- **ADR:** `docs/architecture/GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md` aceptado e indexado.
+- **Verificacion local:** eslint focal OK, vitest focal OK (`organization-brand-assets`, entitlements runtime, capability coverage), `gtimeout 180s pnpm exec tsc --noEmit --pretty false` OK. Pendiente: `ops:lint --changed`, `task:lint`, docs closure, GVC local/staging.
+- **Worktree cuidado:** existen cambios paralelos no cerrados en tipografia/Home y `OrganizationListView`; no revertir ni mezclar sin revisar diff.
+
+---
+
+# Sesion 2026-06-08 — TASK-1016 runtime de organizaciones implementado en develop
+
+Se aplico el hook Codex `pnpm codex:task-hook TASK-1016 --develop` por instruccion explicita del operador de mantenerse en `develop`; no se cambio de rama ni se creo worktree. El cierre administrativo previo se corrigio porque el operador aclaro que la intencion era implementar el workbench en runtime productivo.
+
+- **Estado:** `TASK-1016` queda en `docs/tasks/complete/TASK-1016-organization-list-enterprise-prototype.md`; README/registry sincronizados a `complete`.
+- **Implementacion runtime:** `src/views/greenhouse/organizations/OrganizationListView.tsx` adopta el Organization Operations Workbench sobre `/api/organizations`.
+- **Datos:** se cablean search, filtros, seleccion, summary strip, rows, rail contextual y matrix mode con datos reales disponibles; readiness/timeline se degradan honestamente desde counts/onboarding/source/updatedAt; logos reales siguen fuera de scope de TASK-999.
+- **Polish final:** se acorto el placeholder visible del search en mobile (`Buscar cuenta`), los chips de facts de fila pasan a dos columnas mobile, el grid usa `minmax(0, 1fr)` para no desbordar, y el CTA secundario del rail usa tokens neutros accesibles.
+- **Evidencia runtime:** `.captures/2026-06-08T22-27-12_organization-list-runtime-workbench` (desktop+mobile, 6 frames, `qualityFindings=[]`, dossier generado). Mockup tokenizado vigente: `.captures/2026-06-08T22-05-24_organization-list-enterprise-mockup`.
+- **Verificacion:** eslint focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm route-reachability-gate --strict`, `pnpm fe:capture organization-list-runtime-workbench --env=local`, `pnpm fe:capture:review .captures/2026-06-08T22-27-12_organization-list-runtime-workbench`.
+- **No tocar:** cambios paralelos existentes en tipografia/Home siguen fuera de TASK-1016.
+
+---
+
+# Sesion 2026-06-08 — disclosureText token + Nexa greeting ajustado
+
+Se corrigio el aumento visual del disclaimer del greeting de Nexa sin volver a hardcodear `fontSize`.
+
+- **Causa:** el sweep tipografico habia retirado `fontSize: '0.5rem'` del disclaimer; al quedar `variant='caption'`, el texto heredo el `bodySm` canonico de 13px.
+- **Fix:** nuevo token/variant `disclosureText` / `disclosure-text` para avisos compactos de IA, legales, seguridad o confianza escritos como oracion: Geist 400, `0.75rem` (12px), `lineHeight=metadata(1.45)`, tracking metadata. `NexaGreetingsCard` ahora usa `Typography variant='disclosureText'`.
+- **Contrato sincronizado:** `typographyScale`, `mergedTheme`, tipos MUI, `typography-drift.test`, `DESIGN.md`, `ui-platform/STACK.md`, `ui-platform/HISTORIAL.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md` (solo espejo §15.1 del bridge), `CanonicalTypographyView`, mockup de tipografia, `project_context.md` y `changelog.md`.
+- **Verificacion:** `pnpm vitest run src/components/theme/typography-drift.test.ts` (66/66), `pnpm design:lint` (0/0), eslint focal OK, `pnpm exec tsc --noEmit --pretty false` OK. GVC local: Home limpio `.captures/2026-06-08T21-47-31_inline-home` (0 console/page/hydration/http failures) y typography canonical `.captures/2026-06-08T21-46-38_typography-canonical` (0 findings). Medicion DOM final: `font-size=12px`, `line-height=17.4px`, `letter-spacing=0.36px`.
+- **Nota:** la primera captura Home `.captures/2026-06-08T21-46-37_inline-home` registro un 500 transitorio de documento en dev/HMR; se repitio en caliente y quedo limpio.
+
+---
+
+# Sesion 2026-06-08 — TASK-1056 creada + skills Codex GVC markers
+
+Se formalizo como task la regla operativa de usar `data-capture` estable para que GVC capture secciones/states/flows sin depender de texto, offsets o selectores posicionales.
+
+- **Task:** `docs/tasks/to-do/TASK-1056-gvc-data-capture-marker-skill-contract.md`.
+- **Indices:** `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` avanzan el siguiente ID a `TASK-1057`.
+- **Skills Codex actualizadas:** `greenhouse-product-ui-architect`, `greenhouse-portal-ui-implementer`, `greenhouse-vuexy-ui-expert`, `greenhouse-ui-orchestrator`, `greenhouse-mockup-builder`, `greenhouse-ui-enterprise-review` y `greenhouse-ux-content-accessibility`.
+- **Memoria viva:** `project_context.md` ahora registra la convención: marker semántico kebab-case en wrapper capturable, sin PII/copy traducible, y sin marker-spam en cada nodo pequeño.
+- **Pendiente intencional en TASK-1056:** sincronizar skills Claude equivalentes, reforzar docs GVC/UI delivery y evaluar guardrail warning-first. No se ejecutó esa implementación completa en esta sesión.
+
+---
+
+# Sesion 2026-06-08 — Home Nexa Insights tokenizado y verificado
+
+Se reviso la seccion `Nexa Insights` del Home por uso de primitives/tokens, aplicando las skills `greenhouse-typography-accessibility`, `greenhouse-ux-content-accessibility`, `greenhouse-product-ui-architect`, `greenhouse-portal-ui-implementer` y cierre con `greenhouse-documentation-governor`.
+
+- **Cambio:** `HomeAiInsightsBento` reemplaza `Button`/`Chip` MUI crudos por `GreenhouseButton`/`GreenhouseChip`, usa copy `GH_NEXA`, traduce tipos de señal (`root_cause` → `Causa raíz`), elimina `fontWeight: 500`, tracking manual y `theme.shadows[2]`, y consume motion/elevation tokens.
+- **Shared:** `NexaMentionText` ahora renderiza menciones con `GreenhouseChip` para evitar chips inline route-locales.
+- **GVC:** nuevo scenario `home-nexa-insights-bento` captura desktop+mobile con marker `[data-capture="home-nexa-insights-bento"]`; evidencia final `.captures/2026-06-08T21-04-40_home-nexa-insights-bento`, `qualityFindings=[]`, assertions OK.
+- **Gates:** eslint focal OK, `vitest run src/views/greenhouse/home/v2/HomeAiInsightsBento.test.ts` OK, `tsc --noEmit` OK, `docs:closure-check` focal revisado.
+- **No tocado:** cambios paralelos existentes de `TASK-1054`/charts en otros archivos del worktree.
+
+---
+
+# Sesion 2026-06-08 — TASK-1055 Harness Coverage Matrix creada
+
+Se creo `TASK-1055` como task formal para mejorar el harness del repo sin inflar CI a ciegas.
+
+- **Task:** `docs/tasks/to-do/TASK-1055-harness-coverage-matrix-tiered-quality-gates.md`.
+- **Scope:** matriz canonica `riesgo -> evidencia -> gate` por Tier 0/1/2, `pnpm harness:lint` inicial, bridge a observabilidad de tests y politica gradual para promover warnings maduros a errores.
+- **Registro:** `docs/tasks/TASK_ID_REGISTRY.md` actualizado y `docs/tasks/README.md` movio el siguiente ID disponible a `TASK-1056`.
+- **No ejecutado:** no se implemento la matriz ni el lint; queda para ejecucion futura via task hook.
+- **Gates:** `pnpm ops:lint --changed` y `pnpm task:lint --task TASK-1055` verdes.
+
+---
+
+# Sesion 2026-06-08 — TeamBot mentions corregidas + CLI extendido
+
+Se corrigio el flujo manual de TeamBot tras un envío público duplicado al chat `EO Team`: no volver a usar `activity.text` + Adaptive Card para menciones en grupos, porque Teams muestra `activity.text` como burbuja separada arriba del card.
+
+- **Smoke real:** en 1:1 de Julio Reyes, card-only con `msteams.entities[].mentioned.id = <Entra Object ID>` renderizó mención real; card-only con `29:<aadObjectId>` renderizó texto plano.
+- **CLI:** `pnpm teams:announce` ahora acepta `--mention "Texto visible|entraObjectIdOrUpn|Nombre de perfil"` repetible, permite CTA opcional y rechaza `29:<aadObjectId>` en Adaptive Cards.
+- **Docs/skills:** actualizado `docs/operations/manual-teams-announcements.md`, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.4, `changelog.md`, `project_context.md`, skills `teams-bot-platform` Codex/Claude y nueva skill invocable `greenhouse-teams-message-operator` en `.codex/skills/` + `.claude/skills/`.
+- **Gates:** manual announcement tests 7/7; eslint focal; `tsc --noEmit`; dry-run CLI con mención de Maria Fernanda; `docs:closure-check` focal.
+- **Pendiente:** si se reenvía una bienvenida pública, primero hacer dry-run y, si hay duda de membresía en el chat destino, validar membership/usar 1:1. No enviar otra prueba a `EO Team`.
+
+---
+
+# Sesion 2026-06-08 — TASK-1048 token gaps + incidente ICO batch (worker @core boundary)
+
+Cerrados los gaps de token de color (los 7 warnings residuales de `no-hardcoded-hex-color`) + promovida la rule a `error` (baseline 0). El verde de montos `#2E7D32` convergió a `success.ink #11703f` (token AA de Fase B) en web (`theme.greenhouseSemantic.success.tonalText`) + PDF/Excel (`axisSemanticSubValues.success.ink`). Tokens nuevos: `GH_COLORS.surface.tagBlue`, splash → `brand.greenhouseGreen`, `#666`→`text.secondary`.
+
+**Incidente ICO batch (resuelto):** el cambio de charts de TASK-1053 hizo que `metric-registry` (dominio worker-bundled) importara `@core/theme/axis-chart` → `ERR_MODULE_NOT_FOUND` (los Docker builds de los workers excluyen `src/@core`) → ico-batch deploy failed. **Fix robusto (no parche):** (1) layering — `CSC_CHART_COLORS` (UI) movido a `src/components/greenhouse/charts/csc-chart-colors.ts`; (2) DATA de tokens runtime-agnóstica relocada a `src/lib/design-tokens/semantic-sub-values.ts` (re-exportada por `@core/theme/axis-semantic`) para que PDF/Excel worker-bundled no toquen `@core`; (3) guard esbuild `--alias:@core` en los 3 workers Node (silent-crash → loud-build-fail). Regla canonizada en CLAUDE.md/AGENTS.md "Worker @core boundary".
+
+- **Verificado:** ico-batch + ops-worker + commercial-cost deploy **SUCCESS** (real Docker). eslint . 0 errores · tsc 0 · 18 lint-rule tests · 41 theme tests · GVC success-ink swatch (`/admin/design-system/colors`).
+- **Commits:** worker alias `8385e59a9` · ico layering `28750f7c1` · Slice2+3 `5f7aca7f2` · Slice4+5 `7f9df0e37`.
+- **No tocado:** parcela paralela de Codex (teams skill, mockups, QueryClientProvider, date.ts) sigue sin commitear.
+
+---
+
+# Sesion 2026-06-08 — TASK-1053 color overhaul "Restraint v1" (Fase A + charts)
+
+Recuperación de la sesión perdida (crash de VS Code) + ejecución de la tokenización de la paleta **Restraint v1** (aprobada por el operador). Local-first en `develop`, sin push.
+
+**Shipped (6 commits en `develop`):**
+
+- `1415f8cb3` Slice 0 — ADR `GREENHOUSE_SEMANTIC_COLOR_SYSTEM_DECISION_V1` (Accepted) + DECISIONS_INDEX + task in-progress con callout "Scope vs secuencia".
+- `c62a70aea` A1a — semánticos AA (info/success/error texto-blanco + warning ink) + `contrast.ts` + contrast gate.
+- `e6ff4a0ec` A1b — secondary a verde coherente (ink `#4B8405`).
+- `d02fcc441` fix framing orange.
+- `b301161a8` charts (v1, supersedido) — paleta categórica inicial + cashflow + orange serie #3.
+- `34d71776a` **primary ramp fix** — pasa el accent ramp aprobado a `axisRamp.primary` (navy=accent-800 `#023C70`; main `#0375DB` igual) + `efeonce-core.light` alineado. **Cierra la discrepancia que estaba como follow-up.**
+- **(commit en curso)** **Charts SoT "Deep-bright"** — `axis-chart.ts` rediseñado self-contained (NO marca/semánticos): categórica `#5145E0 #1FBA85 #FB7A00 #D633C9 #3CC9F0 #9BE036` (elegida por el operador entre 4 candidatas re-analizadas CVD+clash+chroma) + dark + directional (pos/neg/neutral). Migrados TODOS los consumers (CSC `CSC_COLORS`+`CSC_CHART_COLORS` legacy, Pulse, KPI sparklines Home vía `chartHexColor` nuevo en `StatsWithAreaChart`, cashflow→directional). Surfaceado en `/colors`. Resuelve las 2 quejas del operador (dos azules + amber-alerta en CSC; verde-dark + amber en KPIs).
+- `990fee915` (tipografía surfaceHeroTitle, parcela previa de Codex/operador, cerrada aparte).
+
+**Capas canónicas, NO override:** todo en `axis-tokens`/`axis-semantic`/`axis-secondary`/`axis-chart` (SoT); `mergedTheme` y consumidores (GH_COLORS, PdfColors) derivan. Verificado: cero cambios de color en mergedTheme/colorSchemes.
+
+**Evidencia:** design:lint 0/0 · tsc · theme tests 18/18 (drift + contrast) · build exit 0 · GVC chips light+dark, colors ramp, charts lab (`.captures/2026-06-08T10-36-34_tmp-a1a-chips`, `...10-45-50_inline-admin-design-system-colors`, `...11-13-40_inline-admin-design-system-charts`). Coblis pre-check: lime/orange marginal deuteranopía (ΔE 10.1) + cashflow verde/rojo inseguro (ΔE 8.8) → reglas color-nunca-solo + signo/ícono horneadas.
+
+**Fase B Slice B1 ✓ (`2c3dc4132`):** sub-valores curados (ink/tint/border/darkFg, 16 hexes AA) en `axisSemanticSubValues` + factory `theme.greenhouseSemantic` (mode-aware, espejo de `greenhouseElevation`) + consumidor **primitive-scoped** (decisión operador vía AskUserQuestion): `GreenhouseChip` `label` variant tonal AA — arregla `warning.main` amber-como-texto (ahora ink `#8a5a00` 5.41:1 sobre tint). dark-fg ya consumido (tonalText en dark). Lab `/admin/design-system/chips` hecho fiel. Sub-valores como tokens en `/admin/design-system/colors`. Gates: `greenhouse-semantic-drift.test.ts` + `axis-semantic-contrast.test.ts` (147 theme tests). GVC light+dark ✓ (`.captures/2026-06-08T14-07-02_tmp-chips-tonal`).
+
+**Fase B Slice B2 ✓ (`e2daf6a8e`):** dos primitives de feedback inline — `GreenhouseKpiDelta` (delta KPI: signo+flecha+color AA, variants text/tonal, `invert`/`neutralThreshold`; migra HomeRunwayStrategic) + `GreenhouseStatusDot` (dot+label/ariaLabel obligatorio, `pulse`/`halo`; migra HomeReliabilityRibbon). Color nunca solo (WCAG 1.4.1). Showcase "Feedback atoms" en el lab de chips. Registradas en PRIMITIVES.md + HISTORIAL + DesignSystemCatalogView (entrada "Feedback atoms", descubrible). 151 tests · GVC light+dark+mobile ✓ — protocolo de primitive canónica cerrado. **→ Fase B COMPLETA.**
+
+**Pendiente (scope aprobado, tasks separadas):** TASK-1054 (migración de ~11 charts al Chart SoT, ya documentada). Reconciliación AXIS Figma upstream (code-first) — incluye accent ramp + charts Deep-bright + sub-valores tonales + atoms. Diferido a tasks separadas: success-ink `#2E7D32` (TASK-1048), paleta emails, lint→error baseline. **Decisión rollout:** tonal es **primitive-scoped**, NO flip global de Chip/Alert MUI crudos. Adopción de KpiDelta/StatusDot en las ~15 superficies restantes = gradual (no bloqueante).
+
+**No tocar — parcela paralela de Codex** (en el working tree, NO commitear): `QueryClientProvider.tsx` (devtools opt-in), `lib/format/date.ts` (normalizeIntlWhitespace), `agency/organizations/mockup/page.tsx` + `people/daniela-workforce/page.tsx` + sus `ClientMockupPage.tsx`. Codex las commitea.
+
+---
+
+# Sesion 2026-06-08 — Surface Hero Title token para títulos primarios
+
+Se promovio el tamaño/peso que el operador aprobo visualmente en `/people/mockup/daniela-workforce` y `/agency/organizations/mockup` a token canonico de surface, sin cambiar `h1-h4` globales.
+
+- **Token nuevo:** `surfaceHeroTitle` / `surface-hero-title` en `typographyScale`, bridged a `Typography variant='surfaceHeroTitle'`.
+- **Valores:** Poppins 600; `2.125rem` desktop/tablet; `1.75rem` mobile; `lineHeight=surfaceHero(1.15)`.
+- **Regla de uso:** solo título primario de surface full-page/workbench o header de identidad principal, maximo uno por surface. No usar en cards, tablas, listas, drawers, modals, dashboards, rows repetidas, headings genericos ni marketing heroes; page titles densos/de detalle siguen en `h4/page-title`.
+- **Runtime/docs:** theme + tipos MUI + drift tests + `DESIGN.md` + `GREENHOUSE_DESIGN_TOKENS_V1.md` + canonical typography view + UI Platform historial/stack + skill Codex de tipografia.
+- **Primer consumer:** `src/views/greenhouse/people/mockup/daniela-workforce/DanielaWorkforceProfileMockupView.tsx` reemplaza `h3` con `fontSize`/`lineHeight` inline por `variant='surfaceHeroTitle'`.
+- **Segundo consumer:** `src/views/greenhouse/organizations/mockup/OrganizationListEnterpriseMockupView.tsx` aplica `variant='surfaceHeroTitle'` al titulo principal `Organizaciones`; rail contextual vuelve a `h5` y lista/matriz siguen en `h6` por la regla anti-rows repetidas.
+- **Diagnostico local Next/Turbopack post-cambio:** el operador reporto rotura similar a ISSUE-085. Se reprodujeron errores transitorios `module factory is not available` mezclando los mockups de organizaciones/personas en el grafo SSR durante HMR y un chunk async viejo de `@tanstack/query-devtools`; no habia manifest/chunk huerfano persistente tras restart, pero el patron podia generar 500 temporales durante GVC.
+- **Fix runtime local:** las rutas mockup `/agency/organizations/mockup` y `/people/mockup/daniela-workforce` ahora cargan sus views pesadas con wrappers client-only (`ClientMockupPage.tsx`, `next/dynamic({ ssr:false })`), evitando que Turbopack intente instanciarlas en el grafo SSR de otras paginas durante HMR. `ReactQueryDevtools` queda opt-in local con `NEXT_PUBLIC_GREENHOUSE_REACT_QUERY_DEVTOOLS=1` para que el chunk de tooling no interfiera con GVC por defecto.
+- **Gates:** `typography-drift.test.ts` 63/63, eslint focal OK, `design:lint` 0/0, `tsc --noEmit` OK. Post-fix: eslint focal de wrappers/provider OK, `tsc --noEmit` OK, `pnpm fe:capture organization-list-enterprise-mockup --env=local` OK desktop+mobile (`.captures/2026-06-08T10-06-32_organization-list-enterprise-mockup`, runtime 0 console/page/http/hydration), `pnpm fe:capture person-daniela-workforce-profile --env=local` OK desktop+laptop+mobile (`.captures/2026-06-08T10-07-02_person-daniela-workforce-profile`, runtime 0 console/page/http/hydration). Referencia previa: `.captures/2026-06-08T09-32-37_typography-canonical`.
+- **No tocado:** cambios paralelos de `TASK-1053` siguen fuera de este cierre.
+
+---
+
+# Sesion 2026-06-08 — TASK-1016 mockup de organizaciones tokenizado (develop local)
+
+Se reviso `/agency/organizations/mockup` por hardcodes visuales tras levantar server local y ver el mockup en Browser/GVC.
+
+- **Cambio acotado:** `src/views/greenhouse/organizations/mockup/OrganizationListEnterpriseMockupView.tsx` mantiene la direccion visual aprobada y reemplaza los valores route-locales por tokens/primitives canonicos.
+- **Primitives:** CTAs y empty-state action usan `GreenhouseButton`; pills/metadata/status usan `GreenhouseChip`.
+- **Tokens:** color/opacity via `theme.palette.*`, `*.lighterOpacity`/`*.lightOpacity`/`*.mainOpacity` y `action.hover/selected`; tipografia via variants MUI/Greenhouse; radios via `theme.shape.customBorderRadius`; elevacion flat via `theme.greenhouseElevation.none`; motion via `motionCss`, `MOTION_DURATION_S` y `MOTION_EASE`.
+- **Scanner focal:** sin hits para `alpha(`, HEX/RGBA, MUI `Button`, `<Button`, typography inline (`fontSize/fontWeight/lineHeight/letterSpacing/fontVariantNumeric`), `borderRadius: <number>`, `boxShadow: 'none'`, motion literals tipo `duration: 0.x`/`stiffness`/`damping`.
+- **Gates:** `pnpm exec eslint src/views/greenhouse/organizations/mockup/OrganizationListEnterpriseMockupView.tsx` OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm fe:capture organization-list-enterprise-mockup --env=local` OK desktop+mobile, `qualityFindings=[]`, evidencia `.captures/2026-06-08T09-04-14_organization-list-enterprise-mockup`.
+- **No tocado:** cambios locales paralelos de `TASK-1053` (`DESIGN.md`, color lab, brand-color proposal, lifecycle move) siguen fuera de este cierre.
+
+---
+
+# Sesion 2026-06-07 — ISSUE-085 fix local dev compile loop por ApexCharts dynamic nested (resolved, develop local)
+
+Incidente local diagnosticado: `localhost:3000/home` quedaba con el indicador **Compiling...** y el `next-server (v16.1.1)` entraba en loop de CPU (~480-525%), dejando requests nuevas sin bytes.
+
+- **Causa raíz:** doble frontera `next/dynamic` alrededor de ApexCharts. `AppReactApexCharts` importaba un wrapper legacy `@/libs/ApexCharts` que a su vez hacía `dynamic(() => import('react-apexcharts'), { ssr:false })`, mientras 23 consumers además hacían `dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr:false })`. En Turbopack dev eso dejó `react-loadable-manifest.json` apuntando a chunks huérfanos (`node_modules_react-apexcharts_dist_react-apexcharts_min_*.js` 404) y Fast Refresh se quedaba en rebuild.
+- **Fix robusto:** `src/libs/styles/AppReactApexCharts.tsx` queda como **único owner** del `dynamic<Props>(() => import('react-apexcharts'), { ssr:false })`; se retiró `src/libs/ApexCharts.tsx`; todos los consumers importan `AppReactApexCharts` directo.
+- **Guardrail:** nueva lint rule `greenhouse/no-dynamic-app-react-apexcharts` (error) bloquea volver a envolver el wrapper con `next/dynamic` y bloquea imports del legacy `@/libs/ApexCharts`. Rule-tests agregados y verdes.
+- **Issue resuelto:** `docs/issues/resolved/ISSUE-085-local-dev-turbopack-apexcharts-chunk-loop.md` documenta síntoma, causa raíz, verificación y runbook corto. Aprendizaje canonizado: si local queda en `Compiling...`, diagnosticar chunks/manifests con Playwright/browser real antes de limpiar cache; `pnpm clean` confirma, no arregla la causa.
+- **Evidencia runtime local:** tras `pnpm clean` + `pnpm dev`, Playwright abrió `/home` (17.4s cold: compile 7.7s, render 9.6s) y `/admin/design-system/colors` (4.6s cold) sin colgarse. Consola: 0 errores; el chunk `react-apexcharts_min_5c90e618.js` respondió `200 OK` (antes era 404); Fast Refresh terminó (`done in 362ms/459ms`).
+- **Gates:** `pnpm test:lint-rules` OK (18 suites); eslint focal OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm lint` OK con 9 warnings HEX preexistentes fuera de este fix; `pnpm build` OK.
+- **Task hook:** `TASK-1053` tenía `Blocked by: \`none\` (coordina...)` y el hook lo leía como blocker. Se dejó parseable (`Blocked by: \`none\``) y la nota pasó a `Coordination`; `pnpm codex:task-hook TASK-1053 --prompt-only` ahora corre.
+- **Pendiente no tocado:** cambios locales previos de `TASK-1053` (`DESIGN.md`, `AxisColorLabView`, `BrandColorSystemMockupView`, nueva ruta mockup proposal) siguen en worktree y no se reinterpretaron como parte de este incidente.
+
+---
+
+# Sesion 2026-06-07 — TASK-1052 chart-card primitives a elevation roles + lint cubre customShadows (complete, develop)
+
+Tier 1 del follow-up de TASK-1051: cierra la **capa primitive** del contrato de elevación. Local-first en `develop`.
+
+- **Migración (7 callsites, 4 archivos):** tooltips de chart (`role='status'`, `customShadows-sm`) en `GreenhouseChartCard`/`GreenhouseMetricBreakdownChartCard`/`GreenhouseStackedDistributionChartCard`/`MetricTrendCard` → `theme.greenhouseElevation.floating.boxShadow`; contenedores `<Card>` (`customShadows-md`) de los 3 chart cards → `theme.greenhouseElevation.raised.boxShadow`. Rol por semántica (tooltip anclado=floating, card resting=raised), no por matchear el shade.
+- **Lint rule extendida:** `greenhouse/no-direct-mui-elevation-in-primitives` ahora también flaggea `customShadows` en primitives (`theme.customShadows.*` member + string `var(--mui-customShadows-*)` incl. template quasi). Fuera de primitives = compat (no flaggea). RuleTester +4 casos (8 invalid total).
+- **Resultado:** 0 `customShadows`/`theme.shadows[`/`elevation={n≥1}` en `src/components/greenhouse/primitives/**`. La capa primitive queda 100% en roles.
+- **Gates:** 0 violaciones en `src/` · rule-tests 17/17 · primitives 168/168 · tsc 0 · GVC charts lab (chart cards `raised` suaves OK).
+- **Decisión documentada:** chart card container → `raised` (preserva intención elevada + tokeniza/moderniza); flatten a `none` sería rediseño aparte (fuera de scope).
+- **Follow-up abierto:** Tier 2 (views/app `theme.shadows[n]`/`customShadows`) oportunista o warn-rule scopeada a views; Tier 3 (mockups + Vuexy `card-statistics`) no tocar hasta promoción a runtime.
+
+---
+
+# Sesion 2026-06-07 — TASK-1051 elevation token primitive migration + lint rule (complete, develop)
+
+Cierra el follow-up de TASK-1049. Local-first en `develop` (sin branch). 4 primitives migradas a `theme.greenhouseElevation.<role>` + lint rule guardrail.
+
+- **Migración (rol por semántica, no por matchear el número):** `InlineNumericEditor` (Popper editor) `elevation={6}`→`floating`; `ContextChip` (×2 popovers `role=dialog`) `theme.shadows[6]`→`floating`; `MetricTrendCard` (hover lift) `theme.shadows[4]`→`raised`; `ContextualSidecar` (contained desktop) `theme.shadows[2]`→`raised`. La sombra **direccional** del lane `adaptive` (`-18px 0 48px`) queda **bespoke** (no es `theme.shadows[n]`, un rol simétrico no la expresa) — decisión documentada.
+- **Lint rule** `greenhouse/no-direct-mui-elevation-in-primitives` (modo `error`, scope `src/components/greenhouse/primitives/**`): flag `elevation={n≥1}` + `theme.shadows[n]`. NO flaggea `customShadows` ni sombras direccionales bespoke (compat Vuexy + lane shadows legítimos). RuleTester 4 valid + 4 invalid. Plugin v1.13.0→1.14.0.
+- **Gates:** 0 violaciones en `src/` · rule-tests 17/17 · primitives 168/168 · drift 27/27 · tsc/eslint 0. GVC: adaptive-sidecar mockup (`raised` contenido OK) + Person 360 (ContextChip `floating`, mismo token aprobado en TASK-1049).
+- **Follow-up abierto (no en scope):** barrido opcional de `customShadows`/`theme.shadows[n]` en views de producto + chart cards (Vuexy compat).
+
+---
+
+# Sesion 2026-06-07 — Design System catalog canonizado
+
+Se aprobo el mockup del catalogo del Design System y se canonizo como home real.
+
+- **Ruta canonica:** `/admin/design-system` ahora renderiza `DesignSystemCatalogView` (catalogo interno de tokens, primitives, patrones y labs). La ruta mockup `/admin/design-system/mockup/catalog` fue retirada.
+- **Color AXIS:** la antigua home de paleta se movio a `/admin/design-system/colors` como `AxisColorLabView`, con el mismo gate `administracion.design_system`. La pagina de color queda enfocada solo en color AXIS; se retiraron las cards heredadas de navegacion a otras paginas del Design System.
+- **Catalogo:** entradas actuales enlazan a rutas reales; `Color AXIS` apunta a `/admin/design-system/colors`; el item del catalogo queda marcado como canonical; se retiro la fila falsa de docs sin ruta de producto.
+- **Jerarquia visual:** la tabla del catalogo separa `Contrato` y `SoT` con gutter + borde sutil en desktop, corrigiendo la falta de separacion marcada por el operador.
+- **Governance para agentes/Claude:** `CLAUDE.md`, `AGENTS.md` y `ui-platform` declaran que toda nueva incorporacion del Design System debe agregarse al catalogo, enlazar su ruta/lab, declararse en reachability y conectar docs/GVC.
+- **Verificacion local:** `pnpm exec eslint ...` focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm docs:closure-check` y GVC `design-system-catalog` local desktop/wide/mobile OK. Color validado con `pnpm fe:capture --route=/admin/design-system/colors --env=local`.
+- **Nota de staging:** no mezclar en este commit los cambios de lifecycle `TASK-1051` ya presentes en el worktree.
+
+---
+
+# Sesion 2026-06-07 — TASK-1050 Geometry Lab iniciado
+
+Se inicio `TASK-1050` en `develop` sin cambiar de rama porque el worktree ya tenia cambios paralelos de `TASK-1049` (elevation). No se revirtio ni se edito ownership ajeno.
+
+- **Runtime:** `theme.shape.customBorderRadius` ahora incluye `xxl: 12` y `display: 16`; tipos MUI extendidos en `src/components/theme/types.ts`.
+- **Lab interno:** nueva ruta `/admin/design-system/geometry`, gateada igual que el Design System (`administracion.design_system`, clientes redirigen a `/401`). View: `GeometryLabView`.
+- **Contenido:** spacing AXIS `Gap/Padding 1..16 + 25` renderizado desde `theme.spacing(n)`; radius AXIS `xs..xl`, round (`9999px` / `50%`) y extension Greenhouse `xxl/display`; ejemplo vivo de `display` en superficie grande.
+- **Navegacion:** card "Geometry foundations" agregada en `DesignSystemView`; child route declarada en `route-reachability-manifest.ts`.
+- **GVC:** scenario nuevo `design-system-geometry`; captura local desktop+mobile OK en `.captures/2026-06-07T16-52-49_design-system-geometry`.
+- **Gates:** eslint focal OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm route-reachability-gate --strict` OK; `pnpm task:lint --task TASK-1050` OK; `pnpm ops:lint --changed` sin errores y con warnings preexistentes de registry parity de `TASK-1049`.
+- **Pendiente para cerrar TASK-1050:** sincronizar docs de contrato (`DESIGN.md`, `GREENHOUSE_DESIGN_TOKENS_V1.md`, `ui-platform/*`) y cierre documental/changelog si se completa la task.
+
+---
+
+# Sesion 2026-06-07 — TASK-1049 elevation/shadow token system (in-progress, develop)
+
+Implementación del SoT semántico de elevación/sombra Greenhouse. Local-first en `develop` (sin branch, por instrucción del operador). ADR `GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1` **Accepted 2026-06-07**.
+
+- **Open Questions resueltas pre-ejecución:** (Q#2) derivación = composición propia en `elevation-tokens.ts` sobre el canal canónico `var(--mui-mainColorChannels-${mode}Shadow)` (mismo que `shadows.ts`/`customShadows.ts`, AXIS-aware, light/dark), NO reuse de `customShadows.md/lg` (quedan compat Vuexy). (Q#3) cada rol es factory mode-aware (alpha light≠dark) + `borderColor` obligatorio en floating/overlay/modal (carga separación bajo `forced-colors` + compensa sombra débil en dark). (Drift) runtime real = `light`/`dark` (NO `darkSemi` — la skill overlay estaba desactualizada; runtime gana).
+- **Decisión de restraint:** NO se agrega campo `elevationRole` al `floating-surface-controller` — los 6 variants son visualmente idénticos y comparten `floating`. Abstracción por-variant es follow-up documentado solo si un variant lo necesita (mismo criterio que `overflow` reservado).
+- **Slice 0:** ADR `Accepted`, lifecycle `in-progress`, `DECISIONS_INDEX` + README. Sin migración (viewCode `administracion.design_system` reusado, TASK-1034). Sin capability/event/signal nuevos.
+- **Slice 1:** SoT `src/components/theme/elevation-tokens.ts` (factory mode-aware, 6 roles) + inyección `mergedTheme.ts` (`theme.greenhouseElevation`) + augmentation `types.ts` + `render.tsx` test theme. Tests: focal (11) + drift-guard (16, paridad 3-capas). DESIGN.md §Elevation + V1 §6 → roles (numérica = §6.1 legacy).
+- **Slice 2:** `GreenhouseFloatingSurface` `elevation={6}`→`{0}` + `theme.greenhouseElevation.floating` (boxShadow + border). Test anti-regresión no-`elevation6`. 6 variants comparten `floating` (sin campo controller — restraint).
+- **Slice 3:** página viva `/admin/design-system/elevation` (gate `administracion.design_system`, AxisWordmark, 100% tokenizada — fix de hardcodes flagged por Julio: borderRadius hack, `<Code>` tokenizado, h4) + card DesignSystemView + route-reachability. GVC local verde (lab + floating-surface-primitives: sombra `floating` enterprise doble-capa+hairline).
+- **Slice 4:** docs — PRIMITIVES.md, HISTORIAL.md (Delta 2026-06-07k), CLAUDE.md invariante, changelog.
+- **Slice 5:** audit `rg` — FloatingSurface migrado ✓; `@core/customizer` legacy read-only (allowed); **follow-up** (fuera de scope): `InlineNumericEditor` (elevation={6}), `ContextChip`/`MetricTrendCard`/`ContextualSidecar` (`theme.shadows[n]`) → migrar a roles + evaluar lint rule `greenhouse/no-direct-mui-elevation-in-primitives`.
+- **Gate de cierre:** `pnpm test` + `pnpm build` (en curso). Push a develop al cerrar.
+- **Pendiente menor:** captura GVC dark mode explícita (contrato dark cubierto por border obligatorio + tests).
+
+---
+
+# Sesion 2026-06-07 — Floating Surface anchored motion hardening
+
+Se modernizo el motion de `GreenhouseFloatingSurface` antes de tocar sombras/elevacion. Se reviso especificamente la duda del operador sobre la primitive `Motion`: existe y se mantiene canonica, pero su ADR la acota a motion cinematica/orquestada/scroll; Floating Surface es una microinteraccion frecuente y por eso se resolvio con CSS Tier 1 + tokens `motionCss`.
+
+- **Decision:** no usar `<Motion>`/`useGreenhouseGSAP` para popovers, menus, tooltips, evidence peeks, inline editors ni validation bubbles. Usar motion CSS tokenizado dentro de la primitive.
+- **Runtime:** `GreenhouseFloatingSurfaceMotion` pasa de `fade` a `anchored`; cada variant oficial queda en `motion: 'anchored'`.
+- **Comportamiento:** el vector de entrada/salida deriva del placement resuelto de Floating UI (`top/right/bottom/left`), empieza unos px desde el borde del anchor, entra con `motionCss.duration.standard` + `motionCss.ease.emphasized`, sale con `motionCss.duration.short` + `motionCss.ease.emphasizedAccelerate`, y usa un snap suave de escala para dar sensacion enterprise actual sin rebote jugueton.
+- **Arquitectura:** el wrapper conserva `refs.setFloating` + `floatingStyles`; la animacion vive en el `Paper` interno para no pisar el transform de posicionamiento de Floating UI. Al cerrar, el surface queda montado brevemente en estado `exiting` hasta completar `exitDuration`; `prefers-reduced-motion` desactiva transform/animation y desmonta sin espera.
+- **Lab:** `/admin/design-system/floating-surfaces` muestra `motion: anchored` en cada specimen.
+- **Gates verdes:** vitest focal (`floating-surface-controller` + `GreenhouseFloatingSurface`, 23 tests), eslint focal, `tsc --noEmit`, GVC local desktop+mobile en `.captures/2026-06-07T15-54-46_floating-surface-primitives`. Frames revisados: rich tooltip desktop, command preview desktop y mobile sin collision visible. La captura mobile conserva un hydration warning generico de app en manifest; no bloquea este cambio y no hay console/page/http failures.
+- **Pendiente separado:** sombra/elevacion sigue deferida a `TASK-1049` y su ADR propuesta; este cambio deja `Paper elevation={6}` intacto por alcance.
+
+---
+
+# Sesion 2026-06-07 — TASK-1018 GVC mockup→runtime contract gates (V1.5)
+
+Se endureció Greenhouse Visual Capture para convertir el paso mockup aprobado → runtime en contrato verificable. Local-first en `develop` (sin branch ni push, por instrucción del operador). 8 slices + verificación live + skills.
+
+- **Slice 0** — `pixelmatch` + `pngjs` como devDeps + ambient `.d.ts` (sin `@types`).
+- **Slice 1** — Baseline visual contract: motor de diff offline (`visual-diff.ts`, pixelmatch + masks por región + dimension guard + warning-first default ratio), home durable committeable `scripts/frontend/baselines/<surfaceId>/<viewport>__<label>.png` + mask sidecar, promoción `pnpm fe:capture:diff --promote`, determinismo (anim off / caret oculto / reduced-motion / fonts settled) auto-aplicado cuando hay `baseline.surfaceId`, `requiredFrameLabels`/`requiredRegions`/`maskSelectors`/`maxDiffRatio`/`maxChangedPixels`. Degrada honesto a `baseline_stale`.
+- **Slice 2** — `quality.layout` (overflow / target <24px / texto cortado / scroll sin label / cards anidadas).
+- **Slice 3** — `quality.runtime` (console.error / pageerror / hydration best-effort / 4xx-5xx, sanitizado + opt-in).
+- **Slice 4** — Playwright trace retain-on-failure (`trace.zip` solo en `exitCode=1`).
+- **Slice 5** — `quality.keyboard` (foco + focus ring + estado + reduced-motion check).
+- **Slice 6** — `quality.performance` (DOM/requests/transfer/FCP, warning-first).
+- **Slice 7** — `quality.enterpriseRubric` (data honesty) + **resumen ejecutivo** (`Apto`/`Revisar`/`Requiere iteración`) en `index.html` + `review-dossier.md`.
+- **Slice 8** — Docs (arch helper Delta V1.5, README, scenarios/_README, manual, documentation) + scenarios regresión `gvc-contract-gates` + `gvc-keyboard-focus` + workflow de adopción.
+- **Codes SSOT**: `scripts/frontend/lib/failure-taxonomy.ts` (`FINDING_CODES`, 33 codes). `manifest.schemaVersion` se mantiene en `1` (campos aditivos). `health.ts` lee de `audit.jsonl` → tolerante a manifests mixtos.
+
+**Verificación live (`--env=local`, dev server local + storageState.local-agent):** `gvc-contract-gates` `baseline_stale` → `pnpm fe:capture:diff --promote` → re-run **`match` (0 px)** end-to-end; hydration warning detectado live; layout/perf/rubric verdes; `gvc-keyboard-focus` probe + frame OK; `fe:capture:review` (resumen ejecutivo + baseline diff + rubric) y `fe:capture:health` verdes. **Aprendizaje canonizado:** esbuild keepNames envuelve arrow-consts dentro de `page.evaluate` con `__name()` ausente en el browser → fix con function declarations + shim `globalThis.__name` vía `context.addInitScript`.
+
+**Skills actualizadas** (Claude + Codex): `greenhouse-product-ui-architect`, `greenhouse-ui-orchestrator`, `greenhouse-mockup-builder`, `greenhouse-ui-review`, `greenhouse-ui-enterprise-review`, `modern-ui`, `greenhouse-ux` (global), + mirrors Codex (`greenhouse-portal-ui-implementer`, `greenhouse-vuexy-ui-expert`) — bloque "GVC V1.5 contract gates".
+
+**Gates:** `tsc --noEmit` 0 · `pnpm lint` 0 errores (9 warnings hex pre-existentes en views ajenas) · 49 tests focales `scripts/frontend` · `docs:closure-check` 0 warnings. No se corrió `pnpm test` full / `pnpm build` (cambio tooling-only bajo `scripts/frontend`, no entra al bundle Next ni a los workers).
+
+**Límites/decisiones:** baselines durables son sensibles al entorno (font hinting cross-OS) — GVC es local-first, no CI obligatorio (Out of Scope). El baseline del regression scenario NO se commitea (PNG pesado + env-sensitive); el scenario ejercita el path `baseline_stale` + promote→match queda verificado live. Open Question del motor de diff resuelta a pixelmatch (vs `toHaveScreenshot`, que exige el runner `@playwright/test`).
+
+---
+
+# Sesion 2026-06-07 — Elevation / shadow token governance propuesta
+
+Se formalizo el discovery pedido por el operador sobre la sombra de `GreenhouseFloatingSurface` (la primitive hoy usa `Paper elevation={6}` y se percibe vieja/pesada). No se toco runtime.
+
+- **Audit creado:** `docs/audits/design-tokens/ELEVATION_SHADOW_TOKEN_AUDIT_2026-06-07.md`. Hallazgo central: existen `theme.shadows` y `theme.customShadows`, pero no un SoT semantico Greenhouse de elevacion; la documentacion actual habla de indices MUI (`boxShadow: 6`) y no de roles.
+- **ADR propuesta:** `docs/architecture/GREENHOUSE_ELEVATION_SHADOW_TOKEN_DECISION_V1.md` (`Status: Proposed`) + entrada en `DECISIONS_INDEX.md` bajo "Decisiones propuestas / en discusion". Propone roles `none`, `raised`, `floating`, `overlay`, `modal`, `overflow`; `theme.shadows[n]`/`Paper elevation={n}` quedan como infra legacy/compat para primitives nuevas.
+- **Task creada:** `docs/tasks/to-do/TASK-1049-greenhouse-elevation-shadow-token-system.md` + registry/README sincronizados (`siguiente ID disponible: TASK-1050`). La task bloquea runtime hasta aceptacion explicita de la ADR y exige token SoT, primer consumidor `GreenhouseFloatingSurface`, tests, GVC desktop/mobile, docs DESIGN.md/V1/UI Platform y audit de usos directos sin migracion global automatica.
+- **Gates verdes:** `pnpm ops:lint --changed`, `pnpm task:lint --task TASK-1049`. `pnpm docs:closure-check` se corrio y pidio changelog/handoff; ambos quedan actualizados en esta nota.
+- **Pendiente:** aprobacion/revision del operador sobre la ADR. Si se aprueba, tomar TASK-1049 via task hook antes de implementar.
+
+---
+
+# Sesion 2026-06-07 — Utilities Lab + Activity Timeline token hardening
+
+Se revisó `/admin/design-system/utilities` y `GreenhouseActivityTimeline` con la misma metodología aplicada a buttons/chips/charts: discovery focal, scanner de literals, owner compartido primero, GVC desktop+mobile y cierre documental.
+
+- **Hallazgo:** la deuda era real. `UtilitiesLabView` usaba MUI `Button`/`Chip` crudos, pesos `800`, `fontSize` route-local y sombra `rgba`; `GreenhouseActivityTimeline` dispersaba sizing/opacidades/motion, usaba sombras `rgba`, `fontWeight: 500` para títulos de item y overrides `700/800` en labels/avatars/títulos.
+- **Fix:** se agregó `greenhouse-activity-timeline-controller.ts` con `GREENHOUSE_ACTIVITY_TIMELINE_TOKENS` para card widths, rail/dot geometry, icon/avatar sizing, opacidades, sombras, motion timing y spacing. La primitive consume ese controller, usa variants canónicas (`h6`, `button`, `monoId`) y resuelve color/sombra desde `theme.palette` + `alpha`.
+- **Lab:** `UtilitiesLabView` ahora compone `GreenhouseButton` y `GreenhouseChip`; layout/chrome usan `DESIGN_SYSTEM_LAB_TOKENS` + `GREENHOUSE_ACTIVITY_TIMELINE_TOKENS`; `AxisWordmark` se mantiene como marca interna del design system.
+- **Visual:** GVC `design-system-utilities` desktop+mobile OK en `.captures/2026-06-07T14-43-31_design-system-utilities`; frames revisados visualmente sin overflow/truncamiento.
+- **Gates verdes:** scanner focal sin raw `Button`/`Chip`, HEX/RGB/RGBA ni font literals sospechosos; eslint focal; Vitest focal de `GreenhouseActivityTimeline` + controller + typography/color drift (60 tests); `tsc --noEmit`.
+
+---
+
+# Sesion 2026-06-07 — Charts Lab + primitives token hardening
+
+Se revisó `/admin/design-system/charts` y las chart primitives por hardcodes de color, tipografía y chrome.
+
+- **Hallazgo:** `ChartsLabView` usaba MUI `Button` crudo, `fontWeight: 800` y layout literals; `GreenhouseChartCard` hardcodeaba `LabelList` (`fontSize/fontWeight/fontFamily`) y labels de tabs; `GreenhouseMetricBreakdownChartCard` dibujaba el delta como chip manual y overrideaba `kpiValue`; `GreenhouseStackedDistributionChartCard` tenía HEX `#2F2B3D` y typography numeric inline; `AppRecharts` todavía tenía rems fijos.
+- **Fix:** se agregó `greenhouse-chart-controller.ts` con `GREENHOUSE_CHART_CHROME_TOKENS` (card widths, icon sizes, chart geometry, opacities); el lab consume `GreenhouseButton`, `DESIGN_SYSTEM_LAB_TOKENS` y los chart tokens; las primitives usan `GreenhouseChip`, `monoId`/`monoAmount`/`kpiValue`, theme palette y `getChartTypographyFromTheme()` para Recharts labels.
+- **Visual:** GVC `design-system-charts` desktop+mobile OK en `.captures/2026-06-07T14-31-20_design-system-charts`; se corrigió el truncamiento mobile de `14.6%` en el stacked bar.
+- **Gates verdes:** eslint focal, vitest focal de charts + chart/typography/color drift (68 tests), `tsc --noEmit`, GVC desktop/mobile, `git diff --check` focal.
+
+---
+
+# Sesion 2026-06-07 — Microinteraction primitives sin Button/Chip/type hardcodes
+
+Se revisó el set de primitives documentado en `/admin/design-system/microinteractions` por deuda de buttons, chips, tipografía y colores hardcodeados.
+
+- **Floating Surface follow-up cerrado:** a pedido del operador se revisó si la página de microinteractions tocaba Floating UI. La página no importaba Floating UI directo, pero `GreenhouseFieldProvenancePeek` sí usaba `@floating-ui/react` ad-hoc. Se migró a `GreenhouseFloatingSurface variant='evidencePeek' kind='fieldProvenance'` manteniendo API pública, trigger, contenido, focus return y `data-capture`.
+- **Floating Surface token audit:** `GreenhouseFloatingSurface`/`floating-surface-controller` no hardcodean colores ni tipografía. Se centralizaron los valores compartidos de chrome/motion (`viewportMargin`, padding por density, `fadeDuration='short'`, `fadeEase='emphasized'`) en el controller y la transición del surface se deriva de `motionCss`, no de un cubic-bezier literal.
+- **Floating Surface Lab tokenizado:** `FloatingSurfaceLabView` dejó de usar MUI `Button`/`Chip` crudos, font/type literals, rgba/HEX y números visuales dispersos. El lab consume `GreenhouseButton`, `GreenhouseChip`, `GreenhouseFloatingSurface`, `typographyScale`, `motionCss` y el namespace `DESIGN_SYSTEM_LAB_TOKENS` para layout/opacidades/focus/icon specimen. GVC local OK: `.captures/2026-06-07T14-16-29_inline-admin-design-system-floating-surfaces/frames/01-snapshot.png`.
+- **Hallazgo:** la deuda era real en el owner compartido: `GreenhouseCommandFeedback`, `GreenhouseInlineValidation`, `GreenhouseEvidenceAttachmentDropzone` y `GreenhouseInlineDecisionPrompt` usaban MUI `Button` crudo; `GreenhouseStateTransition`, `GreenhouseFieldProvenancePeek`, evidence/decision/status labels dibujaban chips/pills con `Box + Typography`; varias primitives usaban `fontWeight`/`fontVariantNumeric` inline para headings, labels y metadata.
+- **Fix:** las acciones ahora usan `GreenhouseButton`; los status/source/freshness/transition pills usan `GreenhouseChip`; IDs/references/progress metadata usan `Typography variant='monoId'`; títulos/labels usan variants (`h6`, `caption`, `button`) sin pesos inline. Los tamaños que quedan como `fontSize` son solo iconos/spinners y se concentraron como `ICON_SIZE` local, no tipografía de texto.
+- **Colores:** búsqueda focal sin HEX/rgba hardcodeados en microinteraction primitives/lab. Los únicos `rgb(...)` relevantes que quedan están en `GreenhouseChip` y usan CSS vars del theme (`var(--mui-...)`), por lo que siguen tokenizados.
+- **Lab:** `MicrointeractionsLabView` usa `GreenhouseButton` para volver al Design System; `MicrointeractionsLabSection` retiró overrides tipográficos inline en headings/labels de documentación.
+- **GVC:** desktop full-page `.captures/2026-06-07T13-54-35_design-system-microinteractions/01-desktop/frames/01-microinteractions-lab.png` revisado. El scenario multi-viewport se colgó en mobile/ffmpeg; se mató solo el proceso GVC y se tomó fallback mobile inline OK: `.captures/2026-06-07T13-58-41_inline-admin-design-system-microinteractions/frames/01-snapshot.png`.
+- **Gates verdes:** búsqueda focal sin raw `Button`/`Chip`, sin `fontWeight/fontFamily/fontVariantNumeric` inline y sin HEX/rgba en el scope; eslint focal; vitest focal de microinteraction/button/chip + typography/color drift (112 tests); `tsc --noEmit`; `design:lint`; `docs:closure-check` acotado (warning esperado por UI interna con GVC cubierto); `git diff --check`; `pnpm lint` exit 0. Nota: el lint completo mostró 29 warnings de la regla nueva `greenhouse/no-hardcoded-hex-color` en archivos fuera de este slice; esos cambios de eslint/config están en el worktree ajeno y no se tocaron.
+
+---
+
+# Sesion 2026-06-07 — Typography canonical page controls hardening
+
+Se revisó `/admin/design-system/typography` por sospecha del operador de colores/tipografía hardcodeados y luego se corrigieron los ejemplos de botones.
+
+- **Resultado audit:** la vista canónica no tenía HEX hardcodeados; los colores usan theme/palette. Sí tenía atajos tipográficos route-locales y ejemplos de controles con MUI `Button`/`Chip` crudos, lo que era incoherente con el contrato nuevo de primitives.
+- **Fix:** `CanonicalTypographyView` ahora usa `GreenhouseButton` para los ejemplos small/medium/large de controles y `GreenhouseChip` para chips de estado/spec. El ejemplo de KPI usa `variant='kpiValue'`; el ID usa `variant='monoId'`; títulos repetidos de cards/spec usan variants (`h6`) en vez de `fontWeight`; los specimens de familia/peso derivan de `typographyScale`; se corrigió `Poppris` → `Poppins`.
+- **Clasificación mockup:** `/admin/design-system/typography/mockup` sigue teniendo `fontSize` inline porque es un registro histórico AS-IS↔TO-BE y conserva ejemplos intencionales de deuda/decisión; la referencia vigente es la canónica.
+- **GVC:** `.captures/2026-06-07T13-41-12_typography-canonical` (`escala`, `aplicaciones`, `gobernanza`) revisado; los botones muestran tipografía aplicada desde `GreenhouseButton`/`controlText`.
+- **Gates verdes:** eslint focal, `tsc --noEmit`, `GreenhouseButton` + `GreenhouseChip` + typography drift tests, `design:lint`, búsqueda estricta sin HEX/literals crudos ni `<Button>/<Chip>` en la canónica.
+
+---
+
+# Sesion 2026-06-07 — Chips Lab tokenizado + typography hardening
+
+Se revisó `/admin/design-system/chips` por sospecha del operador de colores/tipografía hardcodeados.
+
+- **Hallazgo:** la sospecha era correcta. `ChipsLabView` tenía HEX directos para tones, fondos, bordes y textos, además de `labType` con `fontSize/fontWeight/lineHeight` inline. `GreenhouseChip` no tenía HEX, pero sí literals tipográficos para el label (`fontWeight`, `fontSize`, `lineHeight`) y tamaños de icon/avatar mezclados en el `sx`.
+- **Fix:** el lab ahora deriva color desde `axisNeutral`, `axisRamp`, `axisSemanticHex` y `axisSemanticPalette`; headings/labels/helper usan variants MUI (`h4`, `h5`, `body1/body2`, `button`) sin overrides tipográficos. `GreenhouseChip` consume `typographyScale.labelMd/labelSm` para el texto y concentra block/avatar/delete/icon sizes en `GREENHOUSE_CHIP_SIZE_TOKENS`.
+- **No-regresión:** no se cambiaron variants, tones, kinds, props ni consumers productivos. Los colores runtime de la primitive siguen en `theme.palette`/CSS vars; el lab solo documenta la matriz AXIS.
+- **GVC:** `.captures/2026-06-07T13-29-26_design-system-chips` desktop + mobile revisados.
+- **Gates verdes:** eslint focal, `GreenhouseChip` + typography/color drift tests, `tsc --noEmit`, `pnpm design:lint`, `pnpm lint`, `git diff --check` focal. `docs:closure-check` acotado deja cubierto changelog/handoff; UI docs/manual/client changelog no aplican por surface interna.
+
+---
+
+# Sesion 2026-06-07 — UI Platform doc restructure (`ui-platform/`) + skill tipografía
+
+Por pedido del operador se reestructuró el monolito `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` (~3.000 líneas, mayormente changelog `## Delta`).
+
+- **Qué se hizo:** split determinístico (script, conservación de líneas verificada — 61 secciones, 0 sin rutear) en `docs/architecture/ui-platform/`: `README` (índice + mapa "dónde vive X" + modelo de fuentes de verdad) + docs temáticos vigentes (`STACK`/`PRIMITIVES`/`STATE`/`FORMS`/`TABLES`/`MOTION`/`I18N`/`PATTERNS`/`GOVERNANCE`) + `HISTORIAL.md` (todas las `## Delta` + version-log v1.0→v1.29). El path viejo → **router stub** (preserva referencias).
+- **Colisión multi-agente resuelta:** la sesión de botones había dejado las deltas 06-07d/06-07e **sin commitear** en el working tree del V1 doc (su commit `7a9f746ea` las dejó fuera a propósito). El split las **absorbió a `HISTORIAL.md`** → cero pérdida; no se tocó el código de botones (ya committeado).
+- **Naming:** `ui-platform/` neutro. **AXIS reservado para el lenguaje visual** (color/tokens/tipografía/motion), no para la plataforma de ingeniería UI.
+- **Gobernanza:** ADR `GREENHOUSE_UI_PLATFORM_RESTRUCTURE_DECISION_V1.md` + `DECISIONS_INDEX.md`. Regla **anti-monolito** incorporada a la skill `greenhouse-documentation-governor` (Claude + Codex) y al **docs lint** (`scripts/check-documentation-closure.mjs`: findings `architecture_doc_monolith` + `ui_platform_stub_regrowth`, validado sin falso positivo sobre el stub).
+- **Punteros actualizados:** `CLAUDE.md`, `AGENTS.md`, 12 skills UI repo (Codex + Claude) + 2 globales repunteadas a `ui-platform/`. (3 skills Codex — `greenhouse-agent`/`portal-ui-implementer`/`vuexy-ui-expert` — están gitignored: editadas en disco, no committeables.)
+- **Skill tipografía (turno previo):** `typography-design` (global craft + overlay Greenhouse) + mirror Codex `greenhouse-typography-accessibility` enriquecida; puntero en CLAUDE.md.
+- **Pendiente / riesgo:** si la sesión de botones intentaba commitear esas deltas al V1 doc, ahora deben ir a `ui-platform/HISTORIAL.md` (el V1 es stub). Markdownlint warnings cosméticas en docs (no gated por `local:check`).
+
+---
+
+# Sesion 2026-06-07 — Greenhouse Button primitive + Buttons Lab AXIS
+
+Por pedido del operador se reencuadro la referencia Figma `Buttons` (`yyMksCoijfMaIoYplXKZaR`, node `324:32923`) como **tokenizacion + primitive canonical**, no como pagina estetica.
+
+- **Discovery:** el repo ya tenia `MuiButton` overrides Vuexy/MUI (`contained/tonal/outlined/text`, active scale, ButtonBase/ripple config, large size corregido por `mergedTheme` via `controlText.lg`) y `GreenhouseAsyncActionButton` para estados async. Brecha cerrada: contrato Greenhouse reusable para button emphasis/kinds/icon placement/sizes/states + lab GVC.
+- **Primitive:** `GreenhouseButton` (`src/components/greenhouse/primitives/GreenhouseButton.tsx`) + controller `greenhouse-button-controller.ts`.
+- **Contrato V1:** variants `solid/label/outlined/text` (mapeadas a `contained/tonal/outlined/text`), tones `primary/secondary/error/warning/info/success`, sizes `large/medium/small`, kinds `primaryAction/secondaryAction/destructiveAction/inlineAction/navigation/filter/custom`, resolver `kind→variant/tone`, icon placement, `data-variant/tone/kind/capture`, focus ring y reduced-motion fallback.
+- **Compatibilidad/sinergia:** `GreenhouseAsyncActionButton` ahora compone `GreenhouseButton`: conserva su API legacy `variant/color`, traduce internamente a `solid/label/outlined/text` + `tone`, y mantiene su responsabilidad async (`idle/loading/success/error`, double-submit guard, spinner, success/error state). Raw MUI `Button` queda permitido en legacy/Vuexy internals; migrar por slices.
+- **No-regresion de botones existentes:** no hay diff en `src/@core/theme/overrides/button.ts`, `src/components/theme/mergedTheme.ts`, `src/components/theme/types.ts` ni `src/components/theme/typography-tokens.ts`; ningun consumer productivo fue migrado a `GreenhouseButton` en este slice. La nueva primitive solo se usa en el lab y se exporta para adopcion futura por slices.
+- **Tipografia:** la primitive no hardcodea `fontSize`, `fontWeight` ni `fontFamily` del texto; hereda el contrato vigente de MUI/Vuexy (`theme.typography.button` + sizing existente). Los size tokens del controller exponen `controlText.lg/md/sm` como metadata canonical; el unico `fontSize` en `GreenhouseButton` es para iconos. `ButtonsLabView` tambien queda sin `fontSize/fontWeight/fontFamily/lineHeight` inline: headings/labels/spec notes usan variants MUI canonicas.
+- **A11y corregido:** al componer AsyncAction se movio el status live region fuera del `<button>`; antes el texto oculto podia duplicar el accessible name (`EnviarEnviar`) en pruebas.
+- **Lab interno:** `/admin/design-system/buttons`, gateado por `administracion.design_system`, enlazado desde `/admin/design-system`, declarado en route reachability. El header usa `AxisWordmark`; no quedan referencias externas de marca en la surface nueva.
+- **Scenario GVC:** `design-system-buttons`.
+- **Evidencia GVC:** Buttons Lab `.captures/2026-06-07T13-11-51_design-system-buttons` desktop + mobile tras retirar tipografia inline del lab; Microinteractions Lab `.captures/2026-06-07T13-04-17_design-system-microinteractions` desktop + mobile tras componer `GreenhouseAsyncActionButton`.
+- **Gates verdes:** vitest focal `GreenhouseButton` + `GreenhouseAsyncActionButton` (12 tests), no-regression suite `GreenhouseAsyncActionButton` + button/typography/color drift (76 tests), eslint focal, `pnpm lint` completo, `tsc --noEmit`, `route-reachability-gate --strict`, `design:lint`, `docs:closure-check` (warning advisory esperado por UI interna + GVC/docs cubiertos), `pnpm build`, GVC local.
+- **Docs sincronizadas:** `GREENHOUSE_BUTTON_PRIMITIVE_V1.md`, `project_context.md`, `changelog.md`, este handoff. `GREENHOUSE_UI_PLATFORM_V1.md` queda fuera de este commit porque hay una reestructura documental paralela no incluida.
+
+---
+
+# Sesion 2026-06-07 — Greenhouse Motion Primitive (base GSAP gobernada, TASK-1045)
+
+Se construyó la **primitiva base de motion sobre GSAP** (la "primigenia" para reusar acá y en otras apps) y se pusheó a `develop` (`fd23184ca..bf76137af`).
+
+- **3 anillos:** núcleo portable `src/components/greenhouse/motion/core/` (cero deps Greenhouse) con tokens SoT (drift-guarded), `ensureMotionRegistered` (CustomEase = paridad CSS), `prefers-reduced-motion` y el hook `useGreenhouseGSAP` (SSR/StrictMode-safe, cleanup auto, reduced-motion horneado vía `gsap.matchMedia`); binding `theme/motion-tokens.ts`; primitive `<Motion variant kind>` (4 variants `entrance/stagger/scrollReveal/timeline` + resolver `kind→variant`).
+- **Boundary:** lint rule `greenhouse/no-direct-gsap-in-views` (error) — solo el módulo motion importa gsap; jubilados los huérfanos `src/libs/GSAP*.tsx`.
+- **No-regresión:** GSAP NO reemplaza CSS Tier 1 ni framer-motion; las microinteracciones existentes (`useReducedMotion` ×21 + CSS blanket) quedan intactas (verificado: AnimatedCounter/EmptyState tests verdes).
+- **Museo + GVC:** `/admin/design-system/motion` (gate interno, enlazado + reachability), GVC enterprise verde (4 frames mirados).
+- **Docs:** ADR `GREENHOUSE_MOTION_PRIMITIVE_V1.md` + DESIGN.md §Motion + V1 §9 reconciliado al SoT + DECISIONS_INDEX + CLAUDE.md/AGENTS.md.
+- **Colisión multi-agente resuelta:** Codex committeó su Chips Lab (`11951d7c0`) en paralelo; sus hunks en `DesignSystemView`/manifest se aislaron de los míos (chips preservado intacto) y completé su entrada de reachability dangling (`0c92b7451`).
+- **Gates:** `local:check` + `pnpm build` + `design:lint 0/0` + drift-guard 57 + reachability 0 orphans + 37 tests focales. TASK-1045 movida a `complete/` (code-complete + pushed).
+- **Follow-ups creados:** **TASK-1047** (hardening residual: render-test harness de `<Motion>`/variants + full `pnpm test` + verificación staging) y **TASK-1046** (`<AnimatedMetric>`: converge `AnimatedCounter`/31 consumidores swapeando el motor a `useGreenhouseGSAP` con API idéntica → cero churn). Ambas para sesión fresca.
+
+---
+
+# Sesion 2026-06-07 — Skill Codex `greenhouse-typography-accessibility`
+
+Se creo una skill local **solo para Codex** en `.codex/skills/greenhouse-typography-accessibility/` para gobernar decisiones de tipografia Greenhouse: pesos, variantes MUI, contraste, espaciado accesible, jerarquia visual, frontera Poppins/Geist, chips/botones/labels/tablas/KPIs y adapters PDF/email.
+
+- **No se creo copia Claude:** el operador corrigio el scope porque las skills de Product Design de Claude no son equivalentes. La carpeta `.claude/skills/greenhouse-typography-accessibility/` se retiro.
+- **Investigacion externa incorporada:** W3C WCAG 2.2, WCAG Text Spacing 1.4.12, USWDS Typography, Material 3 / Material Web Typography, Carbon Typography e IBM Type Scale. La referencia cargable vive en `.codex/skills/greenhouse-typography-accessibility/references/typography-research-and-runtime-map.md`.
+- **Mapa runtime incluido:** `typographyScale`, `TYPOGRAPHY_VARIANT_BRIDGE`, `SECONDARY_VARIANT_TOKENS`, `controlText`, pesos 400/600/700/800, decision de no crear rol 500, familias PDF registradas y boundary `Poppins display / Geist product UI`.
+- **Decision de skill:** no reemplaza `design-system-governance`; compone con ella cuando se cambia token/SoT. Tampoco reemplaza `greenhouse-ui-orchestrator`, `greenhouse-ux-content-accessibility` ni `greenhouse-ui-enterprise-review`; se activa para diagnostico tipografico especializado ("todo muy bold", pesos, contrastes, variants, Poppins/Geist).
+- **Smoke test practico:** se aplico contra la pagina de Chips del commit local `codex/chips-lab-axis` sin cambiar de rama ni tocar trabajo paralelo. Resultado: la skill detecto correctamente pesos de filas/headers y el uso de `500`; tambien revelo un falso positivo potencial para labs Figma por raw `fontSize` route-local. Se ajusto la skill con una excepcion gobernada para `/admin/design-system/**`: valores specimen permitidos solo si no salen a primitives/tokens/product views y se validan con GVC.
+- **Estado worktree paralelo:** existen archivos untracked de motion de otro trabajo (`src/components/greenhouse/motion/*`); no pertenecen a esta skill y no se tocaron.
+
+---
+
+# Sesion 2026-06-07 — Greenhouse Chip primitive + Chips Lab AXIS restaurado en `develop`
+
+Se restauró en el working tree actual la página `/admin/design-system/chips`, que había quedado solo en la rama local aislada `codex/chips-lab-axis` y por eso devolvía 404 en `develop`.
+
+- **Primitive:** `GreenhouseChip` en `src/components/greenhouse/primitives/`, con variants `solid/label/outlined`, tones semánticos, sizes `medium/small`, kinds, avatar opcional, close affordance y microinteracciones reduced-motion-safe.
+- **Lab interno:** `src/app/(dashboard)/admin/design-system/chips/page.tsx` + `ChipsLabView`, protegido por el mismo gate de `/admin/design-system`.
+- **Figma parity:** lab light/dark basado en AXIS Figma `Chip` (`yyMksCoijfMaIoYplXKZaR`, node `369:92030`), con `AxisWordmark` y avatar de referencia `Avatar/Greenhouse` (`node 369:72301`) en `public/images/greenhouse/design-system/axis-avatar-greenhouse.png`.
+- **No se tocó Claude/motion:** `DesignSystemView` y `route-reachability-manifest` recibieron solo hunks de chips; los hunks de Motion Lab siguen fuera del commit de chips.
+- **Verificación:** eslint focal, test focal `GreenhouseChip` y `pnpm route-reachability-gate --strict` verdes (183 rutas, 0 orphans).
+
+---
+
+# Sesion 2026-06-07 — Typography consumer sweep (TASK-1036 cleanup)
+
+Se resolvió el baseline de warnings `greenhouse/no-fontsize-inline-typography`: `pnpm lint` pasó de 162 warnings en 93 archivos a 0 errores / 0 warnings. El cambio migró `<Typography>` legacy con `fontSize` literal hacia variants del SoT (`caption`, `body1/body2`, `overline`, `inherit`, etc.) y corrigió un warning real de hooks en `CostAllocationsView` moviendo `clientColumnHelper` a scope estable + dependencia explícita de `handleToggleExpand`.
+
+- **No se cambió** `typographyScale`, `mergedTheme`, `DESIGN.md` ni la lint rule; el fix refuerza el contrato existente en vez de agregar tokens ad hoc o silenciar el gate.
+- **Task metadata:** `TASK-1036` sigue en `in-progress`; se corrigió el drift documental `Lifecycle: to-do` → `in-progress` y `Status real` → `Avanzada`. No se movió a `complete` porque esto fue un cleanup slice, no cierre administrativo de todo el programa.
+- **Verificación:** `pnpm lint`, `gtimeout 180s pnpm exec tsc --noEmit --pretty false`, `pnpm vitest run src/components/theme/typography-drift.test.ts`, `pnpm design:lint`, `pnpm docs:closure-check`, `git diff --check`.
+- **Nota operativa:** VS Code del operador crasheó durante el sweep por el volumen de archivos; el diff final quedó en disco y validado por terminal.
+
+---
+
+# Sesion 2026-06-07 — TASK-1033 Greenhouse Floating Surface primitive (complete)
+
+Se implementó y cerró TASK-1033 en `develop` (sin worktree, por instrucción del operador). Es la capa de plataforma que el Delta UI 2026-04-20b anticipaba: el contrato Floating UI dejó de vivir duplicado en cada consumer.
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseFloatingSurface.tsx` + controller puro `floating-surface-controller.ts`, exportados desde `@/components/greenhouse/primitives`. Centraliza el contrato canónico (`autoUpdate` + `offset` + `flip({ fallbackAxisSideDirection: 'end' })` + `shift({ padding: 16 })` + `FloatingPortal` + `FloatingFocusManager modal={false}` + `useDismiss` + `useRole`), open controlled/uncontrolled, render-props `anchor`/`content`, hooks GVC y reduced-motion.
+- **6 variants oficiales** con contrato a11y por variant (frozen `FLOATING_SURFACE_VARIANT_CONFIG`): `richTooltip`/`validationBubble`/`commandPreview` (hover+focus, role tooltip, sin focus trap), `actionMenu` (role menu), `evidencePeek`/`inlineEditor` (role dialog, focus managed; `inlineEditor` NO descarta en outside-press por dirty-state). Resolver idempotente `resolveFloatingSurfaceVariant({ variant?, kind? })`.
+- **Pilotos migrados:** `CostProvenancePopover` → `evidencePeek`/`costProvenance` y `TotalsLadder` (addons) → `evidencePeek`/`totalsAddons`. Ambos dejaron de importar `@floating-ui/react`; API pública intacta; paridad visual/focus preservada.
+- **Regla canónica nueva:** product views NO importan `@floating-ui/react`; consumen la primitive. Excepción: primitives + infra Vuexy menu. Documentada en `GREENHOUSE_UI_PLATFORM_V1` Delta 2026-06-06.
+- **Lab interno + GVC:** `/admin/design-system/floating-surfaces` (`FloatingSurfaceLabView`, reusa viewCode `administracion.design_system`, sin viewCode/migración nuevos) + nav card en `DesignSystemView`. Scenario `floating-surface-primitives` verde: 2 variants (desktop 1280×900 + mobile iPhone 13), 8 frames. Evidencia revisada visualmente: `evidencePeek` dialog, `richTooltip` keyboard path, `commandPreview` flip/shift collision cerca del borde. `.captures/2026-06-07T01-43-23_floating-surface-primitives`.
+- **Sin migración / backend / capability / outbox / reliability signals nuevos.** No toca permisos, rutas de producto, ni Adaptive Sidecar.
+- **Gates verdes:** 19 tests focales, `tsc --noEmit` limpio, `pnpm lint` 0 errores (warnings pre-existentes ajenos), GVC desktop+mobile. `pnpm test` (full) + `pnpm build` corridos como gate de cierre (toca barrel compartido + `eslint.config.mjs`).
+- **Commits:** `9f127a12a` (Slice 1+2 foundation+variants), `abb605c71` (Slice 3 pilotos), `fafc37e4e` (Slice 4 lab+scenario+docs), `2f438e826` (GVC scenario robusto).
+- **Enforcement (post-cierre, a pedido del operador):** lint rule `greenhouse/no-direct-floating-ui-in-views` (modo `error`) promueve la regla de convención a gate mecánico — views/app/components NO importan `@floating-ui/*` directo; exentos por path primitives + infra Vuexy menu; cubre static/`import()`/`require()`. Cero violaciones hoy (`pnpm lint` 0 errores), RuleTester verde. Commit `f7439bae1`. Docs sincronizadas: `GREENHOUSE_UI_PLATFORM_V1` (regla + verificación), CLAUDE.md (Patron canonico Floating Surface), changelog, task closure.
+- **Follow-ups (no bloqueantes):** la skill local `greenhouse-dev` tiene una línea desactualizada ("@floating-ui NOT to use") que el ADR (Accepted 2026-06-06) supersede.
+
+---
+
+# Sesion 2026-06-07 — Vercel staging failure por doble entrypoint global Next.js
+
+Se investigó el error reportado por el operador tras el push de utilities. Resultado: **no fue deploy a producción**; los deploys afectados eran `Environment: staging`, branch `develop`, proyecto `efeonce-7670142f/greenhouse-eo`.
+
+- **Deploys afectados:** `greenhouse-ik5scaqoj` (commit `acf9d8b`), `greenhouse-py9zagblp` (commit `fcaba25`) y `greenhouse-gvgupyep5` (commit `841df05`) fallaron despues de compilar con `Error: ENOENT: no such file or directory, open '/vercel/path0/.next/server/middleware.js.nft.json'`.
+- **Causa raíz:** el repo ya tenía `src/proxy.ts` (security headers/CSP/HSTS) como singleton global de Next.js. El commit de mantenimiento agregó un segundo entrypoint global `middleware.ts` en raíz. Next 16 muestra `ƒ Proxy (Middleware)` y compila, pero Vercel CLI 54.9.0 genera/lee manifests mixtos y busca el artefacto legacy `middleware.js.nft.json`, que Next 16.1.1 no emite en este build.
+- **Fix aplicado:** se consolidó el maintenance gate dentro de `src/proxy.ts`, se eliminó `middleware.ts`, se mantuvieron los security headers como post-procesamiento de cualquier response, y se amplió `src/proxy.test.ts` para cubrir 503, allowlist y bypass.
+- **Guardrail agregado:** `pnpm next-global-entrypoint-gate` corre en `prebuild` y bloquea cualquier `middleware.*` o múltiples `proxy.*`; el único entrypoint permitido es `src/proxy.ts`.
+- **Contrato operativo:** NO crear `middleware.ts`; toda lógica request-global debe agregarse a `src/proxy.ts`, con config SSOT, default-OFF/fail-open y sin DB/IO por request. Docs actualizadas: `docs/documentation/plataforma/middleware-edge.md`, `pagina-mantenimiento.md`, manual de modo mantenimiento, `project_context.md`, `changelog.md`.
+
+# Sesion 2026-06-07 — Greenhouse Utilities Lab + Activity Timeline primitive
+
+Por pedido del operador se abrió una nueva página de utilities bajo el Design System interno y se implementó el diseño AXIS Figma `Activity Timeline` (`yyMksCoijfMaIoYplXKZaR`, node `6678:105154`) como primitive reusable, no como composición route-local.
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseActivityTimeline.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato V1:** variants `card/embedded/compact`, kinds `activityTimeline/auditTrail/handoffTimeline/documentTimeline/custom`, lista ordenada accesible, dots semánticos, timestamps, attachment pill, person row, `TeamAvatarGroup` para clusters de equipo, `data-capture` y responsive mobile.
+- **Motion:** usa `Framer Motion` vía `@/libs/FramerMotion` + `useReducedMotion`. Se eligió sobre GSAP porque el diseño requiere mount transitions y crecimiento sutil de conectores, no una timeline medida/scroll/path compleja.
+- **Lab interno:** `/admin/design-system/utilities`, gateado igual que `/admin/design-system` por `administracion.design_system` y defensa `tenantType !== client`.
+- **Reachability:** link "Ver utilities" agregado en `DesignSystemView` + child route declarada en `src/lib/navigation/route-reachability-manifest.ts`.
+- **Scenario GVC:** `scripts/frontend/scenarios/design-system-utilities.scenario.ts`.
+- **URL local actual:** `http://localhost:3001/admin/design-system/utilities` (GVC local necesitó `AGENT_AUTH_BASE_URL=http://localhost:3001`; 3000 no estaba escuchando).
+- **Evidencia GVC final:** `.captures/2026-06-07T01-08-26_design-system-utilities` desktop + mobile, revisado visualmente; se corrigió el rail vertical tras la primera captura y luego se elevó el acabado con eventos Greenhouse reales, contract card curada y `TeamAvatarGroup`.
+- **Gates verdes:** vitest focal de la primitive, eslint focal, `gtimeout 150s pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm design:lint`, `pnpm docs:closure-check` (warnings esperados: UI interna con GVC, no aplica manual/client changelog) y `git diff --check`.
+
+---
+
+# Sesion 2026-06-06 — Página "En mantenimiento" + Modo Mantenimiento (gate)
+
+Se implementó el diseño AXIS "Under Maintenance" (Figma 504-12356) en la familia canónica de misc-pages + un gate de mantenimiento env-driven (primer `middleware.ts` del repo).
+
+- **Pagina:** `src/views/UnderMaintenance.tsx` + `src/app/(blank-layout-pages)/maintenance/page.tsx` (server→view con `mode`+`copy`). Espejo de NotFound: misc-mask, floats reduced-motion-safe, `MiscPageEfeonceFooter`, tokens de tema. CTAs **Volver al inicio** + **Reintentar** (reload = recovery).
+- **Copy:** namespace `underMaintenance` (es-CL/en-US) con **5 variantes rotativas** (crypto-random al refrescar, patrón 404/401). Ilustración Efeonce propietaria adoptada del AXIS DS → `public/images/illustrations/characters/greenhouse-maintenance.png`.
+- **Gate:** `middleware.ts` + `src/config/maintenance.ts` (SSOT). Default **OFF** (zero behavior change al mergear); **fail-open**; allowlist (`/maintenance`, `_next`, `/api/auth`, `/api/health`, assets); bypass operador `?gh_bypass=<secret>`→cookie httpOnly; **503 + Retry-After + no-store**.
+- **Evidencia:** tsc 0 + lint clean; gate ON **7/7** curl tests (503 gateado, `/maintenance` 200 sin loop, allowlist 200, asset 200, bypass correcto setea cookie, bypass incorrecto 503, cookie persiste); `pnpm build` **BUILD_EXIT=0** con `ƒ Proxy (Middleware)`; GVC desktop+mobile enterprise (`.captures/2026-06-07T00-02-22_inline-maintenance`, `…T00-05-18…` mobile). Skills: greenhouse-ux, modern-ui, greenhouse-ux-writing, arch-architect.
+- **Commit:** `16bb15dac feat(ui): AXIS Under Maintenance misc page + maintenance gate` (solo mis 10 archivos; el trabajo de primitives/charts quedó sin tocar).
+- **Riesgo conocido:** con mantenimiento global ON, "Volver al inicio" recarga `/maintenance` (todo gateado); la acción útil es "Reintentar". Se dejó así por consistencia con la familia.
+- **Extensibilidad documentada:** el `middleware.ts` es de propósito general (capa edge-global, singleton del framework). Doc canónica `docs/documentation/plataforma/middleware-edge.md` lista usos futuros (geo/locale, rate limit, A/B, security headers globales, redirects masivos, bloqueo bot/IP) + reglas (1 función por responsabilidad encadenada, default-OFF + fail-open, cero DB/IO por request, NUNCA un 2º middleware).
+- **Estado: code complete, rollout pendiente.** El gate NO se encendió en ningún ambiente. **Próximo paso (owner: operador):** para activar una mantención → setear `MAINTENANCE_MODE=true` (+ `MAINTENANCE_BYPASS_SECRET=$(openssl rand -hex 32)`) en el target + redeploy; para cerrar → `MAINTENANCE_MODE=false` + redeploy. Runbook: `docs/manual-de-uso/plataforma/modo-mantenimiento.md`.
+
+---
+
+# Sesion 2026-06-07 — Greenhouse chart primitives + Charts Lab
+
+Por pedido del operador se abrió una nueva página de charts bajo el Design System interno y se implementaron tres diseños AXIS Figma como primitives reutilizables, no como composiciones route-locales: `Earning Reports` semanal (`yyMksCoijfMaIoYplXKZaR`, node `6717:211725`), `Earning Reports` anual (node `6717:214469`) y `Vehicles overview` (node `6717:215195`).
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseMetricBreakdownChartCard.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato V1:** `variant='weeklyBarSummary'`, kinds `earningReports/financialSnapshot/operationalSnapshot/custom`, KPI hero + delta + descripcion, bar chart semanal Recharts, metric meters MUI con `role='meter'`, tooltip accesible, responsive mobile, `data-capture`, `aria-label` conciso + `aria-describedby` compacto.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseChartCard.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato V1:** `variant='monthlyBar'`, kinds `earningReports/operationalMetric/financialMetric/custom`, tabs semánticos con `id/label/icon/data/tone/highlightedIndex`, bar chart mensual Recharts, tooltip accesible, responsive mobile, `data-capture`, `aria-label` conciso + `aria-describedby` compacto.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseStackedDistributionChartCard.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato V1:** `variant='stackedStatus'`, kinds `vehiclesOverview/workflowDistribution/capacityDistribution/custom`, segmentos ordenados con `id/label/value/detail/icon/tone`, stacked horizontal bar Recharts, rows operativas MUI, tooltip, responsive mobile y `aria-describedby` compacto.
+- **Fix importante de a11y/layout:** se reemplazó la tabla sr-only inicial por una descripción oculta 1x1. Medición Playwright confirmó `tablesCount=0` y descripción `1x1`; esto elimina la caja absoluta grande que podía explicar el espacio raro observado en mobile.
+- **Lab interno:** `/admin/design-system/charts`, gateado igual que `/admin/design-system` por `administracion.design_system` y defensa `tenantType !== client`.
+- **Reachability:** link "Ver charts" agregado en `DesignSystemView` + child route declarada en `src/lib/navigation/route-reachability-manifest.ts`.
+- **Scenario GVC:** `scripts/frontend/scenarios/design-system-charts.scenario.ts`.
+- **URL local actual:** `http://localhost:3001/admin/design-system/charts` (hay dev server vivo en 3001; 3000 no estaba escuchando).
+- **Evidencia GVC final:** `.captures/2026-06-07T00-48-13_design-system-charts` desktop + mobile, revisado visualmente; el nuevo card semanal no muestra espacio phantom y mobile apila los metric meters sin colisiones.
+- **Gates verdes:** vitest de las tres primitives, eslint focal, `gtimeout 120s pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm design:lint`, `pnpm docs:closure-check` (solo info CLIENT_CHANGELOG; no aplica por surface interna) y `git diff --check`.
+
+# Sesion 2026-06-06 — Greenhouse microinteraction primitives V1
+
+Por pedido del operador de continuar primitives de microinteracciones aparte de loaders, se canonizo el set V1 de microinteracciones: accion async, feedback post-accion, transiciones de estado y validacion inline.
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseAsyncActionButton.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato:** estados `idle`, `loading`, `success`, `error`; labels por estado; `aria-live`, `aria-busy` en loading, `data-state`, reduced-motion, proteccion contra doble submit por default y polish enterprise (sombra/focus/pressed/spinner estable).
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseCommandFeedback.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato:** tonos `success`, `error`, `warning`, `info`, `retrying`; `role=status` o `role=alert` para error; CTA opcional; timestamp/reference id; compact mode.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseStateTransition.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato:** tonos `success`, `warning`, `error`, `info`, `neutral`; variants funcionales `surface` e `inline`; `fromLabel -> toLabel`; title/description/timestamp/reference id; `role=status` o `role=alert` para error; live region y reduced-motion.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseInlineValidation.tsx`, exportada desde `@/components/greenhouse/primitives`.
+- **Contrato:** estados `idle`, `checking`, `valid`, `warning`, `error`, `blocked`; variants funcionales `field`, `section`, `summary`, `asyncCheck`; `role=status` o `role=alert` para error/blocked; live region, progress async y reduced-motion.
+- **Uso esperado:** commands puntuales como guardar, enviar, aprobar, generar, validar o reintentar; transiciones visibles de row/card/panel como pendiente→aprobado, esperando callback→sincronizado o progreso→bloqueado; validaciones locales/async cerca de campos, secciones o summaries. No reemplaza procesos largos multi-step, timelines de auditoria completos, maker-checker ni confirmaciones destructivas/legales/financieras.
+- **Canon de variants:** `GREENHOUSE_UI_PLATFORM_V1.md` v1.21 declara la matriz V1 de primitives + states/tones + variants oficiales. Nuevas variants deben iterarse en estas primitives + lab antes de crear componentes paralelos (`FooSubmitButton`, `FooValidation`, etc.).
+- **Polish por feedback operador:** se retiraron las barras verticales laterales de `GreenhouseStateTransition` y `GreenhouseInlineValidation`; el estado ahora se comunica con icon capsule, border/tint/halo sutil y texto, porque el stripe leia generico/template.
+- **Lab interno:** `/admin/design-system/microinteractions`, enlazado desde `/admin/design-system`, gateado por `administracion.design_system`.
+- **Scenario GVC:** `design-system-microinteractions`.
+- **GVC final:** `.captures/2026-06-06T23-46-53_design-system-microinteractions` desktop + mobile, `qualityFindings=[]`, revisado visualmente.
+- **Gates verdes:** eslint focal, vitest focal de primitives (18/18), `gtimeout 150s pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm design:lint`, `pnpm docs:closure-check` (warning advisory esperado por UI visible + GVC/docs cubiertos), `git diff --check`.
+- **Commits previos:** `8de60dd21 feat: add greenhouse microinteraction primitives`, `635bf0dfd feat: add inline validation microinteraction primitive` y `383a83528 fix: refine inline validation affordance` pusheados a `origin/develop`.
+- **Estado:** V1 base cerrada; V1.1 enterprise extension en progreso local.
+
+## Extension V1.1 — primitives enterprise en progreso local
+
+Por pedido del operador se agregaron cuatro primitives adicionales de microinteraccion con foco enterprise: procedencia de datos, progreso compacto, evidencia/upload y decision inline.
+
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseFieldProvenancePeek.tsx`.
+- **Contrato:** `source` (`integration/manual/calculated/override/seeded/fallback/system`), `confidence` (`verified/high/medium/low/unknown`), `freshness` (`live/recent/stale/partial/unknown`), variants `icon/chip/inline`, Floating UI no-modal, focus return, reference id/notas y data-capture.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseStepperProgressMicro.tsx`.
+- **Contrato:** steps con estados `pending/active/complete/warning/error/blocked`, variants `horizontal/vertical/compact`, live region, `aria-current='step'`, reduced-motion.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseEvidenceAttachmentDropzone.tsx`.
+- **Contrato:** estados `idle/dragging/uploading/scanning/verified/rejected/disabled`, variants `panel/compact`, progress, file summary, browse/replace/remove; no implementa endpoints ni negocio de vault/scan.
+- **Primitive:** `src/components/greenhouse/primitives/GreenhouseInlineDecisionPrompt.tsx`.
+- **Contrato:** tones `info/warning/error/success/neutral`, states `idle/reviewing/submitting/confirmed/blocked`, variants `choice/confirmation/impact`, actions primaria/secundaria/terciaria y lista de impacto.
+- **Lab interno:** `/admin/design-system/microinteractions` actualizado con ejemplos de procedencia HubSpot/override/calculo, pipeline documental, payroll readiness, handoff externo, evidencia y prompts inline.
+- **Docs:** `GREENHOUSE_UI_PLATFORM_V1.md` v1.22, `project_context.md` y `changelog.md` sincronizados.
+- **GVC final:** `.captures/2026-06-07T00-16-32_design-system-microinteractions` desktop + mobile revisado. Ajustes aplicados tras GVC: procedencia como field row real, steppers/evidence/decisions con composicion de mayor ancho y decision prompts a ancho completo.
+- **Gates parciales verdes:** eslint focal, tsc focal/global, nuevas tests focales (18/18) y microinteraction suite (47/47). El operador pidio canonizar, documentar y hacer commit+push; cerrar con commit selectivo excluyendo cambios ajenos de maintenance.
+
+# Sesion 2026-06-06 — Sistema de tipografía CERRADO end-to-end (TASK-1038 + 4 follow-ups, pusheado)
+
+Arco completo del sistema de tipografía sobre el SoT de TASK-1036. **Todo shipped + pusheado a develop**; TASK-1038 y sus 4 follow-ups **cerrados** (`complete`). Estado final:
+
+- **TASK-1038 (escala) ✅** — flip en `typographyScale`: **page-title 16→20** (arregla la inversión page-title < section-title), **section-title 18→16**, subheader/subtitle1 15→14, **label-md/button 15→14**, controlText.md 15→14 / lg 17→16. Ladder 11→**8** (12·13·14·16·20·24·28·32), 0 nuevos/renombrados. subtitle2 (~267 consumidores)→`body-sm`; Tab 18→14; Dialog title h6→section-title 16.
+- **TASK-1039 (peso 500) ✅ won't-do** — evaluado con comparación live (mockup 5b + GVC) y descartado: imperceptible a 14px + ya rinde vía Vuexy. Récord de decisión en el mockup.
+- **TASK-1040 (PDF Geist 600/800) 🔨** — familias `SemiBold`(600)+`ExtraBold`(800) registradas (`.ttf` locales gstatic v5). Corrigió el claim "cae a Helvetica" (es family-name-based → aproxima con Bold/Medium). **Pendiente (slice opcional):** migrar componentes PDF a usar las familias.
+- **TASK-1041 (charts) ✅** — los **43 charts** (Apex 33 + Recharts 10; ECharts no se usa) consumen familia+tamaño del **SoT desde un solo lugar** vía los wrappers `AppReactApexCharts`+`AppRecharts` (CSS `!important` leyendo `theme.typography`, 100% cobertura, 0 bypass). 2 archivos, no el sweep de 47. Helper `getChartTypographyFromTheme` para ECharts canvas.
+- **TASK-1042 (drift-guard) ✅** — el guard se extendió a la **prosa de DESIGN.md + tabla V1 §15.1** (antes solo front-matter, que dejó driftear "15px/17px" en prosa + la tabla V1 entera pre-rediseño). Todo `Npx`/`Nrem` en prosa+V1 debe ser un tamaño vigente del SoT (set de tokens activos, no primitivos huérfanos). Verificado contra drift inyectado.
+- **Consolidación + unidades** — lint rule `no-fontsize-inline-typography` + rule-tests en CI (`pnpm test:lint-rules`, cerró un test roto que nunca corría). DESIGN.md/V1/skills sincronizados (fix §15.1). **DESIGN.md es agent-facing** → prosa `px→rem`; **`letter-spacing` del SoT `px→em`** (escala con la fuente). Sistema de unidades coherente: **font-size rem · line-height unitless · letter-spacing em · borders/1px px**.
+- **Gates:** drift-guard 57 verde, design:lint 0/0, tsc 0, ops:lint verde. Specs: `docs/tasks/complete/TASK-1038..1042-*.md`.
+
+# Sesion 2026-06-06 — TASK-1037 Greenhouse Loading Primitive System (Slice 1)
+
+Por pedido del operador de construir loaders modernos sin limitarse a microinteracciones pobres existentes, se creo `TASK-1037` y se implemento la primera base de plataforma.
+
+- **Task:** `docs/tasks/in-progress/TASK-1037-greenhouse-loading-primitive-system.md` (P1, UI platform/design-system/accessibility).
+- **Primitive:** `GreenhouseLoadingSurface` en `src/components/greenhouse/primitives/GreenhouseLoadingSurface.tsx`, exportada desde el barrel.
+- **Variants V1/V1.1:** `pageSkeleton`, `panelSkeleton`, `tableSkeleton`, `inlineAction`, `brandSplash`, `aiThinking`, `progressRail`, `documentPipeline`, `externalHandoff`, `secureAction`, `uploadVerification`, `reconciliationMatching`.
+- **Named reusable components:** cada variant tiene componente propio exportado desde `@/components/greenhouse/primitives`: `GreenhousePageSkeletonLoader`, `GreenhousePanelSkeletonLoader`, `GreenhouseTableSkeletonLoader`, `GreenhouseInlineActionLoader`, `GreenhouseWorkspaceBootLoader`, `GreenhouseNexaReasoningLoader`, `GreenhouseCheckpointRailLoader`, `GreenhouseDocumentPipelineLoader`, `GreenhouseExternalHandoffLoader`, `GreenhouseSecureActionLoader`, `GreenhouseUploadVerificationLoader`, `GreenhouseReconciliationMatchingLoader`.
+- **Expansion enterprise:** la primitive ahora cubre jobs operativos reales: generacion/render de documentos, handoff a proveedor/callback, acciones sensibles con auditoria, verificacion de uploads/evidencia y matching/conciliacion financiera. `aiThinking` quedo refinado con checkpoints internos para drafting/advisory states.
+- **Loading Lab:** `/admin/design-system/loaders` aloja el laboratorio interno como child surface del Design System; `/admin/design-system` queda como canon AXIS con link hacia loaders. Sigue gateado por `administracion.design_system`; clientes no lo ven.
+- **Regla de plataforma:** reutilizar stack Greenhouse no significa heredar loaders mediocres. Para route/panel/table/IA/brand/documento/proveedor/accion segura/upload/conciliacion loading, extender la primitive antes de crear otro loader local; `CircularProgress` queda tolerado solo para casos puntuales inline mientras se migra.
+- **GVC final:** `.captures/2026-06-06T23-03-37_design-system-loaders` desktop + mobile, `qualityFindings=[]`, revisado visualmente con metadata de componentes nombrados. Capturas previas de separacion: `.captures/2026-06-06T18-12-28_design-system` y `.captures/2026-06-06T18-13-15_design-system-loaders`.
+- **Gates verdes:** `pnpm vitest run src/components/greenhouse/primitives/__tests__/GreenhouseLoadingSurface.test.tsx` (26/26), eslint focal, `gtimeout 150s pnpm exec tsc --noEmit --pretty false`, `pnpm route-reachability-gate --strict`, `pnpm design:lint`, `pnpm task:lint --task TASK-1037`.
+- **Pendiente:** Slice 2 pilotos (`/auth/landing/loading.tsx` brandSplash, un route skeleton, un estado IA/Nexa) + posible refinamiento visual tras feedback operador. No mover a complete todavia.
+
+# Sesion 2026-06-06 — TASK-1036 typography SoT + drift-guard (S0+S1, local-first, sin push)
+
+Spin-off de TASK-1034. Resuelve la deuda tipografica del audit `TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md` con el mismo patron que TASK-1034 uso para color (SoT + drift-guard). Trabajado **local-first, sin push** (espera confirmacion del operador). Task movida a `in-progress/`.
+
+**Reencuadre verificado contra el runtime real (importante — el audit que yo mismo escribi sobre-dimensiono L2):** el coretheme Vuexy `src/@core/theme/typography.ts` **SI** define los `fontSize` de `h5` (1.125rem), `h6`/`subtitle1`/`button` (0.9375rem) y `mergedTheme` los hereda por `deepmerge`. O sea el runtime YA coincidia con el contrato — NO habia "drift activo". La deuda real es de **gobernanza**: esos valores vivian en `@core` (read-only) fuera del SoT de Greenhouse y nada los pineaba (rompible en silencio en un upgrade de Vuexy). Por eso S0/S1 son **no-op visual** (ownership + guard), no fix de valores.
+
+- **S0 — SoT + rewire no-op + drift-guard.** Extendido `src/components/theme/typography-tokens.ts` (mismo archivo que `lineHeights`) con primitivos (`fontFamilies`/`fontWeights`/`fontSizes`/`letterSpacings`/`fontFeatures`) + `typographyScale` (SoT compuesto, keyed por nombre semantico del contrato) + `TYPOGRAPHY_VARIANT_BRIDGE` (contrato↔variante MUI, 1:1, como CODIGO no tabla manual). `mergedTheme` spread-ea el SoT para las variantes que ya seteaba explicito (h1-h4, body1/2, caption, overline, mono*, kpi). Nuevo `typography-drift.test.ts` (espejo de `axis-semantic-drift.test.ts`): pins del SoT + runtime≡SoT (construye el theme real via `createTheme(mergedTheme(...))`, mockeando `next/font/google`) + DESIGN.md front-matter≡SoT (parsea el YAML). Unico delta de valor en todo S0: `overline.lineHeight` 1.16667→1.167 (sub-pixel, alinea al contrato).
+- **S1 — ownership explicito + bridge completo.** `mergedTheme` ahora setea `h5`={...sectionTitle}, `h6`={...labelMd}, `subtitle1`={...subheader}, `button`={...labelMd, textTransform:none} desde el SoT — corta la dependencia silenciosa de `@core`. Agregado token runtime-only `subheader` (para subtitle1, 0.9375/400, sin equivalente en el contrato) + `SECONDARY_VARIANT_TOKENS` (h6 reusa label-md, fuera del bridge 1:1). Drift-guard extendido al bridge completo (14 tokens) + secundarios → **34 tests verdes**. Unico delta de valor en S1: `button.lineHeight` 1.467→1.5 (linea unica, sin efecto visible).
+- **Decisiones de diseño (AskUserQuestion del operador):** (1) reencuadre L2 confirmado (S0/S1 no-op de gobernanza); (2) L1 vocabulario = **bridge verificado en CI**, NO rename de variantes (blast-radius); (3) S2 = hacer SoT+override, GVC sweep, decidir flag tras mirar.
+- **Verificacion:** `pnpm vitest run src/components/theme/typography-drift.test.ts` = 34/34; `pnpm local:check` (lint full + tsc) verde; `pnpm design:lint` 0/0/1 (DESIGN.md sin tocar aun); sin tests del repo dependientes de valores de `theme.typography`.
+- **Archivos:** `src/components/theme/{typography-tokens.ts, mergedTheme.ts, typography-drift.test.ts}` + lifecycle (`docs/tasks/{in-progress}/TASK-1036-*.md`, README). **Nada commiteado/pusheado** — pendiente confirmacion del operador.
+- **PENDIENTE (checkpoint):** S2 (ramp control-text — Button large 17px / Chip 13/15px / input via mergedTheme; UNICO slice visible) requiere review visual GVC del operador + decision de flag + decision Button-large 17px vs label-lg 16px. Luego S3 (formalizar bridge L1) + S4 (re-incorporar `label-lg`/`label-sm` corregidos a DESIGN.md con respaldo real + sync V1 §3.2/§15.1).
+
+# Sesion 2026-06-06 — TASK-1034 canoniza la paleta AXIS como superficie interna `/admin/design-system`
+
+Por pedido del operador ("mas que mockup quiero canonizarlo" + "esto no tienen que verlo los clientes"), el mockup de paleta completa se promovio a una superficie real gobernada **INTERNA**. Commit `9437dbe7c` en `develop`.
+
+- **Link local:** `http://localhost:3000/admin/design-system` (el `/admin/axis-palette/mockup` ya no existe — movido).
+- **Ruta + vista:** `git mv` de `admin/axis-palette/mockup/page.tsx` → `admin/design-system/page.tsx` y `AxisPaletteMockupView` → `DesignSystemView` (fuera de `/mockup`). Heading "Paleta AXIS — referencia completa" + referencia Figma SoT (`yyMksCoijfMaIoYplXKZaR` / `11205:5341`) + nota "interna, no para clientes". Renderiza los ramps live desde `axis-tokens.ts`.
+- **Guard:** `getTenantContext` → `/login` sin sesion → `/401` si `tenantType==='client'` → `hasAuthorizedViewCode('administracion.design_system', fallback routeGroups.includes('internal'))` else `/401`.
+- **Gobernanza View Registry (TASK-827):** viewCode `administracion.design_system` (routeGroup `internal`) en `VIEW_REGISTRY` + migracion `20260606164637875_task-1034-seed-design-system-view.sql` **aplicada** (`view_registry` + `role_view_assignments` a **9 roles internos**, NO `client_*`).
+- **Nav (TASK-982):** item bajo Administracion gateado por `canSeeView('administracion.design_system', false)` + keys en `GH_INTERNAL_NAV` / `greenhouse-navigation-copy`.
+- **GVC:** `/admin/design-system` = 200, render correcto.
+- **Dos bloqueos resueltos:** (1) `git mv` stageo el blob VIEJO (rename preserva contenido) → re-`git add` de los 3 movidos para que staged == working tree (sino lint `no-runtime-mockup-import`); (2) pre-push tsc fallaba por `.next/dev/types/{routes.d.ts,validator.ts}` corruptos (dual-write del dev server al regenerar el manifest tras mover la ruta) → `rm` de los 2 scratch (Turbopack los regenera; tsconfig globs toleran ausentes) → tsc exit 0. NO es codigo mio; CI compila `.next` limpio.
+- **Docs sync:** `CLAUDE.md`, `AGENTS.md`, este `Handoff.md`, TASK-1034 spec, memoria `project_axis_palette_adoption.md`.
+- **Verificacion:** pre-commit lint ✓, pre-push lint+tsc ✓, `pnpm design:lint` 0/0/1, `db.d.ts` sin cambios.
+- **Pendiente separado:** TASK-1036 (deuda tipografica), ya en `to-do/`.
+
+# Sesion 2026-06-06 — Greenhouse Operating Loop V1
+
+Por recomendacion del proceso operativo, se canonizo el nombre **Greenhouse Operating Loop** para el ciclo `intake -> taxonomy -> plan -> execution -> verification -> closure -> handoff`, y se agrego una primera capa de enforcement para epics y mini-tasks, separada de `task:lint`.
+
+- **Fuente canonica:** `docs/operations/GREENHOUSE_OPERATING_LOOP_V1.md`.
+- **Scripts nuevos:** `pnpm epic:lint`, `pnpm mini:lint`, `pnpm ops:lint`, `pnpm ops:lint:test`.
+- **Runtime tooling:** `scripts/ci/ops-artifact-lint.mjs` valida lifecycle/carpeta, secciones obligatorias, status fields, checkboxes, registry y next ID para `EPIC-###` y `MINI-###`.
+- **Orquestador:** `scripts/ci/ops-lint.mjs` corre `task:lint` + `epic:lint` + `mini:lint` con flags compartidos como `--changed`, `--active` y `--strict`.
+- **Scope V1:** cubre estructura/paridad documental; no reemplaza cierre semantico, verification real ni `docs:closure-check`.
+- **Tests:** `scripts/ci/__tests__/ops-artifact-lint.test.mjs`.
+
+# Sesion 2026-06-06 — TASK-1033 Floating Surface Primitive tomada
+
+Por pedido del operador, se empezo a ejecutar `TASK-1033` en el checkout actual y **sin worktree**.
+
+- **Hook Codex:** ejecutado `pnpm codex:task-hook TASK-1033 --prompt-only`; prompt activo confirma la regla anti-worktree.
+- **Lifecycle:** `docs/tasks/to-do/TASK-1033-greenhouse-floating-surface-primitive.md` movida a `docs/tasks/in-progress/TASK-1033-greenhouse-floating-surface-primitive.md`; indices sincronizados.
+- **Plan:** `docs/tasks/plans/TASK-1033-plan.md`.
+- **Checkpoint:** por `P1` + `Effort Medio`, el proceso exige aprobacion humana antes de escribir codigo de producto.
+- **Workspace:** branch actual `develop`, sin branch/worktree aislado por instruccion explicita del operador. No pushear automaticamente.
+- **Discovery:** gap confirmado: solo `TotalsLadder` y `CostProvenancePopover` usan Floating UI ad-hoc en producto; Vuexy menu queda infraestructura fuera de scope.
+- **Tooling fix aplicado durante checkpoint:** `pnpm task:lint --task TASK-1033` ya acepta IDs de 4+ digitos. Se actualizaron regex de `task-lint`/parser/registry/next-id y tests focales; `TASK-1033` ademas fue normalizada con `Acceptance Criteria` y `Closing Protocol`.
+
+# Sesion 2026-06-06 — Hook pre-ejecucion TASK-* para Codex solamente
+
+Por pedido del operador, se formalizo que el prompt robusto de ejecucion se active para **Codex** antes de implementar tasks formales `TASK-*`, sin aplicarlo a todo trabajo pequeño o conversacional ni imponerlo a Cursor/Claude.
+
+- **Mecanico:** nuevo comando `pnpm codex:task-hook TASK-###` (`scripts/codex-task-hook.mjs`) resuelve la task activa, bloquea tasks completas/bloqueadas y emite el prompt canonico sustituido. Para la excepcion `mantente en develop`, usar `pnpm codex:task-hook TASK-### --develop`.
+- **Skill Codex-only:** `.codex/skills/greenhouse-task-execution-hook/SKILL.md` apunta al comando para que sesiones futuras lo carguen como capacidad especifica de Codex.
+- **Canonico:** `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` ahora declara el hook operativo: cualquier pedido a Codex con `TASK-###`, `[TASK-###]` o ruta `docs/tasks/**/TASK-###-*.md` obliga a ejecutar el comando antes de escribir codigo.
+- **Versionamiento:** `CODEX_EXECUTION_PROMPT_V1.md` ahora declara politica de mantenimiento: ajustes compatibles (skills, docs, wording, checks aditivos, comando hook compatible) se quedan en V1; cambios estructurales de trigger, orden/obligatoriedad de fases, formato Audit/Plan/cierre, branch/checkpoint/ownership, skill routing/subagentes o source-of-truth requieren crear `CODEX_EXECUTION_PROMPT_V2.md`.
+- **Scope:** aplica solo a Codex y solo a tasks formales `TASK-*`; no obliga automaticamente a Cursor, Claude u otros agentes; no aplica a preguntas generales, brainstorming, mini-tasks o issues salvo pedido explicito.
+- **Branch override:** si el operador dice `mantente en develop`, eso overridea la branch convention de Codex; Codex debe documentar la excepcion en Audit/Plan/Handoff y no pushear a develop como cierre automatico sin confirmacion humana.
+- **Worktree policy:** tras feedback del operador, Codex NO debe crear worktrees/folders clon por defecto para ejecutar tasks. Solo con pedido/aprobacion explicita en la sesion; si se crea por excepcion, debe limpiarse al cerrar. Se elimino el worktree temporal `../greenhouse-eo-task-1033` y la branch `task/TASK-1033-greenhouse-floating-surface-primitive` creados por error en esta prueba.
+- **Docs sync:** `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `changelog.md`.
+- **Verificacion:** `pnpm codex:task-hook TASK-1033 --develop --prompt-only`, `pnpm docs:closure-check`, `pnpm docs:context-check`, `git diff --check`.
+
+# Sesion 2026-06-06 — TASK-1035 Dashboard Floating Action Dock complete
+
+Por feedback del operador sobre solapamientos globales entre botones flotantes y contenido/footer, se creó y completó `TASK-1035` en la misma sesión.
+
+- **Task:** `docs/tasks/complete/TASK-1035-dashboard-floating-action-dock-shell-collision-model.md`.
+- **Runtime:** nueva primitive `ShellFloatingActionDock` exportada desde `@/components/greenhouse/primitives`.
+- **Consumers migrados:** `src/app/(dashboard)/layout.tsx` monta `ScrollToTop` + `NexaFloatingButton` dentro del dock; ambos mantienen fallback legacy cuando no se usan docked.
+- **Safe-area contract:** el dock publica `--gh-floating-actions-*`; `BilingualReviewDesk` reemplazó el workaround local `pr: 10` por `--gh-floating-actions-safe-inline-size`.
+- **Boundary:** dock = acciones persistentes del viewport; `TASK-1033` = Floating Surface anclada con `@floating-ui/react`; `AdaptiveSidecar` sigue siendo owner de lanes full-height.
+- **Docs sync:** `GREENHOUSE_UI_PLATFORM_V1.md` v1.16, `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, `changelog.md`, `project_context.md`.
+- **Evidencia GVC principal:** `.captures/2026-06-06T14-27-50_dashboard-floating-action-dock` desktop+mobile (`initial-dock`, `bottom-with-scroll-top`, `nexa-open-from-dock`) — visualmente verde.
+- **Evidencia adicional:** `workforce-contracting-studio-runtime` se intentó y generó frames en `.captures/2026-06-06T14-28-51_workforce-contracting-studio-runtime`, pero falló por axe preexistente (`color-contrast`, `image-alt`) en command center, no por el dock.
+- **Browser MCP:** `http://localhost:3000/agency` abrió sin errores de consola; solo warning dev-only de preload font.
+- **Gates verdes:** eslint focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm task:lint --changed`.
+
+# Sesion 2026-06-06 — CI failure root-cause fix: commercial-cost worker + Playwright
+
+Se investigaron fallos GitHub Actions reportados en `develop`:
+
+- **Commercial Cost Worker Deploy** run `27061373156` falló después de construir la imagen correctamente. Causa raíz: carrera de IAM en Secret Manager (`gcloud secrets add-iam-policy-binding` → `409 concurrent policy changes`) mientras otros deploys podían mutar policies compartidas. Fix robusto: nuevo helper compartido `services/_shared/gcloud-secret-iam.sh` con check previo del binding + retry/backoff acotado para `409`/`ABORTED`, fallando loud en errores permanentes. Lo consumen `ops-worker`, `commercial-cost-worker` y `hubspot_greenhouse_integration`. Tests de contrato en `services/_shared/gcloud-secret-iam.test.ts`.
+- **Playwright E2E smoke** run `27063580470` falló por `GET /admin/operations returned 404` en `finance-cash-out-bank-reflection.spec.ts`. Causa raíz: drift de ruta legacy; la surface canónica ya es `/admin/ops-health`, pero runtime/copy/tests seguían enseñando `/admin/operations`. Fix robusto: `src/app/(dashboard)/admin/operations/page.tsx` redirige a `/admin/ops-health`, route manifest declara alias legacy, y referencias runtime visibles se movieron a `/admin/ops-health`. El spec Playwright afectado ahora valida la ruta canónica.
+- **Verificación local:** `pnpm vitest run services/_shared/gcloud-secret-iam.test.ts services/ops-worker/deploy-contract.test.ts` OK; `pnpm exec eslint ...` focal OK; `pnpm exec tsc --noEmit --pretty false` OK; `pnpm route-reachability-gate --strict` OK; `git diff --check` OK.
+- **Verificación Playwright staging:** aunque la shell no exporta esos env vars, `.env.local` sí contiene `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL` y `VERCEL_AUTOMATION_BYPASS_SECRET`, y `playwright.config.ts` los carga. Faltaba solo indicar `PLAYWRIGHT_BASE_URL` para reproducir staging. Comando verificado: `PLAYWRIGHT_BASE_URL=https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app pnpm exec playwright test tests/e2e/smoke/finance-cash-out-bank-reflection.spec.ts --project=chromium --workers=1` → 3/3 passed.
+- **Playwright staging contract hardening:** se agregó `pnpm test:e2e:staging` (`scripts/playwright-staging.mjs`) como entrypoint canónico. Reusa `scripts/lib/vercel-staging-access.mjs`, el mismo resolver de bypass/agent auth que `staging-request.mjs`, setea `PLAYWRIGHT_BASE_URL`/`AGENT_AUTH_BASE_URL` solo para el proceso hijo y no imprime secretos. `scripts/playwright-auth-setup.mjs` ahora carga `.env.local`/`.env` standalone y también respeta `PLAYWRIGHT_BASE_URL`.
+- **Verificación remota:** CI general run `27063580473` en GitHub está verde; Playwright remoto seguirá rojo hasta que este cambio se pushee y corra contra staging.
+
+# Sesion 2026-06-06 — TASK-1034 adopción paleta AXIS (Slices 0–2b DONE, Slice 3 pendiente)
+
+Greenhouse adopta **toda** la paleta de AXIS (Design System de Efeonce, Figma `yyMksCoijfMaIoYplXKZaR`). Pipeline canónico: AXIS (SoT) → `src/@core/theme/axis-tokens.ts` (primitivos espejo 1:1) → `src/@core/theme/axis-semantic.ts` (ramp→rol MUI) → `colorSchemes.light/dark.palette` en `mergedTheme.ts`; primitivos completos en runtime via `theme.axis.{ramp,opacity,neutral}` (augmentation `src/components/theme/types.ts`). Spec: `docs/tasks/in-progress/TASK-1034-axis-full-palette-adoption.md`. Memoria: `project_axis_palette_adoption.md`.
+
+- **Decisiones operador:** sync = pipeline desde Figma; alcance = solo Efeonce/GreenHouse (no Kortex/Verk); huecos a11y = fix en código, reconciliar con AXIS después.
+- **AXIS naming canonizado** (commit `8dee9e5f`): el DS se llama **AXIS** — en DESIGN.md `designSystem: AXIS` + memoria.
+- **Slices 0–2b DONE (semánticos AA-completos):** success `#28c76f`, warning `#ffb703`, info `#00bad1` con contrastText ink `#2f2b3d` (fills brillantes fallan con blanco); **error `#cc3d41`** (AXIS error-800, blanco 4.87:1 — el vibrante `#ff4c51` es `error.light`; desviación a11y deliberada porque error-500 no admite texto AA como fill). `primary`/`secondary`/neutrales/`customColors` INTACTOS. Verificado por sonda Playwright de color computado (NO confiar en thumbnails GVC): btn/alert/chip error = 4.87:1. Gate `design:lint` 0/0/1, tsc, lint verdes.
+- **Mockups de verificación** (no tocan theme): `/admin/axis-palette/mockup` (paleta completa — patrón Tailwind: tile color puro + label DEBAJO sobre fondo card, NUNCA texto sobre el color, garantiza ≥4.97:1), `/admin/theme-preview/mockup` (Alert/Button/Chip reales con palette), `/admin/semantic-colors/mockup` (A/B inicial).
+- **Docs sync:** DESIGN.md (semánticos + chips error/info), `GREENHOUSE_DESIGN_TOKENS_V1.md` §8.1.
+- **⏳ Slice 3 (PRÓXIMO, alto blast-radius):** neutrales AXIS (light bg `#f8f7fa`/text `#2f2b3d` alpha; dark bg `#25293c`/paper `#2f3349`/text `#e1def5`). Cambia el tono de TODA la app, sobre todo **dark** (navy→púrpura-navy Vuexy). Plan: GVC light **y dark** + review operador; posible flag de rollout. DESIGN.md text usa alpha en AXIS → en el contrato usar sólido representativo para el gate.
+- **⏳ Slice 4:** migrar `customColors.{neonLime,sunsetOrange,crimson}` legacy (ya no son mirror; ~41 archivos) + drift guard. **⏳ Slice 5:** shadows AXIS.
+- **Gate crítico recordatorio:** NO meter ramps 100-900 al front-matter de DESIGN.md (`orphanedTokens` bloquea); `contrastCheck` valida pares de los 20 componentes ≥4.5 bajo `STRICT_WARNINGS=true`.
+
+# Sesion 2026-06-06 — TASK-1032 misc pages polish local (`/coming-soon` + `/401`)
+
+Se continuo el fine-tuning visual local de las misc pages iniciadas por Claude/Codex, usando skills de product design + GVC loop.
+
+- `/coming-soon`: se compacto el ritmo desktop sin cambiar el contrato funcional: H1 sin letter spacing negativo, menor aire subtitulo→countdown→CTA, cards countdown un poco mas densas, link "¿Prefieres otro correo?" de menor enfasis y personaje mas integrado. Nueva pasada enterprise: 5 variantes de microcopy creativo+funcional seleccionadas **una vez al entrar** (sin rotacion mientras lee), estructura escaneable `title` → `status` → `recovery`, countdown menos pesado y densidad mobile ajustada **sin achicar Nexa**. Evidencia GVC final: `.captures/2026-06-06T13-09-32_coming-soon`.
+- `/404`: se alineo con la familia enterprise de `/401`: eyebrow canonico (`Pagina no encontrada` / `Page not found`), codigo hero con sombra sobria, descripcion contenida, acciones con iconos, secundario outline y personaje responsive controlado. Ultima iteracion: se redujo el peso visual del cluster superior (chip/codigo/titulo) y botones, se corrigio el centrado optico del chip frente al codigo, se devolvio presencia a Nexa sin volver al hero pesado y se agregaron 5 microcopys creativos+funcionales seleccionados **una vez al entrar** (sin carrusel). Nuevo scenario GVC: `scripts/frontend/scenarios/not-found.scenario.ts`; evidencia final: `.captures/2026-06-06T12-54-45_not-found` desktop + iPhone 13.
+- `/401`: pase enterprise manteniendo el **401** como protagonista. Se agrego eyebrow canonico (`Acceso restringido` / `Restricted access`), 5 variantes de microcopy creativo+funcional (`messages`) y seleccion aleatoria **una vez al entrar** (sin carrusel), accion secundaria `Volver atras`/`Go back`, iconos Tabler en acciones, boton secundario outline sobrio y personaje responsive sin colision con wordmark Efeonce. Ultima iteracion UX writing: el parrafo de permisos se dividio en microcopy escaneable `status` → `detail` → `recovery` para lectura rapida sin bajar el protagonismo del codigo; la linea de recuperacion usa jerarquia secundaria legible, no `text.disabled`. Tambien se bajo el peso visual del codigo/chip/botones y se devolvio presencia a Nexa sin volver al hero pesado. Nuevo scenario GVC: `scripts/frontend/scenarios/not-authorized.scenario.ts`; evidencia final: `.captures/2026-06-06T12-46-28_not-authorized` desktop + iPhone 13.
+- Skills UI actualizadas: `greenhouse-ux-content-accessibility`, `greenhouse-product-ui-architect` y `greenhouse-ui-enterprise-review` ahora declaran que 404/401/access-denied/unavailable routes son brand-and-recovery moments: microcopy creativo si mantiene causa+salida, variantes curadas seleccionadas una vez al entrar, copy en `src/lib/copy/*` y GVC como evidencia.
+- Gates verdes: `pnpm exec eslint src/views/ComingSoon.tsx src/views/NotFound.tsx src/views/NotAuthorized.tsx src/lib/copy/types.ts src/lib/copy/dictionaries/es-CL/comingSoon.ts src/lib/copy/dictionaries/en-US/comingSoon.ts src/lib/copy/dictionaries/es-CL/notFound.ts src/lib/copy/dictionaries/en-US/notFound.ts src/lib/copy/dictionaries/es-CL/notAuthorized.ts src/lib/copy/dictionaries/en-US/notAuthorized.ts scripts/frontend/scenarios/not-found.scenario.ts scripts/frontend/scenarios/not-authorized.scenario.ts`; `pnpm exec tsc --noEmit --pretty false`; `git diff --check`.
+- Docs sync: `changelog.md` + `docs/tasks/in-progress/TASK-1032-coming-soon-launch-page.md`. `pnpm docs:closure-check` habia pedido changelog/handoff/UI evidence; re-correr antes del cierre final si se siguen tocando files.
+- Pendiente: aprobacion visual final del operador, estados no capturados aun de `/coming-soon` (success, campo revelado, anonimo, dark), fecha real `COMING_SOON_LAUNCH_AT`, asset definitivo Efeonce, push/rollout gate.
+
+# Sesion 2026-06-06 — Floating UI / Greenhouse Floating Surface ADR + TASK-1033
+
+Por feedback del operador sobre usar mas `@floating-ui/react`, se formalizo la decision de plataforma:
+
+- **ADR aceptado:** `docs/architecture/GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md`.
+- **Task creada:** `docs/tasks/to-do/TASK-1033-greenhouse-floating-surface-primitive.md`.
+- **Decision:** Floating UI queda como engine canonico para superficies contextuales ancladas (rich tooltip, action menu, evidence peek, inline editor, validation bubble, command preview), pero expuesto via primitive Greenhouse, no imports ad-hoc en views.
+- **Boundary:** no reemplaza `AdaptiveSidecar` para carriles full-height ni `Dialog` para decisiones destructivas/legales/financieras.
+- **Docs sync:** `DECISIONS_INDEX`, `GREENHOUSE_UI_PLATFORM_V1`, `project_context`, `docs/tasks/README.md` y `TASK_ID_REGISTRY`.
+
+# Sesion 2026-06-06 — TASK-1032 Coming Soon / Launch page (in-progress, fine-tuning visual)
+
+Página **Coming Soon** branded (hermana de 404/401) con countdown + captura de email de lanzamiento gobernada. **Commit local hecho, sin push.** Spec completa + contexto para continuar: `docs/tasks/in-progress/TASK-1032-coming-soon-launch-page.md`.
+
+- **Estado:** code complete + **backend verificado e2e en vivo** (created → idempotent → invalid_email 422 → no-email 422). UI enterprise iterada en loop GVC. **Quedamos en fine-tuning del espaciado vertical** (el operador ajustando "compacto pero que respire").
+- **Decisiones locked:** form funcional con backend gobernado · audiencia ambas (pública anónima + gate interno) · countdown auto-redirect con `COMING_SOON_LAUNCH_AT` (placeholder hoy) · solo guardar + toast · **autenticado = "Notifícame" un-clic** + enlace "¿Prefieres otro correo?" (progressive disclosure) · anónimo = campo requerido · ilustración Figma **placeholder** (asset propietario Efeonce pendiente) · **Efeonce logo bottom-centered en las 3 misc pages** (`MiscPageEfeonceFooter`) · copy creativo bilingüe es-CL/en-US con metáfora invernadero + `🌱`.
+- **Backend:** migración `greenhouse_core.launch_notifications` **aplicada** al Cloud SQL dev + tipos regenerados; endpoint `/api/coming-soon/notify` (rate-limit IP hasheada + upsert idempotente + outbox sin PII); reusa `sync.outbox.dead_letter` (sin signal nuevo, documentado).
+- **404/401 también:** copy reescrito creativo+funcional bilingüe + montan el footer Efeonce.
+- **⚠️ Aprendizaje canonizado:** **MUI `sx` ignora los shorthands de margen lógico `mbe`/`mbs`** (no-ops) — usar `mb`/`mt`; `mbe-*` solo como clase Tailwind. Era la causa raíz del "se ve apretado". (Memoria + a documentar en CLAUDE.md/AGENTS.md por el documentation-governor.)
+- **Pendiente:** continuar fine-tuning visual (valores `mb` actuales: eyebrow 3 / headline 2 / subtítulo 4 / countdown 4) · fecha real env · ilustración definitiva Efeonce · capturar estados (éxito/revelado/anónimo/dark) · cierre documental (`greenhouse-documentation-governor`) · push + rollout gate cuando el operador apruebe.
+- **Nota sesión:** el visor de imágenes del tool llegó a tope de la sesión (rechaza frames); para volver al loop GVC visual conviene **sesión nueva**. Todo el trabajo persiste local.
+
+# Sesion 2026-06-06 — Adaptive Sidecar variants oficiales implementadas
+
+Se termino el modelado runtime de las variants oficiales de Adaptive Sidecar bajo la metodologia Primitive + Variants + Kinds. La base inicial fue `inspector`, `composer`, `assistant`; el contrato vigente se extendio a `reconciler`, `evidence` y `runbook`:
+
+- `adaptive-sidecar-controller.ts` ahora exporta `AdaptiveSidecarVariant` y `resolveAdaptiveSidecarVariant()`.
+- Mapeo canonico: `inspector/review/preview -> inspector`, `composer/form -> composer`, `assistant -> assistant`, `reconciler -> reconciler`, `evidence -> evidence`, `runbook -> runbook`; `variant` explicita puede overridear.
+- `ContextualSidecar` usa el resolver canonico y expone `data-sidecar-variant` estable para GVC/testing.
+- Mockup `/platform/adaptive-sidecar/mockup` ahora muestra las variants oficiales; `composer` tiene dirty-state guard, footer de guardado/descarte y wrappers Vuexy (`CustomTextField`, `CustomChip`), y las variants `reconciler/evidence/runbook` usan bloques reutilizables de señal, métricas, comparación, procedencia y pasos operacionales.
+- Scenario GVC desktop actualizado a `switch-to-composer` y a captura full viewport para panels fixed/viewport.
+- Evidencia GVC local: desktop `.captures/2026-06-06T10-24-01_adaptive-sidecar-platform-mockup`; mobile `.captures/2026-06-06T10-24-51_adaptive-sidecar-platform-mobile-mockup`.
+- Gates verdes: focal vitest 22/22, `pnpm exec tsc --noEmit --pretty false`, `pnpm task:lint --changed`, `git diff --check`.
+
+# Sesion 2026-06-06 — UI methodology canonizada: Primitive + Variants + Kinds
+
+Por feedback del operador durante TASK-1028, se canonizo la metodología **Primitive + Variants + Kinds** como contrato de desarrollo UI reusable:
+
+- **ADR aceptado:** `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`.
+- **Decision:** UI platform reusable se desarrolla como primitive estable + variants funcionales oficiales + kinds semanticos por consumidor. Variants no son skins; cambian comportamiento, densidad, estados, footer/actions y microinteracciones. Kinds no deben controlar layout directo: se resuelven a una variant.
+- **Shape canonico:** `<Primitive variant='inspector' kind='contractReview' />`.
+- **Aplicacion TASK-1028:** Adaptive Sidecar tiene 6 variants oficiales: `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, `runbook`; kinds como `form`, `review`, `preview`, reconciliacion, procedencia/evidencia y ejecucion guiada son aliases/casos semanticos que deben mapear a una variant oficial.
+- **Docs/reglas sincronizadas:** `DECISIONS_INDEX`, `GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1`, `GREENHOUSE_UI_PLATFORM_V1`, `AGENTS.md`, `CLAUDE.md`, `project_context.md` y skills UI/Product Design.
+
+# Sesion 2026-06-05 (cont.) — Adaptive Sidecar UI Platform ADR + TASK-1028 🆕
+
+Por pedido del operador se investigo y formalizo la tendencia de **sidecars adaptativos**: asistentes, inspectores y review panels que entran en el flujo y hacen que la UI se acomode, en vez de cubrir la pantalla como overlay.
+
+- **ADR aceptado:** `docs/architecture/GREENHOUSE_ADAPTIVE_SIDECAR_DECISION_V1.md`.
+- **Arquitectura creada:** `docs/architecture/GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md`.
+- **Decision:** Greenhouse adopta Adaptive Sidecar como capacidad UI platform multiuso, no Nexa-only, para asistencia contextual, inspeccion, review, preview y edicion contextual de bajo riesgo. Desktop preferente = in-flow push/reflow; mobile/tablet = Drawer temporal; Dialog modal sigue obligatorio para destructivo/irreversible/legal/financiero/maker-checker.
+- **Motion/library decision:** V1 no necesita libreria nueva. Usar CSS/MUI transitions + `@/libs/FramerMotion` + View Transition helpers existentes; `@formkit/auto-animate` solo para listas simples internas; GSAP solo para excepciones avanzadas segun su ADR.
+- **Platform concerns agregados:** URL mode (`ephemeral`/`addressable`), Back behavior, collision model (1 primary sidecar), scroll containment, dirty-state guard, pin/resize diferidos, AI redaction DTO e instrumentation hooks opcionales.
+- **Investigacion externa usada:** Google Gemini side panel, HubSpot Breeze, MUI persistent Drawer, Equinor Side Sheet, MDN/WAI dialog/aria-modal semantics.
+- **Evidencia local:** Nexa desktop hoy usa overlay fixed (`NexaFloatingButton`); Workforce Contracting y HR Offboarding ya muestran rails/paneles contextuales parciales que la primitive puede normalizar.
+- **Task creada:** `docs/tasks/to-do/TASK-1028-adaptive-sidecar-ui-platform.md`; registry/README sincronizados; `docs/architecture/DECISIONS_INDEX.md` actualizado; `GREENHOUSE_UI_PLATFORM_V1.md` y `GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1.md` sincronizados.
+- **Runtime no tocado:** queda pendiente implementar primitives `AdaptiveSidecarLayout`/`ContextualSidecar`, mockup/GVC con variants assistant/inspector/form/preview/review, piloto Nexa opcional bajo rollout guard y validacion operacional no-Nexa.
+
+# Sesion 2026-06-06 — TASK-1028 Adaptive Sidecar UI Platform in-progress
+
+El operador pidio ejecutar TASK-1028 y mantenerse en `develop` (override explicito: no branch). Ownership verificado: no PR abierto ni branch `TASK-1028`/`adaptive-sidecar`. Se movio la task a `docs/tasks/in-progress/TASK-1028-adaptive-sidecar-ui-platform.md`, `Lifecycle=in-progress`, y se sincronizaron README/registry/links. Worktree contiene cambios ajenos de Workforce Contracting (`TASK-1029/1030`, scenarios y BilingualReviewDesk/copy); no tocarlos ni mezclarlos con TASK-1028.
+
+Avance runtime:
+
+- **Primitives implementadas:** `AdaptiveSidecarLayout`, `ContextualSidecar` y `adaptive-sidecar-controller` en `src/components/greenhouse/primitives/`, exportadas por el barrel. El layout soporta `push|inline|overlay|temporary`, mide ancho real del contenedor con `ResizeObserver`, respeta reduced motion y cae a Drawer/overlay cuando el main no conserva ancho minimo.
+- **Primitive reusable/idempotente:** el barrel ahora expone `reduceAdaptiveSidecarState()` junto con mode resolver, URL helpers y telemetry helper. El reducer vuelve idempotente abrir el mismo target, bloquea close/replacement dirty salvo `force` y deja `lastAction` para que consumers disparen confirmacion sin pisar contexto.
+- **Mockup no-Nexa:** `/platform/adaptive-sidecar/mockup` con variants assistant/inspector/form/preview/review y data operacional tipada. Esto valida que la capacidad es UI platform, no Nexa-only.
+- **GVC final verde:** desktop `.captures/2026-06-06T02-50-18_adaptive-sidecar-platform-mockup` (14 frames: viewport shell reflow, cambio de variant, close/reopen, inline, keyboard, avatar visible, footer visible) y mobile `.captures/2026-06-06T02-40-56_adaptive-sidecar-platform-mobile-mockup` (drawer open/close/reopen).
+- **Gates verdes:** `pnpm vitest run src/components/greenhouse/primitives/__tests__/adaptive-sidecar-controller.test.ts src/components/greenhouse/primitives/__tests__/ContextualSidecar.test.tsx src/components/greenhouse/primitives/__tests__/AdaptiveSidecarLayout.test.tsx` (20 tests), `pnpm exec tsc --noEmit --pretty false`, `pnpm lint`, `pnpm task:lint --changed`.
+- **Product Design/GVC findings corregidos:** push ya no depende solo del viewport global; en dashboard con sidebar se mide el ancho disponible real. Tambien se saco el selector de variant del `CardHeader` para que mobile no comprima el titulo. Tras feedback del operador, se corrigio la lectura drawer-like: `ContextualSidecar` usa chrome `adaptive`, el layout in-flow separa por divider estructural y el mockup desktop muestra una superficie recompuesta. Segundo feedback: la primitive acepta `minHeight` y el mockup la usa como shell-level canvas wrapper. Tercer feedback: se elevo la microinteraccion con content transitions, hover/pressed states, save feedback inline y reduced-motion handling. Cuarto feedback enterprise: se agrego contenedor in-flow con borde/radius/sombra sobria, header sticky con surface blur, close affordance refinado, filas redondeadas y seleccion de alta señal; el mockup oculta el FAB legacy de Nexa via `data-nexa-floating-trigger` para evitar colision visual. Quinto feedback: el panel viewport puede ocupar top-to-bottom completo sin tapar ni romper el appbar gracias a `AdaptiveSidecarShellProvider`; el sidecar publica una reserva de carril y el `Navbar` vertical la consume con `overrideStyles` de Vuexy. Sexto feedback: el footer global se preserva; el mockup redujo densidad/padding y presupuesto de alto para mantener `scrollHeight=900/clientHeight=900` abierto y cerrado.
+- **Deep research 2026 aplicado:** Fluent inline drawer, Material standard/coplanar side sheet, OpenUI/assistant-ui assistant sidebar y Polaris contextual save bar llevaron a V1.2: resize desktop opcional con limites, splitter accesible (`role=separator`, `aria-valuemin/max/now`, ArrowLeft/ArrowRight), footer de dirty actions contextual y salida con reserva temporal para evitar saltos. Check `/home`: navbar base conserva ancho 1132px y avatar en posicion normal cuando no hay reserva activa; en sidecar abierto el navbar se acorta a 692px con avatar visible y al cerrar vuelve a 1132px.
+- **Docs/skills sincronizados:** `GREENHOUSE_ADAPTIVE_SIDECAR_UI_PLATFORM_V1.md`, `GREENHOUSE_UI_PLATFORM_V1.md`, `GREENHOUSE_PRODUCT_UI_OPERATING_MODEL_V1.md`, `GREENHOUSE_UI_ORCHESTRATION_V1.md`, `AGENTS.md`, `CLAUDE.md` y skills locales de UI/Product Design/Microinteractions/Enterprise Review declaran el patron como primitive canonica.
+- **Pendiente honesto:** piloto Nexa runtime no se habilito aun. `NexaFloatingButton` sigue montado fuera de `LayoutWrapper`, asi que reacomodar toda la UI global requiere un shell host/collision model con mayor blast radius. No declarar TASK-1028 complete hasta resolver o documentar formalmente ese slice.
+
+## TASK-1024 ✅ — Workforce Contracting signature bridge (2026-06-05, complete en develop)
+
+El **bridge contrato↔firma** que cierra la firma electrónica end-to-end consumiendo EPIC-001 (TASK-490/491). **En `develop` sin branch.** 3 slices:
+
+- **Slice 1 — Producer** (`e50702ff4`): command `sendContractingCaseToSignature` (3-fases: crea `signature_request` draft idempotente en tx → `sendSignatureRequest` a ZapSign sin tx → avanza el caso a `sent_for_signature` en tx; el caso avanza solo si ZapSign aceptó). El **trabajador es el único firmante electrónico** (firma del representante pre-estampada TASK-863/1023); `resolveContractingWorkerSigner` fail-closed sin email. Migración `20260605222647887` (capability `send_signature` + columna `signature_request_id`) + endpoint + catalog/runtime grant (EFEONCE_ADMIN V0) + 3 eventos v1.
+- **Slice 2 — Consumer** (`02823a91f`): projection reactiva `contracting_signature_bridge` (`signature.request.*` filtrado `sourceKind=contracting_case` → re-lee PG → avanza el caso + liga `signed_pdf_asset_id` + emite eventos; idempotente + cubre crash window). Signal `workforce.contracting.signature_desync` (drift, steady=0). Reusa los signals del aggregate (TASK-490). También surfaceé `contractingPdfStatusDrift` (gap latente TASK-1023: resolved+packed pero no spreadeado).
+- **Slice 3 — UI** (`648559516`): CTA "Enviar a firma" en el Bilingual Review Desk (gated capability + `caseStatus=ready_for_signature`) + badge de estado (pendiente/firmado/falló) + "Descargar firmado". Reader `getLatestContractingDraftContent` JOIN del caso. Copy es-CL tokenizado (`greenhouse-ux-writing`).
+- **Gates verdes**: tsc 0 · lint 0 · `pnpm test` full **6095 passed (0 fail)** · `pnpm build` ✓. Migración aplicada al Cloud SQL compartido.
+- **Decisiones (OQ)**: worker-only signer · CTA explícito (no auto) · ZapSign fuera de tx (TASK-771) · reuse signals + 1 desync nuevo · ZapSign manda el email al worker (no persistir sign_url).
+- **Cero secretos nuevos** (ZapSign ya en los 3 envs vía TASK-491). **Pendiente**: smoke real ZapSign end-to-end (requiere caso real en `ready_for_signature` + flag staging — mismo e2e pendiente de TASK-1023: AI draft → aprobar → generar → **enviar a firma** → firmar). El backend está completo + testeado; el live cierra el round-trip + la GVC del CTA vivo.
+- **Pack firmable**: con TASK-490/491/1023/1024 el contrato se firma end-to-end (crear → IA draft → aprobar → PDF → enviar a firma → ZapSign → firmado ligado al caso). Siguiente: TASK-1025 (emails post-firma) + TASK-1026 (registro DT/REL).
+
+## TASK-491 ✅ — ZapSign Adapter + Webhook Convergence (2026-06-05, complete en develop)
+
+El segundo eslabón del pack firmable después de TASK-490: ZapSign queda como adapter del port provider-neutral + el webhook converge al bus canónico + reconcile. **En `develop` sin branch.** 3 slices:
+
+- **Slice 1** (`a234eeeec`): `zapSignSignatureAdapter` implementa `SignatureProviderAdapter` (TASK-490). `createDocument` (asset → base64 read sin side-effects → `createZapSignDocument`) + `getDocumentState` (`status-map.ts` puro). Extendí el client con `base64Docx`. **Fix latente TASK-490**: `sendSignatureRequest` perdía el `signer_name` (`name:''`) → corregido (el adapter lo necesita). 13 tests status-map.
+- **Slice 2** (`f834559c0`): migración `20260605215340232` seedea `webhook_endpoints` (`zapsign`, `bearer`). Handler `handlers/zapsign.ts` con **dispatch cascade** (aggregate `signature_requests` prioridad → fallback MSA legacy verbatim → ignore) + **borrada** la ruta one-off `/api/webhooks/zapsign` (shadow-eaba el bus) + `verifyAuth` extendido con fallback aditivo `x-zapsign-webhook-secret`. 6 tests cascade.
+- **Slice 3** (`27cab0090`): `apply-state.ts` (`applyZapSignStateToSignatureRequest`, compartido webhook+reconcile → recovery byte-idéntico, descarga el signed PDF al vault `signature_signed_document` antes de aplicar `completed` por el CHECK) + endpoint admin `POST /api/admin/documents/signature-requests/[id]/reconcile` (`requireAdminTenantContext` + `can documents.signature_request:manage`) + CLI `scripts/signatures/reconcile.ts` (`--id` | `--sweep`).
+- **Gates verdes**: tsc 0 · lint 0 · `pnpm test` full + `pnpm build` (ver abajo) · 21 tests focales (status-map + cascade + state-machine).
+- **Secretos/runtime**: `ZAPSIGN_API_TOKEN` + `ZAPSIGN_WEBHOOK_SHARED_SECRET` + `ZAPSIGN_API_BASE_URL` YA configurados en GCP Secret Manager + Vercel (los 3 envs). **Cero secretos/eventos/capabilities nuevos** (reusa los de TASK-490). ZapSign **no se reconfigura** (misma URL `/api/webhooks/zapsign`, mismo secret).
+- **Riesgo gestionado**: borrar la ruta one-off podía romper el lane MSA (vivo en prod). Mitigado: el handler replica la lógica MSA verbatim (fallback del cascade) + auth byte-idéntico (Bearer **o** `x-zapsign-webhook-secret`) + tests del fallback MSA.
+- **Pendiente smoke real**: el aggregate nuevo no tiene producer hasta TASK-1024 (bridge contracting → `createSignatureRequest`); el lane MSA sigue ejercitando el handler en prod. **Siguiente**: TASK-1024 (firma end-to-end del contrato laboral).
+
+## TASK-490 ✅ — Signature Orchestration Foundation (2026-06-05, complete en develop)
+
+Capa provider-neutral de firma (EPIC-001), siguiente eslabón del pack firmable después de TASK-1023. **En `develop` sin branch.** 3 slices + verificación full:
+
+- **Slice 1** (`c23a2a942`): migración `20260605210419134` (+3 tablas en `greenhouse_core`: `signature_requests` aggregate + state machine, `signature_request_signers`, `signature_request_events` append-only trio TASK-765) + asset context `signature_signed_document` (vault privado) + `state-machine.ts` (operator transitions strict + `applyProviderStatus` **monotónico/out-of-order tolerant** — satisface "callbacks fuera de orden") + 8 tests.
+- **Slice 2** (`49cb29c06`): hexagonal port `SignatureProviderAdapter` (DI) + `notImplementedSignatureAdapter` (503 hasta TASK-491) + store dual-mode + commands atómicos (`create`/`send`/`cancel`/`applyProviderSignatureUpdate`/`reconcile`, append-only event + outbox in-tx) + 7 `signature.request.*` events.
+- **Slice 3** (`d08b2f52d`): identidad `documents` (captureWithDomain domain + entitlements module + capability `documents.signature_request` + runtime grant hr∪EFEONCE_ADMIN∪FINANCE_ADMIN + reliability module + 3 signals pending_overdue/failed/signed_artifact_missing + incident-mapping + EVENT_CATALOG Delta).
+- **Gates de cierre verdes**: tsc 0 · lint 0 · **`pnpm test` full 6068 passed (0 fail)** · **`pnpm build` ✓** · grant-coverage + registry-store tests verdes. Migración aplicada al Cloud SQL compartido.
+- **Arch review**: desacopló TASK-489/493 del camino crítico (artefacto firmado = private asset; dominio consumidor lo liga vía evento `completed` — late-binding del registry). NO migra el lane MSA (coexiste).
+- **Siguiente (TASK-491)**: adapter ZapSign real (`base64_pdf`/`base64_docx`) + webhook inbound (firma callbacks → `applyProviderSignatureUpdate`) + bridge `ready_for_signature` (workforce_contracting → signature_request) + routes operador-facing → TASK-1024 (firma end-to-end del contrato).
+
+## TASK-1023 — Workforce Contracting PDF/signable render (2026-06-05, code complete en develop, staging e2e pendiente)
+
+Implementado el render del PDF firmable (carta oferta O1 + contrato C2) consumiendo el estándar visual aprobado por el operador. 7 slices en `develop` (sin push), commits `13674f1b3`→`f1e517212`. El caso es dueño de su `pdf_asset_id` (patrón finiquito TASK-863); render `@react-pdf` con marca Efeonce + firma real pre-estampada (`77357182-1.png`); command + API + capability + signal `pdf_status_drift` + UI desbloqueada (Bilingual Review Desk). **Verificado**: render visual vs mockup aprobado ✓, signal smoke PG ✓, build ✓, 460 tests focales ✓. **Pendiente para complete**: e2e staging (AI draft → aprobar → generar, flag `WORKFORCE_CONTRACTING_AI_ENABLED` staging-only) + 3-skill audit del PDF real emitido. **Siguiente en el pack firmable**: TASK-490/491 (signature orchestration + ZapSign adapter) → TASK-1024 (consume `ready_for_signature`). Arch review desacopló TASK-489/493 del camino crítico.
+
+# Sesion 2026-06-05 (cont.) — TASK-1022 ✅ Collaborator Viewer runtime (Workforce Contracting)
+
+El colaborador ve sus ofertas y contratos en "Mi Ficha" (`/my/offers` + `/my/contracts`). **En `develop` sin branch.** Backend ya existía (TASK-1019 Slice 4: rutas `/api/my/*` + reader `getOwnContractingSummary` anti-IDOR) → TASK-1022 fue UI + nav + governance.
+
+- **Slice 0 — Governance + flag** (`423f5d4db`): viewCode `mi_ficha.mis_contratos` (migración aplicada+verificada, grant `collaborator`) + TS catalog; flag de sesión `hasWorkforceContractingDocument` (helper EXISTS + auth.ts JWT/session + next-auth types + get-tenant-context, mirror TASK-796) gatea los 2 ítems de nav en "Mi Ficha" (ambos bloques internos); copy es/en.
+- **Slice 1 — UI** (`3689a8497`): `MyContractingDocumentsView` compartida (por tipo) consumiendo el reader server-side; estado honesto agrupado (preparando/pendiente firma/firmado/cerrada) + badge bilingüe + nota read-only + acciones firma/descarga `locked` (EPIC-001). 12-state. 2 server pages gated por viewCode.
+- **GVC** (`eafe19b05`): scenario + capturas de `/my/contracts` y `/my/offers` → enterprise, empty states honestos, **0 violaciones axe**. Test pin `mi_ficha` 13→14.
+- **Gate de cierre**: `pnpm test` + `pnpm build` full corriendo; mover a `complete/` + push tras verdes. Migración viewCode ya aplicada al Cloud SQL compartido.
+- **Fuera de scope**: PDF/firma/descarga real = EPIC-001 (TASK-1023/1024). El epic queda: foundation + admin viewer (TASK-1021) + collaborator viewer (TASK-1022) ✅; falta Track B (firmable).
+
+# Sesion 2026-06-05 (cont.) — ADR My Performance self-service + TASK-1027 🆕
+
+Por pedido del operador se formalizo primero la arquitectura y luego la task para llevar a `/my/performance` la riqueza de `People > Person 360 > Actividad` sin convertir la vista colaborador en una copia admin.
+
+- **ADR aceptado:** `docs/architecture/GREENHOUSE_MY_PERFORMANCE_SELF_SERVICE_ACTIVITY_V1.md`.
+- **Decision:** `/my/performance` es la surface self-service canonica de actividad/desempeno personal: ICO metrics + Nexa member-scoped insights, sujeto resuelto por sesion (`requireMyTenantContext()`), DTO redacted sin costo/compensacion, Nexa advisory-only y menciones access-aware antes de linkear a `/people`/`/agency`.
+- **Indice sync:** `docs/architecture/DECISIONS_INDEX.md`.
+- **Task creada:** `docs/tasks/to-do/TASK-1027-my-performance-rich-self-service-activity.md`; registro en `docs/tasks/TASK_ID_REGISTRY.md`; `docs/tasks/README.md` ahora declara siguiente ID `TASK-1028`.
+- **Skills usadas:** `product-design-architect-2026`, `greenhouse-product-ui-architect`, `software-architect-2026`, `greenhouse-ux-content-accessibility`, `greenhouse-task-planner`, `greenhouse-documentation-governor`.
+- **Verificacion docs:** `pnpm task:lint --changed` OK, `git diff --check` OK, `pnpm docs:closure-check` OK.
+
+# Sesion 2026-06-05 (cont.) — TASK-1027 mockup enterprise + GVC microinteractions
+
+Se documento la direccion Product Design aprobada para `/my/performance` y se creo un prototipo runtime de referencia, sin promover aun la vista productiva.
+
+- **Referencia aprobada guardada:** `docs/mockups/TASK-1027/my-performance-tablero-foco-personal-reference.png`.
+- **Task actualizada:** `docs/tasks/to-do/TASK-1027-my-performance-rich-self-service-activity.md` ahora fija la direccion "Tablero de foco personal", nombres canonicos de indicadores/product surface en ingles (`Nexa Insights`, `On-Time Delivery`, `First Time Right`, `Throughput`, `OTD%`, `FTR%`, `Stuck Assets`, etc.), composicion responsive, reglas de UX writing y reglas de microinteraccion/reduced-motion.
+- **Mockup runtime:** `/my/performance/mockup` con `src/views/greenhouse/my/performance/mockup/MyPerformanceMockupView.tsx`, data tipada, copy en `src/lib/copy/my-performance.ts`, Recharts radar, Apex donut CSC y reuso de `MetricTrendCard` para OTD/FTR.
+- **Microinteracciones:** entrada escalonada, hover lift sutil, refresh icon-only con progress + `aria-live`, transicion `Resumen`/`Historial` Nexa con `AnimatePresence`, y rail compacto bajo radar para evitar labels sueltos/no enterprise.
+- **UX writing pass:** subtitulo de una idea, advisory sin lenguaje evaluativo (`procesos HR` en vez de evaluaciones), partial state honesto, helper text especifico por metrica, `Stuck Assets` canonico y score units visibles (`/100 score`).
+- **GVC:** scenario `scripts/frontend/scenarios/my-performance-self-service-mockup.scenario.ts`; ultima captura verde `.captures/2026-06-05T18-33-52_my-performance-self-service-mockup` (desktop + mobile, 16 frames, incluye refresh y transicion Nexa). Frame de charts revisado: desktop sin truncamientos y mobile con score rail horizontal compacto.
+- **Verificacion:** `pnpm exec eslint ...MyPerformanceMockupView.tsx`, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm task:lint --changed`, `pnpm fe:capture my-performance-self-service-mockup --env=local` OK.
+- **No cerrar TASK-1027 aun:** sigue `to-do` hasta implementar DTO real anti-IDOR, safe mentions, runtime `/my/performance`, tests API/UI y GVC sobre colaborador real. No se agrego changelog/manual porque es mockup/prototipo, no feature productiva.
+- **Cuidado multi-agente:** el worktree tambien muestra cambios staged/untracked de `TASK-489` (`docs/tasks/in-progress/TASK-489...` + migracion `20260605182316120...`); no son de este prototipo y no deben mezclarse en un commit de TASK-1027.
+
+# Sesion 2026-06-05 (cont.) — TASK-1021 ✅ Admin Viewer runtime completo (3 superficies, GVC verde)
+
+Promoción del mockup aprobado del Workforce Contracting Studio a runtime real. **En `develop`, sin branch** (instrucción del operador "mantente en develop"). **3 superficies admin entregadas + GVC-verificadas (0 violaciones axe)**. El Collaborator Viewer es TASK-1022.
+
+- **Rollout de TASK-1019 ejecutado antes**: push `develop` (`3ebaa3dc6..55a991b16`) + CI/worker-gate/Playwright/Vercel staging todos verdes + `ANTHROPIC_API_KEY_SECRET_REF` registrado en Vercel (Production/Preview/Development). Roadmap de tasks faltantes registrado (TASK-1021..1026, push `..32b8557c3`). ⚠️ rotar la key Anthropic antes de habilitar el flag IA.
+- **Slice 0 — Governance ✅** (`556347410` + `e5bf9f74f` + `735a2fa1b`): migración `20260605150932572` (viewCode `equipo.workforce_contracting` + 4 grants) **aplicada + verificada live**; nav item "Contratos laborales" (HR/Supervisión, `canSeeView`); copy es/en; TS `VIEW_REGISTRY` catalog. Ruta top-level → alcanzable.
+- **Slice 1 — Command Center runtime ✅** (`75bd66066`): `/hr/workforce/contracts` (page gated + `WorkforceContractingStudioView`) consumiendo `listContractingCases` + detail rail vía API existente. Header + 5 KPIs + queue filtrable + detail rail (status/projection/blockers/drafts/timeline real). 12-state honesto. Builder/Review + PDF/firma = locked. tsc 0 · eslint 0 · 155 tests focales. **GVC empty-state PASS** (chrome enterprise, agent auth OK).
+- **Slice 2 — Guided Builder ✅** (`32bf5231d`): "Nueva carta o contrato" → modo builder con form de creación (tipo + person picker `/api/organizations/people-search` + pack filtrado + `GreenhouseDatePicker` + ref. legal condicional) → POST create → refresh + select. Operating entity server-side. Acción IA honesta (flag OFF → 409).
+- **Slice 3 — Bilingual Review Desk ✅** (`32bf5231d`): reader `getLatestContractingDraftContent` + GET `/[caseId]/draft-content`; modo review ES/EN lado a lado por `sectionCode` + paridad + approve (canApprove, bloqueado si blockers) + void (prompt) + generar IA. Detail rail → "Revisar borrador bilingüe".
+- **GVC loop ✅** (`1e982c966`): scenario runtime captura las 3 superficies; el loop atrapó + corrigió badge "(Próximamente)" obsoleto + 2 violaciones axe color-contrast. Captura final **OK · 0 violaciones**. Paridad real `pass|fail|unknown`.
+- **Gate de cierre**: `pnpm test` + `pnpm build` full corriendo; mover a `complete/` + push tras verdes.
+- La migración del viewCode YA está aplicada al Cloud SQL compartido.
+- **IA encendida en staging (decisión operador 2026-06-05)**: `WORKFORCE_CONTRACTING_AI_ENABLED=true` en **Preview (develop) + Development** (Vercel) + redeploy staging. **Producción queda OFF** (gate de revisión legal de calidad de borrador). El secret `greenhouse-anthropic-api-key` **NO se rotó** — el operador decidió rotarlo al **cerrar todo el epic** (override explícito de la regla CLAUDE.md "rotar antes de habilitar el flag"; riesgo acotado: staging SSO-protegido). ⚠️ **Pendiente al cierre del epic: rotar la key.** Con el flag ON, el "Generar borrador IA" del Bilingual Review ya llama a Claude en staging.
+- **Prompt IA v3 + validación** (commits `274f98953` v2 + `516f5e625` v3, pusheados): persona de especialista senior **nacional E internacional** gobernada por la jurisdicción de la **entidad matriz** (no hardcodea Chile); `maxTokens` 16384; modelo `claude-sonnet-4-6` (override `WORKFORCE_CONTRACTING_AI_MODEL`). **Validado live**: Chile dependiente (contrato Código del Trabajo) + internacional Colombia/USD (acuerdo bajo ley chilena, sin deducciones locales) → ambos `ok=true, parity=pass`. Pendiente: revisión legal de un borrador completo antes de prod; opcional A/B Sonnet vs Opus. Detalle: arch doc Delta 2026-06-05 (prompt v3).
+
+# Sesion 2026-06-05 (cont.) — TASK-1019 ✅ foundation implementada (5 slices, en `develop` sin push)
+
+Workforce Contracting Studio foundation completa (cartas oferta + contratos laborales bilingües ES+EN, drafting Claude advisory, validators por jurisdiction pack). **En `develop`, sin push** (instrucción del operador "mantente en develop"). Sin UI runtime, sin PDF/firma/email (esos consumen EPIC-001 + tasks de viewer).
+
+- **Slices (commits)**: `19b5069c1` Slice 1 (dominio + migración 4 tablas `greenhouse_hr` + state machine + 6 capabilities + CaptureDomain workforce + commands), `495e7ca11` Slice 2 (3 jurisdiction packs fail-closed + paridad bilingüe + legalReviewReference), `7054abff8` Slice 3 (cliente `src/lib/ai/anthropic.ts` + flag OFF + structured output + eval fixtures), `42d8dbcb7` Slice 4 (readers product-shaped + projection + 6 rutas HR + 2 rutas `/my` anti-IDOR + **live smoke** tx rolled-back), `ff8429f25` Slice 5 (3 reliability signals moduleKey `workforce` + EVENT_CATALOG Delta 6 eventos v1). Docs: `50b10918e`.
+- **Migración aplicada** al Cloud SQL `greenhouse-pg-dev` (compartido) — tablas + triggers + 6 capabilities seedeadas verificadas por anti-pre-up DO blocks.
+- **Live smoke verde** (data real, rolled-back): create→draft→approve (walk multi-hop) + trigger DB rechaza transición inválida + append-only event guard + void→voided. Valida triggers + state machine + FKs + outbox in-tx.
+- **Gates**: tsc 0 · eslint 0 · ~94 tests focales + 414 reliability verdes · `pnpm test` (full) + `pnpm build` corriendo al cierre.
+- **Anthropic**: secret `greenhouse-anthropic-api-key` creado (probado HTTP 200). ⚠️ **Rotar la key** (se pegó en chat) ANTES de habilitar el flag en cualquier ambiente.
+- **Pendiente (rollout — decisión operador)**: push `develop` → deploy Vercel/workers; registrar `ANTHROPIC_API_KEY_SECRET_REF` en Vercel; promover el mockup `/hr/workforce/contracts/mockup` a runtime (task viewer); consumir EPIC-001 para PDF/ZapSign. Sin push, los workers Cloud Run + Vercel no se redespliegan (los cambios en `src/lib/reliability`/`observability`/`sync` son additivos).
+- **Doc funcional/manual**: NO creados — TASK-1019 no cambia comportamiento visible (sin UI, flag OFF). Se crearán con la task de viewer. La spec canónica es `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` (Delta 2026-06-05).
+
+# Sesion 2026-06-05 (cont.) — TASK-1019 🚧 implementación iniciada (foundation)
+
+Por pedido del operador se inició la implementación de TASK-1019 (Workforce Contracting Studio Foundation), **en `develop` sin branch** (instrucción explícita). Es P1 → se llega hasta el Plan (FASE 4) y se para en checkpoint humano antes de escribir runtime.
+
+- **Lifecycle:** `to-do` → `in-progress`, archivo movido a `docs/tasks/in-progress/`, README sync. `develop` estaba limpio (HEAD == origin/develop, sin branch/PR conflictivo). Mockups de Codex ya commiteados (`f50ea61c6`).
+- **Open Questions bloqueantes resueltas pre-execution (con rationale en la task):**
+  - *Secret Anthropic:* no existía; creado `greenhouse-anthropic-api-key` en GCP Secret Manager (project `efeonce-group`, v1, probado HTTP 200 contra `claude-haiku-4-5-20251001`). Ref `ANTHROPIC_API_KEY_SECRET_REF`. ⚠️ key pegada en chat → rotar post-implementación (decisión operador).
+  - *Aprobación:* V0 unilateral del operador → `workforce.contracting.approve = EFEONCE_ADMIN` (no existe rol `legal`, colapso TASK-935). Firma legal del representante ya en repo (`src/assets/signatures/77357182-1.png`, helper `@/lib/legal-signatures`).
+  - *Observabilidad:* agregar `'workforce'` a `CaptureDomain` + subsystem rollup propio (signals `workforce.contracting.*`).
+  - *Formato firmable (ZapSign):* investigado — ZapSign acepta **PDF y DOCX** (premisa "solo DOCX" invertida). Estrategia canónica: Greenhouse/EPIC-001 renderiza el artefacto desde structured content y sube por `base64_*` (NO el template feature de ZapSign, que prohíbe imágenes/tablas y choca con el layout bilingüe + firma legal PNG). Foundation reserva dimensión `signable_format` (`docx`/`pdf`, default `pdf` Chile V1) + capability `workforce.contracting.generate_document` (gate de la acción, formato = parámetro).
+- **Anthropic canonizado:** providers de IA conviven en `src/lib/ai/` (Gemini texto + OpenAI imágenes); cliente Claude canónico **debe vivir en `src/lib/ai/anthropic.ts`** (no paralelo). Documentado en CLAUDE.md (nueva subsección "AI providers — texto/LLM") + AGENTS.md.
+- **Próximo paso:** FASE 1 Discovery (subagentes Explore) → Audit → Connections → Plan → STOP checkpoint humano (P1) antes de migración/código.
+
+# Sesion 2026-06-05 (cont.) — Workforce Contracting Studio ADR + TASK-1019 🆕
+
+Por pedido del operador se ideó la arquitectura para dos módulos complementarios de Workforce: **carta oferta** previa contratación y **contrato de trabajo**, con drafting asistido por Claude, aprobación humana, viewers colaborador/admin, PDF institucional, emails pre/post/pendiente de firma y firma vía ZapSign. Ajuste posterior del operador: **carta oferta y contrato deben existir siempre en español e inglés**.
+
+- **ADR/arquitectura creada:** `docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` (`Accepted as target architecture`). Decisión: Claude redacta borradores estructurados advisory-only; Greenhouse valida determinísticamente; humanos aprueban; EPIC-001 renderiza/versiona/firma; ZapSign es provider, no source of truth. Bilingüismo obligatorio `es-CL` + `en-US`; para Chile, `es-CL` queda como versión legal prevalente salvo override de Legal; ningún PDF/firma avanza si falta un idioma o hay divergencia material.
+- **Delta Product Design:** se robusteció la arquitectura y TASK-1019 con la dirección de producto aprobada: **Guided Contract Builder** (flujo guiado), **Bilingual Legal Review Desk** (revisión lado a lado `es-CL`/`en-US` con paridad) y **Contracting Command Center** (cola operativa HR/Legal/Finance). TASK-1019 sigue sin UI runtime, pero sus readers deben exponer `nextActionCode`, `riskLevel`, `languageParityStatus`, `authoritativeLanguage` y metadata para futuras superficies.
+- **Mockup enterprise creado:** `/hr/workforce/contracts/mockup` (`src/app/(dashboard)/hr/workforce/contracts/mockup/page.tsx` + `src/views/greenhouse/hr/workforce-contracting/mockup/*`) con los tres modos navegables: Centro operativo, Flujo guiado y Revisión bilingüe. Incluye preview de portal colaborador, copy tokenizado `src/lib/copy/workforce-contracting.ts`, mock data tipada y scenario GVC `workforce-contracting-studio-mockup`. GVC local final OK en desktop+mobile con axe: `.captures/2026-06-05T12-15-48_workforce-contracting-studio-mockup`.
+- **Primera task creada:** `docs/tasks/to-do/TASK-1019-workforce-contracting-studio-foundation-ai-drafting.md`. Alcance: aggregate `WorkforceContractingCase`, drafts bilingües versionados, ledger Claude, validators V0 por jurisdiction pack, parity validation español/inglés, commands/readers/API/event contracts. **Fuera de scope:** ZapSign real, PDF productivo, emails, UI completa y registro DT/REL.
+- **Índices/cross-links sync:** `docs/architecture/DECISIONS_INDEX.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/epics/to-do/EPIC-001-document-vault-signature-orchestration-platform.md`, `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md`.
+- **Verificación:** docs-only; `pnpm task:lint --changed` verde; `git diff --check` verde. `pnpm docs:closure-check` pidió handoff, resuelto con esta entrada; repetir check antes de cerrar respuesta.
+- **Nota multi-agente:** antes de esta sesión ya había cambios ajenos en `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/to-do/TASK-1016-organization-list-enterprise-prototype.md` y `docs/tasks/to-do/TASK-1018-gvc-mockup-runtime-contract-gates.md`; no revertirlos ni atribuirlos a TASK-1019.
+
+# Sesion 2026-06-05 (cont.) — TASK-1017 ✅ auto-verificación de ítems del checklist contra el estado real (capa de evidencia)
+
+Follow-up del pendiente que dejó TASK-1015. El estado de cada ítem del checklist de onboarding era manual; varios ítems ya tienen estado real queryable → desfase "marcado ≠ realidad" (Berel: Notion provisionado + en BigQuery, pero el paso seguía "en curso"). Extendí el patrón **thin + reuse-first** de TASK-1009 a los 6 ítems auto-derivables (en `develop`, sin push). **Cero migración / capability / outbox / tabla.**
+
+- **Slice 1 — registry + resolvers** (`src/lib/client-lifecycle/evidence/`): por ítem, lee el reader/tabla canónica existente (HubSpot `getClientLifecycleStage`, Notion `getNotionOnboardingReadiness`, equipo/Teams/portal/facturación por su tabla) y lo clasifica en **detected/pending/unverifiable** con clasificadores **puros** (21 tests) + gatherers IO `settle`-wrapped (degradación honesta: fuente caída → `unverifiable`, nunca falso pending). Composer batched `resolveOnboardingEvidence(caseId)` (scope 1 vez, 6 en paralelo — **on-demand, NO en el read del timeline** → evita N+1 sobre BQ; OQ1 resuelta).
+- **Slice 2+3 — endpoint + UI + auto-complete gated**: `POST .../cases/[caseId]/verify-evidence` (auth `client.lifecycle.case.advance`, scope server-side anti-tamper, `mapLifecycleError`). UI: botón "Verificar evidencia" en el header del checklist + chip de evidencia **solo en pasos no resueltos** (loop GVC sobre Berel → enterprise; los casos de drift "Detectado pero pendiente" destacan). Auto-complete detrás de flag `ONBOARDING_ITEM_EVIDENCE_AUTOCOMPLETE_ENABLED` (default OFF): decisión **pura safety-critical** `canAutoCompleteFromEvidence` (anti-fake-green; respeta override manual; `requires_evidence` como Notion → muestra evidencia pero queda manual).
+- **Slice 4 — signal de drift** `client.lifecycle.evidence_detected_not_marked` (commercial, PG-only, steady=0). SQL validado contra PG real (count=0; ningún caso supera 7d todavía).
+- **OQ resueltas**: OQ1 on-demand (no N+1); OQ2 billing detected ⇔ `payment_currency` + (no requires_po o hay OC); OQ3 team detected ⇔ ≥1 assignment activo (FTE>0 no requerido).
+- **Gates**: tsc 0 · eslint 0 · 26 tests focales + suite **862 passed** · build OK · GVC enterprise mirado · smoke live (Berel: Notion/HubSpot/billing-MXN detected).
+- **Test ajeno resuelto** (pedido del operador): `notifications/preferences/route.test.ts` pin 13→14 (escape de TASK-1014, no de TASK-1017) — commit `c443c7719`. Las otras 2 fallas de la suite full (CreatePlacementDialog, HrLeaveView) son flaky por timeout (pasan en aislamiento).
+- **✅ ACTIVADO (2026-06-05, operador autorizó "Staging + Producción")**: flag `ONBOARDING_ITEM_EVIDENCE_AUTOCOMPLETE_ENABLED=true` seteado en **Production + Preview(develop) + staging**; develop pusheado (`c443c7719`) → staging desplegado con el código + flag. **Verificado live en staging** (caso real Berel `clc-3fd3…`, agent auth): `autocompleteEnabled:true`, auto-completó `confirm_billing_setup` (detected MXN), **respetó las reglas de seguridad** (`provision_notion_workspace` detected pero `requires_evidence` → quedó manual; `verify_hubspot_company_synced` ya completo → no tocado), **idempotente** (2ª llamada `autoCompleted:[]`), audit trail persistido (`notes="Verificación automática: …"` + case_event con actor). **Producción**: flag SET pero dormant hasta release develop→main (control plane gated — NO disparado unilateralmente).
+- Spec: `complete/TASK-1017-onboarding-checklist-item-evidence-auto-verification.md`.
+
+# Sesion 2026-06-05 (cont.) — TASK-1015 ✅ pase enterprise del cockpit de onboarding (UX-writing + motion + avatar)
+
+Feedback del operador viendo el cockpit (TASK-1013) en staging → pase de calidad enterprise (en `develop`).
+
+- **6 fixes + UX-writing + motion**: link amigable al wizard; **UX-writing es-CL tuteo** (eliminé voseo rioplatense + jerga cockpit/inbox/timeline); **etiquetas del checklist** reescritas de técnicas a claras (migración `20260605053954845`: plantilla + casos abiertos, `item_code` intactos); **Responsable = operador real** (nombre+email+foto) vía helper canónico `resolveAvatarUrl`; "Bloquea el cierre" solo en etapas pendientes; **transición moderna** al wizard (`ViewTransitionLink` crossfade + `loading.tsx` skeleton del shell); **microinteracciones** (KPIs `AnimatedCounter` + crossfade al cambiar de caso, reduced-motion-aware).
+- **Avatar canonizado en CLAUDE.md**: `resolveAvatarUrl` (`src/lib/person-360/resolve-avatar.ts`) = fuente única; es server-only → resolver en server y pasar el avatar resuelto al cliente. Nunca componer `/api/media/users/{id}/avatar` inline.
+- **GVC en loop**: cockpit (copy + counters + gate) + **escenario nuevo de View Transition** (`onboarding-cases-new-client-transition`, interaction V2, frames 0/140/380/1300ms → crossfade + skeleton del wizard) mirados, enterprise.
+- **Bug class corregido**: server component no puede pasar `sx={{ ...: theme => ... }}` (callback) a MUI client → 500 en el wizard; fix con tokens string (`borderColor: 'divider'`).
+- **Gates**: tsc 0 · eslint full 0 · `pnpm build` (verificando) · GVC mirado. Spec: `complete/TASK-1015-onboarding-cockpit-enterprise-polish.md`.
+- **Pendiente (respondido como follow-ups al operador)**: auto-verificación del estado real de ítems (Notion/Nubox, extiende preflight TASK-1009) + "todo caso con deal" + linkear el deal de Berel (modelo + backfill; el caso de Berel es `manual` sin deal y el cockpit lo muestra honesto).
+
+# Sesion 2026-06-05 (cont.) — TASK-1016 🆕 propuesta enterprise para listado de organizaciones
+
+Por feedback del operador sobre `/agency/organizations` ("parece Excel glorificado"), se uso Product Design + contrato Greenhouse/Vuexy para convertir la recomendacion en una task de prototipo, **sin tocar runtime productivo**.
+
+- **TASK creada:** `docs/tasks/to-do/TASK-1016-organization-list-enterprise-prototype.md`.
+- **Direccion recomendada:** pasar de tabla plana a **Organization Operations Workbench**: header compacto, summary strip accionable, filtros segmentados, lista rica con identidad/status/readiness, rail contextual de cuenta seleccionada y matrix/table como modo secundario.
+- **Scope:** construir `/agency/organizations/mockup` como ruta real del portal con mock data tipada + GVC desktop/mobile. No modifica `/agency/organizations`, `/api/organizations`, schema, flags ni capabilities.
+- **Indices sync:** `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md`; siguiente ID disponible `TASK-1017`.
+- **Verificacion:** `pnpm task:lint --changed` verde; `pnpm task:lint --task TASK-1016` sigue fallando por limitacion conocida del linter focal con IDs de 4 digitos (`Expected TASK-###`).
+
+# Sesion 2026-06-05 (cont.) — TASK-1014 ✅ aviso in-app + email al nacer un onboarding draft por deal
+
+Promoví el Slice 4 diferido de TASK-1013 a **TASK-1014** y lo implementé (en `develop`, sin push intermedio). El cockpit hizo los casos *encontrables* (pull); esto agrega el *push*.
+
+- **100% reuso del sistema canónico de notificaciones** (sin migración, sin endpoint, sin flag): categoría nueva `client_onboarding_draft` (in_app + email, priority high) + handler reactivo en `notificationProjection` que consume `client.lifecycle.case.opened` (ya emitido por `provisionClientLifecycle` solo en creación real).
+- **Filtro honesto**: re-lee el caso (TASK-771, nunca confía el payload) y notifica **solo si `triggerSource=hubspot_deal && status=draft`** (manual/wizard ya tienen al operador en el flujo; uno ya activado no necesita aviso). Idempotente (dedup por `eventId` + at-most-once del reactive consumer). Link → `/agency/clients/{orgId}/lifecycle`.
+- **Destinatarios (decisión del operador):** `efeonce_admin + efeonce_account + efeonce_operations + finance_admin`.
+- **Gates:** tsc 0 · eslint 0 · tests focales (pin del registry de categorías extendido a 14 + 2 tests nuevos del handler: deal-draft→notifica, manual/no-draft→skip). Spec: `complete/TASK-1014-onboarding-draft-notification.md`.
+- **Runtime**: la cadena (deal closed-won → outbox → publisher → reactive consumer → dispatch) ya tiene sus piezas vivas en prod (`CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` ON + Cloud Scheduler). Se confirma con el primer deal real.
+
+# Sesion 2026-06-05 (cont.) — TASK-1013 ✅ cockpit + discoverability implementado (GVC verificado, local-first)
+
+Implementado el contrato de TASK-1013 sobre el mockup aprobado, **quedándome en `develop`** (sin branch, por pedido del operador), **sin push**. Backend TASK-992 reusado: **0 migraciones, 0 flags/capabilities/events/signals nuevos**.
+
+- **Slice 1 — Cockpit `/agency/clients/onboarding`** (commit `440971a98` + scenario `2f6e9ce25`): page server (session + flag `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + capability `client.lifecycle.case.read` + degraded honesto) → `OnboardingCasesInboxView` (copy-and-patch del mockup, layout 3-col, aviso "no reemplaza el wizard", CTA "Nuevo cliente" → `/agency/clients/new`). Reader server-only `getOnboardingCasesInbox()` ([src/lib/client-lifecycle/inbox-reader.ts](src/lib/client-lifecycle/inbox-reader.ts)): cases in-flight JOIN organizations + checklist batched (`case_id = ANY`, sin N+1) + overdue (`CURRENT_DATE - date`) + fechas server-side. **Honesto**: shortCode = caseId[:8] (no fabrica `ONB-####`), owner Sistema/Operador, sin SLA% inventado; KPI "Cumplimiento SLA%" del mockup → "Bloqueados" (real).
+- **Slice 2 — Discoverability cruzada** (commit `cf75784b3`): batched `getActiveOnboardingStatusByOrg(ids)` + enrich `/api/organizations` (flag-gated, non-blocking) → columna "Onboarding" en la lista; componente reusable `OnboardingCaseBanner` en Account 360 (legacy `OrganizationView` + V2 `OrganizationWorkspaceShell` vía slot opcional `headerBanner`); status resuelto server-side en la detail page.
+- **Slice 3 — Nav + reachability** (commit `98f589cdb`): item "Alta de cliente" re-apuntado `/agency/clients/new` → `/agency/clients/onboarding` (gate flag + viewCode intactos); manifest `/agency/clients/new` re-parenteado al cockpit; `route-reachability-gate --strict` **0 orphans** (cierra la ruta huérfana TASK-982).
+
+**GVC en loop (verificado en vivo, datos reales — Grupo Berel `in_progress`):** cockpit desktop+mobile, lista de Organizaciones (columna ONBOARDING), Account 360 (banner) — todos mirados, enterprise + honestos, sin correcciones necesarias (el copy-and-patch mantuvo paridad con el mockup).
+
+**Gates:** tsc 0 · eslint full 0 · `route-reachability-gate --strict` 0 orphans · `pnpm build` exit 0. **Pendiente**: full-suite (`pnpm test`) + cierre lifecycle. **Follow-up diferido**: Slice 4 (notificación al aparecer un caso draft por trigger) — el inbox visible ya cubre el caso operativo.
+
+> ⚠️ Operativo: para GVC reinicié el dev server local (:3000) con `CLIENT_LIFECYCLE_ONBOARDING_ENABLED=true` + `NEXT_PUBLIC_…=true`. Lo detuve para correr el build; para ver la página local, levantá `pnpm dev` con esos flags (la página 404 sin ellos).
+
+# Sesion 2026-06-05 — TASK-1013 mockup aprobado + contrato de implementación
+
+El operador aprobó el mockup Product Design para TASK-1013: **Inbox + Timeline Preview**. Queda como referencia vinculante; la implementación real NO debe rediseñar ni sustituir el wizard.
+
+- **Mockup aprobado:** `/agency/clients/onboarding/mockup`
+- **Archivos mockup:** `src/app/(dashboard)/agency/clients/onboarding/mockup/page.tsx` + `src/views/greenhouse/agency/clients/mockup/onboarding-cases/OnboardingCasesInboxMockupView.tsx`
+- **GVC:** scenario `onboarding-cases-inbox-mockup` + captura `.captures/2026-06-05T00-33-42_onboarding-cases-inbox-mockup` (desktop + mobile, dossier generado).
+- **Regla dura documentada en TASK-1013:** no moverse del diseño aprobado; lo que toca es cablear runtime real con `listLifecycleCases`/organización/checklist/timeline/acciones existentes. El CTA `Nuevo cliente` sigue apuntando al wizard `/agency/clients/new`; el cockpit solo hace visibles y activables los casos en vuelo.
+
+# Sesion 2026-06-04 (cont.) — TASK-1009 ✅ preflight de onboarding Notion (composer thin, reuse-first) + ítem bloqueante
+
+Cierre del último cabo del onboarding de cliente: la diferencia entre **"configurado"** y **"fluyendo de verdad al portal"**. El wizard/checklist ya validan estructura + token + DBs muy bien (confirmado en código: `resolveClientCompleteness`, `notion/validate`, `notion-parity-audit`); el agujero era que nadie componía la cadena completa ni bloqueaba el cierre hasta que las tareas estuvieran en PG. Decisión de alcance del operador: **THIN — componer lo existente + 3 gaps + gate, no duplicar**.
+
+- **Composer** `getNotionOnboardingReadiness(spaceId)` ([src/lib/integrations/notion-onboarding-preflight.ts](src/lib/integrations/notion-onboarding-preflight.ts)): 9 checks en paralelo, **reusa** `getNotionRawFreshnessGate` (#3/#5), `last_synced_at` PG de TASK-1007 (#9), `resolveSecretByRef` (#1); agrega **#6 Estado mapeable a V1** (`normalizeTaskStatus` sobre distinct estado del space), **#8 tareas en `greenhouse_delivery.tasks`** y **#4 client_id** (verificación; TASK-1004 ya lo garantiza). Evaluador puro `evaluateNotionOnboardingReadiness` (unit-testeable) + degradación honesta (advisory vs crítico) + `readyToOnboard` conservador (crítico degraded ⇒ no listo).
+- **Gate bloqueante**: ítem `verify_notion_flowing` (required+blocking, owner operations) en `standard_onboarding_v1` vía migración **aditiva** ([20260604224502258](migrations/20260604224502258_task-1009-verify-notion-flowing-checklist-item.sql), ON CONFLICT DO NOTHING + guard anti-marker) — **solo casos nuevos** lo reciben (los abiertos no; cero regresión). Endpoint `POST .../cases/[caseId]/notion-preflight` (reusa capability `client.lifecycle.case.advance`) corre el preflight server-side y **auto-completa el ítem SOLO si `readyToOnboard`** (anti-fake-green); resuelve el space del caso server-side (anti-tamper).
+- **CLI** read-only `pnpm notion:onboarding-preflight <spaceId> [--json]` (exit 1 si no listo, para gatear). **Signal** `integrations.notion.onboarding_incomplete` (moduleKey integrations.notion, data_quality, warning si >0, steady 0) — PG COUNT O(1), NO corre el preflight pesado por caso (anti-escalable). Wireado en `get-reliability-overview`.
+- **Verificado live (DoD):** Berel (`space-cli-0863869c-eaac-…`) → **9/9 verde, readyToOnboard SÍ** (prueba e2e de TASK-998/1004/1007/1008 de paso). Space inexistente → todo rojo, NO listo. tsc 0 · lint 0 · 10 focales + **suite 5993** + **build** verde.
+- **Migración ya aplicada** al Cloud SQL compartido (regenera tipos; aditiva e idempotente). **Local-first, sin push** — pendiente: push a develop + (cuando el user lo decida) deploy.
+- **Follow-up UI ✅ (2026-06-04, GVC-verificado)**: `NotionPreflightPanel` en el ítem `verify_notion_flowing` del timeline (`/agency/clients/[organizationId]/lifecycle`) — botón "Correr preflight" → endpoint server-side → resultado con estados honestos (idle/verificando/fluye/no-fluye/error), críticos en rojo + advisory en ámbar. Vista de resultado extraída a `NotionPreflightResultView` (reusada por panel real + mockup, sin duplicar JSX). Loop GVC sobre mockup de data ficticia (`/agency/clients/mockup/notion-preflight` — **no toca clientes reales, Berel intacto**): 3 frames mirados, enterprise. Copy tokenizado `GH_CLIENT_ONBOARDING.notionPreflight`. tsc/eslint/design:lint/build verdes.
+
+---
+
+# Sesion 2026-06-04 (cont.) — Skill Documentation Governor creada
+
+Por pedido del operador se creo la skill invocable `greenhouse-documentation-governor` para Codex y Claude. Objetivo: verificar despues de una implementacion si el cierre documental esta completo y decidir/actualizar arquitectura, ADR, changelog, handoff, task lifecycle, `AGENTS.md`, `CLAUDE.md` (incluye typo operativo `claude.mc`), `project_context.md`, docs funcionales, manuales, auditorias y relacionados sin duplicar fuentes canonicas.
+
+- **Paths:** `.codex/skills/greenhouse-documentation-governor/SKILL.md` + `.codex/skills/greenhouse-documentation-governor/agents/openai.yaml` + `.claude/skills/greenhouse-documentation-governor/SKILL.md`.
+- **Helper ejecutable agregado:** `scripts/check-documentation-closure.mjs` + script `pnpm docs:closure-check`. Lee el diff dirty/staged/base, acepta pathspecs y `--json`/`--strict`, y emite findings advisory sobre docs faltantes.
+- **Puntos de entrada sincronizados:** `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `changelog.md`, `Handoff.md`, `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`.
+- **Cierre:** docs-only / skill/tooling-only; sin cambios runtime. Verificacion: `pnpm docs:closure-check -- <scope propio>` = 0 warnings; `pnpm docs:context-check` ejecutado (0 errors, 2 warnings conocidos por tamano historico de `Handoff.md`); frontmatter/YAML validado con Ruby porque `quick_validate.py` no corrio por falta local de `PyYAML`.
+
+---
+
+# Sesion 2026-06-04 (cont.) — 🚀 RELEASE A PRODUCCIÓN (todo develop→main) + rollout TASK-1010
+
+**Release ejecutado y verificado (orquestador canónico).** Promoción acumulada de 161 commits develop→main.
+
+- **Manifest `released`** — run `26979667731` (success), release_id `94130a8504a2-ac06d4b6-cd59-4cff-9730-291ba6e9e177`, SHA `94130a850`. Merge `--no-ff` (`94130a850`) sobre main `f9485a404`.
+- **Preflight con bypass** documentado (`split_batch`: finance+auth_access+11 migraciones, release conjunto aprobado por operador). Ambos gates `Production` aprobados (workers + Azure) vía `gh api pending_deployments`.
+- **4 workers Cloud Run** en GIT_SHA `94130a8504a2` (ops/commercial-cost/ico-batch/hubspot — **drift 0**, confirmado directo). **Azure** validate + no-diff skip (stacks sin cambio). **Vercel prod** `greenhouse-2unazc7kq` Ready. `/api/auth/health` ✅.
+- **Migraciones**: ya aplicadas (Cloud SQL compartida — sin paso separado). `postgres_migrations` al día.
+- **Rollout TASK-1010** (flags ON en prod): `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` + `NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED` = `true` (`printf %s`, sin newline) + **redeploy** `greenhouse-lqr6gwlq6` (mismo SHA, rebuild con flags horneadas) → aliased al dominio prod. Ruta `/agency/clients/new` viva (307→login).
+- **Heads-up flags ya-ON al aterrizar**: `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED=true` activa su código al landear (impacto bajo documentado: solo `EO-CENG-0001`, sin órdenes materializadas).
+- **Pendiente — confirmación live del operador** (NO bloqueante de código): (1) login en prod → ver wizard `/agency/clients/new` renderizar; (2) primer deal HubSpot closed-won real → caso draft. Agent auth deshabilitado en prod por diseño + no se fabrica un deal HubSpot de prueba. Hasta esa confirmación, TASK-1010 queda `in-progress` (rollout aplicado).
+- **Watchdog**: aggregate OK / exit 0 (los 3 signals `unknown` localmente por falta de `GITHUB_RELEASE_OBSERVER_TOKEN` local — `worker_revision_drift` confirmado 0 vía SHA directo).
+
+Branch local de vuelta en `develop`. Release docs (changelog + este Handoff + estado TASK-1010) commiteados a `develop` post-release.
+
+---
+
 # Sesion 2026-06-04 (cont.) — TASK-1010 Slices 2-3 (rollout onboarding cliente)
 
 Trabajo local-first en `develop` (sin push). Continuación de TASK-1010 desde el primer slice incompleto (Slice 1 ya estaba cerrado en sesión previa, commit `101cab770`).
@@ -29483,6 +30566,34 @@ Existing callers no pasan options → comportamiento idéntico a pre-TASK-872. N
 ---
 
 ## 2026-05-31 — EPIC-017 / TASK-959 cierre + TASK-961 creada
+## 2026-06-06 — Adaptive Sidecar variants 6-pack + enterprise polish
+
+Contexto: el operador pidió elevar las nuevas variantes del Adaptive Sidecar porque se sentían planas y poco enterprise. Se aplicó loop con Product Design / microinteractions / UX content-accessibility / modern-ui Greenhouse, y se retiró la línea de color estructural del borde del sidecar por feedback del operador.
+
+Trabajo realizado:
+- Adaptive Sidecar ahora canoniza 6 variants oficiales: `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, `runbook`.
+- Nuevo bloque reusable `src/components/greenhouse/primitives/ContextualSidecarBlocks.tsx`: signal, metric strip, comparison rows, progress, timeline y runbook steps con roles/focus/reduced-motion/tonal states.
+- Mockup `/platform/adaptive-sidecar/mockup` actualizado para mostrar Reconciler/Evidence/Runbook con señal ejecutiva, microcopy operacional, footer contextual y acciones más específicas.
+- Docs/skills sincronizadas: arquitectura Adaptive Sidecar, Primitive+Variants ADR, UI Platform, Product UI Operating Model, TASK-1028, skills Codex/Claude/agents.
+- Se guardaron referencias visuales generadas en `docs/assets/product-design/adaptive-sidecar-variants/`.
+
+Validación:
+- `pnpm vitest run src/components/greenhouse/primitives/__tests__/adaptive-sidecar-controller.test.ts src/components/greenhouse/primitives/__tests__/ContextualSidecar.test.tsx src/components/greenhouse/primitives/__tests__/AdaptiveSidecarLayout.test.tsx` OK (23 tests).
+- `pnpm exec tsc --noEmit --pretty false` OK.
+- `git diff --check` OK.
+- GVC desktop OK: `.captures/2026-06-06T11-04-52_adaptive-sidecar-platform-mockup`.
+- GVC mobile OK: `.captures/2026-06-06T11-05-41_adaptive-sidecar-platform-mobile-mockup`.
+- `pnpm docs:closure-check` ejecutado: warnings por changelog/handoff/project_context y por cambios unrelated en worktree; changelog/handoff/project_context quedaron actualizados para este slice.
+
+Nota de sesión/local auth:
+- GVC renderiza la ruta correctamente. La page `src/app/(dashboard)/platform/adaptive-sidecar/mockup/page.tsx` no tiene guard propio.
+- Si Chrome del operador cae en `/401`, parece sesión/permisos local/stale del navegador o overlay anterior de Next, no ruptura del sidecar. Request sin cookies a la ruta redirige a `/login`, esperado para `(dashboard)`.
+
+Pendiente:
+- No commitear cambios unrelated del worktree (Coming Soon, brand/copy/not authorized, etc.) salvo instrucción explícita.
+
+---
+
 
 Contexto: el operador corrigio el enfoque tras la captura de Deel: la captura corresponde a People / Worker Profile, no a Payroll. Decision operativa: Person 360 ya es un hub parcial y debe evolucionar como hub workforce; Payroll queda como vista/rail especializada para calculos, periodos, recibos y salidas estatutarias.
 
@@ -29603,3 +30714,24 @@ Resuelto el "draft huérfano" (caso Valentina `EO-CENG-0001`): el onboarding (Ca
 - Wizard refleja estado real (activo/retenido), no "Borrador" fijo.
 - 3 commits Slice 1/2/3. Gates: tsc/lint 0 · contractor+payroll+offboarding 728 verde · `pnpm build` (en curso al cierre).
 - **No pusheado**: el operador está testeando en staging (`dev-greenhouse`); para que el fix llegue allí hay que push a `develop` (auto-deploy). Pendiente: (1) push, (2) confirmar fecha real de Valentina (01-05 vs 01-06) + monto, (3) re-onboardear Valentina en staging → el heal la activa.
+
+---
+
+## 2026-06-06 — TASK-1043 Typography PDF adapter (in-progress, develop)
+
+Trabajo directo en `develop` por instrucción del operador (sin branch). P3, domain ui. Realiza la política canonizada "PDF/email = un SSOT semántico + adapter por medio" — **solo el medio PDF**; el email quedó descopeado por el operador.
+
+**Entregado (S1 + S2)**:
+- `src/lib/finance/pdf/pdf-typography.ts` — `getPdfTypography()` adapter: roles semánticos (display/pageTitle/titleLg/sectionTitle/subtitle/label/body/bodyStrong/caption/micro/overline/numericId/numericAmount/kpiValue) en `pt`. El **peso + la familia** (display=Poppins / text=Geist) **derivan del SoT** (`typographyScale`/`fontWeights`/`fontFamilies`); el **tamaño pt es propio del medio** (doc legal denso, NO se copia del web). `pdfFamilyName(intent, weight)` mapea a la familia registrada en `register-fonts.ts` — consume **Geist SemiBold/ExtraBold de TASK-1040** (absorbe su Slice 2). 11 tests pinean la derivación.
+- `generate-contractor-remittance-pdf.tsx` (comprobante de remesa TASK-960) migrado a consumir el adapter (cero `'Geist Bold'` literal). **Render real before/after verificado vía Read PDF**: layout idéntico, sin reflow, una página, neto verde levemente más prominente (kpiValue=ExtraBold por canon SoT KPI=800). `REMITTANCE_TEMPLATE_VERSION` 2→3.
+
+**Decisiones del operador (mid-task)**:
+- **Email descopeado**: Geist no renderiza confiable en clientes de mail (solo Apple Mail; Gmail/Outlook/Yahoo caen al fallback). El operador decidió dejar los emails como están ("se ven bien, me da miedo tocarlos"). Además la familia de email ya estaba centralizada (`EMAIL_FONTS` + `EmailLayout`). NO se creó `getEmailTypography()` ni se tocó ningún email.
+- Open Question resuelta: el adapter deriva del SoT el **set de roles + peso + familia**, NO los px (la jerarquía de un doc legal denso no es proporcional al web → un factor lineal regresaría los docs).
+
+**Remanente (Slice 3, NO migrado — requiere loop GVC real-case mirror TASK-863)**:
+- `generate-contractor-run-pdf.tsx` (tabla densa 8pt afinada a columnas A4 → riesgo reflow), `document-pdf.tsx` (finiquito legal, 29 tamaños fraccionales), `generate-payroll-pdf.tsx` (recibo nómina, hoy Helvetica → cambio visible en cada payslip), reportes finance/payroll. Mismo posture de riesgo que dejó los emails intactos: NO migrar sin render con caso real + skills payroll/finance + verificación no-reflow.
+
+**Validación**: `pnpm exec tsc --noEmit` exit 0 · `pnpm exec vitest run src/lib/finance/pdf src/lib/contractor-engagements/remittance` 68/68 · eslint OK archivos tocados · render real comprobante before/after sin regresión.
+
+**Estado**: task **in-progress** — foundation (adapter) + proof consumer entregados; migración de PDFs densos/legales remanente. **TASK-1040 Slice 2** ya tiene consumidor canónico de sus familias 600/800 vía `pdfFamilyName` (su cierre formal puede hacerse ahora). Pendiente decisión del operador: ¿continúo Slice 3 (loop real-case) o se trackea aparte?

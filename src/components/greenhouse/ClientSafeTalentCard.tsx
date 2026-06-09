@@ -279,7 +279,6 @@ const ExpandedView = ({ profile }: { profile: ClientSafeTalentProfile }) => {
                             component='span'
                             variant='caption'
                             sx={{
-                              fontSize: '0.65rem',
                               color: 'text.disabled',
                               fontWeight: 500,
                               borderLeft: theme => `1px solid ${theme.palette.divider}`,
@@ -319,7 +318,7 @@ const ExpandedView = ({ profile }: { profile: ClientSafeTalentProfile }) => {
                     <Typography variant='body2' fontWeight={500} sx={{ lineHeight: 1.3 }}>
                       {tool.toolName}
                     </Typography>
-                    <Typography variant='caption' color='text.disabled' sx={{ fontSize: '0.65rem' }}>
+                    <Typography variant='caption' color='text.disabled'>
                       {PROFICIENCY_LABELS[tool.proficiencyLevel] || tool.proficiencyLevel}
                     </Typography>
                   </Box>

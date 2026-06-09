@@ -389,6 +389,27 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-490 — Signature orchestration (EPIC-001 signable pack). Gate de las superficies
+  // operador-facing de firma (enviar / cancelar / reconciliar). Matriz canonical: hr
+  // route_group ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN (contracting cases son dominio HR/Workforce;
+  // mismo set que workforce.member.complete_intake). El render (TASK-1023) y el adapter
+  // ZapSign (TASK-491) viven detrás de este gate. Invariant TASK-873 + TASK-935.
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'documents',
+      capability: 'documents.signature_request',
+      action: 'manage',
+      scope: 'tenant',
+      source
+    })
+  }
+
   // TASK-890 Slice 4 — Workforce offboarding external provider close.
   // Capability granular para cerrar offboarding cases en lane `external_payroll`
   // (Deel/EOR/proveedor externo). Operador firma decision (Greenhouse no emite
@@ -411,6 +432,96 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       action: 'update',
       scope: 'tenant',
       source
+    })
+  }
+
+  // TASK-1019 — Workforce Contracting Studio (cartas oferta + contratos bilingües).
+  // Matriz decidida por el operador 2026-06-05 (no existe rol `legal`; el sign-off
+  // legal colapsa a EFEONCE_ADMIN, patrón TASK-935). Spec:
+  // GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1 §8.
+  //   read              -> HR route_group ∪ HR_MANAGER ∪ HR_PAYROLL ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN
+  //   manage            -> HR route_group ∪ HR_MANAGER ∪ EFEONCE_ADMIN
+  //   ai_draft          -> HR_MANAGER ∪ EFEONCE_ADMIN
+  //   approve           -> EFEONCE_ADMIN (V0 aprobación unilateral del operador)
+  //   generate_document -> EFEONCE_ADMIN (dormant hasta el render consumer futuro)
+  //   reveal_sensitive  -> EFEONCE_ADMIN ∪ HR_MANAGER
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER) ||
+    hasRole(subject, ROLE_CODES.HR_PAYROLL)
+  ) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+    })
+  }
+
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    for (const action of ['create', 'update', 'manage'] as const) {
+      addEntitlement(entries, {
+        module: 'workforce',
+        capability: 'workforce.contracting.manage',
+        action,
+        scope: 'tenant',
+        source
+      })
+    }
+  }
+
+  if (hasRole(subject, ROLE_CODES.HR_MANAGER) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.ai_draft',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.approve',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.generate_document',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    // TASK-1024 — enviar a firma electrónica. V0 = EFEONCE_ADMIN (mirror approve/generate_document;
+    // delegación a HR_MANAGER queda V1.1). Invariant TASK-873/935 (grant en el mismo PR que el seed).
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.send_signature',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.HR_MANAGER)) {
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.contracting.reveal_sensitive',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
     })
   }
 
@@ -1589,6 +1700,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     const adminOrgCapabilities: Array<{ capability: EntitlementCapabilityKey; actions: EntitlementAction[] }> = [
       { capability: 'organization.identity', actions: ['read'] },
       { capability: 'organization.identity_sensitive', actions: ['read', 'update'] },
+      { capability: 'organization.brand_asset', actions: ['review', 'update'] },
       { capability: 'organization.spaces', actions: ['read'] },
       { capability: 'organization.team', actions: ['read'] },
       { capability: 'organization.economics', actions: ['read'] },
@@ -1659,6 +1771,21 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         module: 'organization',
         capability,
         action: 'read',
+        scope: 'tenant',
+        source: 'route_group'
+      })
+    }
+  }
+
+  // TASK-999 — Organization commercial logo enrichment. Admin route-group users
+  // can review/update non-operating organization brand assets; the command layer
+  // still blocks `is_operating_entity=TRUE` so Efeonce/legal logos are not touched.
+  if (hasRouteGroup(subject, 'admin') && !hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    for (const action of ['review', 'update'] satisfies EntitlementAction[]) {
+      addEntitlement(entries, {
+        module: 'organization',
+        capability: 'organization.brand_asset',
+        action,
         scope: 'tenant',
         source: 'route_group'
       })

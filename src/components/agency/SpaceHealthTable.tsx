@@ -34,7 +34,7 @@ const getServiceColor = (lines: string[]) => {
 
   return GH_COLORS.service[key] ?? {
     source: GH_COLORS.chart.primary,
-    bg: '#eaf3fc',
+    bg: GH_COLORS.surface.tagBlue,
     text: GH_COLORS.chart.primary
   }
 }

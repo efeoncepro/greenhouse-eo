@@ -34,7 +34,7 @@ The path that actually works:
 | Service URL | `https://smba.trafficmanager.net/teams` (primary), `/amer`, `/emea`, `/apac` (regional fallbacks) |
 | Endpoint to channel | `POST {serviceUrl}/v3/conversations` |
 | Endpoint to existing chat | `POST {serviceUrl}/v3/conversations/{chatId}/activities` |
-| Endpoint create 1:1 | `POST {serviceUrl}/v3/conversations` with `members: [{ id: "29:<aadObjectId>" }]` |
+| Endpoint create 1:1 | `POST {serviceUrl}/v3/conversations` with `members: [{ id: "<aadObjectId>" }]` |
 
 Microsoft Graph **is** used for two ancillary lookups (audience `graph.microsoft.com`):
 - `GET /v1.0/users?$filter=mail eq '<email>'` — recipient resolver fallback
@@ -189,7 +189,39 @@ Bots can `@`-mention users to trigger real push notifications + badge. Without a
 
 Verified rules (public commercial cloud, Bot Framework Connector):
 
-1. **Activity body mentions**: `text` contains `<at>Display Name</at>` and the activity declares `entities[]` with type `mention`. `mentioned.id` MUST be `"29:<aadObjectId>"` — the `29:` prefix is mandatory. Without it, Teams renders the `<at>` as plain text.
+1. **Adaptive Card mentions (verified 2026-06-08):** put `<at>Visible Text</at>` in a card `TextBlock`, declare the matching object in `card.msteams.entities[]`, and set `mentioned.id` to the Microsoft Entra Object ID or UPN. Do **not** pass `29:<aadObjectId>` for Adaptive Cards; that rendered as plain text in a live Teams smoke. Also do **not** add `activity.text` just to trigger the mention when the payload already has a card: Teams renders `activity.text` as a duplicate bubble above the card.
+
+   ```jsonc
+   {
+     "activity": {
+       "type": "message",
+       "attachments": [
+         {
+           "contentType": "application/vnd.microsoft.card.adaptive",
+           "content": {
+             "type": "AdaptiveCard",
+             "version": "1.0",
+             "body": [
+               { "type": "TextBlock", "text": "Hi <at>Julio Reyes</at>" }
+             ],
+             "msteams": {
+               "entities": [
+                 { "type": "mention",
+                   "text": "<at>Julio Reyes</at>",
+                   "mentioned": {
+                     "id": "<entraObjectId-or-upn>",
+                     "name": "Julio Reyes Rangel"
+                   } }
+               ]
+             }
+           }
+         }
+       ]
+     }
+   }
+   ```
+
+2. **Activity body mentions** outside cards use the activity `text` + `entities[]` channel. Prefer Adaptive Card mentions for manual announcements. If you use activity-body mentions, test the exact user ID shape in the target tenant; Teams user/MRI IDs are not interchangeable with `29:<aadObjectId>`.
 
    ```jsonc
    {
@@ -202,31 +234,16 @@ Verified rules (public commercial cloud, Bot Framework Connector):
            "text": "<at>Julio Reyes</at>",
            "mentioned": { "id": "29:<aadObjectId>", "name": "Julio Reyes" } }
        ],
-       "attachments": [{ "contentType": "application/vnd.microsoft.card.adaptive", "content": <card> }]
+       "attachments": []
      }
    }
    ```
 
-2. **`text` and `<at>` tag must match exactly** — same string between `<at>...</at>`, whitespace included. Mismatch = silent mention.
+3. **`text` and `<at>` tag must match exactly** — same string between `<at>...</at>`, whitespace included. Mismatch = silent mention.
 
-3. **`textFormat: "xml"`** (or `"plain"`, NOT `"markdown"`). Otherwise Teams escapes the `<at>` and shows literal.
+4. **`textFormat: "xml"`** (or `"plain"`, NOT `"markdown"`) is required for activity-body mentions. Adaptive Card TextBlocks use card text + `msteams.entities`.
 
-4. **Mentions inside Adaptive Cards** use a different channel: the card declares `msteams.entities` and the `TextBlock` contains the same `<at>` tag.
-
-   ```jsonc
-   {
-     "type": "AdaptiveCard", "version": "1.5",
-     "body": [{ "type": "TextBlock", "text": "Approved by <at>Julio Reyes</at>" }],
-     "msteams": {
-       "entities": [
-         { "type": "mention", "text": "<at>Julio Reyes</at>",
-           "mentioned": { "id": "29:<aadObjectId>", "name": "Julio Reyes" } }
-       ]
-     }
-   }
-   ```
-
-5. **The bot CANNOT mention users not in the team/chat** where it's posting. If `aadObjectId` is not a member, Teams renders the `<at>` as plain text. Always validate membership or accept the silent fallback.
+5. **The bot CANNOT mention users not in the team/chat** where it's posting. If the user is not a member, Teams can render the `<at>` as plain text. Always validate membership or accept the silent fallback before public sends.
 
 6. **DM 1:1 doesn't need `<at>`** — Teams already pings the recipient because it's a direct message.
 

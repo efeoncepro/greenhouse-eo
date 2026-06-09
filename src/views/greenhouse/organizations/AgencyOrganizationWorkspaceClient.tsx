@@ -15,11 +15,10 @@ import { ROLE_CODES } from '@/config/role-codes'
 import { GH_ORGANIZATION_WORKSPACE } from '@/lib/copy/agency'
 import { ORGANIZATION_FACETS } from '@/lib/organization-workspace/facet-capability-mapping'
 
-import OrganizationWorkspaceShell, {
-  OrganizationWorkspaceAdminAction
-} from '@/components/greenhouse/organization-workspace/OrganizationWorkspaceShell'
-import FacetContentRouter from '@/components/greenhouse/organization-workspace/FacetContentRouter'
+import { OrganizationWorkspaceAdminAction } from '@/components/greenhouse/organization-workspace/OrganizationWorkspaceShell'
+import OnboardingCaseBanner from '@/components/greenhouse/OnboardingCaseBanner'
 import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
+import OrganizationEnterpriseWorkspaceRuntime from './OrganizationEnterpriseWorkspaceRuntime'
 
 import type {
   OrganizationFacet,
@@ -52,6 +51,7 @@ interface OrgKpis {
 type Props = {
   organizationId: string
   projection: OrganizationWorkspaceProjection
+  onboardingStatus?: 'draft' | 'in_progress' | 'blocked' | null
 }
 
 const FACET_QUERY_PARAM = 'facet'
@@ -59,12 +59,15 @@ const FACET_QUERY_PARAM = 'facet'
 const isOrganizationFacet = (value: string): value is OrganizationFacet =>
   (ORGANIZATION_FACETS as readonly string[]).includes(value)
 
-const AgencyOrganizationWorkspaceClient = ({ organizationId, projection }: Props) => {
+const AgencyOrganizationWorkspaceClient = ({ organizationId, projection, onboardingStatus = null }: Props) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: session } = useSession()
 
   const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
+
+  const canManageOrganizationLogo =
+    isAdmin || Boolean(session?.user?.routeGroups?.includes('admin'))
 
   const [detail, setDetail] = useState<OrganizationDetailData | null>(null)
   const [kpis, setKpis] = useState<OrgKpis | null>(null)
@@ -79,7 +82,7 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection }: Props
       return fromUrl
     }
 
-    return projection.defaultFacet
+    return projection.visibleFacets.includes('delivery') ? 'delivery' : projection.defaultFacet
   }, [searchParams, projection.defaultFacet, projection.visibleFacets])
 
   const [activeFacet, setActiveFacet] = useState<OrganizationFacet | null>(initialFacet)
@@ -187,19 +190,9 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection }: Props
   ) : undefined
 
   return (
-    <OrganizationWorkspaceShell
-      organization={{
-        organizationId: detail.organizationId,
-        organizationName: detail.organizationName,
-        publicId: detail.publicId,
-        industry: detail.industry,
-        country: detail.country,
-        status: detail.status,
-        active: detail.active,
-        hubspotCompanyId: detail.hubspotCompanyId,
-        spaceCount: detail.spaceCount,
-        membershipCount: detail.membershipCount
-      }}
+    <OrganizationEnterpriseWorkspaceRuntime
+      organizationId={organizationId}
+      detail={detail}
       kpis={
         kpis
           ? {
@@ -213,6 +206,9 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection }: Props
       activeFacet={activeFacet}
       onFacetChange={handleFacetChange}
       adminActions={adminActions}
+      canEditLogo={canManageOrganizationLogo}
+      onLogoUpdated={loadDetail}
+      headerBanner={<OnboardingCaseBanner organizationId={organizationId} status={onboardingStatus} />}
       drawerSlot={
         <EditOrganizationDrawer
           open={editDrawerOpen}
@@ -224,9 +220,7 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection }: Props
           }}
         />
       }
-    >
-      {(facet, ctx) => <FacetContentRouter facet={facet} {...ctx} />}
-    </OrganizationWorkspaceShell>
+    />
   )
 }
 

@@ -9,6 +9,8 @@ const mockGetUserNotificationRecipient = vi.fn()
 const mockGetRoleCodeNotificationRecipients = vi.fn()
 const mockSendEmail = vi.fn()
 const mockWasEmailAlreadySent = vi.fn()
+const mockGetActiveCaseForOrganization = vi.fn()
+const mockGetOrganizationDisplayName = vi.fn()
 
 const MEMBER_RECIPIENTS = new Map([
   ['julio-reyes', {
@@ -88,6 +90,14 @@ vi.mock('@/lib/notifications/person-recipient-resolver', () => ({
   getProfileNotificationRecipient: vi.fn(async () => null),
   getRoleCodeNotificationRecipients: (...args: unknown[]) => mockGetRoleCodeNotificationRecipients(...args),
   getUserNotificationRecipient: (...args: unknown[]) => mockGetUserNotificationRecipient(...args)
+}))
+
+vi.mock('@/lib/client-lifecycle/store', () => ({
+  getActiveCaseForOrganization: (...args: unknown[]) => mockGetActiveCaseForOrganization(...args)
+}))
+
+vi.mock('@/lib/client-onboarding/org-search', () => ({
+  getOrganizationDisplayName: (...args: unknown[]) => mockGetOrganizationDisplayName(...args)
 }))
 
 const { notificationProjection } = await import('./notifications')
@@ -289,5 +299,74 @@ describe('notificationProjection payroll ops', () => {
 
     expect(result).toBe('notified 1 HR recipients about leave_request.escalated_to_hr')
     expect(mockGetRoleCodeNotificationRecipients).toHaveBeenCalledWith(['hr_manager', 'efeonce_admin'])
+  })
+})
+
+describe('notificationProjection client onboarding draft (TASK-1014)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockEnsureNotificationSchema.mockResolvedValue(undefined)
+    mockDispatch.mockResolvedValue({ sent: [], skipped: [], failed: [] })
+    mockGetRoleCodeNotificationRecipients.mockResolvedValue([])
+    mockGetActiveCaseForOrganization.mockResolvedValue(null)
+    mockGetOrganizationDisplayName.mockResolvedValue(null)
+  })
+
+  it('notifies onboarding operators when a deal-trigger draft case opens', async () => {
+    mockGetActiveCaseForOrganization.mockResolvedValue({
+      caseId: 'clc-3f03',
+      organizationId: 'org-berel',
+      status: 'draft',
+      triggerSource: 'hubspot_deal',
+      caseKind: 'onboarding'
+    })
+    mockGetOrganizationDisplayName.mockResolvedValue('Grupo Berel')
+    mockGetRoleCodeNotificationRecipients.mockResolvedValue([
+      {
+        identityProfileId: 'profile-julio',
+        memberId: 'julio-reyes',
+        userId: 'user-efeonce-admin-julio-reyes',
+        email: 'jreyes@efeoncepro.com',
+        fullName: 'Julio Reyes'
+      }
+    ])
+    // dedup check (wasNotificationAlreadySent) → not sent yet
+    mockRunGreenhousePostgresQuery.mockResolvedValue([{ exists: false }])
+
+    const result = await notificationProjection.refresh(
+      { entityType: 'notification', entityId: 'client.lifecycle.case.opened' },
+      { organizationId: 'org-berel', triggerSource: 'hubspot_deal', _eventId: 'evt-onb-1' }
+    )
+
+    expect(result).toBe('notified 1 operators about onboarding draft for org org-berel')
+    expect(mockGetRoleCodeNotificationRecipients).toHaveBeenCalledWith([
+      'efeonce_admin',
+      'efeonce_account',
+      'efeonce_operations',
+      'finance_admin'
+    ])
+    expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({
+      category: 'client_onboarding_draft',
+      title: 'Onboarding por activar: Grupo Berel',
+      actionUrl: '/agency/clients/org-berel/lifecycle'
+    }))
+  })
+
+  it('skips notification when the case is not a deal-trigger draft (manual / already active)', async () => {
+    mockGetActiveCaseForOrganization.mockResolvedValue({
+      caseId: 'clc-manual',
+      organizationId: 'org-manual',
+      status: 'in_progress',
+      triggerSource: 'manual',
+      caseKind: 'onboarding'
+    })
+
+    const result = await notificationProjection.refresh(
+      { entityType: 'notification', entityId: 'client.lifecycle.case.opened' },
+      { organizationId: 'org-manual', triggerSource: 'manual', _eventId: 'evt-onb-2' }
+    )
+
+    expect(result).toBe('skipped onboarding notification (not a deal-trigger draft) for org org-manual')
+    expect(mockDispatch).not.toHaveBeenCalled()
   })
 })

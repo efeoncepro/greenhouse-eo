@@ -26,7 +26,7 @@ const ShareholderAccountPage = async () => {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath)
+    redirect('/401')
   }
 
   return <ShareholderAccountView />

@@ -10,11 +10,17 @@
 // src/components/**, tests, and the rule's own files are allowed.
 
 import { RuleTester } from 'eslint'
+import tsParser from '@typescript-eslint/parser'
 
 import rule from '../no-cross-domain-import-from-client-portal.mjs'
 
+// Los fixtures usan sintaxis TS (`import type`), así que el RuleTester necesita
+// el parser TS — el espree default rompe con "Unexpected token {". Este test
+// nunca corrió antes (no estaba en ningún runner); el gate `test:lint-rules`
+// (node --test) lo cubre desde TASK-1038.
 const ruleTester = new RuleTester({
   languageOptions: {
+    parser: tsParser,
     ecmaVersion: 2022,
     sourceType: 'module'
   }

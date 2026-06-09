@@ -10,6 +10,7 @@ Panel operativo para cambios chicos que no son incidentes (`ISSUE-###`) ni ameri
 - La plantilla copiable vive en `docs/mini-tasks/MINI_TASK_TEMPLATE.md`.
 - Si una mini-task crece de alcance, toca arquitectura shared o deja de ser claramente acotada, debe promoverse a `TASK-###`.
 - Si el hallazgo es una falla real de runtime, debe abrirse como `ISSUE-###`, no como mini-task.
+- Linter operativo: `pnpm mini:lint`; usar `pnpm ops:lint --changed` cuando el cambio toca tambien tasks o epics. Estos comandos forman parte del Greenhouse Operating Loop: `docs/operations/GREENHOUSE_OPERATING_LOOP_V1.md`.
 
 ## Cuándo usar esta lane
 

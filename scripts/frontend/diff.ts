@@ -1,20 +1,18 @@
 #!/usr/bin/env tsx
 /**
- * Structural diff entre 2 capture runs.
+ * Visual diff entre 2 capture runs + promoción de baseline durable (TASK-1018).
  *
- * Compara manifest.json + tamaños de frames + tamaño del .webm entre 2
- * directorios de captura. Emite un reporte HTML side-by-side que el
- * humano puede abrir en browser para diff visual frame-por-frame.
- *
- * NO usa pixelmatch / pngjs / sharp — zero new deps, diff a nivel de
- * metadata + binary size. Para perceptual diff píxel-perfecto (V1.2),
- * agregar pixelmatch como dep opt-in.
+ * Compara manifest.json + pixel diff (pixelmatch) frame-por-frame entre 2
+ * directorios de captura, con masks por región (FrameRecord.maskRects). Emite
+ * un reporte HTML side-by-side + PNG diff cuando hay drift.
  *
  * Usage:
- *   pnpm fe:capture:diff <prev-dir> <curr-dir>
+ *   pnpm fe:capture:diff <prev-dir> <curr-dir>      # diff visual 2 runs
+ *   pnpm fe:capture:diff --promote <capture-dir>    # promueve a baseline durable
  *
  * Output:
  *   <curr-dir>/diff-vs-<prev-name>.html   - side-by-side report
+ *   <curr-dir>/frames/<NN>-<label>.diff.png - diff PNG por frame con drift
  *   stdout:                                - summary table
  */
 
@@ -22,11 +20,16 @@ import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, relative, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 
+import { promoteCaptureToBaseline } from './lib/baseline-contract'
+import type { CaptureManifest, FrameMaskRect } from './lib/manifest'
+import { compareImages, loadPng } from './lib/visual-diff'
+
 interface FrameMeta {
   index: number
   label: string
   path: string
   tMs: number
+  maskRects?: FrameMaskRect[]
 }
 
 interface ManifestLike {
@@ -79,7 +82,10 @@ interface FrameDiff {
   currPath: string | null
   prevBytes: number
   currBytes: number
-  status: 'same' | 'changed' | 'added' | 'removed'
+  status: 'same' | 'changed' | 'added' | 'removed' | 'dimension_mismatch'
+  diffRatio?: number
+  changedPixels?: number
+  diffArtifact?: string
 }
 
 const computeFrameDiffs = (prev: ManifestLike, curr: ManifestLike, prevDir: string, currDir: string): FrameDiff[] => {
@@ -93,21 +99,53 @@ const computeFrameDiffs = (prev: ManifestLike, curr: ManifestLike, prevDir: stri
     const prevBytes = p ? fileSizeBytes(join(prevDir, p.path)) : 0
     const currBytes = c ? fileSizeBytes(join(currDir, c.path)) : 0
 
-    let status: FrameDiff['status'] = 'same'
+    if (!p) return { label, prevPath: null, currPath: c?.path ?? null, prevBytes, currBytes, status: 'added' as const }
+    if (!c) return { label, prevPath: p.path, currPath: null, prevBytes, currBytes, status: 'removed' as const }
 
-    if (!p) status = 'added'
-    else if (!c) status = 'removed'
-    else if (Math.abs(prevBytes - currBytes) > prevBytes * 0.01) status = 'changed'
+    // Pixel diff con masks (unión de ambos lados) cuando ambos PNG existen.
+    try {
+      const prevImg = loadPng(join(prevDir, p.path))
+      const currImg = loadPng(join(currDir, c.path))
+      const maskRects = [...(p.maskRects ?? []), ...(c.maskRects ?? [])]
+      const diffArtifactRel = c.path.replace(/\.png$/i, '.diff.png')
 
-    return {
-      label,
-      prevPath: p?.path ?? null,
-      currPath: c?.path ?? null,
-      prevBytes,
-      currBytes,
-      status
+      const result = compareImages(prevImg, currImg, {
+        maskRects,
+        maxDiffRatio: 0,
+        diffOutputPath: join(currDir, diffArtifactRel)
+      })
+
+      if (result.status === 'dimension_mismatch') {
+        return { label, prevPath: p.path, currPath: c.path, prevBytes, currBytes, status: 'dimension_mismatch' as const }
+      }
+
+      return {
+        label,
+        prevPath: p.path,
+        currPath: c.path,
+        prevBytes,
+        currBytes,
+        status: result.changedPixels > 0 ? ('changed' as const) : ('same' as const),
+        diffRatio: result.diffRatio,
+        changedPixels: result.changedPixels,
+        diffArtifact: result.diffArtifactWritten ? diffArtifactRel : undefined
+      }
+    } catch {
+      // Fallback a byte-size si el PNG no se puede parsear.
+      const status: FrameDiff['status'] = Math.abs(prevBytes - currBytes) > prevBytes * 0.01 ? 'changed' : 'same'
+
+      return { label, prevPath: p.path, currPath: c.path, prevBytes, currBytes, status }
     }
   })
+}
+
+const statusBadge = (status: FrameDiff['status']): string => {
+  if (status === 'same') return '🟢'
+  if (status === 'changed') return '🟡'
+  if (status === 'dimension_mismatch') return '🔴'
+  if (status === 'added') return '🔵'
+
+  return '⚪'
 }
 
 const buildHtmlReport = (prev: ManifestLike, curr: ManifestLike, diffs: FrameDiff[], prevDir: string, currDir: string): string => {
@@ -121,7 +159,7 @@ const buildHtmlReport = (prev: ManifestLike, curr: ManifestLike, diffs: FrameDif
 
   const rows = diffs
     .map(d => {
-      const badge = d.status === 'same' ? '🟢' : d.status === 'changed' ? '🟡' : d.status === 'added' ? '🔵' : '⚪'
+      const badge = statusBadge(d.status)
 
       const prevImg = d.prevPath
         ? `<img src="${relative(currDir, join(prevDir, d.prevPath))}" alt="prev ${d.label}" loading="lazy" />`
@@ -131,11 +169,18 @@ const buildHtmlReport = (prev: ManifestLike, curr: ManifestLike, diffs: FrameDif
         ? `<img src="${d.currPath}" alt="curr ${d.label}" loading="lazy" />`
         : '<div class="missing">—</div>'
 
+      const diffCell = d.diffArtifact
+        ? `<img src="${d.diffArtifact}" alt="diff ${d.label}" loading="lazy" /><br><small>${((d.diffRatio ?? 0) * 100).toFixed(2)}% · ${d.changedPixels ?? 0}px</small>`
+        : d.diffRatio !== undefined
+          ? `<small>${(d.diffRatio * 100).toFixed(2)}% diff</small>`
+          : '<div class="missing">—</div>'
+
       return `
         <tr>
           <td>${badge} <code>${d.label}</code> <small>${d.status}</small></td>
           <td>${prevImg}<br><small>${formatKb(d.prevBytes)}</small></td>
           <td>${currImg}<br><small>${formatKb(d.currBytes)} (${formatDelta(d.prevBytes, d.currBytes)})</small></td>
+          <td>${diffCell}</td>
         </tr>`
     })
     .join('\n')
@@ -170,25 +215,61 @@ const buildHtmlReport = (prev: ManifestLike, curr: ManifestLike, diffs: FrameDif
   ${findings}
   <table>
     <thead>
-      <tr><th>Frame label</th><th>Anterior</th><th>Actual</th></tr>
+      <tr><th>Frame label</th><th>Anterior</th><th>Actual</th><th>Diff</th></tr>
     </thead>
     <tbody>
 ${rows}
     </tbody>
   </table>
   <div class="legend">
-    🟢 same · 🟡 changed (>1% size delta) · 🔵 added · ⚪ removed
+    🟢 same · 🟡 changed (pixel diff) · 🔴 dimension mismatch · 🔵 added · ⚪ removed
   </div>
 </body>
 </html>
 `
 }
 
+const runPromote = (captureDir: string): void => {
+  const dir = resolve(captureDir)
+  const manifestPath = join(dir, 'manifest.json')
+
+  if (!existsSync(manifestPath)) {
+    console.error(`manifest.json no encontrado en ${dir}. Promové un leaf capture dir (con frames/).`)
+    process.exit(1)
+  }
+
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as CaptureManifest
+  const result = promoteCaptureToBaseline(dir, manifest)
+
+  console.log('')
+  console.log(`✓ Baseline durable promovido · surfaceId=${result.surfaceId} · viewport=${result.viewportName}`)
+  for (const p of result.promoted) console.log(`  🟢 ${p.frameLabel} → ${p.png.replace(/.*\/scripts\//, 'scripts/')}`)
+  if (result.skipped.length) console.log(`  ⚠ skipped (sin PNG): ${result.skipped.join(', ')}`)
+  console.log('')
+  console.log('  Commiteá scripts/frontend/baselines/ para compartir el contrato cross-agente.')
+}
+
 const main = (): void => {
-  const { positionals } = parseArgs({ args: process.argv.slice(2), allowPositionals: true, options: {} })
+  const { positionals, values } = parseArgs({
+    args: process.argv.slice(2),
+    allowPositionals: true,
+    options: { promote: { type: 'boolean', default: false } }
+  })
+
+  if (values.promote) {
+    if (positionals.length !== 1) {
+      console.error('Usage: pnpm fe:capture:diff --promote <capture-dir>')
+      process.exit(1)
+    }
+
+    runPromote(positionals[0])
+
+    return
+  }
 
   if (positionals.length !== 2) {
     console.error('Usage: pnpm fe:capture:diff <prev-dir> <curr-dir>')
+    console.error('   OR: pnpm fe:capture:diff --promote <capture-dir>')
     process.exit(1)
   }
 
@@ -212,9 +293,10 @@ const main = (): void => {
   console.log('')
 
   for (const d of diffs) {
-    const badge = d.status === 'same' ? '🟢' : d.status === 'changed' ? '🟡' : d.status === 'added' ? '🔵' : '⚪'
+    const badge = statusBadge(d.status)
+    const pixelInfo = d.diffRatio !== undefined ? `  ${(d.diffRatio * 100).toFixed(2)}% px` : ''
 
-    console.log(`  ${badge} ${d.label.padEnd(36)} ${formatKb(d.prevBytes).padStart(12)} → ${formatKb(d.currBytes).padStart(12)}  ${formatDelta(d.prevBytes, d.currBytes)}`)
+    console.log(`  ${badge} ${d.label.padEnd(36)} ${formatKb(d.prevBytes).padStart(12)} → ${formatKb(d.currBytes).padStart(12)}  ${formatDelta(d.prevBytes, d.currBytes)}${pixelInfo}`)
   }
 
   // Webm comparison

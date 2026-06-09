@@ -108,4 +108,66 @@ describe('frontend capture scenario DSL', () => {
       ]
     })).toThrow('viewport "desktop" duplicado')
   })
+
+  it('accepts a full baseline visual contract', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'first-fold' }]),
+      baseline: {
+        surfaceId: 'agency.organizations.list',
+        baselineName: 'organization-list-enterprise-approved',
+        requiredFrameLabels: ['first-fold'],
+        maskSelectors: ['[data-dynamic-count]'],
+        maxDiffRatio: 0.08,
+        requiredRegions: ['[data-capture="organization-list"]']
+      }
+    })).not.toThrow()
+  })
+
+  it('rejects baseline.maxDiffRatio outside [0,1]', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      baseline: { surfaceId: 's', maxDiffRatio: 1.5 }
+    })).toThrow('baseline.maxDiffRatio')
+  })
+
+  it('requires surfaceId when baseline declares maskSelectors/requiredFrameLabels/requiredRegions', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      baseline: { maskSelectors: ['[data-dynamic]'] }
+    })).toThrow('requiere baseline.surfaceId')
+  })
+
+  it('rejects an invalid baseline.surfaceId', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      baseline: { surfaceId: 'bad surface/id!' }
+    })).toThrow('baseline.surfaceId inválido')
+  })
+
+  it('accepts a keyboard quality gate with probes', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      quality: {
+        keyboard: {
+          enabled: true,
+          reducedMotionCheck: true,
+          probes: [{ name: 'open-menu', keys: ['Tab', 'Enter'], expectedVisibleSelector: '[role="menu"]' }]
+        }
+      }
+    })).not.toThrow()
+  })
+
+  it('rejects an enabled keyboard gate without probes', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      quality: { keyboard: { enabled: true, probes: [] } }
+    })).toThrow('al menos un probe')
+  })
+
+  it('rejects a keyboard probe without keys', () => {
+    expect(() => validateScenario({
+      ...baseScenario([{ kind: 'mark', label: 'a' }]),
+      quality: { keyboard: { enabled: true, probes: [{ name: 'bad', keys: [] }] } }
+    })).toThrow('requiere keys')
+  })
 })

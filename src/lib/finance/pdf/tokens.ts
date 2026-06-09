@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { axisSemanticHex } from '@core/theme/axis-semantic'
+
 /**
  * PdfTokens — sistema de tokens visuales para el PDF de cotizaciones.
  *
@@ -23,10 +25,12 @@ export const PdfColors = {
   divider: '#E4E5EB',          // Borders
   paper: '#FFFFFF',            // Page background
   paperOnPrimary: 'rgba(255,255,255,0.7)',
-  success: '#6ec207',
-  warning: '#ff6500',
+  // Semantic feedback — AXIS SoT (TASK-1034 Slice 4), no longer the legacy lime/orange.
+  success: axisSemanticHex.success,
+  warning: axisSemanticHex.warning,
 
-  // Sub-brand accents — siempre se acompañan del isotipo, nunca standalone
+  // Sub-brand accents — DOMAIN categorical palette (per-service), NOT semantic.
+  // Kept as deliberate brand hues; siempre se acompañan del isotipo.
   subBrand: {
     globe: '#bb1954',
     wave: '#00BAD1',

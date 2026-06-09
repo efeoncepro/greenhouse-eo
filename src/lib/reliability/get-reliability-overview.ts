@@ -54,6 +54,16 @@ import {
 import { getContractorPayableReadyWithoutObligationSignal } from './queries/contractor-payable-ready-without-obligation'
 import { getContractorPayableExpenseUnmaterializedSignal } from './queries/contractor-payable-expense-unmaterialized'
 import { getContractorPayablePaymentSlaOverdueSignal } from './queries/contractor-payable-payment-sla-overdue'
+import { getContractingAiDraftFailedSignal } from './queries/contracting-ai-draft-failed'
+import { getContractingApprovedWithoutPdfSignal } from './queries/contracting-approved-without-pdf'
+import { getContractingPdfStatusDriftSignal } from './queries/contracting-pdf-status-drift'
+import { getContractingSignatureDesyncSignal } from './queries/contracting-signature-desync'
+import {
+  getSignatureFailedSignal,
+  getSignaturePendingOverdueSignal,
+  getSignatureSignedArtifactMissingSignal
+} from './queries/signature-orchestration-signals'
+import { getContractingValidationBlockedOverdueSignal } from './queries/contracting-validation-blocked-overdue'
 import { getContractorPayableUnbatchedOverdueSignal } from './queries/contractor-payable-unbatched-overdue'
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
 import { getContractorRemittanceEmailDeadLetterSignal } from './queries/contractor-remittance-email-dead-letter'
@@ -104,6 +114,7 @@ import {
 } from './queries/notion-metrics-ftr-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentitySessionRouteGroupDriftSignal } from './queries/identity-session-route-group-drift'
+import { getLeaveInvalidDelegatedApprovalSnapshotsSignal } from './queries/leave-invalid-delegated-approval-snapshots'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
 import { getContractorEngagementClassificationReviewPendingSignal } from './queries/contractor-engagement-classification-review-pending'
@@ -156,6 +167,10 @@ import {
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
+import {
+  getOrganizationBrandAssetCoverageSignal,
+  getOrganizationBrandAssetDiscoveryFailuresSignal
+} from './queries/organization-brand-assets'
 import { getCloudRunSilentObservabilitySignal } from './queries/cloud-run-silent-observability'
 import { getAiObserverUnhealthySignal } from './queries/ai-observer-unhealthy'
 import { getSecretsEnvRefFormatDriftSignal } from './queries/secrets-env-ref-format-drift'
@@ -172,6 +187,7 @@ import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-re
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
+import { getNotionOnboardingIncompleteSignal } from './queries/notion-onboarding-incomplete'
 import { getEngagementBudgetOverrunSignal } from './queries/engagement-budget-overrun'
 import { getEngagementConversionRateDropSignal } from './queries/engagement-conversion-rate-drop'
 import { getEngagementOverdueDecisionSignal } from './queries/engagement-overdue-decision'
@@ -185,7 +201,8 @@ import {
   getClientLifecycleChecklistOrphanItemsSignal,
   getClientLifecycleCascadeDeadLetterSignal,
   getClientLifecycleCaseWithoutTemplateSignal,
-  getClientLifecycleBlockerOverrideAnomalySignal
+  getClientLifecycleBlockerOverrideAnomalySignal,
+  getClientLifecycleEvidenceDetectedNotMarkedSignal
 } from './queries/client-lifecycle-signals'
 import { getCommercialOrganizationIncompleteIdentitySignal } from './queries/commercial-organization-incomplete-identity'
 import { getCommercialOrganizationIndustryNoncanonicalSignal } from './queries/commercial-organization-industry-noncanonical'
@@ -627,6 +644,17 @@ interface ReliabilityOverviewSources {
   /** TASK-977 — committed payables without a materialized expense (settlement precondition). */
   contractorPayableExpenseUnmaterialized?: ReliabilitySignal | null
   contractorPayablePaymentSlaOverdue?: ReliabilitySignal | null
+  contractingAiDraftFailed?: ReliabilitySignal | null
+  contractingValidationBlockedOverdue?: ReliabilitySignal | null
+  contractingApprovedWithoutPdf?: ReliabilitySignal | null
+  /** TASK-1023 — stale PDF watermark vs current case status. */
+  contractingPdfStatusDrift?: ReliabilitySignal | null
+  /** TASK-1024 — signature completed/failed but the contracting case never advanced. */
+  contractingSignatureDesync?: ReliabilitySignal | null
+  /** TASK-490 — signature orchestration signals (moduleKey 'documents'). */
+  signaturePendingOverdue?: ReliabilitySignal | null
+  signatureFailed?: ReliabilitySignal | null
+  signatureSignedArtifactMissing?: ReliabilitySignal | null
   /** TASK-979 — un-batched overdue contractor obligations (monthly run coverage gap). */
   contractorPayableUnbatchedOverdue?: ReliabilitySignal | null
 
@@ -690,6 +718,7 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   workspaceProjection?: ReliabilitySignal[] | null
+  organizationBrandAssets?: ReliabilitySignal[] | null
   scimWorkforce?: ReliabilitySignal[] | null
 
   /**
@@ -734,6 +763,9 @@ interface ReliabilityOverviewSources {
    * completing and greenhouse_delivery.* goes stale. Roll up under 'sync'.
    */
   notionConformedDrainFreshness?: ReliabilitySignal | null
+
+  /** TASK-1009 — onboarding cases con verify_notion_flowing pendiente > 7d. */
+  notionOnboardingIncomplete?: ReliabilitySignal | null
 
   /**
    * TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
@@ -965,6 +997,16 @@ export const buildReliabilityOverview = (
       ? [sources.contractorPayableExpenseUnmaterialized]
       : []),
     ...(sources.contractorPayablePaymentSlaOverdue ? [sources.contractorPayablePaymentSlaOverdue] : []),
+    // TASK-1019 — Workforce Contracting signals (moduleKey 'workforce').
+    ...(sources.contractingAiDraftFailed ? [sources.contractingAiDraftFailed] : []),
+    ...(sources.contractingValidationBlockedOverdue ? [sources.contractingValidationBlockedOverdue] : []),
+    ...(sources.contractingApprovedWithoutPdf ? [sources.contractingApprovedWithoutPdf] : []),
+    ...(sources.contractingPdfStatusDrift ? [sources.contractingPdfStatusDrift] : []), // TASK-1023 (was resolved+packed but not surfaced)
+    ...(sources.contractingSignatureDesync ? [sources.contractingSignatureDesync] : []), // TASK-1024
+    // TASK-490 — Signature orchestration signals (moduleKey 'documents').
+    ...(sources.signaturePendingOverdue ? [sources.signaturePendingOverdue] : []),
+    ...(sources.signatureFailed ? [sources.signatureFailed] : []),
+    ...(sources.signatureSignedArtifactMissing ? [sources.signatureSignedArtifactMissing] : []),
     ...(sources.contractorPayableUnbatchedOverdue ? [sources.contractorPayableUnbatchedOverdue] : []),
     // TASK-777 Slice 3 — Expense distribution gates.
     ...(sources.expenseDistribution ?? []),
@@ -983,6 +1025,8 @@ export const buildReliabilityOverview = (
     ...(sources.sisterPlatformOAuth ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
+    // TASK-999 — Organization brand asset coverage + discovery failures.
+    ...(sources.organizationBrandAssets ?? []),
     // TASK-872 Slice 6 — SCIM Internal Collaborator + workforce intake signals (6).
     ...(sources.scimWorkforce ?? []),
     // ISSUE-075 hardening — Microsoft Graph webhook subscription health.
@@ -995,6 +1039,8 @@ export const buildReliabilityOverview = (
     ...(sources.nuboxSourceFreshness ? [sources.nuboxSourceFreshness] : []),
     // Notion conformed → PG drain freshness (FK incident escalation backstop).
     ...(sources.notionConformedDrainFreshness ? [sources.notionConformedDrainFreshness] : []),
+    // TASK-1009 — onboarding Notion sin fluir al portal.
+    ...(sources.notionOnboardingIncomplete ? [sources.notionOnboardingIncomplete] : []),
     // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG.
     ...(sources.criticalTablesMissing ? [sources.criticalTablesMissing] : []),
     // TASK-844 Slice 5 — Cross-runtime observability anti-regresión.
@@ -1425,10 +1471,52 @@ export const getReliabilityOverview = async (
       ? preloadedSources.contractorPayablePaymentSlaOverdue
       : await getContractorPayablePaymentSlaOverdueSignal().catch(() => null)
 
+  // TASK-1019 — Workforce Contracting reliability signals (moduleKey 'workforce').
+  const contractingAiDraftFailed =
+    preloadedSources.contractingAiDraftFailed !== undefined
+      ? preloadedSources.contractingAiDraftFailed
+      : await getContractingAiDraftFailedSignal().catch(() => null)
+
+  const contractingValidationBlockedOverdue =
+    preloadedSources.contractingValidationBlockedOverdue !== undefined
+      ? preloadedSources.contractingValidationBlockedOverdue
+      : await getContractingValidationBlockedOverdueSignal().catch(() => null)
+
+  const contractingApprovedWithoutPdf =
+    preloadedSources.contractingApprovedWithoutPdf !== undefined
+      ? preloadedSources.contractingApprovedWithoutPdf
+      : await getContractingApprovedWithoutPdfSignal().catch(() => null)
+
+  const contractingPdfStatusDrift =
+    preloadedSources.contractingPdfStatusDrift !== undefined
+      ? preloadedSources.contractingPdfStatusDrift
+      : await getContractingPdfStatusDriftSignal().catch(() => null)
+
+  const contractingSignatureDesync =
+    preloadedSources.contractingSignatureDesync !== undefined
+      ? preloadedSources.contractingSignatureDesync
+      : await getContractingSignatureDesyncSignal().catch(() => null)
+
   const contractorPayableUnbatchedOverdue =
     preloadedSources.contractorPayableUnbatchedOverdue !== undefined
       ? preloadedSources.contractorPayableUnbatchedOverdue
       : await getContractorPayableUnbatchedOverdueSignal().catch(() => null)
+
+  // TASK-490 — Signature orchestration reliability signals (moduleKey 'documents').
+  const signaturePendingOverdue =
+    preloadedSources.signaturePendingOverdue !== undefined
+      ? preloadedSources.signaturePendingOverdue
+      : await getSignaturePendingOverdueSignal().catch(() => null)
+
+  const signatureFailed =
+    preloadedSources.signatureFailed !== undefined
+      ? preloadedSources.signatureFailed
+      : await getSignatureFailedSignal().catch(() => null)
+
+  const signatureSignedArtifactMissing =
+    preloadedSources.signatureSignedArtifactMissing !== undefined
+      ? preloadedSources.signatureSignedArtifactMissing
+      : await getSignatureSignedArtifactMissingSignal().catch(() => null)
 
   const expenseDistribution =
     preloadedSources.expenseDistribution !== undefined
@@ -1497,7 +1585,11 @@ export const getReliabilityOverview = async (
           getContractorEngagementClassificationReviewPendingSignal().catch(() => null),
           // TASK-987 — route_groups de sesión que no derivan de roles ACTIVOS
           // (over-exposure por roles revocados; defense-in-depth del fix session_360).
-          getIdentitySessionRouteGroupDriftSignal().catch(() => null)
+          getIdentitySessionRouteGroupDriftSignal().catch(() => null),
+          // TASK-1020 — snapshots de aprobación pendientes con autoridad efectiva
+          // derivada de un approval_delegate genérico inválido (over-exposure de
+          // autoridad de aprobación; steady=0 tras el recovery).
+          getLeaveInvalidDelegatedApprovalSnapshotsSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
@@ -1554,6 +1646,19 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-999 — Organization brand asset signals. Roll up bajo Identity porque
+  // la proyección Organization 360 consume el logo canónico, pero el flujo
+  // protege explícitamente operating/legal entities.
+  const organizationBrandAssets =
+    preloadedSources.organizationBrandAssets !== undefined
+      ? preloadedSources.organizationBrandAssets
+      : await Promise.all([
+          getOrganizationBrandAssetCoverageSignal().catch(() => null),
+          getOrganizationBrandAssetDiscoveryFailuresSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-872 Slice 6 — SCIM + workforce intake signals (6 readers en paralelo).
   // Cubre: users sin identity_profile / sin member / ineligibles in scope /
   // member identity drift / members pending intake completion / allowlist-blocklist
@@ -1594,6 +1699,11 @@ export const getReliabilityOverview = async (
     preloadedSources.notionConformedDrainFreshness !== undefined
       ? preloadedSources.notionConformedDrainFreshness
       : await getNotionConformedDrainFreshnessSignal().catch(() => null)
+
+  const notionOnboardingIncomplete =
+    preloadedSources.notionOnboardingIncomplete !== undefined
+      ? preloadedSources.notionOnboardingIncomplete
+      : await getNotionOnboardingIncompleteSignal().catch(() => null)
 
   // TASK-838 Fase 3 — Runtime guard: critical tables missing in PG. Single
   // reader; degrada honestamente a `unknown` si la query falla.
@@ -1751,7 +1861,9 @@ export const getReliabilityOverview = async (
           getClientLifecycleChecklistOrphanItemsSignal().catch(() => null),
           getClientLifecycleCascadeDeadLetterSignal().catch(() => null),
           getClientLifecycleCaseWithoutTemplateSignal().catch(() => null),
-          getClientLifecycleBlockerOverrideAnomalySignal().catch(() => null)
+          getClientLifecycleBlockerOverrideAnomalySignal().catch(() => null),
+          // TASK-1017 — evidencia auto-derivable detectada pero el paso sigue sin marcar.
+          getClientLifecycleEvidenceDetectedNotMarkedSignal().catch(() => null)
         ])
           .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
@@ -1883,6 +1995,14 @@ export const getReliabilityOverview = async (
     contractorPayableReadyWithoutObligation,
     contractorPayableExpenseUnmaterialized,
     contractorPayablePaymentSlaOverdue,
+    contractingAiDraftFailed,
+    contractingValidationBlockedOverdue,
+    contractingApprovedWithoutPdf,
+    contractingPdfStatusDrift,
+    contractingSignatureDesync,
+    signaturePendingOverdue,
+    signatureFailed,
+    signatureSignedArtifactMissing,
     contractorPayableUnbatchedOverdue,
     contractorPayableBridgeDeadLetter,
     contractorRemittanceEmailDeadLetter,
@@ -1897,12 +2017,14 @@ export const getReliabilityOverview = async (
     identityGovernance,
     sisterPlatformOAuth,
     workspaceProjection,
+    organizationBrandAssets,
     scimWorkforce,
     entraWebhookSubscriptionHealth,
     clientPortalResolverFailureRate,
     financeClientProfileUnlinked,
     nuboxSourceFreshness,
     notionConformedDrainFreshness,
+    notionOnboardingIncomplete,
     criticalTablesMissing,
     cloudRunSilentObservability,
     aiObserverUnhealthy,

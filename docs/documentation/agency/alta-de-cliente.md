@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-06-04 por Claude
-> **Ultima actualizacion:** 2026-06-04 por Claude
+> **Ultima actualizacion:** 2026-06-05 por Claude (TASK-1017 — verificar evidencia del checklist)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1](../../architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md) · [GREENHOUSE_CLIENT_LIFECYCLE_V1](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md)
 
 # Alta de Cliente — Puerta Unica de Onboarding
@@ -133,6 +133,25 @@ El timeline del caso se ve en la ficha del cliente (Account 360): muestra el ori
 
 > Detalle tecnico: aggregate `client_lifecycle_case` + checklist `standard_onboarding_v1` + comando `provisionClientLifecycle`. Maquina de estados y eventos `client.lifecycle.*` v1 en [GREENHOUSE_CLIENT_LIFECYCLE_V1 §5-§10](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md). Implementado por TASK-992.
 
+## Encontrar y activar casos en vuelo (cockpit de onboarding)
+
+No todos los casos nacen del wizard. Cuando un deal de HubSpot pasa a cerrado-ganado, Greenhouse abre automaticamente un caso de onboarding en **borrador** (el operador lo activa; un misclick de ventas no dispara nada irreversible). Esos casos no nacen con una URL a mano — por eso existe el **cockpit de onboarding**.
+
+El cockpit vive en **Agencia → Operaciones → "Alta de cliente"** (`/agency/clients/onboarding`). Es el inbox de los casos en vuelo:
+
+- **KPIs reales**: casos abiertos, en progreso, vencidos (pasaron su fecha objetivo) y bloqueados.
+- **Inbox seleccionable** a la izquierda (filtrable por estado y origen, buscable por cliente / codigo / deal), con los **borradores destacados**.
+- **Preview del checklist real** del caso seleccionado al centro (las 10 etapas con su estado actual).
+- **Rail de accion** a la derecha: "Abrir timeline" (y "Activar caso" cuando esta en borrador), el responsable, la fecha objetivo y la fuente (origen + Deal ID).
+
+El cockpit **no reemplaza el wizard**: lo hace encontrable. Su CTA principal "Nuevo cliente" sigue yendo al wizard (`/agency/clients/new`); el cockpit solo hace **visibles y activables** los casos que ya estan en vuelo. La activacion ocurre en el timeline del caso (`draft → in_progress`).
+
+Ademas, la lista de **Organizaciones** muestra una columna "Onboarding" y la **ficha del cliente (Account 360)** muestra un banner "Onboarding en curso · Abrir timeline" cuando la organizacion tiene un caso activo — para llegar al timeline desde donde ya estabas mirando la cuenta.
+
+Todo lo que muestra el cockpit es **honesto**: si un dato no existe (no hay fecha objetivo, no hay deal asociado, el caso lo abrio el sistema), se muestra "—" / "Sin deal asociado" / "Sistema", nunca un valor inventado.
+
+> Detalle tecnico: reader `getOnboardingCasesInbox()` ([inbox-reader.ts](../../../src/lib/client-lifecycle/inbox-reader.ts), cases + organizacion + checklist batched sin N+1), page `/agency/clients/onboarding`, vista `OnboardingCasesInboxView`. Indicador cruzado: `getActiveOnboardingStatusByOrg` + `OnboardingCaseBanner`. Gated por `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` + capability `client.lifecycle.case.read`. Implementado por TASK-1013 (sobre el backend de TASK-992; el deal-trigger es TASK-1010).
+
 ## Anclaje de referencias externas (Notion, Teams, contactos, industria)
 
 El wizard sigue una regla canonica: **cuando un dato tiene una fuente de verdad externa, no se escribe a mano ni se crea a ciegas — se sugiere desde la fuente y se asocia a la entidad canonica con su trazabilidad.**
@@ -171,3 +190,33 @@ Es idempotente: re-invitar a alguien ya invitado no duplica nada. Solo se pueden
 - **Onboarding en curso** → en la ficha, el banner muestra cuantos items del checklist estan completos (por ejemplo "4 de 10 completados").
 
 > Detalle tecnico: la completitud se resuelve con `resolveClientCompleteness` + `GET .../completeness`. Estados honestos (state-design) en [GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1 §5](../../architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md).
+
+## Preflight Notion: "fluyendo de verdad al portal" (TASK-1009)
+
+Configurar Notion (token + bases) no es lo mismo que tener las tareas **visibles en el portal**. El checklist de onboarding incluye un item bloqueante **"Verificar que el cliente fluye al portal"** (`verify_notion_flowing`): el onboarding **no se puede dar por completado** hasta que ese item este en verde.
+
+El item corre un **preflight de 9 eslabones** sobre la cadena completa y reporta verde/rojo por cada uno:
+
+1. Token Notion resuelve · 2. Sync habilitado + bases configuradas · 3. Datos crudos en BigQuery · 4. `client_id` atribuido · 5. Gate de readiness (tareas + proyectos; los sprints son opcionales) · 6. Template L1 (los estados del cliente mapean al vocabulario canonico) · 7. Datos en la capa conformed · 8. **Tareas visibles en el portal** · 9. Sync reciente.
+
+El item **se auto-completa solo si el preflight da todo verde** — nadie puede marcarlo listo estando rojo. Si algo sale rojo, el detalle dice exactamente que eslabon arreglar (por ejemplo, un estado de Notion que no mapea → alinear el template en Notion, **no** crear excepciones por cliente).
+
+> Detalle tecnico: composer `getNotionOnboardingReadiness(spaceId)` (reusa los helpers de readiness/freshness existentes), endpoint `POST .../cases/[caseId]/notion-preflight`, CLI `pnpm notion:onboarding-preflight <spaceId>`, signal `integrations.notion.onboarding_incomplete`. Delta en [GREENHOUSE_CLIENT_LIFECYCLE_V1](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md).
+
+## Verificar evidencia del checklist (TASK-1017)
+
+Varios pasos del checklist tienen un estado real que el sistema **ya sabe** sin que el operador lo marque a mano: la empresa sincronizada desde HubSpot, el equipo asignado, Notion fluyendo, el canal de Teams, las personas del portal invitadas, la facturacion lista. Antes, el checklist mostraba lo que estaba guardado, no la realidad — un paso podia salir "pendiente" aunque la pieza ya estuviera lista (caso Berel: Notion provisionado y en BigQuery, pero el paso seguia "en curso").
+
+En la ficha del cliente, el panel del checklist tiene un boton **"Verificar evidencia"**. Al correrlo, cada paso **auto-derivable** muestra, junto a su estado, lo que ve el sistema:
+
+- **Detectado** (verde) — la pieza ya esta lista en el sistema.
+- **Sin detectar** (gris) — la fuente respondio y todavia no esta hecho.
+- **No verificable** (ambar) — no pudimos verificar (la fuente esta caida). Nunca se muestra un falso "pendiente".
+
+La evidencia solo aparece en los pasos **aun no resueltos** (donde aporta decision: "ya esta listo, marcalo" o "todavia no"); en un paso ya cerrado seria ruido. Los casos de **drift** ("ya esta listo pero nadie lo marco") destacan: ves "Detectado" junto a un estado que sigue pendiente.
+
+Los pasos **declarativos** (contrato firmado, tipo de servicio, terminos comerciales, fases) **no** tienen fuente automatica: siguen siendo manuales, sin evidencia inventada.
+
+**Auto-completado (opcional, detras de flag):** cuando el operador lo activa, un paso con evidencia **Detectado** que no requiere un documento adjunto humano se marca como completado solo. Nunca con evidencia "pendiente"/"no verificable" (anti-fake-green), nunca pisa lo que ya marcaste a mano, y los pasos que requieren un asset humano (como provisionar Notion) muestran la evidencia pero quedan manuales — la evidencia del sistema no reemplaza el documento.
+
+> Detalle tecnico: registry `item_code → resolver` (reuse-first: HubSpot via `getClientLifecycleStage`, Notion via `getNotionOnboardingReadiness`, equipo/Teams/portal/facturacion por tabla canonica), composer batched `resolveOnboardingEvidence(caseId)` (server-only, degradacion honesta `OutcomeOrError`), endpoint `POST .../cases/[caseId]/verify-evidence` (read + auto-complete gated por `ONBOARDING_ITEM_EVIDENCE_AUTOCOMPLETE_ENABLED`). Decision pura `canAutoCompleteFromEvidence`. Signal de drift `client.lifecycle.evidence_detected_not_marked`. Implementado por TASK-1017 (extiende el patron `verify_notion_flowing` de TASK-1009).

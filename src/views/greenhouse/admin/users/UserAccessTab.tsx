@@ -360,7 +360,7 @@ const EffectiveEntitlementsSection = ({
                 <TableRow key={`${row.capability}:${row.action}:${row.scope}`}>
                   <TableCell>{toTitleCase(row.module.replace('_', ' '))}</TableCell>
                   <TableCell>
-                    <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                    <Typography variant='caption'>
                       {row.capability}
                     </Typography>
                   </TableCell>
@@ -524,7 +524,7 @@ const OverridesSection = ({
                   {overrides.map(override => (
                     <TableRow key={override.overrideId}>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                        <Typography variant='caption'>
                           {override.capability}
                         </Typography>
                       </TableCell>

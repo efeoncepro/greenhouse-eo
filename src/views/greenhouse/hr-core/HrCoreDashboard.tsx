@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
@@ -30,6 +29,8 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
@@ -44,7 +45,6 @@ import { leaveStatusConfig, getLeaveTypeConfig, attendanceStatusConfig, formatDa
 const TASK407_EMPTY_NO_HAY_REGISTROS_DE_ASISTENCIA_RECIENTES = "No hay registros de asistencia recientes."
 
 
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 const HrCoreDashboard = () => {
   const theme = useTheme()

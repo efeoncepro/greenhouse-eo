@@ -109,9 +109,33 @@ Endpoints:
 - `DELETE /api/platform/app/sessions/current`
 - `GET /api/platform/app/context`
 - `GET /api/platform/app/home`
+- `GET /api/platform/app/organizations/:id/compact-signals`
 - `GET /api/platform/app/notifications`
 - `POST /api/platform/app/notifications/:id/read`
 - `POST /api/platform/app/notifications/mark-all-read`
+
+#### Organization Compact Signals
+
+`GET /api/platform/app/organizations/:id/compact-signals`
+
+Returns the compact Organization Workspace signal projection used by first-party
+clients: account health, readiness, recent signals, next actions, provenance,
+source freshness and degraded sources. The resource is read-only and gates
+facet visibility through the canonical Organization Workspace projection.
+
+Query params:
+
+- `asOf` — optional ISO date for Account 360 reads.
+- `year`, `month` — optional period for finance summary reads.
+- `accountLimit`, `recentSignalsLimit`, `nextActionsLimit` — optional positive
+  integer limits.
+
+Failure modes:
+
+- Missing organization returns `404 not_found`.
+- Slow or failed secondary sources return `200` with `data.status='partial'`
+  and populated `data.degradedSources[]`.
+- No authorized facets returns `200` with `data.status='unavailable'`.
 
 ### Event Control Plane
 

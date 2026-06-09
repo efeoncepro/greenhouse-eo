@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
+import { hubspotIndustryLabel } from '@/config/hubspot-industries'
+
 import type { OrganizationDetailData } from './types'
 
 type Props = {
@@ -42,17 +44,28 @@ const STATUS_LABEL: Record<string, string> = {
 const OrganizationLeftSidebar = ({ detail, isAdmin, syncing, onEditOrganization, onSyncHubspot }: Props) => {
   const initial = detail.organizationName.charAt(0).toUpperCase()
   const flag = detail.country ? COUNTRY_FLAGS[detail.country.toUpperCase()] ?? '🌐' : null
+  const industryLabel = hubspotIndustryLabel(detail.industry)
 
   return (
     <Card>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, pt: 6 }}>
         <CustomAvatar variant='rounded' skin='light' color='primary' size={100}>
-          <Typography variant='h3' sx={{ fontWeight: 700 }}>{initial}</Typography>
+          {detail.logoUrl ? (
+            <Box
+              component='img'
+              src={detail.logoUrl}
+              alt=''
+              loading='lazy'
+              sx={{ width: '100%', height: '100%', objectFit: 'contain', p: 2, bgcolor: 'background.paper' }}
+            />
+          ) : (
+            <Typography variant='h3' sx={{ fontWeight: 700 }}>{initial}</Typography>
+          )}
         </CustomAvatar>
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant='h5'>{detail.organizationName}</Typography>
-          {detail.industry && (
-            <Typography variant='body2' color='text.secondary'>{detail.industry}</Typography>
+          {industryLabel && (
+            <Typography variant='body2' color='text.secondary'>{industryLabel}</Typography>
           )}
         </Box>
         <CustomChip
@@ -119,7 +132,7 @@ const OrganizationLeftSidebar = ({ detail, isAdmin, syncing, onEditOrganization,
           <>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Box component='img' src='/images/integrations/hubspot.svg' alt='HubSpot' sx={{ width: 16, height: 16, objectFit: 'contain' }} />
-              <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+              <Typography variant='caption'>
                 HubSpot: {detail.hubspotCompanyId}
               </Typography>
             </Box>

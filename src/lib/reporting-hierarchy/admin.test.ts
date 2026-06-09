@@ -110,71 +110,26 @@ describe('reporting hierarchy admin helpers', () => {
     expect(result.updatedCount).toBe(1)
   })
 
-  it('replaces approval delegations atomically inside a single transaction', async () => {
-    const fakeClient = { query: vi.fn() }
-
-    mockListApprovalDelegations
-      .mockResolvedValueOnce([
+  // TASK-1020 D1 — la delegación genérica de aprobaciones está bloqueada (fail-closed):
+  // recrearla generaría un primitivo inerte y engañoso (no confiere autoridad ni scope).
+  it('blocks generic approval delegation (TASK-1020 D1) without mutating anything', async () => {
+    await expect(
+      assignApprovalDelegationWithDependencies(
         {
-          responsibilityId: 'resp-old',
           supervisorMemberId: 'member-1',
-          supervisorName: 'Julio Reyes',
-          delegateMemberId: 'member-3',
-          delegateMemberName: 'Old Delegate',
-          effectiveFrom: '2026-04-01T00:00:00.000Z',
-          effectiveTo: null,
-          active: true,
-          isPrimary: true,
-          createdAt: '2026-04-01T00:00:00.000Z',
-          updatedAt: '2026-04-01T00:00:00.000Z'
-        }
-      ])
-      .mockResolvedValueOnce([
-        {
-          responsibilityId: 'resp-new',
-          supervisorMemberId: 'member-1',
-          supervisorName: 'Julio Reyes',
           delegateMemberId: 'member-2',
-          delegateMemberName: 'New Delegate',
           effectiveFrom: '2026-04-10T12:00:00.000Z',
-          effectiveTo: null,
-          active: true,
-          isPrimary: true,
-          createdAt: '2026-04-10T12:00:00.000Z',
-          updatedAt: '2026-04-10T12:00:00.000Z'
+          effectiveTo: '2026-04-20T12:00:00.000Z'
+        },
+        {
+          loadApprovalDelegations: mockListApprovalDelegations
         }
-      ])
+      )
+    ).rejects.toMatchObject({ statusCode: 422 })
 
-    mockWithTransaction.mockImplementation(async callback => callback(fakeClient as never))
-    mockCreateResponsibilityInTransaction.mockResolvedValue('resp-new')
-    mockRevokeResponsibilityInTransaction.mockResolvedValue(undefined)
-
-    const delegation = await assignApprovalDelegationWithDependencies(
-      {
-        supervisorMemberId: 'member-1',
-        delegateMemberId: 'member-2',
-        effectiveFrom: '2026-04-10T12:00:00.000Z',
-        effectiveTo: '2026-04-20T12:00:00.000Z'
-      },
-      {
-        loadApprovalDelegations: mockListApprovalDelegations
-      }
-    )
-
-    expect(mockWithTransaction).toHaveBeenCalledTimes(1)
-    expect(mockRevokeResponsibilityInTransaction).toHaveBeenCalledWith('resp-old', fakeClient)
-    expect(mockCreateResponsibilityInTransaction).toHaveBeenCalledWith(
-      expect.objectContaining({
-        memberId: 'member-2',
-        scopeType: 'member',
-        scopeId: 'member-1',
-        responsibilityType: 'approval_delegate',
-        isPrimary: true,
-        effectiveFrom: '2026-04-10T12:00:00.000Z',
-        effectiveTo: '2026-04-20T12:00:00.000Z'
-      }),
-      fakeClient
-    )
-    expect(delegation?.responsibilityId).toBe('resp-new')
+    // NUNCA toca state: ni transacción, ni create, ni revoke de responsabilidad.
+    expect(mockWithTransaction).not.toHaveBeenCalled()
+    expect(mockCreateResponsibilityInTransaction).not.toHaveBeenCalled()
+    expect(mockRevokeResponsibilityInTransaction).not.toHaveBeenCalled()
   })
 })

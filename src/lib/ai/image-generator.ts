@@ -3,6 +3,7 @@ import 'server-only'
 import { writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import { axisSemanticHex } from '@core/theme/axis-semantic'
 import { getGoogleGenAIClient, getGreenhouseAgentModel } from '@/lib/ai/google-genai'
 import {
   generateOpenAIImage,
@@ -70,10 +71,10 @@ Rules:
 - Use CSS keyframes inside a <style> tag within the SVG.
 - Use these exact brand colors:
   - Primary: #7367F0
-  - Success: #6EC207
-  - Warning: #FF6500
-  - Error: #BB1954
-  - Info: #00BAD1
+  - Success: ${axisSemanticHex.success}
+  - Warning: ${axisSemanticHex.warning}
+  - Error: ${axisSemanticHex.error}
+  - Info: ${axisSemanticHex.info}
   - Text primary: #4B465C
   - Text secondary: #808390
   - Background: #F8F7FA

@@ -33,6 +33,8 @@ describe('getTenantEntitlements', () => {
     expect(can(entitlements, 'agency.workspace', 'launch', 'tenant')).toBe(true)
     expect(can(entitlements, 'commercial.workspace', 'launch', 'tenant')).toBe(true)
     expect(can(entitlements, 'finance.status', 'read', 'tenant')).toBe(true)
+    expect(can(entitlements, 'organization.brand_asset', 'update', 'tenant')).toBe(true)
+    expect(can(entitlements, 'organization.brand_asset', 'review', 'tenant')).toBe(true)
     expect(canSeeModule(entitlements, 'people')).toBe(true)
     expect(canSeeModule(entitlements, 'client_portal')).toBe(true)
     expect(canSeeModule(entitlements, 'ai_tooling')).toBe(true)
@@ -139,6 +141,25 @@ describe('getTenantEntitlements', () => {
     expect(can(entitlements, 'my_workspace.workspace', 'launch', 'own')).toBe(true)
     expect(canSeeModule(entitlements, 'my_workspace')).toBe(true)
     expect(canSeeModule(entitlements, 'agency')).toBe(false)
+  })
+
+  it('grants organization brand asset mutation to admin route group but not regular internal users', () => {
+    const adminEntitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.COLLABORATOR],
+      primaryRoleCode: ROLE_CODES.COLLABORATOR,
+      routeGroups: ['internal', 'admin']
+    }))
+
+    const internalEntitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.COLLABORATOR],
+      primaryRoleCode: ROLE_CODES.COLLABORATOR,
+      routeGroups: ['internal']
+    }))
+
+    expect(can(adminEntitlements, 'organization.brand_asset', 'review', 'tenant')).toBe(true)
+    expect(can(adminEntitlements, 'organization.brand_asset', 'update', 'tenant')).toBe(true)
+    expect(can(internalEntitlements, 'organization.brand_asset', 'review', 'tenant')).toBe(false)
+    expect(can(internalEntitlements, 'organization.brand_asset', 'update', 'tenant')).toBe(false)
   })
 
   it('maps client tenants to the client portal workspace', () => {
