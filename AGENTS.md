@@ -1624,6 +1624,16 @@ Para cualquier documento legal/regulatorio nuevo o cambio mayor que vaya a ser f
 
 Sin paso 3 (audit comprehensive post-real-emit), bugs como B-1/B-2/B-3 (cláusulas legales con vicio defendible) o V1.5.1 (cargo del trabajador en col empleador) quedan latentes y se manifiestan recién cuando un cliente, abogado, contralor o auditor externo lo detecta — costo mucho mayor.
 
+### Approval Authority Delegation invariants (TASK-1020, 2026-06-07)
+
+El `operational_responsibilities.responsibility_type='approval_delegate'` **genérico** NO confiere autoridad de aprobación ni scope de supervisor para las superficies de aprobación. Las aprobaciones de permiso/gasto/evaluación resuelven al **supervisor formal** (`reporting_lines`) o al override HR/admin. Reglas duras (versión completa + mecánica en CLAUDE.md "Approval Authority Delegation invariants"):
+
+- **NUNCA** un `approval_delegate` genérico cambia el `effective_approver_member_id` de un stage con `honorGenericApprovalDelegate=false` (default; los 3 stages `effective_supervisor` lo son). NUNCA confiere `canAccessSupervisorLeave`/`visibleMemberIds`/scope (principio TASK-987/ISSUE-083: la validez se mueve junto para todo lo derivado).
+- **NUNCA** resolver una over-exposure de aprobación dando HR/admin broad al supervisor formal ni tocando `route_groups`/`views`. NUNCA crear una delegación genérica nueva vía API/UI (guardrail 422). NUNCA remediar con SQL manual: usar `pnpm hr:leave-approval-authority:recover` (dry-run/apply allowlisted, recompute vía resolver canónico SSOT, revoke append-only, outbox v1, idempotente). NUNCA borrar filas de `operational_responsibilities`.
+- **SIEMPRE** declarar `honorGenericApprovalDelegate` explícito (default `false`) en stages `effective_supervisor` nuevos; mover juntos config flag + signal `hr.leave.invalid_delegated_approval_snapshots` (identity, drift, steady=0) + tests. La delegación REAL de permisos renace como contrato domain-scoped separado (ADR follow-up); el interín es el override HR/admin.
+
+Spec: `docs/tasks/complete/TASK-1020-leave-approval-authority-delegation-drift-hardening.md` + `GREENHOUSE_IDENTITY_ACCESS_V2.md` Delta 2026-06-07 + runbook `docs/operations/runbooks/leave-approval-authority-recovery.md`.
+
 ### Organization-by-facets — receta canónica (TASK-611/612/613, 2026-05-08)
 
 Toda surface organization-centric (clientes finanzas, agency organizations, prospects, partners, vendors, futuras vistas legales/marketing/compliance/audit) **debe** renderearse a través del **Organization Workspace shell canónico** (TASK-612). Cero composición ad-hoc.

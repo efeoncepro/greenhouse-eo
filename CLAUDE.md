@@ -248,6 +248,33 @@ Toda derivación de **acceso de sesión** desde `user_role_assignments` (route_g
 
 **Spec canónica**: `docs/tasks/complete/TASK-987-session-route-groups-lifecycle-fix.md` + `docs/issues/resolved/ISSUE-083-session-route-groups-leak-from-revoked-roles.md`. Migración: `migrations/20260601194051024_task-987-session-route-groups-lifecycle-fix.sql`.
 
+### Approval Authority Delegation invariants (TASK-1020, desde 2026-06-07)
+
+El `operational_responsibilities.responsibility_type='approval_delegate'` **genérico** NO confiere ni **autoridad de aprobación** ni **scope de supervisor** para las superficies de aprobación. Cierra el drift donde una responsabilidad genérica (Valentina delegada, `scope_id=daniela`) congeló a la delegada como `effective_approver_member_id` del permiso de Andrés, bloqueando a la supervisora formal Daniela. Causa raíz = drift de autorización (no "falta un botón"). Decisiones canónicas D1-D4 confirmadas por el operador/CEO el 2026-06-07.
+
+**Dos planos** consumen hoy el mismo delegate genérico (decidir ambos, no asumir que arreglar uno arregla el otro):
+1. **Autoridad** — `resolver.ts` → `getEffectiveSupervisor` (`readers.ts`) → snapshot → `leave-review-policy.ts`. Lo consumen los TRES stages `effective_supervisor` (`leave`, `expense_report`, `performance_evaluation`).
+2. **Visibilidad/scope** — `access.ts` (`getSupervisorScopeForTenant`).
+
+**Mecánica canónica**:
+- Flag declarativo per-stage `ApprovalStageDefinition.honorGenericApprovalDelegate` (`src/lib/approval-authority/config.ts`, default tratado como `false`). El resolver pasa `delegationPolicy: honor ? 'generic' : 'ignore'` a `getEffectiveSupervisor(memberId, { delegationPolicy })`. Con `'ignore'` → `effectiveApproverMemberId === formalApproverMemberId` y `authoritySource='reporting_hierarchy'` (NUNCA `'delegation'`).
+- `getEffectiveSupervisor` default `'generic'` (preserva el contrato del reader para callers explícitos); el cambio NO es global ciego — cada caller declara su política.
+- `getSupervisorScopeForTenant` (D3) ya NO cuenta el `approval_delegate` genérico hacia `canAccessSupervisorLeave`/`visibleMemberIds`/`hasDelegatedAuthority`. El scope deriva de la línea formal (`hasDirectReports` + subárbol propio).
+- Recovery auditado `src/lib/hr-core/leave-approval-authority-recovery.ts` (CLI `pnpm hr:leave-approval-authority:recover`): dry-run default; `--apply` requiere filtro explícito (allowlist anti revoke global); recompute SIEMPRE vía `resolveApprovalAuthorityForStage` (SSOT — runtime y recovery no divergen); revoke global D4 (append-only); outbox `leave_request.approval_authority_recovered` v1; idempotente; solo snapshots `pending_supervisor`.
+- Guardrail fail-closed: `assignApprovalDelegation*` (`src/lib/reporting-hierarchy/admin.ts`) rechaza (422) — la delegación genérica ya no confiere nada → recrearla es un primitivo inerte/engañoso. `revoke`/`list` siguen disponibles para limpiar/auditar. La UI (`HrHierarchyView`) muestra el panel de delegaciones **solo lectura** con Alert honesto.
+
+**⚠️ Reglas duras**:
+- **NUNCA** un `approval_delegate` genérico cambia el `effective_approver_member_id` de un stage con `honorGenericApprovalDelegate=false`. El default es `false`; setear `true` requiere decisión documentada por stage.
+- **NUNCA** resolver un caso de over-exposure de aprobación dando HR/admin broad al supervisor formal ni tocando `route_groups`/`views`/grants de `session_360`. El supervisor formal aprueba porque es supervisor formal (`reporting_lines`).
+- **NUNCA** el delegate genérico confiere `canAccessSupervisorLeave`/`visibleMemberIds`/scope. Conferir visibilidad-sin-autoridad sobre un artefacto no validado es over-exposure (principio TASK-987/ISSUE-083: el predicado de validez se mueve junto para TODO lo derivado).
+- **NUNCA** remediar snapshots/responsabilidades con SQL manual de mutación. Usar el recovery command auditado (read-only SQL solo para diagnóstico/verificación).
+- **NUNCA** recomputar la autoridad dentro del recovery (ni en ningún consumer): pasar SIEMPRE por `resolveApprovalAuthorityForStage`. NUNCA borrar filas históricas de `operational_responsibilities` (revoke con lifecycle/audit).
+- **NUNCA** crear una delegación genérica de aprobaciones nueva vía API/UI (guardrail 422). La delegación REAL de aprobación de permisos (cobertura por vacaciones) renace como contrato domain-scoped separado (ADR follow-up, opt-in por dimensión `confersApprovalAuthority`/`confersVisibilityScope`); el interín es el override HR/admin.
+- **SIEMPRE** que emerja un stage `effective_supervisor` nuevo, declarar su `honorGenericApprovalDelegate` explícito (default `false`) — el contrato per-stage escala sin código nuevo.
+- **SIEMPRE** que se cambie la política de un stage, mover juntos: config flag + signal parametrizado + tests. El signal `hr.leave.invalid_delegated_approval_snapshots` (moduleKey `identity`, kind `drift`, steady=0) lee la política de `config.ts` y cuenta snapshots PENDIENTES con autoridad delegada inválida en stages que no honran delegate.
+
+**Spec canónica**: `docs/tasks/complete/TASK-1020-leave-approval-authority-delegation-drift-hardening.md` + `GREENHOUSE_IDENTITY_ACCESS_V2.md` Delta 2026-06-07 + `DECISIONS_INDEX.md`. Runbook: `docs/operations/runbooks/leave-approval-authority-recovery.md`. Patrones fuente: TASK-987/ISSUE-083 (over-exposure de acceso), TASK-571/766 (VIEW/helper + signal + lint), TASK-742 (defense-in-depth).
+
 ### Runtime Rollout Completion Gate
 
 **Regla dura:** no declarar una task, incidente o flujo como terminado si solo esta implementado en codigo pero falta cualquier paso para que funcione en el runtime real. `code complete` no es `operationally complete`.

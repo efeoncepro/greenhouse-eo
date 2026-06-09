@@ -2,6 +2,14 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-06-07 — TASK-1020: Leave Approval Authority Recovery (1 event v1, audit-only)
+
+Aggregate type: `leave_request`. Audit-only (NO reactivo — no dispara projection).
+
+| Evento | Trigger | Notas |
+| --- | --- | --- |
+| `leave_request.approval_authority_recovered` | `runLeaveApprovalAuthorityRecovery()` (apply), 1 por snapshot reparado | Payload `schemaVersion:1` con `{ leaveRequestId, subjectMemberId, stageCode:'supervisor_review', before:{authoritySource, formal/effective approver, delegateResponsibilityId}, after:{...}, revokedResponsibilityIds[], actorUserId, reason }`. Registra el before/after de la corrección de autoridad cuando un snapshot quedó congelado con un `approval_delegate` genérico inválido. La revocación de la responsabilidad emite además `responsibility.revoked` (existente). |
+
 ## Delta 2026-05-31 — TASK-979: Monthly Contractor Payment Run (1 event v1)
 
 Aggregate type: `contractor_payable`. Extiende los 5 eventos de TASK-793 con la transición que faltaba al lifecycle del payable.

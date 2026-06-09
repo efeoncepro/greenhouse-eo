@@ -7,7 +7,7 @@ La jerarquía de reporte de Greenhouse define quién supervisa formalmente a cad
 - ver quién reporta a quién
 - cambiar supervisor con motivo y trazabilidad
 - reasignar reportes directos cuando cambia un lead
-- registrar delegaciones temporales de aprobación
+- revisar y revocar delegaciones vigentes (la creación de delegaciones genéricas no está disponible — ver Delegaciones)
 - revisar historial de cambios de supervisoría
 
 ## Qué NO es
@@ -48,13 +48,13 @@ Una persona puede tener un cargo alto sin ser la supervisora formal de otra, y p
 
 ## Delegaciones
 
-Las delegaciones temporales de aprobación se modelan en `greenhouse_core.operational_responsibilities` con:
+**Desde TASK-1020 (2026-06-07), la delegación genérica de aprobaciones NO está disponible.** Las aprobaciones de permiso, gasto y evaluación resuelven al **supervisor formal** vigente en `reporting_lines` o, si corresponde, al override de RRHH/Administración. Una responsabilidad genérica `operational_responsibilities.responsibility_type='approval_delegate'` ya **no confiere autoridad de aprobación ni scope de supervisor** (era demasiado amplia: sin expiración, actor, motivo ni elegibilidad — generaba drift de autorización).
 
-- `responsibility_type = approval_delegate`
-- `scope_type = member`
-- `scope_id = <member_id del supervisor>`
+El panel "Delegaciones temporales" en `HR > Jerarquía` queda como **solo lectura**: muestra las delegaciones vigentes únicamente para revisarlas o **revocarlas**; no permite crear nuevas.
 
-Esto permite que el supervisor formal siga existiendo como relación canónica, mientras la aprobación efectiva cambia por vigencia.
+La delegación real de aprobación (cobertura por vacaciones, etc.) renace a futuro como un contrato separado **por dominio** (workflow/etapa/scope + expiración + actor/motivo + elegibilidad + auditoría), con su propio ADR. El interín lo cubre el override de RRHH/Administración.
+
+> Detalle técnico: CLAUDE.md "Approval Authority Delegation invariants" + `GREENHOUSE_IDENTITY_ACCESS_V2.md` Delta 2026-06-07 + runbook `docs/operations/runbooks/leave-approval-authority-recovery.md`.
 
 ## Snapshots de approval
 
@@ -63,7 +63,7 @@ Cuando un workflow se envía, Greenhouse ya no depende solo del snapshot vivo `r
 Ese snapshot guarda:
 
 - supervisor formal
-- aprobador efectivo si hubo delegación
+- aprobador efectivo (desde TASK-1020 es el supervisor formal; el `approval_delegate` genérico ya no lo cambia)
 - fallback de dominio cuando no existe supervisor
 - override administrativo cuando RRHH interviene
 
@@ -81,7 +81,7 @@ Ahí RRHH y administradores pueden:
 - ver reportes directos y tamaño del subárbol
 - cambiar supervisor
 - reasignar reportes directos
-- crear o revocar delegaciones temporales
+- revisar y revocar delegaciones vigentes (la creación no está disponible — ver Delegaciones)
 - revisar el historial auditado de cambios
 - ejecutar una corrida manual de gobernanza
 - revisar propuestas de drift entre Greenhouse y Entra
@@ -93,13 +93,12 @@ Greenhouse ya separa dos niveles de acceso:
 
 - `HR/admin` mantiene acceso amplio a surfaces de personas y permisos
 - `supervisor` obtiene acceso derivado y limitado por:
-  - su subárbol real en `reporting_lines`
-  - delegaciones activas de `approval_delegate`
+  - su subárbol real en `reporting_lines` (desde TASK-1020, el `approval_delegate` genérico ya no aporta scope)
 
 En la iteración actual:
 
 - `/people` puede abrirse para un supervisor aunque no tenga `hr_manager`
-- la lista y los drilldowns se recortan al equipo visible por jerarquía o delegación
+- la lista y los drilldowns se recortan al equipo visible por jerarquía formal
 - `/hr/leave` puede abrirse para supervisoría limitada sin otorgar `routeGroup: hr`
 - `HR > Jerarquía` sigue siendo solo para RRHH/admin
 
