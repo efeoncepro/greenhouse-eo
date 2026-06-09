@@ -136,6 +136,14 @@ jobs:
         # Verifica que el parser del gate sigue funcionando (7 cases).
         run: pnpm migration-marker-gate:test
 
+      - name: Worker runtime-deps gate (ISSUE-090)
+        # Bloquea el silent-startup-crash de los workers Cloud Run Node: un módulo
+        # worker-bundled de src/lib/** que importa un paquete npm clasificado como
+        # devDependency. El runtime stage hace `pnpm install --prod` (solo deps) →
+        # el paquete externalizado no existe → ERR_MODULE_NOT_FOUND al arrancar →
+        # no escucha en 8080 → deploy failed. Convierte ese crash en CI-fail.
+        run: pnpm worker:runtime-deps-gate
+
       - name: Test inventory
         run: pnpm test:inventory
 

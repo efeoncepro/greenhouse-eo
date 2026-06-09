@@ -260,6 +260,9 @@ importers:
       pg:
         specifier: ^8.20.0
         version: 8.20.0
+      pngjs:
+        specifier: ^5.0.0
+        version: 5.0.0
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
@@ -441,9 +444,6 @@ importers:
       pixelmatch:
         specifier: ^5.3.0
         version: 5.3.0
-      pngjs:
-        specifier: ^5.0.0
-        version: 5.0.0
       postcss:
         specifier: 8.5.6
         version: 8.5.6
