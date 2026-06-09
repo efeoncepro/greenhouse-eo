@@ -114,6 +114,7 @@ import {
 } from './queries/notion-metrics-ftr-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
 import { getIdentitySessionRouteGroupDriftSignal } from './queries/identity-session-route-group-drift'
+import { getLeaveInvalidDelegatedApprovalSnapshotsSignal } from './queries/leave-invalid-delegated-approval-snapshots'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
 import { getContractorEngagementClassificationReviewPendingSignal } from './queries/contractor-engagement-classification-review-pending'
@@ -1584,7 +1585,11 @@ export const getReliabilityOverview = async (
           getContractorEngagementClassificationReviewPendingSignal().catch(() => null),
           // TASK-987 — route_groups de sesión que no derivan de roles ACTIVOS
           // (over-exposure por roles revocados; defense-in-depth del fix session_360).
-          getIdentitySessionRouteGroupDriftSignal().catch(() => null)
+          getIdentitySessionRouteGroupDriftSignal().catch(() => null),
+          // TASK-1020 — snapshots de aprobación pendientes con autoridad efectiva
+          // derivada de un approval_delegate genérico inválido (over-exposure de
+          // autoridad de aprobación; steady=0 tras el recovery).
+          getLeaveInvalidDelegatedApprovalSnapshotsSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
