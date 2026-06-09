@@ -23,7 +23,8 @@ export const scenario: CaptureScenario = {
   steps: [
     {
       kind: 'scroll',
-      scrollTo: '[aria-labelledby="hr-hierarchy-delegations-title"]'
+      selector: '[aria-labelledby="hr-hierarchy-delegations-title"]',
+      scrollBlock: 'center'
     },
     { kind: 'sleep', ms: 600 },
     {
