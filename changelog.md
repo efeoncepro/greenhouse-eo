@@ -2,6 +2,7 @@
 
 ## 2026-06-09
 
+- **ISSUE-090 resuelto — ops-worker crash por `pngjs` en devDependencies + guard anti-recurrencia.** El `ops-worker` no desplegaba (silent startup crash `ERR_MODULE_NOT_FOUND: pngjs`): `organization-brand-assets-discovery.ts` (TASK-999, importado estático por `server.ts`) usa `pngjs` en runtime, pero estaba en `devDependencies` y el runtime stage del Dockerfile instala solo `dependencies` (`pnpm install --prod`) + esbuild `--packages=external`. Fix robusto: `pngjs`→`dependencies` (+lockfile) + **nuevo CI gate `pnpm worker:runtime-deps-gate`** que replica el bundle esbuild de los 3 workers Node y falla loud si un paquete externalizado no está en `dependencies` (convierte el crash en CI-fail; wired en `ci.yml`). Blast radius verificado: solo pngjs. Regla canónica "Worker runtime npm deps" (hermana de "Worker @core boundary") en CLAUDE.md/AGENTS.md. ops-worker deploy SUCCESS (`edffa61f4`).
 - **TASK-1059 — Organization Workspace Enterprise Detail runtime, code complete local.** La ruta Agency `/agency/organizations/[id]` adopta el mockup enterprise aprobado como runtime real: masthead sobrio, KPI rail, facet rail, canvases Delivery/Finance/Identity y estados honestos para el resto de facets. La vista consume organization detail, Account 360, projects y finance summary existentes; no duplica Finance Clients ni inventa source-of-truth financiero. El CSC distribution queda en SVG responsive con captura dedicada y sin clipping en laptop/mobile. Gap backend separado en `TASK-1060` para compact signals/next actions/readiness projection del sidecar. GVC final local verde: `.captures/2026-06-09T02-15-20_organization-workspace-enterprise-detail-runtime` (desktop/laptop/mobile, 24 frames, `qualityFindings=[]`). Pendiente de commit/push/deploy por checkout compartido en `develop`.
 
 ## 2026-06-08
@@ -8657,6 +8658,10 @@ Artefactos nuevos:
 
 Comando operativo:
 - `pnpm teams:announce`
+# 2026-06-09
+
+- Agency / Organization Workspace: TASK-1060 agregó el read model canónico `OrganizationWorkspaceCompactSignals`, con Product API y first-party App API para salud, readiness, señales recientes, próximas acciones, provenance y fuentes degradadas del sidecar enterprise.
+
 # 2026-05-03
 
 - Docs operativos: se formalizo `SOLUTION_QUALITY_OPERATING_MODEL_V1` como contrato transversal anti-parche para agentes, enlazado desde `AGENTS.md`, `CLAUDE.md`, `TASK_PROCESS`, prompt Codex y modelos operativos.
