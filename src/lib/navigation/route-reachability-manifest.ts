@@ -167,6 +167,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Charts Lab — child surface del Design System para primitives de visualizacion de datos, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
+    route: '/admin/design-system/nexa-brand',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Brand Mark Lab — child surface del Design System para la primitive GreenhouseNexaBrandMark y sus kinds de marca, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
     route: '/admin/design-system/talent-profile',
     parent: '/admin/design-system',
     via: 'inline-link',

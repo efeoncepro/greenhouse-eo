@@ -20,6 +20,48 @@ export type {
   GreenhouseVerificationBadgeProps,
   GreenhouseVerificationBadgeSize
 } from './GreenhouseVerificationBadge'
+export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
+export {
+  GREENHOUSE_NEXA_BRAND_ASSETS,
+  GREENHOUSE_NEXA_BRAND_COLORS,
+  GREENHOUSE_NEXA_BRAND_KIND_CONFIG,
+  GREENHOUSE_NEXA_BRAND_SIZE_CONFIG,
+  resolveGreenhouseNexaBrandKind
+} from './greenhouse-nexa-brand-controller'
+export { default as GreenhouseThinkingBeat } from './GreenhouseThinkingBeat'
+export type { GreenhouseThinkingBeatProps } from './GreenhouseThinkingBeat'
+export { default as GreenhouseNexaGreeting } from './GreenhouseNexaGreeting'
+export type { GreenhouseNexaGreetingProps } from './GreenhouseNexaGreeting'
+export {
+  GREENHOUSE_NEXA_GREETING_KIND_CONFIG,
+  GREENHOUSE_NEXA_GREETING_VARIANT_CONFIG,
+  resolveGreenhouseNexaGreetingKind,
+  resolveGreenhouseNexaGreetingVariant
+} from './greenhouse-nexa-greeting-controller'
+export type {
+  GreenhouseNexaGreetingKind,
+  GreenhouseNexaGreetingKindConfig,
+  GreenhouseNexaGreetingVariant,
+  GreenhouseNexaGreetingVariantConfig
+} from './greenhouse-nexa-greeting-controller'
+export {
+  GREENHOUSE_THINKING_BEAT_KIND_CONFIG,
+  GREENHOUSE_THINKING_BEAT_MOTION,
+  GREENHOUSE_THINKING_BEAT_VARIANT_CONFIG,
+  resolveGreenhouseThinkingBeatKind,
+  resolveGreenhouseThinkingBeatVariant
+} from './greenhouse-thinking-beat-controller'
+export type {
+  GreenhouseThinkingBeatKind,
+  GreenhouseThinkingBeatKindConfig,
+  GreenhouseThinkingBeatVariant,
+  GreenhouseThinkingBeatVariantConfig
+} from './greenhouse-thinking-beat-controller'
+export type {
+  GreenhouseNexaBrandKind,
+  GreenhouseNexaBrandKindConfig,
+  GreenhouseNexaBrandSize
+} from './greenhouse-nexa-brand-controller'
 export { default as GreenhouseHealthSignalChart } from './GreenhouseHealthSignalChart'
 export type {
   GreenhouseHealthSignalChartKind,
@@ -299,6 +341,40 @@ export type {
   GreenhouseMetricBreakdownPoint,
   GreenhouseMetricBreakdownTone
 } from './GreenhouseMetricBreakdownChartCard'
+export { default as GreenhouseFunnelChartCard } from './GreenhouseFunnelChartCard'
+export {
+  GreenhouseFunnelDiagnosticsGrid,
+  GreenhouseFunnelHeaderControls,
+  GreenhouseFunnelKpiStrip,
+  GreenhouseFunnelStageRail,
+  GreenhouseFunnelStageSegment
+} from './GreenhouseFunnelChartCard'
+export {
+  GREENHOUSE_FUNNEL_CHART_KIND_DEFAULT_VARIANT,
+  GREENHOUSE_FUNNEL_CHART_TOKENS,
+  GREENHOUSE_FUNNEL_CHART_ZONE_PRIMITIVES,
+  GREENHOUSE_FUNNEL_CHART_VARIANTS,
+  resolveGreenhouseFunnelChartVariant
+} from './greenhouse-funnel-chart-controller'
+export type {
+  GreenhouseFunnelChartKind,
+  GreenhouseFunnelChartVariant
+} from './greenhouse-funnel-chart-controller'
+export type {
+  GreenhouseFunnelChartCardProps,
+  GreenhouseFunnelDiagnosticsGridProps,
+  GreenhouseFunnelDiagnosticTone,
+  GreenhouseFunnelHeaderControlsProps,
+  GreenhouseFunnelInsight,
+  GreenhouseFunnelKpiStripProps,
+  GreenhouseFunnelMetric,
+  GreenhouseFunnelResolvedStage,
+  GreenhouseFunnelStage,
+  GreenhouseFunnelStageDiagnostic,
+  GreenhouseFunnelStageRailProps,
+  GreenhouseFunnelStageSegmentProps,
+  GreenhouseFunnelTone
+} from './GreenhouseFunnelChartCard'
 export { default as GreenhouseActivityTimeline } from './GreenhouseActivityTimeline'
 export { GREENHOUSE_ACTIVITY_TIMELINE_TOKENS } from './greenhouse-activity-timeline-controller'
 export type {

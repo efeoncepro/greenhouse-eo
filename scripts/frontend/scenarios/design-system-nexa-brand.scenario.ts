@@ -1,16 +1,16 @@
-// Internal Microinteractions Lab verification — async action feedback primitive.
+// Internal Nexa Brand Mark Lab verification — identity primitive and kinds.
 
 import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
-  name: 'design-system-microinteractions',
-  route: '/admin/design-system/microinteractions',
+  name: 'design-system-nexa-brand',
+  route: '/admin/design-system/nexa-brand',
   viewport: { width: 1280, height: 900 },
   viewports: [
     { name: 'desktop', width: 1280, height: 900 },
     { name: 'mobile', device: 'iPhone 13' }
   ],
-  initialHoldMs: 1200,
+  initialHoldMs: 1500,
   finalHoldMs: 400,
   readiness: {
     absentSelectors: ['[data-testid="login-card"]'],
@@ -28,15 +28,21 @@ export const scenario: CaptureScenario = {
   steps: [
     {
       kind: 'mark',
-      label: 'microinteractions-lab',
+      label: 'nexa-brand-lab',
       fullPage: true,
-      note: 'Laboratorio interno dedicado para primitives de microinteracciones'
+      note: 'Hoja interna dedicada para GreenhouseNexaBrandMark y sus kinds'
     },
     {
       kind: 'mark',
-      label: 'thinking-beat-lab',
-      clipSelector: '[data-capture="thinking-beat-lab"]',
-      note: 'GreenhouseThinkingBeat primitive: variants inline/cluster/standalone y kinds nexa/assistant/sync/neutral'
+      label: 'nexa-brand-primary-specimen',
+      clipSelector: '[data-capture="nexa-brand-primary-specimen"]',
+      note: 'Specimen principal del badge conversacional Preguntale a Nexa'
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-brand-kind-matrix',
+      clipSelector: '[data-capture="nexa-brand-kind-matrix"]',
+      note: 'Matriz de kinds askNexaBadge, badgeIcon, inlineMark y monoMark'
     }
   ]
 }

@@ -150,6 +150,18 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-activity-heartbeat'
   },
   {
+    id: 'nexa-brand',
+    title: 'Nexa brand mark',
+    description: 'Primitive para el isotipo de Nexa, badge conversacional y kinds de marca.',
+    route: '/admin/design-system/nexa-brand',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'GreenhouseNexaBrandMark',
+    tags: ['nexa', 'brand', 'assistant'],
+    icon: 'tabler-sparkles'
+  },
+  {
     id: 'talent-profile',
     title: 'Talent profile',
     description: 'Dossier enterprise, badge Verificado por Efeonce y kind Talento verificado para perfiles verificables.',
@@ -188,14 +200,26 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'charts',
     title: 'Charts',
-    description: 'Chart cards enterprise con fallback accesible y geometría gobernada por tokens.',
+    description: 'Chart cards enterprise, Funnel Analysis Pattern, fallback accesible y geometría gobernada.',
     route: '/admin/design-system/charts',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
-    owner: 'GreenhouseChartCard',
-    tags: ['data', 'visualization', 'kpi'],
+    owner: 'GreenhouseChartCard · GreenhouseFunnelChartCard',
+    tags: ['data', 'visualization', 'kpi', 'funnel', 'pattern'],
     icon: 'tabler-chart-bar'
+  },
+  {
+    id: 'funnel-analysis-pattern',
+    title: 'Funnel Analysis Pattern',
+    description: 'Patrón para leer etapas, caídas, SLA, bloqueos y asistencia Nexa en una composición gobernada.',
+    route: '/admin/design-system/charts',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Canonical',
+    owner: 'GreenhouseFunnelChartCard',
+    tags: ['funnel', 'analysis', 'operations', 'nexa'],
+    icon: 'tabler-filter-cog'
   },
   {
     id: 'utilities',
@@ -224,13 +248,13 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'microinteractions',
     title: 'Microinteractions',
-    description: 'Feedback de comandos, validación, procedencia, decisiones inline y evidencia.',
+    description: 'Thinking beats, feedback de comandos, validación, procedencia, decisiones inline y evidencia.',
     route: '/admin/design-system/microinteractions',
     category: 'Patterns',
     kind: 'Pattern',
     status: 'Canonical',
     owner: 'microinteraction primitives',
-    tags: ['feedback', 'validation', 'decision'],
+    tags: ['feedback', 'thinking', 'validation', 'decision'],
     icon: 'tabler-click'
   },
   {

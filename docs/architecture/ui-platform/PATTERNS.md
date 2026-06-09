@@ -7,6 +7,59 @@
 
 ---
 
+## Funnel Analysis Pattern
+
+**Funnel Analysis Pattern** es el patrón canónico para analizar workflows por
+etapas cuando el operador necesita leer, en una sola superficie, volumen,
+retención, SLA, caídas, bloqueos y siguiente conversación con Nexa.
+
+### Taxonomía
+
+- **Pattern:** `Funnel Analysis Pattern`.
+- **Composition:** `GreenhouseFunnelChartCard`.
+- **Zone primitives:** `GreenhouseFunnelHeaderControls`,
+  `GreenhouseFunnelKpiStrip`, `GreenhouseFunnelStageRail`,
+  `GreenhouseFunnelStageSegment`, `GreenhouseFunnelDiagnosticsGrid`.
+- **Assisted analysis:** `GreenhouseNexaGreeting kind='funnelStageAdvisor'`.
+- **Kinds iniciales:** `cscPipeline`, `commercialLifecycle`, `quoteToCash`,
+  `onboardingActivation`, `custom`.
+
+### Cuándo usarlo
+
+Usar este patrón cuando el usuario debe responder preguntas como:
+
+- dónde se concentra la caída o el atraso;
+- qué etapa concentra bloqueos;
+- si el SLA o freshness cambia la prioridad operativa;
+- qué conversación conviene abrir con Nexa antes de actuar.
+
+No usarlo para charts de conversión simples, scorecards aisladas o dashboards
+donde no existe una secuencia operacional clara. Para funnels verticales puros,
+Recharts puede seguir siendo la base visual; para pipeline horizontal rico, el
+rail vive dentro de `GreenhouseFunnelStageRail`.
+
+### Reglas de composición
+
+- El patrón combina **contexto ejecutivo** (header + controles), **señales
+  rápidas** (KPI strip), **lectura secuencial** (stage rail), **diagnóstico
+  operativo** (grid/tabla) y **asistencia conversacional** (Nexa).
+- `stageRole` representa el rol de proceso de la etapa; `health`/diagnostics
+  representan salud operativa. No mezclar ambos contratos.
+- Nuevos workflows entran como `kind` y resuelven a una `variant`; no deben
+  copiar JSX ni geometría del rail.
+- Las zone primitives se extienden solo cuando cambia una responsabilidad local
+  de esa zona.
+- El patrón debe mantener summary accesible, selección por teclado,
+  reduced-motion y señales no dependientes solo del color.
+
+### Evidencia viva
+
+Hoja interna: `/admin/design-system/charts`.
+
+Scenario GVC: `design-system-charts`, región
+`data-capture='funnel-primitive-anatomy'`.
+
+
 ## Error Handling & Feedback Patterns (TASK-236)
 
 ### Fetch error states
@@ -156,4 +209,3 @@ Para vistas data-dense con más de 10 tarjetas en scroll vertical, usar **Accord
 - Reports detallados → Accordion colapsado por defecto
 - Cada Accordion summary muestra chip con estado/resumen para que el usuario sepa si vale la pena expandir
 - Implementado en: Agency ICO Engine tab (3 Accordions para performance report)
-

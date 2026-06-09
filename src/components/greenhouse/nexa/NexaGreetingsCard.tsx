@@ -11,7 +11,7 @@
 // `server-only` import — safe to reuse on any surface (home hero, Nexa landing,
 // empty states, etc).
 
-import { useEffect, useId, useState } from 'react'
+import { type ReactNode, useEffect, useId, useState } from 'react'
 
 import Image from 'next/image'
 
@@ -22,11 +22,14 @@ import CircularProgress from '@mui/material/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { keyframes } from '@mui/material/styles'
 
 import CustomTextField from '@core/components/mui/TextField'
 
+import GreenhouseNexaBrandMark from '@/components/greenhouse/primitives/GreenhouseNexaBrandMark'
+import GreenhouseThinkingBeat from '@/components/greenhouse/primitives/GreenhouseThinkingBeat'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 // Motion tokens (motion-design canonical): emphasized decelerated curve for
@@ -91,32 +94,48 @@ export interface NexaGreetingsAction {
 }
 
 export interface NexaGreetingsCardProps {
+  /** Visual density/placement. `hero` is the Home card; `compactContextual` fits inside product surfaces. */
+  variant?: 'hero' | 'compactContextual'
   /** Personalized greeting headline, e.g. "Hola, ¿cómo va el día Andrés?". */
   greeting: string
   /** Role + tenant line, e.g. "Colaborador · Efeonce Group". */
   roleLine: string
   /** Called with the trimmed prompt when the user submits the field. */
   onSubmitPrompt: (prompt: string) => void
-  /** Quick-action chips below the prompt (e.g. Mis tareas / Mis horas / Mi nómina). */
+  /** Quick-action chips below the prompt. In `compactContextual`, they behave as prompt starters. */
   actions?: NexaGreetingsAction[]
   /** Label above the prompt field. */
   inputLabel?: string
   /** Prompt field placeholder (used when `placeholderExamples` is not provided). */
   placeholder?: string
+  /** Rotating contextual messages for compact surfaces. */
+  contextMessages?: string[]
+  /** Rotates compact contextual messages with a short Nexa "thinking" beat between swaps. */
+  rotateContextMessages?: boolean
   /**
    * Rotating example prompts. When 2+ are provided, the placeholder cycles
    * through them with a crossfade — teaching what to ask Nexa. Rotation pauses
    * on focus / while typing and is disabled under reduced motion.
    */
   placeholderExamples?: string[]
+  /** Enables prompt placeholder rotation. Disable when another nearby message already rotates. */
+  rotatePlaceholderExamples?: boolean
   /** Identity chip beside the avatar. */
   nexaChipLabel?: string
   /** Generative-AI disclaimer under the avatar. */
   disclaimer?: string
+  /** Short help text for the compact contextual info affordance. */
+  tooltipLabel?: string
+  /** Rich visual tooltip content. Keep `tooltipLabel` as the accessible plain-text equivalent. */
+  tooltipContent?: ReactNode
   /** Nexa avatar source (transparent cutout PNG). */
   avatarSrc?: string
   /** Accessible label for the avatar. */
   avatarAlt?: string
+  /** Stable capture hook for Design System/GVC scenarios. */
+  dataCapture?: string
+  /** Semantic kind exposed for primitive governance. */
+  dataKind?: string
 }
 
 /**
@@ -124,36 +143,115 @@ export interface NexaGreetingsCardProps {
  * the Nexa operative experience with a greeting + prompt entry point.
  */
 export const NexaGreetingsCard = ({
+  variant = 'hero',
   greeting,
   roleLine,
   onSubmitPrompt,
   actions = [],
   inputLabel = 'Comienza tu operación con una pregunta',
   placeholder = 'Pregunta sobre RpA, Cycle Time…',
+  contextMessages,
+  rotateContextMessages = false,
   placeholderExamples,
+  rotatePlaceholderExamples = true,
   nexaChipLabel = '¡Hola, soy Nexa!',
   disclaimer = 'Nexa usa IA generativa. Verifica la información importante.',
+  tooltipLabel,
+  tooltipContent,
   avatarSrc = DEFAULT_NEXA_AVATAR,
-  avatarAlt = 'Nexa, asistente de IA de Greenhouse'
+  avatarAlt = 'Nexa, asistente de IA de Greenhouse',
+  dataCapture,
+  dataKind
 }: NexaGreetingsCardProps) => {
   const [prompt, setPrompt] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [focused, setFocused] = useState(false)
   const [exampleIndex, setExampleIndex] = useState(0)
+  const [contextMessageIndex, setContextMessageIndex] = useState(0)
   const [placeholderVisible, setPlaceholderVisible] = useState(true)
+  const [contextMessageVisible, setContextMessageVisible] = useState(true)
+  const [contextThinking, setContextThinking] = useState(false)
   const inputId = useId()
   const reducedMotion = useReducedMotion()
   const canSend = prompt.trim().length > 0
 
   const hasExamples = Boolean(placeholderExamples && placeholderExamples.length > 0)
+  const hasContextMessages = Boolean(contextMessages && contextMessages.length > 0)
+  const contextMessageKey = contextMessages?.join('\u001F') ?? ''
 
   const isRotating = Boolean(
-    !reducedMotion && placeholderExamples && placeholderExamples.length > 1 && !focused && prompt.length === 0
+    rotatePlaceholderExamples &&
+      !reducedMotion &&
+      placeholderExamples &&
+      placeholderExamples.length > 1 &&
+      !focused &&
+      prompt.length === 0
+  )
+
+  const isContextRotating = Boolean(
+    rotateContextMessages &&
+      !reducedMotion &&
+      contextMessages &&
+      contextMessages.length > 1 &&
+      !focused &&
+      prompt.length === 0
   )
 
   const activePlaceholder = hasExamples
     ? placeholderExamples![exampleIndex % placeholderExamples!.length]
     : placeholder
+
+  const activeContextMessage = hasContextMessages
+    ? contextMessages![contextMessageIndex % contextMessages!.length]
+    : disclaimer
+
+  const compactTooltipLabel = tooltipLabel ?? [roleLine, disclaimer].filter(Boolean).join('. ')
+  const compactTooltipContent = tooltipContent ?? compactTooltipLabel
+
+  // Reset contextual guidance when the parent changes the selected stage/source facts.
+  useEffect(() => {
+    setContextMessageIndex(0)
+    setContextMessageVisible(true)
+    setContextThinking(false)
+  }, [contextMessageKey])
+
+  // Compact context messages rotate with a short "thinking" beat, then swap.
+  useEffect(() => {
+    if (!isContextRotating) {
+      setContextMessageVisible(true)
+      setContextThinking(false)
+
+      return
+    }
+
+    const messageCount = contextMessages?.length ?? 0
+    const timers: number[] = []
+    const HOLD_MS = 8600
+    const THINKING_MS = 1800
+
+    timers.push(
+      window.setTimeout(() => {
+        setContextThinking(true)
+
+        timers.push(
+          window.setTimeout(() => {
+            setContextMessageVisible(false)
+
+            timers.push(
+              window.setTimeout(() => {
+                setContextMessageIndex(index => (index + 1) % messageCount)
+                setContextThinking(false)
+                setContextMessageVisible(true)
+              }, 200)
+            )
+          }, THINKING_MS)
+        )
+      }, HOLD_MS)
+    )
+
+    return () => timers.forEach(timer => window.clearTimeout(timer))
+  }, [contextMessageIndex, contextMessages?.length, isContextRotating])
+
 
   // Crossfade rotation: fade the placeholder out, swap the example, fade back in.
   useEffect(() => {
@@ -187,10 +285,252 @@ export const NexaGreetingsCard = ({
     window.setTimeout(() => setSubmitting(false), 1800)
   }
 
+  const handleCompactSuggestionSelect = (label: string) => {
+    setPrompt(label)
+    setFocused(false)
+  }
+
+  if (variant === 'compactContextual') {
+    return (
+      <Card
+        component='section'
+        aria-label={greeting}
+        data-capture={dataCapture}
+        data-kind={dataKind}
+        elevation={0}
+        sx={theme => ({
+          position: 'relative',
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 'var(--mui-shape-customBorderRadius-md)',
+          bgcolor: theme.palette.background.paper,
+          color: 'text.primary',
+          overflow: 'hidden',
+          boxShadow: 'none'
+        })}
+      >
+        <Tooltip
+          title={compactTooltipContent}
+          arrow
+          placement='bottom-end'
+          disableInteractive
+          slotProps={{
+            popper: {
+              modifiers: [
+                {
+                  name: 'flip',
+                  enabled: false
+                }
+              ]
+            },
+            tooltip: {
+              sx: {
+                display: { xs: 'none', sm: 'block' },
+                maxWidth: theme => theme.spacing(40),
+                typography: 'body2',
+                lineHeight: 1.45
+              }
+            }
+          }}
+        >
+          <Box
+            component='span'
+            tabIndex={0}
+            data-capture='nexa-compact-info'
+            aria-label={compactTooltipLabel}
+            sx={{
+              position: 'absolute',
+              top: { xs: 10, md: 14 },
+              right: { xs: 10, md: 14 },
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'text.secondary',
+              '& i': {
+                fontSize: 18
+              },
+              '&:focus-visible': {
+                outline: '2px solid',
+                outlineColor: 'primary.main',
+                outlineOffset: 2,
+                borderRadius: '50%'
+              }
+            }}
+          >
+            <i className='tabler-info-circle' aria-hidden='true' />
+          </Box>
+        </Tooltip>
+
+        <Stack spacing={2} alignItems='center' sx={{ p: { xs: 2.5, md: 3 } }}>
+          <Stack
+            spacing={1}
+            alignItems='center'
+            sx={{
+              width: '100%',
+              maxWidth: 680,
+              textAlign: 'center',
+              ...entrance(0)
+            }}
+          >
+            <Stack direction='row' spacing={1} alignItems='center'>
+              <GreenhouseNexaBrandMark kind='askNexaBadge' size='small' dataCapture='nexa-ask-badge' />
+            </Stack>
+
+            <Stack spacing={0.75} alignItems='center' sx={{ minWidth: 0, minBlockSize: { xs: 48, sm: 28 } }}>
+              <Typography
+                variant='disclosureText'
+                color='text.secondary'
+                sx={{
+                  display: 'block',
+                  maxWidth: '58ch',
+                  opacity: contextMessageVisible ? 1 : 0,
+                  transform: contextMessageVisible ? 'translateY(0)' : 'translateY(2px)',
+                  transition: reducedMotion
+                    ? 'none'
+                    : `opacity 200ms ${EASE_EMPHASIZED}, transform 200ms ${EASE_EMPHASIZED}`,
+                  '@media (prefers-reduced-motion: reduce)': {
+                    transform: 'none',
+                    transition: 'none'
+                  }
+                }}
+              >
+                {activeContextMessage}
+                {contextThinking ? (
+                  <GreenhouseThinkingBeat
+                    variant='inline'
+                    kind='nexa'
+                    decorative
+                    dataCapture='nexa-context-thinking-beat'
+                    sx={{
+                      ml: 0.75
+                    }}
+                  />
+                ) : null}
+              </Typography>
+            </Stack>
+          </Stack>
+
+          <Stack
+            spacing={1}
+            alignItems='center'
+            sx={{
+              width: '100%',
+              maxWidth: { xs: '100%', md: 640 },
+              ...entrance(80)
+            }}
+          >
+            <Box component='form' onSubmit={event => { event.preventDefault(); handleSubmit() }} sx={{ width: '100%' }}>
+              <CustomTextField
+                id={inputId}
+                fullWidth
+                value={prompt}
+                onChange={event => setPrompt(event.target.value)}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                placeholder={activePlaceholder}
+                aria-label={ARIA_PROMPT_INPUT}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    minBlockSize: 40,
+                    backgroundColor: 'var(--mui-palette-background-paper) !important',
+                    borderRadius: 'var(--mui-shape-customBorderRadius-md)',
+                    boxShadow: 'none',
+                    transition: `border-color 150ms ${EASE_EMPHASIZED}, background-color 150ms ${EASE_EMPHASIZED}`,
+                    '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+                  },
+                  '& .MuiInputBase-root.Mui-focused': {
+                    boxShadow: 'none',
+                    backgroundColor: 'var(--mui-palette-background-paper) !important',
+                    borderColor: 'var(--mui-palette-primary-main)'
+                  },
+                  '& .MuiInputBase-input': {
+                    py: 2
+                  },
+                  '& .MuiInputBase-input::placeholder': {
+                    color: 'var(--mui-palette-text-secondary)',
+                    opacity: 1
+                  }
+                }}
+                slotProps={{
+                  htmlInput: {
+                    'aria-label': ARIA_PROMPT_INPUT
+                  },
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position='start' sx={{ color: 'text.secondary' }}>
+                        <i className='tabler-message-circle text-xl' />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          type='submit'
+                          aria-label={ARIA_SUBMIT_PROMPT}
+                          disabled={!canSend || submitting}
+                          edge='end'
+                          sx={{
+                            inlineSize: 32,
+                            blockSize: 32,
+                            bgcolor: canSend ? 'primary.main' : 'transparent',
+                            color: canSend ? 'common.white' : 'text.disabled',
+                            '&:hover': { bgcolor: canSend ? 'primary.dark' : 'action.hover' },
+                            '&.Mui-disabled': { bgcolor: 'transparent', color: 'text.disabled', opacity: 1 },
+                            '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 2 }
+                          }}
+                        >
+                          {submitting ? (
+                            <CircularProgress size={16} thickness={5} sx={{ color: 'common.white' }} />
+                          ) : (
+                            <i className='tabler-send text-lg' />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }
+                }}
+              />
+            </Box>
+
+            {actions.length > 0 ? (
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={entrance(160)}>
+                {actions.map(action => (
+                  <Chip
+                    key={action.key}
+                    size='small'
+                    label={action.label}
+                    variant='outlined'
+                    clickable
+                    onClick={() => handleCompactSuggestionSelect(action.label)}
+                    icon={action.iconClass ? <i className={action.iconClass} /> : undefined}
+                    sx={theme => ({
+                      color: theme.greenhouseSemantic.info.tonalText,
+                      borderColor: theme.greenhouseSemantic.info.tonalBorder,
+                      bgcolor: 'transparent',
+                      fontWeight: 600,
+                      borderRadius: 'var(--mui-shape-customBorderRadius-sm)',
+                      '& .MuiChip-icon': { color: theme.greenhouseSemantic.info.tonalText },
+                      '&:hover': { bgcolor: 'rgba(var(--mui-palette-primary-mainChannel) / 0.06)' },
+                      '&:focus-visible': {
+                        outline: '2px solid',
+                        outlineColor: theme.palette.primary.main,
+                        outlineOffset: 2
+                      }
+                    })}
+                  />
+                ))}
+              </Stack>
+            ) : null}
+          </Stack>
+        </Stack>
+      </Card>
+    )
+  }
+
   return (
     <Card
       component='section'
       aria-label={nexaChipLabel}
+      data-capture={dataCapture}
+      data-kind={dataKind}
       sx={{
         position: 'relative',
         overflow: 'hidden',

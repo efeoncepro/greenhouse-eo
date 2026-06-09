@@ -11,12 +11,16 @@ import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { typographyScale } from '@/components/theme/typography-tokens'
 import {
   GREENHOUSE_CHART_CHROME_TOKENS,
+  GREENHOUSE_FUNNEL_CHART_ZONE_PRIMITIVES,
   GreenhouseButton,
   GreenhouseChartCard,
+  GreenhouseFunnelChartCard,
   GreenhouseHealthSignalChart,
   GreenhouseMetricBreakdownChartCard,
   GreenhouseStackedDistributionChartCard,
   type GreenhouseChartTab,
+  type GreenhouseFunnelMetric,
+  type GreenhouseFunnelStage,
   type GreenhouseHealthSignalSegment,
   type GreenhouseMetricBreakdownMetric,
   type GreenhouseMetricBreakdownPoint,
@@ -203,6 +207,133 @@ const vehicleSegments: GreenhouseStackedDistributionSegment[] = [
   }
 ]
 
+const cscPipelineMetrics: GreenhouseFunnelMetric[] = [
+  {
+    id: 'retention',
+    label: 'Retención',
+    value: '29.7%',
+    icon: 'tabler-trending-up',
+    tone: 'success'
+  },
+  {
+    id: 'slaRisk',
+    label: 'SLA en riesgo',
+    value: '7',
+    icon: 'tabler-alert-triangle',
+    tone: 'warning'
+  },
+  {
+    id: 'cycleTime',
+    label: 'Ciclo medio',
+    value: '11.4d',
+    icon: 'tabler-clock',
+    tone: 'primary'
+  }
+]
+
+const cscPipelineStages: GreenhouseFunnelStage[] = [
+  {
+    id: 'briefing',
+    label: 'Briefing',
+    value: 64,
+    icon: 'tabler-file-description',
+    slaLabel: 'SLA <= 2d',
+    helperLabel: 'Intake operativo',
+    description: 'Entrada validada: define alcance, prioridad y material listo para entrar a producción.',
+    stageRole: 'intake',
+    health: 'success',
+    retainedRate: 100,
+    diagnostic: {
+      blockers: 0,
+      blockersTone: 'success',
+      ownerName: 'Ana R.',
+      ownerInitials: 'AR',
+      freshnessLabel: '11m atrás',
+      freshnessTone: 'success'
+    }
+  },
+  {
+    id: 'production',
+    label: 'Producción',
+    value: 51,
+    icon: 'tabler-pencil',
+    slaLabel: 'SLA <= 5d',
+    helperLabel: 'Trabajo en curso',
+    description: 'Producción concentra ejecución activa y confirma capacidad antes de revisión.',
+    stageRole: 'production',
+    health: 'warning',
+    retainedRate: 79.7,
+    diagnostic: {
+      blockers: 2,
+      blockersTone: 'warning',
+      ownerName: 'Marco B.',
+      ownerInitials: 'MB',
+      freshnessLabel: '38m atrás',
+      freshnessTone: 'success'
+    }
+  },
+  {
+    id: 'review',
+    label: 'Revisión',
+    value: 38,
+    icon: 'tabler-search',
+    slaLabel: 'SLA <= 3d',
+    helperLabel: 'Control de calidad',
+    description: 'Revisión mide calidad, evidencia y readiness antes de pedir cambios o liberar entrega.',
+    stageRole: 'quality',
+    health: 'warning',
+    retainedRate: 59.4,
+    diagnostic: {
+      blockers: 3,
+      blockersTone: 'warning',
+      ownerName: 'Lucía S.',
+      ownerInitials: 'LS',
+      freshnessLabel: '1h 12m atrás',
+      freshnessTone: 'success'
+    }
+  },
+  {
+    id: 'changes',
+    label: 'Cambios',
+    value: 22,
+    icon: 'tabler-refresh',
+    slaLabel: 'SLA <= 3d',
+    helperLabel: 'Retrabajo',
+    description: 'Cambios agrupa retrabajo y aprobaciones pendientes; aquí vive el mayor atraso operativo.',
+    stageRole: 'rework',
+    health: 'error',
+    retainedRate: 34.4,
+    diagnostic: {
+      blockers: 5,
+      blockersTone: 'error',
+      ownerName: 'Juan P.',
+      ownerInitials: 'JP',
+      freshnessLabel: '2h 05m atrás',
+      freshnessTone: 'warning'
+    }
+  },
+  {
+    id: 'delivery',
+    label: 'Entrega',
+    value: 19,
+    icon: 'tabler-send',
+    slaLabel: 'SLA <= 2d',
+    helperLabel: 'Salida al cliente',
+    description: 'Entrega representa salida controlada con evidencia y confirmación de recepción.',
+    stageRole: 'delivery',
+    health: 'success',
+    retainedRate: 29.7,
+    diagnostic: {
+      blockers: 1,
+      blockersTone: 'warning',
+      ownerName: 'Carla G.',
+      ownerInitials: 'CG',
+      freshnessLabel: '34m atrás',
+      freshnessTone: 'success'
+    }
+  }
+]
+
 const ChartsLabView = () => (
   <Box
     sx={{
@@ -242,6 +373,86 @@ const ChartsLabView = () => (
         Recharts, tokens Greenhouse, tooltips accesibles y fallback compacto para lectores de pantalla.
       </Typography>
     </Stack>
+
+    <Box
+      data-capture='charts-lab-funnel-pipeline'
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          xl: 'minmax(0, 1fr) minmax(280px, 0.3fr)'
+        },
+        gap: DESIGN_SYSTEM_LAB_TOKENS.layout.gridGap,
+        alignItems: 'start'
+      }}
+    >
+      <GreenhouseFunnelChartCard
+        title='Creative Pipeline'
+        subtitle='Lectura ejecutiva para seguir volumen, SLA y bloqueos desde briefing hasta entrega.'
+        subtitleDisplay='tooltip'
+        metrics={cscPipelineMetrics}
+        stages={cscPipelineStages}
+        variant='operationalPipeline'
+        kind='cscPipeline'
+        dataCapture='greenhouse-funnel-chart-csc-pipeline'
+        insight={{
+          label: 'Cambios concentra 42% del atraso',
+          tone: 'warning',
+          actionLabel: 'Consultar a Nexa'
+        }}
+      />
+
+      <Stack spacing={3} sx={{ py: { xs: 0, xl: DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup } }}>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+          <Typography variant='h6'>Primitive + variant</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            <InlineCode>GreenhouseFunnelChartCard</InlineCode> owns the operational funnel rail, stage selection,
+            diagnostics grid, reduced-motion behavior and accessible summary. <InlineCode>variant=operationalPipeline</InlineCode>
+            covers workflow funnels where the operator scans volume, SLA and blockers in one pass.
+          </Typography>
+        </Stack>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+          <Typography variant='h6'>Library choice</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Recharts remains available for vertical funnel variants, but this horizontal pipeline uses a custom renderer inside
+            the primitive because the visual contract is a process rail with richer stage microinteractions.
+          </Typography>
+        </Stack>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+          <Typography variant='h6'>Data contract</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Consumers pass ordered stages with value, SLA, retained rate, owner, blockers and freshness. Domain readers own
+            calculations; the primitive owns structure, keyboard selection and color-independent state cues.
+          </Typography>
+        </Stack>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight} data-capture='funnel-primitive-anatomy'>
+          <Typography variant='h6'>Funnel Analysis Pattern</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Patrón para analizar procesos por etapas con volumen, retención, SLA, bloqueos y asistencia de Nexa. La
+            composition es <InlineCode>GreenhouseFunnelChartCard</InlineCode>; nuevos workflows entran como kind y las
+            responsabilidades locales viven en zone primitives.
+          </Typography>
+          <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
+            {GREENHOUSE_FUNNEL_CHART_ZONE_PRIMITIVES.map(zone => (
+              <Box
+                key={zone}
+                sx={theme => ({
+                  px: DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup,
+                  py: DESIGN_SYSTEM_LAB_TOKENS.spacing.tight,
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                  bgcolor: alpha(theme.palette.action.hover, 0.34),
+                  color: 'text.primary',
+                  ...typographyScale.labelSm
+                })}
+              >
+                {zone}
+              </Box>
+            ))}
+          </Stack>
+        </Stack>
+      </Stack>
+    </Box>
 
     <Box
       data-capture='charts-lab-health-signal'
