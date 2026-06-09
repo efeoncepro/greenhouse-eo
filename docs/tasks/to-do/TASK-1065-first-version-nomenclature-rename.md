@@ -179,7 +179,7 @@ Nombres nuevos (decisión operador 2026-06-09):
 | Cliente/cuenta | Espacios | **Organizations / Organizaciones** (ya vigente en gran parte del runtime: Account 360, org workspace) |
 | Sprint de producción | Ciclos | **Sprints** |
 | Dashboard | Pulse / Pulse Global | **Dashboard / dashboards** (genérico, minúscula) |
-| Admin interno / vista cross-cuenta | Torre de Control | **Cabina de Mando** (corto: "Cabina") — preserva identidad de centro-de-comando sin la cursilería de 1ª versión; el repo ya usa "cabina de mando" (Handoff.md). Override del operador posible. |
+| Admin interno / vista cross-cuenta | Torre de Control | **Cockpit** — inglés (consistente con Organizations/Sprints/Dashboard), centro-de-comando operacional cross-cuenta; mantiene el hilo aviación del original sin el literal "Control Tower"; corto y moderno. Subtítulo es-CL: "Operación interna cross-cuenta". Alternativas: "Command Center" / "Control Room". |
 
 **Matiz CRÍTICO (no es find-replace):** `Space` es un **objeto canónico 360 distinto** (`greenhouse_core.spaces.space_id`, contenedor de trabajo por cliente) — NO es sinónimo de cliente. La nomenclatura de 1ª versión conflaba "Clients" con "Espacios/Spaces". El rename es: **cliente-como-Espacio → Organizations**, pero el objeto canónico **Space se queda** (no renombrar `spaces`/`space_id`/"Spaces" donde refiere al objeto de trabajo). Auditar cada mención de "Espacios/Spaces" y clasificar: ¿refiere al cliente (→ Organization) o al objeto Space (→ se queda)?
 
