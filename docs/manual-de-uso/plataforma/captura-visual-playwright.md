@@ -40,7 +40,8 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 | Dossier para review UI/UX | `pnpm fe:capture:review <scenario-or-capture-dir> --env=staging` |
 | Before/after | `pnpm fe:capture:diff .captures/<prev> .captures/<curr>` |
 | Salud del pipeline local | `pnpm fe:capture:health` |
-| Limpieza de artifacts | `pnpm fe:capture:gc [--apply]` |
+| Lupa de motion / frames por selector | `pnpm fe:capture:micro --route=/path --selector='[data-capture="x"]'` |
+| Limpieza de artifacts | `pnpm fe:capture:gc [--apply] [--max-gb=N]` |
 
 Playwright ad-hoc solo debe usarse como complemento cuando haga falta inspeccionar consola, network, payloads de API o un gesto que el DSL todavía no soporte. En ese caso, guardá artifacts bajo `.captures/`, explicá por qué no alcanzó el helper canónico y convertí el flujo en scenario si se va a repetir.
 
@@ -235,15 +236,32 @@ Para capturar feedback de hover/focus/click con intención explícita:
 
 El video sigue siendo continuo, pero el manifest registra segmentos lógicos por interacción.
 
-### Caso 6 — Purgar capturas viejas
+### Caso 6 — Capturar frames finos de una microinteracción
+
+Cuando necesitás revisar parpadeos, easing, rebotes o una animación pequeña que no alcanza con un `mark`, usá el sampler selector-scoped. Este modo no aplica determinismo de baseline porque su propósito es preservar la motion real.
+
+```bash
+pnpm fe:capture:micro \
+  --route=/admin/design-system/nexa-brand \
+  --selector='[data-capture="nexa-floating-trigger"]' \
+  --env=local \
+  --duration=5000 \
+  --fps=24 \
+  --gif
+```
+
+Output: `recording.webm`, `frames/frame-0001.png...`, `contact-sheet.png`, `micro.gif` opcional, `manifest.json` e `index.html`.
+
+### Caso 7 — Purgar capturas viejas
 
 ```bash
 pnpm fe:capture:gc                    # dry-run, lista qué borraría (>30d)
 pnpm fe:capture:gc --apply            # borra de verdad
 pnpm fe:capture:gc --apply --days=7   # threshold custom
+pnpm fe:capture:gc --max-gb=15 --keep=20  # dry-run por tamaño, conserva últimos 20
 ```
 
-### Caso 7 — Mobile viewport (V1.1)
+### Caso 8 — Mobile viewport (V1.1)
 
 Cualquier device preset de Playwright funciona vía `--device`:
 
@@ -256,7 +274,7 @@ pnpm fe:capture <scenario> --env=staging --device="Galaxy S9+"
 
 El preset overridea viewport + userAgent + DPR del scenario. Útil para validar responsive layouts + mobile microinteractions.
 
-### Caso 7.1 — Multi-viewport por scenario
+### Caso 8.1 — Multi-viewport por scenario
 
 Para correr desktop/tablet/mobile en una sola invocación:
 
@@ -270,7 +288,7 @@ viewports: [
 
 El output crea subdirectorios por viewport y un manifest raíz con `variants`.
 
-### Caso 8 — Visual diff entre 2 capturas (V1.1)
+### Caso 9 — Visual diff entre 2 capturas (V1.1)
 
 Para comparar 2 runs (ej. antes y después de un cambio de UI):
 
@@ -284,7 +302,7 @@ Output:
 
 V1.2 agregará pixel-perfect diff vía pixelmatch.
 
-### Caso 9 — Subir captura a GCS bucket (V1.1)
+### Caso 10 — Subir captura a GCS bucket (V1.1)
 
 Para compartir una captura con el equipo:
 
@@ -294,7 +312,7 @@ pnpm fe:capture <scenario> --env=staging --upload=<bucket-name>
 
 Genera signed URL del manifest (válida 7 días) para compartir. Requiere `gcloud` autenticado localmente (ADC ya configurado por convención).
 
-### Caso 10 — Health probe local (V1.1)
+### Caso 11 — Health probe local (V1.1)
 
 Para verificar salud de capturas recientes (failure rate, mean duration):
 
@@ -306,7 +324,7 @@ pnpm fe:capture:health --json       # machine-readable
 
 Thresholds: 🟡 warning ≥10% failure rate · 🔴 error ≥25%. Exit code 1 si error.
 
-### Caso 11 — UI Review dossier auto-generado (V1.1)
+### Caso 12 — UI Review dossier auto-generado (V1.1)
 
 Para auditar una surface viva con el skill `greenhouse-ui-review`:
 
@@ -320,7 +338,7 @@ Genera `review-dossier.md` con frames + 13-row checklist + canon Geist+Poppins. 
 
 V1.2: invocación directa Anthropic SDK sin copy-paste.
 
-### Caso 12 — Production capture (Triple Gate canónico V1.1)
+### Caso 13 — Production capture (Triple Gate canónico V1.1)
 
 ⚠️ Captura contra production **requiere los 3 gates**:
 

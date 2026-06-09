@@ -11,6 +11,7 @@ import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { typographyScale } from '@/components/theme/typography-tokens'
 import {
   GreenhouseButton,
+  GreenhouseNexaAnimatedMark,
   GreenhouseNexaBrandMark,
   type GreenhouseNexaBrandKind,
   type GreenhouseNexaBrandSize
@@ -171,6 +172,68 @@ const NexaBrandLabView = () => (
             No usar Poppins ni pesos 700/800 para el texto del badge.
           </Typography>
         </Stack>
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+          <Typography variant='h6'>Motion rule</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            <InlineCode>GreenhouseNexaAnimatedMark</InlineCode> permite parpadeo GSAP del sparkle-eye como señal de vida
+            ocasional. Debe respetar reduced-motion y no reemplaza el contrato Rive para animaciones complejas.
+          </Typography>
+        </Stack>
+      </Stack>
+    </Box>
+
+    <Box
+      data-capture='nexa-brand-motion-specimen'
+      sx={theme => ({
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', md: 'minmax(220px, 0.45fr) minmax(320px, 1fr)' },
+        gap: DESIGN_SYSTEM_LAB_TOKENS.layout.gridGap,
+        alignItems: 'center',
+        p: DESIGN_SYSTEM_LAB_TOKENS.spacing.sectionInset,
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+        bgcolor: 'background.paper'
+      })}
+    >
+      <Stack direction='row' spacing={2.5} alignItems='center'>
+        <Box
+          sx={theme => ({
+            display: 'grid',
+            placeItems: 'center',
+            inlineSize: 72,
+            blockSize: 72,
+            borderRadius: '50%',
+            bgcolor: theme.palette.primary.dark,
+            color: theme.palette.common.white,
+            boxShadow: theme.shadows[3]
+          })}
+        >
+          <GreenhouseNexaAnimatedMark
+            autoBlink
+            chrome='none'
+            tone='onNavy'
+            size='medium'
+            ariaLabel='Nexa animada'
+            dataCapture='nexa-brand-gsap-blink-specimen'
+            sx={{ inlineSize: 42, blockSize: 42 }}
+          />
+        </Box>
+        <GreenhouseNexaAnimatedMark
+          autoBlink
+          chrome='badge'
+          tone='onNavy'
+          size='medium'
+          ariaLabel='Nexa badge animado'
+        />
+      </Stack>
+
+      <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+        <Typography variant='h6'>GSAP blink</Typography>
+        <Typography variant='body2' color='text.secondary'>
+          El sparkle parpadea con cadence irregular: attentive para presencia viva en entry points y ambient para apariciones
+          más calmadas. En reduced-motion se mantiene estático. Úsalo para presencia de Nexa; no para loaders, errores ni
+          confirmaciones.
+        </Typography>
       </Stack>
     </Box>
 

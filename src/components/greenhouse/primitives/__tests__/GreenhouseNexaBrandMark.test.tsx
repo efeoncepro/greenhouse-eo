@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
 
+import GreenhouseNexaAnimatedMark from '../GreenhouseNexaAnimatedMark'
 import GreenhouseNexaBrandMark from '../GreenhouseNexaBrandMark'
 import {
   GREENHOUSE_NEXA_BRAND_ASSETS,
@@ -45,5 +46,13 @@ describe('GreenhouseNexaBrandMark', () => {
   it('uses control-label typography for the pill text', () => {
     expect(GREENHOUSE_NEXA_BRAND_SIZE_CONFIG.small.textVariant).toBe('button')
     expect(GREENHOUSE_NEXA_BRAND_SIZE_CONFIG.medium.textVariant).toBe('button')
+  })
+
+  it('keeps the animated mark resilient when no Rive asset is configured yet', () => {
+    const { getByRole } = renderWithTheme(<GreenhouseNexaAnimatedMark kind='badgeIcon' ariaLabel='Nexa animada' />)
+
+    const mark = getByRole('img', { name: 'Nexa animada' })
+
+    expect(mark).toHaveAttribute('data-kind', 'badgeIcon')
   })
 })

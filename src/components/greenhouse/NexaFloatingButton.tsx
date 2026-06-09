@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
-import { useTheme } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 import Drawer from '@mui/material/Drawer'
 
 import {
@@ -24,12 +24,13 @@ import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/uti
 
 import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
 import type { NexaResponse } from '@/lib/nexa/nexa-contract'
+import { GreenhouseNexaAnimatedMark, GreenhouseNexaBrandMark } from '@/components/greenhouse/primitives'
+import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 
 import NexaThread from '@/views/greenhouse/home/components/NexaThread'
 
 const TASK407_ARIA_CERRAR_NEXA = "Cerrar Nexa"
 const TASK407_ARIA_ABRIR_NEXA_AI = "Abrir Nexa AI"
-
 
 const toJsonValue = (value: unknown): ReadonlyJSONValue => {
   if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return value
@@ -123,7 +124,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
         {/* Mini header */}
         <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
           <Stack direction='row' spacing={1} alignItems='center'>
-            <i className='tabler-sparkles' style={{ fontSize: '1rem', color: theme.palette.primary.main }} />
+            <GreenhouseNexaBrandMark kind='badgeIcon' size='small' />
             <Typography variant='subtitle2'>Nexa AI</Typography>
           </Stack>
           <IconButton size='small' onClick={() => setOpen(false)} aria-label={TASK407_ARIA_CERRAR_NEXA}>
@@ -148,6 +149,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       {/* FAB trigger */}
       <Fab
         data-nexa-floating-trigger='true'
+        data-capture='nexa-floating-trigger'
         color='primary'
         size='medium'
         aria-label={TASK407_ARIA_ABRIR_NEXA_AI}
@@ -157,17 +159,48 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
           ? {
               position: 'static',
               zIndex: 'inherit',
-              boxShadow: open ? 'none' : 6
+              bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
+              color: 'common.white',
+              boxShadow: open ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`,
+              '&:hover': {
+                bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
+                boxShadow: open ? 'none' : `0 14px 34px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.34)}`
+              },
+              '&:focus-visible': {
+                outline: `3px solid ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.42)}`,
+                outlineOffset: 3
+              }
             }
           : {
               position: 'fixed',
               bottom: 24,
               right: 24,
               zIndex: theme.zIndex.speedDial,
-              boxShadow: open ? 'none' : 6
+              bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
+              color: 'common.white',
+              boxShadow: open ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`,
+              '&:hover': {
+                bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
+                boxShadow: open ? 'none' : `0 14px 34px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.34)}`
+              },
+              '&:focus-visible': {
+                outline: `3px solid ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.42)}`,
+                outlineOffset: 3
+              }
             }}
       >
-        <i className={open ? 'tabler-x' : 'tabler-sparkles'} style={{ fontSize: '1.25rem' }} />
+        {open ? (
+          <i className='tabler-x' style={{ fontSize: '1.25rem' }} />
+        ) : (
+          <GreenhouseNexaAnimatedMark
+            autoBlink
+            chrome='none'
+            tone='onNavy'
+            size='medium'
+            ariaLabel='Nexa'
+            sx={{ inlineSize: 30, blockSize: 30 }}
+          />
+        )}
       </Fab>
 
       {/* Panel: Drawer on mobile, positioned Card on desktop */}

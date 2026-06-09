@@ -21,6 +21,8 @@ export type {
   GreenhouseVerificationBadgeSize
 } from './GreenhouseVerificationBadge'
 export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
+export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedMark'
+export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
 export {
   GREENHOUSE_NEXA_BRAND_ASSETS,
   GREENHOUSE_NEXA_BRAND_COLORS,

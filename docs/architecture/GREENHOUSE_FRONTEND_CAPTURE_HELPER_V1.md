@@ -133,7 +133,8 @@ pnpm fe:capture <scenario-name> --env=staging --gif --headed --prod
 pnpm fe:capture:review <scenario-or-capture-dir> --env=staging
 pnpm fe:capture:diff .captures/<prev> .captures/<curr>
 pnpm fe:capture:health
-pnpm fe:capture:gc [--apply] [--days=N]
+pnpm fe:capture:micro --route=/path --selector='[data-capture="x"]' --env=local --duration=5000 --fps=24
+pnpm fe:capture:gc [--apply] [--days=N] [--max-gb=N] [--keep=N]
 ```
 
 Flags soportadas:
@@ -143,6 +144,8 @@ Flags soportadas:
 - `--gif` — composeGif via ffmpeg (warn + skip si no disponible)
 - `--headed` — abre browser visible (debug)
 - `--prod` — production gate flag (parte del Triple Gate)
+
+`fe:capture:micro` es el sampler selector-scoped para motion fino: captura PNGs secuenciales a FPS controlado, `recording.webm`, `contact-sheet.png`, `manifest.json`, `index.html` y `micro.gif` opcional. No aplica determinismo de baseline porque se usa para observar motion real.
 
 ### Scenario DSL
 
@@ -246,7 +249,8 @@ interface CaptureManifest {
 ```
 scripts/frontend/
 ├── capture.ts              # CLI entrypoint (tsx)
-├── gc.ts                   # garbage collector >30d
+├── micro.ts                # sampler selector-scoped para motion fino
+├── gc.ts                   # garbage collector por antigüedad/tamaño
 ├── README.md
 ├── lib/
 │   ├── env.ts              # CaptureEnv + EnvConfig + resolveEnvConfig

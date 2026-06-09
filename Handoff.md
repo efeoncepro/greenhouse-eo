@@ -1,3 +1,17 @@
+# Sesion 2026-06-09 — Nexa Floating Widget badge navy + mark canónico
+
+Codex aplicó el ajuste visual pedido para el FAB global de Nexa.
+
+- **Cambio:** `src/components/greenhouse/NexaFloatingButton.tsx` reemplaza la chispa genérica del trigger por el mark completo de Nexa sobre Midnight Navy (`GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy`), con arco teal y chispa blanca como el badge. El header del panel usa `GreenhouseNexaBrandMark kind='badgeIcon'`.
+- **Rive preparado:** `@rive-app/react-canvas@4.29.0` instalado. Nueva primitive `GreenhouseNexaAnimatedMark` en `src/components/greenhouse/primitives/`: acepta `riveSrc`, `artboard`, `animation` y `stateMachine`; si no hay `.riv` o falla la carga, cae al `GreenhouseNexaBrandMark` actual. Para animar de verdad falta exportar el Nexa Mark desde Rive Editor como `.riv` y pasarlo por `riveSrc`.
+- **GVC micro evidence:** se agregó `pnpm fe:capture:micro` (`scripts/frontend/micro.ts`) para capturar motion fino de un selector con frames PNG secuenciales, `recording.webm`, `contact-sheet.png`, `manifest.json`, `index.html` y `micro.gif` opcional. Caso fuente: poder revisar el parpadeo del sparkle y futuras animaciones arco/sparkle del Nexa Mark sin depender de marks aislados ni determinismo de baseline.
+- **GVC garbage collector:** `pnpm fe:capture:gc` conserva dry-run por defecto y ahora reporta tamaño total + purga por `--days`, `--max-gb` y `--keep`; usar `--apply` solo cuando se quiera borrar.
+- **GVC:** desktop `.captures/2026-06-09T19-38-48_inline-admin-design-system-nexa-brand`; mobile iPhone 13 `.captures/2026-06-09T19-39-17_inline-admin-design-system-nexa-brand`; micro sampler `.captures/2026-06-09T20-11-38_micro-admin-design-system-nexa-brand-data-capture-nexa-floating-trigger` con `contact-sheet.png` revisado visualmente. Botón navy, mark completo, sin sparkle aislada; el sampler permite ver el cierre/apertura del sparkle como ojo.
+- **Verificación:** `pnpm exec eslint src/components/greenhouse/NexaFloatingButton.tsx`, `pnpm exec eslint src/components/greenhouse/primitives/GreenhouseNexaAnimatedMark.tsx src/components/greenhouse/primitives/__tests__/GreenhouseNexaBrandMark.test.tsx src/components/greenhouse/primitives/index.ts`, `pnpm exec eslint scripts/frontend/micro.ts scripts/frontend/gc.ts`, `pnpm vitest run src/components/greenhouse/primitives/__tests__/GreenhouseNexaBrandMark.test.tsx`, `pnpm exec tsc --noEmit --pretty false`, `pnpm fe:capture:micro --route=/admin/design-system/nexa-brand --selector='[data-capture="nexa-floating-trigger"]' --env=local --duration=3000 --fps=12 --gif`, `pnpm fe:capture:gc --max-gb=4 --keep=20` dry-run, `pnpm docs:closure-check`.
+- **Rollout:** solo código/UI local; sin flags, env vars, migraciones ni deploy externo aplicado.
+
+---
+
 # Sesion 2026-06-09 — RELEASE develop→main `dc45bdedf` (RELEASED) + context-pack drift sweep
 
 **Release a producción completado y verificado.** Manifest `released`, orchestrator run `27205193173` = success.
