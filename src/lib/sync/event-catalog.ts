@@ -421,6 +421,10 @@ export const EVENT_TYPES = {
   leaveRequestRejected: 'leave_request.rejected',
   leaveRequestCancelled: 'leave_request.cancelled',
   leaveRequestPayrollImpactDetected: 'leave_request.payroll_impact_detected',
+  // TASK-1020 — audit-only: recovery de autoridad de aprobación de un permiso
+  // cuyo snapshot quedó congelado con un delegado genérico inválido. Payload v1
+  // con before/after + actor/reason. NO es reactivo (no dispara projection).
+  leaveApprovalAuthorityRecovered: 'leave_request.approval_authority_recovered',
   leaveBalanceAdjusted: 'leave_balance.adjusted',
   leaveBalanceAdjustmentReversed: 'leave_balance.adjustment_reversed',
 
