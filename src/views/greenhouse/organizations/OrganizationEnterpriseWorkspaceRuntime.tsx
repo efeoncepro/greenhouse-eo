@@ -37,6 +37,11 @@ import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import { DataTableShell } from '@/components/greenhouse/data-table'
 import OrganizationLogoAvatarEditor from '@/components/greenhouse/organization-workspace/OrganizationLogoAvatarEditor'
 import {
+  ORGANIZATION_ENTERPRISE_WORKSPACE_CHART_SERIES,
+  ORGANIZATION_ENTERPRISE_WORKSPACE_TOKENS,
+  organizationEnterpriseCategoricalColor
+} from '@/components/greenhouse/organization-workspace/organization-enterprise-workspace-controller'
+import {
   GreenhouseButton,
   GreenhouseChip,
   GreenhouseKpiDelta,
@@ -51,12 +56,18 @@ import type {
   AccountComplete360,
   AccountEconomicsTrendPoint
 } from '@/types/account-complete-360'
+import type {
+  OrganizationWorkspaceCompactSignals,
+  OrganizationWorkspaceSignalSeverity
+} from '@/lib/organization-workspace/compact-signals-types'
 
 import type { OrganizationDetailData, OrganizationFinanceSummary } from './types'
 
 type EnterpriseTone = 'neutral' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'
 
 const COMMON_ARIA = getMicrocopy('es-CL').aria
+const ENTERPRISE_COPY = GH_ORGANIZATION_WORKSPACE.enterprise
+const ENTERPRISE_TOKENS = ORGANIZATION_ENTERPRISE_WORKSPACE_TOKENS
 
 type OrgKpis = {
   revenueClp: number
@@ -96,12 +107,13 @@ type OrganizationProjectsSummary = {
 }
 
 type RuntimeDataState =
-  | { status: 'loading'; data360: null; projects: null; financeSummary: null; error: null }
+  | { status: 'loading'; data360: null; projects: null; financeSummary: null; compactSignals: null; error: null }
   | {
       status: 'ready'
       data360: AccountComplete360 | null
       projects: OrganizationProjectsSummary | null
       financeSummary: OrganizationFinanceSummary | null
+      compactSignals: OrganizationWorkspaceCompactSignals | null
       error: string | null
     }
 
@@ -129,6 +141,13 @@ type EnterpriseMetric = {
   invert?: boolean
 }
 
+type CapabilityDistributionItem = {
+  name: string
+  value: number
+  tone: EnterpriseTone
+  color: string
+}
+
 const FACET_ICONS: Record<OrganizationFacet, string> = {
   identity: 'tabler-user-square-rounded',
   spaces: 'tabler-cube',
@@ -139,18 +158,6 @@ const FACET_ICONS: Record<OrganizationFacet, string> = {
   crm: 'tabler-briefcase',
   services: 'tabler-tool',
   staffAug: 'tabler-user-check'
-}
-
-const FACET_DESCRIPTIONS: Record<OrganizationFacet, string> = {
-  identity: 'Ficha legal, marca, HubSpot y mapeos canónicos para que el resto de facets no repita ownership.',
-  spaces: 'Spaces operativos, clientes puente y mapeos de trabajo asociados a esta organización.',
-  team: 'Roster, dedicación, roles y capacidad visible para entender si delivery y finance tienen base operativa.',
-  economics: 'Márgenes, contribución, mix de costos y sensibilidad operacional sin duplicar el ledger de Finanzas.',
-  delivery: 'Calidad, throughput, pipeline y proyectos activos. Esta vista es el default recomendado para Agency.',
-  finance: 'Resumen financiero para Agency con puente a la vista rica de Finance Clients cuando se requiere operación.',
-  crm: 'Contactos, deals, pipeline y sincronización HubSpot como contexto, no como único source of truth.',
-  services: 'Catálogo de servicios, cobertura activa y consumo por engagement.',
-  staffAug: 'Placements, contratos externos y baseline de capacidad aumentada con estado honesto de implementación.'
 }
 
 const STATUS_COLOR: Record<string, EnterpriseTone> = {
@@ -173,16 +180,16 @@ const COUNTRY_FLAGS: Record<string, string> = {
 }
 
 const fmtClp = (n: number | null | undefined): string => {
-  if (n == null) return 'Sin datos'
+  if (n == null) return ENTERPRISE_COPY.states.noData
 
   return formatGreenhouseCurrency(n, 'CLP', { maximumFractionDigits: 0 }, 'es-CL')
 }
 
-const fmtPct = (value: number | null | undefined, fallback = 'Sin datos') =>
+const fmtPct = (value: number | null | undefined, fallback = ENTERPRISE_COPY.states.noData) =>
   value == null ? fallback : `${Math.round(value * 10) / 10}%`
 
 const fmtCompact = (value: number | null | undefined, suffix = '') =>
-  value == null ? 'Sin datos' : `${formatNumber(value, { maximumFractionDigits: 1 }, 'es-CL')}${suffix}`
+  value == null ? ENTERPRISE_COPY.states.noData : `${formatNumber(value, { maximumFractionDigits: 1 }, 'es-CL')}${suffix}`
 
 const resolveStatusLabel = (status: string): string => {
   const copy = GH_ORGANIZATION_WORKSPACE.shell.status
@@ -215,6 +222,51 @@ const metricToneFromMargin = (margin: number | null | undefined): Exclude<Enterp
 }
 
 const facetStateTone = (tone: EnterpriseTone) => (tone === 'neutral' ? 'secondary' : tone)
+
+const facetStateLabel = (tone: EnterpriseTone) => {
+  if (tone === 'success') return ENTERPRISE_COPY.states.ready
+  if (tone === 'warning') return ENTERPRISE_COPY.states.partial
+
+  return ENTERPRISE_COPY.states.planned
+}
+
+const deltaPoints = (current: number | null | undefined, previous: number | null | undefined) => {
+  if (current == null || previous == null) return undefined
+
+  const rounded = Math.round((current - previous) * 10) / 10
+
+  return Math.abs(rounded) < 0.05 ? undefined : rounded
+}
+
+const deltaPercentChange = (current: number | null | undefined, previous: number | null | undefined) => {
+  if (current == null || previous == null || previous === 0) return undefined
+
+  const rounded = Math.round(((current - previous) / Math.abs(previous)) * 1000) / 10
+
+  return Math.abs(rounded) < 0.05 ? undefined : rounded
+}
+
+const formatWebsiteLabel = (websiteUrl: string | null | undefined) => {
+  if (!websiteUrl) return null
+
+  try {
+    const parsed = new URL(websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`)
+    const path = parsed.pathname === '/' ? '' : parsed.pathname.replace(/\/$/, '')
+
+    return `${parsed.hostname.replace(/^www\./, '')}${path}`
+  } catch {
+    return websiteUrl.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '')
+  }
+}
+
+const previousEconomicsTrendPoint = (
+  trend: AccountEconomicsTrendPoint[] | undefined,
+  currentYear: number,
+  currentMonth: number
+) =>
+  [...(trend ?? [])]
+    .filter(point => point.year < currentYear || (point.year === currentYear && point.month < currentMonth))
+    .sort((a, b) => b.year - a.year || b.month - a.month)[0] ?? null
 
 const getFacetTone = (facet: OrganizationFacet, data360: AccountComplete360 | null, detail: OrganizationDetailData): EnterpriseTone => {
   if (!data360) return 'warning'
@@ -258,8 +310,13 @@ const buildDistribution = (data360: AccountComplete360 | null, detail: Organizat
     return Object.entries(serviceDistribution)
       .filter(([, value]) => value > 0)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
-      .map(([name, value], index) => ({ name, value, tone: ['primary', 'info', 'warning', 'success', 'error', 'secondary'][index] as EnterpriseTone }))
+      .slice(0, ENTERPRISE_TOKENS.density.distributionMaxItems)
+      .map(([name, value], index) => ({
+        name,
+        value,
+        tone: ['primary', 'info', 'warning', 'success', 'error', 'secondary'][index] as EnterpriseTone,
+        color: organizationEnterpriseCategoricalColor(index)
+      }))
   }
 
   const departmentCounts = new Map<string, number>()
@@ -272,17 +329,22 @@ const buildDistribution = (data360: AccountComplete360 | null, detail: Organizat
 
   return Array.from(departmentCounts.entries())
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
-    .map(([name, value], index) => ({ name, value, tone: ['primary', 'info', 'warning', 'success', 'error', 'secondary'][index] as EnterpriseTone }))
+    .slice(0, ENTERPRISE_TOKENS.density.distributionMaxItems)
+    .map(([name, value], index) => ({
+      name,
+      value,
+      tone: ['primary', 'info', 'warning', 'success', 'error', 'secondary'][index] as EnterpriseTone,
+      color: organizationEnterpriseCategoricalColor(index)
+    }))
 }
 
-const buildDistributionArcs = (items: Array<{ name: string; value: number; tone: EnterpriseTone }>) => {
+const buildDistributionArcs = (items: CapabilityDistributionItem[]) => {
   const total = items.reduce((sum, item) => sum + item.value, 0)
   let start = 0
 
   return items.map(item => {
     const pct = total > 0 ? (item.value / total) * 100 : 0
-    const gap = total > 0 ? 1.2 : 0
+    const gap = total > 0 ? ENTERPRISE_TOKENS.chart.csc.gapDegrees : 0
 
     const arc = {
       ...item,
@@ -297,11 +359,22 @@ const buildDistributionArcs = (items: Array<{ name: string; value: number; tone:
   })
 }
 
-const chartColorForTone = (tone: EnterpriseTone) => {
-  if (tone === 'neutral') return 'var(--mui-palette-text-disabled)'
-  if (tone === 'secondary') return 'var(--mui-palette-secondary-main)'
+const compactToneFromSeverity = (severity: OrganizationWorkspaceSignalSeverity): EnterpriseTone => {
+  if (severity === 'error') return 'error'
+  if (severity === 'warning') return 'warning'
+  if (severity === 'success') return 'success'
 
-  return `var(--mui-palette-${tone}-main)`
+  return 'info'
+}
+
+const compactIconForSource = (source: OrganizationWorkspaceCompactSignals['recentSignals'][number]['source']) => {
+  if (source === 'finance_summary' || source === 'account_360') return 'tabler-report-money'
+  if (source === 'projects') return 'tabler-send'
+  if (source === 'client_lifecycle') return 'tabler-progress-check'
+  if (source === 'organization_360') return 'tabler-building'
+  if (source === 'workspace_projection') return 'tabler-shield-check'
+
+  return 'tabler-activity'
 }
 
 const normalizeTrendRows = (trend: AccountEconomicsTrendPoint[] | undefined) =>
@@ -329,6 +402,7 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
     data360: null,
     projects: null,
     financeSummary: null,
+    compactSignals: null,
     error: null
   })
 
@@ -337,22 +411,24 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
   useEffect(() => {
     let cancelled = false
 
-    setRuntime({ status: 'loading', data360: null, projects: null, financeSummary: null, error: null })
+    setRuntime({ status: 'loading', data360: null, projects: null, financeSummary: null, compactSignals: null, error: null })
 
     Promise.allSettled([
-      fetch(`/api/organization/${organizationId}/360?facets=identity,spaces,team,economics,delivery,finance,crm,services,staffAug&asOf=${period.asOf}&limit=20`, { cache: 'no-store' }).then(response => response.ok ? response.json() as Promise<AccountComplete360> : null),
+      fetch(`/api/organization/${organizationId}/360?facets=identity,spaces,team,economics,delivery,finance,crm,services,staffAug&asOf=${period.asOf}&limit=${ENTERPRISE_TOKENS.density.account360Limit}`, { cache: 'no-store' }).then(response => response.ok ? response.json() as Promise<AccountComplete360> : null),
       fetch(`/api/organizations/${organizationId}/projects`, { cache: 'no-store' }).then(response => response.ok ? response.json() as Promise<OrganizationProjectsSummary> : null),
-      fetch(`/api/organizations/${organizationId}/finance?year=${period.year}&month=${period.month}`, { cache: 'no-store' }).then(response => response.ok ? response.json() as Promise<OrganizationFinanceSummary> : null)
+      fetch(`/api/organizations/${organizationId}/finance?year=${period.year}&month=${period.month}`, { cache: 'no-store' }).then(response => response.ok ? response.json() as Promise<OrganizationFinanceSummary> : null),
+      fetch(`/api/organizations/${organizationId}/workspace/compact-signals?year=${period.year}&month=${period.month}&asOf=${period.asOf}`, { cache: 'no-store' }).then(response => response.ok ? response.json() as Promise<OrganizationWorkspaceCompactSignals> : null)
     ]).then(results => {
       if (cancelled) return
 
-      const [data360Result, projectsResult, financeResult] = results
+      const [data360Result, projectsResult, financeResult, compactSignalsResult] = results
 
       setRuntime({
         status: 'ready',
         data360: data360Result.status === 'fulfilled' ? data360Result.value : null,
         projects: projectsResult.status === 'fulfilled' ? projectsResult.value : null,
         financeSummary: financeResult.status === 'fulfilled' ? financeResult.value : null,
+        compactSignals: compactSignalsResult.status === 'fulfilled' ? compactSignalsResult.value : null,
         error: results.some(result => result.status === 'rejected') ? 'partial_fetch_failed' : null
       })
     })
@@ -364,7 +440,7 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
 
   const data360 = runtime.status === 'ready' ? runtime.data360 : null
   const visibleTabs = projection.visibleTabs
-  const fallbackFacet: OrganizationFacet = projection.defaultFacet ?? projection.visibleFacets[0] ?? 'identity'
+  const fallbackFacet: OrganizationFacet = projection.visibleFacets.includes('delivery') ? 'delivery' : projection.defaultFacet ?? projection.visibleFacets[0] ?? 'identity'
   const effectiveFacet: OrganizationFacet = activeFacet && projection.visibleFacets.includes(activeFacet) ? activeFacet : fallbackFacet
   const activeLabel = visibleTabs.find(tab => tab.facet === effectiveFacet)?.label ?? GH_ORGANIZATION_WORKSPACE.facets.labels[effectiveFacet]
   const activeTone = getFacetTone(effectiveFacet, data360, detail)
@@ -372,28 +448,35 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
   const topMetrics = useMemo<EnterpriseMetric[]>(() => {
     const current = data360?.economics?.currentPeriod
     const finance = data360?.finance
+    const previousEconomics = previousEconomicsTrendPoint(data360?.economics?.trend, current?.year ?? period.year, current?.month ?? period.month)
+    const revenueValue = current?.revenueCLP ?? kpis?.revenueClp
+    const marginValue = current?.grossMarginPct ?? kpis?.grossMarginPct
+    const fteValue = current?.headcountFte ?? data360?.team?.totalFte ?? kpis?.headcountFte
 
     return [
       {
         label: 'Revenue período',
-        value: fmtClp(current?.revenueCLP ?? kpis?.revenueClp),
+        value: fmtClp(revenueValue),
         helper: current ? `${period.month}/${period.year}` : '360 parcial',
         icon: 'tabler-coins',
-        tone: 'secondary'
+        tone: 'secondary',
+        delta: deltaPercentChange(revenueValue, previousEconomics?.revenueCLP)
       },
       {
         label: 'Margen bruto',
-        value: fmtPct(current?.grossMarginPct ?? kpis?.grossMarginPct),
+        value: fmtPct(marginValue),
         helper: current?.periodClosed ? 'período cerrado' : 'período abierto',
         icon: 'tabler-trending-up',
-        tone: metricToneFromMargin(current?.grossMarginPct ?? kpis?.grossMarginPct)
+        tone: metricToneFromMargin(marginValue),
+        delta: deltaPoints(marginValue, previousEconomics?.grossMarginPct)
       },
       {
         label: 'FTE total',
-        value: fmtCompact(current?.headcountFte ?? data360?.team?.totalFte ?? kpis?.headcountFte),
+        value: fmtCompact(fteValue),
         helper: `${data360?.team?.totalMembers ?? detail.uniquePersonCount} personas`,
         icon: 'tabler-users',
-        tone: 'info'
+        tone: 'info',
+        delta: deltaPercentChange(fteValue, previousEconomics?.headcountFte)
       },
       {
         label: 'Saldo pendiente',
@@ -414,11 +497,43 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
     const staffAug = data360?.staffAug
 
     if (effectiveFacet === 'delivery') {
+      const ico = delivery?.icoMetrics
+      const previousIco = delivery?.previousIcoMetrics
+
       return [
-        { label: 'OTD%', value: fmtPct(delivery?.icoMetrics?.otdPct), helper: 'entrega en fecha', icon: 'tabler-clock-check', tone: 'success' },
-        { label: 'FTR%', value: fmtPct(delivery?.icoMetrics?.ftrPct), helper: 'first time right', icon: 'tabler-target-arrow', tone: 'success' },
-        { label: 'Throughput', value: fmtCompact(delivery?.icoMetrics?.throughputCount), helper: 'tareas período', icon: 'tabler-rocket', tone: 'primary' },
-        { label: 'Activos bloqueados', value: fmtCompact(delivery?.icoMetrics?.stuckAssetCount), helper: 'requieren revisión', icon: 'tabler-alert-circle', tone: delivery?.icoMetrics?.stuckAssetCount ? 'warning' : 'secondary' }
+        {
+          label: 'OTD%',
+          value: fmtPct(ico?.otdPct),
+          helper: 'Objetivo >= 90%',
+          icon: 'tabler-clock-check',
+          tone: 'success',
+          delta: deltaPoints(ico?.otdPct, previousIco?.otdPct)
+        },
+        {
+          label: 'FTR%',
+          value: fmtPct(ico?.ftrPct),
+          helper: 'Objetivo >= 85%',
+          icon: 'tabler-target-arrow',
+          tone: 'success',
+          delta: deltaPoints(ico?.ftrPct, previousIco?.ftrPct)
+        },
+        {
+          label: 'Throughput',
+          value: fmtCompact(ico?.throughputCount),
+          helper: 'pts/mes, objetivo 120',
+          icon: 'tabler-rocket',
+          tone: 'primary',
+          delta: deltaPercentChange(ico?.throughputCount, previousIco?.throughputCount)
+        },
+        {
+          label: 'RpA',
+          value: fmtCompact(ico?.rpaAvg),
+          helper: 'revisiones por activo',
+          icon: 'tabler-route',
+          tone: 'warning',
+          delta: deltaPercentChange(ico?.rpaAvg, previousIco?.rpaAvg),
+          invert: true
+        }
       ]
     }
 
@@ -433,7 +548,7 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
 
     return [
       { label: 'Cobertura facet', value: getFacetCount(effectiveFacet, data360, detail), helper: activeLabel, icon: FACET_ICONS[effectiveFacet], tone: facetStateTone(activeTone) as Exclude<EnterpriseTone, 'neutral'> },
-      { label: 'Estado canónico', value: activeTone === 'success' ? 'Listo' : activeTone === 'warning' ? 'Parcial' : 'Planificado', helper: 'visibility via projection', icon: 'tabler-shield-check', tone: facetStateTone(activeTone) as Exclude<EnterpriseTone, 'neutral'> },
+      { label: 'Estado canónico', value: facetStateLabel(activeTone), helper: 'visibility via projection', icon: 'tabler-shield-check', tone: facetStateTone(activeTone) as Exclude<EnterpriseTone, 'neutral'> },
       { label: 'Revenue período', value: fmtClp(current?.revenueCLP), helper: 'puente economía', icon: 'tabler-chart-histogram', tone: 'secondary' },
       { label: 'Puentes activos', value: String([finance, services, crm, staffAug].filter(Boolean).length), helper: 'finance · services · CRM · workforce', icon: 'tabler-git-branch', tone: 'info' }
     ]
@@ -462,6 +577,7 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
           {headerBanner}
           <OrganizationMasthead
             detail={detail}
+            data360={data360}
             adminActions={adminActions}
             canEditLogo={canEditLogo}
             onLogoUpdated={onLogoUpdated}
@@ -470,8 +586,11 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', xl: '224px minmax(0, 1fr) 336px' },
-              minHeight: { xs: 'auto', xl: 656 },
+              gridTemplateColumns: {
+                xs: '1fr',
+                xl: `${ENTERPRISE_TOKENS.layout.facetRailInlineSize}px minmax(0, 1fr) ${ENTERPRISE_TOKENS.layout.sidecarInlineSize}px`
+              },
+              minHeight: { xs: 'auto', xl: ENTERPRISE_TOKENS.layout.minDesktopBlockSize },
               borderBlockStart: theme => `1px solid ${theme.palette.divider}`
             }}
           >
@@ -495,7 +614,7 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
                 <Stack spacing={4}>
                   <FacetHeader
                     label={activeLabel}
-                    description={FACET_DESCRIPTIONS[effectiveFacet]}
+                    description={ENTERPRISE_COPY.facetDescriptions[effectiveFacet]}
                     tone={activeTone}
                     loading={runtime.status === 'loading'}
                   />
@@ -511,7 +630,12 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
                 </Stack>
               </Box>
             </Box>
-            <AccountSidecar detail={detail} data360={data360} partial={runtime.status === 'loading' || Boolean(runtime.error)} />
+            <AccountSidecar
+              detail={detail}
+              data360={data360}
+              compactSignals={runtime.status === 'ready' ? runtime.compactSignals : null}
+              partial={runtime.status === 'loading' || Boolean(runtime.error)}
+            />
           </Box>
         </Stack>
       </Box>
@@ -522,11 +646,13 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
 
 const OrganizationMasthead = ({
   detail,
+  data360,
   adminActions,
   canEditLogo,
   onLogoUpdated
 }: {
   detail: OrganizationDetailData
+  data360: AccountComplete360 | null
   adminActions?: ReactNode
   canEditLogo?: boolean
   onLogoUpdated?: () => void | Promise<void>
@@ -534,6 +660,7 @@ const OrganizationMasthead = ({
   const theme = useTheme()
   const flag = detail.country ? (COUNTRY_FLAGS[detail.country] ?? '') : ''
   const statusTone = STATUS_COLOR[detail.status] ?? 'neutral'
+  const websiteLabel = formatWebsiteLabel(detail.websiteUrl ?? data360?.identity?.websiteUrl ?? data360?.crm?.company?.website)
 
   const fallbackInitials =
     detail.organizationName
@@ -549,8 +676,8 @@ const OrganizationMasthead = ({
         <Stack direction='row' spacing={4} alignItems='center' sx={{ minWidth: 0 }}>
           <Box
             sx={{
-              inlineSize: 78,
-              blockSize: 78,
+              inlineSize: ENTERPRISE_TOKENS.chrome.logoFrameSize,
+              blockSize: ENTERPRISE_TOKENS.chrome.logoFrameSize,
               borderRadius: `${theme.shape.customBorderRadius.lg}px`,
               border: `1px solid ${theme.palette.divider}`,
               display: 'grid',
@@ -566,7 +693,7 @@ const OrganizationMasthead = ({
               fallbackInitials={fallbackInitials}
               editable={Boolean(canEditLogo)}
               isOperatingEntity={detail.isOperatingEntity}
-              size={64}
+              size={ENTERPRISE_TOKENS.chrome.logoAvatarSize}
               onUpdated={onLogoUpdated}
             />
           </Box>
@@ -581,7 +708,7 @@ const OrganizationMasthead = ({
               {detail.country ? <MetaItem icon='tabler-map-pin' label={`${flag ? `${flag} ` : ''}${detail.country}`} /> : null}
               {detail.industry ? <MetaItem icon='tabler-building-skyscraper' label={detail.industry} /> : null}
               {detail.publicId ? <MetaItem icon='tabler-id' label={detail.publicId} /> : null}
-              {detail.websiteUrl ? <MetaItem icon='tabler-world' label={detail.websiteUrl.replace(/^https?:\/\//, '')} tone='primary' /> : null}
+              {websiteLabel ? <MetaItem icon='tabler-world' label={websiteLabel} tone='primary' /> : null}
               <MetaItem icon='tabler-database' label={detail.hubspotCompanyId ? 'Source: HubSpot + AXIS Core' : 'Source: AXIS Core'} />
             </Stack>
           </Stack>
@@ -629,8 +756,8 @@ const MetricRail = ({ metrics }: { metrics: EnterpriseMetric[] }) => (
           <Stack direction='row' spacing={3} alignItems='center'>
             <Box
               sx={{
-                inlineSize: 38,
-                blockSize: 38,
+                inlineSize: ENTERPRISE_TOKENS.chrome.metricIconSize,
+                blockSize: ENTERPRISE_TOKENS.chrome.metricIconSize,
                 borderRadius: theme => `${theme.shape.customBorderRadius.lg}px`,
                 display: 'grid',
                 placeItems: 'center',
@@ -687,7 +814,7 @@ const FacetRail = ({
             aria-pressed={selected}
             sx={theme => ({
               width: '100%',
-              scrollMarginBlockStart: { xs: 164, lg: 0 },
+              scrollMarginBlockStart: { xs: ENTERPRISE_TOKENS.density.facetScrollMarginMobile, lg: 0 },
               justifyContent: 'stretch',
               borderRadius: `${theme.shape.customBorderRadius.md}px`,
               border: `1px solid ${selected ? `var(--mui-palette-primary-main)` : 'transparent'}`,
@@ -741,7 +868,11 @@ const FacetHeader = ({
           size='small'
           variant='label'
           tone={facetStateTone(tone)}
-          label={loading ? 'Cargando' : tone === 'success' ? 'Listo' : tone === 'warning' ? 'Parcial' : 'Planificado'}
+          label={
+            loading
+              ? ENTERPRISE_COPY.states.loading
+              : facetStateLabel(tone)
+          }
           sx={{ minInlineSize: 82 }}
         />
       </Stack>
@@ -751,10 +882,10 @@ const FacetHeader = ({
     </Stack>
     <Stack direction='row' spacing={2}>
       <GreenhouseButton kind='filter' variant='outlined' leadingIconClassName='tabler-filter'>
-        Filtros
+        {ENTERPRISE_COPY.actions.filters}
       </GreenhouseButton>
       <GreenhouseButton kind='navigation' variant='text' trailingIconClassName='tabler-external-link'>
-        Vista completa
+        {ENTERPRISE_COPY.actions.viewFull}
       </GreenhouseButton>
     </Stack>
   </Stack>
@@ -764,7 +895,7 @@ const MetricStrip = ({ metrics }: { metrics: EnterpriseMetric[] }) => (
   <Box
     sx={{
       display: 'grid',
-      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', xl: `repeat(${metrics.length}, minmax(0, 1fr))` },
+      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: `repeat(${metrics.length}, minmax(0, 1fr))` },
       border: theme => `1px solid ${theme.palette.divider}`,
       borderRadius: theme => `${theme.shape.customBorderRadius.lg}px`,
       overflow: 'hidden'
@@ -775,8 +906,8 @@ const MetricStrip = ({ metrics }: { metrics: EnterpriseMetric[] }) => (
         key={metric.label}
         sx={{
           p: 4,
-          borderInlineStart: { xl: index === 0 ? 0 : theme => `1px solid ${theme.palette.divider}` },
-          borderBlockStart: { xs: index === 0 ? 0 : theme => `1px solid ${theme.palette.divider}`, xl: 0 }
+          borderInlineStart: { md: index === 0 ? 0 : theme => `1px solid ${theme.palette.divider}` },
+          borderBlockStart: { xs: index === 0 ? 0 : theme => `1px solid ${theme.palette.divider}`, md: 0 }
         }}
       >
         <Stack spacing={2}>
@@ -802,73 +933,99 @@ const DeliveryCanvas = ({ detail, data360, projects }: { detail: OrganizationDet
   return (
     <Stack spacing={4} data-capture='organization-enterprise-delivery-canvas'>
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', xl: 'minmax(0, 1.35fr) minmax(320px, 0.9fr)' }, gap: 4 }}>
-        <SectionShell title='Tendencia operacional' subtitle='Revenue vs margen como proxy ejecutivo mientras delivery trend se materializa'>
+        <SectionShell title={ENTERPRISE_COPY.sections.operationalTrend.title} subtitle={ENTERPRISE_COPY.sections.operationalTrend.subtitle}>
           {trendRows.length > 1 ? (
-            <Box sx={{ blockSize: 260 }}>
+            <Box sx={{ blockSize: ENTERPRISE_TOKENS.chart.trendHeight }}>
               <ResponsiveContainer width='100%' height='100%'>
                 <LineChart data={trendRows} margin={{ left: -22, right: 18, top: 16, bottom: 0 }}>
                   <XAxis dataKey='label' axisLine={false} tickLine={false} stroke='var(--mui-palette-text-secondary)' />
                   <YAxis axisLine={false} tickLine={false} stroke='var(--mui-palette-text-secondary)' />
                   <RechartsTooltip />
-                  <Line type='monotone' dataKey='revenue' stroke='var(--mui-palette-primary-main)' strokeWidth={2.4} dot={{ r: 3 }} />
-                  <Line type='monotone' dataKey='margin' stroke='var(--mui-palette-text-disabled)' strokeDasharray='4 4' strokeWidth={2.1} dot={{ r: 3 }} />
+                  <Line type='monotone' dataKey='revenue' stroke={ORGANIZATION_ENTERPRISE_WORKSPACE_CHART_SERIES.trend.revenue} strokeWidth={2.4} dot={{ r: 3 }} />
+                  <Line type='monotone' dataKey='margin' stroke={ORGANIZATION_ENTERPRISE_WORKSPACE_CHART_SERIES.trend.margin} strokeDasharray='4 4' strokeWidth={2.1} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
             </Box>
           ) : (
-            <PartialState text='Aún no hay tendencia mensual suficiente para graficar delivery.' />
+            <PartialState text={ENTERPRISE_COPY.empty.operationalTrend} />
           )}
         </SectionShell>
-        <SectionShell title='Distribución CSC' subtitle='Derivada de servicios o equipo disponible'>
+        <SectionShell title={ENTERPRISE_COPY.sections.cscDistribution.title} subtitle={ENTERPRISE_COPY.sections.cscDistribution.subtitle}>
           <CapabilityDistributionChart items={distribution} />
         </SectionShell>
       </Box>
+      <DeliverySummaryGrid delivery={data360?.delivery ?? null} />
       <ProjectTable projects={projects} />
       <RelatedFacetBridge data360={data360} />
     </Stack>
   )
 }
 
-const CapabilityDistributionChart = ({ items }: { items: Array<{ name: string; value: number; tone: EnterpriseTone }> }) => {
+const DeliverySummaryGrid = ({ delivery }: { delivery: AccountComplete360['delivery'] | null }) => (
+  <SectionShell title={ENTERPRISE_COPY.sections.delivery360.title} subtitle={ENTERPRISE_COPY.sections.delivery360.subtitle}>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }, gap: 3 }}>
+      {[
+        { label: ENTERPRISE_COPY.metrics.projects, value: fmtCompact(delivery?.projectCount), helper: `${fmtCompact(delivery?.activeProjectCount)} ${ENTERPRISE_COPY.metrics.active}`, icon: 'tabler-folders', tone: delivery?.projectCount ? 'success' : 'warning' },
+        { label: ENTERPRISE_COPY.metrics.tasks, value: fmtCompact(delivery?.taskCounts.total), helper: `${fmtCompact(delivery?.taskCounts.active)} ${ENTERPRISE_COPY.metrics.taskActive}`, icon: 'tabler-list-check', tone: delivery?.taskCounts.total ? 'success' : 'warning' },
+        { label: ENTERPRISE_COPY.metrics.sprints, value: fmtCompact(delivery?.sprintCount), helper: ENTERPRISE_COPY.metrics.deliveryRuntime, icon: 'tabler-flag', tone: delivery?.sprintCount ? 'success' : 'info' },
+        { label: ENTERPRISE_COPY.metrics.stuckAssets, value: fmtCompact(delivery?.icoMetrics?.stuckAssetCount), helper: fmtPct(delivery?.icoMetrics?.stuckAssetPct), icon: 'tabler-alert-circle', tone: delivery?.icoMetrics?.stuckAssetCount ? 'warning' : 'success' }
+      ].map(item => (
+        <Stack key={item.label} spacing={2} sx={{ minWidth: 0 }}>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <Box sx={{ color: `${item.tone}.main` }}>
+              <i className={item.icon} aria-hidden='true' />
+            </Box>
+            <Typography variant='body2' color='text.secondary'>{item.label}</Typography>
+          </Stack>
+          <Typography variant='h5'>{item.value}</Typography>
+          <Typography variant='caption' color='text.secondary'>{item.helper}</Typography>
+        </Stack>
+      ))}
+    </Box>
+  </SectionShell>
+)
+
+const CapabilityDistributionChart = ({ items }: { items: CapabilityDistributionItem[] }) => {
   const arcs = buildDistributionArcs(items)
+  const cscTokens = ENTERPRISE_TOKENS.chart.csc
 
   if (items.length === 0) {
-    return <PartialState text='Sin distribución suficiente para CSC. Se mostrará cuando existan servicios o equipo clasificado.' />
+    return <PartialState text={ENTERPRISE_COPY.empty.cscDistribution} />
   }
 
   return (
-    <Box data-capture='organization-enterprise-csc-distribution' sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 4, alignItems: 'center', justifyItems: 'center', minBlockSize: 284 }}>
-      <Box role='img' aria-label={GH_ORGANIZATION_WORKSPACE.enterprise.aria.cscDistribution} sx={{ inlineSize: { xs: 176, md: 188 }, aspectRatio: '1 / 1', position: 'relative', flexShrink: 0 }}>
-        <Box component='svg' viewBox='0 0 112 112' sx={{ display: 'block', inlineSize: '100%', blockSize: '100%', overflow: 'visible' }}>
-          <circle cx='56' cy='56' r='44' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='14' />
+    <Box data-capture='organization-enterprise-csc-distribution' sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 4, alignItems: 'center', justifyItems: 'center', minBlockSize: cscTokens.minBlockSize }}>
+      <Box role='img' aria-label={ENTERPRISE_COPY.aria.cscDistribution} sx={{ inlineSize: { xs: cscTokens.inlineSizeXs, md: cscTokens.inlineSizeMd }, aspectRatio: '1 / 1', position: 'relative', flexShrink: 0 }}>
+        <Box component='svg' viewBox={`0 0 ${cscTokens.viewBoxSize} ${cscTokens.viewBoxSize}`} sx={{ display: 'block', inlineSize: '100%', blockSize: '100%', overflow: 'visible' }}>
+          <circle cx={cscTokens.center} cy={cscTokens.center} r={cscTokens.radius} fill='none' stroke='var(--mui-palette-divider)' strokeWidth={cscTokens.strokeWidth} />
           {arcs.map(arc => (
             <circle
               key={arc.name}
-              cx='56'
-              cy='56'
-              r='44'
+              cx={cscTokens.center}
+              cy={cscTokens.center}
+              r={cscTokens.radius}
               fill='none'
               pathLength='100'
-              stroke={chartColorForTone(arc.tone)}
+              stroke={arc.color}
               strokeDasharray={`${arc.length} ${100 - arc.length}`}
               strokeDashoffset={-arc.start}
               strokeLinecap='butt'
-              strokeWidth='14'
-              transform='rotate(-90 56 56)'
+              strokeWidth={cscTokens.strokeWidth}
+              transform={`rotate(-90 ${cscTokens.center} ${cscTokens.center})`}
             />
           ))}
         </Box>
-        <Box sx={{ position: 'absolute', inset: '27%', borderRadius: '50%', bgcolor: 'background.paper', border: theme => `1px solid ${theme.palette.divider}`, display: 'grid', placeItems: 'center', textAlign: 'center', p: 2 }}>
+        <Box sx={{ position: 'absolute', inset: cscTokens.innerInset, borderRadius: '50%', bgcolor: 'background.paper', border: theme => `1px solid ${theme.palette.divider}`, display: 'grid', placeItems: 'center', textAlign: 'center', p: 2 }}>
           <Stack spacing={0.25} alignItems='center'>
             <Typography variant='h6'>100%</Typography>
-            <Typography variant='caption' color='text.primary'>cobertura</Typography>
+            <Typography variant='caption' color='text.primary'>{ENTERPRISE_COPY.sections.cscDistribution.coverage}</Typography>
           </Stack>
         </Box>
       </Box>
       <Stack spacing={1.25} sx={{ width: '100%', minWidth: 0 }}>
         {arcs.map(item => (
-          <Box key={item.name} sx={{ display: 'grid', gridTemplateColumns: '12px minmax(0, 1fr) max-content', columnGap: 2.5, alignItems: 'center', minBlockSize: 28, px: 0.5 }}>
-            <Box aria-hidden='true' sx={{ inlineSize: 10, blockSize: 10, borderRadius: '50%', bgcolor: chartColorForTone(item.tone) }} />
+          <Box key={item.name} sx={{ display: 'grid', gridTemplateColumns: `${cscTokens.legendTrackSize}px minmax(0, 1fr) max-content`, columnGap: 2.5, alignItems: 'center', minBlockSize: cscTokens.legendRowMinBlockSize, px: 0.5 }}>
+            <Box aria-hidden='true' sx={{ inlineSize: cscTokens.legendMarkerSize, blockSize: cscTokens.legendMarkerSize, borderRadius: '50%', bgcolor: item.color }} />
             <Typography variant='body2' sx={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</Typography>
             <Typography variant='monoId'>{Math.round(item.percent)}%</Typography>
           </Box>
@@ -879,14 +1036,14 @@ const CapabilityDistributionChart = ({ items }: { items: Array<{ name: string; v
 }
 
 const ProjectTable = ({ projects }: { projects: OrganizationProjectsSummary | null }) => {
-  const rows = projects?.spaces.flatMap(space => space.projects.map(project => ({ ...project, spaceName: space.spaceName }))).slice(0, 8) ?? []
+  const rows = projects?.spaces.flatMap(space => space.projects.map(project => ({ ...project, spaceName: space.spaceName }))).slice(0, ENTERPRISE_TOKENS.density.projectRows) ?? []
 
   return (
-    <SectionShell title='Proyectos / Sprints activos' subtitle='Priorizados por riesgo de entrega y dependencia financiera'>
+    <SectionShell title={ENTERPRISE_COPY.sections.activeProjects.title} subtitle={ENTERPRISE_COPY.sections.activeProjects.subtitle}>
       {rows.length === 0 ? (
-        <PartialState text='Sin proyectos activos disponibles desde Notion/Delivery para esta organización.' />
+        <PartialState text={ENTERPRISE_COPY.empty.activeProjects} />
       ) : (
-        <DataTableShell identifier='organization-enterprise-projects' ariaLabel='Proyectos activos de la organización' density='compact' stickyFirstColumn>
+        <DataTableShell identifier='organization-enterprise-projects' ariaLabel={ENTERPRISE_COPY.sections.activeProjects.ariaLabel} density='compact' stickyFirstColumn>
           <Table size='small'>
             <TableHead>
               <TableRow>
@@ -944,9 +1101,9 @@ const FinanceCanvas = ({ data360, financeSummary }: { data360: AccountComplete36
           </Typography>
         </Stack>
       </Box>
-      <SectionShell title='Clientes financieros asociados' subtitle='Resumen canónico desde client_economics y perfiles financieros'>
+      <SectionShell title={ENTERPRISE_COPY.sections.financeClients.title} subtitle={ENTERPRISE_COPY.sections.financeClients.subtitle}>
         {rows.length === 0 ? (
-          <PartialState text='Sin snapshots financieros para este período. La facet queda parcial hasta que Finance materialice el período.' />
+          <PartialState text={ENTERPRISE_COPY.empty.financeSnapshots} />
         ) : (
           <DataTableShell identifier='organization-enterprise-invoices' ariaLabel='Clientes financieros de la organización' density='compact' stickyFirstColumn>
             <Table size='small'>
@@ -974,7 +1131,7 @@ const FinanceCanvas = ({ data360, financeSummary }: { data360: AccountComplete36
           </DataTableShell>
         )}
       </SectionShell>
-      <SectionShell title='Estado de pagos' subtitle='Lectura resumida AR desde Finance 360'>
+      <SectionShell title={ENTERPRISE_COPY.sections.financePayments.title} subtitle={ENTERPRISE_COPY.sections.financePayments.subtitle}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(4, minmax(0, 1fr))' }, gap: 3, alignItems: 'center' }}>
           {[
             ['Current', finance?.accountsReceivable?.current],
@@ -1000,7 +1157,7 @@ const ContextFacetCanvas = ({ facet, detail, data360, tone }: { facet: Organizat
   return (
     <Stack spacing={4} data-capture={`organization-enterprise-${facet}-canvas`}>
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', xl: 'minmax(0, 1.1fr) minmax(320px, 0.9fr)' }, gap: 4 }}>
-        <SectionShell title={`${GH_ORGANIZATION_WORKSPACE.facets.labels[facet]} readiness`} subtitle='Estado canónico, ownership y dependencia visible para todos los consumers'>
+        <SectionShell title={`${GH_ORGANIZATION_WORKSPACE.facets.labels[facet]} readiness`} subtitle={ENTERPRISE_COPY.sections.contextReadiness.subtitle}>
           <Stack spacing={3}>
             {rows.map(row => (
               <Stack key={row.title} direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent='space-between'>
@@ -1016,13 +1173,16 @@ const ContextFacetCanvas = ({ facet, detail, data360, tone }: { facet: Organizat
             ))}
           </Stack>
         </SectionShell>
-        <SectionShell title='Consumer contract' subtitle='Cómo esta facet alimenta finance, delivery, CRM y workforce sin duplicar lógica'>
+        <SectionShell title={ENTERPRISE_COPY.sections.consumerContract.title} subtitle={ENTERPRISE_COPY.sections.consumerContract.subtitle}>
           <Stack spacing={3}>
             {[
               ['Canonical owner', GH_ORGANIZATION_WORKSPACE.facets.labels[facet]],
               ['Coverage', getFacetCount(facet, data360, detail)],
               ['Freshness', data360?._meta.resolvedAt ? '360 fresh' : 'partial'],
-              ['State', tone === 'success' ? 'Listo' : tone === 'warning' ? 'Parcial' : 'Planificado']
+              [
+                'State',
+                facetStateLabel(tone)
+              ]
             ].map(([label, value]) => (
               <Stack key={label} direction='row' spacing={2} justifyContent='space-between'>
                 <Typography variant='caption' color='text.primary'>{label}</Typography>
@@ -1032,7 +1192,304 @@ const ContextFacetCanvas = ({ facet, detail, data360, tone }: { facet: Organizat
           </Stack>
         </SectionShell>
       </Box>
+      <FacetRecordsSection facet={facet} detail={detail} data360={data360} />
       <RelatedFacetBridge data360={data360} />
+    </Stack>
+  )
+}
+
+const FacetRecordsSection = ({ facet, detail, data360 }: { facet: OrganizationFacet; detail: OrganizationDetailData; data360: AccountComplete360 | null }) => {
+  if (facet === 'spaces') return <SpacesRecordsSection detail={detail} data360={data360} />
+  if (facet === 'team') return <TeamRecordsSection detail={detail} data360={data360} />
+  if (facet === 'economics') return <EconomicsRecordsSection data360={data360} />
+  if (facet === 'crm') return <CrmRecordsSection data360={data360} />
+  if (facet === 'services') return <ServicesRecordsSection data360={data360} />
+  if (facet === 'staffAug') return <StaffAugRecordsSection data360={data360} />
+
+  return <IdentityRecordsSection detail={detail} />
+}
+
+const IdentityRecordsSection = ({ detail }: { detail: OrganizationDetailData }) => (
+  <SectionShell title='Identidad relacionada' subtitle='Spaces y contactos primarios asociados a la organización'>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' }, gap: 4 }}>
+      <CompactKeyValueList
+        rows={(detail.spaces ?? []).slice(0, ENTERPRISE_TOKENS.density.organizationRecordRows).map(space => ({
+          id: space.spaceId,
+          label: space.spaceName,
+          value: space.status,
+          helper: space.publicId || space.spaceType
+        }))}
+        empty={ENTERPRISE_COPY.empty.spaces}
+      />
+      <CompactKeyValueList
+        rows={(detail.people ?? []).slice(0, ENTERPRISE_TOKENS.density.organizationRecordRows).map(person => ({
+          id: person.membershipId,
+          label: person.fullName || person.canonicalEmail || person.profileId,
+          value: person.isPrimary ? 'Primario' : person.membershipType,
+          helper: person.roleLabel || person.department || person.canonicalEmail || 'Sin rol'
+        }))}
+        empty={ENTERPRISE_COPY.empty.team}
+      />
+    </Box>
+  </SectionShell>
+)
+
+const SpacesRecordsSection = ({ detail, data360 }: { detail: OrganizationDetailData; data360: AccountComplete360 | null }) => {
+  const rows = data360?.spaces?.length
+    ? data360.spaces.map(space => ({
+      id: space.spaceId,
+      name: space.spaceName,
+      type: space.spaceType,
+      client: space.clientName || space.clientId || 'Sin cliente',
+      status: space.status,
+      modules: String(space.activeModuleCount)
+    }))
+    : (detail.spaces ?? []).map(space => ({
+      id: space.spaceId,
+      name: space.spaceName,
+      type: space.spaceType,
+      client: space.clientId || 'Sin cliente',
+      status: space.status,
+      modules: '—'
+    }))
+
+  return (
+    <SectionShell title='Spaces relacionados' subtitle='Lista real de spaces que alimentan delivery, finanzas y servicios'>
+      {rows.length === 0 ? <PartialState text={ENTERPRISE_COPY.empty.spaces} /> : (
+        <DataTableShell identifier='organization-enterprise-spaces' ariaLabel='Spaces relacionados de la organización' density='compact'>
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>Space</TableCell>
+                <TableCell>Tipo</TableCell>
+                <TableCell>Cliente</TableCell>
+                <TableCell>Estado</TableCell>
+                <TableCell align='right'>Módulos</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.slice(0, ENTERPRISE_TOKENS.density.recordRows).map(row => (
+                <TableRow key={row.id} hover>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.type}</TableCell>
+                  <TableCell>{row.client}</TableCell>
+                  <TableCell><GreenhouseChip size='small' variant='label' tone={row.status === 'active' ? 'success' : 'info'} label={row.status} /></TableCell>
+                  <TableCell align='right'>{row.modules}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTableShell>
+      )}
+    </SectionShell>
+  )
+}
+
+const TeamRecordsSection = ({ detail, data360 }: { detail: OrganizationDetailData; data360: AccountComplete360 | null }) => {
+  const rows = data360?.team?.members?.length
+    ? data360.team.members.map(member => ({
+      id: member.profileId,
+      name: member.name,
+      role: member.jobTitle || member.membershipType,
+      department: member.department || 'Sin departamento',
+      fte: fmtCompact(member.fteAllocation),
+      primary: member.isPrimary
+    }))
+    : (detail.people ?? []).map(person => ({
+      id: person.profileId,
+      name: person.fullName || person.canonicalEmail || person.profileId,
+      role: person.roleLabel || person.membershipType,
+      department: person.department || 'Sin departamento',
+      fte: fmtCompact(person.assignedFte),
+      primary: person.isPrimary
+    }))
+
+  return (
+    <SectionShell title='Equipo relacionado' subtitle='Personas y capacidad asociada a esta organización'>
+      {rows.length === 0 ? <PartialState text={ENTERPRISE_COPY.empty.team} /> : (
+        <DataTableShell identifier='organization-enterprise-team' ariaLabel='Equipo relacionado de la organización' density='compact'>
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>Persona</TableCell>
+                <TableCell>Rol</TableCell>
+                <TableCell>Departamento</TableCell>
+                <TableCell align='right'>FTE</TableCell>
+                <TableCell>Contacto</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.slice(0, ENTERPRISE_TOKENS.density.recordRows).map(row => (
+                <TableRow key={row.id} hover>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.role}</TableCell>
+                  <TableCell>{row.department}</TableCell>
+                  <TableCell align='right'>{row.fte}</TableCell>
+                  <TableCell>{row.primary ? <GreenhouseChip size='small' variant='label' tone='success' label='Primario' /> : '—'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTableShell>
+      )}
+    </SectionShell>
+  )
+}
+
+const EconomicsRecordsSection = ({ data360 }: { data360: AccountComplete360 | null }) => {
+  const rows = data360?.economics?.byClient ?? []
+
+  return (
+    <SectionShell title='Profitability por cliente' subtitle='Breakdown económico canónico del período resuelto'>
+      {rows.length === 0 ? <PartialState text={ENTERPRISE_COPY.empty.economics} /> : (
+        <DataTableShell identifier='organization-enterprise-economics' ariaLabel='Profitability por cliente' density='compact'>
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>Cliente</TableCell>
+                <TableCell align='right'>Revenue</TableCell>
+                <TableCell align='right'>Costo</TableCell>
+                <TableCell align='right'>Margen</TableCell>
+                <TableCell align='right'>FTE</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.slice(0, ENTERPRISE_TOKENS.density.recordRows).map(row => (
+                <TableRow key={row.clientId} hover>
+                  <TableCell>{row.clientName}</TableCell>
+                  <TableCell align='right'><Typography variant='monoAmount'>{fmtClp(row.revenueCLP)}</Typography></TableCell>
+                  <TableCell align='right'><Typography variant='monoAmount'>{fmtClp(row.costCLP)}</Typography></TableCell>
+                  <TableCell align='right'><GreenhouseChip size='small' variant='label' tone={metricToneFromMargin(row.marginPct)} label={fmtPct(row.marginPct)} /></TableCell>
+                  <TableCell align='right'>{fmtCompact(row.fte)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTableShell>
+      )}
+    </SectionShell>
+  )
+}
+
+const CrmRecordsSection = ({ data360 }: { data360: AccountComplete360 | null }) => {
+  const rows = data360?.crm?.dealsPipeline ?? []
+
+  return (
+    <SectionShell title='Pipeline CRM' subtitle='Deals vinculados a la organización desde HubSpot'>
+      {rows.length === 0 ? <PartialState text={ENTERPRISE_COPY.empty.crm} /> : (
+        <DataTableShell identifier='organization-enterprise-crm' ariaLabel='Pipeline CRM de la organización' density='compact'>
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>Deal</TableCell>
+                <TableCell>Stage</TableCell>
+                <TableCell align='right'>Monto</TableCell>
+                <TableCell>Owner</TableCell>
+                <TableCell>Cierre</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.slice(0, ENTERPRISE_TOKENS.density.recordRows).map((row, index) => (
+                <TableRow key={`${row.dealName}-${index}`} hover>
+                  <TableCell>{row.dealName}</TableCell>
+                  <TableCell>{row.stage || 'Sin stage'}</TableCell>
+                  <TableCell align='right'><Typography variant='monoAmount'>{fmtClp(row.amount)}</Typography></TableCell>
+                  <TableCell>{row.ownerName || 'Sin owner'}</TableCell>
+                  <TableCell>{row.closeDate ? formatDateTime(row.closeDate, { dateStyle: 'short' }, 'es-CL') : '—'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTableShell>
+      )}
+    </SectionShell>
+  )
+}
+
+const ServicesRecordsSection = ({ data360 }: { data360: AccountComplete360 | null }) => {
+  const rows = data360?.services?.activeServices ?? []
+
+  return (
+    <SectionShell title='Servicios activos' subtitle='Catálogo operativo asociado a los spaces de la organización'>
+      {rows.length === 0 ? <PartialState text={ENTERPRISE_COPY.empty.services} /> : (
+        <DataTableShell identifier='organization-enterprise-services' ariaLabel='Servicios activos de la organización' density='compact'>
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>Servicio</TableCell>
+                <TableCell>Línea</TableCell>
+                <TableCell>Modalidad</TableCell>
+                <TableCell>Estado</TableCell>
+                <TableCell align='right'>Valor</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.slice(0, ENTERPRISE_TOKENS.density.recordRows).map(row => (
+                <TableRow key={row.serviceId} hover>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.businessLine || row.servicoEspecifico || 'Sin línea'}</TableCell>
+                  <TableCell>{row.modalidad || row.billingFrequency || '—'}</TableCell>
+                  <TableCell><GreenhouseChip size='small' variant='label' tone={row.status === 'active' ? 'success' : 'info'} label={row.status} /></TableCell>
+                  <TableCell align='right'><Typography variant='monoAmount'>{fmtClp(row.totalCost)}</Typography></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTableShell>
+      )}
+    </SectionShell>
+  )
+}
+
+const StaffAugRecordsSection = ({ data360 }: { data360: AccountComplete360 | null }) => {
+  const rows = data360?.staffAug?.placements ?? []
+
+  return (
+    <SectionShell title='Placements Staff Aug' subtitle='Asignaciones laborales relacionadas con la organización'>
+      {rows.length === 0 ? <PartialState text={ENTERPRISE_COPY.empty.staffAug} /> : (
+        <DataTableShell identifier='organization-enterprise-staff-aug' ariaLabel='Placements Staff Aug de la organización' density='compact'>
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>Persona</TableCell>
+                <TableCell>Estado</TableCell>
+                <TableCell>Provider</TableCell>
+                <TableCell align='right'>Rate</TableCell>
+                <TableCell>Contrato</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.slice(0, ENTERPRISE_TOKENS.density.recordRows).map(row => (
+                <TableRow key={row.placementId} hover>
+                  <TableCell>{row.memberName || 'Sin persona'}</TableCell>
+                  <TableCell><GreenhouseChip size='small' variant='label' tone={row.status === 'active' ? 'success' : 'info'} label={row.status} /></TableCell>
+                  <TableCell>{row.providerType || '—'}</TableCell>
+                  <TableCell align='right'><Typography variant='monoAmount'>{fmtClp(row.billingRate)}</Typography></TableCell>
+                  <TableCell>{row.contractStart ? formatDateTime(row.contractStart, { dateStyle: 'short' }, 'es-CL') : '—'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTableShell>
+      )}
+    </SectionShell>
+  )
+}
+
+const CompactKeyValueList = ({ rows, empty }: { rows: Array<{ id: string; label: string; value: string; helper: string }>; empty: string }) => {
+  if (rows.length === 0) return <PartialState text={empty} />
+
+  return (
+    <Stack spacing={2}>
+      {rows.map(row => (
+        <Stack key={row.id} direction='row' spacing={2} justifyContent='space-between' alignItems='center'>
+          <Stack spacing={0.25} sx={{ minWidth: 0 }}>
+            <Typography variant='body2'>{row.label}</Typography>
+            <Typography variant='caption' color='text.secondary'>{row.helper}</Typography>
+          </Stack>
+          <Typography variant='caption' color='text.primary' sx={{ textAlign: 'right' }}>{row.value}</Typography>
+        </Stack>
+      ))}
     </Stack>
   )
 }
@@ -1165,39 +1622,96 @@ const EvidenceMap = ({ facet, data360, partial }: { facet: OrganizationFacet; da
   )
 }
 
-const AccountSidecar = ({ detail, data360, partial }: { detail: OrganizationDetailData; data360: AccountComplete360 | null; partial: boolean }) => {
-  const readiness: Array<[label: string, ok: boolean]> = [
-    ['Identidad legal', Boolean(detail.legalName && detail.taxId)],
-    ['Brand asset', Boolean(detail.logoUrl)],
-    ['Spaces mapeados', detail.spaceCount > 0],
-    ['Equipo base', detail.uniquePersonCount > 0],
-    ['CRM integrado', Boolean(detail.hubspotCompanyId)],
-    ['Finance profile', Boolean(data360?.finance)],
-    ['Services catalog', Boolean(data360?.services?.totalActiveCount)],
-    ['Delivery metrics', Boolean(data360?.delivery?.icoMetrics)],
-    ['Staff Aug setup', Boolean(data360?.staffAug?.activePlacementCount)]
-  ]
+const AccountSidecar = ({
+  detail,
+  data360,
+  compactSignals,
+  partial
+}: {
+  detail: OrganizationDetailData
+  data360: AccountComplete360 | null
+  compactSignals: OrganizationWorkspaceCompactSignals | null
+  partial: boolean
+}) => {
+  const readiness = compactSignals?.readiness.length
+    ? compactSignals.readiness.map(item => ({
+      label: item.label,
+      ok: item.state === 'complete',
+      status: item.state === 'complete' ? 'Completed' : item.state === 'blocked' ? 'Blocked' : item.state === 'unknown' ? 'Unknown' : 'Pending'
+    }))
+    : [
+      { label: 'Identidad legal', ok: Boolean(detail.legalName && detail.taxId), status: Boolean(detail.legalName && detail.taxId) ? 'Completed' : 'Pending' },
+      { label: 'Brand asset', ok: Boolean(detail.logoUrl), status: detail.logoUrl ? 'Completed' : 'Pending' },
+      { label: 'Spaces mapeados', ok: detail.spaceCount > 0, status: detail.spaceCount > 0 ? 'Completed' : 'Pending' },
+      { label: 'Equipo base', ok: detail.uniquePersonCount > 0, status: detail.uniquePersonCount > 0 ? 'Completed' : 'Pending' },
+      { label: 'CRM integrado', ok: Boolean(detail.hubspotCompanyId), status: detail.hubspotCompanyId ? 'Completed' : 'Pending' },
+      { label: 'Finance profile', ok: Boolean(data360?.finance), status: data360?.finance ? 'Completed' : 'Pending' },
+      { label: 'Services catalog', ok: Boolean(data360?.services?.totalActiveCount), status: data360?.services?.totalActiveCount ? 'Completed' : 'Pending' },
+      { label: 'Delivery metrics', ok: Boolean(data360?.delivery?.icoMetrics), status: data360?.delivery?.icoMetrics ? 'Completed' : 'Pending' },
+      { label: 'Staff Aug setup', ok: Boolean(data360?.staffAug?.activePlacementCount), status: data360?.staffAug?.activePlacementCount ? 'Completed' : 'Pending' }
+    ]
 
-  const completed = readiness.filter(([, ok]) => ok).length
+  const completed = readiness.filter(item => item.ok).length
 
-  const signals = [
-    ['Finance', data360?.finance ? `${data360.finance.invoiceCount} facturas · ${fmtClp(data360.finance.outstandingAmount)}` : 'Finance 360 parcial', 'tabler-currency-dollar', data360?.finance ? 'success' : 'warning'],
-    ['Delivery', data360?.delivery ? `${data360.delivery.activeProjectCount} proyectos activos` : 'Delivery 360 parcial', 'tabler-send', data360?.delivery ? 'success' : 'warning'],
-    ['CRM', data360?.crm?.company ? `${data360.crm.dealCount} deals · ${data360.crm.contactCount} contactos` : 'HubSpot parcial', 'tabler-briefcase', data360?.crm?.company ? 'success' : 'warning'],
-    ['Services', data360?.services ? `${data360.services.totalActiveCount} servicios` : 'Catálogo parcial', 'tabler-package', data360?.services ? 'success' : 'warning']
-  ]
+  const healthRows = compactSignals?.health.drivers.length
+    ? compactSignals.health.drivers.map(driver => ({
+      label: driver.label,
+      value: driver.value,
+      tone: compactToneFromSeverity(driver.severity)
+    }))
+    : [
+      { label: 'Financiera', value: data360?.finance ? ENTERPRISE_COPY.states.available : ENTERPRISE_COPY.states.partial, tone: data360?.finance ? 'success' : 'warning' },
+      { label: 'Operativa', value: data360?.delivery ? ENTERPRISE_COPY.states.available : ENTERPRISE_COPY.states.partial, tone: data360?.delivery ? 'success' : 'warning' },
+      { label: 'Entrega', value: data360?.delivery?.icoMetrics ? 'Métrica ICO' : 'Sin tendencia', tone: data360?.delivery?.icoMetrics ? 'success' : 'warning' },
+      { label: 'Relacional', value: detail.hubspotCompanyId ? 'HubSpot' : 'AXIS only', tone: detail.hubspotCompanyId ? 'success' : 'warning' }
+    ]
+
+  const signals = compactSignals?.recentSignals.length
+    ? compactSignals.recentSignals.map(signal => ({
+      title: signal.title,
+      helper: signal.body,
+      icon: compactIconForSource(signal.source),
+      tone: compactToneFromSeverity(signal.severity)
+    }))
+    : [
+      { title: 'Finance', helper: data360?.finance ? `${data360.finance.invoiceCount} facturas · ${fmtClp(data360.finance.outstandingAmount)}` : 'Finance 360 parcial', icon: 'tabler-currency-dollar', tone: data360?.finance ? 'success' : 'warning' },
+      { title: 'Delivery', helper: data360?.delivery ? `${data360.delivery.activeProjectCount} proyectos activos` : 'Delivery 360 parcial', icon: 'tabler-send', tone: data360?.delivery ? 'success' : 'warning' },
+      { title: 'CRM', helper: data360?.crm?.company ? `${data360.crm.dealCount} deals · ${data360.crm.contactCount} contactos` : 'HubSpot parcial', icon: 'tabler-briefcase', tone: data360?.crm?.company ? 'success' : 'warning' },
+      { title: 'Services', helper: data360?.services ? `${data360.services.totalActiveCount} servicios` : 'Catálogo parcial', icon: 'tabler-package', tone: data360?.services ? 'success' : 'warning' }
+    ]
+
+  const provenanceRows = compactSignals
+    ? [
+      ['Sistema fuente', compactSignals.provenance.filter(item => item.status === 'available').map(item => item.label).slice(0, ENTERPRISE_TOKENS.density.sidecarProvenanceLimit).join(' + ') || ENTERPRISE_COPY.states.partial],
+      ['Última sincronización', formatDateTime(compactSignals.computedAt, { dateStyle: 'short', timeStyle: 'short' }, 'es-CL')],
+      ['Cobertura 360', `${completed}/${readiness.length}`],
+      ['Estado lectura', compactSignals.status]
+    ]
+    : [
+      ['Sistema fuente', detail.hubspotCompanyId ? 'HubSpot + AXIS Core' : 'AXIS Core'],
+      ['Última sincronización', detail.updatedAt ? formatDateTime(detail.updatedAt, { dateStyle: 'short', timeStyle: 'short' }, 'es-CL') : 'Sin timestamp'],
+      ['Cobertura 360', data360 ? `${data360._meta.facetsResolved.length}/${data360._meta.facetsRequested.length}` : 'parcial'],
+      ['Cache 360', data360 ? Object.values(data360._meta.cacheStatus).join(', ') || 'fresh' : 'parcial']
+    ]
+
+  const nextActions = compactSignals?.nextActions.length
+    ? compactSignals.nextActions.map(action => ({ label: action.label, icon: action.kind === 'monitor' ? 'tabler-radar' : 'tabler-calendar-event' }))
+    : [
+      { label: 'Revisar Finance Client bridge', icon: 'tabler-calendar-event' },
+      { label: 'Completar brand asset si falta', icon: 'tabler-calendar-event' },
+      { label: 'Validar delivery trend materializado', icon: 'tabler-calendar-event' }
+    ]
+
+  const healthAction = compactSignals
+    ? compactSignals.health.score == null ? compactSignals.status : `${compactSignals.health.score}%`
+    : partial ? ENTERPRISE_COPY.states.partial : '360'
 
   return (
     <Box component='aside' data-capture='organization-enterprise-sidecar' sx={{ bgcolor: 'background.paper', minWidth: 0 }}>
       <Stack spacing={0}>
-        <SidecarSection title='Salud de la cuenta' action={partial ? 'Parcial' : '360'}>
+        <SidecarSection title={ENTERPRISE_COPY.sections.sidecarHealth} action={healthAction}>
           <Stack spacing={2}>
-            {[
-              ['Financiera', data360?.finance ? 'Disponible' : 'Parcial', data360?.finance ? 'success' : 'warning'],
-              ['Operativa', data360?.delivery ? 'Disponible' : 'Parcial', data360?.delivery ? 'success' : 'warning'],
-              ['Entrega', data360?.delivery?.icoMetrics ? 'Métrica ICO' : 'Sin tendencia', data360?.delivery?.icoMetrics ? 'success' : 'warning'],
-              ['Relacional', detail.hubspotCompanyId ? 'HubSpot' : 'AXIS only', detail.hubspotCompanyId ? 'success' : 'warning']
-            ].map(([label, value, tone]) => (
+            {healthRows.map(({ label, value, tone }) => (
               <Stack key={label} direction='row' justifyContent='space-between' alignItems='center'>
                 <Typography variant='body2'>{label}</Typography>
                 <GreenhouseStatusDot tone={tone as EnterpriseTone} label={value} />
@@ -1205,24 +1719,19 @@ const AccountSidecar = ({ detail, data360, partial }: { detail: OrganizationDeta
             ))}
           </Stack>
         </SidecarSection>
-        <SidecarSection title='Readiness' action={`${completed} / ${readiness.length}`}>
+        <SidecarSection title={ENTERPRISE_COPY.sections.sidecarReadiness} action={`${completed} / ${readiness.length}`}>
           <Stack spacing={2}>
-            {readiness.map(([label, ok]) => (
+            {readiness.map(({ label, ok, status }) => (
               <Stack key={label} direction='row' alignItems='center' justifyContent='space-between' spacing={2}>
                 <GreenhouseStatusDot tone={ok ? 'success' : 'warning'} label={label} />
-                <Typography variant='caption' color='text.secondary'>{ok ? 'Completed' : 'Pending'}</Typography>
+                <Typography variant='caption' color='text.secondary'>{status}</Typography>
               </Stack>
             ))}
           </Stack>
         </SidecarSection>
-        <SidecarSection title='Procedencia de datos' action='Ver linaje'>
+        <SidecarSection title={ENTERPRISE_COPY.sections.sidecarProvenance} action={ENTERPRISE_COPY.sections.sidecarLineageAction}>
           <Stack spacing={1.5}>
-            {[
-              ['Sistema fuente', detail.hubspotCompanyId ? 'HubSpot + AXIS Core' : 'AXIS Core'],
-              ['Última sincronización', detail.updatedAt ? formatDateTime(detail.updatedAt, { dateStyle: 'short', timeStyle: 'short' }, 'es-CL') : 'Sin timestamp'],
-              ['Cobertura 360', data360 ? `${data360._meta.facetsResolved.length}/${data360._meta.facetsRequested.length}` : 'parcial'],
-              ['Cache 360', data360 ? Object.values(data360._meta.cacheStatus).join(', ') || 'fresh' : 'parcial']
-            ].map(([label, value]) => (
+            {provenanceRows.map(([label, value]) => (
               <Stack key={label} direction='row' justifyContent='space-between' spacing={2}>
                 <Typography variant='caption' color='text.secondary'>{label}</Typography>
                 <Typography variant='caption' color='text.primary' sx={{ textAlign: 'right', overflowWrap: 'anywhere' }}>{value}</Typography>
@@ -1230,9 +1739,9 @@ const AccountSidecar = ({ detail, data360, partial }: { detail: OrganizationDeta
             ))}
           </Stack>
         </SidecarSection>
-        <SidecarSection title='Señales recientes' action='Historial'>
+        <SidecarSection title={ENTERPRISE_COPY.sections.sidecarRecentSignals} action={ENTERPRISE_COPY.sections.sidecarHistoryAction}>
           <Stack spacing={3}>
-            {signals.map(([title, helper, icon, tone]) => (
+            {signals.map(({ title, helper, icon, tone }) => (
               <Stack key={title} direction='row' spacing={2} alignItems='flex-start'>
                 <Box sx={{ color: `${tone}.main`, pt: 0.5 }}><i className={icon} aria-hidden='true' /></Box>
                 <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
@@ -1243,12 +1752,12 @@ const AccountSidecar = ({ detail, data360, partial }: { detail: OrganizationDeta
             ))}
           </Stack>
         </SidecarSection>
-        <SidecarSection title='Próximas acciones'>
+        <SidecarSection title={ENTERPRISE_COPY.sections.sidecarNextActions}>
           <Stack spacing={2}>
-            {['Revisar Finance Client bridge', 'Completar brand asset si falta', 'Validar delivery trend materializado'].map(item => (
-              <Stack key={item} direction='row' spacing={2} alignItems='center'>
-                <i className='tabler-calendar-event' aria-hidden='true' />
-                <Typography variant='body2'>{item}</Typography>
+            {nextActions.map(action => (
+              <Stack key={action.label} direction='row' spacing={2} alignItems='center'>
+                <i className={action.icon} aria-hidden='true' />
+                <Typography variant='body2'>{action.label}</Typography>
               </Stack>
             ))}
           </Stack>

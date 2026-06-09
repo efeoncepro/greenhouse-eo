@@ -1,3 +1,25 @@
+# Sesion 2026-06-09 — TASK-1061 Organization Workspace Enterprise Tokenization + Visual Baseline (in-progress en develop)
+
+Operador pidio avanzar con TASK-1061 mientras TASK-1060 quedaba bajo re-plan. Se mantuvo `develop` por coordinacion multi-agente; no cambiar de rama ni crear worktree.
+
+- **Implementado:** controller visual domain-local `organization-enterprise-workspace-controller`, copy reusable bajo `GH_ORGANIZATION_WORKSPACE.enterprise`, CSC/trend chart colors desde Chart SoT, GVC baseline durable `agency.organizations.enterprise-detail`, fallback de website desde Organization Detail/Identity/CRM 360, Agency default facet `delivery`, y strip delivery en paridad con mockup (`OTD%`, `FTR%`, `Throughput`, `RpA`) con deltas reales vs `previousIcoMetrics`.
+- **Data contract agregado:** `AccountDeliveryFacet.previousIcoMetrics` opcional; `fetchDeliveryFacet()` resuelve período ICO anterior desde el mismo source canonical para no hardcodear variaciones del mockup.
+- **Evidencia GVC:** mockup baseline promovido desde `.captures/2026-06-09T06-34-57_organization-workspace-enterprise-detail-mockup`; runtime quick fold validado en `.captures/2026-06-09T06-51-49_inline-agency-organizations-org-b9977f96-f7ef-4afb-bb26-7355d78c981f` (website visible, delivery default, métricas y deltas visibles).
+- **Verificacion:** eslint focal OK, `pnpm exec tsc --noEmit --pretty false` OK, `pnpm ops:lint --changed` OK. Full runtime scenario con baseline estable matcheo desktop/laptop/mobile en `delivery-first-fold`, `finance-facet`, `identity-facet`, `keyboard-facet-rail`; wide queda sin baseline durable por diseño.
+- **Nota de alcance:** TASK-1061 ya no es solo tokenizacion porque la paridad visual aprobada requeria recuperar website/default delivery/deltas reales. TASK-1060 sigue siendo el owner de compact sidecar/API projection; no cerrar 1060 aun.
+
+---
+
+# Sesion 2026-06-09 — TASK-1060 Organization Workspace Compact Signals Projection (in-progress en develop)
+
+Operador pidio ejecutar TASK-1060 end-to-end con discovery fuerte antes de implementar. Codex aplico `pnpm codex:task-hook TASK-1060 --develop`; por coordinacion multi-agente se mantiene en `develop`, sin cambiar de rama ni crear worktree. Worktree tenia cambios documentales previos de TASK-1061 sin commit; no revertirlos ni mezclarlos semanticamente.
+
+- **Estado:** `TASK-1060` movida a `docs/tasks/in-progress/`; README/registry sincronizados.
+- **Objetivo:** crear `OrganizationWorkspaceCompactSignals` server-side para el sidecar enterprise de Organization Workspace, reutilizando `resolveOrganizationWorkspaceProjection`, Account 360, Organization 360, projects, finance summary, lifecycle y `withSourceTimeout`.
+- **Guardrail:** TASK-1060 es read-model/API/data-contract; TASK-1061 sigue siendo tokenizacion visual/baseline GVC y no debe mezclarse salvo consumo UI minimo.
+
+---
+
 # Sesion 2026-06-08/09 — TASK-1059 Organization Workspace Enterprise Detail Runtime (en curso sobre develop)
 
 Operador pidio avanzar end-to-end con TASK-1059 y luego corrigio explicitamente: **no cambiar de rama** porque Claude tambien trabaja en este checkout. Codex volvio a `develop`; no crear branch/worktree ni hacer push automatico. El checkout esta `ahead 1` por commit local ajeno `d150c2191` de TASK-1020; no empujar ni reescribir ese commit desde TASK-1059.

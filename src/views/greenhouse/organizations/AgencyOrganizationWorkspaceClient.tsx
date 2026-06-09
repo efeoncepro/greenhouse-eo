@@ -82,7 +82,7 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection, onboard
       return fromUrl
     }
 
-    return projection.defaultFacet
+    return projection.visibleFacets.includes('delivery') ? 'delivery' : projection.defaultFacet
   }, [searchParams, projection.defaultFacet, projection.visibleFacets])
 
   const [activeFacet, setActiveFacet] = useState<OrganizationFacet | null>(initialFacet)

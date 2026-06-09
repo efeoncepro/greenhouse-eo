@@ -3,6 +3,7 @@ import 'server-only'
 import type { Session } from 'next-auth'
 
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
+import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 /**
  * Construye el `TenantEntitlementSubject` canónico que consume
@@ -49,4 +50,21 @@ export const buildOrganizationWorkspaceSubject = (
   campaignScopes: user.campaignScopes,
   businessLines: user.businessLines,
   serviceModules: user.serviceModules
+})
+
+export const buildOrganizationWorkspaceSubjectFromTenant = (
+  tenant: TenantContext
+): TenantEntitlementSubject => ({
+  userId: tenant.userId,
+  tenantType: tenant.tenantType,
+  roleCodes: tenant.roleCodes,
+  primaryRoleCode: tenant.primaryRoleCode,
+  routeGroups: tenant.routeGroups,
+  authorizedViews: tenant.authorizedViews,
+  projectScopes: tenant.projectScopes,
+  campaignScopes: tenant.campaignScopes,
+  businessLines: tenant.businessLines,
+  serviceModules: tenant.serviceModules,
+  portalHomePath: tenant.portalHomePath,
+  memberId: tenant.memberId
 })

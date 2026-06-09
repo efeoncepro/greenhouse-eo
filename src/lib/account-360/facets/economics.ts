@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { observeAndDegrade, observeAndRethrow } from '@/lib/account-360/facet-observability'
 import type {
   AccountScope,
   AccountFacetContext,
@@ -104,14 +105,18 @@ const queryCurrentPeriod = async (
       WHERE scope_id = $1 AND scope_type = 'organization'
         AND period_year = $2 AND period_month = $3
       GROUP BY period_year, period_month
-    `, [organizationId, year, month]).catch(() => [] as PeriodRow[]),
+    `, [organizationId, year, month]).catch(observeAndRethrow('finance', 'account360.economics.period')),
 
     runGreenhousePostgresQuery<ClosureRow>(`
-      SELECT closure_status, period_closed
+      SELECT closure_status, (closure_status = 'closed') AS period_closed
       FROM greenhouse_serving.period_closure_status
       WHERE period_year = $1 AND period_month = $2
       LIMIT 1
-    `, [year, month]).catch(() => [] as ClosureRow[])
+    `, [year, month]).catch(
+      // Closure status is enrichment (a display flag); the period P&L above is the primary datum.
+      // Degrade to "unknown closure" rather than nuking the whole economics facet on a transient error.
+      observeAndDegrade('finance', 'account360.economics.closure', [] as ClosureRow[])
+    )
   ])
 
   return {
@@ -134,7 +139,7 @@ const queryTrend = async (
     GROUP BY period_year, period_month
     ORDER BY period_year DESC, period_month DESC
     LIMIT $2
-  `, [organizationId, limit]).catch(() => [] as TrendRow[])
+  `, [organizationId, limit]).catch(observeAndRethrow('finance', 'account360.economics.trend'))
 
 const queryByClient = async (
   clientIds: string[],
@@ -154,7 +159,7 @@ const queryByClient = async (
     WHERE ce.client_id = ANY($1)
       AND ce.period_year = $2 AND ce.period_month = $3
     ORDER BY ce.total_revenue_clp DESC
-  `, [clientIds, year, month]).catch(() => [] as ClientRow[])
+  `, [clientIds, year, month]).catch(observeAndRethrow('finance', 'account360.economics.by_client'))
 }
 
 // ── Mappers ──

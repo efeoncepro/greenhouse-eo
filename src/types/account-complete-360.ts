@@ -175,6 +175,8 @@ export interface AccountEconomicsFacet {
 // ── Delivery Facet ──
 
 export interface AccountDeliveryIcoMetrics {
+  periodYear?: number
+  periodMonth?: number
   rpaAvg: number | null
   rpaMedian: number | null
   otdPct: number | null
@@ -188,6 +190,7 @@ export interface AccountDeliveryIcoMetrics {
 
 export interface AccountDeliveryFacet {
   icoMetrics: AccountDeliveryIcoMetrics | null
+  previousIcoMetrics?: AccountDeliveryIcoMetrics | null
   projectCount: number
   activeProjectCount: number
   sprintCount: number

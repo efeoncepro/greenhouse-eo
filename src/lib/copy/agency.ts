@@ -399,7 +399,15 @@ export const GH_ORGANIZATION_WORKSPACE = {
       logoUrlHelper: 'Buscamos el logo en la web o usamos una imagen directa, y lo guardamos como asset privado.',
       logoLegalProtectionNotice:
         'Los logos institucionales o legales están protegidos y se gestionan en el entorno corporativo. Este logo es exclusivo para esta organización.',
-      protected: 'Protegido'
+      protected: 'Protegido',
+      logoAiLabel: 'Pista de estilo (opcional)',
+      logoAiPlaceholder: 'Ej: símbolo minimalista, paleta azul, sector aviación',
+      logoAiGenerate: 'Generar con IA',
+      logoAiGenerating: 'Generando logo con IA…',
+      logoAiHelper:
+        'Crea una marca original con IA a partir del nombre y tu pista. Es un diseño nuevo, no una copia del logo real; revísalo antes de guardar.',
+      logoAiRequired: 'Escribe una pista de estilo o deja el campo vacío para usar solo el nombre.',
+      logoAiFailed: 'No pudimos generar el logo. Intenta de nuevo o ajusta la pista.'
     },
     kpis: {
       revenue: {
@@ -474,6 +482,105 @@ export const GH_ORGANIZATION_WORKSPACE = {
     loading: 'Cargando sección…'
   },
   enterprise: {
+    actions: {
+      filters: 'Filtros',
+      viewFull: 'Vista completa'
+    },
+    facetDescriptions: {
+      identity: 'Ficha legal, marca, HubSpot y mapeos canónicos para que el resto de facets no repita ownership.',
+      spaces: 'Spaces operativos, clientes puente y mapeos de trabajo asociados a esta organización.',
+      team: 'Roster, dedicación, roles y capacidad visible para entender si delivery y finance tienen base operativa.',
+      economics: 'Márgenes, contribución, mix de costos y sensibilidad operacional sin duplicar el ledger de Finanzas.',
+      delivery: 'Calidad, throughput, pipeline y proyectos activos. Esta vista es el default recomendado para Agency.',
+      finance: 'Resumen financiero para Agency con puente a la vista rica de Finance Clients cuando se requiere operación.',
+      crm: 'Contactos, deals, pipeline y sincronización HubSpot como contexto, no como único source of truth.',
+      services: 'Catálogo de servicios, cobertura activa y consumo por engagement.',
+      staffAug: 'Placements, contratos externos y baseline de capacidad aumentada con estado honesto de implementación.'
+    },
+    states: {
+      loading: 'Cargando',
+      ready: 'Listo',
+      partial: 'Parcial',
+      planned: 'Planificado',
+      available: 'Disponible',
+      noData: 'Sin datos'
+    },
+    sections: {
+      operationalTrend: {
+        title: 'Tendencia operacional',
+        subtitle: 'Revenue vs margen como proxy ejecutivo mientras delivery trend se materializa'
+      },
+      cscDistribution: {
+        title: 'Distribución CSC',
+        subtitle: 'Derivada de servicios o equipo disponible',
+        coverage: 'cobertura'
+      },
+      delivery360: {
+        title: 'Delivery 360',
+        subtitle: 'Métricas canónicas de proyectos, tareas, sprints e ICO para no depender solo del detalle Notion'
+      },
+      activeProjects: {
+        title: 'Proyectos / Sprints activos',
+        subtitle: 'Priorizados por riesgo de entrega y dependencia financiera',
+        ariaLabel: 'Proyectos activos de la organización'
+      },
+      relatedFacetBridge: {
+        title: 'Puentes hacia otras facets',
+        subtitle: 'La vista enterprise mantiene contexto cruzado sin salir de la organización'
+      },
+      financeAgency: {
+        title: 'Finanzas para Agency',
+        subtitle: 'Lectura compacta con salida directa hacia Finance Clients para operación avanzada'
+      },
+      financeClients: {
+        title: 'Finance Clients',
+        subtitle: 'Snapshot materializado desde el dominio financiero'
+      },
+      financePayments: {
+        title: 'Estado de pagos',
+        subtitle: 'Lectura rápida de exposición pendiente'
+      },
+      contextReadiness: {
+        title: 'Readiness de contexto',
+        subtitle: 'Evidencia materializada por facet de Account 360'
+      },
+      evidenceMap: {
+        title: 'Mapa de evidencia',
+        subtitle: 'Qué sistemas soportan la lectura actual'
+      },
+      consumerContract: {
+        title: 'Contrato consumidor',
+        subtitle: 'Cómo Agency usa esta facet sin duplicar el source of truth'
+      },
+      sidecarHealth: 'Salud ejecutiva',
+      sidecarReadiness: 'Readiness',
+      sidecarRecentSignals: 'Señales recientes',
+      sidecarNextActions: 'Próximas acciones',
+      sidecarProvenance: 'Procedencia de datos',
+      sidecarLineageAction: 'Ver linaje',
+      sidecarHistoryAction: 'Historial'
+    },
+    metrics: {
+      projects: 'Proyectos',
+      active: 'activos',
+      tasks: 'Tareas',
+      taskActive: 'activas',
+      sprints: 'Sprints',
+      deliveryRuntime: 'delivery runtime',
+      stuckAssets: 'Stuck assets'
+    },
+    empty: {
+      operationalTrend: 'Aún no hay tendencia mensual suficiente para graficar delivery.',
+      cscDistribution: 'Sin distribución suficiente para CSC. Se mostrará cuando existan servicios o equipo clasificado.',
+      activeProjects: 'Sin proyectos activos disponibles desde Notion/Delivery para esta organización.',
+      financeSnapshots: 'Sin snapshots financieros materializados todavía.',
+      spaces: 'Sin Spaces asociados desde Organization 360.',
+      team: 'Sin personas vinculadas desde Account 360.',
+      economics: 'Sin snapshots económicos materializados.',
+      crm: 'Sin datos CRM materializados.',
+      services: 'Sin servicios activos materializados.',
+      staffAug: 'Sin placements activos materializados.'
+    },
     aria: {
       cscDistribution: 'Distribución CSC por capability de entrega',
       loadingOrganizationData: 'Cargando datos de organización'

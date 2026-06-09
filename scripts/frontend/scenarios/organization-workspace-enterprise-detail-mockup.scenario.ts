@@ -14,6 +14,22 @@ export const scenario: CaptureScenario = {
   ],
   initialHoldMs: 1400,
   finalHoldMs: 400,
+  baseline: {
+    surfaceId: 'agency.organizations.enterprise-detail',
+    baselineName: 'organization-workspace-enterprise-detail-approved-mockup',
+    approvedMockupCaptureDir: '.captures/2026-06-09T01-42-45_organization-workspace-enterprise-detail-mockup',
+    requiredFrameLabels: ['delivery-first-fold', 'finance-facet', 'identity-facet'],
+    maskSelectors: [
+      '[data-capture="organization-enterprise-masthead"]',
+      '[data-capture="organization-enterprise-sidecar"]'
+    ],
+    maxDiffRatio: 0.08,
+    requiredRegions: [
+      '[data-capture="organization-enterprise-masthead"]',
+      '[data-capture="organization-enterprise-facet-rail"]',
+      '[data-capture="organization-enterprise-main-canvas"]'
+    ]
+  },
   readiness: {
     selector: '[data-capture="organization-workspace-enterprise-detail-mockup"]',
     selectors: [

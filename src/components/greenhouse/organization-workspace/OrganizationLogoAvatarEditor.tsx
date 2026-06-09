@@ -76,6 +76,7 @@ const OrganizationLogoAvatarEditor = ({
   const copy = GH_ORGANIZATION_WORKSPACE.shell.actions
   const [busy, setBusy] = useState<string | null>(null)
   const [logoUrlDraft, setLogoUrlDraft] = useState('')
+  const [aiHint, setAiHint] = useState('')
   const [uploadedLogo, setUploadedLogo] = useState<UploadedFileValue | null>(null)
 
   const footerCopy = isOperatingEntity
@@ -131,6 +132,40 @@ const OrganizationLogoAvatarEditor = ({
       })
       setLogoUrlDraft('')
     }, close)
+  }
+
+  const generateAiLogo = async () => {
+    setBusy(copy.logoAiGenerating)
+
+    try {
+      const response = await fetch(`/api/organizations/${encodeURIComponent(organizationId)}/brand-assets/logo/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ styleHint: aiHint.trim() || null })
+      })
+
+      const payload = await response.json().catch(() => ({}))
+
+      if (!response.ok || !payload?.asset?.assetId) {
+        throw new Error(typeof payload.error === 'string' ? payload.error : copy.logoAiFailed)
+      }
+
+      // Drop the AI draft into the same slot the uploader/URL flows use → preview lights up and the
+      // existing "Aplicar" button takes over (it goes through attachOrganizationLogoAsset, which
+      // re-checks the operating-entity guardrail). The operator reviews before committing.
+      setUploadedLogo({
+        assetId: payload.asset.assetId,
+        filename: payload.asset.filename,
+        mimeType: payload.asset.mimeType,
+        sizeBytes: payload.asset.sizeBytes,
+        downloadUrl: payload.downloadUrl,
+        asset: payload.asset
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.logoAiFailed)
+    } finally {
+      setBusy(null)
+    }
   }
 
   const applyUploadedLogo = async (close?: () => void) => {
@@ -406,6 +441,36 @@ const OrganizationLogoAvatarEditor = ({
             </GreenhouseButton>
             <Typography variant='caption' color='text.secondary'>
               {copy.logoUrlHelper}
+            </Typography>
+          </Stack>
+
+          <Divider />
+
+          <Stack spacing={1.25} data-capture='organization-logo-ai-generate'>
+            <TextField
+              size='small'
+              label={copy.logoAiLabel}
+              value={aiHint}
+              disabled={Boolean(busy)}
+              onChange={event => setAiHint(event.target.value)}
+              placeholder={copy.logoAiPlaceholder}
+              fullWidth
+              multiline
+              minRows={2}
+            />
+            <GreenhouseButton
+              kind='primaryAction'
+              variant='solid'
+              tone='primary'
+              leadingIconClassName='tabler-sparkles'
+              disabled={Boolean(busy)}
+              onClick={() => void generateAiLogo()}
+              fullWidth
+            >
+              {copy.logoAiGenerate}
+            </GreenhouseButton>
+            <Typography variant='caption' color='text.secondary'>
+              {copy.logoAiHelper}
             </Typography>
           </Stack>
 

@@ -10,12 +10,29 @@ export const scenario: CaptureScenario = {
   route: `/agency/organizations/${organizationId}`,
   viewport: { width: 1440, height: 1024 },
   viewports: [
+    { name: 'wide', width: 1920, height: 1080 },
     { name: 'desktop', width: 1440, height: 1024 },
     { name: 'laptop', width: 1280, height: 860 },
     { name: 'mobile', device: 'iPhone 13' }
   ],
   initialHoldMs: 1800,
   finalHoldMs: 400,
+  baseline: {
+    surfaceId: 'agency.organizations.enterprise-detail',
+    baselineName: 'organization-workspace-enterprise-detail-approved-mockup',
+    approvedMockupCaptureDir: '.captures/2026-06-09T01-42-45_organization-workspace-enterprise-detail-mockup',
+    requiredFrameLabels: ['delivery-first-fold', 'finance-facet', 'identity-facet'],
+    maskSelectors: [
+      '[data-capture="organization-enterprise-masthead"]',
+      '[data-capture="organization-enterprise-sidecar"]'
+    ],
+    maxDiffRatio: 0.08,
+    requiredRegions: [
+      '[data-capture="organization-enterprise-masthead"]',
+      '[data-capture="organization-enterprise-facet-rail"]',
+      '[data-capture="organization-enterprise-main-canvas"]'
+    ]
+  },
   readiness: {
     selector: '[data-capture="organization-workspace-enterprise-runtime"]',
     selectors: [
@@ -123,6 +140,30 @@ export const scenario: CaptureScenario = {
     { kind: 'click', selector: '[data-facet-key="identity"]' },
     { kind: 'sleep', ms: 350 },
     { kind: 'mark', label: 'identity-facet', note: 'Identity dossier and evidence map from runtime organization data' },
+    { kind: 'scroll', selector: '[data-facet-key="spaces"]', scrollBlock: 'center', scrollInline: 'center' },
+    { kind: 'click', selector: '[data-facet-key="spaces"]' },
+    { kind: 'sleep', ms: 250 },
+    { kind: 'mark', label: 'spaces-facet', note: 'Spaces facet with runtime rows' },
+    { kind: 'scroll', selector: '[data-facet-key="team"]', scrollBlock: 'center', scrollInline: 'center' },
+    { kind: 'click', selector: '[data-facet-key="team"]' },
+    { kind: 'sleep', ms: 250 },
+    { kind: 'mark', label: 'team-facet', note: 'Team facet with runtime people rows' },
+    { kind: 'scroll', selector: '[data-facet-key="economics"]', scrollBlock: 'center', scrollInline: 'center' },
+    { kind: 'click', selector: '[data-facet-key="economics"]' },
+    { kind: 'sleep', ms: 250 },
+    { kind: 'mark', label: 'economics-facet', note: 'Economics facet with profitability rows' },
+    { kind: 'scroll', selector: '[data-facet-key="crm"]', scrollBlock: 'center', scrollInline: 'center' },
+    { kind: 'click', selector: '[data-facet-key="crm"]' },
+    { kind: 'sleep', ms: 250 },
+    { kind: 'mark', label: 'crm-facet', note: 'CRM facet with pipeline rows' },
+    { kind: 'scroll', selector: '[data-facet-key="services"]', scrollBlock: 'center', scrollInline: 'center' },
+    { kind: 'click', selector: '[data-facet-key="services"]' },
+    { kind: 'sleep', ms: 250 },
+    { kind: 'mark', label: 'services-facet', note: 'Services facet with catalog rows' },
+    { kind: 'scroll', selector: '[data-facet-key="staffAug"]', scrollBlock: 'center', scrollInline: 'center' },
+    { kind: 'click', selector: '[data-facet-key="staffAug"]' },
+    { kind: 'sleep', ms: 250 },
+    { kind: 'mark', label: 'staff-aug-facet', note: 'Staff Aug facet with placement rows or honest empty state' },
     { kind: 'scroll', selector: '[data-capture="organization-workspace-enterprise-runtime"]', scrollBlock: 'end' },
     { kind: 'mark', label: 'full-page', fullPage: true, note: 'Full-page runtime evidence for enterprise review' }
   ]
