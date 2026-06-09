@@ -472,5 +472,11 @@ export const GH_ORGANIZATION_WORKSPACE = {
       }
     },
     loading: 'Cargando sección…'
+  },
+  enterprise: {
+    aria: {
+      cscDistribution: 'Distribución CSC por capability de entrega',
+      loadingOrganizationData: 'Cargando datos de organización'
+    }
   }
 } as const

@@ -1,3 +1,17 @@
+# Sesion 2026-06-08/09 — TASK-1059 Organization Workspace Enterprise Detail Runtime (en curso sobre develop)
+
+Operador pidio avanzar end-to-end con TASK-1059 y luego corrigio explicitamente: **no cambiar de rama** porque Claude tambien trabaja en este checkout. Codex volvio a `develop`; no crear branch/worktree ni hacer push automatico. El checkout esta `ahead 1` por commit local ajeno `d150c2191` de TASK-1020; no empujar ni reescribir ese commit desde TASK-1059.
+
+- **Estado:** `TASK-1059` movida a `docs/tasks/in-progress/`; README/registry sincronizados.
+- **Objetivo activo:** promover el mockup aprobado `/agency/organizations/mockup/enterprise-detail` al runtime `/agency/organizations/[organizationId]`, usando projection/capabilities canónicas de Organization Workspace y GVC runtime desktop/laptop/mobile.
+- **Estado actual:** code complete local sobre `develop`; no commit/push/deploy por checkout compartido. Runtime Agency detail corta directo a `OrganizationEnterpriseWorkspaceRuntime` y conserva projection/capabilities como gate.
+- **Implementado:** `src/views/greenhouse/organizations/OrganizationEnterpriseWorkspaceRuntime.tsx` consume detail + Account 360 + projects + finance summary; Delivery/Finance/Identity son canvases reales; facets restantes degradan honesto; CSC chart responsive sin clipping; scenario GVC runtime versionado.
+- **Evidencia:** `.captures/2026-06-09T02-15-20_organization-workspace-enterprise-detail-runtime` (desktop/laptop/mobile, 24 frames, `qualityFindings=[]`). Validado: eslint focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm ops:lint --changed` (solo warnings ajenos TASK-1020).
+- **Follow-up abierto:** `docs/tasks/to-do/TASK-1060-organization-workspace-compact-signals-projection.md` para compact signals/next actions/readiness projection del sidecar y API parity programatica.
+- **Guardrail:** cualquier gap backend/facet debe degradar honesto en UI y abrir task follow-up, no inventar datos completos en JSX.
+
+---
+
 # Sesion 2026-06-07/08 — TASK-1020 Leave Approval Authority Delegation Drift Hardening (code complete en develop + caso vivo remediado)
 
 Por instruccion del operador se trabajo todo en `develop` (sin cambiar de rama, sin push). Task movida `to-do → in-progress → complete` (8 slices). Open Questions D1-D4 confirmadas por el operador/CEO el 2026-06-07.

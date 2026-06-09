@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Mockup aprobado`
+- Status real: `code complete local; rollout/commit pendiente por checkout compartido`
 - Rank: `TBD`
 - Domain: `agency|ui|data|finance|delivery`
 - Blocked by: `none`
-- Branch: `task/TASK-1059-organization-workspace-enterprise-detail-runtime`
+- Branch: `develop` (operator override: shared checkout, no branch switch)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -248,12 +248,12 @@ N/A — repo-only change unless discovery finds a missing external source or fea
 
 ## Acceptance Criteria
 
-- [ ] Runtime `/agency/organizations/[organizationId]` renders the approved enterprise detail shell with real organization data.
-- [ ] Facet navigation supports Delivery, Finance and Identity as real canvases and renders remaining facets with honest partial/degraded states.
-- [ ] CSC distribution chart and other dense chart/table regions do not clip, overflow or collapse labels on laptop/mobile.
-- [ ] Runtime GVC scenario captures desktop, laptop and mobile with 0 blocking runtime/layout findings.
-- [ ] Finance facet links/summarizes existing finance consumer behavior without duplicating finance source-of-truth logic.
-- [ ] Approved mockup route remains available until runtime parity is accepted or is intentionally retired with documentation.
+- [x] Runtime `/agency/organizations/[organizationId]` renders the approved enterprise detail shell with real organization data.
+- [x] Facet navigation supports Delivery, Finance and Identity as real canvases and renders remaining facets with honest partial/degraded states.
+- [x] CSC distribution chart and other dense chart/table regions do not clip, overflow or collapse labels on laptop/mobile.
+- [x] Runtime GVC scenario captures desktop, laptop and mobile with 0 blocking runtime/layout findings.
+- [x] Finance facet links/summarizes existing finance consumer behavior without duplicating finance source-of-truth logic.
+- [x] Approved mockup route remains available until runtime parity is accepted or is intentionally retired with documentation.
 
 ## Verification
 
@@ -284,7 +284,17 @@ N/A — repo-only change unless discovery finds a missing external source or fea
 
 Task creada despues de aprobacion visual del mockup enterprise detail. Evidence base: `.captures/2026-06-09T01-42-45_organization-workspace-enterprise-detail-mockup`.
 
+## Implementation Delta 2026-06-09
+
+- Runtime cutover local aplicado en `src/app/(dashboard)/agency/organizations/[id]/page.tsx`: Agency organization detail entra directo al enterprise runtime, manteniendo `resolveOrganizationWorkspaceProjection()` como gate de acceso/facets y sin tocar Finance Clients.
+- Nueva vista runtime `src/views/greenhouse/organizations/OrganizationEnterpriseWorkspaceRuntime.tsx` cablea el mockup aprobado a datos reales disponibles: organization detail, Account 360 (`/api/organization/[id]/360`), projects (`/api/organizations/[id]/projects`) y finance summary (`/api/organizations/[id]/finance`).
+- Delivery, Finance e Identity quedan como canvases reales; las demas facets renderizan readiness/provenance/degraded states honestos desde 360/detail.
+- CSC distribution se renderiza con SVG responsive y marker GVC dedicado `organization-enterprise-csc-distribution`; laptop/mobile no clippean ni colapsan labels.
+- Gap backend identificado y separado en `docs/tasks/to-do/TASK-1060-organization-workspace-compact-signals-projection.md`: sidecar compact signals/next actions/readiness cross-facet como projection programatica, para no inventar source-of-truth en JSX.
+- Runtime GVC final: `.captures/2026-06-09T02-15-20_organization-workspace-enterprise-detail-runtime` (desktop, laptop, mobile; 24 frames; `qualityFindings=[]`; dossier `review-dossier.md` generado).
+- Estado de cierre: `code complete local`; no se movio a `complete/` ni se hizo push por instruccion explicita del operador de no cambiar rama/coordinar con Claude en el checkout compartido.
+
 ## Open Questions
 
-- Which production/staging organization fixture should become the canonical runtime GVC scenario target after implementation?
-- Should the old Organization Workspace remain accessible behind a temporary flag during rollout, or can runtime replacement be direct after preview approval?
+- Canonical local GVC fixture usado: `org-b9977f96-f7ef-4afb-bb26-7355d78c981f` (`Sky Airline`).
+- Cutover local directo aprobado para Agency route; el legacy shell no se conserva como fallback en esta ruta. Rollout remoto queda pendiente de commit/push/deploy humano por checkout compartido.

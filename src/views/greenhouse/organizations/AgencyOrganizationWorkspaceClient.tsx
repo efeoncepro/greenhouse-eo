@@ -15,12 +15,10 @@ import { ROLE_CODES } from '@/config/role-codes'
 import { GH_ORGANIZATION_WORKSPACE } from '@/lib/copy/agency'
 import { ORGANIZATION_FACETS } from '@/lib/organization-workspace/facet-capability-mapping'
 
-import OrganizationWorkspaceShell, {
-  OrganizationWorkspaceAdminAction
-} from '@/components/greenhouse/organization-workspace/OrganizationWorkspaceShell'
-import FacetContentRouter from '@/components/greenhouse/organization-workspace/FacetContentRouter'
+import { OrganizationWorkspaceAdminAction } from '@/components/greenhouse/organization-workspace/OrganizationWorkspaceShell'
 import OnboardingCaseBanner from '@/components/greenhouse/OnboardingCaseBanner'
 import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
+import OrganizationEnterpriseWorkspaceRuntime from './OrganizationEnterpriseWorkspaceRuntime'
 
 import type {
   OrganizationFacet,
@@ -192,23 +190,9 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection, onboard
   ) : undefined
 
   return (
-    <OrganizationWorkspaceShell
-      organization={{
-        organizationId: detail.organizationId,
-        organizationName: detail.organizationName,
-        publicId: detail.publicId,
-        industry: detail.industry,
-        country: detail.country,
-        status: detail.status,
-        active: detail.active,
-        hubspotCompanyId: detail.hubspotCompanyId,
-        logoAssetId: detail.logoAssetId,
-        logoUrl: detail.logoUrl,
-        websiteUrl: detail.websiteUrl,
-        isOperatingEntity: detail.isOperatingEntity,
-        spaceCount: detail.spaceCount,
-        membershipCount: detail.membershipCount
-      }}
+    <OrganizationEnterpriseWorkspaceRuntime
+      organizationId={organizationId}
+      detail={detail}
       kpis={
         kpis
           ? {
@@ -236,9 +220,7 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection, onboard
           }}
         />
       }
-    >
-      {(facet, ctx) => <FacetContentRouter facet={facet} {...ctx} />}
-    </OrganizationWorkspaceShell>
+    />
   )
 }
 

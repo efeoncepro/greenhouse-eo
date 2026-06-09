@@ -1,8 +1,6 @@
-import OrganizationView from '@views/greenhouse/organizations/OrganizationView'
 import AgencyOrganizationWorkspaceClient from '@views/greenhouse/organizations/AgencyOrganizationWorkspaceClient'
 
 import { requireServerSession } from '@/lib/auth/require-server-session'
-import { isWorkspaceShellEnabledForSubject } from '@/lib/workspace-rollout'
 import { resolveOrganizationWorkspaceProjection } from '@/lib/organization-workspace/projection'
 import { buildOrganizationWorkspaceSubject } from '@/lib/organization-workspace/build-projection-subject'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -39,21 +37,10 @@ const resolveOnboardingStatus = async (organizationId: string): Promise<Onboardi
 }
 
 /**
- * TASK-612 Slice 5 — Agency organization detail page.
- *
- * Server-side decide entre el shell V2 (gated por
- * `organization_workspace_shell_agency` flag) y el legacy `OrganizationView`.
- *
- * Cuando el flag está enabled:
- *  - resolveOrganizationWorkspaceProjection (TASK-611) calcula visibility
- *    server-side y lo pasa al wrapper client.
- *  - Si la projection falla → captureWithDomain('identity') + degraded mode
- *    se renderiza honest desde el shell mismo.
- *
- * Cuando el flag está disabled (default V1):
- *  - render legacy `<OrganizationView>` sin cambios funcionales.
- *
- * Patrón source: src/app/(dashboard)/home/page.tsx (TASK-780).
+ * TASK-1059 — Agency organization detail now cuts over directly to the
+ * enterprise Organization Workspace runtime. The projection remains the access
+ * gate; the legacy OrganizationView fallback was only for the staged TASK-612
+ * rollout and no longer owns this route.
  */
 
 const OrganizationDetailPage = async ({ params }: { params: Promise<{ id: string }> }) => {
@@ -61,27 +48,7 @@ const OrganizationDetailPage = async ({ params }: { params: Promise<{ id: string
 
   const session = await requireServerSession()
 
-  const subject = {
-    userId: session.user.userId,
-    tenantId: session.user.clientId ?? null,
-    roleCodes: session.user.roleCodes ?? []
-  }
-
-  const shellEnabled = await isWorkspaceShellEnabledForSubject(subject, 'agency').catch(error => {
-    captureWithDomain(error, 'identity', {
-      tags: { source: 'agency_organization_detail_page', stage: 'rollout_flag' },
-      extra: { organizationId: id }
-    })
-
-    // Resilient default: false (legacy fallback) — nunca crash.
-    return false
-  })
-
   const onboardingStatus = await resolveOnboardingStatus(id)
-
-  if (!shellEnabled) {
-    return <OrganizationView organizationId={id} onboardingStatus={onboardingStatus} />
-  }
 
   const projection = await resolveOrganizationWorkspaceProjection({
     subject: buildOrganizationWorkspaceSubject(session.user),
