@@ -27,6 +27,41 @@ vi.mock('@/lib/storage/greenhouse-assets', () => ({
 
 const { createOperatorUrlOrganizationLogoCandidate } = await import('./organization-brand-assets-discovery')
 
+const createOnePixelIco = () => {
+  const header = Buffer.alloc(6)
+
+  header.writeUInt16LE(0, 0)
+  header.writeUInt16LE(1, 2)
+  header.writeUInt16LE(1, 4)
+
+  const directory = Buffer.alloc(16)
+  const dibSize = 40 + 4 + 4
+  const dibOffset = 6 + 16
+
+  directory[0] = 1
+  directory[1] = 1
+  directory.writeUInt16LE(1, 4)
+  directory.writeUInt16LE(32, 6)
+  directory.writeUInt32LE(dibSize, 8)
+  directory.writeUInt32LE(dibOffset, 12)
+
+  const dib = Buffer.alloc(dibSize)
+
+  dib.writeUInt32LE(40, 0)
+  dib.writeInt32LE(1, 4)
+  dib.writeInt32LE(2, 8)
+  dib.writeUInt16LE(1, 12)
+  dib.writeUInt16LE(32, 14)
+  dib.writeUInt32LE(0, 16)
+  dib.writeUInt32LE(4, 20)
+  dib[40] = 0
+  dib[41] = 0
+  dib[42] = 255
+  dib[43] = 255
+
+  return Buffer.concat([header, directory, dib])
+}
+
 describe('createOperatorUrlOrganizationLogoCandidate', () => {
   beforeEach(() => {
     mockQuery.mockReset()
@@ -98,6 +133,62 @@ describe('createOperatorUrlOrganizationLogoCandidate', () => {
       assetId: 'asset-latam-logo',
       source: 'operator_url',
       sourceUrl: 'https://s.latamairlines.com/images/seo/logo_latam.jpg'
+    }))
+  })
+
+  it('converts ICO favicons from website metadata into PNG candidates', async () => {
+    mockQuery
+      .mockResolvedValueOnce([{
+        organization_id: 'org-sky',
+        public_id: 'EO-ORG-SKY',
+        organization_name: 'Sky Airline',
+        website_url: null
+      }])
+      .mockResolvedValueOnce([{ is_operating_entity: false }])
+
+    mockStoreSystemGeneratedPrivateAsset.mockResolvedValue({ assetId: 'asset-sky-logo' })
+    mockCreateOrganizationLogoCandidate.mockResolvedValue({
+      candidate_id: 'candidate-sky-logo',
+      asset_id: 'asset-sky-logo'
+    })
+
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response('<html></html>', {
+        status: 200,
+        headers: { 'content-type': 'text/html; charset=utf-8' }
+      }))
+      .mockResolvedValueOnce(new Response(
+        '<link rel="icon" type="image/x-icon" href="https://cdn.buttercms.com/Jbze6MD6RT2rZPYBb8Fi">',
+        {
+          status: 200,
+          headers: { 'content-type': 'text/html; charset=utf-8' }
+        }
+      ))
+      .mockResolvedValueOnce(new Response(createOnePixelIco(), {
+        status: 200,
+        headers: { 'content-type': 'image/vnd.microsoft.icon', 'content-length': String(createOnePixelIco().byteLength) }
+      }))
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await createOperatorUrlOrganizationLogoCandidate({
+      organizationId: 'org-sky',
+      sourceUrl: 'https://www.skyairline.com/es/chile',
+      actorUserId: 'user-admin'
+    })
+
+    expect(result).toEqual({
+      candidate_id: 'candidate-sky-logo',
+      asset_id: 'asset-sky-logo'
+    })
+    expect(mockStoreSystemGeneratedPrivateAsset).toHaveBeenCalledWith(expect.objectContaining({
+      fileName: 'EO-ORG-SKY-logo-candidate.png',
+      mimeType: 'image/png',
+      metadata: expect.objectContaining({
+        sourceUrl: 'https://cdn.buttercms.com/Jbze6MD6RT2rZPYBb8Fi',
+        htmlSource: 'icon',
+        requestedUrl: 'https://www.skyairline.com/es/chile'
+      })
     }))
   })
 })

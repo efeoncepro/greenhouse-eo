@@ -2,6 +2,8 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 
+import { PNG } from 'pngjs'
+
 import { query } from '@/lib/db'
 import {
   createOrganizationLogoCandidate,
@@ -13,6 +15,8 @@ import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-asset
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 const MAX_HTML_BYTES = 1024 * 1024
 const DISCOVERY_USER_ID = 'ops-worker:organization-brand-assets'
+const SUPPORTED_RASTER_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp'])
+const ICO_MIME_TYPES = new Set(['image/x-icon', 'image/vnd.microsoft.icon', 'image/icon'])
 
 type DiscoveryOrgRow = {
   organization_id: string
@@ -65,6 +69,88 @@ const extractAttr = (tag: string, attr: string) => {
   const match = tag.match(new RegExp(`${attr}\\s*=\\s*["']([^"']+)["']`, 'i'))
 
   return match?.[1]?.trim() || null
+}
+
+const isIcoBuffer = (bytes: Buffer) =>
+  bytes.byteLength >= 6 && bytes.readUInt16LE(0) === 0 && bytes.readUInt16LE(2) === 1 && bytes.readUInt16LE(4) > 0
+
+const convertIcoToPng = (bytes: Buffer) => {
+  if (!isIcoBuffer(bytes)) {
+    throw new Error('unsupported_ico_format')
+  }
+
+  const imageCount = bytes.readUInt16LE(4)
+  let selected: { width: number; height: number; bitCount: number; size: number; offset: number } | null = null
+
+  for (let index = 0; index < imageCount; index += 1) {
+    const entryOffset = 6 + index * 16
+    const width = bytes[entryOffset] || 256
+    const height = bytes[entryOffset + 1] || 256
+    const bitCount = bytes.readUInt16LE(entryOffset + 6)
+    const size = bytes.readUInt32LE(entryOffset + 8)
+    const offset = bytes.readUInt32LE(entryOffset + 12)
+
+    if (offset <= 0 || size <= 0 || offset + size > bytes.byteLength) continue
+
+    const score = width * height * Math.max(bitCount, 1)
+    const selectedScore = selected ? selected.width * selected.height * Math.max(selected.bitCount, 1) : -1
+
+    if (score > selectedScore) {
+      selected = { width, height, bitCount, size, offset }
+    }
+  }
+
+  if (!selected) {
+    throw new Error('unsupported_ico_format')
+  }
+
+  const image = bytes.subarray(selected.offset, selected.offset + selected.size)
+
+  if (image.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) {
+    return image
+  }
+
+  const headerSize = image.readUInt32LE(0)
+  const width = image.readInt32LE(4)
+  const dibHeight = image.readInt32LE(8)
+  const planes = image.readUInt16LE(12)
+  const bitCount = image.readUInt16LE(14)
+  const compression = image.readUInt32LE(16)
+
+  if (headerSize < 40 || planes !== 1 || compression !== 0 || ![24, 32].includes(bitCount) || width <= 0 || dibHeight === 0) {
+    throw new Error('unsupported_ico_format')
+  }
+
+  const height = Math.abs(dibHeight) / 2
+
+  if (!Number.isInteger(height) || height <= 0) {
+    throw new Error('unsupported_ico_format')
+  }
+
+  const bytesPerPixel = bitCount / 8
+  const rowStride = Math.ceil((width * bytesPerPixel) / 4) * 4
+  const pixelOffset = headerSize
+  const png = new PNG({ width, height })
+
+  if (pixelOffset + rowStride * height > image.byteLength) {
+    throw new Error('unsupported_ico_format')
+  }
+
+  for (let y = 0; y < height; y += 1) {
+    const sourceY = dibHeight > 0 ? height - 1 - y : y
+
+    for (let x = 0; x < width; x += 1) {
+      const sourceOffset = pixelOffset + sourceY * rowStride + x * bytesPerPixel
+      const targetOffset = (y * width + x) * 4
+
+      png.data[targetOffset] = image[sourceOffset + 2] ?? 0
+      png.data[targetOffset + 1] = image[sourceOffset + 1] ?? 0
+      png.data[targetOffset + 2] = image[sourceOffset] ?? 0
+      png.data[targetOffset + 3] = bitCount === 32 ? (image[sourceOffset + 3] ?? 255) : 255
+    }
+  }
+
+  return PNG.sync.write(png)
 }
 
 const extractImageCandidatesFromHtml = (html: string, baseUrl: URL) => {
@@ -148,11 +234,7 @@ const fetchImage = async (sourceUrl: string) => {
     throw new Error(`logo_fetch_failed:${response.status}`)
   }
 
-  const mimeType = response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase() || ''
-
-  if (!['image/png', 'image/jpeg', 'image/webp'].includes(mimeType)) {
-    throw new Error('unsupported_logo_mime_type')
-  }
+  const responseMimeType = response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase() || ''
 
   const contentLength = Number(response.headers.get('content-length') || '0')
 
@@ -166,7 +248,21 @@ const fetchImage = async (sourceUrl: string) => {
     throw new Error('logo_too_large')
   }
 
-  return { bytes, mimeType }
+  if (SUPPORTED_RASTER_MIME_TYPES.has(responseMimeType)) {
+    return { bytes, mimeType: responseMimeType }
+  }
+
+  if (ICO_MIME_TYPES.has(responseMimeType) || isIcoBuffer(bytes)) {
+    const pngBytes = convertIcoToPng(bytes)
+
+    if (pngBytes.byteLength > MAX_IMAGE_BYTES) {
+      throw new Error('logo_too_large')
+    }
+
+    return { bytes: pngBytes, mimeType: 'image/png' }
+  }
+
+  throw new Error('unsupported_logo_mime_type')
 }
 
 const getOrganizationsForDiscovery = async ({
