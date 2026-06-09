@@ -2,10 +2,10 @@
 
 Codex reviso el worktree completo para commit/push seguro, leyo los dos nuevos context docs y empujo `develop` hasta `4dd267c16`.
 
+- **Vercel env runtime verificado/corregido (2026-06-09):** `OPENAI_API_KEY_SECRET_REF` existe en Vercel `Production` (main/prod), `Development`, `Preview (develop)` y ahora tambien en custom env `staging` (agregado por Codex via `vercel env add ... staging`, valor ref `greenhouse-openai-api-key`). GCP Secret Manager confirma `greenhouse-openai-api-key` con version habilitada. Pendiente: redeploy/restart de targets que deban leer la env nueva; Vercel no aplica env vars nuevas a deployments ya construidos.
 - **Context docs nuevos:** `docs/context/13_icp-buyer-personas-jtbd.md` y `docs/context/14_modelo-negocio-asaas.md` leidos y commiteados en `585c7152a`; `00_INDEX.md` ahora los referencia y se limpiaron referencias a un `12` inexistente.
 - **Paquete Organization Workspace/brand/logo:** commit `4dd267c16` incluye polish del pop-up de logo, señales/labels/provenance, OTD/industry helpers y docs operativas. Verificado antes del push con lint, TypeScript, tests focales, build, route gate, design lint y GVC (`organization-logo-avatar-editor` local final `.captures/2026-06-09T07-58-13_organization-logo-avatar-editor`).
 - **Post-push task taxonomy:** aparecieron cambios nuevos de lifecycle: `TASK-1060` queda `complete`/deprecada y supersedida por `TASK-1063`; `TASK-1062` permanece como follow-up MCP/reliability sobre el contrato compact-signals heredado por TASK-1063. README/registry/referencias cruzadas sincronizadas en esta continuidad.
-- **Pendiente runtime:** no se verifico Vercel staging/prod para `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key`; el flujo IA esta code-pushed pero el rollout deployado requiere confirmar env var antes de declararlo operativo.
 
 ---
 
