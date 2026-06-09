@@ -123,4 +123,4 @@ Greenhouse incorpora **Nexa** como capa de inteligencia del producto:
 
 ---
 
-*Fuente: Greenhouse — Capacidades del Producto + Análisis Técnico + Product Ecosystem v1.0. Recordatorio: el producto se llama **Greenhouse**, nunca "Greenhouse EO".*
+*Fuente: Greenhouse — Capacidades del Producto + Análisis Técnico + Product Ecosystem v1.0. Recordatorio: el producto se llama **Greenhouse**, nunca "Greenhouse EO". Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — valores de runtime referenciados al SoT, no hardcodeados.*

@@ -120,4 +120,11 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 
 ---
 
-*Propiedad intelectual de Efeonce Group SpA. Uso interno. Última destilación: junio 2026, a partir del corpus estratégico v5.3 / GTM 2026 / Product Ecosystem v1.0.*
+## Frescura y gobierno del pack
+
+- **Cadencia.** El pack se re-destila periódicamente vía `greenhouse-documentation-governor`. Cada cierre de trabajo que cambie negocio/marca/GTM verifica si toca refrescar el pack.
+- **Verificar antes de confiar.** Ante cualquier valor de runtime (conteos, %, schemas, gaps, métricas, rótulos, fechas), confirmar contra el SoT técnico antes de actuar — el pack puede ir por detrás del runtime. Los docs con `Última verificación` vigente fueron revisados contra el runtime en esa fecha; los que no, llevan la destilación del corpus y deben verificarse.
+- **SoT canónico:** `CLAUDE.md`, `DESIGN.md`, `docs/architecture/`, `06_glosario-metricas.md` (métricas), `project_context.md` (estado/roadmap).
+- **Reconciliación con la skill `efeonce-agency`:** este pack (`docs/context/*`) es la **fuente** del contexto de negocio; la skill `efeonce-agency` lo **referencia/operacionaliza** para agentes. No duplicar la misma verdad en ambos: si difieren, prevalece el pack.
+
+*Propiedad intelectual de Efeonce Group SpA. Uso interno. Última destilación: junio 2026, a partir del corpus estratégico v5.3 / GTM 2026 / Product Ecosystem v1.0. Última verificación de drift contra runtime: 2026-06-09 (TASK-1064, docs 00/04/05/08/14).*

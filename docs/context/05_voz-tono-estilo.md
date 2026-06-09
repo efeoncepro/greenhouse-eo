@@ -112,4 +112,4 @@ Este doc fija **la voz y el registro** (estratégico, prosa-doctrina). Se **ejec
 
 ---
 
-*Fuente: Brand Voice, Tone & Personality v1.0 + Editorial Style Guide v1.0 + Brand Guideline v1.1. Marca visual canónica: Design System **AXIS** + `DESIGN.md` (cuando el Brand Guideline difiera de los tokens vigentes, prevalece AXIS/runtime). Ejecución de copy: skill `greenhouse-ux-writing` + `src/lib/copy/*` + `src/config/greenhouse-nomenclature.ts`.*
+*Fuente: Brand Voice, Tone & Personality v1.0 + Editorial Style Guide v1.0 + Brand Guideline v1.1. Marca visual canónica: Design System **AXIS** + `DESIGN.md` (cuando el Brand Guideline difiera de los tokens vigentes, prevalece AXIS/runtime). Ejecución de copy: skill `greenhouse-ux-writing` + `src/lib/copy/*` + `src/config/greenhouse-nomenclature.ts`. Última verificación de drift contra runtime: 2026-06-09 (TASK-1064).*

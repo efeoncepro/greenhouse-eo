@@ -93,4 +93,4 @@ La recalibración cambia tres cosas, y todas tocan al producto:
 
 ---
 
-*Fuentes: ASaaS Strategy (mar-2026) + Addendum de Recalibración (vigente). El addendum prevalece sobre el roadmap original donde difieren. Nombres/dominios normalizados según `00` (Greenhouse, greenhouse.efeoncepro.com).*
+*Fuentes: ASaaS Strategy (mar-2026) + Addendum de Recalibración (vigente). El addendum prevalece sobre el roadmap original donde difieren. Nombres/dominios normalizados según `00` (Greenhouse, greenhouse.efeoncepro.com). Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — fases sin fecha dura; estado/roadmap vivo en `project_context.md`.*

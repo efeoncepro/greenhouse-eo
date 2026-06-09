@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -159,11 +159,10 @@ Omitida (task `policy`/doc-governance). El Scope + el patrón ya aplicado en `05
   - `14_modelo-negocio-asaas.md`: fases de roadmap des-fechadas (Q2/Q3/Q4 2026 → orden/foco; fechas → project_context).
   - `08_estrategia-comercial.md`: coverage "3.3%" eliminado (era el mismo dato falso en 3 docs; ahora puntero al reporte CI).
   - `05_voz-tono-estilo.md`: ya saneado en commit previo (color→AXIS, copy→UX writing, nombres de primera versión quitados).
-- **Pendiente:**
-  - Slice 2 — metadata de frescura por doc (stamping last-verified+owner en los 13 docs).
-  - Slice 3 — reconciliación fuente↔referencia con la skill `efeonce-agency`.
-  - Fechas-target comerciales (NRR >110% "Q3 2026" en `06`/`11`, título de `08`) se dejaron: son targets de GTM, no claims de runtime que confundan a un dev.
-  - Nomenclatura de primera versión en docs (Pulse/Ciclos/etc.) en 02/04/06/08/10/11 → se mueve junto con el rename de producto (TASK-1065), no se toca aquí salvo donde se presentaba como claim canónico.
+- **Slice 2 (freshness governance) — hecho:** sección "Frescura y gobierno del pack" agregada al INDEX (cadencia vía `greenhouse-documentation-governor`, regla "verificar antes de confiar", SoT canónico declarado). Los 5 docs realmente barridos (00/04/05/08/14) llevan stamp `Última verificación: 2026-06-09 (TASK-1064)` en su footer. Los 9 docs no barridos (01/02/03/06/07/09/10/11/13) **NO se stampean con fecha de hoy** (sería falsa frescura — el bug class que esta task combate); quedan cubiertos por la regla del INDEX y se verifican en el próximo refresh del governor (follow-up honesto, no ceremonia).
+- **Slice 3 (reconciliación con `efeonce-agency`) — hecho:** la relación fuente↔referencia ya estaba declarada en la skill (`.claude/skills/efeonce-agency/SKILL.md` líneas 8/10/150: "Fuente de verdad = `docs/context/`… esta skill NO los reemplaza… ante conflicto mandan los docs"); se declaró el lado pack en el INDEX ("Reconciliación con la skill `efeonce-agency`"). Ambos lados consistentes, sin duplicar la verdad.
+- **Dejado fuera a propósito:** fechas-target comerciales (NRR >110% "Q3 2026" en `06`/`11`, título de `08`) — son targets de GTM, no claims de runtime que confundan a un dev. Nomenclatura de primera versión en docs (Pulse/Ciclos/etc.) en 02/04/06/08/10/11 + triggers de la skill → se mueve junto con el rename de producto (TASK-1065).
+- **Cierre:** core de la task (matar drift + frontera de altitud + gobernanza de frescura + reconciliación) completo. El stamping de los 9 docs no verificados es follow-up del refresh del governor (verificar contenido contra runtime, no solo poner fecha).
 
 ## Open Questions
 
