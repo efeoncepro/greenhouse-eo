@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
 import Autocomplete from '@mui/material/Autocomplete'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -78,13 +79,6 @@ type ReassignDirectReportsForm = {
   nextSupervisorMemberId: string
   reason: string
   effectiveFrom: string
-}
-
-type DelegationForm = {
-  supervisorMemberId: string
-  delegateMemberId: string
-  effectiveFrom: string
-  effectiveTo: string
 }
 
 type ApiError = { error?: string }
@@ -261,13 +255,6 @@ const EMPTY_REASSIGN_FORM: ReassignDirectReportsForm = {
   effectiveFrom: todayIso()
 }
 
-const EMPTY_DELEGATION_FORM: DelegationForm = {
-  supervisorMemberId: '',
-  delegateMemberId: '',
-  effectiveFrom: todayIso(),
-  effectiveTo: ''
-}
-
 const HrHierarchyView = () => {
   const [hierarchy, setHierarchy] = useState<HrHierarchyResponse | null>(null)
   const [hierarchyLoading, setHierarchyLoading] = useState(true)
@@ -297,9 +284,7 @@ const HrHierarchyView = () => {
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false)
   const [bulkForm, setBulkForm] = useState<ReassignDirectReportsForm>(EMPTY_REASSIGN_FORM)
   const [bulkValidationAttempted, setBulkValidationAttempted] = useState(false)
-  const [delegationDialogOpen, setDelegationDialogOpen] = useState(false)
-  const [delegationForm, setDelegationForm] = useState<DelegationForm>(EMPTY_DELEGATION_FORM)
-  const [savingAction, setSavingAction] = useState<'change' | 'bulk' | 'delegation' | 'revoke' | null>(null)
+  const [savingAction, setSavingAction] = useState<'change' | 'bulk' | 'revoke' | null>(null)
 
   const loadHierarchy = useCallback(async (signal?: AbortSignal) => {
     setHierarchyLoading(true)
@@ -504,11 +489,6 @@ const HrHierarchyView = () => {
     [bulkForm.currentSupervisorMemberId, memberChoices]
   )
 
-  const delegationSupervisorOptions = useMemo(
-    () => memberChoices.filter(member => member.memberId !== delegationForm.delegateMemberId),
-    [delegationForm.delegateMemberId, memberChoices]
-  )
-
   const filterSupervisorValue = useMemo(
     () => memberChoices.find(member => member.memberId === supervisorFilterId) ?? null,
     [memberChoices, supervisorFilterId]
@@ -532,16 +512,6 @@ const HrHierarchyView = () => {
   const bulkNextSupervisorValue = useMemo(
     () => bulkSupervisorOptions.find(member => member.memberId === bulkForm.nextSupervisorMemberId) ?? null,
     [bulkForm.nextSupervisorMemberId, bulkSupervisorOptions]
-  )
-
-  const delegationSupervisorValue = useMemo(
-    () => delegationSupervisorOptions.find(member => member.memberId === delegationForm.supervisorMemberId) ?? null,
-    [delegationForm.supervisorMemberId, delegationSupervisorOptions]
-  )
-
-  const delegationDelegateValue = useMemo(
-    () => memberChoices.find(member => member.memberId === delegationForm.delegateMemberId) ?? null,
-    [delegationForm.delegateMemberId, memberChoices]
   )
 
   const summary = hierarchy?.summary ?? {
@@ -586,23 +556,6 @@ const HrHierarchyView = () => {
         effectiveFrom: todayIso()
       })
       setBulkDialogOpen(true)
-    },
-    [selectedRow]
-  )
-
-  const openDelegationDialog = useCallback(
-    (row?: HrHierarchyRecord | null) => {
-      const target = row ?? selectedRow
-
-      if (!target) return
-
-      setDelegationForm({
-        supervisorMemberId: target.memberId,
-        delegateMemberId: '',
-        effectiveFrom: todayIso(),
-        effectiveTo: ''
-      })
-      setDelegationDialogOpen(true)
     },
     [selectedRow]
   )
@@ -681,39 +634,6 @@ const HrHierarchyView = () => {
       setSavingAction(null)
     }
   }, [bulkForm, loadHierarchy, loadPanelData, selectedMemberId])
-
-  const submitDelegation = useCallback(async () => {
-    if (!delegationForm.supervisorMemberId || !delegationForm.delegateMemberId) return
-
-    setSavingAction('delegation')
-
-    try {
-      const res = await fetch('/api/hr/core/hierarchy/delegations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          supervisorMemberId: delegationForm.supervisorMemberId,
-          delegateMemberId: delegationForm.delegateMemberId,
-          effectiveFrom: delegationForm.effectiveFrom || null,
-          effectiveTo: delegationForm.effectiveTo || null
-        })
-      })
-
-      if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as ApiError
-
-        throw new Error(data.error || 'No pudimos crear la delegación.')
-      }
-
-      toast.success('Delegación temporal creada. La nueva delegación reemplaza la activa anterior.')
-      setDelegationDialogOpen(false)
-      await Promise.all([loadHierarchy(), loadPanelData(selectedMemberId)])
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'No pudimos crear la delegación.')
-    } finally {
-      setSavingAction(null)
-    }
-  }, [delegationForm, loadHierarchy, loadPanelData, selectedMemberId])
 
   const revokeDelegation = useCallback(
     async (responsibilityId: string) => {
@@ -845,8 +765,6 @@ const HrHierarchyView = () => {
       governanceAction.resolution === resolution,
     [governanceAction]
   )
-
-  const canSubmitDelegation = Boolean(delegationForm.supervisorMemberId && delegationForm.delegateMemberId)
 
   const changeReasonError = changeValidationAttempted && !changeForm.reason.trim() ? 'La razón es obligatoria para guardar este cambio.' : ''
 
@@ -1816,9 +1734,6 @@ const HrHierarchyView = () => {
                           <Button variant='tonal' size='small' onClick={() => openBulkDialog(selectedRow)}>
                             Reasignar reportes
                           </Button>
-                          <Button variant='tonal' size='small' onClick={() => openDelegationDialog(selectedRow)}>
-                            Nueva delegación
-                          </Button>
                         </Stack>
                       </Stack>
                     </Box>
@@ -1917,21 +1832,17 @@ const HrHierarchyView = () => {
                 icon='tabler-shield-check'
                 titleId='hr-hierarchy-delegations-title'
                 title='Delegaciones temporales'
-                subtitle='Historial completo de delegaciones. Solo una delegación primaria puede quedar activa por supervisor.'
-                action={
-                  <Button
-                    variant='tonal'
-                    size='small'
-                    startIcon={<i className='tabler-plus' />}
-                    disabled={!selectedRow}
-                    onClick={() => openDelegationDialog(selectedRow)}
-                  >
-                    Nueva delegación
-                  </Button>
-                }
+                subtitle='Delegaciones vigentes (solo lectura). La delegación de aprobaciones no está disponible en esta versión.'
               />
               <Divider />
               <CardContent>
+                <Alert severity='info' icon={<i className='tabler-shield-off' />} sx={{ mb: 3 }}>
+                  <AlertTitle>La delegación de aprobaciones no está disponible</AlertTitle>
+                  Las solicitudes de permiso, gasto y evaluación las aprueba el supervisor formal o, si corresponde,
+                  Recursos Humanos/Administración. Las delegaciones vigentes se conservan aquí solo para revisarlas o
+                  revocarlas.
+                </Alert>
+
                 {panelLoading && !delegationRows.length ? (
                   <Stack spacing={1.5}>
                     {Array.from({ length: 3 }).map((_, index) => (
@@ -1992,14 +1903,9 @@ const HrHierarchyView = () => {
                 ) : (
                   <EmptyState
                     icon='tabler-shield-off'
-                    title='Sin delegaciones'
-                    description='Crea una delegación temporal para que otra persona apruebe en nombre del supervisor.'
+                    title='Sin delegaciones vigentes'
+                    description='No hay delegaciones que revisar ni revocar.'
                     minHeight={220}
-                    action={
-                      <Button variant='outlined' size='small' onClick={() => openDelegationDialog(selectedRow)} disabled={!selectedRow}>
-                        Crear delegación
-                      </Button>
-                    }
                   />
                 )}
               </CardContent>
@@ -2200,96 +2106,6 @@ const HrHierarchyView = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={delegationDialogOpen}
-        onClose={() => setDelegationDialogOpen(false)}
-        maxWidth='sm'
-        fullWidth
-        closeAfterTransition={false}
-      >
-        <DialogTitle>Nueva delegación temporal</DialogTitle>
-        <Divider />
-        <DialogContent>
-          <Stack spacing={3} sx={{ mt: 1 }}>
-            <Autocomplete
-              disablePortal
-              options={delegationSupervisorOptions}
-              value={delegationSupervisorValue}
-              onChange={(_, value) => setDelegationForm(prev => ({ ...prev, supervisorMemberId: value?.memberId ?? '' }))}
-              getOptionLabel={option => option.displayName}
-              isOptionEqualToValue={(option, value) => option.memberId === value.memberId}
-              renderOption={(props, option) => (
-                <Box component='li' {...props} key={option.memberId}>
-                  <MemberChoiceRow option={option} />
-                </Box>
-              )}
-              renderInput={params => (
-                <CustomTextField
-                  {...params}
-                  label='Supervisor'
-                  placeholder='Persona que delega'
-                  size='small'
-                  helperText='La delegación se registrará sobre esta persona.'
-                />
-              )}
-            />
-
-            <Autocomplete
-              disablePortal
-              options={memberChoices}
-              value={delegationDelegateValue}
-              onChange={(_, value) => setDelegationForm(prev => ({ ...prev, delegateMemberId: value?.memberId ?? '' }))}
-              getOptionLabel={option => option.displayName}
-              isOptionEqualToValue={(option, value) => option.memberId === value.memberId}
-              renderOption={(props, option) => (
-                <Box component='li' {...props} key={option.memberId}>
-                  <MemberChoiceRow option={option} />
-                </Box>
-              )}
-              renderInput={params => (
-                <CustomTextField
-                  {...params}
-                  label='Delegado'
-                  placeholder='Persona que recibirá la aprobación'
-                  size='small'
-                  helperText='La persona elegida podrá actuar temporalmente en nombre del supervisor.'
-                />
-              )}
-            />
-
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Vigente desde'
-              type='date'
-              value={delegationForm.effectiveFrom}
-              onChange={event => setDelegationForm(prev => ({ ...prev, effectiveFrom: event.target.value }))}
-              InputLabelProps={{ shrink: true }}
-            />
-
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Vigente hasta'
-              type='date'
-              value={delegationForm.effectiveTo}
-              onChange={event => setDelegationForm(prev => ({ ...prev, effectiveTo: event.target.value }))}
-              InputLabelProps={{ shrink: true }}
-              helperText='Opcional. Si lo dejas vacío, la delegación queda abierta hasta que la revocas.'
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button variant='text' color='secondary' onClick={() => setDelegationDialogOpen(false)}>{GREENHOUSE_COPY.actions.cancel}</Button>
-          <Button
-            variant='contained'
-            onClick={() => void submitDelegation()}
-            disabled={!canSubmitDelegation || savingAction === 'delegation'}
-          >
-            {savingAction === 'delegation' ? <CircularProgress size={18} color='inherit' /> : 'Crear delegación'}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Stack>
   )
 }
