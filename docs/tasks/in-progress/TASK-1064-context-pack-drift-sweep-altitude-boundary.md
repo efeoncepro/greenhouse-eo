@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -150,6 +150,20 @@ Omitida (task `policy`/doc-governance). El Scope + el patrón ya aplicado en `05
 ## Follow-ups
 
 - TASK-1065 — rename de nomenclatura de primera versión en el producto.
+
+## Delta 2026-06-09
+
+- **Slice 1 (drift técnico) — sustancialmente hecho:**
+  - `00_INDEX.md`: gap list (outbox marcado como cerrado por TASK-773, coverage sin número, roadmap sin fecha dura → punteros) + nota RpA des-runtime-izada + **regla de altitud agregada a "Convenciones críticas"** (el pack defiere al SoT técnico; valores de runtime no se hardcodean).
+  - `04_greenhouse-producto.md`: "En números" → escala cualitativa + puntero a CLAUDE.md §Data Architecture (la lista de schemas estaba mal: 6≠9); "4 cron jobs" → puntero a `GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1`; roadmap sin fechas duras; gaps con nota "verificar contra project_context + backlog" (outbox marcado materializado).
+  - `14_modelo-negocio-asaas.md`: fases de roadmap des-fechadas (Q2/Q3/Q4 2026 → orden/foco; fechas → project_context).
+  - `08_estrategia-comercial.md`: coverage "3.3%" eliminado (era el mismo dato falso en 3 docs; ahora puntero al reporte CI).
+  - `05_voz-tono-estilo.md`: ya saneado en commit previo (color→AXIS, copy→UX writing, nombres de primera versión quitados).
+- **Pendiente:**
+  - Slice 2 — metadata de frescura por doc (stamping last-verified+owner en los 13 docs).
+  - Slice 3 — reconciliación fuente↔referencia con la skill `efeonce-agency`.
+  - Fechas-target comerciales (NRR >110% "Q3 2026" en `06`/`11`, título de `08`) se dejaron: son targets de GTM, no claims de runtime que confundan a un dev.
+  - Nomenclatura de primera versión en docs (Pulse/Ciclos/etc.) en 02/04/06/08/10/11 → se mueve junto con el rename de producto (TASK-1065), no se toca aquí salvo donde se presentaba como claim canónico.
 
 ## Open Questions
 
