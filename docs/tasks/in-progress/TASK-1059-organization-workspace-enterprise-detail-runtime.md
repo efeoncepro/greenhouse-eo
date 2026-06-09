@@ -290,7 +290,7 @@ Task creada despues de aprobacion visual del mockup enterprise detail. Evidence 
 - Nueva vista runtime `src/views/greenhouse/organizations/OrganizationEnterpriseWorkspaceRuntime.tsx` cablea el mockup aprobado a datos reales disponibles: organization detail, Account 360 (`/api/organization/[id]/360`), projects (`/api/organizations/[id]/projects`) y finance summary (`/api/organizations/[id]/finance`).
 - Delivery, Finance e Identity quedan como canvases reales; las demas facets renderizan readiness/provenance/degraded states honestos desde 360/detail.
 - CSC distribution se renderiza con SVG responsive y marker GVC dedicado `organization-enterprise-csc-distribution`; laptop/mobile no clippean ni colapsan labels.
-- Gap backend identificado y separado en `docs/tasks/to-do/TASK-1060-organization-workspace-compact-signals-projection.md`: sidecar compact signals/next actions/readiness cross-facet como projection programatica, para no inventar source-of-truth en JSX.
+- Gap backend/paridad identificado y separado en `docs/tasks/to-do/TASK-1063-organization-detail-mockup-runtime-parity-completion.md` (supersede TASK-1060): sidecar compact signals/next actions/readiness cross-facet como projection programatica, bloqueadores/fechas y delivery chart real, para no inventar source-of-truth en JSX.
 - Runtime GVC final: `.captures/2026-06-09T02-15-20_organization-workspace-enterprise-detail-runtime` (desktop, laptop, mobile; 24 frames; `qualityFindings=[]`; dossier `review-dossier.md` generado).
 - Estado de cierre: `code complete local`; no se movio a `complete/` ni se hizo push por instruccion explicita del operador de no cambiar rama/coordinar con Claude en el checkout compartido.
 

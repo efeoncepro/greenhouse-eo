@@ -8,25 +8,25 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Follow-up de TASK-1060; Product API y first-party App API ya existen, falta MCP wrapper y sampling durable si se requiere reliability rate`
+- Status real: `Follow-up del contrato compact-signals heredado por TASK-1063; Product API y first-party App API ya existen, falta MCP wrapper y sampling durable si se requiere reliability rate`
 - Rank: `TBD`
 - Domain: `agency|organization|api|mcp|reliability`
-- Blocked by: `TASK-1060`
+- Blocked by: `TASK-1063`
 - Branch: `task/TASK-1062-organization-workspace-compact-signals-mcp-reliability-sampling`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Crear el wrapper MCP/app-tool `get_organization_workspace_compact_signals` sobre el contrato entregado por TASK-1060 y, si el equipo necesita alerting operacional, implementar sampling durable de degradación por request para el read model `OrganizationWorkspaceCompactSignals`.
+Crear el wrapper MCP/app-tool `get_organization_workspace_compact_signals` sobre el contrato compact-signals que TASK-1063 hereda de TASK-1060, y si el equipo necesita alerting operacional, implementar sampling durable de degradación por request para el read model `OrganizationWorkspaceCompactSignals`.
 
 ## Why This Task Exists
 
-TASK-1060 entregó el reader canónico, Product API, first-party App API y consumo runtime del sidecar enterprise. No registró un reliability signal porque la degradación actual existe en el payload por request, pero no hay todavía almacenamiento durable de tasas/series por fuente. Registrar un signal sin sampling persistente produciría falsos positivos o invisibilidad histórica.
+TASK-1060 dejó una projection parcial y TASK-1063 consolida el contrato restante. No registrar reliability signal hasta que exista sampling durable de tasas/series por fuente; registrar un signal solo con degradación por request produciría falsos positivos o invisibilidad histórica.
 
 ## Scope
 
-- Agregar un MCP/tool wrapper read-only que consuma el mismo contrato de TASK-1060 sin duplicar queries.
+- Agregar un MCP/tool wrapper read-only que consuma el mismo contrato compact-signals sin duplicar queries.
 - Definir si el wrapper vive sobre Product API, App API o un adapter server-side autorizado.
 - Si se requiere Reliability Control Plane:
   - persistir sampling mínimo de `status`, `degradedSources[]`, duración y source ids;
@@ -36,7 +36,7 @@ TASK-1060 entregó el reader canónico, Product API, first-party App API y consu
 
 ## Out of Scope
 
-- Cambiar el DTO de TASK-1060 salvo ajuste compatible.
+- Cambiar el DTO compact-signals salvo ajuste compatible.
 - Crear nuevas métricas finance/delivery.
 - Acciones autónomas desde el sidecar.
 

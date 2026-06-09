@@ -14,7 +14,7 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `En ejecucion en develop por coordinacion multi-agente; controller/copy/Chart SoT/GVC baseline implementados. Paridad mockup recuperada en runtime para website, default delivery y strip OTD/FTR/Throughput/RpA con deltas reales vs previousIcoMetrics. TASK-1060 sigue siendo owner del compact sidecar/API projection.`
+- Status real: `En ejecucion en develop por coordinacion multi-agente; controller/copy/Chart SoT/GVC baseline implementados. Paridad mockup recuperada en runtime para website, default delivery y strip OTD/FTR/Throughput/RpA con deltas reales vs previousIcoMetrics. TASK-1063 hereda el compact sidecar/API projection tras deprecar TASK-1060.`
 - Rank: `TBD`
 - Domain: `agency|ui|platform|design-system|quality`
 - Blocked by: `none`
@@ -30,7 +30,7 @@ Convertir el runtime enterprise aprobado de Organization Workspace en un contrat
 
 TASK-1059 entrego la experiencia visual aprobada para `/agency/organizations/[id]`, pero parte de su fidelidad depende de literales route-locales en JSX, copy dispersa y una paleta de series de chart derivada de semanticos visuales. Eso funciona para shippear el runtime, pero deja una superficie enterprise sensible a drift, regressions silenciosas y divergencia con el sistema AXIS/Greenhouse.
 
-TASK-1060 cubre la projection compacta backend del sidecar. Esta task es deliberadamente UI/platform: conserva el diseno aprobado y lo convierte en una base mantenible sin inflar tokens globales.
+TASK-1063 cubre la projection compacta backend del sidecar y los gaps de paridad mockup→runtime heredados de TASK-1060. Esta task es deliberadamente UI/platform: conserva el diseno aprobado y lo convierte en una base mantenible sin inflar tokens globales.
 
 ## Goal
 
@@ -81,7 +81,7 @@ Reglas obligatorias:
 ### Depends on
 
 - TASK-1059 runtime implementation pushed to `develop`.
-- TASK-1060 remains independent for compact backend signals.
+- TASK-1063 remains independent for compact backend signals and mockup→runtime parity gaps.
 - `src/views/greenhouse/organizations/OrganizationEnterpriseWorkspaceRuntime.tsx`
 - `src/components/greenhouse/organization-workspace/**`
 - `src/lib/copy/agency.ts`
@@ -279,7 +279,7 @@ Do not move one-off technical IDs or server field names into copy. Do move any u
 
 - Slice 1 (inventory) -> Slice 2 (controller) -> Slice 3 (copy) -> Slice 4 (chart SoT) -> Slice 5 (component boundary) -> Slice 6 (GVC baseline) -> Slice 7 (closure).
 - Slice 6 must run after visual refactors and before closure.
-- TASK-1060 may proceed independently; do not wait on it and do not mix its backend reader scope into this task.
+- TASK-1063 may proceed independently; do not wait on it and do not mix its backend reader/parity scope into this task.
 
 ### Risk matrix
 
@@ -332,7 +332,7 @@ N/A — repo-only UI/platform hardening. No external system, env var, migration,
 - [ ] Reusable organization workspace pieces are either extracted to `src/components/greenhouse/organization-workspace/` or explicitly documented as route-local.
 - [ ] GVC baseline/diff protects approved mockup→runtime fidelity and includes desktop/laptop/mobile evidence.
 - [ ] Runtime capture reports `qualityFindings=[]`, including CSC distribution with no clipping or container trapping.
-- [ ] TASK-1060 backend/projection scope is not implemented or duplicated here.
+- [ ] TASK-1063 backend/projection/parity scope is not implemented or duplicated here.
 
 ## Verification
 
@@ -352,14 +352,14 @@ N/A — repo-only UI/platform hardening. No external system, env var, migration,
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado con evidencia GVC, baseline y cualquier deuda restante
 - [ ] `changelog.md` quedo actualizado si el refactor cambia comportamiento visual observable
-- [ ] se ejecuto chequeo de impacto cruzado sobre TASK-1059, TASK-1060, TASK-1054 y TASK-1056
+- [ ] se ejecuto chequeo de impacto cruzado sobre TASK-1059, TASK-1063, TASK-1054 y TASK-1056
 - [ ] se reviso si algun token/controller nuevo debe documentarse en UI Platform o quedar solo como dominio
 
 ## Follow-ups
 
 - Posible task futura: reconciliacion upstream con Figma/AXIS si el controller de dominio revela un patron repetible platform-level.
 - Posible task futura: lint warning-first para bloquear series de chart desde semantic palette en views.
-- TASK-1060 sigue siendo el follow-up backend para compact signals/projection/API parity del sidecar.
+- TASK-1063 sigue siendo el follow-up backend/paridad para compact signals/projection/API parity del sidecar.
 
 ## Delta YYYY-MM-DD
 

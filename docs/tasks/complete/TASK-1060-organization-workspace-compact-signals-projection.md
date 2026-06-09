@@ -6,15 +6,17 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+> **⛔ DEPRECADA / SUPERSEDIDA (2026-06-09) por [TASK-1063](../to-do/TASK-1063-organization-detail-mockup-runtime-parity-completion.md).** El operador deprecó esta task. Su scope (projection compact-signals del sidecar + reliability/API-lane) se consolidó dentro de TASK-1063, junto con los gaps adicionales mockup→runtime (bloqueadores del ciclo de vida, fechas en señales/acciones, delivery chart real, recency por facet, acciones admin). La projection parcial ya materializada (`src/lib/organization-workspace/compact-signals*.ts` + route `/api/organizations/[id]/workspace/compact-signals`) queda como foundation que TASK-1063 extiende. NO retomar esta task; tomar TASK-1063.
+
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `En re-plan 2026-06-09 tras discovery runtime; ejecución sobre develop por instrucción del operador; NO cerrar hasta recuperar paridad de datos con tabs legacy`
+- Status real: `Deprecada/supersedida por TASK-1063 (2026-06-09). Projection parcial entregada queda como foundation; el resto del scope migró a TASK-1063.`
 - Rank: `TBD`
 - Domain: `agency|organization|data|finance|delivery|api|reliability`
 - Blocked by: `none`

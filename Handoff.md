@@ -1,3 +1,14 @@
+# Sesion 2026-06-09 — Context pack + Organization Workspace commits/push + TASK-1060 superseded
+
+Codex reviso el worktree completo para commit/push seguro, leyo los dos nuevos context docs y empujo `develop` hasta `4dd267c16`.
+
+- **Context docs nuevos:** `docs/context/13_icp-buyer-personas-jtbd.md` y `docs/context/14_modelo-negocio-asaas.md` leidos y commiteados en `585c7152a`; `00_INDEX.md` ahora los referencia y se limpiaron referencias a un `12` inexistente.
+- **Paquete Organization Workspace/brand/logo:** commit `4dd267c16` incluye polish del pop-up de logo, señales/labels/provenance, OTD/industry helpers y docs operativas. Verificado antes del push con lint, TypeScript, tests focales, build, route gate, design lint y GVC (`organization-logo-avatar-editor` local final `.captures/2026-06-09T07-58-13_organization-logo-avatar-editor`).
+- **Post-push task taxonomy:** aparecieron cambios nuevos de lifecycle: `TASK-1060` queda `complete`/deprecada y supersedida por `TASK-1063`; `TASK-1062` permanece como follow-up MCP/reliability sobre el contrato compact-signals heredado por TASK-1063. README/registry/referencias cruzadas sincronizadas en esta continuidad.
+- **Pendiente runtime:** no se verifico Vercel staging/prod para `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key`; el flujo IA esta code-pushed pero el rollout deployado requiere confirmar env var antes de declararlo operativo.
+
+---
+
 # Sesion 2026-06-09 — Org 360 facet wiring fix + AI logo generation (Claude, code complete en develop, sin push)
 
 Operador frenó a Codex y pidió a Claude continuar el cableado de los tabs de la vista de detalle de organización + sumar generación de logo con IA. Todo en `develop`, checkout compartido, **sin commit/push**. Se invocaron las skills `arch-architect` (diseño 4-pilar) y `greenhouse-ai-image-generator` (dirección de arte) por pedido explícito.
@@ -18,7 +29,7 @@ Operador pidio avanzar con TASK-1061 mientras TASK-1060 quedaba bajo re-plan. Se
 - **Data contract agregado:** `AccountDeliveryFacet.previousIcoMetrics` opcional; `fetchDeliveryFacet()` resuelve período ICO anterior desde el mismo source canonical para no hardcodear variaciones del mockup.
 - **Evidencia GVC:** mockup baseline promovido desde `.captures/2026-06-09T06-34-57_organization-workspace-enterprise-detail-mockup`; runtime quick fold validado en `.captures/2026-06-09T06-51-49_inline-agency-organizations-org-b9977f96-f7ef-4afb-bb26-7355d78c981f` (website visible, delivery default, métricas y deltas visibles).
 - **Verificacion:** eslint focal OK, `pnpm exec tsc --noEmit --pretty false` OK, `pnpm ops:lint --changed` OK. Full runtime scenario con baseline estable matcheo desktop/laptop/mobile en `delivery-first-fold`, `finance-facet`, `identity-facet`, `keyboard-facet-rail`; wide queda sin baseline durable por diseño.
-- **Nota de alcance:** TASK-1061 ya no es solo tokenizacion porque la paridad visual aprobada requeria recuperar website/default delivery/deltas reales. TASK-1060 sigue siendo el owner de compact sidecar/API projection; no cerrar 1060 aun.
+- **Nota de alcance:** TASK-1061 ya no es solo tokenizacion porque la paridad visual aprobada requeria recuperar website/default delivery/deltas reales. Estado actualizado: TASK-1060 fue deprecada/supersedida; TASK-1063 hereda compact sidecar/API projection + paridad mockup→runtime.
 
 ---
 
@@ -41,7 +52,7 @@ Operador pidio avanzar end-to-end con TASK-1059 y luego corrigio explicitamente:
 - **Estado actual:** code complete local sobre `develop`; no commit/push/deploy por checkout compartido. Runtime Agency detail corta directo a `OrganizationEnterpriseWorkspaceRuntime` y conserva projection/capabilities como gate.
 - **Implementado:** `src/views/greenhouse/organizations/OrganizationEnterpriseWorkspaceRuntime.tsx` consume detail + Account 360 + projects + finance summary; Delivery/Finance/Identity son canvases reales; facets restantes degradan honesto; CSC chart responsive sin clipping; scenario GVC runtime versionado.
 - **Evidencia:** `.captures/2026-06-09T02-15-20_organization-workspace-enterprise-detail-runtime` (desktop/laptop/mobile, 24 frames, `qualityFindings=[]`). Validado: eslint focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm ops:lint --changed` (solo warnings ajenos TASK-1020).
-- **Follow-up abierto:** `docs/tasks/to-do/TASK-1060-organization-workspace-compact-signals-projection.md` para compact signals/next actions/readiness projection del sidecar y API parity programatica.
+- **Follow-up abierto:** `docs/tasks/to-do/TASK-1063-organization-detail-mockup-runtime-parity-completion.md` para compact signals/next actions/readiness projection del sidecar, API parity programatica y gaps de paridad mockup→runtime.
 - **Guardrail:** cualquier gap backend/facet debe degradar honesto en UI y abrir task follow-up, no inventar datos completos en JSX.
 
 ---
