@@ -52,3 +52,71 @@ export const expectOrganizationWorkspaceShellReady = async (
     ).toHaveCount(0, { timeout: timeoutMs })
   }
 }
+
+type EnterpriseWorkspaceReadyOptions = {
+  /** Facet rail labels rendered as cards (text), e.g. 'Identidad', 'CRM', 'Servicios'. */
+  requiredFacets: string[]
+  /** Legacy OrganizationView role=tab names that must be absent (anti-regression). */
+  forbiddenLegacyTabs?: string[]
+  /** Enterprise KPI strip markers (exact text). */
+  positiveMarkers?: string[]
+  timeoutMs?: number
+}
+
+/**
+ * Canonical readiness gate for the Organization Enterprise Workspace Runtime
+ * (TASK-1016 / TASK-1059), the surface that replaced the TASK-612 facet-tab V2
+ * shell on the Agency entrypoint (`AgencyOrganizationWorkspaceClient` ->
+ * `OrganizationEnterpriseWorkspaceRuntime`).
+ *
+ * Differences vs `expectOrganizationWorkspaceShellReady` (still used by the
+ * Finance clients route, which keeps the V2 facet-tab shell):
+ *   - KPI strip labels are "Revenue período" / "Margen bruto" / "FTE total"
+ *     (not the exact "Revenue" the V2 shell used).
+ *   - Facets render as a clickable card rail (text), NOT MUI `role='tab'` tabs.
+ *
+ * Invariants preserved from the original TASK-612 V1.1 smoke:
+ *   1. NO degraded mode banner (ISSUE-071 anti-regression).
+ *   2. Canonical workspace markers visible (enterprise KPI strip).
+ *   3. Anti-regression vs legacy `OrganizationView` (its `role='tab'` tabs absent).
+ */
+export const expectOrganizationEnterpriseWorkspaceReady = async (
+  page: Page,
+  {
+    requiredFacets,
+    forbiddenLegacyTabs = [],
+    positiveMarkers = ['Revenue período', 'Margen bruto'],
+    timeoutMs = 20_000
+  }: EnterpriseWorkspaceReadyOptions
+) => {
+  for (const marker of positiveMarkers) {
+    await expect(
+      page.getByText(marker, { exact: true }).first(),
+      `Organization Enterprise Workspace marker "${marker}" debe estar visible antes de validar facets`
+    ).toBeVisible({ timeout: timeoutMs })
+  }
+
+  await expect(
+    page.getByText('Workspace en modo degradado'),
+    'Organization Enterprise Workspace no debe quedar en modo degradado'
+  ).toHaveCount(0, { timeout: timeoutMs })
+
+  // Facet labels appear many times across the rich enterprise runtime (KPI
+  // helpers, tables, drawers), so scope the assertion to the canonical facet
+  // rail nav (`data-capture` test hook) — unambiguous and meaningful.
+  const facetRail = page.locator('[data-capture="organization-enterprise-facet-rail"]')
+
+  for (const facet of requiredFacets) {
+    await expect(
+      facetRail.getByText(facet, { exact: true }).first(),
+      `Organization Enterprise Workspace debe exponer el facet "${facet}" en el facet rail`
+    ).toBeVisible({ timeout: timeoutMs })
+  }
+
+  for (const tabName of forbiddenLegacyTabs) {
+    await expect(
+      page.getByRole('tab', { name: tabName }),
+      `Organization Enterprise Workspace no debe exponer la tab legacy "${tabName}"`
+    ).toHaveCount(0, { timeout: timeoutMs })
+  }
+}
