@@ -7,7 +7,13 @@ const mockQuery = vi.fn()
 vi.mock('@/lib/postgres/client', () => ({
   onGreenhousePostgresReset: () => () => {},
   isGreenhousePostgresRetryableConnectionError: () => false,
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockQuery(...args),
+  // Re-exported by `@/lib/db` and pulled into the import graph via
+  // `reporting-hierarchy/access.ts` (org-scoping). Without it the module fails
+  // to load under the full suite. Callback-invoking stub mirrors the canonical
+  // mock pattern (monthly-run.test.ts) so any tx path runs its callback.
+  withGreenhousePostgresTransaction: (cb: (client: unknown) => unknown) =>
+    cb({ query: (...args: unknown[]) => mockQuery(...args) })
 }))
 
 vi.mock('@/lib/account-360/id-generation', () => ({

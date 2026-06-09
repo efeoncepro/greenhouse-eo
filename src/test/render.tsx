@@ -12,6 +12,13 @@ import type { RenderOptions } from '@testing-library/react'
 // `theme.greenhouseElevation.<role>` test against the canonical values.
 import { elevationTokens } from '@/components/theme/elevation-tokens'
 
+// Greenhouse semantic feedback tokens (TASK-1053 Restraint v1) — real SoT factory
+// (pure: only type + axis token data imports, no next/font), so primitives reading
+// `theme.greenhouseSemantic.<role>` (StateTransition, InlineDecisionPrompt,
+// EvidenceAttachmentDropzone, FieldProvenancePeek, MetricBreakdownChartCard) test
+// against the canonical values instead of crashing on an undefined token.
+import { greenhouseSemanticTokens } from '@/components/theme/greenhouse-semantic-tokens'
+
 // Mirrors the Greenhouse shape tokens (GREENHOUSE_DESIGN_TOKENS_V1.md §5.1) so
 // primitives that consume `theme.shape.customBorderRadius.*` can be unit-tested
 // without pulling the full Vuexy theme graph. TASK-946 — extends with
@@ -30,6 +37,7 @@ const theme = createTheme({
     }
   },
   greenhouseElevation: elevationTokens('light'),
+  greenhouseSemantic: greenhouseSemanticTokens('light'),
   palette: {
     customColors: {
       bodyBg: '#F8F9FA',

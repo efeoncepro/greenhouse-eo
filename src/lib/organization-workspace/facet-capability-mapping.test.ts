@@ -14,10 +14,11 @@ describe('TASK-611 — capability + view mappings', () => {
     expect(ENTITLEMENT_MODULES).toContain('organization')
   })
 
-  it('declares 11 organization.* capabilities in catalog', () => {
+  it('declares 12 organization.* capabilities in catalog', () => {
     const organizationKeys = Object.keys(ENTITLEMENT_CAPABILITY_MAP).filter(key => key.startsWith('organization.'))
 
     expect(organizationKeys.sort()).toEqual([
+      'organization.brand_asset',
       'organization.crm',
       'organization.delivery',
       'organization.economics',
@@ -67,10 +68,9 @@ describe('TASK-611 — capability + view mappings', () => {
     // 11 originales TASK-611 (Organization Workspace projection facets) + 3 nuevas
     // TASK-872 (scim.eligibility_override.create / .delete + scim.backfill.execute) +
     // 5 nuevas TASK-877 (identity.reconciliation.{read, approve, reject, reassign, run})
-    // = 19 total. Pin actualizado 2026-05-14 al detectar regression preexistente
-    // (TASK-877 ship con módulo='organization' para las identity.reconciliation.*
-    // sin actualizar este test → CI failing en cada commit posterior).
-    expect(organizationCapabilities).toHaveLength(19)
+    // + 1 nueva TASK-999 (organization.brand_asset — brand asset enrichment) = 20 total.
+    // Pin actualizado 2026-05-14 (TASK-877) y 2026-06-09 (TASK-999 brand_asset).
+    expect(organizationCapabilities).toHaveLength(20)
 
     for (const capability of organizationCapabilities) {
       expect(capability.actions.length, `${capability.key} must have at least one action`).toBeGreaterThan(0)
