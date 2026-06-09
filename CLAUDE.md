@@ -2,7 +2,14 @@
 
 ## Project Overview
 
-Greenhouse EO — portal operativo de Efeonce Group. Next.js 16 App Router + MUI 7.x + Vuexy starter-kit + TypeScript 5.9. Deploy en Vercel.
+Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del modelo ASaaS. Next.js 16 App Router + MUI 7.x + Vuexy starter-kit + TypeScript 5.9. Deploy en Vercel. "EO" es solo abreviatura del repo, no nombre de producto ni copy visible.
+
+### Business Context Pack
+
+- `docs/context/` es el context pack de negocio, marca, GTM, producto y experiencia cliente de Efeonce/Greenhouse. Empezar por `docs/context/00_INDEX.md`.
+- Usarlo antes de proponer o construir features que toquen producto, UX/copy, naming, metricas, HubSpot/Account 360, onboarding/cliente, GTM, marca o estrategia comercial.
+- Carga selectiva: `05_voz-tono-estilo.md` para copy visible, `06_glosario-metricas.md` para metricas/naming, `07_ico.md` para ICO, `08_estrategia-comercial.md` para prioridad comercial, `09_marca-agencia.md` para marca Efeonce, `10_experiencia-cliente.md` para journey/onboarding y `11_hubspot-bowtie.md` para sync/lifecycle HubSpot.
+- El context pack alinea el negocio; no reemplaza arquitectura vigente, runtime real, `DESIGN.md`, specs tecnicas ni contratos de datos. Si hay drift, prevalece el contrato tecnico verificado y se documenta.
 
 ### Operator Communication Style
 
