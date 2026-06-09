@@ -65,7 +65,10 @@ describe('getReleaseDeployDurationSignal', () => {
   })
 
   it('severity ok when p95 < 30min (steady)', async () => {
-    const baseStart = new Date('2026-05-10T10:00:00.000Z').getTime()
+    // Relative to now (1 day ago) so fixtures stay inside the signal's 30-day
+    // window regardless of run date. (Was hardcoded 2026-05-10, which aged out
+    // of the window and made these tests fail ~30 days later — time-bomb fixture.)
+    const baseStart = Date.now() - 24 * 60 * 60 * 1000
 
     // 5 releases con duraciones 5, 10, 15, 20, 25 min — p95 = 25 min < 30 min
     const releases = [5, 10, 15, 20, 25].map((minutes, idx) =>
@@ -86,7 +89,10 @@ describe('getReleaseDeployDurationSignal', () => {
   })
 
   it('severity warning when 30 <= p95 < 60 min', async () => {
-    const baseStart = new Date('2026-05-10T10:00:00.000Z').getTime()
+    // Relative to now (1 day ago) so fixtures stay inside the signal's 30-day
+    // window regardless of run date. (Was hardcoded 2026-05-10, which aged out
+    // of the window and made these tests fail ~30 days later — time-bomb fixture.)
+    const baseStart = Date.now() - 24 * 60 * 60 * 1000
 
     const releases = [10, 25, 35, 45, 50].map((minutes, idx) =>
       buildManifest({
@@ -105,7 +111,10 @@ describe('getReleaseDeployDurationSignal', () => {
   })
 
   it('severity error when p95 >= 60 min', async () => {
-    const baseStart = new Date('2026-05-10T10:00:00.000Z').getTime()
+    // Relative to now (1 day ago) so fixtures stay inside the signal's 30-day
+    // window regardless of run date. (Was hardcoded 2026-05-10, which aged out
+    // of the window and made these tests fail ~30 days later — time-bomb fixture.)
+    const baseStart = Date.now() - 24 * 60 * 60 * 1000
 
     const releases = [10, 30, 60, 90, 120].map((minutes, idx) =>
       buildManifest({
@@ -123,7 +132,10 @@ describe('getReleaseDeployDurationSignal', () => {
   })
 
   it('filters out non-released states (degraded, aborted, in-flight)', async () => {
-    const baseStart = new Date('2026-05-10T10:00:00.000Z').getTime()
+    // Relative to now (1 day ago) so fixtures stay inside the signal's 30-day
+    // window regardless of run date. (Was hardcoded 2026-05-10, which aged out
+    // of the window and made these tests fail ~30 days later — time-bomb fixture.)
+    const baseStart = Date.now() - 24 * 60 * 60 * 1000
 
     const releases = [
       buildManifest({
