@@ -14,7 +14,7 @@
 
 | Si vas a... | Lee |
 |---|---|
-| Decidir si una feature vale la pena / priorizar | `00_INDEX` (este archivo) + `02_gtm` + `08_estrategia-comercial` |
+| Decidir si una feature vale la pena / priorizar | `00_INDEX` (este archivo) + `02_gtm` + `08_estrategia-comercial` + `13_icp-buyer-personas-jtbd` + `14_modelo-negocio-asaas` |
 | Tocar UX copy, microcopy, vacíos, errores, emails | `05_voz-tono-estilo` + `09_marca-agencia` |
 | Nombrar una métrica, propiedad, columna o KPI | `06_glosario-metricas` |
 | Entender el sistema de medición (ICO Engine, bonos, dashboards) | `07_ico` + `06_glosario-metricas` |
@@ -24,6 +24,8 @@
 | Cuidar marca/branding en el portal (Ecosystem Tour, onboarding, naming) | `09_marca-agencia` |
 | Diseñar la experiencia/onboarding del cliente en el portal | `10_experiencia-cliente` |
 | Tocar el sync con HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
+| Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
+| Evaluar ASaaS, tiers, switching cost, self-service o monetizacion | `14_modelo-negocio-asaas` |
 
 **Enganche desde el repo.** Este archivo está pensado para referenciarse desde el `CLAUDE.md` / `AGENTS.md` de Greenhouse. Sugerencia de línea en ese archivo raíz:
 
@@ -32,6 +34,8 @@
 Antes de proponer o construir features, lee `greenhouse-context/00_INDEX.md`.
 Es el North Star de producto. No lo ignores por "ir más rápido".
 ```
+
+Ruta vigente en este repo: `docs/context/00_INDEX.md`.
 
 ---
 
@@ -108,6 +112,8 @@ El roadmap ASaaS ya nombra dónde duele. Si buscas dónde aportar, empieza aquí
 | `09_marca-agencia.md` | Arquitectura de marca (masterbrand + capabilities), sistema verbal, posicionamiento, elevator pitch, messaging por audiencia, reglas de comunicación. |
 | `10_experiencia-cliente.md` | Greenhouse como sistema de experiencia: journey de 8 fases + 2 transversales mapeado a módulos, artefactos de marca (Ecosystem Tour, "Tu año con Efeonce"), métricas de adopción. |
 | `11_hubspot-bowtie.md` | Arquitectura HubSpot: 3 pipelines de deals, properties custom, y Bow-tie (lifecycle dual 7/12 stages + motion booleans) con los **internal names exactos** para el sync de Account 360. |
+| `13_icp-buyer-personas-jtbd.md` | ICPs, buyer personas y Jobs-to-be-Done. Traduce dolores comerciales en prioridades de producto por usuario y tier de entrada. |
+| `14_modelo-negocio-asaas.md` | Modelo ASaaS recalibrado: switching cost, self-service, tiers, monetizacion recurrente y roadmap de exposicion/adopcion. |
 
 ---
 
