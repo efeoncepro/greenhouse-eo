@@ -40,7 +40,7 @@
     "test:e2e:setup": "node scripts/playwright-auth-setup.mjs",
     "test:inventory": "tsx scripts/test-inventory.ts",
     "test:lint-rules": "node --test eslint-plugins/greenhouse/rules/__tests__/*.test.mjs",
-    "test:results": "mkdir -p artifacts/tests && vitest run --reporter=default --reporter=json --outputFile=artifacts/tests/results.json 2>&1 | tee artifacts/tests/vitest.log",
+    "test:results": "bash scripts/ci/vitest-with-log.sh",
     "test:coverage": "mkdir -p artifacts/coverage && vitest run --coverage",
     "test:observability:summary": "tsx scripts/test-observability-summary.ts",
     "test:observability": "pnpm test:inventory && pnpm test:results && pnpm test:coverage && pnpm test:observability:summary",
