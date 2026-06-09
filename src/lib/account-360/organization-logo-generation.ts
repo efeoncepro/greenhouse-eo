@@ -3,25 +3,30 @@ import 'server-only'
 import { generateOpenAIImage } from '@/lib/ai/openai-image'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { createPrivatePendingAsset, type GreenhouseAssetRecord } from '@/lib/storage/greenhouse-assets'
+import { createPrivatePendingAsset } from '@/lib/storage/greenhouse-assets'
+import type { GreenhouseAssetRecord } from '@/types/assets'
 
 import { OrganizationBrandAssetError } from './organization-brand-assets'
 
 /**
  * AI logo generation for client organizations (TASK-999 brand-asset foundation).
  *
- * Produces an ORIGINAL brand mark with OpenAI gpt-image-2 (opaque background — the operator chose
- * max precision over transparency) and persists it as an `organization_logo_draft` private asset.
- * It does NOT attach the logo — the operator reviews the result and then applies it through the
- * existing `attachOrganizationLogoAsset` flow (which re-checks the operating-entity guardrail).
+ * RECREATES the company's REAL brand logo with OpenAI gpt-image-2 (opaque background — the operator
+ * chose max precision over transparency) from the model's own knowledge of that company, and
+ * persists it as an `organization_logo_draft` private asset. It does NOT attach the logo — the
+ * operator reviews the result (it is an AI approximation of the real mark) and then applies it
+ * through the existing `attachOrganizationLogoAsset` flow (which re-checks the operating-entity
+ * guardrail). For the exact, pixel-perfect official logo the operator can still use the URL/upload
+ * paths in the same pop-up.
  *
  * Hard guardrails:
  * - Reuses the canonical `organization.brand_asset` capability gate at the route boundary.
  * - Fails fast (before spending an OpenAI call) when the org is an operating entity — Efeonce /
  *   Greenhouse / operating-entity logos are never generated or replaced here.
- * - Generates an ORIGINAL mark inspired by the name/sector; the prompt explicitly forbids copying
- *   any real-world trademark (greenhouse-ai-image-generator skill constraint) and forbids rendered
- *   text (image models garble it).
+ * - Targets CLIENT organizations only and renders the result for internal account display; the
+ *   operator reviews before committing. (This deliberately overrides the greenhouse-ai-image-generator
+ *   default of "never reproduce a real trademark" per explicit operator decision: the org avatar
+ *   should show the client's actual brand, not an invented mark.)
  */
 
 type OrganizationLogoOrgRow = {
@@ -63,16 +68,16 @@ const buildLogoPrompt = ({
   industry: string | null
   hint: string
 }): string => {
-  const industryClause = industry ? ` operating in the ${industry} sector` : ''
-  const hintClause = hint ? ` Operator art direction: ${hint}.` : ''
+  const industryClause = industry ? ` (a company in the ${industry} sector)` : ''
+  const hintClause = hint ? ` Operator note: ${hint}.` : ''
 
   return [
-    `Design a single, original, modern, minimalist brand logo MARK (one abstract geometric symbol or emblem) for a company called "${organizationName}"${industryClause}.`,
-    'The mark must be ORIGINAL — inspired by the name and sector, NOT a reproduction of any existing real-world brand, trademark or logo.',
-    'Center one clean iconic symbol on a solid flat opaque background with generous even padding and balanced negative space.',
-    'Flat vector aesthetic, crisp clean edges, a restrained palette of at most three colors, geometric, professional, enterprise and trustworthy, instantly recognizable as a small app or avatar icon.',
+    `Recreate the REAL, official brand logo of the company "${organizationName}"${industryClause}, as accurately and faithfully as you know it from your own knowledge.`,
+    'Reproduce the genuine logo — its actual logomark/symbol, real brand colors, proportions and visual style. Do NOT invent a new, alternative or stylized design; assign the authentic brand identity.',
+    'Center the logo on a solid flat opaque background with generous even padding, presented cleanly as a square brand avatar icon.',
+    'If the brand logo includes its name as a wordmark, render that text crisply and correctly in the brand’s actual typographic style; if you are unsure of the exact letterforms, favor the brand’s iconic symbol or monogram rather than guessing text.',
     hintClause,
-    'Do NOT render any text, letters, words, monograms, initials, numbers or taglines. No photographic realism, no busy 3D, no heavy gradients, no drop shadows, no mockup scene, no border frame, no watermark.'
+    'No mockup scene, no extra invented graphics, no drop shadows, no border frame, no watermark, no caption text.'
   ]
     .filter(Boolean)
     .join(' ')
@@ -115,7 +120,11 @@ export const generateOrganizationLogoDraft = async (
       background: 'opaque',
       format: 'png',
       size: '1024x1024',
-      quality: 'high'
+      // A flat geometric logo mark does not need the 'high' photographic tier (which can exceed the
+      // 125s default timeout). 'medium' keeps the precise gpt-image-2 model with a popup-friendly
+      // latency; the extended timeout gives headroom for slow generations.
+      quality: 'medium',
+      timeoutMs: 180_000
     })
   } catch (error) {
     captureWithDomain(error, 'agency', {

@@ -86,12 +86,14 @@ const GreenhouseKpiDelta = ({
   sx,
   dataCapture
 }: GreenhouseKpiDeltaProps) => {
-  const direction = resolveKpiDeltaDirection(value, neutralThreshold, invert)
-  const isUp = value > 0
-  const trend = value === 0 ? 'flat' : isUp ? 'up' : 'down'
+  const roundedValue = Number(value.toFixed(fractionDigits))
+  const normalizedValue = Object.is(roundedValue, -0) ? 0 : roundedValue
+  const direction = resolveKpiDeltaDirection(normalizedValue, neutralThreshold, invert)
+  const isUp = normalizedValue > 0
+  const trend = normalizedValue === 0 ? 'flat' : isUp ? 'up' : 'down'
 
-  const sign = value > 0 ? '+' : value < 0 ? '−' : ''
-  const magnitude = Math.abs(value).toFixed(fractionDigits)
+  const sign = normalizedValue > 0 ? '+' : normalizedValue < 0 ? '−' : ''
+  const magnitude = Math.abs(normalizedValue).toFixed(fractionDigits)
   const suffix = format === 'percent' ? '%' : unit ? ` ${unit}` : ''
   const text = `${sign}${magnitude}${suffix}`
 
@@ -101,6 +103,8 @@ const GreenhouseKpiDelta = ({
   const computedAria =
     ariaLabel ??
     `${sign === '−' ? 'baja' : sign === '+' ? 'sube' : 'sin cambio'} ${magnitude}${format === 'percent' ? ' por ciento' : unit ? ` ${unit}` : ''}`
+
+  const shouldShowIcon = !hideIcon && trend !== 'flat'
 
   return (
     <Box
@@ -133,7 +137,7 @@ const GreenhouseKpiDelta = ({
         }
       }}
     >
-      {!hideIcon && <i aria-hidden className={ICON_BY_TREND[trend]} style={{ fontSize: iconSize }} />}
+      {shouldShowIcon && <i aria-hidden className={ICON_BY_TREND[trend]} style={{ fontSize: iconSize }} />}
       {text}
     </Box>
   )

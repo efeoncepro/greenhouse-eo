@@ -20,6 +20,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import { GH_ORGANIZATION_WORKSPACE } from '@/lib/copy/agency'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+import { hubspotIndustryLabel } from '@/config/hubspot-industries'
 
 import OrganizationLogoAvatarEditor from './OrganizationLogoAvatarEditor'
 
@@ -135,6 +136,7 @@ const OrganizationWorkspaceShell = ({
   const statusColor = STATUS_COLOR[organization.status] ?? 'secondary'
   const statusLabel = resolveStatusLabel(organization.status)
   const flag = organization.country ? (COUNTRY_FLAGS[organization.country] ?? '') : ''
+  const industryLabel = hubspotIndustryLabel(organization.industry)
 
   const fallbackInitials =
     organization.organizationName
@@ -209,9 +211,9 @@ const OrganizationWorkspaceShell = ({
                         {flag} {organization.country}
                       </Typography>
                     )}
-                    {organization.industry && (
+                    {industryLabel && (
                       <Typography variant='body2' color='text.secondary'>
-                        {organization.industry}
+                        {industryLabel}
                       </Typography>
                     )}
                     {organization.publicId && (

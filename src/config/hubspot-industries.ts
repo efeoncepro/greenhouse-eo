@@ -167,9 +167,32 @@ export const HUBSPOT_INDUSTRIES: HubSpotIndustryOption[] = [
 const LABEL_BY_VALUE = new Map(HUBSPOT_INDUSTRIES.map(o => [o.value, o.label]))
 const VALUE_BY_LABEL = new Map(HUBSPOT_INDUSTRIES.map(o => [o.label.toLowerCase(), o.value]))
 
+const TECHNICAL_VALUE_PATTERN = /^[A-Z0-9]+(?:_[A-Z0-9]+)+$/
+const SMALL_WORDS = new Set(['and', 'or', 'of', 'the'])
+
+const titleCaseTechnicalValue = (value: string): string =>
+  value
+    .toLowerCase()
+    .split(/[_\s]+/)
+    .filter(Boolean)
+    .map((word, index) => {
+      if (index > 0 && SMALL_WORDS.has(word)) return word
+
+      return `${word.charAt(0).toUpperCase()}${word.slice(1)}`
+    })
+    .join(' ')
+
+const fallbackIndustryLabel = (value: string): string =>
+  TECHNICAL_VALUE_PATTERN.test(value) ? titleCaseTechnicalValue(value) : value
+
 /** Resolve the display label for a stored HubSpot industry value. */
-export const hubspotIndustryLabel = (value: string | null | undefined): string | null =>
-  value ? LABEL_BY_VALUE.get(value) ?? value : null
+export const hubspotIndustryLabel = (value: string | null | undefined): string | null => {
+  const trimmed = value?.trim()
+
+  if (!trimmed) return null
+
+  return LABEL_BY_VALUE.get(trimmed) ?? fallbackIndustryLabel(trimmed)
+}
 
 /** Find the option for a stored value (Autocomplete value object). */
 export const hubspotIndustryOption = (value: string | null | undefined): HubSpotIndustryOption | null =>

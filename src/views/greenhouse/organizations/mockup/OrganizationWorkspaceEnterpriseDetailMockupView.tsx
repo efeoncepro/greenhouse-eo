@@ -124,7 +124,7 @@ const facetDetails: Record<EnterpriseFacetKey, { heading: string; description: s
 
 const contextFacetRows: Record<Exclude<EnterpriseFacetKey, 'delivery' | 'finance'>, string[][]> = {
   identity: [
-    ['Legal profile', 'Efeonce Group SpA customer record', 'Verified', 'AXIS Core'],
+    ['Legal profile', 'Efeonce Group SpA customer record', 'Verified', 'Greenhouse'],
     ['Brand asset', 'Logo and public domain attached', 'Fresh', 'Brand registry'],
     ['CRM mapping', 'HubSpot company + stakeholder contacts', 'Healthy', 'HubSpot'],
     ['Knowledge base', 'Notion operating page linked', 'Healthy', 'Notion']
@@ -133,7 +133,7 @@ const contextFacetRows: Record<Exclude<EnterpriseFacetKey, 'delivery' | 'finance
     ['Commercial workspace', '21 core memberships', 'Healthy', 'Spaces'],
     ['Delivery workspace', '5 active project rooms', 'Healthy', 'Operations'],
     ['Finance workspace', '32 finance records mapped', 'Partial', 'Finance Clients'],
-    ['Orphan scan', '0 orphan spaces', 'Healthy', 'AXIS Core']
+    ['Orphan scan', '0 orphan spaces', 'Healthy', 'Greenhouse']
   ],
   team: [
     ['Leadership', '14 accountable roles', 'Healthy', 'Identity'],
@@ -379,7 +379,7 @@ const OrganizationMasthead = () => {
               <MetaItem icon='tabler-building-skyscraper' label='Airlines & Aviation' />
               <MetaItem icon='tabler-id' label='EO-ORG-0011' />
               <MetaItem icon='tabler-world' label='skyairline.com' tone='primary' />
-              <MetaItem icon='tabler-database' label='Source: AXIS Core' />
+              <MetaItem icon='tabler-database' label='Fuente: Greenhouse' />
             </Stack>
           </Stack>
         </Stack>
@@ -1061,7 +1061,7 @@ const AccountSidecar = () => (
       <SidecarSection title='Procedencia de datos' action='Ver linaje'>
         <Stack spacing={1.5}>
           {[
-            ['Sistema fuente', 'AXIS Core'],
+            ['Sistema fuente', 'Greenhouse'],
             ['Última sincronización', 'Hoy 08:35'],
             ['Cobertura', '98%'],
             ['Cache 360', 'fresh']

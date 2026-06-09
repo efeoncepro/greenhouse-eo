@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
+import { hubspotIndustryLabel } from '@/config/hubspot-industries'
+
 import type { OrganizationDetailData } from './types'
 
 type Props = {
@@ -42,6 +44,7 @@ const STATUS_LABEL: Record<string, string> = {
 const OrganizationLeftSidebar = ({ detail, isAdmin, syncing, onEditOrganization, onSyncHubspot }: Props) => {
   const initial = detail.organizationName.charAt(0).toUpperCase()
   const flag = detail.country ? COUNTRY_FLAGS[detail.country.toUpperCase()] ?? '🌐' : null
+  const industryLabel = hubspotIndustryLabel(detail.industry)
 
   return (
     <Card>
@@ -61,8 +64,8 @@ const OrganizationLeftSidebar = ({ detail, isAdmin, syncing, onEditOrganization,
         </CustomAvatar>
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant='h5'>{detail.organizationName}</Typography>
-          {detail.industry && (
-            <Typography variant='body2' color='text.secondary'>{detail.industry}</Typography>
+          {industryLabel && (
+            <Typography variant='body2' color='text.secondary'>{industryLabel}</Typography>
           )}
         </Box>
         <CustomChip

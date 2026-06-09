@@ -46,6 +46,12 @@ export const scenario: CaptureScenario = {
   ],
   steps: [
     { kind: 'click', selector: '[data-capture="organization-logo-avatar-trigger"]' },
-    { kind: 'mark', label: 'avatar-editor-open', clipSelector: '[data-capture="organization-logo-avatar-editor"]', note: 'Avatar-triggered logo editor pop-up' }
+    { kind: 'mark', label: 'avatar-editor-open', clipSelector: '[data-capture="organization-logo-avatar-editor"]', note: 'Upload method (default)' },
+    { kind: 'click', selector: '[data-capture="organization-logo-avatar-editor"] button[value="ai"]' },
+    { kind: 'sleep', ms: 500 },
+    { kind: 'mark', label: 'ai-method', clipSelector: '[data-capture="organization-logo-avatar-editor"]', note: 'Generar con IA method panel' },
+    { kind: 'click', selector: '[data-capture="organization-logo-avatar-editor"] button[value="url"]' },
+    { kind: 'sleep', ms: 500 },
+    { kind: 'mark', label: 'url-method', clipSelector: '[data-capture="organization-logo-avatar-editor"]', note: 'Desde URL method panel' }
   ]
 }

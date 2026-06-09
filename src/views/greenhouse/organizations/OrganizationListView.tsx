@@ -33,6 +33,7 @@ import { motion } from '@/libs/FramerMotion'
 import { getMicrocopy } from '@/lib/copy'
 import { GH_CLIENT_ONBOARDING } from '@/lib/copy/client-onboarding'
 import { formatDate } from '@/lib/format'
+import { hubspotIndustryLabel } from '@/config/hubspot-industries'
 
 type OnboardingStatus = 'draft' | 'in_progress' | 'blocked'
 type ViewMode = 'workbench' | 'matrix'
@@ -812,7 +813,7 @@ function OrganizationRow({ item, selected, onSelect }: { item: OrganizationListI
                 <StatusPill label={risk.label} tone={risk.tone} icon={risk.icon} />
               </Stack>
               <Typography variant='caption' color='text.secondary'>
-                {item.publicId} · {item.country ?? 'Sin pais'} · {item.industry ?? 'Sin industria'}
+                {item.publicId} · {item.country ?? 'Sin pais'} · {hubspotIndustryLabel(item.industry) ?? 'Sin industria'}
               </Typography>
             </Stack>
           </Stack>

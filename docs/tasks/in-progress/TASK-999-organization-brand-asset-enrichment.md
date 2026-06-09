@@ -400,6 +400,15 @@ El plan puede colapsar eventos si el event catalog vigente recomienda granularid
 - Account 360 readers, `organization_360` DTOs, Organization list/detail/sidebar/workspace headers now consume `logoUrl` with stable fallback.
 - ADR added: `docs/architecture/GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md`.
 
+### 2026-06-09 — AI logo generation (gpt-image-2) added to the logo pop-up (Claude)
+
+- New server-only command `generateOrganizationLogoDraft` (`src/lib/account-360/organization-logo-generation.ts`) + route `POST /api/organizations/[id]/brand-assets/logo/generate`. Same `organization.brand_asset` gate + **fail-fast `is_operating_entity` guard BEFORE the paid OpenAI call**. Uses `gpt-image-2` opaque background; persists the result as an `organization_logo_draft` private asset; the operator reviews and applies via the existing `attachOrganizationLogoAsset` flow.
+- **Prompt = explicit operator override** of the `greenhouse-ai-image-generator` "never reproduce a trademark" default: it **recreates the company's REAL brand logo** from the model's knowledge (an approximation; the exact logo still comes via upload/URL). Rationale + contract: ADR Delta 2026-06-09.
+- `gpt-image-2` is **raster only** (PNG/WebP/JPEG) — no SVG.
+- UI: `OrganizationLogoAvatarEditor.tsx` gains a "Generar con IA" section; es-CL copy in `src/lib/copy/agency.ts` (`logoAi*`). Failures → `captureWithDomain('agency', { source: 'organization_logo_ai_generate' })` + sanitized 502.
+- **Runtime requirement (Rollout Completion Gate):** `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key` must exist in every env. Added to local `.env.local` + dev server restarted (verified live: gpt-image-2 produced a recognizable Sky Airline logo, persisted, assetId returned via the HTTP route). **Vercel staging/prod env var still to confirm.**
+- **Pop-up redesigned to enterprise level (same session, product-design skills + GVC loop):** `OrganizationLogoAvatarEditor` went from 3 stacked forms + button soup to a **segmented method selector** (Subir · Generar con IA · Desde URL, one at a time) + clean Actual→Vista previa preview (real avatars, no "VS" boxes) + **single primary** (`Guardar logo` solid; method actions outlined) + condensed governance line + honest states (AI "~1 min" estimate). **Modern non-cliché microinteractions** (framer-motion + motion tokens, `reduced-motion` baked via `useReducedMotion`): method cross-fade+slide, new-logo reveal scale/fade, anticipatory AI loading (the slot breathes while generating, not a spinner). Reuse not new primitive (`GreenhouseFloatingSurface` + tokenized `ToggleButtonGroup` + primitives + es-CL copy). GVC desktop+mobile green, **0 a11y errors** (contrast + label fixed). tsc 0 · lint 0.
+
 Still pending before task completion:
 
 - discovery worker / scheduled fetch and candidate download;

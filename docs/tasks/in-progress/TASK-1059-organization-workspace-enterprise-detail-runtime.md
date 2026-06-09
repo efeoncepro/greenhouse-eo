@@ -294,6 +294,18 @@ Task creada despues de aprobacion visual del mockup enterprise detail. Evidence 
 - Runtime GVC final: `.captures/2026-06-09T02-15-20_organization-workspace-enterprise-detail-runtime` (desktop, laptop, mobile; 24 frames; `qualityFindings=[]`; dossier `review-dossier.md` generado).
 - Estado de cierre: `code complete local`; no se movio a `complete/` ni se hizo push por instruccion explicita del operador de no cambiar rama/coordinar con Claude en el checkout compartido.
 
+## Facet Wiring Hardening Delta 2026-06-09 (Claude)
+
+Los tabs del runtime salian vacios (Equipo, Entrega/ICO, Economia) aunque el legacy tenia datos. Causa raiz: los readers canonicos del 360 ocultaban drift de schema/scope tras `.catch(() => [])` (indistinguible de "sin datos"). Fixes en la capa canonica (todo consumer del 360 se beneficia):
+
+- **team** (`facets/team.ts`): filtro temporal NULL-safe — los contactos HubSpot tienen `start_date NULL` y `start_date <= asOf` los borraba.
+- **delivery** (`facets/delivery.ts`): join `project_record_id`; conteo de tareas por `task-status-canonical` (`task_status` en español, no `status='completed'`); **fallback ICO a BigQuery `ico_engine.metrics_by_organization`** (keyed por `spaces.client_id`, no org_id; tablas serving PG vacias).
+- **economics** (`facets/economics.ts`): `period_closure_status.period_closed` no existe → derivar de `closure_status='closed'`.
+- **ico-source resolver** (`organization-ico-metrics-source.ts`): columnas inexistentes (`organization_360.source_id`, `spaces.external_source_id`) → `spaces.client_id`.
+- **Endurecimiento (causa raiz):** nuevo `facet-observability.ts` (`observeAndRethrow` primario → `_meta.errors` + Sentry; `observeAndDegrade` enriquecimiento) — destapo 2 drifts mas ocultos (`period_closed`, `tasks.status`). Guard live `account-complete-360.live.test.ts`.
+- **Verificado live (Sky):** 9 facets, 0 errores, team=21, delivery tasks=4208 + ICO rpa/otd/ftr, economics presente; org sin data degrada honesto. tsc 0 · lint 0 · diseño visual intacto. GVC frames delivery+team con datos reales.
+- Contrato canonico pinneado en CLAUDE.md "Account 360 facet readers — anti silent-catch contract". Pendiente commit/push por checkout compartido.
+
 ## Open Questions
 
 - Canonical local GVC fixture usado: `org-b9977f96-f7ef-4afb-bb26-7355d78c981f` (`Sky Airline`).

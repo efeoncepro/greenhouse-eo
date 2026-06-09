@@ -400,14 +400,21 @@ export const GH_ORGANIZATION_WORKSPACE = {
       logoLegalProtectionNotice:
         'Los logos institucionales o legales están protegidos y se gestionan en el entorno corporativo. Este logo es exclusivo para esta organización.',
       protected: 'Protegido',
-      logoAiLabel: 'Pista de estilo (opcional)',
-      logoAiPlaceholder: 'Ej: símbolo minimalista, paleta azul, sector aviación',
+      logoAiLabel: 'Indicación adicional (opcional)',
+      logoAiPlaceholder: 'Ej: usa la versión a color, fondo blanco',
       logoAiGenerate: 'Generar con IA',
       logoAiGenerating: 'Generando logo con IA…',
       logoAiHelper:
-        'Crea una marca original con IA a partir del nombre y tu pista. Es un diseño nuevo, no una copia del logo real; revísalo antes de guardar.',
-      logoAiRequired: 'Escribe una pista de estilo o deja el campo vacío para usar solo el nombre.',
-      logoAiFailed: 'No pudimos generar el logo. Intenta de nuevo o ajusta la pista.'
+        'La IA reconstruye el logo real de la empresa a partir de su conocimiento de la marca. Es una aproximación: revísala antes de guardar. Para el logo exacto, usa subir archivo o la URL del sitio.',
+      logoAiRequired: 'Escribe una indicación o deja el campo vacío para usar solo el nombre.',
+      logoAiFailed: 'No pudimos generar el logo. Intenta de nuevo o ajusta la indicación.',
+      logoAiEstimate: 'Puede tardar hasta ~1 minuto.',
+      logoMethodAria: 'Cómo cambiar el logo',
+      logoMethodUpload: 'Subir',
+      logoMethodAi: 'Generar con IA',
+      logoMethodUrl: 'Desde URL',
+      logoCurrentEmpty: 'Sin logo',
+      logoReadyToSave: 'Listo para guardar'
     },
     kpis: {
       revenue: {
@@ -505,6 +512,26 @@ export const GH_ORGANIZATION_WORKSPACE = {
       available: 'Disponible',
       noData: 'Sin datos'
     },
+    provenance: {
+      mastheadPrefix: 'Fuente',
+      sourceSystemLabel: 'Sistema fuente',
+      lastSyncLabel: 'Última sincronización',
+      coverageLabel: 'Cobertura 360',
+      cacheLabel: 'Cache 360',
+      readStateLabel: 'Estado lectura',
+      fallbackFresh: 'fresh',
+      noTimestamp: 'Sin timestamp',
+      joiner: ' + ',
+      sources: {
+        greenhouse: 'Greenhouse',
+        hubspot: 'HubSpot',
+        account360: 'Account 360',
+        finance360: 'Finance 360',
+        delivery360: 'Delivery 360',
+        services360: 'Services 360',
+        staffAug360: 'Staff Aug 360'
+      }
+    },
     sections: {
       operationalTrend: {
         title: 'Tendencia operacional',
@@ -522,7 +549,18 @@ export const GH_ORGANIZATION_WORKSPACE = {
       activeProjects: {
         title: 'Proyectos / Sprints activos',
         subtitle: 'Priorizados por riesgo de entrega y dependencia financiera',
-        ariaLabel: 'Proyectos activos de la organización'
+        ariaLabel: 'Proyectos activos de la organización',
+        columns: {
+          id: 'ID',
+          name: 'Nombre',
+          space: 'Space',
+          phase: 'Fase',
+          otd: 'OTD%',
+          rpa: 'RpA',
+          progress: 'Progreso',
+          dueDate: 'Due date',
+          sponsor: 'Sponsor'
+        }
       },
       relatedFacetBridge: {
         title: 'Puentes hacia otras facets',

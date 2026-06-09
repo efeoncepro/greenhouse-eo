@@ -482,6 +482,9 @@ WHERE updated_by = 'migration:TASK-XXX';
 - OpenAI usa `src/lib/ai/openai-image.ts` y resuelve la key solo server-side con `OPENAI_API_KEY` / `OPENAI_API_KEY_SECRET_REF`; el secreto canonico es `greenhouse-openai-api-key` en GCP Secret Manager. Nunca hardcodear `sk-*` en repo, Vercel env directo, logs, tests ni docs.
 - Para PNG transparente, pedir `format: 'png'` + `background: 'transparent'`; `gpt-image-2` no soporta transparencia y el helper aplica fallback seguro a `gpt-image-1.5`, dejando `requestedModel` y `modelFallbackReason`.
 - Modos OpenAI disponibles: `generateOpenAIImage()` para text-to-image, `editOpenAIImage()` para imagenes de referencia/mascara, y `runOpenAIImageTool()` para Responses API multi-turn con `image_generation`.
+- **`gpt-image-*` es RASTER** (PNG/WebP/JPEG) — **NO genera SVG**. Si se necesita vector, vectorizar el raster como paso aparte (no hay helper canonico de vectorizacion hoy) o aceptar un SVG real via upload (el uploader hoy acepta PNG/JPG/WebP, no SVG).
+- **OpenAI requiere `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key` en CADA entorno** (local `.env.local`, Vercel staging/prod, workers). Sin ese ref el resolver no sabe de que secret sacar la key y todo flujo OpenAI devuelve "not configured". Runtime Rollout Completion Gate: confirmar la env var en Vercel antes de declarar operativo un flujo OpenAI en deployado.
+- **Generacion de logo de organizacion con IA (TASK-999, desde 2026-06-09):** command server-only `generateOrganizationLogoDraft` (`src/lib/account-360/organization-logo-generation.ts`) → `POST /api/organizations/[id]/brand-assets/logo/generate`. Usa `gpt-image-2` fondo opaco, persiste como `organization_logo_draft` y reusa `attachOrganizationLogoAsset` (gate `organization.brand_asset` + fail-fast `is_operating_entity` ANTES de la llamada paga). **Excepcion canonizada al default de la skill** `greenhouse-ai-image-generator` ("nunca reproducir un trademark"): por decision explicita del operador, el prompt **recrea el logo real** del cliente desde el conocimiento del modelo (es aproximacion; el logo exacto va por upload/URL). NUNCA generar logos de operating-entity (Efeonce/legal). Fuente: ADR `GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md` Delta 2026-06-09.
 - Fuente canonica: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
 
 ### AI providers — texto/LLM (Gemini, Anthropic, OpenAI) — desde 2026-06-05
@@ -3639,6 +3642,23 @@ Toda surface que renderice `/agency/sample-sprints` (command center, wizards, fu
 **Patrones fuente reusados**: TASK-611 (organization-workspace projection + cache + reactive consumer), TASK-742 (degraded enum cerrado), TASK-265/407/408 (microcopy hygiene), TASK-708 (commercial_cost_attribution_v2 sibling reader pattern).
 
 **Spec canónica**: `docs/tasks/complete/TASK-835-sample-sprints-runtime-projection-hardening.md`.
+
+### Account 360 facet readers — anti silent-catch contract (TASK-1059, desde 2026-06-09)
+
+Los readers canónicos de facets del 360 (`src/lib/account-360/facets/*` consumidos por `getAccountComplete360` → org-detail runtime + compact-signals + person/space 360 + finance clients) **NUNCA** envuelven una sub-query de **dato primario** en `.catch(() => [])`. Ese patrón convierte un error real (columna/join renombrado, schema/scope drift) en un resultado **indistinguible de "no hay datos"** — la causa raíz de los tabs vacíos (Equipo=0, Delivery tasks=0, Economía null) que el legacy sí mostraba. Es el bug class del "SQL Signal Reader Schema Validation Gate".
+
+**Helper canónico** `src/lib/account-360/facet-observability.ts`:
+- `observeAndRethrow(domain, source)` — para **dato primario** que el facet no puede falsear: captura a Sentry (`captureWithDomain`) y **re-lanza** → el resolver lo registra en `_meta.errors` y **omite el facet** (un facet roto debe ser VISIBLE, ausente + error, nunca medio-renderizado con ceros silenciosos).
+- `observeAndDegrade(domain, source, fallback)` — para **enriquecimiento opcional** con estado "sin valor" legítimo o fallback downstream (ej. ICO null es honesto + hay fuente BQ canónica siguiente): captura y devuelve el fallback.
+
+**⚠️ Reglas duras**:
+- **NUNCA** `.catch(() => [])` (silent empty) en un reader canónico del 360. Usar `observeAndRethrow` (primario) u `observeAndDegrade` (enriquecimiento). Un error de schema debe llegar a `_meta.errors` + Sentry, no esconderse.
+- **NUNCA** contar tareas por `status='completed'`/`active` ni literales — `greenhouse_delivery.tasks.task_status` es el **vocabulario canónico V1 en español**; usar `task-status-canonical` (`taskStatusGroupSql` + `TASK_STATUS_GROUPS`).
+- **NUNCA** filtrar membresías "as-of" con `start_date <= asOf` sin NULL-safe — `start_date IS NULL` = inicio no acotado = activo (los contactos HubSpot lo traen NULL; el predicado los borraba).
+- **ICO org-level**: la fuente de verdad es **BigQuery `ico_engine.metrics_by_organization`** (materializer TASK-900), **keyed por `spaces.client_id`** (NO org_id). Las tablas serving PG (`organization_operational_metrics`/`ico_organization_metrics`) son un mirror frecuentemente vacío → el delivery facet hace PG-first → fallback BQ vía `readOrganizationIcoMetricsFromBigQuery`. El resolver de aliases (`organization-ico-metrics-source.ts`) usa SOLO columnas existentes (`organization_360.{organization_id,public_id,hubspot_company_id}` + `spaces.client_id`).
+- **SIEMPRE** validar SQL nuevo de reader contra PG real (CLAUDE.md SQL gate) — `db.d.ts` no es source of truth de columnas. Guard de regresión: `account-complete-360.live.test.ts` (asserta 0 `_meta.errors` para el org más rico + team>0; skip sin PG).
+
+Verificado live (Sky Airline): 9 facets, 0 errores, team=21, delivery tasks=4208 + ICO rpa/otd/ftr, economics presente; org sin data degrada honesto. Relacionado: TASK-1059 (org workspace enterprise detail runtime) + [Organization Workspace projection invariants (TASK-611)](#organization-workspace-projection-invariants-task-611).
 
 ### Organization Workspace projection invariants (TASK-611)
 

@@ -28,6 +28,7 @@ import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
 import AddMembershipDrawer from './drawers/AddMembershipDrawer'
 import OrganizationLogoAvatarEditor from '@/components/greenhouse/organization-workspace/OrganizationLogoAvatarEditor'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
+import { hubspotIndustryLabel } from '@/config/hubspot-industries'
 
 const TASK407_ARIA_SINCRONIZAR_CON_HUBSPOT = "Sincronizar con HubSpot"
 const TASK407_ARIA_EDITAR_ORGANIZACION = "Editar organización"
@@ -186,6 +187,7 @@ const OrganizationView = ({ organizationId, onboardingStatus = null }: Props) =>
 
   const initial = detail.organizationName.charAt(0).toUpperCase()
   const flag = detail.country ? COUNTRY_FLAGS[detail.country.toUpperCase()] ?? '🌐' : null
+  const industryLabel = hubspotIndustryLabel(detail.industry)
 
   return (
     <>
@@ -217,8 +219,8 @@ const OrganizationView = ({ organizationId, onboardingStatus = null }: Props) =>
                   />
                   {flag && <Typography variant='body2' color='text.secondary'>{flag} {detail.country}</Typography>}
                 </Box>
-                {detail.industry && (
-                  <Typography variant='body2' color='text.secondary'>{detail.industry}</Typography>
+                {industryLabel && (
+                  <Typography variant='body2' color='text.secondary'>{industryLabel}</Typography>
                 )}
                 {(detail.legalName || detail.taxId) && (
                   <Typography variant='caption' color='text.secondary'>

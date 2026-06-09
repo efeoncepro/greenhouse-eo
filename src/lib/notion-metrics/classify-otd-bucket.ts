@@ -3,7 +3,8 @@ import 'server-only'
 import {
   TASK_STATUS_CANONICAL,
   allVariantsForCanonical,
-  normalizeTaskStatus
+  normalizeTaskStatus,
+  taskStatusSql
 } from '@/lib/delivery/task-status-canonical'
 
 import {
@@ -157,6 +158,42 @@ export const buildOtdBucketSql = (
   const esMesActual = `EXTRACT(MONTH FROM ${dueDate}) = EXTRACT(MONTH FROM CURRENT_DATE()) AND EXTRACT(YEAR FROM ${dueDate}) = EXTRACT(YEAR FROM CURRENT_DATE())`
 
   const monthGateClause = applyMonthGate ? `\n    WHEN NOT (${esMesActual}) THEN 'not_applicable'` : ''
+
+  return `CASE
+    WHEN ${dueDate} IS NULL THEN 'not_applicable'
+    WHEN ${taskStatus} IN (${cancelado}, ${archivado}) THEN 'not_applicable'${monthGateClause}
+    WHEN ${taskStatus} IN (${aprobado}) AND ${completedAt} IS NULL THEN 'on_time'
+    WHEN ${taskStatus} IN (${aprobado}) AND ${daysLateExpr} <= 0 THEN 'on_time'
+    WHEN ${taskStatus} IN (${aprobado}) THEN 'late_drop'
+    WHEN ${daysOverdueExpr} > 0 THEN 'overdue'
+    ELSE 'carry_over'
+  END`
+}
+
+/**
+ * Mirror PostgreSQL del clasificador OTD para readers server-side que agregan
+ * desde `greenhouse_delivery.tasks` sin pasar por la view BQ. Mantiene la misma
+ * semántica que `classifyOtdBucket` / `buildOtdBucketSql`.
+ */
+export const buildOtdBucketPostgresSql = (
+  cols: { taskStatus: string; dueDate: string; completedAt: string } = {
+    taskStatus: 'task_status',
+    dueDate: 'due_date',
+    completedAt: 'completed_at'
+  },
+  frozenDaysSql = '0',
+  applyMonthGate = true
+): string => {
+  const { taskStatus, dueDate, completedAt } = cols
+  const cancelado = taskStatusSql(TASK_STATUS_CANONICAL.CANCELADO)
+  const archivado = taskStatusSql(TASK_STATUS_CANONICAL.ARCHIVADO)
+  const aprobado = taskStatusSql(TASK_STATUS_CANONICAL.APROBADO)
+  const dueDateExpr = `(${dueDate})::date`
+  const completedAtExpr = `(${completedAt})::date`
+  const daysLateExpr = `((${completedAtExpr} - ${dueDateExpr}) - (${frozenDaysSql}))`
+  const daysOverdueExpr = `((CURRENT_DATE - ${dueDateExpr}) - (${frozenDaysSql}))`
+  const sameMonthExpr = `EXTRACT(MONTH FROM ${dueDateExpr}) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM ${dueDateExpr}) = EXTRACT(YEAR FROM CURRENT_DATE)`
+  const monthGateClause = applyMonthGate ? `\n    WHEN NOT (${sameMonthExpr}) THEN 'not_applicable'` : ''
 
   return `CASE
     WHEN ${dueDate} IS NULL THEN 'not_applicable'

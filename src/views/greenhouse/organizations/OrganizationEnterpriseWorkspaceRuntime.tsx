@@ -14,7 +14,7 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
+import { useTheme, type Theme } from '@mui/material/styles'
 
 import {
   Line,
@@ -32,6 +32,11 @@ import {
 } from '@/lib/format'
 import { getMicrocopy } from '@/lib/copy'
 import { GH_ORGANIZATION_WORKSPACE } from '@/lib/copy/agency'
+import { hubspotIndustryLabel } from '@/config/hubspot-industries'
+import {
+  organizationIdentitySourceDisplay,
+  organizationWorkspaceSourceDisplay
+} from '@/lib/account-360/organization-provenance-labels'
 
 import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import { DataTableShell } from '@/components/greenhouse/data-table'
@@ -68,6 +73,7 @@ type EnterpriseTone = 'neutral' | 'primary' | 'secondary' | 'success' | 'warning
 const COMMON_ARIA = getMicrocopy('es-CL').aria
 const ENTERPRISE_COPY = GH_ORGANIZATION_WORKSPACE.enterprise
 const ENTERPRISE_TOKENS = ORGANIZATION_ENTERPRISE_WORKSPACE_TOKENS
+const TABLE_EMPTY_VALUE = '—'
 
 type OrgKpis = {
   revenueClp: number
@@ -87,6 +93,11 @@ type OrganizationProjectsSummary = {
       notionPageId: string
       projectName: string
       status: string
+      phase: string | null
+      onTimePct: number | null
+      avgRpaSource: number | null
+      dueDate: string | null
+      ownerName: string | null
       totalTasks: number
       activeTasks: number
       completedTasks: number
@@ -221,6 +232,18 @@ const metricToneFromMargin = (margin: number | null | undefined): Exclude<Enterp
   return 'error'
 }
 
+const metricToneFromScore = (
+  value: number | null | undefined,
+  successThreshold = 90,
+  warningThreshold = 80
+): Exclude<EnterpriseTone, 'neutral'> => {
+  if (value == null) return 'secondary'
+  if (value >= successThreshold) return 'success'
+  if (value >= warningThreshold) return 'warning'
+
+  return 'error'
+}
+
 const facetStateTone = (tone: EnterpriseTone) => (tone === 'neutral' ? 'secondary' : tone)
 
 const facetStateLabel = (tone: EnterpriseTone) => {
@@ -235,7 +258,7 @@ const deltaPoints = (current: number | null | undefined, previous: number | null
 
   const rounded = Math.round((current - previous) * 10) / 10
 
-  return Math.abs(rounded) < 0.05 ? undefined : rounded
+  return Math.abs(rounded) < 0.05 ? 0 : rounded
 }
 
 const deltaPercentChange = (current: number | null | undefined, previous: number | null | undefined) => {
@@ -243,20 +266,49 @@ const deltaPercentChange = (current: number | null | undefined, previous: number
 
   const rounded = Math.round(((current - previous) / Math.abs(previous)) * 1000) / 10
 
-  return Math.abs(rounded) < 0.05 ? undefined : rounded
+  return Math.abs(rounded) < 0.05 ? 0 : rounded
+}
+
+const parseWebsiteUrl = (websiteUrl: string | null | undefined) => {
+  if (!websiteUrl) return null
+
+  const trimmed = websiteUrl.trim()
+
+  if (!trimmed) return null
+
+  try {
+    const parsed = new URL(/^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`)
+
+    if (!['http:', 'https:'].includes(parsed.protocol)) return null
+
+    return parsed
+  } catch {
+    return null
+  }
 }
 
 const formatWebsiteLabel = (websiteUrl: string | null | undefined) => {
-  if (!websiteUrl) return null
+  const parsed = parseWebsiteUrl(websiteUrl)
 
-  try {
-    const parsed = new URL(websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`)
+  if (parsed) {
     const path = parsed.pathname === '/' ? '' : parsed.pathname.replace(/\/$/, '')
 
     return `${parsed.hostname.replace(/^www\./, '')}${path}`
-  } catch {
-    return websiteUrl.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '')
   }
+
+  return websiteUrl?.trim().replace(/^https?:\/\//i, '').replace(/^www\./, '').replace(/\/$/, '') ?? null
+}
+
+const formatWebsiteHref = (websiteUrl: string | null | undefined) => {
+  const parsed = parseWebsiteUrl(websiteUrl)
+
+  return parsed?.toString() ?? null
+}
+
+const normalizePercentValue = (value: number | null | undefined) => {
+  if (value == null) return null
+
+  return value > 0 && value <= 1 ? value * 100 : value
 }
 
 const previousEconomicsTrendPoint = (
@@ -660,7 +712,11 @@ const OrganizationMasthead = ({
   const theme = useTheme()
   const flag = detail.country ? (COUNTRY_FLAGS[detail.country] ?? '') : ''
   const statusTone = STATUS_COLOR[detail.status] ?? 'neutral'
-  const websiteLabel = formatWebsiteLabel(detail.websiteUrl ?? data360?.identity?.websiteUrl ?? data360?.crm?.company?.website)
+  const websiteSource = detail.websiteUrl ?? data360?.identity?.websiteUrl ?? data360?.crm?.company?.website
+  const websiteLabel = formatWebsiteLabel(websiteSource)
+  const websiteHref = formatWebsiteHref(websiteSource)
+  const industryLabel = hubspotIndustryLabel(detail.industry)
+  const sourceLabel = organizationIdentitySourceDisplay({ hasHubspotCompany: Boolean(detail.hubspotCompanyId) })
 
   const fallbackInitials =
     detail.organizationName
@@ -706,10 +762,10 @@ const OrganizationMasthead = ({
             </Stack>
             <Stack direction='row' spacing={2.5} alignItems='center' flexWrap='wrap'>
               {detail.country ? <MetaItem icon='tabler-map-pin' label={`${flag ? `${flag} ` : ''}${detail.country}`} /> : null}
-              {detail.industry ? <MetaItem icon='tabler-building-skyscraper' label={detail.industry} /> : null}
+              {industryLabel ? <MetaItem icon='tabler-building-skyscraper' label={industryLabel} /> : null}
               {detail.publicId ? <MetaItem icon='tabler-id' label={detail.publicId} /> : null}
-              {websiteLabel ? <MetaItem icon='tabler-world' label={websiteLabel} tone='primary' /> : null}
-              <MetaItem icon='tabler-database' label={detail.hubspotCompanyId ? 'Source: HubSpot + AXIS Core' : 'Source: AXIS Core'} />
+              {websiteLabel ? <MetaItem icon='tabler-world' label={websiteLabel} href={websiteHref ?? undefined} tone='primary' /> : null}
+              <MetaItem icon='tabler-database' label={sourceLabel} />
             </Stack>
           </Stack>
         </Stack>
@@ -731,14 +787,66 @@ const OrganizationMasthead = ({
   )
 }
 
-const MetaItem = ({ icon, label, tone = 'secondary' }: { icon: string; label: string; tone?: 'secondary' | 'primary' }) => (
-  <Stack direction='row' spacing={1} alignItems='center' sx={{ color: tone === 'primary' ? 'primary.main' : 'text.secondary', minWidth: 0 }}>
-    <i className={icon} aria-hidden='true' />
-    <Typography variant='body2' color={tone === 'primary' ? 'primary.main' : 'text.secondary'} sx={{ overflowWrap: 'anywhere' }}>
-      {label}
-    </Typography>
-  </Stack>
-)
+type MetaItemProps = {
+  icon: string
+  label: string
+  tone?: 'secondary' | 'primary'
+  href?: string
+}
+
+const metaItemSx = (tone: MetaItemProps['tone'], interactive = false) => ({
+  color: tone === 'primary' ? 'primary.main' : 'text.secondary',
+  minWidth: 0,
+  textDecoration: 'none',
+  borderRadius: (theme: Theme) => `${theme.shape.customBorderRadius.sm}px`,
+  ...(interactive
+    ? {
+        '&:hover': {
+          color: 'primary.dark',
+          textDecoration: 'underline',
+          textUnderlineOffset: 3
+        },
+        '&:focus-visible': {
+          outline: (theme: Theme) => `2px solid ${theme.palette.primary.main}`,
+          outlineOffset: 3
+        }
+      }
+    : {})
+})
+
+const MetaItem = ({ icon, label, tone = 'secondary', href }: MetaItemProps) => {
+  const content = (
+    <>
+      <i className={icon} aria-hidden='true' />
+      <Typography variant='body2' color='inherit' component='span' sx={{ overflowWrap: 'anywhere' }}>
+        {label}
+      </Typography>
+    </>
+  )
+
+  if (href) {
+    return (
+      <Stack
+        component='a'
+        href={href}
+        target='_blank'
+        rel='noopener noreferrer'
+        direction='row'
+        spacing={1}
+        alignItems='center'
+        sx={metaItemSx(tone, true)}
+      >
+        {content}
+      </Stack>
+    )
+  }
+
+  return (
+    <Stack direction='row' spacing={1} alignItems='center' sx={metaItemSx(tone)}>
+      {content}
+    </Stack>
+  )
+}
 
 const MetricRail = ({ metrics }: { metrics: EnterpriseMetric[] }) => (
   <Box sx={{ borderBlockStart: theme => `1px solid ${theme.palette.divider}` }}>
@@ -1037,6 +1145,7 @@ const CapabilityDistributionChart = ({ items }: { items: CapabilityDistributionI
 
 const ProjectTable = ({ projects }: { projects: OrganizationProjectsSummary | null }) => {
   const rows = projects?.spaces.flatMap(space => space.projects.map(project => ({ ...project, spaceName: space.spaceName }))).slice(0, ENTERPRISE_TOKENS.density.projectRows) ?? []
+  const columns = ENTERPRISE_COPY.sections.activeProjects.columns
 
   return (
     <SectionShell title={ENTERPRISE_COPY.sections.activeProjects.title} subtitle={ENTERPRISE_COPY.sections.activeProjects.subtitle}>
@@ -1047,33 +1156,54 @@ const ProjectTable = ({ projects }: { projects: OrganizationProjectsSummary | nu
           <Table size='small'>
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Space</TableCell>
-                <TableCell>Estado</TableCell>
-                <TableCell>RpA</TableCell>
-                <TableCell>Progreso</TableCell>
-                <TableCell>Review</TableCell>
+                <TableCell>{columns.id}</TableCell>
+                <TableCell>{columns.name}</TableCell>
+                <TableCell>{columns.space}</TableCell>
+                <TableCell>{columns.phase}</TableCell>
+                <TableCell>{columns.otd}</TableCell>
+                <TableCell>{columns.rpa}</TableCell>
+                <TableCell>{columns.progress}</TableCell>
+                <TableCell>{columns.dueDate}</TableCell>
+                <TableCell>{columns.sponsor}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rows.map(row => {
                 const progress = row.totalTasks > 0 ? Math.round((row.completedTasks / row.totalTasks) * 100) : 0
+                const otd = normalizePercentValue(row.onTimePct)
+                const rpa = normalizePercentValue(row.avgRpaSource ?? (row.totalTasks > 0 ? row.avgRpa : null))
+                const dueDate = row.dueDate ? formatDateTime(row.dueDate, { dateStyle: 'medium' }, 'es-CL') : TABLE_EMPTY_VALUE
 
                 return (
                   <TableRow key={row.notionPageId} hover>
                     <TableCell><Typography variant='monoId'>{row.notionPageId.slice(0, 8)}</Typography></TableCell>
                     <TableCell>{row.projectName}</TableCell>
                     <TableCell>{row.spaceName}</TableCell>
-                    <TableCell><GreenhouseChip size='small' variant='label' tone={row.status === 'done' ? 'success' : 'info'} label={row.status} /></TableCell>
-                    <TableCell>{fmtCompact(row.avgRpa)}</TableCell>
+                    <TableCell>{row.phase ?? row.status}</TableCell>
+                    <TableCell>
+                      <GreenhouseChip
+                        size='small'
+                        variant='label'
+                        tone={metricToneFromScore(otd)}
+                        label={otd == null ? TABLE_EMPTY_VALUE : fmtPct(otd)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <GreenhouseChip
+                        size='small'
+                        variant='label'
+                        tone={metricToneFromScore(rpa, 70, 40)}
+                        label={rpa == null ? TABLE_EMPTY_VALUE : fmtPct(rpa)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <Stack direction='row' spacing={2} alignItems='center'>
                         <LinearProgress variant='determinate' value={progress} aria-label={`Progreso ${row.projectName}`} sx={{ flex: 1, minWidth: 56 }} />
                         <Typography variant='caption' color='text.secondary'>{progress}%</Typography>
                       </Stack>
                     </TableCell>
-                    <TableCell>{row.openReviewItems}</TableCell>
+                    <TableCell>{dueDate}</TableCell>
+                    <TableCell>{row.ownerName ?? TABLE_EMPTY_VALUE}</TableCell>
                   </TableRow>
                 )
               })}
@@ -1497,7 +1627,7 @@ const CompactKeyValueList = ({ rows, empty }: { rows: Array<{ id: string; label:
 const buildContextRows = (facet: OrganizationFacet, detail: OrganizationDetailData, data360: AccountComplete360 | null) => {
   const rows = {
     identity: [
-      ['Legal profile', detail.legalName || 'Legal name pendiente', detail.legalName ? 'Verified' : 'Partial', 'AXIS Core', detail.legalName ? 'success' : 'warning'],
+      ['Legal profile', detail.legalName || 'Legal name pendiente', detail.legalName ? 'Verified' : 'Partial', 'Greenhouse', detail.legalName ? 'success' : 'warning'],
       ['Tax identity', detail.taxId || 'Tax ID pendiente', detail.taxId ? 'Verified' : 'Partial', 'Organization 360', detail.taxId ? 'success' : 'warning'],
       ['Brand asset', detail.logoUrl ? 'Logo asociado' : 'Logo pendiente', detail.logoUrl ? 'Fresh' : 'Partial', 'Brand registry', detail.logoUrl ? 'success' : 'warning'],
       ['CRM mapping', detail.hubspotCompanyId ? 'HubSpot company asociado' : 'HubSpot pendiente', detail.hubspotCompanyId ? 'Healthy' : 'Partial', 'HubSpot', detail.hubspotCompanyId ? 'success' : 'warning']
@@ -1663,7 +1793,11 @@ const AccountSidecar = ({
       { label: 'Financiera', value: data360?.finance ? ENTERPRISE_COPY.states.available : ENTERPRISE_COPY.states.partial, tone: data360?.finance ? 'success' : 'warning' },
       { label: 'Operativa', value: data360?.delivery ? ENTERPRISE_COPY.states.available : ENTERPRISE_COPY.states.partial, tone: data360?.delivery ? 'success' : 'warning' },
       { label: 'Entrega', value: data360?.delivery?.icoMetrics ? 'Métrica ICO' : 'Sin tendencia', tone: data360?.delivery?.icoMetrics ? 'success' : 'warning' },
-      { label: 'Relacional', value: detail.hubspotCompanyId ? 'HubSpot' : 'AXIS only', tone: detail.hubspotCompanyId ? 'success' : 'warning' }
+      {
+        label: 'Relacional',
+        value: organizationWorkspaceSourceDisplay({ hasHubspotCompany: Boolean(detail.hubspotCompanyId) }),
+        tone: detail.hubspotCompanyId ? 'success' : 'warning'
+      }
     ]
 
   const signals = compactSignals?.recentSignals.length
@@ -1682,16 +1816,31 @@ const AccountSidecar = ({
 
   const provenanceRows = compactSignals
     ? [
-      ['Sistema fuente', compactSignals.provenance.filter(item => item.status === 'available').map(item => item.label).slice(0, ENTERPRISE_TOKENS.density.sidecarProvenanceLimit).join(' + ') || ENTERPRISE_COPY.states.partial],
-      ['Última sincronización', formatDateTime(compactSignals.computedAt, { dateStyle: 'short', timeStyle: 'short' }, 'es-CL')],
-      ['Cobertura 360', `${completed}/${readiness.length}`],
-      ['Estado lectura', compactSignals.status]
+      [ENTERPRISE_COPY.provenance.sourceSystemLabel, compactSignals.provenance.filter(item => item.status === 'available').map(item => item.label).slice(0, ENTERPRISE_TOKENS.density.sidecarProvenanceLimit).join(ENTERPRISE_COPY.provenance.joiner) || ENTERPRISE_COPY.states.partial],
+      [ENTERPRISE_COPY.provenance.lastSyncLabel, formatDateTime(compactSignals.computedAt, { dateStyle: 'short', timeStyle: 'short' }, 'es-CL')],
+      [ENTERPRISE_COPY.provenance.coverageLabel, `${completed}/${readiness.length}`],
+      [ENTERPRISE_COPY.provenance.readStateLabel, compactSignals.status]
     ]
     : [
-      ['Sistema fuente', detail.hubspotCompanyId ? 'HubSpot + AXIS Core' : 'AXIS Core'],
-      ['Última sincronización', detail.updatedAt ? formatDateTime(detail.updatedAt, { dateStyle: 'short', timeStyle: 'short' }, 'es-CL') : 'Sin timestamp'],
-      ['Cobertura 360', data360 ? `${data360._meta.facetsResolved.length}/${data360._meta.facetsRequested.length}` : 'parcial'],
-      ['Cache 360', data360 ? Object.values(data360._meta.cacheStatus).join(', ') || 'fresh' : 'parcial']
+      [
+        ENTERPRISE_COPY.provenance.sourceSystemLabel,
+        organizationWorkspaceSourceDisplay({
+          hasHubspotCompany: Boolean(detail.hubspotCompanyId),
+          resolvedFacets: data360?._meta.facetsResolved
+        })
+      ],
+      [
+        ENTERPRISE_COPY.provenance.lastSyncLabel,
+        detail.updatedAt ? formatDateTime(detail.updatedAt, { dateStyle: 'short', timeStyle: 'short' }, 'es-CL') : ENTERPRISE_COPY.provenance.noTimestamp
+      ],
+      [
+        ENTERPRISE_COPY.provenance.coverageLabel,
+        data360 ? `${data360._meta.facetsResolved.length}/${data360._meta.facetsRequested.length}` : ENTERPRISE_COPY.states.partial
+      ],
+      [
+        ENTERPRISE_COPY.provenance.cacheLabel,
+        data360 ? Object.values(data360._meta.cacheStatus).join(', ') || ENTERPRISE_COPY.provenance.fallbackFresh : ENTERPRISE_COPY.states.partial
+      ]
     ]
 
   const nextActions = compactSignals?.nextActions.length
