@@ -183,6 +183,44 @@ Nombres nuevos (decisión operador 2026-06-09):
 
 **Matiz CRÍTICO (no es find-replace):** `Space` es un **objeto canónico 360 distinto** (`greenhouse_core.spaces.space_id`, contenedor de trabajo por cliente) — NO es sinónimo de cliente. La nomenclatura de 1ª versión conflaba "Clients" con "Espacios/Spaces". El rename es: **cliente-como-Espacio → Organizations**, pero el objeto canónico **Space se queda** (no renombrar `spaces`/`space_id`/"Spaces" donde refiere al objeto de trabajo). Auditar cada mención de "Espacios/Spaces" y clasificar: ¿refiere al cliente (→ Organization) o al objeto Space (→ se queda)?
 
-**Estado del SSOT (`greenhouse-nomenclature.ts`):** `organizations` ya es 'Organizaciones' (l.75). A cambiar: `dashboard` label 'Pulse'→'Dashboard' (l.15), `sprints` label 'Ciclos'→'Sprints' (l.17), `internalDashboard` 'Torre de control'→'Cabina de Mando' (l.31), `pulseGlobal` 'Pulse Global' (l.72) + subtítulos con "Pulse"/"Spaces" (l.31/71/72) — reescribir distinguiendo Space-objeto de cliente.
+**Estado del SSOT (`greenhouse-nomenclature.ts`):** `organizations` ya es 'Organizaciones' (l.75). A cambiar: `dashboard` label 'Pulse'→'Dashboard' (l.15), `sprints` label 'Ciclos'→'Sprints' (l.17), `internalDashboard` 'Torre de control'→'Cockpit' (l.31), `pulseGlobal` 'Pulse Global' (l.72) + subtítulos con "Pulse"/"Spaces" (l.31/71/72) — reescribir distinguiendo Space-objeto de cliente.
 
 **Slice ordering recomendado (timing):** ejecutar como **pase limpio dedicado, idealmente post-release** (la rama actual tiene el release en vuelo + WIP paralelo de Codex en componentes; un rename de labels sobre archivos compartidos ahora arriesga conflictos). Las renames de **identificadores de código** (`HomePulseStrip.tsx`→...) son follow-up de menor valor (internos, no user-facing) — separar de los cambios de label user-facing.
+
+## Delta 2026-06-09 (Discovery) — blast radius real + plan por capas + decisiones pendientes
+
+Discovery ejecutada 2026-06-09. **No es un rename de labels; es un cambio multi-superficie con gobernanza e IA.** Task devuelta a `to-do` para ejecutar como pase limpio dedicado en otra sesión.
+
+### Blast radius real (inventario verificado)
+
+"Pulse" / "Ciclos" / "Torre de Control" viven en **más de una fuente**:
+
+- **Dos fuentes de copy (no una):** `src/config/greenhouse-nomenclature.ts` (es) **y** `src/config/greenhouse-navigation-copy.ts` (en) — ambas con `dashboard: 'Pulse'` + `workspace` subtitle "Pulse, Spaces…".
+- **VIEW_REGISTRY gobernado** `src/lib/admin/view-access-catalog.ts`: viewCode **`cliente.pulse`** + `label: 'Pulse'` (l.705) + `label: 'Ciclos'` (l.721) + descripciones. Por **TASK-827** el `label` está **seedeado en DB** (`view_registry`) → para que el menú del **portal cliente** deje de decir "Pulse" hace falta **migración TS↔DB**, no solo editar el TS.
+- **Copy de dominio:** `src/lib/copy/agency.ts` (`pulse_title: 'Pulse Global'`), `src/lib/copy/client-portal.ts` ('Ciclos anteriores', `name: 'Pulse'`), `src/lib/shortcuts/catalog.ts` (`label: 'Pulse'`).
+- **Teams:** `src/lib/sync/projections/teams-notify.ts` ('Pulse diario de delivery').
+- **~8 tests** pinean estos labels: `home/snapshot/route.test.ts`, `client-portal/__tests__/modules.test.ts`, `agency-queries.test.ts`, `integrations/teams/__tests__/cards.test.ts`, `client-portal/composition/menu-builder.test.ts`, `client-portal/readers/native/module-resolver.test.ts`, `views/greenhouse/GreenhouseDashboard.test.tsx`, `notion-token-connect.test.ts`.
+
+### NO tocar (clasificación crítica)
+
+- **`classifyNotionDatabaseTitle('Ciclos')`** — es el **nombre de la DB Notion del cliente** (data del cliente), no nuestro label. El mapeo title→'sprints' se queda.
+- **Objeto canónico `Space`** (`greenhouse_core.spaces.space_id`) + ruta `/agency/spaces` + subtítulos que refieren al work-container ("Servicios contratados por Space", "cross-space"). NO es sinónimo de cliente.
+- **viewCode key `cliente.pulse`** — ID interno estable; **NO renombrar el key** (churn de gobernanza sin beneficio user-facing). Solo cambiar el `label`.
+
+### Conflación Spaces↔Organizations = decisión de IA (no rename)
+
+`GH_AGENCY_NAV.spaces` → **`/agency/spaces`** ("Spaces", subtitle *"Lista de clientes activos"*) y `GH_AGENCY_NAV.organizations` → **`/agency/organizations`** ("Organizaciones") son **dos rutas vivas distintas** en `VerticalMenu` (l.180 y l.207). "Clients→Organizations" implica **converger/deprecar `/agency/spaces`** → IA/routing, no label. Renombrar "Spaces"→"Organizations" dejaría dos "Organizations" apuntando a rutas distintas → roto. **Decisión IA pendiente:** ¿deprecar `/agency/spaces`? ¿es "Spaces" la superficie canónica del objeto Space? ¿fusionar en `/agency/organizations`?
+
+### Plan de ejecución por capas (próxima sesión)
+
+1. **Capa 1 — labels UI no-gobernados (seguro):** Pulse→Dashboard, Ciclos→Sprints, Torre de Control→Cockpit en `greenhouse-nomenclature.ts` + `greenhouse-navigation-copy.ts` + `shortcuts/catalog.ts` + `copy/agency.ts` + `copy/client-portal.ts` + `teams-notify.ts`. Actualizar los ~8 tests. GVC desktop+mobile.
+2. **Capa 2 — VIEW_REGISTRY label (gobernado, TASK-827):** migración TS↔DB del `label` de `cliente.pulse` (+ view 'Ciclos') para que el menú del portal cliente cambie. Patrón TASK-827 (INSERT ON CONFLICT DO UPDATE del `label` + DO block). **NO** renombrar el `view_code` key.
+3. **Capa 3 — identificadores de código** (`HomePulseStrip.tsx`→…): follow-up de menor valor (internos), opcional.
+4. **Capa 4 — Spaces↔Organizations:** decisión IA del operador (arriba); puede ser task separada.
+
+### Decisiones pendientes del operador (pre-ejecución)
+- **(a)** ¿Capa 2 (migración VIEW_REGISTRY) incluida, o solo capa 1? (Capa 2 es la que saca "Pulse" del portal cliente.)
+- **(b)** Spaces↔Organizations (capa 4): ¿decisión IA ahora o task separada?
+
+### Nombres finales confirmados
+Pulse→**Dashboard/dashboards** · Ciclos→**Sprints** · Espacios(cliente)→**Organizations** · Torre de Control→**Cockpit** (subtítulo es-CL "Operación interna cross-cuenta").
