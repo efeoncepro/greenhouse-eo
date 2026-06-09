@@ -30,6 +30,18 @@ export const getLeaveApprovalStageCode = (status: HrLeaveRequest['status']): App
   return null
 }
 
+/**
+ * Aprobador efectivo de un permiso. Lee el snapshot ya normalizado; cae al
+ * supervisor FORMAL (`request.supervisorMemberId`) cuando no hay snapshot.
+ *
+ * TASK-1020 — fallback verificado seguro: post-fix el snapshot ya NO congela
+ * delegados genéricos inválidos (el resolver de `leave.supervisor_review` ignora
+ * el `approval_delegate` genérico → `effectiveApproverMemberId === formal`). El
+ * fallback `?? request.supervisorMemberId` resuelve también al supervisor formal.
+ * Ambas ramas → autoridad formal; ninguna reintroduce delegación insegura. Los
+ * snapshots ya congelados con un delegado inválido se reparan via el recovery
+ * command auditado (no se confía en este fallback para corregirlos).
+ */
 export const getEffectiveLeaveApproverMemberId = (request: HrLeaveRequest) =>
   request.approvalSnapshot?.effectiveApproverMemberId ?? request.supervisorMemberId ?? null
 

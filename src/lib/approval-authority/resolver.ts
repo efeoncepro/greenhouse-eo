@@ -61,7 +61,13 @@ export const resolveApprovalAuthorityForStage = async ({
     }
   }
 
-  const effectiveSupervisor = await getEffectiveSupervisor(subjectMemberId)
+  // TASK-1020 — política per-stage declarativa. Default tratado como `false`:
+  // el approval_delegate genérico NO transfiere autoridad de aprobación.
+  const honorGenericApprovalDelegate = stage.honorGenericApprovalDelegate === true
+
+  const effectiveSupervisor = await getEffectiveSupervisor(subjectMemberId, {
+    delegationPolicy: honorGenericApprovalDelegate ? 'generic' : 'ignore'
+  })
 
   if (effectiveSupervisor?.effectiveSupervisorMemberId) {
     return {

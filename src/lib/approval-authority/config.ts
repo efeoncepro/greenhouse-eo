@@ -11,6 +11,27 @@ export interface ApprovalStageDefinition {
   fallbackRoleCodes: RoleCode[]
   fallbackStageCode?: ApprovalStageCode | null
   nextStageCode?: ApprovalStageCode | null
+
+  /**
+   * TASK-1020 — política per-stage de delegación de aprobación.
+   *
+   * Cuando un stage usa `resolutionStrategy: 'effective_supervisor'`, decide si
+   * honra una responsabilidad operacional GENÉRICA
+   * `operational_responsibilities.responsibility_type='approval_delegate'` como
+   * fuente de autoridad efectiva.
+   *
+   * Default tratado como `false`: el `approval_delegate` genérico NO transfiere
+   * autoridad de aprobación (decisión canónica D1/D2 — ver
+   * `GREENHOUSE_IDENTITY_ACCESS_V2.md` Delta 2026-06-07). El resolver pasa
+   * `delegationPolicy: 'ignore'` a `getEffectiveSupervisor`, dejando
+   * `effectiveApproverMemberId === formalApproverMemberId` y
+   * `authoritySource='reporting_hierarchy'` (NUNCA `'delegation'`).
+   *
+   * Solo se setea `true` con decisión documentada explícita por stage. La
+   * delegación real de aprobación (cobertura por vacaciones, etc.) renace como
+   * contrato domain-scoped separado (ADR follow-up), NO via este flag.
+   */
+  honorGenericApprovalDelegate?: boolean
 }
 
 export interface ApprovalWorkflowDefinition {
@@ -41,6 +62,8 @@ export const APPROVAL_WORKFLOW_DEFINITIONS: Record<ApprovalWorkflowDomain, Appro
         stageCode: 'supervisor_review',
         label: 'Revisión de supervisor',
         resolutionStrategy: 'effective_supervisor',
+        // TASK-1020 D1/D2 — permisos NO honran el approval_delegate genérico.
+        honorGenericApprovalDelegate: false,
         fallbackRoleCodes: HR_FALLBACK_ROLE_CODES,
         fallbackStageCode: 'hr_review',
         nextStageCode: 'hr_review'
@@ -63,6 +86,9 @@ export const APPROVAL_WORKFLOW_DEFINITIONS: Record<ApprovalWorkflowDomain, Appro
         stageCode: 'supervisor_review',
         label: 'Revisión de supervisor',
         resolutionStrategy: 'effective_supervisor',
+        // TASK-1020 D2 — aprobar reembolsos = autoridad financiera; no honra el
+        // approval_delegate genérico (gate de datos limpio: 0 snapshots delegados).
+        honorGenericApprovalDelegate: false,
         fallbackRoleCodes: FINANCE_FALLBACK_ROLE_CODES,
         fallbackStageCode: 'finance_review',
         nextStageCode: 'finance_review'
@@ -113,6 +139,9 @@ export const APPROVAL_WORKFLOW_DEFINITIONS: Record<ApprovalWorkflowDomain, Appro
         stageCode: 'supervisor_review',
         label: 'Revisión de supervisor',
         resolutionStrategy: 'effective_supervisor',
+        // TASK-1020 D2 — aprobar evaluaciones = autoridad HR; no honra el
+        // approval_delegate genérico (gate de datos limpio: 0 snapshots delegados).
+        honorGenericApprovalDelegate: false,
         fallbackRoleCodes: HR_FALLBACK_ROLE_CODES,
         fallbackStageCode: 'hr_review',
         nextStageCode: 'hr_review'
