@@ -11,6 +11,7 @@ import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { typographyScale } from '@/components/theme/typography-tokens'
 import {
   GreenhouseButton,
+  GreenhouseNexaAnimatedAskBadge,
   GreenhouseNexaAnimatedMark,
   GreenhouseNexaBrandMark,
   type GreenhouseNexaBrandKind,
@@ -141,10 +142,13 @@ const NexaBrandLabView = () => (
         })}
       >
         <Stack spacing={2.5} alignItems='center' textAlign='center'>
-          <GreenhouseNexaBrandMark kind='askNexaBadge' size='medium' dataCapture='nexa-brand-ask-badge-hero' />
+          <Stack direction='row' spacing={1.5} alignItems='center' justifyContent='center' flexWrap='wrap'>
+            <GreenhouseNexaBrandMark kind='askNexaBadge' size='medium' dataCapture='nexa-brand-ask-badge-hero' />
+            <GreenhouseNexaAnimatedAskBadge size='medium' dataCapture='nexa-brand-animated-ask-badge-hero' />
+          </Stack>
           <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 420 }}>
-            La versión conversacional usa Midnight Navy, isotipo real y tipografía de control para sentirse accionable sin
-            competir con la superficie principal.
+            La versión conversacional estática se mantiene intacta. La versión animada es una opción separada para entry
+            points donde el blink suave de Nexa aporta presencia sin convertir el badge en loader.
           </Typography>
         </Stack>
       </Box>
@@ -175,8 +179,8 @@ const NexaBrandLabView = () => (
         <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='h6'>Motion rule</Typography>
           <Typography variant='body2' color='text.secondary'>
-            <InlineCode>GreenhouseNexaAnimatedMark</InlineCode> permite parpadeo GSAP del sparkle-eye como señal de vida
-            ocasional. Debe respetar reduced-motion y no reemplaza el contrato Rive para animaciones complejas.
+            <InlineCode>GreenhouseNexaAnimatedMark</InlineCode> permite blink, arc-sparkle play y signal catch como señales
+            de vida ocasionales. Deben respetar reduced-motion y no reemplazan el contrato Rive para animaciones complejas.
           </Typography>
         </Stack>
       </Stack>
@@ -210,29 +214,35 @@ const NexaBrandLabView = () => (
         >
           <GreenhouseNexaAnimatedMark
             autoBlink
+            ambientMoments
+            ambientMoment='arcSparklePlay'
             chrome='none'
             tone='onNavy'
             size='medium'
             ariaLabel='Nexa animada'
-            dataCapture='nexa-brand-gsap-blink-specimen'
+            dataCapture='nexa-brand-arc-sparkle-specimen'
             sx={{ inlineSize: 42, blockSize: 42 }}
           />
         </Box>
         <GreenhouseNexaAnimatedMark
           autoBlink
+          ambientMoments
+          ambientMoment='signalCatch'
           chrome='badge'
           tone='onNavy'
           size='medium'
           ariaLabel='Nexa badge animado'
+          dataCapture='nexa-brand-signal-catch-specimen'
         />
       </Stack>
 
       <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
-        <Typography variant='h6'>GSAP blink</Typography>
+        <Typography variant='h6'>GSAP ambient moments</Typography>
         <Typography variant='body2' color='text.secondary'>
-          El sparkle parpadea con cadence irregular: attentive para presencia viva en entry points y ambient para apariciones
-          más calmadas. En reduced-motion se mantiene estático. Úsalo para presencia de Nexa; no para loaders, errores ni
-          confirmaciones.
+          El sparkle parpadea con cadence irregular y, cada cierto tiempo, alterna entre arc-sparkle play y signal catch.
+          El badge animado <InlineCode>GreenhouseNexaAnimatedAskBadge</InlineCode> usa solo el blink del mark, como versión
+          aparte del badge estático. En reduced-motion se mantiene estático. Úsalo para presencia de Nexa; no para loaders,
+          errores ni confirmaciones.
         </Typography>
       </Stack>
     </Box>

@@ -115,6 +115,61 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
     ]
   })
 
+  const nexaFabRestShadow = open ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`
+
+  const nexaFabHoverShadow = open ? 'none' : `0 14px 34px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.34)}`
+
+  const nexaFabAuraSx = {
+    position: docked ? 'relative' : 'fixed',
+    ...(docked
+      ? {}
+      : {
+          bottom: 24,
+          right: 24,
+          zIndex: theme.zIndex.speedDial
+        }),
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    isolation: 'isolate',
+    overflow: 'visible',
+    borderRadius: '50%',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      inset: -28,
+      zIndex: 0,
+      borderRadius: '50%',
+      background: `radial-gradient(circle, ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.3)} 0%, ${alpha(
+        GREENHOUSE_NEXA_BRAND_COLORS.electricTeal,
+        0.14
+      )} 38%, ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0)} 72%)`,
+      filter: 'blur(18px)',
+      opacity: 0,
+      pointerEvents: 'none',
+      transform: 'scale(0.74)',
+      transition: theme.transitions.create(['opacity', 'transform'], {
+        duration: 820,
+        easing: theme.transitions.easing.easeOut
+      })
+    },
+    '&:hover::before, &:focus-within::before': {
+      opacity: open ? 0 : 1,
+      transform: 'scale(1)',
+      transitionDuration: '220ms'
+    },
+    '& > .MuiFab-root': {
+      position: 'relative',
+      zIndex: 1
+    },
+    '@media (prefers-reduced-motion: reduce)': {
+      '&::before, &:hover::before, &:focus-within::before': {
+        transform: 'none',
+        transitionDuration: '1ms'
+      }
+    }
+  }
+
   // Hide on /home (Nexa is inline there)
   if (pathname === '/home') return null
 
@@ -147,61 +202,49 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   return (
     <>
       {/* FAB trigger */}
-      <Fab
+      <Box
         data-nexa-floating-trigger='true'
         data-capture='nexa-floating-trigger'
-        color='primary'
-        size='medium'
-        aria-label={TASK407_ARIA_ABRIR_NEXA_AI}
-        aria-expanded={open}
-        onClick={() => setOpen(prev => !prev)}
-        sx={docked
-          ? {
-              position: 'static',
-              zIndex: 'inherit',
-              bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
-              color: 'common.white',
-              boxShadow: open ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`,
-              '&:hover': {
-                bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
-                boxShadow: open ? 'none' : `0 14px 34px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.34)}`
-              },
-              '&:focus-visible': {
-                outline: `3px solid ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.42)}`,
-                outlineOffset: 3
-              }
-            }
-          : {
-              position: 'fixed',
-              bottom: 24,
-              right: 24,
-              zIndex: theme.zIndex.speedDial,
-              bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
-              color: 'common.white',
-              boxShadow: open ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`,
-              '&:hover': {
-                bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
-                boxShadow: open ? 'none' : `0 14px 34px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.34)}`
-              },
-              '&:focus-visible': {
-                outline: `3px solid ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.42)}`,
-                outlineOffset: 3
-              }
-            }}
+        sx={nexaFabAuraSx}
       >
-        {open ? (
-          <i className='tabler-x' style={{ fontSize: '1.25rem' }} />
-        ) : (
-          <GreenhouseNexaAnimatedMark
-            autoBlink
-            chrome='none'
-            tone='onNavy'
-            size='medium'
-            ariaLabel='Nexa'
-            sx={{ inlineSize: 30, blockSize: 30 }}
-          />
-        )}
-      </Fab>
+        <Fab
+          color='primary'
+          size='medium'
+          aria-label={TASK407_ARIA_ABRIR_NEXA_AI}
+          aria-expanded={open}
+          onClick={() => setOpen(prev => !prev)}
+          sx={{
+            position: 'static',
+            zIndex: 'inherit',
+            bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
+            color: 'common.white',
+            boxShadow: nexaFabRestShadow,
+            '&:hover': {
+              bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
+              boxShadow: nexaFabHoverShadow
+            },
+            '&:focus-visible': {
+              outline: `3px solid ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.42)}`,
+              outlineOffset: 3,
+              boxShadow: nexaFabHoverShadow
+            }
+          }}
+        >
+          {open ? (
+            <i className='tabler-x' style={{ fontSize: '1.25rem' }} />
+          ) : (
+            <GreenhouseNexaAnimatedMark
+              autoBlink
+              ambientMoments
+              chrome='none'
+              tone='onNavy'
+              size='medium'
+              ariaLabel='Nexa'
+              sx={{ inlineSize: 30, blockSize: 30 }}
+            />
+          )}
+        </Fab>
+      </Box>
 
       {/* Panel: Drawer on mobile, positioned Card on desktop */}
       {isMobile ? (

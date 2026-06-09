@@ -28,6 +28,7 @@ import { keyframes } from '@mui/material/styles'
 
 import CustomTextField from '@core/components/mui/TextField'
 
+import GreenhouseNexaAnimatedAskBadge from '@/components/greenhouse/primitives/GreenhouseNexaAnimatedAskBadge'
 import GreenhouseNexaBrandMark from '@/components/greenhouse/primitives/GreenhouseNexaBrandMark'
 import GreenhouseThinkingBeat from '@/components/greenhouse/primitives/GreenhouseThinkingBeat'
 import useReducedMotion from '@/hooks/useReducedMotion'
@@ -128,6 +129,8 @@ export interface NexaGreetingsCardProps {
   tooltipLabel?: string
   /** Rich visual tooltip content. Keep `tooltipLabel` as the accessible plain-text equivalent. */
   tooltipContent?: ReactNode
+  /** Compact prompt badge treatment. Keep static by default; use animated for selected product entry points. */
+  askBadgeVariant?: 'static' | 'animated'
   /** Nexa avatar source (transparent cutout PNG). */
   avatarSrc?: string
   /** Accessible label for the avatar. */
@@ -158,6 +161,7 @@ export const NexaGreetingsCard = ({
   disclaimer = 'Nexa usa IA generativa. Verifica la información importante.',
   tooltipLabel,
   tooltipContent,
+  askBadgeVariant = 'static',
   avatarSrc = DEFAULT_NEXA_AVATAR,
   avatarAlt = 'Nexa, asistente de IA de Greenhouse',
   dataCapture,
@@ -372,7 +376,11 @@ export const NexaGreetingsCard = ({
             }}
           >
             <Stack direction='row' spacing={1} alignItems='center'>
-              <GreenhouseNexaBrandMark kind='askNexaBadge' size='small' dataCapture='nexa-ask-badge' />
+              {askBadgeVariant === 'animated' ? (
+                <GreenhouseNexaAnimatedAskBadge size='small' dataCapture='nexa-ask-badge-animated' />
+              ) : (
+                <GreenhouseNexaBrandMark kind='askNexaBadge' size='small' dataCapture='nexa-ask-badge' />
+              )}
             </Stack>
 
             <Stack spacing={0.75} alignItems='center' sx={{ minWidth: 0, minBlockSize: { xs: 48, sm: 28 } }}>

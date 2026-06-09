@@ -22,12 +22,15 @@ export type GreenhouseNexaAnimatedMarkProps = {
   animation?: string | string[]
   stateMachine?: string | string[]
   autoBlink?: boolean
+  ambientMoments?: boolean
+  ambientMoment?: 'random' | 'arcSparklePlay' | 'signalCatch'
   blinkCadence?: 'ambient' | 'attentive'
   chrome?: 'none' | 'badge'
   tone?: 'onNavy' | 'fullColor' | 'mono'
   kind?: GreenhouseNexaBrandKind
   size?: GreenhouseNexaBrandSize
   ariaLabel?: string
+  decorative?: boolean
   dataCapture?: string
   sx?: SxProps<Theme>
 }
@@ -51,6 +54,13 @@ const NEXA_BLINK_CADENCE = {
     interval: [2.8, 5.2],
     doubleBlinkChance: 0.24
   }
+} as const
+
+const NEXA_AMBIENT_MOMENTS_CADENCE = {
+  initialDelay: [4.8, 7.2],
+  interval: [28, 48],
+  cooldown: [4, 7],
+  arcSparklePlayChance: 0.64
 } as const
 
 const NexaRiveRenderer = ({
@@ -83,22 +93,28 @@ const NexaRiveRenderer = ({
 
 type NexaGsapBlinkMarkProps = {
   autoBlink: boolean
+  ambientMoments: boolean
+  ambientMoment: NonNullable<GreenhouseNexaAnimatedMarkProps['ambientMoment']>
   blinkCadence: keyof typeof NEXA_BLINK_CADENCE
   chrome: 'none' | 'badge'
   tone: 'onNavy' | 'fullColor' | 'mono'
   size: GreenhouseNexaBrandSize
   ariaLabel: string
+  decorative: boolean
   dataCapture?: string
   sx?: SxProps<Theme>
 }
 
 const NexaGsapBlinkMark = ({
   autoBlink,
+  ambientMoments,
+  ambientMoment,
   blinkCadence,
   chrome,
   tone,
   size,
   ariaLabel,
+  decorative,
   dataCapture,
   sx
 }: NexaGsapBlinkMarkProps) => {
@@ -111,20 +127,35 @@ const NexaGsapBlinkMark = ({
   useGreenhouseGSAP(
     ctx => {
       const sparkle = scopeRef.current?.querySelector('.gh-nexa-sparkle-eye')
+      const arc = scopeRef.current?.querySelector('.gh-nexa-arc')
+      const arcPulse = scopeRef.current?.querySelector('.gh-nexa-arc-pulse')
+      const arcHighlight = scopeRef.current?.querySelector('.gh-nexa-arc-highlight')
 
-      if (!sparkle) return
+      if (!sparkle || !arc || !arcPulse || !arcHighlight) return
 
-      ctx.gsap.set(sparkle, {
-        transformBox: 'fill-box',
-        transformOrigin: '50% 50%',
-        scaleX: 1,
-        scaleY: 1,
-        y: 0
-      })
+      ctx.gsap.set([sparkle, arc, arcPulse, arcHighlight], { transformBox: 'fill-box', transformOrigin: '50% 50%' })
+      ctx.gsap.set(sparkle, { scaleX: 1, scaleY: 1, x: 0, y: 0, rotation: 0 })
+      ctx.gsap.set(arc, { scaleX: 1, scaleY: 1, x: 0, y: 0, strokeWidth: 4 })
+      ctx.gsap.set(arcPulse, { autoAlpha: 0, scale: 1, strokeWidth: 3 })
+      ctx.gsap.set(arcHighlight, { autoAlpha: 0, strokeDasharray: 14, strokeDashoffset: 26 })
 
-      if (ctx.reduced || !autoBlink) return
+      if (ctx.reduced || (!autoBlink && !ambientMoments)) return
 
       const cadence = NEXA_BLINK_CADENCE[blinkCadence]
+      const ambientCadence = NEXA_AMBIENT_MOMENTS_CADENCE
+      let busy = false
+
+      const runMoment = (timeline: ReturnType<typeof ctx.gsap.timeline>): boolean => {
+        if (busy) return false
+
+        busy = true
+        timeline.eventCallback('onComplete', () => {
+          busy = false
+        })
+        timeline.restart()
+
+        return true
+      }
 
       const blink = ctx.gsap.timeline({ paused: true })
 
@@ -151,11 +182,133 @@ const NexaGsapBlinkMark = ({
           ease: 'gh-emphasized'
         })
 
+      const arcSparklePlay = ctx.gsap.timeline({ paused: true })
+
+      arcSparklePlay
+        .to(arc, {
+          scaleX: 1.06,
+          y: -0.35,
+          strokeWidth: 4.4,
+          duration: MOTION_DURATION_S.short,
+          ease: 'gh-emphasized'
+        })
+        .to(
+          sparkle,
+          {
+            scale: 1.2,
+            x: 1.1,
+            y: -1.2,
+            rotation: 8,
+            duration: MOTION_DURATION_S.short,
+            ease: 'gh-emphasized'
+          },
+          '<'
+        )
+        .to(
+          arcHighlight,
+          {
+            autoAlpha: 0.8,
+            strokeDashoffset: 0,
+            duration: MOTION_DURATION_S.standard,
+            ease: 'gh-standard'
+          },
+          '<0.04'
+        )
+        .to(
+          arcHighlight,
+          {
+            autoAlpha: 0,
+            duration: MOTION_DURATION_S.short,
+            ease: 'gh-emphasized-accelerate'
+          },
+          '>-0.05'
+        )
+        .to(
+          [arc, sparkle],
+          {
+            scaleX: 1,
+            scaleY: 1,
+            scale: 1,
+            x: 0,
+            y: 0,
+            rotation: 0,
+            strokeWidth: 4,
+            duration: MOTION_DURATION_S.standard,
+            ease: 'gh-emphasized'
+          },
+          '<'
+        )
+
+      const signalCatch = ctx.gsap.timeline({ paused: true })
+
+      signalCatch
+        .to(sparkle, {
+          x: -4.2,
+          y: 5.8,
+          scale: 0.84,
+          rotation: -10,
+          duration: MOTION_DURATION_S.short,
+          ease: 'gh-emphasized-accelerate'
+        })
+        .to(
+          arc,
+          {
+            scaleX: 1.04,
+            strokeWidth: 4.8,
+            duration: MOTION_DURATION_S.short,
+            ease: 'gh-emphasized'
+          },
+          '>-0.04'
+        )
+        .to(
+          arcPulse,
+          {
+            autoAlpha: 0.55,
+            scale: 1.05,
+            duration: MOTION_DURATION_S.instant,
+            ease: 'none'
+          },
+          '<'
+        )
+        .to(arcPulse, {
+          autoAlpha: 0,
+          scale: 1.42,
+          strokeWidth: 1.4,
+          duration: MOTION_DURATION_S.standard,
+          ease: 'gh-emphasized'
+        })
+        .to(
+          sparkle,
+          {
+            x: 0,
+            y: 0,
+            scale: 1,
+            rotation: 0,
+            duration: MOTION_DURATION_S.standard,
+            ease: 'gh-emphasized'
+          },
+          '<0.04'
+        )
+        .to(
+          arc,
+          {
+            scaleX: 1,
+            strokeWidth: 4,
+            duration: MOTION_DURATION_S.standard,
+            ease: 'gh-emphasized'
+          },
+          '<'
+        )
+
       const playBlink = () => {
-        blink.restart()
+        if (!autoBlink) return
+
+        runMoment(blink)
 
         if (Math.random() < cadence.doubleBlinkChance) {
-          ctx.gsap.delayedCall(0.22, () => blink.restart())
+          ctx.gsap.delayedCall(0.24, () => {
+            if (!busy) runMoment(blink)
+          })
         }
       }
 
@@ -166,17 +319,45 @@ const NexaGsapBlinkMark = ({
         })
       }
 
-      scheduleBlink(cadence.initialDelay)
+      const playAmbientMoment = () => {
+        if (!ambientMoments) return
+
+        const timeline = (() => {
+          if (ambientMoment === 'arcSparklePlay') return arcSparklePlay
+          if (ambientMoment === 'signalCatch') return signalCatch
+
+          return Math.random() < ambientCadence.arcSparklePlayChance ? arcSparklePlay : signalCatch
+        })()
+
+        const played = runMoment(timeline)
+
+        if (!played) {
+          ctx.gsap.delayedCall(ctx.gsap.utils.random(2, 4), playAmbientMoment)
+        }
+      }
+
+      const scheduleAmbientMoment = (delayRange: readonly [number, number] = ambientCadence.interval) => {
+        ctx.gsap.delayedCall(ctx.gsap.utils.random(delayRange[0], delayRange[1]), () => {
+          playAmbientMoment()
+          ctx.gsap.delayedCall(ctx.gsap.utils.random(ambientCadence.cooldown[0], ambientCadence.cooldown[1]), () => {
+            scheduleAmbientMoment()
+          })
+        })
+      }
+
+      if (autoBlink) scheduleBlink(cadence.initialDelay)
+      if (ambientMoments) scheduleAmbientMoment(ambientCadence.initialDelay)
     },
-    { scope: scopeRef, dependencies: [autoBlink, blinkCadence] }
+    { scope: scopeRef, dependencies: [ambientMoment, ambientMoments, autoBlink, blinkCadence] }
   )
 
   return (
     <Box
       component='span'
       ref={scopeRef}
-      role='img'
-      aria-label={ariaLabel}
+      role={decorative ? undefined : 'img'}
+      aria-label={decorative ? undefined : ariaLabel}
+      aria-hidden={decorative ? 'true' : undefined}
       data-capture={dataCapture}
       data-kind='nexa-gsap-blink-mark'
       sx={[
@@ -198,7 +379,12 @@ const NexaGsapBlinkMark = ({
             overflow: 'visible'
           },
           '& .gh-nexa-sparkle-eye': {
-            willChange: autoBlink ? 'transform' : 'auto',
+            willChange: autoBlink || ambientMoments ? 'transform' : 'auto',
+            transformBox: 'fill-box',
+            transformOrigin: 'center'
+          },
+          '& .gh-nexa-arc, & .gh-nexa-arc-pulse, & .gh-nexa-arc-highlight': {
+            willChange: ambientMoments ? 'transform, opacity' : 'auto',
             transformBox: 'fill-box',
             transformOrigin: 'center'
           }
@@ -207,7 +393,32 @@ const NexaGsapBlinkMark = ({
       ]}
     >
       <svg viewBox='0 0 48 48' aria-hidden='true' focusable='false'>
-        <path d='M9 27 Q19 39 29 27' fill='none' stroke={arcColor} strokeWidth='4' strokeLinecap='round' />
+        <path
+          className='gh-nexa-arc-pulse'
+          d='M9 27 Q19 39 29 27'
+          fill='none'
+          stroke={arcColor}
+          strokeWidth='3'
+          strokeLinecap='round'
+          opacity='0'
+        />
+        <path
+          className='gh-nexa-arc'
+          d='M9 27 Q19 39 29 27'
+          fill='none'
+          stroke={arcColor}
+          strokeWidth='4'
+          strokeLinecap='round'
+        />
+        <path
+          className='gh-nexa-arc-highlight'
+          d='M9 27 Q19 39 29 27'
+          fill='none'
+          stroke={markColor}
+          strokeWidth='2'
+          strokeLinecap='round'
+          opacity='0'
+        />
         <path
           className='gh-nexa-sparkle-eye'
           d='M34 9 C35 12.5 36.5 14 40 15 C36.5 16 35 17.5 34 21 C33 17.5 31.5 16 28 15 C31.5 14 33 12.5 34 9 Z'
@@ -224,27 +435,33 @@ const GreenhouseNexaAnimatedMark = ({
   animation,
   stateMachine,
   autoBlink = false,
+  ambientMoments = false,
+  ambientMoment = 'random',
   blinkCadence = 'attentive',
   chrome,
   tone,
   kind = 'badgeIcon',
   size = 'medium',
   ariaLabel = 'Nexa',
+  decorative = false,
   dataCapture,
   sx
 }: GreenhouseNexaAnimatedMarkProps) => {
   const [riveUnavailable, setRiveUnavailable] = useState(false)
   const sizeConfig = GREENHOUSE_NEXA_BRAND_SIZE_CONFIG[size]
 
-  if (autoBlink && (!riveSrc || riveUnavailable)) {
+  if ((autoBlink || ambientMoments) && (!riveSrc || riveUnavailable)) {
     return (
       <NexaGsapBlinkMark
         autoBlink={autoBlink}
+        ambientMoments={ambientMoments}
+        ambientMoment={ambientMoment}
         blinkCadence={blinkCadence}
         chrome={chrome ?? (kind === 'badgeIcon' ? 'badge' : 'none')}
         tone={tone ?? (kind === 'inlineMark' ? 'fullColor' : 'onNavy')}
         size={size}
         ariaLabel={ariaLabel}
+        decorative={decorative}
         dataCapture={dataCapture}
         sx={sx}
       />
@@ -258,8 +475,9 @@ const GreenhouseNexaAnimatedMark = ({
   return (
     <Box
       component='span'
-      role='img'
-      aria-label={ariaLabel}
+      role={decorative ? undefined : 'img'}
+      aria-label={decorative ? undefined : ariaLabel}
+      aria-hidden={decorative ? 'true' : undefined}
       data-capture={dataCapture}
       data-kind='nexa-rive-mark'
       sx={[

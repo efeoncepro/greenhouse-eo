@@ -6,6 +6,42 @@
 
 ---
 
+## Delta 2026-06-09h — Nexa animated mark + animated ask badge canon
+
+El mark de Nexa queda formalizado como familia canónica de primitives de marca
+y microinteracción, no como variantes locales por surface.
+
+- `GreenhouseNexaBrandMark` sigue siendo la primitive estática base de
+  identidad Nexa. Kinds oficiales: `askNexaBadge`, `badgeIcon`,
+  `inlineMark`, `monoMark`.
+- `GreenhouseNexaAnimatedMark` agrega dos capacidades oficiales:
+  reproducción Rive cuando existe un `.riv` exportado desde Rive Editor, y
+  fallback GSAP tokenizado cuando no existe asset Rive o se necesita motion
+  ligero. Props canónicas: `autoBlink`, `blinkCadence`,
+  `ambientMoments`, `ambientMoment`, `chrome`, `tone`, `decorative`.
+- Momentos GSAP oficiales: `autoBlink` para presencia viva ocasional,
+  `arcSparklePlay` para juego arco-sparkle y `signalCatch` para captura de
+  señal. El scheduler evita solapes y respeta reduced-motion.
+- `GreenhouseNexaAnimatedAskBadge` es la versión animada oficial del badge
+  `Pregúntale a Nexa`. No reemplaza el kind estático `askNexaBadge`; se usa
+  solo cuando un entry point debe sentirse vivo sin convertirse en loader.
+- `NexaGreetingsCard` expone `askBadgeVariant='static' | 'animated'`; el
+  default es `static`. `GreenhouseFunnelChartCard` activa
+  `askBadgeVariant='animated'` para
+  `GreenhouseNexaGreeting kind='funnelStageAdvisor'`.
+- El FAB global de Nexa usa `GreenhouseNexaAnimatedMark` con `autoBlink` +
+  `ambientMoments`; su aura hover/focus vive detrás del botón y no debe
+  lavarle el mark.
+- Evidencia canónica: micro GVC del badge animado en lab Nexa
+  `.captures/2026-06-09T20-52-25_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-animated-ask-badge-hero`,
+  micro GVC del consumer en charts
+  `.captures/2026-06-09T20-57-11_micro-admin-design-system-charts-data-capture-nexa-ask-badge-animated`,
+  ambient moments
+  `.captures/2026-06-09T20-24-18_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-arc-sparkle-specimen`
+  /
+  `.captures/2026-06-09T20-24-19_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-signal-catch-specimen`
+  y hover aura `.captures/2026-06-09T20-46-22_nexa-floating-hover-glow`.
+
 ## Delta 2026-06-09g — Funnel Analysis Pattern
 
 La familia del funnel queda nombrada como **Funnel Analysis Pattern** en la capa
@@ -81,6 +117,9 @@ sin componer iconos sueltos por surface.
 
 - Kinds iniciales: `askNexaBadge` (badge Midnight Navy con label
   `Pregúntale a Nexa`), `badgeIcon`, `inlineMark` y `monoMark`.
+- Variante animada separada: `GreenhouseNexaAnimatedAskBadge` renderiza el
+  mismo badge `Pregúntale a Nexa` con `GreenhouseNexaAnimatedMark` y el blink
+  del FAB, sin sustituir el kind estático `askNexaBadge` por defecto.
 - Source visual: `public/images/nexa-mark/nexa-mark.svg`,
   `nexa-mark-mono.svg`, `nexa-badge.svg` y spec
   `public/images/nexa-mark/nexa-icon-spec.md`.
@@ -96,7 +135,10 @@ sin componer iconos sueltos por surface.
 - Evidencia: GVC `design-system-nexa-brand` local
   `.captures/2026-06-09T17-17-52_design-system-nexa-brand`
   (desktop/mobile, `qualityFindings=[]`) + GVC `design-system-charts`
-  `.captures/2026-06-09T18-35-44_design-system-charts` para el primer consumer.
+  `.captures/2026-06-09T18-35-44_design-system-charts` para el primer consumer
+  + micro evidence
+  `.captures/2026-06-09T20-52-25_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-animated-ask-badge-hero`
+  para el badge animado.
 
 ## Delta 2026-06-09c — Greenhouse Funnel Chart primitive
 

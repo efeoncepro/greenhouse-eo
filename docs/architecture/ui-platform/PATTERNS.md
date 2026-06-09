@@ -20,7 +20,8 @@ retención, SLA, caídas, bloqueos y siguiente conversación con Nexa.
 - **Zone primitives:** `GreenhouseFunnelHeaderControls`,
   `GreenhouseFunnelKpiStrip`, `GreenhouseFunnelStageRail`,
   `GreenhouseFunnelStageSegment`, `GreenhouseFunnelDiagnosticsGrid`.
-- **Assisted analysis:** `GreenhouseNexaGreeting kind='funnelStageAdvisor'`.
+- **Assisted analysis:** `GreenhouseNexaGreeting kind='funnelStageAdvisor'`
+  con `askBadgeVariant='animated'`.
 - **Kinds iniciales:** `cscPipeline`, `commercialLifecycle`, `quoteToCash`,
   `onboardingActivation`, `custom`.
 
@@ -43,6 +44,9 @@ rail vive dentro de `GreenhouseFunnelStageRail`.
 - El patrón combina **contexto ejecutivo** (header + controles), **señales
   rápidas** (KPI strip), **lectura secuencial** (stage rail), **diagnóstico
   operativo** (grid/tabla) y **asistencia conversacional** (Nexa).
+- La asistencia conversacional del funnel usa el badge canónico
+  `GreenhouseNexaAnimatedAskBadge`; no copiar el pill ni animar un badge local.
+  Otros greetings mantienen badge estático por default.
 - `stageRole` representa el rol de proceso de la etapa; `health`/diagnostics
   representan salud operativa. No mezclar ambos contratos.
 - Nuevos workflows entran como `kind` y resuelven a una `variant`; no deben

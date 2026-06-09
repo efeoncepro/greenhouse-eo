@@ -2,7 +2,7 @@
 /* eslint-disable greenhouse/no-untokenized-copy -- fixture copy for primitive rendering assertions */
 
 import { cleanup, fireEvent } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
 
@@ -57,7 +57,26 @@ const stages: GreenhouseFunnelStage[] = [
   }
 ]
 
-afterEach(cleanup)
+beforeEach(() => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn()
+    }))
+  })
+})
+
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
 
 describe('GreenhouseFunnelChartCard', () => {
   it('renders the operational pipeline with accessible stage controls', () => {
@@ -85,6 +104,7 @@ describe('GreenhouseFunnelChartCard', () => {
     expect(getByLabelText(/Consulta a Nexa sobre este funnel/i)).toBeInTheDocument()
     expect(queryByText('Consulta a Nexa sobre este funnel')).not.toBeInTheDocument()
     expect(queryByText('Foco actual: Cambios')).not.toBeInTheDocument()
+    expect(getByRole('img', { name: 'Pregúntale a Nexa' })).toHaveAttribute('data-kind', 'askNexaAnimatedBadge')
     expect(getAllByText('Cambios').length).toBeGreaterThan(0)
     expect(getAllByText('Juan P.').length).toBeGreaterThan(0)
     expect(getByRole('textbox', { name: /Pregunta para Nexa/i })).toBeInTheDocument()

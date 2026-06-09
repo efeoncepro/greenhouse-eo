@@ -23,6 +23,8 @@ export type {
 export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
 export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedMark'
 export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
+export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
+export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export {
   GREENHOUSE_NEXA_BRAND_ASSETS,
   GREENHOUSE_NEXA_BRAND_COLORS,

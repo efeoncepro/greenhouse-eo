@@ -1514,6 +1514,7 @@ const GreenhouseFunnelChartCard = ({
                 <Box sx={{ mt: 4 }}>
                   <GreenhouseNexaGreeting
                     kind='funnelStageAdvisor'
+                    askBadgeVariant='animated'
                     greeting={resolvedCopy.nexaAssistantTitle}
                     roleLine={`${resolvedCopy.nexaAssistantFocusLabel}: ${selectedStage.label}`}
                     disclaimer={resolvedCopy.nexaAssistantDescription}
