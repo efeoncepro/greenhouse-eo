@@ -164,6 +164,10 @@ Omitida (task `policy`/doc-governance). El Scope + el patrón ya aplicado en `05
 - **Dejado fuera a propósito:** fechas-target comerciales (NRR >110% "Q3 2026" en `06`/`11`, título de `08`) — son targets de GTM, no claims de runtime que confundan a un dev. Nomenclatura de primera versión en docs (Pulse/Ciclos/etc.) en 02/04/06/08/10/11 + triggers de la skill → se mueve junto con el rename de producto (TASK-1065).
 - **Cierre:** core de la task (matar drift + frontera de altitud + gobernanza de frescura + reconciliación) completo. El stamping de los 9 docs no verificados es follow-up del refresh del governor (verificar contenido contra runtime, no solo poner fecha).
 
+### Delta 2026-06-09 (cont.) — follow-up de stamping completado
+
+Los **9 docs restantes** (01/02/03/06/07/09/10/11/13) fueron **verificados contra runtime y stampeados** (`Última verificación: 2026-06-09 (TASK-1064)`). Resultado de la verificación: limpios de drift de runtime salvo **10:80** (claim de estado de UI "el doc Prospect aún rotula 'Reviews per Asset', string a corregir en UI" → suavizado a guía de naming canónico, mismo trato que 00). Las fechas-target comerciales (NRR ">110% (Q3 2026)" en 06/11, "100% a partir de Q3" en 10) y la arquitectura Bow-tie 7/12 stages (06/11) se confirmaron **intencionales** (targets GTM / contrato de arquitectura, no claims de runtime) y se dejaron. **Los 14 docs del pack llevan ahora stamp de verificación.** Slice 2 100% completo (no solo el core).
+
 ## Open Questions
 
 - ¿El mirror repo `.claude/skills/efeonce-agency/SKILL.md` existe, o la skill es solo global? Determina si la reconciliación de Slice 3 es committeable. [verificar en Discovery]

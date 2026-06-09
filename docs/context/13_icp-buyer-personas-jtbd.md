@@ -111,3 +111,5 @@ Cada job mapea a una capacidad del portal. Esto es lo accionable:
 ---
 
 *Fuente: doc de Segmentación Comercial — ICPs, Buyer Personas & JTBD (mar-2026). El doc fuente tiene las 11 dimensiones de los 12 ICPs y los JTBD de las 4 unidades; aquí se destiló lo que informa producto.*
+
+*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*

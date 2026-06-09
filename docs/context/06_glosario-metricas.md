@@ -248,3 +248,5 @@ La visibilidad se escala por tier (alineado con el modelo ASaaS). **Directamente
 ---
 
 *Fuentes de autoridad: Contrato de Métricas ICO v1.0 · Addendum ICO v1.1 (Métricas Outcome) · Addendum ICO v1.2 (SEO/AEO Manager) · Arquitectura Bow-tie v1.1 · GTM 2026 · Product Ecosystem v1.0. Ante un nombre nuevo, este archivo manda.*
+
+*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*

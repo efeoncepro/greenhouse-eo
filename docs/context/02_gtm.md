@@ -142,3 +142,5 @@ Validado por datos del CRM: win rate ~50% en cuentas existentes vs. 2–3% en ne
 ---
 
 *Fuente: GTM Strategy Efeonce Group 2026 v1.0. Documentos de autoridad por dominio: ICP/Buyer Personas/JTBD, Estrategia Comercial v1.3, Sistema Comercial Pipeline Core, BDR Prospecting Playbook 2026.*
+
+*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*

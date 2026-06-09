@@ -116,3 +116,5 @@ Esta es la conexión que importa para un agente de producto:
 ---
 
 *Fuente: ICO — Intelligent Creative Operations v1.0 + Contrato de Métricas ICO v1.0 + Addendum v1.1 (Outcome) + Addendum v1.2 (SEO/AEO). Métricas y siglas: ver `06`.*
+
+*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*
