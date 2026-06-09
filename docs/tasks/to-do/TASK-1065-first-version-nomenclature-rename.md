@@ -11,7 +11,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `operator decision on new canonical names (see Open Questions)`
+- Blocked by: `none (nombres resueltos 2026-06-09 — ver Delta)`
 - Branch: `task/TASK-1065-nomenclature-rename`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -170,11 +170,19 @@ Pendiente de los nombres nuevos (Open Questions). Una vez decididos, el detalle 
 
 - none.
 
-## Open Questions
+## Delta 2026-06-09 — nombres resueltos + matiz Space≠Organization
 
-- **¿Cuáles son los nombres nuevos?** (bloqueante) — el operador debe definir, por concepto:
-  - Clients/Espacios → ?
-  - Sprints/Ciclos → ?
-  - Dashboard/Pulse → ?
-  - Internal admin/Torre de Control → ?
-  - O bien: usar términos neutros (clientes/cuentas, sprints, dashboard, admin).
+Nombres nuevos (decisión operador 2026-06-09):
+
+| Concepto | Nombre viejo (1ª versión) | **Nombre nuevo** |
+|---|---|---|
+| Cliente/cuenta | Espacios | **Organizations / Organizaciones** (ya vigente en gran parte del runtime: Account 360, org workspace) |
+| Sprint de producción | Ciclos | **Sprints** |
+| Dashboard | Pulse / Pulse Global | **Dashboard / dashboards** (genérico, minúscula) |
+| Admin interno / vista cross-cuenta | Torre de Control | **Cabina de Mando** (corto: "Cabina") — preserva identidad de centro-de-comando sin la cursilería de 1ª versión; el repo ya usa "cabina de mando" (Handoff.md). Override del operador posible. |
+
+**Matiz CRÍTICO (no es find-replace):** `Space` es un **objeto canónico 360 distinto** (`greenhouse_core.spaces.space_id`, contenedor de trabajo por cliente) — NO es sinónimo de cliente. La nomenclatura de 1ª versión conflaba "Clients" con "Espacios/Spaces". El rename es: **cliente-como-Espacio → Organizations**, pero el objeto canónico **Space se queda** (no renombrar `spaces`/`space_id`/"Spaces" donde refiere al objeto de trabajo). Auditar cada mención de "Espacios/Spaces" y clasificar: ¿refiere al cliente (→ Organization) o al objeto Space (→ se queda)?
+
+**Estado del SSOT (`greenhouse-nomenclature.ts`):** `organizations` ya es 'Organizaciones' (l.75). A cambiar: `dashboard` label 'Pulse'→'Dashboard' (l.15), `sprints` label 'Ciclos'→'Sprints' (l.17), `internalDashboard` 'Torre de control'→'Cabina de Mando' (l.31), `pulseGlobal` 'Pulse Global' (l.72) + subtítulos con "Pulse"/"Spaces" (l.31/71/72) — reescribir distinguiendo Space-objeto de cliente.
+
+**Slice ordering recomendado (timing):** ejecutar como **pase limpio dedicado, idealmente post-release** (la rama actual tiene el release en vuelo + WIP paralelo de Codex en componentes; un rename de labels sobre archivos compartidos ahora arriesga conflictos). Las renames de **identificadores de código** (`HomePulseStrip.tsx`→...) son follow-up de menor valor (internos, no user-facing) — separar de los cambios de label user-facing.
