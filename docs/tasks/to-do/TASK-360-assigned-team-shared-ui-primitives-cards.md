@@ -93,6 +93,14 @@ Reglas obligatorias:
 - no existe set shared para `FreshnessChip`, `CapacityCoverageBar`, `VerificationConfidenceStack`, `AttentionListCard`
 - no hay package local de cards preparado para surfaces múltiples
 
+## Approved Mockup Dependency
+
+El contrato visual/producto aprobado vive en `docs/mockups/TASK-357/README.md`.
+
+Esta task debe promover a primitives/cards compartidas las piezas reutilizables del mockup aprobado: scope switcher, freshness chip, KPI strip, roster row, skill mark, verification badge, talent dossier, health card, capability coverage chart, attention list y continuity panel. No crear componentes paralelos por surface; usar primitive + variants + kinds cuando aplique.
+
+Seed canónico ya creado (2026-06-09): `GreenhouseHealthSignalChart` en `/admin/design-system/charts`, `GreenhouseTalentProfileDossier` y `GreenhouseVerificationBadge` en `/admin/design-system/talent-profile`. El resto de bloques sigue dentro del alcance de esta task.
+
 ## Scope
 
 ### Slice 1 — Primitives
@@ -120,6 +128,7 @@ Reglas obligatorias:
 - [ ] Existe una librería local `assigned-team` reusable desde varias surfaces
 - [ ] Los componentes reutilizan patrones Vuexy/Greenhouse ya existentes
 - [ ] Hay tests o fixtures para estados loading, empty, normal y degraded
+- [ ] Las primitives/cards cubren los bloques reutilizables del mockup aprobado con GVC evidence
 
 ## Verification
 

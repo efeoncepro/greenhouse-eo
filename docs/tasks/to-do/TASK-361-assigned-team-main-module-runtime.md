@@ -90,6 +90,12 @@ Reglas obligatorias:
 - no hay grouping por `space`, seniority, rol, idioma o health
 - no hay premium cards, freshness ni attention lane
 
+## Approved Mockup Dependency
+
+El contrato visual/producto aprobado vive en `docs/mockups/TASK-357/README.md` y se validó con GVC en `.captures/2026-06-09T11-16-25_assigned-team-command-portfolio-mockup`.
+
+Esta task debe bajar `/equipo` a runtime con paridad funcional respecto al mockup aprobado. Si falta backend/modelo para algún bloque visible, no se debe simular localmente: volver a `TASK-358`, `TASK-359`, `TASK-363` o `TASK-364` según corresponda. Si existe una capability backend no representada en UI, debe pasar por mockup + GVC antes de incorporarse.
+
 ## Scope
 
 ### Slice 1 — Page shell
@@ -117,6 +123,7 @@ Reglas obligatorias:
 - [ ] `/equipo` resuelve como `Equipo asignado` sobre portfolio canónico
 - [ ] La página muestra composición, FTE, saturation, skills y health en lenguaje cliente-safe
 - [ ] La surface soporta variantes con y sin premium entitlements sin romper layout
+- [ ] Existe GVC runtime comparado contra el mockup aprobado antes de cerrar
 
 ## Verification
 

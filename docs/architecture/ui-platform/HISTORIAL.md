@@ -6,6 +6,19 @@
 
 ---
 
+## Delta 2026-06-09b — Assigned Team health chart, talent dossier y verification primitives
+
+El mockup aprobado de `Equipo asignado` promovió tres piezas route-locales a
+primitives canónicas de UI Platform:
+
+- **`GreenhouseHealthSignalChart`** — chart SVG segmentado para salud/cobertura/continuidad (`variant='segmentedDonut'`, kinds `teamHealth`/`talentHealth`/`capacityHealth`). Vive en `/admin/design-system/charts` con specimen, mini reglas de uso/cambio y GVC dedicado.
+- **`GreenhouseTalentProfileDossier`** — card enterprise de perfil verificable (`variant='enterpriseCard'`, kinds `assignedTeamTalent`/`candidateTalent`/`deliveryTalent`) para dossier de talento, stack verificado, métricas compactas, cobertura y última señal.
+- **`GreenhouseVerificationBadge`** queda formalizada como primitive de verificación con kinds `efeonce` y `talentVerified`; el lab vivo `/admin/design-system/talent-profile` muestra badges + dossier y documenta reglas de uso/cambio.
+
+Regla: nuevas variants/kinds deben aparecer primero en el lab correspondiente
+con `data-capture`, GVC desktop/mobile y contrato de datos explícito; no crear
+badges, dossiers ni health donuts route-locales paralelos.
+
 ## Delta 2026-06-08 — Disclosure text typography token
 
 La escala tipográfica suma `disclosureText` / `disclosure-text` como variante

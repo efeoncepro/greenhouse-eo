@@ -93,6 +93,12 @@ Reglas obligatorias:
 - no existe health summary reusable por cards y alerts
 - no existe contrato de thresholds y severities compartido con `Assigned Team`
 
+## Approved Mockup Dependency
+
+El contrato visual/producto aprobado vive en `docs/mockups/TASK-357/README.md`.
+
+Esta task debe dar vida real a los bloques de capacidad y salud del mockup: FTE activa, capacidad cubierta, seniority mix, delivery confidence, riesgo operativo, health donut/card, coverage por capability, coverage por persona y estados `Estable / En riesgo / Critico`. Si alguna métrica del mockup no existe en `Team Capacity` o sources actuales, esta task debe modelar el bridge antes de runtime.
+
 ## Scope
 
 ### Slice 1 — Capacity translation
@@ -120,6 +126,7 @@ Reglas obligatorias:
 - [ ] `Assigned Team` consume capacidad y health desde un bridge canónico
 - [ ] Los thresholds y severities quedan centralizados y testeados
 - [ ] La semántica cliente-safe coincide con la arquitectura y no filtra ruido interno
+- [ ] Todas las métricas de capacidad/health del mockup aprobado tienen source, threshold y fallback
 
 ## Verification
 

@@ -92,6 +92,12 @@ Reglas obligatorias:
 - no hay score o catálogo de alertas cliente-safe por miembro/equipo
 - no existe bridge entre continuidad operativa y visibilidad cliente-facing
 
+## Approved Mockup Dependency
+
+El contrato visual/producto aprobado vive en `docs/mockups/TASK-357/README.md`, con attention/continuity visibles en `docs/mockups/TASK-357/assigned-team-command-portfolio-approved.png` y `docs/mockups/TASK-357/assigned-team-intelligence-band-approved.png`.
+
+Esta task debe respaldar las señales del mockup: `señales en observación`, `Riesgo operativo`, `Continuidad operativa`, `Backup activo`, `Próxima decisión` y `Señales para accionar`. Si falta source-of-truth para una señal, debe diseñarse el modelo/reader policy-aware antes de exponer la card runtime.
+
 ## Scope
 
 ### Slice 1 — Alert catalog
@@ -119,6 +125,7 @@ Reglas obligatorias:
 - [ ] Existe un catálogo enterprise de alertas para `Assigned Team`
 - [ ] Las alertas se sirven desde reader policy-aware y con freshness explícita
 - [ ] UI principal y consumers pueden renderizar alertas sin lógica local adicional
+- [ ] Las señales visibles del mockup aprobado tienen alert type, severity, freshness y owner
 
 ## Verification
 

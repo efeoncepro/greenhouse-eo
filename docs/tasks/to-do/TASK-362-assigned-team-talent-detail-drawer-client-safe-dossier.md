@@ -90,6 +90,12 @@ Reglas obligatorias:
 - no existe layout para skills + certs + idiomas + signals + coverage en detalle
 - no existe convergencia entre roster y dossier
 
+## Approved Mockup Dependency
+
+El dossier aprobado vive en `docs/mockups/TASK-357/assigned-team-dossier-approved.png` y su contrato completo en `docs/mockups/TASK-357/README.md`.
+
+Esta task debe implementar el dossier/drawer con la misma jerarquía aprobada: identidad, health, role kind, verificación Efeonce, métricas compactas, coverage, foco, stack verificado, certificaciones/idiomas y última señal. Todo campo debe venir de client-safe profile + assignment/capacity/policy; nada debe resolverse desde copy o mock data local en runtime.
+
 ## Scope
 
 ### Slice 1 — Drawer structure
@@ -117,6 +123,7 @@ Reglas obligatorias:
 - [ ] Existe un drawer `Assigned Team` usable desde la página principal
 - [ ] El detalle individual converge dossier client-safe + contexto assignment/capacity
 - [ ] La navegación del drawer es accesible y reusable en otras surfaces
+- [ ] El dossier runtime tiene GVC parity contra `assigned-team-dossier-approved.png`
 
 ## Verification
 

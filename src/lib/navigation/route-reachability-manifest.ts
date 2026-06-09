@@ -167,6 +167,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Charts Lab — child surface del Design System para primitives de visualizacion de datos, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
+    route: '/admin/design-system/talent-profile',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Talent Profile Lab — child surface del Design System para dossier/verificacion de talento, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
     route: '/admin/design-system/utilities',
     parent: '/admin/design-system',
     via: 'inline-link',

@@ -97,6 +97,12 @@ Reglas obligatorias:
 - no hay matriz de campos visibles por variant de cliente
 - no hay degradación explícita para premium cards y signals de riesgo
 
+## Approved Mockup Dependency
+
+El contrato visual/producto aprobado vive en `docs/mockups/TASK-357/README.md`.
+
+Esta task debe convertir los bloques del mockup aprobado en policy field-level: roster, coverage, skills, dossier, capacity, health, attention lane, freshness y premium degradation. Si un campo visible del mockup no puede mostrarse a un cliente/tier, debe definirse su masking o estado degradado antes de `TASK-361`/`TASK-362`.
+
 ## Scope
 
 ### Slice 1 — Policy model
@@ -124,6 +130,7 @@ Reglas obligatorias:
 - [ ] Existe una policy field-level reutilizable por página, drawer y cards embebidas
 - [ ] `Assigned Team` se puede habilitar por scope sin exponer signals fuera de policy
 - [ ] Hay tests de autorización y masking para al menos tres variantes de acceso
+- [ ] La matriz de policy cubre todos los bloques del mockup aprobado o documenta su exclusión
 
 ## Verification
 

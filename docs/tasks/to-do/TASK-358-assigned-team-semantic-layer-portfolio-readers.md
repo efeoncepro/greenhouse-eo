@@ -99,6 +99,12 @@ Reglas obligatorias:
 - no existe tipado compartido `AssignedTeam` / `ClientWorkforcePortfolio`
 - no hay freshness ni lineage documentada por campo para esta capability
 
+## Approved Mockup Dependency
+
+El contrato visual/producto aprobado vive en `docs/mockups/TASK-357/README.md` y especialmente en `docs/mockups/TASK-357/assigned-team-command-portfolio-approved.png`.
+
+Esta task debe revisar cada dato visible del mockup y decidir su source-of-truth antes de que `TASK-361` lo consuma. Si el mockup muestra una capacidad sin contrato de datos actual, esta task debe modelarla o dejar un follow-up explícito antes de permitir UI runtime.
+
 ## Scope
 
 ### Slice 1 — Domain contract
@@ -126,6 +132,7 @@ Reglas obligatorias:
 - [ ] Existe un contrato tipado `Assigned Team` reusable por surfaces cliente-facing
 - [ ] El reader unifica assignments, capacidad y perfil client-safe sin duplicar tablas
 - [ ] Las APIs nuevas tienen cobertura de tests para casos vacíos, parciales y multi-space
+- [ ] Cada campo visible del mockup aprobado tiene provenance/freshness o gap documentado
 
 ## Verification
 
