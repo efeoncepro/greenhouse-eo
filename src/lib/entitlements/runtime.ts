@@ -1700,6 +1700,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     const adminOrgCapabilities: Array<{ capability: EntitlementCapabilityKey; actions: EntitlementAction[] }> = [
       { capability: 'organization.identity', actions: ['read'] },
       { capability: 'organization.identity_sensitive', actions: ['read', 'update'] },
+      { capability: 'organization.brand_asset', actions: ['review', 'update'] },
       { capability: 'organization.spaces', actions: ['read'] },
       { capability: 'organization.team', actions: ['read'] },
       { capability: 'organization.economics', actions: ['read'] },
@@ -1770,6 +1771,21 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         module: 'organization',
         capability,
         action: 'read',
+        scope: 'tenant',
+        source: 'route_group'
+      })
+    }
+  }
+
+  // TASK-999 — Organization commercial logo enrichment. Admin route-group users
+  // can review/update non-operating organization brand assets; the command layer
+  // still blocks `is_operating_entity=TRUE` so Efeonce/legal logos are not touched.
+  if (hasRouteGroup(subject, 'admin') && !hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    for (const action of ['review', 'update'] satisfies EntitlementAction[]) {
+      addEntitlement(entries, {
+        module: 'organization',
+        capability: 'organization.brand_asset',
+        action,
         scope: 'tenant',
         source: 'route_group'
       })

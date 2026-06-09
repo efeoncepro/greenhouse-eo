@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 import type { AccountIdentityFacet, AccountScope, AccountFacetContext } from '@/types/account-complete-360'
 
 type IdentityRow = {
@@ -16,6 +17,9 @@ type IdentityRow = {
   status: string
   active: boolean
   hubspot_company_id: string | null
+  logo_asset_id: string | null
+  website_url: string | null
+  is_operating_entity: boolean | null
   notes: string | null
   space_count: string | number
   membership_count: string | number
@@ -56,6 +60,9 @@ export const fetchIdentityFacet = async (
       status,
       active,
       hubspot_company_id,
+      logo_asset_id,
+      website_url,
+      is_operating_entity,
       notes,
       space_count,
       membership_count,
@@ -85,6 +92,10 @@ export const fetchIdentityFacet = async (
     status: row.status,
     active: row.active,
     hubspotCompanyId: row.hubspot_company_id,
+    logoAssetId: row.logo_asset_id,
+    logoUrl: row.logo_asset_id ? `${buildPrivateAssetDownloadUrl(row.logo_asset_id)}?inline=1` : null,
+    websiteUrl: row.website_url,
+    isOperatingEntity: row.is_operating_entity === true,
     notes: row.notes,
     spaceCount: toNum(row.space_count),
     membershipCount: toNum(row.membership_count),

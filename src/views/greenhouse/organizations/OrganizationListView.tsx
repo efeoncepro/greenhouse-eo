@@ -49,6 +49,10 @@ interface OrganizationListItem {
   industry: string | null
   country: string | null
   hubspotCompanyId: string | null
+  logoAssetId: string | null
+  logoUrl: string | null
+  websiteUrl: string | null
+  isOperatingEntity: boolean
   status: string
   active: boolean
   spaceCount: number
@@ -731,12 +735,29 @@ function OrgAvatar({ item, size = 'default' }: { item: OrganizationListItem; siz
         flexShrink: 0,
         border: `1px solid ${theme.palette[tone].mainOpacity}`,
         bgcolor: `${tone}.lighterOpacity`,
-        color: 'text.primary'
+        color: 'text.primary',
+        overflow: 'hidden'
       }}
     >
-      <Typography component='span' variant={size === 'matrix' ? 'caption' : 'button'} color='inherit'>
-        {getInitials(item.organizationName)}
-      </Typography>
+      {item.logoUrl ? (
+        <Box
+          component='img'
+          src={item.logoUrl}
+          alt=''
+          loading='lazy'
+          sx={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            p: size === 'matrix' ? 0.5 : 1,
+            bgcolor: 'background.paper'
+          }}
+        />
+      ) : (
+        <Typography component='span' variant={size === 'matrix' ? 'caption' : 'button'} color='inherit'>
+          {getInitials(item.organizationName)}
+        </Typography>
+      )}
     </Box>
   )
 }
@@ -906,7 +927,12 @@ function OrganizationContextRail({ item }: { item: OrganizationListItem }) {
         <StatusPill label={riskMeta[risk].label} tone={riskMeta[risk].tone} icon={riskMeta[risk].icon} />
       </Stack>
 
-      <RailSection title='Readiness operacional' subheader='Derivado de datos reales disponibles' icon='tabler-progress-check'>
+      <RailSection
+        title='Readiness operacional'
+        subheader='Derivado de datos reales disponibles'
+        icon='tabler-progress-check'
+        captureId='organization-context-rail-readiness'
+      >
         <Stack spacing={3}>
           <Stack spacing={1}>
             <Stack direction='row' justifyContent='space-between' alignItems='center'>
@@ -989,18 +1015,21 @@ function RailSection({
   subheader,
   icon,
   tone = 'primary',
+  captureId,
   children
 }: {
   title: string
   subheader: string
   icon: string
   tone?: 'primary' | 'info'
+  captureId?: string
   children: ReactNode
 }) {
   const theme = useTheme()
 
   return (
     <Box
+      data-capture={captureId}
       sx={{
         borderBottom: `1px solid ${theme.palette.divider}`,
         pb: 4,

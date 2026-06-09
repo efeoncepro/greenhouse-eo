@@ -78,6 +78,10 @@ export interface AccountIdentityFacet {
   status: string
   active: boolean
   hubspotCompanyId: string | null
+  logoAssetId: string | null
+  logoUrl: string | null
+  websiteUrl: string | null
+  isOperatingEntity: boolean
   notes: string | null
   spaceCount: number
   membershipCount: number

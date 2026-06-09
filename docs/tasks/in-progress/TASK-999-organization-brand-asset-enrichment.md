@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `code complete local/dev; rollout staging/prod pendiente`
 - Rank: `TBD`
 - Domain: `identity|agency|ui|data|integrations|reliability`
 - Blocked by: `none`
-- Branch: `task/TASK-999-organization-brand-asset-enrichment`
+- Branch: `develop` (por instruccion explicita del operador)
 - Legacy ID: `optional`
 - GitHub Issue: `optional`
 
@@ -27,6 +27,14 @@
 Greenhouse debe resolver el flujo enterprise para poblar logos de organizaciones sin cargarlos uno a uno desde cero: dominio/HubSpot/website generan candidatos, un operador revisa o sube el asset, y `Organization` queda con un logo canonico servido desde storage propio.
 
 La task conecta ese logo al avatar/header de Organization Workspace y superficies 360, usando `greenhouse_core.organizations.logo_asset_id` como puntero final, `greenhouse_core.assets` como owner de bytes y una cola de revision para evitar aplicar logos incorrectos.
+
+**Guardrail de alcance:** TASK-999 aplica a organizaciones comerciales/cliente/proveedor que no son la entidad legal/operating entity de Efeonce. No cambia logos de Efeonce, Greenhouse institucional, operating entities ni entidades relacionadas usadas en documentos legales.
+
+## Progress Log
+
+- 2026-06-08/09 — Foundation implementada en `develop`: migration dev aplicada, contexts de assets, capability `organization.brand_asset`, command/API de attach, candidates, discovery por website/URL, review queue admin suplementaria, señales reliability, ops-worker y consumo de `logoUrl` en listas/workspace.
+- 2026-06-09 — UX principal corregida por feedback de operador: el flujo primario vive al hacer click en el avatar de la organizacion, abre un pop-up `GreenhouseFloatingSurface` tipo Logo Studio y usa `GreenhouseFileUploader` para carga manual; Admin Center queda como cola suplementaria de data-quality/bulk review.
+- 2026-06-09 — Busqueda por URL corregida: acepta sitio web o URL directa de imagen; si recibe un website (ej. `https://latam.com`) lee metadata (`og:image`, `twitter:image`, icon links/fallback) y guarda el logo como asset privado, sin hotlink.
 
 ## Why This Task Exists
 
@@ -43,6 +51,7 @@ La causa raiz no es visual: falta una primitive canonica de Organization Brand A
 ## Goal
 
 - Definir `organizations.logo_asset_id` como puntero canonico final para logo de organizacion, preservando su uso legal-documental y documentando el delta semantico.
+- Limitar enrichment comercial a organizaciones con `is_operating_entity=FALSE`; las filas Efeonce/operating entity quedan fuera del flujo normal de discovery, upload, review y replace.
 - Crear un flujo de enrichment enterprise: discovery de candidatos, normalizacion a asset propio, review queue, accept/reject/upload manual y re-scan.
 - Exponer el logo en `organization_360`, readers, Organization Workspace, listas y avatars con fallback estable a iniciales.
 - Evitar hotlinking, SVG no confiable, aplicar logos de baja confianza sin revision y fugas de acceso.
@@ -77,6 +86,7 @@ Reglas obligatorias:
 
 - Organization sigue siendo el objeto canonico 360; no crear un SSOT paralelo de cliente/logo en BigQuery, HubSpot ni media legacy.
 - `greenhouse_core.assets` guarda bytes, metadata, retention y access log; la semantica de marca pertenece al dominio Organization.
+- El enrichment comercial excluye `organizations.is_operating_entity=TRUE` y cualquier fila institucional Efeonce/relacionada; esos logos pertenecen al contrato legal/institucional existente y no se gestionan por esta cola.
 - No hacer hotlink de logos remotos en UI productiva. Todo logo aceptado debe copiarse a storage propio, validarse y servirse por endpoint/proxy controlado.
 - No renderizar SVG remoto sin sanitizacion fuerte. Preferir PNG/WebP normalizado; SVG solo si se sanitiza y se sirve como asset controlado.
 - La lectura visible del logo vive bajo `organization.identity`; mutar/revisar logos requiere capability granular y auditada, no solo presencia de ruta.
@@ -205,7 +215,7 @@ Reglas obligatorias:
 - Agregar contexts/retention classes `organization_logo_draft`, `organization_logo` y `organization_logo_candidate` en `src/types/assets.ts` y storage helpers.
 - Extender upload privado o crear endpoint dedicado para subir logo de organizacion con validacion de MIME, tamano, dimensiones y owner `organizationId`.
 - Crear command atomico (tx unica) para adjuntar/reemplazar logo: actualiza `organizations.logo_asset_id`, marca asset como attached (`owner_aggregate_type='organization_logo'`), escribe audit/outbox y **preserva el logo anterior como asset historico no borrado** (supersede, nunca DELETE). Idempotente por `content_hash`.
-- Gatear mutaciones con la capability granular `organization.brand_asset` (`update|review`) — ver Access model. Aplicar el **operating-entity guard**: bloquear/elevar cuando `is_operating_entity=TRUE`.
+- Gatear mutaciones con la capability granular `organization.brand_asset` (`update|review`) — ver Access model. Aplicar el **operating-entity guard**: bloquear el flujo normal cuando `is_operating_entity=TRUE`; TASK-999 no permite cambiar logos de Efeonce/operating entities desde discovery, upload, review ni replace comercial. Cualquier cambio legal/institucional futuro debe ir por task/ADR separado.
 
 ### Slice 3 — Candidate discovery model
 
@@ -235,6 +245,7 @@ Reglas obligatorias:
 
 - Redisenar completo el Organization Workspace.
 - Sustituir el logo institucional Efeonce/Greenhouse en PDFs, footers o brand assets propios.
+- Cambiar logos de Efeonce, operating entities o entidades relacionadas a Efeonce usadas como marca legal/institucional.
 - Usar imagen generada por IA para suplantar el logo real de una organizacion.
 - Aplicar automaticamente logos de baja o media confianza sin revision humana.
 - Hotlink permanente a Clearbit, HubSpot, website externo u otro proveedor.
@@ -283,7 +294,7 @@ Fuentes iniciales permitidas:
 - Read: `organization.identity:read` (logo es parte de identity basica; `logoUrl` se sirve por proxy propio con `canTenantAccessAsset`).
 - Mutate/review: **capability granular nueva `organization.brand_asset`** con actions `review|update` scope `tenant|all`. DECIDIDO (overlay arch-architect regla #7 — capability granular, no reusar coarse): NO reutilizar `organization.identity_sensitive.update` porque mezcla dimensiones ortogonales (editar campos sensibles de identidad vs revisar/aplicar logos). El naming `brand_asset` es consistente con los eventos `organization.brand_asset.*` y la tabla `organization_brand_asset_candidates`.
 - Capability nueva => TS catalog (`src/config/entitlements-catalog.ts`) + migration seed `capabilities_registry` + grants en `src/lib/entitlements/runtime.ts` en el MISMO PR + `capability-grant-coverage.test.ts` verde (invariant TASK-873/935; sin grant runtime el endpoint da 403 a todos). Grants canonicos: route_group `identity`/`admin` + `EFEONCE_ADMIN`; evaluar `efeonce_account` (lider de cuenta) para review de sus organizaciones si Discovery lo justifica.
-- **Operating-entity guard (Pilar 1, DECIDIDO)**: las mutaciones de `organization.brand_asset` que apunten a una fila con `is_operating_entity=TRUE` (logo legal de Efeonce usado en finiquitos/contratos, TASK-862/863) DEBEN bloquearse o exigir `EFEONCE_ADMIN` explicito. Aplicar un logo comercial a la operating entity cambiaria el logo de documentos legales. El command verifica el flag antes de tocar `logo_asset_id`.
+- **Operating-entity guard (Pilar 1, DECIDIDO)**: las mutaciones de `organization.brand_asset` que apunten a una fila con `is_operating_entity=TRUE` (logo legal de Efeonce usado en finiquitos/contratos, TASK-862/863) DEBEN bloquearse en TASK-999. Aplicar un logo comercial a la operating entity cambiaria el logo de documentos legales. El command verifica el flag antes de tocar `logo_asset_id`; cambios legales/institucionales quedan fuera de alcance y requieren task/ADR separado.
 - `routeGroups` y `views` solo gobiernan navegacion; las mutaciones API deben usar `can()`.
 
 ### Events and audit
@@ -369,14 +380,32 @@ El plan puede colapsar eventos si el event catalog vigente recomienda granularid
 
 ## Acceptance Criteria
 
-- [ ] `organization_360` y los readers exponen logo canonico sin romper organizaciones sin logo.
-- [ ] Manual upload/attach permite asignar/reemplazar logo con capability, audit/outbox y access control.
+- [x] `organization_360` y los readers exponen logo canonico sin romper organizaciones sin logo.
+- [x] Manual upload/attach permite asignar/reemplazar logo con capability, audit/outbox y access control.
 - [ ] Candidate discovery crea candidatos con provenance y copia a storage propio sin hotlink final.
 - [ ] Review queue permite aceptar, rechazar, subir manualmente y buscar de nuevo.
-- [ ] Organization list/detail/workspace renderizan logo cuando existe y fallback estable cuando no.
+- [x] Organization list/detail/workspace renderizan logo cuando existe y fallback estable cuando no.
 - [ ] Reliability signals reportan coverage gap, discovery failures y/o projection drift.
 - [ ] Docs funcionales/manuales explican el flujo enterprise y la politica de no auto-aplicar logos dudosos.
 - [ ] No hay rutas huerfanas nuevas (`pnpm route-reachability-gate --strict` verde si se agregan pages).
+
+## Progress Log
+
+### 2026-06-08 — Foundation/manual attach implemented on `develop`
+
+- Migration `20260608230303037_task-999-organization-brand-assets-foundation.sql` applied in dev via `pnpm pg:connect:migrate --status` wrapper: adds `organizations.website_url`, creates `organization_brand_asset_candidates`, seeds capability `organization.brand_asset`, and refreshes `greenhouse_serving.organization_360` with `logo_asset_id`, `website_url`, `is_operating_entity`.
+- Added asset contexts `organization_logo_draft`, `organization_logo_candidate`, `organization_logo`; private upload/download access now supports organization logo drafts/finals with identity/owner checks.
+- Added domain command `attachOrganizationLogoAsset()` and API route `POST /api/organizations/[id]/brand-assets/logo`; command blocks `is_operating_entity=TRUE` before asset lookup, supersedes previous logo without deleting bytes, updates `organizations.logo_asset_id`, and publishes outbox events.
+- Updated entitlements catalog/runtime grants for `organization.brand_asset` (`review|update`), with tests for admin/superadmin coverage.
+- Account 360 readers, `organization_360` DTOs, Organization list/detail/sidebar/workspace headers now consume `logoUrl` with stable fallback.
+- ADR added: `docs/architecture/GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md`.
+
+Still pending before task completion:
+
+- discovery worker / scheduled fetch and candidate download;
+- visual review queue under Admin/Data Quality;
+- reliability signals for coverage/drift/failures;
+- staging/production rollout and GVC evidence after runtime server capture.
 
 ## Verification
 
@@ -413,7 +442,7 @@ El plan puede colapsar eventos si el event catalog vigente recomienda granularid
 
 - **Auto-apply vs review** => **V1 siempre review humana** para todos los candidatos. Blast radius de logo equivocado en cliente equivocado es medium; costo de review es 1 click. Auto-apply high-confidence se difiere a follow-up gated por precision medida (>= N candidatos aceptados sin rechazo posterior). Pinned en Slice ordering.
 - **Capability de mutacion** => **nueva granular `organization.brand_asset` (`review|update`)**, NO reusar `organization.identity_sensitive.update` (overlay regla #7; naming consistente con eventos/tabla `brand_asset`). Resuelto en Access model.
-- **Logo legal vs comercial comparten `logo_asset_id`** => **SI, comparten** la misma columna; el significado es unificado "logo canonico de la organizacion" y el uso depende del tipo de fila (operating entity => documentos; cliente => UI). Un override documental separado seria una columna NUEVA futura (YAGNI). Protegido por el operating-entity guard.
+- **Logo legal vs comercial comparten `logo_asset_id`** => **SI, comparten** la misma columna; el significado es unificado "logo canonico de la organizacion" y el uso depende del tipo de fila (operating entity => documentos; cliente/proveedor/no-operating => UI/enrichment comercial). TASK-999 solo opera sobre filas no-operating; un override documental o cambio institucional de Efeonce seria una columna/tarea/ADR futuro, no parte de esta implementacion. Protegido por el operating-entity guard.
 
 ## Open Questions
 

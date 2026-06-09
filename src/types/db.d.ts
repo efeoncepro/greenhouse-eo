@@ -2656,6 +2656,23 @@ export interface GreenhouseCoreOperationalResponsibilities {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreOrganizationBrandAssetCandidates {
+  asset_id: string | null;
+  candidate_id: string;
+  confidence: Numeric | null;
+  created_at: Generated<Timestamp>;
+  discovered_at: Generated<Timestamp>;
+  metadata_json: Generated<Json>;
+  organization_id: string;
+  rejection_reason: string | null;
+  reviewed_at: Timestamp | null;
+  reviewed_by_user_id: string | null;
+  source: string;
+  source_url: string | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreOrganizationLifecycleHistory {
   commercial_party_id: string;
   from_stage: string | null;
@@ -2699,7 +2716,7 @@ export interface GreenhouseCoreOrganizations {
    */
   lifecycle_stage_source: Generated<string>;
   /**
-   * TASK-862 — Logo del empleador (legal entity) renderizado en el header de documentos legales (finiquito, contrato, anexo). Resuelto desde greenhouse_core.assets via /api/assets/private/<id>. Fallback a logo Greenhouse hardcoded cuando null.
+   * TASK-999 — canonical organization logo asset pointer. For non-operating organizations this is the commercial/brand logo used by Organization 360 UI. For operating entities it remains the legal/institutional document logo and is NOT mutated by the TASK-999 enrichment flow.
    */
   logo_asset_id: string | null;
   notes: string | null;
@@ -2715,6 +2732,10 @@ export interface GreenhouseCoreOrganizations {
   tax_id: string | null;
   tax_id_type: string | null;
   updated_at: Generated<Timestamp>;
+  /**
+   * TASK-999 — canonical organization website URL used as input for brand-asset discovery/enrichment. Nullable; no hotlinking contract.
+   */
+  website_url: string | null;
 }
 
 export interface GreenhouseCorePermissionSets {
@@ -8364,7 +8385,9 @@ export interface GreenhouseServingOrganization360 {
   created_at: Timestamp | null;
   hubspot_company_id: string | null;
   industry: string | null;
+  is_operating_entity: boolean | null;
   legal_name: string | null;
+  logo_asset_id: string | null;
   membership_count: Int8 | null;
   notes: string | null;
   organization_id: string | null;
@@ -8379,6 +8402,7 @@ export interface GreenhouseServingOrganization360 {
   tax_id_type: string | null;
   unique_person_count: Int8 | null;
   updated_at: Timestamp | null;
+  website_url: string | null;
 }
 
 export interface GreenhouseServingOrganizationOperationalMetrics {
@@ -9938,6 +9962,7 @@ export interface DB {
   "greenhouse_core.notion_workspace_source_bindings": GreenhouseCoreNotionWorkspaceSourceBindings;
   "greenhouse_core.notion_workspaces": GreenhouseCoreNotionWorkspaces;
   "greenhouse_core.operational_responsibilities": GreenhouseCoreOperationalResponsibilities;
+  "greenhouse_core.organization_brand_asset_candidates": GreenhouseCoreOrganizationBrandAssetCandidates;
   "greenhouse_core.organization_lifecycle_history": GreenhouseCoreOrganizationLifecycleHistory;
   "greenhouse_core.organizations": GreenhouseCoreOrganizations;
   "greenhouse_core.permission_sets": GreenhouseCorePermissionSets;

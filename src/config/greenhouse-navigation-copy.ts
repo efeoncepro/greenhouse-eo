@@ -74,6 +74,7 @@ const enUS: NavigationCopy = {
     adminNotifications: { label: 'Notifications', subtitle: 'In-app and email notification system' },
     adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, projections and serving freshness' },
     adminUntitledNotionPages: { label: 'Untitled Notion pages', subtitle: 'Tasks, projects and sprints without titles — fix in Notion' },
+    adminOrganizationLogos: { label: 'Organization logos', subtitle: 'Brand coverage and candidates for non-legal organizations' },
     adminDesignSystem: { label: 'Design System', subtitle: 'Internal AXIS and primitives catalog' },
     adminBusinessLines: { label: 'Business Lines', subtitle: 'Canonical business line metadata' },
     adminServiceSlas: { label: 'Service SLAs', subtitle: 'Contractual governance by service and compliance' },

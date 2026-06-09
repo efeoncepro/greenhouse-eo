@@ -166,6 +166,10 @@ import {
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
+import {
+  getOrganizationBrandAssetCoverageSignal,
+  getOrganizationBrandAssetDiscoveryFailuresSignal
+} from './queries/organization-brand-assets'
 import { getCloudRunSilentObservabilitySignal } from './queries/cloud-run-silent-observability'
 import { getAiObserverUnhealthySignal } from './queries/ai-observer-unhealthy'
 import { getSecretsEnvRefFormatDriftSignal } from './queries/secrets-env-ref-format-drift'
@@ -713,6 +717,7 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   workspaceProjection?: ReliabilitySignal[] | null
+  organizationBrandAssets?: ReliabilitySignal[] | null
   scimWorkforce?: ReliabilitySignal[] | null
 
   /**
@@ -1019,6 +1024,8 @@ export const buildReliabilityOverview = (
     ...(sources.sisterPlatformOAuth ?? []),
     // TASK-611 Slice 5 — Organization Workspace projection signals (2).
     ...(sources.workspaceProjection ?? []),
+    // TASK-999 — Organization brand asset coverage + discovery failures.
+    ...(sources.organizationBrandAssets ?? []),
     // TASK-872 Slice 6 — SCIM Internal Collaborator + workforce intake signals (6).
     ...(sources.scimWorkforce ?? []),
     // ISSUE-075 hardening — Microsoft Graph webhook subscription health.
@@ -1634,6 +1641,19 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-999 — Organization brand asset signals. Roll up bajo Identity porque
+  // la proyección Organization 360 consume el logo canónico, pero el flujo
+  // protege explícitamente operating/legal entities.
+  const organizationBrandAssets =
+    preloadedSources.organizationBrandAssets !== undefined
+      ? preloadedSources.organizationBrandAssets
+      : await Promise.all([
+          getOrganizationBrandAssetCoverageSignal().catch(() => null),
+          getOrganizationBrandAssetDiscoveryFailuresSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-872 Slice 6 — SCIM + workforce intake signals (6 readers en paralelo).
   // Cubre: users sin identity_profile / sin member / ineligibles in scope /
   // member identity drift / members pending intake completion / allowlist-blocklist
@@ -1992,6 +2012,7 @@ export const getReliabilityOverview = async (
     identityGovernance,
     sisterPlatformOAuth,
     workspaceProjection,
+    organizationBrandAssets,
     scimWorkforce,
     entraWebhookSubscriptionHealth,
     clientPortalResolverFailureRate,

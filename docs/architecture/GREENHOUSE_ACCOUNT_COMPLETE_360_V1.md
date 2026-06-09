@@ -99,6 +99,19 @@ AccountComplete360 { _meta, identity, spaces?, team?, economics?, delivery?, fin
 | `services` | 10 min | internal | `greenhouse_core.client_service_modules` |
 | `staffAug` | 10 min | confidential | `client_team_assignments` (type=staff_augmentation) |
 
+### Organization Brand Assets
+
+Since TASK-999, the `identity` facet also exposes the Organization Brand Asset foundation:
+
+- `logoAssetId`
+- `logoUrl`
+- `websiteUrl`
+- `isOperatingEntity`
+
+`logoUrl` is always a Greenhouse private asset URL, not a remote hotlink. The final pointer lives in `greenhouse_core.organizations.logo_asset_id` and `greenhouse_serving.organization_360`. Mutations use `organization.brand_asset:update|review` and must block `is_operating_entity=TRUE`; Efeonce legal/institutional logos are outside this enrichment flow.
+
+Canonical decision: [GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md](GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md).
+
 ## Scope Resolution
 
 Unlike Person 360 which resolves `profileId -> memberId`, Account 360 resolves a full **AccountScope** once:

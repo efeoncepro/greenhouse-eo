@@ -369,7 +369,37 @@ export const GH_ORGANIZATION_WORKSPACE = {
     actions: {
       syncHubspot: 'Sincronizar con HubSpot',
       syncing: 'Sincronizando…',
-      edit: 'Editar organización'
+      edit: 'Editar organización',
+      changeLogo: 'Cambiar logo',
+      uploadingLogo: 'Subiendo logo…',
+      applyingLogo: 'Aplicando logo…',
+      searchingLogo: 'Buscando logo…',
+      logoUpdated: 'Logo actualizado.',
+      logoUpdateFailed: 'No se pudo actualizar el logo.',
+      logoUploadRequired: 'Sube una imagen antes de aplicar el logo.',
+      logoUrlRequired: 'Pega una URL de imagen para buscar el logo.',
+      logoEditorDescription:
+        'Sube una imagen o pega una URL pública. El logo se guarda como asset privado y queda asociado a esta organización.',
+      logoEditorFileHint: 'PNG, JPG o WebP. No se hotlinkea: Greenhouse guarda el logo como asset privado.',
+      logoEditorProtectedHint: 'Los logos institucionales o legales no se modifican desde este flujo.',
+      logoUploaderTitle: 'Subir logo',
+      logoUploaderHelper: 'Arrastra una imagen o súbela desde tu equipo.',
+      logoUploaderEmptyTitle: 'Arrastra una imagen o súbela',
+      logoUploaderEmptyDescription: 'Formatos soportados: PNG, JPG, WebP. Tamaño máximo: 5 MB.',
+      logoUploaderBrowse: 'Subir desde equipo',
+      logoUploaderReplace: 'Reemplazar logo',
+      logoUploaderRemove: 'Quitar imagen',
+      applyLogo: 'Guardar logo',
+      clientOrganization: 'Organización cliente',
+      currentLogo: 'Actual',
+      newLogoPreview: 'Nuevo logo',
+      noNewLogoPreview: 'Vista previa',
+      logoUrlLabel: 'Sitio web o URL de imagen',
+      logoUrlPlaceholder: 'https://latam.com',
+      logoUrlHelper: 'Buscamos el logo en la web o usamos una imagen directa, y lo guardamos como asset privado.',
+      logoLegalProtectionNotice:
+        'Los logos institucionales o legales están protegidos y se gestionan en el entorno corporativo. Este logo es exclusivo para esta organización.',
+      protected: 'Protegido'
     },
     kpis: {
       revenue: {

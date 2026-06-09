@@ -216,7 +216,9 @@ const GreenhouseFileUploader = ({
   return (
     <Stack spacing={2}>
       <Stack spacing={0.5}>
-        <Typography variant='subtitle2'>{title}</Typography>
+        <Typography variant='subtitle2' color='text.primary'>
+          {title}
+        </Typography>
         <Typography variant='caption' color='text.secondary'>
           {helperText}
         </Typography>
@@ -224,7 +226,7 @@ const GreenhouseFileUploader = ({
 
       <Dropzone>
         <div {...getRootProps({ className: 'dropzone' })}>
-          <input {...getInputProps()} />
+          <input {...getInputProps({ 'aria-label': title, title })} />
           <Stack spacing={1.5} alignItems='center' sx={{ textAlign: 'center' }}>
             <Box
               sx={{
@@ -243,7 +245,7 @@ const GreenhouseFileUploader = ({
             <Typography variant='body2' color='text.secondary'>
               {emptyDescription}
             </Typography>
-            <Button variant='tonal' size='small' onClick={open} disabled={disabled || isUploading}>
+            <Button variant='outlined' size='small' onClick={open} disabled={disabled || isUploading}>
               {isUploading ? uploadingCta : value ? replaceCta : browseCta}
             </Button>
           </Stack>

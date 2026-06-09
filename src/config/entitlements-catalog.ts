@@ -46,6 +46,7 @@ export const ENTITLEMENT_ACTIONS = [
   'configure',
   'launch',
   'sync',
+  'review',
   // TASK-848 — verbs explícitos del control plane production (NO conflated con manage).
   // Mismo patrón que TASK-742/768/784 que extendieron actions per-dominio en lugar
   // de reusar manage/launch.
@@ -1053,6 +1054,14 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'organization.identity_sensitive',
     module: 'organization',
     actions: ['read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // TASK-999 — commercial brand/logo asset review for non-operating organizations.
+    // Does not authorize mutating Efeonce/operating-entity legal logos.
+    key: 'organization.brand_asset',
+    module: 'organization',
+    actions: ['review', 'update'] as const,
     defaultScope: 'tenant'
   },
   {

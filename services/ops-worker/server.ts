@@ -38,6 +38,7 @@
  *   POST /notion-conformed/recovery    → Notion conformed retry due runs (TASK-775, replaces Vercel /api/cron/sync-conformed-recovery)
  *   POST /reconciliation/auto-match    → Continuous bank statement auto-match (TASK-775, replaces Vercel /api/cron/reconciliation-auto-match)
  *   POST /ico/member-sync              → ICO member metrics BQ → PG (TASK-775, replaces Vercel /api/cron/ico-member-sync)
+ *   POST /organization-brand-assets/discover → Discover logo candidates for non-operating orgs (TASK-999)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -83,6 +84,7 @@ import {
 import { getFinanceLedgerHealth } from '@/lib/finance/ledger-health'
 import { captureMessageWithDomain, captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { discoverOrganizationBrandAssets } from '@/lib/account-360/organization-brand-assets-discovery'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
 import { runEmailDeliverabilityMonitor } from '@/lib/email/deliverability-monitor'
@@ -637,6 +639,39 @@ const handleProductCatalogReconcileV2 = async (_req: IncomingMessage, res: Serve
 
     console.error('[ops-worker] /product-catalog/reconcile-v2 failed:', message)
     json(res, 500, { error: message })
+  }
+}
+
+/**
+ * POST /organization-brand-assets/discover
+ * TASK-999: bounded discovery of logo candidates for non-operating organizations only.
+ */
+const handleOrganizationBrandAssetsDiscover = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const organizationId = parseOptionalString(body.organizationId)
+  const limit = parseOptionalPositiveInt(body.limit, 50) ?? 20
+  const startMs = Date.now()
+
+  console.log(
+    `[ops-worker] POST /organization-brand-assets/discover — organizationId=${organizationId ?? 'all'} limit=${limit}`
+  )
+
+  try {
+    const result = await discoverOrganizationBrandAssets({
+      organizationId,
+      limit,
+      actorUserId: 'ops-worker:organization-brand-assets'
+    })
+
+    json(res, 200, {
+      ...result,
+      durationMs: Date.now() - startMs
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /organization-brand-assets/discover failed:', message)
+    json(res, 502, { error: message })
   }
 }
 
@@ -2113,6 +2148,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/product-catalog/reconcile-v2') {
       await handleProductCatalogReconcileV2(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/organization-brand-assets/discover') {
+      await handleOrganizationBrandAssetsDiscover(req, res)
 
       return
     }

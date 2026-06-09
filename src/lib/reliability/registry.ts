@@ -327,20 +327,25 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     domain: 'identity',
     routes: [
       { path: '/admin/users', label: 'Usuarios admin' },
-      { path: '/my/profile', label: 'Mi perfil' }
+      { path: '/my/profile', label: 'Mi perfil' },
+      { path: '/admin/data-quality/organization-logos', label: 'Cola de logos de organizaciones' }
     ],
     apis: [
       { path: '/api/my/legal-profile', label: 'Self-service legal profile' },
       { path: '/api/auth/health', label: 'Auth readiness' },
       { path: '/api/auth/sister-platforms/authorize', label: 'Sister-platform OAuth authorize' },
       { path: '/api/integrations/v1/sister-platforms/oauth/token', label: 'Sister-platform OAuth token exchange' },
-      { path: '/api/hr/workforce/role-title-drift', label: 'Role title drift queue' }
+      { path: '/api/hr/workforce/role-title-drift', label: 'Role title drift queue' },
+      { path: '/api/admin/data-quality/organization-logos', label: 'Organization logo review overview' },
+      { path: '/api/admin/data-quality/organization-logos/candidates', label: 'Organization logo candidates' },
+      { path: '/api/organizations/[id]/brand-assets/logo', label: 'Organization logo apply command' }
     ],
     dependencies: [
       'greenhouse_core.identity_profiles',
       'greenhouse_core.person_identity_documents',
       'greenhouse_core.person_addresses',
       'greenhouse_core.client_users',
+      'greenhouse_core.organization_brand_asset_candidates',
       'greenhouse_core.member_role_title_audit_log',
       'greenhouse_sync.member_role_title_drift_proposals',
       'GCP Secret Manager (greenhouse-pii-normalization-pepper)',
@@ -361,6 +366,9 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/api/hr/people/**/legal-profile/**',
       'src/app/api/hr/workforce/**',
       'src/app/api/admin/team/members/**/role-title/**',
+      'src/app/api/admin/data-quality/organization-logos/**',
+      'src/app/api/organizations/**/brand-assets/**',
+      'src/lib/account-360/organization-brand-assets*',
       'src/lib/contractor-engagements/**',
       'src/app/api/hr/contractors/**'
     ],

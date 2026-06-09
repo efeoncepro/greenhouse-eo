@@ -578,6 +578,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminCloudIntegrations), href: '/admin/cloud-integrations' },
               { label: nl(GH_INTERNAL_NAV.adminOpsHealth), href: '/admin/ops-health' },
               { label: nl(GH_INTERNAL_NAV.adminUntitledNotionPages), href: '/admin/data-quality/notion-titles' },
+              { label: nl(GH_INTERNAL_NAV.adminOrganizationLogos), href: '/admin/data-quality/organization-logos' },
               { label: nl(GH_INTERNAL_NAV.adminDesignSystem), href: '/admin/design-system' }
             ].filter(item => {
               if (item.href === '/admin/operational-calendar') return canSeeView('administracion.calendario_operativo', true)
@@ -588,6 +589,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/admin/cloud-integrations') return canSeeView('administracion.cloud_integrations', true)
               if (item.href === '/admin/ops-health') return canSeeView('administracion.ops_health', true)
               if (item.href === '/admin/data-quality/notion-titles') return canSeeView('administracion.cloud_integrations', true)
+              if (item.href === '/admin/data-quality/organization-logos') return canSeeView('administracion.cloud_integrations', true)
               if (item.href === '/admin/design-system') return canSeeView('administracion.design_system', false)
 
               return true

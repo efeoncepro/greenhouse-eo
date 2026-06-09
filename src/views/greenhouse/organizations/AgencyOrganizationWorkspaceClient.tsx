@@ -68,6 +68,9 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection, onboard
 
   const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
 
+  const canManageOrganizationLogo =
+    isAdmin || Boolean(session?.user?.routeGroups?.includes('admin'))
+
   const [detail, setDetail] = useState<OrganizationDetailData | null>(null)
   const [kpis, setKpis] = useState<OrgKpis | null>(null)
   const [loading, setLoading] = useState(true)
@@ -199,6 +202,10 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection, onboard
         status: detail.status,
         active: detail.active,
         hubspotCompanyId: detail.hubspotCompanyId,
+        logoAssetId: detail.logoAssetId,
+        logoUrl: detail.logoUrl,
+        websiteUrl: detail.websiteUrl,
+        isOperatingEntity: detail.isOperatingEntity,
         spaceCount: detail.spaceCount,
         membershipCount: detail.membershipCount
       }}
@@ -215,6 +222,8 @@ const AgencyOrganizationWorkspaceClient = ({ organizationId, projection, onboard
       activeFacet={activeFacet}
       onFacetChange={handleFacetChange}
       adminActions={adminActions}
+      canEditLogo={canManageOrganizationLogo}
+      onLogoUpdated={loadDetail}
       headerBanner={<OnboardingCaseBanner organizationId={organizationId} status={onboardingStatus} />}
       drawerSlot={
         <EditOrganizationDrawer

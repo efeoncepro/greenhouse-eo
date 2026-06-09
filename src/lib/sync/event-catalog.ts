@@ -224,6 +224,8 @@ export const EVENT_TYPES = {
   // Account 360
   organizationCreated: 'organization.created',
   organizationUpdated: 'organization.updated',
+  organizationBrandAssetCandidateCreated: 'organization.brand_asset.candidate_created',
+  organizationBrandAssetUpdated: 'organization.brand_asset.updated',
 
   // Commercial Party Lifecycle (TASK-535)
   commercialPartyCreated: 'commercial.party.created',

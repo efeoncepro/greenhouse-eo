@@ -16,7 +16,6 @@ import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomIconButton from '@core/components/mui/IconButton'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -27,6 +26,7 @@ import type { OrganizationDetailData } from './types'
 import OrganizationTabs from './OrganizationTabs'
 import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
 import AddMembershipDrawer from './drawers/AddMembershipDrawer'
+import OrganizationLogoAvatarEditor from '@/components/greenhouse/organization-workspace/OrganizationLogoAvatarEditor'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 
 const TASK407_ARIA_SINCRONIZAR_CON_HUBSPOT = "Sincronizar con HubSpot"
@@ -69,6 +69,9 @@ type Props = {
 const OrganizationView = ({ organizationId, onboardingStatus = null }: Props) => {
   const { data: session } = useSession()
   const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
+
+  const canManageOrganizationLogo =
+    isAdmin || Boolean(session?.user?.routeGroups?.includes('admin'))
 
   const [detail, setDetail] = useState<OrganizationDetailData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -193,9 +196,16 @@ const OrganizationView = ({ organizationId, onboardingStatus = null }: Props) =>
           <CardContent sx={{ py: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
               {/* Avatar + Identity */}
-              <CustomAvatar variant='rounded' skin='light' color='primary' size={56}>
-                <Typography variant='h5' sx={{ fontWeight: 700 }}>{initial}</Typography>
-              </CustomAvatar>
+              <OrganizationLogoAvatarEditor
+                organizationId={detail.organizationId}
+                organizationName={detail.organizationName}
+                logoUrl={detail.logoUrl}
+                fallbackInitials={initial}
+                editable={canManageOrganizationLogo}
+                isOperatingEntity={detail.isOperatingEntity}
+                size={56}
+                onUpdated={loadDetail}
+              />
 
               <Box sx={{ flex: 1, minWidth: 200 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>

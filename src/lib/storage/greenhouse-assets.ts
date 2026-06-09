@@ -65,7 +65,8 @@ const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<DraftUploadContext, number> = 
   // TASK-791 — invoices/boletas + work evidence pueden ser escaneos grandes.
   contractor_invoice_draft: 25 * 1024 * 1024,
   contractor_work_evidence_draft: 25 * 1024 * 1024,
-  provider_invoice_draft: 25 * 1024 * 1024
+  provider_invoice_draft: 25 * 1024 * 1024,
+  organization_logo_draft: 5 * 1024 * 1024
 }
 
 // TASK-791 — MIME extra permitido por contexto. La factura electrónica oficial
@@ -107,6 +108,9 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   provider_invoice_draft: 'provider_supporting_doc',
   provider_invoice: 'provider_supporting_doc',
   provider_payout_statement: 'provider_supporting_doc',
+  organization_logo_draft: 'organization_brand_asset',
+  organization_logo: 'organization_brand_asset',
+  organization_logo_candidate: 'organization_brand_asset',
   // TASK-1023 — Workforce Contracting signable document (offer letter / employment contract).
   workforce_contracting_document: 'workforce_contract',
   // TASK-490 — signed PDF artifact from the signature provider (vault retention).
@@ -143,6 +147,9 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   provider_invoice_draft: 'provider-invoices',
   provider_invoice: 'provider-invoices',
   provider_payout_statement: 'provider-payout-statements',
+  organization_logo_draft: 'organization-logos',
+  organization_logo: 'organization-logos',
+  organization_logo_candidate: 'organization-logos',
   // TASK-1023 — Workforce Contracting signable document bucket prefix.
   workforce_contracting_document: 'workforce-contracting-documents',
   // TASK-490 — signed signature artifact bucket prefix.
@@ -685,7 +692,7 @@ export const upsertSystemGeneratedAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -798,7 +805,7 @@ export const storeSystemGeneratedPrivateAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -943,9 +950,30 @@ const canAccessSignatureSignedDocumentAsset = (tenant: TenantContext, asset: Gre
     return true
   }
 
+  if (asset.ownerAggregateId && tenant.organizationId && asset.ownerAggregateId === tenant.organizationId) {
+    return true
+  }
+
   return (
     hasRouteGroup(tenant, 'hr') ||
     hasRouteGroup(tenant, 'finance') ||
+    hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  )
+}
+
+const canAccessOrganizationLogoAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord) => {
+  if (asset.uploadedByUserId && asset.uploadedByUserId === tenant.userId) {
+    return true
+  }
+
+  if (asset.ownerClientId && tenant.clientId && asset.ownerClientId === tenant.clientId) {
+    return true
+  }
+
+  return (
+    hasRouteGroup(tenant, 'internal') ||
+    hasRouteGroup(tenant, 'agency') ||
+    hasRouteGroup(tenant, 'admin') ||
     hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   )
 }
@@ -1001,6 +1029,12 @@ export const canTenantAccessAsset = ({
     // TASK-490 — signed signature artifact.
     case 'signature_signed_document':
       return canAccessSignatureSignedDocumentAsset(tenant, asset)
+    // TASK-999 — organization commercial logo assets. Mutation is gated by
+    // organization.brand_asset; download follows identity visibility + owner.
+    case 'organization_logo_draft':
+    case 'organization_logo':
+    case 'organization_logo_candidate':
+      return canAccessOrganizationLogoAsset(tenant, asset)
     default:
       return false
   }

@@ -47,7 +47,17 @@ const OrganizationLeftSidebar = ({ detail, isAdmin, syncing, onEditOrganization,
     <Card>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, pt: 6 }}>
         <CustomAvatar variant='rounded' skin='light' color='primary' size={100}>
-          <Typography variant='h3' sx={{ fontWeight: 700 }}>{initial}</Typography>
+          {detail.logoUrl ? (
+            <Box
+              component='img'
+              src={detail.logoUrl}
+              alt=''
+              loading='lazy'
+              sx={{ width: '100%', height: '100%', objectFit: 'contain', p: 2, bgcolor: 'background.paper' }}
+            />
+          ) : (
+            <Typography variant='h3' sx={{ fontWeight: 700 }}>{initial}</Typography>
+          )}
         </CustomAvatar>
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant='h5'>{detail.organizationName}</Typography>

@@ -20,7 +20,8 @@ const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>([
   'resignation_letter_ratified_draft',
   'contractor_invoice_draft',
   'contractor_work_evidence_draft',
-  'provider_invoice_draft'
+  'provider_invoice_draft',
+  'organization_logo_draft'
 ])
 
 const isDraftContext = (value: string): value is DraftUploadContext =>
@@ -74,6 +75,12 @@ const canUploadForContext = ({
       hasRouteGroup(tenant, 'hr') ||
       hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
     )
+  }
+
+  // TASK-999 — organization logo draft upload. Apply/replacement is separately
+  // gated by organization.brand_asset and the operating-entity guard.
+  if (contextType === 'organization_logo_draft') {
+    return hasRouteGroup(tenant, 'internal') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   }
 
   return hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)

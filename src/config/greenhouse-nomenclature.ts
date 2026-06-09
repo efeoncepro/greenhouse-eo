@@ -43,6 +43,7 @@ export const GH_INTERNAL_NAV = {
   adminNotifications: { label: 'Notificaciones', subtitle: 'Sistema de notificaciones in-app y email' },
   adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, proyecciones y freshness del serving' },
   adminUntitledNotionPages: { label: 'Páginas sin título Notion', subtitle: 'Tareas, proyectos y sprints sin título — fix directo en Notion' },
+  adminOrganizationLogos: { label: 'Logos de organizaciones', subtitle: 'Candidatos y cobertura de marca para organizaciones no legales' },
   adminDesignSystem: { label: 'Design System', subtitle: 'Catálogo interno de AXIS y primitives' },
   adminBusinessLines: { label: 'Business Lines', subtitle: 'Metadata canonica de las lineas de negocio' },
   adminServiceSlas: { label: 'SLA de servicios', subtitle: 'Gobernanza contractual por servicio y cumplimiento' },
