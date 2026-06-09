@@ -1,3 +1,33 @@
+# Sesion 2026-06-09 — RELEASE develop→main `dc45bdedf` (RELEASED) + context-pack drift sweep
+
+**Release a producción completado y verificado.** Manifest `released`, orchestrator run `27205193173` = success.
+
+- **SHA released:** `dc45bdedf64afbec1331778926bd26b63e0bd310` (merge `release: develop→main 2026-06-09` desde develop `b5a816b9d`). Remote main = `dc45bdedf`.
+- **Bundle:** acumulado desde el release 2026-06-04 — Design System overhaul (color Restraint v1, typography SoT, elevation, motion), GVC V1.5 gates, Workforce Contracting + signature platform, leave approval delegation, org enterprise workspace runtime + Account 360 facet readers, client onboarding evidence, ISSUE-090 worker deps, **+ assigned-team UI primitives de Codex (TASK-357..366)** + context-pack drift sweep (TASK-1064).
+- **Orchestrator:** preflight (con `bypass_preflight_reason` por batch-policy split del bundle) ✅ → manifest started ✅ → 2 approval gates (workers + Azure) aprobados vía gh api ✅ → 4 workers Cloud Run + Azure (skip Bicep, sin diff) ✅ → post-release health ✅ → manifest → released ✅.
+- **Cloud Run GIT_SHA (los 4):** `dc45bdedf` — match perfecto, cero drift. Watchdog `aggregateSeverity=ok`.
+- **Blockers encontrados + resueltos en el camino (todos pre-release, ninguno llegó a prod):**
+  1. **Playwright smoke stale** — el enterprise runtime (TASK-1016/1059) reemplazó el shell V2 de facets en agency pero el smoke TASK-612 no se actualizó. Fix: helper `expectOrganizationEnterpriseWorkspaceReady` (anclado al `data-capture` del facet rail) + spec repointed. Producto sano (verificado live).
+  2. **19 fallos genuinos en CI Deep Verification** (masked en CI por `test:results | tee` → exit de tee=0): `greenhouseSemantic` ausente en el theme de tests (`src/test/render.tsx`), facet capability count 11→12 (TASK-999 `organization.brand_asset`), mock pg sin `withGreenhousePostgresTransaction` en `organization-store.test.ts`. Fixes verificados + full suite verde.
+  3. **`release-deploy-duration.test.ts` time-bomb fixture** — fecha hardcodeada `2026-05-10` que envejeció fuera de la ventana de 30d del signal → fix a fecha relativa. Atrapado por full local `pnpm test` antes del merge.
+- **Hallazgo de CI a fixear aparte (no bloqueó):** `pnpm test:results` hace `vitest ... | tee` → el exit code es el de `tee` (0), **enmascarando fallos de test en el workflow "CI"**. Solo "CI Deep Verification" (sin pipe) los atrapa. Candidato a ISSUE/TASK (pipefail portable; dash no soporta `set -o pipefail`).
+- **Docs/tasks de la sesión:** TASK-1064 (context pack drift sweep + altitude rule + freshness governance + reconciliación efeonce-agency) **complete**; TASK-1065 (rename nomenclatura Pulse→Dashboard/Ciclos→Sprints/Espacios→Organizations/Torre de Control→**Cockpit**) **to-do desbloqueada** (recomendada como pase limpio post-release; matiz: `Space` es objeto canónico distinto, no renombrar); `05_voz-tono-estilo.md` alineado a AXIS + UX writing.
+
+---
+
+# Sesion 2026-06-09 — GreenhouseFunnelChartCard primitive + Charts Lab
+
+Codex implementó la dirección Product Design opción 3 como primitive reusable de charts.
+
+- **Nueva primitive:** `GreenhouseFunnelChartCard` en `src/components/greenhouse/primitives/`, con controller `greenhouse-funnel-chart-controller.ts`, `variant='operationalPipeline'` y kinds iniciales `cscPipeline|commercialLifecycle|quoteToCash|onboardingActivation|custom`.
+- **Decisión de stack:** Recharts sigue como librería canónica para futuros funnels verticales (`FunnelChart/Funnel`), pero la variante horizontal usa renderer custom dentro de la primitive para permitir rail de proceso, selección de etapa, diagnóstico y microinteracciones ricas sin pelear con la geometría Recharts.
+- **Lab interno:** `/admin/design-system/charts` ahora muestra el specimen CSC delivery pipeline con métricas, insight, etapas, bloqueos, owner y freshness. Scenario `design-system-charts` actualizado con full-page + clip de la primitive.
+- **Evidencia:** GVC final `.captures/2026-06-09T12-14-23_design-system-charts` (desktop+mobile, 4 frames). Revisado visualmente: desktop enterprise limpio; mobile wrap de toolbar corregido (`Tabla` visible) y rail scrolleable.
+- **Verificación:** `pnpm exec tsc --noEmit --pretty false`, eslint focal, `pnpm vitest run src/components/greenhouse/primitives/__tests__/GreenhouseFunnelChartCard.test.tsx`, `pnpm fe:capture design-system-charts --env=local`.
+- **Docs sincronizados:** `docs/architecture/ui-platform/PRIMITIVES.md`, `HISTORIAL.md`, `project_context.md`, `changelog.md`.
+
+---
+
 # Sesion 2026-06-09 — Context pack + Organization Workspace commits/push + TASK-1060 superseded
 
 Codex reviso el worktree completo para commit/push seguro, leyo los dos nuevos context docs y empujo `develop` hasta `4dd267c16`.
