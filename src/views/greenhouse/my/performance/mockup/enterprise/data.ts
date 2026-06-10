@@ -87,7 +87,12 @@ export const editorialBrief = {
       { label: 'May', value: 44.6 }
     ],
     annotation: { atIndex: 4, label: '−50.6 pts' },
-    target: 80
+    target: 80,
+    // HTML caption under the chart (NOT in-SVG — the AppRecharts 13px !important mangles SVG text).
+    caption: {
+      lead: 'El quiebre de mayo:',
+      rest: '−50.6 pts vs abril — más piezas volvieron con cambios del cliente.'
+    }
   },
 
   // Nexa insight — 2nd person, collaborator coaching (NOT commercial).
