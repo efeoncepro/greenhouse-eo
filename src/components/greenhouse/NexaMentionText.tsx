@@ -21,6 +21,14 @@ export interface NexaMentionTextProps {
   text: string | null
   variant?: TypographyProps['variant']
   sx?: TypographyProps['sx']
+  /**
+   * Access-aware safe mode (TASK-1027). When `true`, mentions render as
+   * non-navigable chips regardless of mention type — used on self-service
+   * surfaces (`/my/*`) where linking to `/people/[id]` or `/agency/spaces/[id]`
+   * would leak access the collaborator does not have. Labels stay human and
+   * sanitized; IDs are never shown. Default `false` preserves admin behavior.
+   */
+  safeMode?: boolean
 }
 
 // ─── Config ─────────────────────────────────────────────────────────────────
@@ -44,7 +52,7 @@ const MENTION_CONFIG: Record<MentionType, { icon: string; href: (id: string) => 
 
 // ─── Parser ─────────────────────────────────────────────────────────────────
 
-const parseMentions = (text: string): ReactNode[] => {
+const parseMentions = (text: string, safeMode: boolean): ReactNode[] => {
   const parts: ReactNode[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
@@ -63,7 +71,9 @@ const parseMentions = (text: string): ReactNode[] => {
     }
 
     const config = MENTION_CONFIG[mention.type]
-    const href = config.href(mention.id)
+
+    // Safe mode forces every mention non-navigable — never link out of /my/*.
+    const href = safeMode ? null : config.href(mention.id)
 
     parts.push(
       <GreenhouseChip
@@ -97,8 +107,8 @@ const parseMentions = (text: string): ReactNode[] => {
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
-const NexaMentionText = ({ text, variant = 'body2', sx }: NexaMentionTextProps) => {
-  const parts = useMemo(() => (text ? parseMentions(text) : []), [text])
+const NexaMentionText = ({ text, variant = 'body2', sx, safeMode = false }: NexaMentionTextProps) => {
+  const parts = useMemo(() => (text ? parseMentions(text, safeMode) : []), [text, safeMode])
 
   if (!text) return null
 

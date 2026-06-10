@@ -14,6 +14,8 @@ const STORAGE_KEY = 'nexa.insights.rootCause.expanded'
 export interface NexaInsightRootCauseSectionProps {
   narrative: string
   insightId: string
+  /** TASK-1027 — access-aware mentions (non-navigable on self-service). */
+  safeMode?: boolean
 }
 
 const readInitial = (): boolean => {
@@ -26,7 +28,7 @@ const readInitial = (): boolean => {
   }
 }
 
-const NexaInsightRootCauseSection = ({ narrative, insightId }: NexaInsightRootCauseSectionProps) => {
+const NexaInsightRootCauseSection = ({ narrative, insightId, safeMode = false }: NexaInsightRootCauseSectionProps) => {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -132,6 +134,7 @@ const NexaInsightRootCauseSection = ({ narrative, insightId }: NexaInsightRootCa
           <NexaMentionText
             text={narrative}
             variant='body2'
+            safeMode={safeMode}
             sx={{ color: theme => theme.palette.customColors.midnight }}
           />
         </Box>
