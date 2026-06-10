@@ -9,6 +9,10 @@
  *   - figma.com/design/:fileKey/:fileName?node-id=205-234905
  *   - figma.com/file/:fileKey/:fileName?node-id=205-234905   (legacy)
  *   - figma.com/design/:fileKey/branch/:branchKey/:fileName?node-id=…  (branch)
+ *   - prose around the URL — Figma's "Implement this design" / Dev Mode copy prepends
+ *     text + an @-mention, e.g. "Implementa este diseño desde Figma.\n@https://…?node-id=…&m=dev".
+ *     The URL token is extracted from anywhere in the text (ignoring prose, the leading
+ *     "@", quotes, angle brackets, newlines and trailing sentence punctuation).
  * Returns null when it is not a Figma URL or has no node-id.
  *
  * Canonical reference: TASK-1072 (designer role + Figma node linking).
@@ -23,25 +27,45 @@ export interface ParsedFigmaUrl {
 
 const FIGMA_HOST = /(^|\.)figma\.com$/i
 const FILE_PATH = /^\/(design|file|board)\/([A-Za-z0-9]+)(?:\/(.*))?$/
+// First http(s) Figma URL token anywhere in the text. `[^\s"'<>]` keeps it bounded by
+// whitespace/quotes/brackets so it ignores surrounding prose + the leading "@".
+const FIGMA_URL_TOKEN = /https?:\/\/[^\s"'<>]*figma\.com\/[^\s"'<>]*/i
 
-export const parseFigmaUrl = (raw: string | null | undefined): ParsedFigmaUrl | null => {
-  if (!raw || typeof raw !== 'string') return null
+/**
+ * Pull the Figma URL out of an arbitrary pasted string. Tolerates prose before/after,
+ * a leading "@", angle-bracket wrapping, surrounding quotes and trailing punctuation.
+ */
+const extractFigmaUrlCandidate = (raw: string): string | null => {
+  const match = raw.match(FIGMA_URL_TOKEN)
 
-  // Tolerate paste artifacts: a leading "@" (Figma / editor "copy link as mention"),
-  // angle-bracket wrapping (<url>), and surrounding quotes/whitespace.
-  const normalized = raw
+  if (match) {
+    // Strip trailing sentence punctuation that is not part of the URL (e.g. a final ".").
+    return match[0].replace(/[.,;:!?)\]}>'"]+$/, '')
+  }
+
+  // No scheme-qualified URL found — fall back to wrapper-stripping (bare paste of a URL
+  // with a leading "@"/quotes but, e.g., a non-standard scheme the regex missed).
+  const stripped = raw
     .trim()
     .replace(/^<(.*)>$/, '$1')
     .replace(/^['"]|['"]$/g, '')
     .replace(/^@+/, '')
     .trim()
 
-  if (!normalized) return null
+  return stripped || null
+}
+
+export const parseFigmaUrl = (raw: string | null | undefined): ParsedFigmaUrl | null => {
+  if (!raw || typeof raw !== 'string') return null
+
+  const candidate = extractFigmaUrlCandidate(raw)
+
+  if (!candidate) return null
 
   let url: URL
 
   try {
-    url = new URL(normalized)
+    url = new URL(candidate)
   } catch {
     return null
   }

@@ -49,4 +49,23 @@ describe('parseFigmaUrl', () => {
   it('rejects a malformed node-id shape', () => {
     expect(parseFigmaUrl(`https://www.figma.com/design/${AXIS}/X?node-id=abc`)).toBeNull()
   })
+
+  it('extracts the URL from Figma "Implement this design" prose + @-mention + newline', () => {
+    const pasted = `Implementa este diseño desde Figma.\n@https://www.figma.com/design/${AXIS}/Design-System-%7C-Vuexy-%3E-AXIS?node-id=139-349628&m=dev`
+
+    expect(parseFigmaUrl(pasted)).toEqual({
+      fileKey: AXIS,
+      fileName: 'Design-System-|-Vuexy->-AXIS',
+      nodeId: '139:349628'
+    })
+  })
+
+  it('extracts the URL when prose follows it and strips trailing sentence punctuation', () => {
+    expect(parseFigmaUrl(`Mirá este nodo: https://www.figma.com/design/${AXIS}/X?node-id=7-8.`)?.nodeId).toBe('7:8')
+    expect(parseFigmaUrl(`(ref https://www.figma.com/design/${AXIS}/X?node-id=7-8)`)?.nodeId).toBe('7:8')
+  })
+
+  it('ignores prose that mentions a non-Figma URL', () => {
+    expect(parseFigmaUrl(`ver https://example.com/design/${AXIS}/X?node-id=1-2 acá`)).toBeNull()
+  })
 })
