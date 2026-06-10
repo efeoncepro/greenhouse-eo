@@ -416,9 +416,9 @@ const NexaInsightsBlock = ({
 
   return (
     <Card elevation={0} data-capture='nexa-insights-block' sx={{ border: theme => `1px solid ${theme.palette.customColors.lightAlloy}` }}>
-      <Box sx={{ p: { xs: 3, md: 4 } }}>
+      <Box sx={{ p: { xs: 3, md: 5 } }}>
         {/* Nexa agent header — the mark (no badge) anchors the panel as 'Nexa speaking' */}
-        <Stack direction='row' spacing={{ xs: 2, md: 2.5 }} alignItems='flex-start'>
+        <Stack direction='row' spacing={{ xs: 2, md: 3 }} alignItems='flex-start'>
           <Box
             component='img'
             src={GREENHOUSE_NEXA_BRAND_ASSETS.mark}
@@ -447,16 +447,18 @@ const NexaInsightsBlock = ({
               )}
             </Stack>
             <Typography
-              variant='h6'
-              sx={{ fontWeight: 600, mt: 0.5, color: theme => theme.palette.customColors.midnight, textWrap: 'balance' }}
+              variant='h4'
+              sx={{ mt: 0.75, color: theme => theme.palette.customColors.midnight, textWrap: 'balance', maxWidth: '40ch' }}
             >
               {agentHeadline}
             </Typography>
-            <Typography variant='body2' sx={{ color: 'text.secondary', mt: 0.5 }}>
+            <Typography variant='body2' sx={{ color: 'text.secondary', mt: 1 }}>
               {GH_NEXA.agent_summary(totalAnalyzed, countWithActions)}
             </Typography>
           </Box>
         </Stack>
+
+        <Divider sx={{ mt: 3, mb: 1 }} />
 
         {/* View mode toggle (shown only when historical data is available) */}
         {timelineAvailable && (
@@ -518,20 +520,36 @@ const NexaInsightsBlock = ({
           </Box>
         )}
 
-        {/* Nexa disclaimer */}
-        <Typography
-          variant='caption'
-          sx={{
-            color: 'text.secondary',
-            textAlign: 'center',
-            display: 'block',
-            mt: 3,
-            pt: 2,
-            borderTop: theme => `1px solid ${theme.palette.customColors.lightAlloy}`
-          }}
+        {/* Footer — gateway to the full list + Nexa learning note */}
+        <Stack
+          spacing={1.25}
+          alignItems='center'
+          sx={{ mt: 3, pt: 3, borderTop: theme => `1px solid ${theme.palette.customColors.lightAlloy}` }}
         >
-          {GH_NEXA.agent_footer}
-        </Typography>
+          <Typography
+            component={Link}
+            href='/nexa/insights'
+            variant='button'
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              color: 'primary.main',
+              fontWeight: 600,
+              textTransform: 'none',
+              textDecoration: 'none',
+              borderRadius: '4px',
+              '&:hover': { textDecoration: 'underline' },
+              '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
+            }}
+          >
+            {GH_NEXA.home_bento_menu_view_all}
+            <i className='tabler-arrow-right' style={{ fontSize: 15 }} aria-hidden='true' />
+          </Typography>
+          <Typography variant='caption' sx={{ color: 'text.disabled', textAlign: 'center' }}>
+            {GH_NEXA.agent_footer}
+          </Typography>
+        </Stack>
       </Box>
     </Card>
   )
