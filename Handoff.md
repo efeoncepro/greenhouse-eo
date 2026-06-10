@@ -1,3 +1,42 @@
+# Sesion 2026-06-10 — GreenhouseBreadcrumbs primitive desde AXIS Figma
+
+Codex promovió el diseño Figma `Breadcrumbs Greenhouse` (AXIS fileKey `yyMksCoijfMaIoYplXKZaR`, node `205:234905`) a primitive canónica.
+
+- **Primitive:** `GreenhouseBreadcrumbs` en `src/components/greenhouse/primitives/`, basada en MUI Breadcrumbs para preservar semántica `nav`, links y `aria-current`. Variants `default|compact`, kinds `pageHierarchy|workbenchHierarchy|designSystemSpecimen|legacy|custom`, separators `slash|chevron`, iconos opcionales por item y `data-capture`.
+- **Compat:** el wrapper legacy `Breadcrumb` ahora delega en `GreenhouseBreadcrumbs kind='legacy'` con chevron compacto, evitando un patrón paralelo.
+- **Lab interno:** `/admin/design-system/breadcrumbs`, con entrada en `DesignSystemCatalogView`, route-reachability y scenario GVC `design-system-breadcrumbs`.
+- **Docs:** sincronizados `docs/architecture/ui-platform/PRIMITIVES.md`, `PATTERNS.md`, `HISTORIAL.md`, `project_context.md` y `changelog.md`.
+- **Pendiente de esta sesión:** correr verificación focal, GVC local y cierre documental antes de declarar listo.
+
+---
+
+# Sesion 2026-06-09 — TASK-1027 My Performance rich self-service (EN CURSO)
+
+Claude tomó **TASK-1027** (`/my/performance` self-service rico, P1). **Excepción de rama autorizada por el operador**: se trabaja in-place en `develop`, sin branch dedicado (documentado aquí + en el Status de la task + Audit).
+
+- **Hallazgo crítico de Discovery (live PII leak)**: `/api/my/performance` hoy devuelve `intelligence`/`intelligenceTrend` = `PersonIntelligenceSnapshot` con `cost.{monthlyBaseSalary, monthlyTotalComp, compensationVersionId, loadedCostTarget, costPerHourTarget, suggestedBillRateTarget}` (poblados sin filtro en `person-intelligence/store.ts:113-120`). Slice 1 (DTO redacted) **cierra esa fuga**, no es solo enrichment.
+- **Anti-IDOR ya airtight**: `requireMyTenantContext()` resuelve `memberId` desde JWT, no del cliente.
+- **NexaMentionText sin safe-mode**: linkea `member→/people/{id}`, `space→/agency/spaces/{id}`; Slice 2 agrega modo access-aware (chips no navegables).
+- **Reuso Slice 3**: `KPI_CONFIG`, `normalizeForRadar`, `getZoneColor`, `shouldShowPendingClosures`, `TREND_CONFIG`, closed-month doctrine (`resolveTrendHero`), builders radar/CSC/velocity — extraíbles puros desde `PersonActivityTab.tsx`. Charts ApexCharts (`AppReactApexCharts`) + Recharts (`MetricTrendCard`).
+- **Copy**: `src/lib/copy/my-performance.ts` (`GH_MY_PERFORMANCE`) ya existe con 44 keys + `safeMentions` + `aria.safeMention`.
+- **Referencia visual**: `docs/mockups/TASK-1027/my-performance-tablero-foco-personal-reference.png` ("Tablero de foco personal", dirección ya elegida por el operador).
+- **Estado**: **5 slices entregados + commiteados en `develop`** (claim `347fbe72b` → Slice 5 `7c00e42d2`). Slice 1 DTO redacted (cierra **ISSUE-091** PII leak) · Slice 2 safe Nexa mentions (`safeMode`) · Slice 3 shared primitives (`activity-presentation.ts`) · Slice 4 `MyPerformanceView` enterprise + ruta `/my/performance/mockup/runtime` (vista previa con data rica para admins sin métricas) · Slice 5 GVC scenario `task-1027-my-performance`. **GVC desktop+mobile fullPage revisado — enterprise**; safe mention "Sky" no navegable; estado parcial honesto. Gates: `design:lint` 0/0, full `pnpm test` **6559 passed**, `pnpm build` corriendo. Docs: ADR Delta 2026-06-10 + ISSUE-091 resuelto + changelog. **Pendiente**: build verde → mover task a `complete/` + sync README.
+
+---
+
+# Sesion 2026-06-09 — Efeonce Orbital Signature Lab local
+
+Codex preparó una prueba fluida del logo institucional azul de Efeonce sin tocar el asset principal.
+
+- **Asset seguro:** `public/branding/logo-full.svg` queda intacto. Se creó copia editable `public/branding/experiments/efeonce-logo-full-orbit-motion-copy.svg` con IDs semánticos para puente superior, círculo orbital 360°, arcos y nave.
+- **Primitive:** `EfeonceOrbitalLogoMark` en `src/components/greenhouse/primitives/`, con variants `static|orbitalSignature|ambient` y kinds `institutionalWordmark|motionSpecimen`. Usa `useGreenhouseGSAP`, `MOTION_DURATION_S` y reduced-motion baked-in. El círculo superior recorre la elipse de la O/nave; `#efeonce-orbit-top-bridge` rellena la pista cuando el punto abandona su posición original.
+- **Lab interno:** `/admin/design-system/efeonce-brand` gateado por `administracion.design_system`, registrado en `DesignSystemCatalogView` y `route-reachability-manifest.ts`. El hero usa `ambient` para que se sienta vivo; la card `Signature once` muestra la firma sobria una vez.
+- **GVC:** scenario nuevo `design-system-efeonce-brand`. Evidencia final `.captures/2026-06-09T23-11-57_design-system-efeonce-brand` (desktop+mobile, 6 frames, `qualityFindings=[]`, 0 console/page/hydration/http failures) y micro motion `.captures/2026-06-09T23-12-23_micro-admin-design-system-efeonce-brand-data-capture-efeonce-orbital-signature`.
+- **Verificación:** `pnpm exec eslint` focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm route-reachability-gate --strict`, `pnpm fe:capture design-system-efeonce-brand --env=local --gif`, `pnpm fe:capture:micro --route=/admin/design-system/efeonce-brand --selector='[data-capture="efeonce-orbital-signature"]' --env=local --duration=3200 --fps=16 --gif`.
+- **Rollout:** solo local/design-system; sin flags, env vars, migraciones ni deploy externo.
+
+---
+
 # Sesion 2026-06-09 — Nexa Floating Widget badge navy + mark canónico
 
 Codex aplicó el ajuste visual pedido para el FAB global de Nexa.
