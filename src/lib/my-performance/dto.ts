@@ -12,6 +12,14 @@ import {
 } from '@/lib/ico-engine/read-metrics'
 import { getPersonIcoProfile } from '@/lib/person-360/get-person-ico-profile'
 import { getPersonOperationalServing } from '@/lib/person-360/get-person-operational-serving'
+import type {
+  MyPerformanceDegradedSource,
+  MyPerformanceIco,
+  MyPerformanceOperational,
+  MyPerformancePeriodStatus,
+  MyPerformanceResponse,
+  MyPerformanceTrendPoint
+} from '@/lib/my-performance/types'
 
 /**
  * Self-service performance DTO — TASK-1027.
@@ -29,72 +37,18 @@ import { getPersonOperationalServing } from '@/lib/person-360/get-person-operati
  * GREENHOUSE_MY_PERFORMANCE_SELF_SERVICE_ACTIVITY_V1 self-critique.
  */
 
-export type MyPerformancePeriodStatus =
-  | 'current_partial'
-  | 'closed_snapshot'
-  | 'no_data'
-  | 'degraded'
-
-export type MyPerformanceDegradedSource = 'ico' | 'trend' | 'operational' | 'nexa'
-
-export interface MyPerformanceMetric {
-  metricId: string
-  value: number | null
-  zone: string | null
-}
-
-export interface MyPerformanceCscEntry {
-  phase: string
-  label: string
-  count: number
-  pct: number
-}
-
-export interface MyPerformanceTrendPoint {
-  periodYear: number
-  periodMonth: number
-  otdPct: number | null
-  ftrPct: number | null
-}
-
-export interface MyPerformanceIco {
-  hasData: boolean
-  metrics: MyPerformanceMetric[]
-  context: {
-    totalTasks: number
-    completedTasks: number
-    activeTasks: number
-    carryOverTasks: number
-  }
-  cscDistribution: MyPerformanceCscEntry[]
-}
-
-export interface MyPerformanceOperational {
-  tasksCompleted: number
-  tasksActive: number
-  stuckAssetCount: number
-}
-
-export interface MyPerformanceResponse {
-  subject: {
-    memberId: string
-  }
-  period: {
-    year: number
-    month: number
-    label: string
-    isCurrentPeriod: boolean
-    status: MyPerformancePeriodStatus
-  }
-  ico: MyPerformanceIco | null
-  trend: MyPerformanceTrendPoint[]
-  nexaInsights: MemberNexaInsightsPayload | null
-  operational: MyPerformanceOperational | null
-  meta: {
-    materializedAt: string | null
-    degradedSources: MyPerformanceDegradedSource[]
-  }
-}
+// DTO types live in ./types (no `server-only`) so client components can import
+// them without pulling this server-only module into the client bundle (TASK-827).
+export type {
+  MyPerformancePeriodStatus,
+  MyPerformanceDegradedSource,
+  MyPerformanceMetric,
+  MyPerformanceCscEntry,
+  MyPerformanceTrendPoint,
+  MyPerformanceIco,
+  MyPerformanceOperational,
+  MyPerformanceResponse
+} from '@/lib/my-performance/types'
 
 export interface ComposeMyPerformanceInput {
   memberId: string
