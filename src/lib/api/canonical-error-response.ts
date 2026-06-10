@@ -54,6 +54,9 @@ export type CanonicalErrorCode =
   | 'invalid_period'
   | 'rate_limited'
   | 'internal_error'
+  // Design System Figma node linking (TASK-1072).
+  | 'invalid_figma_url'
+  | 'figma_node_not_axis'
   // Reserved for future canonical codes — extender aquí cuando emerjan
   // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -113,6 +116,16 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   internal_error: {
     status: 500,
     message: 'Algo salió mal de nuestro lado. Inténtalo de nuevo en unos minutos.',
+    actionable: true
+  },
+  invalid_figma_url: {
+    status: 422,
+    message: 'No parece un enlace de nodo Figma. Copia el enlace desde Figma → Copiar enlace de la selección.',
+    actionable: true
+  },
+  figma_node_not_axis: {
+    status: 422,
+    message: 'El nodo debe ser del archivo AXIS. Pega un enlace de un nodo del Design System en AXIS.',
     actionable: true
   }
 }

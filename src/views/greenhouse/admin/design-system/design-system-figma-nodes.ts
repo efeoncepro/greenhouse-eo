@@ -1,13 +1,12 @@
 /**
- * Design System ↔ AXIS Figma node registry.
+ * Design System ↔ AXIS Figma node registry — SEED ONLY (TASK-1072).
  *
- * Maps each internal `/design-system/*` route to its AXIS Figma node id
- * (master file `yyMksCoijfMaIoYplXKZaR`). The shell renders a
- * `GreenhouseFigmaNodeButton` resolved from this map: routes WITH a node get an
- * active "Nodo Figma" link; routes WITHOUT one render the button disabled — a
- * deliberate signal that the team still has to create + link that AXIS node.
- *
- * To activate a page: create its node in AXIS and add `route → 'NNN:MMM'` here.
+ * ⚠️ This is NO LONGER the runtime source of truth. As of TASK-1072 the canonical
+ * SSOT is the DB table `greenhouse_core.design_system_figma_nodes` (the shell reads
+ * it server-side via `getDesignSystemFigmaNodeMap()` and a designer links nodes from
+ * the UI). These two rows were the migration seed; kept here as the historical seed
+ * reference only. Do NOT add routes here to "activate" a page — link them in the UI
+ * (the "+" affordance) or via `POST /api/design-system/figma-nodes`.
  */
 export const DESIGN_SYSTEM_FIGMA_NODES: Record<string, string> = {
   '/design-system/breadcrumbs': '205:234905',

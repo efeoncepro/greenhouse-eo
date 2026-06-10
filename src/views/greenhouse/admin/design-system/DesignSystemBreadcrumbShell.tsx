@@ -1,19 +1,21 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useCallback, type ReactNode } from 'react'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 
 import {
   GreenhouseBreadcrumbs,
-  GreenhouseFigmaNodeButton,
   type GreenhouseBreadcrumbItem
 } from '@/components/greenhouse/primitives'
+import type { DesignSystemFigmaNodeMap } from '@/lib/design-system/figma-nodes/store'
 
-import { resolveDesignSystemFigmaNode } from './design-system-figma-nodes'
+import FigmaNodeLinkAffordance, {
+  type FigmaNodeLinkResult
+} from './figma-link/FigmaNodeLinkAffordance'
 
 const HOME_ROUTE = '/home'
 const DESIGN_SYSTEM_ROUTE = '/design-system'
@@ -92,10 +94,51 @@ const resolveDesignSystemBreadcrumbItems = (pathname: string): GreenhouseBreadcr
   return items
 }
 
-const DesignSystemBreadcrumbShell = ({ children }: { children: ReactNode }) => {
+export interface DesignSystemBreadcrumbShellProps {
+  children: ReactNode
+  /** Surface→AXIS-node map, resolved server-side from the SSOT (TASK-1072). */
+  figmaNodeMap?: DesignSystemFigmaNodeMap
+  /** Whether the subject holds `design_system.figma_node.link` (designer ∪ admin). */
+  canLinkFigmaNode?: boolean
+}
+
+const DesignSystemBreadcrumbShell = ({
+  children,
+  figmaNodeMap = {},
+  canLinkFigmaNode = false
+}: DesignSystemBreadcrumbShellProps) => {
   const pathname = usePathname()
+  const router = useRouter()
+  const currentRoute = normalizePathname(pathname)
   const breadcrumbItems = resolveDesignSystemBreadcrumbItems(pathname)
-  const figmaNodeId = resolveDesignSystemFigmaNode(pathname)
+  // SSOT runtime: the node comes from the DB-fed map (TASK-1072), not the TS seed.
+  const figmaNodeId = figmaNodeMap[currentRoute]?.nodeId ?? null
+
+  const handleLink = useCallback(
+    async (url: string): Promise<FigmaNodeLinkResult> => {
+      try {
+        const res = await fetch('/api/design-system/figma-nodes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ surfaceKey: currentRoute, url })
+        })
+
+        if (!res.ok) {
+          const payload = (await res.json().catch(() => null)) as { error?: string } | null
+
+          return { ok: false, error: payload?.error ?? 'No se pudo vincular el nodo. Reintenta.' }
+        }
+
+        // Re-fetch the server layout → the shell receives the refreshed SSOT map.
+        router.refresh()
+
+        return { ok: true }
+      } catch {
+        return { ok: false, error: 'No se pudo vincular el nodo. Reintenta.' }
+      }
+    },
+    [currentRoute, router]
+  )
 
   return (
     <Box data-capture='design-system-page-shell' sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -121,7 +164,7 @@ const DesignSystemBreadcrumbShell = ({ children }: { children: ReactNode }) => {
             kind='pageHierarchy'
             showIcons={false}
           />
-          <GreenhouseFigmaNodeButton nodeId={figmaNodeId} dataCapture='design-system-figma-node' />
+          <FigmaNodeLinkAffordance nodeId={figmaNodeId} canLink={canLinkFigmaNode} onLink={handleLink} />
         </Stack>
       </Box>
       {children}
