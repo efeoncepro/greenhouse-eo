@@ -1867,6 +1867,20 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1072 — Design System Figma node linking. Primera capability real del rol
+  // `designer`. Ver el Design System es plano views (plataforma.design_system, abierto a
+  // todo interno); VINCULAR un nodo AXIS es este entitlement, exclusivo de DESIGNER ∪
+  // EFEONCE_ADMIN. Invariant TASK-873/935 (grant en el mismo PR que el seed del catalog).
+  if (hasRole(subject, ROLE_CODES.DESIGNER) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.figma_node.link',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   const resolvedEntries = Array.from(entries.values())
   const moduleKeys = Array.from(new Set(resolvedEntries.map(entry => entry.module)))
 
