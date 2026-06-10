@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -176,6 +176,18 @@ Reglas obligatorias (skills de diseño):
 - **NO** tocar la migración RpA V2 ni los flags de captura.
 
 ## Detailed Spec
+
+### Concepto elegido (product-design-loop Fase 2, 2026-06-10): **mix A+C** (+ B arriba)
+
+3 conceptos IA generados (`.captures/concepts/concept-{a,b,c}-*.png`, gitignored). El operador eligió el **mix A+C**:
+
+- **Esqueleto = C (split-temporal):** dos lanes. **Lane izq = mes cerrado** (settled, último mes completo); **lane der = mes en curso** (ring de progreso "N de M días", cards "Pendiente" honestas para lo que aún no cierra). Mata la contradicción OTD 5%/100%.
+- **Por lane = A (score-hero):** cada lane lleva su **score-hero compuesto** (número grande + verdicto semáforo color+icono+label) + sus KPIs con sparkline+delta+meta.
+- **Arriba = B (narrative-first):** el insight Nexa lidera como banda narrativa (2ª persona, TASK-1073) + CTA acción, sobre los dos lanes.
+
+Imagen = intención: layout/jerarquía/interacción se toman del concepto; colores/tipografía/spacing se **mapean a tokens AXIS / SoT / 4n** (no se transcribe el PNG). Las métricas placeholder en inglés de los conceptos → RpA/OTD%/FTR%/Throughput/Cycle/Stuck en es-CL.
+
+### Blueprint completo
 
 Ver el blueprint completo en la conversación de análisis (sesión 2026-06-10): scorecard enterprise, espina narrativa, component manifest por sección, upgrade chart-by-chart, modelo temporal, a11y/motion. Resumen del contrato:
 

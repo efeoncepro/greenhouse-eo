@@ -1,3 +1,16 @@
+# Sesion 2026-06-10 — EPIC-018: Performance Dashboard Storytelling (diseño + concepto elegido)
+
+**Auditoría enterprise de `/my/performance` (Mi Desempeño) + arranque del rediseño cross-surface.** Disparado por feedback del operador ("se ve terrible, poco moderna; modernizar nivel enterprise, gráficos impactantes, data storytelling"). GVC real entrando como `daniela.ferreira@efeonce.org` (junio 2026, estado degradado, desktop+mobile fullPage) + skills `greenhouse-ui-orchestrator`/`-enterprise-review`/`modern-ui`/`dataviz-design`/`state-design`/`greenhouse-ux`/`modern-web-guidance`/`product-design-loop`/`greenhouse-ux-writing`/`greenhouse-ico`/`arch-architect`.
+
+- **Veredicto:** BLOCK, rubric ~2.0/5. 3 causas raíz **estructurales** (no cosméticas): (1) cero data storytelling — números sin contexto; (2) modelo temporal incoherente que engaña — KPI cards muestran junio en curso (OTD 5%) y los trends justo debajo muestran mayo cerrado (OTD 100%) sin rótulo; (3) madurez visual template plano 2018.
+- **Backlog creado (commit `c9595ea77`):** **EPIC-018** (Performance Dashboard Storytelling Platform) + **TASK-1075** (foundation: primitives reusables + piloto `/my/performance`; depende TASK-1073 + TASK-1074) + **TASK-1076** (adopción hermana Agency ICO / Space 360 / Person 360, consume sin fork; Person 360 = voz observer). Estructura foundation→adoption.
+- **Tasks satélite previas (`a9f3d62c5`, `97431853a`):** **TASK-1073** (Nexa self-view 2ª persona) + **TASK-1074** (RpA "—" microcopy honesto — verificado contra BQ: suprimido en junio porque las 28 tareas cerradas tienen `rpa_value=0`/"✅ 0" = 0 correcciones; nada roto).
+- **product-design-loop:** Fase 1 (3 conceptos IA en `.captures/concepts/concept-{a,b,c}-*.png`, gitignored) → Fase 2 cerrada: operador eligió **mix A+C** (split-temporal mes-cerrado|en-curso + score-hero por lane + insight Nexa narrativo arriba). Registrado en TASK-1075 Detailed Spec.
+- **TASK-1075 → in-progress.** Próximo: Fase 3 (build mockup tokenizado `/my/performance/mockup` + GVC loop) bajo Figma Implementation Contract.
+- **Nota:** TASK-1027 (`/my/performance`) ya shipeó en el release `e8705157e` de hoy — el view actual ES esa superficie; TASK-1075 la moderniza.
+
+---
+
 # Sesion 2026-06-10 — RELEASE develop→main `e8705157e` (RELEASED)
 
 **Release a producción completado y verificado.** Manifest `released`, orchestrator run `27293405799` = success.
