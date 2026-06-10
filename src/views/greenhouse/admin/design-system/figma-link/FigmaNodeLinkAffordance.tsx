@@ -6,7 +6,7 @@ import {
   GreenhouseAnchoredDisclosure,
   GreenhouseFigmaNodeButton
 } from '@/components/greenhouse/primitives'
-import { AXIS_FILE_KEY } from '@/components/greenhouse/primitives/GreenhouseFigmaNodeButton'
+import { AXIS_FILE_KEY } from '@/lib/design-system/figma-nodes/axis-file'
 import { parseFigmaUrl } from '@/lib/design-system/figma-nodes/parse-figma-url'
 
 import FigmaNodeLinkEditor, { type FigmaNodeLinkStatus } from './FigmaNodeLinkEditor'

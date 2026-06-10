@@ -5,9 +5,12 @@ import { getFigmaNodeRender } from '@/lib/design-system/figma-nodes/figma-render
 import { can } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireTenantContext } from '@/lib/tenant/authorization'
-import { AXIS_FILE_KEY } from '@/components/greenhouse/primitives/GreenhouseFigmaNodeButton'
+import { AXIS_FILE_KEY } from '@/lib/design-system/figma-nodes/axis-file'
 
 export const dynamic = 'force-dynamic'
+// Figma `/v1/images` cold render can take 10-20s; give the function enough budget
+// (the helper aborts at 25s). TASK-1072 Slice 4.
+export const maxDuration = 30
 
 /**
  * TASK-1072 Slice 4 — Figma node render preview.

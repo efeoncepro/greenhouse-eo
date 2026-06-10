@@ -7,8 +7,7 @@ import type { PoolClient } from 'pg'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
-import { AXIS_FILE_KEY } from '@/components/greenhouse/primitives/GreenhouseFigmaNodeButton'
-
+import { AXIS_FILE_KEY } from './axis-file'
 import { parseFigmaUrl } from './parse-figma-url'
 
 /**

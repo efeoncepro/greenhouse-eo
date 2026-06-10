@@ -7,6 +7,7 @@ import Tooltip from '@mui/material/Tooltip'
 
 import GreenhouseButton from './GreenhouseButton'
 import type { GreenhouseButtonProps } from './GreenhouseButton'
+import { AXIS_FILE_KEY, AXIS_FILE_NAME, buildFigmaNodeUrl } from '@/lib/design-system/figma-nodes/axis-file'
 
 /**
  * GreenhouseFigmaNodeButton — canonical "open the AXIS Figma node" control.
@@ -19,8 +20,11 @@ import type { GreenhouseButtonProps } from './GreenhouseButton'
  * (`yyMksCoijfMaIoYplXKZaR`), so callers usually only pass `nodeId`.
  */
 
-export const AXIS_FILE_KEY = 'yyMksCoijfMaIoYplXKZaR'
-export const AXIS_FILE_NAME = 'Design-System-%7C-Vuexy-%3E-AXIS'
+// Re-export desde el módulo universal (SoT) para backward-compat del barrel + tests.
+// Importar estos valores desde este módulo 'use client' hacia código server los
+// volvía client-refs en el bundle de Vercel (rompía `fileKey === AXIS_FILE_KEY`
+// server-side); el server ahora importa directo de `axis-file`. TASK-1072.
+export { AXIS_FILE_KEY, AXIS_FILE_NAME, buildFigmaNodeUrl }
 
 const DEFAULT_LABEL = 'Nodo Figma'
 const DEFAULT_OPEN_TOOLTIP = 'Abrir el nodo en AXIS (Figma)'
@@ -46,13 +50,6 @@ export interface GreenhouseFigmaNodeButtonProps {
   tone?: GreenhouseButtonProps['tone']
   size?: GreenhouseButtonProps['size']
   dataCapture?: string
-}
-
-/** Build the canonical AXIS Figma node URL. The URL form uses `-`, not `:`. */
-export const buildFigmaNodeUrl = (nodeId: string, fileKey = AXIS_FILE_KEY, fileName = AXIS_FILE_NAME): string => {
-  const urlNode = nodeId.trim().replace(/:/g, '-')
-
-  return `https://www.figma.com/design/${fileKey}/${fileName}?node-id=${urlNode}&m=dev`
 }
 
 const GreenhouseFigmaNodeButton = ({

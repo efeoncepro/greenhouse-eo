@@ -18,7 +18,11 @@ import { captureWithDomain } from '@/lib/observability/capture'
  */
 
 const FIGMA_API_BASE = 'https://api.figma.com'
-const FIGMA_FETCH_TIMEOUT_MS = 6000
+// `/v1/images` renders on-demand: a COLD node render can take 10-20s (Figma blocks
+// until rendered, then caches → warm calls are instant). 6s was too aggressive and
+// aborted cold renders → false `unavailable`. 25s covers cold renders; the editor
+// shows an honest loading spinner meanwhile. The route sets maxDuration accordingly.
+const FIGMA_FETCH_TIMEOUT_MS = 25000
 // Figma image URLs are temporary; the editor preview is transient so the URL is
 // used immediately. Durable thumbnail caching (download → asset) is a further
 // enhancement, only needed if a long-lived thumbnail surface emerges.
