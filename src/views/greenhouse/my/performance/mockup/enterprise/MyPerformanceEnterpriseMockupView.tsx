@@ -14,11 +14,12 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import NexaInsightsBlock from '@/components/greenhouse/NexaInsightsBlock'
+
 import { editorialBrief } from './data'
 import PerformanceHeader from './components/PerformanceHeader'
 import StoryHeroPanel from './components/StoryHeroPanel'
 import CausalChainPanel from './components/CausalChainPanel'
-import NexaInsightPanel from './components/NexaInsightPanel'
 import MetricsRibbonPanel from './components/MetricsRibbonPanel'
 
 const MyPerformanceEnterpriseMockupView = () => {
@@ -33,13 +34,22 @@ const MyPerformanceEnterpriseMockupView = () => {
         {/* Tier 1 — the dominant story module */}
         <StoryHeroPanel headline={b.headline} subline={b.subline} score={b.score} hero={b.hero} />
 
-        {/* Tier 2 — diagnosis row: causal chain (wider) | Nexa coaching (narrower) */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '7fr 5fr' }, gap: { xs: 3, md: 3.5 } }}>
-          <CausalChainPanel nodes={b.causal} />
-          <NexaInsightPanel nexa={b.nexa} />
-        </Box>
+        {/* Tier 2 — diagnosis: the causal chain */}
+        <CausalChainPanel nodes={b.causal} />
 
-        {/* Tier 3 — supporting metrics */}
+        {/* Tier 3 — Nexa Insights (the REAL hardened component): severity-led cards,
+            recommended action, "Ver causa raíz" drill CTA. Self-view (mentionSafeMode). */}
+        <NexaInsightsBlock
+          insights={b.nexaBlock.insights}
+          totalAnalyzed={b.nexaBlock.totalAnalyzed}
+          lastAnalysis={b.nexaBlock.lastAnalysis}
+          runStatus={b.nexaBlock.runStatus}
+          dataStatus='ready'
+          defaultExpanded
+          mentionSafeMode
+        />
+
+        {/* Tier 4 — supporting metrics */}
         <MetricsRibbonPanel metrics={b.ribbon} />
 
         <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', mt: 1 }}>

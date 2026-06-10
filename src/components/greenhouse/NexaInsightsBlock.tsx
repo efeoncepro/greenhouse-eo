@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import Link from 'next/link'
+
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
@@ -9,15 +11,14 @@ import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
-import Grid from '@mui/material/Grid'
+import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
-import { useTheme } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
-import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { motion, AnimatePresence } from '@/libs/FramerMotion'
@@ -30,6 +31,8 @@ import NexaInsightsTimeline, {
   type NexaTimelineItem
 } from '@/components/greenhouse/NexaInsightsTimeline'
 import NexaSeveritySparkline from '@/components/greenhouse/NexaSeveritySparkline'
+import GreenhouseNexaAnimatedMark from '@/components/greenhouse/primitives/GreenhouseNexaAnimatedMark'
+import { buildNexaInsightDrillHref } from '@/lib/ico-engine/ai/nexa-insight-href'
 import type {
   NexaSignalLifecycleStatus,
   NexaSignalObservation
@@ -40,6 +43,10 @@ import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 export type NexaInsightItem = {
   id: string
+  /** TASK-947 — signal-anchored id (EO-AIS-*) for the canonical "Ver causa raíz"
+   * drill to `/nexa/insights/[id]`. Stable cross-period. Optional for backward
+   * compat: when absent, the card falls back to `id` (enrichment-anchored). */
+  signalId?: string
   signalType: string
   metricId: string
   severity: string | null
@@ -127,6 +134,16 @@ const getRunChip = (status: string | null) => ({
 
 // ─── Subcomponents ─────────────────────────────────────────────────────────
 
+// Severity icon canonical — matches the `/nexa/insights` list card contract
+// (icon + label, NUNCA color-only — WCAG 2.2 AA).
+const SEVERITY_ICON: Record<string, string> = {
+  critical: 'tabler-alert-octagon',
+  warning: 'tabler-alert-triangle',
+  info: 'tabler-info-circle'
+}
+
+const SEVERITY_ICON_UNKNOWN = 'tabler-help-circle'
+
 const STAGGER_ITEM = {
   hidden: { opacity: 0, y: 8 },
   visible: (i: number) => ({
@@ -147,9 +164,15 @@ const InsightCard = ({
   animate: boolean
   mentionSafeMode: boolean
 }) => {
+  const theme = useTheme()
   const signalLabel = GH_NEXA.signal_type[item.signalType] ?? item.signalType
-  const severityColor = GH_NEXA.severity_color[item.severity ?? ''] ?? 'secondary'
+  const severityKey = item.severity ?? 'unknown'
+  const severityColor = GH_NEXA.severity_color[severityKey] ?? 'secondary'
+  const severityLabel = GH_NEXA.severity_label[severityKey] ?? GH_NEXA.severity_label_unknown
+  const severityIcon = SEVERITY_ICON[severityKey] ?? SEVERITY_ICON_UNKNOWN
   const metricName = getMetricDisplayName(item.metricId)
+  // TASK-947 — signal-anchored drill (stable). Fallback to enrichment id.
+  const drillHref = buildNexaInsightDrillHref(item.signalId ?? item.id)
 
   // TASK-945 — lifecycle gating: sparkline solo si >= 2 observations.
   // resolved badge solo si lifecycleStatus === 'resolved'.
@@ -163,28 +186,30 @@ const InsightCard = ({
         p: 2.5,
         borderRadius: 2,
         border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
+        borderLeft: theme => `4px solid ${theme.palette[severityColor]?.main ?? theme.palette.text.secondary}`,
         bgcolor: 'background.paper',
-        '&:hover': { bgcolor: 'action.hover' }
+        transition: theme => theme.transitions.create(['box-shadow'], { duration: theme.transitions.duration.shorter }),
+        '&:hover': { boxShadow: theme => theme.greenhouseElevation.raised.boxShadow },
+        '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
       }}
     >
-      <Stack spacing={1}>
-        {/* Header: signal type + metric + TASK-945 sparkline + resolved badge */}
-        <Stack
-          direction='row'
-          spacing={1}
-          alignItems='center'
-          sx={{ flexWrap: 'wrap', rowGap: 0.5 }}
-        >
+      <Stack spacing={1.5}>
+        {/* Header: severity (icon + label, not color-only) + metric + signal type + sparkline + resolved */}
+        <Stack direction='row' spacing={1} alignItems='center' sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
           <CustomChip
             round='true'
             size='small'
             variant='tonal'
             color={severityColor}
-            label={signalLabel}
-            sx={{ height: 20, fontSize: '0.64rem', fontWeight: 600 }}
+            icon={<i className={severityIcon} style={{ fontSize: 13 }} aria-hidden='true' />}
+            label={severityLabel}
+            sx={{ height: 22, fontSize: '0.68rem', fontWeight: 600, '& .MuiChip-icon': { ml: 0.5 } }}
           />
           <Typography variant='subtitle2' sx={{ color: theme => theme.palette.customColors.midnight }}>
             {metricName}
+          </Typography>
+          <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+            · {signalLabel}
           </Typography>
           {showSparkline && (
             <Box sx={{ display: { xs: 'none', sm: 'inline-flex' } }}>
@@ -204,26 +229,21 @@ const InsightCard = ({
               color='success'
               label={GH_NEXA.lifecycle_resolved_badge}
               icon={<i className='tabler-circle-check' style={{ fontSize: 12 }} aria-hidden='true' />}
-              sx={{
-                height: 20,
-                fontSize: '0.64rem',
-                fontWeight: 600,
-                ml: 'auto',
-                '& .MuiChip-icon': { ml: 0.5 }
-              }}
+              sx={{ height: 22, fontSize: '0.68rem', fontWeight: 600, ml: 'auto', '& .MuiChip-icon': { ml: 0.5 } }}
               aria-label={GH_NEXA.lifecycle_status_resolved}
             />
           )}
         </Stack>
 
-        {/* Explanation */}
+        {/* Headline = explanation (promoted: the insight a person reads first) */}
         {item.explanation && (
           <NexaMentionText
             text={item.explanation}
-            variant='body2'
+            variant='body1'
             safeMode={mentionSafeMode}
             sx={{
-              color: 'text.secondary',
+              fontWeight: 500,
+              color: theme => theme.palette.customColors.midnight,
               display: '-webkit-box',
               WebkitLineClamp: 3,
               WebkitBoxOrient: 'vertical',
@@ -241,26 +261,57 @@ const InsightCard = ({
           />
         )}
 
-        {/* Recommended action */}
+        {/* Recommended action — the actionable block */}
         {item.recommendedAction && (
-          <Box
+          <Stack
+            direction='row'
+            spacing={1.25}
             sx={{
-              mt: 0.5,
-              pl: 1.5,
-              borderLeft: t => `3px solid ${t.palette.warning.main}`
+              p: 1.5,
+              borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+              bgcolor: theme => alpha(theme.palette.primary.main, 0.06),
+              border: theme => `1px solid ${alpha(theme.palette.primary.main, 0.16)}`
             }}
           >
-            <Typography variant='caption' sx={{ fontWeight: 600, color: 'text.secondary', display: 'block', mb: 0.25 }}>
-              {GH_NEXA.insights_action_label}
-            </Typography>
-            <NexaMentionText
-              text={item.recommendedAction}
-              variant='body2'
-              safeMode={mentionSafeMode}
-              sx={{ color: theme => theme.palette.customColors.midnight }}
-            />
-          </Box>
+            <i className='tabler-bulb' style={{ fontSize: 16, marginTop: 2, color: theme.palette.primary.main }} aria-hidden='true' />
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant='caption' sx={{ fontWeight: 700, color: 'primary.main', display: 'block', mb: 0.25 }}>
+                {GH_NEXA.insights_action_label}
+              </Typography>
+              <NexaMentionText
+                text={item.recommendedAction}
+                variant='body2'
+                safeMode={mentionSafeMode}
+                sx={{ color: theme => theme.palette.customColors.midnight }}
+              />
+            </Box>
+          </Stack>
         )}
+
+        {/* Drill CTA — the path to the full root-cause detail */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 0.5 }}>
+          <Typography
+            component={Link}
+            href={drillHref}
+            variant='button'
+            aria-label={GH_NEXA.list_card_aria_label(metricName, severityLabel)}
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.75,
+              color: 'primary.main',
+              fontWeight: 600,
+              textTransform: 'none',
+              textDecoration: 'none',
+              borderRadius: '4px',
+              '&:hover': { textDecoration: 'underline' },
+              '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
+            }}
+          >
+            {GH_NEXA.list_card_drill_cta}
+            <i className='tabler-arrow-right' style={{ fontSize: 16 }} aria-hidden='true' />
+          </Typography>
+        </Box>
       </Stack>
     </Box>
   )
@@ -313,7 +364,7 @@ const NexaInsightsBlock = ({
         <Accordion disableGutters elevation={0} defaultExpanded={defaultExpanded}>
           <AccordionSummary expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <i className='tabler-sparkles' style={{ fontSize: 20, color: theme.palette.primary.main }} aria-hidden='true' />
+              <GreenhouseNexaAnimatedMark kind='badgeIcon' tone='fullColor' size='small' decorative />
               <Typography variant='h6'>{GH_NEXA.insights_title}</Typography>
               <CustomChip
                 round='true'
@@ -384,11 +435,11 @@ const NexaInsightsBlock = ({
   }
 
   return (
-    <Card elevation={0} sx={{ border: `1px solid ${theme.palette.customColors.lightAlloy}` }}>
+    <Card elevation={0} data-capture='nexa-insights-block' sx={{ border: `1px solid ${theme.palette.customColors.lightAlloy}` }}>
       <Accordion disableGutters elevation={0} defaultExpanded={defaultExpanded}>
         <AccordionSummary expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}>
           <Stack direction='row' alignItems='center' spacing={2} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
-            <i className='tabler-sparkles' style={{ fontSize: 20, color: theme.palette.primary.main }} aria-hidden='true' />
+            <GreenhouseNexaAnimatedMark kind='badgeIcon' tone='fullColor' size='small' decorative />
             <Typography variant='h6'>{GH_NEXA.insights_title}</Typography>
             <CustomChip
               round='true'
@@ -410,29 +461,28 @@ const NexaInsightsBlock = ({
         </AccordionSummary>
         <AccordionDetails>
           <Stack spacing={4}>
-            {/* KPIs */}
-            <Grid container spacing={6}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <HorizontalWithSubtitle
-                  title={GH_NEXA.kpi_analyzed}
-                  stats={<AnimatedCounter value={totalAnalyzed} format='integer' />}
-                  avatarIcon='tabler-sparkles'
-                  avatarColor='primary'
-                  subtitle={GH_NEXA.kpi_analyzed_subtitle(totalAnalyzed)}
-                  titleTooltip={GH_NEXA.kpi_analyzed_tooltip}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <HorizontalWithSubtitle
-                  title={GH_NEXA.kpi_actionable}
-                  stats={<AnimatedCounter value={countWithActions} format='integer' />}
-                  avatarIcon='tabler-bulb'
-                  avatarColor='warning'
-                  subtitle={GH_NEXA.kpi_actionable_subtitle(countWithActions, totalAnalyzed)}
-                  titleTooltip={GH_NEXA.kpi_actionable_tooltip}
-                />
-              </Grid>
-            </Grid>
+            {/* Summary strip — slim, no heavy avatar cards */}
+            <Stack direction='row' spacing={4} alignItems='center' divider={<Divider orientation='vertical' flexItem />}>
+              <Stack spacing={0.25}>
+                <Typography variant='h4' sx={{ fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                  <AnimatedCounter value={totalAnalyzed} format='integer' />
+                </Typography>
+                <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+                  {GH_NEXA.kpi_analyzed}
+                </Typography>
+              </Stack>
+              <Stack spacing={0.25}>
+                <Stack direction='row' alignItems='center' spacing={0.75}>
+                  <i className='tabler-bulb' style={{ fontSize: 18, color: theme.palette.primary.main }} aria-hidden='true' />
+                  <Typography variant='h4' sx={{ color: 'primary.main', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                    <AnimatedCounter value={countWithActions} format='integer' />
+                  </Typography>
+                </Stack>
+                <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+                  {GH_NEXA.kpi_actionable}
+                </Typography>
+              </Stack>
+            </Stack>
 
             {/* View mode toggle (shown only when historical data is available) */}
             {timelineAvailable && (
