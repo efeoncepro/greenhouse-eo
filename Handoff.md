@@ -1,3 +1,43 @@
+# Sesion 2026-06-10 — EPIC-018 / TASK-1075: RESUME POINT (build editorial brief en curso)
+
+> **CHECKPOINT por inestabilidad de la API Claude (rate limit + clasificador Bash caído).** Estado exacto para retomar sin perder trabajo.
+
+## Dónde quedó el trabajo (TASK-1075, in-progress)
+
+**Decisión de diseño vigente (NO recapturar):** se descartó el primer mockup (card-grid A+C) por feedback del operador ("card sobre card, no enterprise, no accionable"). Loop nuevo de conceptos v2 (`.captures/concepts/v2-{a,b,c}-*.png`, gitignored). Operador eligió **concepto A — editorial brief**. Reencuadre crítico del operador: la vista es del **COLABORADOR**, NO del cliente → la cadena causal ICO va en lens colaborador (**calidad → tu ritmo → tu foco**), NUNCA "Revenue Enabled / ganaste más" (eso es el pitch comercial / Space-Agency-cliente). Copy **es-CL tuteo**, CERO voseo argentino (el operador cazó "reforzá/alineá/controlás" — ya corregidos).
+
+**Superficie:** ruta mockup nueva `/my/performance/mockup/enterprise` (NO pisa el mockup TASK-1027 existente). Archivos:
+- `src/app/(dashboard)/my/performance/mockup/enterprise/page.tsx`
+- `src/views/greenhouse/my/performance/mockup/enterprise/MyPerformanceEnterpriseMockupView.tsx`
+- `src/views/greenhouse/my/performance/mockup/enterprise/data.ts`
+
+**Layout concepto A (implementado):** una superficie plana (1 Card, hairline `<Divider>` entre secciones, **cero card-on-card**) con: header (eyebrow + member + toggle período Mayo cerrado/Junio en curso + score 78/100) → headline editorial dominante (h2, verdicto) → banda **cadena causal** (3 nodos lens colaborador: "Lo que controlas" FTR / "Tu ritmo" retrabajo / "Tu foco ahora" acción, con flechas) → **chart hero Recharts** (área FTR con cliff May 95→44.6, gridlines, ReferenceLine meta 80, ReferenceDot rojo en el cliff) → fila Nexa (Nexa Mark REAL `GreenhouseNexaAnimatedMark` + narrativa 2ª persona + chip acción) → **ribbon plano** de las otras 5 métricas (OTD/RpA/Throughput/Cycle/Stuck, sparklines Apex, hairline dividers, NO cards) → footer.
+
+## ⚠️ ESTADO GIT (importante — recuperar antes de seguir)
+
+- **Remoto `develop` (último push exitoso): commit `75aefddea`** = todavía el mockup VIEJO card-grid A+C. El rediseño editorial NO está en remoto.
+- **Local HEAD = un commit "feat: editorial brief A rebuild" que NO se pusheó** (el pre-push `pnpm local:check` falló por 1 error tsc: el `formatter` del RechartsTooltip). Ese commit tiene el bug tsc en su snapshot.
+- **Working tree (sin commitear) tiene los fixes encima:** (1) formatter tsc corregido (`formatter={value => [...] as [string,string]}`) → **tsc ahora 0 errores (verificado)**; (2) voseo "controlás"→"controlas" en data.ts; (3) chart text: removidos los `<Label>` de adentro del SVG + removido el import `Label` + agregado `data-capture='hero-chart'`.
+- **Para recuperar:** commitear el working tree (mejor `git commit --amend` o un commit nuevo encima) y **push** — el tsc ya pasa, debería pushear bien.
+
+## EXACTAMENTE dónde me quedé (siguiente micro-paso)
+
+Arreglando **"los textos del chart se ven mal"** (feedback operador). Causa: el wrapper `AppRecharts` fuerza `caption` 13px por CSS `!important` a TODO el texto SVG (TASK-1041), así que los labels de anotación Recharts perdían tamaño/peso y el callout del cliff se cortaba en el borde derecho. **Fix en curso:** saqué el texto de adentro del SVG (ya removí los `<Label>`). **FALTA terminar:** (a) poner "Meta ≥ 80%" como indicador HTML en el header del chart + una leyenda (dot verde punteado); (b) agregar un **caption HTML limpio bajo el chart** con el quiebre ("El quiebre de mayo: −50.6 pts vs abril — más piezas volvieron con cambios."), tipografía controlada; (c) re-lint + GVC `clipSelector='[data-capture="hero-chart"]'` (resize con `sips -Z 1500` porque el clip retina excede 2000px y la API lo rechaza) → mirar → iterar.
+
+## Pendientes del loop (autocrítica vs v2-a, para enterprise-grade)
+
+- Terminar el fix de textos del chart (arriba).
+- Verificar **mobile** del editorial brief (última verificación fue desktop).
+- Evaluar headline a h1 (32px) si se quiere más dominante (hoy h2/24).
+- Considerar consolidar a UNA librería de charts en el view (hoy hero=Recharts + ribbon-sparklines=Apex; OK para mockup, consolidar en runtime). echarts NO está instalado (CLAUDE.md "ECharts no se usa hoy") — agregarlo sería decisión de dep aparte.
+- Tras aprobación visual: promover hero-score/cadena-causal/KPI-story/ribbon a **primitives del registry** (Primitive+Variants+Kinds) + cutover runtime flag-gated (resto de TASK-1075) + TASK-1076 (Agency/Space/Person 360, con el boundary de lens por audiencia).
+
+## Boundary canónico a fijar (anotado, aún no en CLAUDE.md)
+
+Mismas métricas ICO, **el lens narrativo cambia por audiencia**: colaborador (`/my/performance`, craft/desarrollo, 2ª persona) ≠ manager (Person 360, coaching, 3ª persona observer) ≠ cliente (Space/Agency/portal, Revenue Enabled comercial). El nivel 3 de la cadena causal NUNCA es "revenue" en la vista del colaborador.
+
+---
+
 # Sesion 2026-06-10 — EPIC-018: Performance Dashboard Storytelling (diseño + concepto elegido)
 
 **Auditoría enterprise de `/my/performance` (Mi Desempeño) + arranque del rediseño cross-surface.** Disparado por feedback del operador ("se ve terrible, poco moderna; modernizar nivel enterprise, gráficos impactantes, data storytelling"). GVC real entrando como `daniela.ferreira@efeonce.org` (junio 2026, estado degradado, desktop+mobile fullPage) + skills `greenhouse-ui-orchestrator`/`-enterprise-review`/`modern-ui`/`dataviz-design`/`state-design`/`greenhouse-ux`/`modern-web-guidance`/`product-design-loop`/`greenhouse-ux-writing`/`greenhouse-ico`/`arch-architect`.

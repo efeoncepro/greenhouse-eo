@@ -1,512 +1,364 @@
 'use client'
 
-// TASK-1075 — Mi Desempeño enterprise redesign mockup (concept A+C).
-// A+C mix: split-temporal skeleton (mes cerrado | mes en curso) + composite
-// score-hero per lane + Nexa narrative band (2nd person) on top.
-// Tokenized (AXIS / SoT / elevation roles) — image was intención, no literal.
+// TASK-1075 — Mi Desempeño · editorial brief (concept A v2).
+// Collaborator lens: calidad → tu ritmo → tu foco (NOT revenue/client lens).
+// One flat surface, hairline dividers, strong type hierarchy, causal-chain band,
+// hero chart with annotation, real Nexa mark, flat metrics ribbon. NO card-on-card.
+// Tokenized (AXIS / SoT / elevation). Reference north: .captures/concepts/v2-a-editorial-brief.png
 
 import { useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
-import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
-import LinearProgress from '@mui/material/LinearProgress'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import { alpha, useTheme, type Theme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
+import AppRecharts from '@/libs/styles/AppRecharts'
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ReferenceDot,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  XAxis,
+  YAxis
+} from '@/libs/Recharts'
+import GreenhouseNexaAnimatedMark from '@/components/greenhouse/primitives/GreenhouseNexaAnimatedMark'
 
-import { enterpriseMock, type MockKpi, type MockLane, type MockTone } from './data'
+import { editorialBrief, type BriefTone, type CausalNode, type RibbonMetric } from './data'
 
-type ThemeColorKey = 'success' | 'warning' | 'error' | 'info' | 'primary' | 'secondary'
+const toneColor = (theme: Theme, tone: BriefTone): string =>
+  tone === 'neutral' ? theme.palette.text.disabled : theme.palette[tone].main
 
-const toneToColorKey = (tone: MockTone): ThemeColorKey => (tone === 'neutral' ? 'secondary' : tone)
+// ── Hairline section label (overline) ───────────────────────────────────────
+const SectionLabel = ({ children }: { children: React.ReactNode }) => (
+  <Typography variant='overline' sx={{ color: 'text.secondary', letterSpacing: '0.08em' }}>
+    {children}
+  </Typography>
+)
 
-const toneMain = (theme: Theme, tone: MockTone): string =>
-  tone === 'neutral' ? theme.palette.text.disabled : theme.palette[toneToColorKey(tone)].main
-
-const fmtValue = (kpi: Pick<MockKpi, 'value' | 'format' | 'suffix'>): string => {
-  if (kpi.value === null) return '—'
-
-  const base =
-    kpi.format === 'percentage'
-      ? `${Number.isInteger(kpi.value) ? kpi.value : kpi.value.toFixed(1)}%`
-      : kpi.format === 'decimal'
-        ? kpi.value.toFixed(kpi.value < 10 ? 2 : 1).replace(/\.00$/, '.0')
-        : `${kpi.value}`
-
-  return kpi.suffix ? `${base}${kpi.suffix}` : base
-}
-
-const fmtDelta = (delta: number, unit?: string): string => {
-  const sign = delta > 0 ? '+' : ''
-  const num = Number.isInteger(delta) ? `${delta}` : delta.toFixed(1)
-
-  return `${sign}${num}${unit ? ` ${unit}` : ''}`
-}
-
-// ── Sparkline (tiny area, governed by chart wrapper typography) ──────────────
-const Sparkline = ({ series, color }: { series: { value: number | null }[]; color: string }) => {
-  const data = series.map(p => p.value)
-
+// ── Sparkline (tiny, flat) ──────────────────────────────────────────────────
+const Sparkline = ({ data, color }: { data: number[]; color: string }) => {
   const options: ApexOptions = {
-    chart: { sparkline: { enabled: true }, animations: { enabled: true, speed: 400 } },
+    chart: { sparkline: { enabled: true }, animations: { enabled: true, speed: 500 } },
     stroke: { width: 2, curve: 'smooth', lineCap: 'round' },
-    fill: { type: 'gradient', gradient: { opacityFrom: 0.32, opacityTo: 0, stops: [0, 100] } },
     colors: [color],
     tooltip: { enabled: false },
     markers: { size: 0 }
   }
 
-  return <AppReactApexCharts type='area' height={40} width='100%' series={[{ data }]} options={options} />
+  return <AppReactApexCharts type='line' height={28} width={84} series={[{ data }]} options={options} />
 }
 
-// ── KPI story card (code + name + value + delta + target + sparkline + semaphore) ──
-const KpiStoryCard = ({ kpi }: { kpi: MockKpi }) => {
+// ── Causal node (flat, no card) ─────────────────────────────────────────────
+const CausalNodeBlock = ({ node }: { node: CausalNode }) => {
   const theme = useTheme()
-  const main = toneMain(theme, kpi.tone)
-  const isEmpty = kpi.value === null
-  const deltaGood = kpi.delta !== null && ((kpi.id === 'stuck' || kpi.id === 'cycle' || kpi.id === 'rpa') ? kpi.delta <= 0 : kpi.delta >= 0)
-  const deltaColor = kpi.delta === null ? theme.palette.text.disabled : deltaGood ? theme.palette.success.main : theme.palette.error.main
+  const accent = toneColor(theme, node.tone)
 
   return (
-    <Card
-      elevation={0}
-      sx={{
-        height: '100%',
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: `${theme.shape.customBorderRadius.md}px`,
-        borderTop: `3px solid ${main}`,
-        transition: theme.transitions.create(['box-shadow', 'transform'], { duration: 150 }),
-        '&:hover': { boxShadow: theme.greenhouseElevation.raised.boxShadow, transform: 'translateY(-2px)' }
-      }}
-    >
-      <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
-        <Stack direction='row' alignItems='baseline' justifyContent='space-between' sx={{ mb: 0.5 }}>
-          <Stack direction='row' alignItems='baseline' spacing={1}>
-            <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
-              {kpi.code}
-            </Typography>
-            <Typography variant='caption' sx={{ color: 'text.secondary' }}>
-              {kpi.name}
-            </Typography>
-          </Stack>
-          <i className={kpi.icon} style={{ fontSize: 18, color: main }} aria-hidden='true' />
-        </Stack>
-
-        <Stack direction='row' alignItems='flex-end' justifyContent='space-between' sx={{ minHeight: 44 }}>
-          <Typography
-            variant='kpiValue'
-            sx={{ color: isEmpty ? 'text.disabled' : 'text.primary', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}
-          >
-            {fmtValue(kpi)}
+    <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
+      <Stack direction='row' alignItems='center' spacing={1}>
+        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: accent }} />
+        <SectionLabel>{node.stage}</SectionLabel>
+      </Stack>
+      <Typography variant='subtitle1' sx={{ fontWeight: 700, color: node.isFocus ? 'primary.main' : 'text.primary' }}>
+        {node.headline}
+      </Typography>
+      {node.figure && (
+        <Stack direction='row' alignItems='baseline' spacing={1}>
+          <Typography variant='h5' sx={{ color: accent, fontVariantNumeric: 'tabular-nums' }}>
+            {node.figure}
           </Typography>
-          {kpi.delta !== null && (
-            <Chip
-              size='small'
-              label={fmtDelta(kpi.delta, kpi.deltaUnit)}
-              icon={<i className={kpi.delta >= 0 ? 'tabler-arrow-up-right' : 'tabler-arrow-down-right'} style={{ fontSize: 14 }} />}
-              sx={{
-                height: 22,
-                color: deltaColor,
-                bgcolor: alpha(deltaColor, 0.12),
-                fontVariantNumeric: 'tabular-nums',
-                '& .MuiChip-icon': { color: deltaColor, ml: 0.5 }
-              }}
-            />
+          {node.figureDelta && (
+            <Typography variant='caption' sx={{ color: accent }}>
+              {node.figureDelta}
+            </Typography>
           )}
         </Stack>
-
-        {kpi.emptyReason ? (
-          <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', mt: 0.5, minHeight: 40 }}>
-            {kpi.emptyReason}
-          </Typography>
-        ) : (
-          <Box sx={{ mt: 0.5, mx: -0.5, minHeight: 40 }}>{kpi.series.length > 0 && <Sparkline series={kpi.series} color={main} />}</Box>
-        )}
-
-        <Divider sx={{ my: 1.5 }} />
-
-        <Stack direction='row' alignItems='center' justifyContent='space-between'>
-          <Stack direction='row' alignItems='center' spacing={0.5}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: main }} />
-            <Typography variant='caption' sx={{ color: main, fontWeight: 600 }}>
-              {kpi.statusLabel}
-            </Typography>
-          </Stack>
-          <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-            {kpi.target}
-          </Typography>
-        </Stack>
-      </CardContent>
-    </Card>
+      )}
+      <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+        {node.detail}
+      </Typography>
+    </Stack>
   )
 }
 
-// ── Hero score (closed: radial gauge + verdict + movers · live: progress ring) ──
-const HeroScore = ({ lane }: { lane: MockLane }) => {
+// ── Hero chart — the metric that is the story ────────────────────────────────
+const HeroChart = () => {
   const theme = useTheme()
-  const tone = lane.scoreTone
-  const main = toneMain(theme, tone)
-  const isLive = lane.key === 'live'
-  const gaugeValue = isLive ? Math.round((lane.elapsedPct ?? 0) * 100) : (lane.score ?? 0)
-
-  const gaugeOptions: ApexOptions = {
-    chart: { sparkline: { enabled: true } },
-    colors: [main],
-    plotOptions: {
-      radialBar: {
-        hollow: { size: '60%' },
-        track: { background: alpha(main, 0.14), strokeWidth: '100%' },
-        dataLabels: {
-          name: { show: false },
-          value: {
-            show: true,
-            offsetY: 6,
-            fontSize: '26px',
-            fontWeight: 800,
-            color: theme.palette.text.primary,
-            formatter: () => (isLive ? `${gaugeValue}%` : `${lane.score}`)
-          }
-        }
-      }
-    },
-    stroke: { lineCap: 'round' }
-  }
+  const hero = editorialBrief.hero
+  const stroke = theme.palette.error.main
+  const annPoint = hero.series[hero.annotation.atIndex]
+  const data = hero.series.map(p => ({ label: p.label, value: p.value }))
 
   return (
-    <Stack direction='row' spacing={3} alignItems='center'>
-      <Box sx={{ width: 120, flexShrink: 0 }}>
-        <AppReactApexCharts type='radialBar' height={140} series={[gaugeValue]} options={gaugeOptions} />
+    <Box>
+      <Stack direction='row' alignItems='baseline' spacing={1.5} sx={{ mb: 2 }}>
+        <Typography variant='h5'>{hero.code}</Typography>
+        <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+          {hero.name}
+        </Typography>
+        <Box sx={{ flex: 1 }} />
+        <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+          {hero.cadence}
+        </Typography>
+      </Stack>
+      <Box sx={{ width: '100%' }} data-capture='hero-chart'>
+        <AppRecharts>
+          <ResponsiveContainer width='100%' height={300}>
+            <AreaChart data={data} margin={{ top: 28, right: 16, bottom: 0, left: -8 }}>
+              <defs>
+                <linearGradient id='ftr-hero-fill' x1='0' y1='0' x2='0' y2='1'>
+                  <stop offset='0%' stopColor={stroke} stopOpacity={0.26} />
+                  <stop offset='92%' stopColor={stroke} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} stroke={theme.palette.divider} strokeDasharray='4 4' />
+              <XAxis dataKey='label' tickLine={false} axisLine={false} dy={8} tick={{ fill: theme.palette.text.secondary, fontSize: 12 }} />
+              <YAxis
+                domain={[0, 100]}
+                ticks={[0, 25, 50, 75, 100]}
+                width={42}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: theme.palette.text.disabled, fontSize: 11 }}
+                tickFormatter={v => `${v}%`}
+              />
+              <RechartsTooltip
+                cursor={{ stroke: theme.palette.divider }}
+                formatter={value => [`${value}%`, hero.code] as [string, string]}
+                contentStyle={{
+                  borderRadius: theme.shape.customBorderRadius.md,
+                  border: `1px solid ${theme.palette.divider}`,
+                  boxShadow: theme.greenhouseElevation.floating.boxShadow,
+                  fontSize: 12
+                }}
+              />
+              <ReferenceLine y={hero.target} stroke={theme.palette.success.main} strokeDasharray='5 5' strokeWidth={1.5} />
+              <Area
+                type='monotone'
+                dataKey='value'
+                stroke={stroke}
+                strokeWidth={3}
+                fill='url(#ftr-hero-fill)'
+                dot={{ r: 4, fill: theme.palette.background.paper, stroke, strokeWidth: 2 }}
+                activeDot={{ r: 6 }}
+                isAnimationActive
+                animationDuration={700}
+              />
+              <ReferenceDot x={annPoint.label} y={annPoint.value} r={6} fill={stroke} stroke={theme.palette.background.paper} strokeWidth={3} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </AppRecharts>
       </Box>
-      <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
+    </Box>
+  )
+}
+
+// ── Nexa insight row (real Nexa mark + 2nd-person narrative + action) ────────
+const NexaInsightRow = () => {
+  const theme = useTheme()
+  const n = editorialBrief.nexa
+
+  return (
+    <Stack direction='row' spacing={2.5} alignItems='flex-start'>
+      <GreenhouseNexaAnimatedMark kind='badgeIcon' tone='fullColor' size='medium' decorative dataCapture='brief-nexa-mark' />
+      <Stack spacing={1.5} sx={{ flex: 1, minWidth: 0 }}>
         <Stack direction='row' spacing={1} alignItems='center'>
-          <Chip
-            size='small'
-            icon={<i className={isLive ? 'tabler-loader-2' : 'tabler-circle-check'} style={{ fontSize: 14 }} />}
-            label={lane.scoreVerdict}
-            sx={{ height: 24, color: main, bgcolor: alpha(main, 0.12), fontWeight: 600, '& .MuiChip-icon': { color: main } }}
-          />
-          {!isLive && (
-            <Typography variant='caption' sx={{ color: 'text.secondary' }}>
-              ICO score
-            </Typography>
-          )}
+          <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+            Nexa
+          </Typography>
+          <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+            · análisis {n.lastAnalysis}
+          </Typography>
         </Stack>
-
-        {isLive ? (
-          <Box>
-            <Typography variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-              {lane.elapsedLabel}
-            </Typography>
-            <Typography variant='caption' sx={{ color: 'text.secondary' }}>
-              El score se calcula al cerrar el mes.
-            </Typography>
-          </Box>
-        ) : (
-          <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-            {lane.movers.map(m => {
-              const mc = m.good ? theme.palette.success.main : theme.palette.error.main
-
-              return (
-                <Stack key={m.label} spacing={0} sx={{ minWidth: 64 }}>
-                  <Typography variant='caption' sx={{ color: 'text.secondary' }}>
-                    {m.label}
-                  </Typography>
-                  <Stack direction='row' alignItems='center' spacing={0.25}>
-                    <i
-                      className={m.direction === 'up' ? 'tabler-arrow-up-right' : 'tabler-arrow-down-right'}
-                      style={{ fontSize: 14, color: mc }}
-                      aria-hidden='true'
-                    />
-                    <Typography variant='caption' sx={{ color: mc, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                      {m.delta} {m.unit}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              )
-            })}
-          </Stack>
-        )}
+        <Typography variant='body1' sx={{ color: 'text.primary', maxWidth: '68ch' }}>
+          {n.narrative}
+        </Typography>
+        <Box
+          sx={{
+            display: 'inline-flex',
+            alignSelf: 'flex-start',
+            alignItems: 'center',
+            gap: 1,
+            px: 2,
+            py: 1,
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+            bgcolor: alpha(theme.palette.primary.main, 0.08),
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
+          }}
+        >
+          <i className='tabler-arrow-guide' style={{ fontSize: 16, color: theme.palette.primary.main }} aria-hidden='true' />
+          <Typography variant='body2' sx={{ color: 'primary.main', fontWeight: 600 }}>
+            {n.action}
+          </Typography>
+        </Box>
       </Stack>
     </Stack>
   )
 }
 
-// ── Performance lane (one per month: closed | live) ──────────────────────────
-const PerformanceLane = ({ lane }: { lane: MockLane }) => {
+// ── Metrics ribbon (flat, hairline-separated, secondary) ─────────────────────
+const RibbonItem = ({ m }: { m: RibbonMetric }) => {
   const theme = useTheme()
-  const statusMain = toneMain(theme, lane.statusTone)
+  const main = toneColor(theme, m.tone)
+  const deltaColor = m.deltaGood === null ? theme.palette.text.disabled : m.deltaGood ? theme.palette.success.main : theme.palette.error.main
 
   return (
-    <Card
-      elevation={0}
-      sx={{
-        height: '100%',
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-        bgcolor: lane.key === 'live' ? alpha(theme.palette.info.main, 0.03) : 'background.paper'
-      }}
-    >
-      <CardContent sx={{ p: 4 }}>
-        <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ mb: 3 }}>
-          <Typography variant='h5'>{lane.periodLabel}</Typography>
-          <Chip
-            size='small'
-            icon={<i className={lane.key === 'live' ? 'tabler-progress' : 'tabler-lock-check'} style={{ fontSize: 14 }} />}
-            label={lane.statusLabel}
-            sx={{ height: 24, color: statusMain, bgcolor: alpha(statusMain, 0.12), fontWeight: 600, '& .MuiChip-icon': { color: statusMain } }}
-          />
-        </Stack>
-
-        {lane.key === 'live' && (
-          <LinearProgress
-            variant='determinate'
-            value={(lane.elapsedPct ?? 0) * 100}
-            sx={{ mb: 3, height: 6, borderRadius: `${theme.shape.customBorderRadius.xs}px`, bgcolor: alpha(theme.palette.info.main, 0.16) }}
-          />
-        )}
-
-        <Box sx={{ mb: 3 }}>
-          <HeroScore lane={lane} />
-        </Box>
-
-        <Divider sx={{ mb: 3 }} />
-
-        <Grid container spacing={3}>
-          {lane.kpis.map(kpi => (
-            <Grid key={kpi.id} size={{ xs: 6 }}>
-              <KpiStoryCard kpi={kpi} />
-            </Grid>
-          ))}
-        </Grid>
-      </CardContent>
-    </Card>
-  )
-}
-
-// ── CSC distribution (donut + insight annotation) ────────────────────────────
-const CscPanel = () => {
-  const theme = useTheme()
-
-  const toneMap: Record<string, string> = {
-    briefing: theme.palette.primary.main,
-    production: theme.palette.success.main,
-    review: theme.palette.warning.main
-  }
-
-  const colors = enterpriseMock.csc.map(c => toneMap[c.toneKey])
-
-  const options: ApexOptions = {
-    chart: { type: 'donut' },
-    labels: enterpriseMock.csc.map(c => c.label),
-    colors,
-    legend: { position: 'bottom', markers: { strokeWidth: 0 } },
-    stroke: { width: 2, colors: [theme.palette.background.paper] },
-    dataLabels: { enabled: false },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: '68%',
-          labels: {
-            show: true,
-            value: { fontSize: '26px', fontWeight: 800, color: theme.palette.text.primary, offsetY: 4 },
-            total: { show: true, label: 'cierres', color: theme.palette.text.secondary, formatter: () => `${enterpriseMock.cscTotal}` }
-          }
-        }
-      }
-    }
-  }
-
-  return (
-    <Card elevation={0} sx={{ height: '100%', border: `1px solid ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.lg}px` }}>
-      <CardContent sx={{ p: 4 }}>
-        <Typography variant='h5' sx={{ mb: 0.5 }}>
-          Distribución CSC
+    <Stack spacing={0.75} sx={{ flex: 1, minWidth: 0, px: 2 }}>
+      <Stack direction='row' alignItems='baseline' spacing={1}>
+        <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+          {m.code}
         </Typography>
-        <Typography variant='caption' sx={{ color: 'text.secondary' }}>
-          Cierres por centro operativo del mes cerrado.
+        <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+          {m.name}
         </Typography>
-
-        <Grid container spacing={4} alignItems='center' sx={{ mt: 0.5 }}>
-          <Grid size={{ xs: 12, md: 5 }}>
-            <AppReactApexCharts type='donut' height={260} series={enterpriseMock.csc.map(c => c.count)} options={options} />
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 7 }}>
-            <Stack spacing={2.5}>
-              {enterpriseMock.csc.map(c => {
-                const color = toneMap[c.toneKey]
-
-                return (
-                  <Box key={c.label}>
-                    <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ mb: 0.75 }}>
-                      <Stack direction='row' alignItems='center' spacing={1}>
-                        <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: color }} />
-                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                          {c.label}
-                        </Typography>
-                      </Stack>
-                      <Typography variant='body2' sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
-                        {c.count} · {c.pct}%
-                      </Typography>
-                    </Stack>
-                    <LinearProgress
-                      variant='determinate'
-                      value={c.pct}
-                      sx={{
-                        height: 6,
-                        borderRadius: `${theme.shape.customBorderRadius.xs}px`,
-                        bgcolor: alpha(color, 0.14),
-                        '& .MuiLinearProgress-bar': { bgcolor: color, borderRadius: `${theme.shape.customBorderRadius.xs}px` }
-                      }}
-                    />
-                  </Box>
-                )
-              })}
-
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                  bgcolor: alpha(theme.palette.warning.main, 0.08),
-                  border: `1px solid ${alpha(theme.palette.warning.main, 0.24)}`
-                }}
-              >
-                <Stack direction='row' spacing={1} alignItems='flex-start'>
-                  <i className='tabler-bulb' style={{ fontSize: 18, color: theme.palette.warning.dark }} aria-hidden='true' />
-                  <Typography variant='body2' sx={{ color: 'text.primary' }}>
-                    {enterpriseMock.cscInsight}
-                  </Typography>
-                </Stack>
-              </Box>
-            </Stack>
-          </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
-  )
-}
-
-// ── Nexa narrative band (story-first, 2nd person — TASK-1073) ────────────────
-const NexaBand = () => {
-  const theme = useTheme()
-  const n = enterpriseMock.nexa
-
-  return (
-    <Card
-      elevation={0}
-      sx={{
-        border: `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
-        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)}, ${alpha(theme.palette.primary.main, 0.02)})`
-      }}
-    >
-      <CardContent sx={{ p: 4 }}>
-        <Grid container spacing={4} alignItems='center'>
-          <Grid size={{ xs: 12, md: 8 }}>
-            <Stack direction='row' spacing={1.5} alignItems='center' sx={{ mb: 1.5 }}>
-              <Box
-                sx={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                  display: 'grid',
-                  placeItems: 'center',
-                  bgcolor: alpha(theme.palette.primary.main, 0.16)
-                }}
-              >
-                <i className='tabler-sparkles' style={{ fontSize: 20, color: theme.palette.primary.main }} aria-hidden='true' />
-              </Box>
-              <Stack direction='row' spacing={1} alignItems='center'>
-                <Typography variant='subtitle1' sx={{ fontWeight: 700 }}>
-                  Nexa Insights
-                </Typography>
-                <Chip
-                  size='small'
-                  label={n.severityLabel}
-                  sx={{ height: 22, color: theme.palette.error.main, bgcolor: alpha(theme.palette.error.main, 0.12), fontWeight: 600 }}
-                />
-                <Chip size='small' label={n.metric} variant='outlined' sx={{ height: 22 }} />
-              </Stack>
-            </Stack>
-            <Typography variant='body1' sx={{ color: 'text.primary', mb: 1.5 }}>
-              {n.narrative}
+      </Stack>
+      <Stack direction='row' alignItems='flex-end' justifyContent='space-between'>
+        <Stack spacing={0}>
+          <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+            {m.value}
+          </Typography>
+          {m.delta && (
+            <Typography variant='caption' sx={{ color: deltaColor, fontVariantNumeric: 'tabular-nums' }}>
+              {m.delta}
             </Typography>
-            <Stack direction='row' spacing={1} alignItems='flex-start'>
-              <i className='tabler-arrow-guide' style={{ fontSize: 18, color: theme.palette.text.secondary, marginTop: 2 }} aria-hidden='true' />
-              <Typography variant='body2' sx={{ color: 'text.secondary' }}>
-                {n.action}
-              </Typography>
-            </Stack>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Stack spacing={1.5} alignItems={{ xs: 'flex-start', md: 'flex-end' }}>
-              <Button variant='contained' endIcon={<i className='tabler-arrow-right' />}>
-                Ver causa raíz
-              </Button>
-              <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-                Último análisis: {n.lastAnalysis}
-              </Typography>
-            </Stack>
-          </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
+          )}
+        </Stack>
+        <Sparkline data={m.series} color={main} />
+      </Stack>
+    </Stack>
   )
 }
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 const MyPerformanceEnterpriseMockupView = () => {
   const theme = useTheme()
-  const [lanes] = useState(enterpriseMock.lanes)
+  const b = editorialBrief
+  const [period, setPeriod] = useState<'closed' | 'live'>('closed')
+  const scoreAccent = toneColor(theme, b.score.tone)
 
   return (
-    <Box sx={{ maxWidth: 1320, mx: 'auto' }}>
-      {/* Header */}
-      <Stack direction='row' alignItems='flex-start' justifyContent='space-between' sx={{ mb: 4 }} flexWrap='wrap' useFlexGap>
-        <Box>
-          <Typography variant='h4'>Mi desempeño</Typography>
-          <Typography variant='body2' sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Cómo cerraste tu último mes, cómo vas en el que está en curso, y qué hacer al respecto.
-          </Typography>
-        </Box>
-        <Chip
-          icon={<i className='tabler-user' style={{ fontSize: 16 }} />}
-          label={`${enterpriseMock.memberName} · ${enterpriseMock.spaceName} · ${enterpriseMock.roleTitle}`}
-          sx={{ bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'text.primary', fontWeight: 600 }}
-        />
-      </Stack>
+    <Box sx={{ maxWidth: 1180, mx: 'auto' }}>
+      <Card
+        elevation={0}
+        sx={{ border: `1px solid ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.lg}px`, overflow: 'visible' }}
+      >
+        <CardContent sx={{ p: { xs: 4, md: 6 } }}>
+          {/* Header */}
+          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' flexWrap='wrap' useFlexGap sx={{ mb: 5 }}>
+            <Box>
+              <SectionLabel>{b.eyebrow}</SectionLabel>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                {b.member} · {b.space}
+              </Typography>
+            </Box>
+            <Stack direction='row' spacing={3} alignItems='center'>
+              <ToggleButtonGroup
+                exclusive
+                size='small'
+                value={period}
+                onChange={(_, v) => v && setPeriod(v)}
+                sx={{ '& .MuiToggleButton-root': { textTransform: 'none', px: 2 } }}
+              >
+                {b.periods.map(p => (
+                  <ToggleButton key={p.key} value={p.key}>
+                    <Stack alignItems='flex-start'>
+                      <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                        {p.label}
+                      </Typography>
+                      <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+                        {p.status}
+                      </Typography>
+                    </Stack>
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+            </Stack>
+          </Stack>
 
-      {/* Nexa narrative band (acción) */}
-      <Box sx={{ mb: 5 }}>
-        <NexaBand />
-      </Box>
+          {/* Hero verdict + score */}
+          <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={4} sx={{ mb: 2 }}>
+            <Box sx={{ maxWidth: 600 }}>
+              <Typography variant='h2' sx={{ lineHeight: 1.18, textWrap: 'balance' }}>
+                {b.headline}
+              </Typography>
+              <Typography variant='body2' sx={{ color: 'text.secondary', mt: 2 }}>
+                {b.subline}
+              </Typography>
+            </Box>
+            <Stack alignItems='flex-end' sx={{ flexShrink: 0 }}>
+              <Stack direction='row' alignItems='baseline' spacing={0.5}>
+                <Typography variant='kpiValue' sx={{ color: scoreAccent, fontVariantNumeric: 'tabular-nums' }}>
+                  {b.score.value}
+                </Typography>
+                <Typography variant='h5' sx={{ color: 'text.disabled' }}>
+                  /{b.score.max}
+                </Typography>
+              </Stack>
+              <Chip
+                size='small'
+                icon={<i className='tabler-circle-check' style={{ fontSize: 14 }} />}
+                label={b.score.verdict}
+                sx={{ mt: 1, color: scoreAccent, bgcolor: alpha(scoreAccent, 0.12), fontWeight: 600, '& .MuiChip-icon': { color: scoreAccent } }}
+              />
+            </Stack>
+          </Stack>
 
-      {/* Split temporal — mes cerrado | mes en curso */}
-      <Grid container spacing={5} sx={{ mb: 5 }}>
-        {lanes.map(lane => (
-          <Grid key={lane.key} size={{ xs: 12, md: 6 }}>
-            <PerformanceLane lane={lane} />
-          </Grid>
-        ))}
-      </Grid>
+          <Divider sx={{ my: 5 }} />
 
-      {/* Detalle — distribución CSC (full-width, layout horizontal) */}
-      <Grid container spacing={5}>
-        <Grid size={{ xs: 12 }}>
-          <CscPanel />
-        </Grid>
-      </Grid>
+          {/* Causal chain band */}
+          <SectionLabel>Cadena de impacto · causa → efecto → foco</SectionLabel>
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ md: 'stretch' }} sx={{ mt: 3 }}>
+            {b.causal.map((node, i) => (
+              <Stack key={node.stage} direction='row' spacing={3} sx={{ flex: 1, minWidth: 0 }}>
+                <CausalNodeBlock node={node} />
+                {i < b.causal.length - 1 && (
+                  <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', color: 'text.disabled' }}>
+                    <i className='tabler-arrow-right' style={{ fontSize: 22 }} aria-hidden='true' />
+                  </Box>
+                )}
+              </Stack>
+            ))}
+          </Stack>
 
-      <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', textAlign: 'center', mt: 5 }}>
+          <Divider sx={{ my: 5 }} />
+
+          {/* Hero chart + Nexa insight */}
+          <HeroChart />
+          <Box sx={{ mt: 4 }}>
+            <NexaInsightRow />
+          </Box>
+
+          <Divider sx={{ my: 5 }} />
+
+          {/* Metrics ribbon */}
+          <SectionLabel>Tus otras métricas del mes</SectionLabel>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            divider={<Divider orientation='vertical' flexItem sx={{ display: { xs: 'none', md: 'block' } }} />}
+            spacing={{ xs: 3, md: 0 }}
+            sx={{ mt: 3 }}
+          >
+            {b.ribbon.map(m => (
+              <RibbonItem key={m.id} m={m} />
+            ))}
+          </Stack>
+        </CardContent>
+      </Card>
+
+      <Typography variant='caption' sx={{ color: 'text.disabled', display: 'block', textAlign: 'center', mt: 4 }}>
         Nexa Insights es una lectura operativa personal. No reemplaza procesos de HR ni otras acciones formales.
       </Typography>
     </Box>
