@@ -2227,6 +2227,31 @@ export interface GreenhouseCoreDepartments {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreDesignSystemFigmaNodeEvents {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  event_id: string;
+  event_type: string;
+  file_key: string | null;
+  from_node_id: string | null;
+  metadata_json: Generated<Json>;
+  surface_key: string;
+  to_node_id: string | null;
+}
+
+export interface GreenhouseCoreDesignSystemFigmaNodes {
+  created_at: Generated<Timestamp>;
+  file_key: string;
+  linked_at: Generated<Timestamp>;
+  linked_by: string;
+  node_id: string;
+  node_name: string | null;
+  superseded_at: Timestamp | null;
+  surface_key: string;
+  updated_at: Generated<Timestamp>;
+  updated_by: string | null;
+}
+
 export interface GreenhouseCoreEntitlementGovernanceAuditLog {
   action: string | null;
   audit_id: string;
@@ -9943,6 +9968,8 @@ export interface DB {
   "greenhouse_core.client_users": GreenhouseCoreClientUsers;
   "greenhouse_core.clients": GreenhouseCoreClients;
   "greenhouse_core.departments": GreenhouseCoreDepartments;
+  "greenhouse_core.design_system_figma_node_events": GreenhouseCoreDesignSystemFigmaNodeEvents;
+  "greenhouse_core.design_system_figma_nodes": GreenhouseCoreDesignSystemFigmaNodes;
   "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;

@@ -213,7 +213,11 @@ export const AGGREGATE_TYPES = {
   // Aggregate identity = caseId ('wcc-{uuid}').
   workforceContractingCase: 'workforce_contracting_case',
   // TASK-490 — provider-neutral signature orchestration (EPIC-001). Identity = 'sig-{uuid}'.
-  signatureRequest: 'signature_request'
+  signatureRequest: 'signature_request',
+
+  // TASK-1072 — Design System ↔ AXIS Figma node link (SSOT runtime del vínculo
+  // superficie↔nodo). Aggregate identity = surface_key (ruta normalizada del DS).
+  designSystemFigmaNode: 'design_system_figma_node'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -1016,7 +1020,14 @@ export const EVENT_TYPES = {
   signatureRequestCompleted: 'signature.request.completed',
   signatureRequestCancelled: 'signature.request.cancelled',
   signatureRequestFailed: 'signature.request.failed',
-  signatureRequestExpired: 'signature.request.expired'
+  signatureRequestExpired: 'signature.request.expired',
+
+  // TASK-1072 — Design System Figma node link. aggregate_type = design_system_figma_node,
+  // aggregate_id = surface_key. `linked` = primer vínculo de la superficie;
+  // `relinked` = cambio del nodo (supersede del anterior, audit append-only).
+  // Sin consumer reactivo en V1 (audit/observabilidad). Enrichment (node render) = Slice 4 diferido.
+  designSystemFigmaNodeLinked: 'design_system.figma_node.linked',
+  designSystemFigmaNodeRelinked: 'design_system.figma_node.relinked'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
