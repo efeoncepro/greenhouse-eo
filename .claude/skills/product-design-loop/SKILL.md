@@ -28,14 +28,19 @@ Capturar antes de generar nada:
 - **Surface**: qué pantalla/feature, en qué dominio (`<domain>/<surface>`), qué route group.
 - **Objetivo + decisión del usuario**: ¿qué tarea resuelve y qué decide la persona en esta pantalla?
 - **Datos**: qué entidades/campos se muestran (para mock data tipada después).
-- **Restricciones**: rol/acceso, estados (loading/empty/error/degraded), responsive, gates de copy.
+- **Restricciones**: rol/acceso, estados (loading/empty/error/degraded/**disabled-sin-capability/permiso**), responsive, gates de copy.
 
 Si el brief está subespecificado, hacer **2-3 preguntas** con `AskUserQuestion` antes de divergir. No generar conceptos a ciegas.
 
+**Decision-gate: ¿diverger con AI o ir directo a mockup real?** No toda surface necesita 3 conceptos IA.
+- **Brief específico + primitive/wrapper existente + design system fuerte** (ej. un micro-componente, un editor sobre `FloatingSurface`, una variant de algo que ya existe) → **saltar la divergencia AI** e ir directo a Fase 3 (ruta mockup real tokenizada) + GVC. Más fiel, sin costo/tiempo de generación.
+- **Espacio de diseño amplio** (pantalla nueva, varias layouts plausibles, no hay primitive obvia) → **diverger con AI** (Fase 1). La imagen sirve para elegir dirección, no para el acabado.
+- En duda, decirlo explícito al operador y dejar que elija. La imagen es intención; el acabado siempre sale del runtime + GVC.
+
 ### Fase 1 — Divergencia: 3 conceptos IA
 
-1. **Fijar dirección de arte primero** cargando las skills de diseño que apliquen: `modern-ui` (jerarquía/tipografía/spacing/balance), `greenhouse-ux` (layout + selección de componente Vuexy/MUI), `state-design` (estados honestos), `dataviz-design` (si hay charts), `forms-ux` (si hay inputs), `typography-design`, y `modern-web-guidance` (patrones de plataforma web actuales verificados por Chrome — consultar `search`/`retrieve` para Forms/UX/Performance/APIs nativas). Estas definen el "bar enterprise 2026"; el operador exige verse enterprise-moderno al año vigente.
-2. **Generar 3 conceptos DISTINTOS** con la **CLI canónica `pnpm ai:image`** (gpt-image-2; la skill `greenhouse-ai-image-generator` aporta la dirección de arte del prompt). Batch: `pnpm ai:image --batch concepts.json` (`[{ filename, prompt }, …]`) o uno por uno con `--prompt`. La CLI envuelve `generateOpenAIImage` (timeout 280s — gpt-image-2 `high` supera los 125s del helper runtime `generateImage`). Conceptos a un dir gitignored (`.captures/concepts/`). Vectores reales: Higgsfield + Recraft V4.1. Cada concepto = **una dirección de layout/interacción genuinamente diferente** (no skins del mismo layout). Ej.: (A) dashboard-first, (B) inspector/sidecar-first, (C) wizard/flow-first.
+1. **Fijar dirección de arte primero** cargando las skills de diseño que apliquen: `modern-ui` (jerarquía/tipografía/spacing/balance), `greenhouse-ux` (layout + selección de componente Vuexy/MUI), `state-design` (**enumerar la matriz de estados como checklist ANTES de codear**: idle/loading/empty/error/degraded/disabled-sin-capability — no olvidar ninguno), `forms-ux` (si hay inputs: paste-friendly, validación, preview), `motion-design` (**si hay micro-interacción** — rotación/hover/toggle/reveal: fijar ángulo/duración-token/reduced-motion up front, no improvisado), `a11y-architect` (foco/teclado/SR/role — y activar el GVC `quality.keyboard` gate en Fase 4), `typography-design`, `dataviz-design` (si hay charts), y `modern-web-guidance` (patrones de plataforma web verificados por Chrome — `search`/`retrieve` para Forms/UX/Performance/APIs nativas). Estas definen el "bar enterprise 2026".
+2. **Generar 3 conceptos DISTINTOS** con la **CLI canónica `pnpm ai:image`** (gpt-image-2; la skill `greenhouse-ai-image-generator` aporta la dirección de arte del prompt). **Quality-tier por fase**: conceptos en `--quality medium` (más barato/rápido; alcanza para elegir dirección); reservar `--quality high` para la dirección elegida o un hero en Fase 3. Batch: `pnpm ai:image --batch concepts.json --quality medium` (`[{ filename, prompt }, …]`). Conceptos a un dir gitignored (`.captures/concepts/`). Vectores reales: Higgsfield + Recraft V4.1. Cada concepto = **una dirección de layout/interacción genuinamente diferente** (no skins del mismo layout). Ej.: (A) dashboard-first, (B) inspector/sidecar-first, (C) wizard/flow-first.
    - Prompt de cada imagen: describir layout, jerarquía, densidad, paleta **alineada a AXIS** (no inventar marca), estados visibles. Aplicar dirección de arte de la skill de imagen (composición, materiales, iluminación, rubric QA).
    - Guardar las imágenes en un dir **gitignored** de scratch (ej. `public/branding/experiments/` ya existe, o `.captures/concepts/`). NO committear conceptos exploratorios.
 3. **Presentar los 3** con una línea de racional cada uno (qué tradeoff representa). Mostrar las imágenes.
@@ -54,13 +59,17 @@ Correr los **2 gates del Figma Implementation Contract** aunque la fuente sea un
 Construir con la skill **`greenhouse-mockup-builder`** como **ruta real** (no HTML suelto):
 - Route: `src/app/(dashboard)/<domain>/<surface>/mockup/page.tsx`
 - View: `src/views/greenhouse/<domain>/<surface>/mockup/*`
-- Mock data tipada + `src/lib/format/*` para números/fechas/moneda + `src/lib/copy/*` para copy visible (validar tono es-CL con `greenhouse-ux-writing`).
+- Mock data tipada + `src/lib/format/*` para números/fechas/moneda.
+
+3. **Copy es-CL (no inline)**: invocar `greenhouse-ux-writing` para toda string visible (labels, placeholders, helper, errores, estados, aria, tooltips). En el mockup puede tolerarse literal efímero, pero **cuando el shell pasa a runtime (fuera de `/mockup/`) el copy reusable DEBE extraerse a `src/lib/copy/*`** (regla canónica `greenhouse/no-untokenized-copy`). NO dejar literales es-CL en componentes que van a producción.
 
 **Reportar la decisión de primitive** (reuse / extend / new-primitive + por qué) ANTES de codear.
 
 ### Fase 4 — Verificar (GVC en loop)
 
 `pnpm fe:capture` la ruta → **leer el frame PNG** → ajustar → re-capturar hasta que se vea enterprise. **Desktop + mobile.** Nunca declarar "listo" sin una captura GVC mirada. Para pantallas largas usar scenario con `scroll`/`mark fullPage`/`clipSelector` sobre `data-capture`. Para mockup aprobado→runtime, usar `baseline.surfaceId` + `fe:capture:diff --promote`.
+
+**No solo mirar el PNG — declarar los gates V1.5 (opt-in) en el scenario** para que GVC atrape lo que el ojo deja pasar: `quality.layout` (overflow / target <24px / texto cortado / cards anidadas), `quality.keyboard` (foco esperado + focus ring + reduced-motion — obligatorio si hubo `a11y-architect`/`motion-design`), `quality.enterpriseRubric` (placeholders / exceso de `—`·`0` / >1 botón primario por header / saturación). Para una micro-interacción (rotación/hover/reveal) usar `interaction` V2 con frames relativos para capturar el estado abierto/cerrado.
 
 ### Fase 5 — Handoff
 
@@ -75,8 +84,12 @@ Entregar: URL `localhost` exacta + los 3 conceptos + el elegido + decisión de p
 - **NUNCA** generar 3 "skins" del mismo layout — los 3 conceptos deben representar tradeoffs genuinamente distintos.
 - **NUNCA** crear una primitive paralela cuando existe una Greenhouse/wrapper Vuexy — usar/expandir.
 - **NUNCA** logos de operating-entity (Efeonce/legal) en los conceptos IA; respetar el contrato de marca AXIS.
-- **SIEMPRE** cargar las skills de diseño (`modern-ui`, `greenhouse-ux`, `state-design`, etc.) para fijar el bar ANTES de generar conceptos.
-- **SIEMPRE** estados honestos (loading/empty/error/degraded) — no `$0`/`—` ambiguo; mostrar "Pendiente" con razón.
+- **NUNCA** forzar 3 conceptos IA cuando el brief es específico + hay primitive/wrapper existente — ahí ir directo a mockup real (decision-gate Fase 0). La generación IA cuesta tiempo/plata; no es gratis.
+- **NUNCA** dejar literales es-CL inline en componentes que van a runtime — extraer a `src/lib/copy/*` (regla `greenhouse/no-untokenized-copy`).
+- **SIEMPRE** cargar las skills de diseño (`modern-ui`, `greenhouse-ux`, `state-design`, + `motion-design` si hay micro-interacción, + `a11y-architect`, `forms-ux`) para fijar el bar ANTES de generar conceptos/codear.
+- **SIEMPRE** conceptos en `--quality medium`; `high` solo para la dirección elegida o un hero.
+- **SIEMPRE** estados honestos (loading/empty/error/degraded/disabled-sin-capability) — no `$0`/`—` ambiguo; mostrar "Pendiente" con razón.
+- **SIEMPRE** declarar los GVC `quality.*` gates en el scenario cuando aplique (no solo screenshots) — `quality.keyboard` es obligatorio si hubo `a11y-architect`/`motion-design`.
 
 ## Output Contract
 

@@ -27,6 +27,13 @@ export interface GenerateImageOptions {
   size?: OpenAIImageSize
   background?: OpenAIImageBackground
   transparentBackgroundStrategy?: OpenAITransparentBackgroundStrategy
+  /**
+   * Per-image timeout in ms for the `openai-image` provider. Omit → the canonical
+   * 125s default (tuned for Vercel function limits). Raise it explicitly off-Vercel
+   * (CLI, Cloud Run, batch) where `gpt-image-2 high` can exceed 125s — passthrough,
+   * not a global default change. No effect on the `google-imagen` provider.
+   */
+  timeoutMs?: number
 }
 
 export interface GenerateImageResult {
@@ -145,7 +152,8 @@ export const generateImage = async (
       quality: options.quality,
       size: options.size,
       background: options.background,
-      transparentBackgroundStrategy: options.transparentBackgroundStrategy
+      transparentBackgroundStrategy: options.transparentBackgroundStrategy,
+      timeoutMs: options.timeoutMs
     })
 
     const buffer = Buffer.from(generated.imageBytesBase64, 'base64')
