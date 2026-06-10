@@ -1,3 +1,14 @@
+# Sesion 2026-06-10 — GreenhouseFigmaNodeButton primitive + cierre sesión DS de Codex
+
+Claude (1) shippeó **TASK-1027** (`/my/performance` self-service rico, cierra ISSUE-091 PII leak) a `origin/develop`, y (2) finalizó la sesión DS de Codex (breadcrumbs + Efeonce Orbital + Nexa marks, ~60 archivos) **+ agregó el primitive `GreenhouseFigmaNodeButton`** pedido por el operador, todo pusheado (`0575f9117`).
+
+- **`GreenhouseFigmaNodeButton`** (`src/components/greenhouse/primitives/`): compone `GreenhouseButton`; construye la URL AXIS desde `nodeId` (`buildFigmaNodeUrl`, default file `yyMksCoijfMaIoYplXKZaR`), abre en pestaña nueva; **`disabled` + tooltip "créalo y enlázalo" sin nodo**. Registro route→nodo `design-system-figma-nodes.ts` (seed: breadcrumbs `205:234905`, colors `11205:5341`). Cableado en `DesignSystemBreadcrumbShell` → aparece en todas las páginas DS, activo donde hay nodo, inactivo donde falta. 5/5 tests. Para activar más páginas: crear el nodo en AXIS y agregar la fila al registro.
+- **GVC desktop revisado**: activo `.captures/2026-06-10T09-35-32_inline-admin-design-system-breadcrumbs` (botón outlined sólido) + inactivo `.captures/2026-06-10T09-36-10_inline-admin-design-system-buttons` (botón atenuado/disabled). ADC se restauró con `gcloud auth login` + `gcloud auth application-default login` (el dev server fresco fallaba agent-auth `Tenant lookup failed` sin ADC).
+- **Gates**: tsc 0, lint clean, `pnpm build` exit 0, full `pnpm test` 6559 passed (pre-primitive) + 5 nuevos del primitive.
+- **Fix**: 1 error tsc en `DesignSystemBreadcrumbShell.tsx` (comparación de ruta redundante) que bloqueaba el pre-push.
+
+---
+
 # Sesion 2026-06-10 — Radius token gotcha documentado para agentes
 
 Se formalizó el feedback del operador sobre `borderRadius` en MUI `sx`.
