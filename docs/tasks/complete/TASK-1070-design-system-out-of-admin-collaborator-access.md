@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `—`
-- Status real: `Implementacion`
+- Status real: `Shipped a develop (2026-06-10, commit 814f770f0). Migración additive-only aplicada al Cloud SQL compartido (prod-safe). Production rollout via release train normal; único follow-up = TASK-1071 cleanup (revoke legacy post-deploy).`
 
 ## Problem
 
