@@ -125,11 +125,11 @@ const KpiStoryCard = ({ kpi }: { kpi: MockKpi }) => {
         </Stack>
 
         {kpi.emptyReason ? (
-          <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', mt: 0.5, minHeight: 32 }}>
+          <Typography variant='caption' sx={{ color: 'text.secondary', display: 'block', mt: 0.5, minHeight: 40 }}>
             {kpi.emptyReason}
           </Typography>
         ) : (
-          <Box sx={{ mt: 0.5, mx: -0.5 }}>{kpi.series.length > 0 && <Sparkline series={kpi.series} color={main} />}</Box>
+          <Box sx={{ mt: 0.5, mx: -0.5, minHeight: 40 }}>{kpi.series.length > 0 && <Sparkline series={kpi.series} color={main} />}</Box>
         )}
 
         <Divider sx={{ my: 1.5 }} />
@@ -334,25 +334,62 @@ const CscPanel = () => {
         <Typography variant='caption' sx={{ color: 'text.secondary' }}>
           Cierres por centro operativo del mes cerrado.
         </Typography>
-        <Box sx={{ mt: 2 }}>
-          <AppReactApexCharts type='donut' height={260} series={enterpriseMock.csc.map(c => c.count)} options={options} />
-        </Box>
-        <Box
-          sx={{
-            mt: 2,
-            p: 2,
-            borderRadius: `${theme.shape.customBorderRadius.md}px`,
-            bgcolor: alpha(theme.palette.warning.main, 0.08),
-            border: `1px solid ${alpha(theme.palette.warning.main, 0.24)}`
-          }}
-        >
-          <Stack direction='row' spacing={1} alignItems='flex-start'>
-            <i className='tabler-bulb' style={{ fontSize: 18, color: theme.palette.warning.dark }} aria-hidden='true' />
-            <Typography variant='body2' sx={{ color: 'text.primary' }}>
-              {enterpriseMock.cscInsight}
-            </Typography>
-          </Stack>
-        </Box>
+
+        <Grid container spacing={4} alignItems='center' sx={{ mt: 0.5 }}>
+          <Grid size={{ xs: 12, md: 5 }}>
+            <AppReactApexCharts type='donut' height={260} series={enterpriseMock.csc.map(c => c.count)} options={options} />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 7 }}>
+            <Stack spacing={2.5}>
+              {enterpriseMock.csc.map(c => {
+                const color = toneMap[c.toneKey]
+
+                return (
+                  <Box key={c.label}>
+                    <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ mb: 0.75 }}>
+                      <Stack direction='row' alignItems='center' spacing={1}>
+                        <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: color }} />
+                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                          {c.label}
+                        </Typography>
+                      </Stack>
+                      <Typography variant='body2' sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
+                        {c.count} · {c.pct}%
+                      </Typography>
+                    </Stack>
+                    <LinearProgress
+                      variant='determinate'
+                      value={c.pct}
+                      sx={{
+                        height: 6,
+                        borderRadius: `${theme.shape.customBorderRadius.xs}px`,
+                        bgcolor: alpha(color, 0.14),
+                        '& .MuiLinearProgress-bar': { bgcolor: color, borderRadius: `${theme.shape.customBorderRadius.xs}px` }
+                      }}
+                    />
+                  </Box>
+                )
+              })}
+
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                  bgcolor: alpha(theme.palette.warning.main, 0.08),
+                  border: `1px solid ${alpha(theme.palette.warning.main, 0.24)}`
+                }}
+              >
+                <Stack direction='row' spacing={1} alignItems='flex-start'>
+                  <i className='tabler-bulb' style={{ fontSize: 18, color: theme.palette.warning.dark }} aria-hidden='true' />
+                  <Typography variant='body2' sx={{ color: 'text.primary' }}>
+                    {enterpriseMock.cscInsight}
+                  </Typography>
+                </Stack>
+              </Box>
+            </Stack>
+          </Grid>
+        </Grid>
       </CardContent>
     </Card>
   )
@@ -462,9 +499,9 @@ const MyPerformanceEnterpriseMockupView = () => {
         ))}
       </Grid>
 
-      {/* Detalle — distribución CSC */}
+      {/* Detalle — distribución CSC (full-width, layout horizontal) */}
       <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12 }}>
           <CscPanel />
         </Grid>
       </Grid>
