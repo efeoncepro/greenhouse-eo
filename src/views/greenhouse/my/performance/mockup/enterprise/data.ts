@@ -119,11 +119,11 @@ export const editorialBrief = {
         metricId: 'ftr_pct',
         severity: 'critical',
         explanation:
-          'Tu calidad de primera entrega (FTR%) cayó a 44.6% en mayo, −50.6 pts vs abril. Más piezas volvieron con cambios del cliente.',
+          'Tu FTR% cayó a 44.6% en mayo (−50.6 pts vs abril). Las piezas de @[Campaña Invierno](project:sky-invierno) en @[Sky Airline](space:sky) volvieron con cambios del cliente.',
         rootCauseNarrative:
-          'El alza de retrabajo se concentró en piezas que pasaron a revisión del cliente sin una revisión interna previa. Las que sí tuvieron revisión interna mantuvieron su FTR.',
+          'El alza de retrabajo se concentró en piezas que pasaron a revisión del cliente sin una revisión interna previa. Las que sí pasaron por @[Valentina Hoyos](member:valentina) mantuvieron su FTR.',
         recommendedAction:
-          'Alinea el brief y suma una revisión interna antes de enviar al cliente, sobre todo en las piezas con más vueltas.',
+          'Alinea el brief con @[Valentina Hoyos](member:valentina) y suma una revisión interna antes de enviar a @[Sky Airline](space:sky).',
         lifecycle: [
           { generatedAt: '2026-05-04T09:00:00-04:00', severity: 'warning', currentValue: 78 },
           { generatedAt: '2026-05-18T09:00:00-04:00', severity: 'critical', currentValue: 44.6 }
@@ -136,9 +136,10 @@ export const editorialBrief = {
         metricId: 'cycle_time',
         severity: 'warning',
         explanation:
-          'Cada ronda de cambios alarga el cierre de tu pieza: el cycle time se mantuvo en 12.0 días pese a bajar el volumen.',
+          'Cada ronda de cambios alarga el cierre: el cycle time se mantuvo en 12.0 días en @[Rebranding Q2](project:sky-rebrand) pese a bajar el volumen.',
         rootCauseNarrative: null,
-        recommendedAction: 'Cierra el brief con el cliente antes de producir para cortar las rondas de cambio.'
+        recommendedAction:
+          'Cierra el brief con el cliente antes de producir para cortar las rondas de cambio en @[Rebranding Q2](project:sky-rebrand).'
       },
       {
         id: 'EO-AIE-throughput-may',
@@ -146,7 +147,8 @@ export const editorialBrief = {
         signalType: 'prediction',
         metricId: 'throughput',
         severity: 'info',
-        explanation: 'Tu ritmo de cierres se recuperó a 74 piezas (+12 vs abril). La tendencia vuelve a subir.',
+        explanation:
+          'Tu ritmo de cierres se recuperó a 74 piezas (+12 vs abril) en @[Sky Airline](space:sky). La tendencia vuelve a subir.',
         rootCauseNarrative: null,
         recommendedAction: null,
         lifecycleStatus: 'resolved' as const

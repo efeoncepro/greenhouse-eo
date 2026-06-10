@@ -227,5 +227,16 @@ export const GH_NEXA = {
   home_bento_menu_configure: 'Configurar análisis',
   home_bento_last_analysis: (count: number, label: string) =>
     `${count} ${count === 1 ? 'señal analizada' : 'señales analizadas'} · último análisis: ${label}`,
-  home_bento_view_all_cta: 'Ver todos los insights del mes'
+  home_bento_view_all_cta: 'Ver todos los insights del mes',
+
+  // ── Nexa agent panel (concept C redesign) — conversational header ──
+  agent_eyebrow: 'Nexa',
+  // Self-view (mentionSafeMode): Nexa speaks to the person (2nd person, es-CL tuteo).
+  agent_headline_self: 'Revisé tu período y resalté lo que más mueve tus resultados.',
+  // Observer/admin view: Nexa speaks about the member (3rd person).
+  agent_headline_observer: 'Revisé este período y resalté lo que más mueve los resultados.',
+  agent_summary: (analyzed: number, actions: number) =>
+    `${analyzed} ${analyzed === 1 ? 'señal analizada' : 'señales analizadas'} · ${actions} con acción sugerida`,
+  agent_working: 'Nexa está analizando tu desempeño',
+  agent_footer: 'Nexa aprende de tus datos para darte mejores insights cada día'
 } as const
