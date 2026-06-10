@@ -1,3 +1,17 @@
+# Sesion 2026-06-10 — RELEASE develop→main `e8705157e` (RELEASED)
+
+**Release a producción completado y verificado.** Manifest `released`, orchestrator run `27293405799` = success.
+
+- **SHA released:** `e8705157ed07282a4f839d2753379312eb4c3643` (merge `release: develop→main 2026-06-10` desde develop `10e378e73`, árbol byte-idéntico a develop). Remote main = `e8705157e`. `release_id` = `e8705157ed07-b7d1a77e-c5c1-4a15-b63f-7f9becfa2cd9`.
+- **Bundle (44 commits acumulados desde el release 2026-06-09):** TASK-1072 (rol `designer` + Figma node linking AXIS data-driven: SSOT `design_system_figma_nodes` + capability `design_system.figma_node.link` + render real del nodo Figma + 6 migraciones, ya aplicadas al Cloud SQL compartido) · TASK-1027 (/my/performance self-service dashboard + ISSUE-091 PII leak fix) · TASK-1070 (Design System fuera de Admin → `/design-system`, viewCode `plataforma.design_system`, acceso `collaborator`) · Nexa animated mark primitives · CLI canónica `pnpm ai:image` (gpt-image-2) · Disclosure + funnel pattern primitives · fix CI `test:results` pipefail (e1f676bbf — cierra el masking que el release previo dejó como follow-up abierto).
+- **Orchestrator:** preflight ✅ (con `bypass_preflight_reason` por `release_batch_policy=requires_break_glass` — bundle toca migraciones/identity; override auditado canónico que dispara `--override-batch-policy --bypass-preflight-warnings`, Lesson 3) → manifest started ✅ → Wait Vercel READY ✅ (match exacto del target_sha) → 2 approval gates (workers + Azure) aprobados vía `gh api` ✅ → 4 workers Cloud Run + Azure (skip Bicep, sin diff `infra/azure/**`) ✅ → post-release health ✅ → manifest → **released** ✅.
+- **Cloud Run GIT_SHA (los 4):** `e8705157e` — match perfecto, cero drift. ops-worker `00340-cxn` · commercial-cost-worker `00257-cmf` · ico-batch-worker `00158-87h` · hubspot-integration `00086-88g`.
+- **Watchdog:** `pnpm release:watchdog` → **Aggregate OK, exit 0**. Los 3 signals salieron `unknown` por falta de `GITHUB_RELEASE_OBSERVER_TOKEN` local (degradación honesta, no falla); el único load-bearing — `worker_revision_drift` — verificado autoritativamente vía `gcloud` (los 4 workers en el SHA exacto = 0 drift).
+- **Vercel prod READY** (`greenhouse-3upi6zg0i`) + `greenhouse.efeoncepro.com` `/api/auth/health` **HTTP 200 overallStatus=ready** (azure-ad/google/credentials ready, nextAuthSecretReady=true).
+- **Pre-release verde:** CI verde en HEAD `10e378e73` · pre-push hook (lint+tsc) verde · 0 migraciones pendientes (Cloud SQL compartido) · pg:doctor verde · cero hotfixes perdidos en main (21 únicos = merge commits) · merge byte-idéntico a develop.
+
+---
+
 # Sesion 2026-06-10 — TASK-1072: rol `designer` + Figma node linking data-driven (COMPLETE en develop)
 
 El operador pidió implementar TASK-1072 quedándose en `develop` (sin push remoto) y luego: dar el rol `designer` (además de `collaborator`) a Daniela Ferreira, Andrés Carlosama y Melkin Hernández sin quitarle a Daniela sus otros roles; y resolver de forma robusta (no parche) el drift de parity catalog⇆registry.
