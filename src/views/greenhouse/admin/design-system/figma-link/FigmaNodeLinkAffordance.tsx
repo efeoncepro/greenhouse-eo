@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   GreenhouseAnchoredDisclosure,
@@ -48,9 +48,61 @@ const FigmaNodeLinkAffordance = ({
   const [value, setValue] = useState('')
   const [status, setStatus] = useState<FigmaNodeLinkStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [nodeThumbnailUrl, setNodeThumbnailUrl] = useState<string | null>(null)
+  const [thumbnailStatus, setThumbnailStatus] = useState<'idle' | 'loading' | 'ready' | 'unavailable'>('idle')
 
   const parsed = useMemo(() => parseFigmaUrl(value), [value])
   const mode: 'link' | 'change' = nodeId ? 'change' : 'link'
+
+  // Slice 4 — real node render preview. Debounced fetch when the pasted URL parses to
+  // a valid AXIS node; degrades honest to identity fallback when no token / API fails.
+  const previewKey = status === 'valid' && parsed ? `${parsed.fileKey}|${parsed.nodeId}` : null
+  const latestPreviewKey = useRef<string | null>(null)
+
+  useEffect(() => {
+    latestPreviewKey.current = previewKey
+
+    if (!previewKey || !parsed) {
+      setNodeThumbnailUrl(null)
+      setThumbnailStatus('idle')
+
+      return
+    }
+
+    setNodeThumbnailUrl(null)
+    setThumbnailStatus('loading')
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/design-system/figma-nodes/preview?fileKey=${encodeURIComponent(parsed.fileKey)}&nodeId=${encodeURIComponent(parsed.nodeId)}`
+        )
+
+        if (latestPreviewKey.current !== previewKey) return
+
+        if (!res.ok) {
+          setThumbnailStatus('unavailable')
+
+          return
+        }
+
+        const payload = (await res.json()) as { imageUrl?: string | null; status?: string }
+
+        if (latestPreviewKey.current !== previewKey) return
+
+        if (payload.status === 'ready' && payload.imageUrl) {
+          setNodeThumbnailUrl(payload.imageUrl)
+          setThumbnailStatus('ready')
+        } else {
+          setThumbnailStatus('unavailable')
+        }
+      } catch {
+        if (latestPreviewKey.current === previewKey) setThumbnailStatus('unavailable')
+      }
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [previewKey, parsed])
 
   const handleChange = (next: string) => {
     setValue(next)
@@ -85,6 +137,8 @@ const FigmaNodeLinkAffordance = ({
     setValue('')
     setStatus('idle')
     setErrorMessage(null)
+    setNodeThumbnailUrl(null)
+    setThumbnailStatus('idle')
   }
 
   const handleOpenChange = (next: boolean) => {
@@ -137,6 +191,8 @@ const FigmaNodeLinkAffordance = ({
           status={status}
           errorMessage={errorMessage}
           currentNodeId={nodeId}
+          nodeThumbnailUrl={nodeThumbnailUrl}
+          thumbnailStatus={thumbnailStatus}
           onSubmit={handleSubmit}
           onClose={close}
         />
