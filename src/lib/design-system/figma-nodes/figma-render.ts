@@ -94,12 +94,13 @@ export const getFigmaNodeRender = async ({
     return UNAVAILABLE
   }
 
-  const encodedId = encodeURIComponent(nodeId)
-
+  // The Figma API matches node ids in their raw `NNN:MMM` form in the `ids` query
+  // param; URL-encoding the colon (`%3A`) makes `/v1/images` fail to match → null.
+  // `nodeId` is already shape-validated (`^\d+:\d+$`) by callers, so it is URL-safe.
   try {
     const [images, nodes] = await Promise.all([
-      fetchFigmaJson<FigmaImagesResponse>(`/v1/images/${fileKey}?ids=${encodedId}&format=png&scale=2`, token),
-      fetchFigmaJson<FigmaNodesResponse>(`/v1/files/${fileKey}/nodes?ids=${encodedId}`, token)
+      fetchFigmaJson<FigmaImagesResponse>(`/v1/images/${fileKey}?ids=${nodeId}&format=png&scale=2`, token),
+      fetchFigmaJson<FigmaNodesResponse>(`/v1/files/${fileKey}/nodes?ids=${nodeId}`, token)
     ])
 
     const imageUrl = images?.images?.[nodeId] ?? null
