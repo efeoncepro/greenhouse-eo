@@ -9,7 +9,7 @@
 
 export const DESIGN_SYSTEM_LAB_TOKENS = Object.freeze({
   routes: {
-    root: '/admin/design-system'
+    root: '/design-system'
   },
   layout: {
     pageMaxInlineSize: 1100,

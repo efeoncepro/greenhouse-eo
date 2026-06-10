@@ -4,7 +4,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'design-system',
-  route: '/admin/design-system',
+  route: '/design-system',
   viewport: { width: 1280, height: 900 },
   viewports: [
     { name: 'desktop', width: 1280, height: 900 },
@@ -27,7 +27,7 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'axis-palette-full',
       fullPage: true,
-      note: 'Paleta AXIS completa; el Loading Lab vive en /admin/design-system/loaders'
+      note: 'Paleta AXIS completa; el Loading Lab vive en /design-system/loaders'
     }
   ]
 }

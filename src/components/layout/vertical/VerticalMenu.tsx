@@ -578,8 +578,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminCloudIntegrations), href: '/admin/cloud-integrations' },
               { label: nl(GH_INTERNAL_NAV.adminOpsHealth), href: '/admin/ops-health' },
               { label: nl(GH_INTERNAL_NAV.adminUntitledNotionPages), href: '/admin/data-quality/notion-titles' },
-              { label: nl(GH_INTERNAL_NAV.adminOrganizationLogos), href: '/admin/data-quality/organization-logos' },
-              { label: nl(GH_INTERNAL_NAV.adminDesignSystem), href: '/admin/design-system' }
+              { label: nl(GH_INTERNAL_NAV.adminOrganizationLogos), href: '/admin/data-quality/organization-logos' }
             ].filter(item => {
               if (item.href === '/admin/operational-calendar') return canSeeView('administracion.calendario_operativo', true)
               if (item.href === '/admin/email-delivery') return canSeeView('administracion.email_delivery', true)
@@ -590,7 +589,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/admin/ops-health') return canSeeView('administracion.ops_health', true)
               if (item.href === '/admin/data-quality/notion-titles') return canSeeView('administracion.cloud_integrations', true)
               if (item.href === '/admin/data-quality/organization-logos') return canSeeView('administracion.cloud_integrations', true)
-              if (item.href === '/admin/design-system') return canSeeView('administracion.design_system', false)
 
               return true
             })
@@ -781,6 +779,20 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         })
       }
     }
+  }
+
+  // ── Design System (standalone — cross-cutting INTERNAL resource) ──
+  // Out of Admin Center (it is not an admin domain). Rendered for ANY staff with
+  // the `plataforma.design_system` grant — all internal roles incl. `collaborator`
+  // (who are not `isInternalPortalUser`) — and NEVER clients (the viewCode is never
+  // granted to client_* roles). Placed after both portal branches so collaborators
+  // (route group `my`) reach it too.
+  if (canSeeView('plataforma.design_system', false)) {
+    menuData.push({
+      label: nl(GH_INTERNAL_NAV.adminDesignSystem),
+      href: '/design-system',
+      icon: 'tabler-palette'
+    })
   }
 
   return (

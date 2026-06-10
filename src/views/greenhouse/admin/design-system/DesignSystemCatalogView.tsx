@@ -70,7 +70,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'colors',
     title: 'Color AXIS',
     description: 'Usa esta entrada cuando necesites rampas, opacidades, contraste o neutrales del sistema.',
-    route: '/admin/design-system/colors',
+    route: '/design-system/colors',
     category: 'Foundations',
     kind: 'Token',
     status: 'Canonical',
@@ -82,7 +82,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'typography',
     title: 'Tipografía',
     description: 'Revisa jerarquía, familias y frontera Poppins/Geist antes de tocar copy visible.',
-    route: '/admin/design-system/typography',
+    route: '/design-system/typography',
     category: 'Foundations',
     kind: 'Token',
     status: 'Canonical',
@@ -94,7 +94,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'geometry',
     title: 'Geometry',
     description: 'Consulta spacing, radius y extensiones xxl/display para superficies amplias.',
-    route: '/admin/design-system/geometry',
+    route: '/design-system/geometry',
     category: 'Foundations',
     kind: 'Token',
     status: 'Canonical',
@@ -106,7 +106,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'elevation',
     title: 'Elevation',
     description: 'Elige roles de sombra por uso: raised, floating, overlay, modal u overflow.',
-    route: '/admin/design-system/elevation',
+    route: '/design-system/elevation',
     category: 'Foundations',
     kind: 'Token',
     status: 'Canonical',
@@ -118,7 +118,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',
-    route: '/admin/design-system/buttons',
+    route: '/design-system/buttons',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -130,7 +130,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'breadcrumbs',
     title: 'Breadcrumbs',
     description: 'Primitive para jerarquía de navegación con ancestors clickeables, current page y separadores gobernados.',
-    route: '/admin/design-system/breadcrumbs',
+    route: '/design-system/breadcrumbs',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -143,7 +143,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'chips',
     title: 'Chips',
     description: 'Primitive para estados compactos, atributos, identidad, filtros y entradas removibles.',
-    route: '/admin/design-system/chips',
+    route: '/design-system/chips',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -155,7 +155,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'feedback-atoms',
     title: 'Feedback atoms',
     description: 'KPI delta inline (signo+flecha+color AA) y status dot (dot+label). Color nunca solo; consumen theme.greenhouseSemantic.',
-    route: '/admin/design-system/chips',
+    route: '/design-system/chips',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -167,7 +167,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'nexa-brand',
     title: 'Nexa brand mark',
     description: 'Primitive para el isotipo de Nexa, badge conversacional y kinds de marca.',
-    route: '/admin/design-system/nexa-brand',
+    route: '/design-system/nexa-brand',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -179,7 +179,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'efeonce-brand',
     title: 'Efeonce orbital signature',
     description: 'Primitive experimental para la firma orbital del wordmark institucional de Efeonce.',
-    route: '/admin/design-system/efeonce-brand',
+    route: '/design-system/efeonce-brand',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Hardening',
@@ -191,7 +191,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'talent-profile',
     title: 'Talent profile',
     description: 'Dossier enterprise, badge Verificado por Efeonce y kind Talento verificado para perfiles verificables.',
-    route: '/admin/design-system/talent-profile',
+    route: '/design-system/talent-profile',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -203,7 +203,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'floating-surfaces',
     title: 'Floating surfaces',
     description: 'Usa esto para popovers, menus, peeks de evidencia e inline editors anclados.',
-    route: '/admin/design-system/floating-surfaces',
+    route: '/design-system/floating-surfaces',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -215,7 +215,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'loaders',
     title: 'Loading surfaces',
     description: 'Estados de carga nombrados para documentos, acciones seguras, handoffs y conciliación.',
-    route: '/admin/design-system/loaders',
+    route: '/design-system/loaders',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -227,7 +227,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'charts',
     title: 'Charts',
     description: 'Chart cards enterprise, Funnel Analysis Pattern, fallback accesible y geometría gobernada.',
-    route: '/admin/design-system/charts',
+    route: '/design-system/charts',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -239,7 +239,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'funnel-analysis-pattern',
     title: 'Funnel Analysis Pattern',
     description: 'Patrón para leer etapas, caídas, SLA, bloqueos y asistencia Nexa en una composición gobernada.',
-    route: '/admin/design-system/charts',
+    route: '/design-system/charts',
     category: 'Patterns',
     kind: 'Pattern',
     status: 'Canonical',
@@ -251,7 +251,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'utilities',
     title: 'Utilities',
     description: 'Timelines y utilities para auditoría, handoff y trazas de documentos.',
-    route: '/admin/design-system/utilities',
+    route: '/design-system/utilities',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -263,7 +263,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'motion',
     title: 'Motion',
     description: 'Primitive gobernada para entrance, stagger, scroll reveal y timelines GSAP.',
-    route: '/admin/design-system/motion',
+    route: '/design-system/motion',
     category: 'Patterns',
     kind: 'Pattern',
     status: 'Canonical',
@@ -275,7 +275,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'microinteractions',
     title: 'Microinteractions',
     description: 'Thinking beats, feedback de comandos, validación, procedencia, decisiones inline y evidencia.',
-    route: '/admin/design-system/microinteractions',
+    route: '/design-system/microinteractions',
     category: 'Patterns',
     kind: 'Pattern',
     status: 'Canonical',
@@ -287,7 +287,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'catalog',
     title: 'Catalog index',
     description: 'Home canónica para encontrar tokens, primitives, patrones y labs internos.',
-    route: '/admin/design-system',
+    route: '/design-system',
     category: 'Governance',
     kind: 'Pattern',
     status: 'Canonical',
@@ -606,7 +606,7 @@ const DesignSystemCatalogView = () => {
             <Stack className='gh-catalog-actions' direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
               <GreenhouseButton
                 component={Link}
-                href='/admin/design-system/colors'
+                href='/design-system/colors'
                 variant='label'
                 kind='navigation'
                 leadingIconClassName='tabler-arrow-left'
@@ -615,7 +615,7 @@ const DesignSystemCatalogView = () => {
               </GreenhouseButton>
               <GreenhouseButton
                 component={Link}
-                href='/admin/design-system/geometry'
+                href='/design-system/geometry'
                 variant='outlined'
                 kind='navigation'
                 leadingIconClassName='tabler-dimensions'

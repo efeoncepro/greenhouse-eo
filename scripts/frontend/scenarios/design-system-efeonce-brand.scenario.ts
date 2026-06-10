@@ -2,7 +2,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'design-system-efeonce-brand',
-  route: '/admin/design-system/efeonce-brand',
+  route: '/design-system/efeonce-brand',
   viewport: { width: 1440, height: 1100 },
   initialHoldMs: 1800,
   finalHoldMs: 400,

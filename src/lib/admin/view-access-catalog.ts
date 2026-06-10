@@ -5,6 +5,7 @@ export type GovernanceSection =
   | 'finanzas'
   | 'ia'
   | 'administracion'
+  | 'plataforma'
   | 'mi_ficha'
   | 'cliente'
 
@@ -24,6 +25,7 @@ export const GOVERNANCE_SECTIONS = [
   { key: 'finanzas', label: 'Finanzas', description: 'Resumen financiero, ingresos, egresos y conciliación.' },
   { key: 'ia', label: 'IA', description: 'Gobernanza de herramientas, licencias y créditos.' },
   { key: 'administracion', label: 'Administración', description: 'Admin Center, Spaces, usuarios y gobierno del portal.' },
+  { key: 'plataforma', label: 'Plataforma', description: 'Recursos internos transversales (Design System).' },
   { key: 'mi_ficha', label: 'Mi Ficha', description: 'Experiencia personal del colaborador interno.' },
   { key: 'cliente', label: 'Portal cliente', description: 'Pulse, proyectos, ciclos y settings del cliente.' }
 ] as const satisfies Array<{
@@ -580,11 +582,11 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
-    viewCode: 'administracion.design_system',
-    section: 'administracion',
+    viewCode: 'plataforma.design_system',
+    section: 'plataforma',
     label: 'Design System',
-    description: 'Catálogo interno de AXIS: tokens, primitives, patrones y labs del Design System. Clientes no acceden.',
-    routePath: '/admin/design-system',
+    description: 'Catálogo interno de AXIS: tokens, primitives, patrones y labs. Recurso interno transversal — clientes no acceden.',
+    routePath: '/design-system',
     routeGroup: 'internal'
   },
   {

@@ -6,7 +6,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'floating-surface-primitives',
-  route: '/admin/design-system/floating-surfaces',
+  route: '/design-system/floating-surfaces',
   // Escape/focus are UI-only interactions over an internal lab with no backend
   // writes — safe to capture.
   mutating: true,

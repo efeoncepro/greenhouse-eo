@@ -15,8 +15,8 @@ import {
 
 import { resolveDesignSystemFigmaNode } from './design-system-figma-nodes'
 
-const ADMIN_ROUTE = '/admin'
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
+const HOME_ROUTE = '/home'
+const DESIGN_SYSTEM_ROUTE = '/design-system'
 
 const DESIGN_SYSTEM_ROUTE_LABELS = {
   [DESIGN_SYSTEM_ROUTE]: 'Design System',
@@ -64,8 +64,8 @@ const resolveDesignSystemBreadcrumbItems = (pathname: string): GreenhouseBreadcr
 
   const items: GreenhouseBreadcrumbItem[] = [
     {
-      label: 'Admin',
-      href: ADMIN_ROUTE
+      label: 'Greenhouse',
+      href: HOME_ROUTE
     },
     {
       label: 'Design System',

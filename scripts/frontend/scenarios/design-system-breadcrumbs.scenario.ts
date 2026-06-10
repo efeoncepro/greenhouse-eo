@@ -4,7 +4,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'design-system-breadcrumbs',
-  route: '/admin/design-system/breadcrumbs',
+  route: '/design-system/breadcrumbs',
   viewport: { width: 1280, height: 900 },
   viewports: [
     { name: 'desktop', width: 1280, height: 900 },

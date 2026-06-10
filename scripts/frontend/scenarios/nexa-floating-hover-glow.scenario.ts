@@ -2,7 +2,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'nexa-floating-hover-glow',
-  route: '/admin/design-system/nexa-brand',
+  route: '/design-system/nexa-brand',
   viewport: { width: 1440, height: 900 },
   initialHoldMs: 1200,
   assertions: [

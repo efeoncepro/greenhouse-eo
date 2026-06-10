@@ -19,7 +19,7 @@ pnpm fe:capture --route=/hr/offboarding --env=staging --hold=3000
 pnpm fe:capture offboarding-queue-microinteractions --env=staging --gif
 
 # Lupa de microinteracción: frames secuenciales de un selector
-pnpm fe:capture:micro --route=/admin/design-system/nexa-brand --selector='[data-capture="nexa-floating-trigger"]' --env=local --duration=5000 --fps=24 --gif
+pnpm fe:capture:micro --route=/design-system/nexa-brand --selector='[data-capture="nexa-floating-trigger"]' --env=local --duration=5000 --fps=24 --gif
 
 # Headed para debug visual
 pnpm fe:capture offboarding-queue-microinteractions --env=staging --headed

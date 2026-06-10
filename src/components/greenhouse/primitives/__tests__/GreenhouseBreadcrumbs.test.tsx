@@ -29,7 +29,7 @@ describe('GreenhouseBreadcrumbs', () => {
         kind='pageHierarchy'
         items={[
           { label: TEST_LABELS.root, href: '/home', iconClassName: 'tabler-star-filled' },
-          { label: TEST_LABELS.designSystem, href: '/admin/design-system', iconClassName: 'tabler-star-filled' },
+          { label: TEST_LABELS.designSystem, href: '/design-system', iconClassName: 'tabler-star-filled' },
           { label: TEST_LABELS.breadcrumbs, iconClassName: 'tabler-star-filled' }
         ]}
       />

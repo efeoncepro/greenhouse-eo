@@ -18,7 +18,7 @@ describe('DesignSystemCatalogView search', () => {
   })
 
   it('indexes route and owner metadata for design-system entries', () => {
-    expect(findCatalogIds('/admin/design-system/breadcrumbs')).toEqual(['breadcrumbs'])
+    expect(findCatalogIds('/design-system/breadcrumbs')).toEqual(['breadcrumbs'])
     expect(findCatalogIds('GreenhouseBreadcrumbs')).toContain('breadcrumbs')
   })
 })

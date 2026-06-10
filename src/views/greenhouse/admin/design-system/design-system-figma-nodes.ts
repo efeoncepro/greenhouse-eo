@@ -1,7 +1,7 @@
 /**
  * Design System ↔ AXIS Figma node registry.
  *
- * Maps each internal `/admin/design-system/*` route to its AXIS Figma node id
+ * Maps each internal `/design-system/*` route to its AXIS Figma node id
  * (master file `yyMksCoijfMaIoYplXKZaR`). The shell renders a
  * `GreenhouseFigmaNodeButton` resolved from this map: routes WITH a node get an
  * active "Nodo Figma" link; routes WITHOUT one render the button disabled — a
@@ -10,8 +10,8 @@
  * To activate a page: create its node in AXIS and add `route → 'NNN:MMM'` here.
  */
 export const DESIGN_SYSTEM_FIGMA_NODES: Record<string, string> = {
-  '/admin/design-system/breadcrumbs': '205:234905',
-  '/admin/design-system/colors': '11205:5341'
+  '/design-system/breadcrumbs': '205:234905',
+  '/design-system/colors': '11205:5341'
 }
 
 const normalize = (pathname: string) => (pathname === '/' ? pathname : pathname.replace(/\/+$/, ''))

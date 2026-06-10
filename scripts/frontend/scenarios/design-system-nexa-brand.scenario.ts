@@ -4,7 +4,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'design-system-nexa-brand',
-  route: '/admin/design-system/nexa-brand',
+  route: '/design-system/nexa-brand',
   viewport: { width: 1280, height: 900 },
   viewports: [
     { name: 'desktop', width: 1280, height: 900 },

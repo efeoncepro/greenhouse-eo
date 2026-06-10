@@ -21,7 +21,7 @@ import {
 
 import { DESIGN_SYSTEM_LAB_TOKENS } from './design-system-lab-tokens'
 
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
+const DESIGN_SYSTEM_ROUTE = '/design-system'
 
 const previewItems = [
   { label: 'Greenhouse', href: '/home', iconClassName: 'tabler-star-filled' },

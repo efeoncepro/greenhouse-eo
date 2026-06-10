@@ -1,3 +1,15 @@
+# Sesion 2026-06-10 — TASK-1070: Design System fuera del Admin + acceso colaboradores
+
+El operador pidió sacar el Design System del menú del Admin Center (no es dominio del Admin) y darle acceso a los colaboradores ("debe poder verlo el colaborador pero también yo").
+
+- **Ruta movida** `git mv src/app/(dashboard)/admin/design-system/**` → `src/app/(dashboard)/design-system/**` (~21 page.tsx + layout). Las **views** quedan en `src/views/greenhouse/admin/design-system/` (path de código interno; solo cambió la URL).
+- **viewCode canónico** `administracion.design_system` → **`plataforma.design_system`** (nueva `GovernanceSection` `plataforma`, route_group `internal`, route_path `/design-system`). Migración seed `20260610095101532` (View Registry Governance TASK-827) concede a los **10 roles internos incl `collaborator`** (NUNCA `client_*`).
+- **Nav**: removido de la sección Platform del Admin; agregado como ítem standalone `/design-system` (`tabler-palette`) **después de ambas ramas portal** en `VerticalMenu` (los colaboradores `isMyUser` NO son `isInternalPortalUser`). Gateado por `canSeeView('plataforma.design_system', false)`. Breadcrumb root del shell: `Admin → /admin` ⟶ `Greenhouse → /home`.
+- **Deploy-ordering (shared Cloud SQL):** migración **additive-only** — NO revoca el legacy `administracion.design_system` (rompería producción con código viejo). **Follow-up pendiente: TASK-1071 cleanup** que revoca el legacy DESPUÉS del deploy a producción.
+- **Verificado:** migración aplicada (anti pre-up-marker ≥10 grants), `pnpm build` exit 0, route-reachability 0 orphans, 12 tests focales, lint full (pendiente confirmar verde abajo). **GVC**: colaborador (`agent-collaborator`) y admin (`agent@`, efeonce_admin) — ambos ven el nav `/design-system` y acceden a la surface; cero links legacy `/admin/design-system`. Frame colaborador: `.captures/2026-06-10T10-13-58_inline-design-system`.
+
+---
+
 # Sesion 2026-06-10 — GreenhouseFigmaNodeButton primitive + cierre sesión DS de Codex
 
 Claude (1) shippeó **TASK-1027** (`/my/performance` self-service rico, cierra ISSUE-091 PII leak) a `origin/develop`, y (2) finalizó la sesión DS de Codex (breadcrumbs + Efeonce Orbital + Nexa marks, ~60 archivos) **+ agregó el primitive `GreenhouseFigmaNodeButton`** pedido por el operador, todo pusheado (`0575f9117`).

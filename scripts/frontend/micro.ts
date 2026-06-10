@@ -42,7 +42,7 @@ Opciones:
   -h, --help         Muestra esta ayuda
 
 Ejemplo:
-  pnpm fe:capture:micro --route=/admin/design-system/nexa-brand --selector='[data-capture="nexa-floating-trigger"]' --env=local --duration=5000 --fps=24 --gif
+  pnpm fe:capture:micro --route=/design-system/nexa-brand --selector='[data-capture="nexa-floating-trigger"]' --env=local --duration=5000 --fps=24 --gif
 `
 
 interface MicroFrame {
