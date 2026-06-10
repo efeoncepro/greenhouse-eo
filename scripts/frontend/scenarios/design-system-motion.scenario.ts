@@ -5,7 +5,7 @@ import type { CaptureScenario } from '../lib/scenario'
 // whole museum, not just the above-the-fold header.
 export const scenario: CaptureScenario = {
   name: 'design-system-motion',
-  route: '/admin/design-system/motion',
+  route: '/design-system/motion',
   viewport: { width: 1440, height: 900 },
   initialHoldMs: 2000,
   finalHoldMs: 400,

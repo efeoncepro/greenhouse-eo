@@ -51,8 +51,12 @@ export type CanonicalErrorCode =
   | 'client_tenant_required'
   // Generic input / throttle / server codes (Coming Soon notify + reusable).
   | 'invalid_email'
+  | 'invalid_period'
   | 'rate_limited'
   | 'internal_error'
+  // Design System Figma node linking (TASK-1072).
+  | 'invalid_figma_url'
+  | 'figma_node_not_axis'
   // Reserved for future canonical codes — extender aquí cuando emerjan
   // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -99,6 +103,11 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     message: 'Ingresa un correo válido (ej. nombre@empresa.com).',
     actionable: true
   },
+  invalid_period: {
+    status: 400,
+    message: 'El período solicitado no es válido. Usa un año entre 2024 y 2030 y un mes entre 1 y 12.',
+    actionable: true
+  },
   rate_limited: {
     status: 429,
     message: 'Demasiados intentos. Espera un momento e inténtalo de nuevo.',
@@ -107,6 +116,16 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   internal_error: {
     status: 500,
     message: 'Algo salió mal de nuestro lado. Inténtalo de nuevo en unos minutos.',
+    actionable: true
+  },
+  invalid_figma_url: {
+    status: 422,
+    message: 'No parece un enlace de nodo Figma. Copia el enlace desde Figma → Copiar enlace de la selección.',
+    actionable: true
+  },
+  figma_node_not_axis: {
+    status: 422,
+    message: 'El nodo debe ser del archivo AXIS. Pega un enlace de un nodo del Design System en AXIS.',
     actionable: true
   }
 }

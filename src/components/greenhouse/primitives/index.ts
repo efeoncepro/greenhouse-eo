@@ -13,6 +13,18 @@ export type {
 } from './GreenhouseAsyncActionButton'
 export { default as GreenhouseButton } from './GreenhouseButton'
 export type { GreenhouseButtonProps } from './GreenhouseButton'
+export {
+  default as GreenhouseFigmaNodeButton,
+  buildFigmaNodeUrl,
+  AXIS_FILE_KEY,
+  AXIS_FILE_NAME
+} from './GreenhouseFigmaNodeButton'
+export type { GreenhouseFigmaNodeButtonProps } from './GreenhouseFigmaNodeButton'
+export { default as GreenhouseBreadcrumbs } from './GreenhouseBreadcrumbs'
+export type {
+  GreenhouseBreadcrumbItem,
+  GreenhouseBreadcrumbsProps
+} from './GreenhouseBreadcrumbs'
 export { default as GreenhouseVerificationBadge } from './GreenhouseVerificationBadge'
 export type {
   GreenhouseVerificationBadgeKind,
@@ -20,6 +32,68 @@ export type {
   GreenhouseVerificationBadgeProps,
   GreenhouseVerificationBadgeSize
 } from './GreenhouseVerificationBadge'
+export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
+export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedMark'
+export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
+export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
+export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
+export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'
+export type { EfeonceOrbitalLogoMarkProps } from './EfeonceOrbitalLogoMark'
+export {
+  EFEONCE_ORBITAL_LOGO_COLOR,
+  EFEONCE_ORBITAL_LOGO_KIND_CONFIG,
+  resolveEfeonceOrbitalLogoAriaLabel,
+  resolveEfeonceOrbitalLogoVariant
+} from './efeonce-orbital-logo-controller'
+export type {
+  EfeonceOrbitalLogoKind,
+  EfeonceOrbitalLogoKindConfig,
+  EfeonceOrbitalLogoVariant
+} from './efeonce-orbital-logo-controller'
+// Claude experiment — variante de órbita completa con el hueco del anillo relleno.
+export { default as ClaudeEfeonceFilledOrbitMark } from './ClaudeEfeonceFilledOrbitMark'
+export type { ClaudeEfeonceFilledOrbitMarkProps } from './ClaudeEfeonceFilledOrbitMark'
+export {
+  GREENHOUSE_NEXA_BRAND_ASSETS,
+  GREENHOUSE_NEXA_BRAND_COLORS,
+  GREENHOUSE_NEXA_BRAND_KIND_CONFIG,
+  GREENHOUSE_NEXA_BRAND_SIZE_CONFIG,
+  resolveGreenhouseNexaBrandKind
+} from './greenhouse-nexa-brand-controller'
+export { default as GreenhouseThinkingBeat } from './GreenhouseThinkingBeat'
+export type { GreenhouseThinkingBeatProps } from './GreenhouseThinkingBeat'
+export { default as GreenhouseNexaGreeting } from './GreenhouseNexaGreeting'
+export type { GreenhouseNexaGreetingProps } from './GreenhouseNexaGreeting'
+export {
+  GREENHOUSE_NEXA_GREETING_KIND_CONFIG,
+  GREENHOUSE_NEXA_GREETING_VARIANT_CONFIG,
+  resolveGreenhouseNexaGreetingKind,
+  resolveGreenhouseNexaGreetingVariant
+} from './greenhouse-nexa-greeting-controller'
+export type {
+  GreenhouseNexaGreetingKind,
+  GreenhouseNexaGreetingKindConfig,
+  GreenhouseNexaGreetingVariant,
+  GreenhouseNexaGreetingVariantConfig
+} from './greenhouse-nexa-greeting-controller'
+export {
+  GREENHOUSE_THINKING_BEAT_KIND_CONFIG,
+  GREENHOUSE_THINKING_BEAT_MOTION,
+  GREENHOUSE_THINKING_BEAT_VARIANT_CONFIG,
+  resolveGreenhouseThinkingBeatKind,
+  resolveGreenhouseThinkingBeatVariant
+} from './greenhouse-thinking-beat-controller'
+export type {
+  GreenhouseThinkingBeatKind,
+  GreenhouseThinkingBeatKindConfig,
+  GreenhouseThinkingBeatVariant,
+  GreenhouseThinkingBeatVariantConfig
+} from './greenhouse-thinking-beat-controller'
+export type {
+  GreenhouseNexaBrandKind,
+  GreenhouseNexaBrandKindConfig,
+  GreenhouseNexaBrandSize
+} from './greenhouse-nexa-brand-controller'
 export { default as GreenhouseHealthSignalChart } from './GreenhouseHealthSignalChart'
 export type {
   GreenhouseHealthSignalChartKind,
@@ -55,6 +129,19 @@ export type {
   GreenhouseButtonTone,
   GreenhouseButtonVariant
 } from './greenhouse-button-controller'
+export {
+  GREENHOUSE_BREADCRUMBS_KIND_DEFAULT_SEPARATOR,
+  GREENHOUSE_BREADCRUMBS_KIND_DEFAULT_VARIANT,
+  GREENHOUSE_BREADCRUMBS_VARIANT_CONFIG,
+  GREENHOUSE_BREADCRUMBS_VARIANTS,
+  resolveGreenhouseBreadcrumbsSeparator,
+  resolveGreenhouseBreadcrumbsVariant
+} from './greenhouse-breadcrumbs-controller'
+export type {
+  GreenhouseBreadcrumbsKind,
+  GreenhouseBreadcrumbsSeparator,
+  GreenhouseBreadcrumbsVariant
+} from './greenhouse-breadcrumbs-controller'
 export { default as GreenhouseChip } from './GreenhouseChip'
 export type {
   GreenhouseChipKind,
@@ -161,6 +248,35 @@ export type {
   GreenhouseFloatingSurfaceVariant,
   GreenhouseFloatingSurfaceVariantConfig
 } from './floating-surface-controller'
+
+// TASK-1072 — Disclosure Trigger (rotating "+" atom) + Anchored Disclosure (trigger + surface)
+export { default as GreenhouseDisclosureTrigger } from './GreenhouseDisclosureTrigger'
+export type { GreenhouseDisclosureTriggerProps } from './GreenhouseDisclosureTrigger'
+export {
+  DISCLOSURE_TRIGGER_VARIANT_CONFIG,
+  getDisclosureTriggerVariantConfig,
+  resolveDisclosureTriggerVariant
+} from './disclosure-trigger-controller'
+export type {
+  GreenhouseDisclosureTriggerKind,
+  GreenhouseDisclosureTriggerVariant,
+  GreenhouseDisclosureTriggerVariantConfig
+} from './disclosure-trigger-controller'
+export { default as GreenhouseAnchoredDisclosure } from './GreenhouseAnchoredDisclosure'
+export type {
+  GreenhouseAnchoredDisclosureContentProps,
+  GreenhouseAnchoredDisclosureProps
+} from './GreenhouseAnchoredDisclosure'
+export {
+  ANCHORED_DISCLOSURE_VARIANT_CONFIG,
+  getAnchoredDisclosureVariantConfig,
+  resolveAnchoredDisclosureVariant
+} from './anchored-disclosure-controller'
+export type {
+  GreenhouseAnchoredDisclosureKind,
+  GreenhouseAnchoredDisclosureVariant,
+  GreenhouseAnchoredDisclosureVariantConfig
+} from './anchored-disclosure-controller'
 
 // TASK-498 — Sprint 3 primitives extraction (Quote Builder generalization)
 export { default as EntitySummaryDock } from './EntitySummaryDock'
@@ -299,6 +415,40 @@ export type {
   GreenhouseMetricBreakdownPoint,
   GreenhouseMetricBreakdownTone
 } from './GreenhouseMetricBreakdownChartCard'
+export { default as GreenhouseFunnelChartCard } from './GreenhouseFunnelChartCard'
+export {
+  GreenhouseFunnelDiagnosticsGrid,
+  GreenhouseFunnelHeaderControls,
+  GreenhouseFunnelKpiStrip,
+  GreenhouseFunnelStageRail,
+  GreenhouseFunnelStageSegment
+} from './GreenhouseFunnelChartCard'
+export {
+  GREENHOUSE_FUNNEL_CHART_KIND_DEFAULT_VARIANT,
+  GREENHOUSE_FUNNEL_CHART_TOKENS,
+  GREENHOUSE_FUNNEL_CHART_ZONE_PRIMITIVES,
+  GREENHOUSE_FUNNEL_CHART_VARIANTS,
+  resolveGreenhouseFunnelChartVariant
+} from './greenhouse-funnel-chart-controller'
+export type {
+  GreenhouseFunnelChartKind,
+  GreenhouseFunnelChartVariant
+} from './greenhouse-funnel-chart-controller'
+export type {
+  GreenhouseFunnelChartCardProps,
+  GreenhouseFunnelDiagnosticsGridProps,
+  GreenhouseFunnelDiagnosticTone,
+  GreenhouseFunnelHeaderControlsProps,
+  GreenhouseFunnelInsight,
+  GreenhouseFunnelKpiStripProps,
+  GreenhouseFunnelMetric,
+  GreenhouseFunnelResolvedStage,
+  GreenhouseFunnelStage,
+  GreenhouseFunnelStageDiagnostic,
+  GreenhouseFunnelStageRailProps,
+  GreenhouseFunnelStageSegmentProps,
+  GreenhouseFunnelTone
+} from './GreenhouseFunnelChartCard'
 export { default as GreenhouseActivityTimeline } from './GreenhouseActivityTimeline'
 export { GREENHOUSE_ACTIVITY_TIMELINE_TOKENS } from './greenhouse-activity-timeline-controller'
 export type {

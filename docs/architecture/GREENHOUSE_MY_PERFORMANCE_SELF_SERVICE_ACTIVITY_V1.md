@@ -318,6 +318,16 @@ Reopen this decision if:
 - self-service consumers need client/space/project drill-downs with new collaborator-safe routes.
 - a security review finds mentions or DTO fields expose admin-only context.
 
+## Delta 2026-06-10 — TASK-1027 implementation
+
+Contract implemented faithfully (no material contract change). Implementation links + one finding worth recording:
+
+- **Live PII leak closed (not just enrichment).** Pre-implementation, `/api/my/performance` returned raw `intelligence`/`intelligenceTrend` (= `PersonIntelligenceSnapshot` with `cost.{monthlyBaseSalary, monthlyTotalComp, compensationVersionId, loadedCostTarget, costPerHourTarget, suggestedBillRateTarget}`, populated unconditionally in `person-intelligence/store.ts`). The DTO rebuild **redacts by construction**: the composer `src/lib/my-performance/dto.ts` never imports the cost-bearing readers; it composes only `readMemberMetrics`/`computeMetricsByContext('member')`, `getPersonIcoProfile` (trend), `getPersonOperationalServing`, `readMemberAiLlmSummary`. A test forbids the cost keys. Tracked as `ISSUE-091` (resolved by this task).
+- **Canonical files**: DTO + composer `src/lib/my-performance/dto.ts`; shared types `src/lib/my-performance/types.ts` (no `server-only`, so the client view imports them safely — TASK-827 bug class); route `src/app/api/my/performance/route.ts` (anti-IDOR, `invalid_period` validation, sanitized `internal_error`); safe mentions `NexaMentionText.safeMode` threaded through `NexaInsightsBlock`/`InsightCard`/`NexaInsightRootCauseSection`/`NexaInsightsTimeline`; shared presentation `src/lib/ico-engine/activity-presentation.ts`; view `src/views/greenhouse/my/MyPerformanceView.tsx`; coaching copy `src/lib/copy/my-performance.ts` (`GH_MY_PERFORMANCE`).
+- **Period status state machine**: `current_partial | closed_snapshot | no_data | degraded`, plus `meta.degradedSources[]` for honest degradation. UI states covered: loading skeleton, no-data, current-partial, pending-closures, degraded, Nexa empty (block-owned).
+- **Reviewable without personal metrics**: `/my/performance/mockup/runtime` renders the real `MyPerformanceView` with a rich fixture (`src/views/greenhouse/my/my-performance-mock.ts`) so admins (no personal ICO data) can review the full dashboard. GVC scenario `task-1027-my-performance` (desktop + mobile, fullPage).
+- **No new storage / no new capability**: page guard `mi_ficha.mi_desempeno` + API `requireMyTenantContext()` (both pre-existing).
+
 ## Related Tasks
 
 - `TASK-1027` — My Performance rich self-service activity runtime.

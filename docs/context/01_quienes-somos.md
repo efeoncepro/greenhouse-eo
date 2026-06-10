@@ -86,3 +86,5 @@ Lo que nos hace competitivos no es *tener* muchas unidades — es la **integraci
 ---
 
 *Fuente: Ecosistema Efeonce Group v5.3 + GTM Strategy 2026. Ver `02` para el detalle comercial y `03` para el detalle de producto.*
+
+*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*

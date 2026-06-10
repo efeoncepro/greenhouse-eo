@@ -6,7 +6,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'brand-color-counter-proposal',
-  route: '/admin/design-system/mockup/brand-color-proposal',
+  route: '/design-system/mockup/brand-color-proposal',
   viewport: { width: 1280, height: 900 },
   initialHoldMs: 1500,
   finalHoldMs: 400,

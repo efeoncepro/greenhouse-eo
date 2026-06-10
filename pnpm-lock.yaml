@@ -122,6 +122,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: 2.11.2
         version: 2.11.2(react-redux@9.2.0(@types/react@19.2.7)(react@19.2.3)(redux@5.0.1))(react@19.2.3)
+      '@rive-app/react-canvas':
+        specifier: ^4.29.0
+        version: 4.29.0(react@19.2.3)
       '@sentry/nextjs':
         specifier: ^10.46.0
         version: 10.46.0(@opentelemetry/context-async-hooks@2.6.1(@opentelemetry/api@1.9.1))(@opentelemetry/core@2.6.1(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.6.1(@opentelemetry/api@1.9.1))(next@16.1.1(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(webpack@5.105.4(esbuild@0.27.3))
@@ -3372,6 +3375,14 @@ packages:
 
   '@remirror/core-constants@3.0.0':
     resolution: {integrity: sha512-42aWfPrimMfDKDi4YegyS7x+/0tlzaqwPQCULLanv3DMIlu96KTJR0fM5isWX2UViOqlGnX6YFgqWepcX+XMNg==}
+
+  '@rive-app/canvas@2.38.0':
+    resolution: {integrity: sha512-tTrPXsWJZLARBa3H9rOPVMrWp5IRwaVABHLISdBogGGebp0sIAAmfDAD1eK/bP+UODejsT4X3mPBI3GPNln44g==}
+
+  '@rive-app/react-canvas@4.29.0':
+    resolution: {integrity: sha512-Jwlnq/9g8DIAS7VIw4c9Pj9UN11F9BmznLq4oFGmd2w80lCZtRjU9UHTs+RfDC2+0y2fBc3BRiwEHgja0krkQQ==}
+    peerDependencies:
+      react: 19.2.3
 
   '@rolldown/binding-android-arm64@1.0.0-rc.9':
     resolution: {integrity: sha512-lcJL0bN5hpgJfSIz/8PIf02irmyL43P+j1pTCfbD1DbLkmGRuFIA4DD3B3ZOvGqG0XiVvRznbKtN0COQVaKUTg==}
@@ -13054,6 +13065,13 @@ snapshots:
       react-redux: 9.2.0(@types/react@19.2.7)(react@19.2.3)(redux@5.0.1)
 
   '@remirror/core-constants@3.0.0': {}
+
+  '@rive-app/canvas@2.38.0': {}
+
+  '@rive-app/react-canvas@4.29.0(react@19.2.3)':
+    dependencies:
+      '@rive-app/canvas': 2.38.0
+      react: 19.2.3
 
   '@rolldown/binding-android-arm64@1.0.0-rc.9':
     optional: true

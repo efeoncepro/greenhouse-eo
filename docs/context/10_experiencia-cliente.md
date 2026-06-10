@@ -77,8 +77,10 @@ El pitch de la experiencia parte del dolor reconocible —"no sabes el estado de
 | Valor acumulado | Sin registro claro | "Tu año con Efeonce" compartible |
 | Switching cost | Bajo, relacional | Alto: datos + proceso + IA + historial en el portal |
 
-> ⚠️ Naming: los documentos de experiencia originales usan **"Greenhouse EO"** y **"Reviews per Asset"**. En producto y copy de cliente: **"Greenhouse"** y **"Rounds per Asset"** (ver `06`). El doc Prospect aún rotula "RpA (Reviews per Asset)" — es exactamente el string a corregir en UI.
+> ⚠️ Naming canónico: **"Greenhouse"** (nunca "Greenhouse EO") y **"Rounds per Asset"** (nunca "Reviews per Asset") — ver `06`. Si un documento o superficie legacy usa los nombres viejos, alinear al canónico; el estado vivo del rótulo en runtime/UI no se fija aquí (verificar contra el SoT).
 
 ---
 
 *Fuente: Efeonce Greenhouse Sistema de Experiencia v1 + Addendum (integración con capacidades reales) + Bienvenida Cliente v2 + Prospect v2. Relación con métricas: `06` y `07`. Relación con expansión comercial: `08`.*
+
+*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*

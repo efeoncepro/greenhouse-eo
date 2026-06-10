@@ -2,10 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import Link from 'next/link'
-
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
@@ -23,7 +20,6 @@ import {
   type GreenhouseChipVariant
 } from '@/components/greenhouse/primitives'
 
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 const FIGMA_AVATAR_SRC = '/images/greenhouse/design-system/axis-avatar-greenhouse.png'
 
 type PreviewMode = 'light' | 'dark'
@@ -412,18 +408,6 @@ const FeedbackAtomsCard = () => (
 
 const ChipsLabView = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, maxWidth: 1360, mx: 'auto' }}>
-    <Button
-      component={Link}
-      href={DESIGN_SYSTEM_ROUTE}
-      variant='text'
-      color='secondary'
-      size='small'
-      startIcon={<i className='tabler-arrow-left' />}
-      sx={{ alignSelf: 'flex-start', px: 0 }}
-    >
-      Design System
-    </Button>
-
     <Box
       sx={{
         display: 'grid',

@@ -26,7 +26,15 @@ import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import { MetricTrendCard, type MetricTrendPoint } from '@/components/greenhouse/primitives'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
-import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, type CscPhase, getMetricById, getThresholdZone } from '@/lib/ico-engine/metric-registry'
+import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, getMetricById, getThresholdZone } from '@/lib/ico-engine/metric-registry'
+import {
+  normalizeForRadar,
+  getZoneColor,
+  QUALITY_PENDING_METRIC_IDS,
+  isPendingClosures,
+  TREND_CONFIG,
+  CSC_PHASE_ORDER
+} from '@/lib/ico-engine/activity-presentation'
 import { CSC_CHART_COLORS } from '@/components/greenhouse/charts/csc-chart-colors'
 import type { MemberNexaInsightsPayload } from '@/lib/ico-engine/ai/llm-types'
 import type { IcoMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
@@ -51,33 +59,8 @@ const getMetric = (snapshot: IcoMetricSnapshot, metricId: string): MetricValue |
 const getMetricValue = (snapshot: IcoMetricSnapshot, metricId: string): number | null =>
   getMetric(snapshot, metricId)?.value ?? null
 
-const normalizeForRadar = (metricId: string, value: number | null): number => {
-  if (value === null) return 0
-
-  switch (metricId) {
-    case 'rpa':
-      return Math.max(0, Math.min(100, Math.round((1 - (value - 1) / 2) * 100)))
-    case 'otd_pct':
-    case 'ftr_pct':
-      return Math.round(Math.min(100, value))
-    case 'cycle_time':
-      return Math.max(0, Math.min(100, Math.round((1 - (value - 3) / 18) * 100)))
-    case 'throughput':
-      return Math.min(100, Math.round((value / 50) * 100))
-    case 'pipeline_velocity':
-      return Math.min(100, Math.round(value * 100))
-    default:
-      return 0
-  }
-}
-
-const getZoneColor = (zone: ThresholdZone | null) =>
-  zone ? THRESHOLD_ZONE_COLOR[zone] : ('secondary' as const)
-
-const QUALITY_PENDING_METRIC_IDS = new Set(['rpa', 'otd_pct', 'ftr_pct', 'cycle_time'])
-
 const shouldShowPendingClosures = (snapshot: IcoMetricSnapshot | null) =>
-  Boolean(snapshot && snapshot.context.totalTasks > 0 && snapshot.context.completedTasks === 0)
+  Boolean(snapshot && isPendingClosures(snapshot.context.totalTasks, snapshot.context.completedTasks))
 
 const EMPTY_NEXA_INSIGHTS: MemberNexaInsightsPayload = {
   summarySource: 'empty',
@@ -99,16 +82,6 @@ const KPI_CONFIG: Array<{ id: string; label: string; icon: string; format: (v: n
   { id: 'throughput', label: 'Throughput', icon: 'tabler-bolt', format: v => (v !== null ? String(Math.round(v)) : '—') },
   { id: 'cycle_time', label: 'Cycle Time', icon: 'tabler-hourglass', format: v => (v !== null ? `${v.toFixed(1)}d` : '—') },
   { id: 'stuck_assets', label: 'Stuck Assets', icon: 'tabler-alert-triangle', format: v => (v !== null ? String(Math.round(v)) : '—') }
-]
-
-// ── Trend Card Config (month-over-month area sparklines, Figma 11853:17766) ──
-// OTD% + FTR% own the richer trend card; both are "higher % is better" so the
-// green-up area reads correctly. Metric names are English by convention (the
-// canonical ICO metric names: On-Time Delivery, First Time Right).
-
-const TREND_CONFIG: Array<{ id: string; title: string; metricName: string }> = [
-  { id: 'otd_pct', title: 'OTD%', metricName: 'On-Time Delivery' },
-  { id: 'ftr_pct', title: 'FTR%', metricName: 'First Time Right' }
 ]
 
 // ── Component ─────────────────────────────────────────────────────────
@@ -248,7 +221,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
   // ── CSC Donut ───────────────────────────────────────────────────────
 
   const cscEntries = hasData
-    ? (['briefing', 'produccion', 'revision_interna', 'cambios_cliente', 'entrega'] as CscPhase[])
+    ? CSC_PHASE_ORDER
         .map(phase => {
           const entry = data.cscDistribution.find((e: CscDistributionEntry) => e.phase === phase)
 

@@ -59,6 +59,8 @@ export type NexaInsightsTimelineProps = {
   /** TASK-945 — V1 forward-compat: detail page TASK-947 V1.2 lo consumira;
    * el bento bento actual NO lo pasa todavia (backward-compat). */
   lifecycles?: NexaSignalLifecycle[]
+  /** TASK-1027 — access-aware mentions (non-navigable on self-service). */
+  safeMode?: boolean
 }
 
 // ─── Styled Timeline ────────────────────────────────────────────────────────
@@ -155,7 +157,15 @@ const DayHeader = ({ label, count }: { label: string; count: number }) => (
   </Box>
 )
 
-const TimelineEntry = ({ item, isLast }: { item: NexaTimelineItem; isLast: boolean }) => {
+const TimelineEntry = ({
+  item,
+  isLast,
+  safeMode
+}: {
+  item: NexaTimelineItem
+  isLast: boolean
+  safeMode: boolean
+}) => {
   const signalLabel = GH_NEXA.signal_type[item.signalType] ?? item.signalType
   const severityColor = GH_NEXA.severity_color[item.severity ?? ''] ?? 'secondary'
   const metricName = getMetricDisplayName(item.metricId)
@@ -193,6 +203,7 @@ const TimelineEntry = ({ item, isLast }: { item: NexaTimelineItem; isLast: boole
             <NexaMentionText
               text={item.explanation}
               variant='body2'
+              safeMode={safeMode}
               sx={{
                 color: 'text.secondary',
                 display: '-webkit-box',
@@ -204,7 +215,11 @@ const TimelineEntry = ({ item, isLast }: { item: NexaTimelineItem; isLast: boole
           )}
 
           {item.rootCauseNarrative && item.rootCauseNarrative.trim() && (
-            <NexaInsightRootCauseSection narrative={item.rootCauseNarrative} insightId={item.id} />
+            <NexaInsightRootCauseSection
+              narrative={item.rootCauseNarrative}
+              insightId={item.id}
+              safeMode={safeMode}
+            />
           )}
 
           {item.recommendedAction && (
@@ -224,6 +239,7 @@ const TimelineEntry = ({ item, isLast }: { item: NexaTimelineItem; isLast: boole
               <NexaMentionText
                 text={item.recommendedAction}
                 variant='body2'
+                safeMode={safeMode}
                 sx={{ color: theme => theme.palette.customColors.midnight }}
               />
             </Box>
@@ -236,7 +252,7 @@ const TimelineEntry = ({ item, isLast }: { item: NexaTimelineItem; isLast: boole
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
-const NexaInsightsTimeline = ({ insights }: NexaInsightsTimelineProps) => {
+const NexaInsightsTimeline = ({ insights, safeMode = false }: NexaInsightsTimelineProps) => {
   const now = useMemo(() => new Date(), [])
 
   const groups = useMemo(() => {
@@ -299,7 +315,7 @@ const NexaInsightsTimeline = ({ insights }: NexaInsightsTimelineProps) => {
             {group.items.map((item, itemIdx) => {
               const isLastInAll = group.isLastGroup && itemIdx === group.items.length - 1
 
-              return <TimelineEntry key={item.id} item={item} isLast={isLastInAll} />
+              return <TimelineEntry key={item.id} item={item} isLast={isLastInAll} safeMode={safeMode} />
             })}
           </Timeline>
         </Box>

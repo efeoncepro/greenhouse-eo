@@ -15,7 +15,8 @@ import {
   GreenhouseInlineValidation,
   GreenhouseInlineDecisionPrompt,
   GreenhouseStepperProgressMicro,
-  GreenhouseStateTransition
+  GreenhouseStateTransition,
+  GreenhouseThinkingBeat
 } from '@/components/greenhouse/primitives'
 import type {
   GreenhouseAsyncActionState,
@@ -33,8 +34,18 @@ import type {
   GreenhouseStepperProgressStep,
   GreenhouseStepperProgressVariant,
   GreenhouseStateTransitionTone,
-  GreenhouseStateTransitionVariant
+  GreenhouseStateTransitionVariant,
+  GreenhouseThinkingBeatKind,
+  GreenhouseThinkingBeatVariant
 } from '@/components/greenhouse/primitives'
+
+type ThinkingBeatExample = {
+  kind: GreenhouseThinkingBeatKind
+  variant: GreenhouseThinkingBeatVariant
+  title: string
+  description: string
+  label: string
+}
 
 type AsyncActionExample = {
   state: GreenhouseAsyncActionState
@@ -48,6 +59,37 @@ type AsyncActionExample = {
   variant?: 'contained' | 'tonal' | 'outlined'
   color?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'
 }
+
+const THINKING_BEAT_EXAMPLES: ThinkingBeatExample[] = [
+  {
+    kind: 'nexa',
+    variant: 'inline',
+    title: 'Nexa inline',
+    description: 'Beat decorativo dentro de una frase mientras cambia el mensaje contextual.',
+    label: 'Estoy separando señal de ruido'
+  },
+  {
+    kind: 'assistant',
+    variant: 'cluster',
+    title: 'Assistant cluster',
+    description: 'Señal compacta para prompts, sidecars o respuestas cortas sin parecer loader pesado.',
+    label: 'Preparando respuesta'
+  },
+  {
+    kind: 'sync',
+    variant: 'standalone',
+    title: 'Sync standalone',
+    description: 'Estado semántico para sincronizaciones cortas o handoffs donde conviene anunciar actividad.',
+    label: 'Sincronizando fuente externa'
+  },
+  {
+    kind: 'neutral',
+    variant: 'cluster',
+    title: 'Neutral utility',
+    description: 'Uso sobrio cuando la marca no debe dominar la superficie.',
+    label: 'Procesando'
+  }
+]
 
 type CommandFeedbackExample = {
   tone: GreenhouseCommandFeedbackTone
@@ -553,6 +595,51 @@ const AsyncActionCard = ({ example }: { example: AsyncActionExample }) => (
   </Card>
 )
 
+const ThinkingBeatCard = ({ example }: { example: ThinkingBeatExample }) => (
+  <Card
+    variant='outlined'
+    sx={theme => ({
+      backgroundColor: alpha(theme.palette.background.paper, 0.94)
+    })}
+  >
+    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.25 }}>
+      <Stack spacing={0.75}>
+        <Typography variant='h6'>
+          {example.title}
+        </Typography>
+        <Typography variant='body2' color='text.secondary'>
+          {example.description}
+        </Typography>
+        <Typography variant='caption' color='text.secondary'>
+          kind={example.kind} · variant={example.variant}
+        </Typography>
+      </Stack>
+      <Stack
+        direction='row'
+        spacing={1}
+        alignItems='center'
+        sx={theme => ({
+          minHeight: 44,
+          p: 1.5,
+          border: `1px solid ${alpha(theme.palette.text.primary, 0.08)}`,
+          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+          backgroundColor: alpha(theme.palette.text.primary, 0.018)
+        })}
+      >
+        <Typography variant='body2' color='text.secondary'>
+          {example.label}
+        </Typography>
+        <GreenhouseThinkingBeat
+          kind={example.kind}
+          variant={example.variant}
+          decorative={example.variant === 'inline'}
+          dataCapture={`thinking-beat-${example.kind}-${example.variant}`}
+        />
+      </Stack>
+    </CardContent>
+  </Card>
+)
+
 const CommandFeedbackCard = ({ example }: { example: CommandFeedbackExample }) => (
   <GreenhouseCommandFeedback
     tone={example.tone}
@@ -709,6 +796,43 @@ const MicrointeractionsLabSection = () => (
       <Stack spacing={1}>
         <Typography variant='overline' color='primary'>
           Microinteractions Lab
+        </Typography>
+        <Typography variant='h5'>
+          Microinteracciones reutilizables
+        </Typography>
+        <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
+          Base para feedback localizado, a11y y reduced-motion en comandos, asistencia contextual, validaciones, procedencia,
+          evidencia y decisiones inline.
+        </Typography>
+      </Stack>
+      <Box data-capture='thinking-beat-lab' sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Stack spacing={1}>
+          <Typography variant='overline' color='primary'>
+            Thinking beat
+          </Typography>
+          <Typography variant='h5'>
+            Señal viva para asistencia contextual
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 820 }}>
+            Microinteraccion breve para comunicar que un asistente, sync o contexto esta preparando el siguiente mensaje. No reemplaza
+            loaders de procesos largos; acompaña transiciones cortas sin mover el layout.
+          </Typography>
+        </Stack>
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }
+          }}
+        >
+          {THINKING_BEAT_EXAMPLES.map(example => (
+            <ThinkingBeatCard key={`${example.kind}-${example.variant}`} example={example} />
+          ))}
+        </Box>
+      </Box>
+      <Stack spacing={1}>
+        <Typography variant='overline' color='primary'>
+          Async action button
         </Typography>
         <Typography variant='h5'>
           Acciones async reutilizables

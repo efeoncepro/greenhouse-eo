@@ -1,7 +1,5 @@
 'use client'
 
-import Link from 'next/link'
-
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -14,7 +12,6 @@ import { alpha } from '@mui/material/styles'
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import {
   GreenhouseActivityTimeline,
-  GreenhouseButton,
   GreenhouseChip,
   GREENHOUSE_ACTIVITY_TIMELINE_TOKENS,
   type GreenhouseActivityTimelineItem
@@ -22,8 +19,6 @@ import {
 import { typographyScale } from '@/components/theme/typography-tokens'
 
 import { DESIGN_SYSTEM_LAB_TOKENS } from './design-system-lab-tokens'
-
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 
 const activityTimelineItems: GreenhouseActivityTimelineItem[] = [
   {
@@ -153,18 +148,6 @@ const UtilitiesLabView = () => (
     }}
   >
     <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.layout.headerGap}>
-      <GreenhouseButton
-        component={Link}
-        href={DESIGN_SYSTEM_ROUTE}
-        variant='text'
-        tone='secondary'
-        size='small'
-        kind='navigation'
-        leadingIconClassName='tabler-arrow-left'
-        sx={{ alignSelf: 'flex-start', px: 0 }}
-      >
-        Design System
-      </GreenhouseButton>
       <AxisWordmark variant='auto' height={DESIGN_SYSTEM_LAB_TOKENS.layout.logoBlockSize} sx={{ mb: 0.5 }} />
       <Typography variant='overline' color='primary'>
         Utilities Lab

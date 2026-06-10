@@ -84,6 +84,12 @@ export type NexaInsightsBlockProps = {
    * Pattern: server-side SSOT; UI solo renderiza, no deriva.
    */
   dataStatus?: NexaInsightsDataStatusUi
+  /**
+   * TASK-1027 — Access-aware mentions. When `true`, every Nexa mention renders
+   * as a non-navigable chip (no links to `/people`, `/agency/spaces`, …). Used
+   * on self-service surfaces (`/my/*`). Default `false` keeps admin navigation.
+   */
+  mentionSafeMode?: boolean
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -130,7 +136,17 @@ const STAGGER_ITEM = {
   })
 }
 
-const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: number; animate: boolean }) => {
+const InsightCard = ({
+  item,
+  index,
+  animate,
+  mentionSafeMode
+}: {
+  item: NexaInsightItem
+  index: number
+  animate: boolean
+  mentionSafeMode: boolean
+}) => {
   const signalLabel = GH_NEXA.signal_type[item.signalType] ?? item.signalType
   const severityColor = GH_NEXA.severity_color[item.severity ?? ''] ?? 'secondary'
   const metricName = getMetricDisplayName(item.metricId)
@@ -205,6 +221,7 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
           <NexaMentionText
             text={item.explanation}
             variant='body2'
+            safeMode={mentionSafeMode}
             sx={{
               color: 'text.secondary',
               display: '-webkit-box',
@@ -217,7 +234,11 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
 
         {/* Root cause narrative (collapsible) */}
         {item.rootCauseNarrative && item.rootCauseNarrative.trim() && (
-          <NexaInsightRootCauseSection narrative={item.rootCauseNarrative} insightId={item.id} />
+          <NexaInsightRootCauseSection
+            narrative={item.rootCauseNarrative}
+            insightId={item.id}
+            safeMode={mentionSafeMode}
+          />
         )}
 
         {/* Recommended action */}
@@ -235,6 +256,7 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
             <NexaMentionText
               text={item.recommendedAction}
               variant='body2'
+              safeMode={mentionSafeMode}
               sx={{ color: theme => theme.palette.customColors.midnight }}
             />
           </Box>
@@ -266,7 +288,8 @@ const NexaInsightsBlock = ({
   runStatus,
   defaultExpanded,
   timelineInsights,
-  dataStatus
+  dataStatus,
+  mentionSafeMode = false
 }: NexaInsightsBlockProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
@@ -455,7 +478,13 @@ const NexaInsightsBlock = ({
                 <AnimatePresence>
                   <Stack spacing={1.5}>
                     {insights.map((item, i) => (
-                      <InsightCard key={item.id} item={item} index={i} animate={!prefersReduced} />
+                      <InsightCard
+                        key={item.id}
+                        item={item}
+                        index={i}
+                        animate={!prefersReduced}
+                        mentionSafeMode={mentionSafeMode}
+                      />
                     ))}
                   </Stack>
                 </AnimatePresence>
@@ -463,7 +492,7 @@ const NexaInsightsBlock = ({
             )}
 
             {activeView === 'timeline' && timelineInsights && (
-              <NexaInsightsTimeline insights={timelineInsights} />
+              <NexaInsightsTimeline insights={timelineInsights} safeMode={mentionSafeMode} />
             )}
 
             {/* Nexa disclaimer */}

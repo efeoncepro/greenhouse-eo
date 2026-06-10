@@ -59,14 +59,15 @@ Global modern-ui recommends OKLCH for new systems. Greenhouse uses MUI's sRGB pa
 
 Do NOT introduce OKLCH tokens, `color-mix()`, or P3 colors in Greenhouse components. Use `var(--mui-palette-primary-main)` and opacity variants.
 
-### 3. Border-radius — use `theme.shape.customBorderRadius.*`, NOT multipliers
+### 3. Border-radius — use `theme.shape.customBorderRadius.*` as CSS px in `sx`, NOT multipliers
 
 ```tsx
 // CORRECT
-sx={theme => ({ borderRadius: theme.shape.customBorderRadius.lg })}  // 8px
+sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })}  // 8px
 
 // WRONG
 sx={{ borderRadius: 3 }}  // 18px — off-scale
+sx={theme => ({ borderRadius: theme.shape.customBorderRadius.lg })}  // numeric token becomes an sx multiplier
 sx={{ borderRadius: '12px' }}  // hardcoded
 ```
 
@@ -128,7 +129,7 @@ Do not repeat these. Full list in `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1
 1. **Monospace for numbers** → use `tabular-nums`
 2. **Popover + Select combo** → use `CustomAutocomplete`
 3. **Empty state with 3 semantic-colored CTAs** → 1 primary + N tonal secondary
-4. **`borderRadius: 2.5`, `borderRadius: 3`** → use customBorderRadius tokens
+4. **`borderRadius: 2.5`, `borderRadius: 3`, numeric `customBorderRadius.*` in `sx`** → use customBorderRadius tokens as CSS px strings
 5. **Icon sizes 14/17/21/24** → stick to {14, 16, 18, 20, 22}
 6. **`<Box>` layouts where `<Card>` fits** → use Vuexy card pattern
 7. **Empty state as plain paragraph** → `EmptyState` primitive
@@ -144,7 +145,7 @@ Before writing a single line of UI code, agents MUST answer:
 - [ ] Did I count clicks for every interaction I'll build?
 - [ ] Did I choose font variants from the canonical scale (h4/h5/subtitle1/body1/body2/caption/overline)?
 - [ ] Did I choose spacing from the canonical scale (multiples of 4)?
-- [ ] Did I choose borderRadius from `theme.shape.customBorderRadius.*`?
+- [ ] Did I choose borderRadius from `theme.shape.customBorderRadius.*` and emit it as a CSS px string inside `sx`?
 - [ ] Am I using `color='success|warning|error|info'` only for semantic states?
 - [ ] Am I using `fontVariantNumeric: 'tabular-nums'` (NOT monospace) for numbers?
 
@@ -182,7 +183,7 @@ If this overlay says X but runtime says Y, **runtime wins** and this overlay mus
 
 Al implementar cualquier diseño (especialmente desde Figma), **Figma es intención, no valores literales**. Antes de escribir JSX, correr 2 gates (contrato canónico completo en CLAUDE.md / AGENTS.md → "Figma Implementation Contract"):
 
-1. **Token mapping (siempre):** color → `theme.palette.*` / `theme.axis.*` / `var(--mui-palette-*)`; tipografía → variant/SoT (skill `typography-design`); spacing/radius → spacing scale `4n` / `theme.shape.customBorderRadius.*`; motion → `motion/core/tokens.ts`. **NUNCA** transcribir HEX/px/fontFamily/ms crudos. Del MCP Figma usar `get_variable_defs` + `get_code_connect_map` → **mapear, no pegar**. Lint: `greenhouse/no-hardcoded-hex-color` + `no-hardcoded-fontfamily` + `no-fontsize-inline-typography`.
+1. **Token mapping (siempre):** color → `theme.palette.*` / `theme.axis.*` / `var(--mui-palette-*)`; tipografía → variant/SoT (skill `typography-design`); spacing → scale `4n`; radius → `theme.shape.customBorderRadius.*` **como CSS length en `sx`**, no como número directo; motion → `motion/core/tokens.ts`. **NUNCA** transcribir HEX/px/fontFamily/ms crudos. Del MCP Figma usar `get_variable_defs` + `get_code_connect_map` → **mapear, no pegar**. Lint: `greenhouse/no-hardcoded-hex-color` + `no-hardcoded-fontfamily` + `no-fontsize-inline-typography`.
 2. **Primitive lookup en capas (ANTES de construir):** (a) ¿existe **primitive Greenhouse**? grep `src/components/greenhouse/primitives/index.ts` (~79 exports) + `docs/architecture/ui-platform/PRIMITIVES.md` → **usar o expandir** (variant/kind, no fork paralelo); (b) ¿hay **wrapper Vuexy `Custom*`** o componente MUI base (Select/Autocomplete/List/TextField/Menu…)? → la primitive nueva **envuelve esa base** (hereda a11y/teclado/estados), NUNCA reinventar input/select/list/dropdown desde cero; (c) solo si no hay nada → desde cero.
 
 **Si hay que crear una primitive nueva (dropdown/list/input/etc.):** protocolo Primitive+Variants+Kinds COMPLETO — vive en `primitives/` + export en barrel + resolver `kind→variant`; a11y/responsive/reduced-motion horneados; **cero hardcode** (solo tokens); **Lab interno** `/admin/design-system/<nombre>` (gate `administracion.design_system`, alcanzable por nav + route-reachability); **GVC** desktop+mobile mirada; nodo AXIS Figma referenciado; contrato en `ui-platform/PRIMITIVES.md` (+ ADR si platform-level). Patrón fuente: `GreenhouseButton`/`GreenhouseChip`/`GreenhouseActivityTimeline`/chart cards.

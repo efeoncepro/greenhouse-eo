@@ -6,6 +6,283 @@
 
 ---
 
+## Delta 2026-06-10d — Disclosure primitives (trigger rotatorio + anchored disclosure)
+
+TASK-1072. Se canonizaron dos primitives nuevas en `src/components/greenhouse/primitives/`:
+
+- **`GreenhouseDisclosureTrigger`** — átomo: botón icono (wrappea MUI `IconButton`, `forwardRef`)
+  que **rota para señalar abierto/cerrado**. Es el único motion (vía `theme.transitions` +
+  reduced-motion horneado). Variants: `addToggle` (`+`→`×`, 45°), `expand` (chevron, 180°),
+  `reveal` (kebab `⋮`→`⋯`, 90°). Kinds: `linkResource`·`addEntry` → addToggle,
+  `expandSection`·`showFilters` → expand, `moreActions` → reveal. a11y: `ariaLabel` obligatorio +
+  `aria-expanded`. Usable solo (acordeón, alternar) o como ancla de un disclosure.
+- **`GreenhouseAnchoredDisclosure`** — higher-order primitive: **compone** el trigger +
+  `GreenhouseFloatingSurface` + un slot `companion` (acción a la derecha). NO forkea FloatingSurface;
+  cada variant resuelve a un par (surface variant + trigger variant): `contextualEditor` →
+  inlineEditor+addToggle, `actionMenu` → actionMenu+reveal, `quickPeek` → evidencePeek+reveal. Kinds:
+  `figmaNodeLink` → contextualEditor, `quickAdd`·`contextualOptions` → actionMenu, `evidence` → quickPeek.
+
+`FigmaNodeLinkAffordance` (TASK-1072) se refactorizó para **consumir** `GreenhouseAnchoredDisclosure
+kind='figmaNodeLink'` (deja de ser impl paralela). Controllers con resolver `kind→variant` + config
+frozen (tests). Lab interno `/design-system/disclosure` (registrado en el catálogo, route-reachability,
+scenario GVC `design-system-disclosure`, breadcrumb label). Nodo AXIS Figma pendiente (el botón Figma
+del shell aparece inactivo en esa página — señal para crearlo). Tokenizado (radius CSS length, colores
+de tema, motion tokens); cero hardcode. GVC desktop+mobile mirada.
+
+## Delta 2026-06-10c — Design System breadcrumbs shell
+
+El Design System interno hereda breadcrumbs canónicos en todas sus páginas y
+mockups internos.
+
+- `src/app/(dashboard)/admin/design-system/layout.tsx` envuelve todo el subtree
+  con `DesignSystemBreadcrumbShell`.
+- El shell compone `GreenhouseBreadcrumbs kind='pageHierarchy'` y resuelve la
+  jerarquía `Admin / Design System / Página`, con parent real para
+  `Typography / Typography Mockup`.
+- Las rutas nuevas bajo `/admin/design-system` quedan cubiertas por fallback de
+  label, pero deben agregarse al mapa del shell cuando necesiten nombre
+  editorial o parent específico.
+- Como consecuencia del shell, los labs y mockups del Design System no deben
+  renderizar CTAs locales de retorno al catálogo (`Design System`, `Volver al
+  sistema`, `Volver al catálogo`) en el header o secciones de reglas; ese
+  retorno vive en el breadcrumb global. Se conservan solo links no redundantes
+  como nodos Figma, links entre labs o specimens de botones.
+
+## Delta 2026-06-10b — Radius token sx gotcha
+
+Se documenta una trampa recurrente del stack MUI/Vuexy: `borderRadius` numérico
+en `sx` se transforma como multiplicador de `theme.shape.borderRadius`, no como
+px directo.
+
+- `theme.shape.customBorderRadius.*` guarda números en px (`2/4/6/8/10`), pero
+  dentro de `sx` deben emitirse como CSS length (`'4px'`, `'6px'`, etc.).
+- Queda prohibido presentar `borderRadius:
+  theme.shape.customBorderRadius.*` como ejemplo correcto dentro de `sx`, porque
+  puede inflar el radio visual.
+- `DESIGN.md`, `ui-platform/STACK.md` y las skills locales de Codex/Claude se
+  sincronizan para que agentes no repitan el error en labs, mockups o primitives.
+
+## Delta 2026-06-10a — GreenhouseBreadcrumbs primitive
+
+La navegación jerárquica de Greenhouse deja de depender de usos MUI crudos y
+queda canonizada como primitive AXIS/Greenhouse.
+
+- `GreenhouseBreadcrumbs` vive en `src/components/greenhouse/primitives/` y
+  envuelve MUI Breadcrumbs para preservar semántica `nav`/links/`aria-current`.
+- Variants oficiales: `default` (port del componente AXIS Figma
+  `Breadcrumbs Greenhouse`, node `205:234905`) y `compact` (headers densos,
+  inspectors y workbenches).
+- Kinds oficiales: `pageHierarchy`, `workbenchHierarchy`,
+  `designSystemSpecimen`, `legacy` y `custom`, resueltos por
+  `greenhouse-breadcrumbs-controller.ts`.
+- Separators oficiales: `slash` (default AXIS) y `chevron` (compat legacy).
+  El wrapper viejo `Breadcrumb` delega en la primitive con `kind='legacy'`.
+- Hoja viva interna: `/admin/design-system/breadcrumbs`; catálogo DS y
+  route-reachability actualizados; scenario GVC:
+  `design-system-breadcrumbs`.
+- Regla de uso: no duplicar breadcrumbs con botones "volver"; ancestors son
+  links reales y el último item es current page con `aria-current='page'`.
+
+## Delta 2026-06-09i — Efeonce orbital signature lab
+
+La identidad institucional de Efeonce suma un lab interno de motion para probar
+una firma orbital del wordmark sin tocar el asset principal.
+
+- `public/branding/logo-full.svg` permanece intacto como asset canónico.
+- Se creó una copia experimental con IDs semánticos en
+  `public/branding/experiments/efeonce-logo-full-orbit-motion-copy.svg` para
+  iteración visual.
+- `EfeonceOrbitalLogoMark` queda como primitive de hardening para motion de
+  marca institucional: variants `static`, `orbitalSignature` y `ambient`;
+  kinds `institutionalWordmark` y `motionSpecimen`.
+- La animación usa `useGreenhouseGSAP` y respeta reduced-motion. El círculo
+  superior (`#efeonce-orbiting-satellite-circle`) recorre el óvalo que forma la
+  O/nave; `#efeonce-orbit-top-bridge` completa la pista superior cuando el punto
+  abandona su posición original.
+- Hoja viva: `/admin/design-system/efeonce-brand`; scenario GVC:
+  `design-system-efeonce-brand`.
+
+## Delta 2026-06-09h — Nexa animated mark + animated ask badge canon
+
+El mark de Nexa queda formalizado como familia canónica de primitives de marca
+y microinteracción, no como variantes locales por surface.
+
+- `GreenhouseNexaBrandMark` sigue siendo la primitive estática base de
+  identidad Nexa. Kinds oficiales: `askNexaBadge`, `badgeIcon`,
+  `inlineMark`, `monoMark`.
+- `GreenhouseNexaAnimatedMark` agrega dos capacidades oficiales:
+  reproducción Rive cuando existe un `.riv` exportado desde Rive Editor, y
+  fallback GSAP tokenizado cuando no existe asset Rive o se necesita motion
+  ligero. Props canónicas: `autoBlink`, `blinkCadence`,
+  `ambientMoments`, `ambientMoment`, `chrome`, `tone`, `decorative`.
+- Momentos GSAP oficiales: `autoBlink` para presencia viva ocasional,
+  `arcSparklePlay` para juego arco-sparkle y `signalCatch` para captura de
+  señal. El scheduler evita solapes y respeta reduced-motion.
+- `GreenhouseNexaAnimatedAskBadge` es la versión animada oficial del badge
+  `Pregúntale a Nexa`. No reemplaza el kind estático `askNexaBadge`; se usa
+  solo cuando un entry point debe sentirse vivo sin convertirse en loader.
+- `NexaGreetingsCard` expone `askBadgeVariant='static' | 'animated'`; el
+  default es `static`. `GreenhouseFunnelChartCard` activa
+  `askBadgeVariant='animated'` para
+  `GreenhouseNexaGreeting kind='funnelStageAdvisor'`.
+- El FAB global de Nexa usa `GreenhouseNexaAnimatedMark` con `autoBlink` +
+  `ambientMoments`; su aura hover/focus vive detrás del botón y no debe
+  lavarle el mark.
+- Evidencia canónica: micro GVC del badge animado en lab Nexa
+  `.captures/2026-06-09T20-52-25_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-animated-ask-badge-hero`,
+  micro GVC del consumer en charts
+  `.captures/2026-06-09T20-57-11_micro-admin-design-system-charts-data-capture-nexa-ask-badge-animated`,
+  ambient moments
+  `.captures/2026-06-09T20-24-18_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-arc-sparkle-specimen`
+  /
+  `.captures/2026-06-09T20-24-19_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-signal-catch-specimen`
+  y hover aura `.captures/2026-06-09T20-46-22_nexa-floating-hover-glow`.
+
+## Delta 2026-06-09g — Funnel Analysis Pattern
+
+La familia del funnel queda nombrada como **Funnel Analysis Pattern** en la capa
+de patrones de UI Platform.
+
+- Pattern: `Funnel Analysis Pattern`.
+- Composition oficial: `GreenhouseFunnelChartCard`.
+- Zone primitives: `GreenhouseFunnelHeaderControls`,
+  `GreenhouseFunnelKpiStrip`, `GreenhouseFunnelStageRail`,
+  `GreenhouseFunnelStageSegment`, `GreenhouseFunnelDiagnosticsGrid`.
+- Asistencia contextual: `GreenhouseNexaGreeting kind='funnelStageAdvisor'`.
+- Kinds iniciales: `cscPipeline`, `commercialLifecycle`, `quoteToCash`,
+  `onboardingActivation`, `custom`.
+- Regla de gobierno: nuevos workflows entran como `kind` y resuelven a una
+  `variant`; las zonas se extienden solo cuando cambia una responsabilidad
+  local. No copiar geometría del rail ni crear charts paralelos para el mismo
+  análisis.
+- Hoja viva: `/admin/design-system/charts`, sección
+  `data-capture='funnel-primitive-anatomy'`.
+
+## Delta 2026-06-09f — Funnel chart anatomy primitives + Nexa stage advisor kind
+
+`GreenhouseFunnelChartCard` deja de ser una composición monolítica para quedar
+como una familia de primitives de zona reutilizables, manteniendo el chart
+completo como entrypoint oficial.
+
+- Chart completo: `GreenhouseFunnelChartCard`.
+- Zone primitives exportadas desde el mismo módulo:
+  `GreenhouseFunnelHeaderControls`, `GreenhouseFunnelKpiStrip`,
+  `GreenhouseFunnelStageRail`, `GreenhouseFunnelStageSegment` y
+  `GreenhouseFunnelDiagnosticsGrid`.
+- Variants oficiales del funnel: `operationalPipeline`,
+  `conversionPipeline`, `lifecyclePipeline`.
+- Mapping inicial de kinds:
+  `cscPipeline -> operationalPipeline`,
+  `quoteToCash -> conversionPipeline`,
+  `commercialLifecycle/onboardingActivation -> lifecyclePipeline`.
+- `GreenhouseFunnelStageRail` concentra la geometría sensible: SVG rail,
+  fills por etapa, separadores internos, borde exterior único, scroll mobile,
+  selection/focus/tooltip y summary accesible. No copiar el rail en consumers.
+- `GreenhouseNexaGreeting` nace como facade primitive sobre el greeting
+  existente de Nexa. Kinds iniciales: `homeOperatorGreeting`,
+  `funnelStageAdvisor`, `custom`; el funnel usa
+  `kind='funnelStageAdvisor'` para interpretar la etapa activa.
+- `/admin/design-system/charts` documenta la anatomía del funnel y el scenario
+  `design-system-charts` captura `funnel-primitive-anatomy`.
+
+## Delta 2026-06-09e — Thinking Beat microinteraction primitive
+
+Greenhouse suma **`GreenhouseThinkingBeat`** como primitive canónica para los
+tres dots de pensamiento/actividad breve que empezaron en el prompt compacto de
+Nexa dentro de `GreenhouseFunnelChartCard`.
+
+- Runtime: `src/components/greenhouse/primitives/GreenhouseThinkingBeat.tsx`.
+- Controller: `greenhouse-thinking-beat-controller.ts` gobierna variants,
+  kinds y timings; no copiar dots/timings por consumer.
+- Variants oficiales: `inline`, `cluster`, `standalone`.
+- Kinds semánticos: `nexa`, `assistant`, `sync`, `neutral`.
+- A11y: por defecto anuncia `role='status'` con `aria-label`; cuando vive
+  dentro de una frase legible debe usarse `decorative` para no duplicar el
+  mensaje en screen readers.
+- Reduced motion: la primitive apaga el pulso y deja dots estáticos.
+- Frontera: no reemplaza `GreenhouseLoadingSurface` ni loaders de procesos
+  largos; comunica un beat corto entre mensajes, respuestas o syncs compactos.
+- Hoja viva: `/admin/design-system/microinteractions`, scenario
+  `design-system-microinteractions` captura `thinking-beat-lab`.
+
+## Delta 2026-06-09d — Nexa brand mark primitive
+
+La capa UI Platform suma **`GreenhouseNexaBrandMark`** en
+`src/components/greenhouse/primitives/` para representar la identidad de Nexa
+sin componer iconos sueltos por surface.
+
+- Kinds iniciales: `askNexaBadge` (badge Midnight Navy con label
+  `Pregúntale a Nexa`), `badgeIcon`, `inlineMark` y `monoMark`.
+- Variante animada separada: `GreenhouseNexaAnimatedAskBadge` renderiza el
+  mismo badge `Pregúntale a Nexa` con `GreenhouseNexaAnimatedMark` y el blink
+  del FAB, sin sustituir el kind estático `askNexaBadge` por defecto.
+- Source visual: `public/images/nexa-mark/nexa-mark.svg`,
+  `nexa-mark-mono.svg`, `nexa-badge.svg` y spec
+  `public/images/nexa-mark/nexa-icon-spec.md`.
+- Regla de marca: la unidad mínima es arco + sparkle. No usar
+  `tabler-sparkles` solo como representación de Nexa porque la chispa aislada
+  puede leerse como proveedor AI, no como Nexa.
+- Hoja viva: `/admin/design-system/nexa-brand` (gate
+  `administracion.design_system`) muestra specimen principal, matriz de kinds,
+  sizes y reglas de uso/cambio antes de agregar nuevas variantes.
+- Primer consumer: `NexaGreetingsCard variant='compactContextual'` dentro de
+  `GreenhouseFunnelChartCard`, donde el badge vive encima del input de chat sin
+  agregar elevation ni competir con el gráfico.
+- Evidencia: GVC `design-system-nexa-brand` local
+  `.captures/2026-06-09T17-17-52_design-system-nexa-brand`
+  (desktop/mobile, `qualityFindings=[]`) + GVC `design-system-charts`
+  `.captures/2026-06-09T18-35-44_design-system-charts` para el primer consumer
+  + micro evidence
+  `.captures/2026-06-09T20-52-25_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-animated-ask-badge-hero`
+  para el badge animado.
+
+## Delta 2026-06-09c — Greenhouse Funnel Chart primitive
+
+La familia de chart primitives suma **`GreenhouseFunnelChartCard`** en
+`src/components/greenhouse/primitives/` con `variant='operationalPipeline'` y
+kinds iniciales `cscPipeline` / `commercialLifecycle` / `quoteToCash` /
+`onboardingActivation` / `custom`.
+
+- V1 implementa el funnel operativo horizontal como rail interactivo custom
+  dentro de la primitive: etapas con icono, volumen, SLA, retención, selección
+  keyboard-accessible, grid de diagnóstico (bloqueos, owner, freshness),
+  insight lateral, reduced motion y summary accesible.
+- El upgrade de robustez separa color de proceso y salud operativa: `stageRole`
+  gobierna la rampa visual de etapas (`intake` → `delivery`), mientras
+  `health`/diagnostics gobiernan dots, chips y explicación. La primitive
+  normaliza valores inválidos, degrada a empty state honesto sin etapas y usa
+  `NexaGreetingsCard variant='compactContextual'` para interpretación asistida:
+  prompt dock blanco y centrado, guía contextual en primera persona rotando
+  lentamente sobre un input estable con `GreenhouseThinkingBeat kind='nexa'`
+  antes del cambio, título/foco en tooltip y sin elevation/shadow; owner y
+  freshness viven en la tabla de diagnóstico para evitar duplicidad. La voz de
+  Nexa se mantiene técnica con un toque incisivo y se ancla a la cadena ICO
+  (retención, caídas, Cycle Time, TTM, FTR/RpA).
+- Recharts sigue siendo la librería canónica para charts reales y queda
+  reservado para futuras variants verticales basadas en `FunnelChart/Funnel`;
+  la variante horizontal no fuerza esa geometría porque el contrato visual es un
+  pipeline de proceso con microinteracciones ricas.
+- El lab interno `/admin/design-system/charts` ahora muestra el specimen
+  `cscPipeline` y el scenario GVC `design-system-charts` captura full-page +
+  clip de la primitive desktop/wide/mobile.
+- Responsive/layout: el rail se dibuja en una sola capa SVG detrás del contenido
+  para mantener lectura de pipeline continuo sin solapes DOM ni texto dentro de
+  máscaras. Cada segmento reserva padding para el chevron, los fills light usan
+  `color-mix(...)` sólido para evitar puntas más oscuras por alpha compuesto, y
+  `rail.cornerRadius` redondea levemente el rail sin perder dirección
+  operacional. La geometría final usa stage paths sin stroke, separadores
+  internos clippeados con apex suavizado y un único borde exterior SVG
+  redondeado; no hay líneas superiores duplicadas ni strokes compitiendo en los
+  caps externos. El strip superior usa layout determinístico de KPIs separado
+  del rail por divider tokenizado para no truncar ni solapar texto. Los labels
+  de rol (`Entrada`, `Producción`, etc.) quedan fuera del rail visual
+  porque el título de etapa ya nombra el paso; el rol permanece en `aria-label`
+  y summary accesible. El overflow horizontal queda como fallback mobile del
+  rail, no como scroll de página/Lab.
+- Guardrails: nuevos kinds deben entrar primero al Charts Lab con
+  `data-capture`, contrato de etapas ordenadas, retención calculada por domain
+  reader y estados que no dependan solo de color.
+
 ## Delta 2026-06-09b — Assigned Team health chart, talent dossier y verification primitives
 
 El mockup aprobado de `Equipo asignado` promovió tres piezas route-locales a

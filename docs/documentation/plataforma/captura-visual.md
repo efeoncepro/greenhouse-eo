@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.1
 > **Creado:** 2026-05-12 por Claude (round 4 deep audit / sesión de microinteractions)
-> **Ultima actualizacion:** 2026-05-30 por Codex
+> **Ultima actualizacion:** 2026-06-09 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md)
 > **Manual operativo:** [captura-visual-playwright.md](../../manual-de-uso/plataforma/captura-visual-playwright.md)
 
@@ -25,7 +25,8 @@ El orden esperado es:
 2. Si no hay scenario, usar `pnpm fe:capture --route=<path> --env=staging --hold=3000`.
 3. Si la revisión requiere checklist UI/UX, correr `pnpm fe:capture:review`.
 4. Si se compara antes/después, correr `pnpm fe:capture:diff`.
-5. Solo usar Playwright ad-hoc como complemento para consola, red, payloads API o un gesto no soportado por el DSL; los artifacts igual deben quedar bajo `.captures/`.
+5. Si se necesita ver motion fino de un selector concreto, correr `pnpm fe:capture:micro`.
+6. Solo usar Playwright ad-hoc como complemento para consola, red, payloads API o un gesto no soportado por el DSL; los artifacts igual deben quedar bajo `.captures/`.
 
 ## Para qué sirve
 
@@ -37,6 +38,7 @@ El orden esperado es:
 | "Quiero capturar una sección específica después de hacer scroll" | scenario con `scroll selector` + `mark clipSelector` |
 | "Quiero comparar antes/después" | `pnpm fe:capture:diff .captures/<prev> .captures/<curr>` |
 | "Quiero revisar la salud de capturas recientes" | `pnpm fe:capture:health` |
+| "Quiero ver el parpadeo/easing de un elemento en frames" | `pnpm fe:capture:micro --route=/ruta --selector='[data-capture="x"]'` |
 | "Necesito un GIF para adjuntar al PR review" | mismo comando + `--gif` |
 | "Quiero ver el browser mientras corre" | mismo comando + `--headed` |
 
@@ -153,7 +155,7 @@ Esta doble confirmación previene que alguien grabe un screenshot y termine crea
 | Cookie de agent expirada (a 24h) | Detección automática + refresh proactivo si <1h restante |
 | Password / secret en el recording | CSS blur + transparent + text-shadow sobre password inputs |
 | Outputs commiteados al repo | `.captures/` está en `.gitignore` |
-| Capturas viejas acumulando GBs | `pnpm fe:capture:gc --apply` purga >30 días |
+| Capturas viejas acumulando GBs | `pnpm fe:capture:gc --apply` purga >30 días; `--max-gb` + `--keep` controlan tamaño total |
 | Scroll que cambia por copy o layout | Selectores estables + `scrollBlock` + `clipSelector` |
 | Captura incompleta de pantallas largas | `mark fullPage: true` |
 | Scenarios mutating ejecutándose sin querer | Doble flag (`mutating: true` + `safeForCapture: true`) requerido |

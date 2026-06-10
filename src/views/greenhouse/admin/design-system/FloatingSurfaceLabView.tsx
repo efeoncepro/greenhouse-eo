@@ -2,8 +2,6 @@
 
 import type { ReactNode } from 'react'
 
-import Link from 'next/link'
-
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -335,18 +333,6 @@ const FloatingSurfaceLabView = () => (
     }}
   >
     <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.layout.headerGap}>
-      <GreenhouseButton
-        component={Link}
-        href={DESIGN_SYSTEM_LAB_TOKENS.routes.root}
-        variant='text'
-        tone='secondary'
-        kind='navigation'
-        size='small'
-        leadingIcon={<i className='tabler-arrow-left' />}
-        sx={{ alignSelf: 'flex-start', px: 0 }}
-      >
-        Design System
-      </GreenhouseButton>
       <AxisWordmark
         variant='auto'
         height={DESIGN_SYSTEM_LAB_TOKENS.layout.logoBlockSize}

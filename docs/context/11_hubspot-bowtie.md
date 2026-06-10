@@ -116,3 +116,5 @@ NRR (Net Revenue Retention) es la **métrica reina** del Bow-tie, meta **>110%**
 ---
 
 *Fuente: Arquitectura de Pipelines HubSpot Efeonce v1.0 + Arquitectura Bow-tie Efeonce v1.1. Glosario de métricas de negocio (NRR, buckets): `06`.*
+
+*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*

@@ -118,95 +118,123 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Preferencias personales de notificaciones. Link en UserDropdown pendiente (TASK-983 follow-up); alcanzable por URL directa mientras tanto.'
   },
   {
-    route: '/admin/design-system/colors',
-    parent: '/admin/design-system',
+    route: '/design-system/colors',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Color AXIS Lab — child surface del Design System para ramps, opacidades, contraste y neutrales; alcanzable desde el catalogo canonico /admin/design-system.'
+      'Color AXIS Lab — child surface del Design System para ramps, opacidades, contraste y neutrales; alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/loaders',
-    parent: '/admin/design-system',
+    route: '/design-system/disclosure',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Disclosure Lab (TASK-1072) — child surface del Design System para GreenhouseDisclosureTrigger (+ rotatorio) y GreenhouseAnchoredDisclosure; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/loaders',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
       'Loading Lab (TASK-1037) — child surface del Design System, alcanzable desde la referencia interna de tokens AXIS sin mezclar loaders en la pagina canonica de color.'
   },
   {
-    route: '/admin/design-system/microinteractions',
-    parent: '/admin/design-system',
+    route: '/design-system/microinteractions',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Microinteractions Lab — child surface del Design System para primitives de feedback de comandos async, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Microinteractions Lab — child surface del Design System para primitives de feedback de comandos async, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/typography',
-    parent: '/admin/design-system',
+    route: '/design-system/typography',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Referencia canonica de tipografia (TASK-1044) — child surface del Design System, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Referencia canonica de tipografia (TASK-1044) — child surface del Design System, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/chips',
-    parent: '/admin/design-system',
+    route: '/design-system/chips',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/buttons',
-    parent: '/admin/design-system',
+    route: '/design-system/buttons',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Buttons Lab — child surface del Design System para la primitive GreenhouseButton basada en AXIS Figma, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Buttons Lab — child surface del Design System para la primitive GreenhouseButton basada en AXIS Figma, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/charts',
-    parent: '/admin/design-system',
+    route: '/design-system/breadcrumbs',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Charts Lab — child surface del Design System para primitives de visualizacion de datos, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Breadcrumbs Lab — child surface del Design System para la primitive GreenhouseBreadcrumbs basada en AXIS Figma, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/talent-profile',
-    parent: '/admin/design-system',
+    route: '/design-system/charts',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Talent Profile Lab — child surface del Design System para dossier/verificacion de talento, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Charts Lab — child surface del Design System para primitives de visualizacion de datos, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/utilities',
-    parent: '/admin/design-system',
+    route: '/design-system/nexa-brand',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Utilities Lab — child surface del Design System para primitives utilitarias como Activity Timeline, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Nexa Brand Mark Lab — child surface del Design System para la primitive GreenhouseNexaBrandMark y sus kinds de marca, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/floating-surfaces',
-    parent: '/admin/design-system',
+    route: '/design-system/efeonce-brand',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Floating Surfaces Lab (TASK-1033) — child surface del Design System para la primitive GreenhouseFloatingSurface y sus 6 variants, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Efeonce Orbital Signature Lab — child surface del Design System para iterar motion del wordmark institucional de Efeonce sin tocar el asset principal, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/motion',
-    parent: '/admin/design-system',
+    route: '/design-system/talent-profile',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Motion Lab (TASK-1045) — child surface del Design System para la primitiva de motion sobre GSAP (<Motion> + useGreenhouseGSAP) y sus 4 variants, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Talent Profile Lab — child surface del Design System para dossier/verificacion de talento, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/elevation',
-    parent: '/admin/design-system',
+    route: '/design-system/utilities',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Elevation & Shadows Lab (TASK-1049) — child surface del Design System para los roles semánticos de elevación (theme.greenhouseElevation), alcanzable desde el catalogo canonico /admin/design-system.'
+      'Utilities Lab — child surface del Design System para primitives utilitarias como Activity Timeline, alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/admin/design-system/geometry',
-    parent: '/admin/design-system',
+    route: '/design-system/floating-surfaces',
+    parent: '/design-system',
     via: 'inline-link',
     reason:
-      'Geometry Lab (TASK-1050) — child surface del Design System para spacing/radius AXIS y la extension Greenhouse xxl/display, alcanzable desde el catalogo canonico /admin/design-system.'
+      'Floating Surfaces Lab (TASK-1033) — child surface del Design System para la primitive GreenhouseFloatingSurface y sus 6 variants, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/motion',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Motion Lab (TASK-1045) — child surface del Design System para la primitiva de motion sobre GSAP (<Motion> + useGreenhouseGSAP) y sus 4 variants, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/elevation',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Elevation & Shadows Lab (TASK-1049) — child surface del Design System para los roles semánticos de elevación (theme.greenhouseElevation), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/geometry',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Geometry Lab (TASK-1050) — child surface del Design System para spacing/radius AXIS y la extension Greenhouse xxl/display, alcanzable desde el catalogo canonico /design-system.'
   }
 ]
 

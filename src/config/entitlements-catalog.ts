@@ -29,7 +29,12 @@ export const ENTITLEMENT_MODULES = [
   // Dedicated identity (captureWithDomain 'documents' + reliability moduleKey + este módulo).
   // Distinto de `workforce` (contracting cases producen el documento) y `hr` (procesos HR):
   // `documents` es la orquestación de firma reusable (contracting_case, master_agreement, …).
-  'documents'
+  'documents',
+  // TASK-1072 — namespace del Design System interno (AXIS). Future-proof para
+  // capabilities de operación del DS (vincular nodos Figma hoy; tokens/specimens
+  // a futuro). NO conflar con `platform` (control plane de release) ni `admin`.
+  // Ver el DS es plano views (plataforma.design_system); OPERAR el DS es este módulo.
+  'design_system'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -1466,6 +1471,17 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'documents.signature_request',
     module: 'documents',
     actions: ['read', 'create', 'update', 'manage'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1072 — vincular (o cambiar) el nodo AXIS de una superficie del Design System.
+  // Primera capability real del rol `designer`. Ver el DS es view abierto a todo interno
+  // (plataforma.design_system); VINCULAR es exclusivo de designer + efeonce_admin.
+  // Grant matriz (runtime.ts): DESIGNER ∪ EFEONCE_ADMIN. NUNCA seed sin grant en
+  // runtime.ts mismo PR (invariant TASK-873/935; guard capability-grant-coverage.test.ts).
+  {
+    key: 'design_system.figma_node.link',
+    module: 'design_system',
+    actions: ['update'] as const,
     defaultScope: 'tenant'
   }
 ] as const

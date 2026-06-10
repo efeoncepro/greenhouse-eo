@@ -60,7 +60,7 @@ Validate local with `pnpm design:lint` before commit.
 | Category | Scale |
 |---|---|
 | **Spacing** | `4n px` — values: 0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12 |
-| **Border radius** | `customBorderRadius`: xs=2, sm=4, md=6, lg=8, xl=10; full pill=9999 |
+| **Border radius** | `customBorderRadius`: xs=2, sm=4, md=6, lg=8, xl=10; full pill=9999. En MUI `sx`, emitir los tokens como CSS px strings, porque `borderRadius` numérico es multiplicador. |
 | **Type sizes** | h1, h2, h3, h4, h5, h6, subtitle1, subtitle2, body1, body2, button, caption, overline (NEVER inline `fontSize`) |
 | **Icon sizes** | {14, 16, 18, 20, 22} px |
 | **Motion duration** | {75, 150, 200, 300, 400, 600} ms |

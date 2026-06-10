@@ -1,7 +1,5 @@
 'use client'
 
-import Link from 'next/link'
-
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -11,10 +9,8 @@ import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
-import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
+import { GreenhouseChip } from '@/components/greenhouse/primitives'
 import { DESIGN_SYSTEM_LAB_TOKENS } from './design-system-lab-tokens'
-
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 
 const SPACING_STEPS = [...Array.from({ length: 16 }, (_, index) => index + 1), 25] as const
 const PREFERRED_SPACING_STEPS = new Set<number>([1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12])
@@ -73,20 +69,8 @@ const GeometryLabView = () => {
         maxWidth: DESIGN_SYSTEM_LAB_TOKENS.layout.pageMaxInlineSize,
         mx: 'auto'
       }}
-    >
-      <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.layout.headerGap}>
-        <GreenhouseButton
-          component={Link}
-          href={DESIGN_SYSTEM_ROUTE}
-          variant='text'
-          tone='secondary'
-          size='small'
-          kind='navigation'
-          leadingIconClassName='tabler-arrow-left'
-          sx={{ alignSelf: 'flex-start', px: 0 }}
-        >
-          Design System
-        </GreenhouseButton>
+  >
+    <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.layout.headerGap}>
         <AxisWordmark variant='auto' height={DESIGN_SYSTEM_LAB_TOKENS.layout.logoBlockSize} />
         <SectionHeader
           eyebrow='Design System · Interno'

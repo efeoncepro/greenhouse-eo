@@ -1163,3 +1163,20 @@ They must update:
 - `project_context.md`
 - `Handoff.md`
 - `changelog.md`
+
+## Delta 2026-06-10 — TASK-1072: rol `designer` + capability `design_system.figma_node.link`
+
+ROLE_CODES pasó de 13 → **14**: nació `designer` (`role_family='domain_operator'`, `is_internal=TRUE`, `is_admin=FALSE`, `route_group_scope={internal,my}`). Distingue quién **opera** el Design System de quién solo lo **consume**.
+
+**Separación de planos canónica** (refuerza el principio de los dos planos):
+
+- **Ver** el Design System = plano **views** (`plataforma.design_system`, granted a todo rol interno incl. `collaborator` desde TASK-1070). `designer` recibe el grant explícito en `role_view_assignments`.
+- **Vincular** un nodo Figma a una superficie del DS = plano **entitlements** (capability `design_system.figma_node.link`, módulo nuevo `design_system`, action `update`, scope `tenant`). Grant runtime: `designer` ∪ `efeonce_admin`. Un colaborador no-diseñador ve el DS pero no puede vincular.
+
+**Parity TS↔DB (invariante TASK-987)**: `ROLE_ROUTE_GROUPS['designer']` (TS, `role-route-mapping.ts`) === `roles.route_group_scope` (DB seed) = `{internal, my}`. Test `src/lib/tenant/designer-role.test.ts` lo pinea.
+
+**Rollout**: Daniela Ferreira, Andrés Carlosama y Melkin Hernández recibieron `designer` de forma **aditiva** vía `user_role_assignments` (lifecycle-aware: `active=TRUE`, `effective_to=NULL`), conservando sus roles existentes (Daniela mantiene `efeonce_operations`). Migración idempotente `20260610133821108`.
+
+La UI de asignación (`/admin/users` → usuario → Acceso) lista `availableRoles` directo desde `greenhouse_core.roles` → `designer` aparece para asignar sin tocar UI; el label visible sale de `roles.role_name` ('Diseñador').
+
+Spec: `docs/tasks/complete/TASK-1072-designer-role-figma-node-linking.md`. Invariante operativo + reglas duras: `CLAUDE.md` §"Design System Figma node linking — ver ≠ vincular".

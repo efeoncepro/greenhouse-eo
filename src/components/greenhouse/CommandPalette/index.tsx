@@ -65,6 +65,7 @@ const DEFAULT_ICON_FOR_SECTION: Record<GovernanceSection, string> = {
   finanzas: 'tabler-report-money',
   ia: 'tabler-sparkles',
   administracion: 'tabler-shield-lock',
+  plataforma: 'tabler-palette',
   mi_ficha: 'tabler-user-circle',
   cliente: 'tabler-folders'
 }

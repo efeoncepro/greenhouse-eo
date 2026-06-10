@@ -1,9 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -11,22 +8,9 @@ import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 
 import LoadingLabSection from './LoadingLabSection'
 
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
-
 const LoadingLabView = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 1100, mx: 'auto' }}>
     <Stack spacing={1.5}>
-      <Button
-        component={Link}
-        href={DESIGN_SYSTEM_ROUTE}
-        variant='text'
-        color='secondary'
-        size='small'
-        startIcon={<i className='tabler-arrow-left' />}
-        sx={{ alignSelf: 'flex-start', px: 0 }}
-      >
-        Design System
-      </Button>
       <AxisWordmark variant='auto' height={32} sx={{ mb: 0.5 }} />
       <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
         Loading Lab

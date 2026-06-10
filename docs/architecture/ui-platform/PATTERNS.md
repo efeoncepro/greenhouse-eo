@@ -7,6 +7,63 @@
 
 ---
 
+## Funnel Analysis Pattern
+
+**Funnel Analysis Pattern** es el patrón canónico para analizar workflows por
+etapas cuando el operador necesita leer, en una sola superficie, volumen,
+retención, SLA, caídas, bloqueos y siguiente conversación con Nexa.
+
+### Taxonomía
+
+- **Pattern:** `Funnel Analysis Pattern`.
+- **Composition:** `GreenhouseFunnelChartCard`.
+- **Zone primitives:** `GreenhouseFunnelHeaderControls`,
+  `GreenhouseFunnelKpiStrip`, `GreenhouseFunnelStageRail`,
+  `GreenhouseFunnelStageSegment`, `GreenhouseFunnelDiagnosticsGrid`.
+- **Assisted analysis:** `GreenhouseNexaGreeting kind='funnelStageAdvisor'`
+  con `askBadgeVariant='animated'`.
+- **Kinds iniciales:** `cscPipeline`, `commercialLifecycle`, `quoteToCash`,
+  `onboardingActivation`, `custom`.
+
+### Cuándo usarlo
+
+Usar este patrón cuando el usuario debe responder preguntas como:
+
+- dónde se concentra la caída o el atraso;
+- qué etapa concentra bloqueos;
+- si el SLA o freshness cambia la prioridad operativa;
+- qué conversación conviene abrir con Nexa antes de actuar.
+
+No usarlo para charts de conversión simples, scorecards aisladas o dashboards
+donde no existe una secuencia operacional clara. Para funnels verticales puros,
+Recharts puede seguir siendo la base visual; para pipeline horizontal rico, el
+rail vive dentro de `GreenhouseFunnelStageRail`.
+
+### Reglas de composición
+
+- El patrón combina **contexto ejecutivo** (header + controles), **señales
+  rápidas** (KPI strip), **lectura secuencial** (stage rail), **diagnóstico
+  operativo** (grid/tabla) y **asistencia conversacional** (Nexa).
+- La asistencia conversacional del funnel usa el badge canónico
+  `GreenhouseNexaAnimatedAskBadge`; no copiar el pill ni animar un badge local.
+  Otros greetings mantienen badge estático por default.
+- `stageRole` representa el rol de proceso de la etapa; `health`/diagnostics
+  representan salud operativa. No mezclar ambos contratos.
+- Nuevos workflows entran como `kind` y resuelven a una `variant`; no deben
+  copiar JSX ni geometría del rail.
+- Las zone primitives se extienden solo cuando cambia una responsabilidad local
+  de esa zona.
+- El patrón debe mantener summary accesible, selección por teclado,
+  reduced-motion y señales no dependientes solo del color.
+
+### Evidencia viva
+
+Hoja interna: `/admin/design-system/charts`.
+
+Scenario GVC: `design-system-charts`, región
+`data-capture='funnel-primitive-anatomy'`.
+
+
 ## Error Handling & Feedback Patterns (TASK-236)
 
 ### Fetch error states
@@ -96,36 +153,38 @@ items.length === 0 ? (
 | Agency Workspace (3 lazy tabs) | Retry button | — | — | Skeletons |
 
 
-## Breadcrumbs Pattern (TASK-238)
+## Breadcrumbs Pattern
 
-Para vistas de detalle con jerarquía de navegación, usar **MUI Breadcrumbs** en vez de botones "Volver":
+Para vistas de detalle con jerarquía de navegación, usar la primitive
+canónica `GreenhouseBreadcrumbs`. La primitive envuelve MUI Breadcrumbs para
+mantener semántica accesible y aplica el contrato AXIS del nodo Figma
+`205:234905`.
 
 ```tsx
-import Breadcrumbs from '@mui/material/Breadcrumbs'
-import Link from 'next/link'
+import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 
-<Breadcrumbs aria-label='breadcrumbs' sx={{ mb: 2 }}>
-  <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2'
-    sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-    Agencia
-  </Typography>
-  <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2'
-    sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-    Spaces
-  </Typography>
-  <Typography color='text.primary' variant='body2'>
-    {detail.clientName}
-  </Typography>
-</Breadcrumbs>
+<GreenhouseBreadcrumbs
+  kind='pageHierarchy'
+  items={[
+    { label: 'Agencia', href: '/agency' },
+    { label: 'Organizaciones', href: '/agency/organizations' },
+    { label: organization.name }
+  ]}
+/>
 ```
 
 **Reglas:**
-- Breadcrumbs reemplazan botones "Volver a X" — no duplicar ambos
-- Cada nivel intermedio es un link, el último nivel es texto estático
-- `variant='body2'` para tamaño compacto
-- Links con `textDecoration: 'none'` y hover underline
-- `aria-label='breadcrumbs'` para accesibilidad
-- Implementado en: Agency Space 360, Greenhouse Project Detail, Sprint Detail
+- Breadcrumbs reemplazan botones "Volver a X" — no duplicar ambos.
+- Cada nivel intermedio es un link real; el último nivel es texto estático con
+  `aria-current='page'`.
+- `kind='pageHierarchy'` usa la variante `default`; `kind='workbenchHierarchy'`
+  usa la variante `compact` para headers densos, inspectors y workbenches.
+- El separator canónico es `/`; el wrapper legacy `Breadcrumb` conserva chevron
+  solo por compatibilidad.
+- Iconos son opcionales por item y deben reforzar jerarquía/brand context, no
+  decorar todos los breadcrumbs productivos por defecto.
+- Hoja viva: `/admin/design-system/breadcrumbs`; scenario GVC:
+  `design-system-breadcrumbs`.
 
 
 ## Progressive Disclosure Pattern (TASK-237)
@@ -156,4 +215,3 @@ Para vistas data-dense con más de 10 tarjetas en scroll vertical, usar **Accord
 - Reports detallados → Accordion colapsado por defecto
 - Cada Accordion summary muestra chip con estado/resumen para que el usuario sepa si vale la pena expandir
 - Implementado en: Agency ICO Engine tab (3 Accordions para performance report)
-

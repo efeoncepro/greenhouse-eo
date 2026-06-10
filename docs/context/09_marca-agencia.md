@@ -120,3 +120,5 @@ ICO y el ecosistema de producto no son solo operaciones — son **experiencia de
 ---
 
 *Fuente: Arquitectura de Marca & Messaging Framework v1.0 + Marca Agencia Estrategia Completa v1.2. Los Thought Territories T1–T5 (contenido/LinkedIn) viven en el doc de marca; T6 = ASaaS / futuro de la agencia.*
+
+*Última verificación de drift contra runtime: 2026-06-09 (TASK-1064) — sin claims de runtime hardcodeados; targets/fechas comerciales son intencionales.*

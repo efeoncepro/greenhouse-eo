@@ -10,8 +10,6 @@
 
 import type { ReactNode } from 'react'
 
-import Link from 'next/link'
-
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -19,7 +17,6 @@ import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 const DARK_SURFACE = '#25293C'
 const ERROR = '#DC2E39'
 const ERROR_DARK = '#C01D27'
@@ -288,9 +285,6 @@ const DarkShowcase = () => (
 const BrandColorComparisonMockupView = () => (
   <Box data-capture='brand-color-comparison' sx={{ display: 'flex', flexDirection: 'column', gap: 4, maxInlineSize: 1200, mx: 'auto' }}>
     <Stack spacing={1.5}>
-      <Button component={Link} href={DESIGN_SYSTEM_ROUTE} variant='text' color='secondary' size='small' startIcon={<i className='tabler-arrow-left' />} sx={{ alignSelf: 'flex-start', px: 0 }}>
-        Design System
-      </Button>
       <Typography variant='overline' sx={{ color: '#0375DB', fontWeight: 800 }}>
         Iteración de color · comparación
       </Typography>

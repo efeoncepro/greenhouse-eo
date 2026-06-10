@@ -483,6 +483,20 @@ Rounded corners are moderate and systematic.
 - `xxl` (`12px`) and `display` (`16px`) are Greenhouse extensions for large support/editorial/internal documentation surfaces. They are available in `theme.shape.customBorderRadius`, but they are not the default for dense operational cards, tables, menus, inputs, or chips.
 - `full` is for pill treatments only; use `9999px` for pills/capsules and `50%` for true circles, not the Figma `500px` literal.
 
+**MUI `sx` radius gotcha:** `borderRadius` numbers are transformed by MUI as a
+multiplier of `theme.shape.borderRadius`. Because
+`theme.shape.customBorderRadius.*` stores numeric px values, passing it directly
+inside `sx` can inflate the rendered radius. In `sx`, write radius tokens as CSS
+lengths:
+
+```tsx
+// Correct
+sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.sm}px` })}
+
+// Wrong: MUI may multiply the numeric token
+sx={theme => ({ borderRadius: theme.shape.customBorderRadius.sm })}
+```
+
 Do not introduce arbitrary radii or make the system softer than the token scale suggests. Greenhouse should feel modern and precise, not playful.
 
 ## Components

@@ -18,6 +18,9 @@ pnpm fe:capture --route=/hr/offboarding --env=staging --hold=3000
 # Con GIF (requiere ffmpeg instalado)
 pnpm fe:capture offboarding-queue-microinteractions --env=staging --gif
 
+# Lupa de microinteracción: frames secuenciales de un selector
+pnpm fe:capture:micro --route=/design-system/nexa-brand --selector='[data-capture="nexa-floating-trigger"]' --env=local --duration=5000 --fps=24 --gif
+
 # Headed para debug visual
 pnpm fe:capture offboarding-queue-microinteractions --env=staging --headed
 ```
@@ -40,6 +43,7 @@ Toda verificación visual de UI Greenhouse debe pasar primero por este helper:
 - `pnpm fe:capture:review <scenario|capture-dir>` cuando la captura alimenta una revisión UI/UX.
 - `pnpm fe:capture:diff <prev> <curr>` para comparar before/after.
 - `pnpm fe:capture:health` para revisar salud local del pipeline de capturas.
+- `pnpm fe:capture:micro --route=/path --selector='[data-capture="x"]'` para inspeccionar motion/frames de un selector concreto sin aplicar determinismo de baseline.
 
 Para pantallas con scroll, no uses offsets frágiles como primera opción. Escribe un scenario con:
 
@@ -65,7 +69,8 @@ Playwright ad-hoc queda como complemento para consola/red/API payloads o pasos q
 ```
 scripts/frontend/
 ├── capture.ts                 # CLI entrypoint (tsx)
-├── gc.ts                      # purga capturas > 30 días
+├── micro.ts                   # sampler de microinteracciones selector-scoped
+├── gc.ts                      # purga capturas por antigüedad/tamaño
 ├── README.md                  # este archivo
 ├── lib/
 │   ├── env.ts                 # 3 envs: local | staging | dev-agent | production
@@ -134,7 +139,8 @@ Ver `scenarios/_README.md` para el DSL completo.
 ## Garbage collection
 
 ```bash
-pnpm fe:capture:gc              # dry-run, lista qué borraría (>30d)
-pnpm fe:capture:gc --apply      # ejecuta
-pnpm fe:capture:gc --apply --days=7  # threshold custom
+pnpm fe:capture:gc                         # dry-run, lista qué borraría (>30d)
+pnpm fe:capture:gc --apply                 # ejecuta
+pnpm fe:capture:gc --apply --days=7        # threshold custom
+pnpm fe:capture:gc --max-gb=15 --keep=20   # dry-run por tamaño, protege lo más reciente
 ```

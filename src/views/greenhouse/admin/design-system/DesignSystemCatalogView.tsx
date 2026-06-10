@@ -31,6 +31,7 @@ interface CatalogItem {
   status: CatalogStatus
   owner: string
   tags: string[]
+  searchAliases?: string[]
   icon: string
 }
 
@@ -69,7 +70,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'colors',
     title: 'Color AXIS',
     description: 'Usa esta entrada cuando necesites rampas, opacidades, contraste o neutrales del sistema.',
-    route: '/admin/design-system/colors',
+    route: '/design-system/colors',
     category: 'Foundations',
     kind: 'Token',
     status: 'Canonical',
@@ -81,7 +82,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'typography',
     title: 'Tipografía',
     description: 'Revisa jerarquía, familias y frontera Poppins/Geist antes de tocar copy visible.',
-    route: '/admin/design-system/typography',
+    route: '/design-system/typography',
     category: 'Foundations',
     kind: 'Token',
     status: 'Canonical',
@@ -93,7 +94,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'geometry',
     title: 'Geometry',
     description: 'Consulta spacing, radius y extensiones xxl/display para superficies amplias.',
-    route: '/admin/design-system/geometry',
+    route: '/design-system/geometry',
     category: 'Foundations',
     kind: 'Token',
     status: 'Canonical',
@@ -105,7 +106,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'elevation',
     title: 'Elevation',
     description: 'Elige roles de sombra por uso: raised, floating, overlay, modal u overflow.',
-    route: '/admin/design-system/elevation',
+    route: '/design-system/elevation',
     category: 'Foundations',
     kind: 'Token',
     status: 'Canonical',
@@ -117,7 +118,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',
-    route: '/admin/design-system/buttons',
+    route: '/design-system/buttons',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -126,10 +127,23 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-square-rounded-letter-b'
   },
   {
+    id: 'breadcrumbs',
+    title: 'Breadcrumbs',
+    description: 'Primitive para jerarquía de navegación con ancestors clickeables, current page y separadores gobernados.',
+    route: '/design-system/breadcrumbs',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'GreenhouseBreadcrumbs',
+    tags: ['navigation', 'hierarchy', 'figma'],
+    searchAliases: ['breadcrumb', 'breadcrumbs', 'breadcumbs', 'migas', 'migas de pan', 'ruta', 'rutas', 'jerarquía', 'jerarquia'],
+    icon: 'tabler-slash'
+  },
+  {
     id: 'chips',
     title: 'Chips',
     description: 'Primitive para estados compactos, atributos, identidad, filtros y entradas removibles.',
-    route: '/admin/design-system/chips',
+    route: '/design-system/chips',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -138,10 +152,23 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-badge'
   },
   {
+    id: 'disclosure',
+    title: 'Disclosure',
+    description: 'El “+” rotatorio (DisclosureTrigger) y el patrón que lo ancla a una superficie flotante para desplegar UI contextual (AnchoredDisclosure).',
+    route: '/design-system/disclosure',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'GreenhouseDisclosureTrigger · GreenhouseAnchoredDisclosure',
+    tags: ['disclosure', 'trigger', 'popover', 'add', 'motion'],
+    searchAliases: ['disclosure', 'mas', 'más', 'plus', '+', 'agregar', 'desplegar', 'popover', 'editor inline', 'rotacion', 'rotación', 'expandir', 'trigger'],
+    icon: 'tabler-circle-plus'
+  },
+  {
     id: 'feedback-atoms',
     title: 'Feedback atoms',
     description: 'KPI delta inline (signo+flecha+color AA) y status dot (dot+label). Color nunca solo; consumen theme.greenhouseSemantic.',
-    route: '/admin/design-system/chips',
+    route: '/design-system/chips',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -150,10 +177,34 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-activity-heartbeat'
   },
   {
+    id: 'nexa-brand',
+    title: 'Nexa brand mark',
+    description: 'Primitive para el isotipo de Nexa, badge conversacional y kinds de marca.',
+    route: '/design-system/nexa-brand',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'GreenhouseNexaBrandMark',
+    tags: ['nexa', 'brand', 'assistant'],
+    icon: 'tabler-sparkles'
+  },
+  {
+    id: 'efeonce-brand',
+    title: 'Efeonce orbital signature',
+    description: 'Primitive experimental para la firma orbital del wordmark institucional de Efeonce.',
+    route: '/design-system/efeonce-brand',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'EfeonceOrbitalLogoMark',
+    tags: ['efeonce', 'brand', 'gsap', 'logo'],
+    icon: 'tabler-planet'
+  },
+  {
     id: 'talent-profile',
     title: 'Talent profile',
     description: 'Dossier enterprise, badge Verificado por Efeonce y kind Talento verificado para perfiles verificables.',
-    route: '/admin/design-system/talent-profile',
+    route: '/design-system/talent-profile',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -165,7 +216,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'floating-surfaces',
     title: 'Floating surfaces',
     description: 'Usa esto para popovers, menus, peeks de evidencia e inline editors anclados.',
-    route: '/admin/design-system/floating-surfaces',
+    route: '/design-system/floating-surfaces',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -177,7 +228,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'loaders',
     title: 'Loading surfaces',
     description: 'Estados de carga nombrados para documentos, acciones seguras, handoffs y conciliación.',
-    route: '/admin/design-system/loaders',
+    route: '/design-system/loaders',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -188,20 +239,32 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'charts',
     title: 'Charts',
-    description: 'Chart cards enterprise con fallback accesible y geometría gobernada por tokens.',
-    route: '/admin/design-system/charts',
+    description: 'Chart cards enterprise, Funnel Analysis Pattern, fallback accesible y geometría gobernada.',
+    route: '/design-system/charts',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
-    owner: 'GreenhouseChartCard',
-    tags: ['data', 'visualization', 'kpi'],
+    owner: 'GreenhouseChartCard · GreenhouseFunnelChartCard',
+    tags: ['data', 'visualization', 'kpi', 'funnel', 'pattern'],
     icon: 'tabler-chart-bar'
+  },
+  {
+    id: 'funnel-analysis-pattern',
+    title: 'Funnel Analysis Pattern',
+    description: 'Patrón para leer etapas, caídas, SLA, bloqueos y asistencia Nexa en una composición gobernada.',
+    route: '/design-system/charts',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Canonical',
+    owner: 'GreenhouseFunnelChartCard',
+    tags: ['funnel', 'analysis', 'operations', 'nexa'],
+    icon: 'tabler-filter-cog'
   },
   {
     id: 'utilities',
     title: 'Utilities',
     description: 'Timelines y utilities para auditoría, handoff y trazas de documentos.',
-    route: '/admin/design-system/utilities',
+    route: '/design-system/utilities',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
@@ -213,7 +276,7 @@ const CATALOG_ITEMS: CatalogItem[] = [
     id: 'motion',
     title: 'Motion',
     description: 'Primitive gobernada para entrance, stagger, scroll reveal y timelines GSAP.',
-    route: '/admin/design-system/motion',
+    route: '/design-system/motion',
     category: 'Patterns',
     kind: 'Pattern',
     status: 'Canonical',
@@ -224,20 +287,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'microinteractions',
     title: 'Microinteractions',
-    description: 'Feedback de comandos, validación, procedencia, decisiones inline y evidencia.',
-    route: '/admin/design-system/microinteractions',
+    description: 'Thinking beats, feedback de comandos, validación, procedencia, decisiones inline y evidencia.',
+    route: '/design-system/microinteractions',
     category: 'Patterns',
     kind: 'Pattern',
     status: 'Canonical',
     owner: 'microinteraction primitives',
-    tags: ['feedback', 'validation', 'decision'],
+    tags: ['feedback', 'thinking', 'validation', 'decision'],
     icon: 'tabler-click'
   },
   {
     id: 'catalog',
     title: 'Catalog index',
     description: 'Home canónica para encontrar tokens, primitives, patrones y labs internos.',
-    route: '/admin/design-system',
+    route: '/design-system',
     category: 'Governance',
     kind: 'Pattern',
     status: 'Canonical',
@@ -263,7 +326,48 @@ const kindTone = (kind: CatalogKind) => {
   return 'default'
 }
 
-const normalize = (value: string) => value.toLocaleLowerCase('es-CL')
+const normalize = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('es-CL')
+
+export const filterDesignSystemCatalogItems = ({
+  category,
+  kind,
+  query
+}: {
+  category: CategoryFilter
+  kind: CatalogKind | 'Todos'
+  query: string
+}) => {
+  const normalizedQuery = normalize(query.trim())
+
+  return CATALOG_ITEMS.filter(item => {
+    const matchesCategory = category === 'Todos' || item.category === category
+    const matchesKind = kind === 'Todos' || item.kind === kind
+
+    const haystack = normalize(
+      [
+        item.id,
+        item.title,
+        item.description,
+        item.route,
+        item.category,
+        CATEGORY_LABELS[item.category],
+        item.kind,
+        KIND_LABELS[item.kind],
+        item.owner,
+        ...item.tags,
+        ...(item.searchAliases ?? [])
+      ].join(' ')
+    )
+
+    const matchesQuery = normalizedQuery.length === 0 || haystack.includes(normalizedQuery)
+
+    return matchesCategory && matchesKind && matchesQuery
+  })
+}
 
 const AxisInteractiveWordmark = () => {
   const scopeRef = useRef<SVGSVGElement | null>(null)
@@ -383,18 +487,7 @@ const DesignSystemCatalogView = () => {
   const [kind, setKind] = useState<CatalogKind | 'Todos'>('Todos')
   const [query, setQuery] = useState('')
 
-  const filteredItems = useMemo(() => {
-    const normalizedQuery = normalize(query.trim())
-
-    return CATALOG_ITEMS.filter(item => {
-      const matchesCategory = category === 'Todos' || item.category === category
-      const matchesKind = kind === 'Todos' || item.kind === kind
-      const haystack = normalize([item.title, item.description, item.owner, ...item.tags].join(' '))
-      const matchesQuery = normalizedQuery.length === 0 || haystack.includes(normalizedQuery)
-
-      return matchesCategory && matchesKind && matchesQuery
-    })
-  }, [category, kind, query])
+  const filteredItems = useMemo(() => filterDesignSystemCatalogItems({ category, kind, query }), [category, kind, query])
 
   const categoryCounts = useMemo(
     () =>
@@ -526,7 +619,7 @@ const DesignSystemCatalogView = () => {
             <Stack className='gh-catalog-actions' direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
               <GreenhouseButton
                 component={Link}
-                href='/admin/design-system/colors'
+                href='/design-system/colors'
                 variant='label'
                 kind='navigation'
                 leadingIconClassName='tabler-arrow-left'
@@ -535,7 +628,7 @@ const DesignSystemCatalogView = () => {
               </GreenhouseButton>
               <GreenhouseButton
                 component={Link}
-                href='/admin/design-system/geometry'
+                href='/design-system/geometry'
                 variant='outlined'
                 kind='navigation'
                 leadingIconClassName='tabler-dimensions'

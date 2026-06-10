@@ -5,7 +5,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'typography-canonical',
-  route: '/admin/design-system/typography',
+  route: '/design-system/typography',
   viewport: { width: 1280, height: 1100 },
   initialHoldMs: 1500,
   finalHoldMs: 400,

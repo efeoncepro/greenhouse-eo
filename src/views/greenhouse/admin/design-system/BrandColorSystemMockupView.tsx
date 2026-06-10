@@ -18,8 +18,6 @@
 //   5. Dual-mode: cada rol tiene un dark-fg verificado sobre charcoal.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import Link from 'next/link'
-
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -31,7 +29,6 @@ import { useTheme } from '@mui/material/styles'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 const DARK_SURFACE = '#25293C'
 const DARK_PAPER = '#2F3349'
 const DARK_TEXT = 'rgba(255,255,255,0.92)'
@@ -584,9 +581,6 @@ const BrandColorSystemMockupView = () => {
     <Box data-capture='brand-color-system' sx={{ display: 'flex', flexDirection: 'column', gap: 5, maxInlineSize: theme.spacing(290), mx: 'auto' }}>
       {/* Header */}
       <Stack spacing={1.5}>
-        <Button component={Link} href={DESIGN_SYSTEM_ROUTE} variant='text' color='secondary' size='small' startIcon={<i className='tabler-arrow-left' />} sx={{ alignSelf: 'flex-start', px: 0 }}>
-          Design System
-        </Button>
         <Box
           sx={theme => ({
             display: 'grid',

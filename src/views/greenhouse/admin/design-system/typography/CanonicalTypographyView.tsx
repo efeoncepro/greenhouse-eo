@@ -263,7 +263,7 @@ const CanonicalTypographyView = () => {
           (<code>typographyScale</code>). Dos familias, una escala de 8 tamaños, roles semánticos y
           gobernanza de 3 capas. Esta vista es el <strong>espacio canónico</strong>; las reglas que un
           agente aplica viven en <code>DESIGN.md</code> / V1 / <code>CLAUDE.md</code>. El{' '}
-          <Box component={Link} href='/admin/design-system/typography/mockup' sx={{ color: 'primary.main' }}>
+          <Box component={Link} href='/design-system/typography/mockup' sx={{ color: 'primary.main' }}>
             mockup
           </Box>{' '}
           guarda el registro del rediseño (AS-IS↔TO-BE + decisiones).
