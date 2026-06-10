@@ -6,14 +6,27 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `—`
-- Status real: `Slice 3 UI construida como design artifact + aprobada por el operador (product-design-loop, GVC desktop/mobile). Backend (Slices 0-2) + wiring runtime pendientes.`
+- Status real: `COMPLETE (2026-06-10). Rol designer (14 ROLE_CODES) + tabla SSOT design_system_figma_nodes + capability design_system.figma_node.link + wiring runtime server-fed + rollout (3 usuarios) en develop. Slice 4 (render real del nodo Figma) diferido.`
 - Domain: `platform | identity | ui`
+
+## Delta 2026-06-10 — COMPLETE
+
+Implementado end-to-end en `develop` (sin push remoto, instrucción del operador):
+
+- **Slice 0** — Rol `designer` (4 planos): migración `20260610131435833` (seed `greenhouse_core.roles` + grant `plataforma.design_system`), `ROLE_CODES.DESIGNER` (13→14), `ROLE_ROUTE_GROUPS['designer']=['internal','my']` (parity TS↔DB verificada en PG).
+- **Slice 1** — SSOT: migración `20260610131826746` (`design_system_figma_nodes` + `_events` audit append-only con triggers anti-UPDATE/DELETE, file_key allowlist AXIS CHECK, seed de las 2 filas) + command `linkDesignSystemFigmaNode` + reader `getDesignSystemFigmaNodeMap` (`src/lib/design-system/figma-nodes/store.ts`) + eventos v1 `design_system.figma_node.{linked,relinked}`. Verificado live: reader, relink supersede, fail-closed AXIS/url, audit trail.
+- **Slice 2** — Capability triple-layer: módulo `design_system` + capability `design_system.figma_node.link` en el catalog TS, grant runtime (DESIGNER ∪ EFEONCE_ADMIN), seed `capabilities_registry` (migración `20260610132434509`). `role_entitlement_defaults` NO sembrado (tabla vacía system-wide; runtime.ts es la autoridad). grant-coverage verde.
+- **Reconciliación (TASK-1072b)** — migración `20260610132929841`: backfill de 14 capabilities preexistentes (TASK-490/790/792/793/968/992/1001) que estaban en el catalog TS pero no en el registry DB → live parity verde. Causa raíz cerrada de forma escalable (no parche); la live parity test previene regresión.
+- **Slice 3** — Wiring runtime: `layout.tsx` server-fed (map + `canLink`), `DesignSystemBreadcrumbShell` prop-driven (resuelve el nodo del map DB, no del TS) con `FigmaNodeLinkAffordance` + `onLink` real → `POST /api/design-system/figma-nodes` (gateada por `requireTenantContext` + `can()`, errores es-CL canónicos `invalid_figma_url`/`figma_node_not_axis`). El TS `design-system-figma-nodes.ts` quedó seed-only. Build Turbopack ✓ (sin leak server-only).
+- **Rollout** — migración `20260610133821108`: `designer` aditivo a Daniela Ferreira, Andrés Carlosama, Melkin Hernández (lifecycle-aware, idempotente), preservando roles existentes. Verificado live.
+- **Slice 5** — test `designer-role.test.ts` (route-group parity + capability gate) + docs (CLAUDE.md invariante + ROLE_CODES 13→14, AGENTS.md, IDENTITY_ACCESS_V2 Delta, EVENT_CATALOG Delta, changelog, Handoff).
+- **Slice 4 (DIFERIDO)** — render real del nodo vía Figma REST + token en Secret Manager. El slot UI (`nodeThumbnailUrl`/`thumbnailStatus`) ya está construido; falta el fetch runtime + provisionar `greenhouse-figma-api-token`.
 
 ## Design artifact aprobado (2026-06-10)
 

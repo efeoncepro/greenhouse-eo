@@ -1017,3 +1017,17 @@ Spec: `docs/tasks/in-progress/TASK-490-signature-orchestration-foundation.md`.
 - **Reliability** (moduleKey `workforce`): `workforce.contracting.signature_desync` (drift, steady=0) — el caso quedó atrás de su signature_request (consumer falló). Los failure modes del aggregate ya los cubre TASK-490 `documents.signature_request.*`.
 
 Spec: `docs/tasks/in-progress/TASK-1024-workforce-contracting-signature-consumer-zapsign.md`.
+
+## Delta 2026-06-10 — TASK-1072: `design_system.figma_node.{linked,relinked}` (Design System Figma node link)
+
+`aggregate_type = design_system_figma_node`, `aggregate_id = surface_key` (ruta normalizada del DS, ej. `/design-system/breadcrumbs`).
+
+| Event | Cuándo | Payload v1 | Consumers |
+|---|---|---|---|
+| `design_system.figma_node.linked` | primer vínculo de la superficie a un nodo AXIS | `{surfaceKey, fileKey, nodeId, previousNodeId:null, actorUserId}` | ninguno (audit/observabilidad V1) |
+| `design_system.figma_node.relinked` | cambio del nodo (supersede del anterior) | `{surfaceKey, fileKey, nodeId, previousNodeId, actorUserId}` | ninguno (audit/observabilidad V1) |
+
+- **Emisor**: command `linkDesignSystemFigmaNode` (`src/lib/design-system/figma-nodes/store.ts`) dentro de la tx que hace el upsert del current + el INSERT del audit event append-only (`greenhouse_core.design_system_figma_node_events`).
+- **Sin consumer reactivo en V1** — la feature es link-only síncrona. El enrichment del nodo (render real vía Figma REST) sería un consumer futuro (Slice 4 diferido).
+
+Spec: `docs/tasks/complete/TASK-1072-designer-role-figma-node-linking.md`.

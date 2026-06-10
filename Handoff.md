@@ -1,3 +1,18 @@
+# Sesion 2026-06-10 — TASK-1072: rol `designer` + Figma node linking data-driven (COMPLETE en develop)
+
+El operador pidió implementar TASK-1072 quedándose en `develop` (sin push remoto) y luego: dar el rol `designer` (además de `collaborator`) a Daniela Ferreira, Andrés Carlosama y Melkin Hernández sin quitarle a Daniela sus otros roles; y resolver de forma robusta (no parche) el drift de parity catalog⇆registry.
+
+- **Rol `designer`** (ROLE_CODES 13→14): `src/config/role-codes.ts` + `role-route-mapping.ts` (`{internal,my}`) + seed `greenhouse_core.roles` (migración `20260610131435833`) con parity TS↔DB (TASK-987). `role_family='domain_operator'`, `is_internal=TRUE`, `is_admin=FALSE`.
+- **SSOT tabla** `greenhouse_core.design_system_figma_nodes` + `_events` (audit append-only, triggers anti-UPDATE/DELETE, file_key allowlist AXIS CHECK fail-closed; migración `20260610131826746`) reemplaza el TS hardcodeado (ahora seed-only). Command `linkDesignSystemFigmaNode` + reader `getDesignSystemFigmaNodeMap` (`src/lib/design-system/figma-nodes/store.ts`). Eventos v1 `design_system.figma_node.{linked,relinked}`. Verificado live (reader, relink supersede, fail-closed AXIS/url, audit trail).
+- **Capability** `design_system.figma_node.link` (módulo nuevo `design_system`): catalog TS + grant runtime (DESIGNER ∪ EFEONCE_ADMIN) + seed `capabilities_registry` (migración `20260610132434509`). `role_entitlement_defaults` NO sembrado (tabla vacía system-wide; runtime.ts es la autoridad).
+- **Reconciliación robusta (TASK-1072b, migración `20260610132929841`)**: 14 capabilities preexistentes (TASK-490/790/792/793/968/992/1001) estaban en el catalog TS pero no en el registry DB → live parity roja. Backfill idempotente derivado del catálogo (mismo patrón TASK-611 seed-existing) → **live parity verde**. Causa raíz cerrada; el guard `parity.live.test` previene regresión.
+- **Wiring runtime**: `layout.tsx` server-fed (map DB + `canLink` via `can()`), `DesignSystemBreadcrumbShell` prop-driven (resuelve del map, no del TS) con `FigmaNodeLinkAffordance` + `onLink` real → `POST /api/design-system/figma-nodes` (`requireTenantContext` + `can()`, NO admin context; errores es-CL `invalid_figma_url`/`figma_node_not_axis`). Build Turbopack ✓ (sin leak server-only — el shell solo importa el TYPE del store).
+- **Rollout** (migración `20260610133821108`): `designer` aditivo a los 3 internos (lifecycle-aware, idempotente). Verificado live: Andrés [collaborator,designer], Daniela [collaborator,designer,**efeonce_operations** preservado], Melkin [collaborator,designer].
+- **Gates**: `local:check` (lint+tsc) verde, `pnpm build` exit 0, tests focales verdes (parser+store 10, designer-role 6, grant-coverage 2, parity.live 1, internal-role-visibility 29). 6 commits en `develop` (Slices 0/1/2/1072b/3/rollout/test). **NO pusheado** (instrucción del operador).
+- **Diferido (Slice 4)**: render real del nodo Figma (REST `/v1/images` + token `greenhouse-figma-api-token` en Secret Manager). El slot UI ya existe; falta el fetch runtime + provisionar el secret.
+
+---
+
 # Sesion 2026-06-10 — TASK-1070: Design System fuera del Admin + acceso colaboradores
 
 El operador pidió sacar el Design System del menú del Admin Center (no es dominio del Admin) y darle acceso a los colaboradores ("debe poder verlo el colaborador pero también yo").

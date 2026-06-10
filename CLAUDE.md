@@ -4142,11 +4142,11 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 
 **Reflejo canonical antes de citar cualquier rol** (TASK-947 follow-up 2026-05-29): cuando un agente o spec mencione un rol, DEBE verificarlo primero contra el snapshot canonical de abajo (single source of truth: `src/config/role-codes.ts`, `ROLE_CODES` const). El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capability sin grant, pero el daño documental (specs/CLAUDE.md/AGENTS.md confusos) NO lo atrapa el guard. Esta regla cubre el lado documental.
 
-#### ROLE_CODES vigentes (snapshot 2026-05-29, V1.0 canonical)
+#### ROLE_CODES vigentes (snapshot 2026-06-10, V1.1 canonical)
 
-**13 roles reales** — son los ÚNICOS valores legítimos para `roleCodes`/`primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`. Cualquier mención fuera de esta tabla es bug documental. Fuente: `src/config/role-codes.ts:5-19` + `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` §"Role codes internos actuales" + `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`.
+**14 roles reales** — son los ÚNICOS valores legítimos para `roleCodes`/`primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`. Cualquier mención fuera de esta tabla es bug documental. Fuente: `src/config/role-codes.ts` + `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` §"Role codes internos actuales" + `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`. (TASK-1072 agregó `designer` → 13→14.)
 
-**Internos Efeonce (10)**:
+**Internos Efeonce (11)**:
 
 | `role_code` | Nombre visible | Para qué sirve | Route groups típicos |
 |---|---|---|---|
@@ -4159,6 +4159,7 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 | `efeonce_account` | Líder de Cuenta | Responsabilidad comercial y salud de cuentas. | `internal` |
 | `people_viewer` | Lectura de Personas | Lectura de People, capacidad, assignments y memberships. | `internal`, `people` |
 | `ai_tooling_admin` | Administrador de Herramientas AI | Gobierno de catálogo, licencias y wallets AI. | `internal`, `ai_tooling` |
+| `designer` | Diseñador | Opera el Design System interno (AXIS): vincula nodos Figma a las superficies del DS (capability `design_system.figma_node.link`), a futuro gobierna tokens/specimens. Ver el DS es view abierto a todo interno; **vincular** es exclusivo de este rol ∪ admin (TASK-1072). | `internal`, `my` |
 | `collaborator` | Colaborador | Experiencia personal del miembro en Greenhouse (Mi Ficha, Mi Nómina). Lo tiene todo colaborador interno además de su rol funcional. | `my` |
 
 **Externos cliente (3)**:
@@ -4199,11 +4200,29 @@ Estos NO existen en `ROLE_CODES` pero se siguen citando incorrectamente. Cuando 
 
 **Protocolo obligatorio cuando un agente vaya a citar un rol** (nuevo draft, capability matrix, grant analysis, doc nueva, edit a CLAUDE.md/AGENTS.md):
 
-1. Leer `src/config/role-codes.ts` (`ROLE_CODES` const) — los 13 valores arriba.
+1. Leer `src/config/role-codes.ts` (`ROLE_CODES` const) — los 14 valores arriba.
 2. Listar los roles que el draft/análisis menciona.
 3. Flag cualquier rol que no esté en la tabla.
 4. Proponer colapso canonical (típicamente `EFEONCE_ADMIN` para admin/release, `+ FINANCE_ADMIN` para finance observability, `HR_MANAGER` para HR governance).
 5. Documentar el colapso con marcador inline si la spec original tiene valor histórico (patrón: `<!-- spec original menciona X — colapsado a Y por TASK-935 -->`).
+
+### Design System Figma node linking — ver ≠ vincular (TASK-1072, desde 2026-06-10)
+
+El mapeo superficie↔nodo AXIS del Design System es **data-driven** desde la DB, no hardcodeado. SSOT runtime: `greenhouse_core.design_system_figma_nodes` (+ `_events` append-only). El TS `src/views/greenhouse/admin/design-system/design-system-figma-nodes.ts` quedó **seed-only** (NO source of truth runtime). El shell (`DesignSystemBreadcrumbShell`) lee el map server-side vía `getDesignSystemFigmaNodeMap()` y lo recibe como prop; un diseñador lo llena desde la UI (affordance "+" → `POST /api/design-system/figma-nodes`).
+
+**Separación de planos canónica**: **ver** el Design System = plano **views** (`plataforma.design_system`, abierto a todo interno incl. `collaborator`). **Vincular** un nodo = plano **entitlements** (`design_system.figma_node.link`, módulo `design_system`, solo `designer` ∪ `efeonce_admin`). Un colaborador no-diseñador ve el DS + el botón disabled, pero no ve el affordance de vincular.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** resolver el mapeo ruta→nodo desde el TS hardcodeado en runtime. El TS es seed; `greenhouse_core.design_system_figma_nodes` es SSOT. Toda lectura pasa por `getDesignSystemFigmaNodeMap()`.
+- **NUNCA** persistir un vínculo cuyo `file_key` no sea AXIS (`yyMksCoijfMaIoYplXKZaR`) — allowlist CHECK fail-closed (DB) + validación en el command (TS). No dejar entrar un Figma externo arbitrario al DS.
+- **NUNCA** `DELETE` de un vínculo ni de las filas de audit. Re-link = UPDATE in-place del current + evento append-only (`design_system.figma_node.{linked,relinked}`); soft-unlink = `superseded_at`.
+- **NUNCA** mostrar el affordance de vincular a quien no tenga la capability `design_system.figma_node.link` (capability, NO viewCode). Ver el DS ≠ poder vincular.
+- **NUNCA** mutar/escribir el vínculo desde un componente cliente — el command `linkDesignSystemFigmaNode` es server-only y pasa por la API gateada. El shell client solo importa el TYPE del store (`import type`, sin leak server-only — verificado build Turbopack).
+- **SIEMPRE** la layout (server) inyecta el map + `canLink` (resuelto por `can()`) al shell; el cliente no decide acceso.
+- El rol `designer` se asigna **aditivo** vía `user_role_assignments` (lifecycle-aware TASK-987), sin quitar roles existentes. Slice 4 (render real del nodo vía Figma REST + token en Secret Manager) queda **diferido** (el slot UI `nodeThumbnailUrl`/`thumbnailStatus` ya existe).
+
+**Spec canónica**: `docs/tasks/complete/TASK-1072-designer-role-figma-node-linking.md`. Helpers: `src/lib/design-system/figma-nodes/{store,parse-figma-url}.ts`. Migraciones: `20260610131435833` (rol), `20260610131826746` (tabla+trio), `20260610132434509` (capability), `20260610133821108` (rollout 3 usuarios). Patrón fuente: TASK-790 (audit trio), TASK-721 (evidence SSOT), TASK-873/935 (capability grant coverage), TASK-987 (route-group parity TS↔DB + lifecycle).
 
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 

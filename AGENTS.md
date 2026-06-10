@@ -207,13 +207,13 @@ Si falta alguno de esos pasos, el cierre debe decir `code complete, rollout pend
 - Revisar `git status` y no asumir que el arbol esta limpio.
 - Confirmar si el cambio toca layout global, navegacion, autenticacion, tema o deploy. Si toca alguno, documentarlo en `Handoff.md`.
 
-### 1.1 ROLE_CODES vigentes (snapshot 2026-05-29) y bug class de roles fantasma
+### 1.1 ROLE_CODES vigentes (snapshot 2026-06-10) y bug class de roles fantasma
 
 Cuando un agente o spec mencione un rol (`EFEONCE_ADMIN`, `FINANCE_ADMIN`, `HR_MANAGER`, etc.), DEBE verificarlo primero contra el snapshot canonical de abajo. Fuente: `src/config/role-codes.ts` (`ROLE_CODES` const). Es bug documental conocido (TASK-935 reconciliation) que specs antiguas siguen citando roles que NO existen.
 
-**13 roles reales** — los ÚNICOS valores legítimos para `roleCodes` / `primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`.
+**14 roles reales** — los ÚNICOS valores legítimos para `roleCodes` / `primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`. (TASK-1072 agregó `designer` → 13→14.)
 
-**Internos Efeonce (10)**:
+**Internos Efeonce (11)**:
 
 | `role_code` | Nombre visible | Para qué sirve | Route groups típicos |
 |---|---|---|---|
@@ -226,6 +226,7 @@ Cuando un agente o spec mencione un rol (`EFEONCE_ADMIN`, `FINANCE_ADMIN`, `HR_M
 | `efeonce_account` | Líder de Cuenta | Responsabilidad comercial y salud de cuentas. | `internal` |
 | `people_viewer` | Lectura de Personas | Lectura de People, capacidad, assignments, memberships. | `internal`, `people` |
 | `ai_tooling_admin` | Administrador de Herramientas AI | Gobierno de catálogo, licencias, wallets AI. | `internal`, `ai_tooling` |
+| `designer` | Diseñador | Opera el Design System interno (AXIS): vincula nodos Figma (`design_system.figma_node.link`), a futuro tokens/specimens. Ver el DS = view abierto a todo interno; **vincular** = exclusivo designer ∪ admin (TASK-1072). | `internal`, `my` |
 | `collaborator` | Colaborador | Experiencia personal del miembro (Mi Ficha, Mi Nómina). Lo tiene todo colaborador interno además de su rol funcional. | `my` |
 
 **Externos cliente (3)**:
