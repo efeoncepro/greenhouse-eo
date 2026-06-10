@@ -35,6 +35,24 @@ For assets that will live in Greenhouse, use the canonical helper when possible:
 
 Do not call image providers from parallel scripts if the helper covers the case.
 
+## CLI: `pnpm ai:image` (gpt-image-2)
+
+For terminal/operator-driven generation — `product-design-loop` concepts, mockup fixtures, icon/asset batches — use the canonical CLI instead of writing an ad-hoc `scripts/_gen-*.ts`:
+
+```bash
+pnpm ai:image --prompt "<text>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x...] \
+              [--quality low|medium|high|auto] [--background opaque|transparent] \
+              [--model gpt-image-2] [--count N] [--timeout 280000] [--open]
+pnpm ai:image --prompt-file <path>          # long prompts
+pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": "…" }, …] — multiple
+```
+
+- Wraps the canonical `generateOpenAIImage` (`src/lib/ai/openai-image.ts`). Self-contained: loads `.env.local`, resolves `OPENAI_API_KEY_SECRET_REF` server-side, never prints the secret.
+- Defaults: `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` exceeds the 125s of the runtime `generateImage` helper).
+- `--background transparent` falls back to `gpt-image-1.5` (gpt-image-2 has no alpha). Still **raster** (PNG) — for real vectors use Higgsfield + Recraft V4.1.
+- The CLI **operates** the model; THIS skill is the **art direction** (brief, composition, finish, palette, QA). Run the skill to write the prompt, then the CLI to generate, then critique + GVC if it lands in UI.
+- Keep exploratory concepts out of commits (gitignored dir, e.g. `.captures/concepts/`).
+
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.
