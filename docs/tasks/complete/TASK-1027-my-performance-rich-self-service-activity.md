@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `[none]`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `ui|delivery|ico|nexa|identity|api`
 - Blocked by: `none`
-- Branch: `task/TASK-1027-my-performance-rich-self-service-activity`
+- Branch: `develop` (excepción autorizada por el operador 2026-06-09 — trabajar in-place en develop, sin branch dedicado; documentado en Audit + Handoff)
 - Legacy ID: `[none]`
 - GitHub Issue: `[none]`
 
