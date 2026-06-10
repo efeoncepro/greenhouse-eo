@@ -12,8 +12,32 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `—`
-- Status real: `Diseño (skills arch-architect + greenhouse-product-ui-architect aplicadas)`
+- Status real: `Slice 3 UI construida como design artifact + aprobada por el operador (product-design-loop, GVC desktop/mobile). Backend (Slices 0-2) + wiring runtime pendientes.`
 - Domain: `platform | identity | ui`
+
+## Design artifact aprobado (2026-06-10)
+
+La **mini-interfaz (Slice 3)** se construyó como artefacto de diseño vía el
+`product-design-loop` (3 conceptos gpt-image-2 → operador eligió **A popover anclado +
+preview de C**) y quedó **aprobada por el operador** con evidencia GVC desktop+mobile.
+Vive como ruta mockup tokenizada (mock `onLink`, sin backend):
+
+- Ruta: `/design-system/figma-link/mockup` · view `src/views/greenhouse/admin/design-system/figma-link/`.
+- `FigmaNodeLinkAffordance` — el **"+" circular a la izquierda** del `GreenhouseFigmaNodeButton`;
+  rota 45° (+→×) al abrir, vuelve al cerrar (reduced-motion horneado, `theme.transitions`).
+  Solo aparece con la capability `design_system.figma_node.link` (sin ella → solo el botón).
+- `FigmaNodeLinkEditor` — popover sobre `GreenhouseFloatingSurface variant='inlineEditor'`
+  (reuse, **no primitive nueva**). 7 estados honestos (idle / válido / vinculando / inválido /
+  archivo≠AXIS / cambiar nodo / error).
+- `parseFigmaUrl` (`src/lib/design-system/figma-nodes/parse-figma-url.ts`, pure + tests) —
+  disecciona la URL; **tolera el prefijo `@`** (paste real de Figma: `@https://…?node-id=11669-40645&m=dev`),
+  `<url>`, comillas, `/file/` legacy, branch URLs; valida fail-closed que el `fileKey` sea AXIS.
+- **Preview del nodo (decidido OK)**: el preview muestra el **render real del nodo**
+  (Figma REST `GET /v1/images/{fileKey}?ids={nodeId}&format=png`) cuando está disponible, con
+  la **identidad AXIS (isotipo `AxisWordmark variant='isotype'` + node id chip) como fallback
+  honesto** + estado loading. Feasibility confirmada (MCP Figma renderizó `11669:40645` = specimen
+  "Tooltip"). El slot de thumbnail ya está construido en `FigmaNodeLinkEditor`
+  (`nodeThumbnailUrl` + `thumbnailStatus`) — solo falta el fetch runtime (Slice 4).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — PROBLEM & SOLUTION
@@ -111,10 +135,10 @@ updated_by    TEXT
 patrón state-machine+CHECK+audit trio). Ownership `greenhouse_ops`, GRANT a `greenhouse_runtime`.
 Seed: las 2 filas del TS hardcodeado actual (breadcrumbs, colors).
 
-**Parser puro** `parseFigmaUrl(url) → { fileKey, fileName, nodeId } | null`
-(`src/lib/design-system/figma-nodes/parse-figma-url.ts`): `figma.com/design/:fileKey/:fileName?node-id=205-234905`
-→ normaliza `205-234905` → `205:234905` (inverso de `buildFigmaNodeUrl`). Cero side-effects,
-tests exhaustivos (URLs válidas/malformadas/otro file/branch URLs).
+**Parser puro** `parseFigmaUrl(url) → { fileKey, fileName, nodeId } | null` — ✅ **CONSTRUIDO**
+(`src/lib/design-system/figma-nodes/parse-figma-url.ts` + tests). `node-id=205-234905` → `205:234905`
+(inverso de `buildFigmaNodeUrl`). **Tolera artefactos de paste**: prefijo `@` (`@https://…&m=dev`),
+`<url>`, comillas envolventes, `/file/` legacy, branch URLs, fileName encodeado. Cero side-effects.
 
 **Command** `linkDesignSystemFigmaNode({ surfaceKey, url, actorUserId })` (server-only):
 parse → validar `fileKey === AXIS_FILE_KEY` (fail-closed) → upsert idempotente por
@@ -134,30 +158,39 @@ SSOT = DB; el TS `design-system-figma-nodes.ts` queda como **seed**, no como fue
    **+ `efeonce_admin`**. El guard `capability-grant-coverage.test.ts` exige ≥1 grant.
 4. **Default gobernado**: `role_entitlement_defaults` seed para `designer`.
 
-### Slice 3 — UI: inline editor + shell server-fed
+### Slice 3 — UI: inline editor + shell server-fed — ✅ design artifact CONSTRUIDO (mockup)
 
 **Decisión reuse/extend/new-primitive: NO primitive nueva.** Reusar `GreenhouseFloatingSurface`
-variant `inlineEditor` (su contrato canónico incluye "inline editors"); `GreenhouseFigmaNodeButton`
-es el **anchor**.
+variant `inlineEditor`; `GreenhouseFigmaNodeButton` es el **anchor**. Construido + aprobado por GVC
+como ruta mockup (ver "Design artifact aprobado" arriba). **Falta el wiring runtime** (lo de abajo):
 
-- **Shell server-fed**: la `layout.tsx` (server) de `/design-system` lee `getDesignSystemFigmaNodeMap()`
-  y lo pasa como prop a `DesignSystemBreadcrumbShell` (`'use client'`). Deja de resolver client-side
-  desde el TS.
-- **Affordance gateado**: pasar `canLink` (resuelto server-side por `can(subject, 'design_system.figma_node.link', 'update')`)
-  al shell. Cuando `!nodeId && canLink` → render "Vincular nodo Figma" que ancla un `GreenhouseFloatingSurface inlineEditor`
-  con un `CustomTextField` (URL) + preview parseado (`AXIS · node 205:234905`) + botón "Vincular".
-- **forms-ux**: un campo, paste-friendly, validación al submit, **mostrar el preview parseado antes de confirmar**.
-- **Estados (state-design)**:
-  - No-diseñador: botón disabled + tooltip "Sin nodo Figma — pedile a un diseñador que lo vincule". Sin editor.
-  - Diseñador sin nodo: affordance "Vincular nodo" → inline editor.
-  - Editando → validando (spinner) → error (URL inválida / file ≠ AXIS / nodo no encontrado) → vinculado (botón flipea optimista a "Abrir en Figma", confirmado por server).
-  - Reduced-motion horneado por FloatingSurface.
-- **API**: `POST /api/admin/design-system/figma-nodes` (o `/api/design-system/...`), gateado por la capability.
+- **Shell server-fed** (pendiente runtime): la `layout.tsx` (server) de `/design-system` lee
+  `getDesignSystemFigmaNodeMap()` y lo pasa como prop a `DesignSystemBreadcrumbShell` (`'use client'`)
+  + `canLink` (resuelto server-side por `can(subject, 'design_system.figma_node.link', 'update')`).
+  Reemplaza el `FigmaNodeLinkAffordance` mock `onLink` por el command real.
+- **Affordance** (✅ construido): cuando `canLink` → "+" a la izquierda del botón que ancla el
+  `inlineEditor`. Cuando `!canLink` → solo el botón. El "+" rota 45° (+→×) al abrir.
+- **Estados** (✅ construidos, state-design): idle / válido (preview) / vinculando / inválido /
+  archivo≠AXIS / cambiar nodo / error. Reduced-motion horneado.
+- **API** (pendiente): `POST /api/admin/design-system/figma-nodes`, gateado por la capability.
   Error es-CL canónico (`canonicalErrorResponse`), nunca `error.message` crudo.
 
-### Slice 4 — (opcional, diferible) enrichment de metadata del nodo
+### Slice 4 — Render real del nodo (enrichment) — diseño OK, fetch runtime pendiente
 
-`node_name`/thumbnail vía API Figma o MCP, reactivo + degradable. NO bloquea V1. Puede ser task derivada.
+Decidido OK con el operador (2026-06-10): el preview muestra el **render real del nodo**, con la
+**identidad AXIS como fallback honesto**. El slot UI ya está construido (`FigmaNodeLinkEditor`
+props `nodeThumbnailUrl` + `thumbnailStatus: idle|loading|ready|unavailable`). Falta el fetch runtime:
+
+- **Token Figma** (PAT u OAuth app) en **GCP Secret Manager** (`greenhouse-figma-api-token`,
+  `FIGMA_API_TOKEN_SECRET_REF`) — **no existe aún**, provisionarlo. Resolver server-side vía
+  `resolveSecretByRef`; nunca exponer al cliente.
+- **Cliente server-only** `src/lib/design-system/figma-nodes/figma-render.ts`:
+  `GET /v1/images/{fileKey}?ids={nodeId}&format=png&scale=2` (render) + `GET /v1/files/{fileKey}/nodes?ids=`
+  (node_name). Debounced on type; degrada honesto a identidad si falla/sin token (nunca rompe el editor).
+- **Caché del thumbnail**: las URLs de imagen de Figma son **temporales** → bajar el PNG y persistirlo
+  como **asset Greenhouse** (mismo patrón que las imágenes IA, `greenhouse_core.assets`) + `node_name`
+  en `design_system_figma_nodes`. Re-fetch periódico/on-demand. Rate-limit aware.
+- Feasibility confirmada (MCP Figma renderizó `11669:40645`). El MCP es agent-side; runtime = REST API.
 
 ### Slice 5 — Tests + GVC + docs
 
