@@ -25,6 +25,7 @@ const DESIGN_SYSTEM_ROUTE_LABELS = {
   [`${DESIGN_SYSTEM_ROUTE}/charts`]: 'Charts',
   [`${DESIGN_SYSTEM_ROUTE}/chips`]: 'Chips',
   [`${DESIGN_SYSTEM_ROUTE}/colors`]: 'AXIS Colors',
+  [`${DESIGN_SYSTEM_ROUTE}/disclosure`]: 'Disclosure',
   [`${DESIGN_SYSTEM_ROUTE}/efeonce-brand`]: 'Efeonce Brand',
   [`${DESIGN_SYSTEM_ROUTE}/elevation`]: 'Elevation',
   [`${DESIGN_SYSTEM_ROUTE}/floating-surfaces`]: 'Floating Surfaces',

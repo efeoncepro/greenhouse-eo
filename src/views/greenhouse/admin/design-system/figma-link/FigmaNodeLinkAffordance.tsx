@@ -2,13 +2,8 @@
 
 import { useMemo, useState } from 'react'
 
-import Stack from '@mui/material/Stack'
-import IconButton from '@mui/material/IconButton'
-import Tooltip from '@mui/material/Tooltip'
-
-import useReducedMotion from '@/hooks/useReducedMotion'
 import {
-  GreenhouseFloatingSurface,
+  GreenhouseAnchoredDisclosure,
   GreenhouseFigmaNodeButton
 } from '@/components/greenhouse/primitives'
 import { AXIS_FILE_KEY } from '@/components/greenhouse/primitives/GreenhouseFigmaNodeButton'
@@ -36,10 +31,11 @@ export interface FigmaNodeLinkAffordanceProps {
 /**
  * FigmaNodeLinkAffordance — the "+" link control left of the Figma node button (TASK-1072).
  *
- * A circular "+" icon (designer-only) anchors a `GreenhouseFloatingSurface inlineEditor`
- * to link/change the page's AXIS Figma node. The "+" rotates 45° (→ ×) while open and
- * returns on close (reduced-motion baked). When `canLink` is false, only the node button
- * renders — seeing the Design System (view) ≠ linking a node (entitlement).
+ * Consumes the canonical `GreenhouseAnchoredDisclosure kind='figmaNodeLink'` (designer-only):
+ * a rotating "+" trigger anchors the inline editor to link/change the page's AXIS Figma node,
+ * with the node button as the `companion` on the right. When `canLink` is false, only the node
+ * button renders — seeing the Design System (view) ≠ linking a node (entitlement). This view
+ * owns the parse/link state; the trigger/surface/companion layout is the primitive.
  */
 const FigmaNodeLinkAffordance = ({
   nodeId,
@@ -48,7 +44,6 @@ const FigmaNodeLinkAffordance = ({
   onLink,
   defaultOpen = false
 }: FigmaNodeLinkAffordanceProps) => {
-  const reduced = useReducedMotion()
   const [open, setOpen] = useState(defaultOpen)
   const [value, setValue] = useState('')
   const [status, setStatus] = useState<FigmaNodeLinkStatus>('idle')
@@ -125,56 +120,28 @@ const FigmaNodeLinkAffordance = ({
   }
 
   return (
-    <Stack direction='row' alignItems='center' spacing={2}>
-      <GreenhouseFloatingSurface
-        variant='inlineEditor'
-        width={360}
-        open={open}
-        onOpenChange={handleOpenChange}
-        anchor={anchorProps => (
-          <Tooltip title={mode === 'change' ? 'Cambiar nodo Figma' : 'Vincular nodo Figma'} disableInteractive>
-            <IconButton
-              {...anchorProps}
-              size='small'
-              aria-label={mode === 'change' ? 'Cambiar nodo Figma' : 'Vincular nodo Figma'}
-              sx={{
-                inlineSize: 32,
-                blockSize: 32,
-                color: 'text.secondary',
-                border: theme => `1px solid ${theme.palette.divider}`,
-                transition: reduced
-                  ? 'none'
-                  : theme => theme.transitions.create(['background-color', 'border-color', 'color']),
-                '& i': {
-                  fontSize: 18,
-                  transition: reduced
-                    ? 'none'
-                    : theme => theme.transitions.create('transform', { duration: theme.transitions.duration.standard }),
-                  transform: open ? 'rotate(45deg)' : 'rotate(0deg)'
-                },
-                '&:hover': { bgcolor: 'action.hover', borderColor: 'primary.main', color: 'primary.main' }
-              }}
-            >
-              <i className='tabler-plus' aria-hidden='true' />
-            </IconButton>
-          </Tooltip>
-        )}
-        content={({ close }) => (
-          <FigmaNodeLinkEditor
-            mode={mode}
-            value={value}
-            onChange={handleChange}
-            parsed={parsed}
-            status={status}
-            errorMessage={errorMessage}
-            currentNodeId={nodeId}
-            onSubmit={handleSubmit}
-            onClose={close}
-          />
-        )}
-      />
-      <GreenhouseFigmaNodeButton nodeId={nodeId} fileName={fileName} />
-    </Stack>
+    <GreenhouseAnchoredDisclosure
+      kind='figmaNodeLink'
+      triggerAriaLabel={mode === 'change' ? 'Cambiar nodo Figma' : 'Vincular nodo Figma'}
+      triggerDataCapture='figma-node-link-trigger'
+      surfaceWidth={360}
+      open={open}
+      onOpenChange={handleOpenChange}
+      companion={<GreenhouseFigmaNodeButton nodeId={nodeId} fileName={fileName} />}
+      content={({ close }) => (
+        <FigmaNodeLinkEditor
+          mode={mode}
+          value={value}
+          onChange={handleChange}
+          parsed={parsed}
+          status={status}
+          errorMessage={errorMessage}
+          currentNodeId={nodeId}
+          onSubmit={handleSubmit}
+          onClose={close}
+        />
+      )}
+    />
   )
 }
 

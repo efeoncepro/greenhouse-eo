@@ -125,6 +125,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Color AXIS Lab — child surface del Design System para ramps, opacidades, contraste y neutrales; alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/disclosure',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Disclosure Lab (TASK-1072) — child surface del Design System para GreenhouseDisclosureTrigger (+ rotatorio) y GreenhouseAnchoredDisclosure; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/loaders',
     parent: '/design-system',
     via: 'inline-link',

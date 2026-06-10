@@ -152,6 +152,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-badge'
   },
   {
+    id: 'disclosure',
+    title: 'Disclosure',
+    description: 'El “+” rotatorio (DisclosureTrigger) y el patrón que lo ancla a una superficie flotante para desplegar UI contextual (AnchoredDisclosure).',
+    route: '/design-system/disclosure',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'GreenhouseDisclosureTrigger · GreenhouseAnchoredDisclosure',
+    tags: ['disclosure', 'trigger', 'popover', 'add', 'motion'],
+    searchAliases: ['disclosure', 'mas', 'más', 'plus', '+', 'agregar', 'desplegar', 'popover', 'editor inline', 'rotacion', 'rotación', 'expandir', 'trigger'],
+    icon: 'tabler-circle-plus'
+  },
+  {
     id: 'feedback-atoms',
     title: 'Feedback atoms',
     description: 'KPI delta inline (signo+flecha+color AA) y status dot (dot+label). Color nunca solo; consumen theme.greenhouseSemantic.',

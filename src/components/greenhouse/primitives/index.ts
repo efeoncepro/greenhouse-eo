@@ -249,6 +249,35 @@ export type {
   GreenhouseFloatingSurfaceVariantConfig
 } from './floating-surface-controller'
 
+// TASK-1072 — Disclosure Trigger (rotating "+" atom) + Anchored Disclosure (trigger + surface)
+export { default as GreenhouseDisclosureTrigger } from './GreenhouseDisclosureTrigger'
+export type { GreenhouseDisclosureTriggerProps } from './GreenhouseDisclosureTrigger'
+export {
+  DISCLOSURE_TRIGGER_VARIANT_CONFIG,
+  getDisclosureTriggerVariantConfig,
+  resolveDisclosureTriggerVariant
+} from './disclosure-trigger-controller'
+export type {
+  GreenhouseDisclosureTriggerKind,
+  GreenhouseDisclosureTriggerVariant,
+  GreenhouseDisclosureTriggerVariantConfig
+} from './disclosure-trigger-controller'
+export { default as GreenhouseAnchoredDisclosure } from './GreenhouseAnchoredDisclosure'
+export type {
+  GreenhouseAnchoredDisclosureContentProps,
+  GreenhouseAnchoredDisclosureProps
+} from './GreenhouseAnchoredDisclosure'
+export {
+  ANCHORED_DISCLOSURE_VARIANT_CONFIG,
+  getAnchoredDisclosureVariantConfig,
+  resolveAnchoredDisclosureVariant
+} from './anchored-disclosure-controller'
+export type {
+  GreenhouseAnchoredDisclosureKind,
+  GreenhouseAnchoredDisclosureVariant,
+  GreenhouseAnchoredDisclosureVariantConfig
+} from './anchored-disclosure-controller'
+
 // TASK-498 — Sprint 3 primitives extraction (Quote Builder generalization)
 export { default as EntitySummaryDock } from './EntitySummaryDock'
 export type {

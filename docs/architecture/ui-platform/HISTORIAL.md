@@ -6,6 +6,29 @@
 
 ---
 
+## Delta 2026-06-10d — Disclosure primitives (trigger rotatorio + anchored disclosure)
+
+TASK-1072. Se canonizaron dos primitives nuevas en `src/components/greenhouse/primitives/`:
+
+- **`GreenhouseDisclosureTrigger`** — átomo: botón icono (wrappea MUI `IconButton`, `forwardRef`)
+  que **rota para señalar abierto/cerrado**. Es el único motion (vía `theme.transitions` +
+  reduced-motion horneado). Variants: `addToggle` (`+`→`×`, 45°), `expand` (chevron, 180°),
+  `reveal` (kebab `⋮`→`⋯`, 90°). Kinds: `linkResource`·`addEntry` → addToggle,
+  `expandSection`·`showFilters` → expand, `moreActions` → reveal. a11y: `ariaLabel` obligatorio +
+  `aria-expanded`. Usable solo (acordeón, alternar) o como ancla de un disclosure.
+- **`GreenhouseAnchoredDisclosure`** — higher-order primitive: **compone** el trigger +
+  `GreenhouseFloatingSurface` + un slot `companion` (acción a la derecha). NO forkea FloatingSurface;
+  cada variant resuelve a un par (surface variant + trigger variant): `contextualEditor` →
+  inlineEditor+addToggle, `actionMenu` → actionMenu+reveal, `quickPeek` → evidencePeek+reveal. Kinds:
+  `figmaNodeLink` → contextualEditor, `quickAdd`·`contextualOptions` → actionMenu, `evidence` → quickPeek.
+
+`FigmaNodeLinkAffordance` (TASK-1072) se refactorizó para **consumir** `GreenhouseAnchoredDisclosure
+kind='figmaNodeLink'` (deja de ser impl paralela). Controllers con resolver `kind→variant` + config
+frozen (tests). Lab interno `/design-system/disclosure` (registrado en el catálogo, route-reachability,
+scenario GVC `design-system-disclosure`, breadcrumb label). Nodo AXIS Figma pendiente (el botón Figma
+del shell aparece inactivo en esa página — señal para crearlo). Tokenizado (radius CSS length, colores
+de tema, motion tokens); cero hardcode. GVC desktop+mobile mirada.
+
 ## Delta 2026-06-10c — Design System breadcrumbs shell
 
 El Design System interno hereda breadcrumbs canónicos en todas sus páginas y
