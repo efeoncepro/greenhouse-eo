@@ -6,6 +6,79 @@
 
 ---
 
+## Delta 2026-06-10c — Design System breadcrumbs shell
+
+El Design System interno hereda breadcrumbs canónicos en todas sus páginas y
+mockups internos.
+
+- `src/app/(dashboard)/admin/design-system/layout.tsx` envuelve todo el subtree
+  con `DesignSystemBreadcrumbShell`.
+- El shell compone `GreenhouseBreadcrumbs kind='pageHierarchy'` y resuelve la
+  jerarquía `Admin / Design System / Página`, con parent real para
+  `Typography / Typography Mockup`.
+- Las rutas nuevas bajo `/admin/design-system` quedan cubiertas por fallback de
+  label, pero deben agregarse al mapa del shell cuando necesiten nombre
+  editorial o parent específico.
+- Como consecuencia del shell, los labs y mockups del Design System no deben
+  renderizar CTAs locales de retorno al catálogo (`Design System`, `Volver al
+  sistema`, `Volver al catálogo`) en el header o secciones de reglas; ese
+  retorno vive en el breadcrumb global. Se conservan solo links no redundantes
+  como nodos Figma, links entre labs o specimens de botones.
+
+## Delta 2026-06-10b — Radius token sx gotcha
+
+Se documenta una trampa recurrente del stack MUI/Vuexy: `borderRadius` numérico
+en `sx` se transforma como multiplicador de `theme.shape.borderRadius`, no como
+px directo.
+
+- `theme.shape.customBorderRadius.*` guarda números en px (`2/4/6/8/10`), pero
+  dentro de `sx` deben emitirse como CSS length (`'4px'`, `'6px'`, etc.).
+- Queda prohibido presentar `borderRadius:
+  theme.shape.customBorderRadius.*` como ejemplo correcto dentro de `sx`, porque
+  puede inflar el radio visual.
+- `DESIGN.md`, `ui-platform/STACK.md` y las skills locales de Codex/Claude se
+  sincronizan para que agentes no repitan el error en labs, mockups o primitives.
+
+## Delta 2026-06-10a — GreenhouseBreadcrumbs primitive
+
+La navegación jerárquica de Greenhouse deja de depender de usos MUI crudos y
+queda canonizada como primitive AXIS/Greenhouse.
+
+- `GreenhouseBreadcrumbs` vive en `src/components/greenhouse/primitives/` y
+  envuelve MUI Breadcrumbs para preservar semántica `nav`/links/`aria-current`.
+- Variants oficiales: `default` (port del componente AXIS Figma
+  `Breadcrumbs Greenhouse`, node `205:234905`) y `compact` (headers densos,
+  inspectors y workbenches).
+- Kinds oficiales: `pageHierarchy`, `workbenchHierarchy`,
+  `designSystemSpecimen`, `legacy` y `custom`, resueltos por
+  `greenhouse-breadcrumbs-controller.ts`.
+- Separators oficiales: `slash` (default AXIS) y `chevron` (compat legacy).
+  El wrapper viejo `Breadcrumb` delega en la primitive con `kind='legacy'`.
+- Hoja viva interna: `/admin/design-system/breadcrumbs`; catálogo DS y
+  route-reachability actualizados; scenario GVC:
+  `design-system-breadcrumbs`.
+- Regla de uso: no duplicar breadcrumbs con botones "volver"; ancestors son
+  links reales y el último item es current page con `aria-current='page'`.
+
+## Delta 2026-06-09i — Efeonce orbital signature lab
+
+La identidad institucional de Efeonce suma un lab interno de motion para probar
+una firma orbital del wordmark sin tocar el asset principal.
+
+- `public/branding/logo-full.svg` permanece intacto como asset canónico.
+- Se creó una copia experimental con IDs semánticos en
+  `public/branding/experiments/efeonce-logo-full-orbit-motion-copy.svg` para
+  iteración visual.
+- `EfeonceOrbitalLogoMark` queda como primitive de hardening para motion de
+  marca institucional: variants `static`, `orbitalSignature` y `ambient`;
+  kinds `institutionalWordmark` y `motionSpecimen`.
+- La animación usa `useGreenhouseGSAP` y respeta reduced-motion. El círculo
+  superior (`#efeonce-orbiting-satellite-circle`) recorre el óvalo que forma la
+  O/nave; `#efeonce-orbit-top-bridge` completa la pista superior cuando el punto
+  abandona su posición original.
+- Hoja viva: `/admin/design-system/efeonce-brand`; scenario GVC:
+  `design-system-efeonce-brand`.
+
 ## Delta 2026-06-09h — Nexa animated mark + animated ask badge canon
 
 El mark de Nexa queda formalizado como familia canónica de primitives de marca

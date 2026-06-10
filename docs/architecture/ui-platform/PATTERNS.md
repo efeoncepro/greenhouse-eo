@@ -153,36 +153,38 @@ items.length === 0 ? (
 | Agency Workspace (3 lazy tabs) | Retry button | — | — | Skeletons |
 
 
-## Breadcrumbs Pattern (TASK-238)
+## Breadcrumbs Pattern
 
-Para vistas de detalle con jerarquía de navegación, usar **MUI Breadcrumbs** en vez de botones "Volver":
+Para vistas de detalle con jerarquía de navegación, usar la primitive
+canónica `GreenhouseBreadcrumbs`. La primitive envuelve MUI Breadcrumbs para
+mantener semántica accesible y aplica el contrato AXIS del nodo Figma
+`205:234905`.
 
 ```tsx
-import Breadcrumbs from '@mui/material/Breadcrumbs'
-import Link from 'next/link'
+import { GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 
-<Breadcrumbs aria-label='breadcrumbs' sx={{ mb: 2 }}>
-  <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2'
-    sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-    Agencia
-  </Typography>
-  <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2'
-    sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-    Spaces
-  </Typography>
-  <Typography color='text.primary' variant='body2'>
-    {detail.clientName}
-  </Typography>
-</Breadcrumbs>
+<GreenhouseBreadcrumbs
+  kind='pageHierarchy'
+  items={[
+    { label: 'Agencia', href: '/agency' },
+    { label: 'Organizaciones', href: '/agency/organizations' },
+    { label: organization.name }
+  ]}
+/>
 ```
 
 **Reglas:**
-- Breadcrumbs reemplazan botones "Volver a X" — no duplicar ambos
-- Cada nivel intermedio es un link, el último nivel es texto estático
-- `variant='body2'` para tamaño compacto
-- Links con `textDecoration: 'none'` y hover underline
-- `aria-label='breadcrumbs'` para accesibilidad
-- Implementado en: Agency Space 360, Greenhouse Project Detail, Sprint Detail
+- Breadcrumbs reemplazan botones "Volver a X" — no duplicar ambos.
+- Cada nivel intermedio es un link real; el último nivel es texto estático con
+  `aria-current='page'`.
+- `kind='pageHierarchy'` usa la variante `default`; `kind='workbenchHierarchy'`
+  usa la variante `compact` para headers densos, inspectors y workbenches.
+- El separator canónico es `/`; el wrapper legacy `Breadcrumb` conserva chevron
+  solo por compatibilidad.
+- Iconos son opcionales por item y deben reforzar jerarquía/brand context, no
+  decorar todos los breadcrumbs productivos por defecto.
+- Hoja viva: `/admin/design-system/breadcrumbs`; scenario GVC:
+  `design-system-breadcrumbs`.
 
 
 ## Progressive Disclosure Pattern (TASK-237)

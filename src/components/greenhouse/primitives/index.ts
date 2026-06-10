@@ -13,6 +13,18 @@ export type {
 } from './GreenhouseAsyncActionButton'
 export { default as GreenhouseButton } from './GreenhouseButton'
 export type { GreenhouseButtonProps } from './GreenhouseButton'
+export {
+  default as GreenhouseFigmaNodeButton,
+  buildFigmaNodeUrl,
+  AXIS_FILE_KEY,
+  AXIS_FILE_NAME
+} from './GreenhouseFigmaNodeButton'
+export type { GreenhouseFigmaNodeButtonProps } from './GreenhouseFigmaNodeButton'
+export { default as GreenhouseBreadcrumbs } from './GreenhouseBreadcrumbs'
+export type {
+  GreenhouseBreadcrumbItem,
+  GreenhouseBreadcrumbsProps
+} from './GreenhouseBreadcrumbs'
 export { default as GreenhouseVerificationBadge } from './GreenhouseVerificationBadge'
 export type {
   GreenhouseVerificationBadgeKind,
@@ -25,6 +37,22 @@ export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedM
 export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
+export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'
+export type { EfeonceOrbitalLogoMarkProps } from './EfeonceOrbitalLogoMark'
+export {
+  EFEONCE_ORBITAL_LOGO_COLOR,
+  EFEONCE_ORBITAL_LOGO_KIND_CONFIG,
+  resolveEfeonceOrbitalLogoAriaLabel,
+  resolveEfeonceOrbitalLogoVariant
+} from './efeonce-orbital-logo-controller'
+export type {
+  EfeonceOrbitalLogoKind,
+  EfeonceOrbitalLogoKindConfig,
+  EfeonceOrbitalLogoVariant
+} from './efeonce-orbital-logo-controller'
+// Claude experiment — variante de órbita completa con el hueco del anillo relleno.
+export { default as ClaudeEfeonceFilledOrbitMark } from './ClaudeEfeonceFilledOrbitMark'
+export type { ClaudeEfeonceFilledOrbitMarkProps } from './ClaudeEfeonceFilledOrbitMark'
 export {
   GREENHOUSE_NEXA_BRAND_ASSETS,
   GREENHOUSE_NEXA_BRAND_COLORS,
@@ -101,6 +129,19 @@ export type {
   GreenhouseButtonTone,
   GreenhouseButtonVariant
 } from './greenhouse-button-controller'
+export {
+  GREENHOUSE_BREADCRUMBS_KIND_DEFAULT_SEPARATOR,
+  GREENHOUSE_BREADCRUMBS_KIND_DEFAULT_VARIANT,
+  GREENHOUSE_BREADCRUMBS_VARIANT_CONFIG,
+  GREENHOUSE_BREADCRUMBS_VARIANTS,
+  resolveGreenhouseBreadcrumbsSeparator,
+  resolveGreenhouseBreadcrumbsVariant
+} from './greenhouse-breadcrumbs-controller'
+export type {
+  GreenhouseBreadcrumbsKind,
+  GreenhouseBreadcrumbsSeparator,
+  GreenhouseBreadcrumbsVariant
+} from './greenhouse-breadcrumbs-controller'
 export { default as GreenhouseChip } from './GreenhouseChip'
 export type {
   GreenhouseChipKind,

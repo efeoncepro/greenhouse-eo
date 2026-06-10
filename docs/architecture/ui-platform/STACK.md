@@ -95,6 +95,20 @@ La plataforma UI consume geometry desde el theme, no desde literals route-locale
 - Radius Greenhouse `xxl=12` y `display=16` → superficies grandes con uso intencional, no cards operacionales densas.
 - `Border-Round` → `9999px` para pills/capsules o `50%` para circulos.
 
+**Gotcha MUI `sx`:** `borderRadius` numérico no significa px directo; MUI lo
+transforma como multiplicador de `theme.shape.borderRadius`. Como
+`theme.shape.customBorderRadius.*` guarda números en px, usar
+`borderRadius: theme.shape.customBorderRadius.sm` dentro de `sx` puede renderizar
+un radio mucho más grande. En `sx`, convertir siempre el token a length CSS:
+
+```tsx
+sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.sm}px` })}
+```
+
+Solo usar números directos en `borderRadius` para casos MUI-intencionales
+revisados visualmente; en Greenhouse, el default para tokens de radius es string
+con `px`.
+
 Referencia viva interna: `/admin/design-system/geometry`. Contrato extenso: `GREENHOUSE_DESIGN_TOKENS_V1.md` §4-§5.
 
 ### Wrappers (@core/components/mui/)
@@ -198,7 +212,7 @@ import type { OperationsOverview } from '@/lib/operations/get-operations-overvie
 - No usar `elevation > 0` en cards internas (usar `variant='outlined'`)
 - No mezclar español e inglés en la misma surface
 - No hardcodear colores — siempre `theme.palette.*`
-- No hardcodear spacing/radius — spacing usa `theme.spacing(N)`; radius usa `theme.shape.customBorderRadius.*`
+- No hardcodear spacing/radius — spacing usa `theme.spacing(N)`; radius usa `theme.shape.customBorderRadius.*` convertido a CSS length (`${...}px`) dentro de `sx`
 - No crear stat displays custom cuando un card-statistics component sirve
 - No usar Redux para estado local — `useState` o `react-hook-form`
 - No instalar librerías nuevas sin verificar si ya están disponibles en este inventario

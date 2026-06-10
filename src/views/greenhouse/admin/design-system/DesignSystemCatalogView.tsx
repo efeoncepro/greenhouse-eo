@@ -31,6 +31,7 @@ interface CatalogItem {
   status: CatalogStatus
   owner: string
   tags: string[]
+  searchAliases?: string[]
   icon: string
 }
 
@@ -126,6 +127,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-square-rounded-letter-b'
   },
   {
+    id: 'breadcrumbs',
+    title: 'Breadcrumbs',
+    description: 'Primitive para jerarquía de navegación con ancestors clickeables, current page y separadores gobernados.',
+    route: '/admin/design-system/breadcrumbs',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'GreenhouseBreadcrumbs',
+    tags: ['navigation', 'hierarchy', 'figma'],
+    searchAliases: ['breadcrumb', 'breadcrumbs', 'breadcumbs', 'migas', 'migas de pan', 'ruta', 'rutas', 'jerarquía', 'jerarquia'],
+    icon: 'tabler-slash'
+  },
+  {
     id: 'chips',
     title: 'Chips',
     description: 'Primitive para estados compactos, atributos, identidad, filtros y entradas removibles.',
@@ -160,6 +174,18 @@ const CATALOG_ITEMS: CatalogItem[] = [
     owner: 'GreenhouseNexaBrandMark',
     tags: ['nexa', 'brand', 'assistant'],
     icon: 'tabler-sparkles'
+  },
+  {
+    id: 'efeonce-brand',
+    title: 'Efeonce orbital signature',
+    description: 'Primitive experimental para la firma orbital del wordmark institucional de Efeonce.',
+    route: '/admin/design-system/efeonce-brand',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'EfeonceOrbitalLogoMark',
+    tags: ['efeonce', 'brand', 'gsap', 'logo'],
+    icon: 'tabler-planet'
   },
   {
     id: 'talent-profile',
@@ -287,7 +313,48 @@ const kindTone = (kind: CatalogKind) => {
   return 'default'
 }
 
-const normalize = (value: string) => value.toLocaleLowerCase('es-CL')
+const normalize = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('es-CL')
+
+export const filterDesignSystemCatalogItems = ({
+  category,
+  kind,
+  query
+}: {
+  category: CategoryFilter
+  kind: CatalogKind | 'Todos'
+  query: string
+}) => {
+  const normalizedQuery = normalize(query.trim())
+
+  return CATALOG_ITEMS.filter(item => {
+    const matchesCategory = category === 'Todos' || item.category === category
+    const matchesKind = kind === 'Todos' || item.kind === kind
+
+    const haystack = normalize(
+      [
+        item.id,
+        item.title,
+        item.description,
+        item.route,
+        item.category,
+        CATEGORY_LABELS[item.category],
+        item.kind,
+        KIND_LABELS[item.kind],
+        item.owner,
+        ...item.tags,
+        ...(item.searchAliases ?? [])
+      ].join(' ')
+    )
+
+    const matchesQuery = normalizedQuery.length === 0 || haystack.includes(normalizedQuery)
+
+    return matchesCategory && matchesKind && matchesQuery
+  })
+}
 
 const AxisInteractiveWordmark = () => {
   const scopeRef = useRef<SVGSVGElement | null>(null)
@@ -407,18 +474,7 @@ const DesignSystemCatalogView = () => {
   const [kind, setKind] = useState<CatalogKind | 'Todos'>('Todos')
   const [query, setQuery] = useState('')
 
-  const filteredItems = useMemo(() => {
-    const normalizedQuery = normalize(query.trim())
-
-    return CATALOG_ITEMS.filter(item => {
-      const matchesCategory = category === 'Todos' || item.category === category
-      const matchesKind = kind === 'Todos' || item.kind === kind
-      const haystack = normalize([item.title, item.description, item.owner, ...item.tags].join(' '))
-      const matchesQuery = normalizedQuery.length === 0 || haystack.includes(normalizedQuery)
-
-      return matchesCategory && matchesKind && matchesQuery
-    })
-  }, [category, kind, query])
+  const filteredItems = useMemo(() => filterDesignSystemCatalogItems({ category, kind, query }), [category, kind, query])
 
   const categoryCounts = useMemo(
     () =>

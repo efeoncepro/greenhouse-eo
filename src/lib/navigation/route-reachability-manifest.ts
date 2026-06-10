@@ -160,6 +160,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Buttons Lab — child surface del Design System para la primitive GreenhouseButton basada en AXIS Figma, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
+    route: '/admin/design-system/breadcrumbs',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Breadcrumbs Lab — child surface del Design System para la primitive GreenhouseBreadcrumbs basada en AXIS Figma, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
     route: '/admin/design-system/charts',
     parent: '/admin/design-system',
     via: 'inline-link',
@@ -172,6 +179,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Nexa Brand Mark Lab — child surface del Design System para la primitive GreenhouseNexaBrandMark y sus kinds de marca, alcanzable desde el catalogo canonico /admin/design-system.'
+  },
+  {
+    route: '/admin/design-system/efeonce-brand',
+    parent: '/admin/design-system',
+    via: 'inline-link',
+    reason:
+      'Efeonce Orbital Signature Lab — child surface del Design System para iterar motion del wordmark institucional de Efeonce sin tocar el asset principal, alcanzable desde el catalogo canonico /admin/design-system.'
   },
   {
     route: '/admin/design-system/talent-profile',

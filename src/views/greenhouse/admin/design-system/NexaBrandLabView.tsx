@@ -1,7 +1,5 @@
 'use client'
 
-import Link from 'next/link'
-
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -10,7 +8,6 @@ import { alpha } from '@mui/material/styles'
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { typographyScale } from '@/components/theme/typography-tokens'
 import {
-  GreenhouseButton,
   GreenhouseNexaAnimatedAskBadge,
   GreenhouseNexaAnimatedMark,
   GreenhouseNexaBrandMark,
@@ -84,18 +81,6 @@ const NexaBrandLabView = () => (
     }}
   >
     <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.layout.headerGap}>
-      <GreenhouseButton
-        component={Link}
-        href={DESIGN_SYSTEM_LAB_TOKENS.routes.root}
-        variant='text'
-        tone='secondary'
-        kind='navigation'
-        size='small'
-        leadingIcon={<i className='tabler-arrow-left' />}
-        sx={{ alignSelf: 'flex-start', px: 0 }}
-      >
-        Design System
-      </GreenhouseButton>
       <AxisWordmark
         variant='auto'
         height={DESIGN_SYSTEM_LAB_TOKENS.layout.logoBlockSize}

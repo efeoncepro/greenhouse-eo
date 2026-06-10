@@ -2,10 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import Link from 'next/link'
-
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
@@ -16,8 +13,6 @@ import { useTheme } from '@mui/material/styles'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { GREENHOUSE_ELEVATION_LEVELS, type GreenhouseElevationLevel } from '@/components/theme/elevation-tokens'
-
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 
 // Internal Elevation & Shadows Lab (TASK-1049). Live museum rendered from the
 // elevation token SoT via the theme (`theme.greenhouseElevation`). NOT where the
@@ -59,17 +54,6 @@ const ElevationLabView = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, maxWidth: 1100, mx: 'auto' }}>
       <Stack spacing={1.5}>
-        <Button
-          component={Link}
-          href={DESIGN_SYSTEM_ROUTE}
-          variant='text'
-          color='secondary'
-          size='small'
-          startIcon={<i className='tabler-arrow-left' />}
-          sx={{ alignSelf: 'flex-start', px: 0 }}
-        >
-          Design System
-        </Button>
         <AxisWordmark variant='auto' height={32} sx={{ mb: 0.5 }} />
         <Typography variant='overline' color='primary' sx={{ fontWeight: 800 }}>
           Elevation & Shadows

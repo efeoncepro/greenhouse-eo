@@ -48,7 +48,7 @@ Si el brief está subespecificado, hacer **2-3 preguntas** con `AskUserQuestion`
 
 Correr los **2 gates del Figma Implementation Contract** aunque la fuente sea una imagen (contrato completo en CLAUDE.md):
 
-1. **Token mapping (siempre)**: cada color del concepto → `theme.palette.*`/`theme.axis.*`; tipografía → variante/SoT; spacing/radius → scale `4n`/`customBorderRadius.*`; motion → `motion/core/tokens.ts`. **Cero hardcode** (lo bloquean los lint `no-hardcoded-hex-color`/`no-hardcoded-fontfamily`/`no-fontsize-inline-typography`).
+1. **Token mapping (siempre)**: cada color del concepto → `theme.palette.*`/`theme.axis.*`; tipografía → variante/SoT; spacing → scale `4n`; radius → `customBorderRadius.*` como CSS length en `sx`, no como número directo; motion → `motion/core/tokens.ts`. **Cero hardcode** (lo bloquean los lint `no-hardcoded-hex-color`/`no-hardcoded-fontfamily`/`no-fontsize-inline-typography`). Gotcha MUI: `borderRadius` numérico en `sx` es multiplicador y puede inflar el radio.
 2. **Primitive lookup en capas (ANTES de construir)**: (a) ¿existe primitive Greenhouse? grep `src/components/greenhouse/primitives/index.ts` + `ui-platform/PRIMITIVES.md` → usar/expandir, NUNCA fork; (b) ¿wrapper Vuexy `Custom*` o MUI base? → envolver esa base; (c) solo si no hay nada → desde cero (protocolo Primitive+Variants+Kinds completo + Lab interno + GVC).
 
 Construir con la skill **`greenhouse-mockup-builder`** como **ruta real** (no HTML suelto):

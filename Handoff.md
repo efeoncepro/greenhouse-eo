@@ -1,3 +1,14 @@
+# Sesion 2026-06-10 — Radius token gotcha documentado para agentes
+
+Se formalizó el feedback del operador sobre `borderRadius` en MUI `sx`.
+
+- **Regla:** `theme.shape.customBorderRadius.*` guarda números en px, pero `sx={{ borderRadius: <number> }}` lo interpreta como multiplicador de `theme.shape.borderRadius`. En `sx`, usar CSS length (`'4px'`, `'6px'`, etc.) para evitar radios inflados.
+- **Docs:** actualizado `DESIGN.md`, `docs/architecture/ui-platform/STACK.md`, `HISTORIAL.md`, `project_context.md`, `changelog.md`.
+- **Skills:** sincronizadas las skills UI locales de Codex y Claude para Figma/mockups/review/arquitectura visual. También se corrigió el ejemplo erróneo en `.claude/skills/modern-ui/SKILL.md`.
+- **Verificación pendiente de esta entrada:** lint/docs closure tras aplicar los parches.
+
+---
+
 # Sesion 2026-06-10 — GreenhouseBreadcrumbs primitive desde AXIS Figma
 
 Codex promovió el diseño Figma `Breadcrumbs Greenhouse` (AXIS fileKey `yyMksCoijfMaIoYplXKZaR`, node `205:234905`) a primitive canónica.
@@ -5,8 +16,11 @@ Codex promovió el diseño Figma `Breadcrumbs Greenhouse` (AXIS fileKey `yyMksCo
 - **Primitive:** `GreenhouseBreadcrumbs` en `src/components/greenhouse/primitives/`, basada en MUI Breadcrumbs para preservar semántica `nav`, links y `aria-current`. Variants `default|compact`, kinds `pageHierarchy|workbenchHierarchy|designSystemSpecimen|legacy|custom`, separators `slash|chevron`, iconos opcionales por item y `data-capture`.
 - **Compat:** el wrapper legacy `Breadcrumb` ahora delega en `GreenhouseBreadcrumbs kind='legacy'` con chevron compacto, evitando un patrón paralelo.
 - **Lab interno:** `/admin/design-system/breadcrumbs`, con entrada en `DesignSystemCatalogView`, route-reachability y scenario GVC `design-system-breadcrumbs`.
-- **Docs:** sincronizados `docs/architecture/ui-platform/PRIMITIVES.md`, `PATTERNS.md`, `HISTORIAL.md`, `project_context.md` y `changelog.md`.
-- **Pendiente de esta sesión:** correr verificación focal, GVC local y cierre documental antes de declarar listo.
+- **Design System chrome:** se agregó `src/app/(dashboard)/admin/design-system/layout.tsx` + `DesignSystemBreadcrumbShell`, que inyecta `Admin / Design System / Página` con `GreenhouseBreadcrumbs` en todas las páginas y mockups bajo `/admin/design-system`.
+- **Cleanup navegación:** removidos CTAs locales redundantes de retorno al catálogo en labs/mockups del Design System (`Design System`, `Volver al sistema`, `Volver al catálogo`), porque ahora el retorno vive en el breadcrumb global. Se conservaron links no redundantes (Figma, links entre labs, specimens).
+- **Catalog search:** el catálogo ahora indexa `id`, `route`, `category`, `kind`, `owner`, tags y aliases; `Breadcrumbs` responde también a `breadcrumb`, `breadcumbs` y `migas`.
+- **Docs:** sincronizados `docs/architecture/ui-platform/PRIMITIVES.md`, `PATTERNS.md`, `HISTORIAL.md`, `project_context.md`, `changelog.md`, `AGENTS.md` y `CLAUDE.md`; ambos docs de agentes indican que toda jerarquía visible debe usar `GreenhouseBreadcrumbs`.
+- **Verificación:** eslint focal, vitest focal `GreenhouseBreadcrumbs.test.tsx`, `pnpm design:lint`, `pnpm route-reachability-gate --strict`, GVC local `design-system-breadcrumbs` desktop+mobile (`.captures/2026-06-10T08-25-44_design-system-breadcrumbs`, `qualityFindings=[]`, 0 console/page/hydration/http failures) y re-GVC del shell DS (`.captures/2026-06-10T08-47-28_design-system`, `.captures/2026-06-10T08-47-28_design-system-breadcrumbs`, ambos con `qualityFindings=[]`, 0 console/page/hydration/http failures). `pnpm docs:closure-check` corrido; mantiene warnings globales por cambios paralelos ajenos en el worktree. Nota: `pnpm exec tsc --noEmit --pretty false` se intentó con `gtimeout 90s` y expiró sin salida; no se declara verde para el slice del shell.
 
 ---
 

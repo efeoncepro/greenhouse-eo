@@ -2,10 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import Link from 'next/link'
-
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { SxProps, Theme } from '@mui/material/styles'
@@ -21,8 +18,6 @@ import {
 } from '@/components/greenhouse/primitives'
 import { axisNeutral, axisRamp } from '@core/theme/axis-tokens'
 import { axisSemanticHex, axisSemanticPalette } from '@core/theme/axis-semantic'
-
-const DESIGN_SYSTEM_ROUTE = '/admin/design-system'
 
 type PreviewMode = 'light' | 'dark'
 type ButtonState = 'default' | 'hover' | 'active' | 'focus' | 'disabled'
@@ -450,16 +445,6 @@ const ButtonsLabView = () => (
           copiar referencias externas ni introducir otro theme.
         </Typography>
       </Stack>
-      <Button
-        component={Link}
-        href={DESIGN_SYSTEM_ROUTE}
-        variant='tonal'
-        color='secondary'
-        size='small'
-        startIcon={<i className='tabler-arrow-left' />}
-      >
-        Volver al sistema
-      </Button>
     </Box>
 
     <Box
