@@ -29,6 +29,9 @@ export const ROLE_ROUTE_GROUPS: Record<string, RouteGroup[]> = {
 
   [ROLE_CODES.PEOPLE_VIEWER]: ['people'],
   [ROLE_CODES.AI_TOOLING_ADMIN]: ['ai_tooling'],
+  // TASK-1072 — internal para el Design System + my para conservar la experiencia
+  // personal. DEBE igualar roles.route_group_scope del seed (parity TS↔DB, TASK-987).
+  [ROLE_CODES.DESIGNER]: ['internal', 'my'],
   [ROLE_CODES.COLLABORATOR]: ['my'],
   [ROLE_CODES.CLIENT_EXECUTIVE]: ['client'],
   [ROLE_CODES.CLIENT_MANAGER]: ['client'],

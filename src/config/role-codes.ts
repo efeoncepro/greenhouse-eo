@@ -12,6 +12,10 @@ export const ROLE_CODES = {
   EFEONCE_ACCOUNT: 'efeonce_account',
   PEOPLE_VIEWER: 'people_viewer',
   AI_TOOLING_ADMIN: 'ai_tooling_admin',
+  // TASK-1072 — operator del Design System interno (AXIS). Distingue quién OPERA
+  // el DS (vincula nodos Figma, futuras capabilities de tokens/specimens) de quién
+  // solo lo CONSUME. route_group_scope {internal,my}; parity en role-route-mapping.ts.
+  DESIGNER: 'designer',
   COLLABORATOR: 'collaborator',
   CLIENT_EXECUTIVE: 'client_executive',
   CLIENT_MANAGER: 'client_manager',
@@ -31,6 +35,7 @@ export const ROLE_PRIORITY: RoleCode[] = [
   ROLE_CODES.EFEONCE_ACCOUNT,
   ROLE_CODES.PEOPLE_VIEWER,
   ROLE_CODES.AI_TOOLING_ADMIN,
+  ROLE_CODES.DESIGNER,
   ROLE_CODES.COLLABORATOR,
   ROLE_CODES.CLIENT_EXECUTIVE,
   ROLE_CODES.CLIENT_MANAGER,
