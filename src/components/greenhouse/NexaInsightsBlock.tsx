@@ -29,7 +29,7 @@ import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRoot
 import NexaInsightsTimeline, {
   type NexaTimelineItem
 } from '@/components/greenhouse/NexaInsightsTimeline'
-import { GREENHOUSE_NEXA_BRAND_ASSETS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
+import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 import { buildNexaInsightDrillHref } from '@/lib/ico-engine/ai/nexa-insight-href'
 import type {
   NexaSignalLifecycleStatus,
@@ -141,6 +141,25 @@ const SEVERITY_ICON: Record<string, string> = {
 }
 
 const SEVERITY_ICON_UNKNOWN = 'tabler-help-circle'
+
+// Inline Nexa mark (arc + spark, no badge) — inlined here so we can size it freely
+// to the header height and tint the spark Midnight Navy. Colors from the brand SSOT.
+// Fills its wrapper, so callers control the size (responsive) via the parent Box.
+const NexaMark = () => (
+  <Box component='svg' viewBox='0 0 48 48' aria-hidden='true' sx={{ width: '100%', height: '100%', display: 'block' }}>
+    <path
+      d='M9 27 Q19 39 29 27'
+      fill='none'
+      stroke={GREENHOUSE_NEXA_BRAND_COLORS.electricTeal}
+      strokeWidth={4}
+      strokeLinecap='round'
+    />
+    <path
+      d='M34 9 C35 12.5 36.5 14 40 15 C36.5 16 35 17.5 34 21 C33 17.5 31.5 16 28 15 C31.5 14 33 12.5 34 9 Z'
+      fill={GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy}
+    />
+  </Box>
+)
 
 const STAGGER_ITEM = {
   hidden: { opacity: 0, y: 8 },
@@ -336,13 +355,9 @@ const NexaInsightsBlock = ({
         <Accordion disableGutters elevation={0} defaultExpanded={defaultExpanded}>
           <AccordionSummary expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box
-                component='img'
-                src={GREENHOUSE_NEXA_BRAND_ASSETS.mark}
-                alt=''
-                aria-hidden='true'
-                sx={{ flexShrink: 0, width: 28, height: 28, display: 'block' }}
-              />
+              <Box sx={{ flexShrink: 0, width: 28, height: 28 }}>
+                <NexaMark />
+              </Box>
               <Typography variant='h6'>{GH_NEXA.insights_title}</Typography>
               <CustomChip
                 round='true'
@@ -417,19 +432,15 @@ const NexaInsightsBlock = ({
   return (
     <Card elevation={0} data-capture='nexa-insights-block' sx={{ border: theme => `1px solid ${theme.palette.customColors.lightAlloy}` }}>
       <Box sx={{ p: { xs: 3, md: 5 } }}>
-        {/* Nexa agent header — the mark (no badge) anchors the panel as 'Nexa speaking' */}
-        <Stack direction='row' spacing={{ xs: 2, md: 3 }} alignItems='flex-start'>
-          <Box
-            component='img'
-            src={GREENHOUSE_NEXA_BRAND_ASSETS.mark}
-            alt=''
-            aria-hidden='true'
-            data-capture='nexa-agent-mark'
-            sx={{ flexShrink: 0, width: 56, height: 56, display: 'block' }}
-          />
+        {/* Nexa agent header — Nexa is the protagonist: the mark + the NAME lead;
+            the sentence is what Nexa says (supporting subtitle). */}
+        <Stack direction='row' spacing={{ xs: 2, md: 3 }} alignItems='center'>
+          <Box data-capture='nexa-agent-mark' sx={{ flexShrink: 0, width: { xs: 64, md: 92 }, height: { xs: 64, md: 92 } }}>
+            <NexaMark />
+          </Box>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Stack direction='row' spacing={1.5} alignItems='center' sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
-              <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+              <Typography variant='h3' sx={{ color: theme => theme.palette.customColors.midnight }}>
                 {GH_NEXA.agent_eyebrow}
               </Typography>
               <CustomChip
@@ -438,7 +449,7 @@ const NexaInsightsBlock = ({
                 variant='tonal'
                 color={chip.color}
                 label={chip.label}
-                sx={{ height: 20, fontSize: '0.64rem', fontWeight: 600 }}
+                sx={{ height: 22, fontSize: '0.68rem', fontWeight: 600 }}
               />
               {lastAnalysis && (
                 <Typography variant='caption' sx={{ color: 'text.disabled', display: { xs: 'none', sm: 'inline' } }}>
@@ -447,12 +458,12 @@ const NexaInsightsBlock = ({
               )}
             </Stack>
             <Typography
-              variant='h4'
-              sx={{ mt: 0.75, color: theme => theme.palette.customColors.midnight, textWrap: 'balance', maxWidth: '40ch' }}
+              variant='body1'
+              sx={{ mt: 0.75, color: 'text.secondary', textWrap: 'balance', maxWidth: '52ch' }}
             >
               {agentHeadline}
             </Typography>
-            <Typography variant='body2' sx={{ color: 'text.secondary', mt: 1 }}>
+            <Typography variant='caption' sx={{ display: 'block', color: 'text.disabled', mt: 0.75 }}>
               {GH_NEXA.agent_summary(totalAnalyzed, countWithActions)}
             </Typography>
           </Box>
