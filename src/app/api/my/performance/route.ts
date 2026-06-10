@@ -1,55 +1,63 @@
 import { NextResponse } from 'next/server'
 
+import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
+import { captureWithDomain } from '@/lib/observability/capture'
+import { composeMyPerformance, resolveCurrentSantiagoPeriod } from '@/lib/my-performance/dto'
 import { requireMyTenantContext } from '@/lib/tenant/authorization'
-import { getPersonIcoProfile } from '@/lib/person-360/get-person-ico-profile'
-import { getPersonOperationalServing } from '@/lib/person-360/get-person-operational-serving'
-import { readPersonIntelligence, readPersonIntelligenceTrend } from '@/lib/person-intelligence/store'
 
 export const dynamic = 'force-dynamic'
 
-const getCurrentSantiagoPeriod = () => {
-  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
-  const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
+const parsePeriodParam = (raw: string | null): number | null => {
+  if (raw === null) return null
+  const trimmed = raw.trim()
 
-  if (!match) {
-    const now = new Date()
+  if (trimmed === '') return null
+  const n = Number(trimmed)
 
-    return { year: now.getFullYear(), month: now.getMonth() + 1 }
-  }
-
-  return { year: Number(match[1]), month: Number(match[2]) }
+  return Number.isInteger(n) ? n : NaN
 }
 
-export async function GET() {
+/**
+ * GET /api/my/performance?year=YYYY&month=M — TASK-1027.
+ *
+ * Self-service performance surface. The subject is ALWAYS resolved from the
+ * session via `requireMyTenantContext()`. Any `memberId`/`identityProfileId`/
+ * target param the browser sends is ignored by construction (anti-IDOR).
+ * Returns a redacted DTO; cost/compensation fields are never composed in.
+ */
+export async function GET(request: Request) {
   const { tenant, memberId, errorResponse } = await requireMyTenantContext()
 
   if (!tenant || !memberId) {
-    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return errorResponse ?? canonicalErrorResponse('unauthorized')
+  }
+
+  // Only `year`/`month` are honored — subject is never client-supplied.
+  const { searchParams } = new URL(request.url)
+  const current = resolveCurrentSantiagoPeriod()
+  const yearParam = parsePeriodParam(searchParams.get('year'))
+  const monthParam = parsePeriodParam(searchParams.get('month'))
+
+  if (Number.isNaN(yearParam) || Number.isNaN(monthParam)) {
+    return canonicalErrorResponse('invalid_period')
+  }
+
+  const year = yearParam ?? current.year
+  const month = monthParam ?? current.month
+
+  if (year < 2024 || year > 2030 || month < 1 || month > 12) {
+    return canonicalErrorResponse('invalid_period')
   }
 
   try {
-    const { year, month } = getCurrentSantiagoPeriod()
+    const payload = await composeMyPerformance({ memberId, year, month })
 
-    const [ico, operational, intelligence, trend] = await Promise.allSettled([
-      getPersonIcoProfile(memberId, 6),
-      getPersonOperationalServing(memberId),
-      readPersonIntelligence(memberId, year, month),
-      readPersonIntelligenceTrend(memberId, 6)
-    ])
-
-    return NextResponse.json({
-      ico: ico.status === 'fulfilled' ? ico.value : null,
-      operational: operational.status === 'fulfilled' ? operational.value : null,
-      intelligence: intelligence.status === 'fulfilled' ? intelligence.value : null,
-      intelligenceTrend: trend.status === 'fulfilled' ? trend.value : [],
-      memberId
-    })
+    return NextResponse.json(payload)
   } catch (error) {
-    console.error('GET /api/my/performance failed:', error)
+    captureWithDomain(error, 'delivery', {
+      tags: { source: 'my_performance_route', stage: 'compose' }
+    })
 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    )
+    return canonicalErrorResponse('internal_error')
   }
 }

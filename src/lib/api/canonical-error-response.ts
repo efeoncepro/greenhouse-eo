@@ -51,6 +51,7 @@ export type CanonicalErrorCode =
   | 'client_tenant_required'
   // Generic input / throttle / server codes (Coming Soon notify + reusable).
   | 'invalid_email'
+  | 'invalid_period'
   | 'rate_limited'
   | 'internal_error'
   // Reserved for future canonical codes — extender aquí cuando emerjan
@@ -97,6 +98,11 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   invalid_email: {
     status: 422,
     message: 'Ingresa un correo válido (ej. nombre@empresa.com).',
+    actionable: true
+  },
+  invalid_period: {
+    status: 400,
+    message: 'El período solicitado no es válido. Usa un año entre 2024 y 2030 y un mes entre 1 y 12.',
     actionable: true
   },
   rate_limited: {
