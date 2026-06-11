@@ -54,6 +54,22 @@ El set de golden questions vive como **fixtures TS** en el repo (versionado, rev
 - **Resilience:** eval harness como regresión (eval-driven); degradación honesta si el índice falta (`baseline`/error sanitizado, no falso 0).
 - **Scalability:** GIN sobre tsvector escala a miles de chunks; vector es escalación aditiva, no rework; full-text antes de comprometer un substrato vectorial sin medir.
 
+## Delta 2026-06-11 — Full API Parity hardening (pre-execution)
+
+Aplicando el principio canónico **Full API Parity** (`GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`; arch-architect decisión #16: la UI es un cliente de contratos gobernados, no el source of truth). 5 endurecimientos para que la búsqueda nazca como **plataforma** (consumible por UI, Nexa, MCP, partners), no como un buscador acoplado a una pantalla:
+
+1. **Browse/list endpoint (la UI no puede bypassear el contrato).** Además de `search` + `documents/:id`, exponer `GET /api/platform/app/knowledge/documents` (list por `documentType`/`audience`/`publicationStatus`/`agenticPolicy`/`ownerDomain`, paginado). El Human Center (1084) **navega y filtra el corpus por este contrato**, nunca queryeando `knowledge_documents` directo. Reusa `listKnowledgeDocumentsByMetadata` (TASK-1081). Sin esto, 1084 forka su propia query → rompe parity + duplica el access control.
+
+2. **El reader es el ÚNICO punto de query del índice (access control centralizado = SSOT + seguridad).** `searchKnowledge` + los readers de documents son el único lugar que toca `knowledge_chunks`/`knowledge_documents` para lectura agéntica/búsqueda. NINGÚN consumer (1084 UI, 1085 Nexa, 1086 MCP) queryea las tablas directo — el **pre-LLM filtering vive en un solo lugar** (si se duplica, alguien lo olvida → fuga). Lint rule `greenhouse/no-direct-knowledge-chunk-query` (warn→error tras 1084/1085) que bloquee `SELECT ... knowledge_chunks` fuera de `src/lib/knowledge/search/**`. Defense-in-depth (#5) + Full API Parity (#16).
+
+3. **Contrato versionado `knowledge-search.v1`.** El packet declara `contractVersion: 'knowledge-search.v1'` (patrón TASK-672 Platform Health V1). Nexa/MCP/partners dependen de una forma estable; un cambio breaking de shape → `v2`, nunca mutación silenciosa. Sin versión, cada consumer machine se rompe ante cualquier ajuste del packet.
+
+4. **Path programático de consumers machine — declarado explícito (Full API Parity exige el path planificado).** Lane `app` (first-party: humano + agent session) = **esta task**. Lane `ecosystem` (`/api/platform/ecosystem/knowledge/*`, server-to-server / MCP) = **TASK-1086**, thin wrapper del **mismo** reader (cero lógica nueva). Por eso el reader se diseña **lane-agnóstico**: recibe `subject` (no `request`), retorna el packet — el endpoint (app o ecosystem) es solo el transporte.
+
+5. **Feedback como contrato compartido (no UI-only).** `knowledge.feedback.submit` (capability seedeada TASK-1081) → declarar `POST /api/platform/app/knowledge/feedback` (consume `recordKnowledgeFeedback`). El Human Center (1084) **y** Nexa (1085) capturan feedback **por el mismo contrato**, no cada uno el suyo. Se implementa donde primero se necesite (aquí o en 1084), pero el path queda declarado ahora (no nace UI-only).
+
+> Estos 5 + los 5 ajustes del Delta de revisión arquitectónica (substrato FTS, reader 2-modos, packet→columnas, signal a 1085, golden questions fixtures) son el contrato endurecido con el que arranca la implementación.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -154,8 +170,11 @@ Reglas obligatorias:
 
 ### Slice 2 — API Platform endpoints
 
-- `GET /api/platform/app/knowledge/search`
+- `GET /api/platform/app/knowledge/search` (packet versionado `knowledge-search.v1`)
+- `GET /api/platform/app/knowledge/documents` (browse/list por metadata, paginado — Delta Full API Parity #1)
 - `GET /api/platform/app/knowledge/documents/:id`
+- `POST /api/platform/app/knowledge/feedback` (contrato compartido humano+Nexa — Delta Full API Parity #5; implementar aquí o donde primero se necesite)
+- Lint rule `greenhouse/no-direct-knowledge-chunk-query` (reader = único query path — Delta Full API Parity #2)
 - Errores sanitizados, auth first-party y payload estable.
 
 ### Slice 3 — Golden questions
@@ -211,8 +230,10 @@ El response debe seguir el shape conceptual de `KnowledgeRetrievalPacket` docume
 
 ## Acceptance Criteria
 
-- [ ] `knowledge_search` devuelve citation packet acotado, filtrado y con confidence/freshness.
-- [ ] API Platform app endpoints existen y no usan Notion live.
+- [ ] `knowledge_search` devuelve citation packet acotado, filtrado y con confidence/freshness, versionado `knowledge-search.v1`.
+- [ ] API Platform app endpoints existen (search + browse/list + document/:id + feedback) y no usan Notion live.
+- [ ] El reader es el único query path del índice: la UI/Nexa/MCP consumen el contrato, no `knowledge_chunks` directo (Full API Parity #2; lint rule activa).
+- [ ] El reader es lane-agnóstico (recibe `subject`, no `request`) → TASK-1086 lo envuelve para `ecosystem`/MCP sin lógica nueva (Full API Parity #4).
 - [ ] Golden questions cubren fuente correcta, fuente equivocada, no-answer, stale/deprecated y sensitive escalation.
 - [ ] No hay embeddings/vector dependency en esta task.
 - [ ] Docs API/funcionales quedan actualizadas.
