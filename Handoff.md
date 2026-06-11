@@ -1,8 +1,12 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
-## Sesion 2026-06-11 — Knowledge Platform foundation en curso (TASK-1081, develop)
+## Sesion 2026-06-11 — Knowledge Platform foundation COMPLETA (TASK-1081, develop)
 
-- **TASK-1081 `in-progress`** en `develop` (sin branch, override del operador). Foundation persistente de Knowledge Platform.
+- **TASK-1081 `complete`** en `develop` (sin branch, override del operador). 3 slices verdes. Foundation persistente de Knowledge Platform.
+- **Slice 2 DONE (core + capabilities):** `src/lib/knowledge/` (barrel puro + store server-only, patrón TASK-790) + 5 capabilities `knowledge.*` (catalog + `capabilities_registry` migración `20260611201441449` + grants en runtime.ts + CaptureDomain `knowledge`). Verificado **live contra PG**: parity catalog⇆registry + full lifecycle (publish, transition trigger, chunks denormalizados, feedback append-only).
+- **Slice 3 DONE (triple doc):** arquitectura Delta (schema materializado) + `docs/documentation/plataforma/knowledge-platform.md` + `docs/manual-de-uso/plataforma/knowledge-platform.md` + CLAUDE.md invariantes (sección "Knowledge Platform foundation invariants") + índices de docs.
+- **Desbloquea TASK-1082..1086.** Próximo: TASK-1082 (ingesta Notion del corpus piloto hacia las tablas ya materializadas).
+- (histórico in-progress abajo)
 - **Synergy check clave:** `greenhouse_knowledge` NO es identidad paralela de `greenhouse_context` (Structured Context Layer). SCL = sidecar JSONB de memoria de agente/replay sobre aggregates; Knowledge = corpus de documentos prosa + chunks con gobernanza editorial. Boundary confirmado por el propio doc SCL (§900-906). Schema separado correcto.
 - **Slice 1 DONE (DDL):** migración `20260611200140700_task-1081-knowledge-core-schema.sql` aplicada en dev compartida (Cloud SQL). Schema `greenhouse_knowledge` + 6 tablas: `knowledge_sources`, `knowledge_documents`, `knowledge_document_versions`, `knowledge_chunks`, `knowledge_publication_runs` (anti-DELETE), `knowledge_feedback` (append-only). Dos dimensiones ortogonales `publication_status` × `agentic_policy` (decisión TASK-1080). Transition trigger en documents + touch updated_at + anti pre-up-marker DO block. `db.d.ts` regenerado (6 tablas). tsc verde.
 - **Decisiones de ejecución (refinamientos documentados):** tsvector/GIN diferido a TASK-1083 (search); outbox events diferidos (sin consumidor, audit via publication_runs); viewCode `plataforma.knowledge` diferido a TASK-1084 (nace con la página); capabilities `knowledge.*` SÍ se siembran aquí (SSOT, Slice 2). Patrón módulo = `query()` raw tipado (espejo TASK-790), no Kysely.

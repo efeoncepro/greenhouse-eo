@@ -1,0 +1,68 @@
+# Knowledge Platform — Foundation
+
+> **Tipo de documento:** Documentación funcional (lenguaje simple)
+> **Versión:** 1.0
+> **Creado:** 2026-06-11 por Claude (TASK-1081)
+> **Última actualización:** 2026-06-11 por Claude (TASK-1081)
+> **Documentación técnica:** [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md) · [GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md)
+
+## Qué es
+
+La **Knowledge Platform** es la capa de Greenhouse donde vive el conocimiento publicado: manuales, procedimientos, glosarios y runbooks que las personas leen para aprender a operar Greenhouse, y que Nexa usa para responder con citas (sin inventar).
+
+La idea base: **Notion sigue siendo el lugar donde se escribe el conocimiento; Greenhouse es el lugar gobernado donde se publica, versiona y consulta.**
+
+Esta página describe la **foundation** (TASK-1081): la base de datos donde ese conocimiento vivirá. Todavía **no** hay ingesta desde Notion, ni búsqueda, ni pantalla, ni conexión con Nexa — eso llega en tasks siguientes (TASK-1082 a 1086).
+
+## Qué guarda (en simple)
+
+| Cosa | Para qué sirve |
+| --- | --- |
+| **Fuente** (`knowledge_sources`) | De dónde viene el conocimiento (un teamspace de Notion, una colección de docs). |
+| **Documento** (`knowledge_documents`) | El artículo lógico ("Cómo preguntar a Nexa", "Glosario ICO"). |
+| **Versión** (`knowledge_document_versions`) | Cada vez que se publica el documento queda una foto inmutable, con su checksum. |
+| **Chunk** (`knowledge_chunks`) | El documento partido en pedazos pequeños para que Nexa recupere solo lo relevante y lo cite. |
+| **Run de publicación** (`knowledge_publication_runs`) | Bitácora de qué se publicó / puso en cuarentena / marcó viejo, y cuándo. No se borra. |
+| **Feedback** (`knowledge_feedback`) | Opiniones ("útil", "fuente equivocada", "está viejo") para mejorar el corpus. No se borra. |
+
+## Las dos preguntas que un documento responde por separado
+
+Un detalle importante del diseño: **el estado de un documento y el permiso de Nexa son dos cosas distintas** (no se mezclan).
+
+- **¿En qué etapa está el documento?** → `publication_status`: borrador → en revisión → publicado → (viejo / descontinuado). Y un estado especial, **cuarentena**, que lo bloquea para todos.
+- **¿Nexa lo puede usar?** → `agentic_policy`: permitido (`agent_allowed`) o excluido (`agent_excluded`).
+
+Por eso un documento puede estar **publicado y visible para las personas, pero fuera de Nexa** (ej. una política interna de seguridad). Y la cuarentena gana sobre todo: si un documento tiene un secreto o algo peligroso, no lo ve nadie — ni personas ni Nexa.
+
+> Detalle técnico: las dos dimensiones son columnas ortogonales con CHECK constraints separados. Las transiciones de `publication_status` se validan en un trigger de base de datos y en el helper TS `assertValidKnowledgePublicationTransition`. Ver `src/lib/knowledge/state-machine.ts`.
+
+## Quién puede qué (permisos)
+
+La foundation siembra 5 permisos (capabilities) del módulo `knowledge`:
+
+| Permiso | Para qué | Quién (MVP interno) |
+| --- | --- | --- |
+| `knowledge.document.read` | Leer documentos publicados | Equipo interno + admins |
+| `knowledge.document.publish` | Publicar/actualizar documentos | Equipo interno + admin |
+| `knowledge.source.admin` | Administrar las fuentes | Solo admin |
+| `knowledge.agentic.retrieve` | Que Nexa/MCP recuperen conocimiento | Equipo interno + admin |
+| `knowledge.feedback.submit` | Dejar feedback | Equipo interno + admin |
+
+En el MVP todo es **solo interno** — los clientes todavía no ven nada de la Knowledge Platform.
+
+## Qué NO es
+
+- **No es** la "memoria de runtime" de los agentes (eso es la *Structured Context Layer*, `greenhouse_context`, que guarda evidencia de ejecución en JSONB). La Knowledge Platform guarda **documentos de prosa para enseñar**.
+- **No es** el sync de métricas de Notion (delivery/ICO). Ese pipeline es separado.
+
+> Detalle técnico: separación de contextos en [GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md](../../architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md) §900-906.
+
+## Qué sigue
+
+- **TASK-1082** — ingesta del corpus piloto desde Notion (snapshot, normalizar, versionar, sanitizar).
+- **TASK-1083** — API de búsqueda + golden questions.
+- **TASK-1084** — el "Knowledge Center" humano en `/knowledge`.
+- **TASK-1085** — conexión de Nexa con citas.
+- **TASK-1086** — recursos MCP read-only.
+
+> Operación de la foundation (aplicar migración, usar los helpers): ver el [manual de uso](../../manual-de-uso/plataforma/knowledge-platform.md).

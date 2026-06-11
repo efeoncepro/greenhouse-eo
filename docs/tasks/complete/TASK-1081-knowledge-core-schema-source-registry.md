@@ -13,7 +13,7 @@ Aceptación cerrada por **TASK-1080** (ADR `Accepted (direction)`). Ajustes que 
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -164,24 +164,35 @@ El DDL debe ser additive-only, con claves estables, timestamps, actor/publisher 
 
 ## Acceptance Criteria
 
-- [ ] `greenhouse_knowledge` existe con tablas mínimas y constraints de states/audience/sensitivity/agent policy.
-- [ ] `src/lib/knowledge/` tiene tipos y helpers server-only cubiertos por tests.
-- [ ] No hay lectura Notion ni endpoints API en esta task.
-- [ ] Documentación técnica, funcional y manual/runbook quedan creadas o actualizadas.
+- [x] `greenhouse_knowledge` existe con tablas mínimas y constraints de states/audience/sensitivity/agent policy. → 6 tablas + CHECK enums (publication_status × agentic_policy ortogonales) + triggers, migración `20260611200140700` aplicada en dev.
+- [x] `src/lib/knowledge/` tiene tipos y helpers server-only cubiertos por tests. → barrel puro + store server-only; pure tests (state-machine + validators) + live PG test verdes.
+- [x] No hay lectura Notion ni endpoints API en esta task. → cero imports Notion, cero `route.ts`.
+- [x] Documentación técnica, funcional y manual/runbook quedan creadas o actualizadas. → arquitectura Delta + `docs/documentation/plataforma/knowledge-platform.md` + `docs/manual-de-uso/plataforma/knowledge-platform.md` + CLAUDE.md invariantes.
+
+## Delta 2026-06-11 — Closed (Slices 1-3, develop)
+
+Implementada en `develop` (sin branch, override del operador). 3 slices verdes.
+
+- **Slice 1 (DDL):** schema `greenhouse_knowledge` + 6 tablas (sources/documents/versions/chunks/publication_runs[anti-DELETE]/feedback[append-only]) + transition trigger + GRANTs. Migración `20260611200140700`. `db.d.ts` regenerado.
+- **Slice 2 (core + capabilities):** `src/lib/knowledge/` (barrel puro + store server-only, patrón TASK-790) + 5 capabilities `knowledge.*` (catalog + registry + grants + CaptureDomain). Migración `20260611201441449`. Verificado live: parity catalog⇆registry + full lifecycle.
+- **Slice 3 (docs):** arquitectura Delta + doc funcional + manual + CLAUDE.md invariantes + índices.
+
+**Refinamientos de ejecución (vs el alcance original):** viewCode `plataforma.knowledge` diferido a TASK-1084 (nace con la página); tsvector/GIN diferido a TASK-1083 (search); outbox diferido (sin consumidor; audit via publication_runs). Patrón `query()` raw tipado (no Kysely), espejo TASK-790. **Synergy check:** `greenhouse_knowledge` ≠ `greenhouse_context` (SCL) — boundary confirmado.
 
 ## Verification
 
-- `pnpm task:lint --task TASK-1081`
-- tests focales `src/lib/knowledge`
-- `pnpm docs:closure-check --staged`
+- `pnpm task:lint --task TASK-1081` ✓
+- tests focales `src/lib/knowledge` ✓ (pure + live PG)
+- `pnpm docs:closure-check --staged` ✓
+- `pnpm test` + `pnpm build` (gate de cierre) ✓
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con carpeta.
-- [ ] `docs/tasks/README.md` actualizado.
-- [ ] `Handoff.md` actualizado con migration/runtime state.
-- [ ] `changelog.md` actualizado.
-- [ ] Chequeo de impacto sobre `TASK-1082..1086`.
+- [x] `Lifecycle` sincronizado con carpeta. → `complete` + movido a `complete/`.
+- [x] `docs/tasks/README.md` actualizado.
+- [x] `Handoff.md` actualizado con migration/runtime state.
+- [x] `changelog.md` actualizado.
+- [x] Chequeo de impacto sobre `TASK-1082..1086`. → Deltas ya presentes (sesión TASK-1080); schema materializado desbloquea 1082/1083. Sin nuevo drift.
 
 ## Follow-ups
 

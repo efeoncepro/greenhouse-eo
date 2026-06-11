@@ -872,3 +872,42 @@ Mapeado a documentación existente (la ingesta real es TASK-1082; algunos requie
 | Q10 golden questions + approver | Diferido → TASK-1083 (por dominio del doc) |
 | Q11 feedback → tarea editorial vs retrieval | Diferido → TASK-1085 (feedback loop §12.7) |
 | Q12 link manuales `docs/manual-de-uso/` ↔ corpus | Resuelto en parte: tabla C los mapea; la ingesta canónica es TASK-1082 |
+
+## Delta 2026-06-11 — Schema materializado (TASK-1081)
+
+La foundation persistente ya está en el repo (additive, sin consumidores runtime hasta TASK-1082+).
+
+### Materializado
+
+- Migración `migrations/20260611200140700_task-1081-knowledge-core-schema.sql` — schema `greenhouse_knowledge` + 6 tablas.
+- Migración `migrations/20260611201441449_task-1081-knowledge-capabilities-registry-seed.sql` — 5 capabilities en `capabilities_registry`.
+- Runtime `src/lib/knowledge/` — barrel puro (`index.ts`) + `store.ts` server-only (patrón TASK-790/822).
+- Capabilities: `src/config/entitlements-catalog.ts` (módulo `knowledge` + 5 caps) + grants en `src/lib/entitlements/runtime.ts` + `CaptureDomain 'knowledge'`.
+
+### Tablas (`greenhouse_knowledge`)
+
+| Tabla | Rol | Notas |
+| --- | --- | --- |
+| `knowledge_sources` | Origen autorizado | `source_system`/`source_kind`, `audience`, `sync_enabled`, `secret_ref`. public_id `EO-KSRC-*`. |
+| `knowledge_documents` | Documento lógico | `publication_status` (lifecycle) **×** `agentic_policy` (compuerta) ortogonales; `document_type`, `sensitivity`, `slug` único, `current_version_id`. public_id `EO-KDOC-*`. |
+| `knowledge_document_versions` | Snapshot publicado | `version_number` UNIQUE por doc, `checksum`, `normalized_markdown`, `version_status`. |
+| `knowledge_chunks` | Unidad de retrieval | Denormaliza `audience`/`sensitivity`/`freshness`/`agentic_policy` para filtrado pre-LLM (TASK-1083); `heading_path[]`, `citation_anchor`, `token_estimate`, `allowed_scopes[]`. |
+| `knowledge_publication_runs` | Audit (anti-DELETE) | `run_kind`/`status`, forensic. |
+| `knowledge_feedback` | Feedback (append-only) | anti-UPDATE + anti-DELETE. |
+
+### Dos dimensiones ortogonales (corrige el enum mezclado de §8.4)
+
+- `publication_status`: `draft → review → published → stale → deprecated`; `quarantined` = bloqueo alcanzable desde cualquier estado (gana sobre todo). Transiciones enforced en trigger DB `knowledge_documents_validate_transition` **y** en `assertValidKnowledgePublicationTransition` (TS, mirror exacto).
+- `agentic_policy`: `agent_allowed | agent_excluded`. Independiente del lifecycle.
+
+### Refinamientos de la aceptación TASK-1080 (decisiones de ejecución)
+
+- **viewCode `plataforma.knowledge` → diferido a TASK-1084.** Nace con la página `/knowledge` (TASK-827: viewCode + routePath + page + nav juntos). Sembrarlo ahora sería una ruta huérfana 404.
+- **Full-text / tsvector / GIN → diferido a TASK-1083** (search API). La foundation indexa owner/kind/metadata (SCL learning §269: no GIN day-one). Los chunks guardan `body_text` plano.
+- **Outbox events → diferidos.** Sin consumidores hasta TASK-1082+. El audit leg es `knowledge_publication_runs` (append-only). `event-catalog` NO se tocó.
+- **Capabilities → sembradas aquí** (SSOT): catalog + registry + grants en el mismo PR (invariant TASK-873/935). Aún no `can()`-checked.
+- **Boundary con SCL confirmado:** `greenhouse_knowledge` ≠ `greenhouse_context` (Structured Context Layer). SCL = sidecar JSONB de memoria de agente/replay; Knowledge = corpus de prosa + chunks editorial. Ver STRUCTURED_CONTEXT_LAYER_V1 §900-906.
+
+### Verificación
+
+Migración aplicada en dev compartida (anti pre-up-marker DO blocks OK). Tests: pure (state-machine + validators) + live PG (`store.live.test.ts`: publish, transition trigger, chunks denormalizados, feedback append-only) + `parity.live.test` (catalog⇆registry) verdes. tsc + eslint limpios.
